@@ -904,13 +904,9 @@ global void AiInit(Player* player)
 	pai->AiType = ait;
 	pai->Script = ait->Script;
 
-	pai->Collect[TimeCost] = 0;
 	pai->Collect[GoldCost] = 50;
 	pai->Collect[WoodCost] = 50;
 	pai->Collect[OilCost] = 0;
-	pai->Collect[OreCost] = 0;
-	pai->Collect[StoneCost] = 0;
-	pai->Collect[CoalCost] = 0;
 
 	player->Ai = pai;
 }
