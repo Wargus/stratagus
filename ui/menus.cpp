@@ -55,7 +55,8 @@ local void GameMenuSave(void);
 local void GameMenuEnd(void);
 local void GameMenuReturn(void);
 
-local void StartMenusSetBackground(Menuitem *mi);
+local void PrgStartInit(Menuitem *mi);		// master init
+local void StartMenusSetBackground(Menuitem *mi);	
 local void NameLineDrawFunc(Menuitem *mi);
 local void EnterNameAction(Menuitem *mi, int key);
 local void EnterNameCancel(void);
@@ -78,7 +79,7 @@ local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
 local void ScenSelectCancel(void);
 
-local void GameSetupInit(Menuitem *mi);	// master init
+local void GameSetupInit(Menuitem *mi);		// master init
 local void GameDrawFunc(Menuitem *mi);
 
 local void GameRCSAction(Menuitem *mi, int i);
@@ -94,6 +95,8 @@ local void MultiGameSetupInit(Menuitem *mi);	// master init
 local void MultiGameDrawFunc(Menuitem *mi);
 local void MultiGameFWSAction(Menuitem *mi, int i);
 local void NetMultiPlayerDrawFunc(Menuitem *mi);
+local void MultiGamePlayerSelectorsUpdate(int initial);
+local void MultiScenSelectMenu(void);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -236,11 +239,11 @@ local Menuitem ScenSelectMenuItems[] = {
 **	Items for the Prg Start Menu
 */
 local Menuitem PrgStartMenuItems[] = {
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, NULL, NULL,
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL,
 	{ drawfunc:{ NameLineDrawFunc } } },
     { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, StartMenusSetBackground, NULL,
 	{ button:{ "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
-    { MI_TYPE_BUTTON, 208, 320 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
     { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'x'} } },
@@ -375,7 +378,7 @@ local Menuitem NetMultiSetupMenuItems[] = {
     { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL,
 	{ text:{ "~<Multi Player Setup~>", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
-	{ button:{ "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, ScenSelectMenu, 'e'} } },
+	{ button:{ "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, MultiScenSelectMenu, 'e'} } },
     { MI_TYPE_BUTTON, 640-224-16, 360+36, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'} } },
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
@@ -907,6 +910,19 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
     SetDefaultTextColors(nc, rc);
 }
 
+local void PrgStartInit(Menuitem *mi)	// Start menu master init
+{
+#ifdef NEW_NETMENUS
+    if (NetworkNumInterfaces == 0) {
+	mi[2].flags = MenuButtonDisabled;
+    } else {
+	mi[2].flags = 0;
+    }
+#else
+    mi[2].flags = MenuButtonDisabled;
+#endif
+}
+
 local void GameMenuReturn(void)
 {
     EndMenu();
@@ -948,6 +964,12 @@ local void ScenSelectMenu(void)
 	// FIXME: GetCmInfo();
     }
     ScenSelectPath[i] = 0;
+}
+
+local void MultiScenSelectMenu(void)
+{
+    ScenSelectMenu();
+    MultiGamePlayerSelectorsUpdate(1);
 }
 
 local void SinglePlayerGameMenu(void)
@@ -1412,20 +1434,21 @@ local void GameSetupInit(Menuitem *mi __attribute__((unused)))
 
 local void GameDrawFunc(Menuitem *mi)
 {
-    int nc, rc;
+    int nc, rc, l;
     char buffer[32];
 
     GetDefaultTextColors(&nc, &rc);
     StartMenusSetBackground(mi);
     SetDefaultTextColors(rc, rc);
+    l = TextLength(GameFont, "Scenario:");
     DrawText(OffsetX + 16, OffsetY + 360, GameFont, "Scenario:");
     DrawText(OffsetX + 16, OffsetY + 360+24 , GameFont, ScenSelectFileName);
     if (ScenSelectPudInfo) {
 	if (ScenSelectPudInfo->Description) {
-	    DrawText(OffsetX + 16, OffsetY + 360+24+24, GameFont, ScenSelectPudInfo->Description);
+	    DrawText(OffsetX + 16 + l + 8, OffsetY + 360, GameFont, ScenSelectPudInfo->Description);
 	}
-	sprintf(buffer, "%d x %d", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
-	DrawText(OffsetX + 16, OffsetY + 360+24+24+24, GameFont, buffer);
+	sprintf(buffer, " (%d x %d)", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
+	DrawText(OffsetX + 16+l+8+TextLength(GameFont, ScenSelectFileName), OffsetY + 360+24, GameFont, buffer);
     }
 #if 0
     for (n = j = 0; j < 16; j++) {
@@ -1485,17 +1508,46 @@ local void MultiGameDrawFunc(Menuitem *mi)
     GameDrawFunc(mi);
 }
 
-local void MultiGameSetupInit(Menuitem *mi)
+local void MultiGamePlayerSelectorsUpdate(int initial)
 {
-    int i;
+    int i, h, c;
 
-    GameSetupInit(mi);
+    /* FIXME: What this has to do:
+	analyze pudinfo for available slots, disable additional buttons - partially done
+	put names of net-connected players in _available_ slots
+    	announce changes by the game creator to connected clients
+    */
+    for (c = h = i = 0; i < 16; i++) {
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerHuman) {
+	    h++;
+	}
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
+	    c++;
+	}
+    }
+
     NetMultiSetupMenuItems[5] = NetMultiButtonStorage[1];
     NetMultiSetupMenuItems[5].yofs = 32;
     for (i = 1; i < 8; i++) {
 	NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[0];
 	NetMultiSetupMenuItems[5 + i].yofs = 32 + i * 22;
+	if (i >= h) {
+	    /* FIXME: This is wrong - avoid slots of net-connected player! */
+	    NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = 1;
+	}
+	if (i >= h + c) {
+	    NetMultiSetupMenuItems[5 + i].d.pulldown.defopt =
+		NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = 2;
+	    NetMultiSetupMenuItems[5 + i].flags = MenuButtonDisabled;
+	}
+	/* FIXME: don't forget to throw out additional players without available slots here! */
     }
+}
+
+local void MultiGameSetupInit(Menuitem *mi)
+{
+    GameSetupInit(mi);
+    MultiGamePlayerSelectorsUpdate(1);
 }
 
 local void NetMultiPlayerDrawFunc(Menuitem *mi)
@@ -1504,6 +1556,11 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 
     GetDefaultTextColors(&nc, &rc);
     SetDefaultTextColors(rc, rc);
+    /* FIXME: NetworkName has to be replaced by indexing Netplayer Names array
+	with mi - NetMultiSetupMenuItems - 5
+	to access the name of the local (game creator) or connected player.
+	also: further changes to implement client menu...
+    */
     DrawText(mi->xofs, mi->yofs, GameFont, NetworkName);
     SetDefaultTextColors(nc, rc);
 }
@@ -1858,6 +1915,11 @@ global void MenuHandleMouseMove(int x,int y)
 				mi->d.vslider.cursel |= MI_CFLAGS_KNOB;
 			    } else {
 				mi->d.vslider.cursel |= MI_CFLAGS_CONT;
+				if (j <= h) {
+				    mi->d.vslider.cursel |= MI_CFLAGS_UP;
+				} else {
+				    mi->d.vslider.cursel |= MI_CFLAGS_DOWN;
+				}
 			    }
 			}
 			if (mi->d.vslider.action) {
@@ -1936,6 +1998,9 @@ global void MenuHandleButtonDown(int b)
 			if (mi->d.listbox.action) {
 			    (*mi->d.listbox.action)(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 			}
+		    } else if (mi->d.listbox.handler) {
+			// double click support - maybe limit time!
+			(*mi->d.listbox.handler)();
 		    }
 		    break;
 		default:

@@ -175,19 +175,40 @@ global void CreateGame(char* filename, WorldMap* map)
     int i, j;
     char* s;
 
+    //
+    //	Network part 1 (port set-up)
+    //
+    InitNetwork1();
+
     if (filename == NULL) {
 	ProcessMenu(MENU_PRG_START, 1);
+	if( NetworkFildes!=-1 && NetPlayers<2 ) {
+	    ExitNetwork1();
+	}
+	
     } else {
-	s=NULL;
+	s = NULL;
 	if (filename[0] != '/' && filename[0] != '.') {
-	    s= filename = strdcat3(FreeCraftLibPath, "/", filename);
+	    s = strdcat3(FreeCraftLibPath, "/", filename);
 	}
 	//
 	//	Load the map.
 	//
-	LoadMap(filename, map);
-	if( s ) {
+	LoadMap(s, map);
+
+	if (s) {
 	    free(s);
+	}
+	
+	//
+	//	Network by command line
+	//
+	if( NetworkFildes!=-1 ) {
+	    if( NetPlayers>1 || NetworkArg ) {
+		InitNetwork2();
+	    } else {
+		ExitNetwork1();
+	    }
 	}
     }
 
@@ -216,17 +237,6 @@ global void CreateGame(char* filename, WorldMap* map)
 		}
 	    }
 	}
-    }
-
-    //
-    //	Network part
-    //
-    if( NetPlayers>1 || NetworkArg ) {	// with network
-	InitNetwork1();
-	InitNetwork2();
-    } else {
-	NetworkFildes=-1;
-	NetworkInSync=1;
     }
 
     //
