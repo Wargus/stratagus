@@ -58,7 +58,7 @@
 **	For gems: -1 == disabled, +1 == depressed, +2 checked,
 **	+3 checked+depressed
 */
-typedef unsigned MenuButtonId;
+typedef int MenuButtonId;
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
@@ -97,16 +97,16 @@ typedef struct _menuitem_text_ {
 } MenuitemText;
 typedef struct _menuitem_button_ {
     unsigned char *text;
-    unsigned int xsize;
-    unsigned int ysize;
+    int xsize;
+    int ysize;
     MenuButtonId button;
     void (*handler)(void);
-    int hotkey;
+    unsigned hotkey;
 } MenuitemButton;
 typedef struct _menuitem_pulldown_ {
     unsigned char **options;
-    unsigned int xsize;
-    unsigned int ysize;
+    int xsize;
+    int ysize;
     MenuButtonId button;
     void (*action)(struct _menuitem_ *, int);
     int noptions;
@@ -117,8 +117,8 @@ typedef struct _menuitem_pulldown_ {
 } MenuitemPulldown;
 typedef struct _menuitem_listbox_ {
     void *options;
-    unsigned int xsize;
-    unsigned int ysize;
+    int xsize;
+    int ysize;
     MenuButtonId button;
     void (*action)(struct _menuitem_ *, int);
     int noptions;
@@ -133,8 +133,8 @@ typedef struct _menuitem_listbox_ {
 } MenuitemListbox;
 typedef struct _menuitem_vslider_ {
     unsigned cflags;
-    unsigned int xsize;	// x-size of slider, not including buttons
-    unsigned int ysize;	// y-size of slider, not including buttons
+    int xsize;		// x-size of slider, not including buttons
+    int ysize;		// y-size of slider, not including buttons
     void (*action)(struct _menuitem_ *, int);
     int defper;
     int percent;	// percent of the way to bottom (0 to 100)
@@ -144,8 +144,8 @@ typedef struct _menuitem_vslider_ {
 } MenuitemVslider;
 typedef struct _menuitem_hslider_ {
     unsigned cflags;
-    unsigned int xsize; // x-size of slider, not including buttons
-    unsigned int ysize; // y-size of slider, not including buttons
+    int xsize;		// x-size of slider, not including buttons
+    int ysize;		// y-size of slider, not including buttons
     void (*action)(struct _menuitem_ *, int);
     int defper;
     int percent;	// percent of the way to right (0 to 100)
@@ -158,8 +158,8 @@ typedef struct _menuitem_drawfunc_ {
 } MenuitemDrawfunc;
 typedef struct _menuitem_input_ {
     unsigned char *buffer;
-    unsigned int xsize;
-    unsigned int ysize;
+    int xsize;
+    int ysize;
     MenuButtonId button;
     void (*action)(struct _menuitem_ *, int);	/* for key */
     int nch;
@@ -167,8 +167,8 @@ typedef struct _menuitem_input_ {
 } MenuitemInput;
 typedef struct _menuitem_gem_ {
     unsigned int state;
-    unsigned int xsize;
-    unsigned int ysize;
+    int xsize;
+    int ysize;
     MenuButtonId button;
     void (*action)(struct _menuitem_ *);
 } MenuitemGem;
@@ -235,10 +235,10 @@ typedef struct _menuitem_ {
 */
 typedef struct _menus_ {
     // FIXME: char* Name;			/// menu name
-    unsigned int x;			/// menu area x pos
-    unsigned int y;			/// menu area y pos
-    unsigned int xsize;			/// menu area x size
-    unsigned int ysize;			/// menu area y size
+    int x;				/// menu area x pos
+    int y;				/// menu area y pos
+    int xsize;				/// menu area x size
+    int ysize;				/// menu area y size
     int	image;				/// optional background panel image #
     int defsel;				/// initial selected item number (or -1)
     int nitems;				/// number of items to follow
@@ -286,7 +286,7 @@ extern void InitMenus(int race);
     /// Draw menu
 extern void DrawMenu(Menu *menu);
     /// Draw menu button
-extern void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigned h,unsigned x,unsigned y,const int font,const unsigned char *text);
+extern void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,int y,const int font,const unsigned char *text);
     /// Set menu backgound and draw it
 extern void MenusSetBackground(void);
     /// Draw and process a menu
