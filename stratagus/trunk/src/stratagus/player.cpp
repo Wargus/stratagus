@@ -10,7 +10,7 @@
 //
 /**@name player.c	-	The players. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -249,7 +249,7 @@ global void SavePlayers(FILE* file)
     //
     //	Dump local variables
     //
-    fprintf(file,"(this-player %d)\n\n",ThisPlayer->Player);
+    fprintf(file,"(set-this-player! %d)\n\n",ThisPlayer->Player);
 }
 
 /**
