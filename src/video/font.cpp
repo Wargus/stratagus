@@ -91,11 +91,11 @@ local char* DefaultNormalColorIndex;
 local char* DefaultReverseColorIndex;
 
     /// Draw character with current video depth.
-local void (*VideoDrawChar)(const Graphic*,int,int,int,int,int,int);
+local void (*VideoDrawChar)(const Graphic*, int, int, int, int, int, int);
 
 #ifdef USE_OPENGL
     /// Font bitmaps
-local GLubyte *FontBitmaps[MaxFonts][NumFontColors];
+local GLubyte* FontBitmaps[MaxFonts][NumFontColors];
     /// Font bitmap widths
 local int FontBitmapWidths[MaxFonts];
     /// Current font
@@ -105,7 +105,7 @@ local int CurrentFont;
 /**
 **	FIXME: should use the names of the real fonts.
 */
-global char *FontNames[] = {
+global char* FontNames[] = {
     "small",
     "game",
     "large",
@@ -136,7 +136,7 @@ global char *FontNames[] = {
 **	@param y	Y screen position
 */
 local void VideoDrawChar8(const Graphic* sprite,
-	int gx,int gy,int w,int h,int x,int y)
+    int gx, int gy, int w, int h, int x, int y)
 {
     int p;
     const unsigned char* sp;
@@ -146,35 +146,35 @@ local void VideoDrawChar8(const Graphic* sprite,
     VMemType8* dp;
     int da;
 
-    sp=(const unsigned char*)sprite->Frames+gx+gy*sprite->Width-1;
-    gp=sp+sprite->Width*h;
-    sa=sprite->Width-w;
-    dp=VideoMemory8+x+y*VideoWidth-1;
-    da=VideoWidth-w;
+    sp = (const unsigned char*)sprite->Frames + gx + gy * sprite->Width - 1;
+    gp = sp + sprite->Width * h;
+    sa = sprite->Width - w;
+    dp = VideoMemory8 + x + y * VideoWidth - 1;
+    da = VideoWidth - w;
     --w;
     
 #define UNROLL \
     ++dp; \
-    p=*++sp; \
-    if (p!=255) { \
-	if( p<NumFontColors ) { \
-	    *dp=FontPixels8[p]; \
+    p = *++sp; \
+    if (p != 255) { \
+	if (p < NumFontColors) { \
+	    *dp = FontPixels8[p]; \
 	} else { \
-	    *dp=((VMemType8*)sprite->Pixels)[p]; \
+	    *dp = ((VMemType8*)sprite->Pixels)[p]; \
 	} \
     }
 
-    while( sp<gp ) {
-	lp=sp+w;
-	while( sp<lp ) {		// loop with unroll
+    while (sp < gp) {
+	lp = sp + w;
+	while (sp < lp) {		// loop with unroll
 	    UNROLL;
 	    UNROLL;
 	}
-	if( sp<=lp ) {
+	if (sp <= lp) {
 	    UNROLL;
 	}
-	sp+=sa;
-	dp+=da;
+	sp += sa;
+	dp += da;
     }
 #undef UNROLL
 }
@@ -191,7 +191,7 @@ local void VideoDrawChar8(const Graphic* sprite,
 **	@param y	Y screen position
 */
 local void VideoDrawChar16(const Graphic* sprite,
-	int gx,int gy,int w,int h,int x,int y)
+    int gx, int gy, int w, int h, int x, int y)
 {
     int p;
     const unsigned char* sp;
@@ -201,35 +201,35 @@ local void VideoDrawChar16(const Graphic* sprite,
     VMemType16* dp;
     int da;
 
-    sp=(const unsigned char*)sprite->Frames+gx+gy*sprite->Width-1;
-    gp=sp+sprite->Width*h;
-    sa=sprite->Width-w;
-    dp=VideoMemory16+x+y*VideoWidth-1;
-    da=VideoWidth-w;
+    sp = (const unsigned char*)sprite->Frames + gx + gy * sprite->Width - 1;
+    gp = sp + sprite->Width * h;
+    sa = sprite->Width - w;
+    dp = VideoMemory16 + x + y * VideoWidth - 1;
+    da = VideoWidth - w;
     --w;
 
 #define UNROLL \
     ++dp; \
-    p=*++sp; \
-    if (p!=255) { \
-	if( p<NumFontColors ) { \
-	    *dp=FontPixels16[p]; \
+    p = *++sp; \
+    if (p != 255) { \
+	if (p < NumFontColors) { \
+	    *dp = FontPixels16[p]; \
 	} else { \
-	    *dp=((VMemType16*)sprite->Pixels)[p]; \
+	    *dp = ((VMemType16*)sprite->Pixels)[p]; \
 	} \
     }
 
-    while( sp<gp ) {
-	lp=sp+w;
-	while( sp<lp ) {		// loop with unroll
+    while (sp < gp) {
+	lp = sp + w;
+	while (sp < lp) {		// loop with unroll
 	    UNROLL;
 	    UNROLL;
 	}
-	if( sp<=lp ) {
+	if (sp <= lp) {
 	    UNROLL;
 	}
-	sp+=sa;
-	dp+=da;
+	sp += sa;
+	dp += da;
     }
 #undef UNROLL
 }
@@ -246,7 +246,7 @@ local void VideoDrawChar16(const Graphic* sprite,
 **	@param y	Y screen position
 */
 local void VideoDrawChar24(const Graphic* sprite,
-	int gx,int gy,int w,int h,int x,int y)
+    int gx, int gy, int w, int h, int x, int y)
 {
     int p;
     const unsigned char* sp;
@@ -256,35 +256,35 @@ local void VideoDrawChar24(const Graphic* sprite,
     VMemType24* dp;
     int da;
 
-    sp=(const unsigned char*)sprite->Frames+gx+gy*sprite->Width-1;
-    gp=sp+sprite->Width*h;
-    sa=sprite->Width-w;
-    dp=VideoMemory24+x+y*VideoWidth-1;
-    da=VideoWidth-w;
+    sp = (const unsigned char*)sprite->Frames + gx + gy * sprite->Width - 1;
+    gp = sp + sprite->Width * h;
+    sa = sprite->Width - w;
+    dp = VideoMemory24 + x + y * VideoWidth - 1;
+    da = VideoWidth - w;
     --w;
 
 #define UNROLL \
     ++dp; \
-    p=*++sp; \
-    if (p!=255) { \
-	if( p<NumFontColors ) { \
-	    *dp=FontPixels24[p]; \
+    p = *++sp; \
+    if (p != 255) { \
+	if (p < NumFontColors) { \
+	    *dp = FontPixels24[p]; \
 	} else { \
-	    *dp=((VMemType24*)sprite->Pixels)[p]; \
+	    *dp = ((VMemType24*)sprite->Pixels)[p]; \
 	} \
     }
 
-    while( sp<gp ) {
-	lp=sp+w;
-	while( sp<lp ) {		// loop with unroll
+    while (sp < gp) {
+	lp = sp + w;
+	while (sp < lp) {		// loop with unroll
 	    UNROLL;
 	    UNROLL;
 	}
-	if( sp<=lp ) {
+	if (sp <= lp) {
 	    UNROLL;
 	}
-	sp+=sa;
-	dp+=da;
+	sp += sa;
+	dp += da;
     }
 #undef UNROLL
 }
@@ -301,7 +301,7 @@ local void VideoDrawChar24(const Graphic* sprite,
 **	@param y	Y screen position
 */
 local void VideoDrawChar32(const Graphic* sprite,
-	int gx,int gy,int w,int h,int x,int y)
+    int gx, int gy, int w, int h, int x, int y)
 {
     int p;
     const unsigned char* sp;
@@ -311,35 +311,35 @@ local void VideoDrawChar32(const Graphic* sprite,
     VMemType32* dp;
     int da;
 
-    sp=(const unsigned char*)sprite->Frames+gx+gy*sprite->Width-1;
-    gp=sp+sprite->Width*h;
-    sa=sprite->Width-w;
-    dp=VideoMemory32+x+y*VideoWidth-1;
-    da=VideoWidth-w;
+    sp = (const unsigned char*)sprite->Frames + gx + gy * sprite->Width - 1;
+    gp = sp + sprite->Width * h;
+    sa = sprite->Width - w;
+    dp = VideoMemory32 + x + y * VideoWidth - 1;
+    da = VideoWidth - w;
     --w;
 
 #define UNROLL \
     ++dp; \
-    p=*++sp; \
-    if (p!=255) { \
-	if( p<NumFontColors ) { \
-	    *dp=FontPixels32[p]; \
+    p = *++sp; \
+    if (p != 255) { \
+	if (p < NumFontColors) { \
+	    *dp = FontPixels32[p]; \
 	} else { \
-	    *dp=((VMemType32*)sprite->Pixels)[p]; \
+	    *dp = ((VMemType32*)sprite->Pixels)[p]; \
 	} \
     }
 
-    while( sp<gp ) {
-	lp=sp+w;
-	while( sp<lp ) {		// loop with unroll
+    while (sp < gp) {
+	lp = sp + w;
+	while (sp < lp) {		// loop with unroll
 	    UNROLL;
 	    UNROLL;
 	}
-	if( sp<=lp ) {
+	if (sp <= lp) {
 	    UNROLL;
 	}
-	sp+=sa;
-	dp+=da;
+	sp += sa;
+	dp += da;
     }
 #undef UNROLL
 }
@@ -357,39 +357,42 @@ local void VideoDrawChar32(const Graphic* sprite,
 **	@param y	Y screen position
 */
 local void VideoDrawCharOpenGL(const Graphic* sprite,
-	int gx,int gy,int w,int h,int x,int y)
+    int gx, int gy, int w, int h, int x, int y)
 {
     Palette c;
     int i;
 
     glDisable(GL_TEXTURE_2D);
 
-    for( i=0; i<NumFontColors; ++i ) {
-	//c=FontPixels[i];
-	memcpy(&c,FontPixels+i,sizeof(Palette));
-	glColor3ub(c.r,c.g,c.b);
-	glRasterPos2i(x,VideoHeight-y-h);
-	glBitmap(FontBitmapWidths[CurrentFont]*8,h,
-	    0.0f,0.0f,0.0f,0.0f,
-	    FontBitmaps[CurrentFont][i]+(gy+Fonts[CurrentFont].Height-h)*FontBitmapWidths[CurrentFont]);
+    for (i = 0; i < NumFontColors; ++i) {
+	//c = FontPixels[i];
+	memcpy(&c, FontPixels + i, sizeof(Palette));
+	glColor3ub(c.r, c.g, c.b);
+	glRasterPos2i(x, VideoHeight - y - h);
+	glBitmap(FontBitmapWidths[CurrentFont] * 8, h,
+	    0.0f, 0.0f, 0.0f, 0.0f,
+	    FontBitmaps[CurrentFont][i] + (gy + Fonts[CurrentFont].Height - h) * FontBitmapWidths[CurrentFont]);
     }
 
     glEnable(GL_TEXTURE_2D);
 }
 #endif
 
+/**
+**	FIXME: docu
+*/
 local const VMemType* GetFontColorMapping(char* color)
 {
     FontColorMapping* fcm;
 
-    fcm=FontColorMappings;
-    while( fcm ) {
-	if( !strcmp(fcm->Color,color) ) {
+    fcm = FontColorMappings;
+    while (fcm) {
+	if (!strcmp(fcm->Color, color)) {
 	    return fcm->Pixels;
 	}
-	fcm=fcm->Next;
+	fcm = fcm->Next;
     }
-    fprintf(stderr,"Font mapping not found: '%s'\n",color);
+    fprintf(stderr, "Font mapping not found: '%s'\n", color);
     ExitFatal(1);
     return NULL;
 }
@@ -400,12 +403,12 @@ local const VMemType* GetFontColorMapping(char* color)
 **	@param normal	Normal text color.
 **	@param reverse	Reverse text color.
 */
-global void SetDefaultTextColors(char* normal,char* reverse)
+global void SetDefaultTextColors(char* normal, char* reverse)
 {
-    DefaultNormalColorIndex=normal;
-    DefaultReverseColorIndex=reverse;
-    LastTextColor=DefaultTextColor=FontPixels=GetFontColorMapping(normal);
-    ReverseTextColor=GetFontColorMapping(reverse);
+    DefaultNormalColorIndex = normal;
+    DefaultReverseColorIndex = reverse;
+    LastTextColor = DefaultTextColor = FontPixels = GetFontColorMapping(normal);
+    ReverseTextColor = GetFontColorMapping(reverse);
 }
 
 /**
@@ -414,10 +417,10 @@ global void SetDefaultTextColors(char* normal,char* reverse)
 **	@param normalp	Normal text color pointer.
 **	@param reversep	Reverse text color pointer.
 */
-global void GetDefaultTextColors(char** normalp,char** reversep)
+global void GetDefaultTextColors(char** normalp, char** reversep)
 {
-    *normalp=DefaultNormalColorIndex;
-    *reversep=DefaultReverseColorIndex;
+    *normalp = DefaultNormalColorIndex;
+    *reversep = DefaultReverseColorIndex;
 }
 
 /**
@@ -428,23 +431,23 @@ global void GetDefaultTextColors(char** normalp,char** reversep)
 **
 **	@return		The length in pixels of the text.
 */
-global int VideoTextLength(unsigned font,const unsigned char* text)
+global int VideoTextLength(unsigned font, const unsigned char* text)
 {
     int width;
     const unsigned char* s;
     const char* widths;
 
-    widths=Fonts[font].CharWidth;
-    for( width=0,s=text; *s; ++s ) {
-	if( *s=='~' )  {
-	    if( !*++s ) {		// bad formated string
+    widths = Fonts[font].CharWidth;
+    for (width = 0, s = text; *s; ++s) {
+	if (*s == '~') {
+	    if (!*++s) {		// bad formated string
 		break;
 	    }
-	    if( *s!='~' ) {		// ~~ -> ~
+	    if (*s != '~') {		// ~~ -> ~
 		continue;
 	    }
 	}
-	width+=widths[*s-32]+1;
+	width += widths[*s - 32] + 1;
     }
     return width;
 }
@@ -472,12 +475,14 @@ global int VideoTextHeight(unsigned font)
 **	@param x	X screen position
 **	@param y	Y screen position
 */
-local void VideoDrawCharClip(const Graphic* graphic,int gx,int gy,int w,int h,
-	int x,int y)
+local void VideoDrawCharClip(const Graphic* graphic, int gx, int gy, int w, int h,
+    int x, int y)
 {
-    int ox,oy,ex;
-    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
-    VideoDrawChar(graphic,gx+ox,gy+oy,w,h,x,y);
+    int ox;
+    int oy;
+    int ex;
+    CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
+    VideoDrawChar(graphic, gx + ox, gy + oy, w, h, x, y);
 }
 
 /**
@@ -497,8 +502,8 @@ local void VideoDrawCharClip(const Graphic* graphic,int gx,int gy,int w,int h,
 **
 **	@return		The length of the printed text.
 */
-local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
-	int clip)
+local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
+    int clip)
 {
     int w;
     int height;
@@ -507,23 +512,23 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
     const VMemType* rev;
     char* color;
     const unsigned char* p;
-    void (*DrawChar)(const Graphic*,int,int,int,int,int,int);
+    void (*DrawChar)(const Graphic*, int, int, int, int, int, int);
 
 #ifdef USE_OPENGL
-    CurrentFont=font;
+    CurrentFont = font;
 #endif
 
-    if( clip ) {
-	DrawChar=VideoDrawCharClip;
+    if (clip) {
+	DrawChar = VideoDrawCharClip;
     } else {
-	DrawChar=VideoDrawChar;
+	DrawChar = VideoDrawChar;
     }
 
-    fp=Fonts+font;
-    height=fp->Height;
-    for( rev=NULL,widths=0; *text; ++text ) {
-	if( *text=='~' ) {
-	    switch( *++text ) {
+    fp = Fonts + font;
+    height = fp->Height;
+    for (rev = NULL, widths = 0; *text; ++text) {
+	if (*text == '~') {
+	    switch (*++text) {
 		case '\0':		// wrong formated string.
 		    DebugLevel0Fn("oops, format your ~\n");
 		    return widths;
@@ -531,52 +536,52 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 		    break;
 		case '!':
 		    rev=FontPixels;
-		    FontPixels=ReverseTextColor;
+		    FontPixels = ReverseTextColor;
 		    ++text;
 		    break;
 		case '<':
-		    LastTextColor=FontPixels;
-		    FontPixels=ReverseTextColor;
+		    LastTextColor = FontPixels;
+		    FontPixels = ReverseTextColor;
 		    continue;
 		case '>':
-		    rev=LastTextColor;	// swap last and current color
-		    LastTextColor=FontPixels;
-		    FontPixels=rev;
+		    rev = LastTextColor;	// swap last and current color
+		    LastTextColor = FontPixels;
+		    FontPixels = rev;
 		    continue;
 
 		default:
-		    p=text;
-		    while( *p && *p!='~' ) {
+		    p = text;
+		    while (*p && *p!='~') {
 			++p;
 		    }
-		    if( !*p ) {
+		    if (!*p) {
 			DebugLevel0Fn("oops, format your ~\n");
 			return widths;
 		    }
-		    color=malloc(p-text+1);
-		    memcpy(color,text,p-text);
-		    color[p-text]='\0';
-		    text=p;
-		    LastTextColor=FontPixels;
-		    FontPixels=GetFontColorMapping(color);
+		    color = malloc(p - text + 1);
+		    memcpy(color, text, p - text);
+		    color[p - text] = '\0';
+		    text = p;
+		    LastTextColor = FontPixels;
+		    FontPixels = GetFontColorMapping(color);
 		    free(color);
 		    continue;
 	    }
 	}
 
-	DebugCheck( *text<32 );
+	DebugCheck(*text < 32);
 
-	if( *text-32>=0 && height*(*text-32)<fp->Graphic->Height ) {
-	    w=fp->CharWidth[*text-32];
-	    DrawChar(fp->Graphic,0,height*(*text-32),w,height,x+widths,y);
+	if (*text - 32 >= 0 && height * (*text - 32) < fp->Graphic->Height) {
+	    w = fp->CharWidth[*text - 32];
+	    DrawChar(fp->Graphic, 0, height * (*text - 32), w, height, x + widths, y);
 	} else {
 	    w=fp->CharWidth[0];
-	    DrawChar(fp->Graphic,0,height*0,w,height,x+widths,y);
+	    DrawChar(fp->Graphic, 0, height * 0, w, height, x + widths, y);
 	}
-	widths+=w+1;
-	if( rev ) {
-	    FontPixels=rev;
-	    rev=NULL;
+	widths += w + 1;
+	if (rev) {
+	    FontPixels = rev;
+	    rev = NULL;
 	}
     }
 
@@ -600,9 +605,10 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 **
 **	@return		The length of the printed text.
 */
-global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
+global int VideoDrawText(int x, int y, unsigned font,
+    const unsigned char* text)
 {
-    return DoDrawText(x,y,font,text,0);
+    return DoDrawText(x, y, font, text, 0);
 }
 
 /**
@@ -612,10 +618,10 @@ global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
 **
 **	@return		The length of the printed text.
 */
-global int VideoDrawTextClip(int x,int y,unsigned font,
-			     const unsigned char* text)
+global int VideoDrawTextClip(int x, int y, unsigned font,
+    const unsigned char* text)
 {
-    return DoDrawText(x,y,font,text,1);
+    return DoDrawText(x, y, font, text, 1);
 }
 
 /**
@@ -630,14 +636,14 @@ global int VideoDrawTextClip(int x,int y,unsigned font,
 **
 **	@return		The length of the printed text.
 */
-global int VideoDrawReverseText(int x,int y,unsigned font,
-	const unsigned char* text)
+global int VideoDrawReverseText(int x, int y, unsigned font,
+    const unsigned char* text)
 {
     int w;
 
-    FontPixels=ReverseTextColor;
-    w=VideoDrawText(x,y,font,text);
-    FontPixels=DefaultTextColor;
+    FontPixels = ReverseTextColor;
+    w = VideoDrawText(x, y, font, text);
+    FontPixels = DefaultTextColor;
 
     return w;
 }
@@ -654,15 +660,15 @@ global int VideoDrawReverseText(int x,int y,unsigned font,
 **
 **	@return		The length of the printed text.
 */
-global int VideoDrawTextCentered(int x,int y,unsigned font,
-	const unsigned char* text)
+global int VideoDrawTextCentered(int x, int y, unsigned font,
+    const unsigned char* text)
 {
     int dx;
 
-    dx=VideoTextLength(font,text);
-    VideoDrawText(x-dx/2,y,font,text);
+    dx = VideoTextLength(font, text);
+    VideoDrawText(x - dx / 2, y, font, text);
 
-    return dx/2;
+    return dx / 2;
 }
 
 /**
@@ -705,12 +711,12 @@ global int VideoDrawNumber(int x, int y, unsigned font, int number)
 **
 **	@return		The length of the printed text.
 */
-global int VideoDrawNumberClip(int x,int y,unsigned font,int number)
+global int VideoDrawNumberClip(int x, int y, unsigned font, int number)
 {
-    char buf[sizeof(int)*10+2];
+    char buf[sizeof(int) * 10 + 2];
 
-    sprintf(buf,"%d",number);
-    return VideoDrawTextClip(x,y,font,buf);
+    sprintf(buf, "%d", number);
+    return VideoDrawTextClip(x, y, font, buf);
 }
 
 /**
@@ -723,12 +729,12 @@ global int VideoDrawNumberClip(int x,int y,unsigned font,int number)
 **
 **	@return		The length of the printed text.
 */
-global int VideoDrawReverseNumber(int x,int y,unsigned font,int number)
+global int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
 {
-    char buf[sizeof(int)*10+2];
+    char buf[sizeof(int) * 10 + 2];
 
-    sprintf(buf,"%d",number);
-    return VideoDrawReverseText(x,y,font,buf);
+    sprintf(buf, "%d", number);
+    return VideoDrawReverseText(x, y, font, buf);
 }
 
 /**
@@ -737,7 +743,7 @@ global int VideoDrawReverseNumber(int x,int y,unsigned font,int number)
 // FIXME: ARI: This is runtime and fairly slow!
 // FIXME: ARI: Maybe integrate into wartool and load from file!
 */
-local void FontMeasureWidths(ColorFont * fp)
+local void FontMeasureWidths(ColorFont* fp)
 {
     int y;
     const unsigned char *sp;
@@ -776,40 +782,41 @@ local void FontMeasureWidths(ColorFont * fp)
 **	Make font bitmap.
 */
 #ifdef USE_OPENGL
-local void MakeFontBitmap(Graphic *g,int font)
+local void MakeFontBitmap(Graphic* g, int font)
 {
     int i;
     int j;
     int k;
-    GLubyte *c;
+    GLubyte* c;
     GLubyte x;
-    const unsigned char *sp;
+    const unsigned char* sp;
     int numfonts;
     int n;
 
-    FontBitmapWidths[font] = (g->Width+7)/8;
+    FontBitmapWidths[font] = (g->Width + 7) / 8;
 
-    for( n=0; n<NumFontColors; ++n ) {
-	if( FontBitmaps[font][n] ) {
+    for (n=0; n < NumFontColors; ++n) {
+	if (FontBitmaps[font][n]) {
 	    free(FontBitmaps[font][n]);
 	}
-	FontBitmaps[font][n] = (GLubyte*)malloc(FontBitmapWidths[font]*g->Height);
+	FontBitmaps[font][n] = (GLubyte*)malloc(FontBitmapWidths[font] * g->Height);
 
 	sp = (const unsigned char*)g->Frames;
 	x = 0;
-	numfonts=g->Height/Fonts[font].Height;
-	for( k=0; k<numfonts; ++k ) {
-	    for( i=0; i<Fonts[font].Height; ++i ) {
-		c = FontBitmaps[font][n] + k*Fonts[font].Height*FontBitmapWidths[font] + (Fonts[font].Height-1-i)*FontBitmapWidths[font];
-		for( j=0; j<g->Width; ++j ) {
-		    if( *sp == n ) {
+	numfonts = g->Height / Fonts[font].Height;
+	for (k = 0; k < numfonts; ++k) {
+	    for (i = 0; i<Fonts[font].Height; ++i) {
+		c = FontBitmaps[font][n] + k * Fonts[font].Height * FontBitmapWidths[font] +
+		    (Fonts[font].Height - 1 - i) * FontBitmapWidths[font];
+		for (j=0; j < g->Width; ++j) {
+		    if (*sp == n) {
 			x |= 0x1;
 		    }
 		    ++sp;
-		    if( (j & 0x7) == 0x7 ) {
+		    if ((j & 0x7) == 0x7) {
 			*c++ = x;
 			x = 0;
-		    } else if( j == g->Width - 1 ) {
+		    } else if (j == g->Width - 1) {
 			x <<= 0x7 - (j & 0x7);
 			*c++ = x;
 			x = 0;
@@ -838,24 +845,24 @@ global void LoadFonts(void)
     //	First select the font drawing procedure.
     //
 #ifdef USE_OPENGL
-    VideoDrawChar=VideoDrawCharOpenGL;
+    VideoDrawChar = VideoDrawCharOpenGL;
 #else
-    switch( VideoBpp ) {
+    switch (VideoBpp) {
 	case 8:
-	    VideoDrawChar=VideoDrawChar8;
+	    VideoDrawChar = VideoDrawChar8;
 	    break;
 
 	case 15:
 	case 16:
-	    VideoDrawChar=VideoDrawChar16;
+	    VideoDrawChar = VideoDrawChar16;
 	    break;
 
 	case 24:
-	    VideoDrawChar=VideoDrawChar24;
+	    VideoDrawChar = VideoDrawChar24;
 	    break;
 
 	case 32:
-	    VideoDrawChar=VideoDrawChar32;
+	    VideoDrawChar = VideoDrawChar32;
 	    break;
 
 	default:
@@ -864,38 +871,38 @@ global void LoadFonts(void)
     }
 #endif
 
-    for( i=0; i<sizeof(Fonts)/sizeof(*Fonts); ++i ) {
-	if( Fonts[i].File ) {
-	    ShowLoadProgress("\tFonts %s\n",Fonts[i].File);
-	    Fonts[i].Graphic=LoadGraphic(Fonts[i].File);
-	    FontMeasureWidths(Fonts+i);
+    for (i = 0; i<sizeof(Fonts) / sizeof(*Fonts); ++i) {
+	if (Fonts[i].File) {
+	    ShowLoadProgress("\tFonts %s\n", Fonts[i].File);
+	    Fonts[i].Graphic = LoadGraphic(Fonts[i].File);
+	    FontMeasureWidths(Fonts + i);
 #ifdef USE_OPENGL
-	    MakeFontBitmap(Fonts[i].Graphic,i);
+	    MakeFontBitmap(Fonts[i].Graphic, i);
 #endif
 	}
     }
 
-    fcm=FontColorMappings;
-    while( fcm ) {
-	pixels=fcm->Pixels;
-	for( i=0; i<NumFontColors; ++i ) {
-	    switch( VideoBpp ) {
+    fcm = FontColorMappings;
+    while (fcm) {
+	pixels = fcm->Pixels;
+	for (i = 0; i < NumFontColors; ++i) {
+	    switch (VideoBpp) {
 		case 8:
-		    ((VMemType8*)pixels)[i]=VideoMapRGB(fcm->RGB[i].R,fcm->RGB[i].G,fcm->RGB[i].B);
+		    ((VMemType8*)pixels)[i] = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
 		    break;
 		case 15:
 		case 16:
-		    ((VMemType16*)pixels)[i]=VideoMapRGB(fcm->RGB[i].R,fcm->RGB[i].G,fcm->RGB[i].B);
+		    ((VMemType16*)pixels)[i] = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
 		    break;
 		case 24:
-		    v=VideoMapRGB(fcm->RGB[i].R,fcm->RGB[i].G,fcm->RGB[i].B);
-		    vp=(char*)(&v);
-		    ((VMemType24*)pixels)[i].a=vp[0];
-		    ((VMemType24*)pixels)[i].b=vp[1];
-		    ((VMemType24*)pixels)[i].c=vp[2];
+		    v = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
+		    vp = (char*)(&v);
+		    ((VMemType24*)pixels)[i].a = vp[0];
+		    ((VMemType24*)pixels)[i].b = vp[1];
+		    ((VMemType24*)pixels)[i].c = vp[2];
 		    break;
 		case 32:
-		    ((VMemType32*)pixels)[i]=VideoMapRGB(fcm->RGB[i].R,fcm->RGB[i].G,fcm->RGB[i].B);
+		    ((VMemType32*)pixels)[i] = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
 		    break;
 	    }
 	}
@@ -978,41 +985,41 @@ local SCM CclDefineFontColor(SCM list)
     FontColorMapping* fcm;
     FontColorMapping** fcmp;
 
-    value=gh_car(list);
-    list=gh_cdr(list);
+    value = gh_car(list);
+    list = gh_cdr(list);
 
-    color=gh_scm2newstr(value,NULL);
+    color = gh_scm2newstr(value,NULL);
 
-    if( !FontColorMappings ) {
-	FontColorMappings=calloc(sizeof(*FontColorMappings),1);
-	fcm=FontColorMappings;
+    if (!FontColorMappings) {
+	FontColorMappings = calloc(sizeof(*FontColorMappings), 1);
+	fcm = FontColorMappings;
     } else {
-	fcmp=&FontColorMappings;
-	while( *fcmp ) {
-	    if( !strcmp((*fcmp)->Color,color) ) {
-		fprintf(stderr,"Warning: Redefining color '%s'\n",color);
+	fcmp = &FontColorMappings;
+	while (*fcmp) {
+	    if (!strcmp((*fcmp)->Color, color)) {
+		fprintf(stderr, "Warning: Redefining color '%s'\n", color);
 		free((*fcmp)->Color);
-		fcm=*fcmp;
+		fcm = *fcmp;
 		break;
 	    }
-	    fcmp=&(*fcmp)->Next;
+	    fcmp = &(*fcmp)->Next;
 	}
-	*fcmp=calloc(sizeof(*FontColorMappings),1);
-	fcm=*fcmp;
+	*fcmp = calloc(sizeof(*FontColorMappings), 1);
+	fcm = *fcmp;
     }
-    fcm->Color=color;
-    fcm->Next=NULL;
+    fcm->Color = color;
+    fcm->Next = NULL;
 
-    value=gh_car(list);
-    list=gh_cdr(list);
+    value = gh_car(list);
+    list = gh_cdr(list);
 
-    if( gh_vector_length(value) != 7*3 ) {
-	fprintf(stderr,"Wrong vector length\n");
+    if (gh_vector_length(value) != NumFontColors * 3) {
+	fprintf(stderr, "Wrong vector length\n");
     }
-    for( i=0; i<7; ++i ) {
-	fcm->RGB[i].R=gh_scm2int(gh_vector_ref(value,gh_int2scm(i*3+0)));
-	fcm->RGB[i].G=gh_scm2int(gh_vector_ref(value,gh_int2scm(i*3+1)));
-	fcm->RGB[i].B=gh_scm2int(gh_vector_ref(value,gh_int2scm(i*3+2)));
+    for (i = 0; i < NumFontColors; ++i) {
+	fcm->RGB[i].R = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 0)));
+	fcm->RGB[i].G = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 1)));
+	fcm->RGB[i].B = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 2)));
     }
 
     return SCM_UNSPECIFIED;
@@ -1025,17 +1032,17 @@ local SCM CclDefineFontColor(SCM list)
 */
 global void FontsCclRegister(void)
 {
-    gh_new_procedure4_0("define-font",CclDefineFont);
-    gh_new_procedureN("define-font-color",CclDefineFontColor);
+    gh_new_procedure4_0("define-font", CclDefineFont);
+    gh_new_procedureN("define-font-color", CclDefineFontColor);
 
-    //gh_new_procedure2_0("default-text-colors",CclDefaultTextColors);
-    //gh_new_procedure1_0("text-length",CclTextLength);
-    //gh_new_procedure4_0("draw-text",CclDrawText);
-    //gh_new_procedure4_0("draw-reverse-text",CclDrawReverseText);
-    //gh_new_procedure4_0("draw-text-centered",CclDrawTextCentered);
-    //gh_new_procedure4_0("draw-reverse-text-centered",CclDrawReverseTextCentered);
-    //gh_new_procedure4_0("draw-number",CclDrawNumber);
-    //gh_new_procedure4_0("draw-reverse-number",CclDrawReverseNumber);
+    //gh_new_procedure2_0("default-text-colors", CclDefaultTextColors);
+    //gh_new_procedure1_0("text-length", CclTextLength);
+    //gh_new_procedure4_0("draw-text", CclDrawText);
+    //gh_new_procedure4_0("draw-reverse-text", CclDrawReverseText);
+    //gh_new_procedure4_0("draw-text-centered", CclDrawTextCentered);
+    //gh_new_procedure4_0("draw-reverse-text-centered", CclDrawReverseTextCentered);
+    //gh_new_procedure4_0("draw-number", CclDrawNumber);
+    //gh_new_procedure4_0("draw-reverse-number", CclDrawReverseNumber);
 }
 
 /**
@@ -1047,21 +1054,21 @@ global void CleanFonts(void)
     FontColorMapping* fcm;
     FontColorMapping* temp;
 
-    for( i=0; i<sizeof(Fonts)/sizeof(*Fonts); ++i ) {
+    for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
 	free(Fonts[i].File);
 	VideoSaveFree(Fonts[i].Graphic);
-	Fonts[i].File=NULL;
-	Fonts[i].Graphic=NULL;
+	Fonts[i].File = NULL;
+	Fonts[i].Graphic = NULL;
     }
 
-    fcm=FontColorMappings;
-    while( fcm ) {
-	temp=fcm->Next;
+    fcm = FontColorMappings;
+    while (fcm) {
+	temp = fcm->Next;
 	free(fcm->Color);
 	free(fcm);
-	fcm=temp;
+	fcm = temp;
     }
-    FontColorMappings=NULL;
+    FontColorMappings = NULL;
 }
 
 /**
@@ -1073,7 +1080,7 @@ global void CleanFonts(void)
 */
 global int IsFontLoaded(unsigned font)
 {
-    return Fonts[font].Graphic!=0;
+    return Fonts[font].Graphic != 0;
 }
 
 //@}
