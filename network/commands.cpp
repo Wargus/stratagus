@@ -78,14 +78,13 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
 {
     static FILE* logf;
 
-    if( !CommandLogEnabled ) {
+    if( !CommandLogEnabled ) {		// No log wanted
 	return;
     }
 
-    abort();
-
     //
-    //	Create and write header of log file.
+    //	Create and write header of log file. The player number is added
+    //  to the save file name, to test more than one player on one computer.
     //
     if( !logf ) {
 	time_t now;
@@ -104,7 +103,7 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     }
 
     //
-    //	Frame, unit, (type-ident only for better readable.
+    //	Frame, unit, (type-ident only to be better readable).
     //
     if( unit ) {
 	fprintf(logf,"(log %lu 'U%d '%s '%s '%s",
@@ -885,8 +884,9 @@ global void ParseExtendedCommand(unsigned char type,int status,
 	    CommandDiplomacy(arg2,arg3,arg4);
 	    break;
 	default:
-	    DebugLevel0Fn("Unknown message %u/%s %u %u %u %u\n" _C_
-		type _C_ status ? "flush" : "-" _C_ arg1 _C_ arg2 _C_ arg3 _C_ arg4);
+	    DebugLevel0Fn("Unknown extended message %u/%s %u %u %u %u\n" _C_
+		type _C_ status ? "flush" : "-"
+		_C_ arg1 _C_ arg2 _C_ arg3 _C_ arg4);
 	    break;
     }
 }
