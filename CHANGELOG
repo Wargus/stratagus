@@ -2,6 +2,7 @@ Change log for Invasion - Battle of Survival
 --------------------------------------------
 
 CVS version:
+- Added sounds for the camera and radar unit. (micahf)
 - Replaced assault attack sound with a bearable one. (micahf)
 - Added tree unit. (TimberDragon, François Beerten)
 - Playlist created dynamically with music files found in 

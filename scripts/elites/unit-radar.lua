@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: unit-radar.lua,v 1.2 2004/12/12 16:07:28 feb Exp $
+--	$Id$
 
 DefineAnimations("animations-radar",
    "still", {
@@ -46,6 +46,8 @@ DefineIcon({
 	Size = {46, 38},
 	Frame = 0,
 	File = "elites/build/radar_b.png"})
+
+MakeSound("radar-selected", "elites/buildings/sfx_rdar.select.wav")
 
 DefineConstruction("construction-radar", {
         Constructions = {
@@ -71,7 +73,7 @@ DefineUnitType("unit-radar", {
         VisibleUnderFog = true,
 	NumDirections = 1,
 	RadarRange = 40,
-        Sounds = {}
+        Sounds = {"selected", "radar-selected"}
         })
 
 DefineUnitType("radar_destroyed", {

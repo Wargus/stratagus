@@ -99,12 +99,12 @@ DefineButton({
 
 DefineButton({
 	Pos = 8, Level = 0, Icon = "icon-build-lvl2", Action = "button",
-	Value = 2, Key = "b", Hint = "~!BUILD Level 2",
+	Value = 2, Key = "u", Hint = "~!BUILD Level 2",
 	ForUnit = {"unit-engineer"}})
 
 DefineButton({
 	Pos = 9, Level = 0, Icon = "icon-build-lvl3", Action = "button",
-	Value = 3, Key = "b", Hint = "~!BUILD Level 3",
+	Value = 3, Key = "d", Hint = "~!BUILD Level 3",
 	ForUnit = {"unit-engineer"}})
 
 -- simple buildings elites -----------------------------------------------------
