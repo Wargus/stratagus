@@ -872,24 +872,10 @@ extern VMemType* VideoMemory;
 	**		Special 8bpp functionality, only to be used in ../video
 	**		@todo use CommonPalette names!
 	*/
-extern Palette   *commonpalette;
-	/// FIXME: docu
-extern unsigned long commonpalette_defined[8];
-	/// FIXME: docu
-extern VMemType8 *colorcube8;
 	/// FIXME: docu
 extern VMemType8 *lookup25trans8;
 	/// FIXME: docu
 extern VMemType8 *lookup50trans8;
-	/// FIXME: docu
-extern void (*VideoAllocPalette8)(Palette* palette, Palette* syspalette,
-	unsigned long syspalette_defined[8]);
-//FIXME: following function should be local in video.c, but this will also
-//	   need VideoCreateNewPalette to be there (will all video still work?).
-	/// FIXME: docu
-extern global VMemType8* VideoFindNewPalette8(const VMemType8 *cube,
-	const Palette *palette);
-
 
 	/**
 	**		Video synchronization speed. Synchronization time in percent.
