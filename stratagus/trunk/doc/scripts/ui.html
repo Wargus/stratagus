@@ -47,50 +47,7 @@
 <a href="unittype.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
-<a href="#add-button">add-button</a>
-<a href="#set-selection-changed-hook">set-selection-changed-hook</a>
-<a href="#set-selected-unit-changed-hook">set-selected-unit-changed-hook</a>
-<a href="#set-choose-target-begin-hook">set-choose-target-begin-hook</a>
-<a href="#set-choose-target-finish-hook">set-choose-target-finish-hook</a>
-<a href="#add-button">add-button</a>
-<a href="#remove-button">remove-button</a>
-<a href="#remove-all-buttons">remove-all-buttons</a>
-
-<a href="#command-patrol">command-patrol</a>
-<a href="#command-harvest">command-harvest</a>
-<a href="#command-attack">command-attack</a>
-<a href="#command-cancel-upgrade">command-cancel-upgrade</a>
-<a href="#command-build">command-build</a>
-<a href="#command-train-unit">command-train-unit</a>
-<a href="#command-cast-spell">command-cast-spell</a>
-<a href="#command-move">command-move</a>
-<a href="#command-stop">command-stop</a>
-<a href="#command-research">command-research</a>
-<a href="#command-unload">command-unload</a>
-<a href="#command-upgrade-to">command-upgrade-to</a>
-<a href="#command-attack-ground">command-attack-ground</a>
-<a href="#command-return-goods">command-return-goods</a>
-<a href="#command-cancel">command-cancel</a>
-<a href="#command-cancel-building">command-cancel-building</a>
-<a href="#command-cancel-train-unit">command-cancel-train-unit</a>
-<a href="#command-repair">command-repair</a>
-<a href="#command-stand-ground">command-stand-ground</a>
-<a href="#command-demolish">command-demolish</a>
-
-<a href="#check-allowed">check-allowed</a>
-<a href="#get-cost-string">get-cost-string</a>
-
-<a href="#selected-is-building">selected-is-building</a>
-<a href="#selected-is-training">selected-is-training</a>
-<a href="#selected-is-upgrading">selected-is-upgrading</a>
-<a href="#selected-get-race">selected-get-race</a>
-<a href="#selected-get-speed">selected-get-speed</a>
-<a href="#selected-owned-by-player">selected-owned-by-player</a>
-<a href="#selected-mixed-units">selected-mixed-units</a>
-<a href="#selected-get-action">selected-get-action</a>
-<a href="#selected-resource-loaded">selected-resource-loaded</a>
-<a href="#selected-draw-buttons">selected-draw-buttons</a>
-
+<a href="#define-button">define-button</a>
 <a href="#define-cursor">define-cursor</a>
 <a href="#define-font">define-font</a>
 <a href="#define-font-colors">define-font-colors</a>
@@ -107,30 +64,46 @@
 
 Everything around the user interface.
 <h2>Functions</h2>
-<a name="add-button"></a>
-<h3>(add-button 'tag1 value1 'tag2 value2 ...)</h3>
+<a name="define-button"></a>
+<h3>(define-button 'tag1 value1 'tag2 value2 ...)</h3>
 
-Add a button to the button panel during the game. This is usually
-called from the 'button-hook of the unittypes (FIXME link), or from
-the selection-changed-hook (FIXME link) directly.
-See also (remove-all-buttons) (FIXME link)<br>
-Possible tags:
+Define a button in the button panel show during the game. Possible tags:
 
 <dl>
+<dt>forunit</dt>
+<dd>List of units the button applies to, or '(*) for all units.
+</dd>
 <dt>pos</dt>
-<dd>Position number. Currently buttons can be added only to the button
-panel.
+<dd>Position number. 
 <pre>
 0 1 2
 3 4 5
 6 7 8
 </pre>
 </dd>
+<dt>level</dt>
+<dd>Visible when in this button level (0 default, 9 cancel-only)
+</dd>
 <dt>icon</dt>
 <dd>Name of the icon to display.
 </dd>
 <dt>action</dt>
-<dd>Script to eval when the button is pressed.
+<dd>Action to perform when the button is clicked.  Can be any of the following:
+move, stop, attack, repair, harvest, button, build, train-unit, patrol,
+stand-ground, attack-ground, return-goods, demolish, cast-spell, research,
+upgrade-to, unload, cancel, cancel-upgrade, cancel-train-unit, cancel-build.
+</dd>
+<dt>value</dt>
+<dd>Optional value associated with the action.
+</dd>
+<dt>allowed</dt>
+<dd>Optional check to see if a button is allowed.  Can be any of the following:
+check-true, check-false, check-upgrade, check-units-or, check-units-and,
+check-network, check-no-work, check-no-research, check-attack,
+check-upgrade-to, check-research, check-single-research.
+</dd>
+<dt>allowarg</dt>
+<dd>Optional argument used by the allowed function.
 </dd>
 <dt>key</dt>
 <dd>Shortcut key for the button.
@@ -138,393 +111,16 @@ panel.
 <dt>hint</dt>
 <dd>Hint to be displayed for the button.
 </dd>
-<dt>highlight</dt>
-<dd>If given and true, highlight the button by drawing an extra border
-(used for showing actions).
-</dd>
 </dl>
 
 <h4>Example</h4>
 <pre>
-    ;; add a patrol button
-    (add-button 'pos 4
-      'icon (string-append "icon-" (selected-get-race) "-patrol-land")
-      'key "p" 'hint "~!PATROL"
-      'action (lambda () (command-patrol)))
+    (define-button 'pos 9 'level 0 'icon 'icon-exorcism
+      'action 'cast-spell 'value 'spell-exorcism
+      'allowed 'check-upgrade 'allow-arg '(upgrade-exorcism)
+      'key "e" 'hint "~!EXORCISM"
+      'for-unit '(unit-paladin unit-knight-rider unit-man-of-light))
 </pre>
-
-<a name="remove-button"></a>
-<h3>(remove-button id)</h3>
-Remove button number id.
-<h4>Example</h4>
-    (remove-button 4)
-<pre>
-</pre>
-
-<a name="remove-all-buttons"></a>
-<h3>(remove-all-buttons)</h3>
-Removes all buttons from the button panel.
-
-<a name="set-selection-changed-hook"></a>
-<h3>(set-selection-changed-hook '(begin ...))</h3>
-Set the script that will be evaluated whenever the player selects an other set of units.
-You will probably want call things like <a href="#remove-all-buttons">remove-all-buttons</a>
-and <a href="#add-button">add-button</a> here, after examining the selection with other helper functions.
-<p>
-I suggest you define a helper function that rebuilds the buttons, and
-call it from both selection-changed-hook and 
-<a href="#set-selected-unit-changed-hook">selected-unit-changed-hook</a>.
-
-<h4>Example</h4>
-<pre>
-    ; (Those are extracts from the demogame ccls)
-
-    ; FIXME: this is most likely a very ugly hack to scheme
-    (define (set-global symbol value)
-      (set-symbol-value! symbol value nil))
-    (define (get-global symbol)
-      (symbol-value symbol nil))
-
-    (set-selection-changed-hook '(begin
-      (set-global 'button-level 0)
-      (rebuild-buttons)))
-
-    (set-selected-unit-changed-hook '(begin
-      (rebuild-buttons)))
-
-    ; Build all the command buttons from scratch.
-    (define (rebuild-buttons)
-      (remove-all-buttons)
-      (if (selected-owned-by-player) (begin
-        ; draw some generic buttons
-        (if (= (get-global 'button-level) 0) (begin
-          (if (> (selected-get-speed) 0) (begin
-            (generic-movement-buttons)
-            (if (selected-mixed-units) (begin
-              (generic-combat-buttons))
-              ; Uniform selection: draw the unit's own buttons
-              (selected-draw-buttons))))
-          (if (selected-is-building) (begin
-            ; there can be only one building selected
-            ; no common buttons should be here for now, 
-            ; "destroy building" or something could be added.
-            (add-button 'pos 7
-              'icon 'icon-move-peasant
-              'key "m" 'hint "SET ~!MOVE"
-              'action (lambda () (command-move)))
-            ;
-            ; Call the building's own button-draw hook
-            ;
-            (selected-draw-buttons)
-            ; FIXME: maybe non-buildings could be upgrading too
-            ; note: upgrade is both researching and changing unit type
-            (if (selected-is-upgrading) (begin
-              ; could be optimized by not calling (selected-draw-buttons)
-              (remove-all-buttons)
-              (add-button 'pos 9 'icon 'icon-cancel
-                'key "\033" 'hint "~<ESC~> CANCEL UPGRADE"
-                'action (lambda() (command-cancel-upgrade))))))))
-        (begin ; else: button level is not zero
-          ;
-          ; Generic cancel button to go back to button level 0
-          ;
-          (add-button 'pos 9 'icon 'icon-cancel
-            'key "\033" 'hint "~<ESC~> CANCEL"
-            'action (lambda()
-              (set-global 'button-level 0)
-              (rebuild-buttons)))
-          ;
-          ; Call the unit's own button-draw hook
-          ;
-          (selected-draw-buttons))))))
-    ; no command buttons for enemy units.
-</pre>
-
-<a name="set-selected-unit-changed-hook"></a>
-<h3>(set-selected-unit-changed-hook)</h3>
-
-Set the script that will be evaluated when one of the selected units
-experiences some kind of upgrade, or when a global research is
-completed (this is when you might want new buttons to appear, or old
-ones to remove, or button images to be changed). This is seperated
-from <a href="#set-selection-changed-hook">set-selection-changed-hook</a>
-because you probably don't want to break out of a subbutton (eg selecting
-the building to build) here.
-
-<h4>Example</h4>
-<pre>
-    (set-selected-unit-changed-hook '(begin
-      (writes nil "[debug] selected-unit-changed-hook called")
-      (rebuild-buttons)))
-</pre>
-
-<a name="set-choose-target-begin-hook"></a>
-<h3>(set-choose-target-begin-hook)</h3>
-
-Set the script that will be evaluated when the user is asked to select
-some target. You will want to change the buttons. FIXME: other hooks
-can interrupt the select-target process, so a global flag must be set
-
-<h4>Example</h4>
-<pre>
-    ; When doing a target selection, only draw a cancel button.
-    ; If you leave them both empty, you can choose another building while
-    ; setting the destination and similar things.
-    (set-choose-target-begin-hook '(begin
-      (set-global 'button-level 9)
-      (rebuild-buttons)))
-    (set-choose-target-finish-hook '(begin
-      (set-global 'button-level 0)
-      (rebuild-buttons)))
-</pre>
-
-<a name="set-choose-target-finish-hook"></a>
-<h3>(set-choose-target-finish-hook)</h3>
-Set the script that will be evaluated when the user has finished to
-select a target. See <a href="#set-choose-target-begin-hook">set-choose-target-begin-hook</a>
-for details.
-
-<a name="command-patrol"></a>
-<h3>(command-patrol)</h3>
-(While game is running) Let the player select a destination where the
-currently selected units will patrol to.
-
-<a name="command-harvest"></a>
-<h3>(command-harvest)</h3>
-(While game is running) Let the player select a destination where the
-currently selected units will harvest.
-
-<a name="command-attack"></a>
-<h3>(command-attack)</h3>
-(While game is running) Let the player select a destination where the
-currently selected units will attack.
-
-<a name="command-cancel-upgrade"></a>
-<h3>(command-cancel-upgrade)</h3>
-(While game is running) Cancel the upgrade the currently selected unit
-is doing.
-
-<a name="command-build"></a>
-<h3>(command-build unittype)</h3>
-(While game is running) Let the player select a destination where a
-building will be placed. Costs are checked.
-<h4>Example</h4>
-<pre>
-    (command-build 'unit-farm)
-</pre>
-
-<a name="command-train-unit"></a>
-<h3>(command-train-unit unittype)</h3>
-(While game is running) Let the current unit train another unit (I
-wonder whether this works with non-buildings, too?)
-<h4>Example</h4>
-<pre>
-    ; define a helper function to add training buttons
-    (define (train-button type pos key hint)
-      (if (check-allowed (string-append 'unit- type))
-        (add-button
-          'icon (string-append 'icon- type)
-          'hint (string-append hint "   " (get-cost-string (string-append 'unit- type)))
-          'pos pos
-          'key key
-          'action (lambda ()
-            (writes nil "Train-command\n")
-            (command-train-unit  (string-append 'unit- type))))))
-</pre>
-
-<a name="command-cast-spell"></a>
-<h3>(command-cast-spell spellid)</h3>
-(While game is running) Let the current unit(selection) cast a spell.
-<br>FIXME: untested.
-
-<h4>Example</h4>
-<pre>
-    FIXME
-</pre>
-
-<a name="command-move"></a>
-<h3>(command-move)</h3>
-(While game is running) Let the player select a destination where the
-currently selected units will move to.
-
-<a name="command-stop"></a>
-<h3>(command-stop)</h3>
-(While game is running) stop the selected units.
-
-<a name="command-research"></a>
-<h3>(command-research upgrade)</h3>
-(While game is running) Command the selected unit to research the
-given upgrade.
-
-<a name="command-unload"></a>
-<h3>(command-unload)</h3>
-(While game is running) Let the player select a destination where the
-currently selected unit(s) will unload to.
-
-<a name="command-upgrade-to"></a>
-<h3>(command-upgrade-to unittype)</h3>
-(While game is running) Command the selected unit to upgrade to
-another unittype.
-
-<a name="command-attack-ground"></a>
-<h3>(command-attack-ground)</h3>
-(While game is running) Let the player select a destination where the
-currently selected unit(s) will attack a ground area.
-
-<a name="command-return-goods"></a>
-<h3>(command-return-goods)</h3>
-(While game is running) Let the currently selected units return their
-goods.
-
-<a name="command-cancel"></a>
-<h3>(command-cancel)</h3>
-(While game is running) This cancels selecting a
-destination. (FIXME: or is it used elsewhere too?)
-
-<a name="command-cancel-building"></a>
-<h3>(command-cancel-building)</h3>
-(While game is running) This cancels building.
-(FIXME: does it work?)
-
-<a name="command-cancel-train-unit"></a>
-<h3>(command-cancel-train-unit)</h3>
-(While game is running) Let the first selected unit remove one item
-from the training queue. 
-(FIXME: or does it rather empty the training queue completely?)
-
-<a name="command-repair"></a>
-<h3>(command-repair)</h3>
-(While game is running) Let the player select a destination that the
-currently selected units will repair.
-
-<a name="command-stand-ground"></a>
-<h3>(command-stand-ground)</h3>
-Command the selected units not to move. (FIXME: correct?)
-
-<a name="command-demolish"></a>
-<h3>(command-demolish)</h3>
-(While game is running) Let the player select a destination where the
-currently selected units go demolishing (explode there).
-
-<a name="check-allowed"></a>
-<h3>(check-allowed thing)</h3>
-Check whether thing is allowed. Thing can be an upgrade or an unit.
-<h4>Example</h4>
-<pre>
-    (if (check-allowed 'unit-keep)
-      (add-button 'pos 2
-      'icon 'icon-keep
-      'key "k" 
-      'hint (string-append "UPGRADE TO ~!KEEP   " (get-cost-string 'unit-keep))
-      'action (lambda () (command-upgrade-to 'unit-keep))))
-</pre>
-
-<a name="get-cost-string"></a>
-<h3>(get-cost-string thing)</h3>
-Returns a string with the costs of thing (unit or upgrade), useful to
-give as button hint.
-<br>
-The string contains the special characters like
-&quot;$1&quot; that will let a resource icon appear instead of the
-text.
-
-<h4>Example</h4>
-<pre>
-      'hint (string-append "UPGRADE TO ~!KEEP   " (get-cost-string 'unit-keep))
-</pre>
-
-<a name="selected-is-building"></a>
-<h3>(selected-is-building)</h3>
-Returns true if the selected unit is a building. FIXME: bad name
-
-<a name="selected-is-training"></a>
-<h3>(selected-is-training)</h3>
-Returns true if the selected unit is training.
-
-<a name="selected-is-upgrading"></a>
-<h3>(selected-is-upgrading)</h3>
-Returns true if the selected unit is upgrading.
-
-<a name="selected-get-race"></a>
-<h3>(selected-get-race)</h3>
-Returns the race of the selected unit.
-<h4>Example</h4>
-<pre>
-    ; not yet used, could be useful for something like
-    'icon (string-append "icon-" (selected-get-race) "shield1")
-    ; if the icons are named properly
-</pre>
-
-<a name="selected-get-speed"></a>
-<h3>(selected-get-speed)</h3>
-
-Gets the speed of the selected unit, as defined in the
-unittype. Useful to decide whether to draw a movement button. 
-<br>
-Note that the speed declared in the unittype is just to display something,
-the real unit speed is hidden in the animation script.
-
-<a name="selected-owned-by-player"></a>
-<h3>(selected-owned-by-player)</h3>
-
-Returns true if the selected unit(s) is owned by the current
-player.
-<br>
-Note that the player cannot select more than one enemy unit a
-a time.
-
-<a name="selected-mixed-units"></a>
-<h3>(selected-mixed-units)</h3>
-Returns true if the selection contains more than one unittype.
-<h4>Example</h4>
-<pre>
-    (if (selected-mixed-units) (begin
-      ; attack/stand/patrol buttons for mixed selections
-        (generic-combat-buttons))
-      ; Uniform selection: draw the unit's own buttons
-        (selected-draw-buttons))
-</pre>
-
-<a name="selected-get-action"></a>
-<h3>(selected-get-action)</h3>
-Returns the name of the current action as a string. Possible values are:
-<p>
-Invalid (No unit selected), Mixed (multiple units selected, and they
-are doing different things), None, Still, StandGround, Follow, Move,
-Attack, AttackGround, Die, SpellCast, Train, Train, UpgradeTo,
-Research, Builded, Board, Unload, Patrol, Build, Repair, Resource,
-ReturnGoods, Demolish.
-<p>
-Note that those are case-sensitive.
-
-<h4>Example</h4>
-<pre>
-    (add-button 'pos 3
-      'icon (string-append "icon-sword1")
-      'key "a" 'hint "~!ATTACK"
-      'highlight (= (strcmp (selected-get-action) 'Attack) 0)
-      'action (lambda () (command-attack))))
-</pre>
-
-<a name="selected-resource-loaded"></a>
-<h3>(selected-resource-loaded)</h3>
-Returns the name of the resource the selected units have loaded, 
-'mixed if there are different resources loaded, or nil (false) if
-there are no resources loaded.
-<h4>Example</h4>
-<pre>
-    (if (selected-resource-loaded) (begin
-      (writes nil (string-append "[debug] Selected unit has loaded " (selected-resource-loaded) " resources.\n"))
-      (add-button 'pos 6 
-        ; could build icon string from the resource name :)
-        'icon 'icon-return-goods-peasant
-        'key "g" 'hint "RETURN WITH ~!GOODS"
-        'action (lambda () (command-return-goods)))))
-</pre>
-
-<a name="selected-draw-buttons"></a>
-<h3>(selected-draw-buttons)</h3>
-Run the 'add-buttons hook from the first selected unittype.
 
 <a name="define-cursor"></a>
 <h3>(define-cursor 'ident 'race 'tag1 value1 'tag2 value2 ...)</h3>
@@ -1069,21 +665,20 @@ All of those tags should be given:
       minimapx (+ minimapy 148))
 </pre>
 </dd>
-<dt>minimap</dt>
+<dt>minimap-panel</dt>
 <dd>
 <pre>
-    'minimap (list
-      'file (string-append "graphics/ui/" race "/minimap.png")
-      'panel-pos (list minimapx minimapy)
-      'pos (list (+ minimapx 27) (+ minimapy 13))
-      'size '(128 128)
-      'transparent)
+    'minimap-panel (list
+      (string-append "graphics/ui/" race "/minimap.png")
+      minimapx minimapy)
 </pre>
-There is a minimap panel an the minimap on it. The panel graphic has
-certain palette restrictions (FIXME: exactly? probably the same as the
-tileset?). Pos is the absoloute position of the minimap on the screen
-(the upper left corner of it). If you give 'transparent, the panel
-graphic will be displayed on unexplored terrain, black otherwise.
+</dd>
+<dt>minimap-pos</dt>
+<dd>
+<pre>
+    'minimap-pos (list
+      (+ minimapx 27) (+ minimapy 13))
+</pre>
 </dd>
 <dt>status-line</dt>
 <dd>

@@ -635,12 +635,10 @@ global void RemoveUnit(Unit* unit, Unit* host)
     unit->Removed=1;
     //  Remove unit from the current selection
     if( unit->Selected ) {
-#ifndef NEW_UI
 	if( NumSelected==1 ) {		//  Remove building cursor
 	    CancelBuildingMode();
 	}
 	MustRedraw|=RedrawPanels;
-#endif
 	UnSelectUnit(unit);
 	SelectionChanged();
     }

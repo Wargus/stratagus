@@ -45,17 +45,6 @@ if test "x$with_guile" = "xyes"; then
 fi
 dnl -----------------------
 
-dnl --- NEW_UI ---
-AC_ARG_WITH([new-ui],
-    AC_HELP_STRING([--with-new-ui], [Enable New User Interface (default: no)]),,
-    with_new_ui="no")
-NEWUI_CFLAGS=
-if test "x$with_new_ui" = "xyes"; then
-    NEWUI_CFLAGS="-DNEW_UI"
-fi
-AC_SUBST(NEWUI_CFLAGS)
-dnl -----------------------
-
 dnl --- CHECK FOR WITH SOUND ---
 AC_ARG_ENABLE(sound,
     [  --enable-sound	  [Use sound (default: yes)]], SOUND="$with_sound")
