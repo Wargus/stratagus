@@ -889,7 +889,7 @@ local int GameStatsDrawFunc(int frame)
 	for( i=0; RaceWcNames[i]; ++i ) {
 	    if( !strcmp(RaceWcNames[i],ThisPlayer->RaceName) ) {
 		ranks=Ranks[i].Ranks;
-		scores=Ranks[ThisPlayer->Player].Scores;
+		scores=Ranks[i].Scores;
 		break;
 	    }
 	}
