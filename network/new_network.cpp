@@ -1302,26 +1302,28 @@ global void NetworkChatMessage(const char* msg)
     int n;
     int t;
 
-    t=MessageChat;
-    cp=msg;
-    n=strlen(msg);
-    while( n>=sizeof(ncm->Text) ) {
+    if( NetworkFildes!=-1 ) {
+	t=MessageChat;
+	cp=msg;
+	n=strlen(msg);
+	while( n>=sizeof(ncm->Text) ) {
+	    ncq=malloc(sizeof(NetworkCommandQueue));
+	    dl_insert_last(CommandsIn,ncq->List);
+	    ncq->Data.Type=t;
+	    t=MessageChatCont;
+	    ncm=(NetworkChat*)(&ncq->Data);
+	    ncm->Player=ThisPlayer->Player;
+	    memcpy(ncm->Text,cp,sizeof(ncm->Text));
+	    cp+=sizeof(ncm->Text);
+	    n-=sizeof(ncm->Text);
+	}
 	ncq=malloc(sizeof(NetworkCommandQueue));
 	dl_insert_last(CommandsIn,ncq->List);
 	ncq->Data.Type=t;
-	t=MessageChatCont;
 	ncm=(NetworkChat*)(&ncq->Data);
 	ncm->Player=ThisPlayer->Player;
-	memcpy(ncm->Text,cp,sizeof(ncm->Text));
-	cp+=sizeof(ncm->Text);
-	n-=sizeof(ncm->Text);
+	memcpy(ncm->Text,cp,n+1);		// see >= above :)
     }
-    ncq=malloc(sizeof(NetworkCommandQueue));
-    dl_insert_last(CommandsIn,ncq->List);
-    ncq->Data.Type=t;
-    ncm=(NetworkChat*)(&ncq->Data);
-    ncm->Player=ThisPlayer->Player;
-    memcpy(ncm->Text,cp,n+1);		// see >= above :)
 }
 
 /**
