@@ -755,10 +755,6 @@ local SCM CclLoadMap(SCM file)
     name = gh_scm2newstr(file, NULL);
     if (strcasestr(name, ".pud")) {
 	LoadPud(LibraryFileName(name, buffer), &TheMap);
-    } else if (strcasestr(name, ".scm")) {
-	LoadScm(LibraryFileName(name, buffer), &TheMap);
-    } else if (strcasestr(name, ".chk")) {
-	LoadChk(LibraryFileName(name, buffer), &TheMap);
     }
     free(name);
 

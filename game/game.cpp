@@ -154,10 +154,6 @@ local void LoadMap(const char* filename, WorldMap* map)
     // ARI: This bombs out, if no pud, so will be safe.
     if (strcasestr(filename, ".pud")) {
 	LoadPud(filename, map);
-    } else if (strcasestr(filename, ".scm")) {
-	LoadScm(filename, map);
-    } else if (strcasestr(filename, ".chk")) {
-	LoadChk(filename, map);
     }
 }
 
