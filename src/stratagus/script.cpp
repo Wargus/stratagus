@@ -54,6 +54,7 @@
 #include "campaign.h"
 #include "trigger.h"
 #include "settings.h"
+#include "editor.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -490,6 +491,8 @@ global void InitCcl(void)
     CampaignCclRegister();
     TriggerCclRegister();
     CreditsCclRegister();
+
+    EditorCclRegister();
 
     init_subr_1("load-pud",CclLoadPud);
     init_subr_2("define-map",CclDefineMap);
