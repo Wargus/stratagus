@@ -1596,21 +1596,15 @@ global void UnitIncrementMana(void)
  **
  **	@note:	We could build a table of all regenerating units reducing cpu
  **		use.
- **		Any idea how to handle this more general? It whould be nice
- **		to have more units that could regenerate.
  */
 global void UnitIncrementHealth(void)
 {
     Unit** table;
     Unit* unit;
-    int regeneration;
-
-    // FIXME: move to init code! (Can't be done here, load/save!)
-    regeneration=UpgradeIdByIdent("upgrade-berserker-regeneration");
 
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
-	if (HitPointRegeneration &&  unit->HP<unit->Stats->HitPoints) {
+	if (HitPointRegeneration && unit->HP<unit->Stats->HitPoints) {
 	    ++unit->HP;
 
 	    if( 0 ) {		// some frames delayed done my color cycling
@@ -1620,10 +1614,11 @@ global void UnitIncrementHealth(void)
 		MustRedraw|=RedrawInfoPanel;
 	    }
 	}
-	if( unit->Type==UnitTypeBerserker
-		&& unit->HP<unit->Stats->HitPoints
-		&& UpgradeIdAllowed(unit->Player,regeneration)=='R' ) {
-	    ++unit->HP;			// FIXME: how fast do we regenerate
+	if( unit->Stats->RegenerationRate && unit->HP<unit->Stats->HitPoints ) {
+	    unit->HP+=unit->Stats->RegenerationRate;
+	    if( unit->HP > unit->Stats->HitPoints ) {
+		unit->HP = unit->Stats->HitPoints;
+	    }
 
 	    // some frames delayed done my color cycling
 	    if( 0 ) {
