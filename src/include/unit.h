@@ -672,9 +672,10 @@ extern void InitUnitsMemory(void);
 //extern void FreeUnitMemory(Unit* unit);
     /// Release an unit
 extern void ReleaseUnit(Unit* unit);
-//extern void InitUnit (Unit * , UnitType * , Player * );
-extern void InitUnit (Unit * , UnitType * );
-extern void AssignUnitToPlayer (Unit * , Player * );
+    /// Initialize unit structure with default values
+extern void InitUnit(Unit* unit, UnitType* type);
+    /// Assign unit to player
+extern void AssignUnitToPlayer(Unit* unit, Player* player);
     ///	Create a new unit
 extern Unit* MakeUnit(UnitType* type,Player* player);
     /// Place an unit on map
@@ -700,8 +701,10 @@ extern int UnitKnownOnMap(const Unit* unit);
 extern int UnitVisibleInViewport (int v, const Unit * );
 #endif /* SPLIT_SCREEN_SUPPORT */
 
+#ifndef SPLIT_SCREEN_SUPPORT
     /// Returns true, if unit is visible on current map view
 extern int UnitVisibleOnScreen(const Unit* unit);
+#endif /* SPLIT_SCREEN_SUPPORT */
 
     /// FIXME: more docu
 extern int CheckUnitToBeDrawn(const Unit* unit);
@@ -709,6 +712,7 @@ extern int CheckUnitToBeDrawn(const Unit* unit);
 extern void GetUnitMapArea( const Unit* unit,
                             int *sx, int *sy, int *ex, int *ey );
 #ifdef HIERARCHIC_PATHFINDER
+    /// FIXME: more docu
 extern int UnitGetNextPathSegment (Unit * , int * , int * );
 #endif
     /// Increment mana of all magic units each second
