@@ -224,14 +224,21 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
     Quit level.
 <LI><KBD>^</KBD><BR>
     Unselect all units.
-<LI><KBD>1-9,0</KBD><BR>
-    Select unit group first time, if group already selected center on group.
-<LI><KBD>CTRL + 1-9,0</KBD><BR>
-    Define unit group.
-<LI><KBD>SHIFT + 1-9,0</KBD><BR>
-    FIXME: code not written.
-<LI><KBD>ALT + 1-9,0</KBD><BR>
-    FIXME: code not written.
+<LI><KBD># (1-9,0)</KBD><BR>
+    Recall unit group. All units in the group becomes the current selection. 
+    If unit group is already selected, center on group.
+<LI><KBD>SHIFT + # (1-9,0)</KBD><BR>
+    Add the units of the group to the current selection.
+<LI><KBD>CTRL + # (1-9,0)</KBD><BR>
+    Define unit group. All currently selected units become the new group.
+<LI><KBD>SHIFT+CTRL + # (1-9,0)</KBD><BR>
+    Add to unit group. All currently selected units are added to the group.
+<LI><KBD>ALT + # (1-9,0)</KBD><BR>
+    Alternate unit group. All currently selected units are also added to the
+    new group.
+<LI><KBD>SHIFT+ALT + # (1-9,0)</KBD><BR>
+    Add to alternate unit group. All currently selected units are also added to
+    the group.
 <LI><KBD>ALT+G, CTRL+G</KBD><BR>
     Toggle mouse grab mode.
 <LI><KBD>ALT+F, CTRL+F</KBD><BR>
