@@ -236,7 +236,7 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 /**
 **	Play music from cdrom.
 **
-**	:all :random :off
+**	CDModeAll CDModeRandom CDModeOff
 **
 **	@param name	Name starting with ":".
 **
@@ -289,8 +289,7 @@ global int PlayCDRom(int name)
 /**
 **	Play music from cdrom.
 **
-**	FIXME: remove :defined
-**	:all :random :off :defined
+**	CDModeAll CDModeRandom CDModeDefined CDModeOff
 **
 **	@param name	Name starting with ":".
 **
@@ -355,41 +354,7 @@ global int PlayCDRom(int name)
 
     if (name == CDModeDefined) {
         CDMode = CDModeDefined;
-	return 0;
-        track = cd_current_track();
-        if (CurrentPlaySection == PlaySectionStats) {
-	    if (GameResult == GameVictory) {
-		if (!ThisPlayer->Race && track != 8) {
-		    cd_play(8);
-		} else if (ThisPlayer->Race && track != 16) {
-		    cd_play(16);
-		}
-	    } else {
-		if (!ThisPlayer->Race && track != 9) {
-		    cd_play(9);
-		} else if (ThisPlayer->Race && track != 17) {
-		    cd_play(17);
-		}
-	    }
-	} else if (CurrentPlaySection == PlaySectionBriefing) {
-	    if (!ThisPlayer->Race && track != 7) {
-	        cd_play(7);
-	    } else if (ThisPlayer->Race && track != 15) {
-	        cd_play(15);
-	    }
-	} else if (CurrentPlaySection == PlaySectionMainMenu && track != 15) {
-	    cd_play(15);
-	} else if (CurrentPlaySection == PlaySectionGame && 
-		    !ThisPlayer->Race && (track < 3 || track > 6)) {
-	    do CDTrack = (MyRand() % NumCDTracks) + 3;
-	    while (CDTrack < 3 || CDTrack > 7); 
-	    cd_play(CDTrack);
-	} else if (CurrentPlaySection == PlaySectionGame && 
-		    ThisPlayer->Race && (track < 10 || track > 14)) {
-	    do CDTrack = (MyRand() % NumCDTracks) + 9;
-	    while (CDTrack < 11 || CDTrack > 14); 
-	    cd_play(CDTrack);
-	}
+	return 1;
     }
 
     return 0;
@@ -398,7 +363,7 @@ global int PlayCDRom(int name)
 /**
 **	Play music from cdrom.
 **
-**	:all :random :off
+**	CDModeAll CDModeRandom CDModeOff
 **
 **	@param name	Name starting with ":".
 **
