@@ -52,6 +52,38 @@
 -- Functions
 ----------------------------------------------------------------------------*/
 
+
+/**
+**  Try to find a reparable unit around
+**  and return it.
+**
+**  @param unit   unit which could repare.
+**  @param range  range to find a reparable unit.
+**
+**  @return unit to repare if found, NULL else.
+**
+**  @todo FIXME : find the better unit (most damaged, ...).
+*/
+static Unit* UnitToRepairInRange(Unit* unit, int range)
+{
+	Unit* table[UnitMax]; // all unit in range.
+	int n;                // number of unit in range.
+	int i;                // iterator on unit.
+
+	n = UnitCacheSelect(unit->X - range, unit->Y - range,
+						unit->X + unit->Type->TileWidth + range,
+						unit->Y + unit->Type->TileHeight + range,
+						table);
+	for (i = 0; i < n; ++i) {
+		if (PlayersTeamed(table[i]->Player->Player, unit->Player->Player)
+			&& table[i]->Type->RepairHP && table[i]->HP < table[i]->Stats->HitPoints
+			&& UnitVisibleAsGoal(table[i], unit->Player)) {
+			return table[i];
+		}
+	}
+	return NoUnitP;
+}
+
 /**
 **  Unit stands still or stand ground.
 **
@@ -183,6 +215,19 @@ void ActionStillGeneric(Unit* unit, int ground)
 			}
 		}
 	}
+
+	// Auto Repair
+	if (unit->AutoRepair && type->Variable[AUTOREPAIRRANGE_INDEX].Value) {
+		Unit* repairedUnit; // Unit to repare
+
+		repairedUnit = UnitToRepairInRange(unit, type->Variable[AUTOREPAIRRANGE_INDEX].Value);
+		if (repairedUnit != NULL) {
+			CommandRepair(unit, -1, -1, repairedUnit, FlushCommands);
+			// unit has new order.
+			return ;
+		}
+	}
+
 	//
 	// Cowards don't attack unless instructed.
 	//

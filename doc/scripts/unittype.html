@@ -219,6 +219,8 @@ Value correspond of min degat that the unit could do, and Max the max.</dd>
   <dd>X position of the unit. Max is the Map size.</dd>
   <dt>PosY</dt>
   <dd>Y position of the unit. Max is the Map size.</dd>
+  <dt>AutoRepairRange</dt>
+  <dd>Range to check for unit to repair. (for unit which can repair)<dd>
   <dt>Slot</dt>
   <dd>Unique number that identifies the unit (begin at 0). Max is the last valid slot number.</dd>
 </dl>
@@ -575,6 +577,8 @@ F.E.: ImproveProduction = {"gold", 20, "wood", 5} will give 120% gold and 105% w
 <dt>RepairRange = number</dt>
 <dd>Range that a unit can repair from, eg. RepairRange = 1.
 </dd>
+<dt>AutoRepairRange = number</dt>
+<dd>Range to check for unit to repair. (for unit which can repair)<dd>
 <dt>RepairHp = number</dt>
 <dd>Defines the amount of hp a unit gain for each repair animation.  Units can only be
 repaired if this value is non-zero.

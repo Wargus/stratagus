@@ -627,6 +627,7 @@ struct _unit_ {
 	Order SavedOrder;           ///< order to continue after current
 	Order NewOrder;             ///< order for new trained units
 	char* AutoCastSpell;        ///< spells to auto cast
+	unsigned AutoRepair : 1;    ///< True if unit tries to repair on still action.
 
 	union _order_data_ {
 	struct _order_move_ {

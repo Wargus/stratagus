@@ -82,6 +82,7 @@ enum _message_type_ {
 	MessageCommandFollow,          ///< Unit command follow
 	MessageCommandMove,            ///< Unit command move
 	MessageCommandRepair,          ///< Unit command repair
+	MessageCommandAutoRepair,      ///< Unit command autorepair
 	MessageCommandAttack,          ///< Unit command attack
 	MessageCommandGround,          ///< Unit command attack ground
 	MessageCommandPatrol,          ///< Unit command patrol

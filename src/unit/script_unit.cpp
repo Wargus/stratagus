@@ -696,6 +696,9 @@ static int CclUnit(lua_State* l)
 		} else if (!strcmp(value, "attacked")) {
 			// FIXME : unsigned long should be better handled
 			unit->Attacked = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "auto-repair")) {
+			unit->AutoRepair = 1;
+			--j;
 		} else if (!strcmp(value, "burning")) {
 			unit->Burning = 1;
 			--j;
