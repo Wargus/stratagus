@@ -50,26 +50,6 @@
 //----------------------------------------------------------------------------
 
 /**
-**	Network chat message.
-*/
-typedef struct _network_chat_ {
-    unsigned char	Frame;		/// Destination frame
-    unsigned char	Type;		/// Network command type
-    unsigned char	Player;		/// Sending player
-    char		Text[7];	/// Message bytes
-} NetworkChat;
-
-/**
-**	Network packet.
-**
-**	This is sent over the network.
-*/
-typedef struct _network_packet_ {
-					/// Commands in packet.
-    NetworkCommand	Commands[NetworkDups];
-} NetworkPacket;
-
-/**
 **	Network command input/output queue.
 */
 typedef struct _network_command_queue_ {
@@ -415,7 +395,7 @@ global void NetworkEvent(void)
     //
     //	Minimal checks for good/correct packet.
     //
-    if ( n!=sizeof(NetworkPacket) ) {
+    if ( n!=sizeof(NetworkPacket) && packet->Commands[0].Type != MessageQuit ) {
 	DebugLevel0Fn("Bad packet\n");
 	return;
     }

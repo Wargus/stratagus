@@ -102,6 +102,25 @@ typedef struct _network_command_ {
     UnitRef		Dest;		/// Destination unit.
 } NetworkCommand;
 
+/**
+**	Network packet.
+**
+**	This is sent over the network.
+*/
+typedef struct _network_packet_ {
+					/// Commands in packet.
+    NetworkCommand	Commands[NetworkDups];
+} NetworkPacket;
+
+/**
+**	Network chat message.
+*/
+typedef struct _network_chat_ {
+    unsigned char	Frame;		/// Destination frame
+    unsigned char	Type;		/// Network command type
+    unsigned char	Player;		/// Sending player
+    char		Text[7];	/// Message bytes
+} NetworkChat;
 
 /*----------------------------------------------------------------------------
 --	Variables

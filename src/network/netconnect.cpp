@@ -460,26 +460,26 @@ global void NetworkClientSetup(void)
 */
 global void NetworkParseSetupEvent(const char *buf, int size)
 {
-#if 0
-	if ( packet->Commands[0].Type == MessageInitConfig
-		&& n==sizeof(InitMessage)) {
-	    Acknowledge acknowledge;
+    NetworkPacket* packet;
 
-	    DebugLevel0Fn("Received late clients\n");
+    packet=(NetworkPacket*)buf;
+    if ( packet->Commands[0].Type == MessageInitConfig
+	    && size==sizeof(InitMessage)) {
+	Acknowledge acknowledge;
 
-	    // Acknowledge the packets.
-	    acknowledge.Type = MessageInitReply;
-	    n=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
-		    sizeof(acknowledge));
-	    DebugLevel0Fn("Sending config ack (%d)\n", n);
-	    return;
-	}
-	if (packet->Commands[0].Type == MessageInitReply) {
-	    DebugLevel0Fn("late init reply\n");
-	    return;
-	}
-#endif
+	DebugLevel0Fn("Received late clients\n");
+
+	// Acknowledge the packets.
+	acknowledge.Type = MessageInitReply;
+	size=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
+		sizeof(acknowledge));
+	DebugLevel0Fn("Sending config ack (%d)\n", size);
 	return;
+    }
+    if (packet->Commands[0].Type == MessageInitReply) {
+	DebugLevel0Fn("late init reply\n");
+	return;
+    }
 }
 
 //@}
