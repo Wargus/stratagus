@@ -774,15 +774,10 @@ static int CclShowNoFull(lua_State* l)
 */
 static int CclDecorationOnTop(lua_State* l)
 {
-	int i;
-
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
-//		UnitTypeVar.DecoVar[i].OffsetY = 0;
-		UnitTypeVar.DecoVar[i].OffsetYPercent = 0;
-	}
+	// FIXME: not implemented
 	return 0;
 }
 
