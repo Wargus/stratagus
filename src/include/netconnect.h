@@ -109,7 +109,10 @@ enum _ic_message_subtype_ {
 
     ICMGameFull,			/// No player slots available
     ICMWelcome,				/// Acknowledge for new client connections
-    ICMWaiting,				/// Client has received Welcome and is waiting
+
+    ICMWaiting,				/// Client has received Welcome and is waiting for Map/State
+    ICMMap,				/// MapInfo (and Mapinfo Ack)
+    ICMState,				/// StateInfo
 
     ICMServerQuit,			/// Server has quit game
 };
@@ -119,8 +122,10 @@ enum _ic_message_subtype_ {
 */
 enum _net_client_con_state_ {
     ccs_unused = 0,
-    ccs_connecting,
-    ccs_connected,
+    ccs_connecting,		/* new client */
+    ccs_connected,		/* has received slot info */
+    ccs_mapinfo,		/* has received matching map-info */
+    ccs_badmap,			/* has received non-matching map-info */
     ccs_synced,
     ccs_unreachable,
 };

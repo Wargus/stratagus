@@ -44,6 +44,7 @@
 #include "network.h"
 #include "netconnect.h"
 #include "interface.h"
+#include "menus.h"
 
 
 //----------------------------------------------------------------------------
@@ -79,7 +80,7 @@ local unsigned long NetworkServerIP;	/// Network Client: IP of server to join
 
 /// FIXME ARI: The following is a kludge to have some way to override the default port
 /// on the server to connect to. Should be selectable by advanced network menus.
-/// For now just specify with the network arg...
+/// For now just specify with the -P port command line arg...
 local int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 
 
@@ -757,11 +758,45 @@ global void NetworkProcessClientRequest(void)
 	    }
 	    break;
 	case ccs_connected:
+	    if (NetStateMsgCnt < 20) {	/// 20 retries 
+		message.Type = MessageInitHello;
+		message.SubType = ICMWaiting;
+		NetworkSendRateLimitedClientMessage(&message, 650);
+	    } else {
+		NetLocalState = ccs_unreachable;			
+		NetConnectRunning = 0;	/// End the menu..
+	    }
+	    break;
+	case ccs_synced:
 	    message.Type = MessageInitHello;
 	    message.SubType = ICMWaiting;
-	    // memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);
-	    message.MapUID = 0L;
-	    NetworkSendRateLimitedClientMessage(&message, 650);
+	    NetworkSendRateLimitedClientMessage(&message, 850);
+	    break;
+	case ccs_mapinfo:
+	    if (NetStateMsgCnt < 20 && ScenSelectPudInfo != NULL) {		/// 20 retries 
+		message.Type = MessageInitHello;
+		message.SubType = ICMMap;					/// ICMMapAck..
+		message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+		NetworkSendRateLimitedClientMessage(&message, 650);
+	    } else {
+		NetLocalState = ccs_unreachable;			
+		NetConnectRunning = 0;	/// End the menu..
+	    }
+	case ccs_badmap:
+	    if (NetStateMsgCnt < 20) {	/// 20 retries 
+		message.Type = MessageInitHello;
+		message.SubType = ICMMapUidMismatch;
+		if (ScenSelectPudInfo) {
+		    message.MapUID = htonl(ScenSelectPudInfo->MapUID);		/// MAP Uid doesn't match
+		} else {
+		    message.MapUID = 0L;					/// Map not found
+		}
+		NetworkSendRateLimitedClientMessage(&message, 650);
+	    } else {
+		NetLocalState = ccs_unreachable;			
+		NetConnectRunning = 0;	/// End the menu..
+	    }
+	    break;
 	default:
 	    break;
     }
@@ -786,9 +821,9 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 	    msg->Type, msg->SubType, size, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
     if (NetConnectRunning == 2) {		/// client
-	switch(NetLocalState) {
-	    case ccs_connecting:
-		if (msg->Type == MessageInitReply) {
+	if (msg->Type == MessageInitReply) {
+	    switch(NetLocalState) {
+		case ccs_connecting:
 		    switch(msg->SubType) {
 
 			case ICMEngineMismatch: /// FreeCraft engine version doesn't match
@@ -843,14 +878,66 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				    memcpy(Hosts[i].PlyName, NetworkName, 16);
 				}
 			    }
+			    break;
 
+			default:
+			    DebugLevel0Fn("ccs_connecting: Unhandled subtype %d\n",msg->SubType);
+			    break;
+
+		    }
+		    break;
+
+		case ccs_connected:
+		    switch(msg->SubType) {
+
+			case ICMMap:		/// Server has sent us new map info
+			    memcpy(ScenSelectFullPath, msg->u.MapPath, 256);
+			    ScenSelectFullPath[255] = 0;
+			    if (NetClientSelectScenario()) {
+				NetLocalState = ccs_badmap;
+				break;
+			    }
+			    if (ntohl(msg->MapUID) != ScenSelectPudInfo->MapUID) {
+				NetLocalState = ccs_badmap;
+				fprintf(stderr,
+				    "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
+					    (unsigned int)ScenSelectPudInfo->MapUID,
+					    (unsigned int)ntohl(msg->MapUID));
+				break;
+			    }
+			    NetLocalState = ccs_mapinfo;
 			    NetConnectRunning = 0;	/// Kick the menu..
 			    break;
+
+			case ICMWelcome:	/// Server has accepted us (dup)
+			    DebugLevel3Fn("ccs_connected: DUP Welcome subtype %d\n",msg->SubType);
+			    break;
+
+			default:
+			    DebugLevel0Fn("ccs_connected: Unhandled subtype %d\n",msg->SubType);
+			    break;
 		    }
-		}
-		break;
-	    default:
-		break;
+		    break;
+
+		case ccs_mapinfo:
+		    switch(msg->SubType) {
+
+			case ICMState:		/// Server has sent us new state info
+			    /// FIXME: Implement passed state info here
+			    NetLocalState = ccs_synced;
+			    break;
+
+			default:
+			    DebugLevel0Fn("ccs_mapinfo: Unhandled subtype %d\n",msg->SubType);
+			    break;
+		    }
+		    break;
+
+		case ccs_synced:
+		default:
+		    DebugLevel0Fn("Client: Unhandled state %d\n", NetLocalState);
+		    break;
+	    }
 	}
 
     } else if (NetConnectRunning == 1) {	/// server
@@ -945,21 +1032,95 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    // FIXME: Client sends hellos, but doesn't receive our welcome acks....
 			    ;
 			}
+			NetConnectForceDisplayUpdate();
 			return;
 
-		    case ICMWaiting:		/// client has recvd welcome and is waiting for info/game start
+		    case ICMWaiting:
 			// look up the host
 			for (h = 0; h < HostsCount; ++h) {
 			    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
-				NetStates[h].State = ccs_connected;
-				NetStates[h].MsgCnt = 0;
-				NetStates[h].Ready = 0;
+				switch (NetStates[h].State) {
+				    /// client has recvd welcome and is waiting for info
+				    case ccs_connecting:
+					NetStates[h].State = ccs_connected;
+					NetStates[h].MsgCnt = 0;
+					NetStates[h].Ready = 0;
+					/* Fall through */
+				    case ccs_connected:
+					/// this code path happens until client acknoledges the map
+					message.Type = MessageInitReply;
+					message.SubType = ICMMap;			/// Send Map info to the client
+					/// FIXME: Transmit (and receive!) relative to FreeCraftLibPath
+					memcpy(message.u.MapPath, ScenSelectFullPath, 256);
+					message.HostsCount = (char)(HostsCount & 0xff);
+					message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+					n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+					DebugLevel0Fn("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n",
+						    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+					NetStates[h].MsgCnt++;
+					if (NetStates[h].MsgCnt > 50) {
+					    // FIXME: Client sends waiting, but doesn't receive our map....
+					    ;
+					}
+					break;
+				    case ccs_mapinfo:
+					NetStates[h].State = ccs_synced;
+					NetStates[h].MsgCnt = 0;
+				    case ccs_synced:
+					/// the wanted state - do nothing.. until start...
+					break;
+
+				    default:
+					DebugLevel0Fn("Server: ICMWaiting: Unhandled state %d Host %d\n",
+									 NetStates[h].State, h);
+					break;
+				}
+				break;
+			    }
+			}
+			break;
+
+		    case ICMMap:
+			// look up the host
+			for (h = 0; h < HostsCount; ++h) {
+			    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+				switch (NetStates[h].State) {
+				    /// client has recvd map info waiting for state info
+				    case ccs_connected:
+					NetStates[h].State = ccs_mapinfo;
+					NetStates[h].MsgCnt = 0;
+					NetStates[h].Ready = 0;
+					/* Fall through */
+				    case ccs_mapinfo:
+					/// this code path happens until client acknoledges the state info
+					/// by falling back to ICMWaiting with prev. State synced
+					message.Type = MessageInitReply;
+					message.SubType = ICMState;		/// Send State info to the client
+					/// FIXME: Implement and setup the menu state info here...
+
+					message.HostsCount = (char)(HostsCount & 0xff);
+					message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+					n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+					DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n",
+						    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+					NetStates[h].MsgCnt++;
+					if (NetStates[h].MsgCnt > 50) {
+					    // FIXME: Client sends mapinfo, but doesn't receive our state....
+					    ;
+					}
+					break;
+				    default:
+					DebugLevel0Fn("Server: ICMMap: Unhandled state %d Host %d\n",
+									 NetStates[h].State, h);
+					break;
+				}
 				break;
 			    }
 			}
 			break;
 
 		    default:
+			DebugLevel0Fn("Server: Unhandled subtype %d\n",msg->SubType);
 			break;
 		}
 	    default:
