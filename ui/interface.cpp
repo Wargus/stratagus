@@ -447,10 +447,12 @@ local int CommandKey(int key)
 	    break;
 
 	case '+':			// + Faster
+	case KeyCodeKPPlus:
 	    UiIncrementGameSpeed();
 	    break;
 
 	case '-':			// - Slower
+	case KeyCodeKPMinus:
 	    UiDecrementGameSpeed();
 	    break;
 

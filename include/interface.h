@@ -112,6 +112,8 @@ enum _key_codes_ {
     KeyCodeKP7,				/// internal keycode: keypad 7
     KeyCodeKP8,				/// internal keycode: keypad 8
     KeyCodeKP9,				/// internal keycode: keypad 9
+    KeyCodeKPPlus,			/// internal keycode: keypad +
+    KeyCodeKPMinus,			/// internal keycode: keypad -
 
     KeyCodeShift,			/// internal keycode: shift modifier
     KeyCodeControl,			/// internal keycode: ctrl modifier

@@ -668,6 +668,12 @@ local void KeyboardEvent(int scancode, int press)
 	    case SCANCODE_KEYPAD9:
 		icode = KeyCodeKP9;
 		break;
+	    case SCANCODE_KEYPADPLUS:
+		icode = KeyCodeKPPlus;
+		break;
+	    case SCANCODE_KEYPADMINUS:
+		icode = KeyCodeKPMinus;
+		break;
 
 		// KeyCodePause
 
