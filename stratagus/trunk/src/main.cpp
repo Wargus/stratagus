@@ -9,14 +9,18 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name main.c		-	Dummy main for win32. */
-/*
-**	(c) Copyright 2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
+/**
+**
+**	Main entry point. This is needed for mingw32 and SDL.
+**	This combination didn't likes if main is in the freecraft lib.
+*/
 int main(int argc,char** argv)
 {
     extern int mymain(int argc,char** argv);
