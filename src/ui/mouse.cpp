@@ -160,24 +160,31 @@ global void DoRightButton(int x,int y)
     for( i=0; i<NumSelected; ++i ) {
         unit=Selected[i];
         DebugCheck( !unit );
-        type=unit->Type;
         if( !acknowledged ) {
             PlayUnitSound(unit,VoiceAcknowledging);
             acknowledged=1;
         }
+        type=unit->Type;
         action=type->MouseAction;
 	DebugLevel3Fn("Mouse action %d\n",action);
 
         //
         //      Enter transporters?
-        //	FIXME: UnitOnMapTile returns random unit on tile
 	//
-        dest=UnitOnMapTile(x,y);
+        dest=TransporterOnMapTile(x,y);
         if( dest && dest->Type->Transporter
                 && dest->Player==ThisPlayer
                 && unit->Type->UnitType==UnitTypeLand ) {
             dest->Blink=3;
 	    DebugLevel3Fn("Board transporter\n");
+	    //	Let the transporter move to passenger
+	    //		It should do nothing and not already on coast.
+	    //		FIXME: perhaps force move if not reachable.
+	    if( dest->Orders[0].Action==UnitActionStill
+		    && dest->OrderCount==1
+		    && !CoastOnMap(dest->X,dest->Y) ) {
+		SendCommandFollow(dest,unit,FlushCommands);
+	    }
             SendCommandBoard(unit,-1,-1,dest,flush);
             continue;
         }
