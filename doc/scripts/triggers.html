@@ -59,6 +59,7 @@
 <A HREF="#if-score">if-score</A>
 <A HREF="#if-timer">if-timer</A>
 <A HREF="#if-unit">if-unit</A>
+<A HREF="#set-trigger-number!">set-trigger-number!</A>
 <HR>
 <H2>Intro - Introduction to trigger functions and variables</H2>
 
@@ -276,10 +277,10 @@ Game run for duration.  If the game run for the duration game cycles the action 
 <DT>op</DT>
 <DD><PRE>
 '==         operator equal
-'>          operator greater than
-'>=         operator greater than or equal
-'<          operator less than
-'<=         operator less than or equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
 </PRE></DD>
 <DT>quantity</DT>
 <DD><PRE>
@@ -290,7 +291,7 @@ Game run for duration.  If the game run for the duration game cycles the action 
 <H4>Example</H4>
 
 <PRE>
-    (if-elapsed '>= 300)
+    (if-elapsed '&gt;= 300)
 </PRE>
 
 <P>If the game has run for 300 cycles.
@@ -322,10 +323,10 @@ player for the action.
 <DT>op</DT>
 <DD><PRE>
 '==         operator equal
-'>          operator greater than
-'>=         operator greater than or equal
-'<          operator less than
-'<=         operator less than or equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
 </PRE></DD>
 <DT>quantity</DT>
 <DD><PRE>
@@ -336,7 +337,7 @@ player for the action.
 <H4>Example</H4>
 
 <PRE>
-    (if-kills 'this '>= 30)
+    (if-kills 'this '&gt;= 30)
 </PRE>
 
 <P>.
@@ -369,10 +370,10 @@ the action.
 <DT>op</DT>
 <DD><PRE>
 '==         operator equal
-'>          operator greater than
-'>=         operator greater than or equal
-'<          operator less than
-'<=         operator less than or equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
 </PRE></DD>
 <DT>quantity</DT>
 <DD><PRE>
@@ -422,10 +423,10 @@ Player has the quantity of opponents.
 <DT>op</DT>
 <DD><PRE>
 '==         operator equal
-'>          operator greater than
-'>=         operator greater than or equal
-'<          operator less than
-'<=         operator less than or equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
 </PRE></DD>
 <DT>quantity</DT>
 <DD><PRE>
@@ -469,10 +470,10 @@ for the action.
 <DT>op</DT>
 <DD><PRE>
 '==         operator equal
-'>          operator greater than
-'>=         operator greater than or equal
-'<          operator less than
-'<=         operator less than or equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
 </PRE></DD>
 <DT>quantity</DT>
 <DD><PRE>
@@ -524,10 +525,10 @@ player must have for the action.
 <DT>op</DT>
 <DD><PRE>
 '==         operator equal
-'>          operator greater than
-'>=         operator greater than or equal
-'<          operator less than
-'<=         operator less than or equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
 </PRE></DD>
 <DT>quantity</DT>
 <DD><PRE>
@@ -544,7 +545,7 @@ player must have for the action.
 <H4>Example</H4>
 
 <PRE>
-    (if-resource 'this '>= 5000 'gold)
+    (if-resource 'this '&gt;= 5000 'gold)
 </PRE>
 
 <P>If the player on the console has at least 5000 gold.
@@ -576,10 +577,10 @@ quantity of score the action is executed.
 <DT>op</DT>
 <DD><PRE>
 '==         operator equal
-'>          operator greater than
-'>=         operator greater than or equal
-'<          operator less than
-'<=         operator less than or equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
 </PRE></DD>
 <DT>quantity</DT>
 <DD><PRE>
@@ -591,7 +592,7 @@ quantity of score the action is executed.
 <H4>Example</H4>
 
 <PRE>
-    (if-score 'this '>= 1000)
+    (if-score 'this '&gt;= 1000)
 </PRE>
 
 <P>If the player on the console has a score of at least 1000.
@@ -615,10 +616,10 @@ Timer reaches quantity. If the timer reaches quantity the action is executed.
 <DT>op</DT>
 <DD><PRE>
 '==         operator equal
-'>          operator greater than
-'>=         operator greater than or equal
-'<          operator less than
-'<=         operator less than or equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
 </PRE></DD>
 <DT>quantity</DT>
 <DD><PRE>
@@ -661,10 +662,10 @@ units must control the player for the action.
 <DT>op</DT>
 <DD><PRE>
 '==         operator equal
-'>          operator greater than
-'>=         operator greater than or equal
-'<          operator less than
-'<=         operator less than or equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
 </PRE></DD>
 <DT>quantity</DT>
 <DD><PRE>
@@ -683,7 +684,7 @@ units must control the player for the action.
 <H4>Example</H4>
 
 <PRE>
-    (if-unit 'this '>= 8 'unit-archer)
+    (if-unit 'this '&gt;= 8 'unit-archer)
 </PRE>
 
 <P>If the player on the console has at least 8 archers.
@@ -691,6 +692,32 @@ units must control the player for the action.
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-trigger-number!"></A>
+<H3>set-trigger-number!</H3>
+
+<H4>Description</H4>
+
+Set the current trigger number.
+
+<H4>Syntax</H4>
+
+<CODE>(set-trigger-number! number)</CODE>
+
+<DL>
+<DT>number</DT>
+<DD>Trigger number (0 offset, -1 for no current trigger)</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-trigger-number! 0)
+</PRE>
+
+<P>Set the current trigger to the first trigger.
+
+<H4>Not Used</H4>
 
 <HR>
 Last changed: $Id$<BR>
