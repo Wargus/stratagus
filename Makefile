@@ -35,7 +35,7 @@ OBJDIR ?= .
 
 CROSSDIR = /usr/local/cross
 
-INCLUDE_DIRS = src/include src/movie/vp31/include
+INCLUDE_DIRS = src/include src/movie/vp31/include etlib
 
 MODULES = src/action src/ai src/beos src/clone src/editor src/freecraft src/game src/libmodplug src/map \
           src/missile src/movie src/movie/vp31 src/network src/pathfinder src/siod src/sound src/ui src/unit \
@@ -212,14 +212,17 @@ tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
 #	Distributions
 ##############################################################################
 
-DOCS    = README README.BeOS doc/readme.html doc/install.html \
-	  doc/freecraft.html doc/datadir.html \
-	  doc/faq.html doc/ChangeLog.html doc/todo.html doc/freecraft.lsm \
-	  doc/development.html doc/gpl.txt doc/gpl.html doc/SIOD.txt \
+DOCS    = README doc/index.html doc/install.html \
+	  doc/media.html doc/datadir.html doc/README-SDL.txt\
+	  doc/faq.html doc/ChangeLog.html doc/todo.html \
+	  doc/development.html doc/gpl.html doc/SIOD.txt \
 	  doc/ccl/ai.html doc/ccl/ccl.html doc/ccl/config.html \
 	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
-	  doc/ccl/research.html doc/graphic/*.html doc/graphic/*.png \
-	  doc/trigger.txt debian/freecraft.6
+	  doc/ccl/research.html doc/graphic/* \
+	  doc/trigger.txt doc/vp32_opensource_license_9-6-01.txt \
+	  debian/freecraft.6 doc/ccl/ccl-index.html doc/ccl/game.html \
+	  doc/ccl/icon.html doc/ccl/sound.html doc/ccl/triggers.html \
+	  doc/ccl/ui.html
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
@@ -258,9 +261,9 @@ CONTRIB	= contrib/cross.png contrib/red_cross.png \
 
 MISC    += Makefile Rules.make.orig setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
-	  .indent.pro make/common.scc make/rules.scc make/makefile.scc \
-	  make/README tools/udta.c tools/ugrd.c $(CONTRIB) \
-	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h \
+	  .indent.pro Rules.make.in configure.in configure \
+	  $(CONTRIB) \
+	  \
 	  src/freecraft.rc data/default.cm
 
 mydate	= $(shell date +%y%m%d)
