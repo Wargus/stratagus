@@ -2286,15 +2286,11 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
 */
 local void PrgStartInit(Menuitem *mi)
 {
-#ifdef NEW_NETMENUS
     if (NetworkNumInterfaces == 0) {
 	mi[2].flags = MenuButtonDisabled;
     } else {
 	mi[2].flags = 0;
     }
-#else
-    mi[2].flags = MenuButtonDisabled;
-#endif
 }
 
 local void GameMenuReturn(void)

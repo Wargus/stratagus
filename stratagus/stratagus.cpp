@@ -983,9 +983,6 @@ local void PrintHeader(void)
 #ifdef NEW_SHIPS
     "NEW-SHIPS "
 #endif
-#ifdef NEW_NETMENUS
-    "NEW-NETMENUS "
-#endif
 #ifdef HIERARCHIC_PATHFINDER
     "HIERARCHIC-PATHFINDER "
 #endif
