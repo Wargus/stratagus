@@ -39,6 +39,7 @@
 #include <string.h>
 
 #include "stratagus.h"
+#include "unittype.h"
 #include "player.h"
 #include "script.h"
 #include "ai.h"

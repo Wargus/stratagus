@@ -41,7 +41,7 @@
 #include "stratagus.h"
 #include "player.h"
 #include "unit.h"
-
+#include "unittype.h"
 #include "pathfinder.h"
 
 /*----------------------------------------------------------------------------

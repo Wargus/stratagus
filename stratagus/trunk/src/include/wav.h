@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//            T H E   W A R   B E G I N S
-//     Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name wav.h - The wav file format header file. */
 //
-//  (c) Copyright 1998-2001 by Lutz Sammer
+//      (c) Copyright 1998-2001 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//  $Id$
+//      $Id$
 
 #ifndef __WAV_H__
 #define __WAV_H__
@@ -69,14 +69,14 @@
 **  Wav format
 */
 typedef struct __wav_fmt__ {
-	unsigned int    FMTchunk;
-	unsigned int    FMTlength;
-	unsigned short  Encoding;       ///< 1 = PCM
-	unsigned short  Channels;       ///< 1 = mono, 2 = stereo
-	unsigned int    Frequency;      ///< One of 11025, 22050, or 44100 Hz
-	unsigned int    ByteRate;       ///< Average bytes per second
-	unsigned short  SampleSize;     ///< Bytes per sample block
-	unsigned short  BitsPerSample;  ///< One of 8, 12, 16
+	unsigned int   FMTchunk;
+	unsigned int   FMTlength;
+	unsigned short Encoding;       ///< 1 = PCM
+	unsigned short Channels;       ///< 1 = mono, 2 = stereo
+	unsigned int   Frequency;      ///< One of 11025, 22050, or 44100 Hz
+	unsigned int   ByteRate;       ///< Average bytes per second
+	unsigned short SampleSize;     ///< Bytes per sample block
+	unsigned short BitsPerSample;  ///< One of 8, 12, 16
 } WavFMT;
 
 /**

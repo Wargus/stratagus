@@ -42,10 +42,9 @@
 #include "stratagus.h"
 #include "player.h"
 #include "unit.h"
+#include "unittype.h"
 #include "map.h"
-
 #include "pathfinder.h"
-
 #include "splitter_local.h"
 
 /*----------------------------------------------------------------------------

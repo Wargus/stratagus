@@ -382,13 +382,6 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include "video.h"
-#include "unittype.h"
-#include "upgrade_structs.h"
-#include "upgrade.h"
-#include "construct.h"
-#include "script.h"
-
 #include "SDL.h"
 
 /*----------------------------------------------------------------------------
@@ -397,7 +390,16 @@
 
 typedef struct _unit_ Unit;            ///< unit itself
 typedef enum _unit_action_ UnitAction; ///< all possible unit actions
-struct _spell_type_;                   ///< base structure of a spell type
+struct _unit_type_;
+struct _unit_stats_;
+struct _spell_type_;
+struct _unit_colors_;
+struct _construction_frame_;
+struct _variable_type_;
+struct _upgrade_;
+struct _building_restrictions_;
+struct _CL_File_;
+struct lua_State;
 
 /**
 **  Unit references over network, or for memory saving.
@@ -454,7 +456,7 @@ typedef struct _order_ {
 	Unit*     Goal;         ///< goal of the order (if any)
 	int       X;            ///< or X tile coordinate of destination
 	int       Y;            ///< or Y tile coordinate of destination
-	UnitType* Type;         ///< Unit-type argument
+	struct _unit_type_* Type;///< Unit-type argument
 
 	void* Arg1;             ///< Extra command argument
 } Order;
@@ -529,13 +531,13 @@ struct _unit_ {
 	int X; ///< Map position X
 	int Y; ///< Map position Y
 
-	UnitType*  Type;              ///< Pointer to unit-type (peon,...)
+	struct _unit_type_*  Type;    ///< Pointer to unit-type (peon,...)
 	Player*    Player;            ///< Owner of this unit
-	UnitStats* Stats;             ///< Current unit stats
+	struct _unit_stats_* Stats;   ///< Current unit stats
 	int        CurrentSightRange; ///< Unit's Current Sight Range
 
 // DISPLAY:
-	UnitColors* Colors;     ///< Player colors
+	struct _unit_colors_* Colors; ///< Player colors
 	signed char IX;         ///< X image displacement to map position
 	signed char IY;         ///< Y image displacement to map position
 	int         Frame;      ///< Image frame: <0 is mirrored
@@ -558,22 +560,22 @@ struct _unit_ {
 	/* Seen stuff. */
 	char VisCount[PlayerMax]; ///< Unit visibility counts
 	struct _seen_stuff_ {
-		unsigned           ByPlayer : 16;           ///< Track unit seen by player
-		int                Frame;                   ///< last seen frame/stage of buildings
-		UnitType*          Type;                    ///< Pointer to last seen unit-type
-		signed char        IX;                      ///< Seen X image displacement to map position
-		signed char        IY;                      ///< seen Y image displacement to map position
-		unsigned           Constructed : 1;         ///< Unit seen construction
-		unsigned           State : 3;               ///< Unit seen build/upgrade state
-		unsigned           Destroyed : PlayerMax;   ///< Unit seen destroyed or not
-		ConstructionFrame* CFrame;                  ///< Seen construction frame
+		unsigned            ByPlayer : 16;           ///< Track unit seen by player
+		int                 Frame;                   ///< last seen frame/stage of buildings
+		struct _unit_type_* Type;                    ///< Pointer to last seen unit-type
+		signed char         IX;                      ///< Seen X image displacement to map position
+		signed char         IY;                      ///< seen Y image displacement to map position
+		unsigned            Constructed : 1;         ///< Unit seen construction
+		unsigned            State : 3;               ///< Unit seen build/upgrade state
+		unsigned            Destroyed : PlayerMax;   ///< Unit seen destroyed or not
+		struct _construction_frame_* CFrame;         ///< Seen construction frame
 	} Seen;
 
 	int Mana;               ///< mana points
 	int HP;                 ///< hit points
 	int XP;                 ///< experience points
 	int Kills;              ///< how many unit has this unit killed
-	VariableType *Variable; ///< array of User Defined variables.
+	struct _variable_type_* Variable; ///< array of User Defined variables.
 
 	unsigned long TTL;  ///< time to live
 	int Bloodlust;      ///< ticks bloodlust
@@ -620,7 +622,7 @@ struct _unit_ {
 		Unit* Worker;               ///< Worker building this unit
 		int Progress;               ///< Progress counter, in 1/100 cycles.
 		int Cancel;                 ///< Cancel construction
-		ConstructionFrame* Frame;   ///< Construction frame
+		struct _construction_frame_* Frame; ///< Construction frame
 	} Builded; ///< ActionBuilded,...
 	struct _order_resource_ {
 		int Active; ///< how many units are harvesting from the resource.
@@ -630,7 +632,7 @@ struct _unit_ {
 		unsigned DoneHarvesting:1;  ///< Harvesting done, wait for action to break.
 	} ResWorker; ///< Worker harvesting
 	struct _order_research_ {
-		Upgrade* Upgrade; ///< Upgrade researched
+		struct _upgrade_* Upgrade; ///< Upgrade researched
 	} Research; ///< Research action
 	struct _order_upgradeto_ {
 		int Ticks; ///< Ticks to complete
@@ -750,15 +752,15 @@ extern void RefsDecrease(Unit* unit);
 	/// Release an unit
 extern void ReleaseUnit(Unit* unit);
 	/// Initialize unit structure with default values
-extern void InitUnit(Unit* unit, UnitType* type);
+extern void InitUnit(Unit* unit, struct _unit_type_* type);
 	/// Assign unit to player
 extern void AssignUnitToPlayer(Unit* unit, Player* player);
 	/// Create a new unit
-extern Unit* MakeUnit(UnitType* type,Player* player);
+extern Unit* MakeUnit(struct _unit_type_* type,Player* player);
 	/// Place an unit on map
 extern void PlaceUnit(Unit* unit, int x, int y);
 	/// Create a new unit and place on map
-extern Unit* MakeUnitAndPlace(int x, int y, UnitType* type,Player* player);
+extern Unit* MakeUnitAndPlace(int x, int y, struct _unit_type_* type,Player* player);
 	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
 extern void MoveUnitToXY(Unit* unit, int x, int y);
 	/// Add an unit inside a container. Only deal with list stuff.
@@ -819,13 +821,13 @@ extern void DropOutNearest(Unit* unit, int x, int y, int addx, int addy);
 extern void DropOutAll(const Unit* unit);
 
 	/// Return the rule used to build this building.
-extern BuildRestriction* OnTopDetails(const Unit* unit, const UnitType* parent);
+extern struct _building_restrictions_* OnTopDetails(const Unit* unit, const struct _unit_type_* parent);
 	/// @todo more docu
-extern Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y);
+extern Unit* CanBuildHere(const Unit* unit, const struct _unit_type_* type, int x, int y);
 	/// @todo more docu
 extern int CanBuildOn(int x, int y, int mask);
 	/// FIXME: more docu
-extern Unit* CanBuildUnitType(const Unit* unit,const UnitType* type, int x, int y, int real);
+extern Unit* CanBuildUnitType(const Unit* unit,const struct _unit_type_* type, int x, int y, int real);
 
 	/// Find resource
 extern Unit* FindResource(const Unit* unit, int x, int y, int range, int resource);
@@ -853,11 +855,11 @@ extern void HitUnit(Unit* attacker, Unit* target, int damage);
 	/// Returns the map distance between two points
 extern int MapDistance(int x1, int y1, int x2, int y2);
 	/// Returns the map distance between two points with unit-type
-extern int MapDistanceToType(int x1, int y1,const UnitType* type, int x2, int y2);
+extern int MapDistanceToType(int x1, int y1,const struct _unit_type_* type, int x2, int y2);
 	/// Returns the map distance to unit
 extern int MapDistanceToUnit(int x, int y,const Unit* dest);
 	/// Returns the map diestance between to unittype as locations
-extern int MapDistanceBetweenTypes(const UnitType* src, int x1, int y1, const UnitType* dst, int x2, int y2);
+extern int MapDistanceBetweenTypes(const struct _unit_type_* src, int x1, int y1, const struct _unit_type_* dst, int x2, int y2);
 	/// Returns the map distance between two units
 extern int MapDistanceBetweenUnits(const Unit* src,const Unit* dst);
 
@@ -877,19 +879,19 @@ extern int ViewPointDistanceToUnit(const Unit* dest);
 	(((player)->SharedVision & (1 << (dest)->Player->Player)) && \
 		((dest)->Player->SharedVision & (1 << (player)->Player)))
 	/// Can this unit-type attack the other (destination)
-extern int CanTarget(const UnitType* type,const UnitType* dest);
+extern int CanTarget(const struct _unit_type_* type, const struct _unit_type_* dest);
 	/// Can transporter transport the other unit
-extern int CanTransport(const Unit* transporter,const Unit* unit);
+extern int CanTransport(const Unit* transporter, const Unit* unit);
 
 
 	/// Generate a unit reference, a printable unique string for unit
 extern char* UnitReference(const Unit*);
 	/// Save an order
-extern void SaveOrder(const Order* order, CLFile* file);
+extern void SaveOrder(const Order* order, struct _CL_File_* file);
 	/// save unit-structure
-extern void SaveUnit(const Unit* unit,CLFile* file);
+extern void SaveUnit(const Unit* unit, struct _CL_File_* file);
 	/// save all units
-extern void SaveUnits(CLFile* file);
+extern void SaveUnits(struct _CL_File_* file);
 
 	/// Initialize unit module
 extern void InitUnits(void);
@@ -935,13 +937,13 @@ extern void LoadDecorations(void);
 extern void CleanDecorations(void);
 
 	/// Draw unit's shadow
-extern void DrawShadow(const Unit* unit, const UnitType* type, int frame,
+extern void DrawShadow(const Unit* unit, const struct _unit_type_* type, int frame,
 	int x, int y);
 	/// Draw A single Unit
 extern void DrawUnit(const Unit* unit);
 #ifdef USE_OPENGL
 	/// Draw the sprite with the player colors
-extern void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** glsprite,
+extern void DrawUnitPlayerColor(const struct _unit_type_* type, Graphic* sprite, Graphic** glsprite,
 	int player, int frame, int x, int y);
 #endif
 	/// Draw all units visible on map in viewport
@@ -951,9 +953,9 @@ extern void ShowOrder(const Unit* unit);
 
 // in unit_find.c
 	/// Find all units of this type
-extern int FindUnitsByType(const UnitType* type, Unit** table);
+extern int FindUnitsByType(const struct _unit_type_* type, Unit** table);
 	/// Find all units of this type of the player
-extern int FindPlayerUnitsByType(const Player*,const UnitType*, Unit**);
+extern int FindPlayerUnitsByType(const Player*, const struct _unit_type_*, Unit**);
 	/// Return any unit on that map tile
 extern Unit* UnitOnMapTile(int tx, int ty);
 	/// Return repairable unit on that map tile
@@ -966,7 +968,7 @@ extern Unit* TargetOnMap(const Unit* unit, int x1, int y1, int x2, int y2);
 extern Unit* TransporterOnMapTile(int tx, int ty);
 
 	/// Return unit of a fixed type on a map tile.
-extern Unit* UnitTypeOnMap(int tx, int ty, UnitType* type);
+extern Unit* UnitTypeOnMap(int tx, int ty, struct _unit_type_* type);
 	/// Return resource, if on map tile
 extern Unit* ResourceOnMap(int tx, int ty, int resource);
 	/// Return resource deposit, if on map tile
@@ -984,7 +986,7 @@ extern Unit* AttackUnitsInReactRange(Unit* unit);
 	/// Initialize data structures for groups
 extern void InitGroups(void);
 	/// Save groups
-extern void SaveGroups(CLFile* file);
+extern void SaveGroups(struct _CL_File_* file);
 	/// Cleanup groups
 extern void CleanGroups(void);
 
@@ -1050,7 +1052,7 @@ extern int AddSelectedAirUnitsInRectangle(int tx, int ty, int w, int h);
 	/// Init selections
 extern void InitSelections(void);
 	/// Save current selection state
-extern void SaveSelections(CLFile* file);
+extern void SaveSelections(struct _CL_File_* file);
 	/// Clean up selections
 extern void CleanSelections(void);
 	/// Register CCL selection features
@@ -1059,7 +1061,7 @@ extern void SelectionCclRegister(void);
 // in ccl_unit.c
 
 	/// Parse order
-extern void CclParseOrder(lua_State* l, Order* order);
+extern void CclParseOrder(struct lua_State* l, Order* order);
 	/// register CCL units features
 extern void UnitCclRegister(void);
 

@@ -37,6 +37,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+struct _unit_type_;
 struct lua_State;
 struct _CL_File_;
 
@@ -67,7 +68,7 @@ extern Timer GameTimer; ///< the game timer
 ----------------------------------------------------------------------------*/
 
 extern int TriggerGetPlayer(struct lua_State* l);///< get player number.
-extern const UnitType* TriggerGetUnitType(struct lua_State* l); ///< get the unit-type
+extern const struct _unit_type_* TriggerGetUnitType(struct lua_State* l); ///< get the unit-type
 extern void TriggersEachCycle(void);    ///< test triggers
 
 extern void TriggerCclRegister(void);   ///< Register ccl features

@@ -53,6 +53,8 @@
 
 #include "stratagus.h"
 
+#include "unittype.h"
+#include "upgrade.h"
 #include "spells.h"
 #include "sound.h"
 #include "sound_id.h"

@@ -48,6 +48,7 @@
 #include "ai.h"
 #include "interface.h"
 #include "pathfinder.h"
+#include "construct.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

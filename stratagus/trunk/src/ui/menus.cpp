@@ -50,6 +50,7 @@
 
 #include "iocompat.h"
 
+#include "unittype.h"
 #include "video.h"
 #include "player.h"
 #include "font.h"
@@ -75,6 +76,7 @@
 #include "cdaudio.h"
 #include "net_lowlevel.h"
 #include "master.h"
+#include "construct.h"
 
 
 /*----------------------------------------------------------------------------

@@ -40,6 +40,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unittype.h"
 #include "pathfinder.h"
 #include "interface.h"
 #include "actions.h"

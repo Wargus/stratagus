@@ -39,6 +39,7 @@
 #include <string.h>
 
 #include "stratagus.h"
+#include "unittype.h"
 #include "upgrade.h"
 #include "depend.h"
 #include "interface.h"

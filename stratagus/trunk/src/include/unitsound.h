@@ -35,18 +35,18 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include "sound_id.h"
 #include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
--- Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-** Sound definition
+**  Sound definition
 */
 typedef struct _sound_config_ {
 	char*   Name;   ///< config sound name
@@ -54,9 +54,9 @@ typedef struct _sound_config_ {
 } SoundConfig;
 
 /**
-** The sounds of the units.
+**  The sounds of the units.
 **
-** Played for the various events.
+**  Played for the various events.
 */
 typedef struct _unit_sound_ {
 	SoundConfig Selected;           ///< selected by user
@@ -71,29 +71,29 @@ typedef struct _unit_sound_ {
 /// @todo temporary solution should perhaps be a member of a more general weapon structure.
 
 /**
-** Attack sounds
+**  Attack sounds
 */
 typedef struct _weapon_sound_ {
 	SoundConfig Attack; ///< weapon is fired
 } WeaponSound;
 
 /*----------------------------------------------------------------------------
--- Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
--- Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-** Loads sounds defined in unitsound.c. Should be replaced by ccl loading of
-** sounds.
+**  Loads sounds defined in unitsound.c. Should be replaced by ccl loading of
+**  sounds.
 */
 extern void LoadUnitSounds(void);
 
 /**
-** Performs the mapping between sound names and SoundId for each unit type.
-** Set ranges for some sounds (infinite range for acknowledge and help sounds).
+**  Performs the mapping between sound names and SoundId for each unit type.
+**  Set ranges for some sounds (infinite range for acknowledge and help sounds).
 */
 extern void MapUnitSounds(void);
 
