@@ -27,8 +27,10 @@
 
 #include "freecraft.h"
 
+#include "unittype.h"
 #include "unit.h"
 #include "ai_local.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -151,6 +153,89 @@ global void AiAssignToForce(Unit* unit)
 	    ++unit->Refs;
 	    AiPlayer->Force[force].Units=aiunit;
 	    break;
+	}
+    }
+}
+
+/**
+**	Attack at position with force.
+**
+**	@param force	Force number to attack with.
+**	@param x	X tile map position to be attacked.
+**	@param y	Y tile map position to be attacked.
+*/
+global void AiAttackWithForceAt(int force,int x,int y)
+{
+    const AiUnit* aiunit;
+
+    AiPlayer->Force[force].Attacking=1;
+    aiunit=AiPlayer->Force[force].Units;
+
+    //
+    //	Send all units in the force to enemy.
+    //
+    while( aiunit ) {
+	CommandAttack(aiunit->Unit, x, y, NULL,FlushCommands);
+	aiunit=aiunit->Next;
+    }
+}
+
+/**
+**	Attack opponent with force.
+**
+**	@param force	Force number to attack with.
+*/
+global void AiAttackWithForce(int force)
+{
+    const AiUnit* aiunit;
+    const Unit* enemy;
+
+    AiPlayer->Force[force].Attacking=1;
+    aiunit=AiPlayer->Force[force].Units;
+
+    enemy = AttackUnitsInDistance(aiunit->Unit, 1000);
+    if (!enemy) {
+	return;
+    }
+
+    //
+    //	Send all units in the force to enemy.
+    //
+    while( aiunit ) {
+	CommandAttack(aiunit->Unit, enemy->X, enemy->Y, NULL,FlushCommands);
+	aiunit=aiunit->Next;
+    }
+}
+
+/**
+**	Entry point of force manager, perodic called.
+*/
+global void AiForceManager(void)
+{
+    int force;
+
+    //
+    //	Look if our defenders still have enemies in range.
+    //
+    for( force=0; force<AI_MAX_FORCES; ++force ) {
+	if( AiPlayer->Force[force].Defending ) {
+	    const AiUnit* aiunit;
+
+	    //
+	    //	Look if still enemies in attack range.
+	    //
+	    aiunit=AiPlayer->Force[force].Units;
+	    while( aiunit ) {
+		if( AttackUnitsInReactRange(aiunit->Unit) ) {
+		    break;
+		}
+		aiunit=aiunit->Next;
+	    }
+	    if( !aiunit ) {		// No enemies go home.
+		DebugLevel0Fn("FIXME: not written, should send force home\n");
+		AiPlayer->Force[force].Defending=0;
+		AiPlayer->Force[force].Attacking=0;
+	    }
 	}
     }
 }
