@@ -209,46 +209,31 @@ the corresponding packages in your particular distribution.
 
 You need a C compiler for Windows. Get <B>one</B> of the following.
 <UL>
-<LI>VC or VC++<P>
-    This isn't supported by the FreeCraft team (nobody owns a VC++ kit).
-    FreeCraft should compile without errors, if you follow these instructions:
+<LI>VC++<P>
+    In order to compile FreeCraft with VC++ follow these instructions:
     <UL>
-    <LI>Of course, you must buy or own a VC/VC++ 6 development kit.
-    <LI>You need <A HREF="http://www.libsdl.org">SDL</A> for VC++ (
-    <A HREF="http://www.libsdl.org/release/SDL-devel-1.2.4-VC6.zip">
-    SDL-devel-1.2.4-VC6.zip</A>.
-    <LI><A HREF="http;//www.libpng.org">libpng</A> for win32 and VC++.
-    Sorry, no direct download link.
-    <LI><A HREF="http;//www.zlib.org">zlib</A> for win32 and VC++.
-    Sorry, no direct download link.
-    <LI>VC++ <A HREF="http://freecraft.sourceforge.net/snapshots/fc.dsp">
-    workbench</A> and
-    <A HREF="http://freecraft.sourceforge.net/snapshots/fc.dsw">project</A>.
+    <LI>You need <A HREF="http://www.libsdl.org">SDL</A> for VC++.  The 
+    development libraries can be downloaded
+    <A HREF="http://www.libsdl.org/release/SDL-devel-1.2.4-VC6.zip">here</A>.
+    <LI>Download the source code for
+    <A HREF="http://www.libpng.org/pub/png/libpng.html">libpng</A> and
+    <A HREF="http://www.zlib.org">zlib</A>.  To compile these libraries, open
+    the MSVC workspace included in the PNG source code.  The workspace assumes 
+    the zlib source code is in a directory called "zlib" at the same level as
+    libpng.  Set the active configuration to "libpng - Win32 LIB" then go to 
+    Project, Settings, C/C++, Code Generation and set the run-time library to 
+    Multithreaded DLL.  You should then be able to build the library.
+    <LI>Download the FreeCraft 
+    <A HREF="http://freecraft.sourceforge.net/snapshots/fc.dsp">project</A> and
+    <A HREF="http://freecraft.sourceforge.net/snapshots/fc.dsw">workspace</A>.
+    You will need to modify the paths to libpng, zlib, and SDL.  Change the 
+    include paths in Project, Settings, C/C++, Preprocessor.  Remove the 
+    libraries SDL.lib, SDLmain.lib, and libpng.lib and add your libraries to
+    the project.  You should now be able to compile FreeCraft.
+    <LI>FreeCraft needs SDL.dll to run.  Copy this from the SDL development
+    libraries to the FreeCraft directory and it should now run.
     </UL>
-    To use the project without changes, setup your includes like the following:
-    <UL>
-    <LI>C:\SDL-1.2.2\include
-    <LI>C:\FC-010802-VC\SRC\INCLUDE
-    <LI>C:\LPNG120
-    <LI>C:\ZLIB
-    <LI>C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\INCLUDE
-    </UL>
-    If you have other versions or patches, please correct this in the project
-    settings and the libs like following:
-    <UL>
-    <LI>C:\LPNG120\PROJECTS\MSVC\WIN32\LIBPNG\LIB_DBG
-    <LI>C:\Program Files\Microsoft Visual Studio\VC98\LIB
-    </UL>
-    and add the lib files in the project:
-    <UL>
-    <LI>libpng.lib
-    <LI>SDLmain.lib
-    <LI>SDL.lib
-    <LI>WS2_32.lib
-    </UL>
-    FreeCraft should now compile with VC++ and work correct (untested!).<P>
-    <B>Please send me corrections and improvements for this, we can't test this.
-    </B>
+    
 
 <P><LI><A HREF="http://sources.redhat.com/cygwin/">cygwin</A><P>
     The Cygwin tools are ports of the popular GNU development tools and
