@@ -459,8 +459,8 @@ static Sample* ChooseSample(SoundRequest* sr)
 		theSound = (ServerSoundId)(sr->Sound);
 		if (theSound->Number == TWO_GROUPS) {
 			// handle a special sound (selection)
-			if (SelectionHandler.Source.Base == sr->Source.Base
-				&& SelectionHandler.Source.Id == sr->Source.Id) {
+			if (SelectionHandler.Source.Base == sr->Source.Base &&
+					SelectionHandler.Source.Id == sr->Source.Id) {
 				if (SelectionHandler.Sound == theSound->Sound.TwoGroups->First) {
 					result = SimpleChooseSample(SelectionHandler.Sound);
 					SelectionHandler.HowMany++;

@@ -133,6 +133,7 @@ extern char* CurrentMusicFile;
 */
 extern void PlayUnitSound(const struct _unit_* unit,
 	UnitVoiceGroup unit_voice_group);
+extern void PlayUnitSoundId(const struct _unit_* unit, SoundId id);
 
 /**
 **  Ask to the sound server to play a sound associated to a missile.

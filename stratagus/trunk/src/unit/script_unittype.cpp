@@ -1469,11 +1469,13 @@ static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
 		anim->D.RandomWait.MaxWait = atoi(op2);
 	} else if (!strcmp(op1, "sound")) {
 		anim->Type = NewAnimationSound;
-		anim->D.Sound.Sound = strdup(op2);
+		anim->D.Sound.Name = strdup(op2);
 	} else if (!strcmp(op1, "random-sound")) {
 		// FIXME: multiple sounds
 		anim->Type = NewAnimationRandomSound;
-		anim->D.RandomSound.Sound = strdup(op2);
+		anim->D.RandomSound.Name = malloc(sizeof(char*));
+		anim->D.RandomSound.Name[0] = strdup(op2);
+		anim->D.RandomSound.NumSounds = 1;
 	} else if (!strcmp(op1, "attack")) {
 		anim->Type = NewAnimationAttack;
 	} else if (!strcmp(op1, "rotate")) {

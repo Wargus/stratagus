@@ -47,6 +47,7 @@
 #include "actions.h"
 #include "interface.h"
 #include "map.h"
+#include "sound.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -122,6 +123,9 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				break;
 
 			case NewAnimationSound:
+				if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
+					PlayUnitSoundId(unit, unit->Anim.Anim->D.Sound.Sound);
+				}
 				break;
 			case NewAnimationRandomSound:
 				break;
