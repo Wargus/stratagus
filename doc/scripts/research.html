@@ -47,21 +47,21 @@
 <a href="sound.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
-<a href="#check-dependency">check-dependency</a>
-<a href="#define-allow">define-allow</a>
-<a href="#define-dependency">define-dependency</a>
-<a href="#define-modifier">define-modifier</a>
-<a href="#define-upgrade">define-upgrade</a>
-<a href="pud.html#define-upgrade-wc-names">define-upgrade-wc-names</a>
-<a href="#get-dependency">get-dependency</a>
+<a href="#CheckDependency">CheckDependency</a>
+<a href="#DefineAllow">DefineAllow</a>
+<a href="#DefineDependency">DefineDependency</a>
+<a href="#DefineModifier">DefineModifier</a>
+<a href="#DefineUpgrade">DefineUpgrade</a>
+<a href="pud.html#DefineUpgradeWcNames">DefineUpgradeWcNames</a>
+<a href="#GetDependency">GetDependency</a>
 <hr>
 <h2>Intro - Introduction to research functions and variables</h2>
 
 Everything around researching and upgrades.
 <h2>Functions</h2>
 
-<a name="check-dependency"></a>
-<h3>(check-dependency)</h3>
+<a name="DheckDependency"></a>
+<h3>CheckDependency()</h3>
 
 NOT WRITTEN YET.
 
@@ -75,17 +75,11 @@ NOT WRITTEN YET.
 <h4>Example</h4>
 
 <pre>
-    (check-dependency)
+    CheckDependency()
 </pre>
-<h4>Used</h4>
 
-<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
-<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
-<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
-
-
-<a name="define-unit-allow"></a>
-<h3>(define-unit-allow name N N N N N N N N N N N N N N N N)</h3>
+<a name="DefineUnitAllow"></a>
+<h3>DefineUnitAllow name N N N N N N N N N N N N N N N N)</h3>
 
 Define how many units of each type a players can have during
 a level.
@@ -105,13 +99,13 @@ a level.
 <h4>Example</h4>
 
 <pre>
-    ;; Allow the catapult for the 2nd player.
-    (define-unit-allow 'unit-catapult  0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+    -- Allow 1 catapult for the 2nd player.
+    DefineUnitAllow("unit-catapult" 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 </pre>
 
 
-<a name="define-allow"></a>
-<h3>(define-allow name str16)</h3>
+<a name="DefineAllow"></a>
+<h3>DefineAllow(name str16)</h3>
 
 Define what upgrades are enabled for each player during
 a level.
@@ -138,24 +132,20 @@ a level.
 <h4>Example</h4>
 
 <pre>
-    ;; Allow the metal upgrade for all 16 players.
-    (define-allow 'upgrade-metal  "AAAAAAAAAAAAAAAA")
-    ;;                             ^- player 0    ^- player 15
+    -- Allow the metal upgrade for all 16 players.
+    DefineAallow("upgrade-metal", "AAAAAAAAAAAAAAAA")
+    --                             ^- player 0    ^- player 15
 </pre>
 
-<h4>Used</h4>
 
-<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
-<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
-<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
-<a name="define-dependency"></a>
-<h3>(define-dependency unit-type/upgrade ...)</h3>
+<a name="DefineDependency"></a>
+<h3>DefineDependency( unit-type/upgrade ...)</h3>
 
 Define the dependencies for an unit-type or an upgrade. The dependency
 must be full filled before an unit or research can be used.
 <p>
-<code>(define-dependency unit-type/upgrade '( required-part )
+<code>DefineDependency unit-type/upgrade '( required-part )
      ['or '( optional-or-part ) ...] )
 </code>
 
@@ -187,21 +177,15 @@ must be full filled before an unit or research can be used.
 <h4>Example</h4>
 
 <pre>
-    ;; The second sword upgrade is only possible, if the first sword upgrade is
-    ;; researched.
-    (define-dependency 'upgrade-sword2 '(upgrade-sword1))
-    ;; The ranger upgrade is only available if a keep or castle is available.
+    -- The second sword upgrade is only possible, if the first sword upgrade is
+    -- researched.
+    (define-dependency "upgrade-sword2" '(upgrade-sword1))
+    -- The ranger upgrade is only available if a keep or castle is available.
     (define-dependency 'upgrade-ranger '(unit-keep) 'or '(unit-castle))
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
-<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
-<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
-
-<a name="define-modifier"></a>
-<h3>(define-modifier upgrade-name '(effect1 effect1-arg) ...)</h3>
+<a name="DefineModifier"></a>
+<h3>DefineModifier( upgrade-name '(effect1 effect1-arg) ... )</h3>
 
 Define the effects (modifier) of an upgrade. An upgrade can have multiple 
 modifiers. It can activate, enable or disable other upgrades and allows
@@ -291,14 +275,8 @@ all old units and any new unit of a player.
       '(apply-to unit-u____-l___________) '(apply-to unit-t_______))
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
-<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
-<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
-
-<a name="define-upgrade"></a>
-<h3>(define-upgrade name 'icon icon-id 'costs #( costs ... ))</h3>
+<a name="DefineUpgrade"></a>
+<h3>DefineUpgrade( name 'icon icon-id 'costs #( costs ... ))</h3>
 
 Define an upgrade, how it is shown and how much it costs.
 
@@ -306,13 +284,13 @@ Define an upgrade, how it is shown and how much it costs.
 <dl>
 <dt>name</dt>
 <dd>Name of the upgrade, used in buttons (define-button) and 
-<a href="#define-modifier">(define-modifier)</a>.
+<a href="#DefineModifier">DefineModifier()</a>.
 </dd>
 <dt>'icon icon-id</dt>
 <dd>Name of the upgrade icon, shown in buttons or during the research of the
 upgrade.  The icon is defined with 
-<a href="icon.html#define-icon">(define-icon)</a> or
-<a href="icon.html#define-icon-alias">(define-icon-alias)</a>
+<a href="icon.html#DefineIcon">DefineIcon()</a> or
+<a href="icon.html#DefineIconAlias">DefineIconAlias()</a>
 <dt>'costs #( time resource1 resource2 resource3 resource4 resource5 resource6)</dt>
 <dd>This are the costs for the upgrade. The costs (resource1-resource6) could
 be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
@@ -329,14 +307,8 @@ be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
       'costs #(   200   800     0     0     0     0     0))
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
-<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
-<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
-
-<a name="get-dependency"></a>
-<h3>(get-dependency)</h3>
+<a name="GetDependency"></a>
+<h3>GetDependency()</h3>
 
 NOT WRITTEN YET.
 
@@ -350,13 +322,8 @@ NOT WRITTEN YET.
 <h4>Example</h4>
 
 <pre>
-    (get-dependency)
+    GetDependency()
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
-<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
-<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
 <hr>
 Last changed: $Id$<br>

@@ -47,24 +47,24 @@
 <a href="unittype.html">NEXT</a>
 <a href="ccl-index.html">Index</a>
 <hr>
-<a href="#define-button">DefineButton</a>
-<a href="#define-cursor">DefineCursor</a>
-<a href="#define-font">DefineFont</a>
-<a href="#define-font-colors">DefineFontColors</a>
-<a href="#define-menu">DefineMenu</a>
-<a href="#define-menu-graphics">DefineMenuGraphics</a>
-<a href="#define-menu-item">DefineMenuItem</a>
-<a href="#define-ui">DefineUI</a>
-<a href="#define-viewports">DefineViewports</a>
-<a href="#display-picture">DisplayPicture</a>
-<a href="#process-menu">ProcessMenu</a>
-<a href="#set-game-cursor!">SetGameCursor</a>
+<a href="#DefineButton">DefineButton</a>
+<a href="#DefineCursor">DefineCursor</a>
+<a href="#DefineFont">DefineFont</a>
+<a href="#DefineFontColors">DefineFontColors</a>
+<a href="#DefineMenu">DefineMenu</a>
+<a href="#DefineMenuGraphics">DefineMenuGraphics</a>
+<a href="#DefineMenuItem">DefineMenuItem</a>
+<a href="#DefineUI">DefineUI</a>
+<a href="#DefineViewports">DefineViewports</a>
+<a href="#DisplayPicture">DisplayPicture</a>
+<a href="#ProcessMenu">ProcessMenu</a>
+<a href="#SetGameCursor">SetGameCursor</a>
 <hr>
 <h2>Intro - Introduction to UI functions and variables</h2>
 
 Everything around the user interface.
 <h2>Functions</h2>
-<a name="define-button"></a>
+<a name="DefineButton"></a>
 <h3>DefineButton({tag1 = value1, tag2 value2, ...})</h3>
 
 Define a button in the button panel show during the game. Possible tags:
@@ -195,7 +195,7 @@ DefineButton( { Pos = 8, Level = 0, Icon = "icon-build-advanced",
   ForUnit = {"unit-peasant"} } )
 </pre>
 
-<a name="define-cursor"></a>
+<a name="DefineCursor"></a>
 <h3>DefineCursor({tag = value, ...})</h3>
 
 Define a cursor.
@@ -238,7 +238,7 @@ DefineCursor({
   Size = {18, 18}})
 </pre>
 
-<a name="define-font"></a>
+<a name="DefineFont"></a>
 <h3>DefineFont({tag = value, ...})</h3>
 
 Define a font.
@@ -275,7 +275,7 @@ DefineFont({
   Size = {13, 14}})
 </pre>
 
-<a name="define-font-color"></a>
+<a name="DefineFontColor"></a>
 <h3>DefineFontColor("color-name", {r1, g1, b1, ..., r7, g7, b7})</h3>
 
 Define the font colors.<br>
@@ -314,7 +314,7 @@ DefineFontColor("yellow",
      108, 108, 108})	-- 104
 </pre>
 
-<a name="define-menu"></a>
+<a name="DefineMenu"></a>
 <h3>DefineMenu("tag1", value1, ...)</h3>
 
 FIXME: incomplete docu<br>
@@ -345,7 +345,7 @@ DefineMenu("name", "menu-sound-options", "geometry", {224, 64, 352, 352},
   "panel", "panel5", "default", 23)
 </pre>
 
-<a name="define-menu-graphics"></a>
+<a name="DefineMenuGraphics"></a>
 <h3>DefineMenuGraphics({{"tag", value, ...}, ...})</h3>
 
 Define the menu graphics for each of the races.
@@ -365,7 +365,7 @@ DefineMenuGraphics({
   {"file", "ui/buttons_2.png", "size", {300, 144}}})
 </pre>
 
-<a name="define-menu-item"></a>
+<a name="DefineMenuItem"></a>
 <h3>DefineMenuItem("tag1", value1, ...)</h3>
 
 Add an item to a menu. This could be any item, it depends
@@ -705,7 +705,7 @@ Example:
                    "menu", "menu-game")
 </pre>
 
-<a name="define-ui"></a>
+<a name="DefineUI"></a>
 <h3>DefineUI("race-name", screen-width, screen-height, tag1, value1, tag2, value2, ...)</h3>
 
 <dl>
@@ -1003,7 +1003,7 @@ requirement of the pictures, write them down here. Example:
 
 </dl>
 
-<a name="define-viewports"></a>
+<a name="DefineViewports"></a>
 <h3>DefineViewports("mode", mode, "viewport", {mapx, mapy}, ...)</h3>
 
 Define the viewports. Only used in savegames, but could be useful for
@@ -1025,7 +1025,7 @@ DefineViewports("mode", 1, "viewport", {82, 31},
                            "viewport", {64, 31})
 </pre>
 
-<a name="display-picture"></a>
+<a name="DisplayPicture"></a>
 <h3>DisplayPicture("file")</h3>
 
 Display a picture.
@@ -1041,7 +1041,7 @@ Display a picture.
 DisplayPicture("graphics/ui/stratagus.png")
 </pre>
 
-<a name="process-menu"></a>
+<a name="ProcessMenu"></a>
 <h3>ProcessMenu("menu-id")</h3>
 
 Process a menu.
@@ -1057,7 +1057,7 @@ Process a menu.
 ProcessMenu("menu-program-start")
 </pre>
 
-<a name="set-game-cursor!"></a>
+<a name="SetGameCursor"></a>
 <h3>SetGameCursor("cursor-ident")</h3>
 Set the game cursor.
 <dl>

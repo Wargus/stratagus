@@ -47,23 +47,23 @@
 <a href="ai.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
-<a href="#define-animations">DefineAnimations</a>
-<a href="#define-bool-flags">DefineBoolFlags</a>
+<a href="#DefineAnimations">DefineAnimations</a>
+<a href="#DefineBoolFlags">DefineBoolFlags</a>
 <!-- <a href="#define-unit-stats">define-unit-stats</a> -->
-<a href="#define-unit-type">DefineUnitType</a>
-<a href="pud.html#define-unittype-wc-names">DefineUnittypeWcNames</a>
-<a href="#get-unit-type-ident">GetUnitTypeIdent</a>
-<a href="#get-unit-type-name">GetUnitTypeName</a>
-<a href="#set-unit-type-name">SetUnitTypeName</a>
-<a href="#unit-type">UnitType</a>
-<a href="#unit-type-array">UnitTypeArray</a>
+<a href="#DefineUnitType">DefineUnitType</a>
+<a href="pud.html#DefineUnitTypeWcNames">DefineUnittypeWcNames</a>
+<a href="#GetUnitTypeIdent">GetUnitTypeIdent</a>
+<a href="#GetUnitTypeName">GetUnitTypeName</a>
+<a href="#SetUnitTypeName">SetUnitTypeName</a>
+<a href="#UnitType">UnitType</a>
+<a href="#UnitTpeArray">UnitTypeArray</a>
 <hr>
 <h2>Intro - Introduction to unit-type functions and variables</h2>
 
 Everything around the C UnitType structure.
 
 <h2>Functions</h2>
-<a name="define-animations"></a>
+<a name="DefineAnimations"></a>
 <h3>DefineAnimations( "ident-name", "still", script, "move", script, "die", script, "attack", script)</h3>
 
 Define animations.
@@ -117,7 +117,7 @@ DefineAnimations("animations-footman",
     { 0, 0,   3,  45}, { 0, 0,   3,  50}, { 0, 0, 100,  55}, { 3, 0,   1,  55}})
 </pre>
 
-<a name="define-bool-flags"></a>
+<a name="DefineBoolFlags"></a>
 <h3>DefineBoolFlags( "flag-1", "flag-2", ...)</h3>
 
 Define boolean unit flags. Examples are organic, mechanical, undead, etc.
@@ -194,7 +194,7 @@ A special 'resource' is time, the time to train the unit in cycles.
 </pre>
 <h4>Not Used</h4>
 -->
-<a name="define-unit-type"></a>
+<a name="DefineUnitType"></a>
 <h3>DefineUnitType( "ident", { tag1 = value1, tag2  = value2, ...})</h3>
 
     Define the unit types in game. A lot of the data in this struct used to be
@@ -279,7 +279,7 @@ F.E. "icon-knight", "icon-gold-mine".
 <dd>
 You can use the same help or ready sound for all units if you want generic
 "Your unit is under attack", "Some unit was trained" sounds. The actual sound
-files are not declared here. Please see the documentation on <a href="sound.html#make-sound">sounds</a>
+files are not declared here. Please see the documentation on <a href="sound.html#MakeSound">sounds</a>
 </dd>
 <!--
 <dt>The following stats are also included in a unit stats struct and are upgradeable, see
@@ -503,7 +503,7 @@ close range units as well, but I can't really see the point.
 <dt>Corpse = {unittype-name, number}</dt>
 <dd>This is the corpse of the unit. When the unit dies and passes through it's
 death animation it turns into this. It's a list of an unit-name and a a corpse frame
-number. As you can see in <a href="#define-animations">DefineAnimations()</a>,
+number. As you can see in <a href="#DefineAnimations">DefineAnimations()</a>,
 an animation is composed out of several script frames, this is the frame to
 start the script from. FE: Corpse = {"unit-dead-body", 0}
 </dd>
@@ -534,9 +534,9 @@ and can't be interacted with. Please see the documentation on spells.</dd>
 alone, use this for buildings. Enemy units are never selectable by rectangle.
 </dd>
 <dt>flags = boolean<dt>
-<dd>You can add a bunch of flags, defined with <a href="#define-bool-flags">DefineBoolFlags()</a>
+<dd>You can add a bunch of flags, defined with <a href="#DefineBoolFlags">DefineBoolFlags()</a>
 You can add how many flags you would like, but keep in mind that you have to call
-<a href="#define-bool-flags">DefineBoolFlags()</a> before.
+<a href="#DefineBoolFlags">DefineBoolFlags()</a> before.
 </dd>
 <dt>CanTargetFlag = {flag, "true" or "only" or "false", ...}</dt>
 <dd>This allows check for targetting similar to spell conditions.
@@ -619,7 +619,7 @@ DefineUnitType("unit-footman", { Name = "Footman",
     Get the identifier of the unit type peon.<p>
 -->
 
-<a name="get-unit-type-ident"></a>
+<a name="GetUnitTypeIdent"></a>
 <h3>GetUnitTypeIdent(unit-type)</h3>
 
 Get the ident of the unit-type structure.
@@ -637,7 +637,7 @@ Get the ident of the unit-type structure.
 </pre>
 <h4>Not Used</h4>
 
-<a name="get-unit-type-name"></a>
+<a name="GetUnitTypeName"></a>
 <h3>GetUnitTypeName(unit-type)</h3>
 
 Get the name of the unit-type structure.
@@ -656,7 +656,7 @@ Get the name of the unit-type structure.
 </pre>
 <h4>Not Used</h4>
 
-<a name="set-unit-type-name!"></a>
+<a name="SetUnitTypeName"></a>
 <h3>SetUnitTypeName(unit-type, name)</h3>
 
 Set the name of the unit-type structure.
@@ -678,7 +678,7 @@ Set the name of the unit-type structure.
 </pre>
 <h4>Not Used</h4>
 
-<a name="unit-type"></a>
+<a name="UnitType"></a>
 <h3>UnitType(ident)</h3>
 
 Get unit-type structure.
@@ -695,11 +695,8 @@ Get unit-type structure.
 <pre>
     UnitType("unit-great-hall")
 </pre>
-<h4>Used</h4>
 
-<a href="../../data/scripts/ai.lua"> $LIBRARYPATH/scripts/ai.lua </a>
-
-<a name="unit-type-array"></a>
+<a name="UnitTypeArray"></a>
 <h3>UnitTypeArray()</h3>
 
 Get all unit-type structures.
@@ -710,7 +707,6 @@ Get all unit-type structures.
 <pre>
     UnitTypeArray()
 </pre>
-<h4>Not Used</h4>
 
 <hr>
 Last changed: $Id$<br>
