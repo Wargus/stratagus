@@ -24,10 +24,11 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-// #include "player.h"			// recursive!
 #ifndef __STRUCT_PLAYER__
 #define __STRUCT_PLAYER__
 typedef struct _player_ Player;
+
+// #include "player.h"			// recursive!
 #endif
 
 #include "video.h"
@@ -43,6 +44,11 @@ typedef enum _unit_action_ UnitAction;	/// all possible unit actions
 typedef struct _command_ Command;	/// unit command
 
 /**
+**	Unit references over network, or for memory saving.
+*/
+typedef unsigned short UnitRef;
+
+/**
 **	All possible unit actions.
 */
 enum _unit_action_ {
@@ -54,25 +60,28 @@ enum _unit_action_ {
     UnitActionAttack,			/// unit attacks position/unit
     UnitActionDie,			/// unit dies
 
-    UnitActionTrain,			///
-    UnitActionUpgradeTo,		///
-    UnitActionUpgrade,			///
-    UnitActionResearch,			///
-    UnitActionBuilded,			///
+    UnitActionTrain,			/// building is training
+    UnitActionUpgradeTo,		/// building is upgrading itself
+    // UnitActionUpgrade,		/// building is researching upgrade
+    UnitActionResearch,			/// building is researching spell
+    UnitActionBuilded,			/// building is under construction
 
 // Compound actions
-    UnitActionBoard,			///
-    UnitActionUnload,			///
-    UnitActionPatrol,			///
-    UnitActionBuild,			///
+    UnitActionBoard,			/// unit entering transporter
+    UnitActionUnload,			/// unit leaving transporter
+    UnitActionPatrol,			/// unit paroling area
+    UnitActionBuild,			/// unit builds building
 
-    UnitActionRepair,			///
-    UnitActionHarvest,			///
-    UnitActionMineGold,			///
-    UnitActionReturnGoods,		///
-    UnitActionHaulOil,			///
+    UnitActionRepair,			/// unit repairing
+    UnitActionHarvest,			/// unit harvest lumber
+    UnitActionMineGold,			/// unit mines gold
+    UnitActionMineOre,			/// unit mines ore FIXME: not written
+    UnitActionMineCoal,			/// unit mines coal FIXME: not written
+    UnitActionQuarryStone,		/// unit quarrying stone FIXME: not written
+    UnitActionHaulOil,			/// unit hauling oil
+    UnitActionReturnGoods,		/// unit returning any resource
 
-    UnitActionDemolish			/// unit demolish at position/unit
+    UnitActionDemolish,			/// unit demolish at position/unit
 };
 
 /**
@@ -81,6 +90,7 @@ enum _unit_action_ {
 struct _command_ {
     UnitAction	Action : 8;		/// global action
     union {
+	// FIXME: will be changed with new pathfinder
 	struct {
 	    unsigned	Fast : 1;	/// Can fast move
 	    unsigned	Range : 31;	/// Range to goal
@@ -152,7 +162,14 @@ typedef enum _unit_voice_group_ {
 **	The big unit structure.
 */
 struct _unit_ {
+#ifdef NEW_UNIT
+    short	Count;			/// Reference counter
+    UnitRef	Slot;			/// Assignd slot number
+    Unit*	Next;			/// generic link pointer
+#else
+    // FIXME: this will be removed
     unsigned	Id;			/// unique unit id
+#endif
 
     int		X;			/// Map position X
     int		Y;			/// Map position Y
@@ -193,7 +210,7 @@ struct _unit_ {
 #define UNIT_MAX_WAIT	255		/// biggest number in action counter
     unsigned	State : 8; 		/// action state
 #define UNIT_MAX_STATE	255		/// biggest state for action
-    unsigned	Reset : 1;		/// can process new command.
+    unsigned	Reset : 1;		/// can process new command
     unsigned	Blink : 3;		/// Let selection rectangle blink
     unsigned	Moving : 1;		/// The unit is moving
 					/** set to random 1..100 when MakeUnit()
@@ -204,6 +221,7 @@ struct _unit_ {
     unsigned	Value;			/// value used for much
     unsigned	WoodToHarvest;
 #define MAX_UNITS_ONBOARD 6		/// max number of units in transporter
+    // FIXME: use the new next pointer
     Unit*	OnBoard[MAX_UNITS_ONBOARD];	/// Units in transporter
 
     union _command_data_ {
@@ -230,7 +248,7 @@ struct _unit_ {
 //	W		 E
 //	SW		SE
 //		S
-// FIXME: this heading should be changed see tasks.txt.
+// FIXME: this heading should be changed see tasks.txt
 #define HeadingN		0	/// Unit heading north
 #define HeadingNE		1	/// Unit heading north east
 #define HeadingE		2	/// Unit heading east
@@ -243,7 +261,13 @@ struct _unit_ {
 #define NoUnitP		(Unit*)0	/// return value: for no unit found
 #define InfiniteDistance INT_MAX	/// the distance is unreachable
 
+// FIXME: will be removed, we get player limits
 #define MAX_UNITS	1800		/// maximal number of units supported
+
+/**
+**	Maximal number of used slots.
+*/
+#define MAX_UNIT_SLOTS	65535
 
 /**
 **	Returns true, if unit is unusable. (for attacking,...)
@@ -252,12 +276,15 @@ struct _unit_ {
     ( (unit)->Removed || (unit)->Command.Action==UnitActionDie || \
       (unit)->Command.Action==UnitActionBuilded)
 
-/*
-** Returns unit number (unique to this unit).
+/**
+**	Returns unit number (unique to this unit)
 */
-
+#ifdef NEW_UNIT
+#define UnitNumber(unit)	((unit)->Slot)
+#else
 #define UnitNumber(unit) \
-		((unit) - UnitsPool)
+    ((unit) - UnitsPool)
+#endif
 
 /**
 **	How many units could be selected
@@ -266,11 +293,11 @@ struct _unit_ {
 
 // FIXME: hardcoded...
 /**
-**	How many units could be in a group.
+**	How many units could be in a group
 */
 #define NUM_UNITS_PER_GROUP 9
 /**
-**	How many groups supported.
+**	How many groups supported
 */
 #define NUM_GROUPS 10
 
@@ -278,11 +305,16 @@ struct _unit_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#ifdef NEW_UNIT
+extern Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All units
+extern Unit** UnitSlotFree; 		/// First free unit slot
+#else
 extern int NumUnits;			/// Number of units used
 extern Unit** Units;			/// Units used
 extern Unit* UnitsPool;			/// Units memory pool
+#endif
 
-//	in unit_draw.c
+//	in unit_draw.c (FIXME: could be moved into the user interface?)
 extern int ShowHealthBar;		/// Flag: show health bar
 extern int ShowHealthDot;		/// Flag: show health dot
 extern int ShowManaBar;			/// Flag: show mana bar

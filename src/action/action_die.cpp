@@ -17,6 +17,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -29,133 +33,15 @@
 #include "unit.h"
 #include "actions.h"
 
-#ifndef USE_CCL2
-
-/**
-**	The corpse type. FIXME: move this to unit-type. CCL configurable
-*/
-global char UnitCorpse[UnitTypeInternalMax] = {
-    CorpseHuman,		// UnitFootman
-    CorpseOrc,			// UnitGrunt
-    CorpseHuman,		// UnitPeasant
-    CorpseOrc,			// UnitPeon
-    CorpseNone,			// UnitBallista
-    CorpseNone,			// UnitCatapult
-    CorpseHuman,		// UnitKnight
-    CorpseOrc,			// UnitOgre
-    CorpseHuman,		// UnitArcher
-    CorpseOrc,			// UnitAxethrower
-    CorpseNone,			// UnitMage
-    CorpseNone,			// UnitDeathKnight
-    CorpseHuman,		// UnitPaladin
-    CorpseOrc,			// UnitOgreMage
-    CorpseNone,			// UnitDwarves
-    CorpseNone,			// UnitGoblinSappers
-    CorpseHuman,		// UnitAttackPeasant
-    CorpseOrc,			// UnitAttackPeon
-    CorpseHuman,		// UnitRanger
-    CorpseOrc,			// UnitBerserker
-    CorpseHuman,		// UnitAlleria
-    CorpseOrc,			// UnitTeronGorefiend
-    CorpseNone,			// UnitKurdanAndSky_ree
-    CorpseOrc,			// UnitDentarg
-    CorpseNone,			// UnitKhadgar
-    CorpseHuman,		// UnitGromHellscream
-    CorpseShip,			// UnitTankerHuman
-    CorpseShip,			// UnitTankerOrc
-    CorpseShip,			// UnitTransportHuman
-    CorpseShip,			// UnitTransportOrc
-    CorpseShip,			// UnitElvenDestroyer
-    CorpseShip,			// UnitTrollDestroyer
-    CorpseShip,			// UnitBattleship
-    CorpseShip,			// UnitJuggernaught
-    CorpseNone,			// UnitNothing
-    CorpseNone,			// UnitDeathwing
-    CorpseNone,			// UnitNothing1
-    CorpseNone,			// UnitNothing2
-    CorpseShip,			// UnitGnomishSubmarine
-    CorpseShip,			// UnitGiantTurtle
-    CorpseNone,			// UnitGnomishFlyingMachine
-    CorpseNone,			// UnitGoblinZeppelin
-    CorpseNone,			// UnitGryphonRider
-    CorpseNone,			// UnitDragon
-    CorpseHuman,		// UnitTuralyon
-    CorpseNone,			// UnitEyeOfKilrogg
-    CorpseHuman,		// UnitDanath
-    CorpseHuman,		// UnitKorgathBladefist
-    CorpseNone,			// UnitNothing3
-    CorpseOrc,			// UnitCho_gall
-    CorpseHuman,		// UnitLothar
-    CorpseNone,			// UnitGul_dan
-    CorpseHuman,		// UnitUtherLightbringer
-    CorpseOrc,			// UnitZuljin
-    CorpseNone,			// UnitNothing4
-    CorpseNone,			// UnitSkeleton
-    CorpseNone,			// UnitDaemon
-    CorpseNone,			// UnitCritter
-    CorpseLandSite,		// UnitFarm
-    CorpseLandSite,		// UnitPigFarm
-    CorpseLandSite,		// UnitBarracksHuman
-    CorpseLandSite,		// UnitBarracksOrc
-    CorpseLandSite,		// UnitChurch
-    CorpseLandSite,		// UnitAltarOfStorms
-    CorpseLandSite,		// UnitScoutTowerHuman
-    CorpseLandSite,		// UnitScoutTowerOrc
-    CorpseLandSite,		// UnitStables
-    CorpseLandSite,		// UnitOgreMound
-    CorpseLandSite,		// UnitGnomishInventor
-    CorpseLandSite,		// UnitGoblinAlchemist
-    CorpseLandSite,		// UnitGryphonAviary
-    CorpseLandSite,		// UnitDragonRoost
-    CorpseWaterSite,		// UnitShipyardHuman
-    CorpseWaterSite,		// UnitShipyardOrc
-    CorpseLandSite,		// UnitTownHall
-    CorpseLandSite,		// UnitGreatHall
-    CorpseLandSite,		// UnitElvenLumberMill
-    CorpseLandSite,		// UnitTrollLumberMill
-    CorpseWaterSite,		// UnitFoundryHuman
-    CorpseWaterSite,		// UnitFoundryOrc
-    CorpseLandSite,		// UnitMageTower
-    CorpseLandSite,		// UnitTempleOfTheDamned
-    CorpseLandSite,		// UnitBlacksmithHuman
-    CorpseLandSite,		// UnitBlacksmithOrc
-    CorpseWaterSite,		// UnitRefineryHuman
-    CorpseWaterSite,		// UnitRefineryOrc
-    CorpseWaterSite,		// UnitOilPlatformHuman
-    CorpseWaterSite,		// UnitOilPlatformOrc
-    CorpseLandSite,		// UnitKeep
-    CorpseLandSite,		// UnitStronghold
-    CorpseLandSite,		// UnitCastle
-    CorpseLandSite,		// UnitFortress
-    CorpseLandSite,		// UnitGoldMine
-    CorpseLandSite,		// UnitOilPatch
-    0,				// UnitStartLocationHuman
-    0,				// UnitStartLocationOrc
-    CorpseLandSite,		// UnitGuardTowerHuman
-    CorpseLandSite,		// UnitGuardTowerOrc
-    CorpseLandSite,		// UnitCannonTowerHuman
-    CorpseLandSite,		// UnitCannonTowerOrc
-    CorpseLandSite,		// UnitCircleofPower
-    CorpseLandSite,		// UnitDarkPortal
-    CorpseLandSite,		// UnitRunestone
-    CorpseLandSite,		// UnitWallHuman
-    CorpseLandSite,		// UnitWallOrc
-    CorpseNone,			// UnitDeadBody
-    CorpseNone,			// Unit1x1DestroyedPlace
-    CorpseNone,			// Unit2x2DestroyedPlace
-    CorpseNone,			// Unit3x3DestroyedPlace
-    CorpseNone,			// Unit4x4DestroyedPlace
-    CorpseHuman,		// UnitPeasantWithGold
-    CorpseOrc,			// UnitPeonWithGold
-    CorpseHuman,		// UnitPeasantWithWood
-    CorpseOrc,			// UnitPeonWithWood
-    CorpseShip,			// UnitTankerHumanFull
-    CorpseShip,			// UnitTankerOrcFull
-};
-
-#endif
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
 
 extern Animation ** UnitCorpse;
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Unit dies!
@@ -166,6 +52,7 @@ extern Animation ** UnitCorpse;
 */
 global int HandleActionDie(Unit* unit)
 {
+#if 0
     int type;
 
     type=unit->Type->Type;
@@ -191,23 +78,47 @@ global int HandleActionDie(Unit* unit)
 	    }
 	    break;
     }
-
+#endif
+    //
+    //	Show death animation
+    //
+    if( unit->Type->Animations ) {
+	UnitShowAnimation(unit,unit->Type->Animations->Die);
+    } else {
+	DebugLevel0("FIXME: die animation missing\n");
+	unit->Reset=1;
+	unit->Wait=1;
+    }
 
     //
     //	Die sequence terminated, generate corpse.
     //
     if( unit->Reset ) {
 	DebugLevel3("Die complete %Zd\n",UnitNumber(unit));
+#if 0
 	if( !UnitCorpse[type] ){
 	    FreeUnitMemory(unit);
 	    return 1;
 	}
 	unit->SubAction=type;
 	unit->Type=UnitTypeByIdent("unit-dead-body");
-	unit->Frame=0;
 	unit->State=0;
 	unit->Reset=0;
 	UnitNewHeading(unit);
+#endif
+	if( !unit->Type->CorpseType ) {
+	    FreeUnitMemory(unit);
+	    return 1;
+	}
+
+	unit->State=unit->Type->CorpseScript;
+	unit->Type=unit->Type->CorpseType;
+	unit->Command.Action=UnitActionDie;
+	unit->SubAction=0;
+	UnitNewHeading(unit);
+	DebugCheck( !unit->Type->Animations || !unit->Type->Animations->Die );
+	UnitShowAnimation(unit,unit->Type->Animations->Die);
+
 	ChangeUnitOwner(unit,unit->Player,&Players[PlayerNumNeutral]);
     }
 

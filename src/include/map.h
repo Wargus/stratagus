@@ -24,6 +24,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include "unit.h"
 #include "new_video.h"
 #include "tileset.h"
 
@@ -51,6 +52,12 @@ typedef struct _map_field_ {
     unsigned short	SeenTile;	/// last seen tile (FOW)
     unsigned char	Value;		/// HP for walls
     unsigned short	Flags;		/// field flags
+#ifdef UNITS_ON_MAP
+    UnitRef		Building;	/// Building or corpse.
+    UnitRef		AirUnit;	/// Air unit.
+    UnitRef		LandUnit;	/// Land unit.
+    UnitRef		SeaUnit;	/// Sea unit.
+#endif
 } MapField;
 
 #define MapFieldVisible		0x0001	/// Field visible
