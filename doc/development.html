@@ -34,9 +34,9 @@ This file should give you some information to help with development of Stratagus
 <h2>Mailing list</h2>
 
 If you want to help with development for Stratagus you should 
-<a href="http://lists.sourceforge.net/mailman/listinfo/stratagus-hackers">join</a> 
-the stratagus-hackers mailing list.<br> You may also want to look at the 
-<a href="http://sourceforge.net/mailarchive/forum.php?forum_id=6268">archives.</a>
+<a href="http://mail.nongnu.org/mailman/listinfo/stratagus-devel/">join</a> 
+the stratagus-devel mailing list.<br> You may also want to look at the 
+<a href="http://mail.nongnu.org/archive/html/stratagus-devel/">archives.</a>
 
 <h2>IRC - Internet Relay Chat</h2>
 
@@ -46,10 +46,12 @@ You can try to meet other Stratagus developers and users on the
 
 <h2>Bugs and tasks</h2>
 
-You can find 
-<a href="http://sourceforge.net/tracker/?group_id=1965&amp;atid=101965">known bugs</a> 
-and <a href="http://sourceforge.net/pm/?group_id=1965">planned tasks</a> on the 
-<a href="http://sourceforge.net/tracker/?group_id=1965">sourceforge tracker</a>.<p>
+You can find <a
+href="http://savannah.nongnu.org/bugs/?group=stratagus">known bugs</a>
+and <a href="http://savannah.nongnu.org/pm/?group=stratagus">planned
+tasks</a> on the <a
+href="http://savannah.nongnu.org/projects/stratagus/">Savannah pages
+of Stratagus</a>.<p>
 
 Before starting on a bug or task, please ask on the mailing list or in the 
 IRC channel whether anybody else is already working on it.
@@ -58,10 +60,10 @@ IRC channel whether anybody else is already working on it.
 
 <h3>Installing CVS client</h3>
 
-If you want to help develop, it is the best that you use CVS. To do so, first
-you need CVS for your system. Sourceforge has a guide that will 
-help you get started, you can go to section '<b>F</b>' of their 
-<a href="http://sourceforge.net/docman/?group_id=1">documentation page</a>.<p>
+If you want to help develop, it is the best that you use CVS. To do
+so, first you need CVS for your system. Savannah has a <a
+href="http://savannah.nongnu.org/cvs/?group=stratagus">guide</a> that
+will help you get started.
 
 <h3>Getting Stratagus from CVS</h3>
 
@@ -85,15 +87,15 @@ help you get started, you can go to section '<b>F</b>' of their
 <h4>How do I access to these modules?</h4>
 
 The instructions for accessing the modules are on the 
-<a href="http://sourceforge.net/cvs/?group_id=1965">project cvs</a> page.<br> 
+<a href="http://savannah.nongnu.org/cvs/?group=stratagus">project cvs</a> page.<br> 
 NOTE: it is highly recommended that you use the -z3 flag, this compresses 
 the data and therefore speeds the transfer up.<p>
 
 For example:<p>
 
-cvs -d:pserver:anonymous@cvs.stratagus.sourceforge.net:/cvsroot/stratagus login<br>
+cvs -d:pserver:anoncvs@subversions.gnu.org:/cvsroot/stratagus login<br />
 <i>"When prompted for a password for anonymous, simply press the Enter key."</i><br>
-cvs -z3 -d:pserver:anonymous@cvs.stratagus.sourceforge.net:/cvsroot/stratagus co stratagus<p>
+cvs -z3 -d:pserver:anoncvs@subversions.gnu.org:/cvsroot/stratagus co stratagus<br />
 
 This is done only once. To update your CVS directory, go into 
 the module directory and type 'cvs -z3 -q update -dP'.<p>
@@ -106,7 +108,7 @@ need to type 'cvs update', the cvs (1) man page will show you how.
 Please note CVS is always the latest and it is easier for you to keep
 up to date. But if for some reason you cannot get the source via CVS, 
 you find can regular snapshots of Stratagus 
-<a href="http://stratagus.sourceforge.net/snapshots">here</a>.
+<a href="http://savannah.nongnu.org/files/?group=stratagus">here</a>.
 
 <h3>Compiling Stratagus</h3>
 
@@ -251,7 +253,7 @@ Follow these steps:<p>
     <li>cvs -q update -d
     <li>cvs -q diff -u &gt; your-nickname.diff
     <li>upload 'your-nickname.diff' to the
-    <a href="http://sourceforge.net/tracker/?group_id=1965&amp;atid=301965">patch tracker</a>.
+    <a href=http://savannah.nongnu.org/patch/?group=stratagus">patch tracker</a>.
 </ul>
 
 <h2>Building FcMP</h2>
