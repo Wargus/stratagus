@@ -108,10 +108,10 @@ extern void PlayMissileSound(const Missile* missile,SoundId sound);
 */
 extern void PlayGameSound(SoundId sound,unsigned char volume);
 
-/** Ask to the sound server to set the global volume of the sound.
-    @param volume the sound volume (positive number)
-*/
+    /// Set global volume
 extern void SetGlobalVolume(int volume);
+    /// Set music volume
+extern void SetMusicVolume(int volume);
 
 /** Initialize client side of the sound layer.
 */
@@ -132,6 +132,7 @@ extern void PlayMusic(const char* name);
 #define PlayMissileSound(s,v)		/// Dummy macro for without sound
 #define PlayGameSound(s,v)		/// Dummy macro for without sound
 #define SetGlobalVolume(v)		/// Dummy macro for without sound
+#define SetMusicVolume(v)		/// Dummy macro for without sound
 #define InitSoundClient()		/// Dummy macro for without sound
 
 #define PlayMusic(v)			/// Dummy macro for without sound

@@ -132,33 +132,36 @@ typedef struct _sound_request {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-/// sound file descriptor, if -1 no sound available
+    /// sound file descriptor, if -1 no sound available
 extern int SoundFildes;
 
-/// sound volume (from 0 to MaxVolume, acts as a multiplier)
+    /// sound volume (from 0 to MaxVolume, acts as a multiplier)
 extern int GlobalVolume;
+    /// music volume (from 0 to MaxVolume, acts as a multiplier)
+extern int MusicVolume;
 
-/// global range control (max cut off distance for sound)
+    /// global range control (max cut off distance for sound)
 extern int DistanceSilent;
 
-/// FIFO for sound requests
+    /// FIFO for sound requests
 extern SoundRequest SoundRequests[MAX_SOUND_REQUESTS];
-/// FIFO index in
+    /// FIFO index in
 extern int NextSoundRequestIn;
-/// FIFO index out
+    /// FIFO index out
 extern int NextSoundRequestOut;
 
-/// are we using a sound thread? (default is zero -> no thread)
 #ifdef USE_THREAD
+    /// are we using a sound thread? (default is zero -> no thread)
 extern int WithSoundThread;
 #endif
 
+    /// FIXME: docu
 extern int SoundThreadRunning;
 
 #ifdef DEBUG
-/// allocated memory for sound samples
+    /// allocated memory for sound samples
 extern unsigned AllocatedSoundMemory;
-/// allocated memory for compressed sound samples
+    /// allocated memory for compressed sound samples
 extern unsigned CompressedSoundMemory;
 #endif
 
