@@ -135,10 +135,6 @@ global int WithSoundThread;		/// FIXME: docu
 
 global int SoundThreadRunning;		/// FIXME: docu
 
-#ifdef USE_SDLCD
-global SDL_CD *CDRom;			/// SDL cdrom device
-#endif
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
