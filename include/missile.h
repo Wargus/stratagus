@@ -352,7 +352,8 @@ typedef struct _missile_type_ MissileType;
 
 #endif
 
-#define MAX_MISSILES 1800  /// maximum number of missiles
+#define MAX_MISSILES 2048        /// maximum number of missiles
+#define MAX_LOCAL_MISSILES 4096  /// maximum number of local missiles
 
 /**
 **  Missile-type-class typedef

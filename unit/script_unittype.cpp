@@ -1046,7 +1046,7 @@ local int CclSetUnitTypeName(lua_State* l)
 }
 
 /**
-**		Define tileset mapping from original number to internal symbol
+**		Define unit type mapping from original number to internal symbol
 **
 **		@param list		List of all names.
 */
