@@ -784,6 +784,10 @@ extern void UpdateForNewUnit(const Unit* unit, int upgrade);
 	/// FIXME: more docu
 extern void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy);
 
+	/// Call when an Unit goes under fog.
+extern void UnitGoesUnderFog(Unit* unit, const Player* player);
+	/// Call when an Unit goes out of fog.
+extern void UnitGoesOutOfFog(Unit* unit, const Player* player);
 	/// Marks an unit as seen
 extern void UnitsOnTileMarkSeen(const Player* player, int x, int y, int p);
 	/// Unmarks an unit as seen
