@@ -59,6 +59,7 @@
 //----------------------------------------------------------------------------
 
 global int CommandLogDisabled;		/// True if command log is off
+global ReplayType ReplayGameType;	/// Replay game type
 local int DisabledLog;			/// Disabled log for replay
 local int DisabledShowTips;		/// Disabled show tips
 local SCM ReplayLog;			/// Replay log
@@ -66,7 +67,6 @@ local FILE* LogFile;			/// Replay log file
 local unsigned long NextLogCycle;	/// Next log cycle number
 local int InitReplay;			/// Initialize replay
 local char *ReplayPlayers[PlayerMax];	/// Player names
-local int ReplayGameType;		/// Replay game type
 
 
 //----------------------------------------------------------------------------
@@ -337,7 +337,7 @@ local SCM CclReplayLog(SCM list)
 	    int type;
 	    char *name;
 
-	    ReplayGameType=2;
+	    ReplayGameType=ReplayMultiPlayer;
 	    num=-1;
 	    race=team=type=SettingsPresetMapDefault;
 	    name=NULL;
@@ -394,7 +394,7 @@ global int LoadReplay(char* name)
 	    ReplayPlayers[i]=NULL;
 	}
     }
-    ReplayGameType=1;
+    ReplayGameType=ReplaySinglePlayer;
 
     gh_new_procedureN("log",CclLog);
     gh_new_procedureN("replay-log",CclReplayLog);
@@ -439,6 +439,7 @@ global void EndReplayLog(void)
     }
     GameObserve=0;
     NetPlayers=0;
+    ReplayGameType=ReplayNone;
 }
 
 /**
@@ -638,7 +639,7 @@ local void ReplayEachCycle(void)
 */
 global void SinglePlayerReplayEachCycle(void)
 {
-    if( ReplayGameType==1 ) {
+    if( ReplayGameType==ReplaySinglePlayer ) {
 	ReplayEachCycle();
     }
 }
@@ -648,7 +649,7 @@ global void SinglePlayerReplayEachCycle(void)
 */
 global void MultiPlayerReplayEachCycle(void)
 {
-    if( ReplayGameType==2 ) {
+    if( ReplayGameType==ReplayMultiPlayer ) {
 	ReplayEachCycle();
     }
 }
