@@ -1121,9 +1121,9 @@ global void DrawInfoPanel(void)
 	    //
 	    PlayerPixels(ThisPlayer);	// can only be own!
 	    DrawInfoPanelBackground(0);
-            for (i = 0; i < (NumSelected > ui->NumSelectedButtons ? 
+	    for (i = 0; i < (NumSelected > ui->NumSelectedButtons ? 
 		    ui->NumSelectedButtons : NumSelected); ++i) {
-	        DrawUnitIcon(ThisPlayer,
+		DrawUnitIcon(ThisPlayer,
 		    Selected[i]->Type->Icon.Icon,
 		    (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
 			(IconActive | (MouseButtons & LeftButton)) : 0,
