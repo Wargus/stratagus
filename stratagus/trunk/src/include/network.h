@@ -38,6 +38,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+extern char NetworkName[16];		/// Network Name of local player
 extern int NetworkFildes;		/// Network file descriptor
 extern int NetworkInSync;		/// Network is in sync
 extern int NetworkUpdates;		/// Network update each # frames
@@ -50,8 +51,9 @@ extern int CommandLogEnabled;		/// True if command log is on
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitNetwork(void);		/// initialise network module
-extern void ExitNetwork(void);		/// cleanup network module
+extern void InitNetwork1(void);		/// initialise network part 1 (ports)
+extern void InitNetwork2(void);		/// initialise network part 2
+extern void ExitNetwork1(void);		/// cleanup network part 1 (ports)
 extern void NetworkEvent(void);		/// handle network events
 extern void NetworkSync(void);		/// hold in sync
 extern void NetworkQuit(void);		/// quit game
