@@ -882,7 +882,7 @@ global void DoButtonButtonClicked(int button)
 	case ButtonCancelTrain:
 	    DebugCheck( Selected[0]->Orders[0].Action!=UnitActionTrain
 		    || !Selected[0]->Data.Train.Count );
-	    SendCommandCancelTraining(Selected[0],0);
+	    SendCommandCancelTraining(Selected[0],-1);
 	    ClearStatusLine();
 	    ClearCosts();
 	    break;
