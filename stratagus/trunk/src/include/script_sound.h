@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_sound.h	-	The Ccl sound header file. */
+/**@name ccl_sound.h - The Ccl sound header file. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 1999-2004 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __CCL_SOUND_H__
 #define __CCL_SOUND_H__
@@ -34,34 +34,34 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
-#ifdef WITH_SOUND		// {
+#ifdef WITH_SOUND // {
 
 #include "ccl.h"
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
-extern int ccl_sound_p(SCM sound);		/// is it a ccl sound?
+extern int ccl_sound_p(SCM sound);  /// is it a ccl sound?
 
-extern SoundId ccl_sound_id(SCM sound);		/// scheme -> sound id
+extern SoundId ccl_sound_id(SCM sound);  /// scheme -> sound id
 #elif defined(USE_LUA)
 #endif
 
-extern void SoundCclRegister(void);		/// register ccl features
+extern void SoundCclRegister(void);  /// register ccl features
 
-#else		// }{ defined(WITH_SOUND)
+#else  // }{ defined(WITH_SOUND)
 
 //-----------------------------------------------------------------------------
 
-extern void SoundCclRegister(void);		/// register ccl features
+extern void SoundCclRegister(void);  /// register ccl features
 
-#endif		// } !defined(WITH_SOUND)
+#endif // } !defined(WITH_SOUND)
 
 //@}
 
-#endif		// !__CCL_SOUND_H__
+#endif // !__CCL_SOUND_H__
