@@ -1000,6 +1000,7 @@ local SCM CclDefineAnimations(SCM list)
     int i;
     int frame;
 
+    resource = NULL;
     str = gh_scm2newstr(gh_car(list), NULL);
     list = gh_cdr(list);
     anims = calloc(1,sizeof(Animations));
