@@ -123,7 +123,7 @@ extern void ShowIntro(const Intro* intro);
     /// Show game credits
 extern void ShowCredits();
     /// Show picture
-extern void ShowPicture(const char* name);
+extern void ShowPicture(const char* act,const char* title,const char* picture);
     /// Register Ccl
 extern void CreditsCclRegister(void);
     /// Create a game
