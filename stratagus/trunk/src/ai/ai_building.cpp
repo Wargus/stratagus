@@ -312,11 +312,17 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 **	@param dx	Pointer for X position returned.
 **	@param dy	Pointer for Y position returned.
 **	@return		True if place found, false if no found.
+**
+**	@todo	Better and faster way to find building place of oil platforms
+**		Special routines for special buildings.
 */
 global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
 	int *dx, int *dy)
 {
-    if( AiFindBuildingPlace2(worker,type,dx,dy,1) ) {
+    //
+    //	Platforms can only be build on oil patches
+    //
+    if( !type->GivesOil && AiFindBuildingPlace2(worker,type,dx,dy,1) ) {
 	return 1;
     }
 
