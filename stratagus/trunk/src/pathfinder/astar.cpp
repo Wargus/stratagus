@@ -360,7 +360,7 @@ local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrange
 	}
     }
 
-    for (x = gx; x < gx + gy && !minrange; ++x) {
+    for (x = gx; x < gx + gw && !minrange; ++x) {
 	for (y = gy; y < gy + gh; ++y) {
 	    if (x < 0 || x >= TheMap.Width || y < 0 || y >= TheMap.Height) {
 		continue;
