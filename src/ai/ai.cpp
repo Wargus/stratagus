@@ -1076,7 +1076,7 @@ local int AiRemoveFromBuilded2(PlayerAi* pai, const UnitType* type)
 	//  Search the unit-type order.
 	//
 	for (queue = &pai->UnitTypeBuilded; (next = *queue); queue = &next->Next) {
-		DebugCheck(!next->Want);
+		Assert(next->Want);
 		if (type == next->Type && next->Made) {
 			--next->Made;
 			if (!--next->Want) {
@@ -1121,7 +1121,7 @@ local void AiRemoveFromBuilded(PlayerAi* pai, const UnitType* type)
 		return;
 	}
 
-	DebugCheck(1);
+	Assert(0);
 }
 
 /**
@@ -1172,7 +1172,7 @@ local void AiReduceMadeInBuilded(const PlayerAi* pai, const UnitType* type)
 		}
 	}
 
-	DebugCheck(1);
+	Assert(0);
 }
 
 /*----------------------------------------------------------------------------
@@ -1254,7 +1254,7 @@ global void AiUnitKilled(Unit* unit)
 	DebugLevel1Fn("%d: %d(%s) killed\n" _C_
 		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
-	DebugCheck(unit->Player->Type == PlayerPerson);
+	Assert(unit->Player->Type != PlayerPerson);
 
 	// FIXME: must handle all orders...
 	switch (unit->Orders[0].Action) {
@@ -1298,7 +1298,7 @@ global void AiWorkComplete(Unit* unit, Unit* what)
 			what->Player->Player _C_ what->Type->Ident _C_ what->X _C_ what->Y);
 	}
 
-	DebugCheck(what->Player->Type == PlayerPerson);
+	Assert(what->Player->Type != PlayerPerson);
 
 	AiRemoveFromBuilded(what->Player->Ai, what->Type);
 }
@@ -1315,7 +1315,7 @@ global void AiCanNotBuild(Unit* unit, const UnitType* what)
 		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Ident _C_ unit->X _C_ unit->Y);
 
-	DebugCheck(unit->Player->Type == PlayerPerson);
+	Assert(unit->Player->Type != PlayerPerson);
 
 	AiReduceMadeInBuilded(unit->Player->Ai, what);
 }
@@ -1332,7 +1332,7 @@ global void AiCanNotReach(Unit* unit, const UnitType* what)
 		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Ident _C_ unit->X _C_ unit->Y);
 
-	DebugCheck(unit->Player->Type == PlayerPerson);
+	Assert(unit->Player->Type != PlayerPerson);
 
 	AiReduceMadeInBuilded(unit->Player->Ai, what);
 }
@@ -1725,7 +1725,7 @@ local void HandleTransportRequests(AiTransportRequest* aitr)
 		return;
 	}
 
-	DebugCheck(zonepathlen < 3);
+	Assert(zonepathlen >= 3);
 
 	if (FindTransporterOnZone(zonepath[1], &DestZones,
 			aitr->Unit->X, aitr->Unit->Y, UnitTypeNaval, &transporter)) {
@@ -1753,7 +1753,7 @@ global void AiNeedMoreSupply(Unit* unit, const UnitType* what __attribute__((unu
 		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Ident _C_ unit->X _C_ unit->Y);
 
-	DebugCheck(unit->Player->Type == PlayerPerson);
+	Assert(unit->Player->Type != PlayerPerson);
 
 	((PlayerAi*)unit->Player->Ai)->NeedSupply = 1;
 }
@@ -1770,7 +1770,7 @@ global void AiTrainingComplete(Unit* unit, Unit* what)
 		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Type->Ident _C_ unit->X _C_ unit->Y);
 
-	DebugCheck(unit->Player->Type == PlayerPerson);
+	Assert(unit->Player->Type != PlayerPerson);
 
 	AiRemoveFromBuilded(unit->Player->Ai, what->Type);
 
@@ -1792,7 +1792,7 @@ global void AiUpgradeToComplete(Unit* unit __attribute__((unused)),
 		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Ident _C_ unit->X _C_ unit->Y);
 
-	DebugCheck(unit->Player->Type == PlayerPerson);
+	Assert(unit->Player->Type != PlayerPerson);
 }
 
 /**
@@ -1808,7 +1808,7 @@ global void AiResearchComplete(Unit* unit __attribute__((unused)),
 		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Ident _C_ unit->X _C_ unit->Y);
 
-	DebugCheck(unit->Player->Type == PlayerPerson);
+	Assert(unit->Player->Type != PlayerPerson);
 
 	// FIXME: upgrading knights -> paladins, must rebuild lists!
 }

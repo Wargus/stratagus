@@ -79,8 +79,8 @@ global void HandleActionUpgradeTo(Unit* unit)
 		// don't have such unit now
 		player->UnitTypesCount[unit->Type->Slot]--;
 
-		DebugCheck(unit->Type->TileWidth != type->TileWidth ||
-				unit->Type->TileHeight != type->TileHeight);
+		Assert(unit->Type->TileWidth == type->TileWidth &&
+				unit->Type->TileHeight == type->TileHeight);
 		unit->Type = type;
 		unit->Stats = (UnitStats*)stats;
 		// and we have new one...

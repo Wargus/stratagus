@@ -412,7 +412,7 @@ global int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen)
 		}
 	}
 
-	DebugCheck(bestdst == -1);
+	Assert(bestdst != -1);
 	*pathlen = 0;
 	do {
 		// Add startzone
@@ -422,7 +422,7 @@ global int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen)
 		}
 
 		startzone = zonenext[startzone];
-		DebugCheck(startzone == -1);
+		Assert(startzone != -1);
 	} while(1);
 }
 

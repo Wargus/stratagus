@@ -302,8 +302,8 @@ global Sample* LoadWav(const char* name, int flags)
 		CLclose(f);
 		ExitFatal(-1);
 	}
-	DebugCheck(wavfmt.Frequency != 44100 && wavfmt.Frequency != 22050 &&
-		wavfmt.Frequency != 11025);
+	Assert(wavfmt.Frequency == 44100 || wavfmt.Frequency == 22050 ||
+		wavfmt.Frequency == 11025);
 
 	data = malloc(sizeof(WavData));
 	data->WavFile = f;
@@ -368,7 +368,7 @@ global Sample* LoadWav(const char* name, int flags)
 			rem -= read;
 
 			sample->Buffer = realloc(sample->Buffer, sample->Len + read * divide);
-			DebugCheck(!sample->Buffer);
+			Assert(sample->Buffer);
 
 			comp = CLread(data->WavFile, sndbuf, read);
 			if (!comp) {

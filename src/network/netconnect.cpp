@@ -347,7 +347,7 @@ global void NetworkServerStartGame(void)
 	InitMessage message;
 	InitMessage statemsg;
 
-	DebugCheck(ServerSetupState.CompOpt[0] != 0);
+	Assert(ServerSetupState.CompOpt[0] == 0);
 
 	// save it first..
 	LocalSetupState = ServerSetupState;
@@ -466,7 +466,7 @@ global void NetworkServerStartGame(void)
 
 			    num[chosen] = num[--j];
 		    } else {
-			    DebugCheck(1 == 1);
+			    Assert(0);
 #if 0
 			// ARI: is this code path really executed? (initially h >= NetPlayers..)
 			// Above Debugcheck will catch it..

@@ -202,7 +202,7 @@ global void RegionFindPointOnX(RegionDefinition * def,int x,int * vx,int * vy)
 	}
 
 	// Check one was found !
-	DebugCheck(besty == -1);
+	Assert(besty != -1);
 
 	*vx = bestx;
 	*vy = besty;
@@ -255,7 +255,7 @@ global void RegionFindPointOnY(RegionDefinition * def,int y,int * vx,int * vy)
 	}
 
 	// Check one was found !
-	DebugCheck(besty == -1);
+	Assert(besty != -1);
 
 	*vx = bestx;
 	*vy = besty;
@@ -593,7 +593,7 @@ global void RegionAddConnection(RegionId rega, RegionId regb,int value)
 	int j;
 	RegionDefinition * adef;
 
-	DebugCheck(rega == regb);
+	Assert(rega != regb);
 
 	adef = Regions + rega;
 
@@ -615,7 +615,7 @@ global void RegionAddConnection(RegionId rega, RegionId regb,int value)
 		}
 	}
 
-	DebugCheck(value<=0);
+	Assert(value > 0);
 
 	adef->Connections = (int*)realloc(adef->Connections, sizeof(int) * (adef->ConnectionsNumber + 1));
 	adef->ConnectionsCount = (int*)realloc(adef->ConnectionsCount, sizeof(int) * (adef->ConnectionsNumber + 1));

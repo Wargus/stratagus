@@ -159,7 +159,7 @@ global int GetTileNumber(int basic, int random, int filler)
 			while (++i < 16 && !TheMap.Tileset->Table[tile + i]) {
 			}
 		} while (i < 16 && n--);
-		DebugCheck(i == 16);
+		Assert(i != 16);
 		return tile + i;
 	}
 	if (filler) {
@@ -185,7 +185,7 @@ global void EditTile(int x, int y, int tile)
 {
 	MapField* mf;
 
-	DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
 
 	ChangeTile(x, y, GetTileNumber(tile, TileToolRandom, TileToolDecoration));
 
@@ -371,7 +371,7 @@ local void CalculateMaxIconSize(void)
 	IconHeight = 0;
 	for (i = 0; i < MaxUnitIndex; ++i) {
 		type = UnitTypeByIdent(EditorUnitTypes[i]);
-		DebugCheck(!type || !type->Icon.Icon);
+		Assert(type && type->Icon.Icon);
 		icon = type->Icon.Icon;
 		if (IconWidth < icon->Width) {
 			IconWidth = icon->Width;
@@ -742,13 +742,13 @@ local void DrawEditorPanel(void)
 	// Select / Units / Tiles
 	//
 	icon = IconByIdent(EditorSelectIcon);
-	DebugCheck(!icon);
+	Assert(icon);
 	DrawUnitIcon(Players, icon,
 		(ButtonUnderCursor == SelectButton ? IconActive : 0) |
 			(EditorState == EditorSelecting ? IconSelected : 0),
 		x, y);
 	icon = IconByIdent(EditorUnitsIcon);
-	DebugCheck(!icon);
+	Assert(icon);
 	DrawUnitIcon(Players, icon,
 		(ButtonUnderCursor == UnitButton ? IconActive : 0) |
 			(EditorState == EditorEditUnit ? IconSelected : 0),
@@ -887,7 +887,7 @@ local void DrawEditorInfo(void)
 		}
 	}
 
-	DebugCheck(i == TheMap.Tileset->NumTiles);
+	Assert(i != TheMap.Tileset->NumTiles);
 
 	sprintf(buf, "%d %s %s", tile,
 		TheMap.Tileset->SolidTerrainTypes[TheMap.Tileset->Tiles[i].BaseTerrain].TerrainName,
@@ -1251,7 +1251,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		Viewport* vp;
 
 		vp = GetViewport(CursorX, CursorY);
-		DebugCheck(!vp);
+		Assert(vp);
 		if ((MouseButtons & LeftButton) && TheUI.SelectedViewport != vp) {
 			// viewport changed
 			TheUI.SelectedViewport = vp;
@@ -1789,7 +1789,7 @@ local void EditorCallbackMouse(int x, int y)
 		Viewport* vp;
 
 		vp = GetViewport(x, y);
-		DebugCheck(!vp);
+		Assert(vp);
 		if (TheUI.MouseViewport != vp) { // viewport changed
 			TheUI.MouseViewport = vp;
 			DebugLevel0Fn("active viewport changed to %d.\n" _C_

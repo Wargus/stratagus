@@ -492,7 +492,7 @@ global Sample* LoadMp3(const char* name, int flags)
 		data->MadFile = f;
 		sample->User = data;
 		sample->Buffer = malloc(55000000);
-		DebugCheck(!sample->Buffer);
+		Assert(sample->Buffer);
 
 		sample->Len = 0;
 		sample->Pos = 0;

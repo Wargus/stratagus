@@ -92,7 +92,7 @@ global void ActionStillGeneric(Unit* unit, int ground)
 		//
 		// Still animation
 		//
-		DebugCheck(!type->Animations || !type->Animations->Still);
+		Assert(type->Animations && type->Animations->Still);
 
 		UnitShowAnimation(unit, type->Animations->Still);
 
@@ -157,7 +157,7 @@ global void ActionStillGeneric(Unit* unit, int ground)
 			if (CheckedCanMoveToMask(x, y, TypeMovementMask(type))) {
 				// FIXME: Don't use pathfinder for this, costs too much cpu.
 				unit->Orders[0].Action = UnitActionMove;
-				DebugCheck(unit->Orders[0].Goal);
+				Assert(!unit->Orders[0].Goal);
 				unit->Orders[0].Goal = NoUnitP;
 				unit->Orders[0].Range = 0;
 				unit->Orders[0].X = x;
@@ -193,8 +193,8 @@ global void ActionStillGeneric(Unit* unit, int ground)
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 				DebugLevel3Fn(" %d Attacking in range %d\n" _C_
 					UnitNumber(unit) _C_ unit->SubAction);
-				DebugCheck(unit->SavedOrder.Action != UnitActionStill);
-				DebugCheck(unit->SavedOrder.Goal);
+				Assert(unit->SavedOrder.Action == UnitActionStill);
+				Assert(!unit->SavedOrder.Goal);
 				unit->SavedOrder.Action = UnitActionAttack;
 				unit->SavedOrder.Range = 0;
 				unit->SavedOrder.X = unit->X;

@@ -207,7 +207,7 @@ global RegionId NewRegion(int iswater)
 
 	result = NextFreeRegion;
 
-	DebugCheck(NextFreeRegion >= MaxRegionNumber);
+	Assert(NextFreeRegion < MaxRegionNumber);
 
 	if (RegionMax <= result) {
 		RegionMax = result + 1;
@@ -215,7 +215,7 @@ global RegionId NewRegion(int iswater)
 	++RegionCount;
 
 	DebugLevel3Fn("New region %d, iswater = %d\n" _C_ result _C_ iswater);
-	DebugCheck(Regions[result].TileCount);
+	Assert(!Regions[result].TileCount);
 
 	Regions[result].TileCount = 0;
 	Regions[result].IsWater = iswater;
@@ -349,7 +349,7 @@ global void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections
 
 		while (minx <= seg->MaxX) {
 			initval = *tempptr;
-			DebugCheck(initval == 0);
+			Assert(initval != 0);
 
 			while ((maxx < seg->MaxX) && (tempptr[1] == initval)) {
 				tempptr++;
@@ -407,7 +407,7 @@ global void RegionJoin(RegionId a, RegionId b)
 	RegionId* mapptr;
 	int i;
 
-	DebugCheck(Regions[a].IsWater != Regions[b].IsWater);
+	Assert(Regions[a].IsWater == Regions[b].IsWater);
 	if (a > b) {
 		tmp = a;
 		a = b;
@@ -468,7 +468,7 @@ global void RegionSplit(RegionId regid, int updateConnections)
 
 	adef = Regions + regid;
 
-	DebugCheck(adef->TileCount <= 1);
+	Assert(adef->TileCount > 1);
 
 	RegionTempStorageAllocate();
 
@@ -498,19 +498,19 @@ global void RegionSplit(RegionId regid, int updateConnections)
 	// Find two correct starting place for flood filling
 	if (adef->MaxX - adef->MinX > adef->MaxY - adef->MinY) {
 		RegionFindPointOnX(adef, adef->MinX, &x, &y);
-		DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
+		Assert(!RegionTempStorage[x + TheMap.Width * y]);
 		CircularFillerInit(fillers, regid, x, y, 1);
 
 		RegionFindPointOnX(adef, adef->MaxX, &x, &y);
-		DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
+		Assert(!RegionTempStorage[x + TheMap.Width * y]);
 		CircularFillerInit(fillers + 1, regid, x, y, 2);
 	} else {
 		RegionFindPointOnY(adef, adef->MinY, &x, &y);
-		DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
+		Assert(!RegionTempStorage[x + TheMap.Width * y]);
 		CircularFillerInit(fillers, regid, x, y, 1);
 
 		RegionFindPointOnY(adef, adef->MaxY, &x, &y);
-		DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
+		Assert(!RegionTempStorage[x + TheMap.Width * y]);
 		CircularFillerInit(fillers + 1, regid, x, y, 2);
 	}
 
@@ -536,7 +536,7 @@ global void RegionSplit(RegionId regid, int updateConnections)
 
 		// Need to unmark ?
 		if (done < tileleft) {
-			DebugCheck(erodelevel < 3);
+			Assert(erodelevel >= 3);
 
 			RegionTempStorageUnmarkPoints(regid, erodelevel--);
 
@@ -875,13 +875,13 @@ local void RegionFloodFill(int x0, int x1, int starty, int RegId, int IsWater)
 	int y;
 	int i;
 
-	DebugCheck(x0 > x1);
-	DebugCheck(IsWater != 0 && IsWater != 1);
+	Assert(x0 <= x1);
+	Assert(IsWater == 0 || IsWater == 1);
 
 	y = starty;
 
 	for (x = x0; x <= x1; ++x) {
-		DebugCheck(TileIsWater(x, y) != IsWater);
+		Assert(TileIsWater(x, y) == IsWater);
 		RegionAssignTile(RegId, x, y);
 	}
 
@@ -906,8 +906,8 @@ local void RegionFloodFill(int x0, int x1, int starty, int RegId, int IsWater)
 			}
 
 			FindHExtent(x, y, &subx0, &subx1, IsWater);
-			DebugCheck(TileIsWater(subx0,y) != IsWater);
-			DebugCheck(TileIsWater(subx1,y) != IsWater);
+			Assert(TileIsWater(subx0,y) == IsWater);
+			Assert(TileIsWater(subx1,y) == IsWater);
 			RegionFloodFill(subx0, subx1, y, RegId, IsWater);
 
 			x = subx1;
@@ -1057,7 +1057,7 @@ global void ZoneFindConnexion(int a, int b, int refx, int refy, int* rsltx, int*
 		}
 	}
 
-	DebugCheck(bestdst == -1);
+	Assert(bestdst != -1);
 }
 
 /**
@@ -1074,7 +1074,7 @@ local void RefreshZones(void)
 	int j;
 	int zoneid;
 
-	DebugCheck(!RegionCount);
+	Assert(RegionCount);
 	regions_stack = malloc(RegionCount * sizeof(int));
 
 	for (i = 0; i < RegionMax; ++i) {
@@ -1178,7 +1178,7 @@ global void MapSplitterEachCycle(void)
 	RegionId i;
 	RegionId j;
 
-	DebugCheck(!MapSplitterInitialised);
+	Assert(MapSplitterInitialised);
 
 	// Check for connection in regions
 	for (i = 0; i < RegionMax; ++i) {

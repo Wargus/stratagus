@@ -72,7 +72,7 @@ global void AnimateActionSpellCast(Unit* unit)
 	int flags;
 
 	if (unit->Type->Animations) {
-		DebugCheck(!unit->Type->Animations->Attack);
+		Assert(unit->Type->Animations->Attack);
 
 		flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
 
@@ -161,7 +161,7 @@ local void SpellMoveToTarget(Unit* unit)
 			}
 		}
 	}
-	DebugCheck(unit->Type->Vanishes || unit->Destroyed);
+	Assert(!unit->Type->Vanishes && !unit->Destroyed);
 }
 
 /**

@@ -111,7 +111,7 @@ global SoundId SoundIdForName(const char* name)
 {
 	const SoundId* result;
 
-	DebugCheck(!name);
+	Assert(name);
 
 	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
 		return *result;
@@ -137,7 +137,7 @@ global SoundId MakeSound(const char* name, const char* file[], int nb)
 	SoundId id;
 	const SoundId* result;
 
-	DebugCheck(nb > 255);
+	Assert(nb <= 255);
 
 	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
 		DebugLevel0Fn("re-register sound `%s'\n" _C_ name);

@@ -214,7 +214,7 @@ global unsigned long NetResolveHost(const char* host)
 			he = gethostbyname(host);
 			if (he) {
 				addr = 0;
-				DebugCheck(he->h_length != 4);
+				Assert(he->h_length == 4);
 				memcpy(&addr, he->h_addr, he->h_length);
 			}
 		}

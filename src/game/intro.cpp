@@ -915,7 +915,7 @@ local int GameStatsDrawFunc(int frame)
 				break;
 			}
 		}
-		DebugCheck(i == PlayerRaces.Count);
+		Assert(i != PlayerRaces.Count);
 
 		rank = ranks[0];
 		i = 0;

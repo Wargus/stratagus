@@ -173,7 +173,7 @@ global void HandleActionBuild(Unit* unit)
 	//
 	// FIXME: got bug report about unit->Type==NULL in building
 	//
-	DebugCheck(!unit->Type || !unit->HP);
+	Assert(unit->Type && unit->HP);
 
 	if (!unit->Type || !unit->HP) {
 		return;
@@ -235,7 +235,7 @@ global void HandleActionBuild(Unit* unit)
 			UnitClearOrders(temp);
 			ReleaseUnit(temp);
 		} else {
-			DebugCheck(1);
+			Assert(0);
 		}
 	}
 
