@@ -713,13 +713,17 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 
     case SpellActionPolymorph:
 	if (target && target->Type->Organic) {
-	    Player *pl = target->Player;
+	    UnitType* type;
 
+	    unit->Player->Score+=target->Type->Points;
 	    // as said somewhere else -- no corpses :)
 	    RemoveUnit(target);
 	    UnitLost(target);
 	    ReleaseUnit(target);
-	    MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-critter"), pl);
+	    type=UnitTypeByIdent("unit-critter");
+	    if( CanMoveToMask(x,y,TypeMovementMask(type)) ) {
+		MakeUnitAndPlace(x, y, type, Players+PlayerNumNeutral);
+	    }
 
 	    unit->Mana -= spell->ManaCost;
 
