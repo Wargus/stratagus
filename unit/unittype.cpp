@@ -1234,18 +1234,7 @@ global UnitType* UnitTypeByIdent(const char* ident)
 	UnitType* const* type;
 
 	type = (UnitType* const*)hash_find(UnitTypeHash, ident);
-	if (type) {
-		return *type;
-	}
-
-#ifdef DEBUG
-	if (!NoWarningUnitType) {
-		DebugLevel0Fn("Name `%s' not found\n" _C_ ident);
-		DebugCheck(1);
-	}
-#endif
-
-	return NULL;
+	return type ? *type : 0;
 }
 
 /**
