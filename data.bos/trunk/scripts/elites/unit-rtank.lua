@@ -1,0 +1,79 @@
+--       _________ __                 __                               
+--      /   _____//  |_____________ _/  |______     ____  __ __  ______
+--      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+--      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+--     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+--             \/                  \/          \//_____/            \/ 
+--  ______________________                           ______________________
+--			  T H E   W A R   B E G I N S
+--	   Stratagus - A free fantasy real time strategy game engine
+--
+--	unit-rtank.lua	-	Define the rocket tank unit.
+--
+--	(c) Copyright 2005 by François Beerten.
+--
+--      This program is free software; you can redistribute it and/or modify
+--      it under the terms of the GNU General Public License as published by
+--      the Free Software Foundation; either version 2 of the License, or
+--      (at your option) any later version.
+--  
+--      This program is distributed in the hope that it will be useful,
+--      but WITHOUT ANY WARRANTY; without even the implied warranty of
+--      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--      GNU General Public License for more details.
+--  
+--      You should have received a copy of the GNU General Public License
+--      along with this program; if not, write to the Free Software
+--      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+--
+--	$Id$
+
+DefineAnimations("animations-rtank", 
+   "still", {{3, 0, 1, 0}},
+   "move", {
+           {0, 4, 3, 5}, {0, 4, 3, 10}, {0, 4, 3, 5}, {0, 4, 3, 10},
+           {0, 4, 3, 5}, {0, 4, 3, 10}, {0, 4, 3, 5}, {3, 4, 3, 10},},
+   "attack", {
+           {0, 0, 4, 0}, {12, 0, 1, 20}, {12, 0, 10, 20}, {3, 0, 4, 0}},
+   "die", {
+           {3, 0, 2, 30}})
+
+DefineIcon({
+	Name = "icon-rtank",
+	Size = {46, 38},
+	Frame = 0,
+	File = "elites/units/ico_rtank.png"})
+
+DefineUnitType("unit-rtank", {
+        Name = "Rocket Tank",
+        Files = {"default", "elites/units/unit_rtank.png"}, Size = {64, 64},
+        Shadow = {"file", "elites/units/unit_rtank_s.png", "size", {64, 64}},
+        Animations = "animations-rtank", Icon = "icon-rtank",
+        Flip = false,
+        Costs = {"time", 120, "titanium", 170, "crystal", 300},
+        RepairHp = 1, RepairCosts = {"crystal", 6},
+        Speed = 10, HitPoints = 50, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
+        SightRange = 5, Armor = 20, BasicDamage = 10, PiercingDamage = 0,
+        Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
+        Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+        Type = "land",
+	ComputerReactionRange = 10, PersonReactionRange = 10,
+	RightMouseAction = "attack",
+	LandUnit = true, SelectableByRectangle = true, 
+	Demand = 0, CanAttack = true, CanTargetLand = true,
+	NumDirections = 8, MaxAttackRange = 8,
+        Sounds = {}
+        })
+
+DefineAllow("unit-rtank", "AAAAAAAAAAAAAAAA")
+DefineDependency("unit-rtank", {"unit-vfac"})
+
+DefineButton({
+        Pos = 5, Level = 0, Icon = "icon-rtank", Action = "train-unit",
+        Value = "unit-rtank", Key = "r", Hint = "BUILD ~!ROCKET TANK",
+        ForUnit = {"unit-vfac"}})
+
+DefineCommonButtons({"unit-rtank"})
+
+
+
