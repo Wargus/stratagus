@@ -35,9 +35,9 @@
 #include "etlib/hash.h"
 
 local int AddUpgradeModifierBase(int,int,int,int,int,int,int,int,int*,
-	const char*,const char*,const char*,const char*);
+	const char*,const char*,const char*,UnitType*);
 local int AddUpgradeModifier(int,int,int,int,int,int,int,int,int*,
-	const char*,const char*,const char*,const char*);
+	const char*,const char*,const char*);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -83,6 +83,8 @@ local struct _wc_upgrades_ {
     int		CostsModifier[MaxCosts];/// costs modifier
 
     const char*	Units;			/// units affected
+
+    const char*	ConvertTo;		/// convert to this unit
 } WcUpgrades[] = {
 //			Name			Icon
 //  Time  Gold Wood  Oil         At Si BD PD Ar Sp HP  Time Gold Wood  Oil
@@ -387,10 +389,6 @@ local void SetupAllow(void)
 		    ,sizeof(Players[z].Allow.Upgrades));
 	    memset(Players[z].Allow.Units,'A'
 		    ,sizeof(Players[z].Allow.Units));
-#if 0
-	    memset(Players[z].Allow.Actions,'A'
-		    ,sizeof(Players[z].Allow.Actions));
-#endif
 	}
 
 	// Give some upgrades as default.
@@ -836,67 +834,72 @@ global void SaveUpgrades(FILE* file)
     //
     for( i=0; i<UpgradeModifiersCount; ++i ) {
 	fprintf(file,"(define-modifier '%s",
-		Upgrades[UpgradeModifiers[i]->uid].Ident);
+		Upgrades[UpgradeModifiers[i]->UpgradeId].Ident);
 
-	if( UpgradeModifiers[i]->mods.AttackRange ) {
+	if( UpgradeModifiers[i]->Modifier.AttackRange ) {
 	    fprintf(file,"\n  '(attack-range %d)"
-		    ,UpgradeModifiers[i]->mods.AttackRange );
+		    ,UpgradeModifiers[i]->Modifier.AttackRange );
 	}
-	if( UpgradeModifiers[i]->mods.SightRange ) {
+	if( UpgradeModifiers[i]->Modifier.SightRange ) {
 	    fprintf(file,"\n  '(sight-range %d)"
-		    ,UpgradeModifiers[i]->mods.SightRange );
+		    ,UpgradeModifiers[i]->Modifier.SightRange );
 	}
-	if( UpgradeModifiers[i]->mods.SightRange ) {
+	if( UpgradeModifiers[i]->Modifier.SightRange ) {
 	    fprintf(file,"\n  '(attack-range %d)"
-		    ,UpgradeModifiers[i]->mods.SightRange );
+		    ,UpgradeModifiers[i]->Modifier.SightRange );
 	}
-	if( UpgradeModifiers[i]->mods.BasicDamage ) {
+	if( UpgradeModifiers[i]->Modifier.BasicDamage ) {
 	    fprintf(file,"\n  '(basic-damage %d)"
-		    ,UpgradeModifiers[i]->mods.BasicDamage );
+		    ,UpgradeModifiers[i]->Modifier.BasicDamage );
 	}
-	if( UpgradeModifiers[i]->mods.PiercingDamage ) {
+	if( UpgradeModifiers[i]->Modifier.PiercingDamage ) {
 	    fprintf(file,"\n  '(piercing-damage %d)"
-		    ,UpgradeModifiers[i]->mods.PiercingDamage );
+		    ,UpgradeModifiers[i]->Modifier.PiercingDamage );
 	}
-	if( UpgradeModifiers[i]->mods.Armor ) {
+	if( UpgradeModifiers[i]->Modifier.Armor ) {
 	    fprintf(file,"\n  '(armor %d)"
-		    ,UpgradeModifiers[i]->mods.Armor );
+		    ,UpgradeModifiers[i]->Modifier.Armor );
 	}
-	if( UpgradeModifiers[i]->mods.Speed ) {
+	if( UpgradeModifiers[i]->Modifier.Speed ) {
 	    fprintf(file,"\n  '(speed %d)"
-		    ,UpgradeModifiers[i]->mods.Speed );
+		    ,UpgradeModifiers[i]->Modifier.Speed );
 	}
-	if( UpgradeModifiers[i]->mods.HitPoints ) {
+	if( UpgradeModifiers[i]->Modifier.HitPoints ) {
 	    fprintf(file,"\n  '(hit-points %d)"
-		    ,UpgradeModifiers[i]->mods.HitPoints );
+		    ,UpgradeModifiers[i]->Modifier.HitPoints );
 	}
 
 	for( j=0; j<MaxCosts; ++j ) {
-	    if( UpgradeModifiers[i]->mods.Costs[j] ) {
+	    if( UpgradeModifiers[i]->Modifier.Costs[j] ) {
 		fprintf(file,"\n  '(%s-cost %d)"
-			,DEFAULT_NAMES[j],UpgradeModifiers[i]->mods.Costs[j]);
+			,DEFAULT_NAMES[j],UpgradeModifiers[i]->Modifier.Costs[j]);
 	    }
 	}
 
 	for( j=0; j<MAXUNITTYPES; ++j ) {	// allow/forbid units
-	    if( UpgradeModifiers[i]->af_units[j]!='?' ) {
+	    if( UpgradeModifiers[i]->ChangeUnits[j]!='?' ) {
 		fprintf(file,"\n  '(allow %s %d)",
 			UnitTypes[j].Ident,
-			UpgradeModifiers[i]->af_units[j]);
+			UpgradeModifiers[i]->ChangeUnits[j]);
 	    }
 	}
 
 	for( j=0; j<MAXUPGRADES; ++j ) {	// allow/forbid upgrades
-	    if( UpgradeModifiers[i]->af_upgrades[j]!='?' ) {
+	    if( UpgradeModifiers[i]->ChangeUpgrades[j]!='?' ) {
 		fprintf(file,"\n  '(allow %s %c)",Upgrades[j].Ident,
-			UpgradeModifiers[i]->af_upgrades[j]);
+			UpgradeModifiers[i]->ChangeUpgrades[j]);
 	    }
 	}
 
 	for( j=0; j<MAXUNITTYPES; ++j ) {	// apply to units
-	    if( UpgradeModifiers[i]->apply_to[j]!='?' ) {
+	    if( UpgradeModifiers[i]->ApplyTo[j]!='?' ) {
 		fprintf(file,"\n  '(apply-to %s)",UnitTypes[j].Ident);
 	    }
+	}
+
+	if( UpgradeModifiers[i]->ConvertTo ) {
+	    fprintf(file,"\n  '(convert-to %s)",
+		    ((UnitType*)UpgradeModifiers[i]->ConvertTo)->Ident);
 	}
 
 	fprintf(file,")\n\n");
@@ -973,6 +976,7 @@ local SCM CclDefineModifier(SCM list)
     char units[MAXUNITTYPES];
     char upgrades[MAXUPGRADES];
     char apply_to[MAXUNITTYPES];
+    UnitType* convert_to;
 
     attack_range=0;
     sight_range=0;
@@ -985,6 +989,7 @@ local SCM CclDefineModifier(SCM list)
     memset(units,'?',sizeof(units));
     memset(upgrades,'?',sizeof(upgrades));
     memset(apply_to,'?',sizeof(apply_to));
+    convert_to=NULL;
 
     value=gh_car(list);
     list=gh_cdr(list);
@@ -1050,6 +1055,11 @@ local SCM CclDefineModifier(SCM list)
 	    str=gh_scm2newstr(gh_car(value),NULL);
 	    apply_to[UnitTypeIdByIdent(str)]='X';
 	    free(str);
+	} else if( gh_eq_p(temp,gh_symbol2scm("convert-to")) ) {
+	    value=gh_cdr(value);
+	    str=gh_scm2newstr(gh_car(value),NULL);
+	    convert_to=UnitTypeByIdent(str);
+	    free(str);
 	} else {
 	    errl("wrong tag",temp);
 	    return SCM_UNSPECIFIED;
@@ -1058,7 +1068,7 @@ local SCM CclDefineModifier(SCM list)
 
     AddUpgradeModifierBase(uid,attack_range,sight_range,
 	    basic_damage,piercing_damage,armor,speed,hit_points,costs,
-	    units,NULL,upgrades,apply_to);
+	    units,upgrades,apply_to,convert_to);
 
     return SCM_UNSPECIFIED;
 }
@@ -1262,10 +1272,10 @@ void UpgradesDone(void) // free upgrade/allow structures
 #endif
 
 // returns upgrade modifier id or -1 for error ( actually this id is useless, just error checking )
-local int AddUpgradeModifierBase(int aUid,int aattack_range,int asight_range,
-    int abasic_damage,int apiercing_damage,int aarmor,int aspeed,
-    int ahit_points,int* acosts,const char* aaf_units,const char* aaf_actions,
-    const char* aaf_upgrades,const char* aapply_to)
+local int AddUpgradeModifierBase(int uid,int attack_range,int sight_range,
+    int basic_damage,int piercing_damage,int armor,int speed,
+    int hit_points,int* costs,const char* af_units,
+    const char* af_upgrades,const char* apply_to,UnitType* convert_to)
 {
     int i;
     UpgradeModifier *um;
@@ -1275,27 +1285,26 @@ local int AddUpgradeModifierBase(int aUid,int aattack_range,int asight_range,
 	return -1;
     }
 
-    um->uid = aUid;
+    um->UpgradeId = uid;
 
     // get/save stats modifiers
-    um->mods.AttackRange	= aattack_range;
-    um->mods.SightRange		= asight_range;
-    um->mods.BasicDamage	= abasic_damage;
-    um->mods.PiercingDamage	= apiercing_damage;
-    um->mods.Armor		= aarmor;
-    um->mods.Speed		= aspeed;
-    um->mods.HitPoints		= ahit_points;
+    um->Modifier.AttackRange	= attack_range;
+    um->Modifier.SightRange	= sight_range;
+    um->Modifier.BasicDamage	= basic_damage;
+    um->Modifier.PiercingDamage	= piercing_damage;
+    um->Modifier.Armor		= armor;
+    um->Modifier.Speed		= speed;
+    um->Modifier.HitPoints	= hit_points;
 
     for( i=0; i<MaxCosts; ++i ) {
-	um->mods.Costs[i]	= acosts[i];
+	um->Modifier.Costs[i]	= costs[i];
     }
 
-    memcpy(um->af_units,aaf_units,sizeof(um->af_units));
-#if 0
-    memcpy(um->af_actions,aaf_actions,sizeof(um->af_actions));
-#endif
-    memcpy(um->af_upgrades,aaf_upgrades,sizeof(um->af_upgrades));
-    memcpy(um->apply_to,aapply_to,sizeof(um->apply_to));
+    memcpy(um->ChangeUnits,af_units,sizeof(um->ChangeUnits));
+    memcpy(um->ChangeUpgrades,af_upgrades,sizeof(um->ChangeUpgrades));
+    memcpy(um->ApplyTo,apply_to,sizeof(um->ApplyTo));
+
+    um->ConvertTo=convert_to;
 
     UpgradeModifiers[UpgradeModifiersCount] = um;
 
@@ -1304,23 +1313,22 @@ local int AddUpgradeModifierBase(int aUid,int aattack_range,int asight_range,
 
 
 // returns upgrade modifier id or -1 for error ( actually this id is useless, just error checking )
-local int AddUpgradeModifier( int aUid,
-    int aattack_range,
-    int asight_range,
-    int abasic_damage,
-    int apiercing_damage,
-    int aarmor,
-    int aspeed,
-    int ahit_points,
+local int AddUpgradeModifier( int uid,
+    int attack_range,
+    int sight_range,
+    int basic_damage,
+    int piercing_damage,
+    int armor,
+    int speed,
+    int hit_points,
 
-    int* acosts,
+    int* costs,
 
     // following are comma separated list of required string id's
 
-    const char* aaf_units,    // "A:unit-mage,F:unit-grunt" -- allow mages, forbid grunts
-    const char* aaf_actions,  // "A:PeonAttack"
-    const char* aaf_upgrades, // "F:upgrade-Shield1,R:upgrade-ShieldTotal" -- :)
-    const char* aapply_to	    // "unit-Peon,unit-Peasant"
+    const char* af_units,    // "A:unit-mage,F:unit-grunt" -- allow mages, forbid grunts
+    const char* af_upgrades, // "F:upgrade-Shield1,R:upgrade-ShieldTotal" -- :)
+    const char* apply_to	    // "unit-Peon,unit-Peasant"
 
     )
 {
@@ -1334,36 +1342,33 @@ local int AddUpgradeModifier( int aUid,
 	return -1;
     }
 
-    um->uid = aUid;
+    um->UpgradeId = uid;
 
     // get/save stats modifiers
-    um->mods.AttackRange	= aattack_range;
-    um->mods.SightRange		= asight_range;
-    um->mods.BasicDamage	= abasic_damage;
-    um->mods.PiercingDamage	= apiercing_damage;
-    um->mods.Armor		= aarmor;
-    um->mods.Speed		= aspeed;
-    um->mods.HitPoints		= ahit_points;
+    um->Modifier.AttackRange	= attack_range;
+    um->Modifier.SightRange	= sight_range;
+    um->Modifier.BasicDamage	= basic_damage;
+    um->Modifier.PiercingDamage	= piercing_damage;
+    um->Modifier.Armor		= armor;
+    um->Modifier.Speed		= speed;
+    um->Modifier.HitPoints	= hit_points;
 
     for( i=0; i<MaxCosts; ++i ) {
-	um->mods.Costs[i]	= acosts[i];
+	um->Modifier.Costs[i]	= costs[i];
     }
 
     // FIXME: all the thing below is sensitive to the format of the string!
     // FIXME: it will be good if things are checked for errors better!
     // FIXME: perhaps the function `strtok()' should be replaced with local one?
 
-    memset( um->af_units,    '?', sizeof(um->af_units)    );
-#if 0
-    memset( um->af_actions,  '?', sizeof(um->af_actions)  );
-#endif
-    memset( um->af_upgrades, '?', sizeof(um->af_upgrades) );
-    memset( um->apply_to,    '?', sizeof(um->apply_to)    );
+    memset( um->ChangeUnits,    '?', sizeof(um->ChangeUnits)   );
+    memset( um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
+    memset( um->ApplyTo,     '?', sizeof(um->ApplyTo)    );
 
     //
     // get allow/forbid's for units
     //
-    s1 = strdup( aaf_units );
+    s1 = strdup( af_units );
     DebugCheck(!s1);
     for( s2 = strtok( s1, "," ); s2; s2=strtok( NULL, "," ) ) {
 	int id;
@@ -1373,33 +1378,14 @@ local int AddUpgradeModifier( int aUid,
 	if ( id == -1 ) {
 	    continue;		// should we cancel all and return error?!
 	}
-	um->af_units[id] = s2[0];
+	um->ChangeUnits[id] = s2[0];
     }
     free(s1);
-
-    //
-    // get allow/forbid's for actions
-    //
-#if 0
-    s1 = strdup( aaf_actions );
-    DebugCheck(!s1);
-    for( s2 = strtok( s1, "," ); s2; s2=strtok( NULL, "," ) ) {
-	int id;
-	DebugCheck(!( s2[0] == 'A' || s2[0] == 'F' ));
-	DebugCheck(!( s2[1] == ':' ));
-	id = ActionIdByIdent( s2+2 );
-	if ( id == -1 ) {
-	    continue;		// should we cancel all and return error?!
-	}
-	um->af_actions[id] = s2[0];
-    }
-    free(s1);
-#endif
 
     //
     // get allow/forbid's for upgrades
     //
-    s1 = strdup( aaf_upgrades );
+    s1 = strdup( af_upgrades );
     DebugCheck(!s1);
     for( s2 = strtok( s1, "," ); s2; s2=strtok( NULL, "," ) ) {
 	int id;
@@ -1409,14 +1395,14 @@ local int AddUpgradeModifier( int aUid,
 	if ( id == -1 ) {
 	    continue;		// should we cancel all and return error?!
 	}
-	um->af_upgrades[id] = s2[0];
+	um->ChangeUpgrades[id] = s2[0];
     }
     free(s1);
 
     //
     // get units that are affected by this upgrade
     //
-    s1 = strdup( aapply_to );
+    s1 = strdup( apply_to );
     DebugCheck(!s1);
     for( s2 = strtok( s1, "," ); s2; s2=strtok( NULL, "," ) ) {
 	int id;
@@ -1426,7 +1412,7 @@ local int AddUpgradeModifier( int aUid,
 	if ( id == -1 ) {
 	    break;		// cade: should we cancel all and return error?!
 	}
-	um->apply_to[id] = 'X'; // something other than '?'
+	um->ApplyTo[id] = 'X'; // something other than '?'
     }
     free(s1);
 
@@ -1438,35 +1424,35 @@ local int AddUpgradeModifier( int aUid,
 
 // this function is used for define `simple' upgrades
 // with only one modifier
-global void AddSimpleUpgrade( const char* aIdent,
-    const char* aIcon,
+global void AddSimpleUpgrade( const char* ident,
+    const char* icon,
     // upgrade costs
-    int* aCosts,
+    int* costs,
     // upgrade modifiers
-    int aattack_range,
-    int asight_range,
-    int abasic_damage,
-    int apiercing_damage,
-    int aarmor,
-    int aspeed,
-    int ahit_points,
+    int attack_range,
+    int sight_range,
+    int basic_damage,
+    int piercing_damage,
+    int armor,
+    int speed,
+    int hit_points,
 
     int* mcosts,
 
-    const char* aapply_to		// "unit-Peon,unit-Peasant"
+    const char* apply_to		// "unit-Peon,unit-Peasant"
     )
 {
     Upgrade* up;
 
-    up = AddUpgrade(aIdent,aIcon,aCosts);
+    up = AddUpgrade(ident,icon,costs);
     if ( !up )  {
 	return;
     }
-    AddUpgradeModifier(up-Upgrades,aattack_range,asight_range,abasic_damage,
-	    apiercing_damage,aarmor,aspeed,ahit_points,
+    AddUpgradeModifier(up-Upgrades,attack_range,sight_range,basic_damage,
+	    piercing_damage,armor,speed,hit_points,
 	    mcosts,
-	    "","","", // no allow/forbid maps
-	    aapply_to);
+	    "","", // no allow/forbid maps
+	    apply_to);
 }
 
 /*----------------------------------------------------------------------------
@@ -1511,99 +1497,142 @@ global int UpgradeIdByIdent(const char* sid)
     return -1;
 }
 
-#if 0
-// FIXME: Docu
-global int ActionIdByIdent( const char* sid )
-{
-  // FIXME: there's no actions table yet
-  DebugLevel0Fn(" fix this %s\n",sid);
-  return -1;
-}
-#endif
-
 /*----------------------------------------------------------------------------
 --	Upgrades
 ----------------------------------------------------------------------------*/
 
-// amount==-1 to cancel upgrade, could happen when building destroyed during upgrade
-// using this we could have one upgrade research in two buildings, so we can have
-// this upgrade faster.
-global void UpgradeIncTime( Player* player, int id, int amount )
+/**
+**	Increment the counter of an upgrade.
+**
+**	Amount==-1 to cancel upgrade, could happen when building destroyed
+**	during upgrade. Using this we could have one upgrade research in two
+**	buildings, so we can have this upgrade faster.
+**
+**	@param player	Player pointer of the incremented upgrade.
+**	@param id	Upgrade id number.
+**	@param amount	Value to add to timer. -1 to cancel upgrade
+*/
+global void UpgradeIncTime(Player * player, int id, int amount)
 {
-    player->UTimers.upgrades[id] += amount;
-    if ( player->UTimers.upgrades[id] >= Upgrades[id].Costs[TimeCost] )
-    {
-	player->UTimers.upgrades[id] = Upgrades[id].Costs[TimeCost];
-	UpgradeAcquire( player, &Upgrades[id] );
+    player->UpgradeTimers.Upgrades[id] += amount;
+    if (player->UpgradeTimers.Upgrades[id] >= Upgrades[id].Costs[TimeCost]) {
+	player->UpgradeTimers.Upgrades[id] = Upgrades[id].Costs[TimeCost];
+	UpgradeAcquire(player, &Upgrades[id]);
     }
 }
 
-// this function will mark upgrade done and do all required modifications to
-// unit types and will modify allow/forbid maps
-global void ApplyUpgradeModifier( Player* player, UpgradeModifier* um )
+/**
+**	Apply the modifiers of an upgrade.
+**
+**	This function will mark upgrade done and do all required modifications
+**	to unit types and will modify allow/forbid maps
+**
+**	@param player	Player that get all the upgrades.
+**	@param um	Upgrade modifier that do the effects
+*/
+local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 {
     int z;
     int j;
-    int pn = player-Players; // player number
+    int pn;
 
-    for ( z = 0; z < MAXUACOUNT; z++ )
-    {
+    pn = player->Player;		// player number
+    for (z = 0; z < MAXUACOUNT; z++) {
 	// allow/forbid unit types for player
-	if ( um->af_units[z] == 'A' ) player->Allow.Units[z] = 'A';
-	if ( um->af_units[z] == 'F' ) player->Allow.Units[z] = 'F';
-
-#if 0
-	// allow/forbid actions for player
-	if ( um->af_actions[z] == 'A' ) player->Allow.Actions[z] = 'A';
-	if ( um->af_actions[z] == 'F' ) player->Allow.Actions[z] = 'F';
-#endif
-
-	// allow/forbid upgrades for player
-	if ( player->Allow.Upgrades[z] != 'R' )
-	{ // only if upgrade is not acquired
-	    if ( um->af_upgrades[z] == 'A' ) player->Allow.Upgrades[z] = 'A';
-	    if ( um->af_upgrades[z] == 'F' ) player->Allow.Upgrades[z] = 'F';
-	    // we can even have upgrade acquired w/o costs
-	    if ( um->af_upgrades[z] == 'R' ) player->Allow.Upgrades[z] = 'R';
+	if (um->ChangeUnits[z] == 'A') {
+	    player->Allow.Units[z] = 'A';
+	}
+	if (um->ChangeUnits[z] == 'F') {
+	    player->Allow.Units[z] = 'F';
 	}
 
-	DebugCheck(!( um->apply_to[z] == '?' || um->apply_to[z] == 'X' ));
-	if ( um->apply_to[z] == 'X' )
-	{ // this modifier should be applied to unittype id == z
+	// allow/forbid upgrades for player.  only if upgrade is not acquired
+	if (player->Allow.Upgrades[z] != 'R') {
+	    if (um->ChangeUpgrades[z] == 'A') {
+		player->Allow.Upgrades[z] = 'A';
+	    }
+	    if (um->ChangeUpgrades[z] == 'F') {
+		player->Allow.Upgrades[z] = 'F';
+	    }
+	    // we can even have upgrade acquired w/o costs
+	    if (um->ChangeUpgrades[z] == 'R') {
+		player->Allow.Upgrades[z] = 'R';
+	    }
+	}
 
-	    DebugLevel3Fn(" applied to %d\n",z);
+	DebugCheck(!(um->ApplyTo[z] == '?' || um->ApplyTo[z] == 'X'));
+
+	// this modifier should be applied to unittype id == z
+	if (um->ApplyTo[z] == 'X') {
+
+	    DebugLevel3Fn(" applied to %d\n", z);
 	    // upgrade stats
-	    UnitTypes[z].Stats[pn].AttackRange	+= um->mods.AttackRange;
-	    UnitTypes[z].Stats[pn].SightRange	+= um->mods.SightRange;
-	    UnitTypes[z].Stats[pn].BasicDamage	+= um->mods.BasicDamage;
-	    UnitTypes[z].Stats[pn].PiercingDamage += um->mods.PiercingDamage;
-	    UnitTypes[z].Stats[pn].Armor	+= um->mods.Armor;
-	    UnitTypes[z].Stats[pn].Speed	+= um->mods.Speed;
-	    UnitTypes[z].Stats[pn].HitPoints	+= um->mods.HitPoints;
-
+	    UnitTypes[z].Stats[pn].AttackRange += um->Modifier.AttackRange;
+	    UnitTypes[z].Stats[pn].SightRange += um->Modifier.SightRange;
+	    UnitTypes[z].Stats[pn].BasicDamage += um->Modifier.BasicDamage;
+	    UnitTypes[z].Stats[pn].PiercingDamage
+		    += um->Modifier.PiercingDamage;
+	    UnitTypes[z].Stats[pn].Armor += um->Modifier.Armor;
+	    UnitTypes[z].Stats[pn].Speed += um->Modifier.Speed;
+	    UnitTypes[z].Stats[pn].HitPoints += um->Modifier.HitPoints;
 
 	    // upgrade costs :)
-	    for( j=0; j<MaxCosts; ++j ) {
-		UnitTypes[z].Stats[pn].Costs[j]	+= um->mods.Costs[j];
+	    for (j = 0; j < MaxCosts; ++j) {
+		UnitTypes[z].Stats[pn].Costs[j] += um->Modifier.Costs[j];
 	    }
 
 	    UnitTypes[z].Stats[pn].Level++;
+
+	    if( um->ConvertTo ) {
+		UnitType* dst;
+		UnitType* src;
+		Unit* unit;
+		int i;
+
+		src=&UnitTypes[z];
+		dst=(UnitType*)um->ConvertTo;
+		dst->Stats[pn].Level++;
+		for( i=0; i<player->TotalNumUnits; ++i ) {
+		    unit=player->Units[i];
+		    if( unit->Type==src ) {
+			unit->HP+=dst->Stats[pn].HitPoints
+				-unit->Stats->HitPoints;
+			// don't have such unit now
+			player->UnitTypesCount[src->Type]--;
+			unit->Type=dst;
+			unit->Stats=&dst->Stats[pn];
+			// and we have new one...
+			player->UnitTypesCount[dst->Type]++;
+			UpdateForNewUnit(unit,1);
+			if( dst->CanCastSpell ) {
+			    unit->Mana=MAGIC_FOR_NEW_UNITS;
+			}
+			CheckUnitToBeDrawn(unit);
+		    }
+		}
+	    }
 	}
     }
 }
 
- // called by UpgradeIncTime() when timer reached
-global void UpgradeAcquire( Player* player, Upgrade* upgrade )
+/**
+**	Handle that an upgrade was acquired.
+**	Called by UpgradeIncTime() when timer reached
+**
+**	@param player	Player researching the upgrade.
+**	@param upgrade	Upgrade ready researched.
+*/
+global void UpgradeAcquire( Player* player, const Upgrade* upgrade )
 {
     int z;
     int id;
 
     id=upgrade-Upgrades;
-    player->UTimers.upgrades[id] = upgrade->Costs[TimeCost];
+    player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
     AllowUpgradeId( player, id, 'R' );		// research done
 
     for ( z = 0; z < UpgradeModifiersCount; z++ ) {
-	if ( UpgradeModifiers[z]->uid == id ) {
+	if ( UpgradeModifiers[z]->UpgradeId == id ) {
 	    ApplyUpgradeModifier( player, UpgradeModifiers[z] );
 	}
     }
@@ -1613,6 +1642,7 @@ global void UpgradeAcquire( Player* player, Upgrade* upgrade )
     //
     if( player==ThisPlayer ) {
 	UpdateButtonPanel();
+	MustRedraw|=RedrawInfoPanel;
     }
 }
 
@@ -1624,7 +1654,7 @@ global void UpgradeLost( Player* player, int id )
 {
   return; //FIXME: remove this if implemented below
 
-  player->UTimers.upgrades[id] = 0;
+  player->UpgradeTimers.Upgrades[id] = 0;
   AllowUpgradeId( player, id, 'A' ); // research is lost i.e. available
   // FIXME: here we should reverse apply upgrade...
 }
@@ -1644,17 +1674,6 @@ global void AllowUnitId( Player* player, int id, char af ) // id -- unit type id
   player->Allow.Units[id] = af;
 }
 
-#if 0
-/**
-**	FIXME: docu
-*/
-global void AllowActionId( Player* player,  int id, char af )
-{
-  DebugCheck(!( af == 'A' || af == 'F' ));
-  player->Allow.Actions[id] = af;
-}
-#endif
-
 /**
 **	FIXME: docu
 */
@@ -1673,17 +1692,6 @@ global char UnitIdAllowed(const Player* player,  int id )
   return player->Allow.Units[id];
 }
 
-#if 0
-/**
-**	FIXME: docu
-*/
-global char ActionIdAllowed(const Player* player,  int id )
-{
-  if ( id < 0 || id >= MAXUACOUNT ) return 'F';
-  return player->Allow.Actions[id];
-}
-#endif
-
 /**
 **	FIXME: docu
 */
@@ -1696,34 +1704,38 @@ global char UpgradeIdAllowed(const Player* player,  int id )
 }
 
 // ***************by sid's
-/**
-**	FIXME: docu
-*/
-global void UpgradeIncTime2( Player* player, char* sid, int amount ) // by ident string
-  { UpgradeIncTime( player, UpgradeIdByIdent(sid), amount ); }
-/**
-**	FIXME: docu
-*/
-global void UpgradeLost2( Player* player, char* sid ) // by ident string
-  { UpgradeLost( player, UpgradeIdByIdent(sid) ); }
 
 /**
 **	FIXME: docu
 */
-global void AllowUnitByIdent( Player* player,  const char* sid, char af )
-     { AllowUnitId( player,  UnitTypeIdByIdent(sid), af ); };
-#if 0
+global void UpgradeIncTime2(Player * player, char *sid, int amount)	// by ident string
+{
+    UpgradeIncTime(player, UpgradeIdByIdent(sid), amount);
+}
+
 /**
 **	FIXME: docu
 */
-global void AllowActionByIdent( Player* player,  const char* sid, char af )
-     { AllowActionId( player,  ActionIdByIdent(sid), af ); };
-#endif
+global void UpgradeLost2(Player * player, char *sid)	// by ident string
+{
+    UpgradeLost(player, UpgradeIdByIdent(sid));
+}
+
 /**
 **	FIXME: docu
 */
-global void AllowUpgradeByIdent( Player* player,  const char* sid, char af )
-     { AllowUpgradeId( player,  UpgradeIdByIdent(sid), af ); };
+global void AllowUnitByIdent(Player * player, const char *sid, char af)
+{
+    AllowUnitId(player, UnitTypeIdByIdent(sid), af);
+}
+
+/**
+**	FIXME: docu
+*/
+global void AllowUpgradeByIdent(Player * player, const char *sid, char af)
+{
+    AllowUpgradeId(player, UpgradeIdByIdent(sid), af);
+}
 
 /**
 **	FIXME: docu
@@ -1742,27 +1754,16 @@ global void AllowByIdent(Player* player,  const char* sid, char af )
 /**
 **	FIXME: docu
 */
-global char UnitIdentAllowed(const Player* player,const char* sid )
+global char UnitIdentAllowed(const Player * player, const char *sid)
 {
-    return UnitIdAllowed( player,  UnitTypeIdByIdent(sid) );
+    return UnitIdAllowed(player, UnitTypeIdByIdent(sid));
 }
-
-#if 0
-/**
-**	FIXME: docu
-*/
-global char ActionIdentAllowed(const Player* player,const char* sid )
-{
-    return ActionIdAllowed( player,  ActionIdByIdent(sid) );
-}
-#endif
 
 /**
 **	FIXME: docu
 */
-global char UpgradeIdentAllowed(const Player* player,const char* sid )
+global char UpgradeIdentAllowed(const Player * player, const char *sid)
 {
-    return UpgradeIdAllowed( player,  UpgradeIdByIdent(sid) );
+    return UpgradeIdAllowed(player, UpgradeIdByIdent(sid));
 }
-
 //@}

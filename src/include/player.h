@@ -10,7 +10,7 @@
 //
 /**@name player.h	-	The player headerfile. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -18,6 +18,26 @@
 #define __PLAYER_H__
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**	@struct _player_ player.h
+**
+**	\#include "player.h"
+**
+**	typedef struct _player_ Player;
+**
+**	This structure contains all informations about a player in game.
+**
+**	The player structure members:
+**
+**	Player::Player
+**
+**	FIXME: not written documentation
+*/
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -98,7 +118,7 @@ struct _player_ {
 
 //  Upgrades/Allows:
     Allow		Allow;		/// Allowed for player
-    UpgradeTimers	UTimers;	/// Timer for the upgrades
+    UpgradeTimers	UpgradeTimers;	/// Timer for the upgrades
 };
 
 /*
