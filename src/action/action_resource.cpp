@@ -249,7 +249,6 @@ local int WaitInResource(Unit* unit)
 
     CheckUnitToBeDrawn(unit);
     if( IsOnlySelected(unit) ) {
-	UpdateButtonPanel();
 	SelectedUnitChanged();
 	// FIXME: redundant?
 	MustRedraw|=RedrawButtonPanel;
