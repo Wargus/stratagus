@@ -3748,6 +3748,14 @@ void SaveUnit(const Unit* unit, CLFile* file)
 
 	CLprintf(file, "\"sub-action\", %d, ", unit->SubAction);
 	CLprintf(file, "\"state\", %d,", unit->State);
+	CLprintf(file, "\"anim-wait\", %d,", unit->Anim.Wait);
+	for (i = 0; i < NumNewAnimations; ++i) {
+		if (NewAnimationsArray[i] == unit->Anim.CurrAnim) {
+			CLprintf(file, "\"curr-anim\", %d,", i);
+			CLprintf(file, "\"anim\", %d,", unit->Anim.Anim - unit->Anim.CurrAnim);
+			break;
+		}
+	}
 	if (unit->Anim.Unbreakable) {
 		CLprintf(file, " \"unbreakable\",");
 	}
