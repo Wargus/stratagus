@@ -153,6 +153,8 @@ local SCM CclDefineAiHelper(SCM list)
 	    what=5;
 	} else if( gh_eq_p(value,gh_symbol2scm("unit-limit")) ) {
 	    what=6;
+	} else if( gh_eq_p(value,gh_symbol2scm("unit-equiv")) ) {
+	    what=7;
 	} else {
 	    fprintf(stderr,"unknown tag\n");
 	    continue;
@@ -268,6 +270,12 @@ local SCM CclDefineAiHelper(SCM list)
 		    AiHelperSetupTable(
 			&AiHelpers.UnitLimitCount,&AiHelpers.UnitLimit,cost);
 		    AiHelperInsert( AiHelpers.UnitLimit+cost,base);
+		    break;
+		case 7:			// equivalence
+		    AiHelperSetupTable(
+			    &AiHelpers.EquivCount,&AiHelpers.Equiv,base->Type);
+		    AiHelperInsert(
+			    AiHelpers.Equiv+base->Type,type);
 		    break;
 	    }
 	}

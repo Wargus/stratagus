@@ -284,6 +284,12 @@ typedef struct _ai_helper_ {
     */
     int			UnitLimitCount;
     AiUnitTypeTable**	UnitLimit;
+    /**
+    **	The index is the unit that should be made, giving a table of all
+    **	units/buildings which are equivalent.
+    */
+    int			EquivCount;
+    AiUnitTypeTable**	Equiv;
 } AiHelper;
 
 /*----------------------------------------------------------------------------
