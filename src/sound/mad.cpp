@@ -190,11 +190,11 @@ local enum mad_flow MAD_error(void* user __attribute__((unused)),
 /**
 **  Read one frame from mad decoder.
 **
-**  @param decoder  Decoder
-**  @param buf      Buffer to write data to
-**  @param len      Length of the buffer
+**  @param sample  Sample
+**  @param buf     Buffer to write data to
+**  @param len     Length of the buffer
 **
-**  @return         Number of bytes read
+**  @return        Number of bytes read
 */
 local int MadRead(Sample *sample, unsigned char* buf, int len)
 {
