@@ -999,7 +999,7 @@ global int UnitVisibleOnMap(const Unit* unit)
     //
     for( ; h-->0; ) {
 	for( w=w0; w-->0; ) {
-	    if( IsMapFieldVisible(x+w,y+h) ) {
+	    if( IsMapFieldVisible(ThisPlayer,x+w,y+h) ) {
 		return 1;
 	    }
 	}
@@ -1052,9 +1052,9 @@ global int UnitKnownOnMap(const Unit* unit)
     //
     for( ; h-->0; ) {
 	for( w=w0; w-->0; ) {
-	    if( IsMapFieldVisible(x+w,y+h)
+	    if( IsMapFieldVisible(ThisPlayer,x+w,y+h)
 		    || (unit->Type->Building && unit->SeenFrame!=UnitNotSeen
-			&& IsMapFieldExplored(x+w,y+h)) ) {
+			&& IsMapFieldExplored(ThisPlayer,x+w,y+h)) ) {
 		return 1;
 	    }
 	}
@@ -1120,9 +1120,9 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
     //
     for( ; h-->0; ) {
 	for( w=w0; w-->0; ) {
-	    if( IsMapFieldVisible(x+w,y+h)
+	    if( IsMapFieldVisible(ThisPlayer,x+w,y+h)
 		    || (unit->Type->Building && unit->SeenFrame!=UnitNotSeen
-			&& IsMapFieldExplored(x+w,y+h)) ) {
+			&& IsMapFieldExplored(ThisPlayer,x+w,y+h)) ) {
 		return 1;
 	    }
 	}
@@ -2723,7 +2723,11 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		//
 		//	Look if there is wood
 		//
+#ifdef NEW_FOW
+		if ( ForestOnMap(x,y) && IsMapFieldExplored(unit->Player,x,y) ) {
+#else
 		if ( ForestOnMap(x,y) ) {
+#endif
 		    if( destu ) {
 			n=max(abs(destx-x),abs(desty-y));
 			if( n<bestd ) {

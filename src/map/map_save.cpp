@@ -100,7 +100,7 @@ global void SaveMap(FILE* file)
 		}
 	    }
 #else
-	    if( IsMapFieldVisible(w,h) ) {
+	    if( IsMapFieldVisible(ThisPlayer,w,h) ) {
 		fprintf(file," visible");
 	    }
 	    if( mf->Flags&MapFieldExplored ) {

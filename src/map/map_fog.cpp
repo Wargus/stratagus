@@ -450,7 +450,7 @@ global void MapMarkSight(int tx,int ty,int range)
 	for( i=x; i<=x+width; ++i ) {
 	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
 		// FIXME: can combine more bits
-		if( !IsMapFieldVisible(i,y) ) {
+		if( !IsMapFieldVisible(ThisPlayer,i,y) ) {
 		    TheMap.Fields[i+y*TheMap.Width].Flags |= MapFieldExplored;
 		    TheMap.Visible[0][(i+y*TheMap.Width)/32]
 			    |= 1<<((i+y*TheMap.Width)%32);
@@ -588,7 +588,7 @@ global void UpdateFogOfWarChange(void)
 	w=TheMap.Width;
 	for( y=0; y<TheMap.Height; y++ ) {
 	    for( x=0; x<TheMap.Width; ++x ) {
-		if( IsMapFieldExplored(x,y) ) {
+		if( IsMapFieldExplored(ThisPlayer,x,y) ) {
 #ifndef NEW_FOW
 		    TheMap.Visible[0][(x+y*w)/32] |= 1<<((x+y*w)%32);
 #endif
@@ -1784,66 +1784,66 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
     //
     if( sy ) {
 	if( sx!=sy ) {
-	    if( !IsMapFieldExplored(x-1,y-1) ) {
+	    if( !IsMapFieldExplored(ThisPlayer,x-1,y-1) ) {
 		tile2|=2;
 		tile|=2;
-	    } else if( !IsMapFieldVisible(x-1,y-1) ) {
+	    } else if( !IsMapFieldVisible(ThisPlayer,x-1,y-1) ) {
 		tile|=2;
 	    }
 	}
-	if( !IsMapFieldExplored(x,y-1) ) {
+	if( !IsMapFieldExplored(ThisPlayer,x,y-1) ) {
 	    tile2|=3;
 	    tile|=3;
-	} else if( !IsMapFieldVisible(x,y-1) ) {
+	} else if( !IsMapFieldVisible(ThisPlayer,x,y-1) ) {
 	    tile|=3;
 	}
 	if( sx!=sy+w-1 ) {
-	    if( !IsMapFieldExplored(x+1,y-1) ) {
+	    if( !IsMapFieldExplored(ThisPlayer,x+1,y-1) ) {
 		tile2|=1;
 		tile|=1;
-	    } else if( !IsMapFieldVisible(x+1,y-1) ) {
+	    } else if( !IsMapFieldVisible(ThisPlayer,x+1,y-1) ) {
 		tile|=1;
 	    }
 	}
     }
 
     if( sx!=sy ) {
-	if( !IsMapFieldExplored(x-1,y) ) {
+	if( !IsMapFieldExplored(ThisPlayer,x-1,y) ) {
 	    tile2|=10;
 	    tile|=10;
-	} else if( !IsMapFieldVisible(x-1,y) ) {
+	} else if( !IsMapFieldVisible(ThisPlayer,x-1,y) ) {
 	    tile|=10;
 	}
     }
     if( sx!=sy+w-1 ) {
-	if( !IsMapFieldExplored(x+1,y) ) {
+	if( !IsMapFieldExplored(ThisPlayer,x+1,y) ) {
 	    tile2|=5;
 	    tile|=5;
-	} else if( !IsMapFieldVisible(x+1,y) ) {
+	} else if( !IsMapFieldVisible(ThisPlayer,x+1,y) ) {
 	    tile|=5;
 	}
     }
 
     if( sy+w<TheMap.Height*w ) {
 	if( sx!=sy ) {
-	    if( !IsMapFieldExplored(x-1,y+1) ) {
+	    if( !IsMapFieldExplored(ThisPlayer,x-1,y+1) ) {
 		tile2|=8;
 		tile|=8;
-	    } else if( !IsMapFieldVisible(x-1,y+1) ) {
+	    } else if( !IsMapFieldVisible(ThisPlayer,x-1,y+1) ) {
 		tile|=8;
 	    }
 	}
-	if( !IsMapFieldExplored(x,y+1) ) {
+	if( !IsMapFieldExplored(ThisPlayer,x,y+1) ) {
 	    tile2|=12;
 	    tile|=12;
-	} else if( !IsMapFieldVisible(x,y+1) ) {
+	} else if( !IsMapFieldVisible(ThisPlayer,x,y+1) ) {
 	    tile|=12;
 	}
 	if( sx!=sy+w-1 ) {
-	    if( !IsMapFieldExplored(x+1,y+1) ) {
+	    if( !IsMapFieldExplored(ThisPlayer,x+1,y+1) ) {
 		tile2|=4;
 		tile|=4;
-	    } else if( !IsMapFieldVisible(x+1,y+1) ) {
+	    } else if( !IsMapFieldVisible(ThisPlayer,x+1,y+1) ) {
 		tile|=4;
 	    }
 	}
@@ -1861,7 +1861,7 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 	    tile=0;
 	}
     }
-    if( IsMapFieldVisible(x,y) ) {
+    if( IsMapFieldVisible(ThisPlayer,x,y) ) {
 	if( tile ) {
 	    VideoDrawFog(TheMap.Tiles[tile],dx,dy);
 //	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;

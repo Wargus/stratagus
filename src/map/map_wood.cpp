@@ -169,7 +169,7 @@ global void MapFixSeenWoodTile(int x, int y)
     }
 
     // FIXME: can this only happen if seen?
-    if ( IsMapFieldVisible(x,y) ) {
+    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
 	UpdateMinimapSeenXY(x, y);
 	MarkDrawPosMap(x, y);
 	MustRedraw |= RedrawMinimap;
@@ -306,7 +306,7 @@ global void MapFixWoodTile(int x, int y)
 	UpdateMinimapXY(x, y);
 	//MapFixWoodNeighbors(x, y);
 
-	if ( IsMapFieldVisible(x,y) ) {
+	if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
 	    MarkDrawPosMap(x, y);
@@ -334,7 +334,7 @@ global void MapRemoveWood(unsigned x, unsigned y)
     UpdateMinimapXY(x, y);
     MapFixWoodNeighbors(x, y);
 
-    if ( IsMapFieldVisible(x,y) ) {
+    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
 	MarkDrawPosMap(x, y);
@@ -389,10 +389,10 @@ global void RegenerateForest(void)
 			    mf->Tile = TheMap.Tileset->BotOneTree;
 			    mf->Value = 0;
 			    mf->Flags |= MapFieldForest | MapFieldUnpassable;
-			    if ( IsMapFieldVisible(x,y) ) {
+			    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
 				MapMarkSeenTile(x, y);
 			    }
-			    if ( IsMapFieldVisible(x,y-1) ) {
+			    if ( IsMapFieldVisible(ThisPlayer,x,y-1) ) {
 				MapMarkSeenTile(x, y-1);
 			    }
 			}
