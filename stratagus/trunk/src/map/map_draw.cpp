@@ -1622,6 +1622,30 @@ global void DrawMapBackground(int x,int y)
 	dy+=TileSizeY;
     }
 
+#if defined(HIERARCHIC_PATHFINDER) && defined(GRID)
+    {
+    int xmax = x + (TheUI.MapEndX-TheUI.MapX)/TileSizeX;
+    int xmin = x;
+    int ymax = y + (TheUI.MapEndY-TheUI.MapY)/TileSizeY;
+    int ymin = y;
+    int AreaWidth = AreaGetWidth ();
+    int AreaHeight = AreaGetHeight ();
+    for ( ; x <= xmax; x++)  {
+	if (x%AreaWidth == 0) {
+	    int	xx = TheUI.MapX + TileSizeX * (x - xmin) - 1;
+	    VideoDrawLineClip (ColorRed, xx, TheUI.MapY, xx, TheUI.MapEndY);
+	}
+    }
+    for ( ; y <= ymax; y++)  {
+	if (y%AreaHeight == 0) {
+	    int	yy = TheUI.MapY + TileSizeY * (y - ymin) - 1;
+	    VideoDrawLineClip (ColorRed, TheUI.MapX, yy, TheUI.MapEndX, yy);
+	}
+    }
+
+    }
+#endif
+
 #ifdef TIMEIT
     ev=rdtsc();
     sx=(ev-sv);
