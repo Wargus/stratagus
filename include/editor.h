@@ -34,6 +34,8 @@
 
     /// Editor is running
 extern char EditorRunning;
+    /// Map loaded in editor
+extern char EditorMapLoaded;
 
     /// Editor CCL start file
 extern const char* EditorStartFile;
