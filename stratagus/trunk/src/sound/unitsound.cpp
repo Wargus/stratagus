@@ -239,7 +239,7 @@ static void RemapSounds(void)
 */
 void LoadUnitSounds(void)
 {
-	if (SoundFildes != -1) {
+	if (SoundEnabled()) {
 		LoadSimpleSounds();
 		LoadSoundGroups();
 		RemapSounds();
@@ -315,7 +315,7 @@ void MapUnitSounds(void)
 	int i;
 	int j;
 
-	if (SoundFildes != -1) {
+	if (SoundEnabled()) {
 		SetSoundRange(SoundIdForName("tree-chopping"), 32);
 
 		//

@@ -207,9 +207,6 @@ enum _play_audio_flags_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-	/// sound file descriptor, if -1 no sound available
-extern int SoundFildes;
-
 	/// sound volume (from 0 to MaxVolume, acts as a multiplier)
 extern int GlobalVolume;
 	/// music volume (from 0 to MaxVolume, acts as a multiplier)
@@ -276,6 +273,9 @@ extern void FreeOneChannel(int channel);
 extern int InitSound(void);
 	/// Initialize the sound card with SDL support.
 extern int InitSdlSound(int freq, int size);
+
+	/// Check if sound is enabled
+extern int SoundEnabled(void);
 
 	/// Initialize the sound server.
 extern int InitSoundServer(void);

@@ -946,7 +946,7 @@ static void NameLineDrawFunc(Menuitem* mi __attribute__ ((unused)))
 	GetDefaultTextColors(&nc, &rc);
 	SetDefaultTextColors(rc, rc);
 
-	if (SoundFildes == -1 && !SoundOff) {
+	if (!SoundEnabled() && !SoundOff) {
 		VideoDrawText(16, 16, LargeFont, "Sound disabled, please check!");
 	}
 
@@ -1461,7 +1461,7 @@ static void SoundOptionsInit(Menuitem* mi __attribute__((unused)))
 	menu = FindMenu("menu-sound-options");
 
 	// master volume slider
-	if (SoundFildes == -1) {
+	if (SoundOff || !SoundEnabled()) {
 		menu->Items[2].Flags = MenuButtonDisabled;
 	} else {
 		menu->Items[2].Flags = 0;
@@ -1469,14 +1469,14 @@ static void SoundOptionsInit(Menuitem* mi __attribute__((unused)))
 	}
 
 	// master power
-	if (SoundFildes == -1) {
+	if (SoundOff || !SoundEnabled()) {
 		menu->Items[5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	} else {
 		menu->Items[5].D.Checkbox.State = MI_CSTATE_CHECKED;
 	}
 
 	// music volume slider
-	if (PlayingMusic != 1 || SoundFildes == -1) {
+	if (SoundOff || PlayingMusic != 1 || !SoundEnabled()) {
 		menu->Items[7].Flags = MenuButtonDisabled;
 	} else {
 		menu->Items[7].Flags = 0;
@@ -1484,7 +1484,7 @@ static void SoundOptionsInit(Menuitem* mi __attribute__((unused)))
 	}
 
 	// music power
-	if (SoundFildes == -1) {
+	if (SoundOff || !SoundEnabled()) {
 		menu->Items[10].Flags = MenuButtonDisabled;
 	} else {
 		menu->Items[10].Flags = 0;
@@ -1495,7 +1495,7 @@ static void SoundOptionsInit(Menuitem* mi __attribute__((unused)))
 		menu->Items[10].Flags = MenuButtonDisabled;
 	}
 #endif
-	if (PlayingMusic != 1 || SoundFildes == -1) {
+	if (SoundOff || PlayingMusic != 1 || !SoundEnabled()) {
 		menu->Items[10].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	} else {
 		menu->Items[10].D.Checkbox.State = MI_CSTATE_CHECKED;
@@ -1664,24 +1664,10 @@ static void GlobalOptionsFullscreenCheckbox(Menuitem* mi __attribute__((unused))
 */
 static void SetMasterPower(Menuitem* mi __attribute__((unused)))
 {
-	if (SoundFildes != -1) {
-		QuitSound();
-		SoundOff = 1;
-	} else {
-		SoundOff = 0;
-		if(InitSound()) {
-			SoundOff = 1;
-			SoundFildes = -1;
-		}
-		MapUnitSounds();
-		if (InitSoundServer()) {
-			SoundOff = 1;
-		} else {
-			InitSoundClient();
-		}
+	if (SoundEnabled()) {
+		SoundOff ^= 1;
+		SoundOptionsInit(NULL);
 	}
-
-	SoundOptionsInit(NULL);
 }
 
 /**
