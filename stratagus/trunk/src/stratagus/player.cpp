@@ -205,6 +205,9 @@ global void SavePlayers(CLFile* file)
 {
 	int i;
 	int j;
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
 
 	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file, "--- MODULE: players $Id$\n\n");
@@ -364,7 +367,9 @@ global void SavePlayers(CLFile* file)
 		CLprintf(file, "\n  \"total-razings\", %d,", Players[i].TotalRazings);
 		CLprintf(file, "\n  \"total-kills\", %d,", Players[i].TotalKills);
 
-		// Color done by init code.
+		SDL_GetRGB(Players[i].Color, TheScreen->format, &r, &g, &b);
+		CLprintf(file, "\n  \"color\", { %d, %d, %d },", r, g, b);
+
 		// UnitColors done by init code.
 
 		// Allow saved by allow.
