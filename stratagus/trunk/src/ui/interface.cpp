@@ -300,7 +300,7 @@ local void UiEnterMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    ProcessMenu(MENU_GAME, 0);
+    ProcessMenu(MENU_GAME, 1);
 }
 
 local void UiEnterHelpMenu(void)
@@ -919,6 +919,69 @@ local int InputKey(int key)
 }
 
 /**
+**	Update KeyModifiers if a key is pressed.
+**
+**	@param key	Key scancode.
+**	@param keychar	Character code.
+**
+**	@return		1 if modifier found, 0 otherwise
+*/
+global int HandleKeyModifiersDown(unsigned key,unsigned keychar)
+{
+    switch( key ) {
+	case KeyCodeShift:
+	    KeyModifiers|=ModifierShift;
+	    return 1;
+	case KeyCodeControl:
+	    KeyModifiers|=ModifierControl;
+	    return 1;
+	case KeyCodeAlt:
+	    KeyModifiers|=ModifierAlt;
+	    return 1;
+	case KeyCodeSuper:
+	    KeyModifiers|=ModifierSuper;
+	    return 1;
+	case KeyCodeHyper:
+	    KeyModifiers|=ModifierHyper;
+	    return 1;
+	default:
+	    break;
+    }
+    return 0;
+}
+
+/**
+**	Update KeyModifiers if a key is released.
+**
+**	@param key	Key scancode.
+**	@param keychar	Character code.
+**
+**	@return		1 if modifier found, 0 otherwise
+*/
+global int HandleKeyModifiersUp(unsigned key,
+                                 unsigned keychar __attribute__((unused)))
+{
+    switch( key ) {
+	case KeyCodeShift:
+	    KeyModifiers&=~ModifierShift;
+	    return 1;
+	case KeyCodeControl:
+	    KeyModifiers&=~ModifierControl;
+	    return 1;
+	case KeyCodeAlt:
+	    KeyModifiers&=~ModifierAlt;
+	    return 1;
+	case KeyCodeSuper:
+	    KeyModifiers&=~ModifierSuper;
+	    return 1;
+	case KeyCodeHyper:
+	    KeyModifiers&=~ModifierHyper;
+	    return 1;
+    }
+    return 0;
+}
+
+/**
 **	Handle key down.
 **
 **	@param key	Key scancode.
@@ -926,48 +989,23 @@ local int InputKey(int key)
 */
 global void HandleKeyDown(unsigned key,unsigned keychar)
 {
-    // Handle Modifier Keys
-    switch( key ) {
-	case KeyCodeShift:
-	    KeyModifiers|=ModifierShift;
-	    return;
-	case KeyCodeControl:
-	    KeyModifiers|=ModifierControl;
-	    return;
-	case KeyCodeAlt:
-	    KeyModifiers|=ModifierAlt;
-	    return;
-	case KeyCodeSuper:
-	    KeyModifiers|=ModifierSuper;
-	    return;
-	case KeyCodeHyper:
-	    KeyModifiers|=ModifierHyper;
-	    return;
-	default:
-	    break;
-    }
+    if( HandleKeyModifiersDown(key,keychar) )
+	return;
 
     // Handle All other keys
-    switch( InterfaceState ) {
-	case IfaceStateNormal:			// Normal Game state
-	    // Command line input: for message or cheat
-	    if( KeyState==KeyStateInput && keychar ) {
-		InputKey(keychar);
-	    } else {
-		// If no modifier look if button bound
-		if( !(KeyModifiers&(ModifierControl|ModifierAlt
-			|ModifierSuper|ModifierHyper)) ) {
-		    if( DoButtonPanelKey(key) ) {
-			return;
-		    }
-		}
-		CommandKey(key);
-	    }
-	    return;
 
-	case IfaceStateMenu:			// Menu active
-	    MenuHandleKeyboard(key, keychar);
-	    return;
+    // Command line input: for message or cheat
+    if( KeyState==KeyStateInput && keychar ) {
+	InputKey(keychar);
+    } else {
+	// If no modifier look if button bound
+	if( !(KeyModifiers&(ModifierControl|ModifierAlt
+		|ModifierSuper|ModifierHyper)) ) {
+	    if( DoButtonPanelKey(key) ) {
+		return;
+	    }
+	}
+	CommandKey(key);
     }
 }
 
@@ -977,25 +1015,12 @@ global void HandleKeyDown(unsigned key,unsigned keychar)
 **	@param key	Key scancode.
 **	@param keychar	Character code.
 */
-global void HandleKeyUp(unsigned key,unsigned keychar __attribute__((unused)))
+global void HandleKeyUp(unsigned key,unsigned keychar)
 {
-    switch( key ) {
-	case KeyCodeShift:
-	    KeyModifiers&=~ModifierShift;
-	    break;
-	case KeyCodeControl:
-	    KeyModifiers&=~ModifierControl;
-	    break;
-	case KeyCodeAlt:
-	    KeyModifiers&=~ModifierAlt;
-	    break;
-	case KeyCodeSuper:
-	    KeyModifiers&=~ModifierSuper;
-	    break;
-	case KeyCodeHyper:
-	    KeyModifiers&=~ModifierHyper;
-	    break;
+    if( HandleKeyModifiersUp(key,keychar) )
+	return;
 
+    switch( key ) {
 	case KeyCodeUp:
 	case KeyCodeKP8:
 	    KeyScrollState &= ~ScrollUp;
@@ -1018,6 +1043,33 @@ global void HandleKeyUp(unsigned key,unsigned keychar __attribute__((unused)))
 }
 
 /**
+**	Keep coordinates in window and update cursor position
+**
+**	@param x	screen pixel X position.
+**	@param y	screen pixel Y position.
+*/
+global void HandleCursorMove(int* x,int* y)
+{
+    //
+    //	Reduce coordinates to window-size.
+    //
+    if( *x<0 ) {
+	*x=0;
+    } else if( *x>=VideoWidth ) {
+	*x=VideoWidth-1;
+    }
+    if( *y<0 ) {
+	*y=0;
+    } else if( *y>=VideoHeight ) {
+	*y=VideoHeight-1;
+    }
+
+    CursorX=*x;
+    CursorY=*y;
+
+}
+
+/**
 **	Handle movement of the cursor.
 **
 **	@param x	screen pixel X position.
@@ -1025,31 +1077,8 @@ global void HandleKeyUp(unsigned key,unsigned keychar __attribute__((unused)))
 */
 global void HandleMouseMove(int x,int y)
 {
-    //
-    //	Reduce coordinates to window-size.
-    //
-    if( x<0 ) {
-	x=0;
-    } else if( x>=VideoWidth ) {
-	x=VideoWidth-1;
-    }
-    if( y<0 ) {
-	y=0;
-    } else if( y>=VideoHeight ) {
-	y=VideoHeight-1;
-    }
-
-    CursorX=x;
-    CursorY=y;
-
-    switch( InterfaceState ) {
-	case IfaceStateNormal:			// Normal Game state
-	    UIHandleMouseMove(x, y);
-	    break;
-	case IfaceStateMenu:			// Menu active
-	    MenuHandleMouseMove(x, y);
-	    break;
-    }
+    HandleCursorMove(&x,&y);
+    UIHandleMouseMove(x, y);
 }
 
 /**
@@ -1059,14 +1088,7 @@ global void HandleMouseMove(int x,int y)
 */
 global void HandleButtonDown(unsigned button)
 {
-    switch( InterfaceState ) {
-	case IfaceStateNormal:			// Normal Game state
-	    UIHandleButtonDown(button);
-	    break;
-	case IfaceStateMenu:			// Menu active
-	    MenuHandleButtonDown(button);
-	    break;
-    }
+    UIHandleButtonDown(button);
 }
 
 /**
@@ -1079,14 +1101,7 @@ global void HandleButtonDown(unsigned button)
 */
 global void HandleButtonUp(unsigned button)
 {
-    switch( InterfaceState ) {
-	case IfaceStateNormal:			// Normal Game state
-	    UIHandleButtonUp(button);
-	    break;
-	case IfaceStateMenu:			// Menu active
-	    MenuHandleButtonUp(button);
-	    break;
-    }
+    UIHandleButtonUp(button);
 }
 
 /*----------------------------------------------------------------------------
