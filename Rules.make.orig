@@ -176,7 +176,7 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 #DEBUG=	-DDEBUG # -DREFS_DEBUG # -DFLAG_DEBUG
 ##
 ## There are some still not well tested code parts or branches.
-## UNITS_ON_MAP:	Faster lookup of units
+## UNIT_ON_MAP:		Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code
 ## NEW_NAMES:		New unit names without copyleft problems
 ## This aren't working:
