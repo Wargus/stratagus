@@ -59,7 +59,7 @@ global char DefaultObjective[] = "-Destroy your enemies";
 
 global int GameResult;  /// Outcome of the game
 global char CurrentMapPath[1024];  /// Path of the current map
-global char DefaultMap[1024] = "puds/default.pud";  /// Default map path
+global char DefaultMap[1024] = "maps/default.pud";  /// Default map path
 global int RestartScenario;  /// Restart the scenario
 global int QuitToMenu;  /// Quit to menu
 global Campaign* Campaigns;  /// Campaigns
