@@ -10,7 +10,7 @@
 //
 /**@name linedraw.c	-	The general linedraw functions. */
 //
-//	(c) Copyright 2000,2001 by Lutz Sammer
+//	(c) Copyright 2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -41,21 +41,23 @@
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
-    /**
-    **	Bitmask, denoting a postion left/right/above/below clip rectangle
-    **  (mainly used by VideoDrawLineClip)
-    */
+
+/**
+**	Bitmask, denoting a postion left/right/above/below clip rectangle
+**	(mainly used by VideoDrawLineClip)
+*/
 typedef enum {
-   ClipCodeInside = 0,
-   ClipCodeAbove  = 1,
-   ClipCodeBelow  = 2,
-   ClipCodeLeft   = 4,
-   ClipCodeRight  = 8
+   ClipCodeInside = 0,			/// Clipping inside rectangle
+   ClipCodeAbove  = 1,			/// Clipping above rectangle
+   ClipCodeBelow  = 2,			/// Clipping below rectangle
+   ClipCodeLeft   = 4,			/// Clipping left rectangle
+   ClipCodeRight  = 8			/// Clipping right rectangle
 } ClipCode;
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
     /**
     **	Draw pixel unclipped.
     **
@@ -417,21 +419,28 @@ global void (*VideoFillTransRectangle)(SysColors color,int x,int y
 --	Local functions
 ----------------------------------------------------------------------------*/
 
+#ifdef DEBUG
+
 /**
 **	Dump bits in debugger (DEBUG only)
 **
 **	@param bits	bits to display
 */
-local void DebugBits( unsigned long bits )
+local void DebugBits(unsigned long bits)
 {
-  unsigned long i;
+    unsigned long i;
 
-  for ( i = ((~(unsigned long)0)>>1)+1; i > 0; i>>=1 )
-    if ( bits & i )
-      putc( '1', stderr );
-    else  putc( '0', stderr );
-  putc( '\n', stderr );
+    for (i = ((~(unsigned long)0) >> 1) + 1; i > 0; i >>= 1) {
+	if (bits & i) {
+	    putc('1', stderr);
+	} else {
+	    putc('0', stderr);
+	}
+    }
+    putc('\n', stderr);
 }
+
+#endif
 
 // ===========================================================================
 //	Color
