@@ -82,7 +82,7 @@ LowlevelNeighbor Neighbor[8];
 
 static struct pf_lowlevel Lowlevel;
 
-local void LowMarkGoal (Unit * );
+//local void LowMarkGoal (Unit * );
 local MapField *LowAstarLoop (Unit * );
 local int LowTraceback (Unit * , MapField * );
 local void LowResetStats (void);
@@ -202,6 +202,7 @@ int LowlevelPath (Unit *unit, HighlevelPath *HighPath)
 	return retval;
 }
 
+#if 0
 local void LowMarkGoal (Unit *unit)
 {
 	Unit *GoalUnit;
@@ -249,6 +250,7 @@ local void LowMarkGoal (Unit *unit)
 	Lowlevel.Goal.X = (xmax+xmin) / 2;
 	Lowlevel.Goal.Y = (ymax+ymin) / 2;
 }
+#endif
 
 //static int h_count=0;
 

@@ -41,7 +41,7 @@ local void WidenSearchRect (int * , int * , int * , int * );
 local int AddToCandidates (CandidateSet * , CandidateSet * );
 local void RegionArrayReset (RegionArray * );
 local int RegionArrayAddRegion (RegionArray * , Region * );
-local int CheckGoalNeighborhood (Unit * , int , int , int , int );
+//local int CheckGoalNeighborhood (Unit * , int , int , int , int );
 local int CheckGoalFieldConnectivity (Unit * , int , int );
 local int CheckGoalAreaConnectivity (Unit * , int , int , CandidateSet * );
 local void MarkGoalField (int , int , int );
