@@ -381,6 +381,10 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	v = Fetch8(udta);
 	unittype->_PiercingDamage = v;
     }
+    /*
+     * This is not used in stratagus. so it was simply removed.
+     * We use our own upgrade methods that are a lot more flexible.
+     * Maybe we could use this one day, not sure.
     for (i = 0; i < 110; ++i) {		// Weapons upgradable
 	unittype = UnitTypeByWcNum(i);
 	v = Fetch8(udta);
@@ -390,7 +394,7 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	unittype = UnitTypeByWcNum(i);
 	v = Fetch8(udta);
 	unittype->ArmorUpgradable = v;
-    }
+    }*/
     for (i = 0; i < 110; ++i) {		// Missile Weapon
 	unittype = UnitTypeByWcNum(i);
 	v = Fetch8(udta);
@@ -746,9 +750,6 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     if (all || type->_MaxMana) {
 	CLprintf(file, "  'max-mana %d\n", type->_MaxMana);
     }
-    if (all || type->Magic) {
-	CLprintf(file, "  'magic %d\n", type->Magic);
-    }
     CLprintf(file, "  'tile-size '(%d %d)", type->TileWidth, type->TileHeight);
     CLprintf(file, "  'box-size '(%d %d)\n", type->BoxWidth, type->BoxHeight);
     CLprintf(file, "  'sight-range %d", type->_SightRange);
@@ -774,16 +775,6 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	CLprintf(file, "  'max-attack-range %d\n", type->_AttackRange);
     } else if (type->_AttackRange) {
 	CLprintf(file, "  'max-attack-range %d\n", type->_AttackRange);
-    }
-    if (all || type->WeaponsUpgradable) {
-	CLprintf(file, "  'weapons-upgradable %d", type->WeaponsUpgradable);
-	if (all || type->ArmorUpgradable) {
-	    CLprintf(file, " 'armor-upgradable %d\n", type->ArmorUpgradable);
-	} else {
-	    CLprintf(file, "\n");
-	}
-    } else if (type->ArmorUpgradable) {
-	CLprintf(file, "  'armor-upgradable %d\n", type->ArmorUpgradable);
     }
     CLprintf(file, "  'priority %d", type->Priority);
     if (all || type->AnnoyComputerFactor) {

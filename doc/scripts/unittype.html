@@ -50,7 +50,7 @@
 <a href="#define-animations">define-animations</a>
 <a href="#define-unit-stats">define-unit-stats</a>
 <a href="#define-unit-type">define-unit-type</a>
-<a href="#define-unittype-wc-names">define-unittype-wc-names</a>
+<a href="pud.html#define-unittype-wc-names">define-unittype-wc-names</a>
 <a href="#get-unit-type-ident">get-unit-type-ident</a>
 <a href="#get-unit-type-name">get-unit-type-name</a>
 <a href="#get-unit-type-property">get-unit-type-property</a>
@@ -75,24 +75,31 @@ Define animations.
 <dd>Name of the animation to define.
 </dd>
 <dt>script</dt>
-<dd><pre>
-        A script has this format:
-                (#(Flags Pixel Sleep Frame)
-                 #(Flags Pixel Sleep Frame)
-		 ...)
-        o Flags are the sum of the following:
-                1 Restart - restart animation
-                2 Reset   - animation could here be aborted (switch to another)
-                4 Sound   - play a sound with the animation
-                8 Missile - fire a missile at this point
-        o Pixel is the number of pixels to move (if this is a moving animation)
-          the sum of a walking animation should be 16 (the tile size in pixels)
-        o Sleep is the number of frames to wait for the next animation
-          (this seems to be a way to control the unit speed)
-	  FIXME: what is the speed tag from the unittype definition used for then?
-        o Frame is the tile position on the image. Usually 5*tilerows.
-          The engine will add something between 0 and 4 for the heading.
-</pre></dd>
+<dd>
+    A script is a bunch of frames and has this format:
+    <pre>
+	(#(Flags Pixel Sleep Frame)
+	 #(Flags Pixel Sleep Frame)
+	 ...)</pre>
+<dd>
+
+<dt>Here is a more detailed description of a frame.</dt>
+    <ul>
+	<li>Flags are the sum of the following:
+	<ul>
+	    <li>1 Restart - restart animation
+	    <li>2 Reset   - animation could here be aborted (switch to another)
+	    <li>4 Sound   - play a sound with the animation
+	    <li>8 Missile - fire a missile at this point
+	</ul>
+	<li>Pixel is the number of pixels to move (if this is a moving animation)
+	    the sum of a walking animation should be 16 (the tile size in pixels)
+	<li>Sleep is the number of game cycles to wait unit the next animation frame.
+	this is the way unit speed is controlled, unit-speed in unit type is
+	only used for showing. This should be fixed sometime in the future.
+	<li>Frame is the tile position on the image. Usually 5*tilerows.
+	  The engine will add something between 0 and 4 for the heading.
+    </ul>
 </dl>
 
 <h4>Example</h4>
@@ -115,53 +122,59 @@ Define animations.
 <a name="define-unit-stats"></a>
 <h3>(define-unit-stats ident player 'tag1 value1 'tag2 value2 ...)</h3>
 
-Define unit stats.
+Define unit stats. This is mostly only used in savegames, but included
+here for completeness. In the game every unit of the same type of one
+player have the same stats, affected by upgrades.
 
 <dl>
 <dt>ident</dt>
-<dd>Ident of the unit.
+<dd>Ident of the unit. This obviousely means that it should be defined after units.
 </dd>
 <dt>player</dt>
 <dd>Player number.
 </dd>
-</dl>
-Possible tags:
+<p>
+<dt>Possible tags:</dt>
 <dl>
 <dt>level</dt>
-<dd>.
+<dd>The level of the unit. It is equal to the number of upgrades of a
+certain unit and is purely cosmetic. It doesn't affect the game in any way.
 </dd>
 <dt>speed</dt>
-<dd>.
+<dd>The speed of the unit. This is not used, just shown. Unit speed is
+controlled by animation length, see define-animation.
 </dd>
-<dt>arange</dt>
-<dd>.
+<dt>attack-range</dt>
+<dd>The unit's attack range(circular). Use 1 for melee units.
 </dd>
-<dt>srange</dt>
-<dd>.
+<dt>sight-range</dt>
+<dd>The unit's sight range(circular).
 </dd>
 <dt>armor</dt>
-<dd>.
+<dd>Unit's armor. FIXME calculations?
 </dd>
-<dt>bdamage</dt>
-<dd>.
+<dt>basic-damage</dt>
+<dd>Unit's basic damage. FIXME calculations?
 </dd>
-<dt>pdamage</dt>
-<dd>.
+<dt>piercing-damage</dt>
+<dd>Unit's piercing damage. FIXME calculations?
 </dd>
-<dt>hp</dt>
-<dd>.
+<dt>hit-points</dt>
+<dd>The unit's maximum hit points.
 </dd>
 <dt>regeneration-rate</dt>
-<dd>amount of HP a unit gains per seconds</dt>
+<dd>amount of HP a unit gains per seconds
+</dt>
 <dt>costs</dt>
-<dd>.
+<dd>The cost to train this unit. This is a standard resource/value list.
+A special 'resource' is time, the time to train the unit in cycles.
 </dd>
+</dl>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    ;; seems to be used only in savegames
     (define-unit-stats 'unit-archer 14
       'level 1 'speed 10 'attack-range 4 'sight-range 5
       'armor 0 'basic-damage 3 'piercing-damage 6 'hit-points 40
@@ -172,13 +185,15 @@ Possible tags:
 <a name="define-unit-type"></a>
 <h3>(define-unit-type ident 'tag1 value1 'tag2 value2 ...)</h3>
 
-    Define the unit types in game it is based on the UDTA (FIXME:
-    what is UDTA?)<p>
+    Define the unit types in game. A lot of the data in this struct used to be
+    based on the UDTA section of puds, with unit statistics, but it is now a lot
+    bigger and more configurable<p>
 
 <dl>
 <dt>ident</dt>
 <dd>The unit-type unique identifier.  It is used to reference unit-types in
-game. F.E: "unit-knight", "unit-gold-mine".
+game. F.E: "unit-knight", "unit-gold-mine". Please use all-lowercase names
+prefixed with unit-, it is easier to read this way.
 </dd>
 </dl>
 Possible tags:
@@ -209,49 +224,214 @@ Examples:
 	this unit-type (here paladin).</dd>
     </dl>
 </dd>
-<dt>pixel-size</dt>
-<dd>Size of the unit-type graphic in pixeln. A list of X (width) and Y (height)
-sizes.  F.E. '( 72 72 ), '( 96 96 ).<p></dd>
+<dt>draw-level</dt>
+<dd>This is used when sorting units and missiles for drawing. Units with a higher draw
+order will always be on top of units with lower draw order. Units are also sorted from
+top to the bottom of the screen.
+</dd>
 <dt>animations</dt>
 <dd>Identifier to reference the animation sequences (scripts) for the
-unit-type. F.E. "animations-knight", "animations-gold-mine".<p></dd>
+unit-type. F.E. "animations-knight", "animations-gold-mine".
+</dd>
+<dt>pixel-size</dt>
+<dd>Size of the unit-type graphic in pixels. A list of X (width) and Y (height)
+sizes.  F.E. '( 72 72 ), '( 96 96 ).
+</dd>
+<dt>tile-size</dt>
+<dd>Define the unit-type size in tiles. NOTE: currently only buildings could
+be bigger than one tile. A list of X (width) and Y (height) sizes.
+F.E. '( 1 1 ), '( 2 2 ).
+</dd>
+<dt>box-size</dt>
+<dd>Define the size of the unit selection box. This is drawn centered around
+the unit and most of the time it is equal to the tile size of the unit* the size
+of a terrain tile, for an almost perfect fit. It's a list of X (width) and Y (height)
+too. F.E. '(32 32) '(64 64)
+</dd>
 <dt>icon</dt>
 <dd>Identifier to reference the icon shown in game for this unit-type.
-F.E. "icon-knight", "icon-gold-mine".<p></dd>
-<dt>speed</dt>
-<dd>The speed shown for this unit-type in game. (NOTE: this is
-only shown and *not* used). F.E. 10, 13.<p></dd>
-<dt>overlay</dt>
-<dd>Define the overlay shown if this unit is constructed (build).
-Currently are available:
-<ul>
-<li> 6 land construction site
-<li> 7 human shipyard construction site
-<li> 8 orc shipyard construction site
-<li> 9 human oil well construction site
-<li>10 orc oil well construction site
-<li>11 human refinery construction site
-<li>12 orc refinery construction site
-<li>13 human foundry construction site
-<li>14 orc foundry construction site
-<li>15 wall construction site
-</ul>
-NOTE: this will be changed to identifiers sometime.
-<p></dd>
-<dt>sight-range</dt>
-<dd>Sight range (in tiles) of this unit. F.E. 6, 14.<p></dd>
-<dt>hitpoints</dt>
-<dd>Hitpoints for this Unit. F.E. 90, 1000<p></dd>
-<dt>magic</dt>
-<dd>Flag to determine whether this unit is a spell user. 0 = false (not a magic
-user), 1 = true (magic user).  F.E. 1, 0<p>
+F.E. "icon-knight", "icon-gold-mine".
 </dd>
-<dt>costs</dt>
-<dd>Define the costs to build (or aquire) this unit. It is an array of '(
-resource-name amount) pairs. Time is in frames to build this unit.
-Gold is the amount required to build this unit. Wood is the amount required
-to build this unit.  Oil is the amount required to build this unit.
-F.E.: '( time 200 gold 2000 wood 1000 oil 200 ).<p>
+<p>
+    <dt>sound</dt>
+    <dd>After this tag there is a list of event/sound-name pairs. The following events
+    are supported:</dd>
+    <dl>
+    <ul>
+    <li>selected: Happens when the unit is selected.
+    <li>acknowledge: Happens when the unit received an order.
+    <li>attack: Attack sound of the unit. Used when giving an attack order, it
+    can override the acknowledge sound.
+    <li>ready: Happens when the unit finished training (and it's ready) 
+    <li>help: Happens when the unit is under attack.
+    <li>dead: Happens when the unit is killed.
+    </ul>
+    </dl>
+    <dd>
+    You can use the same help or ready sound for all units if you want generic
+    "Your unit is under attack", "Some unit was trained" sounds. The actual sound
+    files are not declared here. Please see the documentation on <a href="sound.html#make-sound">sounds</a>
+    </dd>
+<p>
+<dt>The following stats are also included in a unit stats struct and are upgradeable, see
+<a href="#define-unit-stats">define-unit-stats</a>
+</dt>
+<dl>
+    <dt>speed</dt>
+    <dd>The speed shown for this unit-type in game. (NOTE: this is
+    only shown and *not* used). F.E. 10, 13.
+    </dd>
+    <dt>max-attack-range</dt>
+    <dd>Attack range (in tiles) of this unit. Use 1 for melee units.
+    </dd>
+    <dt>min-attack-range</dt>
+    <dd>Minimum attack range (in tiles) of this unit. This is usefull for siege units you
+    want to make vulnerable to close range attacks.
+    </dd>
+    <dt>sight-range</dt>
+    <dd>Sight range (in tiles) of this unit.
+    </dd>
+    <dt>armor</dt>
+    <dd>Basic armor of the unit.
+    </dd>
+    <dt>basic-damage</dt>
+    <dd>Unit's basic damage. FIXME calculations?
+    </dd>
+    <dt>piercing-damage</dt>
+    <dd>Unit's piercing damage. FIXME calculations?
+    </dd>
+    <dt>regeneration-rate</dt>
+    <dd>amount of HP a unit gains per seconds
+    </dd>
+    <dt>hit-points</dt>
+    <dd>Maximum hitpoints for this Unit.
+    </dd>
+    <dt>costs</dt>
+    <dd>Define the costs to build (or aquire) this unit. It is an array of '(
+    resource-name amount) pairs. Time is in frames to build this unit.
+    Gold is the amount required to build this unit. Wood is the amount required
+    to build this unit.  Oil is the amount required to build this unit.
+    F.E.: '( time 200 gold 2000 wood 1000 oil 200 ).
+    </dd>
+<p></dl>
+<dt>The following flags affect the same value. Somebody somewhere should really clean this up.</dt>
+<dl>
+    <dt>right-attack</dt>
+    <dd>Right clicking defaults to attack. This should be used for most combat units.
+    </dd>
+    <dt>right-move</dt>
+    <dd>Right clicking defaults to move. This should be used for unit's that can't attack.
+    </dd>
+    <dt>right-harvest</dt>
+    <dd>This should be used for resource gathering units. It will return goods when
+    on a deposit and mine when on a resource.
+    </dd>
+    <dt>right-demolish</dt>
+    <dd>This is for demolishing units. It will try to demolish instead of attack (since
+    demolishing units can still have a normal attack, but it really shouldn't be used)
+    </dd>
+<p></dl>
+<dt>can-gather-resource</dt>
+<dd>This will begin a block of resoure gathering information. The folowing tags are available in this section:</dd>
+<dl>
+    <dt>resource-id</dt>
+    <dd>The resource identification. Has to be a resource-name defined before.
+    </dd>    
+    <dt>final-resource</dt>
+    <dd>The resource is converted to this at the depot. Usefull for a fisherman who harvests fish,
+    but it all turns to food at the depot. Warning: curently ignored by the Ai.
+    </dd>    
+    <dt>wait-at-resource</dt>
+    <dd>Cycles the unit waits while inside at a resource to get one resource step
+    (see below). This is completely independent of animation length and such.
+    </dd>    
+    <dt>wait-at-depot</dt>
+    <dd>Cycles the unit waits while inside the depot to unload.
+    </dd>
+    <dt>resource-step</dt>
+    <dd>The unit makes so-caled mining cycles. Each mining cycle it does some sort
+    of animation and gains resource-step resources. You can stop after any number of
+    steps. When the quantity in the harvester reaches the maximum (resource-capacity)
+    it will return home. If this is not included then it's considered infinity, and
+    resource-capacity will be the limit.
+    </dd>   
+    <dt>resource-capacity</dt>
+    <dd>Maximum amount of resources a harvester can carry. The actual amount can be
+    modified while unloading, with improve-incomes.
+    </dd>    
+    <dt>file-when-loaded</dt>
+    <dd>The harvester's animation file will change when it's loaded.
+    </dd>    
+    <dt>file-when-empty</dt>
+    <dd>The harvester's animation file will change when it's empty.The standard animation
+    is used only when building/repairing.
+    </dd>    
+    <dt>harvest-from-outside</dt>
+    <dd>Unit will harvest from the outside. The unit will use it's attack animation
+    (seems it turned into a generic Action anim.)
+    </dd>    
+    <dt>lose-resources</dt>
+    <dd>Special lossy behaviour for loaded harvesters. Harvesters with loads other
+    than 0 and ResourceCapacity will lose their cargo on any new order.
+    </dd>    
+    <dt>terrain-harvester</dt>
+    <dd>The unit will harvest terrain. For now this only works for wood.
+    </dd>
+<p></dl>
+<dt>gives-resource</dt>
+<dd>This will make the unit (normally a building) a resource (sugar mine, geyser, etc).
+It's followed by a resource ident F.E. 'gives-resource 'gold
+</dd>
+<dt>can-harvest</dt>
+<dd>This is a flag for harvestable resource buildings. You can ommit it, and give every
+race a building that is built on top of this (see below) and has the can-harvest flag.
+</dd>
+<dt>can-store<dt>
+<dd>This flag makes the unit a resource storage, units will come here and unload their cargo.
+It's followed by a list of accepted resource identifiers. F.E. can-store '(stone coal)
+</dd>
+<dt>building</dt>
+<dd>Unit is a building, and imobile. Available as a spell target check.
+</dd>
+<dt>shore-building</dt>
+<dd>Unit is a shore building, and imobile. This is used for those unique buildings
+that have to be build on sea and have at least one point on coast.
+</dd>
+<dt>must-build-on-top</dt>
+<dd>This is for buildings that must be built on top of other buildings, as an
+upgrade of sorts. FIXME: This is <b>NOT COMPLETE</b> and only implements the
+behaviour of wc2 oil platforms. It is followed by the building type it must
+be built on.
+</dd>
+<dt>volatile</dt>
+<dd>This should be true for suicide bombers, a bit of a hack. Available as a
+target check for spells, making those invisible would ruin the game.
+</dd>
+<dt>organic</dt>
+<dd>This is a flag for spell target check.
+</dd>
+<dt>hero</dt>
+<dd>This is a flag for spell target check. Prevent instant kills for instance.
+</dd>
+<dt>coward</dt>
+<dd>Unit will not attack on sight, and will run away instead of retaliating.
+Use this for units that can't attack or are next to useless in combat (like
+resource workers) Available as a spell target check.
+</dd>
+<dt>can-cast-spell</dt>
+<dd>This is used to determine what spells can this unit cast. It is followed by a
+list of spell names. Spells have to be declared already. Since some spells also
+rely on units being defined this can lead to a chicken and egg problem. It's
+better to declare an unit type in advance with just (define-unit-type 'unit-whatever).
+Please see the documentation on spells, not written. F.E. 'can-cast-spell '(spell-reveal-map)
+</dd>
+<dt>supply<dt>
+<dd>This is the amount of food supplied by the unit. Food is a global per-player
+counter that signifies the maximum amount of units.
+</dd>
+<dt>demand</dt>
+<dd>This is the amount of food required by the unit. It should be 0 for buildings.
+It can have values greater than one, for bigger units.
 </dd>
 <dt>improve-production</dt>
 <dd>Define the production increase from defaults that this unit adds. It is an
@@ -259,177 +439,146 @@ array of '(resource-name amount) pairs. Gold is the amount it increase the
 default gold by. All other defined resources are treated the same way. The
 values are treated like percents. Improvement from multiple buildings do
 not stack, but the maximum is what matters.
-F.E.: 'improve-production '( gold 20 wood 5 ) will give 120% gold and 105% wood.<p>
+F.E.: 'improve-production '( gold 20 wood 5 ) will give 120% gold and 105% wood.
 </dd>
 <dt>repair-range</dt>
-<dd>Range that a unit can repair from, eg. repair-range 1.</dd>
+<dd>Range that a unit can repair from, eg. repair-range 1.
+</dd>
 <dt>repair-hp</dt>
 <dd>Defines the amount of hp a unit gain for each repair animation.  Units can only be
 repaired if this value is non-zero.
-F.E.: 'repair-hp 4.<p>
+F.E.: 'repair-hp 4.
 </dd>
 <dt>repair-costs</dt>
 <dd>Define the costs to repair this unit. It is an array of '(
 resource-name amount) pairs.
 Gold is the amount required to repair repair-hp above.
 Wood and Oil are the same.
-F.E.: '( gold 2 wood 1 oil 1 ).<p>
+F.E.: '( gold 2 wood 1 oil 1 ).
 </dd>
-<dt>can-gather-resource</dt>
-<dd>This will begin a block of resoure gathering information. The folowing tags are available in this section:<p></dd>
-    <dl>
-    <dt>resource-id</dt>
-    <dd>The resource identification. Has to be a resource-name defined before.<p></dd>
-    
-    <dt>final-resource</dt>
-    <dd>The resource is converted to this at the depot. Usefull for a fisherman who harvests fish,
-    but it all turns to food at the depot. Warning: curently ignored by the Ai.<p></dd>
-    
-    <dt>wait-at-resource</dt>
-    <dd>Cycles the unit waits while inside at a resource to get one resource step
-    (see below). This is completely independent of animation length and such.<p></dd>
-    
-    <dt>wait-at-depot</dt>
-    <dd>Cycles the unit waits while inside the depot to unload.<p></dd>
-
-    <dt>resource-step</dt>
-    <dd>The unit makes so-caled mining cycles. Each mining cycle it does some sort
-    of animation and gains resource-step resources. You can stop after any number of
-    steps. When the quantity in the harvester reaches the maximum (resource-capacity)
-    it will return home. If this is not included then it's considered infinity, and
-    resource-capacity will be the limit.<p></dd>
-   
-    <dt>resource-capacity</dt>
-    <dd>Maximum amount of resources a harvester can carry. The actual amount can be
-    modified while unloading, with improve-incomes.<p></dd>
-    
-    <dt>file-when-loaded</dt>
-    <dd>The harvester's animation file will change when it's loaded.<p></dd>
-    
-    <dt>file-when-empty</dt>
-    <dd>The harvester's animation file will change when it's empty.The standard animation
-    is used only when building/repairing.<p></dd>
-    
-    <dt>harvest-from-outside</dt>
-    <dd>Unit will harvest from the outside. The unit will use it's attack animation
-    (seems it turned into a generic Action anim.)<p></dd>
-    
-    <dt>lose-resources</dt>
-    <dd>Special lossy behaviour for loaded harvesters. Harvesters with loads other
-    than 0 and ResourceCapacity will lose their cargo on any new order.<p></dd>
-    
-    <dt>terrain-harvester</dt>
-    <dd>The unit will harvest terrain. For now this only works for wood.<p></dd>
-    </dl>
-<dt>tile-size</dt>
-<dd>Define the unit-type size in tiles. NOTE: currently only buildings could
-be bigger than one tile. A list of X (width) and Y (height) sizes.
-F.E. '( 1 1 ), '( 2 2 ).<p></dd>
 <dt>permanent-cloak</dt>
-<dd>Unit is permanently cloaked, and can only be seen by detectors (see below.)<p></dd>
+<dd>Unit is permanently cloaked, and can only be seen by detectors (see below.)
+</dd>
 <dt>detect-cloak</dt>
-<dd>Unit can detect cloaked units. If an unit is detected other units can attack it as well<p></dd>
+<dd>Unit can detect cloaked units. If an unit is detected other units can attack it as well\
+</dd>
 <dt>demolish-range</dt>
-<dd>If non-zero this is the range for units that can demolish.The demolished area is a square, sorry.<p></dd>
+<dd>If non-zero this is the range for units that can demolish.The demolished area is a square, sorry.
+</dd>
 <dt>demolish-damage</dt>
 <dd>Damage dealt to unit affected by demolition. This can be 0, in this case
-only terrain will be affected. Units have to be in demolish-range to be affected.<p></dd>
+only terrain will be affected. Units have to be in demolish-range to be affected.
+</dd>
 <dt>random-movement-probablitity</dt>
 <dd>When the unit is idle this is the probability that it will take a
-step in a random direction, in percents. Usefull for netural animals.<p></dd>
+step in a random direction, in percents. Usefull for netural animals.
+</dd>
 <dt>clicks-to-explode</dt>
 <dd>If this is non-zero, then after that many clicks the unit will commit
 suicide. Doesn't work with resource workers/resources. It can even be used
 in combination with demolish-damage and demolish-range, though it wouldn't
-be very fair.<p></dd>
+be very fair.
+</dd>
 <dt>sniper</dt>
-<dd>Unit can only target organic units</dd>
-<dt>box-size</dt>
-<dd></dd>
-<dt>attack-range</dt>
-<dd></dd>
+<dd>Unit can only target organic units.
+</dd>
 <dt>computer-reaction-range</dt>
-<dd></dd>
-<dt>human-reaction-range</dt>
-<dd></dd>
-<dt>armor</dt>
-<dd></dd>
-<dt>priorty</dt>
-<dd></dd>
-<dt>damage</dt>
-<dd></dd>
-<dt>piercing-damge</dt>
-<dd></dd>
-<dt>weapon-upgradable</dt>
-<dd></dd>
-<dt>armor-upgradeable</dt>
-<dd></dd>
+<dd>This is supossed to be the reaction range for AI units, but it is not used.
+</dd>
+<dt>person-reaction-range</dt>
+<dd>This is supossed to be the reaction range for human player units, but it is not used.
+</dd>
+<dt>priority</dt>
+<dd>This is the ai priority level. High damage low-hp units for instancce should have
+higher priorities than say a peasant. It can be safely ignored.
+</dd>
+<dt>annoy-computer-factor<F12></dt>
+<dd>This is another ai priority level. This is not used, but included in wc2 data. Maybe
+it should be used to attack resource buildings first? You can safely ignore it.
+</dd>
 <dt>decay</dt>
-<dd></dd>
-<dt>annoy-factor</dt>
-<dd></dd>
+<dd>This is the unit's decay rate, in 1/6 seconds. It should be really really really changed to
+cycles. If you set this the unit will die by itself after a while. Don't use it for spells,
+spells will override this with their own ttl setting.
+</dd>
 <dt>points</dt>
-<dd></dd>
-<dt>regeneration-rate</dt>
-<dd>amount of HP a unit gains per seconds</dt>
+<dd>This is the score value of an unit. Used for the final score.
+</dd>
 <dt>missile</dt>
-<dd></dd>
+<dd>Some units fire by throwing missiles, this is the missile thrown. You can use it for
+close range units as well, but I can't really see the point.
+</dd>
 <dt>corpse</dt>
-<dd></dd>
+<dd>This is the corpse of the unit. When the unit dies and passes through it's
+death animation it turns into this. It's a list of an unit-name and a a corpse frame
+number. As you can see in <a href="#define-animations">define-animations</a>,
+an animation is composed out of several script frames, this is the frame to
+start the script from. FE: 'corpse '(unit-dead-body 0)
+</dd>
 <dt>explode-when-killed</dt>
 <dd>Sets unit to explode when killed, syntax is followed by the missile to use.
-    eg. 'explode-when-killed 'missile-explosion</dd>
-<dt>type</dt>
+eg. 'explode-when-killed 'missile-explosion
+</dd>
+<dt>transporter</dt>
+<dd>Unit is a transporter, you can place units inside. Note: you really should add
+an unload button for transporters.
+</dd>
+<dt>max-on-board</dt>
+<dd>This is only used for transporters, It's the maximum allowed on board. Curently the
+you can't have more that 6, or you won't get any buttons for the rest.
+</dd>
+<dt>revealer</dt>
+<dd>This is a special flag to use for reveal map spells. A reveal map smell is
+in fact a summon spell with an infinite range, that summons an unit with the
+revealer flag. Revealer are summoned and marked removed, but they still keep
+their sight. This way a revealer unit can't be attacked, won't show on the minimap
+and can't be interacted with. Please see the documentation on spells.</dd>
+<dt>FIXME: continue documentation.</dt>
 <dd></dd>
-<dt>right-mouse</dt>
-<dd></dd>
-<dt>can-target</dt>
-<dd></dd>
-<dt>flags</dt>
-<dd></dd>
-<dt>sounds</dt>
-<dd></dd>
-<dt>attack-sound</dt>
-<dd></dd>
+<dt>selectable-by-rectangle</dt>
+<dd>Most units should have this flag. When false the unit will only get selected
+alone, use this for buildings. Enemy units are never selectable by rectangle.
+</dd>
+<!--IDEA:<dt>force-minimap-color<dt>
+<dd>An unit with this flag will ignore any friend/foe/owning player considerations
+for the minimap color, and will force this. It takes a number from the palette here.
+</dd>-->
 </dl>
 
-<h4>Example</h4>
 
+<h4>Example</h4>
+Sorry, but due to the huge number of available flags we can only show a limited example.
 <pre>
-    (define-unit-type "unit-footman"		"Footman"
-      ;; graphic data
-      #("footman.png"
-	()
-	()
-	() )
-      '(  72  72 )			;; graphic size
-      "animations-footman"	;; animations
-      "icon-footman"
-      ;;Speed OvFrame SightR Hitpnt Magic  BTime	Gold	Wood	Oil
-	  10       0      4     60      0 #(   60    600       0      0 )
-      ;;Tile    Box Size    Attack	ReactC	ReactH
-      '( 1 1 ) '(  31  31 )     1       6       4
-      ;;Armor Prior	Damage	Pierc	WUpgr	AUpgr
-	   2    60      6      3       1       1
-      ;;Decay Annoy	Points
-	  0      0      50
-      "missile-none"
-      'corpse-human
+    (define-unit-type 'unit-footman 'name "Footman"
+      'files '(tileset-summer "human/units/footman.png")
+      'size '(72 72)
+      'animations 'animations-footman 'icon 'icon-footman
+      'costs '(time 60 gold 600)
+      'speed 10
+      'hit-points 60
+      'draw-level 40
+      'tile-size '(1 1) 'box-size '(31 31)
+      'sight-range 4 'computer-reaction-range 6 'person-reaction-range 4
+      'armor 2 'basic-damage 6 'piercing-damage 3 'missile 'missile-none
+      'max-attack-range 1
+      'priority 60
+      'points 50
+      'demand 1
+      'corpse '(unit-dead-body 6)
       'type-land
       'right-attack
+      'can-attack 'repair-range 1
       'can-target-land
-      ;; flags
       'land-unit
-      'can-attack
       'organic
       'selectable-by-rectangle
-      ;; sounds
-      #("footman-selected"
-	"footman-acknowledge"
-	"footman-ready"
-	"footman-help"
-	"footman-dead" )
-      "footman-attack" )
+      'sounds '(
+	selected "footman-selected"
+	acknowledge "footman-acknowledge"
+	ready "footman-ready"
+	help "basic human voices help 1"
+	dead "basic human voices dead"
+	attack "footman-attack"))
 </pre>
 
 <!--
@@ -463,20 +612,6 @@ be very fair.<p></dd>
     (get-unit-type-ident (unit-type "unit-peon"))<p>
     Get the identifier of the unit type peon.<p>
 -->
-
-<a name="define-unittype-wc-names"></a>
-<h3>(define-unittype-wc-names footman grunt ...)</h3>
-
-Define unit-type mapping from original number to internal symbol.
-
-<h4>Example</h4>
-
-<pre>
-    (define-unittype-wc-names)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBRARYPATH/ccl/wc2.ccl </a>
 
 <a name="get-unit-type-ident"></a>
 <h3>(get-unit-type-ident unit-type)</h3>

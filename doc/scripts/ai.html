@@ -45,13 +45,13 @@
 <a href="../faq.html">FAQ</a> 
 <a href="ccl.html">CCL</a> 
 <a href="unittype.html">PREV</a> 
-<a href="ccl.html">NEXT</a> 
+<a href="config.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
 <a href="#define-ai">define-ai</a>
 <a href="#define-ai-helper">define-ai-helper</a>
 <a href="#define-ai-player">define-ai-player</a>
-<a href="#define-ai-wc-names">define-ai-wc-names</a>
+<a href="pud.html#define-ai-wc-names">define-ai-wc-names</a>
 <a href="#ai:attack-with-force">ai:attack-with-force</a>
 <a href="#ai:check-force">ai:check-force</a>
 <a href="#ai:debug">ai:debug</a>
@@ -188,25 +188,6 @@ and what they can build and many other things that the AI must know.
   </dl>
   <b>Note:</b> If more units can repair the same units you need the same list
 	for all units.
- <li><code>(list 'collect 'worker 'resource-1 ... 'resource-n)</code>
-  <dl>
-  <dt>worker</dt>
-  <dd>Name of the unit-type that can collect resources.
-  </dd>
-  <dt>resource-1</dt>
-  <dt>resource-n</dt>
-  <dd>Names of the resources that can be collected by the worker.
-  </dd>
-  </dl>
- <li><code>(list 'with-goods 'unit 'resource)</code>
-  <dl>
-  <dt>unit</dt>
-  <dd>Name of the unit-type that is carring a resource.
-  </dd>
-  <dt>resource</dt>
-  <dd>Name of the resource that is carried by the unit.
-  </dd>
-  </dl>
  <li><code>(list 'equiv 'unit 'unit-1 ... 'unit-n)</code>
   <dl>
   <dt>unit</dt>
@@ -242,8 +223,6 @@ A minimal AI helper definition:
   (list 'upgrade 'unit-town-hall 'unit-keep)
   (list 'research 'unit-human-blacksmith 'upgrade-sword1)
   (list 'repair 'unit-peasant 'unit-town-hall)
-  (list 'collect 'unit-peasant 'gold)
-  (list 'with-goods 'unit-peasant-with-gold 'gold)
   (list 'unit-limit 'unit-farm 'food)
   (list 'unit-equiv 'unit-town-hall 'unit-keep))
 </pre>
@@ -253,8 +232,6 @@ A minimal AI helper definition:
 <p>A town hall can be upgraded to a keep.
 <p>The blacksmith can reasearch the upgrade sword1.
 <p>A peasant can repair the town hall.
-<p>A peasant can collect gold.
-<p>A the peasant with gold carries gold.
 <p>To fix the food shortage the AI must build farms.
 <p>For the AI is a keep equivalent to a town hall.
 
@@ -280,35 +257,6 @@ Define an AI player. (NOT SUPPORTED)
     ;; FIXME:
 FIXME:
     (define-ai-player (list ...))
-</pre>
-
-<h4>Not Used</h4>
-
-<a name="define-ai-wc-names"></a>
-<h3>(define-ai-wc-names 'land-attack 'passive ... )</h3>
-
-Define AI mapping from original number to internal symbol.
-
-
-
-<dl>
-<dt></dt>
-<dd>
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (define-ai-wc-names
-      'land-attack 'passive 'orc-03 'hum-04 'orc-04 'hum-05 'orc-05
-      'hum-06 'orc-06 'hum-07 'orc-07 'hum-08 'orc-08 'hum-09 'orc-09
-      'hum-10 'orc-10 'hum-11 'orc-11 'hum-12 'orc-12 'hum-13 'orc-13
-      'hum-14-orange 'orc-14-blue 'sea-attack 'air-attack 'hum-14-red
-      'hum-14-white 'hum-14-black 'orc-14-green 'orc-14-white 'orc-exp-04
-      'orc-exp-05 'orc-exp-07a 'orc-exp-09 'orc-exp-10 'orc-exp-12 'orc-exp-06a
-      'orc-exp-06b 'orc-exp-11a 'orc-exp-11b 'hum-exp-02a-red 'hum-exp-02b-black
-      ...
 </pre>
 
 <h4>Not Used</h4>

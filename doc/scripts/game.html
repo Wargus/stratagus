@@ -44,7 +44,7 @@
 <a href="../faq.html">FAQ</a> 
 <a href="ccl.html">CCL</a> 
 <a href="config.html">PREV</a> 
-<a href="research.html">NEXT</a> 
+<a href="icon.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
 <a href="#add-keystroke-help">add-keystroke-help</a>
@@ -59,11 +59,9 @@
 <a href="#define-burning-building">define-burning-building</a>
 <a href="#define-campaign">define-campaign</a>
 <a href="#define-construction">define-construction</a>
-<a href="#define-construction-wc-names">define-construction-wc-names</a>
+<a href="pud.html#define-construction-wc-names">define-construction-wc-names</a>
 <a href="#define-editor-unittypes">define-editor-unittypes</a>
 <a href="#define-map">define-map</a>
-<a href="#define-missile-type">define-missile-type</a>
-<a href="#define-missiletype-wc-names">define-missiletype-wc-names</a>
 <a href="#define-race-names">define-race-names</a>
 <a href="#define-ranks">define-ranks</a>
 <a href="#diplomacy">diplomacy</a>
@@ -82,7 +80,6 @@
 <a href="#load-pud">load-pud</a>
 <a href="#log">log</a>
 <a href="#make-unit">make-unit</a>
-<a href="#missile">missile</a>
 <a href="#new-colors">new-colors</a>
 <a href="#pf-show-groupids!">pf-show-groupids!</a>
 <a href="#pf-show-regids!">pf-show-regids!</a>
@@ -460,26 +457,6 @@ first frame should be 0.
 <a href="../../data/ccl/human/constructions.ccl"> $LIBARYPATH/ccl/human/constructions.ccl </a><br>
 <a href="../../data/ccl/orc/constructions.ccl"> $LIBARYPATH/ccl/orc/constructions.ccl </a>
 
-<a name="define-construction-wc-names"></a>
-<h3>(define-construction-wc-names)</h3>
-
-Define construction mapping from original number to internal symbol
-
-<dl>
-<dt></dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (define-construction-wc-names human-shipyard orc-shipyard ... )
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
-
 <a name="define-editor-unittypes"></a>
 <h3>(define-editor-unittypes)</h3>
 
@@ -517,48 +494,6 @@ Define construction mapping from original number to internal symbol
 
 <pre>
     (define-map)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
-
-<a name="define-missile-type"></a>
-<h3>(define-missile-type)</h3>
-
-.
-
-
-<dl>
-<dt></dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (define-missile-type)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
-
-<a name="define-missiletype-wc-names"></a>
-<h3>(define-missiletype-wc-names)</h3>
-
-Define missiletype mapping from original number to internal symbol
-
-
-<dl>
-<dt></dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (define-missiletype-wc-names lightning griffon-hammer ... )
 </pre>
 <h4>Used</h4>
 
@@ -1022,27 +957,6 @@ Load a map using the pud format.
 
 <pre>
     (make-unit)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
-
-<a name="missile"></a>
-<h3>(missile)</h3>
-
-.
-
-
-<dl>
-<dt></dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (missile)
 </pre>
 <h4>Used</h4>
 

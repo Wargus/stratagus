@@ -48,7 +48,7 @@
 <a href="ccl-index.html">Index</a> 
 <hr>
 <a href="#define-tileset">define-tileset</a>
-<a href="#define-tileset-wc-names">define-tileset-wc-names</a>
+<a href="pud.html#define-tileset-wc-names">define-tileset-wc-names</a>
 <hr>
 <h2>Intro - Introduction to tileset functions and variables</h2>
 
@@ -93,38 +93,6 @@ FIXME:
 <pre>
     (define-tileset
 </pre>
-
-<a name="define-tileset-wc-names"></a>
-<h3>(define-tileset-wc-names tileset0 tileset1 tileset2 tileset3)</h3>
-
-    Define tileset mapping from original number to internal symbol
-
-<dl>
-<dt>tileset0</dt>
-<dd>Name of the tileset assigned to index 0 (summer).
-</dd>
-<dt>tileset1</dt>
-<dd>Name of the tileset assigned to index 1 (winter).
-</dd>
-<dt>tileset2</dt>
-<dd>Name of the tileset assigned to index 2 (wasteland).
-</dd>
-<dt>tileset3</dt>
-<dd>Name of the tileset assigned to index 3 (orc swamp).
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; This is the default tileset mapping.
-    (define-tileset-wc-names 
-      'tileset-summer 'tileset-winter 'tileset-wasteland 'tileset-swamp )
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <hr>
 Last changed: $Id$<br>
