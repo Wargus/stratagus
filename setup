@@ -420,7 +420,7 @@ echo
 echo "Checking for various video libraries..."
 
 # Check for SDL >= 1.x
-if [ "`uname -a | grep -is bsd` x" != " x" ] ; then
+if [ "`uname -a | grep -is freebsd` x" != " x" ] ; then
   SDL_CONFIG=sdl11-config
 else
   SDL_CONFIG=sdl-config
