@@ -124,6 +124,8 @@ local void HandleUnitAction(Unit* unit)
 
 	    if( unit->Removed ) {	// FIXME: johns I see this as an error
 		DebugLevel0Fn("Flushing removed unit\n");
+		// This happens, if building with ALT+SHIFT.
+		return;
 	    }
 
 	    //
