@@ -96,10 +96,16 @@ static void LoadStratagusMap(const char* mapname,
 	WorldMap* map __attribute__((unused)))
 {
 	char mapfull[PATH_MAX];
+	CLFile* file;
 
-	strcpy(mapfull, StratagusLibPath);
-	strcat(mapfull, "/");
-	strcat(mapfull, mapname);
+	if (!(file = CLopen(mapname, CL_OPEN_READ))) {
+		strcpy(mapfull, StratagusLibPath);
+		strcat(mapfull, "/");
+		strcat(mapfull, mapname);
+	} else {
+		strcpy(mapfull, mapname);
+		CLclose(file);
+	}
 
 	if (LcmPreventRecurse) {
 		fprintf(stderr,"recursive use of load Stratagus map!\n");
