@@ -10,7 +10,7 @@
 //
 /**@name movie.c - Movie playback functions. */
 //
-// (c) Copyright 2005 by Nehal Mistry
+//      (c) Copyright 2005 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
