@@ -1169,6 +1169,7 @@ local SCM CclSetPlayerResource(SCM list)
 	list = gh_cdr(list);
 	player->Resources[i] = gh_scm2int(value);
     }
+    MustRedraw |= RedrawResources;
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
@@ -1193,16 +1194,12 @@ local int CclSetPlayerResource(lua_State* l)
 	    }
 	}
 	if (i == MaxCosts) {
-	   // FIXME: this leaves a half initialized player
 	   lua_pushfstring(l, "Unsupported tag: %s", value);
 	   lua_error(l);
 	}
-	if (!lua_isnumber(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	player->Resources[i] = lua_tonumber(l, j + 1);
+	player->Resources[i] = LuaToNumber(l, j + 1);
     }
+    MustRedraw |= RedrawResources;
     return 0;
 }
 #endif
