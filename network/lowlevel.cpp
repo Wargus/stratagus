@@ -37,7 +37,9 @@
 #include <stddef.h>
 #include <string.h>
 
+#ifndef _MSC_VER
 #include <signal.h>
+#endif
 
 #include "freecraft.h"
 #include "net_lowlevel.h"

@@ -32,7 +32,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef _MSC_VER
 #include <time.h>
+#endif
 
 #include "freecraft.h"
 #include "unit.h"
