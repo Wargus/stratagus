@@ -75,11 +75,10 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 **
 **  @param name  png filename to load.
 **
-**  @return      graphic object with loaded graphic, or NULL if failure.
+**  @return      0 for success, -1 for error.
 */
-Graphic* LoadGraphicPNG(const char* name)
+int LoadGraphicPNG(Graphic* graphic)
 {
-	Graphic* graphic;
 	CLFile* fp;
 	SDL_Surface* volatile surface;
 	png_structp png_ptr;
@@ -99,17 +98,18 @@ Graphic* LoadGraphicPNG(const char* name)
 	int i;
 	volatile int ckey;
 	png_color_16* transv;
+	const char* name;
 
+	name = graphic->File;
 	ckey = -1;
 
 	if (!name) {
-		return NULL;
+		return -1;
 	}
 	if (!(fp = CLopen(name, CL_OPEN_READ))) {
 		perror("Can't open file");
-		return NULL;
+		return -1;
 	}
-	graphic = NULL;
 
 	/* Initialize the data we will clean up when we're done */
 	png_ptr = NULL; info_ptr = NULL; row_pointers = NULL; surface = NULL;
@@ -280,7 +280,9 @@ Graphic* LoadGraphicPNG(const char* name)
 		}
 	}
 
-	graphic = MakeGraphic(surface);
+	graphic->Surface = surface;
+	graphic->GraphicWidth = surface->w;
+	graphic->GraphicHeight = surface->h;
 
 done:   /* Clean up and return */
 	png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : (png_infopp)0,
@@ -289,7 +291,7 @@ done:   /* Clean up and return */
 		free(row_pointers);
 	}
 	CLclose(fp);
-	return graphic;
+	return 0;
 }
 
 /**
