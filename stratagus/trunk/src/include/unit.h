@@ -722,6 +722,8 @@ extern Unit* UnitOnMapTile(unsigned tx,unsigned ty);
 extern Unit* RepairableOnMapTile(unsigned tx,unsigned ty);
     /// Return possible attack target on that map tile
 extern Unit* TargetOnMapTile(Unit* unit,unsigned tx,unsigned ty);
+    /// Return transporter unit on that map tile
+extern Unit* TransporterOnMapTile(unsigned tx,unsigned ty);
 
     /// Return gold mine, if on map tile
 extern Unit* GoldMineOnMap(int tx,int ty);

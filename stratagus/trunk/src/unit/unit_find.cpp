@@ -216,7 +216,7 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 	unit=table[i];
 	// unusable unit ?
 	// if( UnitUnusable(unit) ) can't attack constructions
-	// FIXME: did SelectUnitsOnTile already filter this.
+	// FIXME: did SelectUnitsOnTile already filter this?
 	if( unit->Removed || unit->Orders[0].Action==UnitActionDie ) {
 	    continue;
 	}
@@ -237,6 +237,29 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 	}
     }
     return best;
+}
+
+/**
+**	Transporter unit on map tile.
+**
+**	@param tx	X position on map, tile-based.
+**	@param ty	Y position on map, tile-based.
+**
+**	@return		Returns transporter unit found on tile.
+*/
+global Unit* TransporterOnMapTile(unsigned tx,unsigned ty)
+{
+    Unit* table[MAX_UNITS];
+    int n;
+    int i;
+
+    n=SelectUnitsOnTile(tx,ty,table);
+    for( i=0; i<n; ++i ) {
+	if( table[i]->Type->Transporter ) {
+	    return table[i];
+	}
+    }
+    return NoUnitP;
 }
 
 /*----------------------------------------------------------------------------
