@@ -31,6 +31,11 @@
 **	@attention
 **	This combination didn't likes if main is in the freecraft lib.
 */
+
+#if defined(_MSC_VER) && !defined(_WIN32_WCE) && defined(USE_SDL)
+#include "SDL.h"
+#endif
+
 int main(int argc,char** argv)
 {
     extern int mymain(int argc,char** argv);
