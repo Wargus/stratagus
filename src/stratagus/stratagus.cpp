@@ -879,6 +879,7 @@ Use it at your own risk.\n\n");
 #endif
 				}
 				Invalidate();
+				RealizeVideoMemory();
 				WaitForInput(TitleScreens[i]->Timeout);
 			}
 		}

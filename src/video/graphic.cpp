@@ -42,6 +42,7 @@
 #include "video.h"
 #include "iolib.h"
 #include "intern_video.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --		Declarations
@@ -63,6 +64,18 @@ local GraphicType GraphicImage16Type;		/// image type 16bit palette
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_SDL_SURFACE
+/**
+**		Video draw part of graphic.
+**
+**		@param graphic		Pointer to object
+**		@param gx		X offset into object
+**		@param gy		Y offset into object
+**		@param w		width to display
+**		@param h		height to display
+**		@param x		X screen position
+**		@param y		Y screen position
+*/
+#ifndef USE_OPENGL
 global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y)
 {
@@ -79,13 +92,70 @@ global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 
 	SDL_BlitSurface(graphic->Surface, &srect, TheScreen, &drect);
 }
+#else
+global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
+	int w, int h, int x, int y)
+{
+	int sx;
+	int ex;
+	int sy;
+	int ey;
+	GLfloat stx;
+	GLfloat etx;
+	GLfloat sty;
+	GLfloat ety;
 
+	sx = x;
+	ex = sx + w;
+	ey = VideoHeight - y;
+	sy = ey - h;
+
+	stx = (GLfloat)gx / graphic->Width * graphic->TextureWidth;
+	etx = (GLfloat)(gx + w) / graphic->Width * graphic->TextureWidth;
+	sty = (GLfloat)gy / graphic->Height * graphic->TextureHeight;
+	ety = (GLfloat)(gy + h) / graphic->Height * graphic->TextureHeight;
+
+	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(stx, 1.0f - ety);
+	glVertex2i(sx, sy);
+	glTexCoord2f(stx, 1.0f - sty);
+	glVertex2i(sx, ey);
+	glTexCoord2f(etx, 1.0f - sty);
+	glVertex2i(ex, ey);
+	glTexCoord2f(etx, 1.0f - ety);
+	glVertex2i(ex, sy);
+	glEnd();
+}
+#endif
+
+/**
+**		Video draw part of graphic clipped.
+**
+**		@param graphic		Pointer to object
+**		@param gx		X offset into object
+**		@param gy		Y offset into object
+**		@param w		width to display
+**		@param h		height to display
+**		@param x		X screen position
+**		@param y		Y screen position
+*/
+#ifndef USE_OPENGL
 global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y)
 {
 	CLIP_RECTANGLE(x, y, w, h);
 	VideoDrawSub(graphic, gx, gy, w, h, x, y);
 }
+#else
+global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
+	int w, int h, int x, int y)
+{
+	CLIP_RECTANGLE(x, y, w, h);
+	VideoDrawSub(graphic, gx, gy, w, h, x, y);
+}
+#endif
+
 
 global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char fade)
@@ -291,54 +361,6 @@ local void VideoDrawSub8to32(const Graphic* graphic, int gx, int gy,
 }
 #endif
 
-/**
-**		Video draw part of graphic.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-#ifdef USE_OPENGL
-local void VideoDrawSubOpenGL(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	int sx;
-	int ex;
-	int sy;
-	int ey;
-	GLfloat stx;
-	GLfloat etx;
-	GLfloat sty;
-	GLfloat ety;
-
-	sx = x;
-	ex = sx + w;
-	ey = VideoHeight - y;
-	sy = ey - h;
-
-	stx = (GLfloat)gx / graphic->Width * graphic->TextureWidth;
-	etx = (GLfloat)(gx + w) / graphic->Width * graphic->TextureWidth;
-	sty = (GLfloat)gy / graphic->Height * graphic->TextureHeight;
-	ety = (GLfloat)(gy + h) / graphic->Height * graphic->TextureHeight;
-
-	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(stx, 1.0f - ety);
-	glVertex2i(sx, sy);
-	glTexCoord2f(stx, 1.0f - sty);
-	glVertex2i(sx, ey);
-	glTexCoord2f(etx, 1.0f - sty);
-	glVertex2i(ex, ey);
-	glTexCoord2f(etx, 1.0f - ety);
-	glVertex2i(ex, sy);
-	glEnd();
-}
-#endif
-
 #ifndef USE_SDL_SURFACE
 /**
 **		Video draw part of 8bit graphic clipped into 8 bit framebuffer.
@@ -410,26 +432,6 @@ local void VideoDrawSub8to32Clip(const Graphic* graphic, int gx, int gy,
 {
 	CLIP_RECTANGLE(x, y, w, h);
 	VideoDrawSub8to32(graphic, gx, gy, w, h, x, y);
-}
-#endif
-
-/**
-**		Video draw part of graphic clipped.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-#ifdef USE_OPENGL
-local void VideoDrawSubOpenGLClip(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSubOpenGL(graphic, gx, gy, w, h, x, y);
 }
 #endif
 
@@ -669,18 +671,19 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		SDL_LockSurface(graphic->Surface);
 		for (i = 0; i < height; ++i) {
-			sp = (const unsigned char*)graphic->Frames + (x % fl) * width +
+			sp = (const unsigned char*)graphic->Surface->pixels + (x % fl) * width +
 				((x / fl) * height + i) * graphic->Width;
 			for (j = 0; j < width; ++j) {
 				int c;
-				Palette p;
+				SDL_Color p;
 
 				c = (h - i - 1) * w * 4 + j * 4;
 				if (*sp == 255) {
 					tex[c + 3] = 0;
 				} else {
-					p = graphic->Palette[*sp];
+					p = graphic->Surface->format->palette->colors[*sp];
 					tex[c + 0] = p.r;
 					tex[c + 1] = p.g;
 					tex[c + 2] = p.b;
@@ -689,6 +692,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 				++sp;
 			}
 		}
+		SDL_UnlockSurface(graphic->Surface);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
 			GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG
@@ -727,7 +731,6 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 		(*g)->NumTextureNames = n;
 		(*g)->TextureNames = calloc(n,sizeof(GLuint));
 
-		(*g)->Type = graphic->Type;
 		(*g)->Width = graphic->Width;
 		(*g)->Height = graphic->Height;
 		(*g)->GraphicWidth = graphic->GraphicWidth;
@@ -753,18 +756,19 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	SDL_LockSurface(graphic->Surface);
 	for (i = 0; i < graphic->Height; ++i) {
-		sp = (const unsigned char*)graphic->Frames + (frame % fl) * graphic->Width +
+		sp = (const unsigned char*)graphic->Surface->pixels + (frame % fl) * graphic->Width +
 			((frame / fl) * graphic->Height + i) * graphic->GraphicWidth;
 		for (j = 0; j < graphic->Width; ++j) {
 			int c;
 			int z;
-			Palette p;
+			SDL_Color p;
 
 			c = (h - i - 1) * w * 4 + j * 4;
 			for (z = 0; z < maplen; ++z) {
 				if (*sp == map[z * 2]) {
-					p = GlobalPalette[map[z * 2 + 1]];
+					p = TheMap.TileGraphic->Surface->format->palette->colors[map[z * 2 + 1]];
 					tex[c + 0] = p.r;
 					tex[c + 1] = p.g;
 					tex[c + 2] = p.b;
@@ -778,6 +782,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 			++sp;
 		}
 	}
+	SDL_UnlockSurface(graphic->Surface);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
 		GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG

@@ -146,9 +146,15 @@ local void* OldCursorImage;				/// background saved behind cursor
 	**	 (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
 	*/
 #ifdef USE_SDL_SURFACE
+#ifndef USE_OPENGL
 local void SaveCursorBackground(int x, int y, int w, int h);
 	/// Function pointer: Load background behind cursor
 local void LoadCursorBackground(int x, int y, int w, int h);
+#else
+#define LoadCursorBackground(x, y, w, h)  // nothing
+#define SaveCursorBackground(x, y, w, h)  // nothing
+#endif
+
 #else
 local void (*SaveCursorBackground)(int x, int y, int w, int h);
 	/// Function pointer: Load background behind cursor
@@ -185,10 +191,12 @@ local int HiddenCursorRectangleH;		/// saved cursor height in pixel
 **		non-empty
 **	 (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
 */
+#ifndef USE_OPENGL
 #ifdef USE_SDL_SURFACE
 global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h);
 #else
 global void (*SaveCursorRectangle)(void* buffer, int x, int y, int w, int h);
+#endif
 #endif
 
 /**
@@ -202,10 +210,12 @@ global void (*SaveCursorRectangle)(void* buffer, int x, int y, int w, int h);
 **
 **		@note rectangle previously saved with SaveCursorRectangle(x,y,w,h)
 */
+#ifndef USE_OPENGL
 #ifdef USE_SDL_SURFACE
 global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h);
 #else
 global void (*LoadCursorRectangle)(void* buffer, int x, int y, int w, int h);
+#endif
 #endif
 
 /*----------------------------------------------------------------------------
@@ -284,6 +294,7 @@ global CursorType* CursorTypeByIdent(const char* ident)
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_SDL_SURFACE
+#ifndef USE_OPENGL
 global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h)
 {
 	int i;
@@ -344,6 +355,7 @@ global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h)
 
 	VideoUnlockScreen();
 }
+#endif
 #else
 /**
 **		Puts stored 'image' from SAVECURSORRECTANGLE back on the screen.
@@ -536,6 +548,7 @@ local void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 --		DRAW SPRITE CURSOR
 ----------------------------------------------------------------------------*/
 #ifdef USE_SDL_SURFACE
+#ifndef USE_OPENGL
 local void LoadCursorBackground(int x, int y, int w, int h)
 {
 	SDL_Rect drect;
@@ -563,6 +576,7 @@ local void SaveCursorBackground(int x, int y, int w, int h)
 
 	SDL_BlitSurface(TheScreen, &srect, OldCursorImage, NULL);
 }
+#endif
 #else
 /**
 **		Restore cursor background for 8bpp frame buffer.
@@ -1164,29 +1178,6 @@ global void InvalidateCursorAreas(void)
 	}
 }
 
-#ifdef USE_OPENGL
-local void LoadCursorRectangleOpenGL(void* buffer __attribute__((unused)),
-	int x __attribute__((unused)), int y __attribute__((unused)),
-	int w __attribute__((unused)), int h __attribute__((unused)))
-{
-}
-local void SaveCursorRectangleOpenGL(void* buffer __attribute__((unused)),
-	int x __attribute__((unused)), int y __attribute__((unused)),
-	int w __attribute__((unused)), int h __attribute__((unused)))
-{
-}
-local void LoadCursorBackgroundOpenGL(int x __attribute__((unused)),
-	int y __attribute__((unused)),
-	int w __attribute__((unused)), int h __attribute__((unused)))
-{
-}
-local void SaveCursorBackgroundOpenGL(int x __attribute__((unused)),
-	int y __attribute__((unused)),
-	int w __attribute__((unused)), int h __attribute__((unused)))
-{
-}
-#endif
-
 /**
 **		Setup the cursor part.
 **
@@ -1195,13 +1186,7 @@ local void SaveCursorBackgroundOpenGL(int x __attribute__((unused)),
 */
 global void InitVideoCursors(void)
 {
-#ifdef USE_OPENGL
-	SaveCursorBackground = SaveCursorBackgroundOpenGL;
-	LoadCursorBackground = LoadCursorBackgroundOpenGL;
-	MemSize = 1;
-	SaveCursorRectangle = SaveCursorRectangleOpenGL;
-	LoadCursorRectangle = LoadCursorRectangleOpenGL;
-#else
+#ifndef USE_OPENGL
 	if (OldCursorRectangle) {		// memory of possible previous video-setting?
 		free(OldCursorRectangle);
 		OldCursorRectangle = 0;

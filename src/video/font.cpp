@@ -161,6 +161,7 @@ global char* FontNames[] = {
 **  @param x       X screen position
 **  @param y       Y screen position
 */
+#ifndef USE_OPENGL
 local void VideoDrawChar(const Graphic* sprite,
 	int gx, int gy, int w, int h, int x, int y)
 {
@@ -179,9 +180,29 @@ local void VideoDrawChar(const Graphic* sprite,
 
 	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
 }
-
 #else
+local void VideoDrawChar(const Graphic* sprite,
+	int gx, int gy, int w, int h, int x, int y)
+{
+	SDL_Color* c;
+	int i;
 
+	glDisable(GL_TEXTURE_2D);
+
+	for (i = 0; i < NumFontColors; ++i) {
+		c = FontColor->Color + i;
+		glColor3ub(c->r, c->g, c->b);
+		glRasterPos2i(x, VideoHeight - y - h);
+		glBitmap(FontBitmapWidths[CurrentFont] * 8, h,
+			0.0f, 0.0f, 0.0f, 0.0f,
+			FontBitmaps[CurrentFont][i] +
+				(gy + Fonts[CurrentFont].Height - h) * FontBitmapWidths[CurrentFont]);
+	}
+
+	glEnable(GL_TEXTURE_2D);
+}
+#endif
+#else
 /**
 **  Draw character with current color into 8bit video memory.
 **
@@ -400,40 +421,6 @@ local void VideoDrawChar32(const Graphic* sprite,
 		dp += da;
 	}
 #undef UNROLL
-}
-#endif
-
-#ifdef USE_OPENGL
-/**
-**  Draw character with current color.
-**
-**  @param sprite  Pointer to object
-**  @param gx      X offset into object
-**  @param gy      Y offset into object
-**  @param w       width to display
-**  @param h       height to display
-**  @param x       X screen position
-**  @param y       Y screen position
-*/
-local void VideoDrawCharOpenGL(const Graphic* sprite,
-	int gx, int gy, int w, int h, int x, int y)
-{
-	Palette c;
-	int i;
-
-	glDisable(GL_TEXTURE_2D);
-
-	for (i = 0; i < NumFontColors; ++i) {
-		//c = FontPixels[i];
-		memcpy(&c, FontPixels + i, sizeof(Palette));
-		glColor3ub(c.r, c.g, c.b);
-		glRasterPos2i(x, VideoHeight - y - h);
-		glBitmap(FontBitmapWidths[CurrentFont] * 8, h,
-			0.0f, 0.0f, 0.0f, 0.0f,
-			FontBitmaps[CurrentFont][i] + (gy + Fonts[CurrentFont].Height - h) * FontBitmapWidths[CurrentFont]);
-	}
-
-	glEnable(GL_TEXTURE_2D);
 }
 #endif
 
@@ -692,7 +679,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 			w = fp->CharWidth[*text - 32];
 			DrawChar(fp->Graphic, 0, height * (*text - 32), w, height, x + widths, y);
 		} else {
-			w=fp->CharWidth[0];
+			w = fp->CharWidth[0];
 			DrawChar(fp->Graphic, 0, height * 0, w, height, x + widths, y);
 		}
 		widths += w + 1;
@@ -884,6 +871,7 @@ local void FontMeasureWidths(ColorFont* fp)
 
 	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
 
+	SDL_LockSurface(fp->Graphic->Surface);
 	for (y = 1; y < 207; ++y) {
 		sp = (const unsigned char *)fp->Graphic->Surface->pixels +
 			y * fp->Height * fp->Graphic->Width - 1;
@@ -906,6 +894,7 @@ local void FontMeasureWidths(ColorFont* fp)
 		}
 
 	}
+	SDL_UnlockSurface(fp->Graphic->Surface);
 }
 #else
 /**
@@ -967,20 +956,21 @@ local void MakeFontBitmap(Graphic* g, int font)
 
 	FontBitmapWidths[font] = (g->Width + 7) / 8;
 
+	SDL_LockSurface(g->Surface);
 	for (n = 0; n < NumFontColors; ++n) {
 		if (FontBitmaps[font][n]) {
 			free(FontBitmaps[font][n]);
 		}
 		FontBitmaps[font][n] = (GLubyte*)malloc(FontBitmapWidths[font] * g->Height);
 
-		sp = (const unsigned char*)g->Frames;
+		sp = (const unsigned char*)g->Surface->pixels;
 		x = 0;
 		numfonts = g->Height / Fonts[font].Height;
 		for (k = 0; k < numfonts; ++k) {
 			for (i = 0; i<Fonts[font].Height; ++i) {
 				c = FontBitmaps[font][n] + k * Fonts[font].Height * FontBitmapWidths[font] +
 					(Fonts[font].Height - 1 - i) * FontBitmapWidths[font];
-				for (j=0; j < g->Width; ++j) {
+				for (j = 0; j < g->Width; ++j) {
 					if (*sp == n) {
 						x |= 0x1;
 					}
@@ -999,6 +989,7 @@ local void MakeFontBitmap(Graphic* g, int font)
 			}
 		}
 	}
+	SDL_UnlockSurface(g->Surface);
 }
 #endif
 
@@ -1016,9 +1007,6 @@ global void LoadFonts(void)
 	//
 	//  First select the font drawing procedure.
 	//
-#ifdef USE_OPENGL
-	VideoDrawChar = VideoDrawCharOpenGL;
-#else
 #ifndef USE_SDL_SURFACE
 	switch (VideoBpp) {
 		case 8:
@@ -1042,7 +1030,6 @@ global void LoadFonts(void)
 			DebugLevel0Fn("unsupported %d bpp\n" _C_ VideoBpp);
 			abort();
 	}
-#endif
 #endif
 
 	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {

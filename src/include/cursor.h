@@ -210,8 +210,13 @@ extern void CursorAnimate(unsigned ticks);
 	/// Save/load rectangle region from/to screen
 	/// Note: this is made extern for minimap only
 #ifdef USE_SDL_SURFACE
+#ifndef USE_OPENGL
 extern void SaveCursorRectangle(void *buffer, int x, int y, int w, int h);
 extern void LoadCursorRectangle(void *buffer, int x, int y, int w, int h);
+#else
+#define SaveCursorRectangle(buffer, x, y, w, h)
+#define LoadCursorRectangle(buffer, x, y, w, h)
+#endif
 #else
 extern void (*SaveCursorRectangle)(void *buffer, int x, int y, int w, int h);
 extern void (*LoadCursorRectangle)(void *buffer, int x, int y, int w, int h);
