@@ -645,8 +645,8 @@ global int NoWarningMissileType;		/// quiet ident lookup.
 
 #define MAX_MISSILES	1800		/// maximum number of missiles
 
-local int NumMissiles;			/// currently used missiles
 local Missile Missiles[MAX_MISSILES];	/// all missiles on map
+local int NumMissiles;			/// currently used missiles
 
     /// lookup table for missile names
 local hashtable(MissileType*,65) MissileTypeHash;
@@ -685,52 +685,8 @@ global void LoadMissileSprites(void)
 	    MissileTypes[i].Sprite->NumFrames=MissileTypes[i].Frames;
 	}
     }
+#ifndef USE_CCL
     NumMissileTypes=i;
-
-    //
-    //	Add missile names to hash table
-    //
-    for( i=0; i<NumMissileTypes; ++i ) {
-	*(MissileType**)hash_add(MissileTypeHash,MissileTypes[i].Ident)
-		=&MissileTypes[i];
-    }
-
-    //
-    //	Resolve impact missiles and sounds.
-    //
-    for( i=0; i<NumMissileTypes; ++i ) {
-	if( MissileTypes[i].FiredSound.Name ) {
-	    MissileTypes[i].FiredSound.Sound
-		    =SoundIdForName(MissileTypes[i].FiredSound.Name);
-	}
-	if( MissileTypes[i].ImpactSound.Name ) {
-	    MissileTypes[i].ImpactSound.Sound
-		    =SoundIdForName(MissileTypes[i].ImpactSound.Name);
-	}
-	if( MissileTypes[i].ImpactName ) {
-	    MissileTypes[i].ImpactMissile
-		    =MissileTypeByIdent(MissileTypes[i].ImpactName);
-	}
-    }
-
-    MissileTypeSmallFire=MissileTypeByIdent("missile-small-fire");
-    MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
-    MissileTypeGreenCross=MissileTypeByIdent("missile-green-cross");
-    MissileTypeExplosion = MissileTypeByIdent("missile-explosion");
-
-#if 0
-    // FIXME: FIXME: FIXME: very dirty hacks
-    DebugCheck( MissileTypeSmallFire->Sprite->NumFrames!=6 );
-    MissileTypeSmallFire->Sprite->NumFrames=6;
-    DebugCheck( MissileTypeByIdent("missile-death-and-decay")
-		->Sprite->NumFrames!=8 );
-    MissileTypeByIdent("missile-death-and-decay")->Sprite->NumFrames=8;
-    DebugCheck( MissileTypeByIdent("missile-normal-spell")
-		->Sprite->NumFrames!=6 );
-    MissileTypeByIdent("missile-normal-spell")->Sprite->NumFrames=6;
-    DebugCheck( MissileTypeByIdent("missile-flame-shield")
-		->Sprite->NumFrames!=6 );
-    MissileTypeByIdent("missile-flame-shield")->Sprite->NumFrames=6;
 #endif
 }
 
@@ -743,12 +699,12 @@ global void LoadMissileSprites(void)
 */
 global MissileType* MissileTypeByIdent(const char* ident)
 {
-    MissileType* const* type;
+    MissileType* const* mtype;
 
-    type=(MissileType**)hash_find(MissileTypeHash,(char*)ident);
+    mtype=(MissileType**)hash_find(MissileTypeHash,(char*)ident);
 
-    if( type ) {
-	return *type;
+    if( mtype ) {
+	return *mtype;
     }
 
     IfDebug(
@@ -771,25 +727,25 @@ global MissileType* MissileTypeByIdent(const char* ident)
 */
 global MissileType* NewMissileTypeSlot(char* ident)
 {
-    MissileType* type;
+    MissileType* mtype;
     unsigned i;
 
     //
     //	Allocate new memory. (+2 for start end empty last entry.)
     //
-    type=calloc(NumMissileTypes+2,sizeof(MissileType));
-    if( !type ) {
+    mtype=calloc(NumMissileTypes+2,sizeof(MissileType));
+    if( !mtype ) {
 	fprintf(stderr,"Out of memory\n");
 	exit(-1);
     }
-    memcpy(type,MissileTypes,sizeof(MissileType)*NumMissileTypes);
+    memcpy(mtype,MissileTypes,sizeof(MissileType)*NumMissileTypes);
     if( MissileTypes ) {
 	free(MissileTypes);
     }
-    MissileTypes=type;
-    type=MissileTypes+NumMissileTypes++;
-    type->OType=MissileTypeType;
-    type->Ident=ident;
+    MissileTypes=mtype;
+    mtype=MissileTypes+NumMissileTypes++;
+    mtype->OType=MissileTypeType;
+    mtype->Ident=ident;
     //
     //	Rehash.
     //
@@ -797,13 +753,13 @@ global MissileType* NewMissileTypeSlot(char* ident)
 	*(MissileType**)hash_add(MissileTypeHash,MissileTypes[i].Ident)
 		=&MissileTypes[i];
     }
-    return type;
+    return mtype;
 }
 
 /**
 **	Create a new missile at (x,y).
 **
-**	@param type	Type pointer of missile.
+**	@param mtype	Type pointer of missile.
 **	@param sx	Missile x start point in pixel.
 **	@param sy	Missile y start point in pixel.
 **	@param dx	Missile x destination point in pixel.
@@ -814,12 +770,12 @@ global MissileType* NewMissileTypeSlot(char* ident)
 **	@todo
 **		Need a better memory management for missiles.
 */
-global Missile* MakeMissile(MissileType* type,int sx,int sy,int dx,int dy)
+global Missile* MakeMissile(MissileType* mtype,int sx,int sy,int dx,int dy)
 {
     Missile* missile;
 
     DebugLevel3Fn("type %d(%s) at %d,%d to %d,%d\n"
-	    ,type-MissileTypes,type->Ident,sx,sy,dx,dy);
+	    ,mtype-MissileTypes,mtype->Ident,sx,sy,dx,dy);
 
     //
     //	Find free slot, FIXME: see MakeUnit for better code
@@ -840,15 +796,15 @@ global Missile* MakeMissile(MissileType* type,int sx,int sy,int dx,int dy)
     missile=Missiles+NumMissiles++;
 
 found:
-    missile->X=sx-type->Width/2;
-    missile->Y=sy-type->Height/2;
-    missile->DX=dx-type->Width/2;
-    missile->DY=dy-type->Height/2;
-    missile->Type=type;
+    missile->X=sx-mtype->Width/2;
+    missile->Y=sy-mtype->Height/2;
+    missile->DX=dx-mtype->Width/2;
+    missile->DY=dy-mtype->Height/2;
+    missile->Type=mtype;
     missile->Frame=0;
     missile->State=0;
-    missile->Wait=type->Sleep;		// initial wait = sleep
-    missile->Delay=type->Delay;		// initial delay
+    missile->Wait=mtype->Sleep;		// initial wait = sleep
+    missile->Delay=mtype->Delay;		// initial delay
 
     missile->SourceUnit=NULL;
 
@@ -939,7 +895,8 @@ local int CalculateDamageStats(const UnitStats * attacker_stats,
     damage += piercing_damage + 1;	// round up
     damage /= 2;
     damage *= ((SyncRand() >> 15) & 1) + 1;
-    DebugLevel3Fn("Damage done %d\n", damage);
+    DebugLevel3Fn("\nDamage done [%d] %d %d ->%d\n",goal_stats->Armor,
+	    basic_damage,piercing_damage, damage);
 
     return damage;
 }
@@ -971,8 +928,6 @@ global void FireMissile(Unit* unit)
     int dy;
     Unit* goal;
     Missile* missile;
-
-    DebugLevel3Fn("\n");
 
     //
     //	Goal dead?
@@ -1125,13 +1080,13 @@ local int CheckMissileToBeDrawn(const Missile* missile)
 /**
 **	Draw missile.
 */
-global void DrawMissile(const MissileType* type,unsigned frame,int x,int y)
+global void DrawMissile(const MissileType* mtype,unsigned frame,int x,int y)
 {
     // FIXME: This is a hack for mirrored sprites
     if( frame&128 ) {
-	VideoDrawClipX(type->Sprite,frame&127,x,y);
+	VideoDrawClipX(mtype->Sprite,frame&127,x,y);
     } else {
-	VideoDrawClip(type->Sprite,frame,x,y);
+	VideoDrawClip(mtype->Sprite,frame,x,y);
     }
 }
 
@@ -1477,10 +1432,13 @@ global void MissileHit(Missile* missile)
 	//	NOTE: perhaps this should be come a property of the missile.
 	//
 	if( CanTarget(missile->SourceUnit->Type,goal->Type) ) {
-	    if( goal->X==x && goal->Y==y ) {
-		MissileHitsGoal(missile,goal,1);
-	    } else {
+	    // We are attacking the nearest field of the unit
+	    if( x<goal->X || y<goal->Y
+		    || x>=goal->X+goal->Type->TileWidth
+		    || y>=goal->Y+goal->Type->TileHeight ) {
 		MissileHitsGoal(missile,goal,2);
+	    } else {
+		MissileHitsGoal(missile,goal,1);
 	    }
 	}
     }
@@ -1492,7 +1450,7 @@ global void MissileHit(Missile* missile)
     y-=missile->Type->Range;
     for( i=missile->Type->Range*2; --i; ) {
 	for( n=missile->Type->Range*2; --n; ) {
-	    if( x>=0 && x<TheMap.Width && y>=0 && y<TheMap.Height ) {
+	    if( x+i>=0 && x+i<TheMap.Width && y+n>=0 && y+n<TheMap.Height ) {
 		if( i==0 && n==0 ) {
 		    MissileHitsWall(missile,x+i,y+n,1);
 		} else {
@@ -1794,7 +1752,7 @@ global int ViewPointDistanceToMissile(const Missile* missile)
 */
 global void SaveMissileTypes(FILE* file)
 {
-    MissileType* mt;
+    MissileType* mtype;
     char** sp;
     int i;
 
@@ -1816,34 +1774,34 @@ global void SaveMissileTypes(FILE* file)
     //
     //	Missile types
     //
-    for( mt=MissileTypes; mt<&MissileTypes[NumMissileTypes]; ++mt ) {
-	fprintf(file,"(define-missile-type '%s\n ",mt->Ident);
-	if( mt->File ) {
-	    fprintf(file," 'file \"%s\"",mt->File);
+    for( mtype=MissileTypes; mtype<&MissileTypes[NumMissileTypes]; ++mtype ) {
+	fprintf(file,"(define-missile-type '%s\n ",mtype->Ident);
+	if( mtype->File ) {
+	    fprintf(file," 'file \"%s\"",mtype->File);
 	}
-	fprintf(file," 'size '(%d %d)",mt->Width,mt->Height);
-	if( mt->Sprite ) {
-	    fprintf(file," 'frames %d",mt->Frames);
+	fprintf(file," 'size '(%d %d)",mtype->Width,mtype->Height);
+	if( mtype->Sprite ) {
+	    fprintf(file," 'frames %d",mtype->Frames);
 	}
 	fprintf(file,"\n ");
-	if( mt->FiredSound.Name ) {
-	    fprintf(file," 'fired-sound \"%s\"",mt->FiredSound.Name);
+	if( mtype->FiredSound.Name ) {
+	    fprintf(file," 'fired-sound \"%s\"",mtype->FiredSound.Name);
 	}
-	if( mt->ImpactSound.Name ) {
-	    fprintf(file," 'impact-sound \"%s\"",mt->ImpactSound.Name);
+	if( mtype->ImpactSound.Name ) {
+	    fprintf(file," 'impact-sound \"%s\"",mtype->ImpactSound.Name);
 	}
-	if( mt->FiredSound.Name || mt->ImpactSound.Name ) {
+	if( mtype->FiredSound.Name || mtype->ImpactSound.Name ) {
 	    fprintf(file,"\n ");
 	}
-	fprintf(file," 'class '%s",MissileClassNames[mt->Class]);
-	if( mt->Delay ) {
-	    fprintf(file," 'delay %d",mt->Delay);
+	fprintf(file," 'class '%s",MissileClassNames[mtype->Class]);
+	if( mtype->Delay ) {
+	    fprintf(file," 'delay %d",mtype->Delay);
 	}
-	fprintf(file," 'sleep %d",mt->Sleep);
-	fprintf(file," 'speed %d",mt->Speed);
-	fprintf(file," 'range %d",mt->Range);
-	if( mt->ImpactMissile ) {
-	    fprintf(file,"\n  'impact-missile '%s",mt->ImpactMissile->Ident);
+	fprintf(file," 'sleep %d",mtype->Sleep);
+	fprintf(file," 'speed %d",mtype->Speed);
+	fprintf(file," 'range %d",mtype->Range);
+	if( mtype->ImpactMissile ) {
+	    fprintf(file,"\n  'impact-missile '%s",mtype->ImpactMissile->Ident);
 	}
 	fprintf(file,")\n");
     }
@@ -1898,11 +1856,74 @@ global void SaveMissiles(FILE* file)
 }
 
 /**
+**	Initialize missile-types.
+*/
+global void InitMissileTypes(void)
+{
+    MissileType* mtype;
+
+    for( mtype=MissileTypes; mtype->OType; ++mtype ) {
+	//
+	//	Add missile names to hash table
+	//
+	*(MissileType**)hash_add(MissileTypeHash,mtype->Ident)=mtype;
+
+	//
+	//	Resolve impact missiles and sounds.
+	//
+	if( mtype->FiredSound.Name ) {
+	    mtype->FiredSound.Sound=SoundIdForName(mtype->FiredSound.Name);
+	}
+	if( mtype->ImpactSound.Name ) {
+	    mtype->ImpactSound.Sound=SoundIdForName(mtype->ImpactSound.Name);
+	}
+	if( mtype->ImpactName ) {
+	    mtype->ImpactMissile=MissileTypeByIdent(mtype->ImpactName);
+	}
+    }
+
+    MissileTypeSmallFire=MissileTypeByIdent("missile-small-fire");
+    MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
+    MissileTypeGreenCross=MissileTypeByIdent("missile-green-cross");
+    MissileTypeExplosion = MissileTypeByIdent("missile-explosion");
+
+#if 0
+    // FIXME: FIXME: FIXME: very dirty hacks
+    DebugCheck( MissileTypeSmallFire->Sprite->NumFrames!=6 );
+    MissileTypeSmallFire->Sprite->NumFrames=6;
+    DebugCheck( MissileTypeByIdent("missile-death-and-decay")
+		->Sprite->NumFrames!=8 );
+    MissileTypeByIdent("missile-death-and-decay")->Sprite->NumFrames=8;
+    DebugCheck( MissileTypeByIdent("missile-normal-spell")
+		->Sprite->NumFrames!=6 );
+    MissileTypeByIdent("missile-normal-spell")->Sprite->NumFrames=6;
+    DebugCheck( MissileTypeByIdent("missile-flame-shield")
+		->Sprite->NumFrames!=6 );
+    MissileTypeByIdent("missile-flame-shield")->Sprite->NumFrames=6;
+#endif
+}
+
+/**
 **	Clean up missile-types.
 */
 global void CleanMissileTypes(void)
 {
-    DebugLevel0Fn("FIXME: not written\n");
+    MissileType* mtype;
+
+    for( mtype=MissileTypes; mtype->OType; ++mtype ) {
+	hash_del(MissileTypeHash,mtype->Ident);
+
+	free(mtype->Ident);
+	free(mtype->File);
+	free(mtype->FiredSound.Name);
+	free(mtype->ImpactSound.Name);
+	free(mtype->ImpactName);
+
+	VideoSaveFree(mtype->Sprite);
+    }
+    free(MissileTypes);
+    MissileTypes=NULL;
+    NumMissileTypes=0;
 
     MissileTypeSmallFire=NULL;
     MissileTypeBigFire=NULL;
@@ -1910,13 +1931,19 @@ global void CleanMissileTypes(void)
     MissileTypeExplosion=NULL;
 }
 
+/**
+**	Initialize missiles.
+*/
+global void InitMissiles(void)
+{
+}
 
 /**
 **	Clean up missiles.
 */
 global void CleanMissiles(void)
 {
-    DebugLevel0Fn("FIXME: not written\n");
+    NumMissiles=0;
 }
 
 //@}
