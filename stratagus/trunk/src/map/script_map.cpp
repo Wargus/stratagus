@@ -60,11 +60,15 @@ local SCM CclSetFogOfWar(SCM flag)
 {
     int old;
 
-    old=TheMap.NoFogOfWar;
-    TheMap.NoFogOfWar=gh_scm2bool(flag);
+    old=!TheMap.NoFogOfWar;
+    TheMap.NoFogOfWar=!gh_scm2bool(flag);
 
-    return gh_int2scm(old);
+    return gh_bool2scm(old);
 }
+
+#if 1
+
+// FIXME: Should be removed
 
 /**
 **	Enable fog of war.
@@ -85,6 +89,8 @@ local SCM CclNoFogOfWar(void)
 
     return SCM_UNSPECIFIED;
 }
+
+#endif
 
 /**
 **	Enable display of terrain in minimap.
@@ -223,8 +229,12 @@ global void MapCclRegister(void)
 
     gh_new_procedure1_0("set-fog-of-war!",CclSetFogOfWar);
 
+#if 1
+    // FIXME: should be removed
+
     gh_new_procedure0_0("fog-of-war",CclFogOfWar);
     gh_new_procedure0_0("no-fog-of-war",CclNoFogOfWar);
+#endif
 
     gh_new_procedure0_0("minimap-terrain",CclMinimapTerrain);
     gh_new_procedure0_0("no-minimap-terrain",CclNoMinimapTerrain);
