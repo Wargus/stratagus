@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name menubuttons.c	-	The menu buttons. */
+/**@name menus.c	-	The menu buttons. */
 //
 //	(c) Copyright 1999-2001 by Andreas Arens
 //
