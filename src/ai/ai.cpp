@@ -49,6 +49,27 @@
 **
 **      @section API The AI API
 **
+**	@subsection aimanage Management calls
+**
+**	Manage the inititialse and cleanup of the AI players.
+**
+**	::AiInit(::Player)
+**
+**		Called for each player, to setup the AI structures
+**		Player::Aiin the player structure. It can use Player::AiNum to
+**		select different AI's.
+**
+**	::CleanAi(void)
+**
+**		Called to release all the memory for all AI structures.
+**		Must handle self which players contains AI structures.
+**
+**	::SaveAi(::FILE*)
+**
+**		Save the AI structures of all players to file.
+**		Must handle self which players contains AI structures.
+**
+**
 **	@subsection aipcall Periodic calls
 **
 **	This functions are called regular for all AI players.
@@ -61,6 +82,7 @@
 **	::AiEachSecond(::Player)
 **
 **		Called each second, to handle more CPU intensive things.
+**
 **
 **	@subsection aiecall Event call-backs
 **
@@ -312,7 +334,7 @@ local void AiCheckUnits(void)
 **
 **	@param file	Output file.
 */
-global void SaveAiTypesWcName(FILE* file)
+local void SaveAiTypesWcName(FILE* file)
 {
     char** cp;
     int i;
@@ -605,7 +627,7 @@ local void SaveAiTypes(FILE* file)
 **	@param plynr	Player number.
 **	@param ai	Player AI.
 */
-global void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
+local void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
 {
     SCM script;
     int i;
@@ -759,7 +781,7 @@ global void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
 **
 **	@param file	Output file.
 */
-global void SaveAiPlayers(FILE* file)
+local void SaveAiPlayers(FILE* file)
 {
     unsigned p;
 
@@ -845,8 +867,6 @@ global void AiInit(Player* player)
     pai->AiType=ait;
     pai->Script=ait->Script;
 
-    player->Ai=pai;
-
     pai->Collect[TimeCost]=0;
     pai->Collect[GoldCost]=50;
     pai->Collect[WoodCost]=50;
@@ -854,6 +874,8 @@ global void AiInit(Player* player)
     pai->Collect[OreCost]=0;
     pai->Collect[StoneCost]=0;
     pai->Collect[CoalCost]=0;
+
+    player->Ai=pai;
 }
 
 /**
