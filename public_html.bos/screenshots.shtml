@@ -1,0 +1,12 @@
+<!--#set var="title" value="Bos Development"-->
+<!--#include file="header.shtml" -->
+ 
+      <h2>Screenshots</h2>
+      <p> </p>
+      <center> <a href="images/screen01.png"><img
+ src="images/screen01s.png" width="320" height="240"> </a>&nbsp;&nbsp;&nbsp;
+      <a href="images/screen02.png"><img src="images/screen02s.png"
+ width="320" height="240"> </a></center>
+ 
+
+<!--#include file="footer.shtml" -->

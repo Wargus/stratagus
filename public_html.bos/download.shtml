@@ -1,0 +1,48 @@
+<!--#set var="title" value="Bos"-->
+<!--#include file="header.shtml" -->
+
+      <h2>Downloads</h2>
+
+The engine and the game are evolving a lot. Therefore, <em><font color="red">the game will work only 
+with the version of the Stratagus engine matching the release !</font></em>
+
+<h3>Release 1.1 (2004/7/4)</h3>
+This version of Invasion - Battle of Survival works with version 2.1 of the <a href="http://www.stratagus.org">Stratagus</a> engine. 
+The packages include a pre-compiled binary of the stratagus engine.
+
+<ul>
+<li>Linux: <a href="files/bos_1_1.tar.gz">bos_1_1.tar.gz</a></li>
+<li>Debian Linux: <a href="http://packages.debian.org/unstable/games/bos">bos</a> 
+      package in debian unstable by David Martínez Moreno.
+<li>Windows: <a href="files/BattleOfSurvival-1.1.exe">BattleOfSurvival-1.1.exe</a></li>
+</ul>
+
+<h3>Release 1.1 pre 1</h3>
+This version of Invasion - Battle of Survival works with version 2.1 of the Stratagus engine.
+
+<ul>
+<li>Linux: <a href="files/bos_1_1pre1.tgz">bos_1_1pre1.tgz</a>
+<li>Windows: <a href="files/BattleOfSurvival-1.1pre1.exe">BattleOfSurvival-1.1pre1.exe</a>
+</ul>
+
+<h3>Release 1.0</h3>
+The first version of <a
+ href="files/bos_1_0.tgz">Invasion
+- Battle of Survival</a> has been released. This version works with <a
+ href="http://sourceforge.net/project/showfiles.php?group_id=84903">release
+2.0 of the Stratagus engine</a>. The release includes only the data files, you'll need 
+to download the stratagus engine too.
+</p>
+
+<h2>Development version</h2>
+The game is still in development. You can get the latest version with <a href="http://subversion.tigris.org/">subversion</a>:
+ <pre>svn svn://bos.seul.org/svn/bos/data.bos/trunk data.bos</pre>
+<p>
+To start the game run :<br>
+ <pre>./stratagus -d path/to/data.bos</pre>
+
+Old development done before december 17th 2004 can be found in the 
+<a href="http://savannah.nongnu.org/cvs/?group=stratagus-bos">CVS repository</a>.
+
+
+<!--#include file="footer.shtml" -->

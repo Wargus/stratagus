@@ -1,0 +1,21 @@
+<!--#set var="title" value="Bos Development"-->
+<!--#include file="header.shtml" -->
+
+<h2>Before you start</h2>
+Before any development, feature request or bug report, 
+you should get and use the development version of the <a href="www.stratagus.org">Stratagus engine</a> 
+and of Bos. 
+
+The <a href="download.shtml">Download</a> section explains how to get the development version of Bos.
+
+<p>
+Before starting a new development, contact us to check if it fits in the game 
+and if nobody else is working on it.      
+
+<h2>New Features</h2>
+The design of the game happens on <a href="irc://sterling.freenode.net/bos">irc</a> and on the 
+<a href="http://bos.seul.org/wiki/pmwiki.php">Bos Wiki</a>. 
+Don't hesitate to add your comments and ideas.
+
+
+<!--#include file="footer.shtml" -->
