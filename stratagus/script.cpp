@@ -239,53 +239,6 @@ local SCM CclDecorationOnTop(void)
 }
 
 /**
-**	Enable display of sight range.
-*/
-local SCM CclShowSightRange(void)
-{
-    ShowSightRange=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable display of react range.
-*/
-local SCM CclShowReactRange(void)
-{
-    ShowReactRange=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable display of attack range.
-*/
-local SCM CclShowAttackRange(void)
-{
-    ShowAttackRange=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Set display of orders.
-**
-**	@param flag	True = turning display of orders on, false = off.
-**
-**	@return		The old state of display of orders.
-*/
-local SCM CclSetShowOrders(SCM flag)
-{
-    int old;
-
-    old=!ShowOrders;
-    ShowOrders=gh_scm2bool(flag);
-
-    return gh_bool2scm(old);
-}
-
-/**
 **	For debug increase mining speed.
 **
 **	@param speed	Speed factor of gold mining.
@@ -601,10 +554,6 @@ global void CclInit(void)
     init_subr_0("show-full",CclShowFull);
     init_subr_0("show-no-full",CclShowNoFull);
     init_subr_0("decoration-on-top",CclDecorationOnTop);
-    init_subr_0("show-sight-range",CclShowSightRange);
-    init_subr_0("show-react-range",CclShowReactRange);
-    init_subr_0("show-attack-range",CclShowAttackRange);
-    gh_new_procedure1_0("set-show-orders!",CclSetShowOrders);
 
     gh_new_procedure1_0("speed-mine",CclSpeedMine);
     gh_new_procedure1_0("speed-gold",CclSpeedGold);
