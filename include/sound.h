@@ -159,7 +159,7 @@ extern void InitSoundClient(void);
 extern void PlaySectionMusic(PlaySectionType section);
 
     /// Play a sample file
-extern void PlayFile(const char* name);
+extern void PlayFile(char* name);
     /// Play a music file
 extern void PlayMusic(const char* name);
     /// Stop music playing

@@ -347,31 +347,6 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
     return ri;
 }
 
-/*----------------------------------------------------------------------------
---	Channels and other internal variables
-----------------------------------------------------------------------------*/
-
-#define MaxChannels	16		/// How many channels are supported
-
-    /// Channels for sound effects and unit speach
-typedef struct _sound_channel_
-{
-    unsigned char	Command;	/// channel command
-    int			Point;		/// point into sample
-    Sample*		Sample;		/// sample to play
-    Origin		Source;		/// unit playing
-    unsigned char	Volume;		/// Volume of this channel
-    SoundId		Sound;		/// The sound currently played
-	/// stereo location of sound (-128 left, 0 center, 127 right)
-    signed char		Stereo;
-} SoundChannel;
-
-#define ChannelFree	0		/// channel is free
-#define ChannelPlay	3		/// channel is playing
-
-/*
-**	All possible sound channels.
-*/
 global SoundChannel Channels[MaxChannels];
 global int NextFreeChannel;
 
@@ -815,7 +790,13 @@ local Sample* LoadSample(const char* name)
     Sample* sample;
     char* buf;
 
-    buf = strdcat3(FreeCraftLibPath, "/sounds/", name);
+    // FIXME: find a better way to detect sound not in sound dir
+    if (strstr(name, "campaign")) {
+	buf = strdcat3(FreeCraftLibPath, "/", name);
+    } else {
+	buf = strdcat3(FreeCraftLibPath, "/sounds/", name);
+    }
+
     if ((sample = LoadWav(buf, PlayAudioLoadInMemory))) {
 	free(buf);
 	return sample;
