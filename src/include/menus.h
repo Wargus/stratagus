@@ -140,6 +140,17 @@ typedef struct _menuitem_ {
 	    void (*handler)(void);	/* for return key */
 	} vslider;
 	struct {
+	    unsigned cflags;
+	    unsigned int xsize;
+	    unsigned int ysize;
+	    void (*action)(struct _menuitem_ *, int);
+	    int defper;
+	    int percent;
+	    int curper;		/* used in mouse-move state */
+	    int cursel;		/* used in mouse-over state */
+	    void (*handler)(void);	/* for return key */
+	} hslider;
+	struct {
 	    void (*draw)(struct _menuitem_ *);
 	} drawfunc;
 	struct {
@@ -171,6 +182,7 @@ typedef struct _menuitem_ {
 #define MI_TYPE_DRAWFUNC 6
 #define MI_TYPE_INPUT 7
 #define MI_TYPE_GEM 8
+#define MI_TYPE_HSLIDER 9
 
     /// for MI_TYPE_TEXT
 #define MI_TFLAGS_CENTERED 1
