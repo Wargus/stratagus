@@ -205,7 +205,7 @@ void LoadUserInterface(void)
 	//
 	for (i = 0; i < TheUI.NumFillers; ++i) {
 		if (TheUI.Filler[i].File) {
-			TheUI.Filler[i].Graphic = LoadGraphic(TheUI.Filler[i].File);
+			TheUI.Filler[i].Graphic = LoadSprite(TheUI.Filler[i].File, 0, 0);
 		}
 	}
 
@@ -219,14 +219,14 @@ void LoadUserInterface(void)
 	}
 
 	if (TheUI.InfoPanel.File) {
-		TheUI.InfoPanel.Graphic = LoadGraphic(TheUI.InfoPanel.File);
+		TheUI.InfoPanel.Graphic = LoadSprite(TheUI.InfoPanel.File, 0, 0);
 	}
 	if (TheUI.ButtonPanel.File) {
-		TheUI.ButtonPanel.Graphic = LoadGraphic(TheUI.ButtonPanel.File);
+		TheUI.ButtonPanel.Graphic = LoadSprite(TheUI.ButtonPanel.File, 0, 0);
 	}
 	if (TheUI.PieMenuBackground.File) {
 		TheUI.PieMenuBackground.Graphic =
-			LoadGraphic(TheUI.PieMenuBackground.File);
+			LoadSprite(TheUI.PieMenuBackground.File, 0, 0);
 	}
 
 	//
@@ -252,7 +252,7 @@ void LoadUserInterface(void)
 	menupanel = TheUI.MenuPanels;
 	while (menupanel) {
 		if (menupanel->Panel.File) {
-			menupanel->Panel.Graphic = LoadGraphic(menupanel->Panel.File);
+			menupanel->Panel.Graphic = LoadSprite(menupanel->Panel.File, 0, 0);
 		}
 		menupanel = menupanel->Next;
 	}

@@ -43,12 +43,18 @@
 #include "map.h"
 #include "player.h"
 #include "intern_video.h"
+#include "util.h"
+#include "iocompat.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 PaletteLink* PaletteList;        /// List of all used palettes.
+
+static hashtable(Graphic*, 4099) GraphicHash;/// lookup table for graphic data
+
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -232,29 +238,85 @@ void VideoFree(Graphic* graphic)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Make a graphic object.
+**  Make a new graphic object.
 **
-**  @param surface FIXME:Docu
+**  @param name  Filename
+**  @param w     Width of a frame (optional)
+**  @param h     Height of a frame (optional)
 **
-**  @todo docu
-**  @return        New graphic object (malloced).
+**  @return      New graphic object (malloced).
 */
-Graphic* MakeGraphic(SDL_Surface* surface)
+Graphic* NewGraphic(const char* file, int w, int h)
 {
 	Graphic* graphic;
+	Graphic** g;
+	char name[PATH_MAX];
+	char buf[PATH_MAX];
 
-	graphic = calloc(1, sizeof(Graphic));
-	if (!graphic) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
+	g = (Graphic**)hash_find(GraphicHash, file);
+	if (!g || !*g) {
+		graphic = calloc(1, sizeof(Graphic));
+		if (!graphic) {
+			fprintf(stderr, "Out of memory\n");
+			ExitFatal(-1);
+		}
+		strcat(strcpy(name, "graphics/"), file);
+		LibraryFileName(name, buf);
+		graphic->File = strdup(buf);
+		graphic->Width = w;
+		graphic->Height = h;
+		graphic->NumFrames = 1;
+		*(Graphic**)hash_add(GraphicHash, file) = graphic;
+	} else {
+		graphic = *g;
+		Assert(graphic->Width == w && graphic->Height == h);
 	}
 
-	graphic->Surface = surface;
-	graphic->GraphicWidth = surface->w;
-	graphic->GraphicHeight = surface->h;
-	graphic->NumFrames = 1;
-
 	return graphic;
+}
+
+/**
+**  Load a graphic
+**
+**  @param graphic  Graphic object to load
+*/
+void LoadGraphic(Graphic* g)
+{
+	if (g->Surface) {
+		return;
+	}
+
+	// TODO: More formats?
+	if (LoadGraphicPNG(g) == -1) {
+		fprintf(stderr, "Can't load the graphic `%s'\n", g->File);
+		ExitFatal(-1);
+	}
+	if (g->Surface->format->BytesPerPixel == 1) {
+		VideoPaletteListAdd(g->Surface);
+	}
+
+	if (!g->Width) {
+		g->Width = g->GraphicWidth;
+	}
+	if (!g->Height) {
+		g->Height = g->GraphicHeight;
+	}
+
+	Assert(g->Width <= g->GraphicWidth && g->Height <= g->GraphicHeight);
+
+	if ((g->GraphicWidth / g->Width) * g->Width != g->GraphicWidth ||
+			(g->GraphicHeight / g->Height) * g->Height != g->GraphicHeight) {
+		fprintf(stderr, "Invalid graphic (width, height) %s\n", g->File);
+		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
+			g->Width, g->Height, g->GraphicWidth, g->GraphicHeight);
+		ExitFatal(1);
+	}
+
+	g->NumFrames = g->GraphicWidth / g->Width * g->GraphicHeight / g->Height;
+
+#ifdef USE_OPENGL
+	MakeTexture(g);
+#endif
 }
 
 /**

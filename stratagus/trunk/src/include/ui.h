@@ -66,10 +66,7 @@ typedef enum _text_alignment_ {
 } TextAlignment;
 
 typedef struct _button_style_properties_ {
-	char* File;
 	Graphic* Sprite;
-	int Width;
-	int Height;
 	int Frame;
 	SDL_Color BorderColorRGB;
 	Uint32 BorderColor;

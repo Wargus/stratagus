@@ -45,6 +45,7 @@
 #endif
 
 typedef struct _graphic_ {
+	char* File;                ///< Filename
 	SDL_Surface* Surface;      ///< Surface
 #ifndef USE_OPENGL
 	SDL_Surface* SurfaceFlip;  ///< Flipped surface
@@ -224,7 +225,7 @@ extern void InitVideo(void);
 extern void ResizeGraphic(Graphic* g, int w, int h);
 
 	/// Load graphic from PNG file
-extern Graphic* LoadGraphicPNG(const char* name);
+extern int LoadGraphicPNG(Graphic* g);
 
 #ifdef USE_MNG
 	/// Load a MNG file
@@ -243,7 +244,9 @@ extern void MakePlayerColorTexture(Graphic* graphic, int player);
 #endif
 
 	/// Load graphic
-#define LoadGraphic(file) LoadSprite(file, 0, 0)
+extern void LoadGraphic(Graphic* g);
+
+#define GraphicLoaded(g) (g)->Surface
 
 	/// Flip graphic and store in graphic->SurfaceFlip
 extern void FlipGraphic(Graphic* graphic);
@@ -255,7 +258,7 @@ extern void SetVideoSync(void);
 extern void VideoClearScreen(void);
 
 	/// Make graphic
-extern Graphic* MakeGraphic(SDL_Surface* surface);
+extern Graphic* NewGraphic(const char* file, int w, int h);
 
 	/// Load a picture and display it on the screen (full screen),
 	/// changing the colormap and so on..
