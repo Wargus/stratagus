@@ -1882,7 +1882,7 @@ static int CclDefinePanelContents(lua_State* l)
 										} else if (!strcmp(key, "Variable")) {
 											content->Data.SimpleText.Index = GetVariableIndex(LuaToString(l, -1));
 											if (content->Data.SimpleText.Index == -1) {
-												LuaError(l, "unknow variable '%s'" _C_ LuaToString(l, -1));
+												LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 											}
 										} else if (!strcmp(key, "Component")) {
 											content->Data.SimpleText.Component = Str2EnumVariable(l, LuaToString(l, -1));
@@ -1910,7 +1910,7 @@ static int CclDefinePanelContents(lua_State* l)
 									} else if (!strcmp(key, "Variable")) {
 										content->Data.FormatedText.Index = GetVariableIndex(LuaToString(l, -1));
 										if (content->Data.FormatedText.Index == -1) {
-											LuaError(l, "unknow variable '%s'" _C_ LuaToString(l, -1));
+											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Component")) {
 										content->Data.FormatedText.Component = Str2EnumVariable(l, LuaToString(l, -1));
@@ -1937,7 +1937,7 @@ static int CclDefinePanelContents(lua_State* l)
 										content->Data.FormatedText2.Index1 = GetVariableIndex(LuaToString(l, -1));
 										content->Data.FormatedText2.Index2 = GetVariableIndex(LuaToString(l, -1));
 										if (content->Data.FormatedText2.Index1 == -1) {
-											LuaError(l, "unknow variable '%s'" _C_ LuaToString(l, -1));
+											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Component")) {
 										content->Data.FormatedText2.Component1 = Str2EnumVariable(l, LuaToString(l, -1));
@@ -1945,14 +1945,14 @@ static int CclDefinePanelContents(lua_State* l)
 									} else if (!strcmp(key, "Variable1")) {
 										content->Data.FormatedText2.Index1 = GetVariableIndex(LuaToString(l, -1));
 										if (content->Data.FormatedText2.Index1 == -1) {
-											LuaError(l, "unknow variable '%s'" _C_ LuaToString(l, -1));
+											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Component1")) {
 										content->Data.FormatedText2.Component1 = Str2EnumVariable(l, LuaToString(l, -1));
 									} else if (!strcmp(key, "Variable2")) {
 										content->Data.FormatedText2.Index2 = GetVariableIndex(LuaToString(l, -1));
 										if (content->Data.FormatedText2.Index2 == -1) {
-											LuaError(l, "unknow variable '%s'" _C_ LuaToString(l, -1));
+											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Component2")) {
 										content->Data.FormatedText2.Component2 = Str2EnumVariable(l, LuaToString(l, -1));
@@ -1981,7 +1981,7 @@ static int CclDefinePanelContents(lua_State* l)
 									if (!strcmp(key, "Variable")) {
 										content->Data.LifeBar.Index = GetVariableIndex(LuaToString(l, -1));
 										if (content->Data.LifeBar.Index == -1) {
-											LuaError(l, "unknow variable '%s'" _C_ LuaToString(l, -1));
+											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Height")) {
 										content->Data.LifeBar.Height = LuaToNumber(l, -1);
@@ -2009,7 +2009,7 @@ static int CclDefinePanelContents(lua_State* l)
 									if (!strcmp(key, "Variable")) {
 										content->Data.CompleteBar.Index = GetVariableIndex(LuaToString(l, -1));
 										if (content->Data.CompleteBar.Index == -1) {
-											LuaError(l, "unknow variable '%s'" _C_ LuaToString(l, -1));
+											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Height")) {
 										content->Data.CompleteBar.Height = LuaToNumber(l, -1);
