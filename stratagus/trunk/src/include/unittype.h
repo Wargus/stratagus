@@ -597,9 +597,6 @@ typedef struct _new_animation_ {
 			int Rotate;
 		} Rotate;
 		struct {
-			int Rotate;
-		} RandomRotate;
-		struct {
 			int Move;
 		} Move;
 		struct {
