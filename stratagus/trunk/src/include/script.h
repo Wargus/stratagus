@@ -10,7 +10,7 @@
 //
 /**@name ccl.h		-	The clone configuration language headerfile. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,11 +33,17 @@
 
 //@{
 
+#if !defined(USE_GUILE) && !defined(USE_SIOD) && !defined(USE_LUA)
+#define USE_SIOD
+#endif
+
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_GUILE
+#if defined(USE_GUILE)
+
+
 #  include <guile/gh.h>
 #  define get_c_string(lisp)     CclConvertToString(lisp)
 #  define try_get_c_string(lisp) CclConvertToString(lisp)
@@ -68,7 +74,10 @@ extern int siod_verbose_level;
 struct gen_printio* f;
 typedef scm_t_bits ccl_smob_type_t;
 
-#else
+
+#elif defined(USE_SIOD)
+
+
 #  include <string.h>
 #  include "siod.h"
 #  include "siodp.h"
@@ -146,7 +155,21 @@ extern LISP fast_load(LISP lfname,LISP noeval);
 extern LISP sym_t;
 typedef long ccl_smob_type_t;
 
-#endif // !USE_GUILE
+
+#elif defined(USE_LUA)
+
+
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
+
+extern lua_State* Lua;
+
+extern int LuaLoadFile(const char* file);
+
+
+#endif // USE_LUA
+
 
 #include "iolib.h"
 
@@ -163,6 +186,7 @@ extern int CclInConfigFile;		/// True while config file parsing
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 extern char*           CclConvertToString(SCM scm);
 extern ccl_smob_type_t CclMakeSmobType(const char* name);
 extern SCM             CclMakeSmobObj(ccl_smob_type_t tag, void* ptr);
@@ -172,6 +196,8 @@ extern ccl_smob_type_t CclGetSmobType(SCM smob);
 extern void CclGcProtect(SCM* obj);	/// Protect scm var for GC
 extern void CclGcUnprotect(SCM* obj);	/// Unprotect scm var for GC
 extern void CclGcProtectedAssign(SCM* obj, SCM value); /// Alter garbage protected scm var.
+#elif defined(USE_LUA)
+#endif
 extern void CclGarbageCollect(int fast);/// Perform garbage collection
 extern void CclFlushOutput();		/// Flush ccl output
 extern void InitCcl(void);		/// Initialise ccl
