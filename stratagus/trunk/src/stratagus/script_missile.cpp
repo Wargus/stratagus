@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_missile.c	-	The missile-type ccl functions. */
+/**@name ccl_missile.c - The missile-type ccl functions. */
 //
 //      (c) Copyright 2002-2003 by Lutz Sammer
 //
@@ -172,16 +172,15 @@ local int CclDefineMissileType(lua_State* l)
 	char* str;
 	MissileType* mtype;
 	unsigned i;
-	int args;
-	int j;
 
-	args = lua_gettop(l);
-	j = 0;
+	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	}
 
 	// Slot identifier
 
-	str = strdup(LuaToString(l, j + 1));
-	++j;
+	str = strdup(LuaToString(l, 1));
 #ifdef DEBUG
 	i = NoWarningMissileType;
 	NoWarningMissileType = 1;
@@ -200,38 +199,39 @@ local int CclDefineMissileType(lua_State* l)
 	mtype->NumDirections = 1;
 	// Ensure we don't divide by zero.
 	mtype->SplashFactor = 100;
+
 	//
-	// Parse the arguments, already the new tagged format.
+	// Parse the arguments
 	//
-	for (; j < args; ++j) {
-		value = LuaToString(l, j + 1);
-		++j;
-		if (!strcmp(value, "file")) {
+	lua_pushnil(l);
+	while (lua_next(l, 2)) {
+		value = LuaToString(l, -2);
+		if (!strcmp(value, "File")) {
 			free(mtype->File);
-			mtype->File = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "size")) {
-			if (!lua_istable(l, j + 1)) {
+			mtype->File = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "Size")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
-			lua_rawgeti(l, j + 1, 1);
+			lua_rawgeti(l, -1, 1);
 			mtype->Width = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
+			lua_rawgeti(l, -1, 2);
 			mtype->Height = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value,"frames")) {
-			mtype->SpriteFrames = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "num-directions")) {
-			mtype->NumDirections = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "fired-sound")) {
+		} else if (!strcmp(value, "Frames")) {
+			mtype->SpriteFrames = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "NumDirections")) {
+			mtype->NumDirections = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "FiredSound")) {
 			free(mtype->FiredSound.Name);
-			mtype->FiredSound.Name = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "impact-sound")) {
+			mtype->FiredSound.Name = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "ImpactSound")) {
 			free(mtype->ImpactSound.Name);
-			mtype->ImpactSound.Name = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "class")) {
-			value = LuaToString(l, j + 1);
+			mtype->ImpactSound.Name = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "Class")) {
+			value = LuaToString(l, -1);
 			for (i = 0; MissileClassNames[i]; ++i) {
 				if (!strcmp(value, MissileClassNames[i])) {
 					mtype->Class = i;
@@ -239,39 +239,38 @@ local int CclDefineMissileType(lua_State* l)
 				}
 			}
 			if (!MissileClassNames[i]) {
-				// FIXME: this leaves a half initialized missile-type
 				lua_pushfstring(l, "Unsupported class: %s", value);
 				lua_error(l);
 			}
-		} else if (!strcmp(value, "num-bounces")) {
-			mtype->NumBounces = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "delay")) {
-			mtype->StartDelay = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "sleep")) {
-			mtype->Sleep = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "speed")) {
-			mtype->Speed = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "draw-level")) {
-			mtype->DrawLevel = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "range")) {
-			mtype->Range = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "impact-missile")) {
+		} else if (!strcmp(value, "NumBounces")) {
+			mtype->NumBounces = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Delay")) {
+			mtype->StartDelay = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Sleep")) {
+			mtype->Sleep = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Speed")) {
+			mtype->Speed = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "DrawLevel")) {
+			mtype->DrawLevel = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Range")) {
+			mtype->Range = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ImpactMissile")) {
 			free(mtype->ImpactName);
-			mtype->ImpactName = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "smoke-missile")) {
+			mtype->ImpactName = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "SmokeMissile")) {
 			free(mtype->ImpactName);
-			mtype->SmokeName = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "can-hit-owner")) {
-			mtype->CanHitOwner = 1;
-		} else if (!strcmp(value, "friendly-fire")) {
-			mtype->FriendlyFire = 1;
-		} else if (!strcmp(value, "splash-factor")) {
-			mtype->SplashFactor = LuaToNumber(l, j + 1);
+			mtype->SmokeName = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "CanHitOwner")) {
+			mtype->CanHitOwner = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "FriendlyFire")) {
+			mtype->FriendlyFire = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "SplashFactor")) {
+			mtype->SplashFactor = LuaToNumber(l, -1);
 		} else {
-			// FIXME: this leaves a half initialized missile-type
 			lua_pushfstring(l, "Unsupported tag: %s", value);
 			lua_error(l);
 		}
+		lua_pop(l, 1);
 	}
 
 	return 0;
