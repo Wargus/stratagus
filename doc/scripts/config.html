@@ -43,13 +43,10 @@
 <a href="ccl-index.html">Index</a> 
 <hr>
 <a href="#a-star">a-star</a>
-<a href="#a-star-fixed-unit-cost">a-star-fixed-unit-cost</a>
-<a href="#a-star-moving-unit-cost">a-star-moving-unit-cost</a>
 <a href="#alpha-fog-of-war">alpha-fog-of-war</a>
 <a href="#decoration-on-top">decoration-on-top</a>
 <a href="#health-sprite">health-sprite</a>
 <a href="#mana-sprite">mana-sprite</a>
-<a href="#no-a-star">no-a-star</a>
 <a href="#original-fog-of-war">original-fog-of-war</a>
 <a href="#reveal-map">reveal-map</a>
 <a href="#right-button-attacks">right-button-attacks</a>
@@ -130,77 +127,36 @@ General configurations.
 
 <h4>Description</h4>
 
-.
+Configures the A-star pathfinder to be on or off.  Also sets variables about the pathfinder.
+What the movement cost for unseen terrian is and whether units are aware of what's under unseen terrain.
+Items can be turned on and off to give desired behaviour, however dont_know_unseen_terrain will increase
+the amount the pathfinder is used at the start of a game while the map is being discovered.  If you need
+the performance, turn it off.
 
+The Cost of a move it 1 if moving straight, or 2 if moving diagonal.
 <h4>Syntax</h4>
 
-<code>(a-star)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (a-star)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
-
-<a name="a-star-fixed-unit-cost"></a>
-<h3>a-star-fixed-unit-cost</h3>
-
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(a-star-fixed-unit-cost cost)</code>
+<code>(a-star on fixed_unit_cost moving_unit_cost unseen_terrain unseen_terrain_cost)</code>
 
 <dl>
-<dt>cost</dt>
-<dd>.
-</dd>
-</dl>
+<dt>on</dt>
+<dd>Whether A-Star is on or off &lt;'on|'off&gt;</dd>
+<dt>fixed_unit_cost</dt>
+<dd>cost to move over a unit that is standing still.</dd>
+<dt>moving_unit_cost</dt>
+<dd>cost to move over a unit that is moving to somewhere.</dd>
+<dt>unseen_terrain</dt>
+<dd>Whether the pathfinder treats unknown terrain as visible when calculating paths or not. &lt;'dont-know-unseen-terrain|'know-unseen-terrain&gt;</dd>
+<dt>unseen_terrain_cost</dt>
+<dd>Extra cost to move on unseen terrain, makes units tend towards know areas when finding paths.</dd>
+<dd></dd>
+
 
 <h4>Example</h4>
 
 <pre>
-    (a-star-fixed-unit-cost)
+    (a-star 'on 'fixed-unit-cost 1000 'moving-unit-cost 2 'dont-know-unseen-terrain 'unseen-terrain-cost 100)
 </pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
-
-<a name="a-star-moving-unit-cost"></a>
-<h3>a-star-moving-unit-cost</h3>
-
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(a-star-moving-unit-cost cost)</code>
-
-<dl>
-<dt>cost</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (a-star-moving-unit-cost)
-</pre>
-
-<p>.
 
 <h4>Used</h4>
 
@@ -319,29 +275,6 @@ Show bars and dots always on top. (Planned feature)
 
 <pre>
     (mana-sprite graphics/ui/mana2.png" 0 -1 31 4)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
-
-<a name="no-a-star"></a>
-<h3>no-a-star</h3>
-
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(no-a-star)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (no-a-star)
 </pre>
 
 <p>.

@@ -148,35 +148,17 @@ global unsigned char* MakeMatrix(void)
 **	@param h	Height of target area
 **	@param matrix	Target area marked in matrix
 */
-local void MarkPlaceInMatrix(int x,int y,int w,int h,unsigned char* matrix)
+local void MarkPlaceInMatrix(int x1,int y1,int x2,int y2,unsigned char* matrix)
 {
-    int xi;
-    int xe;
+    int x;
+    int y;
     int mw;
-
-    if( x<0 ) {				// reduce to map limits
-	w-=x;
-	x=0;
-    }
-    if( x+w>TheMap.Width ) {
-	w=TheMap.Width-x;
-    }
-    if( y<0 ) {
-	h-=y;
-	y=0;
-    }
-    if( y+h>TheMap.Height ) {
-	h=TheMap.Height-y;
-    }
-
-    DebugCheck( h==0 || w==0 );		// atleast one tile should be there!
 
     mw=TheMap.Width+2;
     matrix+=mw+mw+2;
-    xe=x+w;
-    while( h-- ) {			// mark the rectangle
-	for( xi=x; xi<xe; ++xi ) {
-	    matrix[xi+y*mw]=88;
+    for( y=y1; y<=y2; y++) {
+	for( x=x1; x<=x2; ++x ) {
+	    matrix[x+y*mw]=88;
 	}
 	++y;
     }
@@ -341,21 +323,66 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 **
 **	@return		Distance to place.
 */
-global int PlaceReachable(const Unit* src,int x,int y,int range)
+global int PlaceReachable(Unit* src,int x,int y,int range)
 {
-    unsigned char* matrix;
     int depth;
+    int x1;
+    int x2;
+    int y1;
+    int y2;
+    int reachable;
+    unsigned char* matrix;
 
     DebugLevel3Fn("%p -> %d,%d\n" _C_ src _C_ x _C_ y);
 
     //
-    //	Setup movement.
+    //	Find a path to the place.
     //
-    matrix=CreateMatrix();
-    MarkPlaceInMatrix(x,y,range,range,matrix);
+    x1 = x;
+    if( x1 < 0 ) {
+	x1 = 0;
+    }
+    x2 = x + range;
+    if( x2 > TheMap.Width ) {
+	x2 = TheMap.Width;
+    }
+    y1 = y;
+    if( y1 < 0 ) {
+	y1 = 0;
+    }
+    y2 = y+range;
+    if( y2 > TheMap.Height ) {
+    	y2 = TheMap.Height;
+    }
+    // Find a reachable target, otherwise, don't search
+    reachable=0;
+    for( x=x1;x<=x2;x++ ) {
+	if( CheckedCanMoveToMask(x,y1,UnitMovementMask(src)) ||
+	    CheckedCanMoveToMask(x,y2,UnitMovementMask(src)) ) {
+	    reachable=1;
+	}
+    }
+    for( y=y1;y<y2;y++ ) {
+	if( CheckedCanMoveToMask(x1,y,UnitMovementMask(src)) ||
+	    CheckedCanMoveToMask(x2,y,UnitMovementMask(src)) ) {
+	    reachable=1;
+	}
+    }
+
+    if( !reachable ) {
+	DebugLevel3("Can't move to destination\n");
+	return 0;
+    }
 
     //
-    //	Find a path to the place.
+    //  Setup movement.
+    //
+    range++; // Mark Place doesn't like 0 range.
+    matrix=CreateMatrix();
+    MarkPlaceInMatrix(x1,y1,x2,y2,matrix);
+
+    //
+    //  Find a path to the place.
     //
     if( (depth=MarkPathInMatrix(src,matrix)) < 0 ) {
 	DebugLevel3("Can't move to destination\n");
@@ -363,6 +390,7 @@ global int PlaceReachable(const Unit* src,int x,int y,int range)
     }
 
     return depth;
+								
 }
 
 /**
@@ -374,25 +402,21 @@ global int PlaceReachable(const Unit* src,int x,int y,int range)
 **
 **	@return		Distance to place.
 */
-global int UnitReachable(const Unit* src,const Unit* dst,int range)
+global int UnitReachable(Unit* src,const Unit* dst,int range)
 {
-    unsigned char* matrix;
     int depth;
+    int realrange;
 
     DebugLevel3Fn("%d(%d,%d,%s)->%d(%d,%d,%s)+%d "
 	_C_ UnitNumber(src) _C_ src->X _C_ src->Y _C_ src->Type->Ident
 	_C_ UnitNumber(dst) _C_ dst->X _C_ dst->Y _C_ dst->Type->Ident _C_ range);
 
     //
-    //	Setup movement.
-    //
-    matrix=CreateMatrix();
-    MarkGoalInMatrix(dst,range,matrix);
-
-    //
     //	Find a path to the goal.
     //
-    if( (depth=MarkPathInMatrix(src,matrix))<0 ) {
+    realrange = range + range + max(dst->Type->TileHeight,dst->Type->TileWidth);
+    depth=PlaceReachable(src,dst->X-range,dst->Y-range,realrange);
+    if( depth <= 0 ) {
 	DebugLevel3("NO WAY\n");
 	return 0;
     }
@@ -420,8 +444,7 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
-local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
-	,int *xdp,int* ydp)
+local int FastNewPath(Unit* unit,int x1,int y1,int x2,int y2)
 {
     int x;
     int y;
@@ -430,8 +453,7 @@ local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
     const UnitType* type;
     int mask;
     int steps;
-    int add;
-
+	
     //
     //	Fast check if the way is blocked in sight.
     //
@@ -441,35 +463,24 @@ local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
 
     x=unit->X;
     y=unit->Y;
-    xd=gx+ox/2;				// Center of goal
-    yd=gy+oy/2;
-
-#ifdef NEW_SHIPS
-    if( type->UnitType==UnitTypeLand ) {
-	add=1;
-    } else {
-	add=2;
-    }
-#else
-    add=1;
-#endif
+    xd=(x1+x2)/2;				// Center of goal
+    yd=(y1+y2)/2;
 
 
     // FIXME: johns: has anybody an idea how to write this faster?
     xd-=x;
-    if( xd<0 ) xd=-add; else if( xd>0 ) xd=add;
-    *xdp=xd;
     yd-=y;
-    if( yd<0 ) yd=-add; else if( yd>0 ) yd=add;
-    *ydp=yd;
-    DebugLevel3Fn("%d,%d\n" _C_ xd _C_ yd);
+    if( xd<0 ) xd=-1; else if( xd>0 ) xd=1;
+    if( yd<0 ) yd=-1; else if( yd>0 ) yd=1;
+    unit->Data.Move.Path[0]=XY2Heading[xd+1][yd+1];
+    unit->Data.Move.Length=1;
 
-    while( (steps-=add)>0 ) {
+    while( (steps-=1)>0 ) {
 	x+=xd;
 	y+=yd;
 
 	DebugLevel3Fn("Unit %d,%d Goal %d,%d - %d,%d\n"
-		_C_ x _C_ y _C_ gx _C_ gy _C_ gx+ox _C_ gy+oy);
+		_C_ x _C_ y _C_ x1 _C_ y1 _C_ x2 _C_ y2);
 	DebugLevel3Fn("Check %d,%d=%x\n" _C_ x _C_ y _C_ mask);
 
 	//
@@ -484,7 +495,7 @@ local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
 	//
 	//	Check if goal is reached
 	//
-	if( x>=gx && x<gx+ox && y>=gy && y<gy+oy ) {
+	if( x>=x1 && x<=x2 && y>=y1 && y<=y2 ) {
 	    DebugLevel3Fn("Goal in sight\n");
 	    return unit->Stats->SightRange-steps;
 	}
@@ -495,13 +506,13 @@ local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
 	//
 	mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
 
-	xd=gx+ox/2;			// Center of goal
-	yd=gy+oy/2;
+	xd=(x1+x2)/2;			// Center of goal
+	yd=(y1+y2)/2;
 
 	xd-=x;
-	if( xd<0 ) xd=-add; else if( xd>0 ) xd=add;
+	if( xd<0 ) xd=-1; else if( xd>0 ) xd=1;
 	yd-=y;
-	if( yd<0 ) yd=-add; else if( yd>0 ) yd=add;
+	if( yd<0 ) yd=-1; else if( yd>0 ) yd=1;
     }
     DebugLevel3Fn("Nothing in sight range\n");
 
@@ -526,11 +537,16 @@ local void PathTraceBack(const unsigned char* matrix,int add,int x,int y
     const unsigned char* m;
     int d;
     int n;
+    int startdepth;
 
     w=TheMap.Width+2;
     m=matrix+x+y*w;			// End of path in matrix.
     w*=add;
     w2=w+w;
+    startdepth=depth;
+    if( startdepth > MAX_PATH_LENGTH ) {
+	startdepth = MAX_PATH_LENGTH;
+    }
 
     //
     //	Find the way back, nodes are numbered ascending.
@@ -579,8 +595,10 @@ local void PathTraceBack(const unsigned char* matrix,int add,int x,int y
 	  }
 	}
 	// found: continue
-	if( depth<MAX_PATH_LENGTH ) {
-	    path[depth]=d;
+	// Mart path if it's needed
+	// 
+	if( depth<MAX_PATH_LENGTH && path != NULL) {
+	    path[startdepth-depth-1]=d;
 	}
     }
 }
@@ -599,12 +617,8 @@ local void PathTraceBack(const unsigned char* matrix,int add,int x,int y
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
-local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
+local int ComplexNewPath(Unit* unit,int x1,int y1,int x2,int y2,char* path)
 {
-    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1,
-	     0,-2,+2, 0, -2,+2,-2,+2 };
-    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1,
-	    -2, 0, 0,+2, -2,-2,+2,+2 };
     unsigned char* matrix;
     unsigned char* m;
     unsigned short* points;
@@ -635,7 +649,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
     DebugLevel3Fn("%s(%d) to %d=%d,%d+%d+%d\n"
 	    _C_ unit->Type->Ident _C_ UnitNumber(unit)
 	    _C_ unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : 0
-	    _C_ gx _C_ gy _C_ ox _C_ oy);
+	    _C_ x1 _C_ y1 _C_ x2 _C_ y2);
 
     size=TheMap.Width*TheMap.Height;
     points=malloc(size);
@@ -655,8 +669,8 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 #ifdef USE_BEST
     bestx=x;
     besty=y;
-    xd=abs(gx+ox/2-x);
-    yd=abs(gy+oy/2-y);
+    //xd=abs(gx+ox/2-x);
+    //yd=abs(gy+oy/2-y);
     bestd=xd>yd ? xd : yd;
     bestn=0;					// needed if goal not reachable
 #endif
@@ -664,19 +678,16 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
     //
     //	Mark goal
     //
-    xd=gx+ox;
-    if( xd>TheMap.Width ) {			// limit to map
-	xd=TheMap.Width;
-    }
-    yd=gy+oy;
-    if( yd>TheMap.Height ) {
-	yd=TheMap.Height;
-    }
-
     unreachable=1;
     // FIXME: we need only to mark the rectangle border!!
-    for( x=gx<0 ? 0 : gx; x<xd; ++x ) {
-	for( y=gy<0 ? 0 : gy; y<yd; ++y ) {
+    for( x=x1; x<=x2; ++x ) {
+        if( x > TheMap.Width ) {
+	    continue;
+	}
+	for( y=y1; y<=y2; ++y ) {
+	    if( y > TheMap.Height ) {
+	        continue;
+	    }
 	    if( CanMoveToMask(x,y,mask) ) {	// reachable
 		matrix[x+y*w]=88;
 		unreachable=0;
@@ -706,8 +717,8 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
     add=0;
 #endif
 
-    gx+=ox/2;
-    gy+=oy/2;
+    //gx=(x1+x2)/2;
+    //gy=(y1+y2)/2;
 
     //
     //	Push and pop points until reached.
@@ -715,8 +726,8 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
     for( ;; ) {
 	while( rp!=ep ) {
 	    for( j=0; j<8; ++j ) {		// mark all neighbors
-		x=points[rp]  +xoffset[j+add];
-		y=points[rp+1]+yoffset[j+add];
+		x=points[rp]  +Heading2X[j+add];
+		y=points[rp+1]+Heading2Y[j+add];
 		m=matrix+x+y*w;
 		if( *m ) {			// already checked/goal
 		    if( *m==88 ) {		// Check if goal reached.
@@ -748,7 +759,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 		    }
 		    goal=UnitCacheOnXY(x,y,unit->Type->UnitType);
 		    if( !goal ) {	// Should not happen.
-			DebugLevel0Fn("%d %s: No goal for %d,%d on %d,%d?\n" _C_
+			DebugLevel3Fn("%d %s: No goal for %d,%d on %d,%d?\n" _C_
 				UnitNumber(unit) _C_ unit->Type->Ident _C_
 				unit->X _C_ unit->Y _C_ x _C_ y);
 			*m=99;
@@ -772,12 +783,12 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 		    wp=0;
 		}
 
-#ifdef USE_BEST
+#if 0
 		//
 		//	Save nearest point to target.
 		//
-		xd=abs(gx-x);
-		yd=abs(gy-y);
+		//xd=abs(gx-x);
+		//yd=abs(gy-y);
 		DebugLevel3("Best: %d,%d-%d - %d,%d\n" _C_ bestx _C_ besty _C_ bestd _C_ xd _C_ yd);
 		if( xd>yd && xd<bestd ) {
 		    bestd=xd;
@@ -870,86 +881,115 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
-global int NewPath(Unit* unit,int* xdp,int* ydp)
+global int NewPath(Unit* unit)
 {
     int x;
     int y;
     const Unit* goal;
     const UnitType* type;
-    int gx;
-    int gy;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
     int rx;
     int ry;
     int i;
-    int p;
-    unsigned char path[MAX_PATH_LENGTH];
-
-    //
-    //	Convert heading into direction.
-    //				  //  N NE  E SE  S SW  W NW
-    local const int Heading2X[8] = {  0,+1,+1,+1, 0,-1,-1,-1 };
-    local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
-
+    int reachable;
+    char* path;
 
     x=unit->X;
     y=unit->Y;
     goal=unit->Orders[0].Goal;
-    gx=unit->Orders[0].X;
-    gy=unit->Orders[0].Y;
+    x1=unit->Orders[0].X;
+    y1=unit->Orders[0].Y;
     rx=unit->Orders[0].RangeX;
     ry=unit->Orders[0].RangeY;
     unit->Data.Move.Length=0;
 
-    DebugLevel3Fn("%d: -> %s %p | %dx%d+%d+%d\n"
+#if 0
+    DebugLevel1Fn("%d: -> %s %p | %dx%d-%dx%d\n"
 	_C_ UnitNumber(unit) _C_ unit->Data.Move.Fast ? "F" : "C"
-	_C_ goal _C_ gx _C_ gy _C_ rx _C_ ry);
-
+	_C_ goal _C_ x1 _C_ y1 _C_ x2 _C_ y2);
+#endif
     //
     //	Check if goal is already reached.
     //
     if( goal ) {			// goal unit
+	// Increase range, so can move to edge of building
 	type=goal->Type;
-	gx=goal->X-rx;
-	gy=goal->Y-ry;
-	rx+=rx+type->TileWidth;
-	ry+=ry+type->TileHeight;
+	DebugLevel3Fn("Goal: %s, Me: %s (range %d)\n" _C_ type->Ident _C_ unit->Type->Ident _C_ rx);
+	x1=goal->X-rx;
+	y1=goal->Y-ry;
+	x2=x1+rx+type->TileWidth;
+	y2=y1+ry+type->TileHeight;
 	DebugLevel3Fn("Unit %d,%d Goal %d,%d - %d,%d\n"
-		_C_ x _C_ y _C_ gx _C_ gy _C_ gx+rx _C_ gy+ry);
-	if( x>=gx && x<gx+rx && y>=gy && y<gy+ry ) {
+		_C_ x _C_ y _C_ x1 _C_ y1 _C_ x2 _C_ y2);
+	if( x>=x1 && x<=x2 && y>=y1 && y<=y2 ) {
 	    DebugLevel3Fn("Goal reached\n");
-	    *xdp=*ydp=0;
 	    return PF_REACHED;
 	}
     } else {				// goal map field
-	// FIXME: still some wired code, if moving to point this must +1
-	// FIXME: should be +2? for ships/flyers?
-	++rx;
-	++ry;
-	if( x>=gx && x<gx+rx && y>=gy && y<gy+ry ) {
+	x1=unit->Orders[0].X-rx;
+	x2=unit->Orders[0].X+rx;
+	y1=unit->Orders[0].Y-ry;
+	y2=unit->Orders[0].Y+ry;
+	DebugLevel3Fn("Location: Unit %d,%d (%d,%d,%d) Goal %d,%d - %d,%d\n"
+		_C_ x _C_ y _C_ unit->Orders[0].X _C_ unit->Orders[0].Y _C_ rx _C_ x1 _C_ y1 _C_ x2 _C_ y2);
+	if( x>=x1 && x<=x2 && y>=y1 && y<=y2 ) {
 	    DebugLevel3Fn("Field reached\n");
-	    *xdp=*ydp=0;
 	    return PF_REACHED;
 	}
 	// This reduces the processor use,
 	// If target isn't reachable and were are beside it
 	// FIXME: should be +2? for ships/flyers?
-	if( rx==1 && ry==1 && x>=gx-1 && x<=gx+1 && y>=gy-1 && y<=gy+1 ) {
-	    if( !CheckedCanMoveToMask(gx,gy,UnitMovementMask(unit)) ) {
+#if 0
+	if( x>=x1-1 && x<=x2+1 && y>=y1-1 && y<=y2+1 ) {
+	    if( !CheckedCanMoveToMask(x,y,UnitMovementMask(unit)) ) {
 		// target field blocked by something
-		*xdp=*ydp=0;
+		DebugLevel1Fn("Unreachable\n");
 		return PF_UNREACHABLE;
 	    }
 	    unit->Data.Move.Fast=1;	// this could be handled fast
 	}
+#endif
+    }
+
+    // Ensure the pathfinder gets something that's on the map
+    if( x1 < 0 ) x1 = 0;
+    if( x2 >= TheMap.Width ) x2 = TheMap.Width-1;
+    if( y1 < 0 ) y1 = 0;
+    if( y2 >= TheMap.Height ) y2 = TheMap.Height-1;
+    // Find a reachable target
+    reachable=0;
+    for( x=x1;x<=x2;x++ ) {
+	if( CheckedCanMoveToMask(x,y1,UnitMovementMask(unit)) ||
+	    CheckedCanMoveToMask(x,y2,UnitMovementMask(unit)) ) {
+	    reachable=1;
+	}
+    }
+    for( y=y1;y<y2;y++ ) {
+	if( CheckedCanMoveToMask(x1,y,UnitMovementMask(unit)) ||
+	    CheckedCanMoveToMask(x2,y,UnitMovementMask(unit)) ) {
+	    reachable=1;
+	}
+    }
+    if( !reachable ) {
+	return PF_UNREACHABLE;
+    }
+    x=unit->X;
+    y=unit->Y;
+    if( x>=x1 && x<=x2 && y>=y1 && y<=y2 ) {
+	DebugLevel3Fn("Field reached\n");
+	return PF_REACHED;
     }
 
     //
     //	If possible, try fast.
     //
     if( unit->Data.Move.Fast ) {
-	if( (i=FastNewPath(unit,gx,gy,rx,ry,xdp,ydp))>=-1 ) {
+	if( (i=FastNewPath(unit,x1,y1,x2,y2))>=-1 ) {
 	    // Fast works
-	    DebugCheck( *xdp==0 && *ydp==0 );
+	    // DebugCheck( *xdp==0 && *ydp==0 );
 	    return i;
 	}
 	DebugLevel3Fn("Fallback to slow method\n");
@@ -959,33 +999,28 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     //
     //	Fall back to slow complex method.
     //
-    i=ComplexNewPath(unit,gx,gy,rx,ry,path);
+    path = unit->Data.Move.Path;
+    if( AStarOn ) {
+	i=AStarFindPath(unit,x1,y1,x2,y2,path);
+	if( i == PF_FAILED ) {
+	    i = PF_UNREACHABLE;
+	}
+    } else {
+	i=ComplexNewPath(unit,x1,y1,x2,y2,path);
+    }
 
-    if( i>=0 ) {
-#ifdef NEW_SHIPS
-	if( unit->Type->UnitType==UnitTypeLand ) {
-	    *xdp=Heading2X[*path];
-	    *ydp=Heading2Y[*path];
-	} else {
-	    *xdp=Heading2X[*path]*2;
-	    *ydp=Heading2Y[*path]*2;
-	}
-#else
-	*xdp=Heading2X[*path];
-	*ydp=Heading2Y[*path];
-	// Build Path to follow later
-	// -1 to include 0, -1 for 1 point will have been executed
+    // Update path if it was requested. Otherwise we may only want
+    // to know if there exists a path.
+
+    if( path != NULL ) {
 	if( i >= MAX_PATH_LENGTH ) {
-	    p=MAX_PATH_LENGTH;
-	    unit->Data.Move.Length=MAX_PATH_LENGTH-1;
+	    unit->Data.Move.Length=MAX_PATH_LENGTH;
 	} else {
-	    p=i;
-	    unit->Data.Move.Length=p-1;
+	    unit->Data.Move.Length=i;
 	}
-	for(; p > 0; p--) {
-	    unit->Data.Move.Path[p-1]=path[unit->Data.Move.Length-p+1];
+	if( unit->Data.Move.Length == 0) {
+	    unit->Data.Move.Length++;
 	}
-#endif
     }
     return i;
 }
