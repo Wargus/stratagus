@@ -361,15 +361,19 @@ global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, in
 #else
 global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
+	VideoDraw(sprite, frame, x, y);
 }
 global void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
+	VideoDrawClip(sprite, frame, x, y);
 }
 global void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
+	VideoDrawX(sprite, frame, x, y);
 }
 global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
+	VideoDrawClipX(sprite, frame, x, y);
 }
 #endif
 
