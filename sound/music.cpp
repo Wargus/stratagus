@@ -368,61 +368,53 @@ global int PlayCDRom(int name)
 **
 **	@return		True if name is handled by the cdrom module.
 */
-local int PlayCDRom(const char* name)
+global int PlayCDRom(int name)
 {
     int i;
     Sample *sample;
 
     if (CDMode == CDModeOff) {
-	if (!strncmp(name, ":", 1)) {
-	    CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
-	    ioctl(CDDrive, CDROMRESET);
+	CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
+	ioctl(CDDrive, CDROMRESET);
 
-	    ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
+	ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
 
-	    for (i = CDchdr.cdth_trk0; i <= CDchdr.cdth_trk1; ++i){
-		CDtocentry[i].cdte_format = CDROM_LBA;
-		CDtocentry[i].cdte_track = i;
-		ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);
-	    }
-	    NumCDTracks = i - 1;
+	for (i = CDchdr.cdth_trk0; i <= CDchdr.cdth_trk1; ++i){
+	    CDtocentry[i].cdte_format = CDROM_LBA;
+	    CDtocentry[i].cdte_track = i;
+	    ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);
+	}
+	NumCDTracks = i - 1;
 
-	    if (NumCDTracks == 0) {
-		CDMode = CDModeOff;
-		return 1;
-	    }
+	if (NumCDTracks == 0) {
+	    CDMode = CDModeOff;
+	    return 1;
 	}
     }
 
-    if (!strncmp(name, ":", 1)) {
+    StopMusic();
 
-	StopMusic();
-
-	// if mode is play all tracks
-	if (!strcmp(name, ":all")) {
-	    CDMode = CDModeAll;
-	    do {
-		if (CDTrack >= NumCDTracks) {
-		    CDTrack = 0;
-		}
-	    } while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
-	}
-	// if mode is play random tracks
-	if (!strcmp(name, ":random")) {
-	    CDMode = CDModeRanom;
-	    do {
-		CDTrack = MyRand() % NumCDTracks;
-	    } while (CDtocentry[CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
-	}
-
-	sample = LoadCD(NULL, CDTrack);
-	MusicSample = sample;
-	PlayingMusic = 1;
-	return 1;
+    // if mode is play all tracks
+    if (name == CDModeAll) {
+        CDMode = CDModeAll;
+        do {
+	    if (CDTrack >= NumCDTracks) {
+		CDTrack = 0;
+	    }
+	} while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
+    }
+    // if mode is play random tracks
+    if (name == CDModeRandom) {
+	CDMode = CDModeRandom;
+	do {
+	    CDTrack = MyRand() % NumCDTracks;
+	} while (CDtocentry[CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
     }
 
-    return 0;
-
+    sample = LoadCD(NULL, CDTrack);
+    MusicSample = sample;
+    PlayingMusic = 1;
+    return 1;
 }
 #endif
 

@@ -255,13 +255,13 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
 	}
     }
 #elif defined(USE_CDDA)
-    if (CDMode != CDModeOff && CDMode != CDModeStopped)
+    if (CDMode != CDModeOff && CDMode != CDModeStopped
 	    && !PlayingMusic) {
 	DebugLevel0Fn("Playing new track\n");
 	if (CDMode == CDModeAll) {
-	    PlayCDRom(":all");
+	    PlayCDRom(CDModeAll);
 	} else if (CDMode == CDModeRandom) {
-	    PlayCDRom(":random");
+	    PlayCDRom(CDModeRandom);
 	}
     }
 #endif
