@@ -155,7 +155,7 @@ typedef struct _menuitem_ {
 #define MI_CFLAGS_LEFT MI_CURC_UP
 #define MI_CFLAGS_RIGHT MI_CURC_DOWN
 #define MI_CFLAGS_KNOB 4
-#define MI_CFLAGS_CONT 8		/// unused right now
+#define MI_CFLAGS_CONT 8		/// unused right now - to be implemented!
 
 /**
 **	Menu definition.
@@ -179,7 +179,9 @@ typedef struct _menus_ {
 #define MENU_PRG_START 4
 #define MENU_CUSTOM_GAME_SETUP 5
 #define MENU_ENTER_NAME 6
-#define MENU_MAX  6			/// highest available menu id (for ccl)
+#define MENU_NET_CREATE_JOIN 7
+#define MENU_NET_MULTI_SETUP 8
+#define MENU_MAX 8			/// highest available menu id (for ccl)
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
