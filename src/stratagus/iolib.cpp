@@ -283,7 +283,7 @@ global int CLread(CLFile *file, void *buf, size_t len)
 #endif	// USE_BZ2LIB
 #ifdef USE_ZZIPLIB
 	if (tp == CLF_TYPE_ZZIP) {
-	    ret = zzip_read(file->cl_bz, buf, len);
+	    ret = zzip_read(file->cl_zz, buf, len);
 	}
 #endif	// USE_ZZIPLIB
     } else {
@@ -320,7 +320,7 @@ global int CLseek(CLFile *file, long offset, int whence)
 #endif	// USE_BZ2LIB
 #ifdef USE_ZZIPLIB
 	if (tp == CLF_TYPE_ZZIP) {
-	    zzip_seek(file->cl_bz, offset, whence);
+	    zzip_seek(file->cl_zz, offset, whence);
 	    ret = 0;
 	}
 #endif	// USE_ZZIPLIB
