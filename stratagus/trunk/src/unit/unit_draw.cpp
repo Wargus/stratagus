@@ -1201,8 +1201,8 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 	}
 	if( type->CanAttack || type->Tower ) {
 	    if( ShowReactionRange ) {
-		r= (unit->Player->Type==PlayerHuman)
-			? type->ReactRangeHuman
+		r= (unit->Player->Type==PlayerPerson)
+			? type->ReactRangePerson
 			: type->ReactRangeComputer;
 		if( r ) {
 		    VideoDrawRectangleClip(ColorBlue

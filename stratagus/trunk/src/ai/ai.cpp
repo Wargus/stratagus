@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -553,7 +552,7 @@ global void AiUnitKilled(Unit* unit)
     DebugLevel1Fn("%d: %d(%s) killed\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 
     // FIXME: must handle all orders...
 
@@ -595,7 +594,7 @@ global void AiWorkComplete(Unit* unit,Unit* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Type->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 
     AiRemoveFromBuilded(unit->Player->Ai,what->Type);
 }
@@ -612,7 +611,7 @@ global void AiCanNotBuild(Unit* unit,const UnitType* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident
 	    _C_ what->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 
     AiReduceMadeInBuilded(unit->Player->Ai,what);
 }
@@ -629,7 +628,7 @@ global void AiCanNotReach(Unit* unit,const UnitType* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 
     AiReduceMadeInBuilded(unit->Player->Ai,what);
 }
@@ -646,7 +645,7 @@ global void AiNeedMoreFarms(Unit* unit,const UnitType* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 
     ((PlayerAi*)unit->Player->Ai)->NeedFood=1;
 }
@@ -663,7 +662,7 @@ global void AiTrainingComplete(Unit* unit,Unit* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Type->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 
     AiRemoveFromBuilded(unit->Player->Ai,what->Type);
 
@@ -683,7 +682,7 @@ global void AiUpgradeToComplete(Unit* unit,const UnitType* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 }
 
 /**
@@ -698,7 +697,7 @@ global void AiResearchComplete(Unit* unit,const Upgrade* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 
     // FIXME: upgrading knights -> paladins, must rebuild lists!
 }

@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -135,7 +134,7 @@ struct _unit_type_ {
     int		MinAttackRange;		/// minimal attack range
     int		_AttackRange;		/// how far can the unit attack
     int		ReactRangeComputer;	/// reacts on enemy for computer
-    int		ReactRangeHuman;	/// reacts on enemy for human player
+    int		ReactRangePerson;	/// reacts on enemy for person player
     int		_Armor;			/// amount of armor this unit has
     int		Priority;		/// Priority value / AI Treatment
     int		_BasicDamage;		/// Basic damage dealt
