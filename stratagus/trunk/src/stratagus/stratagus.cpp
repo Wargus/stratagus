@@ -508,6 +508,7 @@ global volatile void Exit(int err)
 	DebugLevel0("Path: Error: %u(%u) OK: %u Depth: %u\n"
 		,PfCounterFail,PfCounterNotReachable
 		,PfCounterOk,PfCounterDepth);
+	CclUnits();
     );
     fprintf(stderr,"Thanks for playing FreeCraft.\n");
     exit(err);
