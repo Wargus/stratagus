@@ -10,7 +10,7 @@
 //
 /**@name network.c	-	The network. */
 //
-//	(c) Copyright 2000-2002 by Lutz Sammer, Andreas Arens.
+//	(c) Copyright 2000-2003 by Lutz Sammer, Andreas Arens.
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -687,7 +687,7 @@ global void NetworkEvent(void)
     
     for (i = 0; i < HostsCount; ++i) {
 	if (Hosts[i].Host == NetLastHost && Hosts[i].Port == NetLastPort &&
-		!PlayerQuit[i]) {
+		!PlayerQuit[Hosts[i].PlyNr]) {
 	    break;
 	}
     }
