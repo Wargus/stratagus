@@ -1,0 +1,707 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<!--
+----	(c) Copyright 2001 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FreeCraft Configuration Language Description: Artificial Intelligence(AI)</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,ai,artificial intelligence">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Artificial Intelligence
+    (AI)</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 2001 by The FreeCraft Project. Distributed under the
+<A HREF="../gpl.html">"GNU General Public License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<A HREF="unittype.html">PREV</A> 
+<A HREF="ccl.html">NEXT</A> 
+<HR>
+<A HREF="#ai:attack-with-force">ai:attack-with-force</A>
+<A HREF="#ai:debug">ai:debug</A>
+<A HREF="#ai:force">ai:force</A>
+<A HREF="#ai:get-race">ai:get-race</A>
+<A HREF="#ai:need">ai:need</A>
+<A HREF="#ai:research">ai:research</A>
+<A HREF="#ai:restart">ai:restart</A>
+<A HREF="#ai:script">ai:script</A>
+<A HREF="#ai:set">ai:set</A>
+<A HREF="#ai:sleep">ai:sleep</A>
+<A HREF="#ai:upgrade-to">ai:upgrade-to</A>
+<A HREF="#ai:wait">ai:wait</A>
+<A HREF="#ai:wait-force">ai:wait-force</A>
+<A HREF="#define-ai">define-ai</A>
+<A HREF="#define-ai-helper">define-ai-helper</A>
+<HR>
+<H2>Intro - Introduction to AI functions and variables</H2>
+
+Everything around the control of the FreeCraft AI.
+
+<H2>Functions</H2>
+<A NAME="define-ai-helper"></A>
+<H3>define-ai-helper</H3>
+
+<H4>Description</H4>
+
+The AI is complete configurable, nothing is hardcoded. The AI knows nothing
+about any units without this table. This table defines F.E. what unit can build
+and what they can build and many other things that the AI must know.
+
+<H4>Syntax</H4>
+
+<CODE>(define-ai-helper (list))</CODE>
+
+<DL>
+<DT>list</DT>
+<DD>A list of features:
+ <UL>
+ <LI><CODE>(list 'build 'builder 'building-1 ... 'building-n)</CODE>
+  <DL>
+  <DT>builder</DT>
+  <DD>Name of the unit-type that can build.
+  </DD>
+  <DT>building-1</DT>
+  <DT>building-n</DT>
+  <DD>Names of the unit-types that can be builded by the builder.
+  </DD>
+  </DL>
+  <B>Note:</B> If more units can build the same buildings you need the same list
+	for all units.
+ <LI><CODE>(list 'train 'trainer 'unit-1 ... 'unit-n)</CODE>
+  <DL>
+  <DT>trainer</DT>
+  <DD>Name of the unit-type that can train the units.
+  </DD>
+  <DT>unit-1</DT>
+  <DT>unit-n</DT>
+  <DD>Names of the unit-types that can be trained by the trainer.
+  </DD>
+  </DL>
+  <B>Note:</B> If more units can train the same unit you need the same list
+	for all units.
+ <LI><CODE>(list 'upgrade 'unit 'upgraded-unit-1 ... 'upgraded-unit-n)</CODE>
+  <DL>
+  <DT>unit</DT>
+  <DD>Name of the unit-type that can be upgraded.
+  </DD>
+  <DT>upgraded-unit-1</DT>
+  <DT>upgraded-unit-n</DT>
+  <DD>Names of the unit-types to that the unit can be upgraded.
+  </DD>
+  </DL>
+ <LI><CODE>(list 'research 'researcher 'upgrade-1 ... 'spell-n)</CODE>
+  <DL>
+  <DT>researcher</DT>
+  <DD>Name of the unit-type that can reasearch upgrades or spells.
+  </DD>
+  <DT>upgrade-1</DT>
+  <DT>spell-n</DT>
+  <DD>Names of the upgrades or spells that can be researched by the researcher.
+  </DD>
+  </DL>
+ <LI><CODE>(list 'repair 'worker 'unit-1 ... 'unit-n)</CODE>
+  <DL>
+  <DT>worker</DT>
+  <DD>Name of the unit-type that can repair other units.
+  </DD>
+  <DT>unit-1</DT>
+  <DT>unit-n</DT>
+  <DD>Names of the unit-types that can be repaired by the worker.
+  </DD>
+  </DL>
+  <B>Note:</B> If more units can repair the same units you need the same list
+	for all units.
+ <LI><CODE>(list 'collect 'worker 'resource-1 ... 'resource-n)</CODE>
+  <DL>
+  <DT>worker</DT>
+  <DD>Name of the unit-type that can collect resources.
+  </DD>
+  <DT>resource-1</DT>
+  <DT>resource-n</DT>
+  <DD>Names of the resources that can be collected by the worker.
+  </DD>
+  </DL>
+ <LI><CODE>(list 'with-goods 'unit 'resource)</CODE>
+  <DL>
+  <DT>unit</DT>
+  <DD>Name of the unit-type that is carring a resource.
+  </DD>
+  <DT>resource</DT>
+  <DD>Name of the resource that is carried by the unit.
+  </DD>
+  </DL>
+ <LI><CODE>(list 'equiv 'unit 'unit-1 ... 'unit-n)</CODE>
+  <DL>
+  <DT>unit</DT>
+  <DD>Name of the unit-type that have equilvalent units.
+  </DD>
+  <DT>unit-1</DT>
+  <DT>unit-n</DT>
+  <DD>Names of the unit-types that can be uses by the AI equivalent.
+  </DD>
+  </DL>
+ <LI><CODE>(list 'unit-limit 'unit 'resource)</CODE>
+  <DL>
+  <DT>unit</DT>
+  <DD>Name of the unit-type that must be produced to reduce the unit limit.
+  </DD>
+  <DT>resource</DT>
+  <DD>Name of the resource producing the shortage.
+  </DD>
+  </DL>
+  <I>I think we should swap the arguments: 'resource 'unit.</I>
+ </UL>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+A minimal AI helper definition:
+
+<PRE>
+(define-ai-helper
+  (list 'build 'unit-peasant 'unit-farm)
+  (list 'train 'unit-town-hall 'unit-peasant)
+  (list 'upgrade 'unit-town-hall 'unit-keep)
+  (list 'research 'unit-human-blacksmith 'upgrade-sword1)
+  (list 'repair 'unit-peasant 'unit-town-hall)
+  (list 'collect 'unit-peasant 'gold)
+  (list 'with-goods 'unit-peasant-with-gold 'gold)
+  (list 'unit-limit 'unit-farm 'food)
+  (list 'unit-equiv 'unit-town-hall 'unit-keep))
+</PRE>
+
+<P>A peasant can build a farm.
+<P>The town hall can train a peasant.
+<P>A town hall can be upgraded to a keep.
+<P>The blacksmith can reasearch the upgrade sword1.
+<P>A peasant can repair the town hall.
+<P>A peasant can collect gold.
+<P>A the peasant with gold carries gold.
+<P>To fix the food shortage the AI must build farms.
+<P>For the AI is a keep equivalent to a town hall.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME="define-ai"></A>
+<H3>define-ai</H3>
+
+<H4>Description</H4>
+
+This defines how a special AI works. Each level can use his own AI definition.
+
+<H4>Syntax</H4>
+
+<CODE>(define-ai name race class script)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Unique name of this AI definitions.
+</DD>
+<DT>race</DT>
+<DD>Name of the race for what this definition can be used, if the definition
+    can be used for any race use "*".
+</DD>
+<DT>class</DT>
+<DD>Class name of this definition. Used to chooce the AI for computer players.
+The puds contains numbers which are mapped by the C table AiTypeWcNames into
+internal names. Some common used names are "passive", "land", "sea", "air".
+</DD>
+<DT>script</DT>
+<DD>A list of scheme statements executed one after another.<P>
+<CODE>( (code-1) (code-2) ... (code-n) )</CODE><P>
+code-1 can be any valid scheme statement. Currently each second this
+statement is executed, if the statement returns not #t, than the next
+time the next statement is executed. No statement should use more than 3 ms.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+(define-ai "wc2-passive" "*" "passive"
+  '((ai:sleep	10000)
+  (ai:restart) ))
+</PRE>
+
+<P>Defines the passive computer AI, which does nothing.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME="ai-debug"></A>
+<H3>ai-debug</H3>
+
+<H4>Description</H4>
+
+Enable or disable the debug output of the AI script execution.
+
+<H4>Syntax</H4>
+
+<CODE>(ai:debug flag)</CODE>
+
+<DL>
+<DT>flag</DT>
+<DD>If #t enables printing of the AI commands, if #f disables it.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (ai:debug #t)
+</PRE>
+
+<P>Prints now the commands of this computer player.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME="ai:need"></A>
+<H3>ai-need</H3>
+
+<H4>Description</H4>
+
+Tells the AI that it should have an unit of this unit-type. The AI builds or
+trains units in this order of the ai:need commands. If the unit or an
+equivalent unit already exists, the AI does nothing. If the unit is lost, it is
+automatic rebuild. If the units are requested in wrong order, the AI could 
+hang up. Resources are collected automatic and farms are automatic build, but
+additional could be requested.
+
+<H4>Syntax</H4>
+
+<CODE>(ai:need unit-type)</CODE>
+
+<DL>
+<DT>unit-type</DT>
+<DD>Name of the unit-type required.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+  (ai:need (unit-type 'unit-great-hall))
+  (ai:need (unit-type 'unit-barrack))
+</PRE>
+
+<P>The great hall must be build before a barrack.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+
+<A NAME=""></A>
+<H3></H3>
+
+<H4>Description</H4>
+
+<H4>Syntax</H4>
+
+<CODE></CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+</PRE>
+
+<P>
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2001 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
