@@ -82,17 +82,16 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 	n = WAV_BUFFER_SIZE - sample->Length;
 
 	rate = 44100 / sample->Frequency;
+	i = CLread(data->WavFile, sndbuf, (n+4)/rate);
 
-	i = CLread(data->WavFile, sndbuf, n/rate);
-
-	// FIXME: clicking for 22khz sounds
-	for (x = 0; x < i*rate; x += 4) {
+	for (x = 0; x < n; x += 4) {
 	    for (y = 0; y < 4; ++y) {
-	        data->PointerInBuffer[x + y] = sndbuf[x/rate+y];
+		DebugCheck(x/rate+y >= i);
+		data->PointerInBuffer[x + y] = sndbuf[x/rate+y];
 	    }
 	}
 
-	sample->Length += i*rate;
+	sample->Length += n;
 
         if (sample->Length < len) {
             len = sample->Length;
