@@ -318,7 +318,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 }
 
 /**
-**      Find building place for hall.
+**      Find building place for hall. (flood fill version)
 **
 **      The best place:
 **              1) near to goldmine.
@@ -332,110 +332,160 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 **	@param type	Type of building.
 **	@param dx	Pointer for X position returned.
 **	@param dy	Pointer for Y position returned.
-**	@return		True if place found, false if no found.
+**
+**	@return		True if place found, false if not found.
+**
+**	@todo	FIXME: This is slow really slow, using two flood fills, is not
+**		a perfect solution.
 */
 local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 	int *dx, int *dy)
 {
-    int i;
-    int j;
-    int minx;
-    int maxx;
-    int miny;
-    int maxy;
-    int num_goldmine;
-    Unit* goldmines[UnitMax];
-    int nunits;
-    Unit* units[UnitMax];
-    int d;
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
     struct {
-	int d;
-	Unit* unit;
-    } best_mines[30];
-    int buildings;
+	unsigned short X;
+	unsigned short Y;
+    } * points;
+    int size;
+    int x;
+    int y;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    unsigned char* m;
+    unsigned char* morg;
+    unsigned char* matrix;
+    Unit* mine;
+    int destx;
+    int desty;
+    int bestx;
+    int besty;
+    int bestd;
+
+    destx=x=worker->X;
+    desty=y=worker->Y;
+    size=TheMap.Width*TheMap.Height/4;
+    points=alloca(size*sizeof(*points));
+
+    bestd=99999;
+    IfDebug( bestx=besty=0; );		// keep the compiler happy
 
     //
-    //  Find all goldmines.
+    //	Make movement matrix. FIXME: can create smaller matrix.
     //
-    // FIXME: Wo says that are only one gold mine?
-    // FIXME: The hardcoded UnitTypeGoldMine will be removed soon
-    num_goldmine = FindUnitsByType(UnitTypeGoldMine, goldmines);
-    DebugLevel3("\tGoldmines %d\n" _C_ num_goldmine);
-    if (!num_goldmine) {
-	return 0;
-    }
+    morg=MakeMatrix();
+    w=TheMap.Width+2;
+    matrix=morg+w+w+2;
 
-    for( i=0; i<(int)(sizeof(best_mines)/sizeof(*best_mines)); ++i) {
-	best_mines[i].d=-1;
-    }
+    points[0].X=x;
+    points[0].Y=y;
+    rp=0;
+    matrix[x+y*w]=1;			// mark start point
+    ep=wp=1;				// start with one point
 
-    for( i=0; i<num_goldmine; ++i ) {
-	buildings=0;
+    mask=UnitMovementMask(worker);
 
-	//
-	//  Check units around mine
-	//
-	minx=goldmines[i]->X-5;
-	if( minx<0 ) minx=0;
-	miny=goldmines[i]->Y-5;
-	if( miny<0 ) miny=0;
-	maxx=goldmines[i]->X+goldmines[i]->Type->TileWidth+5;
-	if( maxx>TheMap.Width ) maxx=TheMap.Width;
-	maxy=goldmines[i]->Y+goldmines[i]->Type->TileHeight+5;
-	if( maxy>TheMap.Height ) maxy=TheMap.Height;
+    //
+    //	Pop a point from stack, push all neighbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		m=matrix+x+y*w;
+		if( *m ) {			// already checked
+		    continue;
+		}
 
-	nunits=SelectUnits(minx,miny,maxx,maxy,units);
-	for( j=0; j<nunits; ++j ) {
-	    // Enemy near mine
-	    if( AiPlayer->Player->Enemy&(1<<units[j]->Player->Player) ) {
-		break;
-	    }
-	    // Town hall near mine
-	    if( units[j]->Type->StoresGold ) {
-		break;
-	    }
-	    // Town hall may not be near but we may be using it, check
-	    // for 2 buildings near it and assume it's been used
-	    if( units[j]->Type->Building && !units[j]->Type->GoldMine ) {
-		buildings++;
-		if( buildings==2 ) {
-		    break;
+		//
+		//	Look if there is a mine
+		//
+		if ( mine=GoldMineOnMap(x,y) ) {
+		    int buildings;
+		    int j;
+		    int minx;
+		    int maxx;
+		    int miny;
+		    int maxy;
+		    int nunits;
+		    Unit* units[UnitMax];
+
+		    buildings=0;
+
+		    //
+		    //  Check units around mine
+		    //
+		    minx=mine->X-5;
+		    if( minx<0 ) minx=0;
+		    miny=mine->Y-5;
+		    if( miny<0 ) miny=0;
+		    maxx=mine->X+mine->Type->TileWidth+5;
+		    if( maxx>TheMap.Width ) maxx=TheMap.Width;
+		    maxy=mine->Y+mine->Type->TileHeight+5;
+		    if( maxy>TheMap.Height ) maxy=TheMap.Height;
+
+		    nunits=SelectUnits(minx,miny,maxx,maxy,units);
+		    for( j=0; j<nunits; ++j ) {
+			// Enemy near mine
+			if( AiPlayer->Player->Enemy&(1<<units[j]->Player->Player) ) {
+			    break;
+			}
+			// Town hall near mine
+			if( units[j]->Type->StoresGold ) {
+			    break;
+			}
+			// Town hall may not be near but we may be using it, check
+			// for 2 buildings near it and assume it's been used
+			if( units[j]->Type->Building && !units[j]->Type->GoldMine ) {
+			    ++buildings;
+			    if( buildings==2 ) {
+				break;
+			    }
+			}
+		    }
+		    if( j==nunits ) {
+			if( AiFindBuildingPlace2(worker,type,x,y,dx,dy,0) ) {
+			    free(morg);
+			    return 1;
+			}
+		    }
+		}
+
+		if( CanMoveToMask(x,y,mask) ) {	// reachable
+		    *m=1;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+		    if( ++wp>=size ) {		// round about
+			wp=0;
+		    }
+		} else {			// unreachable
+		    *m=99;
 		}
 	    }
-	}
-	if( j!=nunits ) {
-	    continue;
-	}
-
-	//
-	//  Sort by distance to mine
-	//
-	d = MapDistanceToUnit(worker->X, worker->Y, goldmines[i]);
-	for( j=0; j<(int)(sizeof(best_mines)/sizeof(*best_mines)); ++j ) {
-	    int k;
-	    if( best_mines[j].d==-1 || d<best_mines[j].d ) {
-		for( k=sizeof(best_mines)/sizeof(*best_mines)-1; k>j; --k ) {
-		    best_mines[k].d=best_mines[k-1].d;
-		    best_mines[k].unit=best_mines[k-1].unit;
-		}
-		best_mines[j].d=d;
-		best_mines[j].unit=goldmines[i];
-		break;
+	    if( ++rp>=size ) {			// round about
+		rp=0;
 	    }
 	}
-    }
-    best_mines[i].d=-1;
 
-    for( i=0; i<(int)(sizeof(best_mines)/sizeof(*best_mines)) && best_mines[i].d!=-1; ++i) {
 	//
-	//  Find a building place near the mine
+	//	Continue with next frame.
 	//
-	if( AiFindBuildingPlace2(worker,type,best_mines[i].unit->X,
-	    best_mines[i].unit->Y,dx,dy,0) ) {
-	    return 1;
+	if( rp==wp ) {			// unreachable, no more points available
+	    break;
 	}
+	ep=wp;
     }
 
+    free(morg);
     return 0;
 }
 
@@ -446,7 +496,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 **	@param type	Type of building.
 **	@param dx	Pointer for X position returned.
 **	@param dy	Pointer for Y position returned.
-**	@return		True if place found, false if no found.
+**	@return		True if place found, false if not found.
 **
 **	@todo	FIXME: This is slow really slow, using two flood fills, is not
 **		a perfect solution.
