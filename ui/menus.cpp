@@ -7497,7 +7497,6 @@ local int MetaServerConnectError(void)
 
 local void MultiMetaServerClose(void)
 {
-    
     MetaClose();
     MetaServerInUse=0;
     EndMenu();
