@@ -55,16 +55,10 @@ global void HandleActionBuild(Unit* unit)
 
     if( !unit->SubAction ) {		// first entry
 	unit->SubAction=1;
-#ifdef NEW_ORDERS
 	NewResetPath(unit);
-#endif
     }
 
-#ifdef NEW_ORDERS
     type=unit->Orders[0].Type;
-#else
-    type=unit->Command.Data.Build.BuildThis;
-#endif
 
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
@@ -72,9 +66,6 @@ global void HandleActionBuild(Unit* unit)
 	    //	Some tries to reach the goal
 	    //
 	    if( unit->SubAction++<10 ) {
-#ifndef NEW_ORDERS
-		unit->Command.Action=UnitActionBuild;
-#endif
 		//	To keep the load low, retry each 1/4 second.
 		unit->Wait=FRAMES_PER_SECOND/4+unit->SubAction;
 		return;
@@ -86,9 +77,7 @@ global void HandleActionBuild(Unit* unit)
 		AiCanNotReach(unit,type);
 	    }
 
-#ifdef NEW_ORDERS
 	    unit->Orders[0].Action=UnitActionStill;
-#endif
 	    unit->SubAction=0;
 	    if( IsSelected(unit) ) {	// update display for new action
 		UpdateButtonPanel();
@@ -107,14 +96,8 @@ global void HandleActionBuild(Unit* unit)
     //
     //	Building place must be reached!
     //
-#ifdef NEW_ORDERS
     x=unit->Orders[0].X;
     y=unit->Orders[0].Y;
-#else
-    x=unit->Command.Data.Move.DX;
-    y=unit->Command.Data.Move.DY;
-#endif
-
     if( type->ShoreBuilding ) {		// correct coordinates.
 	++x;
 	++y;
@@ -128,9 +111,6 @@ global void HandleActionBuild(Unit* unit)
 	//	Some tries to build the building.
 	//
 	if( unit->SubAction++<10 ) {
-#ifndef NEW_ORDERS
-	    unit->Command.Action=UnitActionBuild;
-#endif
 	    //	To keep the load low, retry each 1/4 second.
 	    unit->Wait=FRAMES_PER_SECOND/4+unit->SubAction;
 	    return;
@@ -143,9 +123,7 @@ global void HandleActionBuild(Unit* unit)
 	    AiCanNotBuild(unit,type);
 	}
 
-#ifdef NEW_ORDERS
 	unit->Orders[0].Action=UnitActionStill;
-#endif
 	unit->SubAction=0;
 	if( IsSelected(unit) ) {	// update display for new action
 	    UpdateButtonPanel();
@@ -171,7 +149,7 @@ global void HandleActionBuild(Unit* unit)
     build->Player->UnitTypesCount[type->Type]--;
     build->Constructed=1;
     build->HP=0;
-#ifdef NEW_ORDERS
+
     build->Orders[0].Action=UnitActionBuilded;
     build->Data.Builded.Sum=0;  // FIXME: Is it necessary?
     build->Data.Builded.Val=stats->HitPoints;
@@ -183,19 +161,6 @@ global void HandleActionBuild(Unit* unit)
     DebugLevel3Fn("Build Sum %d, Add %d, Val %d, Sub %d\n"
 	,build->Data.Builded.Sum,build->Data.Builded.Add
 	,build->Data.Builded.Val,build->Data.Builded.Sub);
-#else
-    build->Command.Action=UnitActionBuilded;
-    build->Command.Data.Builded.Sum=0;  // FIXME: Is it necessary?
-    build->Command.Data.Builded.Val=stats->HitPoints;
-    n=(stats->Costs[TimeCost]*FRAMES_PER_SECOND/6)/(SpeedBuild*5);
-    build->Command.Data.Builded.Add=stats->HitPoints/n;
-    build->Command.Data.Builded.Sub=n;
-    build->Command.Data.Builded.Cancel=0; // FIXME: Is it necessary?
-    build->Command.Data.Builded.Worker=unit;
-    DebugLevel3Fn("Build Sum %d, Add %d, Val %d, Sub %d\n"
-	,build->Command.Data.Builded.Sum,build->Command.Data.Builded.Add
-	,build->Command.Data.Builded.Val,build->Command.Data.Builded.Sub);
-#endif
     build->Wait=FRAMES_PER_SECOND/6;
 
     //
@@ -214,11 +179,7 @@ global void HandleActionBuild(Unit* unit)
 
     unit->X=x;
     unit->Y=y;
-#ifdef NEW_ORDERS
     unit->Orders[0].Action=UnitActionStill;
-#else
-    unit->Command.Action=UnitActionStill;
-#endif
     unit->SubAction=0;
 
     CheckUnitToBeDrawn(build);
@@ -240,19 +201,11 @@ global void HandleActionBuilded(Unit* unit)
     //
     // Check if construction should be canceled...
     //
-#ifdef NEW_ORDERS
     if( unit->Data.Builded.Cancel ) {
 	// Drop out unit
 	peon=unit->Data.Builded.Worker;
 	peon->Orders[0].Action=UnitActionStill;
 	unit->Data.Builded.Worker=NoUnitP;
-#else
-    if( unit->Command.Data.Builded.Cancel ) {
-	// Drop out unit
-	peon=unit->Command.Data.Builded.Worker;
-	peon->Command.Action=UnitActionStill;
-	unit->Command.Data.Builded.Worker=NoUnitP;
-#endif
 	peon->Reset=peon->Wait=1;
 	peon->SubAction=0;
 
@@ -269,7 +222,6 @@ global void HandleActionBuilded(Unit* unit)
 
     // FIXME: if attacked subtract hit points!!
 
-#ifdef NEW_ORDERS
     unit->Data.Builded.Val-=unit->Data.Builded.Sub;
     if( unit->Data.Builded.Val<0 ) {
 	unit->Data.Builded.Val+=unit->Stats->HitPoints;
@@ -284,43 +236,18 @@ global void HandleActionBuilded(Unit* unit)
     //
     if( unit->Data.Builded.Sum>=unit->Stats->HitPoints
 		|| unit->HP>=unit->Stats->HitPoints ) {
-#else
-    unit->Command.Data.Builded.Val-=unit->Command.Data.Builded.Sub;
-    if( unit->Command.Data.Builded.Val<0 ) {
-	unit->Command.Data.Builded.Val+=unit->Stats->HitPoints;
-	unit->HP++;
-	unit->Command.Data.Builded.Sum++;
-    }
-    unit->HP+=unit->Command.Data.Builded.Add;
-    unit->Command.Data.Builded.Sum+=unit->Command.Data.Builded.Add;
-
-    //
-    //	Check if building ready.
-    //
-    if( unit->Command.Data.Builded.Sum>=unit->Stats->HitPoints
-		|| unit->HP>=unit->Stats->HitPoints ) {
-#endif
 	if( unit->HP>unit->Stats->HitPoints ) {
 	    unit->HP=unit->Stats->HitPoints;
 	}
-#ifdef NEW_ORDERS
 	unit->Orders[0].Action=UnitActionStill;
-#else
-	unit->Command.Action=UnitActionStill;
-#endif
 	// HACK: the building is ready now
 	unit->Player->UnitTypesCount[type->Type]++;
 	unit->Constructed=0;
 	unit->Frame=0;
 	unit->Reset=unit->Wait=1;
 
-#ifdef NEW_ORDERS
 	peon=unit->Data.Builded.Worker;
 	peon->Orders[0].Action=UnitActionStill;
-#else
-	peon=unit->Command.Data.Builded.Worker;
-	peon->Command.Action=UnitActionStill;
-#endif
 	peon->SubAction=0;
 	peon->Reset=peon->Wait=1;
 	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
@@ -331,13 +258,8 @@ global void HandleActionBuilded(Unit* unit)
 	if( type->GivesOil ) {
 	    CommandHaulOil(peon,unit,0);	// Let the unit haul oil
 	    DebugLevel0Fn("Update oil-platform\n");
-#ifdef NEW_ORDERS
 	    DebugLevel0Fn(" =%d\n",unit->Data.Resource.Active);
 	    unit->Data.Resource.Active=0;
-#else
-	    DebugLevel0Fn(" =%d\n",unit->Command.Data.Resource.Active);
-	    unit->Command.Data.Resource.Active=0;
-#endif
 	    unit->Value=peon->Value;	// peon was holding value while building
 	}
 
@@ -377,21 +299,13 @@ global void HandleActionBuilded(Unit* unit)
     //
     //	Update building states
     //
-#ifdef NEW_ORDERS
     if( unit->Data.Builded.Sum*2>=unit->Stats->HitPoints ) {
-#else
-    if( unit->Command.Data.Builded.Sum*2>=unit->Stats->HitPoints ) {
-#endif
         if( (unit->Frame!=1 || unit->Constructed) ) {
 	  CheckUnitToBeDrawn(unit);
 	}
 	unit->Constructed=0;
 	unit->Frame=1;
-#ifdef NEW_ORDERS
     } else if( unit->Data.Builded.Sum*4>=unit->Stats->HitPoints ) {
-#else
-    } else if( unit->Command.Data.Builded.Sum*4>=unit->Stats->HitPoints ) {
-#endif
         if( unit->Frame!=1 ) {
 	  CheckUnitToBeDrawn(unit);
 	}
