@@ -70,8 +70,6 @@ void HandleActionDie(Unit* unit)
 	//
 	if (unit->Reset) {
 		if (!unit->Type->CorpseType) {
-			// Unmark corpse sight, if it has any
-			MapUnmarkUnitSight(unit);
 			ReleaseUnit(unit);
 			return;
 		}
