@@ -2239,13 +2239,13 @@ local SCM CclDefineMenu(SCM list)
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 
-	    item.x=gh_scm2int(gh_car(value));
+	    item.X=gh_scm2int(gh_car(value));
 	    value=gh_cdr(value);
-	    item.y=gh_scm2int(gh_car(value));
+	    item.Y=gh_scm2int(gh_car(value));
 	    value=gh_cdr(value);
-	    item.xsize=gh_scm2int(gh_car(value));
+	    item.Width=gh_scm2int(gh_car(value));
 	    value=gh_cdr(value);
-	    item.ysize=gh_scm2int(gh_car(value));
+	    item.Height=gh_scm2int(gh_car(value));
 
 	} else if( gh_eq_p(value,gh_symbol2scm("name")) ) {
 	    value=gh_car(list);
@@ -2255,19 +2255,19 @@ local SCM CclDefineMenu(SCM list)
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    if( gh_eq_p(value,gh_symbol2scm("none")) ) {
-		item.image=ImageNone;
+		item.Image=ImageNone;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel1")) ) {
-		item.image=ImagePanel1;
+		item.Image=ImagePanel1;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel2")) ) {
-		item.image=ImagePanel2;
+		item.Image=ImagePanel2;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel3")) ) {
-		item.image=ImagePanel3;
+		item.Image=ImagePanel3;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel4")) ) {
-		item.image=ImagePanel4;
+		item.Image=ImagePanel4;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel5")) ) {
-		item.image=ImagePanel5;
+		item.Image=ImagePanel5;
 	    } else if( gh_eq_p(value,gh_symbol2scm("sc-panel")) ) {
-		item.image=ScPanel;
+		item.Image=ScPanel;
 	    } else {
 		s1=gh_scm2newstr(value, NULL);
 		fprintf(stderr, "Unsupported image %s\n", s1);
@@ -2276,7 +2276,7 @@ local SCM CclDefineMenu(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("default")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    item.defsel=gh_scm2int(value);
+	    item.DefSel=gh_scm2int(value);
 /*
 	} else if( gh_eq_p(value,gh_symbol2scm("nitems")) ) {
 	    value=gh_car(list);
@@ -2289,7 +2289,7 @@ local SCM CclDefineMenu(SCM list)
 	    s1 = gh_scm2newstr(value,NULL);
 	    func = (void **)hash_find(MenuFuncHash, s1);
 	    if (func != NULL) {
-		item.netaction=(void *)*func;
+		item.NetAction=(void *)*func;
 	    } else {
 		fprintf(stderr,"Can't find function: %s\n", s1);
 	    }
@@ -2309,82 +2309,82 @@ local SCM CclDefineMenu(SCM list)
 	} else {
 	    int i;
 	    int mitype;
-	    for (i=0; i<menu->nitems; ++i) {
-		mitype = menu->items[i].mitype;
+	    for (i=0; i<menu->NumItems; ++i) {
+		mitype = menu->Items[i].mitype;
 		if (mitype == MI_TYPE_TEXT) {
-		    if (menu->items[i].d.text.text) {
-			free(menu->items[i].d.text.text);
+		    if (menu->Items[i].d.text.text) {
+			free(menu->Items[i].d.text.text);
 		    }
-		    if (menu->items[i].d.text.normalcolor) {
-			free(menu->items[i].d.text.normalcolor);
+		    if (menu->Items[i].d.text.normalcolor) {
+			free(menu->Items[i].d.text.normalcolor);
 		    }
-		    if (menu->items[i].d.text.reversecolor) {
-			free(menu->items[i].d.text.normalcolor);
+		    if (menu->Items[i].d.text.reversecolor) {
+			free(menu->Items[i].d.text.normalcolor);
 		    }
 		} else if (mitype == MI_TYPE_BUTTON) {
-		    if (menu->items[i].d.button.text) {
-			free(menu->items[i].d.button.text);
+		    if (menu->Items[i].d.button.text) {
+			free(menu->Items[i].d.button.text);
 		    }
-		    if (menu->items[i].d.button.normalcolor) {
-			free(menu->items[i].d.button.normalcolor);
+		    if (menu->Items[i].d.button.normalcolor) {
+			free(menu->Items[i].d.button.normalcolor);
 		    }
-		    if (menu->items[i].d.button.reversecolor) {
-			free(menu->items[i].d.button.normalcolor);
+		    if (menu->Items[i].d.button.reversecolor) {
+			free(menu->Items[i].d.button.normalcolor);
 		    }
 		} else if (mitype == MI_TYPE_PULLDOWN) {
 		    int j;
-		    j = menu->items[i].d.pulldown.noptions-1;
+		    j = menu->Items[i].d.pulldown.noptions-1;
 		    for (; j>=0; --j) {
-			free(menu->items[i].d.pulldown.options[j]);
+			free(menu->Items[i].d.pulldown.options[j]);
 		    }
-		    free(menu->items[i].d.pulldown.options);
-		    if (menu->items[i].d.pulldown.normalcolor) {
-			free(menu->items[i].d.pulldown.normalcolor);
+		    free(menu->Items[i].d.pulldown.options);
+		    if (menu->Items[i].d.pulldown.normalcolor) {
+			free(menu->Items[i].d.pulldown.normalcolor);
 		    }
-		    if (menu->items[i].d.pulldown.reversecolor) {
-			free(menu->items[i].d.pulldown.normalcolor);
+		    if (menu->Items[i].d.pulldown.reversecolor) {
+			free(menu->Items[i].d.pulldown.normalcolor);
 		    }
 		} else if (mitype == MI_TYPE_LISTBOX) {
-		    if (menu->items[i].d.listbox.normalcolor) {
-			free(menu->items[i].d.listbox.normalcolor);
+		    if (menu->Items[i].d.listbox.normalcolor) {
+			free(menu->Items[i].d.listbox.normalcolor);
 		    }
-		    if (menu->items[i].d.listbox.reversecolor) {
-			free(menu->items[i].d.listbox.normalcolor);
+		    if (menu->Items[i].d.listbox.reversecolor) {
+			free(menu->Items[i].d.listbox.normalcolor);
 		    }
 		} else if (mitype == MI_TYPE_INPUT) {
-		    if (menu->items[i].d.input.normalcolor) {
-			free(menu->items[i].d.input.normalcolor);
+		    if (menu->Items[i].d.input.normalcolor) {
+			free(menu->Items[i].d.input.normalcolor);
 		    }
-		    if (menu->items[i].d.input.reversecolor) {
-			free(menu->items[i].d.input.normalcolor);
+		    if (menu->Items[i].d.input.reversecolor) {
+			free(menu->Items[i].d.input.normalcolor);
 		    }
 		} else if (mitype == MI_TYPE_GEM) {
-		    if (menu->items[i].d.gem.normalcolor) {
-			free(menu->items[i].d.gem.normalcolor);
+		    if (menu->Items[i].d.gem.normalcolor) {
+			free(menu->Items[i].d.gem.normalcolor);
 		    }
-		    if (menu->items[i].d.gem.reversecolor) {
-			free(menu->items[i].d.gem.normalcolor);
+		    if (menu->Items[i].d.gem.reversecolor) {
+			free(menu->Items[i].d.gem.normalcolor);
 		    }
 		}
 	    }
-	    free(menu->items);
-	    menu->items = NULL;
+	    free(menu->Items);
+	    menu->Items = NULL;
 	}
-	menu->nitems = 0; // reset to zero
+	menu->NumItems = 0; // reset to zero
 	memcpy(menu, &item, sizeof(Menu));
 	//move the buttons for different resolutions..
 	if (VideoWidth != 640) {
 	    if (VideoWidth == 0) {
 		if (DEFAULT_VIDEO_WIDTH != 640) {
-		    menu->x += (DEFAULT_VIDEO_WIDTH - 640) / 2;
+		    menu->X += (DEFAULT_VIDEO_WIDTH - 640) / 2;
 		}
 		if (DEFAULT_VIDEO_HEIGHT != 480) {
-		    menu->y += (DEFAULT_VIDEO_HEIGHT - 480) / 2;
+		    menu->Y += (DEFAULT_VIDEO_HEIGHT - 480) / 2;
 		}
 	    } else {
 		//printf("VideoWidth = %d\n", VideoWidth);
-		menu->x += TheUI.Offset640X;
-		menu->y += TheUI.Offset480Y;
+		menu->X += TheUI.Offset640X;
+		menu->Y += TheUI.Offset480Y;
 	    }
 	}
 	//printf("Me:%s\n", name);
@@ -3125,14 +3125,14 @@ local SCM CclDefineMenuItem(SCM list)
 
     if ( (tmp = (Menu **)hash_find(MenuHash,name)) ) {
 	menu = *tmp;
-	if (menu->items) {
-	    menu->items=(Menuitem*)realloc(menu->items,sizeof(Menuitem)*(menu->nitems+1));
+	if (menu->Items) {
+	    menu->Items=(Menuitem*)realloc(menu->Items,sizeof(Menuitem)*(menu->NumItems+1));
 	} else {
-	    menu->items=(Menuitem*)malloc(sizeof(Menuitem));
+	    menu->Items=(Menuitem*)malloc(sizeof(Menuitem));
 	}
 	item->menu = menu;
-	memcpy(menu->items+menu->nitems,item,sizeof(Menuitem));
-	menu->nitems++;
+	memcpy(menu->Items+menu->NumItems,item,sizeof(Menuitem));
+	menu->NumItems++;
     }
     free(name);
     free(item);
