@@ -320,7 +320,7 @@ static void GameTypeManTeamVsMachine(void)
 **
 **  @todo FIXME: use in this function InitModules / LoadModules!!!
 */
-void CreateGame(char* filename, WorldMap* map)
+void CreateGame(const char* filename, WorldMap* map)
 {
 	int i;
 	int j;
