@@ -80,6 +80,7 @@
 <A HREF="#reset-keystroke-help">reset-keystroke-help</A>
 <A HREF="#selection">selection</A>
 <A HREF="#set-diplomacy!">set-diplomacy!</A>
+<A HREF="#set-game-cycle!">set-game-cycle!</A>
 <A HREF="#set-group-id!">set-group-id!</A>
 <A HREF="#set-player-resources!">set-player-resources!</A>
 <A HREF="#set-this-player!">set-this-player!</A>
@@ -561,7 +562,7 @@ Everything around the game.
 
 <H4>Description</H4>
 
-.
+Returns the current game cycle.
 
 <H4>Syntax</H4>
 
@@ -581,9 +582,7 @@ Everything around the game.
 
 <P>.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="get-freecraft-home-path"></A>
 <H3>get-freecraft-home-path</H3>
@@ -1164,6 +1163,33 @@ Everything around the game.
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-game-cycle!"></A>
+<H3>set-game-cycle!</H3>
+
+<H4>Description</H4>
+
+Set the current game cycle number.
+
+<H4>Syntax</H4>
+
+<CODE>(set-game-cycle! cycle)</CODE>
+
+<DL>
+<DT>cycle</DT>
+<DD>The game cycle number.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-game-cycle! 100)
+</PRE>
+
+<P>Set the game cycle number to 100.
+
+<H4>Not Used</H4>
 
 <A NAME="set-group-id!"></A>
 <H3>set-group-id!</H3>
