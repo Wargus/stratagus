@@ -127,7 +127,7 @@ local void MovementTypeDeleteSuperGroup (int , SuperGroup * );
 local void MovementTypeInitSuperGroups (int );
 local int  MovementTypeCheckPassability (int , unsigned short );
 local void ExpandGroup (int , SuperGroup * , RegGroup * );
-#if DEBUG
+#ifdef DEBUG
 local void PrintSummary (void);
 #endif
 
@@ -136,7 +136,7 @@ int RegGroupsInitialize (void)
 	RegGroupSetInitialize ();
 	//InitSuperGroups ();
 	Initialized = 1;
-#if DEBUG
+#ifdef DEBUG
 	//PrintSummary ();
 #endif
 	/* TODO: should return something useful */
@@ -223,7 +223,7 @@ local void RegGroupSetDestroy (void)
 
 local int RegGroupSetNextId (void)
 {
-#if DEBUG
+#ifdef DEBUG
 	/* if DEBUGging, try to assign the lowest id available, so that it is
 	 * more probable that a group destroyed by MapChanged() callback and
 	 * immediatelly recreated again will get the same id. This behavior is
@@ -797,7 +797,7 @@ int RegGroupCheckConnectivity (Unit *unit, int groupid0, int groupid1)
 	return 0;	/* we shouldn't get here - this is just to make gcc happy */
 }
 
-#if DEBUG
+#ifdef DEBUG
 local char *mov_type_names[] = { "Transporters", "Hovercrafts" };
 
 local void PrintMovementTypeDescriptor (int );
