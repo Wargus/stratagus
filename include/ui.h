@@ -402,7 +402,8 @@ extern char FancyBuildings;             ///< Mirror buildings 1 yes, 0 now.
 extern int SpeedKeyScroll;              ///< Keyboard Scrolling Speed, in Frames
 extern int SpeedMouseScroll;            ///< Mouse Scrolling Speed, in Frames
 
-extern char* UiGroupKeys;               ///< up to 11 keys used for group selection
+extern char DefaultGroupKeys[];    ///< Default group keys
+extern char* UiGroupKeys;               ///< Up to 11 keys used for group selection
 
 // only exported to save them
 
