@@ -300,6 +300,9 @@ static int CostMoveTo(Unit* unit, int ex, int ey, int mask, int current_cost) {
 	if (unit->X == ex && unit->Y == ey) {
 		return 0;
 	}
+	if (!UnitCanMoveTo(unit, ex, ey)) {
+		return -1;
+	}
 	j = TheMap.Fields[ex + ey * TheMap.Width].Flags & mask;
 	if( j && (AStarKnowUnknown
 			|| IsMapFieldExplored(unit->Player, ex, ey)) ) {
@@ -752,45 +755,45 @@ int NextPathElement(Unit* unit,int* pxd,int *pyd)
 
 	// Attempt to use path cache
 	// FIXME: If there is a goal, it may have moved, ruining the cache
-	*pxd=0;
-	*pyd=0;
+	*pxd = 0;
+	*pyd = 0;
 
 	// Goal has moved, need to recalculate path or no cached path
-	if( unit->Data.Move.Length <= 0 ||
-		( unit->Goal && (unit->Goal->X != unit->Orders[0].X
-			|| unit->Goal->Y != unit->Orders[0].Y)) ) {
-		result=NewPath(unit);
+	if(unit->Data.Move.Length <= 0 ||
+		(unit->Goal && (unit->Goal->X != unit->Orders[0].X
+			|| unit->Goal->Y != unit->Orders[0].Y))) {
+		result = NewPath(unit);
 
-		if( result==PF_UNREACHABLE ) {
-			unit->Data.Move.Length=0;
+		if(result == PF_UNREACHABLE) {
+			unit->Data.Move.Length = 0;
 			return result;
 		}
-		if( result==PF_REACHED ) {
+		if(result == PF_REACHED) {
 			return result;
 		}
-		if( unit->Goal ) {
+		if(unit->Goal) {
 			// Update Orders
-			unit->Orders[0].X=unit->Goal->X;
-			unit->Orders[0].Y=unit->Goal->Y;
+			unit->Orders[0].X = unit->Goal->X;
+			unit->Orders[0].Y = unit->Goal->Y;
 		}
 	}
 
-	*pxd=Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
-	*pyd=Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
-	result=unit->Data.Move.Length;
+	*pxd = Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
+	*pyd = Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
+	result = unit->Data.Move.Length;
 	unit->Data.Move.Length--;
-	if( !CheckedCanMoveToMask(*pxd+unit->X,*pyd+unit->Y,UnitMovementMask(unit)) ) {
-		result=NewPath(unit);
-		if( result>0 ) {
-			*pxd=Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
-			*pyd=Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
-			if( !CheckedCanMoveToMask(*pxd+unit->X,*pyd+unit->Y,UnitMovementMask(unit)) ) {
+	if(!UnitCanMoveTo(unit, *pxd + unit->X, *pyd + unit->Y)) {
+		result = NewPath(unit);
+		if(result > 0) {
+			*pxd = Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
+			*pyd = Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
+			if(!UnitCanMoveTo(unit, *pxd + unit->X, *pyd + unit->Y)) {
 				// There may be unit in the way, Astar may allow you to walk onto it.
-				result=PF_UNREACHABLE;
-				*pxd=0;
-				*pyd=0;
+				result = PF_UNREACHABLE;
+				*pxd = 0;
+				*pyd = 0;
 			} else {
-				result=unit->Data.Move.Length;
+				result = unit->Data.Move.Length;
 				unit->Data.Move.Length--;
 			}
 		}
