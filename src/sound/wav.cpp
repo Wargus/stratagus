@@ -77,6 +77,7 @@ local int WavReadStream(Sample* sample, void* buf, int len)
     int brratio;
     int samplesize;	// number of bytes per sample
     int divide;
+    int i;
 
     data = (WavData*)sample->User;
 
@@ -95,6 +96,12 @@ local int WavReadStream(Sample* sample, void* buf, int len)
 	divide = freqratio * brratio / chanratio;
 
 	comp = CLread(data->WavFile, sndbuf, unc/divide);
+
+	if (sample->BitsPerSample == 16) {
+	    for (i = 0; i < (unc / divide) >> 1; ++i) {
+		((unsigned short*)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
+	    }
+	}
 
 	sample->Length += ConvertToStereo32(sndbuf, 
 	    &data->PointerInBuffer[sample->Length], 
@@ -262,6 +269,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
     sample->Channels = wavfmt.Channels;
     sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
     sample->Frequency = wavfmt.Frequency;
+    sample->BitsPerSample = wavfmt.BitsPerSample;
     sample->Length = 0;
 
 
@@ -316,6 +324,12 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 	}
 
 	CLclose(f);
+
+	if (wavfmt.BitsPerSample == 16) {
+	    for (i = 0; i < sample->Length >> 1; ++i) {
+		((unsigned short*)sample->Data)[i] = ConvertLE16(((unsigned short*)sample->Data)[i]);
+	    }
+	}
 
 #ifdef DEBUG
 	AllocatedSoundMemory += sample->Length;
