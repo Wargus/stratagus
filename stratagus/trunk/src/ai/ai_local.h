@@ -68,8 +68,9 @@ struct _ai_type_{
 #endif
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
-	SCM Script; /// Main script (gc-protected!)
+	SCM Script;   /// Main script (gc-protected!)
 #elif defined(USE_LUA)
+	char* Script; /// Main script
 #endif
 };
 
@@ -185,6 +186,7 @@ typedef struct _ai_running_script_ {
 #if defined(USE_GUILE) || defined(USE_SIOD)
 	SCM           Script;      /// Script executed
 #elif defined(USE_LUA)
+	char*         Script;      /// Script executed
 #endif
 	unsigned long SleepCycles; /// Cycles to sleep
 	char          ident[10];   /// Debugging !
