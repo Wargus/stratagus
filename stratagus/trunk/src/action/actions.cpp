@@ -543,6 +543,10 @@ global void UnitActions(void)
 	if (regenthiscycle) {
 		for (i = 0; i < tabsize; ++i) {
 			HandleRegenerations(table[i]);
+			if (table[i]->Destroyed) {
+				table[i] = table[--tabsize];
+				--i;
+			}
 		}
 	}
 
