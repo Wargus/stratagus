@@ -528,6 +528,10 @@ global void CreateGame(char* filename, WorldMap* map)
     GameResult=GameNoResult;
 
     CommandLog(NULL,NoUnitP,FlushCommands,-1,-1,NoUnitP,NULL,-1);
+    DestroyCursorBackground();
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoUnlockScreen();
 }
 
 /**
