@@ -686,13 +686,13 @@ static void EditorRandomizeUnit(const char* unit_type, int count, int value)
 		TileFill(mx - rx - 1, mx - ry - 1, tile, z * 2);
 
 		// FIXME: can overlap units
-		unit = MakeUnitAndPlace(rx, ry , type, &Players[15]);
+		unit = MakeUnitAndPlace(rx, ry , type, &Players[PlayerNumNeutral]);
 		unit->ResourcesHeld = value;
-		unit = MakeUnitAndPlace(mx - rx - tw, ry, type, &Players[15]);
+		unit = MakeUnitAndPlace(mx - rx - tw, ry, type, &Players[PlayerNumNeutral]);
 		unit->ResourcesHeld = value;
-		unit = MakeUnitAndPlace(rx, my - ry - th, type, &Players[15]);
+		unit = MakeUnitAndPlace(rx, my - ry - th, type, &Players[PlayerNumNeutral]);
 		unit->ResourcesHeld = value;
-		unit = MakeUnitAndPlace(mx - rx - tw, mx - ry - th, type, &Players[15]);
+		unit = MakeUnitAndPlace(mx - rx - tw, mx - ry - th, type, &Players[PlayerNumNeutral]);
 		unit->ResourcesHeld = value;
 	}
 }
