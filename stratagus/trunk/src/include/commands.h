@@ -116,6 +116,8 @@ extern void SendCommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Send spell cast command
 extern void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 	,int flush);
+    /// Send auto spell cast command
+extern void SendCommandAutoSpellCast(Unit* unit,int spellid,int on);
     /// Send diplomacy command
 extern void SendCommandDiplomacy(int player,int state,int opponent);
     /// Send shared vision command

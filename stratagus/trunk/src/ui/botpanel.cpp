@@ -388,6 +388,9 @@ global void DrawButtonPanel(void)
 
     for( i=0; i<9; ++i ) {
 	if( buttons[i].Pos!=-1 ) {
+	    int j;
+	    int action;
+
 	    // cursor is on that button
 	    if( ButtonUnderCursor==i+10 ) {
 		v=IconActive;
@@ -401,65 +404,80 @@ global void DrawButtonPanel(void)
 	    //	Any better ideas?
 	    //	Show the current action state of the unit with the buttons.
 	    //
-	    //	FIXME: Must also show, if all units have the same action!!!
-	    //	FIXME: very useful for contolling stand and stop.
 	    //	FIXME: Should show the rally action of buildings.
 	    //
-	    if( NumSelected==1 ) {
+
+	    action=UnitActionNone;
+	    switch( buttons[i].Action ) {
+		case ButtonStop:
+		    action=UnitActionStill;
+		    break;
+		case ButtonStandGround:
+		    action=UnitActionStandGround;
+		    break;
+		case ButtonAttack:
+		    action=UnitActionAttack;
+		    break;
+		case ButtonDemolish:
+		    action=UnitActionDemolish;
+		    break;
+		case ButtonAttackGround:
+		    action=UnitActionAttackGround;
+		    break;
+		case ButtonRepair:
+		    action=UnitActionRepair;
+		    break;
+		case ButtonPatrol:
+		    action=UnitActionPatrol;
+		    break;
+	    }
+	    if( action!=UnitActionNone ) {
+		for( j=0; j<NumSelected; ++j ) {
+		    if( Selected[j]->Orders[0].Action!=action ) {
+			break;
+		    }
+		}
+		if( j==NumSelected ) {
+		    v|=IconSelected;
+		}
+	    } else {
 		switch( buttons[i].Action ) {
-		    case ButtonStop:
-			if( Selected[0]->Orders[0].Action==UnitActionStill ) {
-			    v|=IconSelected;
-			}
-			break;
-		    case ButtonStandGround:
-			if( Selected[0]->Orders[0].Action
-				==UnitActionStandGround ) {
-			    v|=IconSelected;
-			}
-			break;
 		    case ButtonMove:
-			if( Selected[0]->Orders[0].Action==UnitActionMove
-				|| Selected[0]->Orders[0].Action
-				    ==UnitActionBuild
-				|| Selected[0]->Orders[0].Action
-				    ==UnitActionFollow ) {
+			for( j=0; j<NumSelected; ++j ) {
+			    if( Selected[j]->Orders[0].Action!=UnitActionMove
+				    && Selected[j]->Orders[0].Action
+					!=UnitActionBuild
+				    && Selected[j]->Orders[0].Action
+					!=UnitActionFollow ) {
+				break;
+			    }
+			}
+			if( j==NumSelected ) {
 			    v|=IconSelected;
 			}
 			break;
 		    case ButtonHarvest:
 		    case ButtonReturn:
-			if( Selected[0]->Orders[0].Action==UnitActionMineGold
-				|| Selected[0]->Orders[0].Action
-				    ==UnitActionHarvest ) {
+			for( j=0; j<NumSelected; ++j ) {
+			    if( Selected[j]->Orders[0].Action!=UnitActionMineGold
+				    && Selected[j]->Orders[0].Action
+					!=UnitActionHarvest ) {
+				break;
+			    }
+			}
+			if( j==NumSelected ) {
 			    v|=IconSelected;
 			}
 			break;
-		    case ButtonAttack:
-			if( Selected[0]->Orders[0].Action==UnitActionAttack ) {
-			    v|=IconSelected;
+		    case ButtonSpellCast:
+			for( j=0; j<NumSelected; ++j ) {
+			    if( Selected[j]->AutoCastSpell!=
+				    SpellTypeById(buttons[i].Value) ) {
+				break;
+			    }
 			}
-			break;
-		    case ButtonDemolish:
-			if( Selected[0]->Orders[0].Action
-				==UnitActionDemolish ) {
-			    v|=IconSelected;
-			}
-			break;
-		    case ButtonAttackGround:
-			if( Selected[0]->Orders[0].Action
-				==UnitActionAttackGround ) {
-			    v|=IconSelected;
-			}
-			break;
-		    case ButtonRepair:
-			if( Selected[0]->Orders[0].Action==UnitActionRepair ) {
-			    v|=IconSelected;
-			}
-			break;
-		    case ButtonPatrol:
-			if( Selected[0]->Orders[0].Action==UnitActionPatrol ) {
-			    v|=IconSelected;
+			if( j==NumSelected ) {
+			    v|=IconAutoCast;
 			}
 			break;
 
@@ -853,14 +871,34 @@ global void DoButtonButtonClicked(int button)
 	case ButtonAttackGround:
 	case ButtonDemolish:
         case ButtonSpellCast:
-	    CursorState=CursorStateSelect;
-	    GameCursor=TheUI.YellowHair.Cursor;
-	    CursorAction=CurrentButtons[button].Action;
-	    CursorValue=CurrentButtons[button].Value;
-            CurrentButtonLevel=9;	// level 9 is cancel-only
-            UpdateButtonPanel();
-	    MustRedraw|=RedrawCursor;
-	    SetStatusLine("Select Target");
+	    if( CurrentButtons[button].Action==ButtonSpellCast
+		    && (KeyModifiers&ModifierControl) ) {
+		int autocast;
+
+		autocast=0;
+		// If any selected unit doesn't have autocast on turn it on
+		// for everyone
+		for( i=0; i<NumSelected; ++i ) {
+		    if( Selected[i]->AutoCastSpell!=
+			    SpellTypeById(CurrentButtons[button].Value)) {
+			autocast=1;
+			break;
+		    }
+		}
+		for( i=0; i<NumSelected; ++i ) {
+		    SendCommandAutoSpellCast(Selected[i]
+			    ,CurrentButtons[button].Value,autocast);
+		}
+	    } else {
+		CursorState=CursorStateSelect;
+		GameCursor=TheUI.YellowHair.Cursor;
+		CursorAction=CurrentButtons[button].Action;
+		CursorValue=CurrentButtons[button].Value;
+		CurrentButtonLevel=9;	// level 9 is cancel-only
+		UpdateButtonPanel();
+		MustRedraw|=RedrawCursor;
+		SetStatusLine("Select Target");
+	    }
 	    break;
 	case ButtonReturn:
 	    for( i=0; i<NumSelected; ++i ) {
