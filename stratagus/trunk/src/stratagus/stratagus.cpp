@@ -111,7 +111,12 @@
 **
 **	@subsection AI AI
 **
-**		@see new_ai.h @ai_local.h
+**		There are currently two AI's. The old one is very hardcoded,
+**		but does things like placing buildings better than the new.
+**		The new is very flexible, but very basic. It includes none
+**		optimations.
+**
+**		@see new_ai.c ai_local.h
 **		@see ai.h @see ai.c
 **
 **	@subsection CCL CCL
