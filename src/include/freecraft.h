@@ -321,7 +321,7 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 --	Screen
 ----------------------------------------------------------------------------*/
 
-// FIXME: this values should go into a general ui structure.
+// FIXME: this values should go into a general ui structure
 
 #define noGRID		1		/// Map is shown with a grid, if 1
 
@@ -455,18 +455,23 @@ extern int SpeedTrain;			/// speed factor for training
 extern int SpeedUpgrade;		/// speed factor for upgrading
 extern int SpeedResearch;		/// speed factor for researching
 
+extern unsigned SyncRandSeed;		/// sync random seed value.
+
 extern void LoadGame(char*);		/// Load saved game back
 extern void SaveGame(const char*);	/// Save game for later load
 
 extern void SaveAll(void);		/// Call all modules to save states
-extern void LoadAll(void);		/// Load all data back.
+extern void LoadAll(void);		/// Load all data back
 
-extern int SyncRand(void);
+extern int SyncRand(void);		/// Syncron rand
 
-extern int main1(int argc,char* argv[]);/// init freecraft.
-extern volatile void Exit(int err);	/// exit freecraft.
+extern int main1(int argc,char* argv[]);/// init freecraft
+extern volatile void Exit(int err);	/// exit freecraft
 
-extern void UpdateDisplay(void);
+extern void UpdateDisplay(void);	/// game display update
+extern void InitModules(void);		/// Initinalize all modules
+extern void LoadModules(void);		/// Load all modules
+extern void CleanModules(void);		/// Cleanup all modules
 extern void GameMainLoop(void);		/// game main loop
 
      /// strdup + strcat
@@ -499,21 +504,21 @@ extern char* strdcat3(const char* l, const char *m, const char* r);
     /// How long stay in a oil-deposit
 #define WAIT_FOR_OIL	(100/SpeedOil)
 
-    /// How many resource get the player back if canceling building.
+    /// How many resource get the player back if canceling building
 #define CancelBuildingCostsFactor	75
-    /// How many resource get the player back if canceling training.
+    /// How many resource get the player back if canceling training
 #define CancelTrainingCostsFactor	100
-    /// How many resource get the player back if canceling research.
+    /// How many resource get the player back if canceling research
 #define CancelResearchCostsFactor	100
-    /// How many resource get the player back if canceling upgrade.
+    /// How many resource get the player back if canceling upgrade
 #define CancelUpgradeCostsFactor	100
 
-    /// How near could a hall or gold-depot be build to a goldmine.
+    /// How near could a hall or gold-depot be build to a goldmine
 #define GOLDMINE_DISTANCE	3
-    /// How near could a oil-depot be build to a oil-patch.
+    /// How near could a oil-depot be build to a oil-patch
 #define OILPATCH_DISTANCE	3
 
-    /// How near we could repair an unit.
+    /// How near we could repair an unit
 #define REPAIR_RANGE		1
 
 //@}
