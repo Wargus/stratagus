@@ -35,6 +35,12 @@
 #include "map.h"
 
 /*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
+
+global unsigned SyncHash;	/// Hash calculated to find sync failures
+
+/*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
@@ -265,16 +271,17 @@ local void HandleUnitAction(Unit* unit)
 global void UnitActions(void)
 {
     Unit** table;
+    Unit* unit;
 
     //
     // Do all actions
     //
     for( table=Units; table<Units+NumUnits; table++ ) {
+	unit=*table;
+
 #if defined(UNIT_ON_MAP) && 0		// debug unit store
 	Unit* list;
-	Unit* unit;
 
-	unit=*table;
 	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
 	while( list ) {				// find the unit
 	    if( list==unit ) {
@@ -303,23 +310,23 @@ global void UnitActions(void)
 	    list=list->Next;
 	}
 #endif
-	if( --(*table)->Wait ) {	// Wait until counter reached
+	if( --unit->Wait ) {		// Wait until counter reached
 	    continue;
 	}
-	HandleUnitAction(*table);
-#ifdef no_DEBUG
+	HandleUnitAction(unit);
+	DebugCheck( *table!=unit );	// Removed is evil.
+#ifdef noDEBUG
 	//
 	//	Dump the unit to find the network unsyncron bug.
 	//
 	{
 	static FILE* logf;
-	Unit* unit;
 
 	if( !logf ) {
 	    time_t now;
 	    char buf[256];
 
-	    sprintf(buf,"log_of_freecraft_%d.log",ThisPlayer->Player);
+	    sprintf(buf,"log_of_fc_%d.log",ThisPlayer->Player);
 	    logf=fopen(buf,"wb");
 	    if( !logf ) {
 		return;
@@ -331,17 +338,25 @@ global void UnitActions(void)
 	    fprintf(logf,";;;\tMap: %s\n\n",TheMap.Description);
 	}
 
-	unit=*table;
 	fprintf(logf,"%d: ",FrameCounter);
-	fprintf(logf,"%Zd %s S%d/%d-%d\n",
+	fprintf(logf,"%Zd %s S%d/%d-%d P%d Refs %d\n",
 	    UnitNumber(unit),unit->Type->Ident,
 		unit->State,unit->SubAction,
-		unit->Command.Action);
+		unit->Orders[0].Action,
+		unit->Player->Player,unit->Refs);
 		
 	// SaveUnit(unit,logf);
 	fflush(NULL);
 	}
 #endif
+	//
+	//	Calculate some hash.
+	//
+	SyncHash=(SyncHash<<5)|(SyncHash>>27);
+	SyncHash^=unit->Orders[0].Action<<18;
+	SyncHash^=unit->State<<12;
+	SyncHash^=unit->SubAction<<6;
+	SyncHash^=unit->Refs<<3;
     }
 }
 
