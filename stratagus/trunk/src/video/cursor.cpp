@@ -124,7 +124,7 @@ local int HiddenCursorY;	/// saved cursor position on screen Y
 local int HiddenCursorW;	/// saved cursor width in pixel
 local int HiddenCursorH;	/// saved cursor height in pixel
 
-        /// Memory re-use, so can be defined although no save present!
+	/// Memory re-use, so can be defined although no save present!
 local int OldCursorSize;	/// size of saved cursor image
 #ifdef USE_SDL_SURFACE
 local SDL_Surface* OldCursorImage;		/// background saved behind cursor
@@ -730,7 +730,11 @@ local void SaveCursorBackground32(int x, int y, int w, int h)
 global void DestroyCursorBackground(void)
 {
     if (OldCursorImage) {
+#ifdef USE_SDL_SURFACE
+	SDL_FreeSurface(OldCursorImage);
+#else
 	free(OldCursorImage);
+#endif
 	OldCursorImage = NULL;
     }
     OldCursorSize = 0;
@@ -966,36 +970,36 @@ global void HideAnyCursor(void)
     //	First, Normal cursor (might restore part of rectangle cursor also).
     //
     if (OldCursorW && OldCursorImage) {
-        // restore area of visible cursor
-        LoadCursorBackground(OldCursorX, OldCursorY, OldCursorW, OldCursorH);
+	// restore area of visible cursor
+	LoadCursorBackground(OldCursorX, OldCursorY, OldCursorW, OldCursorH);
 
-        // save hidden area to be invalidated
-        HiddenCursorX = OldCursorX;
-        HiddenCursorY = OldCursorY;
-        HiddenCursorW = OldCursorW;
-        HiddenCursorH = OldCursorH;
+	// save hidden area to be invalidated
+	HiddenCursorX = OldCursorX;
+	HiddenCursorY = OldCursorY;
+	HiddenCursorW = OldCursorW;
+	HiddenCursorH = OldCursorH;
 
-        // Denote cursor no longer visible
-        OldCursorW = 0;
+	// Denote cursor no longer visible
+	OldCursorW = 0;
     }
 
     //
     //	Last, Selecting rectangle
     //
     if (OldCursorRectangleW) {
-        //  restore area of visible cursor
+	//  restore area of visible cursor
 	LoadCursorRectangle(OldCursorRectangle,
 	    OldCursorRectangleX, OldCursorRectangleY,
 	    OldCursorRectangleW, OldCursorRectangleH);
 
-        // save hidden area to be invalidated
-        HiddenCursorRectangleX = OldCursorRectangleX;
-        HiddenCursorRectangleY = OldCursorRectangleY;
-        HiddenCursorRectangleW = OldCursorRectangleW;
-        HiddenCursorRectangleH = OldCursorRectangleH;
+	// save hidden area to be invalidated
+	HiddenCursorRectangleX = OldCursorRectangleX;
+	HiddenCursorRectangleY = OldCursorRectangleY;
+	HiddenCursorRectangleW = OldCursorRectangleW;
+	HiddenCursorRectangleH = OldCursorRectangleH;
 
-        // Denote cursor no longer visible
-        OldCursorRectangleW = 0;
+	// Denote cursor no longer visible
+	OldCursorRectangleW = 0;
     } else if (BuildingCursor) {
 	//
 	//	Or Selecting position for building
@@ -1003,7 +1007,7 @@ global void HideAnyCursor(void)
 	//NOTE: this will restore tiles themselves later in next video update
 	MarkDrawAreaMap(BuildingCursorSX, BuildingCursorSY,
 	    BuildingCursorEX, BuildingCursorEY);
-        BuildingCursor = 0;
+	BuildingCursor = 0;
     }
 }
 
