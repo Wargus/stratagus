@@ -274,15 +274,15 @@ typedef struct _menuitem_ {
 */
 typedef struct _menus_ {
     // FIXME: char* Name;			/// menu name
-    int x;				/// menu area x pos
-    int y;				/// menu area y pos
-    int xsize;				/// menu area x size
-    int ysize;				/// menu area y size
-    int	image;				/// optional background panel image #
-    int defsel;				/// initial selected item number (or -1)
-    int nitems;				/// number of items to follow
-    Menuitem *items;			/// buttons, etc
-    void (*netaction)(void);		/// network action callback
+    int X;				/// menu area x pos
+    int Y;				/// menu area y pos
+    int Width;				/// menu area width
+    int Height;				/// menu area height
+    int	Image;				/// optional background panel image #
+    int DefSel;				/// initial selected item number (or -1)
+    int NumItems;			/// number of items to follow
+    Menuitem *Items;			/// buttons, etc
+    void (*NetAction)(void);		/// network action callback
 } Menu;
 
 /**
