@@ -347,10 +347,10 @@ local SCM CclDisplayPicture(SCM file)
 */
 local SCM CclProcessMenu(SCM id)
 {
-    char *mid;
+    char* mid;
 
     mid = gh_scm2newstr(id, NULL);
-    if (hash_find(MenuHash, mid)) {
+    if (FindMenu(mid)) {
 	ProcessMenu(mid, 1);
     }
     free(mid);
@@ -1458,7 +1458,7 @@ local SCM CclDefineMenu(SCM list)
     }
 
     if (name) {
-	menu = (Menu*)calloc(1,sizeof(Menu));
+	menu = malloc(sizeof(Menu));
 	memcpy(menu, &item, sizeof(Menu));
 	menu->nitems = 0; // reset to zero
 	//move the buttons for different resolutions..
