@@ -111,7 +111,7 @@ DSOUND		= -DWITH_SOUND
 #------------------------------------------------------------------------------
 
 # Choose which compress you like
-#	The win32 port didn't support BZ2LIB
+#	New zziplib support added
 
 # None
 #ZDEFS		=
@@ -125,6 +125,9 @@ ZLIBS		= -lz
 # GZ + BZ2 compression
 #ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB
 #ZLIBS		= -lz -lbz2
+# GZ + BZ2 + ZZIP compression
+#ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB -DUSE_ZZIPLIB
+#ZLIBS		= -lzzip -lz -lbz2
 
 #------------------------------------------------------------------------------
 
@@ -132,10 +135,8 @@ ZLIBS		= -lz
 # extra linker flags and include directory
 # -L/usr/lib
 
-XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib \
-		  -L$(TOPDIR)/libpng-1.0.5 -L$(TOPDIR)/zlib-1.1.3
-XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
-		  -I$(TOPDIR)/libpng-1.0.5 -I$(TOPDIR)/zlib-1.1.3
+XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib 
+XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include 
 
 #------------------------------------------------------------------------------
 #	Support for SIOD (scheme interpreter)
@@ -148,6 +149,8 @@ CCLLIB	= -lm
 
 # Uncomment next to profile
 #PROFILE=	-pg
+# Uncomment next to profile with basic blocks
+#PROFILE=	-pg -a
 
 # Compile Version
 VERSION=	'-DVERSION="1.17pre1-build14"'
@@ -160,7 +163,7 @@ TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm $(THREADLIB)
 
 # Libraries needed to build freecraft
 CLONELIBS=$(XLDFLAGS) -lpng -lz -lm \
-	$(THREADLIB) $(CCLLIB) $(VIDEOLIB) $(ZLIBS)
+	$(THREADLIB) $(CCLLIB) $(VIDEOLIB) $(ZLIBS) #-lefence
 
 DISTLIST=$(TOPDIR)/distlist
 TAGS=$(TOPDIR)/src/tags
@@ -187,15 +190,17 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ##
 ## SLOW_INPUT		If you have problems that events aren't fetched.
 ## There are some still not well tested code parts or branches.
-## UNIT_ON_MAP:		Faster lookup of units
-## NEW_MAPDRAW:		Stephans new map draw code
+## UNIT_ON_MAP:		Fast lookup of units
+## UNITS_ON_MAP:	Faster lookup of units
+## NEW_MAPDRAW:		Stephans new map draw code (broken in this release)
 ## NEW_AI:		New better improved AI code
 ## USE_TILECACHE:	Faster tile drawing, costs memory.
 ## USE_SMART_TILECACHE:	Faster tile drawing, slow with hardware video memory.
+## USE_HP_FOR_XP	Use hit-points for XP calculations.
+## NEW_NETMENUS:	Include new network menues.
 ## This aren't working:
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
-## NEW_NETMENUS:	Include new network menues.
 ## NEW_REGIONS:		Support for new regions code
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
 	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS -DNEW_NETMENUS
@@ -216,8 +221,9 @@ CCLD=c++
 RM=rm -f
 MAKE=make
 
-## JOHNS: my ctags didn't support
-CTAGSFLAGS=-i defmpstuvFS -a -f
+# TAGS 5.0
+CTAGSFLAGS=--c-types=defmpstuvx -a -f
+#CTAGSFLAGS=-i defmpstuvFS -a -f
 #CTAGSFLAGS=-i defptvS -a -f
 
 #
@@ -226,6 +232,10 @@ CTAGSFLAGS=-i defmpstuvFS -a -f
 LOCKVER=	rcs -q -n$(NAME)
 
 %.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+	@ar cru $(TOPDIR)/src/libclone.a $@
+
+%.o: %.cpp
 	$(CC) -c $(CFLAGS) $< -o $@
 	@ar cru $(TOPDIR)/src/libclone.a $@
 
@@ -241,6 +251,9 @@ DOCPP=		doc++
 
 %.doc: %.c
 	@$(TOPDIR)/tools/aledoc $< | $(DOCIFY) > $*-c.doc 2>/dev/null
+
+%.doc: %.cpp
+	@$(TOPDIR)/tools/aledoc $< | $(DOCIFY) > $*-cpp.doc 2>/dev/null
 
 %.doc: %.h
 	@$(TOPDIR)/tools/aledoc $< | $(DOCIFY) > $*-h.doc 2>/dev/null
