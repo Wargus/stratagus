@@ -86,6 +86,7 @@ local void GameMenuEndScenario(void);
 local void GameOptions(void);
 
 local void HelpMenu(void);
+local void KeystrokeHelpMenu(void);
 local void ShowTipsMenu(void);
 local void InitTips(Menuitem *mi);
 local void TipsMenuEnd(void);
@@ -997,9 +998,24 @@ local Menuitem HelpMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Help Menu", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Keystroke ~!Help", 224, 27, MBUTTON_GM_FULL, NULL, 'h'} } },
+	{ button:{ "Keystroke ~!Help", 224, 27, MBUTTON_GM_FULL, KeystrokeHelpMenu, 'h'} } },
     { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Freecraft ~!Tips", 224, 27, MBUTTON_GM_FULL, ShowTipsMenu, 't'} } },
+    { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
+#else
+    { 0 }
+#endif
+};
+
+local Menuitem KeystrokeHelpMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Keystroke Help Menu", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "TEMP1", 224, 27, MBUTTON_GM_FULL, NULL, 'h'} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "TEMP2", 224, 27, MBUTTON_GM_FULL, NULL, 't'} } },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
 #else
@@ -1252,6 +1268,16 @@ global Menu Menus[] = {
 	ImagePanel1,
 	4, 4,
 	HelpMenuItems,
+	NULL,
+    },
+    {
+	// Keystroke Help Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	4, 4,
+	KeystrokeHelpMenuItems,
 	NULL,
     },
     
@@ -2117,6 +2143,11 @@ local void GameMenuEnd(void)
     InterfaceState = IfaceStateNormal;
     GameRunning=0;
     EndMenu();
+}
+
+local void KeystrokeHelpMenu(void)
+{
+    ProcessMenu(MENU_KEYSTROKE_HELP, 1);
 }
 
 local void HelpMenu(void)
