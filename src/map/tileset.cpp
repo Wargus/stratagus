@@ -97,7 +97,7 @@ global void LoadTileset(void)
     int mixed;
     unsigned char* data;
     char* buf;
-    const unsigned short *table;
+    const unsigned short* table;
 
     //
     //  Find the tileset.
@@ -128,7 +128,7 @@ global void LoadTileset(void)
     ShowLoadProgress("\tTileset `%s'\n", Tilesets[i]->ImageFile);
     TheMap.TileData = LoadGraphic(buf);
 #ifdef USE_OPENGL
-    MakeTexture(TheMap.TileData,TheMap.TileData->Width,TheMap.TileData->Height);
+    MakeTexture(TheMap.TileData, TheMap.TileData->Width, TheMap.TileData->Height);
 #endif
 
     TileSizeX = Tilesets[i]->TileSizeX;
@@ -181,10 +181,9 @@ global void LoadTileset(void)
 	unsigned char *s;
 	unsigned char *d;
 
-	s = ((char *)TheMap.TileData->Frames)
-	    + ((tile % tiles_per_row) * (TileSizeX + gap))
-	    + ((tile / tiles_per_row) * (TileSizeY +
-		gap)) * TheMap.TileData->Width;
+	s = (char *)TheMap.TileData->Frames +
+	    (tile % tiles_per_row) * (TileSizeX + gap) +
+	    (tile / tiles_per_row) * (TileSizeY + gap) * TheMap.TileData->Width;
 	d = TheMap.Tiles[tile];
 	if (d != data + tile * TileSizeX * TileSizeY) {
 	    abort();
@@ -309,50 +308,67 @@ global void LoadTileset(void)
     //8 Top Left
     //16 Bottom Tree Tile
     //32 Top Tree Tile
-    for (i = solid; i < solid + 16; i++ ) {
+    for (i = solid; i < solid + 16; ++i) {
 	TheMap.Tileset->MixedLookupTable[table[i]] = 15;
     }
-    for (i = mixed; i < mixed + 256; i++) {
-	int check=(int)((i-mixed)/16);
+    for (i = mixed; i < mixed + 256; ++i) {
+	int check;
+	
+	check = (int)((i - mixed) / 16);
 	switch (check) {
-	    case 0: TheMap.Tileset->MixedLookupTable[table[i]] = 8;
+	    case 0:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8;
 		break;
-	    case 1: TheMap.Tileset->MixedLookupTable[table[i]] = 4;
+	    case 1:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 4;
 		break;
-	    case 2: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4;
+	    case 2:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4;
 		break;
-	    case 3: TheMap.Tileset->MixedLookupTable[table[i]] = 1;
+	    case 3:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 1;
 		break;
-	    case 4: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 1;
+	    case 4:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 1;
 		break;
-	    case 5: TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 1;
+	    case 5:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 1;
 		break;
-	    case 6: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 1;
+	    case 6:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 1;
 		break;
-	    case 7: TheMap.Tileset->MixedLookupTable[table[i]] = 2;
+	    case 7:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 2;
 		break;
-	    case 8: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 2;
+	    case 8:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 2;
 		break;
-	    case 9: TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 2;
+	    case 9:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 2;
 		break;
-	    case 10: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 2;
+	    case 10:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 2;
 	 	break;
-	    case 11: TheMap.Tileset->MixedLookupTable[table[i]] = 2 + 1;
+	    case 11:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 2 + 1;
 		break;
-	    case 12: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 2 + 1;
+	    case 12:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 2 + 1;
 		break;
-	    case 13: TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 2 + 1;
+	    case 13:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 2 + 1;
 		break;
-	    default: TheMap.Tileset->MixedLookupTable[table[i]] = 0;
+	    default:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 0;
 		break;
 	}
     }
     //16 Bottom Tree Special
     //32 Top Tree Special
     //64 Mid tree special - differentiate with mixed tiles.
-    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->BotOneTree]=12+16;
-    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->TopOneTree]=3+32;
-    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->MidOneTree]=15+48;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->BotOneTree] = 12 + 16;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->TopOneTree] = 3 + 32;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->MidOneTree] = 15 + 48;
 
     //
     //  Build rock removement table.
@@ -381,48 +397,65 @@ global void LoadTileset(void)
     //2 Bottom Right
     //4 Top Right
     //8 Top Left
-    for (i = solid; i < solid + 16; i++ ) {
+    for (i = solid; i < solid + 16; ++i) {
 	TheMap.Tileset->MixedLookupTable[table[i]] = 15;
     }
-    for (i = mixed; i < mixed + 256; i++) {
-	int check=(int)((i-mixed)/16);
+    for (i = mixed; i < mixed + 256; ++i) {
+	int check;
+	
+	check = (int)((i - mixed) / 16);
 	switch (check) {
-	    case 0: TheMap.Tileset->MixedLookupTable[table[i]] = 8;
+	    case 0:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8;
 		break;
-	    case 1: TheMap.Tileset->MixedLookupTable[table[i]] = 4;
+	    case 1:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 4;
 		break;
-	    case 2: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4;
+	    case 2:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4;
 		break;
-	    case 3: TheMap.Tileset->MixedLookupTable[table[i]] = 1;
+	    case 3:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 1;
 		break;
-	    case 4: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 1;
+	    case 4:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 1;
 		break;
-	    case 5: TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 1;
+	    case 5:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 1;
 		break;
-	    case 6: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 1;
+	    case 6:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 1;
 		break;
-	    case 7: TheMap.Tileset->MixedLookupTable[table[i]] = 2;
+	    case 7:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 2;
 		break;
-	    case 8: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 2;
+	    case 8:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 2;
 		break;
-	    case 9: TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 2;
+	    case 9:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 2;
 		break;
-	    case 10: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 2;
+	    case 10:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 2;
 	 	break;
-	    case 11: TheMap.Tileset->MixedLookupTable[table[i]] = 2 + 1;
+	    case 11:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 2 + 1;
 		break;
-	    case 12: TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 2 + 1;
+	    case 12:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 2 + 1;
 		break;
-	    case 13: TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 2 + 1;
+	    case 13:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 4 + 2 + 1;
 		break;
-	    default: TheMap.Tileset->MixedLookupTable[table[i]] = 0;
+	    default:
+		TheMap.Tileset->MixedLookupTable[table[i]] = 0;
 		break;
 	}
     }
 
-    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->BotOneRock]=12+16;
-    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->TopOneRock]=3+32;
-    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->MidOneRock]=15+48;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->BotOneRock] = 12 + 16;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->TopOneRock] = 3 + 32;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->MidOneRock] = 15 + 48;
 
     TheMap.Tileset->RockTable[ 0] = -1;
     TheMap.Tileset->RockTable[ 1] = table[mixed + 0x30]; 
@@ -482,7 +515,7 @@ global void LoadTileset(void)
     TheMap.Tileset->OrcWallTable[15] = 0x0C0;
 
     // Set destroyed walls to TileTypeUnknown
-    for (i=0; i<16; ++i) {
+    for (i = 0; i < 16; ++i) {
 	n = 0;
 	tile = TheMap.Tileset->HumanWallTable[i];
 	while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
@@ -501,7 +534,7 @@ global void LoadTileset(void)
 	    ++tile;
 	    ++n;
 	}
-	while (n<16 && TheMap.Tileset->Table[tile]) {
+	while (n < 16 && TheMap.Tileset->Table[tile]) {
 	    TheMap.Tileset->TileTypeTable[
 		TheMap.Tileset->Table[tile]] = TileTypeUnknown;
 	    ++tile;
@@ -578,7 +611,7 @@ local void SaveTilesetSolid(CLFile* file, const unsigned short* table,
     CLprintf(file, "  'solid (list \"%s\"", name);
     SaveTilesetFlags(file, flags);
     // Remove empty tiles at end of block
-    for (n = 15; n >= 0 && !table[start + n]; n--) {
+    for (n = 15; n >= 0 && !table[start + n]; --n) {
     }
     i = CLprintf(file, "\n    #(");
     for (j = 0; j <= n; ++j) {
@@ -613,20 +646,20 @@ local void SaveTilesetMixed(CLFile* file, const unsigned short* table,
 
     CLprintf(file, "  'mixed (list \"%s\" \"%s\"", name1, name2);
     SaveTilesetFlags(file, flags);
-    CLprintf(file,"\n");
+    CLprintf(file, "\n");
     for (x = 0; x < 0x100; x += 0x10) {
 	if (start + x >= end) {		// Check end must be 0x10 aligned
 	    break;
 	}
 	CLprintf(file, "    #(");
 	// Remove empty slots at end of table
-	for (n = 15; n >= 0 && !table[start + x + n]; n--) {
+	for (n = 15; n >= 0 && !table[start + x + n]; --n) {
 	}
 	i = 6;
 	for (j = 0; j <= n; ++j) {
 	    i += CLprintf(file, " %3d", table[start + x + j]);
 	}
-	if (x == 0xF0 ) {
+	if (x == 0xF0) {
 	    i += CLprintf(file, "))");
 	} else {
 	    i += CLprintf(file, ")");
@@ -645,7 +678,7 @@ local void SaveTilesetMixed(CLFile* file, const unsigned short* table,
 **	@param file	Output file.
 **	@param tileset	Save the content of this tileset.
 */
-local void SaveTileset(CLFile*file, const Tileset* tileset)
+local void SaveTileset(CLFile* file, const Tileset* tileset)
 {
     const unsigned short* table;
     int i;
@@ -657,8 +690,7 @@ local void SaveTileset(CLFile*file, const Tileset* tileset)
     CLprintf(file, "\n  'image \"%s\"", tileset->ImageFile);
     CLprintf(file, "\n  'palette \"%s\"", tileset->PaletteFile);
     CLprintf(file, "\n  ;; Slots descriptions");
-    CLprintf(file,
-	"\n  'slots (list\n  'special (list\t\t;; Can't be in pud\n");
+    CLprintf(file, "\n  'slots (list\n  'special (list\t\t;; Can't be in pud\n");
     CLprintf(file, "    'top-one-tree %d 'mid-one-tree %d 'bot-one-tree %d\n",
 	tileset->TopOneTree, tileset->MidOneTree, tileset->BotOneTree);
     CLprintf(file, "    'removed-tree %d\n", tileset->RemovedTree);
@@ -708,8 +740,7 @@ global void SaveTilesets(CLFile* file)
     char** sp;
 
     CLprintf(file, "\n;;; -----------------------------------------\n");
-    CLprintf(file,
-	";;; MODULE: tileset $Id$\n\n");
+    CLprintf(file, ";;; MODULE: tileset $Id$\n\n");
 
     //  Original number to internal tileset name
 
@@ -743,7 +774,7 @@ global void CleanTilesets(void)
     //
     //	Free the tilesets
     //
-    for( i=0; i<NumTilesets; ++i ) {
+    for (i = 0; i < NumTilesets; ++i) {
 	free(Tilesets[i]->Ident);
 	free(Tilesets[i]->Class);
 	free(Tilesets[i]->Name);
@@ -754,7 +785,7 @@ global void CleanTilesets(void)
 	free(Tilesets[i]->Tiles);
 	free(Tilesets[i]->TileTypeTable);
 	free(Tilesets[i]->AnimationTable);
-	for( j=0; j<Tilesets[i]->NumTerrainTypes; ++j ) {
+	for (j = 0; j < Tilesets[i]->NumTerrainTypes; ++j) {
 	    free(Tilesets[i]->SolidTerrainTypes[j].TerrainName);
 	}
 	free(Tilesets[i]->SolidTerrainTypes);
@@ -762,27 +793,27 @@ global void CleanTilesets(void)
 	free(Tilesets[i]);
     }
     free(Tilesets);
-    Tilesets=NULL;
-    NumTilesets=0;
+    Tilesets = NULL;
+    NumTilesets = 0;
 
     //
     //	Should this be done by the map?
     //
     VideoSaveFree(TheMap.TileData);
-    TheMap.TileData=NULL;
+    TheMap.TileData = NULL;
     free(TheMap.Tiles);
-    TheMap.Tiles=NULL;
+    TheMap.Tiles = NULL;
 
     //
     //	Mapping the original tileset numbers in puds to our internal strings
     //
-    if( (ptr=TilesetWcNames) ) {	// Free all old names
-	while( *ptr ) {
+    if ((ptr = TilesetWcNames)) {	// Free all old names
+	while (*ptr) {
 	    free(*ptr++);
 	}
 	free(TilesetWcNames);
 
-	TilesetWcNames=NULL;
+	TilesetWcNames = NULL;
     }
 }
 

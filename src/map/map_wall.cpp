@@ -81,8 +81,8 @@ global int MapIsSeenTileWall(int x, int y, int walltype)
 {
     int t;
 
-    t = TheMap.Tileset->TileTypeTable
-	    [TheMap.Fields[(x) + (y) * TheMap.Width]. SeenTile];
+    t = TheMap.Tileset->TileTypeTable[
+	TheMap.Fields[x + y * TheMap.Width].SeenTile];
     if (walltype == -1) {
 	return t == TileTypeHumanWall || t == TileTypeOrcWall;
     }
@@ -99,7 +99,7 @@ global void MapFixSeenWallTile(int x, int y)
 {
     int t;
     int tile;
-    MapField *mf;
+    MapField* mf;
 
     //  Outside of map or no wall.
     if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
@@ -194,7 +194,7 @@ global void MapFixSeenWallNeighbors(int x, int y)
 global void MapFixWallTile(int x, int y)
 {
     int tile;
-    MapField *mf;
+    MapField* mf;
     int t;
 
     //  Outside of map or no wall.
