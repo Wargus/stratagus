@@ -193,9 +193,6 @@ extern ServerSetup LocalSetupState;	/// Network menu: Multiplayer Client Menu se
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void NetworkServerSetup(WorldMap *map);	/// Connection server setup
-extern void NetworkClientSetup(WorldMap *map);	/// Connection client setup
-extern void NetworkSetupArgs(void);		/// Setup command line connection parameters
 extern void NetworkServerStartGame(void);	/// Server user has finally hit the start game button
 extern void NetworkConnectSetupGame(void);	/// Assign Player slot, evaluate Setup state..
 

@@ -1049,7 +1049,7 @@ Use it at your own risk.\n\n");
 
     InitUnitsMemory();		// Units memory management
     PreMenuSetup();		// Load everything needed for menus
-    NetworkSetupArgs();		// Evaluate optional command line parameters
+
     WaitForInput(20);		// Show game intro
 
     MenuLoop(MapName,&TheMap);	// Enter the menu loop
@@ -1115,11 +1115,10 @@ local void Usage(void)
 \t-f factor\tComputer units cost factor\n\
 \t-h\t\tHelp shows this page\n\
 \t-l\t\tEnable command log to \"command.log\"\n\
-\t-p players\tDON'T USE! Number of players\n\
-\t-P port\t\tNetwork port to use (menu code only)\n\
-\t-n [localport:]host[:port]\tNetwork argument (port default 6660)\n\
+\t-P port\t\tNetwork port to use\n\
+\t-n server\tNetwork server host preset\n\
 \t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
-\t-U update\tNetwork update rate in # frames (default 5=6x pro s)\n\
+\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
 \t-N name\t\tName of the player\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 \t-t factor\tComputer units built time factor\n\
@@ -1169,7 +1168,7 @@ global int main(int argc,char** argv)
     //	Parse commandline
     //
     for( ;; ) {
-	switch( getopt(argc,argv,"c:d:f:hln:p:P:s:t:v:wD:N:FL:S:U:W?") ) {
+	switch( getopt(argc,argv,"c:d:f:hln:P:s:t:v:wD:N:FL:S:U:W?") ) {
 	    case 'c':
 		CclStartFile=optarg;
 		continue;
@@ -1181,9 +1180,6 @@ global int main(int argc,char** argv)
 		continue;
 	    case 'l':
 		CommandLogEnabled=1;
-		continue;
-	    case 'p':
-		NetPlayers=atoi(optarg);
 		continue;
 	    case 'P':
 		NetworkPort=atoi(optarg);
