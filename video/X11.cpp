@@ -1118,37 +1118,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 #endif
 }
 
-/**
-**	Wait for interactive input event.
-**
-**	Handles X11 events, keyboard, mouse.
-**	Video interrupt for sync.
-**	Network messages.
-**	Sound queue.
-**
-**	We must handle atlast one X11 event
-**
-**	@todo FIXME: Use the ::WaitEventsOneFrame().
-*/
-global void WaitEventsAndKeepSync(void)
-{
-    EventCallback callbacks;
-
-    callbacks.ButtonPressed=(void*)HandleButtonDown;
-    callbacks.ButtonReleased=(void*)HandleButtonUp;
-    callbacks.MouseMoved=(void*)HandleMouseMove;
-    callbacks.MouseExit=(void*)HandleMouseExit;
-
-    callbacks.KeyPressed=HandleKeyDown;
-    callbacks.KeyReleased=HandleKeyUp;
-
-    callbacks.NetworkEvent=NetworkEvent;
-    callbacks.SoundReady=WriteSound;
-
-    DebugLevel0Fn("Don't use this function\n");
-    WaitEventsOneFrame(&callbacks);
-}
-
 #if 0
 /**
 **	Free a hardware dependend palette.
