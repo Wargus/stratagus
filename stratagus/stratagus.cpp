@@ -74,7 +74,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef __MSC__
 #include <unistd.h>
+#endif
 #include <sys/time.h>
 #include <time.h>
 

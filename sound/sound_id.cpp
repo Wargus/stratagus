@@ -36,7 +36,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "video.h"
 #include "sound_id.h"

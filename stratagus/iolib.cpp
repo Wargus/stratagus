@@ -36,7 +36,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef __MSC__
 #include <unistd.h>
+#endif
 #include <errno.h>
 
 #include "freecraft.h"
