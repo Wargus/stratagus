@@ -892,9 +892,13 @@ static int CclUnit(lua_State* l)
 		}
 	}
 
-	// FIXME : When it is reached ?
+	// Unit may not have been assigned to a player before now. If not,
+	// do so now. It is only assigned earlier if we have orders.
+	// for loading of units from a MAP, and not a savegame, we won't
+	// have orders for those units.  They should appear here as if
+	// they were just created.
 	if (!unit->Player) {
-		AssignUnitToPlayer (unit, player);
+		AssignUnitToPlayer(unit, player);
 		UpdateForNewUnit(unit, 0);
 		unit->HP = unit->Type->_HitPoints;
 	}

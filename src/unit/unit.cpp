@@ -268,7 +268,6 @@ static Unit* AllocUnit(void)
 	//
 	if (NumUnits >= UnitMax) {
 		DebugPrint("Over all unit limit (%d) reached.\n" _C_ UnitMax);
-		// FIXME: Hoping this is checked everywhere.
 		return NoUnitP;
 	}
 
@@ -285,7 +284,6 @@ static Unit* AllocUnit(void)
 		DebugPrint("%lu:Release %p %d\n" _C_ GameCycle _C_ unit _C_ unit->Slot);
 		slot = UnitSlots + unit->Slot;
 		memset(unit, 0, sizeof(*unit));
-		// FIXME: can release here more slots, reducing memory needs.
 	} else {
 		//
 		// Allocate structure
@@ -395,12 +393,11 @@ void InitUnit(Unit* unit, UnitType* type)
 }
 
 /**
-**  FIXME: Docu
+**  Assigns a unit to a player, adjusting buildings, food and totals
 **
 **  @param unit    unit assigned to player.
 **  @param player  player which have the unit.
 **
-**  @todo FIXME DOCU.
 */
 void AssignUnitToPlayer(Unit* unit, Player* player)
 {
@@ -1707,9 +1704,7 @@ void RescueUnits(void)
 				if (unit->Removed) {
 					continue;
 				}
-				// FIXME: I hope SelectUnits checks bounds?
-				// FIXME: Yes, but caller should check.
-				// NOTE: +1 right,bottom isn't inclusive :(
+
 				if (unit->Type->UnitType == UnitTypeLand) {
 					n = UnitCacheSelect(
 							unit->X - 1, unit->Y - 1,
