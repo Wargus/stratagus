@@ -190,8 +190,6 @@ local int PlayCDRom(const char* name)
 	}
     }
 
-    StopMusic();
-
     // CDPlayer command?
     if (!strncmp(name, ":", 1)) {
 	if (!CDRom) {
@@ -215,6 +213,8 @@ local int PlayCDRom(const char* name)
 	}
 	return 1;
     }
+    
+    StopMusic();
 
     // FIXME: no cdrom, must stop it now!
 
