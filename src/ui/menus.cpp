@@ -151,6 +151,7 @@ local void ScenSelectFolder(void);
 local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
 local void ScenSelectCancel(void);
+local int ScenSelectRDFilter(char *pathbuf, FileList *fl);
 
 local void KeystrokeHelpVSAction(Menuitem *mi, int i);
 local void KeystrokeHelpDrawFunc(Menuitem *mi);
@@ -2351,8 +2352,8 @@ local void SaveSelectLBInit(Menuitem *mi)
     } else {
 	ScenSelectMenuItems[8].flags &= ~MenuButtonDisabled;
     }
-//    i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
-//						     (FileList **)&(mi->d.listbox.options));
+    i = mi->d.listbox.noptions = ReadDataDirectory("data", NULL,
+						     (FileList **)&(mi->d.listbox.options));
     if (i == 0) {
 	ScenSelectMenuItems[3].d.button.text = "OK";
 	ScenSelectMenuItems[3].flags |= MenuButtonDisabled;
@@ -2414,16 +2415,15 @@ local void SaveSelectLBAction(Menuitem *mi, int i)
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
-	if (fl[i].type) {
-	    ScenSelectMenuItems[3].d.button.text = "OK";
-	} else {
-	    ScenSelectMenuItems[3].d.button.text = "Open";
-	}
-	if (mi->d.listbox.noptions > 5) {
+	if (mi->d.listbox.noptions > 7) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
+	strcpy(SaveGameMenuItems[1].d.input.buffer, fl[i].name);
+	SaveGameMenuItems[1].d.input.nch = strlen(fl[i].name);
+	SaveGameMenuItems[4].flags = MenuButtonSelected;
     }
+
 }
 
 local void GameMenuLoad(void)
