@@ -1450,6 +1450,7 @@ local SCM CclDefineUI(SCM list)
     ui->MinimapPanel.File = NULL;
     ui->MinimapPanelX = -1;
     ui->MinimapPanelY = -1;
+    ui->MinimapTransparent = 0;
 
     ui->MinimapPosX = -1;
     ui->MinimapPosY = -1;
@@ -1670,6 +1671,8 @@ local SCM CclDefineUI(SCM list)
 		    sublist = gh_cdr(sublist);
 		    ui->MinimapW = gh_scm2int(gh_car(value));
 		    ui->MinimapH = gh_scm2int(gh_car(gh_cdr(value)));
+		} else if (gh_eq_p(value, gh_symbol2scm("transparent"))) {
+		    ui->MinimapTransparent = 1;
 		} else {
 		    errl("Unsupported tag", value);
 		}
