@@ -104,6 +104,7 @@ global void CleanModules(void)
     CleanMap();
     CleanReplayLog();
     CleanCclCredits();
+    FreeVisionTable();
 #ifdef HIERARCHIC_PATHFINDER
     PfHierClean ();
 #endif
