@@ -193,6 +193,7 @@ local void AiExecuteScript(void)
 local void AiCheckUnits(void)
 {
     int counter[UnitTypeMax];
+    int attacking[UnitTypeMax];
     const AiBuildQueue* queue;
     const int* unit_types_count;
     int i;
@@ -203,6 +204,7 @@ local void AiCheckUnits(void)
     int e;
 
     memset(counter,0,sizeof(counter));
+    memset(attacking,0,sizeof(attacking));
     //
     //	Count the already made build requests.
     //
@@ -258,6 +260,13 @@ local void AiCheckUnits(void)
     //
     //	Look through the forces what is missing.
     //
+    for( i=AI_MAX_FORCES; i<AI_MAX_ATTACKING_FORCES; ++i ) {
+	const AiUnit* unit;
+
+	for( unit=AiPlayer->Force[i].Units; unit; unit=unit->Next ) {
+	    attacking[unit->Unit->Type->Type]++;
+	}
+    }
     for( i=0; i<AI_MAX_FORCES; ++i ) {
 	const AiUnitType* aiut;
 
@@ -270,12 +279,12 @@ local void AiCheckUnits(void)
 	for( aiut=AiPlayer->Force[i].UnitTypes; aiut; aiut=aiut->Next ) {
 	    t=aiut->Type->Type;
 	    x=aiut->Want;
-	    if( x>unit_types_count[t]+counter[t] ) {	// Request it.
+	    if( x>unit_types_count[t]+counter[t]-attacking[t] ) {	// Request it.
 		DebugLevel2Fn("Force %d need %s * %d\n" _C_ i _C_
 			aiut->Type->Ident _C_ x);
 		AiAddUnitTypeRequest(aiut->Type,
-			x-unit_types_count[t]-counter[t]);
-		counter[t]+=x-unit_types_count[t]-counter[t];
+			x-(unit_types_count[t]+counter[t]-attacking[t]));
+		counter[t]+=x-(unit_types_count[t]+counter[t]-attacking[t]);
 		AiPlayer->Force[i].Completed=0;
 	    }
 	    counter[t]-=x;
@@ -662,7 +671,7 @@ local void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
     //
     //	All forces
     //
-    for( i=0; i<AI_MAX_FORCES; ++i ) {
+    for( i=0; i<AI_MAX_ATTACKING_FORCES; ++i ) {
 	const AiUnitType* aut;
 	const AiUnit* aiunit;
 
@@ -896,7 +905,7 @@ global void CleanAi(void)
 	    //
 	    //	Free forces
 	    //
-	    for( i=0; i<AI_MAX_FORCES; ++i ) {
+	    for( i=0; i<AI_MAX_ATTACKING_FORCES; ++i ) {
 		AiUnitType* aut;
 		AiUnit* aiunit;
 
@@ -1161,12 +1170,12 @@ global void AiHelpMe(const Unit* attacker,Unit* defender)
     //
     //	If unit belongs to an attacking force, don't defend it.
     //
-    for( force=0; force<AI_MAX_FORCES; ++force ) {
-	aiunit=pai->Force[force].Units;
+    for( force=0; force<AI_MAX_ATTACKING_FORCES; ++force ) {
 	if( !pai->Force[force].Attacking ) {	// none attacking
 	    // FIXME, send the force for help
 	    continue;
 	}
+	aiunit=pai->Force[force].Units;
 	while( aiunit ) {
 	    if( defender==aiunit->Unit ) {
 		return;
