@@ -64,15 +64,10 @@ global int QuitToMenu;			/// Quit to menu
 global Campaign* Campaigns;		/// Campaigns
 global int NumCampaigns;		/// Number of campaigns
 
-global Campaign* CurrentCampaign;	/// Playing this campaign
-global CampaignChapter* CurrentChapter;	/// Playing this chapter of campaign
-local int SkipCurrentChapter=1;		/// Skip the current chapter when
+local Campaign* CurrentCampaign;	/// Playing this campaign
+local CampaignChapter* CurrentChapter;	/// Playing this chapter of campaign
+local int SkipCurrentChapter = 1;	/// Skip the current chapter when
                                         /// looking for the next one
-
-/**
-**	Unit-type type definition
-*/
-global const char CampaignType[] = "campaign-type";
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -85,47 +80,45 @@ global const char CampaignType[] = "campaign-type";
 */
 global char* NextChapter(void)
 {
-    if( RestartScenario ) {
-	RestartScenario=0;
+    if (RestartScenario) {
+	RestartScenario = 0;
 	return CurrentMapPath;
     }
-    if( QuitToMenu ) {
-	QuitToMenu=0;
-	CurrentCampaign=NULL;
+    if (QuitToMenu) {
+	QuitToMenu = 0;
+	CurrentCampaign = NULL;
 	return NULL;
     }
-    if( !CurrentCampaign ) {
+    if (!CurrentCampaign) {
 	return NULL;
     }
-    if( !CurrentChapter ) {
+    if (!CurrentChapter) {
 	return NULL;
     }
 
     CurrentChapter->Result = GameResult;
 
-    if( GameResult == GameVictory ) {
+    if (GameResult == GameVictory) {
 	//
 	//  FIXME: do other chapter types.
 	//
-	if( SkipCurrentChapter ) {
+	if (SkipCurrentChapter) {
 	    CurrentChapter = CurrentChapter->Next;
 	}
-	while( CurrentChapter) {
-	    if( CurrentChapter->Type==ChapterShowPicture ) {
+	while (CurrentChapter) {
+	    if (CurrentChapter->Type == ChapterShowPicture) {
 		ShowPicture(CurrentChapter);
-	    }
-	    else if( CurrentChapter->Type==ChapterPlayLevel ) {
+	    } else if (CurrentChapter->Type == ChapterPlayLevel) {
 		break;
 	    }
 
 	    CurrentChapter = CurrentChapter->Next;
 	}
-    }
-    else {
+    } else {
 	// FIXME: handle defeat
     }
 
-    if( !CurrentChapter ) {
+    if (!CurrentChapter) {
 	return NULL;
     }
 
@@ -146,32 +139,32 @@ global void PlayCampaign(const char* name)
     //
     //  Find the campaign.
     //
-    for( i=0; i<NumCampaigns; ++i ) {
-	if( !strcmp(Campaigns[i].Ident, name) ) {
+    for (i = 0; i < NumCampaigns; ++i) {
+	if (!strcmp(Campaigns[i].Ident, name)) {
 	    CurrentCampaign = Campaigns + i;
 	}
     }
-    if( !CurrentCampaign ) {
+    if (!CurrentCampaign) {
 	return;
     }
 
-    if( !CurrentCampaign->Chapters ) {
+    if (!CurrentCampaign->Chapters) {
 	char buf[1024];
-	filename=LibraryFileName(CurrentCampaign->File,buf);
+	filename = LibraryFileName(CurrentCampaign->File, buf);
 	vload(filename, 0, 1);
     }
 
-    GameIntro.Objectives[0]=strdup(DefaultObjective);
+    GameIntro.Objectives[0] = strdup(DefaultObjective);
 
-    CurrentChapter=CurrentCampaign->Chapters;
-    SkipCurrentChapter=0;
-    GameResult=GameVictory;
+    CurrentChapter = CurrentCampaign->Chapters;
+    SkipCurrentChapter = 0;
+    GameResult = GameVictory;
 
-    filename=NextChapter();
+    filename = NextChapter();
     DebugCheck(!filename);
 
-    SkipCurrentChapter=1;
-    GameResult=GameNoResult;
+    SkipCurrentChapter = 1;
+    GameResult = GameNoResult;
 
     strcpy(CurrentMapPath, filename);
 }
@@ -182,75 +175,76 @@ global void PlayCampaign(const char* name)
 **	@param chapter	    Chapter.
 **	@param list	    List describing show-picture.
 */
-local void ParseShowPicture(CampaignChapter *chapter,SCM list)
+local void ParseShowPicture(CampaignChapter* chapter, SCM list)
 {
     SCM value;
     SCM sublist;
 
-    chapter->Type=ChapterShowPicture;
+    chapter->Type = ChapterShowPicture;
 
-    while( !gh_null_p(list) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
 
-	if( gh_eq_p(value,gh_symbol2scm("image")) ) {
-	    chapter->Data.Picture.Image=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("fade-in")) ) {
-	    chapter->Data.Picture.FadeIn=gh_scm2int(gh_car(list));
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("fade-out")) ) {
-	    chapter->Data.Picture.FadeOut=gh_scm2int(gh_car(list));
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("display-time")) ) {
-	    chapter->Data.Picture.DisplayTime=gh_scm2int(gh_car(list));
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
-	    ChapterPictureText **text;
+	if (gh_eq_p(value, gh_symbol2scm("image"))) {
+	    chapter->Data.Picture.Image = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("fade-in"))) {
+	    chapter->Data.Picture.FadeIn = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("fade-out"))) {
+	    chapter->Data.Picture.FadeOut = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("display-time"))) {
+	    chapter->Data.Picture.DisplayTime = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("text"))) {
+	    ChapterPictureText** text;
 
-	    sublist=gh_car(list);
-	    list=gh_cdr(list);
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
 
 	    text = &chapter->Data.Picture.Text;
-	    while( *text ) {
+	    while (*text) {
 		text = &((*text)->Next);
 	    }
-	    *text = calloc(sizeof(ChapterPictureText),1);
+	    *text = calloc(sizeof(ChapterPictureText), 1);
 
-	    while( !gh_null_p(sublist) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
 
-		if( gh_eq_p(value,gh_symbol2scm("font")) ) {
-		    (*text)->Font=CclFontByIdentifier(gh_car(sublist));
-		    sublist=gh_cdr(sublist);
-		} else if( gh_eq_p(value,gh_symbol2scm("x")) ) {
-		    (*text)->X=gh_scm2int(gh_car(sublist));
-		    sublist=gh_cdr(sublist);
-		} else if( gh_eq_p(value,gh_symbol2scm("y")) ) {
-		    (*text)->Y=gh_scm2int(gh_car(sublist));
-		    sublist=gh_cdr(sublist);
-		} else if( gh_eq_p(value,gh_symbol2scm("width")) ) {
-		    (*text)->Width=gh_scm2int(gh_car(sublist));
-		    sublist=gh_cdr(sublist);
-		} else if( gh_eq_p(value,gh_symbol2scm("height")) ) {
-		    (*text)->Height=gh_scm2int(gh_car(sublist));
-		    sublist=gh_cdr(sublist);
-		} else if( gh_eq_p(value,gh_symbol2scm("align")) ) {
+		if (gh_eq_p(value, gh_symbol2scm("font"))) {
+		    (*text)->Font = CclFontByIdentifier(gh_car(sublist));
+		    sublist = gh_cdr(sublist);
+		} else if (gh_eq_p(value, gh_symbol2scm("x"))) {
+		    (*text)->X = gh_scm2int(gh_car(sublist));
+		    sublist = gh_cdr(sublist);
+		} else if (gh_eq_p(value, gh_symbol2scm("y"))) {
+		    (*text)->Y = gh_scm2int(gh_car(sublist));
+		    sublist = gh_cdr(sublist);
+		} else if (gh_eq_p(value, gh_symbol2scm("width"))) {
+		    (*text)->Width = gh_scm2int(gh_car(sublist));
+		    sublist = gh_cdr(sublist);
+		} else if (gh_eq_p(value, gh_symbol2scm("height"))) {
+		    (*text)->Height = gh_scm2int(gh_car(sublist));
+		    sublist = gh_cdr(sublist);
+		} else if (gh_eq_p(value, gh_symbol2scm("align"))) {
 		    char* str;
-		    str=gh_scm2newstr(gh_car(sublist), 0);
-		    if( !strcmp(str,"left") ) {
-			(*text)->Align=PictureTextAlignLeft;
-		    } else if( !strcmp(str,"center") ) {
-			(*text)->Align=PictureTextAlignCenter;
+		    str = gh_scm2newstr(gh_car(sublist), 0);
+		    if (!strcmp(str,"left")) {
+			(*text)->Align = PictureTextAlignLeft;
+		    } else if (!strcmp(str, "center")) {
+			(*text)->Align = PictureTextAlignCenter;
 		    } else {
-			errl("Invalid chapter picture text align value",gh_car(sublist));
+			errl("Invalid chapter picture text align value",
+			    gh_car(sublist));
 		    }
 		    free(str);
-		    sublist=gh_cdr(sublist);
-		} else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
-                  (*text)->Text = gh_scm2newstr(gh_car(sublist), 0);
-		    sublist=gh_cdr(sublist);
+		    sublist = gh_cdr(sublist);
+		} else if (gh_eq_p(value,gh_symbol2scm("text"))) {
+		    (*text)->Text = gh_scm2newstr(gh_car(sublist), 0);
+		    sublist = gh_cdr(sublist);
 		}
 	    }
 	}
@@ -269,27 +263,27 @@ local void FreeChapters(CampaignChapter** chapters)
     ChapterPictureText* text;
     ChapterPictureText* textptr;
 
-    ch=*chapters;
-    while( ch ) {
-	if( ch->Type==ChapterShowPicture ) {
+    ch = *chapters;
+    while (ch) {
+	if (ch->Type == ChapterShowPicture) {
 	    free(ch->Data.Picture.Image);
-	    text=ch->Data.Picture.Text;
-	    while( text ) {
+	    text = ch->Data.Picture.Text;
+	    while (text) {
 		free(text->Text);
-		textptr=text;
-		text=text->Next;
+		textptr = text;
+		text = text->Next;
 		free(textptr);
 	    }
-	} else if( ch->Type==ChapterPlayLevel ) {
+	} else if (ch->Type == ChapterPlayLevel) {
 	    free(ch->Data.Level.Name);
-	} else if( ch->Type==ChapterPlayVideo ) {
+	} else if (ch->Type == ChapterPlayVideo) {
 	    free(ch->Data.Movie.PathName);
 	}
-	chptr=ch;
-	ch=ch->Next;
+	chptr = ch;
+	ch = ch->Next;
 	free(chptr);
     }
-    *chapters=NULL;
+    *chapters = NULL;
 }
 
 /**
@@ -312,94 +306,94 @@ local SCM CclDefineCampaign(SCM list)
     //
     //	Campaign name
     //
-    ident=gh_scm2newstr(gh_car(list),NULL);
-    list=gh_cdr(list);
-    campaign=NULL;
+    ident = gh_scm2newstr(gh_car(list), NULL);
+    list = gh_cdr(list);
+    campaign = NULL;
 
-    if( Campaigns ) {
-	for( i=0; i<NumCampaigns; ++i ) {
-	    if( !strcmp(Campaigns[i].Ident, ident) ) {
-		if( !strcmp(ident, "current") && Campaigns[i].Chapters ) {
+    if (Campaigns) {
+	for (i = 0; i < NumCampaigns; ++i) {
+	    if (!strcmp(Campaigns[i].Ident, ident)) {
+		if (!strcmp(ident, "current") && Campaigns[i].Chapters) {
 		    FreeChapters(&Campaigns[i].Chapters);
-		} else if( Campaigns[i].Chapters ) {
+		} else if (Campaigns[i].Chapters) {
 		    // Redefining campaigns causes problems if a campaign is
 		    // playing.
 		    return SCM_UNSPECIFIED;
 		}
-		campaign=Campaigns+i;
+		campaign = Campaigns + i;
 		free(campaign->Ident);
 		free(campaign->Name);
 		free(campaign->File);
 		break;
 	    }
 	}
-	if( i==NumCampaigns ) {
-	    Campaigns=realloc(Campaigns,sizeof(Campaign)*(NumCampaigns+1));
-	    campaign=Campaigns+NumCampaigns;
+	if (i == NumCampaigns) {
+	    Campaigns = realloc(Campaigns, sizeof(Campaign) * (NumCampaigns + 1));
+	    campaign = Campaigns + NumCampaigns;
 	    ++NumCampaigns;
 	}
     } else {
-	campaign=Campaigns=malloc(sizeof(Campaign));
-	NumCampaigns++;
+	campaign = Campaigns = malloc(sizeof(Campaign));
+	++NumCampaigns;
     }
 
-    memset(campaign,0,sizeof(Campaign));
-    campaign->Ident=ident;
-    campaign->Players=1;
-    tail=&campaign->Chapters;
+    memset(campaign, 0, sizeof(Campaign));
+    campaign->Ident = ident;
+    campaign->Players = 1;
+    tail = &campaign->Chapters;
 
     //
     //	Parse the list:	(still everything could be changed!)
     //
-    while( !gh_null_p(list) ) {
+    while (!gh_null_p(list)) {
 
-	value=gh_car(list);
-	list=gh_cdr(list);
+	value = gh_car(list);
+	list = gh_cdr(list);
 
-	if( gh_eq_p(value,gh_symbol2scm("name")) ) {
-	    campaign->Name=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("file")) ) {
-	    campaign->File=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
-	} else if ( gh_eq_p(value,gh_symbol2scm("players")) ) {
-	    campaign->Players=gh_scm2int(gh_car(list));
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("campaign")) ) {
-	    sublist=gh_car(list);
-	    list=gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("name"))) {
+	    campaign->Name = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("file"))) {
+	    campaign->File = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("players"))) {
+	    campaign->Players = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("campaign"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
 	    //
 	    //	Parse the list
 	    //
-	    while( !gh_null_p(sublist) ) {
+	    while (!gh_null_p(sublist)) {
 
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
 
-		chapter=calloc(sizeof(CampaignChapter),1);
-		chapter->Next=*tail;
-		*tail=chapter;
-		tail=&chapter->Next;
+		chapter = calloc(sizeof(CampaignChapter),1);
+		chapter->Next = *tail;
+		*tail = chapter;
+		tail = &chapter->Next;
 
-		if( gh_eq_p(value,gh_symbol2scm("show-picture")) ) {
-		    ParseShowPicture(chapter,gh_car(sublist));
-		    sublist=gh_cdr(sublist);
-		} else if( gh_eq_p(value,gh_symbol2scm("play-movie")) ) {
+		if (gh_eq_p(value, gh_symbol2scm("show-picture"))) {
+		    ParseShowPicture(chapter, gh_car(sublist));
+		    sublist = gh_cdr(sublist);
+		} else if (gh_eq_p(value, gh_symbol2scm("play-movie"))) {
 		    DebugLevel0Fn("FIXME: not supported\n");
-		} else if( gh_eq_p(value,gh_symbol2scm("play-level")) ) {
-		    value=gh_car(sublist);
-		    sublist=gh_cdr(sublist);
+		} else if (gh_eq_p(value, gh_symbol2scm("play-level"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
 
-		    chapter->Type=ChapterPlayLevel;
-		    chapter->Data.Level.Name=gh_scm2newstr(value,NULL);
+		    chapter->Type = ChapterPlayLevel;
+		    chapter->Data.Level.Name = gh_scm2newstr(value, NULL);
 		} else {
 		   // FIXME: this leaves a half initialized campaign
-		   errl("Unsupported tag",value);
+		   errl("Unsupported tag", value);
 		}
 	    }
 	} else {
 	   // FIXME: this leaves a half initialized campaign
-	   errl("Unsupported tag",value);
+	   errl("Unsupported tag", value);
 	}
     }
 
@@ -415,21 +409,21 @@ local SCM CclSetCurrentChapter(SCM num)
 {
     int i;
 
-    for( i=0; i<NumCampaigns; ++i ) {
-	if( !strcmp(Campaigns[i].Ident, "current") ) {
-	    CurrentCampaign=Campaigns+i;
+    for (i = 0; i < NumCampaigns; ++i) {
+	if (!strcmp(Campaigns[i].Ident, "current")) {
+	    CurrentCampaign = Campaigns + i;
 	    break;
 	}
     }
-    if( !CurrentCampaign ) {
+    if (!CurrentCampaign) {
 	return SCM_UNSPECIFIED;
     }
 
-    i=gh_scm2int(num);
-    CurrentChapter=CurrentCampaign->Chapters;
-    while( i && CurrentChapter ) {
+    i = gh_scm2int(num);
+    CurrentChapter = CurrentCampaign->Chapters;
+    while (i && CurrentChapter) {
 	--i;
-	CurrentChapter=CurrentChapter->Next;
+	CurrentChapter = CurrentChapter->Next;
     }
 
     return SCM_UNSPECIFIED;
@@ -446,63 +440,63 @@ local SCM CclBriefing(SCM list)
     int voice;
     int objective;
 
-    voice=objective=0;
+    voice = objective = 0;
     //
     //	Parse the list:	(still everything could be changed!)
     //
-    while( !gh_null_p(list) ) {
+    while (!gh_null_p(list)) {
 
-	value=gh_car(list);
-	list=gh_cdr(list);
+	value = gh_car(list);
+	list = gh_cdr(list);
 
-	if( gh_eq_p(value,gh_symbol2scm("type")) ) {
-	    if( !gh_eq_p(gh_car(list),gh_symbol2scm("wc2")) &&
-		!gh_eq_p(gh_car(list),gh_symbol2scm("sc")) ) {
+	if (gh_eq_p(value, gh_symbol2scm("type"))) {
+	    if (!gh_eq_p(gh_car(list), gh_symbol2scm("wc2")) &&
+		!gh_eq_p(gh_car(list), gh_symbol2scm("sc")) ) {
 	       // FIXME: this leaves a half initialized briefing
-	       errl("Unsupported briefing type",value);
+	       errl("Unsupported briefing type", value);
 	    }
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("title")) ) {
-	    if( GameIntro.Title ) {
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("title"))) {
+	    if (GameIntro.Title) {
 		free(GameIntro.Title);
 	    }
-	    GameIntro.Title=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("background")) ) {
-	    if( GameIntro.Background ) {
+	    GameIntro.Title = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("background"))) {
+	    if (GameIntro.Background) {
 		free(GameIntro.Background);
 	    }
-	    GameIntro.Background=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
-	    if( GameIntro.TextFile ) {
+	    GameIntro.Background = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
+	    if (GameIntro.TextFile) {
 		free(GameIntro.TextFile);
 	    }
-	    GameIntro.TextFile=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("voice")) ) {
-	    if( voice==MAX_BRIEFING_VOICES ) {
-		   errl("too much voices",value);
+	    GameIntro.TextFile = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("voice"))) {
+	    if (voice == MAX_BRIEFING_VOICES) {
+	       errl("too many voices", value);
 	    }
-	    if( GameIntro.VoiceFile[voice] ) {
+	    if (GameIntro.VoiceFile[voice]) {
 		free(GameIntro.VoiceFile[voice]);
 	    }
-	    GameIntro.VoiceFile[voice]=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
+	    GameIntro.VoiceFile[voice] = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
 	    ++voice;
-	} else if( gh_eq_p(value,gh_symbol2scm("objective")) ) {
-	    if( objective==MAX_OBJECTIVES ) {
-		   errl("too much objectives",value);
+	} else if (gh_eq_p(value, gh_symbol2scm("objective"))) {
+	    if (objective == MAX_OBJECTIVES) {
+	       errl("too much objectives", value);
 	    }
-	    if( GameIntro.Objectives[objective] ) {
+	    if (GameIntro.Objectives[objective]) {
 		free(GameIntro.Objectives[objective]);
 	    }
-	    GameIntro.Objectives[objective]=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
+	    GameIntro.Objectives[objective] = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
 	    ++objective;
 	} else {
 	   // FIXME: this leaves a half initialized briefing
-	   errl("Unsupported tag",value);
+	   errl("Unsupported tag", value);
 	}
     }
 
@@ -514,9 +508,9 @@ local SCM CclBriefing(SCM list)
 */
 global void CampaignCclRegister(void)
 {
-    gh_new_procedureN("define-campaign",CclDefineCampaign);
-    gh_new_procedure1_0("set-current-chapter!",CclSetCurrentChapter);
-    gh_new_procedureN("briefing",CclBriefing);
+    gh_new_procedureN("define-campaign", CclDefineCampaign);
+    gh_new_procedure1_0("set-current-chapter!", CclSetCurrentChapter);
+    gh_new_procedureN("briefing", CclBriefing);
 }
 
 /**
@@ -524,71 +518,71 @@ global void CampaignCclRegister(void)
 */
 global void SaveCampaign(CLFile* file)
 {
-    CampaignChapter *ch;
-    ChapterPictureText *text;
+    CampaignChapter* ch;
+    ChapterPictureText* text;
     int i;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: campaign $Id$\n\n");
-    if( !CurrentCampaign ) {
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: campaign $Id$\n\n");
+    if (!CurrentCampaign) {
 	return;
     }
 
-    CLprintf(file,"(define-campaign 'current");
-    if( CurrentCampaign->Name ) {
-	CLprintf(file," 'name \"%s\"",CurrentCampaign->Name);
+    CLprintf(file, "(define-campaign 'current");
+    if (CurrentCampaign->Name) {
+	CLprintf(file, " 'name \"%s\"", CurrentCampaign->Name);
     }
-    CLprintf(file," 'players %d",CurrentCampaign->Players);
-    CLprintf(file,"\n");
+    CLprintf(file, " 'players %d", CurrentCampaign->Players);
+    CLprintf(file, "\n");
 
-    CLprintf(file,"  'campaign (list\n");
-    for( ch=CurrentCampaign->Chapters; ch; ch=ch->Next ) {
-	if( ch->Type == ChapterShowPicture ) {
-	    CLprintf(file,"    'show-picture (list\n");
-	    CLprintf(file,"      'image \"%s\"\n",ch->Data.Picture.Image);
-	    CLprintf(file,"      'fade-in %d\n",ch->Data.Picture.FadeIn);
-	    CLprintf(file,"      'fade-out %d\n",ch->Data.Picture.FadeOut);
-	    CLprintf(file,"      'display-time %d\n",
+    CLprintf(file, "  'campaign (list\n");
+    for (ch = CurrentCampaign->Chapters; ch; ch = ch->Next) {
+	if (ch->Type == ChapterShowPicture) {
+	    CLprintf(file, "    'show-picture (list\n");
+	    CLprintf(file, "      'image \"%s\"\n", ch->Data.Picture.Image);
+	    CLprintf(file, "      'fade-in %d\n", ch->Data.Picture.FadeIn);
+	    CLprintf(file, "      'fade-out %d\n", ch->Data.Picture.FadeOut);
+	    CLprintf(file, "      'display-time %d\n",
 		ch->Data.Picture.DisplayTime);
-	    for( text=ch->Data.Picture.Text; text; text=text->Next ) {
-		CLprintf(file,"      'text (list\n");
-		CLprintf(file,"        'font '%s\n",FontNames[text->Font]);
-		CLprintf(file,"        'x %d\n",text->X);
-		CLprintf(file,"        'y %d\n",text->Y);
-		CLprintf(file,"        'width %d\n",text->Width);
-		CLprintf(file,"        'height %d\n",text->Height);
+	    for (text = ch->Data.Picture.Text; text; text = text->Next) {
+		CLprintf(file, "      'text (list\n");
+		CLprintf(file, "        'font '%s\n", FontNames[text->Font]);
+		CLprintf(file, "        'x %d\n", text->X);
+		CLprintf(file, "        'y %d\n", text->Y);
+		CLprintf(file, "        'width %d\n", text->Width);
+		CLprintf(file, "        'height %d\n", text->Height);
 		if (text->Align == PictureTextAlignLeft) {
 		    CLprintf(file,"        'align 'left\n");
 		} else {
 		    CLprintf(file,"        'align 'center\n");
 		}
-		CLprintf(file,"        'text \"%s\"\n",text->Text);
-		CLprintf(file,"      )\n");
+		CLprintf(file, "        'text \"%s\"\n", text->Text);
+		CLprintf(file, "      )\n");
 	    }
 	    CLprintf(file,"    )\n");
-	} else if( ch->Type == ChapterPlayLevel ) {
-	    CLprintf(file,"    'play-level \"%s\"\n",ch->Data.Level.Name);
-	} else if( ch->Type == ChapterPlayVideo ) {
-	    CLprintf(file,"    'play-movie \"%s\" %d\n",
-		ch->Data.Movie.PathName,ch->Data.Movie.Flags);
+	} else if (ch->Type == ChapterPlayLevel) {
+	    CLprintf(file, "    'play-level \"%s\"\n", ch->Data.Level.Name);
+	} else if (ch->Type == ChapterPlayVideo) {
+	    CLprintf(file, "    'play-movie \"%s\" %d\n",
+		ch->Data.Movie.PathName, ch->Data.Movie.Flags);
 	}
     }
-    CLprintf(file,"  )\n");
-    CLprintf(file,")\n");
+    CLprintf(file, "  )\n");
+    CLprintf(file, ")\n");
 
-    ch=CurrentCampaign->Chapters;
-    i=0;
-    while( ch ) {
-	if( ch==CurrentChapter ) {
+    ch = CurrentCampaign->Chapters;
+    i = 0;
+    while (ch) {
+	if (ch == CurrentChapter) {
 	    break;
 	}
-	ch=ch->Next;
+	ch = ch->Next;
 	++i;
     }
-    if( !ch ) {
-	i=0;
+    if (!ch) {
+	i = 0;
     }
-    CLprintf(file,"(set-current-chapter! %d)\n", i);
+    CLprintf(file, "(set-current-chapter! %d)\n", i);
 }
 
 /**
@@ -601,24 +595,24 @@ global void CleanCampaign(void)
     // FIXME: Can't clean campaign needed for continue.
     DebugLevel0Fn("FIXME: Cleaning campaign not written\n");
 
-    if( GameIntro.Title ) {
+    if (GameIntro.Title) {
 	free(GameIntro.Title);
     }
-    if( GameIntro.Background ) {
+    if (GameIntro.Background) {
 	free(GameIntro.Background);
     }
-    if( GameIntro.TextFile ) {
+    if (GameIntro.TextFile) {
 	free(GameIntro.TextFile);
     }
-    for( i=0; i<MAX_BRIEFING_VOICES; ++i ) {
+    for (i = 0; i < MAX_BRIEFING_VOICES; ++i) {
 	free(GameIntro.VoiceFile[i]);
     }
-    for( i=0; i<MAX_OBJECTIVES; ++i ) {
-	if( GameIntro.Objectives[i] ) {
+    for (i = 0; i < MAX_OBJECTIVES; ++i) {
+	if (GameIntro.Objectives[i]) {
 	    free(GameIntro.Objectives[i]);
 	}
     }
-    memset(&GameIntro,0,sizeof(GameIntro));
+    memset(&GameIntro, 0, sizeof(GameIntro));
 }
 
 //@}

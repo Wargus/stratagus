@@ -89,7 +89,7 @@ typedef struct _chapter_picture_text_ {
     int Height;				/// Height
     PictureTextAlignment Align;		/// Alignment
     char* Text;				/// Text
-    struct _chapter_picture_text_ * Next; /// Next
+    struct _chapter_picture_text_* Next; /// Next
 } ChapterPictureText;
 
 /**
@@ -107,7 +107,7 @@ struct _campaign_chapter_ {
 	    int FadeIn;			/// Number of cycles to fade in
 	    int FadeOut;		/// Number of cycles to fade out
 	    int DisplayTime;		/// Number of cycles to display image
-	    ChapterPictureText *Text;	/// Linked list of text data
+	    ChapterPictureText* Text;	/// Linked list of text data
 	} Picture;			/// Data for a picture
 	struct {
 	    char* PathName;		/// File name of video
@@ -143,11 +143,8 @@ extern char CurrentMapPath[];		/// Path of the current map
 extern char DefaultMap[];		/// Default map path
 extern char DefaultObjective[];		/// The default scenario objective
 
-extern const char CampaignType[];	/// Campaign type
 extern Campaign* Campaigns;		/// Campaigns
 extern int NumCampaigns;		/// Number of campaigns
-extern Campaign* CurrentCampaign;	/// Playing this campaign
-extern CampaignChapter* CurrentChapter;	/// Playing this chapter of campaign
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -159,7 +156,7 @@ extern void PlayCampaign(const char* name);
 extern char* NextChapter(void);
 
 extern void CampaignCclRegister(void);	/// Register ccl features
-extern void SaveCampaign(CLFile*);	/// Save the campaign module
+extern void SaveCampaign(CLFile* file);	/// Save the campaign module
 extern void CleanCampaign(void);	/// Cleanup the campaign module
 
 //@}
