@@ -45,6 +45,7 @@
 #include "editor.h"
 #include "campaign.h"
 #include "menus.h"
+#include "sound.h"
 
 #include "ccl.h"
 
@@ -545,7 +546,7 @@ local void ShowUnitInfo(const Unit* unit)
 /**
 **	Update editor display.
 */
-local void EditorUpdateDisplay(void)
+global void EditorUpdateDisplay(void)
 {
     int i;
 
@@ -656,9 +657,16 @@ local void EditorUpdateDisplay(void)
 /**
 **	Callback for input.
 */
-local void EditorCallbackKey(unsigned dummy __attribute__((unused)))
+local void EditorCallbackButtonUp(unsigned button)
 {
     DebugLevel3Fn("Pressed %8x %8x\n" _C_ MouseButtons _C_ dummy);
+
+    if( (1<<button) == LeftButton && GameMenuButtonClicked==1 ) {
+	GameMenuButtonClicked=0;
+	if( ButtonUnderCursor==0 ) {
+	    ProcessMenu(MENU_EDITOR,1);
+	}
+    }
 }
 
 /**
@@ -673,8 +681,10 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
     //
     //	Click on menu button just exit.
     //
-    if( CursorOn == CursorOnButton && ButtonUnderCursor == 0 ) {
-	EditorRunning=0;
+    if( CursorOn == CursorOnButton && ButtonUnderCursor == 0 &&
+	(MouseButtons&LeftButton) && GameMenuButtonClicked==0 ) {
+	PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
+	GameMenuButtonClicked=1;
 	return;
     }
 
@@ -1057,7 +1067,7 @@ global void EditorMainLoop(void)
     SetVideoSync();
 
     callbacks.ButtonPressed = EditorCallbackButtonDown;
-    callbacks.ButtonReleased = EditorCallbackKey;
+    callbacks.ButtonReleased = EditorCallbackButtonUp;
     callbacks.MouseMoved = EditorCallbackMouse;
     callbacks.MouseExit = EditorCallbackExit;
     callbacks.KeyPressed = EditorCallbackKeyDown;
