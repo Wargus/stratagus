@@ -69,7 +69,7 @@ make-objdir:
 	@for i in $(MODULES_ALL); do \
 	if [ ! -d $$i/$(OBJDIR) ]; then mkdir $$i/$(OBJDIR); fi; done
 
-%.o: $(@D)../%.c
+%.o: $(@D)../%.c $(RULESFILE)
 	$(CC) -c $(CFLAGS) $< -o $@
 
 help:
