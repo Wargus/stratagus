@@ -114,18 +114,74 @@ global void HandleActionFollow(Unit* unit)
 	    if( (goal=unit->Orders[0].Goal) && 
 		    goal->Type->Teleporter && goal->Goal &&
 		    MapDistanceBetweenUnits( unit, goal ) < 4 ) {
-	      RemoveUnit(unit);
-	      unit->X = goal->Goal->X;
-	      unit->Y = goal->Goal->Y;
-	      DropOutOnSide(unit,unit->Direction,1,1);
-	      //FIXME: SoundIdForName() should be called once
-	      PlayGameSound(SoundIdForName("invisibility"),MaxSampleVolume);
-	      //FIXME: MissileTypeByIdent() should be called once
-	      MakeMissile(MissileTypeByIdent("missile-normal-spell"),
-	        	unit->X*TileSizeX+TileSizeX/2,
+		Unit* table[UnitMax];
+		Unit* dest;
+		int n;
+		int i;
+
+		RemoveUnit(unit);
+		unit->X = goal->Goal->X;
+		unit->Y = goal->Goal->Y;
+		DropOutOnSide(unit,unit->Direction,1,1);
+		//FIXME: SoundIdForName() should be called once
+		PlayGameSound(SoundIdForName("invisibility"),MaxSampleVolume);
+		//FIXME: MissileTypeByIdent() should be called once
+		MakeMissile(MissileTypeByIdent("missile-normal-spell"),
+			unit->X*TileSizeX+TileSizeX/2,
 			unit->Y*TileSizeY+TileSizeY/2,
 			unit->X*TileSizeX+TileSizeX/2,
 			unit->Y*TileSizeY+TileSizeY/2 );
+
+		unit->Wait=1;
+		unit->SubAction=0;
+		unit->Orders[0].Action=UnitActionStill;
+
+		//
+		//	FIXME: we must check if the units supports the new order.
+		//
+		dest=NoUnitP;
+		n=SelectUnitsOnTile(goal->Goal->X,goal->Goal->Y,table);
+		for( i=0; i<n; ++i ) {
+		    if( table[i]->Type==UnitTypeByIdent("unit-circle-of-power") ) {
+			dest=table[i];
+		    }
+		}
+
+		if( dest ) {
+		    if( (dest->NewOrder.Action==UnitActionHaulOil
+				&& !unit->Type->Tanker)
+			    || (dest->NewOrder.Action==UnitActionAttack
+				&& !unit->Type->CanAttack)
+			    || (dest->NewOrder.Action==UnitActionBoard
+				&& unit->Type->UnitType!=UnitTypeLand) ) {
+			DebugLevel0Fn("Wrong order for unit\n");
+			unit->Orders[0].Action=UnitActionStill;
+		    } else {
+			if( dest->NewOrder.Goal ) {
+			    if( dest->NewOrder.Goal->Destroyed ) {
+				// FIXME: perhaps we should use another dest?
+				DebugLevel0Fn("Destroyed unit in teleport unit\n");
+				RefsDebugCheck( !dest->NewOrder.Goal->Refs );
+				if( !--dest->NewOrder.Goal->Refs ) {
+				    ReleaseUnit(dest->NewOrder.Goal);
+				}
+				dest->NewOrder.Goal=NoUnitP;
+				dest->NewOrder.Action=UnitActionStill;
+			    }
+			}
+
+			unit->Orders[0]=dest->NewOrder;
+
+			//
+			// FIXME: Pending command uses any references?
+			//
+			if( unit->Orders[0].Goal ) {
+			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
+			    unit->Orders[0].Goal->Refs++;
+			}
+		    }
+		}
+		return;
 	    }
 	
 	    if( !(goal=unit->Orders[0].Goal) ) {// goal has died
