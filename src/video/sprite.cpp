@@ -63,6 +63,15 @@ global void VideoDrawRawClip(SDL_Surface *surface,
 --		RLE Sprites
 ----------------------------------------------------------------------------*/
 
+/**
+**  Draw graphic object unclipped.
+**
+**  @param sprite  pointer to object
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
+*/
+#ifndef USE_OPENGL
 global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	SDL_Rect srect;
@@ -78,7 +87,42 @@ global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 
 	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
 }
+#else
+global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
+{
+	GLint sx;
+	GLint ex;
+	GLint sy;
+	GLint ey;
 
+	sx = x;
+	ex = sx + sprite->Width;
+	sy = y;
+	ey = sy + sprite->Height;
+
+	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex2i(sx, sy);
+	glTexCoord2f(0.0f, sprite->TextureHeight);
+	glVertex2i(sx, ey);
+	glTexCoord2f(sprite->TextureWidth, sprite->TextureHeight);
+	glVertex2i(ex, ey);
+	glTexCoord2f(sprite->TextureWidth, 0.0f);
+	glVertex2i(ex, sy);
+	glEnd();
+}
+#endif
+
+/**
+**		Draw graphic object clipped.
+**
+**		@param sprite		pointer to object
+**		@param frame		number of frame (object index)
+**		@param x		x coordinate on the screen
+**		@param y		y coordinate on the screen
+*/
+#ifndef USE_OPENGL
 global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	SDL_Rect srect;
@@ -102,7 +146,60 @@ global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 
 	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
 }
+#else
+global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
+{
+	GLint svx;
+	GLint evx;
+	GLint svy;
+	GLint evy;
+	GLfloat stx;
+	GLfloat etx;
+	GLfloat sty;
+	GLfloat ety;
+	int ox;
+	int oy;
+	int ex;
+	int w;
+	int h;
 
+	w = sprite->Width;
+	h = sprite->Height;
+	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
+
+	svx = x;
+	evx = svx + w;
+	svy = y;
+	evy = svy + h;
+
+	stx = (GLfloat)ox / sprite->Width * sprite->TextureWidth;
+	etx = (GLfloat)(ox + w) / sprite->Width * sprite->TextureWidth;
+	sty = (GLfloat)oy / sprite->Height * sprite->TextureHeight;
+	ety = (GLfloat)(oy + h) / sprite->Height * sprite->TextureHeight;
+
+	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(stx, sty);
+	glVertex3f(svx, svy, 0.0f);
+	glTexCoord2f(stx, ety);
+	glVertex3f(svx, evy, 0.0f);
+	glTexCoord2f(etx, ety);
+	glVertex3f(evx, evy, 0.0f);
+	glTexCoord2f(etx, sty);
+	glVertex3f(evx, svy, 0.0f);
+	glEnd();
+}
+#endif
+
+/**
+**		Draw graphic object unclipped and flipped in X direction.
+**
+**		@param sprite		pointer to object
+**		@param frame		number of frame (object index)
+**		@param x		x coordinate on the screen
+**		@param y		y coordinate on the screen
+*/
+#ifndef USE_OPENGL
 global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	SDL_Rect srect;
@@ -119,7 +216,42 @@ global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 
 	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 }
+#else
+global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
+{
+	GLint sx;
+	GLint ex;
+	GLint sy;
+	GLint ey;
 
+	sx = x;
+	ex = sx + sprite->Width;
+	ey = VideoHeight - y;
+	sy = ey - sprite->Height;
+
+	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f - sprite->TextureHeight);
+	glVertex2i(sx, sy);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex2i(sx, ey);
+	glTexCoord2f(sprite->TextureWidth, 1.0f);
+	glVertex2i(ex, ey);
+	glTexCoord2f(sprite->TextureWidth, 1.0f - sprite->TextureHeight);
+	glVertex2i(ex, sy);
+	glEnd();
+}
+#endif
+
+/**
+**		Draw graphic object clipped and flipped in X direction.
+**
+**		@param sprite		pointer to object
+**		@param frame		number of frame (object index)
+**		@param x		x coordinate on the screen
+**		@param y		y coordinate on the screen
+*/
+#ifndef USE_OPENGL
 global void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	SDL_Rect srect;
@@ -144,9 +276,61 @@ global void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
 
 	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 }
-
-global void VideoDrawShadowClip(const Graphic* sprite, unsigned frame,
+#else
+global void VideoDrawClipX(const Graphic* sprite, unsigned frame,
 	int x, int y)
+{
+	GLint svx;
+	GLint evx;
+	GLint svy;
+	GLint evy;
+	GLfloat stx;
+	GLfloat etx;
+	GLfloat sty;
+	GLfloat ety;
+	int ox;
+	int oy;
+	int ex;
+	int w;
+	int h;
+
+	w = sprite->Width;
+	h = sprite->Height;
+	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
+
+	svx = x;
+	evx = svx + w;
+	evy = VideoHeight - y;
+	svy = evy - h;
+
+	if (w < sprite->Width) {
+		if (ox == 0) {
+			ox += sprite->Width - w;
+		} else {
+			ox = 0;
+		}
+	}
+	stx = (GLfloat)ox / sprite->Width * sprite->TextureWidth;
+	etx = (GLfloat)(ox + w) / sprite->Width * sprite->TextureWidth;
+	ety = 1.0f - (GLfloat)oy / sprite->Height * sprite->TextureHeight;
+	sty = 1.0f - (GLfloat)(oy + h) / sprite->Height * sprite->TextureHeight;
+
+	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(stx, sty);
+	glVertex2i(evx, svy);
+	glTexCoord2f(stx, ety);
+	glVertex2i(evx, evy);
+	glTexCoord2f(etx, ety);
+	glVertex2i(svx, evy);
+	glTexCoord2f(etx, sty);
+	glVertex2i(svx, svy);
+	glEnd();
+}
+#endif
+
+#ifndef USE_OPENGL
+global void VideoDrawShadowClip(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	SDL_Rect srect;
 	SDL_Rect drect;
@@ -174,8 +358,7 @@ global void VideoDrawShadowClip(const Graphic* sprite, unsigned frame,
 	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
 }
 
-global void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame,
-	int x, int y)
+global void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	SDL_Rect srect;
 	SDL_Rect drect;
@@ -301,188 +484,24 @@ global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, in
 	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
 }
-
-/**
-**		Draw graphic object unclipped.
-**
-**		@param sprite		pointer to object
-**		@param frame		number of frame (object index)
-**		@param x		x coordinate on the screen
-**		@param y		y coordinate on the screen
-*/
-#ifdef USE_OPENGL
-local void VideoDrawOpenGL(const Graphic* sprite, unsigned frame, int x, int y)
+#else
+global void VideoDrawShadowClip(const Graphic* sprite, unsigned frame, int x, int y)
 {
-	GLint sx;
-	GLint ex;
-	GLint sy;
-	GLint ey;
-
-	sx = x;
-	ex = sx + sprite->Width;
-	ey = VideoHeight - y;
-	sy = ey - sprite->Height;
-
-	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 1.0f - sprite->TextureHeight);
-	glVertex2i(sx, sy);
-	glTexCoord2f(0.0f, 1.0f);
-	glVertex2i(sx, ey);
-	glTexCoord2f(sprite->TextureWidth, 1.0f);
-	glVertex2i(ex, ey);
-	glTexCoord2f(sprite->TextureWidth, 1.0f - sprite->TextureHeight);
-	glVertex2i(ex, sy);
-	glEnd();
 }
-#endif
-
-/**
-**		Draw graphic object unclipped and flipped in X direction.
-**
-**		@param sprite		pointer to object
-**		@param frame		number of frame (object index)
-**		@param x		x coordinate on the screen
-**		@param y		y coordinate on the screen
-*/
-#ifdef USE_OPENGL
-local void VideoDrawXOpenGL(const Graphic* sprite, unsigned frame, int x, int y)
+global void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame, int x, int y)
 {
-	GLint sx;
-	GLint ex;
-	GLint sy;
-	GLint ey;
-
-	sx = x;
-	ex = sx + sprite->Width;
-	ey = VideoHeight - y;
-	sy = ey - sprite->Height;
-
-	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 1.0f - sprite->TextureHeight);
-	glVertex2i(sx, sy);
-	glTexCoord2f(0.0f, 1.0f);
-	glVertex2i(sx, ey);
-	glTexCoord2f(sprite->TextureWidth, 1.0f);
-	glVertex2i(ex, ey);
-	glTexCoord2f(sprite->TextureWidth, 1.0f - sprite->TextureHeight);
-	glVertex2i(ex, sy);
-	glEnd();
 }
-#endif
-
-/**
-**		Draw graphic object clipped.
-**
-**		@param sprite		pointer to object
-**		@param frame		number of frame (object index)
-**		@param x		x coordinate on the screen
-**		@param y		y coordinate on the screen
-*/
-#ifdef USE_OPENGL
-local void VideoDrawClipOpenGL(const Graphic* sprite, unsigned frame, int x, int y)
+global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
-	GLint svx;
-	GLint evx;
-	GLint svy;
-	GLint evy;
-	GLfloat stx;
-	GLfloat etx;
-	GLfloat sty;
-	GLfloat ety;
-	int ox;
-	int oy;
-	int ex;
-	int w;
-	int h;
-
-	w = sprite->Width;
-	h = sprite->Height;
-	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
-
-	svx = x;
-	evx = svx + w;
-	evy = VideoHeight - y;
-	svy = evy - h;
-
-	stx = (GLfloat)ox / sprite->Width * sprite->TextureWidth;
-	etx = (GLfloat)(ox + w) / sprite->Width * sprite->TextureWidth;
-	ety = 1.0f - (GLfloat)oy / sprite->Height * sprite->TextureHeight;
-	sty = 1.0f - (GLfloat)(oy + h) / sprite->Height * sprite->TextureHeight;
-
-	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(stx, sty);
-	glVertex3f(svx, svy, 0.0f);
-	glTexCoord2f(stx, ety);
-	glVertex3f(svx, evy, 0.0f);
-	glTexCoord2f(etx, ety);
-	glVertex3f(evx, evy, 0.0f);
-	glTexCoord2f(etx, sty);
-	glVertex3f(evx, svy, 0.0f);
-	glEnd();
 }
-#endif
-
-/**
-**		Draw graphic object clipped and flipped in X direction.
-**
-**		@param sprite		pointer to object
-**		@param frame		number of frame (object index)
-**		@param x		x coordinate on the screen
-**		@param y		y coordinate on the screen
-*/
-#ifdef USE_OPENGL
-local void VideoDrawClipXOpenGL(const Graphic* sprite, unsigned frame,
-	int x, int y)
+global void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
-	GLint svx;
-	GLint evx;
-	GLint svy;
-	GLint evy;
-	GLfloat stx;
-	GLfloat etx;
-	GLfloat sty;
-	GLfloat ety;
-	int ox;
-	int oy;
-	int ex;
-	int w;
-	int h;
-
-	w = sprite->Width;
-	h = sprite->Height;
-	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
-
-	svx = x;
-	evx = svx + w;
-	evy = VideoHeight - y;
-	svy = evy - h;
-
-	if (w < sprite->Width) {
-		if (ox == 0) {
-			ox += sprite->Width - w;
-		} else {
-			ox = 0;
-		}
-	}
-	stx = (GLfloat)ox / sprite->Width * sprite->TextureWidth;
-	etx = (GLfloat)(ox + w) / sprite->Width * sprite->TextureWidth;
-	ety = 1.0f - (GLfloat)oy / sprite->Height * sprite->TextureHeight;
-	sty = 1.0f - (GLfloat)(oy + h) / sprite->Height * sprite->TextureHeight;
-
-	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(stx, sty);
-	glVertex2i(evx, svy);
-	glTexCoord2f(stx, ety);
-	glVertex2i(evx, evy);
-	glTexCoord2f(etx, ety);
-	glVertex2i(svx, evy);
-	glTexCoord2f(etx, sty);
-	glVertex2i(svx, svy);
-	glEnd();
+}
+global void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+{
+}
+global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+{
 }
 #endif
 

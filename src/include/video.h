@@ -323,16 +323,21 @@ extern int ColorIconCycleEnd;				/// color # end   for color cycling
 extern int ColorBuildingCycleStart;		/// color # start for color cycling
 extern int ColorBuildingCycleEnd;		/// color # end   for color cycling
 
-// FIXME: check these out, clean up if we can
-// FIXME: check these out, clean up if we can
-// FIXME: check these out, clean up if we can
-
+#ifndef USE_OPENGL
 	///		Draw pixel unclipped.
 extern void (*VideoDrawPixel)(Uint32 color, int x, int y);
 
 	///		Draw translucent pixel unclipped.
 extern void (*VideoDrawTransPixel)(Uint32 color, int x, int y,
 	unsigned char alpha);
+#else
+	///		Draw pixel unclipped.
+extern void VideoDrawPixel(Uint32 color, int x, int y);
+
+	///		Draw translucent pixel unclipped.
+extern void VideoDrawTransPixel(Uint32 color, int x, int y,
+	unsigned char alpha);
+#endif
 
 	///		Draw pixel clipped to current clip setting.
 extern void VideoDrawPixelClip(Uint32 color, int x, int y);
