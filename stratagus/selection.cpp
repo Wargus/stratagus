@@ -40,6 +40,7 @@
 #include "interface.h"
 #include "map.h"
 #include "ui.h"
+#include "missile.h"
 
 #include "ccl.h"
 
@@ -79,6 +80,26 @@ global void UnSelectAll(void)
 }
 
 /**
+**	Handle a critter being clicked.
+**
+**	@param unit	Critter unit.
+*/
+local void HandleCritterClick(Unit* unit)
+{
+    if( NumSelected==1 && Selected[0]==unit ) {
+	unit->Value++;
+    } else {
+	unit->Value=1;
+    }
+
+    // FIXME: make this configurable
+    if( unit->Value==10 ) {
+	FireMissile(unit);
+	unit->Value=0;
+    }
+}
+
+/**
 **	Replace a group of selected units by an other group of units.
 **
 **	@param units	Array of units to be selected.
@@ -91,6 +112,10 @@ global void ChangeSelectedUnits(Unit** units,int count)
     int n;
 
     DebugCheck( count>MaxSelectable );
+
+    if( count==1 && units[0]->Type->Critter ) {
+	HandleCritterClick(units[0]);
+    }
 
     UnSelectAll();
     for( n=i=0; i<count; i++ ) {
@@ -244,6 +269,10 @@ global int SelectUnitsByType(Unit* base)
     // no unit can be selected.
     if( base->Removed || base->Orders[0].Action==UnitActionDie ) {
 	return 0;
+    }
+
+    if( base->Type->Critter ) {
+	HandleCritterClick(base);
     }
 
     UnSelectAll();
