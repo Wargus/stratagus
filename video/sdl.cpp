@@ -131,8 +131,9 @@ global void InitVideoSdl(void)
     }
 
     Screen = SDL_SetVideoMode(VideoWidth, VideoHeight, VideoDepth
-	    ,SDL_HWSURFACE|SDL_HWPALETTE
-		| (VideoFullScreen ? SDL_FULLSCREEN : 0));
+	    // Sam said: better for windows.
+	    ,/* SDL_HWSURFACE|SDL_HWPALETTE | */
+		(VideoFullScreen ? SDL_FULLSCREEN : 0));
 
     if ( Screen == NULL ) {
 	fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n"
