@@ -6075,7 +6075,7 @@ global void InitLineDraw(void)
 	    break;
 
 	default:
-	    DebugLevel0Fn("unsupported %d bpp\n",VideoBpp);
+	    DebugLevel0Fn("unsupported %d bpp\n" _C_ VideoBpp);
 	    abort();
     }
 }

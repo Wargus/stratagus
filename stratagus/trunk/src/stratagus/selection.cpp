@@ -233,7 +233,7 @@ global int SelectUnitsByType(Unit* base)
 
     type=base->Type;
 
-    DebugLevel3Fn(" %s\n",base->Type->Ident);
+    DebugLevel3Fn(" %s\n" _C_ base->Type->Ident);
 
     // select all visible units.
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
@@ -324,7 +324,7 @@ global int ToggleUnitsByType(Unit* base)
 
     type = base->Type;
 
-    DebugLevel2Fn(" %s FIXME: toggle not written.\n", base->Type->Ident);
+    DebugLevel2Fn(" %s FIXME: toggle not written.\n" _C_ base->Type->Ident);
 
     // select all visible units.
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
@@ -593,7 +593,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     int i;
     int tx0, ty0, tx1, ty1;
 
-    DebugLevel3Fn(" (%d,%d,%d,%d)\n",sx0,sy0,sx1,sy1);
+    DebugLevel3Fn(" (%d,%d,%d,%d)\n" _C_ sx0 _C_ sy0 _C_ sx1 _C_ sy1);
 
     tx0 = sx0 / TileSizeX;
     ty0 = sy0 / TileSizeY;

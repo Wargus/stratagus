@@ -248,7 +248,7 @@ global CursorType* CursorTypeByIdent(const char* ident)
 	    return cursortype;
 	}
     }
-    DebugLevel0Fn("Cursor `%s' not found, please check your code.\n",ident);
+    DebugLevel0Fn("Cursor `%s' not found, please check your code.\n" _C_ ident);
     return NULL;
 }
 
@@ -1094,7 +1094,7 @@ global void InitVideoCursors(void)
 	    LoadCursorRectangle=LoadCursorRectangle32;
 	    break;
 	default:
-	    DebugLevel0Fn("unsupported %d bpp\n",VideoBpp);
+	    DebugLevel0Fn("unsupported %d bpp\n" _C_ VideoBpp);
 	    abort();
     }
     OldCursorRectangle=malloc((2*VideoWidth+2*(VideoHeight-2))*MemSize);

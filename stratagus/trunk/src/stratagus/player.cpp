@@ -273,7 +273,7 @@ global void CreatePlayer(int type)
     int i;
     Player* player;
 
-    DebugLevel3("Player %d, type %d\n",NumPlayers,type);
+    DebugLevel3("Player %d, type %d\n" _C_ NumPlayers _C_ type);
 
     if( NumPlayers==PlayerMax ) {	// already done for bigmaps!
 	return;
@@ -286,7 +286,7 @@ global void CreatePlayer(int type)
     //	FIXME: ARI: is this needed for 'PlayerNobody' ??
     //	FIXME:	A: Johns: currently we need no init for the nobody player.
     if( !(player->Units=(Unit**)calloc(UnitMax,sizeof(Unit*))) ) {
-	DebugLevel0("Not enough memory to create player %d.\n",NumPlayers);
+	DebugLevel0("Not enough memory to create player %d.\n" _C_ NumPlayers);
 	return;
     }
 
@@ -459,7 +459,7 @@ global void PlayerSetSide(Player* player,int side)
 	    ++cp;
 	}
     }
-    DebugLevel0Fn("Unsupported side %d\n",side);
+    DebugLevel0Fn("Unsupported side %d\n" _C_ side);
     player->RaceName="oops";
 }
 
@@ -593,7 +593,7 @@ global int PlayerCheckCosts(const Player* player,const int* costs)
 		if( player==ThisPlayer ) {
 		    SetMessage(buf);
 		} else {
-		    DebugLevel3("Ai: %s.\n",buf);
+		    DebugLevel3("Ai: %s.\n" _C_ buf);
 		}
 	    }
 	    err|=1<<i;
@@ -657,7 +657,7 @@ global void PlayerAddCostsFactor(Player* player,const int* costs,int factor)
     int i;
 
     for( i=1; i<MaxCosts; ++i ) {
-	DebugLevel3("%d %d\n",i,costs[i]*factor/100);
+	DebugLevel3("%d %d\n" _C_ i _C_ costs[i]*factor/100);
 	player->Resources[i]+=costs[i]*factor/100;
     }
     if( player==ThisPlayer ) {

@@ -325,9 +325,9 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     static int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
 
-    DebugLevel3Fn("%d %d,%d->%d,%d\n",
-	    UnitNumber(unit),
-	    unit->X,unit->Y,unit->Orders[0].X,unit->Orders[0].Y);
+    DebugLevel3Fn("%d %d,%d->%d,%d\n" _C_
+	    UnitNumber(unit) _C_
+	    unit->X _C_ unit->Y _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
 
     OpenSetSize=0;
    /*    AStarPrepare();*/
@@ -424,7 +424,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    //
 	    //	Select a "good" point from the open set.
 	    //		Nearest point to goal.
-	    DebugLevel0Fn("%d way too long\n",UnitNumber(unit));
+	    DebugLevel0Fn("%d way too long\n" _C_ UnitNumber(unit));
 	    ex=best_x;
 	    ey=best_y;
 	}
@@ -438,7 +438,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    best_x=x;
 	    best_y=y;
 	}
-	DebugLevel3("Best point in Open Set: %d %d (%d)\n",x,y,OpenSetSize);
+	DebugLevel3("Best point in Open Set: %d %d (%d)\n" _C_ x _C_ y _C_ OpenSetSize);
 	//
 	//	Generate successors of this node.
 	//
@@ -498,11 +498,11 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    ex=best_x;
 	    ey=best_y;
 	    if(ex==unit->X && ey==unit->Y) {
-		DebugLevel3Fn("%d unreachable\n",UnitNumber(unit));
+		DebugLevel3Fn("%d unreachable\n" _C_ UnitNumber(unit));
 		AStarCleanUp(num_in_close);
 		return -2;
 	    }
-	    DebugLevel3Fn("%d unreachable: going to closest\n",UnitNumber(unit));
+	    DebugLevel3Fn("%d unreachable: going to closest\n" _C_ UnitNumber(unit));
 	    break;
 	}
     }
@@ -520,7 +520,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     y=unit->Y;
     i=0;
     while(ex!=x||ey!=y) {
-	DebugLevel3("%d %d %d %d\n",x,y,ex,ey);
+	DebugLevel3("%d %d %d %d\n" _C_ x _C_ y _C_ ex _C_ ey);
 	eo=ex*TheMap.Width+ey;
 	i=AStarMatrix[eo].Direction;
 	ex-=xoffset[i];
@@ -534,8 +534,8 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	if(j==AStarMovingUnitCrossingCost) {
 	    // we should wait, we are blocked by a moving unit
 	    //FIXME: this might lead to a deadlock, or something similar
-	    DebugLevel3("Unit %d waiting. Proposed move: %d %d\n",
-			UnitNumber(unit),*pxd,*pyd);
+	    DebugLevel3("Unit %d waiting. Proposed move: %d %d\n" _C_
+			UnitNumber(unit) _C_ *pxd _C_ *pyd);
 	    path_length=0;
 	} else {
 	    // j==-1 is a bug, so we should have only
@@ -547,8 +547,8 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     }
     // let's clean up the matrix now
     AStarCleanUp(num_in_close);
-    DebugLevel3Fn("%d\n",UnitNumber(unit));
-    DebugLevel3Fn("proposed move: %d %d (%d)\n",*pxd,*pyd,path_length);
+    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
+    DebugLevel3Fn("proposed move: %d %d (%d)\n" _C_ *pxd _C_ *pyd _C_ path_length);
     return path_length;
 }
 
@@ -582,10 +582,10 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
     if( goal ) {			// goal unit
 	type=goal->Type;
 	DebugLevel3Fn("Unit %d,%d Goal %d,%d - %d,%d\n"
-	    ,x,y
-	    ,goal->X-r,goal->Y-r
-	    ,goal->X+type->TileWidth+r
-	    ,goal->Y+type->TileHeight+r);
+	    _C_ x _C_ y
+	    _C_ goal->X-r _C_ goal->Y-r
+	    _C_ goal->X+type->TileWidth+r
+	    _C_ goal->Y+type->TileHeight+r);
 	if( x>=goal->X-r && x<goal->X+type->TileWidth+r
 		&& y>=goal->Y-r && y<goal->Y+type->TileHeight+r ) {
 	    DebugLevel3Fn("Goal reached\n");
@@ -640,7 +640,7 @@ global int NextPathElement(Unit* unit,int* pxd,int *pyd)
     }
     // FIXME: Can use the time left in frame.
     if( !UnreachableCounter ) {
-	DebugLevel0Fn("Done too much %d.\n",UnitNumber(unit));
+	DebugLevel0Fn("Done too much %d.\n" _C_ UnitNumber(unit));
 	return PF_WAIT;
     }
 

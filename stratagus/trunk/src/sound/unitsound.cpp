@@ -228,7 +228,7 @@ local void RemapSounds(void)
 		       SoundIdForName("warthog annoyed"));
 	break;
     default:
-	DebugLevel2("Unknown Terrain %d\n",TheMap.Terrain);
+	DebugLevel2("Unknown Terrain %d\n" _C_ TheMap.Terrain);
     }
 }
 

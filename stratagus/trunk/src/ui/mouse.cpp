@@ -189,7 +189,7 @@ global void DoRightButton (int sx,int sy)
 	}
 	type=unit->Type;
 	action=type->MouseAction;
-	DebugLevel3Fn("Mouse action %d\n",action);
+	DebugLevel3Fn("Mouse action %d\n" _C_ action);
 
 	//
 	//	Control + right click on unit is follow anything.
@@ -467,7 +467,7 @@ local void HandleMouseOn(int x,int y)
 		|| y>TheUI.Buttons[i].Y+TheUI.Buttons[i].Height ) {
 	    continue;
 	}
-	DebugLevel3("On button %d\n",i);
+	DebugLevel3("On button %d\n" _C_ i);
 	ButtonUnderCursor=i;
 	CursorOn=CursorOnButton;
 	if( i<10 ) {
@@ -518,7 +518,7 @@ local void HandleMouseOn(int x,int y)
     int viewport = GetViewport (x, y);
     if (viewport >= 0 && viewport != TheUI.ActiveViewport) {
 	TheUI.ActiveViewport = viewport;
-	DebugLevel0Fn ("active viewport changed to %d.\n", viewport);
+	DebugLevel0Fn ("active viewport changed to %d.\n" _C_ viewport);
     }
 }
 #else /* SPLIT_SCREEN_SUPPORT */
@@ -718,7 +718,7 @@ global void UIHandleMouseMove(int x,int y)
     UnitUnderCursor=NULL;
     GameCursor=TheUI.Point.Cursor;		// Reset
     HandleMouseOn(x,y);
-    DebugLevel3("MouseOn %d\n",CursorOn);
+    DebugLevel3("MouseOn %d\n" _C_ CursorOn);
 
     //	Restrict mouse to minimap when dragging
     if( OldCursorOn==CursorOnMinimap && CursorOn!=CursorOnMinimap &&
@@ -934,7 +934,7 @@ local void SendAttack (int sx,int sy)
 	unit=Selected[i];
 	if( unit->Type->CanAttack || unit->Type->Building ) {
 	    dest=TargetOnScreenMapPosition (unit,sx,sy);
-	    DebugLevel3Fn("Attacking %p\n",dest);
+	    DebugLevel3Fn("Attacking %p\n" _C_ dest);
 	    if( dest ) {
 		dest->Blink=4;
 	    }
@@ -1007,7 +1007,7 @@ local void SendDemolish (int sx,int sy)
 	    }
 	    SendCommandDemolish(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	} else {
-	    DebugLevel0Fn("can't demolish %p\n",unit);
+	    DebugLevel0Fn("can't demolish %p\n" _C_ unit);
 	}
     }
 }
@@ -1080,7 +1080,7 @@ local void SendSpellCast (int sx, int sy)
     int y = sy / TileSizeY;
 
     dest = UnitOnScreenMapPosition (sx, sy);
-    DebugLevel3Fn("SpellCast on: %p (%d,%d)\n", dest, x, y);
+    DebugLevel3Fn("SpellCast on: %p (%d,%d)\n" _C_ dest _C_ x _C_ y);
     /*	NOTE: Vladi:
        This is a high-level function, it sends target spot and unit
        (if exists). All checks are performed at spell cast handle
@@ -1143,7 +1143,7 @@ local void SendCommand (int sx, int sy)
 	    SendSpellCast(sx,sy);
 	    break;
 	default:
-	    DebugLevel1("Unsupported send action %d\n",CursorAction);
+	    DebugLevel1("Unsupported send action %d\n" _C_ CursorAction);
 	    break;
     }
 
@@ -1365,7 +1365,7 @@ global void UIHandleButtonDown(unsigned button)
     if( CursorOn==CursorOnMap ) {
 #ifdef SPLIT_SCREEN_SUPPORT
 	TheUI.LastClickedVP = GetViewport (CursorX, CursorY);
-	DebugLevel0Fn ("last clicked viewport changed to %d.\n",
+	DebugLevel0Fn ("last clicked viewport changed to %d.\n" _C_
 		TheUI.LastClickedVP);
 	MustRedraw = RedrawMinimapCursor | RedrawMap;
 	/* to redraw the cursor immediately (and avoid up to 1 sec delay */
@@ -1428,7 +1428,7 @@ global void UIHandleButtonDown(unsigned button)
 	    CursorStartX=CursorX;
 	    CursorStartY=CursorY;
 	    GameCursor=TheUI.Scroll.Cursor;
-	    DebugLevel3("Cursor middle down %d,%d\n",CursorX,CursorY);
+	    DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
 	    MustRedraw|=RedrawCursor;
 	} else if( MouseButtons&RightButton ) {
 	    Unit* unit;
@@ -1518,8 +1518,8 @@ global void UIHandleButtonDown(unsigned button)
 		}
 		else if( NumSelected==1 && Selected[0]->Type->Building &&
 		         Selected[0]->Orders[0].Action==UnitActionTrain ) {
-		    DebugLevel0Fn("Cancel slot %d %s\n",
-			ButtonUnderCursor-4,
+		    DebugLevel0Fn("Cancel slot %d %s\n" _C_
+			ButtonUnderCursor-4 _C_
 			Selected[0]->Data.Train.What[ButtonUnderCursor-4]
 			    ->Ident);
 		    SendCommandCancelTraining(Selected[0],

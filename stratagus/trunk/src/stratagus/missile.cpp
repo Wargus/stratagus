@@ -399,7 +399,7 @@ global Missile* MakeMissile(MissileType* mtype,int sx,int sy,int dx,int dy)
     Missile* missile;
 
     DebugLevel3Fn("type %d(%s) at %d,%d to %d,%d\n"
-	    ,mtype-MissileTypes,mtype->Ident,sx,sy,dx,dy);
+	    _C_ mtype-MissileTypes _C_ mtype->Ident _C_ sx _C_ sy _C_ dx _C_ dy);
 
 
     if( !(missile=NewGlobalMissile()) ) {
@@ -425,7 +425,7 @@ global Missile* MakeLocalMissile(MissileType* mtype,int sx,int sy,int dx,int dy)
     Missile* missile;
 
     DebugLevel3Fn("type %d(%s) at %d,%d to %d,%d\n"
-	    ,mtype-MissileTypes,mtype->Ident,sx,sy,dx,dy);
+	    _C_ mtype-MissileTypes _C_ mtype->Ident _C_ sx _C_ sy _C_ dx _C_ dy);
 
     if( !(missile=NewLocalMissile()) ) {
 	return missile;
@@ -535,8 +535,8 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
     damage += piercing_damage + 1;	// round up
     damage /= 2;
     damage *= ((SyncRand() >> 15) & 1) + 1;
-    DebugLevel3Fn("\nDamage done [%d] %d %d ->%d\n",goal_stats->Armor,
-	    basic_damage,piercing_damage, damage);
+    DebugLevel3Fn("\nDamage done [%d] %d %d ->%d\n" _C_ goal_stats->Armor _C_
+	    basic_damage _C_ piercing_damage _C_ damage);
 
     return damage;
 }
@@ -639,14 +639,14 @@ global void FireMissile(Unit* unit)
 	DebugCheck( !goal->Type );	// Target invalid?
 	// Fire to nearest point of the unit!
 	NearestOfUnit(goal,unit->X,unit->Y,&dx,&dy);
-	DebugLevel3Fn("Fire to unit at %d,%d\n",dx,dy);
+	DebugLevel3Fn("Fire to unit at %d,%d\n" _C_ dx _C_ dy);
 
 	//
 	//	Moved out of attack range?
 	//
 	if( MapDistanceBetweenUnits(unit,goal)<unit->Type->MinAttackRange ) {
 	    DebugLevel0Fn("Missile target too near %d,%d\n"
-		,MapDistanceBetweenUnits(unit,goal),unit->Type->MinAttackRange);
+		_C_ MapDistanceBetweenUnits(unit,goal) _C_ unit->Type->MinAttackRange);
 	    // FIXME: do something other?
 	    return;
 	}
@@ -713,8 +713,8 @@ local int MissileVisibleInViewport (int v, const Missile* missile)
     if (!AnyMapAreaVisibleInViewport (v,tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
 	return 0;
     }
-    DebugLevel3Fn("Missile bounding box %d %d %d %d\n",
-		tileMinX,tileMaxX,tileMinY,tileMaxY);
+    DebugLevel3Fn("Missile bounding box %d %d %d %d\n" _C_
+		tileMinX _C_ tileMaxX _C_ tileMinY _C_ tileMaxY);
     return 1;
 }
 #else /* SPLIT_SCREEN_SUPPORT */
@@ -916,7 +916,7 @@ local int PointToPointMissile(Missile* missile)
 	missile->Ystep=ystep;
 	++missile->State;
 	DebugLevel3Fn("Init: %d,%d, %d,%d, =%d\n"
-		,dx,dy,xstep,ystep,missile->D);
+		_C_ dx _C_ dy _C_ xstep _C_ ystep _C_ missile->D);
 	return 0;
     } else {
 	// on the way
@@ -1201,8 +1201,8 @@ local void MissileAction(Missile* missile)
 			    VideoGraphicFrames(missile->Type->Sprite);
 		}
 		DebugLevel3Fn("Frame %d of %d\n"
-			,missile->SpriteFrame
-			,VideoGraphicFrames(missile->Type->Sprite));
+			_C_ missile->SpriteFrame
+			_C_ VideoGraphicFrames(missile->Type->Sprite));
 	    }
 	    break;
 
@@ -1253,8 +1253,8 @@ local void MissileAction(Missile* missile)
 			    VideoGraphicFrames(missile->Type->Sprite);
 		}
 		DebugLevel3Fn("Frame %d of %d\n"
-			,missile->SpriteFrame
-			,VideoGraphicFrames(missile->Type->Sprite));
+			_C_ missile->SpriteFrame
+			_C_ VideoGraphicFrames(missile->Type->Sprite));
 	    }
 	    break;
 
@@ -1490,7 +1490,7 @@ global int ViewPointDistanceToMissile(const Missile* missile)
     x=(missile->X+missile->Type->Width/2)/TileSizeX;
     y=(missile->Y+missile->Type->Height/2)/TileSizeY;	// pixel -> tile
 
-    DebugLevel3Fn("Missile %p at %d %d\n",missile,x,y);
+    DebugLevel3Fn("Missile %p at %d %d\n" _C_ missile _C_ x _C_ y);
 
     return ViewPointDistance(x,y);
 }

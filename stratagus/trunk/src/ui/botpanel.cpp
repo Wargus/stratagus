@@ -198,7 +198,7 @@ global void SaveButtons(FILE* file)
 	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckSingleResearch ) {
 		fprintf(file,"'check-single-research");
 	    } else {
-		DebugLevel0Fn("Unsupported check function %p\n",
+		DebugLevel0Fn("Unsupported check function %p\n" _C_
 			UnitButtonTable[i]->Allowed);
 		fprintf(file,"%p",UnitButtonTable[i]->Allowed);
 	    }
@@ -488,12 +488,12 @@ global void DrawButtonPanel(void)
 			// FIXME: store pointer in button table!
 			stats=&UnitTypes[v].Stats[ThisPlayer->Player];
 			DebugLevel3("Upgrade to %s %d %d %d %d %d\n"
-				,UnitTypes[v].Ident
-				,UnitTypes[v].Demand
-				,UnitTypes[v]._Costs[GoldCost]
-				,UnitTypes[v]._Costs[WoodCost]
-				,stats->Costs[GoldCost]
-				,stats->Costs[WoodCost]);
+				_C_ UnitTypes[v].Ident
+				_C_ UnitTypes[v].Demand
+				_C_ UnitTypes[v]._Costs[GoldCost]
+				_C_ UnitTypes[v]._Costs[WoodCost]
+				_C_ stats->Costs[GoldCost]
+				_C_ stats->Costs[WoodCost]);
 
 			SetCosts(0,UnitTypes[v].Demand,stats->Costs);
 
@@ -557,7 +557,7 @@ local void UpdateButtonPanelMultipleUnits(void)
 	    unit_ident=",neutral-group,";
 	    break;
 	default:
-	    DebugLevel0("what %d ",ThisPlayer->Race);
+	    DebugLevel0("what %d "_C_ ThisPlayer->Race);
 	    abort();
     }
 
@@ -572,7 +572,7 @@ local void UpdateButtonPanelMultipleUnits(void)
 	    int allow;
 
 	    allow=0;
-	    DebugLevel3("%d: %p\n",z,UnitButtonTable[z]->Allowed);
+	    DebugLevel3("%d: %p\n" _C_ z _C_ UnitButtonTable[z]->Allowed);
 	    if ( UnitButtonTable[z]->Allowed ) {
 		// there is check function -- call it
 		if (UnitButtonTable[z]->Allowed( NULL, UnitButtonTable[z] )) {
@@ -784,7 +784,7 @@ global void UpdateButtonPanel(void)
 		break;
 
 	    default:
-		DebugLevel0Fn("Unsupported button-action %d\n",
+		DebugLevel0Fn("Unsupported button-action %d\n" _C_
 			buttonaction->Action);
 		break;
 	    }
@@ -807,7 +807,7 @@ global void DoButtonButtonClicked(int button)
     int i;
     UnitType* type;
 
-    DebugLevel3Fn("Button clicked %d\n",button);
+    DebugLevel3Fn("Button clicked %d\n" _C_ button);
 
     if( !CurrentButtons ) {		// no buttons
 	return;
@@ -825,7 +825,7 @@ global void DoButtonButtonClicked(int button)
     //
     //	Handle action on button.
     //
-    DebugLevel3Fn("Button clicked %d=%d\n",button,
+    DebugLevel3Fn("Button clicked %d=%d\n" _C_ button _C_
 	    CurrentButtons[button].Action);
     switch( CurrentButtons[button].Action ) {
 	case ButtonUnload:
@@ -955,9 +955,9 @@ global void DoButtonButtonClicked(int button)
 	    type=&UnitTypes[CurrentButtons[button].Value];
 	    if( !PlayerCheckUnitType(ThisPlayer,type) ) {
 		DebugLevel3("Upgrade to %s %d %d\n"
-			,type->Ident
-			,type->_Costs[GoldCost]
-			,type->_Costs[WoodCost]);
+			_C_ type->Ident
+			_C_ type->_Costs[GoldCost]
+			_C_ type->_Costs[WoodCost]);
 		//PlayerSubUnitType(ThisPlayer,type);
 		SendCommandUpgradeTo(Selected[0],type
 			,!(KeyModifiers&ModifierShift));
@@ -977,7 +977,7 @@ global void DoButtonButtonClicked(int button)
 	    break;
 	default:
 	    DebugLevel1Fn("Unknown action %d\n"
-		    ,CurrentButtons[button].Action);
+		    _C_ CurrentButtons[button].Action);
 	    break;
     }
 }

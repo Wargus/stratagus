@@ -433,9 +433,9 @@ global VMemType* VideoCreateSharedPalette(const Palette* palette)
 	free(pixels);
 	pixels = current_link->Palette;
 	++current_link->RefCount;
-	DebugLevel3("uses palette %p %d\n",pixels,current_link->RefCount);
+	DebugLevel3("uses palette %p %d\n" _C_ pixels _C_ current_link->RefCount);
     } else {				// Palette NOT found
-	DebugLevel3("loading new palette %p\n",pixels);
+	DebugLevel3("loading new palette %p\n" _C_ pixels);
 
 	current_link = *prev_link = malloc(sizeof(PaletteLink));
 	current_link->Checksum = checksum;
@@ -473,7 +473,7 @@ global void VideoFreeSharedPalette(VMemType* pixels)
     }
     if (current_link) {
 	if (!--current_link->RefCount) {
-	    DebugLevel3Fn("Free palette %p\n",pixels);
+	    DebugLevel3Fn("Free palette %p\n" _C_ pixels);
 	    free(current_link->Palette);
 	    *prev_link = current_link->Next;
 	    free(current_link);
@@ -1149,7 +1149,7 @@ local void InitSingleCommonPalette8( void )
 */
 global void VideoSetPalette(const VMemType* palette)
 {
-    DebugLevel3Fn("Palette %x used\n",(unsigned)palette);
+    DebugLevel3Fn("Palette %x used\n" _C_ (unsigned)palette);
 
     Pixels=(VMemType*)palette;
     SetPlayersPalette();
@@ -1267,7 +1267,7 @@ global void InitVideo(void)
 	case 16: ColorCycle=ColorCycle16; break;
 	case 24: ColorCycle=ColorCycle24; break;
 	case 32: ColorCycle=ColorCycle32; break;
-        default: DebugLevel0Fn( "Video %d bpp unsupported\n", VideoBpp );
+        default: DebugLevel0Fn( "Video %d bpp unsupported\n" _C_ VideoBpp );
     }
     VideoTypeSize = VideoBpp / 8;
 

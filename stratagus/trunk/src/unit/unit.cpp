@@ -132,8 +132,8 @@ global void FreeUnitMemory(Unit* unit)
 */
 global void ReleaseUnit(Unit* unit)
 {
-    DebugLevel2Fn("%lu:Unit %p %d `%s'\n",GameCycle,
-	    unit,UnitNumber(unit),unit->Type->Ident);
+    DebugLevel2Fn("%lu:Unit %p %d `%s'\n" _C_ GameCycle _C_
+	    unit _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
     DebugCheck( !unit->Type );		// already free.
     DebugCheck( unit->OrderCount!=1 );
@@ -159,8 +159,8 @@ global void ReleaseUnit(Unit* unit)
 	unit->Destroyed=1;		// mark as destroyed
 	RefsDebugCheck( !unit->Refs );
 	if( --unit->Refs>0 ) {
-	    DebugLevel2Fn("%lu:More references of %d #%d\n",GameCycle
-		    ,UnitNumber(unit),unit->Refs);
+	    DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle
+		    _C_ UnitNumber(unit) _C_ unit->Refs);
 	    return;
 	}
 #ifdef HIERARCHIC_PATHFINDER
@@ -230,7 +230,7 @@ local Unit *AllocUnit (void)
 	if( ReleasedTail==&unit->Next ) {	// last element
 	    ReleasedTail=&ReleasedHead;
 	}
-	DebugLevel2Fn("%lu:Release %p %d\n",GameCycle,unit,UnitNumber(unit));
+	DebugLevel2Fn("%lu:Release %p %d\n" _C_ GameCycle _C_ unit _C_ UnitNumber(unit));
 	slot=UnitSlots+unit->Slot;
 	memset(unit,0,sizeof(*unit));
 	// FIXME: can release here more slots, reducing memory needs.
@@ -268,7 +268,7 @@ global void InitUnit (Unit *unit, UnitType *type)
     unit->UnitSlot=&Units[NumUnits];	// back pointer
     Units[NumUnits++]=unit;
 
-    DebugLevel3Fn("%p %d\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("%p %d\n" _C_ unit _C_ UnitNumber(unit));
 
     //
     //	Initialise unit structure (must be zero filled!)
@@ -609,7 +609,7 @@ global void RemoveUnit(Unit* unit)
 	}
     }
 
-    DebugLevel3Fn("%d %p %p\n",UnitNumber(unit),unit,unit->Next);
+    DebugLevel3Fn("%d %p %p\n" _C_ UnitNumber(unit) _C_ unit _C_ unit->Next);
     UnitCacheRemove(unit);
 #ifdef UNIT_ON_MAP
     if( 0 ) {
@@ -618,7 +618,7 @@ global void RemoveUnit(Unit* unit)
 	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
 	while( list ) {				// find the unit
 	    if( list==unit ) {
-		DebugLevel0Fn("%d\n",UnitNumber(unit));
+		DebugLevel0Fn("%d\n" _C_ UnitNumber(unit));
 		abort();
 		break;
 	    }
@@ -737,7 +737,7 @@ global void UnitLost(Unit* unit)
 		-Upgrades]=0;
     }
 
-    DebugLevel3Fn("Lost %s(%d)\n",unit->Type->Ident,UnitNumber(unit));
+    DebugLevel3Fn("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));
 
     //
     //	Destroy oil-platform, must re-make oil patch.
@@ -845,7 +845,7 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
     x=unit->X;
     y=unit->Y;
 
-    DebugLevel3("Nearest of (%d,%d) - (%d,%d)\n",tx,ty,x,y);
+    DebugLevel3("Nearest of (%d,%d) - (%d,%d)\n" _C_ tx _C_ ty _C_ x _C_ y);
     if( tx>=x+unit->Type->TileWidth ) {
 	*dx=x+unit->Type->TileWidth-1;
     } else if( tx<x ) {
@@ -861,7 +861,7 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 	*dy=ty;
     }
 
-    DebugLevel3Fn("Goal is (%d,%d)\n",*dx,*dy);
+    DebugLevel3Fn("Goal is (%d,%d)\n" _C_ *dx _C_ *dy);
 }
 
 /**
@@ -1398,7 +1398,7 @@ global void UnitIncrementMana(void)
 	//	Look if the time to live is over.
 	//
 	if( unit->TTL && unit->TTL<GameCycle ) {
-	    DebugLevel0Fn("Unit must die %d %lu!\n",unit->TTL,GameCycle);
+	    DebugLevel0Fn("Unit must die %d %lu!\n" _C_ unit->TTL _C_ GameCycle);
 	    //if( !--unit->HP ) { FIXME: must reduce hp the last seconds of life
 		LetUnitDie(unit);
 	    //}
@@ -1441,8 +1441,8 @@ global void UnitIncrementMana(void)
                 flag=CheckUnitToBeDrawn(unit);
 	    }
 	}
-	DebugLevel3Fn("%d:%d,%d,%d,%d,%d\n",UnitNumber(unit),
-		unit->Bloodlust,unit->Haste,unit->Slow,unit->Invisible,
+	DebugLevel3Fn("%d:%d,%d,%d,%d,%d\n" _C_ UnitNumber(unit) _C_
+		unit->Bloodlust _C_ unit->Haste _C_ unit->Slow _C_ unit->Invisible _C_
 		unit->UnholyArmor);
 
 	if (  unit->Type->Submarine ) {
@@ -1640,7 +1640,7 @@ global void RescueUnits(void)
 	    memcpy(table,p->Units,l*sizeof(Unit*));
 	    for( j=0; j<l; j++ ) {
 		unit=table[j];
-		DebugLevel3("Checking %d(%s)",UnitNumber(unit),
+		DebugLevel3("Checking %d(%s)" _C_ UnitNumber(unit) _C_
 			unit->Type->Ident);
 #ifdef UNIT_ON_MAP
 		// FIXME: could be done faster?
@@ -1659,7 +1659,7 @@ global void RescueUnits(void)
 			unit->X+unit->Type->TileWidth+2,
 			unit->Y+unit->Type->TileHeight+2,around);
 		}
-		DebugLevel3(" = %d\n",n);
+		DebugLevel3(" = %d\n" _C_ n);
 		//
 		//	Look if ally near the unit.
 		//
@@ -1960,7 +1960,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
     int mask;
     Unit* table[UnitMax];
 
-    DebugLevel3Fn("%d\n",UnitNumber(unit));
+    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     DebugCheck( !unit->Removed );
 
     // FIXME: better and quicker solution, to find the building.
@@ -1987,7 +1987,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	for( i=addy; i--; y++ ) {	// go down
 	    if( CheckedCanMoveToMask(x,y,mask) ) {
 		n=MapDistance(gx,gy,x,y);
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if( n<bestd ) {
 		    bestd=n;
 		    bestx=x;
@@ -1999,7 +1999,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	for( i=addx; i--; x++ ) {	// go right
 	    if( CheckedCanMoveToMask(x,y,mask) ) {
 		n=MapDistance(gx,gy,x,y);
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if( n<bestd ) {
 		    bestd=n;
 		    bestx=x;
@@ -2011,7 +2011,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	for( i=addy; i--; y-- ) {	// go up
 	    if( CheckedCanMoveToMask(x,y,mask) ) {
 		n=MapDistance(gx,gy,x,y);
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if( n<bestd ) {
 		    bestd=n;
 		    bestx=x;
@@ -2023,7 +2023,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	for( i=addx; i--; x-- ) {	// go left
 	    if( CheckedCanMoveToMask(x,y,mask) ) {
 		n=MapDistance(gx,gy,x,y);
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if( n<bestd ) {
 		    bestd=n;
 		    bestx=x;
@@ -2100,7 +2100,7 @@ global void DropOutAll(const Unit* source)
 	    unit->SubAction=0;
 	}
     }
-    DebugLevel0Fn("Drop out %d of %d\n",i,source->Data.Resource.Active);
+    DebugLevel0Fn("Drop out %d of %d\n" _C_ i _C_ source->Data.Resource.Active);
 #if 0
     // FIXME: Rewrite this use source->Next;
     Unit** table;
@@ -2176,7 +2176,7 @@ global int CanBuildHere(const UnitType* type,unsigned x,unsigned y)
 	for( i=0; i<NumUnits; i++ ) {
 	    unit=Units[i];
 	    if( unit->Type->GoldMine ) {
-		DebugLevel3("Check goldmine %d,%d\n",unit->X,unit->Y);
+		DebugLevel3("Check goldmine %d,%d\n" _C_ unit->X _C_ unit->Y);
 		if( unit->X<x ) {
 		    dx=x-unit->X-unit->Type->TileWidth;
 		} else {
@@ -2187,7 +2187,7 @@ global int CanBuildHere(const UnitType* type,unsigned x,unsigned y)
 		} else {
 		    dy=unit->Y-y-type->TileHeight;
 		}
-		DebugLevel3("Distance %d,%d\n",dx,dy);
+		DebugLevel3("Distance %d,%d\n" _C_ dx _C_ dy);
 		if( dx<GOLDMINE_DISTANCE && dy<GOLDMINE_DISTANCE ) {
 		    return 0;
 		}
@@ -2226,7 +2226,7 @@ next:
 	    unit=Units[i];
 	    if( unit->Type->OilPatch ) {
 	      DebugLevel3("Check oilpatch %d,%d\n"
-			  ,unit->X,unit->Y);
+			  _C_ unit->X _C_ unit->Y);
 	      if( unit->X<x ) {
 		dx=x-unit->X-unit->Type->TileWidth;
 	      } else {
@@ -2237,7 +2237,7 @@ next:
 	      } else {
 		dy=unit->Y-y-type->TileHeight;
 	      }
-	      DebugLevel3("Distance %d,%d\n",dx,dy);
+	      DebugLevel3("Distance %d,%d\n" _C_ dx _C_ dy);
 	      if( dx<OILPATCH_DISTANCE && dy<OILPATCH_DISTANCE ) {
 		return 0;
 	      }
@@ -2396,7 +2396,7 @@ global Unit* FindGoldMine(const Unit* source __attribute__((unused)),
 	    best=unit;
 	}
     }
-    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n" _C_ UnitNumber(best) _C_ best->X _C_ best->Y);
 
     if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
 	return NoUnitP;
@@ -2445,8 +2445,8 @@ global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 	    best=unit;
 	}
     }
-    DebugLevel3Fn("%d %d,%d\n",best?UnitNumber(best):-1,
-                               best?best->X:-1,best?best->Y:-1);
+    DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
+                               best?best->X:-1 _C_ best?best->Y:-1);
     return best;
 }
 
@@ -2493,8 +2493,8 @@ global Unit* FindWoodDeposit(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%d %d,%d\n",best?UnitNumber(best):-1,
-                               best?best->X:-1,best?best->Y:-1);
+    DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
+                               best?best->X:-1 _C_ best?best->Y:-1);
     return best;
 }
 
@@ -2805,8 +2805,8 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%d %d,%d\n",best?UnitNumber(best):-1,
-                               best?best->X:-1,best?best->Y:-1);
+    DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
+                               best?best->X:-1 _C_ best?best->Y:-1);
     /*	Oil platforms are our own, they should be known
     if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
 	return NoUnitP;
@@ -2862,8 +2862,8 @@ global Unit* FindOilDeposit(const Unit* source,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%d %d,%d\n",best?UnitNumber(best):-1,
-                               best?best->X:-1,best?best->Y:-1);
+    DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
+                               best?best->X:-1 _C_ best?best->Y:-1);
     return best;
 }
 
@@ -3091,7 +3091,7 @@ global void LetUnitDie(Unit* unit)
 	    DebugCheck( !unit->Type->Animations
 		    || !unit->Type->Animations->Die );
 	    UnitShowAnimation(unit,unit->Type->Animations->Die);
-	    DebugLevel0Fn("Frame %d\n",unit->Frame);
+	    DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
 
 	    return;
 	}
@@ -3428,7 +3428,7 @@ global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
     }
 
     DebugLevel3("\tDistance %d,%d -> %d,%d = %d\n"
-	    ,x1,y1,x2,y2,(dy<dx) ? dx : dy);
+	    _C_ x1 _C_ y1 _C_ x2 _C_ y2 _C_ (dy<dx) ? dx : dy);
 
     return (dy<dx) ? dx : dy;
 }

@@ -173,8 +173,8 @@ global void CreateMinimap(void)
     MinimapX=(MINIMAP_W-(TheMap.Width*MinimapScale)/MINIMAP_FAC)/2;
     MinimapY=(MINIMAP_H-(TheMap.Height*MinimapScale)/MINIMAP_FAC)/2;
 
-    DebugLevel0Fn("MinimapScale %d(%d), X off %d, Y off %d\n",
-	    MinimapScale/MINIMAP_FAC,MinimapScale,MinimapX,MinimapY);
+    DebugLevel0Fn("MinimapScale %d(%d), X off %d, Y off %d\n" _C_
+	    MinimapScale/MINIMAP_FAC _C_ MinimapScale _C_ MinimapX _C_ MinimapY);
 
     //
     //	Calculate minimap fast lookup tables.
@@ -421,7 +421,7 @@ global void DrawMinimapCursor(int vx,int vy)
 	} else {
 	    OldMinimapCursorImage=malloc(i);
 	}
-	DebugLevel3("Cursor memory %d\n",i);
+	DebugLevel3("Cursor memory %d\n" _C_ i);
 	OldMinimapCursorSize=i;
     }
     SaveCursorRectangle(OldMinimapCursorImage,x,y,w,h);

@@ -1649,7 +1649,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 
     n=(graphic->Width/width)*(graphic->Height/height);
     DebugLevel3Fn("%dx%d in %dx%d = %d frames.\n"
-	    ,width,height,graphic->Width,graphic->Height,n);
+	    _C_ width _C_ height _C_ graphic->Width _C_ graphic->Height _C_ n);
 
     //
     //	Allocate structure
@@ -1734,7 +1734,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
     }
 
     DebugLevel3Fn("\t%d => %d RLE compressed\n"
-	    ,graphic->Width*graphic->Height,dp-data);
+	    _C_ graphic->Width*graphic->Height _C_ dp-data);
 
     //
     //	Update to real length
@@ -1798,7 +1798,7 @@ global void InitSprite(void)
 	    break;
 
 	default:
-	    DebugLevel0Fn("Unsupported %d bpp\n",VideoBpp);
+	    DebugLevel0Fn("Unsupported %d bpp\n" _C_ VideoBpp);
 	    abort();
     }
 

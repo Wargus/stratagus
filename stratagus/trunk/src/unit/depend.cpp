@@ -79,7 +79,7 @@ global void AddDependency(const char* target,const char* required,int count
 	rule.Kind.Upgrade = UpgradeByIdent( target );
     } else {
 	DebugLevel0Fn("dependency target `%s' should be unit-type or upgrade\n"
-		,target);
+		_C_ target);
 	return;
     }
     hash=(int)(long)rule.Kind.UnitType%(sizeof(DependHash)/sizeof(*DependHash));
@@ -115,7 +115,7 @@ global void AddDependency(const char* target,const char* required,int count
     //	Adjust count.
     //
     if ( count < 0 || count > 255 ) {
-	DebugLevel0Fn("wrong count `%d' range 0 .. 255\n",count);
+	DebugLevel0Fn("wrong count `%d' range 0 .. 255\n" _C_ count);
 	count = 255;
     }
 
@@ -137,7 +137,7 @@ global void AddDependency(const char* target,const char* required,int count
     } else {
 	DebugLevel0Fn(
 		"dependency required `%s' should be unit-type or upgrade\n"
-		,required);
+		_C_ required);
 	free(temp);
 	return;
     }
@@ -184,7 +184,7 @@ global int CheckDependByIdent(const Player* player,const char* target)
 	}
 	rule.Type = DependRuleUpgrade;
     } else {
-	DebugLevel0Fn("target `%s' should be unit-type or upgrade\n",target);
+	DebugLevel0Fn("target `%s' should be unit-type or upgrade\n" _C_ target);
 	return 0;
     }
 
@@ -416,7 +416,7 @@ local SCM CclDefineDependency(SCM list)
 */
 local SCM CclGetDependency(SCM target __attribute__((unused)))
 {
-    DebugLevel0Fn("FIXME: write this %p\n",target);
+    DebugLevel0Fn("FIXME: write this %p\n" _C_ target);
 
     return SCM_UNSPECIFIED;
 }
@@ -430,7 +430,7 @@ local SCM CclGetDependency(SCM target __attribute__((unused)))
 */
 local SCM CclCheckDependency(SCM target __attribute__((unused)))
 {
-    DebugLevel0Fn("FIXME: write this %p\n",target);
+    DebugLevel0Fn("FIXME: write this %p\n" _C_ target);
 
     return SCM_UNSPECIFIED;
 }

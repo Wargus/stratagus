@@ -82,7 +82,7 @@ local SCM CclDefineNewUnitType(SCM list)
     type=UnitTypeByIdent(str);
     IfDebug( NoWarningUnitType=i; );
     if( type ) {
-	DebugLevel0Fn("Redefining unit-type `%s'\n",str);
+	DebugLevel0Fn("Redefining unit-type `%s'\n" _C_ str);
 	free(str);
 	// FIXME: loose memory, old content isn't freed.
     } else {
@@ -406,7 +406,7 @@ local SCM CclDefineOldUnitType(SCM list)
     type=UnitTypeByIdent(str);
     IfDebug( NoWarningUnitType=i; );
     if( type ) {
-	DebugLevel0Fn("Redefining unit-type `%s'\n",str);
+	DebugLevel0Fn("Redefining unit-type `%s'\n" _C_ str);
 	free(str);
     } else {
 	type=NewUnitTypeSlot(str);
@@ -416,7 +416,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel3("\tName: %s\n",str);
+    DebugLevel3("\tName: %s\n" _C_ str);
     free(type->Name);
     type->Name=str;
 
@@ -426,7 +426,7 @@ local SCM CclDefineOldUnitType(SCM list)
     value=gh_car(list);
     if( gh_symbol_p(value) || gh_string_p(value) ) {
 	str=gh_scm2newstr(value,NULL);
-	DebugLevel3("\tSame-Sprite: %s\n",str);
+	DebugLevel3("\tSame-Sprite: %s\n" _C_ str);
 	free(type->SameSprite);
 	type->SameSprite=str;
 	free(type->File[0]);
@@ -450,7 +450,7 @@ local SCM CclDefineOldUnitType(SCM list)
 	} else {
 	    str=gh_scm2newstr(temp,NULL);
 	}
-	DebugLevel3("\tFile-0: %s\n",str);
+	DebugLevel3("\tFile-0: %s\n" _C_ str);
 	free(type->File[0]);
 	type->File[0]=str;
 
@@ -460,7 +460,7 @@ local SCM CclDefineOldUnitType(SCM list)
 	} else {
 	    str=gh_scm2newstr(temp,NULL);
 	}
-	DebugLevel3("\tFile-1: %s\n",str);
+	DebugLevel3("\tFile-1: %s\n" _C_ str);
 	free(type->File[1]);
 	type->File[1]=str;
 
@@ -470,7 +470,7 @@ local SCM CclDefineOldUnitType(SCM list)
 	} else {
 	    str=gh_scm2newstr(temp,NULL);
 	}
-	DebugLevel3("\tFile-2: %s\n",str);
+	DebugLevel3("\tFile-2: %s\n" _C_ str);
 	free(type->File[2]);
 	type->File[2]=str;
 
@@ -480,7 +480,7 @@ local SCM CclDefineOldUnitType(SCM list)
 	} else {
 	    str=gh_scm2newstr(temp,NULL);
 	}
-	DebugLevel3("\tFile-3: %s\n",str);
+	DebugLevel3("\tFile-3: %s\n" _C_ str);
 	free(type->File[3]);
 	type->File[3]=str;
     }
@@ -494,7 +494,7 @@ local SCM CclDefineOldUnitType(SCM list)
     type->Width=gh_scm2int(temp);
     temp=gh_car(gh_cdr(value));
     type->Height=gh_scm2int(temp);
-    DebugLevel3("\tGraphic: %d,%d\n",type->Width,type->Height);
+    DebugLevel3("\tGraphic: %d,%d\n" _C_ type->Width _C_ type->Height);
 
     // Animations
 
@@ -509,7 +509,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel3("\tIcon: %s\n",str);
+    DebugLevel3("\tIcon: %s\n" _C_ str);
 
     free(type->Icon.Name);
     type->Icon.Name=str;
@@ -519,7 +519,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tSpeed: %d\n",i);
+    DebugLevel3("\tSpeed: %d\n" _C_ i);
     type->_Speed=i;
 
     // Overlay frame
@@ -527,7 +527,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tOverlay frame: %d\n",i);
+    DebugLevel3("\tOverlay frame: %d\n" _C_ i);
     type->Construction=ConstructionByWcNum(i);
 
     // Sight range
@@ -535,7 +535,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tSight range: %d\n",i);
+    DebugLevel3("\tSight range: %d\n" _C_ i);
     type->_SightRange=i;
 
     // Hitpoints
@@ -543,7 +543,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tHitpoints: %d\n",i);
+    DebugLevel3("\tHitpoints: %d\n" _C_ i);
     type->_HitPoints=i;
 
     // Magic
@@ -551,7 +551,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tMagic: %d\n",i);
+    DebugLevel3("\tMagic: %d\n" _C_ i);
     type->Magic=i;
 
     // Costs
@@ -576,8 +576,8 @@ local SCM CclDefineOldUnitType(SCM list)
     }
 
     DebugLevel3("\tCosts: %d,%d,%d,%d\n"
-	    ,type->_Costs[TimeCost],type->_Costs[GoldCost]
-	    ,type->_Costs[WoodCost],type->_Costs[OilCost]);
+	    _C_ type->_Costs[TimeCost] _C_ type->_Costs[GoldCost]
+	    _C_ type->_Costs[WoodCost] _C_ type->_Costs[OilCost]);
 
     // Tile Size
 
@@ -588,7 +588,7 @@ local SCM CclDefineOldUnitType(SCM list)
     type->TileWidth=gh_scm2int(temp);
     temp=gh_car(gh_cdr(value));
     type->TileHeight=gh_scm2int(temp);
-    DebugLevel3("\tTile: %d,%d\n",type->TileWidth,type->TileHeight);
+    DebugLevel3("\tTile: %d,%d\n" _C_ type->TileWidth _C_ type->TileHeight);
 
     // Box Size
 
@@ -599,14 +599,14 @@ local SCM CclDefineOldUnitType(SCM list)
     type->BoxWidth=gh_scm2int(temp);
     temp=gh_car(gh_cdr(value));
     type->BoxHeight=gh_scm2int(temp);
-    DebugLevel3("\tBox: %d,%d\n",type->BoxWidth,type->BoxHeight);
+    DebugLevel3("\tBox: %d,%d\n" _C_ type->BoxWidth _C_ type->BoxHeight);
 
     // Minimal attack range
 
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tMinimal AttackRange: %d\n",i);
+    DebugLevel3("\tMinimal AttackRange: %d\n" _C_ i);
     type->MinAttackRange=i;
 
     // Attack range
@@ -614,7 +614,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tAttackRange: %d\n",i);
+    DebugLevel3("\tAttackRange: %d\n" _C_ i);
     type->_AttackRange=i;
 
     // Reaction range computer
@@ -622,7 +622,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tReaction range computer: %d\n",i);
+    DebugLevel3("\tReaction range computer: %d\n" _C_ i);
     type->ReactRangeComputer=i;
 
     // Reaction range player
@@ -630,7 +630,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tReaction range player: %d\n",i);
+    DebugLevel3("\tReaction range player: %d\n" _C_ i);
     type->ReactRangePerson=i;
 
     // Armor
@@ -638,7 +638,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tArmor: %d\n",i);
+    DebugLevel3("\tArmor: %d\n" _C_ i);
     type->_Armor=i;
 
     // Priority
@@ -646,7 +646,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tPriority: %d\n",i);
+    DebugLevel3("\tPriority: %d\n" _C_ i);
     type->Priority=i;
 
     // Basic damage
@@ -654,7 +654,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tBasic damage: %d\n",i);
+    DebugLevel3("\tBasic damage: %d\n" _C_ i);
     type->_BasicDamage=i;
 
     // Piercing damage
@@ -662,7 +662,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tPiercing damage: %d\n",i);
+    DebugLevel3("\tPiercing damage: %d\n" _C_ i);
     type->_PiercingDamage=i;
 
     // Weapons upgradable
@@ -670,7 +670,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tWeaponsUpgradable: %d\n",i);
+    DebugLevel3("\tWeaponsUpgradable: %d\n" _C_ i);
     type->WeaponsUpgradable=i;
 
     // Armor upgradable
@@ -678,7 +678,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tArmorUpgradable: %d\n",i);
+    DebugLevel3("\tArmorUpgradable: %d\n" _C_ i);
     type->ArmorUpgradable=i;
 
     // Decay rate
@@ -686,7 +686,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tDecay rate: %d\n",i);
+    DebugLevel3("\tDecay rate: %d\n" _C_ i);
     type->DecayRate=i;
 
     // Annoy computer factor
@@ -694,7 +694,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tAnnoy computer factor: %d\n",i);
+    DebugLevel3("\tAnnoy computer factor: %d\n" _C_ i);
     type->AnnoyComputerFactor=i;
 
     // Points
@@ -702,7 +702,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tPoints: %d\n",i);
+    DebugLevel3("\tPoints: %d\n" _C_ i);
     type->Points=i;
 
     // Food demand
@@ -710,7 +710,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tFood demand: %d\n",i);
+    DebugLevel3("\tFood demand: %d\n" _C_ i);
     type->Demand=i;
 
     // Food supply
@@ -718,7 +718,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
-    DebugLevel3("\tFood supply: %d\n",i);
+    DebugLevel3("\tFood supply: %d\n" _C_ i);
     type->Supply=i;
 
     // Missile
@@ -726,7 +726,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel3("\tMissile: %s\n",str);
+    DebugLevel3("\tMissile: %s\n" _C_ str);
 
     free(type->Missile.Name);
     type->Missile.Name=str;
@@ -744,7 +744,7 @@ local SCM CclDefineOldUnitType(SCM list)
 	value=gh_car(temp);
 	temp=gh_cdr(temp);
 	str=gh_scm2newstr(value,NULL);
-	DebugLevel3("\tCorpse: %s\n",str);
+	DebugLevel3("\tCorpse: %s\n" _C_ str);
 	type->CorpseName=str;
 
 	value=gh_car(temp);
