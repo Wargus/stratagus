@@ -10,7 +10,7 @@
 ##
 
 # Compile commands
-CC=gcc
+CC=@CC@
 CCLD=$(CC)
 RM=rm -f
 MAKE=make
