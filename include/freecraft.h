@@ -101,6 +101,26 @@
 */
 #define DebugLevel3(fmt...)	/* TURNED OFF: printf(fmt##) */
 
+/**
+**	Print debug information of level 0 with function name.
+*/
+#define DebugLevel0Fn(fmt...)	printf(__FUNCTION__": "fmt##)
+
+/**
+**	Print debug information of level 1 with function name.
+*/
+#define DebugLevel1Fn(fmt...)	printf(__FUNCTION__": "fmt##)
+
+/**
+**	Print debug information of level 2 with function name.
+*/
+#define DebugLevel2Fn(fmt...)	printf(__FUNCTION__": "fmt##)
+
+/**
+**	Print debug information of level 3 with function name.
+*/
+#define DebugLevel3Fn(fmt...)	/* TURNED OFF: printf(__FUNCTION__": "fmt##) */
+
 #else	// }{ DEBUG
 
 #define IfDebug(code)
@@ -109,6 +129,10 @@
 #define DebugLevel1(fmt...)
 #define DebugLevel2(fmt...)
 #define DebugLevel3(fmt...)
+#define DebugLevel0Fn(fmt...)
+#define DebugLevel1Fn(fmt...)
+#define DebugLevel2Fn(fmt...)
+#define DebugLevel3Fn(fmt...)
 
 #endif	// } !DEBUG
 
