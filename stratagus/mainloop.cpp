@@ -643,6 +643,7 @@ global void GameMainLoop(void)
 
 	if( showtip ) {
 	    ProcessMenu(MENU_TIPS, 1);
+	    InterfaceState = IfaceStateNormal;
 	    showtip=0;
 	}
     }
