@@ -660,8 +660,9 @@ global MapInfo* GetPudInfo(const char* pud)
 	if( !memcmp(header,"MTXM",4) ) {
 	    unsigned short* mtxm;
 
-	    if( !(mtxm=alloca(length)) ) {
-		perror("alloca()");
+	    // FIXME: linux didn't like this big alloca :((((((
+	    if( !(mtxm=malloc(length)) ) {
+		perror("malloc()");
 		exit(-1);
 	    }
 	    if( CLread(input,mtxm,length)!=length ) {
@@ -669,6 +670,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		exit(-1);
 	    }
 	    info->MapUID += ChksumArea((unsigned char *)mtxm, length);
+	    free(mtxm);
 
 	    continue;
 	}
@@ -679,8 +681,8 @@ global MapInfo* GetPudInfo(const char* pud)
 	if( !memcmp(header,"SQM ",4) ) {
 	    unsigned short* sqm;
 
-	    if( !(sqm=alloca(length)) ) {
-		perror("alloca()");
+	    if( !(sqm=malloc(length)) ) {
+		perror("malloc()");
 		exit(-1);
 	    }
 	    if( CLread(input,sqm,length)!=length ) {
@@ -688,6 +690,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		exit(-1);
 	    }
 	    info->MapUID += ChksumArea((unsigned char *)sqm, length);
+	    free(sqm);
 
 	    continue;
 	}
@@ -698,8 +701,8 @@ global MapInfo* GetPudInfo(const char* pud)
 	if( !memcmp(header,"REGM",4) ) {
 	    unsigned short* regm;
 
-	    if( !(regm=alloca(length)) ) {
-		perror("alloca()");
+	    if( !(regm=malloc(length)) ) {
+		perror("malloc()");
 		exit(-1);
 	    }
 	    if( CLread(input,regm,length)!=length ) {
@@ -707,6 +710,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		exit(-1);
 	    }
 	    info->MapUID += ChksumArea((unsigned char *)regm, length);
+	    free(regm);
 
 	    continue;
 	}
@@ -1111,8 +1115,8 @@ global void LoadPud(const char* pud,WorldMap* map)
 		DebugLevel1("wrong length of MTXM section %ld\n",length);
 		exit(-1);
 	    }
-	    if( !(mtxm=alloca(length)) ) {
-		perror("alloca()");
+	    if( !(mtxm=malloc(length)) ) {
+		perror("malloc()");
 		exit(-1);
 	    }
 	    if( CLread(input,mtxm,length)!=length ) {
@@ -1121,6 +1125,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    }
 
 	    ConvertMTXM(mtxm,width,height,map);
+	    free(mtxm);
 
 	    continue;
 	}
@@ -1135,8 +1140,8 @@ global void LoadPud(const char* pud,WorldMap* map)
 		DebugLevel1("wrong length of SQM  section %ld\n",length);
 		exit(-1);
 	    }
-	    if( !(sqm=alloca(length)) ) {
-		perror("alloca()");
+	    if( !(sqm=malloc(length)) ) {
+		perror("malloc()");
 		exit(-1);
 	    }
 	    if( CLread(input,sqm,length)!=length ) {
@@ -1145,6 +1150,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    }
 
 	    ConvertSQM(sqm,width,height,map);
+	    free(sqm);
 
 	    continue;
 	}
@@ -1159,8 +1165,8 @@ global void LoadPud(const char* pud,WorldMap* map)
 		DebugLevel1("wrong length of REGM section %ld\n",length);
 		exit(-1);
 	    }
-	    if( !(regm=alloca(length)) ) {
-		perror("alloca()");
+	    if( !(regm=malloc(length)) ) {
+		perror("malloc()");
 		exit(-1);
 	    }
 	    if( CLread(input,regm,length)!=length ) {
@@ -1169,6 +1175,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    }
 
 	    ConvertREGM(regm,width,height,map);
+	    free(regm);
 
 	    continue;
 	}
