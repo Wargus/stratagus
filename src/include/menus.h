@@ -10,7 +10,7 @@
 //
 /**@name menus.h - The menu headerfile. */
 //
-//      (c) Copyright 1999-2004 by Andreas Arens and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Andreas Arens and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -198,6 +198,7 @@ typedef struct _menuitem_drawfunc_ {
 } MenuitemDrawfunc;
 typedef struct _menuitem_input_ {
 	unsigned char *buffer;
+	unsigned int iflags;
 	int xsize;
 	int ysize;
 	MenuButtonId button;
@@ -260,6 +261,8 @@ typedef struct _menuitem_ {
 #define MI_CFLAGS_RIGHT 2
 #define MI_CFLAGS_KNOB  4
 #define MI_CFLAGS_CONT  8
+
+#define MI_IFLAGS_PASSWORD 1 /// Input is a password
 
 	/// for MI_TYPE_PULLDOWN
 #define MI_PSTATE_PASSIVE 1  /// Pulldown is passive (grey) drawn
