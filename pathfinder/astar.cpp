@@ -632,6 +632,10 @@ global int NextPathElement(Unit* unit,int* pxd,int *pyd)
 	if (result > 0 ) {
 	    *pxd = Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
 	    *pyd = Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
+	    if( !CheckedCanMoveToMask(*pxd+unit->X,*pyd+unit->Y,UnitMovementMask(unit)) ) {
+		// There may be unit in the way, Astar may allow you to walk onto it.
+		return PF_UNREACHABLE;
+	    }
 	    result = unit->Data.Move.Length;
 	    unit->Data.Move.Length--;
 	}
