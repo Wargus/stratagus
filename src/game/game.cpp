@@ -183,7 +183,21 @@ global void CreateGame(char* filename, WorldMap* map)
 	//
 	if( NetworkFildes!=-1 ) {
 	    if( NetPlayers>1 || NetworkArg ) {
-		InitNetwork2();
+		//
+		//	Server
+		//
+		if (NetPlayers > 1) {
+		    NetworkServerSetup();
+		    DebugLevel0Fn("Server setup ready\n");
+		    InitNetwork2();
+		//
+		// Client
+		//
+		} else if (NetworkArg) {
+		    NetworkClientSetup();
+		    DebugLevel0Fn("Client setup ready\n");
+		    InitNetwork2();
+		}
 	    } else {
 		ExitNetwork1();
 	    }
