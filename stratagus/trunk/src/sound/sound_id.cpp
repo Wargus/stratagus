@@ -71,7 +71,7 @@ global void DisplaySoundHashTable(void)
 }
 
 /**
-**	Ask the sound server to register a sound ans tore the mapping
+**	Ask the sound server to register a sound and store the mapping
 **	between its name and its id.
 **	Register a sound group (or an unique sound if nb==1) and get the
 **	corresponding sound id.

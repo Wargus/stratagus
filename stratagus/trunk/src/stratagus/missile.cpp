@@ -1609,6 +1609,7 @@ global void CleanMissiles(void)
 {
     Missile** missiles;
     Missile* missile;
+    char** sp;
 
     for( missiles=GlobalMissiles; (missile=*missiles); ++missiles ) {
 	free(missile);
@@ -1620,6 +1621,14 @@ global void CleanMissiles(void)
 	*missiles=NULL;
     }
     NumLocalMissiles=0;
+
+    if( MissileTypeWcNames ) {
+	for( sp=MissileTypeWcNames; *sp; ++sp ) {
+	    free(*sp);
+	}
+	free(MissileTypeWcNames);
+	MissileTypeWcNames=NULL;
+    }
 }
 
 //@}

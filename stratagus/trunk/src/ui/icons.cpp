@@ -10,12 +10,11 @@
 //
 /**@name icons.c	-	The icons. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,10 +53,10 @@
 global char** IconWcNames;
 
 local Icon** Icons;			/// Table of all icons.
-local int IconsCount;			/// Number of icons in Icons.
+local int NumIcons;			/// Number of icons in Icons.
 
 local char** IconAliases;		/// Table of all aliases for icons.
-local int IconAliasesCount;		/// Number of icons aliases in Aliases.
+local int NumIconAliases;		/// Number of icons aliases in Aliases.
 
 #ifdef DOXYGEN				// no real code, only for document
 
@@ -81,6 +80,7 @@ local hashtable(Icon*,61) IconHash;	/// lookup table for icon names
 **	@brief Add an icon definition.
 **
 **	@bug Redefining an icon isn't supported.
+**	@note 5 icons pro row are hardcoded.
 **
 **	@param ident	Icon identifier.
 **	@param tileset	Tileset identifier.
@@ -138,8 +138,8 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
 	*(Icon**)hash_add(IconHash,str)=icon;
 	free(str);
     }
-    Icons=realloc(Icons,sizeof(Icon*)*(IconsCount+1));
-    Icons[IconsCount++]=icon;
+    Icons=realloc(Icons,sizeof(Icon*)*(NumIcons+1));
+    Icons[NumIcons++]=icon;
 }
 
 /**
@@ -156,7 +156,7 @@ global void InitIcons(void)
     //
     //	Add icons of the current tileset, with shortcut to hash.
     //
-    for( i=0; i<IconsCount; ++i ) {
+    for( i=0; i<NumIcons; ++i ) {
 	if( !strcmp(Icons[i]->Tileset,TheMap.TerrainName) ) {
 	    *(Icon**)hash_add(IconHash,Icons[i]->Ident)=Icons[i];
 	}
@@ -165,7 +165,7 @@ global void InitIcons(void)
     //
     //	Different names for the same thing
     //
-    for( i=0; i<IconAliasesCount; ++i ) {
+    for( i=0; i<NumIconAliases; ++i ) {
 	Icon* id;
 
 	id=IconByIdent(IconAliases[i*2+1]);
@@ -186,7 +186,7 @@ global void LoadIcons(void)
     //
     //	Load all icon files.
     //
-    for( i=0; i<IconsCount; ++i ) {
+    for( i=0; i<NumIcons; ++i ) {
 	if( !strcmp(Icons[i]->Tileset,TheMap.TerrainName) ) {
 	    if( !Icons[i]->File->Graphic ) {
 		char* buf;
@@ -213,7 +213,7 @@ global void CleanIcons(void)
     int n;
     int i;
 
-    table=alloca(IconsCount);
+    table=alloca(NumIcons);
     //
     //	Mapping the original icon numbers in puds to our internal strings
     //
@@ -231,16 +231,24 @@ global void CleanIcons(void)
     //
     if( Icons ) {
 	n=0;
-	for( i=0; i<IconsCount; ++i ) {
+	for( i=0; i<NumIcons; ++i ) {
 	    char* str;
 
-	    // NOTE hash_del not supported
+	    //
+	    //	Remove long hash and short hash
+	    //
 	    str=strdcat(Icons[i]->Ident,Icons[i]->Tileset);
+	    hash_del(IconHash,str);
+	    free(str);
+	    hash_del(IconHash,Icons[i]->Ident);
+#if 0
+	    // NOTE hash_del not supported
 	    ptr=(void**)hash_find(IconHash,str);
 	    free(str);
 	    *ptr=NULL;
 	    ptr=(void**)hash_find(IconHash,Icons[i]->Ident);
 	    *ptr=NULL;
+#endif
 
 	    free(Icons[i]->Ident);
 	    free(Icons[i]->Tileset);
@@ -256,14 +264,13 @@ global void CleanIcons(void)
 
 	free(Icons);
 	Icons=NULL;
-	IconsCount=0;
+	NumIcons=0;
 
 	//
 	//	Handle the icon files.
 	//
 	for( i=0; i<n; ++i ) {
-	    // NOTE hash_del not supported
-	    // hash_del(IconFileHash,table[i]->FileName);
+	    hash_del(IconFileHash,table[i]->FileName);
 	    free(table[i]->FileName);
 	    VideoSaveFree(table[i]->Graphic);
 	    free(table[i]);
@@ -274,10 +281,11 @@ global void CleanIcons(void)
     //	Icons aliases
     //
     if( IconAliases ) {
-	for( i=0; i<IconAliasesCount; ++i ) {
+	for( i=0; i<NumIconAliases; ++i ) {
+	    hash_del(IconHash,IconAliases[i*2+0]);
 	    // NOTE hash_del not supported
-	    ptr=(void**)hash_find(IconHash,IconAliases[i*2+0]);
-	    *ptr=NULL;
+	    //ptr=(void**)hash_find(IconHash,IconAliases[i*2+0]);
+	    //*ptr=NULL;
 
 	    free(IconAliases[i*2+0]);
 	    free(IconAliases[i*2+1]);
@@ -285,7 +293,7 @@ global void CleanIcons(void)
 
 	free(IconAliases);
 	IconAliases=NULL;
-	IconAliasesCount=0;
+	NumIconAliases=0;
     }
 }
 
@@ -395,7 +403,7 @@ global void SaveIcons(FILE* file)
 	fprintf(file,")\n\n");
     }
 
-    for( i=0; i<IconsCount; ++i ) {
+    for( i=0; i<NumIcons; ++i ) {
 	fprintf(file,"(define-icon '%s '%s\n",
 		Icons[i]->Ident,Icons[i]->Tileset);
 	fprintf(file,"  'normal %d \"%s\")\n",
@@ -468,10 +476,10 @@ local SCM CclDefineIcon(SCM list)
 */
 local SCM CclDefineIconAlias(SCM alias,SCM icon)
 {
-    IconAliases=realloc(IconAliases,sizeof(char*)*2*(IconAliasesCount+1));
-    IconAliases[IconAliasesCount*2+0]=gh_scm2newstr(alias,NULL);
-    IconAliases[IconAliasesCount*2+1]=gh_scm2newstr(icon,NULL);
-    IconAliasesCount++;
+    IconAliases=realloc(IconAliases,sizeof(char*)*2*(NumIconAliases+1));
+    IconAliases[NumIconAliases*2+0]=gh_scm2newstr(alias,NULL);
+    IconAliases[NumIconAliases*2+1]=gh_scm2newstr(icon,NULL);
+    NumIconAliases++;
 
     return SCM_UNSPECIFIED;
 }

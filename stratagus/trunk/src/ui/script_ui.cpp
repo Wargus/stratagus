@@ -202,7 +202,7 @@ local SCM CclSetTitleScreen(SCM title)
     }
     if( !gh_null_p(title) ) {
 	if( TitleScreen ) {
-	    CclFree(TitleScreen);
+	    free(TitleScreen);
 	    TitleScreen=NULL;
 	}
 
@@ -228,7 +228,7 @@ local SCM CclSetTitleMusic(SCM music)
     }
     if( !gh_null_p(music) ) {
 	if( TitleMusic ) {
-	    CclFree(TitleMusic);
+	    free(TitleMusic);
 	    TitleMusic=NULL;
 	}
 
@@ -254,7 +254,7 @@ local SCM CclSetMenuBackground(SCM background)
     }
     if( !gh_null_p(background) ) {
 	if( MenuBackground ) {
-	    CclFree(MenuBackground);
+	    free(MenuBackground);
 	    MenuBackground=NULL;
 	}
 
@@ -280,7 +280,7 @@ local SCM CclSetMenuBackgroundWithTitle(SCM background)
     }
     if( !gh_null_p(background) ) {
 	if( MenuBackgroundWithTitle ) {
-	    CclFree(MenuBackgroundWithTitle);
+	    free(MenuBackgroundWithTitle);
 	    MenuBackgroundWithTitle=NULL;
 	}
 
@@ -306,7 +306,7 @@ local SCM CclSetMenuMusic(SCM music)
     }
     if( !gh_null_p(music) ) {
 	if( MenuMusic ) {
-	    CclFree(MenuMusic);
+	    free(MenuMusic);
 	    MenuMusic=NULL;
 	}
 
@@ -421,12 +421,12 @@ local SCM CclDefineCursor(SCM list)
     //	Not found, make a new slot.
     //
     if( ct ) {
-	CclFree(s1);
-	CclFree(s2);
+	free(s1);
+	free(s2);
     } else {
 	ct=calloc(i+2,sizeof(CursorType));
 	memcpy(ct,Cursors,sizeof(CursorType)*i);
-	CclFree(Cursors);
+	free(Cursors);
 	Cursors=ct;
 	ct=&Cursors[i];
 	ct->OType=CursorTypeType;
@@ -441,7 +441,7 @@ local SCM CclDefineCursor(SCM list)
 	value=gh_car(list);
 	list=gh_cdr(list);
 	if( gh_eq_p(value,gh_symbol2scm("image")) ) {
-	    CclFree(ct->File);
+	    free(ct->File);
 	    ct->File=gh_scm2newstr(gh_car(list),NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("hot-spot")) ) {
 	    value=gh_car(list);
@@ -524,13 +524,13 @@ local SCM CclDefineUI(SCM list)
 	ui=calloc(1,sizeof(UI));
 	v=malloc(sizeof(UI*)*(i+2));
 	memcpy(v,UI_Table,i*sizeof(UI*));
-	CclFree(UI_Table);
+	free(UI_Table);
 	UI_Table=v;
 	UI_Table[i]=ui;
 	UI_Table[i+1]=NULL;
     }
 
-    CclFree(ui->Name);
+    free(ui->Name);
     ui->Name=str;
     ui->Width=x;
     ui->Height=y;
@@ -597,7 +597,7 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    CclFree(ui->Filler1.File);
+    free(ui->Filler1.File);
     ui->Filler1.File=str;
     ui->Filler1X=x;
     ui->Filler1Y=y;
@@ -621,7 +621,7 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    CclFree(ui->Resource.File);
+    free(ui->Resource.File);
     ui->Resource.File=str;
     ui->ResourceX=x;
     ui->ResourceY=y;
@@ -635,7 +635,7 @@ local SCM CclDefineUI(SCM list)
 	list=gh_cdr(list);
 
 	if( gh_null_p(temp) ) {
-	    CclFree(ui->Resources[i].Icon.File);
+	    free(ui->Resources[i].Icon.File);
 	    ui->Resources[i].Icon.File=NULL;
 	    ui->Resources[i].Icon.Graphic=NULL;
 	    ui->Resources[i].IconRow=0;
@@ -656,7 +656,7 @@ local SCM CclDefineUI(SCM list)
 	value=gh_car(temp);
 	temp=gh_cdr(temp);
 	str=gh_scm2newstr(value,NULL);
-	CclFree(ui->Resources[i].Icon.File);
+	free(ui->Resources[i].Icon.File);
 	ui->Resources[i].Icon.File=str;
 
 	value=gh_car(temp);
@@ -707,7 +707,7 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->FoodIcon.File);
+    free(ui->FoodIcon.File);
     ui->FoodIcon.File=str;
 
     value=gh_car(temp);
@@ -757,7 +757,7 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ScoreIcon.File);
+    free(ui->ScoreIcon.File);
     ui->ScoreIcon.File=str;
 
     value=gh_car(temp);
@@ -814,7 +814,7 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    CclFree(ui->InfoPanel.File);
+    free(ui->InfoPanel.File);
     ui->InfoPanel.File=str;
     ui->InfoPanelX=x;
     ui->InfoPanelY=y;
@@ -878,7 +878,7 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    CclFree(ui->ButtonPanel.File);
+    free(ui->ButtonPanel.File);
     ui->ButtonPanel.File=str;
     ui->ButtonPanelX=x;
     ui->ButtonPanelY=y;
@@ -938,7 +938,7 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    CclFree(ui->MenuButton.File);
+    free(ui->MenuButton.File);
     ui->MenuButton.File=str;
     ui->MenuButtonX=x;
     ui->MenuButtonY=y;
@@ -962,7 +962,7 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    CclFree(ui->Minimap.File);
+    free(ui->Minimap.File);
     ui->Minimap.File=str;
     ui->MinimapX=x;
     ui->MinimapY=y;
@@ -986,7 +986,7 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    CclFree(ui->StatusLine.File);
+    free(ui->StatusLine.File);
     ui->StatusLine.File=str;
     ui->StatusLineX=x;
     ui->StatusLineY=y;
@@ -1058,91 +1058,91 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->Point.Name);
+    free(ui->Point.Name);
     ui->Point.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->Glass.Name);
+    free(ui->Glass.Name);
     ui->Glass.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->Cross.Name);
+    free(ui->Cross.Name);
     ui->Cross.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->YellowHair.Name);
+    free(ui->YellowHair.Name);
     ui->YellowHair.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->GreenHair.Name);
+    free(ui->GreenHair.Name);
     ui->GreenHair.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->RedHair.Name);
+    free(ui->RedHair.Name);
     ui->RedHair.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->Scroll.Name);
+    free(ui->Scroll.Name);
     ui->Scroll.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ArrowE.Name);
+    free(ui->ArrowE.Name);
     ui->ArrowE.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ArrowNE.Name);
+    free(ui->ArrowNE.Name);
     ui->ArrowNE.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ArrowN.Name);
+    free(ui->ArrowN.Name);
     ui->ArrowN.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ArrowNW.Name);
+    free(ui->ArrowNW.Name);
     ui->ArrowNW.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ArrowW.Name);
+    free(ui->ArrowW.Name);
     ui->ArrowW.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ArrowSW.Name);
+    free(ui->ArrowSW.Name);
     ui->ArrowSW.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ArrowS.Name);
+    free(ui->ArrowS.Name);
     ui->ArrowS.Name=str;
 
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ArrowSE.Name);
+    free(ui->ArrowSE.Name);
     ui->ArrowSE.Name=str;
 
     //
@@ -1154,7 +1154,7 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->GameMenuePanel.File);
+    free(ui->GameMenuePanel.File);
     ui->GameMenuePanel.File=str;
 
     temp=gh_car(list);
@@ -1163,7 +1163,7 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->Menue1Panel.File);
+    free(ui->Menue1Panel.File);
     ui->Menue1Panel.File=str;
 
     temp=gh_car(list);
@@ -1172,7 +1172,7 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->Menue2Panel.File);
+    free(ui->Menue2Panel.File);
     ui->Menue2Panel.File=str;
 
     temp=gh_car(list);
@@ -1181,7 +1181,7 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->VictoryPanel.File);
+    free(ui->VictoryPanel.File);
     ui->VictoryPanel.File=str;
 
     temp=gh_car(list);
@@ -1190,7 +1190,7 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    CclFree(ui->ScenarioPanel.File);
+    free(ui->ScenarioPanel.File);
     ui->ScenarioPanel.File=str;
 
     return SCM_UNSPECIFIED;

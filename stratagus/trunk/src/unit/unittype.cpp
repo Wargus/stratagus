@@ -1097,8 +1097,9 @@ global void CleanUnitTypes(void)
 
     if( UnitTypes ) {
 	for( type=UnitTypes; type->OType; ++type ) {
+	    hash_del(UnitTypeHash,type->Ident);
 	    // FIXME: hash_del not supported
-	    *(UnitType**)hash_add(UnitTypeHash,type->Ident)=NULL;
+	    //*(UnitType**)hash_add(UnitTypeHash,type->Ident)=NULL;
 
 	    DebugCheck( !type->Ident );
 	    free(type->Ident);

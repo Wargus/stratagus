@@ -10,12 +10,11 @@
 //
 /**@name sound_server.h	-	The sound server header file. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2002 by Lutz Sammer and Fabrice Rossi
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -169,11 +168,7 @@ extern unsigned CompressedSoundMemory;
 --	Functions
 ----------------------------------------------------------------------------*/
 
-/** Ask the sound server to register a sound (and currently to load it) and to
-    return an unique identifier for it.
-    @param file the wav file.
-    @return the sound unique identifier
-*/
+    ///	Register a sound (can be a simple sound or a group)
 extern SoundId RegisterSound(char* file[],unsigned char number);
 
 /** Ask the sound server to put together to sounds to form a special sound.
