@@ -475,63 +475,6 @@ global void SaveIcons(CLFile* file)
 **
 **	@param list	Icon definition list.
 */
-local SCM CclDefineOldIcon(SCM list)
-{
-    SCM value;
-    char* ident;
-    char* tileset;
-    char* str;
-    int n;
-
-#ifdef DEBUG
-    n = 0;
-#endif
-
-    //  Identifier
-
-    ident = gh_scm2newstr(gh_car(list), NULL);
-    list = gh_cdr(list);
-
-    //  Tileset
-
-    tileset = gh_scm2newstr(gh_car(list), NULL);
-    list = gh_cdr(list);
-
-    //  Type
-
-    value = gh_car(list);
-    list = gh_cdr(list);
-    if (gh_eq_p(value, gh_symbol2scm("normal"))) {
-	//      Normal icon - index, file
-	n = gh_scm2int(gh_car(list));
-	list = gh_cdr(list);
-	str = gh_scm2newstr(gh_car(list), NULL);
-	list = gh_cdr(list);
-
-    } else {
-	str = gh_scm2newstr(value, NULL);
-	fprintf(stderr, "%s: Wrong tag `%s'\n", ident, str);
-    }
-
-    if (!gh_null_p(list)) {
-	fprintf(stderr, "too much arguments\n");
-    }
-
-    DebugLevel3Fn("icon %s/%s %d of %s\n" _C_ ident _C_ tileset _C_ n _C_ str);
-
-    AddIcon(ident, tileset, n, IconWidth, IconHeight, str);
-    free(ident);
-    free(tileset);
-    free(str);
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	@brief Parse icon definition.
-**
-**	@param list	Icon definition list.
-*/
 local SCM CclDefineIcon(SCM list)
 {
     SCM value;
@@ -670,7 +613,6 @@ local SCM CclSetIconsPerRow(SCM icons)
 */
 global void IconCclRegister(void)
 {
-    gh_new_procedureN("define-old-icon", CclDefineOldIcon);
     gh_new_procedureN("define-icon", CclDefineIcon);
     gh_new_procedure2_0("define-icon-alias", CclDefineIconAlias);
 
