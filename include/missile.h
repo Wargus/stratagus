@@ -370,7 +370,7 @@ struct _missile_ {
     int		DX;			/// missile pixel destination
     int		DY;			/// missile pixel destination
     MissileType*Type;			/// missile-type pointer
-    int short	SpriteFrame;		/// sprite frame counter
+    int		SpriteFrame;		/// sprite frame counter
     int short	State;			/// state
     int short	Wait;			/// delay between frames
     int short	Delay;			/// delay to showup

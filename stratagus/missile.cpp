@@ -1168,7 +1168,7 @@ local void MissileAction(Missile* missile)
 		    missile->SpriteFrame=-missile->SpriteFrame;
 		}
 		missile->SpriteFrame+=5;		// FIXME: frames pro row
-		if( (missile->SpriteFrame&127)
+		if( missile->SpriteFrame
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
 		    missile->SpriteFrame-=
 			    VideoGraphicFrames(missile->Type->Sprite);
@@ -1228,7 +1228,7 @@ local void MissileAction(Missile* missile)
 		    missile->SpriteFrame=-missile->SpriteFrame;
 		}
 		missile->SpriteFrame+=5;		// FIXME: frames pro row
-		if( (missile->SpriteFrame&127)
+		if( missile->SpriteFrame
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
 		    missile->SpriteFrame-=
 			    VideoGraphicFrames(missile->Type->Sprite);
@@ -1254,7 +1254,7 @@ local void MissileAction(Missile* missile)
 		    missile->SpriteFrame=-missile->SpriteFrame;
 		}
 		missile->SpriteFrame+=5;	// FIXME: frames pro row
-		if( (missile->SpriteFrame&127)
+		if( missile->SpriteFrame
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
 		    MissileHit(missile);
 		    FreeMissile(missile);
@@ -1299,7 +1299,7 @@ local void MissileAction(Missile* missile)
 		    missile->SpriteFrame=-missile->SpriteFrame;
 		}
 		missile->SpriteFrame+=4;	// FIXME: frames pro row
-		if( (missile->SpriteFrame&127)
+		if( missile->SpriteFrame
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
 		    MissileHit(missile);
 		    FreeMissile(missile);
