@@ -127,7 +127,10 @@ extern void CommandAutoSpellCast(Unit* unit,SpellType* spell);
 extern void CommandDiplomacy(int player,int state,int opponent);
     /// Prepare shared vision command
 extern void CommandSharedVision(int player,int state,int opponent);
-
+    /// Send any command
+extern void CommandAnyOrder(Unit* unit,Order * order,int flush);
+    /// Move an order in command queue
+extern void CommandMoveOrder(Unit* unit,int src,int dst);
 /*----------------------------------------------------------------------------
 --	Actions:	in action_<name>.c
 ----------------------------------------------------------------------------*/

@@ -257,6 +257,16 @@ struct _ai_exploration_request_ {
     AiExplorationRequest*Next;		/// Next in linked list
 };
 
+typedef struct _ai_transport_request_ AiTransportRequest;
+
+struct _ai_transport_request_ {
+    Unit*		Unit;
+
+    Order 		Order;
+
+    AiTransportRequest* Next;
+}; 
+
 /**
 **	AI variables.
 */
@@ -296,6 +306,8 @@ typedef struct _player_ai_ {
 
     AiExplorationRequest*FirstExplorationRequest;/// Requests for exploration
     unsigned int	LastExplorationGameCycle;/// When did the last explore occur ?
+
+    AiTransportRequest* TransportRequests;
 
     unsigned int 	LastCanNotMoveGameCycle;
     /// number of elements in UnitTypeRequests
