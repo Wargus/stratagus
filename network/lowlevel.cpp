@@ -97,10 +97,22 @@ global int NetInit(void)
     WSADATA wsaData;
 
     // Start up the windows networking
+#ifdef NEW_NETMENUS
+    // ARI: well, I need winsock2 for SIO_GET_INTERFACE_LIST..
+    // some day this needs to be rewritten using wsock32.dll's WsControl(),
+    // so that we can support Windows 95 with only winsock 1.1..
+    // For now winsock2.dll has to do..
+    // FIXME: must link to ws2_32.lib with MSC - how is this called with mingw???
+    if ( WSAStartup(MAKEWORD(2,2), &wsaData) ) {
+	fprintf(stderr,"Couldn't initialize Winsock 2\n");
+	return -1;
+    }
+#else
     if ( WSAStartup(MAKEWORD(1,1), &wsaData) ) {
 	fprintf(stderr,"Couldn't initialize Winsock 1.1\n");
 	return -1;
     }
+#endif
     return 0;
 }
 
@@ -186,9 +198,6 @@ global unsigned long NetResolveHost(const char* host)
 }
 
 #ifdef NEW_NETMENUS
-// ARI: I knew how to write this for a unix environment,
-//	but am quite certain that porting this can cause you
-//	trouble, esp. to win32. - winipcfg can do, so it's possible..
 /**
 **	Get IP-addrs of local interfaces from Network file descriptor
 **	and store them in the NetLocalAddrs array.
@@ -197,6 +206,52 @@ global unsigned long NetResolveHost(const char* host)
 **
 **	@return		number of IP-addrs found.
 */
+#ifdef USE_WINSOCK	// {
+// ARI: MS documented this for winsock2, so I finally found it..
+//	I also found a way for winsock1.1 (= win95), but
+//	that one was too complex to start with.. -> trouble
+//	Lookout for INTRFC.EXE on the MS web site...
+global int NetSocketAddr(const int sock)
+{
+    INTERFACE_INFO localAddr[MAX_LOC_IP];  // Assume there will be no more than MAX_LOC_IP interfaces 
+    DWORD bytesReturned;
+    SOCKADDR_IN* pAddrInet;
+    u_long SetFlags;
+    int i, nif, wsError;
+    int numLocalAddr; 
+	
+    nif = 0;
+    if (sock != -1) {
+	wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
+                      sizeof(localAddr), &bytesReturned, NULL, NULL);
+	if (wsError == SOCKET_ERROR) {
+	    DebugLevel0Fn("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n", GetLastError());
+	}
+
+	// parse interface information
+	numLocalAddr = (bytesReturned/sizeof(INTERFACE_INFO));
+	for (i=0; i<numLocalAddr; i++) {
+	    SetFlags = localAddr[i].iiFlags;
+	    if ((SetFlags & IFF_UP) == 0) {
+		continue;
+	    }
+	    if ((SetFlags & IFF_LOOPBACK)) {
+		continue;
+	    }
+	    pAddrInet = (SOCKADDR_IN*)&localAddr[i].iiAddress;
+	    NetLocalAddrs[nif] = pAddrInet->sin_addr.s_addr;
+	    nif++;
+	    if (nif == MAX_LOC_IP)
+		break;
+	}
+    }
+    return nif;
+}
+#else	// } { !USE_WINSOCK
+#ifdef unix // {
+// ARI: I knew how to write this for a unix environment,
+//	but am quite certain that porting this can cause you
+//	trouble..
 global int NetSocketAddr(const int sock)
 {
     char buf[4096], *cp, *cplim;
@@ -266,6 +321,15 @@ global int NetSocketAddr(const int sock)
     }
     return nif;
 }
+#else // } !unix
+// Beos?? Mac??
+global int NetSocketAddr(const int sock)
+{
+    NetLocalAddrs[0] = htonl(0x7f000001);
+    return 1;
+}
+#endif
+#endif	// } !USE_WINSOCK
 #endif
 
 /**

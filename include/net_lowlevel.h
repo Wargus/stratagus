@@ -32,7 +32,23 @@
 #else
 #if defined(__WIN32__) || defined(WIN32)
 #  define USE_WINSOCK
-#  include <windows.h>
+#ifdef NEW_NETMENUS
+#define _WIN32_WINNT 0x0400
+#define WINVER 0x0400
+#endif
+#include <windows.h>
+#ifdef NEW_NETMENUS
+#include <ws2tcpip.h>
+// MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
+typedef struct _OLD_INTERFACE_INFO
+{
+  u_long      iiFlags;      /* Interface flags */ 
+  sockaddr   iiAddress;      /* Interface address */ 
+  sockaddr   iiBroadcastAddress;    /* Broadcast address */ 
+  sockaddr   iiNetmask;      /* Network mask */ 
+} OLD_INTERFACE_INFO;
+#define INTERFACE_INFO OLD_INTERFACE_INFO
+#endif
 #else	// UNIX
 #    include <sys/time.h>
 #    include <unistd.h>
