@@ -156,8 +156,12 @@ extern void ShowCredits();
 extern void ShowPicture(const char* act,const char* title,const char* picture);
     /// Show stats
 extern void ShowStats();
-    /// Register Ccl
+    /// Register CCL functions for credits
 extern void CreditsCclRegister(void);
+    /// Register CCL functions for objectives
+extern void ObjectivesCclRegister(void);
+    /// Save the objectives
+extern void SaveObjectives(FILE *file);
     /// Create a game
 extern void CreateGame(char* filename,WorldMap* map);
     /// Init Setting to default values

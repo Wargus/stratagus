@@ -1274,4 +1274,108 @@ global void CreditsCclRegister(void)
     gh_new_procedureN("credits",CclCredits);
 }
 
+/**
+**	Parse the add objective ccl function
+**
+**	The list contains the objective text followed by an optional number
+**	specifying where in the list it should be added.  If no number is
+**	given it is added at the end.
+*/
+local SCM CclAddObjective(SCM list)
+{
+    int i;
+    const char *obj;
+
+    obj=get_c_string(gh_car(list));
+
+    list=gh_cdr(list);
+    if( !gh_null_p(list) ) {
+	// Optional location number given
+	int num;
+
+	num=gh_scm2int(gh_car(list));
+	if( num<0 ) {
+	    num=0;
+	}
+
+	i=0;
+	while( i!=MAX_OBJECTIVES && GameIntro.Objectives[i] ) {
+	    ++i;
+	}
+	if( i==MAX_OBJECTIVES ) {
+	    fprintf(stderr,"Too many objectives: %s\n",obj);
+	    ExitFatal(-1);
+	}
+	if( num>i ) {
+	    num=i;
+	}
+	for( ; i>num; --i ) {
+	    GameIntro.Objectives[i]=GameIntro.Objectives[i-1];
+	}
+	GameIntro.Objectives[num]=strdup(obj);
+    } else {
+	// Add objective to the end of the list
+	i=0;
+	while( i!=MAX_OBJECTIVES && GameIntro.Objectives[i] ) {
+	    ++i;
+	}
+	if( i==MAX_OBJECTIVES ) {
+	    fprintf(stderr,"Too many objectives: %s\n",obj);
+	    ExitFatal(-1);
+	}
+	GameIntro.Objectives[i]=strdup(obj);
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Parse the remove objective ccl function
+*/
+local SCM CclRemoveObjective(SCM objective)
+{
+    int num;
+
+    num=gh_scm2int(objective);
+    if( num<0 || num>=MAX_OBJECTIVES ) {
+	fprintf(stderr,"remove-objective: Invalid number: %d\n",num);
+	ExitFatal(-1);
+    }
+    if( !GameIntro.Objectives[num] ) {
+	fprintf(stderr,"remove-objective: No objective at location: %d\n",num);
+	ExitFatal(-1);
+    }
+
+    free(GameIntro.Objectives[num]);
+
+    if( num==MAX_OBJECTIVES-1 ) {
+	GameIntro.Objectives[num]=NULL;
+    }
+    for( ; num<MAX_OBJECTIVES-1 && GameIntro.Objectives[num]; ++num ) {
+	GameIntro.Objectives[num]=GameIntro.Objectives[num+1];
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Register CCL functions for objectives
+*/
+global void ObjectivesCclRegister(void)
+{
+    gh_new_procedureN("add-objective",CclAddObjective);
+    gh_new_procedure1_0("remove-objective",CclRemoveObjective);
+}
+
+/**
+**	Save the objectives.
+*/
+global void SaveObjectives(FILE *file)
+{
+    int i;
+    for( i=0; i<MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i ) {
+	fprintf(file,"(add-objective \"%s\")\n",GameIntro.Objectives[i]);
+    }
+}
+
 //@}
