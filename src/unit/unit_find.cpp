@@ -204,18 +204,27 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 {
     Unit* table[MAX_UNITS];
     Unit* unit;
+    Unit* best;
     UnitType* type;
     int n;
     int i;
 
     n=SelectUnitsOnTile(tx,ty,table);
+    best=NoUnitP;
     for( i=0; i<n; ++i ) {
 	unit=table[i];
 	// unusable unit ?
 	// if( UnitUnusable(unit) ) can't attack constructions
+#ifdef NEW_ORDERS
+	// FIXME: did SelectUnitsOnTile already filter this.
+	if( unit->Removed || unit->Orders[0].Action==UnitActionDie ) {
+	    continue;
+	}
+#else
 	if( unit->Removed || unit->Command.Action==UnitActionDie ) {
 	    continue;
 	}
+#endif
 	type=unit->Type;
 	if( tx<unit->X || tx>=unit->X+type->TileWidth
 		|| ty<unit->Y || ty>=unit->Y+type->TileHeight ) {
@@ -224,10 +233,15 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 	if( !CanTarget(source->Type,unit->Type) ) {
 	    continue;
 	}
-	// FIXME: more possible targets? choose the best one
-	return unit;
+
+	//
+	//	Choose the best target.
+	//
+	if( !best || best->Type->Priority<unit->Type->Priority ) {
+	    best=unit;
+	}
     }
-    return NoUnitP;
+    return best;
 }
 
 /*----------------------------------------------------------------------------
@@ -578,9 +592,16 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	//
 	//	unusable unit
 	//
+#ifdef NEW_ORDERS
+	// FIXME: did SelectUnits already filter this.
+	if( dest->Removed || dest->Orders[0].Action==UnitActionDie ) {
+	    continue;
+	}
+#else
 	if( dest->Removed || dest->Command.Action==UnitActionDie ) {
 	    continue;
 	}
+#endif
 
 	if( !IsEnemy(player,dest) ) {	// a friend or neutral
 	    continue;

@@ -179,7 +179,7 @@ global int SelectUnitsByType(Unit* base)
 
     type=base->Type;
 
-    DebugLevel3(__FUNCTION__"(%d)\n",base->UnitType->Type);
+    DebugLevel3Fn(" (%d)\n",base->UnitType->Type);
 
     // select all visible units.
     r=SelectUnits(MapX-1,MapY-1,MapX+MapWidth+1,MapY+MapHeight+1,table);
@@ -363,7 +363,7 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
     int n;
     int i;
 
-    DebugLevel3(__FUNCTION__"(%d,%d,%d,%d)\n",tx,ty,w,h);
+    DebugLevel3Fn(" (%d,%d,%d,%d)\n",tx,ty,w,h);
 
     r=SelectUnits(tx,ty,tx+w+1,ty+h+1,table);
 
@@ -383,6 +383,7 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
 	if( unit->Player!=ThisPlayer ) {
 	    continue;
 	}
+	// FIXME: Can we get this?
 	if( !unit->Removed && unit->Command.Action!=UnitActionDie ) { 
 	    SelectSingleUnit(unit);
 	    return 1;
@@ -394,11 +395,18 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
     //
     for( i=0; i<r; ++i ) {
         unit=table[i];
-	// Unit visible
+	// Unit visible FIXME: write function UnitSelectable
 	if( !UnitVisible(unit) ) {
 	    continue;
 	}
 	type=unit->Type;
+	// Buildings are visible but not selectable
+	if( type->Building
+		&& !(TheMap.Fields[
+		    unit->Y*TheMap.Width+unit->X].Flags&MapFieldVisible) ) {
+	    // FIXME: isn't it enough to see a field of the building?
+	    continue;
+	}
 	if( type->Critter || type->GoldMine
 	      || (type->OilPatch && !unit->Removed) ) {  // no oil platform!
 	    SelectSingleUnit(unit);
@@ -411,8 +419,15 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
     //
     for( i=0; i<r; ++i ) {
         unit=table[i];
-	// Unit visible
+	// Unit visible FIXME: write function UnitSelectable
 	if( !UnitVisible(unit) ) {
+	    continue;
+	}
+	// Buildings are visible but not selectable
+	if( unit->Type->Building
+		&& !(TheMap.Fields[
+		    unit->Y*TheMap.Width+unit->X].Flags&MapFieldVisible) ) {
+	    // FIXME: isn't it enough to see a field of the building?
 	    continue;
 	}
 	if( !unit->Removed && unit->Command.Action!=UnitActionDie ) {
