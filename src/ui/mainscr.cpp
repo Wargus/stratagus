@@ -75,7 +75,7 @@
 **	@param x	Screen X postion of icon
 **	@param y	Screen Y postion of icon
 */
-local void DrawLifeBar(const Unit* unit,int x,int y)
+local void UiDrawLifeBar(const Unit* unit,int x,int y)
 {
     int f;
     int color;
@@ -97,12 +97,34 @@ local void DrawLifeBar(const Unit* unit,int x,int y)
 }
 
 /**
+**	Draw mana bar of an unit at x,y.
+**
+**	Placed under icons on top-panel.
+**
+**	@param unit	Pointer to unit.
+**	@param x	Screen X postion of icon
+**	@param y	Screen Y postion of icon
+*/
+local void UiDrawManaBar(const Unit* unit,int x,int y)
+{
+    int f;
+
+    y+=ICON_HEIGHT+7;
+    VideoFillRectangleClip(ColorBlack,x,y+3,ICON_WIDTH+7,4);
+    if( unit->HP ) {
+	f=(100*unit->Mana)/255;
+	f=(f*(ICON_WIDTH+5))/100;
+	VideoFillRectangleClip(ColorBlue,x+1,y+3+1,f,2);
+    }
+}
+
+/**
 **	Draw completed bar into top-panel.
 **
 **	@param full	the 100% value
 **	@param ready	how much till now completed
 */
-local void DrawCompleted(int full,int ready)
+local void UiDrawCompleted(int full,int ready)
 {
     int f;
 
@@ -164,7 +186,7 @@ global void DrawUnitInfo(const Unit* unit)
 	    ,(ButtonUnderCursor==1)
 		? (IconActive|(MouseButtons&LeftButton)) : 0
 	    ,x,y);
-    DrawLifeBar(unit,x,y);
+    UiDrawLifeBar(unit,x,y);
 
     x=TheUI.InfoPanelX;
     y=TheUI.InfoPanelY;
@@ -210,10 +232,14 @@ global void DrawUnitInfo(const Unit* unit)
 	DrawNumber(x+108,y+8+78,GameFont,unit->Value);
 	return;
     }
-    if( type->GivesOil || type->OilPatch ) {
-	DrawText(x+47,y+8+78,GameFont,"Oil Left:");
-	DrawNumber(x+108,y+8+78,GameFont,unit->Value);
-	return;
+    // Not our building and not under construction
+    if( unit->Player!=ThisPlayer
+	    && unit->Orders[0].Action==UnitActionBuilded ) {
+	if( type->GivesOil || type->OilPatch ) {
+	    DrawText(x+47,y+8+78,GameFont,"Oil Left:");
+	    DrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	    return;
+	}
     }
 
     //
@@ -226,7 +252,8 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Draw unit kills and experience.
     //
-    if( !OriginalLevel && stats->Level ) {
+    if( !OriginalLevel && stats->Level 
+	    && !(type->Transporter && unit->Value) ) {
         sprintf(buf,"XP:~<%d~> Kills:~<%d~>",unit->XP,unit->Kills);
 	DrawTextCentered(x+114,y+8+15+33,GameFont,buf);
     }
@@ -245,7 +272,7 @@ global void DrawUnitInfo(const Unit* unit)
 			,0,x+107,y+8+70);
 	    }
 	    // FIXME: not correct must use build time!!
-	    DrawCompleted(stats->HitPoints,unit->HP);
+	    UiDrawCompleted(stats->HitPoints,unit->HP);
 	    return;
 	}
 
@@ -259,7 +286,7 @@ global void DrawUnitInfo(const Unit* unit)
 			,unit->Data.Train.What[0]->Icon.Icon
 			,0,x+107,y+8+70);
 
-		DrawCompleted(
+		UiDrawCompleted(
 			unit->Data.Train.What[0]
 			    ->Stats[unit->Player->Player].Costs[TimeCost]
 			,unit->Data.Train.Ticks);
@@ -274,7 +301,7 @@ global void DrawUnitInfo(const Unit* unit)
 			    ,TheUI.Buttons2[i].X,TheUI.Buttons2[i].Y);
 		}
 
-		DrawCompleted(
+		UiDrawCompleted(
 			unit->Data.Train.What[0]
 			    ->Stats[unit->Player->Player].Costs[TimeCost]
 			,unit->Data.Train.Ticks);
@@ -290,7 +317,7 @@ global void DrawUnitInfo(const Unit* unit)
 	    DrawUnitIcon(unit->Player,unit->Orders[0].Type->Icon.Icon
 		    ,0,x+107,y+8+70);
 
-	    DrawCompleted(unit->Orders[0].Type
+	    UiDrawCompleted(unit->Orders[0].Type
 			->Stats[unit->Player->Player].Costs[TimeCost]
 		    ,unit->Data.UpgradeTo.Ticks);
 	    return;
@@ -305,7 +332,7 @@ global void DrawUnitInfo(const Unit* unit)
 		    ,unit->Data.Research.Upgrade->Icon.Icon
 		    ,0,x+107,y+8+70);
 
-	    DrawCompleted(
+	    UiDrawCompleted(
 		    unit->Data.Research.Upgrade->Costs[TimeCost]
 		    ,unit->Data.Research.Ticks);
 	    return;
@@ -359,9 +386,12 @@ global void DrawUnitInfo(const Unit* unit)
 		    ,(ButtonUnderCursor==i+4)
 			? (IconActive|(MouseButtons&LeftButton)) : 0
 			    ,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
-		DrawLifeBar(unit->OnBoard[i]
+		UiDrawLifeBar(unit->OnBoard[i]
 			,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
-		// FIXME: show also the magic bar :) I want this always.
+		if( unit->OnBoard[i]->Type->CanCastSpell ) {
+		    UiDrawManaBar(unit->OnBoard[i]
+			    ,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
+		}
 		if( ButtonUnderCursor==i+4 ) {
 		    SetStatusLine(unit->OnBoard[i]->Type->Name);
 		}
@@ -904,7 +934,7 @@ global void DrawInfoPanel(void)
 			,(ButtonUnderCursor==i+1)
 			    ? (IconActive|(MouseButtons&LeftButton)) : 0
 				,TheUI.Buttons[i+1].X,TheUI.Buttons[i+1].Y);
-		DrawLifeBar(Selected[i]
+		UiDrawLifeBar(Selected[i]
 			,TheUI.Buttons[i+1].X,TheUI.Buttons[i+1].Y);
 
 		if( ButtonUnderCursor==1+i ) {
