@@ -5595,6 +5595,9 @@ local void EditorMapPropertiesOk(void)
 	free(s);
 	VideoCreatePalette(GlobalPalette);
 	PreprocessMap();
+	LoadConstructions();
+	LoadUnitTypes();
+	LoadIcons();
 	UpdateMinimap();
     }
 
