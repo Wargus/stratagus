@@ -46,8 +46,36 @@
 #include "interface.h"
 
 /*----------------------------------------------------------------------------
---  Definitons
+--  Definitions
 ----------------------------------------------------------------------------*/
+
+typedef struct _button_style_properties_ {
+	char* File;
+	Graphic* Sprite;
+	int Width;
+	int Height;
+	int Frame;
+	SDL_Color BorderColorRGB;
+	Uint32 BorderColor;
+	int BorderSize;
+	int TextOffsetX;
+	int TextOffsetY;
+	char* TextNormalColor;          ///< Normal text color
+	char* TextReverseColor;         ///< Reverse text color
+} ButtonStyleProperties;
+
+typedef struct _button_style_ {
+	int Width;                      ///< Button width
+	int Height;                     ///< Button height
+	int Font;                       ///< Font
+	char* TextNormalColor;          ///< Normal text color
+	char* TextReverseColor;         ///< Reverse text color
+	ButtonStyleProperties Default;  ///< Default button properties
+	ButtonStyleProperties Hover;    ///< Hover button properties
+	ButtonStyleProperties Selected; ///< Selected button properties
+	ButtonStyleProperties Clicked;  ///< Clicked button properties
+	ButtonStyleProperties Disabled; ///< Disabled button properties
+} ButtonStyle;
 
 	/// buttons on screen themselves
 typedef struct _button_ {
@@ -277,7 +305,7 @@ typedef struct _ui_ {
 		int   Font;                     ///< button caption font
 		int   Width;                    ///< button width
 		int   Height;                   ///< button height
-		int   Button;                   ///< button style
+		ButtonStyle* Style;             ///< button style
 	} MenuButton,
 	  NetworkMenuButton,
 	  NetworkDiplomacyButton;
@@ -345,6 +373,10 @@ typedef struct _ui_ {
 extern UI TheUI;                        ///< The user interface
 extern UI** UI_Table;                   ///< All available user interfaces
 
+	/// Hash table of all the button styles
+typedef hashtable(ButtonStyle*,128) _ButtonStyleHash;
+extern _ButtonStyleHash ButtonStyleHash;
+
 extern char RightButtonAttacks;         ///< right button 0 move, 1 attack.
 extern ButtonAction* CurrentButtons;    ///< Current Selected Buttons
 extern char FancyBuildings;             ///< Mirror buildings 1 yes, 0 now.
@@ -372,6 +404,9 @@ extern void CleanUI(UI* ui);
 extern void CleanUserInterface(void);
 	/// Register ccl features
 extern void UserInterfaceCclRegister(void);
+
+	/// Find a button style
+extern ButtonStyle* FindButtonStyle(const char* style);
 
 	/// Called if the mouse is moved in Normal interface state
 extern void UIHandleMouseMove(int x, int y);

@@ -76,34 +76,31 @@ void DrawMenuButtonArea(void)
 	if (!IsNetworkGame()) {
 		if (TheUI.MenuButton.X != -1) {
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
-			DrawMenuButton(TheUI.MenuButton.Button,
+			DrawMenuButton(TheUI.MenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
 				(GameMenuButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
-				TheUI.MenuButton.Width, TheUI.MenuButton.Height,
 				TheUI.MenuButton.X, TheUI.MenuButton.Y,
-				TheUI.MenuButton.Font, TheUI.MenuButton.Text, NULL, NULL);
+				TheUI.MenuButton.Text);
 		}
 	} else {
 		if (TheUI.NetworkMenuButton.X != -1) {
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
-			DrawMenuButton(TheUI.NetworkMenuButton.Button,
+			DrawMenuButton(TheUI.NetworkMenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
 				(GameMenuButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
-				TheUI.NetworkMenuButton.Width, TheUI.NetworkMenuButton.Height,
 				TheUI.NetworkMenuButton.X, TheUI.NetworkMenuButton.Y,
-				TheUI.NetworkMenuButton.Font, TheUI.NetworkMenuButton.Text, NULL, NULL);
+				TheUI.NetworkMenuButton.Text);
 		}
 		if (TheUI.NetworkDiplomacyButton.X != -1) {
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
-			DrawMenuButton(TheUI.NetworkDiplomacyButton.Button,
+			DrawMenuButton(TheUI.NetworkDiplomacyButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
 				(GameDiplomacyButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
-				TheUI.NetworkDiplomacyButton.Width, TheUI.NetworkDiplomacyButton.Height,
 				TheUI.NetworkDiplomacyButton.X, TheUI.NetworkDiplomacyButton.Y,
-				TheUI.NetworkDiplomacyButton.Font, TheUI.NetworkDiplomacyButton.Text, NULL, NULL);
+				TheUI.NetworkDiplomacyButton.Text);
 		}
 	}
 }

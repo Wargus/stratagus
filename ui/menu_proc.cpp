@@ -99,51 +99,6 @@ static int MenuButtonCurSel = -1;
 ----------------------------------------------------------------------------*/
 
 /**
-**   Convert menu button style to a string for saving.
-*/
-char* MenuButtonStyle(int style)
-{
-   switch (style) {
-	   case MBUTTON_MAIN:
-		   return "main";
-	   case MBUTTON_NETWORK:
-		   return "network";
-	   case MBUTTON_GM_HALF:
-		   return "gm-half";
-	   case MBUTTON_132:
-		   return "132";
-	   case MBUTTON_GM_FULL:
-		   return "gm-full";
-	   case MBUTTON_GEM_ROUND:
-		   return "gem-round";
-	   case MBUTTON_GEM_SQUARE:
-		   return "gem-square";
-	   case MBUTTON_UP_ARROW:
-		   return "up-arrow";
-	   case MBUTTON_DOWN_ARROW:
-		   return "down-arrow";
-	   case MBUTTON_LEFT_ARROW:
-		   return "left-arrow";
-	   case MBUTTON_RIGHT_ARROW:
-		   return "right-arrow";
-	   case MBUTTON_S_KNOB:
-		   return "s-knob";
-	   case MBUTTON_S_VCONT:
-		   return "s-vcont";
-	   case MBUTTON_S_HCONT:
-		   return "s-hcont";
-	   case MBUTTON_PULLDOWN:
-		   return "pulldown";
-	   case MBUTTON_VTHIN:
-		   return "vthin";
-	   case MBUTTON_FOLDER:
-		   return "folder";
-   }
-   fprintf(stderr, "MenuButtonStyle not found: %d\n", style);
-   return "";
-}
-
-/**
 ** Find a menu by ident.
 **
 ** @param menu_id Unique identifier for the menu.
@@ -167,8 +122,6 @@ Menu* FindMenu(const char* menu_id)
 ** @param button         Button identifier
 ** @param flags          State of Button (clicked, mouse over...)
 ** @param transparent    State of button transparency: 0=No, 1=Yes
-** @param w              Button width (for border)
-** @param h              Button height (for border)
 ** @param x              X display position
 ** @param y              Y display position
 ** @param font           font number for text
@@ -176,26 +129,93 @@ Menu* FindMenu(const char* menu_id)
 ** @param normalcolor    FIXME : docu
 ** @param reversecolor   FIXME : docu
 */
-void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent, int w, int h,
-	int x, int y, const int font, const unsigned char* text,
-	char* normalcolor, char* reversecolor)
+void DrawMenuButton(ButtonStyle* style, unsigned flags, int transparent,
+	int x, int y, const unsigned char* text)
 {
-	MenuButtonId rb;
-	int s;
 	char* nc;
 	char* rc;
 	char* oldnc;
 	char* oldrc;
+	int i;
+	ButtonStyleProperties* p;
+	ButtonStyleProperties* pimage;
 
-	GetDefaultTextColors(&oldnc, &oldrc);
-	if (normalcolor || reversecolor) {
-		nc = normalcolor ? normalcolor : oldnc;
-		rc = reversecolor ? reversecolor : oldrc;
-		SetDefaultTextColors(nc, rc);
+	if (flags & MenuButtonDisabled) {
+		p = &style->Disabled;
+	} else if (flags & MenuButtonClicked) {
+		p = &style->Clicked;
+	} else if (flags & MenuButtonActive) {
+		p = &style->Hover;
+	} else if (flags & MenuButtonSelected) {
+		p = &style->Selected;
 	} else {
-		nc = oldnc;
-		rc = oldrc;
+		p = &style->Default;
 	}
+
+	//
+	//  Image
+	//
+	pimage = p;
+	if (!p->Sprite && !p->File && !(flags & MenuButtonDisabled)) {
+		// No image.  Try hover, selected, then default
+		if ((flags & MenuButtonActive) && (style->Hover.Sprite || style->Hover.File)) {
+			pimage = &style->Hover;
+		} else if ((flags & MenuButtonSelected) && (style->Selected.Sprite || style->Selected.File)) {
+			pimage = &style->Selected;
+		} else if (style->Default.Sprite || style->Default.File) {
+			pimage = &style->Default;
+		}
+	}
+	if (!pimage->Sprite && pimage->File) {
+		char* buf;
+
+		buf = alloca(strlen(pimage->File) + 9 + 1);
+		strcat(strcpy(buf, "graphics/"), pimage->File);
+		pimage->Sprite = LoadSprite(buf, pimage->Width, pimage->Height);
+	}
+	if (pimage->Sprite) {
+		VideoDraw(pimage->Sprite, pimage->Frame, x, y);
+	}
+
+	//
+	//  Text
+	//
+	if (text) {
+		GetDefaultTextColors(&oldnc, &oldrc);
+		nc = p->TextNormalColor ? p->TextNormalColor :
+			style->TextNormalColor ? style->TextNormalColor : oldnc;
+		rc = p->TextReverseColor ? p->TextReverseColor :
+			style->TextReverseColor ? style->TextReverseColor : oldrc;
+		SetDefaultTextColors(nc, rc);
+
+		VideoDrawTextCentered(p->TextOffsetX + x + style->Width / 2,
+			p->TextOffsetY + y + (style->Height - VideoTextHeight(style->Font)) / 2 + 2,
+			style->Font, text);
+
+		SetDefaultTextColors(oldnc, oldrc);
+	}
+
+	//
+	//  Border
+	//
+	if (!p->BorderSize) {
+		// No border, check if there's a Selected border
+		if ((flags & MenuButtonSelected) && style->Selected.BorderSize) {
+			p = &style->Selected;
+		}
+	}
+	if (!p->BorderColor) {
+		p->BorderColor = VideoMapRGB(TheScreen->format,
+			p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
+	}
+	if (p->BorderSize) {
+		for (i = 0; i < p->BorderSize; ++i) {
+			VideoDrawRectangleClip(p->BorderColor, x - i, y - i,
+				style->Width + 2 * i, style->Height + 2 * i);
+		}
+	}
+
+#if 0
 	if (button == MBUTTON_SC_BUTTON || button == MBUTTON_SC_BUTTON_LEFT ||
 			button == MBUTTON_SC_BUTTON_RIGHT) {
 		if (flags & MenuButtonDisabled) {
@@ -277,7 +297,7 @@ void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent, int w,
 			}
 		}
 	}
-	SetDefaultTextColors(oldnc, oldrc);
+#endif
 }
 
 /**
@@ -311,14 +331,8 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 	rb = mi->d.pulldown.button;
 
 	GetDefaultTextColors(&oldnc, &oldrc);
-	if (mi->d.pulldown.normalcolor || mi->d.pulldown.reversecolor) {
-		nc = mi->d.pulldown.normalcolor ? mi->d.pulldown.normalcolor : oldnc;
-		rc = mi->d.pulldown.reversecolor ? mi->d.pulldown.reversecolor : oldrc;
-		SetDefaultTextColors(nc, rc);
-	} else {
-		nc = oldnc;
-		rc = oldrc;
-	}
+	nc = oldnc;
+	rc = oldrc;
 	if (rb == MBUTTON_SC_PULLDOWN) {
 		h = mi->d.pulldown.ysize;
 		if (flags & MenuButtonClicked) {
@@ -562,14 +576,8 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 	y = my + mi->yofs;
 
 	GetDefaultTextColors(&oldnc, &oldrc);
-	if (mi->d.listbox.normalcolor || mi->d.listbox.reversecolor) {
-		nc = mi->d.listbox.normalcolor ? mi->d.listbox.normalcolor : oldnc;
-		rc = mi->d.listbox.reversecolor ? mi->d.listbox.reversecolor : oldrc;
-		SetDefaultTextColors(nc, rc);
-	} else {
-		nc = oldnc;
-		rc = oldrc;
-	}
+	nc = oldnc;
+	rc = oldrc;
 
 	if (flags & MenuButtonDisabled) {
 		rb--;
@@ -1072,11 +1080,9 @@ void DrawMenu(Menu* menu)
 				SetDefaultTextColors(oldnc, oldrc);
 				break;
 			case MI_TYPE_BUTTON:
-				DrawMenuButton(mi->d.button.button, mi->flags, mi->transparent,
-					mi->d.button.xsize, mi->d.button.ysize,
+				DrawMenuButton(mi->d.button.style, mi->flags, mi->transparent,
 					menu->X + mi->xofs, menu->Y + mi->yofs,
-					mi->font, mi->d.button.text,
-					mi->d.button.normalcolor, mi->d.button.reversecolor);
+					mi->d.button.text);
 				break;
 			case MI_TYPE_PULLDOWN:
 				if (mi->flags & MenuButtonClicked) {
@@ -1702,8 +1708,8 @@ static void MenuHandleMouseMove(int x, int y)
 					case MI_TYPE_BUTTON:
 						xs = menu->X + mi->xofs;
 						ys = menu->Y + mi->yofs;
-						if (x < xs || x > xs + mi->d.button.xsize || y < ys ||
-								y > ys + mi->d.button.ysize) {
+						if (x < xs || x > xs + mi->d.button.style->Width || y < ys ||
+								y > ys + mi->d.button.style->Height) {
 							if (!(mi->flags & MenuButtonClicked)) {
 								if (mi->flags & MenuButtonActive) {
 									mi->flags &= ~MenuButtonActive;

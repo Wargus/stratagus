@@ -207,10 +207,9 @@ static void IntroCallbackExit(void)
 */
 static void DrawContinueButton(void)
 {
-	DrawMenuButton(MBUTTON_GM_HALF, ContinueButtonFlags, 0,
-		106, 27,
+	DrawMenuButton(FindButtonStyle("gm-half"), ContinueButtonFlags, 0,
 		ContinueButtonX, ContinueButtonY,
-		LargeFont, "~!Continue", NULL, NULL);
+		"~!Continue");
 }
 
 /**
