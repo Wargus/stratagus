@@ -419,7 +419,7 @@ void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 	// Check if unit is still valid? (NETWORK!)
 	//
 	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
-		if (unit->Type->Building) {
+		if (!unit->Type->CanAttack) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
 			ReleaseOrder(order);
