@@ -640,6 +640,12 @@ global void UpdateDisplay(void)
 		    ,TheUI.StatusLine.Graphic->Width
 		    ,TheUI.StatusLine.Graphic->Height);
 	}
+	if( MustRedraw&RedrawMenu ) {
+	    InvalidateAreaAndCheckCursor(
+		     MenuRedrawX,MenuRedrawY
+		    ,MenuRedrawW,MenuRedrawH);
+	    MustRedraw&=~RedrawMenu;
+	}
 
         // And now as very last.. checking if the cursor needs a refresh
         InvalidateCursorAreas();
