@@ -933,11 +933,11 @@ global int main(int argc, char** argv)
 #ifdef USE_MAD
 		"MP3 "
 #endif
+#ifdef USE_MIKMOD
+		"MIKMOD "
+#endif
 #ifdef NEW_UNIT_CACHE
 		"NEW-UNIT-CACHE "
-#endif
-#ifdef NEW_MAPDRAW
-		"NEW-MAPDRAW "
 #endif
 #ifdef MAP_REGIONS
 		"MAP-REGIONS "

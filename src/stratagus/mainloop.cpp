@@ -184,23 +184,8 @@ local void DrawMapViewport(Viewport* vp)
 	int y;
 
 	if (InterfaceState == IfaceStateNormal) {
-#ifdef NEW_MAPDRAW
-#if 0
-		MapUpdateFogOfWar(vp->MapX, vp->MapY);
-#endif
-		int u;
-
-		// FIXME: Johns: this didn't work correct with viewports!
-		// FIXME: only needed until flags are correct set
-		for (u = 0; u < vp->MapHeight; ++u) {
-			vp->MustRedrawRow[u] = 1;
-		}
-		for (u = 0; u < vp->MapHeight * vp->MapWidth; ++u) {
-			vp->MustRedrawTile[u] = 1;
-		}
-#endif
 		//
-		// An unit is tracked, center viewport on this unit.
+		// A unit is tracked, center viewport on this unit.
 		//
 		if (vp->Unit) {
 			if (vp->Unit->Destroyed ||
