@@ -218,6 +218,11 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
     int v;
     int p;
 
+    if( !range ) {			// zero sight range is zero sight range
+	DebugLevel0Fn("Zero sight range\n");
+	return;
+    }
+
     x=tx-range;
     y=ty-range;
     width=height=range+range;
@@ -300,6 +305,11 @@ global void MapMarkSight(int tx,int ty,int range)
     int y;
     int height;
     int width;
+
+    if( !range ) {			// zero sight range is zero sight range
+	DebugLevel0Fn("Zero sight range\n");
+	return;
+    }
 
     x=tx-range;
     y=ty-range;
