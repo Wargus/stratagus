@@ -70,8 +70,7 @@ global int ForestRegeneration;		/// Forest regeneration
 global int MapIsSeenTileWood(int x, int y)
 {
     return TheMap.Tileset->TileTypeTable[
-	    TheMap.Fields[(x)+(y)*TheMap.Width].SeenTile
-	] == TileTypeWood;
+	TheMap.Fields[x + y * TheMap.Width].SeenTile] == TileTypeWood;
 }
 
 /**
@@ -87,7 +86,7 @@ global void MapFixSeenWoodTile(int x, int y)
     int ttdown;
     int ttleft;
     int ttright;
-    MapField *mf;
+    MapField* mf;
     
 
     //  Outside of map or no wood.
@@ -167,15 +166,15 @@ global void MapFixSeenWoodTile(int x, int y)
     if (tile == -1) {			// No valid wood remove it.
 	mf->SeenTile = TheMap.Tileset->RemovedTree;
 	MapFixSeenWoodNeighbors(x, y);
-    } else if( TheMap.Tileset->MixedLookupTable[mf->SeenTile]==
-                TheMap.Tileset->MixedLookupTable[tile] ) {      //Same Type
+    } else if (TheMap.Tileset->MixedLookupTable[mf->SeenTile] ==
+                TheMap.Tileset->MixedLookupTable[tile]) {      //Same Type
 	return;
     } else {
 	mf->SeenTile = tile;
     }
 
     // FIXME: can this only happen if seen?
-    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
+    if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	UpdateMinimapSeenXY(x, y);
 	MarkDrawPosMap(x, y);
 	MustRedraw |= RedrawMinimap;
@@ -231,7 +230,7 @@ global void MapFixWoodTile(int x, int y)
     int ttdown;
     int ttleft;
     int ttright;
-    MapField *mf;
+    MapField* mf;
     
 
     //  Outside of map or no wood.
@@ -285,7 +284,7 @@ global void MapFixWoodTile(int x, int y)
     tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
 
     if ((ttdown & 0x10) && 1) {
-	tile |= ((ttleft & 0x06) && 1)* 1;
+	tile |= ((ttleft & 0x06) && 1) * 1;
 	tile |= ((ttright & 0x09) && 1) * 2;
     }
 
@@ -307,12 +306,12 @@ global void MapFixWoodTile(int x, int y)
     if (tile == -1) {			// No valid wood remove it.
 	MapRemoveWood(x, y);
     } else if (TheMap.Tileset->MixedLookupTable[mf->Tile] !=
-                TheMap.Tileset->MixedLookupTable[tile]) {
+	    TheMap.Tileset->MixedLookupTable[tile]) {
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
 	//MapFixWoodNeighbors(x, y);
 
-	if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
+	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
 	    MarkDrawPosMap(x, y);
@@ -329,8 +328,8 @@ global void MapFixWoodTile(int x, int y)
 */
 global void MapRemoveWood(unsigned x, unsigned y)
 {
-    //EditTile(x,y,TheMap.Tileset->RemovedTree);
-    MapField *mf;
+    //EditTile(x, y, TheMap.Tileset->RemovedTree);
+    MapField* mf;
 
     mf = TheMap.Fields + x + y * TheMap.Width;
 
@@ -341,7 +340,7 @@ global void MapRemoveWood(unsigned x, unsigned y)
     UpdateMinimapXY(x, y);
     MapFixWoodNeighbors(x, y);
 
-    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
+    if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
 	MarkDrawPosMap(x, y);
@@ -357,8 +356,8 @@ global void MapRemoveWood(unsigned x, unsigned y)
 */
 global void RegenerateForest(void)
 {
-    MapField *mf;
-    MapField *tmp;
+    MapField* mf;
+    MapField* tmp;
     int x;
     int y;
 
@@ -374,20 +373,15 @@ global void RegenerateForest(void)
 	for (y = 0; y < TheMap.Height; ++y) {
 	    mf = TheMap.Fields + x + y * TheMap.Width;
 	    if (mf->Tile == TheMap.Tileset->RemovedTree) {
-		if (mf->Value >= ForestRegeneration
-		    || ++mf->Value == ForestRegeneration) {
-		    if (x
-			&& !(mf->
-			     Flags & (MapFieldWall | MapFieldUnpassable |
-				      MapFieldLandUnit | MapFieldBuilding))) {
+		if (mf->Value >= ForestRegeneration ||
+			++mf->Value == ForestRegeneration) {
+		    if (x && !(mf->Flags & (MapFieldWall | MapFieldUnpassable |
+			      MapFieldLandUnit | MapFieldBuilding))) {
 			tmp = mf - TheMap.Width;
-			if (tmp->Tile == TheMap.Tileset->RemovedTree
-			    && tmp->Value >= ForestRegeneration
-			    && !(tmp->
-				 Flags & (MapFieldWall | MapFieldUnpassable |
-					  MapFieldLandUnit |
-					  MapFieldBuilding))) {
-
+			if (tmp->Tile == TheMap.Tileset->RemovedTree &&
+				tmp->Value >= ForestRegeneration &&
+				!(tmp->Flags & (MapFieldWall | MapFieldUnpassable |
+				      MapFieldLandUnit | MapFieldBuilding))) {
 			    DebugLevel0("Real place wood\n");
 			    tmp->Tile = TheMap.Tileset->TopOneTree;
 			    tmp->Value = 0;
@@ -396,11 +390,11 @@ global void RegenerateForest(void)
 			    mf->Tile = TheMap.Tileset->BotOneTree;
 			    mf->Value = 0;
 			    mf->Flags |= MapFieldForest | MapFieldUnpassable;
-			    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
+			    if (IsMapFieldVisible(ThisPlayer, x, y)) {
 				MapMarkSeenTile(x, y);
 			    }
-			    if ( IsMapFieldVisible(ThisPlayer,x,y-1) ) {
-				MapMarkSeenTile(x, y-1);
+			    if (IsMapFieldVisible(ThisPlayer, x, y - 1)) {
+				MapMarkSeenTile(x, y - 1);
 			    }
 			}
 		    }
