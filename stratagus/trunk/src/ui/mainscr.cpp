@@ -10,7 +10,7 @@
 //
 /**@name mainscr.c	-	The main screen. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer and Valery Shchedrin
+//	(c) Copyright 1998,2000-2003 by Lutz Sammer and Valery Shchedrin
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -133,6 +133,9 @@ local void UiDrawCompleted(int full,int ready)
 {
     int f;
 
+    if( !full ) {
+	return;
+    }
     f=(100*ready)/full;
     f=(f*152)/100;
     VideoFillRectangleClip(TheUI.CompleteBarColor

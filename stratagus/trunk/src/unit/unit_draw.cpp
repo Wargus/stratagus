@@ -787,8 +787,12 @@ local void DrawManaSprite(int x,int y,const UnitType* type,int full,int ready)
 */
 local void DrawManaBar(int x,int y,const UnitType* type,int full,int ready)
 {
-    int f, w;
+    int f;
+    int w;
 
+    if( !full ) {
+	return;
+    }
     f=(100*ready)/full;
     if ( ShowManaHorizontal == 0)  {
 	VideoFillRectangleClip(ColorBlue
