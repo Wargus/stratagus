@@ -333,7 +333,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	Dimension
+	//	Dimensions
 	//
 	if( !memcmp(header, "DIM ",4) ) {
 	    if( length==4 ) {
@@ -460,7 +460,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//	Thingys
 	//
 	if( !memcmp(header, "THG2",4) ) {
 //	    if( length== ) {
@@ -484,7 +484,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//	Strings
 	//
 	if( !memcmp(header, "STR ",4) ) {
 //	    if( length== ) {
@@ -788,7 +788,7 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 	}
 
 	//
-	//	
+	//	Specifies the owner of the player
 	//
 	if( !memcmp(header, "IOWN",4) ) {
 	    if( length==12 ) {
@@ -799,7 +799,7 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 	}
 
 	//
-	//	
+	//	Specifies the owner of the player, same as IOWN but with 0 added
 	//
 	if( !memcmp(header, "OWNR",4) ) {
 	    if( length==12 ) {
@@ -860,7 +860,7 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 	}
 
 	//
-	//	
+	//	Terrain type
 	//
 	if( !memcmp(header, "ERA ",4) ) {
 	    if( length==2 ) {
@@ -891,7 +891,7 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 	}
 
 	//
-	//	
+	//	Dimensions
 	//
 	if( !memcmp(header, "DIM ",4) ) {
 	    if( length==4 ) {
@@ -968,7 +968,7 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 	}
 
 	//
-	//	
+	//	Graphical tile map
 	//
 	if( !memcmp(header, "MTXM",4) ) {
 	    if( length==width*height*2 ) {
@@ -991,7 +991,7 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 	}
 
 	//
-	//	
+	//	Player upgrade restrictions
 	//
 	if( !memcmp(header, "UPGR",4) ) {
 	    // 1748
@@ -1015,7 +1015,7 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 	}
 
 	//
-	//	
+	//	Units
 	//
 	if( !memcmp(header, "UNIT",4) ) {
 	    int i;
@@ -1199,12 +1199,44 @@ pawn:
 	}
 
 	//
-	//	
+	//	Thingys
 	//
 	if( !memcmp(header, "THG2",4) ) {
-//	    if( length== ) {
-	    if( 1 ) {
-		chk_ptr += length;
+	    if( length%10==0 ) {
+		while( length>0 ) {
+		    int n;
+		    int x;
+		    int y;
+		    int pl;
+		    int fl;
+		    char buf[30];
+		    char **unit;
+		    UnitType *type;
+
+		    n=ChkReadWord();    // unit number of the thingy
+		    x=ChkReadWord();    // x coordinate
+		    y=ChkReadWord();    // y coordinate
+		    pl=ChkReadByte();   // player number of owner
+		    ChkReadByte();	// unknown
+		    fl=ChkReadWord();   // flags
+		    length -= 10;
+
+		    sprintf(buf,"%d",n);
+		    unit=(char**)hash_find(TheMap.Tileset->ItemsHash,buf);
+		    IfDebug(
+			if( !unit ) {
+			    fprintf(stderr,"THG2 n=%d (%d,%d)\n",n,x,y);
+			    continue;
+			}
+		    );
+
+		    // FIXME: remove
+		    type = UnitTypeByIdent(*unit);
+		    x = (x - 32*type->TileWidth/2) / 32;
+		    y = (y - 32*type->TileHeight/2) / 32;
+
+		    MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y,type,&Players[15]);
+		}
 		continue;
 	    }
 	    DebugLevel1("Wrong THG2 length\n");
@@ -1223,7 +1255,7 @@ pawn:
 	}
 
 	//
-	//	
+	//	Strings
 	//
 	if( !memcmp(header, "STR ",4) ) {
 //	    if( length== ) {
