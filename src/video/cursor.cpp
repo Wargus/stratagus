@@ -44,6 +44,11 @@
 
 #ifdef NEW_VIDEO_REAL
 
+/**
+**	Define cursor-types.
+**
+**	FIXME: Should move this to ui part.
+*/
 global CursorType Cursors[CursorMax] = {
    { "human",	"cursor-point",	"human gauntlet.png",	3, 2,	28,32 },
    { "orc",	"cursor-point",	"orcish claw.png",	3, 2,	26,32 },

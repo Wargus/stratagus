@@ -469,7 +469,7 @@ global void UpdateDisplay(void)
 */
 global void GameMainLoop(void)
 {
-    InitVideoSync();
+    SetVideoSync();
     MustRedraw=RedrawEverything;
     GameCursor=&Cursors[CursorTypePoint];
 
@@ -553,7 +553,7 @@ global void GameMainLoop(void)
 	    MustRedraw=0;
 	}
 
-	CheckVideoInterrupts();
+	CheckVideoInterrupts();		// look if already an interrupt
 
 	WaitEventsAndKeepSync();
 

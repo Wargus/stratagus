@@ -26,6 +26,8 @@
 
 #include "new_video.h"
 
+#ifndef NEW_VIDEO	// { Should be removed with new video final version
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -33,7 +35,6 @@
     /// MACRO defines speed of colorcycling
 #define COLOR_CYCLE_SPEED	(FRAMES_PER_SECOND/4)
 
-#ifndef NEW_VIDEO	// { Should be removed with new video final version
 
 /**@name RleSprite */
 //@{
@@ -118,7 +119,6 @@ extern void FreeRleSprite(RleSprite *sprite);
  */
 extern void SetClipping(int left,int top,int right,int bottom);
 
-#endif	// } !NEW_VIDEO
 
 /** Architecture-dependant videomemory. Set by InitVideoXXX.
   @see InitVideo
@@ -165,16 +165,6 @@ extern VMemType32 * Pixels32;	/// 32 bpp
   @return 1 if videomode set correctly; 0 otherwise. */
 extern int SetVideoMode(int width);
 
-/** Loaded system palette. 256-entries long, active system palette. */
-extern Palette GlobalPalette[256];
-
-/** Load palette from resource. Just loads palette, to set it use
-  VideoCreatePalette, which sets system palette.
-  @param pal buffer to store palette (256-entries long)
-  @param name resource file name
- */
-extern void LoadRGB(Palette *pal, const char *name);
-
 /// Initialize Pixels[] for all players (bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette(void);
 
@@ -182,7 +172,7 @@ extern void SetPlayersPalette(void);
 //@{
 
 /// Initializes video synchronization..
-extern void InitVideoSync(void);
+extern void SetVideoSync(void);
 
 /// Prints warning if video is too slow..
 extern void CheckVideoInterrupts(void);
@@ -239,11 +229,13 @@ extern void ToggleGrabMouse(void);
 extern volatile int VideoInterrupts;
 
 /**
-** Video synchronization speed. Synchronization time in milliseconds.
+** Video synchronization speed. Synchronization time in prozent.
 ** If =0, video framerate is not synchronized. Game will try to redraw screen
 ** within intervals of VideoSyncSpeed, not more, not less
 */
 extern int VideoSyncSpeed;
+
+#endif	// } !NEW_VIDEO
 
 //@}
 

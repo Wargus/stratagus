@@ -44,6 +44,9 @@
 */
 global void InitVideoX11(void)
 {
+#ifdef NEW_VIDEO
+    extern void GameInitDisplay(void);
+#endif
     GameInitDisplay();			// Fall back to old function
 }
 

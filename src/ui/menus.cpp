@@ -523,7 +523,7 @@ global void ProcessMenu(int MenuId, int Loop)
     }
     MenuButtonUnderCursor = -1;
     if (Loop) {
-	InitVideoSync();
+	SetVideoSync();
 	MustRedraw = 0;
     }
     DrawMenu(CurrentMenu);
