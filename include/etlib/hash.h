@@ -19,9 +19,9 @@ typedef void hash_no_data;
 typedef struct { } hash_no_data;
 #endif
 
-extern void *_hash_get(u8 *id, void *table, int size, int usize);
-extern void *_hash_find(u8 *id, void *table, int size, int usize);
-extern void  _hash_del(u8 *id, void *table, int size, int usize);
+extern void *_hash_get(const u8 *id, void *table, int size, int usize);
+extern const void *_hash_find(const u8 *id, const void *table, int size, int usize);
+extern void  _hash_del(const u8 *id, void *table, int size, int usize);
 extern void _hash_stat(void *table, int size, struct hash_st *stat_buffer);
 
 #ifdef __GNUC__			// { GNU feature
