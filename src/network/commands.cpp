@@ -245,6 +245,7 @@ local void ApplyReplaySettings(void)
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
 	GameSettings.Terrain = CurrentReplay->TileSet;
 	TheMap.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
+	GameSettings.GameType = CurrentReplay->GameType;
 	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
 	GameSettings.Opponents = CurrentReplay->Opponents;
 
