@@ -299,8 +299,8 @@ global void CreateGame(char* filename, WorldMap* map)
 	DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
 	InitNetwork2();
     } else {
-	if (NetworkName && strcmp(NetworkName,"Anonymous")) {
-          ThisPlayer->Name = strdup(NetworkName);
+	if( LocalPlayerName && strcmp(LocalPlayerName,"Anonymous") ) {
+          ThisPlayer->Name = strdup(LocalPlayerName);
 	}
     }
 
