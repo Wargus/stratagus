@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name sound.h	-	The sound header file. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer and Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer and Fabrice Rossi
+//
+//	$Id$
 
 #ifndef __SOUND_H__
 #define __SOUND_H__

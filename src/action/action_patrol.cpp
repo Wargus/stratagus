@@ -47,7 +47,7 @@ global void HandleActionPatrol(Unit* unit)
 {
     const Unit* goal;
 
-    if( HandleActionMove(unit)<0 ) {	// reached end-point or stop
+    if( DoActionMove(unit)<0 ) {	// reached end-point or stop
 
 #ifdef NEW_ORDERS
 	Order order;

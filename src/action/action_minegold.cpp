@@ -49,19 +49,12 @@ local int MoveToGoldMine(Unit* unit)
     Unit* destu;
     int i;
 
-    if( (i=HandleActionMove(unit))>=0 ) {	// reached end-point?
+    if( (i=DoActionMove(unit))>=0 ) {	// reached end-point?
 	return 0;
     }
 
 #ifdef NEW_ORDERS
     destu=unit->Orders[0].Goal;
-
-    if( !destu ) {
-	// FIXME: perhaps we should choose an alternative
-	unit->Orders[0].Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
 
     DebugCheck( !destu );
     DebugCheck( unit->Wait!=1 );
@@ -92,10 +85,10 @@ local int MoveToGoldMine(Unit* unit)
 	return 0;
     }
 
-    unit->Orders[0].Action=UnitActionMineGold;
+    DebugCheck( unit->Orders[0].Action!=UnitActionMineGold );
 
     //
-    //	Check if mine could be reached.
+    //	Check if gold-mine could be reached.
     //
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another mine, or retry later.
@@ -110,7 +103,7 @@ local int MoveToGoldMine(Unit* unit)
     unit->Orders[0].Goal=NoUnitP;
 
     //
-    // Activate gold-mine
+    //	Activate gold-mine
     //
     // FIXME: hmmm... we're in trouble here.
     // we should check if there's still some gold left in the mine instead.
@@ -176,7 +169,7 @@ local int MoveToGoldMine(Unit* unit)
     unit->Command.Data.Move.Goal=NoUnitP;
 
     //
-    // Activate gold-mine
+    //	Activate gold-mine
     //
     // FIXME: hmmm... we're in trouble here.
     // we should check if there's still some gold left in the mine instead.
@@ -217,7 +210,7 @@ local int MineInGoldmine(Unit* unit)
     DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
 	//
-	// Have gold
+	//	Have gold
 	//
 	mine=GoldMineOnMap(unit->X,unit->Y);
 	IfDebug(
@@ -272,16 +265,15 @@ local int MineInGoldmine(Unit* unit)
 	    unit->SubAction=0;
 	    DebugLevel2Fn("Mine without deposit\n");
 	} else {
-	    DropOutNearest(unit
-		    ,destu->X,destu->Y
+	    DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
+		    ,destu->Y+destu->Type->TileHeight/2
 		    ,mine->Type->TileWidth,mine->Type->TileHeight);
-	    ResetPath(unit->Orders[0]);
 	    unit->Orders[0].Goal=destu;
-	    RefsDebugCheck( !destu->Refs );
+	    NewResetPath(unit);
+	    RefsDebugCheck( destu->Destroyed || !destu->Refs );
 	    ++destu->Refs;
 	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	    unit->Orders[0].X=-1;
-	    unit->Orders[0].Y=-1;
+	    unit->Orders[0].X=unit->Orders[0].Y=-1;
 	    unit->Orders[0].Action=UnitActionMineGold;
 	    DebugLevel3Fn("Mine with deposit %d,%d\n",destu->X,destu->Y);
 	}
@@ -293,12 +285,12 @@ local int MineInGoldmine(Unit* unit)
 	    unit->SubAction=0;
 	    DebugLevel2Fn("Mine without deposit\n");
 	} else {
-	    DropOutNearest(unit
-		    ,destu->X,destu->Y
+	    DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
+		    ,destu->Y+destu->Type->TileHeight/2
 		    ,mine->Type->TileWidth,mine->Type->TileHeight);
 	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=destu;
-	    RefsDebugCheck( !destu->Refs );
+	    RefsDebugCheck( destu->Destroyed || !destu->Refs );
 	    ++destu->Refs;
 	    unit->Command.Data.Move.Range=1;
 	    unit->Command.Data.Move.DX=-1;
@@ -316,13 +308,13 @@ local int MineInGoldmine(Unit* unit)
 	} else if( unit->Type==UnitTypeHumanWorker ) {
 	    unit->Type=UnitTypeHumanWorkerWithGold;
 	} else {
+	    // FIXME: support workers for more races.
 	    DebugLevel0Fn("Wrong unit (%d,%d) for mining gold %d (%s)\n"
 		,unit->X,unit->Y,unit->Type->Type,unit->Type->Name);
 	}
         CheckUnitToBeDrawn(unit);
 	if( IsSelected(unit) ) {
 	    UpdateButtonPanel();
-	    MustRedraw|=RedrawButtonPanel;
 	}
 	unit->Wait=1;
 	return unit->SubAction;
@@ -337,6 +329,7 @@ local int MineInGoldmine(Unit* unit)
 	unit->Wait=MAX_UNIT_WAIT;
     }
     unit->Value-=unit->Wait;
+
     return 0;
 }
 
@@ -352,19 +345,12 @@ local int MoveToGoldDeposit(Unit* unit)
     int i;
     Unit* destu;
 
-    if( (i=HandleActionMove(unit))>=0 ) {	// reached end-point?
+    if( (i=DoActionMove(unit))>=0 ) {	// reached end-point?
 	return 0;
     }
 
 #ifdef NEW_ORDERS
     destu=unit->Orders[0].Goal;
-
-    if( !destu ) {
-	// FIXME: perhaps we should choose an alternative
-	unit->Orders[0].Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
 
     DebugCheck( !destu );
     DebugCheck( unit->Wait!=1 );
@@ -395,7 +381,7 @@ local int MoveToGoldDeposit(Unit* unit)
 	return 0;
     }
 
-    unit->Orders[0].Action=UnitActionMineGold;
+    DebugCheck( unit->Orders[0].Action!=UnitActionMineGold );
 
     //
     //	If depot is still under construction, wait!
@@ -409,7 +395,7 @@ local int MoveToGoldDeposit(Unit* unit)
     //	Check if depot could be reached.
     //
     if( i==PF_UNREACHABLE ) {
-	// FIXME: could try another mine, or retry later.
+	// FIXME: could try another depot, or retry later.
 	DebugLevel3Fn("GOLD-DEPOT NOT REACHED %Zd=%d,%d ? %d\n"
 	      ,UnitNumber(destu),x,y,MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
@@ -505,6 +491,7 @@ local int MoveToGoldDeposit(Unit* unit)
     } else if( unit->Type==UnitTypeHumanWorkerWithGold ) {
 	unit->Type=UnitTypeHumanWorker;
     } else {
+	// FIXME: support workers for more races.
 	DebugLevel0Fn("Wrong unit (%d,%d) for returning gold %d (%s)\n"
 	    ,unit->X,unit->Y,unit->Type->Type,unit->Type->Name);
     }
@@ -546,11 +533,11 @@ local int StoreGoldInDeposit(Unit* unit)
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
 	} else {
-	    DropOutNearest(unit,destu->X,destu->Y
+	    DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
+		    ,destu->Y+destu->Type->TileHeight/2
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-	    ResetPath(unit->Command);
 	    unit->Orders[0].Goal=destu;
-	    RefsDebugCheck( !destu->Refs );
+	    RefsDebugCheck( destu->Destroyed || !destu->Refs );
 	    ++destu->Refs;
 	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
 	    unit->Orders[0].X=-1;
@@ -569,11 +556,12 @@ local int StoreGoldInDeposit(Unit* unit)
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
 	} else {
-	    DropOutNearest(unit,destu->X,destu->Y
+	    DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
+		    ,destu->Y+destu->Type->TileHeight/2
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=destu;
-	    RefsDebugCheck( !destu->Refs );
+	    RefsDebugCheck( destu->Destroyed || !destu->Refs );
 	    ++destu->Refs;
 	    unit->Command.Data.Move.Range=1;
 	    unit->Command.Data.Move.DX=-1;
@@ -610,16 +598,19 @@ global void HandleActionMineGold(Unit* unit)
 
     switch( unit->SubAction ) {
 	//
-	//	Move to gold-mine
+	//	Move to gold-mine, 10 tries to reach gold-mine
 	//
 	case 0:
-	case 1:
-	case 2:
-	case 3:
-	case 4:					// 4 tries to reach gold-mine
+#ifdef NEW_ORDERS
+		NewResetPath(unit);
+#endif
+		unit->SubAction=1;
+	    // FALL THROUGH
+	case 1: case 2: case 3: case 4: case 5:
+	case 6: case 7: case 8: case 9: case 10:
 	    if( (ret=MoveToGoldMine(unit)) ) {
 		if( ret==-1 ) {
-		    if( ++unit->SubAction==5 ) {
+		    if( ++unit->SubAction==11 ) {
 #ifdef NEW_ORDERS
 			unit->Orders[0].Action=UnitActionStill;
 			unit->SubAction=0;
@@ -639,6 +630,9 @@ global void HandleActionMineGold(Unit* unit)
 			    unit->Command.Data.Move.Goal=NoUnitP;
 			}
 #endif
+		    } else {
+			//	To keep the load low, retry each 1/4 second.
+			unit->Wait=unit->SubAction+FRAMES_PER_SECOND/4;
 		    }
 		} else {
 		    unit->SubAction=64;
@@ -656,16 +650,13 @@ global void HandleActionMineGold(Unit* unit)
 	    break;
 
 	//
-	//	Return to gold deposit
+	//	Return to gold deposit, 10 tries to reach gold-depot
 	//
-	case 65:
-	case 66:
-	case 67:
-	case 68:
-	case 69:				// 4 tries to reach depot
+	case 65: case 66: case 67: case 68: case 69:
+	case 70: case 71: case 72: case 73: case 74:
 	    if( (ret=MoveToGoldDeposit(unit)) ) {
 		if( ret==-1 ) {
-		    if( ++unit->SubAction==70 ) {
+		    if( ++unit->SubAction==75 ) {
 #ifdef NEW_ORDERS
 			unit->Orders[0].Action=UnitActionStill;
 			unit->SubAction=0;
@@ -685,6 +676,9 @@ global void HandleActionMineGold(Unit* unit)
 			    unit->Command.Data.Move.Goal=NoUnitP;
 			}
 #endif
+		    } else {
+			//	To keep the load low, retry each 1/4 second.
+			unit->Wait=unit->SubAction-64+FRAMES_PER_SECOND/4;
 		    }
 		} else {
 		    unit->SubAction=128;

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name commands.h	-	The commands header file. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __COMMANDS_H__
 #define __COMMANDS_H__
@@ -24,11 +23,17 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern int CommandLogEnabled;		/// True if command log is on
+extern int CommandLogEnabled;		/// True, if command log is on
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/*
+**	The send command functions sends a command, if needed over the
+**	Network, this is only for user commands. Automatic reactions which
+**	are on all computers equal, should use the functions without Send.
+*/
 
     /// Send stop command
 extern void SendCommandStopUnit(Unit* unit);
@@ -61,7 +66,7 @@ extern void SendCommandMineGold(Unit* unit,Unit* dest,int flush);
     /// Send haul oil command
 extern void SendCommandHaulOil(Unit* unit,Unit* dest,int flush);
     /// Send return goods command
-extern void SendCommandReturnGoods(Unit* unit,int flush);
+extern void SendCommandReturnGoods(Unit* unit,Unit* dest,int flush);
     /// Send train command
 extern void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush);
     /// Send cancel training command
@@ -77,10 +82,13 @@ extern void SendCommandCancelResearch(Unit* unit);
     /// Send demolish command
 extern void SendCommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Send spell cast command
-extern void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int flush);
+extern void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
+	,int flush);
 
     /// Parse a command (from network).
-extern void ParseCommand(unsigned short Type,UnitRef Unum,unsigned short x,unsigned short y,UnitRef Dest);
+extern void ParseCommand(unsigned short Type,UnitRef Unum,unsigned short x
+	,unsigned short y,UnitRef Dest);
+
 //@}
 
 #endif	// !__COMMANDS_H__

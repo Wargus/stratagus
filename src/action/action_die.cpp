@@ -40,16 +40,14 @@
 **	Unit dies!
 **
 **	@param unit	The unit which dies.
-**
-**	@return		True the unit has died.
 */
-global int HandleActionDie(Unit* unit)
+global void HandleActionDie(Unit* unit)
 {
     if ( unit->Revealer ) {
 	if( !--unit->HP ) {
 	    ReleaseUnit(unit);
 	}
-	return 0;
+	return;
     }
 
     //
@@ -70,7 +68,7 @@ global int HandleActionDie(Unit* unit)
 	DebugLevel3("Die complete %Zd\n",UnitNumber(unit));
 	if( !unit->Type->CorpseType ) {
 	    ReleaseUnit(unit);
-	    return 1;
+	    return;
 	}
 
 	unit->State=unit->Type->CorpseScript;
@@ -100,8 +98,6 @@ global int HandleActionDie(Unit* unit)
 	// FIXME: perhaps later or never is better
 	//ChangeUnitOwner(unit,unit->Player,&Players[PlayerNumNeutral]);
     }
-
-    return 0;
 }
 
 //@}

@@ -78,9 +78,15 @@ struct _missile_type_ {
 ----------------------------------------------------------------------------*/
 
 /**
+**	Missile typedef.
+*/
+typedef struct _missile_ Missile;
+
+
+/**
 **	Missile on the map.
 */
-typedef struct _missile_ {
+struct _missile_ {
     int		X;			/// missile pixel position
     int		Y;			/// missile pixel position
     int		DX;			/// missile pixel destination
@@ -102,8 +108,8 @@ typedef struct _missile_ {
     int		Ystep;			/// Y step
 
     int TTL;				/// time to live (ticks) used for spells
-    int (*Controller)( void* this_missile );    /// used to controll spells
-} Missile;
+    int (*Controller)( Missile* this_missile );    /// used to controll spells
+};
 
 /*----------------------------------------------------------------------------
 --	Variables

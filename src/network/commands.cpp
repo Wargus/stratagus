@@ -405,15 +405,16 @@ global void SendCommandHaulOil(Unit* unit,Unit* dest,int flush)
 **	Send command: Unit return goods.
 **
 **	@param unit	pointer to unit.
+**	@param goal	pointer to destination of the goods. (NULL=search best)
 **	@param flush	Flag flush all pending commands.
 */
-global void SendCommandReturnGoods(Unit* unit,int flush)
+global void SendCommandReturnGoods(Unit* unit,Unit* goal,int flush)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("return",unit,flush,-1,-1,NoUnitP,NULL,-1);
-	CommandReturnGoods(unit,flush);
+	CommandLog("return",unit,flush,-1,-1,goal,NULL,-1);
+	CommandReturnGoods(unit,goal,flush);
     } else {
-	NetworkSendCommand(MessageCommandReturn,unit,0,0,NoUnitP,0,flush);
+	NetworkSendCommand(MessageCommandReturn,unit,0,0,goal,0,flush);
     }
 }
 
@@ -553,7 +554,7 @@ global void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 {
     if( NetworkFildes==-1 ) {
 	CommandLog("spell-cast",unit,flush,x,y,dest,NULL,spellid);
-	CommandSpellCast(unit,x,y,dest,spellid,flush);
+	CommandSpellCast(unit,x,y,dest,SpellTypeById(spellid),flush);
     } else {
 	NetworkSendCommand(MessageCommandSpellCast+spellid
 		,unit,x,y,dest,NULL,flush);
@@ -699,8 +700,13 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    CommandHaulOil(unit,dest,status);
 	    break;
 	case MessageCommandReturn:
-	    CommandLog("return",unit,status,-1,-1,NoUnitP,NULL,-1);
-	    CommandReturnGoods(unit,status);
+	    dest=NoUnitP;
+	    if( dstnr!=(unsigned short)0xFFFF ) {
+		dest=UnitSlots[dstnr];
+		DebugCheck( !dest );
+	    }
+	    CommandLog("return",unit,status,-1,-1,dest,NULL,-1);
+	    CommandReturnGoods(unit,dest,status);
 	    break;
 	case MessageCommandTrain:
 	    CommandLog("train",unit,status,-1,-1,NULL
@@ -747,7 +753,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 		dest=UnitSlots[dstnr];
 		DebugCheck( !dest );
 	    }
-	    CommandSpellCast(unit,x,y,dest,id,status);
+	    CommandSpellCast(unit,x,y,dest,SpellTypeById(id),status);
 	    break;
     }
 }

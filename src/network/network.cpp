@@ -62,6 +62,7 @@ typedef struct _network_host_ {
 */
 typedef struct _init_message_ {
     unsigned char	Type;		/// Init message type.
+    int			FreeCraft;	/// FreeCraft engine version.
     int			Version;	/// Network protocol version.
     int			Lag;		/// Lag time
     int			Updates;	/// Update frequency
@@ -217,13 +218,27 @@ local void NetworkServerSetup(void)
 	    continue;
 	}
 
-	if( ntohl(message.Version)!=NetworkProtocolVersion ) {
-	    fprintf(stderr,"Incompatible network protocol version %ld-%d\n"
-		    ,(long)ntohl(message.Version),NetworkProtocolVersion);
+	if( ntohl(message.FreeCraft)!=FreeCraftVersion ) {
+	    fprintf(stderr,"Incompatible FreeCraft version "
+			FreeCraftFormatString " <-> "
+			FreeCraftFormatString "\n"
+		    ,FreeCraftFormatArgs((int)ntohl(message.FreeCraft))
+		    ,FreeCraftFormatArgs(FreeCraftVersion));
 	    exit(-1);
 	}
 
-	DebugLevel0Fn(" Lag=%ld, Updates=%ld\n"
+	if( ntohl(message.Version)!=NetworkProtocolVersion ) {
+	    fprintf(stderr,"Incompatible network protocol version "
+			NetworkProtocolFormatString " <-> "
+			NetworkProtocolFormatString "\n"
+		    ,NetworkProtocolFormatArgs((int)ntohl(message.Version))
+		    ,NetworkProtocolFormatArgs(NetworkProtocolVersion));
+	    exit(-1);
+	}
+
+	DebugLevel0Fn(" Version=" NetworkProtocolFormatString
+		    ", Lag=%ld, Updates=%ld\n"
+		,NetworkProtocolFormatArgs((int)ntohl(message.Version))
 		,(long)ntohl(message.Lag),(long)ntohl(message.Updates));
 
 	if( ntohl(message.Lag)!=NetworkLag ) {
@@ -381,13 +396,15 @@ local void NetworkClientSetup(void)
 	fprintf(stderr,"Can't resolve host %s\n",NetworkArg);
 	exit(-1);
     }
-    DebugLevel0Fn(" Server host:port %d.%d.%d.%d:%d\n", NIPQUAD(ntohl(host)), ntohs(port));
+    DebugLevel0Fn(" Server host:port %d.%d.%d.%d:%d\n",
+	    NIPQUAD(ntohl(host)), ntohs(port));
 
     //
     //	Connecting to server
     //
     for( ;; ) {
 	message.Type=MessageInitHello;
+	message.FreeCraft=htonl(FreeCraftVersion);
 	message.Version=htonl(NetworkProtocolVersion);
 	message.Lag=htonl(NetworkLag);
 	message.Updates=htonl(NetworkUpdates);

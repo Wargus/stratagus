@@ -258,7 +258,19 @@ global void DrawButtonPanel(void)
 			}
 			break;
 		    case B_Move:
-			if( Selected[0]->Orders[0].Action==UnitActionMove ) {
+			if( Selected[0]->Orders[0].Action==UnitActionMove
+				|| Selected[0]->Orders[0].Action
+				    ==UnitActionBuild
+				|| Selected[0]->Orders[0].Action
+				    ==UnitActionFollow ) {
+			    v=IconSelected;
+			}
+			break;
+		    case B_Harvest:
+		    case B_Return:
+			if( Selected[0]->Orders[0].Action==UnitActionMineGold
+				|| Selected[0]->Orders[0].Action
+				    ==UnitActionHarvest ) {
 			    v=IconSelected;
 			}
 			break;
@@ -484,6 +496,7 @@ global void UpdateButtonPanel(void)
     CurrentButtons=NULL;
 
     if( !NumSelected ) {		// no unit selected
+	MustRedraw|=RedrawButtonPanel;
 	return;
     }
 
@@ -690,7 +703,7 @@ global void DoButtonButtonClicked(int button)
 	    break;
 	case B_Return:
 	    for( i=0; i<NumSelected; ++i ) {
-	        SendCommandReturnGoods(Selected[i]
+	        SendCommandReturnGoods(Selected[i],NoUnitP
 			,!(KeyModifiers&ModifierShift));
 	    }
 	    break;

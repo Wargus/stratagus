@@ -107,7 +107,7 @@
 /**
 **	W*rCr*ft number to internal missile-type name.
 **
-**	Should be made configurable.
+**	FIXME: Should be made configurable.
 */
 local const char* MissileTypeWcNames[] = {
     "missile-lightning",
@@ -581,6 +581,28 @@ found:
 }
 
 /**
+**	Free a missile. FIXME: could be done better memory management.
+**
+**	@param missile	Missile pointer.
+*/
+local void FreeMissile(Missile* missile)
+{
+    missile->Type=MissileFree;
+    if( missile->SourceUnit ) {
+	RefsDebugCheck( !missile->SourceUnit->Refs );
+	if( missile->SourceUnit->Destroyed ) {
+	    if( !--missile->SourceUnit->Refs ) {
+		ReleaseUnit(missile->SourceUnit);
+	    }
+	} else {
+	    --missile->SourceUnit->Refs;
+	    RefsDebugCheck( !missile->SourceUnit->Refs );
+	}
+	missile->SourceUnit=NoUnitP;
+    }
+}
+
+/**
 **	Calculate damage.
 **
 **	Damage calculation:
@@ -785,9 +807,20 @@ global void FireMissile(Unit* unit)
 
     if( goal ) {
 	DebugCheck( !goal->Type );	// Target invalid?
-	// Fire to nearest point of unit!
+	// Fire to nearest point of the unit!
 	NearestOfUnit(goal,unit->X,unit->Y,&dx,&dy);
 	DebugLevel3Fn("Fire to unit at %d,%d\n",dx,dy);
+
+	//
+	//	Moved out of attack range?
+	//
+	if( MapDistanceBetweenUnits(unit,goal)<unit->Type->MinAttackRange ) {
+	    DebugLevel0Fn("Missile target too near %d,%d\n"
+		,MapDistanceBetweenUnits(unit,goal),unit->Type->MinAttackRange);
+	    // FIXME: do something other?
+	    return;
+	}
+
     } else {
 #ifdef NEW_ORDERS
 	dx=unit->Orders[0].X;
@@ -796,18 +829,11 @@ global void FireMissile(Unit* unit)
 	dx=unit->Command.Data.Move.DX;
 	dy=unit->Command.Data.Move.DY;
 #endif
+	// FIXME: Can this be too near??
     }
 
-    //
-    //	Moved out of attack range?
-    //
-    if( MapDistance(unit->X,unit->Y,dx,dy)<=unit->Type->MinAttackRange ) {
-	DebugLevel0Fn("Missile target too near %d,%d\n"
-	    ,MapDistance(unit->X,unit->Y,dx,dy),unit->Type->MinAttackRange);
-	// FIXME: do something other?
-	return;
-    }
 
+    // Fire to the tile center of the destination.
     dx=dx*TileSizeX+TileSizeX/2;
     dy=dy*TileSizeY+TileSizeY/2;
     missile=MakeMissile(unit->Type->Missile.Missile,x,y,dx,dy);
@@ -815,7 +841,7 @@ global void FireMissile(Unit* unit)
     //	Damage of missile
     //
     missile->SourceUnit=unit;
-    RefsDebugCheck( !unit->Refs );
+    RefsDebugCheck( !unit->Refs || unit->Destroyed );
     unit->Refs++;
 }
 
@@ -1091,12 +1117,20 @@ global void MissileHit(const Missile* missile)
 
     x=missile->X+missile->Type->Width/2;
     y=missile->Y+missile->Type->Height/2;
+
+    //
+    //	The impact generates a new missile.
+    //
     if( missile->Type->ImpactMissile ) {
 	Missile* mis;
 
 	mis = MakeMissile(missile->Type->ImpactMissile,x,y,0,0);
 	mis->Damage = missile->Damage; // direct damage, spells mostly
 	mis->SourceUnit = missile->SourceUnit;
+	if( mis->SourceUnit ) {
+	    RefsDebugCheck( !mis->SourceUnit->Refs );
+	    mis->SourceUnit->Refs++;
+	}
     }
 
     if( !missile->SourceUnit ) {	// no owner
@@ -1106,7 +1140,7 @@ global void MissileHit(const Missile* missile)
 
     // FIXME: must choose better goal!
     // FIXME: what can the missile hit?
-    // FIXME: "missile-catapult-rock", "missile-ballista-bolt", have are effect
+    // FIXME: "missile-catapult-rock", "missile-ballista-bolt", have area effect
 
     x/=TileSizeX;
     y/=TileSizeY;
@@ -1180,7 +1214,7 @@ global void MissileActions(void)
 	}
 
 	if ( missile->TTL == 0 ) {
-	    missile->Type=MissileFree;
+	    FreeMissile(missile);
 	    continue;
 	}
 
@@ -1199,7 +1233,7 @@ global void MissileActions(void)
 		missile->Wait=missile->Type->Speed;
 		if( PointToPointMissile(missile) ) {
 		    MissileHit(missile);
-		    missile->Type=MissileFree;
+		    FreeMissile(missile);
 		} else {
 		    //
 		    //	Animate missile, cycle through frames
@@ -1220,7 +1254,7 @@ global void MissileActions(void)
 		missile->Wait=missile->Type->Speed;
 		if( PointToPointMissile(missile) ) {
 		    MissileHit(missile);
-		    missile->Type=MissileFree;
+		    FreeMissile(missile);
 		} else {
 		    //
 		    //	Animate missile, depends on the way.
@@ -1247,7 +1281,7 @@ global void MissileActions(void)
 			    // FIXME: reduce damage effects on later impacts
 			    break;
 			default:
-			    missile->Type=MissileFree;
+			    FreeMissile(missile);
 			    break;
 		    }
 		} else {
@@ -1276,7 +1310,7 @@ global void MissileActions(void)
 		    if( (missile->Frame&127)
 			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
 			MissileHit(missile);
-			missile->Type=MissileFree;
+			FreeMissile(missile);
 		    }
 		}
 		break;
@@ -1293,7 +1327,7 @@ global void MissileActions(void)
 			//NOTE: vladi: blizzard cannot hit owner...
 			BlizzardMissileHit = 1;
 			MissileHit(missile);
-			missile->Type=MissileFree;
+			FreeMissile(missile);
 		    }
 		}
 		break;
@@ -1306,7 +1340,7 @@ global void MissileActions(void)
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    BlizzardMissileHit = 1;
 		    MissileHit(missile);
-		    missile->Type=MissileFree;
+		    FreeMissile(missile);
 		}
 		break;
 
@@ -1326,7 +1360,8 @@ global void MissileActions(void)
 		if( ++missile->Frame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    MissileHit(missile);
-		    missile->Type=MissileFree;
+		    FreeMissile(missile);
+		    // FIXME: should MissileHitAndFree();
 		}
 		break;
 
@@ -1347,7 +1382,7 @@ global void MissileActions(void)
 		    case 3:
 			if( !missile->Frame-- ) {
 			    MissileHit(missile);
-			    missile->Type=MissileFree;
+			    FreeMissile(missile);
 			}
 			break;
 		}
@@ -1366,14 +1401,14 @@ global void MissileActions(void)
 			if( !--unit->Refs ) {
 			    ReleaseUnit(unit);
 			}
-			missile->Type=MissileFree;
 			missile->SourceUnit=NoUnitP;
+			FreeMissile(missile);
 			break;
 		    }
 		    missile->Frame=0;
 		    f=(100*unit->HP)/unit->Stats->HitPoints;
 		    if( f>75) {
-			missile->Type=MissileFree;	// No fire for this
+			FreeMissile(missile);
 			unit->Burning=0;
 		    } else if( f>50 ) {
 			if( missile->Type!=MissileTypeSmallFire ) {
