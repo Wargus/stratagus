@@ -87,14 +87,14 @@ global void HandleActionPatrol(Unit* unit)
 	if( unit->Type->CanAttack && !unit->Type->Tower ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
-		DebugLevel0Fn("Patrol attack %d\n",UnitNumber(goal));
+		DebugLevel0Fn("Patrol attack %d\n" _C_ UnitNumber(goal));
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		// Save current command to come back.
 		unit->SavedOrder=unit->Orders[0];
 		unit->Orders[0].Action=UnitActionStill;
 		unit->Orders[0].Goal=NoUnitP;
 		unit->SubAction=0;
-		DebugLevel0Fn("Wait %d\n",unit->Wait);
+		DebugLevel0Fn("Wait %d\n" _C_ unit->Wait);
 	    }
 	}
     }

@@ -304,7 +304,9 @@ local SCM CclDefineAi(SCM list)
     SCM value;
     char* str;
     AiType* aitype;
+#ifdef DEBUG
     const AiType* ait;
+#endif
 
     aitype=malloc(sizeof(AiType));
     aitype->Next=AiTypes;
@@ -771,7 +773,7 @@ local SCM CclAiSleep(SCM value)
 {
     int i;
 
-    DebugLevel3Fn("%lu %d\n",GameCycle,AiPlayer->SleepCycles);
+    DebugLevel3Fn("%lu %d\n" _C_ GameCycle _C_ AiPlayer->SleepCycles);
     if( AiPlayer->SleepCycles ) {
 	if( AiPlayer->SleepCycles<GameCycle ) {
 	    AiPlayer->SleepCycles=0;

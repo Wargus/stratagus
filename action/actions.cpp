@@ -78,11 +78,11 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 	UnitUpdateHeading(unit);		// FIXME: remove this!!
     }
 
-    DebugLevel3Fn("State %2d ",state);
+    DebugLevel3Fn("State %2d " _C_ state);
     DebugLevel3("Flags %2d Pixel %2d Frame %2d Wait %3d "
-	    ,animation[state].Flags,animation[state].Pixel
-	    ,animation[state].Frame,animation[state].Sleep);
-    DebugLevel3("Heading %d +%d,%d\n",unit->Direction,unit->IX,unit->IY);
+	    _C_ animation[state].Flags _C_ animation[state].Pixel
+	    _C_ animation[state].Frame _C_ animation[state].Sleep);
+    DebugLevel3("Heading %d +%d,%d\n" _C_ unit->Direction _C_ unit->IX _C_ unit->IY);
 
     unit->Frame+=animation[state].Frame;
     unit->IX+=animation[state].Pixel;
@@ -125,8 +125,8 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 local void HandleActionNone(Unit* unit __attribute__((unused)))
 {
     DebugLevel1Fn("FIXME: Should not happen!\n");
-    DebugLevel1Fn("FIXME: Unit (%d) %s has action none.!\n",
-	    UnitNumber(unit),unit->Type->Ident);
+    DebugLevel1Fn("FIXME: Unit (%d) %s has action none.!\n" _C_
+	    UnitNumber(unit) _C_ unit->Type->Ident);
 }
 
 /**
@@ -137,8 +137,8 @@ local void HandleActionNone(Unit* unit __attribute__((unused)))
 local void HandleActionNotWritten(Unit* unit __attribute__((unused)))
 {
     DebugLevel1Fn("FIXME: Not written!\n");
-    DebugLevel1Fn("FIXME: Unit (%d) %s has action %d.!\n",
-	    UnitNumber(unit),unit->Type->Ident,unit->Orders[0].Action);
+    DebugLevel1Fn("FIXME: Unit (%d) %s has action %d.!\n" _C_
+	    UnitNumber(unit) _C_ unit->Type->Ident _C_ unit->Orders[0].Action);
 }
 
 /**

@@ -166,7 +166,7 @@ found:
 */
 local int MoveToCoast(Unit* unit)
 {
-    DebugLevel3Fn("%p\n",unit->Orders[0].Goal);
+    DebugLevel3Fn("%p\n" _C_ unit->Orders[0].Goal);
 
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
@@ -200,7 +200,7 @@ local void LeaveTransporter(Unit* unit)
     Unit* goal;
 
     goal=unit->Orders[0].Goal;
-    DebugLevel3Fn("Goal %p\n",goal);
+    DebugLevel3Fn("Goal %p\n" _C_ goal);
     if( goal ) {
 	unit->Orders[0].Goal=NoUnitP;
 	if( goal->Destroyed ) {
@@ -258,7 +258,7 @@ global void HandleActionUnload(Unit* unit)
     int i;
 
     DebugLevel3Fn("%p(%d) SubAction %d\n"
-	    ,unit,UnitNumber(unit),unit->SubAction);
+	    _C_ unit _C_ UnitNumber(unit) _C_ unit->SubAction);
 
     switch( unit->SubAction ) {
 	//

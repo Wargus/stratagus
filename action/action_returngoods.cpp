@@ -78,7 +78,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	unit->Orders[0].Arg1=(void*)-1;
 	NewResetPath(unit);
 	unit->SubAction=65;	// FIXME: hardcoded
-	DebugLevel3("Wait: %d\n",unit->Wait);
+	DebugLevel3("Wait: %d\n" _C_ unit->Wait);
 	unit->Wait=1;
 	return;
     }
@@ -97,13 +97,13 @@ global void HandleActionReturnGoods(Unit* unit)
 	unit->Orders[0].X=unit->X;
 	unit->Orders[0].Y=unit->Y;	// Return point to continue.
 	DebugLevel3("Return to %d=%d,%d\n"
-		,UnitNumber(unit->Orders[0].Goal)
-		,unit->Orders[0].X,unit->Orders[0].Y);
+		_C_ UnitNumber(unit->Orders[0].Goal)
+		_C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHarvest;
 	unit->Orders[0].Arg1=(void*)-1;
 	NewResetPath(unit);
 	unit->SubAction=128;		// FIXME: Hardcoded
-	DebugLevel3("Wait: %d\n",unit->Wait);
+	DebugLevel3("Wait: %d\n" _C_ unit->Wait);
 	unit->Wait=1;
 	return;
     }
@@ -120,13 +120,13 @@ global void HandleActionReturnGoods(Unit* unit)
 	    ++destu->Refs;
 	}
 	DebugLevel3("Return to %d=%d,%d\n"
-		,UnitNumber(unit->Orders[0].Goal)
-		,unit->Orders[0].X,unit->Orders[0].Y);
+		_C_ UnitNumber(unit->Orders[0].Goal)
+		_C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHaulOil;
 	unit->Orders[0].Arg1=(void*)-1;
 	NewResetPath(unit);
 	unit->SubAction=65;		// FIXME: Hardcoded
-	DebugLevel3("Wait: %d\n",unit->Wait);
+	DebugLevel3("Wait: %d\n" _C_ unit->Wait);
 	unit->Wait=1;
 	return;
     }

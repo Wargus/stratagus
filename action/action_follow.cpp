@@ -56,9 +56,9 @@ global void HandleActionFollow(Unit* unit)
 {
     Unit* goal;
 
-    DebugLevel3Fn("%d: %d %d,%d \n",UnitNumber(unit),
-	    unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : -1,
-	    unit->Orders[0].X,unit->Orders[0].Y);
+    DebugLevel3Fn("%d: %d %d,%d \n" _C_ UnitNumber(unit) _C_
+	    unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : -1 _C_
+	    unit->Orders[0].X _C_ unit->Orders[0].Y);
 
     //
     //	Reached target
@@ -187,7 +187,7 @@ global void HandleActionFollow(Unit* unit)
 		    || goal->Orders[0].Action==UnitActionStill) ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
-		DebugLevel2Fn("Follow attack %d\n",UnitNumber(goal));
+		DebugLevel2Fn("Follow attack %d\n" _C_ UnitNumber(goal));
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		// Save current command to come back.
 		unit->SavedOrder=unit->Orders[0];

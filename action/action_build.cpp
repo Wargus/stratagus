@@ -95,7 +95,7 @@ global void HandleActionBuild(Unit* unit)
 	    return;
 
 	case PF_REACHED:
-	    DebugLevel3Fn("reached %d,%d\n",unit->X,unit->Y);
+	    DebugLevel3Fn("reached %d,%d\n" _C_ unit->X _C_ unit->Y);
 	    break;
 
 	default:
@@ -218,8 +218,8 @@ global void HandleActionBuild(Unit* unit)
     build->Data.Builded.Cancel=0; // FIXME: Is it necessary?
     build->Data.Builded.Worker=unit;
     DebugLevel3Fn("Build Sum %d, Add %d, Val %d, Sub %d\n"
-	,build->Data.Builded.Sum,build->Data.Builded.Add
-	,build->Data.Builded.Val,build->Data.Builded.Sub);
+	_C_ build->Data.Builded.Sum _C_ build->Data.Builded.Add
+	_C_ build->Data.Builded.Val _C_ build->Data.Builded.Sub);
     build->Wait=CYCLES_PER_SECOND/6;
 
     //
@@ -341,7 +341,7 @@ global void HandleActionBuilded(Unit* unit)
 	if( type->GivesOil ) {
 	    CommandHaulOil(worker,unit,0);	// Let the unit haul oil
 	    DebugLevel0Fn("Update oil-platform\n");
-	    DebugLevel0Fn(" =%d\n",unit->Data.Resource.Active);
+	    DebugLevel0Fn(" =%d\n" _C_ unit->Data.Resource.Active);
 	    unit->Data.Resource.Active=0;
 	    unit->Value=worker->Value;	// worker holding value while building
 	}

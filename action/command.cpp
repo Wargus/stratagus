@@ -939,7 +939,7 @@ global void CommandCancelTraining(Unit* unit,int slot,const UnitType* type)
 	    slot+=n;
 	}
 
-	DebugLevel0Fn("Cancel type: %s\n",type ? type->Ident : "-any-");
+	DebugLevel0Fn("Cancel type: %s\n" _C_ type ? type->Ident : "-any-");
 	//
 	//	Check if the unit-type is still trained? (NETWORK!)
 	//
@@ -1238,7 +1238,7 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
     );
 
     DebugLevel3Fn(": %d spell-casts on %d\n"
-	,UnitNumber(unit),dest ? UnitNumber(dest) : 0);
+	_C_ UnitNumber(unit) _C_ dest ? UnitNumber(dest) : 0);
 
     //
     //	Check if unit is still valid? (NETWORK!)

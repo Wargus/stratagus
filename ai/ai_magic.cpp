@@ -144,7 +144,7 @@ local int AiBloodlustSpell(Unit* unit)
 		    continue;
 		}
 		r = MapDistanceBetweenUnits(unit, table[i]);
-		DebugLevel0Fn("Distance %d\n", r);
+		DebugLevel0Fn("Distance %d\n" _C_ r);
 		if (r <= 1) {
 		    DebugLevel0Fn("`%s' cast bloodlust\n" _C_ unit->Type->
 			Ident);

@@ -106,7 +106,7 @@ local void AiCleanForce(int force)
     aitype=AiPlayer->Force[force].UnitTypes;
     while( aitype ) {
 	if( aitype->Want>counter[aitype->Type->Type] ) {
-	    DebugLevel3Fn("%d: missing %s.\n",force,aitype->Type->Ident);
+	    DebugLevel3Fn("%d: missing %s.\n" _C_ force _C_ aitype->Type->Ident);
 	    AiPlayer->Force[force].Completed=0;
 	}
 	counter[aitype->Type->Type]-=aitype->Want;
@@ -417,7 +417,7 @@ local void AiLoadForce(AiForce* force)
 		if( unit->Orders[0].Action!=UnitActionBoard ) {
 		    if( table[i]->Orders[0].Action==UnitActionStill
 			    && table[i]->OrderCount==1 ) {
-			DebugLevel0Fn("Send transporter %d\n",i);
+			DebugLevel0Fn("Send transporter %d\n" _C_ i);
 			CommandFollow(table[i],unit,FlushCommands);
 		    }
 		    CommandBoard(unit,table[i],FlushCommands);
