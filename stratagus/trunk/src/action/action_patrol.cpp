@@ -55,7 +55,7 @@ global void HandleActionPatrol(Unit* unit)
     if( DoActionMove(unit)<0 ) {	// reached end-point or stop
 	int tmp;
 
-	unit->Orders[0].Action=UnitActionPatrol;
+	DebugCheck( unit->Orders[0].Action!=UnitActionPatrol );
 
 	//
 	//	Swap the points.
@@ -77,10 +77,17 @@ global void HandleActionPatrol(Unit* unit)
 	if( unit->Type->CanAttack && !unit->Type->Tower ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
-		DebugLevel0("Patrol attack %Zd\n",UnitNumber(goal));
-		// Save current command to come back.
-		unit->SavedOrder=unit->Orders[0];
+		Order order;
+
+		DebugLevel3("Patrol attack %Zd\n",UnitNumber(goal));
+		order=unit->Orders[0];
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
+		// Save current command to come back.
+		unit->SavedOrder=order;
+		if( unit->SavedOrder.Goal ) {
+		    RefsDebugCheck(!order.Goal->Refs || order.Goal->Destroyed);
+		    order.Goal->Refs++;
+		}
 		unit->Orders[0].Action=UnitActionStill;
 		unit->SubAction=0;
 	    }
