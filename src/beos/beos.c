@@ -10,7 +10,7 @@
 //
 /**@name beos.c		-	The BeOS functions */
 //
-//	(c) Copyright 2000 by Kenneth Sanislo
+//	(c) Copyright 2000,2001 by Kenneth Sanislo
 //
 //	$Id$
 
@@ -30,10 +30,13 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	Need init function for beos.
+*/
 global void beos_init( int argc, char **argv )
 { 
 }
 
-//@}
-
 #endif
+
+//@}
