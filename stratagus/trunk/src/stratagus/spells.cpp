@@ -199,7 +199,7 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 		RemoveUnit(portal, NULL);
 		PlaceUnit(portal, x, y);
 	} else {
-		portal = MakeUnitAndPlace(x, y, ptype, caster->Player);
+		portal = MakeUnitAndPlace(x, y, ptype, &Players[PlayerNumNeutral]);
 	}
 /*	MakeMissile(spell->Missile,
 		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
