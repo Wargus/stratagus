@@ -277,7 +277,7 @@ global MissileType DefaultMissileTypes[] = {
     MissileClassPointToPoint,
     1,
     16,
-    1,
+    2,
     "missile-cannon-tower-explosion",	NULL,
     },
 { MissileTypeType,
@@ -344,7 +344,7 @@ global MissileType DefaultMissileTypes[] = {
     MissileClassPointToPointWithDelay,
     1,
     16,
-    1,
+    2,
     "missile-impact",	NULL,
     },
 { MissileTypeType,
@@ -356,7 +356,7 @@ global MissileType DefaultMissileTypes[] = {
     MissileClassPointToPoint,
     1,
     16,
-    1,
+    2,
     "missile-impact",	NULL,
     },
 { MissileTypeType,
@@ -928,8 +928,7 @@ global void FireMissile(Unit* unit)
 	    return;
 	}
 
-	// FIXME: this is wrong some missiles didn't hit the target
-	// FIXME: they hit the field of the target and all units on it.
+	// FIXME: Some missile hit the field of the target and all units on it.
 	// FIXME: goal is already dead, but missile could hit others?
     }
 
@@ -945,11 +944,13 @@ global void FireMissile(Unit* unit)
 		if( HumanWallOnMap(dx,dy) ) {
 		    // FIXME: don't use UnitTypeByIdent here, this is slow!
 		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
-			    UnitTypeByIdent("unit-human-wall")->Stats,0));
+			    UnitTypeByIdent("unit-human-wall")->Stats,
+			    unit->Bloodlust));
 		} else {
 		    // FIXME: don't use UnitTypeByIdent here, this is slow!
 		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
-			    UnitTypeByIdent("unit-orc-wall")->Stats,0));
+			    UnitTypeByIdent("unit-orc-wall")->Stats,
+			    unit->Bloodlust));
 		}
 		return;
 	    }
@@ -1259,6 +1260,61 @@ local int PointToPointMissile(Missile* missile)
 }
 
 /**
+**	Missile hits the goal.
+**
+**	@param missile	Missile hitting the goal.
+**	@param goal	Goal of the missile.
+**	@param splash	Splash damage divisor.
+*/
+local void MissileHitsGoal(const Missile* missile,Unit* goal,int splash)
+{
+    if ( BlizzardMissileHit && goal == missile->SourceUnit ) {
+	return;		// blizzard cannot hit owner unit
+    }
+
+    if( goal->HP && goal->Orders[0].Action!=UnitActionDie ) {
+	if ( missile->Damage ) {	// direct damage, spells mostly
+	    HitUnit(goal,missile->Damage/splash);
+	} else {
+	    HitUnit(goal,CalculateDamage(missile->SourceUnit->Stats,goal,
+		missile->SourceUnit->Bloodlust)/splash);
+	}
+    }
+}
+
+/**
+**	Missile hits wall.
+**
+**	@param missile	Missile hitting the goal.
+**	@param X	Wall X position.
+**	@param Y	Wall Y position.
+**	@param splash	Splash damage divisor.
+*/
+local void MissileHitsWall(const Missile* missile,int x,int y,int splash)
+{
+    if( WallOnMap(x,y) ) {
+	DebugLevel3Fn("Missile on wall?\n");
+	// FIXME: don't use UnitTypeByIdent here, this is slow!
+	if( HumanWallOnMap(x,y) ) {
+	    if ( missile->Damage ) {	// direct damage, spells mostly
+		HitWall(x,y,missile->Damage/splash);
+	    } else {
+		HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
+		    UnitTypeByIdent("unit-human-wall")->Stats,0)/splash);
+	    }
+	} else {
+	    if ( missile->Damage ) {	// direct damage, spells mostly
+		HitWall(x,y,missile->Damage/splash);
+	    } else {
+		HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
+		    UnitTypeByIdent("unit-orc-wall")->Stats,0)/splash);
+	    }
+	}
+	return;
+    }
+}
+
+/**
 **	Work for missile hit.
 **
 **	@param missile	Missile reaching end-point.
@@ -1268,6 +1324,9 @@ global void MissileHit(Missile* missile)
     Unit* goal;
     int x;
     int y;
+    Unit* table[MAX_UNITS];
+    int n;
+    int i;
 
     // FIXME: should I move the PlayMissileSound to here?
 
@@ -1306,9 +1365,6 @@ global void MissileHit(Missile* missile)
 	return;
     }
 
-    // FIXME: what can the missile hit?
-    // FIXME: "missile-catapult-rock", "missile-ballista-bolt", have area effect
-
     x/=TileSizeX;
     y/=TileSizeY;
 
@@ -1319,63 +1375,72 @@ global void MissileHit(Missile* missile)
     }
 
     //
-    //	Chooce correct goal.
+    //	Choose correct goal.
     //
-    if( !missile->Type->Range && missile->TargetUnit ) {
-	goal=missile->TargetUnit;
-	if( goal->Destroyed ) {			// Destroyed
-	    RefsDebugCheck( !goal->Refs );
-	    if( !--goal->Refs ) {
-		ReleaseUnit(goal);
+    if( !missile->Type->Range ) {
+	if( missile->TargetUnit ) {
+	    //
+	    //	Missiles without range only hits the goal always.
+	    //
+	    goal=missile->TargetUnit;
+	    if( goal->Destroyed ) {			// Destroyed
+		RefsDebugCheck( !goal->Refs );
+		if( !--goal->Refs ) {
+		    ReleaseUnit(goal);
+		}
+		missile->TargetUnit=NoUnitP;
+		return;
 	    }
-	    missile->TargetUnit=NoUnitP;
+	    MissileHitsGoal(missile,goal,1);
 	    return;
 	}
-    } else {
-	// FIXME: hits all or only enemies?
-	goal=UnitOnMapTile(x,y);
-    }
-
-    if( !goal || !goal->HP ) {
-	if( WallOnMap(x,y) ) {
-	    DebugLevel3Fn("Missile on wall?\n");
-	    // FIXME: don't use UnitTypeByIdent here, this is slow!
-	    if( HumanWallOnMap(x,y) ) {
-		if ( missile->Damage ) {	// direct damage, spells mostly
-		    HitWall(x,y,missile->Damage);
-		} else {
-		    HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
-			UnitTypeByIdent("unit-human-wall")->Stats,0));
-		}
-	    } else {
-		if ( missile->Damage ) {	// direct damage, spells mostly
-		    HitWall(x,y,missile->Damage);
-		} else {
-		    HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
-			UnitTypeByIdent("unit-orc-wall")->Stats,0));
-		}
-	    }
-	    return;
-	}
-	DebugLevel3Fn("Oops nothing to hit (%d,%d)?\n",x,y);
+	MissileHitsWall(missile,x,y,1);
 	return;
     }
 
-    if ( BlizzardMissileHit && goal == missile->SourceUnit ) {
-	return;		// blizzard cannot hit owner unit
+    //
+    //	Hits all units in range.
+    //
+    i=missile->Type->Range;
+    n=SelectUnits(x-i+1,y-i+1,x+i,y+i,table);
+    for( i=0; i<n; ++i ) {
+	goal=table[i];
+	//
+	//	Can the unit attack the this unit-type?
+	//	NOTE: perhaps this should be come a property of the missile.
+	//
+	if( CanTarget(missile->SourceUnit->Type,goal->Type) ) { 
+	    if( goal->X==x && goal->Y==y ) {
+		MissileHitsGoal(missile,goal,1);
+	    } else {
+		MissileHitsGoal(missile,goal,2);
+	    }
+	}
     }
-    BlizzardMissileHit = 0;
-
-    if ( missile->Damage ) {	// direct damage, spells mostly
-	HitUnit(goal,missile->Damage);
-    } else {
-	HitUnit(goal,CalculateDamage(missile->SourceUnit->Stats,goal,
-	    missile->SourceUnit->Bloodlust));
+    //
+    //	Missile hits ground.
+    //
+    // FIXME: no bock writting it correct.
+    x-=missile->Type->Range;
+    y-=missile->Type->Range;
+    for( i=missile->Type->Range*2; --i; ) {
+	for( n=missile->Type->Range*2; --n; ) {
+	    if( x>=0 && x<TheMap.Width && y>=0 && y<TheMap.Height ) {
+		if( i==0 && n==0 ) {
+		    MissileHitsWall(missile,x+i,y+n,1);
+		} else {
+		    MissileHitsWall(missile,x+i,y+n,2);
+		}
+	    }
+	}
     }
 }
 
 /**
 **	Handle all missile actions.
+**
+**	@todo	Split this function, into small functions, than it is
+**		better readable and easier to extend.
 */
 global void MissileActions(void)
 {
@@ -1513,6 +1578,7 @@ global void MissileActions(void)
 			//NOTE: vladi: blizzard cannot hit owner...
 			BlizzardMissileHit = 1;
 			MissileHit(missile);
+			BlizzardMissileHit = 0;
 			FreeMissile(missile);
 		    }
 		}
@@ -1526,6 +1592,7 @@ global void MissileActions(void)
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    BlizzardMissileHit = 1;
 		    MissileHit(missile);
+		    BlizzardMissileHit = 0;
 		    FreeMissile(missile);
 		}
 		break;
