@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file.
 ##
-##	(c) Copyright 1998-2001 by Lutz Sammer
+##	(c) Copyright 1998-2002 by Lutz Sammer
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
@@ -47,6 +47,7 @@ doc::
 clean::
 	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clean ; done
 	$(RM) $(OBJS) $(OBJDIR)libclone.a
+	$(RM) include/etlib/*.doc
 	-@$(RM) $(OBJDIR)main.$(OE) $(OBJDIR)freecraftrc.$(OE)
 
 clobber::	clean
