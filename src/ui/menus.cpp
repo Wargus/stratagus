@@ -901,11 +901,11 @@ local Menuitem GameOptionsMenuItems[] = {
 */
 enum {
     ImageNone,
-    ImagePanel1,
-    ImagePanel2,
-    ImagePanel3,
-    ImagePanel4,
-    ImagePanel5,
+    ImagePanel1,	// 256 x 288
+    ImagePanel2,	// 288 x 256
+    ImagePanel3,	// 384 x 256
+    ImagePanel4,	// 288 x 128
+    ImagePanel5,	// 352 x 352
 };
 
 /**
