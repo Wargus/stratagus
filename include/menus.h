@@ -295,7 +295,9 @@ extern MapInfo *ScenSelectPudInfo;	/// MapInfo of currently selected map
     /// FIXME: docu
 global hashtable(Menu*,MENUS_MAXMENU) MenuHash;
     /// FIXME: docu
+typedef char char30[30];
 global hashtable(void*,MENUS_MAXFUNC) MenuFuncHash;
+global hashtable(char30,MENUS_MAXFUNC) MenuFuncHash2;
 
 /*----------------------------------------------------------------------------
 --	Functions

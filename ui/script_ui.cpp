@@ -1654,6 +1654,10 @@ local SCM CclDefineMenuItem(SCM list)
 		item->mitype=MI_TYPE_TEXT;
 
 		item->d.text.text=gh_scm2newstr(gh_car(value), NULL);
+		if (!strcmp(item->d.text.text, "null")) {
+		    free(item->d.text.text);
+		    item->d.text.text = NULL;
+		}
 		value=gh_cdr(value);
 		value=gh_car(value);
 		if ( gh_eq_p(value,gh_symbol2scm("center")) ) {
