@@ -431,9 +431,9 @@ global int main1(int argc __attribute__ ((unused)),
     }
     // FIXME: more races supported
 
-    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson and others."
+    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others."
 #ifdef USE_CCL2
-    " SIOD Copyright by George J. Carrette."
+    "\n  SIOD Copyright by George J. Carrette."
 #endif
     "\nCompile options "
 #ifdef USE_CCL
@@ -519,12 +519,12 @@ global volatile void Exit(int err)
 */
 local void Usage(void)
 {
-    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson and others."
+    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others."
 #ifdef USE_CCL2
-    " SIOD Copyright by George J. Carrette."
+    "\n  SIOD Copyright by George J. Carrette."
 #endif
 "\n\nUsage: freecraft [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
-\t-d datapath\tpath to clone data\n\
+\t-d datapath\tpath to freecraft data\n\
 \t-c file.ccl\tccl start file\n\
 \t-f factor\tComputer units cost factor\n\
 \t-h\t\tHelp shows this page\n\
