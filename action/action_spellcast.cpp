@@ -153,7 +153,7 @@ global void HandleActionSpellCast(Unit* unit)
 		  if ( !repeat ) {
 		     unit->Command.Action=UnitActionStill;
 		     unit->SubAction=0;
-		     unit->State=0;
+		     unit->Wait = 1;
 		     if ( unit->Command.Data.Move.Goal )
 		        unit->Command.Data.Move.Goal->Refs--;
 		  }
