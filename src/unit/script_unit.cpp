@@ -448,6 +448,7 @@ local void CclParseResWorker(lua_State* l, Unit* unit)
 		if (!strcmp(value, "time-to-harvest")) {
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.ResWorker.TimeToHarvest = LuaToNumber(l, -1);
+			DebugLevel3("Unit %d load TimeToHarvest %d\n" _C_ unit->Slot _C_ unit->Data.ResWorker.TimeToHarvest);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "done-harvesting")) {
 			unit->Data.ResWorker.DoneHarvesting = 1;
@@ -973,9 +974,9 @@ local int CclUnit(lua_State* l)
 		MapMarkUnitSight(unit);
 	}
 
-	if (unit->Moving) {
+/*	if (unit->Moving) {
 		NewResetPath(unit);
-	}
+	}*/
 	// Fix Colors for rescued units.
 	if (unit->RescuedFrom) {
 		unit->Colors = &unit->RescuedFrom->UnitColors;

@@ -3525,7 +3525,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"seen-pixel\", {%d, %d}, ", unit->Seen.IX, unit->Seen.IY);
 	CLprintf(file, "\"frame\", %d, ", unit->Frame);
 	if (unit->Seen.Frame != UnitNotSeen) {
-		CLprintf(file, "\"%sseen\", %d, ", unit->Seen.Frame);
+		CLprintf(file, "\"seen\", %d, ", unit->Seen.Frame);
 	} else {
 		CLprintf(file, "\"not-seen\", ");
 	}
@@ -3651,6 +3651,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 			}
 			break;
 		case UnitActionResource:
+			DebugLevel3("Unit %d save TimeToHarvest %d\n" _C_ unit->Slot _C_ unit->Data.ResWorker.TimeToHarvest);
 			CLprintf(file, ", \"data-res-worker\", {\"time-to-harvest\", %d,", unit->Data.ResWorker.TimeToHarvest);
 			if (unit->Data.ResWorker.DoneHarvesting) {
 				CLprintf(file, " \"done-harvesting\",");
