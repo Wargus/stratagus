@@ -678,13 +678,32 @@ static void EditorRandomizeUnit(const char* unit_type, int count, int value)
 
 		// FIXME: can overlap units
 		unit = MakeUnitAndPlace(rx, ry , type, &Players[PlayerNumNeutral]);
-		unit->ResourcesHeld = value;
+		if (unit != NoUnitP) {
+			DebugPrint("Unable to allocate Unit");
+		} else {
+			unit->ResourcesHeld = value;
+		}
+
 		unit = MakeUnitAndPlace(mx - rx - tw, ry, type, &Players[PlayerNumNeutral]);
-		unit->ResourcesHeld = value;
+		if (unit != NoUnitP) {
+			DebugPrint("Unable to allocate Unit");
+		} else {
+			unit->ResourcesHeld = value;
+		}
+
 		unit = MakeUnitAndPlace(rx, my - ry - th, type, &Players[PlayerNumNeutral]);
-		unit->ResourcesHeld = value;
+		if (unit != NoUnitP) {
+			DebugPrint("Unable to allocate Unit");
+		} else {
+			unit->ResourcesHeld = value;
+		}
+
 		unit = MakeUnitAndPlace(mx - rx - tw, mx - ry - th, type, &Players[PlayerNumNeutral]);
-		unit->ResourcesHeld = value;
+		if (unit != NoUnitP) {
+			DebugPrint("Unable to allocate Unit");
+		} else {
+			unit->ResourcesHeld = value;
+		}
 	}
 }
 
