@@ -47,9 +47,9 @@ extern sem_t SoundThreadChannelSemaphore;
 #elif defined(USE_LIBCDA)
 #include "libcda.h"
 #elif defined(USE_CDDA)
-#include <cdda_interface.h>
-#include <cdda_paranoia.h>
-#include <utils.h>
+#include <linux/cdrom.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 #endif
 
 /*----------------------------------------------------------------------------
@@ -249,6 +249,10 @@ extern int NumCDTracks;
 #elif defined(USE_CDDA)
 // FIXME: fill up
 extern int NumCDTracks;
+extern int CDDrive;
+extern struct cdrom_tochdr CDchdr;
+extern struct cdrom_tocentry CDtocentry[64];
+extern struct cdrom_read_audio CDdata;
 #endif
 
 extern Sample* MusicSample;		/// Music samples
@@ -261,6 +265,9 @@ extern Sample* LoadFlac(const char* name,int flags);	/// Load a flac file
 extern Sample* LoadWav(const char* name,int flags);	/// Load a wav file
 extern Sample* LoadOgg(const char* name,int flags);	/// Load an ogg file
 extern Sample* LoadMp3(const char* name,int flags);	/// Load a mp3 file
+#ifdef USE_CDDA
+extern Sample* LoadCD(const char* name,int flags);	/// Load a cd track
+#endif
 
     ///	Register a sound (can be a simple sound or a group)
 extern SoundId RegisterSound(char* file[],unsigned number);

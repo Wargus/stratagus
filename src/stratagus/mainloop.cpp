@@ -699,12 +699,10 @@ global void GameMainLoop(void)
 	    //
 	    switch( GameCycle% ((CYCLES_PER_SECOND*VideoSyncSpeed/100)+1) ) {
 		case 0:				// Check cd-rom
-#ifdef USE_SDLCD
+#if defined(USE_SDLCD)
 		    if ( !(GameCycle%2) )	// every 2nd second
 			SDL_CreateThread(CDRomCheck, NULL);
-#endif
-
-#ifdef USE_LIBCDA
+#elif defined(USE_LIBCDA) || defined(USE_CDDA)
 		    CDRomCheck(NULL);
 #endif
 		    break;
