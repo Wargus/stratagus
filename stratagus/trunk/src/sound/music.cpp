@@ -433,8 +433,8 @@ global void PlaySectionMusic(PlaySectionType section)
 {
 #ifdef USE_LIBCDA
     int track;
-#endif
     int newtrack;
+#endif
     int i;
     int j;
     int found;
@@ -444,11 +444,6 @@ global void PlaySectionMusic(PlaySectionType section)
 	return;
     }
 
-    newtrack = 0;
-    j = 0;
-#ifdef USE_LIBCDA
-    track = cd_current_track();
-#endif
     if (section == PlaySectionStats) {
 	if (GameResult == GameVictory) {
 	    section = PlaySectionStatsVictory;
@@ -466,6 +461,8 @@ global void PlaySectionMusic(PlaySectionType section)
 
 #ifdef USE_LIBCDA
     if (CDMode == CDModeDefined) {
+	track = cd_current_track();
+	newtrack = 0;
 	if ( (1 << track) & PlaySections[i].CDTracks ) {
 	    newtrack = 0;
 	} else {
