@@ -840,7 +840,7 @@ global void InitCcl(void)
     sargv[0] = "Stratagus";
     sargv[1] = "-v1";
     sargv[2] = "-g0";
-    sargv[3] = "-h800000:10";
+    sargv[3] = "-h2000000:1";
     buf = malloc(strlen(StratagusLibPath) + 4);
     sprintf(buf, "-l%s", StratagusLibPath);
     sargv[4] = buf;			// never freed
