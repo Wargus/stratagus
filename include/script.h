@@ -85,6 +85,8 @@
 
 #define gh_eval_file(str)	vload(str,0,0)
 
+#define gh_apply(proc,args)	lapply(proc,args)
+
 #define gh_new_procedure0_0	init_subr_0
 #define gh_new_procedure1_0	init_subr_1
 #define gh_new_procedure2_0	init_subr_2
