@@ -794,6 +794,10 @@ local SCM CclUnit(SCM list)
 	}
     }
 
+    if (!unit->Player) {
+	AssignUnitToPlayer (unit, player);
+	unit->HP = unit->Type->_HitPoints;
+    }
     //
     //	Place on map
     //
