@@ -184,7 +184,7 @@ global void HandleActionSpellCast(Unit* unit)
 			// Check if we can cast the spell.
 			//
 			spell = unit->Orders[0].Arg1;
-			if (!CanCastSpell(unit,spell, unit->Orders[0].Goal,
+			if (!CanCastSpell(unit, spell, unit->Orders[0].Goal,
 					unit->Orders[0].X, unit->Orders[0].Y)) {
 
 				//
@@ -249,7 +249,7 @@ global void HandleActionSpellCast(Unit* unit)
 				} else {
 					spell = unit->Orders[0].Arg1;
 					unit->Value = SpellCast(unit, spell, unit->Orders[0].Goal,
-						unit->Orders[0].X,unit->Orders[0].Y);
+						unit->Orders[0].X, unit->Orders[0].Y);
 				}
 			}
 			if (!unit->Value) {
