@@ -35,6 +35,7 @@ MODULES= clone map unit action ai ui sound video network pathfinder siod \
 
 all::
 	@if [ ! -d ./$(OBJDIR) ] ; then mkdir ./$(OBJDIR) ; fi
+	@if [ ! -d movie/$(OBJDIR) ] ; then mkdir movie/$(OBJDIR) ; fi
 	@if [ ! -d movie/$(OBJDIR)/vp31 ] ; then mkdir movie/$(OBJDIR)/vp31 ; fi
 	@set -e; for i in $(MODULES) ; do\
 	    if [ ! -d $$i/$(OBJDIR) ] ; then mkdir $$i/$(OBJDIR) ; fi ;\
