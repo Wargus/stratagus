@@ -4663,6 +4663,7 @@ local void StartEditor(void)
 local void CancelEditorSelect(void)
 {
     QuitToMenu = 1;
+    EditorRunning = 0;
     EndMenu();
 }
 
