@@ -55,7 +55,7 @@ local Construction Constructions[16];
 /**
 **	Number of constuctions.
 */
-local int NumConstructions=15;
+local int NumConstructions=16;
 
 /**
 **	Table mapping the original construction numbers in puds to
@@ -149,7 +149,7 @@ global void SaveConstructions(FILE* file)
 		if( j ) {
 		    fputs("\n    ",file);
 		}
-		fprintf(file,"%s \"%s\"",Tilesets[j].Name,
+		fprintf(file,"%s \"%s\"",Tilesets[j]->Class,
 			Constructions[i].File[j]);
 	    }
 	}
@@ -204,13 +204,42 @@ global void CleanConstructions(void)
 **	@param x	X position.
 **	@param y	Y position.
 */
-global void DrawConstruction(int type,int frame,int x,int y)
+global void DrawConstruction(const Construction* construction,int frame,
+    int x,int y)
 {
     // FIXME: This should be moved to caller/init...
-    x-=Constructions[type].Width/2;
-    y-=Constructions[type].Height/2;
+    x-=construction->Width/2;
+    y-=construction->Height/2;
 
-    VideoDrawClip(Constructions[type].Sprite,frame,x,y);
+    VideoDrawClip(construction->Sprite,frame,x,y);
+}
+
+/**
+**	Get construction by identifier.
+**
+**	@param ident	Identfier of the construction
+*/
+global Construction* ConstructionByIdent(const char* ident)
+{
+    int i;
+
+    for( i=0; i<NumConstructions; ++i ) {
+	if( Constructions[i].Ident && !strcmp(ident,Constructions[i].Ident) ) {
+	    return &Constructions[i];
+	}
+    }
+    DebugLevel0Fn("Construction `%s' not found.\n",ident);
+    return NULL;
+}
+
+/**
+**	Get construction by original wc number.
+**
+**	@param num	Original number used in puds.
+*/
+global Construction* ConstructionByWcNum(int num)
+{
+    return ConstructionByIdent(ConstructionWcNames[num]);
 }
 
 // ----------------------------------------------------------------------------
@@ -275,6 +304,7 @@ local SCM CclDefineConstruction(SCM list)
 	return SCM_UNSPECIFIED;
     }
     construction=&Constructions[i];
+    construction->Nr=i;
     construction->Ident=str;
 
     //
@@ -291,21 +321,20 @@ local SCM CclDefineConstruction(SCM list)
 	    //
 	    while( !gh_null_p(sublist) ) {
 		str=gh_scm2newstr(gh_car(sublist),NULL);
-		sublist=gh_cdr(sublist);
 
 		for( i=0; i<NumTilesets; ++i ) {
-		    if( !strcmp(str,Tilesets[i].Ident) ) {
+		    if( !strcmp(str,Tilesets[i]->Ident) ) {
 			break;
 		    }
-		    if( !strcmp(str,Tilesets[i].Name) ) {
+		    if( !strcmp(str,Tilesets[i]->Class) ) {
 			break;
 		    }
 		}
 		if( i==NumTilesets ) {
 		    fprintf(stderr,"Tileset `%s' not available\n",str);
 		    errl("tileset not available",gh_car(sublist));
-		    exit(-1);
 		}
+		sublist=gh_cdr(sublist);
 		free(str);
 		CclFree(construction->File[i]);
 		construction->File[i]=gh_scm2newstr(gh_car(sublist),NULL);

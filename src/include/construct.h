@@ -47,8 +47,8 @@
 **		frames. This construction frames are currently not animated,
 **		this is planned for the future. What construction frames a
 **		building has, is currently done by numbers see
-**		UnitType::OverlapFrame. This will be soon changed to
-**		identifiers. 
+**		UnitType::Construction. This will be soon changed to
+**		identifiers.
 **
 **	The construction structure members:
 **
@@ -59,6 +59,11 @@
 **	Construction::File[]
 **
 **		FIXME: write the documentation
+**
+**	Construction::Nr
+**
+**		Slot number of the construction, used for saving. This should
+**		be removed, if we use symbol identifiers.
 **
 **	Construction::Width
 **
@@ -72,8 +77,11 @@
 **
 **		FIXME: write the documentation
 **
-**	@todo	FIXME: must change unit-type to use construction pointer.
+**	@todo	
 **		Need ::ConstructionByName, ::TilesetByName, ...
+**		Only fixed number of constructions supported, more than
+**		a single construction is not supported, animated constructions
+**		aren't supported.
 */
 
 /*----------------------------------------------------------------------------
@@ -93,6 +101,8 @@ typedef struct _construction_ {
 
     char*	Ident;			/// construction identifier
     char*	File[TilesetMax];	/// sprite file
+
+    int		Nr;			/// Number for save
 
     int		Width;			/// sprite width
     int		Height;			/// sprite height
@@ -119,7 +129,9 @@ extern void SaveConstructions(FILE* file);
     ///	Clean up the constructions module
 extern void CleanConstructions(void);
     ///	Draw a construction
-extern void DrawConstruction(int type,int image,int x,int y);
+extern void DrawConstruction(const Construction*,int image,int x,int y);
+    /// Get construction by wc number
+extern Construction* ConstructionByWcNum(int num);
 
     /// Register ccl features
 extern void ConstructionCclRegister(void);
