@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_player.c	-	The player ccl functions. */
+/**@name ccl_player.c - The player ccl functions. */
 //
-//	(c) Copyright 2001-2003 by Lutz Sammer
+//      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -203,6 +203,31 @@ local int CclPlayer(lua_State* l)
 					lua_error(l);
 				}
 			}
+		} else if (!strcmp(value, "last-resources")) {
+			if (!lua_istable(l, j + 1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			subargs = luaL_getn(l, j + 1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+
+				for (i = 0; i < MaxCosts; ++i) {
+					if (!strcmp(value, DefaultResourceNames[i])) {
+						lua_rawgeti(l, j + 1, k + 1);
+						player->LastResources[i] = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						break;
+					}
+				}
+				if (i == MaxCosts) {
+					lua_pushfstring(l, "Unsupported tag: %s", value);
+					lua_error(l);
+				}
+			}
 		} else if (!strcmp(value, "incomes")) {
 			if (!lua_istable(l, j + 1)) {
 				lua_pushstring(l, "incorrect argument");
@@ -218,7 +243,32 @@ local int CclPlayer(lua_State* l)
 				for (i = 0; i < MaxCosts; ++i) {
 					if (!strcmp(value, DefaultResourceNames[i])) {
 						lua_rawgeti(l, j + 1, k + 1);
-						player->Resources[i] = LuaToNumber(l, -1);
+						player->Incomes[i] = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						break;
+					}
+				}
+				if (i == MaxCosts) {
+					lua_pushfstring(l, "Unsupported tag: %s", value);
+					lua_error(l);
+				}
+			}
+		} else if (!strcmp(value, "revenue")) {
+			if (!lua_istable(l, j + 1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			subargs = luaL_getn(l, j + 1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+
+				for (i = 0; i < MaxCosts; ++i) {
+					if (!strcmp(value, DefaultResourceNames[i])) {
+						lua_rawgeti(l, j + 1, k + 1);
+						player->Revenue[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						break;
 					}
