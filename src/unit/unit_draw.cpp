@@ -374,7 +374,7 @@ local int CclHealthSprite(lua_State* l)
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    free(ManaSprite.File);
+    free(HealthSprite.File);
 
     HealthSprite.File = strdup(lua_tostring(l, 1));
     HealthSprite.HotX = lua_tonumber(l, 2);
@@ -416,7 +416,7 @@ local int CclShadowSprite(lua_State* l)
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    free(ManaSprite.File);
+    free(ShadowSprite.File);
 
     ShadowSprite.File = strdup(lua_tostring(l, 1));
     ShadowSprite.HotX = lua_tonumber(l, 2);
@@ -458,7 +458,7 @@ local int CclSpellSprite(lua_State* l)
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    free(ManaSprite.File);
+    free(SpellSprite.File);
 
     SpellSprite.File = strdup(lua_tostring(l, 1));
     SpellSprite.HotX = lua_tonumber(l, 2);
