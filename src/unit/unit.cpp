@@ -192,9 +192,9 @@ global void ReleaseUnit(Unit* unit)
 	    }
 	}
 
-    if( unit->Type->Building && unit->Visible != 0xFFFF ) {
-	return;
-    }
+	if( unit->Type->Building && unit->Visible != 0xFFFF ) {
+	    return;
+	}
 #endif
 	RefsDebugCheck( !unit->Refs );
 	if( --unit->Refs>0 ) {
