@@ -77,7 +77,7 @@ global int ShowHealthBackgroundLong;
 global int ShowManaBackgroundLong;
 
 // FIXME: not all variables of this file are here
-// FIXME: perhaps split this file into two?
+// FIXME: perhaps split this file into two or three parts?
 
 /**
 **	Show that units are selected.
@@ -383,21 +383,16 @@ global Decoration ManaSprite;
 global Decoration HealthSprite;
 
 /**
-**	Sprite to display the shadow of flying units.
+**	Sprite to display as the shadow of flying units.
 **
 **	@todo	Made this configurable with CCL.
 */
-global Decoration ShadowSprite
-#ifndef laterUSE_CCL
-// FIXME: Must make this configurable through CCL.
-     = { "graphics/missiles/unit shadow.png",	0,42, 32,32, 0 };
-#endif
-    ;
+global Decoration ShadowSprite;
 
 /**
-**	Sprite to display the active spells on units.
+**	Sprite to display the active spells on an unit.
 */
-global Graphic* SpellSprites;
+global Decoration SpellSprite;
 
 /**
 **	Define mana sprite.
@@ -444,25 +439,234 @@ global SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 }
 
 /**
+**	Define health sprite.
+**
+**	@param file	Shadow graphic file.
+**	@param x	Shadow X position.
+**	@param y	Shadow Y position.
+**	@param w	Shadow width.
+**	@param h	Shadow height.
+*/
+global SCM CclShadowSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
+{
+    free(ShadowSprite.File);
+
+    ShadowSprite.File=gh_scm2newstr(file,NULL);
+    ShadowSprite.HotX=gh_scm2int(x);
+    ShadowSprite.HotY=gh_scm2int(y);
+    ShadowSprite.Width=gh_scm2int(w);
+    ShadowSprite.Height=gh_scm2int(h);
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Define health sprite.
+**
+**	@param file	Spell graphic file.
+**	@param x	Spell X position.
+**	@param y	Spell Y position.
+**	@param w	Spell width.
+**	@param h	Spell height.
+*/
+global SCM CclSpellSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
+{
+    free(SpellSprite.File);
+
+    SpellSprite.File=gh_scm2newstr(file,NULL);
+    SpellSprite.HotX=gh_scm2int(x);
+    SpellSprite.HotY=gh_scm2int(y);
+    SpellSprite.Width=gh_scm2int(w);
+    SpellSprite.Height=gh_scm2int(h);
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display health as health-bar.
+*/
+local SCM CclShowHealthBar(void)
+{
+    ShowHealthBar=1;
+    ShowHealthDot=0;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display health as health-dot.
+*/
+local SCM CclShowHealthDot(void)
+{
+    ShowHealthBar=0;
+    ShowHealthDot=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display health as horizontal bar.
+*/
+local SCM CclShowHealthHorizontal(void)
+{
+    ShowHealthBar=1;
+    ShowHealthDot=0;
+    ShowHealthHorizontal=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display health as vertical bar.
+*/
+local SCM CclShowHealthVertical(void)
+{
+    ShowHealthBar=1;
+    ShowHealthDot=0;
+    ShowHealthHorizontal=0;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display mana as mana-bar.
+*/
+local SCM CclShowManaBar(void)
+{
+    ShowManaBar=1;
+    ShowManaDot=0;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display mana as mana-dot.
+*/
+local SCM CclShowManaDot(void)
+{
+    ShowManaBar=0;
+    ShowManaDot=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable energy bars and dots only for selected units
+*/
+local SCM CclShowEnergySelected(void)
+{
+    ShowEnergySelectedOnly=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+
+/**
+**	Enable display of full bars/dots.
+*/
+local SCM CclShowFull(void)
+{
+    ShowNoFull=0;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display mana as horizontal bar.
+*/
+local SCM CclShowManaHorizontal(void)
+{
+    ShowManaBar=1;
+    ShowManaDot=0;
+    ShowManaHorizontal=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display mana as vertical bar.
+*/
+local SCM CclShowManaVertical(void)
+{
+    ShowManaBar=1;
+    ShowManaDot=0;
+    ShowManaHorizontal=0;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Disable display of full bars/dots.
+*/
+local SCM CclShowNoFull(void)
+{
+    ShowNoFull=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Draw decorations always on top.
+*/
+local SCM CclDecorationOnTop(void)
+{
+    DecorationOnTop=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Register CCL features for decorations.
+*/
+global void DecorationCclRegister(void)
+{
+    gh_new_procedure5_0("mana-sprite",CclManaSprite);
+    gh_new_procedure5_0("health-sprite",CclHealthSprite);
+    gh_new_procedure5_0("shadow-sprite",CclShadowSprite);
+    gh_new_procedure5_0("spell-sprite",CclSpellSprite);
+
+    gh_new_procedure0_0("show-health-bar",CclShowHealthBar);
+    gh_new_procedure0_0("show-health-dot",CclShowHealthDot);
+// adicionado por protoman
+    gh_new_procedure0_0("show-health-vertical",CclShowHealthVertical);
+    gh_new_procedure0_0("show-health-horizontal",CclShowHealthHorizontal);
+    gh_new_procedure0_0("show-mana-vertical",CclShowManaVertical);
+    gh_new_procedure0_0("show-mana-horizontal",CclShowManaHorizontal);
+// fim
+
+    gh_new_procedure0_0("show-mana-bar",CclShowManaBar);
+    gh_new_procedure0_0("show-mana-dot",CclShowManaDot);
+    gh_new_procedure0_0("show-energy-selected-only",CclShowEnergySelected);
+    gh_new_procedure0_0("show-full",CclShowFull);
+    gh_new_procedure0_0("show-no-full",CclShowNoFull);
+    gh_new_procedure0_0("decoration-on-top",CclDecorationOnTop);
+}
+
+/**
 **	Load decoration.
 */
 global void LoadDecorations(void)
 {
     if( HealthSprite.File ) {
+	ShowLoadProgress("\tDecorations `%s'\n",HealthSprite.File);
 	HealthSprite.Sprite=LoadSprite(HealthSprite.File
 		,HealthSprite.Width,HealthSprite.Height);
     }
     if( ManaSprite.File ) {
+	ShowLoadProgress("\tDecorations `%s'\n",ManaSprite.File);
 	ManaSprite.Sprite=LoadSprite(ManaSprite.File
 		,ManaSprite.Width,ManaSprite.Height);
     }
     if( ShadowSprite.File ) {
+	ShowLoadProgress("\tDecorations `%s'\n",ShadowSprite.File);
 	ShadowSprite.Sprite=LoadSprite(ShadowSprite.File
 		,ShadowSprite.Width,ShadowSprite.Height);
     }
-    // FIXME: make this configurable
-    SpellSprites=LoadSprite(
-	    "graphics/ui/bloodlust,haste,slow,invisible,shield.png",16,16);
+    if( SpellSprite.File ) {
+	ShowLoadProgress("\tDecorations `%s'\n",SpellSprite.File);
+	SpellSprite.Sprite=LoadSprite(SpellSprite.File
+		,SpellSprite.Width,SpellSprite.Height);
+    }
 }
 
 /**
@@ -473,7 +677,59 @@ global void SaveDecorations(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: decorations $Id$\n\n");
 
-    DebugLevel0Fn("FIXME: not written.\n");
+    fprintf(file,"(mana-sprite \"%s\"  %d %d  %d %d)\n",
+	ManaSprite.File,ManaSprite.HotX,ManaSprite.HotY,
+	ManaSprite.Width,ManaSprite.Height);
+    fprintf(file,"(health-sprite \"%s\"  %d %d  %d %d)\n",
+	HealthSprite.File,HealthSprite.HotX,HealthSprite.HotY,
+	HealthSprite.Width,HealthSprite.Height);
+    fprintf(file,"(shadow-sprite \"%s\"  %d %d  %d %d)\n",
+	ShadowSprite.File,ShadowSprite.HotX,ShadowSprite.HotY,
+	ShadowSprite.Width,ShadowSprite.Height);
+    fprintf(file,"(spell-sprite \"%s\"  %d %d  %d %d)\n",
+	SpellSprite.File,SpellSprite.HotX,SpellSprite.HotY,
+	SpellSprite.Width,SpellSprite.Height);
+
+    // This belongs to the config and not save file
+    if( ShowHealthBar ) {
+	fprintf(file,";(show-health-bar)\n");
+    }
+    if( ShowHealthDot ) {
+	fprintf(file,";(show-health-dot)\n");
+    }
+    if( ShowHealthHorizontal ) {
+	fprintf(file,";(show-health-horizontal)\n");
+    } else {
+	fprintf(file,";(show-health-vertical)\n");
+    }
+    if( ShowHealthBackgroundLong ) {
+	fprintf(file,";(show-health-blackground-long)\n");
+    }
+    if( ShowManaBar ) {
+	fprintf(file,";(show-mana-bar)\n");
+    }
+    if( ShowManaDot ) {
+	fprintf(file,";(show-mana-dot)\n");
+    }
+    if( ShowManaHorizontal ) {
+	fprintf(file,";(show-mana-horizontal)\n");
+    } else {
+	fprintf(file,";(show-mana-vertical)\n");
+    }
+    if( ShowManaBackgroundLong ) {
+	fprintf(file,";(show-mana-blackground-long)\n");
+    }
+    if( ShowEnergySelectedOnly ) {
+	fprintf(file,";(show-energy-selected-only)\n");
+    }
+    if( ShowNoFull ) {
+	fprintf(file,";(show-no-full)\n");
+    } else {
+	fprintf(file,";(show-full)\n");
+    }
+    if( DecorationOnTop ) {
+	fprintf(file,";(decoration-on-top)\n");
+    }
 }
 
 /**
@@ -481,20 +737,33 @@ global void SaveDecorations(FILE* file)
 */
 global void CleanDecorations(void)
 {
-    //free(HealthSprite.File);	// latimerius: hack?
+    if( HealthSprite.File ) {
+	free(HealthSprite.File);
+    }
     VideoSaveFree(HealthSprite.Sprite);
-    //HealthSprite.File=NULL;	// latimerius: hack?
+    HealthSprite.File=NULL;
     HealthSprite.Sprite=NULL;
-    //free(ManaSprite.File);	// latimerius: hack?
+
+    if( ManaSprite.File ) {
+	free(ManaSprite.File);
+    }
     VideoSaveFree(ManaSprite.Sprite);
-    //ManaSprite.File=NULL;	// latimerius: hack?
+    ManaSprite.File=NULL;
     ManaSprite.Sprite=NULL;
-    //free(ShadowSprite.File);
+
+    if( ShadowSprite.File ) {
+	free(ShadowSprite.File);
+    }
     VideoSaveFree(ShadowSprite.Sprite);
-    //ShadowSprite.File=NULL;
+    ShadowSprite.File=NULL;
     ShadowSprite.Sprite=NULL;
-    VideoSaveFree(SpellSprites);
-    SpellSprites=NULL;
+
+    if( SpellSprite.File ) {
+	free(SpellSprite.File);
+    }
+    VideoSaveFree(SpellSprite.Sprite);
+    SpellSprite.File=NULL;
+    SpellSprite.Sprite=NULL;
 }
 
 /**
@@ -597,7 +866,10 @@ local void DrawManaBar(int x,int y,const UnitType* type,int full,int ready)
 local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 {
     int f;
-    int color, w;
+    int color;
+    int w;
+    int x1;
+    int y1;
     const UnitStats* stats;
 
 #ifdef REFS_DEBUG
@@ -640,6 +912,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 #if defined(DEBUG)
 		    // Johns: I want to see fast moving.
 		    //VideoFillRectangleClip(unit->Data.Move.Fast
+		    // Johns: I want to see the AI active flag
 		    VideoFillRectangleClip(unit->Active
 			    ? ColorBlack : ColorWhite
 #else
@@ -690,8 +963,6 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		&& ShowHealthDot ) {
 	if( stats->HitPoints
 		&& !(ShowNoFull && unit->HP==stats->HitPoints) ) {
-	    int x1;
-	    int y1;
 	    int n;
 
 	    n=VideoGraphicFrames(HealthSprite.Sprite)-1;
@@ -857,28 +1128,47 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	}
     }
 
-    x+=(type->TileWidth*TileSizeX-type->BoxWidth)/2;
-    y+=(type->TileHeight*TileSizeY-type->BoxHeight)/2;
+    // FIXME: Johns there is 100% a way to remove this calculation from
+    //		runtime.
+    x1=x;
+    y1=y;
+    if( SpellSprite.HotX<0 ) {
+	x1+=SpellSprite.HotX
+		+(type->TileWidth*TileSizeX+type->BoxWidth+1)/2;
+    } else if( SpellSprite.HotX>0 ) {
+	x1+=1-SpellSprite.HotX
+		+(type->TileWidth*TileSizeX-type->BoxWidth)/2;
+    } else {
+	x1+=(type->TileWidth*TileSizeX-SpellSprite.Width+1)/2;
+    }
+    if( SpellSprite.HotY<0 ) {
+	y1+=SpellSprite.HotY
+		+(type->TileHeight*TileSizeY+type->BoxHeight+1)/2;
+    } else if( SpellSprite.HotY>0 ) {
+	y1+=1-SpellSprite.HotY
+		+(type->TileHeight*TileSizeY-type->BoxHeight)/2;
+    } else {
+	y1+=(type->TileHeight*TileSizeY-SpellSprite.Height+1)/2;
+    }
+
     //
     // Draw spells decoration
     //
     if ( unit->Bloodlust ) {
-	VideoDrawClip( SpellSprites, 0, x, y );
+	VideoDrawClip( SpellSprite.Sprite, 0, x1, y1 );
     }
     if ( unit->Haste ) {	// same slot as slow
-	VideoDrawClip( SpellSprites, 1, x+16, y );
+	VideoDrawClip( SpellSprite.Sprite, 1, x1+16, y1 );
     }
     if ( unit->Slow ) {		// same slot as haste
-	VideoDrawClip( SpellSprites, 2, x+16, y );
+	VideoDrawClip( SpellSprite.Sprite, 2, x1+16, y1 );
     }
     if ( unit->Invisible ) {
-	VideoDrawClip( SpellSprites, 3, x+16+16, y );
+	VideoDrawClip( SpellSprite.Sprite, 3, x1+16+16, y1 );
     }
     if ( unit->UnholyArmor ) {
-	VideoDrawClip( SpellSprites, 4, x+16+16+16, y );
+	VideoDrawClip( SpellSprite.Sprite, 4, x1+16+16+16, y1 );
     }
-    x-=(type->TileWidth*TileSizeX-type->BoxWidth)/2;
-    y-=(type->TileHeight*TileSizeY-type->BoxHeight)/2;
 
     //
     //	Draw group number
@@ -906,26 +1196,25 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 **	@param type	Type of the unit.
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
+**
+**	@todo FIXME: later units should have its own shadows with animation.
 */
-local void DrawShadow(const Unit* unit __attribute__((unused)),
-	const UnitType* type,int x,int y)
+local void DrawShadow(const Unit* unit __attribute__ ((unused)),
+	const UnitType* type, int x, int y)
 {
     int i;
 
-    // FIXME: later units should have its own shadows with animation
-
     // Shadow size depends on box-size
-    if( type->BoxHeight>63 ) {
-	i=2;
-    } else if( type->BoxHeight>32 ) {
-	i=1;
+    if (type->BoxHeight > 63) {
+	i = 2;
+    } else if (type->BoxHeight > 32) {
+	i = 1;
     } else {
-	i=0;
+	i = 0;
     }
-    DebugLevel3("Box-height %d\n",type->BoxHeight);
 
-    VideoDrawClip(ShadowSprite.Sprite,i
-	    ,x+ShadowSprite.HotX,y+ShadowSprite.HotY);
+    VideoDrawClip(ShadowSprite.Sprite, i, x + ShadowSprite.HotX,
+	y + ShadowSprite.HotY);
 }
 
 /**
@@ -1474,7 +1763,7 @@ global void DrawUnits (int v)
     //
     n = SelectUnits(TheUI.VP[v].MapX-1, TheUI.VP[v].MapY-1,
 		TheUI.VP[v].MapX+TheUI.VP[v].MapWidth+1,
-		TheUI.VP[v].MapY+TheUI.VP[v].MapHeight+1,table); 
+		TheUI.VP[v].MapY+TheUI.VP[v].MapHeight+1,table);
 #else /* SPLIT_SCREEN_SUPPORT */
 
 global void DrawUnits(void)

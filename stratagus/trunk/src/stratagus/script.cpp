@@ -97,143 +97,6 @@ local SCM CclFreeCraftLibraryPath(void)
     return gh_str02scm(FreeCraftLibPath);
 }
 
-// FIXME: remove this
-extern SCM CclManaSprite(SCM file,SCM x,SCM y,SCM w,SCM h);
-extern SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h);
-
-/**
-**	Enable display health as health-bar.
-*/
-local SCM CclShowHealthBar(void)
-{
-    ShowHealthBar=1;
-    ShowHealthDot=0;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable display health as health-dot.
-*/
-local SCM CclShowHealthDot(void)
-{
-    ShowHealthBar=0;
-    ShowHealthDot=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable display health as horizontal bar.
-*/
-local SCM CclShowHealthHorizontal(void)
-{
-    ShowHealthBar=1;
-    ShowHealthDot=0;
-    ShowHealthHorizontal=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable display health as vertical bar.
-*/
-local SCM CclShowHealthVertical(void)
-{
-    ShowHealthBar=1;
-    ShowHealthDot=0;
-    ShowHealthHorizontal=0;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable display mana as mana-bar.
-*/
-local SCM CclShowManaBar(void)
-{
-    ShowManaBar=1;
-    ShowManaDot=0;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable display mana as mana-dot.
-*/
-local SCM CclShowManaDot(void)
-{
-    ShowManaBar=0;
-    ShowManaDot=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable energy bars and dots only for selected units
-*/
-local SCM CclShowEnergySelected(void)
-{
-    ShowEnergySelectedOnly=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-
-/**
-**	Enable display of full bars/dots.
-*/
-local SCM CclShowFull(void)
-{
-    ShowNoFull=0;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable display mana as horizontal bar.
-*/
-local SCM CclShowManaHorizontal(void)
-{
-    ShowManaBar=1;
-    ShowManaDot=0;
-    ShowManaHorizontal=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Enable display mana as vertical bar.
-*/
-local SCM CclShowManaVertical(void)
-{
-    ShowManaBar=1;
-    ShowManaDot=0;
-    ShowManaHorizontal=0;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Disable display of full bars/dots.
-*/
-local SCM CclShowNoFull(void)
-{
-    ShowNoFull=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Draw decorations always on top.
-*/
-local SCM CclDecorationOnTop(void)
-{
-    DecorationOnTop=1;
-
-    return SCM_UNSPECIFIED;
-}
-
 #if 0
 /**
 **	Show tips at the start of a level.
@@ -589,25 +452,6 @@ global void InitCcl(void)
 
     init_subr_0("library-path",CclFreeCraftLibraryPath);
 
-// FIXME: Should move into own C file.
-    init_subr_5("mana-sprite",CclManaSprite);
-    init_subr_5("health-sprite",CclHealthSprite);
-
-    init_subr_0("show-health-bar",CclShowHealthBar);
-    init_subr_0("show-health-dot",CclShowHealthDot);
-// adicionado por protoman
-    init_subr_0("show-health-vertical",CclShowHealthVertical);
-    init_subr_0("show-health-horizontal",CclShowHealthHorizontal);
-    init_subr_0("show-mana-vertical",CclShowManaVertical);
-    init_subr_0("show-mana-horizontal",CclShowManaHorizontal);
-// fim
-
-    init_subr_0("show-mana-bar",CclShowManaBar);
-    init_subr_0("show-mana-dot",CclShowManaDot);
-    init_subr_0("show-energy-selected-only",CclShowEnergySelected);
-    init_subr_0("show-full",CclShowFull);
-    init_subr_0("show-no-full",CclShowNoFull);
-    init_subr_0("decoration-on-top",CclDecorationOnTop);
 
     gh_new_procedure1_0("set-show-tips!",CclSetShowTips);
     gh_new_procedure1_0("add-tip",CclAddTip);
@@ -631,6 +475,7 @@ global void InitCcl(void)
     MapCclRegister();
     PathfinderCclRegister();
     ConstructionCclRegister();
+    DecorationCclRegister();
     UnitTypeCclRegister();
     UpgradesCclRegister();
     DependenciesCclRegister();
