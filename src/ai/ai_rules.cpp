@@ -313,7 +313,7 @@ global int AiUnittypeForce(UnitType * unitType)
 	unitType->Stats[AiPlayer->Player->Player].PiercingDamage +
 	unitType->Stats[AiPlayer->Player->Player].Speed / 3 +
 	unitType->Stats[AiPlayer->Player->Player].HitPoints / 5 +
-	(unitType->Magic ? 30 : 0);
+	(unitType->CanCastSpell ? 30 : 0);
     if (influence == 0) {
 	return 1;
     }
@@ -367,7 +367,7 @@ local void AiDeclareUnitImpact(int x, int y, Unit * unit)
 		unit->Stats->BasicDamage +
 		unit->Stats->PiercingDamage +
 		unit->Stats->Speed / 3 +
-		unit->Stats->HitPoints / 5 + (unitType->Magic ? 30 : 0);
+		unit->Stats->HitPoints / 5 + (unitType->CanCastSpell ? 30 : 0);
 	}
 
 	if (influence <= 1) {

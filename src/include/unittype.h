@@ -159,10 +159,6 @@
 **
 **		Maximum mana points
 **
-**	UnitType::Magic
-**
-**		Unit is a mage
-**
 **	UnitType::_Costs[::MaxCosts]
 **
 **		How many resources needed
@@ -666,8 +662,6 @@ struct _unit_type_ {
     int		_SightRange;		/// Sight range
     int		_HitPoints;		/// Maximum hit points
     int		_MaxMana;		/// Maximum mana points
-    // FIXME: only flag
-    int		Magic;			/// Unit can cast spells
 
     int		_Costs[MaxCosts];	/// How many resources needed
     int		RepairHP;		/// Amount of HP per repair

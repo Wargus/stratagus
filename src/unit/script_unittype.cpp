@@ -557,7 +557,10 @@ local SCM CclDefineUnitType(SCM list)
 	    }
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
-	    type->Magic = 0;
+	    if (gh_null_p(sublist)) { // empty list
+	        free(type->CanCastSpell);
+	        type->CanCastSpell = NULL;
+	    }
 	    while (!gh_null_p(sublist)) {
 		int id;
 		id = CclGetSpellByIdent(gh_car(sublist));
@@ -567,7 +570,6 @@ local SCM CclDefineUnitType(SCM list)
 		}
 		type->CanCastSpell[id] = 1;
 		sublist = gh_cdr(sublist);
-		type->Magic = 1;
 	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("can-target-flag"))) {
 	    //
