@@ -1793,23 +1793,7 @@ static int CclDefineUI(lua_State* l)
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-				if (!strcmp(value, "file")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					ui->StatusLine.File = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "pos")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					ui->StatusLineX = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					ui->StatusLineY = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "text-pos")) {
+				if (!strcmp(value, "text-pos")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
