@@ -88,6 +88,20 @@
 **
 **		Table to map the abstract level (PUD) tile numbers, to tile
 **		numbers in the graphic file (Tileset::File).
+**		FE. 16 (solid light water) in pud to 328 in png. 
+**
+**	Tileset::FlagsTable
+**
+**		Table of the tile flags used by the editor.
+**		@see MapField::Flags
+**
+**	Tileset::BasicNameTable
+**
+**		Name of the basic tile type. FE. "light-water".
+**
+**	Tileset::MixedNameTable
+**
+**		Name of the mixed tile type. FE. "light-water".
 **
 **	Tileset::TileTypeTable
 **
@@ -109,6 +123,14 @@
 **		Contains the animation of tiles.
 **
 **		@note This is currently not used.
+**
+**	Tileset::NumNames
+**
+**		Number of different tile names.
+**
+**	Tileset::TileNames
+**
+**		The different tile names. FE "light-grass", "dark-water".
 **
 **	Tileset::ExtraTrees[6]
 **
@@ -187,15 +209,12 @@
 */
 typedef enum _tile_type_ {
     TileTypeUnknown,			/// Unknown tile type
-    TileTypeNoWood,			/// UNUSED: no wood tile
     TileTypeWood,			/// Any wood tile
     TileTypeGrass,			/// Any grass tile
-    TileTypeNoRock,			/// UNUSED: no rock tile
     TileTypeRock,			/// Any rock tile
     TileTypeCoast,			/// Any coast tile
     TileTypeHumanWall,			/// Any human wall tile
     TileTypeOrcWall,			/// Any orc wall tile
-    TileTypeNoWall,			/// UNUSED: no wall tile
     TileTypeWater,			/// Any water tile
 } TileType;
 
@@ -209,10 +228,18 @@ typedef struct _tileset_ {
 
     int		NumTiles;		/// Number of tiles in the tables
     unsigned short*	Table;		/// Pud to internal conversion table
-    // FIXME: currently unsupported
+    unsigned short*	FlagsTable;	/// Flag table for editor
+
+    unsigned char*	BasicNameTable;	/// Basic tile name/type
+    unsigned char*	MixedNameTable;	/// Mixed tile name/type
+
+    // FIXME: currently hardcoded
     unsigned char*	TileTypeTable;	/// For fast lookup of tile type
     // FIXME: currently unsupported
     unsigned short*	AnimationTable;	/// Tile animation sequences
+
+    int		NumNames;		/// Number of different tile names
+    char**	TileNames;		/// Tile names/types
 
     unsigned	ExtraTrees[6];		/// Extra tree tiles for removing
     unsigned	TopOneTree;		/// Tile for one tree top
