@@ -490,11 +490,6 @@ local void SpellFlameShieldController(Missile * missile)
 global int CastBlizzard(Unit* caster, const SpellType* spell,
     Unit* target __attribute__((unused)), int x, int y)
 {
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-//	assert(x in range, y in range);
-
     int fields;
     int shards;
     int damage;
@@ -504,6 +499,11 @@ global int CastBlizzard(Unit* caster, const SpellType* spell,
     int dx;
     int dy;
     int i;
+
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    //assert(x in range, y in range);
 
     fields = spell->SpellAction->Blizzard.Fields;
     shards = spell->SpellAction->Blizzard.Shards;
@@ -562,15 +562,15 @@ global int CastBlizzard(Unit* caster, const SpellType* spell,
 global int CastCircleOfPower(Unit* caster, const SpellType* spell __attribute__((unused)),
     Unit* target __attribute__((unused)), int x, int y)
 {
+    // FIXME: vladi: cop should be placed only on explored land
+    Unit *cop = NULL;
+    UnitType *ucop = spell->SpellAction->SpawnPortal.PortalType;
+
     assert(caster);
     assert(spell);
     assert(spell->SpellAction);
     assert(spell->SpellAction->SpawnPortal.PortalType);
 //	assert(x in range, y in range);
-
-    // FIXME: vladi: cop should be placed only on explored land
-    Unit *cop = NULL;
-    UnitType *ucop = spell->SpellAction->SpawnPortal.PortalType;
 
     cop = caster->Goal;
     if (cop)
@@ -609,11 +609,6 @@ global int CastCircleOfPower(Unit* caster, const SpellType* spell __attribute__(
 global int CastDeathAndDecay(Unit* caster, const SpellType* spell,
     Unit* target __attribute__((unused)), int x, int y)
 {
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-//	assert(x in range, y in range);
-
     int fields;			// blizzard thing, yep :)
     int shards;
 	int damage;
@@ -621,6 +616,11 @@ global int CastDeathAndDecay(Unit* caster, const SpellType* spell,
     int dx;
     int dy;
     int i;
+
+	assert(caster);
+	assert(spell);
+	assert(spell->SpellAction);
+//	assert(x in range, y in range);
 
     fields = spell->SpellAction->DeathAndDecay.Fields;
     shards = spell->SpellAction->DeathAndDecay.Shards;
@@ -667,15 +667,15 @@ global int CastDeathAndDecay(Unit* caster, const SpellType* spell,
 global int CastDeathCoil(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
+    Missile *mis = NULL;
+    int sx = caster->X;
+    int sy = caster->Y;
+
     assert(caster);
     assert(spell);
     assert(spell->SpellAction);
 //	assert(target);
 //	assert(x in range, y in range);
-
-    Missile *mis = NULL;
-    int sx = caster->X;
-    int sy = caster->Y;
 
     caster->Mana -= spell->ManaCost;
 
@@ -710,17 +710,17 @@ global int CastDeathCoil(Unit* caster, const SpellType* spell, Unit* target,
 global int CastFireball(Unit* caster, const SpellType* spell,
     Unit* target __attribute__((unused)), int x, int y)
 {
+    Missile *missile = NULL;
+    int sx;
+    int sy;
+    int dist;
+
 	assert(caster);
 	assert(spell);
 	assert(spell->SpellAction);
 //	assert(target);
 //	assert(x in range, y in range);
 	assert(spell->Missile);
-
-    Missile *missile = NULL;
-    int sx;
-    int sy;
-    int dist;
 
     // NOTE: fireball can be casted on spot
     sx = caster->X;
@@ -759,15 +759,15 @@ global int CastFireball(Unit* caster, const SpellType* spell,
 global int CastFlameShield(Unit* caster, const SpellType* spell, Unit* target,
     int x __attribute__((unused)), int y __attribute__((unused)))
 {
+	Missile* mis = NULL;
+	int	i;
+
 	assert(caster);
 	assert(spell);
 	assert(spell->SpellAction);
 	assert(target);
 //	assert(x in range, y in range);
 	assert(spell->Missile);
-
-	Missile* mis = NULL;
-	int	i;
 
 	// get mana cost
 	caster->Mana -= spell->ManaCost;
@@ -799,12 +799,13 @@ global int CastFlameShield(Unit* caster, const SpellType* spell, Unit* target,
 global int CastHaste(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
+	struct s_haste	*haste;
+
 	assert(caster);
 	assert(spell);
 	assert(spell->SpellAction);
 	assert(target);
 
-	struct s_haste	*haste;
 	// get mana cost
 	caster->Mana -= spell->ManaCost;
 
@@ -901,16 +902,16 @@ global int CastHaste(Unit* caster, const SpellType* spell, Unit* target,
 global int CastHealing(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-	assert(target);
-
 	int	i;
 	int	diffHP;
 	int diffMana = caster->Mana;
 	int	HP = spell->SpellAction->healing.HP;
 	int Mana = spell->ManaCost;
+
+	assert(caster);
+	assert(spell);
+	assert(spell->SpellAction);
+	assert(target);
 
    	// Healing or exorcism
    	diffHP = (HP > 0) ? target->Stats->HitPoints - target->HP : target->HP;
@@ -1060,13 +1061,13 @@ global int CastInvisibility(Unit* caster, const SpellType* spell, Unit* target,
 global int CastPolymorph(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
+	UnitType* type = spell->SpellAction->polymorph.unit;
+
 	assert(caster);
 	assert(spell);
 	assert(spell->SpellAction);
 	assert(target);
 	assert(spell->SpellAction->polymorph.unit);
-
-	UnitType* type = spell->SpellAction->polymorph.unit;
 
 	caster->Player->Score += target->Type->Points;
 	if (target->Type->Building)
@@ -1114,17 +1115,18 @@ global int CastPolymorph(Unit* caster, const SpellType* spell, Unit* target,
 global int CastRaiseDead(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
+    Unit **corpses;
+    Unit *tempcorpse;
+    UnitType *skeleton;
+
 	assert(caster);
 	assert(spell);
 	assert(spell->SpellAction);
 	assert(spell->SpellAction->raisedead.skeleton != NULL);
 //	assert(x in range, y in range);
-
-	Unit **corpses;
-    Unit *tempcorpse;
+    skeleton = spell->SpellAction->raisedead.skeleton;
 
     corpses = &CorpseList;
-	UnitType *skeleton = spell->SpellAction->raisedead.skeleton;
 
     while (caster->Mana >= spell->ManaCost && *corpses)
     {
@@ -1172,11 +1174,6 @@ global int CastRaiseDead(Unit* caster, const SpellType* spell, Unit* target,
 global int CastRunes(Unit* caster, const SpellType* spell,
     Unit* target __attribute__((unused)), int x, int y)
 {
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-//	assert(x in range, y in range);
-
     Missile *mis = NULL;
 	const int	xx[] = {-1, +1, 0, 0, 0};
 	const int	yy[] = {0, 0, 0, -1, +1};
@@ -1184,6 +1181,11 @@ global int CastRunes(Unit* caster, const SpellType* spell,
 	int	oldx = x;
 	int	oldy = y;
 	int	i;
+
+	assert(caster);
+	assert(spell);
+	assert(spell->SpellAction);
+//	assert(x in range, y in range);
 
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 	for (i = 0; i < 5; i++)
@@ -1258,12 +1260,12 @@ global int CastSummon(Unit* caster, const SpellType* spell, Unit* target,
 global int CastWhirlwind(Unit* caster, const SpellType* spell,
     Unit* target __attribute__((unused)), int x, int y)
 {
+    Missile *mis = NULL;
+
 	assert(caster);
 	assert(spell);
 	assert(spell->SpellAction);
 //	assert(x in range, y in range);
-
-    Missile *mis = NULL;
 
     caster->Mana -= spell->ManaCost;
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
@@ -1354,11 +1356,12 @@ global int		CheckUnitDurationEffect(const t_Conditions	*condition,
 										const Unit* caster,
 										const Unit* target, int x, int y)
 {
+	unsigned int	ttl;
 	assert(condition);
+	ttl = condition->u.durationeffect.ttl;
 
 	if (target == NULL)
 		return !condition->expectvalue;
-	unsigned int	ttl = condition->u.durationeffect.ttl;
 
 	switch (condition->u.durationeffect.flag)
 	{
@@ -1418,9 +1421,6 @@ global int		CheckUnitDurationEffect(const t_Conditions	*condition,
 global int	CheckEnemyPresence(const t_Conditions	*condition,
 							const Unit* caster)
 {
-	assert(condition != NULL);
-	assert(caster != NULL);
-	
 	Unit* table[UnitMax];
     int i;
     int n;
@@ -1428,6 +1428,9 @@ global int	CheckEnemyPresence(const t_Conditions	*condition,
 	int	x = caster->X;
 	int	y = caster->Y;
 
+	assert(condition != NULL);
+	assert(caster != NULL);
+	
 // +1 should be + Caster_tile_Size ?
     n = SelectUnits(x - range, y - range,
     				x + range + 1, y + range + 1,
@@ -1491,11 +1494,11 @@ local Target	*NewTargetPosition(int x, int y)
 */
 local int PassGenericCondition(const Unit* caster,const SpellType* spell,const t_Conditions *condition)
 {
-	assert(caster != NULL);
-	assert(spell != NULL);
-
 //	const t_Conditions	*condition = NULL;
 	int	ret;
+
+	assert(caster != NULL);
+	assert(spell != NULL);
 
 	// FIXME : Move it in spell->Condition_generic ???
 	// mana is a must!
@@ -1529,11 +1532,11 @@ local int		PassSpecificCondition(const Unit* caster,
 									    int y,
 										const t_Conditions *condition)
 {
-	assert(caster != NULL);
-	assert(spell != NULL);
-
 //	const t_Conditions	*condition = NULL;
 	int	ret;
+
+	assert(caster != NULL);
+	assert(spell != NULL);
 
 	for (/*condition = spell->Condition_specific*/; condition != NULL; condition = condition->next)
 	{
@@ -1685,8 +1688,8 @@ global void DoneSpells()
 */
 global int SpellIdByIdent(const char *IdentName)
 {
-    assert(IdentName != NULL);
     int id;
+    assert(IdentName != NULL);
 
     for (id = 0; id < SpellTypeCount; ++id) {
 	if (strcmp(SpellTypeTable[id].IdentName, IdentName) == 0) {
@@ -1705,8 +1708,8 @@ global int SpellIdByIdent(const char *IdentName)
 */
 global SpellType *SpellTypeByIdent(const char *IdentName)
 {
-    assert(IdentName != NULL);
     int id;
+    assert(IdentName != NULL);
 
     id = SpellIdByIdent(IdentName);
     return (id == -1 ? NULL : &SpellTypeTable[id]);
@@ -1796,13 +1799,13 @@ global int CanCastSpell(const Unit* caster,const SpellType* spell,
 global int	AutoCastSpell(Unit *caster,
 						 const SpellType* spell)
 {
+    Target 				*target = NULL;
+
 	assert(caster != NULL);
 	assert(spell != NULL);
 	assert(0 <= spell->Ident && spell->Ident < SpellTypeCount);
     assert(caster->Type->CanCastSpell);
     assert(caster->Type->CanCastSpell[spell->Ident]);
-
-    Target 				*target = NULL;
 
 	if (!PassGenericCondition(caster, spell, spell->Condition_generic)
 		|| !PassGenericCondition(caster, spell, spell->AutoCast->Condition_generic))
