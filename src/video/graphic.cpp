@@ -270,7 +270,7 @@ global void FlipGraphic(Graphic* g)
 
 	s = g->SurfaceFlip = SDL_ConvertSurface(g->Surface,
 		g->Surface->format, SDL_SWSURFACE);
-	if (g->Surface->format->colorkey) {
+	if (g->Surface->flags & SDL_SRCCOLORKEY) {
 		SDL_SetColorKey(g->SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			g->Surface->format->colorkey);
 	}
@@ -506,6 +506,7 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 	int x;
 	SDL_Color pal[256];
 	Uint32 ckey;
+	int useckey;
 
 	// FIXME: Support more formats
 	if (g->Surface->format->BytesPerPixel != 1) {
@@ -534,6 +535,7 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 	if (g->Surface->format->BytesPerPixel == 1) {
 		VideoPaletteListRemove(g->Surface);
 	}
+	useckey = g->Surface->flags & SDL_SRCCOLORKEY;
 	ckey = g->Surface->format->colorkey;
 	SDL_FreeSurface(g->Surface);
 
@@ -542,7 +544,7 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 		VideoPaletteListAdd(g->Surface);
 	}
 	SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
-	if (ckey) {
+	if (useckey) {
 		SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
 	}
 
