@@ -78,11 +78,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
-#ifdef NEW_ORDERS
-	    unit->Orders[0].Action=resource->Action;
-#else
-	    unit->Command.Action=resource->Action;
-#endif
+	    DebugCheck( unit->Orders[0].Action!=resource->Action );
 	    return -1;
 	case PF_REACHED:
 	    break;
@@ -90,7 +86,6 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 	    return 0;
     }
 
-#ifdef NEW_ORDERS
     goal=unit->Orders[0].Goal;
 
     if( !goal ) {			// Move checks for killed units.
@@ -151,70 +146,6 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     goal->Data.Resource.Active++;
     DebugLevel3Fn("+%d\n",goal->Data.Resource.Active);
 
-#else
-
-    goal=unit->Command.Data.Move.Goal;
-
-    if( !goal ) {			// Move checks for killed units.
-	// FIXME: perhaps we should choose an alternative
-	unit->SubAction=0;
-	unit->Command.Action=UnitActionStill;
-	return 0;
-    }
-
-    DebugCheck( !goal );
-    DebugCheck( unit->Wait!=1 );
-    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
-
-    //
-    //	Target is dead, stop getting resources.
-    //
-    if( goal->Destroyed ) {
-	DebugLevel0Fn("Destroyed unit\n");
-	RefsDebugCheck( !goal->Refs );
-	if( !--goal->Refs ) {
-	    ReleaseUnit(goal);
-	}
-	unit->Command.Data.Move.Goal=NoUnitP;
-	// FIXME: perhaps we should choose an alternative
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    } else if( goal->Removed || !goal->HP
-	    || goal->Command.Action==UnitActionDie ) {
-	RefsDebugCheck( !goal->Refs );
-	--goal->Refs;
-	RefsDebugCheck( !goal->Refs );
-	unit->Command.Data.Move.Goal=NoUnitP;
-	// FIXME: perhaps we should choose an alternative
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
-
-    unit->Command.Action=resource->Action;
-
-    //
-    //	If resource is still under construction, wait!
-    //
-    if( goal->Command.Action==UnitActionBuilded ) {
-        DebugLevel2Fn("Invalid resource\n");
-	return 0;
-    }
-
-    RefsDebugCheck( !goal->Refs );
-    --goal->Refs;
-    RefsDebugCheck( !goal->Refs );
-    unit->Command.Data.Move.Goal=NoUnitP;
-
-    //
-    //	Activate the resource
-    //
-    goal->Command.Data.Resource.Active++;
-    DebugLevel3Fn("+%d\n",goal->Command.Data.Resource.Active);
-
-#endif
-
     if( !goal->Frame ) {		// show resource working
 	goal->Frame=resource->Frame;
 	CheckUnitToBeDrawn(goal);
@@ -273,19 +204,11 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//	Remove what we can carry, FIXME: always this?
 	//
 	source->Value-=DEFAULT_INCOMES[resource->Cost];
-#ifdef NEW_ORDERS
 	DebugLevel3Fn("-%d\n",source->Data.Resource.Active);
 	if( !--source->Data.Resource.Active ) {
 	    source->Frame=0;
 	    CheckUnitToBeDrawn(source);
 	}
-#else
-	DebugLevel3Fn("-%d\n",source->Command.Data.Resource.Active);
-	if( !--source->Command.Data.Resource.Active ) {
-	    source->Frame=0;
-	    CheckUnitToBeDrawn(source);
-	}
-#endif
 	if( IsSelected(source) ) {
 	    MustRedraw|=RedrawInfoPanel;
 	}
@@ -323,7 +246,6 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    } else {
 		DropOutOnSide(unit,LookingW,1,1);
 	    }
-#ifdef NEW_ORDERS
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
 	    // should return 0, done below!
@@ -331,7 +253,6 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
 		    ,depot->Y+depot->Type->TileHeight/2
 		    ,source->Type->TileWidth,source->Type->TileHeight);
-	    ResetPath(unit->Orders[0]);
 	    unit->Orders[0].Goal=depot;
 	    RefsDebugCheck( !depot->Refs );
 	    ++depot->Refs;
@@ -348,31 +269,6 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	}
 	unit->Wait=1;
 	return unit->Orders[0].Action==resource->Action;
-#else
-	    unit->Command.Action=UnitActionStill;
-	    unit->SubAction=0;
-	    // should return 0, done below!
-	} else {
-	    DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
-		    ,depot->Y+depot->Type->TileHeight/2
-		    ,source->Type->TileWidth,source->Type->TileHeight);
-	    ResetPath(unit->Command);
-	    unit->Command.Data.Move.Goal=depot;
-	    RefsDebugCheck( !depot->Refs );
-	    ++depot->Refs;
-	    unit->Command.Data.Move.Range=1;
-	    unit->Command.Data.Move.DX=-1;
-	    unit->Command.Data.Move.DY=-1;
-	    unit->Command.Action=resource->Action;
-	}
-
-        CheckUnitToBeDrawn(unit);
-	if( IsSelected(unit) ) {
-	    UpdateButtonPanel();
-	}
-	unit->Wait=1;
-	return unit->Command.Action==resource->Action;
-#endif
     }
 
     //
@@ -401,11 +297,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
-#ifdef NEW_ORDERS
-	    unit->Orders[0].Action=resource->Action;
-#else
-	    unit->Command.Action=resource->Action;
-#endif
+	    DebugCheck( unit->Orders[0].Action!=resource->Action );
 	    return -1;
 	case PF_REACHED:
 	    break;
@@ -413,7 +305,6 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	    return 0;
     }
 
-#ifdef NEW_ORDERS
     goal=unit->Orders[0].Goal;
 
     if( !goal ) {			// Move checks for killed units.
@@ -459,64 +350,6 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
     --goal->Refs;
     RefsDebugCheck( !goal->Refs );
     unit->Orders[0].Goal=NoUnitP;
-
-#else
-
-    goal=unit->Command.Data.Move.Goal;
-
-    if( !goal ) {			// Move checks for killed units.
-	// FIXME: perhaps we should choose an alternative
-	unit->SubAction=0;
-	unit->Command.Action=UnitActionStill;
-	return 0;
-    }
-
-    DebugCheck( !goal );
-    DebugCheck( unit->Wait!=1 );
-    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
-
-    //
-    //	Target is dead, stop getting resources.
-    //
-    if( goal->Destroyed ) {
-	DebugLevel0Fn("Destroyed unit\n");
-	RefsDebugCheck( !goal->Refs );
-	if( !--goal->Refs ) {
-	    ReleaseUnit(goal);
-	}
-	unit->Command.Data.Move.Goal=NoUnitP;
-	// FIXME: perhaps we should choose an alternative
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    } else if( goal->Removed || !goal->HP
-	    || goal->Command.Action==UnitActionDie ) {
-	RefsDebugCheck( !goal->Refs );
-	--goal->Refs;
-	RefsDebugCheck( !goal->Refs );
-	unit->Command.Data.Move.Goal=NoUnitP;
-	// FIXME: perhaps we should choose an alternative
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
-
-    unit->Command.Action=resource->Action;
-
-    //
-    //	If depot is still under construction, wait!
-    //
-    if( goal->Command.Action==UnitActionBuilded ) {
-        DebugLevel2Fn("Invalid depot\n");
-	return 0;
-    }
-
-    RefsDebugCheck( !goal->Refs );
-    --goal->Refs;
-    RefsDebugCheck( !goal->Refs );
-    unit->Command.Data.Move.Goal=NoUnitP;
-
-#endif
 
     //
     //	Place unit inside the depot
@@ -573,7 +406,6 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 
     DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
-#ifdef NEW_ORDERS
 	depot=resource->DepositOnMap(unit->X,unit->Y);
 	DebugCheck( !depot );
 	// Could be destroyed, but than we couldn't be in?
@@ -588,7 +420,6 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 	    DropOutNearest(unit,goal->X+goal->Type->TileWidth/2
 		    ,goal->Y+goal->Type->TileHeight/2
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-	    ResetPath(unit->Command);
 	    unit->Orders[0].Goal=goal;
 	    RefsDebugCheck( !goal->Refs );
 	    ++goal->Refs;
@@ -601,35 +432,6 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
         CheckUnitToBeDrawn(unit);
 	unit->Wait=1;
 	return unit->Orders[0].Action==resource->Action;
-#else
-	depot=resource->DepositOnMap(unit->X,unit->Y);
-	DebugCheck( !depot );
-	// Could be destroyed, but than we couldn't be in?
-
-	// FIXME: return to last position!
-	if( !(goal=resource->FindResource(unit->Player,unit->X,unit->Y)) ) {
-	    DropOutOnSide(unit,LookingW
-		,depot->Type->TileWidth,depot->Type->TileHeight);
-	    unit->Command.Action=UnitActionStill;
-	    unit->SubAction=0;
-	} else {
-	    DropOutNearest(unit,goal->X+goal->Type->TileWidth/2
-		    ,goal->Y+goal->Type->TileHeight/2
-		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-	    ResetPath(unit->Command);
-	    unit->Command.Data.Move.Goal=goal;
-	    RefsDebugCheck( !goal->Refs );
-	    ++goal->Refs;
-	    unit->Command.Data.Move.Range=1;
-	    unit->Command.Data.Move.DX=-1;
-	    unit->Command.Data.Move.DY=-1;
-	    unit->Command.Action=resource->Action;
-	}
-
-        CheckUnitToBeDrawn(unit);
-	unit->Wait=1;
-	return unit->Command.Action==resource->Action;
-#endif
     }
 
     //
@@ -671,7 +473,6 @@ global void HandleActionResource(Unit* unit,const Resource* resource)
 	    if( (ret=MoveToResource(unit,resource)) ) {
 		if( ret==-1 ) {
 		    if( ++unit->SubAction==5 ) {
-#ifdef NEW_ORDERS
 			unit->Orders[0].Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Orders[0].Goal ) {
@@ -680,16 +481,6 @@ global void HandleActionResource(Unit* unit,const Resource* resource)
 			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 			    unit->Orders[0].Goal=NoUnitP;
 			}
-#else
-			unit->Command.Action=UnitActionStill;
-			unit->SubAction=0;
-			if( unit->Command.Data.Move.Goal ) {
-			    RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
-			    --unit->Command.Data.Move.Goal->Refs;
-			    RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
-			    unit->Command.Data.Move.Goal=NoUnitP;
-			}
-#endif
 		    } else {			// Do a little delay
 			unit->Wait*=unit->SubAction;
 			DebugLevel0Fn("Retring\n");
@@ -720,7 +511,6 @@ global void HandleActionResource(Unit* unit,const Resource* resource)
 	    if( (ret=MoveToDepot(unit,resource)) ) {
 		if( ret==-1 ) {
 		    if( ++unit->SubAction==70 ) {
-#ifdef NEW_ORDERS
 			unit->Orders[0].Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Orders[0].Goal ) {
@@ -729,16 +519,6 @@ global void HandleActionResource(Unit* unit,const Resource* resource)
 			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 			    unit->Orders[0].Goal=NoUnitP;
 			}
-#else
-			unit->Command.Action=UnitActionStill;
-			unit->SubAction=0;
-			if( unit->Command.Data.Move.Goal ) {
-			    RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
-			    --unit->Command.Data.Move.Goal->Refs;
-			    RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
-			    unit->Command.Data.Move.Goal=NoUnitP;
-			}
-#endif
 		    } else {			// Do a little delay
 			unit->Wait*=unit->SubAction-65;
 			DebugLevel0Fn("Retring\n");
