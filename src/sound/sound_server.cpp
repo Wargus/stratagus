@@ -311,6 +311,55 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
     return ri;
 }
 
+/**
+**	Convert RAW sound data to 44100 hz, Stereo, 16 bits per channel
+**
+**	// FIXME
+**	@param src		Source buffer
+**	@param dest		Destination buffer
+**	@param frequency	Frequency of source
+**	@param chansize		Bitrate in bytes per channel of source
+**	@param channels		Number of channels of source
+**	@param bytes		Number of compressed bytes to read
+**
+**	@return		Number of bytes written in 'dest'
+*/
+global int ConvertToStereo32(const char *src, char *dest, int frequency, 
+    int chansize, int channels, int bytes)
+{
+    int s;              // sample index
+    int b;              // byte index
+    int c;              // channel index
+    int freqratio;
+    int chanratio;
+    int brratio;
+    int samplesize;     // number of bytes per sample
+    int divide;
+    int offset;
+
+    freqratio = 44100 / frequency;
+    samplesize = chansize * channels;
+    brratio = 4 / samplesize;
+    chanratio = 2 / channels;
+    divide = freqratio * brratio / chanratio;
+
+    // s is the sample
+    for (s = 0; s < bytes*divide; s += 4) {
+        // c is the channel in the sample
+        for (c = 0; c < 2; ++c) {
+            // b is the byte in the channel
+            for (b = 0; b < 2; ++b) {
+                offset=( ((s/4)/freqratio)*samplesize*chanratio +
+                    (c/chanratio)*chansize + b/(2/chansize));
+                    dest[s + c*2 + b] = src[offset] + (chansize == 1 ? 127 : 0);
+                    // FIXME: should this be 127 or 128?
+            }
+        }
+    }
+
+    return bytes*divide;
+}
+
 global SoundChannel Channels[MaxChannels];
 global int NextFreeChannel;
 

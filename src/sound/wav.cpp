@@ -67,16 +67,12 @@ local int WavReadStream(Sample *sample, void *buf, int len)
     char sndbuf[WAV_BUFFER_SIZE];
     int unc;		// number of uncompressed bytes to read
     int comp;		// number of compressed bytes actually read
-    int s;		// sample index
-    int b;		// byte index
-    int c;		// channel index
     int freqratio;
     int chanratio;
     int brratio;
-    int chansize;	// number of bytes per channel
     int samplesize;	// number of bytes per sample
     int divide;
-    int offset;
+    int i;
 
     data = (WavData*) sample->User;
 
@@ -90,30 +86,16 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 
 	freqratio = (44100 / sample->Frequency);
 	samplesize = sample->SampleSize / 8;
-	brratio = 4 / samplesize;
-	chansize = samplesize / sample->Channels;
+	brratio = 4 / (samplesize * sample->Channels);
 	chanratio = 2 / sample->Channels;
 	divide = freqratio*brratio/chanratio;
 
 	comp = CLread(data->WavFile, sndbuf, unc/divide);
 
-	// s is the sample
-	for (s = 0; s < comp*divide; s += 4) {
-	    // c is the channel in the sample
-	    for (c = 0; c < 2; ++c) {
-		// b is the byte in the channel
-	        for (b = 0; b < 2; ++b) {
-		    offset=( ((s/4)/freqratio)*samplesize*chanratio + 
-			(c/chanratio)*chansize + b/(2/chansize));
-
-		    data->PointerInBuffer[sample->Length + s + c*2 + b] = 
-			sndbuf[offset] + (chansize == 1 ? 127 : 0);
-		    	// FIXME: should this be 127 or 128?
-		}
-	    }
-	}
-
-	sample->Length += comp*divide;
+	sample->Length += ConvertToStereo32(sndbuf, 
+	    &data->PointerInBuffer[sample->Length], 
+	    sample->Frequency, sample->SampleSize / 8, 
+	    sample->Channels, comp);
 
         if (sample->Length < len) {
             len = sample->Length;
@@ -272,7 +254,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
     //
     sample = malloc(sizeof(*sample) + WAV_BUFFER_SIZE*wavfmt.Channels);
     sample->Channels = wavfmt.Channels;
-    sample->SampleSize = wavfmt.SampleSize * 8;
+    sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
     sample->Frequency = wavfmt.Frequency;
     sample->Length = 0;
 
