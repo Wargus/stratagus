@@ -1,0 +1,97 @@
+<!--
+----	$Id$
+-->
+<HTML><HEAD>
+    <TITLE>Development for FreeCraft Version 1.16.1</TITLE>
+</HEAD>
+<BODY>
+    <H1>Development for FreeCraft Version 1.16.1</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+
+This file should give you some information to help too develop FreeCraft.<P>
+
+<H2>Make and makefiles</H2>
+
+Type 'make help' to get an overview what all could be made.<P>
+
+<H2>Source code documentation</H2>
+
+Valery Shchedrin has introduced tagged source documentation. I continued to
+use them.<P>
+
+<H3>This programs are required</H3>
+
+You need one this programs to generate source code documentation.
+<UL>
+<LI><A HREF="http://www.stack.nl/~dimitri/doxygen/download.html">DoxyGen</A>
+My patch doxgen-0.4.diff.gz should be obsolete.
+<LI><A HREF="http://www.zib.de/Visual/software/doc++/index.html">DOC++</A>
+</UL>
+
+<H3>Generate documentation from source code</H3>
+
+Please compile and install one of the above programs.
+With this commands you produce the documentations:
+<UL>
+<LI><EM>make doc</EM> If you use DoxyGen.
+<LI><EM>make doc++</EM> If you use DOC++.
+</UL>
+
+<H3>Tags used in source code</H3>
+
+I use the doc++ tags:<P>
+
+/** ... */<P>
+Multi line source code documentation.<P>
+/// ... <P>
+Single line source code documentation.<P>
+//@{ or /*@{*/<P>
+Grouping.<P>
+//@} or /*@}*/<P>
+Grouping.<P>
+
+<UL>
+<LI>@name
+<BR>Name of file or group.
+<LI>@param
+<BR>Describes function/macro parameter
+<LI>@return
+<BR>Describes function return
+<LI>@see
+<BR>Links to other section
+</UL>
+
+Please read the documentation of the programs.
+
+<H2>Coding style</H2>
+
+You can use your own coding style in your own modules.
+If you fix in other modules, please imitate the coding style of the old coder.
+
+<P>I suggest: <A HREF="/usr/src/linux/Documentation/CodingStyle">
+(Linux kernel coding style) </A>
+<UL>
+<LI>Write ANSI C.
+<LI>Use 8 spaces tabulators.
+<LI>Use 4 spaces indention levels.
+<LI>Use C++ comments for to end of line comments.
+<LI>Use { } also for one statement blocks.
+</UL>
+
+<HR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>
