@@ -270,10 +270,10 @@ static Missile* NewLocalMissile(void)
 static Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
 	int sy, int dx, int dy)
 {
-	missile->X = sx - mtype->G->Width / 2;
-	missile->Y = sy - mtype->G->Height / 2;
-	missile->DX = dx - mtype->G->Width / 2;
-	missile->DY = dy - mtype->G->Height / 2;
+	missile->X = sx - mtype->Width / 2;
+	missile->Y = sy - mtype->Height / 2;
+	missile->DX = dx - mtype->Width / 2;
+	missile->DY = dy - mtype->Height / 2;
 	missile->SourceX = missile->X;
 	missile->SourceY = missile->Y;
 	missile->Type = mtype;
@@ -566,8 +566,8 @@ static void GetMissileMapArea(const Missile* missile, int* sx, int* sy,
 #define Bound(x, y) (x) < 0 ? 0 : ((x) > (y) ? (y) : (x))
 	*sx = Bound(missile->X / TileSizeX, TheMap.Width - 1);
 	*sy = Bound(missile->Y / TileSizeY, TheMap.Height - 1);
-	*ex = Bound((missile->X + missile->Type->G->Width) / TileSizeX, TheMap.Width - 1);
-	*ey = Bound((missile->Y + missile->Type->G->Height) / TileSizeY, TheMap.Height - 1);
+	*ex = Bound((missile->X + missile->Type->Width) / TileSizeX, TheMap.Width - 1);
+	*ey = Bound((missile->Y + missile->Type->Height) / TileSizeY, TheMap.Height - 1);
 #undef Bound
 }
 
@@ -812,8 +812,8 @@ static int PointToPointMissile(Missile* missile)
 	missile->X = missile->SourceX + xstep * missile->CurrentStep / 1024;
 	missile->Y = missile->SourceY + ystep * missile->CurrentStep / 1024;
 	if (missile->Type->SmokeMissile && missile->CurrentStep) {
-		x = missile->X + missile->Type->G->Width / 2;
-		y = missile->Y + missile->Type->G->Height / 2;
+		x = missile->X + missile->Type->Width / 2;
+		y = missile->Y + missile->Type->Height / 2;
 		MakeMissile(missile->Type->SmokeMissile, x, y, x, y);
 	}
 	return 0;
@@ -864,8 +864,8 @@ static int ParabolicMissile(Missile* missile)
 	missile->Y += Z * ZprojToY / 64;
 	MissileNewHeadingFromXY(missile, missile->X - orig_x, missile->Y - orig_y);
 	if (missile->Type->SmokeMissile && missile->CurrentStep) {
-		x = missile->X + missile->Type->G->Width / 2;
-		y = missile->Y + missile->Type->G->Height / 2;
+		x = missile->X + missile->Type->Width / 2;
+		y = missile->Y + missile->Type->Height / 2;
 		MakeMissile(missile->Type->SmokeMissile, x, y, x, y);
 	}
 	return 0;
@@ -950,8 +950,8 @@ void MissileHit(Missile* missile)
 		PlayMissileSound(missile, missile->Type->ImpactSound.Sound);
 	}
 
-	x = missile->X + missile->Type->G->Width / 2;
-	y = missile->Y + missile->Type->G->Height / 2;
+	x = missile->X + missile->Type->Width / 2;
+	y = missile->Y + missile->Type->Height / 2;
 
 	//
 	// The impact generates a new missile.
@@ -1212,8 +1212,8 @@ int ViewPointDistanceToMissile(const Missile* missile)
 	int x;
 	int y;
 
-	x = (missile->X + missile->Type->G->Width / 2) / TileSizeX;
-	y = (missile->Y + missile->Type->G->Height / 2) / TileSizeY;  // pixel -> tile
+	x = (missile->X + missile->Type->Width / 2) / TileSizeX;
+	y = (missile->Y + missile->Type->Height / 2) / TileSizeY;  // pixel -> tile
 
 	return ViewPointDistance(x, y);
 }
@@ -1581,11 +1581,11 @@ void MissileActionFire(Missile* missile)
 			unit->Burning = 0;
 		} else {
 			if (missile->Type != fire) {
-				missile->X += missile->Type->G->Width / 2;
-				missile->Y += missile->Type->G->Height / 2;
+				missile->X += missile->Type->Width / 2;
+				missile->Y += missile->Type->Height / 2;
 				missile->Type = fire;
-				missile->X -= missile->Type->G->Width / 2;
-				missile->Y -= missile->Type->G->Height / 2;
+				missile->X -= missile->Type->Width / 2;
+				missile->Y -= missile->Type->Height / 2;
 			}
 		}
 	}
@@ -1758,8 +1758,8 @@ void MissileActionWhirlwind(Missile* missile)
 	//
 	// Center of the tornado
 	//
-	x = (missile->X + TileSizeX / 2 + missile->Type->G->Width / 2) / TileSizeX;
-	y = (missile->Y + TileSizeY + missile->Type->G->Height / 2) / TileSizeY;
+	x = (missile->X + TileSizeX / 2 + missile->Type->Width / 2) / TileSizeX;
+	y = (missile->Y + TileSizeY + missile->Type->Height / 2) / TileSizeY;
 
 #if 0
 	Unit* table[UnitMax];
