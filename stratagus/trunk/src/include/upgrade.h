@@ -180,6 +180,9 @@ extern char ActionIdentAllowed(const Player* player,const char* sid );
 extern char UpgradeIdAllowed(const Player* player,  int id );
 extern char UpgradeIdentAllowed(const Player* player,const char* sid );
 
+    /// Check if the upgrade is researched.
+extern int UpgradeIdentAvailable(const Player* player,const char* ident);
+
 /*----------------------------------------------------------------------------
 --	eof
 ----------------------------------------------------------------------------*/

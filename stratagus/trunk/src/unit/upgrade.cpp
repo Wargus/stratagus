@@ -37,6 +37,7 @@
 #include "upgrade_structs.h"
 #include "upgrade.h"
 #include "player.h"
+#include "depend.h"
 #include "interface.h"
 
 #include "myendian.h"
@@ -76,8 +77,6 @@ local Upgrade* UpgradeHash[61];		/// lookup table for upgrade names
 local hashtable(Upgrade*,61) UpgradeHash;/// lookup table for upgrade names
 
 #endif
-
-local int AllowDone;			/// allow already setup.
 
 /**
 **	W*rCr*ft number to internal upgrade name.
@@ -1508,6 +1507,35 @@ global char UnitIdentAllowed(const Player * player, const char *sid)
 global char UpgradeIdentAllowed(const Player * player, const char *sid)
 {
     return UpgradeIdAllowed(player, UpgradeIdByIdent(sid));
+}
+
+/*----------------------------------------------------------------------------
+--	Check availablity
+----------------------------------------------------------------------------*/
+
+/**
+**	Check if upgrade (also spells) available for the player.
+**
+**	@param player	Player pointer.
+**	@param ident	Upgrade ident.
+*/
+global int UpgradeIdentAvailable(const Player* player,const char* ident)
+{
+    int allow;
+
+#if 0
+    //
+    //	Check dependencies
+    //
+    if( !CheckDependByIdent(player,ident) ) {
+	return 0;
+    }
+#endif
+    //
+    //	Allowed by level
+    //
+    allow=UpgradeIdentAllowed(player,ident);
+    return allow=='R' || allow=='X';
 }
 
 //@}
