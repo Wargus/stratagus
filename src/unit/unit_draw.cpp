@@ -1900,7 +1900,7 @@ global void DrawUnit(const Unit* unit)
 	Graphic* sprite;
 	ResourceInfo* resinfo;
 	ConstructionFrame* cframe;
-	const UnitType* type;
+	UnitType* type;
 	
 	if (unit->Type->Revealer) {				// Revealers are not drawn
 		DebugLevel3Fn("Drawing revealer %d\n" _C_ UnitNumber(unit));
@@ -1928,6 +1928,10 @@ global void DrawUnit(const Unit* unit)
 		constructed = unit->Seen.Constructed;
 		state = unit->Seen.State;
 		cframe = unit->Seen.CFrame;
+	}
+
+	if (!type->Sprite) {
+		LoadUnitTypeSprite(type);
 	}
 
 	if ((!UnitVisible(unit, ThisPlayer)) && frame == UnitNotSeen) {

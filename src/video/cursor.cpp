@@ -510,6 +510,9 @@ local void DrawBuildingCursor(void)
 	//
 	//		Draw building
 	//
+	if (!CursorBuilding->Sprite) {
+		LoadUnitTypeSprite(CursorBuilding);
+	}
 	frame = CursorBuilding->Animations->Still[0].Frame +
 		(CursorBuilding->Building ? 0 : CursorBuilding->NumDirections / 2 + 1 - 1);
 	PushClipping();

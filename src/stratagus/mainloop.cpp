@@ -408,6 +408,9 @@ local void DrawMapViewport(Viewport* vp)
 				y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y;
 				// FIXME: I should copy SourcePlayer for second level missiles.
 				if (missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player) {
+					if (!missiletable[j]->Type->Sprite) {
+						LoadMissileSprite(missiletable[j]->Type);
+					}
 					GraphicPlayerPixels(missiletable[j]->SourceUnit->Player,
 							missiletable[j]->Type->Sprite);
 				}
@@ -433,6 +436,9 @@ local void DrawMapViewport(Viewport* vp)
 			y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y;
 			// FIXME: I should copy SourcePlayer for second level missiles.
 			if (missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player) {
+				if (!missiletable[j]->Type->Sprite) {
+					LoadMissileSprite(missiletable[j]->Type);
+				}
 				GraphicPlayerPixels(missiletable[j]->SourceUnit->Player,
 					missiletable[j]->Type->Sprite);
 			}

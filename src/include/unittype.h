@@ -809,6 +809,7 @@ extern UnitType* NewUnitTypeSlot(char*);        /// Allocate an empty unit-type 
 extern void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);  /// Init unit-type table
+extern void LoadUnitTypeSprite(UnitType* unittype); /// Load the sprite for a unittype
 extern void LoadUnitTypes(void);                    /// Load the unit-type data
 extern void CleanUnitTypes(void);                   /// Cleanup unit-type module
 
