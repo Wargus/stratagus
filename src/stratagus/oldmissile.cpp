@@ -506,7 +506,7 @@ global void LoadMissileSprites(void)
 **
 **	@param ident	Identifier.
 **
-**	@returns	Missile type pointer.
+**	@return		Missile type pointer.
 */
 global MissileType* MissileTypeByIdent(const char* ident)
 {
@@ -531,14 +531,14 @@ global MissileType* MissileTypeByIdent(const char* ident)
 **	@param dx	Missile x destination point in pixel.
 **	@param dy	Missile y destination point in pixel.
 **
-**	@returns	created missile.
+**	@return		created missile.
 */
 global Missile* MakeMissile(MissileType* type,int sx,int sy,int dx,int dy)
 {
     Missile* missile;
 
     DebugLevel3Fn("type %Zd(%s) at %d,%d to %d,%d\n"
-	    ,type-MissileTypes,type->Name,sx,sy,dx,dy);
+	    ,type-MissileTypes,type->Ident,sx,sy,dx,dy);
 
     //
     //	Find free slot, FIXME: see MakeUnit for better code
@@ -595,7 +595,7 @@ found:
 **	@param goal_stats	Goal attributes.
 **	@param bloodlust	If attacker has bloodlust
 **
-**	@returns	damage produces on goal.
+**	@return			damage produces on goal.
 */
 local int CalculateDamageStats( const UnitStats* attacker_stats,
                                 const UnitStats* goal_stats,
@@ -631,7 +631,7 @@ local int CalculateDamageStats( const UnitStats* attacker_stats,
 **	@param attack_stats	Attacker attributes.
 **	@param goal		Goal unit.
 **	@param bloodlust	If attacker has bloodlust
-**	@returns	damage produces on goal.
+**	@return			damage produces on goal.
 */
 local int CalculateDamage( const UnitStats* attacker_stats,
                            const Unit* goal,
@@ -696,13 +696,14 @@ global void FireMissile(Unit* unit)
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
+#if 0
 	    // FIXME: should I clear this here?
 #ifdef NEW_ORDERS
 	    goal=unit->Orders[0].Goal=NULL;
 #else
 	    unit->Command.Data.Move.Goal=NULL;
 #endif
-
+#endif
 	    return;
 	}
 	if( goal->Removed ) {
