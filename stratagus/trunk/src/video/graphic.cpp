@@ -270,8 +270,10 @@ global void FlipGraphic(Graphic* g)
 
 	s = g->SurfaceFlip = SDL_ConvertSurface(g->Surface,
 		g->Surface->format, SDL_SWSURFACE);
-	SDL_SetColorKey(g->SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
-		g->Surface->format->colorkey);
+	if (g->Surface->format->colorkey) {
+		SDL_SetColorKey(g->SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
+			g->Surface->format->colorkey);
+	}
 	if (g->SurfaceFlip->format->BytesPerPixel == 1) {
 		VideoPaletteListAdd(g->SurfaceFlip);
 	}
@@ -354,7 +356,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 
 				c = i * w * 4 + j * 4;
 				if (bpp == 1) {
-					if (*sp == ckey) {
+					if (ckey && *sp == ckey) {
 						tex[c + 3] = 0;
 					} else {
 						p = graphic->Surface->format->palette->colors[*sp];
@@ -540,7 +542,9 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 		VideoPaletteListAdd(g->Surface);
 	}
 	SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
-	SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
+	if (ckey) {
+		SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
+	}
 
 	g->Width = w;
 	g->Height = h;
