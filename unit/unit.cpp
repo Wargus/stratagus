@@ -745,6 +745,7 @@ void PlaceUnit(Unit* unit, int x, int y)
 	Assert(unit->Removed);
 
 	if (unit->Container) {
+		MapUnmarkUnitSight(unit);
 		RemoveUnitFromContainer(unit);
 	}
 	unit->Next = 0;
