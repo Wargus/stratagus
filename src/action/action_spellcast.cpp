@@ -98,6 +98,7 @@ local void SpellMoveToTarget(Unit * unit)
     // when reached DoActionMove changes unit action
     // FIXME: use return codes from pathfinder
     goal = unit->Orders[0].Goal;
+
     if (goal && MapDistanceToUnit(unit->X, unit->Y, goal)
 	    <= unit->Orders[0].RangeX) {
 
@@ -120,8 +121,16 @@ local void SpellMoveToTarget(Unit * unit)
     } else if (err) {
 	// goal/spot out of range -- move to target
 	unit->Orders[0].Action=UnitActionStill;
-	unit->State = 0;
-	unit->SubAction = 0;
+	unit->State=unit->SubAction=0;
+
+	if( unit->Orders[0].Goal ) {	// Release references
+	    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
+	    if (!--unit->Orders[0].Goal->Refs) {
+		RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
+		ReleaseUnit(unit->Orders[0].Goal);
+	    }
+	    unit->Orders[0].Goal=NoUnitP;
+	}
     }
     DebugCheck(unit->Type->Vanishes || unit->Destroyed);
 }
