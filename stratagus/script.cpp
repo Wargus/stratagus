@@ -212,12 +212,12 @@ int LuaLoadFile(const char* file)
 	}
 
 	size = 10000;
-	buf = (char*)malloc(size);
+	buf = malloc(size);
 	location = 0;
 	while ((read = CLread(fp, &buf[location], size - location))) {
 		location += read;
 		size = size * 2;
-		buf = (char*)realloc(buf, size);
+		buf = realloc(buf, size);
 		if (!buf) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);

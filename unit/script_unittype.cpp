@@ -731,7 +731,7 @@ static int CclDefineUnitType(lua_State* l)
 			args = luaL_getn(l, -1);
 			for (j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				res = (ResourceInfo*)calloc(1, sizeof(ResourceInfo));
+				res = calloc(1, sizeof(ResourceInfo));
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}

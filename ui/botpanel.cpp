@@ -113,7 +113,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 	char buf[2048];
 	ButtonAction* ba;
 
-	ba = (ButtonAction*)malloc(sizeof(ButtonAction));
+	ba = malloc(sizeof(ButtonAction));
 	Assert(ba);
 
 	ba->Pos = pos;

@@ -708,9 +708,9 @@ SoundId RegisterTwoGroups(SoundId first, SoundId second)
 	if (first == NO_SOUND || second == NO_SOUND) {
 		return NO_SOUND;
 	}
-	id = (ServerSoundId)malloc(sizeof(*id));
+	id = malloc(sizeof(*id));
 	id->Number = TWO_GROUPS;
-	id->Sound.TwoGroups = (TwoGroups*)malloc(sizeof(TwoGroups));
+	id->Sound.TwoGroups = malloc(sizeof(TwoGroups));
 	id->Sound.TwoGroups->First = first;
 	id->Sound.TwoGroups->Second = second;
 	id->Range = MAX_SOUND_RANGE;

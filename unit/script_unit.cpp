@@ -1449,7 +1449,7 @@ static int CclSlotUsage(lua_State* l)
 	/* now walk through the bitfield and create the needed unit slots */
 	for (i = 0; i < SLOT_LEN * 8; ++i) {
 		if (SlotUsage[i / 8] & (1 << i % 8)) {
-			Unit* new_unit = (Unit*)calloc(1, sizeof(Unit));
+			Unit* new_unit = calloc(1, sizeof(Unit));
 			UnitSlotFree = (void*)UnitSlots[i];
 			UnitSlots[i] = new_unit;
 			new_unit->Slot = i;

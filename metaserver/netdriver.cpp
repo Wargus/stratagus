@@ -133,7 +133,7 @@ int InitServer(int port)
    		return -4;
 	}
 
-	if (!(Pool = (SessionPool*)calloc(1, sizeof(SessionPool)))) {
+	if (!(Pool = calloc(1, sizeof(SessionPool)))) {
 		fprintf(stderr, "Out of memory\n");
 		NetCloseTCP(MasterSocket);
 		NetExit();
@@ -219,7 +219,7 @@ static void AcceptConnections(void)
 			break;
 		}
 
-		new_session = (Session*)calloc(1, sizeof(Session));
+		new_session = calloc(1, sizeof(Session));
 		if (!new_session) {
 			fprintf(stderr, "ERROR: %s\n", strerror(errno));
 			break;

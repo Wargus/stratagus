@@ -2474,7 +2474,7 @@ static void SaveReplayOk(void)
 	sprintf(ptr, "log_of_stratagus_%d.log", ThisPlayer->Player);
 
 	stat(TempPathBuf, &s);
-	buf = (char*)malloc(s.st_size);
+	buf = malloc(s.st_size);
 	fd = fopen(TempPathBuf, "rb");
 	fread(buf, s.st_size, 1, fd);
 	fclose(fd);
@@ -2878,7 +2878,7 @@ static void JoinNetGameMenu(void)
 		server_host_buffer[24] = 0;
 		if (NetworkPort != NetworkDefaultPort) {
 			strcat(server_host_buffer, ":");
-			port = (char*)malloc(10);
+			port = malloc(10);
 			sprintf(port, "%d", NetworkPort);
 			strcat(server_host_buffer, port);
 			free(port);
@@ -5409,7 +5409,7 @@ static void InitTilesets(Menuitem* mi, int mapdefault)
 		free(mi->D.Pulldown.options);
 	}
 	n = NumTilesets + (mapdefault ? 1 : 0);
-	mi->D.Pulldown.options = (unsigned char**)malloc(n * sizeof(unsigned char*));
+	mi->D.Pulldown.options = malloc(n * sizeof(unsigned char*));
 	n = 0;
 	if (mapdefault) {
 		mi->D.Pulldown.options[n++] = strdup("Map Default");

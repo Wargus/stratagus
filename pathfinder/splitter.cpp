@@ -1122,7 +1122,7 @@ static void AllocateMapping(void)
 	int total;
 
 	total = TheMap.Info.MapWidth * TheMap.Info.MapHeight;
-	RegionMappingStorage = (RegionId*) malloc(sizeof(RegionId) * total);
+	RegionMappingStorage = malloc(sizeof(RegionId) * total);
 	NextFreeRegion = 0;
 	RegionCount = 0;
 	RegionMax = 0;
