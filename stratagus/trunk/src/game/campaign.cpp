@@ -53,6 +53,8 @@ global int NumCampaigns;		/// Number of campaigns
 
 global Campaign* CurrentCampaign;	/// Playing this campaign
 global CampaignChapter* CurrentChapter;	/// Playing this chapter of campaign
+local int SkipCurrentChapter=1;		/// Skip the current chapter when
+                                        /// looking for the next one
 
 /**
 **	Unit-type type definition
@@ -83,11 +85,23 @@ global char* NextChapter(void)
 	//
 	//  FIXME: do other chapter types.
 	//
-	do {
+	if( SkipCurrentChapter ) {
 	    CurrentChapter = CurrentChapter->Next;
-	} while (CurrentChapter && CurrentChapter->Type != ChapterPlayLevel);
+	}
+	while( CurrentChapter) {
+	    if( CurrentChapter->Type==ChapterShowPicture ) {
+		ShowPicture(CurrentChapter->Name);
+	    }
+	    else if( CurrentChapter->Type==ChapterPlayLevel ) {
+		break;
+	    }
+
+	    CurrentChapter = CurrentChapter->Next;
+	}
     }
-    // FIXME: handle defeat
+    else {
+	// FIXME: handle defeat
+    }
 
     if (!CurrentChapter) {
 	return NULL;
@@ -118,16 +132,16 @@ global void PlayCampaign(const char* name)
     if (!CurrentCampaign) {
 	return;
     }
+
     CurrentChapter = CurrentCampaign->Chapters;
+    SkipCurrentChapter=0;
+    GameResult=GameVictory;
 
-    //
-    //  FIXME: do other chapter types.
-    //
-    while (CurrentChapter && CurrentChapter->Type != ChapterPlayLevel) {
-	CurrentChapter = CurrentChapter->Next;
-    }
+    filename = NextChapter();
+    DebugCheck(!filename);
 
-    DebugCheck(!CurrentChapter);
+    SkipCurrentChapter=1;
+    GameResult=GameNoResult;
 
     // FIXME: Johns is this here needed? Can the map loaded in create game?
     // ARI: Yes - This switches the menu gfx.. from def. Orc to Human, etc
@@ -137,12 +151,12 @@ global void PlayCampaign(const char* name)
     //  For an alternative Method see network games..
     //  That way it should work finally..
 
-    filename = CurrentChapter->Name;
     s = NULL;
     // FIXME: LibraryFile here?
     if (filename[0] != '/' && filename[0] != '.') {
 	s = filename = strdcat3(FreeCraftLibPath, "/", filename);
     }
+
     //
     //  Load the map.
     //
