@@ -45,8 +45,8 @@
 #include <stdint.h>
 #endif // BSD
 
-#include "vorbis/codec.h"
-#include "vorbis/vorbisfile.h"
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
 #include "myendian.h"
 #include "iolib.h"
