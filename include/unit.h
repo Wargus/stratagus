@@ -726,7 +726,7 @@ extern int UnitVisibleOnMap(const Unit* unit);
 extern int UnitKnownOnMap(const Unit* unit);
 
     /// Returns true, if unit is visible on current map view
-extern int UnitVisibleInViewport (int v, const Unit * );
+extern int UnitVisibleInViewport(int v, const Unit*);
 
     /// FIXME: more docu
 extern int CheckUnitToBeDrawn(const Unit* unit);
