@@ -1454,6 +1454,8 @@ local void PudWriteREGM(gzFile f,const WorldMap* map)
 	} else if( f&MapFieldLandAllowed ) {
 	    v=MapActionLand;
 	}
+	regm[i] = v >> 0;
+	regm[i] = v >> 8;
     }
 
     gzwrite(f,regm,n*2);
