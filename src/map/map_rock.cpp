@@ -85,7 +85,7 @@ global void MapFixSeenRockTile(int x, int y)
     int ttdown;
     int ttleft;
     int ttright;
-    MapField *mf;
+    MapField* mf;
     
 
     //  Outside of map or no wood.
@@ -173,7 +173,7 @@ global void MapFixSeenRockTile(int x, int y)
     }
 
     // FIXME: can this only happen if seen?
-    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
+    if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	UpdateMinimapSeenXY(x, y);
 	MarkDrawPosMap(x, y);
 	MustRedraw |= RedrawMinimap;
@@ -229,7 +229,7 @@ global void MapFixRockTile(int x, int y)
     int ttdown;
     int ttleft;
     int ttright;
-    MapField *mf;
+    MapField* mf;
     
 
     //  Outside of map or no rock.
@@ -312,7 +312,7 @@ global void MapFixRockTile(int x, int y)
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
 
-	if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
+	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
 	    MarkDrawPosMap(x, y);
@@ -329,7 +329,7 @@ global void MapFixRockTile(int x, int y)
 */
 global void MapRemoveRock(unsigned x, unsigned y)
 {
-    MapField *mf;
+    MapField* mf;
 
     mf = TheMap.Fields + x + y * TheMap.Width;
 
@@ -340,7 +340,7 @@ global void MapRemoveRock(unsigned x, unsigned y)
     UpdateMinimapXY(x, y);
     MapFixRockNeighbors(x, y);
 
-    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
+    if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
 	MarkDrawPosMap(x, y);
