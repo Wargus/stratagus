@@ -42,6 +42,12 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "freecraft.h"
+
 #include "spells.h"
 #include "sound.h"
 #include "missile.h"
@@ -81,36 +87,41 @@
 /**
 **	Define the names and effects of all im play available spells.
 */
-global SpellType SpellTypeTable[] = {
+global SpellType SpellTypeTable[]
+#ifndef laterUSE_CCL
+	= {
 
 //TTL's below are in ticks: approx: 500=13sec, 1000=25sec, 2000=50sec
 
 // ident,		 	name,			range,mana,ttl, spell action,		  sound config
 //	---human paladins---
-{ "spell-holy-vision",		"holy vison",		0x7F,  70,  -1, SpellActionHolyVision	, { "holy vision" }    },
-{ "spell-healing",		"healing",		   6,	6,  -1, SpellActionHealing	, { "healing" }	       },
-{ "spell-exorcism",		"exorcism",		  10,	4,  -1, SpellActionExorcism	, { "exorcism" }       },
+{ "spell-holy-vision",		"holy vison",		0x7F,  70,  -1, SpellActionHolyVision	, { "holy vision", NULL }    , { NULL, NULL} },
+{ "spell-healing",		"healing",		   6,	6,  -1, SpellActionHealing	, { "healing", NULL }	     , { NULL, NULL} },
+{ "spell-exorcism",		"exorcism",		  10,	4,  -1, SpellActionExorcism	, { "exorcism", NULL }       , { NULL, NULL} },
 //	---human mages---						 ---human mages---
-{ "spell-fireball",		"fireball",		   8, 100,1000, SpellActionFireball	, { "fireball throw" } },
-{ "spell-slow",			"slow",			  10,  50,1000, SpellActionSlow		, { "slow" }	       },
-{ "spell-flame-shield",		"flame shield",		   6,  80, 600, SpellActionFlameShield	, { "flame shield" },	{ "missile-flame-shield" }   },
-{ "spell-invisibility",		"invisibility",		   6, 200,2000, SpellActionInvisibility , { "invisibility" }   },
-{ "spell-polymorph",		"polymorph",		  10, 200,  -1, SpellActionPolymorph	, { "polymorph" }      },
-{ "spell-blizzard",		"blizzard",		  12,  25,  -1, SpellActionBlizzard	, { "blizzard" }       },
+{ "spell-fireball",		"fireball",		   8, 100,1000, SpellActionFireball	, { "fireball throw", NULL } , { NULL, NULL} },
+{ "spell-slow",			"slow",			  10,  50,1000, SpellActionSlow		, { "slow", NULL }	     , { NULL, NULL} },
+{ "spell-flame-shield",		"flame shield",		   6,  80, 600, SpellActionFlameShield	, { "flame shield", NULL }   , { "missile-flame-shield", NULL } },
+{ "spell-invisibility",		"invisibility",		   6, 200,2000, SpellActionInvisibility , { "invisibility", NULL }   , { NULL, NULL} },
+{ "spell-polymorph",		"polymorph",		  10, 200,  -1, SpellActionPolymorph	, { "polymorph", NULL }      , { NULL, NULL} },
+{ "spell-blizzard",		"blizzard",		  12,  25,  -1, SpellActionBlizzard	, { "blizzard", NULL }       , { NULL, NULL} },
 //	---orc ogres---							 ---orc ogres---
-{ "spell-eye-of-kilrogg",	"eye of kilrogg",	   6,  70,  -1, SpellActionEyeOfKilrogg , { "eye of kilrogg" } },
-{ "spell-bloodlust",		"bloodlust",		   6,  50,1000, SpellActionBloodlust	, { "bloodlust" }      },
-{ "spell-runes",		"runes",		  10, 200,2000, SpellActionRunes	, { "runes" }	       },
+{ "spell-eye-of-kilrogg",	"eye of kilrogg",	   6,  70,  -1, SpellActionEyeOfKilrogg , { "eye of kilrogg", NULL } , { NULL, NULL} },
+{ "spell-bloodlust",		"bloodlust",		   6,  50,1000, SpellActionBloodlust	, { "bloodlust", NULL }      , { NULL, NULL} },
+{ "spell-runes",		"runes",		  10, 200,2000, SpellActionRunes	, { "runes", NULL }	     , { NULL, NULL} },
 //	---orc death knights---						 ---orc death knights-
-{ "spell-death-coil",		"death coil",		  10, 100,  -1, SpellActionDeathCoil	, { "death coil" }     },
-{ "spell-haste",		"haste",		   6,  50,1000, SpellActionHaste	, { "haste" }	       },
-{ "spell-raise-dead",		"raise dead",		   6,  50,  -1, SpellActionRaiseDead	, { "raise dead" }     },
-{ "spell-whirlwind",		"whirlwind",		  12, 100, 801, SpellActionWhirlwind	, { "whirlwind" }      },
-{ "spell-unholy-armor",		"unholy armor",		   6, 100, 500, SpellActionUnholyArmor	, { "unholy armour" }   },
-{ "spell-death-and-decay",	"death and decay",	  12,  25,  -1, SpellActionDeathAndDecay, { "death and decay" }},
+{ "spell-death-coil",		"death coil",		  10, 100,  -1, SpellActionDeathCoil	, { "death coil", NULL }     , { NULL, NULL} },
+{ "spell-haste",		"haste",		   6,  50,1000, SpellActionHaste	, { "haste", NULL }	     , { NULL, NULL} },
+{ "spell-raise-dead",		"raise dead",		   6,  50,  -1, SpellActionRaiseDead	, { "raise dead", NULL }     , { NULL, NULL} },
+{ "spell-whirlwind",		"whirlwind",		  12, 100, 801, SpellActionWhirlwind	, { "whirlwind", NULL }      , { NULL, NULL} },
+{ "spell-unholy-armor",		"unholy armor",		   6, 100, 500, SpellActionUnholyArmor	, { "unholy armour", NULL }  , { NULL, NULL} },
+{ "spell-death-and-decay",	"death and decay",	  12,  25,  -1, SpellActionDeathAndDecay, { "death and decay", NULL }, { NULL, NULL} },
 //	---eot marker---						 ---eot marker---
-{ NULL }
+{ NULL,				NULL,			   0,   0,   0, 0                       , { NULL, NULL}              , { NULL, NULL} }
 };
+#else
+    ;
+#endif
 
     /// How many spell-types are available
 local int SpellTypeCount;
@@ -499,7 +510,8 @@ global SpellType *SpellTypeById(int id)
 **	@return		=!0 if spell should/can casted, 0 if not
 */
 global int CanCastSpell(const Unit* unit, const SpellType* spell,
-    const Unit* target, int x, int y)
+    const Unit* target, int x __attribute__((unused)),
+    int y __attribute__((unused)))
 {
     DebugCheck(spell == NULL);
     DebugCheck(!unit->Type->CanCastSpell);	// NOTE: this must not happen

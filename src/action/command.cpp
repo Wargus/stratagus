@@ -629,7 +629,8 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 **	@param unit	pointer to unit.
 **	@param worker	pointer to unit.
 */
-global void CommandCancelBuilding(Unit* unit,Unit* worker)
+global void CommandCancelBuilding(Unit* unit,
+	Unit* worker __attribute__((unused)))
 {
     //
     //	Check if building is still under construction? (NETWORK!)
@@ -835,7 +836,8 @@ global void CommandReturnGoods(Unit* unit,Unit* goal,int flush)
 **	@param type	unit type to train.
 **	@param flush	if true, flush command queue.
 */
-global void CommandTrainUnit(Unit* unit,UnitType* type,int flush)
+global void CommandTrainUnit(Unit* unit,UnitType* type,
+	int flush __attribute__((unused)))
 {
     //
     //	Check if enough resources remains? (NETWORK!)

@@ -51,7 +51,9 @@ global char FancyBuildings;		/// Mirror buildings 1 yes, 0 now.
 **
 **	@todo FIXME: check if everything is initialized from ccl.
 */
-global UI TheUI = {
+global UI TheUI
+#if 1
+= {
     "default", 640, 480,		// interface selector
     100, 0, 100,			// contrast, brightness, saturation
 
@@ -62,6 +64,9 @@ global UI TheUI = {
     MOUSEADJUST,			// mouse speed
     MOUSESCALE,				// mouse scale
 };
+#else
+    ;
+#endif
 
 /**
 **	The available user interfaces.
@@ -74,7 +79,7 @@ global UI** UI_Table;
 /**
 **	Initialize the user interface.
 */
-global void InitUserInterface(char *RaceName)
+global void InitUserInterface(const char *RaceName)
 {
     int i;
     int best;

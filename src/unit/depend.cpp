@@ -417,7 +417,7 @@ local SCM CclDefineDependency(SCM list)
 */
 local SCM CclGetDependency(SCM target)
 {
-    DebugLevel0Fn("FIXME: write this\n");
+    DebugLevel0Fn("FIXME: write this %p\n",target);
 
     return SCM_UNSPECIFIED;
 }
@@ -431,7 +431,7 @@ local SCM CclGetDependency(SCM target)
 */
 local SCM CclCheckDependency(SCM target)
 {
-    DebugLevel0Fn("FIXME: write this\n");
+    DebugLevel0Fn("FIXME: write this %p\n",target);
 
     return SCM_UNSPECIFIED;
 }

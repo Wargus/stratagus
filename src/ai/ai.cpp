@@ -680,7 +680,7 @@ global void AiResearchComplete(Unit* unit,const Upgrade* what)
 **
 **	@param player	The player structure pointer.
 */
-global void AiEachFrame(Player* player)
+global void AiEachFrame(Player* player __attribute__((unused)))
 {
 }
 

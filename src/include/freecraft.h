@@ -93,42 +93,42 @@
 /**
 **	Print debug information of level 0.
 */
-#define DebugLevel0(fmt...)	printf(fmt##)
+#define DebugLevel0(fmt,args...)	printf(fmt,##args)
 
 /**
 **	Print debug information of level 1.
 */
-#define DebugLevel1(fmt...)	printf(fmt##)
+#define DebugLevel1(fmt,args...)	printf(fmt,##args)
 
 /**
 **	Print debug information of level 2.
 */
-#define DebugLevel2(fmt...)	printf(fmt##)
+#define DebugLevel2(fmt,args...)	printf(fmt,##args)
 
 /**
 **	Print debug information of level 3.
 */
-#define DebugLevel3(fmt...)	/* TURNED OFF: printf(fmt##) */
+#define DebugLevel3(fmt,args...)	/* TURNED OFF: printf(fmt,##args) */
 
 /**
 **	Print debug information of level 0 with function name.
 */
-#define DebugLevel0Fn(fmt...)	printf(__FUNCTION__": "fmt##)
+#define DebugLevel0Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
 
 /**
 **	Print debug information of level 1 with function name.
 */
-#define DebugLevel1Fn(fmt...)	printf(__FUNCTION__": "fmt##)
+#define DebugLevel1Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
 
 /**
 **	Print debug information of level 2 with function name.
 */
-#define DebugLevel2Fn(fmt...)	printf(__FUNCTION__": "fmt##)
+#define DebugLevel2Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
 
 /**
 **	Print debug information of level 3 with function name.
 */
-#define DebugLevel3Fn(fmt...)	/* TURNED OFF: printf(__FUNCTION__": "fmt##) */
+#define DebugLevel3Fn(fmt,args...)	/* TURNED OFF: printf(__FUNCTION__": "fmt,##args) */
 
 #else	// }{ DEBUG
 
@@ -302,7 +302,7 @@ enum MustRedraw_e {
 **	Show load progress.
 **	FIXME: Some time this should be shown in tile screen.
 */
-#define ShowLoadProgress(fmt...)	//printf(fmt##)
+#define ShowLoadProgress(fmt...)	//printf(fmt,##args)
 
     /// mainscreen width (default 640)
 extern int VideoWidth;
@@ -343,7 +343,6 @@ extern int Map2ScreenY(int y);		/// Convert map tile to screen pixel
 */
 #define MyRand()	rand()
 
-extern int FlagRevealMap;		/// Reveal map immediately
 extern char* TitleScreen;		/// file for title screen
 extern char* FreeCraftLibPath;		/// location of freecraft data
 
@@ -372,13 +371,6 @@ extern int SyncRand(void);
 extern int main1(int argc,char* argv[]);/// init freecraft.
 extern volatile void Exit(int err);	/// exit freecraft.
 
-extern void SetMessage( char* fmt, ... );
-extern void SetMessage2( int x, int y, char* fmt, ... );
-extern void SetMessageDup(const char* message);
-extern void SetMessageDupCat(const char* message);
-extern void CenterOnMessage();
-extern void SetStatusLine(char* status);
-extern void ClearStatusLine(void);
 extern void UpdateDisplay(void);
 extern void GameMainLoop(void);		/// game main loop
 

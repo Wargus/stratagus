@@ -31,6 +31,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "freecraft.h"
 #include "tileset.h"
@@ -941,7 +942,7 @@ local void SendCommand(int x,int y)
 **	@param num	Button number.
 **	@param button	Mouse Button pressed.
 */
-local void DoSelectionButtons(unsigned num,unsigned button)
+local void DoSelectionButtons(unsigned num,unsigned button __attribute__((unused)))
 {
     Unit* unit;
 
@@ -971,7 +972,7 @@ local void DoSelectionButtons(unsigned num,unsigned button)
 **
 **	@param button	Button pressed down.
 */
-local void UISelectStateButtonDown(unsigned button)
+local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 {
     int mx;
     int my;

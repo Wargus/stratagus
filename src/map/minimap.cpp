@@ -216,7 +216,7 @@ global void DestroyMinimap(void)
 **
 **	@note This one of the hot-points in the program optimize and optimize!
 */
-global void DrawMinimap(int vx,int vy)
+global void DrawMinimap(int vx __attribute__((unused)),int vy __attribute__((unused)))
 {
     static int RedPhase;
     int mx;
