@@ -1131,7 +1131,7 @@ global int UnitVisible(const Unit* unit, const Player* player)
 	if (unit->VisCount[cp]) {
 		return 1;
 	}
-	for (p = 0; p < PlayerMax; p++) {
+	for (p = 0; p < PlayerMax; ++p) {
 		if (PlayersShareVision(p, cp)) {
 			if (unit->VisCount[p]) {
 				return 1;
@@ -2889,18 +2889,18 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 }
 
 /*----------------------------------------------------------------------------
-  --		Conflicts
-  ----------------------------------------------------------------------------*/
+--  Conflicts
+----------------------------------------------------------------------------*/
 
 /**
-**		Returns the map distance between two points.
+**  Returns the map distance between two points.
 **
-**		@param x1		X map tile position.
-**		@param y1		Y map tile position.
-**		@param x2		X map tile position.
-**		@param y2		Y map tile position.
+**  @param x1  X map tile position.
+**  @param y1  Y map tile position.
+**  @param x2  X map tile position.
+**  @param y2  Y map tile position.
 **
-**		@return				The distance between in tiles.
+**  @return    The distance between in tiles.
 */
 global int MapDistance(int x1, int y1, int x2, int y2)
 {
@@ -2908,15 +2908,15 @@ global int MapDistance(int x1, int y1, int x2, int y2)
 }
 
 /**
-**		Returns the map distance between two points with unit type.
+**  Returns the map distance between two points with unit type.
 **
-**		@param x1		X map tile position.
-**		@param y1		Y map tile position.
-**		@param type		Unit type to take into account.
-**		@param x2		X map tile position.
-**		@param y2		Y map tile position.
+**  @param x1    X map tile position.
+**  @param y1    Y map tile position.
+**  @param type  Unit type to take into account.
+**  @param x2    X map tile position.
+**  @param y2    Y map tile position.
 **
-**		@return				The distance between in tiles.
+**  @return      The distance between in tiles.
 */
 global int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y2)
 {
@@ -2945,13 +2945,13 @@ global int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y
 }
 
 /**
-**		Returns the map distance to unit.
+**  Returns the map distance to unit.
 **
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
-**		@param dest		Distance to this unit.
+**  @param x     X map tile position.
+**  @param y     Y map tile position.
+**  @param dest  Distance to this unit.
 **
-**		@return				The distance between in tiles.
+**  @return      The distance between in tiles.
 */
 global int MapDistanceToUnit(int x, int y, const Unit* dest)
 {
@@ -2959,12 +2959,12 @@ global int MapDistanceToUnit(int x, int y, const Unit* dest)
 }
 
 /**
-**		Returns the map distance between two units.
+**  Returns the map distance between two units.
 **
-**		@param src		Distance from this unit.
-**		@param dst		Distance  to  this unit.
+**  @param src  Distance from this unit.
+**  @param dst  Distance  to  this unit.
 **
-**		@return				The distance between in tiles.
+**  @return     The distance between in tiles.
 */
 global int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
 {
@@ -3005,13 +3005,12 @@ global int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
 }
 
 /**
-**		Compute the distance from the view point to a given point.
+**  Compute the distance from the view point to a given point.
 **
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
+**  @param x  X map tile position.
+**  @param y  Y map tile position.
 **
-**		@todo
-**				FIXME: is it the correct place to put this function in?
+**  @todo FIXME: is it the correct place to put this function in?
 */
 global int ViewPointDistance(int x, int y)
 {
@@ -3026,12 +3025,11 @@ global int ViewPointDistance(int x, int y)
 }
 
 /**
-**		Compute the distance from the view point to a given unit.
+**  Compute the distance from the view point to a given unit.
 **
-**		@param dest		Distance to this unit.
+**  @param dest  Distance to this unit.
 **
-**		@todo
-**				FIXME: is it the correct place to put this function in?
+**  @todo FIXME: is it the correct place to put this function in?
 */
 global int ViewPointDistanceToUnit(const Unit* dest)
 {
@@ -3045,16 +3043,16 @@ global int ViewPointDistanceToUnit(const Unit* dest)
 }
 
 /**
-**		Can the source unit attack the destination unit.
+**  Can the source unit attack the destination unit.
 **
-**		@param source		Unit type pointer of the attacker.
-**		@param dest		Unit type pointer of the target.
+**  @param source  Unit type pointer of the attacker.
+**  @param dest    Unit type pointer of the target.
 */
 global int CanTarget(const UnitType* source, const UnitType* dest)
 {
 	int i;
 
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
+	for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
 		if (source->CanTargetFlag[i] != CONDITION_TRUE) {
 			if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
 				return 0;
@@ -3077,11 +3075,11 @@ global int CanTarget(const UnitType* source, const UnitType* dest)
 }
 
 /*----------------------------------------------------------------------------
-  --		SAVE/LOAD
-  ----------------------------------------------------------------------------*/
+--  SAVE/LOAD
+----------------------------------------------------------------------------*/
 
 /**
-**		Generate a unit reference, a printable unique string for unit.
+**  Generate a unit reference, a printable unique string for unit.
 */
 global char* UnitReference(const Unit* unit)
 {
@@ -3213,10 +3211,10 @@ global void SaveOrder(const Order* order, CLFile* file)
 }
 
 /**
-**		Save the state of an unit to file.
+**  Save the state of an unit to file.
 **
-**		@param unit		Unit pointer to be saved.
-**		@param file		Output file.
+**  @param unit  Unit pointer to be saved.
+**  @param file  Output file.
 */
 global void SaveUnit(const Unit* unit, CLFile* file)
 {
@@ -3325,10 +3323,10 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"flame-shield\", %d, ", unit->FlameShield);
 	CLprintf(file, "\"unholy-armor\", %d,\n  ", unit->UnholyArmor);
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
-			CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
-				UnitTypeVar.VariableName[i], unit->Variable[i].Value, unit->Variable[i].Max,
-				unit->Variable[i].Increase, unit->Variable[i].Enable ? "true" : "false");
+	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+		CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
+			UnitTypeVar.VariableName[i], unit->Variable[i].Value, unit->Variable[i].Max,
+			unit->Variable[i].Increase, unit->Variable[i].Enable ? "true" : "false");
 	}
 
 	CLprintf(file, "\"group-id\", %d,\n  ", unit->GroupId);
@@ -3469,7 +3467,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 		CLprintf(file, ",\n  \"goal\", %d", UnitNumber(unit->Goal));
 	}
 	if (unit->AutoCastSpell) {
-		for (i = 0; i < SpellTypeCount; i++) {
+		for (i = 0; i < SpellTypeCount; ++i) {
 			if (unit->AutoCastSpell[i]) {
 				CLprintf(file, ",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident);
 			}
@@ -3480,9 +3478,9 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 }
 
 /**
-**		Save state of units to file.
+**  Save state of units to file.
 **
-**		@param file		Output file.
+**  @param file  Output file.
 */
 global void SaveUnits(CLFile* file)
 {
@@ -3499,7 +3497,7 @@ global void SaveUnits(CLFile* file)
 
 #if 0
 	//
-	//		Local variables
+	//  Local variables
 	//
 	CLprintf(file, "(set-xp-damage! #%s)\n",
 		XpDamage ? "t" : "f");
@@ -3568,18 +3566,18 @@ global void SaveUnits(CLFile* file)
 }
 
 /*----------------------------------------------------------------------------
-  --		Initialize/Cleanup
-  ----------------------------------------------------------------------------*/
+--  Initialize/Cleanup
+----------------------------------------------------------------------------*/
 
 /**
-**		Initialize unit module.
+**  Initialize unit module.
 */
 global void InitUnits(void)
 {
 }
 
 /**
-**		Cleanup unit module.
+**  Clean up unit module.
 */
 global void CleanUnits(void)
 {
@@ -3587,7 +3585,7 @@ global void CleanUnits(void)
 	Unit* unit;
 
 	//
-	//		Free memory for all units in unit table.
+	//  Free memory for all units in unit table.
 	//
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		free((*table)->AutoCastSpell);
@@ -3597,7 +3595,7 @@ global void CleanUnits(void)
 	}
 
 	//
-	//		Release memory of units in release queue.
+	//  Release memory of units in release queue.
 	//
 	while ((unit = ReleasedHead)) {
 		ReleasedHead = unit->Next;

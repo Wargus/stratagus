@@ -1260,7 +1260,7 @@ global int GetVariableIndex(const char *VarName)
 {
 	int i;
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 		if (!strcmp(VarName, UnitTypeVar.VariableName[i])) {
 			return i;
 		}
@@ -1341,7 +1341,7 @@ local int CclDefineBoolFlags(lua_State* l)
 		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = strdup(str);
 	}
 	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
-		for (i = 0; i < NumUnitTypes; i++) { // adjust array for unit already defined
+		for (i = 0; i < NumUnitTypes; ++i) { // adjust array for unit already defined
 			UnitTypes[i]->BoolFlag = realloc(UnitTypes[i]->BoolFlag,
 				UnitTypeVar.NumberBoolFlag * sizeof((*UnitTypes)->BoolFlag));
 			UnitTypes[i]->CanTargetFlag = realloc(UnitTypes[i]->CanTargetFlag,
@@ -1372,7 +1372,7 @@ local int CclDefineDecorations(lua_State* l)
 	DecoVarType DecoVar;
 
 	nargs = lua_gettop(l);
-	for (i = 0; i < nargs; i++) {
+	for (i = 0; i < nargs; ++i) {
 		Assert(lua_istable(l, i + 1));
 		memset(&DecoVar, 0, sizeof(DecoVar));
 		lua_pushnil(l);
@@ -1483,7 +1483,7 @@ local int CclDefineDecorations(lua_State* l)
 			}
 			lua_pop(l, 1); // Pop the value
 		}
-		for (j = 0; j < UnitTypeVar.NumberDeco; j++) {
+		for (j = 0; j < UnitTypeVar.NumberDeco; ++j) {
 			if (DecoVar.Index == UnitTypeVar.DecoVar[j].Index) {
 				break;
 			}
@@ -1513,7 +1513,7 @@ global void InitDefinedVariables()
 	int i;
 
 	UnitTypeVar.VariableName = calloc(NVARALREADYDEFINED, sizeof(*UnitTypeVar.VariableName));
-	for (i = 0; i < NVARALREADYDEFINED; i++) {
+	for (i = 0; i < NVARALREADYDEFINED; ++i) {
 		UnitTypeVar.VariableName[i] = strdup(var[i]);
 	}
 	UnitTypeVar.Variable = calloc(i, sizeof(*UnitTypeVar.Variable));
