@@ -1247,6 +1247,7 @@ pawn:
 				    ,UnitTypeByWcNum(t),&Players[o]);
 			    if( unit->Type->GoldMine || unit->Type->GivesOil
 				    || unit->Type->OilPatch ) {
+				DebugCheck( !v );
 				unit->Value=v*2500;
 			    } else {	
 				// active/inactive AI units!!
