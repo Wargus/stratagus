@@ -104,7 +104,7 @@ typedef struct _player_ Player;
 typedef struct _viewport_ Viewport;
 #endif
 
-#if !defined(__STRUCT_MISSILETYPE__ ) && !defined(DOXYGEN)
+#if !defined(__STRUCT_MISSILETYPE__) && !defined(DOXYGEN)
 #define __STRUCT_MISSILETYPE__
 typedef struct _missile_type_ MissileType;
 #endif
@@ -326,8 +326,8 @@ extern unsigned SyncRandSeed;               ///< Sync random seed value
 extern unsigned long GameCycle;             ///< Game simulation cycle counter
 extern unsigned long FastForwardCycle;      ///< Game Replay Fast Forward Counter
 
-extern void LoadGame(char*);                ///< Load saved game back
-extern void SaveGame(const char*);          ///< Save game for later load
+extern void LoadGame(char* filename);       ///< Load saved game back
+extern void SaveGame(const char* filename); ///< Save game for later load
 extern int SaveGameLoading;                 ///< Save game is in progress of loading
 
 extern void LoadAll(void);                  ///< Load all data back

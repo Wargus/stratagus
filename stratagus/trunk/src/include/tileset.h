@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-// T H E   W A R   B E G I N S
-// Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name tileset.h - The tileset headerfile. */
 //
-// (c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 #ifndef __TILESET_H__
 #define __TILESET_H__
@@ -38,7 +38,6 @@
 ----------------------------------------------------------------------------*/
 
 #include "util.h"
-#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -321,7 +320,7 @@ typedef struct _tileset_ {
 	unsigned HumanWallTable[16];    ///< Human wall placement table
 	unsigned OrcWallTable[16];      ///< Orc wall placement table
 
-	hashtable(char*,128) ItemsHash; ///< Items hash table
+	hashtable(char*, 128) ItemsHash;///< Items hash table
 } Tileset;
 
 /// @todo this #define's should be removed
@@ -334,7 +333,7 @@ enum _tileset_nr_ {
 };
 
 /*----------------------------------------------------------------------------
--- Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 extern char** TilesetWcNames; ///< Mapping wc-number 2 symbol
@@ -343,7 +342,7 @@ extern int NumTilesets;     ///< Number of available tilesets
 extern Tileset** Tilesets;  ///< Tileset information
 
 /*----------------------------------------------------------------------------
--- Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 extern void LoadTileset(void);   ///< Load tileset definition
