@@ -266,7 +266,7 @@ global void InitUnit(Unit* unit, UnitType* type)
     //  Initialise unit structure (must be zero filled!)
     //
     unit->Type = type;
-    unit->SeenFrame = 0xFF;		// Unit isn't yet seen
+    unit->SeenFrame = UnitNotSeen;		// Unit isn't yet seen
 
     // FIXME: this is not needed for load+save, must move to other place
     if (1) {				// Call CCL for name generation
@@ -543,7 +543,7 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 	//	fancy buildings: mirror buildings (but shadows not correct)
 	//
 	if ( FancyBuildings && unit->Rs > 50 ) {
-	    unit->Frame |= 128;
+	    unit->Frame = -unit->Frame;
 	}
     }
 
@@ -1057,7 +1057,7 @@ global int UnitKnownOnMap(const Unit* unit)
     for( ; h-->0; ) {
 	for( w=w0; w-->0; ) {
 	    if( IsMapFieldVisible(x+w,y+h)
-		    || (unit->Type->Building && unit->SeenFrame!=0xFF
+		    || (unit->Type->Building && unit->SeenFrame!=UnitNotSeen
 			&& IsMapFieldExplored(x+w,y+h)) ) {
 		return 1;
 	    }
@@ -1131,7 +1131,7 @@ global int UnitVisibleInViewport (int v, const Unit* unit)
     for( ; h-->0; ) {
 	for( w=w0; w-->0; ) {
 	    if( IsMapFieldVisible(x+w,y+h)
-		    || (unit->Type->Building && unit->SeenFrame!=0xFF
+		    || (unit->Type->Building && unit->SeenFrame!=UnitNotSeen
 			&& IsMapFieldExplored(x+w,y+h)) ) {
 		return 1;
 	    }
@@ -1210,7 +1210,7 @@ global int UnitVisibleOnScreen(const Unit* unit)
     for( ; h-->0; ) {
 	for( w=w0; w-->0; ) {
 	    if( IsMapFieldVisible(x+w,y+h)
-		    || (unit->Type->Building && unit->SeenFrame!=0xFF
+		    || (unit->Type->Building && unit->SeenFrame!=UnitNotSeen
 			&& IsMapFieldExplored(x+w,y+h)) ) {
 		return 1;
 	    }
@@ -1804,17 +1804,22 @@ global int DirectionToHeading(int delta_x,int delta_y)
 global void UnitUpdateHeading(Unit* unit)
 {
     int dir;
+    int nextdir;
 
-    // FIXME: depends on the possible unit directions wc 8, sc 32
-    unit->Frame&=127;
-    unit->Frame/=5;
-    unit->Frame*=5;		// Remove heading, keep animation frame
-    dir=((unit->Direction+NextDirection/2)&0xFF)/NextDirection;
-    if( dir<=LookingS/NextDirection ) {	// north->east->south
+    if( unit->Frame<0 ) {
+	unit->Frame=-unit->Frame;
+    }
+    unit->Frame/=unit->Type->NumDirections/2+1;
+    unit->Frame*=unit->Type->NumDirections/2+1;
+    // Remove heading, keep animation frame
+
+    nextdir=256/unit->Type->NumDirections;
+    dir=((unit->Direction+nextdir/2)&0xFF)/nextdir;
+    if( dir<=LookingS/nextdir ) {	// north->east->south
 	unit->Frame+=dir;
     } else {
-	// Note: 128 is the flag for flip graphic in X.
-	unit->Frame+=128+256/NextDirection-dir;
+	unit->Frame+=256/nextdir-dir;
+	unit->Frame=-unit->Frame;
     }
 }
 
@@ -3856,10 +3861,10 @@ global void SaveUnit(const Unit* unit,FILE* file)
 #endif
     fprintf(file,"'pixel '(%d %d) ",unit->IX,unit->IY);
     fprintf(file,"'%sframe %d ",
-	    unit->Frame&128 ? "flipped-" : "" ,unit->Frame&127);
-    if( unit->SeenFrame!=0xFF ) {
+	    unit->Frame<0 ? "flipped-" : "" ,unit->Frame<0?-unit->Frame:unit->Frame);
+    if( unit->SeenFrame!=UnitNotSeen ) {
 	fprintf(file,"'%sseen %d ",
-		unit->SeenFrame&128 ? "flipped-" : "" ,unit->SeenFrame&127);
+		unit->SeenFrame<0 ? "flipped-" : "" ,unit->SeenFrame<0?-unit->SeenFrame:unit->SeenFrame);
     } else {
 	fprintf(file,"'not-seen ");
     }

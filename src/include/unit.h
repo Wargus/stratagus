@@ -142,7 +142,7 @@
 **	Unit::SeenFrame
 **
 **		Graphic image (see Unit::Frame) what the player on this
-**		computer has last seen. If -1 (0xFF) the player haven't seen
+**		computer has last seen. If UnitNotSeen the player haven't seen
 **		this unit yet.
 **
 **	Unit::Direction
@@ -455,6 +455,7 @@ enum _directions_ {
 };
 
 #define NextDirection	32		/// Next direction N->NE->E...
+#define UnitNotSeen	0x7fffffff	/// Unit not seen, used by Unit::SeenFrame
 
     /// The big unit structure
 struct _unit_ {
@@ -478,8 +479,8 @@ struct _unit_ {
     UnitColors	Colors;			/// Player colors
     char	IX;			/// X image displacement to map position
     char	IY;			/// Y image displacement to map position
-    unsigned	Frame : 8;		/// Image frame: high bit used for flip
-    unsigned	SeenFrame : 8;		/// last seen frame/stage of buildings
+    int		Frame;			/// Image frame: <0 is mirrored
+    int		SeenFrame;		/// last seen frame/stage of buildings
 
     unsigned	Direction : 8;		/// angle (0-255) unit looking
 
