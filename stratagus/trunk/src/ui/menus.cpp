@@ -1333,6 +1333,7 @@ local void FcDeleteInit(Menuitem *mi)
     menu = FindMenu("menu-save-game");
     strcpy(name, "the file: ");
     strcat(name, menu->items[1].d.input.buffer);
+    name[strlen(name) - 3] = '\0';
     mi->menu->items[2].d.text.text = name;
 }
   
@@ -1348,6 +1349,7 @@ local void FcDeleteOk(void)
     strcpy(name, SaveDir);
     strcat(name, "/");
     strcat(name, menu->items[1].d.input.buffer);
+    name[strlen(name) - 3] = '\0';
     unlink(name);
     EndMenu();
     *menu->items[1].d.input.buffer = '\0';
