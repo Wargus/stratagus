@@ -1827,8 +1827,6 @@ local void SetCdPower(Menuitem *mi)
     /// Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
-	if (SDL_CDStatus(CDRom) <= 1)
-	    SoundOptionsMenuItems[17].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
     /// Stop Playing CD
         SDL_CDStop(CDRom);
