@@ -520,7 +520,7 @@ global const char* IdentOfIcon(IconId icon)
 **	@param x	X display position
 **	@param y	Y display position
 */
-global void DrawUnitIcon(const void* player,IconId icon,unsigned flags
+global void DrawUnitIcon(const Player* player,IconId icon,unsigned flags
 	,unsigned x,unsigned y)
 {
     int color;

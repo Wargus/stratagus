@@ -212,7 +212,7 @@ global void DrawUnitInfo(const Unit* unit)
 	//
 	if( unit->Orders[0].Action==UnitActionBuilded ) {
 	    if( !OriginalBuilding ) {
-		DrawUnitIcon(unit->Data.Builded.Worker
+		DrawUnitIcon(unit->Data.Builded.Worker->Player
 			,unit->Data.Builded.Worker->Type->Icon.Icon
 			,0,x+107,y+8+70);
 	    }
