@@ -390,6 +390,9 @@
 
 typedef struct _unit_ Unit;            ///< unit itself
 typedef enum _unit_action_ UnitAction; ///< all possible unit actions
+#ifdef USE_OPENGL
+struct _graphic_;
+#endif
 struct _unit_type_;
 struct _unit_stats_;
 struct _spell_type_;
@@ -943,8 +946,8 @@ extern void DrawShadow(const Unit* unit, const struct _unit_type_* type, int fra
 extern void DrawUnit(const Unit* unit);
 #ifdef USE_OPENGL
 	/// Draw the sprite with the player colors
-extern void DrawUnitPlayerColor(const struct _unit_type_* type, Graphic* sprite, Graphic** glsprite,
-	int player, int frame, int x, int y);
+extern void DrawUnitPlayerColor(const struct _unit_type_* type, struct _graphic_* sprite, 
+	struct _graphic_** glsprite, int player, int frame, int x, int y);
 #endif
 	/// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const Viewport* vp, Unit** table);
