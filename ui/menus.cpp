@@ -3612,9 +3612,9 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
     //
     if (!*CurrentMapPath || *CurrentMapPath == '.' || *CurrentMapPath == '/') {
 #if 0					// FIXME: as soon as .cm is supported..
-	strcpy(CurrentMapPath, "default.cm");
+	strcpy(CurrentMapPath, "puds/default.cm");
 #endif
-	strcpy(CurrentMapPath, "default.pud");
+	strcpy(CurrentMapPath, "puds/default.pud");
 
     }
 
