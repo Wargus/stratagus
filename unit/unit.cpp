@@ -141,7 +141,9 @@ global void FreeUnitMemory(Unit* unit)
 global void RefsIncrease(Unit* unit)
 {
 	RefsDebugCheck(!unit->Refs || unit->Destroyed);
-	++unit->Refs;
+	if (!SaveGameLoading) {
+		++unit->Refs;
+	}
 }
 
 /**
@@ -152,13 +154,15 @@ global void RefsIncrease(Unit* unit)
 global void RefsDecrease(Unit* unit)
 {
 	RefsDebugCheck(!unit->Refs);
-	if (unit->Destroyed) {
-		if (!--unit->Refs) {
-			ReleaseUnit(unit);
+	if (!SaveGameLoading) {
+		if (unit->Destroyed) {
+			if (!--unit->Refs) {
+				ReleaseUnit(unit);
+			}
+		} else {
+			--unit->Refs;
+			RefsDebugCheck(!unit->Refs);
 		}
-	} else {
-		--unit->Refs;
-		RefsDebugCheck(!unit->Refs);
 	}
 }
 
@@ -192,7 +196,7 @@ global void ReleaseUnit(Unit* unit)
 
 		if (--unit->Refs > 0) {
 			DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle _C_
-			UnitNumber(unit) _C_ unit->Refs);
+				UnitNumber(unit) _C_ unit->Refs);
 			return;
 		}
 	}
@@ -217,7 +221,7 @@ global void ReleaseUnit(Unit* unit)
 
 	unit->Next = 0;
 	ReleasedTail = &unit->Next;
-	unit->Refs = GameCycle + NetworkMaxLag;		// could be reuse after this time
+	unit->Refs = GameCycle + (NetworkMaxLag << 1);	// could be reuse after this time
 	DebugLevel2Fn("%lu:No more references, only wait for network lag, unit %d\n" _C_
 		GameCycle _C_ UnitNumber(unit));
 	unit->Type = 0; 						// for debugging.
@@ -285,13 +289,8 @@ global void InitUnit(Unit* unit, UnitType* type)
 
 	DebugCheck(!type);
 
-	// Refs need to be *increased* by 1, not *set* to 1, because if InitUnit()
-	// is called from game loading code, Refs can already have a nonzero
-	// value (thanks to forward references in the save file).  Incrementing
-	// should not matter during in-game unit creation because in that case
-	// Refs is 0 anyway.
-
-	++unit->Refs;
+	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
+	unit->Refs = 1;
 
 	//
 	//  Build all unit table
@@ -3073,7 +3072,7 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 				0, 0);
 			missile->SourceUnit = target;
 			target->Burning = 1;
-			target->Refs++;
+			RefsIncrease(target);
 		}
 	}
 
