@@ -149,11 +149,13 @@ typedef struct _palette_link_ PaletteLink;
 **	Links all palettes together to join the same palettes.
 */
 struct _palette_link_ {
-    PaletteLink*	Next;		/// Next palette
-    SDL_Palette*	Palette;	/// Palette in hardware format
-    long		Checksum;	/// Checksum for quick lookup
-    int			RefCount;	/// Reference counter
+    PaletteLink*	Prev;		/// Previous palette
+    SDL_Surface*	Surface;	/// Surface that contains palette
 };
+
+extern PaletteLink* PaletteList;	/// List of all used palettes loaded
+
+extern void VideoPaletteListAdd(SDL_Surface* surface);
 
     /**
     **	Video synchronization speed. Synchronization time in percent.
