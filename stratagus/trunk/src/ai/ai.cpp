@@ -212,11 +212,12 @@ global void AiInit(Player* player)
     //	Search correct AI type.
     //
     while( (!ait->Race || strcmp(ait->Race,player->RaceName))
-	    && (!ainame || strcmp(ainame,ait->Class)) ) {
+	    || (!ainame || strcmp(ainame,ait->Class)) ) {
 	ait=ait->Next;
 	DebugCheck( !ait );
     }
-    DebugLevel0Fn("AI: %s with %s\n", player->RaceName, ainame );
+    DebugLevel0Fn("AI: %s with %s\n", ait->Race ? ait->Race: player->RaceName,
+	    ainame );
 
     pai->AiType=ait;
     pai->Script=ait->Script;

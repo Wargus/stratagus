@@ -467,10 +467,10 @@ local void InsertResearchRequests(Upgrade* upgrade)
 */
 local SCM CclAiDebug(SCM flag)
 {
-    if( gh_eq_p(flag,SCM_BOOL_T) ) {
-	AiPlayer->ScriptDebug=1;
-    } else {
+    if( gh_eq_p(flag,SCM_BOOL_F) ) {
 	AiPlayer->ScriptDebug=0;
+    } else {
+	AiPlayer->ScriptDebug=1;
     }
     return SCM_BOOL_F;
 }
