@@ -61,7 +61,7 @@
 **	UnitType::Name
 **
 **		Pretty name shown by the engine. The name should be shorter
-**		than 17 characters and no word can be longer than 8 characters. 
+**		than 17 characters and no word can be longer than 8 characters.
 **
 **	UnitType::SameSprite
 **
@@ -70,7 +70,7 @@
 **	UnitType::File[::TilesetMax]
 **
 **		Path file name of sprite files for the different tilesets.
-**		@note It is planned to change this to support more and 
+**		@note It is planned to change this to support more and
 **		better tilesets.
 **
 **	UnitType::SpriteFile
@@ -403,7 +403,7 @@
 **		Only valid for buildings. When building the worker will
 **		remain outside inside the building.
 **
-**		WARNING: Workers that can build buildings with the 
+**		WARNING: Workers that can build buildings with the
 **		WARNING: BuilderOutside flag must have the CanRepair flag.
 **
 **	UnitType::BuilderLost
@@ -461,11 +461,6 @@
 **		Type as number
 **		FIXME: Should us a general name f.e. Slot here?
 **
-**	UnitType::Property
-**
-**		CCL property storage
-**		FIXME: how is this used at runtime?
-**
 **	UnitType::Sprite
 **
 **		Sprite images
@@ -497,7 +492,7 @@
 **		The harvester's animation file will change when it's loaded.
 **
 **	ResourceInfo::FileWhenEmpty;
-**	
+**
 **		The harvester's animation file will change when it's empty.
 **		The standard animation is used only when building/repairing.
 **
@@ -625,7 +620,7 @@ typedef struct _resource_info_ {
     int 	ResourceCapacity;		/// Max amount of resources to carry.
     unsigned 	WaitAtDepot;			/// Cycles the unit waits while returning.
     unsigned	ResourceId;			/// Id of the resource harvested. Redundant.
-    unsigned 	FinalResource;			/// Convert resource when delivered. 
+    unsigned 	FinalResource;			/// Convert resource when delivered.
     unsigned 	TerrainHarvester;		/// Unit will harvest terrain(wood only for now).
     unsigned	LoseResources;			/// The unit will lose it's resource when distracted.
     //  Runtime info:
@@ -779,8 +774,6 @@ struct _unit_type_ {
 
 	// FIXME: Should us a general name f.e. Slot here?
     int		Type;			/// Type as number
-
-    void*	Property;		/// CCL property storage
 
     Graphic*	Sprite;			/// Sprite images
     Graphic*	ShadowSprite;		/// Shadow sprite image
