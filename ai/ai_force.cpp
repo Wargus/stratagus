@@ -146,7 +146,7 @@ global int AiFindAvailableUnitTypeEquiv(const UnitType * unittype,int * usableTy
 
     // 2 - Remove unavailable unittypes
     for (i = 0; i < usableTypesCount; ) {
-	if (! CheckDependByIdent(AiPlayer->Player, UnitTypes[usableTypes[i]]->Ident)) {
+	if (!CheckDependByIdent(AiPlayer->Player, UnitTypes[usableTypes[i]]->Ident)) {
 	    // Not available, remove it
 	    usableTypes[i] = usableTypes[usableTypesCount - 1];
 	    usableTypesCount--;
@@ -251,7 +251,8 @@ global void AiForceTransfert(int src, int dst)
     AiUnit *aiunit;
     int type;
     int counter[UnitTypeMax + 1];
-
+    int missing;
+    
     //
     //  Count units in dest force.
     //
@@ -260,8 +261,9 @@ global void AiForceTransfert(int src, int dst)
     //
     //  Check the dest force requirements.
     //    
-    if (AiForceSubstractWant(dst, counter) == 0) {
-	// Nothing missing => abort.
+    if ((missing = AiForceSubstractWant(dst, counter)) == 0) {
+	// Nothing missing => mark completed & abort.
+	AiPlayer->Force[dst].Completed = 1;
 	return;
     }
 
@@ -278,6 +280,75 @@ global void AiForceTransfert(int src, int dst)
 	    AiPlayer->Force[dst].Units = aiunit;
 
 	    counter[type]++;
+	    missing--;
+	    
+	    if (!missing) {
+		AiPlayer->Force[dst].Completed = 1;
+		return;
+	    }
+	} else {
+	    // Just iterate
+	    prev = &aiunit->Next;
+	}
+    }
+}
+
+/**
+**	Complete dst force with overflow units in src force.
+**
+**	FIXME : should check that unit can reach dst force's hotspot.
+**
+**	@param src the force from which units are taken
+**	@param dst the force into which units go
+*/
+global void AiForceTransfertOverflow(int src, int dst)
+{
+    AiUnit **prev;
+    AiUnit *aiunit;
+    int type;
+    int counter[UnitTypeMax + 1];
+    int overflow[UnitTypeMax + 1];
+    int missing;
+
+    //
+    //  Count units in dest force.
+    //
+    AiForceCountUnits(dst, counter);
+
+    //
+    //  Check the dest force requirements.
+    //    
+    if ((missing = AiForceSubstractWant(dst, counter)) == 0) {
+	// Nothing missing => abort.
+	AiPlayer->Force[dst].Completed = 1;
+	return;
+    }
+
+    //
+    //	Find overflow units in src force
+    //
+    AiForceCountUnits(src, overflow);
+    AiForceSubstractWant(src, overflow);
+    
+    // Iterate the source force, moving needed units into dest...
+    prev = &AiPlayer->Force[src].Units;
+    while (*prev) {
+	aiunit = (*prev);
+	type = UnitTypeEquivs[aiunit->Unit->Type->Type];
+	if (counter[type] < 0 && overflow[type] > 0) {
+	    // move in dest force...
+	    *prev = aiunit->Next;
+
+	    aiunit->Next = AiPlayer->Force[dst].Units;
+	    AiPlayer->Force[dst].Units = aiunit;
+
+	    counter[type]++;
+	    overflow[type]--;
+	    missing--;
+	    if (!missing) {
+		AiPlayer->Force[dst].Completed = 1;
+		return;
+	    }
 	} else {
 	    // Just iterate
 	    prev = &aiunit->Next;
@@ -494,24 +565,39 @@ global void AiAssignToForce(Unit * unit)
 */
 global void AiForceComplete(int force)
 {
-    int j;
+    int j, overflowonly;;
 
     for (j = 0; j < AI_MAX_FORCES; ++j) {
 	// Don't complete with self ...
 	if (j == force) {
 	    continue;
 	}
+
 	// Complete only with "reusable" forces.
 	if (!AiPlayer->Force[j].UnitsReusable) {
 	    continue;
 	}
+
 	// Honor "populate from attack" 
 	if ((AiPlayer->Force[force].PopulateMode == AiForcePopulateFromAttack) &&
 	    (!AiPlayer->Force[j].Role == AiForceRoleAttack)) {
-	    continue;
+
+	    // Use overflow from force 0...
+	    if (j == 0) {
+		overflowonly = 1;
+	    } else {
+	    	continue;
+	    }
+	} else {
+	    overflowonly = 0;
 	}
+
 	// Complete the force automatically...
-	AiForceTransfert(j, force);
+	if (!overflowonly) {
+	    AiForceTransfert(j, force);
+	} else {
+	    AiForceTransfertOverflow(j, force);
+	}
 
 	if (AiPlayer->Force[force].Completed) {
 	    break;
