@@ -19,7 +19,6 @@
 -->
     <title>Stratagus Configuration Language Description: Triggers</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
-    <meta name="Author" content="johns98@gmx.net">
     <meta name="Keyword" content="ccl,tileset">
     <meta name="Description" content="">
 </head>
@@ -54,7 +53,7 @@
 <a href="#ActionWait">ActionWait</a>
 <a href="#AddTrigger">AddTrigger</a>
 <a href="#IfNearUnit">IfNearUnit</a>
-<a href="#IfOpponents">IfOpponents</a>
+<a href="#GetNumOpponents">GetNumOpponents</a>
 <a href="#IfRescuedNearUnit">IfRescuedNearUnit</a>
 <a href="#IfTimer">IfTimer</a>
 <a href="#IfUnit">IfUnit</a>
@@ -336,35 +335,22 @@ unit-name    Unit type of this name
 IfNearUnit("this", "==", 6, "unit-archer", "unit-circle-of-power")
 </pre>
 
-<a name="IfOpponents"></a>
-<h3>IfOpponents(player, op, quantity)</h3>
+<a name="GetNumOpponents"></a>
+<h3>GetNumOpponents(player, op, quantity)</h3>
 
-Return true when number of opponent's of the player "op" quantity is true.
-
+Returns the number of opponent's for the given player.
 
 <dl>
   <dt>player</dt>
   <dd><pre>
 0 .. 16     Player number
-"any"       Matches any player
-"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-  <dt>op</dt>
-  <dd><pre>
-"=="         operator equal
-"&gt;"          operator greater than
-"&gt;="         operator greater than or equal
-"&lt;"          operator less than
-"&lt;="         operator less than or equal
-</pre></dd>
-  <dt>quantity</dt>
-  <dd>Number to compare with number of opponent.</dd>
-</dl>
 
 <h4>Example</h4>
 <pre>
--- True when player of the console doesn't have opponent
-IfOpponents("this", "==", 0)
+-- You win when you have no opponents left.
+if (GetNumOpponents(GetThisPlayer()) == 0) then
+     ActionVictory()
 </pre>
 
 <a name="IfRescuedNearUnit"></a>

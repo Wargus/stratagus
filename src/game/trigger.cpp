@@ -552,60 +552,30 @@ static int CclIfRescuedNearUnit(lua_State* l)
 }
 
 /**
-**  Player has n opponents left.
+**  Returns the number of opponents of a given player.
 */
-static int CclIfOpponents(lua_State* l)
+static int CclGetNumOpponents(lua_State* l)
 {
 	int plynr;
-	int q;
-	int pn;
 	int n;
-	const char* op;
-	CompareFunction compare;
+	int i;
 
-	if (lua_gettop(l) != 3) {
+	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
 
-	lua_pushvalue(l, 1);
-	plynr = TriggerGetPlayer(l);
-	lua_pop(l, 1);
-	op = LuaToString(l, 2);
-	q = LuaToNumber(l, 3);
+	plynr = LuaToNumber(l, 1);
 
-	compare = GetCompareFunction(op);
-	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-opponents: %s" _C_ op);
-	}
-
-	if (plynr == -1) {
-		plynr = 0;
-		pn = PlayerMax;
-	} else {
-		pn = plynr + 1;
-	}
-
-	//
 	// Check the player opponents
-	//
-	for (n = 0; plynr < pn; ++plynr) {
-		int i;
-
-		for (i = 0; i < PlayerMax; ++i) {
-			//
-			// This player is our enemy and has units left.
-			//
-			if ((Players[i].Enemy & (1 << plynr)) && Players[i].TotalNumUnits) {
-				++n;
-			}
-		}
-		if (compare(n, q)) {
-			lua_pushboolean(l, 1);
-			return 1;
+	n = 0;
+	for (i = 0; i < PlayerMax; ++i) {
+		// This player is our enemy and has units left.
+		if ((Players[i].Enemy & (1 << plynr)) && Players[i].TotalNumUnits) {
+			++n;
 		}
 	}
 
-	lua_pushboolean(l, 0);
+	lua_pushnumber(l, n);
 	return 1;
 }
 
@@ -951,7 +921,7 @@ void TriggerCclRegister(void)
 	lua_register(Lua, "IfUnitAt", CclIfUnitAt);
 	lua_register(Lua, "IfNearUnit", CclIfNearUnit);
 	lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
-	lua_register(Lua, "IfOpponents", CclIfOpponents);
+	lua_register(Lua, "GetNumOpponents", CclGetNumOpponents);
 	lua_register(Lua, "IfTimer", CclIfTimer);
 	// Actions
 	lua_register(Lua, "ActionVictory", CclActionVictory);
