@@ -101,7 +101,7 @@ global void SaveGame(const char* filename)
 	FreeCraftMajorVersion,FreeCraftMinorVersion,FreeCraftPatchLevel);
     fprintf(file,";;;  'savefile\t'(%d %d %d)\n",
 	FreeCraftMajorVersion,FreeCraftMinorVersion,FreeCraftPatchLevel);
-    fprintf(file,";;;  'preview\t\"%s.pam\n",filename);
+    fprintf(file,";;;  'preview\t\"%s.pam\"\n",filename);
     fprintf(file,";;;  )\n");
 
     SaveCcl(file);
