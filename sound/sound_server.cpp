@@ -288,16 +288,25 @@ global Sample* LoadWav(const char* name)
     return sample;
 }
 
-/*
+/**
 **	Mix sample to buffer.
 **
-**	Returns:	the number of bytes used to fill buffer
+**	The input samples are adjusted by the local volume and resampled
+**	to the output frequence.
+**
+**	@param sample	Input sample
+**	@param index	Position into input sample
+**	@param volume	Volume of the input sample
+**	@param buffer	Output buffer
+**	@param size	Size of the output buffer to be filled
+**	
+**	@return		the number of bytes used to fill buffer
 */
 local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 			      int* buffer,int size)
 {
-    int ri;
-    int wi;
+    int ri;				// read index
+    int wi;				// write index
     int length;
     int v;
     int local_volume;
