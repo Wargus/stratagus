@@ -113,6 +113,9 @@ global void HandleActionTrain(Unit* unit)
 	type=unit->Type;
 	DropOutOnSide(nunit,LookingW,type->TileWidth,type->TileHeight);
 
+	// set life span
+	nunit->TTL=GameCycle+type->DecayRate*6*CYCLES_PER_SECOND;
+
 	// FIXME: GameMessage
 	if( player==ThisPlayer ) {
 	    SetMessageEvent( nunit->X, nunit->Y, "New %s ready",
