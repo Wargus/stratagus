@@ -918,7 +918,7 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 		mv = sx;
 	}
 
-	DebugLevel1("%ld %ld %3ld\n" _C_ (long)sx _C_ mv _C_ (sx * 100) / mv);
+	DebugPrint("%ld %ld %3ld\n" _C_ (long)sx _C_ mv _C_ (sx * 100) / mv);
 #endif
 }
 
