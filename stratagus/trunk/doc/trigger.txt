@@ -52,6 +52,10 @@ For the following syntax I use:
 	'all		All units (sum of units and buildings)
 	'units		All non building units
 	'building	All building units
+<op>
+	'==		opperator equal
+	'>		opperator more
+	'<		opperator less
 <quantity>
 	0 ... oo	Number for the quantity
 <location>
@@ -59,80 +63,80 @@ For the following syntax I use:
 	'(x1 y1 x2 y2)	A rectangle in tile coordinates on the map
 
 -- resource
-(if-resource <player> <quantity> <resource>)
+(if-resource <player> <op> <quantity> <resource>)
 	o player has the quantity of resources
         This condition is used to specify how many or how little resources
         (gold, oil, lumber) a player must have for the action.
-(if-resource-least <player> <quantity> <resource>)
+(if-resource-least <player> <op> <quantity> <resource>)
 	o player has the least quantity of resources
         This condition is used to specify how many or how little resources
         (gold, oil, lumber) a player must have at least for the action.
-(if-resource-most <player> <quantity> <resource>)
+(if-resource-most <player> <op> <quantity> <resource>)
 	o player the most quantity of resources
         This condition is used to specify how many or how little resources
         (gold, oil, lumber) a player must have at most for the action.
 -- unit
-(if-unit <player> <quantity> <unit>)
+(if-unit <player> <op> <quantity> <unit>)
 	o player has the quantity of unit-type
         Which unit and how many units must control the player for the action.
-(if-near <player> <quantity> <unit> <location>)
+(if-near <player> <op> <quantity> <unit> <location>)
 	o player has the quantity of unit-type near to location
         Which unit and how many units must the player have near to a location
         for the action.
-(if-near-unit <player> <quantity> <unit> <unit>)
+(if-near-unit <player> <op> <quantity> <unit> <unit>)
 	o player has the quantity of unit-type near to unit-type
         Which unit and how many units must the player have near to an other
         unit for the action.
-(if-unit-least <player> <quantity> <unit>)
+(if-unit-least <player> <op> <quantity> <unit>)
 	o player has the least quantity of unit-type
         Which unit and how many units must control the player at least for
 	the action.
-(if-near-least <player> <quantity> <unit> <location>)
+(if-near-least <player> <op> <quantity> <unit> <location>)
 	o player has the least quantity of unit-type near to location
         Which unit and how many units must the player at least have near to a
         location for the action.
-(if-near-unit-least <player> <quantity> <unit> <location>)
+(if-near-unit-least <player> <op> <quantity> <unit> <location>)
 	o player has the least quantity of unit-type near to unit-type
         Which unit and how many units must the player at least have near to
         an other unit for the action.
-(if-unit-most <player> <quantity> <unit>)
+(if-unit-most <player> <op> <quantity> <unit>)
 	o player has the most quantity of unit-type
         Which unit and how many units must control the player at most for
 	the action.
-(if-near-most <player> <quantity> <unit> <location>)
+(if-near-most <player> <op> <quantity> <unit> <location>)
 	o player has the most quantity of unit-type near to location
         Which unit and how many units must the player at most have near to a
         location for the action.
-(if-near-unit-most <player> <quantity> <unit> <unit>)
+(if-near-unit-most <player> <op> <quantity> <unit> <unit>)
 	o player has the most quantity of unit-type near to unit-type
 	Which unit and how many units must the player at most have near to
         an other unit for the action.
-(if-deaths <player> <unit>)
+(if-deaths <player> <op> <unit>)
 	o player has quantity of unit dies
         Which quantity of the unit must be lost by the player for the
 	action.
-<if-kills <player> <unit>)
+<if-kills <player> <op> <unit>)
 	o player has quantity of unit-type killed
         Which quantity of the unit must be killed by the player for the
 	action.
-<if-kills-least <player> <unit>)
+<if-kills-least <player> <op> <unit>)
 	o player has the least quantity of unit-type killed
         The player has killed the quantity of the unit at least for the
 	action.
-<if-kills-most <player> <unit>)
+<if-kills-most <player> <op> <unit>)
 	o player has the most quantity of unit killed
         The player has killed the quantity of the unit at most for the action.
-<if-score <player> <quantity>)
+<if-score <player> <op> <quantity>)
 	o player has the quantity of score
         If the player reaches the quantity of score the action is executed.
-(if-opponents <player> <quantity>)
+(if-opponents <player> <op> <quantity>)
 	o player has quantity opponents remaining in game
         If less than quantity opponents of the player remaining in game the
 	action is executed.
-<if-elapsed <quantity>)
+<if-elapsed <op> <quantity>)
 	o game run for duration
         If the game run for the duration game cycles the action is executed.
-<if-timer <quantity>)
+<if-timer <op> <quantity>)
 	o countdown timer reaches quantity
         If the countdown timer reaches quantity the action is executed.
 
@@ -185,8 +189,8 @@ This is an example for a bring to goal trigger:
 ;;
 (add-trigger
   ;; Condition
-  (lambda () (and (if-unit 1 0 'unit-archer)
-    (if-near-unit 'this 1 'unit-archer 'unit-circle-of-power)) )
+  (lambda () (and (if-unit 1 0 '== 'unit-archer)
+    (if-near-unit 'this 1 '== 'unit-archer 'unit-circle-of-power)) )
   ;; Action
   (lambda () (action-victory)))
 
@@ -195,6 +199,6 @@ This is an example for a bring to goal trigger:
 ;;
 (add-trigger
   ;; Condition
-  (lambda () (if-unit 'this 0 'all))
+  (lambda () (if-unit 'this '== 0 'all))
   ;; Action
   (lambda () (action-defeat)))
