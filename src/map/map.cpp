@@ -39,6 +39,7 @@
 #include <string.h>
 
 #include "stratagus.h"
+#include "unittype.h"
 #include "map.h"
 #include "tileset.h"
 #include "minimap.h"

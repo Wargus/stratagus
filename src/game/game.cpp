@@ -45,6 +45,8 @@
 #include "minimap.h"
 #include "player.h"
 #include "unit.h"
+#include "unittype.h"
+#include "upgrade.h"
 #include "pathfinder.h"
 #include "pud.h"
 #include "ui.h"

@@ -147,6 +147,8 @@
 
 #include "player.h"
 #include "unit.h"
+#include "unittype.h"
+#include "upgrade.h"
 #include "script.h"
 #include "actions.h"
 #include "map.h"

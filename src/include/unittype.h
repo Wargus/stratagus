@@ -550,17 +550,16 @@ struct lua_State;
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "video.h"
-#include "icons.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "upgrade_structs.h"
-#include "construct.h"
 #include "util.h"
+#include "unitsound.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+struct _graphic_;
+struct _construction_;
 
 /**
 **  Defines the animation for different actions.
@@ -593,7 +592,7 @@ typedef struct __animations__ {
 #define ANIMATIONS_MAXANIM 1024
 
 	/// Hash table of all the animations
-typedef hashtable(Animations*,ANIMATIONS_MAXANIM) _AnimationsHash;
+typedef hashtable(Animations*, ANIMATIONS_MAXANIM) _AnimationsHash;
 extern _AnimationsHash AnimationsHash;
 
 /**
@@ -619,11 +618,11 @@ typedef struct _resource_info_ {
 	unsigned TerrainHarvester;      ///< Unit will harvest terrain(wood only for now).
 	unsigned LoseResources;         ///< The unit will lose it's resource when distracted.
 	//  Runtime info:
-	Graphic* SpriteWhenLoaded;      ///< The graphic corresponding to FileWhenLoaded.
-	Graphic* SpriteWhenEmpty;       ///< The graphic corresponding to FileWhenEmpty
+	struct _graphic_* SpriteWhenLoaded; ///< The graphic corresponding to FileWhenLoaded.
+	struct _graphic_* SpriteWhenEmpty;  ///< The graphic corresponding to FileWhenEmpty
 #ifdef USE_OPENGL
-	Graphic* PlayerColorSpriteWhenLoaded[PlayerMax];  ///< Sprites with player colors
-	Graphic* PlayerColorSpriteWhenEmpty[PlayerMax];  ///< Sprites with player colors
+	struct _graphic_* PlayerColorSpriteWhenLoaded[PlayerMax]; ///< Sprites with player colors
+	struct _graphic_* PlayerColorSpriteWhenEmpty[PlayerMax];  ///< Sprites with player colors
 #endif
 } ResourceInfo;
 
@@ -633,7 +632,7 @@ typedef struct _resource_info_ {
 **  It is used to define variables and use it after
 **  to manage magic, energy, shield or other stuff.
 */
-typedef struct {
+typedef struct _variable_type_ {
 	int Max;           ///< Maximum for the variable. (Assume min is 0.)
 	int Value;         ///< Current (or initial) value of the variable (or initial value).
 	char Increase;     ///< Number to increase(decrease) Value by second.
@@ -643,7 +642,8 @@ typedef struct {
 struct _decovartype_;
 struct _unit_;
 
-typedef void DrawDecoFunc(int x, int y, const struct _unit_* unit, const struct _decovartype_* Deco);
+typedef void DrawDecoFunc(int x, int y, const struct _unit_* unit,
+	const struct _decovartype_* Deco);
 
 /**
 **  Decoration for userdefined variable.
@@ -796,7 +796,7 @@ struct _unit_type_ {
 	int _Speed;                     ///< Movement speed
 
 	// this is taken from the UDTA section
-	Construction* Construction;     ///< What is shown in construction phase
+	struct _construction_* Construction; ///< What is shown in construction phase
 	int _SightRange;                ///< Sight range
 	int _HitPoints;                 ///< Maximum hit points
 	int _MaxMana;                   ///< Maximum mana points
@@ -903,10 +903,10 @@ struct _unit_type_ {
 	/// @todo This stats should? be moved into the player struct
 	UnitStats Stats[PlayerMax];     ///< Unit status for each player
 
-	Graphic* Sprite;                ///< Sprite images
-	Graphic* ShadowSprite;          ///< Shadow sprite image
+	struct _graphic_* Sprite;                ///< Sprite images
+	struct _graphic_* ShadowSprite;          ///< Shadow sprite image
 #ifdef USE_OPENGL
-	Graphic* PlayerColorSprite[PlayerMax];  ///< Sprites with player colors
+	struct _graphic_* PlayerColorSprite[PlayerMax];  ///< Sprites with player colors
 #endif
 };
 
@@ -961,7 +961,8 @@ extern Animations* AnimationsByIdent(const char* ident);
 extern void SaveUnitTypes(struct _CL_File_* file);  ///< Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);            ///< Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
-extern void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y);
+extern void DrawUnitType(const UnitType* type, struct _graphic_* sprite,
+	int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);  ///< Init unit-type table
 extern void LoadUnitTypeSprite(UnitType* unittype); ///< Load the sprite for a unittype

@@ -38,6 +38,7 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
+#include "unittype.h"
 #include "video.h"
 #include "map.h"
 #include "tileset.h"
