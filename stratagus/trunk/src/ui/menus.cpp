@@ -1761,9 +1761,12 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 		VideoWidth = res;
 		VideoHeight = res * 3 / 4;
 		SavePreferences();
+		ExitMenus();
 		InitVideo();
-		DestroyCursorBackground();
+		// Force Update Background Size
 		SetClipping(0,0,VideoWidth - 1,VideoHeight - 1);
+		MenusSetBackground();
+		Invalidate();
 		CleanModules();
 		LoadCcl();
 		PreMenuSetup();
