@@ -91,7 +91,6 @@ global void LoadTileset(void)
     int i;
     int n;
     int tile;
-    int gap;
     int tiles_per_row;
     int solid;
     int mixed;
@@ -137,24 +136,9 @@ global void LoadTileset(void)
     //
     //  Calculate number of tiles in graphic tile
     //
-    if (TheMap.TileData->Width == 626) {
-	// FIXME: allow 1 pixel gap between the tiles!!
-	gap = 1;
-	tiles_per_row = (TheMap.TileData->Width + 1) / (TileSizeX + 1);
-	TheMap.TileCount = n =
-	    tiles_per_row * ((TheMap.TileData->Height + 1) / (TileSizeY + 1));
-    } else if (TheMap.TileData->Width == 527) {
-	// FIXME: allow 1 pixel gap between the tiles!!
-	gap = 1;
-	tiles_per_row = (TheMap.TileData->Width + 1) / (TileSizeX + 1);
-	TheMap.TileCount = n =
-	    tiles_per_row * ((TheMap.TileData->Height + 1) / (TileSizeY + 1));
-    } else {
-	gap = 0;
-	tiles_per_row = TheMap.TileData->Width / TileSizeX;
-	TheMap.TileCount = n =
-	    tiles_per_row * (TheMap.TileData->Height / TileSizeY);
-    }
+    tiles_per_row = TheMap.TileData->Width / TileSizeX;
+    TheMap.TileCount = n =
+	tiles_per_row * (TheMap.TileData->Height / TileSizeY);
 
     DebugLevel2Fn(" %d Tiles in file %s, %d per row\n" _C_ TheMap.
 	TileCount _C_ TheMap.Tileset->ImageFile _C_ tiles_per_row);
@@ -178,16 +162,14 @@ global void LoadTileset(void)
     //  Convert the graphic data into faster format
     //
     for (tile = 0; tile < n; ++tile) {
-	unsigned char *s;
-	unsigned char *d;
+	unsigned char* s;
+	unsigned char* d;
 
 	s = (char *)TheMap.TileData->Frames +
-	    (tile % tiles_per_row) * (TileSizeX + gap) +
-	    (tile / tiles_per_row) * (TileSizeY + gap) * TheMap.TileData->Width;
+	    (tile % tiles_per_row) * TileSizeX +
+	    (tile / tiles_per_row) * TileSizeY * TheMap.TileData->Width;
 	d = TheMap.Tiles[tile];
-	if (d != data + tile * TileSizeX * TileSizeY) {
-	    abort();
-	}
+	DebugCheck(d != data + tile * TileSizeX * TileSizeY);
 	for (i = 0; i < TileSizeY; ++i) {
 	    memcpy(d, s, TileSizeX * sizeof(unsigned char));
 	    d += TileSizeX;
