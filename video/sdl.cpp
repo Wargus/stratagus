@@ -82,11 +82,6 @@ local int FrameRemainder;		/// Frame remainder 0.1 ms
 local int FrameFraction;		/// Frame fractional term
 local int SkipFrames;			/// Skip this frames
 
-#ifdef USE_OPENGL
-// FIXME: When all the drawing functions are done this isn't needed anymore
-VMemType *_VideoMemory;
-#endif
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -124,6 +119,24 @@ global void SetVideoSync(void)
 /*----------------------------------------------------------------------------
 --	Video
 ----------------------------------------------------------------------------*/
+
+#ifdef USE_OPENGL
+local void InitOpenGL(void)
+{
+    glViewport(0, 0, (GLsizei)VideoWidth, (GLsizei)VideoHeight);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0,1,0,1,-1,1);
+
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearDepth(1.0f);
+    glShadeModel(GL_FLAT);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+}
+#endif
 
 /**
 **	Initialze the video part for SDL.
@@ -240,21 +253,7 @@ global void InitVideoSdl(void)
     SDL_EnableUNICODE(1);
 
 #ifdef USE_OPENGL
-    // FIXME: When all the drawing functions are done this isn't needed anymore
-    _VideoMemory = (VMemType*)malloc(VideoWidth*VideoHeight*VideoBpp/8);
-
-    glViewport(0, 0, (GLsizei)VideoWidth, (GLsizei)VideoHeight);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0,1,0,1,-1,1);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClearDepth(1.0f);
-    glShadeModel(GL_FLAT);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-    glEnable(GL_TEXTURE_2D);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    InitOpenGL();
 #endif
 
     DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
@@ -890,10 +889,7 @@ global void RealizeVideoMemory(void)
 */
 global void SdlLockScreen(void)
 {
-#ifdef USE_OPENGL
-    // FIXME: When all the drawing functions are done this isn't needed anymore
-    VideoMemory=_VideoMemory;
-#else
+#ifndef USE_OPENGL
     SDL_LockSurface(Screen);
     VideoMemory=Screen->pixels;
 #endif
@@ -943,14 +939,16 @@ global void ToggleFullScreen(void)
 {
 #ifdef USE_WIN32
     long framesize;
-    void *pixels;
-    SDL_Color *palette;
     SDL_Rect clip;
-    int ncolors;
     Uint32 flags;
     int w;
     int h;
     int bpp;
+#ifndef USE_OPENGL
+    void *pixels;
+    SDL_Color *palette;
+    int ncolors;
+#endif
 
     if ( !Screen ) {			// don't bother if there's no surface.
 	return;
@@ -965,7 +963,8 @@ global void ToggleFullScreen(void)
 
     // save the contents of the screen.
     framesize = w * h * Screen->format->BytesPerPixel;
-    
+
+#ifndef USE_OPENGL
     if ( !(pixels = malloc(framesize)) ) {	// out of memory
 	return;
     }
@@ -983,15 +982,18 @@ global void ToggleFullScreen(void)
 	    ncolors * sizeof(SDL_Color));
     }
     SDL_UnlockSurface(Screen);
+#endif
 
     Screen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
     if( !Screen ) {
 	Screen = SDL_SetVideoMode(w, h, bpp, flags);
 	if ( !Screen ) {		// completely screwed.
+#ifndef USE_OPENGL
 	    free(pixels);
 	    if( Screen->format->palette ) {
 		free(palette);
 	    }
+#endif
 	    fprintf(stderr,"Toggle to fullscreen, crashed all\n");
 	    Exit(-1);
 	}
@@ -1002,6 +1004,9 @@ global void ToggleFullScreen(void)
     SDL_ShowCursor(SDL_ENABLE);
     SDL_ShowCursor(SDL_DISABLE);
 
+#ifdef USE_OPENGL
+    InitOpenGL();
+#else
     SDL_LockSurface(Screen);
     memcpy(Screen->pixels, pixels, framesize);
     free(pixels);
@@ -1012,6 +1017,7 @@ global void ToggleFullScreen(void)
 	free(palette);
     }
     SDL_UnlockSurface(Screen);
+#endif
 
     SDL_SetClipRect(Screen, &clip);
 
