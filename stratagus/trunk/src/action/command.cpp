@@ -1202,8 +1202,9 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 			//
 			if (dest->Destroyed) {
 				// FIXME: where check if spell needs an unit as destination?
-				order->X = dest->X + dest->Type->TileWidth / 2 - order->Range;
-				order->Y = dest->Y + dest->Type->TileHeight / 2 - order->Range;
+				// FIXME: dest->Type is now set to 0. maybe we shouldn't bother.
+				order->X = dest->X /*+ dest->Type->TileWidth / 2*/  - order->Range;
+				order->Y = dest->Y /*+ dest->Type->TileHeight / 2*/ - order->Range;
 				order->Goal = NoUnitP;
 				order->Range <<= 1;
 				order->Range <<= 1;
