@@ -25,6 +25,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <time.h>
 
 #ifdef USE_BEOS
 #include <fcntl.h>
@@ -273,6 +274,32 @@ global int main1(int argc __attribute__ ((unused)),
 #endif
 #ifdef WITH_SOUND
     "SOUND "
+#endif
+    // New features:
+    "\nFeatures "
+#ifdef UNIT_ON_MAP
+    "UNIT-ON-MAP "
+#endif
+#ifdef NEW_ORDERS
+    "NEW-ORDERS "
+#endif
+#ifdef NEW_MAPDRAW
+    "NEW-MAPDRAW "
+#endif
+#ifdef NEW_NAMES
+    "NEW-NAMES "
+#endif
+#ifdef NEW_FOW
+    "NEW-FOW "
+#endif
+#ifdef NEW_AI
+    "NEW-AI "
+#endif
+#ifdef SLOW_INPUT
+    "SLOW-INPUT "
+#endif
+#ifdef HAVE_EXPANSION
+    "EXPANSION "
 #endif
     "\n\nFreeCraft may be copied only under the terms of the Artistic License\
 \nwhich may be found in the FreeCraft source kit."
