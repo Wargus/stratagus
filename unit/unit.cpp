@@ -255,13 +255,6 @@ global void ReleaseUnit(Unit* unit)
 	RefsDebugCheck(unit->Refs);
 
 	//
-	//		Free used memory
-	//
-	if (unit->Name) {
-		free(unit->Name);
-	}
-
-	//
 	//		No more references remaining, but the network could have an order
 	//		on the way. We must wait a little time before we could free the
 	//		memory.
@@ -351,25 +344,6 @@ global void InitUnit(Unit* unit, UnitType* type)
 	//
 	unit->Type = type;
 	unit->SeenFrame = UnitNotSeen;				// Unit isn't yet seen
-
-	// FIXME: this is not needed for load+save, must move to other place
-	if (1) {								// Call CCL for name generation
-#if defined(USE_GUILE) || defined(USE_SIOD)
-		SCM fun;
-
-		fun = gh_symbol2scm("gen-unit-name");
-		if (symbol_boundp(fun, NIL)) {
-			SCM value;
-
-			value = symbol_value(fun, NIL);
-			if (!gh_null_p(value)) {
-				value = gh_apply(value, cons(gh_symbol2scm(type->Ident), NIL));
-				unit->Name = gh_scm2newstr(value, NULL);
-			}
-		}
-#elif defined(USE_LUA)
-#endif
-	}
 
 	unit->Frame = unit->Type->Animations->Still[0].Frame +
 		(type->Building ? 0 : type->NumDirections / 2 + 1 - 1);
@@ -3483,10 +3457,6 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 
 	CLprintf(file, "'player %d\n  ", unit->Player->Player);
 
-	if (unit->Name) {
-		CLprintf(file, "'name \"%s\" ", unit->Name);
-	}
-
 	if (unit->Next) {
 		CLprintf(file, "'next '%d ", UnitNumber(unit->Next));
 	}
@@ -3807,9 +3777,6 @@ global void CleanUnits(void)
 	//		Free memory for all units in unit table.
 	//
 	for (table = Units; table < &Units[NumUnits]; ++table) {
-		if ((*table)->Name) {
-			free((*table)->Name);
-		}
 		free(*table);
 		*table = NULL;
 	}

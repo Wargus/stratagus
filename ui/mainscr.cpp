@@ -437,13 +437,7 @@ global void DrawUnitInfo(const Unit* unit)
 				UiDrawManaBar(uins, TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
 			}
 			if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == i) {
-				if (uins->Name) {
-					char buf[128];
-					sprintf(buf, "%s %s", uins->Type->Name, uins->Name);
-					SetStatusLine(buf);
-				} else {
-					SetStatusLine(uins->Type->Name);
-				}
+				SetStatusLine(uins->Type->Name);
 			}
 		}
 		return;
@@ -1132,15 +1126,7 @@ global void DrawInfoPanel(void)
 
 				if (ButtonAreaUnderCursor == ButtonAreaSelected &&
 						ButtonUnderCursor == i) {
-					if (Selected[i]->Name) {
-						char buf[128];
-
-						sprintf(buf, "%s %s", Selected[i]->Type->Name,
-							Selected[i]->Name);
-						SetStatusLine(buf);
-					} else {
-						SetStatusLine(Selected[i]->Type->Name);
-					}
+					SetStatusLine(Selected[i]->Type->Name);
 				}
 			}
 			if (NumSelected > TheUI.NumSelectedButtons) {
@@ -1170,15 +1156,7 @@ global void DrawInfoPanel(void)
 			DrawInfoPanelBackground(i);
 			DrawUnitInfo(Selected[0]);
 			if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
-				if (Selected[0]->Name) {
-					char buf[128];
-
-					sprintf(buf, "%s %s", Selected[0]->Type->Name,
-						Selected[0]->Name);
-					SetStatusLine(buf);
-				} else {
-					SetStatusLine(Selected[0]->Type->Name);
-				}
+				SetStatusLine(Selected[0]->Type->Name);
 			}
 			return;
 		}
