@@ -50,7 +50,7 @@
 **	FIXME: designers to create own resources.
 */
 typedef struct _resource_ {
-    UnitAction	Action : 8;		/// Unit action.
+    unsigned char Action;		/// Unit action.
     int	Frame;				/// Frame for active resource
     Unit* (*ResourceOnMap)(int,int);	/// Get the resource on map.
     Unit* (*DepositOnMap)(int,int);	/// Get the deposit on map.
