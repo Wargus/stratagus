@@ -1651,20 +1651,17 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
     int w;
 
     graphic=LoadGraphic(name);
-    if( !width ) {			// FIXME: this is hack for cursors!
-	width=graphic->Width;
-    }
-    if( !height ) {
-	height=graphic->Height;
-    }
+
+    DebugCheck( !width || !height );
     DebugCheck( width>graphic->Width || height>graphic->Height );
+
     depth=8;
 
-    if(((graphic->Width/width)*width!=graphic->Width)
-       || ((graphic->Height/height)*height!=graphic->Height) ){
-      fprintf(stderr,"Invalid graphic (width, height) %s\n",name);
-      fprintf(stderr,"Expected: (%d,%d)  Found: (%d,%d)",
-	      width,height,graphic->Width,graphic->Height);
+    if( ((graphic->Width/width)*width!=graphic->Width)
+	    || ((graphic->Height/height)*height!=graphic->Height) ) {
+	fprintf(stderr,"Invalid graphic (width, height) %s\n",name);
+	fprintf(stderr,"Expected: (%d,%d)  Found: (%d,%d)",
+		width,height,graphic->Width,graphic->Height);
     }
        
     // Check if width and height fits.
