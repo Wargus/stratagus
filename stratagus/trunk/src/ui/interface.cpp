@@ -983,21 +983,22 @@ local int CommandKey(int key)
 **
 **	@return	    1 if a cheat was handle, 0 otherwise
 */
-global int HandleCheats(const char* Input)
+global int HandleCheats(const char* input)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     int ret;
     int i;
 
     ret = 1;
 
     // FIXME: disable cheats
-    if (strcmp(Input, "there is no aliens level") == 0) {
+    if (strcmp(input, "there is no aliens level") == 0) {
 	// FIXME: no function yet.
 	SetMessage("cheat enabled");
-    } else if (strcmp(Input, "hatchet") == 0) {
+    } else if (strcmp(input, "hatchet") == 0) {
 	SpeedResourcesHarvest[WoodCost] = 52 / 2;
 	SetMessage("Wow -- I got jigsaw!");
-    } else if (strcmp(Input, "glittering prizes") == 0) {
+    } else if (strcmp(input, "glittering prizes") == 0) {
 	ThisPlayer->Resources[GoldCost] += 12000;
 	ThisPlayer->Resources[WoodCost] += 5000;
 	ThisPlayer->Resources[OilCost] += 5000;
@@ -1006,19 +1007,19 @@ global int HandleCheats(const char* Input)
 	ThisPlayer->Resources[CoalCost] += 5000;
 	MustRedraw |= RedrawResources;
 	SetMessage("!!! :)");
-    } else if (strcmp(Input, "on screen") == 0) {
+    } else if (strcmp(input, "on screen") == 0) {
 	RevealMap();
-    } else if (!strcmp(Input, "showpath")) {
+    } else if (!strcmp(input, "showpath")) {
 	RevealMap();
-    } else if (strcmp(Input, "fow on") == 0) {
+    } else if (strcmp(input, "fow on") == 0) {
 	TheMap.NoFogOfWar = 0;
 	UpdateFogOfWarChange();
 	SetMessage("Fog Of War is now ON");
-    } else if (strcmp(Input, "fow off") == 0) {
+    } else if (strcmp(input, "fow off") == 0) {
 	TheMap.NoFogOfWar = 1;
 	UpdateFogOfWarChange();
 	SetMessage("Fog Of War is now OFF");
-    } else if (strcmp(Input, "fast debug") == 0) {
+    } else if (strcmp(input, "fast debug") == 0) {
 	for (i = 1; i < MaxCosts; ++i) {
 	    SpeedResourcesHarvest[i] = 10;
 	    SpeedResourcesReturn[i] = 10;
@@ -1028,7 +1029,7 @@ global int HandleCheats(const char* Input)
 	SpeedUpgrade = 10;	// speed factor for upgrading
 	SpeedResearch = 10;	// speed factor for researching
 	SetMessage("FAST DEBUG SPEED");
-    } else if (strcmp(Input, "normal debug") == 0) {
+    } else if (strcmp(input, "normal debug") == 0) {
 	for (i = 1; i < MaxCosts; ++i) {
 	    SpeedResourcesHarvest[i] = 1;
 	    SpeedResourcesReturn[i] = 1;
@@ -1038,7 +1039,7 @@ global int HandleCheats(const char* Input)
 	SpeedUpgrade = 1;	// speed factor for upgrading
 	SpeedResearch = 1;	// speed factor for researching
 	SetMessage("NORMAL DEBUG SPEED");
-    } else if (strcmp(Input, "make it so") == 0) {
+    } else if (strcmp(input, "make it so") == 0) {
 	if (SpeedCheat) {
 	    SpeedCheat = 0;
 	    for (i = 1; i < MaxCosts; ++i) {
@@ -1069,20 +1070,20 @@ global int HandleCheats(const char* Input)
 	    MustRedraw |= RedrawResources;
 	    SetMessage("SO!");
 	}
-    } else if (!strcmp(Input, "unite the clans")) {
+    } else if (!strcmp(input, "unite the clans")) {
 	GameRunning = 0;
 	GameResult = GameVictory;
-    } else if (!strcmp(Input, "you pitiful worm")) {
+    } else if (!strcmp(input, "you pitiful worm")) {
 	GameRunning = 0;
 	GameResult = GameDefeat;
-    } else if (!strcmp(Input, "it is a good day to die")) {
+    } else if (!strcmp(input, "it is a good day to die")) {
 	GodMode = !GodMode;
 	if (GodMode) {
 	    SetMessage("God Mode ON");
 	} else {
 	    SetMessage("God Mode OFF");
 	}
-    } else if (!strcmp(Input, "fill mana")) {
+    } else if (!strcmp(input, "fill mana")) {
 	for (i = 0; i < ThisPlayer->TotalNumUnits; ++i) {
 	    if (ThisPlayer->Units[i]->Type->_MaxMana) {
 		ThisPlayer->Units[i]->Mana = ThisPlayer->Units[i]->Type->_MaxMana;
@@ -1090,7 +1091,7 @@ global int HandleCheats(const char* Input)
 	}
 	SetMessage("All magic at your command");
 #ifdef DEBUG
-    } else if (!strcmp(Input, "ai me")) {
+    } else if (!strcmp(input, "ai me")) {
 	if (ThisPlayer->AiEnabled) {
 	    ThisPlayer->AiEnabled = 0;
 	    ThisPlayer->Type = PlayerPerson;
@@ -1109,6 +1110,24 @@ global int HandleCheats(const char* Input)
     }
 
     return ret;
+#elif defined(USE_LUA)
+    int ret;
+
+    lua_pushstring(Lua, "HandleCheats");
+    lua_gettable(Lua, LUA_GLOBALSINDEX);
+    lua_pushstring(Lua, input);
+    LuaCall(1, 0);
+    ret = lua_gettop(Lua);
+    if (lua_gettop(Lua) == 1) {
+	ret = LuaToBoolean(Lua, 1);
+	lua_pop(Lua, 1);
+    } else {
+	lua_pushstring(Lua, "HandleCheats must return a boolean");
+	lua_error(Lua);
+	ret = 0;
+    }
+    return ret;
+#endif
 }
 
 /**
