@@ -44,4 +44,4 @@ screen*
 *.pud.gz
 autom4te.cache
 config.status
-
+configure
