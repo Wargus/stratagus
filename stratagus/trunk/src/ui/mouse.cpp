@@ -1110,7 +1110,12 @@ global void UIHandleButtonUp(int b)
 		    num=SelectUnitsByType(unit);
 		} else if( (KeyModifiers&ModifierAlt) && unit->GroupId!=-1 ) {
                     num=SelectGroupFromUnit(unit);
-		} else if( KeyModifiers&ModifierShift ) {
+
+		    // Don't allow to select own and enemy units.
+		} else if( KeyModifiers&ModifierShift
+			&& unit->Player==ThisPlayer
+			&& (NumSelected!=1
+			    || Selected[0]->Player==ThisPlayer)) {
 		    num=ToggleSelectUnit(unit);
 		} else {
 		    SelectSingleUnit(unit);
