@@ -782,6 +782,7 @@ global int FindAndSortMissiles(const Viewport* vp, Missile** table)
 **	@param missile	Missile pointer.
 **	@param dx	Delta in x.
 **	@param dy	Delta in y.
+**	@internal We have : SpriteFrame / (2 * (Numdirection - 1)) == DirectionToHeading / 256.
 */
 local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 {
@@ -790,21 +791,26 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 
     DebugCheck(missile == NULL);
     DebugCheck(missile->Type == NULL);
+    DebugCheck(!(missile->Type->NumDirections & 1)); // Only support for impair number of directions.
+    if (missile->Type->NumDirections == 1 || (dx == 0 && dy == 0)) {
+        return ;
+    }
+// reinitialise the direction but with skipping Animation step.
     if (missile->SpriteFrame < 0) {
 	missile->SpriteFrame = -missile->SpriteFrame;
     }
     missile->SpriteFrame /= missile->Type->NumDirections / 2 + 1;
     missile->SpriteFrame *= missile->Type->NumDirections / 2 + 1;
 
-    nextdir = 256 / missile->Type->NumDirections;
+    nextdir = 128 / (missile->Type->NumDirections - 1);
     DebugCheck(nextdir == 0);
-    dir = ((DirectionToHeading(dx, dy) + nextdir / 2) & 0xFF) / nextdir;
-    if (dir <= LookingS / nextdir) {	// north->east->south
-	missile->SpriteFrame += dir;
-    } else {
-	missile->SpriteFrame += 256 / nextdir - dir;
-	missile->SpriteFrame = -missile->SpriteFrame;
+    dir = ((DirectionToHeading(10 * dx, 10 * dy) + nextdir / 2) & 0xFF) / nextdir;
+    if (dir >= missile->Type->NumDirections) {
+        dir -= (missile->Type->NumDirections - 1) * 2;
     }
+    DebugCheck(dir >= missile->Type->NumDirections);
+    DebugCheck(dir < -missile->Type->NumDirections + 1);
+    missile->SpriteFrame = dir;
 }
 /**
 **	Init the move.
@@ -817,15 +823,15 @@ local int MissileInitMove(Missile* missile)
     int dy;
 
     DebugCheck(missile == 0);
+    dx = missile->DX - missile->X;
+    dy = missile->DY - missile->Y;
+    MissileNewHeadingFromXY(missile, dx, dy);
     if (!(missile->State & 1)) {
-        dx = missile->DX - missile->X;
-        dy = missile->DY - missile->Y;
         missile->CurrentStep = 0;
         missile->TotalStep = 0;
         if (dx == 0 && dy == 0) {
             return 1;
         }
-        MissileNewHeadingFromXY(missile, dx, dy);
 	// initialize
         missile->TotalStep = MapDistance(missile->SourceX, missile->SourceY, missile->DX, missile->DY);
         missile->State++;
