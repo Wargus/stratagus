@@ -1189,9 +1189,22 @@ local void SaveUnitType(const UnitType* type,FILE* file)
 global void SaveUnitTypes(FILE* file)
 {
     const UnitType* type;
+    char* const* sp;
+    int i;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: unittypes $Id$\n");
+    fprintf(file,";;; MODULE: unittypes $Id$\n\n");
+
+    //	Original number to internal missile-type name.
+
+    i=fprintf(file,"(define-unittype-wc-names");
+    for( sp=UnitTypeWcNames; *sp; ++sp ) {
+	if( i+strlen(*sp)>79 ) {
+	    i=fprintf(file,"\n ");
+	}
+	i+=fprintf(file," '%s",*sp);
+    }
+    fprintf(file,")\n");
 
     //	Save all animations.
 
@@ -1441,6 +1454,8 @@ global void CleanUnitTypes(void)
 
 	UnitTypeWcNames=NULL;
     }
+
+    // FIXME: more!
 
     //
     //	Clean hardcoded unit types.
