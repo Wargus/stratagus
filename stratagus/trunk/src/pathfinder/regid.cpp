@@ -92,8 +92,9 @@ int RegidFind (RegidSpace *space, enum regid_dir dir, enum regid_usage used)
 		/* the above didn't work, we have to do a bit-by-bit search */
 		i = dir==REGID_LOWEST ? 0 : 7;
 		for ( ; i<8 && i>=0; i += increment) {
-			if ( (space->Bitmap[byte] & (1 << i)) == used)
+			if ( (space->Bitmap[byte] & (1 << i)) == (int)used) {
 				return 8*byte + i + 1;
+			}
 		}
 	}
 	return -1;
