@@ -103,7 +103,7 @@ extern unsigned short inline _FetchLE16(unsigned char** pp) {
 
 #else
 
-#define FetchLE16(p) SDL_SwapLE16(*((unsigned short*)(p))); ++p
+#define FetchLE16(p) SDL_SwapLE16(*((unsigned short*)(p))); p += 2
 
 #endif
 
@@ -123,7 +123,7 @@ extern unsigned inline _FetchLE32(unsigned char** pp) {
 
 #else
 
-#define FetchLE32(p) SDL_SwapLE32(*((unsigned int*)(p))); ++p
+#define FetchLE32(p) SDL_SwapLE32(*((unsigned int*)(p))); p += 4
 
 #endif
 
