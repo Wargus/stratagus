@@ -528,11 +528,27 @@ local SCM CclAiWait(SCM value)
 {
     AiUnitTypeTable* autt;
     UnitType* type;
+    int j;
 
     type=CclGetUnitType(value);
     if( !(autt=FindInUnitTypeRequests(type)) ) {
+	//
+	//	Look if we have this unit-type.
+	//
 	if( AiPlayer->Player->UnitTypesCount[type->Type] ) {
 	    return SCM_BOOL_F;
+	}
+	//
+	//	Look if we have equivalent unit-types.
+	//
+	if( type->Type<AiHelpers.EquivCount && AiHelpers.Equiv[type->Type] ) {
+	    DebugLevel3Fn("Equivalence for %s\n" _C_ type->Ident);
+	    for( j=0; j<AiHelpers.Equiv[type->Type]->Count; ++j ) {
+		if( AiPlayer->Player->UnitTypesCount[
+			AiHelpers.Equiv[type->Type]->Table[j]->Type] ) {
+		    return SCM_BOOL_F;
+		}
+	    }
 	}
 	// FIXME: could happen upgrades-to! return SCM_BOOL_F;
 	DebugLevel0Fn("Broken? waiting on unit-type which wasn't requested.\n");
