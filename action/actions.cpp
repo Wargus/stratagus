@@ -487,12 +487,12 @@ local void HandleUnitAction(Unit* unit)
 global void UnitActions(void)
 {
 	Unit* table[UnitMax];
-	Unit** tpos;
-	Unit** tend;
 	Unit* unit;
 	int blinkthiscycle;
 	int buffsthiscycle;
 	int regenthiscycle;
+	int i;
+	int tabsize;
 
 	buffsthiscycle = regenthiscycle =
 		blinkthiscycle = !(GameCycle % CYCLES_PER_SECOND);
@@ -500,19 +500,17 @@ global void UnitActions(void)
 	//
 	// Must copy table, units could be removed.
 	//
-	tend = table + NumUnits;
 	memcpy(table, Units, sizeof(Unit*) * NumUnits);
 
 	//
 	// Check for dead/destroyed units in table...
+	// Filter them out
 	//
-	for (tpos = table; tpos < tend; ++tpos) {
-		unit = *tpos;
-			if (unit->Destroyed) {		// Ignore destroyed units
-			DebugLevel0Fn("Destroyed unit %d in table, should be ok\n" _C_
-				UnitNumber(unit));
-			unit = 0;
-			continue;
+	for (i = tabsize = 0; i < NumUnits; ++i) {
+		if (!table[i]->Destroyed) {		// Ignore destroyed units
+			table[tabsize++] = table[i];
+		} else {
+			DebugLevel3Fn("Destroyed unit %d in table, should be ok\n" _C_ table[i]->Slot);
 		}
 	}
 
@@ -523,48 +521,38 @@ global void UnitActions(void)
 
 	// 1) Blink flag.
 	if (blinkthiscycle) {
-		for (tpos = table; tpos < tend; ++tpos) {
-			if ((unit = *tpos)) {
-				if (unit->Blink) {
-					--unit->Blink;
-				}
+		for (i = 0; i < tabsize; ++i) {
+			if (table[i]->Blink) {
+				--table[i]->Blink;
 			}
 		}
 	}
 
 	// 2) Buffs...
 	if (buffsthiscycle) {
-		for (tpos = table; tpos < tend; ++tpos) {
-			if ((unit = *tpos)) {
-				HandleBuffs(unit, CYCLES_PER_SECOND);
-			}
+		for (i = 0; i < tabsize; ++i) {
+			HandleBuffs(table[i], CYCLES_PER_SECOND);
 		}
 	}
 
 	// 3) Increase health mana, burn and stuff
 	if (regenthiscycle) {
-		for (tpos = table; tpos < tend; ++tpos) {
-			if ((unit = *tpos)) {
-				HandleRegenerations(unit);
-			}
+		for (i = 0; i < tabsize; ++i) {
+			HandleRegenerations(table[i]);
 		}
 	}
 
 	//
 	// Do all actions
 	//
-	for (tpos = table; tpos < tend; ++tpos) {
-		unit = *tpos;
-		if (!tpos) {
-			continue;
-		}
+	for (i = 0; i < tabsize; ++i) {
+		unit = table[i];
 
 		if (--unit->Wait) {			// Wait until counter reached
 			continue;
 		}
 
 		HandleUnitAction(unit);
-		DebugCheck(*tpos != unit);		// Removed is evil.
 
 #ifdef DEBUG_ACTIONS
 		//

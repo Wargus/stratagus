@@ -1635,7 +1635,7 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 	const UnitStats* stats;
 	int r;
 
-#if 0 // This is for showing vis counts and refs.
+#if 1 // This is for showing vis counts and refs.
 	char buf[10];
 	sprintf(buf, "%d%c%c%d", unit->VisCount[ThisPlayer->Player],
 		unit->Seen.ByPlayer & (1 << ThisPlayer->Player) ? 'Y' : 'N',
