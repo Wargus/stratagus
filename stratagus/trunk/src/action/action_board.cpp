@@ -87,13 +87,21 @@ static int WaitForTransporter(Unit* unit)
 {
 	Unit* trans;
 
-	unit->Wait = 6;
-	unit->Reset = 1;
+	if (!unit->Type->NewAnimations) {
+		unit->Wait = 6;
+		unit->Reset = 1;
+	} else if (unit->Wait) {
+		unit->Wait--;
+		return 0;
+	}
 
 	trans = unit->Orders[0].Goal;
 
 	if (!trans || !CanTransport(trans, unit)) {
 		// FIXME: destination destroyed??
+		if (unit->Type->NewAnimations) {
+			unit->Wait = 6;
+		}
 		return 0;
 	}
 
@@ -101,6 +109,9 @@ static int WaitForTransporter(Unit* unit)
 		DebugPrint("Transporter Gone\n");
 		RefsDecrease(trans);
 		unit->Orders[0].Goal = NoUnitP;
+		if (unit->Type->NewAnimations) {
+			unit->Wait = 6;
+		}
 		return 0;
 	}
 
@@ -190,9 +201,10 @@ void HandleActionBoard(Unit* unit)
 		// Wait for transporter
 		//
 		case 201:
-			// FIXME: show still animations
 			if (WaitForTransporter(unit)) {
 				unit->SubAction = 202;
+			} else if (unit->Type->NewAnimations) {
+				UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
 			}
 			break;
 		//
@@ -205,6 +217,10 @@ void HandleActionBoard(Unit* unit)
 		// Move to transporter
 		//
 		case 0:
+			if (unit->Type->NewAnimations && unit->Wait) {
+				unit->Wait--;
+				return;
+			}
 			NewResetPath(unit);
 			unit->SubAction = 1;
 			// FALL THROUGH
