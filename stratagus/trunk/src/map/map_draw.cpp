@@ -153,7 +153,7 @@ void VideoDrawTile(const int tile, int x, int y)
 	sty = (GLfloat)(gy + y - oldy) / g->Height * g->TextureHeight;
 	ety = (GLfloat)(gy + y - oldy + h) / g->Height * g->TextureHeight;
 
-	glBindTexture(GL_TEXTURE_2D, g->TextureNames[0]);
+	glBindTexture(GL_TEXTURE_2D, g->Textures[0]);
 	glBegin(GL_QUADS);
 	glTexCoord2f(stx, sty);
 	glVertex2i(sx, sy);

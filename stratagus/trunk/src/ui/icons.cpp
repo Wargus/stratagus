@@ -357,29 +357,6 @@ const char* IdentOfIcon(const Icon* icon)
 	return icon->Ident;
 }
 
-#ifdef USE_OPENGL
-/**
-**  Draw the sprite with the player colors
-**
-**  @param sprite    Original sprite
-**  @param glsprite  Array of player color sprites
-**  @param player    Player number
-**  @param frame     Frame number to draw.
-**  @param x         X position.
-**  @param y         Y position.
-*/
-static void DrawIconPlayerColor(Graphic* sprite, Graphic** glsprite,
-	int player, int frame, int x, int y)
-{
-	if (!glsprite[player] || !glsprite[player]->TextureNames[frame]) {
-		MakePlayerColorTexture(&glsprite[player],
-			sprite, frame, &Players[player].UnitColors);
-	}
-
-	VideoDrawClip(glsprite[player], frame, x, y);
-}
-#endif
-
 /**
 **  Draw icon on x,y.
 **
@@ -390,12 +367,13 @@ static void DrawIconPlayerColor(Graphic* sprite, Graphic** glsprite,
 */
 void DrawIcon(const Player* player, Icon* icon, int x, int y)
 {
-	GraphicPlayerPixels(player, icon->Sprite);
-	VideoDrawClip(icon->Sprite, icon->Index, x, y);
 #ifdef USE_OPENGL
-	DrawIconPlayerColor(icon->Sprite, icon->PlayerColorSprite,
-		player->Player, icon->Index, x, y);
+	if (!icon->Sprite->PlayerColorTextures[player->Player]) {
+		MakePlayerColorTexture(icon->Sprite, player->Player);
+	}
 #endif
+	GraphicPlayerPixels(player, icon->Sprite);
+	VideoDrawPlayerColorClip(icon->Sprite, player->Player, icon->Index, x, y);
 }
 
 /**

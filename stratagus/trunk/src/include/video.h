@@ -45,18 +45,18 @@
 #endif
 
 typedef struct _graphic_ {
-	SDL_Surface* Surface;
-	SDL_Surface* SurfaceFlip;
-	int Width;
-	int Height;
-	int NumFrames;
+	SDL_Surface* Surface;      ///< Surface
+	SDL_Surface* SurfaceFlip;  ///< Flipped surface
+	int Width;                 ///< Width of a frame
+	int Height;                ///< Height of a frame
+	int NumFrames;             ///< Number of frames
+	int GraphicWidth;          ///< Original graphic width
+	int GraphicHeight;         ///< Original graphic height
 #ifdef USE_OPENGL
-	int GraphicWidth;       ///< Original graphic width
-	int GraphicHeight;      ///< Original graphic height
-	GLfloat TextureWidth;   ///< Width of the texture
-	GLfloat TextureHeight;  ///< Height of the texture
-	int NumTextureNames;    ///< Number of textures
-	GLuint* TextureNames;   ///< Texture names
+	GLfloat TextureWidth;      ///< Width of the texture
+	GLfloat TextureHeight;     ///< Height of the texture
+	GLuint* Textures;          ///< Texture names
+	GLuint* PlayerColorTextures[PlayerMax];///< Textures with player colors
 #endif
 } Graphic;
 
@@ -235,10 +235,9 @@ extern void FreeMNG(Mng* mng);
 
 #ifdef USE_OPENGL
 	/// Make an OpenGL texture
-extern void MakeTexture(Graphic* graphic, int width, int height);
+extern void MakeTexture(Graphic* graphic);
 	/// Make an OpenGL texture of the player color pixels only.
-extern void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
-	UnitColors* colors);
+extern void MakePlayerColorTexture(Graphic* graphic, int player);
 #endif
 
 	/// Load graphic
@@ -496,18 +495,48 @@ extern void VideoDraw(const Graphic*, unsigned, int, int);
 	/// Draw a graphic object clipped to the current clipping.
 extern void VideoDrawSub(const Graphic*, int, int, int, int, int, int);
 
+#ifdef USE_OPENGL
 	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawClip(const Graphic*, unsigned frame, int x, int y);
+extern void VideoDoDrawClip(const Graphic* s, GLuint* textures, unsigned frame,
+	int x, int y);
+
+#define VideoDrawClip(s, frame, x, y) \
+	VideoDoDrawClip((s), (s)->Textures, (frame), (x), (y))
+
+#define VideoDrawPlayerColorClip(sprite, player, frame, x, y) \
+	VideoDoDrawClip((sprite), (sprite)->PlayerColorTextures[player], (frame), (x), (y))
+#else
+	/// Draw a graphic object clipped to the current clipping.
+extern void VideoDrawClip(const Graphic* s, unsigned frame, int x, int y);
+
+#define VideoDrawPlayerColorClip(sprite, player, frame, x, y) \
+	VideoDrawClip((sprite), (frame), (x), (y))
+#endif
 
 	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawSubClip(const Graphic*, int ix, int iy, int w,
+extern void VideoDrawSubClip(const Graphic* sprite, int ix, int iy, int w,
 	int h, int x, int y);
 
 	/// Draw a graphic object unclipped and flipped in X direction.
-extern void VideoDrawX(const Graphic*, unsigned frame, int x, int y);
+extern void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y);
 
+#ifdef USE_OPENGL
 	/// Draw a graphic object clipped and flipped in X direction.
-extern void VideoDrawClipX(const Graphic*, unsigned frame, int x, int y);
+extern void VideoDoDrawClipX(const Graphic* sprite, GLuint* textures, unsigned frame,
+	int x, int y);
+
+#define VideoDrawClipX(s, frame, x, y) \
+	VideoDoDrawClipX((s), (s)->Textures, (frame), (x), (y))
+
+#define VideoDrawPlayerColorClipX(sprite, player, frame, x, y) \
+	VideoDoDrawClipX((sprite), (sprite)->PlayerColorTextures[player], (frame), (x), (y))
+#else
+	/// Draw a graphic object clipped and flipped in X direction.
+extern void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y);
+
+#define VideoDrawPlayerColorClipX(sprite, player, frame, x, y) \
+	VideoDrawClipX((sprite), (frame), (x), (y))
+#endif
 
 	/// Translucent Functions
 	/// Draw a graphic object unclipped.

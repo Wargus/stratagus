@@ -1695,35 +1695,18 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 	}
 }
 
-/**
-**  Change current color set to units colors.
-**
-**  @param unit    Pointer to unit.
-**  @param sprite  Change the palette entries 208-211 in this sprite.
-*/
-static void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
-{
-#ifndef USE_OPENGL
-	SDL_SetColors(sprite->Surface, unit->Colors->Colors, 208, 4);
-	if (sprite->SurfaceFlip) {
-		SDL_SetColors(sprite->SurfaceFlip, unit->Colors->Colors, 208, 4);
-	}
-#endif
-}
-
-#ifdef USE_OPENGL
+#if 0
 /**
 **  Draw the sprite with the player colors
 **
 **  @param type      Unit type
 **  @param sprite    Original sprite
-**  @param glsprite  Array of player color sprites
 **  @param player    Player number
 **  @param frame     Frame number to draw.
 **  @param x         X position.
 **  @param y         Y position.
 */
-void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** glsprite,
+void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite,
 	int player, int frame, int x, int y)
 {
 	int f;
@@ -1744,9 +1727,8 @@ void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** glspri
 			f = (frame / row) * type->NumDirections + frame % row;
 		}
 	}
-	if (!glsprite[player] || !glsprite[player]->TextureNames[f]) {
-		MakePlayerColorTexture(&glsprite[player],
-			sprite, frame < 0 ? -frame - 1 : frame, &Players[player].UnitColors);
+	if (!sprite->PlayerColorTextures[player]) {
+		MakePlayerColorTexture(sprite, player, &Players[player].UnitColors);
 	}
 
 	// FIXME: move this calculation to high level.
@@ -1859,22 +1841,21 @@ static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 		construction = type->Construction;
 		x -= construction->Width / 2;
 		y -= construction->Height / 2;
-		GraphicUnitPixels(unit, construction->Sprite);
 		if (frame < 0) {
-			VideoDrawClipX(construction->Sprite, -frame - 1, x, y);
+			VideoDrawPlayerColorClipX(construction->Sprite,
+				unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
+				-frame - 1, x, y);
 		} else {
-			VideoDrawClip(construction->Sprite, frame, x, y);
+			VideoDrawPlayerColorClip(construction->Sprite,
+				unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
+				frame, x, y);
 		}
 	} else {
 		x -= type->TileWidth * TileSizeX / 2;
 		y -= type->TileHeight * TileSizeY / 2;
-		GraphicUnitPixels(unit, type->Sprite);
-		DrawUnitType(type, type->Sprite, frame, x, y);
-#ifdef USE_OPENGL
-		DrawUnitPlayerColor(type, type->Sprite, (Graphic**)type->PlayerColorSprite,
+		DrawUnitType(type, type->Sprite,
 			unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
 			frame, x, y);
-#endif
 	}
 }
 
@@ -1895,9 +1876,6 @@ void DrawUnit(const Unit* unit)
 	int state;
 	int constructed;
 	Graphic* sprite;
-#ifdef USE_OPENGL
-	Graphic** glsprite;
-#endif
 	ResourceInfo* resinfo;
 	ConstructionFrame* cframe;
 	UnitType* type;
@@ -1959,32 +1937,19 @@ void DrawUnit(const Unit* unit)
 	//
 	DrawUnitSelection(unit);
 
-	GraphicUnitPixels(unit, type->Sprite);
-
 	//
 	// Adjust sprite for Harvesters.
 	//
 	sprite = type->Sprite;
-#ifdef USE_OPENGL
-	glsprite = type->PlayerColorSprite;
-#endif
 	if (type->Harvester && unit->CurrentResource) {
 		resinfo = type->ResInfo[unit->CurrentResource];
 		if (unit->ResourcesHeld) {
 			if (resinfo->SpriteWhenLoaded) {
 				sprite = resinfo->SpriteWhenLoaded;
-#ifdef USE_OPENGL
-				glsprite = resinfo->PlayerColorSpriteWhenLoaded;
-#endif
-				GraphicUnitPixels(unit, sprite);
 			}
 		} else {
 			if (resinfo->SpriteWhenEmpty) {
 				sprite = resinfo->SpriteWhenEmpty;
-#ifdef USE_OPENGL
-				glsprite = resinfo->PlayerColorSpriteWhenEmpty;
-#endif
-				GraphicUnitPixels(unit, sprite);
 			}
 		}
 	}
@@ -2004,20 +1969,13 @@ void DrawUnit(const Unit* unit)
 	//
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
-		GraphicUnitPixels(unit, type->Sprite);
-		DrawUnitType(type, sprite, frame < 0 ? -1 - 1 : 1, x, y);
-#ifdef USE_OPENGL
-		DrawUnitPlayerColor(type, sprite, glsprite, 
+		DrawUnitType(type, sprite,
 			unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
 			frame < 0 ? -1 - 1 : 1, x, y);
-#endif
 	} else {
-		DrawUnitType(type, sprite, frame, x, y);
-#ifdef USE_OPENGL
-		DrawUnitPlayerColor(type, sprite, glsprite,
+		DrawUnitType(type, sprite,
 			unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
 			frame, x, y);
-#endif
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.

@@ -905,9 +905,6 @@ struct _unit_type_ {
 
 	struct _graphic_* Sprite;                ///< Sprite images
 	struct _graphic_* ShadowSprite;          ///< Shadow sprite image
-#ifdef USE_OPENGL
-	struct _graphic_* PlayerColorSprite[PlayerMax];  ///< Sprites with player colors
-#endif
 };
 
 	/// @todo ARI: should be dynamic (lua..), JOHNS: Pud only supports 255.
@@ -961,7 +958,7 @@ extern Animations* AnimationsByIdent(const char* ident);
 extern void SaveUnitTypes(struct _CL_File_* file);  ///< Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);            ///< Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
-extern void DrawUnitType(const UnitType* type, struct _graphic_* sprite,
+extern void DrawUnitType(const UnitType* type, struct _graphic_* sprite, int player,
 	int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);  ///< Init unit-type table
