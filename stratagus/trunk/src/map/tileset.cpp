@@ -564,11 +564,12 @@ global void CleanTilesets(void)
 	free(Tilesets[i]->MixedNameTable);
 	free(Tilesets[i]->TileTypeTable);
 	free(Tilesets[i]->AnimationTable);
-	free(Tilesets[i]);
 	for( j=0; j<Tilesets[i]->NumNames; ++j ) {
 	    free(Tilesets[i]->TileNames[j]);
 	}
 	free(Tilesets[i]->TileNames);
+
+	free(Tilesets[i]);
     }
     free(Tilesets);
     Tilesets=NULL;

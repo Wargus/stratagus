@@ -423,6 +423,11 @@ local void DefineTilesetParseSlot(Tileset* tileset,SCM list)
 	fprintf(stderr, "out of memory.\n");
 	ExitFatal(-1);
     }
+    tileset->TileNames = malloc(4);
+    if (!tileset->TileNames) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
 
     //
     //	Parse the list:	(still everything could be changed!)
