@@ -682,8 +682,6 @@ static Sample* LoadSample(const char* name)
 
 	fprintf(stderr, "Can't load the sound `%s'\n", name);
 
-	// FIXME: should support more sample formats.
-	free(buf);
 	return sample;
 }
 
