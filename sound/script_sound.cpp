@@ -325,17 +325,30 @@ local SCM CclDefineGameSounds(SCM list)
 /**
 **	Global volume support
 **
-**	@param volume new global sound volume
+**	@param volume	new global sound volume
 */
-local SCM CclSetSoundVolume(SCM volume) {
+local SCM CclSetSoundVolume(SCM volume)
+{
     SetGlobalVolume(gh_scm2int(volume));
+    return volume;
+}
+
+/**
+**	Music volume support
+**
+**	@param volume	new global music volume
+*/
+local SCM CclSetMusicVolume(SCM volume)
+{
+    SetMusicVolume(gh_scm2int(volume));
     return volume;
 }
 
 /**
 **	Turn Off Sound (client side)
 */
-local SCM CclSoundOff(void) {
+local SCM CclSoundOff(void)
+{
     SoundOff=1;
     return SCM_UNSPECIFIED;
 }
@@ -346,7 +359,8 @@ local SCM CclSoundOff(void) {
 **	@return true if and only if the sound is REALLY turned on
 **		(uses SoundFildes)
 */
-local SCM CclSoundOn(void) {
+local SCM CclSoundOn(void)
+{
     if (SoundFildes != -1) {
 	return SCM_BOOL_T;
     }
@@ -426,16 +440,18 @@ global void SoundCclRegister(void)
 {
     SiodSoundTag=allocate_user_tc();
 
-    init_subr_1("set-sound-volume",CclSetSoundVolume);
+    gh_new_procedure1_0("set-sound-volume!",CclSetSoundVolume);
+    gh_new_procedure1_0("set-music-volume!",CclSetMusicVolume);
+
     init_subr_0("sound-off",CclSoundOff);
     init_subr_0("sound-on",CclSoundOn);
     init_subr_0("sound-thread",CclSoundThread);
-    init_subr_1("set-global-sound-range",CclSetGlobalSoundRange);
+    init_subr_1("set-global-sound-range!",CclSetGlobalSoundRange);
     init_lsubr("define-game-sounds",CclDefineGameSounds);
     init_subr_0("display-sounds",CclDisplaySounds);
     init_subr_2("map-sound",CclMapSound);
     init_subr_1("sound-for-name",CclSoundForName);
-    init_subr_2("set-sound-range",CclSetSoundRange);
+    init_subr_2("set-sound-range!",CclSetSoundRange);
     init_subr_2("make-sound",CclMakeSound);
     init_subr_3("make-sound-group",CclMakeSoundGroup);
     init_subr_1("play-sound",CclPlaySound);
@@ -561,16 +577,18 @@ local SCM CclPlayMusic(SCM name)
 */
 global void SoundCclRegister(void)
 {
-    gh_new_procedure1_0("set-sound-volume",CclSetSoundVolume);
+    gh_new_procedure1_0("set-sound-volume!",CclSetSoundVolume);
+    gh_new_procedure1_0("set-music-volume!",CclSetMusicVolume);
     gh_new_procedure0_0("sound-off",CclSoundOff);
     gh_new_procedure0_0("sound-on",CclSoundOn);
     gh_new_procedure0_0("sound-thread",CclSoundThread);
-    gh_new_procedure1_0("set-global-sound-range",CclSetGlobalSoundRange);
+    gh_new_procedure1_0("set-global-sound-range!",CclSetGlobalSoundRange);
     gh_new_procedureN("define-game-sounds",CclDefineGameSounds);
     gh_new_procedure0_0("display-sounds",CclDisplaySounds);
     gh_new_procedure2_0("map-sound",CclMapSound);
     gh_new_procedure1_0("sound-for-name",CclSoundForName);
-    gh_new_procedure2_0("set-sound-range",CclSetSoundRange);
+    gh_new_procedure2_0("set-sound-range!",CclSetSoundRange);
+
     gh_new_procedure1_0("play-music",CclPlayMusic);
 }
 

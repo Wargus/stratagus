@@ -238,7 +238,11 @@ global void PlayGameSound(SoundId sound,unsigned char volume)
 }
 
 /**
-**	FIXME: docu
+**	Ask to the sound server to set the global volume of the sound.
+**
+**	@param volume	the sound volume (positive number) 0-255
+**
+**	@see MaxVolume
 */
 global void SetGlobalVolume(int volume)
 {
@@ -252,7 +256,28 @@ global void SetGlobalVolume(int volume)
     } else {
 	GlobalVolume=volume;
     }
-    DebugLevel3("Sound Volume: %d\n",GlobalVolume);
+}
+
+/**
+**	Ask to the sound server to set the volume of the music.
+**
+**	@param volume	the music volume (positive number) 0-255
+**
+**	@see MaxVolume
+*/
+global void SetMusicVolume(int volume)
+{
+    //FIXME: we use here the fact that we are in a shared memory context. This
+    // should send a message to the sound server
+
+    // silently discard out of range values
+    if ( volume<0 ) {
+	MusicVolume=0;
+    } else if ( volume>MaxVolume ) {
+	MusicVolume=MaxVolume;
+    } else {
+	MusicVolume=volume;
+    }
 }
 
 /**
