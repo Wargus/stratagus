@@ -490,7 +490,7 @@ global void GameMainLoop(void)
 				default:
 					// FIXME: assume that NumPlayers < (CYCLES_PER_SECOND - 7)
 					player = (GameCycle % CYCLES_PER_SECOND) - 7;
-					DebugCheck(player < 0);
+					Assert(player >= 0);
 					if (player < NumPlayers){
 						PlayersEachSecond(player);
 					}
