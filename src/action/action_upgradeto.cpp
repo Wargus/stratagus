@@ -49,7 +49,6 @@ global void HandleActionUpgradeTo(Unit* unit)
     DebugLevel3Fn(" %Zd\n",UnitNumber(unit));
 
     player=unit->Player;
-#ifdef NEW_ORDERS
     if( !unit->SubAction ) {		// first entry
 	unit->Data.UpgradeTo.Ticks=0;
 	unit->SubAction=1;
@@ -60,14 +59,6 @@ global void HandleActionUpgradeTo(Unit* unit)
     // FIXME: Should count down here
     unit->Data.UpgradeTo.Ticks+=SpeedUpgrade;
     if( unit->Data.UpgradeTo.Ticks>=stats->Costs[TimeCost] ) {
-#else
-    type=unit->Command.Data.UpgradeTo.What;
-    stats=&type->Stats[player->Player];
-
-    // FIXME: Should count down here
-    unit->Command.Data.UpgradeTo.Ticks+=SpeedUpgrade;
-    if( unit->Command.Data.UpgradeTo.Ticks>=stats->Costs[TimeCost] ) {
-#endif
 
 	unit->HP+=stats->HitPoints-unit->Type->Stats[player->Player].HitPoints;
 	// don't have such unit now
@@ -86,11 +77,7 @@ global void HandleActionUpgradeTo(Unit* unit)
 	    // FIXME: AiUpgradeToComplete(unit,type);
 	}
 	unit->Reset=unit->Wait=1;
-#ifdef NEW_ORDERS
 	unit->Orders[0].Action=UnitActionStill;
-#else
-	unit->Command.Action=UnitActionStill;
-#endif
 	unit->SubAction=0;
 
 	//

@@ -688,105 +688,38 @@ global void FireMissile(Unit* unit)
 
     DebugLevel3Fn("\n");
 
+    // FIXME: make sure thats the correct unit.
+
     //
     //	Goal dead?
-    // FIXME: make sure thats the correct unit.
     //
-#ifdef NEW_ORDERS
     goal=unit->Orders[0].Goal;
-#else
-    goal=unit->Command.Data.Move.Goal;
-#endif
     if( goal ) {
-
-	if( goal->Destroyed ) {
-	    DebugLevel0Fn("destroyed unit\n");
-	    return;
-	}
-	if( goal->Removed ) {
-	    DebugLevel3Fn("Missile-none hits removed unit!\n");
-	    return;
-	}
-#ifdef NEW_ORDERS
-	if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
-#else
-	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
-#endif
-	    DebugLevel3Fn("Missile-none hits dead unit!\n");
-	    return;
-	}
 
 	// Better let the caller/action handle this.
 
-#if 0
-	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
-	    RefsDebugCheck( !goal->Refs );
-	    if( !--goal->Refs ) {
-		ReleaseUnit(goal);
-	    }
-#ifdef NEW_ORDERS
-	    unit->Orders[0].Goal=NULL;
-	    ResetPath(unit->Orders[0]);
-#else
-	    unit->Command.Data.Move.DX=goal->X;
-	    unit->Command.Data.Move.DY=goal->Y;
-	    unit->Command.Data.Move.Goal=NULL;
-	    ResetPath(unit->Command);
-#endif
 	    return;
 	}
 	if( goal->Removed ) {
 	    DebugLevel3Fn("Missile-none hits removed unit!\n");
-	    RefsDebugCheck( !goal->Refs );
-	    --goal->Refs;
-	    RefsDebugCheck( !goal->Refs );
-#ifdef NEW_ORDERS
-	    goal=unit->Orders[0].Goal=NULL;
-	    ResetPath(unit->Orders[0]);
-#else
-	    unit->Command.Data.Move.Goal=NULL;
-	    ResetPath(unit->Command);
-#endif
 	    return;
 	}
-#ifdef NEW_ORDERS
 	if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
-#else
-	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
-#endif
 	    DebugLevel3Fn("Missile-none hits dead unit!\n");
-	    RefsDebugCheck( !goal->Refs );
-	    --goal->Refs;
-	    RefsDebugCheck( !goal->Refs );
-#ifdef NEW_ORDERS
-	    goal=unit->Orders[0].Goal=NULL;
-	    ResetPath(unit->Orders[0]);
-#else
-	    unit->Command.Data.Move.Goal=NULL;
-	    ResetPath(unit->Command);
-#endif
 	    return;
 	}
-#endif
-
     }
 
     //
     //	None missile hits immediately!
     //
     if( ((MissileType*)unit->Type->Missile.Missile)->Class==MissileClassNone ) {
-#ifdef NEW_ORDERS
 	// No goal, take target coordinates
 	if( !goal ) {
 	    dx=unit->Orders[0].X;
 	    dy=unit->Orders[0].Y;
-#else
-	if( !goal ) {
-	    dx=unit->Command.Data.Move.DX;
-	    dy=unit->Command.Data.Move.DY;
-#endif
 	    if( WallOnMap(dx,dy) ) {
 		if( HumanWallOnMap(dx,dy) ) {
 		    // FIXME: don't use UnitTypeByIdent here, this is slow!
@@ -831,13 +764,8 @@ global void FireMissile(Unit* unit)
 	}
 
     } else {
-#ifdef NEW_ORDERS
 	dx=unit->Orders[0].X;
 	dy=unit->Orders[0].Y;
-#else
-	dx=unit->Command.Data.Move.DX;
-	dy=unit->Command.Data.Move.DY;
-#endif
 	// FIXME: Can this be too near??
     }
 

@@ -248,18 +248,11 @@ local int AiFindFreeWorkers(Unit ** table)
     //
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
-#ifdef NEW_ORDERS
 	if (unit->Orders[0].Action != UnitActionBuild
-		&& (unit->OrderCount==1
+		&& (unit->OrderCount==2
 		    || unit->Orders[1].Action != UnitActionBuild) ) {
 	    table[num++] = unit;
 	}
-#else
-	if (unit->Command.Action != UnitActionBuild
-	    && unit->NextCommand[0].Action != UnitActionBuild) {
-	    table[num++] = unit;
-	}
-#endif
     }
     return num;
 }
@@ -784,15 +777,9 @@ local int AiTrainCreature(int type)
 	return -1;
     }
     while (nunits--) {
-#ifdef NEW_ORDERS
 	if (units[nunits]->Orders[0].Action != UnitActionStill) {
 	    continue;
 	}
-#else
-	if (units[nunits]->Command.Action != UnitActionStill) {
-	    continue;
-	}
-#endif
 	player = AiPlayer->Player;
 	CommandTrainUnit(units[nunits], &UnitTypes[type],FlushCommands);
 	// FIXME: and if not possible?
@@ -937,11 +924,7 @@ local void AiAssignWorker(void)
     if (num_worker) {
 	num_still = num_gold = num_wood = num_repair = 0;
 	for (w = 0; w < num_worker; ++w) {
-#ifdef NEW_ORDERS
 	    action = workers[w]->Orders[0].Action;
-#else
-	    action = workers[w]->Command.Action;
-#endif
 	    switch (action) {
 	    case UnitActionStill:
 		++num_still;
@@ -972,11 +955,7 @@ local void AiAssignWorker(void)
 	    if (num_still) {		// assign the non-working
 		for (w = 0; w < num_worker; ++w) {
 		    type = workers[w]->Type->Type;
-#ifdef NEW_ORDERS
 		    action = workers[w]->Orders[0].Action;
-#else
-		    action = workers[w]->Command.Action;
-#endif
 		    if (action == UnitActionStill) {
 			if (type ==
 			    AiChooseRace(UnitTypeHumanWorkerWithGold->Type)
@@ -1010,11 +989,7 @@ local void AiAssignWorker(void)
 		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		} else {
 		    // FIXME: don't interrupt chopping
-#ifdef NEW_ORDERS
 		    action = workers[w]->Orders[0].Action;
-#else
-		    action = workers[w]->Command.Action;
-#endif
 		    if (action == UnitActionStill
 			|| action == UnitActionHarvest) {
 			AiMineGold(workers[w]);
@@ -1036,11 +1011,7 @@ local void AiAssignWorker(void)
 		    AiChooseRace(UnitTypeHumanWorkerWithGold->Type)) {
 		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		} else {
-#ifdef NEW_ORDERS
 		    action = workers[w]->Orders[0].Action;
-#else
-		    action = workers[w]->Command.Action;
-#endif
 		    if (action == UnitActionStill
 			|| action == UnitActionMineGold) {
 			AiHarvest(workers[w]);
@@ -1053,11 +1024,7 @@ local void AiAssignWorker(void)
 	//          FIXME: if there is no gold/no wood forget this!
 	if (num_still) {		// assign the non working
 	    for (w = 0; w < num_worker; ++w) {
-#ifdef NEW_ORDERS
 		action = workers[w]->Orders[0].Action;
-#else
-		action = workers[w]->Command.Action;
-#endif
 		if (action == UnitActionStill) {
 		    type = workers[w]->Type->Type;
 		    if (type == AiChooseRace(UnitTypeHumanWorkerWithGold->Type)
@@ -1093,11 +1060,7 @@ local void AiAssignWorker(void)
     if (num_worker) {			// assign the non working
 	if (AiPlayer->MainHall) {
 	    for (w = 0; w < num_worker; ++w) {
-#ifdef NEW_ORDERS
 		action = workers[w]->Orders[0].Action;
-#else
-		action = workers[w]->Command.Action;
-#endif
 		if (action == UnitActionStill) {
 		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		}
@@ -1113,11 +1076,7 @@ local void AiAssignWorker(void)
     if (num_worker) {			// assign the non working
 	if (AiPlayer->MainHall) {
 	    for (w = 0; w < num_worker; ++w) {
-#ifdef NEW_ORDERS
 		action = workers[w]->Orders[0].Action;
-#else
-		action = workers[w]->Command.Action;
-#endif
 		if (action == UnitActionStill) {
 		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		}
