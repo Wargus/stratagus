@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -555,7 +555,7 @@ global int AiPlanAttack(AiForce* force)
 	    unit=AiPlayer->Player->Units[i];
 	    if( unit->Type->Transporter 
 		    && unit->Orders[0].Action==UnitActionStill
-		    && unit->OrderCount==1 && !unit->OnBoard[0] ) {
+		    && unit->OrderCount==1 ) {
 		DebugLevel0Fn("Assign any transporter\n");
 		AiMarkWaterTransporter(unit,watermatrix);
 		// FIXME: can be the wrong transporter.

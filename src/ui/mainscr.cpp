@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -183,6 +183,7 @@ global void DrawUnitInfo(const Unit* unit)
     int i;
     int x;
     int y;
+    Unit* uins;
 
     type=unit->Type;
     stats=unit->Stats;
@@ -279,7 +280,7 @@ global void DrawUnitInfo(const Unit* unit)
     //	Draw unit kills and experience.
     //
     if( !OriginalLevel && stats->Level
-	    && !(type->Transporter && unit->Value) ) {
+	    && !(type->Transporter && unit->InsideCount) ) {
         sprintf(buf,"XP:~<%d~> Kills:~<%d~>",unit->XP,unit->Kills);
 	VideoDrawTextCentered(x+114,y+8+15+33,GameFont,buf);
     }
@@ -367,7 +368,7 @@ global void DrawUnitInfo(const Unit* unit)
 	}
     }
 
-    if( type->StoresWood ) {
+    if( type->Stores[WoodCost] ) {
 	VideoDrawText(x+20,y+8+78,GameFont,"Production");
 	VideoDrawText(x+22,y+8+93,GameFont,"Lumber:");
 	// I'm assuming that it will be short enough to fit in the space
@@ -385,7 +386,7 @@ global void DrawUnitInfo(const Unit* unit)
         VideoDrawText(x+120,y+8+93,GameFont,buf);
 	return;
 
-    } else if( type->StoresOil ) {
+    } else if( type->Stores[OilCost] ) {
 	VideoDrawText(x+20,y+8+78,GameFont,"Production");
 	VideoDrawText(x+54,y+8+93,GameFont,"Oil:");
 	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[OilCost]);
@@ -398,7 +399,7 @@ global void DrawUnitInfo(const Unit* unit)
         VideoDrawText(x+120,y+8+93,GameFont,buf);
 	return;
 
-    } else if( type->StoresGold ) {
+    } else if( type->Stores[GoldCost] ) {
 	VideoDrawText(x+20,y+8+61,GameFont,"Production");
 	VideoDrawText(x+43,y+8+77,GameFont,"Gold:");
 	VideoDrawNumber(x+78,y+8+77,GameFont,DefaultIncomes[GoldCost]);
@@ -433,30 +434,25 @@ global void DrawUnitInfo(const Unit* unit)
         VideoDrawText(x+120,y+8+109,GameFont,buf);
 	return;
 
-    } else if( type->Transporter && unit->Value ) {
-	for( i=0; i<6; ++i ) {
-	    if( unit->OnBoard[i]!=NoUnitP ) {
-		DrawUnitIcon(unit->Player
-		    ,unit->OnBoard[i]->Type->Icon.Icon
+    } else if( type->Transporter && unit->InsideCount ) {
+	uins=unit->UnitInside;
+	for( i=0; i<unit->InsideCount; ++i,uins=uins->NextContained ) {
+	    DrawUnitIcon(unit->Player
+		    ,uins->Type->Icon.Icon
 		    ,(ButtonAreaUnderCursor==ButtonAreaInfo && ButtonUnderCursor==i+3)
-			? (IconActive|(MouseButtons&LeftButton)) : 0
+		    ? (IconActive|(MouseButtons&LeftButton)) : 0
 			    ,TheUI.InfoButtons[i+3].X,TheUI.InfoButtons[i+3].Y);
-		UiDrawLifeBar(unit->OnBoard[i]
-			,TheUI.InfoButtons[i+3].X,TheUI.InfoButtons[i+3].Y);
-		if( unit->OnBoard[i]->Type->CanCastSpell ) {
-		    UiDrawManaBar(unit->OnBoard[i]
-			    ,TheUI.InfoButtons[i+3].X,TheUI.InfoButtons[i+3].Y);
-		}
-		if( ButtonAreaUnderCursor==ButtonAreaInfo && ButtonUnderCursor==i+3 ) {
-		    if( unit->OnBoard[i]->Name ) {
-			char buf[128];
-
-			sprintf(buf,"%s %s",unit->OnBoard[i]->Type->Name,
-			    unit->OnBoard[i]->Name);
-			SetStatusLine(buf);
-		    } else {
-			SetStatusLine(unit->OnBoard[i]->Type->Name);
-		    }
+	    UiDrawLifeBar(uins,TheUI.InfoButtons[i+3].X,TheUI.InfoButtons[i+3].Y);
+	    if( uins->Type->CanCastSpell ) {
+		UiDrawManaBar(uins,TheUI.InfoButtons[i+3].X,TheUI.InfoButtons[i+3].Y);
+	    }
+	    if( ButtonAreaUnderCursor==ButtonAreaInfo && ButtonUnderCursor==i+3 ) {
+		if( uins->Name ) {
+		    char buf[128];
+		    sprintf(buf,"%s %s",uins->Type->Name,uins->Name);
+		    SetStatusLine(buf);
+		} else {
+		    SetStatusLine(uins->Type->Name);
 		}
 	    }
 	}

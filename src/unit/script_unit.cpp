@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -515,6 +515,7 @@ local SCM CclUnit(SCM list)
     Player* player;
     int slot;
     int i;
+    int insidecount=-1;
     char* str;
     char* s;
 
@@ -526,6 +527,7 @@ local SCM CclUnit(SCM list)
     type=NULL;
     seentype=NULL;
     player=NULL;
+    i=0;
 
     //
     //	Parse the list:	(still everything could be changed!)
@@ -628,8 +630,6 @@ local SCM CclUnit(SCM list)
 	    unit->Removed=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("selected")) ) {
 	    unit->Selected=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("rescued")) ) {
-	    unit->Rescued=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("rescued-from")) ) {
 	    unit->RescuedFrom=&Players[gh_scm2int(gh_car(list))];
 	    list=gh_cdr(list);
@@ -719,16 +719,18 @@ local SCM CclUnit(SCM list)
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("revealer")) ) {
 	    unit->Revealer=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("on-board")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("units-contained-count")) ) {
+	    insidecount=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("units-contained")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
-		value=gh_vector_ref(sublist,gh_int2scm(i));
+	    for (i=0;i<insidecount;i++) {
+	    	value=gh_vector_ref(sublist,gh_int2scm(i));
 		if( !gh_null_p(value) ) {
 		    str=gh_scm2newstr(value,NULL);
-
 		    slot=strtol(str+1,NULL,16);
-		    unit->OnBoard[i]=UnitSlots[slot];
+		    AddUnitInContainer(UnitSlots[slot],unit);
 		    DebugCheck( !UnitSlots[slot] );
 		    ++UnitSlots[slot]->Refs;
 		    free(str);
@@ -828,8 +830,8 @@ local SCM CclUnit(SCM list)
 	NewResetPath(unit);
     }
     // Fix Colors for rescued units.
-    if (unit->Rescued) {
-        unit->Colors=unit->RescuedFrom->UnitColors;
+    if (unit->RescuedFrom) {
+        unit->Colors=&unit->RescuedFrom->UnitColors;
     }
     DebugLevel3Fn("unit #%d parsed\n" _C_ slot);
 

@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -73,6 +73,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
     int i;
     int x;
     int y;
+    Unit *uninside;
 
     // FIXME: state 0?, should be wrong, should be Reset.
     // FIXME: Reset flag is cleared by HandleUnitAction.
@@ -153,15 +154,15 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	    UpdateButtonPanel();
 	}
 
+	//  Remark sight for units inside too.
 	if ( unit->Type->Transporter ) {
-	    for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
-		if( unit->OnBoard[i] != NoUnitP ) {
-		    MapMarkNewSight(unit->OnBoard[i]->Player,x,y,
-				    unit->OnBoard[i]->CurrentSightRange,xd,yd);
-		}
+	    uninside=unit->UnitInside;
+	    for( i=unit->InsideCount; i; uninside=uninside->NextContained,i-- ) {
+		MapMarkNewSight(uninside->Player,x,y,uninside->CurrentSightRange,xd,yd);
 	    }
 	}
 
+	//  Reveal Submarines and stuff.
 	if( unit->Type->CanSeeSubmarine ) {
 	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
 	}

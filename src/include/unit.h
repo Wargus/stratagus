@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -87,10 +87,33 @@
 **
 **		A generic link pointer. This member is currently used, if an
 **		unit is on the map, to link all units on the same map field
-**		together.  This member points the the unit that the current
-**		is onboard/inside when a unit is removed (see Unit::Removed).
-**		F.E.: A worker is removed, if he is in a mine or depot.
-**		Or an unit is on board a transporter.
+**		together.  This also links corpses and stuff. Also, this is 
+**		used in memory management to link unused units.
+**
+**	Unit::Container
+**
+**		Pointer to the unit containing it, or NoUnitP if the unit is
+**		free. This points to the transporter for units on board, or to
+**		the building for peasants inside(when they are mining).
+**
+**	Unit::UnitInside
+**
+**		Pointer to the last unit added inside. Order doesn't really
+**		matter. All units inside are kept in a circular linked list.
+**		This is NoUnitP if there are no units inside. Multiple levels
+**		of inclusion are allowed, though not very usefull right now
+**
+**	Unit::NextContained, Unit::PrevContained
+**
+**		The next and previous element in the curent container. Bogus
+**		values allowed for units not contained.
+**
+**	Unit::InsideCount
+**
+**		The number of units inside the container. This used to be
+**		Value for transporters, but since gold mines also use this
+**		field, it has changed to InsideCount, to allow counting
+**		units inside a gold mine.)
 **
 **	Unit::Name
 **
@@ -137,7 +160,7 @@
 **
 **		Player colors of the unit. Contains the hardware dependent
 **		pixel values for the player colors (palette index #208-#211).
-**		Setup from the global palette.
+**		Setup from the global palette. This is a pointer.
 **		@note Index #208-#211 are various SHADES of the team color
 **		(#208 is brightest shade, #211 is darkest shade) .... these
 **		numbers are NOT red=#208, blue=#209, etc
@@ -286,8 +309,10 @@
 **	Unit::Moving
 **
 **
-**	Unit::Rs
+**	Unit::RescuedFrom
 **
+**		Pointer to the original owner of an unit. It will be NULL if
+**		the unit was not rescued.
 **
 **	Unit::Revealer
 **
@@ -480,7 +505,14 @@ struct _unit_ {
     int		Slot;			/// Assigned slot number
     Unit**	UnitSlot;		/// Slot pointer of Units
     Unit**	PlayerSlot;		/// Slot pointer of Player->Units
-    Unit*	Next;			/// Generic link pointer (on map)
+    
+    Unit*	Next;		/// Generic link pointer (on map)
+    
+    unsigned	InsideCount;		/// Number of units inside.
+    Unit*	UnitInside;		/// Pointer to one of the units inside.
+    Unit*	Container;		/// Pointer to the unit containing it (or 0)
+    Unit*	NextContained;		/// Next unit in the container.
+    Unit*	PrevContained;		/// Previous unit in the container.
 
     char*	Name;			/// Unit own name
 
@@ -494,7 +526,7 @@ struct _unit_ {
     int		CurrentSightRange;	/// Unit's Current Sight Range
 
 //	DISPLAY:
-    UnitColors	Colors;			/// Player colors
+    UnitColors*	Colors;			/// Player colors
     signed char	IX;			/// X image displacement to map position
     signed char	IY;			/// Y image displacement to map position
     int		Frame;			/// Image frame: <0 is mirrored
@@ -517,8 +549,8 @@ struct _unit_ {
     unsigned	SeenState : 3;		/// Unit seen build/upgrade state
     unsigned	SeenDestroyed : 1;	/// Unit seen destroyed or not
     unsigned	Active : 1;		/// Unit is active for AI
-    unsigned	Rescued : 1;		/// Unit is rescued
     Player*     RescuedFrom;            /// The original owner of a rescued unit.
+    					/// NULL if the unit was not rescued.
 
 #define MaxMana	255			/// maximal mana for units
     unsigned	Mana : 8;		/// mana points
@@ -553,9 +585,11 @@ struct _unit_ {
     unsigned	Rs : 8;
     unsigned	Revealer : 1;		/// reveal the fog of war
 
+#if 0
 #define MAX_UNITS_ONBOARD 6		/// max number of units in transporter
     // FIXME: use the new next pointer
     Unit*	OnBoard[MAX_UNITS_ONBOARD];	/// Units in transporter
+#endif
 
 #define MAX_ORDERS 16			/// How many outstanding orders?
     char	OrderCount;		/// how many orders in queue
@@ -737,6 +771,10 @@ extern Unit* MakeUnit(UnitType* type,Player* player);
 extern void PlaceUnit(Unit* unit,int x,int y);
     ///	Create a new unit and place on map
 extern Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player);
+    /// Add an unit inside a container. Only deal with list stuff.
+extern void AddUnitInContainer(Unit* unit, Unit* host);
+    /// Remove an unit from inside a container. Only deals with list stuff.
+extern void RemoveUnitFromContainer(Unit* unit);
     /// Remove unit from map/groups/...
 extern void RemoveUnit(Unit* unit, Unit* host);
     /// Handle the loose of an unit (food,...)
@@ -802,20 +840,16 @@ extern int CanBuildOn(int x,int y,int mask);
     /// FIXME: more docu
 extern int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y);
 
-    /// Find nearest gold mine
-extern Unit* FindGoldMine(const Unit*,int,int);
-    /// Find nearest gold deposit
-extern Unit* FindGoldDeposit(const Unit*,int,int);
-    /// Find nearest wood deposit
-extern Unit* FindWoodDeposit(const Player* player,int x,int y);
-    /// Find nearest oil deposit
-extern Unit* FindOilDeposit(const Unit*,int x,int y);
+    /// Find nearest deposit
+extern Unit* FindDeposit(const Player*,int x,int y,int resource);
     /// Find the next idle worker
 extern Unit* FindIdleWorker(const Player* player,const Unit* last);
 
     /// Find the nearest piece of wood in sight range
 extern int FindWoodInSight(const Unit* unit,int* x,int* y);
-    /// FIXME: more docu
+    /// Find gold mine
+extern Unit* FindGoldMine(const Unit* unit,int x,int y);
+    /// Find oil platform
 extern Unit* FindOilPlatform(const Player* player,int x,int y);
 
     /// FIXME: more docu
@@ -938,7 +972,6 @@ extern int FindAndSortUnits(const Viewport* vp, Unit** table);
 extern int SelectUnits(int x1,int y1,int x2,int y2,Unit** table);
     /// Select units on map tile
 extern int SelectUnitsOnTile(int x,int y,Unit** table);
-
     /// Find all units of this type
 extern int FindUnitsByType(const UnitType* type,Unit** table);
     /// Find all units of this type of the player
@@ -962,16 +995,12 @@ extern Unit* TransporterOnScreenMapPosition (int , int );
 
     /// Return gold mine, if on map tile
 extern Unit* GoldMineOnMap(int tx,int ty);
-    /// Return gold deposit, if on map tile
-extern Unit* GoldDepositOnMap(int tx,int ty);
     /// Return oil patch, if on map tile
 extern Unit* OilPatchOnMap(int tx,int ty);
     /// Return oil platform, if on map tile
 extern Unit* PlatformOnMap(int tx,int ty);
-    /// Return oil deposit, if on map tile
-extern Unit* OilDepositOnMap(int tx,int ty);
-    /// Return wood deposit, if on map tile
-extern Unit* WoodDepositOnMap(int tx,int ty);
+    /// Return resource deposit, if on map tile
+extern Unit* ResourceDepositOnMap(int tx,int ty,int resource);
 
     /// Find best enemy in numeric range to attack
 extern Unit* AttackUnitsInDistance(Unit* unit,int range);
