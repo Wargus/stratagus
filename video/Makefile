@@ -33,8 +33,10 @@ MODULE	= video
 
 HDRS	= _clip_rectangle intern_video.h
 
-OBJS	= video.$(OE) cursor.$(OE) sprite.$(OE) \
-	  graphic.$(OE) linedraw.$(OE) font.$(OE) png.$(OE) \
-	  sdl.$(OE) new_X11.$(OE) X11.$(OE) svgalib.$(OE) wince.$(OE)
+SRCS	= video.c cursor.c sprite.c \
+	  graphic.c linedraw.c font.c png.c \
+	  sdl.c new_X11.c X11.c svgalib.c wince.c
+
+OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

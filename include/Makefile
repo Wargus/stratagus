@@ -33,6 +33,8 @@ include $(TOPDIR)/Rules.make
 
 MODULE	= include
 
+SRCS	=
+
 OBJS	=
 
 HDRS	= actions.h ai.h ccl.h freecraft.h construct.h cursor.h font.h icons.h \

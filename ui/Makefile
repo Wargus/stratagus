@@ -36,8 +36,11 @@ include $(TOPDIR)/Rules.make
 ##
 
 MODULE	= ui
-OBJS	= mouse.$(OE) button_checks.$(OE) botpanel.$(OE) mainscr.$(OE) \
-	  icons.$(OE) ui.$(OE) ccl_ui.$(OE) menus.$(OE) console.$(OE) \
-	  interface.$(OE)
+
+SRCS	= mouse.c button_checks.c botpanel.c mainscr.c \
+	  icons.c ui.c ccl_ui.c menus.c console.c \
+	  interface.c
+
+OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

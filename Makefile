@@ -34,14 +34,19 @@ MODULES= clone map unit action ai ui sound video network pathfinder siod \
 	 game beos missile libmodplug
 
 all::
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i all ; done
+	@if [ ! -d ./$(OBJDIR) ] ; then mkdir ./$(OBJDIR) ; fi
+	@set -e; for i in $(MODULES) ; do\
+	    if [ ! -d $$i/$(OBJDIR) ] ; then mkdir $$i/$(OBJDIR) ; fi ;\
+	    $(MAKE) -C $$i all ;\
+	done
 
 doc::	
 	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i doc ; done
 
 clean::
 	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i clean ; done
-	$(RM) $(OBJS) libclone.a
+	$(RM) $(OBJS) $(OBJDIR)libclone.a
+	-@$(RM) $(OBJDIR)main.$(OE) $(OBJDIR)freecraftrc.$(OE)
 
 clobber::	clean
 	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i clobber ; done
