@@ -172,64 +172,70 @@ local int MapVisibleMask(void)
 **	@param player	Player to mark sight.
 **	@param tx	X center position.
 **	@param ty	Y center position.
+**
+**	@return		Number of units that can see this square.
 */
 #define MAX_SIGHT_RANGE 9
-local int LookupSight(const Player* player, int tx, int ty)
+local int LookupSight(const Player* player,int tx,int ty)
 {
     int numunits;
-    int visiblecount=0;
+    int visiblecount;
     int x;
     int y;
     int range;
     Unit* unitrange[UnitMax];
-    //Lookup all units that could possibly see this square.
-    //And see how many there are.
-    numunits=SelectUnits(tx-MAX_SIGHT_RANGE-1,
-			    ty-MAX_SIGHT_RANGE-1,
-			    tx+MAX_SIGHT_RANGE+1,
-			    ty+MAX_SIGHT_RANGE+1,unitrange);
-    numunits--;
+
+    visiblecount=0;
+    // Lookup all units that could possibly see this square.
+    // And see how many there are.
+    numunits=SelectUnits(tx-MAX_SIGHT_RANGE-1,ty-MAX_SIGHT_RANGE-1,
+	tx+MAX_SIGHT_RANGE+1,ty+MAX_SIGHT_RANGE+1,unitrange);
+    --numunits;
     range=(unitrange[numunits]->Stats->SightRange+1)*
-	    (unitrange[numunits]->Stats->SightRange+1);
-    printf("Number of Lookup Units: %d\n",numunits);
-    while(numunits >= 0) {
-	if (unitrange[numunits]->Player->Player == player->Player) {
-	    x = unitrange[numunits]->X;
-	    y = unitrange[numunits]->Y;
-	    if (((x-tx)*(x-tx)+(y-ty)*(y-ty)) <= range) {
-		visiblecount++;
+	(unitrange[numunits]->Stats->SightRange+1);
+    DebugLevel1Fn("Number of Lookup Units: %d\n" _C_ numunits);
+    while( numunits>=0 ) {
+	if( unitrange[numunits]->Player->Player==player->Player ) {
+	    x=unitrange[numunits]->X;
+	    y=unitrange[numunits]->Y;
+	    if( ((x-tx)*(x-tx)+(y-ty)*(y-ty))<=range ) {
+		++visiblecount;
 	    }
 	}
-	if (visiblecount >= 255) return 255;
-	numunits--;
+	if( visiblecount>=255 ) {
+	    return 255;
+	}
+	--numunits;
     }
     return visiblecount;
 }
 
 /**
 **	Find out if a field is seen (By me, or by shared vision)
-**	@param player,	Player to check for
-**	@param x,	X tile to check
-**	@param y,	Y tile to check
+**
+**	@param player	Player to check for.
+**	@param x	X tile to check.
+**	@param y	Y tile to check.
+**
+**	@return		FIXME: docu.
 */
-global int IsTileVisible(const Player* player, int x, int y)
+global int IsTileVisible(const Player* player,int x,int y)
 {
-    int visiontype=0;
+    int visiontype;
     int i;
-    if (TheMap.Fields[y*TheMap.Width+x].Visible[player->Player] > 1) {
-      return 2;
+
+    if( TheMap.Fields[y*TheMap.Width+x].Visible[player->Player]>1 ) {
+	return 2;
     }
     visiontype=TheMap.Fields[y*TheMap.Width+x].Visible[player->Player];
-    for (i=0;i<PlayerMax;i++) {
-	if ( player->SharedVision&(1<<i) &&
-		   (Players[i].SharedVision&(1<<player->Player)) ) {
-            if (visiontype < TheMap.Fields[y*TheMap.Width+x].
-					Visible[i]) {
-		visiontype=TheMap.Fields[y*TheMap.Width+x].
-					Visible[i];
+    for( i=0; i<PlayerMax; i++ ) {
+	if( player->SharedVision&(1<<i) &&
+	    (Players[i].SharedVision&(1<<player->Player)) ) {
+            if( visiontype<TheMap.Fields[y*TheMap.Width+x].Visible[i] ) {
+		visiontype=TheMap.Fields[y*TheMap.Width+x].Visible[i];
 	    }
 	}
-	if (visiontype > 1) {
+	if( visiontype>1 ) {
 	    return 2;
 	}
     }
@@ -254,7 +260,7 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
     int v;
     int p;
 
-    //Mark as Seen
+    // Mark as seen
     if( !range ) {			// zero sight range is zero sight range
 	DebugLevel0Fn("Zero sight range\n");
 	return;
@@ -291,9 +297,11 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		switch( v ) {
 		    case 0:		// Unexplored
 		    case 1:		// Unseen
-			//if( IsTileVisible(ThisPlayer,i,y) > 1) {
-			//    MapMarkSeenTile(i,y);
-			//}
+#if 0
+			if( IsTileVisible(ThisPlayer,i,y) > 1) {
+			    MapMarkSeenTile(i,y);
+			}
+#endif
 			// FIXME: mark for screen update
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=2;
 			break;
@@ -312,7 +320,7 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 }
 
 /**
-**	Unmark the sight of unit. (Dies, Boards A unit.)
+**	Unmark the sight of unit. (Dies, Boards a unit.)
 **
 **	@param player	Player to mark sight.
 **	@param tx	X center position.
@@ -329,7 +337,8 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
     int v;
     int p;
 
-        if( !range ) {			// zero sight range is zero sight range
+    // zero sight range is zero sight range
+    if( !range ) {
 	DebugLevel0Fn("Zero sight range\n");
 	return;
     }
@@ -550,7 +559,7 @@ global void MapUpdateFogOfWar(int x,int y)
 	    if( vis > 1 && (!last || last&MapFieldPartiallyVisible) ) {
 #else
 	    vis=TheMap.Fields[sx].Flags&MapFieldVisible;
-	    if( vis  && (!last || last&MapFieldPartiallyVisible) ) {
+	    if( vis && (!last || last&MapFieldPartiallyVisible) ) {
 #endif
 #ifdef NEW_MAPDRAW
 		*redraw_row=NEW_MAPDRAW;
@@ -595,23 +604,23 @@ global void UpdateFogOfWarChange(void)
     //
     //	Mark all explored fields as visible.
     //
-    if ( TheMap.NoFogOfWar ) {
+    if( TheMap.NoFogOfWar ) {
 	w=TheMap.Width;
 	for( y=0; y<TheMap.Height; y++ ) {
 	    for( x=0; x<TheMap.Width; ++x ) {
 #ifdef NEW_FOW
-	if ( IsTileVisible(ThisPlayer,x,y) ) {
+		if( IsTileVisible(ThisPlayer,x,y) ) {
 		    int p;
 
-		   for( p=0; p<PlayerMax; ++p ) {
-			if (TheMap.Fields[x+y*w].Visible[p] < 2) {
+		    for( p=0; p<PlayerMax; ++p ) {
+			if(TheMap.Fields[x+y*w].Visible[p]<2 ) {
 			    TheMap.Fields[x+y*w].Visible[p]=2;
 			} else {
 			    TheMap.Fields[x+y*w].Visible[p]++;
 			}
 		    }
 #else
-	if ( IsMapFieldExplored(x,y) ) {
+		if( IsMapFieldExplored(x,y) ) {
 		    TheMap.Visible[0][(x+y*w)/32] |= 1<<((x+y*w)%32);
 #endif
 		    MapMarkSeenTile( x,y );
@@ -624,29 +633,31 @@ global void UpdateFogOfWarChange(void)
 	int p;
 	int numunits;
 	Unit* units[UnitMax];
+
 	for( y=0; y<TheMap.Height; y++ ) {
 	    for( x=0; x<TheMap.Width; ++x ) {
 		for( p=0; p<PlayerMax; ++p ) {
 		    if( TheMap.Fields[x+y*TheMap.Width].Visible[p] ) {
-			    TheMap.Fields[x+y*TheMap.Width].Visible[p]=1;
+			TheMap.Fields[x+y*TheMap.Width].Visible[p]=1;
 		    }
 		}
 	    }
 	}
 	for( y=0; y<TheMap.Height; y++ ) {
 	    for( x=0; x<TheMap.Width; ++x ) {
-		    //Find and Mark each unit
-		    numunits = SelectUnitsOnTile(x,y,units);
-		    numunits--;
-		    while(numunits >= 0) {
-			int tx;
-			int ty;
-			tx=units[numunits]->X+units[numunits]->Type->TileWidth/2;
-			ty=units[numunits]->Y+units[numunits]->Type->TileHeight/2;
-			MapMarkSight(units[numunits]->Player,tx,ty,
-					units[numunits]->Stats->SightRange);
-			numunits--;
-		    }
+		// Find and Mark each unit
+		numunits = SelectUnitsOnTile(x,y,units);
+		--numunits;
+		while( numunits>=0 ) {
+		    int tx;
+		    int ty;
+
+		    tx=units[numunits]->X+units[numunits]->Type->TileWidth/2;
+		    ty=units[numunits]->Y+units[numunits]->Type->TileHeight/2;
+		    MapMarkSight(units[numunits]->Player,tx,ty,
+			units[numunits]->Stats->SightRange);
+		    --numunits;
+		}
 	    }
 	}
     }
@@ -1852,8 +1863,8 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 
     w=TheMap.Width;
     tile=tile2=0;
-    x = sx - sy;
-    y = sy / TheMap.Width;
+    x=sx-sy;
+    y=sy/TheMap.Width;
 
     //
     //	Which Tile to draw for fog
