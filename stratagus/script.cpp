@@ -98,7 +98,7 @@ global int CclInConfigFile;		/// True while config file parsing
 --	Functions
 ----------------------------------------------------------------------------*/
 
-/***
+/**
 **	Free pointer, if it lays in the heap.
 **
 **	@param ptr	Pointer into heap.
@@ -296,7 +296,7 @@ local SCM CclSpeedGold(SCM speed)
     return speed;
 }
 
-/*
+/**
 **	For debug increase wood chopping speed.
 */
 local SCM CclSpeedChop(SCM speed)
@@ -306,7 +306,7 @@ local SCM CclSpeedChop(SCM speed)
     return speed;
 }
 
-/*
+/**
 **	For debug increase wood delivery speed.
 */
 local SCM CclSpeedWood(SCM speed)
@@ -316,7 +316,7 @@ local SCM CclSpeedWood(SCM speed)
     return speed;
 }
 
-/*
+/**
 **	For debug increase haul speed.
 */
 local SCM CclSpeedHaul(SCM speed)
@@ -326,7 +326,7 @@ local SCM CclSpeedHaul(SCM speed)
     return speed;
 }
 
-/*
+/**
 **	For debug increase oil delivery speed.
 */
 local SCM CclSpeedOil(SCM speed)
@@ -336,7 +336,7 @@ local SCM CclSpeedOil(SCM speed)
     return speed;
 }
 
-/*
+/**
 **	For debug increase building speed.
 */
 local SCM CclSpeedBuild(SCM speed)
@@ -346,7 +346,7 @@ local SCM CclSpeedBuild(SCM speed)
     return speed;
 }
 
-/*
+/**
 **	For debug increase training speed.
 */
 local SCM CclSpeedTrain(SCM speed)
@@ -356,7 +356,7 @@ local SCM CclSpeedTrain(SCM speed)
     return speed;
 }
 
-/*
+/**
 **	For debug increase upgrading speed.
 */
 local SCM CclSpeedUpgrade(SCM speed)
@@ -366,7 +366,7 @@ local SCM CclSpeedUpgrade(SCM speed)
     return speed;
 }
 
-/*
+/**
 **	For debug increase researching speed.
 */
 local SCM CclSpeedResearch(SCM speed)
@@ -376,7 +376,7 @@ local SCM CclSpeedResearch(SCM speed)
     return speed;
 }
 
-/*
+/**
 **	For debug increase all speeds.
 */
 local SCM CclSpeeds(SCM speed)
@@ -409,32 +409,44 @@ local SCM CclUnits(void)
 {
 #ifdef NEW_UNIT
     Unit** slot;
+    int freeslots;
+    int destroyed;
+    int nullrefs;
     int i;
-    int r;
     static char buf[80];
 
-    i=r=0;
+    i=0;
     slot=UnitSlotFree;
-    while( slot ) {
+    while( slot ) {			// count the free slots
 	++i;
 	slot=(void*)*slot;
     }
+    freeslots=i;
+
+    //
+    //	Look how many slots are used
+    //
+    i=nullrefs=0;
     for( slot=UnitSlots; slot<UnitSlots+MAX_UNIT_SLOTS; ++slot ) {
 	if( *slot
 		&& (*slot<(Unit*)UnitSlots
 			|| *slot>(Unit*)(UnitSlots+MAX_UNIT_SLOTS)) ) {
 	    if( (*slot)->Destroyed ) {
-		++r;
+		++i;
+	    } else if( !(*slot)->Refs ) {
+		++nullrefs;
 	    }
 	}
     }
-    sprintf(buf,"%d free %d used %d destroyed slots"
-	    ,i,MAX_UNIT_SLOTS-2-i,r);
-    fprintf(stderr,"%d free %d used %d destroyed slots\n"
-	    ,i,MAX_UNIT_SLOTS-2-i,r);
-    SetStatusLine(buf);
+    destroyed=i;
 
-    return gh_int2scm(i);
+    sprintf(buf,"%d free %d used %d destroyed slots %d"
+	    ,freeslots,MAX_UNIT_SLOTS-2-freeslots,destroyed,nullrefs);
+    SetStatusLine(buf);
+    fprintf(stderr,"%d free %d used %d destroyed slots %d\n"
+	    ,freeslots,MAX_UNIT_SLOTS-2-freeslots,destroyed,nullrefs);
+
+    return gh_int2scm(destroyed);
 #else
     return SCM_UNSPECIFIED;
 #endif
