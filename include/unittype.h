@@ -774,7 +774,7 @@ struct _unit_type_ {
     unsigned GroundAttack : 1;		/// Can do command ground attack.
     unsigned IsUndead : 1;		/// Unit is already dead.
     unsigned ShoreBuilding : 1;		/// Building must be build on coast.
-    unsigned CanCastSpell : 1;		/// Unit is able to use spells.
+    char *CanCastSpell;			/// Unit is able to use spells.
     unsigned CanAttack : 1;		/// Unit can attack.
     unsigned int DemolishRange;		/// Unit will Demolish around when dead.
     unsigned int DemolishDamage;	/// Damage dealt to unit affected by demolition.
@@ -863,6 +863,7 @@ extern UnitType* UnitTypeByWcNum(unsigned);		/// Get unit-type by wc number
     /// Get the animations structure by ident
 extern Animations* AnimationsByIdent(const char* ident);
 
+extern void SaveUnitTypeDefs(CLFile* file);		/// Declare the unit-type table first.
 extern void SaveUnitTypes(CLFile* file);		/// Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);		/// Allocate an empty unit-type slot
     /// Draw the sprite frame of unit-type

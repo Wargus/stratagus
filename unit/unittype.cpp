@@ -50,6 +50,7 @@
 #include "player.h"
 #include "missile.h"
 #include "ccl.h"
+#include "spells.h"
 
 #include "etlib/hash.h"
 
@@ -462,7 +463,8 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->GroundAttack=BIT(14,v);
 	unittype->IsUndead=BIT(15,v);
 	unittype->ShoreBuilding=BIT(16,v);
-	unittype->CanCastSpell=BIT(17,v);
+//	unittype->CanCastSpell=BIT(17,v);unittype->CanCastSpell = (char *) malloc(/*nb_spell*/);
+	unittype->CanCastSpell = NULL;//
 	unittype->CanStore[WoodCost]=BIT(18,v);
 	unittype->CanAttack=BIT(19,v);
 	unittype->Hero=BIT(23,v);
@@ -997,7 +999,16 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 	}
     if (flag)
 	CLprintf(file,")");
-    
+   
+    if( type->CanCastSpell ) {
+	CLprintf(file,"  'can-cast-spell '( ");
+	for (i=0;i<SpellTypeCount;++i) {
+	    if (type->CanCastSpell[i]) {
+		CLprintf(file,"%s ",SpellTypeTable[i].IdentName);
+	    }
+	}
+	CLprintf(file,")\n");
+    }
     if( type->MustBuildOnTop ) {
 	CLprintf(file,"  'must-build-on-top '%s\n",type->MustBuildOnTop->Ident);
     }
@@ -1016,9 +1027,6 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     }
     if( type->IsUndead ) {
 	CLprintf(file,"  'isundead\n");
-    }
-    if( type->CanCastSpell ) {
-	CLprintf(file,"  'can-cast-spell\n");
     }
     if( type->Organic ) {
 	CLprintf(file,"  'organic\n");
@@ -1102,6 +1110,22 @@ local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
 }
 
 /**
+** 	Save the names of all unit types, before actually defining anything about them.
+**	
+**	@param file	Output file.
+*/
+global void SaveUnitTypeDefs(CLFile* file)
+{
+    int i;
+    CLprintf(file,"\n;;; Declare all unit types in advance.\n");
+    //  Define all types in advance to avoid undefined unit problems.
+    for ( i=0; i<NumUnitTypes; ++i ) {
+	CLprintf(file,"(define-unit-type '%s)\n",UnitTypes[i]->Ident);
+    }
+    CLprintf(file,"\n");
+}
+
+/**
 **	Save state of the unit-type table to file.
 **
 **	@param file	Output file.
@@ -1131,13 +1155,6 @@ global void SaveUnitTypes(CLFile* file)
     for( i=0; i<NumUnitTypes; ++i ) {
 	SaveAnimations(UnitTypes[i],file);
     }
-
-    CLprintf(file,"\n;;; Declare all unit types in advance.\n");
-    //  Define all types in advance to avoid undefined unit problems.
-    for ( i=0; i<NumUnitTypes; ++i ) {
-	CLprintf(file,"(define-unit-type '%s)\n",UnitTypes[i]->Ident);
-    }
-    CLprintf(file,"\n");
 
     //	Save all types
 
