@@ -189,27 +189,31 @@ DEBUG=	-DDEBUG -DREFS_DEBUG # -DFLAG_DEBUG
 ## There are some still not well tested code parts or branches.
 ## UNITS_ON_MAP:	Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code
-## NEW_NAMES:		New unit names without copyleft problems
 ## NEW_AI:		New better improved AI code
 ## This aren't working:
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
 ## NEW_NETMENUS:	Include new network menues.
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -DNEW_NAMES -D_NEW_NETMENUS -DBPP8_IRGB # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS
+	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -D_NEW_NETMENUS -DBPP8_IRGB # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
 #CFLAGS=-g -O1 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
-#CFLAGS=-g -O2 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS)  $(DFLAGS)
-CFLAGS=-g -O3 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS)  $(DFLAGS)
+CFLAGS=-g -O2 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
+#CFLAGS=-g -O3 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
 #CFLAGS=-g -O3 $(PROFILE) -pipe -Wcast-align -Wall $(IFLAGS)  $(DFLAGS)
-#CFLAGS=-g -O6 -pipe -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)
+#CFLAGS=-g -O6 -pipe -fconserve-space -fexpensive-optimizations -ffast-math $(IFLAGS) $(DFLAGS)
 #-- Production
-#CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)
-#CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS) -static
+#CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math $(IFLAGS) $(DFLAGS)
+#CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math $(IFLAGS) $(DFLAGS) -static
+
+# GCC 3.0
+#CFLAGS=-g -O3 $(PROFILE) -pipe -Wcast-align -W -Wredundant-decls -Wno-sign-compare -Wall -Wno-comment $(IFLAGS) $(DFLAGS)
+#CC=gcc-3.0
 
 CC=cc
+#CC=gcc272
 RM=rm -f
 MAKE=make
 

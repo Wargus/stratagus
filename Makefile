@@ -162,8 +162,9 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/buttons.ccl data/ccl/human/buttons.ccl \
 	  data/ccl/orc/buttons.ccl \
 	  data/ccl/fonts.ccl data/ccl/ai.ccl \
-	  data/ccl/tilesets.ccl data/ccl/summer.ccl data/ccl/winter.ccl \
-	  data/ccl/wasteland.ccl data/ccl/swamp.ccl \
+	  data/ccl/tilesets.ccl data/ccl/tilesets/summer.ccl \
+	  data/ccl/tilesets/winter.ccl \
+	  data/ccl/tilesets/wasteland.ccl data/ccl/tilesets/swamp.ccl \
 	  data/ccl/anim.ccl data/ccl/wc2.ccl data/default.cm
 
 CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
