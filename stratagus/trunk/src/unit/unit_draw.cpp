@@ -54,6 +54,10 @@ global int ShowSightRange;		/// Flag: show right range
 global int ShowReactRange;		/// Flag: show react range
 global int ShowAttackRange;		/// Flag: show attack range
 global int ShowOrders;			/// Flag: show orders of unit on map
+    /// Flag: health horizontal instead of vertical
+global int ShowHealthHorizontal=1;
+    /// Flag: health horizontal instead of vertical
+global int ShowManaHorizontal=1;
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two?
@@ -355,12 +359,27 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	    } else {
 		color=ColorRed;
 	    }
-	    VideoFillRectangleClip(color
-		,x+(type->TileWidth*TileSizeX
-			-type->BoxWidth)/2
-		,y+(type->TileHeight*TileSizeY
-			-type->BoxHeight)/2
-		,2,(f*type->BoxHeight)/100);
+	    if ( ShowHealthHorizontal == 0)  {
+		    VideoFillRectangleClip(color
+			,x+(type->TileWidth*TileSizeX
+				-type->BoxWidth)/2
+			,y+(type->TileHeight*TileSizeY
+				-type->BoxHeight)/2
+			,2,(f*type->BoxHeight)/100);
+	    }  else  {
+		    VideoFillRectangleClip(ColorBlack
+			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)-1
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+1
+			,((f*type->BoxHeight)/100)+2
+			,5);
+		    VideoFillRectangleClip(color
+			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+2
+			,(f*type->BoxHeight)/100
+			,3);
+	    }
 	}
     }
 
@@ -413,13 +432,28 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
     if( ShowManaBar ) {
 	if( type->CanCastSpell
 		&& !(ShowNoFull && unit->Mana==255) ) {
-	    f=(100*unit->Mana)/255;
-	    VideoFillRectangleClip(ColorBlue
-		,x+(type->TileWidth*TileSizeX
-			+type->BoxWidth)/2
-		,y+(type->TileHeight*TileSizeY
-			-type->BoxHeight)/2
-		,2,(f*type->BoxHeight)/100);
+	    if ( ShowManaHorizontal == 0)  {
+	    	f=(100*unit->Mana)/255;
+		    VideoFillRectangleClip(ColorBlue
+			,x+(type->TileWidth*TileSizeX
+				+type->BoxWidth)/2
+			,y+(type->TileHeight*TileSizeY
+				-type->BoxHeight)/2
+			,2,(f*type->BoxHeight)/100);
+	    }  else  {
+		    f=(100*unit->Mana)/255;
+		    VideoFillRectangleClip(ColorBlack
+			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)-1
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+6
+			,(type->BoxHeight)+2
+			,5);
+		    VideoFillRectangleClip(ColorBlue
+			,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+7
+			,(f*type->BoxHeight)/100
+			,3);
+	    }
+
 	}
     }
 
