@@ -173,7 +173,7 @@ struct _unit_type_ {
     unsigned GoldMine : 1;		///
     unsigned Hero : 1;			///
     unsigned StoresOil : 1;		///
-    unsigned Explodes : 1;		/// invisiblity/unholy armor kills unit
+    unsigned Volatile : 1;		/// invisiblity/unholy armor kills unit
     unsigned CowerMage : 1;		///
     unsigned Organic : 1;		/// organic
 

@@ -766,7 +766,7 @@ local void SendDemolish(int x,int y)
 
     for( i=0; i<NumSelected; ++i ) {
         unit=Selected[i];
-	if( unit->Type->Explodes ) {
+	if( unit->Type->Volatile ) {
 	    // FIXME: choose correct unit no flying ...
 	    dest=TargetOnMapTile(unit,x,y);
 	    if( dest==unit ) {	// don't let an unit self destruct

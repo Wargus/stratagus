@@ -286,7 +286,7 @@ typedef struct _unit_type_  {
     unsigned GoldMine : 1;
     unsigned Hero : 1;
     unsigned StoresOil : 1;
-    unsigned Explodes : 1;	// invisiblity/unholy armor killes this unit
+    unsigned Volatile : 1;	// invisiblity/unholy armor killes this unit
     unsigned CowerMage : 1;
     unsigned Organic : 1;
 
@@ -1569,7 +1569,7 @@ void DumpUdtaAsScm(void)
 	if( UnitTypes[i].StoresOil ) {
 	    printf("  'stores-oil\n");
 	}
-	if( UnitTypes[i].Explodes ) {
+	if( UnitTypes[i].Volatile ) {
 	    printf("  'volatile\n");
 	}
 	if( UnitTypes[i].CowerMage ) {
@@ -1739,7 +1739,7 @@ int main(int argc,char** argv)
 	UnitTypes[i].GoldMine=BIT(22,v);
 	UnitTypes[i].Hero=BIT(23,v);
 	UnitTypes[i].StoresOil=BIT(24,v);
-	UnitTypes[i].Explodes=BIT(25,v);
+	UnitTypes[i].Volatile=BIT(25,v);
 	UnitTypes[i].CowerMage=BIT(26,v);
 	UnitTypes[i].Organic=BIT(27,v);
 	if( BIT(28,v) )	printf("Unused bit 28 used in %d\n",i);
@@ -1806,7 +1806,7 @@ if( 0 )
 	printf("\tMine\t%d\n",UnitTypes[i].GoldMine);
 	printf("\tHero\t%d\n",UnitTypes[i].Hero);
 	printf("\tStoresOil\t%d\n",UnitTypes[i].StoresOil);
-	printf("\tExplodes\t%d\n",UnitTypes[i].Explodes);
+	printf("\tVolatile\t%d\n",UnitTypes[i].Volatile);
 	printf("\tCowerMage\t%d\n",UnitTypes[i].CowerMage);
 	printf("\tOrganic\t%d\n",UnitTypes[i].Organic);
     }
@@ -1928,7 +1928,7 @@ if( 0 )
 	printf(",%d,%d,%d,%d,%d,%d"
 	    ,UnitTypes[i].Hero
 	    ,UnitTypes[i].StoresOil
-	    ,UnitTypes[i].Explodes
+	    ,UnitTypes[i].Volatile
 	    ,UnitTypes[i].CowerMage
 	    ,UnitTypes[i].Organic
 	    ,UnitTypes[i].SelectableByRectangle);
