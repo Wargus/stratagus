@@ -123,7 +123,9 @@ global void InitVideoSdl(void)
 {
     //	Initialize the SDL library
 
-    if ( SDL_Init(
+    if( SDL_WasInit(SDL_INIT_VIDEO) == 0 ) {
+
+	if ( SDL_Init(
 #ifdef USE_SDLA
 	    // FIXME: doesn't work with SDL SVGAlib
 	    SDL_INIT_AUDIO |
@@ -132,17 +134,22 @@ global void InitVideoSdl(void)
 	    SDL_INIT_NOPARACHUTE|
 #endif
 	    SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0 ) {
-	fprintf(stderr,"Couldn't initialize SDL: %s\n", SDL_GetError());
-	exit(1);
+	    fprintf(stderr,"Couldn't initialize SDL: %s\n", SDL_GetError());
+	    exit(1);
+	}
+
+	//	Clean up on exit
+
+	atexit(SDL_Quit);
+
+	// Set WindowManager Title
+
+	SDL_WM_SetCaption("FreeCraft (formerly known as ALE Clone)","FreeCraft");
+    } else {
+	if( VideoBpp == 32 && VideoDepth == 24 ) {
+	    VideoDepth = 0;
+	}
     }
-
-    //	Clean up on exit
-
-    atexit(SDL_Quit);
-
-    // Set WindowManager Title
-
-    SDL_WM_SetCaption("FreeCraft (formerly known as ALE Clone)","FreeCraft");
 
     // Initialize the display
 
@@ -171,7 +178,8 @@ global void InitVideoSdl(void)
     // Turn cursor off, we use our own.
     SDL_ShowCursor(0);
 
-    VideoBpp=Screen->format->BitsPerPixel;
+    VideoBpp = Screen->format->BitsPerPixel;
+    VideoFullScreen = (Screen->flags & SDL_FULLSCREEN) ? 1 : 0;
 
     //
     //	I need the used bits per pixel.
@@ -928,12 +936,10 @@ global void ToggleFullScreen(void)
 	}
     }
 
-#ifdef USE_WIN32
     // Windows shows the SDL cursor when starting in fullscreen mode
     // then switching to window mode.  This hides the cursor again.
     SDL_ShowCursor(SDL_ENABLE);
     SDL_ShowCursor(SDL_DISABLE);
-#endif
 
     SDL_LockSurface(Screen);
     memcpy(Screen->pixels, pixels, framesize);
@@ -949,11 +955,10 @@ global void ToggleFullScreen(void)
     SDL_SetClipRect(Screen, &clip);
 
     Invalidate();			// Update display
-
-    return;
 #else
     SDL_WM_ToggleFullScreen(Screen);
 #endif
+    VideoFullScreen = (Screen->flags & SDL_FULLSCREEN) ? 1 : 0;
 }
 
 #endif // } USE_SDL
