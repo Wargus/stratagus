@@ -519,7 +519,7 @@ global void VideoDrawPixelClip(Uint32 color, int x, int y)
 
 global void VideoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
-    if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipX2) {
+    if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
 	VideoDrawTransPixel(color, x, y, alpha);
     }
 }
