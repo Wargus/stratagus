@@ -1438,10 +1438,8 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 	y2 = Map2ViewportY(CurrentViewport,
 	    goal->Y) + goal->IY + goal->Type->TileHeight * TileSizeY / 2;
     } else {
-	x2 = Map2ViewportX(CurrentViewport,
-	    order->X + order->RangeX / 2) + TileSizeX / 2;
-	y2 = Map2ViewportY(CurrentViewport,
-	    order->Y + order->RangeY / 2) + TileSizeY / 2;
+	x2 = Map2ViewportX(CurrentViewport, order->X ) + TileSizeX / 2;
+	y2 = Map2ViewportY(CurrentViewport, order->Y ) + TileSizeY / 2;
     }
     dest = 0;
     switch (order->Action) {
