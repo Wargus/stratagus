@@ -79,6 +79,8 @@
 #define WC_StartLocationHuman	0x5E	/// start location human
 #define WC_StartLocationOrc	0x5F	/// start location orc
 
+#define SC_StartLocation	214	/// sc start location
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -102,6 +104,8 @@ extern void SavePud(const char* pud,const WorldMap* map);
 
     /// Clean the pud module
 extern void CleanPud(void);
+    /// Clean the scm module
+extern void CleanScm(void);
 
 //@}
 
