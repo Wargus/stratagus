@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	Makefile for tools. (Level 2)
 ##
-##	(c) Copyright 1998,2000 by Lutz Sammer
+##	(c) Copyright 1998,2000,2001 by Lutz Sammer
 ##
 ##	$Id$
 ##
@@ -58,7 +58,7 @@ extract$(EXE): extract.c
 aledoc$(EXE):	aledoc.c
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
-wartool$(EXE): wartool.c
+wartool$(EXE): wartool.c $(TOPDIR)/Makefile $(TOPDIR)/Rules.make
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
 FILES= 	gfx2png.c tile2png.c extract.c \
