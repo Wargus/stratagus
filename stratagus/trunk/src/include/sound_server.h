@@ -274,6 +274,9 @@ extern void WriteSound(void);
     ///	Cleanup sound.
 extern void QuitSound(void);
 
+    /// Close CD
+extern void QuitCD(void);
+
 #else	// }{ WITH_SOUND
 
 /*----------------------------------------------------------------------------
