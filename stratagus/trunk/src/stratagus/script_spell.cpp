@@ -644,12 +644,12 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 }
 
 /**
-** Parse the Condition for spell.
+**  Parse the Condition for spell.
 **
-** @param list SCM object to parse
-** @param autocast pointer to autocast to fill with data.
+**  @param l         Lua state.
+**  @param autocast  pointer to autocast to fill with data.
 **
-** @notes: autocast must be allocated. All data already in is LOST.
+**  @notes: autocast must be allocated. All data already in is LOST.
 */
 static void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 {
