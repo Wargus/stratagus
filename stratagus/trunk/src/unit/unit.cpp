@@ -144,33 +144,33 @@ global void FreeUnitMemory(Unit* unit)
 global void ReleaseUnit(Unit* unit)
 {
     DebugLevel2Fn("%lu:Unit %p %d `%s'\n" _C_ GameCycle _C_
-	    unit _C_ UnitNumber(unit) _C_ unit->Type->Ident);
+	unit _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
-    DebugCheck( !unit->Type );		// already free.
-    DebugCheck( unit->OrderCount!=1 );
-    RefsDebugCheck( unit->Orders[0].Goal );
+    DebugCheck(!unit->Type);		// already free.
+    DebugCheck(unit->OrderCount != 1);
+    RefsDebugCheck(unit->Orders[0].Goal);
 
     //
     //	First release, remove from lists/tables.
     //
-    if( !unit->Destroyed ) {
+    if (!unit->Destroyed) {
 	Unit* temp;
 
 	//
 	//	Remove the unit from the global units table.
 	//
-	DebugCheck( *unit->UnitSlot!=unit );
-	temp=Units[--NumUnits];
-	temp->UnitSlot=unit->UnitSlot;
-	*unit->UnitSlot=temp;
-	Units[NumUnits]=NULL;
+	DebugCheck(*unit->UnitSlot != unit);
+	temp = Units[--NumUnits];
+	temp->UnitSlot = unit->UnitSlot;
+	*unit->UnitSlot = temp;
+	Units[NumUnits] = NULL;
 	//
 	//	Are more references remaining?
 	//
-	unit->Destroyed=1;		// mark as destroyed
+	unit->Destroyed = 1;		// mark as destroyed
 
 	// Mark building as can't be destroyed, since it's still seen
-	if( unit->Type->Building ) {
+	if (unit->Type->Building) {
 	    int i;
 	    int x;
 	    int y;
@@ -182,14 +182,14 @@ global void ReleaseUnit(Unit* unit)
 	    x = unit->X;
 	    y = unit->Y;
 	    unit->Visible = 0x0000;
-	    for( i=0; i < PlayerMax; i++ ) {
+	    for (i = 0; i < PlayerMax; ++i) {
 		w = w0 = unit->Type->TileWidth;
 		h = unit->Type->TileHeight;
-		for( ; h-->0; ) {
-		    for( w=w0; w-->0; ) {
-			if( !IsMapFieldVisible(&Players[i],x+w,y+h)
-				&& IsMapFieldExplored(&Players[i],x+w,y+h)
-				&& Players[i].Type == PlayerPerson ) {
+		for (; h-- > 0;) {
+		    for (w = w0; w-- > 0;) {
+			if (!IsMapFieldVisible(&Players[i], x + w, y + h) &&
+				IsMapFieldExplored(&Players[i], x + w, y + h) &&
+				Players[i].Type == PlayerPerson) {
 			    unit->Visible |= (1 << i);
 			}
 		    }
@@ -197,13 +197,13 @@ global void ReleaseUnit(Unit* unit)
 	    }
 	}
 
-	if( unit->Type->Building && unit->Visible != 0x0000 ) {
+	if (unit->Type->Building && unit->Visible != 0x0000) {
 	    return;
 	}
-	RefsDebugCheck( !unit->Refs );
-	if( --unit->Refs>0 ) {
-	    DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle
-		    _C_ UnitNumber(unit) _C_ unit->Refs);
+	RefsDebugCheck(!unit->Refs);
+	if (--unit->Refs > 0) {
+	    DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle _C_
+		UnitNumber(unit) _C_ unit->Refs);
 	    return;
 	}
 #ifdef HIERARCHIC_PATHFINDER
@@ -212,20 +212,20 @@ global void ReleaseUnit(Unit* unit)
     }
 
     // Update Corpse Cache
-    if( unit->Orders[0].Action == UnitActionDie ) {
-	if( unit->Type->Building ) {
+    if (unit->Orders[0].Action == UnitActionDie) {
+	if (unit->Type->Building) {
 	    DeadBuildingCacheRemove(unit);
 	} else {
 	    CorpseCacheRemove(unit);
 	}
     }
 
-    RefsDebugCheck( unit->Refs );
+    RefsDebugCheck(unit->Refs);
 
     //
     //	Free used memory
     //
-    if( unit->Name ) {
+    if (unit->Name) {
 	free(unit->Name);
     }
 
@@ -234,14 +234,14 @@ global void ReleaseUnit(Unit* unit)
     //	on the way. We must wait a little time before we could free the
     //	memory.
     //
-    *ReleasedTail=unit;
-    ReleasedTail=&unit->Next;
-    unit->Refs=GameCycle+NetworkMaxLag;	// could be reuse after this time
-    IfDebug(
-	    DebugLevel2Fn("%lu:No more references %d\n" _C_
-		GameCycle _C_ UnitNumber(unit));
-	    // unit->Type=NULL;			// for debugging.
-	   );
+    *ReleasedTail = unit;
+    ReleasedTail = &unit->Next;
+    unit->Refs = GameCycle + NetworkMaxLag;	// could be reuse after this time
+#ifdef DEBUG
+    DebugLevel2Fn("%lu:No more references %d\n" _C_
+	GameCycle _C_ UnitNumber(unit));
+    // unit->Type = NULL;			// for debugging.
+#endif
 }
 
 /**
@@ -1825,7 +1825,7 @@ found:
  **	@param addx	Tile size in x.
  **	@param addy	Tile size in y.
  */
-global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
+global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 {
     int x;
     int y;
@@ -1837,77 +1837,79 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
     int n;
 
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
-    DebugCheck( !unit->Removed );
+    DebugCheck(!unit->Removed);
 
     // FIXME: better and quicker solution, to find the building.
-    x=y=-1;
-    if( unit->Container ) {
-	x=unit->Container->X;
-	y=unit->Container->Y;
+    x = y = -1;
+    if (unit->Container) {
+	x = unit->Container->X;
+	y = unit->Container->Y;
     } else {
-	x=unit->X;
-	y=unit->Y;
+	x = unit->X;
+	y = unit->Y;
     }
 
-    DebugCheck( x==-1 || y==-1 );
-    mask=UnitMovementMask(unit);
+    DebugCheck(x == -1 || y == -1);
+    mask = UnitMovementMask(unit);
 
-    bestd=99999;
-    IfDebug( bestx=besty=0; );		// keep the compiler happy
+    bestd = 99999;
+#ifdef DEBUG
+    bestx = besty = 0;		// keep the compiler happy
+#endif
 
     // FIXME: if we reach the map borders we can go fast up, left, ...
     --x;
-    for( ;; ) {
-	for( i=addy; i--; y++ ) {	// go down
-	    if( CheckedCanMoveToMask(x,y,mask) ) {
-		n=MapDistance(gx,gy,x,y);
+    for (;;) {
+	for (i = addy; i--; ++y) {	// go down
+	    if (CheckedCanMoveToMask(x, y, mask)) {
+		n = MapDistance(gx, gy, x, y);
 		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
-		if( n<bestd ) {
-		    bestd=n;
-		    bestx=x;
-		    besty=y;
+		if (n < bestd) {
+		    bestd = n;
+		    bestx = x;
+		    besty = y;
 		}
 	    }
 	}
 	++addx;
-	for( i=addx; i--; x++ ) {	// go right
-	    if( CheckedCanMoveToMask(x,y,mask) ) {
-		n=MapDistance(gx,gy,x,y);
+	for (i = addx; i--; ++x) {	// go right
+	    if (CheckedCanMoveToMask(x, y, mask)) {
+		n = MapDistance(gx, gy, x, y);
 		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
-		if( n<bestd ) {
-		    bestd=n;
-		    bestx=x;
-		    besty=y;
+		if (n < bestd) {
+		    bestd = n;
+		    bestx = x;
+		    besty = y;
 		}
 	    }
 	}
 	++addy;
-	for( i=addy; i--; y-- ) {	// go up
-	    if( CheckedCanMoveToMask(x,y,mask) ) {
-		n=MapDistance(gx,gy,x,y);
+	for (i = addy; i--; --y) {	// go up
+	    if (CheckedCanMoveToMask(x, y, mask)) {
+		n = MapDistance(gx, gy, x, y);
 		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
-		if( n<bestd ) {
-		    bestd=n;
-		    bestx=x;
-		    besty=y;
+		if (n < bestd) {
+		    bestd = n;
+		    bestx = x;
+		    besty = y;
 		}
 	    }
 	}
 	++addx;
-	for( i=addx; i--; x-- ) {	// go left
-	    if( CheckedCanMoveToMask(x,y,mask) ) {
-		n=MapDistance(gx,gy,x,y);
+	for (i = addx; i--; --x) {	// go left
+	    if (CheckedCanMoveToMask(x, y, mask)) {
+		n = MapDistance(gx, gy, x, y);
 		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
-		if( n<bestd ) {
-		    bestd=n;
-		    bestx=x;
-		    besty=y;
+		if (n < bestd) {
+		    bestd = n;
+		    bestx = x;
+		    besty = y;
 		}
 	    }
 	}
-	if( bestd!=99999 ) {
-	    unit->Wait=1;		// unit should have action still
-	    PlaceUnit(unit,bestx,besty);
+	if (bestd != 99999) {
+	    unit->Wait = 1;		// unit should have action still
+	    PlaceUnit(unit, bestx, besty);
 	    return;
 	}
 	++addy;
@@ -2082,7 +2084,7 @@ global int CanBuildOn(int x,int y,int mask)
  **
  **	@todo can't handle building units !1x1, needs a rewrite.
  */
-global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
+global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y)
 {
     int w;
     int h;
@@ -2090,89 +2092,91 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
     int mask;
 
     // Terrain Flags don't matter.
-    if ( type->MustBuildOnTop ) {
-	return CanBuildHere(type,x,y);
+    if (type->MustBuildOnTop) {
+	return CanBuildHere(type, x, y);
     }
 
     //
     //	Remove unit that is building!
     //
-    IfDebug( j=0; );
-    if( unit ) {
+#ifdef DEBUG
+    j = 0;
+#endif
+    if (unit) {
 	// FIXME: This only works with 1x1 big units
-	DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
-	j=unit->Type->FieldFlags;
-	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags&=~j;
+	DebugCheck(unit->Type->TileWidth != 1 || unit->Type->TileHeight != 1);
+	j = unit->Type->FieldFlags;
+	TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags &= ~j;
     }
 
 #if 0
     // FIXME: Should be moved into unittype structure, and allow more types.
-    if( type->ShoreBuilding ) {
-	mask=MapFieldLandUnit
-	    | MapFieldSeaUnit
-	    | MapFieldBuilding	// already occuppied
-	    | MapFieldWall
-	    | MapFieldRocks
-	    | MapFieldForest	// wall,rock,forest not 100% clear?
-	    | MapFieldLandAllowed	// can't build on this
-	    //| MapFieldUnpassable	// FIXME: I think shouldn't be used
-	    | MapFieldNoBuilding;
-    } else if( type->Building ) {
-	switch( type->UnitType ) {
+    if (type->ShoreBuilding) {
+	mask = MapFieldLandUnit |
+	    MapFieldSeaUnit |
+	    MapFieldBuilding |	// already occuppied
+	    MapFieldWall |
+	    MapFieldRocks |
+	    MapFieldForest |	// wall,rock,forest not 100% clear?
+	    MapFieldLandAllowed |	// can't build on this
+	    //MapFieldUnpassable |	// FIXME: I think shouldn't be used
+	    MapFieldNoBuilding;
+    } else if (type->Building) {
+	switch (type->UnitType) {
 	    case UnitTypeLand:
-		mask=MapFieldLandUnit
-		    | MapFieldBuilding	// already occuppied
-		    | MapFieldWall
-		    | MapFieldRocks
-		    | MapFieldForest	// wall,rock,forest not 100% clear?
-		    | MapFieldCoastAllowed
-		    | MapFieldWaterAllowed	// can't build on this
-		    | MapFieldUnpassable	// FIXME: I think shouldn't be used
-		    | MapFieldNoBuilding;
+		mask = MapFieldLandUnit |
+		    MapFieldBuilding |	// already occuppied
+		    MapFieldWall |
+		    MapFieldRocks |
+		    MapFieldForest |	// wall,rock,forest not 100% clear?
+		    MapFieldCoastAllowed |
+		    MapFieldWaterAllowed |	// can't build on this
+		    MapFieldUnpassable |	// FIXME: I think shouldn't be used
+		    MapFieldNoBuilding;
 		break;
 	    case UnitTypeNaval:
-		mask=MapFieldSeaUnit
-		    | MapFieldBuilding	// already occuppied
-		    | MapFieldCoastAllowed
-		    | MapFieldLandAllowed	// can't build on this
-		    | MapFieldUnpassable	// FIXME: I think shouldn't be used
-		    | MapFieldNoBuilding;
+		mask = MapFieldSeaUnit |
+		    MapFieldBuilding |	// already occuppied
+		    MapFieldCoastAllowed |
+		    MapFieldLandAllowed |	// can't build on this
+		    MapFieldUnpassable |	// FIXME: I think shouldn't be used
+		    MapFieldNoBuilding;
 		break;
 	    case UnitTypeFly:
-		mask=MapFieldAirUnit;	// already occuppied
+		mask = MapFieldAirUnit;	// already occuppied
 		break;
 	    default:
 		DebugLevel1Fn("Were moves this unit?\n");
-		if( unit ) {
-		    TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+		if (unit) {
+		    TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
 		}
 		return 0;
 	}
-    } else switch( type->UnitType ) {
+    } else switch (type->UnitType) {
 	case UnitTypeLand:
-	    mask=MapFieldLandUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldWall
-		| MapFieldRocks
-		| MapFieldForest	// wall,rock,forest not 100% clear?
-		| MapFieldCoastAllowed
-		| MapFieldWaterAllowed	// can't build on this
-		| MapFieldUnpassable;	// FIXME: I think shouldn't be used
+	    mask = MapFieldLandUnit |
+		MapFieldBuilding |	// already occuppied
+		MapFieldWall |
+		MapFieldRocks |
+		MapFieldForest |	// wall,rock,forest not 100% clear?
+		MapFieldCoastAllowed |
+		MapFieldWaterAllowed |	// can't build on this
+		MapFieldUnpassable;	// FIXME: I think shouldn't be used
 	    break;
 	case UnitTypeNaval:
-	    mask=MapFieldSeaUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldCoastAllowed
-		| MapFieldLandAllowed	// can't build on this
-		| MapFieldUnpassable;	// FIXME: I think shouldn't be used
+	    mask = MapFieldSeaUnit |
+		MapFieldBuilding |	// already occuppied
+		MapFieldCoastAllowed |
+		MapFieldLandAllowed |	// can't build on this
+		MapFieldUnpassable;	// FIXME: I think shouldn't be used
 	    break;
 	case UnitTypeFly:
-	    mask=MapFieldAirUnit;	// already occuppied
+	    mask = MapFieldAirUnit;	// already occuppied
 	    break;
 	default:
 	    DebugLevel1Fn("Were moves this unit?\n");
-	    if( unit ) {
-		TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+	    if (unit) {
+		TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
 	    }
 	    return 0;
     }
@@ -2182,24 +2186,24 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 
 #endif
 
-    for( h=type->TileHeight; h--; ) {
-	for( w=type->TileWidth; w--; ) {
-	    if( !CanBuildOn(x+w,y+h,mask) ) {
-		if( unit ) {
-		    TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+    for (h = type->TileHeight; h--;) {
+	for (w = type->TileWidth; w--;) {
+	    if (!CanBuildOn(x + w, y + h, mask)) {
+		if (unit) {
+		    TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
 		}
 		return 0;
 	    }
 	}
     }
-    if( unit ) {
-	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+    if (unit) {
+	TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
     }
 
     //
     //	We can build here: check distance to gold mine/oil patch!
     //
-    return CanBuildHere(type,x,y);
+    return CanBuildHere(type, x, y);
 }
 
 /*----------------------------------------------------------------------------
@@ -2213,10 +2217,10 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
  **	@param x	OUT: Map X position of tile.
  **	@param y	OUT: Map Y position of tile.
  */
-global int FindWoodInSight(const Unit* unit,int* x,int* y)
+global int FindWoodInSight(const Unit* unit, int* x, int* y)
 {
-    return FindTerrainType(UnitMovementMask(unit),0,MapFieldForest,9999,
-	    unit->Player,unit->X,unit->Y,x,y);
+    return FindTerrainType(UnitMovementMask(unit), 0, MapFieldForest, 9999,
+	unit->Player, unit->X, unit->Y, x, y);
 }
 
 /**
