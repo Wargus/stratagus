@@ -412,12 +412,14 @@ global void InitNetwork1(void)
 
     // Our communication port
     port = NetworkPort;
-    NetworkFildes = NetOpenUDP(port);
-    if (NetworkFildes == -1) {
-	NetworkFildes = NetOpenUDP(++port);
-	if (NetworkFildes == -1) {
+    for( i=0; i<10; ++i ) {
+	NetworkFildes = NetOpenUDP(port+i);
+	if (NetworkFildes != -1) {
+	    break;
+	}
+	if( i==9 ) {
 	    fprintf(stderr,"NETWORK: No free ports %d-%d available, aborting\n",
-		    port - 1, port);
+		    port, port+i);
 	    NetExit();		// machine dependend network exit
 	    return;
 	}
