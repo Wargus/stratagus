@@ -957,39 +957,6 @@ static int CclGetCompileFeature(lua_State* l)
 }
 
 /**
-**  Get Stratagus home path.
-**
-**  @param l  Lua state.
-*/
-static int CclGetStratagusHomePath(lua_State* l)
-{
-	const char* cp;
-	char* buf;
-
-	cp = getenv("HOME");
-	buf = alloca(strlen(cp) + strlen(GameName) + sizeof(STRATAGUS_HOME_PATH) + 3);
-	strcpy(buf, cp);
-	strcat(buf, "/");
-	strcat(buf, STRATAGUS_HOME_PATH);
-	strcat(buf, "/");
-	strcat(buf, GameName);
-
-	lua_pushstring(l, buf);
-	return 1;
-}
-
-/**
-**  Get Stratagus library path.
-**
-**  @param l  Lua state.
-*/
-static int CclGetStratagusLibraryPath(lua_State* l)
-{
-	lua_pushstring(l, STRATAGUS_LIB_PATH);
-	return 1;
-}
-
-/**
 **  Get a value from the Stratagus syncronized random number generator.
 **
 **  @param l  Lua state.
@@ -1157,10 +1124,6 @@ void InitCcl(void)
 	lua_register(Lua, "LoadMap", CclLoadMap);
 
 	lua_register(Lua, "Units", CclUnits);
-
-	lua_register(Lua, "GetStratagusHomePath", CclGetStratagusHomePath);
-	lua_register(Lua, "GetStratagusLibraryPath",
-		CclGetStratagusLibraryPath);
 
 	lua_register(Lua, "SyncRand", CclSyncRand);
 }
