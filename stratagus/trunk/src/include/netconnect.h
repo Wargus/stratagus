@@ -192,6 +192,7 @@ extern unsigned char NetLocalState;	/// Network menu: Local Server/Client connec
 extern int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
 extern char NetTriesText[32];		/// Network menu: Client tries count text
 extern char NetServerText[64];		/// Network menu: Text describing the Network Server IP
+extern int NetLocalPlayerNumber;	/// Player number of local client
 
 extern ServerSetup ServerSetupState;	/// Network menu: Multiplayer Server Menu selections state
 extern ServerSetup LocalSetupState;	/// Network menu: Multiplayer Client Menu selections local state
