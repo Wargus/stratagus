@@ -461,7 +461,16 @@ typedef struct _order_ {
 	int       Y;            ///< or Y tile coordinate of destination
 	struct _unit_type_* Type;///< Unit-type argument
 
-	void* Arg1;             ///< Extra command argument
+	union {
+		struct {
+			int X;                    ///< X position for patroling.
+			int Y;                    ///< Y position for patroling.
+		} Patrol;                     ///< position.
+		int ResourcePos;              ///< ResourcePos == (X<<16 | Y).
+		struct _spell_type_* Spell;   ///< spell when casting.
+		struct _upgrade_* Upgrade;    ///< upgrade.
+		struct _order_* Order;        ///< FIXME : seems to be a hack for free memory.
+	} Arg1;             ///< Extra command argument.
 } Order;
 
 /**

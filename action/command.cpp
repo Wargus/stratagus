@@ -130,6 +130,7 @@ static void RemoveOrder(Unit* unit, int order)
 {
 	int i;
 	
+	Assert(0 <= order && order < unit->OrderCount);
 	i = order;
 	while(i < unit->OrderCount - 1) {
 		unit->Orders[i] = unit->Orders[i + 1];
@@ -139,11 +140,10 @@ static void RemoveOrder(Unit* unit, int order)
 	if (unit->OrderCount > 1) {
 		--unit->OrderCount;
 	} else {
+		Assert(i == 0);
+		memset(unit->Orders + i, 0, sizeof(*unit->Orders));
 		unit->Orders[i].Action = UnitActionStill;
 		unit->Orders[i].X = unit->Orders[i].Y = -1;
-		unit->SubAction = 0;
-		unit->Orders[i].Type = NULL;
-		unit->Orders[i].Arg1 = NULL;
 	}
 }
 
@@ -159,10 +159,9 @@ static void ClearSavedAction(Unit* unit)
 {
 	ReleaseOrder(&unit->SavedOrder);
 
+	memset(&unit->SavedOrder, 0, sizeof(unit->SavedOrder));
 	unit->SavedOrder.Action = UnitActionStill; // clear saved action
 	unit->SavedOrder.X = unit->SavedOrder.Y = -1;
-	unit->SavedOrder.Type = NULL;
-	unit->SavedOrder.Arg1 = NULL;
 }
 
 /*----------------------------------------------------------------------------
@@ -181,11 +180,11 @@ void CommandStopUnit(Unit* unit)
 	// Ignore that the unit could be removed.
 
 	order = GetNextOrder(unit, FlushCommands); // Flush them.
+	Assert(order);
+	memset(order, 0, sizeof(*order));
+
 	order->Action = UnitActionStill;
 	order->X = order->Y = -1;
-	order->Goal = NoUnitP;
-	order->Type = NULL;
-	order->Arg1 = NULL;
 	ReleaseOrder(&unit->SavedOrder);
 	ReleaseOrder(&unit->NewOrder);
 	unit->SavedOrder = unit->NewOrder = *order;
@@ -267,11 +266,9 @@ void CommandStandGround(Unit* unit, int flush)
 	} else if (!(order = GetNextOrder(unit, flush))) {
 		return;
 	}
+	memset(order, 0, sizeof(*order));
 	order->Action = UnitActionStandGround;
 	order->X = order->Y = -1;
-	order->Goal = NoUnitP;
-	order->Type = NULL;
-	order->Arg1 = NULL;
 	ClearSavedAction(unit);
 }
 
@@ -297,6 +294,7 @@ void CommandFollow(Unit* unit, Unit* dest, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionFollow;
 		//
@@ -307,16 +305,12 @@ void CommandFollow(Unit* unit, Unit* dest, int flush)
 		if (dest->Destroyed) {
 			order->X = dest->X + dest->Type->TileWidth / 2;
 			order->Y = dest->Y + dest->Type->TileHeight / 2;
-			order->Goal = NoUnitP;
-			order->Range = 0;
 		} else {
 			order->X = order->Y = -1;
 			order->Goal = dest;
 			RefsIncrease(dest);
 			order->Range = 1;
 		}
-		order->Type = NULL;
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -346,14 +340,12 @@ void CommandMove(Unit* unit, int x, int y, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionMove;
 		order->Goal = NoUnitP;
 		order->X = x;
 		order->Y = y;
-		order->Range = 0;
-		order->Type = NULL;
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -382,6 +374,7 @@ void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionRepair;
 		//
@@ -393,12 +386,8 @@ void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 			if (dest->Destroyed) {
 				order->X = dest->X + dest->Type->TileWidth / 2;
 				order->Y = dest->Y + dest->Type->TileHeight / 2;
-				order->Goal = NoUnitP;
-				order->Range = 0;
-				order->Width = order->Height = 0;
 			} else {
 				order->X = order->Y = -1;
-				order->Width = order->Height = 0;
 				order->Goal = dest;
 				RefsIncrease(dest);
 				order->Range = unit->Type->RepairRange;
@@ -406,11 +395,7 @@ void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 		} else {
 			order->X = x;
 			order->Y = y;
-			order->Goal = NoUnitP;
-			order->Range = 0;
 		}
-		order->Type = NULL;
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -441,6 +426,7 @@ void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionAttack;
 		if (attack) {
@@ -452,8 +438,6 @@ void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 			if (attack->Destroyed) {
 				order->X = attack->X + attack->Type->TileWidth / 2;
 				order->Y = attack->Y + attack->Type->TileHeight / 2;
-				order->Goal = NoUnitP;
-				order->Range = 0;
 			} else {
 				// Removed, Dying handled by action routine.
 				order->X = order->Y = -1;
@@ -468,16 +452,12 @@ void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 			order->Y = y;
 			order->Range = unit->Stats->AttackRange;
 			order->MinRange = unit->Type->MinAttackRange;
-			order->Goal = NoUnitP;
 		} else {
 			order->X = x;
 			order->Y = y;
 			order->Range = 0;
 			order->Goal = NoUnitP;
 		}
-		order->Type = NULL;
-		order->Arg1 = NULL;
-
 	}
 	ClearSavedAction(unit);
 }
@@ -507,15 +487,13 @@ void CommandAttackGround(Unit* unit, int x, int y, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionAttackGround;
 		order->X = x;
 		order->Y = y;
 		order->Range = unit->Stats->AttackRange;
 		order->MinRange = unit->Type->MinAttackRange;
-		order->Goal = NoUnitP;
-		order->Type = NULL;
-		order->Arg1 = NULL;
 
 		DebugPrint("FIXME this next\n");
 	}
@@ -549,16 +527,14 @@ void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionPatrol;
-		order->Goal = NoUnitP;
 		order->X = x;
 		order->Y = y;
-		order->Range = 0;
-		order->Type = NULL;
 		Assert(!(unit->X & ~0xFFFF) && !(unit->Y & ~0xFFFF));
-		// FIXME: BUG-ALERT: encode source into arg1 as two 16 bit values!
-		order->Arg1 = (void*)((unit->X << 16) | unit->Y);
+		order->Arg1.Patrol.X = unit->X;
+		order->Arg1.Patrol.Y = unit->Y;
 	}
 	ClearSavedAction(unit);
 }
@@ -594,14 +570,13 @@ void CommandBoard(Unit* unit, Unit* dest, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionBoard;
 		order->X = order->Y = -1;
 		order->Goal = dest;
 		RefsIncrease(dest);
 		order->Range = 1;
-		order->Type = NULL;
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -626,6 +601,7 @@ void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionUnload;
 		order->X = x;
@@ -635,14 +611,10 @@ void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 		// Should be handled in action, but is not possible!
 		// Unit::Refs is used as timeout counter.
 		//
-		order->Goal = NoUnitP;
 		if (what && !what->Destroyed) {
 			order->Goal = what;
 			RefsIncrease(what);
 		}
-		order->Range = 0;
-		order->Type = NULL;
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -672,9 +644,9 @@ void CommandBuildBuilding(Unit* unit, int x, int y,
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionBuild;
-		order->Goal = NoUnitP;
 		order->X = x;
 		order->Y = y;
 		order->Width = what->TileWidth;
@@ -686,17 +658,12 @@ void CommandBuildBuilding(Unit* unit, int x, int y,
 			if (what->ShoreBuilding && unit->Type->UnitType == UnitTypeLand) {
 					// Peon won't dive :-)
 				order->Range = 1;
-			} else {
-				order->Range = 0;
 			}
 		}
 		order->Type = what;
 		if (what->BuilderOutside) {
 			order->MinRange = 1;
-		} else {
-			order->MinRange = 0;
 		}
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -745,6 +712,7 @@ void CommandResourceLoc(Unit* unit, int x, int y, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionResource;
 
@@ -769,9 +737,6 @@ void CommandResourceLoc(Unit* unit, int x, int y, int flush)
 		order->Y = ny;
 
 		order->Range = 1;
-		order->Goal = NoUnitP;
-		order->Type = NULL;
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -807,14 +772,13 @@ void CommandResource(Unit* unit, Unit* dest, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionResource;
 		order->X = order->Y = -1;
 		order->Goal = dest;
 		RefsIncrease(dest);
 		order->Range = 1;
-		order->Type = NULL;
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -847,10 +811,10 @@ void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionReturnGoods;
 		order->X = order->Y = -1;
-		order->Goal = NoUnitP;
 		//
 		// Destination could be killed. NETWORK!
 		//
@@ -859,8 +823,6 @@ void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 			RefsIncrease(goal);
 		}
 		order->Range = 1;
-		order->Type = NULL;
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -900,12 +862,11 @@ void CommandTrainUnit(Unit* unit, UnitType* type,
 		if (!(order = GetNextOrder(unit, 0))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionTrain;
 		order->Type = type;
 		order->X = order->Y = -1;
-		order->Goal = NoUnitP;
-		order->Arg1 = NULL;
 		// FIXME: if you give quick an other order, the resources are lost!
 		PlayerSubUnitType(unit->Player, type);
 	}
@@ -938,7 +899,7 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 				unit->Orders[0].Type->Stats[unit->Player->Player].Costs,
 				CancelTrainingCostsFactor);
 			RemoveOrder(unit, 0);
-		}	
+		}
 		unit->Data.Train.Ticks = 0;
 		unit->Wait = unit->Reset = 1; // immediately start next training
 		if (unit->Player == ThisPlayer && unit->Selected) {
@@ -1007,15 +968,14 @@ void CommandUpgradeTo(Unit* unit, UnitType* type, int flush)
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		// FIXME: if you give quick an other order, the resources are lost!
 		PlayerSubUnitType(unit->Player, type);
 
 		order->Action = UnitActionUpgradeTo;
 		order->X = order->Y = -1;
-		order->Goal = NoUnitP;
 		order->Type = type;
-		order->Arg1 = NULL;
 	}
 	ClearSavedAction(unit);
 }
@@ -1038,11 +998,10 @@ void CommandCancelUpgradeTo(Unit* unit)
 			unit->Orders[0].Type->Stats[unit->Player->Player].Costs,
 			CancelUpgradeCostsFactor);
 
+		memset(unit->Orders, 0, sizeof(*unit->Orders));
+
 		unit->Orders[0].Action = UnitActionStill;
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
-		unit->Orders[0].Goal = NoUnitP;
-		unit->Orders[0].Type = NULL;
-		unit->Orders[0].Arg1 = NULL;
 
 		unit->SubAction = 0;
 
@@ -1099,15 +1058,14 @@ void CommandResearch(Unit* unit, Upgrade* what, int flush)
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		// FIXME: if you give quick an other order, the resources are lost!
 		PlayerSubCosts(unit->Player, what->Costs);
 
 		order->Action = UnitActionResearch;
 		order->X = order->Y = -1;
-		order->Goal = NoUnitP;
-		order->Type = NULL;
-		order->Arg1 = what;
+		order->Arg1.Upgrade = what;
 	}
 	ClearSavedAction(unit);
 }
@@ -1132,12 +1090,10 @@ void CommandCancelResearch(Unit* unit)
 
 		PlayerAddCostsFactor(unit->Player,upgrade->Costs,
 			CancelResearchCostsFactor);
+		memset(unit->Orders, 0, sizeof(*unit->Orders));
 
 		unit->Orders[0].Action = UnitActionStill;
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
-		unit->Orders[0].Goal = NoUnitP;
-		unit->Orders[0].Type = NULL;
-		unit->Orders[0].Arg1 = NULL;
 
 		unit->SubAction = 0;
 
@@ -1183,6 +1139,7 @@ void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
+		memset(order, 0, sizeof(*order));
 
 		order->Action = UnitActionSpellCast;
 		order->Range = spell->Range;
@@ -1197,9 +1154,7 @@ void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 				// FIXME: dest->Type is now set to 0. maybe we shouldn't bother.
 				order->X = dest->X /*+ dest->Type->TileWidth / 2*/  - order->Range;
 				order->Y = dest->Y /*+ dest->Type->TileHeight / 2*/ - order->Range;
-				order->Goal = NoUnitP;
-				order->Range <<= 1;
-				order->Range <<= 1;
+				order->Range <<= 2;
 			} else {
 				order->X = order->Y = -1;
 				order->Goal = dest;
@@ -1210,8 +1165,7 @@ void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 			order->Y = y;
 			order->Range <<= 1;
 		}
-		order->Type = NULL;
-		order->Arg1 = spell;
+		order->Arg1.Spell = spell;
 	}
 	ClearSavedAction(unit);
 }

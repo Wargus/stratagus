@@ -289,7 +289,7 @@ static void LoseResource(Unit* unit, const Unit* source)
 		//
 		// Remember were it mined, so it can look around for another resource.
 		//
-		unit->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
+		unit->Orders[0].Arg1.ResourcePos = (unit->X << 16) | unit->Y;
 		unit->Orders[0].Goal = depot;
 		RefsIncrease(depot);
 		NewResetPath(unit);
@@ -495,7 +495,7 @@ static int StopGathering(Unit* unit)
 
 	// Store resource position.
 	// FIXME: is this the best way?
-	unit->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
+	unit->Orders[0].Arg1.ResourcePos = (unit->X << 16) | unit->Y;
 
 #ifdef DEBUG
 	if (!unit->ResourcesHeld) {
@@ -636,12 +636,12 @@ static int WaitInDepot(Unit* unit)
 	Assert(depot);
 	// Could be destroyed, but then we couldn't be in?
 
-	if (unit->Orders[0].Arg1 == (void*)-1) {
+	if (unit->Orders[0].Arg1.ResourcePos == -1) {
 		x = unit->X;
 		y = unit->Y;
 	} else {
-		x = (int)unit->Orders[0].Arg1 >> 16;
-		y = (int)unit->Orders[0].Arg1 & 0xFFFF;
+		x = unit->Orders[0].Arg1.ResourcePos >> 16;
+		y = unit->Orders[0].Arg1.ResourcePos & 0xFFFF;
 	}
 	// Range hardcoded. don't stray too far though
 	if (resinfo->TerrainHarvester) {
@@ -684,6 +684,10 @@ static int WaitInDepot(Unit* unit)
 void ResourceGiveUp(Unit* unit)
 {
 	DebugPrint("Unit %d gave up on resource gathering.\n" _C_ unit->Slot);
+	if (unit->Orders[0].Goal) {
+		RefsDecrease(unit->Orders->Goal);
+	}
+	memset(unit->Orders, 0, sizeof(*unit->Orders));
 	unit->Orders[0].Action = UnitActionStill;
 	unit->Wait = 1;
 	unit->Reset = 1;
@@ -694,10 +698,6 @@ void ResourceGiveUp(Unit* unit)
 			unit->ResourcesHeld < unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) {
 		unit->ResourcesHeld = 0;
 		unit->CurrentResource = 0;
-	}
-	if (unit->Orders[0].Goal) {
-		RefsDecrease(unit->Orders->Goal);
-		unit->Orders[0].Goal = NoUnitP;
 	}
 }
 
