@@ -1026,6 +1026,12 @@ extern void (*VideoDrawRawClip)( VMemType *pixels,
     /// Does ColorCycling..
 extern void (*ColorCycle)(void);
 
+    /**
+    **	Draw part of a graphic clipped and faded.
+    */
+extern void VideoDrawSubClipFaded(Graphic* graphic,int gx,int gy,
+	unsigned w,unsigned h,int x,int y,int fade);
+
 /*----------------------------------------------------------------------------
 --	Macros
 ----------------------------------------------------------------------------*/
