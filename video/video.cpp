@@ -31,54 +31,54 @@
 //@{
 
 /**
-**	  @page VideoModule Module - Video
+**   @page VideoModule Module - Video
 **
-**				There are lots of video functions available, therefore this
-**				page tries to summarize these separately.
+** There are lots of video functions available, therefore this
+** page tries to summarize these separately.
 **
-**				@note care must be taken what to use, how to use it and where
-**				put new source-code. So please read the following sections
-**				first.
-**
-**
-**	  @section VideoMain Video main initialization
-**
-**			  The general setup of platform dependent video and basic video
-**				functionalities is done with function @see InitVideo
-**
-**				We support (depending on the platform) resolutions:
-**				640x480, 800x600, 1024x768, 1600x1200
-**				with colors 8,15,16,24,32 bit
-**
-**				@see video.h @see video.c
+** @note care must be taken what to use, how to use it and where
+** put new source-code. So please read the following sections
+** first.
 **
 **
-**	  @section VideoModuleHigh High Level - video dependent functions
+**   @section VideoMain Video main initialization
 **
-**				These are the video platforms that are supported, any platform
-**				dependent settings/functionailty are located within each
-**				separate files:
+**   The general setup of platform dependent video and basic video
+** functionalities is done with function @see InitVideo
 **
-**				SDL				: Simple Direct Media for Linux,
-**								  Win32 (Windows 95/98/2000), BeOs, MacOS
-**								  (visit http://www.libsdl.org)
+** We support (depending on the platform) resolutions:
+** 640x480, 800x600, 1024x768, 1600x1200
+** with colors 8,15,16,24,32 bit
 **
-**				@see sdl.c
+** @see video.h @see video.c
 **
 **
-**	  @section VideoModuleLow  Low Level - draw functions
+**   @section VideoModuleHigh High Level - video dependent functions
 **
-**				All direct drawing functions
+** These are the video platforms that are supported, any platform
+** dependent settings/functionailty are located within each
+** separate files:
 **
-**				@note you might need to use Decorations (see above), to prevent
-**				drawing directly to screen in conflict with the video update.
+** SDL : Simple Direct Media for Linux,
+**   Win32 (Windows 95/98/2000), BeOs, MacOS
+**   (visit http://www.libsdl.org)
 **
-**			  @see linedraw.c
-**			  @see sprite.c
+** @see sdl.c
+**
+**
+**   @section VideoModuleLow  Low Level - draw functions
+**
+** All direct drawing functions
+**
+** @note you might need to use Decorations (see above), to prevent
+** drawing directly to screen in conflict with the video update.
+**
+**   @see linedraw.c
+**   @see sprite.c
 */
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -163,7 +163,7 @@ int VideoDepth;
 SDL_Surface* TheScreen;
 
 int VideoSyncSpeed = 100;            /// 0 disable interrupts
-int SkipFrames;						/// Skip this frames
+int SkipFrames; /// Skip this frames
 
 int ColorWaterCycleStart;
 int ColorWaterCycleEnd;
@@ -256,7 +256,7 @@ void SetClipping(int left, int top, int right, int bottom)
 			right >= VideoWidth || bottom < 0 || bottom >= VideoHeight) {
 		DebugPrint("Wrong clipping %d->%d %d->%d, write cleaner code.\n" _C_
 			left _C_ right _C_ top _C_ bottom);
-//		Assert(0);
+// Assert(0);
 	}
 #endif
 	ClipRectToRect(&left, &top, &right, &bottom, 0, 0, VideoWidth, VideoHeight);
