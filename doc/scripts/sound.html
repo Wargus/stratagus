@@ -20,7 +20,7 @@
     <title>Stratagus Configuration Language Description: Icon</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
     <meta name="Author" content="johns98@gmx.net">
-    <meta name="Keyword" content="ccl,tileset">
+    <meta name="Keyword" content="scripts,tileset">
     <meta name="Description" content="">
 </head>
 <body>
@@ -42,90 +42,95 @@
 <a href="../stratagus.html">Stratagus</a> 
 <a href="../readme.html">Readme</a> 
 <a href="../faq.html">FAQ</a> 
-<a href="ccl.html">CCL</a> 
+<a href="ccl.html">Scripts</a> 
 <a href="research.html">PREV</a> 
 <a href="tileset.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
-<a href="#define-game-sounds">define-game-sounds</a>
-<a href="#display-sounds">display-sounds</a>
-<a href="#make-sound">make-sound</a>
-<a href="#make-sound-group">make-sound-group</a>
-<a href="#map-sound">map-sound</a>
-<a href="#play-file">play-file</a>
-<a href="#play-music">play-music</a>
-<a href="#play-sound">play-sound</a>
-<a href="#set-cd-mode!">set-cd-mode!</a>
-<a href="#set-global-sound-range!">set-global-sound-range!</a>
-<a href="#set-menu-music!">set-menu-music!</a>
-<a href="#set-music-volume!">set-music-volume!</a>
-<a href="#set-sound-range!">set-sound-range!</a>
-<a href="#set-sound-volume!">set-sound-volume!</a>
-<a href="#sound-for-name">sound-for-name</a>
-<a href="#sound-off">sound-off</a>
-<a href="#sound-on">sound-on</a>
-<a href="#sound-thread">sound-thread</a>
-<a href="#stop-music">stop-music</a>
-<a href="#with-sound">with-sound</a>
+<a href="#define-game-sounds">DefineGameSounds()</a>
+<a href="#display-sounds">DisplaySounds()</a>
+<a href="#make-sound">MakeSound()</a>
+<a href="#make-sound-group">MakeSoundGroup()</a>
+<a href="#map-sound">MapSound()</a>
+<a href="#play-file">PlayFile()</a>
+<a href="#play-music">PlayMusic()</a>
+<a href="#play-sound">PlaySound()</a>
+<a href="#set-cd-mode!">SetCdMode()</a>
+<a href="#set-global-sound-range!">SetGlobalSoundRange()</a>
+<a href="#set-menu-music!">SetMenuMusic()</a>
+<a href="#set-music-volume!">SetMusicVolume()</a>
+<a href="#set-sound-range!">SetSoundRange()</a>
+<a href="#set-sound-volume!">SetSoundVolume()</a>
+<a href="#sound-for-name">SoundForName()</a>
+<a href="#sound-off">SoundOff()</a>
+<a href="#sound-on">SoundOn()</a>
+<a href="#sound-thread">SoundThread()</a>
+<a href="#stop-music">StopMusic()</a>
 <hr>
 <h2>Intro - Introduction to sound functions and variables</h2>
 
 Everything around sound.
 <h2>Functions</h2>
 <a name="define-game-sounds"></a>
-<h3>(define-game-sounds name sound [[name sound] ...])</h3>
+<h3>DefineGameSounds("name", arg, [[name2, arg] ...])</h3>
 
 Specify some global sounds.
 
 
 <dl>
-<dt>name</dt>
+<dt>"name", arg</dt>
 <dd>One of the following:
-'click, 'placement-error, 'placement-success, 'repair, 'human-rescue, 'orc-rescue
+<dl>"click", SoundId</dl>
+<dl>"placement-error", SoundId</dl>
+<dl>"placement-success", SoundId</dl>
+
+<dl>"rescue",{"RaceName", SoundId}</dl>
+<dl>"work-complete", {RaceName, SoundId}</dl>
 </dd>
-<dt>value</dt>
-<dd>The sound to use.
-</dd>
+<dt>Where Soundid is the sound to use</dt>
+<dt>And RaceName the concerned race.</dt>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    ;; Defines some game sounds.
-    (define-game-sounds
-      'placement-error (make-sound "placement error" "ui/placement error.wav")
-      'placement-success (make-sound "placement success" "ui/placement success.wav")
-      'click sound-click
-      'human-rescue (make-sound "human rescue" "human/rescue.wav")
-      'orc-rescue (make-sound "orc rescue" "orc/rescue.wav") )))
+--	Define sounds used by game
+--
+DefineGameSounds(
+
+  "placement-error", MakeSound("placement error", "ui/placement_error.wav"),
+  "placement-success", MakeSound("placement success", "ui/placement_success.wav"),
+  "click", sound_click, -- sound_click already define as SoundId
+
+-- FIXME: Not ready
+--  "transport-docking",
+--  "building-construction",
+
+  "work-complete", {"human", MakeSound("basic human voices work complete", "human/basic_voices/work_complete.wav")},
+  "work-complete", {"orc", MakeSound("basic orc voices work complete", "orc/basic_voices/work_complete.wav")},
+
+  "rescue", {"human", MakeSound("human rescue", "human/rescue.wav")},
+  "rescue", {"orc", MakeSound("orc rescue", "orc/rescue.wav")} )
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
-
 <a name="display-sounds"></a>
-<h3>(display-sounds)</h3>
+<h3>DisplaySounds()</h3>
 
 Ask the sound system to dump on the standard output the mapping 
 between sound names and sound id.
 
-
 <h4>Example</h4>
 
 <pre>
-    ;; Displays the mapping between sound names and sound id.
-    (display-sounds)
+-- Displays the mapping between sound names and sound id.
+DisplaySounds()
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="make-sound"></a>
-<h3>(make-sound name file)</h3>
+<h3>MakeSound("name", "file" or {"file1", "file2", ...})</h3>
 
 Asks the sound system to register a sound under a given name, with an 
 associated list of files (the list can be replaced by only one file).
-
 
 <dl>
 <dt>name</dt>
@@ -139,21 +144,18 @@ associated list of files (the list can be replaced by only one file).
 <h4>Example</h4>
 
 <pre>
-    ;; Makes the sounds "lightning" and "basic human voices acknowledge".
-    (make-sound "lightning" "spells/lightning.wav")
-    (make-sound "basic human voices acknowledge"
-      (list "human/basic_voices/acknowledgement/1.wav"
-            "human/basic_voices/acknowledgement/2.wav"
-            "human/basic_voices/acknowledgement/3.wav"
-            "human/basic_voices/acknowledgement/4.wav"))
+-- Makes the sounds "lightning" and "basic human voices acknowledge".
+MakeSound("lightning", "spells/lightning.wav")
+
+MakeSound("basic human voices acknowledge",
+	{"human/basic_voices/acknowledgement/1.wav",
+	"human/basic_voices/acknowledgement/2.wav",
+	"human/basic_voices/acknowledgement/3.wav",
+	"human/basic_voices/acknowledgement/4.wav"})
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
-
 <a name="make-sound-group"></a>
-<h3>(make-sound-group name group group)</h3>
+<h3>MakeSoundGroup("name", "groupname1" or SoundId, "groupname2" or SoundId)</h3>
 
 Asks the sound system to build a special sound group.
 
@@ -170,18 +172,15 @@ Asks the sound system to build a special sound group.
 <h4>Example</h4>
 
 <pre>
-    (make-sound-group "footman-selected"
-      "basic human voices selected" "basic human voices annoyed")
+--	Define selection sound groups.
+MakeSoundGroup("footman-selected",
+	"basic human voices selected", "basic human voices annoyed")
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <a name="map-sound"></a>
-<h3>(map-sound name sound)</h3>
+<h3>MapSound("name", "sound")</h3>
 
 Ask the sound system to remap a sound id to a given name.
-
 
 <dl>
 <dt>name</dt>
@@ -195,20 +194,13 @@ Ask the sound system to remap a sound id to a given name.
 <h4>Example</h4>
 
 <pre>
-    ;; Maps the name "footman-acknowledge" to "basic human voices acknowledge".
-    (map-sound "footman-acknowledge" "basic human voices acknowledge")
+-- Maps the name "footman-acknowledge" to "basic human voices acknowledge".
+MapSound("footman-acknowledge", "basic human voices acknowledge")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
-
 <a name="play-file"></a>
-<h3>(play-file name)</h3>
-
+<h3>PlayFile("name")</h3>
 Play a sound file.
-
-
 <dl>
 <dt>name</dt>
 <dd>Name of the file to play.
@@ -216,21 +208,15 @@ Play a sound file.
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Play the file "spells/lightning.wav".
-    (play-file "spells/lightning.wav")
+-- Play the file "spells/lightning.wav".
+PlayFile("spells/lightning.wav")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
-
 <a name="play-music"></a>
-<h3>(play-music name)</h3>
+<h3>PlayMusic("name")</h3>
 
 Name of the music file to play.
-
 
 <dl>
 <dt>name</dt>
@@ -239,68 +225,54 @@ Name of the music file to play.
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Plays the music file "music/default.mod".
-    (play-music "music/default.mod")
+-- Plays the music file "music/default.mod".
+PlayMusic("music/default.mod")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
-
 <a name="play-sound"></a>
-<h3>(play-sound name)</h3>
+<h3>PlaySound("name")</h3>
 
 Ask the sound system to play the specified sound.
 
-
 <dl>
-<dt>name</dt>
+<dt>"name"</dt>
 <dd>Name of the sound to play.
 </dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Play the sound "basic human voices ready".
-    (play-sound "basic human voices ready")
+-- Play the sound "basic human voices ready".
+PlaySound("basic human voices ready")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
-
 <a name="set-cd-mode!"></a>
-<h3>(set-cd-mode! mode)</h3>
+<h3>SetCdMode("mode")</h3>
 
 Set the cd mode.
 
-
 <dl>
-<dt>mode</dt>
-<dd>":all", ":random", ":off"
-</dd>
+<dt>"all"</dt>
+<dd>plays all tracks</dd>
+<dt>"random"</dt>
+<dd>plays random tracks</dd>
+<dt>"defined"</dt>
+<dd>play according to playlist below. define before playlist = {"song1", "song2", ...}</dd>
+<dt>"off"</dt>
+<dd>turns cd player off</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Set the cd mode to play songs in a random order.
-    (set-cd-mode! ":random")
+-- Set the cd mode to play songs in a random order.
+SetCdMode("random")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
-
 <a name="set-global-sound-range!"></a>
-<h3>(set-global-sound-range! distance)</h3>
+<h3>SetGlobalSoundRange(distance)</h3>
 
 Set the cut off distance.
-
-
 <dl>
 <dt>distance</dt>
 <dd>Max tile distance to hear sounds.
@@ -308,42 +280,31 @@ Set the cut off distance.
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Set the sound range to 40.
-    (set-global-sound-range! 40)
+-- Set the sound range to 40.
+SetGlobalSoundRange(40)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="set-menu-music!"></a>
-<h3>(set-menu-music! song)</h3>
+<h3>SetMenuMusic("song")</h3>
 
 Set the default menu music.
-
-
 <dl>
-<dt>song</dt>
+<dt>"song"</dt>
 <dd>Song to be played at menu screen, this is the second screen displayed.
 </dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; This is the default song played.
-    (set-menu-music! "music/default.mod")
+-- This is the default song played.
+SetMenuMusic("music/default.mod")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-music-volume!"></a>
-<h3>(set-music-volume! volume)</h3>
+<h3>SetMusicVolume(volume)</h3>
 
-.
-
+Set the music volume.
 
 <dl>
 <dt>volume</dt>
@@ -354,19 +315,14 @@ Set the default menu music.
 <h4>Example</h4>
 
 <pre>
-    ;; Set the music volume to 128.
-    (set-music-volume! 128)
+-- Set the music volume to 128.
+SetMusicVolume(128)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-sound-range!"></a>
-<h3>(set-sound-range! name distance)</h3>
+<h3>SetSoundRange("name", distance)</h3>
 
 Set the range of a given sound.
-
 
 <dl>
 <dt>name</dt>
@@ -378,19 +334,15 @@ Set the range of a given sound.
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Set the range of the sound "basic human voices ready" to 20.
-    (set-sound-range! "basic human voices ready" 20)
+-- Set the range of the sound "basic human voices ready" to 20.
+SetSoundRange("basic human voices ready", 20)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="set-sound-volume!"></a>
-<h3>(set-sound-volume! volume)</h3>
+<h3>SetSoundVolume(volume)</h3>
 
 Global volume support.
-
 
 <dl>
 <dt>volume</dt>
@@ -399,21 +351,15 @@ Global volume support.
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Set the sound volume to 128.
-    (set-sound-volume! 128)
+-- Set the sound volume to 128.
+SetSoundVolume(128)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="sound-for-name"></a>
-<h3>(sound-for-name name)</h3>
+<h3>SoundForName("name")</h3>
 
 Ask the sound system to associate a sound id to a sound name.
-
 
 <dl>
 <dt>name</dt>
@@ -424,84 +370,52 @@ Ask the sound system to associate a sound id to a sound name.
 <h4>Example</h4>
 
 <pre>
-    (sound-for-name "peasant attack")
+SoundForName("peasant attack")
 </pre>
-<h4>Not Used</h4>
-
 <a name="sound-off"></a>
-<h3>(sound-off)</h3>
+<h3>SoundOff()</h3>
 
 Turn off sound.
 
-
 <h4>Example</h4>
 
 <pre>
-    ;; Turns off sound.
-    (sound-off)
+-- Turns off sound.
+SoundOff()
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="sound-on"></a>
-<h3>(sound-on)</h3>
+<h3>SoundOn()</h3>
 
 Turn on sound.
 
-
 <h4>Example</h4>
 
 <pre>
-    ;; Turns on sound.
-    (sound-on)
+-- Turns on sound.
+SoundOn()
 </pre>
-
-<h4>Not Used</h4>
 
 <a name="sound-thread"></a>
-<h3>(sound-thread)</h3>
+<h3>SoundThread()</h3>
 
-Ask clone to use a sound thread.
+Ask stratagus to use a sound thread.
 
 
 <h4>Example</h4>
-
 <pre>
-    (sound-thread)
+SoundThread()
 </pre>
-<h4>Not Used</h4>
-
 <a name="stop-music"></a>
-<h3>(stop-music)</h3>
+<h3>StopMusic()</h3>
 
 Stop playing music.
 
-
 <h4>Example</h4>
-
 <pre>
-    ;; Stop playing music.
-    (stop-music)
+-- Stop playing music.
+StopMusic()
 </pre>
-
-<h4>Not Used</h4>
-
-<a name="with-sound"></a>
-<h3>(with-sound)</h3>
-
-Returns true if compiled with sound, false otherwise.
-
-
-<h4>Example</h4>
-
-<pre>
-    ;; Returns true if compiled with sound, false otherwise.
-    (with-sound)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <hr>
 Last changed: $Id$<br>
