@@ -1469,6 +1469,9 @@ global void CleanUnitTypes(void)
 	if( type->Missile.Name ) {
 	    free(type->Missile.Name);
 	}
+	if( type->Explosion.Name ) {
+	    free(type->Explosion.Name);
+	}
 	if( type->CorpseName ) {
 	    free(type->CorpseName);
 	}
