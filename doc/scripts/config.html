@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<!--
+----	(c) Copyright 2001 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FreeCraft Configuration Language Description: Config</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,config">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Config</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 2001 by The FreeCraft Project. Distributed under the
+<A HREF="../gpl.html">"GNU General Public License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<A HREF="ccl.html">PREV</A> 
+<A HREF="tileset.html">NEXT</A> 
+<HR>
+<A HREF="#set-brightness">set-brightness!</A>
+<A HREF="#set-color-cycle-all">set-color-cycle-all!</A>
+<A HREF="#set-contrast">set-contrast!</A>
+<A HREF="#set-saturation">set-saturation!</A>
+<A HREF="#set-title-screen">set-title-screen!</A>
+<HR>
+<H2>Intro - Introduction to config functions and variables</H2>
+
+General configurations.
+
+<H2>Functions</H2>
+<A NAME="set-brightness"></A>
+<H3>set-brightness!</H3>
+
+<H4>Description</H4>
+
+Change the global game brightness. Use this to adapt FreeCraft to your monitor
+settings.
+
+<H4>Syntax</H4>
+
+<CODE>(set-brightness! brightness)</CODE>
+
+<DL>
+<DT>brightness</DT>
+<DD>Your brightness, can be a value from -100 to 100. 0 is the neutral point.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-brightness! 15)
+</PRE>
+
+<P>This is the default brightness. A little lighter than the original.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="set-contrast"></A>
+<H3>set-contrast!</H3>
+
+<H4>Description</H4>
+
+Change the global game contrast. Use this to adapt FreeCraft to your monitor
+settings.
+
+<H4>Syntax</H4>
+
+<CODE>(set-contrast! contrast)</CODE>
+
+<DL>
+<DT>contrast</DT>
+<DD>Your contrast, can be a value from 0 to 400. 100 is the neutral point.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-contrast! 110)
+</PRE>
+
+<P>This is the default contrast. A little more than the original.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="set-saturation"></A>
+<H3>set-saturation!</H3>
+<H4>Description</H4>
+
+Change the global game saturation. Use this to adapt FreeCraft to your monitor
+settings.
+
+<H4>Syntax</H4>
+
+<CODE>(set-saturation! saturation)</CODE>
+
+<DL>
+<DT>saturation</DT>
+<DD>Your saturation, can be a value from -100 to 200. 100 is the neutral point.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-saturation! 100)
+</PRE>
+
+<P>This is the default saturation.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="set-title-screen"></A>
+<H3>set-title-screen!</H3>
+
+<H4>Description</H4>
+
+Change the default title screen.
+
+<H4>Syntax</H4>
+
+<CODE>(set-title-screen! image)</CODE>
+
+<DL>
+<DT>image</DT>
+<DD>Image to be displayed as title screen, this is the first screen displayed. The image should be a png file with 640x480 8-bit indexed colormap.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-title-screen! "graphics/ui/freecraft.png")
+</PRE>
+
+<P>This is the default title displayed.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<H2>Functions</H2>
+<A NAME="set-color-cycle-all"></A>
+<H3>set-color-cycle-all!</H3>
+
+<H4>Description</H4>
+
+Change how the color cycling is working. This is used to make the water moving
+or the circle in the dark portal rotating.
+
+<H4>Syntax</H4>
+
+<CODE>(set-color-cycle-all! flag)</CODE>
+
+<DL>
+<DT>flag</DT>
+<DD>If flag is true (#t) all images are color cycled. If flag is false (#f) only the tileset and global palettes  are color cycled.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-color-cycle-all! #t)
+</PRE>
+
+<P>This is the default, all images are color cycled.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2001 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
