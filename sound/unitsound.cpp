@@ -157,7 +157,7 @@ local void LoadSimpleSounds(void)
 
     if (SimpleSounds) {
 	for (i = 0; SimpleSounds[i].Name; ++i) {
-	    MakeSound(SimpleSounds[i].Name, &(SimpleSounds[i].File), 1);
+	    MakeSound(SimpleSounds[i].Name, (const char**)&(SimpleSounds[i].File), 1);
 	}
     }
 }
@@ -172,7 +172,7 @@ local void LoadSoundGroups(void)
 
     if (SoundGroups) {
 	for (i = 0; SoundGroups[i].Name; ++i) {
-	    MakeSound(SoundGroups[i].Name, SoundGroups[i].Sounds,
+	    MakeSound(SoundGroups[i].Name, (const char**)SoundGroups[i].Sounds,
 		NbSoundsInGroup(SoundGroups[i].Sounds));
 	}
     }

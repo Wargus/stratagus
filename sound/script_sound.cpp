@@ -158,7 +158,7 @@ local SCM CclMakeSound(SCM name, SCM file)
 	// only one file
 	c_name = gh_scm2newstr(name, NULL);
 	c_file = gh_scm2newstr(file, NULL);
-	id = MakeSound(c_name, &c_file, 1);
+	id = MakeSound(c_name, (const char**)&c_file, 1);
 	DebugLevel3("Making sound `%s' from `%s' with id %p\n" _C_ c_name _C_
 	    c_file _C_ id);
 	// the sound name (c_name) must be kept but the file name can be freed
@@ -183,7 +183,7 @@ local SCM CclMakeSound(SCM name, SCM file)
 	    file = gh_cdr(file);
 	}
 	//FIXME: check size before casting
-	id = MakeSound(c_name, c_files, (unsigned char)nb);
+	id = MakeSound(c_name, (const char**)c_files, (unsigned char)nb);
 	for (i = 0; i < nb; ++i) {
 	    free(c_files[i]);
 	}
