@@ -1,0 +1,64 @@
+<HTML><HEAD>
+<!--
+----	$Id$
+-->
+    <TITLE>FreeCraft Version 1.17 - CursorType: C type description</TITLE>
+</HEAD>
+<BODY>
+    <H1>FreeCraft Version 1.17 - CursorType: C type description</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<B>(C) Copyright 2001 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+<PRE>
+CursorType:
+==========
+
+    #include "cursor.h"
+    typedef struct _cursor_type_ CursorType;
+
+    This structure contains all informations about a cursor.
+
+    In the future it is planned to support animated cursors.
+
+The cursor-type structure members:
+
+CursorType::Ident
+-----------------
+    Unique identifier of the cursor, used to reference it in config files
+    and during startup. Don't use this in game, use instead the pointer to this
+    structure.
+
+CursorType::Race
+----------------
+    Owning Race of this cursor. ("human", "orc", "alliance", "mythical", ...)
+    If NULL, this cursor could be used by any race.
+
+CursorType::HotX CursorType::HotY
+---------------- ----------------
+    Hot spot of the cursor in pixels. Relative to the sprite origin (0,0).
+    The hot spot of a cursor is the point to which FreeCraft refers in
+    tracking the cursor's position. 
+
+CursorType::Width
+-----------------
+    Width of the cursor in pixels.
+
+CursorType::Height
+------------------
+    Height of the cursor in pixels.
+
+</PRE><HR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>
