@@ -479,7 +479,7 @@ local void SaveAiHelper(FILE* file)
     SaveAiEquivTable(file,"unit-equiv",AiHelpers.EquivCount,
 	    AiHelpers.Equiv);
 
-    fprintf(file," )\n");
+    fprintf(file," )\n\n");
 }
 
 /**
@@ -490,21 +490,181 @@ local void SaveAiHelper(FILE* file)
 global void SaveAiTypes(FILE* file)
 {
     const AiType* aitype;
+    SCM list;
 
     //
     //	Save AiTypes.
     //
     for( aitype=AiTypes; aitype; aitype=aitype->Next ) {
 	DebugLevel3Fn("%s,%s,%s\n",aitype->Name,aitype->Race,aitype->Class);
-	fprintf(file,"(define-ai '%s '%s \"%s\"\n",
-		aitype->Class,aitype->Race ? aitype->Race : "*",aitype->Name);
+	fprintf(file,"(define-ai \"%s\" '%s '%s\n",
+		aitype->Name,aitype->Race ? aitype->Race : "*",aitype->Class);
 
-	fprintf(file,"  '");
-	lprin1f(aitype->Script,file);
-	fprintf(file,")\n");
+	fprintf(file,"  '(");
+	//	Print the script a little formated
+	list=aitype->Script;
+	while( !gh_null_p(list) ) {
+	    fprintf(file,"\n    ");
+	    lprin1f(gh_car(list),file);
+	    list=gh_cdr(list);
+	}
+	fprintf(file," ))\n\n");
 
 	// FIXME: Must save references to other scripts - scheme functions
 	// Perhaps we should dump the complete scheme state
+    }
+}
+
+/**
+**	Save state of player AI.
+**
+**	@param file	Output file.
+**	@param plynr	Player number.
+**	@param ai	Player AI.
+*/
+global void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
+{
+    SCM script;
+    int i;
+    const AiBuildQueue* queue;
+
+    fprintf(file,"(define-ai-player %u\n",plynr);
+    fprintf(file,"  'ai-type '%s\n",ai->AiType->Name);
+    //
+    //	Find the script.
+    //
+    if( !gh_null_p(ai->Script) ) {
+	i=0;
+	script=ai->AiType->Script;
+	do {
+	    if( ai->Script==script ) {
+		fprintf(file,"  'script '(aitypes %d)\n",i);
+		break;
+	    }
+	    script=gh_cdr(script);
+	    ++i;
+	} while( !gh_null_p(script) );
+
+	if( gh_null_p(script) ) {	// Not found in ai-types.
+	    DebugLevel0Fn("FIXME: not written\n");
+	    fprintf(file,"  'script '(FIXME: %d)\n",i);
+	}
+
+    }
+    fprintf(file,"  'script-debug #%s\n",ai->ScriptDebug ? "t" : "f");
+    fprintf(file,"  'sleep-cycles %d\n",ai->SleepCycles);
+
+    //
+    //	All forces
+    //
+    for( i=0; i<AI_MAX_FORCES; ++i ) {
+	const AiUnitType* aut;
+
+	fprintf(file,"  'force '(%d %s %s %s\n",i,
+		AiPlayer->Force[i].Completed ? "complete" : "recruit",
+		AiPlayer->Force[i].Attacking ? "attack" : "",
+		AiPlayer->Force[i].Defending ? "defend" : "");
+
+	fprintf(file,"    units ( ");
+	for( aut=AiPlayer->Force[i].UnitTypes; aut; aut=aut->Next ) {
+	    fprintf(file,"%d %s ",aut->Want,aut->Type->Ident);
+	}
+	fprintf(file,"))\n");
+    }
+
+    fprintf(file,"  'reserve '(");
+    for( i=0; i<MaxCosts; ++i ) {
+	fprintf(file,"%s %d ",DEFAULT_NAMES[i],ai->Reserve[i]);
+    }
+    fprintf(file,")\n");
+
+    fprintf(file,"  'used '(");
+    for( i=0; i<MaxCosts; ++i ) {
+	fprintf(file,"%s %d ",DEFAULT_NAMES[i],ai->Used[i]);
+    }
+    fprintf(file,")\n");
+
+    fprintf(file,"  'needed '(");
+    for( i=0; i<MaxCosts; ++i ) {
+	fprintf(file,"%s %d ",DEFAULT_NAMES[i],ai->Needed[i]);
+    }
+    fprintf(file,")\n");
+
+    fprintf(file,"  'collect '(");
+    for( i=0; i<MaxCosts; ++i ) {
+	fprintf(file,"%s %d ",DEFAULT_NAMES[i],ai->Collect[i]);
+    }
+    fprintf(file,")\n");
+
+    fprintf(file,"  'need-mask '(");
+    for( i=0; i<MaxCosts; ++i ) {
+	if( ai->NeededMask&(1<<i) ) {
+	    fprintf(file,"%s ",DEFAULT_NAMES[i]);
+	}
+    }
+    fprintf(file,")\n");
+
+    if( ai->NeedFood ) {
+	fprintf(file,"  'need-food");
+    }
+
+    //
+    //	Requests
+    //
+    fprintf(file,"  'unit-type '(");
+    for( i=0; i<AiPlayer->UnitTypeRequestsCount; ++i ) {
+	fprintf(file,"%s ",ai->UnitTypeRequests[i].Table[0]->Ident);
+	fprintf(file,"%d ",ai->UnitTypeRequests[i].Count);
+    }
+    fprintf(file,")\n");
+
+    fprintf(file,"  'upgrade '(");
+    for( i=0; i<AiPlayer->UpgradeToRequestsCount; ++i ) {
+	fprintf(file,"%s ",ai->UpgradeToRequests[i]->Ident);
+    }
+    fprintf(file,")\n");
+
+    fprintf(file,"  'research '(");
+    for( i=0; i<AiPlayer->ResearchRequestsCount; ++i ) {
+	fprintf(file,"%s ",ai->ResearchRequests[i]->Ident);
+    }
+    fprintf(file,")\n");
+
+    //
+    //	Building queue
+    //
+    fprintf(file,"  'building '(");
+    for( queue=ai->UnitTypeBuilded; queue; queue=queue->Next ) {
+	fprintf(file,"%s %d %d ",queue->Type->Ident,queue->Made,queue->Want);
+    }
+    fprintf(file,")\n");
+
+    fprintf(file,"  'repair-building %u\n",ai->LastRepairBuilding);
+
+    fprintf(file,"  'repair-workers '(");
+    for( i=0; i<UnitMax; ++i ) {
+	if( ai->TriedRepairWorkers[i] ) {
+	    fprintf(file,"%d %d",i,ai->TriedRepairWorkers[i]);
+	}
+    }
+    fprintf(file,")");
+
+    fprintf(file,")\n\n");
+}
+
+/**
+**	Save state of player AIs.
+**
+**	@param file	Output file.
+*/
+global void SaveAiPlayers(FILE* file)
+{
+    unsigned p;
+
+    for( p=0; p<PlayerMax; ++p ) {
+	if( Players[p].Ai ) {
+	    SaveAiPlayer(file,p,Players[p].Ai);
+	}
     }
 }
 
@@ -518,11 +678,12 @@ global void SaveAi(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: AI $Id$\n\n");
 
-    DebugLevel0Fn("FIXME: Saving AI isn't supported\n");
-
     SaveAiTypesWcName(file);
     SaveAiHelper(file);
     SaveAiTypes(file);
+    SaveAiPlayers(file);
+
+    DebugLevel0Fn("FIXME: Saving AI isn't supported\n");
 }
 
 /**
@@ -553,7 +714,7 @@ global void AiInit(Player* player)
     //	Search correct AI type.
     //
     for( ;; ) {
-   	if( ait->Race && strcmp(ait->Race,player->RaceName) ) {
+	if( ait->Race && strcmp(ait->Race,player->RaceName) ) {
 	    ait=ait->Next;
 	    if( !ait && ainame ) {
 		ainame=NULL;
