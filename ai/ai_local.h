@@ -217,7 +217,7 @@ typedef struct _player_ai_ {
     int		NeedFood;		/// Flag need food
 
 	/// number of elements in UnitTypeRequests
-    int			RequestsCount;
+    int			UnitTypeRequestsCount;
 	/// unit-types to build/train requested and priority list
     AiUnitTypeTable*	UnitTypeRequests;
 	/// number of elements in UpgradeRequests
@@ -310,6 +310,10 @@ extern PlayerAi* AiPlayer;		/// Current AI player
 //
     /// Add unit-type request to resource manager
 extern void AiAddUnitTypeRequest(UnitType* type,int count);
+    /// Add upgrade-to request to resource manager
+extern void AiAddUpgradeToRequest(UnitType* type);
+    /// Add research request to resource manager
+extern void AiAddResearchRequest(Upgrade* upgrade);
     /// Periodic called resource manager handler
 extern void AiResourceManager(void);
 
