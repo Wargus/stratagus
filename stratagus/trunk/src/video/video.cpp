@@ -35,11 +35,12 @@
 
 #include "freecraft.h"
 #include "video.h"
-
 #include "map.h"
 #include "ui.h"
 #include "cursor.h"
 #include "iolib.h"
+
+#include "intern_video.h"
 
 #ifdef USE_SDL
 #include <SDL/SDL.h>
