@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1999-2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -34,6 +44,190 @@
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	Parse a freecraft map.
+**
+**	@param list	list of tuples keyword data
+*/
+local SCM CclFreeCraftMap(SCM list)
+{
+    SCM value;
+    SCM data;
+    char* str;
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("version")) ) {
+	    char buf[32];
+
+	    data=gh_car(list);
+	    list=gh_cdr(list);
+	    str=gh_scm2newstr(data,NULL);
+	    sprintf(buf,FreeCraftFormatString,
+		    FreeCraftFormatArgs(FreeCraftVersion));
+	    if( strcmp(buf,str) ) {
+		fprintf(stderr,"Warning not saved with this version.\n");
+	    }
+	    free(str);
+	} else if( gh_eq_p(value,gh_symbol2scm("description")) ) {
+	    data=gh_car(list);
+	    list=gh_cdr(list);
+
+	    str=gh_scm2newstr(data,NULL);
+	    strncpy(TheMap.Description,str,sizeof(TheMap.Description));
+	    free(str);
+	} else if( gh_eq_p(value,gh_symbol2scm("the-map")) ) {
+	    data=gh_car(list);
+	    list=gh_cdr(list);
+
+	    while( !gh_null_p(data) ) {
+		value=gh_car(data);
+		data=gh_cdr(data);
+
+		if( gh_eq_p(value,gh_symbol2scm("terrain")) ) {
+		    int i;
+
+		    value=gh_car(data);
+		    data=gh_cdr(data);
+
+		    free(TheMap.TerrainName);
+		    TheMap.TerrainName=str=gh_scm2newstr(gh_car(value),NULL);
+		    //
+		    //	Lookup the index of this tileset.
+		    //
+		    for( i=0; TilesetWcNames[i]
+			    && strcmp(str,TilesetWcNames[i]); ++i ) {
+		    }
+		    TheMap.Terrain=i;
+		    // Ignore: str=gh_scm2newstr(gh_cadr(value),NULL);
+		   
+		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		    value=gh_car(data);
+		    data=gh_cdr(data);
+
+		    TheMap.Width=gh_scm2int(gh_car(value));
+		    TheMap.Height=gh_scm2int(gh_cadr(value));
+
+		    free(TheMap.Fields);
+		    TheMap.Fields=calloc(TheMap.Width*TheMap.Height,
+			    sizeof(*TheMap.Fields));
+		    InitUnitCache();
+
+		} else if( gh_eq_p(value,gh_symbol2scm("fog-of-war")) ) {
+
+		    TheMap.NoFogOfWar=0;
+
+		} else if( gh_eq_p(value,gh_symbol2scm("no-fog-of-war")) ) {
+
+		    TheMap.NoFogOfWar=1;
+
+		} else if( gh_eq_p(value,gh_symbol2scm("map-fields")) ) {
+		    int i;
+
+		    value=gh_car(data);
+		    data=gh_cdr(data);
+
+		    i=gh_length(value);
+		    if( i!=TheMap.Width*TheMap.Height ) {
+			fprintf(stderr,"Wrong tile table length %d\n",i);
+		    }
+		    i=0;
+		    while( !gh_null_p(value) ) {
+			SCM field;
+
+			field=gh_car(value);
+			value=gh_cdr(value);
+
+			TheMap.Fields[i].Tile=gh_scm2int(gh_car(field));
+			field=gh_cdr(field);
+			TheMap.Fields[i].SeenTile=gh_scm2int(gh_car(field));
+			field=gh_cdr(field);
+			while( !gh_null_p(field) ) {
+			    if( gh_exact_p(gh_car(field)) ) {
+				TheMap.Fields[i].Value=
+					gh_scm2int(gh_car(field));
+
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("visible")) ) {
+				TheMap.Fields[i].Flags|=MapFieldVisible;
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("explored")) ) {
+				TheMap.Fields[i].Flags|=MapFieldExplored;
+
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("human")) ) {
+				TheMap.Fields[i].Flags|=MapFieldHuman;
+
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("land")) ) {
+				TheMap.Fields[i].Flags|=MapFieldLandAllowed;
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("coast")) ) {
+				TheMap.Fields[i].Flags|=MapFieldCoastAllowed;
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("water")) ) {
+				TheMap.Fields[i].Flags|=MapFieldWaterAllowed;
+
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("mud")) ) {
+				TheMap.Fields[i].Flags|=MapFieldNoBuilding;
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("block")) ) {
+				TheMap.Fields[i].Flags|=MapFieldUnpassable;
+
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("wall")) ) {
+				TheMap.Fields[i].Flags|=MapFieldWall;
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("rock")) ) {
+				TheMap.Fields[i].Flags|=MapFieldRocks;
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("wood")) ) {
+				TheMap.Fields[i].Flags|=MapFieldForest;
+
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("ground")) ) {
+				TheMap.Fields[i].Flags|=MapFieldLandUnit;
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("air")) ) {
+				TheMap.Fields[i].Flags|=MapFieldAirUnit;
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("sea")) ) {
+				TheMap.Fields[i].Flags|=MapFieldSeaUnit;
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("building")) ) {
+				TheMap.Fields[i].Flags|=MapFieldBuilding;
+
+			    } else {
+			       // FIXME: this leaves a half initialized map
+			       errl("Unsupported tag",value);
+			    }
+			    field=gh_cdr(field);
+			}
+			++i;
+		    }
+
+		} else {
+		   // FIXME: this leaves a half initialized map
+		   errl("Unsupported tag",value);
+		}
+	    }
+
+	} else {
+	   // FIXME: this leaves a half initialized map
+	   errl("Unsupported tag",value);
+	}
+    }
+
+    return SCM_UNSPECIFIED;
+}
 
 /**
 **	Reveal the complete map.
@@ -225,6 +419,7 @@ local SCM CclForestRegeneration(SCM speed)
 */
 global void MapCclRegister(void)
 {
+    gh_new_procedureN("freecraft-map",CclFreeCraftMap);
     gh_new_procedure0_0("reveal-map",CclRevealMap);
 
     gh_new_procedure1_0("set-fog-of-war!",CclSetFogOfWar);

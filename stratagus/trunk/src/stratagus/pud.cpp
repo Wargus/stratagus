@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1998-2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -414,27 +424,18 @@ global MapInfo* GetPudInfo(const char* pud)
 	if( !memcmp(header,"ERA ",4) || !memcmp(header,"ERAX",4) ) {
 	    if( length==2 ) {
 		int t;
+		int i;
 
 		t=PudReadWord(input);
-		switch( t ) {
-		    case TilesetSummer:
-			DebugLevel3("\tTerrain: SUMMER\n");
-			break;
-		    case TilesetWinter:
-			DebugLevel3("\tTerrain: WINTER\n");
-			break;
-		    case TilesetWasteland:
-			DebugLevel3("\tTerrain: WASTELAND\n");
-			break;
-		    case TilesetSwamp:
-			DebugLevel3("\tTerrain: SWAMP\n");
-			break;
-		    default:
-			DebugLevel1("Unknown terrain %d\n",t);
-			t=TilesetSummer;
-			break;
+		//
+		//	Look if we have this as tileset.
+		//
+		for( i=0; i<t && TilesetWcNames[i]; ++i ) {
 		}
-		info->MapTerrainName=TilesetWcNames[t];
+		if( !TilesetWcNames[i] ) {
+		    t=0;
+		}
+		info->MapTerrainName=strdup(TilesetWcNames[t]);
 		info->MapTerrain=t;
 		buf[0] = t & 0xFF;
 		info->MapUID += ChksumArea(buf, 1);
@@ -864,31 +865,24 @@ global void LoadPud(const char* pud,WorldMap* map)
 	if( !memcmp(header,"ERA ",4) || !memcmp(header,"ERAX",4) ) {
 	    if( length==2 ) {
 		int t;
+		int i;
 
 		t=PudReadWord(input);
-		if (GameSettings.Terrain == SettingsPresetMapDefault) {
-		    switch( t ) {
-			case TilesetSummer:
-			    DebugLevel3("\tTerrain: SUMMER\n");
-			    break;
-			case TilesetWinter:
-			    DebugLevel3("\tTerrain: WINTER\n");
-			    break;
-			case TilesetWasteland:
-			    DebugLevel3("\tTerrain: WASTELAND\n");
-			    break;
-			case TilesetSwamp:
-			    DebugLevel3("\tTerrain: SWAMP\n");
-			    break;
-			default:
-			    DebugLevel1("Unknown terrain %d\n",t);
-			    t=TilesetSummer;
-			    break;
-		    }
-		} else {
+		if (GameSettings.Terrain != SettingsPresetMapDefault) {
 		    t = GameSettings.Terrain;
 		}
-		map->TerrainName=TilesetWcNames[t];
+		if( map->TerrainName ) {
+		    free(map->TerrainName);
+		}
+		//
+		//	Look if we have this as tileset.
+		//
+		for( i=0; i<t && TilesetWcNames[i]; ++i ) {
+		}
+		if( !TilesetWcNames[i] ) {
+		    t=0;
+		}
+		map->TerrainName=strdup(TilesetWcNames[t]);
 		map->Terrain=t;
 		continue;
 	    } else {

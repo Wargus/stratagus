@@ -75,7 +75,7 @@ struct _player_ {
     char*	Name;			/// name of non computer
 
     unsigned	Type;			/// type of player (human,computer,...)
-    char*	RaceName;		/// name of race.
+    char*	RaceName;		/// name of race
     unsigned	Race;			/// race of player (orc,human,...)
     unsigned	AiNum;			/// AI for computer
 
@@ -88,7 +88,7 @@ struct _player_ {
     unsigned	Y;			/// map tile start Y position
 
     unsigned	Resources[MaxCosts];	/// resources in store
-    int		Incomes[MaxCosts];	/// income of the resources.
+    int		Incomes[MaxCosts];	/// income of the resources
 
 //  FIXME: needed again? if not remove
 //    unsigned	UnitFlags[
@@ -101,7 +101,7 @@ struct _player_ {
     void*	Ai;			/// Ai structure pointer
 
     Unit**	Units;			/// units of this player
-    unsigned	TotalNumUnits;		/// total # units for units' list.
+    unsigned	TotalNumUnits;		/// total # units for units' list
 
     unsigned	NumFoodUnits;		/// # units (need food)
     unsigned	NumBuildings;		/// # buildings (don't need food)
@@ -181,19 +181,27 @@ extern Player* ThisPlayer;		/// Player on this computer
 --	Functions
 ----------------------------------------------------------------------------*/
 
+    /// Init players
+extern void InitPlayers(void);
+    /// Clean up players
+extern void CleanPlayers(void);
+    /// Save players
+extern void SavePlayers(FILE*);
+
     /// Create a new player
 extern void CreatePlayer(int type);
-    /// Change player side.
+
+    /// Change player side
 extern void PlayerSetSide(Player* player,int side);
-    /// Change player name.
-extern void PlayerSetName(Player* player,char* name);
-    /// Change player AI.
+    /// Change player name
+extern void PlayerSetName(Player* player,const char* name);
+    /// Change player AI
 extern void PlayerSetAiNum(Player* player,int ai);
 
-    /// Set a resource of the player.
+    /// Set a resource of the player
 extern void PlayerSetResource(Player* player,int resource,int value);
 
-    /// Check if the unit-type didn't break any unit limits.
+    /// Check if the unit-type didn't break any unit limits
 extern int PlayerCheckLimits(const Player* player,const UnitType* type);
 
     /// Check if enough food is available for unit-type
@@ -229,7 +237,7 @@ extern void PlayersEachFrame(void);
     /// Called each second for player handlers (AI)
 extern void PlayersEachSecond(void);
 
-    /// Change current color set to new player.
+    /// Change current color set to new player
 extern void PlayerPixels(const Player* player);
 
     /// Change current color set to new player of the sprite

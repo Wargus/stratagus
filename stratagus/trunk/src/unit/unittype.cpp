@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1998-2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -859,11 +869,10 @@ local void SaveAnimation(const char* name,const Animation* anim,FILE* file)
 local void SaveAnimations(const UnitType* type,FILE* file)
 {
     const UnitType* temp;
-    const Animations* anim;
+    const Animations* anims;
     int i;
 
-    anim=type->Animations;
-    if( !anim ) {
+    if( !(anims=type->Animations) ) {
 	return;
     }
 
@@ -871,7 +880,7 @@ local void SaveAnimations(const UnitType* type,FILE* file)
     //	Look if this is the first use of it.
     //
     for( temp=UnitTypes; temp->OType && temp!=type ; ++temp ) {
-	if( temp->Animations==anim ) {
+	if( temp->Animations==anims ) {
 	    return;			// allready handled.
 	}
     }
@@ -882,7 +891,7 @@ local void SaveAnimations(const UnitType* type,FILE* file)
     //
     i=0;
     for( temp=UnitTypes; temp->OType; ++temp ) {
-	if( temp->Animations==anim ) {
+	if( temp->Animations==anims ) {
 	    if( i ) {
 		fprintf(file,", ");
 	    }
@@ -892,10 +901,10 @@ local void SaveAnimations(const UnitType* type,FILE* file)
     }
     fprintf(file,"\n(define-animations \"animations-%s\"",type->Ident+5);
 
-    SaveAnimation("still",anim->Still,file);
-    SaveAnimation("move",anim->Move,file);
-    SaveAnimation("attack",anim->Attack,file);
-    SaveAnimation("die",anim->Die,file);
+    SaveAnimation("still",anims->Still,file);
+    SaveAnimation("move",anims->Move,file);
+    SaveAnimation("attack",anims->Attack,file);
+    SaveAnimation("die",anims->Die,file);
 
     fprintf(file,")\n");
 }
@@ -1430,6 +1439,8 @@ global void LoadUnitTypes(void)
 	if( type->CorpseName ) {
 	    type->CorpseType=UnitTypeByIdent(type->CorpseName);
 	}
+
+	// FIXME: should i copy the animations of same graphics?
     }
 
     // FIXME: must copy unit data from peon/peasant to with gold/wood
@@ -1441,6 +1452,7 @@ global void LoadUnitTypes(void)
 */
 global void CleanUnitTypes(void)
 {
+    UnitType* type;
     void** ptr;
 
     //
@@ -1455,7 +1467,104 @@ global void CleanUnitTypes(void)
 	UnitTypeWcNames=NULL;
     }
 
-    // FIXME: more!
+    //	Clean all animations.
+
+    for( type=UnitTypes; type->OType; ++type ) {
+	Animations* anims;
+	UnitType* temp;
+	
+	if( !(anims=type->Animations) ) {	// Must be handled?
+	    continue;
+	}
+	for( temp=type; temp->OType; ++temp ) {	// remove all uses
+	    if( anims==temp->Animations ) {
+		temp->Animations=NULL;
+	    }
+	}
+	type->Animations=NULL;
+	if( anims->Still ) {
+	    free(anims->Still);
+	}
+	if( anims->Move ) {
+	    free(anims->Move);
+	}
+	if( anims->Attack ) {
+	    free(anims->Attack);
+	}
+	if( anims->Die ) {
+	    free(anims->Die);
+	}
+	free(anims);
+    }
+
+    //	Clean all unit-types
+
+    if( UnitTypes ) {
+	for( type=UnitTypes; type->OType; ++type ) {
+	    // FIXME: hash_del not supported
+	    *(UnitType**)hash_add(UnitTypeHash,type->Ident)=NULL;
+
+	    DebugCheck( !type->Ident );
+	    free(type->Ident);
+	    DebugCheck( !type->Name );
+	    free(type->Name);
+
+	    if( type->SameSprite ) {
+		free(type->SameSprite);
+	    }
+	    if( type->File[0] ) {
+		free(type->File[0]);
+	    }
+	    if( type->File[1] ) {
+		free(type->File[1]);
+	    }
+	    if( type->File[2] ) {
+		free(type->File[2]);
+	    }
+	    if( type->File[3] ) {
+		free(type->File[3]);
+	    }
+
+#if 0
+	    if( type->Icon.Name ) {
+		free(type->Icon.Name);
+	    }
+	    if( type->Missile.Name ) {
+		free(type->Missile.Name);
+	    }
+	    if( type->CorpseName ) {
+		free(type->CorpseName);
+	    }
+#endif
+
+	    if( type->Sound.Selected.Name ) {
+		free(type->Sound.Selected.Name);
+	    }
+	    if( type->Sound.Acknowledgement.Name ) {
+		free(type->Sound.Acknowledgement.Name);
+	    }
+	    if( type->Sound.Ready.Name ) {
+		free(type->Sound.Ready.Name);
+	    }
+	    if( type->Sound.Help.Name ) {
+		free(type->Sound.Help.Name);
+	    }
+	    if( type->Sound.Dead.Name ) {
+		free(type->Sound.Dead.Name);
+	    }
+	    if( type->Weapon.Attack.Name ) {
+		free(type->Weapon.Attack.Name);
+	    }
+
+	    if( !type->SameSprite ) {
+		VideoSaveFree(type->Sprite);
+	    }
+	}
+	free(UnitTypes);
+	UnitTypes=NULL;
+	NumUnitTypes=0;
+    }
+
 
     //
     //	Clean hardcoded unit types.

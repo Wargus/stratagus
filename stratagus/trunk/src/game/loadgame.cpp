@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 2001 by Lutz Sammer, Andreas Arens
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -28,6 +38,9 @@
 #include "upgrade.h"
 #include "depend.h"
 #include "interface.h"
+#include "missile.h"
+#include "tileset.h"
+#include "map.h"
 #include "ccl.h"
 
 /*----------------------------------------------------------------------------
@@ -47,17 +60,16 @@ global void CleanModules(void)
 {
     CleanIcons();
     // CleanUI();
+    CleanPlayers();
     CleanUnitTypes();
     CleanUnits();
     CleanUpgrades();
     CleanDependencies();
     CleanButtons();
-#if 0
     CleanMissileTypes();
     CleanMissiles();
     CleanTileset();
     CleanMap();
-#endif
 }
 
 /**
@@ -69,6 +81,7 @@ global void InitModules(void)
 {
     InitIcons();
     // InitUI();
+    InitPlayers();
     InitUnitTypes();
     InitUnits();
     InitUpgrades();
@@ -86,7 +99,10 @@ global void LoadModules(void)
 {
     LoadIcons();
     // LoadUI();
+    // LoadPlayers();
     LoadUnitTypes();
+
+    LoadTileset();
 
     // LoadButtons();
 }

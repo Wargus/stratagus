@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1998-2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -1471,13 +1481,12 @@ global void LoadTileset(void)
     //	Find the tileset.
     //
     for( i=0; i<TilesetsCount; ++i ) {
-	if( !strcmp(TilesetWcNames[TheMap.Terrain],Tilesets[i].Ident) ) {
+	if( !strcmp(TheMap.TerrainName,Tilesets[i].Ident) ) {
 	    break;
 	}
     }
     if( i==TilesetsCount ) {
-	fprintf(stderr,"Tileset `%s' not available\n"
-		,TilesetWcNames[TheMap.Terrain]);
+	fprintf(stderr,"Tileset `%s' not available\n",TheMap.TerrainName);
 	exit(-1);
     }
     TheMap.Tileset=&Tilesets[i];
@@ -1485,7 +1494,6 @@ global void LoadTileset(void)
     //
     //	Load and prepare the tileset
     //
-
     TheMap.TileData=LoadGraphic(TheMap.Tileset->File);
 
     //
@@ -1872,7 +1880,7 @@ global void SaveTileset(FILE* file)
 /**
 **	Cleanup the tileset module.
 **
-**	NOTE: this didn't frees the configuration memory.
+**	@note	this didn't frees the configuration memory.
 */
 global void CleanTileset(void)
 {
@@ -1880,6 +1888,8 @@ global void CleanTileset(void)
     IfDebug( TheMap.TileData=NULL; );
     free(TheMap.Tiles);
     IfDebug( TheMap.Tiles=NULL; );
+
+    DebugLevel0Fn("FIXME: not complete written\n");
 }
 
 //@}

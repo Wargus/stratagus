@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -69,6 +79,135 @@ local int PlayerColors[PlayerMax] = {
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	Init players.
+*/
+global void InitPlayers(void)
+{
+    int p;
+
+    for( p=0; p<PlayerMax; ++p ) {
+	Players[p].Player=p;
+    }
+}
+
+/**
+**	Clean up players.
+*/
+global void CleanPlayers(void)
+{
+    int p;
+
+    for( p=0; p<PlayerMax; ++p ) {
+	if( Players[p].Name ) {
+	    free(Players[p].Name); 
+	}
+	if( Players[p].Units ) {
+	    free(Players[p].Units);
+	}
+    }
+    ThisPlayer=NULL;
+    memset(Players,0,sizeof(Players));
+    NumPlayers=0;
+}
+
+/**
+**	Save state of players to file.
+**
+**	@param file	Output file.
+*/
+global void SavePlayers(FILE* file)
+{
+    int i;
+    int j;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: players $Id$\n\n");
+
+    for( i=0; i<NumPlayers; ++i ) {
+	fprintf(file,"(player %d\n",i);
+	fprintf(file,"  'name \"%s\"\n",Players[i].Name);
+	fprintf(file,"  'type ");
+	switch( Players[i].Type ) {
+	    case 2: fprintf(file,"'neutral");		break;
+	    case 3: fprintf(file,"'nobody");		break;
+	    case 4: fprintf(file,"'computer");		break;
+	    case 5: fprintf(file,"'human");		break;
+	    case 6: fprintf(file,"'rescue-passive");	break;
+	    case 7: fprintf(file,"'rescue-active");	break;
+	    default:fprintf(file,"%d",Players[i].Type); break;
+	}
+	fprintf(file," 'race \"%s\"",Players[i].RaceName);
+	fprintf(file," 'ai %d\n",Players[i].AiNum);
+	fprintf(file,"  'team %d",Players[i].Team);
+
+	fprintf(file," 'enemy \"");
+	for( j=0; j<PlayerMax; ++j ) {
+	    fputc((Players[i].Enemy&(1<<j)) ? 'X' : '_',file);
+	}
+	fprintf(file,"\" 'allied \"");
+	for( j=0; j<PlayerMax; ++j ) {
+	    fputc((Players[i].Allied&(1<<j)) ? 'X' : '_',file);
+	}
+	fprintf(file,"\"\n  'start '(%d %d)\n",Players[i].X,Players[i].Y);
+
+	// Resources
+	fprintf(file,"  'resources '(");
+	for( j=0; j<MaxCosts; ++j ) {
+	    if( j ) {
+		if( j==MaxCosts/2 ) {
+		    fputs("\n    ",file);
+		} else {
+		    fputc(' ',file);
+		}
+	    }
+	    fprintf(file,"%s %d",DEFAULT_NAMES[j],Players[i].Resources[j]);
+	}
+	// Incomes
+	fprintf(file,")\n  'incomes '(");
+	for( j=0; j<MaxCosts; ++j ) {
+	    if( j ) {
+		if( j==MaxCosts/2 ) {
+		    fputs("\n    ",file);
+		} else {
+		    fputc(' ',file);
+		}
+	    }
+	    fprintf(file,"%s %d",DEFAULT_NAMES[j],Players[i].Incomes[j]);
+	}
+
+	// UnitTypesCount done by load units.
+
+	fprintf(file,")\n  '%s\n",Players[i].AiEnabled ?
+		"ai-enabled" : "ai-disabled");
+
+	// Ai done by load ais.
+
+	fprintf(file,"  'food-unit-limit %d",Players[i].FoodUnitLimit);
+	fprintf(file," 'building-limit %d",Players[i].BuildingLimit);
+	fprintf(file," 'total-unit-limit %d",Players[i].TotalUnitLimit);
+
+	fprintf(file," 'score %d",Players[i].Score);
+
+	// Colors done by init code.
+
+	// Allow saved by allow.
+
+	fprintf(file,"\n  'timers '(");
+	for( j=0; j<UpgradeMax; ++j ) {
+	    if( j ) {
+		fputc(' ',file);
+	    }
+	    fprintf(file,"%d",Players[i].UpgradeTimers.Upgrades[j]);
+	}
+	fprintf(file,")");
+
+	fprintf(file,")\n\n");
+    }
+
+    fprintf(file,"(this-player %d)\n\n",ThisPlayer->Player);
+}
 
 /**
 **	Create a new player.
@@ -142,7 +281,7 @@ global void CreatePlayer(int type)
 	return;
     }
 
-    player->Name="Computer";
+    player->Name=strdup("Computer");
     player->Type=type;
     player->Race=PlayerRaceHuman;
     player->RaceName="human";
@@ -231,7 +370,6 @@ global void CreatePlayer(int type)
     player->Score=0;
 
 #ifndef USE_CCL
-    // FIXME: done by ccl
     player->FoodUnitLimit=200;
     player->BuildingLimit=200;
     player->TotalUnitLimit=400;
@@ -281,9 +419,12 @@ global void PlayerSetSide(Player* player,int side)
 **	@param player	Pointer to player.
 **	@param name	New name.
 */
-global void PlayerSetName(Player* player,char *name)
+global void PlayerSetName(Player* player,const char *name)
 {
-    player->Name=name;
+    if( player->Name ) {
+	free(player->Name);
+    }
+    player->Name=strdup(name);
 }
 
 /**

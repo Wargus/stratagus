@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1998-2001 by Lutz Sammer and Vladi Shabanski
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -43,8 +53,8 @@ global WorldMap TheMap;			/// The current map
 
 global unsigned MapX;			/// Map tile X start on display
 global unsigned MapY;			/// Map tile Y start on display
-global unsigned MapWidth;		/// Map width in tiles
-global unsigned MapHeight;		/// Map height in tiles
+global unsigned MapWidth;		/// Map width in tiles on display
+global unsigned MapHeight;		/// Map height in tiles on display
 
 global int FlagRevealMap;		/// Flag must reveal the map
 
@@ -536,8 +546,25 @@ global void FreeMapInfo(MapInfo* info)
 	if (info->Description) {
 	    free(info->Description);
 	}
+	if (info->MapTerrainName) {
+	    free(info->MapTerrainName);
+	}
 	free(info);
     }
+}
+
+/**
+**	Cleanup the map module.
+*/
+global void CleanMap(void)
+{
+    free(TheMap.Fields);
+    free(TheMap.TerrainName);
+
+    // Tileset freeed by Tileset?
+
+    FreeMapInfo(TheMap.Info);
+    memset(&TheMap,0,sizeof(TheMap));
 }
 
 //@}
