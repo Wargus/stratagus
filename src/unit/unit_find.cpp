@@ -382,6 +382,7 @@ local int InsideUnitSprite(const Unit* unit,int x,int y)
 **
 **	@param tx	X position on map, tile-based.
 **	@param ty	Y position on map, tile-based.
+**	@param type	Unit Type to Find
 **
 **	@return		Returns the unit if found, or NoUnitP.
 */

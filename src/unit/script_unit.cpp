@@ -1041,8 +1041,7 @@ local SCM CclKillUnit(SCM type,SCM player)
 **	@param type	Unit-type of the unit,
 **	@param player	Owning player number of the unit.
 **	@param quantity	Number of units to kill.
-**	@param loc1	Top left corner location.
-**	@param loc2	Bottom right corner location.
+**	@param loc	Co-ordinates list (x1 y1 x2 y2)
 **
 **	@return		Returns the number of units killed.
 */
