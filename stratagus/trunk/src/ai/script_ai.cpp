@@ -417,7 +417,6 @@ local AiUnitTypeTable* FindInUnitTypeRequests(const UnitType* type)
     int i;
     int n;
 
-
     n=AiPlayer->UnitTypeRequestsCount;
     for( i=0; i<n; ++i ) {
 	if( AiPlayer->UnitTypeRequests[i].Table[0]==type ) {
@@ -425,6 +424,25 @@ local AiUnitTypeTable* FindInUnitTypeRequests(const UnitType* type)
 	}
     }
     return NULL;
+}
+
+/**
+**	Find unit-type in upgrade-to table.
+**
+**	@param type	Unit-type to be found.
+*/
+local int FindInUpgradeToRequests(const UnitType* type)
+{
+    int i;
+    int n;
+
+    n=AiPlayer->UnitTypeRequestsCount;
+    for( i=0; i<n; ++i ) {
+	if( AiPlayer->UpgradeToRequests[i]==type ) {
+	    return 1;
+	}
+    }
+    return 0;
 }
 
 /**
@@ -565,10 +583,16 @@ local SCM CclAiWait(SCM value)
 		}
 	    }
 	}
-	// FIXME: could happen upgrades-to! return SCM_BOOL_F;
+
+	//
+	//	Look if we have an upgrade-to request.
+	//
+	if( FindInUpgradeToRequests(type) ) {
+	    return SCM_BOOL_T;
+	}
 	DebugLevel0Fn("Broken? waiting on %s which wasn't requested.\n" _C_
 		type->Ident);
-	return SCM_BOOL_T;
+	return SCM_BOOL_F;
     }
 
     //
@@ -824,6 +848,45 @@ local SCM CclAiSetReserve(SCM vec)
     return old;
 }
 
+/**
+**	Dump some AI debug informations.
+*/
+local SCM CclAiDump(void)
+{
+    int i;
+    int n;
+    const AiUnitType* aut;
+
+    n=AiPlayer->UnitTypeRequestsCount;
+    printf("UnitTypeRequests(%d):\n",n);
+    for( i=0; i<n; ++i ) {
+	printf("%s ",AiPlayer->UnitTypeRequests[i].Table[0]->Ident);
+    }
+    printf("\n");
+    n=AiPlayer->UpgradeToRequestsCount;
+    printf("UpgradeToRequests(%d):\n",n);
+    for( i=0; i<n; ++i ) {
+	printf("%s ",AiPlayer->UpgradeToRequests[i]->Ident);
+    }
+    printf("\n");
+
+    //
+    //	Look if already in force.
+    //
+    for( i=0; i<AI_MAX_FORCES; ++i) { 
+	printf("Force(%d%s%s%s):\n",i,
+		AiPlayer->Force[i].Completed ? ",complete" : ",recruit",
+		AiPlayer->Force[i].Attacking ? ",attack" : "",
+		AiPlayer->Force[i].Defending ? ",defend" : "");
+	for( aut=AiPlayer->Force[i].UnitTypes; aut; aut=aut->Next ) {
+	    printf("%s(%d) ",aut->Type->Ident,aut->Want);
+	}
+	printf("\n");
+    }
+
+    return SCM_BOOL_F;
+}
+
 #else
 
 /**
@@ -874,6 +937,8 @@ global void AiCclRegister(void)
 
     gh_new_procedure0_0("ai:player",CclAiPlayer);
     gh_new_procedure1_0("ai:set-reserve!",CclAiSetReserve);
+
+    gh_new_procedure0_0("ai:dump",CclAiDump);
 #endif
 }
 
