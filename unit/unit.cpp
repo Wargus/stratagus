@@ -1202,7 +1202,7 @@ global void UnitIncrementMana(void)
 **	Increment health of all regenerating units. Called each second.
 **
 **	@note:	We could build a table of all regenerating units reducing cpu
-**		use. 
+**		use.
 **		Any idea how to handle this more general? It whould be nice
 **		to have more units that could regenerate.
 */
@@ -1521,6 +1521,7 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     int y;
     int i;
     int n;
+    int nb;
     int mask;
     Unit* table[UnitMax];
 
@@ -1529,16 +1530,22 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     // FIXME: better and quicker solution, to find the building.
     x=y=-1;
     n=SelectUnitsOnTile(unit->X,unit->Y,table);
-    for( i=0; i<n; ++i ) {
+    for( nb=i=0; i<n; ++i ) {
 	if( UnitUnusable(table[i]) ) {
 	    continue;
 	}
 	if( table[i]->Type->Building ) {
+	    nb++;
 	    x=table[i]->X;
 	    y=table[i]->Y;
 	}
     }
-    DebugCheck( x==-1 || y==-1 );
+    if (!nb) {	//Check if there actually is a building.
+	DebugLevel0Fn("No building?");
+	x=unit->X;
+	y=unit->Y;
+    }
+
     mask=UnitMovementMask(unit);
 
     if( heading<LookingNE || heading>LookingNW) {
@@ -2687,7 +2694,13 @@ global void LetUnitDie(Unit* unit)
 		|| type->StoresGold || type->StoresWood
 		|| type->GivesOil || type->StoresOil
 		|| unit->Orders[0].Action==UnitActionBuilded ) {
-	    if( type->GivesOil && unit->Orders[0].Action==UnitActionBuilded ) {
+	    //
+	    //	During oil platform build, the worker holds the oil value,
+	    //	but if canceling building the platform, the worker is already
+	    //	outside.
+	    if( type->GivesOil
+			&& unit->Orders[0].Action==UnitActionBuilded
+			&& unit->Data.Builded.Worker ) {
 		// Restore value for oil-patch
 		unit->Value=unit->Data.Builded.Worker->Value;
 	    }
@@ -2823,7 +2836,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     Unit* goal;
 
     if( damage==0 ) {			// Can now happen by splash damage
-	DebugLevel0Fn("Warning no damage\n"); 
+	DebugLevel0Fn("Warning no damage\n");
 	return;
     }
 
@@ -2848,7 +2861,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    //
 	    if( LastFrame<FrameCounter ) {
 		if( LastFrame+FRAMES_PER_SECOND*120<FrameCounter ||
-			target->X<LastX-14 || target->X>LastX+14 
+			target->X<LastX-14 || target->X>LastX+14
 			    || target->Y<LastY-14 || target->Y>LastY+14  ) {
 		    LastFrame=FrameCounter+FRAMES_PER_SECOND*2;
 		    LastX=target->X;
