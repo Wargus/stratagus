@@ -358,8 +358,8 @@ static int CalculateUnitIcons(void)
 }
 
 /**
-**	Calculate the max height and the max widht of icons,
-**	and assign them to IconHeight and IconWidth
+** Calculate the max height and the max widht of icons,
+** and assign them to IconHeight and IconWidth
 */
 static void CalculateMaxIconSize(void)
 {
@@ -697,7 +697,7 @@ static void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 	VideoDrawRectangleClip(color, x, y, TileSizeX + 7, TileSizeY + 7);
 	VideoDrawRectangleClip(ColorBlack, x + 1, y + 1, TileSizeX + 5, TileSizeY + 5);
 
-	VideoDrawVLine(ColorGray, x + TileSizeX + 4, y + 5, TileSizeY - 1);		// _|
+	VideoDrawVLine(ColorGray, x + TileSizeX + 4, y + 5, TileSizeY - 1); // _|
 	VideoDrawVLine(ColorGray, x + TileSizeX + 5, y + 5, TileSizeY - 1);
 	VideoDrawHLine(ColorGray, x + 5, y + TileSizeY + 4, TileSizeX + 1);
 	VideoDrawHLine(ColorGray, x + 5, y + TileSizeY + 5, TileSizeX + 1);
@@ -861,19 +861,19 @@ static void DrawEditorInfo(void)
 	flags = TheMap.Fields[x + y * TheMap.Width].Flags;
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
 		TheMap.Fields[x + y * TheMap.Width].Value, flags,
-		flags & MapFieldUnpassable		? 'u' : '-',
-		flags & MapFieldNoBuilding		? 'n' : '-',
-		flags & MapFieldHuman				? 'h' : '-',
-		flags & MapFieldWall				? 'w' : '-',
-		flags & MapFieldRocks				? 'r' : '-',
-		flags & MapFieldForest				? 'f' : '-',
-		flags & MapFieldLandAllowed		? 'L' : '-',
-		flags & MapFieldCoastAllowed		? 'C' : '-',
-		flags & MapFieldWaterAllowed		? 'W' : '-',
-		flags & MapFieldLandUnit		? 'l' : '-',
-		flags & MapFieldAirUnit				? 'a' : '-',
-		flags & MapFieldSeaUnit				? 's' : '-',
-		flags & MapFieldBuilding		? 'b' : '-');
+		flags & MapFieldUnpassable   ? 'u' : '-',
+		flags & MapFieldNoBuilding   ? 'n' : '-',
+		flags & MapFieldHuman        ? 'h' : '-',
+		flags & MapFieldWall         ? 'w' : '-',
+		flags & MapFieldRocks        ? 'r' : '-',
+		flags & MapFieldForest       ? 'f' : '-',
+		flags & MapFieldLandAllowed  ? 'L' : '-',
+		flags & MapFieldCoastAllowed ? 'C' : '-',
+		flags & MapFieldWaterAllowed ? 'W' : '-',
+		flags & MapFieldLandUnit     ? 'l' : '-',
+		flags & MapFieldAirUnit      ? 'a' : '-',
+		flags & MapFieldSeaUnit      ? 's' : '-',
+		flags & MapFieldBuilding     ? 'b' : '-');
 	VideoDrawText(TheUI.ResourceX + 118, TheUI.ResourceY + 2, GameFont, buf);
 
 	//
@@ -1334,14 +1334,14 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case 'r':
 		case 'R': // CTRL+R Randomize map
 			if (KeyModifiers & ModifierControl) {
-  				EditorCreateRandomMap();
+				EditorCreateRandomMap();
 			}
 			break;
 
 		case 'm':
 		case 'M': // CTRL+M Mirror edit
 			if (KeyModifiers & ModifierControl)  {
-  				++MirrorEdit;
+				++MirrorEdit;
 				if (MirrorEdit == 3) {
 					MirrorEdit = 0;
 				}
