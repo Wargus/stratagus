@@ -10,7 +10,7 @@
 //
 /**@name ccl_ai.c	-	The AI ccl functions. */
 //
-//	(c) Copyright 2000,2001 by Lutz Sammer
+//	(c) Copyright 2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -566,7 +566,8 @@ local SCM CclAiWait(SCM value)
 	    }
 	}
 	// FIXME: could happen upgrades-to! return SCM_BOOL_F;
-	DebugLevel0Fn("Broken? waiting on unit-type which wasn't requested.\n");
+	DebugLevel0Fn("Broken? waiting on %s which wasn't requested.\n" _C_
+		type->Ident);
 	return SCM_BOOL_T;
     }
 
