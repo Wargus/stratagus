@@ -234,8 +234,8 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
     GetDefaultTextColors(&nc, &rc);
     if (flags&MenuButtonClicked) {
 	// Make the menu inside of the screen (TOP)
-	if (y + 1 <= mi->d.pulldown.curopt * h) {
-	    y = 2;
+	if (y + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->y) {
+	    y = 2 + CurrentMenu->y;
 	} else {
 	    y -= mi->d.pulldown.curopt * h;
 	    // Make the menu inside the bottom of the screen
@@ -970,8 +970,8 @@ local void MenuHandleMouseMove(int x,int y)
 		xs = menu->x + mi->xofs;
 		ys = menu->y + mi->yofs;
 		h = mi->d.pulldown.ysize - 2;
-		if (ys + 1 <= mi->d.pulldown.curopt * h) {
-		    ys = 2;
+		if (ys + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->y) {
+		    ys = 2 + CurrentMenu->y;
 		} else {
 		    ys -= mi->d.pulldown.curopt * h;
 		    if (ys + h*mi->d.pulldown.noptions >= 480 + CurrentMenu->y) {
