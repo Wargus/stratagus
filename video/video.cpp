@@ -164,21 +164,6 @@ global unsigned CompressedGraphicMemory;/// memory for compressed objects
 global int VideoDepth;
 
 	/**
-	**		Architecture-dependant video bpp (bits pro pixel).
-	**		Set by InitVideoXXX. (8,16,24,32)
-	**		@see InitVideo @see InitVideoSdl
-	**		@see main
-	*/
-global int VideoBpp;
-
-	/**
-	**  Architecture-dependant video memory-size (byte pro pixel).
-	**  Set by InitVideo. (1,2,3,4 equals VideoBpp/8)
-	**  @see InitVideo
-	*/
-global int VideoTypeSize;
-
-	/**
 	**		Architecture-dependant videomemory. Set by InitVideoXXX.
 	**		FIXME: need a new function to set it, see #ifdef SDL code
 	**		@see InitVideo @see InitVideoSdl
@@ -186,27 +171,8 @@ global int VideoTypeSize;
 	*/
 global SDL_Surface* TheScreen;
 
-global int VideoSyncSpeed = 100;		/// 0 disable interrupts
-global volatile int VideoInterrupts;		/// be happy, were are quicker
-
-	/**
-	** FIXME: this docu is added only to the first variable!
-	**
-	**  As a video 8bpp pixel color doesn't have RGB encoded, but denote some
-	**  index (a value from contents Pixels) in a system pallete, the
-	**  following precalculated arrays deliver a shortcut.
-	**  NOTE: all array pointers are NULL in a non 8bpp mode
-	**
-	**  lookup25trans8:
-	**  Array to get from two system colors as unsigned int (color1<<8)|color2
-	**  to a new system color which is aproximately 75% color1 and 25% color2.
-	**  lookup50trans8:
-	**  The same for 50% color1 and 50% color2.
-	*/
-	// FIXME: docu
-global SDL_Color* lookup25trans8;
-	// FIXME: docu
-global SDL_Color* lookup50trans8;
+global int VideoSyncSpeed = 100;            /// 0 disable interrupts
+global volatile int VideoInterrupts;        /// be happy, were are quicker
 
 global int ColorWaterCycleStart;
 global int ColorWaterCycleEnd;

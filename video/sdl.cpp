@@ -87,7 +87,6 @@
 ----------------------------------------------------------------------------*/
 
 global SDL_Surface* TheScreen;				/// Internal screen
-global int InMainWindow = 1;				/// Cursor inside stratagus window
 
 local int FrameTicks;						/// Frame length in ms
 local int FrameRemainder;				/// Frame remainder 0.1 ms
@@ -168,30 +167,26 @@ local void CleanExit(int signum)
 
 
 /**
-**		Initialize the video part for SDL.
+**  Initialize the video part for SDL.
 */
 global void InitVideoSdl(void)
 {
 	Uint32 flags;
 
-	//		Initialize the SDL library
-
-
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
-
 		if (SDL_Init(
 #ifdef USE_SDLA
-			SDL_INIT_AUDIO |
+				SDL_INIT_AUDIO |
 #endif
 #ifdef DEBUG
-			SDL_INIT_NOPARACHUTE|
+				SDL_INIT_NOPARACHUTE |
 #endif
-			SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 ) {
-			fprintf(stderr,"Couldn't initialize SDL: %s\n", SDL_GetError());
+				SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 ) {
+			fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
 			exit(1);
 		}
 
-		//		Clean up on exit
+		// Clean up on exit
 
 		atexit(SDL_Quit);
 
@@ -203,10 +198,6 @@ global void InitVideoSdl(void)
 #endif
 		// Set WindowManager Title
 		SDL_WM_SetCaption("Stratagus", "Stratagus");
-	} else {
-		if (VideoBpp == 32 && VideoDepth == 24) {
-			VideoDepth = 0;
-		}
 	}
 
 	// Initialize the display
@@ -227,30 +218,22 @@ global void InitVideoSdl(void)
 #endif
 
 	TheScreen = SDL_SetVideoMode(VideoWidth, VideoHeight, VideoDepth, flags);
+	if (TheScreen && (TheScreen->format->BitsPerPixel == 8 ||
+			TheScreen->format->BitsPerPixel == 24)) {
+		// Only support 16 and 32 bpp, default to 16
+		TheScreen = SDL_SetVideoMode(VideoWidth, VideoHeight, 16, flags);
+	}
 	if (TheScreen == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 			VideoWidth, VideoHeight, VideoDepth, SDL_GetError());
 		exit(1);
 	}
 
-#ifdef DEBUG
-	if (SDL_MUSTLOCK(TheScreen)) {
-		DebugLevel0Fn("Must locksurface!\n");
-	}
-#endif
+	VideoFullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
+	VideoDepth = TheScreen->format->BitsPerPixel;
 
 	// Turn cursor off, we use our own.
 	SDL_ShowCursor(0);
-
-	VideoBpp = TheScreen->format->BitsPerPixel;
-	VideoFullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
-
-	//
-	//		I need the used bits per pixel.
-	//		You see it's better making all self, than using wired libaries :)
-	//  And with the win32 version this also doesn't work
-	//
-	VideoDepth = TheScreen->format->BitsPerPixel;
 
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
@@ -271,7 +254,7 @@ global void InitVideoSdl(void)
 
 	DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
 
-	// FIXME: Setup InMainWindow correct.
+	TheUI.MouseWarpX = TheUI.MouseWarpY = -1;
 }
 
 /**
@@ -516,10 +499,10 @@ local void SdlHandleKeyRelease(const EventCallback* callbacks,
 }
 
 /**
-**		Handle interactive input event.
+**  Handle interactive input event.
 **
-**		@param callbacks		Callback structure for events.
-**		@param event				SDL event structure pointer.
+**  @param callbacks  Callback structure for events.
+**  @param event      SDL event structure pointer.
 */
 local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 {
@@ -542,17 +525,17 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 				event->button.button);
 			break;
 
-			// FIXME SDL: check if this is only usefull for the cursor
-			//			if this is the case we don't need this.
+			// FIXME: check if this is only useful for the cursor
+			// FIXME: if this is the case we don't need this.
 		case SDL_MOUSEMOTION:
 			DebugLevel3("\tmotion notify %d,%d\n" _C_ event->motion.x _C_
 				event->motion.y);
 			InputMouseMove(callbacks, SDL_GetTicks(),
 				event->motion.x, event->motion.y);
 			// FIXME: Same bug fix from X11
-			if ((TheUI.MouseWarpX != -1 || TheUI.MouseWarpY != -1)
-				&& (event->motion.x != TheUI.MouseWarpX ||
-					event->motion.y != TheUI.MouseWarpY)) {
+			if ((TheUI.MouseWarpX != -1 || TheUI.MouseWarpY != -1) &&
+					(event->motion.x != TheUI.MouseWarpX ||
+						event->motion.y != TheUI.MouseWarpY)) {
 				int xw;
 				int yw;
 
@@ -566,12 +549,27 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 			break;
 
 		case SDL_ACTIVEEVENT:
-			DebugLevel3("\tFocus changed\n");
-			// FIXME: Johns: I think this was not correct?
-			// FIXME: InMainWindow = !InMainWindow;
-			InMainWindow = event->active.gain;
-			if (!InMainWindow) {
-				InputMouseExit(callbacks,SDL_GetTicks());
+			if (event->active.state & SDL_APPMOUSEFOCUS) {
+				static int InMainWindow = 1;
+
+				DebugLevel3("\tMouse focus changed\n");
+				if (InMainWindow && !event->active.gain) {
+					InputMouseExit(callbacks, SDL_GetTicks());
+				}
+				InMainWindow = event->active.gain;
+			}
+			if (event->active.state & SDL_APPACTIVE) {
+				static int IsVisible = 1;
+
+				DebugLevel3("\tApp focus changed\n");
+				if (IsVisible && !event->active.gain) {
+					IsVisible = 0;
+					UiTogglePause();
+				} else if (!IsVisible && event->active.gain) {
+					IsVisible = 1;
+					UiTogglePause();
+					MustRedraw = RedrawEverything & ~RedrawMinimap;
+				}
 			}
 			break;
 
@@ -589,28 +587,6 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 			Exit(0);
 	}
 }
-
-#ifdef USE_WIN32
-/**
-**		Check if the user alt-tabbed away from the game and redraw
-**		everyhing when the user comes back.
-*/
-local void CheckScreenVisible()
-{
-	static int IsVisible = 1;
-	Uint8 state;
-
-	state = SDL_GetAppState();
-	if (IsVisible && !(state & SDL_APPACTIVE)) {
-		IsVisible = 0;
-		UiTogglePause();
-	} else if (!IsVisible && (state & SDL_APPACTIVE)) {
-		IsVisible = 1;
-		UiTogglePause();
-		MustRedraw = RedrawEverything & ~RedrawMinimap;
-	}
-}
-#endif
 
 /**
 **		Wait for interactive input event for one frame.
@@ -770,10 +746,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	if (!SkipGameCycle--) {
 		SkipGameCycle = SkipFrames;
 	}
-
-#ifdef USE_WIN32
-	CheckScreenVisible();
-#endif
 }
 
 /**
