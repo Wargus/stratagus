@@ -246,6 +246,9 @@ extern Graphic* LoadGraphicPNG(const char* name);
     /// Load graphic
 extern Graphic* LoadGraphic(const char* file);
 
+    /// Flip graphic and store in graphic->SurfaceFlip
+extern void FlipGraphic(Graphic* graphic);
+
     /// New graphic
 extern Graphic* NewGraphic(unsigned d, int w, int h);
 
@@ -497,11 +500,15 @@ extern void VideoDrawClip(const Graphic*, unsigned frame, int x, int y);
 extern void VideoDrawSubClip(const Graphic*, int ix, int iy, int w, 
     int h, int x, int y);
 
+    ///	Draw a graphic object unclipped and flipped in X direction.
+extern void VideoDrawX(const Graphic*, unsigned frame, int x, int y);
+
+    ///	Draw a graphic object clipped and flipped in X direction.
+extern void VideoDrawClipX(const Graphic*, unsigned frame, int x, int y);
+
 // FIXME FIXME FIXME: need to implement all of this
     ///	Draw a graphic object unclipped.
 //#define VideoDraw(o, f, x, y)	//((o)->Type->Draw)((o), (f), (x), (y))
-    ///	Draw a graphic object unclipped and flipped in X direction.
-#define VideoDrawX(o, f, x, y)	//((o)->Type->DrawX)((o), (f), (x), (y))
     ///	Free a graphic object.
 #define VideoFree(o)	//((o)->Type->Free)((o))
     ///	Save (NULL) free a graphic object.
@@ -509,8 +516,6 @@ extern void VideoDrawSubClip(const Graphic*, int ix, int iy, int w,
 //#define VideoDrawSub(a,b,c,d,e,f,g)
     ///	Draw a graphic object clipped to the current clipping.
 //#define VideoDrawSubClip(o, ix, iy, w, h, x, y)
-    ///	Draw a graphic object clipped and flipped in X direction.
-#define VideoDrawClipX(o, f, x, y)	//((o)->Type->DrawClipX)((o), (f), (x), (y))
     ///	Draw a shadow graphic object clipped to the current clipping.
 #define VideoDrawShadowClip(o, f, x, y)	//((o)->Type->DrawShadowClip)((o),(f),(x),(y))
     ///	Draw a shadow graphic object clipped and flipped in X direction.
