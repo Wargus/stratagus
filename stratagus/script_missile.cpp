@@ -425,4 +425,10 @@ global void MissileCclRegister(void)
 	lua_register(Lua, "DefineBurningBuilding", CclDefineBurningBuilding);
 }
 
+#ifdef META_LUA
+/**
+**  Register
+*/
+#endif
+
 //@}
