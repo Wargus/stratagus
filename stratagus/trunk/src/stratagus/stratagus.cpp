@@ -522,8 +522,7 @@ static void ShowTitleScreens(void)
 			}
 		}
 
-		if (PlayMovie(TitleScreens[i]->File,
-				PlayMovieZoomScreen | PlayMovieKeepAspect)) {
+		if (PlayMovie(TitleScreens[i]->File)) {
 			TitleScreenLabel** labels;
 			Graphic* g;
 #ifdef USE_MNG
