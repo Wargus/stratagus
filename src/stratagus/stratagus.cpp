@@ -875,7 +875,6 @@ static void Usage(void)
 \t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
 \t-d datapath\tpath to stratagus data\n\
 \t-e\t\tStart editor\n\
-\t-f factor\tComputer units cost factor\n\
 \t-h\t\tHelp shows this page\n\
 \t-l\t\tDisable command log\n\
 \t-P port\t\tNetwork port to use\n\
@@ -884,7 +883,6 @@ static void Usage(void)
 \t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
 \t-N name\t\tName of the player\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
-\t-t factor\tComputer units built time factor\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
 \t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
 \t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
@@ -1013,9 +1011,6 @@ int main(int argc, char** argv)
 			case 'E':
 				EditorStartFile = optarg;
 				continue;
-			case 'f':
-				AiCostFactor = atoi(optarg);
-				continue;
 			case 'l':
 				CommandLogDisabled = 1;
 				continue;
@@ -1031,9 +1026,6 @@ int main(int argc, char** argv)
 				continue;
 			case 's':
 				AiSleepCycles = atoi(optarg);
-				continue;
-			case 't':
-				AiTimeFactor = atoi(optarg);
 				continue;
 			case 'v':
 				switch (atoi(optarg)) {

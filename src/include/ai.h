@@ -10,7 +10,7 @@
 //
 /**@name ai.h - The ai headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -48,8 +48,6 @@ struct _upgrade_;
 ----------------------------------------------------------------------------*/
 
 extern int AiSleepCycles;  /// Ai sleeps # cycles
-extern int AiTimeFactor;   /// Adjust the AI build times
-extern int AiCostFactor;   /// Adjust the AI costs
 
 /*----------------------------------------------------------------------------
 --  Functions
