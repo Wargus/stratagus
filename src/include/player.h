@@ -169,6 +169,15 @@ struct _player_ {
 
 #define PlayerMax		16	/// maximal players supported
 
+/**
+**	Notify types.
+*/
+enum _notify_type_ {
+    NotifyRed,				/// Red alram
+    NotifyYellow,			/// Yellow alarm
+    NotifyGreen,			/// Green alarm
+};
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -247,6 +256,9 @@ extern void GraphicPlayerPixels(const Player* player, const Graphic * sprite);
 
     /// Output debug informations for players
 extern void DebugPlayers(void);
+
+    /// Notify player about a problem
+extern void NotifyPlayer(const Player*,int,int,int,const char*,...);
 
     /// register ccl features
 extern void PlayerCclRegister(void);

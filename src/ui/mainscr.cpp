@@ -565,7 +565,6 @@ global void DrawResources(void)
 
 #define MESSAGES_TIMEOUT  FRAMES_PER_SECOND*5	/// Message timeout 5 seconds
 
-local char  MessageBuffer[40];			/// message buffer
 local int   MessageFrameTimeout;		/// frame to expire message
 
 #define MESSAGES_MAX  10			/// FIXME: docu
@@ -583,7 +582,7 @@ local int  MessagesEventIndex;			/// FIXME: docu
 /**
 **	Shift messages array with one.
 */
-global void ShiftMessages(void)
+local void ShiftMessages(void)
 {
     int z;
 
@@ -598,7 +597,7 @@ global void ShiftMessages(void)
 /**
 **	Shift messages events array with one.
 */
-global void ShiftMessagesEvent(void)
+local void ShiftMessagesEvent(void)
 {
     int z;
 
@@ -617,18 +616,19 @@ global void ShiftMessagesEvent(void)
 */
 global void DrawMessage(void)
 {
-  int z;
-  if ( MessageFrameTimeout < FrameCounter )
-    {
-    ShiftMessages();
-    MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
+    int z;
+
+    if (MessageFrameTimeout < FrameCounter) {
+	ShiftMessages();
+	MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
     }
-  for ( z = 0; z < MessagesCount; z++ )
-    {
-    DrawText(TheUI.MapX+8,TheUI.MapY+8 + z*16,GameFont,Messages[z] );
+    for (z = 0; z < MessagesCount; z++) {
+	DrawText(TheUI.MapX + 8, TheUI.MapY + 8 + z * 16, GameFont,
+		Messages[z]);
     }
-  if ( MessagesCount < 1 )
-    SameMessageCount = 0;
+    if (MessagesCount < 1) {
+	SameMessageCount = 0;
+    }
 }
 
 /**
@@ -636,12 +636,13 @@ global void DrawMessage(void)
 **
 **	@param msg	Message to add.
 */
-global void AddMessage( const char* msg )
+local void AddMessage(const char *msg)
 {
-    if ( MessagesCount == MESSAGES_MAX )
-      ShiftMessages();
-    DebugCheck( strlen(msg)>=sizeof(Messages[0]) );
-    strcpy( Messages[ MessagesCount ], msg );
+    if (MessagesCount == MESSAGES_MAX) {
+	ShiftMessages();
+    }
+    DebugCheck(strlen(msg) >= sizeof(Messages[0]));
+    strcpy(Messages[MessagesCount], msg);
     MessagesCount++;
 }
 
@@ -649,27 +650,27 @@ global void AddMessage( const char* msg )
 **	Check if this message repeats
 **
 **	@param msg	Message to check.
-**	@return non-zero to skip this message
+**	@return		non-zero to skip this message
 */
-global int CheckRepeatMessage( const char* msg )
+global int CheckRepeatMessage(const char *msg)
 {
-    if ( MessagesCount < 1 )
-      return 0;
-    if ( strcmp( msg, Messages[ MessagesCount-1 ] ) == 0 )
-      {
-      SameMessageCount++;
-      return 1;
-      }
-    else
-    if ( SameMessageCount > 0 )
-      {
-      char temp[128];
-      int n = SameMessageCount;
-      SameMessageCount = 0;
-      // NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
-      sprintf( temp, "Last message repeated ~<%d~> times", n+1 );
-      AddMessage( temp );
-      }
+    if (MessagesCount < 1) {
+	return 0;
+    }
+    if (!strcmp(msg, Messages[MessagesCount - 1])) {
+	SameMessageCount++;
+	return 1;
+    }
+    if (SameMessageCount > 0) {
+	char temp[128];
+	int n;
+
+	n = SameMessageCount;
+	SameMessageCount = 0;
+	// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
+	sprintf(temp, "Last message repeated ~<%d~> times", n + 1);
+	AddMessage(temp);
+    }
     return 0;
 }
 
@@ -678,18 +679,19 @@ global int CheckRepeatMessage( const char* msg )
 **
 **	@param fmt	To be displayed in text overlay.
 */
-global void SetMessage( const char* fmt, ... )
+global void SetMessage(const char *fmt, ...)
 {
     char temp[128];
     va_list va;
 
-    va_start( va, fmt );
-    vsprintf( temp, fmt, va );		// BUG ALERT: buffer overrun
-    va_end( va );
-    if ( CheckRepeatMessage( temp ) )
-      return;
-    AddMessage( temp );
-    MustRedraw|=RedrawMessage;
+    va_start(va, fmt);
+    vsprintf(temp, fmt, va);		// BUG ALERT: buffer overrun
+    va_end(va);
+    if (CheckRepeatMessage(temp)) {
+	return;
+    }
+    AddMessage(temp);
+    MustRedraw |= RedrawMessage;
     //FIXME: for performance the minimal area covered by msg's should be used
     MarkDrawEntireMap();
     MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
@@ -701,24 +703,25 @@ global void SetMessage( const char* fmt, ... )
 **	@param x	Message X map origin.
 **	@param y	Message Y map origin.
 **	@param fmt	To be displayed in text overlay.
+**
+**	@note FIXME: vladi: I know this can be just separated func w/o msg but
+**		it is handy to stick all in one call, someone?
 */
-global void SetMessage2( int x, int y, const char* fmt, ... )
+global void SetMessageEvent( int x, int y, const char* fmt, ... )
 {
-    //FIXME: vladi: I know this can be just separated func w/o msg but
-    //       it is handy to stick all in one call, someone?
-
     char temp[128];
     va_list va;
+
     va_start( va, fmt );
     vsprintf( temp, fmt, va );
     va_end( va );
-    if ( CheckRepeatMessage( temp ) == 0 )
-      {
-      AddMessage( temp );
-      }
+    if ( CheckRepeatMessage( temp ) == 0 ) {
+	AddMessage( temp );
+    }
 
-    if ( MessagesEventCount == MESSAGES_MAX )
-      ShiftMessagesEvent();
+    if ( MessagesEventCount == MESSAGES_MAX ) {
+	ShiftMessagesEvent();
+    }
 
     strcpy( MessagesEvent[ MessagesEventCount ], temp );
     MessagesEventX[ MessagesEventCount ] = x;
@@ -733,32 +736,21 @@ global void SetMessage2( int x, int y, const char* fmt, ... )
 }
 
 /**
-**	Set message to display.
-**
-**	@param message	To be displayed in text overlay.
-*/
-global void SetMessageDup(const char* message)
-{
-    // We need a extra buffer here for the cat.
-    strncpy(MessageBuffer,message,sizeof(MessageBuffer));
-    MessageBuffer[sizeof(MessageBuffer)-1]='\0';
-
-    SetMessage(MessageBuffer);
-}
-
-/**
 **	Goto message origin.
 */
 global void CenterOnMessage(void)
 {
-  if ( MessagesEventIndex >= MessagesEventCount )
-    MessagesEventIndex = 0;
-  if ( MessagesEventIndex >= MessagesEventCount )
-    return;
-  MapCenter( MessagesEventX[ MessagesEventIndex ],
-             MessagesEventY[ MessagesEventIndex ] );
-  SetMessage( "~<Event: %s~>", MessagesEvent[ MessagesEventIndex ] );
-  MessagesEventIndex++;
+    if (MessagesEventIndex >= MessagesEventCount) {
+	MessagesEventIndex = 0;
+    }
+    if (MessagesEventIndex >= MessagesEventCount) {
+	return;
+    }
+    MapCenter(MessagesEventX[MessagesEventIndex],
+	    MessagesEventY[MessagesEventIndex]);
+
+    SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
+    MessagesEventIndex++;
 }
 
 /*----------------------------------------------------------------------------
