@@ -44,6 +44,7 @@
 #include "ui.h"
 
 #ifdef USE_SDL
+	// FIXME: move to system api part!
 #include <SDL/SDL.h>
 #endif
 
@@ -247,6 +248,7 @@ global void UpdateDisplay(void)
     int update_old_cursor;
 
 #ifdef USE_SDL
+    // FIXME: move to system api part!
     extern SDL_Surface *Screen;			/// internal screen
 
     SDL_LockSurface(Screen);
@@ -276,6 +278,9 @@ global void UpdateDisplay(void)
 	    DrawUnits();
 	    DrawMapFogOfWar(MapX,MapY);
 	    DrawMissiles();
+#ifdef NEW_VIDEO
+	    DrawConsole();
+#endif
 	    SetClipping(0,0,VideoWidth,VideoHeight);
 	}
 
@@ -355,16 +360,26 @@ global void UpdateDisplay(void)
     // FIXME: this could be written better, less drawing
     if( update_old_cursor && MustRedraw!=-1  ) {
 	// Draw restored area only if not same.
+#ifdef NEW_VIDEO
+	if( OldCursorX!=(CursorX-GameCursor->HotX) 
+		|| OldCursorY!=(CursorY-GameCursor->HotY)
+		|| OldCursorW!=VideoGraphicWidth(GameCursor->Sprite)
+		|| OldCursorH!=VideoGraphicHeight(GameCursor->Sprite) ) {
+	    InvalidateArea(OldCursorX,OldCursorY,OldCursorW,OldCursorH);
+	}
+#else
 	if( OldCursorX!=(CursorX-GameCursor->HotX) 
 		|| OldCursorY!=(CursorY-GameCursor->HotY)
 		|| OldCursorW!=(GameCursor->RleSprite->Width)
 		|| OldCursorH!=(GameCursor->RleSprite->Height) ) {
 	    InvalidateArea(OldCursorX,OldCursorY,OldCursorW,OldCursorH);
 	}
+#endif
     }
 
     if (!MustRedraw) {
 #ifdef USE_SDL
+	// FIXME: move to system api part!
 	SDL_UnlockSurface(Screen);
 #endif
 	return;
@@ -373,6 +388,7 @@ global void UpdateDisplay(void)
     DrawAnyCursor();
 
 #ifdef USE_SDL
+	// FIXME: move to system api part!
     SDL_UnlockSurface(Screen);
 #endif
     //
@@ -424,11 +440,20 @@ global void UpdateDisplay(void)
 		    ,TheUI.StatusLine.Graphic->Width
 		    ,TheUI.StatusLine.Graphic->Height);
 	}
+#ifdef NEW_VIDEO
+	/* if (MustRedraw) */ {
+	// FIXME: JOHNS: That didn't work: if (MustRedraw&RedrawCursor) 
+	    InvalidateArea(CursorX-GameCursor->HotX,CursorY-GameCursor->HotY
+		,VideoGraphicWidth(GameCursor->Sprite)
+		,VideoGraphicHeight(GameCursor->Sprite));
+	}
+#else
 	/* if (MustRedraw) */ {
 	// JOHNS: That didn't work: if (MustRedraw&RedrawCursor) 
 	    InvalidateArea(CursorX-GameCursor->HotX,CursorY-GameCursor->HotY
 		,GameCursor->RleSprite->Width,GameCursor->RleSprite->Height);
 	}
+#endif
     }
 }
 
