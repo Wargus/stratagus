@@ -168,7 +168,7 @@ global int SelectUnit(Unit* unit)
 	return 0;
     }
 
-    if (!unit->Type->Selectable) {
+    if (!unit->Type->Selectable && GameRunning) {
 	return 0;
     }
 
@@ -288,7 +288,7 @@ global int SelectUnitsByType(Unit* base)
 	HandleSuicideClick(base);
     }
 
-    if (!base->Type->Selectable) {
+    if (!base->Type->Selectable && GameRunning) {
 	return 0;
     }
 
