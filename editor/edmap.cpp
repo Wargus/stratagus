@@ -147,7 +147,7 @@ local unsigned QuadFromTile(int x, int y)
 	    return (mix << 24) | (base << 16) | (base << 8) | base;
     }
 
-    DebugCheck( 1 );
+    DebugCheck(1);
 
     return base | (base << 8) | (base << 16) | (base << 24);
 }
@@ -176,21 +176,21 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
     l = INT_MAX;
     for (i = 0; i < TheMap.Tileset->NumTiles;) {
 	// goal found.
-	if (base == TheMap.Tileset->Tiles[i].BaseTerrain
-		&& goal == TheMap.Tileset->Tiles[i].MixTerrain) {
+	if (base == TheMap.Tileset->Tiles[i].BaseTerrain &&
+		goal == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    *tile = i;
 	    return length;
 	}
 	// goal found.
-	if (goal == TheMap.Tileset->Tiles[i].BaseTerrain
-		&& base == TheMap.Tileset->Tiles[i].MixTerrain) {
+	if (goal == TheMap.Tileset->Tiles[i].BaseTerrain &&
+		base == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    *tile = i;
 	    return length;
 	}
 
 	// possible path found
-	if (base == TheMap.Tileset->Tiles[i].BaseTerrain
-		&& TheMap.Tileset->Tiles[i].MixTerrain) {
+	if (base == TheMap.Tileset->Tiles[i].BaseTerrain &&
+		TheMap.Tileset->Tiles[i].MixTerrain) {
 	    j = TheMap.Tileset->Tiles[i].MixTerrain;
 	    if (!marks[j]) {
 		marks[j] = j;
@@ -202,8 +202,8 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 		}
 	    }
 	// possible path found
-	} else if (TheMap.Tileset->Tiles[i].BaseTerrain
-		&& base == TheMap.Tileset->Tiles[i].MixTerrain) {
+	} else if (TheMap.Tileset->Tiles[i].BaseTerrain &&
+		base == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    j = TheMap.Tileset->Tiles[i].BaseTerrain;
 	    if (!marks[j]) {
 		marks[j] = j;
@@ -271,8 +271,8 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	    //  Find the solid tile
 	    //
 	    for (i = 0; i < TheMap.Tileset->NumTiles;) {
-		if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain
-			&& !TheMap.Tileset->Tiles[i].MixTerrain) {
+		if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain &&
+			!TheMap.Tileset->Tiles[i].MixTerrain) {
 		    break;
 		}
 		// Advance solid or mixed.
@@ -286,7 +286,7 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	    return i;
 	}
     } else {
-	char *marks;
+	char* marks;
 
 	marks = alloca(TheMap.Tileset->NumTerrainTypes);
 	memset(marks, 0, TheMap.Tileset->NumTerrainTypes);
@@ -300,8 +300,8 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	fixed = (quad >> 0) & 0xFF;
 	if (fixed != type1 && fixed != type2) {
 	    quad &= 0xFFFFFF00;
-	    if (FindTilePath(type1, fixed, 0, marks, &i)
-		    < FindTilePath(type2, fixed, 0, marks, &i)) {
+	    if (FindTilePath(type1, fixed, 0, marks, &i) <
+		    FindTilePath(type2, fixed, 0, marks, &i)) {
 		quad |= type1 << 0;
 	    } else {
 		quad |= type2 << 0;
@@ -310,8 +310,8 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	fixed = (quad >> 8) & 0xFF;
 	if (fixed != type1 && fixed != type2) {
 	    quad &= 0xFFFF00FF;
-	    if (FindTilePath(type1, fixed, 0, marks, &i)
-		    < FindTilePath(type2, fixed, 0, marks, &i)) {
+	    if (FindTilePath(type1, fixed, 0, marks, &i) <
+		    FindTilePath(type2, fixed, 0, marks, &i)) {
 		quad |= type1 << 8;
 	    } else {
 		quad |= type2 << 8;
@@ -320,8 +320,8 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	fixed = (quad >> 16) & 0xFF;
 	if (fixed != type1 && fixed != type2) {
 	    quad &= 0xFF00FFFF;
-	    if (FindTilePath(type1, fixed, 0, marks, &i)
-		    < FindTilePath(type2, fixed, 0, marks, &i)) {
+	    if (FindTilePath(type1, fixed, 0, marks, &i) <
+		    FindTilePath(type2, fixed, 0, marks, &i)) {
 		quad |= type1 << 16;
 	    } else {
 		quad |= type2 << 16;
@@ -330,8 +330,8 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	fixed = (quad >> 24) & 0xFF;
 	if (fixed != type1 && fixed != type2) {
 	    quad &= 0x00FFFFFF;
-	    if (FindTilePath(type1, fixed, 0, marks, &i)
-		    < FindTilePath(type2, fixed, 0, marks, &i)) {
+	    if (FindTilePath(type1, fixed, 0, marks, &i) <
+		    FindTilePath(type2, fixed, 0, marks, &i)) {
 		quad |= type1 << 24;
 	    } else {
 		quad |= type2 << 24;
@@ -345,12 +345,12 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
     //  Need a mixed tile
     //
     for (i = 0; i < TheMap.Tileset->NumTiles;) {
-	if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain
-		&& type2 == TheMap.Tileset->Tiles[i].MixTerrain) {
+	if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain &&
+		type2 == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    break;
 	}
-	if (type2 == TheMap.Tileset->Tiles[i].BaseTerrain
-		&& type1 == TheMap.Tileset->Tiles[i].MixTerrain) {
+	if (type2 == TheMap.Tileset->Tiles[i].BaseTerrain &&
+		type1 == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    // Other mixed
 	    type1 ^= type2;
 	    type2 ^= type1;
@@ -366,7 +366,7 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
     }
 
     if (i >= TheMap.Tileset->NumTiles) {
-	char *marks;
+	char* marks;
 
 	DebugLevel3Fn("No good mix found\n");
 	//
@@ -483,7 +483,7 @@ local void EditorTileChanged2(int x, int y, int d)
 
     quad = QuadFromTile(x, y);
     DebugLevel0Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
-	    TheMap.Fields[y * TheMap.Width + x].Tile);
+	TheMap.Fields[y * TheMap.Width + x].Tile);
 
     //
     //  Change the surrounding
@@ -513,7 +513,7 @@ local void EditorTileChanged2(int x, int y, int d)
     // 	check if the margin matches. otherwise, call 
     // 	EditorChangeTile again.
     //
-    if (d&DIR_UP && y) {
+    if (d & DIR_UP && y) {
 	//
 	//      Insert into the bottom the new tile.
 	//
@@ -526,7 +526,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	    EditorChangeTile(x, y - 1, tile, d&~DIR_DOWN);
 	}
     }
-    if (d&DIR_DOWN && y < TheMap.Height - 1) {
+    if (d & DIR_DOWN && y < TheMap.Height - 1) {
 	//
 	//      Insert into the top the new tile.
 	//
@@ -538,7 +538,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	    EditorChangeTile(x, y + 1, tile, d&~DIR_UP);
 	}
     }
-    if (d&DIR_LEFT && x) {
+    if (d & DIR_LEFT && x) {
 	//
 	//      Insert into the left the new tile.
 	//
@@ -550,7 +550,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	    EditorChangeTile(x - 1, y, tile, d&~DIR_RIGHT);
 	}
     }
-    if (d&DIR_RIGHT && x < TheMap.Width - 1) {
+    if (d & DIR_RIGHT && x < TheMap.Width - 1) {
 	//
 	//      Insert into the right the new tile.
 	//
@@ -588,7 +588,7 @@ global void EditorTileChanged(int x, int y)
 **	@param tile	Tile type to edit.
 **	@param size	Size of surrounding rectangle.
 **
-**      TileFill( centerx, centery, tile_type_water, map_width )
+**      TileFill(centerx, centery, tile_type_water, map_width)
 **      will fill map with water...
 */
 local void TileFill(int x, int y, int tile, int size)
@@ -604,22 +604,22 @@ local void TileFill(int x, int y, int tile, int size)
     iy = y - size / 2;
     ay = y + size / 2;
 
-    if ( ix < 0 ) {
+    if (ix < 0) {
 	ix = 0;
     }
-    if ( ax >= TheMap.Width ) {
+    if (ax >= TheMap.Width) {
 	ax = TheMap.Width - 1;
     }
-    if ( iy < 0 ) {
+    if (iy < 0) {
 	iy = 0;
     }
-    if ( ay >= TheMap.Height ) {
+    if (ay >= TheMap.Height) {
 	ay = TheMap.Height - 1;
     }
 
-    for( x = ix; x <= ax; x++ ) {
-	for( y = iy; y <= ay; y++ ) {
-	    EditorChangeTile( x, y, tile, 15 );
+    for (x = ix; x <= ax; ++x) {
+	for (y = iy; y <= ay; ++y) {
+	    EditorChangeTile(x, y, tile, 15);
 	}
     }
 }
@@ -633,7 +633,7 @@ local void TileFill(int x, int y, int tile, int size)
 /**
 **	FIXME: docu
 */
-local void EditorRandomizeTile( int tile, int count, int max_size )
+local void EditorRandomizeTile(int tile, int count, int max_size)
 {
     int mx;
     int my;
@@ -645,22 +645,22 @@ local void EditorRandomizeTile( int tile, int count, int max_size )
     mx = TheMap.Width;
     my = TheMap.Height;
 
-    for( i = 0; i < count; i++ ) {
+    for (i = 0; i < count; ++i) {
 	rx = rand() % (mx / 2);
 	ry = rand() % (my / 2);
 	rz = rand() % max_size + 1;
     
-	TileFill( rx, ry, tile, rz );
-	TileFill( mx - rx - 1, ry, tile, rz );
-	TileFill( rx, my - ry - 1, tile, rz );
-	TileFill( mx - rx - 1, mx - ry - 1, tile, rz );
+	TileFill(rx, ry, tile, rz);
+	TileFill(mx - rx - 1, ry, tile, rz);
+	TileFill(rx, my - ry - 1, tile, rz);
+	TileFill(mx - rx - 1, mx - ry - 1, tile, rz);
     }
 }
 
 /**
 **	FIXME: docu
 */
-local void EditorRandomizeUnit( const char *unit_type, int count, int value )
+local void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
     int mx;
     int my;
@@ -672,7 +672,7 @@ local void EditorRandomizeUnit( const char *unit_type, int count, int value )
     int tw;
     int th;
     UnitType* type;
-    Unit *unit;
+    Unit* unit;
 
     mx = TheMap.Width;
     my = TheMap.Height;
@@ -680,7 +680,7 @@ local void EditorRandomizeUnit( const char *unit_type, int count, int value )
     tw = type->TileWidth;
     th = type->TileHeight;
 
-    for( i = 0; i < count; i++ ) {
+    for (i = 0; i < count; ++i) {
 	rx = rand() % (mx / 2 - tw + 1);
 	ry = rand() % (my / 2 - th + 1);
 	tile = GRASS_TILE;
@@ -688,20 +688,20 @@ local void EditorRandomizeUnit( const char *unit_type, int count, int value )
 
 	// FIXME: vladi: the idea is simple: make proper land for unit(s) :)
 	// FIXME: handle units larger than 1 square
-	TileFill( rx, ry, tile, z*2 );
-	TileFill( mx - rx - 1, ry, tile, z*2 );
-	TileFill( rx, my - ry - 1, tile, z*2 );
-	TileFill( mx - rx - 1, mx - ry - 1, tile, z*2 );
+	TileFill(rx, ry, tile, z * 2);
+	TileFill(mx - rx - 1, ry, tile, z * 2);
+	TileFill(rx, my - ry - 1, tile, z * 2);
+	TileFill(mx - rx - 1, mx - ry - 1, tile, z * 2);
 
 	// FIXME: can overlap units
-	unit=MakeUnitAndPlace( rx, ry , type, &Players[15]);
-	unit->Value=value;
-	unit=MakeUnitAndPlace( mx - rx - tw, ry, type, &Players[15]);
-	unit->Value=value;
-	unit=MakeUnitAndPlace( rx, my - ry - th, type, &Players[15]);
-	unit->Value=value;
-	unit=MakeUnitAndPlace( mx - rx - tw, mx - ry - th, type, &Players[15]);
-	unit->Value=value;
+	unit = MakeUnitAndPlace(rx, ry , type, &Players[15]);
+	unit->Value = value;
+	unit = MakeUnitAndPlace(mx - rx - tw, ry, type, &Players[15]);
+	unit->Value = value;
+	unit = MakeUnitAndPlace(rx, my - ry - th, type, &Players[15]);
+	unit->Value = value;
+	unit = MakeUnitAndPlace(mx - rx - tw, mx - ry - th, type, &Players[15]);
+	unit->Value = value;
     }
 }
 
@@ -712,12 +712,12 @@ local void EditorDestroyAllUnits(void)
 {
     Unit* unit;
 
-    while( NumUnits != 0 ) {
-	unit=Units[0];
-	RemoveUnit( unit,NULL ); 
-	UnitLost( unit ); 
-	UnitClearOrders( unit );
-	ReleaseUnit( unit ); 
+    while (NumUnits != 0) {
+	unit = Units[0];
+	RemoveUnit(unit, NULL);
+	UnitLost(unit);
+	UnitClearOrders(unit);
+	ReleaseUnit(unit);
     }
 }
 
@@ -731,16 +731,16 @@ global void EditorCreateRandomMap(void)
     mz = TheMap.Width > TheMap.Height ? TheMap.Width : TheMap.Height;
 
     // make water-base
-    TileFill( 0, 0, WATER_TILE, mz * 3 );
+    TileFill(0, 0, WATER_TILE, mz * 3);
     // remove all units
     EditorDestroyAllUnits();
 
-    EditorRandomizeTile( COAST_TILE, 10, 16 );
-    EditorRandomizeTile( GRASS_TILE, 20, 16 );
-    EditorRandomizeTile( WOOD_TILE,  60,  4 );
-    EditorRandomizeTile( ROCK_TILE,  30,  2 );
+    EditorRandomizeTile(COAST_TILE, 10, 16);
+    EditorRandomizeTile(GRASS_TILE, 20, 16);
+    EditorRandomizeTile(WOOD_TILE,  60,  4);
+    EditorRandomizeTile(ROCK_TILE,  30,  2);
 
-    EditorRandomizeUnit( "unit-gold-mine",  5,  50000 );
+    EditorRandomizeUnit("unit-gold-mine",  5,  50000);
 }
 
 //@}
