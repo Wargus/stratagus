@@ -342,6 +342,9 @@ extern void EditorEditAiProperties(void);
     /// Save map from the editor
 extern int EditorSave(void);
 
+    /// Error menu
+extern void ErrorMenu(char *);
+
 //@}
 
 #endif	// !__MENUS_H__
