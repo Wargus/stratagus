@@ -339,9 +339,6 @@ typedef struct _world_map_ {
 
 extern WorldMap TheMap;  /// The current map
 
-extern char MustRedrawRow[MAXMAP_W];  /// Flags must redraw map row
-extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];  /// Flags must redraw tile
-
 	/// Fast draw tile, display and video mode independ
 #ifdef USE_SDL_SURFACE
 extern void VideoDrawTile(const int, int, int);
@@ -435,7 +432,7 @@ extern void MapUpdateFogOfWar(int x, int y);
 extern void UpdateFogOfWarChange(void);
 
 	/// Draw the map fog of war
-extern void DrawMapFogOfWar(const Viewport* vp, int x, int y);
+extern void DrawMapFogOfWar(Viewport* vp, int x, int y);
 	/// Build tables for fog of war
 extern void InitMapFogOfWar(void);
 	/// Cleanup memory for fog of war tables

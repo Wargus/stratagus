@@ -162,22 +162,6 @@ local unsigned int PixelsLow[256];
 local unsigned int PixelsHigh[256];
 
 /**
-**		Flags must redraw map row.
-**		MustRedrawRow[y]!=0 This line of tiles must be redrawn.
-**
-**		@see MAXMAP_W
-*/
-global char MustRedrawRow[MAXMAP_W];
-
-/**
-**		Flags must redraw tile.
-**		MustRedrawRow[x + y * ::MapWidth] != 0 This tile must be redrawn.
-**
-**		@see MAXMAP_W @see MAXMAP_H
-*/
-global char MustRedrawTile[MAXMAP_W * MAXMAP_H];
-
-/**
 **		Fast draw tile function pointer.
 **
 **		Draws tiles display and video mode independ
@@ -2581,8 +2565,14 @@ global void MapColorCycle(void)
 */
 global int MarkDrawPosMap(int x, int y)
 {
-	if (MapTileGetViewport(x, y)) {
+	Viewport *vp;
+	
+	if ((vp = MapTileGetViewport(x, y))) {
 		MustRedraw |= RedrawMap;
+#if NEW_MAPDRAW
+		vp->MustRedrawRow[y - vp->MapY] = 1;
+		vp->MustRedrawTile[x - vp->MapX + (y - vp->MapY) * vp->MapWidth] = 1;
+#endif				 
 		return 1;
 	}
 	return 0;
@@ -2657,9 +2647,26 @@ global int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 */
 global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 {
+#ifdef NEW_MAPDRAW
+	int i;
+	int j;
+	Viewport* vp;
+#endif
+
 	if (MapTileGetViewport(sx, sy) || MapTileGetViewport(ex, ey) ||
 			MapTileGetViewport(sx, ey) || MapTileGetViewport(ex, sy)) {
 		MustRedraw |= RedrawMap;
+#ifdef NEW_MAPDRAW
+	if ((vp = MapTileGetViewport(sx, sy))) {
+		for (i = sy - vp->MapY; i <= ey - vp->MapY && i < vp->MapHeight; ++i) {
+			vp->MustRedrawRow[i] = 1;
+			// FIXME: Add Only needed tiles
+			for (j = 0; j < vp->MapWidth; ++j) {
+				vp->MustRedrawTile[i * vp->MapWidth + j] = 1;
+			}
+		}
+	}
+#endif
 		return 1;
 	}
 	return 0;
@@ -2676,12 +2683,16 @@ global void MarkDrawEntireMap(void)
 	DebugLevel3Fn("\n");
 #ifdef NEW_MAPDRAW
 	int i;
+	int x;
+	int y;
 
-	for (i = 0; i < TheMap.Height; ++i) {
-		MustRedrawRow[i] = 1;
-	}
-	for (i = 0; i < TheMap.Height * TheMap.Width; ++i) {
-		MustRedrawTile[i] = 1;
+	for (i = 0; i < TheUI.NumViewports; ++i) {
+		for (y = 0; y < TheUI.Viewports[i].MapHeight; ++y) {
+			TheUI.Viewports[i].MustRedrawRow[y] = 1;
+			for (x = 0; x < TheUI.Viewports[i].MapWidth; ++x) {
+				TheUI.Viewports[i].MustRedrawTile[x + y * TheUI.Viewports[i].MapWidth] = 1;
+			}
+		}
 	}
 #endif
 
@@ -2747,8 +2758,8 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 	memset(TileCached, 0, sizeof(TileCached));
 #endif
 
-	redraw_row = MustRedrawRow;				// flags must redraw or not
-	redraw_tile = MustRedrawTile;
+	redraw_row = vp->MustRedrawRow;				// flags must redraw or not
+	redraw_tile = vp->MustRedrawTile;
 
 	ex = vp->EndX;
 	sy = y * TheMap.Width;
@@ -2772,15 +2783,24 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 					}
 
 				// StephanR: debug-mode denote tiles that are redrawn
-#if NEW_MAPDRAW > 1
-					VideoDrawRectangle(redraw_tile[-1] > 1 ? ColorWhite : ColorRed,
-						dx, dy, 32, 32);
-#endif
 				}
+#ifdef NEW_MAPDRAW_
+				VideoDrawRectangle(redraw_tile[-1] == 1 ? ColorWhite : ColorRed,
+					dx, dy, 32, 32);
+#endif
 				++sx;
 				dx += TileSizeX;
 			}
 		} else {
+#ifdef NEW_MAPDRAW_
+			sx = x + sy;
+			dx = vp->X;
+			while (dx < ex) {
+				VideoDrawRectangle(ColorRed, dx, dy, 32, 32);
+				++sx;
+				dx += TileSizeX;
+			}
+#endif
 			redraw_tile += vp->MapWidth;
 		}
 		sy += TheMap.Width;

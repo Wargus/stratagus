@@ -100,6 +100,9 @@ struct _viewport_ {
 	int MapWidth;				/// Width in map tiles
 	int MapHeight;				/// Height in map tiles
 
+    char MustRedrawTile[MAXMAP_W * MAXMAP_H];
+    char MustRedrawRow[MAXMAP_W];
+
 	Unit* Unit;						/// Bound to this unit
 };
 

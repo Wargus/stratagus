@@ -79,6 +79,8 @@ global void MapMarkSeenTile(int x, int y)
 	// Nothing changed? Seeing already the correct tile.
 	//
 	if ((tile = mf->Tile) == (seentile = mf->SeenTile)) {
+		// FIXME: Check bounds
+		MarkDrawAreaMap(x - 1, y - 1, x + 1, y + 1);
 		return;
 	}
 	mf->SeenTile = tile;
