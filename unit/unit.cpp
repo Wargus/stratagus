@@ -3107,10 +3107,6 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	}
 
 	//
-	//		FIXME: call others for help.
-	//
-
-	//
 	//		Unit is working?
 	//
 	if (target->Orders[0].Action != UnitActionStill) {
@@ -3145,7 +3141,15 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	//		FIXME: Can't attack run away.
 	//
 	if (!type->Building) {
-		DebugLevel0Fn("FIXME: run away!\n");
+		int x;
+		int y;
+
+		x = target->X - attacker->X;
+		y = target->Y - attacker->Y;
+		x = target->X + (x * 5) / isqrt(x * x + y * y);
+		y = target->Y + (y * 5) / isqrt(x * x + y * y);
+		CommandStopUnit(target);
+		CommandMove(target, x + (SyncRand() & 3), y + (SyncRand() & 3), 0);
 	}
 }
 

@@ -107,11 +107,7 @@ global const char MissileTypeType[] = "missile-type";
 */
 global char** MissileTypeWcNames;
 
-/**
-**  Defined missile-types.
-*/
-global MissileType* MissileTypes;
-
+global MissileType** MissileTypes;              /// Missile types.
 global int NumMissileTypes;                     /// number of missile-types made.
 
 #ifdef DEBUG
@@ -175,8 +171,8 @@ global void LoadMissileSprites(void)
 #ifndef DYNAMIC_LOAD
 	int i;
 
-	for (i = 0; MissileTypes[i].OType; ++i) {
-		LoadMissileSprite(&MissileTypes[i]);
+	for (i = 0; i < NumMissileTypes; ++i) {
+		LoadMissileSprite(MissileTypes[i]);
 	}
 #endif
 }
@@ -219,30 +215,19 @@ global MissileType* NewMissileTypeSlot(char* ident)
 	MissileType* mtype;
 	int i;
 
-	//
-	// Allocate new memory. (+2 for start end empty last entry.)
-	//
-	mtype = calloc(NumMissileTypes + 2, sizeof(MissileType));
-	if (!mtype) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
-	}
-	memcpy(mtype, MissileTypes, sizeof(MissileType) * NumMissileTypes);
-	if (MissileTypes) {
-		free(MissileTypes);
-	}
-	MissileTypes = mtype;
-	mtype = MissileTypes + NumMissileTypes++;
-	mtype->OType = MissileTypeType;
+	MissileTypes = realloc(MissileTypes, (NumMissileTypes + 1) * sizeof(MissileType *));
+	mtype = MissileTypes[NumMissileTypes++] = (MissileType *)malloc(sizeof(MissileType));
+	memset(mtype, 0, sizeof(MissileType));
+
+	// Defaults.
 	mtype->Ident = ident;
-	//
-	// Rehash.
-	//
-	for (i = 0; i < NumMissileTypes; ++i) {
-		*(MissileType**)hash_add(MissileTypeHash, MissileTypes[i].Ident) = &MissileTypes[i];
-	}
-	mtype->CanHitOwner = 0;  // defaults
+	mtype->CanHitOwner = 0;
 	mtype->FriendlyFire = 0;
+
+	// Rehash.
+	for (i = 0; i < NumMissileTypes; ++i) {
+		*(MissileType**)hash_add(MissileTypeHash, MissileTypes[i]->Ident) = MissileTypes[i];
+	}
 
 	return mtype;
 }
@@ -1457,12 +1442,15 @@ global void SaveMissiles(CLFile* file)
 */
 global void InitMissileTypes(void)
 {
+	int i;
 	MissileType* mtype;
 
 	if (!MissileTypes) {
 		return;
 	}
-	for (mtype = MissileTypes; mtype->OType; ++mtype) {
+	for (i = 0; i < NumMissileTypes; ++i) {
+		mtype = MissileTypes[i];
+
 		//
 		// Add missile names to hash table
 		//
@@ -1491,12 +1479,15 @@ global void InitMissileTypes(void)
 */
 global void CleanMissileTypes(void)
 {
+	int i;
 	MissileType* mtype;
 
 	if (!MissileTypes) {
 		return;
 	}
-	for (mtype = MissileTypes; mtype->OType; ++mtype) {
+
+	for (i = 0; i < NumMissileTypes; ++i) {
+		mtype = MissileTypes[i];
 		hash_del(MissileTypeHash, mtype->Ident);
 
 		free(mtype->Ident);

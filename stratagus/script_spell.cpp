@@ -1013,34 +1013,31 @@ global void SaveSpells(CLFile* file)
 
 #ifdef META_LUA
 
+	/// Get func for SpellType 
+local int ScriptSpellGet(SpellType* spell, const char* key, lua_State* l);
+	/// Set func for SpellType 
+local int ScriptSpellSet(SpellType* spell, const char* key, lua_State* l);
+
 //
 //	Functions directly acessible from lua. Placed in the stratagus namespace.
 //
 
 /**
 **  Create a new spell
-**
-**	@param l    Lua state, contains one string, the spell name.
-**
-**	@return The spell UserData in the stack.
 */
-local int ScriptCreateSpell(lua_State* l)
+local int ScriptSpellCreate(lua_State* l)
 {
 	const char* name;
 	SpellType* spell;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-		return 0;
+		LuaError(l, "Incorrect number of arguments");
 	}
 	name = LuaToString(l, 1);
 
 	spell = SpellTypeByIdent(name);
 	if (spell != NULL) {
-		lua_pushstring(l, "Spell allready exists");
-		lua_error(l);
-		return 0;
+		LuaError(l, "Spell allready exists");
 	} else {
 		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
 		spell = SpellTypeTable[SpellTypeCount++] = malloc(sizeof(SpellType));
@@ -1048,7 +1045,7 @@ local int ScriptCreateSpell(lua_State* l)
 		spell->Ident = SpellTypeCount - 1;
 		spell->IdentName = strdup(name);
 		spell->DependencyId = -1;
-		ScriptSpellCreateUserdata(l, spell);
+		ScriptCreateUserdata(l, spell, ScriptSpellGet, ScriptSpellSet);
 		return 1;
 	}
 }
@@ -1056,18 +1053,11 @@ local int ScriptCreateSpell(lua_State* l)
 /**
 **	Get function for a spell userdata.
 **
-**	@param l	The Lua State.
+**	@param spell	Pointer to the spell.
+**	@param key      Key string.
 */
-local int ScriptSpellGetValue(lua_State* l)
+local int ScriptSpellGet(SpellType* spell, const char* key, lua_State* l)
 {
-	const SpellType* spell;
-	const char* key;
-
-	spell = *((SpellType**)lua_touserdata(l, -2));
-	key = lua_tostring(l, -1);
-	DebugCheck((!spell) || (!key));
-	DebugLevel3Fn("%p->(%s)\n" _C_ spell _C_ key);
-
 	META_GET_STRING("DisplayName", spell->Name);
 	META_GET_STRING("Ident", spell->IdentName);
 	META_GET_INT("ManaCost", spell->ManaCost);
@@ -1091,26 +1081,18 @@ local int ScriptSpellGetValue(lua_State* l)
 		DebugCheck(1);
 	}
 
-	lua_pushfstring(l, "Field \"%s\" is innexistent or write-only (yes, we have those).\n", key);
-	lua_error(l);
-	return 0;
+	LuaError(l, "Field \"%s\" is innexistent or write-only (yes, we have those).\n" _C_ key);
 }
 
 /**
-**	Get function for a spell userdata.
+**	Set function for a spell userdata.
 **
-**	@param l	The Lua State.
+**	@param spell	Pointer to the spell.
+**	@param key      Key string.
 */
-local int ScriptSpellSetValue(lua_State* l)
+local int ScriptSpellSet(SpellType* spell, const char* key, lua_State* l)
 {
-	SpellType* spell;
-	const char* key;
 	const char* val;
-
-	spell = *((SpellType**)lua_touserdata(l, -3));
-	key = LuaToString(l, -2);
-	DebugCheck((!spell) || (!key));
-	DebugLevel3Fn("%p->(%s)\n" _C_ spell _C_ key);
 
 	META_SET_STRING("DisplayName", spell->Name);
 	META_SET_INT("ManaCost", spell->ManaCost);
@@ -1130,94 +1112,16 @@ local int ScriptSpellSetValue(lua_State* l)
 			spell->Target = TargetUnit;
 			return 0;
 		}
-
-		lua_pushfstring(l, "Enum field \"%s\" can't receive value \"%s\"", key, val);
-		lua_error(l);
-		return 0;
+		LuaError(l, "Enum field \"%s\" can't receive value \"%s\"" _C_ key _C_ val);
 	}
 
-	lua_pushfstring(l, "Field \"%s\" is innexistent or read-only.\n", key);
-	lua_error(l);
-	return 0;
+	LuaError(l, "Field \"%s\" is innexistent or read-only.\n" _C_ key);
 }
 
 /**
-**	Garbage collection for a spell
-**
-**	@param l	 The lua state.
+**	Get function for the big spell namespace.
 */
-global int ScriptSpellGCollect(lua_State* l)
-{
-	SpellType* spell;
-	char s[20];
-
-	spell = *((SpellType**)lua_touserdata(l, -1));
-	DebugLevel3Fn("Collecting ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ spell->ScriptData);
-	lua_pushstring(l, "StratagusReferences");
-	lua_gettable(l, LUA_REGISTRYINDEX);
-	sprintf(s, "%p", spell->ScriptData); // FIXME: 64-bit.
-	lua_pushstring(l, s);
-	lua_pushnil(l);
-	lua_settable(l, -3);
-	lua_settop(l, -2);
-	spell->ScriptData = 0;
-	return 0;
-}
-
-/**
-**  Create a lua table for a spell.
-**
-**	@param l      The lua state.
-**	@param spell  Point to the spell.
-*/
-global void ScriptSpellCreateUserdata(lua_State* l, SpellType* spell)
-{
-	char s[20];
-	SpellType** sp;
-
-	if (spell->ScriptData) {
-		lua_pushstring(l, "StratagusReferences");
-		lua_gettable(l, LUA_REGISTRYINDEX);
-		sprintf(s, "%p", spell->ScriptData); // FIXME: 64-bit.
-		lua_pushstring(l, s);
-		lua_gettable(l, -2);
-		lua_remove(l, -2);
-		DebugLevel3Fn("Reusing ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ lua_touserdata(l, -1));
-	} else {
-		// Create userdata.
-		sp = (SpellType**)lua_newuserdata(l, sizeof(SpellType));
-		*sp = spell;
-		spell->ScriptData = sp;
-		// Generate the metatable
-		lua_newtable(l);
-		lua_pushstring(l, "__index");
-		lua_pushcfunction(l, ScriptSpellGetValue);
-		lua_settable(l, -3);
-		lua_pushstring(l, "__newindex");
-		lua_pushcfunction(l, ScriptSpellSetValue);
-		lua_settable(l, -3);
-		lua_pushstring(l, "__gc");
-		lua_pushcfunction(l, ScriptSpellGCollect);
-		lua_settable(l, -3);
-		lua_setmetatable(l, -2);
-		// Add to weak ref table.
-		lua_pushstring(l, "StratagusReferences");
-		lua_gettable(l, LUA_REGISTRYINDEX);
-		sprintf(s, "%p", spell->ScriptData); // FIXME: 64-bit.
-		lua_pushstring(l, s);
-		lua_pushvalue(l, -3);
-		lua_settable(l, -3);
-		lua_remove(l, -1);
-		DebugLevel3Fn("Creating ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ lua_touserdata(l, -1));
-	}
-}
-
-/**
-**	Get function for the big spell list.
-**
-**	@param l	The Lua State.
-*/
-local int ScriptSpellNamespaceGetValue(lua_State* l)
+local int ScriptSpellNamespaceGet(lua_State* l)
 {
 	int i;
 	const char* key;
@@ -1228,11 +1132,9 @@ local int ScriptSpellNamespaceGetValue(lua_State* l)
 		i = LuaToNumber(l, 2);
 		DebugLevel3Fn("(%d)\n" _C_ i);
 		if (i < 0 || i >= SpellTypeCount) {
-			lua_pushstring(l, "Spell index out of range");
-			lua_error(l);
-			return 0;
+			LuaError(l, "Spell index out of range");
 		}
-		ScriptSpellCreateUserdata(l, SpellTypeTable[i]);
+		ScriptCreateUserdata(l, SpellTypeTable[i], ScriptSpellGet, ScriptSpellSet);
 		return 1;
 	}
 
@@ -1243,21 +1145,16 @@ local int ScriptSpellNamespaceGetValue(lua_State* l)
 
 	META_GET_INT("n", SpellTypeCount);
 
-	spell = SpellTypeByIdent(key);
-	if (spell) {
-		ScriptSpellCreateUserdata(l, spell);
+	if ((spell = SpellTypeByIdent(key))) {
+		ScriptCreateUserdata(l, spell, ScriptSpellGet, ScriptSpellSet);
 		return 1;
 	}
 
-	lua_pushfstring(l, "Spell \"%s\" doesn't exist.\n", key);
-	lua_error(l);
-	return 0;
+	LuaError(l, "Spell \"%s\" doesn't exist.\n" _C_ key);
 }
 
 /**
 **	Initialize spell scripting. The main table is at -1
-**
-**	@param l   The lua state.
 */
 global void ScriptSpellInit(void)
 {
@@ -1269,7 +1166,7 @@ global void ScriptSpellInit(void)
 	// Generate the metatable
 	lua_newtable(Lua);
 	lua_pushstring(Lua, "__index");
-	lua_pushcfunction(Lua, ScriptSpellNamespaceGetValue);
+	lua_pushcfunction(Lua, ScriptSpellNamespaceGet);
 	lua_settable(Lua, -3);
 	lua_pushstring(Lua, "__newindex");
 	lua_pushcfunction(Lua, ScriptSetValueBlock); // Read-Only
@@ -1278,7 +1175,7 @@ global void ScriptSpellInit(void)
 
 	// Add functions.
 	lua_pushstring(Lua, "Create");
-	lua_pushcfunction(Lua, ScriptCreateSpell);
+	lua_pushcfunction(Lua, ScriptSpellCreate);
 	lua_rawset(Lua, -3);
 
 	lua_rawset(Lua, -3);
