@@ -7285,41 +7285,41 @@ local void ShowMetaServerList(void)
 ** Mohydine: Right now, because I find it simpler, the client is sending n commands, one for each online game.
 ** TODO: well, redo this :)
 */
-local void MultiMetaServerGameSetupInit(Menuitem *mi)
+local void MultiMetaServerGameSetupInit(Menuitem* mi)
 {
     int i;
     int j;
     int k;
     int numparams;
     int nummenus;
-    char **reply;
+    char* reply;
 	
-    SendMetaCommand("GameList","");
+    SendMetaCommand("GameList", "");
     reply = NULL;
     //receive
     //check okay
     
     // Meta server only sends matching version
     // Only Displays games from Matching version
-	nummenus=5;
-	i=1;
-	k=0;
-	numparams=4; //TODO: To be changed if more params are sent
+	nummenus = 5;
+	i = 1;
+	k = 0;
+	numparams = 4; //TODO: To be changed if more params are sent
 	
 	//Retrieve list of online game from the meta server
-	for (j=4; j <= nummenus*(numparams+1); j = j + numparams + 1) { // loop over the number of items in the menu
+	for (j = 4; j <= nummenus * (numparams + 1); j += numparams + 1) { // loop over the number of items in the menu
 	    //TODO: hard coded.
 	    // Check if connection to meta server is there.
-	    SendMetaCommand("NextGameInList",""); 
-	    i=RecvMetaReply(reply);
+	    SendMetaCommand("NextGameInList", ""); 
+	    i = RecvMetaReply(&reply);
 	    if (i == 0) {
 		// fill the menus with the right info.
-		mi->menu->Items[j].d.text.text="Nick"; 
-		mi->menu->Items[j+1].d.text.text="IP";
-		mi->menu->Items[j+2].d.text.text="OS";
-		mi->menu->Items[j+3].d.text.text="Engine Version";
+		mi->menu->Items[j].d.text.text = "Nick"; 
+		mi->menu->Items[j + 1].d.text.text = "IP";
+		mi->menu->Items[j + 2].d.text.text = "OS";
+		mi->menu->Items[j + 3].d.text.text = "Engine Version";
 	    }
-	    k++;
+	    ++k;
 	}
 	//	mi->menu->Items[4].d.text.text=TheMessage->Nickname; 
 	//	mi->menu->Items[9].d.text.text=TheMessage->Nickname; 
