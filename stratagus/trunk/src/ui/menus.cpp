@@ -1549,6 +1549,7 @@ local void SetRes800(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     LoadCcl();
     EndMenu();
     GlobalOptions();
