@@ -543,16 +543,16 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 	    InputMouseMove(callbacks, SDL_GetTicks(),
 		event->motion.x, event->motion.y);
 	    // FIXME: Same bug fix from X11
-	    if ((TheUI.WarpX != -1 || TheUI.WarpY != -1)
-		&& (event->motion.x != TheUI.WarpX
-		    || event->motion.y != TheUI.WarpY)) {
+	    if ((TheUI.MouseWarpX != -1 || TheUI.MouseWarpY != -1)
+		&& (event->motion.x != TheUI.MouseWarpX
+		    || event->motion.y != TheUI.MouseWarpY)) {
 		int xw;
 		int yw;
 
-		xw = TheUI.WarpX;
-		yw = TheUI.WarpY;
-		TheUI.WarpX = -1;
-		TheUI.WarpY = -1;
+		xw = TheUI.MouseWarpX;
+		yw = TheUI.MouseWarpY;
+		TheUI.MouseWarpX = -1;
+		TheUI.MouseWarpY = -1;
 		SDL_WarpMouse(xw, yw);
 	    }
 	    MustRedraw |= RedrawCursor;

@@ -825,14 +825,14 @@ local void X11DoEvent(const EventCallback* callbacks)
 		 _C_ event.xbutton.x _C_ event.xbutton.y);
 	    InputMouseMove(callbacks, X11GetTicks(),
 		    event.xbutton.x,event.xbutton.y);
-	    if ( (TheUI.WarpX != -1 || TheUI.WarpY != -1)
-		    && (event.xbutton.x!=TheUI.WarpX
-			 || event.xbutton.y!=TheUI.WarpY)
+	    if ( (TheUI.MouseWarpX != -1 || TheUI.MouseWarpY != -1)
+		    && (event.xbutton.x!=TheUI.MouseWarpX
+			 || event.xbutton.y!=TheUI.MouseWarpY)
 		    ) {
-		xw = TheUI.WarpX;
-		yw = TheUI.WarpY;
-		TheUI.WarpX = -1;
-		TheUI.WarpY = -1;
+		xw = TheUI.MouseWarpX;
+		yw = TheUI.MouseWarpY;
+		TheUI.MouseWarpX = -1;
+		TheUI.MouseWarpY = -1;
 
 		XWarpPointer(TheDisplay,TheMainWindow,TheMainWindow,0,0
 			,0,0,xw,yw);
