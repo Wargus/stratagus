@@ -48,6 +48,7 @@
 <A HREF="#add-tip">add-tip</A>
 <A HREF="#briefing">briefing</A>
 <A HREF="#center-map">center-map</A>
+<A HREF="#change-units-owner">change-units-owner</A>
 <A HREF="#create-unit">create-unit</A>
 <A HREF="#credits">credits</A>
 <A HREF="#define-campaign">define-campaign</A>
@@ -277,6 +278,39 @@ Center the current viewport at a certain location.
 </PRE>
 
 <P>Centers the current viewport at tile 17x40.
+
+<H4>Not Used</H4>
+
+<A NAME="change-units-owner"></A>
+
+<H3>change-units-owner</H3>
+
+<H4>Description</H4>
+
+Changes the owner of a group of units from 1 player to another.
+
+<H4>Syntax</H4>
+
+<CODE>(change-units-owner '(x1 y1) '(x2 y2) oldplayer newplayer)</CODE>
+
+<DL>
+<DT>'(x1 y1)</DT>
+<DD>Upper left location for tilebox to check for units within.</DD>
+<DT>'(x2 y2)</DT>
+<DD>Lower right location for tilebox to check for units within.</DD>
+<DT>oldplayer</DT>
+<DD>The player that currently owns the units</DD>
+<DT>newplayer</DT>
+<DD>The player that the units should now be owned by</DD>
+
+<H4>Example</H4>
+
+<PRE>
+    (change-units-owner '(0 0) '(10 10) 3 2)
+</PRE>
+
+<P>Changes the owner to player 2 for all units owned by player 3,
+that are located in the area (0,0)-(10,10).
 
 <H4>Not Used</H4>
 
