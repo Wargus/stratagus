@@ -1234,6 +1234,7 @@ global void UIHandleButtonUp(unsigned button)
 	if( num ) {
 	    ClearStatusLine();
 	    ClearCosts();
+	    CurrentButtonLevel = 0; // reset unit buttons to normal
 	    UpdateButtonPanel();
 
 	    //
@@ -1256,7 +1257,6 @@ global void UIHandleButtonUp(unsigned button)
 		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		}
 	    }
-            CurrentButtonLevel = 0; // reset unit buttons to normal
 	}
 
 	CursorStartX=0;
