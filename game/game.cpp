@@ -263,6 +263,12 @@ global void CreateGame(char* filename, WorldMap* map)
     }
     //GamePaused=1;
 
+    if( NetworkFildes!=-1 && TheMap.NoFogOfWar ) {
+	// FIXME: In multiplayer the map setup didn't reveal placed units.
+	TheMap.NoFogOfWar = 0;
+	MapUpdateVisible();
+	TheMap.NoFogOfWar = 1;
+    }
     if( FlagRevealMap ) {
 	RevealMap();
     }
