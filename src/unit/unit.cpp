@@ -418,6 +418,16 @@ global Unit* MakeUnit(UnitType* type, Player* player)
 		AssignUnitToPlayer(unit, player);
 	}
 
+	if (type->Building) {
+		//
+		//  fancy buildings: mirror buildings (but shadows not correct)
+		//
+		if (FancyBuildings && unit->Rs > 50) {
+			unit->Frame = -unit->Frame - 1;
+		}
+	}
+
+
 	return unit;
 }
 
@@ -516,17 +526,6 @@ global Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 	Unit* unit;
 
 	unit = MakeUnit(type, player);
-
-	if (type->Building) {
-		//
-		//		fancy buildings: mirror buildings (but shadows not correct)
-		//
-		if (FancyBuildings && unit->Rs > 50) {
-			// FIXME: doesn't work if Frame is 0
-			unit->Frame = -unit->Frame;
-		}
-	}
-
 	PlaceUnit(unit, x, y);
 
 	return unit;
@@ -1755,9 +1754,13 @@ global void UnitUpdateHeading(Unit* unit)
 {
 	int dir;
 	int nextdir;
+	int neg;
 
 	if (unit->Frame < 0) {
-		unit->Frame = -unit->Frame;
+		unit->Frame = -unit->Frame - 1;
+		neg = 1;
+	} else {
+		neg = 0;
 	}
 	unit->Frame /= unit->Type->NumDirections / 2 + 1;
 	unit->Frame *= unit->Type->NumDirections / 2 + 1;
@@ -1769,7 +1772,10 @@ global void UnitUpdateHeading(Unit* unit)
 		unit->Frame += dir;
 	} else {
 		unit->Frame += 256 / nextdir - dir;
-		unit->Frame = -unit->Frame;
+		unit->Frame = -unit->Frame - 1;
+	}
+	if (neg && !unit->Frame && unit->Type->Building) {
+		unit->Frame = -1;
 	}
 }
 
@@ -3558,11 +3564,11 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"seen-pixel\", {%d, %d}, ", unit->Seen.IX, unit->Seen.IY);
 	CLprintf(file, "\"%sframe\", %d, ",
 		unit->Frame < 0 ? "flipped-" : "",
-		unit->Frame < 0 ? -unit->Frame : unit->Frame);
+		unit->Frame < 0 ? -unit->Frame - 1 : unit->Frame);
 	if (unit->Seen.Frame != UnitNotSeen) {
 		CLprintf(file, "\"%sseen\", %d, ",
 			unit->Seen.Frame < 0 ? "flipped-" : "",
-			unit->Seen.Frame < 0 ? -unit->Seen.Frame : unit->Seen.Frame);
+			unit->Seen.Frame < 0 ? -unit->Seen.Frame - 1 : unit->Seen.Frame);
 	} else {
 		CLprintf(file, "\"not-seen\", ");
 	}

@@ -1199,7 +1199,7 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 			y += type->ShadowOffsetY;
 			if (type->Flip) {
 				if (frame < 0) {
-					VideoDrawShadowClipX(type->ShadowSprite, -frame, x, y);
+					VideoDrawShadowClipX(type->ShadowSprite, -frame - 1, x, y);
 				} else {
 					VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
 				}
@@ -1208,7 +1208,7 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 
 				row = type->NumDirections / 2 + 1;
 				if (frame < 0) {
-					frame = (-frame / row) * type->NumDirections + type->NumDirections - -frame % row;
+					frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
 				} else {
 					frame = (frame / row) * type->NumDirections + frame % row;
 				}
@@ -1233,7 +1233,7 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 
 		if (type->Flip) {
 			if (frame < 0) {
-				VideoDrawShadowClipX(type->ShadowSprite, -frame, x, y);
+				VideoDrawShadowClipX(type->ShadowSprite, -frame - 1, x, y);
 			} else {
 				VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
 			}
@@ -1242,7 +1242,7 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 
 			row = type->NumDirections / 2 + 1;
 			if (frame < 0) {
-				frame = (-frame / row) * type->NumDirections + type->NumDirections - -frame % row;
+				frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
 			} else {
 				frame = (frame / row) * type->NumDirections + frame % row;
 			}
@@ -1706,9 +1706,9 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 	if (!type->PlayerColorSprite[player] ||
 			!type->PlayerColorSprite[player]->TextureNames[
 				type->Flip ?
-					(frame < 0 ? -frame : frame) :
+					(frame < 0 ? -frame - 1 : frame) :
 					(frame < 0 ?
-						(-frame / (type->NumDirections / 2 + 1)) * type->NumDirections +
+						((-frame - 1) / (type->NumDirections / 2 + 1)) * type->NumDirections +
 							type->NumDirections - -frame % (type->NumDirections / 2 + 1) :
 						(frame / (type->NumDirections / 2 + 1)) * type->NumDirections +
 							frame % (type->NumDirections / 2 + 1))]) {
@@ -1728,7 +1728,7 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 		}
 		fprintf(stderr,"%s (%d)\n", type->Ident, player);
 		MakePlayerColorTexture(&((UnitType*)type)->PlayerColorSprite[player],
-			type->Sprite, frame < 0 ? -frame : frame, mapping, 4);
+			type->Sprite, frame < 0 ? -frame - 1 : frame, mapping, 4);
 	}
 
 	// FIXME: move this calculation to high level.
@@ -1737,7 +1737,7 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 
 	if (type->Flip) {
 		if (frame < 0) {
-			VideoDrawClipX(type->PlayerColorSprite[player], -frame, x, y);
+			VideoDrawClipX(type->PlayerColorSprite[player], -frame - 1, x, y);
 		} else {
 			VideoDrawClip(type->PlayerColorSprite[player], frame, x, y);
 		}
@@ -1746,7 +1746,7 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 
 		row = type->NumDirections / 2 + 1;
 		if (frame < 0) {
-			frame = (-frame / row) * type->NumDirections + type->NumDirections - -frame % row;
+			frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
 		} else {
 			frame = (frame / row) * type->NumDirections + frame % row;
 		}
@@ -1777,7 +1777,7 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 			if (unit->Type->Flip) {
 				if (frame < 0) {
 					VideoDrawShadowClipX(unit->Type->Construction->ShadowSprite,
-						-frame, x, y);
+						-frame - 1, x, y);
 				} else {
 					VideoDrawShadowClip(unit->Type->Construction->ShadowSprite,
 						frame, x, y);
@@ -1787,7 +1787,7 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 
 				row = unit->Type->NumDirections / 2 + 1;
 				if (frame < 0) {
-					frame = (-frame / row) * unit->Type->NumDirections + unit->Type->NumDirections - -frame % row;
+					frame = ((-frame - 1) / row) * unit->Type->NumDirections + unit->Type->NumDirections - (-frame - 1) % row;
 				} else {
 					frame = (frame / row) * unit->Type->NumDirections + frame % row;
 				}
@@ -1803,7 +1803,7 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 			y += unit->Type->ShadowOffsetY;
 			if (unit->Type->Flip) {
 				if (frame < 0) {
-					VideoDrawShadowClipX(unit->Type->ShadowSprite, -frame, x, y);
+					VideoDrawShadowClipX(unit->Type->ShadowSprite, -frame - 1, x, y);
 				} else {
 					VideoDrawShadowClip(unit->Type->ShadowSprite, frame, x, y);
 				}
@@ -1812,7 +1812,7 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 
 				row = unit->Type->NumDirections / 2 + 1;
 				if (frame < 0) {
-					frame = (-frame / row) * unit->Type->NumDirections + unit->Type->NumDirections - -frame % row;
+					frame = ((-frame - 1) / row) * unit->Type->NumDirections + unit->Type->NumDirections - (-frame - 1) % row;
 				} else {
 					frame = (frame / row) * unit->Type->NumDirections + frame % row;
 				}
@@ -1840,7 +1840,11 @@ local void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 		x -= construction->Width / 2;
 		y -= construction->Height / 2;
 		GraphicUnitPixels(unit, construction->Sprite);
-		VideoDrawClip(construction->Sprite, frame, x, y);
+		if (frame < 0) {
+			VideoDrawClipX(construction->Sprite, -frame - 1, x, y);
+		} else {
+			VideoDrawClip(construction->Sprite, frame, x, y);
+		}
 	} else {
 		x -= type->TileWidth * TileSizeX / 2;
 		y -= type->TileHeight * TileSizeY / 2;
@@ -1969,10 +1973,10 @@ global void DrawUnit(const Unit* unit)
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
 		GraphicUnitPixels(unit, type->Sprite);
-		DrawUnitType(type, sprite, frame < 0 ? -1 : 1, x, y);
+		DrawUnitType(type, sprite, frame < 0 ? -1 - 1 : 1, x, y);
 #ifdef USE_OPENGL
 		DrawUnitPlayerColor(type, unit->Player->Player,
-			frame < 0 ? -1 : 1, x, y);
+			frame < 0 ? -1 - 1 : 1, x, y);
 #endif
 	} else {
 		DrawUnitType(type, sprite, frame, x, y);

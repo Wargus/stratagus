@@ -109,6 +109,7 @@ global void LoadConstructions(void)
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->Sprite = LoadSprite(file,
 					(*cop)->Width, (*cop)->Height);
+				FlipGraphic((*cop)->Sprite);
 			}
 			file = (*cop)->ShadowFile[TheMap.Terrain].File;
 			if (file) {
@@ -127,6 +128,7 @@ global void LoadConstructions(void)
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->ShadowSprite = LoadSprite(file,
 					(*cop)->ShadowWidth, (*cop)->ShadowHeight);
+				FlipGraphic((*cop)->ShadowSprite);
 			}
 			++cop;
 		}
