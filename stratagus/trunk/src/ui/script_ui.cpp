@@ -629,10 +629,21 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    free(ui->Filler1.File);
-    ui->Filler1.File=str;
-    ui->Filler1X=x;
-    ui->Filler1Y=y;
+    for( i=0; i<ui->NumFillers; ++i ) {
+	free(ui->Filler[i].File);
+    }
+    free(ui->Filler);
+    free(ui->FillerX);
+    free(ui->FillerY);
+
+    ui->NumFillers=1;
+    ui->Filler=malloc(ui->NumFillers*sizeof(*ui->Filler));
+    ui->FillerX=malloc(ui->NumFillers*sizeof(*ui->FillerX));
+    ui->FillerY=malloc(ui->NumFillers*sizeof(*ui->FillerY));
+
+    ui->Filler[0].File=str;
+    ui->FillerX[0]=x;
+    ui->FillerY[0]=y;
 
     //	Resource
     temp=gh_car(list);
@@ -1338,7 +1349,7 @@ local SCM CclDefineNewUI(SCM list)
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    ui->ReverseFontColor=gh_scm2newstr(value,NULL);
-	} else if( gh_eq_p(value,gh_symbol2scm("filler-1")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("filler")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("resources")) ) {
