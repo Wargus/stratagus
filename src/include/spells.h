@@ -145,6 +145,7 @@ struct _spell_action_type_ {
 
 		struct {
 			UnitType *NewForm;				/// The new form
+			int PlayerNeutral;					/// Convert the unit to the neutral player.
 			//  TODO: temporary polymorphs would be awesome, but hard to implement
 		} Polymorph;
 
