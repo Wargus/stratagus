@@ -580,6 +580,8 @@ local SCM CclDefineMap(SCM width,SCM height)
 */
 local SCM CclFreeCraftMap(SCM list)
 {
+#if 0
+
     SCM value;
     SCM name;
     SCM data;
@@ -668,6 +670,7 @@ local SCM CclFreeCraftMap(SCM list)
 
 	list=gh_cdr(list);
     }
+#endif
 
     return list;
 }
@@ -711,7 +714,7 @@ global void CclInit(void)
     sargv[0] = "FreeCraft";
     sargv[1] = "-v1";
     sargv[2] = "-g0";
-    sargv[3] = "-h200000:10";
+    sargv[3] = "-h400000:10";
 #ifdef __MINGW32__
     sprintf(buf,"-l%s\\",FreeCraftLibPath);
 #else
