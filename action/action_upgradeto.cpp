@@ -79,9 +79,8 @@ global void HandleActionUpgradeTo(Unit* unit)
 	player->UnitTypesCount[unit->Type->Type]++;
 	UpdateForNewUnit(unit,1);
 
-	
-	SetMessageEvent(player,NotifyGreen,unit->X, unit->Y,
-	    "Upgrade to %s complete", unit->Type->Name );
+	NotifyPlayer(player,NotifyGreen,unit->X,unit->Y,
+	    "Upgrade to %s complete",unit->Type->Name );
 	if( unit->Player->Ai ) {
 	    AiUpgradeToComplete(unit,type);
 	}
