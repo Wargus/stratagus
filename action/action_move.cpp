@@ -287,13 +287,10 @@ global void HandleActionMove(Unit* unit)
 	    //
 	    //	Some tries to reach the goal
 	    //
-	    if( unit->SubAction++<10 ) {
-	        // FIXME: If it's not reachable, It's not
-		//	To keep the load low, retry delayed.
-		unit->Wait=CYCLES_PER_SECOND/10+unit->SubAction;
+	    if( unit->Orders[0].RangeX <= TheMap.Width
+	        || unit->Orders[0].RangeX <= TheMap.Height) {
 		unit->Orders[0].RangeX++;
 		unit->Orders[0].RangeY++;
-		// FIXME: Now the units didn't defend themself :(((((((
 		break;
 	    }
 	    // FALL THROUGH
