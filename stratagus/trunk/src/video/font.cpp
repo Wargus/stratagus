@@ -895,6 +895,7 @@ global void FontsCclRegister(void)
 global void CleanFonts(void)
 {
 	unsigned i;
+	FontColorMapping *fcmp, *fcmpn;
 
 	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
 		free(Fonts[i].File);
@@ -903,6 +904,12 @@ global void CleanFonts(void)
 		Fonts[i].Graphic = NULL;
 	}
 
+	fcmp = FontColorMappings;
+	while (fcmp) {
+		fcmpn = fcmp->Next;
+		free(fcmp);
+		fcmp = fcmpn;
+	}
 	FontColorMappings = NULL;
 }
 

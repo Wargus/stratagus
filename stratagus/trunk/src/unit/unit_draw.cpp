@@ -114,42 +114,35 @@ global const Viewport* CurrentViewport;		/// FIXME: quick hack for split screen
 **
 **		@return				Color for selection, or NULL if not selected.
 */
-local Uint32* SelectionColor(const Unit* unit)
+local Uint32 SelectionColor(const Unit* unit)
 {
-	static Uint32 color;
-
-	// FIXME: make these colors customizable via CVS
+	// FIXME: make these colors customizable with scripts.
 
 	if (EditorRunning && unit == UnitUnderCursor &&
 			EditorState == EditorSelecting) {
-		color = ColorWhite;
-		return &color;
+		return ColorWhite;
 	}
 
 	if (unit->Selected || (unit->Blink & 1)) {
 		if (unit->Player->Player == PlayerNumNeutral) {
-			color = ColorYellow;
-			return &color;
+			return ColorYellow;
 		}
 		// FIXME: better allied?
 		if (unit->Player == ThisPlayer) {
-			color = ColorGreen;
-			return &color;
+			return ColorGreen;
 		}
 		if (IsEnemy(ThisPlayer, unit)) {
-			color = ColorRed;
-			return &color;
+			return ColorRed;
 		}
-		return &unit->Player->Color;
+		return unit->Player->Color;
 	}
 
 	// If building mark all own buildings
 	if (CursorBuilding && unit->Type->Building &&
 			unit->Player == ThisPlayer) {
-		color = ColorGray;
-		return &color;
+		return ColorGray;
 	}
-	return NULL;
+	return 0;
 }
 
 /**
@@ -159,25 +152,23 @@ local Uint32* SelectionColor(const Unit* unit)
 */
 global void DrawUnitSelection(const Unit* unit)
 {
-	Uint32* color;
 	int x;
 	int y;
 	UnitType* type;
+	Uint32 color;
 
 	type = unit->Type;
 
 	color = SelectionColor(unit);
-	if (!color) {
-		return;
+	if (color) {
+		x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX +
+			type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
+			(type->Width - VideoGraphicWidth(type->Sprite)) / 2;
+		y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY +
+			type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
+			(type->Height - VideoGraphicHeight(type->Sprite)) / 2;
+		DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
 	}
-	x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX +
-		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
-		(type->Width - VideoGraphicWidth(type->Sprite)) / 2;
-	y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY +
-		type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
-		(type->Height - VideoGraphicHeight(type->Sprite)) / 2;
-	DrawSelection(*color, x, y, x + type->BoxWidth, y + type->BoxHeight);
-	free(color);
 }
 
 /**

@@ -283,7 +283,7 @@ global void FlipGraphic(Graphic* graphic)
 	for (i = 0; i < s->h; ++i) {
 		for (j = 0; j < s->w; ++j) {
 			((char*)s->pixels)[j + i * s->w] =
-				((char*)graphic->Surface->pixels)[s->w - j + i * s->w];
+				((char*)graphic->Surface->pixels)[s->w - j - 1 + i * s->w];
 		}
 	}
 	SDL_UnlockSurface(s);
