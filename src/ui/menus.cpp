@@ -116,10 +116,9 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
 	const int font,const unsigned char *text)
 {
     MenuButtonId rb;
-    int s;
+    int s, nc, rc;
 
-    // NOTE: johns -> ari, i hope, i have fixed it correct for the new colors.
-
+    GetDefaultTextColors(&nc, &rc);
     if (flags&MenuButtonDisabled) {
 	rb = button - 1;
 	s = 0;
@@ -127,13 +126,14 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
     } else if (flags&MenuButtonClicked) {
 	rb = button + 1;
 	s = 2;
-	SetDefaultTextColors(FontWhite,FontYellow);
+	SetDefaultTextColors(rc,rc);
     } else {
 	rb = button;
 	s = 0;
-	SetDefaultTextColors(FontYellow,FontWhite);
+	if (flags&MenuButtonActive) {
+	    SetDefaultTextColors(rc,rc);
+	}
     }
-
     DrawRleSprite(MenuButtonGfx.RleSprite, rb, x, y);
     if (text) {
 	DrawTextCentered(s+x+w/2,s+y+(font == GameFont ? 4 : 7),font,text);
@@ -142,15 +142,7 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
 	/// FIXME: use ColorGrey if selected button is disabled!
 	VideoDrawRectangle(ColorYellow,x,y,w,h);
     }
-
-    // Restore old colors: FIXME: quick&dirty
-
-    if( ThisPlayer->Race==PlayerRaceHuman ) {
-	SetDefaultTextColors(FontWhite,FontYellow);
-    } else if( ThisPlayer->Race==PlayerRaceOrc ) {
-	SetDefaultTextColors(FontYellow,FontWhite);
-    }
-    // FIXME: more races supported
+    SetDefaultTextColors(nc,rc);
 }
 
 
