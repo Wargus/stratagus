@@ -708,18 +708,6 @@ static void CclParseIcon(lua_State* l, Button* icon)
 			icon->Y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "size")) {
-			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			icon->Width = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			icon->Height = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "style")) {
 			lua_rawgeti(l, -1, j + 1);
 			icon->Style = FindButtonStyle(LuaToString(l, -1));

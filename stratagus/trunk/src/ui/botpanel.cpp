@@ -226,7 +226,6 @@ void DrawButtonPanel(void)
 	Player* player;
 	const ButtonAction* buttons;
 	char buf[8];
-	ButtonStyle style;
 
 	//
 	//  Draw background
@@ -361,18 +360,8 @@ void DrawButtonPanel(void)
 				buf[0] = '\0';
 			}
 
-			memcpy(&style, TheUI.ButtonButtons[i].Style, sizeof(ButtonStyle));
-			style.Default.Sprite = style.Hover.Sprite = style.Selected.Sprite =
-				style.Clicked.Sprite = style.Disabled.Sprite = buttons[i].Icon.Icon->Sprite;
-			style.Default.Frame = style.Hover.Frame = style.Selected.Frame =
-				style.Clicked.Frame = style.Disabled.Frame = buttons[i].Icon.Icon->Index;
-			if (!(v & IconSelected) && (v & IconAutoCast)) {
-				style.Default.BorderColorRGB = TheUI.ButtonAutoCastBorderColorRGB;
-				style.Default.BorderColor = 0;
-			}
-			GraphicPlayerPixels(player, buttons[i].Icon.Icon->Sprite);
-			DrawMenuButton(&style, v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y, buf);
-			// FIXME: player colors with opengl
+			DrawUnitIcon(player, TheUI.ButtonButtons[i].Style, buttons[i].Icon.Icon,
+				v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y, buf);
 
 			//
 			//  Update status line for this button
