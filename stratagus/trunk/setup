@@ -414,7 +414,7 @@ fi
 
 if [ "$BEOS" != "1" ] ; then
 
-if [ "$DARWIN" != "1" ] ; then
+if [ "$DARWIN" != "1" ] && [ "$WIN32" != "1" ] ; then
   # Check for SVGALIB
   LIBCHECK="-lvga -lvgagl"
   check_for_libs
