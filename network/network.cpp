@@ -751,6 +751,7 @@ global void NetworkEvent(void)
 	int player;
 	int i;
 	int commands;
+	int allowed;
 	unsigned long n;
 
 	if (NetworkFildes == (Socket)-1) {
@@ -897,9 +898,31 @@ global void NetworkEvent(void)
 		NetworkLastFrame[player] = FrameCounter;
 
 		// Place in network in
-		NetworkIn[packet->Header.Cycle][player][i].Time = n;
-		NetworkIn[packet->Header.Cycle][player][i].Type = packet->Header.Type[i];
-		NetworkIn[packet->Header.Cycle][player][i].Data = *nc;
+		switch (packet->Header.Type[i]) {
+			case MessageExtendedCommand:
+				// FIXME: ensure the sender is part of the command
+				allowed = 1;
+				break;
+			case MessageSync:
+				// Sync does not matter
+				allowed = 1;
+				break;
+			default:
+				if (UnitSlots[ntohs(nc->Unit)]->Player->Player == player ||
+					PlayersTeamed(player, UnitSlots[ntohs(nc->Unit)]->Player->Player)) {
+					allowed = 1;
+				} else {
+					allowed = 0;
+				}
+		}
+
+		if (allowed) {
+			NetworkIn[packet->Header.Cycle][player][i].Time = n;
+			NetworkIn[packet->Header.Cycle][player][i].Type = packet->Header.Type[i];
+			NetworkIn[packet->Header.Cycle][player][i].Data = *nc;
+		} else {
+			SetMessage("%s Sent Bad Command", Players[player].Name);
+		}
 	}
 
 	for ( ; i < MaxNetworkCommands; ++i) {
