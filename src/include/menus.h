@@ -113,6 +113,7 @@ struct _menuitem_;
 typedef struct _menuitem_text_ {
     unsigned char *text;
     unsigned int tflags;
+    void (*action)(struct _menuitem_ *);
 } MenuitemText;
 typedef struct _menuitem_button_ {
     unsigned char *text;

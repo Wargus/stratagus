@@ -2535,21 +2535,21 @@ local SCM CclDefineMenuItem(SCM list)
 /* Menu types */
 	} else if( !item->mitype ) {
 	    if ( gh_eq_p(value,gh_symbol2scm("text")) ) {
-		value=gh_car(list);
+		sublist=gh_car(list);
 		list=gh_cdr(list);
 		item->mitype=MI_TYPE_TEXT;
 		item->d.text.text = NULL;
 
-		if ( !gh_null_p(gh_car(value)) ) {
-		    item->d.text.text=gh_scm2newstr(gh_car(value), NULL);
+		if ( !gh_null_p(gh_car(sublist)) ) {
+		    item->d.text.text=gh_scm2newstr(gh_car(sublist), NULL);
 		    // FIXME: can be removed
 		    if (!strcmp(item->d.text.text, "null")) {
 			free(item->d.text.text);
 			item->d.text.text = NULL;
 		    }
 		}
-		value=gh_cdr(value);
-		value=gh_car(value);
+		sublist=gh_cdr(sublist);
+		value=gh_car(sublist);
 		if ( gh_eq_p(value,gh_symbol2scm("center")) ) {
 		    item->d.text.tflags=MI_TFLAGS_CENTERED;
 		} else if ( gh_eq_p(value,gh_symbol2scm("left")) ) {
@@ -2562,6 +2562,21 @@ local SCM CclDefineMenuItem(SCM list)
 		    s1=gh_scm2newstr(gh_car(value),NULL);
 		    fprintf(stderr,"Unknow flag %s\n", s1);
 		    free(s1);
+		}
+
+		sublist=gh_cdr(sublist);
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
+	    	    s1 = gh_scm2newstr(gh_car(sublist),NULL);
+		    func = (void **)hash_find(MenuFuncHash,s1);
+		    if (func != NULL) {
+		        item->d.text.action=(void *)*func;
+		    } else {
+		        fprintf(stderr,"Can't find function: %s\n", s1);
+		    }
+		    free(s1);
+		    sublist=gh_cdr(sublist);
 		}
 	    } else if ( gh_eq_p(value,gh_symbol2scm("button")) ) {
 		sublist=gh_car(list);
