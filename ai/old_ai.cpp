@@ -1403,7 +1403,7 @@ global void AiUnitKilled(Unit* unit)
     DebugLevel1Fn("%d: %d(%s) killed\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 
     // FIXME: if the unit builds something for us it must restartet!!!!
 }
@@ -1420,7 +1420,7 @@ global void AiNeedMoreFarms(Unit* unit,const UnitType* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 }
 
 /**
@@ -1434,7 +1434,7 @@ global void AiWorkComplete(Unit * unit, Unit * what)
     DebugLevel3("Ai: Player %d: %d Work %d complete\n",
 		unit->Player - Players, UnitNumber(unit), UnitNumber(what));
     // FIXME: correct position
-    if (unit->Player->Type == PlayerHuman) {
+    if (unit->Player->Type == PlayerPerson) {
 	return;
     }
     AiPlayer = &Ais[unit->Player->Player];
@@ -1460,7 +1460,7 @@ global void AiCanNotBuild(Unit * unit, const UnitType * what)
 		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
 		unit->Y);
     // FIXME: correct position
-    if (unit->Player->Type == PlayerHuman) {
+    if (unit->Player->Type == PlayerPerson) {
 	return;
     }
     AiPlayer = &Ais[unit->Player->Player];
@@ -1491,7 +1491,7 @@ global void AiCanNotReach(Unit * unit, const UnitType * what)
 		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
 		unit->Y);
     // FIXME: correct position
-    if (unit->Player->Type == PlayerHuman) {
+    if (unit->Player->Type == PlayerPerson) {
 	return;
     }
     AiPlayer = &Ais[unit->Player->Player];
@@ -1522,7 +1522,7 @@ global void AiTrainingComplete(Unit * unit, Unit * what)
     DebugLevel3("Ai: Player %d: %d Training %d complete\n",
 		unit->Player - Players, UnitNumber(unit), UnitNumber(what));
     // FIXME: correct position
-    if (unit->Player->Type == PlayerHuman) {
+    if (unit->Player->Type == PlayerPerson) {
 	return;
     }
     // FIXME: Should I put an AiPlayer pointer into the player struct?
@@ -1545,7 +1545,7 @@ global void AiUpgradeToComplete(Unit* unit,const UnitType* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 }
 
 /**
@@ -1560,7 +1560,7 @@ global void AiResearchComplete(Unit* unit,const Upgrade* what)
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
-    DebugCheck(unit->Player->Type == PlayerHuman);
+    DebugCheck(unit->Player->Type == PlayerPerson);
 }
 
 /**

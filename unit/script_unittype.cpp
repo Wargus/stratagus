@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -313,7 +312,7 @@ local SCM CclDefineUnitType(SCM list)
     value=gh_car(list);
     i=gh_scm2int(value);
     DebugLevel3("\tReaction range player: %d\n",i);
-    type->ReactRangeHuman=i;
+    type->ReactRangePerson=i;
 
     // Armor
 

@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -52,7 +51,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global int NumPlayers;			/// How many player used
+global int NumPlayers;			/// How many player slots used
 global Player Players[PlayerMax];	/// All players in play
 global Player* ThisPlayer;		/// Player on this computer
 
@@ -173,7 +172,7 @@ global void SavePlayers(FILE* file)
 	    case PlayerNeutral:	      fprintf(file,"'neutral");		break;
 	    case PlayerNobody:	      fprintf(file,"'nobody");		break;
 	    case PlayerComputer:      fprintf(file,"'computer");	break;
-	    case PlayerHuman:	      fprintf(file,"'human");		break;
+	    case PlayerPerson:	      fprintf(file,"'person");		break;
 	    case PlayerRescuePassive: fprintf(file,"'rescue-passive");	break;
 	    case PlayerRescueActive:  fprintf(file,"'rescue-active");	break;
 	    default:		      fprintf(file,"%d",Players[i].Type); break;
@@ -280,10 +279,10 @@ global void CreatePlayer(int type)
     }
 
     //
-    //	Take first slot for human on this computer,
+    //	Take first slot for person on this computer,
     //	fill other with computer players.
     //
-    if( type==PlayerHuman && !NetPlayers && !NetworkArg ) {
+    if( type==PlayerPerson && !NetPlayers && !NetworkArg ) {
 	if( !ThisPlayer ) {
 	    ThisPlayer=player;
 	} else {
@@ -293,7 +292,7 @@ global void CreatePlayer(int type)
 
     //
     //	Make simple teams:
-    //		All human players are enemies.
+    //		All person players are enemies.
     //
     switch( type ) {
 	case PlayerNeutral:
@@ -304,7 +303,7 @@ global void CreatePlayer(int type)
 	case PlayerComputer:
 	    team=1;
 	    break;
-	case PlayerHuman:
+	case PlayerPerson:
 	    team=2+NumPlayers;
 	    break;
 	case PlayerRescuePassive:
@@ -343,20 +342,20 @@ global void CreatePlayer(int type)
 	    default:
 		break;
 	    case PlayerComputer:
-		// Computer allied with computer and enemy of all humans.
+		// Computer allied with computer and enemy of all persons.
 		if( Players[i].Type==PlayerComputer ) {
 		    player->Allied|=(1<<i);
 		    Players[i].Allied|=(1<<NumPlayers);
-		} else if( Players[i].Type==PlayerHuman
+		} else if( Players[i].Type==PlayerPerson
 			|| Players[i].Type==PlayerRescueActive ) {
 		    player->Enemy|=(1<<i);
 		    Players[i].Enemy|=(1<<NumPlayers);
 		}
 		break;
-	    case PlayerHuman:
+	    case PlayerPerson:
 		// Humans are enemy of all?
 		if( Players[i].Type==PlayerComputer
-			|| Players[i].Type==PlayerHuman ) {
+			|| Players[i].Type==PlayerPerson ) {
 		    player->Enemy|=(1<<i);
 		    Players[i].Enemy|=(1<<NumPlayers);
 		} else if( Players[i].Type==PlayerRescueActive
@@ -366,18 +365,18 @@ global void CreatePlayer(int type)
 		}
 		break;
 	    case PlayerRescuePassive:
-		// Rescue passive are allied with humans
-		if( Players[i].Type==PlayerHuman ) {
+		// Rescue passive are allied with persons
+		if( Players[i].Type==PlayerPerson ) {
 		    player->Allied|=(1<<i);
 		    Players[i].Allied|=(1<<NumPlayers);
 		}
 		break;
 	    case PlayerRescueActive:
-		// Rescue active are allied with humans and enemies of computer
+		// Rescue active are allied with persons and enemies of computer
 		if( Players[i].Type==PlayerComputer ) {
 		    player->Enemy|=(1<<i);
 		    Players[i].Enemy|=(1<<NumPlayers);
-		} else if( Players[i].Type==PlayerHuman ) {
+		} else if( Players[i].Type==PlayerPerson ) {
 		    player->Allied|=(1<<i);
 		    Players[i].Allied|=(1<<NumPlayers);
 		}
@@ -986,7 +985,7 @@ global void DebugPlayers(void)
 	    case 2: DebugLevel0("neutral      ");	break;
 	    case 3: DebugLevel0("nobody       ");	break;
 	    case 4: DebugLevel0("computer     ");	break;
-	    case 5: DebugLevel0("human        ");	break;
+	    case 5: DebugLevel0("person       ");	break;
 	    case 6: DebugLevel0("rescue pas.  ");	break;
 	    case 7: DebugLevel0("rescue akt.  ");	break;
 	}
