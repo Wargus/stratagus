@@ -2470,7 +2470,7 @@ global void HitUnit(Unit* unit,int damage)
 **	@param x2	X map tile position.
 **	@param y2	Y map tile position.
 **
-**	@returns	The distance between in tiles.
+**	@return		The distance between in tiles.
 */
 global int MapDistance(int x1,int y1,int x2,int y2)
 {
@@ -2486,7 +2486,7 @@ global int MapDistance(int x1,int y1,int x2,int y2)
 **	@param x2	X map tile position.
 **	@param y2	Y map tile position.
 **
-**	@returns	The distance between in tiles.
+**	@return		The distance between in tiles.
 */
 global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
 {
@@ -2524,7 +2524,7 @@ global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
 **	@param y	Y map tile position.
 **	@param dest	Distance to this unit.
 **
-**	@returns	The distance between in tiles.
+**	@return		The distance between in tiles.
 */
 global int MapDistanceToUnit(int x,int y,const Unit* dest)
 {
@@ -2537,7 +2537,7 @@ global int MapDistanceToUnit(int x,int y,const Unit* dest)
 **	@param src	Distance from this unit.
 **	@param dst	Distance  to  this unit.
 **
-**	@returns	The distance between in tiles.
+**	@return		The distance between in tiles.
 */
 global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 {
