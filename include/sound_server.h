@@ -46,6 +46,10 @@ extern sem_t SoundThreadChannelSemaphore;
 #include "libcda.h"
 #endif
 
+#ifdef USE_SDLCD
+#include <SDL.h>
+#endif
+
 /*----------------------------------------------------------------------------
 --	Definitons
 ----------------------------------------------------------------------------*/
@@ -224,9 +228,14 @@ extern char *CDMode;
     /// FIXME: docu
 extern int CDTrack;
 #endif
+
 #ifdef USE_LIBCDA
     /// number of tracks on the cd
 extern int NumCDTracks;
+#endif
+
+#ifdef USE_SDLCD
+extern SDL_CD *CDRom;                   /// SDL cdrom device
 #endif
 
 /*----------------------------------------------------------------------------
