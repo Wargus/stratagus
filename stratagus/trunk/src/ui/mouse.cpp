@@ -353,7 +353,17 @@ global void DoRightButton(int x,int y)
 	// FIXME: demolish!!!!!!!
 
 	// FIXME: attack/follow/board ...
-	if( action==MouseActionMove ) {
+	if( action==MouseActionMove || action==MouseActionSail ) {
+	    dest=UnitOnMapTile(x,y);
+            if( dest ) {
+		// Follow allied units, but not self.
+                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+			&& dest!=unit ) {
+		    dest->Blink=3;
+		    SendCommandFollow(unit,dest,flush);
+                    continue;
+		}
+            }
 	}
 
         //
