@@ -20,7 +20,7 @@
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
-//
+/
 //	$Id$
 
 //@{
@@ -36,25 +36,10 @@
 
 #include "freecraft.h"
 
-// FIXME: Check if all are needed?
 #include "video.h"
-#include "icons.h"
-#include "sound_id.h"
-#include "upgrade_structs.h"
-#include "upgrade.h"
-#include "unitsound.h"
-#include "unittype.h"
-#include "player.h"
 #include "unit.h"
-#include "commands.h"
-#include "depend.h"
 #include "interface.h"
 #include "ui.h"
-#include "sound.h"
-#include "actions.h"
-#include "cursor.h"
-#include "map.h"
-#include "unit.h"
 #include "font.h"
 #include "spells.h"
 
