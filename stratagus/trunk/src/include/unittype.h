@@ -533,6 +533,7 @@ struct _graphic_;
 struct _construction_;
 
 typedef enum _new_animation_type_ {
+	NewAnimationNone,
 	NewAnimationFrame,
 	NewAnimationExactFrame,
 	NewAnimationWait,

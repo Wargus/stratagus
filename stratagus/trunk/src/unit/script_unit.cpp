@@ -889,6 +889,12 @@ static int CclUnit(lua_State* l)
 			unit->SubAction = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "state")) {
 			unit->State = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "anim-wait")) {
+			unit->Anim.Wait = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "curr-anim")) {
+			unit->Anim.CurrAnim = NewAnimationsArray[(int)LuaToNumber(l, j + 1)];
+		} else if (!strcmp(value, "anim")) {
+			unit->Anim.Anim = unit->Anim.CurrAnim + (int)LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "unbreakable")) {
 			unit->Anim.Unbreakable = 1;
 			--j;

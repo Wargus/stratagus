@@ -1370,13 +1370,12 @@ static void FixLabels(lua_State* l)
 /**
 **  Parse an animation frame
 */
-static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
+static void ParseAnimationFrame(lua_State* l, const char* str,
+	NewAnimation* anim)
 {
-	NewAnimation* anim;
 	char* op1;
 	char* op2;
 
-	anim = calloc(1, sizeof(*anim));
 	op1 = strdup(str);
 	op2 = strchr(op1, ' ');
 	if (op2) {
@@ -1470,7 +1469,6 @@ static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
 	}
 
 	free(op1);
-	return anim;
 }
 
 /**
@@ -1480,7 +1478,6 @@ static NewAnimation* ParseAnimation(lua_State* l, int idx)
 {
 	NewAnimation* anim;
 	NewAnimation* tail;
-	NewAnimation* newanim;
 	int args;
 	int j;
 	const char* str;
@@ -1489,19 +1486,20 @@ static NewAnimation* ParseAnimation(lua_State* l, int idx)
 		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, idx);
-	anim = tail = NULL;
+	anim = calloc(args + 1, sizeof(*anim));
+	tail = NULL;
 	NumLabels = NumLabelsLater = 0;
 
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, idx, j + 1);
 		str = LuaToString(l, -1);
 		lua_pop(l, 1);
-		newanim = ParseAnimationFrame(l, str);
-		if (!anim) {
-			anim = tail = newanim;
+		ParseAnimationFrame(l, str, &anim[j]);
+		if (!tail) {
+			tail = &anim[j];
 		} else {
-			tail->Next = newanim;
-			tail = newanim;
+			tail->Next = &anim[j];
+			tail = &anim[j];
 		}
 	}
 	FixLabels(l);
