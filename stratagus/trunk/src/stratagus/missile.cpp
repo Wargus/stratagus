@@ -411,12 +411,10 @@ static int CalculateDamageStats(const UnitStats* attacker_stats,
 /**
 **  Calculate damage.
 **
-**  @param attacker   Attacker.
-**  @param goal       Goal unit.
-**  @param bloodlust  If attacker has bloodlust
-**  @param xp         Experience of attack.
+**  @param attacker  Attacker.
+**  @param goal      Goal unit.
 **
-**  @return           damage produces on goal.
+**  @return          damage produces on goal.
 */
 static int CalculateDamage(const Unit* attacker, const Unit* goal)
 {

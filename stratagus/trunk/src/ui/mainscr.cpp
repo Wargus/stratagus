@@ -483,9 +483,9 @@ void DrawPanelIcon(const Unit* unit, ContentType* content, int defaultfont)
 **  Draw life bar of a unit using selected variable.
 **  Placed under icons on top-panel.
 **
-**  @param unit  Pointer to unit.
-**  @param x     Screen X postion of icon
-**  @param y     Screen Y postion of icon
+**  @param unit         Pointer to unit.
+**  @param content      FIXME: docu
+**  @param defaultfont  FIXME: docu
 **
 **  @todo Color and percent value Parametrisation.
 */
@@ -528,9 +528,9 @@ void DrawLifeBar(const Unit* unit, ContentType* content, int defaultfont)
 **  Draw life bar of a unit using selected variable.
 **  Placed under icons on top-panel.
 **
-**  @param unit  Pointer to unit.
-**  @param x     Screen X postion of icon
-**  @param y     Screen Y postion of icon
+**  @param unit         Pointer to unit.
+**  @param content      FIXME: docu
+**  @param defaultfont  FIXME: docu
 **
 **  @todo Color and percent value Parametrisation.
 */
