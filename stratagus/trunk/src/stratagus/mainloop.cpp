@@ -67,6 +67,7 @@
 #include "settings.h"
 #include "commands.h"
 #include "cdaudio.h"
+#include "pathfinder.h"
 
 #ifdef USE_SDLCD
 #include "SDL.h"
@@ -800,6 +801,9 @@ global void GameMainLoop(void)
 	    ++GameCycle;
 	    MultiPlayerReplayEachCycle();
 	    NetworkCommands();		// Get network commands
+#ifdef MAP_REGIONS
+	    MapSplitterEachCycle();
+#endif // MAP_REGIONS	    
 	    UnitActions();		// handle units
 	    MissileActions();		// handle missiles
 	    PlayersEachCycle();		// handle players

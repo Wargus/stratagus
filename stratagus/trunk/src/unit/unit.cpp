@@ -520,6 +520,12 @@ global void PlaceUnit(Unit* unit, int x, int y)
     }
 #endif
 
+#ifdef MAP_REGIONS
+    if (type->Building) {
+	MapSplitterTilesOccuped(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
+    }
+#endif
+
     x += unit->Type->TileWidth / 2;
     y += unit->Type->TileHeight / 2;
 
@@ -705,6 +711,16 @@ global void RemoveUnit(Unit* unit, Unit* host)
     //
     if (type->Building) {
 	PfHierMapChangedCallback(unit->X, unit->Y,
+	    unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
+    }
+#endif
+
+#ifdef MAP_REGIONS
+    //
+    //	Update map splitting.
+    //
+    if (type->Building) {
+	MapSplitterTilesCleared(unit->X, unit->Y,
 	    unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
     }
 #endif
