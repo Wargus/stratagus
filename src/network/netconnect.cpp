@@ -36,8 +36,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "net_lowlevel.h"
 #include "freecraft.h"
+
+#include "net_lowlevel.h"
 #include "player.h"
 #include "map.h"
 #include "network.h"
@@ -622,7 +623,10 @@ local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
     unsigned long s, u, d;
     int n;
 
+#ifndef USE_WIN32
+    DebugLevel0Fn("Didn't work with win32\n");
     gettimeofday(&now, NULL);
+#endif
     s = now.tv_sec - NetLastPacketSent.tv_sec;
     u = now.tv_usec - NetLastPacketSent.tv_usec;
     d = s * 1000 + u / 1000;
@@ -649,7 +653,10 @@ global void NetworkInitClientConnect(void)
     int i;
 
     NetConnectRunning = 2;
+#ifndef USE_WIN32
+    DebugLevel0Fn("Didn't work with win32\n");
     gettimeofday(&NetLastPacketSent, NULL);
+#endif
     NetLocalState = ccs_connecting;
     NetStateMsgCnt = 0;
     LastStateMsgType = ICMServerQuit;

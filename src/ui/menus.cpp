@@ -47,7 +47,10 @@
 #include "map.h"
 #include "pud.h"
 #include "iolib.h"
+#ifndef USE_WIN32
+#warning "NOT HERE LOW-LEVEL = LOW-LEVEL!!!"
 #include "net_lowlevel.h"
+#endif
 #include "network.h"
 #include "netconnect.h"
 #include "settings.h"
@@ -1259,15 +1262,21 @@ local void JoinNetGameMenu(void)
     ServerHostBuf[EnterServerIPMenuItems[1].d.input.nch] = 0;	// Now finally here is the address
 
     addr = NetResolveHost(ServerHostBuf);
+#ifndef USE_WIN32
+    DebugLevel0Fn("Didn't work with win32\n");
     if (addr == INADDR_NONE) {
 	return;
     }
+#endif
     NetworkServerIP = addr;
 
+#ifndef USE_WIN32
+    DebugLevel0Fn("Didn't work with win32\n");
     DebugLevel1Fn("SELECTED SERVER: %s (%d.%d.%d.%d)\n", ServerHostBuf,
 		    NIPQUAD(ntohl(addr)));
 
     sprintf(NetworkServerText, "%d.%d.%d.%d", NIPQUAD(ntohl(addr)));
+#endif
 
     NetworkInitClientConnect();
 
