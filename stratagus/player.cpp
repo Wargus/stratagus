@@ -140,6 +140,8 @@ global void CleanPlayers(void)
 **	Save state of players to file.
 **
 **	@param file	Output file.
+**
+**	@note FIXME: Not complete saved.
 */
 global void SavePlayers(FILE* file)
 {
@@ -220,6 +222,7 @@ global void SavePlayers(FILE* file)
 	    }
 	    fprintf(file,"%s %d",DEFAULT_NAMES[j],Players[i].Incomes[j]);
 	}
+	fprintf(file,";;FIXME: new members must be saved\n");
 
 	// UnitTypesCount done by load units.
 
