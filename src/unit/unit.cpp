@@ -216,6 +216,8 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     Unit* unit;
     Unit** slot;
 
+    DebugCheck( !player );	// Current code didn't support no player
+
     DebugLevel3Fn("%s(%d)\n",type->Name,player-Players);
 
     //
@@ -284,7 +286,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     if( type->CanCastSpell ) {
 	unit->Mana=MAGIC_FOR_NEW_UNITS;
     }
-    unit->HP=type->Stats[player->Player].HitPoints;
+    unit->HP=unit->Stats->HitPoints;
     unit->Active=1;
 
     unit->GroupId=-1;
@@ -315,23 +317,21 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 }
 
 /**
-**	Create new unit and place on map.
+**	Place unit on map.
 **
+**	@param unit	Unit to be placed.
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
-**	@param type	Pointer to unit-type.
-**	@param player	Pointer to owning player.
-**
-**	@return		Pointer to created unit.
 */
-global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
+global void PlaceUnit(Unit* unit,int x,int y)
 {
-    Unit* unit;
+    const UnitType* type;
     int h;
     int w;
 
-    unit=MakeUnit(type,player);
+    DebugCheck( !unit->Removed || unit->Destroyed );
 
+    type=unit->Type;
     //
     //	Sea and air units are 2 tiles aligned
     //
@@ -369,13 +369,6 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 		}
 	    }
 	}
-
-	//
-	//	fancy buildings: mirror buildings (but shadows not correct)
-	//
-	if ( FancyBuildings && unit->Rs > 50 ) {
-	    unit->Frame |= 128;
-	}
     } else {
 	unsigned flags;
 
@@ -396,16 +389,47 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
     //
     //	Update fog of war, if unit belongs to player on this computer
     //
-    if( player==ThisPlayer ) {
+    if( unit->Player==ThisPlayer ) {
 	MapMarkSight(x,y,unit->Stats->SightRange);
     }
 #endif
     if( type->CanSeeSubmarine ) {
-	MarkSubmarineSeen(player,unit->X,unit->Y,unit->Stats->SightRange);
+	MarkSubmarineSeen(unit->Player,unit->X,unit->Y,unit->Stats->SightRange);
     }
 
     unit->Removed=0;
     UnitCacheInsert(unit);
+
+    MustRedraw|=RedrawMinimap;
+    CheckUnitToBeDrawn(unit);
+}
+
+/**
+**	Create new unit and place on map.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**	@param type	Pointer to unit-type.
+**	@param player	Pointer to owning player.
+**
+**	@return		Pointer to created unit.
+*/
+global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
+{
+    Unit* unit;
+
+    unit=MakeUnit(type,player);
+
+    if( type->Building ) {
+	//
+	//	fancy buildings: mirror buildings (but shadows not correct)
+	//
+	if ( FancyBuildings && unit->Rs > 50 ) {
+	    unit->Frame |= 128;
+	}
+    }
+
+    PlaceUnit(unit,x,y);
 
     return unit;
 }
@@ -613,8 +637,7 @@ global void UpdateForNewUnit(const Unit* unit,int upgrade)
     const UnitType* type;
     Player* player;
 
-    DebugLevel3Fn("unit %d (%d)\n"
-	    ,UnitNumber(unit),unit->Type->Type);
+    DebugLevel3Fn("unit %d (%d)\n",UnitNumber(unit),unit->Type->Type);
 
     player=unit->Player;
     type=unit->Type;
@@ -1407,7 +1430,7 @@ global void UnitUpdateHeading(Unit* unit)
     // FIXME: depends on the possible unit directions wc 8, sc 32
     unit->Frame&=127;
     unit->Frame/=5;
-    unit->Frame*=5;
+    unit->Frame*=5;		// Remove heading, keep animation frame
     dir=((unit->Direction+NextDirection/2)&0xFF)/NextDirection;
     if( dir<=LookingS/NextDirection ) {	// north->east->south
 	unit->Frame+=dir;
@@ -1525,6 +1548,12 @@ startn:
     }
 
 found:
+    if( unit->Wait!=1 ) {
+	unit->Wait=1;
+	DebugLevel2Fn("Check this\n");
+    }
+
+    // FIXME: Should I use PlaceUnit here?
     unit->X=x;
     unit->Y=y;
     UnitCacheInsert(unit);
@@ -1532,13 +1561,6 @@ found:
     DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
     TheMap.Fields[x+y*TheMap.Width].Flags|=UnitFieldFlags(unit);
 
-    //unit->Orders[0].Action=UnitActionStill;
-    //DebugCheck( unit->SubAction );
-
-    if( unit->Wait!=1 ) {
-	unit->Wait=1;
-	DebugLevel2Fn("Check this\n");
-    }
     unit->Removed=0;
 
 #ifdef NEW_FOW
@@ -1645,6 +1667,13 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	if( bestd!=99999 ) {
 	    unit->X=bestx;
 	    unit->Y=besty;
+
+	    if( unit->Wait!=1 ) {
+		unit->Wait=1;
+		DebugLevel2Fn("Check this\n");
+	    }
+
+	    // FIXME: Should I use PlaceUnit here?
 
 	    // FIXME: This only works with 1x1 big units
 	    DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
@@ -2394,8 +2423,8 @@ global void DestroyUnit(Unit* unit)
     //	Catapults,... explodes.
     //
     if( type->ExplodeWhenKilled ) {
-	// FIXME: make it configurable? remove ident lookup
-	MakeMissile(MissileTypeByIdent("missile-explosion")
+	// FIXME: make it configurable?
+	MakeMissile(MissileTypeExplosion
 	    ,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
 	    ,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
 	    ,0,0);
@@ -2792,7 +2821,8 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 **	@param y	Y map tile position.
 */
 //FIXME: is it the correct place to put this?
-global int ViewPointDistance(int x,int y) {
+global int ViewPointDistance(int x,int y)
+{
     int x_v;
     int y_v;
     // first compute the view point coordinate
@@ -2809,7 +2839,8 @@ global int ViewPointDistance(int x,int y) {
 **	@param dest	Distance to this unit.
 */
 //FIXME: is it the correct place to put this?
-global int ViewPointDistanceToUnit(Unit* dest) {
+global int ViewPointDistanceToUnit(const Unit* dest)
+{
     int x_v;
     int y_v;
     // first compute the view point coordinate
@@ -3023,19 +3054,27 @@ global void SaveUnit(const Unit* unit,FILE* file)
     char* ref;
     int i;
 
-    fprintf(file,"\n(unit '%s\n  ",ref=UnitReference(unit));
+    fprintf(file,"\n(unit '%s ",ref=UnitReference(unit));
     free(ref);
+    // Needed to create the unit slot
+    fprintf(file,"'type '%s ",unit->Type->Ident);
+    fprintf(file,"'player %d\n  ",unit->Player->Player);
 
     if( unit->Next ) {
 	fprintf(file,"'next '%s ",ref=UnitReference(unit->Next));
 	free(ref);
     }
 
-    fprintf(file,"'tile '(%d %d)",unit->X,unit->Y);
-
-    fprintf(file," 'type '%s\n  ",unit->Type->Ident);
-    fprintf(file,"'player %d ",unit->Player->Player);
-    fprintf(file,"'stats 'S%08X\n  ",(int)unit->Stats);
+    fprintf(file,"'tile '(%d %d) ",unit->X,unit->Y);
+    for( i=0; i<PlayerMax; ++i ) {
+	if( &unit->Type->Stats[i]==unit->Stats ) {
+	    fprintf(file,"'stats %d\n  ",i);
+	    break;
+	}
+    }
+    if( i==PlayerMax ) {
+	fprintf(file,"'stats 'S%08X\n  ",(int)unit->Stats);
+    }
     fprintf(file,"'pixel '(%d %d) ",unit->IX,unit->IY);
     fprintf(file,"'%sframe %d ",
 	    unit->Frame&128 ? "flipped-" : "" ,unit->Frame&127);
@@ -3130,18 +3169,23 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	case UnitActionStill:
 	    break;
 	case UnitActionBuilded:
+	    DebugLevel0Fn("FIXME: not written\n");
 	    fprintf(file,"\n  'data-builded 'FIXME");
 	    break;
 	case UnitActionResearch:
+	    DebugLevel0Fn("FIXME: not written\n");
 	    fprintf(file,"\n  'data-reseach 'FIXME");
 	    break;
 	case UnitActionUpgradeTo:
+	    DebugLevel0Fn("FIXME: not written\n");
 	    fprintf(file,"\n  'data-upgrade-to 'FIXME");
 	    break;
 	case UnitActionTrain:
+	    DebugLevel0Fn("FIXME: not written\n");
 	    fprintf(file,"\n  'data-train 'FIXME");
 	    break;
 	default:
+	    DebugLevel0Fn("FIXME: not written\n");
 	    fprintf(file,"\n  'data-move 'FIXME");
 	    break;
     }
@@ -3166,6 +3210,11 @@ global void SaveUnits(FILE* file)
     //
     fprintf(file,"(set-hitpoint-regeneration! #%s)\n",
 	    HitPointRegeneration ? "t" : "f");
+    if( FancyBuildings ) {
+	fprintf(file,"(fancy-buildings)");
+    }
+    fprintf(file,";;(set-fancy-buildings! #%s)\n",
+	    FancyBuildings ? "t" : "f");
 
     for( table=Units; table<&Units[NumUnits]; ++table ) {
 	SaveUnit(*table,file);
@@ -3181,7 +3230,6 @@ global void SaveUnits(FILE* file)
 */
 global void InitUnits(void)
 {
-    InitUnitsMemory();
 }
 
 /**
@@ -3207,6 +3255,11 @@ global void CleanUnits(void)
 	ReleasedHead=unit->Next;
 	free(unit);
     }
+
+    InitUnitsMemory();
+
+    HitPointRegeneration=0;
+    FancyBuildings=0;
 }
 
 //@}
