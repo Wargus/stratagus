@@ -37,17 +37,17 @@ You need:
 	<LI>Any BSD System with an installed X Windows System.
 	<LI>Maybe any other Unix/POSIX OS with X Windows System installed.
 	    You may have to create the configuration by hand and install additional non-common
-	    libraries and gcc (untested).
+	    libraries (see below) and gcc (untested).
 	<LI>BeOS System with an installed X Windows System.
 	<LI>MacOS System with an installed X Windows System.
-	<LI>X Window System with 8/15/16/24/32bit X Server.
+	<LI>X Windows System with 8/15/16/24/32bit X Server.
 	<LI>Win32 system win95, win98, winME, winNT or win2000.
 	    <UL>
 		<LI>For network play WIN95 OSR2 (aka win95b) or higher is required
-                    since some features of winsock2.dll are used. We try to emulate
-		    this using wsock32.dll features, but that code is not in yet.
-		<LI>winNT mean winNT4.0 (most like + service pack 3) or higher for
-		    the same reasons.
+                    since some features of Winsock2 (WS2_32.DLL) are used. We try
+		    to emulate this using WSOCK32.DLL features, but that code is not in yet.
+		<LI>winNT mean winNT4.0 + service pack 3 or higher for the same
+		    reasons.
 	    </UL>
 	</UL>
 	<LI>libpng. (I use libpng-2.1.0, aka 1.0.5)
@@ -72,6 +72,9 @@ To use this program you need the following hardware:
 	<LI>At least an i586 133 Mhz (faster recommended) and 16 MB Ram.
 	<LI>Any graphic-card with 15/16bit videomode running with X11 or 
 	    SVGALib or Win32.
+	<LI>8/24/32 bit modes work, but may be buggy.
+	<LI>Freecraft is believed to be endian save, so other (big endian) 
+	    architectures like ppc should also work at least with Linux.
 </UL>
 
     <H2>Installation</H2>
