@@ -56,6 +56,10 @@
 #endif	// !WIN32
 #endif // !USE_SDL_NET
 
+#ifndef INADDR_NONE
+#define INADDR_NONE -1
+#endif
+
 #define BASE_OF(type, elem, p) ((type *)((char *)(p) - offsetof(type, elem)))
 
 //----------------------------------------------------------------------------
