@@ -233,6 +233,15 @@
 **
 **		Regeneration rate in HP per second
 **
+**	UnitType::BurnPercent
+**
+**		The burning limit in percents. If the unit has lees than
+**		this it will start to burn.
+**
+**	UnitType::BurnDamageRate
+**
+**		Burn rate in HP per second
+**
 **	UnitType::UnitType
 **
 **		Land / fly / naval
@@ -681,7 +690,9 @@ struct _unit_type_ {
     int		Priority;		/// Priority value / AI Treatment
     int		_BasicDamage;		/// Basic damage dealt
     int		_PiercingDamage;	/// Piercing damage dealt
-    int		_RegenerationRate;	/// HP regeneration HP per sec
+    int		_RegenerationRate;	/// HP regeneration rate per sec
+    int		BurnPercent;		/// Burning percent.
+    int		BurnDamageRate;		/// HP burn rate per sec
     int 	RepairRange;		/// Units repair range.
     char 	*CanCastSpell;		/// Unit is able to use spells.
     // FIXME: n0body: AutoBuildRate not implemented.

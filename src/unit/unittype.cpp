@@ -756,6 +756,10 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     CLprintf(file, "  'speed %d\n", type->_Speed);
     CLprintf(file, "  'hit-points %d\n", type->_HitPoints);
     CLprintf(file, "  'regeneration-rate %d\n", type->_RegenerationRate);
+    if (type->BurnPercent) {
+	CLprintf(file, "  'burn-percent %d 'burn-damage-rate %d\n",
+		type->BurnPercent, type->BurnDamageRate);
+    }
     if (all || type->_MaxMana) {
 	CLprintf(file, "  'max-mana %d\n", type->_MaxMana);
     }
