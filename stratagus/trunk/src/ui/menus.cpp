@@ -77,6 +77,7 @@ local void CustomGameStart(void);
 local void CustomGameDrawFunc(Menuitem *mi);
 
 local void CustomGameRCSAction(Menuitem *mi, int i);
+local void CustomGameTSSAction(Menuitem *mi, int i);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -289,7 +290,7 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Map Tileset:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgtssoptions, 152, 20, MBUTTON_PULLDOWN, NULL, 5, 0, 0, 0} } },
+	{ pulldown:{ cgtssoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameTSSAction, 5, 0, 0, 0} } },
 };
 
 /**
@@ -1170,6 +1171,13 @@ local void CustomGameRCSAction (Menuitem *mi __attribute__((unused)), int i)
     GameSettings.Presets[0].Race = v[i];
 }
 
+local void CustomGameTSSAction (Menuitem *mi __attribute__((unused)), int i)
+{
+    int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
+
+    GameSettings.Terrain = v[i];
+}
+
 /*----------------------------------------------------------------------------
 --	Menu operation functions
 ----------------------------------------------------------------------------*/
@@ -1723,6 +1731,18 @@ global void InitMenus(unsigned int race)
     buf = alloca(strlen(file) + 9 + 1);
     file = strcat(strcpy(buf, "graphic/"), file);
     MenuButtonGfx.Sprite = LoadSprite(file, 0, 144);
+
+    strcpy(ScenSelectPath, FreeCraftLibPath);
+    if (ScenSelectPath[0]) {
+	strcat(ScenSelectPath, "/");
+    }
+    strcat(ScenSelectPath, "swamp.rgb");
+    if (access(ScenSelectPath, F_OK) != 0) {
+	// ARI FIXME: Hack to disable Expansion Gfx..
+	// also shows how to add new tilesets....
+	CustomGameMenuItems[14].d.pulldown.noptions = 4;
+	
+    }
 }
 
 //@}
