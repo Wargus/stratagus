@@ -2506,6 +2506,7 @@ local void MapDraw32Tile32(int tile, int x, int y)
 --		Global functions
 ----------------------------------------------------------------------------*/
 
+#ifndef USE_SDL_SURFACE
 /**
 **		Called if color cycled.
 **		Must mark color cycled tiles as dirty.
@@ -2531,10 +2532,6 @@ global void MapColorCycle(void)
 	}
 #endif
 
-#ifdef USE_SDL_SURFACE
-	// FIXME: what to do?
-	i = 0;
-#else
 	if (VideoBpp == 15 || VideoBpp == 16) {
 		//
 		//		Convert 16 bit pixel table into two 32 bit tables.
@@ -2544,8 +2541,8 @@ global void MapColorCycle(void)
 			PixelsHigh[i] = (((VMemType16*)TheMap.TileData->Pixels)[i] & 0xFFFF) << 16;
 		}
 	}
-#endif
 }
+#endif
 
 /**
 **		Mark position inside viewport be drawn for next display update.
@@ -2903,7 +2900,9 @@ local void mapdeco_draw(void* dummy_data)
 */
 global void InitMap(void)
 {
+#ifndef USE_SDL_SURFACE
 	MapColorCycle();
+#endif
 
 #ifdef USE_OPENGL
 	MapDrawTile = MapDrawTileOpenGL;
