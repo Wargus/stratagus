@@ -1394,7 +1394,7 @@ global Menu Menus[] = {
 	640, 480,
 	ImageNone,
 	4, 44,
-	NetMultiClientMenuItems,		// FIXME: unfinished
+	NetMultiClientMenuItems,
 	TerminateNetConnect,
     },
     {
@@ -2077,8 +2077,8 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
     SetDefaultTextColors(rc, rc);
 
 #ifdef WITH_SOUND
-    if( SoundFildes==-1 ) {
-	VideoDrawText(16,16,LargeFont,"Sound disabled, please check!");
+    if (SoundFildes == -1) {
+	VideoDrawText(16, 16, LargeFont, "Sound disabled, please check!");
     }
 #endif
 
@@ -2386,7 +2386,7 @@ local void GameShowCredits(void)
 local void GameMenuEndScenario(void)
 {
     ProcessMenu(MENU_END_SCENARIO, 1);
-    if( !GameRunning )
+    if (!GameRunning)
 	EndMenu();
 }
 
@@ -2871,7 +2871,7 @@ local void SelectCampaignMenu(void)
 }
 
 /**
-**	FIXME: docu.
+**	Cancel button of player name menu pressed.
 */
 local void EnterNameCancel(void)
 {
@@ -2880,7 +2880,7 @@ local void EnterNameCancel(void)
 }
 
 /**
-**	FIXME: docu.
+**	Input field action of player name menu.
 */
 local void EnterNameAction(Menuitem *mi, int key)
 {
@@ -2977,6 +2977,10 @@ local void JoinNetGameMenu(void)
     ProcessMenu(MENU_NET_CONNECTING, 1);
 
     if (GuiGameStarted) {
+	VideoLockScreen();
+	StartMenusSetBackground(NULL);
+	VideoUnlockScreen();
+	Invalidate();
 	EndMenu();
     }
 }
@@ -3053,6 +3057,9 @@ local void TerminateNetConnect(void)
     }
 }
 
+/**
+**	Start processing network game setup menu (server).
+*/
 local void CreateNetGameMenu(void)
 {
     DestroyCursorBackground();
@@ -4016,7 +4023,9 @@ local void GameRESAction(Menuitem *mi, int i)
     if (!mi || mi->d.pulldown.curopt == i) {
 	GameSettings.Resources = v[i];
 	ServerSetupState.ResOpt = i;
-	NetworkServerResyncClients();
+	if (mi) {
+	    NetworkServerResyncClients();
+	}
     }
 }
 
@@ -4025,7 +4034,9 @@ local void GameUNSAction(Menuitem *mi, int i)
     if (!mi || mi->d.pulldown.curopt == i) {
 	GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
 	ServerSetupState.UnsOpt = i;
-	NetworkServerResyncClients();
+	if (mi) {
+	    NetworkServerResyncClients();
+	}
     }
 }
 
@@ -4037,7 +4048,9 @@ local void GameTSSAction(Menuitem *mi, int i)
     if (!mi || mi->d.pulldown.curopt == i) {
 	GameSettings.Terrain = v[i];
 	ServerSetupState.TssOpt = i;
-	NetworkServerResyncClients();
+	if (mi) {
+	    NetworkServerResyncClients();
+	}
     }
 }
 
@@ -4056,7 +4069,9 @@ local void MultiGameFWSAction(Menuitem *mi, int i)
     if (!mi || mi->d.pulldown.curopt == i) {
 	FlagRevealMap = i;
 	ServerSetupState.FwsOpt = i;
-	NetworkServerResyncClients();
+	if (mi) {
+	    NetworkServerResyncClients();
+	}
     }
 }
 
@@ -4406,11 +4421,16 @@ local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
 
 local void MultiClientRCSAction(Menuitem *mi, int i)
 {
+#if 0
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
+#endif
 
     if (mi->d.pulldown.curopt == i) {
 	LocalSetupState.Race[NetLocalHostsSlot] = i;
+#if 0
+	// FIXME: Handle RACES -> Not visible! Delayed to final InitConfig msg...
 	GameSettings.Presets[NetLocalHostsSlot].Race = v[i];
+#endif
 	MultiClientUpdate(0);
     }
 }
@@ -4432,9 +4452,9 @@ local void MultiClientNotReady(void)
 }
 
 /*
- * Callback from Netconnect Loop in Client-Sync State:
- * Compare Local State with Server's information
- * and force Update when changes have occured.
+ * Callback from netconnect loop in Client-Sync state:
+ * Compare local state with server's information
+ * and force update when changes have occured.
  */
 global void NetClientCheckLocalState(void)
 {

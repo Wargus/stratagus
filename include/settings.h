@@ -59,6 +59,7 @@ struct _settings_ {
     struct {
 	unsigned	Race;		/// Race of the player
 	unsigned	Team;		/// Team of player -- NOT SELECTABLE YET
+	unsigned	Type;		/// Type of player (for network games)
     }	Presets[PlayerMax];
 
 //  Common settings:
