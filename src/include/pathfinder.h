@@ -65,7 +65,7 @@ enum _move_return_ {
 ----------------------------------------------------------------------------*/
 
     /// Path matrix
-extern unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)];
+extern unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];
     /// are we using A* or the old path finder
 extern int AStarOn;
     /// cost associated to move on a tile occupied by a fixed unit
