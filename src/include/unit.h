@@ -575,6 +575,8 @@ struct _unit_ {
 		unsigned            ByPlayer : PlayerMax;    ///< Track unit seen by player
 		int                 Frame;                   ///< last seen frame/stage of buildings
 		struct _unit_type_* Type;                    ///< Pointer to last seen unit-type
+		int                 X;                       ///< Last unit->X Seen
+		int                 Y;                       ///< Last unit->Y Seen
 		signed char         IX;                      ///< Seen X image displacement to map position
 		signed char         IY;                      ///< seen Y image displacement to map position
 		unsigned            Constructed : 1;         ///< Unit seen construction
