@@ -46,7 +46,6 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern int MinimapScale;		/// Minimap scale to fit into window
 extern int MinimapX;			/// Minimap drawing position x offset
 extern int MinimapY;			/// Minimap drawing position y offset
 
