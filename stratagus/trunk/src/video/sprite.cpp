@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sprite.c	-	The general sprite functions. */
+/**@name sprite.c - The general sprite functions. */
 //
-//	(c) Copyright 2000-2002 by Lutz Sammer, Stephan Rasenberg,
-//	Nehal Mistry
+//      (c) Copyright 2000-2004 by Lutz Sammer, Stephan Rasenberg,
+//                                 Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -211,6 +211,104 @@ global void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame,
 	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
+}
+
+global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+{
+	SDL_Rect srect;
+	SDL_Rect drect;
+	int oldalpha;
+
+	srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
+	srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
+	srect.w = sprite->Width;
+	srect.h = sprite->Height;
+
+	drect.x = x;
+	drect.y = y;
+
+	oldalpha = sprite->Surface->format->alpha;
+	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, alpha);
+	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
+	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
+}
+
+global void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+{
+	SDL_Rect srect;
+	SDL_Rect drect;
+	int oldx;
+	int oldy;
+	int oldalpha;
+
+	srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
+	srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
+	srect.w = sprite->Width;
+	srect.h = sprite->Height;
+
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
+
+	drect.x = x;
+	drect.y = y;
+
+	oldalpha = sprite->Surface->format->alpha;
+	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, alpha);
+	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
+	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
+}
+
+global void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+{
+	SDL_Rect srect;
+	SDL_Rect drect;
+	int oldalpha;
+
+	srect.x = (sprite->SurfaceFlip->w - (frame % (sprite->SurfaceFlip->w /
+			sprite->Width)) * sprite->Width) - sprite->Width;
+	srect.y = (frame / (sprite->SurfaceFlip->w / sprite->Width)) * sprite->Height;
+	srect.w = sprite->Width;
+	srect.h = sprite->Height;
+
+	drect.x = x;
+	drect.y = y;
+
+	oldalpha = sprite->Surface->format->alpha;
+	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, alpha);
+	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
+}
+
+global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+{
+	SDL_Rect srect;
+	SDL_Rect drect;
+	int oldx;
+	int oldy;
+	int oldalpha;
+
+	srect.x = (sprite->SurfaceFlip->w - (frame % (sprite->SurfaceFlip->w /
+			sprite->Width)) * sprite->Width) - sprite->Width;
+	srect.y = (frame / (sprite->SurfaceFlip->w / sprite->Width)) * sprite->Height;
+	srect.w = sprite->Width;
+	srect.h = sprite->Height;
+
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
+
+	drect.x = x;
+	drect.y = y;
+
+	oldalpha = sprite->Surface->format->alpha;
+	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, alpha);
+	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
 }
 #else
 //
