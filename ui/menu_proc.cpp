@@ -1645,8 +1645,8 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
     Display *display;
     Window window;
     Atom rettype;
-    unsigned long nitem, bytes, dummy;
-    int retform, ret;
+    unsigned long nitem, dummy;
+    int retform;
 #endif
 #endif
 
@@ -1744,7 +1744,14 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			if (!(display = XOpenDisplay(NULL)))
 				break;
 
-			if ((window = XGetSelectionOwner(display, XA_PRIMARY)) == None) {
+			if ((XGetSelectionOwner(display, XA_PRIMARY)) == None) {
+				XCloseDisplay(display);
+				break;
+			}
+
+			// Creates a non maped temporary X window to hold the selection
+			if (!(window = XCreateSimpleWindow(display, 
+			    DefaultRootWindow(display), 0, 0, 1, 1, 0, 0, 0))) {
 				XCloseDisplay(display);
 				break;
 			}
@@ -1754,19 +1761,16 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 
 			XFlush(display);
 
-			XGetWindowProperty(display, window, XA_STRING, 0, 0, 0,
-					   AnyPropertyType, &rettype, &retform,
-					   &nitem, &bytes, (unsigned char **)&clipboard);
+			XGetWindowProperty(display, window, XA_STRING, 0, 1024, False, 
+					   AnyPropertyType, &rettype, &retform, &nitem, 
+					   &dummy, (unsigned char **)&clipboard);
 
-			if (bytes > 0) {
-			    ret = XGetWindowProperty(display, window, XA_STRING, 0, bytes, False, 
-						     AnyPropertyType, &rettype, &retform, &nitem, 
-						     &dummy, (unsigned char **)&clipboard);
-			} else {
-			    break;
-			}
-
+			XDestroyWindow(display, window);
 			XCloseDisplay(display);
+
+			if (clipboard == NULL) {
+				break;
+			}
 #endif
 			for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i) {
 			    if (clipboard[i] != '\r' && clipboard[i] != '\n') {
