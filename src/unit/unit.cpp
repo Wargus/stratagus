@@ -432,303 +432,6 @@ Unit* MakeUnit(UnitType* type, Player* player)
 }
 
 /**
-**  (Un)Mark on vision table the Sight of the unit
-**  (and units inside for transporter (recursively))
-**
-**  @param unit      Unit to (un)mark.
-**  @param x         X coord of first container of unit.
-**  @param y         Y coord of first container of unit.
-**  @param width     Width of the first container of unit.
-**  @param height    Height of the first container of unit.
-**  @param f         Function to (un)mark for normal vision.
-**  @param f2        Function to (un)mark for cloaking vision.
-*/
-static void MapMarkUnitSightRec(Unit* unit, int x, int y, int width, int height,
-	MapMarkerFunc* f, MapMarkerFunc* f2)
-{
-	Unit* unit_inside; // iterator on units inside unit. 
-	int i;             // number of units inside to process.
-
-	Assert(unit);
-	Assert(f);
-	MapSight(unit->Player, x, y, width, height, unit->CurrentSightRange, f);
-
-	if (unit->Type && unit->Type->DetectCloak && f2) {
-		MapSight(unit->Player, x, y, width, height, unit->CurrentSightRange, f2);
-	}
-
-	unit_inside = unit->UnitInside;
-	for (i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
-		MapMarkUnitSightRec(unit_inside, x, y, width, height, f, f2);
-	}
-}
-
-/**
-**  Return the unit not transported, by viewing the container recursively.
-**
-**  @param unit    unit from where look the first conatiner.
-**
-**  @return        Container of container of ... of unit. It is not null.
-*/
-static Unit* GetFirstContainer(const Unit* unit)
-{
-	Assert(unit);
-	while (unit->Container) {
-		unit = unit->Container;
-	}
-	return (Unit *) unit;
-}
-
-/**
-**  Mark on vision table the Sight of the unit
-**  (and units inside for transporter)
-**
-**  @param unit    unit to unmark its vision.
-**  @see MapUnmarkUnitSight.
-*/
-void MapMarkUnitSight(Unit* unit)
-{
-	Unit* container;  // First container of the unit.
-
-	Assert(unit);
-
-	container = GetFirstContainer(unit);
-	Assert(container->Type);
-	MapMarkUnitSightRec(unit,
-		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
-		MapMarkTileSight, MapMarkTileDetectCloak);
-}
-
-/**
-**  Unmark on vision table the Sight of the unit
-**  (and units inside for transporter)
-**
-**  @param unit    unit to unmark its vision.
-**  @see MapMarkUnitSight.
-*/
-void MapUnmarkUnitSight(Unit* unit)
-{
-	Unit* container;  // First container of the unit.
-
-	Assert(unit);
-	Assert(unit->Type);
-
-	container = GetFirstContainer(unit);
-	Assert(container->Type);
-	MapMarkUnitSightRec(unit,
-		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
-		MapUnmarkTileSight, MapUnmarkTileDetectCloak);
-}
-
-/**
-**  Update the Unit Current sight range to good value and transported units inside.
-**
-**  @param unit    unit to update SightRange
-**
-**  @internal before use it, MapUnmarkUnitSight(unit)
-**  and after MapMarkUnitSight(unit)
-**  are often necessary.
-**
-**  FIXME @todo manage differently unit inside with option.
-**  (no vision, min, host value, own value, bonus value, ...)
-*/
-static void UpdateUnitSightRange(Unit* unit)
-{
-	Unit* unit_inside; // iterator on units inside unit. 
-	int i;             // number of units inside to process.
-
-#if 0 // which is the better ? caller check ?
-	if (SaveGameLoading) {
-		return ;
-	}
-#else
-	Assert(!SaveGameLoading);
-#endif
-	// FIXME : these values must be configurable.
-	if (unit->Constructed) { // Units under construction have no sight range.
-		unit->CurrentSightRange = 0;
-	} else if (!unit->Container) { // proper value.
-		unit->CurrentSightRange = unit->Stats->SightRange;
-	} else { // value of it container.
-		unit->CurrentSightRange = unit->Container->CurrentSightRange;
-	}
-
-	unit_inside = unit->UnitInside;
-	for (i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
-		UpdateUnitSightRange(unit_inside);
-	}
-}
-
-/**
-**  Mark the field with the FieldFlags.
-**
-**  @param unit    unit to mark.
-*/
-static void MarkUnitFieldFlags(const Unit* unit)
-{
-	UnitType* type; // Type of the unit.
-	unsigned flags; //
-	int h;          // Tile height of the unit.
-	int w;          // Tile width of the unit.
-	int x;          // X tile of the unit.
-	int y;          // Y tile of the unit.
-
-	Assert(unit);
-	type = unit->Type;
-	x = unit->X;
-	y = unit->Y;
-	flags = type->FieldFlags;
-	for (h = type->TileHeight; h--;) {
-		for (w = type->TileWidth; w--;) {
-			TheMap.Fields[x + w + (y + h) * TheMap.Width].Flags |= flags;
-		}
-	}
-#ifdef MAP_REGIONS
-	// Update map splitting.
-	if (type->Building && (flags &
-		 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
-		  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))) {
-		MapSplitterTilesOccuped(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
-	}
-#endif
-
-}
-
-/**
-**  Mark the field with the FieldFlags.
-**
-**  @param unit    unit to mark.
-*/
-static void UnmarkUnitFieldFlags(const Unit* unit)
-{
-	UnitType* type; // Type of the unit.
-	unsigned flags; //
-	int h;          // Tile height of the unit.
-	int w;          // Tile width of the unit.
-	int x;          // X tile of the unit.
-	int y;          // Y tile of the unit.
-
-	Assert(unit);
-	type = unit->Type;
-	x = unit->X;
-	y = unit->Y;
-	flags = type->FieldFlags;
-	for (h = type->TileHeight; h--;) {
-		for (w = type->TileWidth; w--;) {
-			TheMap.Fields[x + w + (y + h) * TheMap.Width].Flags &= ~flags;
-		}
-	}
-#ifdef MAP_REGIONS
-	// Update map splitting.
-	if (type->Building && (flags &
-		 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
-		  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))){
-		MapSplitterTilesCleared(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
-	}
-#endif
-}
-
-/**
-** Add unit to a container. It only updates linked list stuff
-**
-** @param unit    Pointer to unit.
-** @param host    Pointer to container.
-*/
-void AddUnitInContainer(Unit* unit, Unit* host)
-{
-	Assert(host && unit->Container == 0);
-	unit->Container = host;
-	if (host->InsideCount == 0) {
-		unit->NextContained = unit->PrevContained = unit;
-	} else {
-		unit->NextContained = host->UnitInside;
-		unit->PrevContained = host->UnitInside->PrevContained;
-		host->UnitInside->PrevContained->NextContained = unit;
-		host->UnitInside->PrevContained = unit;
-	}
-	host->UnitInside = unit;
-	host->InsideCount++;
-}
-
-/**
-** Remove unit from a container. It only updates linked list stuff
-**
-** @param unit    Pointer to unit.
-*/
-static void RemoveUnitFromContainer(Unit* unit)
-{
-	Unit* host;  // transporter which contain unit.
-
-	host = unit->Container;
-	Assert(unit->Container);
-	Assert(unit->Container->InsideCount > 0);
-	host->InsideCount--;
-	unit->NextContained->PrevContained = unit->PrevContained;
-	unit->PrevContained->NextContained = unit->NextContained;
-	if (host->InsideCount == 0) {
-		host->UnitInside = NoUnitP;
-	} else {
-		if (host->UnitInside == unit) {
-			host->UnitInside = unit->NextContained;
-		}
-	}
-	unit->Container = NoUnitP;
-}
-
-
-/**
-**  Affect Tile coord of an unit (with units inside) to tile (x, y).
-**
-**  @param unit    unit to move.
-**  @param x       X map tile position.
-**  @param y       Y map tile position.
-**
-**  @internal before use it, UnitCacheRemove(unit), MapUnmarkUnitSight(unit)
-**  and after UnitCacheInsert(unit), MapMarkUnitSight(unit)
-**  are often necessary. Check Flag also for Pathfinder.
-*/
-static void UnitInXY(Unit* unit, int x, int y)
-{
-	Unit* unit_inside;      // iterator on units inside unit. 
-	int i;                  // number of units inside to process.
-
-	Assert(unit);
-	unit->X = x;
-	unit->Y = y;
-
-	unit_inside = unit->UnitInside;
-	for (i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
-		UnitInXY(unit_inside, x, y);
-	}
-}
-
-/**
-**  Move an unit (with units inside) to tile (x, y).
-**  (Do stuff with vision, cachelist and pathfinding).
-**
-**  @param unit    unit to move.
-**  @param x       X map tile position.
-**  @param y       Y map tile position.
-**
-*/
-void MoveUnitToXY(Unit* unit, int x, int y)
-{
-	MapUnmarkUnitSight(unit);
-	UnitCacheRemove(unit);
-	UnmarkUnitFieldFlags(unit);
-
-	// Move the unit.
-	UnitInXY(unit, x, y);
-
-	UnitCacheInsert(unit);
-	MarkUnitFieldFlags(unit);
-	MapMarkUnitSight(unit);
-}
-
-
-
-
-/**
 ** Place unit on map.
 **
 ** @param unit    Unit to be placed.
@@ -737,23 +440,63 @@ void MoveUnitToXY(Unit* unit, int x, int y)
 */
 void PlaceUnit(Unit* unit, int x, int y)
 {
+	const UnitType* type;
+	int h;
+	int w;
+	unsigned flags;
+
 	Assert(unit->Removed);
 
-	if (unit->Container) {
-		RemoveUnitFromContainer(unit);
+	type = unit->Type;
+
+
+	unit->X = x;
+	unit->Y = y;
+
+	//
+	// Place unit on the map, mark the field with the FieldFlags.
+	//
+	flags = type->FieldFlags;
+	for (h = type->TileHeight; h--;) {
+		for (w = type->TileWidth; w--;) {
+			TheMap.Fields[x + w + (y + h) * TheMap.Width].Flags |= flags;
+		}
 	}
-	unit->Next = 0;
-	if (!SaveGameLoading) {
-		UpdateUnitSightRange(unit);
+
+#ifdef MAP_REGIONS
+	if (type->Building &&
+			(type->FieldFlags &
+		 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
+		  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))){
+		MapSplitterTilesOccuped(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
 	}
+#endif
+
+	x += unit->Type->TileWidth / 2;
+	y += unit->Type->TileHeight / 2;
+
+	//
+	// Units under construction have no sight range.
+	//
+	if (!unit->Constructed) {
+		//
+		// Update fog of war, if unit belongs to player on this computer
+		//
+		if (unit->Container && unit->Removed) {
+			MapUnmarkUnitOnBoardSight(unit, unit->Container);
+		}
+		if (unit->Container) {
+			RemoveUnitFromContainer(unit);
+		}
+		if (!SaveGameLoading) {
+			unit->CurrentSightRange = unit->Stats->SightRange;
+		}
+		MapMarkUnitSight(unit);
+	}
+
 	unit->Removed = 0;
-	UnitInXY(unit, x, y);
-	// Pathfinding info.
-	MarkUnitFieldFlags(unit);
-	// Tha cache list.
+	unit->Next = 0;
 	UnitCacheInsert(unit);
-	// Vision
-	MapMarkUnitSight(unit);
 
 	MustRedraw |= RedrawMinimap;
 	UnitCountSeen(unit);
@@ -780,6 +523,61 @@ Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 }
 
 /**
+** Add unit to a container. It only updates linked list stuff
+**
+** @param unit    Pointer to unit.
+** @param host    Pointer to container.
+*/
+void AddUnitInContainer(Unit* unit, Unit* host)
+{
+	if (unit->Container) {
+		DebugPrint("Unit is already contained.\n");
+		exit(0);
+	}
+	unit->Container = host;
+	if (host->InsideCount == 0) {
+		unit->NextContained = unit->PrevContained = unit;
+	} else {
+		unit->NextContained = host->UnitInside;
+		unit->PrevContained = host->UnitInside->PrevContained;
+		host->UnitInside->PrevContained->NextContained = unit;
+		host->UnitInside->PrevContained = unit;
+	}
+	host->UnitInside = unit;
+	host->InsideCount++;
+}
+
+/**
+** Remove unit from a container. It only updates linked list stuff
+**
+** @param unit    Pointer to unit.
+*/
+void RemoveUnitFromContainer(Unit* unit)
+{
+	Unit* host;
+	host = unit->Container;
+	if (!unit->Container) {
+		DebugPrint("Unit not contained.\n");
+		exit(0);
+	}
+	if (host->InsideCount == 0) {
+		DebugPrint("host's inside count reached -1.");
+		exit(0);
+	}
+	host->InsideCount--;
+	unit->NextContained->PrevContained = unit->PrevContained;
+	unit->PrevContained->NextContained = unit->NextContained;
+	if (host->InsideCount == 0) {
+		host->UnitInside = NoUnitP;
+	} else {
+		if (host->UnitInside == unit) {
+			host->UnitInside = unit->NextContained;
+		}
+	}
+	unit->Container = NoUnitP;
+}
+
+/**
 ** Remove unit from map.
 **
 ** Update selection.
@@ -791,24 +589,27 @@ Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 */
 void RemoveUnit(Unit* unit, Unit* host)
 {
+	int h;
+	int w;
+	const UnitType* type;
+	unsigned flags;
+
+	if (unit->Removed && unit->Container) {
+		MapUnmarkUnitOnBoardSight(unit, unit->Container);
+	} else {
+		MapUnmarkUnitSight(unit);
+	}
+	if (host) {
+		unit->CurrentSightRange = host->CurrentSightRange;
+		MapMarkUnitOnBoardSight(unit, host);
+		AddUnitInContainer(unit, host);
+	}
+
 	if (unit->Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
-		DebugPrint("unit '%s' already remove" _C_ unit->Type->Ident);
 		return;
 	}
-	UnitCacheRemove(unit);
-	MapUnmarkUnitSight(unit);
-	UnmarkUnitFieldFlags(unit);
-	if (host) {
-		AddUnitInContainer(unit, host);
-		UpdateUnitSightRange(unit);
-		UnitInXY(unit, host->X, host->Y);
-		MapMarkUnitSight(unit);
-		unit->Next = host; // What is it role ?
-	}
-
 	unit->Removed = 1;
-
 	//  Remove unit from the current selection
 	if (unit->Selected) {
 		if (NumSelected == 1) { //  Remove building cursor
@@ -826,6 +627,37 @@ void RemoveUnit(Unit* unit, Unit* host)
 	if (unit == UnitUnderCursor) {
 		UnitUnderCursor = NULL;
 	}
+
+	type = unit->Type;
+
+	//
+	// Update map
+	//
+	flags = ~type->FieldFlags;
+	for (h = type->TileHeight; h--;) {
+		for (w = type->TileWidth; w--;) {
+			TheMap.Fields[unit->X + w + (unit->Y + h) * TheMap.Width].Flags &= flags;
+		}
+	}
+
+#ifdef MAP_REGIONS
+	//
+	// Update map splitting.
+	//
+	if (type->Building &&
+			(type->FieldFlags &
+		 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
+		  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))){
+		MapSplitterTilesCleared(unit->X, unit->Y,
+			unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
+	}
+#endif
+
+	if (host) {
+		UnitCacheRemove(unit);
+		unit->Next = host;
+	}
+
 	MustRedraw |= RedrawMinimap;
 }
 
@@ -1525,9 +1357,15 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 	}
 	*unit->PlayerSlot = unit;
 
-	MapUnmarkUnitSight(unit);
-	unit->Player = newplayer;
-	MapMarkUnitSight(unit);
+	if (unit->Removed && unit->Container) {
+		MapUnmarkUnitOnBoardSight(unit, unit->Next);
+		unit->Player = newplayer;
+		MapMarkUnitOnBoardSight(unit, unit->Next);
+	} else {
+		MapUnmarkUnitSight(unit);
+		unit->Player = newplayer;
+		MapMarkUnitSight(unit);
+	}
 
 	unit->Stats = &unit->Type->Stats[newplayer->Player];
 	//
@@ -2696,6 +2534,7 @@ void LetUnitDie(Unit* unit)
 	// removed units,  just remove.
 	if (unit->Removed) {
 		DebugPrint("Killing a removed unit?\n");
+		RemoveUnit(unit, NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		ReleaseUnit(unit);
@@ -2741,8 +2580,8 @@ void LetUnitDie(Unit* unit)
 			// Restore value for oil-patch
 			unit->Value = unit->Data.Builded.Worker->Value;
 		}
-
 		DestroyAllInside(unit);
+
 		RemoveUnit(unit, NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);
@@ -2753,6 +2592,7 @@ void LetUnitDie(Unit* unit)
 			unit->State = unit->Type->CorpseScript;
 			Assert(type->TileWidth == type->CorpseType->TileWidth &&
 					type->TileHeight == type->CorpseType->TileHeight);
+			MapMarkUnitSight(unit);
 			type = unit->Type = type->CorpseType;
 
 #ifdef DYNAMIC_LOAD
@@ -2764,7 +2604,7 @@ void LetUnitDie(Unit* unit)
 			unit->IY = (type->Height - VideoGraphicHeight(type->Sprite)) / 2;
 
 			unit->SubAction = 0;
-			unit->Removed = 0;
+			//unit->Removed = 0;
 			unit->Frame = 0;
 			unit->Orders[0].Action = UnitActionDie;
 
@@ -2772,11 +2612,13 @@ void LetUnitDie(Unit* unit)
 				unit->Type->Animations->Die);
 			UnitShowAnimation(unit, unit->Type->Animations->Die);
 			DebugPrint("Frame %d\n" _C_ unit->Frame);
+			MapUnmarkUnitSight(unit);
 			unit->CurrentSightRange = type->Stats[unit->Player->Player].SightRange;
 			MapMarkUnitSight(unit);
-			UnitCacheInsert(unit);
 		} else {
 			// no corpse available
+			MapMarkUnitSight(unit);
+			MapUnmarkUnitSight(unit);
 			unit->CurrentSightRange = 0;
 		}
 		return;
@@ -2787,6 +2629,7 @@ void LetUnitDie(Unit* unit)
 		// FIXME: destroy or unload : do a flag.
 		DestroyAllInside(unit);
 	}
+
 	RemoveUnit(unit, NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
@@ -2797,18 +2640,18 @@ void LetUnitDie(Unit* unit)
 
 	// Not good: UnitUpdateHeading(unit);
 	unit->SubAction = 0;
+	//unit->Removed = 0;
 	unit->State = 0;
 	unit->Reset = 0;
 	unit->Wait = 1;
 	unit->Orders[0].Action = UnitActionDie;
+
 	if (unit->Type->CorpseType) {
 		unit->CurrentSightRange = unit->Type->CorpseType->Stats[unit->Player->Player].SightRange;
-		MapMarkUnitSight(unit);
 	} else {
 		unit->CurrentSightRange = 0;
 	}
-	unit->Removed = 0;
-	UnitCacheInsert(unit);
+	MapMarkUnitSight(unit);;
 }
 
 /**
@@ -2826,6 +2669,7 @@ void DestroyAllInside(Unit* source)
 		if (unit->UnitInside) {
 			DestroyAllInside(unit);
 		}
+		RemoveUnit(unit, NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		ReleaseUnit(unit);
