@@ -1112,6 +1112,10 @@ SOURCE=.\src\include\editor.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\include\fc_types.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\include\font.h
 # End Source File
 # Begin Source File
@@ -1160,10 +1164,6 @@ SOURCE=.\src\include\movie.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\mpq.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\include\myendian.h
 # End Source File
 # Begin Source File
@@ -1201,10 +1201,6 @@ SOURCE=.\src\include\rdtsc.h
 # Begin Source File
 
 SOURCE=.\src\include\script.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\script_helpers.h
 # End Source File
 # Begin Source File
 
