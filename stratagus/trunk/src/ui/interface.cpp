@@ -526,7 +526,7 @@ local void UiFindIdleWorker(void)
 local void UiToggleGrabMouse(void)
 {
     DebugLevel0Fn("%x\n",KeyModifiers);
-    ToggleGrabMouse();
+    ToggleGrabMouse(0);
     SetStatusLine("Grab mouse toggled.");
 }
 

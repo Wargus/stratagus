@@ -1062,7 +1062,7 @@ global void SaveCursors(FILE* file)
     }
 
     // Not ready:
-    fprintf(file,";;(game-cursor '%s)\n",GameCursor->Ident);
+    fprintf(file,";;(set-game-cursor! '%s)\n",GameCursor->Ident);
     // FIXME: what about the other variables???
     switch( CursorState ) {
 	case CursorStatePoint:

@@ -59,9 +59,10 @@ global enum _mouse_buttons_ MouseButtons;/// current pressed mouse buttons
 
 global enum _key_modifiers_ KeyModifiers;/// current keyboard modifiers
 
-global int ButtonUnderCursor=-1;	/// Button under cursor
-global int GameMenuButtonClicked=0;	/// Game menu button (F10) was clicked
 global Unit* UnitUnderCursor;		/// Unit under cursor
+global int ButtonUnderCursor=-1;	/// Button under cursor
+global char GameMenuButtonClicked;	/// Game menu button (F10) was clicked
+global char LeaveStops;			/// Mouse leaves windows stops scroll
 
 global enum _cursor_on_ CursorOn=CursorOnUnknown;	/// cursor on field
 
@@ -563,6 +564,9 @@ local void HandleMouseOn(int x,int y)
 */
 global void HandleMouseExit(void)
 {
+    if( !LeaveStops ) {			// Disabled
+	return;
+    }
     //
     // Denote cursor not on anything in window (used?)
     //
