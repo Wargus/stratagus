@@ -466,9 +466,11 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 	damage -= SyncRand() % ((damage + 2) / 2);
     }
 #else
-    damage = min(basic_damage-goal_stats->Armor,1)+piercing_damage;
+    damage = max(basic_damage-goal_stats->Armor,1)+piercing_damage;
     damage -= SyncRand() % ((damage+2)/2);
+    DebugCheck(damage<0);
 #endif
+	
     DebugLevel3Fn("\nDamage done [%d] %d %d ->%d\n" _C_ goal_stats->Armor _C_
 	    basic_damage _C_ piercing_damage _C_ damage);
 
