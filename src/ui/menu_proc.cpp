@@ -1426,6 +1426,8 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    default:
 			break;
 		}
+		if (mi->d.input.action)
+		    (*mi->d.input.action)(mi, 'x');
 	    }
 	}
     }
