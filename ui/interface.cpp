@@ -311,7 +311,7 @@ local void UiEnterMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    ProcessMenu(MENU_GAME, 1);
+    ProcessMenu("menu-game", 1);
 }
 
 /**
@@ -320,7 +320,7 @@ local void UiEnterMenu(void)
 local void UiEnterHelpMenu(void)
 {
     GamePaused=1;
-    ProcessMenu(MENU_HELP, 1);
+    ProcessMenu("menu-help", 1);
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
@@ -335,7 +335,7 @@ local void UiEnterOptionsMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    ProcessMenu(MENU_GAME_OPTIONS, 1);
+    ProcessMenu("menu-game-options", 1);
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
@@ -784,7 +784,7 @@ local int CommandKey(int key)
 		break;
 	    }
 	    if( !(KeyModifiers&ModifierAlt) ) {
-		SavePud("freecraft.pud",&TheMap);
+		SavePud("freecraft.pud.gz",&TheMap);
 		SetMessage("Pud saved");
 		break;
 	    }

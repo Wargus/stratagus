@@ -2150,7 +2150,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(GameMenuSave,"game-menu-save");
     HASHADD(GameMenuLoad,"game-menu-load");
     HASHADD(GameOptions,"game-options");
-    HASHADD(HelpMenu,"help-menu");
+    HASHADD(HelpMenu,"menu-help");
     HASHADD(GameMenuObjectives,"game-menu-objectives");
     HASHADD(GameMenuEndScenario,"game-menu-end-scenario");
     HASHADD(GameMenuReturn,"game-menu-return");
@@ -2334,9 +2334,9 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorLoadOk,"editor-load-ok");
     HASHADD(EditorLoadCancel,"editor-load-cancel");
     HASHADD(EditorLoadFolder,"editor-load-folder");
-    HASHADD(EditorMapProperties,"editor-map-properties");
+    HASHADD(EditorMapProperties,"menu-editor-map-properties");
     HASHADD(EditorEnterMapDescriptionAction,"editor-enter-map-description-action");
-    HASHADD(EditorPlayerProperties,"editor-player-properties");
+    HASHADD(EditorPlayerProperties,"menu-editor-player-properties");
 
 // Editor menu
     HASHADD(EditorQuitMenu,"editor-quit-menu");
@@ -2416,7 +2416,7 @@ local void InitSaveGameMenu(Menuitem *mi)
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
 #else
     menu = mi->menu;
 #endif
@@ -2445,7 +2445,7 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
     }
     TypedFileName = 1;
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
     menu->items[5].flags = MenuButtonDisabled;
 #else
     mi->menu->items[5].flags = MenuButtonDisabled;
@@ -2459,7 +2459,7 @@ local void SaveAction(void)
     Menu *menu;
     size_t nameLength;
   
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
     name = menu->items[1].d.input.buffer;
 
     nameLength = strlen(name);
@@ -2477,7 +2477,7 @@ local void SaveAction(void)
         SaveGame(filename);
 	SetMessage("Saved game to: %s", filename);
     } else {
-	ProcessMenu(MENU_CONFIRM_SAVE, 1);
+	ProcessMenu("menu-save-confirm", 1);
     }
 
     EndMenu();
@@ -2508,13 +2508,13 @@ global void GameMenuSave(void)
     char savegame_buffer[32];
     Menu *menu;
 
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
     strcpy(savegame_buffer, "~!_");
     menu->items[1].d.input.buffer = savegame_buffer;
     menu->items[1].d.input.nch = 0; /* strlen(savegame_buffer) - 3; */
     menu->items[1].d.input.maxch = 24;
     menu->items[4].flags = MenuButtonDisabled;	/* Save button! */
-    ProcessMenu(MENU_SAVE_GAME, 1);
+    ProcessMenu("menu-save-game", 1);
 }
 
 // FIXME: modify function
@@ -2537,7 +2537,7 @@ local void SaveLBInit(Menuitem *mi)
 #ifdef OLD_MENU
     Menu *menu;
 
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
 #endif
     SaveLBExit(mi);
 
@@ -2576,7 +2576,7 @@ local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
 #ifdef OLD_MENU
-		    menu = FindMenu(MENU_SCEN_SELECT);
+		    menu = FindMenu("menu-select-scenario");
 #else
 		    menu = mi->menu;
 #endif
@@ -2614,7 +2614,7 @@ local void SaveLBAction(Menuitem *mi, int i)
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
 #else
     menu = mi->menu;
 #endif
@@ -2734,7 +2734,7 @@ local void SaveOk(void)
     Menu *menu;
     int i;
 
-    menu = FindMenu(MENU_SCEN_SELECT);
+    menu = FindMenu("menu-select-scenario");
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
 
@@ -2812,7 +2812,7 @@ local void InitLoadGameMenu(Menuitem *mi)
 #ifdef OLD_MENU
     Menu *menu;
 
-    menu = FindMenu(MENU_LOAD_GAME);
+    menu = FindMenu("menu-load-game");
     menu->items[3].flags = MI_DISABLED;
 #else
     mi->menu->items[3].flags = MI_DISABLED;
@@ -2840,7 +2840,7 @@ local void LoadLBInit(Menuitem *mi)
     int i;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_LOAD_GAME);
+    menu = FindMenu("menu-load-game");
 #else
     menu = mi->menu;
 #endif
@@ -2873,7 +2873,7 @@ local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
 #ifdef OLD_MENU
-		    menu = FindMenu(MENU_SCEN_SELECT);
+		    menu = FindMenu("menu-select-scenario");
 #else
 		    menu = mi->menu;
 #endif
@@ -2913,7 +2913,7 @@ local void LoadLBAction(Menuitem *mi, int i)
     FileList *fl;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_LOAD_GAME);
+    menu = FindMenu("menu-load-game");
 #endif
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
@@ -3033,7 +3033,7 @@ local void LoadOk(void)
     Menu *menu;
     int i;
 
-    menu = FindMenu(MENU_SCEN_SELECT);
+    menu = FindMenu("menu-select-scenario");
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
@@ -3066,7 +3066,7 @@ local void LoadOk(void)
 local void SaveMenu(void)
 {
     EndMenu();
-    ProcessMenu(MENU_CONFIRM_SAVE, 1);
+    ProcessMenu("menu-save-confirm", 1);
 }
 #endif
 
@@ -3076,7 +3076,7 @@ local void ConfirmSaveInit(Menuitem * mi __attribute__ ((unused)))
     int fileLength;
     Menu *menu;
 
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
     fileLength = strlen(menu->items[1].d.input.buffer);
     if (TypedFileName) {
 	fileLength -= 3;
@@ -3087,7 +3087,7 @@ local void ConfirmSaveInit(Menuitem * mi __attribute__ ((unused)))
     if (strstr(name, ".sav") == NULL) {
 	strcat(name, ".sav");
     }
-    menu = FindMenu(MENU_CONFIRM_SAVE);
+    menu = FindMenu("menu-save-confirm");
     menu->items[2].d.text.text = name;
 }
 
@@ -3097,7 +3097,7 @@ local void ConfirmSaveFile(void)
     int fileLength;
     Menu *menu;
 
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
     fileLength = strlen(menu->items[1].d.input.buffer);
     if (TypedFileName) {
 	fileLength -= 3;
@@ -3117,7 +3117,7 @@ local void ConfirmSaveFile(void)
 local void FcDeleteMenu(void)
 {
     EndMenu();
-    ProcessMenu(MENU_CONFIRM_DELETE, 1);
+    ProcessMenu("menu-delete-confirm", 1);
 }
 
 local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
@@ -3126,13 +3126,13 @@ local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
 #else
     menu = mi->menu;
 #endif
     strcpy(name, "the file: ");
     strcat(name, menu->items[1].d.input.buffer);
-    menu = FindMenu(MENU_CONFIRM_DELETE);
+    menu = FindMenu("menu-delete-confirm");
     menu->items[2].d.text.text = name;
 }
   
@@ -3141,7 +3141,7 @@ local void FcDeleteFile(void)
     Menu *menu;
     char name[PATH_MAX];
 
-    menu = FindMenu(MENU_SAVE_GAME);
+    menu = FindMenu("menu-save-game");
     strcpy(name, SaveDir);
     strcat(name, "/");
     strcat(name, menu->items[1].d.input.buffer);
@@ -3149,7 +3149,7 @@ local void FcDeleteFile(void)
     EndMenu();
     *menu->items[1].d.input.buffer = '\0';
     menu->items[1].d.input.nch = 0;
-    ProcessMenu(MENU_SAVE_GAME, 1);
+    ProcessMenu("menu-save-game", 1);
 }
 
 local void LoadAction(void)
@@ -3160,7 +3160,7 @@ local void LoadAction(void)
     char *name;
     size_t nameLength;
 
-    menu = FindMenu(MENU_LOAD_GAME);
+    menu = FindMenu("menu-load-game");
     fl = menu->items[1].d.listbox.options;
 
     name = fl[menu->items[1].d.listbox.curopt].name;
@@ -3180,10 +3180,10 @@ global void GameMenuLoad(void)
 {
     Menu *menu;
 
-    menu = FindMenu(MENU_LOAD_GAME);
+    menu = FindMenu("menu-load-game");
     menu->items[3].flags = MI_DISABLED;		// Load button!
     GameLoaded=0;
-    ProcessMenu(MENU_LOAD_GAME, 1);
+    ProcessMenu("menu-load-game", 1);
     if( GameLoaded ) {
 	GameMenuReturn();
     }
@@ -3198,7 +3198,7 @@ global void SoundOptions(void)
 {
     Menu *menu;
 
-    menu = FindMenu(MENU_SOUND_OPTIONS);
+    menu = FindMenu("menu-sound-options");
 #ifdef WITH_SOUND
     menu->items[2].flags = 0;				// master volume slider
     menu->items[5].d.gem.state = MI_GSTATE_CHECKED;	// master power
@@ -3257,9 +3257,9 @@ global void SoundOptions(void)
     menu->items[21].flags = -1;			// random tracks button
 #endif
     if (InterfaceState == IfaceStateMenu)
-	ProcessMenu(MENU_SOUND_OPTIONS, 0);
+	ProcessMenu("menu-sound-options", 0);
     else
-	ProcessMenu(MENU_SOUND_OPTIONS, 1);
+	ProcessMenu("menu-sound-options", 1);
 #endif // with sound
 }
 
@@ -3438,7 +3438,7 @@ global void SpeedSettings(void)
     Menu *menu;
     int i = 2;
 
-    menu = FindMenu(MENU_SPEED_SETTINGS);
+    menu = FindMenu("menu-settings-speed");
     menu->items[i].d.hslider.percent = ((VideoSyncSpeed - MIN_GAME_SPEED) * 100) / (MAX_GAME_SPEED - MIN_GAME_SPEED);
     if (menu->items[i].d.hslider.percent < 0)
 	menu->items[i].d.hslider.percent = 0;
@@ -3450,7 +3450,7 @@ global void SpeedSettings(void)
     menu->items[i + 8].d.hslider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 10;
     if (TheUI.KeyScroll == 0)
 	menu->items[i + 8].d.hslider.percent = 0;
-    ProcessMenu(MENU_SPEED_SETTINGS, 1);
+    ProcessMenu("menu-settings-speed", 1);
 }
 
 /**
@@ -3463,7 +3463,7 @@ global void Preferences(void)
 {
     Menu *menu;
 
-    menu = FindMenu(MENU_PREFERENCES);
+    menu = FindMenu("menu-preferences");
     if (!TheMap.NoFogOfWar) {
 	menu->items[1].d.gem.state = MI_GSTATE_CHECKED;
     } else {
@@ -3482,7 +3482,7 @@ global void Preferences(void)
 	menu->items[3].d.gem.state = MI_GSTATE_UNCHECKED;
     }
 
-    ProcessMenu(MENU_PREFERENCES, 1);
+    ProcessMenu("menu-preferences", 1);
 }
 
 /**
@@ -3490,7 +3490,7 @@ global void Preferences(void)
 */
 local void GameOptions(void)
 {
-    ProcessMenu(MENU_GAME_OPTIONS, 1);
+    ProcessMenu("menu-game-options", 1);
 }
 
 /**
@@ -3514,7 +3514,7 @@ local void GameShowCredits(void)
 */
 local void GameMenuEndScenario(void)
 {
-    ProcessMenu(MENU_END_SCENARIO, 1);
+    ProcessMenu("menu-end-scenario", 1);
     if (!GameRunning)
 	EndMenu();
 }
@@ -3567,28 +3567,28 @@ local void KeystrokeHelpMenu(void)
 {
     Menu *menu;
 
-    menu = FindMenu(MENU_KEYSTROKE_HELP);
+    menu = FindMenu("menu-keystroke-help");
     menu->items[1].d.vslider.percent = 0;
-    ProcessMenu(MENU_KEYSTROKE_HELP, 1);
+    ProcessMenu("menu-keystroke-help", 1);
 }
 
 local void HelpMenu(void)
 {
-    ProcessMenu(MENU_HELP, 1);
+    ProcessMenu("menu-help", 1);
 }
 
 local void ShowTipsMenu(void)
 {
     Menu *menu;
 
-    menu = FindMenu(MENU_TIPS);
+    menu = FindMenu("menu-tips");
     if (ShowTips) {
 	menu->items[1].d.gem.state = MI_GSTATE_CHECKED;
     } else {
 	menu->items[1].d.gem.state = MI_GSTATE_UNCHECKED;
     }
 
-    ProcessMenu(MENU_TIPS, 1);
+    ProcessMenu("menu-tips", 1);
 }
 
 /**
@@ -3599,7 +3599,7 @@ local void FreeTips()
     int i;
     Menu *menu;
 
-    menu = FindMenu(MENU_TIPS);
+    menu = FindMenu("menu-tips");
     for( i=5; i<13; i++ ) {
 	if( menu->items[i].d.text.text ) {
 	    free(menu->items[i].d.text.text);
@@ -3628,7 +3628,7 @@ local void InitTips(Menuitem *mi)
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_TIPS);
+    menu = FindMenu("menu-tips");
 #else
     menu = mi->menu;
 #endif
@@ -3697,7 +3697,7 @@ local void SetTips(Menuitem *mi)
 #ifdef OLD_MENU
     Menu *menu;
 
-    menu = FindMenu(MENU_TIPS);
+    menu = FindMenu("menu-tips");
     if (menu->items[1].d.gem.state == MI_GSTATE_CHECKED)
 #else
     if (mi->menu->items[1].d.gem.state == MI_GSTATE_CHECKED)
@@ -3760,7 +3760,7 @@ local void SetMenuObjectives(void)
     int l;
     Menu *menu;
 
-    menu = FindMenu(MENU_OBJECTIVES);
+    menu = FindMenu("menu-objectives");
     w=menu->xsize-2*menu->items[1].xofs;
     font=menu->items[1].font;
     i=0;
@@ -3813,7 +3813,7 @@ local void FreeMenuObjectives(void)
     int i;
     Menu *menu;
 
-    menu = FindMenu(MENU_OBJECTIVES);
+    menu = FindMenu("menu-objectives");
     for( i=1;i<menu->nitems-1;i++ ) {
 	if( menu->items[i].d.text.text ) {
 	    free(menu->items[i].d.text.text);
@@ -3828,7 +3828,7 @@ local void FreeMenuObjectives(void)
 local void GameMenuObjectives(void)
 {
     SetMenuObjectives();
-    ProcessMenu(MENU_OBJECTIVES, 1);
+    ProcessMenu("menu-objectives", 1);
     FreeMenuObjectives();
 }
 
@@ -3863,7 +3863,7 @@ local void GetInfoFromSelectPath(void)
 */
 local void ScenSelectMenu(void)
 {
-    ProcessMenu(MENU_SCEN_SELECT, 1);
+    ProcessMenu("menu-select-scenario", 1);
 
     GetInfoFromSelectPath();
 }
@@ -3884,7 +3884,7 @@ local void SinglePlayerGameMenu(void)
 {
     DestroyCursorBackground();
     GuiGameStarted = 0;
-    ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
+    ProcessMenu("menu-custom-game", 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -3905,7 +3905,7 @@ local void CampaignGameMenu(void)
     VideoUnlockScreen();
     Invalidate();
 
-    menu = FindMenu(MENU_CAMPAIGN_SELECT);
+    menu = FindMenu("menu-campaign-select");
     DebugLevel0Fn("%d campaigns available\n" _C_ NumCampaigns);
     IfDebug(
 	for( i=0; i<NumCampaigns; ++i ) {
@@ -3934,7 +3934,7 @@ local void CampaignGameMenu(void)
     }
 
     GuiGameStarted = 0;
-    ProcessMenu(MENU_CAMPAIGN_SELECT, 1);
+    ProcessMenu("menu-campaign-select", 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -3961,7 +3961,7 @@ local void StartCampaignFromMenu(int number)
 
     // Any Campaign info should be displayed through a DrawFunc() Item
     // int the CAMPAIN_CONT menu processed below...
-    ProcessMenu(MENU_CAMPAIGN_CONT, 1);
+    ProcessMenu("menu-campaign-continue", 1);
     // Set GuiGameStarted = 1 to acctually run a game here...
     // See CustomGameStart() for info...
 #endif
@@ -4033,7 +4033,7 @@ local void SelectCampaignMenu(void)
 local void EnterNameCancel(void)
 {
     Menu *menu;
-    menu = FindMenu(MENU_ENTER_NAME);
+    menu = FindMenu("menu-enter-name");
     menu->items[1].d.input.nch = 0;
     EndMenu();
 }
@@ -4059,7 +4059,7 @@ local void EnterNameAction(Menuitem *mi, int key)
 local void EnterServerIPCancel(void)
 {
     Menu *menu;
-    menu = FindMenu(MENU_NET_ENTER_SERVER_IP);
+    menu = FindMenu("menu-enter-server");
     menu->items[1].d.input.nch = 0;
     EndMenu();
 }
@@ -4100,7 +4100,7 @@ local void JoinNetGameMenu(void)
     } else {
 	server_host_buffer[0] = '\0';
     }
-    menu = FindMenu(MENU_NET_ENTER_SERVER_IP);
+    menu = FindMenu("menu-enter-server");
     strcat(server_host_buffer, "~!_");
     menu->items[1].d.input.buffer = server_host_buffer;
     menu->items[1].d.input.nch = strlen(server_host_buffer) - 3;
@@ -4111,7 +4111,7 @@ local void JoinNetGameMenu(void)
 	menu->items[2].flags |= MenuButtonDisabled;
     }
 
-    ProcessMenu(MENU_NET_ENTER_SERVER_IP, 1);
+    ProcessMenu("menu-enter-server", 1);
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
@@ -4124,7 +4124,7 @@ local void JoinNetGameMenu(void)
     server_host_buffer[menu->items[1].d.input.nch] = 0;
     if (NetworkSetupServerAddress(server_host_buffer)) {
 	menu->items[1].d.text.text = "Unable to lookup host.";
-	ProcessMenu(MENU_NET_ERROR, 1);
+	ProcessMenu("menu-net-error", 1);
 	VideoLockScreen();
 	StartMenusSetBackground(NULL);
 	VideoUnlockScreen();
@@ -4137,7 +4137,7 @@ local void JoinNetGameMenu(void)
     NetworkArg = strdup(server_host_buffer);
 
     // Here we really go...
-    ProcessMenu(MENU_NET_CONNECTING, 1);
+    ProcessMenu("menu-net-connecting", 1);
 
     if (GuiGameStarted) {
 	VideoLockScreen();
@@ -4169,35 +4169,35 @@ local void TerminateNetConnect(void)
 {
     Menu *menu;
 
-    menu = FindMenu(MENU_NET_ERROR);
+    menu = FindMenu("menu-net-error");
     switch (NetLocalState) {
 	case ccs_unreachable:
 	    menu->items[1].d.text.text = "Cannot reach server.";
-	    ProcessMenu(MENU_NET_ERROR, 1);
+	    ProcessMenu("menu-net-error", 1);
 
 	    NetConnectingCancel();
 	    return;
 	case ccs_nofreeslots:
 	    menu->items[1].d.text.text = "Server is full.";
-	    ProcessMenu(MENU_NET_ERROR, 1);
+	    ProcessMenu("menu-net-error", 1);
 
 	    NetConnectingCancel();
 	    return;
 	case ccs_serverquits:
 	    menu->items[1].d.text.text = "Server gone.";
-	    ProcessMenu(MENU_NET_ERROR, 1);
+	    ProcessMenu("menu-net-error", 1);
 
 	    NetConnectingCancel();
 	    return;
 	case ccs_incompatibleengine:
 	    menu->items[1].d.text.text = "Incompatible engine version.";
-	    ProcessMenu(MENU_NET_ERROR, 1);
+	    ProcessMenu("menu-net-error", 1);
 
 	    NetConnectingCancel();
 	    return;
 	case ccs_incompatiblenetwork:
 	    menu->items[1].d.text.text = "Incompatible network version.";
-	    ProcessMenu(MENU_NET_ERROR, 1);
+	    ProcessMenu("menu-net-error", 1);
 
 	case ccs_usercanceled:
 	    NetConnectingCancel();
@@ -4216,7 +4216,7 @@ local void TerminateNetConnect(void)
     NetConnectRunning = 2;
     DestroyCursorBackground();
     GuiGameStarted = 0;
-    ProcessMenu(MENU_NET_MULTI_CLIENT, 1);
+    ProcessMenu("menu-net-multi-client", 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     } else {
@@ -4231,7 +4231,7 @@ local void CreateNetGameMenu(void)
 {
     DestroyCursorBackground();
     GuiGameStarted = 0;
-    ProcessMenu(MENU_NET_MULTI_SETUP, 1);
+    ProcessMenu("menu-multi-setup", 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -4266,7 +4266,7 @@ local void MultiPlayerGameMenu(void)
     VideoUnlockScreen();
     Invalidate();
 
-    menu = FindMenu(MENU_ENTER_NAME);
+    menu = FindMenu("menu-enter-name");
     menu->items[1].d.input.buffer = NameBuf;
     strcpy(NameBuf, NetworkName);
     strcat(NameBuf, "~!_");
@@ -4274,7 +4274,7 @@ local void MultiPlayerGameMenu(void)
     menu->items[1].d.input.maxch = 15;
     menu->items[2].flags &= ~MenuButtonDisabled;
 
-    ProcessMenu(MENU_ENTER_NAME, 1);
+    ProcessMenu("menu-enter-name", 1);
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
@@ -4290,7 +4290,7 @@ local void MultiPlayerGameMenu(void)
 
     GuiGameStarted = 0;
     // Here we really go...
-    ProcessMenu(MENU_NET_CREATE_JOIN, 1);
+    ProcessMenu("menu-create-join-menu", 1);
 
     DebugLevel0Fn("GuiGameStarted: %d\n" _C_ GuiGameStarted);
     if (GuiGameStarted) {
@@ -4322,7 +4322,7 @@ local void ScenSelectInit(Menuitem *mi)
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_SCEN_SELECT);
+    menu = FindMenu("menu-select-scenario");
 #else
     menu = mi->menu;
 #endif
@@ -4339,7 +4339,7 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_SCEN_SELECT);
+    menu = FindMenu("menu-select-scenario");
 #else
     menu = mi->menu;
 #endif
@@ -4383,7 +4383,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     ZZIP_FILE *zzf;
 #endif
 
-    menu = FindMenu(MENU_SCEN_SELECT);
+    menu = FindMenu("menu-select-scenario");
 
 #if 0
     if (menu->items[6].d.pulldown.curopt == 0) {
@@ -4496,7 +4496,7 @@ local void ScenSelectLBInit(Menuitem *mi)
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_SCEN_SELECT);
+    menu = FindMenu("menu-select-scenario");
 #else
     menu = mi->menu;
 #endif
@@ -4534,7 +4534,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
 #ifdef OLD_MENU
-		    menu = FindMenu(MENU_SCEN_SELECT);
+		    menu = FindMenu("menu-select-scenario");
 #else
 		    menu = mi->menu;
 #endif
@@ -4570,7 +4570,7 @@ local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 {
 #ifdef OLD_MENU
     Menu *menu;
-    menu = FindMenu(MENU_SCEN_SELECT);
+    menu = FindMenu("menu-select-scenario");
     mi = menu->items + 1;
 #else
     mi = mi->menu->items + 1;
@@ -4708,7 +4708,7 @@ local void KeystrokeHelpDrawFunc(Menuitem *mi)
     int i, j, nitems = sizeof(keystrokekeystexts) / sizeof(unsigned char *);
     int i2, j2, nitems2 = sizeof(keystrokehintstexts) / sizeof(unsigned char *);
 #ifdef OLD_MENU
-    Menu *menu = FindMenu(MENU_KEYSTROKE_HELP);
+    Menu *menu = FindMenu("menu-keystroke-help");
 #else
     Menu *menu = mi->menu;
 #endif
@@ -4996,7 +4996,7 @@ local void ScenSelectFolder(void)
     Menu *menu;
     Menuitem *mi;
 
-    menu = FindMenu(MENU_SCEN_SELECT);
+    menu = FindMenu("menu-select-scenario");
     mi = menu->items + 1;
     if (ScenSelectDisplayPath[0]) {
 	cp = strrchr(ScenSelectDisplayPath, '/');
@@ -5028,7 +5028,7 @@ local void ScenSelectOk(void)
     Menuitem *mi;
     int i;
 
-    menu = FindMenu(MENU_SCEN_SELECT);
+    menu = FindMenu("menu-select-scenario");
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
@@ -5304,7 +5304,7 @@ local void MultiGamePTSAction(Menuitem *mi, int o)
     Menu *menu;
     int i;
 
-    menu = FindMenu(MENU_NET_MULTI_SETUP);
+    menu = FindMenu("menu-multi-setup");
     i = mi - menu->items - SERVER_PLAYER_STATE;
     // JOHNS: Must this be always true?
     // ARI: NO! think of client menus!
@@ -5423,7 +5423,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     int i, h, c;
     int avail, ready;
 
-    menu = FindMenu(MENU_NET_MULTI_SETUP);
+    menu = FindMenu("menu-multi-setup");
 
     //	FIXME: What this has to do:
     //	Use lag gem as KICK button
@@ -5547,7 +5547,7 @@ local void MultiClientUpdate(int initial)
     Menu *menu;
     int i, h, c;
 
-    menu = FindMenu(MENU_NET_MULTI_CLIENT);
+    menu = FindMenu("menu-net-multi-client");
 
     //	Calculate available slots from pudinfo
     for (c = h = i = 0; i < PlayerMax; i++) {
@@ -5611,7 +5611,7 @@ local void MultiGameSetupInit(Menuitem *mi)
     int i, h;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_NET_MULTI_SETUP);
+    menu = FindMenu("menu-multi-setup");
 #else
     menu = mi->menu;
 #endif
@@ -5658,7 +5658,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     Menu *menu;
     int i, nc, rc;
 
-    menu = FindMenu(MENU_NET_MULTI_SETUP);
+    menu = FindMenu("menu-multi-setup");
     i = mi - menu->items - SERVER_PLAYER_STATE;
     if (i >= 0 && i < PlayerMax - 1) {		// Ugly test to detect server
 	if (i > 0) {
@@ -5687,7 +5687,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 
 	}
     } else {
-	menu = FindMenu(MENU_NET_MULTI_CLIENT);
+	menu = FindMenu("menu-net-multi-client");
 	i = mi - menu->items - CLIENT_PLAYER_STATE;
 	if (i > 0) {
 	    menu->items[CLIENT_PLAYER_READY - 1 + i].flags &=
@@ -5728,7 +5728,7 @@ local void MultiGameClientInit(Menuitem *mi)
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_NET_MULTI_CLIENT);
+    menu = FindMenu("menu-net-multi-client");
 #else
     menu = mi->menu;
 #endif
@@ -5753,7 +5753,7 @@ local void MultiClientGemAction(Menuitem *mi)
     int i;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_NET_MULTI_CLIENT);
+    menu = FindMenu("menu-net-multi-client");
 #else
     menu = mi->menu;
 #endif
@@ -5784,7 +5784,7 @@ local void MultiClientReady(void)
 {
     Menu *menu;
 
-    menu = FindMenu(MENU_NET_MULTI_CLIENT);
+    menu = FindMenu("menu-net-multi-client");
     menu->items[2].flags = MenuButtonDisabled;
     menu->items[3].flags = 0;
     LocalSetupState.Ready[NetLocalHostsSlot] = 1;
@@ -5795,7 +5795,7 @@ local void MultiClientNotReady(void)
 {
     Menu *menu;
 
-    menu = FindMenu(MENU_NET_MULTI_CLIENT);
+    menu = FindMenu("menu-net-multi-client");
     menu->items[3].flags = MenuButtonDisabled;
     menu->items[2].flags = 0;
     LocalSetupState.Ready[NetLocalHostsSlot] = 0;
@@ -5859,7 +5859,7 @@ global void NetClientUpdateState(void)
 {
     Menu *menu;
 
-    menu = FindMenu(MENU_NET_MULTI_CLIENT);
+    menu = FindMenu("menu-net-multi-client");
 
     GameRESAction(NULL, ServerSetupState.ResOpt);
     menu->items[CLIENT_RESOURCE].d.pulldown.curopt =
@@ -5917,7 +5917,7 @@ local void StartEditor(void)
 
     GetInfoFromSelectPath();
 
-    ProcessMenu(MENU_EDITOR_SELECT, 1);
+    ProcessMenu("menu-editor-select", 1);
 
 }
 
@@ -5939,7 +5939,7 @@ local void EditorLoadMap(void)
     char *p;
 
     EditorLoadCancelled=0;
-    ProcessMenu(MENU_EDITOR_LOAD_MAP, 1);
+    ProcessMenu("menu-editor-load-map", 1);
     GetInfoFromSelectPath();
 
     if (EditorLoadCancelled) {
@@ -5976,7 +5976,7 @@ local void EditorLoadInit(Menuitem *mi)
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_EDITOR_LOAD_MAP);
+    menu = FindMenu("menu-editor-load-map");
 #else
     menu = mi->menu;
 #endif
@@ -5993,7 +5993,7 @@ local void EditorLoadLBInit(Menuitem *mi)
     int i;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_EDITOR_LOAD_MAP);
+    menu = FindMenu("menu-editor-load-map");
 #else
     menu = mi->menu;
 #endif
@@ -6096,7 +6096,7 @@ local void EditorLoadFolder(void)
     Menuitem *mi;
     char *cp;
 
-    menu = FindMenu(MENU_EDITOR_LOAD_MAP);
+    menu = FindMenu("menu-editor-load-map");
     mi = &menu->items[1];
 
     if (ScenSelectDisplayPath[0]) {
@@ -6129,7 +6129,7 @@ local void EditorLoadOk(void)
     FileList *fl;
     int i;
 
-    menu = FindMenu(MENU_EDITOR_LOAD_MAP);
+    menu = FindMenu("menu-editor-load-map");
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
@@ -6203,7 +6203,7 @@ local unsigned char *EditorLoadLBRetrieve(Menuitem *mi, int i)
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
 #ifdef OLD_MENU
-		    menu = FindMenu(MENU_EDITOR_LOAD_MAP);
+		    menu = FindMenu("menu-editor-load-map");
 #else
 		    menu = mi->menu;
 #endif
@@ -6241,7 +6241,7 @@ local void EditorLoadLBAction(Menuitem *mi, int i)
     FileList *fl;
 
 #ifdef OLD_MENU
-    menu = FindMenu(MENU_EDITOR_LOAD_MAP);
+    menu = FindMenu("menu-editor-load-map");
 #else
     menu = mi->menu;
 #endif
@@ -6350,7 +6350,7 @@ local void EditorMapProperties(void)
     char MapDescription[36];
     char MapSize[30];
 
-    menu = FindMenu(MENU_EDITOR_MAP_PROPERTIES);
+    menu = FindMenu("menu-editor-map-properties");
 
     menu->items[2].d.input.buffer = MapDescription;
     strcpy(MapDescription, TheMap.Info->Description);
@@ -6367,7 +6367,7 @@ local void EditorMapProperties(void)
     menu->items[8].d.pulldown.defopt = 1;
     menu->items[8].flags = -1;
 
-    ProcessMenu(MENU_EDITOR_MAP_PROPERTIES, 1);
+    ProcessMenu("menu-editor-map-properties", 1);
 }
 
 local void EditorEnterMapDescriptionAction(Menuitem *mi, int key)
@@ -6384,7 +6384,7 @@ local void EditorMapPropertiesOk(void)
     // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
     int v[] = { TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
-    menu = FindMenu(MENU_EDITOR_MAP_PROPERTIES);
+    menu = FindMenu("menu-editor-map-properties");
 
     MapDescription = menu->items[2].d.input.buffer;
     MapDescription[strlen(MapDescription)-3] = '\0';
@@ -6405,7 +6405,7 @@ local void EditorMapPropertiesCancel(void)
 
 local void EditorPlayerProperties(void)
 {
-    ProcessMenu(MENU_EDITOR_PLAYER_PROPERTIES, 1);
+    ProcessMenu("menu-editor-player-properties", 1);
 }
 
 local void EditorQuitMenu(void)
@@ -6505,39 +6505,39 @@ global void InitMenuData(void)
     }
 
 #ifdef OLD_MENU
-    *(Menu **)hash_add(MenuHash,MENU_GAME) = Menus + 0;
-    *(Menu **)hash_add(MenuHash,MENU_VICTORY) = Menus + 1;
-    *(Menu **)hash_add(MenuHash,MENU_LOST) = Menus + 2;
-    *(Menu **)hash_add(MenuHash,MENU_SCEN_SELECT) = Menus + 3;
-    *(Menu **)hash_add(MenuHash,MENU_PRG_START) = Menus + 4;
-    *(Menu **)hash_add(MenuHash,MENU_CUSTOM_GAME_SETUP) = Menus + 5;
-    *(Menu **)hash_add(MenuHash,MENU_ENTER_NAME) = Menus + 6;
-    *(Menu **)hash_add(MenuHash,MENU_NET_CREATE_JOIN) = Menus + 7;
-    *(Menu **)hash_add(MenuHash,MENU_NET_MULTI_SETUP) = Menus + 8;
-    *(Menu **)hash_add(MenuHash,MENU_NET_ENTER_SERVER_IP) = Menus + 9;
-    *(Menu **)hash_add(MenuHash,MENU_NET_MULTI_CLIENT) = Menus + 10;
-    *(Menu **)hash_add(MenuHash,MENU_NET_CONNECTING) = Menus + 11;
-    *(Menu **)hash_add(MenuHash,MENU_CAMPAIGN_SELECT) = Menus + 12;
-    *(Menu **)hash_add(MenuHash,MENU_CAMPAIGN_CONT) = Menus + 13;
-    *(Menu **)hash_add(MenuHash,MENU_OBJECTIVES) = Menus + 14;
-    *(Menu **)hash_add(MenuHash,MENU_END_SCENARIO) = Menus + 15;
-    *(Menu **)hash_add(MenuHash,MENU_SOUND_OPTIONS) = Menus + 16;
-    *(Menu **)hash_add(MenuHash,MENU_PREFERENCES) = Menus + 17;
-    *(Menu **)hash_add(MenuHash,MENU_SPEED_SETTINGS) = Menus + 18;
-    *(Menu **)hash_add(MenuHash,MENU_GAME_OPTIONS) = Menus + 19;
-    *(Menu **)hash_add(MenuHash,MENU_NET_ERROR) = Menus + 20;
-    *(Menu **)hash_add(MenuHash,MENU_TIPS) = Menus + 21;
-    *(Menu **)hash_add(MenuHash,MENU_HELP) = Menus + 22;
-    *(Menu **)hash_add(MenuHash,MENU_KEYSTROKE_HELP) = Menus + 23;
-    *(Menu **)hash_add(MenuHash,MENU_SAVE_GAME) = Menus + 24;
-    *(Menu **)hash_add(MenuHash,MENU_LOAD_GAME) = Menus + 25;
-    *(Menu **)hash_add(MenuHash,MENU_CONFIRM_SAVE) = Menus + 26;
-    *(Menu **)hash_add(MenuHash,MENU_CONFIRM_DELETE) = Menus + 27;
-    *(Menu **)hash_add(MenuHash,MENU_EDITOR_SELECT) = Menus + 28;
-    *(Menu **)hash_add(MenuHash,MENU_EDITOR_LOAD_MAP) = Menus + 29;
-    *(Menu **)hash_add(MenuHash,MENU_EDITOR) = Menus + 30;
-    *(Menu **)hash_add(MenuHash,MENU_EDITOR_MAP_PROPERTIES) = Menus + 31;
-    *(Menu **)hash_add(MenuHash,MENU_EDITOR_PLAYER_PROPERTIES) = Menus + 32;
+    *(Menu **)hash_add(MenuHash,"menu-game") = Menus + 0;
+    *(Menu **)hash_add(MenuHash,"menu-victory") = Menus + 1;
+    *(Menu **)hash_add(MenuHash,"menu-defeated") = Menus + 2;
+    *(Menu **)hash_add(MenuHash,"menu-select-scenario") = Menus + 3;
+    *(Menu **)hash_add(MenuHash,"menu-program-start") = Menus + 4;
+    *(Menu **)hash_add(MenuHash,"menu-custom-game") = Menus + 5;
+    *(Menu **)hash_add(MenuHash,"menu-enter-name") = Menus + 6;
+    *(Menu **)hash_add(MenuHash,"menu-create-join-menu") = Menus + 7;
+    *(Menu **)hash_add(MenuHash,"menu-multi-setup") = Menus + 8;
+    *(Menu **)hash_add(MenuHash,"menu-enter-server") = Menus + 9;
+    *(Menu **)hash_add(MenuHash,"menu-net-multi-client") = Menus + 10;
+    *(Menu **)hash_add(MenuHash,"menu-net-connecting") = Menus + 11;
+    *(Menu **)hash_add(MenuHash,"menu-campaign-select") = Menus + 12;
+    *(Menu **)hash_add(MenuHash,"menu-campaign-continue") = Menus + 13;
+    *(Menu **)hash_add(MenuHash,"menu-objectives") = Menus + 14;
+    *(Menu **)hash_add(MenuHash,"menu-end-scenario") = Menus + 15;
+    *(Menu **)hash_add(MenuHash,"menu-sound-options") = Menus + 16;
+    *(Menu **)hash_add(MenuHash,"menu-preferences") = Menus + 17;
+    *(Menu **)hash_add(MenuHash,"menu-settings-speed") = Menus + 18;
+    *(Menu **)hash_add(MenuHash,"menu-game-options") = Menus + 19;
+    *(Menu **)hash_add(MenuHash,"menu-net-error") = Menus + 20;
+    *(Menu **)hash_add(MenuHash,"menu-tips") = Menus + 21;
+    *(Menu **)hash_add(MenuHash,"menu-help") = Menus + 22;
+    *(Menu **)hash_add(MenuHash,"menu-keystroke-help") = Menus + 23;
+    *(Menu **)hash_add(MenuHash,"menu-save-game") = Menus + 24;
+    *(Menu **)hash_add(MenuHash,"menu-load-game") = Menus + 25;
+    *(Menu **)hash_add(MenuHash,"menu-save-confirm") = Menus + 26;
+    *(Menu **)hash_add(MenuHash,"menu-delete-confirm") = Menus + 27;
+    *(Menu **)hash_add(MenuHash,"menu-editor-select") = Menus + 28;
+    *(Menu **)hash_add(MenuHash,"menu-editor-load-map") = Menus + 29;
+    *(Menu **)hash_add(MenuHash,"menu-editor") = Menus + 30;
+    *(Menu **)hash_add(MenuHash,"menu-editor-map-properties") = Menus + 31;
+    *(Menu **)hash_add(MenuHash,"menu-editor-player-properties") = Menus + 32;
 #endif
 }
 
@@ -6557,7 +6557,7 @@ global void InitMenuFunctions(void)
 	strcat(ScenSelectFullPath, "/graphics/tilesets/");
     }
     strcat(ScenSelectFullPath, "swamp");
-    menu = FindMenu(MENU_CUSTOM_GAME_SETUP);
+    menu = FindMenu("menu-custom-game");
     if (access(ScenSelectFullPath, F_OK) != 0) {
 	// ARI FIXME: Hack to disable Expansion Gfx..
 	// also shows how to add new tilesets....
@@ -6585,39 +6585,39 @@ global void InitMenuFunctions(void)
 }
 
 char *menu_names[] = {
-    MENU_GAME,
-    MENU_VICTORY,
-    MENU_LOST,
-    MENU_SCEN_SELECT,
-    MENU_PRG_START,
-    MENU_CUSTOM_GAME_SETUP,
-    MENU_ENTER_NAME,
-    MENU_NET_CREATE_JOIN,
-    MENU_NET_MULTI_SETUP,
-    MENU_NET_ENTER_SERVER_IP,
-    MENU_NET_MULTI_CLIENT,
-    MENU_NET_CONNECTING,
-    MENU_CAMPAIGN_SELECT,
-    MENU_CAMPAIGN_CONT,
-    MENU_OBJECTIVES,
-    MENU_END_SCENARIO,
-    MENU_SOUND_OPTIONS,
-    MENU_PREFERENCES,
-    MENU_SPEED_SETTINGS,
-    MENU_GAME_OPTIONS,
-    MENU_NET_ERROR,
-    MENU_TIPS,
-    MENU_HELP,
-    MENU_KEYSTROKE_HELP,
-    MENU_SAVE_GAME,
-    MENU_LOAD_GAME,
-    MENU_CONFIRM_SAVE,
-    MENU_CONFIRM_DELETE,
-    MENU_EDITOR_SELECT,
-    MENU_EDITOR_LOAD_MAP,
-    MENU_EDITOR,
-    MENU_EDITOR_MAP_PROPERTIES,
-    MENU_EDITOR_PLAYER_PROPERTIES,
+    "menu-game",
+    "menu-victory",
+    "menu-defeated",
+    "menu-select-scenario",
+    "menu-program-start",
+    "menu-custom-game",
+    "menu-enter-name",
+    "menu-create-join-menu",
+    "menu-multi-setup",
+    "menu-enter-server",
+    "menu-net-multi-client",
+    "menu-net-connecting",
+    "menu-campaign-select",
+    "menu-campaign-continue",
+    "menu-objectives",
+    "menu-end-scenario",
+    "menu-sound-options",
+    "menu-preferences",
+    "menu-settings-speed",
+    "menu-game-options",
+    "menu-net-error",
+    "menu-tips",
+    "menu-help",
+    "menu-keystroke-help",
+    "menu-save-game",
+    "menu-load-game",
+    "menu-save-confirm",
+    "menu-delete-confirm",
+    "menu-editor-select",
+    "menu-editor-load-map",
+    "menu-editor",
+    "menu-editor-map-properties",
+    "menu-editor-player-properties",
 };
 
 char *menu_flags[] = {

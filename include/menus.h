@@ -55,7 +55,8 @@
 **	Menu button referencing
 **	Each button is 300 x 144  =>	50 buttons (53 for Expansion GFX)
 **	For multi-version buttons: button - 1 == disabled, + 1 == depressed
-**	For gems: -1 == disabled, +1 == depressed, +2 checked, +3 checked+depressed
+**	For gems: -1 == disabled, +1 == depressed, +2 checked,
+**	+3 checked+depressed
 */
 typedef unsigned MenuButtonId;
 
@@ -233,6 +234,7 @@ typedef struct _menuitem_ {
 **	Menu definition.
 */
 typedef struct _menus_ {
+    // FIXME: char* Name;			/// menu name
     unsigned int x;			/// menu area x pos
     unsigned int y;			/// menu area y pos
     unsigned int xsize;			/// menu area x size
@@ -243,45 +245,6 @@ typedef struct _menus_ {
     Menuitem *items;			/// buttons, etc
     void (*netaction)(void);		/// network action callback
 } Menu;
-
-
-
-#define MENU_GAME "game-menu"			/// FIXME: write docu
-#define MENU_VICTORY "victory-menu"
-#define MENU_LOST "lost-menu"
-#define MENU_SCEN_SELECT "scene-select-menu"
-#define MENU_PRG_START "program-start-menu"
-#define MENU_CUSTOM_GAME_SETUP "custom-game-menu"
-#define MENU_ENTER_NAME "enter-name-menu"
-#define MENU_NET_CREATE_JOIN "net-create-join-menu"
-#define MENU_NET_MULTI_SETUP "net-multi-setup-menu"
-#define MENU_NET_ENTER_SERVER_IP "net-enter-server-menu"
-#define MENU_NET_MULTI_CLIENT "net-multi-client-menu"
-#define MENU_NET_CONNECTING "net-connecting-menu"
-#define MENU_CAMPAIGN_SELECT "campaign-select-menu"
-#define MENU_CAMPAIGN_CONT "campaign-continue-menu"
-#define MENU_OBJECTIVES "objectives-menu"
-#define MENU_END_SCENARIO "end-scenario-menu"
-#define MENU_SOUND_OPTIONS "sound-options-menu"
-#define MENU_PREFERENCES "preferences-menu"
-#define MENU_SPEED_SETTINGS "speed-settings-menu"
-#define MENU_GAME_OPTIONS "game-options-menu"
-#define MENU_NET_ERROR "net-error-menu"
-#define MENU_TIPS "tips-menu"
-#define MENU_HELP "help-menu"
-#define MENU_KEYSTROKE_HELP "keystroke-help-menu"
-#define MENU_SAVE_GAME "save-game-menu"
-#define MENU_LOAD_GAME "load-game-menu"
-#define MENU_CONFIRM_SAVE "save-confirm-menu"
-#define MENU_CONFIRM_DELETE "delete-confirm-menu"
-#define MENU_EDITOR_SELECT "editor-select-menu"
-#define MENU_EDITOR_LOAD_MAP "editor-load-map-menu"
-#define MENU_EDITOR "editor-menu"
-#define MENU_EDITOR_MAP_PROPERTIES "editor-map-properties"
-#define MENU_EDITOR_PLAYER_PROPERTIES "editor-player-properties"
-#define MENU_MAX "max"			/// highest available menu id (for ccl)
-
-// FIXME: FILL IN THIS TABLE!!!!
 
 /*----------------------------------------------------------------------------
 --	Variables
