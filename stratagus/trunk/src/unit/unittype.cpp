@@ -1289,7 +1289,7 @@ global void InitUnitTypes(void)
     }
 
     //
-    //	Setup hardcoded unit types.
+    //	Setup hardcoded unit types. FIXME: should be moved to some configs.
     //
     UnitTypeGoldMine=UnitTypeByIdent("unit-gold-mine");
     UnitTypeHumanTanker=UnitTypeByIdent("unit-human-oil-tanker");
