@@ -39,6 +39,7 @@
 #include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
+#include "missile.h"
 #include "unit.h"
 #include "interface.h"
 #include "tileset.h"
@@ -630,6 +631,182 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 ----------------------------------------------------------------------------*/
 
 /**
+**	Attack units in distance, with large missile
+**
+**		Choose the best target, that can be attacked. It takes into
+**		account allied unit which could be hit by the missile
+**
+**	@param unit	Find in distance for this unit.
+**	@param range	Distance range to look.
+**
+**	@return		Unit to be attacked.
+**
+**	@note	This could be improved, for better performance / better trade.
+**      @note   Limited to attack range smaller than 16.
+*/
+local Unit* FindRangeAttack(const Unit* u, int range)
+{
+    int x, y, n, cost;
+    int missile_range;
+    int good[32][32], bad[32][32];
+    Unit* table[UnitMax];
+    Unit* dest;
+    const UnitType* dtype;
+    const UnitType* type;
+    const Player* player;
+    int xx, yy;
+    int best_x, best_y, best_cost;
+    int i, sbad, sgood;
+    Unit* best;
+
+    type = u->Type;
+    player = u->Player;
+
+    //  If catapult, count units near the target...
+    //      FIXME : make it configurable
+    //
+    missile_range = type->Missile.Missile->Range + range - 1;
+
+    DebugCheck(2 * missile_range + 1 >= 32);
+
+    x = u->X;
+    y = u->Y;
+    n = SelectUnits(x - missile_range, y - missile_range,
+	x + missile_range + 1, y + missile_range + 1, table);
+    for (y = 0; y < 2 * missile_range + 1; y++) {
+	for (x = 0; x < 2 * missile_range + 1; x++) {
+	    good[y][x] = 0;
+	    bad[y][x] = 0;
+	}
+    }
+
+    // FILL good/bad...
+    for (i = 0; i < n; i++) {
+	dest = table[i];
+	dtype = dest->Type;
+	//
+	//      unusable unit
+	//
+	// FIXME: did SelectUnits already filter this.
+	if (dest->Removed || dest->Invisible || !u->HP
+		|| !(dest->Visible & (1 << player->Player))
+		|| dest->Orders[0].Action == UnitActionDie) {
+	    table[i] = 0;
+	    continue;
+	}
+
+	if (!IsEnemy(player, dest)) {	// a friend or neutral
+	    table[i] = 0;
+	    if (!IsAllied(player, dest)) {
+		continue;
+	    }
+	    // Calc a negative cost
+	    cost = dest->HP / (dtype->TileWidth * dtype->TileWidth);
+	    if (cost < 1) {
+		cost = 1;
+	    }
+	    cost = (-cost);
+	} else {
+	    if (!CanTarget(type, dtype)) {	// can't be attacked.
+		table[i] = 0;
+		continue;
+	    }
+	    //
+	    //  Calculate the costs to attack the unit.
+	    //  Unit with the smallest attack costs will be taken.
+	    //
+	    cost = 0;
+	    //
+	    //  Priority 0-255
+	    //
+	    cost -= dtype->Priority * PRIORITY_FACTOR / 100;
+	    //
+	    //  Remaining HP (Health) 0-65535
+	    //
+	    cost += dest->HP * HEALTH_FACTOR / 100;
+
+	    //
+	    //  Unit can attack back.
+	    //
+	    if (CanTarget(dtype, type)) {
+		cost -= CANATTACK_BONUS / 100;
+	    }
+
+	    if (cost < 1) {
+		cost = 1;
+	    }
+	}
+
+	x = dest->X - u->X + missile_range;
+	y = dest->Y - u->Y + missile_range;
+
+	// Mark the good/bad array...
+	for (xx = 0; xx < dtype->TileWidth; xx++) {
+	    for (yy = 0; yy < dtype->TileWidth; yy++) {
+		if ((x + xx < 0) || (y + yy < 0)
+			|| (x + xx >= 2 * missile_range + 1)
+			|| (y + yy >= 2 * missile_range + 1)) {
+		    continue;
+		}
+		if (cost < 0) {
+		    good[y + yy][x + xx] -= cost;
+		} else {
+		    bad[y + yy][x + xx] += cost;
+		}
+	    }
+	}
+    }
+
+    // Find the best area...
+    best_x = -1;
+    best_y = -1;
+    best_cost = -1;
+    best = NoUnitP;
+    for (i = 0; i < n; i++) {
+	if (!table[i]) {
+	    continue;
+	}
+	dest = table[i];
+	dtype = dest->Type;
+
+	x = dest->X - u->X + missile_range;
+	y = dest->Y - u->Y + missile_range;
+
+	sbad = 0;
+	sgood = 0;
+	for (yy = -(type->Missile.Missile->Range - 1);
+	    yy <= type->Missile.Missile->Range - 1; yy++) {
+	    for (xx = -(type->Missile.Missile->Range - 1);
+		xx <= type->Missile.Missile->Range - 1; xx++) {
+		if ((x + xx < 0) || (y + yy < 0)
+			|| ((x + xx) >= 2 * missile_range + 1)
+			|| ((y + yy) >= 2 * missile_range + 1)) {
+		    continue;
+		}
+
+		sbad += bad[y + yy][x + xx];
+		sgood += good[y + yy][x + xx];
+		if ((!yy) && (!xx)) {
+		    sbad += bad[y + yy][x + xx];
+		    sgood += good[y + yy][x + xx];
+		}
+	    }
+	}
+
+	// cost is sbad/sgood....
+	if (sgood < 1) {
+	    sgood = 1;
+	}
+	cost = (sbad * 100) / sgood;
+	if (cost > best_cost) {
+	    best_cost = cost;
+	    best = dest;
+	}
+    }
+    return best;
+}
+
+/**
 **	Attack units in distance.
 **
 **		If the unit can attack must be handled by caller.
@@ -660,6 +837,12 @@ global Unit* AttackUnitsInDistance(const Unit* unit,int range)
     int best_cost;
 
     DebugLevel3Fn("(%d)%s\n" _C_ UnitNumber(unit) _C_ unit->Type->Ident);
+
+    // if necessary, take possible damage on allied units into account...
+    if (unit->Type->Missile.Missile->Range
+	    && (range+unit->Type->Missile.Missile->Range<15)) {
+        return FindRangeAttack(unit,range);
+    }
 
     //
     //	Select all units in range.
