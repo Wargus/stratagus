@@ -10,7 +10,7 @@
 //
 /**@name linedraw.c	-	The general linedraw functions. */
 //
-//	(c) Copyright 2000-2002 by Lutz Sammer
+//	(c) Copyright 2000-2002 by Lutz Sammer, Stephan Rasenberg.
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -6080,6 +6080,8 @@ global void InitLineDraw(void)
     }
 }
 
+#ifdef DEBUG	// {
+
 // ===========================================================================
 //
 //      Below are functions which can test above linedraw functionaility
@@ -6323,6 +6325,6 @@ global void DebugTestDisplayLines(void)
      VideoDrawPixel(ColorWhite,x,y);
 }
 
-
+#endif	// } DEBUG
 
 //@}
