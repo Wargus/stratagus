@@ -39,9 +39,6 @@ typedef struct _player_ Player;		// recursive includes :(
 
 typedef struct _unit_ Unit;		/// unit itself
 typedef enum _unit_action_ UnitAction;	/// all possible unit actions
-#ifndef NEW_ORDERS
-typedef struct _command_ Command;	/// unit command
-#endif
 
 /**
 **	Unit references over network, or for memory saving.
@@ -88,7 +85,6 @@ enum _unit_action_ {
     UnitActionDemolish,			/// unit demolish at position/unit
 };
 
-#ifdef NEW_ORDERS
 /**
 **	Unit order structure.
 */
@@ -105,66 +101,6 @@ typedef struct _order_ {
 
     void*		Arg1;		/// Extra command argument
 } Order;
-
-#else
-/**
-**	Unit command data structure.
-*/
-struct _command_ {
-    UnitAction	Action : 8;		/// global action
-    union {
-	struct {
-	    unsigned	Fast : 1;	/// Can fast move
-	    unsigned	Range : 31;	/// Range to goal
-	    Unit*	Goal;		/// Goal unit
-	    unsigned	SX;
-	    unsigned	SY;		/// Source
-	    unsigned	DX;
-	    unsigned	DY;		/// Destination
-	    void*	Spell;		/// spell type id
-	} Move;				/// move:
-	struct {
-	    unsigned	Fast : 1;	/// Can fast move
-	    unsigned	Range : 31;	/// Range to goal
-	    Unit*	Goal;		/// Goal unit
-	    unsigned	SX;
-	    unsigned	SY;		/// Source
-	    unsigned	DX;
-	    unsigned	DY;		/// Destination
-	    UnitType*	BuildThis;	/// Unit to build
-	} Build;			/// build:
-	struct {
-	    int		Sum;		/// HP for building
-	    int		Add;		/// added to sum
-	    int		Val;		/// counter
-	    int		Sub;		/// subtracted from counter
-	    int		Cancel;		/// Cancel construction
-	    Unit*	Worker;		/// Worker building the unit
-	} Builded;			// builded:
-	struct {
-	    unsigned	Ticks;		/// Ticks to complete
-	    unsigned	Count;		/// Units in training queue
-	    // FIXME: vladi: later we should train more units or automatic
-#define MAX_UNIT_TRAIN	6
-	    UnitType*	What[MAX_UNIT_TRAIN];	/// Unit trained
-	} Train;			/// train:
-	struct {
-	    unsigned	Ticks;		/// Ticks to complete
-	    UnitType*	What;		/// Unit upgraded to
-	} UpgradeTo;			/// upgradeto:
-	struct {
-	    unsigned	Ticks;		/// Ticks to complete
-	    Upgrade*	What;		/// Unit researching this
-	} Research;			/// research:
-	struct {
-	    unsigned	Active;		/// how much units are in the goldmine
-	} GoldMine;			/// gold-mine:
-	struct {
-	    unsigned	Active;		/// how much units are in the resource
-	} Resource;			/// generic resource
-    } Data;				/// data for action
-};
-#endif
 
 /**
 **	Voice groups for an unit
@@ -276,8 +212,6 @@ struct _unit_ {
     // FIXME: use the new next pointer
     Unit*	OnBoard[MAX_UNITS_ONBOARD];	/// Units in transporter
 
-#ifdef NEW_ORDERS	//{--------------------------------------------
-
 #define MAX_ORDERS 16			/// How many outstanding orders?
     char	OrderCount;		/// how many orders in queue
     char	OrderFlush;		/// cancel current order, take next
@@ -324,20 +258,6 @@ struct _unit_ {
     } Train;				/// Train units action
     }		Data;			/// Storage room for different commands
 
-#else			//}{-------------------------------------------
-
-    unsigned	WoodToHarvest;		/// Ticks for harvest
-
-#define MAX_COMMANDS 16			/// max number of outstanding commands
-//	NEW-ACTIONS:
-    Command	Command;		/// current command processed
-    Command	SavedCommand;		/// saved command
-    Command	NextCommand[MAX_COMMANDS];/// next command to process
-    char	NextCount;		/// how many commands are in the queue
-    char	NextFlush;	/// true: cancel command and proceed to next one
-    Command	PendCommand;		/// pending commands
-#endif			//}--------------------------------------------
-
 #ifdef DEBUG
     const Unit*	Goal;			/// Goal for pathfinder
     int		GoalX;			/// Destination X of pathfinder
@@ -359,21 +279,14 @@ struct _unit_ {
 */
 #define MAX_UNIT_SLOTS	65535
 
-#ifdef NEW_ORDERS
 /**
 **	Returns true, if unit is unusable. (for attacking,...)
+**	FIXME: look if correct used (UnitActionBuilded is no problem if
+**	attacked)?
 */
 #define UnitUnusable(unit) \
     ( (unit)->Removed || (unit)->Orders[0].Action==UnitActionDie || \
       (unit)->Orders[0].Action==UnitActionBuilded)
-#else
-/**
-**	Returns true, if unit is unusable. (for attacking,...)
-*/
-#define UnitUnusable(unit) \
-    ( (unit)->Removed || (unit)->Command.Action==UnitActionDie || \
-      (unit)->Command.Action==UnitActionBuilded)
-#endif
 
 /**
 **	Returns unit number (unique to this unit)
