@@ -410,6 +410,9 @@ local SCM CclSetFogOfWar(SCM flag)
 
     old = !TheMap.NoFogOfWar;
     TheMap.NoFogOfWar = !gh_scm2bool(flag);
+    if (!CclInConfigFile) {
+	UpdateFogOfWarChange();
+    }
 
     return gh_bool2scm(old);
 }
@@ -424,6 +427,9 @@ local int CclSetFogOfWar(lua_State* l)
     }
     old = !TheMap.NoFogOfWar;
     TheMap.NoFogOfWar = !LuaToBoolean(l, 1);
+    if (!CclInConfigFile) {
+	UpdateFogOfWarChange();
+    }
 
     lua_pushboolean(l, old);
     return 1;
