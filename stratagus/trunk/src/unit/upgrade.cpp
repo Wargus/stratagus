@@ -10,7 +10,7 @@
 //
 /**@name upgrade.c	-	The upgrade/allow functions. */
 //
-//	(c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -826,12 +826,158 @@ local SCM CclDefineModifier(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineModifier(lua_State* l)
+{
+    const char* temp;
+    const char* value;
+    int uid;
+    int attack_range;
+    int sight_range;
+    int basic_damage;
+    int piercing_damage;
+    int armor;
+    int speed;
+    int regeneration_rate;
+    int hit_points;
+    int costs[MaxCosts];
+    char units[UnitTypeMax];
+    char upgrades[UpgradeMax];
+    char apply_to[UnitTypeMax];
+    UnitType* convert_to;
+    int args;
+    int j;
+
+    args = lua_gettop(l);
+    j = 0;
+
+    attack_range = 0;
+    sight_range = 0;
+    basic_damage = 0;
+    piercing_damage = 0;
+    armor = 0;
+    speed = 0;
+    hit_points = 0;
+    regeneration_rate = 0;
+    memset(costs, 0, sizeof(costs));
+    memset(units, '?', sizeof(units));
+    memset(upgrades, '?', sizeof(upgrades));
+    memset(apply_to, '?', sizeof(apply_to));
+    convert_to = NULL;
+
+    value = LuaToString(l, j + 1);
+    uid = UpgradeIdByIdent(value);
+    ++j;
+
+    for (; j < args; ++j) {
+	if (!lua_istable(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	lua_rawgeti(l, j + 1, 1);
+	temp = LuaToString(l, -1);
+	lua_pop(l, 1);
+	if (!strcmp(temp, "attack-range")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    attack_range = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "sight-range")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    sight_range = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "basic-damage")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    basic_damage = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "piercing-damage")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    piercing_damage = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "armor")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    armor = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "speed")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    speed = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "hit-points")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    hit_points = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "regeneration-rate")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    regeneration_rate = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "cost")) {
+	    int i;
+
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    for (i = 0; i < MaxCosts; ++i) {
+		if (!strcmp(value, DefaultResourceNames[i])) {
+		    break;
+		}
+	    }
+	    if (i == MaxCosts) {
+		lua_pushfstring(l, "Resource not found: %s", value);
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 2);
+	    costs[i] = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "allow")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    DebugLevel3Fn("%s\n" _C_ value);
+	    if (!strncmp(value, "upgrade-", 8)) {
+		lua_rawgeti(l, j + 1, 3);
+		upgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    } else if (!strncmp(value, "unit-", 5)) {
+		lua_rawgeti(l, j + 1, 3);
+		units[UnitTypeIdByIdent(value)] = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    } else {
+		lua_pushfstring(l, "upgrade or unit expected");
+		lua_error(l);
+	    }
+	} else if (!strcmp(temp, "apply-to")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    apply_to[UnitTypeIdByIdent(value)] = 'X';
+	} else if (!strcmp(temp, "convert-to")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    convert_to = UnitTypeByIdent(value);
+	} else {
+	    lua_pushfstring(l, "wrong tag: %s", temp);
+	    return 0;
+	}
+    }
+
+    AddUpgradeModifierBase(uid, attack_range, sight_range, basic_damage,
+	piercing_damage, armor, speed, hit_points, regeneration_rate, costs,
+	units, upgrades, apply_to,convert_to);
+
+    return 0;
+}
+#endif
 
 /**
 **	Define a new upgrade.
 **
 **	@param list	List defining the upgrade.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineUpgrade(SCM list)
 {
     SCM value;
@@ -867,7 +1013,7 @@ local SCM CclDefineUpgrade(SCM list)
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    n = gh_vector_length(value);
-	    if (n < 4 || n > MaxCosts) {
+	    if (n > MaxCosts) {
 		fprintf(stderr, "%s: Wrong vector length\n", ident);
 		if (n > MaxCosts) {
 		    n = MaxCosts;
@@ -892,10 +1038,70 @@ local SCM CclDefineUpgrade(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineUpgrade(lua_State* l)
+{
+    const char* value;
+    const char* icon;
+    const char* ident;
+    int costs[MaxCosts];
+    int n;
+    int j;
+    int args;
+    int k;
+
+    args = lua_gettop(l);
+    k = 0;
+
+    //	Identifier
+
+    ident = LuaToString(l, k + 1);
+    ++k;
+
+    icon = NULL;
+    memset(costs, 0, sizeof(costs));
+
+    for (; k < args; ++k) {
+	value = LuaToString(l, k + 1);
+	++k;
+	if (!strcmp(value, "icon")) {
+	    //	Icon
+	    icon = LuaToString(l, k + 1);
+	} else if (!strcmp(value, "costs")) {
+	    //	Costs
+	    if (!lua_istable(l, k + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    n = luaL_getn(l, k + 1);
+	    if (n > MaxCosts) {
+		lua_pushfstring(l, "%s: Wrong vector length", ident);
+		lua_error(l);
+	    }
+	    for (j = 0; j < n; ++j) {
+		lua_rawgeti(l, k + 1, j + 1);
+		costs[j] = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    }
+	    while (j < MaxCosts) {
+		costs[j++] = 0;
+	    }
+	} else {
+	    lua_pushfstring(l, "%s: Wrong tag `%s'", ident, value);
+	    lua_error(l);
+	}
+    }
+
+    AddUpgrade(ident, icon, costs);
+
+    return 0;
+}
+#endif
 
 /**
 **	Define which units/upgrades are allowed.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineAllow(SCM list)
 {
     SCM value;
@@ -929,6 +1135,34 @@ local SCM CclDefineAllow(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineAllow(lua_State* l)
+{
+    const char* str;
+    const char* ids;
+    int i;
+    int n;
+    int args;
+    int j;
+
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	str = LuaToString(l, j + 1);
+	++j;
+	ids = LuaToString(l, j + 1);
+
+	n = strlen(ids);
+	if (n > 16) {
+	    fprintf(stderr, "%s: Allow string too long %d\n", str, n);
+	    n = 16;
+	}
+
+	for (i = 0; i < n; ++i) {
+	    AllowByIdent(&Players[i], str, ids[i]);
+	}
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -1007,9 +1241,9 @@ global void UpgradesCclRegister(void)
 
     gh_new_procedureN("define-upgrade-wc-names", CclDefineUpgradeWcNames);
 #elif defined(USE_LUA)
-//    lua_register(Lua, "DefineModifier", CclDefineModifier);
-//    lua_register(Lua, "DefineUpgrade", CclDefineUpgrade);
-//    lua_register(Lua, "DefineAllow", CclDefineAllow);
+    lua_register(Lua, "DefineModifier", CclDefineModifier);
+    lua_register(Lua, "DefineUpgrade", CclDefineUpgrade);
+    lua_register(Lua, "DefineAllow", CclDefineAllow);
 
     lua_register(Lua, "DefineUpgradeWcNames", CclDefineUpgradeWcNames);
 #endif
