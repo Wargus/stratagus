@@ -234,7 +234,7 @@ extern unsigned AllocatedSoundMemory;
 extern unsigned CompressedSoundMemory;
 #endif
 
-    /// cd play mode, ":off" ":random" or ":all"
+    /// cd play mode, ":off" ":random" ":all" or ":wc2"
 extern char *CDMode;
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     /// FIXME: docu

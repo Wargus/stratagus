@@ -49,6 +49,7 @@
 #include "iocompat.h"
 #include "sound.h"
 #include "sound_server.h"
+#include "menus.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -64,7 +65,7 @@
 global Sample* MusicSample;		/// Music samples
 #endif
 
-global char *CDMode = ":off";	/// cd play mode, ":off" ":random" or ":all"
+global char *CDMode = ":off";	/// cd play mode, ":off" ":random" ":all" or ":wc2"
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global int CDTrack = 0;			/// Current cd track
 #endif
@@ -287,7 +288,7 @@ global int PlayCDRom(const char* name)
 /**
 **	Play music from cdrom.
 **
-**	:all :random :off
+**	:all :random :off :wc2
 **
 **	@param name	Name starting with ":".
 **
@@ -351,6 +352,11 @@ global int PlayCDRom(const char* name)
 	    if (cd_play(CDTrack))
 		CDMode = ":stopped";
 	    return 1;
+	}
+	if (!strcmp(name, ":wc2")) {
+	    CDMode = ":wc2";
+	    if (GuiGameStarted == 0)
+		cd_play(15);
 	}
 	return 1;
     }

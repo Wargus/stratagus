@@ -243,11 +243,7 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
     if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
 	    && !cd_current_track()) {
 	DebugLevel0Fn("Playing new track\n");
-	if (!strcmp(CDMode, ":all")) {
-	    PlayCDRom(":all");
-	} else if (!strcmp(CDMode, ":random")) {
-	    PlayCDRom(":random");
-	}
+	PlayCDRom(CDMode);
     } else if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")) {
 	DebugLevel0Fn("get track\n");
 	CDTrack = cd_current_track() + 1;
