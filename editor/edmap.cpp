@@ -231,7 +231,6 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
     int type2;
     int base;
     int direction;
-
     //                 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
     char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
 
@@ -259,9 +258,9 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	    fixed >>= 8;
 	}
 	if (type1 == type2) {		// Oooh a solid tile.
-find_solid:
+	  find_solid:
 	    //
-	    //	Find the solid tile
+	    //  Find the solid tile
 	    //
 	    for (i = 0; i < TheMap.Tileset->NumTiles;) {
 		if (type1 == TheMap.Tileset->BasicNameTable[i]
@@ -275,8 +274,60 @@ find_solid:
 		    i += 256;
 		}
 	    }
-	    DebugCheck( i >= TheMap.Tileset->NumTiles );
+	    DebugCheck(i >= TheMap.Tileset->NumTiles);
 	    return i;
+	}
+    } else {
+	char *marks;
+
+	marks = alloca(TheMap.Tileset->NumNames);
+	memset(marks, 0, TheMap.Tileset->NumNames);
+	marks[type1] = type1;
+	marks[type2] = type2;
+
+	//
+	//      What fixed tile-type should replace the non useable tile-types.
+	//      FIXME: write a loop.
+	//
+	fixed = (quad >> 0) & 0xFF;
+	if (fixed != type1 && fixed != type2) {
+	    quad &= 0xFFFFFF00;
+	    if (FindTilePath(type1, fixed, 0, marks, &i)
+		    < FindTilePath(type2, fixed, 0, marks, &i)) {
+		quad |= type1 << 0;
+	    } else {
+		quad |= type2 << 0;
+	    }
+	}
+	fixed = (quad >> 8) & 0xFF;
+	if (fixed != type1 && fixed != type2) {
+	    quad &= 0xFFFF00FF;
+	    if (FindTilePath(type1, fixed, 0, marks, &i)
+		    < FindTilePath(type2, fixed, 0, marks, &i)) {
+		quad |= type1 << 8;
+	    } else {
+		quad |= type2 << 8;
+	    }
+	}
+	fixed = (quad >> 16) & 0xFF;
+	if (fixed != type1 && fixed != type2) {
+	    quad &= 0xFF00FFFF;
+	    if (FindTilePath(type1, fixed, 0, marks, &i)
+		    < FindTilePath(type2, fixed, 0, marks, &i)) {
+		quad |= type1 << 16;
+	    } else {
+		quad |= type2 << 16;
+	    }
+	}
+	fixed = (quad >> 24) & 0xFF;
+	if (fixed != type1 && fixed != type2) {
+	    quad &= 0x00FFFFFF;
+	    if (FindTilePath(type1, fixed, 0, marks, &i)
+		    < FindTilePath(type2, fixed, 0, marks, &i)) {
+		quad |= type1 << 24;
+	    } else {
+		quad |= type2 << 24;
+	    }
 	}
     }
 
@@ -307,20 +358,20 @@ find_solid:
     }
 
     if (i >= TheMap.Tileset->NumTiles) {
-	char* marks;
+	char *marks;
 
-	DebugLevel3Fn("No good mix found\n");
+	DebugLevel0Fn("No good mix found\n");
 	//
-	//	Find the best tile path.
+	//      Find the best tile path.
 	//
-	marks=alloca(TheMap.Tileset->NumNames);
-	memset(marks,0,TheMap.Tileset->NumNames);
-	marks[type1]=type1;
-	if (FindTilePath(type1,type2,0,marks,&i) == INT_MAX) {
+	marks = alloca(TheMap.Tileset->NumNames);
+	memset(marks, 0, TheMap.Tileset->NumNames);
+	marks[type1] = type1;
+	if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
 	    DebugLevel0Fn("Huch, no mix found!!!!!!!!!!!\n");
 	    goto find_solid;
 	}
-	if ( type1 == TheMap.Tileset->MixedNameTable[i]) {
+	if (type1 == TheMap.Tileset->MixedNameTable[i]) {
 	    // Other mixed
 	    type1 ^= type2;
 	    type2 ^= type1;
@@ -344,7 +395,8 @@ find_solid:
 	direction |= 1;
     }
 
-    DebugLevel3Fn("%08x %x %x %d\n" _C_ quad _C_ type1 _C_ type2 _C_ direction);
+    DebugLevel3Fn("%08x %x %x %d\n" _C_ quad _C_ type1 _C_ type2 _C_
+	direction);
 
     return base | (table[direction] << 4);
 }
@@ -420,7 +472,7 @@ local void EditorTileChanged2(int x, int y, int d)
     MapField* mf;
 
     quad = QuadFromTile(x, y);
-    DebugLevel3Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
+    DebugLevel2Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
 	    TheMap.Fields[y * TheMap.Width + x].Tile);
 
     //
@@ -452,9 +504,9 @@ local void EditorTileChanged2(int x, int y, int d)
 	q2 = QuadFromTile(x, y - 1);
 	u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 	if (u != q2) {
-	    DebugLevel3Fn("U+    %08x -> %08x\n" _C_ q2 _C_ u);
+	    DebugLevel2Fn("U+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & BH_QUAD_M, u);
-	    DebugLevel3Fn("= %08x\n" _C_ tile);
+	    DebugLevel2Fn("= %08x\n" _C_ tile);
 	    EditorChangeTile(x, y - 1, tile, d&~D_DOWN);
 	}
     }
@@ -465,7 +517,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	q2 = QuadFromTile(x, y + 1);
 	u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 	if (u != q2) {
-	    DebugLevel3Fn("D+    %08x -> %08x\n" _C_ q2 _C_ u);
+	    DebugLevel2Fn("D+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & TH_QUAD_M, u);
 	    EditorChangeTile(x, y + 1, tile, d&~D_UP);
 	}
@@ -477,7 +529,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	q2 = QuadFromTile(x - 1, y);
 	u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 	if (u != q2) {
-	    DebugLevel3Fn("L+    %08x -> %08x\n" _C_ q2 _C_ u);
+	    DebugLevel2Fn("L+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & RH_QUAD_M, u);
 	    EditorChangeTile(x - 1, y, tile, d&~D_RIGHT);
 	}
@@ -489,7 +541,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	q2 = QuadFromTile(x + 1, y);
 	u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 	if (u != q2) {
-	    DebugLevel3Fn("R+    %08x -> %08x\n" _C_ q2 _C_ u);
+	    DebugLevel2Fn("R+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & LH_QUAD_M, u);
 	    EditorChangeTile(x + 1, y, tile, d&~D_LEFT);
 	}
