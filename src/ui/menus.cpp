@@ -5116,6 +5116,28 @@ local void MenuHandleKeyUp(unsigned key,unsigned keychar)
 }
 
 /**
+**	Handle keys repeated in menu mode.
+**
+**	@param key	Key scancode.
+**	@param keychar	ASCII character code of key.
+*/
+local void MenuHandleKeyRepeat(unsigned key,unsigned keychar)
+{
+    Menu *menu;
+
+    HandleKeyModifiersDown(key,keychar);
+
+    if (CurrentMenu < 0) {
+	return;
+    }
+    menu = Menus + CurrentMenu;
+
+    if (MenuButtonCurSel != -1 && menu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
+	MenuHandleKeyDown(key,keychar);
+    }
+}
+
+/**
 **	Handle movement of the cursor.
 **
 **	@param x	Screen X position.
@@ -5762,6 +5784,7 @@ global void InitMenus(unsigned int race)
 	callbacks.MouseExit=&HandleMouseExit;
 	callbacks.KeyPressed=&MenuHandleKeyDown;
 	callbacks.KeyReleased=&MenuHandleKeyUp;
+	callbacks.KeyRepeated=&MenuHandleKeyRepeat;
 	callbacks.NetworkEvent=NetworkEvent;
 	callbacks.SoundReady=WriteSound;
     }

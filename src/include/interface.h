@@ -291,6 +291,8 @@ extern int HandleKeyModifiersUp(unsigned keycode,unsigned keychar);
 extern void HandleKeyDown(unsigned keycode,unsigned keychar);
     /// Called when a key is released
 extern void HandleKeyUp(unsigned keycode,unsigned keychar);
+    /// Called when a key is repeated
+extern void HandleKeyRepeat(unsigned keycode,unsigned keychar);
 
 //
 //	in interface.c (for link between video and mouse.c)
@@ -303,8 +305,15 @@ extern void InputMouseButtonRelease(const EventCallback*,unsigned,unsigned);
 extern void InputMouseMove(const EventCallback*,unsigned,int,int);
     /// Called if the mouse exits the game window (when supported by videomode)
 extern void InputMouseExit(const EventCallback*,unsigned);
-    /// Called to look for mouse timeout's
+    /// Called to look for mouse timeouts
 extern void InputMouseTimeout(const EventCallback*,unsigned);
+
+    /// Called if any key button is pressed down
+extern void InputKeyButtonPress(const EventCallback*,unsigned,unsigned,unsigned);
+    /// Called if any key button is released up
+extern void InputKeyButtonRelease(const EventCallback*,unsigned,unsigned,unsigned);
+    /// Called to look for key timeouts
+extern void InputKeyTimeout(const EventCallback*,unsigned);
 
     /// Toggle pause mode
 extern void UiTogglePause(void);
