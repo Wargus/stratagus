@@ -340,6 +340,12 @@ local int ReturnWithWood(Unit* unit)
 
     destu=unit->Orders[0].Goal;
 
+    if( !destu ) {
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+
     DebugCheck( !destu );
 
     //
@@ -388,6 +394,12 @@ local int ReturnWithWood(Unit* unit)
 #else
 
     destu=unit->Command.Data.Move.Goal;
+
+    if( !destu ) {
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
 
     DebugCheck( !destu );
 
