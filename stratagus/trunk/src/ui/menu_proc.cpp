@@ -220,17 +220,25 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 {
     int i, nc, rc;
     char *text;
-    unsigned flags = mi->flags;
-    MenuButtonId rb = mi->d.pulldown.button;
+    unsigned flags;
+    MenuButtonId rb;
     unsigned w, h, x, y, oh;
+
     x = mx+mi->xofs;
     y = my+mi->yofs;
     w = mi->d.pulldown.xsize;
+    flags = mi->flags;
+    rb = mi->d.pulldown.button;
     oh = h = mi->d.pulldown.ysize - 2;
 
     GetDefaultTextColors(&nc, &rc);
     if (flags&MenuButtonClicked) {
-	y -= mi->d.pulldown.curopt * h;
+	// Make the menu inside of the screen (TOP)
+	if (y <= mi->d.pulldown.curopt * h) {
+	    y = 0;
+	} else {
+	    y -= mi->d.pulldown.curopt * h;
+	}
 	i = mi->d.pulldown.noptions;
 	h *= i;
 	while (i--) {
@@ -956,7 +964,11 @@ local void MenuHandleMouseMove(int x,int y)
 		xs = menu->x + mi->xofs;
 		ys = menu->y + mi->yofs;
 		h = mi->d.pulldown.ysize - 2;
-		ys -= mi->d.pulldown.curopt * h;
+		if (ys <= mi->d.pulldown.curopt * h) {
+		    ys = 0;
+		} else {
+		    ys -= mi->d.pulldown.curopt * h;
+		}
 		if (!(x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + h*mi->d.pulldown.noptions)) {
 		    j = (y - ys) / h;
 		    if (j >= 0 && j < mi->d.pulldown.noptions && j != mi->d.pulldown.cursel) {
