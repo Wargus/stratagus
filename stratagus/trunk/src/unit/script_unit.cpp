@@ -38,6 +38,8 @@
 
 #include <stdlib.h>
 
+#include "unittype.h"
+#include "player.h"
 #include "unit.h"
 #include "ccl.h"
 
@@ -48,6 +50,9 @@
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+    /// Get unit-type.
+extern UnitType* CclGetUnitType(SCM ptr);
 
 /**
 **	Set hit-point regeneration
@@ -75,10 +80,249 @@ local SCM CclSetHitPointRegeneration(SCM flag)
 */
 local SCM CclUnit(SCM list)
 {
+    SCM value;
+    //SCM sublist;
+    Unit* unit;
+    UnitType* type;
+    Player* player;
+    int slot;
+    int i;
+    char* str;
+
+    str=gh_scm2newstr(gh_car(list),NULL);
+    list=gh_cdr(list);
+
+    slot=strtol(str+1,NULL,16);
+    free(str);
+    unit=NULL;
+    type=NULL;
+    player=NULL;
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("type")) ) {
+	    type=UnitTypeByIdent(str=gh_scm2newstr(gh_car(list),NULL));
+	    free(str);
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("player")) ) {
+	    player=&Players[gh_scm2int(gh_car(list))];
+	    list=gh_cdr(list);
+
+	    DebugCheck( !type );
+	    unit=MakeUnit(type,player);
+	    unit->Removed=0;
+	    unit->Reset=0;
+	    DebugCheck( unit->Slot!=slot );
+	} else if( gh_eq_p(value,gh_symbol2scm("tile")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    unit->X=gh_scm2int(gh_car(value));
+	    unit->Y=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(value,gh_symbol2scm("stats")) ) {
+	    unit->Stats=&type->Stats[gh_scm2int(gh_car(list))];
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("pixel")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    unit->IX=gh_scm2int(gh_car(value));
+	    unit->IY=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(value,gh_symbol2scm("frame")) ) {
+	    unit->Frame=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("flipped-frame")) ) {
+	    unit->Frame=128|gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("seen")) ) {
+	    unit->SeenFrame=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("flipped-seen")) ) {
+	    unit->SeenFrame=128|gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("not-seen")) ) {
+	    unit->SeenFrame=-1;
+	} else if( gh_eq_p(value,gh_symbol2scm("direction")) ) {
+	    unit->Direction=(gh_scm2int(gh_car(list))*256)/360;
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("attacked")) ) {
+	    unit->Attacked=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("burning")) ) {
+	    unit->Burning=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("destroyed")) ) {
+	    unit->Destroyed=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("removed")) ) {
+	    unit->Removed=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("selected")) ) {
+	    unit->Selected=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("visible")) ) {
+	    str=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	    for( i=0; i<PlayerMax && *str; ++i,++str ) {
+		if( *str=='-' || *str=='_' || *str==' ' ) {
+		    unit->Visible&=~(1<<i);
+		} else {
+		    unit->Visible|=(1<<i);
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("constructed")) ) {
+	    unit->Constructed=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("active")) ) {
+	    unit->Active=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("mana")) ) {
+	    unit->Mana=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("hp")) ) {
+	    unit->HP=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("ttl")) ) {
+	    unit->TTL=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("bloodlust")) ) {
+	    unit->Bloodlust=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("haste")) ) {
+	    unit->Haste=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("slow")) ) {
+	    unit->Slow=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("invisible")) ) {
+	    unit->Invisible=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("flame-shield")) ) {
+	    unit->FlameShield=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("unholy-armor")) ) {
+	    unit->UnholyArmor=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("group-id")) ) {
+	    unit->GroupId=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("last-group")) ) {
+	    unit->LastGroup=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("sub-action")) ) {
+	    unit->SubAction=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("wait")) ) {
+	    unit->Wait=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("state")) ) {
+	    unit->State=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("reset")) ) {
+	    unit->Reset=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("blink")) ) {
+	    unit->Blink=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("moving")) ) {
+	    unit->Moving=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("rs")) ) {
+	    unit->Rs=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("revealer")) ) {
+	    unit->Revealer=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("on-board")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME:\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("order-count")) ) {
+	    unit->OrderCount=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("order-flush")) ) {
+	    unit->OrderFlush=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("orders")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME:\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("saved-order")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME:\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("new-order")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME:\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("data-builded")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME:\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("data-reseach")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME:\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("data-upgrade-to")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME:\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("data-train")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME:\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("data-move")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME:\n");
+	} else {
+	   // FIXME: this leaves a half initialized unit
+	   errl("Unsupported tag",value);
+	}
+    }
+
+    //
+    //	Place on map
+    //
+    if( !unit->Removed && !unit->Destroyed ) {
+	unit->Removed=1;
+	PlaceUnit(unit,unit->X,unit->Y);
+    }
+
     DebugLevel0Fn("FIXME: not written\n");
 
     return SCM_UNSPECIFIED;
 }
+
+/**
+**	Make an unit.
+**
+**	@param type	Unit-type of the unit,
+**	@param player	Owning player number of the unit.
+**
+**	@return		Returns the slot number of the made unit.
+*/
+local SCM CclMakeUnit(SCM type,SCM player)
+{
+    UnitType* unittype;
+    Unit* unit;
+
+    unittype=CclGetUnitType(type);
+    unit=MakeUnit(unittype,&Players[gh_scm2int(player)]);
+
+    return gh_int2scm(unit->Slot);
+}
+
+/**
+**	Place an unit on map.
+**
+**	@param unit	Unit (slot number) to be placed.
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**
+**	@return		Returns the slot number of the made placed.
+*/
+local SCM CclPlaceUnit(SCM unit,SCM x,SCM y)
+{
+    PlaceUnit(UnitSlots[gh_scm2int(unit)],gh_scm2int(x),gh_scm2int(y));
+    return unit;
+}
+
 
 /**
 **	Register CCL features for unit.
@@ -88,6 +332,9 @@ global void UnitCclRegister(void)
     gh_new_procedure1_0("set-hitpoint-regeneration!",
 	    CclSetHitPointRegeneration);
     gh_new_procedureN("unit",CclUnit);
+
+    gh_new_procedure2_0("make-unit",CclMakeUnit);
+    gh_new_procedure3_0("place-unit",CclPlaceUnit);
 }
 
 #endif	// } USE_CCL
