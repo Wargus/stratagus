@@ -138,7 +138,7 @@ local void AiCleanForce(int force)
 /**
 **	Cleanup units in forces.
 */
-local void AiCleanForces(void)
+global void AiCleanForces(void)
 {
     int force;
 
