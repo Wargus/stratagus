@@ -156,9 +156,11 @@ global void SaveAll(void)
 
     SaveUnitTypes(file);
     SaveUnits(file);
+    SaveTileset(file);
     SaveMap(file);
     SaveUpgrades(file);
     SaveDependencies(file);
+
     // FIXME: find all state information which must be saved.
 
     fclose(file);
@@ -225,7 +227,6 @@ global char* strdcat3(const char* l, const char* m, const char* r) {
 global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
-
     printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others."
 #ifdef USE_CCL2
     "\n  SIOD Copyright by George J. Carrette."
