@@ -1725,10 +1725,14 @@ global void SoundOptions(void)
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
 	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;
 #endif
+    if (SoundFildes != -1)
+	SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_CHECKED;
     SoundOptionsMenuItems[2].d.hslider.percent = (GlobalVolume * 100) / 255;
 
-    if (PlayingMusic == 1);
+    if (PlayingMusic == 1 && SoundFildes != -1)
         SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_CHECKED;
+    else 
+	SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_UNCHECKED;
     SoundOptionsMenuItems[8].d.hslider.percent = (MusicVolume * 100) / 255;
     
 #ifdef USE_LIBCDA
@@ -1741,6 +1745,24 @@ global void SoundOptions(void)
 
 local void SetMasterPower(Menuitem *mi)
 {
+
+#ifdef USE_SDLA 
+    if (SoundFildes != -1) {
+	SDL_CloseAudio();
+	SoundFildes=-1;
+    } else {
+	InitSound();
+    }
+#else 
+    if (SoundFildes != -1) {
+        close(SoundFildes);
+        SoundFildes=-1;
+    } else {
+	InitSound();
+    }
+#endif 				
+    EndMenu();
+    SoundOptions();
 }
 
 local void SetMusicPower(Menuitem *mi)
@@ -1762,6 +1784,8 @@ local void SetMusicPower(Menuitem *mi)
                 } 
             } 
     }
+    EndMenu();
+    SoundOptions();
 }
 
 local void SetCdPower(Menuitem *mi)
