@@ -191,6 +191,7 @@ global void SaveAll(void)
     SaveUnits(file);
     SaveUpgrades(file);
     SaveDependencies(file);
+    SaveButtons(file);
     SaveTileset(file);
     SaveMap(file);
 

@@ -836,7 +836,6 @@ local void SendSpellCast(int x,int y)
     }
 }
 
-
 /**
 **	Send a command to selected units.
 **
@@ -850,31 +849,31 @@ local void SendCommand(int x,int y)
     CurrentButtonLevel = 0; // reset unit buttons to normal
     UpdateButtonPanel();
     switch( CursorAction ) {
-	case B_Move:
+	case ButtonMove:
 	    SendMove(x,y);
 	    break;
-	case B_Repair:
+	case ButtonRepair:
 	    SendRepair(x,y);
 	    break;
-	case B_Attack:
+	case ButtonAttack:
 	    SendAttack(x,y);
 	    break;
-	case B_AttackGround:
+	case ButtonAttackGround:
 	    SendAttackGround(x,y);
 	    break;
-	case B_Patrol:
+	case ButtonPatrol:
 	    SendPatrol(x,y);
 	    break;
-	case B_Harvest:
+	case ButtonHarvest:
 	    SendHarvest(x,y);
 	    break;
-	case B_Unload:
+	case ButtonUnload:
 	    SendUnload(x,y);
 	    break;
-	case B_Demolish:
+	case ButtonDemolish:
 	    SendDemolish(x,y);
 	    break;
-        case B_SpellCast:
+        case ButtonSpellCast:
 	    SendSpellCast(x,y);
 	    break;
 	default:

@@ -1,11 +1,11 @@
 //   ___________		     _________		      _____  __
-//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
-//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//   \_	  _____/______	 ____	____ \_	  ___ \____________ _/ ____\/  |_
+//    |	   __) \_  __ \_/ __ \_/ __ \/	  \  \/\_  __ \__  \\	__\\   __\ 
+//    |	    \	|  | \/\  ___/\	 ___/\	   \____|  | \// __ \|	|   |  |
+//    \___  /	|__|	\___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
-//  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
+//  ______________________			     ______________________
+//			  T H E	  W A R	  B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name interface.h	-	The user interface header file. */
@@ -33,26 +33,27 @@
 
     /// Button Commands
 enum _button_cmd_ {
-    B_Move,				/// order move
-    B_Stop,				/// order stop
-    B_Attack,				/// order attack
-    B_Repair,				/// order repair
-    B_Harvest,				/// order harvest
-    B_Button,				/// choose other button set
-    B_Build,				/// order build
-    B_Train,				/// order train
-    B_Patrol,				/// order patrol
-    B_StandGround,			/// order stand ground
-    B_AttackGround,			/// order attack ground
-    B_Return,				/// order return goods
-    B_Demolish,				/// order demolish/explode
-    B_SpellCast,			/// order cast spell
-    B_Research,				/// order reseach
-    B_UpgradeTo,			/// order upgrade
-    B_Unload,				/// order unload unit
-    B_Cancel,				/// cancel
-    B_CancelTrain,			/// cancel training
-    B_CancelBuild,			/// cancel building
+    ButtonMove,				/// order move
+    ButtonStop,				/// order stop
+    ButtonAttack,			/// order attack
+    ButtonRepair,			/// order repair
+    ButtonHarvest,			/// order harvest
+    ButtonButton,			/// choose other button set
+    ButtonBuild,			/// order build
+    ButtonTrain,			/// order train
+    ButtonPatrol,			/// order patrol
+    ButtonStandGround,			/// order stand ground
+    ButtonAttackGround,			/// order attack ground
+    ButtonReturn,			/// order return goods
+    ButtonDemolish,			/// order demolish/explode
+    ButtonSpellCast,			/// order cast spell
+    ButtonResearch,			/// order reseach
+    ButtonUpgradeTo,			/// order upgrade
+    ButtonUnload,			/// order unload unit
+    ButtonCancel,			/// cancel
+    ButtonCancelUpgrade,		/// cancel upgrade
+    ButtonCancelTrain,			/// cancel training
+    ButtonCancelBuild,			/// cancel building
 };
 
     /// typedef for action of button
@@ -60,18 +61,18 @@ typedef struct _button_action_ ButtonAction;
 
     /// Action of button
 struct _button_action_ {
-    int         Pos;                    /// button position in the grid
-    int         Level;                  /// requires button level
+    int		Pos;			/// button position in the grid
+    int		Level;			/// requires button level
     IconConfig	Icon;			/// icon to display
     enum _button_cmd_ Action;		/// command on button press
     int		Value;			/// extra value for command
-    char*	ValueStr;               /// keep original value string
+    char*	ValueStr;		/// keep original value string
 	/// Check if this button is allowed
-    int         (*Allowed)(const Unit* unit,const ButtonAction* button);
+    int		(*Allowed)(const Unit* unit,const ButtonAction* button);
     char*	AllowStr;		/// argument for allowed
     int		Key;			/// alternative on keyboard
     char*	Hint;			/// tip text
-    char*       UMask;                  /// for which units is available
+    char*	UnitMask;		/// for which units is it available
 };
 
     /// current interface state
@@ -138,7 +139,7 @@ enum _mouse_buttons_ {
     // FIXME: support for double click and long hold
 
 	/// Left+Middle button on mouse
-    LeftAndMiddleButton	= LeftButton|MiddleButton,
+    LeftAndMiddleButton = LeftButton|MiddleButton,
 	/// Left+Right button on mouse
     LeftAndRightButton	= LeftButton|RightButton,
 	/// Middle+Right button on mouse
@@ -242,9 +243,12 @@ extern void InitButtons(void);
 extern void DoneButtons(void);
     /// Make a new button
 extern int AddButton(int pos,int level,const char* IconIdent,
-    enum _button_cmd_ action,const char* value,
-    const void* func,const void* arg,
-    int key,const char* hint,const char* umask);
+	enum _button_cmd_ action,const char* value,
+	const void* func,const void* arg,
+	int key,const char* hint,const char* umask);
+
+    /// Save all buttons
+extern void SaveButtons(FILE* file);
 
     /// Called if any mouse button is pressed down
 extern void HandleButtonDown(int b);
@@ -288,6 +292,33 @@ extern void UpdateButtonPanel(void);
 extern void DoButtonButtonClicked(int button);
     /// Lookup key for bottom panel buttons.
 extern int DoButtonPanelKey(int key);
+
+//
+//	in button_table.c
+//
+    /// Check is always true
+extern int ButtonCheckTrue(const Unit* unit,const ButtonAction* button);
+    /// Check is always false
+extern int ButtonCheckFalse(const Unit* unit,const ButtonAction* button);
+    /// Check if allowed upgrade is ready
+extern int ButtonCheckUpgrade(const Unit* unit,const ButtonAction* button);
+    /// Check if allowed unit exists
+extern int ButtonCheckUnit(const Unit* unit,const ButtonAction* button);
+    /// Check if allowed units exists
+extern int ButtonCheckUnits(const Unit* unit,const ButtonAction* button);
+    /// Check if have network play
+extern int ButtonCheckNetwork(const Unit* unit,const ButtonAction* button);
+    /// Check if unit isn't working (train,upgrade,research)
+extern int ButtonCheckNoWork(const Unit* unit,const ButtonAction* button);
+    /// Check if unit isn't researching or upgrading
+extern int ButtonCheckNoResearch(const Unit* unit,const ButtonAction* button);
+
+    /// Check if all requirements for an attack to are meet
+extern int ButtonCheckAttack(const Unit* unit,const ButtonAction* button);
+    /// Check if all requirements for an upgrade to are meet
+extern int ButtonCheckUpgradeTo(const Unit* unit,const ButtonAction* button);
+    /// Check if all requirements for a research are meet
+extern int ButtonCheckResearch(const Unit* unit,const ButtonAction* button);
 
 //@}
 
