@@ -2574,10 +2574,6 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 	}
     }
 
-    if( src->Selected )
-    DebugLevel2("\tDistance %d,%d -> %d,%d = %d\n"
-	    ,x1,y1,x2,y2,(dy<dx) ? dx : dy);
-
     return (dy<dx) ? dx : dy;
 }
 
