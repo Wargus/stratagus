@@ -392,8 +392,6 @@ global _MenuFuncHash MenuFuncHash;
     *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
 }
 
-    /// A game was loaded
-local int GameLoaded;
     /// Game started
 global int GuiGameStarted;
     /// Editor cancel button pressed
@@ -1154,7 +1152,6 @@ local int SaveGameRDFilter(char *pathbuf, FileList *fl)
 local void LoadGameInit(Menuitem *mi)
 {
     mi->menu->items[3].flags = MI_DISABLED;
-    GameLoaded=0;
     CreateSaveDir();
 }
 
@@ -1163,9 +1160,6 @@ local void LoadGameInit(Menuitem *mi)
 */
 local void LoadGameExit(Menuitem *mi __attribute__ ((unused)))
 {
-    if( GameLoaded ) {
-	GameMenuReturn();
-    }
 }
 
 /**
@@ -1361,10 +1355,9 @@ local void LoadGameOk(void)
 	sprintf(TempPathBuf, "%s/%s", SaveDir, fl[i].name);
 	LoadGame(TempPathBuf);
 	SetMessage("Loaded game: %s", TempPathBuf);
-	GameLoaded = 1;
 	GuiGameStarted = 1;
 	CurrentMapPath[0] = '\0';
-	EndMenu();
+	GameMenuReturn();
     }
 }
 
