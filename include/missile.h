@@ -278,6 +278,10 @@ extern int ViewPointDistanceToMissile(const Missile*);
 extern void SaveMissileTypes(FILE*);
     /// Save missiles
 extern void SaveMissiles(FILE*);
+    /// Clean missile-types
+extern void CleanMissileTypes(void);
+    /// Clean missiles
+extern void CleanMissiles(void);
 
 //@}
 
