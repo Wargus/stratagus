@@ -220,7 +220,7 @@ global void SaveButtons(FILE* file)
 	}
 	fprintf(file,"  'key \"");
 	switch( UnitButtonTable[i]->Key ) {
-	    case '\e':
+	    case '\033':
 		fprintf(file,"\\%03o",UnitButtonTable[i]->Key);
 		break;
 	    default:
