@@ -29,7 +29,10 @@
 
 //@{
 
+#ifndef _MSC_VER
 #include <sys/types.h>			// for u_int64_t
+#endif
+
 #if defined(__MINGW32__)
 typedef unsigned long long u_int64_t;
 #endif
