@@ -74,6 +74,10 @@
 
 #include "myendian.h"
 
+// If this is defined, the flags for the tiles are not read from the saved
+// map while loading, but are taken from the actual tileset information of
+// the game (which might have changed since the map was saved)
+#define USE_TILEFLAGS_FROM_TILESET_WHILE_LOADING_A_PUD
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
@@ -124,6 +128,7 @@ static unsigned int ChksumArea(const unsigned char* adr,int length)
 static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			,WorldMap* map)
 {
+	Tileset *tileset;
 	const unsigned short* ctab;
 	int h;
 	int w;
@@ -134,14 +139,15 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 	if(map->Terrain < TilesetMax) {
 		// FIXME: should use terrain name or better map->Tileset!!
 		//Assert( map->Tileset->Table == Tilesets[map->Terrain]->Table );
-		ctab = Tilesets[map->Terrain]->Table;
-		DebugPrint("FIXME: %s <-> %s\n" _C_ Tilesets[map->Terrain]->Class _C_
+		tileset = Tilesets[map->Terrain];
+		DebugPrint("FIXME: %s <-> %s\n" _C_ tileset->Class _C_
 				map->TerrainName);
 	} else {
 		DebugPrint("Unknown terrain!\n");
 		// FIXME: don't use TilesetSummer
-		ctab = Tilesets[TilesetSummer]->Table;
+		tileset = Tilesets[TilesetSummer];
 	}
+	ctab = tileset->Table;
 
 	for(h=0; h<height; ++h ) {
 		for( w=0; w<width; ++w ) {
@@ -150,6 +156,9 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			v=ConvertLE16(mtxm[h*width+w]);
 			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Tile=ctab[v];
 			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Value=0;
+#ifdef USE_TILEFLAGS_FROM_TILESET_WHILE_LOADING_A_PUD
+			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Flags = tileset->FlagsTable[v];
+#endif
 			//
 			// Walls are handled special (very ugly).
 			//
@@ -168,6 +177,7 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 	}
 }
 
+#ifndef USE_TILEFLAGS_FROM_TILESET_WHILE_LOADING_A_PUD
 /**
 ** Convert puds SQM section into our internal format.
 **
@@ -234,6 +244,7 @@ static void ConvertSQM(const unsigned short* sqm,int width,int height
 		}
 	}
 }
+#endif
 
 /**
 ** Convert puds REGM section into internal format.
@@ -1173,7 +1184,10 @@ void LoadPud(const char* pud,WorldMap* map)
 				ExitFatal(-1);
 			}
 
+#ifndef USE_TILEFLAGS_FROM_TILESET_WHILE_LOADING_A_PUD
 			ConvertSQM(sqm,width,height,map);
+#endif
+
 			free(sqm);
 
 			continue;
