@@ -147,7 +147,7 @@ global void CreatePlayer(char* name,int type)
     player->Type=type;
     player->Race=PlayerRaceHuman;
     player->Team=team;
-    player->Ai=PlayerAiUniversal;
+    player->AiNum=PlayerAiUniversal;
     
     //
     //	Initial default resources.
@@ -205,7 +205,7 @@ global void PlayerSetSide(Player* player,int side)
 */
 global void PlayerSetAiNum(Player* player,int ai)
 {
-    player->Ai=ai;
+    player->AiNum=ai;
 }
 
 /*----------------------------------------------------------------------------
@@ -423,7 +423,7 @@ global void PlayersInitAi(void)
 
     for( player=0; player<NumPlayers; ++player ) {
 	if( Players[player].AiEnabled ) {
-	    AiInit(player);
+	    AiInit(&Players[player]);
 	}
     }
 }
@@ -437,7 +437,7 @@ global void PlayersEachFrame(void)
 
     for( player=0; player<NumPlayers; ++player ) {
 	if( Players[player].AiEnabled ) {
-	    AiEachFrame(player);
+	    AiEachFrame(&Players[player]);
 	}
     }
 }
@@ -451,7 +451,7 @@ global void PlayersEachSecond(void)
 
     for( player=0; player<NumPlayers; ++player ) {
 	if( Players[player].AiEnabled ) {
-	    AiEachSecond(player);
+	    AiEachSecond(&Players[player]);
 	}
     }
 }
@@ -604,8 +604,8 @@ global void DebugPlayers(void)
 	    case PlayerRaceNeutral: DebugLevel0("neutral ");	break;
 	    default: DebugLevel0("what %d ",Players[i].Race);	break;
 	}
-	DebugLevel0("%2d ",Players[i].Ai);
-	switch( Players[i].Ai ) {
+	DebugLevel0("%2d ",Players[i].AiNum);
+	switch( Players[i].AiNum ) {
 	    case PlayerAiLand:	  DebugLevel0("(land)");	break;
 	    case PlayerAiPassive: DebugLevel0("(passive)");	break;
 	    case PlayerAiAir:	  DebugLevel0("(air)");		break;
