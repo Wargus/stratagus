@@ -221,6 +221,20 @@ int LuaLoadFile(const char* file)
 }
 
 /**
+**	Save preferences
+**
+**  @param l  Lua state.
+*/
+static int CclSavePreferences(lua_State* l)
+{
+	if (lua_gettop(l) != 0) {
+		LuaError(l, "incorrect argument");
+	}
+	SavePreferences();
+	return 0;
+}
+
+/**
 **  FIXME: docu
 **
 **  @param l  Lua state.
@@ -1092,6 +1106,7 @@ void InitCcl(void)
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
 
+	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "SaveGame", CclSaveGame);
 
