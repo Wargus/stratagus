@@ -236,8 +236,10 @@ local int PlayCDRom(const char* name)
 		CDMode = ":off";
 		return 1;
 	    }
-	    if (cd_get_tracks(&CDTrack, &NumCDTracks))
+	    if (cd_get_tracks(&CDTrack, &NumCDTracks)) {
+		CDMode = ":off";
 		return 1;
+	    }
 	    if (NumCDTracks == 0) {
 		CDMode = ":off";
 		return 1;
@@ -258,7 +260,8 @@ local int PlayCDRom(const char* name)
 		if (CDTrack > NumCDTracks)
 		    CDTrack = 1;
 	    } while (cd_is_audio(++CDTrack) < 1);
-	    cd_play(CDTrack);
+	    if (cd_play(CDTrack))
+		CDMode = ":stopped";
 	    return 1;
 	}
 	// if mode is play random tracks
@@ -267,7 +270,8 @@ local int PlayCDRom(const char* name)
 	    do {
 		CDTrack = MyRand() % NumCDTracks;
 	    } while (cd_is_audio(CDTrack) < 1);
-	    cd_play(CDTrack);
+	    if (cd_play(CDTrack))
+		CDMode = ":stopped";
 	    return 1;
 	}
 	return 1;
