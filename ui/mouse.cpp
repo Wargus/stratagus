@@ -439,45 +439,45 @@ local void HandleMouseOn(int x,int y)
     if( x<SCROLL_LEFT ) {
 	CursorOn=CursorOnScrollLeft;
 	MouseScrollState = ScrollLeft;
-	GameCursor=&Cursors[CursorTypeArrowW];
+	GameCursor=TheUI.ArrowW.Cursor;
 	if( y<SCROLL_UP ) {
 	    CursorOn=CursorOnScrollLeftUp;
 	    MouseScrollState = ScrollLeftUp;
-	    GameCursor=&Cursors[CursorTypeArrowNW];
+	    GameCursor=TheUI.ArrowNW.Cursor;
 	}
 	if( y>SCROLL_DOWN ) {
 	    CursorOn=CursorOnScrollLeftDown;
 	    MouseScrollState = ScrollLeftDown;
-	    GameCursor=&Cursors[CursorTypeArrowSW];
+	    GameCursor=TheUI.ArrowSW.Cursor;
 	}
 	return;
     }
     if( x>SCROLL_RIGHT ) {
 	CursorOn=CursorOnScrollRight;
 	MouseScrollState = ScrollRight;
-	GameCursor=&Cursors[CursorTypeArrowE];
+	GameCursor=TheUI.ArrowE.Cursor;
 	if( y<SCROLL_UP ) {
 	    CursorOn=CursorOnScrollRightUp;
 	    MouseScrollState = ScrollRightUp;
-	    GameCursor=&Cursors[CursorTypeArrowNE];
+	    GameCursor=TheUI.ArrowNE.Cursor;
 	}
 	if( y>SCROLL_DOWN ) {
 	    CursorOn=CursorOnScrollRightDown;
 	    MouseScrollState = ScrollRightDown;
-	    GameCursor=&Cursors[CursorTypeArrowSE];
+	    GameCursor=TheUI.ArrowSE.Cursor;
 	}
 	return;
     }
     if( y<SCROLL_UP ) {
 	CursorOn=CursorOnScrollUp;
 	MouseScrollState = ScrollUp;
-	GameCursor=&Cursors[CursorTypeArrowN];
+	GameCursor=TheUI.ArrowN.Cursor;
 	return;
     }
     if( y>SCROLL_DOWN ) {
 	CursorOn=CursorOnScrollDown;
 	MouseScrollState = ScrollDown;
-	GameCursor=&Cursors[CursorTypeArrowS];
+	GameCursor=TheUI.ArrowS.Cursor;
 	return;
     }
 }
@@ -500,7 +500,7 @@ global void UIHandleMouseMove(int x,int y)
     //
     //	Move map.
     //
-    if( GameCursor==&Cursors[CursorTypeMove] ) {
+    if( GameCursor==TheUI.Scroll.Cursor ) {
 	int xo = MapX, yo = MapY;
 
 	if ( TheUI.ReverseMouseMove ) {
@@ -531,7 +531,7 @@ global void UIHandleMouseMove(int x,int y)
     }
 
     UnitUnderCursor=NULL;
-    GameCursor=&Cursors[CursorTypePoint];		// Reset
+    GameCursor=TheUI.Point.Cursor;		// Reset
     HandleMouseOn(x,y);
     DebugLevel3("MouseOn %d\n",CursorOn);
 
@@ -570,13 +570,13 @@ global void UIHandleMouseMove(int x,int y)
     //
     if( CursorState==CursorStateSelect ) {
 	if( CursorOn==CursorOnMap || CursorOn==CursorOnMinimap ) {
-	    GameCursor=&Cursors[CursorTypeYellowHair];
+	    GameCursor=TheUI.YellowHair.Cursor;
 	    if( UnitUnderCursor ) {
 		// FIXME: should use IsEnemy here? yes (:
 		if( UnitUnderCursor->Player==ThisPlayer ) {
-		    GameCursor=&Cursors[CursorTypeGreenHair];
+		    GameCursor=TheUI.GreenHair.Cursor;
 		} else if( UnitUnderCursor->Player->Player!=PlayerNumNeutral ) {
-		    GameCursor=&Cursors[CursorTypeRedHair];
+		    GameCursor=TheUI.RedHair.Cursor;
 		}
 	    }
 	    if( CursorOn==CursorOnMinimap && (MouseButtons&RightButton) ) {
@@ -602,7 +602,7 @@ global void UIHandleMouseMove(int x,int y)
 	    if( NumSelected==0 ) {
 		MustRedraw|=RedrawInfoPanel;
 	    }
-	    GameCursor=&Cursors[CursorTypeGlass];
+	    GameCursor=TheUI.Glass.Cursor;
 	}
 
 #ifdef FLAG_DEBUG	// ARI: Disabled by introducing flag debug!
@@ -911,7 +911,7 @@ global void UIHandleButtonDown(int b)
 	    ClearStatusLine();
 	    ClearCosts();
 	    CursorState=CursorStatePoint;
-	    GameCursor=&Cursors[CursorTypePoint];
+	    GameCursor=TheUI.Point.Cursor;
             CurrentButtonLevel = 0;
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel|RedrawCursor;
@@ -925,7 +925,7 @@ global void UIHandleButtonDown(int b)
 		ClearStatusLine();
 		ClearCosts();
 		CursorState=CursorStatePoint;
-		GameCursor=&Cursors[CursorTypePoint];
+		GameCursor=TheUI.Point.Cursor;
                 CurrentButtonLevel = 0; // reset unit buttons to normal
 		UpdateButtonPanel();
 		MustRedraw|=RedrawButtonPanel|RedrawCursor;
@@ -949,7 +949,7 @@ global void UIHandleButtonDown(int b)
 	ClearStatusLine();
 	ClearCosts();
 	CursorState=CursorStatePoint;
-	GameCursor=&Cursors[CursorTypePoint];
+	GameCursor=TheUI.Point.Cursor;
         CurrentButtonLevel = 0; // reset unit buttons to normal
 	UpdateButtonPanel();
 	MustRedraw|=RedrawButtonPanel|RedrawCursor;
@@ -993,13 +993,13 @@ global void UIHandleButtonDown(int b)
 	if( MouseButtons&LeftButton ) {	// enter select mode
 	    CursorStartX=CursorX;
 	    CursorStartY=CursorY;
-	    GameCursor=&Cursors[CursorTypeCross];
+	    GameCursor=TheUI.Cross.Cursor;
 	    CursorState=CursorStateRectangle;
 	    MustRedraw|=RedrawCursor;
 	} else if( MouseButtons&MiddleButton ) {// enter move map mode
 	    CursorStartX=CursorX;
 	    CursorStartY=CursorY;
-	    GameCursor=&Cursors[CursorTypeMove];
+	    GameCursor=TheUI.Scroll.Cursor;
 	    DebugLevel3("Cursor middle down %d,%d\n",CursorX,CursorY);
 	    MustRedraw|=RedrawCursor;
 	} else if( MouseButtons&RightButton ) {
@@ -1060,8 +1060,8 @@ global void UIHandleButtonUp(int b)
     //
     //	Move map.
     //
-    if( GameCursor==&Cursors[CursorTypeMove] ) {
-	GameCursor=&Cursors[CursorTypePoint];		// Reset
+    if( GameCursor==TheUI.Scroll.Cursor ) {
+	GameCursor=TheUI.Point.Cursor;		// Reset
 	return;
     }
     if( (1<<b) == LeftButton && GameMenuButtonClicked == 1 ) {
@@ -1190,7 +1190,7 @@ global void UIHandleButtonUp(int b)
 
 	CursorStartX=0;
 	CursorStartY=0;
-	GameCursor=&Cursors[CursorTypePoint];
+	GameCursor=TheUI.Point.Cursor;
 	CursorState=CursorStatePoint;
 	MustRedraw|=RedrawCursor|RedrawMap|RedrawPanels;
     }

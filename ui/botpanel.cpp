@@ -693,7 +693,7 @@ global void DoButtonButtonClicked(int button)
 	case B_Demolish:
         case B_SpellCast:
 	    CursorState=CursorStateSelect;
-	    GameCursor=&Cursors[CursorTypeYellowHair];
+	    GameCursor=TheUI.YellowHair.Cursor;
 	    CursorAction=CurrentButtons[button].Action;
 	    CursorValue=CurrentButtons[button].Value;
             CurrentButtonLevel=9;	// level 9 is cancel-only
@@ -743,7 +743,7 @@ global void DoButtonButtonClicked(int button)
 	    ClearCosts();
             CurrentButtonLevel = 0;
 	    UpdateButtonPanel();
-	    GameCursor=&Cursors[CursorTypePoint];
+	    GameCursor=TheUI.Point.Cursor;
 	    CursorBuilding=NULL;
 	    CursorState=CursorStatePoint;
 	    MustRedraw|=RedrawCursor;

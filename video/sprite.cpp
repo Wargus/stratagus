@@ -1647,6 +1647,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
     if( !height ) {
 	height=graphic->Height;
     }
+    DebugCheck( width>graphic->Width || height>graphic->Height );
     depth=8;
 
     // Check if width and height fits.
