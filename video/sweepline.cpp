@@ -33,6 +33,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "freecraft.h"
+
+#ifdef NEW_DECODRAW
+
+#include "video.h"
 #include "sweepline.h"
 
 /*----------------------------------------------------------------------------
@@ -218,6 +223,8 @@ void SweeplineAdd( int leftx, int rightx, int y )
   SRectangle **pnode, *nextleft, *nextright, *node;
   int shadowleftx, shadowrightx;
 
+  IfDebug( nextleft=nextright=NULL);
+
   DebugCheck( leftx > rightx );
 
   shadowleftx  = leftx  - SWEEPLINE_MERGE;
@@ -364,5 +371,7 @@ void SweeplineInvalidateAll( void )
     DeleteSRectangle( sweepline_bottom_head );
   }
 }
+
+#endif
 
 //@}
