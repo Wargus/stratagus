@@ -333,7 +333,6 @@ static void EditorEditAiPropertiesCancel(void);
 // Editor save
 static void EditorSaveInit(Menu* menu);
 static void EditorSaveExit(Menu* menu);
-static void EditorSaveLBInit(Menuitem* mi);
 static void EditorSaveVSAction(Menuitem* mi);
 static void EditorSaveEnterAction(Menuitem* mi, int key);
 static void EditorSaveOk(void);
@@ -1015,14 +1014,6 @@ void InitMenuFuncHash(void)
 	HASHADD(LBRetrieveAndInfo, "scen-select-lb-retrieve");
 	HASHADD(LBRetrieveAndInfo, "editor-main-load-lb-retrieve");
 
-	HASHADD(LBExit, "scen-select-lb-exit");
-	HASHADD(LBExit, "editor-main-load-lb-exit");
-	HASHADD(LBExit, "editor-load-lb-exit");
-	HASHADD(LBExit, "replay-game-lb-exit");
-	HASHADD(LBExit, "editor-save-lb-exit");
-	HASHADD(LBExit, "load-game-lb-exit");
-	HASHADD(LBExit, "save-game-lb-exit");
-
 	HASHADD(PathLBAction, "scen-select-lb-action");
 	HASHADD(SaveGameLBAction, "save-game-lb-action");
 	HASHADD(PathLBAction, "load-game-lb-action");
@@ -1055,7 +1046,6 @@ void InitMenuFuncHash(void)
 // Scenario select
 	HASHADD(ScenSelectInit,"scen-select-init");
 	HASHADD(ScenSelectExit,"scen-select-exit");
-	HASHADD(ScenSelectLBInit,"scen-select-lb-init");
 	HASHADD(ScenSelectTPMSAction,"scen-select-tpms-action");
 	HASHADD(ScenSelectVSAction,"scen-select-vs-action");
 	HASHADD(ScenSelectFolder,"scen-select-folder");
@@ -1212,7 +1202,6 @@ void InitMenuFuncHash(void)
 // Save
 	HASHADD(SaveGameInit,"save-game-init");
 	HASHADD(SaveGameExit,"save-game-exit");
-	HASHADD(SaveGameLBInit,"save-game-lb-init");
 	HASHADD(SaveGameEnterAction,"save-game-enter-action");
 	HASHADD(SaveGameVSAction,"save-game-vs-action");
 	HASHADD(SaveGameOk,"save-game-ok");
@@ -1221,7 +1210,6 @@ void InitMenuFuncHash(void)
 // Load
 	HASHADD(LoadGameInit,"load-game-init");
 	HASHADD(LoadGameExit,"load-game-exit");
-	HASHADD(LoadGameLBInit,"load-game-lb-init");
 	HASHADD(LoadGameVSAction,"load-game-vs-action");
 	HASHADD(LoadGameOk,"load-game-ok");
 
@@ -1256,7 +1244,6 @@ void InitMenuFuncHash(void)
 // Editor main load map
 	HASHADD(EditorMainLoadInit,"editor-main-load-init");
 	HASHADD(EditorMainLoadExit,"editor-main-load-exit");
-	HASHADD(EditorMainLoadLBInit,"editor-main-load-lb-init");
 	HASHADD(EditorMainLoadVSAction,"editor-main-load-vs-action");
 	HASHADD(EditorMainLoadOk,"editor-main-load-ok");
 	HASHADD(EditorMainLoadCancel,"editor-main-load-cancel");
@@ -1265,7 +1252,6 @@ void InitMenuFuncHash(void)
 // Editor load map
 	HASHADD(EditorMainLoadInit,"editor-load-init");
 	HASHADD(EditorMainLoadExit,"editor-load-exit");
-	HASHADD(EditorMainLoadLBInit,"editor-load-lb-init");
 	HASHADD(EditorMainLoadVSAction,"editor-load-vs-action");
 	HASHADD(EditorLoadOk,"editor-load-ok");
 	HASHADD(EditorLoadCancel,"editor-load-cancel");
@@ -1314,7 +1300,6 @@ void InitMenuFuncHash(void)
 // Replay game
 	HASHADD(ReplayGameInit,"replay-game-init");
 	HASHADD(ReplayGameExit,"replay-game-exit");
-	HASHADD(ReplayGameLBInit,"replay-game-lb-init");
 	HASHADD(ReplayGameVSAction,"replay-game-vs-action");
 	HASHADD(ReplayGameFolder,"replay-game-folder");
 	HASHADD(ReplayGameDisableFog,"replay-game-disable-fog");
