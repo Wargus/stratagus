@@ -357,6 +357,8 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
     //
     //  Find all goldmines.
     //
+    // FIXME: Wo says that are only one gold mine?
+    // FIXME: The hardcoded UnitTypeGoldMine will be removed soon
     num_goldmine = FindUnitsByType(UnitTypeGoldMine, goldmines);
     DebugLevel3("\tGoldmines %d\n" _C_ num_goldmine);
     if (!num_goldmine) {
