@@ -1160,7 +1160,7 @@ local int GameStatsDrawFunc(int frame)
 	    max = 1;
 	}
 
-	VideoDrawTextCentered(x + 230, y + bottom_offset, LargeFont, "Gold");
+	VideoDrawTextCentered(x + 230, y + bottom_offset, LargeFont, DefaultResourceNames[GoldCost]);
 	sprintf(buf, "%u", ThisPlayer->TotalResources[GoldCost]);
 	percent = ThisPlayer->TotalResources[GoldCost] * 100 / max;
 	DrawStatBox(x + 190, y + bottom_offset + description_offset, buf,
@@ -1193,7 +1193,7 @@ local int GameStatsDrawFunc(int frame)
 	    max = 1;
 	}
 
-	VideoDrawTextCentered(x + 320, y + bottom_offset, LargeFont, "Lumber");
+	VideoDrawTextCentered(x + 320, y + bottom_offset, LargeFont, DefaultResourceNames[WoodCost]);
 	sprintf(buf, "%u", ThisPlayer->TotalResources[WoodCost]);
 	percent = ThisPlayer->TotalResources[WoodCost] * 100 / max;
 	DrawStatBox(x + 280, y + bottom_offset + description_offset, buf,
@@ -1226,7 +1226,7 @@ local int GameStatsDrawFunc(int frame)
 	    max = 1;
 	}
 
-	VideoDrawTextCentered(x + 410, y + bottom_offset, LargeFont, "Oil");
+	VideoDrawTextCentered(x + 410, y + bottom_offset, LargeFont, DefaultResourceNames[OilCost]);
 	sprintf(buf, "%u", ThisPlayer->TotalResources[OilCost]);
 	percent = ThisPlayer->TotalResources[OilCost] * 100 / max;
 	DrawStatBox(x + 370, y + bottom_offset + description_offset, buf,
