@@ -1200,7 +1200,7 @@ global int InitSound(void)
     DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
 #endif
 
-    if( TitleMusic && (!strcmp(CDMode, "off")) ) {
+    if( TitleMusic && (!strcmp(CDMode, ":off")) ) {
 	PlayMusic(TitleMusic);
     }
 
