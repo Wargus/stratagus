@@ -947,6 +947,11 @@ global void InitUnitTypes(void)
 	//
 	*(UnitType**)hash_add(UnitTypeHash,UnitTypes[type].Ident)
 		=&UnitTypes[type];
+
+	// FIXME: Should be made configurable
+	if( !UnitTypes[type].Building ) {
+	    UnitTypes[type].Demand=1;
+	}
     }
 
     //
@@ -968,6 +973,17 @@ global void InitUnitTypes(void)
     UnitTypeHumanWall=UnitTypeByIdent("unit-human-wall");
     UnitTypeOrcWall=UnitTypeByIdent("unit-orc-wall");
     UnitTypeCritter=UnitTypeByIdent("unit-critter");
+
+    //
+    //	Setup some hard coded values. FIXME: should be moved to some configs.
+    //
+    UnitTypeHumanFarm->Supply=UnitTypeOrcFarm->Supply=4;
+    UnitTypeByIdent("unit-town-hall")->Supply=1;
+    UnitTypeByIdent("unit-great-hall")->Supply=1;
+    UnitTypeByIdent("unit-keep")->Supply=1;
+    UnitTypeByIdent("unit-stronghold")->Supply=1;
+    UnitTypeByIdent("unit-castle")->Supply=1;
+    UnitTypeByIdent("unit-fortress")->Supply=1;
 }
 
 /**

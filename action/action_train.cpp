@@ -90,7 +90,8 @@ global void HandleActionTrain(Unit* unit)
 	//
 	//	Check if enough food available.
 	//
-	if( player->Food<=player->NumFoodUnits ) {
+	if( player->Food<
+		player->NumFoodUnits+unit->Data.Train.What[0]->Demand ) {
 
 	    // FIXME: GameMessage
 	    if( player==ThisPlayer ) {

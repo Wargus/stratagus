@@ -511,7 +511,7 @@ global int PlayerCheckLimits(const Player* player,const UnitType* type)
     //
     if( NumUnits<UnitMax ) {
 	if( (type->Building ?  player->NumBuildings<player->BuildingLimit
-		: player->NumFoodUnits<player->FoodUnitLimit)
+		: player->NumFoodUnits+type->Demand<=player->FoodUnitLimit)
 		&& player->TotalNumUnits<player->TotalUnitLimit ) {
 	    return 1;
 	}
@@ -535,12 +535,11 @@ global int PlayerCheckLimits(const Player* player,const UnitType* type)
 **
 **	@note	The return values of the PlayerCheck functions are inconsistent.
 */
-global int PlayerCheckFood(const Player* player,
-	const UnitType* type __attribute__((unused)))
+global int PlayerCheckFood(const Player* player,const UnitType* type)
 {
     // FIXME: currently all units costs 1 food
 
-    if( player->Food<=player->NumFoodUnits ) {
+    if( player->Food<player->NumFoodUnits+type->Demand ) {
 	// FIXME: need a general notify function
 	if( player==ThisPlayer ) {
 	    SetMessage("Not enough food...build more farms.");
