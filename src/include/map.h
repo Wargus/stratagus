@@ -361,6 +361,8 @@ extern int FogOfWarSaturation;
 extern int ForestRegeneration;
     /// Flag must reveal the map
 extern int FlagRevealMap;
+    /// Flag must reveal map when in replay
+extern int ReplayRevealMap;
 
 /*----------------------------------------------------------------------------
 --	Functions

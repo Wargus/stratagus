@@ -105,6 +105,10 @@
 **		all informations that all units of the same type shares.
 **		(Animations, Name, Stats, ...)
 **
+**	Unit::SeenType
+**		Pointer to the unit-type that this unit was, when last seen.
+**		Currently only used by buildings.
+**
 **	Unit::Player
 **
 **		Pointer to the owner of this unit (::Player). An unit could
@@ -191,7 +195,17 @@
 **
 **
 **	Unit::Constructed
+**		Set when a building is under construction, and still using the
+**		generic building animation.
 **
+**	Unit::SeenConstructed
+**		Last seen state of construction.  Used to draw correct building
+**		frame. See Unit::Constructed for more information.
+**
+**	Unit::SeenState
+**		The Seen State of the building.
+**		01 The building in being built when last seen.
+**		10 The building was been upgraded when last seen.
 **
 **	Unit::Mana
 **
@@ -473,6 +487,7 @@ struct _unit_ {
     int		Y;			/// Map position Y
 
     UnitType*	Type;			/// Pointer to unit-type (peon,...)
+    UnitType*	SeenType;		/// Pointer to last seen unit-type
     Player*     Player;			/// Owner of this unit
     UnitStats*	Stats;			/// Current unit stats
 #ifdef NEW_FOW
@@ -497,6 +512,8 @@ struct _unit_ {
 
     unsigned	Visible : 16;		/// Unit is visible (submarine)
     unsigned	Constructed : 1;	/// Unit is in construction
+    unsigned	SeenConstructed : 1;	/// Unit seen construction
+    unsigned	SeenState : 3;		/// Unit seen build/upgrade state
     unsigned	Active : 1;		/// Unit is active for AI
     unsigned	Rescued : 1;		/// Unit is rescued
 
