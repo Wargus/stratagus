@@ -82,8 +82,9 @@ local void UiDrawLifeBar(const Unit* unit, int x, int y)
     int f;
     VMemType color;
 
-    y += IconHeight + 7;
-    VideoFillRectangleClip(ColorBlack, x, y, IconWidth + 7, 7);
+    y += unit->Type->Icon.Icon->Height + 7;
+    VideoFillRectangleClip(ColorBlack, x, y,
+	unit->Type->Icon.Icon->Width + 7, 7);
     if (unit->HP) {
 	f = (100 * unit->HP) / unit->Stats->HitPoints;
 	if (f > 75) {
@@ -95,7 +96,7 @@ local void UiDrawLifeBar(const Unit* unit, int x, int y)
 	} else {
 	    color = ColorRed;
 	}
-	f = (f * (IconWidth + 5)) / 100;
+	f = (f * (unit->Type->Icon.Icon->Width + 5)) / 100;
 	VideoFillRectangleClip(color, x + 1, y + 1, f, 5);
     }
 }
@@ -113,13 +114,14 @@ local void UiDrawManaBar(const Unit* unit, int x, int y)
 {
     int f;
 
-    y += IconHeight + 7;
-    VideoFillRectangleClip(ColorBlack, x, y + 3, IconWidth + 7, 4);
+    y += unit->Type->Icon.Icon->Height + 7;
+    VideoFillRectangleClip(ColorBlack, x, y + 3,
+	unit->Type->Icon.Icon->Width + 7, 4);
     if (unit->HP) {
 	// s0m3body: mana bar should represent proportional value of Mana
 	// with respect to MaxMana (unit->Type->_MaxMana) for the unit
 	f = (100 * unit->Mana) / unit->Type->_MaxMana;
-	f = (f * (IconWidth + 5)) / 100;
+	f = (f * (unit->Type->Icon.Icon->Width + 5)) / 100;
 	VideoFillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
     }
 }
