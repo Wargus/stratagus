@@ -2732,7 +2732,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		//
 		//	Look if there is wood
 		//
-		if ( ForestOnMap(x,y) && IsMapFieldExplored(x,y) ) {
+		if ( ForestOnMap(x,y) ) {
 		    if( destu ) {
 			n=max(abs(destx-x),abs(desty-y));
 			if( n<bestd ) {
