@@ -4441,7 +4441,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     GetDefaultTextColors(&nc, &rc);
     SetDefaultTextColors(rc, rc);
     DebugLevel3Fn("Hosts[%d].PlyName = %s\n", i, Hosts[i].PlyName);
-    VideoDrawText(mi->xofs, mi->yofs, GameFont, Hosts[i].PlyName);
+    VideoDrawText(OffsetX+mi->xofs, OffsetY+mi->yofs, GameFont, Hosts[i].PlyName);
 
     SetDefaultTextColors(nc, rc);
 }
