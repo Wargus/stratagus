@@ -163,7 +163,7 @@ local int OldCursorRectangleY;		/// saved cursor position on screen Y
 local int OldCursorRectangleW;		/// saved cursor width in pixel
 local int OldCursorRectangleH;		/// saved cursor height in pixel
 #ifdef USE_SDL_SURFACE
-local SDL_Surface* OldCursorRectangle;		/// background saved behind rectangle
+local void* OldCursorRectangle;		/// background saved behind rectangle
 #else
 local void* OldCursorRectangle;		/// background saved behind rectangle
 #endif
@@ -298,34 +298,59 @@ global CursorType* CursorTypeByIdent(const char* ident)
 #ifdef USE_SDL_SURFACE
 global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h)
 {
-    // FIXME: todo
     int i;
     int bpp;
-
-    return;
+    void *sp;
 
     bpp = TheScreen->format->BytesPerPixel;
-    SDL_LockSurface(TheScreen);
-    for (i = 0; i < h; ++i) {
-	memcpy(&((char*)TheScreen->pixels)[x * bpp + (y + i) * TheScreen->pitch], buffer, w * bpp);
+
+    VideoLockScreen();
+
+    sp = buffer;
+    memcpy(&((unsigned char*)TheScreen->pixels)
+	[x * bpp + y * TheScreen->pitch], sp, w * bpp);
+    sp = sp + w * bpp;
+    memcpy(&((unsigned char*)TheScreen->pixels)
+	[x * bpp + (y + h) * TheScreen->pitch], sp, w * bpp);
+    sp = sp + w * bpp;
+    for (i = 1; i < h; ++i) {
+	memcpy(&((unsigned char*)TheScreen->pixels)
+	    [x * bpp + (y + i) * TheScreen->pitch], sp, bpp);
+	memcpy(&((unsigned char*)TheScreen->pixels)
+	    [(x + w - 1) * bpp + (y + i) * TheScreen->pitch], 
+		sp + bpp, bpp);
+	sp += bpp * 2;
     }
-    SDL_UnlockSurface(TheScreen);
+
+    VideoUnlockScreen();
 }
 
 global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h)
 {
     int i;
     int bpp;
-
-    return;
+    void *dp;
 
     bpp = TheScreen->format->BytesPerPixel;
-    SDL_LockSurface(TheScreen);
-    for (i = 0; i < h; ++i) {
-	memcpy(buffer, &((char*)TheScreen->pixels)[x * bpp + (y + i) * TheScreen->pitch], w * bpp);
+    
+    VideoLockScreen();
+
+    dp = buffer;
+    memcpy(dp, &((unsigned char*)TheScreen->pixels)
+	[x * bpp + y * TheScreen->pitch], w * bpp);
+    dp = dp + w * bpp;
+    memcpy(dp, &((unsigned char*)TheScreen->pixels)
+	[x * bpp + (y + h) * TheScreen->pitch], w * bpp);
+    dp = dp + w * bpp;
+    for (i = 1; i < h; ++i) {
+	memcpy(dp, &((unsigned char*)TheScreen->pixels)
+	    [x * bpp + (y + i) * TheScreen->pitch], bpp);
+	memcpy(dp + bpp, &((unsigned char*)TheScreen->pixels)
+	    [(x + w - 1) * bpp + (y + i) * TheScreen->pitch], bpp);
+	dp += bpp * 2;
     }
-    SDL_UnlockSurface(TheScreen);
-    // FIXME: todo
+
+    VideoUnlockScreen();
 }
 #else
 /**
@@ -1202,10 +1227,9 @@ global void InitVideoCursors(void)
 	free(OldCursorRectangle);
 	OldCursorRectangle = 0;
     }
-
 #ifdef USE_SDL_SURFACE
-//    OldCursorImage = SDL_CreateRGBSurface(SDL_SWSURFACE, 40, 40, 8, 0, 0, 0, 0);
-//    OldCursorRectangle = SDL_CreateRGBSurface(SDL_SWSURFACE, 40, 40, 8, 0, 0, 0, 0);
+    OldCursorRectangle = malloc((2 * VideoWidth + 2 * 
+	(VideoHeight - 2)) * TheScreen->format->BytesPerPixel);
 #else
     switch (VideoBpp) {
 	case 8:
