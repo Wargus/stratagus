@@ -1207,7 +1207,7 @@ global int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 			(!PlayersShareVision(player->Player, unit->Player->Player))) {
 		return 0;
 	}
-	if (UnitVisible(unit, player)) {
+	if (UnitVisible(unit, player) || player->Type == PlayerComputer) {
 		return  (!unit->Removed) &&
 				(!unit->Destroyed) &&
 				(unit->Orders->Action != UnitActionDie);
