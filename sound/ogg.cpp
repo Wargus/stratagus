@@ -149,12 +149,11 @@ local int OggReadStream(Sample* sample, void* buf, int len)
     // see if we have enough read already
     if (data->PointerInBuffer - sample->Data + len > sample->Length) {
 	// not enough in buffer, read more
-	n = sample->Length - (data->PointerInBuffer - sample->Data);
-	memcpy(sample->Data, data->PointerInBuffer, n);
-	sample->Length = n;
+	sample->Length -= (data->PointerInBuffer - sample->Data);
+	memcpy(sample->Data, data->PointerInBuffer, sample->Length);
 	data->PointerInBuffer = sample->Data;
 
-	n = OGG_BUFFER_SIZE - n;
+	n = OGG_BUFFER_SIZE - sample->Length;
 	for (;;) {
 		#ifdef WORDS_BIGENDIAN
 	    i = ov_read(data->VorbisFile,
