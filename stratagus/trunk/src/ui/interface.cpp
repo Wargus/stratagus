@@ -292,6 +292,26 @@ local void UiToggleSound(void)
 }
 
 /**
+**	Toggle music on / off.
+**/
+local void UiToggleMusic(void)
+{
+#ifdef WITH_SOUND
+    static int vol;
+    if (MusicVolume) {
+	vol = MusicVolume;
+	MusicVolume = 0;
+	SetStatusLine("Music is off.");
+    } else {
+	MusicVolume = vol;
+	SetStatusLine("Music is on.");
+    }
+#else
+    SetStatusLine("Compiled without sound support.");
+#endif
+}
+
+/**
 **	Toggle pause on / off.
 */
 global void UiTogglePause(void)
@@ -714,6 +734,10 @@ local int CommandKey(int key)
 
 	case 'm':
 	case 'M':			// ALT+M, F10 Game menu
+	    if( KeyModifiers&ModifierControl ) {
+		UiToggleMusic();
+		break;
+	    }
 	    if( !(KeyModifiers&ModifierAlt) ) {
 		break;
 	    }
