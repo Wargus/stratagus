@@ -17,8 +17,8 @@
 //@{
 
 /**
-**
 **	Main entry point. This is needed for mingw32 and SDL.
+**	@attention
 **	This combination didn't likes if main is in the freecraft lib.
 */
 int main(int argc,char** argv)
