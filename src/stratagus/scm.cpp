@@ -348,6 +348,7 @@ global MapInfo* GetScmInfo(const char* scm)
 		// 07 - Twilight World
 		info->MapTerrainName=strdup(TilesetWcNames[t]);
 		info->MapTerrain=t;
+		LoadTileset();
 		continue;
 	    }
 	    DebugLevel1("Wrong ERA  length\n");
