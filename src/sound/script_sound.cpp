@@ -229,22 +229,6 @@ static int CclPlaySound(lua_State* l)
 }
 
 /**
-**  Glue between c and scheme. Ask the sound system to dump on the
-**  standard output the mapping between sound names and sound id.
-**
-**  @param l  Lua state.
-*/
-static int CclDisplaySounds(lua_State* l)
-{
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-
-	DisplaySoundHashTable();
-	return 0;
-}
-
-/**
 **  Glue between c and scheme. Allows to specify some global game sounds
 **  in a ccl file.
 **
@@ -624,20 +608,6 @@ static int CclSetGlobalSoundRange(lua_State* l)
 }
 
 /**
-**  Use a sound thread
-**
-**  @param l  Lua state.
-*/
-static int CclSoundThread(lua_State* l)
-{
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-
-	return 0;
-}
-
-/**
 **  Set the range of a given sound.
 **
 **  @param l  Lua state.
@@ -728,10 +698,8 @@ void SoundCclRegister(void)
 	lua_register(Lua, "SoundOn", CclSoundOn);
 	lua_register(Lua, "MusicOff", CclMusicOff);
 	lua_register(Lua, "MusicOn", CclMusicOn);
-	lua_register(Lua, "SoundThread", CclSoundThread);
 	lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);
 	lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
-	lua_register(Lua, "DisplaySounds", CclDisplaySounds);
 	lua_register(Lua, "MapSound", CclMapSound);
 	lua_register(Lua, "SoundForName", CclSoundForName);
 	lua_register(Lua, "SetSoundRange", CclSetSoundRange);

@@ -46,7 +46,6 @@
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#DefineGameSounds">DefineGameSounds</a>
-<a href="#DisplaySounds">DisplaySounds</a>
 <a href="#MakeSound">MakeSound</a>
 <a href="#MakeSoundGroup">MakeSoundGroup</a>
 <a href="#MapSound">MapSound</a>
@@ -62,7 +61,6 @@
 <a href="#SoundForName">SoundForName</a>
 <a href="#SoundOff">SoundOff</a>
 <a href="#SoundOn">SoundOn</a>
-<a href="#SoundThread">SoundThread</a>
 <a href="#StopMusic">StopMusic</a>
 <hr>
 <h2>Intro - Introduction to sound functions and variables</h2>
@@ -109,19 +107,6 @@ DefineGameSounds(
 
   "rescue", {"human", MakeSound("human rescue", "human/rescue.wav")},
   "rescue", {"orc", MakeSound("orc rescue", "orc/rescue.wav")} )
-</pre>
-
-<a name="DisplaySounds"></a>
-<h3>DisplaySounds()</h3>
-
-Ask the sound system to dump on the standard output the mapping 
-between sound names and sound id.
-
-<h4>Example</h4>
-
-<pre>
--- Displays the mapping between sound names and sound id.
-DisplaySounds()
 </pre>
 
 <a name="MakeSound"></a>
@@ -394,16 +379,6 @@ Turn on sound.
 SoundOn()
 </pre>
 
-<a name="SoundThread"></a>
-<h3>SoundThread()</h3>
-
-Ask stratagus to use a sound thread.
-
-
-<h4>Example</h4>
-<pre>
-SoundThread()
-</pre>
 <a name="StopMusic"></a>
 <h3>StopMusic()</h3>
 
