@@ -10,7 +10,7 @@
 //
 /**@name action_spellcast.c	-	The spell cast action. */
 //
-//	(c) Copyright 2000,2001 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 2000-2002 by Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -56,6 +56,8 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#if 0
+
 /**
 **	Animate unit spell cast (it is attack really)!
 **
@@ -79,6 +81,8 @@ global void AnimateActionSpellCast(Unit * unit)
 	}
     }
 }
+
+#endif
 
 /**
 **	Handle moving to the target.
@@ -104,18 +108,24 @@ local void SpellMoveToTarget(Unit * unit)
 
 	// there is goal and it is in range
 	unit->State = 0;
-	UnitHeadingFromDeltaXY(unit, goal->X - unit->X, goal->Y - unit->Y);
+	if( !unit->Type->Building ) {
+	    // FIXME: buildings could have directions
+	    UnitHeadingFromDeltaXY(unit, goal->X - unit->X, goal->Y - unit->Y);
+	}
 	unit->SubAction++;		// cast the spell
 	return;
     } else if (!goal && MapDistance(unit->X, unit->Y, unit->Orders[0].X,
 	    unit->Orders[0].Y) <= unit->Orders[0].RangeX) {
 	// there is no goal and target spot is in range
 	unit->State = 0;
-	UnitHeadingFromDeltaXY(unit,
+	if( !unit->Type->Building ) {
+	    // FIXME: buildings could have directions
+	    UnitHeadingFromDeltaXY(unit,
 		unit->Orders[0].X
 			+((SpellType*)unit->Orders[0].Arg1)->Range-unit->X,
 		unit->Orders[0].Y
 			+((SpellType*)unit->Orders[0].Arg1)->Range-unit->Y);
+	}
 	unit->SubAction++;		// cast the spell
 	return;
     } else if (err) {
@@ -188,8 +198,23 @@ global void HandleActionSpellCast(Unit * unit)
 	break;
 
     case 2:				// Cast spell on the target.
-	flags=UnitShowAnimation(unit, unit->Type->Animations->Attack);
-	if( flags&AnimationMissile ) {
+	// FIXME: should use AnimateActionSpellCast here
+	if (unit->Type->Animations && unit->Type->Animations->Attack ) {
+	    flags=UnitShowAnimation(unit, unit->Type->Animations->Attack);
+	    if( flags&AnimationMissile ) {
+		// FIXME: what todo, if unit/goal is removed?
+		if (unit->Orders[0].Goal && unit->Orders[0].Goal->Destroyed) {
+		    unit->Value = 0;
+		} else {
+		    spell = unit->Orders[0].Arg1;
+		    unit->Value = SpellCast(unit,spell,unit->Orders[0].Goal,
+			    unit->Orders[0].X,unit->Orders[0].Y);
+		}
+	    }
+	    if ( !(flags&AnimationReset) ) {	// end of animation
+		return;
+	    }
+	} else {
 	    // FIXME: what todo, if unit/goal is removed?
 	    if (unit->Orders[0].Goal && unit->Orders[0].Goal->Destroyed) {
 		unit->Value = 0;
@@ -198,9 +223,6 @@ global void HandleActionSpellCast(Unit * unit)
 		unit->Value = SpellCast(unit,spell,unit->Orders[0].Goal,
 			unit->Orders[0].X,unit->Orders[0].Y);
 	    }
-	}
-	if ( !(flags&AnimationReset) ) {	// end of animation
-	    return;
 	}
 	if (!unit->Value) {
 	    unit->Orders[0].Action = UnitActionStill;
