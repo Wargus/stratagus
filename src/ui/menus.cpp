@@ -999,7 +999,7 @@ local Menuitem HelpMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Keystroke ~!Help", 224, 27, MBUTTON_GM_FULL, NULL, 'h'} } },
     { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Warcraft ~!Tips", 224, 27, MBUTTON_GM_FULL, ShowTipsMenu, 't'} } },
+	{ button:{ "Freecraft ~!Tips", 224, 27, MBUTTON_GM_FULL, ShowTipsMenu, 't'} } },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
 #else
