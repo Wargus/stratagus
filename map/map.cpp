@@ -162,7 +162,7 @@ global void MapViewportSetViewpoint(int v, int x, int y)
     int map_height;
 
     if (x == TheUI.VP[v].MapX && y == TheUI.VP[v].MapY) {
-	return;
+	return;				// Already using this view.
     }
 
     map_width = TheUI.VP[v].MapWidth;
@@ -195,8 +195,8 @@ global void MapViewportSetViewpoint(int v, int x, int y)
 */
 global void MapViewportCenter(int v, int x, int y)
 {
-    MapViewportSetViewpoint(v,
-	    x - (TheUI.VP[v].MapWidth / 2), y - (TheUI.VP[v].MapHeight / 2));
+    MapViewportSetViewpoint(v, x - (TheUI.VP[v].MapWidth / 2),
+	y - (TheUI.VP[v].MapHeight / 2));
 }
 
 /*----------------------------------------------------------------------------
