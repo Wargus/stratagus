@@ -112,6 +112,7 @@ enum _game_types_ {
 	SettingsGameTypeTopVsBottom,
 	SettingsGameTypeLeftVsRight,
 	SettingsGameTypeManVsMachine,
+	SettingsGameTypeManTeamVsMachine,
 
 	// Future game type ideas
 #if 0

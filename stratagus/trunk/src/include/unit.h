@@ -543,6 +543,7 @@ struct _unit_ {
 	unsigned		Destroyed : 1;			/// unit is destroyed pending reference
 	unsigned		Removed : 1;			/// unit is removed (not on map)
 	unsigned		Selected : 1;			/// unit is selected
+	unsigned        TeamSelected;           /// unit is selected by a team member.
 
 	unsigned		Constructed : 1;		/// Unit is in construction
 	unsigned		Active : 1;				/// Unit is active for AI
@@ -733,8 +734,10 @@ extern void DrawUnitSelection(const Unit*);
 extern void (*DrawSelection)(Uint32, int, int, int, int);
 extern int MaxSelectable;				/// How many units could be selected
 
-extern Unit** Selected;						/// currently selected units
-extern int NumSelected;						/// how many units selected
+extern Unit** Selected;                    /// currently selected units
+extern Unit** TeamSelected[PlayerMax];     /// teams currently selected units
+extern int    NumSelected;                 /// how many units selected
+extern int    NumTeamSelected[PlayerMax];  /// Number of Units a team member has selected
 
 
 /*----------------------------------------------------------------------------
@@ -1010,6 +1013,8 @@ extern void GroupCclRegister(void);
 extern void UnSelectAll(void);
 	/// Select group as selection
 extern void ChangeSelectedUnits(Unit** units, int num_units);
+	/// Changed TeamUnit Selection
+extern void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count);
 	/// Add a unit to selection
 extern int SelectUnit(Unit* unit);
 	/// Select one unit as selection

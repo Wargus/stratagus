@@ -54,11 +54,14 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-global int NumSelected;						/// Number of selected units
+global int NumSelected;					/// Number of selected units
+global int TeamNumSelected[PlayerMax];  /// how many units selected
 global int MaxSelectable;				/// Maximum number of selected units
-global Unit** Selected;						/// All selected units
+global Unit** Selected;					/// All selected units
+global Unit** TeamSelected[PlayerMax];  /// teams currently selected units
 
-local unsigned GroupId;						/// Unique group # for automatic groups
+
+local unsigned GroupId;					/// Unique group # for automatic groups
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -80,6 +83,7 @@ global void UnSelectAll(void)
 		unit->Selected = 0;
 		CheckUnitToBeDrawn(unit);
 	}
+
 }
 
 /**
@@ -127,8 +131,9 @@ global void ChangeSelectedUnits(Unit** units,int count)
 	}
 
 	UnSelectAll();
+	NetworkSendSelection(units, count);
 	for (n = i = 0; i < count; ++i) {
-		if (!units[i]->Removed && units[i]->Type->Selectable) {
+		if (!units[i]->Removed && !units[i]->TeamSelected && units[i]->Type->Selectable) {
 			Selected[n++] = unit = units[i];
 			unit->Selected = 1;
 			if (count > 1) {
@@ -138,6 +143,56 @@ global void ChangeSelectedUnits(Unit** units,int count)
 		}
 	}
 	NumSelected = n;
+}
+
+/**
+**  Change A Unit Selection from my Team
+**
+**  @param player  The Player who is selecting the units
+**  @param units   The Units to add/remove
+**  @param adjust  0 = reset, 1 = remove units, 2 = add units
+**  @param count   the number of units to be adjusted
+*/
+global void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count)
+{
+	int i;
+	int n;
+	Unit* unit;
+
+	switch (adjust) {
+		case 0:
+			// UnSelectAllTeam(player);
+			while (TeamNumSelected[player->Player]) {
+				unit = TeamSelected[player->Player][--TeamNumSelected[player->Player]];
+				unit->TeamSelected &= ~(1 << player->Player);
+				TeamSelected[player->Player][TeamNumSelected[player->Player]] = NoUnitP;		// FIXME: only needed for old code
+				CheckUnitToBeDrawn(unit);
+			}
+			// FALL THROUGH
+		case 2:
+			for (i = 0; i < count; ++i) {
+				if (!units[i]->Removed && units[i]->Type->Selectable) {
+					TeamSelected[player->Player][TeamNumSelected[player->Player]++] = units[i];
+					units[i]->TeamSelected |= 1 << player->Player;
+				}
+				CheckUnitToBeDrawn(units[i]);
+			}
+			DebugCheck(TeamNumSelected[player->Player] > MaxSelectable);
+			break;
+		case 1:
+			for (n = 0; n < TeamNumSelected[player->Player]; ++n) {
+				for (i = 0; i < count; ++i) {
+					if (units[i] == TeamSelected[player->Player][n]) {
+						TeamSelected[player->Player][n] = 
+							TeamSelected[player->Player][TeamNumSelected[player->Player]--];
+					}
+				}
+			}
+			DebugCheck(TeamNumSelected[player->Player] < 0);
+			break;
+		default:
+			DebugCheck(1);
+	}
 }
 
 /**
@@ -199,7 +254,24 @@ global void SelectSingleUnit(Unit* unit)
 global void UnSelectUnit(Unit* unit)
 {
 	int i;
+	int j;
 
+	if (unit->TeamSelected) {
+		for (i = 0; i < PlayerMax; ++i) {
+			if (unit->TeamSelected & (1 << i)) {
+				for (j = 0; TeamSelected[i][j] != unit; ++i) {
+					;
+				}
+				DebugCheck(j >= TeamNumSelected[i]);
+
+				if (j < --TeamNumSelected[i]) {
+
+					TeamSelected[i][j] = TeamSelected[i][TeamNumSelected[i]];
+				}
+				unit->TeamSelected &= ~(1 << i);
+			}
+		}
+	}
 	if (!unit->Selected) {
 		return;
 	}
@@ -291,6 +363,9 @@ global int SelectUnitsByType(Unit* base)
 	if (!base->Type->Selectable && GameRunning) {
 		return 0;
 	}
+	if (base->TeamSelected) { // Somebody else onteam has this unit
+		return 0;
+	}
 
 	UnSelectAll();
 	Selected[0] = base;
@@ -320,6 +395,9 @@ global int SelectUnitsByType(Unit* base)
 		if (unit == base) {  // no need to have the same unit twice :)
 			continue;
 		}
+		if (unit->TeamSelected) { // Somebody else onteam has this unit
+			continue;
+		}
 		Selected[NumSelected++] = unit;
 		unit->Selected = 1;
 		CheckUnitToBeDrawn(unit);
@@ -334,6 +412,7 @@ global int SelectUnitsByType(Unit* base)
 		}
 	}
 
+	NetworkSendSelection(Selected, NumSelected);
 	return NumSelected;
 }
 
@@ -401,11 +480,15 @@ global int ToggleUnitsByType(Unit* base)
 		if (unit == base) {				// no need to have the same unit twice
 			continue;
 		}
+		if (unit->TeamSelected) { // Somebody else onteam has this unit
+			continue;
+		}
 		if (!SelectUnit(unit)) {		// add unit to selection
 			return NumSelected;
 		}
 	}
 
+	NetworkSendSelection(Selected, NumSelected);
 	return NumSelected;
 }
 
@@ -497,6 +580,9 @@ local int SelectOrganicUnitsInTable(Unit** table,int num_units)
 			continue;
 		}
 		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
+			continue;
+		}
+		if (unit->TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
 		table[n++] = unit;
@@ -754,6 +840,9 @@ global int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		if (unit->Type->UnitType == UnitTypeFly) {
 			continue;
 		}
+		if (unit->TeamSelected) { // Somebody else onteam has this unit
+			continue;
+		}
 		table[n++] = unit;
 		if (n == MaxSelectable) {
 			break;
@@ -804,6 +893,9 @@ global int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 			continue;
 		}
 		if (unit->Type->UnitType != UnitTypeFly) {
+			continue;
+		}
+		if (unit->TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
 		table[n++] = unit;
@@ -871,6 +963,9 @@ global int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 			continue;
 		}
 		if (unit->Type->UnitType == UnitTypeFly) {
+			continue;
+		}
+		if (unit->TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
 		table[n++] = unit;
@@ -944,6 +1039,9 @@ global int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		if (unit->Type->UnitType != UnitTypeFly) {
 			continue;
 		}
+		if (unit->TeamSelected) { // Somebody else onteam has this unit
+			continue;
+		}
 		table[n++] = unit;
 		if (n == MaxSelectable) {
 			break;
@@ -964,8 +1062,16 @@ global int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 */
 global void InitSelections(void)
 {
+	int i;
+
 	if (!Selected) {
 		Selected = malloc(MaxSelectable * sizeof(Unit*));
+	}
+	
+	for (i = 0; i < PlayerMax; ++i) {
+		if (!TeamSelected[i]) {
+			TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
+		}
 	}
 }
 
@@ -997,11 +1103,19 @@ global void SaveSelections(CLFile* file)
 */
 global void CleanSelections(void)
 {
+	int i;
+
 	GroupId = 0;
 	NumSelected = 0;
 	DebugCheck(NoUnitP);				// Code fails if none zero
 	free(Selected);
 	Selected = NULL;
+
+	for (i = 0; i < PlayerMax; ++i) {
+		free(TeamSelected[i]);
+		TeamSelected[i] = NULL;
+		TeamNumSelected[i] = 0;
+	}
 }
 
 // ----------------------------------------------------------------------------

@@ -615,6 +615,10 @@ global void RemoveUnit(Unit* unit, Unit* host)
 		UnSelectUnit(unit);
 		SelectionChanged();
 	}
+	// Remove unit from team selections
+	if (!unit->Selected && unit->TeamSelected) {
+		UnSelectUnit(unit);
+	}
 
 	// Unit is seen as under cursor
 	if (unit == UnitUnderCursor) {

@@ -1349,7 +1349,7 @@ global void CommandQuit(int player)
 	// If the player doesn't have any units then this is pointless?
 	Players[player].Type = PlayerNeutral;
 	for (i = 0; i < NumPlayers; ++i) {
-		if (i != player) {
+		if (i != player && Players[i].Team != Players[player].Team) {
 			Players[i].Allied &= ~(1 << player);
 			Players[i].Enemy &= ~(1 << player);
 			Players[player].Enemy &= ~(1 << i);
@@ -1358,6 +1358,8 @@ global void CommandQuit(int player)
 			//  We do this because Shared vision is a bit complex.
 			CommandSharedVision(i, 0, player);
 			CommandSharedVision(player, 0, i);
+			// Remove Selection from Quit Player
+			ChangeTeamSelectedUnits(&Players[player], NULL, 0, 0);
 		}
 	}
 	

@@ -2005,7 +2005,7 @@ local void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
 				menu->Items[4 * j + 7].d.gem.state = MI_GSTATE_UNCHECKED;
 			}
 
-			if (ReplayGameType != ReplayNone) {
+			if (ReplayGameType != ReplayNone || ThisPlayer->Team == Players[i].Team) {
 				menu->Items[4 * j + 5].d.gem.state |= MI_GSTATE_PASSIVE;
 				menu->Items[4 * j + 6].d.gem.state |= MI_GSTATE_PASSIVE;
 				menu->Items[4 * j + 7].d.gem.state |= MI_GSTATE_PASSIVE;
