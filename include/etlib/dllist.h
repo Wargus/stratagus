@@ -56,10 +56,8 @@ dl_insert_after(struct dl_node *p, struct dl_node *n)
 
 #define dl_empty(h)             ((h)->first->next == 0)
 #define dl_insert_before(p, n)  dl_insert_after((p)->prev, (n))
-#define dl_insert_first(h, n)   ({ struct dl_node *_n = (n); \
-					dl_insert_before((h)->first, _n); })
-#define dl_insert_last(h, n)    ({ struct dl_node *_n = (n); \
-					dl_insert_after((h)->last, _n); })
+#define dl_insert_first(h, n)   (dl_insert_before((h)->first, (n)))
+#define dl_insert_last(h, n)    (dl_insert_after((h)->last, (n)))
 #define dl_remove_first(h)      dl_remove((h)->first) // mustn't be empty!
 #define dl_remove_last(h)       dl_remove((h)->last) // mustn't be empty!
 
