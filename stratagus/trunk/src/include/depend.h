@@ -125,6 +125,9 @@ extern void InitDependencies(void);
 extern void LoadDependencies(FILE* file);
     /// Save the dependencies
 extern void SaveDependencies(FILE* file);
+    /// Cleanup dependencies module
+extern void CleanDependencies();
+
 
     /// Add a new dependency
 extern void AddDependency(const char*,const char*,int,int);
