@@ -51,7 +51,6 @@
 #define MNG_USE_SO
 #endif
 #include <libmng.h>
-#undef LOCAL
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -262,7 +261,10 @@ Mng* LoadMNG(const char* name)
 	}
 
 	if (!mng->Surface || mng->Iteration == 0x7fffffff) {
-		mng_cleanup(&(mng_handle)mng->Handle);
+		mng_handle mh;
+
+		mh = (mng_handle)mng->Handle;
+		mng_cleanup(&mh);
 		free(mng->Buffer);
 		free(mng);
 		return NULL;
@@ -277,7 +279,10 @@ Mng* LoadMNG(const char* name)
 */
 void FreeMNG(Mng* mng)
 {
-	mng_cleanup(&(mng_handle)mng->Handle);
+	mng_handle mh;
+
+	mh = (mng_handle)mng->Handle;
+	mng_cleanup(&mh);
 	SDL_FreeSurface(mng->Surface);
 	free(mng->Buffer);
 	free(mng->Name);
