@@ -554,31 +554,26 @@ global int DrawReverseNumber(int x,int y,unsigned font,int number)
 */
 local void FontMeasureWidths(ColorFont* fp)
 {
-    int i, x, y, h, w;
+    int y;
     const unsigned char* sp;
     const unsigned char* lp;
     const unsigned char* gp;
-    const Graphic *sprite;
 
-    sprite = fp->Graphic;
-    w = sprite->Width;
-    h = fp->Height;
     for (y = 1; y < 207; y++) {
-	sp = sprite->Frames + y * h * w - 1;
-	gp = sp + w * h;
-	x = 0;
+	sp = fp->Graphic->Frames + y * fp->Height * fp->Graphic->Width - 1;
+	gp = sp + fp->Graphic->Width * fp->Height;
+	fp->CharWidth[y] = 0;
 	while (sp < gp) {
-	    lp = sp + w;
-	    while (sp < lp) {
-		if (*++sp != 255) {
-		    i = w - (lp - sp);
-		    if (i > x) {	// max width
-			x = i;
+	    lp = sp + fp->Graphic->Width - 1;
+	    for (;sp < lp; --lp) {
+		if (*lp != 255) {
+		    if (lp - sp > fp->CharWidth[y]) {	// max width
+			fp->CharWidth[y] = lp - sp;
 		    }
 		}
 	    }
+	    sp += fp->Graphic->Width;
 	}
-	fp->CharWidth[y] = x;
     }
     fp->CharWidth[0] = fp->Width / 2; // a reasonable value for SPACE
 }
