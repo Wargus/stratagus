@@ -1757,11 +1757,7 @@ local void DrawBuilding(Unit* unit)
     int constructed;
 
 
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
     visible=BuildingVisibleOnMap(unit);
-#else
-    visible=UnitVisibleOnMap(unit);
-#endif
     
     if( ReplayRevealMap ) {
 	type = unit->Type;
@@ -1913,7 +1909,6 @@ global void DrawUnits(const void* v)
 	corpses=&(*corpses)->Next;
     }
 
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
     //
     //  2a1) Destroyed Buildings
     //
@@ -1926,7 +1921,6 @@ global void DrawUnits(const void* v)
 	}
 	corpses=&(*corpses)->Next;
     }
-#endif
     //
     //  2b) buildings
     //

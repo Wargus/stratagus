@@ -220,9 +220,7 @@ typedef struct _map_field_ {
     // FIXME: Value can be removed, walls and regeneration can be handled
     //	      different.
     unsigned char	Value;		/// HP for walls/ Wood Regeneration
-#ifdef NEW_FOW
     unsigned char Visible[PlayerMax];	/// Seen counter 0 unexplored
-#endif
 #ifdef UNIT_ON_MAP
     union {
 	Unit*		Units;		/// An unit on the map field
@@ -252,11 +250,6 @@ typedef struct _map_field_ {
 					/// to this one
 #endif
 } MapField;
-
-#ifndef NEW_FOW
-// 0 Unexplored, 1 Explored, 2 PartialVisible, 3 CompleteVisible
-#define MapFieldExplored	0x0002	/// Field explored
-#endif
 
 // Not used until now:
 //#define MapFieldArray		0x0004	/// More than one unit on the field
@@ -400,7 +393,6 @@ extern  void MarkDrawEntireMap(void);
 //
 //	in map_fog.c
 //
-#ifdef NEW_FOW
     /// Mark the sight in range
 extern void MapMarkSight(const Player*,int,int,int);
     /// Mark the new sight in range
@@ -409,18 +401,10 @@ extern void MapMarkNewSight(const Player*,int,int,int,int,int);
 extern void MapUnmarkSight(const Player*,int,int,int);
     /// Find if a tile is visible (With shared vision)
 extern int IsTileVisible(const Player* player, int x, int y);
-#else
-    /// Mark the sight in range
-extern void MapMarkSight(int tx,int ty,int range);
-    /// Mark the new sight in range
-extern void MapMarkNewSight(int,int,int,int,int);
-#endif
     /// Mark tiles with fog of war to be redrawn
 extern void MapUpdateFogOfWar(int x,int y);
     ///	Update fog of war
 extern void UpdateFogOfWarChange(void);
-    /// Update visible areas for fog of war
-extern void MapUpdateVisible(void);
 
     /// Draw the map fog of war
 extern void DrawMapFogOfWar(const Viewport* vp,int x,int y);
@@ -556,7 +540,6 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #define CanMoveToMask(x,y,mask) \
 	!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
 
-#ifdef NEW_FOW
 
     /// Check if a field for the user is explored
 #define IsMapFieldExplored(player,x,y) \
@@ -565,19 +548,6 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
     /// Check if a field for the user is visibile
 #define IsMapFieldVisible(player,x,y) \
     (IsTileVisible((player),(x),(y))>1)
-
-#else
-
-    /// Check if a field for the user is explored
-#define IsMapFieldExplored(player,x,y) \
-    (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldExplored)
-
-    /// Check if a field for the user is visibile
-#define IsMapFieldVisible(player,x,y) \
-    (TheMap.Visible[0][((y)*TheMap.Width+(x))/32] \
-	&(1<<(((y)*TheMap.Width+(x))%32)))
-
-#endif
 
 #ifdef UNITS_ON_MAP
     /// Is there a building on this field

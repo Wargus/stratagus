@@ -147,7 +147,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	//
 	x+=unit->Type->TileWidth/2;
 	y+=unit->Type->TileHeight/2;
-#ifdef NEW_FOW
+
 	MapMarkNewSight(unit->Player,x,y,unit->Stats->SightRange,xd,yd);
 	if ( unit->Type->Transporter ) {
 	    for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
@@ -157,11 +157,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 		}
 	    }
 	}
-#else
-	if( unit->Player==ThisPlayer ) {
-	    MapMarkNewSight(x,y,unit->Stats->SightRange,xd,yd);
-	}
-#endif
+
 	if( unit->Type->CanSeeSubmarine ) {
 	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
 	}

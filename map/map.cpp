@@ -132,21 +132,12 @@ global void RevealMap(void)
 
     for (ix = 0; ix < TheMap.Width; ++ix) {
 	for (iy = 0; iy < TheMap.Height; ++iy) {
-#ifdef NEW_FOW
 	    int i;
 	    for (i = 0; i < PlayerMax; ++i) {
 		if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
 		    TheMap.Fields[ix+iy*TheMap.Width].Visible[i]=1;
 		}
 	    }
-#else
-	    TheMap.Fields[ix+iy*TheMap.Width].Flags |= MapFieldExplored;
-
-	    if (TheMap.NoFogOfWar) {
-		TheMap.Visible[0][((iy)*TheMap.Width+(ix))/32] |= 
-			(1<<(((iy)*TheMap.Width+(ix))%32));
-	    }
-#endif
 	    MapMarkSeenTile(ix, iy);
 	    UnitsMarkSeen(ix, iy);
 	}

@@ -234,9 +234,6 @@ global void DrawMinimap(int vx __attribute__((unused)),
     int w;
     int h;
     int h0;
-#ifndef NEW_FOW
-    int flags;
-#endif
 
     x=(FrameCounter/FRAMES_PER_SECOND)&1;
     if( (new_phase=red_phase-x) ) {
@@ -259,7 +256,6 @@ global void DrawMinimap(int vx __attribute__((unused)),
     if( MinimapWithTerrain ) {
 	for( my=0; my<MINIMAP_H; ++my ) {
 	    for( mx=0; mx<MINIMAP_W; ++mx ) {
-#ifdef NEW_FOW
 		if( IsMapFieldVisible(ThisPlayer,Minimap2MapX[mx],(Minimap2MapY[my]/TheMap.Width))
 			|| (IsMapFieldExplored(ThisPlayer,Minimap2MapX[mx],
 					(Minimap2MapY[my]/TheMap.Width)) &&
@@ -268,16 +264,6 @@ global void DrawMinimap(int vx __attribute__((unused)),
 		    VideoDrawPixel(((unsigned char*)MinimapGraphic->Frames)
 			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
-#else
-		flags=Minimap2MapX[mx]+Minimap2MapY[my];
-		if( (TheMap.Fields[flags].Flags&MapFieldExplored &&
-			( (TheMap.Visible[0][flags/32]&(1<<(flags%32)))
-			    || ((mx&1)==(my&1)) ))
-			    || ReplayRevealMap ) {
-		    VideoDrawPixel(((unsigned char*)MinimapGraphic->Frames)
-			    [mx+my*MINIMAP_W],x+mx,y+my);
-		}
-#endif
 	    }
 	}
     }

@@ -189,14 +189,11 @@ global void HandleActionBuild(Unit* unit)
 
     build=MakeUnit(type,unit->Player);
     build->Constructed=1;
-#ifdef NEW_FOW
     build->CurrentSightRange=0;
-#endif
     PlaceUnit(build,x,y);
-#ifdef NEW_FOW
     build->CurrentSightRange=build->Type->TileWidth < build->Type->TileHeight
 				? build->Type->TileHeight : build->Type->TileWidth;
-#endif
+
 
 /* Done by PlaceUnit now
 #ifdef HIERARCHIC_PATHFINDER
@@ -249,9 +246,7 @@ global void HandleActionBuild(Unit* unit)
     unit->Value=build->Value;		// worker holding value while building
 
     RemoveUnit(unit,build);		// automaticly: CheckUnitToBeDrawn(unit)
-#ifdef NEW_FOW
     build->CurrentSightRange=0;
-#endif
     unit->X=x;
     unit->Y=y;
     unit->Orders[0].Action=UnitActionStill;
@@ -373,12 +368,10 @@ global void HandleActionBuilded(Unit* unit)
 	} else if( unit->Player==ThisPlayer ) {
 	    UpdateButtonPanel();
 	}
-#ifdef NEW_FOW
 	unit->CurrentSightRange=unit->Stats->SightRange;
 	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2,
 			    unit->Y+unit->Type->TileWidth/2,
 			    unit->CurrentSightRange);
-#endif
         CheckUnitToBeDrawn(unit);
 	return;
     }

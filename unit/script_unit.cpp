@@ -553,21 +553,6 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("next")) ) {
 	    unit->Next=UnitSlots[gh_scm2int(gh_car(list))];
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME: 'next of unit %d\n" _C_ slot);
-#if 0
-	    // This is currently not used.
-	    if( !gh_null_p(value) ) {
-		str=gh_scm2newstr(value,NULL);
-
-		slot=strtol(str+1,NULL,16);
-		unit->Next=UnitSlots[slot];
-		if( !UnitSlots[slot] ) {
-		    DebugLevel0Fn("FIXME: Forward reference not supported\n");
-		}
-		free(str);
-	    }
-#endif
-#ifdef NEW_FOW
 	} else if( gh_eq_p(value,gh_symbol2scm("current-sight-range")) ) {
 	    unit->CurrentSightRange=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
@@ -576,8 +561,7 @@ local SCM CclUnit(SCM list)
 	    list=gh_cdr(list);
 	    MapMarkSight(player,gh_scm2int(gh_car(value)),
 				gh_scm2int(gh_cadr(value)),
-				unit->CurrentSightRange);
-#endif    
+				unit->CurrentSightRange);   
 	} else if( gh_eq_p(value,gh_symbol2scm("tile")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
@@ -743,27 +727,19 @@ local SCM CclUnit(SCM list)
 		// HACK: the building is not ready yet
 		unit->Player->UnitTypesCount[type->Type]--;
 	    }
-	    // FIXME: Does not load CorpseList Properly
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+	    // FIXME: (mr-russ) Does not load CorpseList Properly
 	    if( unit->Type->Building &&
 		( unit->Orders[0].Action==UnitActionDie || unit->Destroyed )) {
 		DeadBuildingCacheInsert(unit);
 	    } else if( unit->Orders[0].Action==UnitActionDie ) {
 		CorpseCacheInsert(unit);
 	    }
-#else
-	    if( unit->Orders[0].Action==UnitActionDie ) {
-		CorpseCacheInsert(unit);
-	    }
-#endif
-#ifdef NEW_FOW
 	    if( unit->Orders[0].Action==UnitActionDie &&
 		unit->Type->CorpseScript ) {
 		MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2,
 					unit->Y+unit->Type->TileHeight/2,
 					unit->CurrentSightRange);
 	    }
-#endif
 	} else if( gh_eq_p(value,gh_symbol2scm("saved-order")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);

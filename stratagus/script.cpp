@@ -737,9 +737,6 @@ global void InitCcl(void)
 #ifdef HIERARCHIC_PATHFINDER
     gh_define("freecraft-feature-hierarchic-pathfinder",SCM_BOOL_T);
 #endif
-#ifdef NEW_FOW
-    gh_define("freecraft-feature-new-fow",SCM_BOOL_T);
-#endif
 #ifdef NEW_AI
     gh_define("freecraft-feature-new-ai",SCM_BOOL_T);
 #endif

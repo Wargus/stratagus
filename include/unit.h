@@ -485,9 +485,7 @@ struct _unit_ {
     UnitType*	SeenType;		/// Pointer to last seen unit-type
     Player*     Player;			/// Owner of this unit
     UnitStats*	Stats;			/// Current unit stats
-#ifdef NEW_FOW
     int		CurrentSightRange;	/// Unit's Current Sight Range
-#endif
 
 //	DISPLAY:
     UnitColors	Colors;			/// Player colors
@@ -680,9 +678,7 @@ extern Unit** UnitSlotFree;		/// First free unit slot
 
 extern Unit* Units[MAX_UNIT_SLOTS];	/// Units used
 extern int NumUnits;			/// Number of units used
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
 extern Unit* DestroyedBuildings;	/// List of DestroyedBuildings
-#endif
 extern Unit* CorpseList;		/// List of Corpses On Map
 
 //	in unit_draw.c (FIXME: could be moved into the user interface?)
@@ -746,10 +742,9 @@ extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
 extern void MarkSubmarineSeen(const Player* player,int x,int y,int range);
     /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
     /// Returns true, if building is known on the map
-extern int BuildingVisibleOnMap(Unit* unit);
-#endif
+extern int BuildingVisibleOnMap(const Unit* unit);
+
     /// Updates seen data
 extern void UnitsMarkSeen(int x,int y);
     /// Checks and updates if a Unit's seen information
