@@ -1360,14 +1360,26 @@ normkey:
 							break;
 						case MI_TYPE_LISTBOX:
 							if (key == KeyCodeDown) {
-								if (mi->d.listbox.startline + mi->d.listbox.nlines < mi->d.pulldown.noptions) {
-									mi->d.listbox.startline++;
+								if (mi->d.listbox.curopt < mi->d.listbox.noptions - 1) {
+									mi->d.listbox.curopt++;
+									if (mi->d.listbox.curopt >= mi->d.listbox.startline + mi->d.listbox.nlines) {
+										mi->d.listbox.startline = mi->d.listbox.curopt - mi->d.listbox.nlines + 1;
+									} else if (mi->d.listbox.curopt < mi->d.listbox.startline) {
+										mi->d.listbox.startline = mi->d.listbox.curopt;
+									}
 								}
-							} else if (mi->d.listbox.startline > 0) {
-								mi->d.listbox.startline--;
+							} else {
+								if (mi->d.listbox.curopt > 0) {
+									mi->d.listbox.curopt--;
+									if (mi->d.listbox.curopt >= mi->d.listbox.startline + mi->d.listbox.nlines) {
+										mi->d.listbox.startline = mi->d.listbox.curopt - mi->d.listbox.nlines + 1;
+									} else if (mi->d.listbox.curopt < mi->d.listbox.startline) {
+										mi->d.listbox.startline = mi->d.listbox.curopt;
+									}
+								}
 							}
 							if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-								mi[1].d.vslider.percent = (mi->d.listbox.curopt * 100) / (mi->d.listbox.noptions - mi->d.listbox.nlines);
+								mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) / (mi->d.listbox.noptions - mi->d.listbox.nlines);
 							}
 							if (mi[1].d.vslider.action) {
 								(*mi[1].d.vslider.action)(mi);
@@ -1392,7 +1404,7 @@ normkey:
 								}
 							}
 							if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
-								mi->d.vslider.percent = (mi->d.listbox.startline * 100) / (mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines);
+								mi->d.vslider.percent = (mi[-1].d.listbox.startline * 100) / (mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines);
 							}
 							if (mi->d.vslider.action) {
 								(*mi->d.vslider.action)(mi);
