@@ -623,6 +623,10 @@ typedef struct _resource_info_ {
 	//  Runtime info:
 	Graphic* SpriteWhenLoaded;      ///< The graphic corresponding to FileWhenLoaded.
 	Graphic* SpriteWhenEmpty;       ///< The graphic corresponding to FileWhenEmpty
+#ifdef USE_OPENGL
+	Graphic* PlayerColorSpriteWhenLoaded[PlayerMax];  ///< Sprites with player colors
+	Graphic* PlayerColorSpriteWhenEmpty[PlayerMax];  ///< Sprites with player colors
+#endif
 } ResourceInfo;
 
 /**

@@ -1638,21 +1638,40 @@ local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 
 #ifdef USE_OPENGL
 /**
-**  FIXME: docu
+**  Draw the sprite with the player colors
+**
+**  @param type      Unit type
+**  @param sprite    Original sprite
+**  @param glsprite  Array of player color sprites
+**  @param player    Player number
+**  @param frame     Frame number to draw.
+**  @param x         X position.
+**  @param y         Y position.
 */
-local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int x, int y)
+local void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** glsprite,
+	int player, int frame, int x, int y)
 {
-	if (!type->PlayerColorSprite[player] ||
-			!type->PlayerColorSprite[player]->TextureNames[
-				type->Flip ?
-					(frame < 0 ? -frame - 1 : frame) :
-					(frame < 0 ?
-						((-frame - 1) / (type->NumDirections / 2 + 1)) * type->NumDirections +
-							type->NumDirections - -frame % (type->NumDirections / 2 + 1) :
-						(frame / (type->NumDirections / 2 + 1)) * type->NumDirections +
-							frame % (type->NumDirections / 2 + 1))]) {
-		MakePlayerColorTexture(&((UnitType*)type)->PlayerColorSprite[player],
-			type->Sprite, frame < 0 ? -frame - 1 : frame, &Players[player].UnitColors);
+	int f;
+
+	if (type->Flip) {
+		if (frame < 0) {
+			f = -frame - 1;
+		} else {
+			f = frame;
+		}
+	} else {
+		int row;
+
+		row = type->NumDirections / 2 + 1;
+		if (frame < 0) {
+			f = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
+		} else {
+			f = (frame / row) * type->NumDirections + frame % row;
+		}
+	}
+	if (!glsprite[player] || !glsprite[player]->TextureNames[f]) {
+		MakePlayerColorTexture(&glsprite[player],
+			sprite, frame < 0 ? -frame - 1 : frame, &Players[player].UnitColors);
 	}
 
 	// FIXME: move this calculation to high level.
@@ -1661,9 +1680,9 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 
 	if (type->Flip) {
 		if (frame < 0) {
-			VideoDrawClipX(type->PlayerColorSprite[player], -frame - 1, x, y);
+			VideoDrawClipX(glsprite[player], -frame - 1, x, y);
 		} else {
-			VideoDrawClip(type->PlayerColorSprite[player], frame, x, y);
+			VideoDrawClip(glsprite[player], frame, x, y);
 		}
 	} else {
 		int row;
@@ -1674,7 +1693,7 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 		} else {
 			frame = (frame / row) * type->NumDirections + frame % row;
 		}
-		VideoDrawClip(type->PlayerColorSprite[player], frame, x, y);
+		VideoDrawClip(glsprite[player], frame, x, y);
 	}
 }
 #endif
@@ -1777,7 +1796,8 @@ local void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 		GraphicUnitPixels(unit, type->Sprite);
 		DrawUnitType(type, type->Sprite, frame, x, y);
 #ifdef USE_OPENGL
-		DrawUnitPlayerColor(type, unit->Player->Player, frame, x, y);
+		DrawUnitPlayerColor(type, type->Sprite, (Graphic**)type->PlayerColorSprite,
+			unit->Player->Player, frame, x, y);
 #endif
 	}
 }
@@ -1799,6 +1819,9 @@ global void DrawUnit(const Unit* unit)
 	int state;
 	int constructed;
 	Graphic* sprite;
+#ifdef USE_OPENGL
+	Graphic** glsprite;
+#endif
 	ResourceInfo* resinfo;
 	ConstructionFrame* cframe;
 	UnitType* type;
@@ -1867,16 +1890,25 @@ global void DrawUnit(const Unit* unit)
 	//		Adjust sprite for Harvesters.
 	//
 	sprite = type->Sprite;
+#ifdef USE_OPENGL
+	glsprite = type->PlayerColorSprite;
+#endif
 	if (type->Harvester && unit->CurrentResource) {
 		resinfo = type->ResInfo[unit->CurrentResource];
 		if (unit->Value) {
 			if (resinfo->SpriteWhenLoaded) {
 				sprite = resinfo->SpriteWhenLoaded;
+#ifdef USE_OPENGL
+				glsprite = resinfo->PlayerColorSpriteWhenLoaded;
+#endif
 				GraphicUnitPixels(unit, sprite);
 			}
 		} else {
 			if (resinfo->SpriteWhenEmpty) {
 				sprite = resinfo->SpriteWhenEmpty;
+#ifdef USE_OPENGL
+				glsprite = resinfo->PlayerColorSpriteWhenEmpty;
+#endif
 				GraphicUnitPixels(unit, sprite);
 			}
 		}
@@ -1900,13 +1932,13 @@ global void DrawUnit(const Unit* unit)
 		GraphicUnitPixels(unit, type->Sprite);
 		DrawUnitType(type, sprite, frame < 0 ? -1 - 1 : 1, x, y);
 #ifdef USE_OPENGL
-		DrawUnitPlayerColor(type, unit->Player->Player,
+		DrawUnitPlayerColor(type, sprite, glsprite, unit->Player->Player,
 			frame < 0 ? -1 - 1 : 1, x, y);
 #endif
 	} else {
 		DrawUnitType(type, sprite, frame, x, y);
 #ifdef USE_OPENGL
-		DrawUnitPlayerColor(type, unit->Player->Player, frame, x, y);
+		DrawUnitPlayerColor(type, sprite, glsprite, unit->Player->Player, frame, x, y);
 #endif
 	}
 
