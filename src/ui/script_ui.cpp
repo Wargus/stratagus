@@ -1156,10 +1156,6 @@ static int CclDefineUI(lua_State* l)
 	ui->ButtonPanelX = -1;
 	ui->ButtonPanelY = -1;
 
-	ui->MenuPanel.File = NULL;
-	ui->MenuPanelX = -1;
-	ui->MenuPanelY = -1;
-
 	ui->MinimapPanel.File = NULL;
 	ui->MinimapPanelX = -1;
 	ui->MinimapPanelY = -1;
@@ -1628,38 +1624,7 @@ static int CclDefineUI(lua_State* l)
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-				if (!strcmp(value, "panel")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					subsubargs = luaL_getn(l, -1);
-					for (subk = 0; subk < subsubargs; ++subk) {
-						lua_rawgeti(l, -1, subk + 1);
-						value = LuaToString(l, -1);
-						lua_pop(l, 1);
-						++subk;
-						if (!strcmp(value, "file")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->MenuPanel.File = strdup(LuaToString(l, -1));
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "pos")) {
-							lua_rawgeti(l, -1, subk + 1);
-							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-								LuaError(l, "incorrect argument");
-							}
-							lua_rawgeti(l, -1, 1);
-							ui->MenuPanelX = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_rawgeti(l, -1, 2);
-							ui->MenuPanelY = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_pop(l, 1);
-						} else {
-							LuaError(l, "Unsupported tag: %s" _C_ value);
-						}
-					}
-				} else if (!strcmp(value, "menu-button")) {
+				if (!strcmp(value, "menu-button")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
