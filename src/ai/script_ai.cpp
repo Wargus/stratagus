@@ -381,9 +381,7 @@ local SCM CclDefineAi(SCM list)
 --	Ai script functions
 ----------------------------------------------------------------------------*/
 
-/**
-**	Get unit-type.
-*/
+    /// Get unit-type.
 extern UnitType* CclGetUnitType(SCM ptr);
 
 /**
