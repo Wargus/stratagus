@@ -189,7 +189,7 @@
 	+FreeCraftPatchLevel)
 
     /// FreeCraft printf format string
-#define FreeCraftFormatString	"%d,%d,%d"
+#define FreeCraftFormatString	"%d.%d.%d"
     /// FreeCraft printf format arguments
 #define FreeCraftFormatArgs(v)	(v)/10000,((v)/100)%100,(v)%100
 #endif
@@ -352,6 +352,9 @@ extern int SpeedResearch;		/// speed factor for researching
 
 extern int SpeedKeyScroll;		/// Keyboard Scrolling Speed, in Frames
 extern int SpeedMouseScroll;		/// Mouse Scrolling Speed, in Frames
+
+extern void LoadGame(char*);		/// Load saved game back
+extern void SaveGame(const char*);	/// Save game for later load
 
 extern void SaveAll(void);		/// Call all modules to save states
 extern void LoadAll(void);		/// Load all data back.
