@@ -160,7 +160,7 @@ global void HandleActionSpellCast(Unit * unit)
 	// FIXME: Use the general unified message system.
 	if (unit->Mana < spell->ManaCost) {
 	    if (unit->Player == ThisPlayer) {
-		SetMessage("%s: not enough mana to cast spell: %s",
+		SetMessage("%s: not enough mana for spell: %s",
 			   unit->Type->Name, spell->Ident);
 	    }
 	    repeat = 0;
