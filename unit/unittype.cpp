@@ -937,20 +937,11 @@ global void InitUnitTypes(void)
 {
     unsigned type;
 
-    if( !UnitTypes ) {
-	// Johns: I think this is needed for the none CCL version
-	DebugLevel0Fn("Called too early\n");
-	return;
-    }
-    if( UnitTypes[2].Type==2 ) {	// FIXME: trick 17, double entered
-	DebugLevel0Fn("Called twice?\n");
-    }
-
     for( type=0; UnitTypes[type].OType; ++type ) {
 	//
 	//	Initialize:
 	//
-	UnitTypes[type].Type=type;
+	DebugCheck( UnitTypes[type].Type!=type );
 	//
 	//	Add idents to hash.
 	//
