@@ -462,6 +462,7 @@ local void DrawPulldown(Menuitem *mi, int mx, int my)
 		}
 	    }
 	    w += 2;
+	    h += 2;
 	} else {
 	    h = mi->d.pulldown.ysize;
 	    y = my+mi->yofs;
