@@ -429,10 +429,13 @@ global void EndReplayLog(void)
 	fclose(LogFile);
 	LogFile=NULL;
     }
-    if( DisabledLog ) {
+    // FIXME: LoadGame disables the log since replays aren't saved in the
+    // FIXME: saved games yet.  Always enable the log again for now even
+    // FIXME: though it ignores the -l command line option.
+//    if( DisabledLog ) {
 	CommandLogDisabled=0;
 	DisabledLog=0;
-    }
+//    }
     if( DisabledShowTips ) {
 	ShowTips=1;
 	DisabledShowTips=0;

@@ -10,7 +10,7 @@
 //
 /**@name menus.c	-	The menu function code. */
 //
-//	(c) Copyright 1999-2002 by Andreas Arens
+//	(c) Copyright 1999-2003 by Andreas Arens and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
