@@ -635,10 +635,10 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
 
     // Contrast
     alpha = TheMap.TileGraphic->Surface->format->alpha;
-    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA,
+    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA | SDL_RLEACCEL,
 	(100 - FogOfWarContrast) * 255 / 100);
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
-    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, alpha);
+    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
 
     csrc.r = 255;
     csrc.g = 255;
@@ -2989,8 +2989,9 @@ global void InitMapFogOfWar(void)
 	    32, RMASK, GMASK, BMASK, AMASK);
 	SDL_FillRect(s, NULL, SDL_MapRGBA(s->format, 0, 0, 0,
 	    (100 - FogOfWarContrast) * 255 / 100));
-	SolidFog = SDL_DisplayFormatAlpha(s);
-	SDL_FreeSurface(s);
+//	SolidFog = SDL_DisplayFormatAlpha(s);
+//	SDL_FreeSurface(s);
+	SolidFog = s;
     }
     if (!OriginalFogOfWar) {
 	VideoDrawFog = VideoDrawFogAlpha;
