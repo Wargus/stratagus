@@ -40,7 +40,7 @@
 **
 **	@param unit	Pointer to unit, moving to transporter.
 **
-**	@returns	>0 remaining path length, 0 wait for path, -1
+**	@return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
 local int MoveToTransporter(Unit* unit)
