@@ -1552,14 +1552,16 @@ global void InitMapFogOfWar(void)
 		    //	Find the best matching color
 		    //
 		    l=i;
-		    d=256;
+		    d=256*3+256;
 		    for( j=0; j<256; ++j ) {
-			v=abs(GlobalPalette[j].r-r)*1
-			    +abs(GlobalPalette[j].g-g)*1
-			    +abs(GlobalPalette[j].b-b)*1
+			// simple color distance
+			v=(abs(GlobalPalette[j].r-r)
+			    +abs(GlobalPalette[j].g-g)
+			    +abs(GlobalPalette[j].b-b))*3
+			    // light
 			    +abs(GlobalPalette[j].r
 				+GlobalPalette[j].g
-				+GlobalPalette[j].b-r-g-b)*2;
+				+GlobalPalette[j].b-(r+g+b))*1;
 			if( v<d ) {
 			    d=v;
 			    l=j;
@@ -1634,11 +1636,13 @@ build_table:
 		break;
 
 	    case 24:
-		VideoDrawFog=VideoDraw24Fog32Alpha;
-		VideoDrawOnlyFog=VideoDraw24OnlyFog32Alpha;
-		VideoDrawUnexplored=VideoDraw24Unexplored32Solid;
-		break;
-
+		if( VideoBpp==24 ) {
+		    VideoDrawFog=VideoDraw24Fog32Alpha;
+		    VideoDrawOnlyFog=VideoDraw24OnlyFog32Alpha;
+		    VideoDrawUnexplored=VideoDraw24Unexplored32Solid;
+		    break;
+		}
+		// FALL THROUGH
 	    case 32:
 		VideoDrawFog=VideoDraw32Fog32Alpha;
 		VideoDrawOnlyFog=VideoDraw32OnlyFog32Alpha;
@@ -1646,7 +1650,7 @@ build_table:
 		break;
 
 	    default:
-		DebugLevel0Fn("Depth unsupported\n");
+		DebugLevel0Fn("Depth unsupported %d\n",VideoDepth);
 		break;
 	}
     } else {
@@ -1664,10 +1668,13 @@ build_table:
 		VideoDrawUnexplored=VideoDraw16Unexplored32Solid;
 		break;
 	    case 24:			// 24 bpp video depth
-		VideoDrawFog=VideoDraw24Fog32Solid;
-		VideoDrawOnlyFog=VideoDraw24OnlyFog32Solid;
-		VideoDrawUnexplored=VideoDraw24Unexplored32Solid;
-		break;
+		if( VideoBpp==24 ) {
+		    VideoDrawFog=VideoDraw24Fog32Solid;
+		    VideoDrawOnlyFog=VideoDraw24OnlyFog32Solid;
+		    VideoDrawUnexplored=VideoDraw24Unexplored32Solid;
+		    break;
+		}
+		// FALL THROUGH
 	    case 32:			// 32 bpp video depth
 		VideoDrawFog=VideoDraw32Fog32Solid;
 		VideoDrawOnlyFog=VideoDraw32OnlyFog32Solid;
@@ -1675,7 +1682,7 @@ build_table:
 		break;
 
 	    default:
-		DebugLevel0Fn("Depth unsupported\n");
+		DebugLevel0Fn("Depth unsupported %d\n",VideoDepth);
 		break;
 	}
     }

@@ -121,6 +121,14 @@ global unsigned CompressedGraphicMemory;/// memory for compressed objects
 global int VideoDepth;
 
     /**
+    **	Architecture-dependant video bpp (bits pro pixel).
+    **	Set by InitVideoXXX. (8,16,24,32)
+    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
+    **	@see InitVideoWin32 @see main
+    */
+global int VideoBpp;
+
+    /**
     **	Architecture-dependant videomemory. Set by InitVideoXXX.
     **	FIXME: need a new function to set it, see #ifdef SDL code
     **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
@@ -629,7 +637,7 @@ global void InitVideo(void)
     InitLineDraw();
     InitSprite();
     InitCursor();
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
 	case  8: ColorCycle=ColorCycle8 ; break;
 	case 15:
 	case 16: ColorCycle=ColorCycle16; break;

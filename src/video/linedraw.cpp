@@ -3029,7 +3029,7 @@ global void VideoFill75TransCircleClip(SysColors color,int x,int y,unsigned r)
 */
 global void InitLineDraw(void)
 {
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
 	case 8:
 	    VideoDrawPixel=DrawPixel8;
 	    VideoDrawPixelClip=DrawPixelClip8;
@@ -3112,7 +3112,7 @@ global void InitLineDraw(void)
 	    break;
 
 	default:
-	    DebugLevel0Fn("unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("unsupported %d bpp\n",VideoBpp);
 	    abort();
     }
 }
