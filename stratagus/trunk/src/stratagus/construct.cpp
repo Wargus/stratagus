@@ -360,17 +360,6 @@ local SCM CclDefineConstruction(SCM list)
     str = gh_scm2newstr(gh_car(list), NULL);
     list = gh_cdr(list);
 
-    for (i = 0; ConstructionWcNames[i]; ++i) {
-	if (!strcmp(ConstructionWcNames[i], str)) {
-	    break;
-	}
-    }
-    if (!ConstructionWcNames[i]) {
-	DebugLevel0Fn("Construction not found.\n");
-	free(str);
-	return SCM_UNSPECIFIED;
-    }
-
     if ((cop = Constructions) == NULL) {
 	Constructions = malloc(2 * sizeof(Construction*));
 	Constructions[0] = calloc(1, sizeof(Construction));
