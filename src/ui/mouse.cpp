@@ -899,8 +899,7 @@ global void UIHandleButtonDown(int b)
                 CurrentButtonLevel = 0; // reset unit buttons to normal
 		UpdateButtonPanel();
 		MustRedraw|=RedrawButtonPanel|RedrawCursor;
-		// FIXME: slow slow slow slow....
-		MakeMissile(MissileTypeByIdent("missile-green-cross")
+		MakeMissile(MissileTypeGreenCross
 			,Minimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 			,Minimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
 		SendCommand(Minimap2MapX(CursorX),Minimap2MapY(CursorY));
@@ -974,18 +973,16 @@ global void UIHandleButtonDown(int b)
 	    DebugLevel3("Cursor middle down %d,%d\n",CursorX,CursorY);
 	    MustRedraw|=RedrawCursor;
 	} else if( MouseButtons&RightButton ) {
-            Unit* unit = UnitOnMapTile(Screen2MapX(CursorX),Screen2MapY(CursorY));
-            if ( unit )
-              { // if right click on building -- blink
+            Unit* unit;
+
+            unit = UnitOnMapTile(Screen2MapX(CursorX),Screen2MapY(CursorY));
+            if ( unit ) { // if right click on building -- blink
               unit->Blink=3;
-              }
-            else
-              { // if not not click on building -- green cross
-	      // FIXME: slow slow slow slow....
-	      MakeMissile(MissileTypeByIdent("missile-green-cross")
+	    } else { // if not not click on building -- green cross
+	      MakeMissile(MissileTypeGreenCross
 	 	    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
-              }
+	    }
 	    DoRightButton(Screen2MapX(CursorX),Screen2MapY(CursorY));
 	}
     } else if( CursorOn==CursorOnMinimap ) {
@@ -993,8 +990,7 @@ global void UIHandleButtonDown(int b)
 	    MapSetViewpoint(Minimap2MapX(CursorX)-MapWidth/2
 		    ,Minimap2MapY(CursorY)-MapHeight/2);
 	} else if( MouseButtons&RightButton ) {
-	    // FIXME: slow slow slow slow....
-	    MakeMissile(MissileTypeByIdent("missile-green-cross")
+	    MakeMissile(MissileTypeGreenCross
 		    ,Minimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 		    ,Minimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
 	    DoRightButton(Minimap2MapX(CursorX),Minimap2MapY(CursorY));
