@@ -460,7 +460,6 @@ global int NetOpenTCP(int port)
 */
 global int NetConnectTCP(int sockfd,char* host,int port)
 {
-    struct hostent* hp;
     struct sockaddr_in sa;
     unsigned long addr;
     int opt;
