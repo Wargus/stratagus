@@ -1093,6 +1093,8 @@ void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 static void UnitFillSeenValues(Unit* unit)
 {
 	// Seen values are undefined for visible units.
+	unit->Seen.Y = unit->Y;
+	unit->Seen.X = unit->X;
 	unit->Seen.IY = unit->IY;
 	unit->Seen.IX = unit->IX;
 	unit->Seen.Frame = unit->Frame;

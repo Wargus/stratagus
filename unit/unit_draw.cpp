@@ -1827,6 +1827,8 @@ void DrawUnit(const Unit* unit)
 		frame = unit->Frame;
 		y = unit->IY;
 		x = unit->IX;
+		x += Map2ViewportX(CurrentViewport, unit->X);
+		y += Map2ViewportY(CurrentViewport, unit->Y);
 		state = (unit->Orders[0].Action == UnitActionBuilded) |
 			((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
 		constructed = unit->Constructed;
@@ -1839,6 +1841,8 @@ void DrawUnit(const Unit* unit)
 	} else {
 		y = unit->Seen.IY;
 		x = unit->Seen.IX;
+		x += Map2ViewportX(CurrentViewport, unit->Seen.X);
+		y += Map2ViewportY(CurrentViewport, unit->Seen.Y);
 		frame = unit->Seen.Frame;
 		type = unit->Seen.Type;
 		constructed = unit->Seen.Constructed;
@@ -1858,8 +1862,6 @@ void DrawUnit(const Unit* unit)
 		return;
 	}
 
-	x += Map2ViewportX(CurrentViewport, unit->X);
-	y += Map2ViewportY(CurrentViewport, unit->Y);
 
 	if (state == 1 && constructed) {
 		DrawConstructionShadow(unit, frame, x, y);
