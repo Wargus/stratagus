@@ -202,6 +202,9 @@ local SCM CclDefineCampaign(SCM list)
 	if( gh_eq_p(value,gh_symbol2scm("name")) ) {
 	    campaign->Name=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+	    campaign->File=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
 	} else if ( gh_eq_p(value,gh_symbol2scm("players")) ) {
 	    campaign->Players=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
@@ -292,27 +295,18 @@ local SCM CclBriefing(SCM list)
 	    GameIntro.TextFile=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
 	} else if ( gh_eq_p(value,gh_symbol2scm("voice")) ) {
-	    switch( voice ) {
-		case 0:
-		    if( GameIntro.VoiceFile1 ) {
-			free(GameIntro.VoiceFile1);
-		    }
-		    GameIntro.VoiceFile1=gh_scm2newstr(gh_car(list),NULL);
-		    break;
-		case 1:
-		    if( GameIntro.VoiceFile2 ) {
-			free(GameIntro.VoiceFile2);
-		    }
-		    GameIntro.VoiceFile2=gh_scm2newstr(gh_car(list),NULL);
-		    break;
-		default:
-		   errl("Only two voice",value);
+	    if( voice==MAX_BRIEFING_VOICES ) {
+		   errl("too much voices",value);
 	    }
-	    ++voice;
+	    if( GameIntro.VoiceFile[voice] ) {
+		free(GameIntro.VoiceFile[voice]);
+	    }
+	    GameIntro.VoiceFile[voice]=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
+	    ++voice;
 	} else if ( gh_eq_p(value,gh_symbol2scm("objective")) ) {
 	    if( objective==MAX_OBJECTIVES ) {
-		   errl("Only too much objectives",value);
+		   errl("too much objectives",value);
 	    }
 	    if( GameIntro.Objectives[objective] ) {
 		free(GameIntro.Objectives[objective]);
@@ -367,11 +361,8 @@ global void CleanCampaign(void)
     if( GameIntro.TextFile ) {
 	free(GameIntro.TextFile);
     }
-    if( GameIntro.VoiceFile2 ) {
-	free(GameIntro.VoiceFile1);
-    }
-    if( GameIntro.VoiceFile2 ) {
-	free(GameIntro.VoiceFile2);
+    for( i=0; i<MAX_BRIEFING_VOICES; ++i ) {
+	free(GameIntro.VoiceFile[i]);
     }
     for( i=0; i<MAX_OBJECTIVES; ++i ) {
 	if( GameIntro.Objectives[i] ) {
