@@ -3013,27 +3013,16 @@ global void LetUnitDie(Unit* unit)
     //	Catapults,... explodes.
     //
     if( type->ExplodeWhenKilled ) {
-	// FIXME: make it configurable?
-	MakeMissile(MissileTypeExplosion
+	MakeMissile(type->Explosion.Missile
 		,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
 		,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
 		,0,0);
-	RemoveUnit(unit,NULL);
-	UnitLost(unit);
-	UnitClearOrders(unit);
-	ReleaseUnit(unit);
-	return;
     }
 
     //
-    //	Building,... explodes.
+    //	Building,...
     //
     if( type->Building ) {
-	MakeMissile(MissileTypeByIdent("missile-explosion")
-		,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
-		,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
-		,0,0);
-
 	//
 	//	Building with units inside?
 	//
