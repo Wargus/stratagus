@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name font.h		-	The font headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __FONT_H__
 #define __FONT_H__
@@ -49,6 +48,7 @@ enum _game_font_ {
     LargeFont,				/// Large font used in menus
 
     // ... more to come
+    MaxFonts,				/// Number of fonts supported.
 };
 
 /**
@@ -78,7 +78,7 @@ enum _font_color {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-// extern ColorFont Fonts[];		
+// extern ColorFont Fonts[];
 
 /*----------------------------------------------------------------------------
 --	Functions

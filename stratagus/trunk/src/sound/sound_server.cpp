@@ -757,13 +757,23 @@ local void ClipMixToStereo16(int* mix,int size,short* output)
 --	Other
 ----------------------------------------------------------------------------*/
 
-/*
+/**
 **	Load one sample
+**
+**	@param name	File name of sample (short version).
+**
+**	@return		Wav sample loaded from file.
 */
 local Sample* LoadSample(const char* name)
 {
     Sample* sample;
-    char* buf = strdcat3(FreeCraftLibPath, "/sound/", name);
+    char* buf;
+
+#ifdef NEW_NAMES
+    buf = strdcat3(FreeCraftLibPath, "/sounds/", name);
+#else
+    buf = strdcat3(FreeCraftLibPath, "/sound/", name);
+#endif
     if( !(sample=LoadWav(buf)) ) {
 	printf("Can't load the sound `%s'\n",name);
     }

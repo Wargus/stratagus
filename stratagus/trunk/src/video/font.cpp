@@ -35,17 +35,19 @@
 **
 **	Define the font files, sizes.
 */
-global ColorFont Fonts[] = {
+local ColorFont Fonts[MaxFonts]
+#ifndef USE_CCL
 #ifdef NEW_NAMES
-    { "graphic/ui/fonts/game.png",	13,14 },
-    { "graphic/ui/fonts/small.png",	 7, 6 },
-    { "graphic/ui/fonts/large.png",	17,17 },
+    ={ { "graphics/ui/fonts/game.png",	13,14 },
+    { "graphics/ui/fonts/small.png",	 7, 6 },
+    { "graphics/ui/fonts/large.png",	17,17 }, }
 #else
-    { "graphic/small font.png",		13,14 },
+    ={ { "graphic/small font.png",	13,14 },
     { "graphic/game font.png",		 7, 6 },
-    { "graphic/large font.png",		17,17 },
+    { "graphic/large font.png",		17,17 }, }
 #endif
-};
+#endif
+    ;
 
 /**
 **	Font color table.
