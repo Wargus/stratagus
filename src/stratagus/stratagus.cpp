@@ -147,6 +147,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #ifdef USE_BEOS
 #include <fcntl.h>
@@ -241,11 +242,14 @@ global int SpeedResearch=SPEED_RESEARCH;/// speed factor for researching
 global int VideoWidth;			/// window width in pixels
 global int VideoHeight;			/// window height in pixels
 
+global unsigned long NextFrameTicks;	/// Ticks of begin of the next frame
 global int FrameCounter;		/// current frame number
 global int SlowFrameCounter;		/// profile, frames out of sync
 
 // FIXME: not the correct place
 global enum MustRedraw_e MustRedraw=RedrawEverything;	/// redraw flags
+
+global unsigned long GameCycle;		/// Game simulation cycle counter
 
 /*----------------------------------------------------------------------------
 --	Random
@@ -427,7 +431,7 @@ local void PreMenuSetup(void)
     VideoCreatePalette(GlobalPalette);
     LoadFonts();
 
-    InitCursors();
+    InitVideoCursors();
 
     // All pre-start menues are orcish - may need to be switched later..
     SetDefaultTextColors(FontYellow,FontWhite);
