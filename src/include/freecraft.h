@@ -510,6 +510,9 @@ extern char* strdcat3(const char* l, const char *m, const char* r);
 extern char* strcasestr(const char* str, const char* substr);
 #endif // !BSD || APPLE
 
+    /// Compute a square root using ints
+extern long isqrt(long num);
+
 /*============================================================================
 ==	Misc
 ============================================================================*/

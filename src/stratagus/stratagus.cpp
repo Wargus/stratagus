@@ -387,6 +387,54 @@ global char* strcasestr(const char* a, const char* b)
 }
 #endif // BSD
 
+/**
+**	Compute a square root using ints
+**
+**	Uses John Halleck's method, see 
+**	http://www.cc.utah.edu/~nahaj/factoring/isqrt.legalize.c.html
+**
+**	@param num	Calculate the square root of this number
+**
+**	@return		The integer square root.
+*/
+global long isqrt(long num)
+{
+    long squaredbit;
+    long remainder;
+    long root;
+
+    if (num < 1) {
+	return 0;
+    }
+
+    //
+    //	Load the binary constant 01 00 00 ... 00, where the number
+    //	of zero bits to the right of the single one bit
+    //	is even, and the one bit is as far left as is consistant
+    //	with that condition.)
+    //
+    //	This portable load replaces the loop that used to be 
+    //	here, and was donated by  legalize@xmission.com 
+    //
+    squaredbit  = (long)((((unsigned long)~0L) >> 1) & ~(((unsigned long)~0L) >> 2));
+
+    // Form bits of the answer.
+    remainder = num;
+    root = 0;
+    while (squaredbit > 0) {
+	if (remainder >= (squaredbit | root)) {
+	    remainder -= (squaredbit | root);
+	    root >>= 1;
+	    root |= squaredbit;
+	} else {
+	    root >>= 1;
+	}
+	squaredbit >>= 2; 
+    }
+
+    return root;
+}
+
 /*============================================================================
 ==	MAIN
 ============================================================================*/

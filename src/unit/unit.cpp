@@ -3474,9 +3474,9 @@ global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
     }
 
     DebugLevel3("\tDistance %d,%d -> %d,%d = %d\n"
-	    _C_ x1 _C_ y1 _C_ x2 _C_ y2 _C_ (dy<dx) ? dx : dy);
+	    _C_ x1 _C_ y1 _C_ x2 _C_ y2 _C_ isqrt(dx*dx+dy*dy));
 
-    return floor(sqrt(dx*dx+dy*dy));
+    return isqrt(dx*dx+dy*dy);
 }
 
 /**

@@ -521,7 +521,7 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
     int basic_damage;
     int piercing_damage;
 
-    basic_damage = attacker_stats->BasicDamage + (int)(sqrt(xp/100))*XpDamage;
+    basic_damage = attacker_stats->BasicDamage + isqrt(xp/100)*XpDamage;
     piercing_damage = attacker_stats->PiercingDamage;
     if (bloodlust) {
 	basic_damage *= 2;
