@@ -169,7 +169,7 @@ local int ChopWood(Unit* unit)
 	//
 #if 1
 	if( unit->Orders[1].Action==UnitActionHarvest
-		 || unit->Orders[1].Action==UnitActionMineGold ) {
+		 || unit->Orders[1].Action==UnitActionResource ) {
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
 	    return 0;

@@ -480,32 +480,6 @@ global Unit* TransporterOnScreenMapPosition(int x,int y)
 ----------------------------------------------------------------------------*/
 
 /**
-**	Gold mine on map tile
-**
-**	@param tx	X position on map, tile-based.
-**	@param ty	Y position on map, tile-based.
-**
-**	@return		Returns the gold mine if found, or NoUnitP.
-*/
-global Unit* GoldMineOnMap(int tx,int ty)
-{
-    Unit* table[UnitMax];
-    int i;
-    int n;
-
-    n=SelectUnitsOnTile(tx,ty,table);
-    for( i=0; i<n; ++i ) {
-	if( UnitUnusable(table[i]) ) {
-	    continue;
-	}
-	if( table[i]->Type->GivesResource==GoldCost ) {
-	    return table[i];
-	}
-    }
-    return NoUnitP;
-}
-
-/**
 ** 	Find a unit on a map tile with a specific type
 **
 **	@param tx	X position on map, tile-based.

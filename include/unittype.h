@@ -555,8 +555,7 @@ struct _unit_type_ {
 #define MouseActionNone		0		/// Nothing
 #define MouseActionAttack	1		/// Attack
 #define MouseActionMove		2		/// Move
-#define MouseActionHarvest	3		/// Harvest or mine gold
-#define MouseActionHaulOil	4		/// Haul oil
+#define MouseActionHarvest	3		/// Harvest resources
 #define MouseActionDemolish	5		/// Demolish
 #define MouseActionSail		6		/// Sail
     int		Points;			/// How many points you get for unit
@@ -583,6 +582,7 @@ struct _unit_type_ {
     unsigned ShoreBuilding : 1;		/// Building must be build on coast.
     unsigned CanCastSpell : 1;		/// Unit is able to use spells.
     unsigned CanAttack : 1;		/// Unit can attack.
+    unsigned CanRepair : 1;		/// Unit can repair .
     unsigned Tower : 1;			/// Unit can attack, but not move.
     unsigned Hero : 1;			/// Is hero only used for triggers .
     unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit.
@@ -591,7 +591,7 @@ struct _unit_type_ {
     
     unsigned CanStore[MaxCosts];	/// Resources that we can store here.
     unsigned GivesResource;		/// The resource this unit gives.
-    unsigned CanHarvest : 1;		/// Resource can be harvested(false for oil patches).
+    unsigned CanHarvest : 1;		/// Resource can be harvested (false for oil patches).
     unsigned Harvester : 1;		/// Unit is a resource worker.
     unsigned ResourceHarvested;		/// The resource it can harvest.
     unsigned WaitAtResource;		/// Cycles the unit waits while mining.
@@ -651,8 +651,6 @@ extern int NumUnitTypes;			/// Number of unit-types made
 // FIXME: this hardcoded unit-types must be removed!!
 extern UnitType*UnitTypeHumanWorker;		/// Human worker
 extern UnitType*UnitTypeOrcWorker;		/// Orc worker
-extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
-extern UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold
 extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
 extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
 extern UnitType*UnitTypeHumanWall;		/// Human wall

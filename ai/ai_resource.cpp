@@ -855,7 +855,7 @@ local Unit* AiFindGoldMine(const Unit* unit)
 		//
 		//	Look if there is a mine
 		//
-		if ( (mine=GoldMineOnMap(x,y)) ) {
+		if ( (mine=ResourceOnMap(x,y,GoldCost)) ) {
 		    if( destu ) {
 			n=max(abs(destx-x),abs(desty-y));
 			if( n<bestd ) {
@@ -932,7 +932,7 @@ local int AiMineGold(Unit* unit)
     DebugCheck(unit->Type != UnitTypeHumanWorker
 	    && unit->Type != UnitTypeOrcWorker);
 
-    CommandMineGold(unit, dest, FlushCommands);
+    CommandResource(unit, dest, FlushCommands);
 
     return 1;
 }
@@ -1256,16 +1256,12 @@ local void AiCollectResources(void)
 	//	See if it's assigned already
 	//
 	switch( unit->Orders[0].Action ) {
-	    case UnitActionMineGold:
-		units_assigned[num_units_assigned[GoldCost]++][GoldCost]=unit;
-		continue;
 	    case UnitActionHarvest:
 		units_assigned[num_units_assigned[WoodCost]++][WoodCost]=unit;
 		continue;
 	    case UnitActionResource:
 		units_assigned[num_units_assigned[unit->Type->ResourceHarvested]++][unit->Type->ResourceHarvested]=unit;
 		continue;
-		// FIXME: the other resources
 	    default:
 		break;
 	}
@@ -1418,7 +1414,7 @@ local void AiCollectResources(void)
 			    int n1;
 			    int n2;
 			    case GoldCost:
-				if( unit->Orders[0].Action==UnitActionMineGold || AiMineGold(unit) ) {
+				if( (unit->Orders[0].Action==UnitActionResource&&unit->Type->ResourceHarvested==GoldCost) || AiMineGold(unit) ) {
 				    DebugLevel3Fn("Assigned to gold\n");
 				    units_assigned[num_units_assigned[c]++][c]=unit;
     				    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];
@@ -1450,7 +1446,7 @@ local void AiCollectResources(void)
 				}
 				break;
 			    case OilCost:
-				if( unit->Orders[0].Action==UnitActionResource || AiHaulOil(unit) ) {
+				if( (unit->Orders[0].Action==UnitActionResource&&unit->Type->ResourceHarvested==OilCost) || AiHaulOil(unit) ) {
 				    DebugLevel3Fn("Assigned to oil\n");
 				    units_assigned[num_units_assigned[c]++][c]=unit;
     				    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];
@@ -1519,9 +1515,10 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     nunits = FindPlayerUnitsByType(AiPlayer->Player,type,table);
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
-    //if (unit->Orders[0].Action != UnitActionBuild && unit->OrderCount==1 ) {
-	if ( unit->Orders[0].Action == UnitActionMineGold
-		&& unit->OrderCount==1 ) {
+	if ( unit->Type->CanRepair &&
+		(unit->Orders[0].Action==UnitActionResource ||
+		unit->Orders[0].Action==UnitActionStill) &&
+		unit->OrderCount==1 ) {
 	    table[num++] = unit;
 	}
     }

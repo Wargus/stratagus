@@ -46,6 +46,7 @@
 #include "map.h"
 #include "minimap.h"
 #include "player.h"
+#include "editor.h"
 #ifdef HIERARCHIC_PATHFINDER
 #include "pathfinder.h"
 #endif
@@ -328,6 +329,7 @@ global void MapFixWoodTile(int x, int y)
 */
 global void MapRemoveWood(unsigned x, unsigned y)
 {
+    //EditTile(x,y,TheMap.Tileset->RemovedTree);
     MapField *mf;
 
     mf = TheMap.Fields + x + y * TheMap.Width;

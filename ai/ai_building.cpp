@@ -412,7 +412,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 		//
 		//	Look if there is a mine
 		//
-		if ( (mine=GoldMineOnMap(x,y)) ) {
+		if ( (mine=ResourceOnMap(x,y,GoldCost)) ) {
 		    int buildings;
 		    int j;
 		    int minx;
@@ -638,9 +638,9 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
     }
 
     //
-    //	Platforms can only be build on oil patches
+    //	Platforms can only be built on oil patches
     //
-    if( !type->GivesResource==OilCost && AiFindBuildingPlace2(worker,type,worker->X,worker->Y,dx,dy,1) ) {
+    if( type->GivesResource!=OilCost && AiFindBuildingPlace2(worker,type,worker->X,worker->Y,dx,dy,1) ) {
 	return 1;
     }
 

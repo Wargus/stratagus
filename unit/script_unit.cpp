@@ -210,8 +210,6 @@ local void CclParseOrder(SCM list,Order* order)
 	    order->Action=UnitActionRepair;
 	} else if( gh_eq_p(value,gh_symbol2scm("action-harvest")) ) {
 	    order->Action=UnitActionHarvest;
-	} else if( gh_eq_p(value,gh_symbol2scm("action-mine-gold")) ) {
-	    order->Action=UnitActionMineGold;
 	} else if( gh_eq_p(value,gh_symbol2scm("action-resource")) ) {
 	    order->Action=UnitActionResource;
 	} else if( gh_eq_p(value,gh_symbol2scm("action-return-goods")) ) {

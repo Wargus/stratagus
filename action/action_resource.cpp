@@ -341,6 +341,7 @@ local int MoveToDepot(Unit* unit)
 	(unit->Value*unit->Player->Incomes[unit->Type->ResourceHarvested])/100;
     unit->Player->TotalResources[unit->Type->ResourceHarvested]+=
 	(unit->Value*unit->Player->Incomes[unit->Type->ResourceHarvested])/100;
+    unit->Value=0;
     if( unit->Player==ThisPlayer ) {
 	MustRedraw|=RedrawResources;
     }
