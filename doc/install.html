@@ -150,11 +150,24 @@
 	    you will need to specify the directory by passing '-d DIR' flag 
 	    when you run the freecraft binary, by default the binary 
 	    looks for 'data' in the current directory.</font><p> 
+
+	    If you are using the CVS engine, you may need to checkuot 
+	    the 'fcmp' module from CVS. Then edit the locations at the top 
+	    of 'buildfcmp.sh' and run it, this will create a working 
+	    FcMP dir called: 'data.fcmp' , you may then rename this to 
+	    '$FCDIR/data' where $FCDIR is the directory where the freecraft 
+	    binary exists, or run freecraft with the '-d' option.<p>
 	</ul>
+
+	<li><b>Step 4, Run:</b><p>
+
+	You may now go into the topleve freecraft dir and run the binary. Remember, 
+	if the data dir is not './data', you will need to run freecraft with 
+	the '-d' option.<p>
     </ul>
 
 <hr>
-(C) Copyright 1998-2003 by The <a href="http://freecraft.sf.net">FreeCraft</a> Project
+(C) Copyright 1998-2003 by The <a href="http://freecraft.sf.net">FreeCraft</a> Project 
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
