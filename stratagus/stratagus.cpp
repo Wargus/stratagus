@@ -1094,6 +1094,9 @@ global void MenuLoop(char* filename, WorldMap* map)
 
 	    GuiGameStarted = 0;
 	    while (GuiGameStarted == 0) {
+		if( EditorRunning == 2 ) {
+		    SetupEditor();
+		}
 		if( EditorRunning ) {
 		    ProcessMenu("menu-editor-select", 1);
 		} else {
@@ -1104,6 +1107,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    EnableRedraw=RedrawEverything;
 	    DebugLevel0Fn("Menu start: NetPlayers %d\n" _C_ NetPlayers);
 	    filename = CurrentMapPath;
+	} else {
+	    strcpy(CurrentMapPath,filename);
 	}
 	if( NetworkFildes!=-1 && NetPlayers<2 ) {
 	    ExitNetwork1();
@@ -1426,7 +1431,7 @@ global int main(int argc,char** argv)
                 StratagusLibPath=optarg;
                 continue;
 	    case 'e':
-		EditorRunning=1;
+		EditorRunning=2;
 		continue;
 	    case 'E':
 		EditorStartFile=optarg;
