@@ -50,7 +50,7 @@ local void DoActionRepairGeneric(Unit* unit,const Animation* repair)
 
     flags=UnitShowAnimation(unit,repair);
 
-    if( (flags&AnimationSound) ) {	
+    if( (flags&AnimationSound) ) {
 	PlayUnitSound(unit,VoiceAttacking); //FIXME: should be something else...
     }
 }
@@ -82,7 +82,7 @@ local void RepairUnit(Unit* unit,Unit* goal)
     //	Calculate the repair costs.
     //
     DebugCheck( !goal->Stats->HitPoints );
-    
+
     for( i=1; i<MaxCosts; ++i ) {
 	costs[i]=((goal->Stats->Costs[i]*hp)/goal->Stats->HitPoints)/DIVISOR;
 
@@ -98,7 +98,7 @@ local void RepairUnit(Unit* unit,Unit* goal)
     //
     for( i=1; i<MaxCosts; ++i ) {
 	if( player->Resources[i]<costs[i] ) {
-    // FIXME: we should show a message, we need resources!
+	  SetMessage("We need resources!");
     // FIXME: perhaps we should not animate if no resources are available.
 	    return;
 	}
@@ -132,7 +132,7 @@ local int AnimateActionRepair(Unit* unit)
 {
     if( unit->Type->Animations ) {
 	DebugCheck( !unit->Type->Animations->Attack );
-	// FIXME: An seperate repair animation would be nice?
+	// FIXME: A seperate repair animation would be nice?
 	DoActionRepairGeneric(unit,unit->Type->Animations->Attack);
     }
 
@@ -157,7 +157,7 @@ global int HandleActionRepair(Unit* unit)
 	//
 	case 0:
 	    // FIXME: RESET FIRST!! Why? (Johns)
-	    err=HandleActionMove(unit); 
+	    err=HandleActionMove(unit);
 	    if( unit->Reset ) {
 		//
 		//	No goal: if meeting enemy attack it.
