@@ -1657,11 +1657,10 @@ local SCM CclSetShowOrders(SCM flag)
 */
 global SCM CclSetMessage(SCM message)
 {
-    char *str;
+    const char *str;
 
-    str = gh_scm2newstr(message, NULL);
+    str = get_c_string(message);
     SetMessage(str);
-    free(str);
 
     return SCM_UNSPECIFIED;
 }
