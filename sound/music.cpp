@@ -355,6 +355,7 @@ global int PlayCDRom(int name)
     }
 
     if (name == CDModeDefined) {
+	return 0;
         CDMode = CDModeDefined;
         track = cd_current_track();
         if (CurrentPlaySection == PlaySectionStats) {
@@ -470,7 +471,7 @@ global void PlaySectionMusic(PlaySectionType section)
 
     track = cd_current_track();
 
-    for (i = 0;; ++i) {
+    for (i = 0; i < NumPlaySections; ++i) {
 	if (PlaySections[i].Type == section && (!PlaySections[i].Race || 
 		!(strcmp(PlaySections[i].Race, ThisPlayer->RaceName)))) {
 	    break;

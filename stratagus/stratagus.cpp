@@ -1077,8 +1077,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    if( !PlayingMusic && strcmp(TitleMusic,MenuMusic) ) {
 		if (CDMode == CDModeOff) {
 		    PlayMusic(MenuMusic);
-		} else {
-		    CDRomCheck(NULL);
+		} else if (CDMode == CDModeDefined) {
+		    PlaySectionMusic(PlaySectionMainMenu);
 		}
 	    }
 	    EnableRedraw=RedrawMenu;

@@ -639,8 +639,7 @@ global void GameMainLoop(void)
 
     MultiPlayerReplayEachCycle();
 
-    CurrentPlaySection = PlaySectionGame;
-    CDRomCheck(NULL);
+    PlaySectionMusic(PlaySectionGame);
 
     while( GameRunning ) {
 #if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
@@ -820,8 +819,7 @@ global void GameMainLoop(void)
     }
 
     if( GameResult==GameVictory || GameResult==GameDefeat ) {
-	CurrentPlaySection = PlaySectionStats;
-	CDRomCheck(NULL);
+	PlaySectionMusic(PlaySectionStats);
 	ShowStats();
     }
 
