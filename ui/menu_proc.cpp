@@ -770,7 +770,6 @@ local void DrawGem(Menuitem *mi, int mx, int my)
 
     GetDefaultTextColors(&nc, &rc);
     if (mi->d.gem.text) {
-	// FIXME: find correct x, y for other gem types , add options for other fonts
 	VideoDrawText(x+24, y+4, GameFont, mi->d.gem.text);
 	if (mi->flags&MenuButtonActive) {
 	    SetDefaultTextColors(rc,rc);
@@ -1533,9 +1532,9 @@ local void MenuHandleMouseMove(int x,int y)
 		    case MI_TYPE_GEM:
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
-			if ((!mi->d.gem.text || x < xs - 4 || x > xs + 
-				VideoTextLength(GameFont, mi->d.gem.text)+30 || y < ys - 4 || 
-				y > ys + VideoTextHeight(GameFont)+12) && (x < xs || 
+			if ((!mi->d.gem.text || x < xs - 1 || x > xs + 
+				VideoTextLength(GameFont, mi->d.gem.text)+28 || y < ys - 2 || 
+				y > ys + VideoTextHeight(GameFont)+9) && (x < xs || 
 				x > xs + mi->d.gem.xsize || y < ys || y > ys + mi->d.gem.ysize)) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
