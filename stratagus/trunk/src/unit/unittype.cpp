@@ -604,7 +604,7 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     int flag;
     const UnitType* temp;
 
-    fprintf(file,"(define-new-unit-type '%s",type->Ident);
+    fprintf(file,"(define-unit-type '%s",type->Ident);
     fprintf(file," 'name \"%s\"\n  ",type->Name);
     // Graphic files
     if( type->SameSprite ) {
@@ -655,7 +655,7 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     fprintf(file,"  'speed %d\n",type->_Speed);
     fprintf(file,"  'hit-points %d\n",type->_HitPoints);
     if( all || type->_MaxMana ) {
-	fprintf(file,"  'magic %d\n",type->_MaxMana);
+	fprintf(file,"  'max-mana %d\n",type->_MaxMana);
     }
     if( all || type->Magic ) {
 	fprintf(file,"  'magic %d\n",type->Magic);
