@@ -913,6 +913,8 @@ global void InputMouseButtonPress(const EventCallback* callbacks,
 global void InputMouseButtonRelease(const EventCallback* callbacks,
 	unsigned ticks,unsigned button)
 {
+    unsigned mask;
+
     //
     //	Same button before pressed.
     //
@@ -922,13 +924,21 @@ global void InputMouseButtonRelease(const EventCallback* callbacks,
 	LastMouseButton=0;
 	MouseState=InitialMouseState;
     }
-    MouseButtons&=~(1<<button);
-    MouseButtons&=~(1<<button)<<MouseDoubleShift;
-    MouseButtons&=~(1<<button)<<MouseDragShift;
-    MouseButtons&=~(1<<button)<<MouseHoldShift;
     LastMouseTicks=ticks;
 
-    callbacks->ButtonReleased(button);
+    mask=0;
+    if( MouseButtons&((1<<button)<<MouseDoubleShift) ) {
+	mask|=button<<MouseDoubleShift;
+    }
+    if( MouseButtons&((1<<button)<<MouseDragShift) ) {
+	mask|=button<<MouseDragShift;
+    }
+    if( MouseButtons&((1<<button)<<MouseHoldShift) ) {
+	mask|=button<<MouseHoldShift;
+    }
+    MouseButtons&=~(0x01010101<<button);
+
+    callbacks->ButtonReleased(button|mask);
 }
 
 /**

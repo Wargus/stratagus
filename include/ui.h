@@ -247,10 +247,9 @@ extern void UserInterfaceCclRegister(void);	/// register ccl features
     /// Called if the mouse is moved in Normal interface state
 extern void UIHandleMouseMove(int x,int y);
     /// Called if any mouse button is pressed down
-extern void UIHandleButtonDown(int b);
+extern void UIHandleButtonDown(unsigned button);
     /// Called if any mouse button is released up
-extern void UIHandleButtonUp(int b);
-    /// Called if the mouse is moved
+extern void UIHandleButtonUp(unsigned button);
 
 //@}
 
