@@ -2161,7 +2161,12 @@ local void HelpMenu(void)
 
 local void ShowTipsMenu(void)
 {
-    ProcessMenu(MENU_TIPS, 0);
+    if (ShowTips)
+	TipsMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
+    else
+	TipsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+
+    ProcessMenu(MENU_TIPS, 1);
 }
 
 /**
