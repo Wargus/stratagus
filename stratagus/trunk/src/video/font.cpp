@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name font.c		-	The color fonts. */
+/**@name font.c - The color fonts. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2004 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -54,31 +54,30 @@
 #ifdef USE_SDL_SURFACE
 	/// Font color mapping
 typedef struct _font_color_mapping_ {
-	char* ColorName;						/// Font color name
-
-	SDL_Color Color[NumFontColors];		/// Array of hardware dependent pixels
-	struct _font_color_mapping_* Next;		/// Next pointer
+	char* ColorName;                        /// Font color name
+	SDL_Color Color[NumFontColors];         /// Array of colors
+	struct _font_color_mapping_* Next;      /// Next pointer
 } FontColorMapping;
 
 local FontColorMapping* FontColor;
 #else
 	/// Font color mapping
 typedef struct _font_color_mapping_ {
-	char* Color;						/// Font color
+	char* Color;                            /// Font color
 	struct {
 		int R;
 		int G;
 		int B;
 	} RGB[NumFontColors];
-	VMemType Pixels[NumFontColors];		/// Array of hardware dependent pixels
-	struct _font_color_mapping_* Next;		/// Next pointer
+	VMemType Pixels[NumFontColors];         /// Array of hardware dependent pixels
+	struct _font_color_mapping_* Next;      /// Next pointer
 } FontColorMapping;
 
-local const VMemType* FontPixels;				/// Font pixels
-#define FontPixels8		(&FontPixels->D8)		/// font pixels  8bpp
-#define FontPixels16		(&FontPixels->D16)		/// font pixels 16bpp
-#define FontPixels24		(&FontPixels->D24)		/// font pixels 24bpp
-#define FontPixels32		(&FontPixels->D32)		/// font pixels 32bpp
+local const VMemType* FontPixels;           /// Font pixels
+#define FontPixels8  (&FontPixels->D8)      /// font pixels  8bpp
+#define FontPixels16 (&FontPixels->D16)     /// font pixels 16bpp
+#define FontPixels24 (&FontPixels->D24)     /// font pixels 24bpp
+#define FontPixels32 (&FontPixels->D32)     /// font pixels 32bpp
 
 #endif
 
@@ -99,10 +98,6 @@ local FontColorMapping* LastTextColor;
 local FontColorMapping* DefaultTextColor;
 	/// Reverse text color
 local FontColorMapping* ReverseTextColor;
-	/// Default normal color index
-local char* DefaultNormalColorIndex;
-	/// Default reverse color index
-local char* DefaultReverseColorIndex;
 #else
 	/// Last text color
 local const VMemType* LastTextColor;
@@ -110,11 +105,11 @@ local const VMemType* LastTextColor;
 local const VMemType* DefaultTextColor;
 	/// Reverse text color
 local const VMemType* ReverseTextColor;
+#endif
 	/// Default normal color index
 local char* DefaultNormalColorIndex;
 	/// Default reverse color index
 local char* DefaultReverseColorIndex;
-#endif
 
 	/// Draw character with current video depth.
 #ifdef USE_SDL_SURFACE
@@ -666,7 +661,6 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 					color[p - text] = '\0';
 					text = p;
 #ifdef USE_SDL_SURFACE
-					printf("NBNNNNNNNNNNNNNNNNNNNNNN\n");
 					LastTextColor = FontColor;
 					FontColor = GetFontColorMapping(color);
 #else
@@ -677,9 +671,6 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 					continue;
 			}
 		}
-#ifdef USE_SDL_SURFACE
-
-#endif
 
 		DebugCheck(*text < 32);
 
@@ -1011,8 +1002,7 @@ global void LoadFonts(void)
 #ifdef USE_OPENGL
 	VideoDrawChar = VideoDrawCharOpenGL;
 #else
-#ifdef USE_SDL_SURFACE
-#else
+#ifndef USE_SDL_SURFACE
 	switch (VideoBpp) {
 		case 8:
 			VideoDrawChar = VideoDrawChar8;
@@ -1049,26 +1039,8 @@ global void LoadFonts(void)
 		}
 	}
 
+#ifndef USE_SDL_SURFACE
 	fcm = FontColorMappings;
-#ifdef USE_SDL_SURFACE
-
-	while (fcm) {
-		color = fcm->Color;
-		for (i = 0; i < NumFontColors; ++i) {
-///			SDL_Color c;
-			// FIXME: todo
-//			c = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
-///			c = VideoMapRGB(fcm->Color[i].r, fcm->Color[i].g, fcm->Color[i].b);
-
-///			color[i] = VideoMapRGB(c.r, c.g, c.b);
-			color[i].r = fcm->Color[i].r;
-			color[i].g = fcm->Color[i].g;
-			color[i].b = fcm->Color[i].b;
-		}
-		fcm = fcm->Next;
-	}
-
-#else
 	while (fcm) {
 		pixels = fcm->Pixels;
 		for (i = 0; i < NumFontColors; ++i) {
