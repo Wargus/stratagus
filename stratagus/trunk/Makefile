@@ -346,7 +346,7 @@ release:
 WIN32=	\
     EXE='.exe' \
     VIDEO='-DUSE_WIN32 $(SDL)'	\
-    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -Wl,--stack,16777216'
+    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32 -Wl,--stack,16777216'
 
 win32new:
 	@$(MAKE) distclean
