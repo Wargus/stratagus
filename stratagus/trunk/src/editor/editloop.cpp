@@ -93,6 +93,8 @@ local enum _mode_buttons_ {
     TileButton,
 };
 
+local int UnitIndex;			/// Unit index
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -322,18 +324,26 @@ local void DrawUnitIcons(void)
     sprintf(buf, "Air units %d\n", j);
     VideoDrawText(x, y, GameFont, buf);
 
-    y = TheUI.ButtonPanelY + 4;
+    y = TheUI.ButtonPanelY + 24;
 
-    icon = IconByIdent("icon-footman");
+    i = UnitIndex;
     while( y < TheUI.ButtonPanelY
-	    + TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT / 2 ) { 
-	x = TheUI.ButtonPanelX + 4;
-	while( x < TheUI.ButtonPanelX + 146 ) {
-	    VideoDrawSub(icon->Graphic, icon->X, icon->Y, icon->Width / 2,
-		icon->Height / 2, x, y);
-	    x += ICON_WIDTH / 2 + 2;
+	    + TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT ) { 
+	if( !UnitTypeWcNames[i] ) {
+	    break;
 	}
-	y += ICON_HEIGHT / 2 + 2;
+	x = TheUI.ButtonPanelX + 10;
+	while( x < TheUI.ButtonPanelX + 146 ) {
+	    if( !UnitTypeWcNames[i] ) {
+		break;
+	    }
+	    icon = UnitTypeByIdent(UnitTypeWcNames[i])->Icon.Icon;
+	    VideoDrawSub(icon->Graphic, icon->X, icon->Y, icon->Width,
+		icon->Height, x, y);
+	    x += ICON_WIDTH + 8;
+	    ++i;
+	}
+	y += ICON_HEIGHT + 2;
     }
 
     x = TheUI.ButtonPanelX + 4;
@@ -344,7 +354,7 @@ local void DrawUnitIcons(void)
     SetClipping(0,0,x + j - 20,VideoHeight-1);
     VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
     PopClipping();
-    if (1) {
+    if (0) {
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
     } else {
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
@@ -682,6 +692,33 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	    && EditorState == EditorEditTile ) {
 	TileCursor = ButtonUnderCursor - 100;
 	return;
+    }
+    //
+    //	Click on unit area
+    //
+    if (EditorState == EditorEditUnit) {
+	if (TheUI.ButtonPanelX + 4 < CursorX
+		&& CursorX < TheUI.ButtonPanelX + 24
+		&& TheUI.ButtonPanelY + 4 < CursorY
+		&& CursorY < TheUI.ButtonPanelY + 24) {
+	    int i;
+
+	    for( i=9; i-- && UnitIndex; ) {
+		--UnitIndex;
+	    }
+	    return;
+	}
+	if (TheUI.ButtonPanelX + 176 - 24 < CursorX
+		&& CursorX < TheUI.ButtonPanelX + 176 - 4
+		&& TheUI.ButtonPanelY + 4 < CursorY
+		&& CursorY < TheUI.ButtonPanelY + 24) {
+	    int i;
+
+	    for( i=9; i-- && UnitTypeWcNames[UnitIndex + 1]; ) {
+		++UnitIndex;
+	    }
+	    return;
+	}
     }
 
     //
