@@ -6,11 +6,11 @@
 --             \/                  \/          \//_____/            \/ 
 --  ______________________                           ______________________
 --  T H E   W A R   B E G I N S
---   Stratagus - A free fantasy real time strategy game engine
+--      Stratagus - A free fantasy real time strategy game engine
 --
---tile_desert.ccl-Define the desert tileset.
+--      winter.lua - Define the winter tileset.
 --
---(c) Copyright 2000-2004 by Lutz Sammer and Crestez Leonard.
+--      (c) Copyright 2000-2004 by Lutz Sammer and Crestez Leonard.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---$Id: winter.lua,v 1.2 2004/12/05 14:55:19 gorm Exp $
+--$Id$
 
 DefineTileset("tileset-winter",
  "class", "winter",
