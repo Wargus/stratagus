@@ -127,7 +127,7 @@ global int ButtonCheckFalse(const Unit* unit,const ButtonAction* button)
 */
 global int ButtonCheckUpgrade(const Unit* unit,const ButtonAction* button)
 {
-    DebugLevel3("%s\n",button->AllowStr);
+    DebugLevel2Fn("%s\n",button->AllowStr);
     return UpgradeIdentAllowed(unit->Player,button->AllowStr)=='R';
 }
 
@@ -290,7 +290,7 @@ global int ButtonCheckResearch(const Unit* unit,const ButtonAction* button)
 --      Table
 ----------------------------------------------------------------------------*/
 
-#ifndef laterUSE_CCL
+#ifndef USE_CCL
 
 /**
 **	All possible buttons.
@@ -430,25 +430,25 @@ global ButtonAction AllButtons[] = {
 },
 {   6, 0, { "icon-flame-shield" },
     ButtonSpellCast,	0, "spell-flame-shield",
-    ButtonCheckUpgrade,		"upgrade-flame-shield",
+    ButtonCheckUpgrade,	"upgrade-flame-shield",
     'l', "F~!LAME SHIELD",
     "unit-mage"
 },
 {   7, 0, { "icon-invisibility" },
     ButtonSpellCast,	0, "spell-invisibility",
-    ButtonCheckUpgrade,		"upgrade-invisibility",
+    ButtonCheckUpgrade,	"upgrade-invisibility",
     'i', "~!INVISIBILITY",
     "unit-mage"
 },
 {   8, 0, { "icon-polymorph" },
     ButtonSpellCast,	0, "spell-polymorph",
-    ButtonCheckUpgrade,		"upgrade-polymorph",
+    ButtonCheckUpgrade,	"upgrade-polymorph",
     'p', "~!POLYMORPH",
     "unit-mage"
 },
 {   9, 0, { "icon-blizzard" },
     ButtonSpellCast,	0, "spell-blizzard",
-    ButtonCheckUpgrade,		"upgrade-blizzard",
+    ButtonCheckUpgrade,	"upgrade-blizzard",
     'b', "~!BLIZZARD",
     "unit-mage"
 },
@@ -475,21 +475,21 @@ global ButtonAction AllButtons[] = {
 
 // build basic/advanced structs -----------------------------------------------
 {   7, 0, { "icon-build-basic" },
-    ButtonButton,		1, "1",
+    ButtonButton,	1, "1",
     NULL,		NULL,
     'b', "~!BUILD BASIC STRUCTURE",
     WORKERS_H
 },
 {   8, 0, { "icon-build-advanced" },
-    ButtonButton,		2, "2",
-    ButtonCheckUnit,		"unit-elven-lumber-mill",
+    ButtonButton,	2, "2",
+    ButtonCheckUnit,	"unit-elven-lumber-mill",
     'v', "BUILD AD~!VANCED STRUCTURE",
     WORKERS_H
 },
 #ifdef USE_EXTENSIONS
 {   9, 0, { "icon-build-advanced" },
-    ButtonButton,		3, "3",
-    ButtonCheckUnits,		"unit-castle,unit-mage-tower,unit-church",
+    ButtonButton,	3, "3",
+    ButtonCheckUnits,	"unit-castle,unit-mage-tower,unit-church",
     'e', "BUILD SP~!ECIAL STRUCTURE",
     WORKERS_H
 },
@@ -538,7 +538,7 @@ global ButtonAction AllButtons[] = {
     WORKERS_H
 },
 {   9, 1, { "icon-cancel" },
-    ButtonButton,	0, NULL,
+    ButtonButton,	0, "0",
     NULL,		NULL,
     '\e', "~<ESC~> CANCEL",
     WORKERS_H
@@ -593,7 +593,7 @@ global ButtonAction AllButtons[] = {
     WORKERS_H
 },
 {   9, 2, { "icon-cancel" },
-    ButtonButton,	0, NULL,
+    ButtonButton,	0, "0",
     NULL,		NULL,
     '\e', "~<ESC~> CANCEL",
     WORKERS_H
@@ -613,7 +613,7 @@ global ButtonAction AllButtons[] = {
     WORKERS_H
 },
 {   9, 3, { "icon-cancel" },
-    ButtonButton,	0, NULL,
+    ButtonButton,	0, "0",
     NULL,		NULL,
     '\e', "~<ESC~> CANCEL",
     WORKERS_H
@@ -1120,38 +1120,38 @@ global ButtonAction AllButtons[] = {
 // ogre-mage specific actions --------------------------------------------
 {   7, 0, { "icon-eye-of-kilrogg" },
     ButtonSpellCast,	0, "spell-eye-of-kilrogg",
-    ButtonCheckTrue,		NULL,
+    ButtonCheckUpgrade,	"upgrade-eye-of-kilrogg",
     'k', "EYE OF ~!KILROGG",
     "unit-ogre-mage"
 },
 {   8, 0, { "icon-bloodlust" },
     ButtonSpellCast,	0, "spell-bloodlust",
-    ButtonCheckUpgrade,		"upgrade-bloodlust",
+    ButtonCheckUpgrade,	"upgrade-bloodlust",
     'b', "~!BLOODLUST",
     "unit-ogre-mage"
 },
 {   9, 0, { "icon-runes" },
     ButtonSpellCast,	0, "spell-runes",
-    ButtonCheckTrue,		"upgrade-runes",
+    ButtonCheckUpgrade,	"upgrade-runes",
     'r', "~!RUNES",
     "unit-ogre-mage"
 },
 // cho'gall specific actions --- same as ogre mage but it has them always --
 {   7, 0, { "icon-eye-of-kilrogg" },
     ButtonSpellCast,	0, "spell-eye-of-kilrogg",
-    ButtonCheckTrue,		NULL,
+    ButtonCheckTrue,	NULL,
     'k', "EYE OF ~!KILROGG",
     "unit-cho-gall"
 },
 {   8, 0, { "icon-bloodlust" },
     ButtonSpellCast,	0, "spell-bloodlust",
-    ButtonCheckTrue,		NULL,
+    ButtonCheckTrue,	NULL,
     'b', "~!BLOODLUST",
     "unit-cho-gall"
 },
 {   9, 0, { "icon-runes" },
     ButtonSpellCast,	0, "spell-runes",
-    ButtonCheckTrue,		NULL,
+    ButtonCheckTrue,	NULL,
     'r', "~!RUNES",
     "unit-cho-gall"
 },
@@ -1164,7 +1164,7 @@ global ButtonAction AllButtons[] = {
 },
 {   4, 0, { "icon-death-coil" },
     ButtonSpellCast,	0, "spell-death-coil",
-    ButtonCheckTrue,		NULL,
+    ButtonCheckUpgrade,	"upgrade-death-coil",
     'c', "DEATH ~!COIL",
     "unit-death-knight" ",unit-gul-dan" ",unit-teron-gorefiend"
 },
@@ -1283,7 +1283,7 @@ global ButtonAction AllButtons[] = {
     WORKERS_O
 },
 {   9, 1, { "icon-cancel" },
-    ButtonButton,	0, NULL,
+    ButtonButton,	0, "0",
     NULL,		NULL,
     '\e', "~<ESC~> CANCEL",
     WORKERS_O
@@ -1338,7 +1338,7 @@ global ButtonAction AllButtons[] = {
     WORKERS_O
 },
 {   9, 2, { "icon-cancel" },
-    ButtonButton,	0, NULL,
+    ButtonButton,	0, "0",
     NULL,		NULL,
     '\e', "~<ESC~> CANCEL",
     WORKERS_O
@@ -1358,7 +1358,7 @@ global ButtonAction AllButtons[] = {
     WORKERS_O
 },
 {   9, 3, { "icon-cancel" },
-    ButtonButton,	0, NULL,
+    ButtonButton,	0, "0",
     NULL,		NULL,
     '\e', "~<ESC~> CANCEL",
     WORKERS_O
