@@ -1513,7 +1513,7 @@ local void GameOptions(void)
 #if !defined(USE_SDLCD) && !defined(USE_LIBCDA)
     GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
 #else
-    if (strcmp(":off", CDMode))
+    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
 	GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
 #endif
     ProcessMenu(MENU_GAME_OPTIONS, 1);
@@ -1524,7 +1524,7 @@ local void SetCdMode(Menuitem *mi)
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
 
     /// Start Playing CD
-    if (!strcmp(":off", CDMode)) {
+    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
     } else {
     /// Stop Playing CD
@@ -1536,7 +1536,7 @@ local void SetCdMode(Menuitem *mi)
         cd_stop();
 #endif
 
-	CDMode = ":off";
+	CDMode = ":stopped";
     }
 #else
     ProcessMenu(MENU_CDROM_DISABLED, 1);
