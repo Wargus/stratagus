@@ -43,70 +43,6 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-#if 0	// {
-
-/**
-**	Ai Script commands.
-*/
-enum _ai_script_command_ {
-    AiCmdNeed,				/// need building/unit
-    AiCmdBuild,				/// build building
-    AiCmdTrain,				/// train unit
-    AiCmdResearch,			/// research upgrade
-    AiCmdForce,				/// Set force
-};
-
-/**
-**	Ai Script.
-*/
-typedef struct _ai_script_ {
-    unsigned char	Cmd;		/// command
-    unsigned char	Arg;		/// argument
-    unsigned char	Cnt;		/// counter
-} AiScript;
-
-/**
-**	AI goal typedef.
-*/
-typedef struct _ai_goal_ AiGoal;
-
-/**
-**	AI Priority, will later be finer tuned.
-*/
-enum _ai_priority_ {
-    AiPriorityVeryLow,			/// very low
-    AiPriorityLow,			/// low
-    AiPriorityMid,			/// middle
-    AiPriorityHigh,			/// high
-    AiPriorityVeryHigh,			/// very high
-};
-
-/**
-**	Define the AI goals.
-*/
-struct _ai_goal_ {
-    AiGoal*	Next;			/// double linked list of all goals
-    AiGoal*	Down;			/// dependend goals
-    AiGoal*	Prev;			/// double linked list of all goals
-    int		Priority;		/// Priority of this goal
-};
-
-    // goals stuff
-    AiGoal*     GoalHead;               /// Goals start of double linked list
-    AiGoal*     GoalNil1;               /// Goals dummy end of dl-list
-    AiGoal*     GoalTail;               /// Goals end of double linked list
-
-    AiGoal*     WaitHead;               /// Wait start of double linked list
-    AiGoal*     WaitNil1;               /// Wait dummy end of dl-list
-    AiGoal*     WaitTail;               /// Wait end of double linked list
-
-    // scripting stuff
-    AiScript*	Ip;			/// AI script instruction pointer
-    AiScript**	Sp;			/// Ai script stack pointer
-    AiScript**	Stack;			/// Ai script stack
-
-#endif	// }-------------------------------------------------------------------
-
 /**
 **	Ai Type typedef.
 */
@@ -126,7 +62,7 @@ struct _ai_type_ {
     //unsigned char	AllExplored : 1;	/// Ai sees unexplored area
     //unsigned char	AllVisibile : 1;	/// Ai sees invisibile area
 
-    SCM			Script;			/// Main script
+    SCM			Script;			/// Main script (gc-protected!)
 };
 
 /**

@@ -304,6 +304,7 @@ local SCM CclDefineAi(SCM list)
     SCM value;
     char* str;
     AiType* aitype;
+    const AiType* ait;
 
     aitype=malloc(sizeof(AiType));
     aitype->Next=AiTypes;
@@ -317,6 +318,15 @@ local SCM CclDefineAi(SCM list)
     str=gh_scm2newstr(value,NULL);
     DebugLevel3Fn("%s\n" _C_ str);
     aitype->Name=str;
+
+#ifdef DEBUG
+    for( ait=AiTypes->Next; ait; ait=ait->Next ) {
+	if( !strcmp(aitype->Name,ait->Name) ) {
+	    DebugLevel0Fn("Warning two or more AI's with the same name '%s'\n",
+		    ait->Name);
+	}
+    }
+#endif
 
     //
     //	AI Race
@@ -985,10 +995,24 @@ local SCM CclDefineAiWcNames(SCM list)
     return SCM_UNSPECIFIED;
 }
 
+/**
+**	Define an AI player.
+**
+**	@param list	List of the AI Player.
+*/
+local SCM CclDefineAiPlayer(SCM list __attribute__((unused)))
+{
+    DebugLevel0Fn("FIXME: Ai Player loading not supported\n");
+
+    return SCM_UNSPECIFIED;
+}
+
 #else
 
 /**
 **	Define helper for AI.
+**
+**	@param list	List of the AI player.
 */
 local SCM CclDefineAiHelper(SCM list)
 {
@@ -997,6 +1021,8 @@ local SCM CclDefineAiHelper(SCM list)
 
 /**
 **	Define an AI engine.
+**
+**	@param list	List of the AI.
 */
 local SCM CclDefineAi(SCM list)
 {
@@ -1042,6 +1068,8 @@ global void AiCclRegister(void)
     gh_new_procedure0_0("ai:dump",CclAiDump);
 
     gh_new_procedureN("define-ai-wc-names",CclDefineAiWcNames);
+
+    gh_new_procedureN("define-ai-player",CclDefineAiPlayer);
 #endif
 }
 
