@@ -30,6 +30,7 @@
 #include "video.h"
 #include "map.h"
 #include "icons.h"
+#include "player.h"
 
 #include "etlib/hash.h"
 
