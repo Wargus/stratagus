@@ -89,9 +89,13 @@
 
     /// Return info for pud
 extern MapInfo* GetPudInfo(const char*);
+    /// Return info for scm
+extern MapInfo* GetScmInfo(const char*);
 
     /// Load a pud file
 extern void LoadPud(const char* pud,WorldMap* map);
+    /// Load a scm file
+extern void LoadScm(const char* scm,WorldMap* map);
 
     /// Save a pud file
 extern void SavePud(const char* pud,const WorldMap* map);
