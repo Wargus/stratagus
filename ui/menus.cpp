@@ -38,6 +38,7 @@
 #include "map.h"
 #include "pud.h"
 #include "iolib.h"
+#include "settings.h"
 
 /*----------------------------------------------------------------------------
 --	Prototypes for local functions
@@ -75,9 +76,14 @@ local void CustomGameCancel(void);
 local void CustomGameStart(void);
 local void CustomGameDrawFunc(Menuitem *mi);
 
+local void CustomGameRCSAction(Menuitem *mi, int i);
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
+    /// Name, Version, Copyright
+extern char NameLine[];
 
 // FIXME: Johns: this must be all be configured from ccl some time.
 
@@ -203,6 +209,8 @@ local Menuitem ScenSelectMenuItems[] = {
 **	Items for the Prg Start Menu
 */
 local Menuitem PrgStartMenuItems[] = {
+    { MI_TYPE_TEXT, 640/2, 440, 0, GameFont, NULL, NULL,
+	{ text:{ NameLine, MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, StartMenusSetBackground, NULL,
 	{ button:{ "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
     { MI_TYPE_BUTTON, 208, 320 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
@@ -265,7 +273,7 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgrcsoptions, 152, 20, MBUTTON_PULLDOWN, NULL, 3, 2, 2, 0} } },
+	{ pulldown:{ cgrcsoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameRCSAction, 3, 2, 2, 0} } },
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
@@ -330,7 +338,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	0, 3,
+	1, 4,
 	PrgStartMenuItems
     },
     {
@@ -709,7 +717,11 @@ local void ScenSelectMenu(void)
 	i = 0;
     }
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
-    ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
+    if (strstr(ScenSelectFileName, ".pud")) {
+	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
+    } else {
+	// FIXME: GetCmInfo();
+    }
     ScenSelectPath[i] = 0;
 }
 
@@ -821,7 +833,12 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #endif
 	if (*cp == 0) {
 	    if (p) {
-		info = GetPudInfo(pathbuf);
+		if (strstr(pathbuf, ".pud")) {
+		    info = GetPudInfo(pathbuf);
+		} else {
+		    info = NULL;
+		    // info = GetCmInfo(pathbuf);
+		}
 		if (info) {
 		    sz = szl[ScenSelectMenuItems[8].d.pulldown.curopt];
 		    if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
@@ -832,6 +849,10 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 		    } else {
 			FreePudInfo(info);
 		    }
+		} else {
+		    fl->type = 1;
+		    fl->name = strdup(np);
+		    fl->xdata = NULL;
 		}
 	    } else {
 		fl->type = 1;
@@ -1088,16 +1109,24 @@ local void CustomGameStart(void)
 
 local void CustomGameSetupInit(Menuitem *mi __attribute__((unused)))
 {
-    extern int lcm_prevent_recurse;			// FIXME: quickhack
-    lcm_prevent_recurse = 0;
-
     strcpy(ScenSelectPath, FreeCraftLibPath);
+#if 0	// FIXME: as soon as .cm is supported..
+#if defined(USE_CCL) || defined(USE_CCL2)
+    strcpy(ScenSelectFileName, "default.cm");
+#else
+    strcpy(ScenSelectFileName, "default.pud");
+#endif
+#endif
     strcpy(ScenSelectFileName, "default.pud");
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");
     }
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
-    ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
+    if (strstr(ScenSelectFileName, ".pud")) {
+	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
+    } else {
+	// FIXME: GetCmInfo();
+    }
     strcpy(ScenSelectPath, FreeCraftLibPath);
 }
 
@@ -1111,11 +1140,13 @@ local void CustomGameDrawFunc(Menuitem *mi)
     SetDefaultTextColors(rc, rc);
     DrawText(16, 360, GameFont, "Scenario:");
     DrawText(16, 360+24 , GameFont, ScenSelectFileName);
-    if (ScenSelectPudInfo->Description) {
-	DrawText(16, 360+24+24, GameFont, ScenSelectPudInfo->Description);
+    if (ScenSelectPudInfo) {
+	if (ScenSelectPudInfo->Description) {
+	    DrawText(16, 360+24+24, GameFont, ScenSelectPudInfo->Description);
+	}
+	sprintf(buffer, "%d x %d", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
+	DrawText(16, 360+24+24+24, GameFont, buffer);
     }
-    sprintf(buffer, "%d x %d", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
-    DrawText(16, 360+24+24+24, GameFont, buffer);
 #if 0
     for (n = j = 0; j < 16; j++) {
 	if (info->PlayerType[j] == PlayerHuman) {
@@ -1130,6 +1161,13 @@ local void CustomGameDrawFunc(Menuitem *mi)
     }
 #endif
     SetDefaultTextColors(nc, rc);
+}
+
+local void CustomGameRCSAction (Menuitem *mi __attribute__((unused)), int i)
+{
+    int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
+
+    GameSettings.Presets[0].Race = v[i];
 }
 
 /*----------------------------------------------------------------------------
@@ -1519,8 +1557,8 @@ global void MenuHandleButtonUp(int b)
 			    MenuButtonUnderCursor = -1;
 			    if (mi->d.pulldown.cursel != mi->d.pulldown.curopt) {
 				mi->d.pulldown.curopt = mi->d.pulldown.cursel;
-				if (mi->d.button.handler) {
-				    (*mi->d.button.handler)();
+				if (mi->d.pulldown.action) {
+				    (*mi->d.pulldown.action)(mi, mi->d.pulldown.curopt);
 				}
 			    }
 			}

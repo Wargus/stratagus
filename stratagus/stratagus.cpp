@@ -70,18 +70,26 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "sound_server.h"
 #include "sound.h"
 #include "network.h"
-#include "pathfinder.h"
-#include "spells.h"
+#include "settings.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
 #ifdef DEBUG
-extern unsigned AllocatedGraphicMemory;
-extern unsigned CompressedGraphicMemory;
 extern SCM CclUnits(void);
 #endif
+
+global char* TitleScreen;		/// Titlescreen to show at startup
+global char* FreeCraftLibPath;		/// Path for data
+
+    /// Name, Version, Copyright
+global char NameLine[] =
+    "FreeCraft V" VERSION ", (c) 1998-2000 by The FreeCraft Project.";
+
+    /// Filename of the map to load
+local char* MapName = NULL;
+
 
 /*----------------------------------------------------------------------------
 --	Speedups
@@ -157,134 +165,6 @@ global void SaveAll(void)
 }
 
 /*----------------------------------------------------------------------------
---	INIT
-----------------------------------------------------------------------------*/
-
-/**
-**	Initialise.
-**
-**		Load all graphics, sounds.
-*/
-global void FreeCraftInit(void)
-{
-    char* PalettePath;
-
-    DebugLevel3("Terrain %d\n",TheMap.Terrain);
-
-    // FIXME: must use palette from tileset!!
-    // FIXME: this must be extendable!!
-
-    switch( TheMap.Terrain ) {
-	case TilesetSummer:
-            PalettePath = strdcat(FreeCraftLibPath, "/summer.rgb");
-	    break;
-	case TilesetWinter:
-            PalettePath = strdcat(FreeCraftLibPath, "/winter.rgb");
-	    break;
-	case TilesetWasteland:
-            PalettePath = strdcat(FreeCraftLibPath, "/wasteland.rgb");
-	    break;
-	case TilesetSwamp:
-            PalettePath = strdcat(FreeCraftLibPath, "/swamp.rgb");
-	    break;
-	default:
-	    DebugLevel2("Unknown Terrain %d\n",TheMap.Terrain);
-            PalettePath = strdcat(FreeCraftLibPath, "/summer.rgb");
-	    break;
-    }
-    LoadRGB(GlobalPalette, PalettePath);
-    VideoCreatePalette(GlobalPalette);
-
-    //
-    //	Graphic part
-    //
-    LoadIcons();
-    InitMenus(ThisPlayer->Race);
-    LoadImages(ThisPlayer->Race);
-    LoadCursors(ThisPlayer->Race);
-    LoadTileset();
-    InitUnitButtons();
-    LoadMissileSprites();
-    InitSpells();
-    LoadUnitSprites();
-    LoadConstructions();
-    LoadDecorations();
-
-    IfDebug(
-	DebugLevel0("Graphics uses %d bytes (%d KB, %d MB)\n"
-		,AllocatedGraphicMemory
-		,AllocatedGraphicMemory/1024
-		,AllocatedGraphicMemory/1024/1024);
-	DebugLevel0("Compressed graphics uses %d bytes (%d KB, %d MB)\n"
-		,CompressedGraphicMemory
-		,CompressedGraphicMemory/1024
-		,CompressedGraphicMemory/1024/1024);
-    );
-
-    // FIXME: johns: did this belong into LoadMap?
-    CreateMinimap();			// create minimap for pud
-    InitMap();				// setup draw functions
-    InitMapFogOfWar();			// build tables for fog of war
-    PreprocessMap();			// Adjust map for use
-    MapColorCycle();			// Setup color cycle
-
-    InitUserInterface();		// Setup the user interface.
-
-    //
-    //	Sound part
-    //
-    //FIXME: check if everything is really loaded
-    LoadUnitSounds();
-    MapUnitSounds();
-
-#ifdef WITH_SOUND
-    IfDebug(
-	DebugLevel0("Sounds uses %d bytes (%d KB, %d MB)\n"
-		,AllocatedSoundMemory
-		,AllocatedSoundMemory/1024
-		,AllocatedSoundMemory/1024/1024);
-	DebugLevel0("Compressed sounds uses %d bytes (%d KB, %d MB)\n"
-		,CompressedSoundMemory
-		,CompressedSoundMemory/1024
-		,CompressedSoundMemory/1024/1024);
-    );
-#endif
-
-    //
-    //	Network part
-    //
-    InitNetwork();
-
-    //
-    //  Init units' groups
-    //
-    InitGroups();
-
-    //
-    //	Init players?
-    //
-    DebugPlayers();
-    PlayersInitAi();
-
-    //
-    //  Upgrades
-    //
-    InitUpgrades();
-
-    //
-    //  Dependencies
-    //
-    InitDependencies();
-
-    //
-    //  Buttons (botpanel)
-    //
-    InitButtons();
-
-    MapCenter(ThisPlayer->X,ThisPlayer->Y);
-}
-
-/*----------------------------------------------------------------------------
 --	Random
 ----------------------------------------------------------------------------*/
 
@@ -336,19 +216,8 @@ global char* strdcat3(const char* l, const char* m, const char* r) {
 ==	MAIN
 ============================================================================*/
 
-global char* TitleScreen;		/// Titlescreen show by startup
-global char* FreeCraftLibPath;		/// Path for data
-global int FlagRevealMap;		/// Flag must reveal the map
-
-
-local char* MapName;			/// Filename of the map to load
-
-    /// Name, Version, Copyright
-local char NameLine[] =
-    "FreeCraft V" VERSION ", (c) 1998-2000 by The FreeCraft Project.";
-
 /**
-**	Main, called from guile main.
+**	Main1, called from guile main / main.
 **
 **	@param	argc	Number of arguments.
 **	@param	argv	Vector of arguments.
@@ -356,82 +225,6 @@ local char NameLine[] =
 global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
-    InitVideo();			// setup video display
-#ifdef WITH_SOUND
-    if( InitSound() ) {			// setup sound card
-	SoundOff=1;
-	SoundFildes=-1;
-    }
-#endif
-
-    //
-    //	Show title screen.
-    //
-    SetClipping(0,0,VideoWidth,VideoHeight);
-    if( TitleScreen ) {
-	DisplayPicture(TitleScreen);
-    }
-    Invalidate();
-
-    //
-    //  Units Memory Management
-    //
-    InitUnitsMemory();
-    UpdateStats();
-    InitUnitTypes();
-
-    // 
-    //  Inital menues require some gfx..
-    //
-    LoadRGB(GlobalPalette, strdcat(FreeCraftLibPath, "/summer.rgb"));
-    VideoCreatePalette(GlobalPalette);
-    LoadFonts();
-
-    // All pre-start menues are orcish - may need to be switched later..
-    SetDefaultTextColors(FontYellow,FontWhite);
-    InitMenus(1);
-    LoadImages(1);
-    LoadCursors(1);
-
-    //
-    //	Load the map.
-    //
-    LoadMap(MapName,&TheMap);
-    if( FlagRevealMap ) {
-	RevealMap();
-    }
-
-    FreeCraftInit();
-#ifdef WITH_SOUND
-    if (SoundFildes!=-1) {
-	//FIXME: must be done after map is loaded
-	if ( InitSoundServer() ) {
-	    SoundOff=1;
-	    SoundFildes=-1;
-	} else {
-	    // must be done after sounds are loaded
-	    InitSoundClient();
-	}
-    }
-#endif
-    //FIXME: must be done after map is loaded
-    if(AStarOn) {
-	InitAStar();
-    }
-
-    SetStatusLine(NameLine);
-    SetMessage("Do it! Do it now!");
-
-    if( ThisPlayer->Race==PlayerRaceHuman ) {
-	SetDefaultTextColors(FontWhite,FontYellow);
-	// FIXME: Add this again:
-	//	PlaySound(SoundBasicHumanVoicesSelected1);
-    } else if( ThisPlayer->Race==PlayerRaceOrc ) {
-	SetDefaultTextColors(FontYellow,FontWhite);
-	// FIXME: Add this again:
-	//	PlaySound(SoundBasicOrcVoicesSelected1);
-    }
-    // FIXME: more races supported
 
     printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others."
 #ifdef USE_CCL2
@@ -481,6 +274,52 @@ This software is provided as-is.  The author(s) can not be held liable for any\
 \ndamage that might arise from the use of this software.\n\
 Use it at your own risk.\n"
 	,NameLine);
+
+    InitVideo();			// setup video display
+#ifdef WITH_SOUND
+    if( InitSound() ) {			// setup sound card
+	SoundOff=1;
+	SoundFildes=-1;
+    }
+#endif
+
+    //
+    //	Show title screen.
+    //
+    SetClipping(0,0,VideoWidth,VideoHeight);
+    if( TitleScreen ) {
+	DisplayPicture(TitleScreen);
+    }
+    Invalidate();
+
+    //
+    //  Units Memory Management
+    //
+    InitUnitsMemory();
+    UpdateStats();
+    InitUnitTypes();
+
+    // 
+    //  Inital menues require some gfx..
+    //
+    LoadRGB(GlobalPalette, strdcat(FreeCraftLibPath, "/summer.rgb"));
+    VideoCreatePalette(GlobalPalette);
+    LoadFonts();
+
+    // All pre-start menues are orcish - may need to be switched later..
+    SetDefaultTextColors(FontYellow,FontWhite);
+    InitMenus(1);
+    LoadImages(1);
+    LoadCursors(1);
+    InitSettings();
+
+    //
+    //	Create the game.
+    //
+    CreateGame(MapName,&TheMap);
+
+    SetStatusLine(NameLine);
+    SetMessage("Do it! Do it now!");
 
     GameMainLoop();
 
@@ -571,12 +410,9 @@ global int main(int argc,char** argv)
 #endif
 #if defined(USE_CCL) || defined(USE_CCL2)
     CclStartFile="ccl/freecraft.ccl";
-    MapName="default.cm";
-#else
-    MapName="default.pud";	// .gz/.bz2 automatically appended as needed.
 #endif
 
-    // FIXME: Parse options before ccl oder after?
+    // FIXME: Parse options before or after ccl?
 
     //
     //	Parse commandline
@@ -677,9 +513,6 @@ global int main(int argc,char** argv)
 	--argc;
     }
 
-    if (MapName[0] != '/' && MapName[0] != '.') {
-        MapName = strdcat3(FreeCraftLibPath, "/", MapName);
-    }
 #if defined(USE_CCL) || defined(USE_CCL2)
     if (CclStartFile[0] != '/' && CclStartFile[0] != '.') {
         CclStartFile = strdcat3(FreeCraftLibPath, "/", CclStartFile);

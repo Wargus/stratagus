@@ -21,6 +21,6 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = game
 
-OBJS	= dummy.$(OE)
+OBJS	= game.$(OE)
 
 include $(TOPDIR)/Common.mk
