@@ -190,8 +190,8 @@ extern void HandleActionSpellCast(Unit* unit);
 extern int UnitShowAnimation(Unit* unit,const Animation* animation);
 	/// Handle the actions of all units each game cycle
 extern void UnitActions(void);
-	/// Handle Cloaked Unit's Visible
-extern void HandleCloak(void);
+	/// Unload an unit.
+extern int UnloadUnit(Unit* unit);
 //@}
 
 #endif // !__ACTIONS_H__
