@@ -1597,7 +1597,7 @@ local SCM CclDefineMenuItem(SCM list)
 		} else if ( gh_eq_p(value,gh_symbol2scm("clicked")) ) {
 		    item->flags|=MenuButtonClicked;
 		} else if ( gh_eq_p(value,gh_symbol2scm("selected")) ) {
-		    item->flags|=MenuButtonClicked;
+		    item->flags|=MenuButtonSelected;
 		} else if ( gh_eq_p(value,gh_symbol2scm("disabled")) ) {
 		    item->flags|=MenuButtonDisabled;
 		} else {
@@ -1843,6 +1843,7 @@ local SCM CclDefineMenuItem(SCM list)
 		sublist=gh_car(list);
 		list=gh_cdr(list);
 		item->mitype=MI_TYPE_VSLIDER;
+		item->d.vslider.defper=-1;
 
 		while ( !gh_null_p(sublist) ) {
 
@@ -2017,6 +2018,7 @@ local SCM CclDefineMenuItem(SCM list)
 		sublist=gh_car(list);
 		list=gh_cdr(list);
 		item->mitype=MI_TYPE_HSLIDER;
+		item->d.hslider.defper=-1;
 
 		while ( !gh_null_p(sublist) ) {
 
