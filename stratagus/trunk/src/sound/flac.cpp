@@ -162,14 +162,17 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	ssize = (frame->header.bits_per_sample / 8);
 	buf = malloc(frame->header.blocksize * sample->Channels * ssize);
 
+	// FIXME: mono flac files don't play correctly
+
 	// FLAC splits it up the channels, we need to sew it back together
 	for (i = 0; i < frame->header.blocksize; ++i) {
 		for (j = 0; j < sample->Channels; ++j) {
 			if (ssize == 1) {
-				buf[i * sample->Channels + j] = ((const char*)buffer[j])[i * sample->Channels];
+				buf[i * sample->Channels + j] = ((const char*)buffer[j])[i];
 			} else {
-				buf[i * 2 * sample->Channels + j * 2] = ((const char*)buffer[j])[i * 2 * sample->Channels];
-				buf[i * 2 * sample->Channels + j * 2 + 1] = ((const char*)buffer[j])[i * 2 * sample->Channels + 1];
+				buf[i * 2 * sample->Channels + j * 2] = ((const char*)buffer[j])[i * 2];
+				buf[i * 2 * sample->Channels + j * 2 + 1] = ((const char*)buffer[j])[i * 2 + 1];
+
 			}
 		}
 	}
