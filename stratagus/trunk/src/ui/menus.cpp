@@ -1452,11 +1452,7 @@ local Menuitem GameOptionsMenuItems[] = {
 #ifdef OLD_MENU
 local void InitGameOptionsMenuItems() {
     MenuitemText   i0 = { "Game Options", MI_TFLAGS_CENTERED};
-#ifdef WITH_SOUND
     MenuitemButton i1 = { "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7};
-#else
-    MenuitemButton i1 = { "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7};
-#endif
     MenuitemButton i2 = { "Speeds (~!F~!8)", 224, 27, MBUTTON_GM_FULL, SpeedSettings, KeyCodeF8};
     MenuitemButton i3 = { "Preferences (~!F~!9)", 224, 27, MBUTTON_GM_FULL, Preferences, KeyCodeF9};
     MenuitemButton i4 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
@@ -3750,6 +3746,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
     if (SoundFildes != -1) {
 	SDL_CloseAudio();
 	SoundFildes=-1;
+	SoundOff=1;
     } else {
 	InitSound();
 	MapUnitSounds();
@@ -3761,6 +3758,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
     if (SoundFildes != -1) {
         close(SoundFildes);
         SoundFildes=-1;
+	SoundOff=1;
     } else {
 	InitSound();
 	MapUnitSounds();
