@@ -1023,9 +1023,9 @@ global void LoadScm(const char* scm,WorldMap* map)
 			if (GameSettings.NumUnits == SettingsNumUnits1
 				&& Players[o].Type != PlayerNobody) {
 			    if (t == SC_StartLocation) {
-				if( Players[i].Race==0 ) {
+				if( Players[o].Race==0 ) {
 				    t=SC_ZergDrone;
-				} else if( Players[i].Race==1 ) {
+				} else if( Players[o].Race==1 ) {
 				    t=SC_TerranSCV;
 				} else {
 				    t=SC_ProtossProbe;
