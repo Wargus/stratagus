@@ -381,7 +381,7 @@ extern global VMemType8* VideoFindNewPalette8(const VMemType8 *cube,
 
 
     /**
-    **	Video synchronization speed. Synchronization time in prozent.
+    **	Video synchronization speed. Synchronization time in percent.
     **	If =0, video framerate is not synchronized. 100 is exact
     **	CYCLES_PER_SECOND (30). Game will try to redraw screen within
     **	intervals of VideoSyncSpeed, not more, not less.

@@ -668,6 +668,13 @@ local SCM CclDefineUnitType(SCM list)
 	}
     }
 
+    // FIXME: try to simplify/combine the flags instead
+    if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
+	printf("Unit-type `%s': right-attack is set, but can-attack is not\n", type->Name);
+	// ugly way to show the line number
+	errl("", SCM_UNSPECIFIED); 
+    }
+
     return SCM_UNSPECIFIED;
 }
 
