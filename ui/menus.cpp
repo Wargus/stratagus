@@ -2803,7 +2803,7 @@ local void SinglePlayerGameMenu(void)
 local void CampaignGameMenu(void)
 {
     int i;
-    Menu *menu;
+    Menu* menu;
 
     VideoLockScreen();
     MenusSetBackground();
@@ -2812,30 +2812,30 @@ local void CampaignGameMenu(void)
 
     menu = FindMenu("menu-campaign-select");
     DebugLevel0Fn("%d campaigns available\n" _C_ NumCampaigns);
-    IfDebug(
-	for( i=0; i<NumCampaigns; ++i ) {
-	    DebugLevel0Fn("Campaign %d: %16.16s: %s\n" _C_ i _C_
-		Campaigns[i].Ident _C_
-		Campaigns[i].Name);
-	}
-    );
+#ifdef DEBUG
+    for (i = 0; i < NumCampaigns; ++i) {
+	DebugLevel0Fn("Campaign %d: %16.16s: %s\n" _C_ i _C_
+	    Campaigns[i].Ident _C_
+	    Campaigns[i].Name);
+    }
+#endif
 
     //
     //	Setup campaign name.
     //
-    for( i=0; i<NumCampaigns && i<4; ++i ) {
+    for (i = 0; i < NumCampaigns && i < 4; ++i) {
 	char* s;
 
-	menu->Items[i].d.button.text=Campaigns[i].Name;
-	menu->Items[i].flags&=~MenuButtonDisabled;
+	menu->Items[i].d.button.text = Campaigns[i].Name;
+	menu->Items[i].flags &= ~MenuButtonDisabled;
 
-	if( (s=strchr(Campaigns[i].Name,'!')) ) {
-	    menu->Items[i].d.button.hotkey=tolower(s[1]);
+	if ((s = strchr(Campaigns[i].Name, '!'))) {
+	    menu->Items[i].d.button.hotkey = tolower(s[1]);
 	}
     }
-    for( ; i<4; ++i ) {
-	menu->Items[i].d.button.text="Not available";
-	menu->Items[i].flags|=MenuButtonDisabled;
+    for (; i < 4; ++i) {
+	menu->Items[i].d.button.text = "Not available";
+	menu->Items[i].flags |= MenuButtonDisabled;
     }
 
     GuiGameStarted = 0;
@@ -2844,8 +2844,8 @@ local void CampaignGameMenu(void)
 	GameMenuReturn();
     }
 
-    for( i=0; i<4; ++i ) {
-	menu->Items[i].d.button.text=NULL;
+    for (i = 0; i < 4; ++i) {
+	menu->Items[i].d.button.text = NULL;
     }
 }
 
