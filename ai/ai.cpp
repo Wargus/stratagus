@@ -641,18 +641,134 @@ local void SaveAiTypes(CLFile* file)
 **  @param plynr  Player number.
 **  @param ai     Player AI.
 */
-local void SaveAiPlayer(CLFile* file, unsigned plynr, PlayerAi* ai)
+local void SaveAiPlayer(CLFile* file, int plynr, PlayerAi* ai)
 {
-#if 0
-	IOOutFile = file;
-	IOLoadingMode = 0;
-	IOTabLevel = 1;
+	int i;
+	const AiBuildQueue* queue;
 
-	CLprintf(IOOutFile, "(define-ai-player '");
-	IOPlayerAiFullPtr(SCM_UNSPECIFIED, &ai, 0);
-	CLprintf(IOOutFile, ")\n");
-#else
-#endif
+	CLprintf(file, "DefineAiPlayer(%d,\n", plynr);
+	CLprintf(file, "  \"ai-type\", \"%s\",\n",ai->AiType->Name);
+
+	CLprintf(file, "  \"script\", \"%s\",\n", ai->Script);
+	CLprintf(file, "  \"script-debug\", %s,\n", ai->ScriptDebug ? "true" : "false");
+	CLprintf(file, "  \"sleep-cycles\", %lu,\n", ai->SleepCycles);
+
+	//
+	//  All forces
+	//
+	for (i = 0; i < AI_MAX_ATTACKING_FORCES; ++i) {
+		const AiUnitType* aut;
+		const AiUnit* aiunit;
+
+		CLprintf(file, "  \"force\", {%d, %s%s%s", i,
+			ai->Force[i].Completed ? "\"complete\"," : "\"recruit\",",
+			ai->Force[i].Attacking ? " \"attack\"," : "",
+			ai->Force[i].Defending ? " \"defend\"," : "");
+
+		CLprintf(file, " \"role\", ");
+		switch (ai->Force[i].Role) {
+			case AiForceRoleAttack:
+				CLprintf(file, "\"attack\",");
+				break;
+			case AiForceRoleDefend:
+				CLprintf(file, "\"defend\",");
+				break;
+			default:
+				CLprintf(file, "\"unknown-%d\",", ai->Force[i].Role);
+				break;
+		}
+
+		CLprintf(file, "\n    \"types\", { ");
+		for (aut = ai->Force[i].UnitTypes; aut; aut = aut->Next) {
+			CLprintf(file, "%d, \"%s\", ", aut->Want, aut->Type->Ident);
+		}
+		CLprintf(file, "},\n    \"units\", {");
+		for (aiunit = ai->Force[i].Units; aiunit; aiunit = aiunit->Next) {
+			CLprintf(file, " %d, \"%s\",", UnitNumber(aiunit->Unit),
+				aiunit->Unit->Type->Ident);
+		}
+		CLprintf(file, "},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d, \"must-transport\", %d,",
+			ai->Force[i].State, ai->Force[i].GoalX, ai->Force[i].GoalY, ai->Force[i].MustTransport);
+		CLprintf(file, "},\n");
+	}
+
+	CLprintf(file, "  \"reserve\", {");
+	for (i = 0; i < MaxCosts; ++i) {
+		CLprintf(file, "\"%s\", %d, ", DefaultResourceNames[i], ai->Reserve[i]);
+	}
+	CLprintf(file, "},\n");
+
+	CLprintf(file, "  \"used\", {");
+	for (i = 0; i < MaxCosts; ++i) {
+		CLprintf(file, "\"%s\", %d, ", DefaultResourceNames[i], ai->Used[i]);
+	}
+	CLprintf(file, "},\n");
+
+	CLprintf(file, "  \"needed\", {");
+	for (i = 0; i < MaxCosts; ++i) {
+		CLprintf(file, "\"%s\", %d, ", DefaultResourceNames[i], ai->Needed[i]);
+	}
+	CLprintf(file, "},\n");
+
+	CLprintf(file, "  \"collect\", {");
+	for (i = 0; i < MaxCosts; ++i) {
+		CLprintf(file, "\"%s\", %d, ", DefaultResourceNames[i], ai->Collect[i]);
+	}
+	CLprintf(file, "},\n");
+
+	CLprintf(file,"  \"need-mask\", {");
+	for (i = 0; i < MaxCosts; ++i) {
+		if (ai->NeededMask & (1 << i)) {
+			CLprintf(file, "\"%s\", ", DefaultResourceNames[i]);
+		}
+	}
+	CLprintf(file, "},\n");
+	if (ai->NeedSupply) {
+		CLprintf(file, "  \"need-supply\",\n");
+	}
+
+	//
+	//  Requests
+	//
+	// FIXME: FirstExplorationRequest
+	// FIXME: TransportRequests
+	CLprintf(file, "  \"unit-type\", {");
+	for (i = 0; i < ai->UnitTypeRequestsCount; ++i) {
+		CLprintf(file, "\"%s\", ", ai->UnitTypeRequests[i].Table[0]->Ident);
+		CLprintf(file, "%d, ", ai->UnitTypeRequests[i].Count);
+	}
+	CLprintf(file, "},\n");
+
+	CLprintf(file, "  \"upgrade\", {");
+	for (i = 0; i < ai->UpgradeToRequestsCount; ++i) {
+		CLprintf(file, "\"%s\", ", ai->UpgradeToRequests[i]->Ident);
+	}
+	CLprintf(file, "},\n");
+
+	CLprintf(file, "  \"research\", {");
+	for (i = 0; i < ai->ResearchRequestsCount; ++i) {
+		CLprintf(file, "\"%s\", ", ai->ResearchRequests[i]->Ident);
+	}
+	CLprintf(file, "},\n");
+
+	//
+	//  Building queue
+	//
+	CLprintf(file, "  \"building\", {");
+	for (queue = ai->UnitTypeBuilded; queue; queue = queue->Next) {
+		CLprintf(file, "\"%s\", %d, %d, ", queue->Type->Ident, queue->Made, queue->Want);
+	}
+	CLprintf(file, "},\n");
+
+	CLprintf(file, "  \"repair-building\", %u,\n", ai->LastRepairBuilding);
+
+	CLprintf(file, "  \"repair-workers\", {");
+	for (i = 0; i < UnitMax; ++i) {
+		if (ai->TriedRepairWorkers[i]) {
+			CLprintf(file, "%d, %d, ", i, ai->TriedRepairWorkers[i]);
+		}
+	}
+	CLprintf(file,"})\n\n");
 }
 
 /**
@@ -662,7 +778,7 @@ local void SaveAiPlayer(CLFile* file, unsigned plynr, PlayerAi* ai)
 */
 local void SaveAiPlayers(CLFile* file)
 {
-	unsigned p;
+	int p;
 
 	for (p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Ai) {
