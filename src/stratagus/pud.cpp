@@ -390,6 +390,8 @@ global MapInfo* GetPudInfo(const char* pud)
 		return NULL;
 	}
 
+	info->Filename = strdup(pud);
+
 	//
 	//		Parse all sections.
 	//
