@@ -1105,32 +1105,12 @@ local SCM CclAiOwnForce(void)
 local SCM CclAiClearForce(SCM s_force)
 {
     int force;
-/*    AiUnitType * aiut,*next;
-    AiUnit *aiu,*next_u;
-*/
+
     force = gh_scm2int(s_force);
     if (force < 0 || force >= AI_MAX_FORCES) {
 	errl("Force out of range", s_force);
     }
-/*
-    aiut=AiPlayer->Force[force].UnitTypes;
-    while(aiut){
-    	next=aiut->Next;
-	free(aiut);
-	aiut=next;
-    }
-    AiPlayer->Force[force].UnitTypes=0;
 
-    aiu=AiPlayer->Force[force].Units;
-    while(aiu){
-	next_u=aiu->Next;
-	free(aiu);
-	aiu=next_u;
-    }
-    AiPlayer->Force[force].Units=0;
-    
-    AiAssignFreeUnitsToForce();
-    */
     AiEraseForce(force);
     return SCM_BOOL_F;
 
@@ -1761,11 +1741,11 @@ local SCM CclGetUnitTypeForce(SCM value)
 local SCM CclAiRestart(void)
 {
     int i;
-    AiPlayer->Scripts[0].Script = AiPlayer->AiType->Script;
+    CclGcProtectedAssign(&AiPlayer->Scripts[0].Script, AiPlayer->AiType->Script);
     AiPlayer->Scripts[0].SleepCycles = 0;
     snprintf(AiPlayer->Scripts[0].ident, 10, "Main AI");
     for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; i++) {
-	AiPlayer->Scripts[i].Script = NIL;
+	CclGcProtectedAssign(&AiPlayer->Scripts[i].Script, NIL);
 	AiPlayer->Scripts[i].SleepCycles = 0;
 	snprintf(AiPlayer->Scripts[i].ident, 10, "Empty");
     }
@@ -1783,13 +1763,13 @@ local SCM CclAiRestart(void)
 */
 global void AiRunScript(int script, SCM list, int hotSpotX, int hotSpotY, int hotSpotRay)
 {
-    AiPlayer->Scripts[script].Script = list;
+    CclGcProtectedAssign(&AiPlayer->Scripts[script].Script, list);
     AiPlayer->Scripts[script].SleepCycles = 0;
     snprintf(AiPlayer->Scripts[script].ident, 10, "AiRunScript");
     AiPlayer->Scripts[script].HotSpot_X = hotSpotX;
     AiPlayer->Scripts[script].HotSpot_Y = hotSpotY;
     AiPlayer->Scripts[script].HotSpot_Ray = hotSpotRay;
-    // TODO : Compute gauges here ?    
+    // FIXME : Compute gauges here ?
 }
 
 /**
@@ -1797,7 +1777,7 @@ global void AiRunScript(int script, SCM list, int hotSpotX, int hotSpotY, int ho
 */
 local SCM CclAiSwitchTo(SCM value)
 {
-    AiScript->Script = value;
+    CclGcProtectedAssign(&AiScript->Script, value);
     AiScript->SleepCycles = 0;
     return SCM_BOOL_T;
 }
@@ -1808,11 +1788,11 @@ local SCM CclAiSwitchTo(SCM value)
 local SCM CclAiScript(SCM value)
 {
     int i;
-    AiPlayer->Scripts[0].Script = value;
+    CclGcProtectedAssign(&AiPlayer->Scripts[0].Script, value);
     AiPlayer->Scripts[0].SleepCycles = 0;
     snprintf(AiPlayer->Scripts[0].ident, 10, "MainScript");
     for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; i++) {
-	AiPlayer->Scripts[i].Script = NIL;
+	CclGcProtectedAssign(&AiPlayer->Scripts[i].Script, NIL);
 	AiPlayer->Scripts[i].SleepCycles = 0;
 	AiEraseForce(AiPlayer->Scripts[i].ownForce);
 	snprintf(AiPlayer->Scripts[i].ident, 10, "Empty");	
@@ -2037,303 +2017,6 @@ local SCM CclDefineAiPlayer(SCM list)
     DebugCheck(i < 0 || i > PlayerMax);
     Players[i].Ai = ai;
 
-#if 0
-    i = gh_scm2int(gh_car(list));
-    list = gh_cdr(list);
-
-    DebugCheck(i < 0 || i > PlayerMax);
-    DebugLevel0Fn("%p %d\n" _C_ Players[i].Ai _C_ Players[i].AiEnabled);
-    // FIXME: loose this:
-    // DebugCheck( Players[i].Ai || !Players[i].AiEnabled );
-
-    ai = Players[i].Ai = calloc(1, sizeof (PlayerAi));
-    ai->Player = &Players[i];
-
-    snprintf(AiPlayer->Scripts[0].ident, 10, "Empty");
-    for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; i++) {
-	ai->Scripts[i].Script = NIL;
-	ai->Scripts[i].SleepCycles = 0;
-	snprintf(AiPlayer->Scripts[i].ident, 10, "Empty");
-    }
-
-    //
-    //  Parse the list: (still everything could be changed!)
-    //
-    while (!gh_null_p(list)) {
-
-	value = gh_car(list);
-	list = gh_cdr(list);
-
-	if (gh_eq_p(value, gh_symbol2scm("ai-type"))) {
-	    AiType *ait;
-
-	    str = gh_scm2newstr(gh_car(list), NULL);
-	    for (ait = AiTypes; ait; ait = ait->Next) {
-		if (!strcmp(ait->Name, str)) {
-		    break;
-		}
-	    }
-	    free(str);
-	    if (!ait) {
-		errl("ai-type not found", gh_car(list));
-	    }
-	    ai->AiType = ait;
-	    ai->Scripts[0].Script = ait->Script;
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("script"))) {
-	    sublist = gh_car(list);
-	    value = gh_car(sublist);
-	    sublist = gh_cdr(sublist);
-	    if (gh_eq_p(value, gh_symbol2scm("aitypes"))) {
-		i = gh_scm2int(gh_car(sublist));
-		while (i--) {
-		    ai->Scripts[0].Script = gh_cdr(ai->Scripts[0].Script);
-		}
-	    } else {
-		DebugLevel0Fn("FIXME: not written\n");
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("script-debug"))) {
-	    ai->ScriptDebug = gh_scm2bool(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("sleep-cycles"))) {
-	    ai->Scripts[0].SleepCycles = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("force"))) {
-	    sublist = gh_car(list);
-	    value = gh_car(sublist);
-	    sublist = gh_cdr(sublist);
-	    i = gh_scm2int(value);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		if (gh_eq_p(value, gh_symbol2scm("complete"))) {
-		    ai->Force[i].Completed = 1;
-		} else if (gh_eq_p(value, gh_symbol2scm("recruit"))) {
-		    ai->Force[i].Completed = 0;
-		} else if (gh_eq_p(value, gh_symbol2scm("attack"))) {
-		    ai->Force[i].Attacking = 1;
-		} else if (gh_eq_p(value, gh_symbol2scm("role"))) {
-		    if (gh_eq_p(gh_car(sublist), gh_symbol2scm("attack"))) {
-			ai->Force[i].Role = AiForceRoleAttack;
-		    } else if (gh_eq_p(gh_car(sublist), gh_symbol2scm("defend"))) {
-			ai->Force[i].Role = AiForceRoleDefend;
-		    }
-		    sublist = gh_cdr(sublist);
-		} else if (gh_eq_p(value, gh_symbol2scm("types"))) {
-		    AiUnitType **queue;
-		    SCM subsublist;
-		    subsublist = gh_car(sublist);
-		    queue = &ai->Force[i].UnitTypes;
-		    while (!gh_null_p(subsublist)) {
-			int num;
-			char *ident;
-			value = gh_car(subsublist);
-			subsublist = gh_cdr(subsublist);
-			num = gh_scm2int(value);
-			value = gh_car(subsublist);
-			subsublist = gh_cdr(subsublist);
-			ident = get_c_string(value);
-			*queue = malloc(sizeof (AiUnitType));
-			(*queue)->Next = NULL;
-			(*queue)->Want = num;
-			(*queue)->Type = UnitTypeByIdent(ident);
-			queue = &(*queue)->Next;
-		    }
-		    sublist = gh_cdr(sublist);
-		} else if (gh_eq_p(value, gh_symbol2scm("units"))) {
-		    AiUnit **queue;
-		    SCM subsublist;
-		    subsublist = gh_car(sublist);
-		    queue = &ai->Force[i].Units;
-		    while (!gh_null_p(subsublist)) {
-			int num;
-			char *ident;
-			value = gh_car(subsublist);
-			subsublist = gh_cdr(subsublist);
-			num = gh_scm2int(value);
-			value = gh_car(subsublist);
-			subsublist = gh_cdr(subsublist);
-			ident = get_c_string(value);
-			*queue = malloc(sizeof (AiUnit));
-			(*queue)->Next = NULL;
-			(*queue)->Unit = UnitSlots[num];
-			queue = &(*queue)->Next;
-		    }
-		}
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("reserve"))) {
-	    sublist = gh_car(list);
-	    while (!gh_null_p(sublist)) {
-		char *type;
-		int num;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		type = get_c_string(value);
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		num = gh_scm2int(value);
-		ai->Reserve[DefaultResourceNumber(type)] = num;
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("used"))) {
-	    sublist = gh_car(list);
-	    while (!gh_null_p(sublist)) {
-		char *type;
-		int num;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		type = get_c_string(value);
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		num = gh_scm2int(value);
-		ai->Used[DefaultResourceNumber(type)] = num;
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("needed"))) {
-	    sublist = gh_car(list);
-	    while (!gh_null_p(sublist)) {
-		char *type;
-		int num;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		type = get_c_string(value);
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		num = gh_scm2int(value);
-		ai->Needed[DefaultResourceNumber(type)] = num;
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("collect"))) {
-	    sublist = gh_car(list);
-	    while (!gh_null_p(sublist)) {
-		char *type;
-		int num;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		type = get_c_string(value);
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		num = gh_scm2int(value);
-		ai->Collect[DefaultResourceNumber(type)] = num;
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("need-mask"))) {
-	    sublist = gh_car(list);
-	    while (!gh_null_p(sublist)) {
-		char *type;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		type = get_c_string(value);
-		ai->NeededMask |= (1 << DefaultResourceNumber(type));
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("need-food"))) {
-	    ai->NeedFood = 1;
-	} else if (gh_eq_p(value, gh_symbol2scm("unit-type"))) {
-	    sublist = gh_car(list);
-	    i = 0;
-	    if (gh_length(sublist)) {
-		ai->UnitTypeRequests =
-		    malloc(gh_length(sublist) / 2 * sizeof (AiUnitTypeTable));
-	    }
-	    while (!gh_null_p(sublist)) {
-		char *ident;
-		int count;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		ident = get_c_string(value);
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		count = gh_scm2int(value);
-		ai->UnitTypeRequests[i].Table[0] = UnitTypeByIdent(ident);
-		ai->UnitTypeRequests[i].Count = count;
-		++i;
-	    }
-	    ai->UnitTypeRequestsCount = i;
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("upgrade"))) {
-	    sublist = gh_car(list);
-	    i = 0;
-	    if (gh_length(sublist)) {
-		ai->UpgradeToRequests = malloc(gh_length(sublist) * sizeof (UnitType *));
-	    }
-	    while (!gh_null_p(sublist)) {
-		char *ident;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		ident = get_c_string(value);
-		ai->UpgradeToRequests[i] = UnitTypeByIdent(ident);
-		++i;
-	    }
-	    ai->UpgradeToRequestsCount = i;
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("research"))) {
-	    sublist = gh_car(list);
-	    i = 0;
-	    if (gh_length(sublist)) {
-		ai->ResearchRequests = malloc(gh_length(sublist) * sizeof (Upgrade *));
-	    }
-	    while (!gh_null_p(sublist)) {
-		char *ident;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		ident = get_c_string(value);
-		ai->ResearchRequests[i] = UpgradeByIdent(ident);
-		++i;
-	    }
-	    ai->ResearchRequestsCount = i;
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("building"))) {
-	    AiBuildQueue **queue;
-	    sublist = gh_car(list);
-	    queue = &ai->UnitTypeBuilded;
-	    while (!gh_null_p(sublist)) {
-		char *ident;
-		int made;
-		int want;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		ident = get_c_string(value);
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		made = gh_scm2int(value);
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		want = gh_scm2int(value);
-		*queue = malloc(sizeof (AiBuildQueue));
-		(*queue)->Next = NULL;
-		(*queue)->Type = UnitTypeByIdent(ident);
-		(*queue)->Want = want;
-		(*queue)->Made = made;
-		queue = &(*queue)->Next;
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("repair-building"))) {
-	    ai->LastRepairBuilding = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("repair-workers"))) {
-	    sublist = gh_car(list);
-	    while (!gh_null_p(sublist)) {
-		int num;
-		int workers;
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		num = gh_scm2int(value);
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		workers = gh_scm2int(value);
-		ai->TriedRepairWorkers[num] = workers;
-		++i;
-	    }
-	    list = gh_cdr(list);
-	} else {
-	    // FIXME: this leaves a half initialized ai player
-	    errl("Unsupported tag", value);
-	}
-    }
-#endif
     return SCM_UNSPECIFIED;
 }
 

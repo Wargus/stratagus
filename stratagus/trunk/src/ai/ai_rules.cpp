@@ -833,7 +833,7 @@ local void AiStartScript(AiScriptAction * script, char *ident)
 
     // Launch the code.
     code = gh_eval(gh_cadr(gh_cdr(gh_car(script->Action))), NIL);
-    AiScript->Script = code;
+    CclGcProtectedAssign(&AiScript->Script, code);
     AiScript->SleepCycles = 0;
 
     // Don't add anymore units to this force.
