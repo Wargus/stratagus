@@ -153,7 +153,7 @@ void LoadTileset(void)
 			//Initialize all Lookup Items to zero
 			TheMap.Tileset->MixedLookupTable[table[i]] = 0;
 
-			flags = TheMap.Tileset->Tiles[i].Flags;
+			flags = TheMap.Tileset->FlagsTable[i];
 			if (flags & MapFieldWaterAllowed) {
 				TheMap.Tileset->TileTypeTable[tile] = TileTypeWater;
 			} else if (flags & MapFieldCoastAllowed) {
@@ -201,14 +201,14 @@ void LoadTileset(void)
 	for (mixed = solid = i = 0; i < n;) {
 		if (TheMap.Tileset->Tiles[i].BaseTerrain
 			&& TheMap.Tileset->Tiles[i].MixTerrain) {
-			if (TheMap.Tileset->Tiles[i].Flags & MapFieldForest) {
+			if (TheMap.Tileset->FlagsTable[i] & MapFieldForest) {
 				mixed = i;
 			}
 			i += 256;
 		} else {
 			if (TheMap.Tileset->Tiles[i].BaseTerrain != 0 &&
 				TheMap.Tileset->Tiles[i].MixTerrain == 0) {
-					if (TheMap.Tileset->Tiles[i].Flags & MapFieldForest) {
+					if (TheMap.Tileset->FlagsTable[i] & MapFieldForest) {
 						solid = i;
 				}
 			}
@@ -312,14 +312,14 @@ void LoadTileset(void)
 	for (mixed = solid = i = 0; i < n;) {
 		if (TheMap.Tileset->Tiles[i].BaseTerrain
 			&& TheMap.Tileset->Tiles[i].MixTerrain) {
-			if (TheMap.Tileset->Tiles[i].Flags & MapFieldRocks) {
+			if (TheMap.Tileset->FlagsTable[i] & MapFieldRocks) {
 				mixed = i;
 			}
 			i += 256;
 		} else {
 			if (TheMap.Tileset->Tiles[i].BaseTerrain != 0 &&
 				TheMap.Tileset->Tiles[i].MixTerrain == 0) {
-					  if (TheMap.Tileset->Tiles[i].Flags & MapFieldRocks) {
+					  if (TheMap.Tileset->FlagsTable[i] & MapFieldRocks) {
 					solid = i;
 					  }
 			}
@@ -500,6 +500,7 @@ void CleanTilesets(void)
 		free(Tilesets[i]->Name);
 		free(Tilesets[i]->ImageFile);
 		free(Tilesets[i]->Table);
+		free(Tilesets[i]->FlagsTable);
 		free(Tilesets[i]->Tiles);
 		free(Tilesets[i]->TileTypeTable);
 		free(Tilesets[i]->AnimationTable);

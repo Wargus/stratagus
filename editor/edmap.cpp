@@ -449,7 +449,7 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
 
-	mf->Flags |= TheMap.Tileset->Tiles[tile].Flags;
+	mf->Flags |= TheMap.Tileset->FlagsTable[tile];
 
 	UpdateMinimapSeenXY(x, y);
 	UpdateMinimapXY(x, y);
