@@ -640,8 +640,10 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	    return 0;
 
 	case SpellActionFlameShield:
-	    // flame shield only on organic land units?
-	    if (target && target->Type->Organic && target->Type->LandUnit
+	    // flame shield only on land and sea units
+	    if (target && !target->Type->Building
+		    && (target->Type->UnitType == UnitTypeLand
+			|| target->Type->UnitType == UnitTypeNaval)
 		    && target->FlameShield < spell->TTL ) {
 		return 1;
 	    }
@@ -876,7 +878,9 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	break;
 
     case SpellActionFlameShield:
-	if (target && target->Type->Organic && target->Type->LandUnit
+	if (target && !target->Type->Building
+		&& (target->Type->UnitType == UnitTypeLand
+		    || target->Type->UnitType == UnitTypeNaval)
 		&& target->FlameShield < spell->TTL) {
 	    Missile* mis;
 
