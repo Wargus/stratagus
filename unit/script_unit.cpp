@@ -88,12 +88,12 @@ local int CclSetXpDamage(lua_State* l)
 {
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     old = XpDamage;
-    XpDamage = lua_toboolean(l, 1);
+    XpDamage = LuaToBoolean(l, 1);
 
     lua_pushboolean(l, old);
     return 1;
@@ -122,12 +122,12 @@ local int CclSetTrainingQueue(lua_State* l)
 {
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     old = EnableTrainingQueue;
-    EnableTrainingQueue = lua_toboolean(l, 1);
+    EnableTrainingQueue = LuaToBoolean(l, 1);
 
     lua_pushboolean(l, old);
     return 1;
@@ -156,12 +156,12 @@ local int CclSetBuildingCapture(lua_State* l)
 {
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     old = EnableBuildingCapture;
-    EnableBuildingCapture = lua_toboolean(l, 1);
+    EnableBuildingCapture = LuaToBoolean(l, 1);
 
     lua_pushboolean(l, old);
     return 1;
@@ -190,12 +190,12 @@ local int CclSetRevealAttacker(lua_State* l)
 {
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     old = RevealAttacker;
-    RevealAttacker = lua_toboolean(l, 1);
+    RevealAttacker = LuaToBoolean(l, 1);
 
     lua_pushboolean(l, old);
     return 1;
@@ -525,7 +525,7 @@ local void CclParseTrain(Unit *unit, SCM list)
 		if (gh_eq_p(value, gh_symbol2scm("unit-none"))) {
 		    unit->Data.Train.What[i] = NULL;
 		} else {
-		    char *ident;
+		    char* ident;
 		    ident = gh_scm2newstr(value, NULL);
 		    unit->Data.Train.What[i] = UnitTypeByIdent(ident);
 		    free(ident);
@@ -639,13 +639,13 @@ local SCM CclUnit(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("current-sight-range"))) {
 	    unit->CurrentSightRange = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("host-info"))) {          
+	} else if (gh_eq_p(value, gh_symbol2scm("host-info"))) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    MapMarkSight(player, gh_scm2int(gh_car(value)), gh_scm2int(gh_cadr(value)),
 		gh_scm2int(gh_cadr(gh_cdr(value))),
 		gh_scm2int(gh_cadr(gh_cdr(gh_cdr(value)))),
-		unit->CurrentSightRange);   
+		unit->CurrentSightRange);
 	} else if (gh_eq_p(value, gh_symbol2scm("tile"))) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
@@ -915,7 +915,7 @@ local SCM CclUnit(SCM list)
     if (unit->Removed && unit->Type->Revealer) {
     	MapMarkUnitSight(unit);
     }
-    
+
     //	Place on map
     if (!unit->Removed && !unit->Destroyed && !unit->Type->Vanishes) {
 	unit->Removed = 1;
@@ -928,7 +928,7 @@ local SCM CclUnit(SCM list)
     }
     // Fix Colors for rescued units.
     if (unit->RescuedFrom) {
-        unit->Colors = &unit->RescuedFrom->UnitColors;
+	unit->Colors = &unit->RescuedFrom->UnitColors;
     }
     DebugLevel3Fn("unit #%d parsed\n" _C_ slot);
 
