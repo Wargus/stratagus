@@ -215,7 +215,7 @@ static int StartGathering(Unit* unit)
 		// FIXME: We should add a flag for that, and a limited range.
 		// FIXME: Think minerals in st*rcr*ft!!
 		// However the CPU usage is really low (no pathfinding stuff).
-		unit->Data.ResWorker.Wait = 10;
+		unit->Wait = 10;
 		return 0;
 	}
 
@@ -573,7 +573,7 @@ static int MoveToDepot(Unit* unit)
 	// If resource depot is still under construction, wait!
 	//
 	if (goal->Orders[0].Action == UnitActionBuilt) {
-		unit->Data.ResWorker.Wait = 10;
+		unit->Wait = 10;
 		return 0;
 	}
 
@@ -595,7 +595,7 @@ static int MoveToDepot(Unit* unit)
 		(unit->ResourcesHeld * unit->Player->Incomes[resinfo->FinalResource]) / 100;
 	unit->ResourcesHeld = 0;
 
-	unit->Data.ResWorker.Wait = resinfo->WaitAtDepot / SpeedResourcesReturn[resinfo->ResourceId] - 1;
+	unit->Wait = resinfo->WaitAtDepot / SpeedResourcesReturn[resinfo->ResourceId] - 1;
 
 	return 1;
 }
@@ -695,9 +695,14 @@ void HandleActionResource(Unit* unit)
 	int ret;
 	int newres;
 
+	if (unit->Wait) {
+		// FIXME: show idle animation while we wait?
+		unit->Wait--;
+		return;
+	}
+
 	// Let's start mining.
 	if (unit->SubAction == SUB_START_RESOURCE) {
-		unit->Data.ResWorker.Wait = 0;
 		if (unit->Orders->Goal) {
 			newres = unit->Orders->Goal->Type->GivesResource;
 		} else {
@@ -717,12 +722,6 @@ void HandleActionResource(Unit* unit)
 		}
 	}
 
-	if (unit->Data.ResWorker.Wait) {
-		// FIXME: show idle animation while we wait?
-		unit->Data.ResWorker.Wait--;
-		return;
-	}
-
 	// Move to the resource location.
 	if (unit->SubAction >= SUB_MOVE_TO_RESOURCE &&
 			unit->SubAction < SUB_UNREACHABLE_RESOURCE) {
@@ -731,7 +730,7 @@ void HandleActionResource(Unit* unit)
 			if (ret == -1) {
 				// Can't Reach
 				unit->SubAction++;
-				unit->Data.ResWorker.Wait = 10;
+				unit->Wait = 10;
 				return;
 			} else {
 				// Reached
@@ -782,7 +781,7 @@ void HandleActionResource(Unit* unit)
 			if (ret == -1) {
 				// Can't Reach
 				unit->SubAction++;
-				unit->Data.ResWorker.Wait = 10;
+				unit->Wait = 10;
 			} else {
 				unit->SubAction = SUB_RETURN_RESOURCE;
 			}

@@ -62,7 +62,6 @@ void HandleActionUpgradeTo(Unit* unit)
 	const UnitStats* stats;
 
 	if (!unit->SubAction) { // first entry
-		unit->Data.UpgradeTo.Wait = 0;
 		unit->Data.UpgradeTo.Ticks = 0;
 		unit->SubAction = 1;
 	}
@@ -70,8 +69,8 @@ void HandleActionUpgradeTo(Unit* unit)
 	unit->Type->NewAnimations->Upgrade ?
 		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Upgrade) :
 		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
-	if (unit->Data.UpgradeTo.Wait) {
-		unit->Data.UpgradeTo.Wait--;
+	if (unit->Wait) {
+		unit->Wait--;
 		return;
 	}
 
@@ -119,7 +118,7 @@ void HandleActionUpgradeTo(Unit* unit)
 		return;
 	}
 
-	unit->Data.UpgradeTo.Wait = CYCLES_PER_SECOND / 6;
+	unit->Wait = CYCLES_PER_SECOND / 6;
 }
 
 //@}

@@ -100,7 +100,6 @@ void HandleActionTrain(Unit* unit)
 	// First entry
 	//
 	if (!unit->SubAction) {
-		unit->Data.Train.Wait = 0;
 		unit->Data.Train.Ticks = 0;
 		unit->SubAction = 1;
 	}
@@ -108,8 +107,8 @@ void HandleActionTrain(Unit* unit)
 	unit->Type->NewAnimations->Train ?
 		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Train) :
 		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
-	if (unit->Data.Train.Wait) {
-		unit->Data.Train.Wait--;
+	if (unit->Wait) {
+		unit->Wait--;
 		return;
 	}
 
@@ -124,7 +123,7 @@ void HandleActionTrain(Unit* unit)
 		if (NumUnits >= UnitMax) {
 			unit->Data.Train.Ticks =
 				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
-			unit->Data.Train.Wait = CYCLES_PER_SECOND / 6;
+			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
 
@@ -139,7 +138,7 @@ void HandleActionTrain(Unit* unit)
 
 			unit->Data.Train.Ticks =
 				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
-			unit->Data.Train.Wait = CYCLES_PER_SECOND / 6;
+			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
 
@@ -217,7 +216,7 @@ void HandleActionTrain(Unit* unit)
 		}
 	}
 
-	unit->Data.Train.Wait = CYCLES_PER_SECOND / 6;
+	unit->Wait = CYCLES_PER_SECOND / 6;
 }
 
 //@}

@@ -336,68 +336,6 @@ static void CclParseOrders(lua_State* l, Unit* unit)
 }
 
 /**
-**  Parse follow
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseFollow(lua_State* l, Unit* unit)
-{
-	const char* value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = luaL_getn(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "wait")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Follow.Wait = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		}
-	}
-}
-
-/**
-**  Parse build
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseBuild(lua_State* l, Unit* unit)
-{
-	const char* value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = luaL_getn(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "cycles")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Build.Cycles = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "wait")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Build.Wait = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		}
-	}
-}
-
-/**
 **  Parse built
 **
 **  @param l     Lua state.
@@ -452,35 +390,6 @@ static void CclParseBuilt(lua_State* l, Unit* unit)
 }
 
 /**
-**  Parse board
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseBoard(lua_State* l, Unit* unit)
-{
-	const char* value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = luaL_getn(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "wait")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Board.Wait = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		}
-	}
-}
-
-/**
 **  Parse res worker data
 **
 **  @param l     Lua state.
@@ -508,10 +417,6 @@ static void CclParseResWorker(lua_State* l, Unit* unit)
 		} else if (!strcmp(value, "done-harvesting")) {
 			unit->Data.ResWorker.DoneHarvesting = 1;
 			--j;
-		} else if (!strcmp(value, "wait")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.ResWorker.Wait = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		}
 	}
 }
@@ -542,10 +447,6 @@ static void CclParseResearch(lua_State* l, Unit* unit)
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			unit->Data.Research.Upgrade = UpgradeByIdent(value);
-		} else if (!strcmp(value, "wait")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Research.Wait = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		}
 	}
 }
@@ -575,10 +476,6 @@ static void CclParseUpgradeTo(lua_State* l, Unit* unit)
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.UpgradeTo.Ticks = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "wait")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.UpgradeTo.Wait = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		}
 	}
 }
@@ -607,10 +504,6 @@ static void CclParseTrain(lua_State* l, Unit* unit)
 		if (!strcmp(value, "ticks")) {
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.Train.Ticks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "wait")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Train.Wait = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		}
 	}
@@ -887,6 +780,8 @@ static int CclUnit(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "sub-action")) {
 			unit->SubAction = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "wait")) {
+			unit->Wait = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "state")) {
 			unit->State = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "anim-wait")) {
@@ -958,21 +853,9 @@ static int CclUnit(lua_State* l)
 			lua_pushvalue(l, j + 1);
 			CclParseOrder(l, &unit->NewOrder);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-follow")) {
-			lua_pushvalue(l, j + 1);
-			CclParseFollow(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-build")) {
-			lua_pushvalue(l, j + 1);
-			CclParseBuild(l, unit);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "data-built")) {
 			lua_pushvalue(l, j + 1);
 			CclParseBuilt(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-board")) {
-			lua_pushvalue(l, j + 1);
-			CclParseBoard(l, unit);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "data-res-worker")) {
 			lua_pushvalue(l, j + 1);
