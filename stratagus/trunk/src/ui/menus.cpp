@@ -4841,7 +4841,7 @@ local void EditorMapProperties(void)
 }
 
 local void EditorMapPropertiesEnterAction(
-	Menuitem *mi __attribute__((unused)), int key)
+	Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
 {
 }
 
