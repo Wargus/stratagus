@@ -10,7 +10,7 @@
 //
 /**@name action_still.c	-	The stand still action. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer
+//	(c) Copyright 1998,2000-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -205,6 +205,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->Orders[0].Goal=goal;
 		RefsDebugCheck( !goal->Refs );
 		goal->Refs++;
+		unit->Reset=0;
 		unit->State=0;
 		unit->SubAction=1;	// Mark attacking.
 		if( !type->Tower ) {
