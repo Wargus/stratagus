@@ -186,10 +186,9 @@ typedef struct _menuitem_vslider_ {
 	unsigned cflags;
 	int xsize;  ///< x-size of slider, not including buttons
 	int ysize;  ///< y-size of slider, not including buttons
-	void (*action)(struct _menuitem_ *, int);
+	void (*action)(struct _menuitem_ *);
 	int defper;
 	int percent;  ///< percent of the way to bottom (0 to 100)
-	int curper;   ///< used in mouse-move state
 	int cursel;   ///< used in mouse-over state
 	int style;
 	void (*handler)(void); ///< for return key
@@ -238,7 +237,7 @@ typedef struct _menuitem_ {
 	int yofs;
 	unsigned flags;
 	int font;
-		int transparent;  ///< Add the transparent flag to draw a translucide menu
+	int transparent;  ///< Add the transparent flag to draw a translucide menu
 	void (*initfunc)(struct _menuitem_ *);  ///< constructor
 	void (*exitfunc)(struct _menuitem_ *);  ///< destructor
 	struct _menus_ *menu;  ///< backpointer for speedups
