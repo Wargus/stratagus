@@ -1,3 +1,4 @@
+<?html version="4.0" encoding="UTF-8"?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <!--
 ----	$Id$
@@ -35,1122 +36,924 @@
 
 <A HREF="#current">Current</A>
 
+
 <UL>
-<P><LI>Version 1.10
     <UL>
-    <LI>Remove use of imlib.
-    <LI>Implement run-length-encoded sprites. (Saves 9 MB memory).
+    <LI>+++
+    <LI>Rewrote construction config (from Jimmy Salmon).
+    <LI>Fixed bug #713185: Runestone heals inorganic units (from Russell Smith).
+    <LI>Implemented Feature Request #691262: Watch wc2 replays with fcmp (from Russell Smith).
+    <LI>Allow God mode cheat to be disabled (from Phil Hannent).
+    <LI>Chat messages are shown in the player's color (from Jimmy Salmon).
+    <LI>Made font colors more configurable (from Jimmy Salmon).
+    <LI>Fixed bugs #676511,#710239: Segfault when loading game with walls (from Russell Smith).
+    <LI>Made wheel mouse work for sliders (from Nehal Mistry).
+    <LI>Made color cycling configurable via ccl (from Nehal Mistry).
+    <LI>Fixed bug #704720: The green pointing should be visible under fow (from Jimmy Salmon).
+    <LI>Fixed bug #707075: Bug in DeathCoilController (from Jimmy Salmon).
+    <LI>Fixed bug #704338: Crash: Town Hall Destroyed, Peasant inside (from Russell Smith).
+    <LI>Added support for 16x16 tiles (from Jimmy Salmon).
+    <LI>Fixed setup script for BSD and 'sh' (from ppl).
     </UL>
-<P><LI>Version 1.11
+<A NAME="current"> </A>
+<P><LI>1.18 Released<P>
     <UL>
-    <LI>Sort units for display, correct overlapping.
-    <LI>Faster cursor drawing.
-    <LI>Improved updates. (Faster)
-    <LI>Implemented first sound support.
+    <LI>Allow text to be clicked on like normal menu items (from Nehal Mistry).
+    <LI>Use victory/defeat backgrounds for stats (from Nehal Mistry).
+    <LI>Dynamically set maximum characters for input box based on text width (from Nehal Mistry).
+    <LI>Removed +1 range upgrade for catapults and ballistas (from Jimmy Salmon).
+    <LI>Fixed WC2 UI on 1600x1200 (from Jimmy Salmon).
+    <LI>Fixed saving cd mode preferences (from Nehal Mistry).
+    <LI>Fixed bug when a player quits in a multiplayer game (from Jimmy Salmon).
+    <LI><B>1.18pre2 Released</B>
+    <LI>Fixed crash when doing "fow off" followed by "on screen" (from Russell Smith).
+    <LI>Disabled save replay button when replay wasn't enabled (from Jimmy Salmon).
+    <LI>Fixed bug when eye of vision was destroyed (from Jimmy Salmon).
+    <LI>Don't display Neutral player's Score in Game (from Russell Smith).
+    <LI>Fixed circle of power so it's a neutral unit (from Jimmy Salmon).
+    <LI>Fixed bug (One Peasant Only) Should only effect Human and Computer Players, not Nobody, Neutral or Rescue Units
+    <LI>Fixed bug 444273: Heroes have wrong upgrades (from Russell Smith).
+    <LI>Walls don't count for buildings stats (from Jimmy Salmon).
+    <LI>Fixed bug #233900: Train new units in pause mode didn't work. (from Russell Smith).
+    <LI>Fixed crash on BSD (from Jimmy Salmon and ppl).
+    <LI>Fixed crash when middle clicking in a menu (from Nehal Mistry).
+    <LI>Fixed "make buildit" (from Nehal Mistry).
+    <LI>Fixed bug in save replay menu (from Jimmy Salmon).
+    <LI><B>1.18pre1 Released</B>
+    <LI>Added ctrl-v for pasting, ctrl-u to delete everything, fixed several bugs in input boxes (from Jimmy Salmon).
+    <LI>Fixed bug where destroyed buildings didn't show under fow until they were destroyed.  (They show immediately now) (from Russell Smith).
+    <LI>Fixed bug #689227: Internal editor crashes saving 1024x1024 maps (from Jimmy Salmon).
+    <LI>Fixed bug #690994: Editor scrolling bug (from Jimmy Salmon).
+    <LI>Fixed bug when shared vision didn't update seen tiles when sharing vision (from Russell Smith).
+    <LI>Fixed bug #691057: Shared vision and destroyed buildings (from Russell Smith).
+    <LI>Fixed bug #690843: Shared vision tiles aren't explored (from Russell Smith).
+    <LI>Fixed bug #690232: AI can't pass walls (from Jimmy Salmon).
+    <LI>Fixed bug #690171: Crash building oil platform with UNITS_ON_MAP (from Jimmy Salmon).
+    <LI>Fixed bug when destroying a unit with another unit inside it (from Jimmy Salmon).
+    <LI>Added middle-click pasting support in X11 (from Juan Pablo).
+    <LI>Added playlist support (from Nehal Mistry).
+    <LI>Runestone gives HP and Mana (from Juan Pablo).
+    <LI>Implemented feature request #631910: Super fast forward for replay (from Russell Smith).
+    <LI>Fixed bug #561204: 3 player game can end too soon (from Jimmy Salmon).
+    <LI>Fixed bug #678580: Dragon Breath impact too long (from Jimmy Salmon).
+    <LI>Implemented feature request #631875: No MP menu pause (from Jimmy Salmon).
+    <LI>Fixed bug #685087: middle mouse button doesn't work in editor (from Jimmy Salmon).
+    <LI>Fixed bug #683771: Own Buildings go under FOW when destroyed (from Russell Smith).
+    <LI>Diplomacy menu doesn't allow allies and enemies at the same time (from Jimmy Salmon).
+    <LI>Fixed bug #683769: Preferences and Diplomacy should be disabled in replay (from Jimmy Salmon).
+    <LI>Fixed bug #683770: Load Game from replay doesn't allow me to command units (from Jimmy Salmon).
+    <LI>Fixed bug #438896: Platform destroyed in fog of war (from Russell Smith).
+    <LI>Fixed bug #676724: Buildings Not Updated Until seen in viewport (from Russell Smith).
+    <LI>Fixed bug #678581: Dragons, Gryphon, Mage, Deathknight death animation (from Russell Smith).
+    <LI>Added auto spell casting (from Jimmy Salmon).
+    <LI>Fixed Bug #674531: When sound if off, Sound disabled message should not display (from Russell Smith).
+    <LI>Fixed bug #674532: Last Unit cost should not display when typing a message (from Jimmy Salmon).
+    <LI>Fixed bug #672463: Editor Crash with missing expansion graphics (from Jimmy Salmon).
+    <LI>Fixed bug #672490: FlameShield can now be cast on catapults and naval units (from Jimmy Salmon).
+    <LI>Fixed bug #672467: FlameShield is unable to hit air (from Jimmy Salmon).
+    <LI>Fixed bug #668971: Segfaults on game load (from Jimmy Salmon).
+    <LI>Fixed bug #671050: Mage can cast flameshield on dying unit (from Jimmy Salmon).
+    <LI>Fixed bug #671045: Invisible Units can attack (from Jimmy Salmon).
+    <LI>Fixed bug #671047: Peasants in Goldmine don't mine next mine when it's destroyed (from Jimmy Salmon).
+    <LI>Fixed bug #670166: demosquad make unpassable destroyed rock (from Jimmy Salmon).
+    <LI>Added exploding critters (from Jimmy Salmon).
+    <LI>Fixed bug #668993: Transporters don't work (from Jimmy Salmon).
+    <LI>Workers only automatically mine gold mines that have been discovered (from Jimmy Salmon).
+    <LI>Fixed bug #611418: Viewports aren't saved (from Jimmy Salmon).
+    <LI>Fixed Bug #667666: Training Queue used, fog of war wrong (from Russell Smith).
+    <LI>Fixed bug #667132: Replay Must save fog of war settings (from Jimmy Salmon).
+    <LI>Fixed bug #667203: Can Haul Oil From enemy platform (from Jimmy Salmon).
+    <LI>Fixed bug #667078: NEW_FOW and Save with Unit Dying (from Russell Smith).
+    <LI>Fixed bug #666990: Replay with reveal map and NEW_FOW (from Russell Smith).
+    <LI>Fixed bug #666612: Crash on UnitCache (from Jimmy Salmon).
+    <LI>Implemented a new fog of war (from Russell Smith).
+    <LI>Fixed bug #657810: Save &amp; Load bugs (from Jimmy Salmon).
+    <LI>Fixed bug #635894: Altering Landscape Type in Editor (from Jimmy Salmon).
+    <LI>Fixed bugs #647169 and #636552: Forest/Rock Display Errors (from Russell Smith).
+    <LI>Fixed bug #657533: User save directory not created (from Jimmy Salmon).
+    <LI>Added load/save of config options (from Jimmy Salmon).
+    <LI>Fixed bug #657167: Crash on human campaign level 2 (from Jimmy Salmon).
+    <LI>Added smooth scrolling for messages (from Jimmy Salmon).
+    <LI>Fixed bug #628947: WC2 Graphic Display Errors (from Jimmy Salmon).
+    <LI>Fixed bug #611417: Campaign not saved (from Jimmy Salmon).
+    <LI>Fixed bug #651992: Wrong picture for destroyed orc wall (from Jimmy Salmon).
+    <LI>Minimap cursor color in C sources configurable.
+    <LI>Viewport code cleanup, viewport numbers changed to pointers.
+    <LI>New include file "fc_types.h" for type forward references.
+    <LI>Campaigns extracted from original CD's (from Russell Smith).
+    <LI>Fixed bug #643179: Victory/Defeat on network (from Jimmy Salmon).
+    <LI>Updated User Interface extraction for wartool.  All resolutions now supported (from Russell Smith).
+    <LI>Fixed bug #646385: Custom Single Player .cm Crash (from Jimmy Salmon).
+    <LI>Can specify port when entering IP Address in format: "x.x.x.x:port" (from Nehal Mistry).
+    <LI>Fixed bug #618086: bugs when without network (from Nehal Mistry).
+    <LI>Fixed bug #600046: No new construction options after upgrade (from Russell Smith).
+    <LI>Fixed bug #643281: Compile errors on Mac OS X 10.2.2 (from Jimmy Salmon).
+    <LI>Fixed bug #581489: GUI - Network refresh (from Jimmy Salmon).
+    <LI>Fixed bug #641074: Return gold to ally's town hall (from Jimmy Salmon).
+    <LI>Fixed bug #640812: Flameshield segfault (from Jimmy Salmon).
+    <LI>Middle-click pastes from clipboard(Win32) or cut buffer(X11) in input boxes (from Nehal Mistry).
+    <LI>Implemented tab completion for chatting (from Nehal Mistry).
+    <LI>Implemented feature request #632356: Stretching Background Images (from Jimmy Salmon).
+    <LI>Added Man vs Machine game type (from Jimmy Salmon).
+    <LI>Fixed bug #634359: Click while in comment makes invisible (from Jimmy Salmon).
+    <LI>Fixed bug #638383: Freecraft memfill on some puds (from Jimmy Salmon).
+    <LI>Fixed bug #636395: Double-click does not work in window (from Jimmy Salmon).
+    <LI>Implemented feature request #635863: Clicking on Score Screen Displays All (from Jimmy Salmon).
+    <LI>Correct paths and filenames for expansion voice extraction (from Russell Smith).
+    <LI>Added diplomacy menu (from Russell Smith).
+    <LI>Fixed bug #632526: Missile Graphic Direction (from Jimmy Salmon).
+    <LI>Fixed bug #595466: Rescueing Active Unit Issues (from Russell Smith).
+    <LI>Implemented feature request #631845: Allied shared vision (from Jimmy Salmon).
+    <LI>Fixed an overflow error that caused multiplayer games to go out of sync (from Jimmy Salmon).
+    <LI>Implemented feature request #631851: Fog of war disable for replay (from Jimmy Salmon).
+    <LI>New feature: Smarter ballistas, avoids hitting friendly units (from Ludovic).
+    <LI>Added, the ai uses paladin healing when possible (from Ludovic).
+    <LI>Fixed a bug which prevented unitstats to be restored when loading a game : unitstats were loaded and then reset by InitUnitType() (from Ludovic).
+    <LI>Added "it is a good day to die" cheat (from Jimmy Salmon).
+    <LI>Fixed bug #628948: Load Game - Doesn't know Scroll (from Russell Smith).
+    <LI>Fixed bug #624306: Creating new map with winter crash (from Jimmy Salmon).
+    <LI>Fixed bug #624309: Load&amp;Save Bloodlust crash (from Jimmy Salmon).
+    <LI>Ranks are now configurable with ccl (from Jimmy Salmon).
+    <LI>Fixed bug #622556: Save then Load crash (from Jimmy Salmon).
+    <LI>Fixed bug #621572: Save &amp; Load Music mistake (from Jimmy Salmon).
+    <LI>Fixed bug #621818: Save&amp;Load/Replay: Building restrictions (from Jimmy Salmon).
+    <LI>Fixed bug #611416: Objectives not saved (from Jimmy Salmon).
+    <LI>Fixed bug #594439: Peasant Repairs when no resources (from Russell Smith).
+    <LI>Fixed crash: SIOD executes a longjmp without a setjmp (from Dirk Thierbach).
+    <LI>Implemented task #55511: Don't load the complete tileset configuration (from Jimmy Salmon).
+    <LI>Added end scenario confirm menus (from Jimmy Salmon).
+    <LI>Fixed bug #581504: Bug in libmodplug conversion (from Jimmy Salmon).
+    <LI>Fixed bug #595460: Killed when tracked, can't scroll (from Jimmy Salmon).
+    <LI>Fixed various memory leaks.
+    <LI>Added support for arts sound daemon (KDE) (from Ari).
+    <LI>Fixed bug #577066: Restart loses custom settings (from Jimmy Salmon).
+    <LI>Fixed bug #587638: Transports can carry ships (from Jimmy Salmon).
+    <LI>Fixed bug #536262: Oil icon changes colors (from Jimmy Salmon).
+    <LI>Added initial support for game replay (from Jimmy Salmon).
+    <LI>Added editor save confirm menu (from Jimmy Salmon).
+    <LI>Fixed bug: Memory heap corruption in AiFindLumberMillPlace found from Mark Pazolli.
+    <LI>Fixed bug: Cancel training button didn't work in multiplayer.
+    <LI>Scroll wheel support in list boxes added (from Jeff Binder).
+    <LI>Movie play support addded (Only avi files with VP3/Ogg codecs).
+    <LI>Fixed bug: 16bit sound is wrong on big endian machines (from Jeff Binder).
+    <LI>Fixed bug #582572: Can build refinery too close to platform (from Jimmy Salmon).
+    <LI>Fixed bug #577436: Multiplayer check fail (from Jimmy Salmon).
+    <LI>Fixed bug #580788: Crashes with Fog of War in network menus (from Jimmy Salmon).
+    <LI>Added new feature (set-xp-damage! #t) which adds extra damage from units as they gain XP (from David Slimp).
+    <LI>Magic parameter in units.ccl file to be used as MaxMana; MAGIC_FOR_NEW_UNITS now means number of percent instead of absolute value (from Martin Hajduch).
+    <LI>Middle click on unit portrait tracks the unit in the current viewport.
+    <LI>Fixed bug: FreeCraft segfaults when you try to abort a unit being trained and you click on a wrong (empty) slot (from Martin Renold).
+    <LI>Added burning buildings (from Jimmy Salmon).
+    <LI>Movement/Placement mask and field flags added to unit-type structure.
+    <LI>Fixed bug: Editor can't place units on mud/dirt.
+    <LI>Fixed bug in screenshots in 15 bit video depth (from Jimmy Salmon).
+    <LI>Added support for tracking units in viewport.
+    <LI>Added mirror editing for the internal editor (Vladi).
+    <LI>Added random map generation for the internal editor (Vladi).
+    <LI>Ogg music files are loaded and played in parallel (from Jimmy Salmon).
     </UL>
-<P><LI>Version 1.12 (first released public version)
+<P><LI>1.17.2 Released<P>
     <UL>
-    <LI>Fixed bug: player 0 units are drawn with wrong colors on mini-map.
-    <LI>Fixed bug: cursor not clipped on right edge of window.
-    <LI>Fixed bug: allocated too much shared video memory.
-    <LI>Fixed bug: cursor outside window, drawn with bad coordinates.
-    <LI>Added middle mouse button, scrolls the map.
-    <LI>Fixed bug: can't reach buildings if one coordinate is 0. (sign!)
-    <LI>Fixed bug: selecting, selects not all units.
-    <LI>Added ALT+select selects the old group.
-    <LI>Added CTRL+select selects all visible units of this type.
+    <LI>Fixed bug #575614: Holy Vision broken when fog of war off (from	Jimmy Salmon).
+    <LI>Fixed bug #422331: New Townhall in too random place (from Jimmy Salmon).
+    <LI>Added support for the keypad in menus (from Jimmy Salmon).
+    <LI>Added game timer (from Jimmy Salmon).
+    <LI>Triggers are removed if they return true (from Jimmy Salmon).
+    <LI>Fixed bug #573774: Moving a Dark Portal Destination more than 128 units/tiles causes a seg fault.
+    <LI>Implemented task #55510: Improvement of the AI resource collection (from Jimmy Salmon).
+    <LI>Fixed crash: freed palette used.
+    <LI>Fixed bug: minimap colors are wrong (sign problem).
+    <LI>Implemented task #55513: Don't load the complete campaign configuration (from Jimmy Salmon).
+    <LI>Added if-resource, if-kills, if-score, and if-elapsed triggers (from Jimmy Salmon).
+    <LI>Fixed bug #573331: Peasants don't chop wood (from Jimmy Salmon).
+    <LI>Added free for all, top vs bottom, and left vs right game types (from Jimmy Salmon).
+    <LI>Fixed multiplayer fog of war (from Jimmy Salmon).
     </UL>
-<P><LI>Version 1.13
+<P><LI>1.17.1 Released<P>
     <UL>
-    <LI>Fixed bug: in unit drawing, no more cores here.
-    <LI>Added: unit names are now shown correct.
-    <LI>Added missiles.
-    <LI>Added attack, death animation.
-    <LI>Added corpse.
-    <LI>You can now return goods.
-    <LI>The debug speeds of mining, harvest, building, training are now
-	configurable.
-    <LI>The mini-map is now only redraw each second. (more speed)
-    <LI>Started AI code.
-    <LI>Rewritten wood remove, but still not works 100% correct.
-    <LI>Fixed bug: in save/restore cursor, no more cores here.
-    <LI>Started cleanup source tree.
+    <LI>Added Global Options, can change resolution, fog mode, and fullscreen mode.
+    <LI>An in the engine integrated editor is now available (from Jimmy, Johns and Cade)
+    <LI>Capture building is disabled as default.
+    <LI>Fixed bug: Can capture only enemy buildings.
+    <LI>Fixed bug #570475: 'Next tip' causes segmentation fault (from Jimmy Salmon).
+    <LI><B>1.17.1pre1 Released</B>
+    <LI>Fixed bug: Units with zero sightrange see 1 tile.
+    <LI>Fixed bug: Oil platform can't be placed in snapshots.
+    <LI>Fixed bug: Teleported units aren't removed from map before teleport.
+    <LI>Disabled select scenario after player have joined.
+    <LI>Fixed clients menus of setup multiplayer game.
+    <LI>Fixed bug: Syncron random seed and hash not initialized.
+    <LI>Fixed credit cursor extraction with wartool (from Kachalov Anton).
+    <LI>Menus are configurable from CCL (basic patch from Kachalov Anton, than continue from all).
+    <LI>Added ALT-R, CTRL-R to restart the scenario (from Jimmy Salmon).
+    <LI>Fixed bug #568071: Crash after Master-Volume toggle (from ari).
+    <LI>Fixed bug: #443203: Mouse pointer not updated when scrolling with keyboard (from Nehal Mistry).
+    <LI>Added Load + Save Menus (from Nehal Mistry).
+    <LI>Fixed bug: Server setup screen shows the pulldown again if a player leaves (from Jimmy Salmon).
+    <LI>Fixed bug: Menus weren't drawn correctly causing the cursor to flicker (from Jimmy Salmon).
+    <LI>Fixed bug: Garbage collector frees too much.
+    <LI>Fixed bug: Harvest corrupts memory.
+    <LI>Old command line network setup api is gone.
+    <LI>Added support for repeating keys in input fields (from Jimmy Salmon).
+    <LI>Fixed bug #562548: Number of opponents doesn't matter (from Jimmy Salmon).
+    <LI>Added ALT+CTRL+S to save the current level as pud "freecraft.pud.gz".
+    <LI>Fixed bug in server menu where the Start Game button was deactivated (from Jimmy Salmon).
+    <LI>Fixed bug #528207: Fog of war is not correct (from Jimmy Salmon).
+    <LI>Implemented task #38320: Making screen shots (from Jimmy Salmon).
+    <LI>Fixed bug #562444: Disable fog of war in menus in net game (from Jimmy Salmon).
+    <LI>Fixed bug: Right clicking a wall will attack it now (from Jimmy Salmon).
+    <LI>Fixed bug: Chat messages that are too wide are wrapped (from Jimmy Salmon).
+    <LI>Fixed bug #561203: Who is speaking in 3 player game (from Jimmy Salmon).
+    <LI>Fixed bug: Server now sends the map path relative to the data directory (from Jimmy Salmon).
+    <LI>MacOS compile fixed and project builder project added (from Ben Hines).
+    <LI>Fixed bug: Wrapper script loses all command line options (from Josef Spillner).
     </UL>
-<P><LI>Version 1.14
+<P><LI>1.17 Released<P>
     <UL>
-    <LI>Fixed bug: upgrade unit
-    <LI>Fixed bug: RevealMap and MapUpdateVisible no longer overwrite memory.
-    <LI>Fixed bug: Save and restore cursor no longer access outside the bounds.
-    <LI>Add new functions UnitCache..., to improve speed.
-    <LI>Many cleanups in the sources.
-    <LI>Damaged buildings are now burning.
-    <LI>Support for guile snapshot version. (I removed it)
-    <LI>Support for guile-1.3
-    <LI>Fixed bug: removed unit builds building. (from Charles K Hardin)
-    <LI>Modified makefiles to support inline source code documentation.
-    <LI>Started greater map and own maps support.
-    <LI>Fixed bug: Matrix was too small for big maps.
-    <LI>Tried to get working source code documentation.
-    <LI>Added threaded sound support (from Fabrice Rossi).
-    <LI>Fixed bug: 96x96 maps dumps core, introduced with big maps.
-    <LI>Fixed bug: Movement flags was wrong for big maps.
-    <LI>Started network code. (Just for testing)
-    <LI>Fixed bug: Trained units are inserted twice into unit cache.
-    <LI>Written transporter load/unload code.
-    <LI>Fixed bug: Buttons aren't reported over network.
-    <LI>Applied patches from Josh Cogliati.
-    <LI>Applied patches for sound part (from Fabrice Rossi).
-    <LI>Fixed bug: Upgrades dumps core. (Player::UnitFlags was to small)
-    <LI>Fixed bug: Building cursor destroys map border.
-    <LI>Fixed bug: Selecting building place and unit is killed dumps core.
-    <LI>Experimental guile-gtk support added.
-    <LI>New command-line option -c file.ccl = CCL start file.
-    <LI>Fixed bug: A unit could attack it self. (self destruction)
-    <LI>Fixed bug: New units says again hello (from Fabrice Rossi).
-    <LI>Fixed bug: Unit placed twice in unit-cache. (end of resources)
-    <LI>Fixed bug: All units crossing coast plays docking sound (from Fabrice
-	Rossi).
-    <LI>Original speed is the default for the release
+    <LI>Added Alt-Buttons: second set of buttons are available on pressed Alt-key.
+    <LI>Fixed bug: Player are wrong assigned in campaign.
+    <LI><B>1.17pre1 build #18 released</B>
+    <LI>Multiplayer menus should now work. (from Ari)
+    <LI>The tips are only shown in the single player game.
+    <LI>Fixed bug #557954: Opponent's action markers are visible.
+    <LI>Fixed bug #440634: Sea Attack: Can't use transports.
+    <LI>Fixed bug #472075: Diplomacy over network.
+    <LI>Multiple viewports implementation separated completely from the old single-viewport one, reported bugs fixed. (from Latimerius)
+    <LI>Fixed bug #520492: Small map crashed with big screen.
+    <LI>Fixed bug #515713: Color didn't cycle continuos in buttons.
+    <LI>Fixed bug #422586: Lose a group on entering a building.
+    <LI>Multiple viewports support (from Latimerius).
+    <LI>New define-unit-type syntax for save/load/config.
+    <LI>Water effect intro screen.
+    <LI>Added support for complete campaign/level in a zip file or directory.
+    <LI>Scenario requester now remembers path during one game.
+    <LI>Fixed bug #547068: Damage indicators ignore fog-of-war.
+    <LI>New config option: Attacker can be revealed under fog of war, if they attack.
+    <LI>Fixed bug #233889: Could cancel wrong training slot over network.
+    <LI>Made campaigns menu configurable (Fixes also debian bug #143301).
+    <LI>Fixed endian and word size problem in new flac/ogg/mp3/wav code.
+    <LI>Removed hardcoded unit-types, spells and upgrades.
+    <LI>Added support for loading CCL files out of zip archive.
+    <LI>Fixed bug #542313: Sleep does not work with NEW_AI.
+    <LI>Added fog of war control to preferences. (from Nehal Mistry)
+    <LI>Added master, music, and cd volume control options. (from Nehal Mistry)
+    <LI>Added keyboard, mouse, and game speed options. (from Nehal Mistry)
+    <LI>More CD Audio fixes and optimizations. (from Nehal Mistry)
+    <LI>Added game stats screen after a level is played (from Jimmy Salmon).
+    <LI>Fixed bug #422167: Cursor in minimap not restricted (from Jimmy Salmon).
+    <LI><B>1.17pre1 build #17 released</B>
+    <LI>Added keyboard shortcuts to the options menus (from Jimmy Salmon).
+    <LI>Fixed bug #522203: F10 Menu doesn't completely dissappear.
+    <LI>Fixed bug #539093: Status line input not redrawn after menu.
+    <LI>Fixed bug #540121: Events retained between maps.
+    <LI>Fixed bug #416568: Timer has only a resolution of 10ms.
+    <LI>Added objective menu (from Jimmy Salmon).
+    <LI>Added showing picture between campaign levels (from Jimmy Salmon).
+    <LI>Improved triggers, they now support operator =,&lt;,&gt; (from Jimmy Salmon).
+    <LI>Added showing credits (from Jimmy Salmon).
+    <LI>Added select all flying units with ctrl rectangle.
+    <LI>Added select all ground units with alt rectangle.
+    <LI>Improved briefing scrolling text (from Jimmy Salmon).
+    <LI>New functions VideoTextHeight, clipping text (from Jimmy Salmon).
+    <LI>Added feature #443233: which makes the unit and missile sounds in stereo depending on their location on the screen (from Jimmy Salmon).
+    <LI>Added big map mode (ALT-B,CTRL-B).
+    <LI>Added name generations for units.
+    <LI>Fixed feature request #422244: Units in multiple groups (from Jimmy Salmon).
+    <LI>Added support for drawing clipped numbers.
+    <LI>Added showing the damage on the map. 
+    <LI>Fixed bug: Wrong error message "illegal level", if loading .cm maps for network play.
+    <LI>Fixed feature request #499301: Find idle workers (from Jimmy Salmon).
+    <LI>New video frame and game simulation timing code written. Closes bug #205006.
+    <LI>Fixed bug #537142: Crashes with flame shield attacking buildings.
+    <LI>Fixed some video locking problems.
+    <LI>Switch to full screen and back (ALT-F) now works also under windows.
+    <LI>Removed WaitAndKeepSync from GameLoop.
+    <LI>Network timeout didn't block mouse movement and scrolling.
+    <LI>Renamed FrameCounter to GameCycle.
+    <LI>Randomize startpositions of network play (from Daniel Burrows).
+    <LI>Ogg, mp3 audio format support added.
+    <LI>Split sound_server.c into wav.c, oss_audio.c and sdl_audio.c.
+    <LI>Linux sound driver now didn't block if dsp in use. Blocks if command line option -w is used.
+    <LI>Flac audio format support added.
+    <LI>Fixed many doxygen warnings.
+    <LI>Fixed bug: Units have wrong colors, if level is loaded with GUI.
+    <LI>Fixed bug: Add to selections with shift and rectangle didn't work.
+    <LI>Added display of orders after command for 2s.
+    <LI>Added display of orders if shift key is hold.
+    <LI>Fixed bug: Goal of unit to board is destroyed, didn't free reference.
+    <LI>Fixed bug: AI players shared the same sleep counter.
+    <LI>Added trigger for bringing rescued units to a point.
+    <LI>Rescued units keeps their player color.
+    <LI>CD player support with libcda. (from Nehal)
+    <LI>Fixed bug #498350: Goblin Sappers didn't support follow.
+    <LI>Applied FreeBSD patches from Flavio Silvestrow.
+    <LI>Added patrol command to flying scouts.
+    <LI><B>1.17pre1 build #16 released</B>
+    <LI>Ai player uses the eye of vision spell.
+    <LI>Added example for hold-click, if you hold the mouse button down, Ranges and orders are shown until next mouse click.
+    <LI>Show some statistics if no unit is selected.
+    <LI>Improved resource collection management for the AI.
+    <LI>AI aborts repair if target is destroyed or already repaired.
+    <LI>AI didn't try to repair buildings under enemy control.
+    <LI>Fixed bug: Scouts could rescue units.
+    <LI>More AI scripts written.
+    <LI>AI uses transporters.
+    <LI>New triggers added. Old goals removed. 
+    <LI>Add campaign support.
+    <LI>CD player support with SDL. (from Nehal)
+    <LI>Many documentation fixes. (from Ender)
+    <LI>First version of campaigns.
+    <LI>For a new level you don't have to leave freecraft. (Attention: looses memory)
+    <LI>First version of level briefing.
+    <LI>Fixed bug: AI could hang waiting on a force.
+    <LI>Player (struct _player_) source documentation written.
+    <LI>Made selection configurable with CCL.
+    <LI>New feature: Worker can capture defect buildings. (from David Slimp)
+    <LI>Improved installation documentation written by Alex.
+    <LI>Added food demand and supply to config files and load+save. (from Alex)
+    <LI>The food demand of units is shown in the status line. (from Alex)
+    <LI>Written new memory manager for missiles.
+    <LI>Fixed bug: Missiles are not syncron in the multiplayer game.
+    <LI>Fixed bug: Submarines are handled different in the multiplayer game.
+    <LI>Fixed: Flame Shield Spell.
+    <LI>Fixed bug: Unreachable deposits. (from Antonis Chaniotis)
+    <LI>Repaired the automatic build of complete version.
+    <LI>Converted libmodplug from C++ to C.
+    <LI>Fixed bug #439445: Training queue should cancel last unit.
+    <LI>Fixed bug #475716: Crash with null goal in action follow (from Tim Freeman).
+    <LI>Fixed bug: Wrong repair speed and costs (from Antonis Chaniotis).
+    <LI>Fixed bug: Wrong animations for workers with resource (from Antonis Chaniotis).
+    <LI>Cygwin/Mingw support fixed.
+    <LI>Some more config options (set-title-screen, set-color-cycle-all, set-fancy-buildings) are renamed to new style.
+    <LI>Fixed bug #463549: Towers don't display attack power.
+    <LI>Each AI cycle only three workers tries to repair a building. (from Antonis Chaniotis)
+    <LI>Better repair performance. (from Antonis Chaniotis)
+    <LI>Added zzip-lib support for puds, namely directory function for gui.
+    <LI>Some config options are renamed to new style.
+    <LI>Added new tileset configuration syntax.
+    <LI>Removed static tileset configuration.
+    <LI>Fixed bug: Some names are wrong for the swamp tileset.
+    <LI>Added support for mod/xm/... music files using libmodplug written by Kenton Varda and Olivier Lapique.
+    <LI>Fixed bug #443202: Oil patch lost if oil platform under construction is	destroyed.
+    <LI>Fixed bug #422077: Sounds in unexplored area.
+    <LI>Action follow now attacks if leader is not moving. (from Antonis Chaniotis)
+    <LI>Fixed bug: Workers always go to the nearest gold-mine and not to the selected. (from Antonis Chaniotis)
+    <LI>Fixed bug: Buttons are not refreshed, if unit is selected from a group over the info panel icon.
+    <LI>Fixed bug: Building under construction have a sight range.
+    <LI>Fixed bug: Same upgrade in different buildings.
+    <LI>Fixed bug: Increased incomes aren't reduced if builing was lost.
+    <LI>Showing how many gold/oil is in mine/oil-patch on map.
+    <LI>Fixed bug: XP (experience points) and unit kill counter overlapped by Units in a transporter.
+    <LI>Added showing mana of units inside of a transporter.
+    <LI>Removed support for old directory structure, now only the new directory	structure (NEW_NAMES) is supported.
+    <LI>Support for compiling without CCL removed by SDoL.
+    <LI>Removed RaceAdd and make race names configurable with CCL.
+    <LI>Image module removed, panel configuration handled with ui.
+    <LI>Fixed bug: #426589 Warning:low on resources, when I wasn't.
+    <LI>Let work automatic start harvest after building a lumber mill.
+    <LI>Fixed bug: Unit can follow self.
+    <LI>Fixed bug: Can't attack walls on map border.
+    <LI>Added showing how many units are in a transporter on map.
+    <LI>Health and mana sprites now supports left,center,right aligned.
+    <LI>Fixed health bar drawing position.
+    <LI>Renamed DestroyUnit to LetUnitDie, to make function clearer.
+    <LI>Added support for XP (experience points) and unit kill counter.
+    <LI>Stephan Rasenbergver changes for better 8bit palette support.
+    <LI>Fixed problems around uncommon map sizes (32x64,64x32,128x1024...).
+    <LI>License changed to GNU General Public License.
+    <LI>Added new feature: automatic hit point regeneration of all units from Jan Uerpmann.
+    <LI>Unit limits added, configurable with CCL.
+    <LI>Spells checks requirements before spell casting starts.
+    <LI>Showing progress of training, research, upgrade on map (with mana bar).
+    <LI>Submarine are now handled. Much fun fighting against this evil beasts.
+    <LI>Fixed bug: Rescue active computer player didn't have AI enabled.
+    <LI>Killing units now counts as points.
+    <LI>New AI now working better than the old, now default.
+    <LI>Player names are now setup and transfered over the network.
+    <LI>Fixed bug: Casting invisibilty/unholy armor on volatile units, they should explode.
+    <LI>Fixed bug: Polymorph over water, places a critter on water :).
+    <LI>Fixed bug: Units in training queues aren't upgraded. (Paladin,Ranger...)
+    <LI>Automatic groups added.
+    <LI>Added support for mouse clicks on icons of selections.
+    <LI>Fixed bug: Wrong mana cost for rune spell.
+    <LI>Fixed bug: Time for duration of spells is wrong.
+    <LI>Removed all %Zd in printf, not portable.
+    <LI>Fixed bug: Spell eye of k. could place more units on the same tile.
+    <LI>Fixed bug: Return goods aren't working and dumps core.
+    <LI>Fixed toggling fullscreen on/off with SDL 1.2.
+    <LI>Fixed grabbing mouse on/off with SDL 1.2.
+    <LI>Title screen now showed for 15s, interrupt it with any button/key press.
+    <LI>Mouse driver now supports single click, double click and hold button.
+    <LI>Event handling now supports call backs.
+    <LI>Fixed bug: Can't set attack exit point of buildings.
+    <LI>Repairing does now 8 hit points / repair cycle. (Better information?)
+    <LI>Upgrades now supports changing the unit-type of already build units.
+    <LI>Fixed bug: Spells hits unit without hitpoints, dumps core. (from Latimerius)
+    <LI>Fixed bug: demolish explosion hits units without hitpoints, dumps core. (from Latimerius)
+    <LI>Spell runes works now correct.
+    <LI>Spell blizzard handled more like the original.
+    <LI>Added decay of units, eye of k. and skeletons dies after some seconds.
+    <LI>Spell raise dead removes the corpse and works on adjacent fields.
+    <LI>Spell whirlwind now moves correct and did the correct damage on the correct position.
+    <LI>Spell death and decay handled now like original.
+    <LI>Fixed bug: Spell death coil could heal dying units.
+    <LI>Spells haste/slow and invisible have now an effect.
+    <LI>Set range of healing to 6 fields.
+    <LI>Fixed bug: Archives didn't contain all needed run time files.
+    <LI>Fixed bug: Known buildings under fog of war aren't shown on the minimap.
+    <LI>Fixed bug: Ships on oil patches can not be attacked.
+    <LI>Missiles could now have an area effect.
+    <LI>Fixed bug: Polymorph an unit who was just killed raises debug abort.
+    <LI>Fixed bug: Decoration of buildings under fog of war is shown.
+    <LI>Fixed bug: Units in the left or topmost row couldn't be reached.
+    <LI>Fixed bug: Haul oil dumps core, if running out of oil.
+    <LI>Fixed bug: Removing wood, rocks and walls isn't syncron over network.
+    <LI>Fixed bug: Demolish of rock looks wrong.
+    <LI>Fixed bug: Alt-x now works throughout menus (Old 'Q' is gone).
+    <LI>Fixed bug: Demolish didn't destroy buildings.
+    <LI>Patrolling units returns to patrol route, after attacking enemies.
+    <LI>Improved network code. More error checking. Player number bugfix.
+    <LI>Fixed bug: Unit does not return to starting point, if attacking.
+    <LI>Fixed bug: Worker repairing didn't turn to target.
+    <LI>Fixed bug: Repairing didn't work with network code.
+    <LI>Missile could now hits units always. Set range to zero.
+    <LI>Fixed bug: ShiftMessagesEvent overwrites memory. Found and fixed by Jan Uerpmann.
+    <LI>Fixed bug: Building buildings with 0 build time, dumps core. (/0)
+    <LI>Fixed bug: Attacking walls broken with new orders.
+    <LI>Removed old command code, only the new order code is now present.
+    <LI>Made buttons configurable (with CCL FreeCraft configuration language).
+    <LI>Made icons configurable (with CCL FreeCraft configuration language).
+    <LI>Let the AI workers only harvest reachable trees. (very great performance increase.)
+    <LI>Some more menu code for network menus - unfinished yet.
+    <LI>Updated to use doxygen 1.2.5.
+    <LI>Changed keyboard layout, all special keys must be pressed with ALT/CTRL.
+    <LI>Fixed bug: Wrong resources display, wrong format string.
+    <LI>Cursor module support now more than two races and is configurable with CCL.
+    <LI>Guile support removed, Gtk support removed.
+    <LI>Fixed bug: Cannon tower can't attack units near to it.
+	<UL>
+	<LI>Fixed bug: First screen isn't correct redrawn.
+	<LI>New feature: The menus are centered even on different resolutions.
+	<LI>Fog of war should be working correctly now when NEW_MAPDRAW is defined.  I also fixed a couple of redraw problems when drawing the selection rectangle or when units rotate when attacking.
+	<LI>I've made several code changes that fixed a few bugs.  Bug #213510 about buildings not appearing until the top left corner is visible should be fixed.
+	</UL>
+    <LI>Patches from Jimmy Salmon included:
+    <LI>Fixed bug: Wrong point for getting costs back, if canceling.
+    <LI>Fixed bug: Spell death coil hits dying unit, dumps core.
+    <LI>Fixed bug: Message "not enough mana to cast spell" too long.
+    <LI>Fixed bug: Unit redraw in the top row or far left column due to a signed/unsigned comparison. (From Jimmy Salmon)
+    <LI>Fixed bug: Green cross not drawn on map border. (from Jimmy Salmon)
+    <LI>Fixed bug: Rescue range too small.
+    <LI>Fixed bug: Attack cries are too often.
+    <LI>Fixed bug: firing missile outside of map.
+    <LI>Fixed bug: Cancel build of oil platform didn't place oil patch back.
+    <LI>Fixed compile without any CCL support.
+    <LI>Made a generic get resource function.
+    <LI>Fixed bug: Ships and Flyers moves correct.
+    <LI>Fixed bug: Platform didn't mark the map correct.
+    <LI>Corrected old path finder.
+    <LI>Changed wrong doc++/doxygen tags @returns to @return.
+    <LI>Fixed bug: level of some units not raised for new spells. (from Josef Spillner)
+    <LI>Fixed bug: loading critters into transporter, crashes.
+    <LI>Improved map drawing patches from Stephan Rasenbergver.
+    <LI>Hopefully fixed BZ2 API name change brain damage.
+    <LI>Spells now should work across network.
+    <LI>Network changes for messages, spells, and menus code.
+    <LI>BeOS port by Kenneth Sanislo.
+    <LI>Tileset handling less hardcoded.
+    <LI>Finished Opponents selection in Custom Game menu (reduce only!).
+    <LI>Finished Resources and Units selection in Custom Game menu.
+    <LI>Finished Race and Tileset selection in Custom Game menu.
+    <LI>Added Custom game settings (not used yet).
+    <LI>Added commands (color-cycle-all) and (no-color-cycle-all).
+    <LI>Fixed bug: Buttons aren't updated after upgrade/research/build.
+    <LI>Fixed bug: Building could be selected under fog of war.
+    <LI>Fixed bug: Selecting with shift more than one enemy or neutral unit.
+    <LI>Fixed bug: Right mouse click attacks neutral units.
+    <LI>Fixed bug: Cursor not show on the right or bottom border with SDL.
+    <LI>New spell code integrated from Cade.
+    <LI>Fixed bug: Mana costs display dumps core.
+    <LI>Added multiple messages and jump with space to event. (from Cade)
+    <LI>Select Scenario requester done.
+    <LI>New code for automatic target choose.
+    <LI>Removed old code for unit management and network.
+    <LI>New horizontal energy bars from Iuri Fiedoruk.
+    <LI>Enabled real 24bpp mode.
+    <LI>Implemented first part of Select Scenario requesters from Ari.
+    <LI>Prepared all calls for handling the new return codes of the pathfinder.
+    <LI>Command...Fast=1 removed, use now ResetPath.
+    <LI>Fixed bug: Repairing buildings already at max HP from David Slimp.
+    <LI>Fixed bug: buildings under construction couldn't be repaired from David Slimp.
+    <LI>Old heading code removed, better turning to target.
+    <LI>Fixed workers attack sounds and unorganic units death sounds from David Slimp.
+    <LI>Fixed bug: Now starts if compiled without sound and with CCL.
+    <LI>Cleanup of video code.
+    <LI>Fixed bug: Placement and removement of oil patch from David Slimp.
+    <LI>Network code finished, most bugs found, works now with firewalls.
+    <LI>Fixed bug: cancel gives back more than the unit/upgrade has cost.
+    <LI>Building of walls only in network game allowed.
+    <LI>Fixed bug: New network code, did not call win32 init.
+    <LI>Made fancy building configurable.
+    <LI>Fixed bug: cancel button, of set pending command didn't work.
+    <LI>Fixed bug: Attack ground didn't work.
+    <LI>'Q' is now the quit key, 'q' works no longer.
+    <LI>Burning buildings now play burning sound if selected.
+    <LI>Fixed bug: Building are not burning correct.
+    <LI>Missile code rewritten.
+    <LI>Heading code rewritten.
+    <LI>Fixed bug: can't upgrade axe-thrower to berserker.
+    <LI>Enemy handling rewritten, now supporting also allies.
+    <LI>Regenerating of berserker units written.
+    <LI>New network code ready, supporting internet and win32 play.
+    <LI>Command flush argument, now in the user input layer handled.
+    <LI>New unit allocation and unit reference handling.
+    <LI>Calculate better repair costs.
+    <LI>Fixed bug: cancel with full training queue, gives wrong cost back.
+    <LI>Fixed bug: corpse do attack.
+    <LI>Old function UnitConflicts removed.
+    <LI>Changed input polling of SDL version, should react better under load.
+    <LI>Not ready: New directory structure and filenames in data.
+    <LI>Wrote new corpse handling.
+    <LI>Removed old animation scripts handling.
+    <LI>Executable renamed to "freecraft".
+    <LI>Distribution archive renamed to "freecraft".
     </UL>
-<P><LI>Version 1.15
+<P><LI>1.16.1 released<P>
     <UL>
-    <LI>Applied patches: sound is distance dependent. (Fabrice Rossi)
-    <LI>Support for 15bit X11 server. (My new graphic card needs it)
-    <LI>Started moving unit code into own directory. 
-    <LI>Moved unit-type CCL code into own file.
-    <LI>Moved sound CCL code into own file.
-    <LI>UDTA section of puds are now parsed and supported.
-    <LI>Fixed bug: No goal. (from Patrick)
-    <LI>Applied patches: new sound configuration and api. (Fabrice Rossi)
-    <LI>Changed &lt;strings.h&gt; to &lt;string.h&gt; for glibc-2.1.
-    <LI>Applied patches from lokh:
+    <LI>The main CCL file "freecraft.ccl" first looked up in $HOME/.freecraft.
+    <LI>Fixed build.bat (from Ari)
+    <LI>Mythical and alliance user interface removed from main distribution.
+    <LI>Fixed bug: If Transporter killed, skeletts of passengers appears.
+    <LI>Fixed bug: compile with nosound option didn't work.
+    <LI>Fixed bug: Wrong text in upgrade.
+    <LI><B>1.16.1pre2 released</B>
+    <LI>Changed text handling now ~ is a command prefix. ~! = reverse,... See DrawText for the complete documentation.
+    <LI>Fixed bug: 24bpp video mode didn't work correct.
+    <LI>Fixed error messages in build.bat. (From Joachim)
+    <LI>Fixed bug: 8bpp and 32bpp video modes crashes. (From Mike Earl)
+    <LI>Updated setup script, cleaned up and more options. (From Josh+Dan)
+    <LI>Fixes the problem that if you cancel training on the last unit training the cancel button will remain. (From Josh)
+    <LI>Fixed bug: costs in statusline shows for everything the gold cost.
+    <LI>Added: reactivate the sound cancellation without glib. (From Fabrice)
+    <LI>Fixed bug: correct compression options in setup. (From Hensley)
+    <LI>Fixed bug: Acknowledge sounds are not played. (From Fabrice)
+    <LI>Moved endian stuff to central point "endian.h", changed the macros names. Support for SDL_endian.h with SDL.
+    <LI>Added support for 6 default resources. (new Ore, Stone and Coal)
+    <LI>Ari has rewritten LoadRLESprite, that it no longer use alloca.
+    <LI>Added CCL Configurable Scrolling Speed from Sean McMillan.
+    <LI>Patch from Dan Hensley for auto detection of SVGALINEAR.
+    <LI>Support for 640x480, 800x600, 1024x768, 1600x1200 videomodes.
+    <LI>User interface is now configurable (see data/ccl/ui.ccl)
+    <LI>Updated setup script from Dan Hensley.
+    <LI>Applied new patches from Ari.
+    <LI>Rewritten VideoCreatePalette.
+    <LI>Fixed wrong names in unitsound.c.
+    <LI>Fixed bug: wrong colors in mini-map.
+    <LI>Added grab mouse toggle with 'G'.
+    <LI>Included source setup script from  Dan Hensley.
+    <LI>Fixed bugs in video code, due 32bpp upgrade.
+    <LI>Removed the old Sprite declarations and functions.
+    <LI>unit-UnitsPool changed to UnitNumber(unit) (from Michael O'Reilly).
+    <LI>32bpp videomode patches from Michael O'Reilly applied.
+    <LI>Fixed bug: LoadTileset violates memory bounds.
+    <LI>Added support for new scrolling to svgalib version.
+    <LI>Fixed bug: Draw from smart cache, draws a scanline too much.
+    <LI>Removed the OldGraphic code, the new should work correct.
+    <LI>Removed the old line draw code, new should work correct.
+    <LI>Fixed bug: FontMeasureWidths violates memory bounds.
+    <LI>Added setting of contrast, brightness and saturation.
+    <LI>New scroll handling: Both keyboard and mouse scrolling are now handled by the same code, and you can now scroll diagonally with the keyboard. (from Sean McMillan)
+    <LI>Added display of command keys, for tutorial.
+    <LI>Added configurable regeneration of the forest.
+    <LI>Contrast, Brightness and Saturation now also to runtime changeable.
+    <LI>Fixed bug: Fog of war is wrong for 16 bpp video modes.
+    <LI>Corrected palette in score.png.
+    <LI>Fixed bug: wrong library path for SIOD under win32.
+    <LI>Fixed bug: Wrong damage displayed, if basic damage is zero.
+    <LI>Added icon for score contributed from Guardian.
+    <LI>CCL2 load now uses FreeCraftLibPath.
+    <LI>Upgrade/Unit dependency code rewritten.
+    <LI>Split upgrade.[ch] into depend.[ch] and upgrade.[ch].
     <UL>
-<LI>Gold mined, wood harvested and oil hauled is added to the player's
-    resources as soon as the peon/peasant reach the hall/mill/...
-    Note that this is the standard behaviour of w*rcr*ft 2.
-    This part generates a bunch of warnings from the AI saying that it
-    can't build a farm. This is just this: a warning. As soon as it is
-    possible (the peon gets out of the hall), the farm is builded.
-<LI>New memory management. The main memory array isn't used directly
-    anymore (except for debug message and network code), and the units
-    are accessed by arrays of pointers (the solution isn't currently
-    memory optimized, but this can be modified quite easily).
-    There are currently 3 kind of "lists": Used unit slots, free unit
-    slots, and a list of units used by each player.
-    This implies a bunch of (more or less) small changes through the
-    code...
-<LI>It's now possible to cancel the construction of a building.
-<LI>Now when a castle/keep/stronghold/../lumber mill/refinery is 
-    destroyed, the gold/wood/oil harvested is correctly adjusted.
-<LI>When a keep/stronghold/castle/fortress is constructed, gold/wood/oil
-    harvested is adjusted if necessary.
-<LI>I added ActionUnitConstructed test to UnitUnusable(): A building 
-    under construction can be considered unusable :). There is an
-    exception though when you select a building under construction with
-    the mouse.
-    For example, the peons harvesting wood were bringing it back to the
-    lumber mill under construction...
-<LI>In unit_find.c I added 2 functions FindUnitsByType() and 
-    FindPlayerUnitsByType(). These are general functions but used by the
-    AI code and building construction/destruction (halls/lumber mill/...)
-<LI>AiFindFreeWorkers now finds free workers.
-<LI>Various code cleanups, code optimizations, minor changes, and things
-    I forgot...
-<LI>ChangeUnitOwner() is now recursive. This is not important for w*rcr*ft but
-    it will be interesting for st*rcr*ft.
-<LI>Modified a couple of things in DestroyAllInside(), to speed up things in
-    special cases (transporters, construction...)
-<LI>Fixed a bug in DestroyUnit(): Units in transporters weren't destroyed
-    (although they were still "removed" from the map. There is still a problem
-    though, as the dead bodies of the units in the transporters are displayed.
-    Sorry I didn't look at this yet.
-<LI>The dead body animation is now displayed.
-<LI>Reworked the rectangle selection to match the one of w*rcr*ft 2:
-    Select a group of player's "mobile" units.
-    if none, select a construction from that player.
-    if still none, select a (random) neutral unit (critter, mine...)
-    if still none, select a (random) enemy unit.
+    <LI>New CCL functions "display-picture" and "process-menu".
+    <LI>LoadCursors and LoadImages rewritten to support multiple loads.
+    <LI>New default map: "default.cm" instead of "default.pud"
     </UL>
-    <LI>New tool written in C: wartool, includes all xxx2png in one file.
-    <LI>Fixed bug: Files from tool directory are not included in the
-	distribution.
-    <LI>Applied patches from Vladi.
-    <UL>
-<LI>MapField.SeenTile -- used for the wood/rocks last seen fog bug :)
-<LI>Macros MAPEXPLORED, MAPVISIBLE... added
-<LI>Fixed bug: Wood removing should be ok.
-<LI>Fixed bug: Fog of war should be ok.
-<LI>Fixed bug: Fixes seen wood bug.
-<LI>Added cheats -- for debug really :)
-<LI>Added TileTypeTables -- used to lookup what tile is what? i.e. which tiles
-    are woods, water,... required for the fog
-<LI>Rewritten DrawUnits
-<LI>Added Unit.rs which is filled by MakeUnit() with random number between 1
-    and 100, used for fancy buildings. `fancy buildings'! every building is
-    drawn randomly normal or flipped horizontally, so the your city will have
-    some buildings pointed to right and some to left! i.e. will not look
-    uniform.
-<LI>Fixed bug: in UnitVisible() for fog of war
-<LI>Added Now enemy buildings will look under the fog with the last 
-    seen frame (or will not show if you haven't seen them yet)
-    FIXME: if seen building under fog is ruined it will disappear
-<LI>Added DrawResources() shows food usage now.
-<LI>Added Unit.PendCommand, now TownHall and Barracks have `move', `stop',
-    `attack' and `harvest' commands ( and RightClick will do it ), which will
-    be applied auto to all new units.
-<LI>Fixed: `case 1...100' thing --&gt; with default:if(...&lt;100)                    
+    <LI>From Ari:
+    <LI>Fixed bug: Network sync clears too many bits. (from Michael O'Reilly)
+    <LI>Added MissileByIdent.
+    <LI>More configuration of mana and health display.
+    <LI>Renamed all scheme functions from "clone-" to "freecraft-".
+    <LI>Fixed bug: correct include file path for SDL_audio.h (from Cade)
+    <LI>Include print unit type table code only, if DEBUG is defined.
+    <LI>Added support for bz2 compressed png. (from Ari)
+    <LI>Fixed bug: Can't repair buildings under construction.
+    <LI>Fixed bug: units in the gold-mine could be attacked.
+    <LI>Added icon for food resource contributed from Guardian.
+    <LI>Fixed bug: in new video code, sign problems produce cores.
+    <LI>Make use of SDL_Sound.
+    <LI>Fixed bug: goblin zeppelin annoyed, not played.
+    <LI>I also enabled the threaded sound, if compiled with it.
+    <LI>Fixed bug: sound configuration couldn't be defined in CCL.
+    <LI>Removed glib use in sound_id.c, uses now etlib hash.
+    <LI>Fixed bug: tools/Makefile overwrites c files for gfx2png...
+    <LI>Add support for SIOD instead of GUILE.
+    <LI>Fixed bug: Long input line writes over right border.
+    <LI>Fixed bug: SDL port didn't support upper case character input.
+    <LI>Better build.bat script written for Win32.
+    <LI>Changes in WaitEventsAndKeepSync.
+    <LI>Gray text patch applied. (from Ari)
+    <LI>Fixed bug: XWarpPointer produces many unnecessary events.
+    <LI>Improved bz2lib and zlib support added. (from Ari)
+    <LI>Fixed bug: Ship cannon and armor upgrade shows no effect.
+    <LI>Fixed bug: Wrong tech tree for rangers and berserkers.
     </UL>
-    <LI>Rewritten DrawUnits, combined work.
-    <LI>Moved map.c minimap.c and tileset.c into own directory map.
-    <LI>Fixed bug: Map redrawn only for visible missiles. (from Fabrice Rossi).
-    <LI>Fixed bug: Buildings are now visible again without fog of war.
-    <LI>Applied patches from Vladi.
+<LI>1.16 released<P>
     <UL>
-    <LI>Units could have command queues.
-    <LI>Building could now train more units.
-    <LI>Walls are now converted into tileset.
-    <LI>Walls are now connected correct.
+    <LI>Input buffer size reduced, should now fit into line.
+    <LI>Changed: Units which stand still attacks now in reaction range.
+    <LI>Fixed bug: A unit with the command "stand ground" stands forever.
+    <LI>Fixed bug: AI dumps core, if all commands are processed.
+    <LI>Fixed bug: destroyed attacking towers shows destroyed water site image.
+    <LI>Fixed bug: Own units automatic attacks neutral units (from lokh).
+    <LI>Added patches from Ari: hooks for menus and first menus.
+    <UL>
+    <LI>Add some install targets.
+    <LI>Changed build.sh to use arguments instead of requiring you to hack the script itself.
+    <LI>Replace CLONE_LIB_PATH with CloneLibPath everywhere it occurs
+    <LI>Add a CloneLibPath variable (in clone/clone.c) to replace C_L_P
+    <LI>Add a -d argument to specify CLONE_LIB_PATH
     </UL>
-    <LI>Cache for tiles now source configurable.
-    <LI>Fixed bug: Outside map access in HandleMouseMove.
-    <LI>Faster map background drawing routines.
-    <LI>Map background drawing routines for all bpp.
-    <LI>Fixed bug: Area too big for CursorOnMap.
-    <LI>Add smart cache for map background drawing.
-    <LI>All the background drawing stuff could be compile time configured.
-    <LI>Added rock removing. (from Vladi)
-    <LI>Added demolish code. (from Vladi)
-    <LI>Add needed code for demolish.
-    <LI>Fixed bug: Attack or demolish moving target.
-    <LI>Dwarves and goblin sappers has no longer a corpse.
-    <LI>Make compilable without DEBUG defined.
-    <LI>Split map.c in more parts.
-    <LI>Add patches from Patrice.
+    <LI>Patches from Anthony Towns
+    <LI>Fixed bug: Patrolling units didn't attack the enemy.
+    <LI>Fixed bug: Continuous ***** NO FREE SLOT IN SOUND FIFO ***** (from Fabrice)
+    <LI>Fixed bug: attacked units blinks for ever.
+    <LI>Fixed bug: resource line not immediate update for new units.
+    <LI>Old code MOVE_MAP and ACTION_MAP are now removed.
+    <LI>Add command log file "command.log".
+    <LI>Cancel upgrade and research _should_ work with multiplayer.
+    <LI>Added patches from Ari.
+    <LI>Added to SDL version, old sound and network support.
+    <LI>Added 'A'...'Z' handling to SDL support.
+    <LI>Added fullscreen to SDL support.
+    <LI>Added Win32 support. (Sound, network is missing)
+    <LI>Added SDL support.
+    <LI>Changed WINDOW_WIDTH and WINDOW_HEIGHT to VideoWidth and VideoHeight.
+    <LI>Fixed bug: svgalib works wrong with 15 bit videomode.
+    <LI>Prepared removement of TheMap.MovementMap, all functions should now use the flags in TheMap.Fields.
+    <LI>Fixed bug: Oil well didn't show the correct frame if active.
+    <LI>Fixed bug: Building rune stone dumps debug core.
     <UL>
-    <LI>Moved selection stuff into own file.
-    <LI>Reorganized functions.
+    <LI>When a peon was chopping wood and was moved to another location, he was losing all wood he had, same thing when two peons chopped the same tree, the second to finish was losing all the wood.
+    <LI>More keys working ( svgalib.c )
+    <LI>Changeable mouse scale (svgalib.c)
+    <LI>Initial mouse position set to the middle of the screen ( svgalib.c )
     </UL>
-    <LI>Added new fog of war look.
-    <LI>Improved speed of fog of war.
-    <LI>New fog of war now runtime configurable.
-    <LI>Fixed bug: with build action queuing (from Vladi)
-    <LI>You can build a line of walls by pressing the SHIFT+ALT keys.
-    <LI>Fixed bug: computer units could get "flush".
-    <LI>Applied patches from Ari (Better -I and -L for other distributions)
-    <LI>Add patches from Patrice: Added selection of groups.
-    <LI>Added patches new AI code from Jon Gabrielson
-    <LI>Fixed bug: You can repair without money.
-    <LI>Fixed bug: Can build more units than food with building queues.
-    <LI>Added patches new AI code from Jon Gabrielson
+    <LI>From Jarek Sobieszek:
+    <LI>Made sound support optional (WITH_SOUND) to support ports without sound.
+    <LI>Fixed bug: Destroyed shore buildings shows wrong destroyed image.
+    <LI>Fixed bug: Window close button must exit/quit game. (from Ari)
+    <LI>Fixed bug: build.sh didn't link default pud.
     <UL>
-    <LI>Added pause and better quit sequences.
-    <LI>Changed FAST_DEBUG to cheat codes 'fast debug' and 'normal debug'
+    <LI>Fixed bug: CTRL ALT and SHIFT modifiers in svgalib
+    <LI>svgalib mouse bug #3 (mouse movement slowed so it's usable)
+    <LI>svgalib mouse bug #2 (mouse stays on screen)
+    <LI>svgalib mouse bug #1 (no more hardcoded MS mouse, reads the libvga.config)
+    <LI>Added svgalib non-linear support (so S3 chipsets work)
+    <LI>Fixed bug: Compiler warning `unit_ident' might be used uninitialized in	this function.
     </UL>
-    <LI>Fixed bug: 's' are now usable for the panel. save is now 'S'.
-    <LI>Fixed bug: ships play now an attacking sound.
-    <LI>Cleanup in the includes files (#ifndef ... #endif).
-    <LI>Fixed bug: Builded walls aren't really removed.
-    <LI>Fixed bug: Attacking units in reaction range, are now only weak targets.
-    <LI>Added patches for alpha port.
-    <LI>Fixed bug: When a new unit is selected the status bar isn't correctly
-	updated. (from Lokh)
-    <LI>Fixed bug: weak targets should now work.
-    <LI>Added upgrade+button patches (from Vladi)
-    <LI>Cleaned and reorganized the patches.
-    <LI>Added ShowOrders and show-orders.
-    <LI>Updated todo.html (from Vladi)
-    <LI>Moved "icons.c" from directory src/clone to src/ui.
-    <LI>Removed all "Icon..." defines, please use now IconConfig and IconByIdent
-    <LI>Changed Unit::Player from integer bitfield to pointer.
-    <LI>Added patches to compile under FreeBSD. (from Steinar)
-    <LI>Fixed bug: Foreign units now didn't acknowledge selection.
-    <LI>Fixed bug: Cancel train should now work correct.
-    <LI>Better and configurable middle mouse button (from Ari)
-    <LI>strdupa removed, didn't supported by libc5 (from Ari)
-    <LI>Added saturation for alpha fog of war (from Edgar)
-    </UL>
-<P><LI>Version 1.16
+    <LI>Patches from Kenneth Sanislo
+    <LI>Fixed bug: ballista and catapult can't enter transporter.
+    <LI>Added command line option -f and -t to adjust computer costs and build times.
+    <LI>Added support for svgalib from Jarek Sobieszek.
+    <LI>Fixed bug: The AI didn't build a hall, when enough workers exists.
+    <LI>Fixed bug: transporter(s) has no unload buttons.
+    <LI>Fixed bug: memory corruption by big maps.
+    <LI>Fixed bug: Chopping of wood on left or top map border (not 100%)
+    <LI>Changed input handling, improved interactive handling.
+    <LI>Fixed bug: play selecting sound for goldmines... (don't know if correct)
+    <LI>Added "set" buttons to gryphon aviary,gnomish inventor,dragon roost and goblin alchemist.
+    <LI>Fixed bug: Income effects should now work correct.
+    <LI>Fixed bug: Unit type aren't correct counted, if present in pud.
+    <LI>Fixed bug: Computer didn't use standing workers with gold/wood.
     <UL>
-    <LI>Added PowerPC patches from Ian Farmer.
-    <LI>Support for non expansion CD version, based on Stefan Dirsch wartool
-	patch.
-    <LI>Icons names must now be prefixed with "icon-" (arrow1 -> icon-arrow1)
-    <LI>Unit actions now shown with the buttons (still needs some work)
-    <LI>Corrected display of damage in middle panel.
-    <LI>Added fast scrolling with cursor keys and control.
-    <LI>Added support for bz2 compression library.
-    <LI>Fixed bug wrong frame for automatic attacks.
-    <LI>Rewritten input event loop.
-    <LI>Fixed bug construction could be attacked again.
-    <LI>Fixed bug clone crashes if an oil tanker tries to go into a oil well
-	that is still building
-    <LI>Fixed bug: upgrade costs are now shown correct.
-    <LI>Add -s n to set the sleep time for the AI.
-    <LI>Added "set" buttons to mage-tower.
-    <LI>Fixed bug: harvest uses to fast ComplexPath.
-    <LI>Fixed bug: can't reach shore building place.
-    <LI>Fixed bug: can't build in the last row or column.
-    <LI>Fixed bug: AI sleeps in some levels (no MainHall).
-    <LI>Fixed bug: Leaving goldmine without deposit.
-    <LI>Patches from Josh
-    <UL>
-	<LI>Fixed two constants so that you can load transporters.
-	<LI>Sound patch so that missing sounds don't crash clone.
+	<LI>Added a LoadPicture() function to handle full-screen picture (palette changes &co)
+	<LI>No fog of war for the peons in the mines.
     </UL>
     <LI>Patches from Lokh
     <UL>
-	<LI>No fog of war for the peons in the mines.
-	<LI>Added a LoadPicture() function to handle full-screen picture 
-	    (palette changes &co)
+	<LI>Sound patch so that missing sounds don't crash clone.
+	<LI>Fixed two constants so that you can load transporters.
     </UL>
-    <LI>Fixed bug: Computer didn't use standing workers with gold/wood.
-    <LI>Fixed bug: Unit type aren't correct counted, if present in pud.
-    <LI>Fixed bug: Income effects should now work correct.
-    <LI>Added "set" buttons to gryphon aviary,gnomish inventor,dragon roost
-	and goblin alchemist.
-    <LI>Fixed bug: play selecting sound for goldmines... (don't know if correct)
-    <LI>Changed input handling, improved interactive handling.
-    <LI>Fixed bug: Chopping of wood on left or top map border (not 100%)
-    <LI>Fixed bug: memory corruption by big maps.
-    <LI>Fixed bug: transporter(s) has no unload buttons.
-    <LI>Fixed bug: The AI didn't build a hall, when enough workers exists.
-    <LI>Added support for svgalib from Jarek Sobieszek.
-    <LI>Added command line option -f and -t to adjust computer costs and build
-	times.
-    <LI>Fixed bug: ballista and catapult can't enter transporter.
-    <LI>Patches from Kenneth Sanislo
+    <LI>Patches from Josh
+    <LI>Fixed bug: Leaving goldmine without deposit.
+    <LI>Fixed bug: AI sleeps in some levels (no MainHall).
+    <LI>Fixed bug: can't build in the last row or column.
+    <LI>Fixed bug: can't reach shore building place.
+    <LI>Fixed bug: harvest uses to fast ComplexPath.
+    <LI>Added "set" buttons to mage-tower.
+    <LI>Add -s n to set the sleep time for the AI.
+    <LI>Fixed bug: upgrade costs are now shown correct.
+    <LI>Fixed bug clone crashes if an oil tanker tries to go into a oil well that is still building
+    <LI>Fixed bug construction could be attacked again.
+    <LI>Rewritten input event loop.
+    <LI>Fixed bug wrong frame for automatic attacks.
+    <LI>Added support for bz2 compression library.
+    <LI>Added fast scrolling with cursor keys and control.
+    <LI>Corrected display of damage in middle panel.
+    <LI>Unit actions now shown with the buttons (still needs some work)
+    <LI>Icons names must now be prefixed with "icon-" (arrow1 -> icon-arrow1)
+    <LI>Support for non expansion CD version, based on Stefan Dirsch wartool patch.
+    <LI>Added PowerPC patches from Ian Farmer.
+    </UL>
+<P><LI>1.15 released<P>
     <UL>
-    <LI>Fixed bug: Compiler warning `unit_ident' might be used uninitialized in
-	this function.
-    <LI>Added svgalib non-linear support (so S3 chipsets work)
-    <LI>svgalib mouse bug #1 (no more hardcoded MS mouse, reads the
-	libvga.config)
-    <LI>svgalib mouse bug #2 (mouse stays on screen)
-    <LI>svgalib mouse bug #3 (mouse movement slowed so it's usable)
-    <LI>Fixed bug: CTRL ALT and SHIFT modifiers in svgalib
-    </UL>
-    <LI>Fixed bug: build.sh didn't link default pud.
-    <LI>Fixed bug: Window close button must exit/quit game. (from Ari)
-    <LI>Fixed bug: Destroyed shore buildings shows wrong destroyed image.
-    <LI>Made sound support optional (WITH_SOUND) to support ports without sound.
-    <LI>From Jarek Sobieszek:
+    <LI>Added saturation for alpha fog of war (from Edgar)
+    <LI>strdupa removed, didn't supported by libc5 (from Ari)
+    <LI>Better and configurable middle mouse button (from Ari)
+    <LI>Fixed bug: Cancel train should now work correct.
+    <LI>Fixed bug: Foreign units now didn't acknowledge selection.
+    <LI>Added patches to compile under FreeBSD. (from Steinar)
+    <LI>Changed Unit::Player from integer bitfield to pointer.
+    <LI>Removed all "Icon..." defines, please use now IconConfig and IconByIdent
+    <LI>Moved "icons.c" from directory src/clone to src/ui.
+    <LI>Updated todo.html (from Vladi)
+    <LI>Added ShowOrders and show-orders.
+    <LI>Cleaned and reorganized the patches.
+    <LI>Added upgrade+button patches (from Vladi)
+    <LI>Fixed bug: weak targets should now work.
+    <LI>Fixed bug: When a new unit is selected the status bar isn't correctly updated. (from Lokh)
+    <LI>Added patches for alpha port.
+    <LI>Fixed bug: Attacking units in reaction range, are now only weak targets.
+    <LI>Fixed bug: Builded walls aren't really removed.
+    <LI>Cleanup in the includes files (#ifndef ... #endif).
+    <LI>Fixed bug: ships play now an attacking sound.
+    <LI>Fixed bug: 's' are now usable for the panel. save is now 'S'.
     <UL>
-    <LI>Initial mouse position set to the middle of the screen ( svgalib.c )
-    <LI>Changeable mouse scale (svgalib.c)
-    <LI>More keys working ( svgalib.c )
-    <LI>When a peon was chopping wood and was moved to another location, he was
-    losing all wood he had, same thing when two peons chopped the same tree,
-    the second to finish was losing all the wood.
+    <LI>Changed FAST_DEBUG to cheat codes 'fast debug' and 'normal debug'
+    <LI>Added pause and better quit sequences.
     </UL>
-    <LI>Fixed bug: Building rune stone dumps debug core.
-    <LI>Fixed bug: Oil well didn't show the correct frame if active.
-    <LI>Prepared removement of TheMap.MovementMap, all functions should now use
-	the flags in TheMap.Fields.
-    <LI>Fixed bug: svgalib works wrong with 15 bit videomode.
-    <LI>Changed WINDOW_WIDTH and WINDOW_HEIGHT to VideoWidth and VideoHeight.
-    <LI>Added SDL support.
-    <LI>Added Win32 support. (Sound, network is missing)
-    <LI>Added fullscreen to SDL support.
-    <LI>Added 'A'...'Z' handling to SDL support.
-    <LI>Added to SDL version, old sound and network support.
-    <LI>Added patches from Ari.
-    <LI>Cancel upgrade and research _should_ work with multiplayer.
-    <LI>Add command log file "command.log".
-    <LI>Old code MOVE_MAP and ACTION_MAP are now removed.
-    <LI>Fixed bug: resource line not immediate update for new units.
-    <LI>Fixed bug: attacked units blinks for ever.
-    <LI>Fixed bug: Continuous ***** NO FREE SLOT IN SOUND FIFO ***** (from Fabrice)
-    <LI>Fixed bug: Patrolling units didn't attack the enemy.
-    <LI>Patches from Anthony Towns
+    <LI>Added patches new AI code from Jon Gabrielson
+    <LI>Fixed bug: Can build more units than food with building queues.
+    <LI>Fixed bug: You can repair without money.
+    <LI>Added patches new AI code from Jon Gabrielson
+    <LI>Add patches from Patrice: Added selection of groups.
+    <LI>Applied patches from Ari (Better -I and -L for other distributions)
+    <LI>Fixed bug: computer units could get "flush".
+    <LI>You can build a line of walls by pressing the SHIFT+ALT keys.
+    <LI>Fixed bug: with build action queuing (from Vladi)
+    <LI>New fog of war now runtime configurable.
+    <LI>Improved speed of fog of war.
+    <LI>Added new fog of war look.
     <UL>
-    <LI>Add a -d argument to specify CLONE_LIB_PATH
-    <LI>Add a CloneLibPath variable (in clone/clone.c) to replace C_L_P
-    <LI>Replace CLONE_LIB_PATH with CloneLibPath everywhere it occurs
-    <LI>Changed build.sh to use arguments instead of requiring you to
-	hack the script itself.
-    <LI>Add some install targets.
+    <LI>Reorganized functions.
+    <LI>Moved selection stuff into own file.
     </UL>
-    <LI>Added patches from Ari: hooks for menus and first menus.
-    <LI>Fixed bug: Own units automatic attacks neutral units (from lokh).
-    <LI>Fixed bug: destroyed attacking towers shows destroyed water site image.
-    <LI>Fixed bug: AI dumps core, if all commands are processed.
-    <LI>Fixed bug: A unit with the command "stand ground" stands forever.
-    <LI>Changed: Units which stand still attacks now in reaction range.
-    <LI>Input buffer size reduced, should now fit into line.
-    </UL>
-<P><LI>Version 1.16.1
+    <LI>Add patches from Patrice.
+    <LI>Split map.c in more parts.
+    <LI>Make compilable without DEBUG defined.
+    <LI>Dwarves and goblin sappers has no longer a corpse.
+    <LI>Fixed bug: Attack or demolish moving target.
+    <LI>Add needed code for demolish.
+    <LI>Added demolish code. (from Vladi)
+    <LI>Added rock removing. (from Vladi)
+    <LI>All the background drawing stuff could be compile time configured.
+    <LI>Add smart cache for map background drawing.
+    <LI>Fixed bug: Area too big for CursorOnMap.
+    <LI>Map background drawing routines for all bpp.
+    <LI>Faster map background drawing routines.
+    <LI>Fixed bug: Outside map access in HandleMouseMove.
+    <LI>Cache for tiles now source configurable.
     <UL>
-    <LI>Fixed bug: Wrong tech tree for rangers and berserkers.
-    <LI>Fixed bug: Ship cannon and armor upgrade shows no effect.
-    <LI>Improved bz2lib and zlib support added. (from Ari)
-    <LI>Fixed bug: XWarpPointer produces many unnecessary events.
-    <LI>Gray text patch applied. (from Ari)
-    <LI>Changes in WaitEventsAndKeepSync.
-    <LI>Better build.bat script written for Win32.
-    <LI>Fixed bug: SDL port didn't support upper case character input.
-    <LI>Fixed bug: Long input line writes over right border.
-    <LI>Add support for SIOD instead of GUILE.
-    <LI>Fixed bug: tools/Makefile overwrites c files for gfx2png...
-    <LI>Removed glib use in sound_id.c, uses now etlib hash.
-    <LI>Fixed bug: sound configuration couldn't be defined in CCL.
-    <LI>I also enabled the threaded sound, if compiled with it.
-    <LI>Fixed bug: goblin zeppelin annoyed, not played.
-    <LI>Make use of SDL_Sound.
-    <LI>Fixed bug: in new video code, sign problems produce cores.
-    <LI>Added icon for food resource contributed from Guardian.
-    <LI>Fixed bug: units in the gold-mine could be attacked.
-    <LI>Fixed bug: Can't repair buildings under construction.
-    <LI>Added support for bz2 compressed png. (from Ari)
-    <LI>Include print unit type table code only, if DEBUG is defined.
-    <LI>Fixed bug: correct include file path for SDL_audio.h (from Cade)
-    <LI>Renamed all scheme functions from "clone-" to "freecraft-".
-    <LI>More configuration of mana and health display.
-    <LI>Added MissileByIdent.
-    <LI>Fixed bug: Network sync clears too many bits. (from Michael O'Reilly)
-    <LI>From Ari:
-    <UL>
-    <LI>New default map: "default.cm" instead of "default.pud"
-    <LI>LoadCursors and LoadImages rewritten to support multiple loads.
-    <LI>New CCL functions "display-picture" and "process-menu".
+    <LI>Walls are now connected correct.
+    <LI>Walls are now converted into tileset.
+    <LI>Building could now train more units.
+    <LI>Units could have command queues.
     </UL>
-    <LI>Split upgrade.[ch] into depend.[ch] and upgrade.[ch].
-    <LI>Upgrade/Unit dependency code rewritten.
-    <LI>CCL2 load now uses FreeCraftLibPath.
-    <LI>Added icon for score contributed from Guardian.
-    <LI>Fixed bug: Wrong damage displayed, if basic damage is zero.
-    <LI>Fixed bug: wrong library path for SIOD under win32.
-    <LI>Corrected palette in score.png.
-    <LI>Fixed bug: Fog of war is wrong for 16 bpp video modes.
-    <LI>Contrast, Brightness and Saturation now also to runtime changeable.
-    <LI>Added configurable regeneration of the forest.
-    <LI>Added display of command keys, for tutorial.
-    <LI>New scroll handling: Both keyboard and mouse scrolling are now handled
-	by the same code, and you can now scroll diagonally with the keyboard.
-	(from Sean McMillan)
-    <LI>Added setting of contrast, brightness and saturation.
-    <LI>Fixed bug: FontMeasureWidths violates memory bounds.
-    <LI>Removed the old line draw code, new should work correct.
-    <LI>Removed the OldGraphic code, the new should work correct.
-    <LI>Fixed bug: Draw from smart cache, draws a scanline too much.
-    <LI>Added support for new scrolling to svgalib version.
-    <LI>Fixed bug: LoadTileset violates memory bounds.
-    <LI>32bpp videomode patches from Michael O'Reilly applied.
-    <LI>unit-UnitsPool changed to UnitNumber(unit) (from Michael O'Reilly).
-    <LI>Removed the old Sprite declarations and functions.
-    <LI>Fixed bugs in video code, due 32bpp upgrade.
-    <LI>Included source setup script from  Dan Hensley.
-    <LI>Added grab mouse toggle with 'G'.
-    <LI>Fixed bug: wrong colors in mini-map.
-    <LI>Fixed wrong names in unitsound.c.
-    <LI>Rewritten VideoCreatePalette.
-    <LI>Applied new patches from Ari.
-    <LI>Updated setup script from Dan Hensley.
-    <LI>User interface is now configurable (see data/ccl/ui.ccl)
-    <LI>Support for 640x480, 800x600, 1024x768, 1600x1200 videomodes.
-    <LI>Patch from Dan Hensley for auto detection of SVGALINEAR.
-    <LI>Added CCL Configurable Scrolling Speed from Sean McMillan.
-    <LI>Ari has rewritten LoadRLESprite, that it no longer use alloca.
-    <LI>Added support for 6 default resources. (new Ore, Stone and Coal)
-    <LI>Moved endian stuff to central point "endian.h", changed the macros
-	names. Support for SDL_endian.h with SDL.
-    <LI>Fixed bug: Acknowledge sounds are not played. (From Fabrice)
-    <LI>Fixed bug: correct compression options in setup. (From Hensley)
-    <LI>Added: reactivate the sound cancellation without glib. (From Fabrice)
-    <LI>Fixed bug: costs in statusline shows for everything the gold cost.
-    <LI>Fixes the problem that if you cancel training on the last unit training
-	the cancel button will remain. (From Josh)
-    <LI>Updated setup script, cleaned up and more options. (From Josh+Dan)
-    <LI>Fixed bug: 8bpp and 32bpp video modes crashes. (From Mike Earl)
-    <LI>Fixed error messages in build.bat. (From Joachim)
-    <LI>Fixed bug: 24bpp video mode didn't work correct.
-    <LI>Changed text handling now ~ is a command prefix. ~! = reverse,...
-	See DrawText for the complete documentation.
-    <LI><B>1.16.1pre2 -> final</B>
-    <LI>Fixed bug: Wrong text in upgrade.
-    <LI>Fixed bug: compile with nosound option didn't work.
-    <LI>Fixed bug: If Transporter killed, skeletts of passengers appears.
-    <LI>Mythical and alliance user interface removed from main distribution.
-    <LI>Fixed build.bat (from Ari)
-    <LI>The main CCL file "freecraft.ccl" first looked up in $HOME/.freecraft.
-    </UL>
-<P><LI>Version 1.17
+    <LI>Applied patches from Vladi.
+    <LI>Fixed bug: Buildings are now visible again without fog of war.
+    <LI>Fixed bug: Map redrawn only for visible missiles. (from Fabrice Rossi).
+    <LI>Moved map.c minimap.c and tileset.c into own directory map.
+    <LI>Rewritten DrawUnits, combined work.
     <UL>
-    <LI>Distribution archive renamed to "freecraft".
-    <LI>Executable renamed to "freecraft".
-    <LI>Removed old animation scripts handling.
-    <LI>Wrote new corpse handling.
-    <LI>Not ready: New directory structure and filenames in data.
-    <LI>Changed input polling of SDL version, should react better under load.
-    <LI>Old function UnitConflicts removed.
-    <LI>Fixed bug: corpse do attack.
-    <LI>Fixed bug: cancel with full training queue, gives wrong cost back.
-    <LI>Calculate better repair costs.
-    <LI>New unit allocation and unit reference handling.
-    <LI>Command flush argument, now in the user input layer handled.
-    <LI>New network code ready, supporting internet and win32 play.
-    <LI>Regenerating of berserker units written.
-    <LI>Enemy handling rewritten, now supporting also allies.
-    <LI>Fixed bug: can't upgrade axe-thrower to berserker.
-    <LI>Heading code rewritten.
-    <LI>Missile code rewritten.
-    <LI>Fixed bug: Building are not burning correct.
-    <LI>Burning buildings now play burning sound if selected.
-    <LI>'Q' is now the quit key, 'q' works no longer.
-    <LI>Fixed bug: Attack ground didn't work.
-    <LI>Fixed bug: cancel button, of set pending command didn't work.
-    <LI>Made fancy building configurable.
-    <LI>Fixed bug: New network code, did not call win32 init.
-    <LI>Building of walls only in network game allowed.
-    <LI>Fixed bug: cancel gives back more than the unit/upgrade has cost.
-    <LI>Network code finished, most bugs found, works now with firewalls.
-    <LI>Fixed bug: Placement and removement of oil patch from David Slimp.
-    <LI>Cleanup of video code.
-    <LI>Fixed bug: Now starts if compiled without sound and with CCL.
-    <LI>Fixed workers attack sounds and unorganic units death sounds from
-	David Slimp.
-    <LI>Old heading code removed, better turning to target.
-    <LI>Fixed bug: buildings under construction couldn't be repaired from
-	David Slimp.
-    <LI>Fixed bug: Repairing buildings already at max HP from David Slimp.
-    <LI>Command...Fast=1 removed, use now ResetPath.
-    <LI>Prepared all calls for handling the new return codes of the pathfinder.
-    <LI>Implemented first part of Select Scenario requesters from Ari.
-    <LI>Enabled real 24bpp mode.
-    <LI>New horizontal energy bars from Iuri Fiedoruk.
-    <LI>Removed old code for unit management and network.
-    <LI>New code for automatic target choose.
-    <LI>Select Scenario requester done.
-    <LI>Added multiple messages and jump with space to event. (from Cade)
-    <LI>Fixed bug: Mana costs display dumps core.
-    <LI>New spell code integrated from Cade.
-    <LI>Fixed bug: Cursor not show on the right or bottom border with SDL.
-    <LI>Fixed bug: Right mouse click attacks neutral units.
-    <LI>Fixed bug: Selecting with shift more than one enemy or neutral unit.
-    <LI>Fixed bug: Building could be selected under fog of war.
-    <LI>Fixed bug: Buttons aren't updated after upgrade/research/build.
-    <LI>Added commands (color-cycle-all) and (no-color-cycle-all).
-    <LI>Added Custom game settings (not used yet).
-    <LI>Finished Race and Tileset selection in Custom Game menu.
-    <LI>Finished Resources and Units selection in Custom Game menu.
-    <LI>Finished Opponents selection in Custom Game menu (reduce only!).
-    <LI>Tileset handling less hardcoded.
-    <LI>BeOS port by Kenneth Sanislo.
-    <LI>Network changes for messages, spells, and menus code.
-    <LI>Spells now should work across network.
-    <LI>Hopefully fixed BZ2 API name change brain damage.
-    <LI>Improved map drawing patches from Stephan Rasenbergver.
-    <LI>Fixed bug: loading critters into transporter, crashes.
-    <LI>Fixed bug: level of some units not raised for new spells.
-	(from Josef Spillner)
-    <LI>Changed wrong doc++/doxygen tags @returns to @return.
-    <LI>Corrected old path finder.
-    <LI>Fixed bug: Platform didn't mark the map correct.
-    <LI>Fixed bug: Ships and Flyers moves correct.
-    <LI>Made a generic get resource function.
-    <LI>Fixed compile without any CCL support.
-    <LI>Fixed bug: Cancel build of oil platform didn't place oil patch back.
-    <LI>Fixed bug: firing missile outside of map.
-    <LI>Fixed bug: Attack cries are too often.
-    <LI>Fixed bug: Rescue range too small.
-    <LI>Fixed bug: Green cross not drawn on map border. (from Jimmy Salmon)
-    <LI>Fixed bug: Unit redraw in the top row or far left column due to a
-	signed/unsigned comparison. (From Jimmy Salmon)
-    <LI>Fixed bug: Message "not enough mana to cast spell" too long.
-    <LI>Fixed bug: Spell death coil hits dying unit, dumps core.
-    <LI>Fixed bug: Wrong point for getting costs back, if canceling.
-    <LI>Patches from Jimmy Salmon included:
-	<UL>
-	<LI>I've made several code changes that fixed a few bugs.  Bug #213510
-	    about buildings not appearing until the top left corner is visible
-	    should be fixed. 
-	<LI>Fog of war should be working correctly now when NEW_MAPDRAW is
-	    defined.  I also fixed a couple of redraw problems when drawing
-	    the selection rectangle or when units rotate when attacking.
-	<LI>New feature: The menus are centered even on different resolutions.
-	<LI>Fixed bug: First screen isn't correct redrawn.
-	</UL>
-    <LI>Fixed bug: Cannon tower can't attack units near to it.
-    <LI>Guile support removed, Gtk support removed.
-    <LI>Cursor module support now more than two races and is configurable with
-	CCL.
-    <LI>Fixed bug: Wrong resources display, wrong format string.
-    <LI>Changed keyboard layout, all special keys must be pressed with ALT/CTRL.
-    <LI>Updated to use doxygen 1.2.5.
-    <LI>Some more menu code for network menus - unfinished yet.
-    <LI>Let the AI workers only harvest reachable trees. (very great
-	performance increase.)
-    <LI>Made icons configurable (with CCL FreeCraft configuration language).
-    <LI>Made buttons configurable (with CCL FreeCraft configuration language).
-    <LI>Removed old command code, only the new order code is now present.
-    <LI>Fixed bug: Attacking walls broken with new orders.
-    <LI>Fixed bug: Building buildings with 0 build time, dumps core. (/0)
-    <LI>Fixed bug: ShiftMessagesEvent overwrites memory. Found and fixed by
-	Jan Uerpmann.
-    <LI>Missile could now hits units always. Set range to zero.
-    <LI>Fixed bug: Repairing didn't work with network code.
-    <LI>Fixed bug: Worker repairing didn't turn to target.
-    <LI>Fixed bug: Unit does not return to starting point, if attacking.
-    <LI>Improved network code. More error checking. Player number bugfix.
-    <LI>Patrolling units returns to patrol route, after attacking enemies.
-    <LI>Fixed bug: Demolish didn't destroy buildings.
-    <LI>Fixed bug: Alt-x now works throughout menus (Old 'Q' is gone).
-    <LI>Fixed bug: Demolish of rock looks wrong.
-    <LI>Fixed bug: Removing wood, rocks and walls isn't syncron over network.
-    <LI>Fixed bug: Haul oil dumps core, if running out of oil.
-    <LI>Fixed bug: Units in the left or topmost row couldn't be reached.
-    <LI>Fixed bug: Decoration of buildings under fog of war is shown.
-    <LI>Fixed bug: Polymorph an unit who was just killed raises debug abort.
-    <LI>Missiles could now have an area effect.
-    <LI>Fixed bug: Ships on oil patches can not be attacked.
-    <LI>Fixed bug: Known buildings under fog of war aren't shown on the minimap.
-    <LI>Fixed bug: Archives didn't contain all needed run time files.
-    <LI>Set range of healing to 6 fields.
-    <LI>Spells haste/slow and invisible have now an effect.
-    <LI>Fixed bug: Spell death coil could heal dying units.
-    <LI>Spell death and decay handled now like original.
-    <LI>Spell whirlwind now moves correct and did the correct damage on the
-	correct position.
-    <LI>Spell raise dead removes the corpse and works on adjacent fields.
-    <LI>Added decay of units, eye of k. and skeletons dies after some seconds.
-    <LI>Spell blizzard handled more like the original.
-    <LI>Spell runes works now correct.
-    <LI>Fixed bug: demolish explosion hits units without hitpoints, dumps core.
-	(from Latimerius)
-    <LI>Fixed bug: Spells hits unit without hitpoints, dumps core.
-	(from Latimerius)
-    <LI>Upgrades now supports changing the unit-type of already build units.
-    <LI>Repairing does now 8 hit points / repair cycle. (Better information?)
-    <LI>Fixed bug: Can't set attack exit point of buildings.
-    <LI>Event handling now supports call backs.
-    <LI>Mouse driver now supports single click, double click and hold button.
-    <LI>Title screen now showed for 15s, interrupt it with any button/key press.
-    <LI>Fixed grabbing mouse on/off with SDL 1.2.
-    <LI>Fixed toggling fullscreen on/off with SDL 1.2.
-    <LI>Fixed bug: Return goods aren't working and dumps core.
-    <LI>Fixed bug: Spell eye of k. could place more units on the same tile.
-    <LI>Removed all %Zd in printf, not portable.
-    <LI>Fixed bug: Time for duration of spells is wrong.
-    <LI>Fixed bug: Wrong mana cost for rune spell.
-    <LI>Added support for mouse clicks on icons of selections.
-    <LI>Automatic groups added.
-    <LI>Fixed bug: Units in training queues aren't upgraded. (Paladin,Ranger...)
-    <LI>Fixed bug: Polymorph over water, places a critter on water :).
-    <LI>Fixed bug: Casting invisibilty/unholy armor on volatile units, they
-	should explode.
-    <LI>Player names are now setup and transfered over the network.
-    <LI>New AI now working better than the old, now default.
-    <LI>Killing units now counts as points.
-    <LI>Fixed bug: Rescue active computer player didn't have AI enabled.
-    <LI>Submarine are now handled. Much fun fighting against this evil beasts.
-    <LI>Showing progress of training, research, upgrade on map (with mana bar).
-    <LI>Spells checks requirements before spell casting starts.
-    <LI>Unit limits added, configurable with CCL.
-    <LI>Added new feature: automatic hit point regeneration of all units from
-	Jan Uerpmann.
-    <LI>License changed to GNU General Public License.
-    <LI>Fixed problems around uncommon map sizes (32x64,64x32,128x1024...).
-    <LI>Stephan Rasenbergver changes for better 8bit palette support.
-    <LI>Added support for XP (experience points) and unit kill counter.
-    <LI>Renamed DestroyUnit to LetUnitDie, to make function clearer.
-    <LI>Fixed health bar drawing position.
-    <LI>Health and mana sprites now supports left,center,right aligned.
-    <LI>Added showing how many units are in a transporter on map.
-    <LI>Fixed bug: Can't attack walls on map border.
-    <LI>Fixed bug: Unit can follow self.
-    <LI>Let work automatic start harvest after building a lumber mill.
-    <LI>Fixed bug: #426589 Warning:low on resources, when I wasn't.
-    <LI>Image module removed, panel configuration handled with ui.
-    <LI>Removed RaceAdd and make race names configurable with CCL.
-    <LI>Support for compiling without CCL removed by SDoL.
-    <LI>Removed support for old directory structure, now only the new directory
-	structure (NEW_NAMES) is supported.
-    <LI>Added showing mana of units inside of a transporter.
-    <LI>Fixed bug: XP (experience points) and unit kill counter overlapped by
-	Units in a transporter.
-    <LI>Showing how many gold/oil is in mine/oil-patch on map.
-    <LI>Fixed bug: Increased incomes aren't reduced if builing was lost.
-    <LI>Fixed bug: Same upgrade in different buildings.
-    <LI>Fixed bug: Building under construction have a sight range.
-    <LI>Fixed bug: Buttons are not refreshed, if unit is selected from a group
-	over the info panel icon.
-    <LI>Fixed bug: Workers always go to the nearest gold-mine and not to the
-	selected. (from Antonis Chaniotis)
-    <LI>Action follow now attacks if leader is not moving. (from Antonis
-	Chaniotis)
-    <LI>Fixed bug #422077: Sounds in unexplored area.
-    <LI>Fixed bug #443202: Oil patch lost if oil platform under construction is
-	destroyed.
-    <LI>Added support for mod/xm/... music files using libmodplug written by
-	Kenton Varda and Olivier Lapique.
-    <LI>Fixed bug: Some names are wrong for the swamp tileset.
-    <LI>Removed static tileset configuration.
-    <LI>Added new tileset configuration syntax.
-    <LI>Some config options are renamed to new style.
-    <LI>Added zzip-lib support for puds, namely directory function for gui.
-    <LI>Better repair performance. (from Antonis Chaniotis)
-    <LI>Each AI cycle only three workers tries to repair a building.
-	(from Antonis Chaniotis)
-    <LI>Fixed bug #463549: Towers don't display attack power.
-    <LI>Some more config options (set-title-screen, set-color-cycle-all,
-	set-fancy-buildings) are renamed to new style.
-    <LI>Cygwin/Mingw support fixed.
-    <LI>Fixed bug: Wrong animations for workers with resource
-	(from Antonis Chaniotis).
-    <LI>Fixed bug: Wrong repair speed and costs (from Antonis Chaniotis).
-    <LI>Fixed bug #475716: Crash with null goal in action follow
-	(from Tim Freeman).
-    <LI>Fixed bug #439445: Training queue should cancel last unit.
-    <LI>Converted libmodplug from C++ to C.
-    <LI>Repaired the automatic build of complete version.
-    <LI>Fixed bug: Unreachable deposits. (from Antonis Chaniotis)
-    <LI>Fixed: Flame Shield Spell.
-    <LI>Fixed bug: Submarines are handled different in the multiplayer game.
-    <LI>Fixed bug: Missiles are not syncron in the multiplayer game.
-    <LI>Written new memory manager for missiles.
-    <LI>The food demand of units is shown in the status line. (from Alex)
-    <LI>Added food demand and supply to config files and load+save. (from Alex)
-    <LI>Improved installation documentation written by Alex.
-    <LI>New feature: Worker can capture defect buildings. (from David Slimp)
-    <LI>Made selection configurable with CCL.
-    <LI>Player (struct _player_) source documentation written.
-    <LI>Fixed bug: AI could hang waiting on a force.
-    <LI>First version of level briefing.
-    <LI>For a new level you don't have to leave freecraft. (Attention: looses
-	memory)
-    <LI>First version of campaigns.
-    <LI>Many documentation fixes. (from Ender)
-    <LI>CD player support with SDL. (from Nehal)
-    <LI>Add campaign support.
-    <LI>New triggers added. Old goals removed. 
-    <LI>AI uses transporters.
-    <LI>More AI scripts written.
-    <LI>Fixed bug: Scouts could rescue units.
-    <LI>AI didn't try to repair buildings under enemy control.
-    <LI>AI aborts repair if target is destroyed or already repaired.
-    <LI>Improved resource collection management for the AI.
-    <LI>Show some statistics if no unit is selected.
-    <LI>Added example for hold-click, if you hold the mouse button down,
-	Ranges and orders are shown until next mouse click.
-    <LI>Ai player uses the eye of vision spell.
-    <LI><B>1.17pre1 build #17</B>
-    <LI>Added patrol command to flying scouts.
-    <LI>Applied FreeBSD patches from Flavio Silvestrow.
-    <LI>Fixed bug #498350: Goblin Sappers didn't support follow.
-    <LI>CD player support with libcda. (from Nehal)
-    <LI>Rescued units keeps their player color.
-    <LI>Added trigger for bringing rescued units to a point.
-    <LI>Fixed bug: AI players shared the same sleep counter.
-    <LI>Fixed bug: Goal of unit to board is destroyed, didn't free reference.
-    <LI>Added display of orders if shift key is hold.
-    <LI>Added display of orders after command for 2s.
-    <LI>Fixed bug: Add to selections with shift and rectangle didn't work.
-    <LI>Fixed bug: Units have wrong colors, if level is loaded with GUI.
-    <LI>Fixed many doxygen warnings.
-    <LI>Flac audio format support added.
-    <LI>Linux sound driver now didn't block if dsp in use. Blocks if command
-	line option -w is used.
-    <LI>Split sound_server.c into wav.c, oss_audio.c and sdl_audio.c.
-    <LI>Ogg, mp3 audio format support added.
-    <LI>Randomize startpositions of network play (from Daniel Burrows).
-    <LI>Renamed FrameCounter to GameCycle.
-    <LI>Network timeout didn't block mouse movement and scrolling.
-    <LI>Removed WaitAndKeepSync from GameLoop.
-    <LI>Switch to full screen and back (ALT-F) now works also under windows.
-    <LI>Fixed some video locking problems.
-    <LI>Fixed bug #537142: Crashes with flame shield attacking buildings.
-    <LI>New video frame and game simulation timing code written. Closes bug
-	#205006.
-    <LI>Fixed feature request #499301: Find idle workers (from Jimmy Salmon).
-    <LI>Fixed bug: Wrong error message "illegal level", if loading .cm maps for		network play.
-    <LI>Added showing the damage on the map. 
-    <LI>Added support for drawing clipped numbers.
-    <LI>Fixed feature request #422244: Units in multiple groups (from Jimmy
-	Salmon).
-    <LI>Added name generations for units.
-    <LI>Added big map mode (ALT-B,CTRL-B).
-    <LI>Added feature #443233: which makes the unit and missile sounds in
-	stereo depending on their location on the screen (from Jimmy Salmon).
-    <LI>New functions VideoTextHeight, clipping text (from Jimmy Salmon).
-    <LI>Improved briefing scrolling text (from Jimmy Salmon).
-    <LI>Added select all ground units with alt rectangle.
-    <LI>Added select all flying units with ctrl rectangle.
-    <LI>Added showing credits (from Jimmy Salmon).
-    <LI>Improved triggers, they now support operator =,&lt;,&gt; (from Jimmy Salmon).
-    <LI>Added showing picture between campaign levels (from Jimmy Salmon).
-    <LI>Added objective menu (from Jimmy Salmon).
-    <LI>Fixed bug #416568: Timer has only a resolution of 10ms.
-    <LI>Fixed bug #540121: Events retained between maps.
-    <LI>Fixed bug #539093: Status line input not redrawn after menu.
-    <LI>Fixed bug #522203: F10 Menu doesn't completely dissappear.
-    <LI>Added keyboard shortcuts to the options menus (from Jimmy Salmon).
-    <LI><B>1.17pre1 build #18</B>
-    <LI>Fixed bug #422167: Cursor in minimap not restricted (from Jimmy Salmon).
-    <LI>Added game stats screen after a level is played (from Jimmy Salmon).
-    <LI>More CD Audio fixes and optimizations. (from Nehal Mistry)
-    <LI>Added keyboard, mouse, and game speed options. (from Nehal Mistry)
-    <LI>Added master, music, and cd volume control options. (from Nehal Mistry)
-    <LI>Added fog of war control to preferences. (from Nehal Mistry)
-    <LI>Fixed bug #542313: Sleep does not work with NEW_AI.
-    <LI>Added support for loading CCL files out of zip archive.
-    <LI>Removed hardcoded unit-types, spells and upgrades.
-    <LI>Fixed endian and word size problem in new flac/ogg/mp3/wav code.
-    <LI>Made campaigns menu configurable (Fixes also debian bug #143301).
-    <LI>Fixed bug #233889: Could cancel wrong training slot over network.
-    <LI>New config option: Attacker can be revealed under fog of war, if they
-	attack.
-    <LI>Fixed bug #547068: Damage indicators ignore fog-of-war.
-    <LI>Scenario requester now remembers path during one game.
-    <LI>Added support for complete campaign/level in a zip file or directory.
-    <LI>Water effect intro screen.
-    <LI>New define-unit-type syntax for save/load/config.
-    <LI>Multiple viewports support (from Latimerius).
-    <LI>Fixed bug #422586: Lose a group on entering a building.
-    <LI>Fixed bug #515713: Color didn't cycle continuos in buttons.
-    <LI>Fixed bug #520492: Small map crashed with big screen.
-    <LI>Multiple viewports implementation separated completely from the old
-	single-viewport one, reported bugs fixed. (from Latimerius)
-    <LI>Fixed bug #472075: Diplomacy over network.
-    <LI>Fixed bug #440634: Sea Attack: Can't use transports.
-    <LI>Fixed bug #557954: Opponent's action markers are visible.
-    <LI>The tips are only shown in the single player game.
-    <LI>Multiplayer menus should now work. (from Ari)
-    <LI><B>Final</B>
-    <LI>Fixed bug: Player are wrong assigned in campaign.
-    <LI>Added Alt-Buttons: second set of buttons are available on 
-        pressed Alt-key.
+<LI>Fixed: `case 1...100' thing --&gt; with default:if(...&lt;100)                    
+<LI>Added Unit.PendCommand, now TownHall and Barracks have `move', `stop', `attack' and `harvest' commands ( and RightClick will do it ), which will be applied auto to all new units.
+<LI>Added DrawResources() shows food usage now.
+<LI>Added Now enemy buildings will look under the fog with the last seen frame (or will not show if you haven't seen them yet) FIXME: if seen building under fog is ruined it will disappear
+<LI>Fixed bug: in UnitVisible() for fog of war
+<LI>Added Unit.rs which is filled by MakeUnit() with random number between 1 and 100, used for fancy buildings. `fancy buildings'! every building is drawn randomly normal or flipped horizontally, so the your city will have some buildings pointed to right and some to left! i.e. will not look uniform.
+<LI>Rewritten DrawUnits
+<LI>Added TileTypeTables -- used to lookup what tile is what? i.e. which tiles are woods, water,... required for the fog
+<LI>Added cheats -- for debug really :)
+<LI>Fixed bug: Fixes seen wood bug.
+<LI>Fixed bug: Fog of war should be ok.
+<LI>Fixed bug: Wood removing should be ok.
+<LI>Macros MAPEXPLORED, MAPVISIBLE... added
+<LI>MapField.SeenTile -- used for the wood/rocks last seen fog bug :)
     </UL>
-<P><LI>Version 1.17.1
+    <LI>Applied patches from Vladi.
+    <LI>Fixed bug: Files from tool directory are not included in the distribution.
+    <LI>New tool written in C: wartool, includes all xxx2png in one file.
     <UL>
-    <LI><B>1.17.1pre1</B>
-    <LI>Fixed bug: Wrapper script loses all command line options
-	(from Josef Spillner).
-    <LI>MacOS compile fixed and project builder project added (from Ben Hines).
-    <LI>Fixed bug: Server now sends the map path relative to the data 
-	directory (from Jimmy Salmon).
-    <LI>Fixed bug #561203: Who is speaking in 3 player game (from Jimmy Salmon).
-    <LI>Fixed bug: Chat messages that are too wide are wrapped (from
-	Jimmy Salmon).
-    <LI>Fixed bug: Right clicking a wall will attack it now (from Jimmy Salmon).
-    <LI>Fixed bug #562444: Disable fog of war in menus in net game (from
-	Jimmy Salmon).
-    <LI>Implemented task #38320: Making screen shots (from Jimmy Salmon).
-    <LI>Fixed bug #528207: Fog of war is not correct (from Jimmy Salmon).
-    <LI>Fixed bug in server menu where the Start Game button was deactivated
-	(from Jimmy Salmon).
-    <LI>Added ALT+CTRL+S to save the current level as pud "freecraft.pud.gz".
-    <LI>Fixed bug #562548: Number of opponents doesn't matter (from
-	Jimmy Salmon).
-    <LI>Added support for repeating keys in input fields (from Jimmy Salmon).
-    <LI>Old command line network setup api is gone.
-    <LI>Fixed bug: Harvest corrupts memory.
-    <LI>Fixed bug: Garbage collector frees too much.
-    <LI>Fixed bug: Menus weren't drawn correctly causing the cursor to flicker
-	(from Jimmy Salmon).
-    <LI>Fixed bug: Server setup screen shows the pulldown again if a player
-	leaves (from Jimmy Salmon).
-    <LI>Added Load + Save Menus (from Nehal Mistry).
-    <LI>Fixed bug: #443203: Mouse pointer not updated when scrolling with
-	keyboard (from Nehal Mistry).
-    <LI>Fixed bug #568071: Crash after Master-Volume toggle (from ari).
-    <LI>Added ALT-R, CTRL-R to restart the scenario (from Jimmy Salmon).
-    <LI>Menus are configurable from CCL (basic patch from Kachalov Anton, than
-	continue from all).
-    <LI>Fixed credit cursor extraction with wartool (from Kachalov Anton).
-    <LI>Fixed bug: Syncron random seed and hash not initialized.
-    <LI>Fixed clients menus of setup multiplayer game.
-    <LI>Disabled select scenario after player have joined.
-    <LI>Fixed bug: Teleported units aren't removed from map before teleport.
-    <LI>Fixed bug: Oil platform can't be placed in snapshots.
-    <LI>Fixed bug: Units with zero sightrange see 1 tile.
-    <LI><B>Final</B>
-    <LI>Fixed bug #570475: 'Next tip' causes segmentation fault (from
-	Jimmy Salmon).
-    <LI>Fixed bug: Can capture only enemy buildings.
-    <LI>Capture building is disabled as default.
-    <LI>An in the engine integrated editor is now available (from Jimmy, Johns
-	and Cade)
-    <LI>Added Global Options, can change resolution, fog mode, and 
-	fullscreen mode.
+<LI>Reworked the rectangle selection to match the one of w*rcr*ft 2: Select a group of player's "mobile" units. if none, select a construction from that player. if still none, select a (random) neutral unit (critter, mine...) if still none, select a (random) enemy unit.
+<LI>The dead body animation is now displayed.
+<LI>Fixed a bug in DestroyUnit(): Units in transporters weren't destroyed (although they were still "removed" from the map. There is still a problem though, as the dead bodies of the units in the transporters are displayed. Sorry I didn't look at this yet.
+<LI>Modified a couple of things in DestroyAllInside(), to speed up things in special cases (transporters, construction...)
+<LI>ChangeUnitOwner() is now recursive. This is not important for w*rcr*ft but it will be interesting for st*rcr*ft.
+<LI>Various code cleanups, code optimizations, minor changes, and things I forgot...
+<LI>AiFindFreeWorkers now finds free workers.
+<LI>In unit_find.c I added 2 functions FindUnitsByType() and FindPlayerUnitsByType(). These are general functions but used by the AI code and building construction/destruction (halls/lumber mill/...)
+<LI>I added ActionUnitConstructed test to UnitUnusable(): A building under construction can be considered unusable :). There is an exception though when you select a building under construction with the mouse. For example, the peons harvesting wood were bringing it back to the lumber mill under construction...
+<LI>When a keep/stronghold/castle/fortress is constructed, gold/wood/oil harvested is adjusted if necessary.
+<LI>Now when a castle/keep/stronghold/../lumber mill/refinery is destroyed, the gold/wood/oil harvested is correctly adjusted.
+<LI>It's now possible to cancel the construction of a building.
+<LI>New memory management. The main memory array isn't used directly anymore (except for debug message and network code), and the units are accessed by arrays of pointers (the solution isn't currently memory optimized, but this can be modified quite easily). There are currently 3 kind of "lists": Used unit slots, free unit slots, and a list of units used by each player. This implies a bunch of (more or less) small changes through the code...
+<LI>Gold mined, wood harvested and oil hauled is added to the player's resources as soon as the peon/peasant reach the hall/mill/... Note that this is the standard behaviour of w*rcr*ft 2. This part generates a bunch of warnings from the AI saying that it can't build a farm. This is just this: a warning. As soon as it is possible (the peon gets out of the hall), the farm is builded.
     </UL>
-<P><LI>Version 1.17.2
-    <UL>
-    <LI>Fixed multiplayer fog of war (from Jimmy Salmon).
-    <LI>Added free for all, top vs bottom, and left vs right game types (from
-	Jimmy Salmon).
-    <LI>Fixed bug #573331: Peasants don't chop wood (from Jimmy Salmon).
-    <LI>Added if-resource, if-kills, if-score, and if-elapsed triggers 
-	(from Jimmy Salmon).
-    <LI>Implemented task #55513: Don't load the complete campaign configuration
-	(from Jimmy Salmon).
-    <LI>Fixed bug: minimap colors are wrong (sign problem).
-    <LI>Fixed crash: freed palette used.
-    <LI>Implemented task #55510: Improvement of the AI resource collection
-	(from Jimmy Salmon).
-    <LI>Fixed bug #573774: Moving a Dark Portal Destination more than 128
-	units/tiles causes a seg fault.
-    <LI>Triggers are removed if they return true (from Jimmy Salmon).
-    <LI>Added game timer (from Jimmy Salmon).
-    <LI>Added support for the keypad in menus (from Jimmy Salmon).
-    <LI>Fixed bug #422331: New Townhall in too random place (from Jimmy Salmon).
-    <LI>Fixed bug #575614: Holy Vision broken when fog of war off (from
-	Jimmy Salmon).
+    <LI>Applied patches from lokh:
+    <LI>Changed &lt;strings.h&gt; to &lt;string.h&gt; for glibc-2.1.
+    <LI>Applied patches: new sound configuration and api. (Fabrice Rossi)
+    <LI>Fixed bug: No goal. (from Patrick)
+    <LI>UDTA section of puds are now parsed and supported.
+    <LI>Moved sound CCL code into own file.
+    <LI>Moved unit-type CCL code into own file.
+    <LI>Started moving unit code into own directory. 
+    <LI>Support for 15bit X11 server. (My new graphic card needs it)
+    <LI>Applied patches: sound is distance dependent. (Fabrice Rossi)
     </UL>
-<P><LI>Version 1.18
+<P><LI>1.14 released<P>
     <UL>
-    <LI><B>1.18pre1</B>
-    <LI>Ogg music files are loaded and played in parallel (from Jimmy Salmon).
-    <LI>Added random map generation for the internal editor (Vladi).
-    <LI>Added mirror editing for the internal editor (Vladi).
-    <LI>Added support for tracking units in viewport.
-    <LI>Fixed bug in screenshots in 15 bit video depth (from Jimmy Salmon).
-    <LI>Fixed bug: Editor can't place units on mud/dirt.
-    <LI>Movement/Placement mask and field flags added to unit-type structure.
-    <LI>Added burning buildings (from Jimmy Salmon).
-    <LI>Fixed bug: FreeCraft segfaults when you try to abort a unit being
-	trained and you click on a wrong (empty) slot (from Martin Renold).
-    <LI>Middle click on unit portrait tracks the unit in the current viewport.
-    <LI>Magic parameter in units.ccl file to be used as MaxMana;
-	MAGIC_FOR_NEW_UNITS now means number of percent instead of absolute
-	value (from Martin Hajduch).
-    <LI>Added new feature (set-xp-damage! #t) which adds extra damage from
-	units as they gain XP (from David Slimp).
-    <LI>Fixed bug #580788: Crashes with Fog of War in network menus (from
-	Jimmy Salmon).
-    <LI>Fixed bug #577436: Multiplayer check fail (from Jimmy Salmon).
-    <LI>Fixed bug #582572: Can build refinery too close to platform (from
-	Jimmy Salmon).
-    <LI>Fixed bug: 16bit sound is wrong on big endian machines
-	(from Jeff Binder).
-    <LI>Movie play support addded (Only avi files with VP3/Ogg codecs).
-    <LI>Scroll wheel support in list boxes added (from Jeff Binder).
-    <LI>Fixed bug: Cancel training button didn't work in multiplayer.
-    <LI>Fixed bug: Memory heap corruption in AiFindLumberMillPlace found from
-	Mark Pazolli.
-    <LI>Added editor save confirm menu (from Jimmy Salmon).
-    <LI>Added initial support for game replay (from Jimmy Salmon).
-    <LI>Fixed bug #536262: Oil icon changes colors (from Jimmy Salmon).
-    <LI>Fixed bug #587638: Transports can carry ships (from Jimmy Salmon).
-    <LI>Fixed bug #577066: Restart loses custom settings (from Jimmy Salmon).
-    <LI>Added support for arts sound daemon (KDE) (from Ari).
-    <LI>Fixed various memory leaks.
-    <LI>Fixed bug #595460: Killed when tracked, can't scroll (from Jimmy
-	Salmon).
-    <LI>Fixed bug #581504: Bug in libmodplug conversion (from Jimmy Salmon).
-    <LI>Added end scenario confirm menus (from Jimmy Salmon).
-    <LI>Implemented task #55511: Don't load the complete tileset
-	configuration (from Jimmy Salmon).
-    <LI>Fixed crash: SIOD executes a longjmp without a setjmp (from Dirk
-	Thierbach).
-    <LI>Fixed bug #594439: Peasant Repairs when no resources (from Russell
-	Smith).
-    <LI>Fixed bug #611416: Objectives not saved (from Jimmy Salmon).
-    <LI>Fixed bug #621818: Save&amp;Load/Replay: Building restrictions (from
-	Jimmy Salmon).
-    <LI>Fixed bug #621572: Save &amp; Load Music mistake (from Jimmy Salmon).
-    <LI>Fixed bug #622556: Save then Load crash (from Jimmy Salmon).
-    <LI>Ranks are now configurable with ccl (from Jimmy Salmon).
-    <LI>Fixed bug #624309: Load&amp;Save Bloodlust crash (from Jimmy Salmon).
-    <LI>Fixed bug #624306: Creating new map with winter crash (from
-	Jimmy Salmon).
-    <LI>Fixed bug #628948: Load Game - Doesn't know Scroll (from Russell Smith).
-    <LI>Added "it is a good day to die" cheat (from Jimmy Salmon).
-    <LI>Fixed a bug which prevented unitstats to be restored when loading a
-	game : unitstats were loaded and then reset by InitUnitType()
-	(from Ludovic).
-    <LI>Added, the ai uses paladin healing when possible (from Ludovic).
-    <LI>New feature: Smarter ballistas, avoids hitting friendly units 
-	(from Ludovic).
-    <LI>Implemented feature request #631851: Fog of war disable for replay
-	(from Jimmy Salmon).
-    <LI>Fixed an overflow error that caused multiplayer games to go out of
-	sync (from Jimmy Salmon).
-    <LI>Implemented feature request #631845: Allied shared vision (from
-	Jimmy Salmon).
-    <LI>Fixed bug #595466: Rescueing Active Unit Issues (from Russell Smith).
-    <LI>Fixed bug #632526: Missile Graphic Direction (from Jimmy Salmon).
-    <LI>Added diplomacy menu (from Russell Smith).
-    <LI>Correct paths and filenames for expansion voice extraction (from
-	Russell Smith).
-    <LI>Implemented feature request #635863: Clicking on Score Screen Displays
-	All (from Jimmy Salmon).
-    <LI>Fixed bug #636395: Double-click does not work in window (from
-	Jimmy Salmon).
-    <LI>Fixed bug #638383: Freecraft memfill on some puds (from Jimmy Salmon).
-    <LI>Fixed bug #634359: Click while in comment makes invisible (from
-	Jimmy Salmon).
-    <LI>Added Man vs Machine game type (from Jimmy Salmon).
-    <LI>Implemented feature request #632356: Stretching Background Images
-	(from Jimmy Salmon).
-    <LI>Implemented tab completion for chatting (from Nehal Mistry).
-    <LI>Middle-click pastes from clipboard(Win32) or cut buffer(X11) in 
-	input boxes (from Nehal Mistry).
-    <LI>Fixed bug #640812: Flameshield segfault (from Jimmy Salmon).
-    <LI>Fixed bug #641074: Return gold to ally's town hall (from Jimmy Salmon).
-    <LI>Fixed bug #581489: GUI - Network refresh (from Jimmy Salmon).
-    <LI>Fixed bug #643281: Compile errors on Mac OS X 10.2.2 (from
-	Jimmy Salmon).
-    <LI>Fixed bug #600046: No new construction options after upgrade (from
-	Russell Smith).
-    <LI>Fixed bug #618086: bugs when without network (from Nehal Mistry).
-    <LI>Can specify port when entering IP Address in format: 
-	"x.x.x.x:port" (from Nehal Mistry).
-    <LI>Fixed bug #646385: Custom Single Player .cm Crash (from Jimmy Salmon).
-    <LI>Updated User Interface extraction for wartool.  All resolutions now
-	supported (from Russell Smith).
-    <LI>Fixed bug #643179: Victory/Defeat on network (from Jimmy Salmon).
-    <LI>Campaigns extracted from original CD's (from Russell Smith).
-    <LI>New include file "fc_types.h" for type forward references.
-    <LI>Viewport code cleanup, viewport numbers changed to pointers.
-    <LI>Minimap cursor color in C sources configurable.
-    <LI>Fixed bug #651992: Wrong picture for destroyed orc wall (from
-	Jimmy Salmon).
-    <LI>Fixed bug #611417: Campaign not saved (from Jimmy Salmon).
-    <LI>Fixed bug #628947: WC2 Graphic Display Errors (from Jimmy Salmon).
-    <LI>Added smooth scrolling for messages (from Jimmy Salmon).
-    <LI>Fixed bug #657167: Crash on human campaign level 2 (from Jimmy Salmon).
-    <LI>Added load/save of config options (from Jimmy Salmon).
-    <LI>Fixed bug #657533: User save directory not created (from Jimmy Salmon).
-    <LI>Fixed bugs #647169 and #636552: Forest/Rock Display Errors (from 
-	Russell Smith).
-    <LI>Fixed bug #635894: Altering Landscape Type in Editor (from
-	Jimmy Salmon).
-    <LI>Fixed bug #657810: Save &amp; Load bugs (from Jimmy Salmon).
-    <LI>Implemented a new fog of war (from Russell Smith).
-    <LI>Fixed bug #666612: Crash on UnitCache (from Jimmy Salmon).
-    <LI>Fixed bug #666990: Replay with reveal map and NEW_FOW (from
-	Russell Smith).
-    <LI>Fixed bug #667078: NEW_FOW and Save with Unit Dying (from
-	Russell Smith).
-    <LI>Fixed bug #667203: Can Haul Oil From enemy platform (from
-	Jimmy Salmon).
-    <LI>Fixed bug #667132: Replay Must save fog of war settings (from
-	Jimmy Salmon).
-    <LI>Fixed Bug #667666: Training Queue used, fog of war wrong (from
-	Russell Smith).
-    <LI>Fixed bug #611418: Viewports aren't saved (from Jimmy Salmon).
-    <LI>Workers only automatically mine gold mines that have been discovered
-	(from Jimmy Salmon).
-    <LI>Fixed bug #668993: Transporters don't work (from Jimmy Salmon).
-    <LI>Added exploding critters (from Jimmy Salmon).
-    <LI>Fixed bug #670166: demosquad make unpassable destroyed rock (from
-	Jimmy Salmon).
-    <LI>Fixed bug #671047: Peasants in Goldmine don't mine next mine when
-	it's destroyed (from Jimmy Salmon).
-    <LI>Fixed bug #671045: Invisible Units can attack (from Jimmy Salmon).
-    <LI>Fixed bug #671050: Mage can cast flameshield on dying unit (from
-	Jimmy Salmon).
-    <LI>Fixed bug #668971: Segfaults on game load (from Jimmy Salmon).
-    <LI>Fixed bug #672467: FlameShield is unable to hit air (from
-	Jimmy Salmon).
-    <LI>Fixed bug #672490: FlameShield can now be cast on catapults and naval
-	units (from Jimmy Salmon).
-    <LI>Fixed bug #672463: Editor Crash with missing expansion graphics (from
-	Jimmy Salmon).
-    <LI>Fixed bug #674532: Last Unit cost should not display when typing a
-	message (from Jimmy Salmon).
-    <LI>Fixed Bug #674531: When sound if off, Sound disabled message
-	should not display (from Russell Smith).
-    <LI>Added auto spell casting (from Jimmy Salmon).
-    <LI>Fixed bug #678581: Dragons, Gryphon, Mage, Deathknight death animation
-	(from Russell Smith).
-    <LI>Fixed bug #676724: Buildings Not Updated Until seen in viewport
-	(from Russell Smith).
-    <LI>Fixed bug #438896: Platform destroyed in fog of war (from Russell 
-	Smith).
-    <LI>Fixed bug #683770: Load Game from replay doesn't allow me to
-	command units (from Jimmy Salmon).
-    <LI>Fixed bug #683769: Preferences and Diplomacy should be disabled in
-	replay (from Jimmy Salmon).
-    <LI>Diplomacy menu doesn't allow allies and enemies at the same time
-	(from Jimmy Salmon).
-    <LI>Fixed bug #683771: Own Buildings go under FOW when destroyed (from 
-	Russell Smith).
-    <LI>Fixed bug #685087: middle mouse button doesn't work in editor (from
-	Jimmy Salmon).
-    <LI>Implemented feature request #631875: No MP menu pause (from
-	Jimmy Salmon).
-    <LI>Fixed bug #678580: Dragon Breath impact too long (from Jimmy Salmon).
-    <LI>Fixed bug #561204: 3 player game can end too soon (from Jimmy Salmon).
-    <LI>Implemented feature request #631910: Super fast forward for replay
-	(from Russell Smith).
-    <LI>Runestone gives HP and Mana (from Juan Pablo).
-    <LI>Added playlist support (from Nehal Mistry).
-    <LI>Added middle-click pasting support in X11 (from Juan Pablo).
-    <LI>Fixed bug when destroying a unit with another unit inside it (from
-	Jimmy Salmon).
-    <LI>Fixed bug #690171: Crash building oil platform with UNITS_ON_MAP
-	(from Jimmy Salmon).
-    <LI>Fixed bug #690232: AI can't pass walls (from Jimmy Salmon).
-    <LI>Fixed bug #690843: Shared vision tiles aren't explored (from Russell
-	Smith).
-    <LI>Fixed bug #691057: Shared vision and destroyed buildings (from
-	Russell Smith).
-    <LI>Fixed bug when shared vision didn't update seen tiles when sharing
-	vision (from Russell Smith).
-    <LI>Fixed bug #690994: Editor scrolling bug (from Jimmy Salmon).
-    <LI>Fixed bug #689227: Internal editor crashes saving 1024x1024 maps
-	(from Jimmy Salmon).
-    <LI>Fixed bug where destroyed buildings didn't show under fow until
-	they were destroyed.  (They show immediately now) (from Russell
-	Smith).
-    <LI>Added ctrl-v for pasting, ctrl-u to delete everything, fixed several
-	bugs in input boxes (from Jimmy Salmon).
-    <LI><B>1.18pre2</B>
-    <LI>Fixed bug in save replay menu (from Jimmy Salmon).
-    <LI>Fixed "make buildit" (from Nehal Mistry).
-    <LI>Fixed crash when middle clicking in a menu (from Nehal Mistry).
-    <LI>Fixed crash on BSD (from Jimmy Salmon and ppl).
-    <LI>Fixed bug #233900: Train new units in pause mode didn't work.
-	(from Russell Smith).
-    <LI>Walls don't count for buildings stats (from Jimmy Salmon).
-    <LI>Fixed bug 444273: Heroes have wrong upgrades (from Russell
-	Smith).
-    <LI>Fixed bug (One Peasant Only) Should only effect Human and
-	Computer Players, not Nobody, Neutral or Rescue Units
-    <LI>Fixed circle of power so it's a neutral unit (from Jimmy Salmon).
-    <LI>Don't display Neutral player's Score in Game (from Russell
-	Smith).
-    <LI>Fixed bug when eye of vision was destroyed (from Jimmy Salmon).
-    <LI>Disabled save replay button when replay wasn't enabled (from
-	Jimmy Salmon).
-    <LI>Fixed crash when doing "fow off" followed by "on screen" (from
-	Russell Smith).
-    <LI><B>Final</B>
-    <LI>Fixed bug when a player quits in a multiplayer game (from
-	Jimmy Salmon).
-    <LI>Fixed saving cd mode preferences (from Nehal Mistry).
-    <LI>Fixed WC2 UI on 1600x1200 (from Jimmy Salmon).
-    <LI>Removed +1 range upgrade for catapults and ballistas (from
-	Jimmy Salmon).
-    <LI>Dynamically set maximum characters for input box based on text width 
-	(from Nehal Mistry).
-    <LI>Use victory/defeat backgrounds for stats (from Nehal Mistry).
-    <LI>Allow text to be clicked on like normal menu items (from Nehal Mistry).
+    <LI>Original speed is the default for the release
+    <LI>Fixed bug: All units crossing coast plays docking sound (from Fabrice Rossi).
+    <LI>Fixed bug: Unit placed twice in unit-cache. (end of resources)
+    <LI>Fixed bug: New units says again hello (from Fabrice Rossi).
+    <LI>Fixed bug: A unit could attack it self. (self destruction)
+    <LI>New command-line option -c file.ccl = CCL start file.
+    <LI>Experimental guile-gtk support added.
+    <LI>Fixed bug: Selecting building place and unit is killed dumps core.
+    <LI>Fixed bug: Building cursor destroys map border.
+    <LI>Fixed bug: Upgrades dumps core. (Player::UnitFlags was to small)
+    <LI>Applied patches for sound part (from Fabrice Rossi).
+    <LI>Applied patches from Josh Cogliati.
+    <LI>Fixed bug: Buttons aren't reported over network.
+    <LI>Written transporter load/unload code.
+    <LI>Fixed bug: Trained units are inserted twice into unit cache.
+    <LI>Started network code. (Just for testing)
+    <LI>Fixed bug: Movement flags was wrong for big maps.
+    <LI>Fixed bug: 96x96 maps dumps core, introduced with big maps.
+    <LI>Added threaded sound support (from Fabrice Rossi).
+    <LI>Tried to get working source code documentation.
+    <LI>Fixed bug: Matrix was too small for big maps.
+    <LI>Started greater map and own maps support.
+    <LI>Modified makefiles to support inline source code documentation.
+    <LI>Fixed bug: removed unit builds building. (from Charles K Hardin)
+    <LI>Support for guile-1.3
+    <LI>Support for guile snapshot version. (I removed it)
+    <LI>Damaged buildings are now burning.
+    <LI>Many cleanups in the sources.
+    <LI>Add new functions UnitCache..., to improve speed.
+    <LI>Fixed bug: Save and restore cursor no longer access outside the bounds.
+    <LI>Fixed bug: RevealMap and MapUpdateVisible no longer overwrite memory.
+    <LI>Fixed bug: upgrade unit
     </UL>
-<P><LI>Version 1.19
+<P><LI>1.13 released<P>
     <UL>
-<A NAME="current"> </A>
-    <LI><B>1.19pre1</B>
-    <LI>Fixed setup script for BSD and 'sh' (from ppl).
-    <LI>Added support for 16x16 tiles (from Jimmy Salmon).
-    <LI>Fixed bug #704338: Crash: Town Hall Destroyed, Peasant inside
-	(from Russell Smith).
-    <LI>Fixed bug #707075: Bug in DeathCoilController (from Jimmy Salmon).
-    <LI>Fixed bug #704720: The green pointing should be visible under fow
-	(from Jimmy Salmon).
-    <LI>Made color cycling configurable via ccl (from Nehal Mistry).
-    <LI>Made wheel mouse work for sliders (from Nehal Mistry).
-    <LI>Fixed bugs #676511,#710239: Segfault when loading game with walls
-    	(from Russell Smith).
-    <LI>Made font colors more configurable (from Jimmy Salmon).
-    <LI>Chat messages are shown in the player's color (from Jimmy Salmon).
-    <LI>Allow God mode cheat to be disabled (from Phil Hannent).
-    <LI>Implemented Feature Request #691262: Watch wc2 replays with fcmp
-	(from Russell Smith).
-    <LI>Fixed bug #713185: Runestone heals inorganic units (from Russell
-	Smith).
-    <LI>Rewrote construction config (from Jimmy Salmon).
-    <LI>+++
+    <LI>Started cleanup source tree.
+    <LI>Fixed bug: in save/restore cursor, no more cores here.
+    <LI>Rewritten wood remove, but still not works 100% correct.
+    <LI>Started AI code.
+    <LI>The mini-map is now only redraw each second. (more speed)
+    <LI>The debug speeds of mining, harvest, building, training are now	configurable.
+    <LI>You can now return goods.
+    <LI>Added corpse.
+    <LI>Added attack, death animation.
+    <LI>Added missiles.
+    <LI>Added: unit names are now shown correct.
+    <LI>Fixed bug: in unit drawing, no more cores here.
+    </UL>
+<P><LI>1.12 released (first released public version)<P>
+    <UL>
+    <LI>Added CTRL+select selects all visible units of this type.
+    <LI>Added ALT+select selects the old group.
+    <LI>Fixed bug: selecting, selects not all units.
+    <LI>Fixed bug: can't reach buildings if one coordinate is 0. (sign!)
+    <LI>Added middle mouse button, scrolls the map.
+    <LI>Fixed bug: cursor outside window, drawn with bad coordinates.
+    <LI>Fixed bug: allocated too much shared video memory.
+    <LI>Fixed bug: cursor not clipped on right edge of window.
+    <LI>Fixed bug: player 0 units are drawn with wrong colors on mini-map.
+    </UL>
+<P><LI>1.11 released<P>
+    <UL>
+    <LI>Implemented first sound support.
+    <LI>Improved updates. (Faster)
+    <LI>Faster cursor drawing.
+    <LI>Sort units for display, correct overlapping.
+    </UL>
+<P><LI>1.10 released<P>
+    <UL>
+    <LI>Implement run-length-encoded sprites. (Saves 9 MB memory).
+    <LI>Remove use of imlib.
     </UL>
 </UL>
 
