@@ -102,10 +102,12 @@ local int MoveToResource(Unit* unit)
 		    unit->Orders->X = x;
 		    unit->Orders->Y = y;
 		    NewResetPath(unit);
-		    DebugLevel3Fn("Found a better place to harvest %d,%d\n" _C_ x _C_ y);
+		    DebugLevel0Fn("Found a better place to harvest %d,%d\n" _C_ x _C_ y);
 		    // FIXME: can't this overflow? It really shouldn't, since
 		    // x and y are really supossed to be reachable, checked thorugh a flood fill.
-		    return MoveToResource(unit);
+		    // I don't know, sometimes shit happens.
+		    //return MoveToResource(unit);
+		    return 0;
 		}
 		return -1;
 	    case PF_REACHED:
@@ -149,7 +151,13 @@ local int StartGathering(Unit* unit)
     DebugCheck(unit->IX);
     DebugCheck(unit->IY);
     if (resinfo->TerrainHarvester) {
-	DebugCheck(!ForestOnMap(unit->Orders->X, unit->Orders->Y));
+	//
+	//  This shouldn't happend?
+	/*
+	if (!ForestOnMap(unit->Orders->X, unit->Orders->Y)) {
+	    DebugLevel0Fn("Wood gone, just like that?\n");
+	    return 0;
+	}*/
 	UnitHeadingFromDeltaXY(unit, unit->Orders->X - unit->X,
 	    unit->Orders->Y - unit->Y);
 	if (resinfo->WaitAtResource) {
