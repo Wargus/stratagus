@@ -326,6 +326,7 @@ extern AiType* AiTypes;			/// List of all AI types
 extern AiHelper AiHelpers;		/// AI helper variables
 
 extern PlayerAi* AiPlayer;		/// Current AI player
+extern char** AiTypeWcNames;		/// pud num to internal string mapping
 
 /*----------------------------------------------------------------------------
 --	Functions
