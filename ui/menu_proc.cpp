@@ -176,7 +176,7 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 	//
 	//  Text
 	//
-	if (text) {
+	if (text && text[0]) {
 		GetDefaultTextColors(&oldnc, &oldrc);
 		nc = p->TextNormalColor ? p->TextNormalColor :
 			style->TextNormalColor ? style->TextNormalColor : oldnc;

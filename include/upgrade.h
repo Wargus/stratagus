@@ -43,6 +43,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+struct _CL_File_;
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -57,7 +59,7 @@ extern Upgrade* UpgradeByIdent(const char*);
 	/// init upgrade/allow structures
 extern void InitUpgrades(void);
 	/// save the upgrades
-extern void SaveUpgrades(CLFile*);
+extern void SaveUpgrades(struct _CL_File_*);
 	/// cleanup upgrade module
 extern void CleanUpgrades(void);
 

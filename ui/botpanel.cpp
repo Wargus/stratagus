@@ -51,6 +51,7 @@
 #include "map.h"
 #include "font.h"
 #include "spells.h"
+#include "menus.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -223,6 +224,7 @@ void DrawButtonPanel(void)
 	Player* player;
 	const ButtonAction* buttons;
 	char buf[8];
+	ButtonStyle style;
 
 	//
 	//  Draw background
@@ -343,8 +345,32 @@ void DrawButtonPanel(void)
 				}
 			}
 
-			DrawUnitIcon(player, buttons[i].Icon.Icon,
-				v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y);
+			//
+			//  Tutorial show command key in icons
+			//
+			if (ShowCommandKey) {
+				if (CurrentButtons[i].Key == 27) {
+					strcpy(buf, "ESC");
+				} else {
+					buf[0] = toupper(CurrentButtons[i].Key);
+					buf[1] = '\0';
+				}
+			} else {
+				buf[0] = '\0';
+			}
+
+			memcpy(&style, TheUI.ButtonButtons[i].Style, sizeof(ButtonStyle));
+			style.Default.Sprite = style.Hover.Sprite = style.Selected.Sprite =
+				style.Clicked.Sprite = style.Disabled.Sprite = buttons[i].Icon.Icon->Sprite;
+			style.Default.Frame = style.Hover.Frame = style.Selected.Frame =
+				style.Clicked.Frame = style.Disabled.Frame = buttons[i].Icon.Icon->Index;
+			if (!(v & IconSelected) && (v & IconAutoCast)) {
+				style.Default.BorderColorRGB = TheUI.ButtonAutoCastBorderColorRGB;
+				style.Default.BorderColor = 0;
+			}
+			GraphicPlayerPixels(player, buttons[i].Icon.Icon->Sprite);
+			DrawMenuButton(&style, v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y, buf);
+			// FIXME: player colors with opengl
 
 			//
 			//  Update status line for this button
@@ -352,30 +378,6 @@ void DrawButtonPanel(void)
 			if (ButtonAreaUnderCursor == ButtonAreaButton &&
 					ButtonUnderCursor == i && KeyState != KeyStateInput) {
 				UpdateStatusLineForButton(&buttons[i]);
-			}
-
-			//
-			//  Tutorial show command key in icons
-			//
-			if (ShowCommandKey) {
-				Button* b;
-				int f;
-
-				b = &TheUI.ButtonButtons[i];
-				f = TheUI.CommandKeyFont;
-				if (CurrentButtons[i].Key == 27) {
-					strcpy(buf, "ESC");
-					VideoDrawText(b->X + 4 + b->Width - VideoTextLength(f, buf),
-						b->Y + 5 + b->Height - VideoTextHeight(f),
-						f, buf);
-				} else {
-					// FIXME: real DrawChar would be useful
-					buf[0] = toupper(CurrentButtons[i].Key);
-					buf[1] = '\0';
-					VideoDrawText(b->X + 3 + b->Width - VideoTextLength(f, buf),
-						b->Y + 3 + b->Height - VideoTextHeight(f),
-						f, buf);
-				}
 			}
 		}
 	}

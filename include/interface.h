@@ -71,7 +71,7 @@ enum _button_cmd_ {
 
 	/// typedef for action of button
 typedef struct _button_action_ ButtonAction;
-typedef int (*ButtonCheckFunc)(const Unit*,const ButtonAction*);
+typedef int (*ButtonCheckFunc)(const Unit*, const ButtonAction*);
 
 	/// Action of button
 struct _button_action_ {
