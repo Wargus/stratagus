@@ -982,6 +982,7 @@ local SCM CclCreateUnit(SCM type, SCM player, SCM x, SCM y)
     UnitType* unittype;
     Unit* unit;
     int heading;
+    int playerno;
     int mask;
     int ix;
     int iy;
@@ -991,7 +992,13 @@ local SCM CclCreateUnit(SCM type, SCM player, SCM x, SCM y)
     iy = gh_scm2int(y);
 
     heading = SyncRand() % 256;
-    unit = MakeUnit(unittype, &Players[TriggerGetPlayer(player)]);
+    playerno = TriggerGetPlayer(player);
+    if (playerno == -1) {
+	printf("CreateUnit: You cannot use 'any in create unit, specify a player\n");
+	errl("bad player", player);
+	return SCM_UNSPECIFIED;
+    }
+    unit = MakeUnit(unittype, &Players[playerno]);
     mask = UnitMovementMask(unit);
     if (CheckedCanMoveToMask(ix, iy, mask)) {
 	unit->Wait = 1;
