@@ -1735,7 +1735,7 @@ global void SoundOptions(void)
 	SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_UNCHECKED;
     SoundOptionsMenuItems[8].d.hslider.percent = (MusicVolume * 100) / 255;
     
-#ifdef USE_LIBCDA
+#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     cd_get_volume(&i, &i);
     SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
 #endif
@@ -2812,6 +2812,7 @@ local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
 
 local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 {
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
     mi--;
     
     switch (i) {
@@ -2850,6 +2851,7 @@ local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 	default:
 	    break;
     }
+#endif
 }
 
 local void ScenSelectFolder(void)
