@@ -47,7 +47,7 @@ struct _player_ {
     unsigned	Type;			/// type of player (human,computer,...)
     unsigned	Race;			/// race of player (orc,human,...)
     unsigned	Team;			/// team of player
-    unsigned	Ai;			/// AI for computer
+    unsigned	AiNum;			/// AI for computer
 
     unsigned	X;			/// map tile start X position
     unsigned	Y;			/// map tile start Y position
@@ -61,6 +61,7 @@ struct _player_ {
     unsigned    UnitTypesCount[UnitTypeInternalMax];       /// each type unit count
 
     unsigned	AiEnabled;		/// handle ai on this computer
+    void*	Ai;			/// Ai structure pointer
 
     Unit**	Units;			/// units of this player
     unsigned	TotalNumUnits;		/// total # units for units' list.
