@@ -809,7 +809,7 @@ global void UnitCacheRemove(Unit* unit)
 
     prev=&TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
     DebugCheck( !*prev );
-    for( ;; ) {				// find the unit
+    while( *prev ) {			// find the unit, be bug friendly
 	if( *prev==unit ) {
 	    *prev=unit->Next;
 	    unit->Next=NULL;

@@ -197,6 +197,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassPointToPointWithHit,
+    0,
     1,
     16,
     0,
@@ -208,6 +209,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "fireball hit" },
     MissileClassPointToPoint3Bounces,
+    0,
     1,
     "missile-explosion",	NULL,
     },
@@ -218,6 +220,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "fireball hit" },
     MissileClassPointToPoint3Bounces,
+    0,
     1,
     16,
     1,
@@ -230,6 +233,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "fireball hit" },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     1,
@@ -237,11 +241,12 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-flame-shield",
     "flame shield.png",
-    32,32,
+    32,48,
     { NULL },
     { NULL },
     MissileClassFlameShield,
-    1,
+    0,
+    2,
     16,
     1,
     },
@@ -252,8 +257,9 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassBlizzard,
+    0,
     1,
-    16,
+    4,
     1,
     "missile-blizzard-hit", NULL
     },
@@ -264,8 +270,9 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassDeathDecay,
+    0,
     1,
-    16,
+    0,
     1,
     },
 { MissileTypeType,
@@ -275,6 +282,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     2,
@@ -287,6 +295,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     1,
@@ -298,6 +307,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    0,
     1,
     16,
     1,
@@ -309,6 +319,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassPointToPointWithHit,
+    0,
     1,
     16,
     .,
@@ -320,6 +331,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    0,
     5,
     16,
     1,
@@ -331,8 +343,9 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassWhirlwind,
-    1,
-    16,
+    0,
+    2,
+    2,
     1,
     },
 { MissileTypeType,
@@ -342,6 +355,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPointWithDelay,
+    0,
     1,
     16,
     2,
@@ -354,6 +368,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     2,
@@ -366,6 +381,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "bow hit" },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     0,
@@ -377,6 +393,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "bow hit" },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     0,
@@ -388,6 +405,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     1,
@@ -400,6 +418,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     1,
@@ -412,6 +431,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassFire,
+    0,
     8,
     16,
     1,
@@ -423,6 +443,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassFire,
+    0,
     8,
     16,
     1,
@@ -434,6 +455,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    0,
     1,
     16,
     1,
@@ -445,6 +467,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    0,
     1,
     16,
     1,
@@ -456,6 +479,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    0,
     1,
     16,
     1,
@@ -467,6 +491,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPointWithDelay,
+    0,
     1,
     16,
     1,
@@ -479,6 +504,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    0,
     1,
     16,
     1,
@@ -490,6 +516,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    0,
     1,
     16,
     1,
@@ -501,6 +528,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     1,
@@ -512,6 +540,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassCycleOnce,
+    0,
     FRAMES_PER_SECOND/30
     16,
     1,
@@ -523,6 +552,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassNone,
+    0,
     1,
     16,
     1,
@@ -534,6 +564,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    0,
     1,
     16,
     1,
@@ -545,6 +576,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassPointToPoint,
+    0,
     1,
     16,
     1,
@@ -556,6 +588,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassCustom,
+    0,
     1,
     16,
     1,
@@ -662,10 +695,14 @@ global void LoadMissileSprites(void)
     }
 
     MissileTypeSmallFire=MissileTypeByIdent("missile-small-fire");
-    // FIXME: FIXME: FIXME: very diry hack
-    MissileTypeSmallFire->Sprite->NumFrames=6;
     MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
     MissileTypeGreenCross=MissileTypeByIdent("missile-green-cross");
+
+    // FIXME: FIXME: FIXME: very dirty hacks
+    MissileTypeSmallFire->Sprite->NumFrames=6;
+    MissileTypeByIdent("missile-death-and-decay")->Sprite->NumFrames=8;
+    MissileTypeByIdent("missile-normal-spell")->Sprite->NumFrames=6;
+    MissileTypeByIdent("missile-flame-shield")->Sprite->NumFrames=6;
 }
 
 /**
@@ -781,7 +818,8 @@ found:
     missile->Type=type;
     missile->Frame=0;
     missile->State=0;
-    missile->Wait=1;
+    missile->Wait=type->Sleep;		// initial wait = sleep 
+    missile->Delay=type->Delay;		// initial delay
 
     missile->SourceUnit=NULL;
 
@@ -1089,7 +1127,10 @@ global void DrawMissiles(void)
 	    continue;
 	}
 	if( missile->Type->Class == MissileClassCustom ) {
-	    continue; // custom missiles are handled by Controller() only
+	    continue;	// custom missiles are handled by Controller() only
+	}
+	if( missile->Delay ) {
+	    continue;	// delayed missiles aren't shown
 	}
 	// Draw only visibile missiles
 	if (MissileVisible(missile)) {
@@ -1157,7 +1198,8 @@ local int PointToPointMissile(Missile* missile)
 	}
 
 	// FIXME: could be better written
-	if( missile->Type->Class == MissileClassWhirlwind ) {
+	if( missile->Type->Class == MissileClassWhirlwind
+		|| missile->Type->Class == MissileClassFlameShield ) {
 	    // must not call MissileNewHeading nor frame change
 	} else if( missile->Type->Class == MissileClassBlizzard ) {
 	    missile->Frame = 0;
@@ -1452,11 +1494,11 @@ global void MissileActions(void)
 	if( missile->Type==MissileFree ) {
 	    continue;
 	}
-	if( missile->Wait-- ) {
-	    continue;
+	if( missile->Delay && missile->Delay-- ) {
+	    continue;		// delay start of missile
 	}
 
-	if ( missile->TTL != -1 ) {
+	if ( missile->TTL > 0 ) {
 	    missile->TTL--;	// overall time to live if specified
 	}
 
@@ -1464,8 +1506,12 @@ global void MissileActions(void)
 	    missile->Controller( missile );
 	}
 
-	if ( missile->TTL == 0 ) {
+	if ( !missile->TTL ) {
 	    FreeMissile(missile);
+	    continue;
+	}
+
+	if( --missile->Wait ) {	// wait until time is over
 	    continue;
 	}
 
@@ -1566,6 +1612,18 @@ global void MissileActions(void)
 		}
 		break;
 
+	    case MissileClassFlameShield:
+		missile->Wait=missile->Type->Sleep;
+		if( ++missile->Frame
+			==VideoGraphicFrames(missile->Type->Sprite) ) {
+		    missile->Frame = 0;
+		    if( PointToPointMissile(missile) ) {
+			// Must set new goal.
+		    }
+		}
+		//missile->X-=unit->TargetUnit->X*TileSizeX+unit->TargetUnit->IY;
+		break;
+
 	    case MissileClassBlizzard:
 		missile->Wait=missile->Type->Sleep;
 		if( PointToPointMissile(missile) ) {
@@ -1599,13 +1657,11 @@ global void MissileActions(void)
 
 	    case MissileClassWhirlwind:
 		missile->Wait=missile->Type->Sleep;
-		missile->Frame++;
-		if ( missile->Frame > 3 )
-		  missile->Frame = 0;
-		//NOTE: vladi: whirlwind moves slowly, i.e. it stays
-		//      5 ticks at the same pixels...
-		if ( missile->TTL < 1 || missile->TTL % 10 == 0 )
-		  PointToPointMissile(missile);
+		if( ++missile->Frame
+			==VideoGraphicFrames(missile->Type->Sprite) ) {
+		    missile->Frame = 0;
+		    PointToPointMissile(missile);
+		}
 		break;
 
 	    case MissileClassStayWithDelay:
@@ -1749,6 +1805,9 @@ global void SaveMissileTypes(FILE* file)
 	    fprintf(file,"\n ");
 	}
 	fprintf(file," 'class '%s",MissileClassNames[mt->Class]);
+	if( mt->Delay ) {
+	    fprintf(file," 'delay %d",mt->Delay);
+	}
 	fprintf(file," 'sleep %d",mt->Sleep);
 	fprintf(file," 'speed %d",mt->Speed);
 	fprintf(file," 'range %d",mt->Range);

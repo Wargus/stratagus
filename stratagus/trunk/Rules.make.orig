@@ -140,7 +140,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 #PROFILE=	-pg
 
 # Compile Version
-VERSION=	'-DVERSION="1.17pre1-build12"'
+VERSION=	'-DVERSION="1.17pre1-build13"'
 
 ############################################################################
 # below this, nothing should be changed!
