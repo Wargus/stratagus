@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_editor.c	-	Editor CCL functions. */
+/**@name ccl_editor.c - Editor CCL functions. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//      (c) Copyright 2002-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -43,24 +43,24 @@
 #include "ccl.h"
 
 /*----------------------------------------------------------------------------
---		Defines
+--  Defines
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 global char* EditorSelectIcon;
 global char* EditorUnitsIcon;
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Define an editor unit-type list.
+**  Define an editor unit-type list.
 **
-**		@param list		List of all names.
+**  @param list  List of all names.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineEditorUnitTypes(SCM list)
@@ -68,7 +68,7 @@ local SCM CclDefineEditorUnitTypes(SCM list)
 	int i;
 	char** cp;
 
-	if ((cp = EditorUnitTypes)) {				// Free all old names
+	if ((cp = EditorUnitTypes)) { // Free all old names
 		while (*cp) {
 			free(*cp++);
 		}
@@ -76,7 +76,7 @@ local SCM CclDefineEditorUnitTypes(SCM list)
 	}
 
 	//
-	//		Get new table.
+	// Get new table.
 	//
 	i = gh_length(list);
 	EditorUnitTypes = cp = malloc((i + 1) * sizeof(char*));
@@ -96,7 +96,7 @@ local int CclDefineEditorUnitTypes(lua_State* l)
 	int args;
 	int j;
 
-	if ((cp = EditorUnitTypes)) {				// Free all old names
+	if ((cp = EditorUnitTypes)) { // Free all old names
 		while (*cp) {
 			free(*cp++);
 		}
@@ -104,7 +104,7 @@ local int CclDefineEditorUnitTypes(lua_State* l)
 	}
 
 	//
-	//		Get new table.
+	// Get new table.
 	//
 	args = lua_gettop(l);
 	EditorUnitTypes = cp = malloc((args + 1) * sizeof(char*));
@@ -119,7 +119,7 @@ local int CclDefineEditorUnitTypes(lua_State* l)
 #endif
 
 /**
-**		Set the editor's select icon
+**  Set the editor's select icon
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetEditorSelectIcon(SCM icon)
@@ -142,7 +142,7 @@ local int CclSetEditorSelectIcon(lua_State* l)
 #endif
 
 /**
-**		Set the editor's units icon
+**  Set the editor's units icon
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetEditorUnitsIcon(SCM icon)
@@ -165,7 +165,7 @@ local int CclSetEditorUnitsIcon(lua_State* l)
 #endif
 
 /**
-**		Register CCL features for the editor.
+**  Register CCL features for the editor.
 */
 global void EditorCclRegister(void)
 {
