@@ -162,36 +162,6 @@ global void PlayCampaign(const char* name)
     GameResult=GameNoResult;
 
     strcpy(CurrentMapPath, filename);
-
-#if 0
-    // NOW DONE in create game?
-
-    // FIXME: Johns is this here needed? Can the map loaded in create game?
-    // ARI: Yes - This switches the menu gfx.. from def. Orc to Human, etc
-    InitUnitTypes();
-    UpdateStats();
-    // ARI: And this finally loads it.
-    //  For an alternative Method see network games..
-    //  That way it should work finally..
-
-    strcpy(CurrentMapPath, filename);
-    s = NULL;
-    // FIXME: LibraryFile here?
-    if (filename[0] != '/' && filename[0] != '.') {
-	s = filename = strdcat3(FreeCraftLibPath, "/", filename);
-    }
-
-    //
-    //  Load the map.
-    //
-    InitUnitTypes();
-    UpdateStats();
-    LoadMap(filename, &TheMap);
-
-    if (s) {
-	free(s);
-    }
-#endif
 }
 
 /**
