@@ -1,0 +1,699 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<!--
+----	(c) Copyright 2002 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FreeCraft Configuration Language Description: Triggers</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,tileset">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Triggers</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 2002 by The FreeCraft Project. Distributed under the
+<A HREF="../gpl.html">"GNU General Public License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<A HREF="tileset.html">PREV</A> 
+<A HREF="unittype.html">NEXT</A> 
+<A HREF="ccl-index.html">Index</A> 
+<HR>
+<A HREF="#action-defeat">action-defeat</A>
+<A HREF="#action-draw">action-draw</A>
+<A HREF="#action-set-timer">action-set-timer</A>
+<A HREF="#action-start-timer">action-start-timer</A>
+<A HREF="#action-stop-timer">action-stop-timer</A>
+<A HREF="#action-victory">action-victory</A>
+<A HREF="#add-trigger">add-trigger</A>
+<A HREF="#if-elapsed">if-elapsed</A>
+<A HREF="#if-kills">if-kills</A>
+<A HREF="#if-near-unit">if-near-unit</A>
+<A HREF="#if-opponents">if-opponents</A>
+<A HREF="#if-rescued-near-unit">if-rescued-near-unit</A>
+<A HREF="#if-resource">if-resource</A>
+<A HREF="#if-score">if-score</A>
+<A HREF="#if-timer">if-timer</A>
+<A HREF="#if-unit">if-unit</A>
+<HR>
+<H2>Intro - Introduction to trigger functions and variables</H2>
+
+Everything around triggers.
+<H2>Functions</H2>
+
+<A NAME="action-defeat"></A>
+<H3>action-defeat</H3>
+
+<H4>Description</H4>
+
+The condition player is set to defeat.
+
+<H4>Syntax</H4>
+
+<CODE>(action-defeat)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (add-trigger
+      (lambda () (if-unit 'this '== 0 'all))
+      (lambda () (action-defeat)))
+</PRE>
+
+<P>Adds a trigger.  If the player on the console has 0 units then he loses.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="action-draw"></A>
+<H3>action-draw</H3>
+
+<H4>Description</H4>
+
+The condition player is set to draw. (NOT SUPPORTED)
+
+<H4>Syntax</H4>
+
+<CODE>(action-draw)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (action-draw)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="action-set-timer"></A>
+<H3>action-set-timer</H3>
+
+<H4>Description</H4>
+
+Set the timer.
+
+<H4>Syntax</H4>
+
+<CODE>(action-set-timer seconds increasing)</CODE>
+
+<DL>
+<DT>seconds</DT>
+<DD>The number of seconds.
+</DD>
+<DT>increasing</DT>
+<DD>Set this to 1 if you want the timer to increase, set it to 0 for decreasing.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (action-set-timer 300 0)
+</PRE>
+
+<P>Sets the timer to 5 minutes and decreasing.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="action-start-timer"></A>
+<H3>action-start-timer</H3>
+
+<H4>Description</H4>
+
+Start the timer.
+
+<H4>Syntax</H4>
+
+<CODE>(action-start-timer)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (action-start-timer)
+</PRE>
+
+<P>Starts the timer.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="action-stop-timer"></A>
+<H3>action-stop-timer</H3>
+
+<H4>Description</H4>
+
+Stop the timer.
+
+<H4>Syntax</H4>
+
+<CODE>(action-stop-timer)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (action-stop-timer)
+</PRE>
+
+<P>Stops the timer.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="action-victory"></A>
+<H3>action-victory</H3>
+
+<H4>Description</H4>
+
+The condition player is set to victory.
+
+<H4>Syntax</H4>
+
+<CODE>(action-victory)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (add-trigger
+      (lambda () (if-opponents 'this '== 0))
+      (lambda () (action-victory)))
+</PRE>
+
+<P>Adds a trigger. If the player on the console has killed all his 
+opponents he won.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="add-trigger"></A>
+<H3>add-trigger</H3>
+
+<H4>Description</H4>
+
+Creates a new trigger.
+
+<H4>Syntax</H4>
+
+<CODE>(add-trigger condition action)</CODE>
+
+<DL>
+<DT>condition</DT>
+<DD><PRE>
+condition can be
+	(lambda () (or (and condition1 conditon2 ...)
+	   (and condition3 condition4 ...)))
+	...
+	- condition1 and condition2 and ... must be true or condition3
+	  and condition4 and ... must be true to execute the action.
+</PRE></DD>
+<DT>action</DT>
+<DD><PRE>
+action can be any valid scheme (CCL) statement and is executed if
+the condition is true.  The trigger remains active if the action
+returns true and is removed if the action returns false.
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (add-trigger
+      (lambda () (if-opponents 'this '== 0))
+      (lambda () (action-victory)))
+</PRE>
+
+<P>Adds a trigger. If the player on the console has killed all his 
+opponents he won.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="if-elapsed"></A>
+<H3>if-elapsed</H3>
+
+<H4>Description</H4>
+
+Game run for duration.  If the game run for the duration game cycles the action is executed.
+
+<H4>Syntax</H4>
+
+<CODE>(if-elapsed op quantity)</CODE>
+
+<DL>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'>          operator greater than
+'>=         operator greater than or equal
+'<          operator less than
+'<=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-elapsed '>= 300)
+</PRE>
+
+<P>If the game has run for 300 cycles.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="if-kills"></A>
+<H3>if-kills</H3>
+
+<H4>Description</H4>
+
+Player has quantity of kills. Which quantity must be killed by the
+player for the action.
+
+<H4>Syntax</H4>
+
+<CODE>(if-kills player op quantity)</CODE>
+
+<DL>
+<DT>player</DT>
+<DD><PRE>
+0 .. 16    Player number
+'any       Matches any player
+'all       All players (Not used)
+'this      Player on the local computer, Human player in the campaign.
+</PRE></DD>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'>          operator greater than
+'>=         operator greater than or equal
+'<          operator less than
+'<=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-kills 'this '>= 30)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="if-near-unit"></A>
+<H3>if-near-unit</H3>
+
+<H4>Description</H4>
+
+Player has the quantity of unit-type near to unit-type. Which unit 
+and how many units must the player have near to an other unit for 
+the action.
+
+<H4>Syntax</H4>
+
+<CODE>(if-near-unit player op quantity unit unit)</CODE>
+
+<DL>
+<DT>player</DT>
+<DD><PRE>
+0 .. 16    Player number
+'any       Matches any player
+'all       All players (Not used)
+'this      Player on the local computer, Human player in the campaign.
+</PRE></DD>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'>          operator greater than
+'>=         operator greater than or equal
+'<          operator less than
+'<=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+<DT>unit</DT>
+<DD><PRE>
+'unit-name  Unit type of this name
+'any        Matches any unit type
+'all        All units (sum of units and buildings)
+'units      All non building units
+'building   All building units
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-near-unit 'this '== 6 'unit-archer 'unit-circle-of-power)
+</PRE>
+
+<P>If the player on the console has 6 archers near the circle of power.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="if-opponents"></A>
+<H3>if-opponents</H3>
+
+<H4>Description</H4>
+
+Player has the quantity of opponents.
+
+<H4>Syntax</H4>
+
+<CODE>(if-opponents player op quantity)</CODE>
+
+<DL>
+<DT>player</DT>
+<DD><PRE>
+0 .. 16    Player number
+'any       Matches any player
+'all       All players (Not used)
+'this      Player on the local computer, Human player in the campaign.
+</PRE></DD>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'>          operator greater than
+'>=         operator greater than or equal
+'<          operator less than
+'<=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-opponents 'this '== 0)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="if-rescued-near-unit"></A>
+<H3>if-rescued-near-unit</H3>
+
+<H4>Description</H4>
+
+Player has the quantity of rescued unit-type near to unit-type. Which 
+rescued unit and how many units must the player have near to a unit 
+for the action.
+
+<H4>Syntax</H4>
+
+<CODE>(if-rescued-near-unit player op quantity unit unit)</CODE>
+
+<DL>
+<DT>player</DT>
+<DD><PRE>
+0 .. 16    Player number
+'any       Matches any player
+'all       All players (Not used)
+'this      Player on the local computer, Human player in the campaign.
+</PRE></DD>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'>          operator greater than
+'>=         operator greater than or equal
+'<          operator less than
+'<=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+<DT>unit</DT>
+<DD><PRE>
+'unit-name  Unit type of this name
+'any        Matches any unit type
+'all        All units (sum of units and buildings)
+'units      All non building units
+'building   All building units
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-rescued-near-unit 'this '== 1 'unit-archer 'unit-circle-of-power)
+</PRE>
+
+<P>The player on the console has 1 rescued archer near the circle of power.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="if-resource"></A>
+<H3>if-resource</H3>
+
+<H4>Description</H4>
+
+Player has the quantity of resources. This condition is used to 
+specify how many or how little resources (gold, oil, lumber) a 
+player must have for the action.
+
+<H4>Syntax</H4>
+
+<CODE>(if-resource player op quantity resource)</CODE>
+
+<DL>
+<DT>player</DT>
+<DD><PRE>
+0 .. 16    Player number
+'any       Matches any player
+'all       All players (Not used)
+'this      Player on the local computer, Human player in the campaign.
+</PRE></DD>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'>          operator greater than
+'>=         operator greater than or equal
+'<          operator less than
+'<=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+<DT>resource</DT>
+<DD><PRE>
+'gold 'wood 'oil 'ore 'stone 'coal  Quantity in store
+'all                                Sum of all resources in store
+'any                                Any resource
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-resource 'this '>= 5000 'gold)
+</PRE>
+
+<P>If the player on the console has at least 5000 gold.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="if-score"></A>
+<H3>if-score</H3>
+
+<H4>Description</H4>
+
+Player has the quantity of score. If the player reaches the 
+quantity of score the action is executed.
+
+<H4>Syntax</H4>
+
+<CODE>(if-score player op quantity)</CODE>
+
+<DL>
+<DT>player</DT>
+<DD><PRE>
+0 .. 16    Player number
+'any       Matches any player
+'all       All players (Not used)
+'this      Player on the local computer, Human player in the campaign.
+</PRE></DD>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'>          operator greater than
+'>=         operator greater than or equal
+'<          operator less than
+'<=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-score 'this '>= 1000)
+</PRE>
+
+<P>If the player on the console has a score of at least 1000.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="if-timer"></A>
+<H3>if-timer</H3>
+
+<H4>Description</H4>
+
+Timer reaches quantity. If the timer reaches quantity the action is executed.
+
+<H4>Syntax</H4>
+
+<CODE>(if-timer op quantity)</CODE>
+
+<DL>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'>          operator greater than
+'>=         operator greater than or equal
+'<          operator less than
+'<=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-timer '== 0)
+</PRE>
+
+<P>If the timer is at 0.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="if-unit"></A>
+<H3>if-unit</H3>
+
+<H4>Description</H4>
+
+Player has the quantity of unit-type. Which unit and how many 
+units must control the player for the action.
+
+<H4>Syntax</H4>
+
+<CODE>(if-unit player op quantity unit)</CODE>
+
+<DL>
+<DT>player</DT>
+<DD><PRE>
+0 .. 16    Player number
+'any       Matches any player
+'all       All players (Not used)
+'this      Player on the local computer, Human player in the campaign.
+</PRE></DD>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'>          operator greater than
+'>=         operator greater than or equal
+'<          operator less than
+'<=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+<DT>unit</DT>
+<DD><PRE>
+'unit-name  Unit type of this name
+'any        Matches any unit type
+'all        All units (sum of units and buildings)
+'units      All non building units
+'building   All building units
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-unit 'this '>= 8 'unit-archer)
+</PRE>
+
+<P>If the player on the console has at least 8 archers.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2002 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
