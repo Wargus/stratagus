@@ -40,7 +40,7 @@
 #include "interface.h"
 #include "map.h"
 #include "ui.h"
-#include "missile.h"
+#include "commands.h"
 
 #include "ccl.h"
 
@@ -94,7 +94,7 @@ local void HandleCritterClick(Unit* unit)
 
     // FIXME: make this configurable
     if( unit->Value==10 ) {
-	FireMissile(unit);
+	SendCommandAttack(unit,unit->X,unit->Y,unit,FlushCommands);
 	unit->Value=0;
     }
 }
