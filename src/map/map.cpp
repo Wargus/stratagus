@@ -307,14 +307,14 @@ global int CheckedForestOnMap(int tx,int ty)
 */
 global int ForestOnMap(int tx,int ty)
 {
-    IfDebug(
-	if( tx<0 || ty<0 || tx>=TheMap.Width || ty>=TheMap.Height ) {
-	    // FIXME: must cleanup calling function !
-	    fprintf(stderr,"Used x %d, y %d\n",tx,ty);
-	    abort();
-	    return 0;
-	}
-    );
+#ifdef DEBUG
+    if( tx<0 || ty<0 || tx>=TheMap.Width || ty>=TheMap.Height ) {
+	// FIXME: must cleanup calling function !
+	fprintf(stderr,"Used x %d, y %d\n",tx,ty);
+	abort();
+	return 0;
+    }
+#endif
 
     return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldForest;
 }

@@ -2462,15 +2462,43 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
   ----------------------------------------------------------------------------*/
 
 /**
- **	Find wood in sight range.
+ **	Find the closest piece of wood for an unit.
  **
- **	@param unit	Unit that needs wood.
- **	@param px	OUT: Map X position of wood.
- **	@param py	OUT: Map Y position of wood.
+ **	@param unit	The unit.
+ **	@param x	OUT: Map X position of tile.
+ **	@param y	OUT: Map Y position of tile.
+ */
+global int FindWoodInSight(const Unit* unit,int* x,int* y)
+{
+    return FindTerrainType(UnitMovementMask(unit),0,MapFieldForest,9999,
+	    unit->Player,unit->X,unit->Y,x,y);
+}
+
+/**
+ **	Find the closest piece of terrain with the given flags.
+ **
+ **	@param movemask	The movement mask to reach that location. 
+ **	@param resmask	Result tile mask.
+ **	@param rvresult Return a tile that doesn't match. 
+ **	@param range	Maximum distance for the search.
+ **	@param player	Only search fields explored by player
+ **	@param x	Map X start position for the search.
+ **	@param y	Map Y start position for the search.
+ **
+ **	@param px	OUT: Map X position of tile.
+ **	@param py	OUT: Map Y position of tile.
+ **
+ **	@notes		Movement mask can be 0xFFFFFFFF to have no effect
+ **			Range is not circular, but square.
+ **			Player is ignored if nil(search the entire map)
+ **			Use rvresult if you search for a til;e that doesn't
+ **			match resmask. Like for a tile where an unit can go
+ **			with it's movement mask.
  **
  **	@return		True if wood was found.
  */
-global int FindWoodInSight(const Unit* unit,int* px,int* py)
+global int FindTerrainType(int movemask,int resmask,int rvresult,int range,
+	const Player *player,int x,int y,int* px,int* py)
 {
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2479,8 +2507,115 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 	unsigned short Y;
     } * points;
     int size;
-    int x;
-    int y;
+    int rx;
+    int ry;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    unsigned char* m;
+    unsigned char* matrix;
+    int destx;
+    int desty;
+    int cdist;
+
+    destx=x;
+    desty=y;
+    size=min(TheMap.Width*TheMap.Height/4,range*range*5);
+    points=malloc(size*sizeof(*points));
+
+    //	Make movement matrix. FIXME: can create smaller matrix.
+    matrix=CreateMatrix();
+    w=TheMap.Width+2;
+    matrix+=w+w+2;
+    points[0].X=x;
+    points[0].Y=y;
+    rp=0;
+    matrix[x+y*w]=1;			// mark start point
+    ep=wp=1;				// start with one point
+    cdist=0;				// current distance is 0
+
+    //
+    //	Pop a point from stack, push all neighbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    DebugLevel3("%d,%d\n" _C_ rx _C_ ry);
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		//  Make sure we don't leave the map.
+		if (x<0||y<0||x>=TheMap.Width||y>=TheMap.Height) {
+		    continue; 
+		}
+		m=matrix+x+y*w;
+		//  Check if visited or unexplored
+		if( *m || (player&&!IsMapFieldExplored(player,x,y))) {
+		    continue;
+		}
+		//	Look if found what was required.
+		if ( rvresult?CanMoveToMask(x,y,resmask):!CanMoveToMask(x,y,resmask) ) {
+		    *px=x;
+		    *py=y;
+		    DebugLevel3("Found it! %X %X\n" _C_ TheMap.Fields[x+y*TheMap.Width].Flags _C_ resmask);
+		    return 1;
+		}
+		if( CanMoveToMask(x,y,movemask) ) {	// reachable
+		    *m=1;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+		    if( ++wp>=size ) {		// round about
+			wp=0;
+		    }
+		    if (wp==ep) {
+			//  We are out of points, give up!
+			DebugLevel0Fn("Ran out of points the hard way, beware.\n");
+			break;
+		    }
+		} else {			// unreachable
+		    *m=99;
+		}
+	    }
+	    if( ++rp>=size ) {			// round about
+		rp=0;
+	    }
+	}
+	cdist++;
+	if( rp==wp||cdist>=range ) {			// unreachable, no more points available
+	    break;
+	}
+	//	Continue with next set.
+	ep=wp;
+    }
+    free(points);
+    return 0;
+}
+
+/**
+ **	Find Resource.
+ **
+ **	@param unit	The unit that wants to find a resource.
+ **	@param x	Closest to x
+ **	@param x	Closest to y
+ **	@param range    Maximum distance to the resource.
+ **
+ **	@notes 		This will return an usable resource building that
+ **			belongs to "player" or is neutral.
+ **
+ **	@return		NoUnitP or resource unit
+ */
+global Unit* FindResource(const Unit * unit,int x,int y,int range)
+{
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+	unsigned short X;
+	unsigned short Y;
+    } * points;
+    int size;
     int rx;
     int ry;
     int mask;
@@ -2493,80 +2628,42 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     unsigned char* m;
     unsigned char* matrix;
     const Unit* destu;
+    Unit* mine;
+    Unit* bestmine;
     int destx;
     int desty;
-    int bestx;
-    int besty;
     int bestd;
+    int cdist;
+    int resource;
 
-    destx=x=unit->X;
-    desty=y=unit->Y;
-    size=TheMap.Width*TheMap.Height/4;
+    resource=unit->CurrentResource;
+
+    destx=x;
+    desty=y;
+    size=min(TheMap.Width*TheMap.Height/4,range*range*5);
     points=malloc(size*sizeof(*points));
 
-    //
-    //	Find the nearest wood depot
-    //
-    if( (destu=FindDeposit(unit->Player,x,y,WoodCost)) ) {
+    //	Find the nearest gold depot
+    if( (destu=FindDeposit(unit,x,y,range)) ) {
 	NearestOfUnit(destu,x,y,&destx,&desty);
     }
     bestd=99999;
-    IfDebug( bestx=besty=0; );		// keep the compiler happy
-
-    //
     //	Make movement matrix. FIXME: can create smaller matrix.
-    //
     matrix=CreateMatrix();
     w=TheMap.Width+2;
     matrix+=w+w+2;
-
-    //
-    //	Mark sight range as border. FIXME: matrix didn't need to be bigger.
-    //
-    n=unit->Stats->SightRange;
-    rx=x-n;
-    if( rx<0 ) {
-	rx=0;
-    }
-    ep=x+n;
-    if( ep>TheMap.Width ) {
-	ep=TheMap.Width;
-    }
-    ry=y-n;
-    if( ry<0 ) {
-	ry=0;
-    }
-    wp=y+n;
-    if( wp>TheMap.Height ) {
-	wp=TheMap.Height;
-    }
-    for( i=rx; i<ep; ++i ) {		// top bottom line
-	matrix[i+ry*w]=matrix[i+wp*w]=66;
-    }
-    for( i=ry+1; i<wp-1; ++i ) {
-	matrix[rx+i*w]=matrix[ep+i*w]=66;
-    }
-
-#if 0
-    matrix[x+n+(y+n)*w]=matrix[x-n+(y+n)*w]=
-	matrix[x+n+(y-n)*w]=matrix[x-n+(y-n)*w]=66;
-    for( i=n; i--; ) {
-	// FIXME: marks out of map area
-	DebugCheck( x-i+(y-n)*w<0 || x+i+(y+n)*w>w*TheMap.Hight );
-	matrix[x+n+(y+i)*w]=matrix[x-n+(y+i)*w]=
-	    matrix[x+n+(y-i)*w]=matrix[x-n+(y-i)*w]=
-	    matrix[x-i+(y+n)*w]=matrix[x+i+(y+n)*w]=
-	    matrix[x-i+(y-n)*w]=matrix[x+i+(y-n)*w]=66;
-    }
-#endif
-
+    //  Unit movement mask
     mask=UnitMovementMask(unit);
-
+    //  Ignore all units along the way. Might seem wierd, but otherwise
+    //  peasants would lock at a mine with a lot of workers.
+    mask&=~(MapFieldLandUnit|MapFieldSeaUnit|MapFieldAirUnit);
     points[0].X=x;
     points[0].Y=y;
     rp=0;
     matrix[x+y*w]=1;			// mark start point
     ep=wp=1;				// start with one point
+    cdist=0;				// current distance is 0
+    bestmine=NoUnitP;
 
     //
     //	Pop a point from stack, push all neighbors which could be entered.
@@ -2583,23 +2680,28 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		    continue;
 		}
 
+		if (!IsMapFieldExplored(unit->Player,x,y)) { // Unknown.
+		    continue;
+		}
+
 		//
-		//	Look if there is wood
+		//	Look if there is a mine
 		//
-		if ( ForestOnMap(x,y) && IsMapFieldExplored(unit->Player,x,y) ) {
+		if ((mine=ResourceOnMap(x,y,resource))&&
+			(mine->Type->CanHarvest)&&
+			((mine->Player->Player==PlayerMax-1)||
+			(mine->Player==unit->Player)||
+			(IsAllied(unit->Player,mine)))) {
 		    if( destu ) {
 			n=max(abs(destx-x),abs(desty-y));
 			if( n<bestd ) {
 			    bestd=n;
-			    bestx=x;
-			    besty=y;
+			    bestmine=mine;
 			}
-			*m=22;
+			*m=99;
 		    } else {			// no goal take the first
-			*px=x;
-			*py=y;
 			free(points);
-			return 1;
+			return mine;
 		    }
 		}
 
@@ -2610,6 +2712,10 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		    if( ++wp>=size ) {		// round about
 			wp=0;
 		    }
+		    if (wp==ep) {
+			//  We are out of points, give up!
+			break;
+		    }
 		} else {			// unreachable
 		    *m=99;
 		}
@@ -2618,138 +2724,141 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		rp=0;
 	    }
 	}
-
-	//
 	//	Take best of this frame, if any.
-	//
 	if( bestd!=99999 ) {
-	    *px=bestx;
-	    *py=besty;
 	    free(points);
-	    return 1;
+	    return bestmine;
 	}
-
-	//
-	//	Continue with next frame.
-	//
-	if( rp==wp ) {			// unreachable, no more points available
+	cdist++;
+	if( rp==wp||cdist>=range ) {			// unreachable, no more points available
 	    break;
 	}
+	//	Continue with next set.
 	ep=wp;
     }
-
-    DebugLevel3Fn("no wood in sight-range\n");
-
+    DebugLevel3Fn("no resource found\n");
     free(points);
-    return 0;
-}
-
-/**
- **	Find Resource.
- **
- **	@param player	The player that wants to find a resource.
- **	@param x	Nearest to X position.
- **	@param y	Nearest to Y position
- **	@param resource	The ID of the resource.
- **
- **	@notes 		This will return an usable resource building that
- **			belongs to "player" or is neutral.
- **
- **	@return		NoUnitP or oil platform unit
- */
-global Unit* FindResource(const Player* player,int x,int y,int resource)
-{
-    Unit* unit;
-    Unit* best;
-    Unit** units;
-    int nunits;
-    int best_d;
-    int d;
-    int i;
-    int pnum;
-
-    //	FIXME:	this is not the best one
-    //		We need the deposit with the shortest way!
-    //		At least it must be reachable!
-
-    best=NoUnitP;
-    best_d=99999;
-    for (pnum=0;pnum<PlayerMax;++pnum) {
-	// FIXME: allow harvesting from ally
-	if ( (pnum!=PlayerMax-1) && (pnum!=player->Player) ) {
-	    continue;
-	}
-	nunits=Players[pnum].TotalNumUnits;
-	units=Players[pnum].Units;
-	for( i=0; i<nunits; i++ ) {
-	    unit=units[i];
-	    if( UnitUnusable(unit) || !unit->Type->CanHarvest ) {
-		continue;
-	    }
-	    // Want platform
-	    if( unit->Type->GivesResource==resource ) {
-		d=MapDistanceToUnit(x,y,unit);
-		if( d<best_d ) {
-		    best_d=d;
-		    best=unit;
-		}
-	    }
-	}
-    }
-
-    DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
-	    best?best->X:-1 _C_ best?best->Y:-1);
-    return best;
+    return NoUnitP;
 }
 
 /**
  **	Find deposit. This will find a deposit for a resource 
  **
- **	@param player   The player the deposit must belong to.
- **	@param x	Nearest to X position.
- **	@param y	Nearest to Y position.
- **	@param resource The resource you need the deposit to hold.
+ **	@param unit	The unit that wants to find a resource.
+ **	@param x	Closest to x
+ **	@param x	Closest to y
+ **	@param range    Maximum distance to the deposit.
+ **
+ **	@notes		This will return a reachable allied depot.
  **
  **	@return		NoUnitP or oil deposit unit
  */
-global Unit* FindDeposit(const Player* player,int x,int y,int resource)
+global Unit* FindDeposit(const Unit* unit,int x,int y,int range)
 {
-    Unit* unit;
-    Unit* best;
-    Unit** units;
-    int nunits;
-    int best_d;
-    int d,i;
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+	unsigned short X;
+	unsigned short Y;
+    } * points;
+    int size;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    unsigned char* m;
+    unsigned char* matrix;
+    Unit* depot;
+    int destx;
+    int desty;
+    int cdist;
+    int resource;
 
-    //	FIXME:	this is not the best one
-    //		We need the deposit with the shortest way!
-    //		At least it must be reachable!
-    //	FIXME:	Could we use unit-cache to find it faster?
+    resource=unit->CurrentResource;
+
+    destx=x;
+    desty=y;
+    size=min(TheMap.Width*TheMap.Height/4,range*range*5);
+    points=malloc(size*sizeof(*points));
+
+    //	Make movement matrix. FIXME: can create smaller matrix.
+    matrix=CreateMatrix();
+    w=TheMap.Width+2;
+    matrix+=w+w+2;
+    //  Unit movement mask
+    mask=UnitMovementMask(unit);
+    //  Ignore all units along the way. Might seem wierd, but otherwise
+    //  peasants would lock at a mine with a lot of workers.
+    mask&=~(MapFieldLandUnit|MapFieldSeaUnit|MapFieldAirUnit);
+    points[0].X=x;
+    points[0].Y=y;
+    rp=0;
+    matrix[x+y*w]=1;			// mark start point
+    ep=wp=1;				// start with one point
+    cdist=0;				// current distance is 0
+
     //
-
-    best=NoUnitP;
-    best_d=INT_MAX;
-    nunits=player->TotalNumUnits;
-    units=player->Units;
-    for( i=0; i<nunits; i++ ) {
-	unit=units[i];
-	if( UnitUnusable(unit) ) {
-	    continue;
-	}
-	if( unit->Type->CanStore[resource] ) {
-	    d=MapDistanceToUnit(x,y,unit);
-	    if( d<best_d
-		    // FIXME: UnitReachable didn't work with unit inside
-		    /*&& (d=UnitReachable(source,unit,1)) && d<best_d*/ ) {
-		best_d=d;
-		best=unit;
+    //	Pop a point from stack, push all neighbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		//  Make sure we don't leave the map.
+		if (x<0||y<0||x>=TheMap.Width||y>=TheMap.Height) {
+		    continue; 
+		}
+		m=matrix+x+y*w;
+		//  Check if visited or unexplored
+		if( *m || !IsMapFieldExplored(unit->Player,x,y)) {
+		    continue;
+		}
+		//
+		//	Look if there is a mine
+		//
+		if ((depot=ResourceDepositOnMap(x,y,resource))&&
+			((IsAllied(unit->Player,depot)) ||
+			(unit->Player==depot->Player))) {
+		    free(points);
+		    return depot;
+		}
+		if( CanMoveToMask(x,y,mask) ) {	// reachable
+		    *m=1;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+		    if( ++wp>=size ) {		// round about
+			wp=0;
+		    }
+		    if (wp==ep) {
+			//  We are out of points, give up!
+			DebugLevel0Fn("Ran out of points the hard way, beware.\n");
+			break;
+		    }
+		} else {			// unreachable
+		    *m=99;
+		}
+	    }
+	    if( ++rp>=size ) {			// round about
+		rp=0;
 	    }
 	}
+	cdist++;
+	if( rp==wp||cdist>=range ) {			// unreachable, no more points available
+	    break;
+	}
+	//	Continue with next set.
+	ep=wp;
     }
-
-    DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
-	    best?best->X:-1 _C_ best?best->Y:-1);
-    return best;
+    DebugLevel3Fn("no resource deposit found\n");
+    free(points);
+    return NoUnitP;
 }
 
 /**
@@ -3146,14 +3255,14 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     }
 #endif
 
+    // FIXME: this is dumb. I made repairers capture. crap.
     // david: capture enemy buildings
     // Only worker types can capture.
     // Still possible to destroy building if not careful (too many attackers)
     if( EnableBuildingCapture && attacker
 	    && type->Building && target->HP<=damage*3
 	    && IsEnemy(attacker->Player,target)
-	    && (attacker->Type==UnitTypeOrcWorker
-		|| attacker->Type==UnitTypeHumanWorker) ) {
+	    && attacker->Type->RepairRange ) {
 	ChangeUnitOwner(target,attacker->Player);
 	CommandStopUnit(attacker);	// Attacker shouldn't continue attack!
     }
@@ -3558,9 +3667,6 @@ local void SaveOrder(const Order* order,CLFile* file)
 	case UnitActionRepair:
 	    CLprintf(file,"action-repair");
 	    break;
-	case UnitActionHarvest:
-	    CLprintf(file,"action-harvest");
-	    break;
 	case UnitActionResource:
 	    CLprintf(file,"action-resource");
 	    break;
@@ -3731,6 +3837,9 @@ global void SaveUnit(const Unit* unit,CLFile* file)
     CLprintf(file,"'last-group %d\n  ",unit->LastGroup);
 
     CLprintf(file,"'value %d\n  ",unit->Value);
+    if (unit->CurrentResource) {
+	CLprintf(file,"'current-resource '%s\n  ",DefaultResourceNames[unit->CurrentResource]);
+    }
 
     CLprintf(file,"'sub-action %d ",unit->SubAction);
     CLprintf(file,"'wait %d ",unit->Wait);
@@ -3774,6 +3883,13 @@ global void SaveUnit(const Unit* unit,CLFile* file)
 	    if( unit->Type->GivesResource ) {
 		CLprintf(file," 'resource-active %d",unit->Data.Resource.Active);
 	    }
+	    break;
+	case UnitActionResource:
+	    CLprintf(file," 'data-res-worker '(time-to-harvest %d",unit->Data.ResWorker.TimeToHarvest);
+	    if (unit->Data.ResWorker.DoneHarvesting) {
+		CLprintf(file," done-harvesting");
+	    }
+	    CLprintf(file,")");
 	    break;
 	case UnitActionBuilded:
 	    {

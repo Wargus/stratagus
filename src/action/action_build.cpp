@@ -392,7 +392,7 @@ global void HandleActionBuilded(Unit* unit)
 		//
 		//	If we can harvest from the new building, do it.
 		//
-		if (worker->Type->Harvester&&worker->Type->ResourceHarvested==type->GivesResource) {
+		if (worker->Type->ResInfo[type->GivesResource]) {
 		    CommandResource(worker,unit,0);
 		}
 	    }

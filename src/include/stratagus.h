@@ -139,6 +139,7 @@
 #pragma warning(disable:4244)		// Conversion from double to uchar
 #pragma warning(disable:4761)		// Integral size mismatch
 #define snprintf _snprintf		/// Unix -> dumm
+#define vsnprintf _vsnprintf
 #include <string.h>
 #define strdup _strdup
 #define strncasecmp strnicmp
@@ -531,21 +532,8 @@ extern long isqrt(long num);
     /// bits macro
 #define BitsOf(n)	(sizeof(n)*8)
 
-    // FIXME: more config stuff which needs a better place
-
-    /// How long stay in a gold-mine
-#define MINE_FOR_GOLD	(150/SpeedResourcesHarvest[GoldCost])
-    /// How long stay in a gold-deposit
-#define WAIT_FOR_GOLD	(150/SpeedResourcesReturn[GoldCost])
-    /// How much I must chop for 1 wood
-#define CHOP_FOR_WOOD	(52/SpeedResourcesHarvest[WoodCost])
-    /// How long stay in a wood-deposit
-#define WAIT_FOR_WOOD	(100/SpeedResourcesReturn[WoodCost])
-    /// How long stay in a oil-well
-#define HAUL_FOR_OIL	(100/SpeedResourcesHarvest[OilCost])
-    /// How long stay in a oil-deposit
-#define WAIT_FOR_OIL	(100/SpeedResourcesReturn[OilCost])
-
+// 	FIXME: configurable. maybe we could move it into one big global
+// 	FIXME: settings struct?
     /// How many resource get the player back if canceling building
 #define CancelBuildingCostsFactor	75
     /// How many resource get the player back if canceling training

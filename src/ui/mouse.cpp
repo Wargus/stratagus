@@ -111,6 +111,7 @@ global void DoRightButton(int sx,int sy)
     int action;
     int acknowledged;
     int flush;
+    int res;
 
     //
     // No unit selected
@@ -196,41 +197,45 @@ global void DoRightButton(int sx,int sy)
 	//	Handle resource workers.
 	//
 	if( action==MouseActionHarvest ) {
-	    //	Return wood cutter home
-	    if( (type==UnitTypeOrcWorkerWithWood ||
-		    type==UnitTypeHumanWorkerWithWood) &&
-		    dest && dest->Type->CanStore[WoodCost] &&
-		    dest->Player==unit->Player) {
-		DebugLevel3("send to wood deposit.\n");
-		dest->Blink=4;
-		SendCommandReturnGoods(unit,dest,flush);
-		continue;
-	    }
-	    //	Send wood cutter to work
-	    if((type==UnitTypeOrcWorker||type==UnitTypeHumanWorker) &&
-		    IsMapFieldExplored(unit->Player,x,y) &&
-		    ForestOnMap(x,y) ) {
-		SendCommandHarvest(unit,x,y,flush);
-		continue;
-	    }
-	    if (unit->Type->Harvester && dest) {
-		//  Return a loaded harvester to deposit
-		if( unit->Value>0 &&
-			dest->Type->CanStore[unit->Type->ResourceHarvested] &&
-			dest->Player==unit->Player) {
-		    dest->Blink=4;
-		    DebugLevel3Fn("Return to deposit.\n");
-		    SendCommandReturnGoods(unit,dest,flush);
-		    continue;
-		} 
-		//  Go and harvest
-		if( (unit->Value<unit->Type->ResourceCapacity) &&
-			dest->Type->GivesResource==unit->Type->ResourceHarvested &&
-			(dest->Player==unit->Player ||
-			 dest->Player->Player==PlayerMax-1)) {
-		    dest->Blink=4;
-		    SendCommandResource(unit,dest,flush);
-		    continue;
+	    if (unit->Type->Harvester) {
+		if ( dest ) {
+		    //  Return a loaded harvester to deposit
+		    if( (unit->Value>0) &&
+			    (dest->Type->CanStore[unit->CurrentResource])&&
+			    (dest->Player==unit->Player) ) {
+			dest->Blink=4;
+			DebugLevel3Fn("Return to deposit.\n");
+			SendCommandReturnGoods(unit,dest,flush);
+			continue;
+		    } 
+		    //  Go and harvest from an building
+		    if( (res=dest->Type->GivesResource) &&
+			    (unit->Type->ResInfo[res]) &&
+			    (unit->Value<unit->Type->ResInfo[res]->ResourceCapacity) &&
+			    (dest->Type->CanHarvest) &&
+			    (dest->Player==unit->Player ||
+			        (dest->Player->Player==PlayerMax-1)) ) {
+			dest->Blink=4;
+			SendCommandResource(unit,dest,flush);
+			continue;
+		    }
+		} else {
+		    // FIXME: support harvesting more types of terrain.
+		    for (res=0;res<MaxCosts;res++) {
+			if ( (unit->Type->ResInfo[res]) &&
+				(unit->Type->ResInfo[res]->TerrainHarvester) && 
+				(IsMapFieldExplored(unit->Player,x,y)) &&
+				(ForestOnMap(x,y)) &&
+				((unit->CurrentResource!=res)||
+				(unit->Value<unit->Type->ResInfo[res]->ResourceCapacity))) {
+			    DebugLevel3("Sent worker to cut wood.\n");
+			    SendCommandResourceLoc(unit,x,y,flush);
+			    break;
+			}
+		    }
+		    if (res!=MaxCosts) {
+			continue;
+		    }
 		}
 	    }
 	    //  Go and repair
@@ -358,7 +363,7 @@ global void DoRightButton(int sx,int sy)
 	    }
 	    if( IsMapFieldExplored(unit->Player,x,y) && ForestOnMap(x,y) ) {
                 DebugLevel3("RALY POINT TO FOREST\n");                
-	        SendCommandHarvest(Selected[i],x,y,!(KeyModifiers&ModifierShift));
+	        SendCommandResourceLoc(Selected[i],x,y,!(KeyModifiers&ModifierShift));
                 continue;
             }
 	    SendCommandMove(unit,x,y,flush);
@@ -945,23 +950,31 @@ local void SendDemolish(int sx,int sy)
 **
 **	@see Selected
 */
-local void SendHarvest(int sx,int sy)
+local void SendResource(int sx,int sy)
 {
     int i;
+    int res;
     Unit* dest;
 
     for( i=0; i<NumSelected; ++i ) {
-	DebugCheck(!Selected[i]->Type->Harvester);
 	if ((dest=UnitUnderCursor) &&
-		(Selected[i]->Type->ResourceHarvested==dest->Type->GivesResource)) {
+		(Selected[i]->Type->Harvester) &&
+		(res=dest->Type->GivesResource) &&
+		(Selected[i]->Type->ResInfo[res])) {
 	    dest->Blink=4;
 	    DebugLevel3("RESOURCE\n");
 	    SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
 	}
-	if( IsMapFieldExplored(Selected[i]->Player,sx/TileSizeX,sy/TileSizeY) &&
-		ForestOnMap(sx/TileSizeX,sy/TileSizeY) ) {
-	    SendCommandHarvest(Selected[i],sx/TileSizeY,sy/TileSizeY,!(KeyModifiers&ModifierShift));
+	for (res=0;res<MaxCosts;res++) {
+	    if( Selected[i]->Type->Harvester &&
+		    Selected[i]->Type->ResInfo[res] &&
+		    Selected[i]->Type->ResInfo[res]->TerrainHarvester &&
+		    IsMapFieldExplored(Selected[i]->Player,sx/TileSizeX,sy/TileSizeY) &&
+		    ForestOnMap(sx/TileSizeX,sy/TileSizeY) ) {
+		DebugLevel3("RESOURCE\n");
+		SendCommandResourceLoc(Selected[i],sx/TileSizeY,sy/TileSizeY,!(KeyModifiers&ModifierShift));
+	    }
 	}
     }
 }
@@ -1070,7 +1083,7 @@ local void SendCommand(int sx, int sy)
 	    SendPatrol(sx,sy);
 	    break;
 	case ButtonHarvest:
-	    SendHarvest(sx,sy);
+	    SendResource(sx,sy);
 	    break;
 	case ButtonUnload:
 	    SendUnload(sx,sy);

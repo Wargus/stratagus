@@ -76,10 +76,6 @@ global int NumUnitTypes;			/// number of unit-types made
 **
 **	FIXME: find a way to make it configurable!
 */
-global UnitType*UnitTypeHumanWorker;		/// Human worker
-global UnitType*UnitTypeOrcWorker;		/// Orc worker
-global UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
-global UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
 global UnitType*UnitTypeHumanWall;		/// Human wall
 global UnitType*UnitTypeOrcWall;		/// Orc wall
 global UnitType*UnitTypeCritter;		/// Critter unit type pointer
@@ -453,8 +449,13 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	// Cowards
 	unittype->Coward=BIT(8,v)|BIT(26,v);
 	if (BIT(9,v)) {
-	    unittype->Harvester=1;
-	    unittype->ResourceHarvested=OilCost;
+	    unittype->ResInfo[OilCost]=(ResourceInfo*)malloc(sizeof(ResourceInfo));
+	    memset(unittype->ResInfo[OilCost],0,sizeof(ResourceInfo));
+	    unittype->ResInfo[OilCost]->ResourceId=OilCost;
+	    unittype->ResInfo[OilCost]->FinalResource=OilCost;
+	    unittype->ResInfo[OilCost]->WaitAtResource=150;
+	    unittype->ResInfo[OilCost]->WaitAtDepot=150;
+	    unittype->ResInfo[OilCost]->ResourceCapacity=100;
 	}
 	unittype->Transporter=BIT(10,v);
 	unittype->CanStore[GoldCost]=BIT(12,v);
@@ -645,6 +646,7 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 {
     int i;
     int flag;
+    ResourceInfo* res;
 
     CLprintf(file,"(define-unit-type '%s",type->Ident);
     CLprintf(file," 'name \"%s\"\n  ",type->Name);
@@ -905,35 +907,52 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( type->Coward ) {
 	CLprintf(file,"  'coward\n");
     }
+    
     if( type->Harvester ) {
-	CLprintf(file,"  'harvester 'resource-harvested '%s\n",DefaultResourceNames[type->ResourceHarvested]);
+	CLprintf(file,"  'harvester\n");
+	for (i=0;i<MaxCosts;i++) {
+	    if (type->ResInfo[i]) {
+		res=type->ResInfo[i];
+		CLprintf(file,"  'can-gather-resource '(\n");
+		CLprintf(file,"        resource-id %s\n",DefaultResourceNames[res->ResourceId]);
+		CLprintf(file,"        final-resource %s\n",DefaultResourceNames[res->FinalResource]);
+		if( res->HarvestFromOutside ) {
+		    CLprintf(file,"        harvest-from-outside\n");
+		}
+		if ( res->WaitAtResource ) {
+		    CLprintf(file,"        wait-at-resource %d\n",res->WaitAtResource);
+		}
+		if ( res->WaitAtDepot ) {
+		    CLprintf(file,"        wait-at-depot %d\n",res->WaitAtDepot);
+		}
+		if ( res->ResourceCapacity ) {
+		    CLprintf(file,"        resource-capacity %d\n",res->ResourceCapacity);
+		}
+		if( res->ResourceStep ) {
+		    CLprintf(file,"        resource-step %d\n",res->ResourceStep);
+		}
+		if( res->TerrainHarvester ) {
+		    CLprintf(file,"        terrain-harvester\n");
+		}
+		if( res->LoseResources ) {
+		    CLprintf(file,"        lose-resources\n");
+		}
+		if ( res->FileWhenEmpty ) {
+		    CLprintf(file,"        file-when-empty %s\n",res->FileWhenEmpty);
+		}
+		if ( res->FileWhenLoaded ) {
+		    CLprintf(file,"        file-when-loaded %s\n",res->FileWhenLoaded);
+		}
+		CLprintf(file,"        )\n");
+	    }
+	}
     }
-    if( type->HarvestFromOutside ) {
-	CLprintf(file,"  'harvest-from-outside\n");
-    }
-    if ( type->WaitAtResource ) {
-	CLprintf(file,"  'wait-at-resource %d\n",type->WaitAtResource);
-    }
-    if ( type->WaitAtDepot ) {
-	CLprintf(file,"  'wait-at-depot %d\n",type->WaitAtDepot);
-    }
-    if ( type->ResourceCapacity ) {
-        CLprintf(file,"  'resource-capacity %d\n",type->ResourceCapacity);
-    }
-    if ( type->TransformWhenEmpty ) {
-	CLprintf(file,"  'transform-when-empty '%s\n",type->TransformWhenEmpty->Ident);
-    }
-    if ( type->TransformWhenLoaded ) {
-	CLprintf(file,"  'transform-when-loaded '%s\n",type->TransformWhenLoaded->Ident);
-    }
+
     if( type->GivesResource ) {
 	CLprintf(file,"  'gives-resource '%s\n",DefaultResourceNames[type->GivesResource]);
     }
     if( type->MaxWorkers ) {
 	CLprintf(file,"  'max-workers %d\n",type->MaxWorkers);
-    }
-    if( type->ResourceStep ){
-	CLprintf(file,"  'resource-step %d\n",type->ResourceStep);
     }
    
     // Save store info.
@@ -1222,10 +1241,6 @@ global void InitUnitTypes(int reset_player_stats)
     //
     //	Setup hardcoded unit types. FIXME: should be moved to some configs.
     //
-    UnitTypeHumanWorker=UnitTypeByIdent("unit-peasant");
-    UnitTypeOrcWorker=UnitTypeByIdent("unit-peon");
-    UnitTypeHumanWorkerWithWood=UnitTypeByIdent("unit-peasant-with-wood");
-    UnitTypeOrcWorkerWithWood=UnitTypeByIdent("unit-peon-with-wood");
     UnitTypeHumanWall=UnitTypeByIdent("unit-human-wall");
     UnitTypeOrcWall=UnitTypeByIdent("unit-orc-wall");
     UnitTypeCritter=UnitTypeByIdent("unit-critter");
@@ -1239,16 +1254,35 @@ global void LoadUnitTypes(void)
 {
     UnitType* type;
     const char* file;
+    char buf[1000];
     int i;
+    int res;
+    ResourceInfo* resinfo;
 
     for( i=0; i<NumUnitTypes; ++i ) {
 	type=UnitTypes[i];
 	if( (file=type->ShadowFile) ) {
-	    char *buf;
-	    buf=alloca(strlen(file)+9+1);
 	    file=strcat(strcpy(buf,"graphics/"),file);
 	    ShowLoadProgress("\tUnit `%s'\n",file);
 	    type->ShadowSprite=LoadSprite(file,type->ShadowWidth,type->ShadowHeight);
+	}
+
+	//  Load empty/loaded graphics
+	if (type->Harvester) {
+	    for (res=0;res<MaxCosts;res++) {
+		if ((resinfo=type->ResInfo[res])) {
+		    if ((file=resinfo->FileWhenLoaded)) {
+			file=strcat(strcpy(buf,"graphics/"),file);
+			ShowLoadProgress("\tUnit `%s'\n",file);
+			resinfo->SpriteWhenLoaded=LoadSprite(file,type->Width,type->Height);
+		    }
+		    if ((file=resinfo->FileWhenEmpty)) {
+			file=strcat(strcpy(buf,"graphics/"),file);
+			ShowLoadProgress("\tUnit `%s'\n",file);
+			resinfo->SpriteWhenEmpty=LoadSprite(file,type->Width,type->Height);
+		    }
+		}
+	    }
 	}
 
 	//
@@ -1310,9 +1344,6 @@ global void LoadUnitTypes(void)
 
 	// FIXME: should i copy the animations of same graphics?
     }
-
-    // FIXME: must copy unit data from peon/peasant to with gold/wood
-    // FIXME: must copy unit data from tanker to tanker full
 }
 
 /**
@@ -1324,6 +1355,7 @@ global void CleanUnitTypes(void)
     void** ptr;
     int i;
     int j;
+    int res;
     Animations* anims;
 
     DebugLevel0Fn("FIXME: icon, sounds not freed.\n");
@@ -1407,6 +1439,24 @@ global void CleanUnitTypes(void)
 	    free(type->CorpseName);
 	}
 
+	for (res=0;res<MaxCosts;res++) {
+	    if (type->ResInfo[res]) {
+		if (type->ResInfo[res]->SpriteWhenLoaded) {
+		    free (type->ResInfo[res]->SpriteWhenLoaded);
+		}
+		if (type->ResInfo[res]->SpriteWhenEmpty) {
+		    free (type->ResInfo[res]->SpriteWhenEmpty);
+		}
+		if (type->ResInfo[res]->FileWhenEmpty) {
+		    free (type->ResInfo[res]->FileWhenEmpty);
+		}
+		if (type->ResInfo[res]->FileWhenLoaded) {
+		    free (type->ResInfo[res]->FileWhenLoaded);
+		}
+		free (type->ResInfo[res]);
+	    }
+	}
+
 	//
 	//	FIXME: Sounds can't be freed, they still stuck in sound hash.
 	//
@@ -1445,10 +1495,6 @@ global void CleanUnitTypes(void)
     //
     //	Clean hardcoded unit types.
     //
-    UnitTypeHumanWorker=NULL;
-    UnitTypeOrcWorker=NULL;
-    UnitTypeHumanWorkerWithWood=NULL;
-    UnitTypeOrcWorkerWithWood=NULL;
     UnitTypeHumanWall=NULL;
     UnitTypeOrcWall=NULL;
     UnitTypeCritter=NULL;

@@ -38,7 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@struct _unit_type_ unittype.h
+** 	@struct _unit_type_ unittype.h
 **
 **	\#include "unittype.h"
 **
@@ -328,54 +328,17 @@
 **
 **		Resource can be harvested. It's false for things like
 **		oil patches.
+**		FIXME: crappy name.
 **
 **	UnitType::Harvester
 **
-**		Unit is a resource worker.
+**		Unit is a resource worker. Faster than examining ResInfo
 **
-**	UnitType::HarvestFromOutside
 **
-**		Unit will harvest from the outside. The unit will use it's
-**		Attack animation (seems it turned into a generic Action anim.)
+**	UnitType::ResInfo[::MaxCosts]
 **
-**      UnitType::ResourceHarvested
-**
-**		The resource it can harvest. Needs Harvester flag. An unit
-**		can't harvest more than one type of resource.
-**		FIXME: implement something like TransformForOtherResource.
-**
-**	UnitType::WaitAtResource
-**
-**		Cycles the unit waits while inside a resource.
-**
-**	UnitType::ResourceStep
-**
-**		The unit makes so-caled mining cycles. Each mining cycle
-**		it does some sort of animation and gains ResourceStep
-**		resources. You can stop after any number of steps.
-**		when the quantity in the harvester reaches the maximum
-**		(ResourceCapacity) it will return home. I this is 0 then
-**		it's considered infinity, and ResourceCapacity will now
-**		be the limit.
-**
-**	UnitType::ResourceCapacity
-**
-**		Maximum amount of resources a harvester can carry. The
-**		actual amount can be modified while unloading.
-**
-**	UnitType::WaitAtDepot
-**
-**		Cycles the unit waits while inside the depot to unload.
-**
-**	UnitType::TransformWhenEmpty;
-**	
-**		The harvester will transform into another unit when it is
-**		empty. FIXME: just change the animation.
-**
-**	UnitType::TransformWhenLoaded
-**
-**		The harvester will transform into another unit when it is
-**		loaded. FIXME: just change the animation.
+**		Information about resource harvesting. If NULL, it can't
+**		harvest it.
 **
 **	UnitType::MustBuildOnTop
 **
@@ -520,6 +483,73 @@
 **
 **		Sprite images of the player colors.  This image is drawn
 **		over UnitType::Sprite.  Used with OpenGL only.
+**
+**
+**
+** 	@struct _resource_info_ unittype.h
+**
+** 	\#include "unittype.h"
+**
+** 	typedef struct _unit_type_ UnitType;
+**
+** 	This struct contains information about how a unit will harvest a
+** 	resource.
+**
+**	ResourceInfo::FileWhenLoaded
+**
+**		The harvester's animation file will change when it's loaded.
+**
+**	ResourceInfo::FileWhenEmpty;
+**	
+**		The harvester's animation file will change when it's empty.
+**		The standard animation is used only when building/repairing.
+**
+**
+**	ResourceInfo::HarvestFromOutside
+**
+**		Unit will harvest from the outside. The unit will use it's
+**		Attack animation (seems it turned into a generic Action anim.)
+**
+**      ResourceInfo::ResourceId
+**
+**		The resource this is for. Mostly redundant.
+**
+**	ResourceInfo::FinalResource
+**
+**		The resource is converted to this at the depot. Usefull for
+**		a fisherman who harvests fish, but it all turns to food at the
+**		depot.
+**
+**	ResourceInfo::WaitAtResource
+**
+**		Cycles the unit waits while inside a resource.
+**
+**	ResourceInfo::ResourceStep
+**
+**		The unit makes so-caled mining cycles. Each mining cycle
+**		it does some sort of animation and gains ResourceStep
+**		resources. You can stop after any number of steps.
+**		when the quantity in the harvester reaches the maximum
+**		(ResourceCapacity) it will return home. I this is 0 then
+**		it's considered infinity, and ResourceCapacity will now
+**		be the limit.
+**
+**	ResourceInfo::ResourceCapacity
+**
+**		Maximum amount of resources a harvester can carry. The
+**		actual amount can be modified while unloading.
+**
+**	ResourceInfo::WaitAtDepot
+**
+**		Cycles the unit waits while inside the depot to unload.
+**
+**	ResourceInfo::TerrainHarvester
+**
+**		The unit will harvest terrain. For now this only works
+**		for wood. maybe it could be made to work for rocks, but
+**		more than that requires a tileset rewrite.
+**		FIXME: more configurable.
+**
 */
 
 /*----------------------------------------------------------------------------
@@ -583,6 +613,23 @@ typedef struct _missile_config_ {
     char*	Name;			/// Config missile name
     MissileType*Missile;		/// Identifier to use to run time
 } MissileConfig;
+
+typedef struct _resource_info_ {
+    char * 	FileWhenLoaded;			/// Change the graphic when the unit is loaded.
+    char * 	FileWhenEmpty;			/// Change the graphic when the unit is empty.
+    unsigned 	HarvestFromOutside;		/// Unit harvests without entering the building.
+    unsigned 	WaitAtResource;			/// Cycles the unit waits while mining.
+    unsigned 	ResourceStep;			/// Resources the unit gains per mining cycle.
+    unsigned 	ResourceCapacity;		/// Max amount of resources to carry.
+    unsigned 	WaitAtDepot;			/// Cycles the unit waits while returning.
+    unsigned	ResourceId;			/// Id of the resource harvested. Redundant.
+    unsigned 	FinalResource;			/// Convert resource when delivered. 
+    unsigned 	TerrainHarvester;		/// Unit will harvest terrain(wood only for now).
+    unsigned	LoseResources;			/// The unit will lose it's resource when distracted.
+    //  Runtime info:
+    Graphic *   SpriteWhenLoaded;		/// The graphic corresponding to FileWhenLoaded.
+    Graphic *   SpriteWhenEmpty;		/// The graphic corresponding to FileWhenEmpty
+} ResourceInfo;
 
 /**
 **	Typedef of base structure of unit-type
@@ -664,6 +711,7 @@ struct _unit_type_ {
 #define CanTargetSea	2			/// Can attack sea units
 #define CanTargetAir	4			/// Can attack air units
 
+    unsigned EquivType : 1;		/// 
     unsigned Revealer : 1;		/// reveal the fog of war
     unsigned LandUnit : 1;		/// Land animated
     unsigned AirUnit : 1;		/// Air animated
@@ -692,20 +740,13 @@ struct _unit_type_ {
     unsigned Hero : 1;			/// Is hero only used for triggers .
     unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit.
     unsigned Organic : 1;		/// Organic can be healed.
-    
+
     unsigned CanStore[MaxCosts];	/// Resources that we can store here.
     unsigned GivesResource;		/// The resource this unit gives.
     unsigned MaxWorkers;		/// Maximum number of workers.
     unsigned CanHarvest : 1;		/// Resource can be harvested.
-    unsigned Harvester : 1;		/// Unit is a resource worker.
-    unsigned HarvestFromOutside;	/// Unit harvests without entering the building.
-    unsigned ResourceHarvested;		/// The resource it can harvest.
-    unsigned WaitAtResource;		/// Cycles the unit waits while mining.
-    unsigned ResourceStep;		/// Resources the unit gains per mining cycle.
-    unsigned ResourceCapacity;		/// Max amount of resources to carry.
-    unsigned WaitAtDepot;		/// Cycles the unit waits while returning.
-    UnitType* TransformWhenEmpty;	/// UnitType to transform to when empty.
-    UnitType* TransformWhenLoaded;	/// UnitType to transform to when loaded.
+    unsigned Harvester : 1;		/// unit is a resource harvester.
+    ResourceInfo* ResInfo[MaxCosts];	/// Resource information.
     UnitType* MustBuildOnTop;		/// Must be built on top of something.
 
     unsigned SelectableByRectangle : 1;	/// Selectable with mouse rectangle.
@@ -756,10 +797,6 @@ extern UnitType* UnitTypes[UnitTypeMax];	/// All unit-types
 extern int NumUnitTypes;			/// Number of unit-types made
 
 // FIXME: this hardcoded unit-types must be removed!!
-extern UnitType*UnitTypeHumanWorker;		/// Human worker
-extern UnitType*UnitTypeOrcWorker;		/// Orc worker
-extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
-extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
 extern UnitType*UnitTypeHumanWall;		/// Human wall
 extern UnitType*UnitTypeOrcWall;		/// Orc wall
 extern UnitType*UnitTypeCritter;		/// Critter unit-type pointer

@@ -1082,7 +1082,7 @@ global int HandleCheats(const char* Input)
 	    if( !ThisPlayer->Ai ) {
 	    	AiInit( ThisPlayer );
 	    }
-	    SetMessage("I'm an AI Now :)");
+	    SetMessage("I'm the BORG, resistance is futile!");
 	}
 #endif
     } else {
