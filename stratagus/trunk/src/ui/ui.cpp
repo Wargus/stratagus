@@ -102,13 +102,6 @@ global void InitUserInterface(const char *RaceName)
     //	Calculations
     //
 #ifdef SPLIT_SCREEN_SUPPORT
-#if 0
-    TheUI.MapArea.X = TheUI.MapX;
-    TheUI.MapArea.EndX = TheUI.MapEndX;
-    TheUI.MapArea.Y = TheUI.MapY;
-    TheUI.MapArea.EndY = TheUI.MapEndY;
-#endif
-
     TheUI.LastClickedVP = 0;
 
     TheUI.ViewportMode = VIEWPORT_SINGLE;
@@ -425,7 +418,7 @@ global int GetViewport (int x, int y)
 
 /**
 **	Takes coordinates of a map tile and computes the number of the map
-**  viewport (if any) inside which the tile is displayed.
+**	viewport (if any) inside which the tile is displayed.
 **
 **	@param tx	x coordinate of the map tile
 **	@param ty	y coordinate of the map tile
@@ -433,6 +426,10 @@ global int GetViewport (int x, int y)
 **	@return		viewport number (index into TheUI.VP) or -1
 **			if this map tile is not displayed in any of
 **			the viewports.
+**
+**	@note		If the tile (tx,ty) is currently displayed in more
+**			than one viewports (may well happen) this function
+**			returns the first one it finds.
 */
 global int MapTileGetViewport (int tx, int ty)
 {
@@ -448,7 +445,12 @@ global int MapTileGetViewport (int tx, int ty)
 }
 
 /**
-**	FIXME: DOCU
+**	Compute viewport parameters for single viewport mode.
+**
+**	The parameters 	include viewport's width and height expressed
+**	in pixels, its position with respect to FreeCraft's window
+**	origin, and the corresponding map parameters expressed in map
+**	tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeSingle (void)
 {
@@ -491,7 +493,14 @@ local void SetViewportModeSingle (void)
 }
 
 /**
-**	FIXME: DOCU
+**	Compute viewport parameters for horizontally split viewport mode.
+**	This mode splits the TheUI::MapArea with a horizontal line to
+**	2 (approximately) equal parts.
+**
+**	The parameters 	include viewport's width and height expressed
+**	in pixels, its position with respect to FreeCraft's window
+**	origin, and the corresponding map parameters expressed in map
+**	tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeSplitHoriz (void)
 {
@@ -548,7 +557,15 @@ local void SetViewportModeSplitHoriz (void)
 }
 
 /**
-**	FIXME: DOCU
+**	Compute viewport parameters for horizontal 3-way split viewport mode.
+**	This mode splits the TheUI::MapArea with a horizontal line to
+**	2 (approximately) equal parts, then splits the bottom part vertically
+**	to another 2 parts.
+**
+**	The parameters 	include viewport's width and height expressed
+**	in pixels, its position with respect to FreeCraft's window
+**	origin, and the corresponding map parameters expressed in map
+**	tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeSplitHoriz3 (void)
 {
@@ -616,7 +633,14 @@ local void SetViewportModeSplitHoriz3 (void)
 }
 
 /**
-**	FIXME: DOCU
+**	Compute viewport parameters for vertically split viewport mode.
+**	This mode splits the TheUI::MapArea with a vertical line to
+**	2 (approximately) equal parts.
+**
+**	The parameters 	include viewport's width and height expressed
+**	in pixels, its position with respect to FreeCraft's window
+**	origin, and the corresponding map parameters expressed in map
+**	tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeSplitVert (void)
 {
@@ -683,7 +707,14 @@ local void SetViewportModeSplitVert (void)
 }
 
 /**
-**	FIXME: DOCU
+**	Compute viewport parameters for 4-way split viewport mode.
+**	This mode splits the TheUI::MapArea vertically *and* horizontally
+**	to 4 (approximately) equal parts.
+**
+**	The parameters 	include viewport's width and height expressed
+**	in pixels, its position with respect to FreeCraft's window
+**	origin, and the corresponding map parameters expressed in map
+**	tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeQuad (void)
 {
@@ -754,7 +785,12 @@ local void SetViewportModeQuad (void)
 }
 
 /**
-**	FIXME: DOCU
+**	Sets (calls geometry setup routines) for a new viewport mode.
+**	The new mode's mode number has to be already stored in
+**	TheUI.ViewportMode.
+**
+**	FIXME: it would probably make more sense to pass the new vp mode's
+**	number as an argument to SetViewportMode().
 */
 global void SetViewportMode (void)
 {
@@ -781,11 +817,16 @@ global void SetViewportMode (void)
 }
 
 /**
-**	FIXME: DOCU
+**	Cycles through predefined viewport modes (geometry configurations)
+**	in order defined by the ViewportMode enumerated type.
+**
+**	@param step	The size of step used for cycling. Values that
+**			make sense are mostly 1 (next viewport mode) and
+*			-1 (previous viewport mode).
 */
-global void CycleViewportMode (int direction)
+global void CycleViewportMode (int step)
 {
-    TheUI.ViewportMode += direction;
+    TheUI.ViewportMode += step;
     if ((int )TheUI.ViewportMode >= NUM_VIEWPORT_MODES)
 	TheUI.ViewportMode = 0;
     if ((int )TheUI.ViewportMode < 0)

@@ -159,8 +159,9 @@ global void RevealMap(void)
 #ifdef SPLIT_SCREEN_SUPPORT
 
 /**
-**	Change viewpoint of map to x,y
+**	Change viewpoint of map viewport v to x,y.
 **
+**	@param v	The viewport.
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
 */
@@ -194,8 +195,9 @@ global void MapViewportSetViewpoint (int v, int x, int y)
 }
 
 /**
-**	Center map viewpoint on x,y.
+**	Center map viewport v on map tile (x,y).
 **
+**	@param v	The viewport.
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
 */
@@ -594,7 +596,14 @@ global void PreprocessMap(void)
 #ifdef SPLIT_SCREEN_SUPPORT
 
 /**
-**	FIXME: docu
+**	Convert viewport x coordinate to map tile x coordinate.
+**
+**	@param v	The viewport.
+**	@param x	X coordinate into this viewport (in pixels, relative
+**			to origin of FreeCraft's window - not the viewport
+**			itself!).
+**
+**	@return		X map tile coordinate.
 */
 global int Viewport2MapX(int v, int x)
 {
@@ -605,7 +614,14 @@ global int Viewport2MapX(int v, int x)
 }
 
 /**
-**	FIXME: docu
+**	Convert viewport y coordinate to map tile y coordinate.
+**
+**	@param v	The viewport.
+**	@param y	Y coordinate into this viewport (in pixels, relative
+**			to origin of FreeCraft's window - not the viewport
+**			itself!).
+**
+**	@return		Y map tile coordinate.
 */
 global int Viewport2MapY(int v, int y)
 {
@@ -616,7 +632,13 @@ global int Viewport2MapY(int v, int y)
 }
 
 /**
-**	FIXME: docu
+**	Convert a map tile X coordinate into a viewport x pixel coordinate.
+**
+**	@param v	The viewport.
+**	@param x	The map tile's X coordinate.
+**
+**	@return		X screen coordinate in pixels (relative
+**                      to origin of FreeCraft's window).
 */
 global int Map2ViewportX(int v, int x)
 {
@@ -624,7 +646,13 @@ global int Map2ViewportX(int v, int x)
 }
 
 /**
-**	FIXME: docu
+**	Convert a map tile Y coordinate into a viewport y pixel coordinate.
+**
+**	@param v	The viewport.
+**	@param y	The map tile's Y coordinate.
+**
+**	@return		Y screen coordinate in pixels (relative
+**                      to origin of FreeCraft's window).
 */
 global int Map2ViewportY(int v, int y)
 {
