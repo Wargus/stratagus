@@ -1342,8 +1342,6 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
     if ( cop )
       {
       // FIXME: if cop is already defined --> move it, but it doesn't work?
-      cop->X = x;
-      cop->Y = y;
       RemoveUnit( cop );
       PlaceUnit( cop, x, y );
       }
