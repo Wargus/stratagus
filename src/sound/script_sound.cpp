@@ -560,6 +560,7 @@ local int CclDefineGameSounds(lua_State* l)
     LuaUserData* data;
 
     args = lua_gettop(l);
+    data = NULL;
     for (j = 0; j < args; ++j) {
 	value = LuaToString(l, j + 1);
 	++j;
