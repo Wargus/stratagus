@@ -9,12 +9,11 @@
 //
 /**@name groups.c	-	The units' groups handling. */
 //
-//	(c) Copyright 1999-2001 by Patrice Fortier and Lutz Sammer
+//	(c) Copyright 1999-2002 by Patrice Fortier and Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -144,7 +143,7 @@ global void ClearGroup(int num)
 
     group=&Groups[num];
     for( i=0; i<group->NumUnits; i++ ) {
-	group->Units[i]->GroupId=-1;
+	group->Units[i]->GroupId &= ~(1<<num);
 	DebugCheck( group->Units[i]->Destroyed );
     }
     group->NumUnits=0;
@@ -166,12 +165,8 @@ global void AddToGroup(Unit **units,int nunits,int num)
 
     group=&Groups[num];
     for( i=0; group->NumUnits<NUM_UNITS_PER_GROUP && i<nunits; i++ ) {
-	if( units[i]->GroupId!=-1 ) {
-	    RemoveUnitFromGroup(units[i]);
-	}
-	
         group->Units[group->NumUnits++]=units[i];
-	units[i]->GroupId=num;
+	units[i]->GroupId |= (1<<num);
     }
 }
 
@@ -191,33 +186,36 @@ global void SetGroup(Unit **units,int nunits,int num)
 }
 
 /**
- **	Remove unit from its group
+ **	Remove unit from its groups
  **
  **	@param unit	Unit to remove from group.
  */
-global void RemoveUnitFromGroup(Unit *unit)
+global void RemoveUnitFromGroups(Unit *unit)
 {
     UnitGroup *group;
     int num;
     int i;
 
-    DebugCheck( unit->GroupId==-1 );	// unit doesn't belong to a group
-    num=unit->GroupId;
+    DebugCheck( unit->GroupId==0 );	// unit doesn't belong to a group
 
-    group=&Groups[num];
-    for( i=0; group->Units[i]!=unit; i++ ) {
-	;
+    for( num=0; unit->GroupId; num++,unit->GroupId>>=1 ) {
+	if( (unit->GroupId & 1) != 1 ) {
+	    continue;
+	}
+
+	group=&Groups[num];
+	for( i=0; group->Units[i]!=unit; i++ ) {
+	    ;
+	}
+
+	DebugCheck( i>=group->NumUnits );	// oops not found
+
+	// This is a clean way that will allow us to add a unit
+	// to a group easily, or make an easy array walk...
+	if( i<--group->NumUnits ) {
+	    group->Units[i]=group->Units[group->NumUnits];
+	}
     }
-
-    DebugCheck( i>=group->NumUnits );	// oops not found
-
-    // This is a clean way that will allow us to add a unit
-    // to a group easily, or make an easy array walk...
-    if( i<--group->NumUnits ) {
-        group->Units[i]=group->Units[group->NumUnits];
-    }
-
-    unit->GroupId=-1;
 }
 
 // ----------------------------------------------------------------------------
