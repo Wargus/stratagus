@@ -182,13 +182,13 @@ function DefineElitePanels(info_panel_x, info_panel_y)
   Ident = "panel-attack-unit-contents"..info_panel_x,
   Pos = {info_panel_x, info_panel_y},
   DefaultFont = "game",
-  Condition = {ShowOpponent = false, HideNeutral = true, Level = "only", Build = "false"},
+  Condition = {ShowOpponent = false, HideNeutral = true, Building = "false", Build = "false"},
   Contents = {
 -- Unit caracteristics
-	{ Pos = {114, 37}, Condition = {Level = "only"},
+	{ Pos = {114, 37},
 		More = {"FormattedText", {Variable = "Level", Format = "Level ~<%d~>"}}
 	},
-	{ Pos = {114, 52}, Condition = {Level = "only"},
+	{ Pos = {114, 52},
 		More = {"FormattedText2", {Centered = true,
 			Variable1 = "Xp", Variable2 = "Kill", Format = "XP:~<%d~> Kills:~<%d~>"}}
 	},
