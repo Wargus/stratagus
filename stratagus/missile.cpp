@@ -274,7 +274,7 @@ global MissileType* MissileTypeByIdent(const char* ident)
 global MissileType* NewMissileTypeSlot(char* ident)
 {
     MissileType* mtype;
-    unsigned i;
+    int i;
 
     //
     //	Allocate new memory. (+2 for start end empty last entry.)
