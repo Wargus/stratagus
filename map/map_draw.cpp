@@ -1271,7 +1271,7 @@ global void MapColorCycle(void)
     }
 #endif
 
-    if( VideoDepth==15 || VideoDepth==16 ) {
+    if( VideoBpp==15 || VideoBpp==16 ) {
 	//
 	//	Convert 16 bit pixel table into two 32 bit tables.
 	//
@@ -1481,7 +1481,7 @@ global void DrawMapBackground(int x,int y)
 */
 void InitMap(void)
 {
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
 	case  8:
 	    VideoDrawTile=VideoDraw8Tile32;
 #if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)

@@ -523,7 +523,7 @@ global Graphic* LoadGraphic(const char* name)
 */
 global void InitGraphic(void)
 {
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
 	case 8:
 	    GraphicImage8Type.DrawSub=VideoDrawSub8to8;
 	    GraphicImage8Type.DrawSubClip=VideoDrawSub8to8Clip;
@@ -546,7 +546,7 @@ global void InitGraphic(void)
 	    break;
 
 	default:
-	    DebugLevel0Fn("unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("unsupported %d bpp\n",VideoBpp);
 	    abort();
     }
 

@@ -168,6 +168,8 @@ global void InitVideoSdl(void)
     // Turn cursor off, we use our own.
     SDL_ShowCursor(0);
 
+    VideoBpp=Screen->format->BitsPerPixel;
+
     //
     //	I need the used bits per pixel.
     //	You see it's better making all self, than using wired libaries :)
@@ -191,10 +193,13 @@ global void InitVideoSdl(void)
 	    for( i=0; j&(1<<i); ++i ) {
 	    }
 
+#if 0
+	// FIXME: johns I think this now works out of the box for beos.
 #ifdef USE_BEOS
 	    if( i==24 ) {	// beos compatibility hack
 		i=32;
 	    }
+#endif
 #endif
 
 	    VideoDepth=i;
@@ -215,7 +220,7 @@ global void InitVideoSdl(void)
 #endif
 #endif
 
-    DebugLevel0Fn("Video init ready %d\n",VideoDepth);
+    DebugLevel0Fn("Video init ready %d %d\n",VideoDepth,VideoBpp);
 }
 
 /**
@@ -641,7 +646,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	return NULL;
     }
 
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
     case 8:
 	pixels=malloc(256*sizeof(VMemType8));
 	break;
@@ -692,7 +697,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	b= b<0 ? 0 : b>255 ? 255 : b;
 
 	// -> Video
-	switch( VideoDepth ) {
+	switch( VideoBpp ) {
 	case 8:
 	    ((VMemType8*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);
 	    break;

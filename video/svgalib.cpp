@@ -259,6 +259,9 @@ global void InitVideoSVGA(void)
 	if(vga_info->flags && CAPABLE_LINEAR) {
 	    vga_setlinearaddressing();
 	}
+	VideoBpp=vga_info->bytesperpixel*8;
+    } else {
+	VideoBpp=((VideoDepth+7)/8)*8;
     }
 
     if(mouse_init("/dev/mouse", vga_getmousetype(),
@@ -1023,7 +1026,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
     int i;
     void* pixels;
 
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
     case 8:
 	pixels=malloc(256*sizeof(VMemType8));
 	break;
