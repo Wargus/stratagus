@@ -86,8 +86,10 @@
 <A HREF="#set-game-cycle!">set-game-cycle!</A>
 <A HREF="#set-group-id!">set-group-id!</A>
 <A HREF="#set-player-resources!">set-player-resources!</A>
+<A HREF="#set-shared-vision!">set-shared-vision!</A>
 <A HREF="#set-this-player!">set-this-player!</A>
 <A HREF="#set-unit-unholy-armor!">set-unit-unholy-armor!</A>
+<A HREF="#shared-vision">shared-vision</A>
 <A HREF="#slot-usage">slot-usage</A>
 <A HREF="#unit">unit</A>
 <A HREF="#units">units</A>
@@ -1349,6 +1351,39 @@ Set the current game cycle number.
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
 
+<A NAME="set-shared-vision!"></A>
+<H3>set-shared-vision!</H3>
+
+<H4>Description</H4>
+
+Sets shared vision.
+
+<H4>Syntax</H4>
+
+<CODE>(set-shared-vision! player state opponent)</CODE>
+
+<DL>
+<DT>player</DT>
+<DD>Player number to set shared vision.
+</DD>
+<DT>state</DT>
+<DD>Use 1 to turn on shared vision, 0 to turn off.
+</DD>
+<DT>opponent</DT>
+<DD>Player number to change.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-shared-vision! 0 1 2)
+</PRE>
+
+<P>Sets shared vision for player 0 to on with player 2.
+
+<H4>Not Used</H4>
+
 <A NAME="set-this-player!"></A>
 <H3>set-this-player!</H3>
 
@@ -1406,6 +1441,36 @@ Set the current game cycle number.
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="shared-vision"></A>
+<H3>shared-vision</H3>
+
+<H4>Description</H4>
+
+Sets shared vision for the player at the computer.
+
+<H4>Syntax</H4>
+
+<CODE>(shared-vision)</CODE>
+
+<DL>
+<DT>state</DT>
+<DD>Use 1 to turn on shared vision, 0 to turn off.
+</DD>
+<DT>opponent</DT>
+<DD>Player number to change.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (shared-vision 1 3)
+</PRE>
+
+<P>Sets shared vision on with player number 3.
+
+<H4>Not Used</H4>
 
 <A NAME="slot-usage"></A>
 <H3>slot-usage</H3>

@@ -431,6 +431,44 @@ local SCM CclDiplomacy(SCM state,SCM player)
 }
 
 /**
+**	Change the shared vision from player to another player.
+**
+**	@param player	Player to change shared vision.
+**	@param opponent	Player number to change.
+**	@param state	To which state this should be changed.
+**
+**	@return		FIXME: should return old state.
+**
+**	@todo FIXME: should return old state.
+*/
+local SCM CclSetSharedVision(SCM player,SCM state,SCM opponent)
+{
+    int plynr;
+    int base;
+    int shared;
+
+    base=gh_scm2int(player);
+    shared=gh_scm2int(state);
+    plynr=gh_scm2int(opponent);
+
+    SendCommandSharedVision(base,shared,plynr);
+
+    // FIXME: we can return the old state
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Change the shared vision from ThisPlayer to another player.
+**
+**	@param state	To which state this should be changed.
+**	@param player	Player number to change.
+*/
+local SCM CclSharedVision(SCM state,SCM player)
+{
+    return CclSetSharedVision(gh_int2scm(ThisPlayer->Player),state,player);
+}
+
+/**
 **	Define race mapping from original number to internal symbol
 **
 **	@param list	List of all names.
@@ -537,6 +575,8 @@ global void PlayerCclRegister(void)
 
     gh_new_procedure3_0("set-diplomacy!",CclSetDiplomacy);
     gh_new_procedure2_0("diplomacy",CclDiplomacy);
+    gh_new_procedure3_0("set-shared-vision!",CclSetSharedVision);
+    gh_new_procedure2_0("shared-vision",CclSharedVision);
 
     gh_new_procedureN("define-race-wc-names",CclDefineRaceWcNames);
 

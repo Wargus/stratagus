@@ -122,6 +122,8 @@ extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
 	,SpellType* spell, int flush);
     /// Prepare diplomacy command
 extern void CommandDiplomacy(int player,int state,int opponent);
+    /// Prepare shared vision command
+extern void CommandSharedVision(int player,int state,int opponent);
 
 /*----------------------------------------------------------------------------
 --	Actions:	in action_<name>.c
