@@ -66,7 +66,7 @@
 #include "libcda.h"
 #endif
 
-#define OLD_MENU			/// CCL menus not used
+//#define OLD_MENU			/// CCL menus not used
 
 /*----------------------------------------------------------------------------
 --	Prototypes for local functions
@@ -2095,6 +2095,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(EnterServerIPCancel,"enter-server-ip-cancel");
 
 // Net multi client
+    HASHADD(TerminateNetConnect,"terminate-net-connect");
     HASHADD(MultiGameClientInit,"multi-game-client-init");
     HASHADD(MultiGameClientDrawFunc,"multi-client-draw-func");
     HASHADD(MultiClientReady,"multi-client-ready");
@@ -7773,6 +7774,7 @@ global void SaveMenus(FILE* file)
     char func3[10];
     char initfunc[40];
     char exitfunc[40];
+    char netaction[40];
 
     OffsetX = (VideoWidth - 640) / 2;
     OffsetY = (VideoHeight - 480) / 2;
@@ -7786,13 +7788,20 @@ global void SaveMenus(FILE* file)
 	    abort();
 	}
 	fprintf(file,";;\n;; %s\n;;\n", menu_names[i]);
+	if (menu->netaction) {
+	    sprintf(func,"%p",menu->netaction);
+	    sprintf(netaction," 'netaction '%s",(char*)hash_find(MenuFuncHash2,func));
+	} else {
+	    netaction[0] = '\0';
+	}
 	fprintf(file,"(define-menu 'name \"%s\" 'geometry '(%d %d %d %d)\n"
-		     "    'image '%s 'default '%d)\n",
+		     "    'image '%s 'default '%d%s)\n",
 		     menu_names[i],
 		     menu->x - OffsetX, menu->y - OffsetY,
 		     menu->xsize, menu->ysize,
 		     images[menu->image],
-		     menu->defsel);
+		     menu->defsel,
+		     netaction);
 	for (j=0; j<menu->nitems; ++j) {
 	    if (menu->items[j].initfunc) {
 		sprintf(func,"%p",menu->items[j].initfunc);
