@@ -1783,7 +1783,8 @@ global void DrawUnit(const Unit* unit)
     //
     //	If we are in replay reveal map or the unit is visible(not under fog).
     //
-    if (ReplayRevealMap || unit->VisCount[ThisPlayer->Player]) {
+    if (ReplayRevealMap || TheMap.NoFogOfWar ||
+	    unit->VisCount[ThisPlayer->Player]) {
 	type = unit->Type;
 	frame = unit->Frame;
 	x = unit->IX;
