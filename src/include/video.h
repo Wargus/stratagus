@@ -195,9 +195,13 @@ extern GraphicData * VideoCreateNewPalette(const Palette *palette);
 
 /** Initializes system palette. Also calls SetPlayersPalette to set palette for
   all players.
-  @param palette Palette structure
+  @param palette GraphicData structure, as created by VideoCreateNewPalette
   @see SetPlayersPalette
  */
+extern void VideoSetPalette(const GraphicData *palette);
+
+/// OBSOLETE: Calls VideoCreateNewPalette with the palette argument, and then
+/// feeds the result to VideoSetPalette to initialize system palette with it.
 extern void VideoCreatePalette(const Palette *palette);
 
 /// Process all system events. This function also keeps synchronization of game.
