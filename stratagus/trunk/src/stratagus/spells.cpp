@@ -197,6 +197,7 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 	if (portal) {
 		// FIXME: if cop is already defined --> move it, but it doesn't work?
 		RemoveUnit(portal, NULL);
+		UnitCacheRemove(portal);
 		PlaceUnit(portal, x, y);
 	} else {
 		portal = MakeUnitAndPlace(x, y, ptype, &Players[PlayerNumNeutral]);

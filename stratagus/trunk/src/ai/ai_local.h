@@ -68,6 +68,7 @@ struct _ai_type_{
 #endif
 
 	char* Script; /// Main script
+	char* FunctionName;	/// Name of the function
 };
 
 /**
