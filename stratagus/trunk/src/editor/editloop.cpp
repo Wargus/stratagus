@@ -2111,9 +2111,13 @@ global void EditorMainLoop(void)
 	InterfaceState = IfaceStateMenu;
 	GameCursor = TheUI.Point.Cursor;
 
+#ifdef USE_SDL_SURFACE
+	VideoClearScreen();
+#else
 	VideoLockScreen();
 	VideoClearScreen();
 	VideoUnlockScreen();
+#endif
 	Invalidate();
     } while (EditorMapLoaded);
 
