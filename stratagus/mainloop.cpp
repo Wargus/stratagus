@@ -36,8 +36,8 @@
 
 #include <string.h>
 #include <stdio.h>
-#if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
 #include <stdlib.h>
+#if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
 #include <setjmp.h>
 #endif
 
@@ -833,7 +833,8 @@ global void GameMainLoop(void)
 		    // Clear scheme heap each second
 		    // FIXME: this is too slow to call during the game
 		    CclGarbageCollect(1);
-		    break;		    
+		    break;
+		case 1:
 		case 2:
 		    break;
 		case 3:				// minimap update
@@ -851,6 +852,7 @@ global void GameMainLoop(void)
 		default:
 		    // FIXME : assume that NumPlayers < (CYCLES_PER_SECOND -7)
 		    player = (GameCycle % CYCLES_PER_SECOND) - 7;
+		    DebugCheck(player < 0);
 		    if (player < NumPlayers){
 		    	PlayersEachSecond(player);
 		    }
