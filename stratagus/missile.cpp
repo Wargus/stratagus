@@ -997,7 +997,7 @@ global void FireMissile(Unit* unit)
 	    return;
 	}
 
-	HitUnit(goal,CalculateDamage(unit->Stats,goal,unit->Bloodlust));
+	HitUnit(unit,goal,CalculateDamage(unit->Stats,goal,unit->Bloodlust));
 
 	return;
     }
@@ -1316,10 +1316,11 @@ local void MissileHitsGoal(const Missile* missile,Unit* goal,int splash)
 
     if( goal->HP && goal->Orders[0].Action!=UnitActionDie ) {
 	if ( missile->Damage ) {	// direct damage, spells mostly
-	    HitUnit(goal,missile->Damage/splash);
+	    HitUnit(missile->SourceUnit,goal,missile->Damage/splash);
 	} else {
-	    HitUnit(goal,CalculateDamage(missile->SourceUnit->Stats,goal,
-		missile->SourceUnit->Bloodlust)/splash);
+	    HitUnit(missile->SourceUnit,goal,
+		    CalculateDamage(missile->SourceUnit->Stats,goal,
+			missile->SourceUnit->Bloodlust)/splash);
 	}
     }
 }

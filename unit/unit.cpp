@@ -2432,26 +2432,27 @@ global void DestroyAllInside(Unit* source)
 }
 
 /**
-**	Unit is hit by missile.
+**	Unit is hit by missile or other damage.
 **
-**	@param unit	Unit that is hit.
+**	@param attacker	Unit that attacks.
+**	@param target	Unit that is hit.
 **	@param damage	How many damage to take.
 */
-global void HitUnit(Unit* unit,int damage)
+global void HitUnit(const Unit* attacker,Unit* target,int damage)
 {
     UnitType* type;
     Unit* goal;
 
-    DebugCheck( damage==0 || unit->HP==0 || unit->Type->Vanishes );
+    DebugCheck( damage==0 || target->HP==0 || target->Type->Vanishes );
 
-    if ( unit->UnholyArmor > 0 ) {
+    if ( target->UnholyArmor > 0 ) {
 	// vladi: units with active UnholyArmour are invulnerable
 	return;
     }
 
-    type=unit->Type;
-    if( !unit->Attacked ) {
-	if( unit->Player==ThisPlayer ) {
+    type=target->Type;
+    if( !target->Attacked ) {
+	if( target->Player==ThisPlayer ) {
 	    static int LastFrame;
 
 	    //
@@ -2460,65 +2461,69 @@ global void HitUnit(Unit* unit,int damage)
 	    //
 	    if( LastFrame<FrameCounter ) {
 		LastFrame=FrameCounter+FRAMES_PER_SECOND*2;
-		PlayUnitSound(unit,VoiceHelpMe);
+		PlayUnitSound(target,VoiceHelpMe);
 	    }
 	}
-	if( unit->Player->AiEnabled ) {
-	    AiHelpMe(unit);
+	if( target->Player->AiEnabled ) {
+	    AiHelpMe(target);
 	}
     }
-    unit->Attacked=7;
+    target->Attacked=7;
 
-    if( unit->HP<=damage ) {	// unit is killed or destroyed
-	DestroyUnit(unit);
+    if( target->HP<=damage ) {	// unit is killed or destroyed
+	if( attacker ) {
+	    attacker->Player->Score+=target->Type->Points;
+	}
+	DestroyUnit(target);
 	return;
     }
-    unit->HP-=damage;		// UNSIGNED!
+    target->HP-=damage;		// UNSIGNED!
 
 #if 0
+    // FIXME: want to show hits.
     if( type->Organic ) {
 	MakeMissile(MissileBlood
-		,unit->X*TileSizeX+TileSizeX/2
-		,unit->Y*TileSizeY+TileSizeY/2,0,0);
+		,target->X*TileSizeX+TileSizeX/2
+		,target->Y*TileSizeY+TileSizeY/2,0,0);
     }
     if( type->Building ) {
 	MakeMissile(MissileSmallFire
-		,unit->X*TileSizeX
+		,target->X*TileSizeX
 			+(type->TileWidth*TileSizeX)/2
-		,unit->Y*TileSizeY
+		,target->Y*TileSizeY
 			+(type->TileHeight*TileSizeY)/2
 		,0,0);
     }
 #endif
-    if( type->Building && !unit->Burning ) {
+    if( type->Building && !target->Burning ) {
 	int f;
 	Missile* missile;
 
-	f=(100*unit->HP)/unit->Stats->HitPoints;
+	f=(100*target->HP)/target->Stats->HitPoints;
 	if( f>75) {
 	    ; // No fire for this
 	} else if( f>50 ) {
 	    missile=MakeMissile(MissileTypeSmallFire
-		    ,unit->X*TileSizeX
+		    ,target->X*TileSizeX
 			    +(type->TileWidth*TileSizeX)/2
-		    ,unit->Y*TileSizeY
+		    ,target->Y*TileSizeY
 			    +(type->TileHeight*TileSizeY)/2
 			    -TileSizeY
 		    ,0,0);
-	    missile->SourceUnit=unit;
-	    unit->Burning=1;
-	    ++unit->Refs;
+	    missile->SourceUnit=target;
+	    target->Burning=1;
+	    ++target->Refs;
 	} else {
 	    missile=MakeMissile(MissileTypeBigFire
-		    ,unit->X*TileSizeX
+		    ,target->X*TileSizeX
 			    +(type->TileWidth*TileSizeX)/2
-		    ,unit->Y*TileSizeY
+		    ,target->Y*TileSizeY
 			    +(type->TileHeight*TileSizeY)/2
 			    -TileSizeY
 		    ,0,0);
-	    missile->SourceUnit=unit;
-	    unit->Burning=1;
-	    ++unit->Refs;
+	    missile->SourceUnit=target;
+	    target->Burning=1;
+	    ++target->Refs;
 	}
     }
 
@@ -2529,7 +2534,7 @@ global void HitUnit(Unit* unit,int damage)
     //
     //	Unit is working?
     //
-    if( unit->Orders[0].Action!=UnitActionStill ) {
+    if( target->Orders[0].Action!=UnitActionStill ) {
 	return;
     }
 
@@ -2538,12 +2543,12 @@ global void HitUnit(Unit* unit,int damage)
     //
     if( !type->CowerWorker && !type->CowerMage ) {
 	if( type->CanAttack && !type->Tower ) {
-	    goal=AttackUnitsInReactRange(unit);
+	    goal=AttackUnitsInReactRange(target);
 	    if( goal ) {
 		// FIXME: should rewrite command handling
-		CommandAttack(unit,unit->X,unit->Y,NULL,FlushCommands);
-		unit->SavedOrder=unit->Orders[1];
-		CommandAttack(unit,goal->X,goal->Y,NoUnitP,FlushCommands);
+		CommandAttack(target,target->X,target->Y,NoUnitP,FlushCommands);
+		target->SavedOrder=target->Orders[1];
+		CommandAttack(target,goal->X,goal->Y,NoUnitP,FlushCommands);
 		return;
 	    }
 	}
