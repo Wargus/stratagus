@@ -124,6 +124,11 @@
 
 #include "video.h"
 
+#ifndef __STRUCT_PLAYER__
+#define __STRUCT_PLAYER__
+typedef struct _player_ Player;
+#endif
+
 /*----------------------------------------------------------------------------
 --	Defines
 ----------------------------------------------------------------------------*/
@@ -205,7 +210,7 @@ extern IconId IconByIdent(const char* ident);	/// name -> icon
 extern const char* IdentOfIcon(IconId icon);	/// icon -> name
 
     /// draw icon of an unit
-extern void DrawUnitIcon(const void*,IconId,unsigned,unsigned,unsigned);
+extern void DrawUnitIcon(const Player*,IconId,unsigned,unsigned,unsigned);
 
 extern void SaveIcons(FILE*);			/// Save icons
 extern void IconCclRegister(void);		/// register CCL features
