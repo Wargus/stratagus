@@ -237,7 +237,7 @@ char LocalPlayerName[16];            /// Name of local player
 
 	/// Name, Version, Copyright
 char NameLine[] =
-	"Stratagus V" VERSION ", (c) 1998-2004 by The Stratagus Project.";
+	"Stratagus V" VERSION ", (c) 1998-2005 by The Stratagus Project.";
 
 static char* MapName;                /// Filename of the map to load
 char* CompileOptions;                /// Compile options.
