@@ -229,7 +229,7 @@ local void AiCleanForce(int force)
 	aiunit = AiPlayer->Force[force].Units;
 	while (aiunit) {
 		// FIXME: Should I use equivalent unit types?
-		counter[aiunit->Unit->Type->Slot]++;
+		counter[UnitTypeEquivs[aiunit->Unit->Type->Slot]]++;
 		aiunit = aiunit->Next;
 	}
 
@@ -255,7 +255,7 @@ local void AiCleanForce(int force)
 		while ((aiunit = *prev)) {
 			if (counter[aiunit->Unit->Type->Slot] > 0) {
 				DebugLevel3Fn("Release unit %s\n" _C_ aiunit->Unit->Type->Ident);
-				counter[aiunit->Unit->Type->Slot]--;
+				counter[UnitTypeEquivs[aiunit->Unit->Type->Slot]]--;
 				RefsDecrease(aiunit->Unit);
 				*prev = aiunit->Next;
 				free(aiunit);
@@ -304,8 +304,7 @@ local int AiCheckBelongsToForce(int force, const UnitType* type)
 	//
 	aiunit = AiPlayer->Force[force].Units;
 	while (aiunit) {
-		// FIXME: Should I use equivalent unit types?
-		counter[aiunit->Unit->Type->Slot]++;
+		counter[UnitTypeEquivs[aiunit->Unit->Type->Slot]]++;
 		aiunit = aiunit->Next;
 	}
 
@@ -317,7 +316,7 @@ local int AiCheckBelongsToForce(int force, const UnitType* type)
 	aitype = AiPlayer->Force[force].UnitTypes;
 	while (aitype) {
 		if (aitype->Want > counter[aitype->Type->Slot]) {
-			if (type == aitype->Type) {
+			if (UnitTypeEquivs[type->Slot] == aitype->Type->Slot) {
 				if (aitype->Want - 1 > counter[aitype->Type->Slot]) {
 					AiPlayer->Force[force].Completed = 0;
 				}
