@@ -39,6 +39,9 @@
 
 struct _CL_File_;
 struct lua_State;
+#ifdef USE_MNG
+struct _mng_;
+#endif
 
 /**
 **  @struct _unit_type_ unittype.h
@@ -875,6 +878,15 @@ struct _unit_type_ {
 	NewAnimations* NewAnimations;   /// NewAnimation scripts
 
 	IconConfig Icon;                /// Icon to display for this unit
+#ifdef USE_MNG
+	struct _portrait_ {
+		char** Files;
+		int Num;
+		struct _mng_** Mngs;
+		int CurrMng;
+		int NumIterations;
+	} Portrait;
+#endif
 	MissileConfig Missile;          /// Missile weapon
 	MissileConfig Explosion;        /// Missile for unit explosion
 

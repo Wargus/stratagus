@@ -10,7 +10,7 @@
 //
 /**@name mng.c - The mng graphic file loader. */
 //
-//      (c) Copyright 2004 by Jimmy Salmon
+//      (c) Copyright 2004-2005 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -286,8 +286,9 @@ Mng* LoadMNG(const char* name)
 	mng->Name = strdup(buf);
 	mng->Handle = mng_initialize(mng, my_alloc, my_free, MNG_NULL);
 	if ((mng_handle)mng->Handle == MNG_NULL) {
-		// process error
-		mng = mng;
+		free(mng->Name);
+		free(mng);
+		return NULL;
 	}
 	mng_setcb_openstream(mng->Handle, my_openstream);
 	mng_setcb_closestream(mng->Handle, my_closestream);
@@ -306,10 +307,7 @@ Mng* LoadMNG(const char* name)
 	}
 
 	if (!mng->Surface || mng->Iteration == 0x7fffffff) {
-		mng_handle mh;
-
-		mh = (mng_handle)mng->Handle;
-		mng_cleanup(&mh);
+		mng_cleanup(&(mng_handle)mng->Handle);
 		free(mng->Buffer);
 		free(mng->Name);
 		free(mng);
@@ -319,16 +317,28 @@ Mng* LoadMNG(const char* name)
 }
 
 /**
+**  Reset a MNG
+**
+**  @param mng  Mng file to reset
+*/
+void ResetMNG(Mng* mng)
+{
+	mng_display_reset(mng->Handle);
+	mng->Iteration = 0;
+	mng_display(mng->Handle);
+}
+
+/**
 **  Free a MNG
 **
 **  @param mng  Mng file to free
 */
 void FreeMNG(Mng* mng)
 {
-	mng_handle mh;
-
-	mh = (mng_handle)mng->Handle;
-	mng_cleanup(&mh);
+	if (!mng) {
+		return;
+	}
+	mng_cleanup(&(mng_handle)mng->Handle);
 	SDL_FreeSurface(mng->Surface);
 	free(mng->Buffer);
 #ifdef USE_OPENGL
