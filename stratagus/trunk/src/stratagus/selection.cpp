@@ -475,7 +475,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     int i;
     int tx0, ty0, tx1, ty1;
 
-    DebugLevel3Fn(" (%d,%d,%d,%d)\n",tx,ty,w,h);
+    DebugLevel3Fn(" (%d,%d,%d,%d)\n",sx0,sy0,sx1,sy1);
 
     tx0 = sx0 / TileSizeX;
     ty0 = sy0 / TileSizeY;
