@@ -473,7 +473,8 @@ global void ShowIntro(const Intro *intro)
 	//
 	//	Draw title
 	//
-	VideoDrawTextCentered(422*VideoWidth/640,28*VideoHeight/480,
+	SetDefaultTextColors(FontWhite, FontYellow);
+	VideoDrawTextCentered((70+340)/2*VideoWidth/640,28*VideoHeight/480,
 	    LargeFont,intro->Title);
 	//
 	//	Draw scrolling text
@@ -498,6 +499,7 @@ global void ShowIntro(const Intro *intro)
 	    }
 	}
 
+	SetDefaultTextColors(FontYellow, FontWhite);
 	DrawContinueButton();
 	DrawAnyCursor();
 
