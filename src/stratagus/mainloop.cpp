@@ -31,7 +31,7 @@
 //@{
 
 //----------------------------------------------------------------------------
-// Includes
+//  Includes
 //----------------------------------------------------------------------------
 
 #include <string.h>
@@ -346,9 +346,9 @@ void UpdateDisplay(void)
 
 		if (!BigMapMode) {
 			for (i = 0; i < TheUI.NumFillers; ++i) {
-				VideoDrawSubClip(TheUI.Filler[i].Graphic, 0, 0,
-					TheUI.Filler[i].Graphic->Width,
-					TheUI.Filler[i].Graphic->Height,
+				VideoDrawSubClip(TheUI.Filler[i], 0, 0,
+					TheUI.Filler[i]->Width,
+					TheUI.Filler[i]->Height,
 					TheUI.FillerX[i], TheUI.FillerY[i]);
 			}
 			DrawMenuButtonArea();

@@ -219,7 +219,7 @@ typedef struct _ui_ {
 	char* ReverseFontColor;             ///< Color for reverse text displayed
 
 	// Fillers
-	GraphicConfig* Filler;              ///< Filler graphics
+	Graphic** Filler;                   ///< Filler graphics
 	int* FillerX;                       ///< Filler X positions
 	int* FillerY;                       ///< Filler Y positions
 	int  NumFillers;                    ///< Number of fillers

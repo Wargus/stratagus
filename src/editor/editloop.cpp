@@ -925,12 +925,10 @@ void EditorUpdateDisplay(void)
 	// Fillers
 	//
 	for (i = 0; i < TheUI.NumFillers; ++i) {
-		if (TheUI.Filler[i].Graphic) {
-			VideoDrawSub(TheUI.Filler[i].Graphic, 0, 0,
-				TheUI.Filler[i].Graphic->Width,
-				TheUI.Filler[i].Graphic->Height,
-				TheUI.FillerX[i], TheUI.FillerY[i]);
-		}
+		VideoDrawSub(TheUI.Filler[i], 0, 0,
+			TheUI.Filler[i]->Width,
+			TheUI.Filler[i]->Height,
+			TheUI.FillerX[i], TheUI.FillerY[i]);
 	}
 
 	if (CursorOn == CursorOnMap) {

@@ -32,7 +32,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -87,7 +87,7 @@ static void CleanUIGraphics(UI* ui)
 	int i;
 
 	for (i = 0; i < ui->NumFillers; ++i) {
-		FreeGraphic(ui->Filler[i].Graphic);
+		FreeGraphic(ui->Filler[i]);
 	}
 
 	for (i = 0; i < MaxCosts + 2; ++i) {
@@ -190,7 +190,6 @@ void InitUserInterface(const char* race_name)
 
 /**
 **  Load the user interface graphics.
-**
 */
 void LoadUserInterface(void)
 {
@@ -201,10 +200,7 @@ void LoadUserInterface(void)
 	//  Load graphics
 	//
 	for (i = 0; i < TheUI.NumFillers; ++i) {
-		if (TheUI.Filler[i].File) {
-			TheUI.Filler[i].Graphic = NewGraphic(TheUI.Filler[i].File, 0, 0);
-			LoadGraphic(TheUI.Filler[i].Graphic);
-		}
+		LoadGraphic(TheUI.Filler[i]);
 	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
@@ -304,9 +300,6 @@ void CleanUI(UI* ui)
 	free(ui->ReverseFontColor);
 
 	// Filler
-	for (i = 0; i < ui->NumFillers; ++i) {
-		free(ui->Filler[i].File);
-	}
 	free(ui->FillerX);
 	free(ui->FillerY);
 	free(ui->Filler);
