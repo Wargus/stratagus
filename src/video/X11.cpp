@@ -583,6 +583,10 @@ local unsigned X112InternalKeycode(const KeySym code)
 	    icode=KeyCodeKPMinus;
 	    break;
 
+	case XK_dead_circumflex:
+	    icode='^';
+	    break;
+
         // We need these because if you only hit a modifier key,
         // X doesn't set its state (modifiers) field in the keyevent.
 	case XK_Shift_L:
