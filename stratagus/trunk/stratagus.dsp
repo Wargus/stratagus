@@ -298,26 +298,6 @@ SOURCE=.\src\map\script_tileset.c
 SOURCE=.\src\map\tileset.c
 # End Source File
 # End Group
-# Begin Group "missile"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\missile\missile.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\missile\script_missile.c
-# End Source File
-# End Group
-# Begin Group "movie"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\movie\movie.c
-# End Source File
-# End Group
 # Begin Group "network"
 
 # PROP Default_Filter ""
@@ -459,6 +439,10 @@ SOURCE=.\src\stratagus\mainloop.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\stratagus\missile.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\stratagus\player.c
 # End Source File
 # Begin Source File
@@ -468,6 +452,10 @@ SOURCE=.\src\stratagus\pud.c
 # Begin Source File
 
 SOURCE=.\src\stratagus\script.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\stratagus\script_missile.c
 # End Source File
 # Begin Source File
 
@@ -600,6 +588,10 @@ SOURCE=.\src\video\linedraw.c
 # Begin Source File
 
 SOURCE=.\src\video\mng.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\video\movie.c
 # End Source File
 # Begin Source File
 
