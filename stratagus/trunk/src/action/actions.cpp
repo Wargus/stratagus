@@ -128,6 +128,11 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				}
 				break;
 			case NewAnimationRandomSound:
+				if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
+					int sound;
+					sound = SyncRand() % unit->Anim.Anim->D.RandomSound.NumSounds;
+					PlayUnitSoundId(unit, unit->Anim.Anim->D.RandomSound.Sound[sound]);
+				}
 				break;
 
 			case NewAnimationAttack:
