@@ -870,13 +870,25 @@ local SCM CclCreateUnit(SCM type,SCM player,SCM x,SCM y)
     UnitType* unittype;
     Unit* unit;
     int heading;
+    int mask;
+    int ix;
+    int iy;
 
     unittype=CclGetUnitType(type);
+    ix=gh_scm2int(x);
+    iy=gh_scm2int(y);
+
     heading=SyncRand()%256;
     unit=MakeUnit(unittype,&Players[gh_scm2int(player)]);
-    unit->X=gh_scm2int(x);
-    unit->Y=gh_scm2int(y);
-    DropOutOnSide(unit,heading,unittype->TileWidth,unittype->TileHeight);
+    mask=UnitMovementMask(unit);
+    if( CheckedCanMoveToMask(ix,iy,mask) ) {
+	unit->Wait=1;
+	PlaceUnit(unit,ix,iy);
+    } else {
+	unit->X=ix;
+	unit->Y=iy;
+	DropOutOnSide(unit,heading,unittype->TileWidth,unittype->TileHeight);
+    }
 
     return gh_int2scm(unit->Slot);
 }
