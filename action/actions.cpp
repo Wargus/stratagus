@@ -237,7 +237,6 @@ local void HandleUnitAction(Unit* unit)
 */
 global void UnitActions(void)
 {
-#ifdef NEW_UNIT
     Unit** table;
 
     //
@@ -282,21 +281,6 @@ global void UnitActions(void)
 	}
 	HandleUnitAction(*table);
     }
-#else
-    Unit* unit;
-    int i;
-
-    //
-    // Do all actions
-    //
-    for( i=0; i<NumUnits; i++ ) {
-	unit=Units[i];
-	if( --unit->Wait ) {		// Wait until counter reached
-	    continue;
-	}
-	HandleUnitAction(unit);
-    }
-#endif
 }
 
 //@}

@@ -81,7 +81,6 @@ local void LeaveTransporter(Unit* unit)
     goal=unit->Command.Data.Move.Goal;
     DebugLevel3Fn("Goal %p\n",goal);
     if( goal ) {
-#ifdef NEW_UNIT
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
 	    if( !--goal->Refs ) {
@@ -90,7 +89,6 @@ local void LeaveTransporter(Unit* unit)
 	    return;
 	}
 	--goal->Refs;
-#endif
 	for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
 	    if( goal==unit->OnBoard[i] ) {
 		goal->X=unit->X;

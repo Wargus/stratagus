@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_repair.c	-	The repair action. */
-/*
-**	(c) Copyright 1999,2000 by Vladi Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999,2000 by Vladi Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -77,7 +76,7 @@ local void RepairUnit(Unit* unit,Unit* goal)
     //
     hp=((goal->Stats->Costs[TimeCost]*GIVES_HP*FRAMES_PER_SECOND/6)
 	    /goal->Stats->HitPoints)*MUL;
-    DebugLevel3(__FUNCTION__": hitpoints %d\n",hp);
+    DebugLevel3Fn("hitpoints %d\n",hp);
 
     //
     //	Calculate the repair costs.
@@ -168,12 +167,11 @@ global int HandleActionRepair(Unit* unit)
 		//
 		//	Target is dead, choose new one.
 		//
-#ifdef NEW_UNIT
 		// Check if goal is correct unit.
 		// FIXME: should I do a function for this?
 		if( goal ) {
 		    if( goal->Destroyed ) {
-			DebugLevel0(__FUNCTION__": destroyed unit\n");
+			DebugLevel0Fn("destroyed unit\n");
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
@@ -189,7 +187,6 @@ global int HandleActionRepair(Unit* unit)
 			unit->Command.Data.Move.DY=goal->Y;
 		    }
 		}
-#endif
 		//
 		//	Have reached target? FIXME: could use return value
 		//
@@ -199,11 +196,9 @@ global int HandleActionRepair(Unit* unit)
 		    unit->SubAction=1;
 		} else if( err<0 ) {
 		    DebugCheck( unit->Command.Action!=UnitActionStill );
-#ifdef NEW_UNIT
 		    if( goal ) {		// release reference
 			goal->Refs--;
 		    }
-#endif
 		    return 1;
 		}
 		unit->Command.Action=UnitActionRepair;
@@ -221,12 +216,11 @@ global int HandleActionRepair(Unit* unit)
 		//
 		//	Target is dead, choose new one.
 		//
-#ifdef NEW_UNIT
 		// Check if goal is correct unit.
 		// FIXME: should I do a function for this?
 		if( goal ) {
 		    if( goal->Destroyed ) {
-			DebugLevel0(__FUNCTION__": destroyed unit\n");
+			DebugLevel0Fn("destroyed unit\n");
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
@@ -242,7 +236,6 @@ global int HandleActionRepair(Unit* unit)
 			unit->Command.Data.Move.DY=goal->Y;
 		    }
 		}
-#endif
 		if( goal ) {
 		    RepairUnit(unit,goal);
 		}
@@ -251,11 +244,9 @@ global int HandleActionRepair(Unit* unit)
 		//	Target is fine, choose new one.
 		//
 		if( !goal || goal->HP >= goal->Stats->HitPoints ) {
-#ifdef NEW_UNIT
 		    if( goal ) {		// release reference
 			goal->Refs--;
 		    }
-#endif
                     unit->Command.Action=UnitActionStill;
 		    unit->SubAction=0;
 		    unit->State=0;

@@ -621,7 +621,6 @@ global void FireMissile(Unit* unit)
 	}
 
 	// FIXME: make sure thats the correct unit.
-#ifdef NEW_UNIT
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
@@ -632,20 +631,15 @@ global void FireMissile(Unit* unit)
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
-#endif
 	if( goal->Removed ) {
 	    DebugLevel3Fn("Missile-none hits removed unit!\n");
-#ifdef NEW_UNIT
 	    --goal->Refs;
-#endif
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 	    DebugLevel3Fn("Missile-none hits dead unit!\n");
-#ifdef NEW_UNIT
 	    --goal->Refs;
-#endif
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
@@ -660,7 +654,6 @@ global void FireMissile(Unit* unit)
     x=unit->X*TileSizeX+TileSizeX/2;	// missile starts in tile middle
     y=unit->Y*TileSizeY+TileSizeY/2;
     if( (goal=unit->Command.Data.Move.Goal) ) {
-#ifdef NEW_UNIT
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
@@ -671,7 +664,6 @@ global void FireMissile(Unit* unit)
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
-#endif
 	DebugCheck( !goal->Type );	// Target invalid?
 	// Fire to nearest point of unit!
 	NearestOfUnit(goal,unit->X,unit->Y,&dx,&dy);
@@ -688,9 +680,7 @@ global void FireMissile(Unit* unit)
     //	Damage of missile
     //
     missile->SourceUnit=unit;
-#ifdef NEW_UNIT
     // unit->Refs++; Reference currently not used.
-#endif
     missile->SourceType=unit->Type;
     missile->SourceStats=unit->Stats;
     missile->SourcePlayer=unit->Player;
@@ -1120,11 +1110,9 @@ global void MissileActions(void)
 
 		    unit=missile->SourceUnit;
 		    if( unit->Destroyed || !unit->HP ) {
-#ifdef NEW_UNIT
 			if( !--unit->Refs ) {
 			    ReleaseUnit(unit);
 			}
-#endif
 			missile->Type=MissileFree;
 			break;
 		    }

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_move.c	-	The move action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -66,31 +65,22 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 	//	Target killed?
 	//
 	goal=unit->Command.Data.Move.Goal;
-#ifdef NEW_UNIT
 	if( goal ) {
 	    // FIXME: should this be handled here?
 	    // FIXME: Can't choose a better target here!
 	    if( goal->Destroyed ) {
-		DebugLevel0(__FUNCTION__": destroyed unit\n");
+		DebugLevel0Fn("destroyed unit\n");
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    } else if( goal->Removed ||
 		    !goal->HP || goal->Command.Action==UnitActionDie ) {
-		DebugLevel0(__FUNCTION__": killed unit\n");
+		DebugLevel0Fn("killed unit\n");
 		--goal->Refs;
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    }
 	}
-#else
-	DebugLevel3("UNIT %p GOAL %p\n",unit,goal);
-	if( goal && (!goal->Type || goal->Removed
-		|| goal->Command.Action==UnitActionDie) ) {
-	    unit->Command.Data.Move.Goal=NoUnitP;
-	    DebugLevel3("goal killed\n");
-	}
-#endif
 
 	switch( d=NextPathElement(unit,&xd,&yd) ) {
 	    case PF_UNREACHABLE:	// Can't reach, stop

@@ -216,21 +216,12 @@ global void DrawMinimap(int vx,int vy)
     int my;
     int x;
     int y;
-#ifdef NEW_UNIT
     UnitType* type;
     Unit** table;
     Unit* unit;
     int w;
     int h;
     int h0;
-#else
-    UnitType* type;
-    Unit* unit;
-    int i;
-    int w;
-    int h;
-    int h0;
-#endif
 #ifdef NEW_FOW
     int bits;
     MapField* mf;
@@ -276,7 +267,6 @@ global void DrawMinimap(int vx,int vy)
 	}
     }
 
-#ifdef NEW_UNIT
     //
     //	Draw units on map
     //	FIXME: I should rewrite this complet
@@ -352,67 +342,6 @@ global void DrawMinimap(int vx,int vy)
 	    }
 	}
     }
-#else
-    //
-    //	Draw units on map
-    //
-    for( i=0; i<NumUnits; i++ ) {
-	SysColors color;
-
-	unit=Units[i];
-	type=unit->Type;
-
-	flags=TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags;
-	// Draw only units on explored fields
-	if( !(flags&MapFieldExplored) ) {
-	    continue;
-	}
-	// Draw only units on visible fields
-	if( !(flags&MapFieldVisible) ) {
-	    continue;
-	}
-	// FIXME: buildings under fog of war.
-
-	if( unit->Player->Player==PlayerNumNeutral ) {
-	    if( type->Critter ) {
-		color=ColorNPC;
-	    } else if( type->OilPatch ) {
-		color=ColorBlack;
-	    } else {
-		color=ColorYellow;
-	    }
-	} else if( unit->Player==ThisPlayer ) {
-	    if( unit->Attacked && RedPhase ) {
-		color=ColorRed;
-		// better to clear to fast, than to clear never :?)
-		unit->Attacked=0;
-	    } else if( MinimapShowSelected && unit->Selected ) {
-		color=ColorWhite;
-	    } else {
-		color=ColorGreen;
-	    }
-	} else {
-	    color=unit->Player->Color;
-	}
-
-	mx=x+1+MinimapX+Map2MinimapX[unit->X];
-	my=y+1+MinimapY+Map2MinimapY[unit->Y];
-	w=Map2MinimapX[type->TileWidth];
-	if( mx+w>=x+MINIMAP_W ) {	// clip right side
-	    w=x+MINIMAP_W-mx;
-	}
-	h0=Map2MinimapY[type->TileHeight];
-	if( my+h0>=y+MINIMAP_H ) {	// clip bottom side
-	    h0=y+MINIMAP_H-my;
-	}
-	while( w-->=0 ) {
-	    h=h0;
-	    while( h-->=0 ) {
-		VideoDrawPixel(color,mx+w,my+h);
-	    }
-	}
-    }
-#endif
 }
 
 local int OldMinimapCursorX;		/// Save MinimapCursorX

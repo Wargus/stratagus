@@ -120,9 +120,7 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionFollow;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
-#ifdef NEW_UNIT
     dest->Refs++;
-#endif
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -209,11 +207,9 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
     command->Action=UnitActionRepair;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
-#ifdef NEW_UNIT
     if( dest ) {
 	dest->Refs++;
     }
-#endif
     command->Data.Move.Range=REPAIR_RANGE;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -262,9 +258,7 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
     // choose goal and good attack range
     if( attack ) {
 	command->Data.Move.Goal=attack;
-#ifdef NEW_UNIT
 	attack->Refs++;
-#endif
 	command->Data.Move.Range=unit->Stats->AttackRange;
     } else {
 	command->Data.Move.Goal=NoUnitP;
@@ -372,9 +366,7 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionBoard;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
-#ifdef NEW_UNIT
     dest->Refs++;
-#endif
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -411,11 +403,9 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
     command->Action=UnitActionUnload;
     ResetPath(*command);
     command->Data.Move.Goal=what;
-#ifdef NEW_UNIT
     if( what ) {
 	what->Refs++;
     }
-#endif
     command->Data.Move.Range=0;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -551,9 +541,7 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionMineGold;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
-#ifdef NEW_UNIT
     dest->Refs++;
-#endif
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -591,9 +579,7 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionHaulOil;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
-#ifdef NEW_UNIT
     dest->Refs++;
-#endif
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -824,9 +810,7 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
     // choose goal and good attack range
     if( dest ) {
 	command->Data.Move.Goal=dest;
-#ifdef NEW_UNIT
 	dest->Refs++;
-#endif
 	command->Data.Move.Range=1;
     } else {
 	command->Data.Move.Goal=NoUnitP;

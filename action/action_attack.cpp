@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_attack.c	-	The attack action. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -105,7 +104,7 @@ local void MoveToTarget(Unit* unit)
 
     // FIXME: is this a a-star problem ?
     if( unit->Command.Action==UnitActionAttackGround
-	|| WallOnMap(unit->Command.Data.Move.DX,unit->Command.Data.Move.DY) ) { 
+	|| WallOnMap(unit->Command.Data.Move.DX,unit->Command.Data.Move.DY) ) {
 	// FIXME: workaround for pathfinder problem
 	unit->Command.Data.Move.DX-=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.DY-=unit->Command.Data.Move.Range;
@@ -126,7 +125,6 @@ local void MoveToTarget(Unit* unit)
 	//
 	//	Target is dead, choose new one.
 	//
-#ifdef NEW_UNIT
 	if( (goal=unit->Command.Data.Move.Goal) ) {
 	    // FIXME: Should be done by Action Move???????
 	    if( goal->Destroyed ) {
@@ -140,12 +138,6 @@ local void MoveToTarget(Unit* unit)
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    }
 	}
-#else
-	goal=unit->Command.Data.Move.Goal;
-	if( goal && (!goal->HP || goal->Command.Action==UnitActionDie) ) {
-	    unit->Command.Data.Move.Goal=goal=NoUnitP;
-	}
-#endif
 
 	//
 	//	No goal: if meeting enemy attack it.
@@ -156,9 +148,7 @@ local void MoveToTarget(Unit* unit)
 		&& unit->Command.Action!=UnitActionAttackGround ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
-#ifdef NEW_UNIT
 		goal->Refs++;
-#endif
 		if( unit->SavedCommand.Action==UnitActionStill ) {
 		    // Save current command to come back.
 		    unit->SavedCommand=unit->Command;
@@ -180,10 +170,8 @@ local void MoveToTarget(Unit* unit)
 
 	    temp=AttackUnitsInReactRange(unit);
 	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
-#ifdef NEW_UNIT
 		goal->Refs--;
 		temp->Refs++;
-#endif
 		if( unit->SavedCommand.Action==UnitActionStill ) {
 		    // Save current command to come back.
 		    unit->SavedCommand=unit->Command;
@@ -205,7 +193,7 @@ local void MoveToTarget(Unit* unit)
 		UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
 	    }
 	    unit->SubAction++;
-	} else if( (wall || unit->Command.Action==UnitActionAttackGround) 
+	} else if( (wall || unit->Command.Action==UnitActionAttackGround)
 		&& MapDistance(unit->X,unit->Y
 		    ,unit->Command.Data.Move.DX,unit->Command.Data.Move.DY)
 			<=unit->Stats->AttackRange ) {
@@ -258,7 +246,6 @@ local void AttackTarget(Unit* unit)
 	//
 	//	Target is dead, choose new one.
 	//
-#ifdef NEW_UNIT
 	if( goal ) {
 	    if( goal->Destroyed ) {
 		DebugLevel0Fn("destroyed unit\n");
@@ -290,9 +277,7 @@ local void AttackTarget(Unit* unit)
 		// Save current command to come back.
 		unit->SavedCommand=unit->Command;
 	    }
-#ifdef NEW_UNIT
 	    goal->Refs++;
-#endif
 	    DebugLevel3Fn("%Zd Unit in react range %Zd\n"
 		    ,UnitNumber(unit),UnitNumber(goal));
 	    unit->Command.Data.Move.Goal=goal;
@@ -300,23 +285,6 @@ local void AttackTarget(Unit* unit)
 	    unit->Command.Data.Move.DY=goal->Y;
 	    unit->SubAction|=2;
 	} else
-#else
-	if( !goal || !goal->HP || goal->Command.Action==UnitActionDie ) {
-	    // FIXME: goal->Removed???
-	    unit->State=0;
-	    goal=AttackUnitsInReactRange(unit);
-	    unit->Command.Data.Move.Goal=goal;
-	    if( !goal ) {
-		unit->SubAction=0;
-		unit->Command.Action=UnitActionStill;	// cade?
-		return;
-	    }
-	    unit->SubAction|=2;
-	    DebugLevel3Fn("Unit in react range %Zd\n",UnitNumber(goal));
-	    unit->Command.Data.Move.DX=goal->X;
-	    unit->Command.Data.Move.DY=goal->Y;
-	} else
-#endif
 
 	//
 	//	Have a weak target, try a better target.
@@ -326,10 +294,8 @@ local void AttackTarget(Unit* unit)
 
 	    temp=AttackUnitsInReactRange(unit);
 	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
-#ifdef NEW_UNIT
 		goal->Refs--;
 		temp->Refs++;
-#endif
 		if( unit->SavedCommand.Action==UnitActionStill ) {
 		    // Save current command to come back.
 		    unit->SavedCommand=unit->Command;
