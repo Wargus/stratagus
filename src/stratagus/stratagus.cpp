@@ -979,12 +979,15 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    ExitNetwork1();
 	}
 	InitNetwork1();
+
 	//
 	// Don't leak when called multiple times
 	//	- FIXME: not the ideal place for this..
 	//
+	DebugLevel0Fn("Freeing map info, wrong place\n");
 	FreeMapInfo(map->Info);
 	map->Info = NULL;
+
 	//
 	//	No filename given, choose with the menus
 	//
@@ -996,7 +999,11 @@ global void MenuLoop(char* filename, WorldMap* map)
 		PlayMusic(MenuMusic);
 	    }
 	    EnableRedraw=RedrawMenu;
-	    ProcessMenu("menu-program-start", 1);
+	    if( EditorRunning ) {
+		ProcessMenu("menu-editor-select", 1);
+	    } else {
+		ProcessMenu("menu-program-start", 1);
+	    }
 	    EnableRedraw=RedrawEverything;
 	    DebugLevel0Fn("Menu start: NetPlayers %d\n" _C_ NetPlayers);
 	    filename = CurrentMapPath;
@@ -1006,16 +1013,23 @@ global void MenuLoop(char* filename, WorldMap* map)
 	}
 
 	//
-	//	Create the game.
+	//	Start editor or game.
 	//
-	CreateGame(filename,map);
+	if( EditorRunning ) {
+	    EditorMainLoop();
+	} else {
+	    //
+	    //	Create the game.
+	    //
+	    CreateGame(filename,map);
 
-	SetStatusLine(NameLine);
-	SetMessage("Do it! Do it now!");
-	//
-	//	Play the game.
-	//
-	GameMainLoop();
+	    SetStatusLine(NameLine);
+	    SetMessage("Do it! Do it now!");
+	    //
+	    //	Play the game.
+	    //
+	    GameMainLoop();
+	}
 
 	CleanModules();
 	CleanFonts();
@@ -1267,8 +1281,6 @@ global int mymain(int argc,char** argv)
 global int main(int argc,char** argv)
 #endif
 {
-    int start_editor;
-
 #ifdef USE_BEOS
     //
     //	Parse arguments for BeOS
@@ -1286,8 +1298,6 @@ global int main(int argc,char** argv)
     memset(NetworkName, 0, 16);
     strcpy(NetworkName, "Anonymous");
 
-    start_editor=0;
-
     // FIXME: Parse options before or after ccl?
 
     //
@@ -1302,7 +1312,7 @@ global int main(int argc,char** argv)
                 FreeCraftLibPath=optarg;
                 continue;
 	    case 'e':
-		start_editor=1;
+		EditorRunning=1;
 		continue;
 	    case 'E':
 		EditorStartFile=optarg;
