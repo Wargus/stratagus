@@ -210,9 +210,7 @@ local SCM CclDefineCampaign(SCM list)
     CampaignChapter* chapter;
     CampaignChapter** tail;
     int i;
-    int found;
 
-    found=0;
     //
     //	Campaign name
     //
@@ -222,42 +220,17 @@ local SCM CclDefineCampaign(SCM list)
     if( Campaigns ) {
 	for( i=0; i<NumCampaigns; ++i ) {
 	    if( !strcmp(Campaigns[i].Ident, ident) ) {
-		found=1;
-		break;
+		free(ident);
+		return SCM_UNSPECIFIED;
 	    }
 	}
-	if( found ) {
-	    campaign=Campaigns+i;
-	} else {
-	    Campaigns=realloc(Campaigns,sizeof(Campaign)*(NumCampaigns+1));
-	    campaign=Campaigns+NumCampaigns;
-	    NumCampaigns++;
-	}
+	Campaigns=realloc(Campaigns,sizeof(Campaign)*(NumCampaigns+1));
+	campaign=Campaigns+NumCampaigns;
+	NumCampaigns++;
     } else {
 	campaign=Campaigns=malloc(sizeof(Campaign));
 	NumCampaigns++;
     }
-
-    if( found ) {
-	CampaignChapter* ptr;
-	ptr=campaign->Chapters;
-	while( ptr ) {
-	    chapter=ptr->Next;
-	    if( ptr->Type==ChapterShowPicture ) {
-		free(ptr->d.picture.Act);
-		free(ptr->d.picture.Title);
-	    }
-	    else if( ptr->Type==ChapterPlayLevel ) {
-		free(ptr->d.level.Name);
-	    }
-	    free(ptr);
-	    ptr=chapter;
-	}
-	free(campaign->Ident);
-	free(campaign->Name);
-	free(campaign->File);
-    }
-
 
     memset(campaign,0,sizeof(Campaign));
     campaign->Ident=ident;
