@@ -926,7 +926,6 @@ global void RealizeVideoMemory(void)
 */
 global void ToggleGrabMouse(void)
 {
-#ifdef SDL_GRAB_ON
     static int grabbed;
 
     if( grabbed ) {
@@ -937,7 +936,6 @@ global void ToggleGrabMouse(void)
 	    grabbed=1;
 	}
     }
-#endif	// SDL_GRAB_ON
 }
 
 #endif // } USE_SDL
