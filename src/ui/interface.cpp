@@ -868,7 +868,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    Exit(0);
+	    ExitConfirmMenu();
 
 	case 'q'&0x1F:
 	case 'q':
@@ -876,8 +876,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    QuitToMenu=1;
-	    GameRunning=0;
+	    QuitToMenuConfirmMenu();
 	    break;
 
 	case 'r'&0x1F:
@@ -886,8 +885,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    RestartScenario=1;
-	    GameRunning=0;
+	    RestartConfirmMenu();
 	    break;
 
 	case '.':

@@ -320,6 +320,13 @@ extern void GameMenuSave(void);
     /// Load game menu
 extern void GameMenuLoad(void);
 
+    /// Restart confirm menu
+extern void RestartConfirmMenu(void);
+    /// Quit to menu confirm menu
+extern void QuitToMenuConfirmMenu(void);
+    /// Exit confirm menu
+extern void ExitConfirmMenu(void);
+
     /// Initialize the (ccl-loaded) menus data
 extern void InitMenuData(void);
     /// Post-Initialize the (ccl-loaded) menus
