@@ -318,7 +318,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
 	if (width > size || height > size) {
-		DebugLevel0Fn("Image too large (%d,%d), max size: %d\n" _C_
+		DebugPrint("Image too large (%d,%d), max size: %d\n" _C_
 			width _C_ height _C_ size);
 		return;
 	}
@@ -390,7 +390,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG
 		if ((i = glGetError())) {
-			DebugLevel0Fn("glTexImage2D(%x)\n" _C_ i);
+			DebugPrint("glTexImage2D(%x)\n" _C_ i);
 		}
 #endif
 	}
@@ -489,7 +489,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG
 	if ((i = glGetError())) {
-		DebugLevel0Fn("glTexImage2D(%x)\n" _C_ i);
+		DebugPrint("glTexImage2D(%x)\n" _C_ i);
 	}
 #endif
 	free(tex);
