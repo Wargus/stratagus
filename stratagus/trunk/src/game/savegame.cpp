@@ -268,9 +268,9 @@ void SaveGame(const char* filename)
 	SaveUnitTypes(file);
 	SaveUpgrades(file);
 	SavePlayers(file);
+	SaveMap(file);
 	SaveUnits(file);
 	SaveUserInterface(file);
-	SaveMap(file);
 	SaveAi(file);
 	SaveSelections(file);
 	SaveGroups(file);
