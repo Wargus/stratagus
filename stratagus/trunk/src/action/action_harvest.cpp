@@ -185,6 +185,7 @@ local int ChopWood(Unit* unit)
 	//
 	if( !--unit->Value ) {
 	    // Have wood
+	    unit->Player->UnitTypesCount[unit->Type->Type]--;
 	    if( unit->Type==UnitTypeOrcWorker ) {
 		unit->Type=UnitTypeOrcWorkerWithWood;
 	    } else if( unit->Type==UnitTypeHumanWorker ) {
@@ -194,6 +195,7 @@ local int ChopWood(Unit* unit)
 		DebugLevel0Fn("Wrong unit for chopping wood %d\n"
 			,unit->Type->Type);
 	    }
+	    unit->Player->UnitTypesCount[unit->Type->Type]++;
 
 	    //
 	    //	Update the display.
@@ -323,6 +325,7 @@ local int ReturnWithWood(Unit* unit)
 	MustRedraw|=RedrawResources;
     }
 
+    unit->Player->UnitTypesCount[unit->Type->Type]--;
     if( unit->Type==UnitTypeOrcWorkerWithWood ) {
 	unit->Type=UnitTypeOrcWorker;
     } else if( unit->Type==UnitTypeHumanWorkerWithWood ) {
@@ -331,6 +334,7 @@ local int ReturnWithWood(Unit* unit)
 	// FIXME: must support more races.
 	DebugLevel0Fn("Wrong unit for returning wood %d\n",unit->Type->Type);
     }
+    unit->Player->UnitTypesCount[unit->Type->Type]++;
 
     if( WAIT_FOR_WOOD<MAX_UNIT_WAIT ) {
 	unit->Wait=WAIT_FOR_WOOD;
