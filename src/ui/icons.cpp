@@ -173,7 +173,7 @@ global void InitIcons(void)
 		Icon* id;
 
 		id = IconByIdent(IconAliases[i * 2 + 1]);
-		DebugCheck(id == NoIcon);
+		Assert(id != NoIcon);
 
 		*(Icon**)hash_add(IconHash, IconAliases[i * 2 + 0]) = id;
 	}
@@ -331,7 +331,7 @@ global Icon* IconByIdent(const char* ident)
 */
 global const char* IdentOfIcon(const Icon* icon)
 {
-	DebugCheck(!icon);
+	Assert(icon);
 
 	return icon->Ident;
 }
@@ -366,7 +366,7 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 	int width;
 	int height;
 
-	DebugCheck(!icon);
+	Assert(icon);
 
 	width = icon->Width;
 	height = icon->Height;
@@ -461,7 +461,7 @@ local int CclDefineIcon(lua_State* l)
 		lua_pop(l, 1);
 	}
 
-	DebugCheck(!ident || !filename || !width || !height);
+	Assert(ident && filename && width && height);
 
 	AddIcon(ident, tileset, index, width, height, filename);
 

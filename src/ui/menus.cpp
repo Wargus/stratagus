@@ -1025,7 +1025,7 @@ local void SaveGameLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
-	DebugCheck(i<0);
+	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
@@ -1126,9 +1126,9 @@ local void SaveGameVSAction(Menuitem *mi, int i)
 					}
 				}
 
-				DebugCheck(mi->d.listbox.startline < 0);
-				DebugCheck(mi->d.listbox.noptions > 0 &&
-					mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+				Assert(mi->d.listbox.startline >= 0);
+				Assert(mi->d.listbox.noptions <= 0 ||
+					mi->d.listbox.startline+mi->d.listbox.curopt < mi->d.listbox.noptions);
 
 				SaveGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 			}
@@ -1269,7 +1269,7 @@ local void LoadGameLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
-	DebugCheck(i<0);
+	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
@@ -1368,9 +1368,9 @@ local void LoadGameVSAction(Menuitem *mi, int i)
 					}
 				}
 
-				DebugCheck(mi->d.listbox.startline < 0);
-				DebugCheck(mi->d.listbox.noptions > 0 &&
-					mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+				Assert(mi->d.listbox.startline >= 0);
+				Assert(mi->d.listbox.noptions <= 0 ||
+					mi->d.listbox.startline+mi->d.listbox.curopt < mi->d.listbox.noptions);
 
 				LoadGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 			}
@@ -3242,7 +3242,7 @@ local void FreeMapInfos(FileList *fl, int n)
 */
 local void ScenSelectInit(Menuitem *mi)
 {
-	DebugCheck(!*ScenSelectPath);
+	Assert(*ScenSelectPath);
 	mi->menu->Items[9].flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
 	mi->menu->Items[9].d.button.text = ScenSelectDisplayPath;
@@ -3256,7 +3256,7 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
-	DebugCheck( i < 0);
+	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		free(mi->menu->Items[3].d.button.text);
@@ -3546,9 +3546,9 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 					}
 				}
 
-				DebugCheck(mi->d.listbox.startline < 0);
-				DebugCheck(mi->d.listbox.noptions > 0 &&
-					mi->d.listbox.startline + mi->d.listbox.curopt >= mi->d.listbox.noptions);
+				Assert(mi->d.listbox.startline >= 0);
+				Assert(mi->d.listbox.noptions <= 0 ||
+					mi->d.listbox.startline + mi->d.listbox.curopt < mi->d.listbox.noptions);
 
 				ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 			}
@@ -4071,7 +4071,7 @@ local void MultiGamePTSAction(Menuitem *mi, int o)
 	i = mi - menu->Items - SERVER_PLAYER_STATE;
 	// JOHNS: Must this be always true?
 	// ARI: NO! think of client menus!
-	// DebugCheck( i<0 || i>PlayerMax-1 );
+	// Assert(i >= 0 && i <= PlayerMax - 1);
 
 	if (i > 0 && i < PlayerMax-1) {
 		if (mi->d.pulldown.curopt == o) {
@@ -4118,7 +4118,7 @@ local void NetworkGamePrepareGameSettings(void)
 	int x;
 	int v;
 
-	DebugCheck(!MenuMapInfo);
+	Assert(MenuMapInfo);
 
 	DebugLevel0Fn("NetPlayers = %d\n" _C_ NetPlayers);
 
@@ -4191,7 +4191,7 @@ local void NetworkGamePrepareGameSettings(void)
 
 #ifdef DEBUG
 	for (i = 0; i < NetPlayers; i++) {
-		DebugCheck(GameSettings.Presets[Hosts[i].PlyNr].Type != PlayerPerson);
+		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerPerson);
 		;
 	}
 #endif
@@ -4993,7 +4993,7 @@ local void EditorMainLoadMap(void)
 */
 local void EditorMainLoadInit(Menuitem *mi)
 {
-	DebugCheck(!*ScenSelectPath);
+	Assert(*ScenSelectPath);
 	mi->menu->Items[5].flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
 	mi->menu->Items[5].d.button.text = ScenSelectDisplayPath;
@@ -5269,7 +5269,7 @@ local void EditorMainLoadLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
-	DebugCheck(i<0);
+	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		free(mi->menu->Items[3].d.button.text);
@@ -5363,9 +5363,9 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 					}
 				}
 
-				DebugCheck(mi->d.listbox.startline < 0);
-				DebugCheck(mi->d.listbox.noptions > 0 &&
-					mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+				Assert(mi->d.listbox.startline >= 0);
+				Assert(mi->d.listbox.noptions <= 0 ||
+					mi->d.listbox.startline+mi->d.listbox.curopt < mi->d.listbox.noptions);
 
 				EditorMainLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 			}
@@ -5853,7 +5853,7 @@ global int EditorSaveMenu(void)
 	menu->Items[3].d.input.buffer = path;
 	menu->Items[3].d.input.maxch = PATH_MAX - 4;
 
-	DebugCheck(!*ScenSelectPath);
+	Assert(*ScenSelectPath);
 	menu->Items[6].flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
 	menu->Items[6].d.button.text = ScenSelectDisplayPath;
@@ -6089,7 +6089,7 @@ local void EditorSaveLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
-	DebugCheck(i<0);
+	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		free(mi->menu->Items[4].d.button.text);
@@ -6184,9 +6184,9 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 					}
 				}
 
-				DebugCheck(mi->d.listbox.startline < 0);
-				DebugCheck(mi->d.listbox.noptions > 0 &&
-					mi->d.listbox.startline + mi->d.listbox.curopt >= mi->d.listbox.noptions);
+				Assert(mi->d.listbox.startline >= 0);
+				Assert(mi->d.listbox.noptions <= 0 ||
+					mi->d.listbox.startline + mi->d.listbox.curopt < mi->d.listbox.noptions);
 
 				EditorSaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 			}
@@ -6308,7 +6308,7 @@ local void ReplayGameMenu(void)
 */
 local void ReplayGameInit(Menuitem *mi)
 {
-	DebugCheck(!*ScenSelectPath);
+	Assert(*ScenSelectPath);
 	mi->menu->Items[5].flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
 	mi->menu->Items[5].d.button.text = ScenSelectDisplayPath;
@@ -6412,7 +6412,7 @@ local void ReplayGameLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
-	DebugCheck(i<0);
+	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		free(mi->menu->Items[3].d.button.text);
@@ -6528,9 +6528,9 @@ local void ReplayGameVSAction(Menuitem *mi, int i)
 					}
 				}
 
-				DebugCheck(mi->d.listbox.startline < 0);
-				DebugCheck(mi->d.listbox.noptions > 0 &&
-					mi->d.listbox.startline + mi->d.listbox.curopt >= mi->d.listbox.noptions);
+				Assert(mi->d.listbox.startline >= 0);
+				Assert(mi->d.listbox.noptions <= 0 ||
+					mi->d.listbox.startline + mi->d.listbox.curopt < mi->d.listbox.noptions);
 
 				ReplayGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 			}
