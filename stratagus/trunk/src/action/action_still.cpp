@@ -82,18 +82,10 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	//	FIXME: the frames are hardcoded they should be configurable
 	//
 	if( unit->State==1 && type->GoldMine ) {
-#ifdef NEW_ORDERS
 	    unit->Frame=!!unit->Data.Resource.Active;
-#else
-	    unit->Frame=!!unit->Command.Data.GoldMine.Active;
-#endif
 	}
 	if( unit->State==1 && type->GivesOil ) {
-#ifdef NEW_ORDERS
 	    unit->Frame=unit->Data.Resource.Active ? 2 : 0;
-#else
-	    unit->Frame=unit->Command.Data.Resource.Active ? 2 : 0;
-#endif
 	}
     }
 
@@ -136,24 +128,12 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	if( x!=unit->X || y!=unit->Y ) {
 	    if( CheckedCanMoveToMask(x,y,TypeMovementMask(type)) ) {
 		// FIXME: Don't use pathfinder for this, costs too much cpu.
-#ifdef NEW_ORDERS
 		unit->Orders[0].Action=UnitActionMove;
-		ResetPath(unit->Orders[0]);
 		DebugCheck( unit->Orders[0].Goal );
 		unit->Orders[0].Goal=NoUnitP;
 		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
 		unit->Orders[0].X=x;
 		unit->Orders[0].Y=y;
-#else
-		unit->Command.Action=UnitActionMove;
-		ResetPath(unit->Command);
-		unit->Command.Data.Move.Goal=NoUnitP;
-		unit->Command.Data.Move.Range=0;
-		unit->Command.Data.Move.SX=unit->X;
-		unit->Command.Data.Move.SY=unit->Y;
-		unit->Command.Data.Move.DX=x;
-		unit->Command.Data.Move.DY=y;
-#endif
 	    }
 	}
 	// NOTE: critter couldn't attack automatic through the return
@@ -173,34 +153,18 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		DebugLevel3Fn(" %Zd Attacking in range %d\n"
 			,UnitNumber(unit),unit->SubAction);
-#ifdef NEW_ORDERS
 		unit->SavedOrder.Action=UnitActionAttack;
 		unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
 		unit->SavedOrder.X=unit->X;
 		unit->SavedOrder.Y=unit->Y;
 		unit->SavedOrder.Goal=NoUnitP;
-		ResetPath(unit->SavedOrder);
-		// FIXME: next isn't used: unit->SubAction|=2;
-#else
-		unit->SavedCommand.Action=UnitActionAttack;
-		unit->SavedCommand.Data.Move.Range=0;
-		unit->SavedCommand.Data.Move.DX=unit->X;
-		unit->SavedCommand.Data.Move.DY=unit->Y;
-		unit->SavedCommand.Data.Move.Goal=NoUnitP;
-		ResetPath(unit->SavedCommand);
-		unit->SubAction|=2;
-#endif
 	    }
 	} else if( (goal=AttackUnitsInRange(unit)) ) {
 	    DebugLevel3Fn(" %Zd #%d\n",UnitNumber(goal),goal->Refs);
 	    //
 	    //	Old goal destroyed.
 	    //
-#ifdef NEW_ORDERS
 	    temp=unit->Orders[0].Goal;
-#else
-	    temp=unit->Command.Data.Move.Goal;
-#endif
 	    if( temp && temp->Destroyed ) {
 		DebugLevel3Fn(" destroyed unit %Zd #%d\n"
 			,UnitNumber(temp),temp->Refs);
@@ -208,11 +172,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		if( !--temp->Refs ) {
 		    ReleaseUnit(temp);
 		}
-#ifdef NEW_ORDERS
 		unit->Orders[0].Goal=temp=NoUnitP;
-#else
-		unit->Command.Data.Move.Goal=temp=NoUnitP;
-#endif
 	    }
 	    if( !unit->SubAction || temp!=goal ) {
 		// New target.
@@ -223,11 +183,8 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		    temp->Refs--;
 		    RefsDebugCheck( !temp->Refs );
 		}
-#ifdef NEW_ORDERS
 		unit->Orders[0].Goal=goal;
-#else
-		unit->Command.Data.Move.Goal=goal;
-#endif
+		RefsDebugCheck( !goal->Refs );
 		goal->Refs++;
 		unit->State=0;
 		unit->SubAction=1;	// Mark attacking.
@@ -242,11 +199,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
     }
 
     if( unit->SubAction ) {		// was attacking.
-#ifdef NEW_ORDERS
 	if( (temp=unit->Orders[0].Goal) ) {
-#else
-	if( (temp=unit->Command.Data.Move.Goal) ) {
-#endif
 	    if( temp->Destroyed ) {
 		RefsDebugCheck( !temp->Refs );
 		if( !--temp->Refs ) {
@@ -257,11 +210,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		temp->Refs--;
 		RefsDebugCheck( !temp->Refs );
 	    }
-#ifdef NEW_ORDERS
 	    unit->Orders[0].Goal=NoUnitP;
-#else
-	    unit->Command.Data.Move.Goal=NoUnitP;
-#endif
 	}
 	unit->SubAction=unit->State=0;	// No attacking, restart
     }
