@@ -108,7 +108,8 @@ extern SpellType* SpellTypeById( int Id );
 extern int CanCastSpell( const Unit* unit, int SpellId );
 */
     /// fire spell on target unit or place at x,y
-extern int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y );
+extern int SpellCast( const SpellType* SpellId, Unit* unit, Unit* target,
+	int x, int y );
 
 //@}
 

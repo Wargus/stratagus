@@ -162,6 +162,14 @@ struct _command_ {
 	struct {
 	    unsigned	Active;		/// how much units are in the resource
 	} Resource;			/// generic resource
+	struct {
+	    int		Sum;		/// HP for building
+	    int		Add;		/// added to sum
+	    int		Val;		/// counter
+	    int		Sub;		/// subtracted from counter
+	    int		Cancel;		/// Cancel construction
+	    Unit*	Worker;		/// Worker building the unit
+	} Builded;			// builded:
     } Data;				/// data for action
 };
 #endif
@@ -306,6 +314,21 @@ struct _unit_ {
     struct _order_harvest_ {
 	unsigned WoodToHarvest;		/// Ticks for harvest
     }		Harvest;		/// Harvest action
+    struct _order_research_ {
+	unsigned Ticks;			/// Ticks for research
+	Upgrade* Upgrade;		/// Upgrade researched
+    }		Research;		/// Research action
+    struct _order_upgradeto_ {
+	unsigned	Ticks;		/// Ticks to complete
+	UnitType*	What;		/// Unit upgraded to
+    } UpgradeTo;			/// Upgrade to action
+    struct _order_traub_ {
+	unsigned	Ticks;		/// Ticks to complete
+	unsigned	Count;		/// Units in training queue
+	// FIXME: vladi: later we should train more units or automatic
+#define MAX_UNIT_TRAIN	6
+	UnitType*	What[MAX_UNIT_TRAIN];	/// Unit trained
+    } Train;				/// Train units action
     }		Data;			/// Storage room for different commands
 
 #else			//}{-------------------------------------------
@@ -462,11 +485,11 @@ extern void DropOutNearest(Unit* unit,int x,int y,int addx,int addy);
 extern void DropOutAll(const Unit* unit);
 
     /// FIXME: more docu
-extern int CanBuildHere(UnitType* type,unsigned x,unsigned y);
+extern int CanBuildHere(const UnitType* type,unsigned x,unsigned y);
     /// FIXME: more docu
 extern int CanBuildOn(int x,int y,int mask);
     /// FIXME: more docu
-extern int CanBuildUnitType(Unit* unit,UnitType* type,int x,int y);
+extern int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y);
 
     /// Find nearest gold mine
 extern Unit* FindGoldMine(const Unit*,int,int);

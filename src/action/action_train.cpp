@@ -49,28 +49,23 @@
 global void HandleActionTrain(Unit* unit)
 {
     Unit* nunit;
-    UnitType* type;
+    const UnitType* type;
     Player* player;
 
-#if 0
-    // JOHNS: should be checked by the user-interface
-    if( &Players[unit->Player]==ThisPlayer ) {
-	// FIXME: If so used you get millions of messages.
-	if( ThisPlayer->Food<=ThisPlayer->Units
-		&& unit->Command.Data.Train.Ticks ) {
-	    SetMessage( "You need more farms!" );
-	} else {
-	    AiNeedMoreFarms(unit);
-	}
-    }
-#endif
-
     player=unit->Player;
+#ifdef NEW_ORDERS
+    unit->Data.Train.Ticks+=SpeedTrain;
+    // FIXME: Should count down
+    if( unit->Data.Train.Ticks
+	    >=unit->Data.Train.What[0]
+		->Stats[player->Player].Costs[TimeCost] ) {
+#else
     unit->Command.Data.Train.Ticks+=SpeedTrain;
     // FIXME: Should count down
     if( unit->Command.Data.Train.Ticks
 	    >=unit->Command.Data.Train.What[0]
 		->Stats[player->Player].Costs[TimeCost] ) {
+#endif
 
 	//
 	//	Check if enough food available.
@@ -86,14 +81,21 @@ global void HandleActionTrain(Unit* unit)
 		// AiNeedMoreFarms(unit);
 	    }
 
+#ifdef NEW_ORDERS
+	    unit->Data.Train.Ticks-=SpeedTrain;
+#else
 	    unit->Command.Data.Train.Ticks-=SpeedTrain;
+#endif
 	    unit->Reset=1;
 	    unit->Wait=FRAMES_PER_SECOND/6;
 	    return;
 	}
 
-	nunit=MakeUnit(&UnitTypes[unit->Command.Data.Train.What[0]->Type]
-		,player);
+#ifdef NEW_ORDERS
+	nunit=MakeUnit(unit->Data.Train.What[0],player);
+#else
+	nunit=MakeUnit(unit->Command.Data.Train.What[0],player);
+#endif
 	nunit->X=unit->X;
 	nunit->Y=unit->Y;
 	type=unit->Type;
@@ -110,6 +112,30 @@ global void HandleActionTrain(Unit* unit)
 	unit->Reset=1;
 	unit->Wait=1;
         
+#ifdef NEW_ORDERS
+	if ( --unit->Data.Train.Count ) {
+	    int z;
+	    for( z = 0; z < unit->Data.Train.Count ; z++ ) {
+		unit->Data.Train.What[z]=unit->Data.Train.What[z+1];
+	    }
+	    unit->Data.Train.Ticks=0;
+	} else {
+	    unit->Orders[0].Action=UnitActionStill;
+	}
+
+	nunit->Orders[0]=unit->NewOrder;
+
+	//
+	// FIXME: Pending command uses any references?
+	//
+	if( nunit->Orders[0].Goal ) {
+	    if( nunit->Orders[0].Goal->Destroyed ) {
+		DebugLevel0Fn("FIXME: you have found a bug, please fix it.\n");
+	    }
+	    RefsDebugCheck( !nunit->Orders[0].Goal->Refs );
+	    nunit->Orders[0].Goal->Refs++;
+	}
+#else
 	if ( --unit->Command.Data.Train.Count ) {
 	    int z;
 	    for( z = 0; z < unit->Command.Data.Train.Count ; z++ ) {
@@ -131,6 +157,7 @@ global void HandleActionTrain(Unit* unit)
 	    }
 	    nunit->Command.Data.Move.Goal->Refs++;
 	}
+#endif
 
 	if( IsSelected(unit) ) {
 	    UpdateButtonPanel();
