@@ -64,6 +64,9 @@ local int DisabledShowTips;		/// Disabled show tips
 local SCM ReplayLog;			/// Replay log
 local FILE* LogFile;			/// Replay log file
 local unsigned long NextLogCycle;	/// Next log cycle number
+local int InitReplay;			/// Initialize replay
+local char *ReplayPlayers[PlayerMax];	/// Player names
+local int ReplayGameType;		/// Replay game type
 
 
 //----------------------------------------------------------------------------
@@ -140,9 +143,8 @@ global void CommandLog(const char* name,const Unit* unit,int flag,
 	    int i;
 	    fprintf(LogFile,"  'type\t\"%s\"\n","multi-player");
 	    for( i=0; i<PlayerMax; ++i ) {
-		fprintf(LogFile,"  'player\t(list 'number %d 'race %d 'team %d 'type %d)\n",
-		    i,GameSettings.Presets[i].Race,GameSettings.Presets[i].Team,
-		    GameSettings.Presets[i].Type);
+		fprintf(LogFile,"  'player\t(list 'number %d 'name \"%s\" 'race %d 'team %d 'type %d)\n",
+		    i,Players[i].Name,Players[i].Race,Players[i].Team,Players[i].Type);
 	    }
 	    fprintf(LogFile,"  'local-player\t%d\n",ThisPlayer->Player);
 	}
@@ -212,7 +214,7 @@ global void CommandLog(const char* name,const Unit* unit,int flag,
 }
 
 /**
-**
+**	Parse log
 */
 local SCM CclLog(SCM list)
 {
@@ -234,7 +236,7 @@ local SCM CclLog(SCM list)
 }
 
 /**
-**
+**	Parse replay-log
 */
 local SCM CclReplayLog(SCM list)
 {
@@ -321,15 +323,21 @@ local SCM CclReplayLog(SCM list)
 	    int race;
 	    int team;
 	    int type;
+	    char *name;
 
+	    ReplayGameType=2;
 	    num=-1;
 	    race=team=type=SettingsPresetMapDefault;
+	    name=NULL;
 	    sublist=gh_car(list);
 	    while( !gh_null_p(sublist) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
 		if( gh_eq_p(value,gh_symbol2scm("number")) ) {
 		    num=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("name")) ) {
+		    name=gh_scm2newstr(gh_car(sublist),NIL);
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("race")) ) {
 		    race=gh_scm2int(gh_car(sublist));
@@ -342,10 +350,11 @@ local SCM CclReplayLog(SCM list)
 		    sublist=gh_cdr(sublist);
 		}
 	    }
-	    if( num!=-1) {
+	    if( num!=-1 ) {
 		GameSettings.Presets[num].Race=race;
 		GameSettings.Presets[num].Team=team;
 		GameSettings.Presets[num].Type=type;
+		ReplayPlayers[num]=name;
 	    }
 
 	    list=gh_cdr(list);
@@ -365,6 +374,16 @@ local SCM CclReplayLog(SCM list)
 */
 global int LoadReplay(char* name)
 {
+    int i;
+
+    for( i=0; i<PlayerMax; ++i ) {
+	if( ReplayPlayers[i] ) {
+	    free(ReplayPlayers[i]);
+	    ReplayPlayers[i]=NULL;
+	}
+    }
+    ReplayGameType=1;
+
     gh_new_procedureN("log",CclLog);
     gh_new_procedureN("replay-log",CclReplayLog);
     gh_define("*replay_log*",NIL);
@@ -383,6 +402,7 @@ global int LoadReplay(char* name)
 	DisabledShowTips=0;
     }
     GameObserve=1;
+    InitReplay=1;
 
     return 0;
 }
@@ -562,8 +582,18 @@ local void DoNextReplay(void)
 /**
 **	Replay user commands from log each cycle
 */
-global void ReplayEachCycle(void)
+local void ReplayEachCycle(void)
 {
+    if( InitReplay ) {
+	int i;
+	for( i=0; i<PlayerMax; ++i ) {
+	    if( ReplayPlayers[i] ) {
+		PlayerSetName(&Players[i], ReplayPlayers[i]);
+	    }
+	}
+	InitReplay=0;
+    }
+
     if( gh_null_p(ReplayLog) ) {
 	return;
     }
@@ -583,6 +613,25 @@ global void ReplayEachCycle(void)
     }
 }
 
+/**
+**	Replay user commands from log each cycle, single player games
+*/
+global void SinglePlayerReplayEachCycle(void)
+{
+    if( ReplayGameType==1 ) {
+	ReplayEachCycle();
+    }
+}
+
+/**
+**	Replay user commands from log each cycle, multiplayer games
+*/
+global void MultiPlayerReplayEachCycle(void)
+{
+    if( ReplayGameType==2 ) {
+	ReplayEachCycle();
+    }
+}
 //@}
 
 //----------------------------------------------------------------------------

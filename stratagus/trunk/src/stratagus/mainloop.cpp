@@ -624,6 +624,8 @@ global void GameMainLoop(void)
 	showtip=ShowTips;
     }
 
+    MultiPlayerReplayEachCycle();
+
     while( GameRunning ) {
 #if DEBUG
 	if (setjmp (main_loop)) {
@@ -634,7 +636,7 @@ global void GameMainLoop(void)
 	//	Game logic part
 	//
 	if (!GamePaused && NetworkInSync && !SkipGameCycle) {
-	    ReplayEachCycle();
+	    SinglePlayerReplayEachCycle();
 	    if( !++GameCycle ) {
 		// FIXME: tests with game cycle counter now fails :(
 		// FIXME: Should happen in 68 years :)
@@ -643,6 +645,7 @@ global void GameMainLoop(void)
 		fprintf(stderr,"FIXME: *** round robin ***\n");
 		fprintf(stderr,"FIXME: *** round robin ***\n");
 	    }
+	    MultiPlayerReplayEachCycle();
 	    NetworkCommands();		// Get network commands
 	    UnitActions();		// handle units
 	    MissileActions();		// handle missiles
