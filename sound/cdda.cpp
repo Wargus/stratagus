@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name wav.c			-	wav support */
+/**@name cdda.c			-	cdda support */
 //
 //	(c) Copyright 2002 by Lutz Sammer and Fabrice Rossi
 //
@@ -38,6 +38,9 @@
 #include "sound.h"
 #include "sound_server.h"
 
+/*----------------------------------------------------------------------------
+--	Declarations
+----------------------------------------------------------------------------*/
 
 local struct cdrom_read_audio readdata;
 local void *bufstart;
@@ -47,6 +50,15 @@ static local int pos;
 --	Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	Type member function to read from the cd
+**
+**	@param sample	    Sample reading from
+**	@param buf	    Buffer to write data to
+**	@param len	    Length of the buffer
+**
+**	@return		    Number of bytes read
+*/
 local int CDRead(Sample *sample, void *buf, int len)
 {
     static int count = 0;
@@ -92,11 +104,19 @@ local int CDRead(Sample *sample, void *buf, int len)
     return len;
 }
 
+/**
+**	Type member function to free CDDA sample
+**
+**	@param sample	    Sample to free
+*/
 local void CDFree(Sample *sample)
 {
     free(sample);
 }
 
+/**
+**	CDDA object type structure.
+*/
 local const SampleType CDStreamSampleType = {
     CDRead,
     CDFree,
@@ -106,7 +126,7 @@ local const SampleType CDStreamSampleType = {
 **	Load CD.
 **
 **	@param name	Unused.
-**	@param flags	Track number.
+**	@param flags	Unused.
 **
 **	@return		Returns the loaded sample.
 **
