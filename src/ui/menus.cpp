@@ -1135,12 +1135,13 @@ local int SaveGameRDFilter(char *pathbuf, FileList *fl)
 	    fl->type='b';
 	}
 #endif
-		if (strstr(pathbuf, ".sav")) {
-		    if (fl->type == -1)
-			fl->type = 'n';
-		    fl->name = strdup(np);
-		    fl->xdata = NULL;
-		    return 1;
+	if (strcasestr(pathbuf, ".sav")) {
+	    if (fl->type == -1) {
+		fl->type = 'n';
+	    }
+	    fl->name = strdup(np);
+	    fl->xdata = NULL;
+	    return 1;
 	}
     }
     return 0;
@@ -3255,11 +3256,11 @@ local void ScenSelectLBExit(Menuitem *mi)
 local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
-    char *suf[2];
+    char *suf[3];
     char *cp;
     char *lcp;
     char *np;
-    int p;
+    int curopt;
     unsigned u;
     int sz;
     static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
@@ -3270,18 +3271,17 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 
     menu = FindMenu("menu-select-scenario");
 
-    if (menu->items[6].d.pulldown.curopt == 0) {
+    curopt = menu->items[6].d.pulldown.curopt;
+    if (curopt == 0) {
 	suf[0] = ".cm";
 	suf[1] = NULL;
-	p = 0;
-    } else if (menu->items[6].d.pulldown.curopt == 1) {
+    } else if (curopt == 1) {
 	suf[0] = ".pud";
 	suf[1] = NULL;
-	p = 1;
     } else {
 	suf[0] = ".scm";
 	suf[1] = ".chk";
-	p = 2;
+	suf[2] = NULL;
     }
     np = strrchr(pathbuf, '/');
     if (np) {
@@ -3300,7 +3300,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     }
 #endif
     u = 0;
-    do {
+    while (suf[u]) {
 	cp = np;
 	--cp;
 	do {
@@ -3311,7 +3311,11 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 	    break;
 	}
 	++u;
-    } while (u < sizeof(suf)/sizeof(*suf));
+    }
+    if (!suf[u]) {
+	return 0;
+    }
+
     if (lcp >= np) {
 	cp = lcp + strlen(suf[u]);
 #ifdef USE_ZLIB
@@ -3328,23 +3332,29 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #ifdef USE_ZZIPLIB
 usezzf:
 #endif
-	    if (p==1) {
-		if (strcasestr(pathbuf, ".pud")) {
-		    info = GetPudInfo(pathbuf);
-		    if (info) {
-			DebugLevel3Fn("GetPudInfo(%s) : %p\n" _C_ pathbuf _C_ info);
-			sz = szl[menu->items[8].d.pulldown.curopt];
-			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
-			    fl->type = 1;
-			    fl->name = strdup(np);
-			    fl->xdata = info;
-			    return 1;
-			} else {
-			    FreeMapInfo(info);
-			}
+	    if (curopt == 0) {
+		// info = GetCmInfo(pathbuf);
+		info = NULL;
+		DebugLevel3Fn("GetCmInfo(%s) : %p\n" _C_ pathbuf _C_ info);
+		fl->type = 1;
+		fl->name = strdup(np);
+		fl->xdata = info;
+		return 1;
+	    } else if (curopt == 1) {
+		info = GetPudInfo(pathbuf);
+		if (info) {
+		    DebugLevel3Fn("GetPudInfo(%s) : %p\n" _C_ pathbuf _C_ info);
+		    sz = szl[menu->items[8].d.pulldown.curopt];
+		    if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
+			fl->type = 1;
+			fl->name = strdup(np);
+			fl->xdata = info;
+			return 1;
+		    } else {
+			FreeMapInfo(info);
 		    }
 		}
-	    } else if (p==2) {
+	    } else {
 		if (strcasestr(pathbuf, ".scm")) {
 		    info = GetScmInfo(pathbuf);
 		    if (info) {
@@ -3359,7 +3369,7 @@ usezzf:
 			    FreeMapInfo(info);
 			}
 		    }
-		} else if (strcasestr(pathbuf, ".chk")) {
+		} else {
 		    info = GetChkInfo(pathbuf);
 		    if (info) {
 			DebugLevel3Fn("GetChkInfo(%s) : %p\n" _C_ pathbuf _C_ info);
@@ -3373,16 +3383,6 @@ usezzf:
 			    FreeMapInfo(info);
 			}
 		    }
-		}
-	    } else {
-		if (strstr(pathbuf, ".cm")) {
-		    // info = GetCmInfo(pathbuf);
-		    info = NULL;
-		    DebugLevel3Fn("GetCmInfo(%s) : %p\n" _C_ pathbuf _C_ info);
-		    fl->type = 1;
-		    fl->name = strdup(np);
-		    fl->xdata = info;
-		    return 1;
 		}
 	    }
 	}
@@ -5261,7 +5261,7 @@ local void EditorMainLoadLBExit(Menuitem *mi)
 local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
-    char *suf[3];
+    char *suf[4];
     char *np;
     char *cp;
     char *lcp;
@@ -5290,8 +5290,9 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
     suf[0] = ".pud";
     suf[1] = ".scm";
     suf[2] = ".chk";
+    suf[3] = NULL;
     u = 0;
-    do {
+    while (suf[u]) {
 	cp = np;
 	--cp;
 	do {
@@ -5302,7 +5303,10 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 	    break;
 	}
 	++u;
-    } while (u < sizeof(suf)/sizeof(*suf));
+    }
+    if (!suf[u]) {
+	return 0;
+    }
 
     if (lcp >= np) {
 	cp = lcp + strlen(suf[u]);
