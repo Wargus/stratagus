@@ -75,6 +75,12 @@
 */
 
 /*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
+#include "ccl.h"
+
+/*----------------------------------------------------------------------------
 --	Definitions
 ----------------------------------------------------------------------------*/
 
@@ -174,6 +180,8 @@ extern void FontsCclRegister(void);
 extern void CleanFonts(void);
     /// Check if font is loaded
 extern int IsFontLoaded(unsigned font);
+    /// Font symbol to id
+extern int CclFontByIdentifier(SCM type);
 
 //@}
 
