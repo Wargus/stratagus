@@ -10,7 +10,7 @@
 //
 /**@name action_harvest.c -	The harvest action. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2001,2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -268,15 +268,17 @@ local int ReturnWithWood(Unit* unit)
     Unit* destu;
     int i;
 
-    if( (i=DoActionMove(unit))>=0 ) {	// reached end-point?
+    destu=unit->Orders[0].Goal;
+    DebugCheck( !destu );
+
+    i=DoActionMove(unit);
+    if( i==0 ) {
 	return 0;
     }
-
-    DebugCheck( unit->Wait!=1 );
-
-    destu=unit->Orders[0].Goal;
-
-    DebugCheck( !destu );
+    if( i>0 && !(destu->Destroyed || destu->Removed || !destu->HP
+	    || destu->Orders[0].Action==UnitActionDie) ) {
+	return 0;
+    }
 
     if( !destu ) {
 	unit->Orders[0].Action=UnitActionStill;
@@ -310,6 +312,7 @@ local int ReturnWithWood(Unit* unit)
 	return 0;
     }
 
+    DebugCheck( unit->Wait!=1 );
     DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
 
     //

@@ -10,7 +10,7 @@
 //
 /**@name action_resource.c -	The generic resource action. */
 //
-//	(c) Copyright 2001,2002 by Lutz Sammer
+//	(c) Copyright 2001-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -85,6 +85,9 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 {
     Unit* goal;
 
+    goal=unit->Orders[0].Goal;
+    DebugCheck( !goal );
+
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
 	    DebugCheck( unit->Orders[0].Action!=resource->Action );
@@ -92,13 +95,13 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 	case PF_REACHED:
 	    break;
 	default:
-	    return 0;
+	    if( !(goal->Destroyed || goal->Removed || !goal->HP
+		    || goal->Orders[0].Action==UnitActionDie) ) {
+		return 0;
+	    }
+	    break;
     }
 
-    goal=unit->Orders[0].Goal;
-
-    DebugCheck( !goal );
-    DebugCheck( unit->Wait!=1 );
     // FIXME: 0 can happen, if to near placed by map designer.
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)>1 );
 
@@ -128,6 +131,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 	return 0;
     }
 
+    DebugCheck( unit->Wait!=1 );
     DebugCheck( unit->Orders[0].Action!=resource->Action );
 
     //
@@ -332,6 +336,9 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 {
     Unit* goal;
 
+    goal=unit->Orders[0].Goal;
+    DebugCheck( !goal );
+
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
 	    DebugCheck( unit->Orders[0].Action!=resource->Action );
@@ -339,13 +346,13 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	case PF_REACHED:
 	    break;
 	default:
-	    return 0;
+	    if( !(goal->Destroyed || goal->Removed || !goal->HP
+		    || goal->Orders[0].Action==UnitActionDie) ) {
+		return 0;
+	    }
+	    break;
     }
 
-    goal=unit->Orders[0].Goal;
-
-    DebugCheck( !goal );
-    DebugCheck( unit->Wait!=1 );
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
 
     //
@@ -374,6 +381,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	return 0;
     }
 
+    DebugCheck( unit->Wait!=1 );
     DebugCheck( unit->Orders[0].Action!=resource->Action );
 
     //
