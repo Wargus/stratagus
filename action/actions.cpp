@@ -94,6 +94,10 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 */
 local void HandleUnitAction(Unit* unit)
 {
+    if ( unit->Revealer )
+    {
+    unit->Command.Action = UnitActionDie;
+    }
     //
     //	If current action is breakable proceed with next one.
     //
@@ -235,6 +239,10 @@ local void HandleUnitAction(Unit* unit)
 
 	case UnitActionDemolish:
 	    HandleActionDemolish(unit);
+	    break;
+
+	case UnitActionSpellCast:
+	    HandleActionSpellCast(unit);
 	    break;
 
 	default:

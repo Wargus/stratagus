@@ -113,6 +113,7 @@ enum _message_type_ {
     MessageCommandResearch,		/// unit command research
     MessageCommandCancelResearch,	/// unit command cancel research
     MessageCommandDemolish,		/// unit command demolish
+    MessageCommandSpellCast		/// unit command spell cast
 };
 
 /**
@@ -707,6 +708,30 @@ global void SendCommandDemolish(Unit* unit,int x,int y,Unit* attack,int flush)
 	CommandDemolish(unit,x,y,attack,flush);
     } else {
 	NetworkSendCommand(MessageCommandDemolish,unit,x,y,attack,0,flush);
+    }
+}
+
+/**
+**	Send command: Unit spell cast on position/unit.
+**
+**	@param unit	pointer to unit.
+**	@param x	X map tile position where to cast spell.
+**	@param y	Y map tile position where to cast spell.
+**	@param attack	Cast spell on unit (if exist).
+**	@param spellid  Spell type id.
+**	@param flush	Flag flush all pending commands.
+*/
+global void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int flush)
+{
+    CommandLog("spell-cast",unit,flush,1,x,y,dest,NULL); //FIXME: vladi: spellid?
+    if( NetworkFildes==-1 ) {
+	CommandSpellCast(unit,x,y,dest,spellid,flush);
+    } else {
+        // FIXME: WARNING: vladi: this is weird, we should have and
+	// integer argument to all this or just few bytes buffer or 
+	// something... I'll pass spell id's as pointers until...
+	UnitType* ut = (UnitType*)spellid;
+	NetworkSendCommand(MessageCommandSpellCast,unit,x,y,dest,ut,flush);
     }
 }
 
@@ -1717,6 +1742,12 @@ local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
 		DebugCheck( !dest );
 	    }
 	    CommandDemolish(unit,x,y,dest,status);
+	    break;
+	case MessageCommandSpellCast:
+	    // FIXME: WARNING: vladi: currently network protocol
+	    // cannot carry required information for spell cast
+	    // it is required to handle dest unit and aditional
+	    // integer value!
 	    break;
     }
 }

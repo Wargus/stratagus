@@ -67,7 +67,10 @@
 */
 global int SelectUnits(int x1,int y1,int x2,int y2,Unit** table)
 {
-    return UnitCacheSelect(x1,y1,x2,y2,table);
+    if ( x1 == x2 && y1 == y2 )
+      return UnitCacheOnTile(x1,y1,table);
+    else
+      return UnitCacheSelect(x1,y1,x2,y2,table);
 }
 
 /**

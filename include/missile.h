@@ -69,7 +69,7 @@ struct _missile_type_ {
 };
 
     /// how many missile type are maximal supported
-#define MissileTypeMax			0x1E
+#define MissileTypeMax			0x22
 
     /// mark a free missile slot
 #define MissileFree			(MissileType*)0
@@ -96,11 +96,18 @@ typedef struct _missile_ {
     UnitStats*	SourceStats;		/// stats of unit that fires
     Player*	SourcePlayer;		/// player of unit that fires
 
+    Unit* TargetUnit;                   /// target unit, used for spells
+
+    int 	Damage;                 /// direct damage that missile applies
+    
     int		D;			/// for point to point missiles
     int		Dx;			/// delta x
     int		Dy;			/// delta y
     int		Xstep;			/// X step
     int		Ystep;			/// Y step
+    
+    int TTL;				/// time to live (ticks) used for spells
+    int (*Controller)( void* this_missile );    /// used to controll spells
 } Missile;
 
 /*----------------------------------------------------------------------------

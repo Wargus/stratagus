@@ -271,6 +271,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Reset=1;
 
     unit->Rs=MyRand()%100; // used for random fancy buildings and other things
+    unit->Revealer = 0; // FOW revealer
 
     unit->Command.Action=UnitActionStill;
     unit->PendCommand.Action=UnitActionStill;
@@ -735,6 +736,9 @@ global int UnitVisible(const Unit* unit)
 **
 **	NOTE: we could build a table of all magic units reducing cpu use.
 */
+//FIXME: vladi: the doc says incrementing mana is done by 1 per second
+//       the spells effect can be decremented at the same time and this
+//       will reduse calls to this function to one time per second only!
 global void UnitIncrementMana(void)
 {
     Unit** table;
@@ -758,6 +762,20 @@ global void UnitIncrementMana(void)
 		MustRedraw|=RedrawInfoPanel;
 	    }
 	}
+	
+	//
+	// decrease spells effects time
+	//
+	if ( unit->Bloodlust > 0 )
+	  unit->Bloodlust--;
+	if ( unit->Haste > 0 )
+	  unit->Haste--;
+	if ( unit->Slow > 0 ) 
+	  unit->Slow--;
+	if ( unit->Invisible > 0 )
+	  unit->Invisible--;
+	if ( unit->UnholyArmor > 0 )
+	  unit->UnholyArmor--;
     }
 }
 
@@ -2018,7 +2036,9 @@ global void DestroyUnit(Unit* unit)
 
     // FIXME: units in transporters should die without corpes...
     if( unit->Type->Transporter ) { // Transporters loose their units
-        DestroyAllInside(unit);
+        //FIXME: vladi: it could be usefull if transport is near land
+	//       to unload instead of destroying all units in it... ?
+	DestroyAllInside(unit);
     }
 
     RemoveUnit(unit);
@@ -2578,12 +2598,13 @@ global void SaveUnit(const Unit* unit,FILE* file)
     fprintf(file,"\t%d ",unit->Player->Player);
     fprintf(file,"%d ",unit->Mana);
     fprintf(file,"%d ",unit->HP);
-    fprintf(file,"(%d %d %d %d %d)\n"
+    fprintf(file,"(%d %d %d %d %d %d)\n"
 	    ,unit->Bloodlust
 	    ,unit->Haste
 	    ,unit->Slow
 	    ,unit->Invisible
-	    ,unit->Shield);
+	    ,unit->FlameShield
+	    ,unit->UnholyArmor);
     fprintf(file,"\t%d ",unit->GroupId);
     fprintf(file,"%d\n",unit->Value);
 

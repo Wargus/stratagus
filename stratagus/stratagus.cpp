@@ -71,6 +71,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "sound.h"
 #include "network.h"
 #include "pathfinder.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -204,6 +205,7 @@ global void FreeCraftInit(void)
     LoadTileset();
     InitUnitButtons();
     LoadMissileSprites();
+    InitSpells();
     LoadUnitSprites();
     LoadConstructions();
     LoadDecorations();

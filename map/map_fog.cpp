@@ -358,11 +358,13 @@ global void MapUpdateVisible(void)
 #ifdef NEW_FOW
 	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
 		,unit->Y+unit->Type->TileHeight/2
-		,unit->Stats->SightRange);
+		,unit->Stats->SightRange*(unit->Revealer == 0) 
+		                    + 12*(unit->Revealer != 0));
 #else
 	MapMarkSight(unit->X+unit->Type->TileWidth/2
 		,unit->Y+unit->Type->TileHeight/2
-		,unit->Stats->SightRange);
+		,unit->Stats->SightRange*(unit->Revealer == 0) 
+		                    + 12*(unit->Revealer != 0));
 #endif
     }
 }

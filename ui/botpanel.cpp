@@ -50,6 +50,7 @@
 #include "map.h"
 #include "unit.h"
 #include "font.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --      Defines
@@ -142,12 +143,12 @@ int AddButton( int pos, int level, const char* IconIdent,
       ba->ValueStr = strdup( value );
       switch( action )
 	{
-	case B_Magic:	 ba->Value = UpgradeIdByIdent( value ); break;
-	case B_Train:	 ba->Value = UnitTypeIdByIdent( value ); break;
-	case B_Research: ba->Value = UpgradeIdByIdent( value ); break;
-	case B_UpgradeTo: ba->Value = UnitTypeIdByIdent( value ); break;
-	case B_Build:	 ba->Value = UnitTypeIdByIdent( value ); break;
-	default:	ba->Value = atoi( value ); break;
+	case B_SpellCast:	ba->Value = SpellIdByIdent( value ); break;
+	case B_Train:		ba->Value = UnitTypeIdByIdent( value ); break;
+	case B_Research:	ba->Value = UpgradeIdByIdent( value ); break;
+	case B_UpgradeTo:	ba->Value = UnitTypeIdByIdent( value ); break;
+	case B_Build:		ba->Value = UnitTypeIdByIdent( value ); break;
+        default:		ba->Value = atoi( value ); break;
 	}
   } else {
       ba->ValueStr = NULL;
@@ -297,9 +298,11 @@ global void DrawButtonPanel(void)
 		    case B_Research:
 			SetCosts(0,Upgrades[v].Costs);
 			break;
-		    case B_Magic:
-			// FIXME: correct costs!!!
-			SetCosts(11,NULL);
+		    case B_SpellCast:
+		        {
+			const SpellType* spell = SpellTypeById( v );
+			SetCosts(spell->ManaCost,NULL);
+			}
 			break;
 
 		    default:
@@ -521,7 +524,7 @@ global void UpdateButtonPanel(void)
 			    allow=UpgradeIdentAllowed( ThisPlayer,
 				UnitButtonTable[z]->ValueStr )=='A';
 		    }
-		} else if ( UnitButtonTable[z]->Action == B_Magic ) {
+		} else if ( UnitButtonTable[z]->Action == B_SpellCast ) {
 		    DebugLevel3("Magic: %d,%c\n",
 			    CheckDependByIdent( ThisPlayer,
 				UnitButtonTable[z]->ValueStr ),
@@ -600,9 +603,11 @@ global void DoButtonButtonClicked(int button)
 	case B_Repair:
 	case B_AttackGround:
 	case B_Demolish:
+        case B_SpellCast:
 	    CursorState=CursorStateSelect;
 	    GameCursor=&Cursors[CursorTypeYellowHair];
 	    CursorAction=CurrentButtons[button].Action;
+	    CursorValue=CurrentButtons[button].Value;
             CurrentButtonLevel=9;	// level 9 is cancel-only
             UpdateButtonPanel();
 	    MustRedraw|=RedrawCursor;

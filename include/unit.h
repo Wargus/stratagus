@@ -1,6 +1,6 @@
 //   ___________		     _________		      _____  __
 //   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\
 //    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
 //    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
@@ -61,6 +61,8 @@ enum _unit_action_ {
     UnitActionAttack,			/// unit attacks position/unit
     UnitActionAttackGround,		/// unit attacks ground
     UnitActionDie,			/// unit dies
+
+    UnitActionSpellCast,		/// unit casts spell
 
     UnitActionTrain,			/// building is training
     UnitActionUpgradeTo,		/// building is upgrading itself
@@ -130,6 +132,7 @@ struct _command_ {
 	    unsigned	SY;		/// Source
 	    unsigned	DX;
 	    unsigned	DY;		/// Destination
+	    int         SpellId;	/// spell type id
 	} Move;				/// move:
 	struct {
 	    unsigned	Fast : 1;	/// Can fast move
@@ -152,7 +155,7 @@ struct _command_ {
 	struct {
 	    unsigned	Ticks;		/// Ticks to complete
 	    unsigned	Count;		/// Units in training queue
-	    // FIXME: cade: later we should train more units or automatic
+	    // FIXME: vladi: later we should train more units or automatic
 #define MAX_UNIT_TRAIN	6
 	    UnitType*	What[MAX_UNIT_TRAIN];	/// Unit trained
 	} Train;			/// train:
@@ -230,7 +233,7 @@ struct _unit_ {
     UnitType*	Type;			/// pointer to unit type (peon,...)
     Player*     Player;			/// owner of this unit
     UnitStats*	Stats;			/// current unit stats
-    
+ 
 //	DISPLAY:
     char	IX;
     char	IY;			/// image displacement to map position
@@ -252,10 +255,11 @@ struct _unit_ {
     unsigned	HP;			/// hit points
 
     unsigned	Bloodlust;		/// ticks bloodlust
-    unsigned	Haste;			/// ticks haste
-    unsigned	Slow;			/// ticks slow
+    unsigned	Haste;			/// ticks haste (disables slow)
+    unsigned	Slow;			/// ticks slow (disables haste)
     unsigned	Invisible;		/// ticks invisible
-    unsigned	Shield;			/// ticks shield
+    unsigned	FlameShield;		/// ticks flame shield
+    unsigned	UnholyArmor;		/// ticks unholy armor
 
     unsigned	GroupId;		/// unit belongs to this group id
 
@@ -273,6 +277,10 @@ struct _unit_ {
 					** ,used for fancy buildings
 					*/
     unsigned 	Rs : 8;
+    unsigned	Revealer;               // hack -- `revealer' is unit that
+                                        // has to keep FOW revealed for some
+					// time, this unit cannot be used in
+					// usual manner
 
 #define MAX_UNITS_ONBOARD 6		/// max number of units in transporter
     // FIXME: use the new next pointer

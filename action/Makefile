@@ -1,6 +1,6 @@
 ##   ___________		     _________		      _____  __
 ##   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-##    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+##    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\
 ##    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
 ##    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
 ##	  \/		    \/	   \/	     \/		   \/
@@ -27,6 +27,7 @@ OBJS	= command.$(OE) actions.$(OE) action_die.$(OE) action_patrol.$(OE) \
 	action_board.$(OE) action_unload.$(OE) action_repair.$(OE) \
 	action_harvest.$(OE) action_minegold.$(OE) action_hauloil.$(OE) \
 	action_returngoods.$(OE) action_research.$(OE) action_demolish.$(OE) \
-	action_build.$(OE) action_train.$(OE) action_upgradeto.$(OE)  
+	action_build.$(OE) action_train.$(OE) action_upgradeto.$(OE) \
+	action_spellcast.$(OE)
 
 include $(TOPDIR)/Common.mk

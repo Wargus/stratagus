@@ -124,6 +124,7 @@ global CursorType Cursors[CursorMax] = {
 
 global enum CursorState_e CursorState;	/// cursor state
 global int CursorAction;		/// action for selection
+global int CursorValue;			/// value for CursorAction (spell type f.e.)
 global UnitType* CursorBuilding;	/// building cursor
 
 global CursorType* GameCursor;		/// cursor type

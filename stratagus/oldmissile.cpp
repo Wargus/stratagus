@@ -95,6 +95,10 @@
 **	Missile don't move, than checks the source unit for HP.
 */
 #define MissileClassFire			12
+/**
+**	Missile is controlled completely by Controller() function. (custom)
+*/
+#define MissileClassCustom			13
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -135,6 +139,9 @@ local const char* MissileTypeWcNames[] = {
     "missile-cannon-tower-explosion",
     "missile-daemon-fire",
     "missile-green-cross",
+    "missile-blizzard-hit",
+    "missile-death-coil",
+    "missile-custom",
     "missile-none",
 };
 
@@ -178,7 +185,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "fireball.png",
     32,32,
     { "fireball hit" },
-    MissileClassFireball,	
+    MissileClassPointToPoint,	
     1,
     },
 { MissileTypeType,
@@ -194,15 +201,16 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "blizzard.png",
     32,32,
     { NULL },
-    MissileClassBlizzard,	
+    MissileClassBlizzard,
     1,
+    "missile-blizzard-hit", NULL
     },
 { MissileTypeType,
     "missile-death-and-decay",
     "death and decay.png",
     32,32,
     { NULL },
-    MissileClassDeathDecay,	
+    MissileClassStayWithDelay,	
     1,
     },
 { MissileTypeType,
@@ -227,7 +235,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "heal effect.png",
     48,48,
     { NULL },
-    MissileClassPointToPoint,	
+    MissileClassStayWithDelay,	
     1,
     },
 { MissileTypeType,
@@ -244,7 +252,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     16,16,
     { NULL },
     MissileClassStayWithDelay,	
-    1,
+    5,
     },
 { MissileTypeType,
     "missile-whirlwind",
@@ -320,7 +328,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     48,48,
     { NULL },
     MissileClassFire,	
-    8,
+    8, 
     },
 { MissileTypeType,
     "missile-impact",
@@ -395,6 +403,38 @@ global MissileType MissileTypes[MissileTypeMax] = {
     MissileClassNone,		
     1,
     },
+{ MissileTypeType,
+    "missile-blizzard-hit",
+    "blizzard.png",
+    32,32,
+    { NULL },
+    MissileClassStayWithDelay,
+    1,
+    },
+{ MissileTypeType,
+    "missile-death-coil",
+    "touch of death.png",
+    32,32,
+    { NULL },
+    MissileClassPointToPoint,
+    1,
+    },
+{ MissileTypeType,
+    "missile-custom",
+    NULL,
+    32,32,
+    { NULL },
+    MissileClassCustom,		
+    1,
+    },
+{ MissileTypeType,
+    "missile-none",
+    NULL,
+    32,32,
+    { NULL },
+    MissileClassNone,		
+    1,
+    },
 };
 
 /*
@@ -409,7 +449,7 @@ local int NumMissiles;			/// currently used missiles
 local Missile Missiles[MAX_MISSILES];	/// all missiles on map
 
     /// lookup table for missile names
-local hashtable(MissileType*,61) MissileHash;
+local hashtable(MissileType*,65) MissileHash;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -530,6 +570,11 @@ found:
     missile->SourceType=NULL;
     missile->SourceStats=NULL;
     missile->SourcePlayer=NULL;
+
+    missile->Damage = 0;
+    missile->TargetUnit = NULL;
+    missile->TTL = -1;
+    missile->Controller = NULL;
 
     return missile;
 }
@@ -762,6 +807,9 @@ global void DrawMissiles(void)
 	if( missile->Type==MissileFree ) {
 	    continue;
 	}
+	if( missile->Type->Class == MissileClassCustom ) {
+	    continue; // custom missiles are handled by Controller() only
+	}
 	// Draw only visibile missiles
 	if (MissileVisible(missile)) {
 	    x=missile->X-MapX*TileSizeX+TheUI.MapX;
@@ -830,7 +878,15 @@ local int PointToPointMissile(Missile* missile)
 	}
 
 	// FIXME: could be better written
-	MissileNewHeadingFromXY(missile,dx*xstep,dy*ystep);
+	if( missile->Type->Class == MissileClassWhirlwind )
+	  {
+	  // must not call MissileNewHeading nor frame change
+	  }
+	else
+	if( missile->Type->Class == MissileClassBlizzard )
+	  missile->Frame = 0;
+	else
+	  MissileNewHeadingFromXY(missile,dx*xstep,dy*ystep);
 
 	if( dy==0 ) {		// horizontal line
 	    if( dx==0 ) {
@@ -943,7 +999,9 @@ global void MissileHit(const Missile* missile)
     x=missile->X+missile->Type->Width/2;
     y=missile->Y+missile->Type->Height/2;
     if( missile->Type->ImpactMissile ) {
-	MakeMissile(missile->Type->ImpactMissile,x,y,0,0);
+	Missile* mis = MakeMissile(missile->Type->ImpactMissile,x,y,0,0);
+	mis->Damage = missile->Damage; // direct damage, spells mostly
+	mis->SourceUnit = missile->SourceUnit;
     }
     if( !missile->SourceType ) {	// no target
 	return;
@@ -961,19 +1019,27 @@ global void MissileHit(const Missile* missile)
 	    DebugLevel3Fn("Missile on wall?\n");
 	    // FIXME: don't use UnitTypeByIdent here, this is slow!
 	    if( HumanWallOnMap(x,y) ) {
-		HitWall(x,y,CalculateDamageStats(missile->SourceStats,
-			UnitTypeByIdent("unit-human-wall")->Stats));
+                if ( missile->Damage )
+		  HitWall(x,y,missile->Damage); // direct damage, spells mostly
+		else
+		  HitWall(x,y,CalculateDamageStats(missile->SourceStats,
+			  UnitTypeByIdent("unit-human-wall")->Stats));
 	    } else {
-		HitWall(x,y,CalculateDamageStats(missile->SourceStats,
-			UnitTypeByIdent("unit-orc-wall")->Stats));
+                if ( missile->Damage )
+		  HitWall(x,y,missile->Damage); // direct damage, spells mostly
+		else
+		  HitWall(x,y,CalculateDamageStats(missile->SourceStats,
+			  UnitTypeByIdent("unit-orc-wall")->Stats));
 	    }
 	    return;
 	}
 	DebugLevel3Fn("Oops nothing to hit (%d,%d)?\n",x,y);
 	return;
     }
-
-    HitUnit(goal,CalculateDamage(missile->SourceStats,goal));
+    if ( missile->Damage )
+      HitUnit(goal,missile->Damage); // direct damage, spells mostly
+    else
+      HitUnit(goal,CalculateDamage(missile->SourceStats,goal));
 }
 
 /**
@@ -992,6 +1058,25 @@ global void MissileActions(void)
 	if( missile->Wait-- ) {
 	    continue;
 	}
+	
+	if ( missile->TTL != -1 ) {
+	  missile->TTL--; // overall time to live if specified
+	}
+	
+	if ( missile->Controller ) {
+	  missile->Controller( missile );
+	}
+
+	if ( missile->TTL == 0 ) {
+	  missile->Type=MissileFree;
+	  continue;
+	}
+
+	if ( missile->Type->Class == MissileClassCustom ) {
+	  missile->Wait=missile->Type->Speed;
+	  continue; // custom missiles are handled by Controller() only
+	}
+	
 	if (MissileVisible(missile)) {
 	    // check before movement
 	    MustRedraw|=RedrawMap;
@@ -1088,6 +1173,31 @@ global void MissileActions(void)
 		}
 		break;
 
+	    case MissileClassBlizzard:
+		missile->Wait=missile->Type->Speed;
+		if( PointToPointMissile(missile) ) {
+		    //
+		    //	Animate hit
+		    //
+		    missile->Frame+=4;	// FIXME: frames pro row
+		    if( (missile->Frame&127)
+			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
+			MissileHit(missile);
+			missile->Type=MissileFree;
+		    }
+		}
+		break;
+	    case MissileClassWhirlwind:
+		missile->Wait=missile->Type->Speed;
+		missile->Frame++;
+		if ( missile->Frame > 3 )
+		  missile->Frame = 0;
+	        //NOTE: vladi: whirlwind moves slowly, i.e. it stays
+	        //      5 ticks at the same pixels...
+	        if ( missile->TTL < 1 || missile->TTL % 10 == 0 )
+		  PointToPointMissile(missile);
+		break;
+		
 	    case MissileClassStayWithDelay:
 		missile->Wait=missile->Type->Speed;
 		if( ++missile->Frame
