@@ -517,13 +517,14 @@ global int VideoTextLength(unsigned font, const unsigned char* text)
 	isformat = 0;
 	for (width = 0, s = text; *s; ++s) {
 		if (*s == '~') {
-#if 0
-			isformat = !isformat;
-#endif
 			if (!*++s) {				// bad formated string
 				break;
 			}
+			if (*s == '<' || *s == '>' || *s == '!') {
+				continue;
+			}
 			if (*s != '~') {				// ~~ -> ~
+				isformat = !isformat;
 				continue;
 			}
 		}
