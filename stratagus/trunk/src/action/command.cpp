@@ -424,16 +424,23 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 	//	Should be handled in action, but is not possible!
 	//		Unit::Refs is used as timeout counter.
 	//
-	if( dest->Destroyed ) {
-	    order->X=dest->X+dest->Type->TileWidth/2;
-	    order->Y=dest->Y+dest->Type->TileHeight/2;
-	    order->Goal=NoUnitP;
-	    order->RangeX=order->RangeY=0;
+	if( dest ) {
+	    if( dest->Destroyed ) {
+		order->X=dest->X+dest->Type->TileWidth/2;
+		order->Y=dest->Y+dest->Type->TileHeight/2;
+		order->Goal=NoUnitP;
+		order->RangeX=order->RangeY=0;
+	    } else {
+		order->X=order->Y=-1;
+		order->Goal=dest;
+		RefsDebugCheck( !dest->Refs );
+		dest->Refs++;
+		order->RangeX=order->RangeY=REPAIR_RANGE;
+	    }
 	} else {
-	    order->X=order->Y=-1;
-	    order->Goal=dest;
-	    RefsDebugCheck( !dest->Refs );
-	    dest->Refs++;
+	    order->X=x;
+	    order->Y=y;
+	    order->Goal=NoUnitP;
 	    order->RangeX=order->RangeY=REPAIR_RANGE;
 	}
 	order->Type=NULL;
