@@ -505,9 +505,9 @@ global int CastBlizzard(Unit* caster, const SpellType* spell,
     int dy;
     int i;
 
-    fields = spell->SpellAction->blizzard.fields;
-    shards = spell->SpellAction->blizzard.shards;
-	damage = spell->SpellAction->blizzard.damage;
+    fields = spell->SpellAction->Blizzard.Fields;
+    shards = spell->SpellAction->Blizzard.Shards;
+    damage = spell->SpellAction->Blizzard.Damage;
     while (fields--)
     {
     	// FIXME : radius configurable...
@@ -543,7 +543,7 @@ global int CastBlizzard(Unit* caster, const SpellType* spell,
 		    caster->Refs++;
 		}
     }
-    PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     caster->Mana -= spell->ManaCost;
 	return caster->Mana > spell->ManaCost;
 }
@@ -562,15 +562,15 @@ global int CastBlizzard(Unit* caster, const SpellType* spell,
 global int CastCircleOfPower(Unit* caster, const SpellType* spell __attribute__((unused)),
     Unit* target __attribute__((unused)), int x, int y)
 {
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-	assert(spell->SpellAction->circleofpower.goal);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    assert(spell->SpellAction->SpawnPortal.PortalType);
 //	assert(x in range, y in range);
 
     // FIXME: vladi: cop should be placed only on explored land
     Unit *cop = NULL;
-	UnitType *ucop = spell->SpellAction->circleofpower.goal;
+    UnitType *ucop = spell->SpellAction->SpawnPortal.PortalType;
 
     cop = caster->Goal;
     if (cop)
@@ -622,9 +622,9 @@ global int CastDeathAndDecay(Unit* caster, const SpellType* spell,
     int dy;
     int i;
 
-    fields = spell->SpellAction->deathanddecay.fields;
-    shards = spell->SpellAction->deathanddecay.shards;
-	damage = spell->SpellAction->deathanddecay.damage;
+    fields = spell->SpellAction->DeathAndDecay.Fields;
+    shards = spell->SpellAction->DeathAndDecay.Shards;
+    damage = spell->SpellAction->DeathAndDecay.Damage;
     while (fields--)
     {
 		do {
@@ -648,7 +648,7 @@ global int CastDeathAndDecay(Unit* caster, const SpellType* spell,
 		    caster->Refs++;
 		}
 	}
-    PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     caster->Mana -= spell->ManaCost;
     return (caster->Mana > spell->ManaCost);
 }
@@ -679,7 +679,7 @@ global int CastDeathCoil(Unit* caster, const SpellType* spell, Unit* target,
 
     caster->Mana -= spell->ManaCost;
 
-    PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     mis = MakeMissile(spell->Missile,
 	sx * TileSizeX + TileSizeX / 2, sy * TileSizeY + TileSizeY / 2,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
@@ -734,10 +734,10 @@ global int CastFireball(Unit* caster, const SpellType* spell,
     x = x * TileSizeX + TileSizeX / 2;
     y = y * TileSizeY + TileSizeY / 2;
     caster->Mana -= spell->ManaCost;
-    PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     missile = MakeMissile(spell->Missile, sx, sy, x, y);
-    missile->State = spell->SpellAction->fireball.TTL - (dist - 1) * 2;
-    missile->TTL = spell->SpellAction->fireball.TTL;
+    missile->State = spell->SpellAction->Fireball.TTL - (dist - 1) * 2;
+    missile->TTL = spell->SpellAction->Fireball.TTL;
     missile->Controller = SpellFireballController;
     missile->SourceUnit = caster;
     RefsDebugCheck(!caster->Refs || caster->Destroyed);
@@ -771,12 +771,12 @@ global int CastFlameShield(Unit* caster, const SpellType* spell, Unit* target,
 
 	// get mana cost
 	caster->Mana -= spell->ManaCost;
-	target->FlameShield = spell->SpellAction->flameshield.TTL;
-	PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+	target->FlameShield = spell->SpellAction->FlameShield.TTL;
+	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 	for (i = 0; i < 5; i++)
 	{
 		mis = MakeMissile(spell->Missile, 0, 0, 0, 0);
-		mis->TTL = spell->SpellAction->flameshield.TTL + i * 7;
+		mis->TTL = spell->SpellAction->FlameShield.TTL + i * 7;
 		mis->TargetUnit = target;
 		mis->Controller = SpellFlameShieldController;
 		RefsDebugCheck(!target->Refs || target->Destroyed);
@@ -880,7 +880,7 @@ global int CastHaste(Unit* caster, const SpellType* spell, Unit* target,
 		}
 	}
 	CheckUnitToBeDrawn(target);
-	PlayGameSound(spell->SoundWhenCasted.Sound,MaxSampleVolume);
+	PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
 	MakeMissile(spell->Missile,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -942,7 +942,7 @@ global int CastHealing(Unit* caster, const SpellType* spell, Unit* target,
 		    LetUnitDie(target);
 		}
 	}
-	PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 	MakeMissile(spell->Missile,
 			    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 			    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
@@ -981,7 +981,7 @@ global int CastHolyVision(Unit* caster, const SpellType* spell, Unit* target,
     MapMarkUnitSight(target);
     target->TTL = GameCycle + target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
     CheckUnitToBeDrawn(target);
-    PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     return 0;
 }
 
@@ -1039,7 +1039,7 @@ global int CastInvisibility(Unit* caster, const SpellType* spell, Unit* target,
 		}
 		CheckUnitToBeDrawn(target);
 	}
-	PlayGameSound(spell->SoundWhenCasted.Sound,MaxSampleVolume);
+	PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
 	MakeMissile(spell->Missile,
 				x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 				x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2 );
@@ -1093,7 +1093,7 @@ global int CastPolymorph(Unit* caster, const SpellType* spell, Unit* target,
 	    MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
 	}
 	caster->Mana -= spell->ManaCost;
-	PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 	MakeMissile(spell->Missile,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -1151,7 +1151,7 @@ global int CastRaiseDead(Unit* caster, const SpellType* spell, Unit* target,
 		    corpses = &(*corpses)->Next;
 	    }
 	}
-    PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     MakeMissile(spell->Missile,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -1185,7 +1185,7 @@ global int CastRunes(Unit* caster, const SpellType* spell,
 	int	oldy = y;
 	int	i;
 
-    PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 	for (i = 0; i < 5; i++)
 	{
 		x = oldx + xx[i];
@@ -1237,7 +1237,7 @@ global int CastSummon(Unit* caster, const SpellType* spell, Unit* target,
     target->TTL = GameCycle + target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
     CheckUnitToBeDrawn(target);
 
-    PlayGameSound(spell->SoundWhenCasted.Sound,MaxSampleVolume);
+    PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
     MakeMissile(spell->Missile,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -1266,7 +1266,7 @@ global int CastWhirlwind(Unit* caster, const SpellType* spell,
     Missile *mis = NULL;
 
     caster->Mana -= spell->ManaCost;
-    PlayGameSound(spell->SoundWhenCasted.Sound, MaxSampleVolume);
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     mis = MakeMissile(spell->Missile,
 		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
@@ -1567,7 +1567,7 @@ local Target 	*SelectTargetUnitsOfAutoCast(const Unit *caster,
 	assert(spell->AutoCast != NULL);
 	assert(caster != NULL);
 
-	switch (spell->which_sort_of_target)
+	switch (spell->Target)
 	{
 		case 	TargetSelf :
 		{
@@ -1777,7 +1777,7 @@ global int CanCastSpell(const Unit* caster,const SpellType* spell,
 
     if (!caster->Type->CanCastSpell
 	    || !caster->Type->CanCastSpell[spell->Ident]
-	    || (spell->which_sort_of_target == TargetUnit && target == NULL)) {
+	    || (spell->Target == TargetUnit && target == NULL)) {
 	return 0;
     }
 
