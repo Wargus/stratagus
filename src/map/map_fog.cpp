@@ -236,41 +236,6 @@ global int IsTileVisible(const Player* player, int x, int y)
 }
 
 /**
-**	Find out if units on a field are uncloaked (By player or shared vision.)
-**
-**	@param player	Player to check for.
-**	@param x	X tile to check.
-**	@param y	Y tile to check.
-**
-**	@return		0 not detect, 1 detect
-*/
-global int TileDetectCloak(const Player* player, int x, int y)
-{
-    int i;
-    unsigned char visiontype;
-    unsigned char* visible;
-
-    visible = TheMap.Fields[y * TheMap.Width + x].VisCloak;
-    visiontype = visible[player->Player];
-
-    if (visiontype > 0) {
-	return 1;
-    }
-    if (!player->SharedVision) {
-	return visiontype > 0;
-    }
-    for (i = 0; i < PlayerMax ; ++i) {
-	if (player->SharedVision & (1 << i) &&
-		(Players[i].SharedVision & (1 << player->Player))) {
-	    if (visible[i]) {
-		return 1;
-	    }
-	}
-    }
-    return 0;
-}
-
-/**
 **	Mark a tile's sight. (Explore and make visible.)
 **
 **	@param player	Player to mark sight.
@@ -280,21 +245,51 @@ global int TileDetectCloak(const Player* player, int x, int y)
 global void MapMarkTileSight(const Player* player, int x, int y)
 {
     unsigned char v;
+    Unit* unit;
+    Unit* remove;
+    Unit** corpses;
+    int w;
+    int h;
+ 
     v = TheMap.Fields[x + y * TheMap.Width].Visible[player->Player];
+
     switch (v) {
 	case 0:		// Unexplored
 	case 1:		// Unseen
-	    //  When there is NoFogOfWar only unexplored tiles are marked.
-	    if ((!TheMap.NoFogOfWar) || (v == 0)) {
-		UnitsMarkSeen(player, x, y, 0);
-	    }
+	// FIXME: mark for screen update
 	    v = 2;
+	    if (player->Type == PlayerPerson) {
+		corpses = &DestroyedBuildings;
+		while (*corpses) {
+		    unit = *corpses;
+		    if ((unit->Visible & 1 << player->Player)) {
+			w = unit->Type->TileWidth;
+			h = unit->Type->TileHeight;
+			if (x >= unit->X && y >= unit->Y &&
+				x < unit->X+w && y < unit->Y+h) {
+			    unit->Visible &= ~(1 << player->Player);
+			    UnitMarkSeen(unit);
+			}
+		    }
+		    remove = unit;
+		    unit = unit->Next;
+		    corpses = &unit;
+		    if (remove->Visible == 0x0000 && !remove->Refs) {
+			ReleaseUnit(remove);
+		    }
+		}
+	    }
 	    TheMap.Fields[x + y * TheMap.Width].Visible[player->Player] = v;
-	    MapMarkSeenTile(x, y);
+	    if (IsTileVisible(ThisPlayer, x, y) > 1) {
+		MapMarkSeenTile(x, y);
+		UnitsMarkSeen(x, y);
+	    }
+
 	    return;
 	case 255:		// Overflow
 	    DebugLevel0Fn("Visible overflow (Player): %d\n" _C_ player->Player);
 	    break;
+
 	default:		// seen -> seen
 	    ++v;
 	    break;
@@ -327,13 +322,10 @@ global void MapUnmarkTileSight(const Player* player, int x, int y)
 	    DebugCheck(1);
 	    break;
 	case 2:
-	    //  When there is NoFogOfWar units never get unmarked.
-	    if (!TheMap.NoFogOfWar) {
-		UnitsUnmarkSeen(player, x, y, 0);
-	    }
 	    // Check visible Tile, then deduct...
 	    if (IsTileVisible(ThisPlayer, x, y) > 1) {
 		MapMarkSeenTile(x, y);
+		UnitsMarkSeen(x, y);
 	    }
 	default:		// seen -> seen
 	    v--;
@@ -343,43 +335,25 @@ global void MapUnmarkTileSight(const Player* player, int x, int y)
 }
 
 /**
-**	Mark a tile for cloak detection.
+**	Mark cloacked units on a tile as detected.
 **
 **	@param player	Player to mark sight.
 **	@param x	X tile to mark.
 **	@param y	Y tile to mark.
 */
-global void MapMarkTileDetectCloak(const Player* player, int x, int y)
+global void MapDetectUnitsOnTile(const Player* player, int x, int y)
 {
-    unsigned char v;
-    v = TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player];
-    if (v == 0) {
-	UnitsMarkSeen(player, x, y, 1);
-    }
-    DebugCheck(v == 255);
-    ++v;
-    TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player] = v;
-}
+    Unit* table[UnitMax];
+    int n;
+    int i;
+    int pm;
 
-/**
-**	Unmark a tile for cloak detection.
-**
-**	@param player	Player to mark sight.
-**	@param x	X tile to mark.
-**	@param y	Y tile to mark.
-*/
-global void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
-{
-    unsigned char v;
-    v = TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player];
-    DebugCheck(v == 0);
-    if (v == 1) {
-	UnitsUnmarkSeen(player, x, y, 1);
+    n = SelectUnitsOnTile(x, y, table);
+    pm = ((1 << player->Player) | player->SharedVision);
+    for (i = 0; i < n; ++i) {
+	table[i]->Visible |= pm;
     }
-    --v;
-    TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player] = v;
 }
-
 
 /**
 **	Mark the sight of unit. (Explore and make visible.)
@@ -494,7 +468,6 @@ global void UpdateFogOfWarChange(void)
     int y;
     int w;
 
-    DebugLevel1Fn("\n");
     //
     //	Mark all explored fields as visible.
     //
@@ -504,15 +477,10 @@ global void UpdateFogOfWarChange(void)
 	    for (x = 0; x < TheMap.Width; ++x) {
 		if (IsMapFieldExplored(ThisPlayer, x, y)) {
 		    MapMarkSeenTile(x, y);
+		    UnitsMarkSeen(x, y);
 		}
 	    }
 	}
-    }
-    //
-    //	Start a global unit seen recount. It's the best way.
-    //
-    for (x = 0; x < NumUnits; ++x) {
-	UnitCountSeen(Units[x]);
     }
     MarkDrawEntireMap();
 }

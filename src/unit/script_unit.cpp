@@ -583,6 +583,7 @@ local SCM CclUnit(SCM list)
     int i;
     int insidecount;
     char* str;
+    char* s;
 
     insidecount = -1;
     slot = gh_scm2int(gh_car(list));
@@ -607,6 +608,10 @@ local SCM CclUnit(SCM list)
 	    type=UnitTypeByIdent(str = gh_scm2newstr(gh_car(list),NULL));
 	    free(str);
 	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("seen-type"))) {
+	    seentype = UnitTypeByIdent(str = gh_scm2newstr(gh_car(list), NULL));
+	    free(str);
+	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("name"))) {
 	    unit->Name = gh_scm2newstr(gh_car(list),NULL);
 	    list = gh_cdr(list);
@@ -627,7 +632,7 @@ local SCM CclUnit(SCM list)
 	    DebugCheck(!type);
 	    unit = UnitSlots[slot];
 	    InitUnit(unit, type);
-	    unit->Seen.Type = seentype;
+	    unit->SeenType = seentype;
 	    unit->Active = 0;
 	    unit->Removed = 0;
 	    unit->Reset = 0;		// JOHNS ????
@@ -658,56 +663,25 @@ local SCM CclUnit(SCM list)
 	    list = gh_cdr(list);
 	    unit->IX = gh_scm2int(gh_car(value));
 	    unit->IY = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(value, gh_symbol2scm("seen-pixel"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    unit->SeenIX = gh_scm2int(gh_car(value));
+	    unit->SeenIY = gh_scm2int(gh_cadr(value));
 	} else if (gh_eq_p(value, gh_symbol2scm("frame"))) {
 	    unit->Frame = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("flipped-frame"))) {
 	    unit->Frame = -gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
-	//
-	//	Here is the seen stuff.
-	//
 	} else if (gh_eq_p(value, gh_symbol2scm("seen"))) {
-	    unit->Seen.Frame = gh_scm2int(gh_car(list));
+	    unit->SeenFrame = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("flipped-seen"))) {
-	    unit->Seen.Frame = -gh_scm2int(gh_car(list));
+	    unit->SeenFrame = -gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("not-seen"))) {
-	    unit->Seen.Frame = UnitNotSeen;
-	} else if (gh_eq_p(value, gh_symbol2scm("seen-type"))) {
-	    unit->Seen.Type = seentype = UnitTypeByIdent(str = gh_scm2newstr(gh_car(list),NULL));
-	    free(str);
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("seen-pixel"))) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    unit->Seen.IX = gh_scm2int(gh_car(value));
-	    unit->Seen.IY = gh_scm2int(gh_cadr(value));
-	} else if (gh_eq_p(value, gh_symbol2scm("seen-destroyed"))) {
-	    unit->Seen.Destroyed = 1;
-	} else if (gh_eq_p(value, gh_symbol2scm("seen-constructed"))) {
-	    unit->Seen.Constructed = 1;
-	} else if (gh_eq_p(value, gh_symbol2scm("seen-state"))) {
-	    unit->Seen.State = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("seen-construction-frame"))) {
-	    int frame;
-	    frame = gh_scm2int(gh_car(list));
-	    unit->Seen.CFrame = unit->Type->Construction->Frames;
-	    while (frame--) {
-		unit->Seen.CFrame = unit->Seen.CFrame->Next;
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("vis-count"))) {
-	    sublist = gh_car(list);
-	    for (i = 0; i < PlayerMax; ++i) {
-	    	value = gh_vector_ref(sublist, gh_int2scm(i));
-		if (!gh_null_p(value)) {
-		    unit->VisCount[i] = gh_scm2int(value);
-		}
-	    }
-	    list = gh_cdr(list);
+	    unit->SeenFrame = UnitNotSeen;
 	} else if (gh_eq_p(value, gh_symbol2scm("direction"))) {
 	    unit->Direction = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
@@ -719,6 +693,8 @@ local SCM CclUnit(SCM list)
 	    unit->Burning = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("destroyed"))) {
 	    unit->Destroyed = 1;
+	} else if (gh_eq_p(value, gh_symbol2scm("seen-destroyed"))) {
+	    unit->SeenDestroyed = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("removed"))) {
 	    unit->Removed = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("selected"))) {
@@ -726,8 +702,24 @@ local SCM CclUnit(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("rescued-from"))) {
 	    unit->RescuedFrom = &Players[gh_scm2int(gh_car(list))];
 	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("visible"))) {
+	    str = s = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
+	    for (i = 0; i < PlayerMax && *s; ++i, ++s) {
+		if (*s == '-' || *s == '_' || *s == ' ') {
+		    unit->Visible &= ~(1 << i);
+		} else {
+		    unit->Visible |= (1 << i);
+		}
+	    }
+	    free(str);
 	} else if (gh_eq_p(value, gh_symbol2scm("constructed"))) {
 	    unit->Constructed = 1;
+	} else if (gh_eq_p(value, gh_symbol2scm("seen-constructed"))) {
+	    unit->SeenConstructed = 1;
+	} else if (gh_eq_p(value, gh_symbol2scm("seen-state"))) {
+	    unit->SeenState = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("active"))) {
 	    unit->Active = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("resource-active"))) {
@@ -835,7 +827,10 @@ local SCM CclUnit(SCM list)
 		unit->Player->UnitTypesCount[type->Type]--;
 	    }
 	    // FIXME: (mr-russ) Does not load CorpseList Properly
-	    if (unit->Orders[0].Action == UnitActionDie) {
+	    if (unit->Type->Building &&
+		    (unit->Orders[0].Action == UnitActionDie || unit->Destroyed)) {
+		DeadBuildingCacheInsert(unit);
+	    } else if (unit->Orders[0].Action == UnitActionDie) {
 		CorpseCacheInsert(unit);
 	    }
 #if 0

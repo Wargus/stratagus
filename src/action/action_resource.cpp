@@ -223,6 +223,7 @@ local int StartGathering(Unit* unit)
     //	Activate the resource
     goal->Data.Resource.Active++;
 
+    UnitMarkSeen(goal);
     //
     //	Place unit inside the resource
     //
@@ -254,7 +255,7 @@ local void AnimateActionHarvest(Unit* unit)
 	DebugCheck(!unit->Type->Animations->Harvest[unit->CurrentResource]);
 	flags = UnitShowAnimation(unit,
 	    unit->Type->Animations->Harvest[unit->CurrentResource]);
-	if (flags & AnimationSound) {
+	if ((flags & AnimationSound) && (UnitVisibleOnMap(unit) || ReplayRevealMap)) {
 	    PlayUnitSound(unit, VoiceHarvesting);
 	}
     }
@@ -419,6 +420,7 @@ local int GatherResource(Unit* unit)
 		unit->Value += addload;
 		source->Value -= addload;
 
+		UnitMarkSeen(source);
 		if (IsOnlySelected(source)) {
 		    MustRedraw |= RedrawInfoPanel;
 		}

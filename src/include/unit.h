@@ -133,11 +133,9 @@
 **		all informations that all units of the same type shares.
 **		(Animations, Name, Stats, ...)
 **
-**	Unit::Seen
-**
-**		Type
-**		    Pointer to the unit-type that this unit was, when last seen.
-**		    Currently only used by buildings.
+**	Unit::SeenType
+**		Pointer to the unit-type that this unit was, when last seen.
+**		Currently only used by buildings.
 **
 **	Unit::Player
 **
@@ -202,17 +200,11 @@
 **
 **		If Burning is non-zero, the unit is burning.
 **
-**	Unit::VisCount[PlayerMax]
+**	Unit::Visible
 **
-**		Used to keep track of visible units on the map, it counts the
-**		Number of seen tiles for each player. This is only modified
-**		in UnitsMarkSeen and UnitsUnmarkSeen, from fow.
-**
-**	Unit::SeenByPlayer
-**
-**		This is a bitmask of 1 and 0 values. SeenByPlayer & (1<<p) is 0
-**		If p never saw the unit and 1 if it did. This is important for
-**		keeping track of dead units under fog.
+**		Used for submarines. It is a bit field for all players. If
+**		Unit::Visible&(1<<player-nr) is non-zero, the unit could be
+**		seen on the map.
 **
 **	Unit::Destroyed
 **
@@ -236,9 +228,6 @@
 **	Unit::SeenConstructed
 **		Last seen state of construction.  Used to draw correct building
 **		frame. See Unit::Constructed for more information.
-**
-**	Unit::SeenCFrame
-**		Seen construction frame. This gets copied from Data.Builded.Frame
 **
 **	Unit::SeenState
 **		The Seen State of the building.
@@ -518,6 +507,7 @@ struct _unit_ {
     int		Y;			/// Map position Y
 
     UnitType*	Type;			/// Pointer to unit-type (peon,...)
+    UnitType*	SeenType;		/// Pointer to last seen unit-type
     Player*     Player;			/// Owner of this unit
     UnitStats*	Stats;			/// Current unit stats
     int		CurrentSightRange;	/// Unit's Current Sight Range
@@ -527,17 +517,9 @@ struct _unit_ {
     signed char	IX;			/// X image displacement to map position
     signed char	IY;			/// Y image displacement to map position
     int		Frame;			/// Image frame: <0 is mirrored
-   
-    struct _seen_ {
-	int	    Frame;		/// last seen frame/stage of buildings
-	UnitType*   Type;		/// Pointer to last seen unit-type
-	signed char IX;			/// Unit seen X image displacement to map position
-	signed char IY;			/// Unit seen Y image displacement to map position
-	unsigned    Constructed : 1;	/// Unit seen construction
-	unsigned    State : 3;		/// Unit seen build/upgrade state
-	unsigned    Destroyed : 1;	/// Unit seen destroyed or not
-	ConstructionFrame* CFrame;	/// Unit seen construction frame
-    } Seen;
+    int		SeenFrame;		/// last seen frame/stage of buildings
+    signed char	SeenIX;			/// Seen X image displacement to map position
+    signed char	SeenIY;			/// seen Y image displacement to map position
 
     unsigned	Direction : 8;		/// angle (0-255) unit looking
 
@@ -548,9 +530,11 @@ struct _unit_ {
     unsigned	Removed : 1;		/// unit is removed (not on map)
     unsigned	Selected : 1;		/// unit is selected
 
-    unsigned char VisCount[PlayerMax];  /// Unit visibility counts.
-    unsigned 	SeenByPlayer : 16;	/// Unit seen mask. (as in explored.)
+    unsigned	Visible : 16;		/// Unit is visible (submarine)
     unsigned	Constructed : 1;	/// Unit is in construction
+    unsigned	SeenConstructed : 1;	/// Unit seen construction
+    unsigned	SeenState : 3;		/// Unit seen build/upgrade state
+    unsigned	SeenDestroyed : 1;	/// Unit seen destroyed or not
     unsigned	Active : 1;		/// Unit is active for AI
     Player*     RescuedFrom;            /// The original owner of a rescued unit.
     					/// NULL if the unit was not rescued.
@@ -709,6 +693,7 @@ extern Unit** UnitSlotFree;		/// First free unit slot
 
 extern Unit* Units[MAX_UNIT_SLOTS];	/// Units used
 extern int NumUnits;			/// Number of units used
+extern Unit* DestroyedBuildings;	/// List of DestroyedBuildings
 extern Unit* CorpseList;		/// List of Corpses On Map
 
 //	in unit_draw.c (FIXME: could be moved into the user interface?)
@@ -783,17 +768,15 @@ extern void UpdateForNewUnit(const Unit* unit, int upgrade);
 extern void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy);
     /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
-    /// Returns true, if unit is visible for drawing on the map
-extern int UnitDrawableOnMap(const Unit* unit);
+    /// Returns true, if building is known on the map
+extern int BuildingVisibleOnMap(const Unit* unit);
 
-    /// To be called when an unit goes under fog.
-extern void UnitGoesUnderFog(Unit* unit, int p);
-    /// Marks unit seen. (increases visibility count)
-extern void UnitsMarkSeen(const Player* player, int x, int y, int cloak);
-    /// Unmarks unit seen. (decreases visibility count)
-extern void UnitsUnmarkSeen(const Player* player, int x, int y, int cloak);
-    /// Calculated an unit's seen information itself
-extern void UnitCountSeen(Unit* unit);
+    /// Updates seen data
+extern void UnitsMarkSeen(int x, int y);
+    /// Checks and updates if a Unit's seen information
+extern void UnitMarkSeen(Unit* unit);
+    /// Returns true, if unit is known on the map
+extern int UnitKnownOnMap(const Unit* unit);
 
     /// To be called when the look of the unit changes.
 extern int CheckUnitToBeDrawn(Unit* unit);
@@ -913,8 +896,14 @@ extern void DeadCacheRemove(Unit* unit, Unit** List);
 #define CorpseCacheInsert(unit) \
 	(DeadCacheInsert((unit),&CorpseList))
 
+#define DeadBuildingCacheInsert(unit) \
+	(DeadCacheInsert((unit),&DestroyedBuildings))
+
 #define CorpseCacheRemove(unit) \
 	(DeadCacheRemove((unit),&CorpseList))
+
+#define DeadBuildingCacheRemove(unit) \
+	(DeadCacheRemove((unit),&DestroyedBuildings))
 
 //	in unit_draw.c
 //--------------------

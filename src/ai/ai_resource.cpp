@@ -221,7 +221,7 @@ global int EnemyUnitsInDistance(const Unit * unit, unsigned range)
 	//
 	// FIXME: did SelectUnits already filter this.
 	if (dest->Removed || dest->Invisible || !unit->HP
-	    || (!dest->VisCount[1 << player->Player])
+	    || !(dest->Visible & (1 << player->Player))
 	    || dest->Orders[0].Action == UnitActionDie) {
 	    DebugLevel0Fn("NO\n");
 	    continue;
@@ -917,7 +917,7 @@ local void AiCollectResources(void)
 	if (!unit->Type->Harvester) {
 	    continue;
 	}
-	
+
 	c = unit->CurrentResource;
 
 	//

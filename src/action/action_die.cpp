@@ -72,6 +72,7 @@ global void HandleActionDie(Unit* unit)
 	DebugLevel3("Die complete %d\n" _C_ UnitNumber(unit));
 
 	if (!unit->Type->CorpseType) {
+	    UnitMarkSeen(unit);
 	    ReleaseUnit(unit);
 	    return;
 	}
@@ -99,6 +100,7 @@ global void HandleActionDie(Unit* unit)
 	// FIXME: perhaps later or never is better
 	//ChangeUnitOwner(unit, &Players[PlayerNumNeutral]);
     }
+    UnitMarkSeen(unit);
 }
 
 //@}

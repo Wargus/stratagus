@@ -1370,7 +1370,6 @@ local void AiMoveUnitInTheWay(Unit* unit)
 
     movablenb = 0;
 
-    DebugLevel3Fn("AiCanNotMove : %s at %d %d\n" _C_ unittype->Ident _C_ ux0 _C_ uy0);
 
     // Try to make some unit moves around it
     for (i = 0; i < NumUnits; ++i) {

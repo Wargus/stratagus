@@ -406,7 +406,7 @@ global void HandleActionUnload(Unit* unit)
 		unit->Orders[0].X = x;
 		unit->Orders[0].Y = y;
 	    }
-	    
+
 	    NewResetPath(unit);
 	    unit->SubAction = 1;
 	case 1:
