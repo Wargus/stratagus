@@ -134,6 +134,7 @@ global void RevealMap(void)
 {
     int ix;
     int iy;
+    Unit* unit;
 
     for (ix = 0; ix < TheMap.Width; ++ix) {
 	for (iy = 0; iy < TheMap.Height; ++iy) {
@@ -147,29 +148,27 @@ global void RevealMap(void)
 	    UnitsMarkSeen(ix, iy);
 	}
     }
-    // Update Seen Neutral units, when map is shown.
-    for (ix = 0; ix < NumUnits; ++ix) {
-	if (Units[ix]->Player->Player == PlayerNumNeutral) {
-	    Units[ix]->SeenIY = Units[ix]->IY;
-	    Units[ix]->SeenIX = Units[ix]->IX;
-	    if (Units[ix]->SeenFrame == UnitNotSeen) {
-		DebugLevel3Fn("Units[ix] %d at %d,%d first seen at %lu.\n" _C_
-		    Units[ix]->Slot _C_ Units[ix]->X _C_ Units[ix]->Y _C_ GameCycle);
-	    }
-	    Units[ix]->SeenFrame = Units[ix]->Frame;
-	    Units[ix]->SeenState = (Units[ix]->Orders[0].Action == UnitActionBuilded) |
-		((Units[ix]->Orders[0].Action == UnitActionUpgradeTo) << 1);
-	    if (Units[ix]->Orders[0].Action == UnitActionDie) {
-		Units[ix]->SeenState = 3;
-	    }
-	    if (Units[ix]->SeenState == 2) {
-		Units[ix]->SeenType = Units[ix]->Orders[0].Type;
-	    } else {
-		Units[ix]->SeenType = Units[ix]->Type;
-	    }
-	    Units[ix]->SeenConstructed = Units[ix]->Constructed;
-	    Units[ix]->SeenDestroyed = Units[ix]->Destroyed;
+    for (ix = 0; ix < Players[PlayerNumNeutral].TotalNumUnits; ++ix) {
+	unit = Players[PlayerNumNeutral].Units[ix];
+	unit->SeenIY = unit->IY;
+	unit->SeenIX = unit->IX;
+	if (unit->SeenFrame == UnitNotSeen) {
+	    DebugLevel3Fn("unit %d at %d,%d first seen at %lu.\n" _C_
+		unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
 	}
+	unit->SeenFrame = unit->Frame;
+	unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
+	    ((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
+	if (unit->Orders[0].Action == UnitActionDie) {
+	    unit->SeenState = 3;
+	}
+	if (unit->SeenState == 2) {
+	    unit->SeenType = unit->Orders[0].Type;
+	} else {
+	    unit->SeenType = unit->Type;
+	}
+	unit->SeenConstructed = unit->Constructed;
+	unit->SeenDestroyed = unit->Destroyed;
     }
 }
 
