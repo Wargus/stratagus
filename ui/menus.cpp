@@ -112,7 +112,7 @@ static void ScenSelectLBInit(Menuitem* mi);
 static unsigned char *ScenSelectLBRetrieve(Menuitem* mi, int i);
 static void ScenSelectLBAction(Menuitem* mi, int i);
 static void ScenSelectTPMSAction(Menuitem* mi, int i);
-static void ScenSelectVSAction(Menuitem* mi, int i);
+static void ScenSelectVSAction(Menuitem* mi);
 static void ScenSelectFolder(void);
 static void ScenSelectInit(Menuitem* mi);
 static void ScenSelectOk(void);
@@ -254,7 +254,7 @@ static void KeystrokeHelpMenu(void);
 static void TipsMenu(void);
 
 // Keystroke help
-static void KeystrokeHelpVSAction(Menuitem* mi, int i);
+static void KeystrokeHelpVSAction(Menuitem* mi);
 static void KeystrokeHelpDrawFunc(Menuitem* mi);
 
 // Save
@@ -265,7 +265,7 @@ static void SaveGameLBExit(Menuitem *mi);
 static void SaveGameEnterAction(Menuitem *mi, int key);
 static void SaveGameLBAction(Menuitem *mi, int i);
 static unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i);
-static void SaveGameVSAction(Menuitem *mi, int i);
+static void SaveGameVSAction(Menuitem *mi);
 static void SaveGameOk(void);
 static void DeleteConfirmMenu(void);
 static int SaveGameRDFilter(char *pathbuf, FileList *fl);
@@ -278,7 +278,7 @@ static void LoadGameLBInit(Menuitem *mi);
 static void LoadGameLBExit(Menuitem *mi);
 static void LoadGameLBAction(Menuitem *mi, int i);
 static unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i);
-static void LoadGameVSAction(Menuitem *mi, int i);
+static void LoadGameVSAction(Menuitem *mi);
 static void LoadGameOk(void);
 
 // Confirm save
@@ -315,7 +315,7 @@ static void EditorMainLoadLBInit(Menuitem *mi);
 static void EditorMainLoadLBExit(Menuitem *mi);
 static void EditorMainLoadLBAction(Menuitem *mi, int i);
 static unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i);
-static void EditorMainLoadVSAction(Menuitem *mi, int i);
+static void EditorMainLoadVSAction(Menuitem *mi);
 static void EditorMainLoadOk(void);
 static void EditorMainLoadCancel(void);
 static void EditorMainLoadFolder(void);
@@ -354,7 +354,7 @@ static void EditorSaveLBExit(Menuitem *mi);
 static void EditorSaveFolder(void);
 static void EditorSaveLBAction(Menuitem *mi, int i);
 static unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i);
-static void EditorSaveVSAction(Menuitem *mi, int i);
+static void EditorSaveVSAction(Menuitem *mi);
 static void EditorSaveEnterAction(Menuitem *mi, int key);
 static void EditorSaveOk(void);
 static void EditorSaveCancel(void);
@@ -371,7 +371,7 @@ static void ReplayGameLBInit(Menuitem *mi);
 static void ReplayGameLBExit(Menuitem *mi);
 static void ReplayGameLBAction(Menuitem *mi, int i);
 static unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i);
-static void ReplayGameVSAction(Menuitem *mi, int i);
+static void ReplayGameVSAction(Menuitem *mi);
 static void ReplayGameFolder(void);
 static void ReplayGameDisableFog(Menuitem *mi);
 static void ReplayGameOk(void);
@@ -1041,7 +1041,7 @@ static void SaveGameLBAction(Menuitem *mi, int i)
 /**
 **  Save game vertical slider callback
 */
-static void SaveGameVSAction(Menuitem* mi, int i)
+static void SaveGameVSAction(Menuitem* mi)
 {
 }
 
@@ -1192,7 +1192,7 @@ static void LoadGameLBAction(Menuitem *mi, int i)
 /**
 **  Load game vertical slider callback
 */
-static void LoadGameVSAction(Menuitem* mi, int i)
+static void LoadGameVSAction(Menuitem* mi)
 {
 }
 
@@ -3253,32 +3253,43 @@ static void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 /**
 **  Scenario select vertical slider action callback
 */
-static void ScenSelectVSAction(Menuitem* mi, int i)
+static void ScenSelectVSAction(Menuitem* mi)
 {
 }
 
 /**
 **  Keystroke help vertical slider action callback
 */
-static void KeystrokeHelpVSAction(Menuitem *mi, int i)
+static void KeystrokeHelpVSAction(Menuitem* mi)
 {
+	int j;
+
+	if (mi->flags & MenuButtonClicked) {
+		j = ((mi->d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
+		if ((mi->d.vslider.cflags & MI_CFLAGS_DOWN) && j < nKeyStrokeHelps - 11) {
+			++j;
+		} else if ((mi->d.vslider.cflags & MI_CFLAGS_UP) && j > 0) {
+			--j;
+		}
+		mi->d.vslider.percent = j * 100 / (nKeyStrokeHelps - 11);
+	}
 }
 
 /**
-** Draw the Keystroke Help texts
+**  Draw the Keystroke Help texts
 */
-static void KeystrokeHelpDrawFunc(Menuitem *mi)
+static void KeystrokeHelpDrawFunc(Menuitem* mi)
 {
 	int i;
 	int j;
 
 	j = ((mi[-2].d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
-	for (i = 0; i < 11; i++) {
-		VideoDrawText(mi->menu->X+mi->xofs,mi->menu->Y+mi->yofs+(i*20),
-							mi->font,KeyStrokeHelps[j * 2]);
-		VideoDrawText(mi->menu->X + mi->xofs + 80,mi->menu->Y + mi->yofs+(i * 20),
-							mi->font,KeyStrokeHelps[j * 2 + 1]);
-		j++;
+	for (i = 0; i < 11; ++i) {
+		VideoDrawText(mi->menu->X + mi->xofs, mi->menu->Y + mi->yofs + (i * 20),
+			mi->font,KeyStrokeHelps[j * 2]);
+		VideoDrawText(mi->menu->X + mi->xofs + 80, mi->menu->Y + mi->yofs + (i * 20),
+			mi->font,KeyStrokeHelps[j * 2 + 1]);
+		++j;
 	}
 }
 
@@ -4936,7 +4947,7 @@ static void EditorMainLoadLBAction(Menuitem *mi, int i)
 /**
 ** Editor main load vertical slider action callback
 */
-static void EditorMainLoadVSAction(Menuitem *mi, int i)
+static void EditorMainLoadVSAction(Menuitem *mi)
 {
 }
 
@@ -5673,7 +5684,7 @@ static void EditorSaveLBAction(Menuitem* mi, int i)
 /**
 ** Editor save vertical slider action callback
 */
-static void EditorSaveVSAction(Menuitem* mi, int i)
+static void EditorSaveVSAction(Menuitem* mi)
 {
 }
 
@@ -5925,7 +5936,7 @@ static unsigned char* ReplayGameLBRetrieve(Menuitem *mi, int i)
 /**
 **  Replay game vertical slider action
 */
-static void ReplayGameVSAction(Menuitem* mi, int i)
+static void ReplayGameVSAction(Menuitem* mi)
 {
 }
 
