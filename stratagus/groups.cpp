@@ -31,6 +31,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "freecraft.h"
 #include "video.h"
@@ -63,14 +64,51 @@ global UnitGroup Groups[NUM_GROUPS];	/// Number of groups predefined
 ----------------------------------------------------------------------------*/
 
 /**
- **	Initialize group part.
- */
+**	Initialize group part.
+*/
 global void InitGroups(void)
 {
     int i;
 
     for( i=0; i<NUM_GROUPS; i++ ) {
-        Groups[i].NumUnits=0;
+	Groups[i].NumUnits=0;
+    }
+}
+
+/**
+**	Save groups.
+**
+**	@param file	Output file.
+*/
+global void SaveGroups(FILE* file)
+{
+    int i;
+    int g;
+    char* ref;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: groups $Id$\n\n");
+
+    for( g=0; g<NUM_GROUPS; g++ ) {
+	fprintf(file,";;(group %d %d '(",g,Groups[g].NumUnits);
+	for( i=0; i<NumSelected; ++i ) {
+	    ref=UnitReference(Groups[g].Units[i]);
+	    fprintf(file,"%s ",ref);
+	    free(ref);
+	}
+	fprintf(file,"))\n");
+    }
+}
+
+/**
+**	Clean up group part.
+*/
+global void CleanGroups(void)
+{
+    int i;
+
+    for( i=0; i<NUM_GROUPS; i++ ) {
+        memset(&Groups[i],0,sizeof(Groups[i]));
     }
 }
 
