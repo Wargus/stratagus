@@ -37,7 +37,7 @@ CROSSDIR = /usr/local/cross
 
 INCLUDE_DIRS = src/include src/movie/vp31/include etlib
 
-MODULES = src/action src/ai src/beos src/clone src/editor src/stratagus src/game src/libmodplug src/map \
+MODULES = src/action src/ai src/beos src/stratagus src/editor src/stratagus src/game src/libmodplug src/map \
           src/missile src/movie src/movie/vp31 src/network src/pathfinder src/siod src/sound src/ui src/unit \
           src/video etlib
 
@@ -203,10 +203,10 @@ tools/wartool$(EXE): tools/wartool.c
 tools/war1tool$(EXE): tools/war1tool.c
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
-tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
-	if [ ! -d $(TOPDIR)/src/clone/$(OBJDIR) ]; then \
-	mkdir -p $(TOPDIR)/src/clone/$(OBJDIR); fi
-	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS) $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
+tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/stratagus/$(OBJDIR)/mpq.o
+	if [ ! -d $(TOPDIR)/src/stratagus/$(OBJDIR) ]; then \
+	mkdir -p $(TOPDIR)/src/stratagus/$(OBJDIR); fi
+	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS) $(TOPDIR)/src/stratagus/$(OBJDIR)/mpq.o
 
 ##############################################################################
 #	Distributions
