@@ -324,15 +324,17 @@ local SCM CclDefineBurningBuilding(SCM list)
     SCM value;
     SCM sublist;
     BurningBuildingFrame** frame;
+    BurningBuildingFrame* ptr;
     BurningBuildingFrame* next;
     char* str;
 
-    frame = &BurningBuildingFrames;
-    while (*frame) {
-	next = (*frame)->Next;
-	free(*frame);
-	frame = &next;
+    ptr = BurningBuildingFrames;
+    while (ptr) {
+	next = ptr->Next;
+	free(ptr);
+	ptr = next;
     }
+    BurningBuildingFrames = NULL;
 
     frame = &BurningBuildingFrames;
 
