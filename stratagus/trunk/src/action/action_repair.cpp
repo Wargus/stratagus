@@ -129,7 +129,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
     //
     //  Repair the unit
     //
-    if (goal->Type->BuilderOutside) {
+    if (goal->Type->BuilderOutside && (goal->Orders->Action == UnitActionBuilded)) {
 	//  hp is the current damage taken by the unit.
 	hp = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
 	    (goal->Type->Stats->Costs[TimeCost] * 600) - goal->HP;
