@@ -1280,13 +1280,14 @@ global UnitType* NewUnitTypeSlot(char* ident)
 /**
 **		Draw unit-type on map.
 **
-**		@param type		Unit-type pointer.
-**		@param frame		Animation frame of unit-type.
-**		@param x		Screen X pixel postion to draw unit-type.
-**		@param y		Screen Y pixel postion to draw unit-type.
+**  @param type    Unit-type pointer.
+**  @param frame   Animation frame of unit-type.
+**  @param sprite  Sprite to use for drawing
+**  @param x       Screen X pixel postion to draw unit-type.
+**  @param y       Screen Y pixel postion to draw unit-type.
 **
-**		@todo		Do screen position caculation in high level.
-**				Better way to handle in x mirrored sprites.
+**  @todo  Do screen position caculation in high level.
+**         Better way to handle in x mirrored sprites.
 */
 global void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y)
 {

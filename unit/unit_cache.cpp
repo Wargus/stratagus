@@ -88,7 +88,7 @@ global void UnitCacheRemove(Unit* unit)
 			return;
 		}
 	}
-	DebugLevel0Fn("Try to remove unit not in cache.\n");
+	DebugLevel0Fn("Try to remove unit not in cache. (%d)\n" _C_ unit->Slot);
 }
 
 /**
@@ -285,7 +285,7 @@ global void UnitCacheRemove(Unit* unit)
 				listitem->Prev->Next = listitem->Next;
 			} else {
 				if (mf->UnitCache != listitem) {
-					DebugLevel0Fn("Try to remove unit not in cache. It's ok, mostly.\n");
+					DebugLevel0Fn("Try to remove unit not in cache. (%d)\n" _C_ unit->Slot);
 				}
 				// item is head of the list.
 				mf->UnitCache = listitem->Next;
