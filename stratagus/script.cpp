@@ -585,6 +585,26 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 }
 
 /**
+**  Convert the string in the gameinfo enum number.
+**
+**  @param s    string to convert to enum number.
+**
+**  @return the enum number.
+*/
+static ES_GameInfo StringToGameInfo(const char* s)
+{
+	int i;
+	const char* sgameinfo[] = {"Tips", "Objectives", NULL};
+
+	for (i = 0; sgameinfo[i]; ++i) {
+		if (!strcmp(s, sgameinfo[i])) {
+			return i;
+		}
+	}
+	return -1; // Error.
+}
+
+/**
 **  Return String description.
 **
 **  @param l    lua state.
@@ -682,6 +702,16 @@ StringDesc* CclParseStringDesc(lua_State* l)
 					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
 				}
 				lua_pop(l, 1); // font name.
+			}
+			lua_pop(l, 1); // table.
+		} else if (!strcmp(key, "GameInfo")) {
+			res->e = EString_GameInfo;
+			if (!lua_isstring(l, -1)) {
+				LuaError(l, "Bad type of arg in GameInfo\n");
+			}
+			res->D.GameInfoType = StringToGameInfo(LuaToString(l, -1));
+			if ((int) res->D.GameInfoType == -1) {
+				LuaError(l, "argument '%s' in GameInfo is not valid.\n" _C_ LuaToString(l, -1));
 			}
 			lua_pop(l, 1); // table.
 		} else {
@@ -936,6 +966,24 @@ char* EvalString(const StringDesc* s)
 				}
 				return res;
 			}
+		case EString_GameInfo : // Some info of the game (tips, objectives, ...).
+			switch (s->D.GameInfoType) {
+				case ES_GameInfo_Tips :
+					return strdup(Tips[CurrentTip]);
+				case ES_GameInfo_Objectives :
+					res = GameIntro.Objectives[0];
+					if (!res) {
+						return strdup("");
+					}
+					res = strdup(res);
+					for (i = 1; GameIntro.Objectives[i]; ++i) {
+						tmp1 = strdcat(res, "\n");
+						free(res);
+						res = strdcat(tmp1, GameIntro.Objectives[i]);
+						free(tmp1);
+					}
+					return res;
+			}
 	}
 	return NULL;
 }
@@ -1066,6 +1114,8 @@ void FreeStringDesc(StringDesc* s)
 			free(s->D.Line.Line);
 			FreeNumberDesc(s->D.Line.MaxLen);
 			free(s->D.Line.MaxLen);
+			break;
+		case EString_GameInfo : // Some info of the game (tips, objectives, ...).
 			break;
 	}
 }
@@ -1528,6 +1578,22 @@ static int CclLine(lua_State* l)
 }
 
 /**
+**  Return equivalent lua table for Line.
+**  {"Line", "arg1"}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclGameInfo(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "Bad number of arg for GameInfo()\n");
+	}
+	return Alias(l, "GameInfo");
+}
+
+/**
 **  Return equivalent lua table for VideoTextLength.
 **  {"VideoTextLength", {Text = arg1, Font = arg2}}
 **
@@ -1609,6 +1675,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitName", CclUnitName);
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);
+	lua_register(Lua, "GameInfo", CclGameInfo);
 
 	lua_register(Lua, "If", CclIf);
 }
