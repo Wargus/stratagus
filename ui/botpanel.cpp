@@ -251,6 +251,24 @@ global void SaveButtons(CLFile* file)
 	}
 	CLprintf(file,"))\n\n");
     }
+#else
+
+    CLprintf(file,"(set-selection-changed-hook '");
+    lprin1CL(SelectionChangedHook,file);
+    CLprintf(file,")\n");
+
+    CLprintf(file,"(set-selected-unit-changed-hook '");
+    lprin1CL(SelectedUnitChangedHook,file);
+    CLprintf(file,")\n");
+
+    CLprintf(file,"(set-choose-target-begin-hook '");
+    lprin1CL(ChooseTargetBeginHook,file);
+    CLprintf(file,")\n");
+
+    CLprintf(file,"(set-choose-target-finish-hook '");
+    lprin1CL(ChooseTargetFinishHook,file);
+    CLprintf(file,")\n");
+
 #endif
 
     CLprintf(file,"(set-show-command-key! %s)\n\n",

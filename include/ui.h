@@ -329,6 +329,14 @@ extern char FancyBuildings;		/// Mirror buildings 1 yes, 0 now.
 extern int SpeedKeyScroll;		/// Keyboard Scrolling Speed, in Frames
 extern int SpeedMouseScroll;		/// Mouse Scrolling Speed, in Frames
 
+// only exported to save them
+#ifdef NEW_UI
+extern SCM SelectionChangedHook;    /// Script to add/remove buttons
+extern SCM SelectedUnitChangedHook; /// Script to refresh buttons
+extern SCM ChooseTargetBeginHook;   /// Script to draw target selection buttons
+extern SCM ChooseTargetFinishHook;  /// Script to draw target selection buttons
+#endif
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/

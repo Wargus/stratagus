@@ -984,6 +984,12 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 	CLprintf(file,"  'teleporter\n");
     }
 
+#ifdef NEW_UI
+    CLprintf(file,"  'add-buttons '");
+    lprin1CL(type->AddButtonsHook,file);
+    CLprintf(file,"\n");
+#endif
+
     CLprintf(file,"  'sounds '(");
     if( type->Sound.Selected.Name ) {
 	CLprintf(file,"\n    selected \"%s\"",type->Sound.Selected.Name);
@@ -1001,6 +1007,7 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( type->Sound.Dead.Name ) {
 	CLprintf(file,"\n    dead \"%s\"",type->Sound.Dead.Name);
     }
+
     // FIXME: Attack should be removed!
     if( type->Weapon.Attack.Name ) {
 	CLprintf(file,"\n    attack \"%s\"",type->Weapon.Attack.Name);
