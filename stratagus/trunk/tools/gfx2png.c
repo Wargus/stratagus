@@ -28,10 +28,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
+#ifndef _MSC_VER
 #include <sys/stat.h>
-#ifndef __MSC__
 #include <unistd.h>
+#include <fcntl.h>
 #endif
 
 #include <png.h>
@@ -46,16 +46,15 @@ extern int SavePNG(const char* name,unsigned char* image,int w,int h);
 //
 //	Print debug information of level 0.
 //
-#define DebugLevel0(fmt...)	printf(fmt##)
+#define DebugLevel0(fmt,args...)	printf(fmt,##args)
 //
 //	Print debug information of level 1.
 //
-#define DebugLevel1(fmt...)	/*printf(fmt##)*/
+#define DebugLevel1(fmt,args...)	/*printf(fmt,##args)*/
 //
 //	Print debug information of level 2.
 //
-#define DebugLevel2(fmt...)	/*printf(fmt##)*/
-
+#define DebugLevel2(fmt,args...)	/*printf(fmt,##args)*/
 
 #define GetByte(p)	(*((unsigned char*)(p)))
 #define GetWord(p)	(*((unsigned short*)(p)))
