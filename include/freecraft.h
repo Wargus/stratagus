@@ -104,7 +104,7 @@
 
 #endif
 
-#if defined(WIN32) && defined(DEBUG)
+#if defined(__MINGW32__) && defined(DEBUG)
 // GDB + MINGW doesn't like free(0)
 #include <stdlib.h>
 #define free(x) do { void* __x; __x=(x); if( __x ) free( __x ); } while(0)

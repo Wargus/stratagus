@@ -50,7 +50,7 @@
 #endif
 
 #ifdef USE_WIN32
-#include <winsock.h>
+#include "net_lowlevel.h"
 #endif
 
 #include "video.h"
