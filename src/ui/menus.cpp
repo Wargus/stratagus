@@ -905,7 +905,10 @@ local void CreateSaveDir(void)
     }
 
 #ifdef USE_WIN32
-    SaveDir=strdup("save");
+    strcpy(TempPathBuf,GameName);
+    mkdir(TempPathBuf);
+    strcat(TempPathBuf,"/save");
+    SaveDir=strdup(TempPathBuf);
     mkdir(SaveDir);
 #else
     strcpy(TempPathBuf,getenv("HOME"));
@@ -914,6 +917,7 @@ local void CreateSaveDir(void)
     mkdir(TempPathBuf,0777);
     strcat(TempPathBuf,"/");
     strcat(TempPathBuf,GameName);
+    mkdir(TempPathBuf,0777);
     strcat(TempPathBuf,"/save");
     mkdir(TempPathBuf,0777);
     SaveDir = strdup(TempPathBuf);
