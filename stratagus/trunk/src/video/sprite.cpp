@@ -381,10 +381,10 @@ global void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame, int x, i
 	drect.x = x;
 	drect.y = y;
 
-	alpha = sprite->Surface->format->alpha;
-	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	alpha = sprite->SurfaceFlip->format->alpha;
+	SDL_SetAlpha(sprite->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
-	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
+	SDL_SetAlpha(sprite->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
 }
 
 global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
