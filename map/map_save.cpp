@@ -60,6 +60,9 @@ global void SaveMap(FILE* file)
 {
     int w;
     int h;
+#ifdef NEW_FOW
+    int i;
+#endif
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: map $Id$\n");
@@ -91,7 +94,11 @@ global void SaveMap(FILE* file)
 		fprintf(file," %d",mf->Value);
 	    }
 #ifdef NEW_FOW
-	    DebugLevel0Fn("FIXME:\n");
+	    for( i=0; i < PlayerMax; ++i ) {
+		if( mf->Visible[i] == 1) {
+		    fprintf(file," explored %d",i);
+		}
+	    }
 #else
 	    if( IsMapFieldVisible(w,h) ) {
 		fprintf(file," visible");

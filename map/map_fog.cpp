@@ -176,37 +176,28 @@ local int MapVisibleMask(void)
 **
 **	@return		Number of units that can see this square.
 */
-#define MAX_SIGHT_RANGE 9
 local int LookupSight(const Player* player,int tx,int ty)
 {
-    int numunits;
+    int i;
     int visiblecount;
     int x;
     int y;
     int range;
-    Unit* unitrange[UnitMax];
+    Unit* unit;
 
     visiblecount=0;
-    // FIXME: Do we actually lookup all units here, or just the ones on the
-    // FIXME: map.  We need ALL units that can see this spot, removed or not.
-    numunits=SelectUnits(tx-MAX_SIGHT_RANGE-1,ty-MAX_SIGHT_RANGE-1,
-	tx+MAX_SIGHT_RANGE+1,ty+MAX_SIGHT_RANGE+1,unitrange);
-    --numunits;
-    range=(unitrange[numunits]->Stats->SightRange+1)*
-	(unitrange[numunits]->Stats->SightRange+1);
-    DebugLevel1Fn("Number of Lookup Units: %d\n" _C_ numunits);
-    while( numunits>=0 ) {
-	if( unitrange[numunits]->Player->Player==player->Player ) {
-	    x=unitrange[numunits]->X;
-	    y=unitrange[numunits]->Y;
-	    if( ((x-tx)*(x-tx)+(y-ty)*(y-ty))<=range ) {
-		++visiblecount;
-	    }
+    // FIXME: Speedup can be done by only selecting unit possibly in range
+    for( i=0; i<player->TotalNumUnits; ++i ) {
+	unit=player->Units[i];
+	range=(unit->CurrentSightRange+1)*(unit->CurrentSightRange+1);
+	x=unit->X+unit->Type->TileWidth/2;
+	y=unit->Y+unit->Type->TileHeight/2;
+	if( PythagTree[abs(x-tx)][abs(y-ty)]<=range ) {
+	    ++visiblecount;
 	}
-	if( visiblecount>=255 ) {
+	if( visiblecount >= 255 ) {
 	    return 255;
 	}
-	--numunits;
     }
     return visiblecount;
 }
@@ -218,7 +209,7 @@ local int LookupSight(const Player* player,int tx,int ty)
 **	@param x	X tile to check.
 **	@param y	Y tile to check.
 **
-**	@return		FIXME: docu.
+**	@return		0 unexplored, 1 explored, >1 visible.
 */
 global int IsTileVisible(const Player* player,int x,int y)
 {
@@ -1975,7 +1966,8 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 	char seen[7];
 	int x=(dx-vp->X)/TileSizeX + vp->MapX;
 	int y=(dy-vp->Y)/TileSizeY + vp->MapY;
-	sprintf(seen,"%d(%d)",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player],IsTileVisible(ThisPlayer,x,y));
+	//sprintf(seen,"%d(%d)",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player],IsTileVisible(ThisPlayer,x,y));
+	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player]);
 	VideoDrawText(dx,dy, GameFont,seen);
 	}
 #endif 
