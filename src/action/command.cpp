@@ -81,6 +81,8 @@ global void CommandStopUnit(Unit* unit)
     unit->NextCommand[0].Action=UnitActionStill;
 
     unit->PendCommand=unit->NextCommand[0];
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -98,6 +100,8 @@ global void CommandStandGround(Unit* unit,int flush)
     }
 
     command->Action=UnitActionStandGround;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -124,6 +128,8 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -160,6 +166,8 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -205,6 +213,8 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -262,6 +272,8 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -296,6 +308,8 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -329,6 +343,8 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -357,6 +373,8 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=dest->X;
     command->Data.Move.DY=dest->Y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -394,6 +412,8 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -434,6 +454,8 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
     command->Data.Move.SY=unit->Y;
 
     command->Data.Build.BuildThis=what;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -453,6 +475,8 @@ global void CommandCancelBuilding(Unit* unit,Unit* worker)
 
     unit->Wait=1;
     unit->Reset=1;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -493,6 +517,8 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
     // FIXME: this hack didn't work correct on map border
     command->Data.Move.DX=x ? x-1 : x;
     command->Data.Move.DY=y ? y-1 : y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -531,6 +557,8 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     command->Data.Move.DX=dest->X;
     command->Data.Move.DY=dest->Y;
 #endif
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -569,6 +597,8 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     command->Data.Move.DX=dest->X;
     command->Data.Move.DY=dest->Y;
 #endif
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -589,6 +619,8 @@ global void CommandReturnGoods(Unit* unit,int flush)
     unit->NextCommand[0].Data.Move.Range=1;
     unit->NextCommand[0].Data.Move.SX=unit->X;
     unit->NextCommand[0].Data.Move.SY=unit->Y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -642,6 +674,8 @@ global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
 
     unit->Wait=1;			// FIXME: correct this 
     unit->Reset=1;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -667,6 +701,8 @@ global void CommandCancelTraining(Unit* unit,int slot)
 
     unit->Wait=1;
     unit->Reset=1;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -687,6 +723,8 @@ global void CommandUpgradeTo(Unit* unit,UnitType* what,int flush)
 
     unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -701,6 +739,8 @@ global void CommandCancelUpgradeTo(Unit* unit)
 
     unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -722,6 +762,8 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 
     unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -736,6 +778,8 @@ global void CommandCancelResearch(Unit* unit)
 
     unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 /**
@@ -786,6 +830,8 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
+
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 
 //@}
