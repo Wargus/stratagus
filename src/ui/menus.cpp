@@ -1484,22 +1484,147 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 
 local void SetRes640(Menuitem *mi __attribute__((unused)))
 {
+    Menu *menu;
+#ifdef USE_SDL
+    Uint32 flags;
+    extern SDL_Surface *Screen;
+
+    flags = Screen->flags;
+#endif
+    menu = FindMenu("menu-global-options");
+    
+    menu->items[2].d.gem.state = MI_GSTATE_CHECKED;
+    menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
+
+    if (VideoWidth != 640) {
+	VideoWidth=600;
+	VideoHeight=480;
+	InitVideo();
+    }
+
+#ifdef USE_SDL
+    if (flags & SDL_FULLSCREEN)
+	ToggleFullScreen();
+#endif
 }
 
 local void SetRes800(Menuitem *mi __attribute__((unused)))
 {
+    Menu *menu;
+#ifdef USE_SDL
+    Uint32 flags;
+    extern SDL_Surface *Screen;
+
+    flags = Screen->flags;
+#endif
+    menu = FindMenu("menu-global-options");    
+    
+    menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[4].d.gem.state = MI_GSTATE_CHECKED;
+    menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
+    
+    if (VideoWidth != 800) {
+	VideoWidth=800;
+	VideoHeight=600;
+	InitVideo();
+    }
+
+#ifdef USE_SDL
+    if (flags & SDL_FULLSCREEN)
+	ToggleFullScreen();
+#endif
 }
 
 local void SetRes1024(Menuitem *mi __attribute__((unused)))
 {
+    Menu *menu;
+#ifdef USE_SDL
+    Uint32 flags;
+    extern SDL_Surface *Screen;
+
+    flags = Screen->flags;
+#endif
+    menu = FindMenu("menu-global-options");
+
+    menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[6].d.gem.state = MI_GSTATE_CHECKED;
+    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
+
+    if (VideoWidth != 1024) {
+	VideoWidth=1024;
+	VideoHeight=768;
+	InitVideo();
+    }
+
+#ifdef USE_SDL
+    if (flags & SDL_FULLSCREEN)
+	ToggleFullScreen();
+#endif
 }
 
 local void SetRes1280(Menuitem *mi __attribute__((unused)))
 {
+    Menu *menu;
+#ifdef USE_SDL
+    Uint32 flags;
+    extern SDL_Surface *Screen;
+
+    flags = Screen->flags;
+#endif
+    menu = FindMenu("menu-global-options");    
+
+    menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[8].d.gem.state = MI_GSTATE_CHECKED;
+    menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
+
+    if (VideoWidth != 1280) {
+	VideoWidth=1280;
+	VideoHeight=960;
+	InitVideo();
+    }
+
+#ifdef USE_SDL
+    if (flags & SDL_FULLSCREEN)
+	ToggleFullScreen();
+#endif
 }
 
 local void SetRes1600(Menuitem *mi __attribute__((unused)))
 {
+    Menu *menu;
+#ifdef USE_SDL
+    Uint32 flags;
+    extern SDL_Surface *Screen;
+
+    flags = Screen->flags;
+#endif
+    menu = FindMenu("menu-global-options");
+    
+    menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
+
+    if (VideoWidth != 1600) {
+	VideoWidth=1600;
+	VideoHeight=1200;
+	InitVideo();
+    }
+
+#ifdef USE_SDL
+    if (flags & SDL_FULLSCREEN)
+	ToggleFullScreen();
+#endif
 }
 
 local void SetFullscreen(Menuitem *mi __attribute__((unused)))
