@@ -769,14 +769,18 @@ global void ResizeGraphic(Graphic *g, int w, int h)
     SDL_Color pal[256];
 
     DebugCheck(g->Surface->format->BytesPerPixel != 1);
+    if (g->Width == w && g->Height == h) {
+	return;
+    }
+
     SDL_LockSurface(g->Surface);
 #else
     DebugCheck(g->Type != &GraphicImage8Type);
-#endif
 
     if (g->Width == w && g->Height == h) {
 	return;
     }
+#endif
 
     data = (unsigned char*)malloc(w * h);
 #ifdef DEBUG
