@@ -78,12 +78,10 @@
 **  Icon::X
 **
 **    X pixel index into the graphic image.
-**    (Icon::Index%5)*IconWidth.
 **
 **  Icon::Y
 **
 **    Y pixel index into the graphic image.
-**    (Icon::Index/5)*IconHeight.
 **
 **  Icon::Width
 **
@@ -196,11 +194,6 @@ typedef struct _icon_config_ {
 ----------------------------------------------------------------------------*/
 
 extern char** IconWcNames;  /// pud original -> internal
-
-	/** FIXME: Not needed */
-extern int IconWidth;  /// icon width in panels
-	/** FIXME: Not needed */
-extern int IconHeight;  /// icon height in panels
 
 /*----------------------------------------------------------------------------
 --  Functions
