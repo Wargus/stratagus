@@ -1340,7 +1340,10 @@ local void DrawUnit(const Unit* unit)
     GraphicPlayerPixels(unit->Player,type->Sprite);
     DrawUnitType(type,unit->Frame,x,y);
 
+#ifndef NEW_DECODRAW
+// Unit's extras not fully supported.. need to be deocrations themselves.
     DrawInformations(unit,type,x,y);
+#endif
 }
 
 /**

@@ -391,13 +391,12 @@ global void VideoDraw8to8Clip(const Graphic* sprite,unsigned frame,int x,int y)
     const VMemType8* pixels;
     unsigned da;
 
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
 
     //
     // reduce to visible range
     //
+    sw=w=sprite->Width;
+    h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
@@ -529,13 +528,11 @@ global void VideoDraw8to16Clip(const Graphic* sprite,unsigned frame,int x,int y)
     const VMemType16* pixels;
     unsigned da;
 
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
     //
     // reduce to visible range
     //
+    sw=w=sprite->Width;
+    h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
@@ -667,13 +664,11 @@ global void VideoDraw8to24Clip(const Graphic* sprite,unsigned frame,int x,int y)
     const VMemType24* pixels;
     unsigned da;
 
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
     //
     // reduce to visible range
     //
+    sw=w=sprite->Width;
+    h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
@@ -805,13 +800,11 @@ global void VideoDraw8to32Clip(const Graphic* sprite,unsigned frame,int x,int y)
     const VMemType32* pixels;
     unsigned da;
 
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
     //
     // reduce to visible range
     //
+    sw=w=sprite->Width;
+    h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
@@ -944,13 +937,11 @@ global void VideoDraw8to8ClipX(const Graphic* sprite,unsigned frame,int x,int y)
     const VMemType8* pixels;
     unsigned da;
 
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
     //
     // reduce to visible range
     //
+    sw=w=sprite->Width;
+    h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
@@ -1084,13 +1075,12 @@ global void VideoDraw8to16ClipX(const Graphic* sprite,unsigned frame
     const VMemType16* pixels;
     unsigned da;
 
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
 
     //
     // reduce to visible range
     //
+    sw=w=sprite->Width;
+    h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
@@ -1224,13 +1214,11 @@ global void VideoDraw8to24ClipX(const Graphic* sprite,unsigned frame
     const VMemType24* pixels;
     unsigned da;
 
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
     //
     // reduce to visible range
     //
+    sw=w=sprite->Width;
+    h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
@@ -1364,13 +1352,11 @@ global void VideoDraw8to32ClipX(const Graphic* sprite,unsigned frame
     const VMemType32* pixels;
     unsigned da;
 
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
     //
     // reduce to visible range
     //
+    sw=w=sprite->Width;
+    h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //

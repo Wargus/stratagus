@@ -1149,10 +1149,12 @@ global int CheckUnitToBeDrawn(const Unit * unit)
 #else
 #ifdef NEW_DECODRAW
     if ( !unit->Removed && UnitVisibleOnScreen(unit) ) {
-        int x = Map2ScreenX(unit->X)+unit->IX;
-        int y = Map2ScreenY(unit->Y)+unit->IY;
-        int w = unit->Type->BoxWidth;
-        int h = unit->Type->BoxHeight;
+    // FIXME: Inaccurate dimension to take unit's extras into account..
+    //        Should be solved by adding each unit extra as separate decoration
+        int x = Map2ScreenX(unit->X)+unit->IX-10;
+        int y = Map2ScreenY(unit->Y)+unit->IY-10;
+        int w = unit->Type->Width+20;
+        int h = unit->Type->Height+20;
 
         if ( unit->deco )
         {
