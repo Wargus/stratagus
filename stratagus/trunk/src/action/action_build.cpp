@@ -69,6 +69,7 @@ local void UpdateConstructionFrame(Unit* unit)
     }
     if( cframe!=unit->Data.Builded.Frame ) {
 	unit->Data.Builded.Frame=cframe;
+	unit->Frame=cframe->Frame;
 	UnitMarkSeen(unit);
     }
 }
