@@ -529,8 +529,6 @@ extern void MissileActions(void);
     /// distance from view point to missile
 extern int ViewPointDistanceToMissile(const Missile*);
 
-    /// Save missile-types
-extern void SaveMissileTypes(FILE*);
     /// Save missiles
 extern void SaveMissiles(FILE*);
 

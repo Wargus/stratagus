@@ -130,7 +130,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 		unit->Orders[0].Action = UnitActionStill;
 		unit->State = unit->SubAction = 0;
 		if (unit->Selected) {	// update display for new action
-		    UpdateButtonPanel();
+		    SelectedUnitChanged();
 		}
 	    }
 	    // FIXME: We shouldn't animate if no resources are available.
@@ -279,7 +279,7 @@ global void HandleActionRepair(Unit* unit)
 		    unit->Orders[0].Action=UnitActionStill;
 		    unit->State=unit->SubAction=0;
 		    if( unit->Selected ) {	// update display for new action
-			UpdateButtonPanel();
+			SelectedUnitChanged();
 		    }
 		    return;
 		}
@@ -341,7 +341,7 @@ global void HandleActionRepair(Unit* unit)
                     unit->Orders[0].Action=UnitActionStill;
 		    unit->SubAction=unit->State=0;
 		    if( unit->Selected ) {	// update display for new action
-			UpdateButtonPanel();
+			SelectedUnitChanged();
 		    }
                     return;
 		}

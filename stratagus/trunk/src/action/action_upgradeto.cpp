@@ -96,11 +96,9 @@ global void HandleActionUpgradeTo(Unit* unit)
 	//
 	//	Update possible changed buttons.
 	//
-	if( IsOnlySelected(unit) ) {
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
-	} else if( player==ThisPlayer ) {
-	    UpdateButtonPanel();
+	if( IsOnlySelected(unit) || player==ThisPlayer ) {
+	    // could affect the buttons of any selected unit
+	    SelectedUnitChanged();
 	    MustRedraw|=RedrawInfoPanel;
 	}
 

@@ -134,7 +134,7 @@ local SCM CclPlayer(SCM list)
 	    free(str);
 	    if( i==PlayerRaces.Count ) {
 	       // FIXME: this leaves a half initialized player
-	       errl("Unsupported tag",gh_car(list));
+	       errl("Unsupported race",gh_car(list));
 	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("ai")) ) {

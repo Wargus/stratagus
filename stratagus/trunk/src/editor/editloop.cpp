@@ -922,9 +922,9 @@ global void EditorUpdateDisplay(void)
     //
     //  Minimap border
     //
-    if (TheUI.Minimap.Graphic) {
-	VideoDrawSub(TheUI.Minimap.Graphic, 0, 0, TheUI.Minimap.Graphic->Width,
-		TheUI.Minimap.Graphic->Height, TheUI.MinimapX, TheUI.MinimapY);
+    if (TheUI.MinimapPanel.Graphic) {
+	VideoDrawSub(TheUI.MinimapPanel.Graphic, 0, 0, TheUI.MinimapPanel.Graphic->Width,
+		TheUI.MinimapPanel.Graphic->Height, TheUI.MinimapPanelX, TheUI.MinimapPanelY);
     }
     //
     //  Minimap
@@ -1580,8 +1580,8 @@ local void EditorCallbackMouse(int x, int y)
     //
     //	Minimap
     //
-    if (x >= TheUI.MinimapX+24 && x < TheUI.MinimapX+24+MINIMAP_W
-	    && y >= TheUI.MinimapY+2 && y < TheUI.MinimapY+2+MINIMAP_H) {
+    if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX+MINIMAP_W
+	    && y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY+MINIMAP_H) {
 	CursorOn = CursorOnMinimap;
     }
 
@@ -1733,8 +1733,8 @@ local void EditorCallbackMouse(int x, int y)
     //
     //  Minimap
     //
-    if (x >= TheUI.MinimapX + 24 && x < TheUI.MinimapX + 24 + MINIMAP_W
-	    && y >= TheUI.MinimapY + 2 && y < TheUI.MinimapY + 2 + MINIMAP_H) {
+    if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + MINIMAP_W
+	    && y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + MINIMAP_H) {
 	CursorOn = CursorOnMinimap;
 	return;
     }

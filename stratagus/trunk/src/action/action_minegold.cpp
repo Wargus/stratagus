@@ -323,7 +323,7 @@ local int MineInGoldmine(Unit* unit)
 	unit->Player->UnitTypesCount[unit->Type->Type]++;
         CheckUnitToBeDrawn(unit);
 	if( unit->Selected ) {
-	    UpdateButtonPanel();
+	    SelectedUnitChanged();
 	}
 	unit->Wait=1;
 	return unit->SubAction;

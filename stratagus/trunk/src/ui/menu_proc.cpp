@@ -2326,7 +2326,11 @@ global void ProcessMenu(const char *menu_id, int loop)
     MenuButtonUnderCursorSave = -1;
     MenuButtonCurSelSave = -1;
 
+#ifndef NEW_UI
     CancelBuildingMode();
+#else
+    ChooseTargetFinish();
+#endif
 
     // Recursion protection:
     if (loop) {

@@ -184,8 +184,8 @@ local void EnterTransporter(Unit* unit)
     	unit->OrderCount=1;
     	unit->Orders[0].Action=UnitActionStill;
     	if( IsOnlySelected(transporter) ) {
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
+	    SelectedUnitChanged();
+	    MustRedraw|=RedrawInfoPanel;
 	}
 	return;
     }

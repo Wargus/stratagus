@@ -564,9 +564,9 @@ global void UpdateDisplay(void)
 	DrawMenuButtonArea();
     }
     if( MustRedraw&RedrawMinimapBorder ) {
-	VideoDrawSub(TheUI.Minimap.Graphic,0,0
-		,TheUI.Minimap.Graphic->Width,TheUI.Minimap.Graphic->Height
-		,TheUI.MinimapX,TheUI.MinimapY);
+	VideoDrawSub(TheUI.MinimapPanel.Graphic,0,0
+		,TheUI.MinimapPanel.Graphic->Width,TheUI.MinimapPanel.Graphic->Height
+		,TheUI.MinimapPanelX,TheUI.MinimapPanelY);
     }
 
     PlayerPixels(Players);		// Reset to default colors
@@ -596,11 +596,15 @@ global void UpdateDisplay(void)
     }
     if( MustRedraw&RedrawStatusLine ) {
 	DrawStatusLine();
+#ifndef NEW_UI
 	MustRedraw|=RedrawCosts;
+#endif
     }
+#ifndef NEW_UI
     if( MustRedraw&RedrawCosts ) {
 	DrawCosts();
     }
+#endif
     if( MustRedraw&RedrawTimer ) {
 	DrawTimer();
     }
@@ -664,13 +668,13 @@ global void UpdateDisplay(void)
 	}
 	if( MustRedraw&RedrawMinimapBorder ) {
 	    InvalidateAreaAndCheckCursor(
-		 TheUI.MinimapX,TheUI.MinimapY
-		,TheUI.Minimap.Graphic->Width,TheUI.Minimap.Graphic->Height);
+		 TheUI.MinimapPanelX,TheUI.MinimapPanelY
+		,TheUI.MinimapPanel.Graphic->Width,TheUI.MinimapPanel.Graphic->Height);
 	} else if( (MustRedraw&RedrawMinimap)
 		|| (MustRedraw&RedrawMinimapCursor) ) {
 	    // FIXME: Redraws too much of the minimap
 	    InvalidateAreaAndCheckCursor(
-		     TheUI.MinimapX+24,TheUI.MinimapY+2
+		     TheUI.MinimapPosX,TheUI.MinimapPosY
 		    ,MINIMAP_W,MINIMAP_H);
 	}
 	if( MustRedraw&RedrawInfoPanel ) {
@@ -690,7 +694,11 @@ global void UpdateDisplay(void)
 		    ,TheUI.Resource.Graphic->Width
 		    ,TheUI.Resource.Graphic->Height);
 	}
+#ifndef NEW_UI
 	if( (MustRedraw&RedrawStatusLine || MustRedraw&RedrawCosts) && TheUI.StatusLine.Graphic ) {
+#else
+	if( MustRedraw&RedrawStatusLine && TheUI.StatusLine.Graphic ) {
+#endif
 	    InvalidateAreaAndCheckCursor(
 		     TheUI.StatusLineX,TheUI.StatusLineY
 		    ,TheUI.StatusLine.Graphic->Width
