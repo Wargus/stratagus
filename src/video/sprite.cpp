@@ -79,7 +79,7 @@ void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 	sy = y;
 	ey = sy + sprite->Height;
 
-	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+	glBindTexture(GL_TEXTURE_2D, sprite->Textures[frame]);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex2i(sx, sy);
@@ -110,7 +110,8 @@ void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 		sprite->Width, sprite->Height, x, y);
 }
 #else
-void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
+void VideoDoDrawClip(const Graphic* sprite, GLuint* textures,
+	unsigned frame, int x, int y)
 {
 	GLint svx;
 	GLint evx;
@@ -140,7 +141,7 @@ void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 	sty = (GLfloat)oy / sprite->Height * sprite->TextureHeight;
 	ety = (GLfloat)(oy + h) / sprite->Height * sprite->TextureHeight;
 
-	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+	glBindTexture(GL_TEXTURE_2D, textures[frame]);
 	glBegin(GL_QUADS);
 	glTexCoord2f(stx, sty);
 	glVertex3f(svx, svy, 0.0f);
@@ -192,7 +193,7 @@ void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 	sy = y;
 	ey = sy + sprite->Height;
 
-	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+	glBindTexture(GL_TEXTURE_2D, sprite->Textures[frame]);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex2i(sx, sy);
@@ -240,8 +241,8 @@ void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
 	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 }
 #else
-void VideoDrawClipX(const Graphic* sprite, unsigned frame,
-	int x, int y)
+void VideoDoDrawClipX(const Graphic* sprite, GLuint* textures,
+	unsigned frame, int x, int y)
 {
 	GLint svx;
 	GLint evx;
@@ -278,7 +279,7 @@ void VideoDrawClipX(const Graphic* sprite, unsigned frame,
 	sty = (GLfloat)oy / sprite->Height * sprite->TextureHeight;
 	ety = (GLfloat)(oy + h) / sprite->Height * sprite->TextureHeight;
 
-	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+	glBindTexture(GL_TEXTURE_2D, textures[frame]);
 	glBegin(GL_QUADS);
 	glTexCoord2f(stx, sty);
 	glVertex2i(evx, svy);
@@ -419,31 +420,29 @@ Graphic* LoadSprite(const char* name, int width, int height)
 	}
 
 	if (!width) {
-		width = g->Width;
+		width = g->GraphicWidth;
 	}
 	if (!height) {
-		height = g->Height;
+		height = g->GraphicHeight;
 	}
 
-	Assert(width <= g->Width && height <= g->Height);
+	Assert(width <= g->GraphicWidth && height <= g->GraphicHeight);
 
-	if ((g->Width / width) * width != g->Width ||
-			(g->Height / height) * height != g->Height) {
+	if ((g->GraphicWidth / width) * width != g->GraphicWidth ||
+			(g->GraphicHeight / height) * height != g->GraphicHeight) {
 		fprintf(stderr, "Invalid graphic (width, height) %s\n", name);
 		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
-			width, height, g->Width, g->Height);
+			width, height, g->GraphicWidth, g->GraphicHeight);
 		ExitFatal(1);
 	}
 
-#ifdef USE_OPENGL
-	MakeTexture(g, width, height);
-	g->GraphicWidth = g->Width;
-	g->GraphicHeight = g->Height;
-#endif
-
-	g->NumFrames = g->Width / width * g->Height / height;;
+	g->NumFrames = g->GraphicWidth / width * g->GraphicHeight / height;
 	g->Width = width;
 	g->Height = height;
+
+#ifdef USE_OPENGL
+	MakeTexture(g);
+#endif
 
 	return g;
 }
@@ -458,10 +457,6 @@ Graphic* LoadSprite(const char* name, int width, int height)
 void MakeShadowSprite(Graphic* g)
 {
 	SDL_Color colors[256];
-#ifdef USE_OPENGL
-	int w;
-	int h;
-#endif
 
 	// Set all colors in the palette to black and use 50% alpha
 	memset(colors, 0, sizeof(colors));
@@ -474,13 +469,7 @@ void MakeShadowSprite(Graphic* g)
 		SDL_SetAlpha(g->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 	}
 #ifdef USE_OPENGL
-	w = g->Width;
-	h = g->Height;
-	g->Width = g->GraphicWidth;
-	g->Height = g->GraphicHeight;
-	MakeTexture(g, w, h);
-	g->Width = w;
-	g->Height = h;
+	MakeTexture(g);
 #endif
 }
 
