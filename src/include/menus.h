@@ -123,6 +123,15 @@ typedef struct _menuitem_ {
 	struct {
 	    void (*draw)(struct _menuitem_ *);
 	} drawfunc;
+	struct {
+	    unsigned char *buffer;
+	    unsigned xsize;
+	    unsigned ysize;
+	    MenuButtonId button;
+	    void (*action)(struct _menuitem_ *, int);	/* for key */
+	    int nch;
+	    int maxch;
+	} input;
 	/// ... add here ...
 
     } d;
@@ -134,6 +143,7 @@ typedef struct _menuitem_ {
 #define MI_TYPE_LISTBOX 4
 #define MI_TYPE_VSLIDER 5
 #define MI_TYPE_DRAWFUNC 6
+#define MI_TYPE_INPUT 7
 
     /// for MI_TYPE_TEXT
 #define MI_TFLAGS_CENTERED 1
@@ -168,7 +178,8 @@ typedef struct _menus_ {
 #define MENU_SCEN_SELECT 3
 #define MENU_PRG_START 4
 #define MENU_CUSTOM_GAME_SETUP 5
-#define MENU_MAX  5			/// highest available menu id (for ccl)
+#define MENU_ENTER_NAME 6
+#define MENU_MAX  6			/// highest available menu id (for ccl)
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
