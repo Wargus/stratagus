@@ -40,6 +40,8 @@
 #include "video.h"
 #include "map.h"
 #include "menus.h"
+#include "font.h"
+#include "etlib/hash.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -76,6 +78,7 @@ local SCM CclSetReverseMapMove(SCM flag)
 
     return gh_bool2scm(old);
 }
+
 /**
 **	Defines the SVGALIB mouse speed adjust (must be > 0)
 **
@@ -344,11 +347,13 @@ local SCM CclDisplayPicture(SCM file)
 */
 local SCM CclProcessMenu(SCM id)
 {
-    int mid;
+    char *mid;
 
-    mid=gh_scm2int(id);
-    if (mid >= 0 && mid <= MENU_MAX)
+    mid = gh_scm2newstr(id, NULL);
+    if (hash_find(MenuHash, mid)) {
 	ProcessMenu(mid, 1);
+    }
+    free(mid);
 
     return SCM_UNSPECIFIED;
 }
@@ -1364,6 +1369,671 @@ local SCM CclSetFancyBuildings(SCM flag)
 }
 
 /**
+**	Define a menu
+**
+**	FIXME: need some general data structure to make this parsing easier.
+**
+**	@param list	List describing the menu.
+*/
+local SCM CclDefineMenu(SCM list)
+{
+    SCM value;
+    Menu *menu = NULL, item;
+    char *name;
+    char *s1;
+    void **func;
+
+    DebugLevel3Fn("Define menu\n");
+
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    memset(&item,0,sizeof(Menu));
+
+    while ( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("geometry")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+
+	    item.x=gh_scm2int(gh_car(value));
+	    value=gh_cdr(value);
+	    item.y=gh_scm2int(gh_car(value));
+	    value=gh_cdr(value);
+	    item.xsize=gh_scm2int(gh_car(value));
+	    value=gh_cdr(value);
+	    item.ysize=gh_scm2int(gh_car(value));
+
+	} else if( gh_eq_p(value,gh_symbol2scm("name")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    name=gh_scm2newstr(value, NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("image")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    if( gh_eq_p(value,gh_symbol2scm("none")) ) {
+		item.image=0;
+	    } else if( gh_eq_p(value,gh_symbol2scm("panel1")) ) {
+		item.image=1;
+	    } else if( gh_eq_p(value,gh_symbol2scm("panel2")) ) {
+		item.image=2;
+	    } else if( gh_eq_p(value,gh_symbol2scm("panel3")) ) {
+		item.image=3;
+	    } else if( gh_eq_p(value,gh_symbol2scm("panel4")) ) {
+		item.image=4;
+	    } else if( gh_eq_p(value,gh_symbol2scm("panel5")) ) {
+		item.image=5;
+	    } else {
+		s1=gh_scm2newstr(value, NULL);
+		fprintf(stderr, "Unsupported image %s\n", s1);
+		free(s1);
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("default")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    item.defsel=gh_scm2int(value);
+/*
+	} else if( gh_eq_p(value,gh_symbol2scm("nitems")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    item.nitems=gh_scm2int(value);
+*/
+	} else if( gh_eq_p(value,gh_symbol2scm("netaction")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    s1 = gh_scm2newstr(value,NULL);
+	    func = (void **)hash_find(MenuFuncHash, s1);
+	    if (func != NULL) {
+		item.netaction=(void *)*func;
+	    } else {
+		fprintf(stderr,"Can't find function: %s\n", s1);
+	    }
+	    free(s1);
+	} else {
+	    s1=gh_scm2newstr(value, NULL);
+	    fprintf(stderr, "Unsupported tag %s\n", s1);
+	    free(s1);
+	}
+    }
+
+    if (name) {
+	menu = (Menu*)malloc(sizeof(Menu));
+	memset(menu,0,sizeof(Menu));
+	memcpy(menu, &item, sizeof(Menu));
+	menu->nitems = 0; // reset to zero
+	//printf("Me:%s\n", name);
+	*(Menu **)hash_add(MenuHash,name) = menu;
+    } else {
+	fprintf(stderr,"Name of menu is missed, skip defination\n");
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Define a menu item
+**
+**	FIXME: need some general data structure to make this parsing easier.
+**
+**	@param list	List describing the menu item.
+*/
+
+local MenuButtonId scm2buttonid(SCM value)
+{
+    MenuButtonId id;
+
+    if ( gh_eq_p(value, gh_symbol2scm("main")) ) {
+        id=MBUTTON_MAIN;
+    } else if ( gh_eq_p(value, gh_symbol2scm("gm-half")) ) {
+        id=MBUTTON_GM_HALF;
+    } else if ( gh_eq_p(value, gh_symbol2scm("132")) ) {
+        id=MBUTTON_132;
+    } else if ( gh_eq_p(value, gh_symbol2scm("gm-full")) ) {
+        id=MBUTTON_GM_FULL;
+    } else if ( gh_eq_p(value, gh_symbol2scm("gem-round")) ) {
+        id=MBUTTON_GEM_ROUND;
+    } else if ( gh_eq_p(value, gh_symbol2scm("gem-square")) ) {
+        id=MBUTTON_GEM_SQUARE;
+    } else if ( gh_eq_p(value, gh_symbol2scm("up-arrow")) ) {
+        id=MBUTTON_UP_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("down-arrow")) ) {
+        id=MBUTTON_DOWN_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("left-arrow")) ) {
+        id=MBUTTON_LEFT_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("right-arrow")) ) {
+        id=MBUTTON_RIGHT_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("s-knob")) ) {
+        id=MBUTTON_S_KNOB;
+    } else if ( gh_eq_p(value, gh_symbol2scm("s-vcont")) ) {
+        id=MBUTTON_S_VCONT;
+    } else if ( gh_eq_p(value, gh_symbol2scm("s-hcont")) ) {
+        id=MBUTTON_S_HCONT;
+    } else if ( gh_eq_p(value, gh_symbol2scm("pulldown")) ) {
+        id=MBUTTON_PULLDOWN;
+    } else if ( gh_eq_p(value, gh_symbol2scm("vthin")) ) {
+        id=MBUTTON_VTHIN;
+    } else if ( gh_eq_p(value, gh_symbol2scm("folder")) ) {
+        id=MBUTTON_FOLDER;
+    } else {
+	char *s1=gh_scm2newstr(value, NULL);
+        fprintf(stderr, "Unsupported button %s\n", s1);
+        free(s1);
+	return 0;
+    }
+    return id;
+}
+
+local int scm2hotkey(SCM value)
+{
+    char *s;
+    int l, key=0, f;
+
+    s = gh_scm2newstr(value,NULL);
+    l = strlen(s);
+
+    if (l==1) {
+	key=s[0];
+    } else if (!strcmp(s,"esc")) {
+	key=27;
+    } else if (s[0]=='f' && l>1 && l<4) {
+	f = atoi(s+1);
+	if (f > 0 && f < 13) {
+	    key = KeyCodeF1+f-1; // if key-order in include/interface.h is linear
+	} else {
+	    printf("Unknow key '%s'\n", s);
+	}
+    } else {
+	printf("Unknow key '%s'\n", s);
+    }
+    free(s);
+    return key;
+}
+
+local SCM CclDefineMenuItem(SCM list)
+{
+    SCM value, sublist;
+    char* s1;
+    char* name;
+    Menuitem *item;
+    Menu **tmp, *menu;
+    void **func;
+
+    DebugLevel3Fn("Define menu-item\n");
+
+    item = (Menuitem*)malloc(sizeof(Menuitem));
+    memset(item,0,sizeof(Menuitem));
+
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+
+	    item->xofs=gh_scm2int(gh_car(value));
+	    value=gh_cdr(value);
+	    item->yofs=gh_scm2int(gh_car(value));
+
+	} else if( gh_eq_p(value,gh_symbol2scm("menu")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    name=gh_scm2newstr(value, NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("flags")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+
+	    while ( !gh_null_p(sublist) ) {
+	    
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+	    
+		if ( gh_eq_p(value,gh_symbol2scm("active")) ) {
+		    item->flags|=MenuButtonActive;
+		} else if ( gh_eq_p(value,gh_symbol2scm("clicked")) ) {
+		    item->flags|=MenuButtonClicked;
+		} else if ( gh_eq_p(value,gh_symbol2scm("selected")) ) {
+		    item->flags|=MenuButtonClicked;
+		} else if ( gh_eq_p(value,gh_symbol2scm("disabled")) ) {
+		    item->flags|=MenuButtonDisabled;
+		} else {
+		    s1=gh_scm2newstr(gh_car(value),NULL);
+		    fprintf(stderr,"Unknow flag %s\n",s1);
+		    free(s1);
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("font")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    if( gh_eq_p(value,gh_symbol2scm("small")) ) {
+		item->font=SmallFont;
+	    } else if( gh_eq_p(value,gh_symbol2scm("game")) ) {
+		item->font=GameFont;
+	    } else if( gh_eq_p(value,gh_symbol2scm("large")) ) {
+		item->font=LargeFont;
+	    } else if( gh_eq_p(value,gh_symbol2scm("smallTitle")) ) {
+		item->font=SmallTitleFont;
+	    } else if( gh_eq_p(value,gh_symbol2scm("largeTitle")) ) {
+		item->font=LargeTitleFont;
+	    } else {
+		s1=gh_scm2newstr(value,NULL);
+		fprintf(stderr,"Unsupported font %s\n",s1);
+		free(s1);
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("init")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+
+	    s1 = gh_scm2newstr(value,NULL);
+	    func = (void **)hash_find(MenuFuncHash,s1);
+	    if (func != NULL) {
+		item->initfunc=(void *)*func;
+	    } else {
+	        fprintf(stderr,"Can't find function: %s\n", s1);
+	    }
+	    free(s1);
+	} else if( gh_eq_p(value,gh_symbol2scm("exit")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+
+	    s1 = gh_scm2newstr(value,NULL);
+	    func = (void **)hash_find(MenuFuncHash,s1);
+	    if (func != NULL) {
+		item->exitfunc=(void *)*func;
+	    } else {
+	        fprintf(stderr,"Can't find function: %s\n", s1);
+	    }
+	    free(s1);
+/* Menu types */
+	} else if( !item->mitype ) {
+	    if ( gh_eq_p(value,gh_symbol2scm("text")) ) {
+		value=gh_car(list);
+		list=gh_cdr(list);
+		item->mitype=MI_TYPE_TEXT;
+
+		item->d.text.text=gh_scm2newstr(gh_car(value), NULL);
+		value=gh_cdr(value);
+		value=gh_car(value);
+		if ( gh_eq_p(value,gh_symbol2scm("center")) ) {
+		    item->d.text.tflags=MI_TFLAGS_CENTERED;
+		} else if ( gh_eq_p(value,gh_symbol2scm("left")) ) {
+		    item->d.text.tflags=MI_TFLAGS_LALIGN;
+		} else if ( gh_eq_p(value,gh_symbol2scm("right")) ) {
+		    item->d.text.tflags=MI_TFLAGS_RALIGN;
+		} else if ( gh_eq_p(value,gh_symbol2scm("none")) ) {
+		    item->d.text.tflags=0;
+		} else {
+		    s1=gh_scm2newstr(gh_car(value),NULL);
+		    fprintf(stderr,"Unknow flag %s\n", s1);
+		    free(s1);
+		}
+	    } else if ( gh_eq_p(value,gh_symbol2scm("button")) ) {
+		sublist=gh_car(list);
+		list=gh_cdr(list);
+		item->mitype=MI_TYPE_BUTTON;
+
+		while ( !gh_null_p(sublist) ) {
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+
+		    if ( gh_eq_p(value, gh_symbol2scm("size")) ) {
+			item->d.button.xsize=gh_scm2int(gh_car(gh_car(sublist)));
+			value=gh_cdr(gh_car(sublist));
+			item->d.button.ysize=gh_scm2int(gh_car(value));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("caption")) ) {
+			item->d.button.text=gh_scm2newstr(gh_car(sublist),NULL);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("hotkey")) ) {
+			item->d.button.hotkey=scm2hotkey(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			//item->d.button.handler=hash_mini_get(MenuHndlrHash, s1);
+			func = (void **)hash_find(MenuFuncHash, s1);
+			if (func != NULL) {
+			    item->d.button.handler=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("style")) ) {
+			value=gh_car(sublist);
+			item->d.button.button=scm2buttonid(value);
+		    } else {
+			//s1=gh_scm2newstr(value, NULL);
+			//fprintf(stderr, "Unsupported property %s\n", s1);
+			//free(s1);
+		    }
+		}
+	    } else if ( gh_eq_p(value,gh_symbol2scm("pulldown")) ) {
+		sublist=gh_car(list);
+		list=gh_cdr(list);
+		item->mitype=MI_TYPE_PULLDOWN;
+
+		while ( !gh_null_p(sublist) ) {
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+
+		    if ( gh_eq_p(value, gh_symbol2scm("size")) ) {
+			item->d.pulldown.xsize=gh_scm2int(gh_car(gh_car(sublist)));
+			value=gh_cdr(gh_car(sublist));
+			item->d.pulldown.ysize=gh_scm2int(gh_car(value));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("options")) ) {
+			value=gh_car(sublist);
+			if (gh_list_p(value)) {
+			    int n, i;
+
+			    n = item->d.pulldown.noptions = gh_length(value);
+			    item->d.pulldown.options = (unsigned char **)malloc(sizeof(char*)*n);
+			    for (i=0; i<n; i++) {
+				item->d.pulldown.options[i]=gh_scm2newstr(gh_car(value),NULL);
+				value = gh_cdr(value);
+			    }
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+			    item->d.pulldown.action=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("style")) ) {
+			value=gh_car(sublist);
+			item->d.pulldown.button=scm2buttonid(value);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("state")) ) {
+			value=gh_car(sublist);
+			if ( gh_eq_p(value, gh_symbol2scm("passive")) ) {
+			    item->d.pulldown.state=MI_PSTATE_PASSIVE;
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("default")) ) {
+			item->d.pulldown.defopt=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("current")) ) {
+			item->d.pulldown.curopt=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else {
+			//s1=gh_scm2newstr(value, NULL);
+			//fprintf(stderr, "Unsupported property %s\n", s1);
+			//free(s1);
+		    }
+		}
+	    } else if ( gh_eq_p(value,gh_symbol2scm("listbox")) ) {
+		sublist=gh_car(list);
+		list=gh_cdr(list);
+		item->mitype=MI_TYPE_LISTBOX;
+
+		while ( !gh_null_p(sublist) ) {
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+
+		    if ( gh_eq_p(value, gh_symbol2scm("size")) ) {
+			item->d.listbox.xsize=gh_scm2int(gh_car(gh_car(sublist)));
+			value=gh_cdr(gh_car(sublist));
+			item->d.listbox.ysize=gh_scm2int(gh_car(value));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+			    item->d.listbox.action=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("handler")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+			    item->d.listbox.handler=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("retopt")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+			    item->d.listbox.retrieveopt=(void *)(*func);
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("style")) ) {
+			value=gh_car(sublist);
+			item->d.listbox.button=scm2buttonid(value);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("default")) ) {
+			item->d.listbox.defopt=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("startline")) ) {
+			item->d.listbox.startline=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("nlines")) ) {
+			item->d.listbox.nlines=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("current")) ) {
+			item->d.listbox.curopt=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else {
+			//s1=gh_scm2newstr(value, NULL);
+			//fprintf(stderr, "Unsupported property %s\n", s1);
+			//free(s1);
+		    }
+		}
+	    } else if ( gh_eq_p(value,gh_symbol2scm("vslider")) ) {
+		sublist=gh_car(list);
+		list=gh_cdr(list);
+		item->mitype=MI_TYPE_VSLIDER;
+
+		while ( !gh_null_p(sublist) ) {
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+
+		    if ( gh_eq_p(value, gh_symbol2scm("size")) ) {
+			item->d.vslider.xsize=gh_scm2int(gh_car(gh_car(sublist)));
+			value=gh_cdr(gh_car(sublist));
+			item->d.vslider.ysize=gh_scm2int(gh_car(value));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("flags")) ) {
+			SCM slist;
+
+			slist = gh_car(sublist);
+			while ( !gh_null_p(slist) ) {
+	    
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+	    
+			    if ( gh_eq_p(value,gh_symbol2scm("up")) ) {
+				item->d.vslider.cflags|=MI_CFLAGS_UP;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("down")) ) {
+				item->d.vslider.cflags|=MI_CFLAGS_DOWN;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("left")) ) {
+				item->d.vslider.cflags|=MI_CFLAGS_LEFT;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("right")) ) {
+				item->d.vslider.cflags|=MI_CFLAGS_RIGHT;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("knob")) ) {
+				item->d.vslider.cflags|=MI_CFLAGS_KNOB;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("cont")) ) {
+				item->d.vslider.cflags|=MI_CFLAGS_CONT;
+			    } else {
+				s1=gh_scm2newstr(gh_car(value),NULL);
+				fprintf(stderr,"Unknow flag %s\n",s1);
+				free(s1);
+			    }
+			}
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+			    item->d.vslider.action=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("handler")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+			    item->d.vslider.handler=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("default")) ) {
+			item->d.vslider.defper=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("current")) ) {
+			item->d.vslider.percent=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else {
+			//s1=gh_scm2newstr(value, NULL);
+			//fprintf(stderr, "Unsupported property %s\n", s1);
+			//free(s1);
+		    }
+		}
+	    } else if ( gh_eq_p(value,gh_symbol2scm("drawfunc")) ) {
+		value=gh_car(list);
+		list=gh_cdr(list);
+		item->mitype=MI_TYPE_DRAWFUNC;
+
+		s1 = gh_scm2newstr(value,NULL);
+		func = (void **)hash_find(MenuFuncHash,s1);
+		if (func != NULL) {
+		    item->d.drawfunc.draw=(void *)*func;
+		} else {
+		    fprintf(stderr,"Can't find function: %s\n", s1);
+		}
+		free(s1);
+	    } else if ( gh_eq_p(value,gh_symbol2scm("input")) ) {
+		sublist=gh_car(list);
+		list=gh_cdr(list);
+		item->mitype=MI_TYPE_INPUT;
+
+		while ( !gh_null_p(sublist) ) {
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+
+		    if ( gh_eq_p(value, gh_symbol2scm("size")) ) {
+			item->d.input.xsize=gh_scm2int(gh_car(gh_car(sublist)));
+			value=gh_cdr(gh_car(sublist));
+			item->d.input.ysize=gh_scm2int(gh_car(value));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("text")) ) {
+			item->d.input.buffer=gh_scm2newstr(gh_car(sublist),NULL);
+			item->d.input.nch=strlen(item->d.input.buffer);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash, s1);
+			if (func != NULL) {
+			    item->d.input.action=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("style")) ) {
+			value=gh_car(sublist);
+			item->d.input.button=scm2buttonid(value);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("maxch")) ) {
+			value=gh_car(sublist);
+			item->d.input.maxch=gh_scm2int(value);
+		    } else {
+			//s1=gh_scm2newstr(value, NULL);
+			//fprintf(stderr, "Unsupported property %s\n", s1);
+			//free(s1);
+		    }
+		}
+	    } else if ( gh_eq_p(value,gh_symbol2scm("gem")) ) {
+		sublist=gh_car(list);
+		list=gh_cdr(list);
+		item->mitype=MI_TYPE_GEM;
+
+		while ( !gh_null_p(sublist) ) {
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+
+		    if ( gh_eq_p(value, gh_symbol2scm("size")) ) {
+			item->d.gem.xsize=gh_scm2int(gh_car(gh_car(sublist)));
+			value=gh_cdr(gh_car(sublist));
+			item->d.gem.ysize=gh_scm2int(gh_car(value));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("state")) ) {
+			value=gh_car(sublist);
+			if ( gh_eq_p(value, gh_symbol2scm("unchecked")) ) {
+			    item->d.gem.state=MI_GSTATE_UNCHECKED;
+			} else if ( gh_eq_p(value, gh_symbol2scm("passive")) ) {
+			    item->d.gem.state=MI_GSTATE_PASSIVE;
+			} else if ( gh_eq_p(value, gh_symbol2scm("invisible")) ) {
+			    item->d.gem.state=MI_GSTATE_INVISIBLE;
+			} else if ( gh_eq_p(value, gh_symbol2scm("checked")) ) {
+			    item->d.gem.state=MI_GSTATE_CHECKED;
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+			    item->d.gem.action=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("style")) ) {
+			value=gh_car(sublist);
+			item->d.gem.button=scm2buttonid(value);
+		    } else {
+			//s1=gh_scm2newstr(value, NULL);
+			//fprintf(stderr, "Unsupported property %s\n", s1);
+			//free(s1);
+		    }
+		}
+	    }
+	} else {
+	    s1=gh_scm2newstr(value, NULL);
+	    fprintf(stderr, "Unsupported tag %s\n", s1);
+	    free(s1);
+	}
+    }
+
+    if ( (tmp = (Menu **)hash_find(MenuHash,name)) ) {
+	menu = *tmp;
+	if (menu->items) {
+	    menu->items=(Menuitem*)realloc(menu->items,sizeof(Menuitem)*(menu->nitems+1));
+	} else {
+	    menu->items=(Menuitem*)malloc(sizeof(Menuitem));
+	}
+	memcpy(menu->items+menu->nitems,item,sizeof(Menuitem));
+	menu->nitems++;
+    }
+    free(name);
+    free(item);
+
+    return SCM_UNSPECIFIED;
+}
+
+
+/**
 **	Define a button.
 **
 **	FIXME: need some general data structure to make this parsing easier.
@@ -1770,6 +2440,9 @@ global void UserInterfaceCclRegister(void)
 
     gh_new_procedureN("define-button",CclDefineButton);
 
+    gh_new_procedureN("define-menu-item",CclDefineMenuItem);
+    gh_new_procedureN("define-menu",CclDefineMenu);
+
     //
     //	Correct named functions
     //
@@ -1784,6 +2457,8 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-show-reaction-range!",CclSetShowReactionRange);
     gh_new_procedure1_0("set-show-attack-range!",CclSetShowAttackRange);
     gh_new_procedure1_0("set-show-orders!",CclSetShowOrders);
+
+    InitMenuFuncHash();
 }
 
 //@}
