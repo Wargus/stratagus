@@ -679,12 +679,11 @@ global void VideoDraw24FogAlpha(const int tile, int x, int y)
 
 // Routines for 32 bit displays .. -------------------------------------------
 
-// FIXME: not written
 global void VideoDraw32OnlyFogAlpha(int x, int y)
 {
     int i;
     int j;
-    Uint16* p;
+    Uint32* p;
     int ex;
     int ey;
 
@@ -693,21 +692,21 @@ global void VideoDraw32OnlyFogAlpha(int x, int y)
 
     VideoLockScreen();
     for (i = y; i < ey; ++i) {
-	p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
+	p = &((Uint32*)TheScreen->pixels)[x + i * VideoWidth];
 	for (j = x; j < ex; ++j) {
-	    *p = ((Uint16*)FogOfWarAlphaTable)[*p];
+	    *p = ((Uint32*)FogOfWarAlphaTable)[
+		((*p & 0xf8) >> 3) | ((*p & 0xfc00) >> 5) | ((*p & 0xf80000) >> 8)];
 	    ++p;
 	}
     }
     VideoUnlockScreen();
 }
 
-// FIXME: not written
 global void VideoDraw32FogAlpha(const int tile, int x, int y)
 {
     int i;
     int j;
-    Uint16* p;
+    Uint32* p;
     Uint8* ptile;
     int tilepitch;
     int sx;
@@ -724,12 +723,13 @@ global void VideoDraw32FogAlpha(const int tile, int x, int y)
 
     VideoLockScreen();
     for (i = y; i < ey; ++i) {
-	p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
+	p = &((Uint32*)TheScreen->pixels)[x + i * VideoWidth];
 	ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[
 	    sy + (i - y) * TheMap.TileGraphic->Surface->w + sx];
 	for (j = x; j < ex; ++j) {
 	    if (COLOR_FOG_P(*ptile)) {
-		*p = ((Uint16*)FogOfWarAlphaTable)[*p];
+		*p = ((Uint32*)FogOfWarAlphaTable)[
+		    ((*p & 0xf8) >> 3) | ((*p & 0xfc00) >> 5) | ((*p & 0xf80000) >> 8)];
 	    }
 	    ++p;
 	    ++ptile;
@@ -3149,6 +3149,39 @@ build_table:
 		VideoDrawOnlyFog = VideoDraw24OnlyFogAlpha;
 		break;
 	    case 32:
+		rshft = ( 0);
+		gshft = ( 5);
+		bshft = (11);
+		rmask = (0x1F << rshft);
+		gmask = (0x3F << gshft);
+		bmask = (0x1F << bshft);
+		rloss = ( 3);
+		gloss = ( 2);
+		bloss = ( 3);
+
+		n = 1 << (sizeof(Uint16) * 8);
+		if (!FogOfWarAlphaTable) {
+		    FogOfWarAlphaTable = malloc(n * sizeof(Uint32));
+		}
+		for (i = 0; i < n; ++i) {
+		    r = (i & rmask) >> rshft << rloss;
+		    g = (i & gmask) >> gshft << gloss;
+		    b = (i & bmask) >> bshft << bloss;
+		    v = r + g + b;
+
+		    r = ((((r * 3 - v) * FogOfWarSaturation + v * 100) *
+			FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
+		    g = ((((g * 3 - v) * FogOfWarSaturation + v * 100) *
+			FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
+		    b = ((((b * 3 - v) * FogOfWarSaturation + v * 100) *
+			FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
+
+		    // Boundings
+		    r = r < 0 ? 0 : r > 255 ? 255 : r;
+		    g = g < 0 ? 0 : g > 255 ? 255 : g;
+		    b = b < 0 ? 0 : b > 255 ? 255 : b;
+		    ((Uint32*)FogOfWarAlphaTable)[i] = (r | (g << 8) | (b << 16));
+		}
 		VideoDrawFog = VideoDraw32FogAlpha;
 		VideoDrawOnlyFog = VideoDraw32OnlyFogAlpha;
 		break;
