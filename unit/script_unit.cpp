@@ -557,6 +557,9 @@ static void CclParseMove(lua_State* l, Unit* unit)
 **  Parse unit
 **
 **  @param l  Lua state.
+**
+**  @todo  Verify that vision table is always correct (transporter)
+**  @todo (PlaceUnit() and host-info).
 */
 static int CclUnit(lua_State* l)
 {
@@ -604,7 +607,7 @@ static int CclUnit(lua_State* l)
 			// calls RemoveUnit() and UnitLost()).  Such a unit should not
 			// be put on player's unit list!  However, this state is not
 			// easily detected from this place.  It seems that it is
-			// characterized by unit->HP==0 and by
+			// characterized by
 			// unit->Orders[0].Action==UnitActionDie so we have to wait
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
@@ -642,7 +645,13 @@ static int CclUnit(lua_State* l)
 			lua_rawgeti(l, j + 1, 4);
 			h = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			MapMarkSight(player, x, y, w, h, unit->CurrentSightRange);
+			MapSight(player, x, y, w, h, unit->CurrentSightRange, MapMarkTileSight);
+			// Detectcloak works in container
+			if (unit->Type->DetectCloak) {
+				MapSight(player, x, y, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
+			}
+			// Radar(Jammer) not.
+
 		} else if (!strcmp(value, "tile")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -880,6 +889,7 @@ static int CclUnit(lua_State* l)
 		}
 	}
 
+	// FIXME : When it is reached ?
 	if (!unit->Player) {
 		AssignUnitToPlayer (unit, player);
 		UpdateForNewUnit(unit, 0);
@@ -892,25 +902,11 @@ static int CclUnit(lua_State* l)
 	}
 
 	// Place on map
-	if (!unit->Removed && !unit->Destroyed && !unit->Type->Vanishes) {
+	if (!unit->Removed) {
 		unit->Removed = 1;
 		PlaceUnit(unit, unit->X, unit->Y);
 	}
 
-	if (unit->UnitSlot && (unit->Destroyed || unit->Orders->Action == UnitActionDie)) {
-		UnitCacheRemove(unit);
-		UnitCacheInsert(unit);
-		UnitCountSeen(unit);
-	}
-
-	// Units Dieing may have sight
-	if (unit->Removed && unit->Orders[0].Action == UnitActionDie) {
-		MapMarkUnitSight(unit);
-	}
-
-/* if (unit->Moving) {
-		NewResetPath(unit);
-	}*/
 	// Fix Colors for rescued units.
 	if (unit->RescuedFrom) {
 		unit->Colors = &unit->RescuedFrom->UnitColors;
