@@ -3447,9 +3447,9 @@ static void GameDrawFunc(Menuitem* mi __attribute__((unused)))
 }
 
 /**
-** Menu setup race pulldown action.
+**  Menu setup race pulldown action.
 **
-** @note FIXME: Todo support more and other races.
+**  @note 0 is default-race.
 */
 static void GameRCSAction(Menuitem* mi, int i)
 {
@@ -3459,13 +3459,13 @@ static void GameRCSAction(Menuitem* mi, int i)
 	if (mi->D.Pulldown.curopt == i) {
 		for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
 			if (PlayerRaces.Visible[n]) {
-				if (x == i) {
+				if (x + 1 == i) {
 					break;
 				}
 				++x;
 			}
 		}
-		if (n != PlayerRaces.Count) {
+		if (i != 0) {
 			GameSettings.Presets[0].Race = PlayerRaces.Race[x];
 		} else {
 			GameSettings.Presets[0].Race = SettingsPresetMapDefault;
@@ -3681,13 +3681,13 @@ static void NetworkGamePrepareGameSettings(void)
 				v -= ServerSetupState.Race[num[i]];
 				for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
 					if (PlayerRaces.Visible[n]) {
-						if (x == v) {
+						if (x + 1 == v) {
 							break;
 						}
 						++x;
 					}
 				}
-				if (n != PlayerRaces.Count) {
+				if (v != 0) {
 					GameSettings.Presets[num[i]].Race = PlayerRaces.Race[x];
 				}
 				break;
