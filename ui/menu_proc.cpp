@@ -108,7 +108,6 @@ global Menu *FindMenu(const char *menu_id)
     Menu **menu;
 
     if (!(menu = (Menu **) hash_find(MenuHash, (char *)menu_id))) {
-	DebugLevel0Fn("Menu `%s' not found, probably a bug.\n" _C_ menu_id);
 	return NULL;
     } else {
 	return *menu;
