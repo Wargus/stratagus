@@ -67,8 +67,8 @@ global int NoRescueCheck;		/// Disable rescue check
 **	Colors used for minimap.	FIXME: make this configurable
 */
 #ifdef USE_SDL_SURFACE
-global SDL_Color PlayerColorsRGB[PlayerMax];
-global SDL_Color PlayerColors[PlayerMax];
+local SDL_Color PlayerColorsRGB[PlayerMax];
+global Uint32 PlayerColors[PlayerMax];
 #else
 global VMemType PlayerColorsRGB[PlayerMax];
 global VMemType PlayerColors[PlayerMax];
@@ -167,7 +167,7 @@ global void InitPlayers(void)
 	    Players[p].Type = PlayerNobody;
 	}
 #ifdef USE_SDL_SURFACE
-	PlayerColors[p] = VideoMapRGB(PlayerColorsRGB[p].r,
+	PlayerColors[p] = SDL_MapRGB(TheScreen->format, PlayerColorsRGB[p].r,
 	    PlayerColorsRGB[p].g, PlayerColorsRGB[p].b);
 #else
 	PlayerColors[p] = VideoMapRGB(PlayerColorsRGB[p].D24.a,

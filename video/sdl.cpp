@@ -265,6 +265,17 @@ global void InitVideoSdl(void)
     InitOpenGL();
 #endif
 
+#ifdef USE_SDL_SURFACE
+    ColorBlack = SDL_MapRGB(TheScreen->format, 0, 0, 0);
+    ColorDarkGreen = SDL_MapRGB(TheScreen->format, 48, 100, 4);
+    ColorBlue = SDL_MapRGB(TheScreen->format, 0, 0, 252);
+    ColorOrange = SDL_MapRGB(TheScreen->format, 248, 140, 20);
+    ColorWhite = SDL_MapRGB(TheScreen->format, 252, 248, 240);
+    ColorGray = SDL_MapRGB(TheScreen->format, 128, 128, 128);
+    ColorRed = SDL_MapRGB(TheScreen->format, 252, 0, 0);
+    ColorGreen = SDL_MapRGB(TheScreen->format, 0, 252, 0);
+    ColorYellow = SDL_MapRGB(TheScreen->format, 252, 252, 0);
+#else
     ColorBlack = VideoMapRGB(0, 0, 0);
     ColorDarkGreen = VideoMapRGB(48, 100, 4);
     ColorBlue = VideoMapRGB(0, 0, 252);
@@ -274,6 +285,7 @@ global void InitVideoSdl(void)
     ColorRed = VideoMapRGB(252, 0, 0);
     ColorGreen = VideoMapRGB(0, 252, 0);
     ColorYellow = VideoMapRGB(252, 252, 0);
+#endif
 
     DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
 
@@ -782,18 +794,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 #endif
 }
 
-#ifdef USE_SDL_SURFACE
-global SDL_Color VideoMapRGB(int r, int g, int b)
-{
-    SDL_Color c;
-
-    c.r = r;
-    c.g = g;
-    c.b = b;
-
-    return c;
-}
-#else
+#ifndef USE_SDL_SURFACE
 /**
 **	Maps RGB to a hardware dependent pixel.
 **

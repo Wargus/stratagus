@@ -283,7 +283,8 @@ global void UpdateMinimap(void)
     int h;
     int h0;
     int visiontype; // 0 unexplored, 1 explored, >1 visible.
-    SDL_Color color;
+    SDL_Color c;
+    Uint32 color;
 
     red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
     if (red_phase_changed) {
@@ -333,7 +334,10 @@ global void UpdateMinimap(void)
 	if (!BuildingVisibleOnMap(*table) && (*table)->SeenState != 3
 		&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
 	    if( (*table)->Player->Player == PlayerNumNeutral ) {
-		color = (*table)->Type->NeutralMinimapColorRGB;
+		color = SDL_MapRGB(TheScreen->format,
+		    (*table)->Type->NeutralMinimapColorRGB.r,
+		    (*table)->Type->NeutralMinimapColorRGB.g,
+		    (*table)->Type->NeutralMinimapColorRGB.b);
 	    } else {
 		color = (*table)->Player->Color;
 	    }
@@ -351,8 +355,9 @@ global void UpdateMinimap(void)
 	    while (w-- >= 0) {
 		h = h0;
 		while (h-- >= 0) {
+		    SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
 		    ((Uint8*)MinimapSurface)[mx + w + (my + h) * TheUI.MinimapW] = 
-			SDL_MapRGB(MinimapSurface->format, color.r, color.g, color.b);
+			SDL_MapRGB(MinimapSurface->format, c.r, c.g, c.b);
 		}
 	    }
 	}
@@ -384,7 +389,10 @@ global void UpdateMinimap(void)
 	//  FIXME: We should force unittypes to have a certain color on the minimap.
 	//
 	if (unit->Player->Player == PlayerNumNeutral) {
-	    color = (*table)->Type->NeutralMinimapColorRGB;
+	    color = SDL_MapRGB(TheScreen->format,
+		(*table)->Type->NeutralMinimapColorRGB.r,
+		(*table)->Type->NeutralMinimapColorRGB.g,
+		(*table)->Type->NeutralMinimapColorRGB.b);
 	} else if (unit->Player == ThisPlayer) {
 	    if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 		    (red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
@@ -411,8 +419,9 @@ global void UpdateMinimap(void)
 	while (w-- >= 0) {
 	    h = h0;
 	    while (h-- >= 0) {
+		SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
 		((Uint8*)MinimapSurface->pixels)[mx + w + (my + h) * TheUI.MinimapW] = 
-		    SDL_MapRGB(MinimapSurface->format, color.r, color.g, color.b);
+		    SDL_MapRGB(MinimapSurface->format, c.r, c.g, c.b);
 	    }
 	}
     }

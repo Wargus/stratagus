@@ -233,7 +233,7 @@ typedef struct _ui_ {
     // Completed bar
 #ifdef USE_SDL_SURFACE
     SDL_Color	CompletedBarColorRGB;	/// color for completed bar
-    SDL_Color	CompletedBarColor;	/// color for completed bar
+    Uint32	CompletedBarColor;	/// color for completed bar
 #else
     VMemType	CompletedBarColorRGB;	/// color for completed bar
     VMemType	CompletedBarColor;	/// color for completed bar
@@ -290,7 +290,7 @@ typedef struct _ui_ {
     int		MinimapPosY;		/// minimap screen Y position
     int		MinimapTransparent;     /// unexplored areas are transparent
 #ifdef USE_SDL_SURFACE
-    SDL_Color	ViewportCursorColor;	/// minimap cursor color
+    Uint32	ViewportCursorColor;	/// minimap cursor color
 #else
     VMemType	ViewportCursorColor;	/// minimap cursor color
 #endif

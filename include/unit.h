@@ -718,7 +718,7 @@ extern char RevealAttacker;		/// Config: reveal attacker enabled
 extern const Viewport* CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const Unit*);
 #ifdef USE_SDL_SURFACE
-extern void (*DrawSelection)(SDL_Color, int, int, int, int);
+extern void (*DrawSelection)(Uint32, int, int, int, int);
 #else
 extern void (*DrawSelection)(VMemType, int, int, int, int);
 #endif
@@ -909,17 +909,17 @@ extern void DeadCacheRemove(Unit* unit, Unit** List);
 //--------------------
 #ifdef USE_SDL_SURFACE
     /// Draw nothing around unit
-extern void DrawSelectionNone(SDL_Color, int, int, int, int);
+extern void DrawSelectionNone(Uint32, int, int, int, int);
     /// Draw circle around unit
-extern void DrawSelectionCircle(SDL_Color, int, int, int, int);
+extern void DrawSelectionCircle(Uint32, int, int, int, int);
     /// Draw circle filled with alpha around unit
-extern void DrawSelectionCircleWithTrans(SDL_Color, int, int, int, int);
+extern void DrawSelectionCircleWithTrans(Uint32, int, int, int, int);
     /// Draw rectangle around unit
-extern void DrawSelectionRectangle(SDL_Color, int, int, int, int);
+extern void DrawSelectionRectangle(Uint32, int, int, int, int);
     /// Draw rectangle filled with alpha around unit
-extern void DrawSelectionRectangleWithTrans(SDL_Color, int, int, int, int);
+extern void DrawSelectionRectangleWithTrans(Uint32, int, int, int, int);
     /// Draw corners around unit
-extern void DrawSelectionCorners(SDL_Color, int, int, int, int);
+extern void DrawSelectionCorners(Uint32, int, int, int, int);
 #else
     /// Draw nothing around unit
 extern void DrawSelectionNone(VMemType, int, int, int, int);

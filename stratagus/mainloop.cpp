@@ -519,7 +519,7 @@ global void DrawMapArea(void)
     //
     for (vp = TheUI.Viewports; vp < evp; ++vp) {
 #ifdef USE_SDL_SURFACE
-	SDL_Color color;
+	Uint32 color;
 #else
 	VMemType color;
 #endif

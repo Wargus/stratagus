@@ -934,7 +934,7 @@ global void ShowPicture(CampaignChapter* chapter)
 **	Draw a box with the text inside
 */
 #ifdef USE_SDL_SURFACE
-local void DrawStatBox(int x, int y, char* text, SDL_Color color, int percent)
+local void DrawStatBox(int x, int y, char* text, Uint32 color, int percent)
 #else
 local void DrawStatBox(int x, int y, char* text, VMemType color, int percent)
 #endif

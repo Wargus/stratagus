@@ -81,7 +81,7 @@ local void UiDrawLifeBar(const Unit* unit, int x, int y)
 {
     int f;
 #ifdef USE_SDL_SURFACE
-    SDL_Color color;
+    Uint32 color;
 #else
     VMemType color;
 #endif
