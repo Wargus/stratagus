@@ -8,15 +8,15 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name compression.h	-	The compression functions header file. */
+/**@name iolib.h	-	The iolib functions header file. */
 /*
 **	(c) Copyright 2000 by Andreas Arens
 **
 **	$Id$
 */
 
-#ifndef __COMPRESSION_H__
-#define __COMPRESSION_H__
+#ifndef __IOLIB_H__
+#define __IOLIB_H__
 
 //@{
 
@@ -83,4 +83,4 @@ extern int CLseek(CLFile *file, long offset, int whence); ///  Library file seek
 
 //@}
 
-#endif	// !__COMPRESSION_H__
+#endif	// !__IOLIB_H__
