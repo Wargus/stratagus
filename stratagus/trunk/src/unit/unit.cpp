@@ -381,11 +381,13 @@ global void AssignUnitToPlayer(Unit *unit, Player *player)
     //
     if (player && !type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
 	unit->PlayerSlot=player->Units+player->TotalNumUnits++;
-	if( type->Building ) {
-	    player->TotalBuildings++;
-	}
-	else {
-	    player->TotalUnits++;
+	if( type->_HitPoints!=0 ) {
+	    if( type->Building ) {
+		player->TotalBuildings++;
+	    }
+	    else {
+		player->TotalUnits++;
+	    }
 	}
 	*unit->PlayerSlot=unit;
 
@@ -1696,11 +1698,13 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     //	Insert into new player table.
 
     unit->PlayerSlot=newplayer->Units+newplayer->TotalNumUnits++;
-    if( unit->Type->Building ) {
-	newplayer->TotalBuildings++;
-    }
-    else {
-	newplayer->TotalUnits++;
+    if( unit->Type->_HitPoints!=0 ) {
+	if( unit->Type->Building ) {
+	    newplayer->TotalBuildings++;
+	}
+	else {
+	    newplayer->TotalUnits++;
+	}
     }
     *unit->PlayerSlot=unit;
 
