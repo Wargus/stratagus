@@ -50,6 +50,29 @@ local int MapOffsetY;			/// Offset Y for combined maps
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+/*============================================================================
+==	Simple Helper
+============================================================================*/
+
+/**
+**	Checksum a memory area using a simple hash
+**
+**	@param adr	Address of data
+**	@param length	length of area
+*/
+local unsigned int ChksumArea(const unsigned char* adr,int length)
+{
+    unsigned int res = 0U;
+    unsigned int rem = 0;
+
+    while (length--) {
+	rem = res & 0xff000000;
+	res <<= 8;
+	res += *adr++;
+	res |= (rem >> 24);
+    }
+    return res;
+}
 
 /*============================================================================
 ==	Convert
@@ -296,6 +319,8 @@ global PudInfo* GetPudInfo(const char* pud)
     char header[5];
     char buf[1024];
     PudInfo* info;
+    unsigned short temp_short;
+    // FIXME: Reuse the temporary alloca buffer...
 
     if( !(input=CLopen(pud)) ) {
 	sprintf(buf, "pud: CLopen(%s)", pud);
@@ -320,7 +345,7 @@ global PudInfo* GetPudInfo(const char* pud)
 	exit(-1);
     }
 
-    info=calloc(1, sizeof(PudInfo));
+    info=calloc(1, sizeof(PudInfo));	// clears with 0
     if (!info) {
 	return NULL;
     }
@@ -331,6 +356,8 @@ global PudInfo* GetPudInfo(const char* pud)
     while( PudReadHeader(input,header,&length) ) {
 	DebugLevel3("\tSection: %4.4s\n",header);
 
+	info->PudUID += ChksumArea(header, 4);
+
 	//
 	//	PUD version
 	//
@@ -340,6 +367,8 @@ global PudInfo* GetPudInfo(const char* pud)
 
 		v=PudReadWord(input);
 		DebugLevel3("\tVER: %d.%d\n",(v&0xF0)>>4,v&0xF);
+		buf[0] = v & 0xFF;
+		info->PudUID += ChksumArea(buf, 1);
 		continue;
 	    }
 	    DebugLevel1("Wrong version length\n");
@@ -353,6 +382,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
+	    info->PudUID += ChksumArea(buf, length);
 	    info->Description=strdup(buf);
 	    continue;
 	}
@@ -367,6 +397,8 @@ global PudInfo* GetPudInfo(const char* pud)
 
 		for( i=0; i<16; ++i ) {
 		    p=PudReadByte(input);
+		    buf[0] = p & 0xFF;
+		    info->PudUID += ChksumArea(buf, 1);
 		    info->PlayerType[i]=p;
 		}
 		continue;
@@ -403,6 +435,8 @@ global PudInfo* GetPudInfo(const char* pud)
 		}
 		info->MapTerrainName=TilesetWcNames[t];
 		info->MapTerrain=t;
+		buf[0] = t & 0xFF;
+		info->PudUID += ChksumArea(buf, 1);
 		continue;
 	    } else {
 		DebugLevel1("Wrong terrain type length\n");
@@ -417,6 +451,11 @@ global PudInfo* GetPudInfo(const char* pud)
 
 	    info->MapWidth=PudReadWord(input);
 	    info->MapHeight=PudReadWord(input);
+	    buf[0] = info->MapWidth & 0xFF;
+	    buf[1] = (info->MapWidth >> 8) & 0xFF;
+	    buf[2] = info->MapHeight & 0xFF;
+	    buf[3] = (info->MapHeight >> 8) & 0xFF;
+	    info->PudUID += ChksumArea(buf, 4);
 	    continue;
 	}
 
@@ -427,21 +466,21 @@ global PudInfo* GetPudInfo(const char* pud)
 	    char* bufp;
 
 	    length-=2;
-	    if( PudReadWord(input) ) {
-		DebugLevel3("\tUsing default data\n");
-		CLseek(input,length,SEEK_CUR);
-	    } else {
-		if( length<sizeof(buf) ) {
-		    bufp=buf;
-		} else if( !(bufp=alloca(length)) ) {
-		    perror("alloca()");
-		    exit(-1);
-		}
-		if( CLread(input,bufp,length)!=length ) {
-		    perror("CLread()");
-		    exit(-1);
-		}
+	    temp_short = PudReadWord(input);
+	    buf[0] = temp_short & 0xFF;
+	    buf[1] = (temp_short >> 8) & 0xFF;
+	    info->PudUID += ChksumArea(buf, 2);
+	    if( length<sizeof(buf) ) {
+		bufp=buf;
+	    } else if( !(bufp=alloca(length)) ) {
+		perror("alloca()");
+		exit(-1);
 	    }
+	    if( CLread(input,bufp,length)!=length ) {
+		perror("CLread()");
+		exit(-1);
+	    }
+	    info->PudUID += ChksumArea(bufp, length);
 	    continue;
 	}
 
@@ -461,6 +500,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
+	    info->PudUID += ChksumArea(bufp, length);
 	    continue;
 	}
 
@@ -471,21 +511,21 @@ global PudInfo* GetPudInfo(const char* pud)
 	    char* bufp;
 
 	    length-=2;
-	    if( PudReadWord(input) ) {
-		DebugLevel3("\tUsing default data\n");
-		CLseek(input,length,SEEK_CUR);
-	    } else {
-		if( length<sizeof(buf) ) {
-		    bufp=buf;
-		} else if( !(bufp=alloca(length)) ) {
-		    perror("alloca()");
-		    exit(-1);
-		}
-		if( CLread(input,bufp,length)!=length ) {
-		    perror("CLread()");
-		    exit(-1);
-		}
+	    temp_short = PudReadWord(input);
+	    buf[0] = temp_short & 0xFF;
+	    buf[1] = (temp_short >> 8) & 0xFF;
+	    info->PudUID += ChksumArea(buf, 2);
+	    if( length<sizeof(buf) ) {
+		bufp=buf;
+	    } else if( !(bufp=alloca(length)) ) {
+		perror("alloca()");
+		exit(-1);
 	    }
+	    if( CLread(input,bufp,length)!=length ) {
+		perror("CLread()");
+		exit(-1);
+	    }
+	    info->PudUID += ChksumArea(bufp, length);
 	    continue;
 	}
 
@@ -499,6 +539,8 @@ global PudInfo* GetPudInfo(const char* pud)
 
 		for( i=0; i<16; ++i ) {
 		    v=PudReadByte(input);
+		    buf[0] = v & 0xFF;
+		    info->PudUID += ChksumArea(buf, 1);
 		    switch( v ) {
 			case PlayerRaceHuman:
 			case PlayerRaceOrc:
@@ -527,6 +569,9 @@ global PudInfo* GetPudInfo(const char* pud)
 
 		for( i=0; i<16; ++i ) {
 		    v=PudReadWord(input);
+		    buf[0] = v & 0xFF;
+		    buf[1] = (v >> 8) & 0xFF;
+		    info->PudUID += ChksumArea(buf, 2);
 		    info->PlayerGold[i]=v;
 		}
 		continue;
@@ -545,6 +590,9 @@ global PudInfo* GetPudInfo(const char* pud)
 
 		for( i=0; i<16; ++i ) {
 		    v=PudReadWord(input);
+		    buf[0] = v & 0xFF;
+		    buf[1] = (v >> 8) & 0xFF;
+		    info->PudUID += ChksumArea(buf, 2);
 		    info->PlayerWood[i]=v;
 		}
 		continue;
@@ -563,6 +611,9 @@ global PudInfo* GetPudInfo(const char* pud)
 
 		for( i=0; i<16; ++i ) {
 		    v=PudReadWord(input);
+		    buf[0] = v & 0xFF;
+		    buf[1] = (v >> 8) & 0xFF;
+		    info->PudUID += ChksumArea(buf, 2);
 		    info->PlayerOil[i]=v;
 		}
 		continue;
@@ -583,6 +634,8 @@ global PudInfo* GetPudInfo(const char* pud)
 
 		for( i=0; i<16; ++i ) {
 		    v=PudReadByte(input);
+		    buf[0] = v & 0xFF;
+		    info->PudUID += ChksumArea(buf, 1);
 		    info->PlayerAi[i]=v;
 		}
 		continue;
@@ -613,6 +666,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
+	    info->PudUID += ChksumArea((unsigned char *)mtxm, length);
 
 	    continue;
 	}
@@ -631,6 +685,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
+	    info->PudUID += ChksumArea((unsigned char *)sqm, length);
 
 	    continue;
 	}
@@ -649,6 +704,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
+	    info->PudUID += ChksumArea((unsigned char *)regm, length);
 
 	    continue;
 	}
@@ -671,6 +727,16 @@ global PudInfo* GetPudInfo(const char* pud)
 		v=PudReadWord(input);
 
 		length-=8;
+
+		buf[0] = x & 0xFF;
+		buf[1] = (x >> 8) & 0xFF;
+		buf[2] = y & 0xFF;
+		buf[3] = (y >> 8) & 0xFF;
+		buf[4] = t & 0xFF;
+		buf[5] = o & 0xFF;
+		buf[6] = v & 0xFF;
+		buf[7] = (v >> 8) & 0xFF;
+		info->PudUID += ChksumArea(buf, 8);
 	    }
 	    continue;
 	}

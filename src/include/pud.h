@@ -89,6 +89,7 @@ typedef struct _pud_info_ {
     int		PlayerWood[16];		/// Same player->Wood
     int		PlayerOil[16];		/// Same player->Oil
     int		PlayerAi[16];		/// Same player->Ai
+    unsigned int PudUID;		/// Unique pud ID (hash)
 } PudInfo;
 
 /*----------------------------------------------------------------------------
