@@ -846,6 +846,8 @@ global void DrawMenu(Menu *menu)
     int i;
     int n;
     int l;
+    int nc;
+    int rc;
     Menuitem *mi;
     Menuitem *mip;
 
@@ -925,6 +927,13 @@ global void DrawMenu(Menu *menu)
 	    case MI_TYPE_TEXT:
 		if (!mi->d.text.text)
 		    break;
+		GetDefaultTextColors(&nc, &rc);
+		if (mi->flags&MenuButtonActive && mi->d.text.action) {
+		    VideoDrawRectangleClip(ColorGray,menu->x+mi->xofs-4,menu->y+mi->yofs-4,
+					    VideoTextLength(mi->font, mi->d.text.text)+5,
+					    VideoTextHeight(mi->font)+5);
+		    SetDefaultTextColors(rc,rc);
+		}
 		if (mi->d.text.tflags&MI_TFLAGS_CENTERED)
 		    VideoDrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
@@ -935,6 +944,7 @@ global void DrawMenu(Menu *menu)
 		} else
 		    VideoDrawText(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
+		SetDefaultTextColors(nc, rc);
 		break;
 	    case MI_TYPE_BUTTON:
 		DrawMenuButton(mi->d.button.button,mi->flags,
@@ -1466,6 +1476,22 @@ local void MenuHandleMouseMove(int x,int y)
 	    mi = menu->items + i;
 	    if (!(mi->flags&MenuButtonDisabled)) {
 		switch (mi->mitype) {
+		    case MI_TYPE_TEXT:
+			if (!mi->d.text.text)
+			    continue;
+			xs = menu->x + mi->xofs;
+			ys = menu->y + mi->yofs;
+			if (x < xs - 4 || x > xs + VideoTextLength(mi->font, mi->d.text.text)+5
+			    || y < ys - 4 || y > ys + VideoTextHeight(mi->font)+5) {
+			    if (!(mi->flags&MenuButtonClicked)) {
+				if (mi->flags&MenuButtonActive) {
+				    redraw_flag = 1;
+				    mi->flags &= ~MenuButtonActive;
+				}
+			    }
+			    continue;
+			}
+			break;			
 		    case MI_TYPE_GEM:
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
@@ -1679,6 +1705,7 @@ local void MenuHandleMouseMove(int x,int y)
 		    case MI_TYPE_LISTBOX:
 		    case MI_TYPE_VSLIDER:
 		    case MI_TYPE_HSLIDER:
+		    case MI_TYPE_TEXT:
 			if (!(mi->flags&MenuButtonActive)) {
 			    redraw_flag = 1;
 			    mi->flags |= MenuButtonActive;
@@ -1757,6 +1784,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    case MI_TYPE_VSLIDER:
 		    case MI_TYPE_HSLIDER:
 		    case MI_TYPE_INPUT:
+		    case MI_TYPE_TEXT:
 			if (MenuButtonCurSel != -1) {
 			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
 			}
@@ -1919,6 +1947,18 @@ local void MenuHandleButtonUp(unsigned b)
 			    }
 			    if (mi->d.gem.action) {
 				(*mi->d.gem.action)(mi);
+			    }
+			}
+		    }
+		    break;
+		case MI_TYPE_TEXT:
+		    if (mi->flags&MenuButtonClicked) {
+			redraw_flag = 1;
+			mi->flags &= ~MenuButtonClicked;
+			if (MenuButtonUnderCursor == i) {
+			    MenuButtonUnderCursor = -1;
+			    if (mi->d.text.action) {
+				(*mi->d.text.action)(mi);
 			    }
 			}
 		    }

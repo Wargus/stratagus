@@ -141,6 +141,7 @@ local void GlobalOptionsFogAlphaGem(Menuitem *mi);
 local void TipsInit(Menuitem *mi);
 local void TipsExit(Menuitem *mi);
 local void TipsShowTipsGem(Menuitem *mi);
+local void TipsShowTipsText(Menuitem *mi);
 local void TipsNextTip(void);
 local void TipsPreviousTip(void);
 
@@ -516,6 +517,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(TipsInit,"tips-init");
     HASHADD(TipsExit,"tips-exit");
     HASHADD(TipsShowTipsGem,"tips-show-tips-gem");
+    HASHADD(TipsShowTipsText,"tips-show-tips-text");
     HASHADD(TipsNextTip,"tips-next-tip");
     HASHADD(TipsPreviousTip,"tips-previous-tip");
 
@@ -2549,6 +2551,21 @@ local void TipsShowTipsGem(Menuitem *mi)
     } else {
 	ShowTips = 0;
     }
+}
+
+/**
+**	Show tips at startup text callback
+*/
+local void TipsShowTipsText(Menuitem *mi)
+{
+    if (mi->menu->items[1].d.gem.state == MI_GSTATE_UNCHECKED) {
+	ShowTips = 1;
+	mi->menu->items[1].d.gem.state = MI_GSTATE_CHECKED;
+    } else {
+	ShowTips = 0;
+	mi->menu->items[1].d.gem.state = MI_GSTATE_UNCHECKED;
+    }
+    MustRedraw |= RedrawMenu;
 }
 
 /**
