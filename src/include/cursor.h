@@ -81,7 +81,7 @@
 **	CursorType::Graphic
 **
 **		Contains the sprite of the cursor, loaded from CursorType::File.
-**		Multicolor image with alpha or transparency.
+**		This can be a multicolor image with alpha or transparency.
 */
 
 /**
@@ -143,6 +143,13 @@ typedef struct _cursor_config_ {
     CursorType*	Cursor;			/// cursor-type pointer
 } CursorConfig;
 
+    /// Cursor state
+typedef enum _cursor_states_ {
+    CursorStatePoint,			/// normal cursor
+    CursorStateSelect,			/// select position
+    CursorStateRectangle,		/// rectangle selecting
+} CursorStates;
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -150,7 +157,7 @@ typedef struct _cursor_config_ {
 extern const char CursorTypeType[];	/// cursor-type type
 extern CursorType* Cursors;		/// cursor-types description
 
-extern enum CursorState_e CursorState;	/// cursor state
+extern CursorStates CursorState;	/// current cursor state (point,...)
 extern int CursorAction;		/// action for selection
 extern int CursorValue;			/// value for action (spell type f.e.)
 extern UnitType* CursorBuilding;	/// building cursor
@@ -165,15 +172,13 @@ extern int OldCursorX;			/// saved cursor position on screen X
 extern int OldCursorY;			/// saved cursor position on screen Y
 extern int OldCursorW;			/// saved cursor width in pixel
 extern int OldCursorH;			/// saved cursor height in pixel
-extern int OldCursorSize;		/// size of saved cursor image
-extern void* OldCursorImage;		/// background saved behind cursor
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
     /// Load all cursors
-extern void LoadCursors(unsigned int race);
+extern void LoadCursors(const char* racename);
 
     /// Cursor-type by identifier
 extern CursorType* CursorTypeByIdent(const char* ident);
@@ -194,7 +199,11 @@ extern void DrawAnyCursor(void);
 extern int HideAnyCursor(void);
 
     /// Initialize the cursor module
-extern void InitCursor(void);
+extern void InitCursors(void);
+    /// Save the cursor definitions
+extern void SaveCursors(FILE*);
+    /// Cleanup the cursor module
+extern void CleanCursors(void);
 
 //@}
 
