@@ -176,7 +176,7 @@ local int NetworkSendResend;		/// Packets send to resend
 global void NetworkBroadcast(const void *buf, int len)
 {
     int i;
-#if 1
+#if 0
     //
     //	Can be enabled to simulate network delays.
     //
@@ -1022,7 +1022,7 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 	    ply=ntohs(ncq->Data.X)<<16;
 	    ply|=ntohs(ncq->Data.Y);
 	    if( ply!=NetworkSyncSeeds[FrameCounter&0xFF] ) {
-		DebugLevel0Fn("\nNetwork out of sync!\n\n");
+		DebugLevel0Fn("\n\aNetwork out of sync!\n\n");
 	    }
 	    return;
 	case MessageChat:
