@@ -1180,7 +1180,7 @@ global UnitType UnitTypes[] = {
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        2,      6,      4
+	,     1,    1,    31,     31,        1,      6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1217,7 +1217,7 @@ global UnitType UnitTypes[] = {
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        2,      6,      4
+	,     1,    1,    31,     31,        1,      6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
