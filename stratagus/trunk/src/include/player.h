@@ -108,6 +108,7 @@ struct _player_ {
     unsigned	FoodUnitLimit;		/// # food units allowed
     unsigned	BuildingLimit;		/// # buildings allowed
     unsigned	TotalUnitLimit;		/// # total unit number allowed
+    unsigned	LastRepairResource;	/// last resource for repair cycles
 
     unsigned	Score;			/// points for killing ...
 
