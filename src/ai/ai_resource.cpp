@@ -1147,13 +1147,15 @@ local int AiRepairUnit(Unit* unit)
 */
 local void AiCheckRepair(void)
 {
-    int i;
+    int i,j;
     int n;
+    int repair_flag;
     Unit* unit;
 
     n=AiPlayer->Player->TotalNumUnits;
     for( i=0; i<n; ++i ) {
 	unit=AiPlayer->Player->Units[i];
+	repair_flag=1;
 	// Unit defekt?
 	if( unit->Type->Building 
 		&& unit->Orders[0].Action!=UnitActionBuilded
@@ -1165,7 +1167,17 @@ local void AiCheckRepair(void)
 	    //	Find a free worker, who can build this building can repair it?
 	    //
 	    // FIXME: must check, if there are enough resources
-	    AiRepairUnit(unit);
+	    for( j=1; j<MaxCosts; ++j ) {
+		if( unit->Stats->Costs[j]
+			&& AiPlayer->Player->Resources[j]<99 ) {
+		    repair_flag=0;
+		// } else {
+		//   repair_flag&=1;
+		}
+	    }
+	    if ( repair_flag ) {
+		AiRepairUnit(unit);
+	    }
 	}
     }
 }
@@ -1196,7 +1208,7 @@ global void AiAddUnitTypeRequest(UnitType* type,int count)
 }
 
 /**
-**	Entry point of resource manager, perodic called.
+**	Entry point of resource manager, periodically called.
 */
 global void AiResourceManager(void)
 {
