@@ -139,7 +139,7 @@ global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 	oldx = x;
 	oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSub(graphic, gx + x - oldx, gy + oldy - y, w, h, x, y);
+	VideoDrawSub(graphic, gx + x - oldx, gy + y - oldy, w, h, x, y);
 }
 
 /**
