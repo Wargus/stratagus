@@ -86,7 +86,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global SDL_Surface *Screen;		/// Internal screen
+global SDL_Surface* Screen;		/// Internal screen
 global int InMainWindow = 1;		/// Cursor inside stratagus window
 
 local int FrameTicks;			/// Frame length in ms
@@ -112,7 +112,7 @@ global void SetVideoSync(void)
 {
     int ms;
 
-    if( VideoSyncSpeed ) {
+    if (VideoSyncSpeed) {
 	ms = (1000 * 1000 / CYCLES_PER_SECOND) / VideoSyncSpeed;
     } else {
 	ms = INT_MAX;
@@ -141,12 +141,12 @@ local void InitOpenGL(void)
     glViewport(0, 0, (GLsizei)VideoWidth, (GLsizei)VideoHeight);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0,VideoWidth,0,VideoHeight,-1,1);
+    glOrtho(0, VideoWidth, 0, VideoHeight, -1, 1);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearDepth(1.0f);
     glShadeModel(GL_FLAT);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -162,9 +162,9 @@ global void InitVideoSdl(void)
 
     //	Initialize the SDL library
 
-    if( SDL_WasInit(SDL_INIT_VIDEO) == 0 ) {
+    if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 
-	if ( SDL_Init(
+	if (SDL_Init(
 #ifdef USE_SDLA
 	    // FIXME: doesn't work with SDL SVGAlib
 	    SDL_INIT_AUDIO |
@@ -172,7 +172,7 @@ global void InitVideoSdl(void)
 #ifdef DEBUG
 	    SDL_INIT_NOPARACHUTE|
 #endif
-	    SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0 ) {
+	    SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 ) {
 	    fprintf(stderr,"Couldn't initialize SDL: %s\n", SDL_GetError());
 	    exit(1);
 	}
@@ -183,16 +183,16 @@ global void InitVideoSdl(void)
 
 	// Set WindowManager Title
 
-	SDL_WM_SetCaption("Stratagus","Stratagus");
+	SDL_WM_SetCaption("Stratagus", "Stratagus");
     } else {
-	if( VideoBpp == 32 && VideoDepth == 24 ) {
+	if (VideoBpp == 32 && VideoDepth == 24) {
 	    VideoDepth = 0;
 	}
     }
 
     // Initialize the display
 
-    if( !VideoWidth ) {
+    if (!VideoWidth) {
 	VideoWidth = DEFAULT_VIDEO_WIDTH;
 	VideoHeight = DEFAULT_VIDEO_HEIGHT;
     }
@@ -200,7 +200,7 @@ global void InitVideoSdl(void)
     flags = 0;
     // Sam said: better for windows.
     /* SDL_HWSURFACE|SDL_HWPALETTE | */
-    if( VideoFullScreen ) {
+    if (VideoFullScreen) {
 	flags |= SDL_FULLSCREEN;
     }
 #ifdef USE_OPENGL
@@ -208,17 +208,17 @@ global void InitVideoSdl(void)
 #endif
     Screen = SDL_SetVideoMode(VideoWidth, VideoHeight, VideoDepth, flags);
 
-    if ( Screen == NULL ) {
-	fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n"
-		,VideoWidth,VideoHeight,VideoDepth,SDL_GetError());
+    if (Screen == NULL) {
+	fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
+	    VideoWidth, VideoHeight, VideoDepth, SDL_GetError());
 	exit(1);
     }
 
-    IfDebug(
-	if( SDL_MUSTLOCK(Screen) ) {
-	    DebugLevel0Fn("Must locksurface!\n");
-	}
-    );
+#ifdef DEBUG
+    if (SDL_MUSTLOCK(Screen)) {
+	DebugLevel0Fn("Must locksurface!\n");
+    }
+#endif
 
     // Turn cursor off, we use our own.
     SDL_ShowCursor(0);
@@ -231,27 +231,24 @@ global void InitVideoSdl(void)
     //	You see it's better making all self, than using wired libaries :)
     //  And with the win32 version this also doesn't work
     //
-    if( !VideoDepth ) {
+    if (!VideoDepth) {
 	int i;
 	int j;
 
-	DebugLevel3Fn("Mask R%x G%x B%x\n"
-		_C_ Screen->format->Rmask
-		_C_ Screen->format->Gmask
-		_C_ Screen->format->Bmask);
+	DebugLevel3Fn("Mask R%x G%x B%x\n" _C_
+	    Screen->format->Rmask _C_
+	    Screen->format->Gmask _C_
+	    Screen->format->Bmask);
 
-	if( Screen->format->BitsPerPixel>8 ) {
-	    j=Screen->format->Rmask;
-	    j|=Screen->format->Gmask;
-	    j|=Screen->format->Bmask;
+	if (Screen->format->BitsPerPixel > 8) {
+	    j = Screen->format->Rmask | Screen->format->Gmask |
+		Screen->format->Bmask;
 
-
-	    for( i=0; j&(1<<i); ++i ) {
+	    for (i = 0; j & (1 << i); ++i) {
 	    }
-
-	    VideoDepth=i;
+	    VideoDepth = i;
 	} else {
-	    VideoDepth=Screen->format->BitsPerPixel;
+	    VideoDepth = Screen->format->BitsPerPixel;
 	}
     }
 
@@ -275,32 +272,32 @@ global void InitVideoSdl(void)
 **	@param w	width of rectangle in pixels.
 **	@param h	height of rectangle in pixels.
 */
-global void InvalidateArea(int x,int y,int w,int h)
+global void InvalidateArea(int x, int y, int w, int h)
 {
 #ifndef USE_OPENGL
     // FIXME: This checks should be done at higher level
     // FIXME: did SDL version >1.1, check this now also?
-    if( x<0 ) {
-	w+=x;
-	x=0;
+    if (x < 0) {
+	w += x;
+	x = 0;
     }
-    if( x+w>=VideoWidth ) {
-	w=VideoWidth-x;
+    if (x + w >= VideoWidth) {
+	w = VideoWidth - x;
     }
-    if( w<=0 ) {
+    if (w <= 0) {
 	return;
     }
-    if( y<0 ) {
-	h+=y;
-	y=0;
+    if (y < 0) {
+	h += y;
+	y = 0;
     }
-    if( y+h>=VideoHeight ) {
-	h=VideoHeight-y;
+    if (y + h >= VideoHeight) {
+	h = VideoHeight - y;
     }
-    if( h<=0 ) {
+    if (h <= 0) {
 	return;
     }
-    SDL_UpdateRect(Screen,x,y,w,h);
+    SDL_UpdateRect(Screen, x, y, w, h);
 #endif
 }
 
@@ -310,7 +307,7 @@ global void InvalidateArea(int x,int y,int w,int h)
 global void Invalidate(void)
 {
 #ifndef USE_OPENGL
-    SDL_UpdateRect(Screen,0,0,VideoWidth,VideoHeight);
+    SDL_UpdateRect(Screen, 0, 0, VideoWidth, VideoHeight);
 #endif
 }
 
@@ -322,7 +319,7 @@ global void Invalidate(void)
 **
 **	@return		ASCII code or internal keycode.
 */
-local int Sdl2InternalKeycode(const SDL_keysym * code, int *keychar)
+local int Sdl2InternalKeycode(const SDL_keysym* code, int* keychar)
 {
     int icode;
 
@@ -488,7 +485,7 @@ local void SdlHandleKeyPress(const EventCallback* callbacks,
     int icode;
     int keychar;
 
-    icode = Sdl2InternalKeycode(code,&keychar);
+    icode = Sdl2InternalKeycode(code, &keychar);
     InputKeyButtonPress(callbacks, SDL_GetTicks(), icode, keychar);
 }
 
@@ -504,7 +501,7 @@ local void SdlHandleKeyRelease(const EventCallback* callbacks,
     int icode;
     int keychar;
 
-    icode=Sdl2InternalKeycode(code,&keychar);
+    icode = Sdl2InternalKeycode(code, &keychar);
     InputKeyButtonRelease(callbacks, SDL_GetTicks(), icode, keychar);
 }
 
@@ -514,7 +511,7 @@ local void SdlHandleKeyRelease(const EventCallback* callbacks,
 **	@param callbacks	Callback structure for events.
 **	@param event		SDL event structure pointer.
 */
-local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
+local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 {
     switch (event->type) {
 	case SDL_MOUSEBUTTONDOWN:
@@ -544,8 +541,8 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 		event->motion.x, event->motion.y);
 	    // FIXME: Same bug fix from X11
 	    if ((TheUI.MouseWarpX != -1 || TheUI.MouseWarpY != -1)
-		&& (event->motion.x != TheUI.MouseWarpX
-		    || event->motion.y != TheUI.MouseWarpY)) {
+		&& (event->motion.x != TheUI.MouseWarpX ||
+		    event->motion.y != TheUI.MouseWarpY)) {
 		int xw;
 		int yw;
 
@@ -590,18 +587,18 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 */
 local void CheckScreenVisible()
 {
-    static int IsVisible=1;
+    static int IsVisible = 1;
     Uint8 state;
 
-    state=SDL_GetAppState();
-    if( IsVisible && !(state&SDL_APPACTIVE) ) {
-	IsVisible=0;
+    state = SDL_GetAppState();
+    if (IsVisible && !(state & SDL_APPACTIVE)) {
+	IsVisible = 0;
 	UiTogglePause();
     }
-    else if( !IsVisible && (state&SDL_APPACTIVE) ) {
-	IsVisible=1;
+    else if (!IsVisible && (state & SDL_APPACTIVE)) {
+	IsVisible = 1;
 	UiTogglePause();
-	MustRedraw=RedrawEverything&~RedrawMinimap;
+	MustRedraw = RedrawEverything & ~RedrawMinimap;
     }
 }
 #endif
@@ -632,51 +629,51 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 
 #if defined(WITH_SOUND) && !defined(USE_SDLA)
     // FIXME: ugly hack, move into sound part!!!
-    if( SoundFildes==-1 ) {
-	SoundOff=1;
+    if (SoundFildes == -1) {
+	SoundOff = 1;
     }
 #endif
 
-    if( !++FrameCounter ) {
+    if (!++FrameCounter) {
 	// FIXME: tests with frame counter now fails :(
 	// FIXME: Should happen in 68 years :)
-	fprintf(stderr,"FIXME: *** round robin ***\n");
-	fprintf(stderr,"FIXME: *** round robin ***\n");
-	fprintf(stderr,"FIXME: *** round robin ***\n");
-	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr, "FIXME: *** round robin ***\n");
+	fprintf(stderr, "FIXME: *** round robin ***\n");
+	fprintf(stderr, "FIXME: *** round robin ***\n");
+	fprintf(stderr, "FIXME: *** round robin ***\n");
     }
 
-    ticks=SDL_GetTicks();
-    if( ticks>NextFrameTicks ) {	// We are too slow :(
-//	IfDebug(
-	    // FIXME: need locking!
-	    // if (InterfaceState == IfaceStateNormal) {
-	    // VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
-	    // }
-//	);
+    ticks = SDL_GetTicks();
+    if (ticks > NextFrameTicks) {	// We are too slow :(
+#ifdef DEBUG
+	// FIXME: need locking!
+	// if (InterfaceState == IfaceStateNormal) {
+	// VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	// }
+#endif
 	++SlowFrameCounter;
     }
 
-    InputMouseTimeout(callbacks,ticks);
-    InputKeyTimeout(callbacks,ticks);
+    InputMouseTimeout(callbacks, ticks);
+    InputKeyTimeout(callbacks, ticks);
     CursorAnimate(ticks);
 
-    for(;;) {
+    for (;;) {
 	//
 	//	Time of frame over? This makes the CPU happy. :(
 	//
-	ticks=SDL_GetTicks();
-	if( !VideoInterrupts && ticks+11<NextFrameTicks ) {
+	ticks = SDL_GetTicks();
+	if (!VideoInterrupts && ticks + 11 < NextFrameTicks) {
 	    SDL_Delay(10);
 	}
-	while( ticks>=NextFrameTicks ) {
+	while (ticks >= NextFrameTicks) {
 	    ++VideoInterrupts;
-	    FrameFraction+=FrameRemainder;
-	    if( FrameFraction>10 ) {
-		FrameFraction-=10;
+	    FrameFraction += FrameRemainder;
+	    if (FrameFraction > 10) {
+		FrameFraction -= 10;
 		++NextFrameTicks;
 	    }
-	    NextFrameTicks+=FrameTicks;
+	    NextFrameTicks += FrameTicks;
 	}
 
 	// FIXME: move to better location
@@ -685,36 +682,36 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	Prepare select
 	//
-	maxfd=0;
-	tv.tv_sec=tv.tv_usec=0;
+	maxfd = 0;
+	tv.tv_sec = tv.tv_usec = 0;
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
 
 	//
 	//	Network
 	//
-	if( NetworkFildes!=-1 ) {
-	    if( NetworkFildes>maxfd ) {
-		maxfd=NetworkFildes;
+	if (NetworkFildes != -1) {
+	    if (NetworkFildes > maxfd) {
+		maxfd = NetworkFildes;
 	    }
-	    FD_SET(NetworkFildes,&rfds);
+	    FD_SET(NetworkFildes, &rfds);
 	}
 
 #ifndef USE_SDLA
 	//
 	//	Sound
 	//
-	if( !SoundOff && !SoundThreadRunning ) {
-	    if( SoundFildes>maxfd ) {
-		maxfd=SoundFildes;
+	if (!SoundOff && !SoundThreadRunning) {
+	    if (SoundFildes > maxfd) {
+		maxfd = SoundFildes;
 	    }
-	    FD_SET(SoundFildes,&wfds);
+	    FD_SET(SoundFildes, &wfds);
 	}
 #endif
 
 #if 0
-	maxfd=select(maxfd+1,&rfds,&wfds,NULL
-		,(i=SDL_PollEvent(event)) ? &tv : NULL);
+	maxfd = select(maxfd + 1, &rfds, &wfds, NULL,
+	    (i = SDL_PollEvent(event)) ? &tv : NULL);
 #else
 	// QUICK HACK to fix the event/timer problem
 	//	The timer code didn't interrupt the select call.
@@ -723,21 +720,21 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	// The event handling of SDL is wrong designed = polling only.
 	// There is hope on SDL 1.3 which will have this fixed.
 
-	maxfd=select(maxfd+1,&rfds,&wfds,NULL,&tv);
-	i=SDL_PollEvent(event);
+	maxfd = select(maxfd + 1, &rfds, &wfds, NULL, &tv);
+	i = SDL_PollEvent(event);
 #endif
 
-	if ( i ) {			// Handle SDL event
-	    SdlDoEvent(callbacks,event);
+	if (i) {			// Handle SDL event
+	    SdlDoEvent(callbacks, event);
 	}
 
-	if( maxfd>0 ) {
+	if (maxfd > 0) {
 #ifndef USE_SDLA
 	    //
 	    //	Sound
 	    //
-	    if( !SoundOff && !SoundThreadRunning
-		    && FD_ISSET(SoundFildes,&wfds) ) {
+	    if (!SoundOff && !SoundThreadRunning &&
+		    FD_ISSET(SoundFildes, &wfds) ) {
 		callbacks->SoundReady();
 	    }
 #endif
@@ -745,7 +742,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    //
 	    //	Network
 	    //
-	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
+	    if (NetworkFildes != -1 && FD_ISSET(NetworkFildes, &rfds) ) {
 		callbacks->NetworkEvent();
 	    }
 	}
@@ -753,7 +750,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	No more input and time for frame over: return
 	//
-	if( !i && maxfd<=0 && VideoInterrupts ) {
+	if (!i && maxfd <= 0 && VideoInterrupts) {
 	    break;
 	}
     }
@@ -761,10 +758,10 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     //
     //	Prepare return, time for one frame is over.
     //
-    VideoInterrupts=0;
+    VideoInterrupts = 0;
     
-    if( !SkipGameCycle-- ) {
-	SkipGameCycle=SkipFrames;
+    if (!SkipGameCycle--) {
+	SkipGameCycle = SkipFrames;
     }
 
 #ifdef USE_WIN32
@@ -795,10 +792,10 @@ global unsigned long VideoMapRGB(int r, int g, int b)
 **
 **	@return		A hardware dependent pixel table.
 */
-global VMemType *VideoCreateNewPalette(const Palette * palette)
+global VMemType* VideoCreateNewPalette(const Palette* palette)
 {
     int i;
-    void *pixels;
+    void* pixels;
 
     if (!Screen) {			// no init
 	return NULL;
@@ -831,7 +828,7 @@ global VMemType *VideoCreateNewPalette(const Palette * palette)
 	int g;
 	int b;
 	int v;
-	char *vp;
+	char* vp;
 
 	r = (palette[i].r) & 0xFF;
 	g = (palette[i].g) & 0xFF;
@@ -899,7 +896,7 @@ global void RealizeVideoMemory(void)
 #ifdef USE_OPENGL
     SDL_GL_SwapBuffers();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    MustRedraw=RedrawEverything;
+    MustRedraw = RedrawEverything;
 #endif
 }
 
@@ -910,7 +907,7 @@ global void SdlLockScreen(void)
 {
 #ifndef USE_OPENGL
     SDL_LockSurface(Screen);
-    VideoMemory=Screen->pixels;
+    VideoMemory = Screen->pixels;
 #endif
 }
 
@@ -922,9 +919,9 @@ global void SdlUnlockScreen(void)
 #ifndef USE_OPENGL
     SDL_UnlockSurface(Screen);
 #ifdef DEBUG
-    VideoMemory=NULL;			// Catch errors!
+    VideoMemory = NULL;			// Catch errors!
 #else
-    VideoMemory=Screen->pixels;		// Be kind
+    VideoMemory = Screen->pixels;	// Be kind
 #endif
 #endif
 }
@@ -938,12 +935,12 @@ global void ToggleGrabMouse(int mode)
 {
     static int grabbed;
 
-    if( mode<=0 && grabbed ) {
+    if (mode <= 0 && grabbed) {
 	SDL_WM_GrabInput(SDL_GRAB_OFF);
-	grabbed=0;
-    } else if( mode>=0 && !grabbed ) {
-	if( SDL_WM_GrabInput(SDL_GRAB_ON)==SDL_GRAB_ON ) {
-	    grabbed=1;
+	grabbed = 0;
+    } else if (mode >= 0 && !grabbed) {
+	if (SDL_WM_GrabInput(SDL_GRAB_ON) == SDL_GRAB_ON) {
+	    grabbed = 1;
 	}
     }
 }
@@ -964,12 +961,12 @@ global void ToggleFullScreen(void)
     int h;
     int bpp;
 #ifndef USE_OPENGL
-    void *pixels;
-    SDL_Color *palette;
+    void* pixels;
+    SDL_Color* palette;
     int ncolors;
 #endif
 
-    if ( !Screen ) {			// don't bother if there's no surface.
+    if (!Screen) {			// don't bother if there's no surface.
 	return;
     }
 
@@ -984,16 +981,20 @@ global void ToggleFullScreen(void)
     framesize = w * h * Screen->format->BytesPerPixel;
 
 #ifndef USE_OPENGL
-    if ( !(pixels = malloc(framesize)) ) {	// out of memory
+    if (!(pixels = malloc(framesize))) {	// out of memory
 	return;
     }
     SDL_LockSurface(Screen);
     memcpy(pixels, Screen->pixels, framesize);
 
-    IfDebug( palette=NULL; ncolors=0; );	// shut up compiler
-    if ( Screen->format->palette ) {
+#ifdef DEBUG
+    // shut up compiler
+    palette = NULL;
+    ncolors=0;
+#endif
+    if (Screen->format->palette) {
 	ncolors = Screen->format->palette->ncolors;
-	if ( !(palette = malloc(ncolors * sizeof(SDL_Color))) ) {
+	if (!(palette = malloc(ncolors * sizeof(SDL_Color)))) {
 	    free(pixels);
 	    return;
 	}
@@ -1004,16 +1005,16 @@ global void ToggleFullScreen(void)
 #endif
 
     Screen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
-    if( !Screen ) {
+    if (!Screen) {
 	Screen = SDL_SetVideoMode(w, h, bpp, flags);
-	if ( !Screen ) {		// completely screwed.
+	if (!Screen) {		// completely screwed.
 #ifndef USE_OPENGL
 	    free(pixels);
-	    if( Screen->format->palette ) {
+	    if (Screen->format->palette) {
 		free(palette);
 	    }
 #endif
-	    fprintf(stderr,"Toggle to fullscreen, crashed all\n");
+	    fprintf(stderr, "Toggle to fullscreen, crashed all\n");
 	    Exit(-1);
 	}
     }
@@ -1030,7 +1031,7 @@ global void ToggleFullScreen(void)
     memcpy(Screen->pixels, pixels, framesize);
     free(pixels);
 
-    if ( Screen->format->palette ) {
+    if (Screen->format->palette) {
 	// !!! FIXME : No idea if that flags param is right.
 	SDL_SetPalette(Screen, SDL_LOGPAL, palette, 0, ncolors);
 	free(palette);
