@@ -183,8 +183,8 @@ global void ReleaseUnit(Unit* unit)
 		h = unit->Type->TileHeight;
 		for( ; h-->0; ) {
 		    for( w=w0; w-->0; ) {
-			if( IsMapFieldVisible(&Players[i],x+w,y+h)
-			    || Players[i].Type != PlayerPerson ) {
+			if( !IsMapFieldVisible(&Players[i],x+w,y+h)
+			    && Players[i].Type == PlayerPerson ) {
 			    unit->Visible |= (1 << i);
 			}
 		    }
@@ -192,7 +192,7 @@ global void ReleaseUnit(Unit* unit)
 	    }
 	}
 
-	if( unit->Type->Building && unit->Visible != 0xFFFF ) {
+	if( unit->Type->Building && unit->Visible != 0x0000 ) {
 	    return;
 	}
 #endif

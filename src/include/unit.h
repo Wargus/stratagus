@@ -495,6 +495,8 @@ struct _unit_ {
     signed char	IY;			/// Y image displacement to map position
     int		Frame;			/// Image frame: <0 is mirrored
     int		SeenFrame;		/// last seen frame/stage of buildings
+    signed char	SeenIX;			/// Seen X image displacement to map position
+    signed char	SeenIY;			/// seen Y image displacement to map position
 
     unsigned	Direction : 8;		/// angle (0-255) unit looking
 
