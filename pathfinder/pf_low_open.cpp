@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include "freecraft.h"
 #include "map.h"
+#if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
+#endif
 #define PRINTING
 #include "pf_low_open.h"
 
