@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ai.h		-	The ai headerfile. */
+/**@name ai.h - The ai headerfile. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __AI_H__
 #define __AI_H__
@@ -34,35 +34,35 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include "player.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-extern int AiSleepCycles;						/// Ai sleeps # cycles
-extern int AiTimeFactor;						/// Adjust the AI build times
-extern int AiCostFactor;						/// Adjust the AI costs
+extern int AiSleepCycles;  /// Ai sleeps # cycles
+extern int AiTimeFactor;   /// Adjust the AI build times
+extern int AiCostFactor;   /// Adjust the AI costs
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
-extern void AiEachCycle(Player* player);		/// Called each game cycle
-extern void AiEachSecond(Player* player);		/// Called each second
+extern void AiEachCycle(Player* player);   /// Called each game cycle
+extern void AiEachSecond(Player* player);  /// Called each second
 
-extern void InitAiModule(void);						/// Init AI global structures
-extern void AiInit(Player* player);				/// Init AI for this player
-extern void CleanAi(void);						/// Cleanup the AI module
-extern void SaveAi(CLFile*file);				/// Save the AI state
+extern void InitAiModule(void);       /// Init AI global structures
+extern void AiInit(Player* player);   /// Init AI for this player
+extern void CleanAi(void);            /// Cleanup the AI module
+extern void SaveAi(CLFile*file);      /// Save the AI state
 
-extern void AiCclRegister(void);				/// Register ccl features
+extern void AiCclRegister(void);      /// Register ccl features
 
 /*--------------------------------------------------------
---	 Call Backs/Triggers
+--  Call Backs/Triggers
 --------------------------------------------------------*/
 
 	/// Called if AI unit is attacked
@@ -88,4 +88,4 @@ extern void AiResearchComplete(Unit* unit,const Upgrade* what);
 
 //@}
 
-#endif		// !__AI_H__
+#endif // !__AI_H__
