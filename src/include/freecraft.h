@@ -274,7 +274,7 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef VERSION
-#define VERSION	"1.17.2pre1"		/// Engine version shown
+#define VERSION	"1.17.2"		/// Engine version shown
 #endif
 
 #ifndef FreeCraftMajorVerion
