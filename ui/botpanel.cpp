@@ -485,6 +485,7 @@ global void DrawButtonPanel(void)
 						break;
 					case ButtonSpellCast:
 						for (j = 0; j < NumSelected; ++j) {
+							DebugCheck(!Selected[j]->AutoCastSpell);
 							if (Selected[j]->AutoCastSpell[buttons[i].Value] != 1) {
 								break;
 							}
