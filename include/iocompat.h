@@ -48,7 +48,7 @@
 #define R_OK	1	// FIXME: correct?
 #else
 #define R_OK	4
-#define F_OK	4
+#define F_OK	0
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>
