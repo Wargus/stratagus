@@ -962,14 +962,8 @@ global int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 */
 global void InitSelections(void)
 {
-    int i;
-
-    Selected = malloc(MaxSelectable * sizeof(Unit*));
-
-    if ((i = NumSelected)) {		// Cleanup after load
-	while (i--) {
-	    Selected[i] = UnitSlots[(int)Selected[i]];
-	}
+    if (!Selected) {
+	Selected = malloc(MaxSelectable * sizeof(Unit*));
     }
 }
 
@@ -1036,13 +1030,14 @@ local SCM CclSelection(SCM num, SCM units)
 {
     int i;
 
+    InitSelections();
     NumSelected = gh_scm2int(num);
     i = 0;
     while (!gh_null_p(units)) {
 	char* str;
 
 	str = gh_scm2newstr(gh_car(units), NULL);
-	Selected[i++] = (Unit*)strtol(str + 1, NULL, 16);
+	Selected[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
 	free(str);
 	units = gh_cdr(units);
     }
