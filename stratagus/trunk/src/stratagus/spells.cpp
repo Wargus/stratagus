@@ -1548,7 +1548,7 @@ local int CastHolyVision(Unit* unit, const SpellType* spell, Unit* target,
     target->CurrentSightRange=target->Stats->SightRange;
 
     target->Removed=1;
-    MapMarkSight(target->Player,x,y,target->CurrentSightRange);
+    MapMarkUnitSight(target);
 
     target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
     CheckUnitToBeDrawn(target);

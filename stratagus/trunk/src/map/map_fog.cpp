@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -118,23 +118,41 @@ local const int FogTable[16] = {
      0,11,10, 2,  13, 6, 0, 3,  12, 0, 4, 1,  8, 9, 7, 0,
 };
 
-/**
-**	Pythagorus table tree for use in fow calculations
+/*
+global const unsigned char VisionTable[][3] = {
+      {2,0,0}, {1,1,1},
+      {3,0,0}, {1,1,1}, {1,1,0}, {1,0,1},
+      {4,0,0}, {1,1,1}, {1,1,0}, {1,1,1}, {1,0,1},
+      {5,0,0}, {1,1,1}, {2,1,0}, {1,0,1}, {1,1,0}, {2,0,1},
+      {6,0,0}, {1,1,1}, {2,1,0}, {2,1,1}, {2,0,1},
+      {7,0,0}, {1,1,1}, {2,1,0}, {3,1,1}, {2,0,1},
+      {8,0,0}, {1,1,1}, {2,1,0}, {1,1,1}, {1,1,0}, {1,0,1}, {1,1,0}, {1,0,1},{1,1,1},{2,0,1},
+      {9,0,0}, {1,1,1}, {3,1,0}, {1,0,1}, {1,1,0}, {2,1,1}, {1,0,1}, {1,1,0}, {3,0,1},
+      {10,0,0}, {1,1,1}, {3,1,0}, {1,1,1}, {1,1,0}, {1,0,1}, {1,1,0}, {1,0,1},{1,1,0}, {1,0,1},{1,1,1},{3,0,1},
+      {11,0,0}, {1,1,1}, {3,1,0},{1,1,1},{1,1,0},{3,1,1},{1,0,1},{1,1,1},{3,0,1},
+      {12,0,0}
+    };
+local const int VisionLookup[6] = { 0,0,2,6,11,17 };
+
+global const unsigned char VisionTable[][3] = {
+	{1,0,0}, {1,1,0},
+	{2,0,0}, {2,1,0}, {1,0,1},
+	{3,0,0}, {3,1,0}, {2,0,1},
+	{4,0,0}, {4,1,0}, {3,0,1},
+	{5,0,0}, {5,1,0}, {4,0,1},
+	{6,0,0}, {6,1,0}, {5,0,1},
+	{7,0,0}, {7,1,0}, {6,0,1},
+	{8,0,0}, {8,1,0}, {7,0,1},
+	{9,0,0}, {9,1,0}, {8,0,1},
+	{10,0,0}, {10,1,0}, {9,0,1},
+	{11,0,0}, {11,1,0}, {10,0,1},
+	{12,0,0}
+	};
+
+local const int VisionLookup[14] = { 0,0,3,6,9,12,15,18,21,24,27,30,33,36 };
 */
-local const int PythagTree[13][13] = {
-    {   0,   1,   4,   9,  16,  25,  36,  49,  64,  81, 100, 121, 144},
-    {   1,   2,   5,  10,  17,  26,  37,  50,  65,  82, 101, 122, 145},
-    {   4,   5,   8,  13,  20,  29,  40,  53,  68,  85, 104, 125, 148},
-    {   9,  10,  13,  18,  25,  34,  45,  58,  73,  90, 109, 130, 153},
-    {  16,  17,  20,  25,  32,  41,  52,  65,  80,  97, 116, 137, 160},
-    {  25,  26,  29,  34,  41,  50,  61,  74,  89, 106, 125, 146, 169},
-    {  36,  37,  40,  45,  52,  61,  72,  85, 100, 117, 136, 157, 180},
-    {  49,  50,  53,  58,  65,  74,  85,  98, 113, 130, 149, 170, 193},
-    {  64,  65,  68,  73,  80,  89, 100, 113, 128, 145, 164, 185, 208},
-    {  81,  82,  85,  90,  97, 106, 117, 130, 145, 162, 181, 202, 225},
-    { 100, 101, 104, 109, 116, 125, 136, 149, 164, 181, 200, 221, 244},
-    { 121, 122, 125, 130, 137, 146, 157, 170, 185, 202, 221, 242, 265},
-    { 144, 145, 148, 153, 160, 169, 180, 193, 208, 225, 244, 265, 288}};
+global unsigned char *VisionTable[3];
+global int *VisionLookup;
 /**
 **	Draw unexplored area function pointer. (display and video mode independ)
 */
@@ -173,20 +191,21 @@ local int LookupSight(const Player* player,int tx,int ty)
 {
     int i;
     int visiblecount;
-    int x;
-    int y;
     int range;
+    int mapdistance;
     Unit* unit;
 
     visiblecount=0;
-    // FIXME: Speedup can be done by only selecting unit possibly in range
     for( i=0; i<player->TotalNumUnits; ++i ) {
 	unit=player->Units[i];
-	range=(unit->CurrentSightRange+1)*(unit->CurrentSightRange+1);
-	x=unit->X+unit->Type->TileWidth/2;
-	y=unit->Y+unit->Type->TileHeight/2;
-	if( PythagTree[abs(x-tx)][abs(y-ty)]<=range ) {
+	range=unit->CurrentSightRange;
+	mapdistance=MapDistanceToUnit(tx,ty,unit);
+	if( mapdistance <= range) {
 	    ++visiblecount;
+	}
+	if( (tx >= unit->X && tx < unit->X+unit->Type->TileWidth && mapdistance == range+1) ||
+	    (ty >= unit->Y && ty < unit->Y+unit->Type->TileHeight && mapdistance == range+1)) {
+	    --visiblecount;
 	}
 	if( visiblecount >= 255 ) {
 	    return 255;
@@ -231,27 +250,108 @@ global int IsTileVisible(const Player* player,int x,int y)
 }
 
 /**
-**	Mark the sight of unit. (Explore and make visible.)
+**	Mark a tile's sight. (Explore and make visible.)
 **
 **	@param player	Player to mark sight.
-**	@param tx	X center position.
-**	@param ty	Y center position.
-**	@param range	Radius to mark.
+**	@param x	X tile to mark.
+**	@param y	Y tile to mark.
+**	@param v	Pointer to visible value.
 */
-global void MapMarkSight(const Player* player,int tx,int ty,int range)
+global void MapMarkTileSight(const Player* player, int x, int y, unsigned char *v)
 {
-    int i;
-    int x;
-    int y;
-    int height;
-    int width;
-    int v;
-    int p;
-    int w;
-    int h;
-    Unit** corpses;
     Unit* unit;
     Unit* remove;
+    Unit** corpses;
+    int w;
+    int h;
+
+    switch( *v ) {
+    case 0:		// Unexplored
+    case 1:		// Unseen
+    // FIXME: mark for screen update
+	*v=2;
+	if( player->Type == PlayerPerson ) {
+	    corpses = &DestroyedBuildings;
+	    while( *corpses ) {
+		unit = *corpses;
+		if( (unit->Visible & 1 << player->Player) ) {
+		    w = unit->Type->TileWidth;
+		    h = unit->Type->TileHeight;
+		    if( x >= unit->X && y >= unit->Y
+			&& x < unit->X+w && y < unit->Y+h ) {
+			    unit->Visible &= ~(1 << player->Player);
+			    UnitMarkSeen(unit);
+		    }
+		}
+		remove = unit;
+		unit = unit->Next;
+		corpses=&(unit);
+		if( remove->Visible==0x0000 && !remove->Refs ) {
+		    ReleaseUnit(remove);
+		}
+	    }
+        }
+	if( IsTileVisible(ThisPlayer,x,y) > 1) {
+	    MapMarkSeenTile(x,y);
+	    UnitsMarkSeen(x,y);
+	}
+
+	break;
+    case 255:		// Overflow
+	DebugLevel0Fn("Visible overflow (Player): %d\n" _C_ player->Player);
+	break;
+
+    default:		// seen -> seen
+	*v=*v+1;
+	break;
+    }
+}
+
+global void MapUnmarkTileSight(const Player* player,int x,int y,unsigned char *v)
+{
+    switch( *v ) {
+	case 255:
+	    // FIXME: (mr-russ) Lookupsight is broken :(
+	    DebugCheck( 1 );
+	    *v = LookupSight(player,x,y);
+	    DebugCheck( *v < 254 );
+	    break;
+	case 0:		// Unexplored
+	case 1:
+	    // We are at minimum, don't do anything shouldn't happen.
+	    DebugCheck( 1 );
+	    break;
+	case 2:
+	    // Check visible Tile, then deduct...
+	    if( IsTileVisible(ThisPlayer,x,y) > 1) {
+		MapMarkSeenTile(x,y);
+		UnitsMarkSeen(x,y);
+	    }
+	default:		// seen -> seen
+	    *v=*v-1;
+	    break;
+    }
+}
+
+/**
+**	Mark the sight of unit. (Explore and make visible.)
+**
+**	@param player	player to mark the sight for (not unit owner)
+**	@param x	x location to mark
+**	@param y	y location to mark
+**
+**	@param range	Radius to mark.
+**	@param marker	Function to mark or unmark sight
+*/
+global void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*,int,int,unsigned char*))
+{
+    int mx;
+    int my;
+    int cx[4];
+    int cy[4];
+    int steps;
+    int cycle;
+    int p;
 
     // Mark as seen
     if( !range ) {			// zero sight range is zero sight range
@@ -259,238 +359,80 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 	return;
     }
 
-    x=tx-range;
-    y=ty-range;
-    width=height=range+range;
-
-    //	Clipping
-    if( y<0 ) {
-	height+=y;
-	y=0;
-    }
-    if( x<0 ) {
-	width+=x;
-	x=0;
-    }
-    if( y+height>=TheMap.Height ) {
-	height=TheMap.Height-y-1;
-    }
-    if( x+width>=TheMap.Width ) {
-	width=TheMap.Width-x-1;
-    }
-
     p=player->Player;
-    ++range;
-    range = range*range;
-    // FIXME: Can be speed optimized, no * += ...
-    while( height-->=0 ) {
-	for( i=x; i<=x+width; ++i ) {
-	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
-		v=TheMap.Fields[i+y*TheMap.Width].Visible[p];
-		switch( v ) {
-		    case 0:		// Unexplored
-		    case 1:		// Unseen
-			// FIXME: mark for screen update
-			TheMap.Fields[i+y*TheMap.Width].Visible[p]=2;
-			if( player->Type == PlayerPerson ) {
-			    corpses = &DestroyedBuildings;
-			    while( *corpses ) {
-				unit = *corpses;
-				if( (unit->Visible & 1 << player->Player) ) {
-				    w = unit->Type->TileWidth;
-				    h = unit->Type->TileHeight;
-				    if( i >= unit->X && y >= unit->Y
-					&& i < unit->X+w && y < unit->Y+h ) {
-					    unit->Visible &= ~(1 << player->Player);
-					    UnitMarkSeen(unit);
-				    }
-				}
-				remove = unit;
-				unit = unit->Next;
-				corpses=&(unit);
-				if( remove->Visible==0x0000 && !remove->Refs ) {
-				    ReleaseUnit(remove);
-				}
-			    }
-                        }
-			if( IsTileVisible(ThisPlayer,i,y) > 1) {
-			    MapMarkSeenTile(i,y);
-			    UnitsMarkSeen(i,y);
-			}
-                        
-			break;
-		    case 255:		// Overflow
-			DebugLevel0Fn("Visible overflow (Player): %d\n" _C_ p);
-			break;
 
-		    default:		// seen -> seen
-			TheMap.Fields[i+y*TheMap.Width].Visible[p]=v+1;
-			break;
-		}
+    // Mark Horizontal sight for unit
+    for(mx=x-range; mx < x+range+w; mx++) {
+        for(my=y; my < y+h; my++) {
+	    if( mx >= 0 && mx < TheMap.Width ) {
+		marker(player,mx,my,&TheMap.Fields[mx+my*TheMap.Width].Visible[p]);
 	    }
 	}
-	++y;
-    }
-}
-
-/**
-**	Unmark the sight of unit. (Dies, Boards a unit.)
-**
-**	@param player	Player to mark sight.
-**	@param tx	X center position.
-**	@param ty	Y center position.
-**	@param range	Radius to unmark.
-*/
-global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
-{
-    int i;
-    int x;
-    int y;
-    int height;
-    int width;
-    int v;
-    int p;
-
-    // zero sight range is zero sight range
-    if( !range ) {
-	DebugLevel0Fn("Zero sight range\n");
-	return;
     }
 
-    x=tx-range;
-    y=ty-range;
-    width=height=range+range;
-
-    //	Clipping
-    if( y<0 ) {
-	height+=y;
-	y=0;
-    }
-    if( x<0 ) {
-	width+=x;
-	x=0;
-    }
-    if( y+height>=TheMap.Height ) {
-	height=TheMap.Height-y-1;
-    }
-    if( x+width>=TheMap.Width ) {
-	width=TheMap.Width-x-1;
-    }
-
-    p=player->Player;
-    ++range;
-    range=range*range;
-    while( height-->=0 ) {
-	for( i=x; i<=x+width; ++i ) {
-	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
-		v=TheMap.Fields[i+y*TheMap.Width].Visible[p];
-		switch( v ) {
-		    case 255:
-			TheMap.Fields[i+y*TheMap.Width].Visible[p] =
-			    LookupSight(player,i,y);
-			DebugCheck( TheMap.Fields[i+y*TheMap.Width].Visible[p] < 254 );
-		    case 0:		// Unexplored
-		    case 1:
-			// We are at minimum, don't do anything shouldn't happen.
-			//DebugCheck( 1 );
-			break;
-		    case 2:
-		    	// Check visible Tile, then deduct...
-			if( IsTileVisible(ThisPlayer,i,y) > 1) {
-			    MapMarkSeenTile(i,y);
-			    UnitsMarkSeen(i,y);
-			}
-		    default:		// seen -> seen
-			TheMap.Fields[i+y*TheMap.Width].Visible[p]=v-1;
-			break;
-		}
+    // Mark vertical sight for unit (don't remark self) (above unit)
+    for(my=y-range; my < y; my++) {
+        for(mx=x; mx < x+w; mx++) {
+	    if( my >= 0 && my < TheMap.Width ) {
+		marker(player,mx,my,&TheMap.Fields[mx+my*TheMap.Width].Visible[p]);
 	    }
 	}
-	++y;
     }
-}
 
-    
-/**
-**	Mark the new sight of unit. (Explore and make visible.)
-**
-**	@param player	Player to mark sight.
-**	@param tx	X center position.
-**	@param ty	Y center position.
-**	@param range	Radius to mark.
-**	@param dx	Delta in tiles in X direction.
-**	@param dy	Delta in tiles in Y direction.
-*/
-global void MapMarkNewSight(const Player* player,int tx,int ty,int range
-	,int dx,int dy)
-{
-    /// It's faster to mark then unmark.
-    MapMarkSight(player,tx,ty,range);
-    MapUnmarkSight(player,tx-dx,ty-dy,range);
-}
-
-/**
-**	Update the fog of war, for the view point. Called from UpdateDisplay.
-**
-**	@param x	Viewpoint X map tile position
-**	@param y	Viewpoint Y map tile position
-**
-**	@todo	FIXME: should be handled complete in UpdateDisplay.
-*/
-global void MapUpdateFogOfWar(int x,int y)
-{
-    x=y=0;
-#if 0
-    Unit* unit;
-    Unit* table[UnitMax];
-    char *redraw_row;
-    char *redraw_tile;
-    int n;
-    int i;
-    int sx,sy,ex,ey,dx,dy;
-    int vis;
-    int last;
-
-    // Tiles not visible last frame but are this frame must be redrawn.
-    redraw_row=MustRedrawRow;
-    redraw_tile=MustRedrawTile;
-
-    ex=TheUI.MapEndX;
-    sy=y*TheMap.Width;
-    dy=TheUI.MapY;
-    ey=TheUI.MapEndY;
-
-    while( dy<=ey ) {
-	sx=x+sy;
-	dx=TheUI.MapX;
-	while( dx<=ex ) {
-#ifdef NEW_MAPDRAW
-	    *redraw_row=NEW_MAPDRAW;
-	    *redraw_tile=NEW_MAPDRAW;
-#else
-	    *redraw_row=*redraw_tile=1;
-#endif
-
-	    ++redraw_tile;
-	    ++sx;
-	    dx+=TileSizeX;
+    // Mark vertical sight for unit (don't remark self) (below unit)
+    for(my=y+h; my < y+range+h; my++) {
+        for(mx=x; mx < x+w; mx++) {
+	if( my >= 0 && my < TheMap.Width ) {
+	    marker(player,mx,my,&TheMap.Fields[mx+my*TheMap.Width].Visible[p]);
 	}
-	++redraw_row;
-	sy+=TheMap.Width;
-	dy+=TileSizeY;
-    }
-
-    // Buildings under fog of war must be redrawn
-    n=SelectUnits(MapX,MapY,MapX+MapWidth,MapY+MapHeight,table);
-
-    for( i=0; i<n; ++i ) {
-	unit=table[i];
-	if( unit->Type->Building && !unit->Removed
-		&& UnitVisibleOnScreen(unit) ) {
-	    CheckUnitToBeDrawn(unit);
 	}
     }
-#endif
+
+    // Now the cross has been marked, need to use loop to mark in circle
+    steps=0;
+    while(VisionTable[0][steps] <= range) {
+	// 0 - Top right Quadrant
+	cx[0] = x+w-1;
+	cy[0] = y-VisionTable[0][steps];
+	// 1 - Top left Quadrant
+	cx[1] = x;
+	cy[1] = y-VisionTable[0][steps];
+	// 2 - Bottom Left Quadrant
+	cx[2] = x;
+	cy[2] = y+VisionTable[0][steps]+h-1;
+	// 3 - Bottom Right Quadrant
+	cx[3] = x+w-1;
+	cy[3] = y+VisionTable[0][steps]+h-1;
+	// loop for steps
+	steps++;	// Increment past info pointer
+	while(VisionTable[1][steps] != 0 || VisionTable[2][steps] != 0 ) {
+	    // Loop through for repeat cycle
+	    cycle=0;
+	    while( cycle++ < VisionTable[0][steps] ) {
+		cx[0]+=VisionTable[1][steps];
+		cy[0]+=VisionTable[2][steps];
+		cx[1]-=VisionTable[1][steps];
+		cy[1]+=VisionTable[2][steps];
+		cx[2]-=VisionTable[1][steps];
+		cy[2]-=VisionTable[2][steps];
+		cx[3]+=VisionTable[1][steps];
+		cy[3]-=VisionTable[2][steps];
+		if( cx[0] < TheMap.Width && cy[0] >= 0) {
+		    marker(player,cx[0],cy[0],&TheMap.Fields[cx[0]+cy[0]*TheMap.Width].Visible[p]);
+		}
+		if( cx[1] >= 0 && cy[1] < TheMap.Height) {
+		    marker(player,cx[1],cy[1],&TheMap.Fields[cx[1]+cy[1]*TheMap.Width].Visible[p]);
+		}
+		if( cx[2] >= 0 && cy[2] >= 0 ) {
+		    marker(player,cx[2],cy[2],&TheMap.Fields[cx[2]+cy[2]*TheMap.Width].Visible[p]);
+		}
+		if( cx[3] < TheMap.Width && cy[3] < TheMap.Height ) {
+		    marker(player,cx[3],cy[3],&TheMap.Fields[cx[3]+cy[3]*TheMap.Width].Visible[p]);
+		}
+	    }
+	    steps++;
+	}
+    }
 }
 
 /**
@@ -2511,6 +2453,11 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
     //
     //	Which Tile to draw for fog
     //
+    // Investigate tiles around current tile
+    // 1 2 3
+    // 4 * 5
+    // 6 7 8
+
     if( sy ) {
 	if( sx!=sy ) {
 	    if( !IsMapFieldExplored(ThisPlayer,x-1,y-1) ) {
@@ -2750,6 +2697,14 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 */
 global void InitMapFogOfWar(void)
 {
+    int maxsize;
+    int *visionlist;
+    int sizex;
+    int sizey;
+    int maxsearchsize;
+    int i;
+    int VisionTablePosition;
+
 #ifdef USE_OPENGL
     VideoDrawFog=VideoDrawFogAlphaOpenGL;
     VideoDrawOnlyFog=VideoDrawOnlyFogAlphaOpenGL;
@@ -3025,6 +2980,61 @@ build_table:
 	}
     }
 #endif
+
+	visionlist=malloc(MaxMapWidth*MaxMapWidth*sizeof(int));
+	//*2 as diagonal distance is longer
+
+	maxsize = MaxMapWidth;
+    // Fill in table of map size
+    for(sizex=0; sizex < maxsize; sizex++) {
+	for(sizey=0; sizey < maxsize; sizey++) {
+	    visionlist[sizey*maxsize+sizex]=isqrt(sizex*sizex+sizey*sizey);
+	}
+    }
+    // Find maximum distance in corner of map.
+    maxsearchsize=isqrt(maxsize/2);
+    // 1 for 0 and one for end redundant point
+    VisionLookup=malloc((maxsearchsize+2)*sizeof(int));
+
+    // Initialize Visiontable to large size, can't be more entries than tiles.
+    VisionTable[0]=malloc(maxsize*maxsize*sizeof(int));
+    VisionTable[1]=malloc(maxsize*maxsize*sizeof(int));
+    VisionTable[2]=malloc(maxsize*maxsize*sizeof(int));
+
+    // Mark 1, It's a special case
+    // Only Horizontal is marked
+    VisionTable[0][0]=1;
+    VisionTable[1][0]=0;
+    VisionTable[2][0]=0;
+    VisionTable[0][1]=1;
+    VisionTable[1][1]=1;
+    VisionTable[2][1]=0;
+
+    // Mark VisionLookup
+    VisionLookup[0]=0;
+    VisionLookup[1]=0;
+    i=2;
+    VisionTablePosition=1;
+    while( i <= maxsearchsize ) {
+	VisionTablePosition++;
+	VisionLookup[i]=VisionTablePosition;
+	// Setup Vision Start
+        VisionTable[0][VisionTablePosition]=i;
+	VisionTable[1][VisionTablePosition]=0;
+	VisionTable[2][VisionTablePosition]=0;
+	// Do Horizontal
+	VisionTablePosition++;
+	VisionTable[0][VisionTablePosition]=i;
+	VisionTable[1][VisionTablePosition]=1;
+	VisionTable[2][VisionTablePosition]=0;
+	// Do Vertical
+	VisionTablePosition++;
+	VisionTable[0][VisionTablePosition]=i-1;
+	VisionTable[1][VisionTablePosition]=0;
+	VisionTable[2][VisionTablePosition]=1;
+	i++;
+    }
+    free(visionlist);
 }
 
 /**
@@ -3035,6 +3045,23 @@ global void CleanMapFogOfWar(void)
     if( FogOfWarAlphaTable ) {
 	free(FogOfWarAlphaTable);
 	FogOfWarAlphaTable=NULL;
+    }
+    // Free Vision Data
+    if( VisionTable[0] ) {
+	free(VisionTable[0]);
+	VisionTable[0]=NULL;
+    }
+    if( VisionTable[1] ) {
+	free(VisionTable[1]);
+	VisionTable[1]=NULL;
+    }
+    if( VisionTable[2] ) {
+	free(VisionTable[2]);
+	VisionTable[2]=NULL;
+    }
+    if( VisionLookup ) {
+	free(VisionLookup);
+	VisionLookup=NULL;
     }
 }
 

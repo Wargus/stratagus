@@ -282,6 +282,8 @@ global void CreateGame(char* filename, WorldMap* map)
 	return;
     }
 
+    InitMapFogOfWar();			// build tables for fog of war
+    
     if( filename ) {
 	s = NULL;
 	// FIXME: LibraryFile here?
@@ -425,7 +427,6 @@ global void CreateGame(char* filename, WorldMap* map)
 
     CreateMinimap();			// create minimap for pud
     InitMap();				// setup draw functions
-    InitMapFogOfWar();			// build tables for fog of war
     PreprocessMap();			// Adjust map for use
     MapColorCycle();			// Setup color cycle
 

@@ -318,13 +318,11 @@ global void (*ColorCycle)(void);
 */
 global void SetClipping(int left, int top, int right, int bottom)
 {
-    IfDebug(
 	if( left>right || top>bottom || left<0 || left>=VideoWidth
 		|| top<0 || top>=VideoHeight || right<0
 		|| right>=VideoWidth || bottom<0 || bottom>=VideoHeight ) {
 	    DebugLevel0Fn("Wrong clipping, write cleaner code.\n");
 	}
-    );
 
     // Note this swaps the coordinates, if wrong ordered
     if (left > right) {

@@ -10,7 +10,7 @@
 //
 /**@name unit_find.c	-	The find/select for units. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -65,6 +65,12 @@
 #define INRANGE_FACTOR		0x00010000
 #define INRANGE_BONUS		0x00100000
 #define CANATTACK_BONUS		0x01000000
+
+/*----------------------------------------------------------------------------
+--	Local Data
+----------------------------------------------------------------------------*/
+//FIXME: mr-russ  Really bad hack to improve UnitsInDistance calculation
+local Unit* localunit;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -212,15 +218,15 @@ global Unit* RepairableOnMapTile(int tx,int ty)
 }
 
 /**
-**	Choose target on map tile.
+**	Choose targe on a map
 **
-**	@param source	Unit which want to attack.
-**	@param tx	X position on map, tile-based.
-**	@param ty	Y position on map, tile-based.
+**	@param source	Unit which wants to attack.
+**	@param tx	X position to attack.
+**	@param ty	Y position to attack.
 **
 **	@return		Returns ideal target on map tile.
 */
-global Unit* TargetOnMapTile(const Unit* source,int tx,int ty)
+global Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 {
     Unit* table[UnitMax];
     Unit* unit;
@@ -247,6 +253,57 @@ global Unit* TargetOnMapTile(const Unit* source,int tx,int ty)
 		|| ty<unit->Y || ty>=unit->Y+type->TileHeight ) {
 	    // When does that happen???
 	    DebugLevel0("This is a wierd world");
+	    continue;
+	}
+	if( !CanTarget(source->Type,unit->Type) ) {
+	    continue;
+	}
+	//
+	//	Choose the best target.
+	//
+	if( !best || best->Type->Priority<unit->Type->Priority ) {
+	    best=unit;
+	}
+    }
+    return best;
+}
+
+/**
+**	Choose target on map area.
+**
+**	@param source	Unit which want to attack.
+**	@param x1	X position on map, tile-based.
+**	@param y1	Y position on map, tile-based.
+**	@param x2	X position on map, tile-based.
+**	@param y2	Y position on map, tile-based.
+**
+**	@return		Returns ideal target on map tile.
+*/
+global Unit* TargetOnMap(const Unit* source,int x1,int y1,int x2,int y2)
+{
+    Unit* table[UnitMax];
+    Unit* unit;
+    Unit* best;
+    const UnitType* type;
+    int n;
+    int i;
+
+    n=SelectUnits(x1,y1,x2,y2,table);
+    best=NoUnitP;
+    for( i=0; i<n; ++i ) {
+	unit=table[i];
+	// unusable unit ?
+	// if( UnitUnusable(unit) ) can't attack constructions
+	// FIXME: did SelectUnitsOnTile already filter this?
+	// Invisible and not Visible
+	if( unit->Removed || unit->Invisible || !unit->HP
+		|| !(unit->Visible&(1<<source->Player->Player))
+		|| unit->Orders[0].Action==UnitActionDie ) {
+	    continue;
+	}
+	type=unit->Type;
+	if( x2<unit->X || x1>=unit->X+type->TileWidth
+		|| y2<unit->Y || y1>=unit->Y+type->TileHeight ) {
 	    continue;
 	}
 	if( !CanTarget(source->Type,unit->Type) ) {
@@ -397,6 +454,21 @@ global Unit* ResourceDepositOnMap(int tx,int ty,int resource)
     return NoUnitP;
 }
 
+/**
+**	Compare distance from me to a unit
+**
+**	@param v1	item to compare
+**	@param v2	item to compare with
+**
+**	@return		which unit should be sorted first
+**
+**/
+local int InDistanceCompare(const void* v1, const void* v2)
+{
+    return MapDistanceBetweenUnits(*(Unit**)v1,localunit) <
+	MapDistanceBetweenUnits(*(Unit**)v2,localunit);
+}
+			
 /*----------------------------------------------------------------------------
 --	Finding units for attack
 ----------------------------------------------------------------------------*/
@@ -462,6 +534,9 @@ local Unit* FindRangeAttack(Unit* u, int range)
     }
 
     enemy_count=0;
+    // FIXME: (mr-russ) Breaks all good coding rules...
+    localunit=u;
+    qsort((void *)table,n,sizeof(Unit*),InDistanceCompare);
     // FILL good/bad...
     for (i = 0; i < n; i++) {
 	dest = table[i];
@@ -554,10 +629,10 @@ local Unit* FindRangeAttack(Unit* u, int range)
      	    d=MapDistanceBetweenUnits(u,dest);
 
             // FIXME: we don't support moving away!
-            if((d<type->MinAttackRange)||(!UnitReachable(u,dest,attackrange))) {
-	    	table[i]=0;
-	    } else {
+	    if((d>=type->MinAttackRange)&&(d<=range)&&UnitReachable(u,dest,attackrange)) {
 	    	enemy_count++;
+	    } else {
+	    	table[i]=0;
 	    }
 	}
 
@@ -666,11 +741,10 @@ local Unit* FindRangeAttack(Unit* u, int range)
 **
 **	@return		Unit to be attacked.
 **
-**	@note	This could be improved, for better performance.
 */
 global Unit* AttackUnitsInDistance(Unit* unit,int range)
 {
-    const Unit* dest;
+    Unit* dest;
     const UnitType* type;
     const UnitType* dtype;
     Unit* table[UnitMax];
@@ -681,11 +755,10 @@ global Unit* AttackUnitsInDistance(Unit* unit,int range)
     int d;
     int attackrange;
     int cost;
-    const Player* player;
-    const Unit* best_unit;
     int best_cost;
     int tried_units;
-    int reachable;
+    const Player* player;
+    Unit* best_unit;
 
     DebugLevel3Fn("(%d)%s\n" _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
@@ -700,19 +773,23 @@ global Unit* AttackUnitsInDistance(Unit* unit,int range)
     //
     x=unit->X;
     y=unit->Y;
-    n=SelectUnits(x-range,y-range,x+range+1,y+range+1,table);
+    type=unit->Type;
+    n=SelectUnits(x-range,y-range,x+range+type->TileWidth-1,y+range+type->TileHeight-1,table);
 
     best_unit=NoUnitP;
     best_cost=INT_MAX;
     tried_units=0;
 
     player=unit->Player;
-    type=unit->Type;
     attackrange=unit->Stats->AttackRange;
 
     //
     //	Find the best unit to attack
     //
+
+    // FIXME: (mr-russ) Breaks all good coding rules...
+    localunit=unit;
+    qsort((void *)table,n,sizeof(Unit*),InDistanceCompare);
     for( i=0; i<n; ++i ) {
 	dest=table[i];
 	//
@@ -754,6 +831,10 @@ global Unit* AttackUnitsInDistance(Unit* unit,int range)
 	if( d<type->MinAttackRange ) {	// FIXME: we don't support moving away!
 	    continue;
 	}
+	// Use Circle, not square :)
+	if( d>range ) {
+	    continue;
+	}
 	if( d<attackrange && d>type->MinAttackRange ) {
 	    cost+=d*INRANGE_FACTOR;
 	    cost-=INRANGE_BONUS;
@@ -771,19 +852,16 @@ global Unit* AttackUnitsInDistance(Unit* unit,int range)
 	//
 	//	Take this target?
 	//
-	// If we failed 5 times, we probably can't get anything
+	// If we failed 5 closest units, we probably can't get anything
 	if( tried_units >= 5 && best_cost == INT_MAX ) {
 	    best_unit=NULL;
 	    break;
 	}
-	if( cost<best_cost ) {
-	    reachable = UnitReachable(unit,dest,attackrange);
-	    if( d<attackrange || reachable ) {
-		best_unit=dest;
-		best_cost=cost;
-	    } else {
-		tried_units++;
-	    }
+	if( cost<best_cost && d>attackrange && !UnitReachable(unit,dest,attackrange)) {
+	    tried_units++;
+	} else {
+	    best_unit=dest;
+	    best_cost=cost;
 	}
     }
 
@@ -794,8 +872,7 @@ global Unit* AttackUnitsInDistance(Unit* unit,int range)
     }
 */
 
-    // FIXME: No idea how to make this correct, without cast!!
-    return (Unit*)best_unit;
+    return best_unit;
 }
 
 /**

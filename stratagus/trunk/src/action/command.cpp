@@ -666,23 +666,16 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 
 	order->Action=UnitActionBuild;
 	order->Goal=NoUnitP;
-	if( what->ShoreBuilding ) {
-	    order->RangeX=what->TileWidth+1;
-	    order->RangeY=what->TileHeight+1;
-	    order->X=x-1;
-	    order->Y=y-1;
-	} else {
-	    // FIXME: -1 read note in pathfinder, some old wired code.
-	    order->RangeX=what->TileWidth-1;
-	    order->RangeY=what->TileHeight-1;
-	    order->X=x;
-	    order->Y=y;
-	}
+	order->IsRect=1;
+	order->X=x;
+	order->Y=y;
 	if(what->BuilderOutside) {
-	    // FIXME: n0body: brain damage. Walk around buggy moving to
-	    // FIXME: the building position.
-	    order->RangeX=what->TileWidth*10;
-	    order->RangeY=what->TileWidth*10;
+	    order->RangeX=REPAIR_RANGE;
+	    order->RangeY=REPAIR_RANGE;
+	} else {
+	    // If building inside, but be next to stop
+	    order->RangeX=1;
+	    order->RangeY=1;
 	}
 	order->Type=what;
 	order->Arg1=NULL;

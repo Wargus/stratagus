@@ -10,7 +10,7 @@
 //
 /**@name unit.h		-	The unit headerfile. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -433,8 +433,9 @@ enum _unit_action_ {
 typedef struct _order_ {
     unsigned char	Action;		/// global action
     unsigned char	Flags;		/// Order flags (unused)
-    unsigned char	RangeX;		/// How near in X direction
-    unsigned char	RangeY;		/// How near in Y direction
+    unsigned int	RangeX;		/// How near in X direction
+    unsigned int	RangeY;		/// How near in Y direction
+    unsigned char	IsRect:1;	/// For goal as a square, not circle
 
     Unit*		Goal;		/// goal of the order (if any)
     int			X;		/// or X tile coordinate of destination
@@ -946,8 +947,10 @@ extern int FindPlayerUnitsByType(const Player*,const UnitType*,Unit**);
 extern Unit* UnitOnMapTile(int tx,int ty);
     /// Return repairable unit on that map tile
 extern Unit* RepairableOnMapTile(int tx,int ty);
-    /// Return possible attack target on that map tile
-extern Unit* TargetOnMapTile(const Unit* unit,int tx,int ty);
+    /// Return possible attack target on a tile
+extern Unit* TargetOnMapTile(const Unit* soruce, int tx, int ty);
+    /// Return possible attack target on that map area
+extern Unit* TargetOnMap(const Unit* unit,int x1,int y1,int x2,int y2);
     /// Return transporter unit on that map tile
 extern Unit* TransporterOnMapTile(int tx,int ty);
 

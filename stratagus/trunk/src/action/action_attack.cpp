@@ -357,16 +357,14 @@ local void MoveToTarget(Unit* unit)
 		if( goal ) {
 		    DebugLevel3(", target %d range %d\n" _C_ UnitNumber(goal) _C_ unit->Orders[0].RangeX);
 		} else {
-		    DebugLevel3(", (%d,%d) Tring with more range...\n" _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
-		}
-		if( unit->Orders[0].RangeX < TheMap.Width 
-		    || unit->Orders[0].RangeY < TheMap.Height ) {
-		    // Try again later and with a bigger range.
-		    // FIXME: does the range ever decrease?
-		    unit->Wait=10;
-		    unit->Orders[0].RangeX++;
-		    unit->Orders[0].RangeY++;
-		    return;
+		    DebugLevel0(", (%d,%d) Tring with more range...\n" _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
+		    if( unit->Orders[0].RangeX < TheMap.Width 
+			|| unit->Orders[0].RangeY < TheMap.Height ) {
+			// Try again with more range
+			unit->Orders[0].RangeX++;
+			unit->Orders[0].RangeY++;
+			return;
+		    }
 		}
 	    }
 	    if( unit->Orders[0].Goal ) {

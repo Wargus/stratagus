@@ -296,7 +296,7 @@ local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle)
     target->Y = gh_scm2int(y);
     target->TTL=GameCycle+gh_scm2int(cycle);
     target->CurrentSightRange=gh_scm2int(radius);
-    MapMarkSight(target->Player,gh_scm2int(x),gh_scm2int(y),target->CurrentSightRange);
+    MapMarkUnitSight(target);
     return SCM_UNSPECIFIED;
 }
 /**
