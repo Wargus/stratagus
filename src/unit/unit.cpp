@@ -1122,21 +1122,23 @@ global void UnitsMarkSeen(int x,int y)
     int n;
     Unit* units[UnitMax];
 
-    n = SelectUnitsOnTile(x,y,units);
-    // FIXME: need to handle Dead buldings
-    while( n ) {
-	units[n-1]->SeenIY=units[n-1]->IY;
-	units[n-1]->SeenIX=units[n-1]->IX;
-	units[n-1]->SeenFrame = units[n-1]->Frame;
-	units[n-1]->SeenType = units[n-1]->Type;
-	units[n-1]->SeenState = (units[n-1]->Orders[0].Action==UnitActionBuilded) |
-		((units[n-1]->Orders[0].Action==UnitActionUpgradeTo) << 1);
-	if( units[n-1]->Orders[0].Action==UnitActionDie ) {
+    if( IsMapFieldVisible(ThisPlayer, x, y) ) {
+	n = SelectUnitsOnTile(x,y,units);
+	// FIXME: need to handle Dead buldings
+	while( n ) {
+	    units[n-1]->SeenIY=units[n-1]->IY;
+	    units[n-1]->SeenIX=units[n-1]->IX;
+	    units[n-1]->SeenFrame = units[n-1]->Frame;
+	    units[n-1]->SeenType = units[n-1]->Type;
+	    units[n-1]->SeenState = (units[n-1]->Orders[0].Action==UnitActionBuilded) |
+		    ((units[n-1]->Orders[0].Action==UnitActionUpgradeTo) << 1);
+	    if( units[n-1]->Orders[0].Action==UnitActionDie ) {
 		    units[n-1]->SeenState = 3;
+	    }
+	    units[n-1]->SeenConstructed = units[n-1]->Constructed;
+	    units[n-1]->SeenDestroyed = units[n-1]->Destroyed;
+	    --n;
 	}
-	units[n-1]->SeenConstructed = units[n-1]->Constructed;
-	units[n-1]->SeenDestroyed = units[n-1]->Destroyed;
-	--n;
     }
 }
 
