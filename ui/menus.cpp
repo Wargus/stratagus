@@ -3239,7 +3239,10 @@ global void SoundOptions(void)
     SoundOptionsMenuItems[19].flags = -1;			// all tracks button
     SoundOptionsMenuItems[21].flags = -1;			// random tracks button
 #endif
-    ProcessMenu(MENU_SOUND_OPTIONS, 1);
+    if (InterfaceState == IfaceStateMenu)
+	ProcessMenu(MENU_SOUND_OPTIONS, 0);
+    else
+	ProcessMenu(MENU_SOUND_OPTIONS, 1);
 #endif // with sound
 }
 
