@@ -126,8 +126,31 @@ local int MoveToGoldMine(Unit* unit)
     }
 
     RemoveUnit(unit);
-    unit->X=destu->X;
-    unit->Y=destu->Y;
+#if 1
+    // FIXME: this is a hack, but solves the problem, a better solution is
+    // FIXME: still wanted.
+
+    // Place unit where pathfinder is more likely to work
+    if (unit->X < destu->X) {
+	PlaceUnit(unit,destu->X,unit->Y);
+ 	RemoveUnit(unit);		// Unit removal necessary to free map tiles
+    }
+    if (unit->X > destu->X+destu->Type->TileWidth-1) {
+	PlaceUnit(unit,destu->X+destu->Type->TileWidth-1,unit->Y);
+	RemoveUnit(unit);
+    }
+    if (unit->Y < destu->Y) {
+	PlaceUnit(unit,unit->X,destu->Y);
+	RemoveUnit(unit);
+    }
+    if (unit->Y > destu->Y+destu->Type->TileHeight-1) {
+	PlaceUnit(unit,unit->X,destu->Y+destu->Type->TileHeight-1);
+	RemoveUnit(unit);
+    }
+#else
+    unit->X=dest->X;
+    unit->Y=dest->Y;
+#endif
 
     if( MINE_FOR_GOLD<MAX_UNIT_WAIT ) {
 	unit->Wait=MINE_FOR_GOLD;
