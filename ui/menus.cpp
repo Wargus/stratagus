@@ -132,6 +132,8 @@ local void SaveSelectLBAction(Menuitem *mi, int i);
 local void SaveSelectVSAction(Menuitem *mi, int i);
 local void SaveSelectOk(void);
 
+local void DeleteMenu(void);
+local void DeleteInit(Menuitem *mi __attribute__((unused)));
 local void DeleteFile(void);
 
 local void JoinNetGameMenu(void);
@@ -1443,7 +1445,7 @@ local void InitSaveGameMenuItems() {
 			   (void *)SaveSelectLBRetrieve, ScenSelectOk};
     MenuitemVslider i3 = { 0, 18, 7*18, SaveSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
-    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, DeleteFile, 'd'};
+    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, DeleteMenu, 'd'};
     MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     SaveGameMenuItems[0].d.text    = i0;
     SaveGameMenuItems[1].d.input   = i1;
@@ -1470,7 +1472,7 @@ local void InitLoadGameMenuItems() {
 			   (void *)SaveSelectLBRetrieve, ScenSelectOk};
     MenuitemVslider i3 = { 0, 18, 7*18, SaveSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
-    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, DeleteFile, 'd'};
+    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, DeleteMenu, 'd'};
     MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     SaveGameMenuItems[0].d.text    = i0;
     SaveGameMenuItems[1].d.input   = i1;
@@ -1490,11 +1492,23 @@ local void InitConfirmSaveMenuItems() {
 }
 
 local Menuitem ConfirmDeleteMenuItems[] = {
-    { MI_TYPE_TEXT, 288/2, 11, 0, GameFont, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, DeleteInit, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 16, 11+20*1.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 16, 11+20*2.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_BUTTON, 16, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 288-16-106, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitConfirmDeleteMenuItems() {
-    MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
+    MenuitemText    i0 = { "Delete File", MI_TFLAGS_CENTERED};
+    MenuitemText    i1 = { "Are you sure you want to delete", MI_TFLAGS_LALIGN};
+    MenuitemText    i2 = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemButton  i3 = { "~!Ok", 106, 27, MBUTTON_GM_HALF, DeleteFile, 'o'};
+    MenuitemButton  i4 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     ConfirmDeleteMenuItems[0].d.text = i0;
+    ConfirmDeleteMenuItems[1].d.text = i1;
+    ConfirmDeleteMenuItems[2].d.text = i2;
+    ConfirmDeleteMenuItems[3].d.button = i3;
+    ConfirmDeleteMenuItems[4].d.button = i4;
 }
 
 /**
@@ -1789,7 +1803,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-256)/2,
 	288, 128,
 	ImagePanel4,
-	1, 1,
+	1, 5,
 	ConfirmDeleteMenuItems,
 	NULL,
     },
@@ -2629,9 +2643,27 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
     TypedFileName = 0;
 }
 
+local void DeleteMenu(void)
+{
+    EndMenu();
+    ProcessMenu(MENU_CONFIRM_DELETE, 1);
+}
+
+local void DeleteInit(Menuitem *mi __attribute__((unused)))
+{
+    char text[512]="the file: ";
+    strcat(text, SaveGameMenuItems[1].d.input.buffer);
+    ConfirmDeleteMenuItems[2].d.text.text = text;
+}
+
 local void DeleteFile(void)
 {
-    ProcessMenu(MENU_CONFIRM_DELETE, 1);
+    char name[256];
+    strcat(name, SaveDir);
+    strcat(name, "/");
+    strcat(name, SaveGameMenuItems[1].d.input.buffer);
+    unlink(name);
+    EndMenu();
 }
 
 global void GameMenuLoad(void)
@@ -6010,6 +6042,9 @@ global void InitMenus(unsigned int race)
 	InitHelpMenuItems();
 	InitKeystrokeHelpMenuItems();
 	InitSaveGameMenuItems();
+	InitLoadGameMenuItems();
+	InitConfirmSaveMenuItems();
+	InitConfirmDeleteMenuItems();
 
 	if (VideoWidth != 640) {
 	    MoveButtons();
