@@ -687,21 +687,20 @@ global int CheckMissileToBeDrawn(const Missile* missile)
 */
 global void DrawMissile(const MissileType* mtype, int frame, int x, int y)
 {
-	DebugCheck(mtype == NULL);
+    DebugCheck(mtype == NULL);
 	// FIXME: This is a hack for mirrored sprites
-    if (mtype->Transparency==50) {
+    if (mtype->Transparency == 50) {
         if (frame < 0) {
-			VideoDrawClipXTrans50(mtype->Sprite, -frame, x, y);
-		} else {
-			VideoDrawClipTrans50(mtype->Sprite, frame, x, y);
-		}
- 	} else {
-
-		if (frame < 0) {
-			VideoDrawClipX(mtype->Sprite, -frame, x, y);
-		} else {
-			VideoDrawClip(mtype->Sprite, frame, x, y);
-		}
+		VideoDrawClipXTrans50(mtype->Sprite, -frame, x, y);
+	} else {
+		VideoDrawClipTrans50(mtype->Sprite, frame, x, y);
+	}
+    } else {
+	if (frame < 0) {
+		VideoDrawClipX(mtype->Sprite, -frame, x, y);
+	} else {
+		VideoDrawClip(mtype->Sprite, frame, x, y);
+	}
     }
 }
 
@@ -800,7 +799,7 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 	}
 	// reinitialise the direction but with skipping Animation step.
 	if (missile->SpriteFrame < 0) {
-		missile->SpriteFrame = -missile->SpriteFrame;
+	        missile->SpriteFrame = -missile->SpriteFrame;
 	}
 	missile->SpriteFrame /= missile->Type->NumDirections / 2 + 1;
 	missile->SpriteFrame *= missile->Type->NumDirections / 2 + 1;
