@@ -484,7 +484,7 @@ extern int VideoSyncSpeed;
     **	Counter. Counts how many video interrupts occured, while proceed event
     **	queue. If <1 simply do nothing, =1 means that we should redraw screen.
     **	>1 means that framerate is too slow.
-    **	@see CheckVideoInterrupts @VideoSyncSpeed
+    **	@see CheckVideoInterrupts @see VideoSyncSpeed
     */
 extern volatile int VideoInterrupts;
 
