@@ -54,7 +54,6 @@
 
 extern void PreMenuSetup(void);		/// FIXME: not here!
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
-local void EditorSavePud(const char *file);
 
 extern struct {
     const char*	File[PlayerMaxRaces];	/// Resource filename one for each race
@@ -1111,9 +1110,10 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	case 's':			// ALT s F11 save pud menu
 	case 'S':
 	case KeyCodeF11:
-	    //UiEnterSaveGameMenu();
-	    EditorSavePud("freecraft.pud.gz");
-	    SetStatusLine("Pud saved");
+	    if (EditorSave()) {
+		SetStatusLine("Pud saved");
+	    }
+	    InterfaceState = IfaceStateNormal;
 	    break;
 
 	case 'v':		// 'v' Viewport
@@ -1666,7 +1666,7 @@ local void CreateEditor(void)
 **		Alteast two players, one human slot, every player a startpoint
 **		...
 */
-local void EditorSavePud(const char *file)
+global void EditorSavePud(const char *file)
 {
     int i;
 
