@@ -1190,22 +1190,6 @@ echo >> $RULESFILE
 
 #------------------------------------------------------------------------------
 
-echo "\$(OBJDIR)/%.\$(OE): %.c" >> $RULESFILE
-echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
-echo "	@\$(AR) cru \$(TOPDIR)/src/\$(OBJDIR)/libclone.a \$@" >> $RULESFILE
-if [ "$DARWIN" = 1 ] ; then
-  echo "	ranlib \$(TOPDIR)/src/\$(OBJDIR)/libclone.a" >> $RULESFILE
-fi
-echo >> $RULESFILE
-
-echo "\$(OBJDIR)/%.\$(OE): %.cpp" >> $RULESFILE
-echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
-echo "	@\$(AR) cru \$(TOPDIR)/src/\$(OBJDIR)/libclone.a \$@" >> $RULESFILE
-if [ "$DARWIN" = 1 ] ; then
-  echo "	ranlib \$(TOPDIR)/src/\$(OBJDIR)/libclone.a" >> $RULESFILE
-fi
-echo >> $RULESFILE
-
 #
 # Source code documentation
 
