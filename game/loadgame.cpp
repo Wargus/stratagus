@@ -47,6 +47,9 @@
 #include "ai.h"
 #include "campaign.h"
 #include "trigger.h"
+#ifdef HIERARCHIC_PATHFINDER
+#include "pathfinder.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -87,6 +90,9 @@ global void CleanModules(void)
     CleanMissiles();
     CleanTilesets();
     CleanMap();
+#ifdef HIERARCHIC_PATHFINDER
+    PfHierClean ();
+#endif
 
     //
     //	Free our protected objects, AI scripts, unit-type properties.
@@ -121,6 +127,9 @@ global void InitModules(void)
     InitDependencies();
 
     InitButtons();
+#ifdef HIERARCHIC_PATHFINDER
+    PfHierInitialize ();
+#endif
 }
 
 /**
@@ -181,9 +190,12 @@ global void LoadGame(char* filename)
 */
 global void LoadAll(void)
 {
+#if 0
     SaveGame("save_file_of_freecraft0.ccl");
     LoadGame("save_file_of_freecraft0.ccl");
     SaveGame("save_file_of_freecraft1.ccl");
+#endif
+	LoadGame ("save_file_of_freecraft.ccl");
 }
 
 //@}
