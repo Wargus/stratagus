@@ -78,22 +78,22 @@ global struct {
     ;
 
 /**
-**	The background picture used by menus
-*/
-local Graphic *Menusbgnd;
-
-/**
 **	The currently processed menu
 */
 global const char *CurrentMenu = NULL;
 
 /**
+**	The background picture used by menus
+*/
+local Graphic *Menusbgnd;
+
+/**
 **	X, Y, Width, and Height of menu are to redraw
 */
-global int MenuRedrawX;
-global int MenuRedrawY;
-global int MenuRedrawW;
-global int MenuRedrawH;
+local int MenuRedrawX;
+local int MenuRedrawY;
+local int MenuRedrawW;
+local int MenuRedrawH;
 
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
@@ -105,20 +105,30 @@ local int MenuButtonCurSel = -1;
 /**
 **	Find a menu by ident.
 **
-**	@param menu_id	Unique identifier for the menu.
+**	@param MenuId	Unique identifier for the menu.
 **
 **	@return		Pointer to the menu, NULL if menu is not found.
 */
-global Menu* FindMenu(const char* menu_id)
+global Menu *FindMenu(const char *MenuId)
 {
     Menu **menu;
 
-    if (!(menu = (Menu **) hash_find(MenuHash, (char *)menu_id))) {
-	DebugLevel0Fn("Menu `%s' not found, probably a bug.\n" _C_ menu_id);
+    if (!(menu = (Menu **) hash_find(MenuHash, (char *)MenuId))) {
+	DebugLevel0Fn("Menu `%s' not found, probably a bug.\n" _C_ MenuId);
 	return NULL;
     } else {
 	return *menu;
     }
+}
+
+/**
+**	Invalidate previously redrawn menu areas.
+*/
+global void InvalidateMenuAreas(void)
+{
+    InvalidateAreaAndCheckCursor(
+	     MenuRedrawX,MenuRedrawY,MenuRedrawW,MenuRedrawH);
+    MustRedraw&=~RedrawMenu;
 }
 
 /**
