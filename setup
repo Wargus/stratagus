@@ -823,7 +823,8 @@ if test "$DEBUG" = 1 ; then
 fi
 echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
 echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
-echo -n "	\$(DEBUG) \$(SDLCD) \$(LIBCDA) " >> $RULESFILE
+echo "	\$(DEBUG) \$(SDLCD) \$(LIBCDA) \\" >> $RULESFILE
+echo -n "	\$(FLAC) \$(OGG) \$(MAD) " >> $RULESFILE
 
 echo
 echo -n "Are you using the WarCraft 2 Expansion CD? (n): "
