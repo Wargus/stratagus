@@ -1,0 +1,19 @@
+README.BeOS
+---
+You need, libSDL (the 1..1.x series, preferably 1.1.2, 1.1.4 has some timer bugs):
+http://www.bebits.com/app/1109
+
+libpng and libz (the .so versions, not the .a that come with BeOS):
+http://www.bebits.com/app/1367
+---
+To compile FreeCraft for BeOS, you can either use 'setup' like normal people (but the executable produced can't run from the Tracker) or you can use BeIDE... BeIDE is the prefered method.
+
+But, as expected, BeIDE is kinda dumb... So to get a WORKING executable, you have to do this...
+Open the FreeCraft-beos.proj file, and "Make" it (ALT-M)... when it is finished it will look like it built a working executable called FreeCraft, well... it kinda did. But when linking it screwed something up, i have no idea what, all i know is that it just gives you a blank screen when you load a map. To build the RUNNING executable, open a Terminal, and change into the newly created (Objects.FreeCraft-beos) directory, then run the command:
+
+gcc *.o -lpng -lz -lSDL -lbe -Xlinker -s -Xlinker -x -Xlinker -soname=_APP_ -o ../FreeCraft
+
+Now you have a working copy of FreeCraft, thats all there is to it.
+If you can fix this problem with BeIDE, please do, i have no idea whats causing it, so i just work around it like this.
+---
+written by Kenneth Sanislo.
