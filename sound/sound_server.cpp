@@ -115,8 +115,8 @@ global unsigned AllocatedSoundMemory;	/// memory used by sound
 global unsigned CompressedSoundMemory;	/// compressed memory used by sound
 #endif
 
-global int GlobalVolume=128;		/// global sound volume
-global int MusicVolume=128;		/// music volume
+global int GlobalVolume = 128;		/// global sound volume
+global int MusicVolume = 128;		/// music volume
 
 global int DistanceSilent;		/// silent distance
 
@@ -216,7 +216,7 @@ global void StopMusic(void)
 }
 
 /// Dummy functions if no music support is enabled
-#define MixMusicToStereo32(buffer,size)
+#define MixMusicToStereo32(buffer, size)
 
 #endif
 
@@ -243,7 +243,7 @@ global void StopMusic(void)
 **	@todo		Can combine stereo and volume for faster operation.
 */
 local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
-			      char stereo,int* buffer,int size)
+    char stereo, int* buffer, int size)
 {
     int ri;				// read index
     int wi;				// write index
@@ -253,64 +253,64 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
     unsigned char left;
     unsigned char right;
 
-    local_volume=((int)volume+1)*2*GlobalVolume/MaxVolume;
-    length=sample->Length-index;
-    if( stereo < 0 ) {
-	left=128;
-	right=128+stereo;
+    local_volume = ((int)volume + 1) * 2 * GlobalVolume / MaxVolume;
+    length = sample->Length - index;
+    if (stereo < 0) {
+	left = 128;
+	right = 128 + stereo;
     }
     else {
-	left=128-stereo;
-	right=128;
+	left = 128 - stereo;
+	right = 128;
     }
     DebugLevel3("Length %d\n" _C_ length);
 
     // FIXME: support other formats, stereo or 32 bit ...
 
-    if( sample->SampleSize==8 ) {
+    if (sample->SampleSize == 8) {
 	unsigned char* rp;
 
-	rp=sample->Data+index;
-	if( (size*sample->Frequency)/SoundFrequency/2>length ) {
-	    size=(length*SoundFrequency/sample->Frequency)*2;
+	rp = sample->Data + index;
+	if ((size * sample->Frequency) / SoundFrequency / 2 > length) {
+	    size = (length * SoundFrequency / sample->Frequency) * 2;
 	}
 
 	// mix mono, 8 bit sound to stereo, 32 bit
-	for( ri=wi=0; wi<size; ) {
-	    ri=(wi*sample->Frequency)/SoundFrequency;
-	    ri/=2;			// adjust for mono
+	for (ri = wi = 0; wi < size;) {
+	    ri = (wi * sample->Frequency) / SoundFrequency;
+	    ri /= 2;			// adjust for mono
 
 	    // FIXME: must interpolate samples!
-	    v=(rp[ri]-127)*local_volume;
+	    v = (rp[ri] - 127) * local_volume;
 
-	    buffer[wi++]+=v*left/128;
-	    buffer[wi++]+=v*right/128;	// left+right channel
+	    buffer[wi++] += v * left / 128;
+	    buffer[wi++] += v * right / 128;	// left+right channel
 	}
-	ri=(wi*sample->Frequency)/SoundFrequency;
-	ri/=2;				// adjust for mono
+	ri = (wi * sample->Frequency) / SoundFrequency;
+	ri /= 2;				// adjust for mono
 	DebugLevel3("Mixed %d bytes to %d\n" _C_ ri _C_ wi);
     } else {
 	short* rp;
 
-	DebugCheck( index&1 );
+	DebugCheck(index & 1);
 
-	rp=(short*)(sample->Data+index);
-	if( (size*sample->Frequency)/SoundFrequency>length ) {
-	    size=(length*SoundFrequency/sample->Frequency);
+	rp = (short*)(sample->Data + index);
+	if ((size * sample->Frequency) / SoundFrequency > length) {
+	    size = (length * SoundFrequency / sample->Frequency);
 	}
 
 	// mix mono, 16 bit sound to stereo, 32 bit
-	for( ri=wi=0; wi<size; ) {
-	    ri=(wi*sample->Frequency)/SoundFrequency;
-	    ri/=2;			// adjust for mono
+	for (ri = wi = 0; wi < size;) {
+	    ri = (wi * sample->Frequency) / SoundFrequency;
+	    ri /= 2;			// adjust for mono
 
 	    // FIXME: must interpolate samples!
-	    v=rp[ri]*local_volume/256;
+	    v = rp[ri] * local_volume / 256;
 
-	    buffer[wi++]+=v*left/128;
-	    buffer[wi++]+=v*right/128;
+	    buffer[wi++] += v * left / 128;
+	    buffer[wi++] += v * right / 128;
 	}
-	ri=(wi*sample->Frequency)/SoundFrequency;
+	ri = (wi * sample->Frequency) / SoundFrequency;
     }
 
     return ri;
@@ -329,7 +329,7 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 **
 **	@return		Number of bytes written in 'dest'
 */
-global int ConvertToStereo32(const char *src, char *dest, int frequency, 
+global int ConvertToStereo32(const char* src, char* dest, int frequency, 
     int chansize, int channels, int bytes)
 {
     int s;			// sample index
@@ -353,7 +353,7 @@ global int ConvertToStereo32(const char *src, char *dest, int frequency,
 	for (c = 0; c < 2; ++c) {
 	    offset = (((s / 4) / freqratio) * samplesize + (c / chanratio) * chansize);
 	    if (chansize == 2) {
-		*(short *)(dest + s + c*2) = *(short *)(src + offset);
+		*(short*)(dest + s + c * 2) = *(short*)(src + offset);
 	    } else {
 		*(dest + s + c * 2) = *(src + offset) + 128;
 		*(dest + s + c * 2 + 1) = *(src + offset) + 128;
@@ -386,7 +386,7 @@ SelectionHandling SelectionHandler;
 #ifdef USE_GLIB
 local GHashTable* UnitToChannel;
 #else
-//local hashtable(int,61) UnitToChannel;
+//local hashtable(int, 61) UnitToChannel;
 #endif
 
 /**
@@ -399,15 +399,16 @@ local int ViewPointOffset;
 */
 local int HowManyFree(void)
 {
-  int channel;
-  int nb;
-  nb=0;
-  channel=NextFreeChannel;
-  while(channel<MaxChannels) {
-      nb++;
-      channel=Channels[channel].Point;
-  }
-  return nb;
+    int channel;
+    int nb;
+
+    nb = 0;
+    channel = NextFreeChannel;
+    while(channel < MaxChannels) {
+	++nb;
+	channel = Channels[channel].Point;
+    }
+    return nb;
 }
 
 /*
@@ -417,14 +418,14 @@ local int KeepRequest(SoundRequest* sr) {
     //FIXME: take fight flag into account
     int channel;
 
-    if (sr->Sound==NO_SOUND) {
+    if (sr->Sound == NO_SOUND) {
 	return 0;
     }
 #ifdef USE_GLIB
-    if ( (channel=(int)(long)g_hash_table_lookup(UnitToChannel,
-				      (gpointer)(sr->Source.Base))) ) {
-	channel--;
-	if (Channels[channel].Source.Id==sr->Source.Id) {
+    if ((channel = (int)(long)g_hash_table_lookup(UnitToChannel,
+	    (gpointer)(sr->Source.Base)))) {
+	--channel;
+	if (Channels[channel].Source.Id == sr->Source.Id) {
 	    //FIXME: decision should take into account the sound
 	    return 0;
 	}
@@ -432,19 +433,19 @@ local int KeepRequest(SoundRequest* sr) {
     }
 #else
     {
-	const SoundChannel *theChannel;
+	const SoundChannel* theChannel;
 
 	// slow but working solution: we look for the source in the channels
-	theChannel=Channels;
-	for(channel=0;channel<MaxChannels;channel++) {
-	    if ((*theChannel).Command == ChannelPlay
-		    && (*theChannel).Source.Base==sr->Source.Base
-		    && (*theChannel).Sound==sr->Sound
-		    && (*theChannel).Source.Id==sr->Source.Id) {
+	theChannel = Channels;
+	for (channel = 0; channel < MaxChannels; ++channel) {
+	    if ((*theChannel).Command == ChannelPlay &&
+		    (*theChannel).Source.Base == sr->Source.Base &&
+		    (*theChannel).Sound == sr->Sound &&
+		    (*theChannel).Source.Id == sr->Source.Id) {
 		//FIXME: decision should take into account the sound
 		return 0;
 	    }
-	    theChannel++;
+	    ++theChannel;
 	}
     }
 #endif
@@ -454,21 +455,21 @@ local int KeepRequest(SoundRequest* sr) {
 /*
 ** Register the source of a request in the selection handling hash table.
 */
-local void RegisterSource(SoundRequest* sr,int channel)
+local void RegisterSource(SoundRequest* sr, int channel)
 {
     // always keep the last registered channel
     // use channel+1 to avoid inserting null values
     //FIXME: we should use here the unique identifier of the source, not only
     // the pointer
 #ifdef USE_GLIB
-    g_hash_table_insert(UnitToChannel,(gpointer)(long)(sr->Source.Base),
-			(gpointer)(channel+1));
+    g_hash_table_insert(UnitToChannel, (gpointer)(long)(sr->Source.Base),
+	(gpointer)(channel+1));
 #else
     int i;
     void* p;
 
-    i=channel;
-    p=sr;
+    i = channel;
+    p = sr;
     DebugLevel3Fn("FIXME: must write %p -> %d\n" _C_ sr _C_ channel);
 #endif
     DebugLevel3("Registering %p (channel %d)\n" _C_ sr->Source.Base _C_ channel);
@@ -479,20 +480,19 @@ local void RegisterSource(SoundRequest* sr,int channel)
 */
 local void UnRegisterSource(int channel) {
 #ifdef USE_GLIB
-    if ( (int)(long)g_hash_table_lookup(UnitToChannel,
-				  (gpointer)(Channels[channel].Source.Base))
-	 ==channel+1) {
+    if ((int)(long)g_hash_table_lookup(UnitToChannel,
+	    (gpointer)(Channels[channel].Source.Base)) == channel + 1) {
 	g_hash_table_remove(UnitToChannel,
-			    (gpointer)(long)(Channels[channel].Source.Base));
+	    (gpointer)(long)(Channels[channel].Source.Base));
     }
 #else
     int i;
 
-    i=channel;
+    i = channel;
     DebugLevel3Fn("FIXME: must write %d\n" _C_ channel);
 #endif
-    DebugLevel3("Removing %p (channel %d)\n" _C_ Channels[channel].Source.Base _C_
-		channel);
+    DebugLevel3("Removing %p (channel %d)\n" _C_
+	Channels[channel].Source.Base _C_ channel);
 }
 
 /**
@@ -504,22 +504,24 @@ local void UnRegisterSource(int channel) {
 **
 **	@return		volume for given distance (0..??)
 */
-local unsigned char VolumeForDistance(unsigned short d,unsigned char range) {
+local unsigned char VolumeForDistance(unsigned short d, unsigned char range) {
     int d_tmp;
     int range_tmp;
+
     //FIXME: THIS IS SLOW!!!!!!!
-    if (d <= ViewPointOffset || range==INFINITE_SOUND_RANGE)
+    if (d <= ViewPointOffset || range==INFINITE_SOUND_RANGE) {
 	return MaxVolume;
-    else {
+    } else {
 	if (range) {
-	    d-=ViewPointOffset;
-	    d_tmp=d*MAX_SOUND_RANGE;
-	    range_tmp=DistanceSilent*range;
+	    d -= ViewPointOffset;
+	    d_tmp = d * MAX_SOUND_RANGE;
+	    range_tmp = DistanceSilent * range;
 	    DebugLevel3("Distance: %d, Range: %d\n" _C_ d_tmp _C_ range_tmp);
-	    if (d_tmp > range_tmp )
+	    if (d_tmp > range_tmp) {
 		return 0;
-	    else
-		return (unsigned char)((range_tmp-d_tmp)*MAX_SOUND_RANGE/range_tmp);
+	    } else {
+		return (unsigned char)((range_tmp - d_tmp) * MAX_SOUND_RANGE / range_tmp);
+	    }
 	} else {
 	    return 0;
 	}
@@ -532,14 +534,14 @@ local unsigned char VolumeForDistance(unsigned short d,unsigned char range) {
 */
 local unsigned char ComputeVolume(SoundRequest* sr) {
     if (sr->IsVolume) {
-	if (sr->Power>MaxVolume) {
+	if (sr->Power > MaxVolume) {
 	    return MaxVolume;
 	} else {
 	    return (unsigned char)sr->Power;
 	}
     } else {
 	// map distance to volume
-	return VolumeForDistance(sr->Power,((ServerSoundId)(sr->Sound))->Range);
+	return VolumeForDistance(sr->Power, ((ServerSoundId)(sr->Sound))->Range);
     }
 }
 
@@ -547,12 +549,12 @@ local unsigned char ComputeVolume(SoundRequest* sr) {
 ** "Randomly" choose a sample from a sound group.
 */
 local Sample* SimpleChooseSample(ServerSoundId sound) {
-    if (sound->Number==ONE_SOUND) {
+    if (sound->Number == ONE_SOUND) {
 	return sound->Sound.OneSound;
     } else {
 	//FIXME: check for errors
 	//FIXME: valid only in shared memory context (FrameCounter)
-	return sound->Sound.OneGroup[FrameCounter%sound->Number];
+	return sound->Sound.OneGroup[FrameCounter % sound->Number];
     }
 }
 
@@ -562,58 +564,60 @@ local Sample* SimpleChooseSample(ServerSoundId sound) {
 */
 local Sample* ChooseSample(SoundRequest* sr)
 {
-    ServerSoundId TheSound;
-    Sample* Result=NO_SOUND;
+    ServerSoundId theSound;
+    Sample* result;
+    
+    result = NO_SOUND;
 
-    if (sr->Sound!=NO_SOUND) {
-	TheSound=(ServerSoundId)(sr->Sound);
-	if (TheSound->Number==TWO_GROUPS) {
+    if (sr->Sound != NO_SOUND) {
+	theSound = (ServerSoundId)(sr->Sound);
+	if (theSound->Number == TWO_GROUPS) {
 	    // handle a special sound (selection)
-	    if (SelectionHandler.Source.Base==sr->Source.Base
-		&& SelectionHandler.Source.Id==sr->Source.Id) {
-		if (SelectionHandler.Sound==TheSound->Sound.TwoGroups->First) {
+	    if (SelectionHandler.Source.Base == sr->Source.Base
+		&& SelectionHandler.Source.Id == sr->Source.Id) {
+		if (SelectionHandler.Sound == theSound->Sound.TwoGroups->First) {
 		    DebugLevel3("First group\n");
-		    Result=SimpleChooseSample(SelectionHandler.Sound);
+		    result = SimpleChooseSample(SelectionHandler.Sound);
 		    SelectionHandler.HowMany++;
-		    if (SelectionHandler.HowMany>=3) {
-			SelectionHandler.HowMany=0;
-			SelectionHandler.Sound=(ServerSoundId)TheSound->Sound.TwoGroups->Second;
+		    if (SelectionHandler.HowMany >= 3) {
+			SelectionHandler.HowMany = 0;
+			SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->Second;
 			DebugLevel3("Switching to second group\n");
 		    }
 		} else {
 		    //FIXME: checks for error
 		    DebugLevel3("Second group\n");
 		    // check wether the second group is really a group
-		    if (SelectionHandler.Sound->Number>1) {
-			Result=SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
+		    if (SelectionHandler.Sound->Number > 1) {
+			result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
 			SelectionHandler.HowMany++;
-			if(SelectionHandler.HowMany>=SelectionHandler.Sound->Number) {
-			    SelectionHandler.HowMany=0;
-			    SelectionHandler.Sound=(ServerSoundId)TheSound->Sound.TwoGroups->First;
+			if(SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
+			    SelectionHandler.HowMany = 0;
+			    SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->First;
 			    DebugLevel3("Switching to first group\n");
 			}
 		    } else {
-			Result=SelectionHandler.Sound->Sound.OneSound;
-			SelectionHandler.HowMany=0;
-			SelectionHandler.Sound=(ServerSoundId)TheSound->Sound.TwoGroups->First;
+			result = SelectionHandler.Sound->Sound.OneSound;
+			SelectionHandler.HowMany = 0;
+			SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->First;
 			DebugLevel3("Switching to first group\n");
 		    }
 		}
 	    } else {
-		SelectionHandler.Source=sr->Source;
-		SelectionHandler.Sound=TheSound->Sound.TwoGroups->First;
-		Result=SimpleChooseSample(SelectionHandler.Sound);
-		SelectionHandler.HowMany=1;
+		SelectionHandler.Source = sr->Source;
+		SelectionHandler.Sound = theSound->Sound.TwoGroups->First;
+		result = SimpleChooseSample(SelectionHandler.Sound);
+		SelectionHandler.HowMany = 1;
 	    }
 	} else {
 	    // normal sound/sound group handling
-	    Result=SimpleChooseSample(TheSound);
+	    result = SimpleChooseSample(theSound);
 	    if (sr->Selection) {
-		SelectionHandler.Source=sr->Source;
+		SelectionHandler.Source = sr->Source;
 	    }
 	}
     }
-    return Result;
+    return result;
 }
 
 /*
@@ -621,9 +625,9 @@ local Sample* ChooseSample(SoundRequest* sr)
 */
 global void FreeOneChannel(int channel)
 {
-    Channels[channel].Command=ChannelFree;
-    Channels[channel].Point=NextFreeChannel;
-    NextFreeChannel=channel;
+    Channels[channel].Command = ChannelFree;
+    Channels[channel].Point = NextFreeChannel;
+    NextFreeChannel = channel;
     if (Channels[channel].Source.Base) {
 	// unregister only valid sources
 	UnRegisterSource(channel);
@@ -639,17 +643,17 @@ local int FillOneChannel(SoundRequest* sr)
     int next_free;
     int old_free;
 
-    old_free=NextFreeChannel;
-    if (NextFreeChannel<MaxChannels) {
-	next_free=Channels[NextFreeChannel].Point;
-	Channels[NextFreeChannel].Source=sr->Source;
-	Channels[NextFreeChannel].Point=0;
-	Channels[NextFreeChannel].Volume=ComputeVolume(sr);
-	Channels[NextFreeChannel].Command=ChannelPlay;
-	Channels[NextFreeChannel].Sound=sr->Sound;
-	Channels[NextFreeChannel].Sample=ChooseSample(sr);
-	Channels[NextFreeChannel].Stereo=sr->Stereo;
-	NextFreeChannel=next_free;
+    old_free = NextFreeChannel;
+    if (NextFreeChannel < MaxChannels) {
+	next_free = Channels[NextFreeChannel].Point;
+	Channels[NextFreeChannel].Source = sr->Source;
+	Channels[NextFreeChannel].Point = 0;
+	Channels[NextFreeChannel].Volume = ComputeVolume(sr);
+	Channels[NextFreeChannel].Command = ChannelPlay;
+	Channels[NextFreeChannel].Sound = sr->Sound;
+	Channels[NextFreeChannel].Sample = ChooseSample(sr);
+	Channels[NextFreeChannel].Stereo = sr->Stereo;
+	NextFreeChannel = next_free;
     } else {
 	// should not happen
 	DebugLevel0("***** NO FREE CHANNEL *****\n");
@@ -667,35 +671,35 @@ local void FillChannels(int free_channels,int* discarded,int* started)
     int channel;
     SoundRequest* sr;
 
-    sr=SoundRequests+NextSoundRequestOut;
-    *discarded=0;
-    *started=0;
-    while(free_channels && sr->Used) {
-	if(KeepRequest(sr)) {
+    sr = SoundRequests+NextSoundRequestOut;
+    *discarded = 0;
+    *started = 0;
+    while (free_channels && sr->Used) {
+	if (KeepRequest(sr)) {
 	    DebugLevel3("Source [%p]: start playing request %p at slot %d\n" _C_
-			sr->Source.Base _C_ sr->Sound _C_ NextSoundRequestOut);
-	    channel=FillOneChannel(sr);
+		sr->Source.Base _C_ sr->Sound _C_ NextSoundRequestOut);
+	    channel = FillOneChannel(sr);
 	    if (sr->Source.Base) {
 		//Register only sound with a valid origin
-		RegisterSource(sr,channel);
+		RegisterSource(sr, channel);
 	    }
-	    free_channels--;
+	    --free_channels;
 	    DebugLevel3("Free channels: %d\n" _C_ free_channels);
-	    sr->Used=0;
-	    NextSoundRequestOut++;
+	    sr->Used = 0;
+	    ++NextSoundRequestOut;
 	    (*started)++;
 	} else {
 	  // Discarding request (for whatever reason)
 	  DebugLevel3("Discarding resquest %p from %p at slot %d\n" _C_
-		      sr->Sound _C_ sr->Source.Base _C_ NextSoundRequestOut);
-	  sr->Used=0;
-	  NextSoundRequestOut++;
+	      sr->Sound _C_ sr->Source.Base _C_ NextSoundRequestOut);
+	  sr->Used = 0;
+	  ++NextSoundRequestOut;
 	  (*discarded)++;
 	}
-	if(NextSoundRequestOut>=MAX_SOUND_REQUESTS) {
-	    NextSoundRequestOut=0;
+	if(NextSoundRequestOut >= MAX_SOUND_REQUESTS) {
+	    NextSoundRequestOut = 0;
 	}
-	sr=SoundRequests+NextSoundRequestOut;
+	sr = SoundRequests + NextSoundRequestOut;
     }
 }
 
@@ -713,23 +717,22 @@ local int MixChannelsToStereo32(int* buffer,int size)
     int i;
     int new_free_channels;
 
-    new_free_channels=0;
-    for( channel=0; channel<MaxChannels; ++channel ) {
-	if( Channels[channel].Command==ChannelPlay
-		&& Channels[channel].Sample) {
-	    i=MixSampleToStereo32(
-		    Channels[channel].Sample,Channels[channel].Point,
-		    Channels[channel].Volume,Channels[channel].Stereo,
-		    buffer,size);
-	    Channels[channel].Point+=i;
+    new_free_channels = 0;
+    for (channel = 0; channel < MaxChannels; ++channel) {
+	if (Channels[channel].Command == ChannelPlay &&
+		Channels[channel].Sample) {
+	    i = MixSampleToStereo32(Channels[channel].Sample,
+		Channels[channel].Point, Channels[channel].Volume,
+		Channels[channel].Stereo, buffer, size);
+	    Channels[channel].Point += i;
 
-	    if( Channels[channel].Point>=Channels[channel].Sample->Length ) {
+	    if (Channels[channel].Point >= Channels[channel].Sample->Length) {
 		// free channel as soon as possible (before playing)
 		// useful in multithreading
 		DebugLevel3("End playing request from %p\n" _C_
-			    Channels[channel].Source.Base);
+		    Channels[channel].Source.Base);
 		FreeOneChannel(channel);
-		new_free_channels++;
+		++new_free_channels;
 	    }
 	}
     }
@@ -737,7 +740,7 @@ local int MixChannelsToStereo32(int* buffer,int size)
     return new_free_channels;
 }
 
-#if SoundSampleSize==8
+#if SoundSampleSize == 8
 /**
 **	Clip mix to output stereo 8 unsigned bit.
 **
@@ -745,24 +748,24 @@ local int MixChannelsToStereo32(int* buffer,int size)
 **	@param size	number of samples in input.
 **	@param output	clipped 8 unsigned bit output buffer.
 */
-local void ClipMixToStereo8(const int* mix,int size,unsigned char* output)
+local void ClipMixToStereo8(const int* mix, int size, unsigned char* output)
 {
     int s;
 
-    while( size-- ) {
-	s=(*mix++)/256;
-	if( s>127 ) {
-	    *output++=255;
-	} else if( s<-127 ) {
-	    *output++=0;
+    while (size--) {
+	s = (*mix++) / 256;
+	if (s > 127) {
+	    *output++ = 255;
+	} else if (s < -127) {
+	    *output++ = 0;
 	} else {
-	    *output++=s+127;
+	    *output++ = s + 127;
 	}
     }
 }
 #endif
 
-#if SoundSampleSize==16
+#if SoundSampleSize == 16
 /**
 **	Clip mix to output stereo 16 signed bit.
 **
@@ -770,20 +773,20 @@ local void ClipMixToStereo8(const int* mix,int size,unsigned char* output)
 **	@param size	number of samples in input.
 **	@param output	clipped 16 signed bit output buffer.
 */
-local void ClipMixToStereo16(const int* mix,int size,short* output)
+local void ClipMixToStereo16(const int* mix, int size, short* output)
 {
     int s;
     const int* end;
 
-    end=mix+size;
-    while( mix<end ) {
-	s=(*mix++);
-	if( s>SHRT_MAX ) {
-	    *output++=SHRT_MAX;
-	} else if( s<SHRT_MIN ) {
-	    *output++=SHRT_MIN;
+    end = mix + size;
+    while (mix < end) {
+	s = (*mix++);
+	if (s > SHRT_MAX) {
+	    *output++ = SHRT_MAX;
+	} else if (s < SHRT_MIN) {
+	    *output++ = SHRT_MIN;
 	} else {
-	    *output++=s;
+	    *output++ = s;
 	}
     }
 }
@@ -857,15 +860,15 @@ local Sample* LoadSample(const char* name)
 **	@todo	FIXME: Must handle the errors better.
 **		FIXME: Support for more sample files (ogg/flac/mp3).
 */
-global SoundId RegisterSound(char *files[], unsigned number)
+global SoundId RegisterSound(char* files[], unsigned number)
 {
     unsigned i;
     ServerSoundId id;
 
     id = malloc(sizeof(*id));
     if (number > 1) {			// load a sound group
-	id->Sound.OneGroup = malloc(sizeof(Sample *) * number);
-	for (i = 0; i < number; i++) {
+	id->Sound.OneGroup = malloc(sizeof(Sample*) * number);
+	for (i = 0; i < number; ++i) {
 	    DebugLevel3("Registering `%s'\n" _C_ files[i]);
 	    id->Sound.OneGroup[i] = LoadSample(files[i]);
 	    if (!id->Sound.OneGroup[i]) {
@@ -885,7 +888,7 @@ global SoundId RegisterSound(char *files[], unsigned number)
 	id->Number = ONE_SOUND;
     }
     id->Range = MAX_SOUND_RANGE;
-    return (SoundId) id;
+    return (SoundId)id;
 }
 
 /**
@@ -903,9 +906,9 @@ global SoundId RegisterTwoGroups(SoundId first, SoundId second)
     if (first == NO_SOUND || second == NO_SOUND) {
 	return NO_SOUND;
     }
-    id = (ServerSoundId) malloc(sizeof(*id));
+    id = (ServerSoundId)malloc(sizeof(*id));
     id->Number = TWO_GROUPS;
-    id->Sound.TwoGroups = (TwoGroups *) malloc(sizeof(TwoGroups));
+    id->Sound.TwoGroups = (TwoGroups*)malloc(sizeof(TwoGroups));
     id->Sound.TwoGroups->First = first;
     id->Sound.TwoGroups->Second = second;
     id->Range = MAX_SOUND_RANGE;
@@ -934,31 +937,31 @@ global void SetSoundRange(SoundId sound, unsigned char range)
 **			enough.
 **	@param samples	Number of samples.
 */
-global void MixIntoBuffer(void* buffer,int samples)
+global void MixIntoBuffer(void* buffer, int samples)
 {
     int* mixer_buffer;
     int free_channels;
     int dummy1;
     int dummy2;
 
-    free_channels=HowManyFree();
-    FillChannels(free_channels,&dummy1,&dummy2);
+    free_channels = HowManyFree();
+    FillChannels(free_channels, &dummy1, &dummy2);
 
     // Create empty mixer buffer
-    mixer_buffer=alloca(samples*sizeof(*mixer_buffer));
+    mixer_buffer = alloca(samples * sizeof(*mixer_buffer));
     // FIXME: can save the memset here, if first channel sets the values
-    memset(mixer_buffer,0,samples*sizeof(*mixer_buffer));
+    memset(mixer_buffer, 0, samples * sizeof(*mixer_buffer));
 
     // Add channels to mixer buffer
-    MixChannelsToStereo32(mixer_buffer,samples);
+    MixChannelsToStereo32(mixer_buffer, samples);
     // Add music to mixer buffer
-    MixMusicToStereo32(mixer_buffer,samples);
+    MixMusicToStereo32(mixer_buffer, samples);
 
-#if SoundSampleSize==8
-    ClipMixToStereo8(mixer_buffer,samples,buffer);
+#if SoundSampleSize == 8
+    ClipMixToStereo8(mixer_buffer, samples, buffer);
 #endif
 #if SoundSampleSize==16
-    ClipMixToStereo16(mixer_buffer,samples,buffer);
+    ClipMixToStereo16(mixer_buffer, samples, buffer);
 #endif
 }
 
@@ -968,10 +971,10 @@ global void MixIntoBuffer(void* buffer,int samples)
 */
 global void WriteSound(void)
 {
-#if SoundSampleSize==8
+#if SoundSampleSize == 8
     char buffer[1024];
 #endif
-#if SoundSampleSize==16
+#if SoundSampleSize == 16
     short buffer[1024];
 #endif
 
@@ -983,17 +986,17 @@ global void WriteSound(void)
 
     DebugLevel3Fn("\n");
 
-    if( 0 ) {
+    if (0) {
 	audio_buf_info info;
 
-	ioctl(SoundFildes,SNDCTL_DSP_GETOSPACE,&info);
+	ioctl(SoundFildes, SNDCTL_DSP_GETOSPACE, &info);
 	DebugLevel0("%lu Free bytes %d\n" _C_ GameCycle _C_ info.bytes);
-	if( info.bytes<(int)sizeof(buffer) ) {
+	if (info.bytes < (int)sizeof(buffer)) {
 	    return;
 	}
     }
 
-    MixIntoBuffer(buffer,sizeof(buffer)/sizeof(*buffer));
+    MixIntoBuffer(buffer, sizeof(buffer) / sizeof(*buffer));
 
 #ifdef WITH_ARTSC
     if (WriteArtsSound(buffer, sizeof(buffer)) < 0) {
@@ -1001,8 +1004,8 @@ global void WriteSound(void)
 	
     }
 #else
-    while( write(SoundFildes,buffer,sizeof(buffer))==-1 ) {
-	switch( errno ) {
+    while (write(SoundFildes, buffer, sizeof(buffer)) == -1) {
+	switch (errno) {
 	    case EAGAIN:
 	    case EINTR:
 		continue;
@@ -1029,14 +1032,14 @@ global void WriteSound(void)
 **	@param stream	pointer to buffer you want to fill with information.
 **	@param len	is length of audio buffer in bytes.
 */
-global void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
+global void FillAudio(void* udata __attribute__((unused)), Uint8* stream, int len)
 {
-#if SoundSampleSize==16
-    len>>=1;
+#if SoundSampleSize == 16
+    len >>= 1;
 #endif
     DebugLevel3Fn("%d\n" _C_ len);
 
-    MixIntoBuffer(stream,len);
+    MixIntoBuffer(stream, len);
 }
 #endif	// } USE_SDLA
 
@@ -1048,10 +1051,10 @@ global void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
 global void WriteSoundThreaded(void)
 {
     int mixer_buffer[1024];
-#if SoundSampleSize==8
+#if SoundSampleSize == 8
     char buffer[1024];
 #endif
-#if SoundSampleSize==16
+#if SoundSampleSize == 16
     short buffer[1024];
 #endif
     int new_free_channels;
@@ -1082,16 +1085,16 @@ global void WriteSoundThreaded(void)
 
 	    if (how_many_playing) {
 		new_free_channels = MixChannelsToStereo32(mixer_buffer,
-			sizeof(mixer_buffer) / sizeof(int));
+		    sizeof(mixer_buffer) / sizeof(int));
 	    }
 	    MixMusicToStereo32(mixer_buffer,
 		sizeof(mixer_buffer) / sizeof(int));
 
-#if SoundSampleSize==8
+#if SoundSampleSize == 8
 	    ClipMixToStereo8(mixer_buffer, sizeof(mixer_buffer) / sizeof(int),
 		buffer);
 #endif
-#if SoundSampleSize==16
+#if SoundSampleSize == 16
 	    ClipMixToStereo16(mixer_buffer, sizeof(mixer_buffer) / sizeof(int),
 		buffer);
 #endif
@@ -1119,7 +1122,7 @@ global void WriteSoundThreaded(void)
 	    new_free_channels);
 	new_free_channels += discarded_request;
 	// decrement semaphore by the number of stopped channels
-	for (; new_free_channels > 0; new_free_channels--) {
+	for (; new_free_channels > 0; --new_free_channels) {
 	    //        sem_getvalue(&SoundThreadChannelSemaphore,&tmp);
 	    //        DebugLevel3("SoundSemaphore: %d\n" _C_ tmp);
 	    sem_wait(&SoundThreadChannelSemaphore);
@@ -1142,8 +1145,8 @@ global int InitSound(void)
     //
     //	Open sound device, 8bit samples, stereo.
     //
-    if( InitSdlSound(SoundDeviceName,SoundFrequency,SoundSampleSize,
-	    WaitForSoundDevice) ) {
+    if (InitSdlSound(SoundDeviceName, SoundFrequency, SoundSampleSize,
+	    WaitForSoundDevice)) {
 	return 1;
     }
 #else
@@ -1151,15 +1154,15 @@ global int InitSound(void)
     //
     //	Connect to artsd, 8bit samples, stereo.
     //
-    if( InitArtsSound(SoundFrequency,SoundSampleSize) ) {
+    if (InitArtsSound(SoundFrequency, SoundSampleSize)) {
 	return 1;
     }
 #else
     //
     //	Open dsp device, 8bit samples, stereo.
     //
-    if( InitOssSound(SoundDeviceName,SoundFrequency,SoundSampleSize,
-	    WaitForSoundDevice) ) {
+    if (InitOssSound(SoundDeviceName, SoundFrequency, SoundSampleSize,
+	    WaitForSoundDevice)) {
 	return 1;
     }
 #endif	// WITH_ARTSC
@@ -1168,14 +1171,14 @@ global int InitSound(void)
     //	ARI:	The following must be done here to allow sound to work in
     //		pre-start menus!
     // initialize channels
-    for(dummy=0;dummy<MaxChannels; ++dummy) {
-	Channels[dummy].Point=dummy+1;
+    for (dummy = 0; dummy < MaxChannels; ++dummy) {
+	Channels[dummy].Point = dummy + 1;
     }
 
     // initialize unit to channel hash table
     // WARNING: creation is only valid for a hash table using pointers as key
 #ifdef USE_GLIB
-    UnitToChannel=g_hash_table_new(g_direct_hash,NULL);
+    UnitToChannel = g_hash_table_new(g_direct_hash, NULL);
 #else
     DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
 #endif
@@ -1195,35 +1198,35 @@ global int InitSoundServer(void)
     int MapWidth;
     int MapHeight;
 
-    MapWidth = (TheUI.MapArea.EndX-TheUI.MapArea.X +TileSizeX) / TileSizeX;
-    MapHeight = (TheUI.MapArea.EndY-TheUI.MapArea.Y +TileSizeY) / TileSizeY;
+    MapWidth = (TheUI.MapArea.EndX - TheUI.MapArea.X + TileSizeX) / TileSizeX;
+    MapHeight = (TheUI.MapArea.EndY - TheUI.MapArea.Y + TileSizeY) / TileSizeY;
     //FIXME: Valid only in shared memory context!
-    DistanceSilent=3*max(MapWidth,MapHeight);
+    DistanceSilent = 3 * max(MapWidth, MapHeight);
     DebugLevel2("Distance Silent: %d\n" _C_ DistanceSilent);
-    ViewPointOffset=max(MapWidth/2,MapHeight/2);
+    ViewPointOffset = max(MapWidth / 2, MapHeight / 2);
     DebugLevel2("ViewPointOffset: %d\n" _C_ ViewPointOffset);
 
 #ifdef USE_THREAD
     if (WithSoundThread) {
       //prepare for the sound thread
-      if( sem_init(&SoundThreadChannelSemaphore,0,0) ) {
+      if (sem_init(&SoundThreadChannelSemaphore, 0, 0)) {
 	//FIXME: better error handling
 	PrintFunction();
 	// FIXME: ARI: strerror_r() is better here, but not compatible
 	fprintf(stdout, "%s\n", strerror(errno));
 	close(SoundFildes);
-	SoundFildes=-1;
+	SoundFildes = -1;
 	return 1;
       }
-      if( pthread_create(&SoundThread,NULL,(void *)&WriteSoundThreaded,NULL) ) {
+      if (pthread_create(&SoundThread, NULL, (void*)&WriteSoundThreaded, NULL)) {
 	//FIXME: better error handling
 	PrintFunction();
 	fprintf(stdout, "%s\n", strerror(errno));
 	close(SoundFildes);
-	SoundFildes=-1;
+	SoundFildes = -1;
 	return 1;
       }
-      SoundThreadRunning=1;
+      SoundThreadRunning = 1;
     }
 #endif
 
@@ -1237,14 +1240,14 @@ global void QuitSound(void)
 {
 #ifdef USE_SDLA
     SDL_CloseAudio();
-    SoundFildes=-1;
+    SoundFildes = -1;
 #else
 #ifdef WITH_ARTSC
     ExitArtsSound();
 #else // ! WITH_ARTSC
     if (SoundFildes != -1) {
 	close(SoundFildes);
-	SoundFildes=-1;
+	SoundFildes = -1;
     }
 #endif // WITH_ARTSC
 #endif // USE_SDLA

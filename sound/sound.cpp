@@ -108,43 +108,43 @@ global GameSound GameSounds
 **	@param volume	FIXME: docu
 **	@param stereo	FIXME: docu
 */
-local void InsertSoundRequest(const Unit* unit,unsigned id,unsigned char power,
-			      SoundId sound,unsigned char fight,
-			      unsigned char selection,unsigned char volume,
-			      char stereo) 
+local void InsertSoundRequest(const Unit* unit, unsigned id,
+    unsigned char power, SoundId sound, unsigned char fight,
+    unsigned char selection, unsigned char volume, char stereo) 
 {
 #ifdef USE_SDLA
     SDL_LockAudio();
 #endif
     //FIXME: valid only in a shared memory context...
-    if( !SoundOff && sound != NO_SOUND ) {
+    if (!SoundOff && sound != NO_SOUND) {
 	if (SoundRequests[NextSoundRequestIn].Used) {
 	    DebugLevel0("***** NO FREE SLOT IN SOUND FIFO *****\n");
 	} else {
-	    SoundRequests[NextSoundRequestIn].Used=1;
-	    SoundRequests[NextSoundRequestIn].Source.Base=unit;
-	    SoundRequests[NextSoundRequestIn].Source.Id=id;
-	    SoundRequests[NextSoundRequestIn].Sound=sound;
-	    SoundRequests[NextSoundRequestIn].Power=power;
-	    SoundRequests[NextSoundRequestIn].Fight=(fight)?1:0;
-	    SoundRequests[NextSoundRequestIn].Selection=(selection)?1:0;
-	    SoundRequests[NextSoundRequestIn].IsVolume=(volume)?1:0;
-	    SoundRequests[NextSoundRequestIn].Stereo=stereo;
+	    SoundRequests[NextSoundRequestIn].Used = 1;
+	    SoundRequests[NextSoundRequestIn].Source.Base = unit;
+	    SoundRequests[NextSoundRequestIn].Source.Id = id;
+	    SoundRequests[NextSoundRequestIn].Sound = sound;
+	    SoundRequests[NextSoundRequestIn].Power = power;
+	    SoundRequests[NextSoundRequestIn].Fight = fight ? 1 : 0;
+	    SoundRequests[NextSoundRequestIn].Selection = selection ? 1 : 0;
+	    SoundRequests[NextSoundRequestIn].IsVolume = volume ? 1 : 0;
+	    SoundRequests[NextSoundRequestIn].Stereo = stereo;
 	    DebugLevel3("Source[%p,%s]: registering request %p at slot %d=%d\n" _C_
-			unit _C_ unit ? unit->Type->Ident : ""
-			_C_ sound _C_ NextSoundRequestIn _C_ power);
+		unit _C_ unit ? unit->Type->Ident : "" _C_
+		sound _C_ NextSoundRequestIn _C_ power);
 #ifdef USE_THREAD
 	    // increment semaphore
 	    if (SoundThreadRunning) {
-		if(sem_post(&SoundThreadChannelSemaphore)) {
+		if (sem_post(&SoundThreadChannelSemaphore)) {
 		    DebugLevel0("Cannot increment semaphore!\n");
 		    //FIXME: need to quit?
 		}
 	    }
 #endif
-	    NextSoundRequestIn++;
-	    if (NextSoundRequestIn>=MAX_SOUND_REQUESTS)
-		NextSoundRequestIn=0;
+	    ++NextSoundRequestIn;
+	    if (NextSoundRequestIn >= MAX_SOUND_REQUESTS) {
+		NextSoundRequestIn = 0;
+	    }
 	}
     }
 #ifdef USE_SDLA
@@ -162,31 +162,31 @@ local void InsertSoundRequest(const Unit* unit,unsigned id,unsigned char power,
 **
 **	@todo FIXME: The work completed sounds only supports two races.
 */
-local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
+local SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 {
     switch (voice) {
-    case VoiceAcknowledging:
-	return unit->Type->Sound.Acknowledgement.Sound;
-    case VoiceReady:
-	return unit->Type->Sound.Ready.Sound;
-    case VoiceSelected:
-	return unit->Type->Sound.Selected.Sound;
-    case VoiceAttacking:
-	return unit->Type->Weapon.Attack.Sound;
-    case VoiceHelpMe:
-	return unit->Type->Sound.Help.Sound;
-    case VoiceDying:
-	return unit->Type->Sound.Dead.Sound;
-    case VoiceTreeChopping:
-	return GameSounds.TreeChopping.Sound;
-    case VoiceWorkCompleted:
-	return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
-    case VoiceBuilding:
-	return GameSounds.BuildingConstruction.Sound;
-    case VoiceDocking:
-	return GameSounds.Docking.Sound;
-    case VoiceRepair:
-	return GameSounds.Repair.Sound;
+	case VoiceAcknowledging:
+	    return unit->Type->Sound.Acknowledgement.Sound;
+	case VoiceReady:
+	    return unit->Type->Sound.Ready.Sound;
+	case VoiceSelected:
+	    return unit->Type->Sound.Selected.Sound;
+	case VoiceAttacking:
+	    return unit->Type->Weapon.Attack.Sound;
+	case VoiceHelpMe:
+	    return unit->Type->Sound.Help.Sound;
+	case VoiceDying:
+	    return unit->Type->Sound.Dead.Sound;
+	case VoiceTreeChopping:
+	    return GameSounds.TreeChopping.Sound;
+	case VoiceWorkCompleted:
+	    return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
+	case VoiceBuilding:
+	    return GameSounds.BuildingConstruction.Sound;
+	case VoiceDocking:
+	    return GameSounds.Docking.Sound;
+	case VoiceRepair:
+	    return GameSounds.Repair.Sound;
     }
     return NULL;
 }
@@ -203,9 +203,9 @@ global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 {
     int stereo;
 
-    stereo = ((unit->X * TileSizeX + unit->Type->TileWidth * TileSizeX / 2
-	    + unit->IX - TheUI.SelectedViewport->MapX * TileSizeX) * 256
-		/ ((TheUI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
+    stereo = ((unit->X * TileSizeX + unit->Type->TileWidth * TileSizeX / 2 +
+	unit->IX - TheUI.SelectedViewport->MapX * TileSizeX) * 256 /
+	((TheUI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
     if (stereo < -128) {
 	stereo = -128;
     } else if (stereo > 127) {
@@ -227,9 +227,9 @@ global void PlayMissileSound(const Missile* missile, SoundId sound)
 {
     int stereo;
 
-    stereo = ((missile->X + missile->Type->Width / 2
-	    - TheUI.SelectedViewport->MapX * TileSizeX) * 256
-		/ ((TheUI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
+    stereo = ((missile->X + missile->Type->Width / 2 -
+	TheUI.SelectedViewport->MapX * TileSizeX) * 256 /
+	((TheUI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
     if (stereo < -128) {
 	stereo = -128;
     } else if (stereo > 127) {
@@ -243,17 +243,10 @@ global void PlayMissileSound(const Missile* missile, SoundId sound)
 /**
 **	FIXME: docu
 */
-global void PlayGameSound(SoundId sound,unsigned char volume)
+global void PlayGameSound(SoundId sound, unsigned char volume)
 {
     DebugLevel3("Playing %p at volume %u\n" _C_ sound _C_ volume);
-    InsertSoundRequest(NULL,
-		       0,
-		       volume,
-		       sound,
-		       0,
-		       0,
-		       1,
-		       0);
+    InsertSoundRequest(NULL, 0, volume, sound, 0, 0, 1, 0);
 }
 
 /**
@@ -268,12 +261,12 @@ global void SetGlobalVolume(int volume)
     //FIXME: we use here the fact that we are in a shared memory context. This
     // should send a message to the sound server
     // silently discard out of range values
-    if ( volume<0 ) {
-	GlobalVolume=0;
-    } else if ( volume>MaxVolume ) {
-	GlobalVolume=MaxVolume;
+    if (volume < 0) {
+	GlobalVolume = 0;
+    } else if (volume > MaxVolume) {
+	GlobalVolume = MaxVolume;
     } else {
-	GlobalVolume=volume;
+	GlobalVolume = volume;
     }
 }
 
@@ -290,12 +283,12 @@ global void SetMusicVolume(int volume)
     // should send a message to the sound server
 
     // silently discard out of range values
-    if ( volume<0 ) {
-	MusicVolume=0;
-    } else if ( volume>MaxVolume ) {
-	MusicVolume=MaxVolume;
+    if (volume < 0) {
+	MusicVolume = 0;
+    } else if (volume > MaxVolume) {
+	MusicVolume = MaxVolume;
     } else {
-	MusicVolume=volume;
+	MusicVolume = volume;
     }
 }
 
@@ -306,48 +299,49 @@ global void InitSoundClient(void)
 {
     int i;
 
-    if( SoundFildes==-1 ) {		// No sound enabled
+    if (SoundFildes == -1) {		// No sound enabled
 	return;
     }
     // let's map game sounds, look if already setup in ccl.
 
-    if( !GameSounds.PlacementError.Sound ) {
-	GameSounds.PlacementError.Sound=
-		SoundIdForName(GameSounds.PlacementError.Name);
+    if (!GameSounds.PlacementError.Sound) {
+	GameSounds.PlacementError.Sound =
+	    SoundIdForName(GameSounds.PlacementError.Name);
     }
-    if( !GameSounds.PlacementSuccess.Sound ) {
-	GameSounds.PlacementSuccess.Sound=
-		SoundIdForName(GameSounds.PlacementSuccess.Name);
+    if (!GameSounds.PlacementSuccess.Sound) {
+	GameSounds.PlacementSuccess.Sound =
+	    SoundIdForName(GameSounds.PlacementSuccess.Name);
     }
-    if( !GameSounds.Click.Sound ) {
-	GameSounds.Click.Sound=SoundIdForName(GameSounds.Click.Name);
+    if (!GameSounds.Click.Sound) {
+	GameSounds.Click.Sound = SoundIdForName(GameSounds.Click.Name);
     }
-    if( !GameSounds.TreeChopping.Sound ) {
-	GameSounds.TreeChopping.Sound=
-		SoundIdForName(GameSounds.TreeChopping.Name);
+    if (!GameSounds.TreeChopping.Sound) {
+	GameSounds.TreeChopping.Sound =
+	    SoundIdForName(GameSounds.TreeChopping.Name);
     }
-    if( !GameSounds.Docking.Sound ) {
-	GameSounds.Docking.Sound=
-		SoundIdForName(GameSounds.Docking.Name);
+    if (!GameSounds.Docking.Sound) {
+	GameSounds.Docking.Sound =
+	    SoundIdForName(GameSounds.Docking.Name);
     }
-    if( !GameSounds.BuildingConstruction.Sound ) {
-	GameSounds.BuildingConstruction.Sound=
-		SoundIdForName(GameSounds.BuildingConstruction.Name);
+    if (!GameSounds.BuildingConstruction.Sound) {
+	GameSounds.BuildingConstruction.Sound =
+	    SoundIdForName(GameSounds.BuildingConstruction.Name);
     }
-    for( i=0; i<PlayerRaces.Count; ++i ) {
-	if( !GameSounds.WorkComplete[i].Sound && GameSounds.WorkComplete[i].Name ) {
-	    GameSounds.WorkComplete[i].Sound=
-		    SoundIdForName(GameSounds.WorkComplete[i].Name);
+    for (i = 0; i < PlayerRaces.Count; ++i) {
+	if (!GameSounds.WorkComplete[i].Sound &&
+		GameSounds.WorkComplete[i].Name) {
+	    GameSounds.WorkComplete[i].Sound =
+		SoundIdForName(GameSounds.WorkComplete[i].Name);
 	}
     }
-    if( !GameSounds.Repair.Sound ) {
-	GameSounds.Repair.Sound=
-		SoundIdForName(GameSounds.Repair.Name);
+    if (!GameSounds.Repair.Sound) {
+	GameSounds.Repair.Sound =
+	    SoundIdForName(GameSounds.Repair.Name);
     }
-    for( i=0; i<PlayerRaces.Count; ++i ) {
-	if( !GameSounds.Rescue[i].Sound && GameSounds.Rescue[i].Name ) {
-	    GameSounds.Rescue[i].Sound=
-		    SoundIdForName(GameSounds.Rescue[i].Name);
+    for (i = 0; i < PlayerRaces.Count; ++i) {
+	if (!GameSounds.Rescue[i].Sound && GameSounds.Rescue[i].Name) {
+	    GameSounds.Rescue[i].Sound =
+		SoundIdForName(GameSounds.Rescue[i].Name);
 	}
     }
 }

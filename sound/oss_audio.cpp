@@ -10,7 +10,7 @@
 //
 /**@name oss_audio.c		-	Oss hardware support */
 //
-//	(c) Copyright 2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 2002-2003 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -68,44 +68,44 @@
 **
 **	@return		True if failure, false if everything ok.
 */
-global int InitOssSound(const char* dev,int freq,int size,int wait)
+global int InitOssSound(const char* dev, int freq, int size, int wait)
 {
     int dummy;
 
     //
     //	Open dsp device, 8bit samples, stereo.
     //
-    if( wait ) {
-	SoundFildes=open(dev,O_WRONLY);
+    if (wait) {
+	SoundFildes = open(dev, O_WRONLY);
     } else {
-	SoundFildes=open(dev,O_WRONLY|O_NDELAY);
+	SoundFildes = open(dev, O_WRONLY | O_NDELAY);
     }
-    if( SoundFildes==-1 ) {
-	fprintf(stderr,"Can't open audio device `%s'\n",dev);
+    if (SoundFildes == -1) {
+	fprintf(stderr, "Can't open audio device `%s'\n", dev);
 	return 1;
     }
-    dummy=size;
-    if( ioctl(SoundFildes,SNDCTL_DSP_SAMPLESIZE,&dummy)==-1 ) {
+    dummy = size;
+    if (ioctl(SoundFildes, SNDCTL_DSP_SAMPLESIZE, &dummy) == -1) {
 	PrintFunction();
-	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_SAMPLESIZE)", strerror(errno));
+	fprintf(stdout, "%s - ioctl(SNDCTL_DSP_SAMPLESIZE)", strerror(errno));
 	close(SoundFildes);
-	SoundFildes=-1;
+	SoundFildes = -1;
 	return 1;
     }
-    dummy=1;
-    if( ioctl(SoundFildes,SNDCTL_DSP_STEREO,&dummy)==-1 ) {
+    dummy = 1;
+    if (ioctl(SoundFildes, SNDCTL_DSP_STEREO, &dummy) == -1) {
 	PrintFunction();
-	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_STEREO)", strerror(errno));
+	fprintf(stdout, "%s - ioctl(SNDCTL_DSP_STEREO)", strerror(errno));
 	close(SoundFildes);
-	SoundFildes=-1;
+	SoundFildes = -1;
 	return 1;
     }
-    dummy=freq;
-    if( ioctl(SoundFildes,SNDCTL_DSP_SPEED,&dummy)==-1 ) {
+    dummy = freq;
+    if (ioctl(SoundFildes, SNDCTL_DSP_SPEED, &dummy) == -1) {
 	PrintFunction();
-	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_SPEED)", strerror(errno));
+	fprintf(stdout, "%s - ioctl(SNDCTL_DSP_SPEED)", strerror(errno));
 	close(SoundFildes);
-	SoundFildes=-1;
+	SoundFildes = -1;
 	return 1;
     }
     //
@@ -113,52 +113,52 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
     //
     // FIXME: higher speed more buffers!!
 
-    switch( freq ) {
+    switch (freq) {
 	case 11025:
-	    dummy=((8<<16) |  8);   // 8 Buffers of  256 Bytes
+	    dummy=((8 << 16) |  8);   // 8 Buffers of  256 Bytes
 	    break;
 	case 22050:
-	    dummy=((8<<16) |  9);   // 8 Buffers of  512 Bytes
+	    dummy=((8 << 16) |  9);   // 8 Buffers of  512 Bytes
 	    break;
 	default:
 	    DebugLevel0Fn("Unexpected sample frequency %d\n" _C_ freq);
 	    // FALL THROUGH
 	case 44100:
-	    dummy=((8<<16) | 10);   // 8 Buffers of 1024 Bytes
+	    dummy=((8 << 16) | 10);   // 8 Buffers of 1024 Bytes
 	    break;
     }
-    if( size==16 ) {			//  8 bit
+    if (size == 16) {			//  8 bit
 	++dummy;			// double buffer size
     }
 
     DebugLevel0Fn("%d bytes %d ms buffer\n" _C_ freq*size/8 _C_ 
-	((dummy>>16)*(1<<(dummy&0xFFFF))*1000)/(freq*size/8));
+	((dummy >> 16) * (1 << (dummy & 0xFFFF)) * 1000) / (freq * size / 8));
 
-    if( ioctl(SoundFildes,SNDCTL_DSP_SETFRAGMENT,&dummy)==-1 ) {
+    if (ioctl(SoundFildes, SNDCTL_DSP_SETFRAGMENT, &dummy) == -1) {
 	PrintFunction();
-	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_SETFRAGMENT)", strerror(errno));
+	fprintf(stdout, "%s - ioctl(SNDCTL_DSP_SETFRAGMENT)", strerror(errno));
 	close(SoundFildes);
-	SoundFildes=-1;
+	SoundFildes = -1;
 	return 1;
     }
 
 #if 0
-    dummy=4;
-    if( ioctl(SoundFildes,SNDCTL_DSP_SUBDIVIDE,&dummy)==-1 ) {
+    dummy = 4;
+    if (ioctl(SoundFildes, SNDCTL_DSP_SUBDIVIDE, &dummy) == -1) {
 	PrintFunction();
-	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_SUBDIVIDE)", strerror(errno));
+	fprintf(stdout, "%s - ioctl(SNDCTL_DSP_SUBDIVIDE)", strerror(errno));
 	close(SoundFildes);
-	SoundFildes=-1;
+	SoundFildes = -1;
 	return;
     }
 #endif
 
 #ifdef DEBUG
-    if( ioctl(SoundFildes,SNDCTL_DSP_GETBLKSIZE,&dummy)==-1 ) {
+    if (ioctl(SoundFildes, SNDCTL_DSP_GETBLKSIZE, &dummy) == -1) {
 	PrintFunction();
-	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_GETBLKSIZE)", strerror(errno));
+	fprintf(stdout, "%s - ioctl(SNDCTL_DSP_GETBLKSIZE)", strerror(errno));
 	close(SoundFildes);
-	SoundFildes=-1;
+	SoundFildes = -1;
 	return 1;
     }
 
