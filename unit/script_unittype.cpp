@@ -49,6 +49,7 @@
 #include "script.h"
 #include "construct.h"
 #include "spells.h"
+#include "font.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -1491,7 +1492,11 @@ static int CclDefineDecorations(lua_State* l)
 
 				} else if (!strcmp(key, "text")) {
 					decovar.f = PrintValue;
-					// FIXME : More arguments ? Font, color...
+					lua_rawgeti(l, -1, 1);
+					// FontByIdent stop if not found.
+					decovar.Data.Text.Font = FontByIdent(LuaToString(l, -1));
+					lua_pop(l, 1);
+// FIXME : More arguments ? color...
 				} else if (!strcmp(key, "sprite")) {
 					decovar.f = DrawSpriteBar;
 					lua_rawgeti(l, -1, 1);
