@@ -527,9 +527,13 @@ local void ShowTitleScreens(void)
 		if (PlayMovie(TitleScreens[i]->File,
 				PlayMovieZoomScreen | PlayMovieKeepAspect)) {
 			TitleScreenLabel** labels;
+			Graphic* g;
 
+			g = LoadGraphic(TitleScreens[i]->File);
+			ResizeGraphic(g, VideoWidth, VideoHeight);
 			while (timeout-- && WaitNoEvent) {
-				DisplayPicture(TitleScreens[i]->File);
+				VideoDrawSubClip(g, 0, 0, g->Width, g->Height,
+					(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
 				labels = TitleScreens[i]->Labels;
 				if (labels && labels[0] && IsFontLoaded(labels[0]->Font)) {
 					for (j = 0; labels[j]; ++j) {
@@ -545,6 +549,7 @@ local void ShowTitleScreens(void)
 				RealizeVideoMemory();
 				WaitEventsOneFrame(&callbacks);
 			}
+			VideoFree(g);
 		}
 
 		VideoClearScreen();
