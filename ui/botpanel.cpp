@@ -415,6 +415,8 @@ global void UpdateButtonPanel(void)
     char unit_ident[128];
     int z;
 
+    DebugLevel3(__FUNCTION__": update buttons\n");
+
     CurrentButtons=NULL;
 
     if( !NumSelected ) {		// no unit selected
@@ -559,7 +561,7 @@ global void DoButtonButtonClicked(int button)
     UnitType* type;
     const UnitStats* stats;
 
-    DebugLevel3("Button clicked %d\n",button);
+    DebugLevel3(__FUNCTION__": Button clicked %d\n",button);
 
     if( !CurrentButtons ) {		// no buttons
 	return;
@@ -577,6 +579,8 @@ global void DoButtonButtonClicked(int button)
     //
     //	Handle action on button.
     //
+    DebugLevel3(__FUNCTION__": Button clicked %d=%d\n",button,
+	    CurrentButtons[button].Action);
     switch( CurrentButtons[button].Action ) {
 	case B_Unload:
 	    //
@@ -640,8 +644,6 @@ global void DoButtonButtonClicked(int button)
 		    SendCommandCancelResearch(Selected[0]);
 		}
 	    }
-	    DebugLevel0("Cancel\n");
-
 	    ClearStatusLine();
 	    ClearCosts();
             CurrentButtonLevel = 0;
