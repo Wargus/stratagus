@@ -2364,9 +2364,26 @@ local void GetInfoFromSelectPath(void)
 */
 local void ScenSelectMenu(void)
 {
+    Menu *menu;
+    int n;
+    int j;
+    int t;
+
     ProcessMenu("menu-select-scenario", 1);
 
     GetInfoFromSelectPath();
+
+    menu = FindMenu("menu-custom-game");
+    for (n = j = 0; j < PlayerMax; j++) {
+	t = ScenSelectPudInfo->PlayerType[j];
+	if (t == PlayerPerson || t == PlayerComputer) {
+	    n++;
+	}
+    }
+    menu->items[12].d.pulldown.noptions = n;
+    if (menu->items[12].d.pulldown.curopt >= n) {
+	menu->items[12].d.pulldown.curopt = 0;
+    }
 }
 
 /**
@@ -3710,6 +3727,10 @@ local void CustomGameStart(void)
 */
 local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 {
+    Menu *menu;
+    int n;
+    int j;
+    int t;
     char *s;
 
     //
@@ -3742,6 +3763,18 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
     GetInfoFromSelectPath();
+
+    menu = FindMenu("menu-custom-game");
+    for (n = j = 0; j < PlayerMax; j++) {
+	t = ScenSelectPudInfo->PlayerType[j];
+	if (t == PlayerPerson || t == PlayerComputer) {
+	    n++;
+	}
+    }
+    menu->items[12].d.pulldown.noptions = n;
+    if (menu->items[12].d.pulldown.curopt >= n) {
+	menu->items[12].d.pulldown.curopt = 0;
+    }
 }
 
 /**
