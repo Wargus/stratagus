@@ -437,6 +437,14 @@ global void MenuLoop(char* filename, WorldMap* map)
 {
     for( ;; ) {
 	//
+	//	Clear screen
+	//
+	VideoLockScreen();
+	VideoFillRectangle(ColorBlack,0,0,VideoWidth,VideoHeight);
+	VideoUnlockScreen();
+	Invalidate();
+	RealizeVideoMemory();
+	//
 	//	Network part 1 (port set-up)
 	//	FIXME: JOHNS: -> ARI can this be called multiple?
 	//
