@@ -43,6 +43,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "pathfinder.h"
+#include "interface.h"
 
 /*----------------------------------------------------------------------------
 --      Functions
@@ -110,6 +111,7 @@ local void RepairUnit(Unit* unit,Unit* goal)
 	    }
 	);
     }
+
     //
     //	Check if enough resources are available
     //
@@ -119,6 +121,12 @@ local void RepairUnit(Unit* unit,Unit* goal)
 	    // FIXME: we should say what resource
 	    if( player==ThisPlayer ) {
 		SetMessage("We need resources for repair!");
+	    } else {
+		unit->Orders[0].Action=UnitActionStill;
+		unit->State=unit->SubAction=0;
+		if( unit->Selected ) {	// update display for new action
+		    UpdateButtonPanel();
+		}
 	    }
 	    // FIXME: call back to AI?
 	    // FIXME: We shouldn't animate if no resources are available.
@@ -182,7 +190,8 @@ global void HandleActionRepair(Unit* unit)
 	//	Move near to target.
 	//
 	case 1:
-	    // FIXME: RESET FIRST!! Why? (Johns)
+	    // FIXME: RESET FIRST!! Why? We move first and than check if
+	    // something is in sight.
 	    err=DoActionMove(unit);
 	    if( unit->Reset ) {
 		//
@@ -238,8 +247,10 @@ global void HandleActionRepair(Unit* unit)
 			unit->Orders[0].Goal=NoUnitP;
 		    }
 		    unit->Orders[0].Action=UnitActionStill;
-		    unit->State=0;
-		    unit->SubAction=0;
+		    unit->State=unit->SubAction=0;
+		    if( unit->Selected ) {	// update display for new action
+			UpdateButtonPanel();
+		    }
 		    return;
 		}
 		// FIXME: Should be it already?
@@ -296,8 +307,10 @@ global void HandleActionRepair(Unit* unit)
 			unit->Orders[0].Goal=NULL;
 		    }
                     unit->Orders[0].Action=UnitActionStill;
-		    unit->SubAction=0;
-		    unit->State=0;
+		    unit->SubAction=unit->State=0;
+		    if( unit->Selected ) {	// update display for new action
+			UpdateButtonPanel();
+		    }
                     return;
 		}
 
