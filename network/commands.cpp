@@ -494,7 +494,7 @@ global void CommandLog(const char* action, const Unit* unit, int flush,
 	//
 	log->Num = num;
 
-	log->SyncRandSeed = (signed)SyncRandSeed;
+	log->SyncRandSeed = SyncRandSeed;
 
 	// Append it to ReplayLog list
 	AppendLog(log, LogFile);
@@ -816,9 +816,9 @@ local void DoNextReplay(void)
 			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "No sync info for this replay !");
 		} else {
 			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync (%lu)! ", GameCycle);
-			ReplayStep = 0;
-			NextLogCycle = ~0UL;
-			return;
+			// ReplayStep = 0;
+			// NextLogCycle = ~0UL;
+			// return;
 		}
 #else
 			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync !");
