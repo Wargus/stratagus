@@ -523,9 +523,9 @@ void AiAttackWithForce(int force)
 }
 
 /**
-**	Force on attack ride. We attack until there is no unit or enemy left.
+** Force on attack ride. We attack until there is no unit or enemy left.
 **
-**	@param force	Force pointer.
+** @param force Force pointer.
 */
 static void AiForceAttacks(AiForce* force)
 {
@@ -577,7 +577,7 @@ void AiForceManager(void)
 				}
 				aiunit = aiunit->Next;
 			}
-			if (!aiunit) {		// No enemies go home.
+			if (!aiunit) { // No enemies go home.
 				DebugPrint("FIXME: not written, should send force home\n");
 				AiPlayer->Force[force].Defending = 0;
 				AiPlayer->Force[force].Attacking = 0;
