@@ -3551,13 +3551,13 @@ static void GameDrawFunc(Menuitem* mi __attribute__((unused)))
 	GetDefaultTextColors(&nc, &rc);
 	SetDefaultTextColors(rc, rc);
 	l = VideoTextLength(GameFont, "Scenario:");
-	VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360, GameFont, "Scenario:");
-	VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360 + 24 , GameFont, ScenSelectFileName);
+	VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 380, GameFont, "Scenario:");
+	VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 380 + 24 , GameFont, ScenSelectFileName);
 	if (TheMap.Info.Description) {
-		VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 360, GameFont, TheMap.Info.Description);
+		VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 380, GameFont, TheMap.Info.Description);
 	}
 	sprintf(buffer, " (%d x %d)", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
-	VideoDrawText(TheUI.Offset640X + 16 + l + 8 + VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 360 + 24, GameFont, buffer);
+	VideoDrawText(TheUI.Offset640X + 16 + l + 8 + VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 380 + 24, GameFont, buffer);
 
 #if 0
 	for (n = j = 0; j < PlayerMax; j++) {
@@ -5958,15 +5958,15 @@ static void InitPlayerRaces(Menuitem* mi)
 	if (mi->D.Pulldown.options) {
 		free(mi->D.Pulldown.options);
 	}
-	mi->D.Pulldown.options = (unsigned char**)malloc(n * sizeof(unsigned char*));
-	for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
+	mi->D.Pulldown.options = malloc(n * sizeof(unsigned char*));
+	mi->D.Pulldown.options[0] = strdup("Map Default");
+	for (i = 0, n = 1; i < PlayerRaces.Count; ++i) {
 		if (PlayerRaces.Visible[i]) {
 			mi->D.Pulldown.options[n++] = strdup(PlayerRaces.Display[i]);
 		}
 	}
-	mi->D.Pulldown.options[n++] = strdup("Map Default");
 	mi->D.Pulldown.noptions = n;
-	mi->D.Pulldown.defopt = n - 1;
+	mi->D.Pulldown.defopt = 0;
 }
 
 /**
