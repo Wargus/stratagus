@@ -1725,7 +1725,7 @@ static int CclDefineUI(lua_State* l)
 **  @return  Corresponding value.
 **  @note    Stop on error.
 */
-static EnumVariable Str2EnumVariable(lua_State* l, const char *s)
+EnumVariable Str2EnumVariable(lua_State* l, const char *s)
 {
 	static struct {
 		const char* s;

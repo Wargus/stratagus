@@ -55,6 +55,7 @@
 #include "iolib.h"
 
 #include "util.h"
+#include "trigger.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -134,6 +135,8 @@ static hashtable(MissileType*, 61) MissileTypeHash;
 #endif
 
 BurningBuildingFrame* BurningBuildingFrames; /// Burning building frames
+
+extern NumberDesc* Damage;                   ///< Damage calculation for missile.
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -420,17 +423,31 @@ static int CalculateDamageStats(const UnitStats* attacker_stats,
 /**
 **  Calculate damage.
 **
-**  @param attacker_stats  Attacker attributes.
+**  @param attacker        Attacker.
 **  @param goal            Goal unit.
 **  @param bloodlust       If attacker has bloodlust
 **  @param xp              Experience of attack.
 **
 **  @return                damage produces on goal.
 */
-static int CalculateDamage(const UnitStats* attacker_stats,
-	const Unit* goal, int bloodlust, int xp)
+static int CalculateDamage(const Unit* attacker, const Unit* goal)
 {
-	return CalculateDamageStats(attacker_stats, goal->Stats, bloodlust, xp);
+	Assert(attacker);
+	Assert(goal);
+
+	if (!Damage) { // Use old method.
+		return CalculateDamageStats(attacker->Stats, goal->Stats,
+			attacker->XP, attacker->Bloodlust);
+	}
+	Assert(Damage);
+
+	UpdateUnitVariables((Unit *) attacker);
+	UpdateUnitVariables((Unit *) goal);
+	TriggerData.Attacker = (Unit *) attacker;
+	TriggerData.Defender = (Unit *) goal;
+	return EvalNumber(Damage);
+	TriggerData.Attacker = NULL;
+	TriggerData.Defender = NULL;
 }
 
 /**
@@ -495,8 +512,7 @@ void FireMissile(Unit* unit)
 			return;
 		}
 
-		HitUnit(unit, goal,
-			CalculateDamage(unit->Stats, goal, unit->Bloodlust, unit->XP));
+		HitUnit(unit, goal, CalculateDamage(unit, goal));
 
 		return;
 	}
@@ -890,8 +906,7 @@ static void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 		} else {
 			Assert(missile->SourceUnit != NULL);
 			HitUnit(missile->SourceUnit, goal,
-				CalculateDamage(missile->SourceUnit->Stats, goal,
-					missile->SourceUnit->Bloodlust, 0) / splash);
+				CalculateDamage(missile->SourceUnit, goal) / splash);
 		}
 	}
 }

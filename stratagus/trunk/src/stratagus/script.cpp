@@ -91,10 +91,17 @@ int CurrentTip;                       ///< Current tip to display
 int NoRandomPlacementMultiplayer = 0; ///< Disable the random placement of players in muliplayer mode
 
 char UseHPForXp = 0;                  ///< true if gain XP by dealing damage, false if by killing.
+NumberDesc* Damage;                   ///< Damage calculation for missile.
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+
+/// Usefull for getComponent.
+typedef union {const char *s; int i;} UStrInt;
+/// Get component for unit variable.
+extern UStrInt GetComponent(const Unit* unit, int index, EnumVariable e);
 
 /**
 **  FIXME: docu
@@ -348,6 +355,510 @@ void CclGarbageCollect(int fast)
 		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
 }
 
+// ////////////////////
+
+/**
+**  Parse binary operation with number.
+**
+**  @param l       lua_state.
+**  @param binop   Where to stock info (must be malloced)
+*/
+static void ParseBinOp(lua_State* l, BinOp* binop)
+{
+	Assert(l);
+	Assert(binop);
+	Assert(lua_istable(l, -1));
+	Assert(luaL_getn(l, -1) == 2);
+
+	lua_rawgeti(l, -1, 1); // left
+	binop->Left = CclParseNumberDesc(l);
+	lua_rawgeti(l, -1, 2); // right
+	binop->Right = CclParseNumberDesc(l);
+	lua_pop(l, 1); // table.
+}
+
+/**
+**  Convert the string to the corresponding data (which is a unit).
+**
+**  @param l   lua state.
+**  @param s   Ident.
+**
+**  @return    The reference of the unit.
+**
+**  @todo better check for error (restrict param).
+*/
+static Unit** Str2UnitRef(lua_State* l, const char *s)
+{
+	Unit** res; // Result.
+
+	Assert(l);
+	Assert(s);
+	if (!strcmp(s, "Attacker")) {
+		res = &TriggerData.Attacker;
+	} else if (!strcmp(s, "Defender")) {
+		res = &TriggerData.Defender;
+	} else {
+		LuaError(l, "Invalid unit reference '%s'\n" _C_ s);
+	}
+	Assert(res); // Must check for error.
+	return res;
+}
+
+/**
+**  Return unit referernce definition.
+**
+**  @param l      lua state.
+**
+**  @return unit referernce definition.
+*/
+UnitDesc* CclParseUnitDesc(lua_State* l)
+{
+	UnitDesc* res;  // Result
+
+	res = calloc(1, sizeof(*res));
+	if (lua_isstring(l, -1)) {
+		res->e = EUnit_Ref;
+		res->D.AUnit = Str2UnitRef(l, LuaToString(l, -1));
+	} else {
+		LuaError(l, "Parse Error in ParseUnit\n");
+	}
+	lua_pop(l, 1);
+	return res;
+}
+
+
+/**
+**  Return number.
+**
+**  @param l    lua state.
+**
+**  @return     number.
+*/
+NumberDesc* CclParseNumberDesc(lua_State* l)
+{
+	NumberDesc* res;      // Result.
+	int nargs;            // Size of table.
+	const char* key;      // Key.
+
+	res = calloc(1, sizeof (*res));
+	if (lua_isnumber(l, -1)) {
+		res->e = ENumber_Dir;
+		res->D.Val = LuaToNumber(l, -1);
+	} else if (lua_istable(l, -1)) {
+		nargs = luaL_getn(l, -1);
+		if (nargs != 2) {
+			LuaError(l, "Bad number of args in parse Number table\n");
+		}
+		lua_rawgeti(l, -1, 1); // key
+		key = LuaToString(l, -1);
+		lua_pop(l, 1);
+		lua_rawgeti(l, -1, 2); // table
+		if (!strcmp(key, "Add")){
+			res->e = ENumber_Add;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "Sub")){
+			res->e = ENumber_Sub;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "Mul")){
+			res->e = ENumber_Mul;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "Div")){
+			res->e = ENumber_Div;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "Min")){
+			res->e = ENumber_Min;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "Max")){
+			res->e = ENumber_Max;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "Rand")){
+			res->e = ENumber_Rand;
+			res->D.N = CclParseNumberDesc(l);
+		} else if (!strcmp(key, "UnitVar")){
+			Assert(lua_istable(l, -1));
+
+			res->e = ENumber_UnitStat;
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+				key = LuaToString(l, -2);
+				if (!strcmp(key, "Unit")){
+					res->D.UnitStat.Unit = CclParseUnitDesc(l);
+					lua_pushnil(l);
+				} else if (!strcmp(key, "Variable")){
+					res->D.UnitStat.Index = GetVariableIndex(LuaToString(l, -1));
+					if (res->D.UnitStat.Index == -1) {
+						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
+					}
+				} else if (!strcmp(key, "Component")){
+					res->D.UnitStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
+				} else {
+					LuaError(l, "Bad param %s for Unit" _C_ key);
+				}
+
+
+			}
+			lua_pop(l, 1); // pop the table.
+		} else {
+			lua_pop(l, 1);
+			LuaError(l, "unknow condition '%s'"_C_ key);
+		}
+	} else {
+		LuaError(l, "Parse Error in ParseNumber");
+	}
+	lua_pop(l, 1);
+	return res;
+}
+
+
+/**
+**  compute the Unit expression
+**
+**  @param unitdesc  struct with definition of the calculation.
+**
+**  @return the result unit.
+*/
+Unit* EvalUnit(const UnitDesc* unitdesc)
+{
+	switch (unitdesc->e) {
+		case EUnit_Ref :
+			return *unitdesc->D.AUnit;
+		default :
+			abort();
+			return 0;
+	}
+}
+
+/**
+**  compute the number expression
+**
+**  @param number  struct with definition of the calculation.
+**
+**  @return the result number.
+**
+**  @todo Manage better the error (div/0, unit==NULL, ...).
+*/
+int EvalNumber(const NumberDesc* number)
+{
+	Unit* unit;
+	int a;
+	int b;
+
+	switch (number->e) {
+		case ENumber_Dir :     // directly a number.
+			return number->D.Val;
+		case ENumber_Add :     // a + b.
+			return EvalNumber(number->D.BinOp.Left) + EvalNumber(number->D.BinOp.Right);
+		case ENumber_Sub :     // a - b.
+			return EvalNumber(number->D.BinOp.Left) - EvalNumber(number->D.BinOp.Right);
+		case ENumber_Mul :     // a * b.
+			return EvalNumber(number->D.BinOp.Left) * EvalNumber(number->D.BinOp.Right);
+		case ENumber_Div :     // a / b.
+			a = EvalNumber(number->D.BinOp.Left);
+			b = EvalNumber(number->D.BinOp.Right);
+			if (!b) { // FIXME : manage better this.
+				return 0;
+			}
+			return a / b;
+		case ENumber_Min :     // a <= b ? a : b
+			a = EvalNumber(number->D.BinOp.Left);
+			b = EvalNumber(number->D.BinOp.Right);
+			return (a <= b ? a : b);
+		case ENumber_Max :     // a >= b ? a : b
+			a = EvalNumber(number->D.BinOp.Left);
+			b = EvalNumber(number->D.BinOp.Right);
+			return (a >= b ? a : b);
+		case ENumber_Rand :    // random(a) [0..a-1]
+			a = EvalNumber(number->D.N);
+			return SyncRand() % a;
+		case ENumber_UnitStat : // property of unit.
+			unit = EvalUnit(number->D.UnitStat.Unit);
+			return GetComponent(unit, number->D.UnitStat.Index, number->D.UnitStat.Component).i;
+		default :
+			abort();
+			return 0;
+	}
+}
+
+
+/**
+**  free the unit expression content. (not the pointer itself).
+**
+**  @param unitdesc  struct to free
+**
+*/
+void FreeUnitDesc(UnitDesc* unitdesc)
+{
+#if 0 // Nothing to free mow.
+	if (!unitdesc) {
+		return;
+	}
+#endif
+}
+
+/**
+**  free the number expression content. (not the pointer itself).
+**
+**  @param number  struct to free
+**
+*/
+void FreeNumberDesc(NumberDesc* number)
+{
+	if (number == 0) {
+		return;
+	}
+	switch (number->e) {
+		case ENumber_Dir :     // directly a number.
+			break;
+		case ENumber_Add :     // a + b.
+		case ENumber_Sub :     // a - b.
+		case ENumber_Mul :     // a * b.
+		case ENumber_Div :     // a / b.
+		case ENumber_Min :     // a <= b ? a : b
+		case ENumber_Max :     // a >= b ? a : b
+			FreeNumberDesc(number->D.BinOp.Left);
+			FreeNumberDesc(number->D.BinOp.Right);
+			free(number->D.BinOp.Left);
+			free(number->D.BinOp.Right);
+			break;
+		case ENumber_Rand :    // random(a) [0..a-1]
+			FreeNumberDesc(number->D.N);
+			free(number->D.N);
+			break;
+		case ENumber_UnitStat : // property of unit.
+			FreeUnitDesc(number->D.UnitStat.Unit);
+			break;
+		default :
+			abort();
+	}
+}
+
+/*............................................................................
+..  Aliases
+............................................................................*/
+
+/**
+**  Make alias for some unit Variable function.
+**
+**  @param l  lua State.
+**  @param s
+**
+**  @return the lua table {"UnitVar", {Unit = s, Variable = arg1, Component = "Value" or arg2}
+*/
+static int AliasUnitVar(lua_State* l, const char* s)
+{
+	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 2);
+	lua_newtable (l);
+	lua_pushnumber(l, 1);
+	lua_pushstring(l, "UnitVar");
+	lua_rawset(l, -3);
+	lua_pushnumber(l, 2);
+	lua_newtable (l);
+
+	lua_pushstring(l, "Unit");
+	lua_pushstring(l, s);
+	lua_rawset(l, -3);
+	lua_pushstring(l, "Variable");
+	lua_pushvalue(l, 1);
+	lua_rawset(l, -3);
+	lua_pushstring(l, "Component");
+	if (lua_gettop(l) == 2) {
+		lua_pushvalue(l, 2);
+	} else {
+		lua_pushstring(l, "Value");
+	}
+	lua_rawset(l, -3);
+
+	lua_rawset(l, -3);
+	return 1;
+}
+
+/**
+**  Return equivalent lua table for .
+**  {"Unit", {Unit = "Attacker", Variable = arg1, Component = "Value" or arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitAttacker(lua_State* l)
+{
+	if (lua_gettop(l) == 0 || lua_gettop(l) > 2) {
+		LuaError(l, "Bad number of arg for Attacker()\n");
+	}
+	return AliasUnitVar(l, "Attacker");
+}
+
+/**
+**  Return equivalent lua table for .
+**  {"Unit", {Unit = "Defender", Variable = arg1, Component = "Value" or arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitDefender(lua_State* l)
+{
+	if (lua_gettop(l) == 0 || lua_gettop(l) > 2) {
+		LuaError(l, "Bad number of arg for Defender()\n");
+	}
+	return AliasUnitVar(l, "Defender");
+}
+
+/**
+**  Make alias for some function.
+**
+**  @param l  lua State.
+**  @param s
+**
+**  @return the lua table {s, {arg1, arg2, ..., argn}} or {s, arg1}
+*/
+static int Alias(lua_State* l, const char* s)
+{
+	int i;     // iterator on argument.
+	int narg;  // number of argument
+
+	narg = lua_gettop(l);
+	Assert(narg);
+	lua_newtable (l);
+	lua_pushnumber(l, 1);
+	lua_pushstring(l, s);
+	lua_rawset(l, -3);
+	lua_pushnumber(l, 2);
+	if (narg > 1) {
+		lua_newtable (l);
+		for (i = 1; i <= narg; i++) {
+			lua_pushnumber(l, i);
+			lua_pushvalue(l, i);
+			lua_rawset(l, -3);
+		}
+	} else {
+		lua_pushvalue(l, 1);
+	}
+	lua_rawset(l, -3);
+	return 1;
+}
+
+/**
+**  Return equivalent lua table for add.
+**  {"Add", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclAdd(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for Add()\n");
+	}
+	return Alias(l, "Add");
+}
+
+/**
+**  Return equivalent lua table for add.
+**  {"Div", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclSub(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for Sub()\n");
+	}
+	return Alias(l, "Sub");
+}
+/**
+**  Return equivalent lua table for add.
+**  {"Mul", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclMul(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for Mul()\n");
+	}
+	return Alias(l, "Mul");
+}
+/**
+**  Return equivalent lua table for add.
+**  {"Div", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclDiv(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for Div()\n");
+	}
+	return Alias(l, "Div");
+}
+/**
+**  Return equivalent lua table for add.
+**  {"Min", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclMin(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for Min()\n");
+	}
+	return Alias(l, "Min");
+}
+/**
+**  Return equivalent lua table for add.
+**  {"Max", {arg1, arg2, argn}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclMax(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for Max()\n");
+	}
+	return Alias(l, "Max");
+}
+/**
+**  Return equivalent lua table for add.
+**  {"Rand", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclRand(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "Bad number of arg for Rand()\n");
+	}
+	return Alias(l, "Rand");
+}
+
+
+static void AliasRegister()
+{
+	lua_register(Lua, "Add", CclAdd);
+	lua_register(Lua, "Sub", CclSub);
+	lua_register(Lua, "Mul", CclMul);
+	lua_register(Lua, "Div", CclDiv);
+	lua_register(Lua, "Min", CclMin);
+	lua_register(Lua, "Max", CclMax);
+	lua_register(Lua, "Rand", CclRand);
+
+	lua_register(Lua, "Attacker", CclUnitAttacker);
+	lua_register(Lua, "Defender", CclUnitDefender);
+}
+
 /*............................................................................
 ..  Config
 ............................................................................*/
@@ -509,6 +1020,21 @@ static int CclNoRandomPlacementMultiplayer(lua_State* l)
 	return 0;
 }
 
+/**
+**  Set damage computation method.
+**
+**  @param l  Lua state.
+*/
+static int CclSetDamageFormula(lua_State* l)
+{
+	Assert(l);
+	if (Damage) {
+		FreeNumberDesc(Damage);
+		free(Damage);
+	}
+	Damage = CclParseNumberDesc(l);
+	return 0;
+}
 
 /**
 **  Set God mode.
@@ -1096,6 +1622,7 @@ void InitCcl(void)
 	lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
 	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
+	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
 	lua_register(Lua, "DefineDefaultResources", CclDefineDefaultResources);
 	lua_register(Lua, "DefineDefaultResourcesLow", CclDefineDefaultResourcesLow);
@@ -1111,6 +1638,7 @@ void InitCcl(void)
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "SaveGame", CclSaveGame);
 
+	AliasRegister();
 	NetworkCclRegister();
 	IconCclRegister();
 	MissileCclRegister();

@@ -1840,6 +1840,17 @@ void UpdateUnitVariables(const Unit* unit)
 	}
 	unit->Variable[DAMAGE_INDEX].Max = unit->Type->_BasicDamage + unit->Type->_PiercingDamage;
 
+	if (unit->Bloodlust) { // bloodlust do extra damage.
+		unit->Variable[PIERCINGDAMAGE_INDEX].Value <<= 1;
+		unit->Variable[PIERCINGDAMAGE_INDEX].Max <<= 1;
+		unit->Variable[BASICDAMAGE_INDEX].Value <<= 1;
+		unit->Variable[BASICDAMAGE_INDEX].Max <<= 1;
+		unit->Variable[DAMAGE_INDEX].Value <<= 1;
+		unit->Variable[DAMAGE_INDEX].Max <<= 1;
+		unit->Variable[EXTRADAMAGE_INDEX].Value <<= 1;
+		unit->Variable[EXTRADAMAGE_INDEX].Max <<= 1;
+	}
+
 	// Position
 	unit->Variable[POSX_INDEX].Value = unit->X;
 	unit->Variable[POSX_INDEX].Max = TheMap.Info.MapWidth;
