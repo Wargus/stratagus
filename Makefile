@@ -132,7 +132,7 @@ depend::
 ##############################################################################
 
 DOCS    = README README.BeOS doc/readme.html doc/install.html \
-	  doc/freecraft.html \
+	  doc/freecraft.html doc/datadir.html doc/unit.html \
 	  doc/faq.html doc/ChangeLog.html doc/todo.html doc/freecraft.lsm \
 	  doc/development.html doc/LICENSE doc/OPL doc/opl.html \
 	  doc/artistic-license.html doc/ccl/ccl.html doc/ccl/tileset.html \
