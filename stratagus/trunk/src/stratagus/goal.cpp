@@ -34,6 +34,7 @@
 #include "interface.h"
 
 #include "unit.h"
+#include "menus.h"
 #include "network.h"
 
 /*----------------------------------------------------------------------------
@@ -70,12 +71,14 @@ global void CheckGoals(void)
 	NetworkQuit();
 	if( ThisPlayer->NumFoodUnits+ThisPlayer->NumBuildings ) {
 	    fprintf(stderr,"You have won!\n");
-            SetStatusLine("You have won!");
+            // SetStatusLine("You have won!");
             GamePaused=1;
+	    ProcessMenu(MENU_VICTORY, 1);
 	} else {
 	    fprintf(stderr,"You have lost!\n");
-            SetStatusLine("You have lost!");
+            // SetStatusLine("You have lost!");
             GamePaused=1;
+	    ProcessMenu(MENU_LOST, 1);
 	}
     }
 }
