@@ -36,6 +36,8 @@
 #include "freecraft.h"
 #include "tileset.h"
 #include "map.h"
+#include "iolib.h"
+#include "siod.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -95,14 +97,20 @@ global void LoadTileset(void)
 	ExitFatal(-1);
     }
     DebugCheck(i != TheMap.Terrain);
-    TheMap.Tileset = Tilesets[i];
 
+    if (!Tilesets[i]->Table) {
+	char buf[1024];
+	LibraryFileName(Tilesets[i]->File, buf);
+	vload(buf, 0, 1);
+    }
+
+    TheMap.Tileset = Tilesets[i];
     //
     //  Load and prepare the tileset
     //
-    buf = alloca(strlen(Tilesets[i]->File) + 9 + 1);
-    strcat(strcpy(buf, "graphics/"), Tilesets[i]->File);
-    ShowLoadProgress("\tTileset `%s'\n", Tilesets[i]->File);
+    buf = alloca(strlen(Tilesets[i]->ImageFile) + 9 + 1);
+    strcat(strcpy(buf, "graphics/"), Tilesets[i]->ImageFile);
+    ShowLoadProgress("\tTileset `%s'\n", Tilesets[i]->ImageFile);
     TheMap.TileData = LoadGraphic(buf);
 
     //
@@ -128,7 +136,7 @@ global void LoadTileset(void)
     }
 
     DebugLevel2Fn(" %d Tiles in file %s, %d per row\n" _C_ TheMap.
-	TileCount _C_ TheMap.Tileset->File _C_ tiles_per_row);
+	TileCount _C_ TheMap.Tileset->ImageFile _C_ tiles_per_row);
 
     if (n > MaxTilesInTileset) {
 	fprintf(stderr,
@@ -489,7 +497,7 @@ local void SaveTileset(FILE* file, const Tileset* tileset)
     fprintf(file, "\n(define-tileset\n  '%s 'class '%s", tileset->Ident,
 	tileset->Class);
     fprintf(file, "\n  'name \"%s\"", tileset->Name);
-    fprintf(file, "\n  'image \"%s\"", tileset->File);
+    fprintf(file, "\n  'image \"%s\"", tileset->ImageFile);
     fprintf(file, "\n  'palette \"%s\"", tileset->PaletteFile);
     fprintf(file, "\n  ;; Slots descriptions");
     fprintf(file,
@@ -590,7 +598,7 @@ global void CleanTilesets(void)
 	free(Tilesets[i]->Ident);
 	free(Tilesets[i]->Class);
 	free(Tilesets[i]->Name);
-	free(Tilesets[i]->File);
+	free(Tilesets[i]->ImageFile);
 	free(Tilesets[i]->PaletteFile);
 	free(Tilesets[i]->Table);
 	free(Tilesets[i]->FlagsTable);

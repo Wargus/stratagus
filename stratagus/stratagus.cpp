@@ -938,8 +938,11 @@ global void PreMenuSetup(void)
     //  Inital menues require some gfx.
     //
     // FIXME: must search tileset by identifier or use a gui palette?
+    TheMap.TerrainName=Tilesets[0]->Ident;
+    LoadTileset();
     LoadRGB(GlobalPalette, s=strdcat3(FreeCraftLibPath,
-	    "/graphics/",Tilesets[TilesetSummer]->PaletteFile));
+	    "/graphics/",Tilesets[0]->PaletteFile));
+    TheMap.TerrainName=NULL;
     free(s);
     VideoCreatePalette(GlobalPalette);
     SetDefaultTextColors(FontYellow,FontWhite);

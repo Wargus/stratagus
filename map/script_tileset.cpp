@@ -502,9 +502,10 @@ local SCM CclDefineTileset(SCM list)
 	for( type=0; type<NumTilesets; ++type ) {
 	    if( !strcmp(Tilesets[type]->Ident,ident) ) {
 		free(Tilesets[type]->Ident);
+		free(Tilesets[type]->File);
 		free(Tilesets[type]->Class);
 		free(Tilesets[type]->Name);
-		free(Tilesets[type]->File);
+		free(Tilesets[type]->ImageFile);
 		free(Tilesets[type]->PaletteFile);
 		free(Tilesets[type]->Table);
 		free(Tilesets[type]->TileTypeTable);
@@ -542,12 +543,14 @@ local SCM CclDefineTileset(SCM list)
 	data=gh_car(list);
 	list=gh_cdr(list);
 
-	if( gh_eq_p(value,gh_symbol2scm("class")) ) {
+	if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+	    tileset->File=gh_scm2newstr(data,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("class")) ) {
 	    tileset->Class=gh_scm2newstr(data,NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("name")) ) {
 	    tileset->Name=gh_scm2newstr(data,NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("image")) ) {
-	    tileset->File=gh_scm2newstr(data,NULL);
+	    tileset->ImageFile=gh_scm2newstr(data,NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("palette")) ) {
 	    tileset->PaletteFile=gh_scm2newstr(data,NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("slots")) ) {
