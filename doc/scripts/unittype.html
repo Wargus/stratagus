@@ -436,12 +436,67 @@ buildings.
 <dd>Unit is a shore building, and imobile. This is used for those unique buildings
 that have to be build on sea and have at least one point on coast.
 </dd>
-<dt>MustBuildOnTop = unit-type</dt>
-<dd>This is for buildings that must be built on top of other buildings, as an
-upgrade of sorts. FIXME: This is <b>NOT COMPLETE</b> and only implements the
-behaviour of wc2 oil platforms. It is followed by the building type it must
-be built on.
-</dd>
+<dt>BuilderOutside<dt>
+<dd>true if the builder builds a building from the outside</dd>
+<dt>BuilderLost</dt>
+<dd>true if you would like the builder to die once the building has been completed (used for morphing
+into a building)</dd>
+<dt>AutoBuildRate</dt>
+<dd>The rate at which the building builds itself <b>NOT IMPLEMENTED</b></dd>
+<dt>BuildingRules = { { "distance", { Distance = 3, DistanceType = ">", Type = "unit-gold-mine"}}}
+<dd>BuildingRules allows you to specify a list of restrictions to make when building. The
+list is in nested tables, the inter list is and'd together, and or'd with the other lists. See 
+the example for details.
+<dl>
+	<dt>"distance"</dt>
+	<dd>Specifies a distance constraint</dd>
+	<dl>
+		<dt>Distance</dt>
+		<dd>The distance in tiles to measure</dd>
+		<dt>DistancType</dt>
+		<dd>&lt;, &gt;, &lt;=, &gt;=, ==, !=</dd>
+		<dt>Type</dt>
+		<dd>The type of the unit that this distance restriction applies to</dd>
+		<dt>Except <b>NOT IMPLEMENTED</b></dt>
+		<dd>boolen, #t implies all units, except this type must be</dd>
+	</dl>
+	<dt>"addon"</dt>
+	<dd>Specifies an addon to an existing building</dd>
+	<dl>
+	    <dt>OffsetX</dt>
+		<dd>Offset from the top left of the parent building that this unit must be placed.
+		    eg, -2 would left two of the building. (you need to consider the size of the
+			parent building)</dd>
+		<dt>OffsetY</dt>
+		<dd>As with OffsetX, except in the Y direction</dd>
+		<dt>Type</dt>
+		<dd>Type of the unit that this unit is an addon too</dd>
+	</dl>
+	<dt>"tile" <b>NOT IMPLEMENTED</b></dt>
+	<dd>Implement a tile restriction, unit must be placed on certain types of tiles</dd>
+	<dl>
+	    <dt>NumberOnMask</dt>
+		<dd>The number of tiles that are needed until the build of a type to satisfy</dd>
+		<dt>Mask</dt>
+		<dd>Mask of the tiles that needs to be meet <b>Will be updated to tiletype</b></dd>
+	</dl>
+	<dt>"ontop"</dt>
+	<dd>Building must be built on top of another building type
+	    NOTE: the engine may not be able to guess the correct parent if the rules are complex enough</dd>
+	<dl>
+	    <dt>Type</dt>
+		<dd>The unit-type that we are to build on top of</dd>
+		<dt>ReplaceOnDie</dt>
+		<dd>boolean, true if you want the original unit to be replaced when this unit dies</dd>
+		<dt>ReplaceOnBuild</dt>
+		<dd>boolean, true if you want to remove the old unit underneath when you build this one</dd>
+	</dl>
+	<dt>"direction" <b>NOT IMPLEMENTED</b></dt>
+	<dl>
+	    <dt>Direction</dt>
+		<dd>A bitmask in int format for the directions to build. (bits not specified yet)</dd>
+	</dl>
+</dl>
 <dt>Coward = boolean</dt>
 <dd>Unit will not attack on sight, and will run away instead of retaliating.
 Use this for units that can't attack or are next to useless in combat (like
@@ -613,6 +668,13 @@ DefineUnitType("unit-footman", { Name = "Footman",
   LandUnit = true,
   organic = true,
   SelectableByRectangle = true,
+  -- distance is &gt;3 from gold, and &lt;2 from a watch tower
+  -- or distance is &gt;6 from goldmine
+  BuildingRules = { { "distance", { Distance = 3, DistanceType = "&gt;", Type = "unit-gold-mine"},
+  					  "distance", { Distance = 2, DistanceType = "&lt;", Type = "unit-gold-mine"}},
+					{ "distance", { Distance = 6, DistanceType = "&gt;", Type = "unit-gold-mine"},
+					}
+				  },
   Sounds = {
     "selected", "footman-selected",
     "acknowledge", "footman-acknowledge",

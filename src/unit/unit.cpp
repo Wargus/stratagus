@@ -869,6 +869,7 @@ void RemoveUnit(Unit* unit, Unit* host)
 void UnitLost(Unit* unit)
 {
 	Unit* temp;
+	BuildRestriction* b;
 	const UnitType* type;
 	Player* player;
 	int i;
@@ -962,9 +963,11 @@ void UnitLost(Unit* unit)
 	DebugPrint("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
-	if (type->MustBuildOnTop && unit->Value > 0) {
-		temp = MakeUnitAndPlace(unit->X, unit->Y, type->MustBuildOnTop, &Players[PlayerNumNeutral]);
-		temp->Value = unit->Value;
+	if ((b = OnTopDetails(unit, NULL)) != NULL) {
+		if (b->Data.OnTop.ReplaceOnDie) {
+			temp = MakeUnitAndPlace(unit->X, unit->Y, b->Data.OnTop.Parent, &Players[PlayerNumNeutral]);
+			temp->Value = unit->Value;
+		}
 	}
 	Assert(player->NumBuildings <= UnitMax);
 	Assert(player->TotalNumUnits <= UnitMax);
@@ -1994,6 +1997,41 @@ void DropOutAll(const Unit* source)
   --  Building units
   ----------------------------------------------------------------------------*/
 
+/*
+**  Find the building restriction that gives me this unit built on top
+**  Allows you to define how the restriction is effecting the build
+**
+**  @param unit    the unit that is "OnTop"
+**  @param parent  the parent unit if known. (guess otherwise)
+**
+**  @return        the BuildingRestrictionDetails
+*/
+BuildRestriction* OnTopDetails(const Unit* unit, const UnitType* parent)
+{
+	int w;
+	BuildRestriction* b;
+
+	if (unit->Type->BuildingRules) {
+		w = 0;
+		while (unit->Type->BuildingRules[w] != NULL) {
+			b = unit->Type->BuildingRules[w];
+			while (b != NULL) {
+				if (b->RestrictType == RestrictOnTop) {
+					if (parent && parent == b->Data.OnTop.Parent) {
+						return b;
+					} else if (!parent) {
+						// Guess this is right
+						return b;
+					}
+				}
+				b = b->Next;
+			}
+		++w;
+		}
+	}
+	return NULL;
+}
+
 /**
 **  Can build unit here.
 **  Hall to near to goldmine.
@@ -2004,30 +2042,37 @@ void DropOutAll(const Unit* source)
 **  @param x     Map X position.
 **  @param y     Map Y position.
 **
-**  @return      True if could build here, otherwise false.
+**  @return      OnTop, parent unit, builder on true, NULL false.
 */
-int CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
+Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 {
 	Unit* table[UnitMax];
+	Unit* ontoptarget;
+	BuildRestriction* b;
 	int n;
 	int i;
 	int w;
 	int h;
-	int found;
+	int x1;
+	int x2;
+	int y1;
+	int y2;
+	int distance;
+	int success;
 
 	//
 	//  Can't build outside the map
 	//
 	if (x + type->TileWidth > TheMap.Width) {
-		return 0;
+		return NULL;
 	}
 	if (y + type->TileHeight > TheMap.Height) {
-		return 0;
+		return NULL;
 	}
 
 	// Must be checked before oil!
 	if (type->ShoreBuilding) {
-		found = 0;
+		success = 0;
 
 		// Need at least one coast tile
 		for (h = type->TileHeight; h--;) {
@@ -2035,55 +2080,138 @@ int CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 				if (TheMap.Fields[x + w + (y + h) * TheMap.Width].Flags &
 						MapFieldCoastAllowed) {
 					h = w = 0;
-					found = 1;
+					success = 1;
 				}
 			}
 		}
-		if (!found) {
-			return 0;
+		if (!success) {
+			return NULL;
 		}
 	}
 
-	// resource deposit can't be build too near to resource
-	// FIXME: (mr-russ) check bound for Select
-	n = UnitCacheSelect(x - RESOURCE_DISTANCE, y - RESOURCE_DISTANCE,
-		x + type->TileWidth + RESOURCE_DISTANCE, y + type->TileHeight + RESOURCE_DISTANCE, table);
-	for (i = 0; i < n; ++i) {
-		if (type->CanStore[table[i]->Type->GivesResource]) {
-			return 0;
+
+	// Keep gcc happy
+	distance = 0;
+	x1 = 0;
+	x2 = 0;
+	y1 = 0;
+	y2 = 0;
+	ontoptarget = NULL;
+	
+	if (type->BuildingRules) {
+		w = 0;
+		while (type->BuildingRules[w] != NULL) {
+			b = type->BuildingRules[w];
+			success = 1;
+			while (b != NULL) {
+				// Run Distance Checking
+				if (b->RestrictType == RestrictDistance) {
+					if (b->Data.Distance.DistanceType == LessThanEqual ||
+						b->Data.Distance.DistanceType == GreaterThan ||
+						b->Data.Distance.DistanceType == Equal ||
+						b->Data.Distance.DistanceType == NotEqual) {
+						x1 = x - b->Data.Distance.Distance > 0 ? x - b->Data.Distance.Distance : 0;
+						y1 = y - b->Data.Distance.Distance > 0 ? y - b->Data.Distance.Distance : 0;
+						x2 = x + type->TileWidth + b->Data.Distance.Distance < TheMap.Width ?
+							x + type->TileWidth + b->Data.Distance.Distance : TheMap.Width - 1;
+						y2 = y + type->TileHeight + b->Data.Distance.Distance < TheMap.Height ?
+							y + type->TileHeight + b->Data.Distance.Distance : TheMap.Height - 1;
+						distance = b->Data.Distance.Distance;
+					} else if (b->Data.Distance.DistanceType == LessThan ||
+						b->Data.Distance.DistanceType == GreaterThanEqual) {
+						x1 = x - b->Data.Distance.Distance - 1 > 0 ? x - b->Data.Distance.Distance - 1 : 0;
+						y1 = y - b->Data.Distance.Distance - 1 > 0 ? y - b->Data.Distance.Distance - 1 : 0;
+						x2 = x + type->TileWidth + b->Data.Distance.Distance + 1 < TheMap.Width ?
+							x + type->TileWidth + b->Data.Distance.Distance + 1 : TheMap.Width - 1;
+						y2 = y + type->TileHeight + b->Data.Distance.Distance + 1 < TheMap.Height ?
+							y + type->TileHeight + b->Data.Distance.Distance + 1 : TheMap.Height - 1;
+						distance = b->Data.Distance.Distance - 1;
+					}
+					n = UnitCacheSelect(x1, y1, x2, y2, table);
+				
+					// These type find success, not lose it
+					if (b->Data.Distance.DistanceType == LessThanEqual ||
+						b->Data.Distance.DistanceType == LessThan ||
+						b->Data.Distance.DistanceType == Equal) {
+						success = 0;
+					}
+					for (i = 0; i < n; ++i) {
+						if (table[i]->Type == b->Data.Distance.RestrictType) {
+							if ((b->Data.Distance.DistanceType == GreaterThan ||
+								b->Data.Distance.DistanceType == GreaterThanEqual) &&
+								MapDistanceBetweenTypes(type, x, y, 
+									table[i]->Type, table[i]->X, table[i]->Y) <= distance) {
+								// True on failure
+								success = 0;
+							} else if ((b->Data.Distance.DistanceType == LessThanEqual ||
+								b->Data.Distance.DistanceType == LessThan) &&
+								MapDistanceBetweenTypes(type, x, y,
+									table[i]->Type, table[i]->X, table[i]->Y) <= distance) {
+								success = 1;
+								break;
+							} else if (b->Data.Distance.DistanceType == Equal &&
+								MapDistanceBetweenTypes(type, x, y,
+									table[i]->Type, table[i]->X, table[i]->Y) == distance) {
+								success = 1;
+								break;
+							} else if (b->Data.Distance.DistanceType == NotEqual &&
+								MapDistanceBetweenTypes(type, x, y,
+									table[i]->Type, table[i]->X, table[i]->Y) == distance) {
+								success = 0;
+							}
+						}
+					}
+				}
+				// Check AddOn Restriction
+				if (b->RestrictType == RestrictAddOn) {
+					success = 0;
+					x1 = x - b->Data.AddOn.OffsetX < 0 ? -1 : x - b->Data.AddOn.OffsetX;
+					x1 = x1 >= TheMap.Width ? -1 : x1;
+					y1 = y - b->Data.AddOn.OffsetY < 0 ? -1 : y - b->Data.AddOn.OffsetY;
+					y1 = y1 >= TheMap.Height ? -1 : y1;
+					if (!(x1 == -1 || y1 == -1)) {
+						n = UnitCacheOnTile(x1, y1, table);
+						for (i = 0; i < n; ++i) {
+							if (table[i]->Type == b->Data.AddOn.Parent &&
+								table[i]->X == x1 && table[i]->Y == y1) {
+								success = 1;
+								break;
+							}
+						}
+					}
+				}
+				// Check Build On Top
+				if (b->RestrictType == RestrictOnTop) {
+					success = 0;
+					n = UnitCacheOnTile(x, y, table);
+					for (i = 0; i < n; ++i) {
+						if (table[i]->Type == b->Data.OnTop.Parent &&
+							table[i]->X == x && table[i]->Y == y &&
+							table[i]->Orders[0].Action != UnitActionBuilded &&
+							!table[i]->Destroyed &&
+							table[i]->Orders[0].Action != UnitActionDie) {
+							success = 1;
+							ontoptarget = table[i];
+						}
+					}
+				}
+				// All checks processed, did we really have success
+				if (success) {
+					b = b->Next;
+				} else {
+					break;
+				}
+			}
+			if (b == NULL) {
+				// We passed a full ruleset return
+				return ontoptarget ? ontoptarget : (Unit*)unit;
+			}
+			++w;
 		}
+		return NULL;
 	}
 
-	if (type->MustBuildOnTop) {
-		Unit* target;
-
-		// Resource platform could only be built on resource patch.
-		target = NULL;
-		n = UnitCacheSelect(x, y, x + type->TileWidth, y + type->TileHeight, table);
-		for (i = 0; i < n; ++i) {
-			if (table[i] == unit) {
-				continue;
-			}
-			if (table[i]->Type != type->MustBuildOnTop) {
-				return 0;
-			}
-			if (table[i]->Orders[0].Action == UnitActionBuilded) {
-				return 0;
-			}
-			if (table[i]->Destroyed || table[i]->Orders[0].Action == UnitActionDie) {
-				continue;
-			}
-			if (table[i]->X == x && table[i]->Y == y) {
-				target = table[i];
-			}
-		}
-		if (target) {
-			return 1;
-		}
-		return 0;
-	}
-
-	return 1;
+	return (Unit*)unit;
 }
 
 /**
@@ -2106,21 +2234,23 @@ int CanBuildOn(int x, int y, int mask)
 **  @param y     Y tile map position.
 **  @param real  Really build, or just placement
 **
-**  @return      True if the building could be build..
+**  @return      OnTop, parent unit, builder on true, NULL false.
 **
 **  @todo can't handle building units !1x1, needs a rewrite.
 */
-int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int real)
+Unit* CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int real)
 {
 	int w;
 	int h;
 	int j;
 	int testmask;
 	Player* player;
+	Unit* ontop;
 
-	// Terrain Flags don't matter.
-	if (type->MustBuildOnTop) {
-		return CanBuildHere(unit, type, x, y);
+	// Terrain Flags don't matter if building on top of a unit.
+	ontop = CanBuildHere(unit, type, x, y);
+	if (ontop != unit) {
+		return ontop;
 	}
 
 	//
@@ -2151,10 +2281,10 @@ int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int r
 				if (unit) {
 					TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
 				}
-				return 0;
+				return NULL;
 			}
 			if (player && !IsMapFieldExplored(player, x + w, y + h)) {
-				return 0;
+				return NULL;
 			}
 		}
 	}
@@ -3166,34 +3296,43 @@ int MapDistanceToUnit(int x, int y, const Unit* dest)
 */
 int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
 {
+	return MapDistanceBetweenTypes(src->Type, src->X, src->Y,
+		dst->Type, dst->X, dst->Y);
+}
+
+/**
+**  Returns the map distance between two points with unit type.
+**
+**  @param src     src unittype
+**  @param x1      X map tile position of src (upperleft).
+**  @param y1      Y map tile position of src.
+**  @param dst     Unit type to take into account.
+**  @param x2      X map tile position of dst.
+**  @param y2      Y map tile position of dst.
+**
+**  @return        The distance between the types.
+*/
+int MapDistanceBetweenTypes(const UnitType* src, int x1, int y1, const UnitType* dst, int x2, int y2)
+{
 	int dx;
 	int dy;
-	int x1;
-	int x2;
-	int y1;
-	int y2;
 
-	x1 = src->X;
-	y1 = src->Y;
-	x2 = dst->X;
-	y2 = dst->Y;
-
-	if (x1 + src->Type->TileWidth <= x2) {
-		dx = x2 - x1 - src->Type->TileWidth + 1;
+	if (x1 + src->TileWidth <= x2) {
+		dx = x2 - x1 - src->TileWidth + 1;
 		if (dx < 0) {
 			dx = 0;
 		}
 	} else {
-		dx = x1 - x2 - dst->Type->TileWidth + 1;
+		dx = x1 - x2 - dst->TileWidth + 1;
 		if (dx < 0) {
 			dx = 0;
 		}
 	}
 
-	if (y1 + src->Type->TileHeight <= y2) {
-		dy = y2 - y1 - src->Type->TileHeight + 1;
+	if (y1 + src->TileHeight <= y2) {
+		dy = y2 - y1 - src->TileHeight + 1;
 	} else {
-		dy = y1 - y2 - dst->Type->TileHeight + 1;
+		dy = y1 - y2 - dst->TileHeight + 1;
 		if (dy < 0) {
 			dy = 0;
 		}

@@ -144,8 +144,6 @@ static void RemoveOrder(Unit* unit, int order)
 		unit->Orders[i].Type = NULL;
 		unit->Orders[i].Arg1 = NULL;
 	}
-
-	return;
 }
 
 /**
