@@ -491,8 +491,6 @@ extern int RockOnMap(int x, int y);
 
 	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern int CheckedCanMoveToMask(int x, int y, int mask);
-	/// Returns true, if the unit-type(mask) can enter the field
-extern int CanMoveToMask(int x, int y, int mask);
 	/// Returns true, if the unit-type can enter the field
 extern int UnitTypeCanMoveTo(int x, int y, const UnitType* type);
 	/// Returns true, if the unit can enter the field
@@ -508,12 +506,9 @@ extern void MapSetWall(unsigned x, unsigned y, int humanwall);
 --  Defines
 ----------------------------------------------------------------------------*/
 
-	/// Tile number of the tile drawn for unexplored space
-#define UNEXPLORED_TILE 0
-
-	/// Can an unit with 'mask' can enter the field
-#define CanMoveToMask(x,y,mask) \
-		!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
+	/// Can a unit with 'mask' enter the field
+#define CanMoveToMask(x, y, mask) \
+	!(TheMap.Fields[(x) + (y) * TheMap.Width].Flags & (mask))
 
 #define MapMarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapMarkTileSight)
 #define MapUnmarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapUnmarkTileSight)
