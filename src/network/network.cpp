@@ -31,10 +31,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef __MINGW32__
-extern unsigned int sleep(unsigned int seconds);
-#endif
-
 #include "etlib/dllist.h"
 #include "net_lowlevel.h"
 #include "freecraft.h"
@@ -43,54 +39,15 @@ extern unsigned int sleep(unsigned int seconds);
 #include "actions.h"
 #include "player.h"
 #include "network.h"
+#include "netconnect.h"
 #include "commands.h"
+
 
 #define BASE_OF(type, elem, p) ((type *)((char *)(p) - offsetof(type, elem)))
 
 //----------------------------------------------------------------------------
 //	Declaration
 //----------------------------------------------------------------------------
-
-/**
-**	Network systems active in current game.
-*/
-typedef struct _network_host_ {
-    unsigned long	Host;		/// host address
-    int			Port;		/// port on host
-} NetworkHost;
-
-/**
-**	Network init message.
-*/
-typedef struct _init_message_ {
-    unsigned char	Type;		/// Init message type.
-    int			FreeCraft;	/// FreeCraft engine version.
-    int			Version;	/// Network protocol version.
-    int			Lag;		/// Lag time
-    int			Updates;	/// Update frequency
-    char		HostsCount;	/// Number of hosts.
-    NetworkHost		Hosts[PlayerMax];/// Host and ports of all players.
-    char		Num[PlayerMax];	/// Player number.
-} InitMessage;
-
-/**
-**	Network acknowledge message.
-*/
-typedef struct _ack_message_ {
-    unsigned char	Type;		/// Acknowledge message type.
-} Acknowledge;
-
-/**
-**	Network command message.
-*/
-typedef struct _network_command_ {
-    unsigned char	Type;		/// Network command type.
-    unsigned char	Frame;		/// Destination frame.
-    UnitRef		Unit;		/// Command for unit.
-    unsigned short	X;		/// Map position X.
-    unsigned short	Y;		/// Map position Y.
-    UnitRef		Dest;		/// Destination unit.
-} NetworkCommand;
 
 /**
 **	Network chat message.
@@ -125,22 +82,17 @@ typedef struct _network_command_queue_ {
 //	Variables
 //----------------------------------------------------------------------------
 
-global char NetworkName[16];		/// Network Name of local player
 global int NetworkNumInterfaces;	/// Network number of interfaces
 global int NetworkFildes = -1;		/// Network file descriptor
 global int NetworkInSync = 1;		/// Network is in sync
 global int NetworkUpdates = 5;		/// Network update each # frames
 global int NetworkLag = 5;		/// Network lag in # frames
-global char *NetworkArg;		/// Network command line argument
 
-local int NetPlyNr[PlayerMax];		/// Player nummer
 local char NetMsgBuf[128][PlayerMax];	/// Chat message buffers
 local int NetMsgBufLen[PlayerMax];	/// Stored chat message length
-local NetworkHost Hosts[PlayerMax];	/// Host and ports of all players.
-local int HostsCount;			/// Number of hosts.
 IfDebug(
-local unsigned long MyHost;		/// My host number.
-local int MyPort;			/// My port number.
+global unsigned long MyHost;		/// My host number.
+global int MyPort;			/// My port number.
 );
 local int NetworkDelay;			/// Delay counter for recover.
 local int NetworkSyncSeeds[256];	/// Network sync seeds.
@@ -248,372 +200,16 @@ local void NetworkSendPacket(const NetworkCommandQueue *ncq)
 //----------------------------------------------------------------------------
 
 /**
-**	Server Setup.
-*/
-local void NetworkServerSetup(void)
-{
-    int i, j, n;
-    char buf[1024];
-    InitMessage* msg;
-    InitMessage message;
-    Acknowledge acknowledge;
-    int num[PlayerMax];
-
-    //
-    //	Wait for all clients to connect.
-    //
-    DebugLevel1Fn("Waiting for %d clients\n",NetPlayers-1);
-    acknowledge.Type=MessageInitReply;
-    msg=(InitMessage*)buf;
-    for (i = 1; i < NetPlayers;) {
-	if ( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
-	    exit(-1);
-	}
-
-	DebugLevel0Fn("Receive hello? %d(%d) from %d.%d.%d.%d:%d\n",
-		msg->Type,n,NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
-
-	if (msg->Type != MessageInitHello || n!=sizeof(*msg)) {
-	    DebugLevel0Fn("Wrong message\n");
-	    continue;
-	}
-
-	if( ntohl(msg->FreeCraft)!=FreeCraftVersion ) {
-	    fprintf(stderr,"Incompatible FreeCraft version "
-			FreeCraftFormatString " <-> "
-			FreeCraftFormatString "\n"
-		    ,FreeCraftFormatArgs((int)ntohl(msg->FreeCraft))
-		    ,FreeCraftFormatArgs(FreeCraftVersion));
-	    exit(-1);
-	}
-
-	if( ntohl(msg->Version)!=NetworkProtocolVersion ) {
-	    fprintf(stderr,"Incompatible network protocol version "
-			NetworkProtocolFormatString " <-> "
-			NetworkProtocolFormatString "\n"
-		    ,NetworkProtocolFormatArgs((int)ntohl(msg->Version))
-		    ,NetworkProtocolFormatArgs(NetworkProtocolVersion));
-	    exit(-1);
-	}
-
-	DebugLevel0Fn("Version=" FreeCraftFormatString
-		    ", Network=" NetworkProtocolFormatString
-		    ", Lag=%ld, Updates=%ld\n"
-	    ,FreeCraftFormatArgs((int)ntohl(msg->FreeCraft))
-	    ,NetworkProtocolFormatArgs((int)ntohl(msg->Version))
-	    ,(long)ntohl(msg->Lag),(long)ntohl(msg->Updates));
-
-	//
-	//	Warning: Server should control it!
-	//
-	if (ntohl(msg->Lag) != NetworkLag) {
-	    fprintf(stderr, "Incompatible network lag %ld-%d\n",
-		    (long)ntohl(msg->Lag), NetworkLag);
-	}
-
-	if (ntohl(msg->Updates) != NetworkUpdates) {
-	    fprintf(stderr, "Incompatible network updates %ld-%d\n",
-		(long)ntohl(msg->Updates), NetworkUpdates);
-	}
-
-	// Lookup, if host is already known.
-	for (n = 0; n < HostsCount; ++n) {
-	    if (Hosts[n].Host == NetLastHost && Hosts[n].Port == NetLastPort) {
-		break;
-	    }
-	}
-
-	// A new client
-	if (n == HostsCount) {
-	    Hosts[HostsCount].Host = NetLastHost;
-	    Hosts[HostsCount++].Port = NetLastPort;
-	    DebugLevel0Fn("New client %d.%d.%d.%d:%d\n",
-		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
-	    ++i;
-	}
-
-	// Acknowledge the packet.
-	n = NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
-		sizeof(acknowledge));
-	DebugLevel0Fn("Sending reply for hello (%d)\n", n);
-    }
-
-    //
-    //	Assign the players.
-    //
-    for (n = i = 0; i < NumPlayers && n < NetPlayers; ++i) {
-	if (Players[i].Type == PlayerHuman) {
-	    NetPlyNr[n] = num[n] = i;
-	    DebugLevel3Fn("Assigning %d -> %d\n", i, n);
-	    n++;
-	}
-    }
-    if (n < NetPlayers) {
-	fprintf(stderr, "Not enough human slots\n");
-	exit(-1);
-    }
-
-    // FIXME: randomize the slots :)
-    // FIXME: ARI: selectable by 'Position' selector in Network setup menus!
-
-    //
-    //	Send all clients host:ports to all clients.
-    //
-
-    // Prepare message:
-    message.Type = MessageInitConfig;
-
-    message.FreeCraft = htonl(FreeCraftVersion);
-    message.Version = htonl(NetworkProtocolVersion);
-    message.Lag = htonl(NetworkLag);
-    message.Updates = htonl(NetworkUpdates);
-
-    message.HostsCount = HostsCount + 1;
-    for (i = 0; i < HostsCount; ++i) {
-	message.Hosts[i].Host = Hosts[i].Host;
-	message.Hosts[i].Port = Hosts[i].Port;
-	message.Num[i] = num[i];
-    }
-    message.Hosts[i].Host = message.Hosts[i].Port = 0;	// marks the server
-    message.Num[i] = num[i];
-
-    DebugLevel3Fn("Player here %d\n", num[i]);
-    ThisPlayer = &Players[num[i]];
-
-    DebugLevel1Fn("Ready, assigning to %d hosts\n",HostsCount);
-    //
-    //	Send all clients host:ports to all clients.
-    //
-    for (j = HostsCount; j;) {
-
-	// Send to all clients.
-	for (i = 0; i < HostsCount; ++i) {
-	    if (num[i] != -1) {		// already acknowledged
-		unsigned long host;
-		int port;
-
-		host = message.Hosts[i].Host;
-		port = message.Hosts[i].Port;
-		message.Hosts[i].Host = message.Hosts[i].Port = 0;
-		n = NetSendUDP(NetworkFildes, host, port, &message,
-			sizeof(message));
-		DebugLevel0Fn("Sending config (%d) to %d.%d.%d.%d:%d\n"
-			,n,NIPQUAD(ntohl(host)),ntohs(port));
-		message.Hosts[i].Host = host;
-		message.Hosts[i].Port = port;
-	    }
-	}
-
-	// Wait for acknowledge
-	while (NetSocketReady(NetworkFildes,1000)) {
-	    if( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
-		continue;
-	    }
-
-	    DebugLevel0Fn("Receive ack %d(%d) from %d.%d.%d.%d:%d\n",
-		    msg->Type,n,
-		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
-
-	    if (msg->Type == MessageInitHello && n==sizeof(*msg)) {
-		DebugLevel0Fn("Acknowledge for hello was lost\n");
-
-		// Acknowledge the hello packets.
-		acknowledge.Type = MessageInitReply;
-		n=NetSendUDP(NetworkFildes,NetLastHost,NetLastPort,&acknowledge,
-			sizeof(acknowledge));
-		DebugLevel0Fn("Sending reply for hello (%d)\n", n);
-	    } else {
-		DebugLevel0Fn("Acknowledge for config got?\n");
-
-		for (i = 0; i < HostsCount; ++i) {
-		    if (NetLastHost == Hosts[i].Host
-			    && NetLastPort == Hosts[i].Port
-			    && msg->Type == MessageInitReply
-			    && n==1 ) {
-			if (num[i] != -1) {
-			    DebugLevel0Fn("Removing host\n");
-			    num[i] = -1;
-			    j--;
-			} else {
-			    DebugLevel0Fn("Already removed host\n");
-			}
-			break;
-		    }
-		}
-	    }
-	}
-    }
-}
-
-/**
-**	Client Setup.
-*/
-local void NetworkClientSetup(void)
-{
-    char buf[1024];
-    InitMessage* msg;
-    InitMessage message;
-    Acknowledge acknowledge;
-    unsigned long host;
-    int port;
-    char *cp;
-    int i;
-    int n;
-
-    // Parse server address.
-    cp = strchr(NetworkArg, ':');
-    if (cp) {
-	*cp = '\0';
-	port = htons(atoi(cp + 1));
-	host = NetResolveHost(NetworkArg);
-	*cp = ':';
-    } else {
-	port = htons(NetworkPort);
-	host = NetResolveHost(NetworkArg);
-    }
-    if (host == INADDR_NONE) {
-	fprintf(stderr, "Can't resolve host %s\n", NetworkArg);
-	exit(-1);
-    }
-    DebugLevel0Fn("Server host:port %d.%d.%d.%d:%d\n",
-	    NIPQUAD(ntohl(host)), ntohs(port));
-
-    //
-    //	Connecting to server
-    //
-    message.Type = MessageInitHello;
-    message.FreeCraft = htonl(FreeCraftVersion);
-    message.Version = htonl(NetworkProtocolVersion);
-    message.Lag = htonl(NetworkLag);
-    message.Updates = htonl(NetworkUpdates);
-    msg=(InitMessage*)buf;
-    for (;;) {
-	n = NetSendUDP(NetworkFildes, host, port, &message, sizeof(message));
-	DebugLevel0Fn("Sending hello (%d)\n", n);
-
-	// Wait on answer (timeout 1/2s)
-	if (NetSocketReady(NetworkFildes, 500)) {
-	    if ( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
-		exit(-1);
-	    }
-	    DebugLevel0Fn("Receive reply? %d(%d) %d.%d.%d.%d:%d\n",
-		    msg->Type,n,
-		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
-
-	    IfDebug(
-		if(NetLastHost == MyHost && NetLastPort == MyPort) {
-		    fprintf(stderr, "talking to myself\n");
-		    exit(-1);
-		}
-	    );
-
-	    if (NetLastHost == host && NetLastPort == port
-		    && msg->Type == MessageInitReply && n==1 ) {
-		break;
-	    }
-
-	    DebugLevel0Fn("Received wrong packet\n");
-	}
-    }
-
-    //
-    //	Wait for addresses of other clients.
-    //
-    DebugLevel0Fn("Waiting for clients config\n");
-    acknowledge.Type = MessageInitReply;
-    for (;;) {
-	if ( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
-	    exit(-1);
-	}
-
-	DebugLevel0Fn("Receive config? %d(%d) %d.%d.%d.%d:%d\n",
-		msg->Type,n,
-		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
-
-	if (NetLastHost != host || NetLastPort != port
-		|| msg->Type != MessageInitConfig || n!=sizeof(InitMessage)) {
-	    DebugLevel0Fn("Received wrong packet\n");
-	    continue;
-	}
-
-	DebugLevel0Fn("Received clients\n");
-
-	NetworkLag=ntohl(msg->Lag);
-	NetworkUpdates=ntohl(msg->Updates);
-
-	for (i = 0; i < msg->HostsCount - 1; ++i) {
-	    if (msg->Hosts[i].Host || msg->Hosts[i].Port) {
-		NetPlyNr[HostsCount] = msg->Num[i];
-		Hosts[HostsCount].Host = msg->Hosts[i].Host;
-		Hosts[HostsCount++].Port = msg->Hosts[i].Port;
-	    } else {			// Own client
-		DebugLevel0Fn("SELF %d\n", msg->Num[i]);
-		ThisPlayer = &Players[(int)msg->Num[i]];
-	    }
-	    DebugLevel0Fn("Client %d = %d.%d.%d.%d:%d\n",
-		    msg->Num[i],NIPQUAD(ntohl(msg->Hosts[i].Host)),
-		    ntohs(msg->Hosts[i].Port));
-	}
-	NetPlyNr[HostsCount] = msg->Num[i];
-	Hosts[HostsCount].Host = host;
-	Hosts[HostsCount++].Port = port;
-
-	// Acknowledge the packets.
-	n=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
-		sizeof(acknowledge));
-	DebugLevel0Fn("Sending config ack (%d)\n", n);
-	break;
-    }
-
-    //
-    //	Wait for acknowledge lost (timeout 3s)
-    //
-    while (NetSocketReady(NetworkFildes, 3000)) {
-	if ( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
-	    exit(-1);
-	}
-
-	DebugLevel0Fn("Receive config? %d(%d) %d.%d.%d.%d:%d\n",
-		msg->Type,n,
-		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
-
-	if (NetLastHost == host && NetLastPort == port
-		&& msg->Type == MessageInitConfig && n==sizeof(InitMessage)) {
-
-	    DebugLevel0Fn("Received late clients\n");
-
-	    // Acknowledge the packets.
-	    n=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
-		    sizeof(acknowledge));
-	    DebugLevel0Fn("Sending config ack (%d)\n", n);
-	    continue;
-	}
-
-	if (msg->Type > MessageInitConfig && n==sizeof(NetworkPacket)) {
-	    DebugLevel0Fn("Already a game message\n");
-	    break;
-	}
-    }
-}
-
-/**
 **	Initialise network part 1.
 */
 global void InitNetwork1(void)
 {
-    int i, port;
-    char *cp;
+    int i;
 
     DebugLevel0Fn("\n");
 
-    //
-    //	Server mode: clients connects to this computer.
-    //
     DebugLevel3Fn("Packet %d\n", sizeof(NetworkCommand));
     DebugLevel3Fn("Packet %d\n", sizeof(NetworkChat));
-
-    DebugLevel0Fn("%d players\n", NetPlayers);
-    DebugLevel0Fn("%s arg\n", NetworkArg);
 
     NetworkFildes = -1;
     NetworkInSync = 1;
@@ -632,24 +228,14 @@ global void InitNetwork1(void)
     NetworkLag /= NetworkUpdates;
     NetworkLag *= NetworkUpdates;
 
-    port = NetworkPort;
-    if (NetworkArg) {
-	i = strtol(NetworkArg, &cp, 0);
-	if (cp != NetworkArg && (*cp == ':' || *cp == '\0')) {
-	    if (*cp == ':')
-		cp++;
-	    NetworkArg = cp;
-	    port = i;
-	}
-    }
-
     // Our communication port
-    NetworkFildes = NetOpenUDP(port);
+    NetworkFildes = NetOpenUDP(NetworkPort);
     if (NetworkFildes == -1) {
-	NetworkFildes = NetOpenUDP(port + 1);
+	NetworkFildes = NetOpenUDP(++NetworkPort);
 	if (NetworkFildes == -1) {
 	    fprintf(stderr,"NETWORK: No free ports %d-%d available, aborting\n"
-		    , port, port + 1);
+		    , NetworkPort -1, NetworkPort);
+	    NetExit();		// machine dependend network exit
 	    return;
 	}
     }
@@ -822,28 +408,14 @@ global void NetworkEvent(void)
     packet=(NetworkPacket*)buf;
     IfDebug( NetworkReceivedPackets++ );
 
+    if ( packet->Commands[0].Type <= MessageInitConfig ) {
+	NetworkParseSetupEvent(buf, n);
+	return;
+    }
     //
     //	Minimal checks for good/correct packet.
     //
-    if ( packet->Commands[0].Type <= MessageInitConfig
-	    || n!=sizeof(NetworkPacket)) {
-	if ( packet->Commands[0].Type == MessageInitConfig
-		&& n==sizeof(InitMessage)) {
-	    Acknowledge acknowledge;
-
-	    DebugLevel0Fn("Received late clients\n");
-
-	    // Acknowledge the packets.
-	    acknowledge.Type = MessageInitReply;
-	    n=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
-		    sizeof(acknowledge));
-	    DebugLevel0Fn("Sending config ack (%d)\n", n);
-	    return;
-	}
-	if (packet->Commands[0].Type == MessageInitReply) {
-	    DebugLevel0Fn("late init reply\n");
-	    return;
-	}
+    if ( n!=sizeof(NetworkPacket) ) {
 	DebugLevel0Fn("Bad packet\n");
 	return;
     }

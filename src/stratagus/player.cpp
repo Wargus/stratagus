@@ -33,13 +33,13 @@
 #include "unit.h"
 #include "ai.h"
 #include "network.h"
+#include "netconnect.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
 global int NumPlayers;			/// How many player used
-global int NetPlayers;			/// How many network players
 global Player Players[PlayerMax];	/// All players in play
 global Player* ThisPlayer;		/// Player on this computer
 

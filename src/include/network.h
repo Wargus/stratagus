@@ -33,24 +33,7 @@
 
 #define NetworkMaxLag	250		/// Debuging network lag (# frames)
 
-#define NetworkPort	6660		/// Default port for communication
 #define NetworkDups	4		/// Repeat old commands
-
-    /// Network protocol major version
-#define NetworkProtocolMajorVersion	0
-    /// Network protocol minor version (maximal 99)
-#define NetworkProtocolMinorVersion	2
-    /// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel	4
-    /// Network protocol version (1,2,3) -> 10203
-#define NetworkProtocolVersion \
-	(NetworkProtocolMajorVersion*10000+NetworkProtocolMinorVersion*100 \
-	+NetworkProtocolPatchLevel)
-
-    /// Network protocol printf format string
-#define NetworkProtocolFormatString	"%d,%d,%d"
-    /// Network protocol printf format arguments
-#define NetworkProtocolFormatArgs(v)	(v)/10000,((v)/100)%100,(v)%100
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -100,17 +83,35 @@ enum _message_type_ {
     MessageCommandSpellCast		/// unit command spell cast
 };
 
+/**
+**	Network acknowledge message.
+*/
+typedef struct _ack_message_ {
+    unsigned char	Type;		/// Acknowledge message type.
+} Acknowledge;
+
+/**
+**	Network command message.
+*/
+typedef struct _network_command_ {
+    unsigned char	Type;		/// Network command type.
+    unsigned char	Frame;		/// Destination frame.
+    UnitRef		Unit;		/// Command for unit.
+    unsigned short	X;		/// Map position X.
+    unsigned short	Y;		/// Map position Y.
+    UnitRef		Dest;		/// Destination unit.
+} NetworkCommand;
+
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern char NetworkName[16];		/// Network Name of local player
 extern int NetworkNumInterfaces;	/// Network number of interfaces
 extern int NetworkFildes;		/// Network file descriptor
 extern int NetworkInSync;		/// Network is in sync
 extern int NetworkUpdates;		/// Network update each # frames
 extern int NetworkLag;			/// Network lag (# frames)
-extern char* NetworkArg;		/// Network command line argument
 
 /*----------------------------------------------------------------------------
 --	Functions

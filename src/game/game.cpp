@@ -42,6 +42,7 @@
 #include "spells.h"
 #include "construct.h"
 #include "network.h"
+#include "netconnect.h"
 #include "missile.h"
 #include "settings.h"
 
@@ -146,6 +147,11 @@ global void CreateGame(char* filename, WorldMap* map)
 {
     int i, j;
     char* s;
+
+    //
+    // Evaluate optional command line parameters
+    //
+    NetworkSetupArgs();
 
     //
     //	Network part 1 (port set-up)

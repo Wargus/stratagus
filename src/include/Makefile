@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file (3 level).
 ##
-##	(c) Copyright 1998-2000 by Lutz Sammer
+##	(c) Copyright 1998-2001 by Lutz Sammer
 ##
 ##	siod.h siodp.h from SIOD - Scheme In One Day interpreter.
 ##		Copyright and Author: George J. Carrette, gjc@delphi.com
@@ -31,7 +31,8 @@ HDRS	= actions.h ai.h ccl.h freecraft.h construct.h cursor.h font.h icons.h \
 	  ccl_sound.h sound.h sound_id.h unitsound.h wav.h sound_server.h \
 	  video.h network.h commands.h goal.h ui.h button.h menus.h spells.h \
 	  siod.h siodp.h iolib.h depend.h settings.h myendian.h net_lowlevel.h \
-	  rdtsc.h etlib/generic.h etlib/xmalloc.h etlib/hash.h etlib/dllist.h
+	  netconnect.h etlib/generic.h etlib/xmalloc.h etlib/hash.h etlib/dllist.h \
+	  rdtsc.h
 
 all:
 	echo done.
