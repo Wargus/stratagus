@@ -10,7 +10,7 @@
 //
 /**@name unittype.c	-	The unit types. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 

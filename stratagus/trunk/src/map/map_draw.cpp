@@ -1518,7 +1518,7 @@ void InitMap(void)
 	    break;
 
 	default:
-	    DebugLevel0(__FUNCTION__": Depth unsupported\n");
+	    DebugLevel0Fn("Depth unsupported\n");
 	    break;
     }
 }

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name goal.c		-	The game goal. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -55,7 +54,7 @@ global void CheckGoals(void)
     int i;
     int n;
 
-    DebugLevel3(__FUNCTION__"\n");
+    DebugLevel3Fn("\n");
 
     for( i=n=0; i<NumPlayers; ++i ) {
 	if( Players[i].Race!=PlayerRaceNeutral ) {

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name player.c	-	The players. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -214,7 +213,7 @@ global void CreatePlayer(char* name,int type)
 		break;
 	}
     }
-    
+
     //
     //	Initial default resources.
     //
@@ -547,7 +546,7 @@ global void GraphicPlayerPixels(const Player* player,const Graphic* sprite)
 	    break;
 	case 24:
 	    *((struct __4pixel24__*)(((VMemType24*)sprite->Pixels)+208))
-	    	    =player->UnitColors.Depth24;
+		    =player->UnitColors.Depth24;
 	    break;
 	case 32:
 	    *((struct __4pixel32__*)(((VMemType32*)sprite->Pixels)+208))
@@ -595,7 +594,7 @@ global void SetPlayersPalette(void)
     case 8:
 	// New player colors setup
 	if( !Pixels8 ) {
-	    DebugLevel0(__FUNCTION__": Wrong setup order\n");
+	    DebugLevel0Fn("Wrong setup order\n");
 	    return;
 	}
 
@@ -626,7 +625,7 @@ global void SetPlayersPalette(void)
     case 16:
 	// New player colors setup
 	if( !Pixels16 ) {
-	    DebugLevel0(__FUNCTION__": Wrong setup order\n");
+	    DebugLevel0Fn("Wrong setup order\n");
 	    return;
 	}
 
@@ -655,7 +654,7 @@ global void SetPlayersPalette(void)
     case 24:
 	// New player colors setup
 	if( !Pixels24 ) {
-	    DebugLevel0(__FUNCTION__": Wrong setup order\n");
+	    DebugLevel0Fn("Wrong setup order\n");
 	    return;
 	}
 
@@ -684,7 +683,7 @@ global void SetPlayersPalette(void)
     case 32:
 	// New player colors setup
 	if( !Pixels32 ) {
-	    DebugLevel0(__FUNCTION__": Wrong setup order\n");
+	    DebugLevel0Fn("Wrong setup order\n");
 	    return;
 	}
 

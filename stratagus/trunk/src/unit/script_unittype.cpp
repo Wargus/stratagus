@@ -9,13 +9,16 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ccl_unittype.c	-	The unit-type ccl functions. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -392,7 +395,7 @@ local SCM CclDefineUnitType(SCM list)
 	value=gh_car(temp);
 	i=gh_scm2int(value);
 	type->CorpseScript=i;
-    } 
+    }
 
     // Flags
     type->UnitType=0;			// reset all
@@ -612,7 +615,7 @@ local SCM CclPrintUnitTypeTable(void)
 
 #ifdef USE_CCL2
 
-/** 
+/**
  ** Get a single animation sequence.
  */
 local Animation * GetSingleAnimation(SCM list){
@@ -640,7 +643,7 @@ local Animation * GetSingleAnimation(SCM list){
     Flags = gh_scm2int(value);
     partlist = gh_cdr(partlist);
     value = gh_car(partlist);
-    
+
     Pixel = gh_scm2int(value);
     partlist = gh_cdr(partlist);
     value = gh_car(partlist);
@@ -648,7 +651,7 @@ local Animation * GetSingleAnimation(SCM list){
     Sleep = gh_scm2int(value);
     partlist = gh_cdr(partlist);
     value = gh_car(partlist);
-    
+
     Frame = gh_scm2int(value);
     //printf("(F%d,P%d,S%d,F%d)",Flags,Pixel,Sleep,Frame);
     anim.Flags = Flags;
@@ -658,7 +661,7 @@ local Animation * GetSingleAnimation(SCM list){
     finallist[current_location++] = anim;
   }
   //printf("\n");
-  
+
   return finallist;
 
 }
@@ -674,7 +677,7 @@ local SCM CclAnimType(SCM list)
   list = gh_car(list);
   {
     int length = gh_length(list)-1;
-    Animation ** whole_animation = 
+    Animation ** whole_animation =
       (Animation **)calloc(length,sizeof(Animation*));
     int type = gh_scm2int(gh_car(list));
     int cur = 0;
@@ -686,9 +689,9 @@ local SCM CclAnimType(SCM list)
       //printf("%ld ",gh_length(gh_car(list)));
       whole_animation[cur++] = GetSingleAnimation(gh_car(list));
       list = gh_cdr(list);
-      
+
     }
-    
+
     switch( type ){
     case 0:
       for( i=0; i<UnitTypeInternalMax; ++i ) {
@@ -740,7 +743,7 @@ local SCM CclAnimType(SCM list)
       free(whole_animation);
       break;
     default:
-      DebugLevel1(__FUNCTION__":Unknown unit-type %d\n",type);
+      DebugLevel1Fn("Unknown unit-type %d\n",type);
       free(whole_animation);
       break;
     }
@@ -916,7 +919,7 @@ local SCM CclSetUnitTypeProperty(SCM ptr,SCM property)
 	gc_protect(type->Property);
     }
     if( !property ) {
-	DebugLevel0(__FUNCTION__": oops, my fault\n");
+	DebugLevel0Fn("oops, my fault\n");
     }
     type->Property=property;
 

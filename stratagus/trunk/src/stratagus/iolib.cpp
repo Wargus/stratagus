@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name iolib.c	-	Compression-IO helper functions. */
-/*
-**	(c) Copyright 2000 by Andreas Arens
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 2000,2001 by Andreas Arens
+//
+//	$Id$
 
 //@{
 
@@ -102,7 +101,7 @@ local void bzseek(BZFILE* file,unsigned offset,int whence)
 
 #endif	// USE_BZ2LIB
 
-#if defined(USE_ZLIB) || defined(USE_BZ2LIB) 
+#if defined(USE_ZLIB) || defined(USE_BZ2LIB)
 
 /**
 **	CLopen		Library file open
@@ -356,7 +355,7 @@ global char* LibraryFileName(const char* file,char* buffer)
 	return buffer;
     }
 #endif
-    DebugLevel0(__FUNCTION__": File `%s' not found\n",file);
+    DebugLevel0Fn("File `%s' not found\n",file);
 
     strcpy(buffer,file);
     return buffer;
@@ -405,7 +404,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		continue;
 	    if (strcmp(dp->d_name, "..") == 0)
 		continue;
-	    
+
 	    strcpy(np, dp->d_name);
 	    if (stat(buffer, &st) == 0) {
 		if (S_ISREG(st.st_mode) || S_ISDIR(st.st_mode)) {

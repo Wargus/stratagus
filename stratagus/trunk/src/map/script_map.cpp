@@ -10,7 +10,7 @@
 //
 /**@name ccl_map.c	-	The map ccl functions. */
 //
-//	(c) Copyright 1999,2000 by Lutz Sammer
+//	(c) Copyright 1999-2001 by Lutz Sammer
 //
 //	$Id$
 

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ccl_ai.c	-	The AI ccl functions. */
-/*
-**	(c) Copyright 2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -127,7 +126,7 @@ local SCM CclDefineAiHelper(SCM list)
 	    free(str);
 	    continue;
 	}
-	DebugLevel0(__FUNCTION__": %s\n",base->Name);
+	DebugLevel0Fn("%s\n",base->Name);
 	free(str);
 
 	//
@@ -143,7 +142,7 @@ local SCM CclDefineAiHelper(SCM list)
 		free(str);
 		continue;
 	    }
-	    DebugLevel0(__FUNCTION__": > %s\n",type->Name);
+	    DebugLevel0Fn("> %s\n",type->Name);
 	    free(str);
 
 	    switch( what ) {
@@ -193,7 +192,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel0(__FUNCTION__": %s\n",str);
+    DebugLevel0Fn("%s\n",str);
     aitype->Name=str;
 
     //
@@ -202,7 +201,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel0(__FUNCTION__": %s\n",str);
+    DebugLevel0Fn("%s\n",str);
     aitype->Race=str;
 
     //
@@ -211,7 +210,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel0(__FUNCTION__": %s\n",str);
+    DebugLevel0Fn("%s\n",str);
     aitype->Class=str;
 
     //

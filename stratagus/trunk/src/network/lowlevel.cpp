@@ -10,7 +10,7 @@
 //
 /**@name lowlevel.c	-	The network lowlevel. */
 //
-//	(c) Copyright 2000 by Lutz Sammer
+//	(c) Copyright 2000,2001 by Lutz Sammer
 //
 //	$Id$
 
