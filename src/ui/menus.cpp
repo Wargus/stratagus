@@ -263,7 +263,9 @@ local void EditorQuitMenu(void);
 --	Variables
 ----------------------------------------------------------------------------*/
 
+    /// FIXME: Docu, Johns why typedef?
 global _MenuHash MenuHash;
+    /// FIXME: Docu, Johns why typedef?
 global _MenuFuncHash MenuFuncHash;
 
 #define HASHADD(x,y) { \
@@ -1451,39 +1453,39 @@ local void GlobalOptions(void)
     ProcessMenu("menu-global-options", 1);
 }
 
-local void InitGlobalOptions(Menuitem *mi)
+local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 {
 }
 
-local void SetRes640(Menuitem *mi)
+local void SetRes640(Menuitem *mi __attribute__((unused)))
 {
 }
 
-local void SetRes800(Menuitem *mi)
+local void SetRes800(Menuitem *mi __attribute__((unused)))
 {
 }
 
-local void SetRes1024(Menuitem *mi)
+local void SetRes1024(Menuitem *mi __attribute__((unused)))
 {
 }
 
-local void SetRes1280(Menuitem *mi)
+local void SetRes1280(Menuitem *mi __attribute__((unused)))
 {
 }
 
-local void SetRes1600(Menuitem *mi)
+local void SetRes1600(Menuitem *mi __attribute__((unused)))
 {
 }
 
-local void SetFullscreen(Menuitem *mi)
+local void SetFullscreen(Menuitem *mi __attribute__((unused)))
 {
 }
 
-local void SetShadowFogAlpha(Menuitem *mi)
+local void SetShadowFogAlpha(Menuitem *mi __attribute__((unused)))
 {
 }
 
-local void SetShadowFogGray(Menuitem *mi)
+local void SetShadowFogGray(Menuitem *mi __attribute__((unused)))
 {
 }
 
@@ -4546,7 +4548,8 @@ local void EditorMapProperties(void)
     ProcessMenu("menu-editor-map-properties", 1);
 }
 
-local void EditorEnterMapDescriptionAction(Menuitem *mi, int key)
+local void EditorEnterMapDescriptionAction(
+	Menuitem *mi __attribute__((unused)), int key)
 {
     if (key == 10 || key == 13) {
 	EditorEndMenu();
@@ -4579,12 +4582,13 @@ local void EditorMapPropertiesCancel(void)
     EditorEndMenu();
 }
 
-local void EditorPlayerPropertiesDrawFunc(Menuitem *mi)
+local void EditorPlayerPropertiesDrawFunc(Menuitem *mi __attribute__((unused)))
 {
     MenusSetBackground();
 }
 
-local void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key)
+local void EditorPlayerPropertiesEnterAction(Menuitem *mi,
+	int key __attribute__((unused)))
 {
     if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch-1])) {
 	strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
