@@ -53,7 +53,7 @@ extern void AiInit(Player* player);	/// Init AI for this player
 extern void CleanAi(void);		/// Cleanup the AI module
 extern void SaveAi(FILE* file);		/// Save the AI state
 
-extern void AiCclRegister(void);	/// register ccl features
+extern void AiCclRegister(void);	/// Register ccl features
 
 /*--------------------------------------------------------
 --     Call Backs/Triggers
