@@ -1509,6 +1509,14 @@ local unsigned LastIKey;		/// last key handled
 local unsigned LastIKeyChar;		/// last keychar handled
 local int LastKeyTicks;			/// Ticks of last key
 
+/**
+**	Handle keyboard key press.
+**
+**	@param callbacks	Callback structure for events.
+**	@param ticks		Denotes time-stamp of video-system
+**	@param ikey		Key scancode.
+**	@param ikeychar		Character code.
+*/
 global void InputKeyButtonPress(const EventCallback* callbacks,
 	unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
@@ -1518,6 +1526,14 @@ global void InputKeyButtonPress(const EventCallback* callbacks,
     callbacks->KeyPressed(ikey, ikeychar);
 }
 
+/**
+**	Handle keyboard key release.
+**
+**	@param callbacks	Callback structure for events.
+**	@param ticks		Denotes time-stamp of video-system
+**	@param ikey		Key scancode.
+**	@param ikeychar		Character code.
+*/
 global void InputKeyButtonRelease(const EventCallback* callbacks,
 	unsigned ticks __attribute__((unused)), unsigned ikey,
 	unsigned ikeychar)
@@ -1528,6 +1544,12 @@ global void InputKeyButtonRelease(const EventCallback* callbacks,
     callbacks->KeyReleased(ikey, ikeychar);
 }
 
+/**
+**	Called each frame to handle keyboard timeouts.
+**
+**	@param callbacks	Callback structure for events.
+**	@param ticks		Denotes time-stamp of video-system
+*/
 global void InputKeyTimeout(const EventCallback* callbacks,unsigned ticks)
 {
     if( LastIKey && ticks>LastKeyTicks+HoldKeyDelay) {
