@@ -328,7 +328,7 @@ global int CheckDependByIdent(const Player* player,const char* target)
     //
     //	Find rule
     //
-    i=rule.Kind.UnitType->Type%(sizeof(DependHash)/sizeof(*DependHash));
+    i=(int)(long)rule.Kind.UnitType%(sizeof(DependHash)/sizeof(*DependHash));
 
     if( (node=DependHash[i]) ) {	// find correct entry
 	while( node->Type!=rule.Type
