@@ -20,6 +20,231 @@
 //@{
 
 /*----------------------------------------------------------------------------
+--	Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**	@struct _unit_ unit.h
+**
+**	\#include "unit.h"
+**
+**	typedef struct _unit_ Unit;
+**
+**	This structure contains all informations about an unit in game.
+**	An unit could be everything, a man, a vehicle, a ship or a building.
+**	Currently only a tile, an unit or a missile could be placed on the map.
+**
+**	The unit structure members:
+**
+**	Unit::Refs
+**
+**		The reference counter of the unit. If the pointer to the unit
+**		is stored the counter must be incremented and if this reference
+**		is destroyed the counter must be decremented. Alternative it
+**		would be possible to implement a garbage collector for this.
+**
+**	Unit::Slot
+**
+**		This is the unique slot number. It is not possible that two
+**		units have the same slot number at the same time. The slot
+**		numbers are reused.
+**		This field could be accessed by the macro UnitNumber(Unit*).
+**		Maximal 65535 (=#MAX_UNIT_SLOTS) simultaneous units are
+**		supported.
+**
+**	Unit::UnitSlot
+**
+**		This is the pointer into #Units[], where the unit pointer is
+**		stored.  #Units[] is a table of all units currently active in
+**		game. This pointer is only needed to speed up, the remove of
+**		the unit pointer from #Units[], it didn't must be searched in
+**		the table.
+**
+**	Unit::PlayerSlot
+**
+**		A pointer into Player::Units[], where the unit pointer is
+**		stored. Player::Units[] is a table of all units currently
+**		belonging to a player. 	This pointer is only needed to speed
+**		up, the remove of the unit pointer from Player::Units[].
+**
+**	Unit::Next
+**
+**		A generic link pointer. This member is currently used, if an
+**		unit is on the map, to link all units on the same map field
+**		together.  This member is currently unused, if the unit is
+**		removed (see Unit::Removed). F.E.: A worker is removed, if he
+**		is in a mine or depot. Or an unit is on board a transporter.
+**
+**	Unit::X Unit::Y
+**
+**		The tile map coordinates of the unit. 0,0 is the upper left on
+**		the map. To convert the map coordinates into pixels, they
+**		must be multiplicated with the #TileSizeX and #TileSizeY.
+**
+**	Unit::Type
+**
+**		Pointer to the unit-type (::UnitType). The unit-type contains
+**		all informations that all units of the same type shares.
+**		(Animations, Name, Stats, ...)
+**
+**	Unit::Player
+**
+**		Pointer to the owner of this unit (::Player). An unit could
+**		only be owned by one player.
+**
+**	Unit::Stats
+**
+**		Pointer to the current status (::UnitStats) of an unit. The
+**		units of the same player and the same type could share the same
+**		stats. The status contains all values which could be different
+**		for each player. This f.e. the upgradeable abilities of an
+**		unit.  (Unit::Stats::SightRange, Unit::Stats::Armor,
+**		Unit::Stats::HitPoints, ...)
+**
+**	Unit::IX Unit::IY
+**
+**		Coordinate displacement in pixels or coordinates inside a tile.
+**		Currently only !=0, if the unit is moving from one tile to
+**		another (0-32 and for ships/flyers 0-64).
+**
+**	Unit::Frame
+**
+**		Current graphic image of the animation sequence. The high bit
+**		(128) is used to flip this image horizontal (x direction).
+**		This also limits the number of different frames/image to 126.
+**
+**	Unit::SeenFrame
+**
+**		Graphic image (see Unit::Frame) what the player on this
+**		computer has last seen. If -1 (0xFF) the player haven't seen
+**		this unit yet.
+**
+**	Unit::Direction
+**
+**		Contains the binary angle (0-255) in which the direction the
+**		unit looks. 0, 32, 64, 128, 160, 192, 224, 256 corresponds to
+**		0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°, 360° or north,
+**		north-east, east, south-east, south, south-west, west,
+**		north-west, north. Currently only 8 directions are used, this
+**		is more for the future.
+**
+**	Unit::Attacked
+**
+**		If Attacked is non-zero, the unit is attacked. This member is
+**		counted down.
+**
+**	Unit::Burning
+**
+**		If Burning is non-zero, the unit is burning.
+**
+**	Unit::Visible
+**
+**		Currently unused. Planned for submarines. If Visible is
+**		non-zero, the unit could be seen on the map. Perhaps this should
+**		become a bit field for all players.
+**
+**	Unit::Destroyed
+**
+**	FIXME: @todo
+**		If you need more informations, please send me an email or
+**		write it self.
+**
+**	Unit::Removed
+**
+**
+**	Unit::Selected
+**
+**
+**	Unit::Constructed
+**
+**
+**	Unit::Mana
+**
+**
+**	Unit::HP
+**
+**
+**	Unit::Bloodlust
+**
+**
+**	Unit::Haste
+**
+**
+**	Unit::Slow
+**
+**
+**	Unit::Invisible
+**
+**
+**	Unit::FlameShield
+**
+**
+**	Unit::UnholyArmor
+**
+**
+**	Unit::GroupId
+**
+**
+**	Unit::Value
+**
+**
+**	Unit::SubAction
+**
+**
+**	Unit::Wait
+**
+**
+**	Unit::State
+**
+**
+**	Unit::Reset
+**
+**
+**	Unit::Blink
+**
+**
+**	Unit::Moving
+**
+**
+**	Unit::Rs
+**
+**
+**	Unit::Revealer
+**
+**
+**	Unit::OnBoard
+**
+**
+**	Unit::OrderCount
+**
+**
+**	Unit::OrderFlush
+**
+**
+**	Unit::Orders
+**
+**
+**	Unit::SavedOrder
+**
+**
+**	Unit::NewOrder
+**
+**
+**	Unit::Data
+**
+**
+**	Unit::Goal
+**
+**
+**	Unit::GoalX
+**
+**
+**	Unit::GoalY
+**
+**
+*/
+
+/*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
 
@@ -155,7 +380,7 @@ struct _unit_ {
     int		X;			/// Map position X
     int		Y;			/// Map position Y
 
-    UnitType*	Type;			/// pointer to unit type (peon,...)
+    UnitType*	Type;			/// pointer to unit-type (peon,...)
     Player*     Player;			/// owner of this unit
     UnitStats*	Stats;			/// current unit stats
 
@@ -253,7 +478,7 @@ struct _unit_ {
 	unsigned	Ticks;		/// Ticks to complete
 	unsigned	Count;		/// Units in training queue
 	// FIXME: vladi: later we should train more units or automatic
-#define MAX_UNIT_TRAIN	6
+#define MAX_UNIT_TRAIN	6		/// max number of units in queue
 	UnitType*	What[MAX_UNIT_TRAIN];	/// Unit trained
     } Train;				/// Train units action
     }		Data;			/// Storage room for different commands
@@ -271,13 +496,10 @@ struct _unit_ {
 
 #define FlushCommands	1		/// Flush commands in queue
 
-// FIXME: will be removed, we get player limits
+// FIXME: will be removed, we will get player limits
 #define MAX_UNITS	1800		/// maximal number of units supported
 
-/**
-**	Maximal number of used slots.
-*/
-#define MAX_UNIT_SLOTS	65535
+#define MAX_UNIT_SLOTS	65535		/// Maximal number of used slots.
 
 /**
 **	Returns true, if unit is unusable. (for attacking,...)
@@ -303,6 +525,7 @@ struct _unit_ {
 **	How many units could be in a group
 */
 #define NUM_UNITS_PER_GROUP 9
+
 /**
 **	How many groups supported
 */
@@ -423,7 +646,7 @@ extern void HitUnit(Unit* unit,int damage);
 
     /// Returns the map distance between two points.
 extern int MapDistance(int x1,int y1,int x2,int y2);
-    ///	Returns the map distance between two points with unit type.
+    ///	Returns the map distance between two points with unit-type.
 extern int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2);
     ///	Returns the map distance to unit.
 extern int MapDistanceToUnit(int x,int y,const Unit* dest);
