@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name rdtsc.h	-	The rdtsc header file. */
+/**@name rdtsc.h - The rdtsc header file. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//      (c) Copyright 1999-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __RDTSC_H__
 #define __RDTSC_H__
@@ -34,7 +34,7 @@
 //@{
 
 #ifndef _MSC_VER
-#include <sys/types.h>						// for u_int64_t
+#include <sys/types.h>      // for u_int64_t
 #endif
 
 #if defined(__MINGW32__)
@@ -46,9 +46,9 @@ typedef unsigned long long u_int64_t;
 #endif
 
 /**
-**	  Read the tsc (time-stamp counter) register of the processor.
+**  Read the tsc (time-stamp counter) register of the processor.
 **
-**	  @return the rtc register
+**  @return the rtc register
 */
 static __inline u_int64_t rdtsc(void)
 {
@@ -68,4 +68,4 @@ static __inline u_int64_t rdtsc(void)
 
 //@}
 
-#endif		// !__RDTSC_H__
+#endif  // !__RDTSC_H__

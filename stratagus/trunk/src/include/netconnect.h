@@ -10,7 +10,7 @@
 //
 /**@name netconnect.h - The network connection setup header file. */
 //
-//      (c) Copyright 1998-2003 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 1998-2004 by Lutz Sammer, Andreas Arens
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
