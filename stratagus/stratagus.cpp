@@ -345,24 +345,24 @@ global char* strdcat3(const char* l, const char* m, const char* r)
 **
 **	@return		Pointer to first occurence of b or NULL if not found.
 */
-global char* strcasestr(char* a, const char* b)
+global char* strcasestr(const char* a, const char* b)
 {
     int x;
 
-    if( !a || !*a || !b || !*b || strlen(a) < strlen(b) ) {
+    if (!a || !*a || !b || !*b || strlen(a) < strlen(b)) {
 	return NULL;
     }
 
-    x=0;
-    while( *a ) {
-	if( a[x] && (tolower(a[x]) == tolower(b[x])) )
+    x = 0;
+    while (*a) {
+	if (a[x] && (tolower(a[x]) == tolower(b[x]))) {
 	    x++;
-	else if( b[x] ) {
+	} else if (b[x]) {
 	    a++;
-	    x=0;
+	    x = 0;
+	} else {
+	    return (char *)a;
 	}
-	else
-	    return a;
     }
 
     return NULL;
