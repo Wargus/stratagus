@@ -724,7 +724,7 @@ local void AiCheckingWork(void)
 /**
 **	Find the nearest gold mine for unit.
 **
-**	@param source	Pointer for source unit.
+**	@param unit	Pointer for source unit.
 **
 **	@return		Pointer to the nearest reachable gold mine.
 **

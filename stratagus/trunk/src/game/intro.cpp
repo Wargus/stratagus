@@ -712,9 +712,7 @@ local void PictureDrawText(CampaignChapter* chapter,ChapterTextLines* chlines)
 /**
 **	Show picture.
 **
-**	@param act	Text showing the act number
-**	@param title	Title text
-**	@param picture	Name of the picture file to show.
+**	@param chapter	Pointer to CampaignChapter to show
 */
 global void ShowPicture(CampaignChapter* chapter)
 {
