@@ -73,8 +73,8 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global int IconWidth;                       /// Icon width in panels
-global int IconHeight;                      /// Icon height in panels
+local int IconWidth;                       /// Icon width in panels
+local int IconHeight;                      /// Icon height in panels
 
 
 global char EditorRunning;    /// True editor is running
@@ -349,7 +349,8 @@ local int CalculateUnitIcons(void)
 		x += IconHeight + 2;
 	}
 	x = TheUI.ButtonPanelX + 10;
-	while (x < TheUI.ButtonPanelX + TheUI.ButtonPanel.Graphic->Width) {
+	while (x < TheUI.ButtonPanelX + TheUI.ButtonPanel.Graphic->Width
+			- IconWidth) {
 		count += i;
 		x += IconWidth + 8;
 	}
@@ -624,7 +625,7 @@ local void DrawUnitIcons(void)
 			&& CursorX < TheUI.ButtonPanelX + 24
 			&& TheUI.ButtonPanelY + 4 < CursorY
 			&& CursorY < TheUI.ButtonPanelY + 24
-			&& MouseButtons&LeftButton) {
+			&& MouseButtons & LeftButton) {
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
 	} else {
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
@@ -633,15 +634,12 @@ local void DrawUnitIcons(void)
 			&& CursorX < TheUI.ButtonPanelX + 176 - 4
 			&& TheUI.ButtonPanelY + 4 < CursorY
 			&& CursorY < TheUI.ButtonPanelY + 24
-			&& MouseButtons&LeftButton) {
+			&& MouseButtons & LeftButton) {
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
 	} else {
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + j - 20, y);
 	}
 
-#if 0
-	percent = UnitIndex * 100 / ((MaxShownUnits ? MaxShownUnits : 9) / 9 * 9);
-#endif
 	percent = UnitIndex * 100 / (MaxShownUnits ? MaxShownUnits : 1);
 	i = (percent * (j - 54)) / 100;
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + i, y + 1);
@@ -657,7 +655,8 @@ local void DrawUnitIcons(void)
 			break;
 		}
 		x = TheUI.ButtonPanelX + 10;
-		while (x + IconWidth < TheUI.ButtonPanelX + TheUI.ButtonPanel.Graphic->Width) {
+		while (x < TheUI.ButtonPanelX + TheUI.ButtonPanel.Graphic->Width
+				- IconWidth) {
 			if (i >= MaxShownUnits) {
 				break;
 			}
@@ -703,7 +702,7 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 	VideoDrawHLine(ColorGray, x + 5, y + TileSizeY + 4, TileSizeX + 1);
 	VideoDrawHLine(ColorGray, x + 5, y + TileSizeY + 5, TileSizeX + 1);
 
-	color = (flags&IconClicked) ? ColorGray : ColorWhite;
+	color = (flags & IconClicked) ? ColorGray : ColorWhite;
 	VideoDrawHLine(color, x + 5, y + 3, TileSizeX + 1);
 	VideoDrawHLine(color, x + 5, y + 4, TileSizeX + 1);
 	VideoDrawVLine(color, x + 3, y + 3, TileSizeY + 3);
@@ -757,7 +756,7 @@ local void DrawEditorPanel(void)
 
 	DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
 		(ButtonUnderCursor == TileButton ? IconActive : 0) |
-			(EditorState==EditorEditTile ? IconSelected : 0));
+			(EditorState == EditorEditTile ? IconSelected : 0));
 
 	switch (EditorState) {
 		case EditorSelecting:
@@ -1235,7 +1234,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	// Right click on a resource
 	//
 	if (EditorState == EditorSelecting) {
-		if ((MouseButtons&RightButton && UnitUnderCursor)) {
+		if ((MouseButtons & RightButton && UnitUnderCursor)) {
 			if (UnitUnderCursor->Type->GivesResource) {
 				EditorEditResource();
 				return;
@@ -1532,7 +1531,7 @@ local void EditorCallbackMouse(int x, int y)
 	//
 	// Drawing tiles on map.
 	//
-	if (CursorOn == CursorOnMap && (MouseButtons&LeftButton) &&
+	if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
 			(EditorState == EditorEditTile || EditorState == EditorEditUnit)) {
 
 		//
@@ -1589,7 +1588,7 @@ local void EditorCallbackMouse(int x, int y)
 	//
 	// Minimap move viewpoint
 	//
-	if (CursorOn==CursorOnMinimap && (MouseButtons&LeftButton)) {
+	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
 		ViewportSetViewpoint(TheUI.SelectedViewport,
 			ScreenMinimap2MapX(CursorX)
@@ -1620,6 +1619,13 @@ local void EditorCallbackMouse(int x, int y)
 	// Handle edit unit area
 	//
 	if (EditorState == EditorEditUnit) {
+		// Scrollbar
+		if (TheUI.ButtonPanelX + 4 < CursorX
+				&& CursorX < TheUI.ButtonPanelX + 176 - 4
+				&& TheUI.ButtonPanelY + 4 < CursorY
+				&& CursorY < TheUI.ButtonPanelY + 24) {
+			return;
+		}
 		bx = TheUI.InfoPanelX + 8;
 		by = TheUI.InfoPanelY + 4 + IconHeight + 10;
 		for (i = 0; i < PlayerMax; ++i) {
@@ -1839,9 +1845,7 @@ local void CreateEditor(void)
 	char* file;
 	char buf[PATH_MAX];
 	CLFile* clf;
-	int scm;
 
-	scm = 0;
 	//
 	// Load and evaluate the editor configuration file
 	// FIXME: the CLopen is very slow and repeats the work of LibraryFileName.
@@ -1905,10 +1909,6 @@ local void CreateEditor(void)
 		CreateGame(NULL, &TheMap);
 	} else {
 		CreateGame(CurrentMapPath, &TheMap);
-		if (strcasestr(CurrentMapPath,".scm") ||
-			strcasestr(CurrentMapPath,".chk")) {
-			scm = 1;
-		}
 	}
 
 	ReplayRevealMap = 1;
@@ -1929,12 +1929,12 @@ local void CreateEditor(void)
 			switch (TheMap.Info->PlayerSide[i]) {
 				case PlayerRaceHuman:
 					MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
-						UnitTypeByWcNum(scm ? SC_StartLocation : WC_StartLocationHuman),
+						UnitTypeByWcNum(WC_StartLocationHuman),
 						Players + i);
 					break;
 				case PlayerRaceOrc:
 					MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
-						UnitTypeByWcNum(scm ? SC_StartLocation : WC_StartLocationOrc),
+						UnitTypeByWcNum(WC_StartLocationOrc),
 						Players + i);
 					break;
 			}
@@ -2087,8 +2087,8 @@ global void EditorMainLoop(void)
 				DoScrollArea(MouseScrollState, 0);
 			}
 			if (TheUI.KeyScroll && !(FrameCounter%SpeedKeyScroll)) {
-				DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
-				if (CursorOn == CursorOnMap && (MouseButtons&LeftButton) &&
+				DoScrollArea(KeyScrollState, KeyModifiers & ModifierControl);
+				if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
 						(EditorState == EditorEditTile ||
 							EditorState == EditorEditUnit)) {
 					EditorCallbackButtonDown(0);
