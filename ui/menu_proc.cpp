@@ -816,40 +816,36 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned state,
 	//  Image
 	//
 	pimage = p;
-	if (!p->Sprite && !p->Sprite->File) {
+	if (!p->Sprite) {
 		// No image
 		if ((flags & MenuButtonDisabled)) {
 			// Try unchecked disabled
-			if (checked && (style->Disabled.Sprite || style->Disabled.Sprite->File)) {
+			if (checked && style->Disabled.Sprite) {
 				pimage = &style->Disabled;
 			}
 		} else {
 			// Try hover, selected, then default
 			if (checked) {
-				if ((flags & MenuButtonActive) && (style->CheckedHover.Sprite || style->CheckedHover.Sprite->File)) {
+				if ((flags & MenuButtonActive) && style->CheckedHover.Sprite) {
 					pimage = &style->CheckedHover;
-				} else if ((flags & MenuButtonSelected) && (style->CheckedSelected.Sprite || style->CheckedSelected.Sprite->File)) {
+				} else if ((flags & MenuButtonSelected) && style->CheckedSelected.Sprite) {
 					pimage = &style->CheckedSelected;
-				} else if (style->Checked.Sprite || style->Checked.Sprite->File) {
+				} else if (style->Checked.Sprite) {
 					pimage = &style->Checked;
 				}
 			} else {
-				if ((flags & MenuButtonActive) && (style->Hover.Sprite || style->Hover.Sprite->File)) {
+				if ((flags & MenuButtonActive) && style->Hover.Sprite) {
 					pimage = &style->Hover;
-				} else if ((flags & MenuButtonSelected) && (style->Selected.Sprite || style->Selected.Sprite->File)) {
+				} else if ((flags & MenuButtonSelected) && style->Selected.Sprite) {
 					pimage = &style->Selected;
-				} else if (style->Default.Sprite || style->Default.Sprite->File) {
+				} else if (style->Default.Sprite) {
 					pimage = &style->Default;
 				}
 			}
 		}
 	}
-	if (!pimage->Sprite && pimage->Sprite->File) {
-		char* buf;
-
-		buf = alloca(strlen(pimage->Sprite->File) + 9 + 1);
-		strcat(strcpy(buf, "graphics/"), pimage->Sprite->File);
-		pimage->Sprite = LoadSprite(buf, pimage->Sprite->Width, pimage->Sprite->Height);
+	if (pimage->Sprite && !GraphicLoaded(pimage->Sprite)) {
+		LoadGraphic(pimage->Sprite);
 	}
 	if (pimage->Sprite) {
 		VideoDraw(pimage->Sprite, pimage->Frame, x, y);
