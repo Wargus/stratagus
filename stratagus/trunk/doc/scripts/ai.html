@@ -60,6 +60,7 @@
 <a href="#ai:compute-gauges">ai:compute-gauges</a>
 <a href="#ai:debug">ai:debug</a>
 <a href="#ai:debug-gauges">ai:debug-gauges</a>
+<a href="#ai:debug-player">ai:debug-player</a>
 <a href="#ai:dump">ai:dump</a>
 <a href="#ai:evaluate-force-cost">ai:evaluate-force-cost</a>
 <a href="#ai:force">ai:force</a>
@@ -556,6 +557,23 @@ Dump all the gauges on the stdout.
 <h4>Used</h4>
 
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
+
+<a name="ai:debug-player"></a>
+<h3>(ai:debug-player 1 2 3 ...)</h3>
+
+Activate dump of AI forces and strategy on stdout.<br>
+Parameters are player number, or 'self, for thisplayer.<br>
+'none will stop all AI debug output.
+
+<h4>Example</h4>
+
+<pre>
+    (ai:debug-player 'self)
+</pre>
+
+<h4>Used</h4>
+
+During the game...
 
 <a name="ai:dump"></a>
 <h3>(ai:dump)</h3>
