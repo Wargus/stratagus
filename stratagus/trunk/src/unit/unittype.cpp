@@ -588,7 +588,6 @@ local void SaveAnimation(const char* name,const Animation* anim,FILE* file)
 }
 
 /**
-<<<<<<< unittype.c
 **	Save state of the animitions set to file.
 **
 **	We save only the first occurance of an animation.
@@ -980,8 +979,6 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
 }
 
 /**
-=======
->>>>>>> 1.80
 **	Save state of an unit-stats to file.
 **
 **	@param stats	Unit-stats to save.
