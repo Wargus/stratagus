@@ -109,11 +109,12 @@ local void MoveToTarget(Unit* unit)
 	unit->Command.Data.Move.DX-=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.DY-=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.Range*=2;
+	wall=unit->Command.Action;
 	err=HandleActionMove(unit);
 	unit->Command.Data.Move.Range/=2;
 	unit->Command.Data.Move.DX+=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.DY+=unit->Command.Data.Move.Range;
-	unit->Command.Action=UnitActionAttackGround;
+	unit->Command.Action=wall;
     } else {
 	err=HandleActionMove(unit);
     }
