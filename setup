@@ -120,7 +120,7 @@ fi
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17pre1-build18\""
+VERSION="-DVERSION=\"1.17-build19\""
 UNIX=0
 BEOS=0
 WIN32=0
