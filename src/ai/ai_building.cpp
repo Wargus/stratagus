@@ -250,7 +250,9 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 
     points[0].X=x;
     points[0].Y=y;
-    if( type->TileWidth>1 ) {			// also use the bottom right
+    // also use the bottom right
+    if( type->TileWidth>1 &&
+	x+type->TileWidth-1<TheMap.Width && y+type->TileHeight-1<TheMap.Height ) {
 	points[1].X=x+type->TileWidth-1;
 	points[1].Y=y+type->TileWidth-1;
 	ep=wp=2;				// start with two points
@@ -271,9 +273,6 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	    for( i=0; i<8; ++i ) {		// mark all neighbors
 		x=rx+xoffset[i];
 		y=ry+yoffset[i];
-		if( x<0 || x>= TheMap.Width || y<0 || y>=TheMap.Height ) {
-		    continue;
-		}
 		m=matrix+x+y*w;
 		if( *m ) {			// already checked
 		    continue;
@@ -500,9 +499,6 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 	    for( i=0; i<8; ++i ) {		// mark all neighbors
 		x=rx+xoffset[i];
 		y=ry+yoffset[i];
-		if( x<0 || x>= TheMap.Width || y<0 || y>=TheMap.Height ) {
-		    continue;
-		}
 		m=matrix+x+y*w;
 		if( *m ) {			// already checked
 		    continue;
