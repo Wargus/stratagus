@@ -779,10 +779,6 @@ SOURCE=.\src\unit\unit.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unit\unit_ai.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\unit\unit_cache.c
 # End Source File
 # Begin Source File
@@ -792,10 +788,6 @@ SOURCE=.\src\unit\unit_draw.c
 # Begin Source File
 
 SOURCE=.\src\unit\unit_find.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\unit\unit_save.c
 # End Source File
 # Begin Source File
 
