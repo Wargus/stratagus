@@ -120,14 +120,6 @@ void LoadCursors(const char* race)
 	int i;
 
 	//
-	//  Free old cursor sprites.
-	//
-	for (i = 0; Cursors[i].OType; ++i) {
-		FreeGraphic(Cursors[i].G);
-		Cursors[i].G = NULL;
-	}
-
-	//
 	//  Load the graphics
 	//
 	for (i = 0; Cursors[i].OType; ++i) {
@@ -415,6 +407,7 @@ void CleanCursors(void)
 	int i;
 
 	for (i = 0; Cursors[i].OType; ++i) {
+		FreeGraphic(Cursors[i].G);
 		free(Cursors[i].Ident);
 		free(Cursors[i].Race);
 	}
