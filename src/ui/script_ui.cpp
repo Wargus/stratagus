@@ -8025,6 +8025,14 @@ local int CclResetKeystrokeHelp(lua_State* l)
 }
 #endif
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclSetGroupKeys(SCM list)
+{
+    ui_group_keys = gh_scm2newstr(list, NULL);
+    return SCM_UNSPECIFIED;
+}
+#endif
+
 /**
 **	Add a keystroke help
 **
@@ -8190,6 +8198,7 @@ global void UserInterfaceCclRegister(void)
     //
     gh_new_procedure0_0("reset-keystroke-help", CclResetKeystrokeHelp);
     gh_new_procedureN("add-keystroke-help", CclAddKeystrokeHelp);
+    gh_new_procedure1_0("set-group-keys", CclSetGroupKeys);
 #elif defined(USE_LUA)
     lua_register(Lua, "AddMessage", CclAddMessage);
 

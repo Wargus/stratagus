@@ -968,7 +968,7 @@ global void GameMainLoop(void)
 	    EndMenu();
 	}
     }
-
+    
     //
     //	Game over
     //
