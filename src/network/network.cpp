@@ -144,6 +144,7 @@ local int MyPort;			/// My port number.
 );
 local int NetworkDelay;			/// Delay counter for recover.
 local int NetworkSyncSeeds[256];	/// Network sync seeds.
+local int NetworkSyncHashs[256];	/// Network sync hashs.
 local NetworkCommandQueue NetworkIn[256][PlayerMax]; /// Per-player network packet input queue
 local struct dl_head CommandsIn[1];	/// Network command input queue
 local struct dl_head CommandsOut[1];	/// Network command output queue
@@ -1025,7 +1026,9 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 	case MessageSync:
 	    ply=ntohs(ncq->Data.X)<<16;
 	    ply|=ntohs(ncq->Data.Y);
-	    if( ply!=NetworkSyncSeeds[FrameCounter&0xFF] ) {
+	    if( ply!=NetworkSyncSeeds[FrameCounter&0xFF]
+		    || ntohs(ncq->Data.Unit)
+			!=NetworkSyncHashs[FrameCounter&0xFF] ) {
 		DebugLevel0Fn("\n\aNetwork out of sync!\n\n");
 	    }
 	    return;
@@ -1109,6 +1112,7 @@ local void NetworkSendCommands(void)
     if (dl_empty(CommandsIn)) {
 	ncq = malloc(sizeof(NetworkCommandQueue));
 	ncq->Data.Type = MessageSync;
+	ncq->Data.Unit = htons(SyncHash&0xFFFF);
 	ncq->Data.X = htons(SyncRandSeed>>16);
 	ncq->Data.Y = htons(SyncRandSeed&0xFFFF);
 	// FIXME: can compress sync-messages.
@@ -1136,6 +1140,7 @@ local void NetworkSendCommands(void)
     NetworkSendPacket(ncq);
 
     NetworkSyncSeeds[ncq->Time&0xFF]=SyncRandSeed;
+    NetworkSyncHashs[ncq->Time&0xFF]=SyncHash&0xFFFF;	// FIXME: 32bit later
 }
 
 /**
