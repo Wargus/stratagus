@@ -132,7 +132,7 @@ global void MenusSetBackground(void)
     DestroyCursorBackground();
     if (!Menusbgnd) {
 	Menusbgnd = LoadGraphic(MenuBackground);
-	VideoSetPalette(Menusbgnd->Pixels);
+	// JOHNS: NO VideoSetPalette(Menusbgnd->Pixels);
     }
 
     // VideoLockScreen();
