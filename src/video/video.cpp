@@ -713,6 +713,7 @@ global void LoadRGB(Palette* pal, const char* name)
 local void ColorCycle(void)
 {
     // FIXME: todo
+    MustRedraw |= RedrawColorCycle;
 }
 #else
 local void ColorCycle8(void)
