@@ -35,7 +35,7 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI"
+EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DNEW_NAMES"
 ## SLOW_INPUT		If you have problems that events aren't fetched.
 ## BPP8_*               Only for X11 8bpp common palette:
 ##   BPP8_NORMAL          disables default, like other Xbpp (delivers errors)
