@@ -11,9 +11,7 @@ typedef struct lowlevel_neighbor {
     int Offset;
 } LowlevelNeighbor;
 
-extern LowlevelNeighbor *Neighbor;
-extern LowlevelNeighbor NeighborEvery[];
-extern LowlevelNeighbor NeighborEveryOther[];
+extern LowlevelNeighbor Neighbor[8];
 
 extern int LowlevelInit (void);
 extern void LowlevelReset (void);
