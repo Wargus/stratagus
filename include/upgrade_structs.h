@@ -39,8 +39,6 @@
 #define MAXUNITTYPES	MAXUACOUNT
     /// max upgrades count
 #define MAXUPGRADES	MAXUACOUNT
-    /// max actions count
-#define MAXACTIONS	MAXUACOUNT // include spells
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -120,6 +118,51 @@ typedef struct _upgrade_ {
     IconConfig	Icon;			/// icon to display to the user
 } Upgrade;
 
+/*----------------------------------------------------------------------------
+--	upgrades and modifiers
+----------------------------------------------------------------------------*/
+
+/**
+**	Modifiers of the unit stats.
+**	All the following are modifiers not values!
+**	@see UnitStats
+*/
+typedef struct _modifiers_ {
+    int	AttackRange;			/// attack range modifier
+    int	SightRange;			/// sight range modifier
+    int	BasicDamage;			/// basic damage modifier
+    int	PiercingDamage;			/// piercing damage modifier
+    int	Armor;				/// armor modifier
+    int	Speed;				/// speed modifier (FIXME: not working)
+    int	HitPoints;			/// hit points modifier
+
+    int	Costs[MaxCosts];		/// costs modifier
+} Modifiers;
+
+/**
+**	This is the modifier of an upgrade.
+**	This do the real action of an upgrade, an upgrade can have multiple
+**	modifiers.
+*/
+typedef struct _upgrade_modifier_ {
+
+  int		UpgradeId;		/// used to filter required modifier
+
+  Modifiers	Modifier;		/// modifier of unit stats
+
+  // allow/forbid bitmaps -- used as chars for example:
+  // `?' -- leave as is, `F' -- forbid, `A' -- allow
+  // FIXME: see below allow more semantics?
+  // FIXME: pointers or ids would be faster and less memory use
+  char	ChangeUnits[MAXUNITTYPES];	/// allow/forbid units
+  char	ChangeUpgrades[MAXUPGRADES];	/// allow/forbid upgrades
+  char	ApplyTo[MAXUNITTYPES];		/// which unit types are affected
+
+  // FIXME: UnitType*
+  void*		ConvertTo;		/// convert to this unit-type.
+
+} UpgradeModifier;
+
 /**
 **	Allow what a player can do. Every player has an own Allow struct.
 **
@@ -134,68 +177,29 @@ typedef struct _upgrade_ {
 */
 typedef struct _allow_ {
     char	Units[MAXUNITTYPES];	/// Units allowed/disallowed
-	// FIXME: Actions isn't used yet.
-    //char	Actions[MAXACTIONS];	/// Actions allowed/disallowed
     char	Upgrades[MAXUPGRADES];	/// Upgrades allowed/disallowed
 } Allow;
+
+/**
+**	Upgrade timer used in the player structure.
+**	Every player has an own UpgradeTimers struct.
+*/
+typedef struct _upgrade_timers_ {
+
+    /**
+    **	all 0 at the beginning, all upgrade actions do increment values in
+    **	this struct.
+    */
+    int	Upgrades[MAXUPGRADES];		/// Counter for each upgrade
+
+} UpgradeTimers;
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
 extern const char UpgradeType[];	/// upgrade type
 extern Upgrade Upgrades[MAXUACOUNT];	/// The main user useable upgrades
-
-
-
-
-//Cleaning this
-//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
-/*----------------------------------------------------------------------------
---	upgrades and modifiers
-----------------------------------------------------------------------------*/
-
-typedef struct _modifiers_ {
-  // all the following are modifiers not values!
-  int	AttackRange;			/// attack range modifier
-  int	SightRange;			/// sight range modifier
-  int	BasicDamage;			/// basic damage modifier
-  int	PiercingDamage;			/// piercing damage modifier
-  int	Armor;				/// armor modifier
-  int	Speed;				/// speed modifier (FIXME: not working)
-  int	HitPoints;			/// hit points modifier
-
-  int	Costs[MaxCosts];		/// costs modifier
-} Modifiers;
-
-typedef struct _upgrade_modifier_ {
-
-  int	uid; // used to filter required by upgrade modifiers
-
-  Modifiers mods;
-
-  // allow/forbid bitmaps -- used as chars for example:
-  // `?' -- leave as is, `F' -- forbid, `A' -- allow
-  // FIXME: pointers or ids would be faster and less memory use
-  char af_units[MAXUNITTYPES];   // allow/forbid units
-  //char af_actions[MAXACTIONS]; // allow/forbid actions
-  char af_upgrades[MAXUPGRADES]; // allow/forbid upgrades
-  char apply_to[MAXUNITTYPES]; // which unit types are affected
-
-} UpgradeModifier;
-
-typedef struct _upgrade_timers_ {
-
-  // all 0 at the beginning, all upgrade actions do increment values in
-  // this struct, every player has own UpgradeTimers struct
-  int upgrades[MAXUPGRADES];
-
-} UpgradeTimers;
-
 
 //@}
 

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name upgrade.h	-	The upgrades headerfile. */
-/*
-**	(c) Copyright 1999,2000 by Vladi Belperchinov-Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Vladi Belperchinov-Shabanski
+//
+//	$Id$
 
 #ifndef __UPGRADE_H__
 #define __UPGRADE_H__
@@ -43,13 +42,18 @@ typedef struct _player_ Player;		// recursive includes :(
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitUpgrades(void);		/// init upgrade/allow structures
-extern Upgrade* UpgradeByIdent(const char*); /// upgrade of identifier
-extern void SaveUpgrades(FILE*);	/// save the upgrades
-extern void ParsePudALOW(const char*,int); /// parse pud alow table
-extern void ParsePudUGRD(const char*,int); /// parse pud ugrd table
-extern void UpgradesCclRegister(void);	/// Register CCL features for upgrades
-
+    /// init upgrade/allow structures
+extern void InitUpgrades(void);
+     /// upgrade of identifier
+extern Upgrade* UpgradeByIdent(const char*);
+    /// save the upgrades
+extern void SaveUpgrades(FILE*);
+    /// parse pud alow (upgrade/spell/units allow) table
+extern void ParsePudALOW(const char*,int);
+    /// parse pud ugrd (upgrade cost) table
+extern void ParsePudUGRD(const char*,int);
+    /// Register CCL features for upgrades
+extern void UpgradesCclRegister(void);
 
 // CHAOS PUR
 
@@ -147,24 +151,23 @@ extern int ActionIdByIdent( const char* sid );
 --	Upgrades
 ----------------------------------------------------------------------------*/
 
-// amount==-1 to cancel upgrade, could happen when building destroyed during upgrade
-// using this we could have one upgrade research in two buildings, so we can have
-// this upgrade faster.
-void UpgradeIncTime( Player* player, int id, int amount );
-void UpgradeIncTime2( Player* player, char* sid, int amount ); // by ident string
+    /// Upgrade will be acquired, called by UpgradeIncTime() when timer reached
+extern void UpgradeAcquire( Player* player,const Upgrade* upgrade );
+
+    /// Increment the upgrade timer.
+extern void UpgradeIncTime( Player* player, int id, int amount );
+extern void UpgradeIncTime2( Player* player, char* sid, int amount ); // by ident string
 
 // this function will mark upgrade done and do all required modifications to
 // unit types and will modify allow/forbid maps
 
-    // called by UpgradeIncTime() when timer reached
-void UpgradeAcquire( Player* player,Upgrade* upgrade );
 
 // for now it will be empty?
 // perhaps acquired upgrade can be lost if ( for example ) a building is lost
 // ( lumber mill? stronghold? )
 // this function will apply all modifiers in reverse way
-void UpgradeLost( Player* player, int id );
-void UpgradeLost2( Player* player, char* sid ); // by ident string
+extern void UpgradeLost( Player* player, int id );
+extern void UpgradeLost2( Player* player, char* sid ); // by ident string
 
 /*----------------------------------------------------------------------------
 --	Allow(s)
