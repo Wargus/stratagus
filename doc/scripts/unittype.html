@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
-<!--
+<!-- 
 ----	(c) Copyright 2002-2004 by Lutz Sammer, Russell Smith
 
 ----    This program is free software; you can redistribute it and/or modify
@@ -77,9 +77,10 @@ Define animations.
 	{ {Flags, Pixel, Sleep, Frame},
 	  {Flags Pixel Sleep Frame},
 	 ...}</pre>
-<dd>
+</dd>
 
 <dt>Here is a more detailed description of a frame.</dt>
+<dd>
     <ul>
 	<li>Flags are the sum of the following:
 	<ul>
@@ -96,6 +97,7 @@ Define animations.
 	<li>Frame is the tile position on the image. Usually 5*tilerows.
 	  The engine will add something between 0 and 4 for the heading.
     </ul>
+</dd>
 </dl>
 
 <h4>Example</h4>
@@ -150,6 +152,66 @@ For example, Mana is active only for caster, but HP is available for every unit.
 </dd>
 </dl>
 
+<h4>Note</h4>
+Some variables are predefined and could be used with some restriction. You cannot modify their values,
+there are readonly (but no errors are generated), So see DefineUnit() for initialise them
+(some variables are computed in play and be initialised).
+Also, the max value which is always greater than value, may have no sense or be equal at some player statistic.<br>
+The predefined values are :
+<dl>
+  <dt>HitPoints</dt>
+  <dd>Hp of the unit.</dd>
+  <dt>Build</dt>
+  <dd>State of the construction in building.</dd>
+  <dt>Mana</dt>
+  <dd>Mana point of the unit.</dd>
+  <dt>Transport</dt>
+  <dd>Number of unit inside (for transporter only, no build inside).</dd>
+  <dt>Research</dt>
+  <dd>Time for the current upgrade in searching.</dd>
+  <dt>Training</dt>
+  <dd>Time for the current unit in training.</dd>
+  <dt>UpgradeTo</dt>
+  <dd>Time for the unit to upgrade to an other.</dd>
+  <dt>GiveResource</dt>
+  <dd>Resource that the unit gives ("resource-name" mine for exemple)</dd>
+  <dt>CarryResource</dt>
+  <dd>How many the unit carries the current resource.</dd>
+  <dt>Xp</dt>
+  <dd>Experience of the unit</dd>
+  <dt>Level</dt>
+  <dd>Level of the unit. Level growns when upgrade is researched for this unit.</dd>
+  <dt>Kill</dt>
+  <dd>Number of unit killed by the unit.</dd>
+  <dt>Supply</dt>
+  <dd>How many the unit supply to the player. Max is the total supply for the player.</dd>
+  <dt>Demand</dt>
+  <dd>How many the unit demand to the player. Max is the total demand for the player.</dd>
+  <dt>Armor</dt>
+  <dd>Armor of the unit.</dd>
+  <dt>Speed</dt>
+  <dd>Speed of the unit.</dd>
+  <dt>SightRange</dt>
+  <dd>Sight range of the unit.</dd>
+  <dt>AttackRange</dt>
+  <dd>Attack range of the unit.</dd>
+  <dt>PiercingDamage</dt>
+  <dd>piercing damage of the unit.</dd>
+  <dt>BasicDamage</dt>
+  <dd>Basic damage of the unit.</dd>
+  <dt>Damage</dt>
+  <dd>Total damage of the unit. damage depends of basic and piercing damage.
+Value correspond of min degat that the unit could do, and Max the max.</dd>
+  <dt>ExtraDamage</dt>
+  <dd>Extra damage corresponds of extra damage allowed by Xp.</dd>
+  <dt>PosX</dt>
+  <dd>X position of the unit. Max is the Map size.</dd>
+  <dt>PosY</dt>
+  <dd>Y position of the unit. Max is the Map size.</dd>
+  <dt>Slot</dt>
+  <dd>Unique number that identifies the unit (begin at 0). Max is the last valid slot number.</dd>
+</dl>
+
 <h4>Example</h4>
 <pre>
     DefineVariable("cooldown", {Value = 0, Increase = -1, Max = 50, Enable = false})
@@ -168,11 +230,9 @@ player have the same stats, affected by upgrades.
 <dd>Ident of the unit. This obviousely means that it should be defined after units.
 </dd>
 <dt>player</dt>
-<dd>Player number.
-</dd>
-<p>
+<dd>Player number.</dd>
 <dt>Possible tags:</dt>
-<dl>
+<dd><dl>
 <dt>level</dt>
 <dd>The level of the unit. It is equal to the number of upgrades of a
 certain unit and is purely cosmetic. It doesn't affect the game in any way.
@@ -201,12 +261,12 @@ controlled by animation length, see define-animation.
 </dd>
 <dt>regeneration-rate</dt>
 <dd>amount of HP a unit gains per seconds
-</dt>
+</dd>
 <dt>costs</dt>
 <dd>The cost to train this unit. This is a standard resource/value list.
 A special 'resource' is time, the time to train the unit in cycles.
 </dd>
-</dl>
+</dl></dd>
 </dl>
 
 <h4>Example</h4>
@@ -215,7 +275,7 @@ A special 'resource' is time, the time to train the unit in cycles.
     DefineUnitStats("unit-archer", 14,
       "level", 1, "speed", 10, "attack-range", 4, "sight-range", 5,
       "armor", 0, "basic-damage", 3, "piercing-damage", 6, "hit-points", 40,
-      "costs", {"time", 0, "titanium", 0, "crystal", 0, "gas", 0, "ore", 0, 
+      "costs", {"time", 0, "titanium", 0, "crystal", 0, "gas", 0, "ore", 0,
                 "stone", 0, "coal", 0})
 </pre>
 
@@ -225,7 +285,7 @@ A special 'resource' is time, the time to train the unit in cycles.
 
     Define the unit types in game. A lot of the data in this struct used to be
     based on the UDTA section of puds, with unit statistics, but it is now a lot
-    bigger and more configurable<p>
+    bigger and more configurable.
 
 <dl>
 <dt>ident</dt>
@@ -238,12 +298,12 @@ Possible tags:
 <dl>
 <dt>Name = "show-name"</dt>
 <dd>The unit-type name shown in the game. F.E: "Knight", "Gold Mine".
-If the name is too long, it is split at space.<p>
+If the name is too long, it is split at space.
 </dd>
 <dt>File = {"default" or tileset-name, "file", ...}
 <dd>Defines the graphics used to display the unit-type in game.
 <dt>Shadow = {tag, value}</dt>
-<dd><b>FIXME</b></dd>
+<dd><b>FIXME</b>
 Possible tags:
 <dl>
 <dt>"file", filename</dt>
@@ -252,7 +312,7 @@ Possible tags:
 <dd><b>FIXME</b></dd>
 <dt>"offset", {x, y}</dt>
 <dd><b>FIXME</b></dd>
-</dl>
+</dl></dd>
 <dt>DrawLevel = number</dt>
 <dd>This is used when sorting units and missiles for drawing. Units with a higher draw
 order will always be on top of units with lower draw order. Units are also sorted from
@@ -287,19 +347,19 @@ black oil patch.
 F.E. "icon-knight", "icon-gold-mine".
 </dd>
 <dt>Sounds = {event, "sound-name", ...}</dt>
-<dd>The following events are supported:</dd>
-<dl>
+<dd>The following events are supported:
+<dl><dd>
     <ul>
     <li>"selected": Happens when the unit is selected.
     <li>"acknowledge": Happens when the unit received an order.
     <li>"attack": Attack sound of the unit. Used when giving an attack order, it
     can override the acknowledge sound.
-    <li>"ready": Happens when the unit finished training (and it's ready) 
+    <li>"ready": Happens when the unit finished training (and it's ready)
     <li>"repair": Happens when the unit is repairing.
     <li>"help": Happens when the unit is under attack.
     <li>"dead": Happens when the unit is killed.
-    </ul>
-</dl>
+    </ul></dd>
+</dl></dd>
 <dd>
 You can use the same help or ready sound for all units if you want generic
 "Your unit is under attack", "Some unit was trained" sounds. The actual sound
@@ -343,10 +403,9 @@ want to make vulnerable to close range attacks.
 <dd>Define the costs to build (or aquire) this unit.
 F.E.: Costs = {"time", 200, "gold", 2000, "wood", 1000, "oil", 200}
 </dd>
-<p>
 <dt>RightMouseAction = "none" or "move" or "attack" or "harvest"
     or "spell-cast" or "sail"</dt>
-    <dl>
+    <dd><dl>
     <dt>"none"</dt>
     <dd>Do nothing.</dd>
     <dt>"move"</dt>
@@ -363,9 +422,9 @@ F.E.: Costs = {"time", 200, "gold", 2000, "wood", 1000, "oil", 200}
     <dd>This is an ugly hack for demolishing units. The unit will cast it's first
     known spell(in order of spell definition) instead of attacking a hostile unit.
     </dd>
-<p></dl>
+</dl></dd>
 <dt>CanGatherResources = {flag, value}</dt>
-<dd>This will begin a block of resoure gathering information. The folowing tags are available in this section:</dd>
+<dd>This will begin a block of resoure gathering information. The folowing tags are available in this section:
 <dl>
     <dt>"resource-id", ressource-name</dt>
     <dd>The resource identification. Has to be a resource-name defined before.
@@ -398,19 +457,18 @@ F.E.: Costs = {"time", 200, "gold", 2000, "wood", 1000, "oil", 200}
     <dt>"file-when-empty", filename</dt>
     <dd>The harvester's animation file will change when it's empty.The standard animation
     is used only when building/repairing.
-    </dd>    
+    </dd>
     <dt>"harvest-from-outside"</dt>
     <dd>Unit will harvest from the outside. The unit will use it's attack animation
     (seems it turned into a generic Action anim.)
-    </dd>    
+    </dd>
     <dt>"lose-resources"</dt>
     <dd>Special lossy behaviour for loaded harvesters. Harvesters with loads other
     than 0 and ResourceCapacity will lose their cargo on any new order.
-    </dd>    
-    <dt>"terrain-harvester"</dt>
-    <dd>The unit will harvest terrain. For now this only works for wood.
     </dd>
-<p></dl>
+    <dt>"terrain-harvester"</dt>
+    <dd>The unit will harvest terrain. For now this only works for wood.</dd>
+</dl></dd>
 <dt>GivesResource = resource-name</dt>
 <dd>This will make the unit (normally a building) a resource (sugar mine, geyser, etc).
 It's followed by a resource ident F.E. "gives-resource", "gold"
@@ -419,7 +477,7 @@ It's followed by a resource ident F.E. "gives-resource", "gold"
 <dd>This is a flag for harvestable resource buildings. You can ommit it, and give every
 race a building that is built on top of this (see below) and has the can-harvest flag.
 </dd>
-<dt>CanStore = {resource-name, ...}<dt>
+<dt>CanStore = {resource-name, ...}</dt>
 <dd>This flag makes the unit a resource storage, units will come here and unload their cargo.
 It's followed by a list of accepted resource identifiers. F.E. can-store '(stone coal)
 </dd>
@@ -434,7 +492,7 @@ buildings.
 <dd>Unit is a shore building, and imobile. This is used for those unique buildings
 that have to be build on sea and have at least one point on coast.
 </dd>
-<dt>BuilderOutside<dt>
+<dt>BuilderOutside</dt>
 <dd>true if the builder builds a building from the outside</dd>
 <dt>BuilderLost</dt>
 <dd>true if you would like the builder to die once the building has been completed (used for morphing
@@ -443,11 +501,11 @@ into a building)</dd>
 <dd>The rate at which the building builds itself <b>NOT IMPLEMENTED</b></dd>
 <dt>BuildingRules = { { "distance", { Distance = 3, DistanceType = ">", Type = "unit-gold-mine"}}}
 <dd>BuildingRules allows you to specify a list of restrictions to make when building. The
-list is in nested tables, the inter list is and'd together, and or'd with the other lists. See 
+list is in nested tables, the inter list is and'd together, and or'd with the other lists. See
 the example for details.
 <dl>
 	<dt>"distance"</dt>
-	<dd>Specifies a distance constraint</dd>
+	<dd>Specifies a distance constraint.
 	<dl>
 		<dt>Distance</dt>
 		<dd>The distance in tiles to measure</dd>
@@ -457,9 +515,9 @@ the example for details.
 		<dd>The type of the unit that this distance restriction applies to</dd>
 		<dt>Except <b>NOT IMPLEMENTED</b></dt>
 		<dd>boolen, #t implies all units, except this type must be</dd>
-	</dl>
+	</dl></dd>
 	<dt>"addon"</dt>
-	<dd>Specifies an addon to an existing building</dd>
+	<dd>Specifies an addon to an existing building.
 	<dl>
 	    <dt>OffsetX</dt>
 		<dd>Offset from the top left of the parent building that this unit must be placed.
@@ -469,18 +527,18 @@ the example for details.
 		<dd>As with OffsetX, except in the Y direction</dd>
 		<dt>Type</dt>
 		<dd>Type of the unit that this unit is an addon too</dd>
-	</dl>
+	</dl></dd>
 	<dt>"tile" <b>NOT IMPLEMENTED</b></dt>
-	<dd>Implement a tile restriction, unit must be placed on certain types of tiles</dd>
+	<dd>Implement a tile restriction, unit must be placed on certain types of tiles.
 	<dl>
 	    <dt>NumberOnMask</dt>
 		<dd>The number of tiles that are needed until the build of a type to satisfy</dd>
 		<dt>Mask</dt>
 		<dd>Mask of the tiles that needs to be meet <b>Will be updated to tiletype</b></dd>
-	</dl>
+	</dl></dd>
 	<dt>"ontop"</dt>
 	<dd>Building must be built on top of another building type
-	    NOTE: the engine may not be able to guess the correct parent if the rules are complex enough</dd>
+	    NOTE: the engine may not be able to guess the correct parent if the rules are complex enough.
 	<dl>
 	    <dt>Type</dt>
 		<dd>The unit-type that we are to build on top of</dd>
@@ -488,12 +546,12 @@ the example for details.
 		<dd>boolean, true if you want the original unit to be replaced when this unit dies</dd>
 		<dt>ReplaceOnBuild</dt>
 		<dd>boolean, true if you want to remove the old unit underneath when you build this one</dd>
-	</dl>
+	</dl></dd>
 	<dt>"direction" <b>NOT IMPLEMENTED</b></dt>
-	<dl>
+	<dd><dl>
 	    <dt>Direction</dt>
 		<dd>A bitmask in int format for the directions to build. (bits not specified yet)</dd>
-	</dl>
+	</dl></dd>
 </dl>
 <dt>Coward = boolean</dt>
 <dd>Unit will not attack on sight, and will run away instead of retaliating.
@@ -507,7 +565,7 @@ rely on units being defined this can lead to a chicken and egg problem. It's
 better to declare an unit type in advance with just DefineUnitType( "unit-whatever", {}).
 Please see the documentation on spells. F.E. CanCastSpell = {"spell-healing", "spell-exorcism"}
 </dd>
-<dt>Supply = number<dt>
+<dt>Supply = number</dt>
 <dd>This is the amount of food supplied by the unit. Food is a global per-player
 counter that signifies the maximum amount of units.
 </dd>
@@ -557,7 +615,7 @@ suicide. Doesn't work with resource workers/resources.
 <dd>This is the ai priority level. High damage low-hp units for instancce should have
 higher priorities than say a peasant. It can be safely ignored.
 </dd>
-<dt>AnnoyComputerFactor = number<F12></dt>
+<dt>AnnoyComputerFactor = number</dt>
 <dd>This is another ai priority level. This is not used, but included in wc2 data. Maybe
 it should be used to attack resource buildings first? You can safely ignore it.
 </dd>
@@ -614,12 +672,12 @@ and can't be interacted with. Please see the documentation on spells.</dd>
 <dd>Most units should have this flag. When false the unit will only get selected
 alone, use this for buildings. Enemy units are never selectable by rectangle.
 </dd>
-<dt>flags = boolean<dt>
+<dt>flags = boolean</dt>
 <dd>You can add a bunch of flags, defined with <a href="#DefineBoolFlags">DefineBoolFlags()</a>
 You can add how many flags you would like, but keep in mind that you have to call
 <a href="#DefineBoolFlags">DefineBoolFlags()</a> before.
 </dd>
-<dt>variable = {tag = value , ...} or number or boolean<dt>
+<dt>variable = {tag = value , ...} or number or boolean</dt>
 <dd>You can add a bunch variable, defined with <a href="#DefineVariables">DefineVariables()</a>
 You can add how many flags you would like, but keep in mind that you have to call
 <a href="#DefineVariables">DefineVariables()</a> before.
@@ -632,7 +690,7 @@ By default everything is set to true, so you can target everything. Only means t
 you can only fire units with that flag, and false only units without that flag.
 </dd>
 <dt>FIXME: continue documentation.</dt>
-<dd></dd>
+<dd>FIXME: continue documentation.</dd>
 <!--IDEA:<dt>force-minimap-color<dt>
 <dd>An unit with this flag will ignore any friend/foe/owning player considerations
 for the minimap color, and will force this. It takes a number from the palette here.
