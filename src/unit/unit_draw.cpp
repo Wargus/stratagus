@@ -269,6 +269,7 @@ global void DrawSelectionCorners(const Unit* unit,const UnitType* type
 	,int x,int y)
 {
     int color;
+#define CORNER_PIXELS 6
 
     //
     //	Select color for the rectangle
@@ -280,38 +281,42 @@ global void DrawSelectionCorners(const Unit* unit,const UnitType* type
     VideoDrawVLineClip(color
 	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
 	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
-	    ,4);
+	    ,CORNER_PIXELS);
     VideoDrawHLineClip(color
 	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
 	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
-	    ,3);
+	    ,CORNER_PIXELS-1);
 
     VideoDrawVLineClip(color
 	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth
 	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
-	    ,4);
+	    ,CORNER_PIXELS);
     VideoDrawHLineClip(color
-	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth-3
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth
+		-CORNER_PIXELS+1
 	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
-	    ,3);
+	    ,CORNER_PIXELS-1);
 
     VideoDrawVLineClip(color
 	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
-	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight-3
-	    ,4);
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight
+		-CORNER_PIXELS+1
+	    ,CORNER_PIXELS);
     VideoDrawHLineClip(color
 	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
 	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight
-	    ,3);
+	    ,CORNER_PIXELS-1);
 
     VideoDrawVLineClip(color
 	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth
-	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight-3
-	    ,4);
-    VideoDrawHLineClip(color
-	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth-3
 	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight
-	    ,3);
+		-CORNER_PIXELS+1
+	    ,CORNER_PIXELS);
+    VideoDrawHLineClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth
+		-CORNER_PIXELS+1
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight
+	    ,CORNER_PIXELS-1);
 }
 
 /**
