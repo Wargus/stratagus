@@ -18,6 +18,8 @@
 #ifndef __AI_LOCAL_H__
 #define __AI_LOCAL_H__
 
+#ifdef NEW_AI
+
 //@{
 
 /*----------------------------------------------------------------------------
@@ -174,5 +176,7 @@ extern AiHelper AiHelpers;		/// AI helper variables
 ----------------------------------------------------------------------------*/
 
 //@}
+
+#endif	// NEW_AI
 
 #endif	// !__AI_LOCAL_H__
