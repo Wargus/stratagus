@@ -16,6 +16,11 @@
 
 //@{
 
+/**
+**	@todo FIXME:	I should rewrite this action, if only the
+**			new orders are supported.
+*/
+
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
@@ -38,7 +43,6 @@
 ----------------------------------------------------------------------------*/
 
 #define WEAK_TARGET	2		/// Weak target, could be changed
-
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -95,7 +99,7 @@ local void MoveToTarget(Unit* unit)
 	    || (!unit->Orders[0].Goal &&
 		WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)) ) {
 	// FIXME: workaround for pathfinder problem
-	DebugLevel0Fn("Johns remove this for new orders.\n");
+	DebugLevel3Fn("FIXME: Johns remove this for new orders.\n");
 	unit->Orders[0].X-=unit->Orders[0].RangeX;
 	unit->Orders[0].Y-=unit->Orders[0].RangeY;
 	unit->Orders[0].RangeX*=2;
@@ -171,6 +175,7 @@ local void MoveToTarget(Unit* unit)
 	    if( goal->Destroyed ) {
 		unit->Orders[0].X=goal->X+goal->Type->TileWidth/2;
 		unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
 		DebugLevel0Fn("destroyed unit %Zd\n",UnitNumber(goal));
 		RefsDebugCheck( !goal->Refs );
 		if( !--goal->Refs ) {
@@ -182,22 +187,30 @@ local void MoveToTarget(Unit* unit)
 		    unit->SavedOrder.Action=UnitActionStill;
 		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
 		    // This is not supported
+		    if( unit->Selected && unit->Player==ThisPlayer ) {
+			MustRedraw|=RedrawButtonPanel;
+		    }
+		    DebugLevel0Fn("FIXME: Johns thinks this is wrong!\n");
 		}
 		NewResetPath(unit);
-	    } else if( !goal->HP
-		    || goal->Orders[0].Action==UnitActionDie
+	    } else if( !goal->HP || goal->Orders[0].Action==UnitActionDie
 		    || goal->Removed ) {
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
 		unit->Orders[0].X=goal->X+goal->Type->TileWidth/2;
 		unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
 		unit->Orders[0].Goal=goal=NoUnitP;
 		if( unit->SavedOrder.Action!=UnitActionStill ) {
 		    unit->Orders[0]=unit->SavedOrder;
 		    unit->SavedOrder.Action=UnitActionStill;
 		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
 		    // This is not supported
+		    if( unit->Selected && unit->Player==ThisPlayer ) {
+			MustRedraw|=RedrawButtonPanel;
+		    }
+		    DebugLevel0Fn("FIXME: Johns thinks this is wrong!\n");
 		}
 		NewResetPath(unit);
 	    }
@@ -245,15 +258,16 @@ local void MoveToTarget(Unit* unit)
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
 		if( unit->SavedOrder.Action==UnitActionStill ) {
-		    // Save current command to come back.
+		    // Save current command to continue it later.
 		    DebugCheck( unit->Orders[0].Goal );
 		    unit->SavedOrder=unit->Orders[0];
 		}
 		RefsDebugCheck( goal->Destroyed || !goal->Refs );
 		goal->Refs++;
 		unit->Orders[0].Goal=goal;
-		unit->Orders[0].X=-1;
-		unit->Orders[0].Y=-1;
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=
+			unit->Stats->AttackRange;
+		unit->Orders[0].X=unit->Orders[0].Y=-1;
 		unit->SubAction|=WEAK_TARGET;		// weak target
 		NewResetPath(unit);
 		DebugLevel3Fn("%Zd in react range %Zd\n"
@@ -303,8 +317,7 @@ local void MoveToTarget(Unit* unit)
 		    unit->SavedOrder.Goal=NoUnitP;
 		}
 		unit->Orders[0].Goal=goal=temp;
-		unit->Orders[0].X=-1;
-		unit->Orders[0].Y=-1;
+		unit->Orders[0].X=unit->Orders[0].Y=-1;
 		NewResetPath(unit);
 #else
 		if( unit->SavedCommand.Action==UnitActionStill ) {
@@ -358,14 +371,25 @@ local void MoveToTarget(Unit* unit)
 	} else if( err<0 ) {
 #endif
 	    unit->State=unit->SubAction=0;
+	    DebugLevel0Fn("%d\n",unit->Orders[0].Action);
 	    // Return to old task?
 #ifdef NEW_ORDERS
-	    if( unit->Orders[0].Action==UnitActionStill ) {
-		unit->Orders[0]=unit->SavedOrder;
-		NewResetPath(unit);
-		// Must finish, if saved command finishes
-		unit->SavedOrder.Action=UnitActionStill;
-		DebugCheck( !unit->SavedOrder.Goal );
+	    if( err==-2 ) {
+		DebugLevel0Fn("Target not reachable\n");
+	    }
+	    unit->SubAction=0;
+	    if( unit->Orders[0].Goal ) {
+		RefsDebugCheck( !goal->Refs );
+		goal->Refs--;
+		RefsDebugCheck( !goal->Refs );
+	    }
+	    unit->Orders[0]=unit->SavedOrder;
+	    NewResetPath(unit);
+	    // Must finish, if saved command finishes
+	    unit->SavedOrder.Action=UnitActionStill;
+	    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+	    if( unit->Selected && unit->Player==ThisPlayer ) {
+		MustRedraw|=RedrawButtonPanel;
 	    }
 #else
 	    if( unit->Command.Action==UnitActionStill ) {
@@ -427,6 +451,7 @@ local void AttackTarget(Unit* unit)
 		DebugLevel0Fn("destroyed unit %Zd\n",UnitNumber(goal));
 		unit->Orders[0].X=goal->X+goal->Type->TileWidth/2;
 		unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
 		RefsDebugCheck( !goal->Refs );
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
@@ -435,8 +460,12 @@ local void AttackTarget(Unit* unit)
 		if( unit->SavedOrder.Action!=UnitActionStill ) {
 		    unit->Orders[0]=unit->SavedOrder;
 		    unit->SavedOrder.Action=UnitActionStill;
-		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
 		    // This is not supported
+		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+		    if( unit->Selected && unit->Player==ThisPlayer ) {
+			MustRedraw|=RedrawButtonPanel;
+		    }
+		    DebugLevel0Fn("FIXME: Johns thinks this is wrong!\n");
 		}
 		NewResetPath(unit);
 	    } else if( !goal->HP || goal->Orders[0].Action==UnitActionDie
@@ -446,12 +475,17 @@ local void AttackTarget(Unit* unit)
 		RefsDebugCheck( !goal->Refs );
 		unit->Orders[0].X=goal->X+goal->Type->TileWidth/2;
 		unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
 		unit->Orders[0].Goal=goal=NoUnitP;
 		if( unit->SavedOrder.Action!=UnitActionStill ) {
 		    unit->Orders[0]=unit->SavedOrder;
 		    unit->SavedOrder.Action=UnitActionStill;
-		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
 		    // This is not supported
+		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+		    if( unit->Selected && unit->Player==ThisPlayer ) {
+			MustRedraw|=RedrawButtonPanel;
+		    }
+		    DebugLevel0Fn("FIXME: Johns thinks this is wrong!\n");
 		}
 		NewResetPath(unit);
 	    }
@@ -493,11 +527,15 @@ local void AttackTarget(Unit* unit)
 		// Return to old task!
 		if( unit->SavedOrder.Action!=UnitActionStill ) {
 		    unit->SubAction=0;
+		    DebugCheck( unit->Orders[0].Goal );
 		    unit->Orders[0]=unit->SavedOrder;
 		    NewResetPath(unit);
 		    // Must finish, if saved command finishes
 		    unit->SavedOrder.Action=UnitActionStill;
-		    DebugCheck( !unit->SavedOrder.Goal );
+		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+		    if( unit->Selected && unit->Player==ThisPlayer ) {
+			MustRedraw|=RedrawButtonPanel;
+		    }
 		}
 		return;
 	    }
@@ -531,8 +569,9 @@ local void AttackTarget(Unit* unit)
 		    ,UnitNumber(unit),UnitNumber(goal));
 #ifdef NEW_ORDERS
 	    unit->Orders[0].Goal=goal;
-	    unit->Orders[0].X=-1;
-	    unit->Orders[0].Y=-1;
+	    unit->Orders[0].X=unit->Orders[0].Y=-1;
+	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=
+		    unit->Stats->AttackRange;
 	    NewResetPath(unit);
 #else
 	    unit->Command.Data.Move.Goal=goal;
@@ -565,8 +604,7 @@ local void AttackTarget(Unit* unit)
 		    unit->SavedOrder.Goal=NoUnitP;
 		}
 		unit->Orders[0].Goal=goal=temp;
-		unit->Orders[0].X=-1;
-		unit->Orders[0].Y=-1;
+		unit->Orders[0].X=unit->Orders[0].Y=-1;
 		NewResetPath(unit);
 #else
 		if( unit->SavedCommand.Action==UnitActionStill ) {
@@ -656,6 +694,10 @@ global void HandleActionAttack(Unit* unit)
 	case 5:
 	case 5+WEAK_TARGET:
 	    AttackTarget(unit);
+	    break;
+
+	case WEAK_TARGET:
+	    DebugLevel0("FIXME: wrong entry.\n");
 	    break;
     }
 }
