@@ -1411,10 +1411,6 @@ global void LoadUnitTypeSprite(UnitType* unittype)
 		type->Sprite = LoadSprite(buf, type->Width, type->Height);
 		FlipGraphic(type->Sprite);
 	}
-
-	if (unittype->SameSprite) {
-		unittype->Sprite = type->Sprite;
-	}
 }
 				
 /**
