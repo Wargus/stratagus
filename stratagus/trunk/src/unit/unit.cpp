@@ -714,6 +714,89 @@ global int UnitVisibleOnMap(const Unit* unit)
 #endif
 }
 
+/**
+**	Returns true, if unit is known on the map. Special case for buildings.
+**
+**	@param unit	Unit to be checked.
+**	@return		True if known, false otherwise.
+*/
+global int UnitKnownOnMap(const Unit* unit)
+{
+#ifdef NEW_FOW
+    unsigned x;
+    unsigned y;
+    unsigned w;
+    unsigned h;
+    unsigned i;
+    unsigned m;
+    MapField* mf;
+
+    if ( unit->Invisible && unit->Player != ThisPlayer ) {
+	//FIXME: vladi: should handle teams and shared vision
+	return 0;
+    }
+
+    //
+    //	Check explored and if visible under fog of war.
+    //	Building could always be seen under fog of war.
+    //	FIXME: only known buildings are visible SceenFrame!=-1.
+    //
+    mf=TheMap.Fields+y*TheMap.Width+x;
+    m=1<<ThisPlayer->Player;
+    while( h-- ) {
+	for( i=w; i--; ) {
+	    // FIXME: see below this is wrong (old code).
+	    if( (mf->Explored&m) && (unit->Type->Building
+			|| (mf->Visible&m)) ) {
+		return 1;
+	    }
+	    mf++;
+	}
+	mf+=TheMap.Width-w;
+    }
+    return 0;
+
+#else
+    unsigned x;
+    unsigned y;
+    int w;
+    int w0;
+    int h;
+
+    DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
+
+    if ( unit->Invisible && unit->Player != ThisPlayer ) {
+	//FIXME: vladi: should handle teams and shared vision
+	return 0;
+    }
+
+    //
+    //	Check if visible on screen.
+    //		FIXME: This could be better checked, tells to much!
+    //		FIXME: This is needed to show moving units.
+    //		FIXME: flyers disappears to fast.
+    //
+    x = unit->X;
+    y = unit->Y;
+    w = w0 = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
+    //
+    //	Check explored or if visible (building) under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //
+    for( ; h-->0; ) {
+	for( w=w0; w-->0; ) {
+	    if( IsMapFieldVisible(x+w,y+h)
+		    || (unit->Type->Building && unit->SeenFrame!=0xFF
+			&& IsMapFieldExplored(x+w,y+h)) ) {
+		return 1;
+	    }
+	}
+    }
+
+    return 0;
+#endif
+}
 
 /**
 **	Returns true, if unit is visible on current map view.
@@ -756,6 +839,7 @@ global int UnitVisibleOnScreen(const Unit* unit)
 	m=1<<ThisPlayer->Player;
 	while( h-- ) {
 	    for( i=w; i--; ) {
+		// FIXME: see below this is wrong (old code).
 		if( (mf->Explored&m) && (unit->Type->Building
 			    || (mf->Visible&m)) ) {
 		    return 1;
