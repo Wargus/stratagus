@@ -45,7 +45,6 @@
 #define noUSE_SDL			/// Remove no for sdl support
 #define noUSE_SDLA			/// Remove no for sdl audio support
 #define noUSE_X11			/// Remove no for x11 support
-#define noUSE_SVGALIB			/// Remove no for svgalib support
 #define noUSE_WINCE			/// Remove no for win-ce video support
 
     /**

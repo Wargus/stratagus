@@ -105,7 +105,7 @@ dnl    [  --enable-optimization	  [Enable detection of optimization flags (defau
 dnl FIXME: todo
 
 AC_ARG_WITH(client,
-    [  --with-client=sdl,x11,svgalib
+    [  --with-client=sdl,x11
 			  [Select which client (default: sdl)]])
 THREAD_LIBS=
 if test "$with_client" = "x11"; then
@@ -117,9 +117,6 @@ if test "$with_client" = "x11"; then
     else
 	THREAD_LIBS="-lpthread"
     fi
-elif test "$with_client" = "svgalib"; then
-    VIDEO_CFLAGS="-DUSE_SVGALIB" 
-    VIDEO_LIBS="-lvga"
 else
     AC_CHECK_HEADERS(SDL/SDL.h,, AC_MSG_ERROR(could not find SDL/SDL.h))
     VIDEO_CFLAGS="-DUSE_SDL -DUSE_SDLA `sdl-config --cflags`"

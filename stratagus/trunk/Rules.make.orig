@@ -62,23 +62,12 @@ VIDEO		= -DUSE_X11
 VIDEOLIB	= -lXext -lX11 -ldl
 
 #------------------------------------------------------------------------------
-# Uncomment th next to get svgalib support.
-
-#VIDEO		= -DUSE_SVGALIB
-#VIDEOLIB	= -lvga -lm -ldl
-
-#------------------------------------------------------------------------------
 # Uncomment one of the next for the SDL support.
 
 # Uncomment the next for the generic SDL support.
 
 #VIDEO		= $(SDL)
 #VIDEOLIB	= $(SDLLIB)
-
-# Uncomment the next for the SDL X11/SVGALIB support.
-
-#VIDEO		= $(SDL)
-#VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd -lm -lslang -lgpm
 
 # Uncomment the next for the win32/cygwin support. (not working?)
 
@@ -195,9 +184,6 @@ OBJDIR=.
 #OE=o
 #EXE=.exe
 #OBJDIR=.
-
-## architecture-dependant objects
-#ARCHOBJS=stdmman.$(OE) svgalib.$(OE) unix_lib.$(OE) bitm_lnx.$(OE)
 
 ## include flags
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS) -I$(TOPDIR)/src/movie/vp31/include

@@ -433,17 +433,6 @@ fi
 
 if [ "$BEOS" != "1" ] ; then
 
-if [ "$DARWIN" != "1" ] && [ "$WIN32" != "1" ] ; then
-  # Check for SVGALIB
-  LIBCHECK="-lvga -lvgagl"
-  check_for_libs
-  if test "$?" = 0 ; then
-    HAVESVGA=1
-  else
-    echo "...You do not appear to have SVGALIB installed"
-  fi
-fi
-
 if test "$WIN32" = 0 ; then
   echo
   echo "VIDEO DRIVER OPTIONS"
@@ -451,12 +440,6 @@ if test "$WIN32" = 0 ; then
 
   if test "$HAVESDL" = 1 ; then
     echo "  S - SDL Support"
-  fi
-  if test "$HAVESVGA" = 1 ; then
-    echo "  V - SVGALIB Support"
-  fi
-  if (test "$HAVESVGA" = 1 && test "$HAVESDL" = 1) ; then
-    echo "  B - SDL/SVGALIB Support"
   fi
   echo
   echo -n "Please enter selection: (s) "
@@ -480,25 +463,6 @@ fi
 
 echo "# Video support" >> $RULESFILE
 case $VIDSEL in
-  [vV])
-	echo "-> Using SVGALIB"
-	echo "VIDEO		= -DUSE_SVGALIB" >> $RULESFILE
-	echo "VIDEOLIB	= -lvga $DL" >> $RULESFILE
-	;;
-
-  [bB])
-	echo "-> Using SDL/SVGALIB"
-  	USESDL=1
-	SDLLIB="\$(shell $SDL_CONFIG --libs)"
-	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
-	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
-	echo >> $RULESFILE
-	echo "VIDEO		= \$(SDL)" >> $RULESFILE
-	echo "VIDEOLIB	= \$(SDLLIB) -lvga -lvgagl $DL" >> $RULESFILE
-	echo
-	;;
-
   [xX])
 	echo "-> Using X11"
 	echo "VIDEO           = -DUSE_X11" >> $RULESFILE
@@ -1084,9 +1048,6 @@ fi
 
 #------------------------------------------------------------------------------
 # architecture-dependent objects
-
-echo >> $RULESFILE
-echo "#ARCHOBJS=stdmman.\$(OE) svgalib.\$(OE) unix_lib.\$(OE) bitm_lnx.\$(OE)" >> $RULESFILE
 
 # include flags
 echo "IFLAGS=	-I\$(TOPDIR)/src/include \$(XIFLAGS) -I\$(TOPDIR)/src/movie/vp31/include" >> $RULESFILE
