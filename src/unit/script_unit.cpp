@@ -521,7 +521,7 @@ local SCM CclUnit(SCM list)
 	    type=UnitTypeByIdent(str=gh_scm2newstr(gh_car(list),NULL));
 	    free(str);
 	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("seentype")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("seen-type")) ) {
 	    seentype=UnitTypeByIdent(str=gh_scm2newstr(gh_car(list),NULL));
 	    free(str);
 	    list=gh_cdr(list);
