@@ -7100,7 +7100,7 @@ local int CclResetKeystrokeHelp(lua_State* l)
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetGroupKeys(SCM list)
 {
-    ui_group_keys = gh_scm2newstr(list, NULL);
+    UiGroupKeys = gh_scm2newstr(list, NULL);
     return SCM_UNSPECIFIED;
 }
 #endif
