@@ -106,7 +106,7 @@ local void MoveToTarget(Unit* unit)
     // FIXME: is this a a-star problem ?
 #ifdef NEW_ORDERS
     if( unit->Orders[0].Action==UnitActionAttackGround
-	|| WallOnMap(unit->Orders[0].X,unit->Orders[0].Y) ) {
+	    || WallOnMap(unit->Orders[0].X,unit->Orders[0].Y) ) {
 	// FIXME: workaround for pathfinder problem
 	unit->Orders[0].X-=unit->Orders[0].RangeX;
 	unit->Orders[0].Y-=unit->Orders[0].RangeY;
@@ -148,9 +148,6 @@ local void MoveToTarget(Unit* unit)
 	//
 #ifdef NEW_ORDERS
 	if( (goal=unit->Orders[0].Goal) ) {
-#else
-	if( (goal=unit->Command.Data.Move.Goal) ) {
-#endif
 	    // FIXME: Should be done by Action Move???????
 	    if( goal->Destroyed ) {
 		DebugLevel0Fn("destroyed unit\n");
@@ -158,23 +155,44 @@ local void MoveToTarget(Unit* unit)
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
-#ifdef NEW_ORDERS
+		unit->Orders[0].X=goal->X;
+		unit->Orders[0].Y=goal->Y;
 		unit->Orders[0].Goal=goal=NoUnitP;
+		ResetPath(unit->Orders[0]);
 	    } else if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
-#else
-		unit->Command.Data.Move.Goal=goal=NoUnitP;
-	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
-#endif
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
-#ifdef NEW_ORDERS
+		unit->Orders[0].X=goal->X;
+		unit->Orders[0].Y=goal->Y;
 		unit->Orders[0].Goal=goal=NoUnitP;
-#else
-		unit->Command.Data.Move.Goal=goal=NoUnitP;
-#endif
+		ResetPath(unit->Orders[0]);
 	    }
 	}
+#else
+	if( (goal=unit->Command.Data.Move.Goal) ) {
+	    // FIXME: Should be done by Action Move???????
+	    if( goal->Destroyed ) {
+		DebugLevel0Fn("destroyed unit\n");
+		RefsDebugCheck( !goal->Refs );
+		if( !--goal->Refs ) {
+		    ReleaseUnit(goal);
+		}
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+		ResetPath(unit->Command);
+	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+		RefsDebugCheck( !goal->Refs );
+		--goal->Refs;
+		RefsDebugCheck( !goal->Refs );
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+		ResetPath(unit->Command);
+	    }
+	}
+#endif
 
 	//
 	//	No goal: if meeting enemy attack it.
@@ -299,12 +317,14 @@ local void MoveToTarget(Unit* unit)
 #ifdef NEW_ORDERS
 	    if( unit->Orders[0].Action==UnitActionStill ) {
 		unit->Orders[0]=unit->SavedOrder;
+		ResetPath(unit->Orders[0]);
 		// Must finish, if saved command finishes
 		unit->SavedOrder.Action=UnitActionStill;
 	    }
 #else
 	    if( unit->Command.Action==UnitActionStill ) {
 		unit->Command=unit->SavedCommand;
+		ResetPath(unit->Command);
 		// Must finish if saved command finishes
 		unit->SavedCommand.Action=UnitActionStill;
 	    }
@@ -331,21 +351,18 @@ local void AttackTarget(Unit* unit)
 
     AnimateActionAttack(unit);
     if( unit->Reset ) {
-#ifdef NEW_ORDERS
-	goal=unit->Orders[0].Goal;
-#else
-	goal=unit->Command.Data.Move.Goal;
-#endif
 	//
 	//	Goal is "weak" or a wall.
 	//
 #ifdef NEW_ORDERS
+	goal=unit->Orders[0].Goal;
 	if( !goal && (WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)
 		|| unit->Orders[0].Action==UnitActionAttackGround) ) {
 	    DebugLevel3Fn("attack a wall!!!!\n");
 	    return;
 	}
 #else
+	goal=unit->Command.Data.Move.Goal;
 	if( !goal && (WallOnMap(unit->Command.Data.Move.DX
 		     ,unit->Command.Data.Move.DY)
 		|| unit->Command.Action==UnitActionAttackGround) ) {
@@ -365,23 +382,37 @@ local void AttackTarget(Unit* unit)
 		    ReleaseUnit(goal);
 		}
 #ifdef NEW_ORDERS
+		unit->Orders[0].X=goal->X;
+		unit->Orders[0].Y=goal->Y;
 		unit->Orders[0].Goal=goal=NoUnitP;
+		ResetPath(unit->Orders[0]);
 	    } else if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
-#else
-		unit->Command.Data.Move.Goal=goal=NoUnitP;
-	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
-#endif
 		// FIXME: goal->Removed???
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
-#ifdef NEW_ORDERS
+		unit->Orders[0].X=goal->X;
+		unit->Orders[0].Y=goal->Y;
 		unit->Orders[0].Goal=goal=NoUnitP;
+		ResetPath(unit->Orders[0]);
 #else
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
+		ResetPath(unit->Command);
+	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+		// FIXME: goal->Removed???
+		RefsDebugCheck( !goal->Refs );
+		--goal->Refs;
+		RefsDebugCheck( !goal->Refs );
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+		ResetPath(unit->Command);
 #endif
 	    }
 	}
+
 	//
 	//	No target choose one.
 	//
