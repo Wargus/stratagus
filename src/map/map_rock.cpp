@@ -129,11 +129,24 @@ global void MapFixSeenRockTile(int x, int y)
 	tile = TheMap.Tileset->RockTable[tile];
     }
 
+    //Test if we have top rock, or bottom rock, they are special
+    if ((ttdown & 0x10) && 1) {
+	tile |= ((ttleft & 0x06) && 1)* 1;
+	tile |= ((ttright & 0x09) && 1) * 2;
+    }
+
+    if ((ttup & 0x20) && 1) {
+	tile |= ((ttleft & 0x06) && 1) * 8;
+	tile |= ((ttright & 0x09) && 1) * 4;
+    }
+     
     mf = TheMap.Fields + x + y * TheMap.Width;
     if (tile == -1) {			// No valid rock remove it.
 	mf->SeenTile = TheMap.Tileset->RemovedRock;
 	MapFixSeenRockNeighbors(x, y);
-    } else if (mf->SeenTile == tile) {
+    } else if (TheMap.Tileset->MixedLookupTable[mf->SeenTile] ==
+		TheMap.Tileset->MixedLookupTable[tile]) {
+	//Tiles are the same edge
 	return;
     } else {
 	mf->SeenTile = tile;
@@ -163,6 +176,28 @@ global void MapFixSeenRockNeighbors(int x, int y)
     MapFixSeenRockTile(x - 1, y);
     MapFixSeenRockTile(x, y + 1);
     MapFixSeenRockTile(x, y - 1);
+    MapFixSeenRockTile(x + 1, y + 1);		// side neighbors
+    MapFixSeenRockTile(x - 1, y + 1);
+    MapFixSeenRockTile(x - 1, y - 1);
+    MapFixSeenRockTile(x + 1, y - 1);
+}
+
+/**
+**	Correct the surrounding real rock fields.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+local void MapFixRockNeighbors(int x, int y)
+{
+    MapFixRockTile(x + 1, y);		// side neighbors
+    MapFixRockTile(x - 1, y);
+    MapFixRockTile(x, y + 1);
+    MapFixRockTile(x, y - 1);
+    MapFixRockTile(x + 1, y + 1);		// diagonal neighbors
+    MapFixRockTile(x - 1, y + 1);
+    MapFixRockTile(x - 1, y - 1);
+    MapFixRockTile(x + 1, y - 1);
 }
 
 /**
@@ -216,6 +251,17 @@ global void MapFixRockTile(int x, int y)
     tile += ((ttright & 0x01) && (ttdown & 0x04)) * 2;
     tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
 
+    //Test if we have top rock, or bottom rock, they are special
+    if ((ttdown & 0x10) && 1) {
+	tile |= ((ttleft & 0x06) && 1)* 1;
+	tile |= ((ttright & 0x09) && 1) * 2;
+    }
+
+    if ((ttup & 0x20) && 1) {
+	tile |= ((ttleft & 0x06) && 1) * 8;
+	tile |= ((ttright & 0x09) && 1) * 4;
+    }
+
     
     tile = TheMap.Tileset->RockTable[tile];
     //If tile is -1, then we should check if we are to draw just one tree
@@ -229,7 +275,9 @@ global void MapFixRockTile(int x, int y)
 
     if (tile == -1) {			// No valid rock remove it.
 	MapRemoveRock(x, y);
-    } else if (mf->Tile != tile) {
+	MapFixRockNeighbors(x, y);
+    } else if (TheMap.Tileset->MixedLookupTable[mf->Tile] !=
+		TheMap.Tileset->MixedLookupTable[tile]) {
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
 #ifdef NEW_FOW
@@ -243,20 +291,6 @@ global void MapFixRockTile(int x, int y)
 	    MustRedraw |= RedrawMinimap;
 	}
     }
-}
-
-/**
-**	Correct the surrounding real rock fields.
-**
-**	@param x	Map X tile-position.
-**	@param y	Map Y tile-position.
-*/
-local void MapFixRockNeighbors(int x, int y)
-{
-    MapFixRockTile(x + 1, y);		// side neighbors
-    MapFixRockTile(x - 1, y);
-    MapFixRockTile(x, y + 1);
-    MapFixRockTile(x, y - 1);
 }
 
 /**

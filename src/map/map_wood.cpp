@@ -119,7 +119,17 @@ global void MapFixSeenWoodTile(int x, int y)
     tile += ((ttright & 0x01) && (ttdown & 0x04)) * 2;
     tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
 
-    
+    //Test if we have top tree, or bottom tree, they are special
+    if ((ttdown & 0x10) && 1) {
+	tile |= ((ttleft & 0x06) && 1)* 1;
+	tile |= ((ttright & 0x09) && 1) * 2;
+    }
+
+    if ((ttup & 0x20) && 1) {
+	tile |= ((ttleft & 0x06) && 1) * 8;
+	tile |= ((ttright & 0x09) && 1) * 4;
+    }
+     
     tile = TheMap.Tileset->WoodTable[tile];
     //If tile is -1, then we should check if we are to draw just one tree
     //Check for tile about, or below or both...
@@ -135,7 +145,8 @@ global void MapFixSeenWoodTile(int x, int y)
     if (tile == -1) {			// No valid wood remove it.
 	mf->SeenTile = TheMap.Tileset->RemovedTree;
 	MapFixSeenWoodNeighbors(x, y);
-    } else if( mf->SeenTile==tile ) {	// Already there!
+    } else if( TheMap.Tileset->MixedLookupTable[mf->SeenTile]==
+                TheMap.Tileset->MixedLookupTable[tile] ) {      //Same Type
 	return;
     } else {
 	mf->SeenTile = tile;
@@ -165,6 +176,10 @@ global void MapFixSeenWoodNeighbors(int x, int y)
     MapFixSeenWoodTile(x - 1, y);
     MapFixSeenWoodTile(x, y + 1);
     MapFixSeenWoodTile(x, y - 1);
+    MapFixSeenWoodTile(x + 1, y - 1);		// side neighbors
+    MapFixSeenWoodTile(x - 1, y - 1);
+    MapFixSeenWoodTile(x - 1, y + 1);
+    MapFixSeenWoodTile(x + 1, y + 1);
 }
 
 /**
@@ -179,6 +194,10 @@ local void MapFixWoodNeighbors(int x, int y)
     MapFixWoodTile(x - 1, y);
     MapFixWoodTile(x, y + 1);
     MapFixWoodTile(x, y - 1);
+    MapFixWoodTile(x + 1, y - 1);		// side neighbors
+    MapFixWoodTile(x - 1, y - 1);
+    MapFixWoodTile(x - 1, y + 1);
+    MapFixWoodTile(x + 1, y + 1);
 }
 
 /**
@@ -232,7 +251,16 @@ global void MapFixWoodTile(int x, int y)
     tile += ((ttright & 0x01) && (ttdown & 0x04)) * 2;
     tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
 
-    
+    if ((ttdown & 0x10) && 1) {
+	tile |= ((ttleft & 0x06) && 1)* 1;
+	tile |= ((ttright & 0x09) && 1) * 2;
+    }
+
+    if ((ttup & 0x20) && 1) {
+	tile |= ((ttleft & 0x06) && 1) * 8;
+	tile |= ((ttright & 0x09) && 1) * 4;
+    }
+
     tile = TheMap.Tileset->WoodTable[tile];
     //If tile is -1, then we should check if we are to draw just one tree
     //Check for tile about, or below or both...
@@ -245,10 +273,11 @@ global void MapFixWoodTile(int x, int y)
 
     if (tile == -1) {			// No valid wood remove it.
 	MapRemoveWood(x, y);
-    } else if (mf->Tile != tile) {
+    } else if (TheMap.Tileset->MixedLookupTable[mf->Tile] !=
+                TheMap.Tileset->MixedLookupTable[tile]) {
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
-	MapFixWoodNeighbors(x, y);
+	//MapFixWoodNeighbors(x, y);
 #ifdef NEW_FOW
 	if (mf->Visible[ThisPlayer->Player]>1) {
 #else
