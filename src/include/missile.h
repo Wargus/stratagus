@@ -399,10 +399,7 @@ enum _missile_class_ {
 	/// Base structure of missile-types
 struct _missile_type_ {
 	char* Ident;          ///< missile name
-	char* File;           ///< missile sprite file
 	int   Transparency;   ///< missile transparency possible value is 50 (later 25 and 75)
-	int   Width;          ///< missile width in pixels
-	int   Height;         ///< missile height in pixels
 	int   DrawLevel;      ///< Level to draw missile at
 	int   SpriteFrames;   ///< number of sprite frames in graphic
 	int   NumDirections;  ///< number of directions missile can face
@@ -429,7 +426,7 @@ struct _missile_type_ {
 	MissileType* SmokeMissile;   ///< Trailling missile
 
 // --- FILLED UP ---
-	struct _graphic_* Sprite;    ///< missile sprite image
+	struct _graphic_* G;         ///< missile graphic
 };
 
 /*----------------------------------------------------------------------------
