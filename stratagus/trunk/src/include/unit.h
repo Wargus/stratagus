@@ -113,17 +113,6 @@ typedef struct _order_ {
 struct _command_ {
     UnitAction	Action : 8;		/// global action
     union {
-	// FIXME: will be changed with new pathfinder
-	/*
-	** FIXME: rewrite this complete
-	struct {
-	    unsigned	RangeX;		/// Range to goal in X
-	    unsigned	RangeY;		/// Range to goal in Y
-	    Unit*	Goal;		/// Goal unit
-	    unsigned	DX;
-	    unsigned	DY;		/// Destination
-	} Move;				/// move:
-	*/
 	struct {
 	    unsigned	Fast : 1;	/// Can fast move
 	    unsigned	Range : 31;	/// Range to goal
@@ -171,8 +160,8 @@ struct _command_ {
 	    unsigned	Active;		/// how much units are in the goldmine
 	} GoldMine;			/// gold-mine:
 	struct {
-	    unsigned	Active;		/// how much units are in the goldmine
-	} OilWell;			/// oil-well
+	    unsigned	Active;		/// how much units are in the resource
+	} Resource;			/// generic resource
     } Data;				/// data for action
 };
 #endif
@@ -286,7 +275,7 @@ struct _unit_ {
     // FIXME: use the new next pointer
     Unit*	OnBoard[MAX_UNITS_ONBOARD];	/// Units in transporter
 
-#ifdef NEW_ORDERS	//---------------------------------------------
+#ifdef NEW_ORDERS	//{--------------------------------------------
 
 #define MAX_ORDERS 16			/// How many outstanding orders?
     char	OrderCount;		/// how many orders in queue
@@ -318,7 +307,7 @@ struct _unit_ {
     }		Harvest;		/// Harvest action
     }		Data;			/// Storage room for different commands
 
-#else			//---------------------------------------------
+#else			//}{-------------------------------------------
 
     unsigned	WoodToHarvest;		/// Ticks for harvest
 
@@ -330,7 +319,14 @@ struct _unit_ {
     char	NextCount;		/// how many commands are in the queue
     char	NextFlush;	/// true: cancel command and proceed to next one
     Command	PendCommand;		/// pending commands
-#endif			//---------------------------------------------
+#endif			//}--------------------------------------------
+
+#ifdef DEBUG
+    const Unit*	Goal;			/// Goal for pathfinder
+    int		GoalX;			/// Destination X of pathfinder
+    int		GoalY;			/// Destination Y of pathfinder
+#endif
+
 };
 
 #define NoUnitP		(Unit*)0	/// return value: for no unit found
