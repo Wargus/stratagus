@@ -55,7 +55,7 @@
 **		It will 'know' about overlapping screen decorations and draw
 **		them all (partly) when one is to be updated.
 **
-**		See page @ref Decorations for a detailed description.
+**		See page @ref Deco for a detailed description.
 **
 **              @see deco.h @see deco.c
 **
