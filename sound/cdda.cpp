@@ -72,10 +72,9 @@ typedef struct _cdda_data {
 **
 **	@return		    Number of bytes read
 */
-local int CDRead(Sample *sample, void *buf, int len)
+local int CDRead(Sample* sample, void* buf, int len)
 {
-    CddaData *data;
-
+    CddaData* data;
     int n;
 
     data = (CddaData*)sample->User;
@@ -84,9 +83,10 @@ local int CDRead(Sample *sample, void *buf, int len)
     data->Readdata.addr_format = CDROM_LBA;
 
     // end of track
-    if (FRAME_SIZE * (CDtocentry[CDTrack+1].cdte_addr.lba - 
+    if (FRAME_SIZE * (CDtocentry[CDTrack + 1].cdte_addr.lba - 
 	    CDtocentry[CDTrack].cdte_addr.lba) - data->PosInCd < len) {
-	len = FRAME_SIZE * (CDtocentry[CDTrack+1].cdte_addr.lba - CDtocentry[CDTrack].cdte_addr.lba) - data->PosInCd;
+	len = FRAME_SIZE * (CDtocentry[CDTrack+1].cdte_addr.lba -
+	    CDtocentry[CDTrack].cdte_addr.lba) - data->PosInCd;
 	data->PosInCd = 0;
     }
 
@@ -98,12 +98,12 @@ local int CDRead(Sample *sample, void *buf, int len)
 
 	n = CDDA_BUFFER_SIZE - sample->Length;
 
-	data->Readdata.nframes = n/FRAME_SIZE;
+	data->Readdata.nframes = n / FRAME_SIZE;
 	data->Readdata.buf = data->PointerInBuffer + sample->Length;
 	ioctl(CDDrive, CDROMREADAUDIO, &data->Readdata);
 
-	sample->Length += data->Readdata.nframes*FRAME_SIZE;
-	data->PosInCd += data->Readdata.nframes*FRAME_SIZE;
+	sample->Length += data->Readdata.nframes * FRAME_SIZE;
+	data->PosInCd += data->Readdata.nframes * FRAME_SIZE;
     }
 
     memcpy(buf, data->PointerInBuffer, len);
@@ -116,7 +116,7 @@ local int CDRead(Sample *sample, void *buf, int len)
 **
 **	@param sample	    Sample to free
 */
-local void CDFree(Sample *sample)
+local void CDFree(Sample* sample)
 {
     free(sample);
 }
