@@ -160,6 +160,18 @@ global Upgrade* UpgradeByIdent(const char* ident)
 }
 
 /**
+**	Find upgrade by wc number.
+**
+**	@param num	The upgrade number used in f.e. puds.
+**	@return		Upgrade pointer.
+*/
+local Upgrade* UpgradeByWcNum(unsigned num)
+{
+    return UpgradeByIdent(UpgradeWcNames[num]);
+}
+
+
+/**
 **	Init upgrade/allow structures
 */
 global void InitUpgrades(void)
@@ -238,7 +250,7 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	38, 39,	// unit-gnomish-submarine	unit-giant-turtle
 	40, 41,	// unit-gnomish-flying-machine	unit-goblin-zeppelin
 	42, 43,	// unit-gryphon-rider		unit-dragon
-	-1, -1,	// NULL				NULL
+	-1, -1,	// unused
 	14, 15,	// unit-dwarves			unit-goblin-sappers
 	70, 71,	// unit-gryphon-aviary		unit-dragon-roost
 	58, 59,	// unit-farm			unit-pig-farm
@@ -258,77 +270,75 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	72, 73,	// unit-human-shipyard		unit-orc-shipyard
 	103,104,// unit-human-wall		unit-orc-wall
     };
-    // spell allow bits -> internal names.
-    // FIXME: spells allow bits -> wc2num -> internal names.
-    static char* spells[32] = {
-	"upgrade-holy-vision",
-	"upgrade-healing",
-	NULL,
-	"upgrade-exorcism",
-	"upgrade-flame-shield",
-	"upgrade-fireball",
-	"upgrade-slow",
-	"upgrade-invisibility",
-	"upgrade-polymorph",
-	"upgrade-blizzard",
-	"upgrade-eye-of-kilrogg",
-	"upgrade-bloodlust",
-	NULL,
-	"upgrade-raise-dead",
-	"upgrade-death-coil",
-	"upgrade-whirlwind",
-	"upgrade-haste",
-	"upgrade-unholy-armor",
-	"upgrade-runes",
-	"upgrade-death-and-decay",
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+    // spells allow bits -> wc2num -> internal names.
+    static char spell_for_bit[32] = {
+	34,	// upgrade-holy-vision
+	35,	// upgrade-healing
+	-1,	// not used
+	36,	// upgrade-exorcism
+	37,	// upgrade-flame-shield
+	38,	// upgrade-fireball
+	39,	// upgrade-slow
+	40,	// upgrade-invisibility
+	41,	// upgrade-polymorph
+	42,	// upgrade-blizzard
+	43,	// upgrade-eye-of-kilrogg
+	44,	// upgrade-bloodlust
+	-1,	// not used
+	45,	// upgrade-raise-dead
+	46,	// upgrade-death-coil
+	47,	// upgrade-whirlwind
+	48,	// upgrade-haste
+	49,	// upgrade-unholy-armor
+	50,	// upgrade-runes
+	51,	// upgrade-death-and-decay
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
+	-1,	// not used
     };
-    // upgrades allow bits -> internal names.
-    // FIXME: upgrades allow bits -> wc2num -> internal names.
-    static char* upgrades[64] = {
-	"upgrade-arrow1",		"upgrade-throwing-axe1",
-	"upgrade-arrow2",		"upgrade-throwing-axe2",
-	"upgrade-sword1",		"upgrade-battle-axe1",
-	"upgrade-sword2"	,	"upgrade-battle-axe2",
-	"upgrade-human-shield1",	"upgrade-orc-shield1",
-	"upgrade-human-shield2",	"upgrade-orc-shield2",
-	"upgrade-human-ship-cannon1",	"upgrade-orc-ship-cannon1",
-	"upgrade-human-ship-cannon2",	"upgrade-orc-ship-cannon2",
-	"upgrade-human-ship-armor1",	"upgrade-orc-ship-armor1",
-	"upgrade-human-ship-armor2",	"upgrade-orc-ship-armor2",
-	NULL,				NULL,
-	NULL,				NULL,
-	"upgrade-catapult1",		"upgrade-ballista1",
-	"upgrade-catapult2",		"upgrade-ballista2",
-	NULL,				NULL,
-	NULL,				NULL,
-	"upgrade-ranger",		"upgrade-berserker",
-	"upgrade-longbow",		"upgrade-light-axes",
-	"upgrade-ranger-scouting",	"upgrade-berserker-scouting",
-	"upgrade-ranger-marksmanship",	"upgrade-berserker-regeneration",
-	"upgrade-paladin",		"upgrade-ogre-mage",
-	NULL,				NULL,
-	NULL,				NULL,
-	NULL,				NULL,
-	NULL,				NULL,
-	NULL,				NULL,
-	NULL,				NULL,
-	NULL,				NULL,
-	NULL,				NULL,
-	NULL,				NULL,
-	NULL,				NULL,
-	NULL,				NULL,
+    // upgrades allow bits -> wc2num -> internal names.
+    static char upgrade_for_bit[64] = {
+	 4, 6,	// upgrade-arrow1		upgrade-throwing-axe1
+	 5, 7,	// upgrade-arrow2		upgrade-throwing-axe2
+	 0, 2,	// upgrade-sword1		upgrade-battle-axe1
+	 1, 3,	// upgrade-sword2		upgrade-battle-axe2
+	 8,10,	// upgrade-human-shield1	upgrade-orc-shield1
+	 9,11,	// upgrade-human-shield2	upgrade-orc-shield2
+	12,14,	// upgrade-human-ship-cannon1	upgrade-orc-ship-cannon1
+	13,15,	// upgrade-human-ship-cannon2	upgrade-orc-ship-cannon2
+	16,18,	// upgrade-human-ship-armor1	upgrade-orc-ship-armor1
+	17,19,	// upgrade-human-ship-armor2	upgrade-orc-ship-armor2
+	-1,-1,	// unused
+	-1,-1,	// unused
+	20,22,	// upgrade-catapult1		upgrade-ballista1
+	21,23,	// upgrade-catapult2		upgrade-ballista2
+	-1,-1,	// unused
+	-1,-1,	// unused
+	24,28,	// upgrade-ranger		upgrade-berserker
+	25,29,	// upgrade-longbow		upgrade-light-axes
+	26,30,	// upgrade-ranger-scouting	upgrade-berserker-scouting
+	27,31,	// upgrade-ranger-marksmanship	upgrade-berserker-regeneration
+	33,32,	// upgrade-paladin		upgrade-ogre-mage
+	-1,-1,	// unused
+	-1,-1,	// unused
+	-1,-1,	// unused
+	-1,-1,	// unused
+	-1,-1,	// unused
+	-1,-1,	// unused
+	-1,-1,	// unused
+	-1,-1,	// unused
+	-1,-1,	// unused
+	-1,-1,	// unused
+	-1,-1,	// unused
     };
     int i;
     int b;
@@ -345,7 +355,7 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 
 	    v=(*alow++)&0xFF;
 	    for( b=0; b<8; ++b ) {
-		if( unit_for_bit[i*16+0+b*2]>0 ) {
+		if( unit_for_bit[i*16+0+b*2]>=0 ) {
 		    if( v&(1<<b) ) {
 			AllowUnitId(player,
 			    UnitTypeByWcNum(unit_for_bit[i*16+0+b*2])->Type,
@@ -374,21 +384,14 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
-		if( v&(1<<b) ) {
-		    if( spells[i*8+b] ) {
-			DebugLevel3Fn(" %d %s +R\n",
-				player->Player,spells[i*8+b]);
-
-			AllowUpgradeByIdent(player,spells[i*8+b],'R');
-		    }
-		} else {
-		    if( spells[i*8+b] ) {
-			DebugLevel3Fn(" %d %s -F\n",
-				player->Player,spells[i*8+b]);
-
-			AllowUpgradeByIdent(player,spells[i*8+b],'F');
+		if( spell_for_bit[i*8+b]>=0 ) {
+		    if( v&(1<<b) ) {
+			AllowUpgradeId(player,
+			    UpgradeByWcNum(spell_for_bit[i*8+b])-Upgrades,'R');
+		    } else {
+			AllowUpgradeId(player,
+			    UpgradeByWcNum(spell_for_bit[i*8+b])-Upgrades,'F');
 		    }
 		}
 	    }
@@ -403,14 +406,12 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
-		    if( spells[i*8+b] ) {
-			DebugLevel3Fn(" %d %s +A\n",
-				player->Player,spells[i*8+b]);
-
-			AllowUpgradeByIdent(player,spells[i*8+b],'A');
+		    // FIXME: combine with 'R'esearched and 'F'orbidden
+		    if( spell_for_bit[i*8+b]>=0 ) {
+			AllowUpgradeId(player,
+			    UpgradeByWcNum(spell_for_bit[i*8+b])-Upgrades,'A');
 		    }
 		}
 	    }
@@ -418,21 +419,20 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
     }
 
     //
-    //	Spells researched
+    //	Spells researching
+    //		FIXME: not useful.
     //
     for( player=Players; player<Players+16; ++player ) {
 	for( i=0; i<4; ++i ) {
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
-		    if( spells[i*8+b] ) {
-			DebugLevel3Fn(" %d %s +U\n",
-				player->Player,spells[i*8+b]);
-
-			AllowUpgradeByIdent(player,spells[i*8+b],'U');
+		    // FIXME: combine with 'R'esearched and 'F'orbidden
+		    if( spell_for_bit[i*8+b]>=0 ) {
+			AllowUpgradeId(player,
+			    UpgradeByWcNum(spell_for_bit[i*8+b])-Upgrades,'U');
 		    }
 		}
 	    }
@@ -440,22 +440,22 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
     }
 
     //
-    // Upgrades allowed
+    //	Upgrades allowed
     //
     for( player=Players; player<Players+16; ++player ) {
 	for( i=0; i<4; ++i ) {
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
-		    if( upgrades[i*16+b*2+0] ) {
-			DebugLevel3Fn(" %d %s +A\n",
-				player->Player,upgrades[i*16+b*2]);
-
-			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'A');
-			AllowUpgradeByIdent(player,upgrades[i*16+b*2+1],'A');
+		    if( upgrade_for_bit[i*16+b*2+0]>=0 ) {
+			AllowUpgradeId(player,
+			    UpgradeByWcNum(upgrade_for_bit[i*16+b*2+0])-Upgrades
+			    ,'A');
+			AllowUpgradeId(player,
+			    UpgradeByWcNum(upgrade_for_bit[i*16+b*2+1])-Upgrades
+			    ,'A');
 		    }
 		}
 	    }
@@ -463,22 +463,22 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
     }
 
     //
-    // Upgrades acquired
+    //	Upgrades acquired
     //
     for( player=Players; player<Players+16; ++player ) {
 	for( i=0; i<4; ++i ) {
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
-		    if( upgrades[i*16+b*2+0] ) {
-			DebugLevel3Fn(" %d %s +U\n",
-				player->Player,upgrades[i*16+b*2]);
-
-			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'U');
-			AllowUpgradeByIdent(player,upgrades[i*16+b*2+1],'U');
+		    if( upgrade_for_bit[i*16+b*2+0]>=0 ) {
+			AllowUpgradeId(player,
+			    UpgradeByWcNum(upgrade_for_bit[i*16+b*2+0])-Upgrades
+			    ,'U');
+			AllowUpgradeId(player,
+			    UpgradeByWcNum(upgrade_for_bit[i*16+b*2+1])-Upgrades
+			    ,'U');
 		    }
 		}
 	    }
