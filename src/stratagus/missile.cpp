@@ -1537,7 +1537,7 @@ local void SaveMissile(const Missile* missile,FILE* file)
 	free(s1);
     }
     if( missile->TargetUnit ) {
-	fprintf(file," 'target %s",s1=UnitReference(missile->TargetUnit));
+	fprintf(file," 'target '%s",s1=UnitReference(missile->TargetUnit));
 	free(s1);
     }
     fprintf(file," 'damage %d",missile->Damage);
