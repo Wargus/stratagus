@@ -250,7 +250,7 @@ local void EditorCallbackKey(unsigned dummy __attribute__((unused)))
 */
 global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 {
-    DebugLevel3Fn("%x %x\n",button,MouseButtons);
+    DebugLevel3Fn("%x %x\n" _C_ button _C_ MouseButtons);
 
     //
     //	Click on menu button just exit.
