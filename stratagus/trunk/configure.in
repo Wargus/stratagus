@@ -153,7 +153,7 @@ AC_SUBST(THREAD_LIBS)
 
 dnl --- CHECK FOR BZIP2 --------
 AC_ARG_WITH(bzip2,
-    [  --with-bzip2		  [Use bzip2 (default: enabled)]],, with_bzip2="yes")
+    [  --with-bzip2		  [Use bzip2 (default: yes)]],, with_bzip2="yes")
 if test "$with_bzip2" != "no"; then
     AC_CHECK_LIB(bz2, main, 
         [BZ2_CFLAGS="-DUSE_BZ2LIB"
@@ -170,13 +170,16 @@ dnl ----------------------------
 
 dnl --- CHECK FOR ZZIPLIB ------
 AC_ARG_WITH(zziplib,
-    [  --with-zziplib	  [Use zziplib (default: disabled)]], ZZIPLIB="$with_zziplib")
-if test "$ZZIPLIB" != "yes"; then
+    [  --with-zziplib	  [Use zziplib (default: autodetect)]],, with_zziplib="yes")
+if test "$ZZIPLIB" != "no"; then
+    AC_CHECK_LIB(zziplib, main,
+        [ZZIPLIB_CFLAGS="-DUSE_ZZIPLIB"
+         ZZIPLIB_LIBS="-lzzip"],
+        [ZZIPLIB_CFLAGS="",
+         ZZIPLIB_LIBS=""])
+else
     ZZIPLIB_CFLAGS=""
     ZZIPLIB_LIBS=""
-else
-    ZZIPLIB_CFLAGS="-DUSE_ZZIPLIB"
-    ZZIPLIB_LIBS="-lzzip"
 fi
 AC_SUBST(ZZIPLIB_CFLAGS)
 AC_SUBST(ZZIPLIB_LIBS)
