@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file.
 ##
-##	(c) Copyright 1998-2000 by Lutz Sammer
+##	(c) Copyright 1998-2001 by Lutz Sammer
 ##
 ##	$Id$
 ##
@@ -173,8 +173,8 @@ dist::
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir) 
 	chmod -R a+r $(distdir)
 	tar chzf $(distdir).tar.gz $(distdir)
-	tar chIf $(distdir).tar.bz2 $(distdir)
-	echo "(c) 2000 by the FreeCraft Project http://FreeCraft.Org" | \
+	tar cjhf $(distdir).tar.bz2 $(distdir)
+	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir).zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -193,8 +193,8 @@ small-dist::
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir) 
 	chmod -R a+r $(distdir)
 	tar chzf $(distdir)-small.tar.gz $(distdir)
-	tar chIf $(distdir)-small.tar.bz2 $(distdir)
-	echo "(c) 2000 by the FreeCraft Project http://FreeCraft.Org" | \
+	tar cjhf $(distdir)-small.tar.bz2 $(distdir)
+	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir)-small.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -217,7 +217,7 @@ bin-dist:: all
 	strip -s -R .comment $(distdir)/freecraft$(EXE)
 	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
 	tar chzf freecraft-$(mydate)-bin.tar.gz $(distdir)
-	tar chIf freecraft-$(mydate)-bin.tar.bz2 $(distdir)
+	tar cjhf freecraft-$(mydate)-bin.tar.bz2 $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 
@@ -242,7 +242,7 @@ win32-bin-dist2:: win32
 	@chmod -R a+r $(distdir)
 	@strip -s -R .comment $(distdir)/freecraft$(EXE)
 	@strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	@echo "(c) 2000 by the FreeCraft Project http://FreeCraft.Org" | \
+	@echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
 	@$(RM) -r $(distdir)
@@ -269,9 +269,9 @@ linux-complete:
 	tar xzf $(FCRAFT)
 	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
 	cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
-	tar xIf $(SCRAFT)
-	tar xIf $(PCRAFT)
-	tar xIf $(LCRAFT)
+	tar xjf $(SCRAFT)
+	tar xjf $(PCRAFT)
+	tar xjf $(LCRAFT)
 	mkdir freecraft-complete
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
 	cp -a fcraft/* freecraft-complete
@@ -280,15 +280,15 @@ linux-complete:
 	rm -rf fcraft
 	rm -rf fclone
 	tar chzf freecraft-$(MYDATE)-complete-linux.tar.gz freecraft-complete
-	tar chIf freecraft-$(MYDATE)-complete-linux.tar.bz2 freecraft-complete
+	tar cjhf freecraft-$(MYDATE)-complete-linux.tar.bz2 freecraft-complete
 	rm -rf freecraft-complete
 
 win32-complete:
 	tar xzf $(FCRAFT)
 	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
 	cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
-	tar xIf $(SCRAFT)
-	tar xIf $(PCRAFT)
+	tar xjf $(SCRAFT)
+	tar xjf $(PCRAFT)
 	unzip -oq $(WCRAFT)
 	mkdir freecraft-complete
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
@@ -298,7 +298,7 @@ win32-complete:
 	rm -rf fcraft
 	rm -rf fclone
 	mv freecraft-complete/CONTRIB freecraft-complete/CONTRIB.txt
-	echo "(c) 2000 by the FreeCraft Project http://FreeCraft.Org" | \
+	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(MYDATE)-complete-win32.zip freecraft-complete
 	cat tools/SFXWiz32-gcc.exe freecraft-$(MYDATE)-complete-win32.zip \
 		> freecraft-$(MYDATE)-complete-win32.exe
