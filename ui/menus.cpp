@@ -1378,6 +1378,7 @@ local void GameMenuEndDefeat(void)
 */
 local void GameMenuEnd(void)
 {
+    InterfaceState = IfaceStateNormal;
     GameRunning=0;
     EndMenu();
 }

@@ -53,6 +53,7 @@
 #include "netconnect.h"
 #include "missile.h"
 #include "settings.h"
+#include "campaign.h"
 
 #include "ccl.h"
 
@@ -356,6 +357,8 @@ global void CreateGame(char* filename, WorldMap* map)
 #ifdef HIERARCHIC_PATHFINDER
     PfHierInitialize ();
 #endif /* HIERARCHIC_PATHFINDER */
+
+    GameResult=GameNoResult;
 }
 
 /**
