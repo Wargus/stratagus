@@ -989,6 +989,8 @@ global void WriteSoundThreaded(void)
 */
 global int InitSound(void)
 {
+    int dummy;
+
 #ifdef USE_SDLA
     {
     SDL_AudioSpec wanted;
@@ -1011,8 +1013,6 @@ global int InitSound(void)
     SDL_PauseAudio(0);
     }
 #else
-    int dummy;
-
     //
     //	Open dsp device, 8bit samples, stereo. 
     //
