@@ -783,6 +783,14 @@ extern Unit* RepairableOnMapTile(unsigned tx,unsigned ty);
 extern Unit* TargetOnMapTile(Unit* unit,unsigned tx,unsigned ty);
     /// Return transporter unit on that map tile
 extern Unit* TransporterOnMapTile(unsigned tx,unsigned ty);
+    /// Return any unit on that screen map position
+extern Unit* UnitOnScreenMapPosition (unsigned , unsigned );
+    /// Return repairable unit on that screen map position
+extern Unit* RepairableOnScreenMapPosition (unsigned , unsigned );
+    /// Return possible attack target on that screen map position
+extern Unit* TargetOnScreenMapPosition (Unit* unit,unsigned , unsigned );
+    /// Return transporter unit on that screen map position
+extern Unit* TransporterOnScreenMapPosition (unsigned , unsigned );
 
     /// Return gold mine, if on map tile
 extern Unit* GoldMineOnMap(int tx,int ty);
