@@ -35,10 +35,10 @@ OBJDIR ?= .
 
 CROSSDIR = /usr/local/cross
 
-INCLUDE_DIRS = src/include src/movie/vp31/include
+INCLUDE_DIRS = src/include
 
 MODULES = src/action src/ai src/beos src/stratagus src/editor src/game src/map \
-          src/missile src/movie src/movie/vp31 src/network src/pathfinder src/sound src/ui src/unit \
+          src/missile src/movie src/network src/pathfinder src/sound src/ui src/unit \
           src/video
 
 MODULES_ALL = $(MODULES)

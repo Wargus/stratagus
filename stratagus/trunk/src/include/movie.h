@@ -41,25 +41,41 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "iolib.h"
+#include "ogg/ogg.h"
+#include "vorbis/codec.h"
+#include "theora/theora.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**  Play movie flags.
+**  Ogg data structure to handle vorbis/theora streaming.
 */
-enum _play_movie_flags_ {
-	PlayMovieFullScreen = 1,  ///< Switch to full screen
-	PlayMovieZoomScreen = 2,  ///< Zoom to screen size
-	PlayMovieKeepAspect = 4,  ///< Keep the aspect while zooming
-};
+typedef struct _ogg_data_ {
+	CLFile* File;      ///< Ogg file handle
+	ogg_sync_state sync;
+	ogg_page page;
 
-/**
-**  Movie handle.
-*/
-typedef struct _movie_ {
-	void* File;  ///< Demux handler
-} Movie;
+	ogg_stream_state astream;
+	vorbis_info vinfo;
+	vorbis_comment vcomment;
+	vorbis_block vblock;
+	vorbis_dsp_state vdsp;
+
+#ifdef USE_THEORA
+	ogg_stream_state vstream;
+	theora_info tinfo;
+	theora_comment tcomment;
+	theora_state tstate;
+#endif
+
+	int audio : 1;
+#ifdef USE_THEORA
+	int video : 1;
+#endif
+} OggData;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -69,13 +85,14 @@ typedef struct _movie_ {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Play a movie file
-extern int PlayMovie(const char* name, int flags);
+extern int OggInit(CLFile *f, OggData *data);
+extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CLFile *f);
 
-	/// Initialize the video module
-extern void InitMovie(void);
-	/// Cleanup the video module
-extern void CleanMovie(void);
+extern int VorbisProcessData(OggData *data, char *buffer);
+extern int TheoraProcessData(OggData *data);
+
+	/// Play a movie file
+extern int PlayMovie(const char* name);
 
 //@}
 

@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-// T H E   W A R   B E G I N S
-// Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name movie.c - Movie playback functions. */
 //
-// (c) Copyright 2002-2004 by Lutz Sammer
+// (c) Copyright 2005 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 //@{
 
@@ -34,31 +34,19 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "stratagus.h"
 #include "video.h"
-#include "network.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "avi.h"
 #include "movie.h"
-#include "iocompat.h"
+#include "network.h"
 #include "iolib.h"
 
-#include "vfw_PB_Interface.h"
-#include "pbdll.h"
-extern void VPInitLibrary(void);
-extern void VPDeInitLibrary(void);
-
-#ifdef USE_SDL
 #include "SDL.h"
-#endif
-
-#if defined(USE_SDL) && !defined(USE_OPENGL)  /// Only supported with SDL for now
-
-extern SDL_Surface* TheScreen; ///< internal screen
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -68,335 +56,230 @@ extern SDL_Surface* TheScreen; ///< internal screen
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static char MovieKeyPressed;         /// Flag key is pressed to stop
-static int MovieInitialized;         /// Movie module initialized
+extern SDL_Surface *TheScreen;
+int MovieStop;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_THEORA
 /**
-**  Open a movie file.
-**
-**  @param name  Filename of movie file.
-**
-**  @return      Avi file handle on success.
+**  Callbacks for movie input.
 */
-AviFile* MovieOpen(const char* name)
+
+static void MovieCallbackButtonPressed(unsigned dummy)
 {
-	AviFile* avi;
-	char buffer[PATH_MAX];
-
-	name = LibraryFileName(name, buffer);
-	if (!(avi = AviOpen(name))) {
-		return NULL;
-	}
-
-	return avi;
+	MovieStop = 1;
 }
 
-/**
-**  Close a movie file.
-**
-**  @param avi  Avi file handle.
-*/
-void MovieClose(AviFile* avi)
+static void MovieCallbackButtonReleased(unsigned dummy)
 {
-	AviClose(avi);
 }
 
-/**
-**  Display the next movie frame.
-**
-**  @param avi      Avi file handle.
-**  @param pbi      VP3 decoder.
-**  @param overlay  Output overlay.
-**  @param rect     Destination rectangle.
-**
-**  @return         True if eof.
-*/
-int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
-	SDL_Overlay* overlay, SDL_Rect rect)
+static void MovieCallbackKeyPressed(unsigned dummya, unsigned dummyb)
 {
-	unsigned char* frame;
-	int length;
+	MovieStop = 1;
+}
+
+
+static void MovieCallbackKeyReleased(unsigned dummya, unsigned dummyb)
+{
+}
+
+static void MovieCallbackKeyRepeated(unsigned dummya, unsigned dummyb)
+{
+}
+
+static void MovieCallbackMouseMove(int dummya, int dummyb)
+{
+}
+
+static void MovieCallbackMouseExit(void)
+{
+}
+
+int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
+{
 	int i;
-	YUV_BUFFER_CONFIG yuv;
+	yuv_buffer yuv;
+	int crop_offset;
 
-	length = AviReadNextVideoFrame(avi, &frame);
-	if (length < 0) {  // EOF
-		return 1;
-	}
-	if (length) {
-		if (DecodeFrameToYUV(pbi, frame, length, -1, -1)) {
-			fprintf(stderr, "DecodeFrameToYUV error\n");
-			exit(-1);
-		}
+	theora_decode_YUVout(&data->tstate, &yuv);
 
-		SDL_LockYUVOverlay(overlay);
-		GetYUVConfig(pbi, &yuv);
-		for (i = 0; i < yuv.YHeight; ++i) {  // copy Y
-			memcpy(overlay->pixels[0] + i * overlay->pitches[0],
-				yuv.YBuffer + (yuv.YHeight - i - 1) * yuv.YStride, yuv.YWidth);
+	if (SDL_MUSTLOCK(TheScreen)) {
+		if (SDL_LockSurface(TheScreen) < 0) {
+			return - 1;
 		}
-		for (i = 0; i < yuv.UVHeight; ++i) {  // copy UV
-			memcpy(overlay->pixels[1] + i * overlay->pitches[1],
-				yuv.VBuffer + (yuv.UVHeight - i - 1) * yuv.UVStride,
-				yuv.UVWidth);
-			memcpy(overlay->pixels[2] + i * overlay->pitches[2],
-				yuv.UBuffer + (yuv.UVHeight - i - 1) * yuv.UVStride,
-				yuv.UVWidth);
-		}
-		SDL_UnlockYUVOverlay(overlay);
 	}
 
-	SDL_DisplayYUVOverlay(overlay, &rect);
+	if (SDL_LockYUVOverlay(yuv_overlay) < 0) {
+		return -1;
+	}
+
+	crop_offset = data->tinfo.offset_x + yuv.y_stride * data->tinfo.offset_y;
+	for(i=0; i < yuv_overlay->h; ++i) {
+		memcpy(yuv_overlay->pixels[0] + yuv_overlay->pitches[0] * i,
+		  yuv.y + crop_offset + yuv.y_stride * i, yuv_overlay->w);
+	}
+
+	crop_offset = (data->tinfo.offset_x / 2) + (yuv.uv_stride) *
+	  (data->tinfo.offset_y / 2);
+	for (i=0; i < yuv_overlay->h / 2; ++i) {
+		memcpy(yuv_overlay->pixels[1] + yuv_overlay->pitches[1] * i,
+		  yuv.v + yuv.uv_stride * i, yuv_overlay->w / 2);
+		memcpy(yuv_overlay->pixels[2] + yuv_overlay->pitches[2] * i,
+		  yuv.u + crop_offset + yuv.uv_stride * i, yuv_overlay->w / 2);
+	}
+
+	if (SDL_MUSTLOCK(TheScreen)) {
+		SDL_UnlockSurface(TheScreen);
+	}
+	SDL_UnlockYUVOverlay(yuv_overlay);
+
+	SDL_DisplayYUVOverlay(yuv_overlay, rect);
 
 	return 0;
 }
 
-/*--------------------------------------------------------------------------*/
-
-/**
-**  Callback for input.
-*/
-static void MovieCallbackKey(unsigned dummy __attribute__((unused)))
+int TheoraProcessData(OggData *data)
 {
-	MovieKeyPressed = 0;
+	ogg_packet packet;
+
+	while (1) {
+		if (ogg_stream_packetout(&data->vstream, &packet) != 1) {
+			if (OggGetNextPage(&data->page, &data->sync, data->File)) {
+				// EOF
+				return -1;
+			}
+
+			ogg_stream_pagein(&data->vstream, &data->page);
+		} else {
+			theora_decode_packetin(&data->tstate, &packet);
+			return 0;
+		}
+	}
 }
 
-/**
-**  Callback for input.
-*/
-static void MovieCallbackKey1(unsigned dummy __attribute__((unused)))
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void MovieCallbackKey2(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
-{
-	MovieKeyPressed = 0;
-}
-
-/**
-**  Callback for input.
-*/
-static void MovieCallbackKey3(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void MovieCallbackKey4(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
-{
-	MovieKeyPressed = 0;
-}
-
-/**
-**  Callback for input.
-*/
-static void MovieCallbackMouse(int dummy_x __attribute__((unused)),
-	int dummy_y __attribute__((unused)))
-{
-}
-
-/**
-** Callback for exit.
-*/
-static void MovieCallbackExit(void)
-{
-}
 
 /**
 **  Play a video file.
 **
 **  @param name   Filename of movie file.
-**  @param flags  Flags for movie playback.
 **
-**  @return       True if file isn't a supported movie.
+**  @return       Non-zero if file isn't a supported movie.
 **
-**  @todo Support full screen and resolution changes.
 */
-int PlayMovie(const char* name, int flags)
+int PlayMovie(const char* name)
 {
-	AviFile* avi;
-	SDL_Overlay* overlay;
-	PB_INSTANCE* pbi;
-	EventCallback callbacks;
+	OggData *data;
+	CLFile *f;
 	SDL_Rect rect;
-	int oldspeed;
+	SDL_Overlay *yuv_overlay;
+	Sample *sample;
+	EventCallback callbacks;
+	unsigned int start_ticks;
+	int need_data;
 
-	InitMovie();
-
-	// FIXME: Should split this into lowlevel parts.
-
-	if (!(avi = MovieOpen(name))) {
-		return 1;
+	if (!(f = CLopen(name, CL_OPEN_READ))) {
+		fprintf(stderr, "Can't open file `%s'\n", name);
+		return -1;
 	}
 
-	if (avi->AudioStream != -1) {  // Only if audio available
+	data = malloc(sizeof(OggData));
+
+	if (OggInit(f, data) || !data->video) {
+		free(data);
+		CLclose(f);
+		return -1;
+	}
+
+	data->File = f;
+
+	rect.x = 0;
+	rect.y = 0;
+
+	rect.w = data->tinfo.frame_width;
+	rect.h = data->tinfo.frame_height;
+	rect.w = VideoWidth;
+	rect.h = VideoHeight;
+
+	yuv_overlay = SDL_CreateYUVOverlay(data->tinfo.frame_width,
+	  data->tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
+
+	SDL_DisplayYUVOverlay(yuv_overlay, &rect);
+
+	if (yuv_overlay == NULL) {
+		exit(-1);
+		return -1;
+	}
+
+	if ((sample = LoadVorbis(name, PlayAudioStream))) {
+		if ((sample->Channels != 1 && sample->Channels != 2) ||
+				sample->SampleSize != 16) {
+			DebugPrint("Not supported music format\n");
+			SoundFree(sample);
+			return 0;
+		}
 		StopMusic();
+		MusicSample = sample;
+		PlayingMusic = 1;
 	}
 
-	//
-	//  Prepare video
-	//
-	if (flags & PlayMovieFullScreen) {
-		DebugPrint("FIXME: full screen switch not supported\n");
-	}
-	overlay = SDL_CreateYUVOverlay(avi->Width, avi->Height,
-		SDL_YV12_OVERLAY, TheScreen);
-	if (!overlay) {
-		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
-		exit(1);
-	}
-	if (overlay->hw_overlay) {
-		DebugPrint("Got a hardware overlay.\n");
-	}
-	oldspeed = VideoSyncSpeed;
-	VideoSyncSpeed = avi->FPS100 / FRAMES_PER_SECOND;
-	SetVideoSync();
-
-	StartDecoder(&pbi, avi->Width, avi->Height);
-
-#ifdef USE_OGG
-	if (avi->AudioStream != -1) {  // Only if audio available
-		PlayAviOgg(avi);
-	}
-#endif
-
-	callbacks.ButtonPressed = MovieCallbackKey;
-	callbacks.ButtonReleased = MovieCallbackKey1;
-	callbacks.MouseMoved = MovieCallbackMouse;
-	callbacks.MouseExit = MovieCallbackExit;
-	callbacks.KeyPressed = MovieCallbackKey2;
-	callbacks.KeyReleased = MovieCallbackKey3;
-	callbacks.KeyRepeated = MovieCallbackKey4;
+	callbacks.ButtonPressed = MovieCallbackButtonPressed;
+	callbacks.ButtonReleased = MovieCallbackButtonReleased;
+	callbacks.MouseMoved = MovieCallbackMouseMove;
+	callbacks.MouseExit = MovieCallbackMouseExit;
+	callbacks.KeyPressed = MovieCallbackKeyPressed;
+	callbacks.KeyReleased = MovieCallbackKeyReleased;
+	callbacks.KeyRepeated = MovieCallbackKeyRepeated;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	if (flags & PlayMovieZoomScreen) {
-		if (flags & PlayMovieKeepAspect) {
-			int wa;
-			int ha;
-
-			wa = VideoWidth * 100 / avi->Width;
-			ha = VideoHeight * 100 / avi->Height;
-			DebugPrint(" %d x %d\n" _C_ wa _C_ ha);
-			if (wa < ha) {  // Keep the aspect ratio
-				rect.w = VideoWidth;
-				rect.h = avi->Height * wa / 100;
-			} else {
-				rect.w = avi->Width * ha / 100;
-				rect.h = VideoHeight;
+	MovieStop = 0;
+	start_ticks = SDL_GetTicks();
+	need_data = 1;
+	while (!MovieStop) {
+		if (need_data) {
+			if (TheoraProcessData(data)) {
+				break;
 			}
-		} else {  // Just zoom to max
-			rect.w = VideoWidth;
-			rect.h = VideoHeight;
+			need_data = 0;
+			data->tstate.internal_encode = NULL;
 		}
-	} else {
-		rect.w = avi->Width;
-		rect.h = avi->Height;
-	}
-	rect.x = (VideoWidth - rect.w) / 2;
-	rect.y = (VideoHeight - rect.h) / 2;
-
-	if (1) {
-		int i;
-
-		GetPbParam(pbi, PBC_SET_POSTPROC, &i);
-		DebugPrint("Postprocess level %d\n" _C_ i);
-		SetPbParam(pbi, PBC_SET_POSTPROC, 6);
-	}
-
-	MovieKeyPressed = 1;
-	while (MovieKeyPressed) {
-
-		if (MovieDisplayFrame(avi, pbi, overlay, rect)) {
-			break;
+		
+		if (SDL_GetTicks() - start_ticks > theora_granule_time(&data->tstate, data->tstate.granulepos) * 1000) {
+			OutputTheora(data, yuv_overlay, &rect);
+			need_data = 1;
 		}
-
+		
 		WaitEventsOneFrame(&callbacks);
 	}
 
-	if (avi->AudioStream != -1) {  // Only if audio available
-		StopMusic();
+	StopMusic();
+	SDL_FreeYUVOverlay(yuv_overlay);
+
+	if (data->audio) {
+		ogg_stream_clear(&data->astream);
+		vorbis_block_clear(&data->vblock);
+		vorbis_dsp_clear(&data->vdsp);
+		vorbis_comment_clear(&data->vcomment);
+		vorbis_info_clear(&data->vinfo);
 	}
 
-	StopDecoder(&pbi);
-	SDL_FreeYUVOverlay(overlay);
-
-	MovieClose(avi);
-
-	VideoSyncSpeed = oldspeed;
-	SetVideoSync();
+	if (data->video) {
+		ogg_stream_clear(&data->vstream);
+		theora_comment_clear(&data->tcomment);
+		theora_info_clear(&data->tinfo);
+	}
 
 	return 0;
 }
 
-/**
-**  Initialize the movie module.
-*/
-void InitMovie(void)
-{
-	if (!MovieInitialized) {
-		VPInitLibrary();
-		MovieInitialized = 1;
-	}
-}
-
-/**
-**  Cleanup the movie module.
-*/
-void CleanMovie(void)
-{
-	if (MovieInitialized) {
-		VPDeInitLibrary();
-		MovieInitialized = 0;
-	}
-}
-
 #else
-
-/**
-**  Play a video file.
-**
-**  @param file   Filename of movie file.
-**  @param flags  Flags for movie playback.
-**
-**  @return       True if file isn't a supported movie.
-**
-**  @todo Support full screen and resolution changes.
-*/
-int PlayMovie(const char* file, int flags)
+int PlayMovie(const char* name)
 {
-	printf("FIXME: PlayMovie(\"%s\",%x) not supported.\n", file, flags);
-
-	if (strcasestr(file, ".avi\0")) {
-		return 0;
-	}
-	return 1;
+	return -1;
 }
-
-/**
-**  Initialize the movie module.
-*/
-void InitMovie(void)
-{
-}
-
-/**
-**  Cleanup the movie module.
-*/
-void CleanMovie(void)
-{
-}
-
 #endif
 
 //@}

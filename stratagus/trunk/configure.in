@@ -160,23 +160,42 @@ AC_SUBST(BZ2_CFLAGS)
 AC_SUBST(BZ2_LIBS)
 dnl ----------------------------
 
-dnl --- CHECK FOR OGG VORBIS ---
-AC_ARG_WITH(ogg, 
-    [  --with-ogg		  [Use ogg (default: autodetect)]], OGG="$with_ogg")
-OGG_CFLAGS=
-OGG_LIBS=
-if test "$OGG" != "no"; then
-    OGG="yes"
-    AC_CHECK_HEADERS(ogg/ogg.h,, OGG=no)
-    AC_CHECK_HEADERS(vorbis/vorbisfile.h,, OGG=no)
-    if test "$OGG" != "no"; then
-	AC_CHECK_LIB(vorbis, vorbis_info_init,, AC_MSG_ERROR(libvorbis not found), -logg)
-	OGG_CFLAGS="-DUSE_OGG"
-	OGG_LIBS="-lvorbisfile -lvorbis -logg"
+AC_ARG_WITH(theora,
+    [  --with-theora		  [Use theora, implies --with-vorbis (default: autodetect)]], THEORA="$with_theora")
+THEORA_CFLAGS=
+THEORA_LIBS=
+if test "$THEORA" != "no"; then
+    with_theora="yes"
+    THEORA="yes"
+    AC_CHECK_HEADERS(ogg/ogg.h,, THEORA=no)
+    AC_CHECK_HEADERS(theora/theora.h,, THEORA=no)
+    if test "$THEORA" != "no"; then
+	AC_CHECK_LIB(theora, theora_decode_init,, AC_MSG_ERROR(libtheora not found), -logg)
+	THEORA_CFLAGS="-DUSE_THEORA"
+	THEORA_LIBS="-ltheora -logg"
     fi
 fi
-AC_SUBST(OGG_CFLAGS)
-AC_SUBST(OGG_LIBS)
+AC_SUBST(THEORA_CFLAGS)
+AC_SUBST(THEORA_LIBS)
+
+
+dnl --- CHECK FOR OGG VORBIS ---
+AC_ARG_WITH(vorbis, 
+    [  --with-vorbis		  [Use vorbis (default: autodetect)]], VORBIS="$with_vorbis")
+VORBIS_CFLAGS=
+VORRBIS_LIBS=
+if test "$VORBIS" != "no"; then
+    VORBIS="yes"
+    AC_CHECK_HEADERS(ogg/ogg.h,, VORBIS=no)
+    AC_CHECK_HEADERS(vorbis/codec.h,, VORBIS=no)
+    if test "$VORBIS" != "no"; then
+	AC_CHECK_LIB(vorbis, vorbis_info_init,, AC_MSG_ERROR(libvorbis not found), -logg)
+	VORBIS_CFLAGS="-DUSE_VORBIS"
+	VORBIS_LIBS="-lvorbis -logg"
+    fi
+fi
+AC_SUBST(VORBIS_CFLAGS)
+AC_SUBST(VORBIS_LIBS)
 dnl ----------------------------
 
 dnl --- CHECK FOR MIKMOD ---
