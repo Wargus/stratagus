@@ -1183,9 +1183,10 @@ global void DrawInfoPanel(void)
     //	Nothing selected
 
     DrawInfoPanelBackground(0);
-    if (UnitUnderCursor && UnitVisibleOnMap(UnitUnderCursor)) {
-	// FIXME: not correct for enemies units
-	DrawUnitInfo(UnitUnderCursor);
+    if (UnitUnderCursor && UnitVisibleOnMap(UnitUnderCursor)  &&
+	(UnitUnderCursor->Type->Selectable || !GameRunning)) {
+	    // FIXME: not correct for enemies units
+	    DrawUnitInfo(UnitUnderCursor);
     } else {
 	int x;
 	int y;
