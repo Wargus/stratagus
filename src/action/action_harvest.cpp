@@ -150,7 +150,7 @@ local int ChopWood(Unit* unit)
 
     flags=UnitShowAnimation(unit,unit->Type->Animations->Attack);
 
-    if( (flags&AnimationSound) ) {
+    if( (flags&AnimationSound) && UnitVisibleOnMap(unit) ) {
 	PlayUnitSound(unit,VoiceTreeChopping);
     }
 
