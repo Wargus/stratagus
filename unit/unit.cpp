@@ -2908,7 +2908,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    (attacker->Type==UnitTypeOrcWorker
 	    || attacker->Type==UnitTypeHumanWorker) ) {
 	ChangeUnitOwner(target, target->Player, attacker->Player);
-	CommandStop(attacker);		// Attacker shouldn't continue attack!
+	CommandStopUnit(attacker);	// Attacker shouldn't continue attack!
     }
 
 #if 0
