@@ -90,8 +90,8 @@ typedef unsigned MenuButtonId;
 */
 typedef struct _menuitem_ {
     int mitype;					/// FIXME: write docu
-    unsigned xofs;
-    unsigned yofs;
+    int xofs;
+    int yofs;
     unsigned flags;
     int font;
     void (*initfunc)(struct _menuitem_ *);	/// constructor
