@@ -280,6 +280,28 @@ global int ForestOnMap(int tx,int ty)
 }
 
 /**
+**	Rock on map tile.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**
+**	@return		True if rock, false otherwise.
+*/
+global int RockOnMap(int tx,int ty)
+{
+    IfDebug(
+	if( tx<0 || ty<0 || tx>=TheMap.Width || ty>=TheMap.Height ) {
+	    // FIXME: must cleanup calling function !
+	    fprintf(stderr,"Used x %d, y %d\n",tx,ty);
+	    abort();
+	    return 0;
+	}
+    );
+
+    return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldRock;
+}
+
+/**
 **	Can move to this point, applying mask.
 **
 **	@param x	X map tile position.
