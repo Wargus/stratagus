@@ -487,7 +487,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	//
 	//	Update fog of war, if unit belongs to player on this computer
 	//
-	if ( unit->Host ) {
+	if( unit->Host ) {
 	    MapUnmarkSight(unit->Player,unit->Host->X+unit->Host->Type->TileWidth/2
 				,unit->Host->Y+unit->Host->Type->TileHeight/2
 				,unit->CurrentSightRange);
@@ -568,6 +568,7 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 **	Update map.
 **
 **	@param unit	Pointer to unit.
+**	@param host	Pointer to housing unit.
 */
 global void RemoveUnit(Unit* unit, Unit* host)
 {
@@ -577,14 +578,21 @@ global void RemoveUnit(Unit* unit, Unit* host)
     unsigned flags;
 
 #ifdef NEW_FOW
-    MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-			,unit->Y+unit->Type->TileHeight/2
-			,unit->CurrentSightRange);
-    if ( host ) {
-	unit->CurrentSightRange=host->CurrentSightRange;
-	MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2
-				,host->Y+host->Type->TileWidth/2
+    if ( !(host &&
+	unit->X+unit->Type->TileWidth/2 == host->X+host->Type->TileWidth/2 &&
+	unit->Y+unit->Type->TileHeight/2 == host->Y+host->Type->TileWidth/2 &&
+	unit->CurrentSightRange == unit->CurrentSightRange) ) {
+	    MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+				,unit->Y+unit->Type->TileHeight/2
 				,unit->CurrentSightRange);
+	if( host ) {
+	    unit->CurrentSightRange=host->CurrentSightRange;
+	    MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2,
+				host->Y+host->Type->TileWidth/2,
+				unit->CurrentSightRange);
+	}
+    }
+    if( host ) {
 	unit->Host=host;
     }
 #endif
