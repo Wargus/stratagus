@@ -64,12 +64,26 @@ typedef struct _wav_data_ {
 local int WavReadStream(Sample *sample, void *buf, int len)
 {
     WavData* data;
+    int n;
+    int i;
 
     data = (WavData*) sample->User;
-    printf("READ WAV DATA\n");
 
     if (data->PointerInBuffer - sample->Data + len > sample->Length) {
-	printf("get more data\n");
+	n = sample->Length - (data->PointerInBuffer - sample->Data);
+	memcpy(sample->Data, data->PointerInBuffer, n);
+	sample->Length = n;
+	data->PointerInBuffer = sample->Data;
+
+	n = WAV_BUFFER_SIZE - n;
+
+	i = CLread(data->WavFile, data->PointerInBuffer + sample->Length, 
+		    WAV_BUFFER_SIZE);
+	sample->Length += i;
+
+        if (sample->Length < len) {
+            len = sample->Length;
+        }
     }
 
     memcpy(buf, data->PointerInBuffer, len);
@@ -79,7 +93,15 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 
 local void WavFreeStream(Sample *sample)
 {
-    // FIXME
+    WavData* data;
+    
+    IfDebug( AllocatedSoundMemory -= sizeof(*sample) + WAV_BUFFER_SIZE);
+	
+    data = (WavData*)sample->User;
+
+    CLclose(data->WavFile);
+    free(data);
+    free(sample);
 }
 
 /** 
@@ -222,7 +244,6 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 
     if (flags & PlayAudioStream) {
 	WavData* data;
-	printf("STREAM WAV\n");
 	data = malloc(sizeof(WavData));
 
 	data->WavFile = f;
