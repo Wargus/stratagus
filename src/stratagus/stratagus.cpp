@@ -486,7 +486,7 @@ Use it at your own risk.\n"
 /**
 **	Exit clone.
 **
-**	Called from 'q'.
+**	Called from 'Q'.
 */
 global volatile void Exit(int err)
 {
