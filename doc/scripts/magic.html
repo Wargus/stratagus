@@ -212,7 +212,7 @@ units belonging to the same player of the caster or to an ally.
 <a name="define-spell"></a>
 <h3>(define-spell spell-ident tag value ... )</h3>
 This is the function to define a spell, icluding it's effects and targetting
-conditions.
+conditions. Be very carefull, defining random flags will probably make the game crash.
 
 <dl>
 <dt>showname</dt>
@@ -220,6 +220,10 @@ conditions.
 </dd>
 <dt>manacost</dt>
 <dd>The mana cost of the spell. Maybe this should be set on a per-caster basis?
+</dd>
+<dt>repeat-cast</dt>
+<dd>If specified, the caster will cast it again. To be used with spells like
+area-bombardment to cast it again (area-bombardment is stackable)
 </dd>
 <dt>range</dt>
 <dd>The casting range of the spell, do not confuse this with area effect range.

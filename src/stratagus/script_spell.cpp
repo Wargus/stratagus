@@ -504,6 +504,8 @@ local SCM CclDefineSpell(SCM list)
 		spell->Range = gh_scm2int(gh_car(list));
 	    }
 	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("repeat-cast"))) {
+	    spell->RepeatCast=1;
 	} else if (gh_eq_p(value, gh_symbol2scm("target"))) {
 	    value = gh_car(list);
 	    if (gh_eq_p(value, gh_symbol2scm("self"))) {
@@ -805,6 +807,10 @@ global void SaveSpells(CLFile* file)
 	//
 	CLprintf(file, "    \"%s\"\n", spell->IdentName);
 	CLprintf(file, "    'showname \"%s\"\n", spell->Name);
+	CLprintf(file, "    'manacost %d\n", spell->ManaCost);
+	if (spell->RepeatCast) {
+	    CLprintf(file, "    'repeat-cast\n");
+	}
 	CLprintf(file, "    'manacost %d\n", spell->ManaCost);
 	CLprintf(file, "    'range %d\n", spell->Range);
 	if (spell->SoundWhenCast.Name) { 
