@@ -28,22 +28,31 @@
 --
 --	$Id$
 
-DefineAnimations("animations-artil", 
-   "still", {{3, 0, 1, 0}},
-   "move", {
-	   {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-	   {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-	   {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-	   {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-	   {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-	   {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-	   {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-           {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {3, 1, 1, 0},},
-   "attack", {
-           {2, 0, 20, 0}, {12, 0, 2, 5}, {0, 0, 10, 10}, {0, 0, 10, 15}, 
-           {0, 0, 20, 20}, {3, 0, 20, 0}},
-   "die", {
-           {0, 0, 5, 30}})
+DefineNewAnimations("animations-artil", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "unbreakable end", "wait 1", },
+    Attack = {"unbreakable begin", "frame 0", "wait 10", 
+        "frame 5", "sound bazoo-attack", "attack", "wait 2", 
+        "frame 10", "wait 5", "frame 15", "wait 5", "frame 20", "wait 10", 
+        "frame 0", "wait 60", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 30", "wait 5", "unbreakable end", "wait 1", },
+    })
 
 DefineIcon({
 	Name = "icon-artil",
@@ -55,7 +64,7 @@ DefineUnitType("unit-artil", {
         Name = "Artil",
         Files = {"default", "elites/units/unit_artil.png"}, Size = {96, 96},
         Shadow = {"file", "elites/units/unit_artil_s.png", "size", {96, 96}},
-        Animations = "animations-artil", Icon = "icon-artil",
+        NewAnimations = "animations-artil", Icon = "icon-artil",
         Flip = false,
         Costs = {"time", 200, "titanium", 300, "crystal", 300},
         RepairHp = 1, RepairCosts = {"crystal", 6},

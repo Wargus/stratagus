@@ -28,18 +28,24 @@
 --
 --	$Id$
 
-DefineAnimations("animations-tank", 
-   "still", {{3, 0, 1, 0}},
-   "move", {
-           {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0},
-           {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0},
-           {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0},
-           {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0}, {3, 2, 1, 0},},
-   "attack", {
-           {2, 0, 50, 0}, {12, 0, 2, 5}, {4, 0, 4, 10}, {3, 0, 100, 0}},
-   "die", {
-           {0, 0, 4, 15}, {0, 0, 2, 20}, {0, 0, 2, 25}, {0, 0, 2, 30},
-           {3, 0, 2, 35}})
+DefineNewAnimations("animations-tank", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "unbreakable end", "wait 1", },
+    Attack = {"unbreakable begin", "frame 0", "wait 10", 
+        "frame 5", "sound bazoo-attack", "attack", "wait 2", 
+        "frame 10", "wait 4", "frame 0", "unbreakable end", "wait 50", },
+    Death = {"unbreakable begin", "frame 15", "wait 4", 
+        "frame 20", "wait 2", "frame 25", "wait 2", "frame 30", "wait 2", 
+        "frame 35", "unbreakable end", "wait 2", },
+    })
 
 DefineIcon({
 	Name = "icon-tank",
@@ -51,7 +57,7 @@ DefineUnitType("unit-tank", {
         Name = "Tank",
         Files = {"tileset-desert", "elites/units/unit_tank.png"}, Size = {96, 96},
         Shadow = {"file", "elites/units/unit_tank_s.png", "size", {96, 96}},
-        Animations = "animations-tank", Icon = "icon-tank",
+        NewAnimations = "animations-tank", Icon = "icon-tank",
         Flip = false,
         Costs = {"time", 150, "titanium", 200, "crystal", 100},
         RepairHp = 1, RepairCosts = {"crystal", 6},

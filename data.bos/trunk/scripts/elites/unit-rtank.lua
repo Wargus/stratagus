@@ -28,15 +28,19 @@
 --
 --	$Id$
 
-DefineAnimations("animations-rtank", 
-   "still", {{3, 0, 1, 0}},
-   "move", {
-           {0, 4, 3, 5}, {0, 4, 3, 10}, {0, 4, 3, 5}, {0, 4, 3, 10},
-           {0, 4, 3, 5}, {0, 4, 3, 10}, {0, 4, 3, 5}, {3, 4, 3, 10},},
-   "attack", {
-           {0, 0, 4, 0}, {12, 0, 1, 20}, {12, 0, 10, 20}, {3, 0, 4, 0}},
-   "die", {
-           {3, 0, 2, 30}})
+DefineNewAnimations("animations-rtank", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 5", "move 4", "wait 3", 
+        "frame 10", "move 4", "wait 3", "frame 5", "move 4", "wait 3", 
+        "frame 10", "move 4", "wait 3", "frame 5", "move 4", "wait 3", 
+        "frame 10", "move 4", "wait 3", "frame 5", "move 4", "wait 3", 
+        "frame 10", "move 4", "unbreakable end", "wait 3", },
+    Attack = {"unbreakable begin", "frame 0", "wait 4", 
+        "frame 20", "sound bazoo-attack", "attack", "wait 1", 
+        "frame 20", "sound bazoo-attack", "attack", "wait 10", 
+        "frame 0", "unbreakable end", "wait 60", },
+    Death = {"unbreakable begin", "frame 30", "unbreakable end", "wait 2", },
+    })
 
 DefineIcon({
 	Name = "icon-rtank",
@@ -48,7 +52,7 @@ DefineUnitType("unit-rtank", {
         Name = "Rocket Tank",
         Files = {"default", "elites/units/unit_rtank.png"}, Size = {64, 64},
         Shadow = {"file", "elites/units/unit_rtank_s.png", "size", {64, 64}},
-        Animations = "animations-rtank", Icon = "icon-rtank",
+        NewAnimations = "animations-rtank", Icon = "icon-rtank",
         Flip = false,
         Costs = {"time", 100, "titanium", 100, "crystal", 150},
         RepairHp = 1, RepairCosts = {"crystal", 6},

@@ -26,312 +26,363 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: anim.lua,v 1.6 2004/11/02 03:30:09 mr-russ Exp $
+--        $Id$
 
 ---------------------------
 -------- Elite Units ------
 ---------------------------
 
-DefineAnimations("animations-apcs",
-	"still", {{3, 0, 1, 0}},
-	"move", {
-		{0, 4, 2, 0}, {0, 4, 2, 0}, {0, 4, 2, 0}, {0, 4, 2, 0},
-		{0, 4, 2, 0}, {0, 4, 2, 0}, {0, 4, 2, 0}, {0, 4, 2, 0},
-		{3, 0, 1, 0}},
-	"attack", {
-		{4, 0, 2, 5}, {0, 0, 2, 0}, {0, 0, 2, 5}, {0, 0, 2, 0},
-		{8, 0, 2, 5}, {0, 0, 2, 0}, {0, 0, 2, 0}, {0, 0, 2, 0},
-		{0, 0, 2, 0}, {0, 0, 2, 0}, {0, 0, 2, 0}, {0, 0, 2, 0},
-		{0, 0, 2, 0}, {0, 0, 2, 0}, {0, 0, 2, 0}, {0, 0, 2, 0},
-		{0, 0, 2, 0}, {0, 0, 2, 0}, {0, 0, 2, 0}, {3, 0, 2, 0}},
-	"die", {
-		{0, 0, 5,  0}, {0, 0, 5,  0}, {0, 0, 5,  0}, {3, 0, 5,  0}})
+DefineNewAnimations("animations-apcs", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 0", "move 4", "wait 2", 
+        "frame 0", "move 4", "wait 2", "frame 0", "move 4", "wait 2", 
+        "frame 0", "move 4", "wait 2", "frame 0", "move 4", "wait 2", 
+        "frame 0", "move 4", "wait 2", "frame 0", "move 4", "wait 2", 
+        "frame 0", "move 4", "wait 2", "frame 0", "unbreakable end", "wait 1", },
+    Attack = {"unbreakable begin", "frame 5", "sound apcs-attack", "attack", "wait 2", 
+        "frame 0", "wait 2", "frame 5", "wait 2", "frame 0", "wait 2", 
+        "frame 5", "attack", "wait 2", "frame 0", "wait 2", 
+        "frame 0", "wait 2", "frame 0", "wait 2", "frame 0", "wait 2", 
+        "frame 0", "wait 2", "frame 0", "wait 2", "frame 0", "wait 2", 
+        "frame 0", "wait 2", "frame 0", "wait 2", "frame 0", "wait 2", 
+        "frame 0", "wait 2", "frame 0", "wait 2", "frame 0", "wait 2", 
+        "frame 0", "wait 2", "frame 0", "unbreakable end", "wait 2", },
+    Death = {"unbreakable begin", "frame 0", "wait 5", "frame 0", "wait 5", 
+        "frame 0", "wait 5", "frame 0", "unbreakable end", "wait 5", },
+    })
 
-DefineAnimations("animations-medic",
-	"still", {{3, 0, 1, 0}},
-	"move", {
-		{0, 4, 2, 5}, {0, 4, 2, 5}, {0, 4, 2, 10}, {0, 4, 2, 10},
-		{0, 4, 2, 15}, {0, 4, 2, 15}, {0, 4, 2, 20}, {0, 4, 2, 20},
-		{3, 0, 1, 20}},
-	"attack", {
-		{0, 0, 4, 25}, {12, 0, 4, 30}, {3, 0, 1, 0}},
-	"die", {
-		{0, 0, 2, 40}, {0, 0, 2, 45}, {0, 0, 2, 50}, {3, 0, 2, 55}})
+DefineNewAnimations("animations-medic", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 5", "move 4", "wait 2", 
+        "frame 5", "move 4", "wait 2", "frame 10", "move 4", "wait 2", 
+        "frame 10", "move 4", "wait 2", "frame 15", "move 4", "wait 2", 
+        "frame 15", "move 4", "wait 2", "frame 20", "move 4", "wait 2", 
+        "frame 20", "move 4", "wait 2", "frame 20", "unbreakable end", "wait 1", },
+    Attack = {"unbreakable begin", "frame 25", "wait 4", 
+        "frame 30", "sound medic-attack", "attack", "wait 4", 
+        "frame 0", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 40", "wait 2", "frame 45", 
+        "wait 2", "frame 50", "wait 2", "frame 55", "unbreakable end", "wait 2", },
+    })
 
-DefineAnimations("animations-bazoo",
-	"still", {{3, 0, 1, 0}},
-	"move", {
-		{0, 2, 2, 5}, {0, 2, 1, 5}, {0, 2, 2, 5}, {0, 2, 1, 5},
-		{0, 2, 2, 10}, {0, 2, 1, 10}, {0, 2, 2, 10}, {0, 2, 1, 10},
-		{0, 2, 2, 15}, {0, 2, 1, 15}, {0, 2, 2, 15}, {0, 2, 1, 15},
-		{0, 2, 2, 20}, {0, 2, 1, 20}, {0, 2, 2, 20}, {0, 2, 1, 20},
-		{3, 0, 1, 20}},
-	"attack", {
-		{0, 0, 2, 25}, {12, 0, 2, 30}, {4, 0, 2, 35}, {0, 0, 150, 0},
-		{3, 0, 1, 0}},
-	"die", { 
-		{0, 0, 2, 40}, {0, 0, 2, 45}, {0, 0, 2, 50}, {3, 0, 2, 55}})
+DefineNewAnimations("animations-bazoo", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 5", "move 2", "wait 2", 
+        "frame 5", "move 2", "wait 1", "frame 5", "move 2", "wait 2", 
+        "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 2", 
+        "frame 10", "move 2", "wait 1", "frame 10", "move 2", "wait 2", 
+        "frame 10", "move 2", "wait 1", "frame 15", "move 2", "wait 2", 
+        "frame 15", "move 2", "wait 1", "frame 15", "move 2", "wait 2", 
+        "frame 15", "move 2", "wait 1", "frame 20", "move 2", "wait 2", 
+        "frame 20", "move 2", "wait 1", "frame 20", "move 2", "wait 2", 
+        "frame 20", "move 2", "wait 1", "frame 20", "unbreakable end", "wait 1", },
+    Attack = {"unbreakable begin", "frame 25", "wait 2", 
+        "frame 30", "sound bazoo-attack", "attack", "wait 2", 
+        "frame 35", "sound bazoo-attack", "wait 2", "frame 0", "wait 150", 
+        "frame 0", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 40", "wait 2", "frame 45", "wait 2", 
+        "frame 50", "wait 2", "frame 55", "unbreakable end", "wait 2", },
+    })
 
-DefineAnimations("animations-assault",
-	"still", {{3, 0, 1, 0}},
-	"move", {
-		{0, 2, 1, 5}, {0, 2, 1, 5}, {0, 2, 1, 10}, {0, 2, 1, 10},
-		{0, 2, 1, 15}, {0, 2, 1, 15}, {0, 2, 1, 20}, {0, 2, 1, 20},
-		{0, 2, 1, 5}, {0, 2, 1, 5}, {0, 2, 1, 10}, {0, 2, 1, 10},
-		{0, 2, 1, 15}, {0, 2, 1, 15}, {0, 2, 1, 20}, {0, 2, 1, 20},
-		{3, 0, 1, 20}},
-	"attack", {
-		{4, 0, 1, 25}, {0, 0, 1, 0}, {0, 0, 1, 25}, {0, 0, 1, 0},
-		{0, 0, 1, 25}, {0, 0, 1, 0}, {0, 0, 1, 25}, {0, 0, 1, 0},
-		{0, 0, 1, 25}, {0, 0, 1, 0}, {8, 0, 1, 25}, {0, 0, 24, 0},
-		{3, 0, 1, 0}},
-	"die", {
-		{0, 0, 5, 30}, {0, 0, 5, 35}, {0, 0, 5, 40}, {3, 0, 5, 45}})
+DefineNewAnimations("animations-assault", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 5", "move 2", "wait 1", 
+        "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 1", 
+        "frame 10", "move 2", "wait 1", "frame 15", "move 2", "wait 1", 
+        "frame 15", "move 2", "wait 1", "frame 20", "move 2", "wait 1", 
+        "frame 20", "move 2", "wait 1", "frame 5", "move 2", "wait 1", 
+        "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 1", 
+        "frame 10", "move 2", "wait 1", "frame 15", "move 2", "wait 1", 
+        "frame 15", "move 2", "wait 1", "frame 20", "move 2", "wait 1", 
+        "frame 20", "move 2", "wait 1", "frame 20", "unbreakable end", "wait 1", },
+    Attack = {"unbreakable begin", 
+        "frame 25", "sound assault-attack", "attack", "wait 1", 
+        "frame 0", "wait 1", "frame 25", "wait 1", "frame 0", "wait 1", 
+        "frame 25", "wait 1", "frame 0", "wait 1", "frame 25", "wait 1", 
+        "frame 0", "wait 1", "frame 25", "wait 1", "frame 0", "wait 1", 
+        "frame 25", "attack", "wait 1", "frame 0", "wait 24", 
+        "frame 0", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 30", "wait 5", "frame 35", "wait 5", 
+        "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
+    })
 
-DefineAnimations("animations-grenadier",
-	"still", {{3, 0, 1, 0}},
-	"move", {
-		{0, 2, 1, 5}, {0, 2, 1, 5}, {0, 2, 1, 10}, {0, 2, 1, 10},
-		{0, 2, 1, 15}, {0, 2, 1, 15}, {0, 2, 1, 20}, {0, 2, 1, 20},
-		{0, 2, 1, 5}, {0, 2, 1, 5}, {0, 2, 1, 10}, {0, 2, 1, 10},
-		{0, 2, 1, 15}, {0, 2, 1, 15}, {0, 2, 1, 20}, {0, 2, 1, 20},
-		{3, 0, 1, 20}},
-	"attack", {
-		{0, 0, 3, 25}, {0, 0, 3, 30}, {12, 0, 3, 35}, {0, 0, 3, 40},
-		{0, 0, 150, 0}, {3, 0, 1, 0}},
-	"die", {
-		{0, 0, 5, 30}, {0, 0, 5, 35}, {0, 0, 5, 40}, {3, 0, 5, 45}})
+DefineNewAnimations("animations-grenadier", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 5", "move 2", "wait 1", 
+        "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 1", 
+        "frame 10", "move 2", "wait 1", "frame 15", "move 2", "wait 1", 
+        "frame 15", "move 2", "wait 1", "frame 20", "move 2", "wait 1", 
+        "frame 20", "move 2", "wait 1", "frame 5", "move 2", "wait 1", 
+        "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 1", 
+        "frame 10", "move 2", "wait 1", "frame 15", "move 2", "wait 1", 
+        "frame 15", "move 2", "wait 1", "frame 20", "move 2", "wait 1", 
+        "frame 20", "move 2", "wait 1", "frame 20", "unbreakable end", "wait 1", },
+    Attack = {"unbreakable begin", "frame 25", "wait 3", "frame 30", "wait 3", 
+        "frame 35", "sound grenadier-attack", "attack", "wait 3", 
+        "frame 40", "wait 3", "frame 0", "wait 150", 
+        "frame 0", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 30", "wait 5", "frame 35", "wait 5", 
+        "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
+    })
 
-DefineAnimations("animations-engineer",
-	"still", {{3, 0, 1, 0}},
-	"move", {
-		{0, 2, 2, 5}, {0, 2, 1, 5}, {0, 2, 2, 5}, {0, 2, 1, 5},
-		{0, 2, 2, 10}, {0, 2, 1, 10}, {0, 2, 2, 10}, {0, 2, 1, 10},
-		{0, 2, 2, 15}, {0, 2, 1, 15}, {0, 2, 2, 15}, {0, 2, 1, 15},
-		{0, 2, 2, 20}, {0, 2, 1, 20}, {0, 2, 2, 20}, {0, 2, 1, 20},
-		{3, 0, 1, 20}},
-	"repair", {
-		{0, 0, 8, 25}, {0, 0, 2, 30}, {0, 0, 2, 35}, {4, 0, 8, 40},
-		{0, 0, 3, 35}, {3, 0, 3, 30}},
-	"harvest", "titanium", {
-		{0, 0, 8, 25}, {0, 0, 2, 30}, {0, 0, 2, 35}, {4, 0, 8, 40},
-		{0, 0, 3, 35}, {3, 0, 3, 30}},
-        "harvest", "crystal", {
-                {0, 0, 8, 25}, {0, 0, 2, 30}, {0, 0, 2, 35}, {4, 0, 8, 40},
-                {0, 0, 3, 35}, {3, 0, 3, 30}},
-	"die", {
-		{0, 0, 5, 45}, {0, 0, 5, 50}, {0, 0, 5, 55}, {3, 0, 5, 50}})
+DefineNewAnimations("animations-engineer", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 5", "move 2", "wait 2", 
+        "frame 5", "move 2", "wait 1", "frame 5", "move 2", "wait 2", 
+        "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 2", 
+        "frame 10", "move 2", "wait 1", "frame 10", "move 2", "wait 2", 
+        "frame 10", "move 2", "wait 1", "frame 15", "move 2", "wait 2", 
+        "frame 15", "move 2", "wait 1", "frame 15", "move 2", "wait 2", 
+        "frame 15", "move 2", "wait 1", "frame 20", "move 2", "wait 2", 
+        "frame 20", "move 2", "wait 1", "frame 20", "move 2", "wait 2", 
+        "frame 20", "move 2", "wait 1", "frame 20", "unbreakable end", "wait 1", },
+    Repair = {"frame 25", "wait 8", "frame 30", "wait 2", "frame 35", "wait 2",
+        "frame 40", "sound engineer-repair", "wait 8", "frame 35", "wait 3", 
+        "frame 30", "wait 3", },
+    Build = {"frame 25", "wait 8", "frame 30", "wait 2", "frame 35", "wait 2", 
+        "frame 40", "sound engineer-repair", "wait 8", "frame 35", "wait 3", 
+        "frame 30", "wait 3", },
+    Harvest_titanium = {"frame 25", "wait 8", "frame 30", "wait 2", 
+        "frame 35", "wait 2", "frame 40", "sound engineer-harvest", "wait 8", 
+        "frame 35", "wait 3", "frame 30", "wait 3", },
+    Harvest_crystal = {"frame 25", "wait 8", "frame 30", "wait 2", 
+        "frame 35", "wait 2", "frame 40", "sound engineer-harvest", "wait 8", 
+        "frame 35", "wait 3", "frame 30", "wait 3", },
+    Death = {"unbreakable begin", "frame 45", "wait 5", "frame 50", "wait 5", 
+        "frame 55", "wait 5", "frame 50", "unbreakable end", "wait 5", },
+    })
 
-DefineAnimations("animations-harvester",
-	"still", {{3, 0, 1, 0}},
-	"move", {
-		{0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-		{0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-		{0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-		{0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-		{0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-		{0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-		{0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
-		{0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {3, 1, 1, 0}},
-	"harvest", "crystal", {
-		{4, 0, 6, 5}, {0, 0, 3, 10}, {0, 0, 3, 15}, {0, 0, 3, 20},
-		{4, 0, 6, 25}, {0, 0, 3, 20}, {0, 0, 3, 15}, {3, 0, 3, 10}},
-        "harvest", "titanium", {
-                {4, 0, 6, 5}, {0, 0, 3, 10}, {0, 0, 3, 15}, {0, 0, 3, 20},
-                {4, 0, 6, 25}, {0, 0, 3, 20}, {0, 0, 3, 15}, {3, 0, 3, 10}},
-	"die", {
-		{0, 0, 5, 0}, {0, 0, 5, 0}, {0, 0, 5, 0}, {3, 0, 5, 0}})
+DefineNewAnimations("animations-harvester", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
+        "frame 0", "move 1", "unbreakable end", "wait 1", },
+    Harvest_crystal = {"frame 5", "sound harvester-harvest", "wait 6", 
+        "frame 10", "wait 3", "frame 15", "wait 3", "frame 20", "wait 3", 
+        "frame 25", "sound harvester-harvest", "wait 6", "frame 20", "wait 3", 
+        "frame 15", "wait 3", "frame 10", "wait 3", },
+    Harvest_titanium = {"frame 5", "sound harvester-harvest", "wait 6", 
+        "frame 10", "wait 3", "frame 15", "wait 3", "frame 20", "wait 3", 
+        "frame 25", "sound harvester-harvest", "wait 6", "frame 20", "wait 3", 
+        "frame 15", "wait 3", "frame 10", "wait 3", },
+    Death = {"unbreakable begin", "frame 0", "wait 5", "frame 0", "wait 5", 
+        "frame 0", "wait 5", "frame 0", "unbreakable end", "wait 5", },
+        })
 
 -------------------------------
 -------- Elite Buildings ------
 -------------------------------
 
-DefineAnimations("animations-plate",
-	"still", {{3, 0, 1, 0}})
+DefineNewAnimations("animations-plate", {
+    Still = {"frame 0", "wait 1", },
+    })
 
-DefineAnimations("animations-msilo",
-	"still", {{3, 0, 1, 0}},
-	"attack", {
-		{0, 0, 1, 1}, {12, 0, 1, 2}, {0, 0, 1, 3}, {0, 0, 1, 4},
-		{0, 0, 25, 5}, {12, 0, 25, 6}, {3, 0, 1, 6}})
+DefineNewAnimations("animations-msilo", {
+    Still = {"frame 0", "wait 1", },
+    Attack = {"unbreakable begin", "frame 1", "wait 1", 
+        "frame 2", "sound msilo-attack", "attack", "wait 1", 
+        "frame 3", "wait 1", "frame 4", "wait 1", "frame 5", "wait 25", 
+        "frame 6", "sound msilo-attack", "attack", "wait 25", 
+        "frame 6", "unbreakable end", "wait 1", },
+    })
 
-DefineAnimations("animations-gen",
-	"still", {
-		{0, 0, 2, 0}, {0, 0, 2, 1}, {0, 0, 2, 2}, {0, 0, 2, 3},
-		{0, 0, 2, 4}, {0, 0, 2, 5}, {0, 0, 2, 6}, {0, 0, 2, 7},
-		{3, 0, 2, 8}})
+DefineNewAnimations("animations-gen", {
+    Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
+        "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
+        "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", },
+    })
 
-DefineAnimations("animations-dev-yard",
-	"still", {
-		{0, 0, 20, 1}, {0, 0, 20, 2}, {0, 0, 20, 3}, {0, 0, 50, 4},
-		{0, 0, 20, 5}, {3, 0, 50, 6}})
+DefineNewAnimations("animations-dev-yard", {
+    Still = {"frame 1", "wait 20", "frame 2", "wait 20", "frame 3", "wait 20", 
+        "frame 4", "wait 50", "frame 5", "wait 20", "frame 6", "wait 50", },
+    })
 
-DefineAnimations("animations-rfac",
-	"still", {{3, 0, 3, 0}})
+DefineNewAnimations("animations-rfac", {
+    Still = {"frame 0", "wait 3", },
+    })
 
-DefineAnimations("animations-vault",
-	"still", {
-		{0, 0, 5, 0}, {0, 0, 5, 1}, {0, 0, 5, 2}, {0, 0, 5, 3},
-		{0, 0, 5, 4}, {0, 0, 5, 5}, {0, 0, 5, 5}, {0, 0, 5, 5},
-		{0, 0, 5, 4}, {0, 0, 5, 3}, {0, 0, 5, 2}, {0, 0, 5, 1},
-		{0, 0, 5, 0}, {3, 0, 5, 0}},
-	"die", {{3, 0, 3, 0}})
+DefineNewAnimations("animations-vault", {
+    Still = {"frame 0", "wait 5", "frame 1", "wait 5", "frame 2", "wait 5", 
+        "frame 3", "wait 5", "frame 4", "wait 5", "frame 5", "wait 5", 
+        "frame 5", "wait 5", "frame 5", "wait 5", "frame 4", "wait 5", 
+        "frame 3", "wait 5", "frame 2", "wait 5", "frame 1", "wait 5", 
+        "frame 0", "wait 5", "frame 0", "wait 5", },
+    Death = {"unbreakable begin", "frame 0", "unbreakable end", "wait 3", },
+    })
 
-DefineAnimations("animations-camp",
-	"still", {{3, 0, 3, 0}})
+DefineNewAnimations("animations-camp", {
+    Still = {"frame 0", "wait 3", },
+    })
 
-DefineAnimations("animations-hosp",
-	"still", {
-		{0, 0, 2, 0}, {0, 0, 2, 1}, {0, 0, 2, 2}, {3, 0, 2, 3}})
+DefineNewAnimations("animations-hosp", {
+    Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
+        "frame 3", "wait 2", },
+    })
 
-DefineAnimations("animations-vfac",
-	"still", {
-		{0, 0, 3, 0}, {0, 0, 3, 1}, {0, 0, 3, 2}, {0, 0, 3, 3},
-		{0, 0, 3, 4}, {0, 0, 3, 5}, {0, 0, 3, 6}, {0, 0, 3, 7},
-		{3, 0, 3, 8}}) 
+DefineNewAnimations("animations-vfac", {
+    Still = {"frame 0", "wait 3", "frame 1", "wait 3", "frame 2", "wait 3", 
+        "frame 3", "wait 3", "frame 4", "wait 3", "frame 5", "wait 3", 
+        "frame 6", "wait 3", "frame 7", "wait 3", "frame 8", "wait 3", },
+    })
 
 ----------------------
 -------- Nature ------
 ----------------------
 
-DefineAnimations("animations-elitecorpse1",
-	"die", {
-		{0, 0, 2000, 20}, {0, 0, 200, 0}, {0, 0, 200, 5}, {0, 0, 200, 10},
-		{0, 0, 200, 15}, {3, 0, 1, 15}})
+DefineNewAnimations("animations-elitecorpse1", {
+    Death = {"unbreakable begin", "wait 1", "frame 20", "wait 2000", 
+        "frame 0", "wait 200", "frame 5", "wait 200", "frame 10", "wait 200", 
+        "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
+    }) 
 
-DefineAnimations("animations-elitebuild1",
-	"die", {
-		{0, 0, 2000, 16}, {0, 0, 200, 16}, {0, 0, 200, 16}, {0, 0, 200, 17},
-		{0, 0, 200, 17}, {3, 0, 1, 17}})
+DefineNewAnimations("animations-elitebuild1", {
+    Death = {"unbreakable begin", "wait 1", "frame 16", "wait 2000", 
+        "frame 16", "wait 200", "frame 16", "wait 200", "frame 17", "wait 200",
+        "frame 17", "wait 200", "frame 17", "wait 1", "unbreakable end", "wait 1", },
+    }) 
 
-DefineAnimations("animations-elitebuild2",
-	"die", {
-		{0, 0, 2000, 19}, {0, 0, 200, 19}, {0, 0, 200, 19}, {0, 0, 200, 20},
-		{0, 0, 200, 20}, {3, 0, 1, 20}})
+DefineNewAnimations("animations-elitebuild2", {
+    Death = {"unbreakable begin", "wait 1", "frame 19", "wait 2000", 
+        "frame 19", "wait 200", "frame 19", "wait 200", "frame 20", "wait 200",
+        "frame 20", "wait 200", "frame 20", "wait 1", "unbreakable end", "wait 1", },
+    })
 
-DefineAnimations("animations-elitebuild3",
-	"die", {
-		{0, 0, 2000, 15}, {0, 0, 200, 15}, {0, 0, 200, 15}, {0, 0, 200, 16},
-		{0, 0, 200, 16}, {3, 0, 1, 16}})
+DefineNewAnimations("animations-elitebuild3", {
+    Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
+        "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
+        "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
+    })
 
-DefineAnimations("animations-elitebuild4",
-	"die", {
-		{0, 0, 2000, 12}, {0, 0, 200, 12}, {0, 0, 200, 12}, {0, 0, 200, 13},
-		{0, 0, 200, 13}, {3, 0, 1, 13}})
+DefineNewAnimations("animations-elitebuild4", {
+    Death = {"unbreakable begin", "wait 1", "frame 12", "wait 2000", 
+        "frame 12", "wait 200", "frame 12", "wait 200", "frame 13", "wait 200",
+        "frame 13", "wait 200", "frame 13", "wait 1", "unbreakable end", "wait 1", },
+    })
 
-DefineAnimations("animations-elitebuild5",
-	"die", {
-		{0, 0, 2000, 15}, {0, 0, 200, 15}, {0, 0, 200, 15}, {0, 0, 200, 16},
-		{0, 0, 200, 16}, {3, 0, 1, 16}})
+DefineNewAnimations("animations-elitebuild5", {
+    Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
+        "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
+        "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
+    })
 
-DefineAnimations("animations-elitebuild6",
-	"die", {
-		{0, 0, 2000, 30}, {0, 0, 200, 30}, {0, 0, 200, 30}, {0, 0, 200, 31},
-		{0, 0, 200, 31}, {3, 0, 1, 31}})
+DefineNewAnimations("animations-elitebuild6", {
+    Death = {"unbreakable begin", "wait 1", "frame 30", "wait 2000", 
+        "frame 30", "wait 200", "frame 30", "wait 200", "frame 31", "wait 200",
+        "frame 31", "wait 200", "frame 31", "wait 1", "unbreakable end", "wait 1", },
+    })
 
-DefineAnimations("animations-elitebuild7",
-	"die", {
-		{0, 0, 2000, 14}, {0, 0, 200, 14}, {0, 0, 200, 14}, {0, 0, 200, 15},
-		{0, 0, 200, 15}, {3, 0, 1, 15}})
+DefineNewAnimations("animations-elitebuild7", {
+    Death = {"unbreakable begin", "wait 1", "frame 14", "wait 2000", 
+        "frame 14", "wait 200", "frame 14", "wait 200", "frame 15", "wait 200",
+        "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
+    })
 
-DefineAnimations("animations-crystal-field1",
-	"still", {{0, 0, 4, 6}, {3, 0, 1, 6}})
-DefineAnimations("animations-crystal-field2",
-	"still", {{0, 0, 4, 10}, {3, 0, 1, 10}})
-DefineAnimations("animations-crystal-field3",
-	"still", {{0, 0, 4, 12}, {3, 0, 1, 12}})
-DefineAnimations("animations-crystal-field4",
-	"still", {{0, 0, 4, 4}, {3, 0, 1, 4}})
-DefineAnimations("animations-crystal-field5",
-	"still", {{0, 0, 4, 0}, {3, 0, 1, 0}})
-DefineAnimations("animations-crystal-field6",
-	"still", {{0, 0, 4, 1}, {3, 0, 1, 1}})
-DefineAnimations("animations-crystal-field7",
-	"still", {{0, 0, 4, 5}, {3, 0, 1, 5}})
-DefineAnimations("animations-crystal-field8",
-	"still", {{0, 0, 4, 7}, {3, 0, 1, 7}})
-DefineAnimations("animations-crystal-field9",
-	"still", {{0, 0, 4, 2}, {3, 0, 1, 2}})
-DefineAnimations("animations-crystal-field10",
-	"still", {{0, 0, 4, 3}, {3, 0, 1, 3}})
-DefineAnimations("animations-crystal-field11",
-	"still", {{0, 0, 4, 11}, {3, 0, 1, 11}})
-DefineAnimations("animations-crystal-field12",
-	"still", {{0, 0, 4, 8}, {3, 0, 1, 8}})
-DefineAnimations("animations-crystal-field13",
-	"still", {{0, 0, 4, 9}, {3, 0, 1, 9}})
+DefineNewAnimations("animations-crystal-field1", {
+    Still = {"frame 6", "wait 4", "frame 6", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field2", {
+    Still = {"frame 10", "wait 4", "frame 10", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field3", {
+    Still = {"frame 12", "wait 4", "frame 12", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field4", {
+    Still = {"frame 4", "wait 4", "frame 4", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field5", {
+    Still = {"frame 0", "wait 4", "frame 0", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field6", {
+    Still = {"frame 1", "wait 4", "frame 1", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field7", {
+    Still = {"frame 5", "wait 4", "frame 5", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field8", {
+    Still = {"frame 7", "wait 4", "frame 7", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field9", {
+    Still = {"frame 2", "wait 4", "frame 2", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field10", {
+    Still = {"frame 3", "wait 4", "frame 3", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field11", {
+    Still = {"frame 11", "wait 4", "frame 11", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field12", {
+    Still = {"frame 8", "wait 4", "frame 8", "wait 1", },
+    })
+
+DefineNewAnimations("animations-crystal-field13", {
+    Still = {"frame 9", "wait 4", "frame 9", "wait 1", },
+    })
 
 ----------------------------
 -------- Terras Units ------
 ----------------------------
 
-DefineAnimations("animations-dorcoz",
-	"still", {{3, 0, 1, 0}},
-	"move", {
-		{0, 4, 2, 5}, {0, 4, 2, 10}, {0, 4, 2, 15}, {0, 4, 2, 20},
-		{0, 4, 2, 5}, {0, 4, 2, 10}, {0, 4, 2, 15}, {3, 4, 2, 20}},
-	"attack", {
-		{12, 0, 1, 25}, {3, 0, 49, 0}, {3, 0, 1, 0}},
-	"die", {
-		{0, 0, 5, 30}, {0, 0, 5, 35}, {0, 0, 5, 40}, {3, 0, 5, 45}})
-
--------------------
--------- OLD ------
--------------------
-
---[[
-DefineAnimations("animations-grunt
-"still", {	; #5
-{0 0   4   0}, {3 0   1   0}}
-"move", {	; #16 P32
-{0 3   2   0}, {0 3   1   5}, {0 3   2   5}, {0 2   1  10}
-{0 3   1  10}, {0 2   1   0}, {0 3   2   0}, {0 3   1  15}
-{0 3   2  15}, {0 2   1  20}, {0 3   1  20}, {3 2   1   0}}
-"attack", {	; #25
-{0 0   3  25}, {0 0   3  30}, {0 0   3  35}, {12 0   5  40}
-{0 0  10   0}, {3 0   1   0}}
-"die", {	; #107
-{0 0   3  45}, {0 0   3  50}, {0 0 100  55}, {3 0   1  55}}}
-
---------
---	Peasant, Peon
-DefineAnimations("animations-peasant
-"still", {	; #5
-{ 0 0   4   0}, { 3 0   1   0}}
-"move", {	; #16 P32
-{ 0 3   2   0}, { 0 3   1   5}, { 0 3   2   5}, { 0 2   1  10}
-{ 0 3   1  10}, { 0 2   1   0}, { 0 3   2   0}, { 0 3   1  15}
-{ 0 3   2  15}, { 0 2   1  20}, { 0 3   1  20}, { 3 2   1   0}}
-"attack", {	; #25
-{ 0 0   3  25}, { 0 0   3  30}, { 0 0   3  35}, {12 0   5  40}
-{ 0 0   3  45}, { 0 0   7  25}, { 3 0   1  25}}
-"die", {	; #107
-{ 0 0   3  50}, { 0 0   3  55}, { 0 0 100  60}, { 3 0   1  60}}}
-]]--
+DefineNewAnimations("animations-dorcoz", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 5", "move 4", "wait 2", 
+        "frame 10", "move 4", "wait 2", "frame 15", "move 4", "wait 2", 
+        "frame 20", "move 4", "wait 2", "frame 5", "move 4", "wait 2", 
+        "frame 10", "move 4", "wait 2", "frame 15", "move 4", "wait 2", 
+        "frame 20", "move 4", "unbreakable end", "wait 2", },
+    Attack = {"unbreakable begin", 
+        "frame 25", "sound dorcoz-attack", "attack", "wait 1", 
+        "frame 0", "unbreakable end", "wait 49", },
+    Death = {"unbreakable begin", "frame 30", "wait 5", "frame 35", "wait 5", 
+        "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
+    })
 
 ---------------------------------------
 -- Misc.
-DefineAnimations("animations-building",
-	"still", {{0, 0, 4, 0}, {3, 0, 1, 0}})
+
+DefineNewAnimations("animations-building", {
+    Still = {"frame 0", "wait 4", "frame 0", "wait 1"},
+    })
 
 ---------------------------------------
---	Dead Body
-DefineAnimations("animations-dead-body",
-	"die", {
-		--	Corpse:		Orcish
-		{0, 0, 200, 5}, {16, 0, 200, 10}, {0, 0, 200, 15}, {0, 0, 200, 20},
-		{0, 0, 200, 25}, {3, 0, 1, 25},
-		--	Corpse:		Human
-		{0, 0, 200, 0}, {16, 0, 200, 10}, {0, 0, 200, 15}, {0, 0, 200, 20},
-		{0, 0, 200, 25}, {3, 0, 1, 25},
-		--	Corpse:		Ships
-		{0, 0, 100, 30}, {16, 0, 100, 30}, {3, 0, 1, 30}})
+--        Dead Body
+
+DefineNewAnimations("animations-dead-body", {
+    Death = {"unbreakable begin", "frame 5", "wait 200", "frame 10", "wait 200",
+        "frame 15", "wait 200", "frame 20", "wait 200", "frame 25", "wait 200",
+        "frame 25", "unbreakable end", "wait 1", },
+    })
 
 ---------------------------------------
---	Destroyed *x* Place
-DefineAnimations("animations-destroyed-place",
-	"die", {
-		--	Destroyed land site
-		{0, 0, 200, 0}, {16, 0, 200, 1}, {3, 0, 1, 1},
-		--	Destroyed water site
-		{0, 0, 200, 2}, {16, 0, 200, 3}, {3, 0, 1, 3}})
+--        Destroyed *x* Place
+
+DefineNewAnimations("animations-destroyed-place", {
+    Death = {"unbreakable begin", "frame 0", "wait 200", "frame 1", "wait 200",
+        "frame 1", "unbreakable end", "wait 1", },
+    })
+
+
