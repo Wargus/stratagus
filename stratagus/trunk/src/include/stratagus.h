@@ -299,14 +299,14 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef VERSION
-#define VERSION	"1.18"		/// Engine version shown
+#define VERSION	"2.00"		/// Engine version shown
 #endif
 
 #ifndef StratagusMajorVerion
     /// Stratagus major version
-#define StratagusMajorVersion	1
+#define StratagusMajorVersion	2
     /// Stratagus minor version (maximal 99)
-#define StratagusMinorVersion	18
+#define StratagusMinorVersion	0
     /// Stratagus patch level (maximal 99)
 #define StratagusPatchLevel	0
     /// Stratagus version (1,2,3) -> 10203
