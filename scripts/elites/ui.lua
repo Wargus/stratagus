@@ -27,7 +27,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---      $Id: ui.lua,v 1.23 2004/10/16 21:01:31 feb Exp $
+--      $Id$
 
 DefineCursor({
 	Name = "cursor-point",
@@ -76,6 +76,11 @@ function AddFiller(ui, graphic, position)
 end
 
 function DefineElitePanels(info_panel_x, info_panel_y) 
+   local min_damage = Max(1, Div(ActiveUnitVar("PiercingDamage"), 2))
+   local max_damage = Add(ActiveUnitVar("PiercingDamage"), ActiveUnitVar("BasicDamage"))
+   local damage_bonus = Sub(ActiveUnitVar("PiercingDamage", "Value", "Type"),
+                            ActiveUnitVar("PiercingDamage", "Value", "Initial"))
+
 	DefinePanelContents(
 -- Default presentation. ------------------------
   {
@@ -126,15 +131,13 @@ function DefineElitePanels(info_panel_x, info_panel_y)
   DefaultFont = "game",
   Condition = {ShowOpponent = false, HideNeutral = true, Build = "false"},
   Contents = {
-	{ Pos = {16, 97}, Condition = {Damage = "only"},
-		More = {"FormattedText2", {Format = "Damage: %d-%d", Variable = "Damage",
-			Component1 = "Value", Component2 = "Max"}}
-	},
-	{ Pos = {109, 97}, Condition = {Damage = "only"},-- FIXME When PiercingDamage.Diff != 0.
-		More = {"FormattedText2", {Format = "~<%+d+%d~>", Variable1 = "ExtraDamage",
-			Variable2 = "PiercingDamage", Component2 = "Diff"}}
-
-	},
+         { Pos = {16, 97}, Condition = {BasicDamage = "only"},
+            More = {"Text", {Text = Concat("Damage: ", String(min_damage), 
+                                           "-", String(max_damage),
+                                           If(Equal(0, damage_bonus), "",
+                                              InverseVideo(Concat("+", String(damage_bonus)))) 
+                                          )}}
+        },
 	{ Pos = {16, 111}, Condition = {AttackRange = "only"},
 		More = {"Text", {
 			 Text = "Range: ", Variable = "AttackRange" , Stat = true}}
