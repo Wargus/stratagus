@@ -171,7 +171,7 @@ local SCM CclPlayer(SCM list)
 		sublist=gh_cdr(sublist);
 
 		for( i=0; i<MaxCosts; ++i ) {
-		    if( gh_eq_p(value,gh_symbol2scm(DEFAULT_NAMES[i])) ) {
+		    if( gh_eq_p(value,gh_symbol2scm((char*)DEFAULT_NAMES[i])) ) {
 			player->Resources[i]=gh_scm2int(gh_car(sublist));
 			break;
 		    }
@@ -191,7 +191,7 @@ local SCM CclPlayer(SCM list)
 		sublist=gh_cdr(sublist);
 
 		for( i=0; i<MaxCosts; ++i ) {
-		    if( gh_eq_p(value,gh_symbol2scm(DEFAULT_NAMES[i])) ) {
+		    if( gh_eq_p(value,gh_symbol2scm((char*)DEFAULT_NAMES[i])) ) {
 			player->Incomes[i]=gh_scm2int(gh_car(sublist));
 			break;
 		    }
