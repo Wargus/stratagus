@@ -83,11 +83,11 @@ AC_SUBST(PROFILE_CFLAGS)
 AC_ARG_ENABLE(debug,
     [  --enable-debug	  [Enable debug, implies --disable-optimization (default: no)]])
 if test "$enable_debug" != "yes" -a "$enable_profile" != "yes"; then
-    DEBUG_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
+    STRATAGUS_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
 else
-    DEBUG_CFLAGS="-g -O0 -fsigned-char -Wsign-compare -Werror -Wall -DDEBUG"
+    STRATAGUS_CFLAGS="-g -fsigned-char -Wdeclaration-after-statement -Wsign-compare -Werror -Wall -DDEBUG"
 fi
-AC_SUBST(DEBUG_CFLAGS)
+AC_SUBST(STRATAGUS_CFLAGS)
 
 dnl AC_ARG_ENABLE(optimization,
 dnl    [  --enable-optimization	  [Enable detection of optimization flags (default: no)]])
