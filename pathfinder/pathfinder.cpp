@@ -76,7 +76,6 @@ global unsigned PfCounterDepth;
 global unsigned PfCounterNotReachable;
 );
 
-local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,int type,char* path);
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -342,18 +341,23 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 **
 **	@return		Distance to place.
 */
-global int PlaceReachable(Unit* src,int x,int y,int range)
+global int PlaceReachable(const Unit* src,int x,int y,int range)
 {
+    unsigned char* matrix;
     int depth;
 
     DebugLevel3Fn("%p -> %d,%d\n" _C_ src _C_ x _C_ y);
 
     //
+    //	Setup movement.
+    //
+    matrix=CreateMatrix();
+    MarkPlaceInMatrix(x,y,range,range,matrix);
+
+    //
     //	Find a path to the place.
     //
-    depth=ComplexNewPath(src,x,y,x+range,y+range,MUST_REACH_GOAL,NULL);
-    
-    if( depth < 0 ) {
+    if( (depth=MarkPathInMatrix(src,matrix)) < 0 ) {
 	DebugLevel3("Can't move to destination\n");
 	return 0;
     }
@@ -370,8 +374,9 @@ global int PlaceReachable(Unit* src,int x,int y,int range)
 **
 **	@return		Distance to place.
 */
-global int UnitReachable(Unit* src,const Unit* dst,int range)
+global int UnitReachable(const Unit* src,const Unit* dst,int range)
 {
+    unsigned char* matrix;
     int depth;
 
     DebugLevel3Fn("%d(%d,%d,%s)->%d(%d,%d,%s)+%d "
@@ -379,10 +384,15 @@ global int UnitReachable(Unit* src,const Unit* dst,int range)
 	_C_ UnitNumber(dst) _C_ dst->X _C_ dst->Y _C_ dst->Type->Ident _C_ range);
 
     //
+    //	Setup movement.
+    //
+    matrix=CreateMatrix();
+    MarkGoalInMatrix(dst,range,matrix);
+
+    //
     //	Find a path to the goal.
     //
-    depth=ComplexNewPath(src,dst->X-range,dst->Y-range,dst->X+range,dst->Y+range,MUST_REACH_GOAL,NULL);
-    if( depth <0 ) {
+    if( (depth=MarkPathInMatrix(src,matrix))<0 ) {
 	DebugLevel3("NO WAY\n");
 	return 0;
     }
@@ -410,7 +420,8 @@ global int UnitReachable(Unit* src,const Unit* dst,int range)
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
-local int FastNewPath(Unit* unit,int gx,int gy,int ox,int oy)
+local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
+	,int *xdp,int* ydp)
 {
     int x;
     int y;
@@ -420,7 +431,7 @@ local int FastNewPath(Unit* unit,int gx,int gy,int ox,int oy)
     int mask;
     int steps;
     int add;
-	
+
     //
     //	Fast check if the way is blocked in sight.
     //
@@ -446,11 +457,11 @@ local int FastNewPath(Unit* unit,int gx,int gy,int ox,int oy)
 
     // FIXME: johns: has anybody an idea how to write this faster?
     xd-=x;
-    yd-=y;
     if( xd<0 ) xd=-add; else if( xd>0 ) xd=add;
+    *xdp=xd;
+    yd-=y;
     if( yd<0 ) yd=-add; else if( yd>0 ) yd=add;
-    unit->Data.Move.Path[0]=XY2Heading[xd+1][yd+1];
-    unit->Data.Move.Length=1;
+    *ydp=yd;
     DebugLevel3Fn("%d,%d\n" _C_ xd _C_ yd);
 
     while( (steps-=add)>0 ) {
@@ -515,16 +526,11 @@ local void PathTraceBack(const unsigned char* matrix,int add,int x,int y
     const unsigned char* m;
     int d;
     int n;
-    int startdepth;
 
     w=TheMap.Width+2;
     m=matrix+x+y*w;			// End of path in matrix.
     w*=add;
     w2=w+w;
-    startdepth=depth;
-    if( startdepth > MAX_PATH_LENGTH ) {
-	startdepth = MAX_PATH_LENGTH;
-    }
 
     //
     //	Find the way back, nodes are numbered ascending.
@@ -573,10 +579,8 @@ local void PathTraceBack(const unsigned char* matrix,int add,int x,int y
 	  }
 	}
 	// found: continue
-	// Mart path if it's needed
-	// 
-	if( depth<MAX_PATH_LENGTH && path != NULL) {
-	    path[startdepth-depth-1]=d;
+	if( depth<MAX_PATH_LENGTH ) {
+	    path[depth]=d;
 	}
     }
 }
@@ -595,7 +599,7 @@ local void PathTraceBack(const unsigned char* matrix,int add,int x,int y
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
-local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,int type,char* path)
+local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 {
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1,
 	     0,-2,+2, 0, -2,+2,-2,+2 };
@@ -632,17 +636,6 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,int type,char* p
 	    _C_ unit->Type->Ident _C_ UnitNumber(unit)
 	    _C_ unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : 0
 	    _C_ gx _C_ gy _C_ ox _C_ oy);
-
-    //
-    // Run AStar If it's enabled, I is faster for bigger maps.
-    // 
-    if( AStarOn ) {
-      // run AStar, if it returns PF_FAILED continue with Complex
-      depth = AStarFindPath(unit,gx,gy,(gx+ox-1),(gy+oy-1),type,path);
-    }
-    if( AStarOn && depth != PF_FAILED ) {
-	return depth;
-    }
 
     size=TheMap.Width*TheMap.Height;
     points=malloc(size);
@@ -877,7 +870,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,int type,char* p
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
-global int NewPath(Unit* unit)
+global int NewPath(Unit* unit,int* xdp,int* ydp)
 {
     int x;
     int y;
@@ -888,7 +881,15 @@ global int NewPath(Unit* unit)
     int rx;
     int ry;
     int i;
-    char* path;
+    int p;
+    unsigned char path[MAX_PATH_LENGTH];
+
+    //
+    //	Convert heading into direction.
+    //				  //  N NE  E SE  S SW  W NW
+    local const int Heading2X[8] = {  0,+1,+1,+1, 0,-1,-1,-1 };
+    local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
+
 
     x=unit->X;
     y=unit->Y;
@@ -916,6 +917,7 @@ global int NewPath(Unit* unit)
 		_C_ x _C_ y _C_ gx _C_ gy _C_ gx+rx _C_ gy+ry);
 	if( x>=gx && x<gx+rx && y>=gy && y<gy+ry ) {
 	    DebugLevel3Fn("Goal reached\n");
+	    *xdp=*ydp=0;
 	    return PF_REACHED;
 	}
     } else {				// goal map field
@@ -925,6 +927,7 @@ global int NewPath(Unit* unit)
 	++ry;
 	if( x>=gx && x<gx+rx && y>=gy && y<gy+ry ) {
 	    DebugLevel3Fn("Field reached\n");
+	    *xdp=*ydp=0;
 	    return PF_REACHED;
 	}
 	// This reduces the processor use,
@@ -933,6 +936,7 @@ global int NewPath(Unit* unit)
 	if( rx==1 && ry==1 && x>=gx-1 && x<=gx+1 && y>=gy-1 && y<=gy+1 ) {
 	    if( !CheckedCanMoveToMask(gx,gy,UnitMovementMask(unit)) ) {
 		// target field blocked by something
+		*xdp=*ydp=0;
 		return PF_UNREACHABLE;
 	    }
 	    unit->Data.Move.Fast=1;	// this could be handled fast
@@ -943,9 +947,9 @@ global int NewPath(Unit* unit)
     //	If possible, try fast.
     //
     if( unit->Data.Move.Fast ) {
-	if( (i=FastNewPath(unit,gx,gy,rx,ry))>=-1 ) {
+	if( (i=FastNewPath(unit,gx,gy,rx,ry,xdp,ydp))>=-1 ) {
 	    // Fast works
-	    // DebugCheck( *xdp==0 && *ydp==0 );
+	    DebugCheck( *xdp==0 && *ydp==0 );
 	    return i;
 	}
 	DebugLevel3Fn("Fallback to slow method\n");
@@ -955,21 +959,33 @@ global int NewPath(Unit* unit)
     //
     //	Fall back to slow complex method.
     //
-    path = unit->Data.Move.Path;
-    i=ComplexNewPath(unit,gx,gy,rx,ry,BEST_GOAL,path);
+    i=ComplexNewPath(unit,gx,gy,rx,ry,path);
 
-    // Update path if it was requested. Otherwise we may only want
-    // to know if there exists a path.
-
-    if( path != NULL ) {
-	if( i >= MAX_PATH_LENGTH ) {
-	    unit->Data.Move.Length=MAX_PATH_LENGTH;
+    if( i>=0 ) {
+#ifdef NEW_SHIPS
+	if( unit->Type->UnitType==UnitTypeLand ) {
+	    *xdp=Heading2X[*path];
+	    *ydp=Heading2Y[*path];
 	} else {
-	    unit->Data.Move.Length=i;
+	    *xdp=Heading2X[*path]*2;
+	    *ydp=Heading2Y[*path]*2;
 	}
-	if( unit->Data.Move.Length == 0) {
-	    unit->Data.Move.Length++;
+#else
+	*xdp=Heading2X[*path];
+	*ydp=Heading2Y[*path];
+	// Build Path to follow later
+	// -1 to include 0, -1 for 1 point will have been executed
+	if( i >= MAX_PATH_LENGTH ) {
+	    p=MAX_PATH_LENGTH;
+	    unit->Data.Move.Length=MAX_PATH_LENGTH-1;
+	} else {
+	    p=i;
+	    unit->Data.Move.Length=p-1;
 	}
+	for(; p > 0; p--) {
+	    unit->Data.Move.Path[p-1]=path[unit->Data.Move.Length-p+1];
+	}
+#endif
     }
     return i;
 }
