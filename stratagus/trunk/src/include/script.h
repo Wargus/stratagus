@@ -126,14 +126,17 @@ extern int ScriptGetSetIntBlock(void* object, int index, lua_State* l);
 ----------------------------------------------------------------------------*/
 
     /// Quick way to fail in a function. You can use _C_ like in DebugLevelx
-#ifdef DEBUG
 #define LuaError(l, args) \
 	{ lua_pushfstring(l, args); lua_error(l); return 0; }
-#else
-	/// Save on memory.
-#define LuaError(l, args) \
-	{ lua_pushstring(l, "Lua error"); lua_error(l); return 0; }
-#endif
+
+    /// Quick way to check the number of arguments
+#define LuaCheckArgCount(l, argcount) \
+{ \
+	if (lua_gettop(l) != (argcount)) { \
+		LuaError(l, "Wrong number of arguments, expected %d got %d" \
+				_C_ (argcount) _C_ lua_gettop(l)); \
+	} \
+}
 
 //
 //	Pushing 0 as a string to lua is ok. strdup-ing 0 is not.
