@@ -353,7 +353,7 @@ echo >> $RULESFILE
 
 if [ "$WIN32" = "0" ] ; then
   echo "# Prefix for 'make install'" >> $RULESFILE
-  echo "PREFIX=/usr/local" >> $RULESFILE
+  echo "PREFIX=${PREFIX-/usr/local}" >> $RULESFILE
   echo >> $RULESFILE
 fi
 
