@@ -122,7 +122,7 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 **
 **	@param unit	Unit pointer for none action.
 */
-local void HandleActionNone(Unit* unit)
+local void HandleActionNone(Unit* unit __attribute__((unused)))
 {
     DebugLevel1Fn("FIXME: Should not happen!\n");
     DebugLevel1Fn("FIXME: Unit (%d) %s has action none.!\n",
@@ -134,7 +134,7 @@ local void HandleActionNone(Unit* unit)
 **
 **	@param unit	Unit pointer for notwritten action.
 */
-local void HandleActionNotWritten(Unit* unit)
+local void HandleActionNotWritten(Unit* unit __attribute__((unused)))
 {
     DebugLevel1Fn("FIXME: Not written!\n");
     DebugLevel1Fn("FIXME: Unit (%d) %s has action %d.!\n",

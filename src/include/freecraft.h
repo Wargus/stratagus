@@ -77,11 +77,54 @@
 #define SPEED_RESEARCH	1		/// speed factor for researching
 
 /*============================================================================
+==	Compiler repairs
+============================================================================*/
+
+#ifdef __GNUC__	// {
+
+#if __GNUC__==2 && __GNUC_MINOR__==96
+
+#warning "GCC 2.96 can't compile FreeCraft, downgrade to GCC 2.95"
+
+#endif
+
+#if __GNUC__>=3
+
+//	It looks that GCC 3.xx is becoming nutty:
+//	__FUNCTION__	can't be concated in the future.
+//	__func__	Is defined by ISO C99 as
+//		static const char __func__[] = "function-name";
+
+#define __FUNCTION__ "Wrong compiler:"__FILE__
+#warning "GCC 3.XX is not supported, downgrade to GCC 2.95"
+
+#endif
+
+#endif	// } __GNUC__
+
+#ifndef __GNUC__	// { disable GNU C Compiler features
+
+#define __attribute__(args)		// does nothing
+
+#endif	// }
+
+#ifdef _MSC_VER	// { m$ auto detection
+
+#define inline __inline			// fix m$ brain damage
+#define alloca _alloca			// I hope this works with all VC..
+
+#ifndef __FUNCTION__
+    // I don't know, but eVC didn't has it, even it is documented
+#define __FUNCTION__ __FILE__ ":" /* __LINE__ */
+#endif
+
+#endif	// } m$
+
+/*============================================================================
 ==	Debug definitions
 ============================================================================*/
 
 #define _C_	,			/// Debug , for non GNU-C compiler
-
 
 #ifdef DEBUG	// {
 
@@ -97,44 +140,7 @@
 	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
 	abort(); } }while( 0 )
 
-#ifndef __GNUC__	// { disable GNU C Compiler features
-
-#define __attribute__(args)		// does nothing
-
-#endif	// }
-
-#if defined(__GNUC__)	// {
-
-#if __GNUC__==2 && __GNUC_MINOR__==96
-
-#warning "GCC 2.96 can't compile FreeCraft, downgrade to GCC 2.95"
-
-#endif
-
-#if __GNUC__>=3
-
-//	It looks that GCC 3.xx is becoming nutty:
-//	__FUNCTION__	can't be concated in the future.
-//	__func__	Is defined by ISO C99 as
-//		static const char __func__[] = "function-name";
-
-#define __FUNCTION__ "Wrong compiler"
-#warning "GCC 3.XX is not supported, downgrade to GCC 2.95"
-
-#endif
-
-#endif	// } __GNUC__>=3
-
-#ifdef _MSC_VER	// { m$ auto detection
-
-#define inline __inline			// fix m$ brain damage
-#define alloca _alloca			// I hope this works with all VC..
-
-#ifndef __FUNCTION__
-    // I don't know, but eVC didn't has it, even it is documented
-#define __FUNCTION__ __FILE__ ":" /* __LINE__ */
-
-#endif	// } m$
+#ifndef __GNUC__	// { GNUC supports vararg macros
 
 /**
 **	Print debug information of level 0.
@@ -169,7 +175,7 @@ static inline void DebugLevel2Fn(const char* fmt,...) {};
 */
 static inline void DebugLevel3Fn(const char* fmt,...) {};
 
-#else	// }{ _MSC_VER
+#else	// }{ !__GNUC__
 
 /**
 **	Print debug information of level 0.
@@ -211,14 +217,14 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 */
 #define DebugLevel3Fn(fmt,args...)	/* TURNED OFF: printf(__FUNCTION__": "fmt,##args) */
 
-#endif	// } !_MSC_VER
+#endif	// } __GNUC__
 
 #else	// }{ DEBUG
 
 #define IfDebug(code)
 #define DebugCheck(cond)
 
-#ifdef _MSC_VER	// { m$ auto detection
+#ifndef __GNUC__	// { m$ auto detection
 
 static inline void DebugLevel0(const char* fmt,...) {};
 static inline void DebugLevel1(const char* fmt,...) {};
@@ -240,7 +246,7 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 #define DebugLevel2Fn(fmt...)
 #define DebugLevel3Fn(fmt...)
 
-#endif	// } !_MSC_VER
+#endif	// } __GNUC__
 
 #endif	// } !DEBUG
 

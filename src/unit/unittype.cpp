@@ -145,7 +145,7 @@ global void UpdateStats(void)
 **	@param udta	Pointer to udta area.
 **	@param length	length of udta area.
 */
-global void ParsePudUDTA(const char* udta,int length)
+global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 {
     int i;
     int v;
@@ -344,10 +344,12 @@ global void ParsePudUDTA(const char* udta,int length)
 	unittype->CowerMage=BIT(26,v);
 	unittype->Organic=BIT(27,v);
 
+#ifdef DEBUG
 	if( BIT(28,v) )	DebugLevel0("Unused bit 28 used in %d\n",i);
 	if( BIT(29,v) )	DebugLevel0("Unused bit 29 used in %d\n",i);
 	if( BIT(30,v) )	DebugLevel0("Unused bit 30 used in %d\n",i);
 	if( BIT(31,v) )	DebugLevel0("Unused bit 31 used in %d\n",i);
+#endif
 #undef BIT
     }
 

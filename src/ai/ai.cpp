@@ -744,7 +744,8 @@ global void AiCanNotReach(Unit* unit,const UnitType* what)
 **	@param unit	Point to unit.
 **      @param what     Pointer to unit-type.
 */
-global void AiNeedMoreFarms(Unit* unit,const UnitType* what)
+global void AiNeedMoreFarms(Unit* unit,
+	const UnitType* what __attribute__((unused)))
 {
     DebugLevel1Fn("%d: %d(%s) need more farms %s at %d,%d\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -782,7 +783,8 @@ global void AiTrainingComplete(Unit* unit,Unit* what)
 **	@param unit	Pointer to unit working.
 **	@param what	Pointer to the new unit-type.
 */
-global void AiUpgradeToComplete(Unit* unit,const UnitType* what)
+global void AiUpgradeToComplete(Unit* unit __attribute__((unused)),
+	const UnitType* what __attribute__((unused)))
 {
     DebugLevel1Fn("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -797,7 +799,8 @@ global void AiUpgradeToComplete(Unit* unit,const UnitType* what)
 **	@param unit	Pointer to unit working.
 **	@param what	Pointer to the new upgrade.
 */
-global void AiResearchComplete(Unit* unit,const Upgrade* what)
+global void AiResearchComplete(Unit* unit __attribute__((unused)),
+	const Upgrade* what __attribute__((unused)))
 {
     DebugLevel1Fn("%d: %d(%s) research %s at %d,%d completed\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_

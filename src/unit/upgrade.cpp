@@ -221,7 +221,7 @@ global void CleanUpgrades(void)
 **	@note	Only included for compatibility, for new levels use
 **		CCL (define-allow)
 */
-global void ParsePudALOW(const char* alow,int length)
+global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 {
     // units allow bits -> wc2num -> internal names.
     static char unit_for_bit[] = {
@@ -384,7 +384,7 @@ global void ParsePudALOW(const char* alow,int length)
 	    v=*alow++;
 	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
-		if( units[i*16+0+b*2]>0 ) {
+		if( unit_for_bit[i*16+0+b*2]>0 ) {
 		    DebugCheck( UnitTypeByIdent(units[i*16+0+b*2])->Type
 			    != unit_for_bit[i*16+0+b*2] );
 		}
@@ -536,7 +536,7 @@ global void ParsePudALOW(const char* alow,int length)
 **	@param ugrd	Pointer to ugrd area.
 **	@param length	length of ugrd area.
 */
-global void ParsePudUGRD(const char* ugrd,int length)
+global void ParsePudUGRD(const char* ugrd,int length __attribute__((unused)))
 {
     int i;
     int time;
