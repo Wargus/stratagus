@@ -46,6 +46,8 @@
 
 #include "stratagus.h"
 
+#include "SDL.h"
+
 #include "iocompat.h"
 
 #include "video.h"
@@ -74,9 +76,6 @@
 #include "net_lowlevel.h"
 #include "master.h"
 
-#ifdef USE_SDLA
-#include "SDL.h"
-#endif
 
 //#define SAVE_MENU_CCL				/// SAVE (REWRITE!) the menus.ccl file
 
@@ -803,11 +802,9 @@ local void NameLineDrawFunc(Menuitem * mi __attribute__ ((unused)))
 	MenusSetBackground();
 	SetDefaultTextColors(rc, rc);
 
-#ifdef WITH_SOUND
 	if (SoundFildes == -1 && !SoundOff) {
 		VideoDrawText(16, 16, LargeFont, "Sound disabled, please check!");
 	}
-#endif
 
 	VideoDrawTextCentered(VideoWidth/2, TheUI.Offset480Y + 440, GameFont, NameLine);
 	VideoDrawTextCentered(VideoWidth/2, TheUI.Offset480Y + 456, GameFont,
@@ -1580,7 +1577,6 @@ global void SoundOptionsMenu(void)
 */
 local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 {
-#ifdef WITH_SOUND
 	Menu *menu;
 
 	menu = FindMenu("menu-sound-options");
@@ -1654,7 +1650,6 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 		}
 	}
 #endif // cd
-#endif // with sound
 }
 
 /**
@@ -1784,7 +1779,6 @@ local void GlobalOptionsFullscreenGem(Menuitem *mi __attribute__((unused)))
 */
 local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 {
-#ifdef WITH_SOUND
 	if (SoundFildes != -1) {
 		QuitSound();
 		SoundOff = 1;
@@ -1795,10 +1789,13 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 			SoundFildes = -1;
 		}
 		MapUnitSounds();
-		InitSoundServer();
-		InitSoundClient();
+		if (InitSoundServer()) {
+			SoundOff = 1;
+		} else {
+			InitSoundClient();
+		}
 	}
-#endif
+
 	SoundOptionsInit(NULL);
 }
 
@@ -1807,7 +1804,6 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 */
 local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 {
-#ifdef WITH_SOUND
 	if (PlayingMusic) {
 		MusicOff = 1;
 		StopMusic();
@@ -1819,7 +1815,7 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 			LuaCall(0, 1);
 		}
 	}
-#endif // WITH_SOUND
+
 	SoundOptionsInit(NULL);
 }
 

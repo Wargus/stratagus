@@ -178,21 +178,17 @@ global void LoadModules(void)
 	LoadDecorations();
 	LoadUnitTypes();
 
+	InitAStar();
+
 	LoadUnitSounds();
 	MapUnitSounds();
-	InitAStar();
-#ifdef WITH_SOUND
 	if (SoundFildes != -1) {
-		//FIXME: must be done after map is loaded
 		if (InitSoundServer()) {
 			SoundOff = 1;
-			SoundFildes = -1;
 		} else {
-			// must be done after sounds are loaded
 			InitSoundClient();
 		}
 	}
-#endif
 
 	SetPlayersPalette();
 	CreateMinimap();

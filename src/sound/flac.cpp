@@ -37,7 +37,7 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#if defined(WITH_SOUND) && defined(USE_FLAC)		// {
+#ifdef USE_FLAC		// {
 
 #include <stdlib.h>
 #include <string.h>
@@ -428,6 +428,6 @@ global Sample* LoadFlac(const char* name, int flags)
 	return data->Sample;
 }
 
-#endif		// } WITH_SOUND && USE_FLAC
+#endif		// USE_FLAC
 
 //@}

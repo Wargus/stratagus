@@ -97,13 +97,6 @@ extern void LoadUnitSounds(void);
 */
 extern void MapUnitSounds(void);
 
-#ifndef WITH_SOUND // {
-
-#define LoadUnitSounds()    ///< Dummy function for without sound
-#define MapUnitSounds()     ///< Dummy function for without sound
-
-#endif // } !WITH_SOUND
-
 //@}
 
 #endif // !__UNITSOUND_H__

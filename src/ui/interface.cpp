@@ -254,7 +254,6 @@ local void UiAddToGroup(unsigned group)
 */
 local void UiToggleSound(void)
 {
-#ifdef WITH_SOUND
 	if (SoundFildes != -1) {
 		SoundOff ^= 1;
 	}
@@ -263,9 +262,6 @@ local void UiToggleSound(void)
 	} else {
 		SetStatusLine("Sound is on.");
 	}
-#else
-	SetStatusLine("Compiled without sound support.");
-#endif
 }
 
 /**
@@ -273,7 +269,6 @@ local void UiToggleSound(void)
 */
 local void UiToggleMusic(void)
 {
-#ifdef WITH_SOUND
 	static int vol;
 	if (MusicVolume) {
 		vol = MusicVolume;
@@ -283,9 +278,6 @@ local void UiToggleMusic(void)
 		MusicVolume = vol;
 		SetStatusLine("Music is on.");
 	}
-#else
-	SetStatusLine("Compiled without sound support.");
-#endif
 }
 
 /**

@@ -89,8 +89,6 @@ typedef struct _event_callback_ {
 
 		/// Callback for network event
 	void (*NetworkEvent)(void);
-		/// Callback for sound output ready
-	void (*SoundReady)(void);
 
 } EventCallback;
 

@@ -33,8 +33,6 @@
 
 //@{
 
-#ifdef WITH_SOUND // {
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -167,32 +165,6 @@ extern void StopMusic(void);
 	/// Turn music stopped callback off
 #define CallbackMusicOff() \
   CallbackMusic=0;
-
-#else  // }{ WITH_SOUND
-
-/*----------------------------------------------------------------------------
---  Definitons
-----------------------------------------------------------------------------*/
-
-#define SoundOff  1    ///< Dummy macro for without sound
-#define PlayingMusic  1    ///< Dummy macro for without sound
-#define CurrentMusicFile ""    ///< Dummy macro for without sound
-
-#define PlayUnitSound(u,g)    ///< Dummy macro for without sound
-#define PlayMissileSound(s,v)    ///< Dummy macro for without sound
-#define PlayGameSound(s,v)    ///< Dummy macro for without sound
-#define SetGlobalVolume(v)    ///< Dummy macro for without sound
-#define SetMusicVolume(v)    ///< Dummy macro for without sound
-#define InitSoundClient()    ///< Dummy macro for without sound
-
-#define PlaySoundFile(v)      ///< Dummy macro for without sound
-#define PlayMusic(v) 0      ///< Dummy macro for without sound
-#define StopMusic()      ///< Dummy macro for without sound
-#define CallbackMusicOn()    ///< Dummy macro for without sound
-#define CallbackMusicOff()    ///< Dummy macro for without sound
-#define PlaySectionMusic(v)    ///< Dummy macro for without sound
-
-#endif  // } WITH_SOUND
 
 //@}
 

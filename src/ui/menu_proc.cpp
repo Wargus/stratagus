@@ -2585,7 +2585,6 @@ global void InitMenus(int race)
 		MenuCallbacks.KeyReleased = &MenuHandleKeyUp;
 		MenuCallbacks.KeyRepeated = &MenuHandleKeyRepeat;
 		MenuCallbacks.NetworkEvent = NetworkEvent;
-		MenuCallbacks.SoundReady = WriteSound;
 	} else {
 		// free previous sprites for different race
 		VideoFree(MenuButtonGfx.Sprite);

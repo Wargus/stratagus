@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#if defined(WITH_SOUND) && defined(USE_MAD)		// {
+#ifdef USE_MAD		// {
 
 #include <stdlib.h>
 #include <string.h>
@@ -541,6 +541,6 @@ global Sample* LoadMp3(const char* name, int flags)
 	}
 }
 
-#endif		// } WITH_SOUND && USE_MAD
+#endif		// USE_MAD
 
 //@}

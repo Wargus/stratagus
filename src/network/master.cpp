@@ -47,6 +47,8 @@
 
 #include "stratagus.h"
 
+#include "SDL.h"
+
 #include "iocompat.h"
 #include "network.h"
 #include "netconnect.h"
@@ -54,9 +56,6 @@
 #include "master.h"
 #include "net_lowlevel.h"
 
-#ifdef USE_SDLA
-#include "SDL.h"
-#endif
 
 /*----------------------------------------------------------------------------
 --		Variables

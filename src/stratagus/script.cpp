@@ -1255,7 +1255,7 @@ global void SavePreferences(void)
 	} else {
 		fprintf(fd, "SoundOff()\n");
 	}
-#ifdef WITH_SOUND
+
 	fprintf(fd, "SetSoundVolume(%d)\n", GlobalVolume);
 	if (!MusicOff) {
 		fprintf(fd, "MusicOn()\n");
@@ -1285,7 +1285,6 @@ global void SavePreferences(void)
 	if (buf[0]) {
 		fprintf(fd, "SetCdMode(\"%s\")\n", buf);
 	}
-#endif
 #endif
 
 	fclose(fd);

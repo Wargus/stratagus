@@ -37,7 +37,7 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#if defined(WITH_SOUND) && defined(USE_OGG)		// {
+#ifdef USE_OGG		// {
 
 #include <stdlib.h>
 #include <string.h>
@@ -540,6 +540,6 @@ global void PlayAviOgg(AviFile* avi)
 	PlayingMusic = 1;
 }
 
-#endif		// } WITH_SOUND && USE_OGG
+#endif		// USE_OGG
 
 //@}
