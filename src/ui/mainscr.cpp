@@ -87,6 +87,8 @@ local void UiDrawLifeBar(const Unit* unit,int x,int y)
 	    color=ColorDarkGreen;
 	} else if( f>50 ) {
 	    color=ColorYellow;
+	} else if( f>25 ) {
+	    color=ColorOrange;
 	} else {
 	    color=ColorRed;
 	}
@@ -813,6 +815,17 @@ global void CenterOnMessage(void)
 
     SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
     MessagesEventIndex++;
+}
+
+/**
+**	Cleanup messages.
+*/
+global void CleanMessages(void)
+{
+    MessagesCount = 0;
+    SameMessageCount = 0;
+    MessagesEventCount = 0;
+    MessagesEventIndex = 0;
 }
 
 /*----------------------------------------------------------------------------
