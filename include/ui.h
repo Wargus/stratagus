@@ -44,6 +44,7 @@
 #include "video.h"
 #include "upgrade_structs.h"
 #include "cursor.h"
+#include "interface.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
