@@ -2508,6 +2508,7 @@ local SCM CclResetKeystrokeHelp(void)
 	free(KeyStrokeHelps);
 	KeyStrokeHelps = NULL;
     }
+    nKeyStrokeHelps = 0;
 
     return SCM_UNSPECIFIED;
 }
