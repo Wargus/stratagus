@@ -287,6 +287,400 @@ local int PudReadByte(CLFile* input)
 }
 
 /**
+**	Get the info for a pud.
+*/
+global PudInfo* GetPudInfo(const char* pud)
+{
+    CLFile* input;
+    long length;
+    char header[5];
+    char buf[1024];
+    PudInfo* info;
+
+    if( !(input=CLopen(pud)) ) {
+	sprintf(buf, "pud: CLopen(%s)", pud);
+	perror(buf);
+	exit(-1);
+    }
+    header[4]='\0';
+    if( !PudReadHeader(input,header,&length) ) {
+	fprintf(stderr,"%s: invalid pud\n", pud);
+	exit(-1);
+    }
+    if( memcmp(header,"TYPE",4) || length!=16 ) {
+	fprintf(stderr,"%s: invalid pud\n", pud);
+	exit(-1);
+    }
+    if( CLread(input,buf,16)!=16 ) {	// IGNORE TYPE
+	perror("CLread()");
+	exit(-1);
+    }
+    if( strcmp(buf,"WAR2 MAP") ) {	// ONLY CHECK STRING
+	fprintf(stderr,"%s: invalid pud\n", pud);
+	exit(-1);
+    }
+
+    info=malloc(sizeof(PudInfo));
+
+    //
+    //	Parse all sections.
+    //
+    while( PudReadHeader(input,header,&length) ) {
+	DebugLevel3("\tSection: %4.4s\n",header);
+
+	//
+	//	PUD version
+	//
+	if( !memcmp(header,"VER ",4) ) {
+	    if( length==2 ) {
+		int v;
+
+		v=PudReadWord(input);
+		DebugLevel1("\tVER: %d.%d\n",(v&0xF0)>>4,v&0xF);
+		continue;
+	    }
+	    DebugLevel1("Wrong version length\n");
+	}
+
+	//
+	//	Map description
+	//
+	if( !memcmp(header,"DESC",4) ) {
+	    if( CLread(input,buf,length)!=length ) {
+		perror("CLread()");
+		exit(-1);
+	    }
+	    info->Description=strdup(buf);
+	    continue;
+	}
+
+	//
+	//	Player definitons.
+	//
+	if( !memcmp(header,"OWNR",4) ) {
+	    if( length==16 ) {
+		int i;
+		int p;
+
+		for( i=0; i<16; ++i ) {
+		    p=PudReadByte(input);
+		    info->PlayerType[i]=p;
+		}
+		continue;
+	    } else {
+		DebugLevel1("Wrong player length\n");
+	    }
+	}
+
+	//
+	//	Terrain type or extended terrain type.
+	//
+	if( !memcmp(header,"ERA ",4) || !memcmp(header,"ERAX",4) ) {
+	    if( length==2 ) {
+		int t;
+
+		t=PudReadWord(input);
+		switch( t ) {
+		    case TilesetSummer:
+			DebugLevel3("\tTerrain: SUMMER\n");
+			break;
+		    case TilesetWinter:
+			break;
+		    case TilesetWasteland:
+			DebugLevel3("\tTerrain: WASTELAND\n");
+			break;
+		    case TilesetSwamp:
+			DebugLevel3("\tTerrain: SWAMP\n");
+			break;
+		    default:
+			DebugLevel1("Unknown terrain %d\n",t);
+			t=TilesetSummer;
+			break;
+		}
+		info->MapTerrain=t;
+		continue;
+	    } else {
+		DebugLevel1("Wrong terrain type length\n");
+	    }
+	}
+
+
+	//
+	//	Dimension
+	//
+	if( !memcmp(header,"DIM ",4) ) {
+
+	    info->MapWidth=PudReadWord(input);
+	    info->MapHeight=PudReadWord(input);
+	    continue;
+	}
+
+	//
+	//	Unit data (optional)
+	//
+	if( !memcmp(header,"UDTA",4) ) {
+	    char* bufp;
+
+	    length-=2;
+	    if( PudReadWord(input) ) {
+		DebugLevel3("\tUsing default data\n");
+		CLseek(input,length,SEEK_CUR);
+	    } else {
+		if( length<sizeof(buf) ) {
+		    bufp=buf;
+		} else if( !(bufp=alloca(length)) ) {
+		    perror("alloca()");
+		    exit(-1);
+		}
+		if( CLread(input,bufp,length)!=length ) {
+		    perror("CLread()");
+		    exit(-1);
+		}
+	    }
+	    continue;
+	}
+
+	//
+	//	Pud restrictions (optional)
+	//
+	if( !memcmp(header,"ALOW",4) ) {
+	    char* bufp;
+
+	    if( length<sizeof(buf) ) {
+		bufp=buf;
+	    } else if( !(bufp=alloca(length)) ) {
+		perror("alloca()");
+		exit(-1);
+	    }
+	    if( CLread(input,bufp,length)!=length ) {
+		perror("CLread()");
+		exit(-1);
+	    }
+	    continue;
+	}
+
+	//
+	//	Upgrade data (optional)
+	//
+	if( !memcmp(header,"UGRD",4) ) {
+	    char* bufp;
+
+	    length-=2;
+	    if( PudReadWord(input) ) {
+		DebugLevel3("\tUsing default data\n");
+		CLseek(input,length,SEEK_CUR);
+	    } else {
+		if( length<sizeof(buf) ) {
+		    bufp=buf;
+		} else if( !(bufp=alloca(length)) ) {
+		    perror("alloca()");
+		    exit(-1);
+		}
+		if( CLread(input,bufp,length)!=length ) {
+		    perror("CLread()");
+		    exit(-1);
+		}
+	    }
+	    continue;
+	}
+
+	//
+	//	Identifies race of each player
+	//
+	if( !memcmp(header,"SIDE",4) ) {
+	    if( length==16 ) {
+		int i;
+		int v;
+
+		for( i=0; i<16; ++i ) {
+		    v=PudReadByte(input);
+		    switch( v ) {
+			case PlayerRaceHuman:
+			case PlayerRaceOrc:
+			case PlayerRaceNeutral:
+			    break;
+			default:
+			    DebugLevel1("Unknown race %d\n",v);
+			    v=PlayerRaceNeutral;
+			    break;
+		    }
+		    info->PlayerSide[i]=v;
+		}
+		continue;
+	    } else {
+		DebugLevel1("Wrong side length\n");
+	    }
+	}
+
+	//
+	//	Starting gold
+	//
+	if( !memcmp(header,"SGLD",4) ) {
+	    if( length==32 ) {
+		int i;
+		int v;
+
+		for( i=0; i<16; ++i ) {
+		    v=PudReadWord(input);
+		    info->PlayerGold[i]=v;
+		}
+		continue;
+	    } else {
+		DebugLevel1("Wrong starting gold length\n");
+	    }
+	}
+
+	//
+	//	Starting lumber
+	//
+	if( !memcmp(header,"SLBR",4) ) {
+	    if( length==32 ) {
+		int i;
+		int v;
+
+		for( i=0; i<16; ++i ) {
+		    v=PudReadWord(input);
+		    info->PlayerWood[i]=v;
+		}
+		continue;
+	    } else {
+		DebugLevel1("Wrong starting lumber length\n");
+	    }
+	}
+
+	//
+	//	Starting oil
+	//
+	if( !memcmp(header,"SOIL",4) ) {
+	    if( length==32 ) {
+		int i;
+		int v;
+
+		for( i=0; i<16; ++i ) {
+		    v=PudReadWord(input);
+		    info->PlayerOil[i]=v;
+		}
+		continue;
+	    } else {
+		DebugLevel1("Wrong starting oil length\n");
+	    }
+	}
+
+	// FIXME: support the extended resources with puds?
+
+	//
+	//	AI for each player
+	//
+	if( !memcmp(header,"AIPL",4) ) {
+	    if( length==16 ) {
+		int i;
+		int v;
+
+		for( i=0; i<16; ++i ) {
+		    v=PudReadByte(input);
+		    info->PlayerAi[i]=v;
+		}
+		continue;
+	    } else {
+		DebugLevel1("Wrong AI player length\n");
+	    }
+	}
+
+	//
+	//	obsolete oil map
+	//
+	if( !memcmp(header,"OILM",4) ) {
+	    CLseek(input,length,SEEK_CUR);	// skip section
+	    continue;
+	}
+
+	//
+	//	Tiles MAP
+	//
+	if( !memcmp(header,"MTXM",4) ) {
+	    unsigned short* mtxm;
+
+	    if( !(mtxm=alloca(length)) ) {
+		perror("alloca()");
+		exit(-1);
+	    }
+	    if( CLread(input,mtxm,length)!=length ) {
+		perror("CLread()");
+		exit(-1);
+	    }
+
+	    continue;
+	}
+
+	//
+	//	Movement MAP
+	//
+	if( !memcmp(header,"SQM ",4) ) {
+	    unsigned short* sqm;
+
+	    if( !(sqm=alloca(length)) ) {
+		perror("alloca()");
+		exit(-1);
+	    }
+	    if( CLread(input,sqm,length)!=length ) {
+		perror("CLread()");
+		exit(-1);
+	    }
+
+	    continue;
+	}
+
+	//
+	//	Action MAP
+	//
+	if( !memcmp(header,"REGM",4) ) {
+	    unsigned short* regm;
+
+	    if( !(regm=alloca(length)) ) {
+		perror("alloca()");
+		exit(-1);
+	    }
+	    if( CLread(input,regm,length)!=length ) {
+		perror("CLread()");
+		exit(-1);
+	    }
+
+	    continue;
+	}
+
+	//
+	//	Units
+	//
+	if( !memcmp(header,"UNIT",4) ) {
+	    int x;
+	    int y;
+	    int t;
+	    int o;
+	    int v;
+
+	    while( length>=8 ) {
+		x=PudReadWord(input);
+		y=PudReadWord(input);
+		t=PudReadByte(input);
+		o=PudReadByte(input);
+		v=PudReadWord(input);
+
+		length-=8;
+	    }
+	    continue;
+	}
+
+	DebugLevel2("Unsupported Section: %4.4s\n",header);
+
+	CLseek(input,length,SEEK_CUR);
+    }
+
+    CLclose(input);
+
+    return info;
+}
+
+/**
 **	Load pud.
 **
 **	@param pud	File name.
