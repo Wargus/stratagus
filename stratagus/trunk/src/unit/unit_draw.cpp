@@ -1877,7 +1877,8 @@ static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 		DrawUnitType(type, type->Sprite, frame, x, y);
 #ifdef USE_OPENGL
 		DrawUnitPlayerColor(type, type->Sprite, (Graphic**)type->PlayerColorSprite,
-			unit->Player->Player, frame, x, y);
+			unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
+			frame, x, y);
 #endif
 	}
 }
@@ -2011,13 +2012,16 @@ void DrawUnit(const Unit* unit)
 		GraphicUnitPixels(unit, type->Sprite);
 		DrawUnitType(type, sprite, frame < 0 ? -1 - 1 : 1, x, y);
 #ifdef USE_OPENGL
-		DrawUnitPlayerColor(type, sprite, glsprite, unit->Player->Player,
+		DrawUnitPlayerColor(type, sprite, glsprite, 
+			unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
 			frame < 0 ? -1 - 1 : 1, x, y);
 #endif
 	} else {
 		DrawUnitType(type, sprite, frame, x, y);
 #ifdef USE_OPENGL
-		DrawUnitPlayerColor(type, sprite, glsprite, unit->Player->Player, frame, x, y);
+		DrawUnitPlayerColor(type, sprite, glsprite,
+			unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
+			frame, x, y);
 #endif
 	}
 
