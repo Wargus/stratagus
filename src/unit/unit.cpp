@@ -3071,7 +3071,7 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	//
 	//		Attack units in range (which or the attacker?)
 	//
-	if (!type->Coward) {
+	if (attacker && !type->Coward) {
 		if (type->CanAttack && target->Stats->Speed) {
 			if (RevealAttacker && CanTarget(target->Type, attacker->Type)) {
 				// Reveal Unit that is attacking
@@ -3098,11 +3098,15 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	if (!type->Building) {
 		int x;
 		int y;
+		int d;
 
+		DebugLevel3Fn("Unit at %d, %d attacked from %d, %d, running away.\n" _C_
+				target->X _C_ target->Y _C_ attacker->X _C_ attacker->Y);
 		x = target->X - attacker->X;
 		y = target->Y - attacker->Y;
-		x = target->X + (x * 5) / isqrt(x * x + y * y);
-		y = target->Y + (y * 5) / isqrt(x * x + y * y);
+		d = isqrt(x * x + y * y);
+		x = target->X + (x * 5) / d;
+		y = target->Y + (y * 5) / d;
 		CommandStopUnit(target);
 		CommandMove(target, x + (SyncRand() & 3), y + (SyncRand() & 3), 0);
 	}
