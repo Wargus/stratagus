@@ -463,6 +463,11 @@ global void DrawButtonPanel(void)
 			    v|=IconSelected;
 			}
 			break;
+		    case ButtonPatrol:
+			if( Selected[0]->Orders[0].Action==UnitActionPatrol ) {
+			    v|=IconSelected;
+			}
+			break;
 
 		    // FIXME: must handle more actions
 
