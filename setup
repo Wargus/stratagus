@@ -61,7 +61,7 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
 ## USE_MAD:		Use mad mp3 audio player support.
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
-## NEW_REGIONS:		Support for new regions code
+## HIERARCHIC_PATHFINDER:	Use hierarchic pathfinder
 ## USE_LUA:		Lua scripting support
 
 # Compile commands
