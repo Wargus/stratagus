@@ -217,7 +217,7 @@ global void AddDependency(const char* target,const char* required,int count
 	DebugLevel0(__FUNCTION__": wrong dependency target %s\n",target);
 	return;
     }
-    hash=rule.Kind.UnitType->Type%(sizeof(DependHash)/sizeof(*DependHash));
+    hash=(int)(long)rule.Kind.UnitType%(sizeof(DependHash)/sizeof(*DependHash));
     DebugLevel3("Hash %d\n",hash);
 
     //
