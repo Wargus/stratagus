@@ -388,6 +388,32 @@ local void UiEnterPreferencesOptionsMenu(void)
     GamePaused=0;
 }
 
+//	Enter Save Game Menu
+local void UiEnterSaveGameMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    GameMenuSave();
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
+//	Enter Load Game Menu
+local void UiEnterLoadGameMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    GameMenuLoad();
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
 /**
 **	Toggle big map mode.
 **
@@ -739,7 +765,7 @@ local int CommandKey(int key)
 		break;
 	    }
 	case KeyCodeF12:
-	    LoadAll();
+	    UiEnterLoadGameMenu();
 	    break;
 
 	case 's'&0x1F:			// Ctrl + S - Turn sound on / off
@@ -763,8 +789,7 @@ local int CommandKey(int key)
 		break;
 	    }
 	case KeyCodeF11:
-	    SaveAll();
-	    SetMessage("Game saved");
+	    UiEnterSaveGameMenu();
 	    break;
 
 	case 'b'&0x1F:

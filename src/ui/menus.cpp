@@ -84,8 +84,8 @@ local void EndMenu(void);
 --	Prototypes for action handlers and helper functions
 ----------------------------------------------------------------------------*/
 
-local void GameMenuSave(void);
-local void GameMenuLoad(void);
+global void GameMenuSave(void);
+global void GameMenuLoad(void);
 local void GameMenuEnd(void);
 local void GameMenuExit(void);
 local void GameMenuReturn(void);
@@ -2370,7 +2370,7 @@ free(path);
 #endif
 }
 
-local void GameMenuSave(void)
+global void GameMenuSave(void)
 {
     char savegame_buffer[32];
 
@@ -2561,7 +2561,7 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
     TypedFileName = 0;
 }
 
-local void GameMenuLoad(void)
+global void GameMenuLoad(void)
 {
     LoadAll();	// FIXME: Sample code
 }
