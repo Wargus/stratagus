@@ -2365,7 +2365,7 @@ local int CastCircleOfPower(Unit* unit, const SpellType* spell __attribute__((un
 	PlaceUnit(cop, x, y);
     } else {
 	cop = MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-circle-of-power"),
-		unit->Player);
+		&Players[PlayerMax-1]);
     }
     MakeMissile(MissileTypeSpell, x * TileSizeX + TileSizeX / 2,
 	y * TileSizeY + TileSizeY / 2, x * TileSizeX + TileSizeX / 2,
