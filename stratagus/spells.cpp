@@ -532,10 +532,12 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	unit->Mana -= spell->ManaCost;	// get mana cost
 	target = MakeUnit(UnitTypeByIdent("unit-daemon"), unit->Player);
 	target->Revealer = 1;
-	target->Orders[0].Action = UnitActionDie;
-	target->HP = 2;			// Counter lifing?
+	target->Orders[0].Action = UnitActionStill;
+	target->HP = 0;
 	target->X = x;
 	target->Y = y;
+	target->TTL=FrameCounter+FRAMES_PER_SECOND+FRAMES_PER_SECOND/2;
+	//temp->TTL=FrameCounter+target->Type->DecayRate*6*FRAMES_PER_SECOND;
 	break;
 
     case SpellActionHealing:

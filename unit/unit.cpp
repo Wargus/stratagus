@@ -200,8 +200,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     //
     //	Can use released unit?
     //
-    // FIXME: releasing disabled until references are working correct.
-    if( 1 && ReleasedHead && ReleasedHead->Refs<FrameCounter ) {
+    if( ReleasedHead && ReleasedHead->Refs<FrameCounter ) {
 	unit=ReleasedHead;
 	ReleasedHead=unit->Next;
 	if( ReleasedTail==&unit->Next ) {	// last element

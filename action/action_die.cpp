@@ -40,13 +40,6 @@
 */
 global void HandleActionDie(Unit* unit)
 {
-    if ( unit->Revealer ) {		// Dummy unit. FIXME: own action?
-	if( !--unit->HP ) {
-	    ReleaseUnit(unit);
-	}
-	return;
-    }
-
     //
     //	Show death animation
     //
