@@ -98,9 +98,16 @@ enum _mode_buttons_ {
 };
 
 global char** EditorUnitTypes;		/// Sorted editor unit-type table
+global int MaxUnitIndex;		/// Max unit icon draw index
+
+local char ShowUnitsToSelect;		/// Show units in unit list
+local char ShowBuildingsToSelect;	/// Show buildings in unit list
+local char ShowHeroesToSelect;		/// Show heroes in unit list
+local char ShowAirToSelect;		/// Show air units in unit list
+local char ShowLandToSelect;		/// Show land units in unit list
+local char ShowWaterToSelect;		/// Show water units in unit list
 
 local int UnitIndex;			/// Unit icon draw index
-global int MaxUnitIndex;		/// Max unit icon draw index
 local int CursorUnitIndex;		/// Unit icon under cursor
 local int SelectedUnitIndex;		/// Unit type to draw
 
@@ -444,22 +451,23 @@ local void DrawUnitIcons(void)
 
     VideoDrawText(x + 28 * 0, y, GameFont, "Un");
     VideoDraw(MenuButtonGfx.Sprite,
-	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 0, y + 16);
+	MBUTTON_GEM_SQUARE + (ShowUnitsToSelect ? 2 : 0), x + 28 * 0, y + 16);
     VideoDrawText(x + 28 * 1, y, GameFont, "Bu");
     VideoDraw(MenuButtonGfx.Sprite,
-	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 1, y + 16);
+	MBUTTON_GEM_SQUARE + (ShowBuildingsToSelect ? 2 : 0), x + 28 * 1,
+	y + 16);
     VideoDrawText(x + 28 * 2, y, GameFont, "He");
     VideoDraw(MenuButtonGfx.Sprite,
-	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 2, y + 16);
+	MBUTTON_GEM_SQUARE + (ShowHeroesToSelect ? 2 : 0), x + 28 * 2, y + 16);
     VideoDrawText(x + 28 * 3, y, GameFont, "La");
     VideoDraw(MenuButtonGfx.Sprite,
-	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 3, y + 16);
+	MBUTTON_GEM_SQUARE + (ShowLandToSelect ? 2 : 0), x + 28 * 3, y + 16);
     VideoDrawText(x + 28 * 4, y, GameFont, "Wa");
     VideoDraw(MenuButtonGfx.Sprite,
-	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 4, y + 16);
+	MBUTTON_GEM_SQUARE + (ShowWaterToSelect ? 2 : 0), x + 28 * 4, y + 16);
     VideoDrawText(x + 28 * 5, y, GameFont, "Ai");
     VideoDraw(MenuButtonGfx.Sprite,
-	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 5, y + 16);
+	MBUTTON_GEM_SQUARE + (ShowAirToSelect ? 2 : 0), x + 28 * 5, y + 16);
 #if 0
     j = 0;
     for (i = 0; EditorUnitTypes[i]; ++i) {
@@ -1581,6 +1589,8 @@ local void CreateEditor(void)
 	    if (i == PlayerNumNeutral) {
 		CreatePlayer(PlayerNeutral);
 		TheMap.Info->PlayerType[i] = PlayerNeutral;
+		TheMap.Info->PlayerSide[i] = Players[i].Race
+			= PlayerRaceNeutral;
 	    } else {
 		CreatePlayer(PlayerNobody);
 		TheMap.Info->PlayerType[i] = PlayerNobody;
