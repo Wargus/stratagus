@@ -1003,6 +1003,7 @@ static int CclCreateUnit(lua_State* l)
 	Unit* unit;
 	int heading;
 	int playerno;
+	int mask;
 	int ix;
 	int iy;
 
@@ -1033,7 +1034,8 @@ static int CclCreateUnit(lua_State* l)
 		return 0;
 	}
 	unit = MakeUnit(unittype, &Players[playerno]);
-	if (UnitCanMoveTo(unit, ix, iy)) {
+	mask = UnitMovementMask(unit);
+	if (CheckedCanMoveToMask(ix, iy, mask)) {
 		unit->Wait = 1;
 		PlaceUnit(unit, ix, iy);
 	} else {

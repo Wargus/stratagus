@@ -1805,6 +1805,7 @@ void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
 	int x;
 	int y;
 	int i;
+	int mask;
 
 	if (unit->Container) {
 		x = unit->Container->X;
@@ -1814,6 +1815,9 @@ void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
 		y = unit->Y;
 		// n0b0dy: yes, when training an unit.
 	}
+
+
+	mask = UnitMovementMask(unit);
 
 	if (heading < LookingNE || heading > LookingNW) {
 		x += addx - 1;
@@ -1836,28 +1840,28 @@ void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
 	for (;;) {
 startw:
 		for (i = addy; i--; ++y) {
-			if (UnitCanMoveTo(unit, x, y)) {
+			if (CheckedCanMoveToMask(x, y, mask)) {
 				goto found;
 			}
 		}
 		++addx;
 starts:
 		for (i = addx; i--; ++x) {
-			if (UnitCanMoveTo(unit, x, y)) {
+			if (CheckedCanMoveToMask(x, y, mask)) {
 				goto found;
 			}
 		}
 		++addy;
 starte:
 		for (i = addy; i--; --y) {
-			if (UnitCanMoveTo(unit, x, y)) {
+			if (CheckedCanMoveToMask(x, y, mask)) {
 				goto found;
 			}
 		}
 		++addx;
 startn:
 		for (i = addx; i--; --x) {
-			if (UnitCanMoveTo(unit, x, y)) {
+			if (CheckedCanMoveToMask(x, y, mask)) {
 				goto found;
 			}
 		}
@@ -1887,6 +1891,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 	int bestx;
 	int besty;
 	int bestd;
+	int mask;
 	int n;
 
 	Assert(unit->Removed);
@@ -1901,6 +1906,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 	}
 
 	Assert(x != -1 && y != -1);
+	mask = UnitMovementMask(unit);
 
 	bestd = 99999;
 #ifdef DEBUG
@@ -1911,7 +1917,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 	--x;
 	for (;;) {
 		for (i = addy; i--; ++y) { // go down
-			if (UnitCanMoveTo(unit, x, y)) {
+			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
 					bestd = n;
@@ -1922,7 +1928,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 		}
 		++addx;
 		for (i = addx; i--; ++x) { // go right
-			if (UnitCanMoveTo(unit, x, y)) {
+			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
 					bestd = n;
@@ -1933,7 +1939,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 		}
 		++addy;
 		for (i = addy; i--; --y) { // go up
-			if (UnitCanMoveTo(unit, x, y)) {
+			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
 					bestd = n;
@@ -1944,7 +1950,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 		}
 		++addx;
 		for (i = addx; i--; --x) { // go left
-			if (UnitCanMoveTo(unit, x, y)) {
+			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
 					bestd = n;
