@@ -86,6 +86,10 @@
 **		removed (see Unit::Removed). F.E.: A worker is removed, if he
 **		is in a mine or depot. Or an unit is on board a transporter.
 **
+**	Unit::Name
+**
+**		Name of the unit.
+**
 **	Unit::X Unit::Y
 **
 **		The tile map coordinates of the unit. 0,0 is the upper left on
@@ -442,9 +446,11 @@ struct _unit_ {
     // NOTE: int is faster than shorts
     unsigned	Refs;			/// Reference counter
     unsigned	Slot;			/// Assignd slot number
-    Unit**	UnitSlot;		/// slot pointer of Units
-    Unit**	PlayerSlot;		/// slot pointer of Player->Units
-    Unit*	Next;			/// generic link pointer (on map)
+    Unit**	UnitSlot;		/// Slot pointer of Units
+    Unit**	PlayerSlot;		/// Slot pointer of Player->Units
+    Unit*	Next;			/// Generic link pointer (on map)
+
+    char*	Name;			/// Unit own name
 
     int		X;			/// Map position X
     int		Y;			/// Map position Y
