@@ -1150,27 +1150,27 @@ local void SaveUnitType(const UnitType* type,FILE* file)
     if( type->Sound.Selected.Name ) {
 	fprintf(file,"  #(\"%s\"\n",type->Sound.Selected.Name);
     } else {
-	fprintf(file,"  () )\n");
+	fprintf(file,"  #( ()\n");
     }
     if( type->Sound.Acknowledgement.Name ) {
 	fprintf(file,"    \"%s\"\n",type->Sound.Acknowledgement.Name);
     } else {
-	fprintf(file,"  () )\n");
+	fprintf(file,"    ()\n");
     }
     if( type->Sound.Ready.Name ) {
 	fprintf(file,"    \"%s\"\n",type->Sound.Ready.Name);
     } else {
-	fprintf(file,"  () )\n");
+	fprintf(file,"    ()\n");
     }
     if( type->Sound.Help.Name ) {
 	fprintf(file,"    \"%s\"\n",type->Sound.Help.Name);
     } else {
-	fprintf(file,"  () )\n");
+	fprintf(file,"    ()\n");
     }
     if( type->Sound.Dead.Name ) {
 	fprintf(file,"    \"%s\" )\n",type->Sound.Dead.Name);
     } else {
-	fprintf(file,"  () )\n");
+	fprintf(file,"    () )\n");
     }
     if( type->Weapon.Attack.Name ) {
 	fprintf(file,"  \"%s\" )\n",type->Weapon.Attack.Name);
