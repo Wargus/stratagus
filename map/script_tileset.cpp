@@ -475,6 +475,35 @@ local void DefineTilesetParseSlot(Tileset* tileset,SCM list)
 }
 
 /**
+**	Parse the item mapping part of a tileset definition
+**
+**	@param tileset	Tileset to be filled.
+**	@param list	List defining item mapping.
+*/
+local void DefineTilesetParseItemMapping(Tileset* tileset,SCM list)
+{
+    SCM value;
+    int num;
+    char *unit;
+    char buf[30];
+    char **h;
+
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	num=gh_scm2int(value);
+	value=gh_car(list);
+	list=gh_cdr(list);
+	unit=gh_scm2newstr(value,NIL);
+	sprintf(buf,"%d",num);
+	if( (h=(char**)hash_find(tileset->ItemsHash,buf)) != NULL ) {
+	    free(*h);
+	}
+	*(char**)hash_add(tileset->ItemsHash,buf)=unit;
+    }
+}
+
+/**
 **	Define tileset
 **
 **	@param list	Tagged list defining a tileset.
@@ -559,6 +588,8 @@ local SCM CclDefineTileset(SCM list)
 	    DebugLevel0Fn("Animations not supported.\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("objects")) ) {
 	    DebugLevel0Fn("Objects not supported.\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("item-mapping")) ) {
+	    DefineTilesetParseItemMapping(tileset,data);
 	} else {
 	    errl("Unsupported tag",value);
 	}
