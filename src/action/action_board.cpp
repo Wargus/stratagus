@@ -10,12 +10,11 @@
 //
 /**@name action_board.c	-	The board action. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -185,6 +184,7 @@ local void EnterTransporter(Unit* unit)
 global void HandleActionBoard(Unit* unit)
 {
     int i;
+    Unit* goal;
 
     DebugLevel3Fn("%p(%d) SubAction %d\n"
 	    ,unit,UnitNumber(unit),unit->SubAction);
@@ -220,11 +220,15 @@ global void HandleActionBoard(Unit* unit)
 		    if( i==PF_UNREACHABLE ) {
 			if( ++unit->SubAction==200 ) {
 			    unit->Orders[0].Action=UnitActionStill;
-			    if( unit->Orders[0].Goal ) {
+			    if( (goal=unit->Orders[0].Goal) ) {
 
-				RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-				--unit->Orders[0].Goal->Refs;
-				RefsDebugCheck(!unit->Orders[0].Goal->Refs);
+				RefsDebugCheck(!goal->Refs);
+				if( !--goal->Refs ) {
+				    RefsDebugCheck(!goal->Destroyed);
+				    if( goal->Destroyed ) {
+					ReleaseUnit(goal);
+				    }
+				}
 				unit->Orders[0].Goal=NoUnitP;
 			    }
 			    unit->SubAction=0;
