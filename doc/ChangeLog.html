@@ -41,6 +41,7 @@
 <P><LI>Future 1.19 Release<P>
     <UL>
     <LI>+++
+    <LI>Team game types have shared vision on by default (from Jimmy Salmon).
     <LI>Fixed Bug #645144: Upgrades Not Applied to Rescued Units (from Russell
 	Smith).
     <LI>Implemented Feature Request #719486: Campaign Stuff - New Trigger Actions
@@ -854,39 +855,39 @@
     <LI>Moved map.c minimap.c and tileset.c into own directory map.
     <LI>Rewritten DrawUnits, combined work.
     <UL>
-<LI>Fixed: `case 1...100' thing --&gt; with default:if(...&lt;100)                    
-<LI>Added Unit.PendCommand, now TownHall and Barracks have `move', `stop', `attack' and `harvest' commands ( and RightClick will do it ), which will be applied auto to all new units.
-<LI>Added DrawResources() shows food usage now.
-<LI>Added Now enemy buildings will look under the fog with the last seen frame (or will not show if you haven't seen them yet) FIXME: if seen building under fog is ruined it will disappear
-<LI>Fixed bug: in UnitVisible() for fog of war
-<LI>Added Unit.rs which is filled by MakeUnit() with random number between 1 and 100, used for fancy buildings. `fancy buildings'! every building is drawn randomly normal or flipped horizontally, so the your city will have some buildings pointed to right and some to left! i.e. will not look uniform.
-<LI>Rewritten DrawUnits
-<LI>Added TileTypeTables -- used to lookup what tile is what? i.e. which tiles are woods, water,... required for the fog
-<LI>Added cheats -- for debug really :)
-<LI>Fixed bug: Fixes seen wood bug.
-<LI>Fixed bug: Fog of war should be ok.
-<LI>Fixed bug: Wood removing should be ok.
-<LI>Macros MAPEXPLORED, MAPVISIBLE... added
-<LI>MapField.SeenTile -- used for the wood/rocks last seen fog bug :)
+    <LI>Fixed: `case 1...100' thing --&gt; with default:if(...&lt;100)
+    <LI>Added Unit.PendCommand, now TownHall and Barracks have `move', `stop', `attack' and `harvest' commands ( and RightClick will do it ), which will be applied auto to all new units.
+    <LI>Added DrawResources() shows food usage now.
+    <LI>Added Now enemy buildings will look under the fog with the last seen frame (or will not show if you haven't seen them yet) FIXME: if seen building under fog is ruined it will disappear
+    <LI>Fixed bug: in UnitVisible() for fog of war
+    <LI>Added Unit.rs which is filled by MakeUnit() with random number between 1 and 100, used for fancy buildings. `fancy buildings'! every building is drawn randomly normal or flipped horizontally, so the your city will have some buildings pointed to right and some to left! i.e. will not look uniform.
+    <LI>Rewritten DrawUnits
+    <LI>Added TileTypeTables -- used to lookup what tile is what? i.e. which tiles are woods, water,... required for the fog
+    <LI>Added cheats -- for debug really :)
+    <LI>Fixed bug: Fixes seen wood bug.
+    <LI>Fixed bug: Fog of war should be ok.
+    <LI>Fixed bug: Wood removing should be ok.
+    <LI>Macros MAPEXPLORED, MAPVISIBLE... added
+    <LI>MapField.SeenTile -- used for the wood/rocks last seen fog bug :)
     </UL>
     <LI>Applied patches from Vladi.
     <LI>Fixed bug: Files from tool directory are not included in the distribution.
     <LI>New tool written in C: wartool, includes all xxx2png in one file.
     <UL>
-<LI>Reworked the rectangle selection to match the one of w*rcr*ft 2: Select a group of player's "mobile" units. if none, select a construction from that player. if still none, select a (random) neutral unit (critter, mine...) if still none, select a (random) enemy unit.
-<LI>The dead body animation is now displayed.
-<LI>Fixed a bug in DestroyUnit(): Units in transporters weren't destroyed (although they were still "removed" from the map. There is still a problem though, as the dead bodies of the units in the transporters are displayed. Sorry I didn't look at this yet.
-<LI>Modified a couple of things in DestroyAllInside(), to speed up things in special cases (transporters, construction...)
-<LI>ChangeUnitOwner() is now recursive. This is not important for w*rcr*ft but it will be interesting for st*rcr*ft.
-<LI>Various code cleanups, code optimizations, minor changes, and things I forgot...
-<LI>AiFindFreeWorkers now finds free workers.
-<LI>In unit_find.c I added 2 functions FindUnitsByType() and FindPlayerUnitsByType(). These are general functions but used by the AI code and building construction/destruction (halls/lumber mill/...)
-<LI>I added ActionUnitConstructed test to UnitUnusable(): A building under construction can be considered unusable :). There is an exception though when you select a building under construction with the mouse. For example, the peons harvesting wood were bringing it back to the lumber mill under construction...
-<LI>When a keep/stronghold/castle/fortress is constructed, gold/wood/oil harvested is adjusted if necessary.
-<LI>Now when a castle/keep/stronghold/../lumber mill/refinery is destroyed, the gold/wood/oil harvested is correctly adjusted.
-<LI>It's now possible to cancel the construction of a building.
-<LI>New memory management. The main memory array isn't used directly anymore (except for debug message and network code), and the units are accessed by arrays of pointers (the solution isn't currently memory optimized, but this can be modified quite easily). There are currently 3 kind of "lists": Used unit slots, free unit slots, and a list of units used by each player. This implies a bunch of (more or less) small changes through the code...
-<LI>Gold mined, wood harvested and oil hauled is added to the player's resources as soon as the peon/peasant reach the hall/mill/... Note that this is the standard behaviour of w*rcr*ft 2. This part generates a bunch of warnings from the AI saying that it can't build a farm. This is just this: a warning. As soon as it is possible (the peon gets out of the hall), the farm is builded.
+    <LI>Reworked the rectangle selection to match the one of w*rcr*ft 2: Select a group of player's "mobile" units. if none, select a construction from that player. if still none, select a (random) neutral unit (critter, mine...) if still none, select a (random) enemy unit.
+    <LI>The dead body animation is now displayed.
+    <LI>Fixed a bug in DestroyUnit(): Units in transporters weren't destroyed (although they were still "removed" from the map. There is still a problem though, as the dead bodies of the units in the transporters are displayed. Sorry I didn't look at this yet.
+    <LI>Modified a couple of things in DestroyAllInside(), to speed up things in special cases (transporters, construction...)
+    <LI>ChangeUnitOwner() is now recursive. This is not important for w*rcr*ft but it will be interesting for st*rcr*ft.
+    <LI>Various code cleanups, code optimizations, minor changes, and things I forgot...
+    <LI>AiFindFreeWorkers now finds free workers.
+    <LI>In unit_find.c I added 2 functions FindUnitsByType() and FindPlayerUnitsByType(). These are general functions but used by the AI code and building construction/destruction (halls/lumber mill/...)
+    <LI>I added ActionUnitConstructed test to UnitUnusable(): A building under construction can be considered unusable :). There is an exception though when you select a building under construction with the mouse. For example, the peons harvesting wood were bringing it back to the lumber mill under construction...
+    <LI>When a keep/stronghold/castle/fortress is constructed, gold/wood/oil harvested is adjusted if necessary.
+    <LI>Now when a castle/keep/stronghold/../lumber mill/refinery is destroyed, the gold/wood/oil harvested is correctly adjusted.
+    <LI>It's now possible to cancel the construction of a building.
+    <LI>New memory management. The main memory array isn't used directly anymore (except for debug message and network code), and the units are accessed by arrays of pointers (the solution isn't currently memory optimized, but this can be modified quite easily). There are currently 3 kind of "lists": Used unit slots, free unit slots, and a list of units used by each player. This implies a bunch of (more or less) small changes through the code...
+    <LI>Gold mined, wood harvested and oil hauled is added to the player's resources as soon as the peon/peasant reach the hall/mill/... Note that this is the standard behaviour of w*rcr*ft 2. This part generates a bunch of warnings from the AI saying that it can't build a farm. This is just this: a warning. As soon as it is possible (the peon gets out of the hall), the farm is builded.
     </UL>
     <LI>Applied patches from lokh:
     <LI>Changed &lt;strings.h&gt; to &lt;string.h&gt; for glibc-2.1.
