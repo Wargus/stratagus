@@ -78,7 +78,7 @@ global void NetExit(void)
 /**
 **	Close an UDP socket port.
 **
-**	@param sockfd	Socket fildes;
+**	@param sock	Socket fildes
 */
 global void NetCloseUDP(sock)
 {
@@ -121,7 +121,7 @@ global void NetExit(void)
 /**
 **	Close an UDP socket port.
 **
-**	@param sockfd	Socket fildes;
+**	@param sockfd	Socket fildes
 */
 global void NetCloseUDP(int sockfd)
 {
@@ -150,7 +150,7 @@ global void NetExit(void)
 /**
 **	Close an UDP socket port.
 **
-**	@param sockfd	Socket fildes;
+**	@param sockfd	Socket fildes
 */
 global void NetCloseUDP(int sockfd)
 {
@@ -162,7 +162,7 @@ global void NetCloseUDP(int sockfd)
 /**
 **	Resolve host in name or dotted quad notation.
 **
-**	@param host	Host name.
+**	@param host	Host name (f.e. 192.168.0.0 or freecraft.net)
 */
 global unsigned long NetResolveHost(const char* host)
 {
@@ -195,7 +195,7 @@ global unsigned long NetResolveHost(const char* host)
 **
 **	@param sock	local socket.
 **
-**	@returns	number of IP-addrs found.
+**	@return		number of IP-addrs found.
 */
 global int NetSocketAddr(const int sock)
 {
@@ -339,28 +339,46 @@ global int NetSocketReady(int sockfd,int timeout)
 
 /**
 **	Receive from an UDP socket.
+**
+**	@param sockfd	Socket
+**	@param buf	Receive message buffer.
+**	@param len	Receive message buffer length.
+**
+**	@return		Number of bytes placed in buffer, or -1 if failure.
 */
 global int NetRecvUDP(int sockfd,void* buf,int len)
 {
     int n;
+    int l;
     struct sockaddr_in sock_addr;
 
     n=sizeof(struct sockaddr_in);
-    if( recvfrom(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,&n)<0 ) {
+    if( (l=recvfrom(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,&n))<0 ) {
 	fprintf(stderr,__FUNCTION__": Could not read from UDP socket\n");
-	return 0;
+	return -1;
     }
+
     // FIXME: ARI: verify that it _really_ is from one of our hosts...
     // imagine what happens when an udp port scan hits the port...
+
     NetLastHost=sock_addr.sin_addr.s_addr;
     NetLastPort=sock_addr.sin_port;
     DebugLevel3Fn(" %d.%d.%d.%d:%d\n",
 	    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
-    return 1;
+
+    return l;
 }
 
 /**
 **	Send through an UPD socket to a host:port.
+**
+**	@param sockfd	Socket
+**	@param host	Host to send to.
+**	@param port	Port of host to send to.
+**	@param buf	Send message buffer.
+**	@param len	Send message buffer length.
+**
+**	@return		Number of bytes send.
 */
 global int NetSendUDP(int sockfd,unsigned long host,int port
 	,const void* buf,int len)
@@ -373,7 +391,7 @@ global int NetSendUDP(int sockfd,unsigned long host,int port
     sock_addr.sin_port = port;
     sock_addr.sin_family = AF_INET;
 
-    //if( MyRand()%2 ) return 0;
+    // if( MyRand()%7 ) return 0;
 
     return sendto(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,n);
 }
