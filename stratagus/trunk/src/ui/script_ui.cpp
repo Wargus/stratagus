@@ -1016,8 +1016,8 @@ local SCM CclDefineUI(SCM list)
     y = gh_scm2int(value);
 
     // Find slot: new or redefinition
-    ui=NULL;
-    i=0;
+    ui = NULL;
+    i = 0;
     if (UI_Table) {
 	for (; UI_Table[i]; ++i) {
 	    if (UI_Table[i]->Width == x && UI_Table[i]->Height == y &&
@@ -1144,7 +1144,7 @@ local SCM CclDefineUI(SCM list)
 		value = gh_car(sublist);
 		sublist = gh_cdr(sublist);
 		name = gh_scm2newstr(value, NULL);
-		for (res=0; res < MaxCosts; ++res) {
+		for (res = 0; res < MaxCosts; ++res) {
 		    if (!strcmp(name, DefaultResourceNames[res])) {
 			break;
 		    }

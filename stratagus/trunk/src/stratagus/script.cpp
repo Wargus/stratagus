@@ -607,6 +607,33 @@ local SCM CclDefineDefaultResourceNames(SCM list)
 }
 
 /**
+**	Define default names for the resources.
+*/
+local SCM CclDefineDefaultResourceAmounts(SCM list)
+{
+    int i;
+    SCM value;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+
+	for (i = 0; i < MaxCosts; ++i) {
+	    if (gh_eq_p(value, gh_symbol2scm(DefaultResourceNames[i]))) {
+		value = gh_car(list);
+		list = gh_cdr(list);
+		DefaultResourceAmounts[i] = gh_scm2int(value);
+		break;
+	    }
+	}
+	if (i == MaxCosts) {
+	    errl("Resource not found", value);
+	}
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Debug unit slots.
 */
 local SCM CclUnits(void)
@@ -848,6 +875,7 @@ global void InitCcl(void)
     gh_new_procedureN("define-default-incomes", CclDefineDefaultIncomes);
     gh_new_procedureN("define-default-actions", CclDefineDefaultActions);
     gh_new_procedureN("define-default-resource-names", CclDefineDefaultResourceNames);
+    gh_new_procedureN("define-default-resource-amounts", CclDefineDefaultResourceAmounts);
 
     IconCclRegister();
     MissileCclRegister();

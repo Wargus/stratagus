@@ -115,6 +115,11 @@ extern char* DefaultActions[MaxCosts];
 extern char* DefaultResourceNames[MaxCosts];
 
 /**
+**	Default amounts for the resources.
+*/
+extern int DefaultResourceAmounts[MaxCosts];
+
+/**
 **	This are the current stats of an unit. Upgraded or downgraded.
 */
 typedef struct _unit_stats_ {

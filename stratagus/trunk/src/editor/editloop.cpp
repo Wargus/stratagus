@@ -286,13 +286,10 @@ local void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 {
     Unit* unit;
 
-    //FXIME: vladi: should check place when mirror editing is enabled...?
+    // FIXME: vladi: should check place when mirror editing is enabled...?
     unit = MakeUnitAndPlace(x, y, type, player);
-    if (type->GivesResource == OilCost) {
-	unit->Value = 50000;
-    }
-    if (type->GivesResource == GoldCost) {
-	unit->Value = 100000;
+    if (type->GivesResource) {
+	unit->Value = DefaultResourceAmounts[type->GivesResource];
     }
 }
 
@@ -913,7 +910,7 @@ global void EditorUpdateDisplay(void)
     }
     DrawMenuButton(TheUI.MenuButton.Button,
 	(ButtonAreaUnderCursor == ButtonAreaMenu
-	    && ButtonUnderCursor == 0 ? MenuButtonActive : 0) |
+	    && ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
 	(GameMenuButtonClicked ? MenuButtonClicked : 0),
 	TheUI.MenuButton.Width, TheUI.MenuButton.Height,
 	TheUI.MenuButton.X,TheUI.MenuButton.Y,
@@ -1011,7 +1008,7 @@ local void EditorCallbackButtonUp(unsigned button)
 
     if ((1 << button) == LeftButton && GameMenuButtonClicked == 1) {
 	GameMenuButtonClicked = 0;
-	if (ButtonUnderCursor == 0) {
+	if (ButtonUnderCursor == ButtonUnderMenu) {
 	    ProcessMenu("menu-editor", 1);
 	}
     }
@@ -1032,7 +1029,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
     //
     //  Click on menu button
     //
-    if (CursorOn == CursorOnButton && ButtonUnderCursor == 0 &&
+    if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu &&
 	    (MouseButtons & LeftButton) && !GameMenuButtonClicked) {
 	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 	GameMenuButtonClicked = 1;
@@ -1833,6 +1830,8 @@ local void CreateEditor(void)
 	    strdup(Tilesets[TheMap.Info->MapTerrain]->Ident);
 	InitPlayers();
 	for (i = 0; i < PlayerMax; ++i) {
+	    int j;
+
 	    if (i == PlayerNumNeutral) {
 		CreatePlayer(PlayerNeutral);
 		TheMap.Info->PlayerType[i] = PlayerNeutral;
@@ -1841,9 +1840,9 @@ local void CreateEditor(void)
 		CreatePlayer(PlayerNobody);
 		TheMap.Info->PlayerType[i] = PlayerNobody;
 	    }
-	    TheMap.Info->PlayerResources[i][GoldCost] = Players[i].Resources[GoldCost];
-	    TheMap.Info->PlayerResources[i][WoodCost] = Players[i].Resources[WoodCost];
-	    TheMap.Info->PlayerResources[i][OilCost] = Players[i].Resources[OilCost];
+	    for (j = 1; j < MaxCosts; ++j) {
+		TheMap.Info->PlayerResources[i][j] = Players[i].Resources[j];
+	    }
 	}
 
 	strncpy(TheMap.Description, TheMap.Info->Description, 32);
