@@ -342,6 +342,11 @@ global void LoadDecorations(void)
     SpellSprites=LoadSprite("graphic/bloodlust,haste,slow,invis.,shield.png",16,16);
 }
 
+#ifdef REFS_DEBUG
+    #include "font.h"
+    #include "ui.h"
+#endif
+
 /**
 **	Draw decoration (invis, for the unit.)
 **
@@ -357,11 +362,12 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
     UnitStats* stats;
 
 #ifdef REFS_DEBUG
-    #include "font.h"
     //
     //	Show the number of references.
     //
-    DrawNumber(x+1,y+1,GameFont,unit->Refs);
+    if( x>TheUI.MapX && x<TheUI.MapEndX && y>TheUI.MapY && y<TheUI.MapEndY ) {
+	DrawNumber(x+1,y+1,GameFont,unit->Refs);
+    }
 #endif
 
 
