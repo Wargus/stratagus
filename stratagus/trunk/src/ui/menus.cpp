@@ -2261,6 +2261,9 @@ local void GetInfoFromSelectPath(void)
     if (strcasestr(ScenSelectFileName, ".pud")) {
 	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
 	strcpy(ScenSelectFullPath, ScenSelectPath);
+    } else if (strcasestr(ScenSelectFileName, ".scm")) {
+	ScenSelectPudInfo = GetScmInfo(ScenSelectPath);
+	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else {
 	// FIXME: GetCmInfo();
     }
@@ -2822,18 +2825,15 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 
     menu = FindMenu("menu-select-scenario");
 
-#if 0
-    if (menu->items[6].d.pulldown.curopt == 0) {
-	suf = NULL;
-	p = -1;
-    } else
-#endif
     if (menu->items[6].d.pulldown.curopt == 0) {
 	suf = ".cm";
 	p = 0;
-    } else {
+    } else if (menu->items[6].d.pulldown.curopt == 1) {
 	suf = ".pud";
 	p = 1;
+    } else {
+	suf = ".scm";
+	p = 2;
     }
     np = strrchr(pathbuf, '/');
     if (np) {
@@ -2856,18 +2856,6 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     do {
 	lcp = cp++;
 	cp = strcasestr(cp, suf);
-#if 0
-	if( suf ) {
-	} else if( !suf && (cp = strcasestr(cp, ".cm")) ) {
-	    suf = ".cm";
-	    p = 0;
-	} else if( !suf && (cp = strcasestr(cp, ".pud")) ) {
-	    suf = ".pud";
-	    p = 1;
-	} else {
-	    cp=NULL;
-	}
-#endif
     } while (cp != NULL);
     if (lcp >= np) {
 	cp = lcp + strlen(suf);
@@ -2885,21 +2873,27 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #ifdef USE_ZZIPLIB
 usezzf:
 #endif
-#if 0
-	    if( p==-1 ) {
-		printf("What now ?\n");
-		if (strcasestr(pathbuf, ".pud")) {
-		    p=1;
-		} else {
-		    p=0;
-		}
-	    }
-#endif
-	    if (p) {
+	    if (p==1) {
 		if (strcasestr(pathbuf, ".pud")) {
 		    info = GetPudInfo(pathbuf);
 		    if (info) {
 			DebugLevel3Fn("GetPudInfo(%s) : %p\n" _C_ pathbuf _C_ info);
+			sz = szl[menu->items[8].d.pulldown.curopt];
+			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
+			    fl->type = 1;
+			    fl->name = strdup(np);
+			    fl->xdata = info;
+			    return 1;
+			} else {
+			    FreeMapInfo(info);
+			}
+		    }
+		}
+	    } else if (p==2) {
+		if (strcasestr(pathbuf, ".scm")) {
+		    info = GetScmInfo(pathbuf);
+		    if (info) {
+			DebugLevel3Fn("GetScmInfo(%s) : %p\n" _C_ pathbuf _C_ info);
 			sz = szl[menu->items[8].d.pulldown.curopt];
 			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
 			    fl->type = 1;
@@ -4422,6 +4416,8 @@ global int NetClientSelectScenario(void)
 
     if (strcasestr(ScenSelectFileName, ".pud")) {
 	ScenSelectPudInfo = GetPudInfo(ScenSelectFullPath);
+    } else if (strcasestr(ScenSelectFileName, ".scm")) {
+	ScenSelectPudInfo = GetScmInfo(ScenSelectFullPath);
     } else {
 	// FIXME: GetCmInfo();
     }
@@ -4770,12 +4766,12 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
     char *np;
     char *cp;
     char *lcp;
+    char *lcp2;
 #ifdef USE_ZZIPLIB
     int sz;
     ZZIP_FILE *zzf;
 #endif
 
-    suf = ".pud";
     np = strrchr(pathbuf, '/');
     if (np) {
 	np++;
@@ -4794,10 +4790,22 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 	}
     }
 #endif
+    suf = ".pud";
     do {
 	lcp = cp++;
-	cp = strcasestr(cp, suf);
+	cp = strcasestr(cp, ".pud");
     } while (cp != NULL);
+    cp = np;
+    cp--;
+    do {
+	lcp2 = cp++;
+	cp = strcasestr(cp, ".scm");
+    } while (cp != NULL);
+    if (lcp2 > lcp) {
+	lcp = lcp2;
+	suf = ".scm";
+    }
+
     if (lcp >= np) {
 	cp = lcp + strlen(suf);
 #ifdef USE_ZLIB
@@ -4816,6 +4824,14 @@ usezzf:
 #endif
 	    if (strcasestr(pathbuf, ".pud")) {
 		info = GetPudInfo(pathbuf);
+		if (info) {
+		    fl->type = 1;
+		    fl->name = strdup(np);
+		    fl->xdata = info;
+		    return 1;
+		}
+	    } else if (strcasestr(pathbuf, ".scm")) {
+		info = GetScmInfo(pathbuf);
 		if (info) {
 		    fl->type = 1;
 		    fl->name = strdup(np);
