@@ -239,8 +239,7 @@ global void SaveScreenshotPNG(const char* name)
 	return;
     }
 
-    if (setjmp(png_jmpbuf(png_ptr)))
-    {
+    if (setjmp(png_ptr->jmpbuf)) {
 	/* If we get here, we had a problem reading the file */
 	fclose(fp);
 	png_destroy_write_struct(&png_ptr, &info_ptr);
