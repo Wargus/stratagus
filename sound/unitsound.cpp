@@ -256,6 +256,7 @@ global void LoadUnitSounds(void)
 global void MapUnitSounds(void)
 {
     UnitType* type;
+    int i;
 
     if( SoundFildes!=-1 ) {
 	SetSoundRange(SoundIdForName("tree chopping"),32);
@@ -263,7 +264,8 @@ global void MapUnitSounds(void)
 	//
 	//	Parse all units sounds.
 	//
-	for( type=UnitTypes; type->OType; type++) {
+	for( i=0; i<NumUnitTypes; ++i ) {
+	    type = UnitTypes[i];
 	    if( type->Sound.Selected.Name ) {
 		type->Sound.Selected.Sound=
 			SoundIdForName(type->Sound.Selected.Name);
