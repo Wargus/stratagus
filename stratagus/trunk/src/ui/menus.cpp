@@ -1930,29 +1930,39 @@ global void DiplomacyMenu(void)
     menu = FindMenu("menu-diplomacy");
     j = 0;
 
-    for( i=0; i<=(PlayerMax-2); ++i ) {
-	if( Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
+    for (i=0; i<=PlayerMax-2; ++i) {
+	if (Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
 	    menu->items[4*j+4].d.text.text = Players[i].Name;
-	    if( ThisPlayer->Allied&(1<<Players[i].Player) ) {
+	    if (ThisPlayer->Allied&(1<<Players[i].Player)) {
 		menu->items[4*j+5].d.gem.state = MI_GSTATE_CHECKED;
 	    } else {
 		menu->items[4*j+5].d.gem.state = MI_GSTATE_UNCHECKED;
 	    }
-	    if( ThisPlayer->Enemy&(1<<Players[i].Player) ) {
+	    if (ThisPlayer->Enemy&(1<<Players[i].Player)) {
 		menu->items[4*j+6].d.gem.state = MI_GSTATE_CHECKED;
 	    } else {
 		menu->items[4*j+6].d.gem.state = MI_GSTATE_UNCHECKED;
 	    }
-	    if (ThisPlayer->SharedVision&(1<<Players[i].Player) ) {
+	    if (ThisPlayer->SharedVision&(1<<Players[i].Player)) {
 		menu->items[4*j+7].d.gem.state = MI_GSTATE_CHECKED;
 	    } else {
 		menu->items[4*j+7].d.gem.state = MI_GSTATE_UNCHECKED;
 	    }
 
+	    if (ReplayGameType != ReplayNone) {
+		menu->items[4*j+5].d.gem.state |= MI_GSTATE_PASSIVE;
+		menu->items[4*j+6].d.gem.state |= MI_GSTATE_PASSIVE;
+		menu->items[4*j+7].d.gem.state |= MI_GSTATE_PASSIVE;
+	    } else {
+		menu->items[4*j+5].d.gem.state &= ~MI_GSTATE_PASSIVE;
+		menu->items[4*j+6].d.gem.state &= ~MI_GSTATE_PASSIVE;
+		menu->items[4*j+7].d.gem.state &= ~MI_GSTATE_PASSIVE;
+	    }
+
 	    ++j;
 	}
     }
-    for( ; j<=(PlayerMax-3); ++j ) {
+    for (; j<=PlayerMax-3; ++j ) {
 	menu->items[4*j+4].d.text.text = NULL;
 	menu->items[4*j+5].d.gem.state = MI_GSTATE_INVISIBLE;
 	menu->items[4*j+6].d.gem.state = MI_GSTATE_INVISIBLE;
@@ -1961,7 +1971,7 @@ global void DiplomacyMenu(void)
 
     ProcessMenu("menu-diplomacy", 1);
 
-    for( i=0; i<=(PlayerMax-3); ++i ) {
+    for (i=0; i<=PlayerMax-3; ++i) {
 	menu->items[4*i+4].d.text.text = NULL;
     }
 }
@@ -1971,6 +1981,21 @@ global void DiplomacyMenu(void)
 */
 local void DiplomacyWait(Menuitem *mi __attribute__((unused)))
 {
+    int player;
+    int item;
+
+    item = mi - mi->menu->items;
+    player = (item - 4) / 4;
+
+    // Don't allow allies and enemies at the same time
+    if (item == 4*player+5) {
+	mi->menu->items[4*player+5].d.gem.state |= MI_GSTATE_CHECKED;
+	mi->menu->items[4*player+6].d.gem.state &= ~MI_GSTATE_CHECKED;
+    } else if (item == 4*player+6) {
+	mi->menu->items[4*player+5].d.gem.state &= ~MI_GSTATE_CHECKED;
+	mi->menu->items[4*player+6].d.gem.state |= MI_GSTATE_CHECKED;
+    }
+
     // Don't set diplomacy until clicking ok
 }
 
@@ -1986,21 +2011,21 @@ local void DiplomacyOk(void)
     menu = CurrentMenu;
     j = 0;
 
-    for( i=0; i<=(PlayerMax-2); ++i ) {
-	if( Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
+    for (i=0; i<=PlayerMax-2; ++i) {
+	if (Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
 	    // Menu says to ally
-	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_CHECKED &&
-		menu->items[4*j+6].d.gem.state == MI_GSTATE_UNCHECKED ) {
+	    if (menu->items[4*j+5].d.gem.state == MI_GSTATE_CHECKED &&
+		menu->items[4*j+6].d.gem.state == MI_GSTATE_UNCHECKED) {
 		// Are they allied?
-		if( !(ThisPlayer->Allied&(1<<Players[i].Player) &&
+		if (!(ThisPlayer->Allied&(1<<Players[i].Player) &&
 		    !(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
 		    SendCommandDiplomacy(ThisPlayer->Player,DiplomacyAllied,
 			Players[i].Player);
 		}
 	    }
 	    // Menu says to be enemies
-	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_UNCHECKED &&
-		menu->items[4*j+6].d.gem.state == MI_GSTATE_CHECKED ) {
+	    if (menu->items[4*j+5].d.gem.state == MI_GSTATE_UNCHECKED &&
+		menu->items[4*j+6].d.gem.state == MI_GSTATE_CHECKED) {
 		// Are they enemies?
 		if( !(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
 		    ThisPlayer->Enemy&(1<<Players[i].Player))) {
@@ -2009,20 +2034,20 @@ local void DiplomacyOk(void)
 		}
 	    }
 	    // Menu says to be neutral
-	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_UNCHECKED &&
-		menu->items[4*j+6].d.gem.state == MI_GSTATE_UNCHECKED ) {
+	    if (menu->items[4*j+5].d.gem.state == MI_GSTATE_UNCHECKED &&
+		menu->items[4*j+6].d.gem.state == MI_GSTATE_UNCHECKED) {
 		// Are they neutral?
-		if( !(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
+		if (!(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
 		    !(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
 		    SendCommandDiplomacy(ThisPlayer->Player,DiplomacyNeutral,
 			Players[i].Player);
 		}
 	    }
 	    // Menu says to be crazy
-	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_CHECKED &&
-		menu->items[4*j+6].d.gem.state == MI_GSTATE_CHECKED ) {
+	    if (menu->items[4*j+5].d.gem.state == MI_GSTATE_CHECKED &&
+		menu->items[4*j+6].d.gem.state == MI_GSTATE_CHECKED) {
 		// Are they crazy?
-		if( !(ThisPlayer->Allied&(1<<Players[i].Player) &&
+		if (!(ThisPlayer->Allied&(1<<Players[i].Player) &&
 		    ThisPlayer->Enemy&(1<<Players[i].Player))) {
 		    SendCommandDiplomacy(ThisPlayer->Player,DiplomacyCrazy,
 			Players[i].Player);
@@ -2036,7 +2061,7 @@ local void DiplomacyOk(void)
 		}
 	    }
 	    else {
-		if (ThisPlayer->SharedVision&(1<<Players[i].Player) ) {
+		if (ThisPlayer->SharedVision&(1<<Players[i].Player)) {
 		    SendCommandSharedVision(ThisPlayer->Player,0,
 			Players[i].Player);
 		}
@@ -2071,7 +2096,8 @@ local void PreferencesInit(Menuitem *mi __attribute__((unused)))
 	menu->items[1].d.gem.state = MI_GSTATE_UNCHECKED;
     }
 
-    if (NetworkFildes == -1) {		// Not available in net games
+    // Not available in net games or replays
+    if (NetworkFildes == -1 && ReplayGameType != ReplayNone) {
 	menu->items[1].flags = MI_ENABLED;
     } else {
 	menu->items[1].flags = MI_DISABLED;
