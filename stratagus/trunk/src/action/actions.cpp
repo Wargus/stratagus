@@ -10,7 +10,7 @@
 //
 /**@name actions.c	-	The actions. */
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -119,7 +119,9 @@ local void HandleUnitAction(Unit* unit)
 	    //	Release pending references.
 	    //
 	    if( unit->Command.Data.Move.Goal ) {
+#ifdef REFS_DEBUG
 		DebugCheck( !unit->Command.Data.Move.Goal->Refs-- );
+#endif
 		if !--unit->Command.Data.Move.Goal->Refs ) {
 		    ReleaseUnit(unit->Command.Data.Move.Goal);
 		}
