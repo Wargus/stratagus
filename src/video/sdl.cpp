@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sdl.c		-	SDL video support. */
+/**@name sdl.c - SDL video support. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2004 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -233,12 +233,6 @@ global void InitVideoSdl(void)
 		exit(1);
 	}
 
-#ifdef USE_SDL_SURFACE
-//	if (VideoDepth == 8) {
-//		TheScreen->format->palette = &GlobalPalette;
-//	}
-#endif
-
 #ifdef DEBUG
 	if (SDL_MUSTLOCK(TheScreen)) {
 		DebugLevel0Fn("Must locksurface!\n");
@@ -256,30 +250,7 @@ global void InitVideoSdl(void)
 	//		You see it's better making all self, than using wired libaries :)
 	//  And with the win32 version this also doesn't work
 	//
-#ifdef USE_SDL_SURFACE
 	VideoDepth = TheScreen->format->BitsPerPixel;
-#else
-	if (!VideoDepth) {
-		int i;
-		int j;
-
-		DebugLevel3Fn("Mask R%x G%x B%x\n" _C_
-			TheScreen->format->Rmask _C_
-			TheScreen->format->Gmask _C_
-			TheScreen->format->Bmask);
-
-		if (TheScreen->format->BitsPerPixel > 8) {
-			j = TheScreen->format->Rmask | TheScreen->format->Gmask |
-				TheScreen->format->Bmask;
-
-			for (i = 0; j & (1 << i); ++i) {
-			}
-			VideoDepth = i;
-		} else {
-			VideoDepth = TheScreen->format->BitsPerPixel;
-		}
-	}
-#endif
 
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
@@ -288,7 +259,6 @@ global void InitVideoSdl(void)
 	InitOpenGL();
 #endif
 
-#ifdef USE_SDL_SURFACE
 	ColorBlack = SDL_MapRGB(TheScreen->format, 0, 0, 0);
 	ColorDarkGreen = SDL_MapRGB(TheScreen->format, 48, 100, 4);
 	ColorBlue = SDL_MapRGB(TheScreen->format, 0, 0, 252);
@@ -298,17 +268,6 @@ global void InitVideoSdl(void)
 	ColorRed = SDL_MapRGB(TheScreen->format, 252, 0, 0);
 	ColorGreen = SDL_MapRGB(TheScreen->format, 0, 252, 0);
 	ColorYellow = SDL_MapRGB(TheScreen->format, 252, 252, 0);
-#else
-	ColorBlack = VideoMapRGB(0, 0, 0);
-	ColorDarkGreen = VideoMapRGB(48, 100, 4);
-	ColorBlue = VideoMapRGB(0, 0, 252);
-	ColorOrange = VideoMapRGB(248, 140, 20);
-	ColorWhite = VideoMapRGB(252, 248, 240);
-	ColorGray = VideoMapRGB(128, 128, 128);
-	ColorRed = VideoMapRGB(252, 0, 0);
-	ColorGreen = VideoMapRGB(0, 252, 0);
-	ColorYellow = VideoMapRGB(252, 252, 0);
-#endif
 
 	DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
 
@@ -817,123 +776,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 #endif
 }
 
-#ifndef USE_SDL_SURFACE
-/**
-**		Maps RGB to a hardware dependent pixel.
-**
-**		@param r		Red color.
-**		@param g		Green color.
-**		@param b		Blue color.
-**
-**		@return				A hardware dependent pixel.
-*/
-global VMemType VideoMapRGB(int r, int g, int b)
-{
-	VMemType c;
-	unsigned long map;
-
-	DebugCheck(!TheScreen);
-	map = SDL_MapRGB(TheScreen->format, r, g, b);
-
-	memcpy(&c, &map, sizeof(c));
-	return c;
-}
-#endif
-
-#ifdef USE_SDL_SURFACE
-// FIXME: todo
-/*
-global SDL_Palette* VideoCreateNewPalette(const SDL_Palette* palette)
-{
-	SDL_Palette *s;
-	return s;
-}
-*/
-#else
-/**
-**		Create a new hardware dependent palette palette.
-**
-**		@param palette		Hardware independent palette.
-**
-**		@return				A hardware dependent pixel table.
-*/
-global VMemType* VideoCreateNewPalette(const Palette* palette)
-{
-	int i;
-	void* pixels;
-
-	if (!TheScreen) {						// no init
-		return NULL;
-	}
-
-	switch (VideoBpp) {
-		case 8:
-			pixels = malloc(256 * sizeof(VMemType8));
-			break;
-		case 15:
-		case 16:
-			pixels = malloc(256 * sizeof(VMemType16));
-			break;
-		case 24:
-			pixels = malloc(256 * sizeof(VMemType24));
-			break;
-		case 32:
-			pixels = malloc(256 * sizeof(VMemType32));
-			break;
-		default:
-			DebugLevel0Fn("Unknown depth\n");
-			return NULL;
-	}
-
-	//
-	//  Convert each palette entry into hardware format.
-	//
-	for (i = 0; i < 256; ++i) {
-		int r;
-		int g;
-		int b;
-		int v;
-		char* vp;
-
-		r = (palette[i].r) & 0xFF;
-		g = (palette[i].g) & 0xFF;
-		b = (palette[i].b) & 0xFF;
-		v = r + g + b;
-
-		// Boundings
-		r = r < 0 ? 0 : r > 255 ? 255 : r;
-		g = g < 0 ? 0 : g > 255 ? 255 : g;
-		b = b < 0 ? 0 : b > 255 ? 255 : b;
-
-		// -> Video
-		switch (VideoBpp) {
-			case 8:
-				((VMemType8*)pixels)[i] =
-					SDL_MapRGB(TheScreen->format, r, g, b);
-				break;
-			case 15:
-			case 16:
-				((VMemType16*)pixels)[i] =
-					SDL_MapRGB(TheScreen->format, r, g, b);
-				break;
-			case 24:
-				v = SDL_MapRGB(TheScreen->format, r, g, b);
-				vp = (char *)(&v);
-				((VMemType24*)pixels)[i].a = vp[0];		// endian safe ?
-				((VMemType24*)pixels)[i].b = vp[1];
-				((VMemType24*)pixels)[i].c = vp[2];
-				break;
-			case 32:
-				((VMemType32*)pixels)[i] =
-					SDL_MapRGB(TheScreen->format, r, g, b);
-				break;
-		}
-	}
-
-	return pixels;
-}
-#endif
-
 /**
 **		Check video interrupt.
 **
@@ -964,9 +806,6 @@ global void SdlLockScreen(void)
 	if (SDL_MUSTLOCK(TheScreen)) {
 		SDL_LockSurface(TheScreen);
 	}
-#ifndef USE_SDL_SURFACE
-	VideoMemory = TheScreen->pixels;
-#endif
 #endif
 }
 
@@ -979,13 +818,6 @@ global void SdlUnlockScreen(void)
 	if (SDL_MUSTLOCK(TheScreen)) {
 		SDL_UnlockSurface(TheScreen);
 	}
-#ifndef USE_SDL_SURFACE
-#ifdef DEBUG
-	VideoMemory = NULL;						// Catch errors!
-#else
-	VideoMemory = TheScreen->pixels;		// Be kind
-#endif
-#endif
 #endif
 }
 

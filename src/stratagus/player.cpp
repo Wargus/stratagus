@@ -66,13 +66,8 @@ global int NoRescueCheck;				/// Disable rescue check
 /**
 **		Colors used for minimap.		FIXME: make this configurable
 */
-#ifdef USE_SDL_SURFACE
 local SDL_Color PlayerColorsRGB[PlayerMax][4];
 global Uint32 PlayerColors[PlayerMax][4];
-#else
-global VMemType PlayerColorsRGB[PlayerMax][4];
-global VMemType PlayerColors[PlayerMax][4];
-#endif
 
 global char* PlayerColorNames[PlayerMax] = {
 	"red",
@@ -150,15 +145,9 @@ global void InitPlayers(void)
 	// FIXME: remove this
 	for (p = 0; p < PlayerMax; ++p) {
 		for (x = 0; x < 4; ++x) {
-#ifdef USE_SDL_SURFACE
 			PlayerColorsRGB[p][x].r = PColors[p][x].R;
 			PlayerColorsRGB[p][x].g = PColors[p][x].G;
 			PlayerColorsRGB[p][x].b = PColors[p][x].B;
-#else
-			PlayerColorsRGB[p][x].D24.a = PColors[p][x].R;
-			PlayerColorsRGB[p][x].D24.b = PColors[p][x].G;
-			PlayerColorsRGB[p][x].D24.c = PColors[p][x].B;
-#endif
 		}
 	}
 
@@ -168,13 +157,8 @@ global void InitPlayers(void)
 			Players[p].Type = PlayerNobody;
 		}
 		for (x = 0; x < 4; ++x) {
-#ifdef USE_SDL_SURFACE
 			PlayerColors[p][x] = SDL_MapRGB(TheScreen->format, PlayerColorsRGB[p][x].r,
 				PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
-#else
-			PlayerColors[p][x] = VideoMapRGB(PlayerColorsRGB[p][x].D24.a,
-				PlayerColorsRGB[p][x].D24.b, PlayerColorsRGB[p][x].D24.c);
-#endif
 		}
 	}
 }
@@ -919,7 +903,6 @@ global void PlayersEachSecond(int player)
 */
 global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 {
-#ifdef USE_SDL_SURFACE
 	SDL_LockSurface(sprite->Surface);
 	SDL_SetColors(sprite->Surface, ((Player*)player)->UnitColors.Colors, 208, 4);
 	if (sprite->SurfaceFlip) {
@@ -927,27 +910,6 @@ global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 			((Player*)player)->UnitColors.Colors, 208, 4);
 	}
 	SDL_UnlockSurface(sprite->Surface);
-#else
-	switch (VideoBpp) {
-		case 8:
-			*((struct __4pixel8__*)(((VMemType8*)sprite->Pixels) + 208)) =
-				player->UnitColors.Depth8;
-			break;
-		case 15:
-		case 16:
-			*((struct __4pixel16__*)(((VMemType16*)sprite->Pixels) + 208)) =
-				player->UnitColors.Depth16;
-			break;
-		case 24:
-			*((struct __4pixel24__*)(((VMemType24*)sprite->Pixels) + 208)) =
-				player->UnitColors.Depth24;
-			break;
-		case 32:
-			*((struct __4pixel32__*)(((VMemType32*)sprite->Pixels) + 208)) =
-				player->UnitColors.Depth32;
-			break;
-	}
-#endif
 }
 
 /**
@@ -964,53 +926,11 @@ global void SetPlayersPalette(void)
 
 	//o = rand() & 0x7;						// FIXME: random colors didn't work
 	o = 0;
-#ifdef USE_SDL_SURFACE
 	for (i = 0; i < PlayerMax; ++i) {
 		memcpy(Players[o].UnitColors.Colors, PlayerColorsRGB[i],
 			sizeof(SDL_Color) * 4);
 		o = (o + 1) % PlayerMax;
 	}
-#else
-	switch (VideoBpp) {
-	case 8:
-		for (i = 0; i < PlayerMax; ++i) {
-			Players[o].UnitColors.Depth8.Pixels[0] = PlayerColors[i][0].D8;
-			Players[o].UnitColors.Depth8.Pixels[1] = PlayerColors[i][1].D8;
-			Players[o].UnitColors.Depth8.Pixels[2] = PlayerColors[i][2].D8;
-			Players[o].UnitColors.Depth8.Pixels[3] = PlayerColors[i][3].D8;
-			o = (o + 1) % PlayerMax;
-		}
-		break;
-	case 15:
-	case 16:
-		for (i = 0; i < PlayerMax; ++i) {
-			Players[o].UnitColors.Depth16.Pixels[0] = PlayerColors[i][0].D16;
-			Players[o].UnitColors.Depth16.Pixels[1] = PlayerColors[i][1].D16;
-			Players[o].UnitColors.Depth16.Pixels[2] = PlayerColors[i][2].D16;
-			Players[o].UnitColors.Depth16.Pixels[3] = PlayerColors[i][3].D16;
-			o = (o + 1) % PlayerMax;
-		}
-		break;
-	case 24:
-		for (i = 0; i < PlayerMax; ++i) {
-			Players[o].UnitColors.Depth24.Pixels[0] = PlayerColors[i][0].D24;
-			Players[o].UnitColors.Depth24.Pixels[1] = PlayerColors[i][1].D24;
-			Players[o].UnitColors.Depth24.Pixels[2] = PlayerColors[i][2].D24;
-			Players[o].UnitColors.Depth24.Pixels[3] = PlayerColors[i][3].D24;
-			o = (o + 1) % PlayerMax;
-		}
-		break;
-	case 32:
-		for (i = 0; i < 7; ++i) {
-			Players[o].UnitColors.Depth32.Pixels[0] = PlayerColors[i][0].D32;
-			Players[o].UnitColors.Depth32.Pixels[1] = PlayerColors[i][1].D32;
-			Players[o].UnitColors.Depth32.Pixels[2] = PlayerColors[i][2].D32;
-			Players[o].UnitColors.Depth32.Pixels[3] = PlayerColors[i][3].D32;
-			o = (o + 1) % PlayerMax;
-		}
-		break;
-	}
-#endif
 }
 
 /**

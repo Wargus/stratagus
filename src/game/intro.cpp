@@ -402,13 +402,7 @@ global void ShowIntro(const Intro* intro)
 	GameCursor = TheUI.Point.Cursor;
 	DestroyCursorBackground();
 
-#ifdef USE_SDL_SURFACE
 	VideoClearScreen();
-#else
-	VideoLockScreen();
-	VideoClearScreen();
-	VideoUnlockScreen();
-#endif
 
 	old_video_sync = VideoSyncSpeed;
 	VideoSyncSpeed = 100;
@@ -492,9 +486,6 @@ global void ShowIntro(const Intro* intro)
 			}
 		}
 #endif
-#ifndef USE_SDL_SURFACE
-		VideoLockScreen();
-#endif
 		HideAnyCursor();
 		//
 		// Draw background
@@ -536,10 +527,6 @@ global void ShowIntro(const Intro* intro)
 		DrawContinueButton();
 		DrawAnyCursor();
 
-#ifndef USE_SDL_SURFACE
-		VideoUnlockScreen();
-#endif
-
 		if (!line && !c) {
 			Invalidate();
 		} else {
@@ -573,13 +560,7 @@ global void ShowIntro(const Intro* intro)
 	free(text);
 	VideoFree(background);
 
-#ifdef USE_SDL_SURFACE
 	VideoClearScreen();
-#else
-	VideoLockScreen();
-	VideoClearScreen();
-	VideoUnlockScreen();
-#endif
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
@@ -608,13 +589,7 @@ global void ShowCredits(Credits* credits)
 	TextLines* scrolling_credits;
 	int old_video_sync;
 
-#ifdef USE_SDL_SURFACE
 	VideoClearScreen();
-#else
-	VideoLockScreen();
-	VideoClearScreen();
-	VideoUnlockScreen();
-#endif
 
 	old_video_sync = VideoSyncSpeed;
 	VideoSyncSpeed = 100;
@@ -659,9 +634,6 @@ global void ShowCredits(Credits* credits)
 	scrolling = 1;
 	while (1) {
 
-#ifndef USE_SDL_SURFACE
-		VideoLockScreen();
-#endif
 		HideAnyCursor();
 
 		//
@@ -683,10 +655,6 @@ global void ShowCredits(Credits* credits)
 
 		DrawContinueButton();
 		DrawAnyCursor();
-
-#ifndef USE_SDL_SURFACE
-		VideoUnlockScreen();
-#endif
 
 		// FIXME: update only the changed area!!!!
 
@@ -715,13 +683,7 @@ global void ShowCredits(Credits* credits)
 		VideoFree(background);
 	}
 
-#ifdef USE_SDL_SURFACE
 	VideoClearScreen();
-#else
-	VideoLockScreen();
-	VideoClearScreen();
-	VideoUnlockScreen();
-#endif
 	DestroyCursorBackground();
 
 	VideoSyncSpeed = old_video_sync;
@@ -821,20 +783,13 @@ global void ShowPicture(CampaignChapter* chapter)
 	i = 0;
 	max = chapter->Data.Picture.FadeIn;
 	while (IntroNoEvent && i < max) {
-#ifdef USE_SDL_SURFACE
 		VideoClearScreen();
-#else
-		VideoLockScreen();
-#endif
 		VideoDrawSubClipFaded(background, 0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2,
 			255 * i / max);
 		PictureDrawText(chapter, lines);
-#ifndef USE_SDL_SURFACE
-		VideoUnlockScreen();
-#endif
 
 		Invalidate();
 		RealizeVideoMemory();
@@ -850,17 +805,11 @@ global void ShowPicture(CampaignChapter* chapter)
 	j = 0;
 	max = chapter->Data.Picture.DisplayTime;
 	while (IntroNoEvent && j < max) {
-#ifndef USE_SDL_SURFACE
-		VideoLockScreen();
-#endif
 		VideoDrawSubClip(background, 0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2);
 		PictureDrawText(chapter, lines);
-#ifndef USE_SDL_SURFACE
-		VideoUnlockScreen();
-#endif
 
 		Invalidate();
 		RealizeVideoMemory();
@@ -874,20 +823,13 @@ global void ShowPicture(CampaignChapter* chapter)
 	//
 	max = chapter->Data.Picture.FadeOut;
 	while (i >= 0) {
-#ifdef USE_SDL_SURFACE
 		VideoClearScreen();
-#else
-		VideoLockScreen();
-#endif
 		VideoDrawSubClipFaded(background, 0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2,
 			255 * i / max);
 		PictureDrawText(chapter, lines);
-#ifndef USE_SDL_SURFACE
-		VideoUnlockScreen();
-#endif
 
 		Invalidate();
 		RealizeVideoMemory();
@@ -907,13 +849,7 @@ global void ShowPicture(CampaignChapter* chapter)
 		lines = ptr;
 	}
 
-#ifdef USE_SDL_SURFACE
 	VideoClearScreen();
-#else
-	VideoLockScreen();
-	VideoClearScreen();
-	VideoUnlockScreen();
-#endif
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
@@ -923,11 +859,7 @@ global void ShowPicture(CampaignChapter* chapter)
 /**
 **  Draw a box with the text inside
 */
-#ifdef USE_SDL_SURFACE
 local void DrawStatBox(int x, int y, char* text, Uint32 color, int percent)
-#else
-local void DrawStatBox(int x, int y, char* text, VMemType color, int percent)
-#endif
 {
 	VideoFillRectangleClip(ColorBlack, x, y, 80, 24);
 	VideoDrawRectangleClip(ColorYellow, x + 1, y + 1, 78, 22);
@@ -1349,17 +1281,11 @@ global void ShowStats(void)
 #endif
 	}
 
-#ifndef USE_SDL_SURFACE
-	VideoLockScreen();
-#endif
 	VideoClearScreen();
 	if (background) {
 		VideoDrawSubClip(background, 0, 0, background->Width, background->Height,
 			(VideoWidth - background->Width) / 2, (VideoHeight - background->Height) / 2);
 	}
-#ifndef USE_SDL_SURFACE
-	VideoUnlockScreen();
-#endif
 
 	UseContinueButton = 1;
 	InitContinueButton(TheUI.Offset640X + 455, TheUI.Offset480Y + 440);
@@ -1371,9 +1297,6 @@ global void ShowStats(void)
 	IntroNoEvent = 1;
 	IntroButtonPressed = 0;
 	while (1) {
-#ifndef USE_SDL_SURFACE
-		VideoLockScreen();
-#endif
 		HideAnyCursor();
 #ifdef USE_OPENGL
 		if (background) {
@@ -1388,9 +1311,6 @@ global void ShowStats(void)
 #endif
 		DrawContinueButton();
 		DrawAnyCursor();
-#ifndef USE_SDL_SURFACE
-		VideoUnlockScreen();
-#endif
 
 		Invalidate();
 		RealizeVideoMemory();

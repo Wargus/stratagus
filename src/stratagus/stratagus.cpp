@@ -533,13 +533,7 @@ local void WaitForInput(int timeout)
 		WaitEventsOneFrame(&callbacks);
 	}
 
-#ifdef USE_SDL_SURFACE
 	VideoClearScreen();
-#else
-	VideoLockScreen();
-	VideoClearScreen();
-	VideoUnlockScreen();
-#endif
 	Invalidate();
 	RealizeVideoMemory();
 }
@@ -560,9 +554,6 @@ global void ShowLoadProgress(const char* fmt, ...)
 	va_end(va);
 
 	if (VideoDepth && IsFontLoaded(GameFont)) {
-#ifndef USE_SDL_SURFACE
-		VideoLockScreen();
-#endif
 		// Remove non printable chars
 		for (s = temp; *s; ++s) {
 			if (*s < 32) {
@@ -571,9 +562,6 @@ global void ShowLoadProgress(const char* fmt, ...)
 		}
 		VideoFillRectangle(ColorBlack, 5, VideoHeight - 18, VideoWidth - 10, 18);
 		VideoDrawTextCentered(VideoWidth / 2, VideoHeight - 16, GameFont, temp);
-#ifndef USE_SDL_SURFACE
-		VideoUnlockScreen();
-#endif
 		InvalidateArea(5, VideoHeight - 18, VideoWidth - 10, 18);
 		RealizeVideoMemory();
 	} else {
@@ -620,15 +608,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 		//
 		//  Clear screen
 		//
-#ifdef USE_SDL_SURFACE
 		VideoClearScreen();
 		Invalidate();
-#else
-		VideoLockScreen();
-		VideoClearScreen();
-		VideoUnlockScreen();
-		Invalidate();
-#endif
 		RealizeVideoMemory();
 
 		//
@@ -758,9 +739,6 @@ local void PrintHeader(void)
 #ifdef USE_SDL
 	"SDL "
 #endif
-#ifdef USE_SDL_SURFACE
-	"SDL-SURFACE "
-#endif
 #ifdef USE_SDLA
 	"SDL-AUDIO "
 #endif
@@ -863,9 +841,6 @@ Use it at your own risk.\n\n");
 				DisplayPicture(TitleScreens[i]->File);
 				labels = TitleScreens[i]->Labels;
 				if (labels && labels[0] && IsFontLoaded(labels[0]->Font)) {
-#ifndef USE_SDL_SURFACE
-					VideoLockScreen();
-#endif
 					for (j = 0; labels[j]; ++j) {
 						x = labels[j]->Xofs * VideoWidth / 640;
 						y = labels[j]->Yofs * VideoWidth / 640;
@@ -874,9 +849,6 @@ Use it at your own risk.\n\n");
 						}
 						VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
 					}
-#ifndef USE_SDL_SURFACE
-					VideoUnlockScreen();
-#endif
 				}
 				Invalidate();
 				RealizeVideoMemory();

@@ -162,9 +162,7 @@ global void LoadMissileSprites(void)
 			ShowLoadProgress("Missile %s", file);
 			MissileTypes[i].Sprite = LoadSprite(
 				file, MissileTypes[i].Width, MissileTypes[i].Height);
-#ifdef USE_SDL_SURFACE
 			FlipGraphic(MissileTypes[i].Sprite);
-#endif
 
 			// Correct the number of frames in graphic
 			DebugCheck(MissileTypes[i].Sprite->NumFrames < MissileTypes[i].SpriteFrames);

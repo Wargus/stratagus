@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unittype.c	-	The unit types. */
+/**@name unittype.c - The unit types. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -782,15 +782,9 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 		CLprintf(file, "  'not-selectable\n");
 	}
 
-#ifdef USE_SDL_SURFACE
 	CLprintf(file, "  'neutral-minimap-color '(%d %d %d)\n",
 		type->NeutralMinimapColorRGB.r,type->NeutralMinimapColorRGB.g,
 		type->NeutralMinimapColorRGB.b);
-#else
-	CLprintf(file, "  'neutral-minimap-color '(%d %d %d)\n",
-		type->NeutralMinimapColorRGB.D24.a,type->NeutralMinimapColorRGB.D24.b,
-		type->NeutralMinimapColorRGB.D24.c);
-#endif
 
 	CLprintf(file, "  'sight-range %d", type->_SightRange);
 	if (all || type->ReactRangeComputer) {
@@ -1378,9 +1372,7 @@ global void LoadUnitTypes(void)
 			ShowLoadProgress("Unit `%s'", file);
 			type->ShadowSprite = LoadSprite(file, type->ShadowWidth,
 				type->ShadowHeight);
-#ifdef USE_SDL_SURFACE
 			FlipGraphic(type->ShadowSprite);
-#endif
 		}
 
 		//  Load empty/loaded graphics
@@ -1392,18 +1384,14 @@ global void LoadUnitTypes(void)
 						ShowLoadProgress("Unit `%s'", file);
 						resinfo->SpriteWhenLoaded = LoadSprite(file, type->Width,
 							type->Height);
-#ifdef USE_SDL_SURFACE
 						FlipGraphic(resinfo->SpriteWhenLoaded);
-#endif
 					}
 					if ((file = resinfo->FileWhenEmpty)) {
 						file = strcat(strcpy(buf, "graphics/"), file);
 						ShowLoadProgress("Unit `%s'", file);
 						resinfo->SpriteWhenEmpty = LoadSprite(file, type->Width,
 							type->Height);
-#ifdef USE_SDL_SURFACE
 						FlipGraphic(resinfo->SpriteWhenEmpty);
-#endif
 					}
 				}
 			}
@@ -1431,9 +1419,7 @@ global void LoadUnitTypes(void)
 			file = strcat(strcpy(buf, "graphics/"), file);
 			ShowLoadProgress("Unit `%s'", file);
 			type->Sprite = LoadSprite(file, type->Width, type->Height);
-#ifdef USE_SDL_SURFACE
 			FlipGraphic(type->Sprite);
-#endif
 		}
 	}
 

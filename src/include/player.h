@@ -346,11 +346,7 @@ struct _player_ {
 	int    TotalKills;      /// How many unit killed
 
 // Display video
-#ifdef USE_SDL_SURFACE
 	Uint32 Color;  /// color of units on minimap
-#else
-	VMemType Color;  /// color of units on minimap
-#endif
 
 	UnitColors UnitColors;  /// Unit colors for new units
 
@@ -462,11 +458,7 @@ extern int NumPlayers;             /// How many player slots used
 extern Player Players[PlayerMax];  /// All players
 extern Player* ThisPlayer;         /// Player on local computer
 extern int NoRescueCheck;          /// Disable rescue check
-#ifdef USE_SDL_SURFACE
 extern Uint32 PlayerColors[PlayerMax][4];
-#else
-extern VMemType PlayerColors[PlayerMax][4];   /// Player colors
-#endif
 extern char* PlayerColorNames[PlayerMax];  /// Player color names
 
 extern PlayerRace PlayerRaces;  /// Player races
