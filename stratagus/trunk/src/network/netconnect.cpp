@@ -75,7 +75,7 @@ global unsigned char NetLocalState;	/// Network menu: Local Server/Client connec
 
 local int NetStateMsgCnt;		/// Number of consecutive msgs of same type sent
 local unsigned char LastStateMsgType;	/// Subtype of last InitConfig message sent
-local struct timeval NetLastPacketSent;	/// Time the last network packet was sent
+local unsigned long NetLastPacketSent;	/// Tick the last network packet was sent
 local unsigned long NetworkServerIP;	/// Network Client: IP of server to join
 
 /// FIXME ARI: The following is a kludge to have some way to override the default port
@@ -612,6 +612,22 @@ local int NetworkSendICMessage(unsigned long host, int port, InitMessage *msg)
     return NetSendUDP(NetworkFildes, host, port, msg, sizeof(*msg));
 }
 
+#ifdef DEBUG
+char *ncconstatenames[] = {
+    "ccs_unused",
+    "ccs_connecting",		/* new client */
+    "ccs_connected",		/* has received slot info */
+    "ccs_mapinfo",		/* has received matching map-info */
+    "ccs_badmap",		/* has received non-matching map-info */
+    "ccs_synced",
+    "ccs_async",		/* server user has changed selection */
+    "ccs_changed",		/* client user has made menu selection */
+    "ccs_detaching",		/* client user wants to detach */
+    "ccs_disconnected",		/* client has detached */
+    "ccs_unreachable",
+};
+#endif
+
 /**
 **	Send a message to the server, but only if the last packet was a while ago
 **
@@ -620,17 +636,11 @@ local int NetworkSendICMessage(unsigned long host, int port, InitMessage *msg)
 */
 local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
 {
-    struct timeval now;
-    unsigned long s, u, d;
+    unsigned long now;
     int n;
 
-#ifndef USE_WIN32
-    gettimeofday(&now, NULL);
-#endif
-    s = now.tv_sec - NetLastPacketSent.tv_sec;
-    u = now.tv_usec - NetLastPacketSent.tv_usec;
-    d = s * 1000 + u / 1000;
-    if (d  >= msecs) {
+    now = GetTicks();
+    if (now - NetLastPacketSent >= msecs) {
 	NetLastPacketSent = now;
 	if (msg->SubType == LastStateMsgType) {
 	    NetStateMsgCnt++;
@@ -639,8 +649,8 @@ local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
 	    LastStateMsgType = msg->SubType;
 	}
 	n = NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), msg);
-	DebugLevel0Fn("Sending Init Message (%d:%d): %d:%d(%d) %d.%d.%d.%d:%d\n",
-		NetLocalState, NetStateMsgCnt, msg->Type, msg->SubType, n,
+	DebugLevel0Fn("Sending Init Message (%s:%d): %d:%d(%d) %d.%d.%d.%d:%d\n",
+		ncconstatenames[NetLocalState], NetStateMsgCnt, msg->Type, msg->SubType, n,
 		NIPQUAD(ntohl(NetworkServerIP)), NetworkServerPort);
     }
 }
@@ -678,9 +688,7 @@ global void NetworkInitClientConnect(void)
     int i;
 
     NetConnectRunning = 2;
-#ifndef USE_WIN32
-    gettimeofday(&NetLastPacketSent, NULL);
-#endif
+    NetLastPacketSent = GetTicks();
     NetLocalState = ccs_connecting;
     NetStateMsgCnt = 0;
     LastStateMsgType = ICMServerQuit;
@@ -987,7 +995,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    NetLocalState = ccs_connected;
 			    NetStateMsgCnt = 0;
 			    NetLocalHostsSlot = msg->u.Hosts[0].PlyNr;
-			    memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, 16);	/// Name of server player
+			    memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, 16); /// Name of server player
 			    Hosts[0].Host = NetworkServerIP;
 			    Hosts[0].Port = htons(NetworkServerPort);
 			    HostsCount = msg->HostsCount;
@@ -1082,7 +1090,21 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		case ccs_async:
 		    switch(msg->SubType) {
 
-			case ICMResync:		/// Server has resynced with us
+			case ICMResync:		/// Server has resynced with us and sends resync data
+			    HostsCount = msg->HostsCount;
+			    for (i = 1; i < HostsCount; i++) {
+				if (i != NetLocalHostsSlot) {
+				    Hosts[i].Host = msg->u.Hosts[i].Host;
+				    Hosts[i].Port = msg->u.Hosts[i].Port;
+				    Hosts[i].PlyNr = msg->u.Hosts[i].PlyNr;
+				    memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
+				    DebugLevel3Fn("Other client %d: %s\n", Hosts[i].PlyNr, Hosts[i].PlyName);
+				} else {
+				    Hosts[i].PlyNr = i;
+				    memcpy(Hosts[i].PlyName, NetworkName, 16);
+				}
+			    }
+			    NetClientUpdateState();
 			    NetLocalState = ccs_synced;
 			    NetStateMsgCnt = 0;
 			    break;
@@ -1197,7 +1219,6 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		    // FIXME: Client sends hellos, but doesn't receive our welcome acks....
 		    ;
 		}
-		// FIXME: Resync other clients here!
 		NetConnectForceDisplayUpdate();
 		return;
 
@@ -1217,6 +1238,14 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				message.Type = MessageInitReply;
 				message.SubType = ICMResync;
 				message.HostsCount = (char)(HostsCount & 0xff);
+				for (i = 1; i < HostsCount; i++) {	/// Info about other clients
+				    if (i != h) {
+					message.u.Hosts[i].Host = Hosts[i].Host;
+					message.u.Hosts[i].Port = Hosts[i].Port;
+					message.u.Hosts[i].PlyNr = Hosts[i].PlyNr;
+					memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+				    }
+				}
 				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 				DebugLevel0Fn("Sending InitReply Message Resync: (%d) to %d.%d.%d.%d:%d\n",
 					    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
@@ -1269,6 +1298,12 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    case ccs_mapinfo:
 				NetStates[h].State = ccs_synced;
 				NetStates[h].MsgCnt = 0;
+				for (i = 1; i < HostsCount; i++) {
+				    if (i != h) {
+					// Notify other clients
+					NetStates[i].State = ccs_async;
+				    }
+				}
 				/* Fall through */
 			    case ccs_synced:
 				/// the wanted state - do nothing.. until start...
@@ -1277,6 +1312,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 			    case ccs_async:
 				/// Server User has changed menu selection. This state is set by MENU code
+				/// OR we have received a new client/other client has changed data
 				
 				/// this code path happens until client acknoledges the state change
 				/// by sending ICMResync

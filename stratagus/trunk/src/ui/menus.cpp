@@ -2297,6 +2297,7 @@ global void NetClientUpdateState(void)
     NetMultiClientMenuItems[22].d.pulldown.curopt = ServerSetupState.TssOpt;
 
     MultiClientUpdate(0);
+    DebugLevel1Fn("MultiClientMenuRedraw\n");
 
     MustRedraw |= RedrawMenu;
 }
