@@ -4699,6 +4699,7 @@ local void EditorMainLoadMap(void)
     }
 
     // FIXME: Use EditorRunning and main-loop.
+    EditorRunning=1;
     EditorMainLoop();
     EndMenu();
 }
