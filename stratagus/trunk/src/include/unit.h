@@ -10,7 +10,7 @@
 //
 /**@name unit.h - The unit headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -390,7 +390,6 @@
 ----------------------------------------------------------------------------*/
 
 typedef struct _unit_ Unit;            ///< unit itself
-typedef enum _unit_action_ UnitAction; ///< all possible unit actions
 #ifdef USE_OPENGL
 struct _graphic_;
 #endif
@@ -418,7 +417,7 @@ typedef unsigned short UnitRef;
 **
 **  @see HandleActionTable
 */
-enum _unit_action_ {
+typedef enum _unit_action_ {
 	UnitActionNone,         ///< No valid action
 
 	UnitActionStill,        ///< unit stand still, does nothing
@@ -445,7 +444,7 @@ enum _unit_action_ {
 	UnitActionRepair,       ///< unit repairing
 	UnitActionResource,     ///< unit harvesting resources
 	UnitActionReturnGoods   ///< unit returning any resource
-};
+} UnitAction;
 
 /**
 **  Unit order structure.
