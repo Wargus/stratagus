@@ -811,6 +811,7 @@ global void TriggersEachCycle(void)
 		    setcar(trig,NIL);
 		    setcdr(trig,NIL);
 		}
+		Trigger=trig;
 	    }
 	}
     } else {
