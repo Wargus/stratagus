@@ -58,6 +58,7 @@
 <a href="#DefineCampaign">DefineCampaign</a>
 <a href="#DefineConstruction">DefineConstruction</a>
 <a href="#DefineEditorUnitTypes">DefineEditorUnitTypes</a>
+<a href="#DefinePlayerColors">DefinePlayerColors</a>
 <a href="#DefineRaceNames">DefineRaceNames</a>
 <a href="#DefineRanks">DefineRanks</a>
 <a href="#Diplomacy">Diplomacy</a>
@@ -478,6 +479,31 @@ DefineEditorUnitTypes(
    "unit-camp",
    "unit-hosp"
 )
+</pre>
+
+<a name="DefinePlayerColors"></a>
+<h3>DefinePlayerColors({"color", {{R, G, B}, {R, G, B}, {R, G, B}, {R, G, B}}, ...})</h3>
+
+Define the player colors.  There should be 16 colors defined and 4 shades of each color.
+
+<dl>
+<dt>color</dt>
+<dd>Name of the player color
+</dd>
+<dt>R, G, B</dt>
+<dd>Red, green, blue values for each color
+</dd>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefinePlayerColors({
+      "red", {{164, 0, 0}, {124, 0, 0}, {92, 4, 0}, {68, 4, 0}},
+      "blue", {...},
+      ...
+    )
 </pre>
 
 <a name="DefineRaceNames"></a>
