@@ -207,7 +207,7 @@ local void AiCheckUnits(void)
 	if( !AiPlayer->Player->Units[i]->Active ) {
 	    counter[AiPlayer->Player->Units[i]->Type->Type]--;
 	    DebugLevel3Fn("Removing non active unit: %s\n" _C_
-		    AiPlayer->Player->Units[i]->Type->Ident); 
+		    AiPlayer->Player->Units[i]->Type->Ident);
 	}
     }
     unit_types_count=AiPlayer->Player->UnitTypesCount;
@@ -231,7 +231,7 @@ local void AiCheckUnits(void)
 		e+=unit_types_count[AiHelpers.Equiv[t]->Table[j]->Type];
 	    }
 	}
-	
+
 	if( x>e+counter[t] ) {	// Request it.
 	    DebugLevel3Fn("Need %s *%d\n" _C_
 		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident,x);
@@ -282,7 +282,7 @@ local void AiCheckUnits(void)
 		e+=unit_types_count[AiHelpers.Equiv[t]->Table[j]->Type];
 	    }
 	}
-	
+
 	if( x>e+counter[t] ) {	// Request it.
 	    AiAddUpgradeToRequest(AiPlayer->UpgradeToRequests[i]);
 	    counter[t]+=x-e-counter[t];
@@ -309,6 +309,19 @@ local void AiCheckUnits(void)
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	Save state of AI to file.
+**
+**	@param file	Output file.
+*/
+global void SaveAi(FILE* file)
+{
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: AI $Id$\n\n");
+
+    DebugLevel0Fn("FIXME: Saving AI isn't supported\n");
+}
 
 /**
 **      Setup all at start.
@@ -366,6 +379,98 @@ global void AiInit(Player* player)
     pai->Script=ait->Script;
 
     player->Ai=pai;
+}
+
+/**
+**	Cleanup the AI.
+*/
+local void CleanAi(void)
+{
+    int i;
+    int p;
+    PlayerAi* pai;
+    AiType* temp;
+    AiType* aitype;
+
+    for( p=0; p<PlayerMax; ++p ) {
+	if( (pai=Players[p].Ai) ) {
+	    DebugLevel0Fn("FIXME: Cleaning the AI isn't complete written.\n");
+
+	    // Must free forces
+	    for( i=0; i<AI_MAX_FORCES; ++i ) {
+	    }
+	    // Must free UnitTypeRequests
+	    // Must free UpgradeRequests
+	    // Must free ResearchRequests
+	    // Must free UnitTypeBuilded
+
+	    free(pai);
+	    Players[p].Ai=NULL;
+	}
+    }
+
+    //
+    //	Free AiTypes.
+    //
+    for( aitype=AiTypes; aitype; aitype=temp ) {
+	free(aitype->Name);
+	free(aitype->Race);
+	free(aitype->Class);
+
+	temp=aitype->Next;
+	free(aitype);
+    }
+    AiTypes=NULL;
+
+    //
+    //	Free AiHelpers.
+    //
+    for( i=0; i<AiHelpers.TrainCount; ++i ) {
+	free(AiHelpers.Train[i]);
+    }
+    free(AiHelpers.Train);
+
+    for( i=0; i<AiHelpers.BuildCount; ++i ) {
+	free(AiHelpers.Build[i]);
+    }
+    free(AiHelpers.Build);
+
+    for( i=0; i<AiHelpers.UpgradeCount; ++i ) {
+	free(AiHelpers.Upgrade[i]);
+    }
+    free(AiHelpers.Upgrade);
+
+    for( i=0; i<AiHelpers.ResearchCount; ++i ) {
+	free(AiHelpers.Research[i]);
+    }
+    free(AiHelpers.Research);
+
+    for( i=0; i<AiHelpers.RepairCount; ++i ) {
+	free(AiHelpers.Repair[i]);
+    }
+    free(AiHelpers.Repair);
+
+    for( i=0; i<AiHelpers.CollectCount; ++i ) {
+	free(AiHelpers.Collect[i]);
+    }
+    free(AiHelpers.Collect);
+
+    for( i=0; i<AiHelpers.WithGoodsCount; ++i ) {
+	free(AiHelpers.WithGoods[i]);
+    }
+    free(AiHelpers.WithGoods);
+
+    for( i=0; i<AiHelpers.UnitLimitCount; ++i ) {
+	free(AiHelpers.UnitLimit[i]);
+    }
+    free(AiHelpers.UnitLimit);
+
+    for( i=0; i<AiHelpers.EquivCount; ++i ) {
+	free(AiHelpers.Equiv[i]);
+    }
+    free(AiHelpers.Equiv);
+
+    memset(&AiHelpers,0,sizeof(AiHelpers));
 }
 
 /*----------------------------------------------------------------------------

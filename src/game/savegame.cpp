@@ -49,6 +49,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "player.h"
+#include "ai.h"
 
 #include "ccl.h"
 
@@ -102,7 +103,7 @@ global void SaveGame(const char* filename)
     SaveSelections(file);
     SaveGroups(file);
     SaveMissiles(file);
-    //SaveAI(file);
+    SaveAi(file);
 
     // FIXME: find all state information which must be saved.
 
