@@ -282,14 +282,17 @@ local SCM CclCenterMap(SCM x,SCM y)
 **	@param	y	Y tile location.
 **	@param	radius	radius of view.
 **	@param	cycle	cycles show vision for.
+**	@param	unit	name of unit to use for showing map
 */
-local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle)
+local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle, SCM unit)
 {
     Unit* target;
-    //Put a revealer unit on the map, at this location
-    //time to cycle, and radius to mark.
-    // FIXME: Don't use UnitTypeByIdent during runtime.
-    target = MakeUnit(UnitTypeByIdent("unit-revealer"), ThisPlayer);
+    char* unitname;
+    // Put a unit on map, use it's properties, except for
+    // what is listed below
+
+    unitname = gh_scm2newstr(unit,NULL);
+    target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
     target->Orders[0].Action = UnitActionStill;
     target->HP = 0;
     target->X = gh_scm2int(x);
@@ -297,6 +300,7 @@ local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle)
     target->TTL=GameCycle+gh_scm2int(cycle);
     target->CurrentSightRange=gh_scm2int(radius);
     MapMarkUnitSight(target);
+    free(unitname);
     return SCM_UNSPECIFIED;
 }
 /**
@@ -540,7 +544,7 @@ global void MapCclRegister(void)
     gh_new_procedureN("stratagus-map",CclStratagusMap);
     gh_new_procedure0_0("reveal-map",CclRevealMap);
     gh_new_procedure2_0("center-map",CclCenterMap);
-    gh_new_procedure4_0("show-map-location",CclShowMapLocation);
+    gh_new_procedure5_0("show-map-location",CclShowMapLocation);
 
     gh_new_procedure1_0("set-default-map!",CclSetDefaultMap);
     gh_new_procedure1_0("set-fog-of-war!",CclSetFogOfWar);

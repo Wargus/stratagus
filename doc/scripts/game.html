@@ -1466,22 +1466,32 @@ Sets shared vision for the player at the computer.
 <h4>Not Used</h4>
 
 <a name="show-map-location"></a>
-<h3>(show-map-location x y radius cycles)</h3>
+<h3>(show-map-location x y radius cycles unit)</h3>
 
 Show an area on the map for the given player.
 
 
 <dl>
-<dt></dt>
-<dd>.
-</dd>
+<dt>x</dt>
+<dd>X position on the map to show.</dd>
+<dt>y</dt>
+<dd>Y position on the map to show.</dd>
+<dt>radius</dt>
+<dd>Radius of vision to show.</dd>
+<dt>cycles</dt>
+<dd>The number of game cycles that the area should be shown for</dd>
+<dt>unit</dt>
+<dd>The unit to use for displaying the sight range. Most properties of the unit
+    will be used in the display, whether they can see cloaked units or not.
+    Square Vision can also be achived by creating a large unit, say 10x10 and
+    specifying the radius to be 1</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    ;; Show an area of 6 tiles around location (10,10) for 500 cycles.
-    (show-map-location 10 10 6 500)
+    ;; Show an area of 6 tiles around location (10,10) for 500 cycles using 'unit-revealer.
+    (show-map-location 10 10 6 500 'unit-revealer)
 </pre>
 
 <h4>Not Used</h4>
