@@ -464,8 +464,8 @@ global void DrawMinimapCursor(int vx,int vy)
 	    (vx*MinimapScale)/MINIMAP_FAC;
     OldMinimapCursorY=y=TheUI.MinimapY+2+MinimapY+
 	    (vy*MinimapScale)/MINIMAP_FAC;
-    OldMinimapCursorW=w=(MapWidth*MinimapScale)/MINIMAP_FAC-1;
-    OldMinimapCursorH=h=(MapHeight*MinimapScale)/MINIMAP_FAC-1;
+    OldMinimapCursorW=w=(MapWidth*MinimapScale)/MINIMAP_FAC;
+    OldMinimapCursorH=h=(MapHeight*MinimapScale)/MINIMAP_FAC;
 
     switch( VideoBpp ) {
 	case 8:
