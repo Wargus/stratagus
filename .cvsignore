@@ -27,6 +27,7 @@ screen*
 autom4te.cache
 config.status
 configure
+configure.lineno
 aclocal.m4
 config.h
 config.h.in
