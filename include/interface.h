@@ -199,6 +199,8 @@ enum _scroll_state_ {
 extern char GameRunning;
     /// Flag telling if the game is paused
 extern char GamePaused;
+    /// Flag allow giving orders in pause mode.
+extern char OrdersDuringPause;
     /// Flag telling not to advance to the next game cycle
 extern char SkipGameCycle;
 
