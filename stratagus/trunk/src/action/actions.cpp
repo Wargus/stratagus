@@ -530,7 +530,7 @@ void UnitActions(void)
 
 		HandleUnitAction(unit);
 
-#ifdef DEBUG
+#ifdef DEBUG_LOG
 		//
 		// Dump the unit to find the network sync bugs.
 		//
@@ -541,7 +541,7 @@ void UnitActions(void)
 			time_t now;
 			char buf[256];
 
-			sprintf(buf, "log_of_fc_%d.log", ThisPlayer->Player);
+			sprintf(buf, "log_of_stratagus_%d.log", ThisPlayer->Player);
 			logf = fopen(buf, "wb");
 			if (!logf) {
 				return;
