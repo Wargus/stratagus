@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+	<!--
+	----	(c) Copyright 2004 by Crestez Leonard
+
+	----    This program is free software; you can redistribute it and/or modify
+	----    it under the terms of the GNU General Public License as published by
+	----    the Free Software Foundation; version 2 dated June, 1991.
+	----
+	----    This program is distributed in the hope that it will be useful,
+	----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+	----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	----    GNU General Public License for more details.
+	----
+	----    You should have received a copy of the GNU General Public License
+	----    along with this program; if not, write to the Free Software
+	----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+	----    02111-1307, USA.
+	-->
+	<title>Stratagus Scripting Language Description: Content</title>
+	<meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+	<meta name="Author" content="cleonard@go.ro">
+	<meta name="Keyword" content="scripting">
+	<meta name="Description" content="Documentation for Stratagus.MissileTypes.*">
+</head><body>
+    <h1>Stratagus Scripting Language: Stratagus.MissileTypes.*</h1>
+	<p><b>
+		(C) Copyright 1998-2004 by The Stratagus Project. Distributed under the
+		<a href="../gpl.html">"GNU General Public License"</a>
+	</b></p>
+	<hr>
+	<a href="../faq.html">FAQ</a> 
+	<a href="script.html">Script main</a> 
+	<a href="script-index.html">Script index</a> 
+	<hr>
+	<a href="stratagus.html">Stratagus.*</a>
+	<hr>
+	<dl>
+	<!-- SCRIPT -->
+	    <a name="Stratagus.MissileTypes[].Ident">
+	    <dt><b>Stratagus.MissileTypes[].Ident</b></dt>
+		    <dd><b>Type:</b> string </dd>
+		    <dd>The missile type's name. By tradition you should use something like
+			"missile-small-arrow". Read-only.</dd>
+	    <a name="Stratagus.MissileTypes[].File">
+	    <dt><b>Stratagus.MissileTypes[].File</b></dt>
+		    <dd><b>Type:</b> string (filename) </dd>
+		    <dd>Filename with missile graphics. Relative to
+			<a href="stratagus.html#Stratagus.LibraryFilePath">Stratagus.LibaryFilePath</a></dd>
+	    <a name="Stratagus.MissileTypes[].Transparency">
+	    <dt><b>Stratagus.MissileTypes[].Transparency</b></dt>
+		    <dd><b>Type:</b> int (byte) </dd>
+		    <dd>This is the transparency value for the missile. Value should be between
+			0(completely transparent) and 256(completely opaque). NOT TESTED</dd>
+	    <a name="Stratagus.MissileTypes[].Width">
+	    <dt><b>Stratagus.MissileTypes[].Width</b></dt>
+		    <dd><b>Type:</b> int </dd>
+		    <dd>This is the width of one frame in the graphic file.</dd>
+	    <a name="Stratagus.MissileTypes[].Height">
+	    <dt><b>Stratagus.MissileTypes[].Height</b></dt>
+		    <dd><b>Type:</b> int </dd>
+		    <dd>This is the height of one frame in the graphic file.</dd>
+	    <a name="Stratagus.MissileTypes[].DrawLevel">
+	    <dt><b>Stratagus.MissileTypes[].DrawLevel</b></dt>
+		    <dd><b>Type:</b> int </dd>
+		    <dd>Drawing level. Missiles and units are sorted by this value. We need to
+			add details on the actual implementation of the sort.</dd>
+	    <a name="Stratagus.MissileTypes[].SpriteFrames">
+	    <dt><b>Stratagus.MissileTypes[].SpriteFrames</b></dt>
+		    <dd><b>Type:</b> int </dd>
+		    <dd>The number of the frames for this sprite. Missile animation is trivial,
+			It will go through the Sprite frames in order</dd>
+	    <a name="Stratagus.MissileTypes[].NumDirections">
+	    <dt><b>Stratagus.MissileTypes[].NumDirections</b></dt>
+		    <dd><b>Type:</b> int </dd>
+		    <dd>The number of the directions for the missile. Inside the graphic file
+			sprites are arranged first by frame then by direction. Line x is for frame
+			x, column y for dirrection y. Directions are considered to be equally spaced.</dd>
+	    <a name="Stratagus.MissileTypes[].NumBounces">
+	    <dt><b>Stratagus.MissileTypes[].NumBounces</b></dt>
+		    <dd><b>Type:</b> int </dd>
+		    <dd>You can make missiles bounce, the obvious example is fireballs in warcraft 2.
+			After hitting it's destination point, the missile will "bounce" and keep going
+			hitting "NumBounces" times every tile and a half(haredcoded, sorry)</dd>
+	    <a name="Stratagus.MissileTypes[].Sleep">
+	    <dt><b>Stratagus.MissileTypes[].Sleep</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>This are the number of game cycles to wait between two animation steps.
+			All animation steps are equally spaced.</dd>
+	    <a name="Stratagus.MissileTypes[].Speed">
+	    <dt><b>Stratagus.MissileTypes[].Speed</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>This is the number of pixels the missile moves for every animation frame.</dd>
+	    <a name="Stratagus.MissileTypes[].Range">
+	    <dt><b>Stratagus.MissileTypes[].Range</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>This is <b>NOT</b> the maximum range you can fire the missile at. It's the
+			range for splash damage. 0 affects a single unit, otherwise it's the number of
+			tiles around the hit that get affected.</dd>
+	    <a name="Stratagus.MissileTypes[].SplashFactor">
+	    <dt><b>Stratagus.MissileTypes[].SplashFactor</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>This is the factor for splash damage. The first tile gets full damage,
+			a tile x away from the center get damage / (x * SplashFactor)</dd>
+	    <a name="Stratagus.MissileTypes[].CanHitOwner">
+	    <dt><b>Stratagus.MissileTypes[].CanHitOwner</b></dt>
+		    <dd><b>Type:</b> boolean </dd>
+			<dd>This is true if the missile can hit it's owner (unit that fired it most
+			of the time) or false otherwise. Do not confuse this with
+			<a href="missiletypes.html#Stratagus.MissileTypes[].FriendlyFire">FriendlyFire</a></dd>
+	    <a name="Stratagus.MissileTypes[].FriendlyFire">
+	    <dt><b>Stratagus.MissileTypes[].FriendlyFire</b></dt>
+		    <dd><b>Type:</b> boolean </dd>
+			<dd>This is false if the missile can hit units that are allied with the owner. This
+			includes units of the missile's owner. It also makes 
+			<a href="missiletypes.html#Stratagus.MissileTypes[].CanHitOwner">CanHitOwner</a>
+			useless if it's false.</dd>
+	    <a name="Stratagus.MissileTypes[].ImpactMissile">
+	    <dt><b>Stratagus.MissileTypes[].ImpactMissile</b></dt>
+		    <dd><b>Type:</b> string, missile-ident </dd>
+			<dd>This string is the name of a missile to be spawned when the unit hits. It will
+			spawn multiple times for
+			<a href="missiletypes.html#Stratagus.MissileTypes[].NumBounces">NumBounces</a>.
+			Can also be nil, to disable it.
+	    <a name="Stratagus.MissileTypes[].SmokeMissile">
+	    <dt><b>Stratagus.MissileTypes[].SmokeMissile</b></dt>
+		    <dd><b>Type:</b> string, missile-ident </dd>
+			<dd>This string is the name of a missile to be spawned every "once in a while" as
+			smoke. Can also be nil, to disable it. NOT TESTED</dd>
+	    <a name="Stratagus.MissileTypes[].FiredSound">
+	    <dt><b>Stratagus.MissileTypes[].FiredSound</b></dt>
+		    <dd><b>Type:</b> string, sound-ident </dd>
+			<dd>Sound to be played when the missile is fired. Can also be nil, to disable it.</dd>
+	    <a name="Stratagus.MissileTypes[].ImpactSound">
+	    <dt><b>Stratagus.MissileTypes[].ImpactSound</b></dt>
+		    <dd><b>Type:</b> string, sound-ident </dd>
+			<dd>Sound to be played the missile hits it's target. Can be nil to disable it.</dd>
+		<a name="Stratagus.MissileType[].Class">
+	    <dt><b>Stratagus.MissileTypes[].CLass</b></dt>
+		    <dd><b>Type:</b> string, special values only </dd>
+			<dd>This is probably the most interesting part of the MissileType. It can receive a
+			number of string values, that influence the exact behaviour and trajectory of the
+			missile when it is fired. Here is a list of possible values. </dd>
+			<dl>
+				<dt><i>missile-class-none</i></dt>
+					<dd>Missile does nothing. Shouldn't really be used.</dd>
+				<dt><i>missile-class-point-to-point</i></dt>
+					<dd>Missile flies straight to destination animating on the way</dd>
+				<dt><i>missile-class-point-to-point-with-hit</i></dt>
+					<dd>Missile flies straight to destination keeping the first frame and
+					the finishes the animation when hitting</dd>
+				<dt><i>missile-class-point-to-point-cycle-once</i></dt>
+					<dd>Missile flies straight to destination and animates ONCE from first
+					to last and back again. To be used for catapult and the like to make a
+					projectile bigger mid-way to the target</dd>
+				<dt><i>missile-class-point-to-point-bounce</i></dt>
+					<dd>Missile flies straight to destination, and the "bounces" by hitting
+					every other tile on the path onward. This is requires to make 
+					<a href="missiletypes.html#Stratagus.MissileTypes[].NumBounces">NumBounces</a> work.</dd>
+				<dt><i>missile-class-stay</i></dt>
+					<dd>Missile will just go through it's animation once and vanish. booooring.</dd>
+				<dt><i>missile-class-cycle-once </i></dt>
+					<dd>Missile will just go through it's animation from start to and and back
+					again, then vanish.</dd>
+				<dt><i>missile-class-fire</i></dt>
+					<dd>Missile is used for fire. More documentation?</dd>
+				<dt><i>missile-class-parabolic</i></dt>
+					<dd>Missile flies to destination with a parabolic path. It used the same
+					animation as cycle-once.</dd>
+				<dt><i>missile-class-land-mine</i></dt>
+					<dd>Missile is a landmine, it will sit quietly and wait for someone to step
+					on it. You can use time-to-live as a timeout.<b>FIXME more configurable</b></dd>
+				<dt><i>missile-class-whirlwind </i></dt>
+					<dd>Missile for the whirlwind effect <b>FIXME more configurable</b></dd>
+				<dt><i>missile-class-flame-shield </i></dt>
+					<dd>Missile rotates around target unit and damages everything it touches
+					<b>FIXME more configurable</b></dd>
+				<dt><i>missile-class-death-coil</i></dt>
+					<dd>Missile is death coil, will drain health from target or enemy units
+					in the area and feed it to the caster.<b>FIXME more configurable</b></dd>
+			</dl>
+	<!-- SCRIPT -->
+	</dl><hr>
+	Last changed: $Id$<br>
+	All trademarks and copyrights on this page are owned by their respective owners.
+	<address>(c) 2002-2004 by <a href="http://stratagus.org">The Stratagus Project</a></address>
+</body></html>

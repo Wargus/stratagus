@@ -1724,7 +1724,7 @@ local void HandleTransportRequests(AiTransportRequest* aitr)
 	}
 
 	if (!ZoneSetFindPath(&UnitZones, &DestZones, zonepath, &zonepathlen)) {
-		DebugLevel2Fn("no way over there.\n");
+		DebugLevel3Fn("no way over there.\n");
 		return;
 	}
 
