@@ -25,7 +25,6 @@
 
 #include "video.h"
 #include "icons.h"
-#include "button.h"
 #include "sound_id.h"
 #include "unitsound.h"
 #include "upgrade_structs.h"
@@ -179,7 +178,6 @@ struct _unit_type_ {
 
     unsigned SelectableByRectangle : 1;	/// selectable with mouse rectangle
 
-    //ButtonConfig* Buttons;		/// buttons of this unit-type
     UnitSound Sound;			/// sounds for events
     // FIXME: temporary solution
     WeaponSound Weapon;                 /// currently sound for weapon

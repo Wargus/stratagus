@@ -753,7 +753,6 @@ global void CclInit(void)
     TilesetCclRegister();
     MapCclRegister();
     PathfinderCclRegister();
-    UnitButtonCclRegister();
     UnitTypeCclRegister();
     UpgradesCclRegister();
     DependenciesCclRegister();
