@@ -497,7 +497,7 @@ local Unit* FindRangeAttack(Unit* u, int range)
 	// Evaluation of possible damage...
 	hp_damage_evaluate = u->Stats->BasicDamage + u->Stats->PiercingDamage;
 
-	DebugCheck(2 * missile_range + 1 >= 32);
+	Assert(2 * missile_range + 1 < 32);
 
 	//
 	// If unit is removed, use containers x and y
@@ -865,7 +865,7 @@ global Unit* AttackUnitsInRange(Unit* unit)
 #ifdef DEBUG
 	if (!unit->Type->CanAttack) {
 		DebugLevel0Fn("Should be handled by caller?\n");
-		DebugCheck(1);
+		Assert(0);
 		return NoUnitP;
 	}
 #endif
@@ -892,7 +892,7 @@ global Unit* AttackUnitsInReactRange(Unit* unit)
 #ifdef DEBUG
 	if (!type->CanAttack) {
 		DebugLevel0Fn("Should be handled by caller?\n");
-		DebugCheck(1);
+		Assert(0);
 		return NoUnitP;
 	}
 #endif

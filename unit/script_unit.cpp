@@ -350,7 +350,7 @@ local void CclParseOrders(lua_State* l, Unit* unit)
 	int j;
 
 	args = luaL_getn(l, -1);
-	DebugCheck(args != MAX_ORDERS);
+	Assert(args == MAX_ORDERS);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		CclParseOrder(l, &unit->Orders[j]);
@@ -386,7 +386,7 @@ local void CclParseBuilded(lua_State* l, Unit* unit)
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			slot = strtol(value + 1, NULL, 16);
-			DebugCheck(!UnitSlots[slot]);
+			Assert(UnitSlots[slot]);
 			unit->Data.Builded.Worker = UnitSlots[slot];
 			//++UnitSlots[slot]->Refs;
 		} else if (!strcmp(value, "progress")) {
@@ -657,14 +657,14 @@ local int CclUnit(lua_State* l)
 			// characterized by unit->HP==0 and by
 			// unit->Orders[0].Action==UnitActionDie so we have to wait
 			// until we parsed at least Unit::Orders[].
-			DebugCheck(!type);
+			Assert(type);
 			unit = UnitSlots[slot];
 			InitUnit(unit, type);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
 			unit->Removed = 0;
 			unit->Reset = 0;				// JOHNS ????
-			DebugCheck(unit->Slot != slot);
+			Assert(unit->Slot == slot);
 		} else if (!strcmp(value, "next")) {
 			unit->Next = UnitSlots[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "current-sight-range")) {
@@ -852,7 +852,7 @@ local int CclUnit(lua_State* l)
 				lua_pop(l, 1);
 				slot = strtol(value + 1, NULL, 16);
 				AddUnitInContainer(UnitSlots[slot], unit);
-				DebugCheck(!UnitSlots[slot]);
+				Assert(UnitSlots[slot]);
 				//++UnitSlots[slot]->Refs;
 			}
 		} else if (!strcmp(value, "order-count")) {
@@ -910,7 +910,7 @@ local int CclUnit(lua_State* l)
 			unit->Goal = UnitSlots[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "auto-cast")) {
 			s = LuaToString(l, j + 1);
-			DebugCheck(!SpellTypeByIdent(s));
+			Assert(SpellTypeByIdent(s));
 			if (!unit->AutoCastSpell) {
 				unit->AutoCastSpell = malloc(SpellTypeCount);
 				memset(unit->AutoCastSpell, 0, SpellTypeCount);

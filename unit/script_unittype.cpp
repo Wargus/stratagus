@@ -319,7 +319,7 @@ local int CclDefineUnitType(lua_State* l)
 			auxtype = UnitTypeByIdent(value);
 			if (!auxtype) {
 				DebugLevel0("Build on top of undefined unit \"%s\".\n" _C_ str);
-				DebugCheck(1);
+				Assert(0);
 			}
 			type->MustBuildOnTop = auxtype;
 		} else if (!strcmp(value, "Decoration")) {
@@ -573,7 +573,7 @@ local int CclDefineUnitType(lua_State* l)
 				if (!res->FinalResource) {
 					res->FinalResource = res->ResourceId;
 				}
-				DebugCheck(!res->ResourceId);
+				Assert(res->ResourceId);
 				lua_pop(l, 1);
 			}
 			type->Harvester = 1;
@@ -820,11 +820,11 @@ local int CclDefineUnitStats(lua_State* l)
 	j = 0;
 
 	type = UnitTypeByIdent(LuaToString(l, j + 1));
-	DebugCheck(!type);
+	Assert(type);
 	++j;
 
 	i = LuaToNumber(l, j + 1);
-	DebugCheck(i >= PlayerMax);
+	Assert(i < PlayerMax);
 	++j;
 
 	stats = &type->Stats[i];

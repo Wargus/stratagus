@@ -416,7 +416,7 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->Missile.Name = strdup(MissileTypeWcNames[v]);
-		DebugCheck(unittype->Missile.Missile);
+		Assert(!unittype->Missile.Missile);
 	}
 	for (i = 0; i < 110; ++i) { // Unit type
 		unittype = UnitTypeByWcNum(i);
@@ -551,7 +551,7 @@ local void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 {
 	int j;
 
-	DebugCheck(plynr >= PlayerMax);
+	Assert(plynr < PlayerMax);
 	CLprintf(file, "DefineUnitStats(\"%s\", %d,\n  ", ident, plynr);
 	CLprintf(file, "\"level\", %d, ", stats->Level);
 	CLprintf(file, "\"speed\", %d, ", stats->Speed);
@@ -722,7 +722,7 @@ global void InitUnitTypes(int reset_player_stats)
 		//
 		//  Initialize:
 		//
-		DebugCheck(UnitTypes[type]->Slot != type);
+		Assert(UnitTypes[type]->Slot == type);
 		//
 		//  Add idents to hash.
 		//
@@ -924,9 +924,9 @@ global void CleanUnitTypes(void)
 		type = UnitTypes[i];
 		hash_del(UnitTypeHash, type->Ident);
 
-		DebugCheck(!type->Ident);
+		Assert(type->Ident);
 		free(type->Ident);
-		DebugCheck(!type->Name);
+		Assert(type->Name);
 		free(type->Name);
 
 		free(type->BoolFlag);
