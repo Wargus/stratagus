@@ -64,7 +64,7 @@ void HandleActionResearch(Unit* unit)
 	const Upgrade* upgrade;
 
 	if (!unit->SubAction) { // first entry
-		upgrade = unit->Data.Research.Upgrade = unit->Orders[0].Arg1;
+		upgrade = unit->Data.Research.Upgrade = unit->Orders[0].Arg1.Upgrade;
 #if 0
 		// FIXME: I want to support both, but with network we need this check
 		//  but if want combined upgrades this is worse
@@ -72,7 +72,7 @@ void HandleActionResearch(Unit* unit)
 		//
 		// Check if an other building has already started?
 		//
-		if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]) {
+		if (unit->Player->UpgradeTimers.Upgrades[upgrade - Upgrades]) {
 			DebugPrint("Two researches running\n");
 			PlayerAddCosts(unit->Player, upgrade->Costs);
 

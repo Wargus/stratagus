@@ -75,10 +75,12 @@ void HandleActionPatrol(Unit* unit)
 		//
 		// Swap the points.
 		//
-		tmp = (int)unit->Orders[0].Arg1;
-		unit->Orders[0].Arg1 = (void*)((unit->Orders[0].X << 16) | unit->Orders[0].Y);
-		unit->Orders[0].X = tmp >> 16;
-		unit->Orders[0].Y = tmp & 0xFFFF;
+		tmp = unit->Orders[0].Arg1.Patrol.X;
+		unit->Orders[0].Arg1.Patrol.X = unit->Orders[0].X;
+		unit->Orders[0].X = tmp;
+		tmp = unit->Orders[0].Arg1.Patrol.Y;
+		unit->Orders[0].Arg1.Patrol.Y = unit->Orders[0].Y;
+		unit->Orders[0].Y = tmp;
 
 		NewResetPath(unit);
 	}
