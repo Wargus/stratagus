@@ -602,9 +602,11 @@ local void FontMeasureWidths(ColorFont* fp)
 	const unsigned char* sp;
 	const unsigned char* lp;
 	const unsigned char* gp;
+	int ckey;
 
 	memset(fp->CharWidth, 0, sizeof(fp->CharWidth));
 	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
+	ckey = fp->Graphic->Surface->format->colorkey;
 
 	SDL_LockSurface(fp->Graphic->Surface);
 	for (y = 1; y < 207; ++y) {
@@ -619,7 +621,7 @@ local void FontMeasureWidths(ColorFont* fp)
 		while (sp < gp) {
 			lp = sp + fp->Width - 1;
 			for (; sp < lp; --lp) {
-				if (*lp != 255) {
+				if (*lp != ckey) {
 					if (lp - sp > fp->CharWidth[y]) {  // max width
 						fp->CharWidth[y] = lp - sp;
 					}
@@ -644,6 +646,7 @@ local void MakeFontBitmap(Graphic* g, int font)
 	GLubyte* c;
 	GLubyte x;
 	const unsigned char* sp;
+	const unsigned char* nextsp;
 	int numfonts;
 	int n;
 
@@ -656,11 +659,13 @@ local void MakeFontBitmap(Graphic* g, int font)
 		}
 		FontBitmaps[font][n] = (GLubyte*)malloc(FontBitmapWidths[font] * g->Height);
 
-		sp = (const unsigned char*)g->Surface->pixels;
+		nextsp = (const unsigned char*)g->Surface->pixels;
 		x = 0;
 		numfonts = g->Height / Fonts[font].Height;
 		for (k = 0; k < numfonts; ++k) {
 			for (i = 0; i < Fonts[font].Height; ++i) {
+				sp = nextsp;
+				nextsp += g->Surface->pitch;
 				c = FontBitmaps[font][n] + k * Fonts[font].Height * FontBitmapWidths[font] +
 					(Fonts[font].Height - 1 - i) * FontBitmapWidths[font];
 				for (j = 0; j < g->Width; ++j) {
