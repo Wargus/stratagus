@@ -65,6 +65,7 @@ local void EndMenu(void);
 local void GameMenuSave(void);
 local void GameMenuLoad(void);
 local void GameMenuEnd(void);
+local void GameMenuExit(void);
 local void GameMenuReturn(void);
 
 local void PrgStartInit(Menuitem *mi);		// master init
@@ -322,7 +323,7 @@ local Menuitem PrgStartMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
     { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'x'} } },
+	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
 #else
     { 0 }
 #endif
@@ -1296,7 +1297,18 @@ local void GameMenuLoad(void)
     LoadAll();	// FIXME: Sample code
 }
 
+/**
+**	End the running game from menu.
+*/
 local void GameMenuEnd(void)
+{
+    GameRunning=0;
+}
+
+/**
+**	Exit the game from menu.
+*/
+local void GameMenuExit(void)
 {
     Exit(0);
 }
@@ -1841,6 +1853,9 @@ local void CustomGameStart(void)
 	strcat(ScenSelectPath, "/");
     }
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
+    // FIXME: Johns is this here needed? Can the map loaded in create game?
+    InitUnitTypes();
+    UpdateStats();
     LoadMap(ScenSelectPath, &TheMap);
     GuiGameStarted = 1;
     EndMenu();
