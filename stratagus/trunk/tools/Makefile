@@ -30,9 +30,9 @@ RULESFILE ?= Rules.make
 include $(TOPDIR)/$(RULESFILE)
 
 EXECS=	gfx2png$(EXE) gfu2png$(EXE) img2png$(EXE) cur2png$(EXE) fnt2png$(EXE) \
-	tile2png$(EXE) extract$(EXE) aledoc$(EXE) wartool$(EXE)
+	tile2png$(EXE) extract$(EXE) aledoc$(EXE) wartool$(EXE) startool$(EXE)
 
-all::	aledoc$(EXE) wartool$(EXE)
+all::	aledoc$(EXE) wartool$(EXE) startool$(EXE)
 
 old::	$(EXECS)
 
@@ -72,8 +72,11 @@ aledoc$(EXE):	aledoc.c
 wartool$(EXE): wartool.c $(TOPDIR)/Makefile $(TOPDIR)/Rules.make
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
+startool$(EXE):	startool.c $(TOPDIR)/Makefile $(TOPDIR)/Rules.make
+	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS) $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
+
 FILES= 	gfx2png.c tile2png.c extract.c \
-	build.sh Makefile aledoc.c wartool.c build.bat
+	build.sh Makefile aledoc.c wartool.c startool.c build.bat
 
 distlist:
 	for i in $(FILES); do echo tools/$$i >>$(DISTLIST); done
