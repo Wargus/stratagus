@@ -129,7 +129,7 @@ global int SelectUnit(Unit* unit)
     unit->Selected=1;
     if( NumSelected>1 ) {
 	Selected[0]->LastGroup=unit->LastGroup=GroupId;
-    }
+    };
     CheckUnitToBeDrawn(unit);
     return 1;
 }

@@ -795,7 +795,8 @@ global void CenterOnMessage(void)
 --	STATUS LINE
 ----------------------------------------------------------------------------*/
 
-local char StatusLine[256];			/// status line/hints
+#define STATUS_LINE_LEN 256
+local char StatusLine[STATUS_LINE_LEN];			/// status line/hints
 
 /**
 **	Draw status line.
@@ -820,7 +821,8 @@ global void SetStatusLine(char* status)
 {
     if( strcmp( StatusLine, status ) ) {
 	MustRedraw|=RedrawStatusLine;
-	strcpy( StatusLine, status );
+	strncpy( StatusLine, status, STATUS_LINE_LEN-1 );
+	StatusLine[STATUS_LINE_LEN-1] = 0;
     }
 }
 
@@ -1006,13 +1008,6 @@ global void DrawInfoPanel(void)
 	    }
 	    DrawInfoPanelBackground(i);
 	    DrawUnitInfo(Selected[0]);
-	    if ( i > 0 ) { //FIXME: vladi: i.e. ThisPlayer, is it correct?
-		char buf[64];
-		sprintf( buf, "You have ~<%d~> %s(s)",
-		         Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type],
-			 Selected[0]->Type->Name);
-		SetStatusLine( buf );
-	    }
 	    if( ButtonUnderCursor==1 ) {
 		SetStatusLine(Selected[0]->Type->Name);
 	    }
