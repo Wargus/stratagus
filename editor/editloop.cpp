@@ -361,7 +361,7 @@ local int CalculateUnitIcons(void)
 **	Calculate the max height and the max widht of icons,
 **	and assign them to IconHeight and IconWidth
 */
-local void CalculateMaxIconSize()
+local void CalculateMaxIconSize(void)
 {
 	int i;
 	const UnitType* type;
