@@ -124,6 +124,7 @@ extern Deco *DecorationAdd( void *data,
 				   unsigned x, unsigned y,
 				   unsigned w, unsigned h );
 extern void DecorationRemove( Deco *d );
+extern void DecorationRemoveLevels( DecorationLevel min, DecorationLevel max );
 
 extern void DecorationMark( Deco *d );
 

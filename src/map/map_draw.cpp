@@ -1521,7 +1521,9 @@ global void MarkDrawEntireMap(void)
 #endif
 
 #ifdef NEW_DECODRAW
-  DecorationMark( mapdeco );
+// Hmm.. remove levels directly might not be a good idea, but it is faster ;)
+//  DecorationRemoveLevels( LevCarLow, LevSkyHighest );
+//  DecorationMark( mapdeco );
 #endif
 
     MustRedraw|=RedrawMap;
