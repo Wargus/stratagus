@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -46,7 +46,7 @@
 #include "intern_video.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 #define NumFontColors 7
@@ -85,9 +85,9 @@ local const VMemType* FontPixels;           /// Font pixels
 local FontColorMapping* FontColorMappings;
 
 /**
-**		Fonts table
+**  Fonts table
 **
-**		Define the font files, sizes.
+**  Define the font files, sizes.
 */
 local ColorFont Fonts[MaxFonts];
 
@@ -128,7 +128,7 @@ local int CurrentFont;
 #endif
 
 /**
-**		FIXME: should use the names of the real fonts.
+**  FIXME: should use the names of the real fonts.
 */
 global char* FontNames[] = {
 	"small",
@@ -144,12 +144,23 @@ global char* FontNames[] = {
 };
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 // FIXME: should use RLE encoded fonts, not color key fonts.
 
 #ifdef USE_SDL_SURFACE
+/**
+**  Draw character with current color.
+**
+**  @param sprite  Pointer to object
+**  @param gx      X offset into object
+**  @param gy      Y offset into object
+**  @param w       width to display
+**  @param h       height to display
+**  @param x       X screen position
+**  @param y       Y screen position
+*/
 local void VideoDrawChar(const Graphic* sprite,
 	int gx, int gy, int w, int h, int x, int y)
 {
@@ -172,15 +183,15 @@ local void VideoDrawChar(const Graphic* sprite,
 #else
 
 /**
-**		Draw character with current color into 8bit video memory.
+**  Draw character with current color into 8bit video memory.
 **
-**		@param sprite		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
+**  @param sprite  Pointer to object
+**  @param gx      X offset into object
+**  @param gy      Y offset into object
+**  @param w       width to display
+**  @param h       height to display
+**  @param x       X screen position
+**  @param y       Y screen position
 */
 local void VideoDrawChar8(const Graphic* sprite,
 	int gx, int gy, int w, int h, int x, int y)
@@ -213,7 +224,7 @@ local void VideoDrawChar8(const Graphic* sprite,
 
 	while (sp < gp) {
 		lp = sp + w;
-		while (sp < lp) {				// loop with unroll
+		while (sp < lp) {  // loop with unroll
 			UNROLL;
 			UNROLL;
 		}
@@ -227,15 +238,15 @@ local void VideoDrawChar8(const Graphic* sprite,
 }
 
 /**
-**		Draw character with current color into 16bit video memory.
+**  Draw character with current color into 16bit video memory.
 **
-**		@param sprite		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
+**  @param sprite  Pointer to object
+**  @param gx      X offset into object
+**  @param gy      Y offset into object
+**  @param w       width to display
+**  @param h       height to display
+**  @param x       X screen position
+**  @param y       Y screen position
 */
 local void VideoDrawChar16(const Graphic* sprite,
 	int gx, int gy, int w, int h, int x, int y)
@@ -268,7 +279,7 @@ local void VideoDrawChar16(const Graphic* sprite,
 
 	while (sp < gp) {
 		lp = sp + w;
-		while (sp < lp) {				// loop with unroll
+		while (sp < lp) {  // loop with unroll
 			UNROLL;
 			UNROLL;
 		}
@@ -282,15 +293,15 @@ local void VideoDrawChar16(const Graphic* sprite,
 }
 
 /**
-**		Draw character with current color into 24bit video memory.
+**  Draw character with current color into 24bit video memory.
 **
-**		@param sprite		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
+**  @param sprite  Pointer to object
+**  @param gx      X offset into object
+**  @param gy      Y offset into object
+**  @param w       width to display
+**  @param h       height to display
+**  @param x       X screen position
+**  @param y       Y screen position
 */
 local void VideoDrawChar24(const Graphic* sprite,
 	int gx, int gy, int w, int h, int x, int y)
@@ -323,7 +334,7 @@ local void VideoDrawChar24(const Graphic* sprite,
 
 	while (sp < gp) {
 		lp = sp + w;
-		while (sp < lp) {				// loop with unroll
+		while (sp < lp) {  // loop with unroll
 			UNROLL;
 			UNROLL;
 		}
@@ -337,15 +348,15 @@ local void VideoDrawChar24(const Graphic* sprite,
 }
 
 /**
-**		Draw character with current color into 32bit video memory.
+**  Draw character with current color into 32bit video memory.
 **
-**		@param sprite		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
+**  @param sprite  Pointer to object
+**  @param gx      X offset into object
+**  @param gy      Y offset into object
+**  @param w       width to display
+**  @param h       height to display
+**  @param x       X screen position
+**  @param y       Y screen position
 */
 local void VideoDrawChar32(const Graphic* sprite,
 	int gx, int gy, int w, int h, int x, int y)
@@ -378,7 +389,7 @@ local void VideoDrawChar32(const Graphic* sprite,
 
 	while (sp < gp) {
 		lp = sp + w;
-		while (sp < lp) {				// loop with unroll
+		while (sp < lp) {  // loop with unroll
 			UNROLL;
 			UNROLL;
 		}
@@ -394,15 +405,15 @@ local void VideoDrawChar32(const Graphic* sprite,
 
 #ifdef USE_OPENGL
 /**
-**		Draw character with current color.
+**  Draw character with current color.
 **
-**		@param sprite		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
+**  @param sprite  Pointer to object
+**  @param gx      X offset into object
+**  @param gy      Y offset into object
+**  @param w       width to display
+**  @param h       height to display
+**  @param x       X screen position
+**  @param y       Y screen position
 */
 local void VideoDrawCharOpenGL(const Graphic* sprite,
 	int gx, int gy, int w, int h, int x, int y)
@@ -427,6 +438,9 @@ local void VideoDrawCharOpenGL(const Graphic* sprite,
 #endif
 
 #ifdef USE_SDL_SURFACE
+/**
+**  FIXME: docu
+*/
 local FontColorMapping* GetFontColorMapping(char* color)
 {
 	FontColorMapping *fcm;
@@ -444,7 +458,7 @@ local FontColorMapping* GetFontColorMapping(char* color)
 }
 #else
 /**
-**		FIXME: docu
+**  FIXME: docu
 */
 local const VMemType* GetFontColorMapping(char* color)
 {
@@ -464,10 +478,10 @@ local const VMemType* GetFontColorMapping(char* color)
 #endif
 
 /**
-**		Set the default text colors.
+**  Set the default text colors.
 **
-**		@param normal		Normal text color.
-**		@param reverse		Reverse text color.
+**  @param normal   Normal text color.
+**  @param reverse  Reverse text color.
 */
 global void SetDefaultTextColors(char* normal, char* reverse)
 {
@@ -482,10 +496,10 @@ global void SetDefaultTextColors(char* normal, char* reverse)
 }
 
 /**
-**		Get the default text colors.
+**  Get the default text colors.
 **
-**		@param normalp		Normal text color pointer.
-**		@param reversep		Reverse text color pointer.
+**  @param normalp   Normal text color pointer.
+**  @param reversep  Reverse text color pointer.
 */
 global void GetDefaultTextColors(char** normalp, char** reversep)
 {
@@ -494,12 +508,12 @@ global void GetDefaultTextColors(char** normalp, char** reversep)
 }
 
 /**
-**		Returns the pixel length of a text.
+**  Returns the pixel length of a text.
 **
-**		@param font		Font number.
-**		@param text		Text to calculate the length of.
+**  @param font  Font number.
+**  @param text  Text to calculate the length of.
 **
-**		@return				The length in pixels of the text.
+**  @return      The length in pixels of the text.
 */
 global int VideoTextLength(unsigned font, const unsigned char* text)
 {
@@ -512,7 +526,7 @@ global int VideoTextLength(unsigned font, const unsigned char* text)
 	isformat = 0;
 	for (width = 0, s = text; *s; ++s) {
 		if (*s == '~') {
-			if (!*++s) {				// bad formated string
+			if (!*++s) {  // bad formated string
 				break;
 			}
 			if (*s == '<' || *s == '>' || *s == '!') {
@@ -531,11 +545,11 @@ global int VideoTextLength(unsigned font, const unsigned char* text)
 }
 
 /**
-**		Returns the height of the font.
+**  Returns the height of the font.
 **
-**		@param font		Font number.
+**  @param font  Font number.
 **
-**		@return				The height of the font.
+**  @return      The height of the font.
 */
 global int VideoTextHeight(unsigned font)
 {
@@ -543,15 +557,15 @@ global int VideoTextHeight(unsigned font)
 }
 
 /**
-**		Draw character with current color clipped into 8 bit framebuffer.
+**  Draw character with current color clipped into 8 bit framebuffer.
 **
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
+**  @param graphic  Pointer to object
+**  @param gx       X offset into object
+**  @param gy       Y offset into object
+**  @param w        width to display
+**  @param h        height to display
+**  @param x        X screen position
+**  @param y        Y screen position
 */
 local void VideoDrawCharClip(const Graphic* graphic, int gx, int gy, int w, int h,
 	int x, int y)
@@ -564,21 +578,21 @@ local void VideoDrawCharClip(const Graphic* graphic, int gx, int gy, int w, int 
 }
 
 /**
-**		Draw text with font at x,y clipped/unclipped.
+**  Draw text with font at x,y clipped/unclipped.
 **
-**		~		is special prefix.
-**		~~		is the ~ character self.
-**		~!		print next character reverse.
-**		~<		start reverse.
-**		~>		switch back to last used color.
+**  ~		is special prefix.
+**  ~~		is the ~ character self.
+**  ~!		print next character reverse.
+**  ~<		start reverse.
+**  ~>		switch back to last used color.
 **
-**		@param x		X screen position
-**		@param y		Y screen position
-**		@param font		Font number
-**		@param text		Text to be displayed.
-**		@param clip		Flag if TRUE clip, otherwise not.
+**  @param x     X screen position
+**  @param y     Y screen position
+**  @param font  Font number
+**  @param text  Text to be displayed.
+**  @param clip  Flag if TRUE clip, otherwise not.
 **
-**		@return				The length of the printed text.
+**  @return      The length of the printed text.
 */
 local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 	int clip)
@@ -611,7 +625,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 	for (rev = NULL, widths = 0; *text; ++text) {
 		if (*text == '~') {
 			switch (*++text) {
-				case '\0':				// wrong formated string.
+				case '\0':  // wrong formated string.
 					DebugLevel0Fn("oops, format your ~\n");
 					return widths;
 				case '~':
@@ -637,7 +651,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 #endif
 					continue;
 				case '>':
-					rev = LastTextColor;		// swap last and current color
+					rev = LastTextColor;  // swap last and current color
 #ifdef USE_SDL_SURFACE
 					LastTextColor = FontColor;
 					FontColor = rev;
@@ -696,21 +710,21 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 }
 
 /**
-**		Draw text with font at x,y unclipped.
+**  Draw text with font at x,y unclipped.
 **
-**		~		is special prefix.
-**		~~		is the ~ character self.
-**		~!		print next character reverse.
-**		~n		0123456789abcdef print text in color 1-16.
-**		~<		start reverse.
-**		~>		switch back to last used color.
+**  ~		is special prefix.
+**  ~~		is the ~ character self.
+**  ~!		print next character reverse.
+**  ~n		0123456789abcdef print text in color 1-16.
+**  ~<		start reverse.
+**  ~>		switch back to last used color.
 **
-**		@param x		X screen position
-**		@param y		Y screen position
-**		@param font		Font number
-**		@param text		Text to be displayed.
+**  @param x     X screen position
+**  @param y     Y screen position
+**  @param font  Font number
+**  @param text  Text to be displayed.
 **
-**		@return				The length of the printed text.
+**  @return      The length of the printed text.
 */
 global int VideoDrawText(int x, int y, unsigned font,
 	const unsigned char* text)
@@ -719,11 +733,16 @@ global int VideoDrawText(int x, int y, unsigned font,
 }
 
 /**
-**		Draw text with font at x,y clipped.
+**  Draw text with font at x,y clipped.
 **
-**		See VideoDrawText.
+**  See VideoDrawText.
 **
-**		@return				The length of the printed text.
+**  @param x     X screen position
+**  @param y     Y screen position
+**  @param font  Font number
+**  @param text  Text to be displayed.
+**
+**  @return      The length of the printed text.
 */
 global int VideoDrawTextClip(int x, int y, unsigned font,
 	const unsigned char* text)
@@ -732,16 +751,16 @@ global int VideoDrawTextClip(int x, int y, unsigned font,
 }
 
 /**
-**		Draw reverse text with font at x,y unclipped.
+**  Draw reverse text with font at x,y unclipped.
 **
-**		@see VideoDrawText for full description.
+**  @see VideoDrawText for full description.
 **
-**		@param x		X screen position
-**		@param y		Y screen position
-**		@param font		Font number
-**		@param text		Text to be displayed.
+**  @param x     X screen position
+**  @param y     Y screen position
+**  @param font  Font number
+**  @param text  Text to be displayed.
 **
-**		@return				The length of the printed text.
+**  @return      The length of the printed text.
 */
 global int VideoDrawReverseText(int x, int y, unsigned font,
 	const unsigned char* text)
@@ -762,16 +781,16 @@ global int VideoDrawReverseText(int x, int y, unsigned font,
 }
 
 /**
-**		Draw text with font at x,y centered.
+**  Draw text with font at x,y centered.
 **
-**		@see VideoDrawText for full description.
+**  @see VideoDrawText for full description.
 **
-**		@param x		X screen position
-**		@param y		Y screen position
-**		@param font		Font number
-**		@param text		Text to be displayed.
+**  @param x     X screen position
+**  @param y     Y screen position
+**  @param font  Font number
+**  @param text  Text to be displayed.
 **
-**		@return				The length of the printed text.
+**  @return      The length of the printed text.
 */
 global int VideoDrawTextCentered(int x, int y, unsigned font,
 	const unsigned char* text)
@@ -785,14 +804,14 @@ global int VideoDrawTextCentered(int x, int y, unsigned font,
 }
 
 /**
-**		Draw number with font at x,y unclipped.
+**  Draw number with font at x,y unclipped.
 **
-**		@param x		X screen position
-**		@param y		Y screen position
-**		@param font		Font number
-**		@param number		Number to be displayed.
+**  @param x       X screen position
+**  @param y       Y screen position
+**  @param font    Font number
+**  @param number  Number to be displayed.
 **
-**		@return				The length of the printed text.
+**  @return        The length of the printed text.
 */
 global int VideoDrawNumber(int x, int y, unsigned font, int number)
 {
@@ -815,14 +834,14 @@ global int VideoDrawNumber(int x, int y, unsigned font, int number)
 }
 
 /**
-**		Draw number with font at x,y clipped.
+**  Draw number with font at x,y clipped.
 **
-**		@param x		X screen position
-**		@param y		Y screen position
-**		@param font		Font number
-**		@param number		Number to be displayed.
+**  @param x       X screen position
+**  @param y       Y screen position
+**  @param font    Font number
+**  @param number  Number to be displayed.
 **
-**		@return				The length of the printed text.
+**  @return        The length of the printed text.
 */
 global int VideoDrawNumberClip(int x, int y, unsigned font, int number)
 {
@@ -833,14 +852,14 @@ global int VideoDrawNumberClip(int x, int y, unsigned font, int number)
 }
 
 /**
-**		Draw reverse number with font at x,y unclipped.
+**  Draw reverse number with font at x,y unclipped.
 **
-**		@param x		X screen position
-**		@param y		Y screen position
-**		@param font		Font number
-**		@param number		Number to be displayed.
+**  @param x       X screen position
+**  @param y       Y screen position
+**  @param font    Font number
+**  @param number  Number to be displayed.
 **
-**		@return				The length of the printed text.
+**  @return        The length of the printed text.
 */
 global int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
 {
@@ -863,7 +882,7 @@ local void FontMeasureWidths(ColorFont* fp)
 		fp->CharWidth[y] = 0;
 	}
 
-	fp->CharWidth[0] = fp->Width / 2;		// a reasonable value for SPACE
+	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
 
 	for (y = 1; y < 207; ++y) {
 		sp = (const unsigned char *)fp->Graphic->Surface->pixels +
@@ -878,7 +897,7 @@ local void FontMeasureWidths(ColorFont* fp)
 			lp = sp + fp->Graphic->Width - 1;
 			for (; sp < lp; --lp) {
 				if (*lp != 255) {
-					if (lp - sp > fp->CharWidth[y]) {		// max width
+					if (lp - sp > fp->CharWidth[y]) {  // max width
 						fp->CharWidth[y] = lp - sp;
 					}
 				}
@@ -890,7 +909,7 @@ local void FontMeasureWidths(ColorFont* fp)
 }
 #else
 /**
-**		Calculate widths table for a font.
+**  Calculate widths table for a font.
 **
 // FIXME: ARI: This is runtime and fairly slow!
 // FIXME: ARI: Maybe integrate into wartool and load from file!
@@ -919,7 +938,7 @@ local void FontMeasureWidths(ColorFont* fp)
 			lp = sp + fp->Graphic->Width - 1;
 			for (; sp < lp; --lp) {
 				if (*lp != 255) {
-					if (lp - sp > fp->CharWidth[y]) {		// max width
+					if (lp - sp > fp->CharWidth[y]) {  // max width
 						fp->CharWidth[y] = lp - sp;
 					}
 				}
@@ -927,12 +946,12 @@ local void FontMeasureWidths(ColorFont* fp)
 			sp += fp->Graphic->Width;
 		}
 	}
-	fp->CharWidth[0] = fp->Width / 2;		// a reasonable value for SPACE
+	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
 }
 #endif
 
 /**
-**		Make font bitmap.
+**  Make font bitmap.
 */
 #ifdef USE_OPENGL
 local void MakeFontBitmap(Graphic* g, int font)
@@ -948,7 +967,7 @@ local void MakeFontBitmap(Graphic* g, int font)
 
 	FontBitmapWidths[font] = (g->Width + 7) / 8;
 
-	for (n=0; n < NumFontColors; ++n) {
+	for (n = 0; n < NumFontColors; ++n) {
 		if (FontBitmaps[font][n]) {
 			free(FontBitmaps[font][n]);
 		}
@@ -984,7 +1003,7 @@ local void MakeFontBitmap(Graphic* g, int font)
 #endif
 
 /**
-**		Load all fonts.
+**  Load all fonts.
 */
 global void LoadFonts(void)
 {
@@ -995,7 +1014,7 @@ global void LoadFonts(void)
 #endif
 
 	//
-	//		First select the font drawing procedure.
+	//  First select the font drawing procedure.
 	//
 #ifdef USE_OPENGL
 	VideoDrawChar = VideoDrawCharOpenGL;
@@ -1068,15 +1087,15 @@ global void LoadFonts(void)
 }
 
 /*----------------------------------------------------------------------------
---		CCL
+--  CCL
 ----------------------------------------------------------------------------*/
 
 /**
-**		Font symbol to id.
+**  Font symbol to id.
 **
-**		@param type		Type of the font (game,small,...)
+**  @param type  Type of the font (game,small,...)
 **
-**		@return				Integer as font identifier.
+**  @return      Integer as font identifier.
 */
 global int CclFontByIdentifier(const char* type)
 {
@@ -1108,36 +1127,65 @@ global int CclFontByIdentifier(const char* type)
 }
 
 /**
-**		Define the used fonts.
+**  Define the used fonts.
 **
-**		@param type		Type of the font (game,small,...)
-**		@param file		File name of the graphic file
-**		@param width		Font width in pixels
-**		@param height		Font height in pixels
-**
-**		@todo		make the font name functions more general, support more fonts.
+**  @todo  make the font name functions more general, support more fonts.
 */
 local int CclDefineFont(lua_State* l)
 {
+	const char* value;
 	int i;
+	int w;
+	int h;
+	char* file;
 
-	if (lua_gettop(l) != 4) {
+	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	}
-	i = CclFontByIdentifier(LuaToString(l, 1));
+	i = -1;
+	w = h = 0;
+	file = NULL;
+	lua_pushnil(l);
+	while (lua_next(l, 1)) {
+		value = LuaToString(l, -2);
+		if (!strcmp(value, "Name")) {
+			i = CclFontByIdentifier(LuaToString(l, -1));
+		} else if (!strcmp(value, "File")) {
+			file = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "Size")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			w = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			h = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else {
+			lua_pushfstring(l, "Unsupported tag: %s", value);
+			lua_error(l);
+		}
+		lua_pop(l, 1);
+	}
+	if (i == -1 || !w || !h || !file) {
+		lua_pushstring(l, "missing argument");
+		lua_error(l);
+	}
 	free(Fonts[i].File);
 	VideoSaveFree(Fonts[i].Graphic);
 	Fonts[i].Graphic = NULL;
-	Fonts[i].File = strdup(LuaToString(l, 2));
-	Fonts[i].Width = LuaToNumber(l, 3);
-	Fonts[i].Height = LuaToNumber(l, 4);
+	Fonts[i].File = file;
+	Fonts[i].Width = w;
+	Fonts[i].Height = h;
 
 	return 0;
 }
 
 /**
-**		Define a font color.
+**  Define a font color.
 */
 local int CclDefineFontColor(lua_State* l)
 {
@@ -1215,9 +1263,9 @@ local int CclDefineFontColor(lua_State* l)
 }
 
 /**
-**		Register CCL features for fonts.
+**  Register CCL features for fonts.
 **
-**		@todo FIXME: Make the remaining functions accessable from CCL.
+**  @todo FIXME: Make the remaining functions accessable from CCL.
 */
 global void FontsCclRegister(void)
 {
@@ -1235,7 +1283,7 @@ global void FontsCclRegister(void)
 }
 
 /**
-**		Cleanup the font module.
+**  Cleanup the font module.
 */
 global void CleanFonts(void)
 {
@@ -1265,11 +1313,11 @@ global void CleanFonts(void)
 }
 
 /**
-**		Check if font is already loaded.
+**  Check if font is already loaded.
 **
-**		@param font		Font number
+**  @param font  Font number
 **
-**		@return				True if loaded, false otherwise.
+**  @return      True if loaded, false otherwise.
 */
 global int IsFontLoaded(unsigned font)
 {
