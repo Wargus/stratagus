@@ -434,7 +434,7 @@ static int CclSetForestRegeneration(lua_State* l)
 	i = LuaToNumber(l, 1);
 	if (i < 0 || i > 255) {
 		PrintFunction();
-		fprintf(stdout, "Regneration speed should be 0 - 255\n");
+		fprintf(stdout, "Regeneration speed should be 0 - 255\n");
 		i = 100;
 	}
 	old = ForestRegeneration;
@@ -446,6 +446,29 @@ static int CclSetForestRegeneration(lua_State* l)
 
 	lua_pushnumber(l, old);
 	return 1;
+}
+
+/**
+**  Define Fog graphics
+**
+**  @param l  Lua state.
+*/
+static int CclSetFogOfWarGraphics(lua_State* l)
+{
+	char* FogGraphicFile;
+
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "incorrect argument");
+	}
+
+	FogGraphicFile = LuaToString(l, 1);
+	if(TheMap.FogGraphic) {
+		FreeGraphic(TheMap.FogGraphic);
+		TheMap.FogGraphic = NULL;
+	}
+	TheMap.FogGraphic = NewGraphic(FogGraphicFile, TileSizeX, TileSizeY);
+
+	return 0;
 }
 
 /**
@@ -462,6 +485,7 @@ void MapCclRegister(void)
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
 	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
 
+	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 
 	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
