@@ -381,10 +381,9 @@ global void PlayerAddCosts(Player* player,const int* costs)
 }
 
 /**
-**	Add the costs of new unit to resources
+**	Add the costs of an unit to resources
 **
 **	@param type	Type of unit.
-**	@return		False if all enought, otherwise a bit mask.
 */
 global void PlayerAddUnitType(Player* player,const UnitType* type)
 {
