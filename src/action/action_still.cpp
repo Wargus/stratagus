@@ -72,14 +72,22 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	//
 	//	FIXME: this a workaround of a bad code.
 	//		UnitShowAnimation resets frame.
+	//	FIXME: the frames are hardcoded they should be configurable
 	//
 	if( unit->State==1 && type->GoldMine ) {
+#ifdef NEW_ORDERS
+	    unit->Frame=!!unit->Data.Resource.Active;
+#else
 	    unit->Frame=!!unit->Command.Data.GoldMine.Active;
+#endif
 	}
 	if( unit->State==1 && type->GivesOil ) {
+#ifdef NEW_ORDERS
+	    unit->Frame=unit->Data.Resource.Active ? 2 : 0;
+#else
 	    unit->Frame=unit->Command.Data.OilWell.Active ? 2 : 0;
+#endif
 	}
-
     }
 
     if( !unit->Reset ) {		// animation can't be aborted here
@@ -120,7 +128,16 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	}
 	if( x!=unit->X || y!=unit->Y ) {
 	    if( CheckedCanMoveToMask(x,y,TypeMovementMask(type)) ) {
-		// FIXME: Don't use pathfinder for this.
+		// FIXME: Don't use pathfinder for this, costs too much cpu.
+#ifdef NEW_ORDERS
+		unit->Orders[0].Action=UnitActionMove;
+		ResetPath(unit->Orders[0]);
+		DebugCheck( unit->Orders[0].Goal );
+		unit->Orders[0].Goal=NoUnitP;
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
+		unit->Orders[0].X=x;
+		unit->Orders[0].Y=y;
+#else
 		unit->Command.Action=UnitActionMove;
 		ResetPath(unit->Command);
 		unit->Command.Data.Move.Goal=NoUnitP;
@@ -129,6 +146,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->Command.Data.Move.SY=unit->Y;
 		unit->Command.Data.Move.DX=x;
 		unit->Command.Data.Move.DY=y;
+#endif
 	    }
 	}
 	// NOTE: critter couldn't attack automatic through the return
@@ -147,8 +165,12 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		// Weak goal, can choose other unit, come back after attack
 		// FIXME: should rewrite command handling
 		CommandAttack(unit,unit->X,unit->Y,NULL,FlushCommands);
+#ifdef NEW_ORDERS
+		unit->SavedOrder=unit->Orders[1];
+#else
 		unit->SavedCommand=unit->NextCommand[0];
 		unit->SavedCommand.Action=UnitActionAttack;
+#endif
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		DebugLevel3Fn(" %Zd Attacking in range %d\n"
 			,UnitNumber(unit),unit->SubAction);
@@ -159,7 +181,11 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    //
 	    //	Old goal destroyed.
 	    //
+#ifdef NEW_ORDERS
+	    temp=unit->Orders[0].Goal;
+#else
 	    temp=unit->Command.Data.Move.Goal;
+#endif
 	    if( temp && temp->Destroyed ) {
 		DebugLevel3Fn(" destroyed unit %Zd #%d\n"
 			,UnitNumber(temp),temp->Refs);
@@ -169,7 +195,11 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		if( !--temp->Refs ) {
 		    ReleaseUnit(temp);
 		}
+#ifdef NEW_ORDERS
+		unit->Orders[0].Goal=temp=NoUnitP;
+#else
 		unit->Command.Data.Move.Goal=temp=NoUnitP;
+#endif
 	    }
 	    if( !unit->SubAction || temp!=goal ) {
 		// New target.
@@ -184,7 +214,11 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		    DebugCheck( !temp->Refs );
 #endif
 		}
+#ifdef NEW_ORDERS
+		unit->Orders[0].Goal=goal;
+#else
 		unit->Command.Data.Move.Goal=goal;
+#endif
 		goal->Refs++;
 		unit->State=0;
 		unit->SubAction=1;
@@ -199,7 +233,11 @@ global void ActionStillGeneric(Unit* unit,int ground)
     }
 
     if( unit->SubAction ) {		// was attacking.
+#ifdef NEW_ORDERS
+	if( (temp=unit->Orders[0].Goal) ) {
+#else
 	if( (temp=unit->Command.Data.Move.Goal) ) {
+#endif
 #ifdef REFS_DEBUG
 	    DebugCheck( !temp->Refs );
 #endif
@@ -207,7 +245,11 @@ global void ActionStillGeneric(Unit* unit,int ground)
 #ifdef REFS_DEBUG
 	    DebugCheck( !temp->Refs );
 #endif
+#ifdef NEW_ORDERS
+	    unit->Orders[0].Goal=NoUnitP;
+#else
 	    unit->Command.Data.Move.Goal=NoUnitP;
+#endif
 	}
 	unit->SubAction=unit->State=0;
     }
