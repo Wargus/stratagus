@@ -55,14 +55,14 @@ global int CommandLogEnabled;		/// True if command log is on
 **	@param name	Command name (move,attack,...).
 **	@param unit	Unit that receive the command.
 **	@param flag	Append command or flush old commands.
-**	@param position	Flag X,Y contains position or value or nothing.
 **	@param x	optional X map position.
 **	@param y	optional y map position.
 **	@param dest	optional destination unit.
 **	@param type	optional command argument (unit-type,...).
+**	@param num	optional number argument
 */
 local void CommandLog(const char* name,const Unit* unit,int flag,
-	int position,unsigned x,unsigned y,const Unit* dest,const char* value)
+	unsigned x,unsigned y,const Unit* dest,const char* value,int num)
 {
     static FILE* logf;
 
@@ -86,18 +86,17 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     fprintf(logf,"(log %d 'U%Zd '%s '%s",
 	    FrameCounter,UnitNumber(unit),name,
 	    flag ? "flush" : "append");
-    switch( position ) {
-	case 1:
-	    fprintf(logf," (%d %d)",x,y);
-	    break;
-	case 2:
-	    fprintf(logf," %d",x);
+    if( x!=-1 || y!=-1 ) {
+	fprintf(logf," (%d %d)",x,y);
     }
     if( dest ) {
-	fprintf(logf," 'U%Zd",UnitNumber(unit));
+	fprintf(logf," 'U%Zd",UnitNumber(dest));
     }
     if( value ) {
 	fprintf(logf," '%s",value);
+    }
+    if( num!=-1 ) {
+	fprintf(logf," %d",num);
     }
     fprintf(logf,")\n");
     fflush(logf);
@@ -119,7 +118,7 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
 */
 global void SendCommandStopUnit(Unit* unit)
 {
-    CommandLog("stop",unit,1,0,0,0,NoUnitP,NULL);
+    CommandLog("stop",unit,1,-1,-1,NoUnitP,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandStopUnit(unit);
     } else {
@@ -135,7 +134,7 @@ global void SendCommandStopUnit(Unit* unit)
 */
 global void SendCommandStandGround(Unit* unit,int flush)
 {
-    CommandLog("stand-ground",unit,flush,0,0,0,NoUnitP,NULL);
+    CommandLog("stand-ground",unit,flush,-1,-1,NoUnitP,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandStandGround(unit,flush);
     } else {
@@ -153,7 +152,7 @@ global void SendCommandStandGround(Unit* unit,int flush)
 */
 global void SendCommandFollow(Unit* unit,Unit* dest,int flush)
 {
-    CommandLog("move",unit,flush,0,0,0,dest,NULL);
+    CommandLog("follow",unit,flush,-1,-1,dest,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandFollow(unit,dest,flush);
     } else {
@@ -171,7 +170,7 @@ global void SendCommandFollow(Unit* unit,Unit* dest,int flush)
 */
 global void SendCommandMove(Unit* unit,int x,int y,int flush)
 {
-    CommandLog("move",unit,flush,1,x,y,NoUnitP,NULL);
+    CommandLog("move",unit,flush,x,y,NoUnitP,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandMove(unit,x,y,flush);
     } else {
@@ -189,7 +188,7 @@ global void SendCommandMove(Unit* unit,int x,int y,int flush)
 */
 global void SendCommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 {
-    CommandLog("repair",unit,flush,1,x,y,dest,NULL);
+    CommandLog("repair",unit,flush,x,y,dest,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandRepair(unit,x,y,dest,flush);
     } else {
@@ -208,7 +207,7 @@ global void SendCommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 */
 global void SendCommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 {
-    CommandLog("attack",unit,flush,1,x,y,attack,NULL);
+    CommandLog("attack",unit,flush,x,y,attack,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandAttack(unit,x,y,attack,flush);
     } else {
@@ -226,7 +225,7 @@ global void SendCommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 */
 global void SendCommandAttackGround(Unit* unit,int x,int y,int flush)
 {
-    CommandLog("attack-ground",unit,flush,1,x,y,NoUnitP,NULL);
+    CommandLog("attack-ground",unit,flush,x,y,NoUnitP,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandAttackGround(unit,x,y,flush);
     } else {
@@ -244,7 +243,7 @@ global void SendCommandAttackGround(Unit* unit,int x,int y,int flush)
 */
 global void SendCommandPatrol(Unit* unit,int x,int y,int flush)
 {
-    CommandLog("patrol",unit,flush,1,x,y,NoUnitP,NULL);
+    CommandLog("patrol",unit,flush,x,y,NoUnitP,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandPatrolUnit(unit,x,y,flush);
     } else {
@@ -261,7 +260,7 @@ global void SendCommandPatrol(Unit* unit,int x,int y,int flush)
 */
 global void SendCommandBoard(Unit* unit,int x,int y,Unit* dest,int flush)
 {
-    CommandLog("board",unit,flush,1,x,y,dest,NULL);
+    CommandLog("board",unit,flush,x,y,dest,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandBoard(unit,dest,flush);
     } else {
@@ -280,7 +279,7 @@ global void SendCommandBoard(Unit* unit,int x,int y,Unit* dest,int flush)
 */
 global void SendCommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 {
-    CommandLog("unload",unit,flush,1,x,y,what,NULL);
+    CommandLog("unload",unit,flush,x,y,what,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandUnload(unit,x,y,what,flush);
     } else {
@@ -300,7 +299,7 @@ global void SendCommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 global void SendCommandBuildBuilding(Unit* unit,int x,int y
 	,UnitType* what,int flush)
 {
-    CommandLog("build",unit,flush,1,x,y,NULL,what->Ident);
+    CommandLog("build",unit,flush,x,y,NULL,what->Ident,-1);
     if( NetworkFildes==-1 ) {
 	CommandBuildBuilding(unit,x,y,what,flush);
     } else {
@@ -316,7 +315,7 @@ global void SendCommandBuildBuilding(Unit* unit,int x,int y
 global void SendCommandCancelBuilding(Unit* unit,Unit* worker)
 {
     // FIXME: currently unit and worker are same?
-    CommandLog("cancel-build",unit,1,0,0,0,worker,NULL);
+    CommandLog("cancel-build",unit,1,-1,-1,worker,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandCancelBuilding(unit,worker);
     } else {
@@ -334,7 +333,7 @@ global void SendCommandCancelBuilding(Unit* unit,Unit* worker)
 */
 global void SendCommandHarvest(Unit* unit,int x,int y,int flush)
 {
-    CommandLog("harvest",unit,flush,1,x,y,NoUnitP,NULL);
+    CommandLog("harvest",unit,flush,x,y,NoUnitP,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandHarvest(unit,x,y,flush);
     } else {
@@ -351,7 +350,7 @@ global void SendCommandHarvest(Unit* unit,int x,int y,int flush)
 */
 global void SendCommandMineGold(Unit* unit,Unit* dest,int flush)
 {
-    CommandLog("mine",unit,flush,0,0,0,dest,NULL);
+    CommandLog("mine",unit,flush,-1,-1,dest,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandMineGold(unit,dest,flush);
     } else {
@@ -368,7 +367,7 @@ global void SendCommandMineGold(Unit* unit,Unit* dest,int flush)
 */
 global void SendCommandHaulOil(Unit* unit,Unit* dest,int flush)
 {
-    CommandLog("haul",unit,flush,0,0,0,dest,NULL);
+    CommandLog("haul",unit,flush,-1,-1,dest,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandHaulOil(unit,dest,flush);
     } else {
@@ -384,7 +383,7 @@ global void SendCommandHaulOil(Unit* unit,Unit* dest,int flush)
 */
 global void SendCommandReturnGoods(Unit* unit,int flush)
 {
-    CommandLog("return",unit,flush,0,0,0,NoUnitP,NULL);
+    CommandLog("return",unit,flush,-1,-1,NoUnitP,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandReturnGoods(unit,flush);
     } else {
@@ -401,7 +400,7 @@ global void SendCommandReturnGoods(Unit* unit,int flush)
 */
 global void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush)
 {
-    CommandLog("train",unit,flush,0,0,0,NULL,what->Ident);
+    CommandLog("train",unit,flush,-1,-1,NULL,what->Ident,-1);
     if( NetworkFildes==-1 ) {
 	CommandTrainUnit(unit,what,flush);
     } else {
@@ -416,7 +415,7 @@ global void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush)
 */
 global void SendCommandCancelTraining(Unit* unit,int slot)
 {
-    CommandLog("cancel-train",unit,1,2,slot,0,NoUnitP,NULL);
+    CommandLog("cancel-train",unit,1,-1,-1,NoUnitP,NULL,slot);
     if( NetworkFildes==-1 ) {
 	CommandCancelTraining(unit,slot);
     } else {
@@ -433,7 +432,7 @@ global void SendCommandCancelTraining(Unit* unit,int slot)
 */
 global void SendCommandUpgradeTo(Unit* unit,UnitType* what,int flush)
 {
-    CommandLog("upgrade-to",unit,flush,0,0,0,NULL,what->Ident);
+    CommandLog("upgrade-to",unit,flush,-1,-1,NULL,what->Ident,-1);
     if( NetworkFildes==-1 ) {
 	CommandUpgradeTo(unit,what,flush);
     } else {
@@ -448,7 +447,7 @@ global void SendCommandUpgradeTo(Unit* unit,UnitType* what,int flush)
 */
 global void SendCommandCancelUpgradeTo(Unit* unit)
 {
-    CommandLog("cancel-upgrade-to",unit,1,0,0,0,NoUnitP,NULL);
+    CommandLog("cancel-upgrade-to",unit,1,-1,-1,NoUnitP,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandCancelUpgradeTo(unit);
     } else {
@@ -466,7 +465,7 @@ global void SendCommandCancelUpgradeTo(Unit* unit)
 */
 global void SendCommandResearch(Unit* unit,Upgrade* what,int flush)
 {
-    CommandLog("research",unit,flush,0,0,0,NULL,what->Ident);
+    CommandLog("research",unit,flush,-1,-1,NULL,what->Ident,-1);
     if( NetworkFildes==-1 ) {
 	CommandResearch(unit,what,flush);
     } else {
@@ -482,7 +481,7 @@ global void SendCommandResearch(Unit* unit,Upgrade* what,int flush)
 */
 global void SendCommandCancelResearch(Unit* unit)
 {
-    CommandLog("cancel-research",unit,1,0,0,0,NoUnitP,NULL);
+    CommandLog("cancel-research",unit,1,-1,-1,NoUnitP,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandCancelResearch(unit);
     } else {
@@ -502,7 +501,7 @@ global void SendCommandCancelResearch(Unit* unit)
 */
 global void SendCommandDemolish(Unit* unit,int x,int y,Unit* attack,int flush)
 {
-    CommandLog("demolish",unit,flush,1,x,y,attack,NULL);
+    CommandLog("demolish",unit,flush,x,y,attack,NULL,-1);
     if( NetworkFildes==-1 ) {
 	CommandDemolish(unit,x,y,attack,flush);
     } else {
@@ -522,11 +521,12 @@ global void SendCommandDemolish(Unit* unit,int x,int y,Unit* attack,int flush)
 */
 global void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int flush)
 {
-    CommandLog("spell-cast",unit,flush,1,x,y,dest,NULL); //FIXME: vladi: spellid?
+    CommandLog("spell-cast",unit,flush,x,y,dest,NULL,spellid);
     if( NetworkFildes==-1 ) {
 	CommandSpellCast(unit,x,y,dest,spellid,flush);
     } else {
-	NetworkSendCommand(MessageCommandSpellCast+spellid,unit,x,y,dest,0,flush);
+	NetworkSendCommand(MessageCommandSpellCast+spellid
+		,unit,x,y,dest,0,flush);
     }
 }
 
