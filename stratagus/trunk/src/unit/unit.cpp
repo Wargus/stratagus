@@ -1505,12 +1505,25 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     int x;
     int y;
     int i;
+    int n;
     int mask;
+    Unit* table[UnitMax];
 
     DebugCheck( !unit->Removed );
 
-    x=unit->X;
-    y=unit->Y;
+    // FIXME: better and quicker solution, to find the building.
+    x=y=-1;
+    n=SelectUnitsOnTile(unit->X,unit->Y,table);
+    for( i=0; i<n; ++i ) {
+	if( UnitUnusable(table[i]) ) {
+	    continue;
+	}
+	if( table[i]->Type->Building ) {
+	    x=table[i]->X;
+	    y=table[i]->Y;
+	}
+    }
+    DebugCheck( x==-1 || y==-1 );
     mask=UnitMovementMask(unit);
 
     if( heading<LookingNE || heading>LookingNW) {
@@ -1638,12 +1651,24 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
     int besty;
     int bestd;
     int mask;
+    Unit* table[UnitMax];
 
     DebugLevel3Fn("%d\n",UnitNumber(unit));
     DebugCheck( !unit->Removed );
 
-    x=unit->X;
-    y=unit->Y;
+    // FIXME: better and quicker solution, to find the building.
+    x=y=-1;
+    n=SelectUnitsOnTile(unit->X,unit->Y,table);
+    for( i=0; i<n; ++i ) {
+	if( UnitUnusable(table[i]) ) {
+	    continue;
+	}
+	if( table[i]->Type->Building ) {
+	    x=table[i]->X;
+	    y=table[i]->Y;
+	}
+    }
+    DebugCheck( x==-1 || y==-1 );
     mask=UnitMovementMask(unit);
 
     bestd=99999;
@@ -1753,16 +1778,29 @@ global void DropOutAll(const Unit* source)
     // FIXME: Rewrite this use source->Next;
     Unit** table;
     Unit* unit;
+    Unit* table2[UnitMax];
+    int i;
+    int n;
 
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
-	if( unit->Removed && unit->X==source->X && unit->Y==source->Y ) {
-	    DropOutOnSide(unit,LookingW
-		    ,source->Type->TileWidth,source->Type->TileHeight);
-	    DebugCheck( unit->Orders[0].Goal );
-	    unit->Orders[0].Action=UnitActionStill;
-	    unit->Wait=unit->Reset=1;
-	    unit->SubAction=0;
+	if( unit->Removed ) {
+	    n=SelectUnitsOnTile(unit->X,unit->Y,table2);
+	    for( i=0; i<n; ++i ) {
+		if( UnitUnusable(table2[i]) ) {
+		    continue;
+		}
+		if( table2[i]->Type->Building ) {
+		    if ( table2[i]->X==source->X && table2[i]->Y==source->Y ) {
+			DropOutOnSide(unit,LookingW
+			    ,source->Type->TileWidth,source->Type->TileHeight);
+			DebugCheck( unit->Orders[0].Goal );
+			unit->Orders[0].Action=UnitActionStill;
+			unit->Wait=unit->Reset=1;
+			unit->SubAction=0;
+		    }
+		}
+	    }
 	}
     }
 }
@@ -2074,8 +2112,9 @@ global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 	    continue;
 	}
 	d=MapDistanceToUnit(x,y,unit);
-	// FIXME: UnitReachable(source,unit) didn't work unit still in building
-	if( d<best_d /* && UnitReachable(source,unit) */ ) {
+	// FIXME: UnitReachable(source,unit) didn't work if way blocked
+	// by another worker
+	if( d<best_d  && UnitReachable(source,unit,1)  ) {
 	    best_d=d;
 	    best=unit;
 	}
