@@ -204,6 +204,7 @@ int PlayMovie(const char* name)
 	}
 
 	if (OggInit(f, data) || !data->video) {
+		OggFree(data);
 		free(data);
 		CLclose(f);
 		return -1;
@@ -286,22 +287,7 @@ int PlayMovie(const char* name)
 	StopMusic();
 	SDL_FreeYUVOverlay(yuv_overlay);
 
-	if (data->audio) {
-		ogg_stream_clear(&data->astream);
-		vorbis_block_clear(&data->vblock);
-		vorbis_dsp_clear(&data->vdsp);
-		vorbis_comment_clear(&data->vcomment);
-		vorbis_info_clear(&data->vinfo);
-	}
-
-	if (data->video) {
-		ogg_stream_clear(&data->vstream);
-		theora_comment_clear(&data->tcomment);
-		theora_info_clear(&data->tinfo);
-		theora_clear(&data->tstate);
-	}
-
-	ogg_sync_clear(&data->sync);
+	OggFree(data);
 	free(data);
 	CLclose(f);
 

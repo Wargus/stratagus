@@ -278,6 +278,26 @@ int OggInit(CLFile *f, OggData *data)
 #endif
 }
 
+void OggFree(OggData *data)
+{
+	if (data->audio) {
+		ogg_stream_clear(&data->astream);
+		vorbis_block_clear(&data->vblock);
+		vorbis_dsp_clear(&data->vdsp);
+		vorbis_comment_clear(&data->vcomment);
+		vorbis_info_clear(&data->vinfo);
+	}
+#ifdef USE_THEORA
+	if (data->video) {
+		ogg_stream_clear(&data->vstream);
+		theora_comment_clear(&data->tcomment);
+		theora_info_clear(&data->tinfo);
+		theora_clear(&data->tstate);
+	}
+#endif
+	ogg_sync_clear(&data->sync);
+}
+
 static int VorbisStreamRead(Sample* sample, void* buf, int len)
 {
 	OggData* data;
@@ -316,22 +336,7 @@ static void VorbisStreamFree(Sample* sample)
 	data = sample->User;
 
 	CLclose(data->File);
-
-	if (data->audio) {
-		ogg_stream_clear(&data->astream);
-		vorbis_block_clear(&data->vblock);
-		vorbis_dsp_clear(&data->vdsp);
-		vorbis_comment_clear(&data->vcomment);
-		vorbis_info_clear(&data->vinfo);
-	}
-#ifdef USE_THEORA
-	if (data->video) {
-		ogg_stream_clear(&data->vstream);
-		theora_comment_clear(&data->tcomment);
-		theora_info_clear(&data->tinfo);
-		theora_clear(&data->tstate);
-	}
-#endif
+	OggFree(data);
 
 	free(data);
 	free(sample->Buffer);
@@ -452,6 +457,9 @@ Sample* LoadVorbis(const char* name,int flags)
 		sample->Pos = 0;
 		sample->Buffer = buf;
 		sample->Type = &VorbisSampleType;
+
+		CLclose(f);
+		OggFree(data);
 	}
 
 	return sample;
