@@ -115,7 +115,7 @@ global void HandleActionBuild(Unit* unit)
     if( !CanBuildUnitType(unit,type,x,y) ) {
 	// FIXME: use general notify/messages
         if( unit->Player==ThisPlayer ) {
-	    SetMessage("You cannot build here.");
+	    SetMessage("You cannot build %s here.", type->Name);
 	} else {
 	    AiCanNotBuild(unit,type);
 	}
@@ -252,7 +252,7 @@ global void HandleActionBuilded(Unit* unit)
 
 	// FIXME: General message system
 	if( unit->Player==ThisPlayer ) {
-	    SetMessage("Work complete");
+	    SetMessage2( unit->X, unit->Y, "New %s done", type->Name );
 	    PlayUnitSound(peon,VoiceWorkCompleted);
 	} else {
 	    AiWorkComplete(peon,unit);

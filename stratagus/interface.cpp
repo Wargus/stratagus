@@ -194,6 +194,10 @@ local int CommandKey(int key)
 	    ToggleGrabMouse();
 	    break;
 
+        case ' ':
+            CenterOnMessage();
+            break; 
+
 //	TAB toggles minimap.
 //	FIXME: more...
 	case '\t':
