@@ -59,9 +59,9 @@ global void* VideoMemory;
 */
 global int VideoDepth;
 
-global VMemType8 * Pixels8;
-global VMemType16 * Pixels16;
-global VMemType32 * Pixels32;
+global VMemType8 * Pixels8;		/// 8 bpp palette FIXME: remove pointer
+global VMemType16 * Pixels16;		/// 16 bpp palette
+global VMemType32 * Pixels32;		/// 32 bpp palette
 global Palette GlobalPalette[256];
 
 /*----------------------------------------------------------------------------
@@ -96,6 +96,7 @@ global void InitVideoSync(void)
 	return;
     }
 
+    // FIXME: didn't work with SDL/SVGAlib
     if( SDL_SetTimer(
 		(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed,
 		VideoSyncHandler) ) {
@@ -119,6 +120,7 @@ global void InitVideoSdl(void)
     //	Initialize the SDL library
 
 #ifdef USE_SDLA
+    // FIXME: didn't work with SDL SVGAlib
     if ( SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0 )
 #else
     if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0 )
@@ -162,7 +164,10 @@ global void InitVideoSdl(void)
     // Turn cursor off, we use our own.
     SDL_ShowCursor(0);
 
-    VideoMemory=Screen->pixels;
+    SDL_LockSurface(Screen);
+    VideoMemory=Screen->pixels;		// Hope this is constant
+    SDL_UnlockSurface(Screen);
+
     //
     //	I need the used bits per pixel.
     //	You see it's better making all self, than using wired libaries :)
@@ -580,15 +585,15 @@ global GraphicData * VideoCreateNewPalette(const Palette *palette)
 
     switch( VideoDepth ) {
     case 8:
-	pixels=calloc(256,sizeof(VMemType8));
+	pixels=malloc(256*sizeof(VMemType8));
 	break;
     case 15:
     case 16:
-	pixels=calloc(256,sizeof(VMemType16));
+	pixels=malloc(256*sizeof(VMemType16));
 	break;
     case 24:
     case 32:
-	pixels=calloc(256,sizeof(VMemType32));
+	pixels=malloc(256*sizeof(VMemType32));
 	break;
     default:
 	DebugLevel0(__FUNCTION__": Unknown depth\n");
