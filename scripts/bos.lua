@@ -108,7 +108,8 @@ DefineUnitTypeWcNames(
 	"unit-gturret",
 	"unit-cam",
 	"unit-plate1",
-	"unit-radar")
+	"unit-radar",
+        "unit-tree")
 
 DefineIconWcNames(
 	"icon-assault", "icon-apcs", "icon-grenadier", "icon-bazoo",
@@ -129,9 +130,9 @@ DefineUpgradeWcNames(
 
 DefineAiWcNames("ai-rush", "ai-passive")
 
-SetColorWaterCycleStart(38)
-SetColorWaterCycleEnd(47)
-SetColorIconCycleStart(240)
-SetColorIconCycleEnd(244)
-SetColorBuildingCycleStart(205)
-SetColorBuildingCycleEnd(207)
+SetColorWaterCycleStart(254)
+SetColorWaterCycleEnd(254)
+SetColorIconCycleStart(254)
+SetColorIconCycleEnd(254)
+SetColorBuildingCycleStart(254)
+SetColorBuildingCycleEnd(254)
