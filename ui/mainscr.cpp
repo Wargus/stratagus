@@ -254,6 +254,11 @@ global void DrawUnitInfo(const Unit* unit)
 		VideoDrawTextCentered(x + 114, y + 8 + 33, GameFont, buf);
 	}
 
+#ifdef DEBUG
+	// Draw Unit Number for debug Purposes
+	VideoDrawNumber(x + 10, y + 8 + 150, GameFont, unit->Slot);
+#endif
+
 	//
 	//		Show How much a resource has left for owner and neutral.
 	//
@@ -270,7 +275,9 @@ global void DrawUnitInfo(const Unit* unit)
 			} else {
 				VideoDrawNumber(x + 108, y + 8 + 78, GameFont, unit->Value);
 			}
-			return;
+			if (unit->Orders[0].Action != UnitActionBuilded) {
+				return;
+			}
 		}
 	}
 
