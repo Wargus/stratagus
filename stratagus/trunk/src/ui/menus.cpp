@@ -515,7 +515,6 @@ local void ScenSelectLBExit(Menuitem *mi)
 local void ScenSelectLBInit(Menuitem *mi)
 {
     char *suf;
-    FileList *fl;
 
     ScenSelectLBExit(mi);
     if (ScenSelectMenuItems[5].d.pulldown.curopt == 0)
