@@ -112,14 +112,14 @@
 
 #ifndef __GNUC__	// { disable GNU C Compiler features
 
-#define __attribute__(args)		// Does nothing
+#define __attribute__(args)		/// Does nothing for non GNU CC
 
 #endif	// }
 
 #ifdef _MSC_VER	// { m$ auto detection
 
-#define inline __inline			// Fix m$ brain damage
-#define alloca _alloca			// I hope this works with all VC..
+#define inline __inline			/// Fix m$ brain damage
+#define alloca _alloca			/// I hope this works with all VC..
 
 #ifndef __FUNCTION__
     // I don't know, but eVC didn't has it, even it is documented
@@ -132,7 +132,7 @@
 #pragma warning(disable:4761)		// Integral size mismatch
 #define access(x,y) _access((x),(y))	/// Unix -> dumm
 #define snprintf _snprintf		/// Unix -> dumm
-#define mkdir(x) _mkdir((x))
+#define mkdir(x) _mkdir((x))		/// Unix -> dumm
 #endif
 
 #endif	// } m$
