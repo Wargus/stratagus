@@ -178,7 +178,14 @@ global void HandleActionStill(Unit* unit)
 		if( unit->Command.Data.Move.Goal ) {
 		    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
 		    unit->Command.Data.Move.Goal->Refs--;
-		    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+		    if( unit->Command.Data.Move.Goal ->Destroyed ) {
+			DebugLevel0Fn("destroyed unit\n");
+			if( !unit->Command.Data.Move.Goal->Refs ) {
+			    ReleaseUnit(unit->Command.Data.Move.Goal);
+			}
+		    } else {
+			DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+		    }
 		}
 		unit->Command.Data.Move.Goal=goal;
 		goal->Refs++;
