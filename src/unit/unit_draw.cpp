@@ -1184,8 +1184,8 @@ void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 			type->TileWidth * TileSizeX) / 2;
 		y -= (type->ShadowHeight -
 			type->TileHeight * TileSizeY) / 2;
-		x += type->ShadowOffsetX;
-		y += type->ShadowOffsetY;
+		x += type->OffsetX + type->ShadowOffsetX;
+		y += type->OffsetY + type->ShadowOffsetY;
 
 		if (type->Flip) {
 			if (frame < 0) {
@@ -1705,6 +1705,8 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 			y -= (unit->Type->Construction->Height - unit->Type->TileHeight * TileSizeY )/ 2;
 // x += type->ShadowOffsetX;
 // y += type->ShadowOffsetY;
+			x += unit->Type->OffsetX;
+			y += unit->Type->OffsetY;
 			if (unit->Type->Flip) {
 				if (frame < 0) {
 					VideoDrawClipX(unit->Type->Construction->ShadowSprite,
@@ -1732,6 +1734,8 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 			y -= (unit->Type->ShadowHeight - unit->Type->TileHeight * TileSizeY) / 2;
 			x += unit->Type->ShadowOffsetX;
 			y += unit->Type->ShadowOffsetY;
+			x += unit->Type->OffsetX;
+			y += unit->Type->OffsetY;
 			if (unit->Type->Flip) {
 				if (frame < 0) {
 					VideoDrawClipX(unit->Type->ShadowSprite, -frame - 1, x, y);
