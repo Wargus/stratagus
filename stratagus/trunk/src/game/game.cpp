@@ -172,7 +172,7 @@ local void GameTypeFreeForAll(void)
     for (i=0; i<15; i++) {
 	for (j=0; j<15; j++) {
 	    if (i != j) {
-		SendCommandDiplomacy(i,DiplomacyEnemy,j);
+		CommandDiplomacy(i,DiplomacyEnemy,j);
 	    }
 	}
     }
@@ -198,9 +198,9 @@ local void GameTypeTopVsBottom(void)
 	    if (i != j) {
 		if ((top && Players[j].StartY <= middle) ||
 		    (!top && Players[j].StartY > middle)) {
-		    SendCommandDiplomacy(i,DiplomacyAllied,j);
+		    CommandDiplomacy(i,DiplomacyAllied,j);
 		} else {
-		    SendCommandDiplomacy(i,DiplomacyEnemy,j);
+		    CommandDiplomacy(i,DiplomacyEnemy,j);
 		}
 	    }
 	}
@@ -227,9 +227,9 @@ local void GameTypeLeftVsRight(void)
 	    if (i != j) {
 		if ((top && Players[j].StartX <= middle) ||
 		    (!top && Players[j].StartX > middle)) {
-		    SendCommandDiplomacy(i,DiplomacyAllied,j);
+		    CommandDiplomacy(i,DiplomacyAllied,j);
 		} else {
-		    SendCommandDiplomacy(i,DiplomacyEnemy,j);
+		    CommandDiplomacy(i,DiplomacyEnemy,j);
 		}
 	    }
 	}
