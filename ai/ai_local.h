@@ -66,7 +66,7 @@ typedef struct _ai_goal_ AiGoal;
 **	AI Priority, will later be finer tuned.
 */
 enum _ai_priority_ {
-    AiPriorityVeryLow,			/// very low 
+    AiPriorityVeryLow,			/// very low
     AiPriorityLow,			/// low
     AiPriorityMid,			/// middle
     AiPriorityHigh,			/// high
@@ -167,7 +167,7 @@ typedef struct _ai_force_ AiForce;
 **	A force is a group of units belonging together.
 */
 struct _ai_force_ {
-    int 		Completed;	/// Flag saying force is complete build
+    int			Completed;	/// Flag saying force is complete build
     int			Defending;	/// Flag saying force is defending
     int			Attacking;	/// Flag saying force is attacking
     AiUnitType*		UnitTypes;	/// Count and types of unit-type
@@ -231,6 +231,9 @@ typedef struct _player_ai_ {
 
 	/// What the resource manager should build
     AiBuildQueue*	UnitTypeBuilded;
+
+	/// Last building checked for repair in this turn
+    int		LastRepairBuilding;
 
 } PlayerAi;
 

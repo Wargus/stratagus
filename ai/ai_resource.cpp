@@ -1060,6 +1060,10 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
 {
     Unit* table[UnitMax];
     Unit* unit;
+    Unit* unit_temp;
+    int distance[UnitMax];
+    int rX,rY,r_temp;
+    int j,index_temp;
     int nunits;
     int i;
     int num;
@@ -1072,6 +1076,8 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     //  Remove all workers not mining. //on the way building something
     //	FIXME: too hardcoded, not nice, needs improvement.
     //
+
+    // Selection of mining workers.
     nunits = FindPlayerUnitsByType(AiPlayer->Player,type,table);
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
@@ -1082,7 +1088,43 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
 	}
     }
 
-    for( i=0; i<num; ++i ) {
+    // Sort by distance loops -Antonis-
+    for (i=0; i<num; ++i) {
+	unit = table[i];
+	//	FIXME: Probably calculated from top left corner of building
+	if (rX = unit->X - building->X < 0) rX = -rX;
+	if (rY = unit->Y - building->Y < 0) rY = -rY;	// I don't trust fabs()
+	if (rX<rY) {
+	    distance[i] = rX;
+	}
+	else {
+	    distance[i] = rY;
+	}
+    }
+    for (i=0; i<num; ++i) {
+	r_temp = distance[i];
+	index_temp = i;
+	for (j=i; j<num; ++j) {
+	    if (distance[j] < r_temp) {
+		r_temp = distance[j];
+		index_temp = j;
+	    }
+	}
+	if (index_temp > i) {
+	    unit_temp = table[index_temp];
+	    table[index_temp] = table[i];
+	    distance[index_temp] = distance[i];
+	    table[i] = unit_temp;
+	    distance[i] = r_temp;	// May be omitted, here for completence
+	}
+    }
+
+    // Check if building is reachable
+    // FIXME: Antonis: To reduce slowdowns I limit checked workers to 3 in the
+    // hope that closest workers have more possibilities to reach. Works well,
+    // but flood fill will be better. Flood fill will not need the above sorting
+    // loops and it will stop as soon as the building is unreachable.
+    for( i=0; i<num && i<3; ++i ) {
 
 	unit=table[i];
 	DebugLevel2Fn("Have an unit to repair %d :)\n" _C_ UnitNumber(unit));
@@ -1147,13 +1189,24 @@ local int AiRepairUnit(Unit* unit)
 */
 local void AiCheckRepair(void)
 {
-    int i,j;
+    int i,j,k;
     int n;
     int repair_flag;
     Unit* unit;
 
     n=AiPlayer->Player->TotalNumUnits;
-    for( i=0; i<n; ++i ) {
+    k=0;
+	// Selector for next unit
+    for( i=n; (i>0); --i ) {
+	unit=AiPlayer->Player->Units[i];
+	if (unit) {
+	    if (UnitNumber(unit)==AiPlayer->LastRepairBuilding) {
+		k=i+1;
+	    }
+	}
+    }
+    
+    for( i=k; i<n; ++i ) {
 	unit=AiPlayer->Player->Units[i];
 	repair_flag=1;
 	// Unit defekt?
@@ -1171,15 +1224,16 @@ local void AiCheckRepair(void)
 		if( unit->Stats->Costs[j]
 			&& AiPlayer->Player->Resources[j]<99 ) {
 		    repair_flag=0;
-		// } else {
-		//   repair_flag&=1;
 		}
 	    }
 	    if ( repair_flag ) {
 		AiRepairUnit(unit);
+		AiPlayer->LastRepairBuilding=UnitNumber(unit);
+		return;
 	    }
 	}
     }
+    AiPlayer->LastRepairBuilding=0;
 }
 
 /**
