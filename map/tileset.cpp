@@ -449,35 +449,60 @@ local void SaveTileset(FILE* file,const Tileset* tileset)
     //
     //	Solids
     //
-    SaveTilesetSolid(file,table,"unused",		"",		0x00);
-    SaveTilesetSolid(file,table,"light-water",		"'water",	0x10);
-    SaveTilesetSolid(file,table,"dark-water",		"'water",	0x20);
-    SaveTilesetSolid(file,table,"light-coast",		"'no-building",	0x30);
-    SaveTilesetSolid(file,table,"dark-coast",		"'no-building",	0x40);
-    SaveTilesetSolid(file,table,"light-grass",		"",		0x50);
-    SaveTilesetSolid(file,table,"dark-grass",		"",		0x60);
-    SaveTilesetSolid(file,table,"forest",		"'forest",	0x70);
-    SaveTilesetSolid(file,table,"rocks",		"'rock",	0x80);
-    SaveTilesetSolid(file,table,"human-closed-wall",	"'wall",	0x90);
-    SaveTilesetSolid(file,table,"orc-closed-wall",	"'wall",	0xA0);
-    SaveTilesetSolid(file,table,"human-open-wall",	"'wall",	0xB0);
-    SaveTilesetSolid(file,table,"orc-open-wall",	"'wall",	0xC0);
-    SaveTilesetSolid(file,table,"unused",		"",		0xD0);
-    SaveTilesetSolid(file,table,"unused",		"",		0xE0);
-    SaveTilesetSolid(file,table,"unused",		"",		0xF0);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x00]], "", 0x00);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x10]], "'water", 0x10);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x20]], "'water", 0x20);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x30]], "'no-building", 0x30);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x40]], "'no-building", 0x40);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x50]], "", 0x50);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x60]], "", 0x60);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x70]], "'forest", 0x70);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x80]], "'rock", 0x80);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0x90]], "'wall", 0x90);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0xA0]], "'wall", 0xA0);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0xB0]], "'wall", 0xB0);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0xC0]], "'wall", 0xC0);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0xD0]], "", 0xD0);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0xE0]], "", 0xE0);
+    SaveTilesetSolid(file, table,
+	tileset->TileNames[tileset->BasicNameTable[0xF0]], "", 0xF0);
 
     //
     //	Mixeds
     //
-    SaveTilesetMixed(file,table,"dark-water","light-water","'water",	0x100);
-    SaveTilesetMixed(file,table,"light-water","light-coast","'coast",	0x200);
-    SaveTilesetMixed(file,table,"dark-coast","light-coast","'no-building",0x300);
-    SaveTilesetMixed(file,table,"rocks","light-coast","'rock",		0x400);
-    SaveTilesetMixed(file,table,"light-coast","light-ground","'no-building",0x500);
-    SaveTilesetMixed(file,table,"dark-ground","light-ground","",	0x600);
-    SaveTilesetMixed(file,table,"forest","light-ground","'forest",	0x700);
-    SaveTilesetMixed(file,table,"human-wall","dark-ground","'wall",	0x800);
-    SaveTilesetMixed(file,table,"orc-wall","dark-ground","'wall",	0x900);
+    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x100]],
+	tileset->TileNames[tileset->MixedNameTable[0x100]],"'water",	0x100);
+    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x200]],
+	tileset->TileNames[tileset->MixedNameTable[0x200]],"'coast",	0x200);
+    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x300]],
+	tileset->TileNames[tileset->MixedNameTable[0x300]],"'no-building",	0x300);
+    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x400]],
+	tileset->TileNames[tileset->MixedNameTable[0x400]],"'rock",		0x400);
+    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x500]],
+	tileset->TileNames[tileset->MixedNameTable[0x500]],"'no-building",	0x500);
+    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x600]],
+	tileset->TileNames[tileset->MixedNameTable[0x600]],"",		0x600);
+    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x700]],
+	tileset->TileNames[tileset->MixedNameTable[0x700]],"'forest",	0x700);
+    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x800]],
+	tileset->TileNames[tileset->MixedNameTable[0x800]],"'wall",		0x800);
+    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x900]],
+	tileset->TileNames[tileset->MixedNameTable[0x900]],"'wall",		0x900);
     fprintf(file,"  )\n");
     fprintf(file,"  ;; Animated tiles\n");
     fprintf(file,"  'animations (list #( ) )\n");
@@ -521,6 +546,7 @@ global void SaveTilesets(FILE* file)
 global void CleanTilesets(void)
 {
     int i;
+    int j;
     char** ptr;
 
     //
@@ -533,9 +559,16 @@ global void CleanTilesets(void)
 	free(Tilesets[i]->File);
 	free(Tilesets[i]->PaletteFile);
 	free(Tilesets[i]->Table);
+	free(Tilesets[i]->FlagsTable);
+	free(Tilesets[i]->BasicNameTable);
+	free(Tilesets[i]->MixedNameTable);
 	free(Tilesets[i]->TileTypeTable);
 	free(Tilesets[i]->AnimationTable);
 	free(Tilesets[i]);
+	for( j=0; j<Tilesets[i]->NumNames; ++j ) {
+	    free(Tilesets[i]->TileNames[j]);
+	}
+	free(Tilesets[i]->TileNames);
     }
     free(Tilesets);
     Tilesets=NULL;
