@@ -549,7 +549,7 @@ global Unit* AttackUnitsInRange(const Unit* unit)
     IfDebug(
 
 	if( !unit->Type->CanAttack && !unit->Type->Tower ) {
-	    DebugLevel0("Should be handled by caller?\n");
+	    DebugLevel0Fn("Should be handled by caller?\n");
 	    abort();
 	    return NoUnitP;
 	}
@@ -576,7 +576,7 @@ global Unit* AttackUnitsInReactRange(const Unit* unit)
     type=unit->Type;
     IfDebug(
 	if( !type->CanAttack && !type->Tower ) {
-	    DebugLevel0("Should be handled by caller?\n");
+	    DebugLevel0Fn("Should be handled by caller?\n");
 	    abort();
 	    return NoUnitP;
 	}

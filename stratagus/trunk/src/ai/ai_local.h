@@ -168,9 +168,10 @@ typedef struct _ai_force_ AiForce;
 */
 struct _ai_force_ {
     int 		Completed;	/// Flag saying force is complete build
+    int			Defending;	/// Flag saying force is defending
     int			Attacking;	/// Flag saying force is attacking
     AiUnitType*		UnitTypes;	/// Count and types of unit-type
-    AiUnit*		Units;		/// Units in the force.
+    AiUnit*		Units;		/// Units in the force
 };
 
 /**
@@ -204,7 +205,7 @@ typedef struct _player_ai_ {
 
     // forces
 #define AI_MAX_FORCES	10		/// How many forces are supported
-    AiForce	Force[AI_MAX_FORCES];	/// Forces controlled by AI.
+    AiForce	Force[AI_MAX_FORCES];	/// Forces controlled by AI
 
     // resource manager
 
@@ -315,8 +316,14 @@ extern int AiFindBuildingPlace(const Unit*, const UnitType * , int *, int *);
 //
 //	Forces
 //
-    /// Assign a new unit to a force.
+    /// Assign a new unit to a force
 extern void AiAssignToForce(Unit* unit);
+    /// Attack with force at position
+extern void AiAttackWithForceAt(int force,int x,int y);
+    /// Attack with force
+extern void AiAttackWithForce(int force);
+    /// Periodic called force manager handler
+extern void AiForceManager(void);
 
 //@}
 

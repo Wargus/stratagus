@@ -89,7 +89,7 @@ local void AiCheckUnits(void)
     //
     for( queue=AiPlayer->UnitTypeBuilded; queue; queue=queue->Next ) {
 	counter[queue->Type->Type]+=queue->Want;
-	DebugLevel0Fn("Already in build queue: %s %d/%d\n" _C_
+	DebugLevel3Fn("Already in build queue: %s %d/%d\n" _C_
 		queue->Type->Ident _C_ queue->Made _C_ queue->Want);
     }
     unit_types_count=AiPlayer->Player->UnitTypesCount;
@@ -102,7 +102,7 @@ local void AiCheckUnits(void)
 	t=AiPlayer->UnitTypeRequests[i].Table[0]->Type;
 	x=AiPlayer->UnitTypeRequests[i].Count;
 	if( x>unit_types_count[t]+counter[t] ) {	// Request it.
-	    DebugLevel0Fn("Need %s *%d\n" _C_
+	    DebugLevel3Fn("Need %s *%d\n" _C_
 		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident,x);
 	    AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Table[0],
 		    x-unit_types_count[t]-counter[t]);
@@ -121,7 +121,7 @@ local void AiCheckUnits(void)
 	    t=aiut->Type->Type;
 	    x=aiut->Want;
 	    if( x>unit_types_count[t]+counter[t] ) {	// Request it.
-		DebugLevel0Fn("Force %d need %s * %d\n" _C_ i _C_
+		DebugLevel3Fn("Force %d need %s * %d\n" _C_ i _C_
 			aiut->Type->Ident,x);
 		AiAddUnitTypeRequest(aiut->Type,
 			x-unit_types_count[t]-counter[t]);
@@ -234,8 +234,16 @@ local void AiReduceMadeInBuilded(const PlayerAi* pai,const UnitType* type)
 */
 global void AiHelpMe(Unit* unit)
 {
-    DebugLevel0Fn("%d(%s) attacked at %d,%d" _C_
+    PlayerAi* pai;
+
+    DebugLevel0Fn("%d(%s) attacked at %d,%d\n" _C_
 	    UnitNumber(unit) _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
+
+    pai=unit->Player->Ai;
+    if( !pai->Force[0].Attacking ) {	// Send force 0 defending
+	AiAttackWithForceAt(0,unit->X,unit->Y);
+	pai->Force[0].Defending=1;
+    }
 }
 
 /**
@@ -336,7 +344,7 @@ global void AiEachFrame(Player* player)
 global void AiEachSecond(Player* player)
 {
 
-    DebugLevel0Fn("%d:\n" _C_ player->Player);
+    DebugLevel3Fn("%d:\n" _C_ player->Player);
 
     AiPlayer=player->Ai;
     //
@@ -347,11 +355,14 @@ global void AiEachSecond(Player* player)
     //	Look if everything is fine.
     //
     AiCheckUnits();
-
     //
     //	Handle the resource manager.
     //
     AiResourceManager();
+    //
+    //	Handle the force manager.
+    //
+    AiForceManager();
 }
 
 //@}

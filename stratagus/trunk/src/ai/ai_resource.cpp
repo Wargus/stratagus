@@ -174,16 +174,16 @@ local void AiRequestFarms(void)
 	    return;
 	}
 
-	DebugLevel0Fn("Must build: %s " _C_ type->Ident);
+	DebugLevel3Fn("Must build: %s " _C_ type->Ident);
 	//
 	//	Check if resources available.
 	//
 	if( (c=AiCheckUnitTypeCosts(type)) ) {
-	    DebugLevel0("- no resources\n");
+	    DebugLevel3("- no resources\n");
 	    AiPlayer->NeededMask|=c;
 	    return;
 	} else {
-	    DebugLevel0("- enough resources\n");
+	    DebugLevel3("- enough resources\n");
 	    if( AiMakeUnit(type) ) {
 		queue=malloc(sizeof(*AiPlayer->UnitTypeBuilded));
 		queue->Next=AiPlayer->UnitTypeBuilded;
@@ -474,6 +474,25 @@ local int AiHarvest(Unit * unit)
 }
 
 /**
+**      Assign worker to haul oil.
+*/
+local int AiHaulOil(Unit * unit)
+{
+    Unit *dest;
+
+    DebugLevel3Fn("%d\n", UnitNumber(unit));
+    dest = FindOilPlatform(unit->Player, unit->X, unit->Y);
+    if (!dest) {
+	DebugLevel0Fn("oil platform not reachable\n");
+	return 0;
+    }
+    DebugCheck(unit->Type!=UnitTypeHumanTanker && unit->Type!=UnitTypeOrcTanker);
+    CommandHaulOil(unit, dest,FlushCommands);
+
+    return 1;
+}
+
+/**
 **	Assign workers to collect resources.
 **
 **	If we have a shortage of a resource, let many workers collecting this.
@@ -519,14 +538,20 @@ local void AiCollectResources(void)
 	    if (table[i]->Orders[0].Action != UnitActionBuild
 		    && table[i]->OrderCount==1 ) {
 		switch( c ) {
-		    case 1:
+		    case GoldCost:
 			if (table[i]->Orders[0].Action != UnitActionMineGold ) {
 			    AiMineGold(table[i]);
 			}
 			break;
-		    case 2:
+		    case WoodCost:
 			if (table[i]->Orders[0].Action != UnitActionHarvest ) {
 			    AiHarvest(table[i]);
+			}
+			break;
+
+		    case OilCost:
+			if (table[i]->Orders[0].Action != UnitActionHaulOil ) {
+			    AiHaulOil(table[i]);
 			}
 			break;
 		    default:
@@ -566,11 +591,14 @@ local void AiCollectResources(void)
 		continue;
 	    }
 	    switch( c ) {
-		case 1:
+		case GoldCost:
 		    AiMineGold(table[i]);
 		    break;
-		case 2:
+		case WoodCost:
 		    AiHarvest(table[i]);
+		    break;
+		case OilCost:
+		    AiHaulOil(table[i]);
 		    break;
 		default:
 		    DebugCheck( 1 );
