@@ -1372,39 +1372,10 @@ global void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
 */
 global int CheckUnitToBeDrawn(Unit* unit)
 {
-#ifdef NEW_MAPDRAW
-	int sx;
-	int sy;
-	int ex;
-	int ey;
-
-	// in debug-mode check unsupported displacement exceeding an entire Tile
-	// FIXME: displacement could always be made positive and smaller than Tile
-#if NEW_MAPDRAW > 1
-	if (unit->IX <= -TileSizeX || unit->IX >= TileSizeX ||
-			unit->IY <= -TileSizeY || unit->IY >= TileSizeY) {
-		printf("internal error in CheckUnitToBeDrawn\n");
-	}
-#endif
-
-	GetUnitMapArea(unit, &sx, &sy, &ex, &ey);
-
-	// FIXME: extra tiles added here for attached statusbar/mana/shadow/..
-	--sx;
-	--sy;
-	++ex;
-	++ey;
-
-	if (MarkDrawAreaMap(sx, sy, ex, ey)) {
-		//  MustRedraw|=RedrawMinimap;
-		return 1;
-	}
-#else
 	if (UnitVisibleOnScreen(unit)) {
 		MustRedraw |= RedrawMap;
 		return 1;
 	}
-#endif
 	return 0;
 }
 
