@@ -317,15 +317,12 @@ local int PlayCDRom(const char* name)
 		    break;
 		}
 	    }
-	    if (data_cd) {
-		CDMode = ":off";
-		return 1;
-	    }
-	    if (NumCDTracks == 0) {
+	    if (data_cd || !NumCDTracks) {
 		CDMode = ":off";
 		return 1;
 	    }
 	}
+	--CDTrack;
     }
 
     if (!strncmp(name, ":", 1)) {
