@@ -624,7 +624,7 @@ local Menuitem NetMultiClientMenuItems[] = {
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
 	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, MI_PSTATE_PASSIVE} } },
 
-    { MI_TYPE_GEM, 10, 32+22, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL,
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL,
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
@@ -2521,7 +2521,7 @@ global void NetClientUpdateState(void)
 **	@param key	Key scancode.
 **	@return		True, if key is handled; otherwise false.
 */
-global int MenuHandleKeyboard(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
+global int MenuHandleKeyboard(int key, int keychar)		// FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
 {					//        to implement button animation (depress before action)
     int i, n;
     Menuitem *mi;
@@ -2560,7 +2560,7 @@ inkey:
 		default:
 		    if (key >= 32 && key < 0x100) {
 			if (mi->d.input.nch < mi->d.input.maxch) {
-			    mi->d.input.buffer[mi->d.input.nch++] = key;
+			    mi->d.input.buffer[mi->d.input.nch++] = keychar;
 			    strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
 			    MustRedraw |= RedrawMenu;
 			}
