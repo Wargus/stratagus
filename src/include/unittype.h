@@ -548,7 +548,7 @@ typedef struct _animation_ {
 /**
 **  Define all animations scripts of an unittype.
 */
-typedef struct __animations__ {
+typedef struct _animations_ {
 	Animation*  Still;              ///< Standing still
 	Animation*  Move;               ///< Unit moving
 	Animation*  Attack;             ///< Unit attacking/working
@@ -557,11 +557,81 @@ typedef struct __animations__ {
 	Animation*  Die;                ///< Unit dying
 } Animations;
 
+typedef enum _new_animation_type_ {
+	NewAnimationFrame,
+	NewAnimationExactFrame,
+	NewAnimationWait,
+	NewAnimationRandomWait,
+	NewAnimationSound,
+	NewAnimationRandomSound,
+	NewAnimationAttack,
+	NewAnimationRotate,
+	NewAnimationMove,
+	NewAnimationUnbreakable,
+} NewAnimationType;
+
+typedef struct _new_animation_ {
+	NewAnimationType Type;
+	union {
+		struct {
+			int Frame;
+		} Frame;
+		struct {
+			int Wait;
+		} Wait;
+		struct {
+			int MinWait;
+			int MaxWait;
+		} RandomWait;
+		struct {
+			char* Sound;
+		} Sound;
+		struct {
+			char* Sound;
+		} RandomSound;
+		struct {
+			int Rotate;
+		} Rotate;
+		struct {
+			int Move;
+		} Move;
+		struct {
+			int Begin;
+		} Unbreakable;
+	} D;
+	struct _new_animation_* Next;
+} NewAnimation;
+
+typedef struct _new_animations_ {
+	NewAnimation* Start;
+	NewAnimation* Idle;
+	NewAnimation* Death;
+	NewAnimation* StartAttack;
+	NewAnimation* Attack;
+	NewAnimation* EndAttack;
+	NewAnimation* StartMove;
+	NewAnimation* Move;
+	NewAnimation* EndMove;
+	NewAnimation* StartTrain;
+	NewAnimation* Train;
+	NewAnimation* EndTrain;
+	NewAnimation* StartBuild;
+	NewAnimation* Build;
+	NewAnimation* EndBuild;
+	NewAnimation* StartHarvest[MaxCosts];
+	NewAnimation* Harvest[MaxCosts];
+	NewAnimation* EndHarvest[MaxCosts];
+} NewAnimations;
+
 #define ANIMATIONS_MAXANIM 1024
 
 	/// Hash table of all the animations
 typedef hashtable(Animations*, ANIMATIONS_MAXANIM) _AnimationsHash;
 extern _AnimationsHash AnimationsHash;
+
+	/// Hash table of all the newanimations
+typedef hashtable(NewAnimations*, ANIMATIONS_MAXANIM) _NewAnimationsHash;
+extern _NewAnimationsHash NewAnimationsHash;
 
 /**
 **  Missile type definition (used in config tables)
