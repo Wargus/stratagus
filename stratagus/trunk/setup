@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 RULESFILE=Rules.make
 BEOS_CONFIGFILE=/boot/home/config/settings/FreeCraft/FreeCraft.cfg
@@ -56,6 +56,7 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI"
 
 # Compile commands
 CC=gcc
+CCLD=g++
 RM="rm -f"
 MAKE=make
 
@@ -227,6 +228,7 @@ if [ "$DARWIN" = "0" ] ; then
     BEOS=0
     WIN32=0
     CC=cc
+    CCLD=c++
    CFLAGS="-O2 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS) -traditional-cpp"
     echo "It appears that you are in a Darwin environment..."
     echo "Use --beos, --win32 or --unix to override"
@@ -313,6 +315,7 @@ fi
 
 echo "# Compile commands" >> $RULESFILE
 echo "CC=$CC" >> $RULESFILE
+echo "CCLD=$CCLD" >> $RULESFILE
 echo "RM=$RM" >> $RULESFILE
 echo "MAKE=$MAKE" >> $RULESFILE
 echo >> $RULESFILE

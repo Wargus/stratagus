@@ -89,12 +89,12 @@ etlib/prgname.o: etlib/prgname.c
 
 # UNIX-TARGET
 freecraft:	src etlib/hash.o src/libclone.a
-	$(CC) -o freecraft src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
+	$(CCLD) -o freecraft src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
 freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o \
 		src/freecraftrc.o src/libclone.a
-	$(CC) -o freecraft$(EXE) src/main.c src/libclone.a src/freecraftrc.o \
+	$(CCLD) -o freecraft$(EXE) src/main.c src/libclone.a src/freecraftrc.o \
 	-lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
 src/freecraftrc.o: src/freecraft.rc
