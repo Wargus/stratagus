@@ -31,4 +31,4 @@ MHDRS =  intern_video.h
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
 HDRS +=  $(addprefix $(MODULE)/,$(MHDRS))
-MISC +=  _clip_rectangle
+MISC +=  $(addprefix $(MODULE)/,_clip_rectangle)
