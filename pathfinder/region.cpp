@@ -53,7 +53,7 @@ Region *RegionNew (int seed_x, int seed_y)
 	new->Passability = mf->Flags & MOVEMENT_IMPORTANT_FLAGS;
 	new->Area.X = seed_x / AreaGetWidth();
 	new->Area.Y = seed_y / AreaGetHeight();
-#if DEBUG
+#ifdef DEBUG
 	new->Magic = 0xdeadbeef;
 #endif
 	/* the rest of the attribs are initialized implicitly to 0 by calloc() */

@@ -23,7 +23,7 @@ struct _region_neighbor_ {
 **  A region of the map
 */
 struct _region_ {
-#if DEBUG
+#ifdef DEBUG
 	unsigned int Magic;			// to detect memory corruption
 #endif
     unsigned short RegId;		// this Region's id number
