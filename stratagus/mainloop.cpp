@@ -762,11 +762,11 @@ global void GameMainLoop(void)
 	    RealVideoSyncSpeed = VideoSyncSpeed;
 	    VideoSyncSpeed = 3000;
 	}
-	if( FastForwardCycle == GameCycle-1 ) {
+	if( FastForwardCycle >= GameCycle ) {
 	    MustRedraw = RedrawEverything;
 	}
 	if( MustRedraw /* && !VideoInterrupts */ &&
-		(FastForwardCycle <= GameCycle || GameCycle <= 10)) {
+		(FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle%97))) {
 	    if( Callbacks==&MenuCallbacks ) {
 		MustRedraw|=RedrawMenu;
 	    }
