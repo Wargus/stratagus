@@ -257,7 +257,8 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 		y=ry+yoffset[j+add];
 		m=matrix+x+y*w;
 		if( *m ) {			// already checked
-		    if( *m==88 ) {		// Check if goal reached.
+		    // Check if goal reached.
+		    if( *m==88 && CanMoveToMask(x,y,mask) ) {
 			return depth;
 		    }
 		    continue;
@@ -345,9 +346,9 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
     unsigned char* matrix;
     int depth;
 
-    DebugLevel3Fn("%d(%d,%d,%s)->%d(%d,%d,%s) "
+    DebugLevel3Fn("%d(%d,%d,%s)->%d(%d,%d,%s)+%d "
 	,UnitNumber(src),src->X,src->Y,src->Type->Ident
-	,UnitNumber(dst),dst->X,dst->Y,dst->Type->Ident);
+	,UnitNumber(dst),dst->X,dst->Y,dst->Type->Ident,range);
 
     //
     //	Setup movement.
