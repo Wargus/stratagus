@@ -92,11 +92,7 @@ typedef struct _missile_ {
     int		Wait;			/// delay
 
     Unit*	SourceUnit;		/// unit that fires (could be killed)
-    UnitType*	SourceType;		/// type of unit that fires
-    UnitStats*	SourceStats;		/// stats of unit that fires
-    Player*	SourcePlayer;		/// player of unit that fires
-
-    Unit* TargetUnit;                   /// target unit, used for spells
+    Unit* 	TargetUnit;             /// target unit, used for spells
 
     int 	Damage;                 /// direct damage that missile applies
     

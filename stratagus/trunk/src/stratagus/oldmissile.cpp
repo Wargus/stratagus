@@ -569,9 +569,6 @@ found:
     missile->Wait=1;
 
     missile->SourceUnit=NULL;
-    missile->SourceType=NULL;
-    missile->SourceStats=NULL;
-    missile->SourcePlayer=NULL;
 
     missile->Damage = 0;
     missile->TargetUnit = NULL;
@@ -596,15 +593,24 @@ found:
 **
 **	@param attack_stats	Attacker attributes.
 **	@param goal_stats	Goal attributes.
+**	@param bloodlust	If attacker has bloodlust
 **
 **	@returns	damage produces on goal.
 */
-local int CalculateDamageStats(const UnitStats* attacker_stats
-	,const UnitStats* goal_stats)
+local int CalculateDamageStats( const UnitStats* attacker_stats,
+                                const UnitStats* goal_stats,
+				int bloodlust )
 {
     int damage;
     int basic_damage = attacker_stats->BasicDamage;
     int piercing_damage = attacker_stats->PiercingDamage;
+    
+    if (bloodlust)
+      {
+      basic_damage *= 2;
+      piercing_damage *= 2;
+      printf("bloodlust\n");
+      }
     
     damage=-goal_stats->Armor;
     damage+= basic_damage;
@@ -624,11 +630,14 @@ local int CalculateDamageStats(const UnitStats* attacker_stats
 **
 **	@param attack_stats	Attacker attributes.
 **	@param goal		Goal unit.
+**	@param bloodlust	If attacker has bloodlust
 **	@returns	damage produces on goal.
 */
-local int CalculateDamage(const UnitStats* attacker_stats,const Unit* goal)
+local int CalculateDamage( const UnitStats* attacker_stats,
+                           const Unit* goal,
+                           int bloodlust )
 {
-    return CalculateDamageStats(attacker_stats,goal->Stats);
+    return CalculateDamageStats(attacker_stats,goal->Stats,bloodlust);
 }
 
 /**
@@ -658,11 +667,11 @@ global void FireMissile(Unit* unit)
 		if( HumanWallOnMap(dx,dy) ) {
 		    // FIXME: don't use UnitTypeByIdent here, this is slow!
 		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
-			    UnitTypeByIdent("unit-human-wall")->Stats));
+			    UnitTypeByIdent("unit-human-wall")->Stats,0));
 		} else {
 		    // FIXME: don't use UnitTypeByIdent here, this is slow!
 		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
-			    UnitTypeByIdent("unit-orc-wall")->Stats));
+			    UnitTypeByIdent("unit-orc-wall")->Stats,0));
 		}
 		return;
 	    }
@@ -701,7 +710,7 @@ global void FireMissile(Unit* unit)
 	    return;
 	}
 
-	HitUnit(goal,CalculateDamage(unit->Stats,goal));
+	HitUnit(goal,CalculateDamage(unit->Stats,goal,unit->Bloodlust));
 
 	return;
     }
@@ -748,10 +757,7 @@ global void FireMissile(Unit* unit)
     //	Damage of missile
     //
     missile->SourceUnit=unit;
-    // unit->Refs++; Reference currently not used.
-    missile->SourceType=unit->Type;
-    missile->SourceStats=unit->Stats;
-    missile->SourcePlayer=unit->Player;
+    unit->Refs++; 
 }
 
 /**
@@ -819,8 +825,8 @@ global void DrawMissiles(void)
 	    x=missile->X-MapX*TileSizeX+TheUI.MapX;
 	    y=missile->Y-MapY*TileSizeY+TheUI.MapY;
 	    // FIXME: I should copy SourcePlayer for second level missiles.
-	    if( missile->SourcePlayer ) {
-		GraphicPlayerPixels(missile->SourcePlayer
+	    if( missile->SourceUnit && missile->SourceUnit->Player ) {
+		GraphicPlayerPixels(missile->SourceUnit->Player
 			,missile->Type->Sprite);
 	    }
 	    DrawMissile(missile->Type,missile->Frame,x,y);
@@ -1008,7 +1014,8 @@ global void MissileHit(const Missile* missile)
 	mis->Damage = missile->Damage; // direct damage, spells mostly
 	mis->SourceUnit = missile->SourceUnit;
     }
-    if( !missile->SourceType ) {	// no target
+    if( !missile->SourceUnit ) {	// no target
+       //FIXME: should be removed?
 	return;
     }
 
@@ -1027,14 +1034,14 @@ global void MissileHit(const Missile* missile)
                 if ( missile->Damage )
 		  HitWall(x,y,missile->Damage); // direct damage, spells mostly
 		else
-		  HitWall(x,y,CalculateDamageStats(missile->SourceStats,
-			  UnitTypeByIdent("unit-human-wall")->Stats));
+		  HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
+			  UnitTypeByIdent("unit-human-wall")->Stats,0));
 	    } else {
                 if ( missile->Damage )
 		  HitWall(x,y,missile->Damage); // direct damage, spells mostly
 		else
-		  HitWall(x,y,CalculateDamageStats(missile->SourceStats,
-			  UnitTypeByIdent("unit-orc-wall")->Stats));
+		  HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
+			  UnitTypeByIdent("unit-orc-wall")->Stats,0));
 	    }
 	    return;
 	}
@@ -1047,7 +1054,8 @@ global void MissileHit(const Missile* missile)
     if ( missile->Damage )
       HitUnit(goal,missile->Damage); // direct damage, spells mostly
     else
-      HitUnit(goal,CalculateDamage(missile->SourceStats,goal));
+      HitUnit(goal,CalculateDamage(missile->SourceUnit->Stats,goal,
+                                   missile->SourceUnit->Bloodlust));
 }
 
 /**
