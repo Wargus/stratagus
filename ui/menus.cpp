@@ -7130,7 +7130,7 @@ local void InitPlayerRaces(Menuitem *mi)
 	}
     }
     ++n;
-    mi->d.pulldown.options = (char **)malloc(n * sizeof(char *));
+    mi->d.pulldown.options = (unsigned char **)malloc(n * sizeof(char *));
     for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
 	if (PlayerRaces.Visible[i]) {
 	    mi->d.pulldown.options[n++] = strdup(PlayerRaces.Display[i]);
