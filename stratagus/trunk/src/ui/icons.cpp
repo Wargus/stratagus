@@ -209,10 +209,11 @@ global void LoadIcons(void)
 global void CleanIcons(void)
 {
     void** ptr;
-    IconFile* table[IconsCount];
+    IconFile** table;
     int n;
     int i;
 
+    table=alloca(IconsCount);
     //
     //	Mapping the original icon numbers in puds to our internal strings
     //
