@@ -271,6 +271,10 @@ SOURCE=.\src\map\map_fog.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\map\map_radar.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\map\map_save.c
 # End Source File
 # Begin Source File
