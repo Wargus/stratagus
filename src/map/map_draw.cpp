@@ -67,7 +67,7 @@ typedef struct _tile_cache {
 **	Contains pointer, if the tile is cached.
 **	FIXME: could save memory here and only use how many tiles exits.
 */
-local TileCache* TileCached[TILE_COUNT];
+local TileCache* TileCached[MaxTilesInTileset];
 
 /**
 **	Number of tile caches.
@@ -92,7 +92,7 @@ local struct dl_head TileCacheLRU[1] = {
 **	Contains pointer, to last video position, where this tile was drawn.
 **	FIXME: could save memory here and only use how many tiles exits.
 */
-local void* TileCached[TILE_COUNT];
+local void* TileCached[MaxTilesInTileset];
 
 #endif
 
@@ -1259,7 +1259,7 @@ global void MapColorCycle(void)
     TileCache* cache;
 
     // FIXME: the easy version just remove color cycling tiles from cache.
-    for( i=0; i<TILE_COUNT; ++i ) {
+    for( i=0; i<TheMap.TileCount; ++i ) {
 	if( TheMap.Tileset->TileTypeTable[i]==TileTypeWater ) {
 	    if( (cache=TileCached[i]) ) {
 		DebugLevel3("Flush\n");

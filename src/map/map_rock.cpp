@@ -32,16 +32,17 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
- // FIXME: -1 is hack should be fixed later
-#define FIRST_ROCK_TILE  (TheMap.Tileset->FirstRockTile-1)
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local const int RockTable[16] = {
+/**
+**	Table for rock removable.
+*/
+global int RockTable[20] = {
 //  0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  A,  B,  C,  D,  E,  F
    -1, 22, -1,  1, 20, 21,  3,  2, -1,  9, -1, 23,  6,  8,  5, 36
+   ,7, 10, 11, 4
 };
 
 /*----------------------------------------------------------------------------
@@ -93,16 +94,14 @@ local int FixRock(int x,int y) // used by MapRemoveRock and PreprocessMap
     // Vladi: still to filter tiles w. corner empties -- note: the original
     // tiles and order are not perfect either. It's a hack but is enough and
     // looks almost fine.
-	    if (MapRockChk(x+1,y-1) == 0) tile =  7; else
-	    if (MapRockChk(x+1,y+1) == 0) tile = 10; else
-	    if (MapRockChk(x-1,y+1) == 0) tile = 11; else
-	    if (MapRockChk(x-1,y-1) == 0) tile =  4; else
-				tile = RockTable[15]; // not required really
+	    if (MapRockChk(x+1,y-1) == 0) tile = RockTable[16]; else
+	    if (MapRockChk(x+1,y+1) == 0) tile = RockTable[17]; else
+	    if (MapRockChk(x-1,y+1) == 0) tile = RockTable[18]; else
+	    if (MapRockChk(x-1,y-1) == 0) tile = RockTable[19]; else
+			    tile = RockTable[15]; // not required really
 	}
 
-	tile += FIRST_ROCK_TILE;
 	mf=TheMap.Fields+x+y*TheMap.Width;
-
 	if ( mf->SeenTile == tile) {
 	    return 0;
 	}
@@ -134,7 +133,7 @@ global void MapRemoveRock(unsigned x,unsigned y)
 
     mf=TheMap.Fields+x+y*TheMap.Width;
 
-    mf->Tile=TheMap.Tileset->NoRockTile;
+    mf->Tile=TheMap.Tileset->RemovedRock;
     mf->Flags &= ~(MapFieldRocks|MapFieldUnpassable);
 
     UpdateMinimapXY(x,y);		// FIXME: should be done if visible?
@@ -146,7 +145,7 @@ global void MapRemoveRock(unsigned x,unsigned y)
     if( mf->Flags&MapFieldVisible ) {
 #endif
 	MustRedraw|=RedrawMaps;
-	// FIXME: Should we do this? MapMarkSeenTile(x,y);
+	// FIXME: didn't make it better MapMarkSeenTile(x,y);
     }
 }
 

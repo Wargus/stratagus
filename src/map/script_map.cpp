@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ccl_map.c	-	The map ccl functions. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999,2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -29,7 +28,6 @@
 #if defined(USE_CCL) || defined(USE_CCL2)	// {
 
 #include "ccl.h"
-#include "tileset.h"
 #include "map.h"
 #include "minimap.h"
 
@@ -49,6 +47,23 @@ local SCM CclRevealMap(void)
     FlagRevealMap=1;
 
     return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set fog of war on/off.
+**
+**	@param flag	True = turning fog of war on, false = off.
+**
+**	@returns	The old state of fog of war.
+*/
+local SCM CclSetFogOfWar(SCM flag)
+{
+    int old;
+
+    old=TheMap.NoFogOfWar;
+    TheMap.NoFogOfWar=gh_scm2bool(flag);
+
+    return gh_int2scm(old);
 }
 
 /**
@@ -199,63 +214,14 @@ local SCM CclForestRegeneration(SCM speed)
     return SCM_UNSPECIFIED;
 }
 
-//.............................................................................
-//.	Tables
-//.............................................................................
-
-/**
-**	Parse tileset definition.
-**
-**	@param slot	Slot name
-**	@param name	Reference name
-**	@param file	Graphic file
-**	@param table	Conversion table
-*/
-local SCM CclTileset(SCM slot,SCM name,SCM file,SCM table)
-{
-    int type;
-    int i;
-    unsigned short* wp;
-
-    if( !gh_symbol_p(slot) ) {
-	fprintf(stderr,"Illegal tileset slot name\n");
-	return SCM_UNSPECIFIED;
-    }
-    if( slot==gh_symbol2scm("tileset-summer") ) {
-	type=TilesetSummer;
-    } else if( slot==gh_symbol2scm("tileset-winter") ) {
-	type=TilesetWinter;
-    } else if( slot==gh_symbol2scm("tileset-wasteland") ) {
-	type=TilesetWasteland;
-    } else if( slot==gh_symbol2scm("tileset-swamp") ) {
-	type=TilesetSwamp;
-    } else {
-	fprintf(stderr,"Wrong tileset slot name\n");
-	return SCM_UNSPECIFIED;
-    }
-    Tilesets[type].Name=gh_scm2newstr(name,NULL);
-    Tilesets[type].File=gh_scm2newstr(file,NULL);
-
-    // CONVERT TABLE!!
-    if( gh_vector_length(table)!=2528 ) {	// 0x9E0
-	fprintf(stderr,"Wrong conversion table length\n");
-	return SCM_UNSPECIFIED;
-    }
-
-    Tilesets[type].Table=wp=malloc(sizeof(*Tilesets[type].Table)*2528);
-    for( i=0; i<2528; ++i ) {
-	wp[i]=gh_scm2int(gh_vector_ref(table,gh_int2scm(i)));
-    }
-
-    return SCM_UNSPECIFIED;
-}
-
 /**
 **	Register CCL features for map.
 */
 global void MapCclRegister(void)
 {
     gh_new_procedure0_0("reveal-map",CclRevealMap);
+
+    gh_new_procedure1_0("set-fog-of-war!",CclSetFogOfWar);
 
     gh_new_procedure0_0("fog-of-war",CclFogOfWar);
     gh_new_procedure0_0("no-fog-of-war",CclNoFogOfWar);
@@ -265,13 +231,12 @@ global void MapCclRegister(void)
 
     gh_new_procedure0_0("original-fog-of-war",CclOriginalFogOfWar);
     gh_new_procedure0_0("gray-fog-of-war",CclGrayFogOfWar);
+
     gh_new_procedure1_0("fog-of-war-contrast",CclFogOfWarContrast);
     gh_new_procedure1_0("fog-of-war-brightness",CclFogOfWarBrightness);
     gh_new_procedure1_0("fog-of-war-saturation",CclFogOfWarSaturation);
 
     gh_new_procedure1_0("forest-regeneration",CclForestRegeneration);
-
-    gh_new_procedure4_0("tileset",CclTileset);
 }
 
 #endif	// } defined(USE_CCL) || defined(USE_CCL2)
