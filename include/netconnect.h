@@ -10,7 +10,7 @@
 //
 /**@name netconnect.h	-	The network connection setup header file. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer, Andreas Arens
+//	(c) Copyright 1998-2003 by Lutz Sammer, Andreas Arens
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -43,7 +43,7 @@
     /// Network protocol minor version (maximal 99)
 #define NetworkProtocolMinorVersion	4
     /// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel	12
+#define NetworkProtocolPatchLevel	13
     /// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion*10000+NetworkProtocolMinorVersion*100 \
