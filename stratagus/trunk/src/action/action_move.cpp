@@ -68,6 +68,8 @@ local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
 **	@return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
+
+#include "rdtsc.h"
 local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 {
     int xd;
@@ -82,7 +84,22 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
     // FIXME: Reset flag is cleared by HandleUnitAction.
     if( !(state=unit->State) ) {
 
+#ifdef HIERARCHIC_PATHFINDER
+	d = PfHierComputePath (unit, &xd, &yd);
+
+#if 0
+	{
+	int ts0, ts1;
+	ts0 = rdtsc ();
+	NextPathElement(unit,&xd,&yd);
+	ts1 = rdtsc ();
+	printf ("old pathfinder: %d cycles\n", ts1-ts0);
+	}
+#endif
+	switch( d ) {
+#else /* HIERARCHIC_PATHFINDER */
 	switch( d=NextPathElement(unit,&xd,&yd) ) {
+#endif /* HIERARCHIC_PATHFINDER */
 	    case PF_UNREACHABLE:	// Can't reach, stop
 		unit->Reset=unit->Wait=1;
 		unit->Moving=0;
