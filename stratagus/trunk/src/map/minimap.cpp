@@ -299,18 +299,10 @@ global void DrawMinimap(int vx __attribute__((unused)),
 	    continue;			// Submarine not visible
 	}
 
-
-#ifdef NEW_FOW
-	// Draw only units on explored and visible fields
-	if( !IsMapFieldVisible(unit->X,unit->Y) ) {
-	    continue;
-	}
-#else
 	if( !UnitKnownOnMap(unit) ) {
 	    continue;
 	}
 	unit->SeenFrame = unit->Frame;
-#endif
 
 	// FIXME: submarine not visible
 
