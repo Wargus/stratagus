@@ -197,7 +197,7 @@ int PlayMovie(const char* name)
 		return -1;
 	}
 
-	data = malloc(sizeof(OggData));
+	data = calloc(1, sizeof(OggData));
 	if (!data) {
 		fprintf(stderr, "Out of memory\n");
 		return -1;
