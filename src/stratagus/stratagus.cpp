@@ -791,6 +791,16 @@ local void DebugDrawFonts(void)
 	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
     VideoDrawText(8, 100+ 40,LargeFont,"abdefgABCDEFQ");
 
+    VideoDrawText(8, 160+ 10,SmallTitleFont,"FreeCraft");
+    VideoDrawText(8, 160+ 35,SmallTitleFont,
+	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+    VideoDrawText(8, 160+ 60,SmallTitleFont,"abdefgABCDEFQ");
+
+    VideoDrawText(8, 260+ 10,LargeTitleFont,"FreeCraft");
+    VideoDrawText(8, 260+ 55,LargeTitleFont,
+	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+    VideoDrawText(8, 260+ 100,LargeTitleFont,"abdefgABCDEFQ");
+
     VideoUnlockScreen();
     Invalidate();
     RealizeVideoMemory();
@@ -825,7 +835,6 @@ local void WaitForInput(int timeout)
     //
     //	FIXME: more work needed, scrolling credits, animations, ...
 #ifdef _DEBUG
-    ddfile=NULL; ddate[0]='\0';
     WaitNoEvent=1;
     while( WaitNoEvent ) {
 	DebugDrawFonts();
@@ -836,6 +845,7 @@ local void WaitForInput(int timeout)
     //VideoDrawTextCentered(VideoWidth/2,5,LargeTitleFont,"Press SPACE to continue.");
     VideoDrawTextCentered(VideoWidth/2,5,LargeFont,"Press SPACE to continue.");
 #ifdef linux
+    ddate[0]='\0';
     ddfile=popen("`which ddate`","r");
     fgets(ddate,72,ddfile);
     pclose(ddfile);
