@@ -59,18 +59,10 @@
 #ifndef USE_OPENGL
 global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 {
-	SDL_Rect srect;
-	SDL_Rect drect;
-
-	srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
-	srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
-	srect.w = sprite->Width;
-	srect.h = sprite->Height;
-
-	drect.x = x;
-	drect.y = y;
-
-	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
+	VideoDrawSub(sprite,
+		(frame % (sprite->Surface->w / sprite->Width)) * sprite->Width,
+		(frame / (sprite->Surface->w / sprite->Width)) * sprite->Height,
+		sprite->Width, sprite->Height, x, y);
 }
 #else
 global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
@@ -110,26 +102,10 @@ global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 #ifndef USE_OPENGL
 global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 {
-	SDL_Rect srect;
-	SDL_Rect drect;
-	int oldx;
-	int oldy;
-
-	srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
-	srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
-	srect.w = sprite->Width;
-	srect.h = sprite->Height;
-
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, srect.w, srect.h);
-	srect.x += x - oldx;
-	srect.y += y - oldy;
-
-	drect.x = x;
-	drect.y = y;
-
-	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
+	VideoDrawSubClip(sprite,
+		(frame % (sprite->Surface->w / sprite->Width)) * sprite->Width,
+		(frame / (sprite->Surface->w / sprite->Width)) * sprite->Height,
+		sprite->Width, sprite->Height, x, y);
 }
 #else
 global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
@@ -317,50 +293,18 @@ global void VideoDrawClipX(const Graphic* sprite, unsigned frame,
 #ifndef USE_OPENGL
 global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
-	SDL_Rect srect;
-	SDL_Rect drect;
-	int oldalpha;
-
-	srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
-	srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
-	srect.w = sprite->Width;
-	srect.h = sprite->Height;
-
-	drect.x = x;
-	drect.y = y;
-
-	oldalpha = sprite->Surface->format->alpha;
-	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, alpha);
-	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
-	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
+	VideoDrawSubTrans(sprite,
+		(frame % (sprite->Surface->w / sprite->Width)) * sprite->Width,
+		(frame / (sprite->Surface->w / sprite->Width)) * sprite->Height,
+		sprite->Width, sprite->Height, x, y, alpha);
 }
 
 global void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
-	SDL_Rect srect;
-	SDL_Rect drect;
-	int oldx;
-	int oldy;
-	int oldalpha;
-
-	srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
-	srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
-	srect.w = sprite->Width;
-	srect.h = sprite->Height;
-
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, srect.w, srect.h);
-	srect.x += x - oldx;
-	srect.y += y - oldy;
-
-	drect.x = x;
-	drect.y = y;
-
-	oldalpha = sprite->Surface->format->alpha;
-	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, alpha);
-	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
-	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
+	VideoDrawSubClipTrans(sprite,
+		(frame % (sprite->Surface->w / sprite->Width)) * sprite->Width,
+		(frame / (sprite->Surface->w / sprite->Width)) * sprite->Height,
+		sprite->Width, sprite->Height, x, y, alpha);
 }
 
 global void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)

@@ -255,8 +255,12 @@ extern Graphic* LoadSprite(const char* file, int w, int h);
 	/// Make shadow sprite
 extern void MakeShadowSprite(Graphic* graphic);
 
+	///		Draw a graphic clipped and faded.
+extern void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
+	int w, int h, int x, int y, unsigned char fade);
+
 	///		Draw part of a graphic clipped and faded.
-extern void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
+extern void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char fade);
 
 	///		Save a screenshot to a PNG file
@@ -403,10 +407,6 @@ extern void VideoDrawRawClip(SDL_Surface *surface, int x, int y, int w, int h);
 
 	/// Does ColorCycling..
 extern void ColorCycle(void);
-
-	///		Draw part of a graphic clipped and faded.
-extern void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char fade);
 
 	///		Draw circle.
 extern void VideoDrawCircle(Uint32 color, int x, int y, int r);
