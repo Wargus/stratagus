@@ -33,7 +33,7 @@ MAKE=make
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17pre1-build1\""
+VERSION="-DVERSION=\"1.17pre1-build2\""
 WIN32=-1
 
 # Choose optimization level
@@ -442,7 +442,9 @@ if test "$DEBUG" = 1 ; then
 fi
 echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
 echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
-echo "	\$(DEBUG) -DNEW_VIDEO" >> $RULESFILE
+echo "	\$(DEBUG) " >> $RULESFILE
+# This could be used
+# -DNEW_UNIT -DNEW_NETWORK -DNEW_HEADING # -DNEW_VIDEO -DNEW_NAMES
 
 echo "CFLAGS=$CFLAGS $STATIC $EXTRA_CFLAGS" >> $RULESFILE
 
