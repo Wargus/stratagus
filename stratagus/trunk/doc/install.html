@@ -17,7 +17,7 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 1998-2001 by The FreeCraft Project. Distributed under the
 <A HREF="artistic-license.html">"Artistic License"</A></B>
 <HR>
 
@@ -35,15 +35,17 @@ You need:
 	<LI>Linux System with an installed X Window System.
 	<LI>Linux System with console (graphic card) supported by svgalib.
 	<LI>Any BSD System with an installed X Window System.
-	<LI>X Window System with 15/16bit X Server.
-	<LI>Win32 system win95, win98, winNT or win2000.
+	<LI>BeOS System with an installed X Window System.
+	<LI>MacOS System with an installed X Window System.
+	<LI>X Window System with 8/15/16/24/32bit X Server.
+	<LI>Win32 system win95, win98, winME, winNT or win2000.
 	</UL>
 	<LI>libpng. (I use libpng-2.1.0, aka 1.0.5)
 	<LI>zlib. (Also needed for libpng, I use libz-1.1.3)
 	<LI>SIOD. (Included in the distribution)
 	<LI>The original game CD or expansion CD for manuals and maindat.war
 	    for graphics and sfxdat.sud for sounds.
-	<LI>or the free replacement.
+	<LI>or the free replacements.
 </UL>
 These are optional:
 <UL>
@@ -144,13 +146,23 @@ script should take care of the rest.
 
 You can play FreeCraft in the network or twice on the same computer.  Install
 it on all computers with the above instructions. 
-You can now start it on each computer with: <P>
+You can now start it on each computer with:
+
+<H3>You need a server</H3>
 
 freecraft -p [players] [map]<BR>
-freecraft -p 2 data/puds/multi/3vs3.pud.gz
+freecraft -p 2 ./data/puds/multi/3vs3.pud.gz
 
-<P>The game waits until all players are connected. Press 'q' to quit the game.
-<P>You can only play over the <B>local</B> network!
+<P>The game waits until all players are connected. Press ALT-'q' to quit the
+game.
+
+<H3>You need the clients</H3>
+
+freecraft -n [server] [map]<BR>
+freecraft -n localhost ./data/puds/multi/3vs3.pud.gz
+
+<P>The server is the name (www.freecraft.org) or the IP (192.168.0.0.) of the
+game server. The map must be the same on all computers.
 
     <H3>Unix or BSD</H3>
 <A NAME="unix-bin"></A>
