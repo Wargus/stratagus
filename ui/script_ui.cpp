@@ -2248,6 +2248,880 @@ local SCM CclDefineUI(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineUI(lua_State* l)
+{
+    const char* value;
+    char* str;
+    int x;
+    int y;
+    int i;
+    UI* ui;
+    void* v;
+    int args;
+    int subargs;
+    int j;
+    int k;
+
+    j = 0;
+    args = lua_gettop(l);
+
+    //	Get identifier
+    if (!lua_isstring(l, j + 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    str = strdup(lua_tostring(l, j + 1));
+    ++j;
+    if (!lua_isnumber(l, j + 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    x = lua_tonumber(l, j + 1);
+    ++j;
+    if (!lua_isnumber(l, j + 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    y = lua_tonumber(l, j + 1);
+    ++j;
+
+    // Find slot: new or redefinition
+    ui = NULL;
+    i = 0;
+    if (UI_Table) {
+	for (; UI_Table[i]; ++i) {
+	    if (UI_Table[i]->Width == x && UI_Table[i]->Height == y &&
+		    !strcmp(UI_Table[i]->Name, str)) {
+		CleanUI(UI_Table[i]);
+		ui = calloc(1, sizeof(UI));
+		UI_Table[i] = ui;
+		break;
+	    }
+	}
+    }
+    if (!ui) {
+	ui = calloc(1, sizeof(UI));
+	v = malloc(sizeof(UI*) * (i + 2));
+	memcpy(v, UI_Table, i * sizeof(UI*));
+	free(UI_Table);
+	UI_Table = v;
+	UI_Table[i] = ui;
+	UI_Table[i + 1] = NULL;
+    }
+
+    ui->Name = str;
+    ui->Width = x;
+    ui->Height = y;
+
+    //
+    //	Some value defaults
+    //
+
+    // This save the setup values FIXME: They are set by CCL.
+
+    ui->Contrast = TheUI.Contrast;
+    ui->Brightness = TheUI.Brightness;
+    ui->Saturation = TheUI.Saturation;
+
+    ui->MouseScroll = TheUI.MouseScroll;
+    ui->KeyScroll = TheUI.KeyScroll;
+    ui->MouseScrollSpeedDefault = TheUI.MouseScrollSpeedDefault;
+    ui->MouseScrollSpeedControl = TheUI.MouseScrollSpeedControl;
+
+    ui->MouseWarpX = -1;
+    ui->MouseWarpY = -1;
+
+    ui->Resource.File = NULL;
+    ui->ResourceX = -1;
+    ui->ResourceY = -1;
+
+    ui->InfoPanel.File = NULL;
+    ui->InfoPanelX = -1;
+    ui->InfoPanelY = -1;
+
+    ui->ButtonPanel.File = NULL;
+    ui->ButtonPanelX = -1;
+    ui->ButtonPanelY = -1;
+
+    ui->MenuPanel.File = NULL;
+    ui->MenuPanelX = -1;
+    ui->MenuPanelY = -1;
+    
+    ui->MinimapPanel.File = NULL;
+    ui->MinimapPanelX = -1;
+    ui->MinimapPanelY = -1;
+    ui->MinimapTransparent = 0;
+
+    ui->MinimapPosX = -1;
+    ui->MinimapPosY = -1;
+    for (i = 0; i < MaxCosts + 2; ++i) {
+	ui->Resources[i].TextX = -1;
+    }
+    //
+    //	Parse the arguments, already the new tagged format.
+    //  maxy: this could be much simpler
+    //
+
+    for (; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+	if (!strcmp(value, "normal-font-color")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ui->NormalFontColor = strdup(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "reverse-font-color")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ui->ReverseFontColor = strdup(lua_tostring(l, j + 1));
+#if 0
+	} else if (gh_eq_p(value, gh_symbol2scm("filler"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    ui->NumFillers++;
+	    ui->Filler = realloc(ui->Filler, ui->NumFillers * sizeof(*ui->Filler));
+	    ui->FillerX = realloc(ui->FillerX, ui->NumFillers * sizeof(*ui->FillerX));
+	    ui->FillerY = realloc(ui->FillerY, ui->NumFillers * sizeof(*ui->FillerY));
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("file"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->Filler[ui->NumFillers - 1].File = gh_scm2newstr(value, NULL);
+		} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->FillerX[ui->NumFillers - 1] = gh_scm2int(gh_car(value));
+		    ui->FillerY[ui->NumFillers - 1] = gh_scm2int(gh_car(gh_cdr(value)));
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("resource-line"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    ui->Resource.File = SCM_PopNewStr(&sublist);
+	    ui->ResourceX = SCM_PopInt(&sublist);
+	    ui->ResourceY = SCM_PopInt(&sublist);
+	} else if (gh_eq_p(value, gh_symbol2scm("resources"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		SCM slist;
+		int res;
+		char* name;
+
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		name = gh_scm2newstr(value, NULL);
+		for (res = 0; res < MaxCosts; ++res) {
+		    if (!strcmp(name, DefaultResourceNames[res])) {
+			break;
+		    }
+		}
+		if (res == MaxCosts) {
+		    if (!strcmp(name, "food")) {
+			res = FoodCost;
+		    } else if (!strcmp(name, "score")) {
+			res = ScoreCost;
+		    } else {
+			errl("Resource not found", value);
+		    }
+		}
+		free(name);
+		slist = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		while (!gh_null_p(slist)) {
+		    value = gh_car(slist);
+		    slist = gh_cdr(slist);
+		    if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			ui->Resources[res].IconX = gh_scm2int(gh_car(value));
+			ui->Resources[res].IconY = gh_scm2int(gh_car(gh_cdr(value)));
+		    } else if (gh_eq_p(value, gh_symbol2scm("file"))) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			ui->Resources[res].Icon.File = gh_scm2newstr(value, NULL);
+		    } else if (gh_eq_p(value, gh_symbol2scm("row"))) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			ui->Resources[res].IconRow = gh_scm2int(value);
+		    } else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			ui->Resources[res].IconW = gh_scm2int(gh_car(value));
+			ui->Resources[res].IconH = gh_scm2int(gh_car(gh_cdr(value)));
+		    } else if (gh_eq_p(value, gh_symbol2scm("text-pos"))) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			ui->Resources[res].TextX = gh_scm2int(gh_car(value));
+			ui->Resources[res].TextY = gh_scm2int(gh_car(gh_cdr(value)));
+		    } else {
+			errl("Unsupported tag", value);
+		    }
+		}
+	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("info-panel"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("panel"))) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("file"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->InfoPanel.File = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->InfoPanelX = gh_scm2int(gh_car(value));
+			    ui->InfoPanelY = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->InfoPanelW = gh_scm2int(gh_car(value));
+			    ui->InfoPanelH = gh_scm2int(gh_car(gh_cdr(value)));
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else if (gh_eq_p(value, gh_symbol2scm("selected"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseSelected(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("training"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseTraining(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("upgrading"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseUpgrading(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("researching"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseResearching(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("transporting"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseTransporting(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("completed-bar"))) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("color"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->CompletedBarColorRGB.D24.a = gh_scm2int(gh_car(value));
+			    ui->CompletedBarColorRGB.D24.b = gh_scm2int(gh_car(gh_cdr(value)));
+			    ui->CompletedBarColorRGB.D24.c = gh_scm2int(gh_car(gh_cdr(gh_cdr(value))));
+			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->CompletedBarX = gh_scm2int(gh_car(value));
+			    ui->CompletedBarY = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->CompletedBarW = gh_scm2int(gh_car(value));
+			    ui->CompletedBarH = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
+			    InfoText text;
+
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    CclParseInfoText(value, &text);
+			    ui->CompletedBarText = text.Text;
+			    ui->CompletedBarFont = text.Font;
+			    ui->CompletedBarTextX = text.X;
+			    ui->CompletedBarTextY = text.Y;
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("button-panel"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("panel"))) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("file"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->ButtonPanel.File = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->ButtonPanelX = gh_scm2int(gh_car(value));
+			    ui->ButtonPanelY = gh_scm2int(gh_car(gh_cdr(value)));
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else if (gh_eq_p(value, gh_symbol2scm("icons"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseButtonIcons(value, ui);
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("map-area"))) {
+	    int w;
+	    int h;
+	    
+	    w = 0;
+	    h = 0;
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->MapArea.X = gh_scm2int(gh_car(value));
+		    ui->MapArea.Y = gh_scm2int(gh_car(gh_cdr(value)));
+		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    w = gh_scm2int(gh_car(value));
+		    h = gh_scm2int(gh_car(gh_cdr(value)));
+		    DebugLevel3Fn("Map are size is %d %d\n" _C_ w _C_ h);
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	    ui->MapArea.EndX = ui->MapArea.X + w - 1;
+	    ui->MapArea.EndY = ui->MapArea.Y + h - 1;
+	} else if (!strcmp(value, "menu-panel")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
+		if (!strcmp(value, "panel")) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("file"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuPanel.File = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuPanelX = gh_scm2int(gh_car(value));
+			    ui->MenuPanelY = gh_scm2int(gh_car(gh_cdr(value)));
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else if (!strcmp(value, "menu-button")) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuButton.X = gh_scm2int(gh_car(value));
+			    ui->MenuButton.Y = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuButton.Width = gh_scm2int(gh_car(value));
+			    ui->MenuButton.Height = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("caption"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuButton.Text = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("style"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuButton.Button = scm2buttonid(l, value);
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else if (!strcmp(value, "network-menu-button")) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkMenuButton.X = gh_scm2int(gh_car(value));
+			    ui->NetworkMenuButton.Y = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkMenuButton.Width = gh_scm2int(gh_car(value));
+			    ui->NetworkMenuButton.Height = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("caption"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkMenuButton.Text = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("style"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkMenuButton.Button = scm2buttonid(l, value);
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else if (!strcmp(value, "network-diplomacy-button")) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkDiplomacyButton.X = gh_scm2int(gh_car(value));
+			    ui->NetworkDiplomacyButton.Y = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkDiplomacyButton.Width = gh_scm2int(gh_car(value));
+			    ui->NetworkDiplomacyButton.Height = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("caption"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkDiplomacyButton.Text = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("style"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkDiplomacyButton.Button = scm2buttonid(l, value);
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+#endif
+	} else if (!strcmp(value, "minimap")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
+		if (!strcmp(value, "file")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->MinimapPanel.File = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "panel-pos")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->MinimapPanelX = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->MinimapPanelY = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "pos")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->MinimapPosX = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->MinimapPosY = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "size")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->MinimapW = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->MinimapH = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "transparent")) {
+		    ui->MinimapTransparent = 1;
+		    --k;
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	} else if (!strcmp(value, "status-line")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
+		if (!strcmp(value, "file")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->StatusLine.File = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "pos")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->StatusLineX = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->StatusLineY = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "text-pos")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->StatusLineTextX = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_rawgeti(l, -1, 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->StatusLineTextY = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "font")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->StatusLineFont = CclFontByIdentifier(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	} else if (!strcmp(value, "cursors")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
+		if (!strcmp(value, "point")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->Point.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "glass")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->Glass.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "cross")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->Cross.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "yellow")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->YellowHair.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "green")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->GreenHair.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "red")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->RedHair.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "scroll")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->Scroll.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "arrow-e")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->ArrowE.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "arrow-ne")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->ArrowNE.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "arrow-n")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->ArrowN.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "arrow-nw")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->ArrowNW.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "arrow-w")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->ArrowW.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "arrow-sw")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->ArrowSW.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "arrow-s")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->ArrowS.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "arrow-se")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->ArrowSE.Name = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	} else if (!strcmp(value, "menu-panels")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		MenuPanel** menupanel;
+
+		menupanel = &ui->MenuPanels;
+		while (*menupanel) {
+		    menupanel = &(*menupanel)->Next;
+		}
+		*menupanel = calloc(1, sizeof(**menupanel));
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		(*menupanel)->Ident = strdup(lua_tostring(l, -1));
+		lua_pop(l, 1);
+		++k;
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		(*menupanel)->Panel.File = strdup(lua_tostring(l, -1));
+		lua_pop(l, 1);
+	    }
+	} else if (!strcmp(value, "victory-background")) {
+	    //	Backgrounds
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ui->VictoryBackground.File = strdup(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "defeat-background")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ui->DefeatBackground.File = strdup(lua_tostring(l, j + 1));
+	} else {
+//	    lua_pushfstring(l, "Unsupported tag: %s", value);
+//	    lua_error(l);
+	}
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -4084,6 +4958,7 @@ local int CclDefineMenuItem(lua_State* l)
 			    int subk;
 
 			    subsubargs = luaL_getn(l, -1);
+			    item->d.pulldown.noptions = subsubargs;
 			    if (item->d.pulldown.options) {
 			    	free(item->d.pulldown.options);
 			    }
@@ -4094,7 +4969,7 @@ local int CclDefineMenuItem(lua_State* l)
 				    lua_pushstring(l, "incorrect argument");
 				    lua_error(l);
 				}
-				value = lua_tostring(l, -1);
+				s1 = strdup(lua_tostring(l, -1));
 				lua_pop(l, 1);
 				item->d.pulldown.options[subk] = s1;
 			    }
@@ -5963,7 +6838,7 @@ global void UserInterfaceCclRegister(void)
 
     lua_register(Lua, "DefineCursor", CclDefineCursor);
     lua_register(Lua, "SetGameCursor", CclSetGameCursor);
-//    lua_register(Lua, "DefineUI", CclDefineUI);
+    lua_register(Lua, "DefineUI", CclDefineUI);
 //    lua_register(Lua, "DefineViewports", CclDefineViewports);
 
     lua_register(Lua, "SetGrabMouse", CclSetGrabMouse);
