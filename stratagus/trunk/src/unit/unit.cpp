@@ -3219,7 +3219,9 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     target->Attacked=7;
 
     if( target->HP<=damage ) {	// unit is killed or destroyed
-	if( attacker ) {
+	//  increase scores of the attacker, but not if attacking it's own units.
+	//  prevents cheating by killing your own units.
+	if( attacker && (target->Player->Enemy&(1<<attacker->Player->Player))) {
 	    attacker->Player->Score+=target->Type->Points;
 	    if( type->Building ) {
 		attacker->Player->TotalRazings++;
@@ -3553,6 +3555,10 @@ global int IsSharedVision(const Player* player,const Unit* dest)
  */
 global int CanTarget(const UnitType* source,const UnitType* dest)
 {
+    //  Hack for snipers, can only target organic units.
+    if( !dest->Organic && source->Sniper) {
+	return 0;
+    }
     if( dest->UnitType==UnitTypeLand ) {
 	if( dest->ShoreBuilding ) {
 	    return source->CanTarget&(CanTargetLand|CanTargetSea);

@@ -411,10 +411,10 @@ global void DrawMinimap(int vx __attribute__((unused)),
 	int vy __attribute__((unused)))
 {
    // draw background
-    VideoDrawSub(TheUI.MinimapPanel.Graphic,0,0
+    VideoDrawSubClip(TheUI.MinimapPanel.Graphic,0,0
 	    ,TheUI.MinimapPanel.Graphic->Width,TheUI.MinimapPanel.Graphic->Height
 	    ,TheUI.MinimapPanelX,TheUI.MinimapPanelY);
-    VideoDrawSub(MinimapGraphic,0,0
+    VideoDrawSubClip(MinimapGraphic,0,0
 	    ,MinimapGraphic->Width,MinimapGraphic->Height
 	    ,TheUI.MinimapPosX,TheUI.MinimapPosY);
 }

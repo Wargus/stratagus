@@ -1413,7 +1413,7 @@ local SCM CclDefineUI(SCM list)
     ui->MenuButtonGraphic.File=NULL;
     ui->MenuButtonGraphicX=-1;
     ui->MenuButtonGraphicY=-1;
-
+    
     ui->MinimapPanel.File=NULL;
     ui->MinimapPanelX=-1;
     ui->MinimapPanelY=-1;

@@ -381,6 +381,8 @@ local void HandleMouseOn(int x,int y)
 
     MouseScrollState = ScrollNone;
 
+    DebugLevel3Fn("%d, %d\n" _C_ x _C_ y);
+
     //
     //	Handle buttons
     //
@@ -494,6 +496,7 @@ local void HandleMouseOn(int x,int y)
 	    && y>=TheUI.MapArea.Y && y<=TheUI.MapArea.EndY) {
 	Viewport* vp;
 
+	DebugLevel3Fn("viewport %d, %d\n" _C_ x _C_ y);
 	vp = GetViewport(x, y);
 	DebugCheck( !vp );
 	if (TheUI.MouseViewport != vp ) {	// viewport changed

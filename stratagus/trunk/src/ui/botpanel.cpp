@@ -488,7 +488,7 @@ global void DrawButtonPanel(void)
     //	Draw background
     //
     if (TheUI.ButtonPanel.Graphic) {
-	VideoDrawSub(TheUI.ButtonPanel.Graphic,0,0
+	VideoDrawSubClip(TheUI.ButtonPanel.Graphic,0,0
 	    ,TheUI.ButtonPanel.Graphic->Width,TheUI.ButtonPanel.Graphic->Height
 	    ,TheUI.ButtonPanelX,TheUI.ButtonPanelY);
     }

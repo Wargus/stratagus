@@ -567,7 +567,7 @@ global void UpdateDisplay(void)
 	int i;
 
 	for( i=0; i<TheUI.NumFillers; ++i ) {
-	    VideoDrawSub(TheUI.Filler[i].Graphic,0,0
+	    VideoDrawSubClip(TheUI.Filler[i].Graphic,0,0
 		    ,TheUI.Filler[i].Graphic->Width
 		    ,TheUI.Filler[i].Graphic->Height
 		    ,TheUI.FillerX[i],TheUI.FillerY[i]);
@@ -578,7 +578,7 @@ global void UpdateDisplay(void)
 	DrawMenuButtonArea();
     }
     if( MustRedraw&RedrawMinimapBorder ) {
-	VideoDrawSub(TheUI.MinimapPanel.Graphic,0,0
+	VideoDrawSubClip(TheUI.MinimapPanel.Graphic,0,0
 		,TheUI.MinimapPanel.Graphic->Width,TheUI.MinimapPanel.Graphic->Height
 		,TheUI.MinimapPanelX,TheUI.MinimapPanelY);
     }

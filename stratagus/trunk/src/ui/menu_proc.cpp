@@ -284,7 +284,7 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,
 	    }
 	}
 	if (rb < MenuButtonGfx.Sprite->NumFrames) {
-	    VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
+	    VideoDrawClip(MenuButtonGfx.Sprite, rb, x, y);
 	} else {
 	    if (rb < button) {
 		VideoDrawRectangleClip(ColorGray,x+1,y+1,w-2,h-2);

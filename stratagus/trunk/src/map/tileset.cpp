@@ -240,14 +240,6 @@ global void LoadTileset(void)
     //
     //  mark the special tiles
     //
-    for (i = 0; i < 6; ++i) {
-	if ((tile = TheMap.Tileset->ExtraTrees[i])) {
-	    TheMap.Tileset->TileTypeTable[tile] = TileTypeWood;
-	}
-	if ((tile = TheMap.Tileset->ExtraRocks[i])) {
-	    TheMap.Tileset->TileTypeTable[tile] = TileTypeRock;
-	}
-    }
     if ((tile = TheMap.Tileset->TopOneTree)) {
 	TheMap.Tileset->TileTypeTable[tile] = TileTypeWood;
     }
@@ -272,15 +264,15 @@ global void LoadTileset(void)
     //
     n = TheMap.Tileset->NumTiles;
     for (mixed = solid = i = 0; i < n;) {
-	if (TheMap.Tileset->BasicNameTable[i]
-	    && TheMap.Tileset->MixedNameTable[i]) {
+	if (TheMap.Tileset->Tiles[i].BaseTerrain
+	    && TheMap.Tileset->Tiles[i].MixTerrain) {
 	    if (TheMap.Tileset->FlagsTable[i] & MapFieldForest) {
 		mixed = i;
 	    }
 	    i += 256;
 	} else {
-	    if (TheMap.Tileset->BasicNameTable[i] != 0 &&
-		TheMap.Tileset->MixedNameTable[i] == 0)	{
+	    if (TheMap.Tileset->Tiles[i].BaseTerrain != 0 &&
+		TheMap.Tileset->Tiles[i].MixTerrain == 0)	{
 	    	if (TheMap.Tileset->FlagsTable[i] & MapFieldForest) {
 			solid = i;
 		}
@@ -366,15 +358,15 @@ global void LoadTileset(void)
     //  Build rock removement table.
     //
     for (mixed = solid = i = 0; i < n;) {
-	if (TheMap.Tileset->BasicNameTable[i]
-	    && TheMap.Tileset->MixedNameTable[i]) {
+	if (TheMap.Tileset->Tiles[i].BaseTerrain
+	    && TheMap.Tileset->Tiles[i].MixTerrain) {
 	    if (TheMap.Tileset->FlagsTable[i] & MapFieldRocks) {
 		mixed = i;
 	    }
 	    i += 256;
 	} else {
-	    if (TheMap.Tileset->BasicNameTable[i] != 0 &&
-		TheMap.Tileset->MixedNameTable[i] == 0) {
+	    if (TheMap.Tileset->Tiles[i].BaseTerrain != 0 &&
+		TheMap.Tileset->Tiles[i].MixTerrain == 0) {
 	    	  if (TheMap.Tileset->FlagsTable[i] & MapFieldRocks) {
 		    solid = i;
 	    	  }
@@ -667,19 +659,11 @@ local void SaveTileset(CLFile*file, const Tileset* tileset)
     CLprintf(file, "\n  ;; Slots descriptions");
     CLprintf(file,
 	"\n  'slots (list\n  'special (list\t\t;; Can't be in pud\n");
-    CLprintf(file, "    'extra-trees #( %d %d %d %d %d %d )\n",
-	tileset->ExtraTrees[0], tileset->ExtraTrees[1]
-	, tileset->ExtraTrees[2], tileset->ExtraTrees[3]
-	, tileset->ExtraTrees[4], tileset->ExtraTrees[5]);
     CLprintf(file, "    'top-one-tree %d 'mid-one-tree %d 'bot-one-tree %d\n",
 	tileset->TopOneTree, tileset->MidOneTree, tileset->BotOneTree);
     CLprintf(file, "    'removed-tree %d\n", tileset->RemovedTree);
     CLprintf(file, "    'growing-tree #( %d %d )\n", tileset->GrowingTree[0],
 	tileset->GrowingTree[1]);
-    CLprintf(file, "    'extra-rocks #( %d %d %d %d %d %d )\n",
-	tileset->ExtraRocks[0], tileset->ExtraRocks[1]
-	, tileset->ExtraRocks[2], tileset->ExtraRocks[3]
-	, tileset->ExtraRocks[4], tileset->ExtraRocks[5]);
     CLprintf(file, "    'top-one-rock %d 'mid-one-rock %d 'bot-one-rock %d\n",
 	tileset->TopOneRock, tileset->MidOneRock, tileset->BotOneRock);
     CLprintf(file, "    'removed-rock %d )\n", tileset->RemovedRock);
@@ -691,10 +675,10 @@ local void SaveTileset(CLFile*file, const Tileset* tileset)
 	//
 	//      Mixeds
 	//
-	if (tileset->BasicNameTable[i] && tileset->MixedNameTable[i]) {
+	if (tileset->Tiles[i].BaseTerrain && tileset->Tiles[i].MixTerrain) {
 	    SaveTilesetMixed(file, table,
-		tileset->TileNames[tileset->BasicNameTable[i]],
-		tileset->TileNames[tileset->MixedNameTable[i]],
+		tileset->SolidTerrainTypes[tileset->Tiles[i].BaseTerrain].TerrainName,
+		tileset->SolidTerrainTypes[tileset->Tiles[i].MixTerrain].TerrainName,
 		tileset->FlagsTable[i], i, n);
 	    i += 256;
 	    //
@@ -702,7 +686,7 @@ local void SaveTileset(CLFile*file, const Tileset* tileset)
 	    //
 	} else {
 	    SaveTilesetSolid(file, table,
-		tileset->TileNames[tileset->BasicNameTable[i]],
+		tileset->SolidTerrainTypes[tileset->Tiles[i].BaseTerrain].TerrainName,
 		tileset->FlagsTable[i], i);
 	    i += 16;
 	}
@@ -767,14 +751,13 @@ global void CleanTilesets(void)
 	free(Tilesets[i]->PaletteFile);
 	free(Tilesets[i]->Table);
 	free(Tilesets[i]->FlagsTable);
-	free(Tilesets[i]->BasicNameTable);
-	free(Tilesets[i]->MixedNameTable);
+	free(Tilesets[i]->Tiles);
 	free(Tilesets[i]->TileTypeTable);
 	free(Tilesets[i]->AnimationTable);
-	for( j=0; j<Tilesets[i]->NumNames; ++j ) {
-	    free(Tilesets[i]->TileNames[j]);
+	for( j=0; j<Tilesets[i]->NumTerrainTypes; ++j ) {
+	    free(Tilesets[i]->SolidTerrainTypes[j].TerrainName);
 	}
-	free(Tilesets[i]->TileNames);
+	free(Tilesets[i]->SolidTerrainTypes);
 
 	free(Tilesets[i]);
     }

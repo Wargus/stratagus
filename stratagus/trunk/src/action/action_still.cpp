@@ -164,7 +164,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
     }
 
     //
-    //	Cowards dodn't attack unless instructed.
+    //	Cowards don't attack unless instructed.
     //
     if( type->CanAttack && !type->Coward ) {
 	//
