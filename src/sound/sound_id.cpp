@@ -53,54 +53,85 @@ local hashtable(int,61) SoundIdHash;
 ----------------------------------------------------------------------------*/
 
 /**
-**	display the sound name hash table.
+**	Display the sound name hash table.
 */
-global void DisplaySoundHashTable(void) {
+global void DisplaySoundHashTable(void)
+{
     fprintf(stderr,"Sound HashTable Begin\n");
     fprintf(stderr,__FUNCTION__": not written\n");
     fprintf(stderr,"Sound HashTable End\n");
 }
 
 /**
-** Ask the sound server to register a sound ans tore the mapping
-** between its name and its id.
+**	Ask the sound server to register a sound ans tore the mapping
+**	between its name and its id.
+**	Register a sound group (or an unique sound if nb==1) and get the
+**	corresponding sound id.
+**
+**	@param name	name of this sound group. MUST BE A PERMAMNENT STRING.
+**	@param file	list of sound file names
+**	@param nb	number of sounds
+**
+**	@return the sound id of the created group
 */
-global SoundId MakeSound(char* sound_name,char* file[],unsigned char nb) {
+global SoundId MakeSound(char* name,char* file[],unsigned char nb)
+{
     SoundId id;
+    const SoundId* result;
 
+    if ( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
+	DebugLevel0Fn("re-register sound `%s'\n",name);
+	return *result;
+    }
     // ask the server to register the sound
     id=RegisterSound(file,nb);
-    // save the mapping from sound_name to id in the hash table.
-    MapSound(sound_name,id);
+    // save the mapping from name to id in the hash table.
+    MapSound(name,id);
     return id;
 }
 
 /**
-** maps a sound name to its id
+**	Maps a sound name to its id
+**
+**	@param name	Sound name.
+**
+**	@return		Sound idenfier for this name.
 */
-global SoundId SoundIdForName(const char* sound_name) {
+global SoundId SoundIdForName(const char* name)
+{
     const SoundId* result;
+    
+    DebugCheck( !name );
 
-    result=(const SoundId*)hash_find(SoundIdHash,(char*)sound_name);
-
-    if (result) {
+    if( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
 	return *result;
     }
-    DebugLevel0("Can't find sound %s in sound table\n",sound_name);
+    DebugLevel0("Can't find sound `%s' in sound table\n",name);
     return NULL;
 }
 
 /**
- ** add a new mapping (sound name to sound id) in the hash table
+**	Add a new mapping (sound name to sound id) in the hash table
+**
+**	@param name	Name of the sound (constant or malloced).
+**	@param id	Sound identifier.
 */
-global void MapSound(char* sound_name,SoundId id) {
-    *((SoundId*)hash_add(SoundIdHash,(char*)sound_name))=id;
+global void MapSound(const char* name,const SoundId id)
+{
+    *((SoundId*)hash_add(SoundIdHash,(char*)name))=id;
 }
 
 /**
- ** ask the sound server to build a special sound group.
+**	Ask the sound server to build a special sound group.
+**
+**	@param name	the name of the group. MUST BE A PERMANENT STRING.
+**	@param first	id of the first group
+**	@param second	id of the second group
+**
+**	@return		Registered sound identifier.
 */
-global SoundId MakeSoundGroup(char* group_name,SoundId first,SoundId second) {
+global SoundId MakeSoundGroup(char* group_name,SoundId first,SoundId second)
+{
     SoundId sound;
 
     sound=RegisterTwoGroups(first,second);

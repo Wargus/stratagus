@@ -96,7 +96,7 @@ global SpellType SpellTypeTable[] = {
 { "spell-haste",		"haste",		   6,  50,1000, SpellActionHaste	, { "haste" }	       },
 { "spell-raise-dead",		"raise dead",		   6,  50,  -1, SpellActionRaiseDead	, { "raise dead" }     },
 { "spell-whirlwind",		"whirlwind",		  12, 100, 800, SpellActionWhirlwind	, { "whirlwind" }      },
-{ "spell-unholy-armor",		"unholy armor",		   6, 100, 500, SpellActionUnholyArmor	, { "unholy armor" }   },
+{ "spell-unholy-armor",		"unholy armor",		   6, 100, 500, SpellActionUnholyArmor	, { "unholy armour" }   },
 { "spell-death-and-decay",	"death and decay",	  12,	5,  -1, SpellActionDeathAndDecay, { "death and decay" }},
 //	---eot marker---						 ---eot marker---
 { NULL }

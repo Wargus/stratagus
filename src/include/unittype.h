@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name unittype.h	-	The unit types headerfile. */
+/**@name unittype.h	-	The unit-types headerfile. */
 //
 //	(c) Copyright 1998-2001 by Lutz Sammer
 //
@@ -34,8 +34,6 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-//#define MaxUnitTypes	300		/// maximal number of unit types
-
 /**
 **	Defines the animation for different actions.
 */
@@ -50,6 +48,7 @@ typedef struct _animation_ {
 #define AnimationReset		2	/// animation could here be aborted
 #define AnimationSound		4	/// play sound
 #define AnimationMissile	8	/// fire projectil
+#define AnimationEnd		0x80	/// animation end in memory
 
 /**
 **	Define all animations scripts of an unittype.
@@ -199,7 +198,7 @@ struct _unit_type_ {
     Graphic*	Sprite;			/// sprite images
 };
 
-    /// How many unit types are currently supported.
+    /// How many unit-types are currently supported.
     /// FIXME: ARI: should be dynamic (ccl..)
 #define UnitTypeInternalMax	0x74
 
@@ -207,15 +206,15 @@ struct _unit_type_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern const char UnitTypeType[];		/// unit type type
-// FIXME: this limit must be removed!
-extern UnitType	UnitTypes[UnitTypeInternalMax];	/// all unit types
+extern const char UnitTypeType[];	/// unit-type type
+extern UnitType* UnitTypes;		/// all unit-types
+extern int NumUnitTypes;		/// number of unit-types made.
 
-extern UnitType*UnitTypeGoldMine;	/// Gold-mine unit type pointer.
-extern UnitType*UnitTypeHumanTanker;	/// orc tanker unit type pointer.
-extern UnitType*UnitTypeOrcTanker;	/// human tanker unit type pointer.
-extern UnitType*UnitTypeHumanTankerFull;/// orc tanker full unit type pointer.
-extern UnitType*UnitTypeOrcTankerFull;	/// human tanker full unit type pointer.
+extern UnitType*UnitTypeGoldMine;	/// Gold-mine unit-type pointer.
+extern UnitType*UnitTypeHumanTanker;	/// orc tanker unit-type pointer.
+extern UnitType*UnitTypeOrcTanker;	/// human tanker unit-type pointer.
+extern UnitType*UnitTypeHumanTankerFull;/// orc tanker full unit-type pointer.
+extern UnitType*UnitTypeOrcTankerFull;	/// human tanker full unit-type pointer.
 extern UnitType*UnitTypeHumanWorker;	/// Human worker.
 extern UnitType*UnitTypeOrcWorker;	/// Orc worker.
 extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold.
@@ -224,7 +223,7 @@ extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood.
 extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
 extern UnitType*UnitTypeHumanFarm;	/// Human farm
 extern UnitType*UnitTypeOrcFarm;	/// Orc farm
-extern UnitType*UnitTypeCritter;	/// Critter unit type pointer
+extern UnitType*UnitTypeCritter;	/// Critter unit-type pointer
 
 extern char** UnitTypeWcNames;		/// Mapping wc-number 2 symbol
 
@@ -244,6 +243,7 @@ extern UnitType* UnitTypeByWcNum(unsigned);	/// get unit-type by wc number
 extern void DrawUnitType(const UnitType* type,unsigned frame,int x,int y);
 extern void LoadUnitTypes(FILE* file);	/// load the unit-type table
 extern void SaveUnitTypes(FILE* file);	/// save the unit-type table
+extern UnitType* NewUnitTypeSlot(char*);/// allocate an empty unit-type slot
 extern void InitUnitTypes(void);	/// Init unit-type table
 extern void LoadUnitSprites(void);	/// Load all unit-type sprites
 

@@ -50,7 +50,7 @@ extern SoundId MakeSound(char* sound_name,char* file[],unsigned char nb);
 
 /** Get a sound id for a given sound name. Returns NULL when no sound is
     found.
-    @param sound_name name of the sound. MUST BE A PERMANENT STRING.
+    @param sound_name name of the sound.
     @return the corresponding sound id
 */
 extern SoundId SoundIdForName(const char* sound_name);
@@ -59,7 +59,7 @@ extern SoundId SoundIdForName(const char* sound_name);
     @param sound_name the name. MUST BE A PERMANENT STRING.
     @param id the sound id.
  */
-extern void MapSound(char* sound_name,SoundId id);
+extern void MapSound(const char* sound_name,const SoundId id);
 
 /** Register two sound groups together to make a special sound (for
     selection). Return the corresponding id after registering it under a given

@@ -30,6 +30,9 @@
 #include <limits.h>
 
 #ifdef USE_SDLA
+#ifdef USE_THREAD
+#error "not USE_SDLA and USE_THREAD"
+#endif
 #include <SDL/SDL_audio.h>
 #else
 #ifdef __linux__

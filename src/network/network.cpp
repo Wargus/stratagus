@@ -10,7 +10,7 @@
 //
 /**@name network.c	-	The network. */
 //
-//	(c) Copyright 2000,2001 by Lutz Sammer
+//	(c) Copyright 2000,2001 by Lutz Sammer, Andreas Arens.
 //
 //	$Id$
 
@@ -645,7 +645,7 @@ global void InitNetwork2(void)
 **	@param x	optional X map position.
 **	@param y	optional y map position.
 **	@param dest	optional destination unit.
-**	@param type	optional unit type argument.
+**	@param type	optional unit-type argument.
 **	@param status	Append command or flush old commands.
 */
 global void NetworkSendCommand(int command, const Unit *unit, int x, int y,
@@ -672,7 +672,7 @@ global void NetworkSendCommand(int command, const Unit *unit, int x, int y,
     if (dest) {
 	ncq->Data.Dest = htons(dest->Slot);
     } else if (type) {
-	ncq->Data.Dest = htons(type - UnitTypes);
+	ncq->Data.Dest = htons(type->Type);
     } else {
 	ncq->Data.Dest = htons(-1);
     }
