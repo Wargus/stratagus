@@ -181,9 +181,11 @@ global void HandleActionBoard(Unit* unit)
 		    if( i==-1 ) {
 			if( ++unit->SubAction==200 ) {
 			    unit->Command.Action=UnitActionStill;
+#ifdef NEW_UNIT
 			    if( unit->Command.Data.Move.Goal ) {
 				--unit->Command.Data.Move.Goal->Refs;
 			    }
+#endif
 			    unit->SubAction=0;
 			}
 		    } else {

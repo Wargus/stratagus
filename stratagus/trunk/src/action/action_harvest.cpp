@@ -250,6 +250,7 @@ local int ReturnWithWood(Unit* unit)
     //	Target is dead, stop harvest
     //
     if( destu ) {
+#ifdef NEW_UNIT
 	if( destu->Destroyed ) {
 	    DebugLevel0(__FUNCTION__": destroyed unit\n");
 	    if( !--destu->Refs ) {
@@ -270,8 +271,11 @@ local int ReturnWithWood(Unit* unit)
 	unit->Command.Data.Move.Goal=NoUnitP;
 	--destu->Refs;
     }
+#else
 
     // FIXME: stored target not used!
+
+#endif
 
     x=unit->Command.Data.Move.DX;
     y=unit->Command.Data.Move.DY;
