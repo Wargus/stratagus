@@ -1019,7 +1019,10 @@ global void CleanMapFogOfWar(void)
 		VisibleTable = NULL;
 	}
 #ifndef OPENGL
-	SDL_FreeSurface(OnlyFogSurface);
+	if (OnlyFogSurface) {
+		SDL_FreeSurface(OnlyFogSurface);
+		OnlyFogSurface = NULL;
+	}
 #endif
 }
 
