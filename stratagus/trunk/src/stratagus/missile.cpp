@@ -545,7 +545,7 @@ void FireMissile(Unit* unit)
 	dy = dy * TileSizeY + TileSizeY / 2;
 	missile = MakeMissile(unit->Type->Missile.Missile, x, y, dx, dy);
 	//
-	//		Damage of missile
+	// Damage of missile
 	//
 	if (goal) {
 		missile->TargetUnit = goal;
@@ -961,9 +961,9 @@ void MissileHit(Missile* missile)
 	// The impact generates a new missile.
 	//
 	if (missile->Type->ImpactMissile) {
-//		Missile* mis;
+// Missile* mis;
 
-//		mis =
+// mis =
 		MakeMissile(missile->Type->ImpactMissile, x, y, x, y);
 		// Impact missiles didn't generate any damage now.
 #if 0
@@ -1272,7 +1272,7 @@ static void SaveMissile(const Missile* missile, CLFile* file)
 
 	CLprintf(file, " \"damage\", %d,", missile->Damage);
 
-	CLprintf(file, " \"ttl\", %d,",		missile->TTL);
+	CLprintf(file, " \"ttl\", %d,", missile->TTL);
 	if (missile->Hidden) {
 		CLprintf(file, " \"hidden\", ");
 	}
@@ -1776,7 +1776,7 @@ void MissileActionWhirlwind(Missile* missile)
 	//
 	if (!(missile->TTL % 4)) {
 		n = SelectUnitsOnTile(x, y, table);
-		for (i = 0; i < n; ++i)		{
+		for (i = 0; i < n; ++i) {
 			if (table[i]->HP) {
 				// should be missile damage ?
 				HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE1);

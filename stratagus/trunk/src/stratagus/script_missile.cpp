@@ -90,7 +90,7 @@ static int CclDefineMissileType(lua_State* l)
 		free(str);
 	} else {
 		mtype = NewMissileTypeSlot(str);  // str consumed!
-	} 
+	}
 
 	mtype->NumDirections = 1;
 	mtype->Flip = 1;
