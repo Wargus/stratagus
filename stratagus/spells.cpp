@@ -249,7 +249,7 @@ global int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 	    continue;
 	}
         if (hp < 0) {
-	    HitUnit(caster, target, hp);
+	    HitUnit(caster, target, -hp);
         } else {
 	    target->HP += hp;
 	    if (target->HP > target->Stats->HitPoints) {
@@ -527,7 +527,7 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 
     caster->Mana -= castcount * manacost;
     if (hp < 0) {
-	HitUnit(caster, target, castcount * hp);
+	HitUnit(caster, target, -(castcount * hp));
     } else {
 	target->HP += castcount * hp;
 	if (target->HP > target->Stats->HitPoints) {
