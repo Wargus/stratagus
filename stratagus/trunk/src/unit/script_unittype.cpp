@@ -1525,9 +1525,13 @@ static int CclDefineNewAnimations(lua_State* l)
 	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
-	anims = calloc(1, sizeof(*anims));
 
 	name = LuaToString(l, 1);
+	anims = NewAnimationsByIdent(name);
+	if (!anims) {
+		anims = calloc(1, sizeof(*anims));
+		*(NewAnimations**)hash_add(NewAnimationsHash, name) = anims;
+	}
 
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
@@ -1595,8 +1599,6 @@ static int CclDefineNewAnimations(lua_State* l)
 		}
 		lua_pop(l, 1);
 	}
-
-	*(NewAnimations**)hash_add(NewAnimationsHash, name) = anims;
 
 	return 0;
 }
