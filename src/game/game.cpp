@@ -71,7 +71,7 @@
 ----------------------------------------------------------------------------*/
 
 global Settings GameSettings;		/// Game Settings
-global int lcm_prevent_recurse;		/// prevent recursion through LoadGameMap
+local int LcmPreventRecurse;		/// prevent recursion through LoadGameMap
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -92,12 +92,12 @@ local void LoadStratagusMap(const char* filename,
 {
     DebugLevel3Fn("%p \n" _C_ map);
 
-    if (lcm_prevent_recurse) {
+    if (LcmPreventRecurse) {
 	fprintf(stderr,"recursive use of load Stratagus map!\n");
 	ExitFatal(-1);
     }
     InitPlayers();
-    lcm_prevent_recurse = 1;
+    LcmPreventRecurse = 1;
     gh_load((char*)filename);
     lcm_prevent_recurse = 0;
 
@@ -109,8 +109,8 @@ local void LoadStratagusMap(const char* filename,
     }
     // FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
 #endif
-    if( !TheMap.Width || !TheMap.Height ) {
-	fprintf(stderr,"%s: invalid Stratagus map\n", filename);
+    if (!TheMap.Width || !TheMap.Height) {
+	fprintf(stderr, "%s: invalid Stratagus map\n", filename);
 	ExitFatal(-1);
     }
 }
@@ -121,43 +121,43 @@ local void LoadStratagusMap(const char* filename,
 **	@param filename	map filename
 **	@param map	map loaded
 */
-local void LoadMap(const char* filename,WorldMap* map)
+local void LoadMap(const char* filename, WorldMap* map)
 {
     const char* tmp;
 
-    tmp=strrchr(filename,'.');
-    if( tmp ) {
+    tmp = strrchr(filename, '.');
+    if (tmp) {
 #ifdef USE_ZLIB
-	if( !strcmp(tmp,".gz") ) {
-	    while( tmp-1>filename && *--tmp!='.' ) {
+	if (!strcmp(tmp, ".gz")) {
+	    while (tmp - 1 > filename && *--tmp != '.') {
 	    }
 	} else
 #endif
 #ifdef USE_BZ2LIB
-	if( !strcmp(tmp,".bz2") ) {
-	    while( tmp-1>filename && *--tmp!='.' ) {
+	if (!strcmp(tmp, ".bz2")) {
+	    while (tmp - 1 > filename && *--tmp != '.') {
 	    }
 	}
 #endif
-	if( !strcmp(tmp,".cm")
+	if (!strcmp(tmp, ".cm")
 #ifdef USE_ZLIB
-		|| !strcmp(tmp,".cm.gz")
+		|| !strcmp(tmp, ".cm.gz")
 #endif
 #ifdef USE_BZ2LIB
-		|| !strcmp(tmp,".cm.bz2")
+		|| !strcmp(tmp, ".cm.bz2")
 #endif
 	) {
-	    LoadStratagusMap(filename,map);
+	    LoadStratagusMap(filename, map);
 	    return;
 	}
     }
     // ARI: This bombs out, if no pud, so will be safe.
-    if( strcasestr(filename,".pud") ) {
-	LoadPud(filename,map);
-    } else if( strcasestr(filename,".scm") ) {
-	LoadScm(filename,map);
-    } else if( strcasestr(filename,".chk") ) {
-	LoadChk(filename,map);
+    if (strcasestr(filename, ".pud")) {
+	LoadPud(filename, map);
+    } else if (strcasestr(filename, ".scm")) {
+	LoadScm(filename, map);
+    } else if (strcasestr(filename, ".chk")) {
+	LoadChk(filename, map);
     }
 }
 
@@ -173,10 +173,10 @@ local void GameTypeFreeForAll(void)
     int i;
     int j;
 
-    for (i=0; i<15; i++) {
-	for (j=0; j<15; j++) {
+    for (i = 0; i < 15; ++i) {
+	for (j = 0; j < 15; ++j) {
 	    if (i != j) {
-		CommandDiplomacy(i,DiplomacyEnemy,j);
+		CommandDiplomacy(i, DiplomacyEnemy, j);
 	    }
 	}
     }
@@ -192,17 +192,17 @@ local void GameTypeTopVsBottom(void)
     int top;
     int middle;
 
-    middle = TheMap.Height/2;
-    for (i=0; i<15; i++) {
+    middle = TheMap.Height / 2;
+    for (i = 0; i < 15; ++i) {
 	top = Players[i].StartY <= middle;
-	for (j=0; j<15; j++) {
+	for (j = 0; j < 15; ++j) {
 	    if (i != j) {
 		if ((top && Players[j].StartY <= middle) ||
 			(!top && Players[j].StartY > middle)) {
-		    CommandDiplomacy(i,DiplomacyAllied,j);
-		    Players[i].SharedVision |= (1<<j);
+		    CommandDiplomacy(i, DiplomacyAllied, j);
+		    Players[i].SharedVision |= (1 << j);
 		} else {
-		    CommandDiplomacy(i,DiplomacyEnemy,j);
+		    CommandDiplomacy(i, DiplomacyEnemy, j);
 		}
 	    }
 	}
@@ -219,17 +219,17 @@ local void GameTypeLeftVsRight(void)
     int left;
     int middle;
 
-    middle = TheMap.Width/2;
-    for (i=0; i<15; i++) {
+    middle = TheMap.Width / 2;
+    for (i = 0; i < 15; ++i) {
 	left = Players[i].StartX <= middle;
-	for (j=0; j<15; j++) {
+	for (j = 0; j < 15; ++j) {
 	    if (i != j) {
 		if ((left && Players[j].StartX <= middle) ||
 			(!left && Players[j].StartX > middle)) {
-		    CommandDiplomacy(i,DiplomacyAllied,j);
-		    Players[i].SharedVision |= (1<<j);
+		    CommandDiplomacy(i, DiplomacyAllied, j);
+		    Players[i].SharedVision |= (1 << j);
 		} else {
-		    CommandDiplomacy(i,DiplomacyEnemy,j);
+		    CommandDiplomacy(i, DiplomacyEnemy, j);
 		}
 	    }
 	}
@@ -244,17 +244,17 @@ local void GameTypeManVsMachine(void)
     int i;
     int j;
 
-    for (i=0; i<15; i++) {
-	if (Players[i].Type!=PlayerPerson && Players[i].Type!=PlayerComputer ) {
+    for (i = 0; i < 15; ++i) {
+	if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer ) {
 	    continue;
 	}
-	for (j=0; j<15; j++) {
+	for (j = 0; j < 15; ++j) {
 	    if (i != j) {
-		if (Players[i].Type==Players[j].Type) {
-		    CommandDiplomacy(i,DiplomacyAllied,j);
-		    Players[i].SharedVision |= (1<<j);
+		if (Players[i].Type == Players[j].Type) {
+		    CommandDiplomacy(i, DiplomacyAllied, j);
+		    Players[i].SharedVision |= (1 << j);
 		} else {
-		    CommandDiplomacy(i,DiplomacyEnemy,j);
+		    CommandDiplomacy(i, DiplomacyEnemy, j);
 		}
 	    }
 	}
@@ -277,14 +277,14 @@ global void CreateGame(char* filename, WorldMap* map)
     int j;
     char* s;
 
-    if( filename && !*filename ) {
+    if (filename && !*filename) {
 	// Load game, already created game with Init/LoadModules
 	return;
     }
 
     InitVisionTable();			// build vision table for fog of war
     
-    if( filename ) {
+    if (filename) {
 	s = NULL;
 	// FIXME: LibraryFile here?
 	strcpy(CurrentMapPath, filename);
@@ -308,23 +308,23 @@ global void CreateGame(char* filename, WorldMap* map)
     SyncHash = 0;
     InitSyncRand();
 
-    if( NetworkFildes!=-1 ) {		// Prepare network play
+    if (NetworkFildes != -1) {		// Prepare network play
 	DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
 	InitNetwork2();
     } else {
-	if( LocalPlayerName && strcmp(LocalPlayerName,"Anonymous") ) {
+	if (LocalPlayerName && strcmp(LocalPlayerName, "Anonymous")) {
           ThisPlayer->Name = strdup(LocalPlayerName);
 	}
     }
 
-    if( GameIntro.Title ) {
+    if (GameIntro.Title) {
 	ShowIntro(&GameIntro);
     } else {
 	CallbackMusicOn();
     }
-    //GamePaused=1;
+    //GamePaused = 1;
 
-    if( FlagRevealMap ) {
+    if (FlagRevealMap) {
 	RevealMap();
     }
 
@@ -336,13 +336,13 @@ global void CreateGame(char* filename, WorldMap* map)
 	    for (i = 1; i < MaxCosts; ++i) {
 		switch (GameSettings.Resources) {
 		    case SettingsResourcesLow:
-			Players[j].Resources[i]=DefaultResourcesLow[i];
+			Players[j].Resources[i] = DefaultResourcesLow[i];
 			break;
 		    case SettingsResourcesMedium:
-			Players[j].Resources[i]=DefaultResourcesMedium[i];
+			Players[j].Resources[i] = DefaultResourcesMedium[i];
 			break;
 		    case SettingsResourcesHigh:
-			Players[j].Resources[i]=DefaultResourcesHigh[i];
+			Players[j].Resources[i] = DefaultResourcesHigh[i];
 			break;
 		    default:
 			break;
@@ -396,7 +396,7 @@ global void CreateGame(char* filename, WorldMap* map)
     //	Graphic part
     //
     LoadRGB(GlobalPalette,
-	    s=strdcat3(StratagusLibPath,"/graphics/",
+	    s = strdcat3(StratagusLibPath, "/graphics/",
 		TheMap.Tileset->PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
@@ -417,12 +417,12 @@ global void CreateGame(char* filename, WorldMap* map)
     IfDebug(
 	DebugLevel0("Graphics uses %d bytes (%d KB, %d MB)\n"
 		_C_ AllocatedGraphicMemory
-		_C_ AllocatedGraphicMemory/1024
-		_C_ AllocatedGraphicMemory/1024/1024);
+		_C_ AllocatedGraphicMemory / 1024
+		_C_ AllocatedGraphicMemory / 1024 / 1024);
 	DebugLevel0("Compressed graphics uses %d bytes (%d KB, %d MB)\n"
 		_C_ CompressedGraphicMemory
-		_C_ CompressedGraphicMemory/1024
-		_C_ CompressedGraphicMemory/1024/1024);
+		_C_ CompressedGraphicMemory / 1024
+		_C_ CompressedGraphicMemory / 1024 / 1024);
     );
 
     CreateMinimap();			// create minimap for pud
@@ -445,12 +445,12 @@ global void CreateGame(char* filename, WorldMap* map)
     IfDebug(
 	DebugLevel0("Sounds uses %d bytes (%d KB, %d MB)\n"
 		_C_ AllocatedSoundMemory
-		_C_ AllocatedSoundMemory/1024
-		_C_ AllocatedSoundMemory/1024/1024);
+		_C_ AllocatedSoundMemory / 1024
+		_C_ AllocatedSoundMemory / 1024 / 1024);
 	DebugLevel0("Compressed sounds uses %d bytes (%d KB, %d MB)\n"
 		_C_ CompressedSoundMemory
-		_C_ CompressedSoundMemory/1024
-		_C_ CompressedSoundMemory/1024/1024);
+		_C_ CompressedSoundMemory / 1024
+		_C_ CompressedSoundMemory / 1024 / 1024);
     );
 #endif
 
@@ -491,11 +491,11 @@ global void CreateGame(char* filename, WorldMap* map)
     InitTriggers();
 
 #ifdef WITH_SOUND
-    if (SoundFildes!=-1) {
+    if (SoundFildes != -1) {
 	//FIXME: must be done after map is loaded
-	if ( InitSoundServer() ) {
-	    SoundOff=1;
-	    SoundFildes=-1;
+	if (InitSoundServer()) {
+	    SoundOff = 1;
+	    SoundFildes = -1;
 	} else {
 	    // must be done after sounds are loaded
 	    InitSoundClient();
@@ -503,7 +503,7 @@ global void CreateGame(char* filename, WorldMap* map)
     }
 #endif
 
-    SetDefaultTextColors(TheUI.NormalFontColor,TheUI.ReverseFontColor);
+    SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
 
 #if 0
     if (!TheUI.SelectedViewport) {
@@ -511,7 +511,7 @@ global void CreateGame(char* filename, WorldMap* map)
     }
 #endif
     ViewportCenterViewpoint(TheUI.SelectedViewport,
-	    ThisPlayer->StartX,ThisPlayer->StartY);
+	    ThisPlayer->StartX, ThisPlayer->StartY);
 
     //
     //	Various hacks wich must be done after the map is loaded.
@@ -526,19 +526,19 @@ global void CreateGame(char* filename, WorldMap* map)
     //	FIXME: The palette is loaded after the units are created.
     //	FIXME: This loops fixes the colors of the units.
     //
-    for( i=0; i<NumUnits; ++i ) {
+    for (i = 0; i < NumUnits; ++i) {
         //  I don't really think that there can be any rescued
         //  units at this point.
         if (Units[i]->RescuedFrom) { 
-            Units[i]->Colors=&Units[i]->RescuedFrom->UnitColors;
+            Units[i]->Colors = &Units[i]->RescuedFrom->UnitColors;
         } else {
-            Units[i]->Colors=&Units[i]->Player->UnitColors;
+            Units[i]->Colors = &Units[i]->Player->UnitColors;
         }
     }
 
-    GameResult=GameNoResult;
+    GameResult = GameNoResult;
 
-    CommandLog(NULL,NoUnitP,FlushCommands,-1,-1,NoUnitP,NULL,-1);
+    CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
     DestroyCursorBackground();
     VideoLockScreen();
     VideoClearScreen();
@@ -560,7 +560,7 @@ global void InitSettings(void)
 	return;
     }
 
-    for (i = 0; i < PlayerMax; i++) {
+    for (i = 0; i < PlayerMax; ++i) {
 	GameSettings.Presets[i].Race = SettingsPresetMapDefault;
 	GameSettings.Presets[i].Team = SettingsPresetMapDefault;
 	GameSettings.Presets[i].Type = SettingsPresetMapDefault;
