@@ -139,8 +139,6 @@ int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 	}
 	SDL_UnlockYUVOverlay(yuv_overlay);
 
-	SDL_DisplayYUVOverlay(yuv_overlay, rect);
-
 	return 0;
 }
 
@@ -205,19 +203,13 @@ int PlayMovie(const char* name)
 
 	rect.x = 0;
 	rect.y = 0;
-
-	rect.w = data->tinfo.frame_width;
-	rect.h = data->tinfo.frame_height;
 	rect.w = VideoWidth;
 	rect.h = VideoHeight;
 
 	yuv_overlay = SDL_CreateYUVOverlay(data->tinfo.frame_width,
 	  data->tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
-	SDL_DisplayYUVOverlay(yuv_overlay, &rect);
-
 	if (yuv_overlay == NULL) {
-		exit(-1);
 		return -1;
 	}
 
