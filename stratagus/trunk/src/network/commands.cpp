@@ -144,7 +144,8 @@ global void CommandLog(const char* name,const Unit* unit,int flag,
 	    fprintf(LogFile,"  'type\t\"%s\"\n","multi-player");
 	    for( i=0; i<PlayerMax; ++i ) {
 		fprintf(LogFile,"  'player\t(list 'number %d 'name \"%s\" 'race %d 'team %d 'type %d)\n",
-		    i,Players[i].Name,Players[i].Race,Players[i].Team,Players[i].Type);
+		    i,Players[i].Name,GameSettings.Presets[i].Race,
+		    GameSettings.Presets[i].Team,GameSettings.Presets[i].Type);
 	    }
 	    fprintf(LogFile,"  'local-player\t%d\n",ThisPlayer->Player);
 	}
