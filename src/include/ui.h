@@ -122,6 +122,18 @@ typedef enum {
 #endif /* SPLIT_SCREEN_SUPPORT */
 
 /**
+**	Panel types used in menus (and stored in ui global below)
+*/
+enum {
+    ImageNone,
+    ImagePanel1,	// 256 x 288
+    ImagePanel2,	// 288 x 256
+    ImagePanel3,	// 384 x 256
+    ImagePanel4,	// 288 x 128
+    ImagePanel5,	// 352 x 352
+};
+
+/**
 **	Defines the user interface.
 */
 typedef struct _ui_ {
@@ -270,11 +282,11 @@ typedef struct _ui_ {
 //    SoundConfig	PlacementSuccess;	/// played on placements success
 //    SoundConfig	Click;			/// click noice used often
 
-    GraphicConfig	GameMenuePanel;	/// Panel for in game menue
-    GraphicConfig	Menue1Panel;	/// Panel for menue (unused)
-    GraphicConfig	Menue2Panel;	/// Panel for menue (unused)
-    GraphicConfig	VictoryPanel;	/// Panel for victory message
-    GraphicConfig	ScenarioPanel;	/// Panel for scenary message
+    GraphicConfig	GameMenuePanel;	/// Panel 256 x 288
+    GraphicConfig	Menue1Panel;	/// Panel 288 x 256
+    GraphicConfig	Menue2Panel;	/// Panel 384 x 256
+    GraphicConfig	VictoryPanel;	/// Panel 288 x 128
+    GraphicConfig	ScenarioPanel;	/// Panel 352 x 352
 
 } UI;
 

@@ -1413,17 +1413,17 @@ local SCM CclDefineMenu(SCM list)
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    if( gh_eq_p(value,gh_symbol2scm("none")) ) {
-		item.image=0;
+		item.image=ImageNone;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel1")) ) {
-		item.image=1;
+		item.image=ImagePanel1;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel2")) ) {
-		item.image=2;
+		item.image=ImagePanel2;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel3")) ) {
-		item.image=3;
+		item.image=ImagePanel3;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel4")) ) {
-		item.image=4;
+		item.image=ImagePanel4;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel5")) ) {
-		item.image=5;
+		item.image=ImagePanel5;
 	    } else {
 		s1=gh_scm2newstr(value, NULL);
 		fprintf(stderr, "Unsupported image %s\n", s1);
@@ -1461,10 +1461,15 @@ local SCM CclDefineMenu(SCM list)
 	menu = (Menu*)calloc(1,sizeof(Menu));
 	memcpy(menu, &item, sizeof(Menu));
 	menu->nitems = 0; // reset to zero
+	//move the buttons for different resolutions..
+	if (VideoWidth != 640) {
+	    menu->x += (VideoWidth - 640) / 2;
+	    menu->y += (VideoHeight - 480) / 2;
+	}
 	//printf("Me:%s\n", name);
 	*(Menu **)hash_add(MenuHash,name) = menu;
     } else {
-	fprintf(stderr,"Name of menu is missed, skip defination\n");
+	fprintf(stderr,"Name of menu is missed, skip definition\n");
     }
 
     return SCM_UNSPECIFIED;
