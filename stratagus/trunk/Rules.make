@@ -32,13 +32,6 @@
 ############################################################################
 
 #------------------------------------------------------------------------------
-# Comment next for a version without SIOD (scheme interpreter)
-#	C C L	-	Craft Configuration Language
-
-CCL	= -DUSE_CCL
-CCLLIB	= -lm
-
-#------------------------------------------------------------------------------
 # Uncomment next to add threaded sound support
 #	You should have a thread safe X11 (libc6 or glibc)
 #	Any modern linux distribution are thread safe.
@@ -146,6 +139,13 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 		  -I$(TOPDIR)/libpng-1.0.5 -I$(TOPDIR)/zlib-1.1.3
 
 #------------------------------------------------------------------------------
+#	Support for SIOD (scheme interpreter)
+#	C C L	-	Craft Configuration Language
+
+CCL	= -DUSE_CCL
+CCLLIB	= -lm
+
+#------------------------------------------------------------------------------
 
 # Uncomment next to profile
 #PROFILE=	-pg
@@ -196,7 +196,7 @@ DEBUG=	-DDEBUG -DREFS_DEBUG # -DFLAG_DEBUG
 ## NEW_SHIPS:		New correct ship movement.
 ## NEW_NETMENUS:	Include new network menues.
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -DNEW_NAMES -D_NEW_NETMENUS # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS
+	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -DNEW_NAMES -D_NEW_NETMENUS -DBPP8_IRGB # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)

@@ -31,14 +31,11 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-
-#include "freecraft.h"
-
-#ifdef USE_CCL	// {
-
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+
+#include "freecraft.h"
 
 #include "iolib.h"
 #include "ccl.h"
@@ -698,14 +695,9 @@ global void CclInit(void)
     //
     //	Make some sombols for the compile options/features.
     //
-#ifdef USE_CCL
     gh_define("freecraft-feature-use-ccl",SCM_BOOL_T);
-#endif
 #ifdef USE_SDL
     gh_define("freecraft-feature-use-sdl",SCM_BOOL_T);
-#endif
-#ifdef USE_ONLYCCL
-    gh_define("freecraft-feature-only-ccl",SCM_BOOL_T);
 #endif
 #ifdef USE_THREAD
     gh_define("freecraft-feature-thread",SCM_BOOL_T);
@@ -769,7 +761,5 @@ global void CclInit(void)
     vload(file,0,1);
     CclInConfigFile=0;
 }
-
-#endif	// } USE_CCL
 
 //@}

@@ -128,21 +128,17 @@ global void LoadModules(void)
 */
 global void LoadGame(char* filename)
 {
-#ifdef USE_CCL
     int old_siod_verbose_level;
     extern int siod_verbose_level;
-#endif
 
     CleanModules();
 
-#ifdef USE_CCL
     old_siod_verbose_level=siod_verbose_level;
     siod_verbose_level=4;
     user_gc(SCM_BOOL_F);
     siod_verbose_level=old_siod_verbose_level;
     gh_eval_file(filename);
     user_gc(SCM_BOOL_F);
-#endif
 
     InitModules();
     LoadModules();

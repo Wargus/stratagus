@@ -598,11 +598,9 @@ local int InputKey(int key)
 {
     switch (key) {
 	case '\r':
-#if defined(USE_CCL)
 	    if (Input[0] == '(') {
 		CclCommand(Input);
 	    } else {
-#endif
 		// Handle cheats
 		// FIXME: disable cheats
 		if (strcmp(Input, "there is no aliens level") == 0) {
@@ -677,9 +675,8 @@ local int InputKey(int key)
 		    // FIXME: only to selected players ...
 		}
 		NetworkChatMessage(Input);
-#if defined(USE_CCL)
 	    }
-#endif
+
 	case '\e':
 	    ClearStatusLine();
 	    KeyState = KeyStateCommand;

@@ -406,8 +406,6 @@ global void SaveIcons(FILE* file)
     }
 }
 
-#ifdef USE_CCL
-
 /**
 **	@brief Parse icon definition.
 **
@@ -525,7 +523,5 @@ global void IconCclRegister(void)
 
     gh_new_procedureN("define-icon-wc-names",CclDefineIconWcNames);
 }
-
-#endif
 
 //@}

@@ -34,8 +34,6 @@
 
 #include "freecraft.h"
 
-#ifdef USE_CCL	// {
-
 #ifdef WITH_SOUND	// {
 
 #include <stdlib.h>
@@ -549,7 +547,5 @@ global void SoundCclRegister(void)
 }
 
 #endif	// } !WITH_SOUND
-
-#endif	// } USE_CCL
 
 //@}
