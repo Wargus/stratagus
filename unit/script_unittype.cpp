@@ -1427,6 +1427,93 @@ local SCM CclDefineUnitStats(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineUnitStats(lua_State* l)
+{
+    const char* value;
+    UnitType* type;
+    UnitStats* stats;
+    int i;
+    int args;
+    int j;
+
+    args = lua_gettop(l);
+    j = 0;
+
+    type = UnitTypeByIdent(LuaToString(l, j + 1));
+    DebugCheck(!type);
+    ++j;
+
+    i = LuaToNumber(l, j + 1);
+    DebugCheck(i >= PlayerMax);
+    ++j;
+
+    stats = &type->Stats[i];
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    for (; j < args; ++j) {
+
+	value = LuaToString(l, j + 1);
+	++j;
+
+	if (!strcmp(value, "level")) {
+	    stats->Level = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "speed")) {
+	    stats->Speed = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "attack-range")) {
+	    stats->AttackRange = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "sight-range")) {
+	    stats->SightRange = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "armor")) {
+	    stats->Armor = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "basic-damage")) {
+	    stats->BasicDamage = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "piercing-damage")) {
+	    stats->PiercingDamage = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "hit-points")) {
+	    stats->HitPoints = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "regeneration-rate")) {
+	    stats->RegenerationRate = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "costs")) {
+	    int subargs;
+	    int k;
+
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
+
+		for (i = 0; i < MaxCosts; ++i) {
+		    if (!strcmp(value, DefaultResourceNames[i])) {
+			lua_rawgeti(l, j + 1, k + 1);
+			stats->Costs[i] = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			break;
+		    }
+		}
+		if (i == MaxCosts) {
+		   // FIXME: this leaves half initialized stats
+		   lua_pushfstring(l, "Unsupported tag: %s", value);
+		   lua_error(l);
+		}
+	    }
+	} else {
+	   // FIXME: this leaves a half initialized unit
+	   lua_pushfstring(l, "Unsupported tag: %s", value);
+	   lua_error(l);
+	}
+    }
+
+    return 0;
+}
 #endif
 
 // ----------------------------------------------------------------------------
@@ -2036,7 +2123,7 @@ global void UnitTypeCclRegister(void)
     gh_new_procedureN("define-animations", CclDefineAnimations);
 #elif defined(USE_LUA)
     lua_register(Lua, "DefineUnitType", CclDefineUnitType);
-//    lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);
+    lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);
     lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
 
 //    SiodUnitTypeTag = CclMakeSmobType("UnitType");
