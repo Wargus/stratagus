@@ -1837,6 +1837,21 @@ global void DrawMapFogOfWar(int x,int y)
 		    }
 #endif
 #endif
+
+#ifdef HIERARCHIC_PATHFINDER
+		    {
+			char regidstr[8];
+			int regid;
+extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
+#define GameFont 1
+			regid = MapFieldGetRegId ((dx-TheUI.MapX)/TileSizeX + MapX,
+			     						(dy-TheUI.MapY)/TileSizeY + MapY);
+			if (regid) {
+			    snprintf (regidstr, 8, "%d", regid);
+			    VideoDrawText (dx, dy, GameFont, regidstr);
+			}
+		    }
+#endif /* HIERARCHIC_PATHFINDER */
 		}
                 ++redraw_tile;
 		++sx;
