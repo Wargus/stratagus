@@ -33,7 +33,7 @@ include $(TOPDIR)/$(RULESFILE)
 
 OBJDIR ?= .
 
-CROSSDIR = /usr/local/cross-tools
+CROSSDIR = /usr/local/cross
 
 INCLUDE_DIRS = src/include src/movie/vp31/include
 
@@ -180,7 +180,7 @@ depend:
 #	include dependency files, if they exist
 #
 
-$(OBJ):	$(RULESFILE)
+$(OBJ):		$(RULESFILE)
 
 ifeq (.depend,$(wildcard .depend))
 include .depend
@@ -445,7 +445,7 @@ WIN32=	\
     EXE='.exe' \
     XLDFLAGS='' \
     XIFLAGS='' \
-    VIDEO='-DUSE_WIN32 -DFLAC_IDIOTIC2 $(SDL)'  \
+    VIDEO='-DUSE_WIN32 $(SDL)'  \
     VIDEOLIB='-L$(CROSSDIR)/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32' \
     RULESFILE=$(WINRULESFILE)
 
