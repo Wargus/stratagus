@@ -722,7 +722,7 @@ local int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
 	min_y _C_ max_y);
 
     if( !IsMapFieldVisible(ThisPlayer,(missile->X-TileSizeX/2)/TileSizeX,
-		(missile->Y-TileSizeY/2)/TileSizeY)) {
+		(missile->Y-TileSizeY/2)/TileSizeY) && !ReplayRevealMap) {
 	return 0;
     }
 
