@@ -809,7 +809,7 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	    type->CorpseName, type->CorpseScript);
     }
     if (type->ExplodeWhenKilled) {
-	CLprintf(file, "  'explode-when-killed '%s\n", type->Missile.Name);
+	CLprintf(file, "  'explode-when-killed '%s\n", type->Explosion.Name);
     }
 
     CLprintf(file, "  ");
