@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<!--
+	----	(c) Copyright 2004 by Crestez Leonard.
+
+	----    This program is free software; you can redistribute it and/or modify
+	----    it under the terms of the GNU General Public License as published by
+	----    the Free Software Foundation; version 2 dated June, 1991.
+	----
+	----    This program is distributed in the hope that it will be useful,
+	----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+	----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	----    GNU General Public License for more details.
+	----
+	----    You should have received a copy of the GNU General Public License
+	----    along with this program; if not, write to the Free Software
+	----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+	----    02111-1307, USA.
+	-->
+	<title>Stratagus Configuration Language Description: Content</title>
+	<meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+	<meta name="Author" content="cleonard@go.ro">
+	<meta name="Keyword" content="scripting">
+	<meta name="Description" content="Scripting language main structure">
+</head>
+<body>
+	<h1>Stratagus Configuration Language Description: Content</h1>
+	<hr>
+	<pre width=80>
+         _________ __                 __                               
+        /   _____//  |_____________ _/  |______     ____  __ __  ______
+        \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+       /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+               \/                  \/          \//_____/            \/ 
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   Stratagus - A free fantasy real time strategy game engine
+	</pre>
+	<p><b>
+		(C) Copyright 1998-2004 by The Stratagus Project. Distributed under the
+		<a href="../gpl.html">"GNU General Public License"</a>
+	</b></p>
+	<hr>
+	<a href="../stratagus.html">Stratagus</a> 
+	<a href="../faq.html">FAQ</a> 
+	<hr>
+
+	<h2>Intro - Introduction to scripting in Stratagus</h2>
+	<p>Stratagus is a real-time strategy engine. To define
+	the different games a configuration language is needed.</p>
+	<p>The old scripting language was used mostly in a declarative way,
+	with functions for everything. I am changing that, in the branch
+	called META_LUA (you just change an ifdef in stratagus.h to get it).
+	Somebody should remove this text when META_LUA is complete.</p>
+	<p>In the mean-time you can look at the old outdated scripting
+	documentation <a href="../ccl/ccl.html">here</a>. Most of it is
+	still for scheme... yuk.</p>
+
+	<h3>Scripting interface design</h3>
+	<p>All the scripting interface will be in one big lua table, called
+	<b>Stratagus</b>. If you think that's too long something like Game could do.
+	Inside that table, most configurable structures in the game will be
+	accessbile. For instance Stratagus.UnitTypes[3] or Stratagus.UnitTypes["unit_goldmine"]
+	will get you a reference to a UnitType, and you can change values around from
+	lua code.</p>
+	<p>It is planned to have some sort of access level, depending on the origin
+	of the current script. Possible values could be: save game, config file,
+	map script(trigger), command line. This is because changing values at random
+	can easily crash the game.</p>
+
+	<h3>How to use scripting from lua</h3>
+	<p>If you are a game-designer this is probably all you need to read, the rest of
+	this file is for developers of the engine. You should first read documentation on
+	<a href="http://www.lua.org">Lua</a>, expecially the
+	<a href="http://www.lua.org/manual/5.0/">Lua Reference Manual</a>.</p>
+	<p>The main <b>Stratagus</b> table contains all the scripting interface,
+	inside it you will find all configurable information, in a tree-like structure.
+	Remember that in lua complex variables are passed by reference, so you can do
+	ut = Stratagus.UnitTypes["unit-goldmine"] and manipulate ut. It's even recommended,
+	for speed reasons.</p>
+	<p>Some "structures" in the game are actually collections. You can access them with
+	both an integer and a string index. Collection items are <b>named</b>. Traditionally
+	they are prefixed with the typename ("unit", "missile", "spell"), are all lower-case
+	and use a "-" as a separator in the names. This ensures they don't interfere with
+	methods and values in the same "structure". All collections provide a Create("name")
+	method, to create a new element and a "n" property, the count of elements. "n" is for
+	conformation to the lua convention for arrays.</p>
+	<p>The stratagus scripting interface makes use of "properties". Properties look like
+	normal fields (or however you call them) but remember that in C code it might translate
+	to a complex get or set function. I honestly find this a lot cleaner than calling a
+	lot	of get/set functions like in most languages.</p>
+
+	<h3>How to use scripting from C</h3>
+	<p>The scripting interface is designed to be very clean and neat. This is why most
+	structures/functions are prefixed with "Script", and as many variables should be
+	local. To keep a reasonable level of similarity, lua functions should only be 
+	wrappers around C functions, prefixed with "Script".</p>
+	<p>For every scriptable "module" you have write a separate file with the scripting
+	code for the module, generally called "script_module.c". Scripting is initialized with
+	a function called Script"Module"Init(). The "Stratagus" table is at -1 on the global
+	Lua stack. If there is any "collection" in the module it should be placed in the 
+	global table. Try to keep the Init function the only global variable.</p>
+	<p>Lua provides a mechanism known as meta-tables, it can be explained in short as
+	run-time operator-overloading. It has a great degree of flexibility, since you can
+	even override the "[]" or "." operator. It is possible to get C functions called
+	from lua to override operators. However, lua functions are actually too flexible
+	and require lots of checking code. This is why Stratagus has a C mechanism build
+	on top of lua meta-tables, with proper error-checking and callback signatures.
+	Unless you hack on the scripting framework, only use ScriptProxyType. Read the next
+	sub-section for details on the actual scripting framework.</p>
+	<p>You need to have a ScriptProxyType for every structure <b>type</b>. You can create
+	an reference in lua to a C structure ad push it on the stack with
+	<i>ScriptCreateUserdata(lua_State *l, void* object, ScriptProxyType* type)</i>. You
+	can't free them from C, lua has a garbage collector. ScriptProxyType has a number of
+	function pointers, C functions that get called from lua when something happens to
+	the lua proxy for your object. The void* object won't get touched, and it comes as
+	a parameter to all those functions. Here is a list and a short explanation.</p>
+	<ul>
+		<li><i>ScriptProxyType::GetStr(void* object, const char* key, lua_State *l):</i><br>
+			Called when a script tries to access your object with a string, like
+			print(obj.Key) or print(obj["Key]). You have to push 1 item on the stack,
+			the result, or end up in an error.
+		</li>
+		<li><i>ScriptProxyType::GetInt(void* object, int index, lua_State *l):</i><br>
+			Called when a script tries to access your object with an int, like
+			print(obj[5]). You have to push 1 item on the stack, the result, or end up
+			in an error.
+		</li>
+		<li><i>ScriptProxyType::SetStr(void* object, const char* key, lua_State *l):</i><br>
+			Called when a script tries to write to a field of your object with a string
+			key, like obj.Key = "Hello" or obj["Key] = 7 + 4). You have to pop an
+			item from the stack and assign it to the field, or end up in an error
+		</li>
+		<li><i>ScriptProxyType::SetInt(void* object, int index, lua_State *l):</i><br>
+			Called when a script tries to write to a field of your object with an
+			index, like obj[3] = "Hello". You have to pop an item from the stack
+			and assign it to your index, or end up in an error.
+		</li>
+		<li><i>ScriptProxyType::Collect(void* object):</i><br>
+			This is a special callback. It gets called when the garbage collector
+			decides to get rid of the object. You can have whatever free code you
+			wish in there. Remember, the object pointer is never touched by Lua or
+			the scripting system. You probably don't need this if the lua object
+			you made is a mere "wrapper" around an existing C struct, and not a
+			special object created for Lua.
+		</li>
+	</ul>
+	<p>There are a whole bunch of macros and functions designed to make your life
+	easier when scripting. You should look for them in src/include/script.h, I'm
+	lazy right now.</p>
+
+	<h3>Scripting system internals</h3>
+	<p>The main <b>Stratagus</b> table will be accessible at all times.
+	However, having a lua table for each and every struct we use would be
+	a huge resource waste. This is why we make a table only when we want to get it
+	the actual struct. It works by returning userdate, not a table. Userdata is
+	a special type in lua, and it's mostly opaque to lua, it's good to store random
+	C values.</p>
+	<p>Despite what you might think at first, ScriptCreateUserdata doesn't always
+	create. For every object pointer-type it makes an entry into a special weak
+	table in the registry. The registry is a place in lua where you can keep values
+	unreachable from actual scripts. That the table is weak means that it does <b>
+	not</b> stop the collection of it's values. We have a global garbage collector
+	C function that removes the entry from the weak table and then calls the object
+	GC. There is only one meta-table across the whole system, that converts calls
+	to the nicer callbacks of ScriptProxyType.</p>
+
+	<b>FIXME: this is not complete, but it should give you an idea.</b>
+
+	<h2>Content</h2>
+
+	not much.
+
+	<hr>
+	Last changed: $Id$<br>
+	All trademarks and copyrights on this page are owned by their respective owners.
+	<address>(c) 2004 by <a href="http://stratagus.org">The Stratagus Project</a></address>
+</body></html>
