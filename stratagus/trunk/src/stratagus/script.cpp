@@ -484,6 +484,32 @@ local SCM CclLoadPud(SCM file)
 }
 
 /**
+**	Load a map. (Try in library path first)
+**
+**	@param file	filename of map.
+**
+**	@return		FIXME: Nothing.
+*/
+local SCM CclLoadMap(SCM file)
+{
+    char* name;
+    char buffer[1024];
+
+    name=gh_scm2newstr(file,NULL);
+    if( strcasestr(name,".pud") ) {
+	LoadPud(LibraryFileName(name,buffer),&TheMap);
+    } else if( strcasestr(name,".scm") ) {
+	LoadScm(LibraryFileName(name,buffer),&TheMap);
+    } else if( strcasestr(name,".chk") ) {
+	LoadChk(LibraryFileName(name,buffer),&TheMap);
+    }
+    free(name);
+
+    // FIXME: LoadPud should return an error
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Define a map.
 **
 **	@param width	Map width.
@@ -601,6 +627,7 @@ global void InitCcl(void)
     EditorCclRegister();
 
     init_subr_1("load-pud",CclLoadPud);
+    init_subr_1("load-map",CclLoadMap);
     init_subr_2("define-map",CclDefineMap);
 
     gh_new_procedure0_0("units",CclUnits);

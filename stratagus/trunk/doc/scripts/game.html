@@ -69,6 +69,7 @@
 <A HREF="#get-unit-unholy-armor">get-unit-unholy-armor</A>
 <A HREF="#group">group</A>
 <A HREF="#library-path">library-path</A>
+<A HREF="#load-map">load-map</A>
 <A HREF="#load-pud">load-pud</A>
 <A HREF="#log">log</A>
 <A HREF="#make-unit">make-unit</A>
@@ -863,34 +864,59 @@ Returns the current game cycle.
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
 
-<A NAME="load-pud"></A>
-<H3>load-pud</H3>
+<A NAME="load-map"></A>
+<H3>load-map</H3>
 
 <H4>Description</H4>
 
-.
+Load a map using any of the supported formats.
 
 <H4>Syntax</H4>
 
-<CODE>(load-pud)</CODE>
+<CODE>(load-map map)</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>map</DT>
+<DD>Name of the map to load.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (load-pud)
+    (load-map "campaigns/human/level01h.pud")
 </PRE>
 
-<P>.
+<P>Loads the map.
 
-<H4>Used</H4>
+<H4>Not Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A NAME="load-pud"></A>
+<H3>load-pud</H3>
+
+<H4>Description</H4>
+
+Load a map using the pud format.
+
+<H4>Syntax</H4>
+
+<CODE>(load-pud map)</CODE>
+
+<DL>
+<DT>map</DT>
+<DD>Name of the map to load.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (load-pud "campaigns/human/level01h.pud")
+</PRE>
+
+<P>Loads the pud.
+
+<H4>Not Used</H4>
 
 <A NAME="log"></A>
 <H3>log</H3>
