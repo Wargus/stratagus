@@ -231,7 +231,7 @@ global void DoRightButton (int sx,int sy)
 		    || type==UnitTypeOrcWorkerWithGold
 		    || type==UnitTypeHumanWorkerWithGold ) {
 		dest=UnitOnMapTile(x,y);
-		if( dest ) {
+		if( dest && dest->Player==unit->Player ) {
 		    dest->Blink=4;
 		    if( dest->Type->StoresGold
 			    && (type==UnitTypeOrcWorkerWithGold
