@@ -62,7 +62,7 @@ global int VideoDepth;
 global VMemType8 * Pixels8;
 global VMemType16 * Pixels16;
 global VMemType32 * Pixels32;
-global struct Palette GlobalPalette[256];
+global Palette GlobalPalette[256];
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -485,7 +485,7 @@ global void WaitEventsAndKeepSync(void)
 
     for(;;) {
 	// Not very nice, but this is the problem if you use other libraries
-	// The event handling of SDL is wrong designed = polling.
+	// The event handling of SDL is wrong designed = polling only.
 	while( SDL_PollEvent(event) ) {
 	    // Handle SDL event
 	    DoEvent(event);
@@ -561,38 +561,43 @@ global void WaitEventsAndKeepSync(void)
 	}
     }
 }
-    
-global GraphicData * VideoCreateNewPalette(const struct Palette *palette){
+
+/**
+**	Create a new hardware dependend palette palette.
+**
+**	@param palette	Hardware independend palette.
+**
+**	@returns	A hardware dependend pixel table.
+*/
+global GraphicData * VideoCreateNewPalette(const Palette *palette)
+{
     int i;
-    VMemType8 *  LocalPixels8 = NULL;
-    VMemType16 * LocalPixels16 = NULL;
-    VMemType32 * LocalPixels32 =  NULL;
+    void* pixels;
 
     if( !Screen ) {			// no init
       return NULL;
     }
 
-    
-
-
     switch( VideoDepth ) {
     case 8:
-      LocalPixels8=calloc(256,sizeof(VMemType8));
-      break;
+	pixels=calloc(256,sizeof(VMemType8));
+	break;
     case 15:
     case 16:
-      LocalPixels16=calloc(256,sizeof(VMemType16));
-      break;
+	pixels=calloc(256,sizeof(VMemType16));
+	break;
     case 24:
     case 32:
-      LocalPixels32=calloc(256,sizeof(VMemType32));
-      break;
+	pixels=calloc(256,sizeof(VMemType32));
+	break;
     default:
-      DebugLevel0(__FUNCTION__": Unknown depth\n");
-      break;
+	DebugLevel0(__FUNCTION__": Unknown depth\n");
+	return NULL;
     }
 
-
+    //
+    //	Convert each palette entry into hardware format.
+    //
     for( i=0; i<256; ++i ) {
 	int r;
 	int g;
@@ -604,6 +609,7 @@ global GraphicData * VideoCreateNewPalette(const struct Palette *palette){
 	b=(palette[i].b)&0xFF;
 	v=r+g+b;
 
+	// Apply global saturation,contrast and brightness
 	r= ((((r*3-v)*TheUI.Saturation + v*100)
 	    *TheUI.Contrast)
 	    +TheUI.Brightness*25600*3)/30000;
@@ -622,44 +628,21 @@ global GraphicData * VideoCreateNewPalette(const struct Palette *palette){
 	// -> Video
 	switch( VideoDepth ) {
 	case 8:
-	    LocalPixels8[i]=SDL_MapRGB(Screen->format,r,g,b);
+	    ((VMemType8*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);
 	    break;
 	case 15:
 	case 16:
-	    LocalPixels16[i]=SDL_MapRGB(Screen->format,r,g,b);
+	    ((VMemType16*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);
 	    break;
 	case 24:
 	case 32:
-	    LocalPixels32[i]=SDL_MapRGB(Screen->format,r,g,b);
-	    break;
-	default:
-	    DebugLevel0(__FUNCTION__": Unknown depth\n");
+	    ((VMemType32*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);
 	    break;
 	}
     }
 
-    // -> Video
-    switch( VideoDepth ) {
-    case 8:
-      return (GraphicData *)LocalPixels8;
-      break;
-    case 15:
-    case 16:
-      return (GraphicData *)LocalPixels16;
-      break;
-    case 24:
-    case 32:
-      return (GraphicData *)LocalPixels32;
-      break;
-    default:
-      DebugLevel0(__FUNCTION__": Unknown depth\n");
-      break;
-    }
-    
-    return (GraphicData *)NULL;
-
+    return pixels;
 }
-
 
 /**
 **	Color cycle.
