@@ -562,6 +562,7 @@ global void DrawMinimapCursor(int vx,int vy)
 	}
 	memcpy(dp,sp,(w+1)*sizeof(VMemType8));
 	break; }
+    case 15:
     case 16:
 	{ VMemType16* sp;
 	VMemType16* dp;
