@@ -188,7 +188,15 @@ development with windows.<P>
 <DD>A: No. Sorry Load+Save aren't yet written.
 
 <P>
+<DT><FONT COLOR="#FF0000">Q: I get the following compiler failure:<BR>
+network.c:282: initializer element is not constant<BR>
+network.c:282: (near initialization for `CommandsIn[0].first')<BR>
+What should I do? </FONT>
+<DD>A: This is a bug in the GNU C Compiler 2.96, downgrade to GCC 2.95.x or
+upgrade to GCC 3.xx (expect many wrong warnings). If you are using the
+Redhat distribution 7.2, you can change CC=gcc to CC=kgcc in Rules.make.
 
+<P>
 
 </DL>
 
