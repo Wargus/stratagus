@@ -257,9 +257,9 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    RefsDebugCheck( !depot->Refs );
 	    ++depot->Refs;
 	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	    unit->Orders[0].X=-1;
-	    unit->Orders[0].Y=-1;
+	    unit->Orders[0].X=unit->Orders[0].Y=-1;
 	    unit->Orders[0].Action=resource->Action;
+	    NewResetPath(unit);
 	}
 
         CheckUnitToBeDrawn(unit);
@@ -424,9 +424,9 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 	    RefsDebugCheck( !goal->Refs );
 	    ++goal->Refs;
 	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	    unit->Orders[0].X=-1;
-	    unit->Orders[0].Y=-1;
+	    unit->Orders[0].X=unit->Orders[0].Y=-1;
 	    unit->Orders[0].Action=resource->Action;
+	    NewResetPath(unit);
 	}
 
         CheckUnitToBeDrawn(unit);
