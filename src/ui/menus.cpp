@@ -7137,7 +7137,7 @@ local void MultiGameMasterReport(void)
 	if (master_host) {
 	    free(master_host);
 	}
-	master_host = malloc(strlen(MasterTempString));
+	master_host = malloc(strlen(MasterTempString) + 1);
 	strcpy(master_host, MasterTempString);
 	master_port = atoi(port);
 	port--;
@@ -7146,7 +7146,7 @@ local void MultiGameMasterReport(void)
 	if (master_host) {
 	    free(master_host);
 	}
-	master_host = malloc(strlen(MasterTempString));
+	master_host = malloc(strlen(MasterTempString) + 1);
 	strcpy(master_host, MasterTempString);
 	master_port = MASTER_PORT;
     }
