@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <signal.h>
+#include <ctype.h>
 
 #include "stratagus.h"
 
