@@ -431,20 +431,6 @@ static unsigned char *mgptsoptions[] = {
 	"Closed",
 };
 
-/**
-** Help-items for the Net Multiplayer Setup and Client Menus
-*/
-static Menuitem NetMultiButtonStorage[] = {
-		{ MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
-		{ MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
-};
-static void InitNetMultiButtonStorage(void) {
-	MenuitemPulldown i0 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, -1, 0, 0, 0};
-	MenuitemDrawfunc i1 = { NetMultiPlayerDrawFunc };
-	NetMultiButtonStorage[0].D.Pulldown = i0;
-	NetMultiButtonStorage[1].D.DrawFunc = i1;
-}
-
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
@@ -730,6 +716,7 @@ void InitMenuFuncHash(void)
 	HASHADD(MultiScenSelectMenu,"multi-scen-select");
 	HASHADD(MultiGameStart,"multi-game-start");
 	HASHADD(MultiGameCancel,"multi-game-cancel");
+	HASHADD(MultiGamePTSAction,"multi-game-pts-action");
 	HASHADD(MultiGameFWSAction,"multi-game-fws-action");
 
 // Enter server ip
@@ -746,6 +733,7 @@ void InitMenuFuncHash(void)
 	HASHADD(MultiClientCancel,"multi-client-cancel");
 	HASHADD(MultiClientRCSAction,"multi-client-rcs-action");
 	HASHADD(MultiClientCheckboxAction,"multi-client-checkbox-action");
+	HASHADD(NetMultiPlayerDrawFunc,"net-multi-player-draw-func");
 
 // Net connecting
 	HASHADD(NetConnectingInit,"net-connecting-init");
@@ -3907,7 +3895,8 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 
 		}
 		if (Hosts[i].PlyNr) {
-			menu->Items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
+			menu->Items[SERVER_PLAYER_STATE + i].MiType = 0;
+			menu->Items[SERVER_PLAYER_TEXT + i].MiType = MI_TYPE_DRAWFUNC;
 
 			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = 0;
 			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
@@ -3924,7 +3913,9 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			if (!(menu->Items[SERVER_PLAYER_STATE + i].Flags & MenuButtonClicked)) {
 				if (initial == 1 ||
 					(initial == 2 && menu->Items[SERVER_PLAYER_STATE + i].MiType != MI_TYPE_PULLDOWN)) {
-					menu->Items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[0];
+					menu->Items[SERVER_PLAYER_STATE + i].MiType = MI_TYPE_PULLDOWN;
+					menu->Items[SERVER_PLAYER_TEXT + i].MiType = 0;
+					menu->Items[SERVER_PLAYER_STATE + i].Flags = 0;
 					menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.state = 0;
 					menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = ServerSetupState.CompOpt[i];
 				}
@@ -3938,11 +3929,6 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 
 			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MenuButtonDisabled;
 			menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.State = MI_CSTATE_INVISIBLE;
-		}
-
-		menu->Items[SERVER_PLAYER_STATE + i].YOfs = 32 + (i & 7) * 22;
-		if (i > 7) {
-			menu->Items[SERVER_PLAYER_STATE + i].XOfs = 320 + 40;
 		}
 
 
@@ -4029,8 +4015,8 @@ static void MultiClientUpdate(int initial)
 	// Setup defaults, reset values.
 	//
 	if (initial) {
-		menu->Items[CLIENT_PLAYER_STATE] = NetMultiButtonStorage[1];
-		menu->Items[CLIENT_PLAYER_STATE].YOfs = 32;
+		menu->Items[CLIENT_PLAYER_STATE].MiType = 0;
+		menu->Items[CLIENT_PLAYER_TEXT].MiType = MI_TYPE_DRAWFUNC;
 		memset(&ServerSetupState, 0, sizeof(ServerSetup));
 		memset(&LocalSetupState, 0, sizeof(ServerSetup));
 	}
@@ -4039,7 +4025,8 @@ static void MultiClientUpdate(int initial)
 		// Johns: This works only if initial. Hosts[i].PlyNr is later lost.
 		//
 		if (Hosts[i].PlyNr || i == NetLocalHostsSlot) {
-			menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[1];
+			menu->Items[CLIENT_PLAYER_STATE + i].MiType = 0;
+			menu->Items[CLIENT_PLAYER_TEXT + i].MiType = MI_TYPE_DRAWFUNC;
 			if (i == NetLocalHostsSlot) {
 				menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State = 0;
 			} else {
@@ -4047,17 +4034,14 @@ static void MultiClientUpdate(int initial)
 					MI_CSTATE_PASSIVE;
 			}
 		} else {
-			menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[0];
+			menu->Items[CLIENT_PLAYER_STATE + i].MiType = MI_TYPE_PULLDOWN;
+			menu->Items[CLIENT_PLAYER_TEXT + i].MiType = 0;
 			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.state =
 				MI_PSTATE_PASSIVE;
 			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt =
 				ServerSetupState.CompOpt[i];
 			menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State =
 				MI_CSTATE_INVISIBLE;
-		}
-		menu->Items[CLIENT_PLAYER_STATE + i].YOfs = 32 + (i & 7) * 22;
-		if (i > 7) {
-			menu->Items[CLIENT_PLAYER_STATE + i].XOfs = 320 + 40;
 		}
 		menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = 0;
 
@@ -4105,8 +4089,7 @@ static void MultiGameSetupInit(Menuitem* mi)
 
 	GameSetupInit(mi);
 	NetworkInitServerConnect();
-	mi->Menu->Items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
-	mi->Menu->Items[SERVER_PLAYER_STATE].YOfs = 32;
+	mi->Menu->Items[SERVER_PLAYER_STATE].MiType = 0;
 	MultiGameFWSAction(NULL, mi->Menu->Items[27].D.Pulldown.defopt);
 
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
@@ -4132,13 +4115,6 @@ static void MultiGameSetupInit(Menuitem* mi)
 */
 static void MultiGameSetupExit(Menuitem* mi)
 {
-	int i;
-
-	// ugly hack to prevent NetMultiButtonStorage[0].D.Pulldown.options
-	// from being freed
-	for (i=0; i<PlayerMax-1; ++i) {
-		mi->Menu->Items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
-	}
 }
 
 /**
@@ -4167,7 +4143,7 @@ static void NetMultiPlayerDrawFunc(Menuitem* mi)
 	char* rc;
 
 	menu = FindMenu("menu-multi-setup");
-	i = mi - menu->Items - SERVER_PLAYER_STATE;
+	i = mi - menu->Items - SERVER_PLAYER_TEXT;
 	if (i >= 0 && i < PlayerMax - 1) { // Ugly test to detect server
 		if (i > 0) {
 			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags &=
@@ -4196,7 +4172,7 @@ static void NetMultiPlayerDrawFunc(Menuitem* mi)
 		}
 	} else {
 		menu = FindMenu("menu-net-multi-client");
-		i = mi - menu->Items - CLIENT_PLAYER_STATE;
+		i = mi - menu->Items - CLIENT_PLAYER_TEXT;
 		if (i > 0) {
 			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags &=
 				~MenuButtonDisabled;
@@ -4249,13 +4225,6 @@ static void MultiGameClientInit(Menuitem* mi)
 */
 static void MultiGameClientExit(Menuitem* mi)
 {
-	int i;
-
-	// ugly hack to prevent NetMultiButtonStorage[0].D.Pulldown.options
-	// from being freed
-	for (i = 0; i < PlayerMax-1; ++i) {
-		mi->Menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[1];
-	}
 }
 
 /**
@@ -6031,8 +6000,6 @@ static void InitTilesets(Menuitem* mi, int mapdefault)
 void InitMenuData(void)
 {
 	Menu* menu;
-
-	InitNetMultiButtonStorage();
 
 	menu = FindMenu("menu-custom-game");
 	InitPlayerRaces(&menu->Items[6]);
