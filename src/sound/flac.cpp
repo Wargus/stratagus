@@ -133,7 +133,7 @@ local void FLAC_metadata_callback(const FLAC__StreamDecoder * stream,
 **
 **	@return		Error status.
 */
-static FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
+local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
     FLAC__StreamDecoder * stream, const FLAC__Frame * frame,
     const FLAC__int32 * buffer[], void *user)
 {
@@ -207,6 +207,7 @@ global Sample* LoadFlac(const char* name)
     }
     CLread(f,&magic,sizeof(magic));
     if( magic!=0x43614C66 ) {		// "fLaC" in ASCII
+	CLclose(f);
 	return NULL;
     }
 
@@ -259,7 +260,7 @@ global Sample* LoadFlac(const char* name)
     FLAC__stream_decoder_delete(stream);
     CLclose(f);
 
-    DebugLevel0Fn(" %d\n", user.Sample->Length);
+    DebugLevel3Fn(" %d\n", user.Sample->Length);
     IfDebug( AllocatedSoundMemory+=user.Sample->Length; );
 
     return user.Sample;
