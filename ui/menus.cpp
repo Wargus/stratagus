@@ -2818,7 +2818,7 @@ local void StartCampaignFromMenu(int number)
     VideoUnlockScreen();
     Invalidate();
 
-    // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
+    // FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
     EndMenu();
 }
 
@@ -2975,6 +2975,10 @@ local void JoinNetGameMenu(void)
 
     // Here we really go...
     ProcessMenu(MENU_NET_CONNECTING, 1);
+
+    if (GuiGameStarted) {
+	EndMenu();
+    }
 }
 
 /**
