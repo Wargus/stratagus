@@ -2321,6 +2321,15 @@ local void SaveReplayOk(void)
 
     menu = FindMenu("menu-save-replay");
 
+    if (strchr(menu->items[1].d.input.buffer, '/')) {
+	ErrorMenu("Name cannot contain '/'");
+	return;
+    }
+    if (strchr(menu->items[1].d.input.buffer, '\\')) {
+	ErrorMenu("Name cannot contain '\\'");
+	return;
+    }
+
 #ifdef WIN32
     sprintf(TempPathBuf, "logs/");
 #else
@@ -2343,6 +2352,11 @@ local void SaveReplayOk(void)
     }
 
     fd = fopen(TempPathBuf, "wb");
+    if (!fd) {
+	ErrorMenu("Cannot write to file");
+	free(buf);
+	return;
+    }
     fwrite(buf, s.st_size, 1, fd);
     fclose(fd);
 
