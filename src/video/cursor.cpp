@@ -720,6 +720,7 @@ local void DrawBuildingCursor(void)
     //	Draw the allow overlay
     //
     f=CanBuildHere(CursorBuilding,mx,my);
+#if 0
     // FIXME: Should be moved into unittype structure, and allow more types.
     if( CursorBuilding->ShoreBuilding ) {
 	mask=MapFieldLandUnit
@@ -764,6 +765,12 @@ local void DrawBuildingCursor(void)
 	    mask &= ~MapFieldNoBuilding;
 	}
     }
+
+#else
+
+    mask = CursorBuilding->MovementMask;
+
+#endif
 
     h=CursorBuilding->TileHeight;
     BuildingCursorEY=my+h-1;

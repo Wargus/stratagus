@@ -131,7 +131,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	//
 	//	Update movement map.
 	//
-	i=UnitFieldFlags(unit);
+	i=unit->Type->FieldFlags;
 	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags&=~i;
 
 	UnitCacheRemove(unit);

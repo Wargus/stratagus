@@ -611,6 +611,27 @@ struct _unit_ {
 #define UnitNumber(unit)	((unit)->Slot)
 
 /**
+**      Return the unit type movement mask.
+**
+**      @param type     Unit type pointer.
+**
+**      @return         Movement mask of unit type.
+*/
+#define TypeMovementMask(type) \
+    ((type)->MovementMask)
+
+/**
+**      Return units movement mask.
+**
+**      @param unit     Unit pointer.
+**
+**      @return         Movement mask of unit.
+*/
+#define UnitMovementMask(unit) \
+    ((unit)->Type->MovementMask)
+
+
+/**
 *	How many units could be selected
 */
 #define MaxSelectable	9
@@ -822,15 +843,15 @@ extern void UnitCacheStatistic(void);
     /// Initialize unit-cache
 extern void InitUnitCache(void);
 
+#if 0
 //	in map.c	belongs to map or unit??
-    /// FIXME: more docu
-extern int UnitMovement(const Unit* unit);
     /// FIXME: more docu
 extern unsigned UnitFieldFlags(const Unit* unit);
     /// FIXME: more docu
 extern int TypeMovementMask(const UnitType* type);
     /// FIXME: more docu
 extern int UnitMovementMask(const Unit* unit);
+#endif
 
 //	in bottom_panel.c
 //--------------------

@@ -441,6 +441,8 @@ global int UnitCanMoveTo(int x,int y,const Unit* unit)
     return CanMoveToMask(x,y,TypeMovementMask(unit->Type));
 }
 
+#if 0
+
 /**
 **	Return the units field flags.
 **	This flags are used to mark the field for this unit.
@@ -518,6 +520,8 @@ global int UnitMovementMask(const Unit* unit)
 {
     return TypeMovementMask(unit->Type);
 }
+
+#endif
 
 /**
 **	Fixes initially the wood and seen tiles.

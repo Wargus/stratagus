@@ -54,6 +54,8 @@
 **	@param addy	Tile size in y.
 **
 **	@return		True if unit can be unloaded.
+**
+**	@bug FIXME: Place unit only on fields reachable from the transporter
 */
 global int UnloadUnit(Unit* unit,int addx,int addy)
 {
@@ -129,7 +131,7 @@ found:
     UnitCacheInsert(unit);
     // FIXME: This only works with 1x1 big units
     DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
-    TheMap.Fields[x+y*TheMap.Width].Flags|=UnitFieldFlags(unit);
+    TheMap.Fields[x+y*TheMap.Width].Flags|=unit->Type->FieldFlags;
 
     unit->Removed=0;
 
