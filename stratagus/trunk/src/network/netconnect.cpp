@@ -747,12 +747,18 @@ global void NetworkProcessServerRequest(void)
     unsigned long fcd;
     InitMessage message;
 
+    if (ScenSelectPudInfo == NULL) {
+	return;
+	// Game already started...
+    }
+
     for (i = 1; i < PlayerMax-1; ++i) {
 	if (Hosts[i].PlyNr && Hosts[i].Host && Hosts[i].Port) {
 	    fcd = FrameCounter - ServerSetupState.LastFrame[i];
 	    if (fcd >= CLIENT_LIVE_BEAT) {
 		if (fcd > CLIENT_IS_DEAD) {
 		    // kick client...
+		    DebugLevel0Fn("kicking client %d\n" _C_ Hosts[i].PlyNr);
 		    NetStates[i].State = ccs_unused;
 		    Hosts[i].Host = 0;
 		    Hosts[i].Port = 0;
@@ -1371,7 +1377,7 @@ local void ServerParseMap(void)
 */
 local void ServerParseState(const InitMessage* msg)
 {
-    int h, n;
+    int i, h, n;
     InitMessage message;
 
     // look up the host
@@ -1384,7 +1390,7 @@ local void ServerParseState(const InitMessage* msg)
 		    /* Fall through */
 		case ccs_synced:
 		    // Default case: Client is in sync with us, but notes a local change
-		    NetStates[h].State = ccs_async;
+		    // NetStates[h].State = ccs_async;
 		    NetStates[h].MsgCnt = 0;
 		    // Use information supplied by the client:
 		    ServerSetupState.Ready[h] = msg->u.State.Ready[h];
@@ -1392,6 +1398,13 @@ local void ServerParseState(const InitMessage* msg)
 		    DebugLevel3Fn("Server: ICMState: Client[%d]: Ready: %d Race: %d\n" _C_
 				     h _C_ ServerSetupState.Ready[h] _C_ ServerSetupState.Race[h]);
 		    // Add additional info usage here!
+
+		    // Resync other clients (and us..)
+		    for (i = 1; i < PlayerMax-1; i++) {
+			if (Hosts[i].PlyNr) {
+			    NetStates[i].State = ccs_async;
+			}
+		    }
 		    NetConnectForceDisplayUpdate();
 		    /* Fall through */
 		case ccs_async:
