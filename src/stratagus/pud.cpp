@@ -435,9 +435,11 @@ MapInfo* GetPudInfo(const char* pud, MapInfo* info)
 
 				for( i=0; i<16; ++i ) {
 					p=PudReadByte(input);
+					#ifndef LUA_MAP_API
 					buf[0] = p & 0xFF;
 					info->MapUID += ChksumArea(buf, 1);
 					info->PlayerType[i]=p;
+					#endif
 				}
 				continue;
 			} else {
@@ -871,29 +873,9 @@ void LoadPud(const char* pud,WorldMap* map)
 		if( !memcmp(header,"OWNR",4) ) {
 			if( length==16 ) {
 				int i;
-				int p;
 
 				for( i=0; i<16; ++i ) {
-					p=PudReadByte(input);
-					// Single player games only:
-					// ARI: FIXME: convert to a preset array to share with network game code
-					if (GameSettings.Opponents != SettingsPresetMapDefault) {
-						if (p == PlayerPerson && ThisPlayer != NULL) {
-							p = PlayerComputer;
-						}
-						if (p == PlayerComputer) {
-							if (aiopps < GameSettings.Opponents) {
-								aiopps++;
-							} else {
-								p = PlayerNobody;
-							}
-						}
-					}
-					// Network games only:
-					if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
-						p = GameSettings.Presets[i].Type;
-					}
-					CreatePlayer(p);
+					PudReadByte(input);
 				}
 				continue;
 			} else {

@@ -334,6 +334,32 @@ void CreateGame(const char* filename, WorldMap* map)
 	InitVisionTable(); // build vision table for fog of war
 	InitPlayers();
 
+	for( i=0; i<16; ++i ) {
+		int p;
+		int aiopps;
+
+		p = TheMap.Info.PlayerType[i];
+		// Single player games only:
+		// ARI: FIXME: convert to a preset array to share with network game code
+		if (GameSettings.Opponents != SettingsPresetMapDefault) {
+			if (p == PlayerPerson && ThisPlayer != NULL) {
+				p = PlayerComputer;
+			}
+			if (p == PlayerComputer) {
+				if (aiopps < GameSettings.Opponents) {
+					aiopps++;
+				} else {
+					p = PlayerNobody;
+				}
+			}
+		}
+		// Network games only:
+		if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
+			p = GameSettings.Presets[i].Type;
+		}
+		CreatePlayer(p);
+	}
+
 	if (filename) {
 		// FIXME: LibraryFile here?
 		if (CurrentMapPath != filename) {
