@@ -302,18 +302,20 @@ Possible tags:
 <dd>The unit-type name shown in the game. F.E: "Knight", "Gold Mine".
 If the name is too long, it is split at space.
 </dd>
-<dt>File = {"default" or tileset-name, "file", ...}
-<dd>Defines the graphics used to display the unit-type in game.
-<dt>Shadow = {tag, value}</dt>
-<dd><b>FIXME</b>
-Possible tags:
+<dt>File = {"default" or tileset-name, "file", ...}</dt>
+<dd>Defines the graphics used to display the unit-type in game.</dd>
+<dt>Offset = {x, y}</dt>
+<dd>Defines the offset for the graphics in pixels used to display the unit-type</dd>
+<dt>Shadow = {tag, value, ...}</dt>
+<dd>Defines the Parameters for the shadow the unit is casting in the game</dd>
+<dd>Possible tags:</dd>
 <dl>
 <dt>"file", filename</dt>
-<dd><b>FIXME</b></dd>
+<dd>Defines the graphics used to display the shadow of the unit-type</dd>
 <dt>"size", {width, height}</dt>
-<dd><b>FIXME</b></dd>
+<dd>Defines the size of the graphics in pixels used to display the shadow of the unit-type</dd>
 <dt>"offset", {x, y}</dt>
-<dd><b>FIXME</b></dd>
+<dd>Defines the offset of the graphics in pixels used to display the shadow of the unit-type</dd>
 </dl></dd>
 <dt>DrawLevel = number</dt>
 <dd>This is used when sorting units and missiles for drawing. Units with a higher draw
