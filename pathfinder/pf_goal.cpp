@@ -72,7 +72,12 @@ unsigned short MarkHighlevelGoal (Unit *unit)
 		/* FIXME take max(dx,dy) distance between the unit and the goal
 		 * into account since this is what greatly influences the cost of
 		 * substitute search */
-		if (SuperGroupGetNumRegions (unit, SourceGroup) > 200 /*arbitrary*/)
+		/* we always need to find a substitute goal for air units - they
+		 * don't use the highlevel pathfinder so not having a goal would lead
+		 * to exhaustive search of the whole map - something we cannot afford
+		 */
+		if (SuperGroupGetNumRegions (unit, SourceGroup) > 200 /*arbitrary*/ ||
+				unit->Type->UnitType == UnitTypeFly)
 			MarkGoalSubstitute (unit, xmin, xmax, ymin, ymax);
 	}
 
@@ -113,6 +118,11 @@ void ComputeGoalBoundaries (Unit *unit, int *xmin, int *xmax,
 		*ymax = GoalUnit->Y + GoalUnit->Type->TileHeight + Range.Y - 1;
 	} else {
 		/* our goal is a specific place on the map */
+		UnitType *type = unit->Type;
+		if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
+			unit->Orders[0].X &= ~1;
+			unit->Orders[0].Y &= ~1;
+		}
 		*xmin = unit->Orders[0].X;
 		*xmax = unit->Orders[0].X + Range.X;
 		*ymin = unit->Orders[0].Y;
@@ -355,10 +365,16 @@ void MarkLowlevelGoal (Unit *unit, HighlevelPath *h_path)
 	int x, y, xmin, xmax, ymin, ymax;
 	FieldCoords Goal;
 	Region *BestRegion;
+	UnitType *type = unit->Type;
 
 	ComputeGoalBoundaries (unit, &xmin, &xmax, &ymin, &ymax);
 	Goal.X = (xmin+xmax)/2;
 	Goal.Y = (ymin+ymax)/2;
+	/* is this necessary? well, it certainly doesn't hurt */
+	if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
+		Goal.X &= ~1;
+		Goal.Y &= ~1;
+	}
 	LowlevelSetGoal (Goal.X, Goal.Y);
 
 	if (h_path->OriginalGoalReachable) {
