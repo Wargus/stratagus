@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ccl.h		-	The clone configuration language headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __CCL_H__
 #define __CCL_H__
@@ -86,6 +85,8 @@
 
 extern LISP sym_t;
 
+//extern SCM CclEachSecond;		/// Scheme function called each second
+
 #endif	// USE_CCL2
 
 /*----------------------------------------------------------------------------
@@ -94,7 +95,6 @@ extern LISP sym_t;
 
 extern char* CclStartFile;		/// CCL start file
 extern int CclInConfigFile;		/// True while config file parsing
-extern SCM CclEachSecond;		/// Scheme function called each second
 
 /*----------------------------------------------------------------------------
 --	Functions
