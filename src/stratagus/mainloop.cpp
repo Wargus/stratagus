@@ -308,8 +308,10 @@ global void UpdateDisplay(void)
 	//
 	{ int f;
 
-	f=(168*(NextFrameTicks-GetTicks()))
-	    /((100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed);
+	f=168*(NextFrameTicks-GetTicks());
+	if( VideoSyncSpeed ) {
+	    f/=(100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed;
+	}
 	if( f<0 || f>168 ) {
 	    f=168;
 	}
@@ -503,7 +505,7 @@ global void GameMainLoop(void)
 	//
 	//	Game logic part
 	//
-	if (!GamePaused && NetworkInSync) {
+	if (!GamePaused && NetworkInSync && !SkipGameCycle) {
 	    if( !++GameCycle ) {
 		// FIXME: tests with game cycle counter now fails :(
 		// FIXME: Should happen in 68 years :)

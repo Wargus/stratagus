@@ -1359,6 +1359,9 @@ extern void CheckVideoInterrupts(void);
     /// Toggle mouse grab mode
 extern void ToggleGrabMouse(void);
 
+    /// Toggle full screen mode
+extern void ToggleFullScreen(void);
+
     ///	Lock the screen for display
 extern void VideoLockScreen(void);
 
