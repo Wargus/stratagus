@@ -87,6 +87,59 @@ local int AiCheckCosts(const int* costs)
 }
 
 /**
+**	Check if the AI player needs food.
+**
+**	It counts buildings in progress and units in training queues.
+**
+**	@param pai	AI player.
+**	@param type	Unit-type that should be build.
+**	@return		True if enought, false otherwise.
+**
+**	@todo	The number of food currently trained can be stored global
+**		for faster use.
+*/
+local int AiCheckFood(const PlayerAi* pai,const UnitType* type)
+{
+    int remaining;
+    const AiBuildQueue* queue;
+
+    //
+    //	Count food supplies under construction.
+    //
+    remaining=0;
+    for( queue=pai->UnitTypeBuilded; queue; queue=queue->Next ) {
+	if( queue->Type->Supply ) {
+	    DebugLevel3Fn("Builded %d remain %d\n"
+		_C_ queue->Made _C_ remaining);
+	    remaining+=queue->Made*queue->Type->Supply;
+	}
+    }
+    DebugLevel3Fn("Remain %d\n" _C_ remaining);
+    //
+    //	We are already out of food.
+    //
+    remaining+=pai->Player->Food-pai->Player->NumFoodUnits-type->Demand;
+    DebugLevel3Fn("-Demand %d\n" _C_ remaining);
+    if( remaining<0 ) {
+	return 0;
+    }
+
+    //
+    //	Count what we train.
+    //
+    for( queue=pai->UnitTypeBuilded; queue; queue=queue->Next ) {
+	if( !queue->Type->Building ) {
+	    DebugLevel3Fn("Trained %d remain %d\n"
+		_C_ queue->Made _C_ remaining);
+	    if( (remaining-=queue->Made*queue->Type->Demand)<0 ) {
+		return 0;
+	    }
+	}
+    }
+    return 1;
+}
+
+/**
 **	Check if the costs for an unit-type are available for the AI.
 **
 **	Take reserve and already used resources into account.
@@ -107,7 +160,7 @@ local int AiCheckUnitTypeCosts(const UnitType* type)
 **	@param building	Building to be build.
 **	@return		True if made, false if can't be made.
 **
-**	@note 	We must check if the dependencies are fulfilled.
+**	@note	We must check if the dependencies are fulfilled.
 */
 local int AiBuildBuilding(const UnitType* type,UnitType* building)
 {
@@ -216,7 +269,7 @@ local void AiRequestFarms(void)
 **	@param what	What to be trained.
 **	@return		True if made, false if can't be made.
 **
-**	@note 	We must check if the dependencies are fulfilled.
+**	@note	We must check if the dependencies are fulfilled.
 */
 local int AiTrainUnit(const UnitType* type,UnitType* what)
 {
@@ -259,7 +312,7 @@ local int AiTrainUnit(const UnitType* type,UnitType* what)
 **	@param type	Unit-type that must be made.
 **	@return		True if made, false if can't be made.
 **
-**	@note 	We must check if the dependencies are fulfilled.
+**	@note	We must check if the dependencies are fulfilled.
 */
 local int AiMakeUnit(UnitType* type)
 {
@@ -318,7 +371,7 @@ local int AiMakeUnit(UnitType* type)
 **	@param what	What should be researched.
 **	@return		True if made, false if can't be made.
 **
-**	@note 	We must check if the dependencies are fulfilled.
+**	@note	We must check if the dependencies are fulfilled.
 */
 local int AiResearchUpgrade(const UnitType* type,Upgrade* what)
 {
@@ -413,7 +466,7 @@ global void AiAddResearchRequest(Upgrade* upgrade)
 **	@param what	To what should be upgraded.
 **	@return		True if made, false if can't be made.
 **
-**	@note 	We must check if the dependencies are fulfilled.
+**	@note	We must check if the dependencies are fulfilled.
 */
 local int AiUpgradeTo(const UnitType* type,UnitType* what)
 {
@@ -540,11 +593,17 @@ local void AiCheckingWork(void)
 	    //
 	    //	Check if we have enough food.
 	    //
-	    if( !type->Building && !PlayerCheckFood(AiPlayer->Player,type) ) {
-		DebugLevel3Fn("Need food\n");
-		AiPlayer->NeedFood=1;
-		AiRequestFarms();
-		return;
+	    if( !type->Building ) {
+		// Count future
+		if(  !AiCheckFood(AiPlayer,type) ) {
+		    DebugLevel3Fn("Need food\n");
+		    AiPlayer->NeedFood=1;
+		    AiRequestFarms();
+		}
+		// Current limit
+		if( !PlayerCheckFood(AiPlayer->Player,type) ) {
+		    continue;
+		}
 	    }
 
 	    //
@@ -553,6 +612,9 @@ local void AiCheckingWork(void)
 	    if( (c=AiCheckUnitTypeCosts(type)) ) {
 		DebugLevel3("- no resources\n");
 		AiPlayer->NeededMask|=c;
+		//
+		//	NOTE: we can continue and build things with lesser
+		//		resource or other resource need!
 		return;
 	    } else {
 		DebugLevel3("- enough resources\n");
@@ -602,7 +664,7 @@ global Unit* AiFindGoldMine(const Unit* source,
 	if( !unit->Type->GoldMine || UnitUnusable(unit) ) {
 	    continue;
 	}
-	
+
 	//
 	//	If we have already a shorter way, than the distance to the
 	//	unit, we didn't need to check, if reachable.
@@ -1221,12 +1283,12 @@ local void AiCheckRepair(void)
 	    }
 	}
     }
-    
+
     for( i=k; i<n; ++i ) {
 	unit=AiPlayer->Player->Units[i];
 	repair_flag=1;
 	// Unit defekt?
-	if( unit->Type->Building 
+	if( unit->Type->Building
 		&& unit->Orders[0].Action!=UnitActionBuilded
 		&& unit->Orders[0].Action!=UnitActionUpgradeTo
 		&& unit->HP<unit->Stats->HitPoints ) {
