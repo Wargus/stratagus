@@ -93,9 +93,13 @@ struct _player_ {
     Unit**	Units;			/// units of this player
     unsigned	TotalNumUnits;		/// total # units for units' list.
 
-    unsigned	Food;			/// food available/produced
     unsigned	NumFoodUnits;		/// # units (need food)
     unsigned	NumBuildings;		/// # buildings (don't need food)
+
+    unsigned	Food;			/// food available/produced
+    unsigned	FoodUnitLimit;		/// # food units allowed
+    unsigned	BuildingLimit;		/// # buildings allowed
+    unsigned	TotalUnitLimit;		/// # total unit number allowed
 
     unsigned	Score;			/// points for killing ...
 
@@ -179,12 +183,15 @@ extern void PlayerSetAiNum(Player* player,int ai);
     /// Set a resource of the player.
 extern void PlayerSetResource(Player* player,int resource,int value);
 
-    /// Check if enough food is available for unit type
+    /// Check if the unit-type didn't break any unit limits.
+extern int PlayerCheckLimits(const Player* player,const UnitType* type);
+
+    /// Check if enough food is available for unit-type
 extern int PlayerCheckFood(const Player* player,const UnitType* type);
 
     /// Check if enough resources are available for costs
 extern int PlayerCheckCosts(const Player* player,const int* costs);
-    /// Check if enough resources are available for a new unit type
+    /// Check if enough resources are available for a new unit-type
 extern int PlayerCheckUnitType(const Player* player,const UnitType* type);
 
     /// Add costs to the resources
@@ -220,6 +227,9 @@ extern void GraphicPlayerPixels(const Player* player, const Graphic * sprite);
 
     /// Output debug informations for players
 extern void DebugPlayers(void);
+
+    /// register ccl features
+extern void PlayerCclRegister(void);
 
 //@}
 
