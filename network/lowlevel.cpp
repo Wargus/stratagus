@@ -384,10 +384,10 @@ global int NetSocketReady(int sockfd,int timeout)
     int retval;
     struct timeval tv;
     fd_set mask;
-    sigset_t sigmask;
-
 
 #if defined(linux) && defined(USE_X11)
+    sigset_t sigmask;
+
     // FIXME: ARI: does this work with NON_UNIX hosts ? Posix, but..
     // Linux requires SIGALRM to be blocked, otherwise the
     // itimer set in VIDEO_X11 always kills the select() with EINTR.
