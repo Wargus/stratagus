@@ -449,6 +449,7 @@ global void VideoDraw32Tile32(const unsigned char* data,int x,int y)
 #endif
 }
 
+#ifdef NEW_DECODRAW
 /**
 **	Draw TileSizeX x TileSizeY clipped for XX bpp video modes.
 **	(needed for decoration mechanism, which wants to draw tile partly)
@@ -475,8 +476,9 @@ local void VideoDrawXXTileClip(const unsigned char* data,int x,int y)
 */
 local void MapDrawXXTileClip(int tile,int x,int y)
 {
-  VideoDrawXXTileClip(TheMap.Tiles[tile],x,y);
+    VideoDrawXXTileClip(TheMap.Tiles[tile],x,y);
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --	Draw tile with zoom

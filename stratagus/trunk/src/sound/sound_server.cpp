@@ -773,6 +773,7 @@ local int MixChannelsToStereo32(int* buffer,int size)
     return new_free_channels;
 }
 
+#if SoundSampleSize==8
 /**
 **	Clip mix to output stereo 8 unsigned bit.
 **
@@ -795,7 +796,9 @@ local void ClipMixToStereo8(const int* mix,int size,unsigned char* output)
 	}
     }
 }
+#endif
 
+#if SoundSampleSize==16
 /**
 **	Clip mix to output stereo 16 signed bit.
 **
@@ -820,6 +823,7 @@ local void ClipMixToStereo16(const int* mix,int size,short* output)
 	}
     }
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --	Other
