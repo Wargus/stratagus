@@ -884,8 +884,8 @@ extern void SaveDecorations(FILE* file);
     /// Clean the decorations (health,mana) of units
 extern void CleanDecorations(void);
 
-    /// Draw all units visible on map
-extern void DrawUnits (int );
+    /// Draw all units visible on map in viewport
+extern void DrawUnits(int v);
 
 //	in unit_find.c
     /// Select units in rectangle range
