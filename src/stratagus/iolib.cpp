@@ -41,7 +41,14 @@
 #include <errno.h>
 #include <limits.h>
 #else
+#ifdef _WIN32_WCE
 #define R_OK	1	// FIXME: correct?
+#else
+#define R_OK	4
+#include <string.h>
+#include <errno.h>
+#include <io.h>
+#endif
 #endif
 
 #include "freecraft.h"
@@ -513,6 +520,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 #ifdef _MSC_VER
     // FIXME: help write this function
     // find_first()/find_next() are your friends - well whoever cares..
+    return 0;
 #else
 #ifdef USE_ZZIPLIB
     ZZIP_DIR *dirp = NULL;

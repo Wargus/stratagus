@@ -118,6 +118,13 @@
 #define __FUNCTION__ __FILE__ ":" /* __LINE__ */
 #endif
 
+#ifndef _WIN32_WCE
+#pragma warning(disable:4018)		// signed/unsigned mismatch
+#pragma warning(disable:4244)		// conversion from double to uchar
+#define access(x,y) _access((x),(y))
+#define snprintf _snprintf
+#endif
+
 #endif	// } m$
 
 /*============================================================================
@@ -527,9 +534,11 @@ extern char* strcasestr(char* str, const char* substr);
 ==	Misc
 ============================================================================*/
 
+#if !defined(_MSC_VER) || defined(_WIN32_WCE)
 #ifndef max
     /// max macro
 #define max(n1,n2)	(((n1)<(n2)) ? (n2) : (n1))
+#endif
 #endif
 
     /// bits macro
