@@ -815,7 +815,7 @@ local void DoNextReplay(void)
 			// Replay without the 'sync info
 			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "No sync info for this replay !");
 		} else {
-			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync !");
+			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync (%lu)! ", GameCycle);
 			ReplayStep = 0;
 			NextLogCycle = ~0UL;
 			return;
