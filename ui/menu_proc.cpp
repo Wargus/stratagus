@@ -10,7 +10,7 @@
 //
 /**@name menu_proc.c - The menu processing code. */
 //
-//      (c) Copyright 1999-2004 by Andreas Arens, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2005 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -88,11 +88,6 @@ Graphic* MenuButtonG;
 **  Current menu
 */
 Menu* CurrentMenu;
-
-/**
-**  The background picture used by menus
-*/
-static Graphic* Menusbgnd;
 
 static int MenuButtonUnderCursor = -1;
 static int MenuButtonCurSel = -1;
@@ -2572,8 +2567,6 @@ void ProcessMenu(const char* menu_id, int loop)
 	}
 
 	// FIXME: should ExitMenus() be called instead?!?
-	FreeGraphic(Menusbgnd);
-	Menusbgnd = NULL;
 }
 
 /**
@@ -2618,7 +2611,6 @@ void InitMenus(int race)
 */
 void ExitMenus(void)
 {
-	FreeGraphic(Menusbgnd);
 }
 
 //@}

@@ -10,7 +10,7 @@
 //
 /**@name sdl.c - SDL video support. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -257,6 +257,17 @@ void InitVideoSdl(void)
 	ColorYellow = VideoMapRGB(TheScreen->format, 252, 252, 0);
 
 	TheUI.MouseWarpX = TheUI.MouseWarpY = -1;
+}
+
+/**
+**  Check if a resolution is valid
+**
+**  @param w  Width
+**  @param h  Height
+*/
+int VideoValidResolution(int w, int h)
+{
+	return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 }
 
 /**
