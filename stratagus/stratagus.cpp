@@ -62,7 +62,7 @@
 **		Handles units. Units are ships, flyers, buildings, creatures,
 **		machines.
 **
-**		@see unit.h @see unit.c
+**		@see unit.h @see unit.c @see unittype.h @see unittype.c
 **
 **	@subsection Missile Missile
 **
@@ -240,6 +240,7 @@ global int SpeedResearch=SPEED_RESEARCH;/// speed factor for researching
 ============================================================================*/
 
 // FIXME: move to video header file
+global int VideoPitch;			/// Offset to reach next scan line
 global int VideoWidth;			/// Window width in pixels
 global int VideoHeight;			/// Window height in pixels
 
@@ -330,11 +331,13 @@ global char* strdcat3(const char* l, const char* m, const char* r)
 #ifndef __FreeBSD__
 global char* strcasestr(char* a, const char* b)
 {
-    int x=0;
+    int x;
 
-    if( !a || !*a || !b || !*b || strlen(a) < strlen(b) )
+    if( !a || !*a || !b || !*b || strlen(a) < strlen(b) ) {
 	return NULL;
+    }
 
+    x=0;
     while( *a ) {
 	if( a[x] && (tolower(a[x]) == tolower(b[x])) )
 	    x++;
@@ -392,6 +395,44 @@ local void WaitCallbackExit(void)
     DebugLevel3Fn("Exit\n");
 }
 
+#if 0
+
+/**
+**	Test some video effects.
+*/
+local void VideoEffect0(void)
+{
+    int i;
+    static Graphic* Logo;
+
+    if( !Logo ) {
+	Logo=LoadSprite("freecraft.png",628,141);
+    }
+    VideoLockScreen();
+
+    switch( VideoDepth ) {
+	case 15:
+	case 16:
+	    for( i=0; i<VideoWidth*VideoHeight; ++i ) {
+		int j;
+
+		j=MyRand()&0x1F;
+		VideoMemory16[i]=(j<<11)|(j<<6)|(j);
+	    }
+	    break;
+    }
+
+    VideoDrawTextCentered(VideoWidth/2,5,LargeFont,"Press SPACE to continue.");
+    VideoDraw(Logo,0,(VideoWidth-VideoGraphicWidth(Logo))/2,50);
+
+    VideoUnlockScreen();
+
+    Invalidate();
+    RealizeVideoMemory();
+}
+
+#endif
+
 /**
 **	Wait for any input.
 **
@@ -435,11 +476,15 @@ local void WaitForInput(int timeout)
     WaitNoEvent=1;
     timeout*=CYCLES_PER_SECOND;
     while( timeout-- && WaitNoEvent ) {
+	if( timeout&1 ) {
+	    // VideoEffect0();
+	}
 	WaitEventsOneFrame(&callbacks);
     }
 
     VideoLockScreen();
-    VideoDrawTextCentered(VideoWidth/2,5,LargeFont,"----------------------------");
+    VideoDrawTextCentered(VideoWidth/2,5,LargeFont,
+	"----------------------------");
     VideoUnlockScreen();
     Invalidate();
     RealizeVideoMemory();
