@@ -308,6 +308,7 @@ local SCM CclBriefing(SCM list)
 		default:
 		   errl("Only two voice",value);
 	    }
+	    ++voice;
 	    list=gh_cdr(list);
 	} else if ( gh_eq_p(value,gh_symbol2scm("objective")) ) {
 	    if( objective==MAX_OBJECTIVES ) {
