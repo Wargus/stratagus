@@ -10,7 +10,7 @@
 //
 /**@name ai_local.h	-	The local AI header file. */
 //
-//      (c) Copyright 2000-2002 by Lutz Sammer and Antonis Chaniotis.
+//      (c) Copyright 2000-2003 by Lutz Sammer and Antonis Chaniotis.
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -318,6 +318,8 @@ extern void AiForceManager(void);
 //
 //	Plans
 //
+    /// Find a wall to attack
+extern int AiFindWall(AiForce* force);
     /// Plan the an attack
 extern int AiPlanAttack(AiForce* force);
 

@@ -10,7 +10,7 @@
 //
 /**@name ai_force.c	-	AI force functions. */
 //
-//      (c) Copyright 2001,2002 by Lutz Sammer
+//      (c) Copyright 2001-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -336,7 +336,10 @@ global void AiAttackWithForce(int force)
 	    DebugLevel0Fn("Need to plan an attack with transporter\n");
 	    if( !AiPlayer->Force[force].State 
 		    && !AiPlanAttack(&AiPlayer->Force[force]) ) {
-		AiPlayer->Force[force].Attacking=0;
+		DebugLevel0Fn("Can't transport, look for walls\n");
+		if( !AiFindWall(&AiPlayer->Force[force]) ) {
+		    AiPlayer->Force[force].Attacking=0;
+		}
 	    }
 	    return;
 	}
