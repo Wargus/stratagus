@@ -35,6 +35,7 @@ EXTRA_CFLAGS="-DSLOW_INPUT -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_ORDERS"
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_AI:		New better improved AI code
 ## NEW_SHIPS:		New correct ship movement.
+## NEW_NETMENUS:	Include new network menues.
 
 # Compile commands
 CC=gcc
@@ -44,7 +45,7 @@ MAKE=make
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17pre1-build11\""
+VERSION="-DVERSION=\"1.17pre1-build12\""
 UNIX=0
 BEOS=0
 WIN32=0

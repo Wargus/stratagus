@@ -233,7 +233,6 @@ win32-bin-dist2:: win32
 	@echo freecraft$(EXE) >>$(DISTLIST)
 	@echo tools/wartool$(EXE) >>$(DISTLIST)
 	@echo tools/build.bat >>$(DISTLIST)
-	@echo build.bat >>$(DISTLIST)
 	@rm -rf $(distdir)
 	@mkdir $(distdir)
 	@chmod 777 $(distdir)

@@ -626,7 +626,11 @@ local void AttackTarget(Unit* unit)
 	    if( unit->SavedOrder.Action==UnitActionStill ) {
 		// Save current order to come back or to continue it.
 		unit->SavedOrder=unit->Orders[0];
-		DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+		if( goal ) {
+		    DebugLevel0Fn("Have goal to come back %Zd\n",
+			    UnitNumber(goal));
+		}
+		unit->SavedOrder.Goal=NoUnitP;
 	    }
 	    NewResetPath(unit);
 #else

@@ -350,11 +350,9 @@ local char** UnitTypeNames
 */
 global void PrintUnitTypeTable(void)
 {
-    int i;
-    UnitType* type;
+    const UnitType* type;
 
-    for( i=0; i<sizeof(UnitTypes)/sizeof(*UnitTypes); ++i ) {
-	type=&UnitTypes[i];
+    for( type=UnitTypes; type->OType; ++type ) {
 	printf("\n{   UnitTypeType, \"%s\"",type->Ident);
 	printf("\n    ,\"%s\"\n    ",type->Name);
 	if( type->SameSprite ) {
@@ -387,7 +385,8 @@ global void PrintUnitTypeTable(void)
 	printf("    ,%3d,%3d\t\t\t// graphic size\n"
 		,type->Width,type->Height);
 
-	printf("   ,%sAnimations\t// animations\n",UnitTypeNames[i]);
+	// FIXME: works only with original order!
+	printf("   ,%sAnimations\t// animations\n",UnitTypeNames[type->Type]);
 	printf("   ,{ \"%s\" }\n",IdentOfIcon(type->Icon.Icon));
 
 	printf("   ,{ \"%s\" }\t\t// Missile\n",type->Missile.Name);
@@ -485,26 +484,40 @@ global void PrintUnitTypeTable(void)
 	    ,type->Organic
 	    ,type->SelectableByRectangle);
 
-
-#if 0
-	if( !type->Buttons && 0 ) {
-	    printf("   ,NULL\t\t// buttons\n");
-	} else {
-	    printf("   ,_%sButtons\t// buttons\n"
-		,UnitTypeNames[i]);
-	}
-#endif
-
 	printf("   ,{\t\t// sound\n");
-	printf("\t { \"%s\" }\n",type->Sound.Selected.Name);
-	printf("\t,{ \"%s\" }\n",type->Sound.Acknowledgement.Name);
-	printf("\t,{ \"%s\" }\n",type->Sound.Ready.Name);
-	printf("\t,{ \"%s\" }\n",type->Sound.Help.Name);
-	printf("\t,{ \"%s\" }\n",type->Sound.Dead.Name);
+	if( type->Sound.Selected.Name ) {
+	    printf("\t { \"%s\" }\n",type->Sound.Selected.Name);
+	} else {
+	    printf("\t { NULL }\n");
+	}
+	if( type->Sound.Acknowledgement.Name ) {
+	    printf("\t,{ \"%s\" }\n",type->Sound.Acknowledgement.Name);
+	} else {
+	    printf("\t { NULL }\n");
+	}
+	if( type->Sound.Ready.Name ) {
+	    printf("\t,{ \"%s\" }\n",type->Sound.Ready.Name);
+	} else {
+	    printf("\t { NULL }\n");
+	}
+	if( type->Sound.Help.Name ) {
+	    printf("\t,{ \"%s\" }\n",type->Sound.Help.Name);
+	} else {
+	    printf("\t { NULL }\n");
+	}
+	if( type->Sound.Dead.Name ) {
+	    printf("\t,{ \"%s\" }\n",type->Sound.Dead.Name);
+	} else {
+	    printf("\t { NULL }\n");
+	}
 
 	printf("   },");
 	printf("   {");
-	printf("\t { \"%s\" }\n",type->Weapon.Attack.Name);
+	if( type->Weapon.Attack.Name ) {
+	    printf("\t { \"%s\" }\n",type->Weapon.Attack.Name);
+	} else {
+	    printf("\t { NULL }\n");
+	}
 	printf("   }");
 	printf(" },\n");
     }
@@ -526,8 +539,7 @@ global void UpdateStats(void)
     //
     //	Update players stats
     //
-    for( type=UnitTypes;
-	    type<&UnitTypes[sizeof(UnitTypes)/sizeof(*UnitTypes)]; ++type ) {
+    for( type=UnitTypes; type->OType; ++type ) {
 	for( player=0; player<PlayerMax; ++player ) {
 	    stats=&type->Stats[player];
 	    stats->AttackRange=type->_AttackRange;
@@ -749,8 +761,8 @@ global void ParsePudUDTA(const char* udta,int length)
 	unittype->Hero=BIT(23,v);
 	unittype->StoresOil=BIT(24,v);
 	unittype->Explodes=BIT(25,v);
-	UnitTypes[i].CowerMage=BIT(26,v);
-	UnitTypes[i].Organic=BIT(27,v);
+	unittype->CowerMage=BIT(26,v);
+	unittype->Organic=BIT(27,v);
 
 	if( BIT(28,v) )	DebugLevel0("Unused bit 28 used in %d\n",i);
 	if( BIT(29,v) )	DebugLevel0("Unused bit 29 used in %d\n",i);
@@ -768,13 +780,126 @@ global void ParsePudUDTA(const char* udta,int length)
 }
 
 /**
-**	Save state of an unit-type to file.
+**	Save state of an animition set to file.
 **
+**	@param name	Animation name.
+**	@param anim	Save this animation.
 **	@param file	Output file.
 */
-global void SaveUnitType(const UnitType* type,FILE* file)
+local void SaveAnimation(const char* name,const Animation* anim,FILE* file)
 {
     int i;
+    int p;
+    int frame;
+    const Animation* temp;
+
+    if( anim ) {
+	//
+	//	Calculate the wait sum and pixels count.
+	//
+	i=p=0;
+	for( temp=anim; ; ++temp ) {
+	    i+=temp->Sleep&0xFF;
+	    p+=temp->Pixel;
+	    if( temp->Flags&AnimationEnd ) {
+		break;
+	    }
+	    if( temp->Flags&AnimationRestart ) {
+		i=p=0;
+	    }
+	}
+
+	fprintf(file,"\n  '%s '(\t; #%d",name,i);
+	if( p ) {
+	    fprintf(file," P%d",p);
+	}
+
+	temp=anim;
+	frame=0;
+	for( ;; ) {
+	    fprintf(file,"\n    ");
+	    for( i=0; i<4; ++i ) {
+		if( i ) {
+		    fputc(' ',file);
+		}
+		frame+=temp->Frame;
+		fprintf(file,"#(%2d %d %3d %3d)",
+			temp->Flags&0x7F,temp->Pixel,temp->Sleep&0xFF,frame);
+		if( temp->Flags&AnimationRestart ) {
+		    frame=0;
+		}
+		if( temp->Flags&AnimationEnd ) {
+		    fprintf(file,")");
+		    return;
+		}
+		++temp;
+	    }
+	}
+    }
+}
+
+/**
+**	Save state of the animitions set to file.
+**
+**	We save only the first occurance of an animation.
+**
+**	@param type	Save animations of this unit-type.
+**	@param file	Output file.
+*/
+local void SaveAnimations(const UnitType* type,FILE* file)
+{
+    const UnitType* temp;
+    const Animations* anim;
+    int i;
+
+    anim=type->Animations;
+    if( !anim ) {
+	return;
+    }
+
+    //
+    //	Look if this is the first use of it.
+    //
+    for( temp=UnitTypes; temp->OType && temp!=type ; ++temp ) {
+	if( temp->Animations==anim ) {
+	    return;			// allready handled.
+	}
+    }
+
+    fprintf(file,"\n;;------\n;;\t");
+    //
+    //	Print all units that use this animation.
+    //
+    i=0;
+    for( temp=UnitTypes; temp->OType; ++temp ) {
+	if( temp->Animations==anim ) {
+	    if( i ) {
+		fprintf(file,", ");
+	    }
+	    fprintf(file,"%s",temp->Name);
+	    i=1;
+	}
+    }
+    fprintf(file,"\n(define-animations \"animations-%s\"",type->Ident+5);
+
+    SaveAnimation("still",anim->Still,file);
+    SaveAnimation("move",anim->Move,file);
+    SaveAnimation("attack",anim->Attack,file);
+    SaveAnimation("die",anim->Die,file);
+
+    fprintf(file,")\n");
+}
+
+/**
+**	Save state of an unit-type to file.
+**
+**	@param type	Unit-type to save.
+**	@param file	Output file.
+*/
+local void SaveUnitType(const UnitType* type,FILE* file)
+{
+    int i;
+    const UnitType* temp;
 
     fprintf(file,"(define-unit-type \"%s\"",type->Ident);
     if( strlen(type->Ident)<12 ) {
@@ -802,7 +927,16 @@ global void SaveUnitType(const UnitType* type,FILE* file)
     }
     fprintf(file,"\n  '( %3d %3d )\t\t\t;; graphic size\n"
 		,type->Width,type->Height);
-    fprintf(file,"  \"animations-%s\"\t;; animations\n",type->Ident+5);
+
+    //fprintf(file,"  \"animations-%s\"\t;; animations\n",type->Ident+5);
+
+    for( temp=UnitTypes; temp->OType && temp!=type ; ++temp ) {
+	if( temp->Animations==type->Animations ) {
+	    break;
+	}
+    }
+    fprintf(file,"  \"animations-%s\"\n",temp->Ident+5);
+
     fprintf(file,"  \"%s\"\n",IdentOfIcon(type->Icon.Icon));
 
     fprintf(file,"  ;;Speed Constr SightR Hitpnt Magic  BTime  Gold  Wood   Oil   Ore Stone  Coal\n");
@@ -1005,12 +1139,36 @@ global void SaveUnitType(const UnitType* type,FILE* file)
     }
 
     fprintf(file,"  ;; sounds\n");
-    fprintf(file,"  #(\"%s\"\n",type->Sound.Selected.Name);
-    fprintf(file,"    \"%s\"\n",type->Sound.Acknowledgement.Name);
-    fprintf(file,"    \"%s\"\n",type->Sound.Ready.Name);
-    fprintf(file,"    \"%s\"\n",type->Sound.Help.Name);
-    fprintf(file,"    \"%s\" )\n",type->Sound.Dead.Name);
-    fprintf(file,"  \"%s\" )\n",type->Weapon.Attack.Name);
+    if( type->Sound.Selected.Name ) {
+	fprintf(file,"  #(\"%s\"\n",type->Sound.Selected.Name);
+    } else {
+	fprintf(file,"  () )\n");
+    }
+    if( type->Sound.Acknowledgement.Name ) {
+	fprintf(file,"    \"%s\"\n",type->Sound.Acknowledgement.Name);
+    } else {
+	fprintf(file,"  () )\n");
+    }
+    if( type->Sound.Ready.Name ) {
+	fprintf(file,"    \"%s\"\n",type->Sound.Ready.Name);
+    } else {
+	fprintf(file,"  () )\n");
+    }
+    if( type->Sound.Help.Name ) {
+	fprintf(file,"    \"%s\"\n",type->Sound.Help.Name);
+    } else {
+	fprintf(file,"  () )\n");
+    }
+    if( type->Sound.Dead.Name ) {
+	fprintf(file,"    \"%s\" )\n",type->Sound.Dead.Name);
+    } else {
+	fprintf(file,"  () )\n");
+    }
+    if( type->Weapon.Attack.Name ) {
+	fprintf(file,"  \"%s\" )\n",type->Weapon.Attack.Name);
+    } else {
+	fprintf(file,"  () )\n");
+    }
 }
 
 /**
@@ -1020,16 +1178,20 @@ global void SaveUnitType(const UnitType* type,FILE* file)
 */
 global void SaveUnitTypes(FILE* file)
 {
-    int i;
     const UnitType* type;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: unittypes $Id$\n");
 
-    // Save all types
+    //	Save all animations.
 
-    for( i=0; i<sizeof(UnitTypes)/sizeof(*UnitTypes); ++i ) {
-	type=&UnitTypes[i];
+    for( type=UnitTypes; type->OType; ++type ) {
+	SaveAnimations(type,file);
+    }
+
+    //	Save all types
+
+    for( type=UnitTypes; type->OType; ++type ) {
 	fputc('\n',file);
 	SaveUnitType(type,file);
     }
@@ -1050,7 +1212,7 @@ global UnitType* UnitTypeByIdent(const char* ident)
 	return *type;
     }
 
-    DebugLevel0Fn("Name %s not found\n",ident);
+    DebugLevel0Fn("Name `%s' not found\n",ident);
 
     return NULL;
 }
@@ -1067,17 +1229,54 @@ global UnitType* UnitTypeByWcNum(unsigned num)
 }
 
 /**
+**	Allocate an empty unit-type slot.
+**
+**	@param ident	Identifier to identify the slot (malloced by caller!).
+**
+**	@return		New allocated (zeroed) unit-type pointer.
+*/
+global UnitType* NewUnitTypeSlot(char* ident)
+{
+    UnitType* type;
+    int i;
+
+    // +2 for slot and an empty slot at end.
+    type=calloc(NumUnitTypes+2,sizeof(UnitType));
+    memcpy(type,UnitTypes,sizeof(UnitType)*NumUnitTypes);
+    if( UnitTypes ) {
+	free(UnitTypes);
+    }
+    UnitTypes=type;
+    type=UnitTypes+NumUnitTypes;
+    type->OType=UnitTypeType;
+    type->Type=NumUnitTypes++;
+    type->Ident=ident;
+    //
+    //	Rehash.
+    //
+    for( i=0; i<NumUnitTypes; ++ i ) {
+	*(UnitType**)hash_add(UnitTypeHash,UnitTypes[i].Ident)=&UnitTypes[i];
+    }
+
+    return type;
+}
+
+/**
 **	Init unit types.
 */
 global void InitUnitTypes(void)
 {
     unsigned type;
 
-    if( UnitTypes[2].Type==2 ) {	// FIXME: trick 17, double entered
+    if( !UnitTypes ) {
+	DebugLevel0Fn("Called too early\n");
 	return;
     }
+    if( UnitTypes[2].Type==2 ) {	// FIXME: trick 17, double entered
+	DebugLevel0Fn("Called twice?\n");
+    }
 
-    for( type=0; type<sizeof(UnitTypes)/sizeof(*UnitTypes); ++type ) {
+    for( type=0; UnitTypes[type].OType; ++type ) {
 	//
 	//	Initialize:
 	//
@@ -1113,62 +1312,68 @@ global void InitUnitTypes(void)
 */
 global void LoadUnitSprites(void)
 {
-    UnitType* unittype;
-    unsigned type;
+    UnitType* type;
     const char* file;
 
-    for( type=0; type<sizeof(UnitTypes)/sizeof(*UnitTypes); ++type ) {
+    for( type=UnitTypes; type->OType; ++type ) {
 	//
 	//	Unit-type uses the same sprite as an other.
 	//
-	if( UnitTypes[type].SameSprite ) {
+	if( type->SameSprite ) {
 	    continue;
 	}
 
-	file=UnitTypes[type].File[TheMap.Terrain];
+	//
+	//	FIXME: must handle terrain different!
+	//
+
+	file=type->File[TheMap.Terrain];
 	if( !file ) {			// default one
-	    file=UnitTypes[type].File[0];
+	    file=type->File[0];
 	}
 	if( file ) {
 	    char* buf;
 
-	    buf=alloca(strlen(file)+9+1);
+	    buf=alloca(strlen(file)+10+1);
+#ifdef NEW_NAMES
+	    file=strcat(strcpy(buf,"graphics/"),file);
+#else
 	    file=strcat(strcpy(buf,"graphic/"),file);
+#endif
 	    ShowLoadProgress("\tUnit `%s'\n",file);
-	    UnitTypes[type].Sprite=LoadSprite(file
-		    ,UnitTypes[type].Width,UnitTypes[type].Height);
+	    type->Sprite=LoadSprite(file,type->Width,type->Height);
 	}
     }
 
-    for( type=0; type<sizeof(UnitTypes)/sizeof(*UnitTypes); ++type ) {
+    for( type=UnitTypes; type->OType; ++type ) {
 	//
 	//	Unit-type uses the same sprite as an other.
 	//
-	if( UnitTypes[type].SameSprite ) {
-	    unittype=UnitTypeByIdent(UnitTypes[type].SameSprite);
+	if( type->SameSprite ) {
+	    const UnitType* unittype;
+
+	    unittype=UnitTypeByIdent(type->SameSprite);
 	    if( !unittype ) {
 		fprintf(stderr,__FUNCTION__": unit-type %s not found\n"
-			,UnitTypes[type].SameSprite);
+			,type->SameSprite);
 		exit(-1);
 	    }
-	    UnitTypes[type].Sprite=unittype->Sprite;
+	    type->Sprite=unittype->Sprite;
 	}
 
 	//
 	//	Lookup icons.
 	//
-	UnitTypes[type].Icon.Icon=IconByIdent(UnitTypes[type].Icon.Name);
+	type->Icon.Icon=IconByIdent(type->Icon.Name);
 	//
 	//	Lookup missiles.
 	//
-	UnitTypes[type].Missile.Missile=MissileTypeByIdent(
-		UnitTypes[type].Missile.Name);
+	type->Missile.Missile=MissileTypeByIdent(type->Missile.Name);
 	//
 	//	Lookup corpse.
 	//
-	if( UnitTypes[type].CorpseName ) {
-	    UnitTypes[type].CorpseType
-		    =UnitTypeByIdent(UnitTypes[type].CorpseName);
+	if( type->CorpseName ) {
+	    type->CorpseType=UnitTypeByIdent(type->CorpseName);
 	}
     }
 

@@ -61,6 +61,8 @@
 #define gh_symbol_p(lisp)	SYMBOLP(lisp)
 #define gh_symbol2scm(str)	cintern(str)
 
+#define gh_define(str,val)	setvar(rintern((str)),(val),NIL)
+
 #define gh_display(lisp)	lprin1f(lisp,stdout)
 #define gh_newline()		fprintf(stdout,"\n")
 

@@ -52,40 +52,50 @@ local long SiodSoundTag;
 --	Functions
 ----------------------------------------------------------------------------*/
 
-/** Cast a clone sound id to its scheme version
-
-    @param id the sound id
-
-    @return its siod version
+/**
+**	Cast a FreeCraft sound id to its scheme version
+**
+**	@param id	the sound id
+**
+**	@return		its siod version
 */
-local LISP sound_id_ccl(SoundId id) {
-     LISP sound_id;
+local SCM sound_id_ccl(SoundId id)
+{
+     SCM sound_id;
 
      sound_id=cons(NIL,NIL);
      sound_id->type=SiodSoundTag;
-     sound_id->storage_as.cons.cdr=(LISP)id;
+     sound_id->storage_as.cons.cdr=(SCM)id;
+
      return sound_id;
 }
 
-/** Glue between c and scheme. Ask the sound system to associate a sound id to
-    a sound name.
+/**
+**	Glue between c and scheme. Ask the sound system to associate a
+**	sound id to a sound name.
 */
-local SCM CclSoundForName(SCM name) {
+local SCM CclSoundForName(SCM name)
+{
     SoundId id;
     char* sound_name;
 
     sound_name=gh_scm2newstr(name,NULL);
     id=SoundIdForName(sound_name);
     free(sound_name);
+
     return sound_id_ccl(id);
 }
 
 
-/** Get a Game Sound Id from either a siod sound id or a sound name
- */
-local SoundId CclGetSoundId(SCM sound) {
-    if (CCL_SOUNDP(sound)) {
-	// if we've got the sound id
+/**
+**	Get a Game Sound Id from either a siod sound id or a sound name
+**
+**	@param sound	Lisp cell, SoundID or string or symbol.
+**	@return		The C sound id.
+*/
+local SoundId CclGetSoundId(SCM sound)
+{
+    if (CCL_SOUNDP(sound)) {	// if we've got the sound id
 	return CCL_SOUND_ID(sound);
     } else {
 	return CCL_SOUND_ID(CclSoundForName(sound));
@@ -148,6 +158,31 @@ local SCM CclMakeSound(SCM name,SCM file) {
     return sound_id_ccl(id);
 }
 
+/**
+**	Glue between c and scheme. This function asks the sound system to
+**	build a special sound group.
+**
+**	@param name	the name of the sound
+**	@param first	first group played (sound-id or string)
+**	@param second	second group played (sound-id or string)
+**
+**	@return		The sound id of the created sound
+*/
+local SCM CclMakeSoundGroup(SCM name,SCM first,SCM second)
+{
+    char* c_name;
+
+    if( !gh_string_p(name) && !gh_symbol_p(name) ) {
+	fprintf(stderr,"string or symbol expected\n");
+	return SCM_UNSPECIFIED;
+    }
+    c_name=gh_scm2newstr(name,NULL);
+
+    return sound_id_ccl(MakeSoundGroup(c_name,
+	    CclGetSoundId(first),CclGetSoundId(second)));
+    // c_name consumed by MakeSoundGroup!
+}
+
 /** Glue between c and scheme. Ask to the sound system to remap a sound id to
     a given name.
     @param name the new name for the sound
@@ -158,7 +193,7 @@ local SCM CclMapSound(SCM name,SCM sound) {
     char* sound_name;
 
     sound_name=gh_scm2newstr(name,NULL);
-    MapSound(sound_name,CCL_SOUND_ID(sound));
+    MapSound(sound_name,CclGetSoundId(sound));
     return sound;
 }
 
@@ -356,6 +391,7 @@ global void SoundCclRegister(void)
     init_subr_1("sound-for-name",CclSoundForName);
     init_subr_2("set-sound-range",CclSetSoundRange);
     init_subr_2("make-sound",CclMakeSound);
+    init_subr_3("make-sound-group",CclMakeSoundGroup);
     init_subr_1("play-sound",CclPlaySound);
 
 }

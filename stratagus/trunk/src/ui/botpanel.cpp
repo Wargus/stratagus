@@ -353,6 +353,7 @@ global void DrawButtonPanel(void)
 		    case B_Build:
 		    case B_Train:
 		    case B_UpgradeTo:
+			// FIXME: store pointer in button table!
 			stats=&UnitTypes[v].Stats[ThisPlayer->Player];
 			DebugLevel3("Upgrade to %s %d %d %d %d\n"
 				,UnitTypes[v].Ident
@@ -777,6 +778,7 @@ global void DoButtonButtonClicked(int button)
 	    break;
 
 	case B_Build:
+	    // FIXME: store pointer in button table!
 	    type=&UnitTypes[CurrentButtons[button].Value];
 	    if( !PlayerCheckUnitType(ThisPlayer,type) ) {
 		SetStatusLine("Select Location");
@@ -790,6 +792,7 @@ global void DoButtonButtonClicked(int button)
 	    break;
 
 	case B_Train:
+	    // FIXME: store pointer in button table!
 	    type=&UnitTypes[CurrentButtons[button].Value];
 	    // FIXME: Johns: I want to place commands in queue, even if not
 	    // FIXME:	enough resources are available.
@@ -813,6 +816,7 @@ global void DoButtonButtonClicked(int button)
 	    break;
 
 	case B_UpgradeTo:
+	    // FIXME: store pointer in button table!
 	    type=&UnitTypes[CurrentButtons[button].Value];
 	    if( !PlayerCheckUnitType(ThisPlayer,type) ) {
 		DebugLevel3("Upgrade to %s %d %d\n"
