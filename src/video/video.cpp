@@ -492,6 +492,9 @@ global void DisplayPicture(const char *name)
     Graphic* picture;
 
     picture=LoadGraphic(name);
+#ifdef USE_OPENGL
+    MakeTexture(picture,picture->Width,picture->Height);
+#endif
     // JOHNS: NO VideoSetPalette(picture->Pixels);
 
     VideoLockScreen();

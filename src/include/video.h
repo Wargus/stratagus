@@ -58,6 +58,13 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_OPENGL
+#ifdef USE_WIN32
+#include <windows.h>
+#endif
+#include <GL/gl.h>
+#endif
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -303,6 +310,12 @@ struct _graphic_ {
     Palette*		Palette;        /// Loaded Palette
 	// cache line 2
     //void*		Offsets;	/// Offsets into frames
+#ifdef USE_OPENGL
+    GLfloat		TextureWidth;	/// Width of the texture
+    GLfloat		TextureHeight;	/// Height of the texture
+    int			NumTextureNames; /// Number of textures
+    GLuint		*TextureNames;	/// Texture names
+#endif
 };
 
     ///	Graphic reference used during config/setup
@@ -1160,6 +1173,11 @@ extern void WaitEventsOneFrame(const EventCallback* callbacks);
 
     ///	Load graphic from PNG file
 extern Graphic* LoadGraphicPNG(const char* name);
+
+#ifdef USE_OPENGL
+    /// Make an OpenGL texture
+extern void MakeTexture(Graphic* graphic,int width,int height);
+#endif
 
     ///	Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char* name);
