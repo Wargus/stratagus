@@ -319,7 +319,7 @@ typedef struct _world_map_ {
     Tileset*		Tileset;	/// tileset data
 
 #ifdef USE_SDL_SURFACE
-    unsigned int	TileCount;	/// how many tiles, 
+    unsigned int	TileCount;	/// how many tiles,
 					/// == TileGraphic->NFrames
     Graphic*		TileGraphic;	/// graphic for all the tiles
 #else
@@ -344,7 +344,7 @@ extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile
 
     /// Fast draw tile, display and video mode independ
 #ifdef USE_SDL_SURFACE
-extern void VideoDrawTile(int,int,int);
+extern void VideoDrawTile(const int,int,int);
 #else
 extern void (*VideoDrawTile)(const unsigned char*,int,int);
 #endif
