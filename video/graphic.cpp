@@ -231,12 +231,9 @@ global void VideoFree(Graphic* graphic)
 /**
 **  Make a graphic object.
 **
-**  @param depth   Pixel depth of the object (8,16,32)
-**  @param width   Pixel width.
-**  @param height  Pixel height.
-**  @param data    Object data (malloced by caller, freed from object).
-**  @param size    Size in bytes of the object data.
+**  @param surface FIXME:Docu
 **
+**  @todo docu
 **  @return        New graphic object (malloced).
 */
 global Graphic* MakeGraphic(SDL_Surface* surface)
@@ -260,7 +257,7 @@ global Graphic* MakeGraphic(SDL_Surface* surface)
 /**
 **  Flip graphic and store in graphic->SurfaceFlip
 **
-**  @param graphic  Pointer to object
+**  @param g  Pointer to object
 */
 global void FlipGraphic(Graphic* g)
 {
