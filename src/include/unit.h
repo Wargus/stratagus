@@ -463,19 +463,21 @@ extern void SaveUnit(const Unit* unit,FILE* file);	/// save unit-structure
 extern void SaveUnits(FILE* file);			/// save all units
 
 //	in unitcache.c
-    /// FIXME: more docu
+    /// Insert new unit into cache.
 extern void UnitCacheInsert(Unit* unit);
-    /// FIXME: more docu
+    /// Remove unit from cache.
 extern void UnitCacheRemove(Unit* unit);
-    /// FIXME: more docu
+    /// Change unit position in cache.
 extern void UnitCacheChange(Unit* unit);
-    /// FIXME: more docu
+    /// Select units in range.
 extern int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table);
-    /// FIXME: more docu
+    /// Select units on tile.
+extern int UnitCacheOnTile(int x,int y,Unit** table);
+    /// Select unit on X,Y of type naval,fly,land.
 extern Unit* UnitCacheOnXY(int x,int y,int type);
-    /// FIXME: more docu
+    /// Print unit-cache statistic.
 extern void UnitCacheStatistic(void);
-    /// FIXME: more docu
+    /// Initialize unit-cache.
 extern void InitUnitCache(void);
 
 // 	in map.c 	belongs to map or unit??
@@ -499,8 +501,11 @@ extern void LoadDecorations(void);
 extern void DrawUnits(void);
 
 //	in unit_find.c
-    /// FIXME: more docu
+    /// Select units in rectangle range.
 extern int SelectUnits(int x1,int y1,int x2,int y2,Unit** table);
+    /// Select units on map tile.
+extern int SelectUnitsOnTile(int x,int y,Unit** table);
+
     /// Find all units of this type
 extern int FindUnitsByType(const UnitType* type,Unit** table);
     /// Find all units of this type of the player

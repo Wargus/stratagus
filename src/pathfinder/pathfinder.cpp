@@ -645,23 +645,13 @@ local int ComplexNewPath(Unit* unit,int *xdp,int* ydp)
 		    }
 		    goal=UnitCacheOnXY(x,y,unit->Type->UnitType);
 		    if( !goal ) {
+			// Should not happen.
 			DebugLevel0(__FUNCTION__
 			    ": %p No goal for %d,%d on %d,%d?\n",
 				    unit,unit->X,unit->Y,x,y);
-			//	Clear movement flag from MovementMap
-			//	for this type of unit
-			//TheMap.MovementMap[x+y*TheMap.Width]&=
-			//	~UnitMovement(unit);
 			matrix[w+1+x+y*w]=99;
 			continue;
 		    }
-#if 0
-		    // FIXME: Have more move actions
-		    if( goal->Command.Action!=UnitActionMove ) {
-			matrix[w+1+x+y*w]=99;
-			continue;
-		    }
-#endif
 		    if( !goal->Moving ) {
 			matrix[w+1+x+y*w]=99;
 			continue;

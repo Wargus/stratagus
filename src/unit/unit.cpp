@@ -283,7 +283,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	    return NoUnitP;
 	}
 	UnitSlotFree=(void*)*slot;
-	*slot=unit=calloc(1,sizeof(Unit));
+	*slot=unit=calloc(1,sizeof(*unit));
 	unit->Refs=1;
 	unit->Slot=slot-UnitSlots;		// back index
     }
@@ -1025,7 +1025,7 @@ global void RescueUnits(void)
 	    for( j=0; j<l; j++ ) {
 		unit=table[j];
 		DebugLevel3("Checking %Zd\n",UnitNumber(unit));
-		// NOTE: I hope SelectUnits checks bounds?
+		// FIXME: I hope SelectUnits checks bounds? NO
 		n=SelectUnits(
 			unit->X-1,unit->Y-1,
 			unit->X+unit->Type->TileWidth+1,
