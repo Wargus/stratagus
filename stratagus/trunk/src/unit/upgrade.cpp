@@ -772,20 +772,23 @@ local SCM CclDefineModifier(SCM list)
 	    hit_points = gh_scm2int(gh_cadr(value));
 	} else if (gh_eq_p(temp, gh_symbol2scm("regeneration-rate"))) {
 	    regeneration_rate = gh_scm2int(gh_cadr(value));
-	} else if (gh_eq_p(temp, gh_symbol2scm("time-cost"))) {
-	    costs[0] = gh_scm2int(gh_cadr(value));
-	} else if (gh_eq_p(temp, gh_symbol2scm("gold-cost"))) {
-	    costs[1] = gh_scm2int(gh_cadr(value));
-	} else if (gh_eq_p(temp, gh_symbol2scm("wood-cost"))) {
-	    costs[2] = gh_scm2int(gh_cadr(value));
-	} else if (gh_eq_p(temp, gh_symbol2scm("oil-cost"))) {
-	    costs[3] = gh_scm2int(gh_cadr(value));
-	} else if (gh_eq_p(temp, gh_symbol2scm("ore-cost"))) {
-	    costs[4] = gh_scm2int(gh_cadr(value));
-	} else if (gh_eq_p(temp, gh_symbol2scm("stone-cost"))) {
-	    costs[5] = gh_scm2int(gh_cadr(value));
-	} else if (gh_eq_p(temp, gh_symbol2scm("coal-cost"))) {
-	    costs[6] = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("cost"))) {
+	    int i;
+	    char* name;
+
+	    value = gh_car(gh_cdr(value));
+	    name = gh_scm2newstr(gh_car(value), NULL);
+	    for (i = 0; i < MaxCosts; ++i) {
+		if (!strcmp(name, DefaultResourceNames[i])) {
+		    break;
+		}
+	    }
+	    if (i == MaxCosts) {
+		errl("Resource not found", gh_car(value));
+	    }
+	    free(name);
+	    value = gh_cdr(value);
+	    costs[i] = gh_scm2int(gh_car(value));
 	} else if (gh_eq_p(temp, gh_symbol2scm("allow"))) {
 	    value = gh_cdr(value);
 	    str = gh_scm2newstr(gh_car(value), NULL);
@@ -818,7 +821,7 @@ local SCM CclDefineModifier(SCM list)
 
     AddUpgradeModifierBase(uid, attack_range, sight_range, basic_damage,
 	piercing_damage, armor, speed, hit_points, regeneration_rate, costs,
-	units,upgrades, apply_to,convert_to);
+	units, upgrades, apply_to,convert_to);
 
     return SCM_UNSPECIFIED;
 }
