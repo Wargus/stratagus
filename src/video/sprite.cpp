@@ -3012,19 +3012,21 @@ local void FreeSprite8(Graphic* graphic)
 */
 global Graphic* LoadSprite(const char* name,int width,int height)
 {
-    Graphic* sprite;
     Graphic* graphic;
+#ifndef USE_OPENGL
+    Graphic* sprite;
     unsigned char* data;
     const unsigned char* sp;
     unsigned char* dp;
     unsigned char* cp;
-    int depth;
     int fl;
     int n;
     int counter;
     int i;
     int h;
     int w;
+#endif
+    int depth;
 
     graphic=LoadGraphic(name);
 
@@ -3044,6 +3046,25 @@ global Graphic* LoadSprite(const char* name,int width,int height)
     DebugCheck( ((graphic->Width/width)*width!=graphic->Width)
 	    || ((graphic->Height/height)*height!=graphic->Height) );
 
+#ifdef USE_OPENGL
+    MakeTexture(graphic,width,height);
+    graphic->NumFrames=(graphic->Width/width)*(graphic->Height/height);
+    graphic->GraphicWidth=graphic->Width;
+    graphic->GraphicHeight=graphic->Height;
+    graphic->Width=width;
+    graphic->Height=height;
+
+    if( depth==8 ) {
+	graphic->Type=&GraphicSprite8Type;
+    } else if( depth==16 ) {
+	graphic->Type=&GraphicSprite16Type;
+    } else {
+	fprintf(stderr,"Unsported image depth\n");
+	ExitFatal(-1);
+    }
+
+    return graphic;
+#else
     n=(graphic->Width/width)*(graphic->Height/height);
     DebugLevel3Fn("%dx%d in %dx%d = %d frames.\n"
 	    _C_ width _C_ height _C_ graphic->Width _C_ graphic->Height _C_ n);
@@ -3073,15 +3094,6 @@ global Graphic* LoadSprite(const char* name,int width,int height)
 
     sprite->Palette=graphic->Palette;
     sprite->Pixels=graphic->Pixels;	// WARNING: if not shared freed below!
-
-#ifdef USE_OPENGL
-    MakeTexture(graphic,width,height);
-    sprite->NumTextureNames=graphic->NumTextureNames;
-    sprite->TextureNames=graphic->TextureNames;
-    sprite->TextureWidth=graphic->TextureWidth;
-    sprite->TextureHeight=graphic->TextureHeight;
-    graphic->NumTextureNames=0;
-#endif
 
     sprite->Size=0;
     sprite->Frames=NULL;
@@ -3162,6 +3174,7 @@ global Graphic* LoadSprite(const char* name,int width,int height)
     VideoFree(graphic);
 
     return sprite;
+#endif
 }
 
 /**

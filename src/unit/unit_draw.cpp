@@ -1650,6 +1650,45 @@ local void GraphicUnitPixels(const Unit* unit,const Graphic* sprite)
     }
 }
 
+/**
+**
+*/
+#ifdef USE_OPENGL
+local void DrawUnitPlayerColor(const UnitType* type,int player,int frame,int x,int y)
+{
+    if( !type->PlayerColorSprite[player] ||
+	!type->PlayerColorSprite[player]->TextureNames[frame<0?-frame:frame] ) {
+	unsigned char mapping[4*2];
+	int i;
+	if( player==7 || player==15 ) {
+	    for( i=0; i<4; ++i ) {
+		mapping[i*2+0] = 208+i;
+		mapping[i*2+1] = player*4+12+i;
+	    }
+	} else {
+	    for( i=0; i<4; ++i ) {
+		mapping[i*2+0] = 208+i;
+		mapping[i*2+1] = player*4+208+i;
+	    }
+	}
+	fprintf(stderr,"%s (%d)\n", type->Ident, player);
+	MakePlayerColorTexture(&((UnitType*)type)->PlayerColorSprite[player],
+	    type->Sprite, frame<0?-frame:frame, mapping, 4);
+    }
+
+    // FIXME: move this calculation to high level.
+    x-=(type->Width-type->TileWidth*TileSizeX)/2;
+    y-=(type->Height-type->TileHeight*TileSizeY)/2;
+
+    // FIXME: This is a hack for mirrored sprites
+    if( frame<0 ) {
+	VideoDrawClipX(type->PlayerColorSprite[player],-frame,x,y);
+    } else {
+	VideoDrawClip(type->PlayerColorSprite[player],frame,x,y);
+    }
+}
+#endif
+
 /*
 **	Units on map:
 **
@@ -1712,6 +1751,9 @@ local void DrawBuilding(Unit* unit)
 	} else {
 	    GraphicUnitPixels(unit,type->Sprite);
 	    DrawUnitType(type,frame,x,y);
+#ifdef USE_OPENGL
+	    DrawUnitPlayerColor(type,unit->Player->Player,frame,x,y);
+#endif
 	}
     //
     //	Draw the future unit type, if upgrading to it.
@@ -1720,9 +1762,15 @@ local void DrawBuilding(Unit* unit)
 	// FIXME: this frame is hardcoded!!!
 	GraphicUnitPixels(unit,unit->Orders[0].Type->Sprite);
 	DrawUnitType(unit->Orders[0].Type,frame<0?-1:1,x,y);
+#ifdef USE_OPENGL
+	DrawUnitPlayerColor(unit->Orders[0].Type,unit->Player->Player,frame<0?-1:1,x,y);
+#endif
     } else {
 	GraphicUnitPixels(unit,type->Sprite);
 	DrawUnitType(type,frame,x,y);
+#ifdef USE_OPENGL
+	DrawUnitPlayerColor(type,unit->Player->Player,frame,x,y);
+#endif
     }
 
     // FIXME: johns: ugly check here, should be removed!
@@ -1768,6 +1816,9 @@ local void DrawUnit(const Unit* unit)
 
     GraphicUnitPixels(unit,type->Sprite);
     DrawUnitType(type,unit->Frame,x,y);
+#ifdef USE_OPENGL
+    DrawUnitPlayerColor(type,unit->Player->Player,unit->Frame,x,y);
+#endif
 
 #ifndef NEW_DECODRAW
 // Unit's extras not fully supported.. need to be deocrations themselves.

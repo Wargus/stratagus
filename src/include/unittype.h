@@ -414,6 +414,11 @@
 **	UnitType::ShadowSprite
 **
 **		Shadow sprite images
+**
+**	UnitType::PlayerColorSprite
+**
+**		Sprite images of the player colors.  This image is drawn
+**		over UnitType::Sprite.  Used with OpenGL only.
 */
 
 /*----------------------------------------------------------------------------
@@ -608,6 +613,9 @@ struct _unit_type_ {
 
     Graphic*	Sprite;			/// Sprite images
     Graphic*	ShadowSprite;		/// Shadow sprite image
+#ifdef USE_OPENGL
+    Graphic*	PlayerColorSprite[PlayerMax];	/// Sprites with player colors
+#endif
 };
 
     // FIXME: ARI: should be dynamic (ccl..), JOHNS: Pud only supports 255.
