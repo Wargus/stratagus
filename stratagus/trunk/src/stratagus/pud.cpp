@@ -369,9 +369,14 @@ MapInfo* GetPudInfo(const char* pud, MapInfo* info)
 	char header[5];
 	char buf[1024];
 	unsigned short temp_short;
+	char pudfull[PATH_MAX];
 	// FIXME: Reuse the temporary alloca buffer...
 
-	if( !(input=CLopen(pud,CL_OPEN_READ)) ) {
+	strcpy(pudfull, StratagusLibPath);
+	strcat(pudfull, "/");
+	strcat(pudfull, pud);
+
+	if( !(input=CLopen(pudfull,CL_OPEN_READ)) ) {
 		fprintf(stderr,"Try ./path/name\n");
 		fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
 		return NULL;
@@ -444,11 +449,12 @@ MapInfo* GetPudInfo(const char* pud, MapInfo* info)
 
 				for( i=0; i<16; ++i ) {
 					p=PudReadByte(input);
-					#ifndef LUA_MAP_API
+					info->PlayerType[i] = p;
+#ifndef LUA_MAP_API
 					buf[0] = p & 0xFF;
 					info->MapUID += ChksumArea(buf, 1);
 					info->PlayerType[i]=p;
-					#endif
+#endif
 				}
 				continue;
 			} else {
@@ -817,7 +823,7 @@ void LoadPud(const char* pud,WorldMap* map)
 	strcat(pudfull, "/");
 	strcat(pudfull, pud);
 
-	GetPudInfo(pudfull, &map->Info);
+	GetPudInfo(pud, &map->Info);
 	if( !(input=CLopen(pudfull,CL_OPEN_READ)) ) {
 		fprintf(stderr,"Try ./path/name\n");
 		fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));

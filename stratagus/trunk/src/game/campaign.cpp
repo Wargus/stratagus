@@ -173,7 +173,7 @@ void PlayCampaign(const char* name)
 	GameResult = GameNoResult;
 
 	FreeMapInfo(&TheMap.Info);
-	sprintf(CurrentMapPath, "%s/%s", StratagusLibPath, filename);
+	strcpy(CurrentMapPath, filename);
 }
 
 /**
