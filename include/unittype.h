@@ -50,10 +50,6 @@
 **
 **	The unit-type structure members:
 **
-**	UnitType::OType
-**
-**		Object type (future extensions).
-**
 **	UnitType::Ident
 **
 **		Unique identifier of the unit-type, used to reference it in
@@ -293,10 +289,6 @@
 **	UnitType::CowerWorker
 **
 **		Is a worker, runs away if attcked
-**
-**	UnitType::Tanker
-**
-**		FIXME: used? Can transport oil
 **
 **	UnitType::Transporter
 **
@@ -583,26 +575,33 @@ struct _unit_type_ {
     unsigned Submarine : 1;		/// Is only visible by CanSeeSubmarine
     unsigned CanSeeSubmarine : 1;	/// Only this units can see Submarine
     unsigned CowerWorker : 1;		/// Is a worker, runs away if attcked
-    unsigned Tanker : 1;		/// FIXME: used? Can transport oil
     unsigned Transporter : 1;		/// Can transport units
     unsigned MaxOnBoard;		/// Number of Transporter slots.
-    unsigned Vanishes : 1;		/// Corpes & destroyed places
-    unsigned GroundAttack : 1;		/// Can do command ground attack
-    unsigned IsUndead : 1;		/// Unit is already dead
-    unsigned ShoreBuilding : 1;		/// Building must be build on coast
-    unsigned CanCastSpell : 1;		/// Unit is able to use spells
-    unsigned CanAttack : 1;		/// Unit can attack
-    unsigned Tower : 1;			/// Unit can attack, but not move
-    unsigned Hero : 1;			/// Is hero only used for triggers 
-    unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit
+    unsigned Vanishes : 1;		/// Corpes & destroyed places.
+    unsigned GroundAttack : 1;		/// Can do command ground attack.
+    unsigned IsUndead : 1;		/// Unit is already dead.
+    unsigned ShoreBuilding : 1;		/// Building must be build on coast.
+    unsigned CanCastSpell : 1;		/// Unit is able to use spells.
+    unsigned CanAttack : 1;		/// Unit can attack.
+    unsigned Tower : 1;			/// Unit can attack, but not move.
+    unsigned Hero : 1;			/// Is hero only used for triggers .
+    unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit.
     unsigned CowerMage : 1;		/// FIXME: docu
-    unsigned Organic : 1;		/// Organic can be healed
+    unsigned Organic : 1;		/// Organic can be healed.
     
     unsigned CanStore[MaxCosts];	/// Resources that we can store here.
     unsigned GivesResource;		/// The resource this unit gives.
-    UnitType* MustBuildOnTop;		/// Must be built on top of something
+    unsigned CanHarvest : 1;		/// Resource can be harvested(false for oil patches).
+    unsigned Harvester : 1;		/// Unit is a resource worker.
+    unsigned ResourceHarvested;		/// The resource it can harvest.
+    unsigned WaitAtResource;		/// Cycles the unit waits while mining.
+    unsigned WaitAtDepot;		/// Cycles the unit waits while returning.
+    unsigned ResourceCapacity;		/// Maximum amount of resources it can carry.
+    UnitType* TransformWhenEmpty;	/// UnitType to transform to when empty.
+    UnitType* TransformWhenLoaded;	/// UnitType to transform to when loaded.
+    UnitType* MustBuildOnTop;		/// Must be built on top of something.
 
-    unsigned SelectableByRectangle : 1;	/// Selectable with mouse rectangle
+    unsigned SelectableByRectangle : 1;	/// Selectable with mouse rectangle.
     unsigned Teleporter : 1;		/// Can teleport other units.
 
     UnitSound Sound;			/// Sounds for events

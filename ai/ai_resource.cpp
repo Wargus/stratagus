@@ -1190,7 +1190,7 @@ local int AiHaulOil(Unit * unit)
     Unit *dest;
 
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
-    dest = FindOilPlatform(unit->Player, unit->X, unit->Y);
+    dest = FindResource(unit->Player, unit->X, unit->Y ,unit->Type->ResourceHarvested);
     if (!dest) {
 	DebugLevel0Fn("oil platform not reachable by %s(%d,%d)\n"
 		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
@@ -1199,7 +1199,7 @@ local int AiHaulOil(Unit * unit)
     DebugCheck(unit->Type!=UnitTypeHumanTanker
 	    && unit->Type!=UnitTypeOrcTanker);
 
-    CommandHaulOil(unit, dest,FlushCommands);
+    CommandResource(unit, dest,FlushCommands);
 
     return 1;
 }
@@ -1248,7 +1248,7 @@ local void AiCollectResources(void)
     units=AiPlayer->Player->Units;
     for( i=0; i<n; i++ ) {
 	unit=units[i];
-	if( !unit->Type->CowerWorker && !unit->Type->Tanker ) {
+	if( !unit->Type->CowerWorker && !unit->Type->Harvester ) {
 	    continue;
 	}
 
@@ -1262,8 +1262,8 @@ local void AiCollectResources(void)
 	    case UnitActionHarvest:
 		units_assigned[num_units_assigned[WoodCost]++][WoodCost]=unit;
 		continue;
-	    case UnitActionHaulOil:
-		units_assigned[num_units_assigned[OilCost]++][OilCost]=unit;
+	    case UnitActionResource:
+		units_assigned[num_units_assigned[unit->Type->ResourceHarvested]++][unit->Type->ResourceHarvested]=unit;
 		continue;
 		// FIXME: the other resources
 	    default:
@@ -1450,7 +1450,7 @@ local void AiCollectResources(void)
 				}
 				break;
 			    case OilCost:
-				if( unit->Orders[0].Action==UnitActionHaulOil || AiHaulOil(unit) ) {
+				if( unit->Orders[0].Action==UnitActionResource || AiHaulOil(unit) ) {
 				    DebugLevel3Fn("Assigned to oil\n");
 				    units_assigned[num_units_assigned[c]++][c]=unit;
     				    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];

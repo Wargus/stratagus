@@ -1468,7 +1468,7 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 	    dest = 1;
 	    break;
 
-	case UnitActionHaulOil:
+	case UnitActionResource:
 	    e_color = color = ColorYellow;
 	    dest = 1;
 	    break;

@@ -103,7 +103,7 @@ extern void SendCommandHarvest(Unit* unit,int x,int y,int flush);
     /// Send mine gold command
 extern void SendCommandMineGold(Unit* unit,Unit* dest,int flush);
     /// Send haul oil command
-extern void SendCommandHaulOil(Unit* unit,Unit* dest,int flush);
+extern void SendCommandResource(Unit* unit,Unit* dest,int flush);
     /// Send return goods command
 extern void SendCommandReturnGoods(Unit* unit,Unit* dest,int flush);
     /// Send train command

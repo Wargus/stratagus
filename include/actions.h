@@ -105,7 +105,7 @@ extern void CommandHarvest(Unit* unit,int x,int y,int flush);
     /// Prepare command mine
 extern void CommandMineGold(Unit* unit,Unit* dest,int flush);
     /// Prepare command haul
-extern void CommandHaulOil(Unit* unit,Unit* dest,int flush);
+extern void CommandResource(Unit* unit,Unit* dest,int flush);
     /// Prepare command return
 extern void CommandReturnGoods(Unit* unit,Unit* goal,int flush);
     /// Prepare command train
@@ -167,7 +167,7 @@ extern void HandleActionHarvest(Unit* unit);
     /// Handle command mine
 extern void HandleActionMineGold(Unit* unit);
     /// Handle command haul
-extern void HandleActionHaulOil(Unit* unit);
+extern void HandleActionResource(Unit* unit);
     /// Handle command return
 extern void HandleActionReturnGoods(Unit* unit);
     /// Handle command die

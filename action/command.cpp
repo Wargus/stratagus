@@ -798,7 +798,7 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 **	@param dest	destination unit.
 **	@param flush	if true, flush command queue.
 */
-global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
+global void CommandResource(Unit* unit,Unit* dest,int flush)
 {
     Order* order;
 
@@ -825,7 +825,7 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 	    return;
 	}
 
-	order->Action=UnitActionHaulOil;
+	order->Action=UnitActionResource;
 	order->X=order->Y=-1;
 	order->Goal=dest;
 	RefsDebugCheck( !dest->Refs );
