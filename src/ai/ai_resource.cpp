@@ -10,7 +10,7 @@
 //
 /**@name ai_resource.c	-	AI resource manager. */
 //
-//      (c) Copyright 2000,2001 by Lutz Sammer and Antonis Chaniotis.
+//      (c) Copyright 2000-2002 by Lutz Sammer and Antonis Chaniotis.
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -61,6 +61,10 @@ local int AiMakeUnit(UnitType* type);
 **	@param costs	Costs for something.
 **
 **	@return		A bit field of the missing costs.
+**
+**	@bug		AiPlayer->Used isn't used yet, this should store
+**			already allocated resources, fe. for buildings, while
+**			the builder is on the way.
 */
 local int AiCheckCosts(const int* costs)
 {
@@ -290,7 +294,7 @@ local int AiMakeUnit(UnitType* type)
     unit_count=AiPlayer->Player->UnitTypesCount;
     for( i=0; i<n; ++i ) {
 	//
-	//	The type is available
+	//	The type for builder/trainer is available
 	//
 	if( unit_count[table->Table[i]->Type] ) {
 	    if( type->Building ) {

@@ -782,6 +782,27 @@ local SCM CclAiPlayer(void)
     return gh_int2scm(AiPlayer->Player->Player);
 }
 
+/**
+**	Set ai player resource reserve.
+**
+**	@param vec	Resources vector
+**	@return		Old resource vector
+*/
+local SCM CclAiSetReserve(SCM vec)
+{
+    int i;
+    SCM old;
+
+    old=cons_array(gh_int2scm(MaxCosts),NIL);
+    for( i=0; i<MaxCosts; ++i ) {
+	aset1(old,gh_int2scm(i),gh_int2scm(AiPlayer->Reserve[i]));
+    }
+    for( i=0; i<MaxCosts; ++i ) {
+	AiPlayer->Reserve[i]=gh_scm2int(gh_vector_ref(vec,gh_int2scm(i)));
+    }
+    return old;
+}
+
 #else
 
 /**
@@ -830,6 +851,7 @@ global void AiCclRegister(void)
     gh_new_procedure0_0("ai:restart",CclAiRestart);
 
     gh_new_procedure0_0("ai:player",CclAiPlayer);
+    gh_new_procedure1_0("ai:set-reserve!",CclAiSetReserve);
 #endif
 }
 
