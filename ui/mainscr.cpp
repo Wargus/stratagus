@@ -429,7 +429,7 @@ global void DrawUnitInfo(const Unit* unit)
 		    (IconActive | (MouseButtons & LeftButton)) : 0,
 		TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
 	    UiDrawLifeBar(uins, TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
-	    if (uins->Type->CanCastSpell) {
+	    if (uins->Type->CanCastSpell && unit->Type->_MaxMana) {
 		UiDrawManaBar(uins, TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
 	    }
 	    if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == i) {
