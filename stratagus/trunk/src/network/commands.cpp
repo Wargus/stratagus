@@ -633,7 +633,7 @@ global void ParseCommand(unsigned short Type,UnitRef Unum,unsigned short x,unsig
 	    }
 	    CommandMineGold(unit,dest,status);
 	    break;
- 	case MessageCommandHaul:
+	case MessageCommandHaul:
 	    dest=NoUnitP;
 	    if( Dest!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[Dest];
@@ -641,20 +641,20 @@ global void ParseCommand(unsigned short Type,UnitRef Unum,unsigned short x,unsig
 	    }
 	    CommandHaulOil(unit,dest,status);
 	    break;
- 	case MessageCommandReturn:
+	case MessageCommandReturn:
 	    CommandReturnGoods(unit,status);
 	    break;
- 	case MessageCommandTrain:
+	case MessageCommandTrain:
 	    CommandTrainUnit(unit,UnitTypes+Dest,status);
 	    break;
 	case MessageCommandCancelTrain:
 	    // FIXME: cancel slot?
 	    CommandCancelTraining(unit,0);
 	    break;
- 	case MessageCommandUpgrade:
+	case MessageCommandUpgrade:
 	    CommandUpgradeTo(unit,UnitTypes+Dest,status);
 	    break;
- 	case MessageCommandResearch:
+	case MessageCommandResearch:
 	    CommandResearch(unit,Upgrades+x,status);
 	    break;
 	case MessageCommandDemolish:

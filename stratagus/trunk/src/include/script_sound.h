@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ccl_sound.h	-	The Ccl sound header file. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer and Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer and Fabrice Rossi
+//
+//	$Id$
 
 #ifndef __CCL_SOUND_H__
 #define __CCL_SOUND_H__
@@ -38,7 +37,7 @@ extern SoundId ccl_sound_id(SCM sound);	/// scheme -> sound id
 
 extern void SoundCclRegister(void);	/// register ccl features
 
-#endif 	// } !defined(USE_CCL) && defined(WITH_SOUND)
+#endif	// } !defined(USE_CCL) && defined(WITH_SOUND)
 
 #if defined(USE_CCL2) && defined(WITH_SOUND)	// {
 
@@ -55,7 +54,7 @@ extern SoundId ccl_sound_id(SCM sound);	/// scheme -> sound id
 
 extern void SoundCclRegister(void);	/// register ccl features
 
-#endif 	// { defined(USE_CCL2) && defined(WITH_SOUND)
+#endif	// { defined(USE_CCL2) && defined(WITH_SOUND)
 
 //-----------------------------------------------------------------------------
 

@@ -79,7 +79,7 @@ typedef struct _network_command_ {
     UnitRef		Unit;		/// Command for unit.
     unsigned short	X;		/// Map position X.
     unsigned short	Y;		/// Map position Y.
-    UnitRef 		Dest;		/// Destination unit.
+    UnitRef		Dest;		/// Destination unit.
 } NetworkCommand;
 
 /**
@@ -397,7 +397,7 @@ local void NetworkClientSetup(void)
 
 	// Wait on answer (timeout 1s)
 	if( NetSocketReady(NetworkFildes,1000) ) {
-	    
+
 	    if( !NetRecvUDP(NetworkFildes,&message,sizeof(message)) ) {
 		exit(-1);
 	    }
@@ -423,7 +423,7 @@ local void NetworkClientSetup(void)
 	DebugLevel0Fn(" waiting for clients\n");
 	NetRecvUDP(NetworkFildes,&message,sizeof(message));
 
-	if( NetLastHost!=host || NetLastPort!=port 
+	if( NetLastHost!=host || NetLastPort!=port
 		|| message.Type!=MessageInitConfig ) {
 	    DebugLevel0Fn(" received wrong packet\n");
 	    continue;
@@ -545,7 +545,7 @@ global void ExitNetwork1(void)
     NetCloseUDP(NetworkFildes);
 
     NetExit();			// machine dependend setup
-	
+
     NetworkFildes=-1;
     NetworkInSync=1;
 }
@@ -690,7 +690,7 @@ global void NetworkEvent(void)
 	    // Both directions are same fast/slow
 	    ncq=(NetworkCommandQueue*)(CommandsOut->last);
 	    while( ncq->List->prev ) {
-		DebugLevel3Fn(" resend %d? %d\n",ncq->Time,n); 
+		DebugLevel3Fn(" resend %d? %d\n",ncq->Time,n);
 		if( ncq->Time==n ) {
 		    NetworkSendPacket(ncq);
 		    break;
@@ -704,7 +704,7 @@ global void NetworkEvent(void)
 #else
 	    ncq=(NetworkCommandQueue*)(CommandsOut->first);
 	    while( ncq->List->next ) {
-		DebugLevel3Fn(" resend %d? %d\n",ncq->Time,n); 
+		DebugLevel3Fn(" resend %d? %d\n",ncq->Time,n);
 		if( ncq->Time==n ) {
 		    NetworkSendPacket(ncq);
 		    break;
@@ -891,7 +891,7 @@ local void NetworkResendCommands(void)
     //
     packet.Commands[0].Type=MessageResend;
     packet.Commands[0].Frame=
-    		(FrameCounter/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
+		(FrameCounter/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
 
     ncq=(NetworkCommandQueue*)(CommandsOut->last);
 
@@ -961,7 +961,7 @@ local void NetworkExecCommands(void)
 		ncq=(NetworkCommandQueue*)(CommandsOut->last);
 		// FIXME: how many packets must be kept exactly?
 		//if( ncq->Time+NetworkLag+NetworkUpdates>=FrameCounter )
-		// THIS is too much if( ncq->Time>=FrameCounter ) 
+		// THIS is too much if( ncq->Time>=FrameCounter )
 		if( ncq->Time+NetworkLag>=FrameCounter ) {
 		    break;
 		}
@@ -1019,7 +1019,7 @@ local void NetworkSyncCommands(void)
     for( i=0; i<HostsCount; ++i ) {
 	DebugLevel3Fn(" sync %d\n",NetPlyNr[i]);
 	ncq=&NetworkIn[n&0xFF][NetPlyNr[i]];
-	DebugLevel3Fn(" sync %d==%d\n",ncq->Time,n); 
+	DebugLevel3Fn(" sync %d==%d\n",ncq->Time,n);
 	if( ncq->Time!=n ) {
 	    NetworkInSync=0;
 	    NetworkDelay=NetworkUpdates;
