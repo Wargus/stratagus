@@ -346,7 +346,6 @@
 **
 **		Unit is a resource worker. Faster than examining ResInfo
 **
-**
 **	UnitType::ResInfo[::MaxCosts]
 **
 **		Information about resource harvesting. If NULL, it can't
