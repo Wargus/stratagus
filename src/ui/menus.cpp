@@ -2745,8 +2745,8 @@ global void ProcessMenu(int MenuId, int Loop)
     }
 
     InterfaceState = IfaceStateMenu;
-    DestroyCursorBackground();
     HideAnyCursor();
+    DestroyCursorBackground();
     MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
     GameCursor = TheUI.Point.Cursor;
