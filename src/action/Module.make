@@ -27,7 +27,7 @@
 
 MODULE = src/action
 MSRC =	 action_attack.c action_board.c action_build.c action_demolish.c \
-	 action_die.c action_follow.c action_harvest.c action_minegold.c \
+	 action_die.c action_follow.c action_harvest.c \
 	 action_move.c action_patrol.c action_repair.c action_research.c \
 	 action_resource.c action_returngoods.c action_spellcast.c \
 	 action_stand.c action_still.c action_train.c action_unload.c \

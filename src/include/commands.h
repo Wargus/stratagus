@@ -100,8 +100,6 @@ extern void SendCommandBuildBuilding(Unit*,int,int,UnitType*,int);
 extern void SendCommandCancelBuilding(Unit* unit,Unit* peon);
     /// Send harvest command
 extern void SendCommandHarvest(Unit* unit,int x,int y,int flush);
-    /// Send mine gold command
-extern void SendCommandMineGold(Unit* unit,Unit* dest,int flush);
     /// Send haul oil command
 extern void SendCommandResource(Unit* unit,Unit* dest,int flush);
     /// Send return goods command

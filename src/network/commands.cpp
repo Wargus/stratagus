@@ -563,8 +563,6 @@ local void DoNextReplay(void)
 	SendCommandCancelBuilding(UnitSlots[unit],dunit);
     } else if( !strcmp(name,"harvest") ) {
 	SendCommandHarvest(UnitSlots[unit],posx,posy,flags);
-    } else if( !strcmp(name,"mine") ) {
-	SendCommandMineGold(UnitSlots[unit],dunit,flags);
     } else if( !strcmp(name,"resource") ) {
 	SendCommandResource(UnitSlots[unit],dunit,flags);
     } else if( !strcmp(name,"return") ) {
@@ -922,24 +920,7 @@ global void SendCommandHarvest(Unit* unit,int x,int y,int flush)
 }
 
 /**
-**	Send command: Unit mine gold.
-**
-**	@param unit	pointer to unit.
-**	@param dest	pointer to destination (gold-mine).
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandMineGold(Unit* unit,Unit* dest,int flush)
-{
-    if( NetworkFildes==-1 ) {
-	CommandLog("mine",unit,flush,-1,-1,dest,NULL,-1);
-	CommandMineGold(unit,dest,flush);
-    } else {
-	NetworkSendCommand(MessageCommandMine,unit,0,0,dest,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit haul oil.
+**	Send command: Unit harvest resources
 **
 **	@param unit	pointer to unit.
 **	@param dest	pointer to destination (oil-platform).
@@ -1330,15 +1311,6 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	case MessageCommandHarvest:
 	    CommandLog("harvest",unit,status,x,y,NoUnitP,NULL,-1);
 	    CommandHarvest(unit,x,y,status);
-	    break;
-	case MessageCommandMine:
-	    dest=NoUnitP;
-	    if( dstnr!=(unsigned short)0xFFFF ) {
-		dest=UnitSlots[dstnr];
-		DebugCheck( !dest || !dest->Type );
-	    }
-	    CommandLog("mine",unit,status,-1,-1,dest,NULL,-1);
-	    CommandMineGold(unit,dest,status);
 	    break;
 	case MessageCommandResource:
 	    dest=NoUnitP;

@@ -155,8 +155,7 @@ global void HandleActionTrain(Unit* unit)
 	        && !nunit->Type->Harvester)
     	    || (unit->NewOrder.Action==UnitActionAttack
 	        && !nunit->Type->CanAttack)
-            || ((unit->NewOrder.Action==UnitActionMineGold
-                || unit->NewOrder.Action==UnitActionHarvest)
+            || ((unit->NewOrder.Action==UnitActionHarvest)
 		&& nunit->Type!=UnitTypeOrcWorker 
 		&& nunit->Type!=UnitTypeHumanWorker )
 	    || (unit->NewOrder.Action==UnitActionBoard

@@ -472,45 +472,6 @@ global void PlaceUnit(Unit* unit,int x,int y)
     unit->X=x;
     unit->Y=y;
 
-#if 0
-    //
-    //	Place unit on the map.
-    //
-    if( type->Building ) {
-	//
-	//	Mark building on movement map.
-	//		buildings that could be entered have no HP!
-	//		on Oilpatch could be build.
-	//
-
-	// FIXME: should be done more general.
-	if( unit->HP ) {
-	    for( h=type->TileHeight; h--; ) {
-		for( w=type->TileWidth; w--; ) {
-		    TheMap.Fields[x+w+(y+h)*TheMap.Width].Flags
-			|=MapFieldBuilding;
-		}
-	    }
-	} else if( !type->OilPatch ) {
-	    for( h=type->TileHeight; h--; ) {
-		for( w=type->TileWidth; w--; ) {
-		    TheMap.Fields[x+w+(y+h)*TheMap.Width].Flags
-			|=MapFieldNoBuilding;
-		}
-	    }
-	}
-    } else {
-	unsigned flags;
-
-	flags=unit->Type->FieldFlags;
-	for( h=type->TileHeight; h--; ) {
-	    for( w=type->TileWidth; w--; ) {
-		TheMap.Fields[x+w+(y+h)*TheMap.Width].Flags|=flags;
-	    }
-	}
-    }
-#else
-
     //
     //	Place unit on the map, mark the field with the FieldFlags.
     //
@@ -529,8 +490,6 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	PfHierMapChangedCallback(x, y,
 		x + type->TileWidth - 1, y + type->TileHeight - 1);
     }
-#endif
-
 #endif
 
     x+=unit->Type->TileWidth/2;
@@ -710,52 +669,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
     // FIXME: unit is tracked?
 
     type=unit->Type;
-#if 0
-    //
-    //	Update map
-    //
-    if( type->Building ) {
-	//
-	//	Unmark building on movement map.
-	//		buildings that could be entered have no HP!
-	//		on Oilpatch could be build.
-	//
-
-	// FIXME: should be done more general.
-	if( unit->Stats->HitPoints ) {
-	    for( h=type->TileHeight; h--; ) {
-		for( w=type->TileWidth; w--; ) {
-		    TheMap.Fields[unit->X+w+(unit->Y+h)*TheMap.Width].Flags
-			&=~MapFieldBuilding;
-		}
-	    }
-	} else if( !type->OilPatch ) {
-	    for( h=type->TileHeight; h--; ) {
-		for( w=type->TileWidth; w--; ) {
-		    TheMap.Fields[unit->X+w+(unit->Y+h)*TheMap.Width].Flags
-			&=~MapFieldNoBuilding;
-		}
-	    }
-	}
-#ifdef HIERARCHIC_PATHFINDER
-	//
-	//	Update hierarchic pathfinder structures.
-	//
-	PfHierMapChangedCallback (unit->X, unit->Y,
-		unit->X + unit->Type->TileWidth - 1,
-		unit->Y + unit->Type->TileHeight - 1);
-#endif
-    } else {
-	unsigned flags;
-
-	flags=~UnitFieldFlags(unit);
-	for( h=type->TileHeight; h--; ) {
-	    for( w=type->TileWidth; w--; ) {
-		TheMap.Fields[unit->X+w+(unit->Y+h)*TheMap.Width].Flags&=flags;
-	    }
-	}
-    }
-#else
 
     //
     //	Update map
@@ -774,8 +687,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
 	PfHierMapChangedCallback(unit->X, unit->Y,
 		unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
     }
-#endif
-
 #endif
 
     DebugLevel3Fn("%d %p %p\n" _C_ UnitNumber(unit) _C_ unit _C_ unit->Next);
@@ -2334,6 +2245,7 @@ global int CanBuildHere(const UnitType* type,int x,int y)
 
     if( EditorRunning ) {
 	if( type->GivesResource==OilCost ) {
+	    // FIXME: Better ideas? type->OnlyPlaceable on odd tiles? Yuck.
 	    // Oil patches and platforms can only be placed on even tiles
 	    if( !(x&1 && y&1) ) {
 		return 0;
@@ -2779,7 +2691,7 @@ global Unit* FindResource(const Player* player,int x,int y,int resource)
     best_d=99999;
     for (pnum=0;pnum<PlayerMax;++pnum) {
 	// FIXME: allow harvesting from ally
-	if ( (pnum!=PlayerMax-1) && (pnum!=ThisPlayer->Player) ) {
+	if ( (pnum!=PlayerMax-1) && (pnum!=player->Player) ) {
 	    continue;
 	}
 	nunits=Players[pnum].TotalNumUnits;
@@ -2811,7 +2723,7 @@ global Unit* FindResource(const Player* player,int x,int y,int resource)
  **	@param player   The player the deposit must belong to.
  **	@param x	Nearest to X position.
  **	@param y	Nearest to Y position.
- **	@param resource The resource oyu need the deposit to hold.
+ **	@param resource The resource you need the deposit to hold.
  **
  **	@return		NoUnitP or oil deposit unit
  */
@@ -3106,15 +3018,6 @@ global void LetUnitDie(Unit* unit)
     RemoveUnit(unit,NULL);
     UnitLost(unit);
     UnitClearOrders(unit);
-
-    // FIXME: ugly trick unit-peon-with-gold ... has no die sequence.
-    if( type==UnitTypeHumanWorkerWithGold
-	    || type==UnitTypeHumanWorkerWithWood ) {
-	unit->Type=UnitTypeHumanWorker;
-    } else if( type==UnitTypeOrcWorkerWithGold
-	    || type==UnitTypeOrcWorkerWithWood ) {
-	unit->Type=UnitTypeOrcWorker;
-    }
 
     //
     //	Unit has death animation.
@@ -3671,9 +3574,6 @@ local void SaveOrder(const Order* order,FILE* file)
 	case UnitActionHarvest:
 	    fprintf(file,"action-harvest");
 	    break;
-	case UnitActionMineGold:
-	    fprintf(file,"action-mine-gold");
-	    break;
 	case UnitActionResource:
 	    fprintf(file,"action-resource");
 	    break;
@@ -3715,10 +3615,6 @@ local void SaveOrder(const Order* order,FILE* file)
 		break;
 	    case UnitActionResearch:
 		fprintf(file," upgrade %s",((Upgrade*)order->Arg1)->Ident);
-		break;
-	    case UnitActionMineGold:
-		fprintf(file," mine (%d %d)",
-			(int)order->Arg1>>16,(int)order->Arg1&0xFFFF);
 		break;
 	    default:
 		fprintf(file," arg1 %d",(int)order->Arg1);

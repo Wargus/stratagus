@@ -278,8 +278,8 @@
 **
 **	Unit::Value
 **
-**		This values hold the amount of gold in a goldmine, amount of
-**		oil in an oil patch or oil platform.
+**		This values hold the amount of resources in a resource or in
+**		in a harvester.
 **		FIXME: continue documentation
 **
 **	Unit::SubAction
@@ -290,14 +290,14 @@
 **
 **	Unit::Wait
 **
-**		FIXME: continue documentation
+**		The unit is forced too wait for that many cycles. Be carefull,
+**		setting this to 0 will lock the unit.
 **
 **	Unit::State
 **
 **		Animation state, currently position in the animation script.
 **		0 if an animation has just started, it should only be changed
 **		inside of actions.
-**
 **
 **	Unit::Reset
 **
@@ -313,11 +313,6 @@
 **
 **		Pointer to the original owner of an unit. It will be NULL if
 **		the unit was not rescued.
-**
-**	Unit::OnBoard[::MAX_UNITS_ONBOARD]
-**
-**		A table of units on board. This can be units in a transporter
-**		or units in a tower.
 **
 **	Unit::OrderCount
 **
@@ -426,11 +421,7 @@ enum _unit_action_ {
 
     UnitActionRepair,			/// unit repairing
     UnitActionHarvest,			/// unit harvest lumber
-    UnitActionMineGold,			/// unit mines gold
-    UnitActionMineOre,			/// unit mines ore FIXME: not written
-    UnitActionMineCoal,			/// unit mines coal FIXME: not written
-    UnitActionQuarryStone,		/// unit quarrying stone FIXME: not written
-    UnitActionResource,			/// unit hauling oil
+    UnitActionResource,			/// unit harvesting resources
     UnitActionReturnGoods,		/// unit returning any resource
 
     UnitActionDemolish,			/// unit demolish at position/unit
@@ -979,8 +970,6 @@ extern Unit* TransporterOnScreenMapPosition (int , int );
 
     /// Return unit of a fixed type on a map tile.
 extern Unit* UnitTypeOnMap(int tx,int ty,UnitType* type);
-    /// Return gold mine, if on map tile
-extern Unit* GoldMineOnMap(int tx,int ty);
     /// Return resource, if on map tile
 extern Unit* ResourceOnMap(int tx,int ty,int resource);
     /// Return resource deposit, if on map tile

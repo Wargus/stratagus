@@ -91,26 +91,6 @@ global void HandleActionReturnGoods(Unit* unit)
 	return;
     }
     
-    if( type==UnitTypeHumanWorkerWithGold || type==UnitTypeOrcWorkerWithGold ) {
-	if( !unit->Orders[0].Goal ) {
-	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,GoldCost)) ) {
-		// No deposit -> can't return
-		unit->Orders[0].Action=UnitActionStill;
-		return;
-	    }
-	    unit->Orders[0].Goal=destu;
-	    RefsDebugCheck( !destu->Refs );
-	    ++destu->Refs;
-	}
-	unit->Orders[0].Action=UnitActionMineGold;
-	unit->Orders[0].Arg1=(void*)-1;
-	NewResetPath(unit);
-	unit->SubAction=65;	// FIXME: hardcoded
-	DebugLevel3("Wait: %d\n" _C_ unit->Wait);
-	unit->Wait=1;
-	return;
-    }
-
     if( type==UnitTypeHumanWorkerWithWood || type==UnitTypeOrcWorkerWithWood ) {
 	if( !unit->Orders[0].Goal ) {
 	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,WoodCost)) ) {
