@@ -134,13 +134,15 @@ global int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
 		pbi->LastFrameRecon + pbi->ReconYDataOffset + (height - i -
 		    1) * pbi->Configuration.YStride, width);
 	}
-	for (i = 0; i < height / 2; ++i) {	// copy UV
+	height >>= 1;
+	width >>= 1;
+	for (i = 0; i < height; ++i) {	// copy UV
 	    memcpy(overlay->pixels[1] + i * overlay->pitches[1],
-		pbi->LastFrameRecon + pbi->ReconVDataOffset + (height / 2 - i -
-		    1) * pbi->Configuration.UVStride, width / 2);
+		pbi->LastFrameRecon + pbi->ReconVDataOffset + (height - i -
+		    1) * pbi->Configuration.UVStride, width);
 	    memcpy(overlay->pixels[2] + i * overlay->pitches[2],
-		pbi->LastFrameRecon + pbi->ReconUDataOffset + (height / 2 - i -
-		    1) * pbi->Configuration.UVStride, width / 2);
+		pbi->LastFrameRecon + pbi->ReconUDataOffset + (height - i -
+		    1) * pbi->Configuration.UVStride, width);
 	}
 	SDL_UnlockYUVOverlay(overlay);
     }
@@ -236,7 +238,9 @@ global int PlayMovie(const char *name, int flags)
 
     StartDecoder(&pbi, avi->Width, avi->Height);
 
+#ifdef USE_OGG
     PlayAviOgg(avi);
+#endif
 
     callbacks.ButtonPressed=MovieCallbackKey;
     callbacks.ButtonReleased=MovieCallbackKey;
