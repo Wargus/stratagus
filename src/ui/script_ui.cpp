@@ -545,6 +545,7 @@ local SCM CclDefineUI(SCM list)
     int i;
     UI* ui;
     void* v;
+    MenuPanel** menupanel;
 
     //	Get identifier
     value=gh_car(list);
@@ -1197,8 +1198,13 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->GameMenuPanel.File);
-    ui->GameMenuPanel.File=str;
+    menupanel=&ui->MenuPanels;
+    while( *menupanel ) {
+	menupanel=&(*menupanel)->Next;
+    }
+    (*menupanel)=calloc(1,sizeof(**menupanel));
+    (*menupanel)->Ident=strdup("panel1");
+    (*menupanel)->Panel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -1206,8 +1212,12 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->Menu1Panel.File);
-    ui->Menu1Panel.File=str;
+    while( *menupanel ) {
+	menupanel=&(*menupanel)->Next;
+    }
+    (*menupanel)=calloc(1,sizeof(**menupanel));
+    (*menupanel)->Ident=strdup("panel2");
+    (*menupanel)->Panel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -1215,8 +1225,12 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->Menu2Panel.File);
-    ui->Menu2Panel.File=str;
+    while( *menupanel ) {
+	menupanel=&(*menupanel)->Next;
+    }
+    (*menupanel)=calloc(1,sizeof(**menupanel));
+    (*menupanel)->Ident=strdup("panel3");
+    (*menupanel)->Panel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -1224,8 +1238,12 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->VictoryPanel.File);
-    ui->VictoryPanel.File=str;
+    while( *menupanel ) {
+	menupanel=&(*menupanel)->Next;
+    }
+    (*menupanel)=calloc(1,sizeof(**menupanel));
+    (*menupanel)->Ident=strdup("panel4");
+    (*menupanel)->Panel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -1233,8 +1251,12 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->ScenarioPanel.File);
-    ui->ScenarioPanel.File=str;
+    while( *menupanel ) {
+	menupanel=&(*menupanel)->Next;
+    }
+    (*menupanel)=calloc(1,sizeof(**menupanel));
+    (*menupanel)->Ident=strdup("panel5");
+    (*menupanel)->Panel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -2254,24 +2276,8 @@ local SCM CclDefineMenu(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("image")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    if( gh_eq_p(value,gh_symbol2scm("none")) ) {
-		item.Image=ImageNone;
-	    } else if( gh_eq_p(value,gh_symbol2scm("panel1")) ) {
-		item.Image=ImagePanel1;
-	    } else if( gh_eq_p(value,gh_symbol2scm("panel2")) ) {
-		item.Image=ImagePanel2;
-	    } else if( gh_eq_p(value,gh_symbol2scm("panel3")) ) {
-		item.Image=ImagePanel3;
-	    } else if( gh_eq_p(value,gh_symbol2scm("panel4")) ) {
-		item.Image=ImagePanel4;
-	    } else if( gh_eq_p(value,gh_symbol2scm("panel5")) ) {
-		item.Image=ImagePanel5;
-	    } else if( gh_eq_p(value,gh_symbol2scm("sc-panel")) ) {
-		item.Image=ScPanel;
-	    } else {
-		s1=gh_scm2newstr(value, NULL);
-		fprintf(stderr, "Unsupported image %s\n", s1);
-		free(s1);
+	    if( !gh_eq_p(value,gh_symbol2scm("none")) ) {
+		item.Panel=gh_scm2newstr(value,NULL);
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("default")) ) {
 	    value=gh_car(list);
