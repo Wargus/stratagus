@@ -66,9 +66,28 @@ CursorType::Height
 ------------------
     Height of the cursor in pixels.
 
-CursorType:Graphic
-------------------
+CursorType::Graphic
+-------------------
     Contains the sprite of the cursor, loaded from CursorType::File.
+
+</PRE><HR><PRE>
+
+CursorConfig:
+=============
+
+    #include "cursor.h"
+    typedef struct _cursor_config_ CursorConfig;
+
+    This structure contains all informations to reference/use a cursor.
+    It is normally used in other config structures.
+
+CursorConfig::Name
+------------------
+    Name to reference this cursor type. Used while initialization.
+
+CursorConfig::Cursor
+--------------------
+    Pointer to this cursor type. Used while runtime.
 
 </PRE><HR>
 All trademarks and copyrights on this page are owned by their respective owners.
