@@ -64,8 +64,9 @@ global void ZoneSetClear(ZoneSet* m)
     
     if (m->Id == 0) {
 	for (i = 0; i < MaxZoneNumber; i++) {
-	    m->Marks[i] = 0;
+	    m->Marks[i] = 1;
 	}
+	m->Id++;
     }
     
     m->ZoneCount = 0;
