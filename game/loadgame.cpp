@@ -88,6 +88,8 @@ global void InitModules(void)
     InitCursors();
     InitUserInterface();
     InitPlayers();
+    InitMissileTypes();
+    InitMissiles();
     InitUnitTypes();
     InitUnits();
     InitSelections();
@@ -109,6 +111,7 @@ global void LoadModules(void)
     LoadCursors(ThisPlayer->RaceName);
     LoadUserInterface();
     // LoadPlayers();
+    LoadMissileSprites();
     LoadUnitTypes();
 
     LoadTileset();
