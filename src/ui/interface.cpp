@@ -1225,7 +1225,6 @@ global void HandleCursorMove(int* x,int* y)
 
     CursorX=*x;
     CursorY=*y;
-
 }
 
 /**
