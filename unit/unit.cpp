@@ -1753,6 +1753,12 @@ global int CanBuildOn(int x,int y,int mask)
 
 /**
 **	Can build unit-type on this point.
+**
+**	@param unit	Worker that want to build the building.
+**	@param type	Building unit-type.
+**	@param x	X tile map position.
+**	@param y	Y tile map position.
+**	@return		True if the building could be build..
 */
 global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 {
