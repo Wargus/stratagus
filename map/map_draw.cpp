@@ -46,7 +46,6 @@
 #include "player.h"
 #include "pathfinder.h"
 #include "ui.h"
-#include "deco.h"
 
 #include "etlib/dllist.h"
 #if defined(DEBUG) && defined(TIMEIT)
