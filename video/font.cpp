@@ -887,6 +887,7 @@ void CleanFonts(void)
 			free(FontColorGraphics[i][j]->Textures);
 		}
 		free(FontColorGraphics[i]);
+		FontColorGraphics[i] = NULL;
 #endif
 	}
 
