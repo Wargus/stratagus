@@ -44,7 +44,9 @@
 #include "iolib.h"
 #include "ogg/ogg.h"
 #include "vorbis/codec.h"
+#ifdef USE_THEORA
 #include "theora/theora.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -89,7 +91,9 @@ extern int OggInit(CLFile *f, OggData *data);
 extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CLFile *f);
 
 extern int VorbisProcessData(OggData *data, char *buffer);
+#ifdef USE_THEORA
 extern int TheoraProcessData(OggData *data);
+#endif
 
 	/// Play a movie file
 extern int PlayMovie(const char* name);
