@@ -63,10 +63,12 @@ static void DoActionRepairGeneric(Unit* unit, const Animation* repair)
 {
 	int flags;
 
-	flags = UnitShowAnimation(unit, repair);
+	if (!unit->Type->NewAnimations) {
+		flags = UnitShowAnimation(unit, repair);
 
-	if ((flags & AnimationSound)) {
-		PlayUnitSound(unit, VoiceRepairing);
+		if ((flags & AnimationSound)) {
+			PlayUnitSound(unit, VoiceRepairing);
+		}
 	}
 }
 
@@ -161,6 +163,8 @@ static int AnimateActionRepair(Unit* unit)
 	if (unit->Type->Animations) {
 		Assert(unit->Type->Animations->Repair);
 		DoActionRepairGeneric(unit, unit->Type->Animations->Repair);
+	} else if (unit->Type->NewAnimations) {
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Repair);
 	}
 
 	return 0;
@@ -188,7 +192,8 @@ void HandleActionRepair(Unit* unit)
 			// FIXME: RESET FIRST!! Why? We move first and than check if
 			// something is in sight.
 			err = DoActionMove(unit);
-			if (unit->Reset) {
+			if ((!unit->Type->NewAnimations && unit->Reset) ||
+					(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
 				//
 				// No goal: if meeting damaged building repair it.
 				//
@@ -247,7 +252,8 @@ void HandleActionRepair(Unit* unit)
 		//
 		case 2:
 			AnimateActionRepair(unit);
-			if (unit->Reset) {
+			if ((!unit->Type->NewAnimations && unit->Reset) ||
+					(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
 				goal = unit->Orders[0].Goal;
 
 				//
