@@ -2601,13 +2601,14 @@ global int FindTerrainType(int movemask,int resmask,int rvresult,int range,
  **	@param x	Closest to x
  **	@param x	Closest to y
  **	@param range    Maximum distance to the resource.
+ **	@param resource The resource id.
  **
  **	@notes 		This will return an usable resource building that
  **			belongs to "player" or is neutral.
  **
  **	@return		NoUnitP or resource unit
  */
-global Unit* FindResource(const Unit * unit,int x,int y,int range)
+global Unit* FindResource(const Unit * unit,int x,int y,int range,int resource)
 {
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2634,9 +2635,6 @@ global Unit* FindResource(const Unit * unit,int x,int y,int range)
     int desty;
     int bestd;
     int cdist;
-    int resource;
-
-    resource=unit->CurrentResource;
 
     destx=x;
     desty=y;

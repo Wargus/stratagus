@@ -186,7 +186,7 @@ Possible tags:
 <dl>
 <dt>name</dt>
 <dd>The unit-type name shown in the game. F.E: "Knight", "Gold Mine".
-If the name is too long, it is split at space.
+If the name is too long, it is split at space.<p>
 </dd>
 <dd></dd>
 <dt>graphics</dt>
@@ -212,16 +212,16 @@ Examples:
 </dd>
 <dt>pixel_size</dt>
 <dd>Size of the unit-type graphic in pixeln. A list of X (width) and Y (height)
-sizes.  F.E. '( 72 72 ), '( 96 96 ).</dd>
+sizes.  F.E. '( 72 72 ), '( 96 96 ).<p></dd>
 <dt>animations</dt>
 <dd>Identifier to reference the animation sequences (scripts) for the
-unit-type. F.E. "animations-knight", "animations-gold-mine".</dd>
+unit-type. F.E. "animations-knight", "animations-gold-mine".<p></dd>
 <dt>icon</dt>
 <dd>Identifier to reference the icon shown in game for this unit-type.
-F.E. "icon-knight", "icon-gold-mine".</dd>
+F.E. "icon-knight", "icon-gold-mine".<p></dd>
 <dt>speed</dt>
 <dd>The speed shown for this unit-type in game. (NOTE: this is
-only shown and *not* used). F.E. 10, 13.</dd>
+only shown and *not* used). F.E. 10, 13.<p></dd>
 <dt>overlay</dt>
 <dd>Define the overlay shown if this unit is constructed (build).
 Currently are available:
@@ -238,14 +238,15 @@ Currently are available:
 <li>15 wall construction site
 </ul>
 NOTE: this will be changed to identifiers sometime.
-</dd>
+<p></dd>
 <dt>sight_range</dt>
-<dd>Sight range (in tiles) of this unit. F.E. 6, 14.</dd>
+<dd>Sight range (in tiles) of this unit. F.E. 6, 14.<p></dd>
 <dt>hitpoints</dt>
-<dd>Hitpoints for this Unit. F.E. 90, 1000</dd>
+<dd>Hitpoints for this Unit. F.E. 90, 1000<p></dd>
 <dt>magic</dt>
 <dd>Flag to determine whether this unit is a spell user. 0 = false (not a magic
-user), 1 = true (magic user).  F.E. 1, 0</dd>
+user), 1 = true (magic user).  F.E. 1, 0<p>
+</dd>
 <dt>costs</dt>
 <dd>Define the costs to build (or aquire) this unit. It is an array of '(
 resource-name amount) pairs. Time is in frames to build this unit.
@@ -254,11 +255,12 @@ to build this unit.  Oil is the amount required to build this unit.
 F.E.: '( time 200 gold 2000 wood 1000 oil 200 ).<p>
 </dd>
 <dt>improve_production</dt>
-<dd>Define the production increase from defaults that this unit adds. It is an array of '(
-resource-name amount) pairs.
-Gold is the amount it increase the default gold by. All other defined resources are
-treated the same way.
-F.E.: 'improve-production '( gold 20 wood 5 ).<p>
+<dd>Define the production increase from defaults that this unit adds. It is an
+array of '(resource-name amount) pairs. Gold is the amount it increase the
+default gold by. All other defined resources are treated the same way. The
+values are treated like percents. Improvement from multiple buildings do
+not stack, but the maximum is what matters.
+F.E.: 'improve-production '( gold 20 wood 5 ) will give 120% gold and 105% wood.<p>
 </dd>
 <dt>repair_hp</dt>
 <dd>Defines the amount of hp a unit gain for each repair animation.  Units can only be
@@ -272,10 +274,56 @@ Gold is the amount required to repair repair_hp above.
 Wood and Oil are the same.
 F.E.: '( gold 2 wood 1 oil 1 ).<p>
 </dd>
+<dt>can-gather-resource</dt>
+<dd>This will begin a block of resoure gathering information. The folowing tags are available in this section:<p></dd>
+<!-- Indent this whole block, it pertains to can-gather resource -->
+    <dt>resource-id</dt>
+    <dd>The resource identification. Has to be a resource-name defined before.<p></dd>
+    
+    <dt>final-resource</dt>
+    <dd>The resource is converted to this at the depot. Usefull for a fisherman who harvests fish,
+    but it all turns to food at the depot. Warning: curently ignored by the Ai.<p></dd>
+    
+    <dt>wait-at-resource</dt>
+    <dd>Cycles the unit waits while inside at a resource to get one resource step
+    (see below). This is completely independent of animation length and such.<p></dd>
+    
+    <dt>wait-at-depot</dt>
+    <dd>Cycles the unit waits while inside the depot to unload.<p></dd>
+
+    <dt>resource-step</dt>
+    <dd>The unit makes so-caled mining cycles. Each mining cycle it does some sort
+    of animation and gains resource-step resources. You can stop after any number of
+    steps. When the quantity in the harvester reaches the maximum (resource-capacity)
+    it will return home. I this is not included then it's considered infinity, and
+    resource-capacity will be the limit.<p></dd>
+   
+    <dt>resource-capacity</dt>
+    <dd>Maximum amount of resources a harvester can carry. The actual amount can be
+    modified while unloading, with improve_incomes.<p></dd>
+    
+    <dt>file-when-loaded</dt>
+    <dd>The harvester's animation file will change when it's loaded.<p></dd>
+    
+    <dt>file-when-empty</dt>
+    <dd>The harvester's animation file will change when it's empty.The standard animation
+    is used only when building/repairing.<p></dd>
+    
+    <dt>harvest-from-outside</dt>
+    <dd>Unit will harvest from the outside. The unit will use it's attack animation
+    (seems it turned into a generic Action anim.)<p></dd>
+    
+    <dt>lose-resources</dt>
+    <dd>Special lossy behaviour for loaded harvesters. Harvesters with loads other
+    than 0 and ResourceCapacity will lose their cargo on any new order.<p></dd>
+    
+    <dt>terrain-harvester</dt>
+    <dd>The unit will harvest terrain. For now this only works for wood.<p></dd>
+    
 <dt>tile_size</dt>
 <dd>Define the unit-type size in tiles. NOTE: currently only buildings could
 be bigger than one tile. A list of X (width) and Y (height) sizes.
-F.E. '( 1 1 ), '( 2 2 ).
+F.E. '( 1 1 ), '( 2 2 ).<p>
 </dd>
 <dt>box_size</dt>
 <dd></dd>

@@ -176,7 +176,7 @@ local int StartGathering(Unit* unit)
 	}
 	//  Find an alternative, but don't look too far.
 	unit->Orders[0].X=unit->Orders[0].Y=-1;
-	if ((goal=FindResource(unit,unit->X,unit->Y,10))) {
+	if ((goal=FindResource(unit,unit->X,unit->Y,10,unit->CurrentResource))) {
 	    unit->SubAction=SUB_START_RESOURCE;
 	    unit->Orders[0].Goal=goal;
 	    RefsDebugCheck( !goal->Refs );
@@ -391,7 +391,7 @@ local int GatherResource(Unit* unit)
 		    DropOutOnSide(uins,LookingW
 			    ,source->Type->TileWidth,source->Type->TileHeight);
 		    uins->Orders[0].X=uins->Orders[0].Y=-1;
-		    if ((uins->Orders[0].Goal=FindResource(uins,uins->X,uins->Y,10))) {
+		    if ((uins->Orders[0].Goal=FindResource(uins,uins->X,uins->Y,10,unit->CurrentResource))) {
 			DebugLevel0Fn("Unit %d found another resource.\n" _C_ uins->Slot);
 			uins->SubAction=SUB_START_RESOURCE;
 			uins->Wait=1;
@@ -646,7 +646,7 @@ local int WaitInDepot(Unit* unit)
 	    unit->SubAction=0;
 	}
     } else {
-	if ((goal=FindResource(unit,x,y,10))) {
+	if ((goal=FindResource(unit,x,y,10,unit->CurrentResource))) {
 	    DropOutNearest(unit,goal->X+goal->Type->TileWidth/2
 		    ,goal->Y+goal->Type->TileHeight/2
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
@@ -680,7 +680,8 @@ void ResourceGiveUp(Unit* unit)
     unit->Reset=1;
     unit->Orders[0].X=unit->Orders[0].Y=-1;
     unit->SubAction=0;
-    if( unit->Type->ResInfo[unit->CurrentResource]->LoseResources ) {
+    if( unit->Type->ResInfo[unit->CurrentResource]->LoseResources &&
+	    unit->Value<unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) {
 	unit->Value=0;
 	unit->CurrentResource=0;
     }
