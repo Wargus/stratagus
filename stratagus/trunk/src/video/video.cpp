@@ -678,7 +678,7 @@ global void InitVideo(void)
     InitGraphic();
     InitLineDraw();
     InitSprite();
-    InitCursor();
+    InitCursors();
     switch( VideoBpp ) {
 	case  8: ColorCycle=ColorCycle8 ; break;
 	case 15:
