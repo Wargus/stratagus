@@ -414,35 +414,68 @@ local void CclParseUpgradeTo(Unit* unit, SCM list)
 **	@param unit	Unit pointer which should be filled with the data.
 **	@param list	All options of the trained order
 */
-local void CclParseTrain (Unit *unit, SCM list)
+local void CclParseTrain(Unit *unit, SCM list)
 {
-    SCM value, sublist;
+    SCM value;
+    SCM sublist;
     int i;
 
-    while ( !gh_null_p (list) ) {
-	value = gh_car (list);
-	list = gh_cdr (list);
-	if (gh_eq_p (value, gh_symbol2scm ("ticks")) ) {
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    unit->Data.Train.Ticks = gh_scm2int (value);
-	} else if (gh_eq_p (value, gh_symbol2scm ("count")) ) {
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    unit->Data.Train.Count = gh_scm2int (value);
-	} else if (gh_eq_p (value, gh_symbol2scm ("queue")) ) {
-	    sublist=gh_car (list);
-	    list=gh_cdr (list);
+    while ( !gh_null_p(list) ) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("ticks")) ) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    unit->Data.Train.Ticks = gh_scm2int(value);
+	} else if (gh_eq_p(value, gh_symbol2scm("count")) ) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    unit->Data.Train.Count = gh_scm2int(value);
+	} else if (gh_eq_p(value, gh_symbol2scm("queue")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
 	    for (i=0; i<MAX_UNIT_TRAIN; ++i) {
-		value = gh_vector_ref (sublist, gh_int2scm(i));
-		if ( gh_eq_p (value, gh_symbol2scm ("unit-none")) ) {
+		value = gh_vector_ref(sublist, gh_int2scm(i));
+		if ( gh_eq_p(value, gh_symbol2scm("unit-none")) ) {
 		    unit->Data.Train.What[i] = NULL;
 		} else {
-		    char *ident = gh_scm2newstr (value, NULL);
-		    unit->Data.Train.What[i] = UnitTypeByIdent (ident);
-		    free (ident);
+		    char *ident;
+		    ident = gh_scm2newstr(value, NULL);
+		    unit->Data.Train.What[i] = UnitTypeByIdent(ident);
+		    free(ident);
 		}
 	    }
+	}
+    }
+}
+
+/**
+**	Parse stored data for move order
+**
+**	@param unit	Unit pointer which should be filled with the data.
+**	@param list	All options of the move order
+*/
+local void CclParseMove(Unit *unit, SCM list)
+{
+    SCM value;
+    SCM sublist;
+    int i;
+
+    while ( !gh_null_p(list) ) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("fast")) ) {
+	    unit->Data.Move.Fast = 1;
+	} else if (gh_eq_p(value, gh_symbol2scm("path")) ) {
+	    int len;
+	    sublist=gh_car(list);
+	    list = gh_cdr(list);
+	    len = gh_length(sublist);
+	    for( i=0; i<len; ++i ) {
+		value = gh_vector_ref(sublist, gh_int2scm(i));
+		unit->Data.Move.Path[i]=gh_scm2int(value);
+	    }
+	    unit->Data.Move.Length = len;
 	}
     }
 }
@@ -679,28 +712,26 @@ local SCM CclUnit(SCM list)
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    CclParseOrder(value,&unit->NewOrder);
-
 	} else if( gh_eq_p(value,gh_symbol2scm("data-builded")) ) {
-	    value=gh_car(list);
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    CclParseBuilded(unit,value);
+	    CclParseBuilded(unit,sublist);
 	} else if( gh_eq_p(value,gh_symbol2scm("data-research")) ) {
-	    value=gh_car(list);
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    CclParseResearch(unit,value);
+	    CclParseResearch(unit,sublist);
 	} else if( gh_eq_p(value,gh_symbol2scm("data-upgrade-to")) ) {
-	    value=gh_car(list);
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    CclParseUpgradeTo(unit,value);
+	    CclParseUpgradeTo(unit,sublist);
 	} else if( gh_eq_p(value,gh_symbol2scm("data-train")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    CclParseTrain (unit, sublist);
+	    CclParseTrain(unit,sublist);
 	} else if( gh_eq_p(value,gh_symbol2scm("data-move")) ) {
-	    value=gh_car(list);
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME: move\n");
-
+	    CclParseMove(unit,sublist);
 	} else {
 	   // FIXME: this leaves a half initialized unit
 	   errl("Unsupported tag",value);
@@ -826,57 +857,46 @@ local SCM CclSetUnitUnholyArmor(SCM ptr,SCM value)
 
 local SCM CclSlotUsage (SCM list)
 {
-#if 0
-    /* the old way */
-    int len = gh_vector_length (vector);
-    unsigned char SlotUsage[len];
-    int i;
-    Unit *UnitMemory;
-
-    for (i=0; i<len; i++) {
-	SlotUsage[i] = (unsigned char )
-		gh_scm2int (gh_vector_ref (vector, gh_int2scm (i)));
-    }
-#else
 #define SLOT_LEN MAX_UNIT_SLOTS/8 + 1
-    const int len = SLOT_LEN;
     unsigned char SlotUsage[SLOT_LEN];
-    int i, prev;
+    int i;
+    int prev;
     SCM value;
 
-    memset (SlotUsage, 0, len);
+    memset(SlotUsage, 0, SLOT_LEN);
     prev = -1;
-    while ( !gh_null_p (list) ) {
-	value = gh_car (list);
-	list = gh_cdr (list);
-	if (gh_eq_p (value, gh_symbol2scm ("-"))) {
+    while ( !gh_null_p(list) ) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("-"))) {
 	    int range_end;
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    range_end = gh_scm2int (value);
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    range_end = gh_scm2int(value);
 	    for (i=prev; i<=range_end; i++)
 		SlotUsage[i/8] |= 1 << (i%8);
 	    prev = -1;
 	} else {
 	    if (prev >= 0)
 		SlotUsage[prev/8] |= 1 << (prev%8);
-	    prev = gh_scm2int (value);
+	    prev = gh_scm2int(value);
 	}
     }
-    if (prev >= 0)
+    if (prev >= 0) {
 	SlotUsage[prev/8] |= 1 << (prev%8);
-#endif
+    }
 
     /* now walk through the bitfield and create the needed unit slots */
-    for (i=0; i<len*8; i++) {
+    for (i=0; i<SLOT_LEN*8; i++) {
 	if ( SlotUsage[i/8] & (1 << i%8) ) {
-	    Unit *new_unit = (Unit * )calloc (1, sizeof (Unit));
+	    Unit *new_unit = (Unit * )calloc(1, sizeof (Unit));
 	    UnitSlotFree = (void *)UnitSlots[i];
 	    UnitSlots[i] = new_unit;
 	    new_unit->Slot = i;
 	}
     }
     return SCM_UNSPECIFIED;
+#undef SLOT_LEN
 }
 
 // FIXME: write the missing access functions
