@@ -400,7 +400,7 @@ local void WaitForInput(int timeout)
     RealizeVideoMemory();
 
     WaitNoEvent=1;
-    timeout*=FRAMES_PER_SECOND;
+    timeout*=CYCLES_PER_SECOND;
     while( timeout-- && WaitNoEvent ) {
 	WaitEventsOneFrame(&callbacks);
     }

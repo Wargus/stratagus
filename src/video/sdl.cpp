@@ -10,12 +10,11 @@
 //
 /**@name sdl.c		-	SDL video support. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -76,61 +75,6 @@ global SDL_Surface *Screen;		/// internal screen
 --	Sync
 ----------------------------------------------------------------------------*/
 
-#if 0
-
-/*
-**	The timer resolution is 10ms, which make the timer useless for us.
-*/
-
-/**
-**	Called from another thread or what ever SDL uses..
-**
-**	@param unused	Need by library: interval of the timer.
-**	@param param	Parameter passed in by library.
-*/
-local Uint32 VideoSyncHandler(Uint32 unused,void* param)
-{
-    DebugLevel3("Interrupt %d - %d\n"
-	    ,VideoInterrupts,(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
-
-    ++VideoInterrupts;
-
-    // FIXME: this solves the timer problem with WIN32
-    // WSACancelBlockingCall();
-    // kill(0,SIGALRM);
-
-    return (100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
-}
-
-/**
-**	Initialise video sync.
-**
-**	@note	SDL has only a maximum resolution of 10 ms.
-**
-**	@see VideoSyncSpeed
-*/
-global void SetVideoSync(void)
-{
-    static SDL_TimerID id;
-
-    if( id ) {				// Cancel old timer.
-	SDL_RemoveTimer(id);
-	id=NULL;
-    }
-
-    if( !VideoSyncSpeed ) {
-	return;
-    }
-
-
-    id=SDL_AddTimer((100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed,
-	VideoSyncHandler,NULL);
-
-    // DebugLevel1("Timer installed\n");
-}
-
-#else
-
 /**
 **	Initialise video sync.
 **
@@ -138,10 +82,8 @@ global void SetVideoSync(void)
 */
 global void SetVideoSync(void)
 {
-    DebugLevel0Fn("%d\n",(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
+    DebugLevel0Fn("%d\n",(100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed);
 }
-
-#endif
 
 /*----------------------------------------------------------------------------
 --	Video
@@ -578,6 +520,15 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     }
 #endif
 
+    if( !++FrameCounter ) {
+	// FIXME: tests with frame counter now fails :(
+	// FIXME: Should happen in 68 years :)
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+    }
+
     ticks=SDL_GetTicks();
     if( ticks>NextFrameTicks ) {	// We are too slow :(
 	++SlowFrameCounter;
@@ -594,7 +545,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	}
 	while( ticks>=NextFrameTicks ) {
 	    ++VideoInterrupts;
-	    NextFrameTicks+=(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
+	    NextFrameTicks+=(100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed;
 	}
 
 	//
@@ -613,10 +564,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 		maxfd=NetworkFildes;
 	    }
 	    FD_SET(NetworkFildes,&rfds);
-	    if( !NetworkInSync ) {
-		DebugLevel0Fn("recover-network\n");
-		NetworkRecover();	// recover network
-	    }
 	}
 
 #ifndef USE_SDLA
@@ -679,7 +626,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	Not more input and time for frame over: return
 	//
-	if( !i && NetworkInSync && VideoInterrupts ) {
+	if( !i && VideoInterrupts ) {
 	    break;
 	}
     }
@@ -715,6 +662,7 @@ global void WaitEventsAndKeepSync(void)
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
 
+    DebugLevel0Fn("Don't use this function\n");
     WaitEventsOneFrame(&callbacks);
 }
 

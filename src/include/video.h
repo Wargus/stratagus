@@ -112,7 +112,7 @@ struct _palette_link_ {
 };
 
     /// MACRO defines speed of colorcycling FIXME: should be made configurable
-#define COLOR_CYCLE_SPEED	(FRAMES_PER_SECOND/4)
+#define COLOR_CYCLE_SPEED	(CYCLES_PER_SECOND/4)
 
 // FIXME: not quite correct for new multiple palette version
     /// System-Wide used colors.
@@ -435,9 +435,9 @@ extern global VMemType8* VideoFindNewPalette8( const VMemType8 *cube,
     /**
     **	Video synchronization speed. Synchronization time in prozent.
     **	If =0, video framerate is not synchronized. 100 is exact
-    **	FRAMES_PER_SECOND (30). Game will try to redraw screen within
+    **	CYCLES_PER_SECOND (30). Game will try to redraw screen within
     **	intervals of VideoSyncSpeed, not more, not less.
-    **	@see FRAMES_PER_SECOND @see VideoInterrupts
+    **	@see CYCLES_PER_SECOND @see VideoInterrupts
     */
 extern int VideoSyncSpeed;
 

@@ -339,7 +339,7 @@ local void SpellWhirlwindController(Missile *missile)
     //
     //	Every 1/10s 1 points damage on tornado periphery
     //
-    if (!(missile->TTL % (FRAMES_PER_SECOND/10))) {
+    if (!(missile->TTL % (CYCLES_PER_SECOND/10))) {
 	n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
 	DebugLevel3Fn("Damage on %d,%d-%d,%d = %d\n",x-1,y-1,x+1,y+1,n);
 	for (i = 0; i < n; ++i) {
@@ -625,7 +625,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	case SpellActionSlow:
 	    // slow didn't work on buildings
 	    if (target && !target->Type->Building
-		    && target->Slow < spell->TTL / FRAMES_PER_SECOND) {
+		    && target->Slow < spell->TTL / CYCLES_PER_SECOND) {
 		return 1;
 	    }
 	    return 0;
@@ -641,7 +641,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	case SpellActionInvisibility:
 	    // invisible didn't work on buildings
 	    if (target && !target->Type->Building
-		    && target->Invisible < spell->TTL / FRAMES_PER_SECOND) {
+		    && target->Invisible < spell->TTL / CYCLES_PER_SECOND) {
 		return 1;
 	    }
 	    return 0;
@@ -662,7 +662,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 
 	case SpellActionBloodlust:
 	    if (target && target->Type->Organic
-		    && target->Bloodlust < spell->TTL / FRAMES_PER_SECOND) {
+		    && target->Bloodlust < spell->TTL / CYCLES_PER_SECOND) {
 		return 1;
 	    }
 	    // FIXME: should we support making bloodlust in range?
@@ -680,7 +680,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 
 	case SpellActionHaste:
 	    if (target && !target->Type->Building
-		    && target->Haste < spell->TTL / FRAMES_PER_SECOND) {
+		    && target->Haste < spell->TTL / CYCLES_PER_SECOND) {
 		return 1;
 	    }
 	    return 0;
@@ -693,7 +693,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 
 	case SpellActionUnholyArmor:
 	    if (target && !target->Type->Building
-		    && target->UnholyArmor < spell->TTL / FRAMES_PER_SECOND) {
+		    && target->UnholyArmor < spell->TTL / CYCLES_PER_SECOND) {
 		return 1;
 	    }
 	    return 0;
@@ -758,8 +758,8 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	target->HP = 0;
 	target->X = x;
 	target->Y = y;
-	target->TTL=FrameCounter+FRAMES_PER_SECOND+FRAMES_PER_SECOND/2;
-	//target->TTL=FrameCounter+target->Type->DecayRate*6*FRAMES_PER_SECOND;
+	target->TTL=GameCycle+CYCLES_PER_SECOND+CYCLES_PER_SECOND/2;
+	//target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
 	CheckUnitToBeDrawn(target);
 	break;
 
@@ -845,10 +845,10 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionSlow:
 	if (target && !target->Type->Building
-		&& target->Slow < spell->TTL/FRAMES_PER_SECOND) {
+		&& target->Slow < spell->TTL/CYCLES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
-	    target->Slow = spell->TTL/FRAMES_PER_SECOND;	// about 25 sec
+	    target->Slow = spell->TTL/CYCLES_PER_SECOND;	// about 25 sec
 	    target->Haste = 0;
 	    CheckUnitToBeDrawn(target);
 
@@ -964,7 +964,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionInvisibility:
 	if (target && !target->Type->Building
-		    && target->Invisible < spell->TTL/FRAMES_PER_SECOND) {
+		    && target->Invisible < spell->TTL/CYCLES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
 	    if( target->Type->Volatile ) {
@@ -976,7 +976,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
 	    } else {
 		// about 50 sec
-		target->Invisible = spell->TTL/FRAMES_PER_SECOND;
+		target->Invisible = spell->TTL/CYCLES_PER_SECOND;
 		CheckUnitToBeDrawn(target);
 	    }
 
@@ -1077,7 +1077,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	DropOutOnSide(target,LookingW,0,0);
 
 	// set life span
-	target->TTL=FrameCounter+target->Type->DecayRate*6*FRAMES_PER_SECOND;
+	target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
 	CheckUnitToBeDrawn(target);
 
 	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
@@ -1088,10 +1088,10 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionBloodlust:
 	if (target && target->Type->Organic
-		&& target->Bloodlust < spell->TTL/FRAMES_PER_SECOND) {
+		&& target->Bloodlust < spell->TTL/CYCLES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
-	    target->Bloodlust = spell->TTL/FRAMES_PER_SECOND;	// about 25 sec
+	    target->Bloodlust = spell->TTL/CYCLES_PER_SECOND;	// about 25 sec
 	    CheckUnitToBeDrawn(target);
 
 	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
@@ -1195,11 +1195,11 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionHaste:
 	if (target && !target->Type->Building
-		&& target->Haste < spell->TTL/FRAMES_PER_SECOND) {
+		&& target->Haste < spell->TTL/CYCLES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
 	    target->Slow = 0;
-	    target->Haste = spell->TTL/FRAMES_PER_SECOND;	// about 25 sec
+	    target->Haste = spell->TTL/CYCLES_PER_SECOND;	// about 25 sec
 	    CheckUnitToBeDrawn(target);
 
 	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
@@ -1227,8 +1227,8 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 		target=MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-skeleton"),
 			unit->Player);
 		// set life span
-		target->TTL=FrameCounter+
-			target->Type->DecayRate*6*FRAMES_PER_SECOND;
+		target->TTL=GameCycle+
+			target->Type->DecayRate*6*CYCLES_PER_SECOND;
 		CheckUnitToBeDrawn(target);
 
 		ReleaseUnit( Units[i] );
@@ -1267,7 +1267,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionUnholyArmor:
 	if (target && !target->Type->Building
-		&& target->UnholyArmor < spell->TTL/FRAMES_PER_SECOND) {
+		&& target->UnholyArmor < spell->TTL/CYCLES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
 	    if( target->Type->Volatile ) {
@@ -1279,7 +1279,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
 	    } else {
 		// about 13 sec
-		target->UnholyArmor = spell->TTL/FRAMES_PER_SECOND;
+		target->UnholyArmor = spell->TTL/CYCLES_PER_SECOND;
 		CheckUnitToBeDrawn(target);
 	    }
 

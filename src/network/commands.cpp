@@ -104,8 +104,8 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     //
     //	Frame, unit, (type-ident only for better readable.
     //
-    fprintf(logf,"(log %d 'U%d '%s '%s '%s",
-	    FrameCounter,UnitNumber(unit),unit->Type->Ident,name,
+    fprintf(logf,"(log %lu 'U%d '%s '%s '%s",
+	    GameCycle,UnitNumber(unit),unit->Type->Ident,name,
 	    flag ? "flush" : "append");
 
     //
@@ -599,7 +599,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
     Unit *unit, *dest;
     int id, status;
 
-    DebugLevel3Fn(" %d frame %d\n", msgnr, FrameCounter);
+    DebugLevel3Fn(" %d cycle %lu\n", msgnr, GameCycle);
 
     unit=UnitSlots[unum];
     DebugCheck( !unit );

@@ -10,12 +10,11 @@
 //
 /**@name actions.c	-	The actions. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -327,7 +326,7 @@ local void HandleUnitAction(Unit* unit)
 }
 
 /**
-**	Update the actions of all units each frame.
+**	Update the actions of all units each game cycle.
 **
 **	IDEA:	to improve the preformance use slots for waiting.
 */
@@ -416,7 +415,7 @@ global void UnitActions(void)
 	    fprintf(logf,";;;\tMap: %s\n\n",TheMap.Description);
 	}
 
-	fprintf(logf,"%d: ",FrameCounter);
+	fprintf(logf,"%d: ",GameCycle);
 	fprintf(logf,"%d %s S%d/%d-%d P%d Refs %d\n",
 	    UnitNumber(unit),unit->Type ? unit->Type->Ident : "unit-killed",
 		unit->State,unit->SubAction,
