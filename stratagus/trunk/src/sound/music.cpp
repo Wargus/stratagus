@@ -376,13 +376,21 @@ global int PlayCDRom(const char* name)
 			cd_play(17);
 		    }
 		}
-	    } else if (!GameRunning && track != 15) {
+	    } else if (!strcmp(CDPlaySection, "briefing")) {
+		if (!ThisPlayer->Race && track != 7) {
+		    cd_play(7);
+		} else if (ThisPlayer->Race && track != 15) {
+		    cd_play(15);
+		}
+	    } else if (!strcmp(CDPlaySection, "menu") && track != 15) {
 		cd_play(15);
-	    } else if (GameRunning && !ThisPlayer->Race && (track < 3 || track > 7)) {
+	    } else if (!strcmp(CDPlaySection, "game") && 
+		       !ThisPlayer->Race && (track < 3 || track > 6)) {
 		do CDTrack = (MyRand() % NumCDTracks) + 3;
 		while (CDTrack < 3 || CDTrack > 7); 
 		cd_play(CDTrack);
-	    } else if (GameRunning && ThisPlayer->Race && (track < 11 || track > 14)) {
+	    } else if (!strcmp(CDPlaySection, "game") && 
+		       ThisPlayer->Race && (track < 10 || track > 14)) {
 		do CDTrack = (MyRand() % NumCDTracks) + 9;
 		while (CDTrack < 11 || CDTrack > 14); 
 		cd_play(CDTrack);
