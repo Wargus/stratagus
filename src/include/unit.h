@@ -773,7 +773,7 @@ extern void UnitIncrementHealth(void);
     /// Check for rescue each second
 extern void RescueUnits(void);
     /// Change owner of unit
-extern void ChangeUnitOwner(Unit* unit,Player* old,Player* new);
+extern void ChangeUnitOwner(Unit* unit,Player* newplayer);
 
     /// Convert direction (dx,dy) to heading (0-255)
 extern int DirectionToHeading(int,int);

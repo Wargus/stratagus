@@ -1708,25 +1708,24 @@ global void UnitIncrementHealth(void)
 **	Change the unit's owner
 **
 **	@param unit		Unit which should be consigned.
-**	@param oldplayer	Old owning player.
 **	@param newplayer	New owning player.
 **
 **	@todo	FIXME: I think here are some failures, if building is build
 **		what is with the unit inside? or a main hall with workers
 **		inside?
-**		Parameter old player is redunant?
 */
-global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
+global void ChangeUnitOwner(Unit* unit,Player* newplayer)
 {
     int i;
+    Player* oldplayer;
 
-    DebugCheck( unit->Player!=oldplayer );
+    oldplayer=unit->Player;
 
     // For st*rcr*ft (dark archons),
     if( unit->Type->Transporter ) {
         for( i=0; i<MAX_UNITS_ONBOARD; i++) {
 	    if( unit->OnBoard[i] ) {
-	        ChangeUnitOwner(unit->OnBoard[i],oldplayer,newplayer);
+	        ChangeUnitOwner(unit->OnBoard[i],newplayer);
 	    }
 	}
     }
@@ -1811,7 +1810,7 @@ local void ChangePlayerOwner(Player* oldplayer,Player* newplayer)
     memcpy(table,oldplayer->Units,n*sizeof(Unit*));
     for( i=0; i<n; i++ ) {
 	unit=table[i];
-	ChangeUnitOwner(unit,oldplayer,newplayer);
+	ChangeUnitOwner(unit,newplayer);
 	unit->Blink=5;
 	unit->Rescued=1;
     }
@@ -1882,7 +1881,7 @@ global void RescueUnits(void)
 #endif
 		    if( around[i]->Type->CanAttack &&
 			    IsAllied(unit->Player,around[i]) ) {
-			ChangeUnitOwner(unit,unit->Player,around[i]->Player);
+			ChangeUnitOwner(unit,around[i]->Player);
 			unit->Blink=5;
 			unit->Rescued=1;
 			PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound
@@ -3661,7 +3660,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    && IsEnemy(attacker->Player,target)
 	    && (attacker->Type==UnitTypeOrcWorker
 		|| attacker->Type==UnitTypeHumanWorker) ) {
-	ChangeUnitOwner(target, target->Player, attacker->Player);
+	ChangeUnitOwner(target,attacker->Player);
 	CommandStopUnit(attacker);	// Attacker shouldn't continue attack!
     }
 
