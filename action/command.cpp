@@ -61,7 +61,7 @@ local void ReleaseOrder(Order* order)
 **	@param unit	pointer to unit.
 **	@param flush	if true, flush order queue.
 **
-**	@returns	Pointer to next free order slot.
+**	@return		Pointer to next free order slot.
 */
 local Order* GetNextOrder(Unit* unit,int flush)
 {
@@ -110,7 +110,7 @@ local void ClearSavedAction(Unit* unit)
 **	@param unit	pointer to unit.
 **	@param flush	if true, flush command queue.
 **
-**	@returns	Pointer to next free command.
+**	@return		Pointer to next free command.
 */
 local Command* GetNextCommand(Unit* unit,int flush)
 {
@@ -172,6 +172,7 @@ global void CommandStopUnit(Unit* unit)
     unit->NextFlush=1;
     unit->NextCount=1;
     unit->NextCommand[0].Action=UnitActionStill;
+    unit->NextCommand[0].Data.Move.Goal=NoUnitP;
 
     unit->PendCommand=unit->NextCommand[0];
 
@@ -206,6 +207,7 @@ global void CommandStandGround(Unit* unit,int flush)
     }
 
     command->Action=UnitActionStandGround;
+    command->Data.Move.Goal=NoUnitP;
 
 #endif
     ClearSavedAction(unit);
@@ -233,6 +235,7 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
     order->Action=UnitActionFollow;
     ResetPath(*order);
     order->Goal=dest;
+    RefsDebugCheck( !dest->Refs );
     dest->Refs++;
     order->RangeX=order->RangeY=1;
     order->X=-1;
@@ -249,10 +252,11 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionFollow;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
+    RefsDebugCheck( !dest->Refs );
     dest->Refs++;
     command->Data.Move.Range=1;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
+    command->Data.Move.SX=-1;
+    command->Data.Move.SY=-1;
 
 #endif
     ClearSavedAction(unit);
@@ -454,6 +458,7 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
     // FIXME: pathfinder didn't support this kind of target
+    DebugLevel0("Fixme this next\n");
 
 #endif
     ClearSavedAction(unit);
@@ -656,6 +661,8 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 {
 #ifdef NEW_ORDERS
     DebugLevel0Fn("FIXME: not written\n");
+
+    unit->Data.Harvest.WoodToHarvest=CHOP_FOR_WOOD;
 #else
     Command* command;
 
@@ -666,35 +673,20 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 	return;
     }
 
-#ifdef NEW_ORDERS
-    unit->Data.Harvest.WoodToHarvest=CHOP_FOR_WOOD;
-#else
     unit->WoodToHarvest=CHOP_FOR_WOOD;
-#endif
 
     command->Action=UnitActionHarvest;
     ResetPath(*command);
-
-#if 0
-    // FIXME: reimplement this version
-    command->Data.Move.Goal=NoUnitP;
-    command->Data.Move.Range=1;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x;
-    command->Data.Move.DY=y;
-#endif
 
     command->Data.Move.Goal=NoUnitP;
     command->Data.Move.Range=2;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
-    // FIXME: this hack didn't work correct on map border
-    command->Data.Move.DX=x ? x-1 : x;
-    command->Data.Move.DY=y ? y-1 : y;
+    command->Data.Move.DX=x-1;
+    command->Data.Move.DY=y-1;
 
-#endif
     ClearSavedAction(unit);
+#endif
 }
 
 /**
@@ -721,20 +713,13 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionMineGold;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
+    RefsDebugCheck( !dest->Refs );
     dest->Refs++;
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
-    DebugLevel3Fn("Mine gold refs %d\n",dest->Refs);
-#if 1
-    // FIXME: move to any point of gold mine.
-    NearestOfUnit(dest,unit->X,unit->Y
-	    ,&command->Data.Move.DX
-	    ,&command->Data.Move.DY);
-#else
-    command->Data.Move.DX=dest->X;
-    command->Data.Move.DY=dest->Y;
-#endif
+    command->Data.Move.DX=-1;
+    command->Data.Move.DY=-1;
 
 #endif
     ClearSavedAction(unit);
@@ -764,19 +749,13 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionHaulOil;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
+    RefsDebugCheck( !dest->Refs );
     dest->Refs++;
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
-#if 1
-    // FIXME: move to any point of gold mine.
-    NearestOfUnit(dest,unit->X,unit->Y
-	    ,&command->Data.Move.DX
-	    ,&command->Data.Move.DY);
-#else
-    command->Data.Move.DX=dest->X;
-    command->Data.Move.DY=dest->Y;
-#endif
+    command->Data.Move.DX=-1;
+    command->Data.Move.DY=-1;
 
 #endif
     ClearSavedAction(unit);
