@@ -45,6 +45,7 @@
 #include "unit.h"
 #include "map.h"
 #include "minimap.h"
+#include "font.h"
 #include "ui.h"
 
 #if defined(DEBUG) && defined(TIMEIT)
@@ -113,7 +114,7 @@ global int FogOfWarOpacity;					/// Fog of war Opacity.
 **		Mapping for fog of war tiles.
 */
 local const int FogTable[16] = {
-	 0,11,10, 2,  13, 6, 0, 3,  12, 0, 4, 1,  8, 9, 7, 0,
+	 0,11,10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
 };
 
 global unsigned char* VisionTable[3];
@@ -836,7 +837,7 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	}
 
 	if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
-		if (tile) {
+		if (tile && tile != tile2) {
 			VideoDrawFog(tile, dx, dy);
 //			TheMap.Fields[sx].VisibleLastFrame |= MapFieldPartiallyVisible;
 //		} else {
