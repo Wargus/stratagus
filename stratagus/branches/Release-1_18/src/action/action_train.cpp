@@ -59,6 +59,7 @@ global void HandleActionTrain(Unit* unit)
     Unit* nunit;
     const UnitType* type;
     Player* player;
+    int food;
 
     player=unit->Player;
     //
@@ -89,12 +90,9 @@ global void HandleActionTrain(Unit* unit)
 	//
 	//	Check if enough food available.
 	//
-	if( player->Food<
-		player->NumFoodUnits+unit->Data.Train.What[0]->Demand ) {
-
-	    NotifyPlayer(player,NotifyYellow,unit->X,unit->Y,
-		"Not enough food...build more farms.");
-	    if( unit->Player->Ai ) {
+	if( (food=!PlayerCheckFood(player,unit->Data.Train.What[0]))
+		|| !PlayerCheckLimits(player,unit->Data.Train.What[0]) ) {
+	    if( food && unit->Player->Ai ) {
 		AiNeedMoreFarms(unit,unit->Orders[0].Type);
 	    }
 
