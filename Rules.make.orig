@@ -46,9 +46,9 @@
 #------------------------------------------------------------------------------
 # SDL - Simple DirectMedia Layer configuration (any >=1.0.0)
 
-SDL_CFLAGS	:= $(shell sdl-config --cflags)
-SDLLIB		:= $(shell sdl-config --static-libs)
-#SDLLIB		:= $(shell sdl-config --libs)
+SDL_CFLAGS	= $(shell sdl-config --cflags)
+SDLLIB		= $(shell sdl-config --static-libs)
+#SDLLIB		= $(shell sdl-config --libs)
 
 # Without SDL Sound (only not win32)
 #SDL		= -DUSE_SDL $(SDL_CFLAGS)
