@@ -2296,8 +2296,12 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorMapProperties,"editor-map-properties");
     HASHADD(EditorPlayerProperties,"editor-player-properties");
 
-// EditorMapProperties
+// Editor menu
+    HASHADD(EditorQuitMenu,"editor-quit-menu");
+
+// Editor map properties
     HASHADD(EditorEnterMapDescriptionAction,"editor-map-description-action");
+    HASHADD(EditorEndMenu,"editor-end-menu");
 }
 
 /**
