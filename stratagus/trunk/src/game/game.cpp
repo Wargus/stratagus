@@ -277,6 +277,10 @@ global void CreateGame(char* filename, WorldMap* map)
 	return;
     }
 
+    LoadCcl();
+    LoadFonts();
+    InitVideoCursors();
+
     if( filename ) {
 	s = NULL;
 	// FIXME: LibraryFile here?
