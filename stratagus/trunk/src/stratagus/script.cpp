@@ -661,6 +661,29 @@ StringDesc* CclParseStringDesc(lua_State* l)
 				res->D.SubString.End = CclParseNumberDesc(l);
 			}
 			lua_pop(l, 1); // table.
+		} else if (!strcmp(key, "Line")) {
+			res->e = EString_Line;
+			if (luaL_getn(l, -1) < 2 || luaL_getn(l, -1) > 4) {
+				LuaError(l, "Bad number of args in Line\n");
+			}
+			lua_rawgeti(l, -1, 1); // Line.
+			res->D.Line.Line = CclParseNumberDesc(l);
+			lua_rawgeti(l, -1, 2); // String.
+			res->D.Line.String = CclParseStringDesc(l);
+			if (luaL_getn(l, -1) >= 3) {
+				lua_rawgeti(l, -1, 3); // Lenght.
+				res->D.Line.MaxLen = CclParseNumberDesc(l);
+			}
+			res->D.Line.Font = -1;
+			if (luaL_getn(l, -1) >= 4) {
+				lua_rawgeti(l, -1, 4); // Font.
+				res->D.Line.Font = FontByIdent(LuaToString(l, -1));
+				if (res->D.Line.Font == -1) {
+					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
+				}
+				lua_pop(l, 1); // font name.
+			}
+			lua_pop(l, 1); // table.
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'"_C_ key);
@@ -883,6 +906,36 @@ char* EvalString(const StringDesc* s)
 			} else { // ERROR.
 				return strdup("");
 			}
+		case EString_Line : // line n of the string
+			if (s->D.Line.String == NULL ||
+				(tmp1 = EvalString(s->D.Line.String)) == NULL) {
+				return  strdup(""); // ERROR.
+			} else {
+				int line;
+				int maxlen;
+				int font;
+
+				line = EvalNumber(s->D.Line.Line);
+				if (line <= 0) {
+					free(tmp1);
+					return strdup("");
+				}
+				if (s->D.Line.MaxLen) {
+					maxlen = EvalNumber(s->D.Line.MaxLen);
+					if (maxlen < 0) {
+						maxlen = 0;
+					}
+				} else {
+					maxlen = 0;
+				}
+				font = s->D.Line.Font;
+				res = GetLineFont(line, tmp1, maxlen, font);
+				free(tmp1);
+				if (!res) { // ERROR.
+					res = strdup("");
+				}
+				return res;
+			}
 	}
 	return NULL;
 }
@@ -1005,6 +1058,14 @@ void FreeStringDesc(StringDesc* s)
 			free(s->D.SubString.Begin);
 			FreeNumberDesc(s->D.SubString.End);
 			free(s->D.SubString.End);
+			break;
+		case EString_Line : // line n of the string
+			FreeStringDesc(s->D.Line.String);
+			free(s->D.Line.String);
+			FreeNumberDesc(s->D.Line.Line);
+			free(s->D.Line.Line);
+			FreeNumberDesc(s->D.Line.MaxLen);
+			free(s->D.Line.MaxLen);
 			break;
 	}
 }
@@ -1451,6 +1512,22 @@ static int CclSubString(lua_State* l)
 }
 
 /**
+**  Return equivalent lua table for Line.
+**  {"Line", {arg1, arg2[, arg3]}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclLine(lua_State* l)
+{
+	if (lua_gettop(l) < 2 || lua_gettop(l) > 4) {
+		LuaError(l, "Bad number of arg for Line()\n");
+	}
+	return Alias(l, "Line");
+}
+
+/**
 **  Return equivalent lua table for VideoTextLength.
 **  {"VideoTextLength", {Text = arg1, Font = arg2}}
 **
@@ -1531,7 +1608,7 @@ static void AliasRegister()
 	lua_register(Lua, "InverseVideo", CclInverseVideo);
 	lua_register(Lua, "UnitName", CclUnitName);
 	lua_register(Lua, "SubString", CclSubString);
-
+	lua_register(Lua, "Line", CclLine);
 
 	lua_register(Lua, "If", CclIf);
 }
