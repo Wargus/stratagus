@@ -57,10 +57,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef DEBUG
-extern int NoWarningUnitType;        ///< quiet ident lookup.
-#endif
-
 _AnimationsHash AnimationsHash;      ///< Animations hash table
 _NewAnimationsHash NewAnimationsHash;///< NewAnimations hash table
 
@@ -237,7 +233,7 @@ static int CclDefineUnitType(lua_State* l)
 	const char* value;
 	UnitType* type;
 	ResourceInfo* res;
-	char* str;
+	const char* str;
 	int i;
 	int redefine;
 	int subargs;
@@ -248,26 +244,12 @@ static int CclDefineUnitType(lua_State* l)
 	}
 
 	// Slot identifier
-	str = strdup(LuaToString(l, 1));
-
-#ifdef DEBUG
-	i = NoWarningUnitType;
-	NoWarningUnitType = 1;
-#endif
+	str = LuaToString(l, 1);
 	type = UnitTypeByIdent(str);
-#ifdef DEBUG
-	NoWarningUnitType = i;
-#endif
 	if (type) {
-		free(str);
 		redefine = 1;
 	} else {
-		type = NewUnitTypeSlot(str);
-		type->BoolFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->BoolFlag));
-		type->CanTargetFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTargetFlag));
-		type->Variable = calloc(UnitTypeVar.NumberVariable, sizeof(*type->Variable));
-		memcpy(type->Variable, UnitTypeVar.Variable,
-			UnitTypeVar.NumberVariable * sizeof(*type->Variable));
+		type = NewUnitTypeSlot(strdup(str));
 		redefine = 0;
 	}
 
@@ -277,8 +259,7 @@ static int CclDefineUnitType(lua_State* l)
 	//
 	//  Parse the list: (still everything could be changed!)
 	//
-	lua_pushnil(l);
-	while (lua_next(l, 2)) {
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
 			if (redefine) {
@@ -716,8 +697,7 @@ static int CclDefineUnitType(lua_State* l)
 			args = luaL_getn(l, -1);
 			for (j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				res = (ResourceInfo*)malloc(sizeof(ResourceInfo));
-				memset(res, 0, sizeof(ResourceInfo));
+				res = (ResourceInfo*)calloc(1, sizeof(ResourceInfo));
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
@@ -808,8 +788,7 @@ static int CclDefineUnitType(lua_State* l)
 			// have been defined. FIXME: MaxSpellType=500 or something?
 			//
 			if (!type->CanCastSpell) {
-				type->CanCastSpell = malloc(SpellTypeCount);
-				memset(type->CanCastSpell, 0, SpellTypeCount);
+				type->CanCastSpell = calloc(SpellTypeCount, sizeof(char));
 			}
 			subargs = luaL_getn(l, -1);
 			if (subargs == 0) {
@@ -838,8 +817,7 @@ static int CclDefineUnitType(lua_State* l)
 			// have been defined.
 			//
 			if (!type->AutoCastActive) {
-				type->AutoCastActive = malloc(SpellTypeCount);
-				memset(type->AutoCastActive, 0, SpellTypeCount);
+				type->AutoCastActive = calloc(SpellTypeCount, sizeof(char));
 			}
 			subargs = luaL_getn(l, -1);
 			if (subargs == 0) {
@@ -996,7 +974,6 @@ static int CclDefineUnitType(lua_State* l)
 				} else { // Error
 					LuaError(l, "incorrect argument for the variable in unittype");
 				}
-				lua_pop(l, 1);
 				continue;
 			}
 			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined bool flags
@@ -1010,7 +987,6 @@ static int CclDefineUnitType(lua_State* l)
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		}
-		lua_pop(l, 1);
 	}
 
 	// If number of directions is not specified, make a guess
@@ -1380,24 +1356,16 @@ static int CclDefineAnimations(lua_State* l)
 		t[-1].Flags |= 0x80; // Marks end of list
 
 		if (!strcmp(id, "still")) {
-			if (anims->Still) {
-				free(anims->Still);
-			}
+			free(anims->Still);
 			anims->Still = anim;
 		} else if (!strcmp(id, "move")) {
-			if (anims->Move) {
-				free(anims->Move);
-			}
+			free(anims->Move);
 			anims->Move = anim;
 		} else if (!strcmp(id, "attack")) {
-			if (anims->Attack) {
-				free(anims->Attack);
-			}
+			free(anims->Attack);
 			anims->Attack = anim;
 		} else if (!strcmp(id, "repair")) {
-			if (anims->Repair) {
-				free(anims->Repair);
-			}
+			free(anims->Repair);
 			anims->Repair = anim;
 		} else if (!strcmp(id, "harvest")) {
 			int res;
@@ -1410,14 +1378,10 @@ static int CclDefineAnimations(lua_State* l)
 			if (res == MaxCosts) {
 				LuaError(l, "Resource not found: %s" _C_ resource);
 			}
-			if (anims->Harvest[res]) {
-				free(anims->Harvest[res]);
-			}
+			free(anims->Harvest[res]);
 			anims->Harvest[res] = anim;
 		} else if (!strcmp(id, "die")) {
-			if (anims->Die) {
-				free(anims->Die);
-			}
+			free(anims->Die);
 			anims->Die = anim;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ id);
