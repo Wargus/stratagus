@@ -350,26 +350,11 @@ enum _must_redraw_flags_ {
 	/// Must redraw after color cycle
 #define RedrawColorCycle  (RedrawMap | RedrawInfoPanel | RedrawButtonPanel | RedrawResources)
 
-	/// Mainscreen width (default 640)
-extern int VideoWidth;
-
-	/// Mainscreen height (default 480)
-extern int VideoHeight;
-
 	/// Invalidated redraw flags
 extern int MustRedraw;
 
 	/// Enable redraw flags
 extern int EnableRedraw;
-
-	/// Next frame ticks
-extern unsigned long NextFrameTicks;
-
-	/// Counts frames
-extern unsigned long FrameCounter;
-
-	/// Counts quantity of slow frames
-extern int SlowFrameCounter;
 
 /*----------------------------------------------------------------------------
 --  clone.c

@@ -135,11 +135,26 @@ extern int VideoSyncSpeed;
 
 extern int SkipFrames;
 
+	/// Mainscreen width (default 640)
+extern int VideoWidth;
+
+	/// Mainscreen height (default 480)
+extern int VideoHeight;
+
 	/// Wanted videomode, fullscreen or windowed.
 extern char VideoFullScreen;
 
 	/// Fullscreen or windowed set from commandline.
 extern char VideoForceFullScreen;
+
+	/// Next frame ticks
+extern unsigned long NextFrameTicks;
+
+	/// Counts frames
+extern unsigned long FrameCounter;
+
+	/// Counts quantity of slow frames
+extern int SlowFrameCounter;
 
 	/// Initialize Pixels[] for all players.
 	/// (bring Players[] in sync with Pixels[])
