@@ -76,7 +76,7 @@ global Unit* EnemyOnMapTile(const Unit* source,unsigned tx,unsigned ty)
 	// if( UnitUnusable(unit) ) can't attack constructions
 	// FIXME: did SelectUnitsOnTile already filter this?
 	// Invisible and not Visible
-	if( unit->Removed || unit->Invisible
+	if( unit->Removed || unit->Invisible || !unit->HP
 		|| !(unit->Visible&(1<<source->Player->Player))
 		|| unit->Orders[0].Action==UnitActionDie ) {
 	    continue;
