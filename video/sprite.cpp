@@ -138,8 +138,9 @@ local void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
     int oldx;
     int oldy;
 
-    srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
-    srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
+    srect.x = (sprite->SurfaceFlip->w - (frame % (sprite->SurfaceFlip->w / 
+	    sprite->Width)) * sprite->Width) - sprite->Width;
+    srect.y = (frame / (sprite->SurfaceFlip->w / sprite->Width)) * sprite->Height;
     srect.w = sprite->Width;
     srect.h = sprite->Height;
 
