@@ -681,6 +681,20 @@ local void DrawBuildingCursor(void)
     int mask;
 
     // Align to grid
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *v = &TheUI.VP[TheUI.ActiveViewport];
+
+    x=CursorX-(CursorX - v->X)%TileSizeX;
+    y=CursorY-(CursorY - v->Y)%TileSizeY;
+    BuildingCursorSX = mx = Viewport2MapX (TheUI.ActiveViewport, x);
+    BuildingCursorSY = my = Viewport2MapY (TheUI.ActiveViewport, y);
+
+    //
+    //	Draw building
+    //
+    PushClipping ();
+    SetClipping (v->X, v->Y, v->EndX, v->EndY);
+#else /* SPLIT_SCREEN_SUPPORT */
     x=CursorX-(CursorX-TheUI.MapX)%TileSizeX;
     y=CursorY-(CursorY-TheUI.MapY)%TileSizeY;
     BuildingCursorSX=mx=Screen2MapX(x);
@@ -691,6 +705,7 @@ local void DrawBuildingCursor(void)
     //
     PushClipping();
     SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapEndX,TheUI.MapEndY);
+#endif /* SPLIT_SCREEN_SUPPORT */
     GraphicPlayerPixels(ThisPlayer,CursorBuilding->Sprite);
     DrawUnitType(CursorBuilding,0,x,y);
     PopClipping();
@@ -738,6 +753,16 @@ local void DrawBuildingCursor(void)
 
     h=CursorBuilding->TileHeight;
     BuildingCursorEY=my+h-1;
+#ifdef SPLIT_SCREEN_SUPPORT
+    if (my+h > v->MapY + v->MapHeight) {		// reduce to view limits
+	h = v->MapY + v->MapHeight - my;
+    }
+    w0 = CursorBuilding->TileWidth;	// reduce to view limits
+    BuildingCursorEX=mx+w0-1;
+    if (mx+w0 > v->MapX + v->MapWidth) {
+	w0 = v->MapX + v->MapWidth - mx;
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     if( my+h>MapY+MapHeight ) {		// reduce to view limits
 	h=MapY+MapHeight-my;
     }
@@ -746,6 +771,7 @@ local void DrawBuildingCursor(void)
     if( mx+w0>MapX+MapWidth ) {
 	w0=MapX+MapWidth-mx;
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
     while( h-- ) {
 	w=w0;
 	while( w-- ) {
