@@ -798,7 +798,7 @@ global void WaitEventsAndKeepSync(void)
 	//
 	//	Sound
 	//
-	if( !SoundOff && !SoundThreadRunning ) {
+	if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 ) {
 	    if( SoundFildes>maxfd ) {
 		maxfd=SoundFildes;
 	    }
@@ -852,8 +852,8 @@ global void WaitEventsAndKeepSync(void)
 	    //
 	    //	Sound
 	    //
-	    if( !SoundOff && !SoundThreadRunning
-			&& FD_ISSET(SoundFildes,&wfds) ) {
+	    if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 
+		    && FD_ISSET(SoundFildes,&wfds) ) {
 		WriteSound();
 	    }
 

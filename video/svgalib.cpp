@@ -975,7 +975,7 @@ global void WaitEventsAndKeepSync(void)
 	//
 	//	Sound
 	//
-	if(!SoundOff && !SoundThreadRunning) {
+	if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 ) {
 	    FD_SET(SoundFildes, &wfds);
 	}
 
@@ -985,7 +985,7 @@ global void WaitEventsAndKeepSync(void)
 	    //
 	    //	Sound
 	    //
-	    if(!SoundOff && !SoundThreadRunning
+	    if(!SoundOff && !SoundThreadRunning && SoundFildes!=-1 
 			&& FD_ISSET(SoundFildes, &wfds)) {
 		WriteSound();
 	    }
