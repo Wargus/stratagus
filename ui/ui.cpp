@@ -34,6 +34,7 @@
 global int RaceAdd;			// FIXME: debug solution
 
 global char RightButtonAttacks;		/// right button 0 move, 1 attack
+global char FancyBuildings;		/// Mirror buildings 1 yes, 0 now.
 
 /**
 **	The user interface configuration
