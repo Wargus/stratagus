@@ -740,22 +740,22 @@ local SCM CclDefineUI(SCM list)
 
     //	Resource
     temp=gh_car(list);
-    list=gh_cdr(list);
-
     if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
+        str=NULL;
+        x=-1;
+        y=-1;
+    } else {
+	list=gh_cdr(list);
+	value=gh_car(temp);
+	temp=gh_cdr(temp);
+        str=gh_scm2newstr(value,NULL);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        x=gh_scm2int(value);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        y=gh_scm2int(value);
     }
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
 
     ui->Resource.File=str;
     ui->ResourceX=x;
@@ -827,22 +827,22 @@ local SCM CclDefineUI(SCM list)
 
     //	Info Panel
     temp=gh_car(list);
-    list=gh_cdr(list);
-
     if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
+	str=NULL;
+	x=-1;
+	y=-1;
+    } else {
+	list=gh_cdr(list);
+	value=gh_car(temp);
+	temp=gh_cdr(temp);
+	str=gh_scm2newstr(value,NULL);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        x=gh_scm2int(value);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        y=gh_scm2int(value);
     }
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
 
     ui->InfoPanel.File=str;
     ui->InfoPanelX=x;
@@ -901,22 +901,22 @@ local SCM CclDefineUI(SCM list)
 
     //	Button Panel
     temp=gh_car(list);
-    list=gh_cdr(list);
-
     if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
+	str=NULL;
+	x=-1;
+	y=-1;
+    } else {
+	list=gh_cdr(list);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        str=gh_scm2newstr(value,NULL);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        x=gh_scm2int(value);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        y=gh_scm2int(value);
     }
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
 
     ui->ButtonPanel.File=str;
     ui->ButtonPanelX=x;

@@ -469,12 +469,8 @@ local void DrawMapViewport(Viewport* vp)
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     }
 
-    // Resources over map!
-    // FIXME: trick17! must find a better solution
-    // FIXME: must take resource end into account
-    if( TheUI.MapArea.X<=TheUI.ResourceX && TheUI.MapArea.EndX>=TheUI.ResourceX
-	    && TheUI.MapArea.Y<=TheUI.ResourceY
-	    && TheUI.MapArea.EndY>=TheUI.ResourceY ) {
+    // Resources over map
+    if (TheUI.ResourceX==-1 || TheUI.ResourceY==-1) {
 	MustRedraw|=RedrawResources;
     }
 #endif
@@ -551,10 +547,12 @@ global void UpdateDisplay(void)
 	int i;
 
 	for( i=0; i<TheUI.NumFillers; ++i ) {
-	    VideoDrawSub(TheUI.Filler[i].Graphic,0,0
+	    if (TheUI.Filler[i].Graphic) {
+		VideoDrawSub(TheUI.Filler[i].Graphic,0,0
 		    ,TheUI.Filler[i].Graphic->Width
 		    ,TheUI.Filler[i].Graphic->Height
 		    ,TheUI.FillerX[i],TheUI.FillerY[i]);
+	    }
 	}
     }
 
@@ -676,19 +674,19 @@ global void UpdateDisplay(void)
 		     TheUI.InfoPanelX,TheUI.InfoPanelY
 		    ,TheUI.InfoPanelW,TheUI.InfoPanelH);
 	}
-	if( MustRedraw&RedrawButtonPanel ) {
+	if( MustRedraw&RedrawButtonPanel && TheUI.ButtonPanel.Graphic ) {
 	    InvalidateAreaAndCheckCursor(
 		     TheUI.ButtonPanelX,TheUI.ButtonPanelY
 		    ,TheUI.ButtonPanel.Graphic->Width
 		    ,TheUI.ButtonPanel.Graphic->Height);
 	}
-	if( MustRedraw&RedrawResources ) {
+	if( MustRedraw&RedrawResources && TheUI.Resource.Graphic) {
 	    InvalidateAreaAndCheckCursor(
 		     TheUI.ResourceX,TheUI.ResourceY
 		    ,TheUI.Resource.Graphic->Width
 		    ,TheUI.Resource.Graphic->Height);
 	}
-	if( MustRedraw&RedrawStatusLine || MustRedraw&RedrawCosts ) {
+	if( (MustRedraw&RedrawStatusLine || MustRedraw&RedrawCosts) && TheUI.StatusLine.Graphic ) {
 	    InvalidateAreaAndCheckCursor(
 		     TheUI.StatusLineX,TheUI.StatusLineY
 		    ,TheUI.StatusLine.Graphic->Width
