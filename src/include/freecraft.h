@@ -120,6 +120,9 @@
 
 #ifdef _MSC_VER	// { m$ auto detection
 
+#define WIN32_LEAN_AND_MEAN
+#define NOUSER
+
 #define inline __inline			/// Fix m$ brain damage
 #define alloca _alloca			/// I hope this works with all VC..
 
