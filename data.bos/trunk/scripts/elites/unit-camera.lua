@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: unit-camera.lua,v 1.2 2004/11/23 08:58:23 gorm Exp $
+--	$Id$
 
 DefineAnimations("animations-cam",
    "still", {
@@ -48,6 +48,8 @@ DefineIcon({
 	Size = {46, 38},
 	Frame = 0,
 	File = "elites/build/camera_b.png"})
+
+MakeSound("camera-selected", "elites/buildings/sfx_camera.select.wav")
 
 DefineConstruction("construction-cam", {
         Constructions = {
@@ -77,7 +79,7 @@ DefineUnitType("unit-cam", {
         Corpse = {"camera_destroyed", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
         VisibleUnderFog = true,
-        Sounds = {}
+        Sounds = {"selected", "camera-selected"}
         })
 
 DefineUnitType("camera_destroyed", {
