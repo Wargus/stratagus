@@ -102,7 +102,7 @@
 <a href="#set-speed-train!">set-speed-train!</a>
 <a href="#set-speed-upgrade!">set-speed-upgrade!</a>
 <a href="#set-speeds!">set-speeds!</a>
-<a href="#set-title-screen!">set-title-screen!</a>
+<a href="#set-title-screens!">set-title-screens!</a>
 <a href="#set-training-queue!">set-training-queue!</a>
 <a href="#set-xp-damage!">set-xp-damage!</a>
 <a href="#shadow-sprite">shadow-sprite</a>
@@ -1311,16 +1311,20 @@ Set all speeds.
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
-<a name="set-title-screen!"></a>
-<h3>(set-title-screen! image)</h3>
+<a name="set-title-screens!"></a>
+<h3>(set-title-screens! (image music) ...)</h3>
 
-Change the default title screen.
+Change the default title screens.
 
 
 <dl>
 <dt>image</dt>
-<dd>Image to be displayed as title screen, this is the first screen 
+<dd>Image or video to be displayed as title screen, this is the first screen 
 displayed. The image should be a png file with 640x480 8-bit indexed colormap.
+</dd>
+<dt>music</dt>
+<dd>Optional music to be played with the image or video.  Use "none" to stop
+previously playing music.
 </dd>
 </dl>
 
@@ -1328,7 +1332,8 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 
 <pre>
     ;; This is the default title displayed.
-    (set-title-screen! "graphics/ui/stratagus.png")
+    (set-title-screens!
+      '("graphics/ui/stratagus.png" "music/default.mod"))
 </pre>
 
 <h4>Used</h4>
