@@ -297,7 +297,6 @@ global int PlayCDRom(int name)
 {
     int i;
     int data_cd;
-    int track;
 
     if (CDMode == CDModeOff) {
         if (cd_init()) {
