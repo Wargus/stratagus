@@ -3325,7 +3325,11 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     //
     if( !type->Coward ) {
 	if( type->CanAttack && target->Stats->Speed ) {
-	    goal=AttackUnitsInReactRange(target);
+	    if( RevealAttacker && CanTarget(target->Type,attacker->Type)) {  // Reveal Unit that is attacking
+		goal=attacker;
+	    } else {
+		goal=AttackUnitsInReactRange(target);
+	    }
 	    if( goal ) {
 		if( target->SavedOrder.Action==UnitActionStill ) {
 		    // FIXME: should rewrite command handling
