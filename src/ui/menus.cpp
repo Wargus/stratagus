@@ -237,17 +237,17 @@ local void TerminateNetConnect(void);
 
 local void StartEditor(void);
 local void EditorNewMap(void);
-local void EditorLoadMap(void);
-local void EditorLoadInit(Menuitem *mi);
-local void EditorLoadLBInit(Menuitem *mi);
-local void EditorLoadLBExit(Menuitem *mi);
-local void EditorLoadFolder(void);
-local int EditorLoadRDFilter(char *pathbuf, FileList *fl);
-local void EditorLoadLBAction(Menuitem *mi, int i);
-local unsigned char *EditorLoadLBRetrieve(Menuitem *mi, int i);
-local void EditorLoadOk(void);
-local void EditorLoadCancel(void);
-local void EditorLoadVSAction(Menuitem *mi, int i);
+local void EditorMainLoadMap(void);
+local void EditorMainLoadInit(Menuitem *mi);
+local void EditorMainLoadLBInit(Menuitem *mi);
+local void EditorMainLoadLBExit(Menuitem *mi);
+local void EditorMainLoadFolder(void);
+local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl);
+local void EditorMainLoadLBAction(Menuitem *mi, int i);
+local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i);
+local void EditorMainLoadOk(void);
+local void EditorMainLoadCancel(void);
+local void EditorMainLoadVSAction(Menuitem *mi, int i);
 local void EditorMapProperties(void);
 local void EditorPlayerProperties(void);
 local void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
@@ -260,6 +260,16 @@ local void EditorEditResourceCancel(void);
 local void EditorEditAiPropertiesGem(Menuitem *mi);
 local void EditorEditAiPropertiesOk(void);
 local void EditorEditAiPropertiesCancel(void);
+local void EditorSaveLBInit(Menuitem *mi);
+local void EditorSaveLBExit(Menuitem *mi);
+local void EditorSaveFolder(void);
+local int EditorSaveRDFilter(char *pathbuf, FileList *fl);
+local void EditorSaveLBAction(Menuitem *mi, int i);
+local unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i);
+local void EditorSaveVSAction(Menuitem *mi, int i);
+local void EditorSaveEnterAction(Menuitem *mi, int key);
+local void EditorSaveOk(void);
+local void EditorSaveCancel(void);
 local void EditorQuitMenu(void);
 
 /*----------------------------------------------------------------------------
@@ -280,7 +290,7 @@ extern char NameLine[];
 
 local int GameLoaded;
 local int GuiGameStarted;
-local int EditorLoadCancelled;
+local int EditorCancelled;
 
 /**
 **	Other client and server selection state for Multiplayer clients
@@ -505,18 +515,18 @@ global void InitMenuFuncHash(void) {
 
 // Editor select
     HASHADD(EditorNewMap,"editor-new-map");
-    HASHADD(EditorLoadMap,"editor-load-map");
+    HASHADD(EditorMainLoadMap,"editor-main-load-map");
 
-// Editor load map
-    HASHADD(EditorLoadInit,"editor-load-init");
-    HASHADD(EditorLoadLBInit,"editor-load-lb-init");
-    HASHADD(EditorLoadLBExit,"editor-load-lb-exit");
-    HASHADD(EditorLoadLBAction,"editor-load-lb-action");
-    HASHADD(EditorLoadLBRetrieve,"editor-load-lb-retrieve");
-    HASHADD(EditorLoadVSAction,"editor-load-vs-action");
-    HASHADD(EditorLoadOk,"editor-load-ok");
-    HASHADD(EditorLoadCancel,"editor-load-cancel");
-    HASHADD(EditorLoadFolder,"editor-load-folder");
+// Editor main load map
+    HASHADD(EditorMainLoadInit,"editor-main-load-init");
+    HASHADD(EditorMainLoadLBInit,"editor-main-load-lb-init");
+    HASHADD(EditorMainLoadLBExit,"editor-main-load-lb-exit");
+    HASHADD(EditorMainLoadLBAction,"editor-main-load-lb-action");
+    HASHADD(EditorMainLoadLBRetrieve,"editor-main-load-lb-retrieve");
+    HASHADD(EditorMainLoadVSAction,"editor-main-load-vs-action");
+    HASHADD(EditorMainLoadOk,"editor-main-load-ok");
+    HASHADD(EditorMainLoadCancel,"editor-main-load-cancel");
+    HASHADD(EditorMainLoadFolder,"editor-main-load-folder");
     HASHADD(EditorMapProperties,"menu-editor-map-properties");
     HASHADD(EditorEnterMapDescriptionAction,"editor-enter-map-description-action");
     HASHADD(EditorPlayerProperties,"menu-editor-player-properties");
@@ -542,6 +552,18 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorEditAiPropertiesGem,"editor-edit-ai-properties-gem");
     HASHADD(EditorEditAiPropertiesOk,"editor-edit-ai-properties-ok");
     HASHADD(EditorEditAiPropertiesCancel,"editor-edit-ai-properties-cancel");
+
+// Editor save
+    HASHADD(EditorSave,"editor-save");
+    HASHADD(EditorSaveLBInit,"editor-save-lb-init");
+    HASHADD(EditorSaveLBExit,"editor-save-lb-exit");
+    HASHADD(EditorSaveFolder,"editor-save-folder");
+    HASHADD(EditorSaveLBAction,"editor-save-lb-action");
+    HASHADD(EditorSaveLBRetrieve,"editor-save-lb-retrieve");
+    HASHADD(EditorSaveVSAction,"editor-save-vs-action");
+    HASHADD(EditorSaveEnterAction,"editor-save-enter-action");
+    HASHADD(EditorSaveOk,"editor-save-ok");
+    HASHADD(EditorSaveCancel,"editor-save-cancel");
 }
 
 /*----------------------------------------------------------------------------
@@ -4218,15 +4240,16 @@ local void EditorNewMap(void)
     EndMenu();
 }
 
-local void EditorLoadMap(void)
+local void EditorMainLoadMap(void)
 {
     char *p;
+    char *s;
 
-    EditorLoadCancelled=0;
-    ProcessMenu("menu-editor-load-map", 1);
+    EditorCancelled=0;
+    ProcessMenu("menu-editor-main-load-map", 1);
     GetInfoFromSelectPath();
 
-    if (EditorLoadCancelled) {
+    if (EditorCancelled) {
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
@@ -4238,13 +4261,14 @@ local void EditorLoadMap(void)
     VideoUnlockScreen();
 
     if (ScenSelectPath[0]) {
-	strcat(ScenSelectPath, "/");
-	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
+	s = ScenSelectPath + strlen(ScenSelectPath);
+	*s = '/';
+	strcpy(s+1, ScenSelectFileName);	// Final map name with path
 	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
 	strcpy(CurrentMapPath, p);
+	*s = '\0';
     } else {
 	strcpy(CurrentMapPath, ScenSelectFileName);
-	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
     }
 
     // FIXME: Use EditorRunning and main-loop.
@@ -4253,15 +4277,15 @@ local void EditorLoadMap(void)
 }
 
 #ifdef OLD_MENU
-local void EditorLoadInit(Menuitem *mi __attribute__((unused)))
+local void EditorMainLoadInit(Menuitem *mi __attribute__((unused)))
 #else
-local void EditorLoadInit(Menuitem *mi)
+local void EditorMainLoadInit(Menuitem *mi)
 #endif
 {
     Menu *menu;
 
 #ifdef OLD_MENU
-    menu = FindMenu("menu-editor-load-map");
+    menu = FindMenu("menu-editor-main-load-map");
 #else
     menu = mi->menu;
 #endif
@@ -4272,25 +4296,25 @@ local void EditorLoadInit(Menuitem *mi)
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 }
 
-local void EditorLoadLBInit(Menuitem *mi)
+local void EditorMainLoadLBInit(Menuitem *mi)
 {
     Menu *menu;
     int i;
 
 #ifdef OLD_MENU
-    menu = FindMenu("menu-editor-load-map");
+    menu = FindMenu("menu-editor-main-load-map");
 #else
     menu = mi->menu;
 #endif
-    EditorLoadLBExit(mi);
-    i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorLoadRDFilter,
+    EditorMainLoadLBExit(mi);
+    i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorMainLoadRDFilter,
 	(FileList **)&(mi->d.listbox.options));
 
     if (i == 0) {
 	menu->items[3].d.button.text = "OK";
 	menu->items[3].flags |= MenuButtonDisabled;
     } else {
-	EditorLoadLBAction(mi, 0);
+	EditorMainLoadLBAction(mi, 0);
 	menu->items[3].flags &= ~MenuButtonDisabled;
 	if (i > 5) {
 	    mi[1].flags &= ~MenuButtonDisabled;
@@ -4298,7 +4322,7 @@ local void EditorLoadLBInit(Menuitem *mi)
     }
 }
 
-local void EditorLoadLBExit(Menuitem *mi)
+local void EditorMainLoadLBExit(Menuitem *mi)
 {
     FileList *fl;
 
@@ -4312,7 +4336,7 @@ local void EditorLoadLBExit(Menuitem *mi)
     }
 }
 
-local int EditorLoadRDFilter(char *pathbuf, FileList *fl)
+local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
     char *suf;
@@ -4375,13 +4399,13 @@ usezzf:
     return 0;
 }
 
-local void EditorLoadFolder(void)
+local void EditorMainLoadFolder(void)
 {
     Menu *menu;
     Menuitem *mi;
     char *cp;
 
-    menu = FindMenu("menu-editor-load-map");
+    menu = FindMenu("menu-editor-main-load-map");
     mi = &menu->items[1];
 
     if (ScenSelectDisplayPath[0]) {
@@ -4396,7 +4420,7 @@ local void EditorLoadFolder(void)
 	cp = strrchr(ScenSelectPath, '/');
 	if (cp) {
 	    *cp = 0;
-	    EditorLoadLBInit(mi);
+	    EditorMainLoadLBInit(mi);
 	    mi->d.listbox.cursel = -1;
 	    mi->d.listbox.startline = 0;
 	    mi->d.listbox.curopt = 0;
@@ -4407,14 +4431,14 @@ local void EditorLoadFolder(void)
     }
 }
 
-local void EditorLoadOk(void)
+local void EditorMainLoadOk(void)
 {
     Menu *menu;
     Menuitem *mi;
     FileList *fl;
     int i;
 
-    menu = FindMenu("menu-editor-load-map");
+    menu = FindMenu("menu-editor-main-load-map");
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
@@ -4429,7 +4453,7 @@ local void EditorLoadOk(void)
 		strcat(ScenSelectDisplayPath, "/");
 	    }
 	    strcat(ScenSelectDisplayPath, fl[i].name);
-	    EditorLoadLBInit(mi);
+	    EditorMainLoadLBInit(mi);
 	    mi->d.listbox.cursel = -1;
 	    mi->d.listbox.startline = 0;
 	    mi->d.listbox.curopt = 0;
@@ -4443,11 +4467,11 @@ local void EditorLoadOk(void)
     }
 }
 
-local void EditorLoadCancel(void)
+local void EditorMainLoadCancel(void)
 {
     char* s;
 
-    EditorLoadCancelled=1;
+    EditorCancelled=1;
 
     //
     //  Use last selected map.
@@ -4474,7 +4498,7 @@ local void EditorLoadCancel(void)
     EndMenu();
 }
 
-local unsigned char *EditorLoadLBRetrieve(Menuitem *mi, int i)
+local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
     Menu *menu;
@@ -4488,7 +4512,7 @@ local unsigned char *EditorLoadLBRetrieve(Menuitem *mi, int i)
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
 #ifdef OLD_MENU
-		    menu = FindMenu("menu-editor-load-map");
+		    menu = FindMenu("menu-editor-main-load-map");
 #else
 		    menu = mi->menu;
 #endif
@@ -4520,13 +4544,13 @@ local unsigned char *EditorLoadLBRetrieve(Menuitem *mi, int i)
     return NULL;
 }
 
-local void EditorLoadLBAction(Menuitem *mi, int i)
+local void EditorMainLoadLBAction(Menuitem *mi, int i)
 {
     Menu *menu;
     FileList *fl;
 
 #ifdef OLD_MENU
-    menu = FindMenu("menu-editor-load-map");
+    menu = FindMenu("menu-editor-main-load-map");
 #else
     menu = mi->menu;
 #endif
@@ -4545,7 +4569,7 @@ local void EditorLoadLBAction(Menuitem *mi, int i)
     }
 }
 
-local void EditorLoadVSAction(Menuitem *mi, int i)
+local void EditorMainLoadVSAction(Menuitem *mi, int i)
 {
     int op, d1, d2;
 
@@ -4572,7 +4596,7 @@ local void EditorLoadVSAction(Menuitem *mi, int i)
 		    MustRedraw |= RedrawMenu;
 		}
 	    }
-	    EditorLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    EditorMainLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
 		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
@@ -4620,7 +4644,7 @@ local void EditorLoadVSAction(Menuitem *mi, int i)
 		DebugCheck(mi->d.listbox.startline < 0);
 		DebugCheck(mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
-		EditorLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		EditorMainLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -4936,6 +4960,362 @@ local void EditorEditAiPropertiesCancel(void)
     GameMenuReturn();
 }
 
+/**
+**
+*/
+global int EditorSave(void)
+{
+    Menu *menu;
+    char path[PATH_MAX];
+    char *s;
+    char *p;
+
+    menu = FindMenu("menu-editor-save");
+
+    EditorCancelled = 0;
+
+    menu->items[3].d.input.buffer = path;
+    menu->items[3].d.input.maxch = PATH_MAX - 4;
+
+    DebugCheck(!*ScenSelectPath);
+    menu->items[6].flags =
+	*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
+    menu->items[6].d.button.text = ScenSelectDisplayPath;
+    DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+
+    ProcessMenu("menu-editor-save", 1);
+
+    if (!EditorCancelled) {
+	sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
+	EditorSavePud(path);
+	s = ScenSelectPath + strlen(ScenSelectPath);
+	*s = '/';
+	strcpy(s+1, ScenSelectFileName);	// Final map name with path
+	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
+	strcpy(CurrentMapPath, p);
+	*s = '\0';
+	return 1;
+    }
+    return 0;
+}
+
+local void EditorSaveLBInit(Menuitem *mi)
+{
+    Menu *menu;
+    int i;
+
+#ifdef OLD_MENU
+    menu = FindMenu("menu-editor-save");
+#else
+    menu = mi->menu;
+#endif
+    EditorSaveLBExit(mi);
+    i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorSaveRDFilter,
+	(FileList **)&(mi->d.listbox.options));
+
+    if (i == 0) {
+	menu->items[4].d.button.text = "Save";
+	menu->items[4].flags |= MenuButtonDisabled;
+    } else {
+	EditorSaveLBAction(mi, 0);
+	sprintf(menu->items[3].d.input.buffer, "%s~!_", ScenSelectFileName);
+	menu->items[3].d.input.nch = strlen(menu->items[3].d.input.buffer) - 3;
+	menu->items[4].flags &= ~MenuButtonDisabled;
+	if (i > 5) {
+	    mi[1].flags &= ~MenuButtonDisabled;
+	}
+    }
+}
+
+local void EditorSaveLBExit(Menuitem *mi)
+{
+    FileList *fl;
+
+    if (mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	free(fl);
+	mi->d.listbox.options = NULL;
+	mi->d.listbox.noptions = 0;
+	mi[1].flags |= MenuButtonDisabled;
+    }
+}
+
+local int EditorSaveRDFilter(char *pathbuf, FileList *fl)
+{
+    char *suf;
+    char *np, *cp, *lcp;
+#ifdef USE_ZZIPLIB
+    int sz;
+    ZZIP_FILE *zzf;
+#endif
+
+    suf = ".pud";
+    np = strrchr(pathbuf, '/');
+    if (np) {
+	np++;
+    } else {
+	np = pathbuf;
+    }
+    cp = np;
+    cp--;
+    fl->type = -1;
+#ifdef USE_ZZIPLIB
+    if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
+	sz = zzip_file_real(zzf);
+	zzip_close(zzf);
+	if (!sz) {
+	    goto usezzf;
+	}
+    }
+#endif
+    do {
+	lcp = cp++;
+	cp = strcasestr(cp, suf);
+    } while (cp != NULL);
+    if (lcp >= np) {
+	cp = lcp + strlen(suf);
+#ifdef USE_ZLIB
+	if (strcmp(cp, ".gz") == 0) {
+	    *cp = 0;
+	}
+#endif
+#ifdef USE_BZ2LIB
+	if (strcmp(cp, ".bz2") == 0) {
+	    *cp = 0;
+	}
+#endif
+	if (*cp == 0) {
+#ifdef USE_ZZIPLIB
+usezzf:
+#endif
+	    if (strcasestr(pathbuf, ".pud")) {
+		fl->type = 1;
+		fl->name = strdup(np);
+		return 1;
+	    }
+	}
+    }
+    return 0;
+}
+
+local void EditorSaveFolder(void)
+{
+    Menu *menu;
+    Menuitem *mi;
+    char *cp;
+
+    menu = FindMenu("menu-editor-save");
+    mi = &menu->items[1];
+
+    if (ScenSelectDisplayPath[0]) {
+	cp = strrchr(ScenSelectDisplayPath, '/');
+	if (cp) {
+	    *cp = 0;
+	} else {
+	    ScenSelectDisplayPath[0] = 0;
+	    menu->items[6].flags |= MenuButtonDisabled;
+	    menu->items[6].d.button.text = NULL;
+	}
+	cp = strrchr(ScenSelectPath, '/');
+	if (cp) {
+	    *cp = 0;
+	    EditorSaveLBInit(mi);
+	    mi->d.listbox.cursel = -1;
+	    mi->d.listbox.startline = 0;
+	    mi->d.listbox.curopt = 0;
+	    mi[1].d.vslider.percent = 0;
+	    MustRedraw |= RedrawMenu;
+	}
+    }
+}
+
+/**
+**
+*/
+local void EditorSaveOk(void)
+{
+    Menu *menu;
+    Menuitem *mi;
+    FileList *fl;
+    int i;
+
+    menu = FindMenu("menu-editor-save");
+    mi = &menu->items[1];
+    i = mi->d.listbox.curopt + mi->d.listbox.startline;
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type == 0) {
+	    strcat(ScenSelectPath, "/");
+	    strcat(ScenSelectPath, fl[i].name);
+	    if (menu->items[6].flags&MenuButtonDisabled) {
+		menu->items[6].flags &= ~MenuButtonDisabled;
+		menu->items[6].d.button.text = ScenSelectDisplayPath;
+	    } else {
+		strcat(ScenSelectDisplayPath, "/");
+	    }
+	    strcat(ScenSelectDisplayPath, fl[i].name);
+	    EditorSaveLBInit(mi);
+	    mi->d.listbox.cursel = -1;
+	    mi->d.listbox.startline = 0;
+	    mi->d.listbox.curopt = 0;
+	    mi[1].d.vslider.percent = 0;
+	    MustRedraw |= RedrawMenu;
+	} else {
+	    strcpy(ScenSelectFileName, menu->items[3].d.input.buffer);	// Final map name
+	    ScenSelectFileName[strlen(ScenSelectFileName)-3] = '\0';
+	    if (!strcasestr(ScenSelectFileName, ".pud\0")) {
+		strcat(ScenSelectFileName, ".pud");
+	    }
+	    EditorEndMenu();
+	}
+    }
+}
+
+/**
+**
+*/
+local void EditorSaveCancel(void)
+{
+    EditorCancelled = 1;
+    EditorEndMenu();
+}
+
+local unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i)
+{
+    FileList *fl;
+    static char buffer[1024];
+
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type) {
+	    strcpy(buffer, "   ");
+	} else {
+	    strcpy(buffer, "\260 ");
+	}
+	strcat(buffer, fl[i].name);
+	return buffer;
+    }
+    return NULL;
+}
+
+local void EditorSaveLBAction(Menuitem *mi, int i)
+{
+    Menu *menu;
+    FileList *fl;
+
+#ifdef OLD_MENU
+    menu = FindMenu("menu-editor-save");
+#else
+    menu = mi->menu;
+#endif
+    DebugCheck(i<0);
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type) {
+	    sprintf(menu->items[3].d.input.buffer, "%s~!_", fl[i].name);
+	    menu->items[3].d.input.nch = strlen(menu->items[3].d.input.buffer) - 3;
+	    menu->items[4].d.button.text = "Save";
+	} else {
+	    strcpy(menu->items[3].d.input.buffer, "~!_");
+	    menu->items[3].d.input.nch = strlen(menu->items[3].d.input.buffer) - 3;
+	    menu->items[4].d.button.text = "Open";
+	}
+	if (mi->d.listbox.noptions > 5) {
+	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
+	}
+    }
+}
+
+local void EditorSaveVSAction(Menuitem *mi, int i)
+{
+    int op, d1, d2;
+
+    mi--;
+    switch (i) {
+	case 0:		// click - down
+	case 2:		// key - down
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		    mi->d.listbox.curopt++;
+		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+			mi->d.listbox.curopt--;
+			mi->d.listbox.startline++;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    mi->d.listbox.curopt--;
+		    if (mi->d.listbox.curopt < 0) {
+			mi->d.listbox.curopt++;
+			mi->d.listbox.startline--;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    }
+	    EditorSaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    if (i == 2) {
+		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
+	    }
+	    break;
+	case 1:		// mouse - move
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+			for (;;) {
+			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
+				 (mi->d.listbox.noptions - 1);
+			    d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
+			    d2 = op - mi[1].d.vslider.curper;
+			    if (d2 >= d1)
+				break;
+			    mi->d.listbox.curopt++;
+			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+				mi->d.listbox.curopt--;
+				mi->d.listbox.startline++;
+			    }
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+				break;
+			}
+		    }
+		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+			for (;;) {
+			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
+				     (mi->d.listbox.noptions - 1);
+			    d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
+			    d2 = mi[1].d.vslider.curper - op;
+			    if (d2 >= d1)
+				break;
+			    mi->d.listbox.curopt--;
+			    if (mi->d.listbox.curopt < 0) {
+				mi->d.listbox.curopt++;
+				mi->d.listbox.startline--;
+			    }
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+				break;
+			}
+		    }
+		}
+
+		DebugCheck(mi->d.listbox.startline < 0);
+		DebugCheck(mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+
+		EditorSaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		MustRedraw |= RedrawMenu;
+	    }
+	    break;
+	default:
+	    break;
+    }
+}
+
+local void EditorSaveEnterAction(Menuitem *mi __attribute__ ((unused)), int key)
+{
+    if (key==10 || key==13) {
+	EditorSaveOk();
+    }
+}
 
 /**
 **	Called from menu, to quit editor to menu.

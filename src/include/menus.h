@@ -330,6 +330,9 @@ extern void EditorEditResource(void);
     /// Edit ai properties
 extern void EditorEditAiProperties(void);
 
+    /// Save map from the editor
+extern int EditorSave(void);
+
 //@}
 
 #endif	// !__MENUS_H__
