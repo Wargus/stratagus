@@ -344,6 +344,9 @@ global void CleanButtons(void)
 	if (UnitButtonTable[z]->ValueStr) {
 	    free(UnitButtonTable[z]->ValueStr);
 	}
+	if (UnitButtonTable[z]->AllowStr) {
+	    free(UnitButtonTable[z]->AllowStr);
+	}
 	if (UnitButtonTable[z]->Hint) {
 	    free(UnitButtonTable[z]->Hint);
 	}
