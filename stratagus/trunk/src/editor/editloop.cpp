@@ -87,7 +87,7 @@ local char TileToolDecoration;		/// Tile tool draws with decorations
 local int TileCursorSize;		/// Tile cursor size 1x1 2x2 ... 4x4
 local int TileCursor;			/// Tile type number
 
-local int MirrorEdit = 0;                   /// Mirror editing enabled
+local int MirrorEdit = 0;		/// Mirror editing enabled
 local int UnitPlacedThisPress = 0;	///Only allow one unit per press
 
 enum _mode_buttons_ {

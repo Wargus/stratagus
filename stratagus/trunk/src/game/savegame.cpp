@@ -59,6 +59,7 @@
 #include "trigger.h"
 #include "settings.h"
 #include "iolib.h"
+#include "spells.h"
 
 #include "ccl.h"
 
@@ -134,11 +135,13 @@ global void SaveGame(const char* filename)
     SaveTilesets(file);
     SaveConstructions(file);
     SaveDecorations(file);
+    SaveMissileTypes(file);
+    SaveUnitTypeDefs(file);
+    SaveSpells(file);
     SaveUnitTypes(file);
     SaveUpgrades(file);
     SaveDependencies(file);
     SaveButtons(file);
-    SaveMissileTypes(file);
     SavePlayers(file);
     SaveMap(file);
     SaveUnits(file);

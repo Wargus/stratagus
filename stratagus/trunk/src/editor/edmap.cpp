@@ -168,6 +168,8 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
     int j;
     int n;
 
+    DebugLevel0Fn("base %X goal %X\n" _C_ base _C_ goal);
+
     //
     //  Find any mixed tile
     //
@@ -413,6 +415,8 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 **	@param x	X map tile coordinate.
 **	@param y	Y map tile coordinate.
 **	@param tile	Abstract tile type to edit.
+**
+**	@note  this is a rather dumb function, doesn't do any tile fixing.
 */
 global void ChangeTile(int x, int y, int tile)
 {
@@ -425,10 +429,10 @@ global void ChangeTile(int x, int y, int tile)
     mf->Tile = mf->SeenTile = TheMap.Tileset->Table[tile];
 }
 
-#define D_UP	8		/// Go up allowed
-#define D_DOWN	4		/// Go down allowed
-#define D_LEFT	2		/// Go left allowed
-#define D_RIGHT	1		/// Go right allowed
+#define DIR_UP		8	/// Go up allowed
+#define DIR_DOWN	4	/// Go down allowed
+#define DIR_LEFT	2	/// Go left allowed
+#define DIR_RIGHT	1	/// Go right allowed
 
 /**
 **	Editor change tile.
@@ -478,7 +482,7 @@ local void EditorTileChanged2(int x, int y, int d)
     MapField* mf;
 
     quad = QuadFromTile(x, y);
-    DebugLevel3Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
+    DebugLevel0Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
 	    TheMap.Fields[y * TheMap.Width + x].Tile);
 
     //
@@ -503,7 +507,13 @@ local void EditorTileChanged2(int x, int y, int d)
 	return;
     }
 
-    if (d&D_UP && y) {
+    // 
+    // 	How this works:
+    // 	first get the quad of the neighbouring tile, then
+    // 	check if the margin matches. otherwise, call 
+    // 	EditorChangeTile again.
+    //
+    if (d&DIR_UP && y) {
 	//
 	//      Insert into the bottom the new tile.
 	//
@@ -513,10 +523,10 @@ local void EditorTileChanged2(int x, int y, int d)
 	    DebugLevel3Fn("U+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & BH_QUAD_M, u);
 	    DebugLevel3Fn("= %08x\n" _C_ tile);
-	    EditorChangeTile(x, y - 1, tile, d&~D_DOWN);
+	    EditorChangeTile(x, y - 1, tile, d&~DIR_DOWN);
 	}
     }
-    if (d&D_DOWN && y < TheMap.Height - 1) {
+    if (d&DIR_DOWN && y < TheMap.Height - 1) {
 	//
 	//      Insert into the top the new tile.
 	//
@@ -525,10 +535,10 @@ local void EditorTileChanged2(int x, int y, int d)
 	if (u != q2) {
 	    DebugLevel3Fn("D+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & TH_QUAD_M, u);
-	    EditorChangeTile(x, y + 1, tile, d&~D_UP);
+	    EditorChangeTile(x, y + 1, tile, d&~DIR_UP);
 	}
     }
-    if (d&D_LEFT && x) {
+    if (d&DIR_LEFT && x) {
 	//
 	//      Insert into the left the new tile.
 	//
@@ -537,10 +547,10 @@ local void EditorTileChanged2(int x, int y, int d)
 	if (u != q2) {
 	    DebugLevel3Fn("L+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & RH_QUAD_M, u);
-	    EditorChangeTile(x - 1, y, tile, d&~D_RIGHT);
+	    EditorChangeTile(x - 1, y, tile, d&~DIR_RIGHT);
 	}
     }
-    if (d&D_RIGHT && x < TheMap.Width - 1) {
+    if (d&DIR_RIGHT && x < TheMap.Width - 1) {
 	//
 	//      Insert into the right the new tile.
 	//
@@ -549,7 +559,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	if (u != q2) {
 	    DebugLevel3Fn("R+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & LH_QUAD_M, u);
-	    EditorChangeTile(x + 1, y, tile, d&~D_LEFT);
+	    EditorChangeTile(x + 1, y, tile, d&~DIR_LEFT);
 	}
     }
 }

@@ -48,6 +48,7 @@
 #include "missile.h"
 #include "ccl.h"
 #include "construct.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -120,7 +121,6 @@ local SCM CclDefineUnitType(SCM list)
 	//Set some default values
 	type->_RegenerationRate=0;
     }
-
     type->NumDirections=8;
 #ifdef NEW_UI
     type->AddButtonsHook = NIL;
@@ -521,7 +521,21 @@ local SCM CclDefineUnitType(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("isundead")) ) {
 	    type->IsUndead=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-cast-spell")) ) {
-	    type->CanCastSpell=1;
+	    //
+	    //    Warning: can-cast-spell should only be used AFTER all spells
+	    //    have been defined. FIXME: MaxSpellType=500 or something?
+	    //
+	    if (!type->CanCastSpell) {
+		type->CanCastSpell=malloc(SpellTypeCount);
+		memset(type->CanCastSpell,0,SpellTypeCount);
+	    }
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		DebugLevel3Fn("%d \n" _C_ CclGetSpellByIdent(gh_car(sublist)));
+		type->CanCastSpell[CclGetSpellByIdent(gh_car(sublist))]=1;
+		sublist=gh_cdr(sublist);
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("organic")) ) {
 	    type->Organic=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("selectable-by-rectangle")) ) {

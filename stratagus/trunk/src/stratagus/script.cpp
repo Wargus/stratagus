@@ -66,6 +66,7 @@
 #include "sound_server.h"
 #include "netconnect.h"
 #include "cdaudio.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -862,6 +863,7 @@ global void InitCcl(void)
     TriggerCclRegister();
     CreditsCclRegister();
     ObjectivesCclRegister();
+	SpellCclRegister();
 
     EditorCclRegister();
 
