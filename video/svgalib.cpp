@@ -56,7 +56,7 @@
 #include "interface.h"
 #include "network.h"
 #include "ui.h"
-#include "new_video.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
