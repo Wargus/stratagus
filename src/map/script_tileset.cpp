@@ -352,7 +352,7 @@ static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	for (i = 0; i < len; ++i) {
 		lua_rawgeti(l, -1, i + 1);
 		tileset->Table[index + i] = LuaToNumber(l, -1);
-//		tt->SolidTiles[i] = tileset->Table[index + i] = LuaToNumber(l, -1);
+// tt->SolidTiles[i] = tileset->Table[index + i] = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 		tileset->FlagsTable[index + i] = f;
 		tileset->Tiles[index + i].BaseTerrain = basic_name;

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_save.c	-	Saving the map. */
+/**@name map_save.c - Saving the map. */
 //
 //      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -49,17 +49,17 @@
 #include "script.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Save the complete map.
+** Save the complete map.
 **
-**		@param file		Output file.
+** @param file Output file.
 */
 void SaveMap(CLFile* file)
 {

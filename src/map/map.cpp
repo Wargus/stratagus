@@ -181,7 +181,7 @@ void RevealMap(void)
 **  @param x        X map tile position.
 **  @param y        Y map tile position.
 **  @param offsetx  X offset in tile.
-**	@param offsety  Y offset in tile.
+**  @param offsety  Y offset in tile.
 */
 void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 {
@@ -218,7 +218,7 @@ void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 **  @param x   X map tile position.
 **  @param y   Y map tile position.
 **  @param offsetx  X offset in tile.
-**	@param offsety  Y offset in tile.
+**  @param offsety  Y offset in tile.
 */
 void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 {
