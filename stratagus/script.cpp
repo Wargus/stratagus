@@ -1043,9 +1043,6 @@ global void InitCcl(void)
 #ifdef HIERARCHIC_PATHFINDER
     gh_define("stratagus-feature-hierarchic-pathfinder", SCM_BOOL_T);
 #endif
-#ifdef SLOW_INPUT
-    gh_define("stratagus-feature-slow-input", SCM_BOOL_T);
-#endif
 #ifdef USE_FLAC
     gh_define("stratagus-feature-flac", SCM_BOOL_T);
 #endif
