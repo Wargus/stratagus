@@ -143,46 +143,13 @@ struct _graphic_;
 struct _player_;
 struct _button_style_;
 
-/**
-**  A structure describing an icon file, which could contain one or more
-**  icons. @internal use only.
-**
-**  @todo
-**    IconFile::Icons member isn't setup and used.
-*/
-typedef struct _icon_file_ {
-	char* FileName;  ///< Icon file name/path
-#if 0
-	unsigned Width;   ///< Icon width
-	unsigned Height;  ///< Icon height
-
-	/** FIXME: unsed */
-	unsigned Icons;  ///< Number of icons in this file
-#endif
-
-// --- FILLED UP ---
-	struct _graphic_* Sprite;  ///< Graphic data loaded
-#ifdef USE_OPENGL
-	struct _graphic_* PlayerColorSprite[PlayerMax];  ///< Sprites with player colors
-#endif
-} IconFile;
-
 	/// Icon: rectangle image used in menus
 typedef struct _icon_ {
 	char* Ident;    ///< Icon identifier
 	char* Tileset;  ///< Tileset identifier
 
-	IconFile* File;   ///< File containing the data
-	unsigned  Index;  ///< Index into file
-
-	int Width;   ///< Icon width
-	int Height;  ///< Icon height
-
-// --- FILLED UP ---
-	struct _graphic_* Sprite;  ///< Graphic data loaded
-#ifdef USE_OPENGL
-	struct _graphic_** PlayerColorSprite;  ///< Sprites with player colors
-#endif
+	struct _graphic_* Sprite; ///< Graphic data
+	int Frame;      ///< Frame number in graphic
 } Icon;
 
 #define NoIcon NULL  ///< used for errors == no valid icon
@@ -209,8 +176,6 @@ extern void CleanIcons(void);  ///< Cleanup icons
 
 	/// Name -> icon
 extern Icon* IconByIdent(const char* ident);
-	/// Icon -> name
-extern const char* IdentOfIcon(const Icon* icon);
 	/// Draw icon
 extern void DrawIcon(const struct _player_* player, Icon* icon, int x, int y);
 	/// Draw icon of an unit

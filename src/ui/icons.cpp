@@ -61,21 +61,10 @@ char** IconWcNames;
 static Icon** Icons;                         ///< Table of all icons.
 static int NumIcons;                         ///< Number of icons in Icons.
 
-static char** IconAliases;                   ///< Table of all aliases for icons.
-static int NumIconAliases;                   ///< Number of icons aliases in Aliases.
-
-#ifdef DOXYGEN // no real code, only for document
-
-static IconFile* IconFileHash[61];           ///< lookup table for icon file names
-
-static Icon* IconHash[61];                   ///< lookup table for icon names
-
+#ifdef DOXYGEN // no real code, only for docs
+static Icon* IconHash[257];                  ///< lookup table for icon names
 #else
-
-static hashtable(IconFile*, 61) IconFileHash;/// lookup table for icon file names
-
-static hashtable(Icon*, 61) IconHash;        /// lookup table for icon names
-
+static hashtable(Icon*, 257) IconHash;       /// lookup table for icon names
 #endif
 
 /*----------------------------------------------------------------------------
@@ -91,29 +80,15 @@ static hashtable(Icon*, 61) IconHash;        /// lookup table for icon names
 **  @param tileset  Optional tileset identifier.
 **  @param width    Icon width.
 **  @param height   Icon height.
-**  @param index    Index into file.
+**  @param frame    Frame number in graphic.
 **  @param file     Graphic file containing the icons.
 */
 static void AddIcon(const char* ident, const char* tileset,
-	int index, int width, int height, const char* file)
+	int frame, int width, int height, const char* file)
 {
-	IconFile** ptr;
 	char* str;
-	IconFile* iconfile;
+	Icon** ptr;
 	Icon* icon;
-
-	//
-	//  Look up graphic file
-	//
-	ptr = (IconFile**)hash_find(IconFileHash, file);
-	if (ptr && *ptr) {
-		iconfile = *ptr;
-	} else {  // new file
-		iconfile = malloc(sizeof(IconFile));
-		iconfile->FileName = strdup(file);
-		iconfile->Sprite = NULL;
-		*(IconFile**)hash_add(IconFileHash, iconfile->FileName) = iconfile;
-	}
 
 	//
 	//  Look up icon
@@ -123,7 +98,7 @@ static void AddIcon(const char* ident, const char* tileset,
 	} else {
 		str = strdup(ident);
 	}
-	ptr = (IconFile**)hash_find(IconHash, str);
+	ptr = (Icon**)hash_find(IconHash, str);
 	if (ptr && *ptr) {
 		DebugPrint("FIXME: Icon already defined `%s,%s'\n" _C_
 			ident _C_ tileset);
@@ -134,18 +109,13 @@ static void AddIcon(const char* ident, const char* tileset,
 		icon = malloc(sizeof(Icon));
 		icon->Ident = strdup(ident);
 		icon->Tileset = tileset ? strdup(tileset) : NULL;
-		icon->File = iconfile;
-		icon->Index = index;
-
-		icon->Width = width;
-		icon->Height = height;
-
-		icon->Sprite = NULL;
+		icon->Sprite = NewGraphic(file, width, height);
+		icon->Frame = frame;
 
 		*(Icon**)hash_add(IconHash, str) = icon;
 		free(str);
 	}
-	Icons = realloc(Icons, sizeof(Icon *) * (NumIcons + 1));
+	Icons = realloc(Icons, sizeof(Icon*) * (NumIcons + 1));
 	Icons[NumIcons++] = icon;
 }
 
@@ -167,23 +137,10 @@ void InitIcons(void)
 			*(Icon**)hash_add(IconHash, Icons[i]->Ident) = Icons[i];
 		}
 	}
-
-	//
-	//  Aliases: different names for the same thing
-	//
-	for (i = 0; i < NumIconAliases; ++i) {
-		Icon* id;
-
-		id = IconByIdent(IconAliases[i * 2 + 1]);
-		Assert(id != NoIcon);
-
-		*(Icon**)hash_add(IconHash, IconAliases[i * 2 + 0]) = id;
-	}
 }
 
 /**
-**  Load the graphics for the icons. Graphic data is only loaded once
-**  and then shared.
+**  Load the graphics for the icons.
 */
 void LoadIcons(void)
 {
@@ -199,21 +156,14 @@ void LoadIcons(void)
 		// If tileset only fitting tileset.
 		if (!icon->Tileset || !strcmp(icon->Tileset, TheMap.TerrainName)) {
 			// File already loaded?
-			if (!icon->File->Sprite) {
-				char* buf;
-				char* file;
-
-				file = icon->File->FileName;
-				buf = alloca(strlen(file) + 9 + 1);
-				file = strcat(strcpy(buf, "graphics/"), file);
-				ShowLoadProgress("Icons %s", file);
-				icon->File->Sprite = LoadSprite(file, icon->Width, icon->Height);
+			if (!GraphicLoaded(icon->Sprite)) {
+				LoadGraphic(icon->Sprite);
+				ShowLoadProgress("Icons %s", icon->Sprite->File);
 			}
-			icon->Sprite = icon->File->Sprite;
-			if (icon->Index >= (unsigned)icon->Sprite->NumFrames) {
-				DebugPrint("Invalid icon index: %s - %d\n" _C_
-					icon->Ident _C_ icon->Index);
-				icon->Index = 0;
+			if (icon->Frame >= icon->Sprite->NumFrames) {
+				DebugPrint("Invalid icon frame: %s - %d\n" _C_
+					icon->Ident _C_ icon->Frame);
+				icon->Frame = 0;
 			}
 		}
 	}
@@ -225,9 +175,6 @@ void LoadIcons(void)
 void CleanIcons(void)
 {
 	char** ptr;
-	IconFile** table;
-	IconFile** iptr;
-	int n;
 	int i;
 
 	//
@@ -245,62 +192,28 @@ void CleanIcons(void)
 	//  Icons
 	//
 	if (Icons) {
-		table = alloca(NumIcons * sizeof(IconFile*));
-		n = 0;
-		for (i = 0; i < NumIcons; ++i) {
-			char* str;
+		char* str;
 
+		str = alloca(1024);
+		for (i = 0; i < NumIcons; ++i) {
 			//
 			//  Remove long hash and short hash
 			//
 			if (Icons[i]->Tileset) {
-				str = strdcat(Icons[i]->Ident, Icons[i]->Tileset);
+				strcat(strcpy(str, Icons[i]->Ident), Icons[i]->Tileset);
 				hash_del(IconHash, str);
-				free(str);
 				free(Icons[i]->Tileset);
 			}
 			hash_del(IconHash, Icons[i]->Ident);
 
 			free(Icons[i]->Ident);
-
-			iptr = (IconFile**)hash_find(IconFileHash, Icons[i]->File->FileName);
-			if (iptr && *iptr) {
-				table[n++] = *iptr;
-				*iptr = NULL;
-			}
-
+//			FreeGraphic(Icons[i]->Sprite);
 			free(Icons[i]);
 		}
 
 		free(Icons);
 		Icons = NULL;
 		NumIcons = 0;
-
-		//
-		//  Handle the icon files.
-		//
-		for (i = 0; i < n; ++i) {
-			hash_del(IconFileHash, table[i]->FileName);
-			free(table[i]->FileName);
-			VideoSafeFree(table[i]->Sprite);
-
-			free(table[i]);
-		}
-	}
-
-	//
-	//  Icons aliases
-	//
-	if (IconAliases) {
-		for (i = 0; i < NumIconAliases; ++i) {
-			hash_del(IconHash, IconAliases[i * 2 + 0]);
-			free(IconAliases[i * 2 + 0]);
-			free(IconAliases[i * 2 + 1]);
-		}
-
-		free(IconAliases);
-		IconAliases = NULL;
-		NumIconAliases = 0;
 	}
 }
 
@@ -326,20 +239,6 @@ Icon* IconByIdent(const char* ident)
 }
 
 /**
-**  Get the identifier of an icon.
-**
-**  @param icon  Icon pointer
-**
-**  @return      The identifier for the icon
-*/
-const char* IdentOfIcon(const Icon* icon)
-{
-	Assert(icon);
-
-	return icon->Ident;
-}
-
-/**
 **  Draw icon on x,y.
 **
 **  @param player  Player pointer used for icon colors
@@ -355,7 +254,7 @@ void DrawIcon(const Player* player, Icon* icon, int x, int y)
 	}
 #endif
 	GraphicPlayerPixels(player, icon->Sprite);
-	VideoDrawPlayerColorClip(icon->Sprite, player->Player, icon->Index, x, y);
+	VideoDrawPlayerColorClip(icon->Sprite, player->Player, icon->Frame, x, y);
 }
 
 /**
@@ -377,7 +276,7 @@ void DrawUnitIcon(const Player* player, ButtonStyle* style, Icon* icon,
 	s.Default.Sprite = s.Hover.Sprite = s.Selected.Sprite =
 		s.Clicked.Sprite = s.Disabled.Sprite = icon->Sprite;
 	s.Default.Frame = s.Hover.Frame = s.Selected.Frame =
-		s.Clicked.Frame = s.Disabled.Frame = icon->Index;
+		s.Clicked.Frame = s.Disabled.Frame = icon->Frame;
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
 		s.Default.BorderColorRGB = TheUI.ButtonAutoCastBorderColorRGB;
 		s.Default.BorderColor = 0;
@@ -399,12 +298,12 @@ static int CclDefineIcon(lua_State* l)
 	const char* filename;
 	int width;
 	int height;
-	int index;
+	int frame;
 
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	width = height = index = 0;
+	width = height = frame = 0;
 	ident = tileset = filename = NULL;
 
 	lua_pushnil(l);
@@ -426,8 +325,8 @@ static int CclDefineIcon(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "File")) {
 			filename = LuaToString(l, -1);
-		} else if (!strcmp(value, "Index")) {
-			index = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Frame")) {
+			frame = LuaToNumber(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -436,25 +335,7 @@ static int CclDefineIcon(lua_State* l)
 
 	Assert(ident && filename && width && height);
 
-	AddIcon(ident, tileset, index, width, height, filename);
-
-	return 0;
-}
-
-/**
-**  Parse icon alias definition.
-**
-**  @todo  Should check if alias is free and icon already defined.
-*/
-static int CclDefineIconAlias(lua_State* l)
-{
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	IconAliases = realloc(IconAliases, sizeof(char*) * 2 * (NumIconAliases + 1));
-	IconAliases[NumIconAliases * 2 + 0] = strdup(LuaToString(l, 1));
-	IconAliases[NumIconAliases * 2 + 1] = strdup(LuaToString(l, 2));
-	++NumIconAliases;
+	AddIcon(ident, tileset, frame, width, height, filename);
 
 	return 0;
 }
@@ -500,8 +381,6 @@ static int CclDefineIconWcNames(lua_State* l)
 void IconCclRegister(void)
 {
 	lua_register(Lua, "DefineIcon", CclDefineIcon);
-	lua_register(Lua, "DefineIconAlias", CclDefineIconAlias);
-
 	lua_register(Lua, "DefineIconWcNames", CclDefineIconWcNames);
 }
 

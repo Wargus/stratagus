@@ -374,11 +374,11 @@ static void CalculateMaxIconSize(void)
 		type = UnitTypeByIdent(EditorUnitTypes[i]);
 		Assert(type && type->Icon.Icon);
 		icon = type->Icon.Icon;
-		if (IconWidth < icon->Width) {
-			IconWidth = icon->Width;
+		if (IconWidth < icon->Sprite->Width) {
+			IconWidth = icon->Sprite->Width;
 		}
-		if (IconHeight < icon->Height) {
-			IconHeight = icon->Height;
+		if (IconHeight < icon->Sprite->Height) {
+			IconHeight = icon->Sprite->Height;
 		}
 	}
 }
@@ -666,14 +666,14 @@ static void DrawUnitIcons(void)
 			icon = UnitTypeByIdent(ShownUnitTypes[i])->Icon.Icon;
 			DrawIcon(Players + SelectedPlayer, icon, x, y);
 
-			VideoDrawRectangleClip(ColorGray, x, y, icon->Width, icon->Height);
+			VideoDrawRectangleClip(ColorGray, x, y, icon->Sprite->Width, icon->Sprite->Height);
 			if (i == SelectedUnitIndex) {
 				VideoDrawRectangleClip(ColorGreen, x + 1, y + 1,
-					icon->Width - 2, icon->Height - 2);
+					icon->Sprite->Width - 2, icon->Sprite->Height - 2);
 			}
 			if (i == CursorUnitIndex) {
 				VideoDrawRectangleClip(ColorWhite,x - 1, y - 1,
-					icon->Width + 2, icon->Height + 2);
+					icon->Sprite->Width + 2, icon->Sprite->Height + 2);
 			}
 
 			x += IconWidth + 8;
