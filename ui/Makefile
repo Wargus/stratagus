@@ -26,8 +26,8 @@
 ##
 
 TOPDIR	= ../..
-
-include $(TOPDIR)/Rules.make
+RULESFILE ?= Rules.make
+include $(TOPDIR)/$(RULESFILE)
 
 ##
 ## USER INTERFACE

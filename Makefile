@@ -26,7 +26,8 @@
 ##
 
 TOPDIR=	..
-include $(TOPDIR)/Rules.make
+RULESFILE ?= Rules.make
+include $(TOPDIR)/$(RULESFILE)
 
 OBJS=
 
@@ -37,41 +38,41 @@ all::
 	@if [ ! -d ./$(OBJDIR) ] ; then mkdir ./$(OBJDIR) ; fi
 	@set -e; for i in $(MODULES) ; do\
 	    if [ ! -d $$i/$(OBJDIR) ] ; then mkdir $$i/$(OBJDIR) ; fi ;\
-	    $(MAKE) -C $$i all ;\
+	    $(MAKE) -C $$i RULESFILE=$(RULESFILE) all ;\
 	done
 
 doc::	
-	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i doc ; done
+	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) doc ; done
 
 clean::
-	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i clean ; done
+	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clean ; done
 	$(RM) $(OBJS) $(OBJDIR)libclone.a
 	-@$(RM) $(OBJDIR)main.$(OE) $(OBJDIR)freecraftrc.$(OE)
 
 clobber::	clean
-	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i clobber ; done
+	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clobber ; done
 	$(RM) .depend tags
 
 depend::
 	@echo -n >.depend
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i depend ; done
+	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) depend ; done
 
 tags::
-	@set -e; for i in $(MODULES) ; do cd $$i ; $(MAKE) tags ; cd .. ; done
+	@set -e; for i in $(MODULES) ; do cd $$i ; $(MAKE) RULESFILE=$(RULESFILE) tags ; cd .. ; done
 
 distlist::
 	echo >>$(DISTLIST)
 	echo src/main.c  >>$(DISTLIST)
 	echo src/freecraft.rc >>$(DISTLIST)
 	echo src/Makefile >>$(DISTLIST)
-	@for i in include $(MODULES) ; do $(MAKE) -C $$i distlist ; done
+	@for i in include $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) distlist ; done
 
 ci::
-	@for i in include $(MODULES) ; do $(MAKE) -C $$i ci ; done
+	@for i in include $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) ci ; done
 	ci -l Makefile
 
 lockver::
-	@for i in include $(MODULES) ; do $(MAKE) -C $$i lockver ; done
+	@for i in include $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) lockver ; done
 	$(LOCKVER) Makefile
 
 ifeq (.depend,$(wildcard .depend))
