@@ -1309,6 +1309,52 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	    }
 	}
     }
+
+    if (MouseButtons&UpButton) {
+	if (MenuButtonUnderCursor != -1) {
+	    mi = menu->items + MenuButtonUnderCursor;
+	    switch (mi->mitype) {
+		case MI_TYPE_LISTBOX:
+		    if (mi->d.listbox.startline > 0) {
+			mi->d.listbox.startline--;
+			if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1) {
+			    mi->d.listbox.curopt++;
+			}
+			else {
+			    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)\
+				/ (mi->d.listbox.noptions - 1);
+			}
+			MustRedraw |= RedrawMenu;
+		    }
+		    break;
+		default:
+		    break;
+	    }
+	}
+    }
+
+    if (MouseButtons&DownButton) {
+	if (MenuButtonUnderCursor != -1) {
+	    mi = menu->items + MenuButtonUnderCursor;
+	    switch (mi->mitype) {
+		case MI_TYPE_LISTBOX:
+		    if (mi->d.listbox.startline < mi->d.listbox.noptions - mi->d.listbox.nlines) {
+			mi->d.listbox.startline++;
+			if (mi->d.listbox.curopt != 0) {
+			    mi->d.listbox.curopt--;
+			}
+			else {
+			    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)\
+				/ (mi->d.listbox.noptions - 1);
+			}
+			MustRedraw |= RedrawMenu;
+		    }
+		    break;
+		default:
+		    break;
+	    }
+	}
+    }
 }
 
 /**
