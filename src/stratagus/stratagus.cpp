@@ -212,6 +212,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "ai.h"
 #include "commands.h"
 #include "campaign.h"
+#include "editor.h"
 
 #ifdef DEBUG
 extern SCM CclUnits(void);
@@ -1280,6 +1281,7 @@ global int main(int argc,char** argv)
     //
     FreeCraftLibPath=FREECRAFT_LIB_PATH;
     CclStartFile="ccl/freecraft.ccl";
+    EditorStartFile="ccl/editor.ccl";
 
     memset(NetworkName, 0, 16);
     strcpy(NetworkName, "Anonymous");
@@ -1292,7 +1294,7 @@ global int main(int argc,char** argv)
     //	Parse commandline
     //
     for( ;; ) {
-	switch( getopt(argc,argv,"c:d:ef:hln:P:s:t:v:wD:N:FL:S:U:W?") ) {
+	switch( getopt(argc,argv,"c:d:ef:hln:P:s:t:v:wD:N:E:FL:S:U:W?") ) {
 	    case 'c':
 		CclStartFile=optarg;
 		continue;
@@ -1301,6 +1303,9 @@ global int main(int argc,char** argv)
                 continue;
 	    case 'e':
 		start_editor=1;
+		continue;
+	    case 'E':
+		EditorStartFile=optarg;
 		continue;
 	    case 'f':
 		AiCostFactor=atoi(optarg);
