@@ -233,14 +233,6 @@
 **
 **		Regeneration rate in HP per second
 **
-**	UnitType::WeaponsUpgradable
-**
-**		Weapons could be upgraded
-**
-**	UnitType::ArmorUpgradable
-**
-**		Armor could be upgraded
-**
 **	UnitType::UnitType
 **
 **		Land / fly / naval
@@ -429,15 +421,13 @@
 **
 **	UnitType::Hero
 **
-**		FIXME:	Unit is a hero. Where is this used?
 **		FIXME:  I don't think w*rcr*ft 2 exp heroes have this flag.
-**		In st*rcr*ft heroes seem to be imune to spawn broodlings,
-**		maybe we could use it in the same way. Spawn broodlings is
-**		an instant kill for many units.
+**		This is should be used for spells, to make heroes imune to
+**		instant kill spells (like polymorph)
 **
 **	UnitType::Volatile
 **
-**		Invisiblity/unholy armor kills unit
+**		Unit is a suicide bomber	
 **
 **	UnitType::Organic
 **
@@ -721,8 +711,6 @@ struct _unit_type_ {
     int		_BasicDamage;		/// Basic damage dealt
     int		_PiercingDamage;	/// Piercing damage dealt
     int		_RegenerationRate;	/// HP regeneration HP per sec
-    int		WeaponsUpgradable;	/// Weapons could be upgraded
-    int		ArmorUpgradable;	/// Armor could be upgraded
     int 	DemolishRange;		/// Unit will Demolish around when dead.
     int 	DemolishDamage;		/// Damage dealt to unit affected by demolition.
     int 	RepairRange;		/// Units repair range.
@@ -754,7 +742,6 @@ struct _unit_type_ {
 #define CanTargetSea	2			/// Can attack sea units
 #define CanTargetAir	4			/// Can attack air units
 
-    unsigned EquivType : 1;		/// 
     unsigned Revealer : 1;		/// reveal the fog of war
     unsigned LandUnit : 1;		/// Land animated
     unsigned AirUnit : 1;		/// Air animated
@@ -775,7 +762,7 @@ struct _unit_type_ {
     unsigned BuilderOutside : 1;	/// The builder stays outside during the build.
     unsigned BuilderLost : 1;		/// The builder is lost after the build.
     unsigned Hero : 1;			/// Is hero only used for triggers .
-    unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit.
+    unsigned Volatile : 1;		/// Unit is a suicide bomber.
     unsigned Organic : 1;		/// Organic can be healed.
     unsigned CanHarvest : 1;		/// Resource can be harvested.
     unsigned Harvester : 1;		/// unit is a resource harvester.

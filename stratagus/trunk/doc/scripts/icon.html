@@ -44,12 +44,12 @@
 <a href="../faq.html">FAQ</a> 
 <a href="ccl.html">CCL</a> 
 <a href="game.html">PREV</a> 
-<a href="research.html">NEXT</a> 
+<a href="magic.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
 <a href="#define-icon">define-icon</a>
 <a href="#define-icon-alias">define-icon-alias</a>
-<a href="#define-icon-wc-names">define-icon-wc-names</a>
+<a href="pud.html#define-icon-wc-names">define-icon-wc-names</a>
 <a href="#set-icon-size!">set-icon-size!</a>
 <a href="#set-icons-per-row!">set-icons-per-row!</a>
 <hr>
@@ -132,36 +132,6 @@ from summer-icons-file, which is defined to be the file
 
 Now it is possible to get the icon "skeleton" also with the name
 "icon-raise-dead".
-
-<a name="define-icon-wc-names"></a>
-<h3>(define-icon-wc-names icon-0 icon-1 ... icon-195)</h3>
-
-Define icon mapping from original number to internal symbol.
-
-<dl>
-<dt>icon-0</dt>
-<dd>Name of the icon assigned to index 0 (peasant).
-</dd>
-<dt>icon-1</dt>
-<dd>Name of the icon assigned to index 1 (peon).
-</dd>
-<dt>icon-195</dt>
-<dd>Name of the icon assigned to index 195. In the original only until this
-number are icons defined.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; This is the default icon mapping.
-    (define-icon-wc-names 
-      'icon-peasant 'icon-peon 'icon-footman ... )
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="set-icon-size!"></a>
 <h3>(set-icon-size! width height)</h3>
