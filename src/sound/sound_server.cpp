@@ -332,13 +332,12 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 global int ConvertToStereo32(const char *src, char *dest, int frequency, 
     int chansize, int channels, int bytes)
 {
-    int s;              // sample index
-    int b;              // byte index
-    int c;              // channel index
+    int s;			// sample index
+    int c;			// channel index
     int freqratio;
     int chanratio;
     int brratio;
-    int samplesize;     // number of bytes per sample
+    int samplesize;		// number of bytes per sample
     int divide;
     int offset;
 
@@ -346,23 +345,23 @@ global int ConvertToStereo32(const char *src, char *dest, int frequency,
     samplesize = chansize * channels;
     brratio = 4 / samplesize;
     chanratio = 2 / channels;
-    divide = freqratio * brratio / chanratio;
+    divide = freqratio * brratio;
 
     // s is the sample
-    for (s = 0; s < bytes*divide; s += 4) {
-        // c is the channel in the sample
-        for (c = 0; c < 2; ++c) {
-            // b is the byte in the channel
-            for (b = 0; b < 2; ++b) {
-                offset=( ((s/4)/freqratio)*samplesize*chanratio +
-                    (c/chanratio)*chansize + b/(2/chansize));
-                dest[s + c*2 + b] = src[offset] + (chansize == 1 ? 127 : 0);
-                // FIXME: should this be 127 or 128?
-            }
-        }
+    for (s = 0; s < bytes * divide; s += 4) {
+	// c is the channel in the sample
+	for (c = 0; c < 2; ++c) {
+	    offset = (((s / 4) / freqratio) * samplesize + (c / chanratio) * chansize);
+	    if (chansize == 2) {
+		*(short *)(dest + s + c*2) = *(short *)(src + offset);
+	    } else {
+		*(dest + s + c * 2) = *(src + offset) + 128;
+		*(dest + s + c * 2 + 1) = *(src + offset) + 128;
+	    }
+	}
     }
 
-    return bytes*divide;
+    return bytes * divide;
 }
 
 global SoundChannel Channels[MaxChannels];
