@@ -660,6 +660,7 @@ local int CommandKey(int key)
 	    return 1;
 
 	case '^':			// Unselect everything
+	case '`':
 	    UiUnselectAll();
             break;
 
