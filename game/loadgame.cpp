@@ -48,6 +48,8 @@
 #include "campaign.h"
 #include "trigger.h"
 #include "actions.h"
+#include "minimap.h"
+#include "commands.h"
 #ifdef HIERARCHIC_PATHFINDER
 #include "pathfinder.h"
 #endif
@@ -154,6 +156,7 @@ global void LoadModules(void)
     LoadUnitTypes();
 
     LoadTileset();
+    CreateMinimap();
 
     // LoadButtons();
 }
@@ -169,6 +172,7 @@ global void LoadGame(char* filename)
 {
     int old_siod_verbose_level;
     extern int siod_verbose_level;
+    unsigned long game_cycle;
 
     CleanModules();
 
@@ -179,9 +183,14 @@ global void LoadGame(char* filename)
     gh_eval_file(filename);
     user_gc(SCM_BOOL_F);
 
+    game_cycle=GameCycle;
+    // FIXME: log should be loaded from the save game
+    CommandLogDisabled = 1;
+
     InitModules();
     LoadModules();
 
+    GameCycle=game_cycle;
     //GameCursor=TheUI.Point.Cursor;	// FIXME: just a default.
     GameCursor=CursorTypeByIdent("cursor-point");	// TheUI not cleaned
     UpdateButtonPanel();
