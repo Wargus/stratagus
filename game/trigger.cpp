@@ -691,7 +691,7 @@ local SCM CclIfTimer(SCM operation,SCM quantity)
 	errl("Illegal comparison operation in if-timer", operation);
     }
 
-    if( Compare(GameTimer.Cycles/CYCLES_PER_SECOND,q) ) {
+    if( Compare(GameTimer.Cycles,q) ) {
 	return SCM_BOOL_T;
     }
 
@@ -737,17 +737,12 @@ local SCM CclActionDraw(void)
 /**
 **	Action set timer
 */
-local SCM CclActionSetTimer(SCM seconds, SCM increasing)
+local SCM CclActionSetTimer(SCM cycles, SCM increasing)
 {
-    int secs;
-    int i;
-
-    secs=gh_scm2int(seconds);
-    i=gh_scm2int(increasing);
-
-    GameTimer.Cycles=secs*CYCLES_PER_SECOND;
-    GameTimer.Increasing=i;
+    GameTimer.Cycles=gh_scm2int(cycles);
+    GameTimer.Increasing=gh_scm2int(increasing);
     GameTimer.Init=1;
+    GameTimer.LastUpdate=GameCycle;
 
     return SCM_UNSPECIFIED;
 }
@@ -950,6 +945,9 @@ local void PrintTrigger(LISP exp,FILE *f)
 	fprintf(f,(*exp).storage_as.subr.name);
 	fprintf(f,">");
 	break;
+    case tc_string:
+	fprintf(f,"\"%s\"",(*exp).storage_as.string.data);
+	break;
     case tc_closure:
 	fprintf(f,"(lambda ");
 	if CONSP((*exp).storage_as.closure.code) {
@@ -1004,6 +1002,14 @@ global void SaveTriggers(FILE* file)
 	++i;
     }
     fprintf(file,"(set-trigger-number! %d)\n",trigger);
+
+    if( GameTimer.Init ) {
+	fprintf(file,"(action-set-timer %ld %d)\n",
+	    GameTimer.Cycles,GameTimer.Increasing);
+	if( GameTimer.Running ) {
+	    fprintf(file,"(action-start-timer)\n");
+	}
+    }
 }
 
 /**
@@ -1036,6 +1042,8 @@ global void CleanTriggers(void)
     setvar(var,NIL,NIL);
 
     Trigger=NULL;
+
+    memset(&GameTimer,0,sizeof(GameTimer));
 }
 
 //@}

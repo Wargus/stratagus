@@ -1222,18 +1222,16 @@ global void DrawTimer(void)
 */
 global void UpdateTimer(void)
 {
-    static unsigned long last_update = 0;
-
     if( GameTimer.Running ) {
 	if( GameTimer.Increasing ) {
-	    GameTimer.Cycles += GameCycle-last_update;
+	    GameTimer.Cycles += GameCycle-GameTimer.LastUpdate;
 	} else {
-	    GameTimer.Cycles -= GameCycle-last_update;
+	    GameTimer.Cycles -= GameCycle-GameTimer.LastUpdate;
 	    if( GameTimer.Cycles < 0 ) {
 		GameTimer.Cycles = 0;
 	    }
 	}
-	last_update = GameCycle;
+	GameTimer.LastUpdate = GameCycle;
 	// FIXME: only redraw when the displayed time changes
 	MustRedraw |= RedrawTimer;
     }

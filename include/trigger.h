@@ -40,6 +40,7 @@ typedef struct _timer_ {
     char Running;			/// timer is running
     char Increasing;			/// increasing or decreasing
     long Cycles;			/// current value in game cycles
+    unsigned long LastUpdate;		/// GameCycle of last update
 } Timer;
 
 /*----------------------------------------------------------------------------
