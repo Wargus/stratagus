@@ -1732,11 +1732,8 @@ global void InitCcl(void)
     Lua = lua_open();
     luaopen_base(Lua);
     luaopen_table(Lua);
-    luaopen_io(Lua);
     luaopen_string(Lua);
     luaopen_math(Lua);
-    luaopen_debug(Lua);
-    luaopen_loadlib(Lua);
     lua_settop(Lua, 0);	    // discard any results
 #endif
 
