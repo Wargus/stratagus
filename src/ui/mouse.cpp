@@ -418,9 +418,9 @@ static void HandleMouseOn(int x, int y)
 	}
 	for (i = 0; i < TheUI.NumButtonButtons && !BigMapMode; ++i) {
 		if (x >= TheUI.ButtonButtons[i].X &&
-				x < TheUI.ButtonButtons[i].X + TheUI.ButtonButtons[i].Width + 7 &&
+				x < TheUI.ButtonButtons[i].X + TheUI.ButtonButtons[i].Style->Width &&
 				y >= TheUI.ButtonButtons[i].Y &&
-				y < TheUI.ButtonButtons[i].Y + TheUI.ButtonButtons[i].Height + 7) {
+				y < TheUI.ButtonButtons[i].Y + TheUI.ButtonButtons[i].Style->Height) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
 			if (CurrentButtons && CurrentButtons[i].Pos != -1) {
 				ButtonUnderCursor = i;

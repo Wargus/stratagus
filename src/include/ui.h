@@ -115,6 +115,8 @@ typedef struct _button_ {
 	int Y;                          ///< y coordinate on the screen
 	int Width;                      ///< width of the button on the screen
 	int Height;                     ///< height of the button on the screen
+	char* Text;                     ///< button text
+	ButtonStyle* Style;             ///< button style
 } Button;
 
 #define MAX_NUM_VIEWPORTS 8         ///< Number of supported viewports
@@ -303,11 +305,11 @@ typedef struct _ui_ {
 
 	// Button panel
 	GraphicConfig ButtonPanel;          ///< Button panel background
-	Button*       ButtonButtons;        ///< Button panel buttons
-	int           NumButtonButtons;     ///< Number of button panel buttons
 	int           ButtonPanelX;         ///< Button panel screen X position
 	int           ButtonPanelY;         ///< Button panel screen Y position
-	int           CommandKeyFont;       ///< Command key font
+	Button*       ButtonButtons;        ///< Button panel buttons
+	int           NumButtonButtons;     ///< Number of button panel buttons
+	SDL_Color     ButtonAutoCastBorderColorRGB; ///< Auto cast border color
 
 	// Pie Menu
 	GraphicConfig PieMenuBackground;      ///< Optional background image for the piemenu
@@ -330,14 +332,9 @@ typedef struct _ui_ {
 	int           MenuPanelY;           ///< menu panel screen Y position
 
 	/// Menu buttons
-	struct {
-		int   X;                        ///< button screen X position
-		int   Y;                        ///< button screen Y position
-		char* Text;                     ///< button caption
-		ButtonStyle* Style;             ///< button style
-	} MenuButton,
-	  NetworkMenuButton,
-	  NetworkDiplomacyButton;
+	Button MenuButton;                  ///< menu button
+	Button NetworkMenuButton;           ///< network menu button
+	Button NetworkDiplomacyButton;      ///< network diplomacy button
 
 	// The minimap
 	GraphicConfig MinimapPanel;         ///< minimap panel background
