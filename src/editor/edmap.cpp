@@ -35,10 +35,9 @@
 #include <limits.h>
 
 #include "freecraft.h"
+#include "editor.h"
 #include "map.h"
 #include "minimap.h"
-
-extern void ChangeTile(int x, int y, int tile);
 
 /*----------------------------------------------------------------------------
 --	Defines

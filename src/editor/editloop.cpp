@@ -123,7 +123,7 @@ local int SelectedPlayer;		/// Player selected for draw
 **	@param y	Y map tile coordinate.
 **	@param tile	Tile type to edit.
 */
-local void ChangeTile(int x, int y, int tile)
+global void ChangeTile(int x, int y, int tile)
 {
     MapField *mf;
 
