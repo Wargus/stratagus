@@ -1184,9 +1184,6 @@ local void PrintHeader(void)
 #ifdef USE_ZZIPLIB
     "ZZIPLIB "
 #endif
-#ifdef USE_SVGALIB
-    "SVGALIB "
-#endif
 #ifdef USE_SDL
     "SDL "
 #endif
