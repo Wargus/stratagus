@@ -93,7 +93,7 @@ global int PublicMasterAnnounce;		/// FIXME: docu
 global unsigned long LastTimeAnnounced;		/// FIXME: docu
 global int MasterPort;				/// FIXME: docu
 global unsigned long MasterHost;		/// FIXME: docu
-global char *MasterHostString;			/// FIXME: docu
+global char* MasterHostString;			/// FIXME: docu
 
 local int sock;					/// FIXME: docu
 local char challenge[12];			/// FIXME: docu
@@ -121,7 +121,7 @@ global int MasterInit(void)
 /**
 **	FIXME: docu
 */
-local int MasterSend(const void *buf, int len)
+local int MasterSend(const void* buf, int len)
 {
     return NetSendUDP(sock, MasterHost, MasterPort, buf, len);
 }
@@ -168,15 +168,16 @@ local void MasterSendInfo(void)
     numplayers += mapmaxplayers - NetPlayers;
 
     sprintf(sendinfo, "\xFF\xFF\xFF\xFFinfoResponse\x0A\\protocol\\%d:%d\\gamehost\\%s\\clients\\%d\\sv_maxclients\\%d\\gamename\\%s\\challenge\\%s", 
-	    StratagusVersion, NetworkProtocolVersion, LocalPlayerName, numplayers, 
-	    mapmaxplayers, MenuMapInfo->Description, challenge);
+	StratagusVersion, NetworkProtocolVersion, LocalPlayerName, numplayers, 
+	mapmaxplayers, MenuMapInfo->Description, challenge);
     MasterSend(sendinfo, strlen(sendinfo));
 }
 
 /**
 **	FIXME: docu
 */
-global void MasterProcessGetServerData(const char* msg, size_t length, unsigned long host, int port)
+global void MasterProcessGetServerData(const char* msg, size_t length,
+    unsigned long host, int port)
 {
     if (!PublicMasterAnnounce || !sock) {
 	return;
@@ -209,8 +210,8 @@ global void MasterLoop(unsigned long ticks)
 	return;
     }
 
-    if (LastTimeAnnounced
-	    && ticks <= LastTimeAnnounced + MASTER_REFRESHRATE) {
+    if (LastTimeAnnounced &&
+	    ticks <= LastTimeAnnounced + MASTER_REFRESHRATE) {
 	return;
     }
 
