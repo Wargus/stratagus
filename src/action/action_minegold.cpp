@@ -368,13 +368,11 @@ local int MoveToGoldDeposit(Unit* unit)
     //
     if ( OptionUseDepletedMines && (int)unit->Rs == OptionUseDepletedMines ) {
 	unit->Player->Resources[GoldCost]+=
-		(unit->Player->Incomes[GoldCost] * 100)
-			/ OptionUseDepletedMines;
+	    (unit->Player->Incomes[GoldCost] * OptionUseDepletedMines) / 100;
 	unit->Player->TotalResources[GoldCost]+=
-		(unit->Player->Incomes[GoldCost] * 100)
-			/ OptionUseDepletedMines;
+	    (unit->Player->Incomes[GoldCost] * OptionUseDepletedMines) / 100;
     } else {
-        unit->Player->Resources[GoldCost]+=unit->Player->Incomes[GoldCost];
+	unit->Player->Resources[GoldCost]+=unit->Player->Incomes[GoldCost];
 	unit->Player->TotalResources[GoldCost]+=unit->Player->Incomes[GoldCost];
     }
     if( unit->Player==ThisPlayer ) {
