@@ -230,59 +230,37 @@ Value correspond of min degat that the unit could do, and Max the max.</dd>
 
 
 <a name="DefineUnitStats"></a>
-<h3>DefineUnitStats(ident, player, tag1, value1, tag2, value2 ...)</h3>
+<h3>DefineUnitStats("unit-type", player, "tag1", value1, "tag2", value2 ...)</h3>
 
 Define unit stats. This is almost only used in savegames, but included
 here for completeness. In the game every unit of the same type of one
 player have the same stats, affected by upgrades.
 
 <dl>
-<dt>ident</dt>
+<dt>"unit-type"</dt>
 <dd>Ident of the unit. This obviousely means that it should be defined after units.
 </dd>
 <dt>player</dt>
 <dd>Player number.</dd>
 <dt>Possible tags:</dt>
 <dd><dl>
-<dt>level</dt>
-<dd>The level of the unit. It is equal to the number of upgrades of a
-certain unit and is purely cosmetic. It doesn't affect the game in any way.
-</dd>
-<dt>attack-range</dt>
-<dd>The unit's attack range(circular). Use 1 for melee units.
-</dd>
-<dt>sight-range</dt>
-<dd>The unit's sight range(circular).
-</dd>
-<dt>armor</dt>
-<dd>Unit's armor. FIXME calculations?
-</dd>
-<dt>basic-damage</dt>
-<dd>Unit's basic damage. FIXME calculations?
-</dd>
-<dt>piercing-damage</dt>
-<dd>Unit's piercing damage. FIXME calculations?
-</dd>
-<dt>hit-points</dt>
-<dd>The unit's maximum hit points.
-</dd>
-<dt>regeneration-rate</dt>
-<dd>amount of HP a unit gains per seconds
-</dd>
-<dt>costs</dt>
+<dt>"costs", </dt>
 <dd>The cost to train this unit. This is a standard resource/value list.
-A special 'resource' is time, the time to train the unit in cycles.
+A special 'resource' is "time", the time to train the unit in cycles.
 </dd>
+<dt>"Variable", number or {Value = number, Max = number, Increase = number}</dt>
+<dd>Variable is one of the already defined with <a href="#DefineVariables">DefineVariables()</a>.</dd>
 </dl></dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    DefineUnitStats("unit-archer", 14,
-      "level", 1, "attack-range", 4, "sight-range", 5,
-      "armor", 0, "basic-damage", 3, "piercing-damage", 6, "hit-points", 40,
-      "costs", {"time", 0, "titanium", 0, "crystal", 0, "gas", 0, "ore", 0,
+--  Stat of archer unit for player 14.
+DefineUnitStats("unit-archer", 14,
+      "Level", 1, "AttackRange", 4, "SightRange", 5,
+      "Armor", 0, "BasicDamage", 3, "PiercingDamage", 6,
+	  "HitPoints", {Max = 40, Increase = 0},
+      "costs", {"time", 100, "titanium", 50, "crystal", 100, "gas", 0, "ore", 0,
                 "stone", 0, "coal", 0})
 </pre>
 
@@ -313,7 +291,7 @@ If the name is too long, it is split at space.
 <dd>Defines the offset for the graphics in pixels used to display the unit-type</dd>
 <dt>Shadow = {tag, value, ...}</dt>
 <dd>Defines the Parameters for the shadow the unit is casting in the game</dd>
-<dd>Possible tags:</dd>
+<dd>Possible tags:
 <dl>
 <dt>"file", filename</dt>
 <dd>Defines the graphics used to display the shadow of the unit-type</dd>
