@@ -1295,6 +1295,28 @@ normkey:
 		}
 	    }
 	    break;
+	case KeyCodeLeft: case KeyCodeRight:
+	    if (MenuButtonCurSel != -1) {
+		mi = menu->items + MenuButtonCurSel;
+		if (!(mi->flags&MenuButtonClicked)) {
+		    switch (mi->mitype) {
+			case MI_TYPE_HSLIDER:
+			    if (key == KeyCodeLeft) {
+				mi->d.hslider.cflags |= MI_CFLAGS_LEFT;
+			    } else {
+				mi->d.hslider.cflags |= MI_CFLAGS_RIGHT;
+			    }
+			    if (mi->d.hslider.action) {
+				(*mi->d.hslider.action)(mi, 2);
+			    }
+			    MustRedraw |= RedrawMenu;
+			    break;
+			default:
+			    break;
+		    }
+		}
+	    }
+	    break;
 	case 9:				// TAB			// FIXME: Add Shift-TAB
 	    if (KeyModifiers&ModifierAlt) {
 		break;
@@ -1879,8 +1901,9 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	    mi = menu->items + MenuButtonUnderCursor;
 	    switch (mi->mitype) {
 		case MI_TYPE_LISTBOX:
-		    if (mi->d.listbox.curopt < 0)
+		    if (mi->d.listbox.curopt < 0) {
 			mi->d.listbox.curopt = 0;
+		    }
 		    if (mi->d.listbox.startline > 0) {
 			mi->d.listbox.startline--;
 			if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1)
@@ -1894,6 +1917,20 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    }
 		    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)
 			/ (mi->d.listbox.noptions - 1);
+		    MustRedraw |= RedrawMenu;
+		    break;
+		case MI_TYPE_VSLIDER:
+		    mi->d.vslider.cflags |= MI_CFLAGS_UP;
+		    if (mi->d.vslider.action) {
+			(*mi->d.vslider.action)(mi, 2);
+		    }
+		    MustRedraw |= RedrawMenu;
+		    break;
+		case MI_TYPE_HSLIDER:
+		    mi->d.hslider.cflags |= MI_CFLAGS_RIGHT;
+		    if (mi->d.hslider.action) {
+			(*mi->d.hslider.action)(mi, 2);
+		    }
 		    MustRedraw |= RedrawMenu;
 		    break;
 		default:
@@ -1923,6 +1960,20 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    }
 		    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)
 			/ (mi->d.listbox.noptions - 1);
+		    MustRedraw |= RedrawMenu;
+		    break;
+		case MI_TYPE_VSLIDER:
+		    mi->d.vslider.cflags |= MI_CFLAGS_DOWN;
+		    if (mi->d.vslider.action) {
+			(*mi->d.vslider.action)(mi, 2);
+		    }
+		    MustRedraw |= RedrawMenu;
+		    break;
+		case MI_TYPE_HSLIDER:
+		    mi->d.hslider.cflags |= MI_CFLAGS_LEFT;
+		    if (mi->d.hslider.action) {
+			(*mi->d.hslider.action)(mi, 2);
+		    }
 		    MustRedraw |= RedrawMenu;
 		    break;
 		default:
