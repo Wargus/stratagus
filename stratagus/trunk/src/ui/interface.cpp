@@ -369,6 +369,16 @@ local void UiToggleTerrain(void)
 }
 
 /**
+**	Toggle grab mouse on/off.
+*/
+local void UiToggleGrabMouse(void)
+{
+    DebugLevel0Fn("%x\n",KeyModifiers);
+    ToggleGrabMouse();
+    SetStatusLine("Grab mouse toggled.");
+}
+
+/**
 **	Handle keys in command mode.
 **
 **	@param key	Key scancode.
@@ -507,8 +517,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    DebugLevel0Fn("%x\n",KeyModifiers);
-	    ToggleGrabMouse();
+	    UiToggleGrabMouse();
 	    break;
 
 	case 'f'&0x1F:
