@@ -109,10 +109,10 @@ global int InitArtsSound(int freq, int size)
     }
     arts_stream_set(stream, ARTS_P_PACKET_SETTINGS, frags);
 
-    IfDebug(
+#ifdef DEBUG
 	frags = arts_stream_get(stream, ARTS_P_BUFFER_SIZE);
 	DebugLevel0Fn("frequency %d, buffer size %d\n" _C_ freq _C_ frags);
-    );
+#endif
     SoundFildes = 0;
     return 0;
 }
