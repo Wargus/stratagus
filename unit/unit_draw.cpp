@@ -1369,7 +1369,6 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
     int color;
     int e_color;
     int dest;
-    const Unit* goal;
 
     GetOrderPosition(order,&x2,&y2);
     
@@ -1507,7 +1506,6 @@ local void ShowOrder(const Unit* unit)
     int x1;
     int y1;
     int i;
-    Unit *goal;
 
     if (unit->Destroyed) {
 	return;
