@@ -154,7 +154,7 @@ local SCM CclAddTip(SCM tip)
 **
 **	@param speed	Speed factor of gold mining.
 */
-local SCM CclSpeedMine(SCM speed)
+local SCM CclSetSpeedMine(SCM speed)
 {
     SpeedMine=gh_scm2int(speed);
 
@@ -166,7 +166,7 @@ local SCM CclSpeedMine(SCM speed)
 **
 **	@param speed	Speed factor of gold mining.
 */
-local SCM CclSpeedGold(SCM speed)
+local SCM CclSetSpeedGold(SCM speed)
 {
     SpeedGold=gh_scm2int(speed);
 
@@ -176,7 +176,7 @@ local SCM CclSpeedGold(SCM speed)
 /**
 **	For debug increase wood chopping speed.
 */
-local SCM CclSpeedChop(SCM speed)
+local SCM CclSetSpeedChop(SCM speed)
 {
     SpeedChop=gh_scm2int(speed);
 
@@ -186,7 +186,7 @@ local SCM CclSpeedChop(SCM speed)
 /**
 **	For debug increase wood delivery speed.
 */
-local SCM CclSpeedWood(SCM speed)
+local SCM CclSetSpeedWood(SCM speed)
 {
     SpeedWood=gh_scm2int(speed);
 
@@ -196,7 +196,7 @@ local SCM CclSpeedWood(SCM speed)
 /**
 **	For debug increase haul speed.
 */
-local SCM CclSpeedHaul(SCM speed)
+local SCM CclSetSpeedHaul(SCM speed)
 {
     SpeedHaul=gh_scm2int(speed);
 
@@ -206,7 +206,7 @@ local SCM CclSpeedHaul(SCM speed)
 /**
 **	For debug increase oil delivery speed.
 */
-local SCM CclSpeedOil(SCM speed)
+local SCM CclSetSpeedOil(SCM speed)
 {
     SpeedOil=gh_scm2int(speed);
 
@@ -216,7 +216,7 @@ local SCM CclSpeedOil(SCM speed)
 /**
 **	For debug increase building speed.
 */
-local SCM CclSpeedBuild(SCM speed)
+local SCM CclSetSpeedBuild(SCM speed)
 {
     SpeedBuild=gh_scm2int(speed);
 
@@ -226,7 +226,7 @@ local SCM CclSpeedBuild(SCM speed)
 /**
 **	For debug increase training speed.
 */
-local SCM CclSpeedTrain(SCM speed)
+local SCM CclSetSpeedTrain(SCM speed)
 {
     SpeedTrain=gh_scm2int(speed);
 
@@ -236,7 +236,7 @@ local SCM CclSpeedTrain(SCM speed)
 /**
 **	For debug increase upgrading speed.
 */
-local SCM CclSpeedUpgrade(SCM speed)
+local SCM CclSetSpeedUpgrade(SCM speed)
 {
     SpeedUpgrade=gh_scm2int(speed);
 
@@ -246,7 +246,7 @@ local SCM CclSpeedUpgrade(SCM speed)
 /**
 **	For debug increase researching speed.
 */
-local SCM CclSpeedResearch(SCM speed)
+local SCM CclSetSpeedResearch(SCM speed)
 {
     SpeedResearch=gh_scm2int(speed);
 
@@ -256,7 +256,7 @@ local SCM CclSpeedResearch(SCM speed)
 /**
 **	For debug increase all speeds.
 */
-local SCM CclSpeeds(SCM speed)
+local SCM CclSetSpeeds(SCM speed)
 {
     SpeedMine=SpeedGold=
 	SpeedChop=SpeedWood=
@@ -447,17 +447,17 @@ global void InitCcl(void)
     gh_new_procedure1_0("set-show-tips!",CclSetShowTips);
     gh_new_procedure1_0("add-tip",CclAddTip);
 
-    gh_new_procedure1_0("speed-mine",CclSpeedMine);
-    gh_new_procedure1_0("speed-gold",CclSpeedGold);
-    gh_new_procedure1_0("speed-chop",CclSpeedChop);
-    gh_new_procedure1_0("speed-wood",CclSpeedWood);
-    gh_new_procedure1_0("speed-haul",CclSpeedHaul);
-    gh_new_procedure1_0("speed-oil",CclSpeedOil);
-    gh_new_procedure1_0("speed-build",CclSpeedBuild);
-    gh_new_procedure1_0("speed-train",CclSpeedTrain);
-    gh_new_procedure1_0("speed-upgrade",CclSpeedUpgrade);
-    gh_new_procedure1_0("speed-research",CclSpeedResearch);
-    gh_new_procedure1_0("speeds",CclSpeeds);
+    gh_new_procedure1_0("set-speed-mine!",CclSetSpeedMine);
+    gh_new_procedure1_0("set-speed-gold!",CclSetSpeedGold);
+    gh_new_procedure1_0("set-speed-chop!",CclSetSpeedChop);
+    gh_new_procedure1_0("set-speed-wood!",CclSetSpeedWood);
+    gh_new_procedure1_0("set-speed-haul!",CclSetSpeedHaul);
+    gh_new_procedure1_0("set-speed-oil!",CclSetSpeedOil);
+    gh_new_procedure1_0("set-speed-build!",CclSetSpeedBuild);
+    gh_new_procedure1_0("set-speed-train!",CclSetSpeedTrain);
+    gh_new_procedure1_0("set-speed-upgrade!",CclSetSpeedUpgrade);
+    gh_new_procedure1_0("set-speed-research!",CclSetSpeedResearch);
+    gh_new_procedure1_0("set-speeds!",CclSetSpeeds);
 
     IconCclRegister();
     MissileCclRegister();
