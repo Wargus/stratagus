@@ -974,7 +974,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	ticks=X11GetTicks();
 	if( !VideoInterrupts && ticks+11<NextFrameTicks ) {
-	    tv.tv_usec=ticks*1000;
+	    tv.tv_usec=(NextFrameTicks-ticks)*1000;
 	}
 	while( ticks>=NextFrameTicks ) {
 	    ++VideoInterrupts;
