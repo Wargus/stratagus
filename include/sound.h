@@ -117,7 +117,6 @@ extern void InitSoundClient(void);
 
     /// Play a sample file
 extern void PlayFile(const char* name);
-#define PlayFile PlayMusic
     /// Play a music file
 extern void PlayMusic(const char* name);
     /// Stop music playing
