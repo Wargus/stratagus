@@ -10,7 +10,7 @@
 //
 /**@name font.c		-	The color fonts. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -44,6 +44,29 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#define NumFontColors 7
+
+    /// Font color mapping
+typedef struct _font_color_mapping_ {
+    char* Color;			/// Font color
+    struct {
+	int R;
+	int G;
+	int B;
+    } RGB[NumFontColors];
+    VMemType Pixels[NumFontColors];	/// Array of hardware dependent pixels
+    struct _font_color_mapping_* Next;	/// Next pointer
+} FontColorMapping;
+
+local const VMemType *FontPixels;		/// Font pixels
+#define FontPixels8	(&FontPixels->D8)	/// font pixels  8bpp
+#define FontPixels16	(&FontPixels->D16)	/// font pixels 16bpp
+#define FontPixels24	(&FontPixels->D24)	/// font pixels 24bpp
+#define FontPixels32	(&FontPixels->D32)	/// font pixels 32bpp
+
+    /// Font color mappings
+local FontColorMapping* FontColorMappings;
+
 /**
 **	Fonts table
 **
@@ -51,29 +74,21 @@
 */
 local ColorFont Fonts[MaxFonts];
 
-/**
-**	Font color table.
-*/
-global unsigned char FontColors[16][8];
-
-    /// Current color
-local const unsigned char* TextColor;
     /// Last text color
-local const unsigned char* LastTextColor;
+local const VMemType* LastTextColor;
     /// Default text color
-local const unsigned char* DefaultTextColor;
+local const VMemType* DefaultTextColor;
     /// Reverse text color
-local const unsigned char* ReverseTextColor;
+local const VMemType* ReverseTextColor;
     /// Default normal color index
-local int DefaultNormalColorIndex;
+local char* DefaultNormalColorIndex;
     /// Default reverse color index
-local int DefaultReverseColorIndex;
+local char* DefaultReverseColorIndex;
 
     /// Draw character with current video depth.
 local void (*VideoDrawChar)(const Graphic*,int,int,int,int,int,int);
 
 #ifdef USE_OPENGL
-#define NumFontColors 7
     /// Font bitmaps
 local GLubyte *FontBitmaps[MaxFonts][NumFontColors];
     /// Font bitmap widths
@@ -123,19 +138,19 @@ local void VideoDrawChar8(const Graphic* sprite,
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels8[TextColor[p]];
+		*dp=FontPixels8[p];
 	    }
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels8[TextColor[p]];
+		*dp=FontPixels8[p];
 	    }
 	}
 	if( sp<=lp ) {
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels8[TextColor[p]];
+		*dp=FontPixels8[p];
 	    }
 	}
 	sp+=sa;
@@ -178,19 +193,19 @@ local void VideoDrawChar16(const Graphic* sprite,
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels16[TextColor[p]];
+		*dp=FontPixels16[p];
 	    }
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels16[TextColor[p]];
+		*dp=FontPixels16[p];
 	    }
 	}
 	if( sp<=lp ) {
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels16[TextColor[p]];
+		*dp=FontPixels16[p];
 	    }
 	}
 	sp+=sa;
@@ -233,19 +248,19 @@ local void VideoDrawChar24(const Graphic* sprite,
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels24[TextColor[p]];
+		*dp=FontPixels24[p];
 	    }
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels24[TextColor[p]];
+		*dp=FontPixels24[p];
 	    }
 	}
 	if( sp<=lp ) {
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels24[TextColor[p]];
+		*dp=FontPixels24[p];
 	    }
 	}
 	sp+=sa;
@@ -288,19 +303,19 @@ local void VideoDrawChar32(const Graphic* sprite,
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels32[TextColor[p]];
+		*dp=FontPixels32[p];
 	    }
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels32[TextColor[p]];
+		*dp=FontPixels32[p];
 	    }
 	}
 	if( sp<=lp ) {
 	    ++dp;
 	    p=*++sp;
 	    if( p!=255 ) {
-		*dp=Pixels32[TextColor[p]];
+		*dp=FontPixels32[p];
 	    }
 	}
 	sp+=sa;
@@ -329,7 +344,7 @@ local void VideoDrawCharOpenGL(const Graphic* sprite,
     glDisable(GL_TEXTURE_2D);
 
     for( i=0; i<NumFontColors; ++i ) {
-	c=GlobalPalette[TextColor[i]];
+	c=FontPixels[i];
 	glColor3ub(c.r,c.g,c.b);
 	glRasterPos2i(x,VideoHeight-y-h);
 	glBitmap(FontBitmapWidths[CurrentFont]*8,h,
@@ -341,18 +356,34 @@ local void VideoDrawCharOpenGL(const Graphic* sprite,
 }
 #endif
 
+local const VMemType* GetFontColorMapping(char* color)
+{
+    FontColorMapping* fcm;
+
+    fcm=FontColorMappings;
+    while( fcm ) {
+	if( !strcmp(fcm->Color,color) ) {
+	    return fcm->Pixels;
+	}
+	fcm=fcm->Next;
+    }
+    fprintf(stderr,"Font mapping not found: '%s'\n",color);
+    ExitFatal(1);
+    return NULL;
+}
+
 /**
 **	Set the default text colors.
 **
 **	@param normal	Normal text color.
 **	@param reverse	Reverse text color.
 */
-global void SetDefaultTextColors(int normal,int reverse)
+global void SetDefaultTextColors(char* normal,char* reverse)
 {
     DefaultNormalColorIndex=normal;
     DefaultReverseColorIndex=reverse;
-    LastTextColor=TextColor=DefaultTextColor=FontColors[normal];
-    ReverseTextColor=FontColors[reverse];
+    LastTextColor=DefaultTextColor=FontPixels=GetFontColorMapping(normal);
+    ReverseTextColor=GetFontColorMapping(reverse);
 }
 
 /**
@@ -361,7 +392,7 @@ global void SetDefaultTextColors(int normal,int reverse)
 **	@param normalp	Normal text color pointer.
 **	@param reversep	Reverse text color pointer.
 */
-global void GetDefaultTextColors(int *normalp,int *reversep)
+global void GetDefaultTextColors(char** normalp,char** reversep)
 {
     *normalp=DefaultNormalColorIndex;
     *reversep=DefaultReverseColorIndex;
@@ -433,7 +464,6 @@ local void VideoDrawCharClip(const Graphic* graphic,int gx,int gy,int w,int h,
 **	~	is special prefix.
 **	~~	is the ~ character self.
 **	~!	print next character reverse.
-**	~n	0123456789abcdef print text in color 1-16.
 **	~<	start reverse.
 **	~>	switch back to last used color.
 **
@@ -452,7 +482,7 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
     int height;
     int widths;
     const ColorFont* fp;
-    const unsigned char* rev;
+    const VMemType* rev;
     void (*DrawChar)(const Graphic*,int,int,int,int,int,int);
 
 #ifdef USE_OPENGL
@@ -477,30 +507,24 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 		    break;
 		case '0': case '1': case '2': case '3': case '4':
 		case '5': case '6': case '7': case '8': case '9':
-		    LastTextColor=TextColor;
-		    TextColor=FontColors[*text-'0'];
-		    continue;
 		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-		    LastTextColor=TextColor;
-		    TextColor=FontColors[*text+10-'a'];
-		    continue;
 		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-		    LastTextColor=TextColor;
-		    TextColor=FontColors[*text+10-'A'];
-		    continue;
+		    fprintf(stderr,"Not supported: ~%c\n",*text);
+		    ExitFatal(1);
+		    break;
 		case '!':
-		    rev=TextColor;
-		    TextColor=ReverseTextColor;
+		    rev=FontPixels;
+		    FontPixels=ReverseTextColor;
 		    ++text;
 		    break;
 		case '<':
-		    LastTextColor=TextColor;
-		    TextColor=ReverseTextColor;
+		    LastTextColor=FontPixels;
+		    FontPixels=ReverseTextColor;
 		    continue;
 		case '>':
 		    rev=LastTextColor;	// swap last and current color
-		    LastTextColor=TextColor;
-		    TextColor=rev;
+		    LastTextColor=FontPixels;
+		    FontPixels=rev;
 		    continue;
 
 		default:
@@ -520,7 +544,7 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 	}
 	widths+=w+1;
 	if( rev ) {
-	    TextColor=rev;
+	    FontPixels=rev;
 	    rev=NULL;
 	}
     }
@@ -580,9 +604,9 @@ global int VideoDrawReverseText(int x,int y,unsigned font,
 {
     int w;
 
-    TextColor=ReverseTextColor;
+    FontPixels=ReverseTextColor;
     w=VideoDrawText(x,y,font,text);
-    TextColor=DefaultTextColor;
+    FontPixels=DefaultTextColor;
 
     return w;
 }
@@ -774,6 +798,10 @@ local void MakeFontBitmap(Graphic *g,int font)
 global void LoadFonts(void)
 {
     unsigned i;
+    FontColorMapping* fcm;
+    void* pixels;
+    int v;
+    char* vp;
 
 #ifdef USE_OPENGL
     VideoDrawChar=VideoDrawCharOpenGL;
@@ -811,6 +839,33 @@ global void LoadFonts(void)
 	    MakeFontBitmap(Fonts[i].Graphic,i);
 #endif
 	}
+    }
+
+    fcm=FontColorMappings;
+    while( fcm ) {
+	pixels=fcm->Pixels;
+	for( i=0; i<7; ++i ) {
+	    switch( VideoBpp ) {
+		case 8:
+		    ((VMemType8*)pixels)[i]=VideoMapRGB(fcm->RGB[i].R,fcm->RGB[i].G,fcm->RGB[i].B);
+		    break;
+		case 15:
+		case 16:
+		    ((VMemType16*)pixels)[i]=VideoMapRGB(fcm->RGB[i].R,fcm->RGB[i].G,fcm->RGB[i].B);
+		    break;
+		case 24:
+		    v=VideoMapRGB(fcm->RGB[i].R,fcm->RGB[i].G,fcm->RGB[i].B);
+		    vp=(char*)(&v);
+		    ((VMemType24*)pixels)[i].a=vp[0];
+		    ((VMemType24*)pixels)[i].b=vp[1];
+		    ((VMemType24*)pixels)[i].c=vp[2];
+		    break;
+		case 32:
+		    ((VMemType32*)pixels)[i]=VideoMapRGB(fcm->RGB[i].R,fcm->RGB[i].G,fcm->RGB[i].B);
+		    break;
+	    }
+	}
+	fcm=fcm->Next;
     }
 }
 
@@ -879,26 +934,51 @@ local SCM CclDefineFont(SCM type, SCM file, SCM width, SCM height)
 }
 
 /**
-**	Define the used font colors.
+**	Define a font color.
 */
-local SCM CclDefineFontColors(SCM list)
+local SCM CclDefineFontColor(SCM list)
 {
-    int i;
-    int j;
     SCM value;
-    SCM temp;
+    char* color;
+    int i;
+    FontColorMapping* fcm;
+    FontColorMapping** fcmp;
 
-    for (i = 0; i < 16; ++i) {
-	value = gh_car(list);
-	list = gh_cdr(list);
+    value=gh_car(list);
+    list=gh_cdr(list);
 
-	if (gh_vector_length(value) != 7) {
-	    fprintf(stderr, "Wrong vector length\n");
+    color=gh_scm2newstr(value,NULL);
+
+    if( !FontColorMappings ) {
+	FontColorMappings=calloc(sizeof(*FontColorMappings),1);
+	fcm=FontColorMappings;
+    } else {
+	fcmp=&FontColorMappings;
+	while( *fcmp ) {
+	    if( !strcmp((*fcmp)->Color,color) ) {
+		fprintf(stderr,"Warning: Redefining color '%s'\n",color);
+		free((*fcmp)->Color);
+		fcm=*fcmp;
+		break;
+	    }
+	    fcmp=&(*fcmp)->Next;
 	}
-	for (j = 0; j < 7; ++j) {
-	    temp = gh_vector_ref(value, gh_int2scm(j));
-	    FontColors[i][j] = gh_scm2int(temp);
-	}
+	*fcmp=calloc(sizeof(*FontColorMappings),1);
+	fcm=*fcmp;
+    }
+    fcm->Color=color;
+    fcm->Next=NULL;
+
+    value=gh_car(list);
+    list=gh_cdr(list);
+
+    if( gh_vector_length(value) != 7*3 ) {
+	fprintf(stderr,"Wrong vector length\n");
+    }
+    for( i=0; i<7; ++i ) {
+	fcm->RGB[i].R=gh_scm2int(gh_vector_ref(value,gh_int2scm(i*3+0)));
+	fcm->RGB[i].G=gh_scm2int(gh_vector_ref(value,gh_int2scm(i*3+1)));
+	fcm->RGB[i].B=gh_scm2int(gh_vector_ref(value,gh_int2scm(i*3+2)));
     }
 
     return SCM_UNSPECIFIED;
@@ -912,7 +992,7 @@ local SCM CclDefineFontColors(SCM list)
 global void FontsCclRegister(void)
 {
     gh_new_procedure4_0("define-font",CclDefineFont);
-    gh_new_procedureN("define-font-colors",CclDefineFontColors);
+    gh_new_procedureN("define-font-color",CclDefineFontColor);
 
     //gh_new_procedure2_0("default-text-colors",CclDefaultTextColors);
     //gh_new_procedure1_0("text-length",CclTextLength);
@@ -930,6 +1010,8 @@ global void FontsCclRegister(void)
 global void CleanFonts(void)
 {
     unsigned i;
+    FontColorMapping* fcm;
+    FontColorMapping* temp;
 
     for( i=0; i<sizeof(Fonts)/sizeof(*Fonts); ++i ) {
 	free(Fonts[i].File);
@@ -938,6 +1020,14 @@ global void CleanFonts(void)
 	Fonts[i].Graphic=NULL;
     }
 
+    fcm=FontColorMappings;
+    while( fcm ) {
+	temp=fcm->Next;
+	free(fcm->Color);
+	free(fcm);
+	fcm=temp;
+    }
+    FontColorMappings=NULL;
 }
 
 /**
