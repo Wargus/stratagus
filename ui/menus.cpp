@@ -3082,6 +3082,7 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
 
+    DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
@@ -3316,7 +3317,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
 		    mi->d.listbox.curopt++;
 		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 			mi->d.listbox.curopt--;
@@ -3342,44 +3343,46 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 	case 1:		// mouse - move
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
-			op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+			for (;;) {
+			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
 				 (mi->d.listbox.noptions - 1);
-			d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
-			d2 = op - mi[1].d.vslider.curper;
-			if (d2 < d1) {
-			    int x;
-			    x = (int)(((float)mi[1].d.vslider.curper-op) /
-			             (100/(mi->d.pulldown.noptions-1))+.5f);
-			    for (; x>=0; --x) {
-				mi->d.listbox.curopt++;
-				if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-				    mi->d.listbox.curopt--;
-				    mi->d.listbox.startline++;
-				}
+			    d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
+			    d2 = op - mi[1].d.vslider.curper;
+			    if (d2 >= d1)
+				break;
+			    mi->d.listbox.curopt++;
+			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+				mi->d.listbox.curopt--;
+				mi->d.listbox.startline++;
 			    }
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+				break;
 			}
 		    }
 		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
 		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
-			op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
-				 (mi->d.listbox.noptions - 1);
-			d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
-			d2 = mi[1].d.vslider.curper - op;
-			if (d2 < d1) {
-			    int x;
-			    x = (int)(((float)op-mi[1].d.vslider.curper) /
-			             (100/(mi->d.pulldown.noptions-1))+.5f);
-			    for (; x>=0; --x) {
-				mi->d.listbox.curopt--;
-				if (mi->d.listbox.curopt < 0) {
-				    mi->d.listbox.curopt++;
-				    mi->d.listbox.startline--;
-				}
+			for (;;) {
+			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
+				     (mi->d.listbox.noptions - 1);
+			    d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
+			    d2 = mi[1].d.vslider.curper - op;
+			    if (d2 >= d1)
+				break;
+			    mi->d.listbox.curopt--;
+			    if (mi->d.listbox.curopt < 0) {
+				mi->d.listbox.curopt++;
+				mi->d.listbox.startline--;
 			    }
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+				break;
 			}
 		    }
 		}
+
+		DebugCheck(mi->d.listbox.startline < 0);
+		DebugCheck(mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+
 		ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		MustRedraw |= RedrawMenu;
 	    }
@@ -3430,6 +3433,7 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 	    if ((mi[1].d.vslider.cflags&MI_CFLAGS_KNOB) &&
 	        (mi[1].flags&MenuButtonClicked)) {
 		int ys;
+		// ARI: FIXME: No floats please, John!!!
 		float f;
 		f = (int)((float)mi[1].d.vslider.curper/(100/(nitems-11-3))+.5f) * 100 / (float)(nitems-11-3);
 		mi[1].d.vslider.percent = (int)f;
@@ -4008,7 +4012,7 @@ local void MultiGamePTSAction(Menuitem *mi, int o)
     int i;
 
     i = mi - NetMultiSetupMenuItems - SERVER_PLAYER_STATE;
-    // JOHNS: didn't must this be always true?
+    // JOHNS: Must this be always true?
     DebugCheck( i<0 || i>PlayerMax-1 );
 
     if (i > 0 && i < PlayerMax-1) {
@@ -4417,7 +4421,7 @@ global void NetConnectForceDisplayUpdate(void)
 }
 
 /**
-**	Update client menu of server menu.
+**	Update client menu to follow server menu.
 */
 global void NetClientUpdateState(void)
 {
