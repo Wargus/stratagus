@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+    <TITLE>FreeCraft Configuration Language Description: Icon</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,tileset">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Icon</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 2001 by The FreeCraft Project. Distributed under the
+<A HREF="../artistic-license.html">"Artistic License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<A HREF="tileset.html">PREV</A> 
+<A HREF="unittype.html">NEXT</A> 
+<HR>
+<A HREF="#define-icon-wc-names">define-icon-wc-names</A>
+<A HREF="#define-icon">define-icon</A>
+<A HREF="#define-icon-alias">define-icon-alias</A>
+<HR>
+<H2>Intro - Introduction to icon functions and variables</H2>
+
+Everything around the C icon structure.
+<H2>Functions</H2>
+<A NAME="define-icon-wc-names"></A>
+<H3>define-icon-wc-names</H3>
+
+<H4>Description</H4>
+
+    Define the mapping of the icon numbers in puds, to the icon names.
+
+<H4>Syntax</H4>
+
+<CODE>(define-icon-wc-names icon-0 icon-1 ... icon-195)</CODE>
+
+<DL>
+<DT>icon-0</DT>
+<DD>Name of the icon assigned to index 0 (peasant).
+</DD>
+<DT>icon-1</DT>
+<DD>Name of the icon assigned to index 1 (peon).
+</DD>
+<DT>icon-195</DT>
+<DD>Name of the icon assigned to index 195. In the original only until this
+number are icons defined.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-icon-wc-names 
+      'icon-peasant 'icon-peon 'icon-footman ... )
+</PRE>
+
+<P>This is the default icon mapping.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-icon"></A>
+<H3>define-icon</H3>
+
+<H4>Description</H4>
+
+    Define an icon for the engine.<P>
+
+    This could also be defined in own levels. <P>
+
+<H4>Syntax</H4>
+
+<CODE>(define-icon ident tileset type argument file)</CODE>
+
+FIXME:
+
+<DL>
+<DT>ident</DT>
+<DD>
+</DD>
+<DT>tileset</DT>
+<DD>
+</DD>
+<DT>type</DT>
+<DD>
+</DD>
+<DT>argument</DT>
+<DD>
+</DD>
+<DT>file</DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-icon 'icon-peasant 'tileset-summer 'normal 0 "icons (summer).png")
+</PRE>
+
+Define the peasant icon referenced with icon-peasant for the summer tileset.
+It is a normal static icon.  The graphic is loaded from the file
+"icons (summer).png" and is the first icon in this file.
+
+<A NAME="define-icon-alias"></A>
+<H3>define-icon-alias</H3>
+
+<H4>Description</H4>
+
+    Define an icon alias for an icon.<P>
+    This is an alternative name for the icon.
+
+<H4>Syntax</H4>
+
+<CODE>(define-icon-alias alias icon)</CODE>
+
+FIXME:
+
+<DL>
+<DT>ident</DT>
+<DD>
+</DD>
+<DT>tileset</DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-icon-alias 'icon-raise-dead 'icon-skeleton)
+</PRE>
+
+Now it is possible to get the icon "skeleton" also with the name
+"icon-raise-dead".
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2001 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
