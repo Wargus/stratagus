@@ -3447,10 +3447,7 @@ global void SaveUnits(FILE* file)
     //
     fprintf(file,"(set-hitpoint-regeneration! #%s)\n",
 	    HitPointRegeneration ? "t" : "f");
-    if( FancyBuildings ) {
-	fprintf(file,"(fancy-buildings)");
-    }
-    fprintf(file,";;(set-fancy-buildings! #%s)\n",
+    fprintf(file,"(set-fancy-buildings! #%s)\n",
 	    FancyBuildings ? "t" : "f");
 
     for( table=Units; table<&Units[NumUnits]; ++table ) {

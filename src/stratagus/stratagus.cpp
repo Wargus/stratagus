@@ -106,7 +106,7 @@
 **
 **	@subsection Icon Icon
 **
-**		@see icon.h @see icon.c
+**		@see icons.h @see icons.c
 **
 */
 
