@@ -1392,9 +1392,6 @@ static void SaveGameOk(void)
 			ProcessMenu("menu-save-confirm", 0);
 		}
 	}
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -3469,9 +3466,6 @@ static void ScenSelectOk(void)
 	} else if (ScenSelectFileName[0]){
 		EndMenu();
 	}
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -4727,9 +4721,6 @@ static void EditorMainLoadOk(void)
 	} else if (ScenSelectFileName[0]) {
 		EndMenu();
 	}
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -4833,9 +4824,6 @@ static void EditorLoadOk(void)
 	} else if (ScenSelectFileName[0]) {
 		EndMenu();
 	}
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -5310,9 +5298,6 @@ static void EditorSaveOk(void)
 			EditorEndMenu();
 		}
 	}
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -5364,9 +5349,6 @@ static void EditorSaveConfirmOk(void)
 {
 	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorEndMenu();
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
 }
 
 /**
