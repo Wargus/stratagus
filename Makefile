@@ -190,19 +190,10 @@ endif
 #	TOOLS
 ##############################################################################
 
-tools: tools/aledoc$(EXE) tools/war1tool$(EXE) \
-	tools/startool$(EXE)
+tools: tools/aledoc$(EXE)
 
 tools/aledoc$(EXE): tools/aledoc.c
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
-
-tools/war1tool$(EXE): tools/war1tool.c
-	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
-
-tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/stratagus/$(OBJDIR)/mpq.o
-	if [ ! -d $(TOPDIR)/src/stratagus/$(OBJDIR) ]; then \
-	mkdir -p $(TOPDIR)/src/stratagus/$(OBJDIR); fi
-	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS) $(TOPDIR)/src/stratagus/$(OBJDIR)/mpq.o
 
 ##############################################################################
 #	Distributions
