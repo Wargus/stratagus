@@ -272,6 +272,10 @@ typedef unsigned short UnitRef;
 
 /**
 **	All possible unit actions.
+**
+**	@note	Always change the table ::HandleActionTable
+**
+**	@see HandleActionTable
 */
 enum _unit_action_ {
     UnitActionNone,			/// No valid action
@@ -288,7 +292,6 @@ enum _unit_action_ {
 
     UnitActionTrain,			/// building is training
     UnitActionUpgradeTo,		/// building is upgrading itself
-    // UnitActionUpgrade,		/// building is researching upgrade
     UnitActionResearch,			/// building is researching spell
     UnitActionBuilded,			/// building is under construction
 
