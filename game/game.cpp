@@ -193,19 +193,21 @@ global void CreateGame(char* filename, WorldMap* map)
 		if (NetPlayers > 1) {
 		    NetworkServerSetup(map);
 		    DebugLevel0Fn("Server setup ready\n");
-		    InitNetwork2();
 		//
 		// Client
 		//
 		} else if (NetworkArg) {
 		    NetworkClientSetup(map);
 		    DebugLevel0Fn("Client setup ready\n");
-		    InitNetwork2();
 		}
 	    } else {
 		ExitNetwork1();
 	    }
 	}
+    }
+
+    if( NetworkFildes!=-1 ) {		// Prepare network play
+	InitNetwork2();
     }
 
     if( GameIntro.Title ) {
