@@ -105,9 +105,9 @@ AC_SUBST(PROFILE_CFLAGS)
 AC_ARG_ENABLE(debug,
     [  --enable-debug	  [Enable debug, implies --disable-optimization (default: no)]])
 if test "$enable_debug" != "yes" -a "$enable_profile" != "yes"; then
-    DEBUG_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math"
+    DEBUG_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
 else
-    DEBUG_CFLAGS="-g -O1 -fsigned-char -Wall -Werror -DDEBUG"
+    DEBUG_CFLAGS="-g -O1 -fsigned-char -Wsign-compare -Wall -Werror -DDEBUG"
 fi
 AC_SUBST(DEBUG_CFLAGS)
 

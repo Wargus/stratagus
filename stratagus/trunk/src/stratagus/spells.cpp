@@ -1356,7 +1356,7 @@ global int		CheckUnitDurationEffect(const t_Conditions	*condition,
 										const Unit* caster,
 										const Unit* target, int x, int y)
 {
-	unsigned int	ttl;
+	int	ttl;
 	assert(condition);
 	ttl = condition->u.durationeffect.ttl;
 
