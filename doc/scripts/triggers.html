@@ -68,603 +68,512 @@
 <hr>
 <h2>Intro - Introduction to trigger functions and variables</h2>
 
-Everything around triggers.
+Everything around triggers.<br>
+Triggers are a couple of (condition, action).
+Each cycles in the game, if the condition of the active triggers is true,
+then the associated actions are executed.
+There are used for condition's victory
+and could be usefull to add special actions when an event occurs.
 <h2>Functions</h2>
 
 <a name="ActionDefeat"></a>
-<h3>(ActionDefeat)</h3>
-
-The condition player is set to defeat.
+<h3>ActionDefeat()</h3>
+ 
+The player lose the game.
 
 
 <h4>Example</h4>
-
 <pre>
-    ;; Adds a trigger.  If the player on the console has 0 units then he loses.
-    (AddTrigger
-      '(
-        (IfUnit 'this '== 0 'all))
-      '(
-        (ActionDefeat)))
+-- Adds a trigger. If the player on the console has 0 units then he loses.
+AddTrigger(
+  function() return IfUnit("this", "==", 0, "all") end,
+  function() return ActionDefeat() end)
 </pre>
 
 <a name="ActionDraw"></a>
-<h3>(ActionDraw)</h3>
+<h3>ActionDraw()</h3>
 
 The condition player is set to draw. (NOT SUPPORTED)
 
 
-<h4>Example</h4>
-
-<pre>
-    (ActionDraw)
-</pre>
-
 <a name="ActionSetSwitch"></a>
-<h3>(ActionSetSwitch number set)</h3>
+<h3>ActionSetSwitch(switch-number, boolean or number)</h3>
 
 Set a switch.
 
 
 <dl>
-<dt>number</dt>
-<dd>The switch number.
-</dd>
-<dt>set</dt>
-<dd>#t to set the switch on, #f to clear or turn the switch off
-</dd>
+  <dt>switch-number</dt>
+  <dd>The switch number.</dd>
+  <dt>boolean or number</dt>
+  <dd>if it is a number, 0 is equivalent to false, non-null value is equivalent to true.
+  true to set the switch on, false to clear or turn the switch off</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Sets switch 1 on.
-    (ActionSetSwitch 1 #t)
+-- Sets switch 1 on.
+ActionSetSwitch(1, true)
 </pre>
 
 <a name="ActionSetTimer"></a>
-<h3>(ActionSetTimer cycles increasing)</h3>
+<h3>ActionSetTimer(cycles, increasing)</h3>
 
 Set the timer.
 
 
 <dl>
-<dt>cycles</dt>
-<dd>The number of cycles (default setting is 30 cycles per second).
-</dd>
-<dt>increasing</dt>
-<dd>Set this to 1 if you want the timer to increase, set it to 0 for decreasing.
-</dd>
+  <dt>cycles</dt>
+  <dd>The number of cycles (default setting is 30 cycles per second).</dd>
+  <dt>increasing</dt>
+  <dd>Set this to 1 if you want the timer to increase, set it to 0 for decreasing.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Sets the timer to 9000 cycles (300 seconds or 5 minutes) and decreasing.
-    (ActionSetTimer 9000 0)
+-- Sets the timer to 9000 cycles (300 seconds or 5 minutes) and decreasing.
+ActionSetTimer(9000, 0)
 </pre>
 
 <a name="ActionStartTimer"></a>
-<h3>(ActionStartTimer)</h3>
+<h3>ActionStartTimer()</h3>
 
 Start the timer.
 
 
-<h4>Example</h4>
-
-<pre>
-    ;; Starts the timer.
-    (ActionStartTimer)
-</pre>
-
 <a name="ActionStopTimer"></a>
-<h3>(ActionStopTimer)</h3>
+<h3>ActionStopTimer()</h3>
 
 Stop the timer.
 
 
-<h4>Example</h4>
-
-<pre>
-    ;; Stops the timer.
-    (ActionStopTimer)
-</pre>
-
 <a name="ActionVictory"></a>
-<h3>(ActionVictory)</h3>
+<h3>ActionVictory()</h3>
 
 The condition player is set to victory.
 
-
 <h4>Example</h4>
-
 <pre>
-    ;; Adds a trigger. If the player on the console has killed all his 
-    ;; opponents he won.
-    (AddTrigger
-      '(
-        (IfOpponents 'this '== 0))
-      '(
-        (ActionVictory)))
+-- Adds a trigger. If the player on the console has killed all his 
+-- opponents he won.
+AddTrigger(
+  function() return IfOpponents("this", "==", 0) end,
+  function() return ActionVictory() end)
 </pre>
 
 <a name="ActionWait"></a>
-<h3>(ActionWait ms)</h3>
-
-Causes the trigger to wait a minimum number of milliseconds.
+<h3>ActionWait(time-ms)</h3>
+ 
+Causes the trigger to wait a number of milliseconds before reexamine this trigger.
 
 
 <dl>
-<dt>ms</dt>
-<dd>Minimum number of milliseconds to wait.
-</dd>
+  <dt>time-ms</dt>
+  <dd>Minimum number of milliseconds to wait.</dd>
 </dl>
 
+<!-- IT IS A BAD EXAMPLE NOW.
 <h4>Example</h4>
-
 <pre>
-    ;; Adds a trigger. If the player on the console has killed all his 
-    ;; opponents the message "Hello" appears then two seconds later the message
-    ;; "World" appears.
-    (AddTrigger
-      '(
-        (IfOpponents 'this '== 0))
-      '(
-        (add-message "Hello")
-        (ActionWait 2000)
-        (add-message "World")
-        #f))
+-- Adds a trigger. If the player on the console has killed all his 
+-- opponents the message "Hello" appears then two seconds later the message
+-- "World" appears.
+AddTrigger(
+  function() return IfOpponents("this", "==", 0) end,
+  {
+    function() return AddMessage("Hello") end,
+    function() return ActionWait(2000) end,
+    function() return AddMessage("World") end
+  }
+)
 </pre>
+-->
 
 <a name="AddTrigger"></a>
-<h3>(AddTrigger condition action)</h3>
+<h3>AddTrigger(condition, action)</h3>
 
 Creates a new trigger.
-
+<br>FIXME: in code, action could be a table, but crash on execution..
 
 <dl>
-<dt>condition</dt>
-<dd><pre>
-condition can be
-	'(
-          (or
-            (and condition1 conditon2 ...)
-	    (and condition3 condition4 ...)))
-	...
-	- condition1 and condition2 and ... must be true or condition3
-	  and condition4 and ... must be true to execute the action.
-</pre></dd>
-<dt>action</dt>
-<dd><pre>
-action can be any valid scheme (CCL) statement and is executed if
-the condition is true.  The trigger remains active if the action
-returns true and is removed if the action returns false.
-</pre></dd>
+  <dt>condition</dt>
+  <dd>Function which must return true to execute the condition. It is tested every FIXME.</dd>
+  <dt>action</dt>
+  <dd>
+  Function executed when condition return true. The trigger remains active
+  if the action returns true and is removed if the action returns false.
+  </dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Adds a trigger. If the player on the console has killed all his 
-    ;; opponents he won.
-    (AddTrigger
-      '(
-        (IfOpponents 'this '== 0))
-      '(
-        (ActionVictory)))
+-- Adds a trigger. If the player on the console has killed all his 
+-- opponents he won.
+AddTrigger(
+  function() return IfOpponents("this", "==", 0) end,
+  function() return ActionVictory() end)
 </pre>
 
 <a name="IfElapsed"></a>
-<h3>(IfElapsed op quantity)</h3>
-
-Game run for duration.  If the game run for the duration game cycles the action is executed.
-
+<h3><h3>IfElapsed(op, quantity)</h3>
+ 
+Return true if the game-cycle "op" quantity is true.
 
 <dl>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>quantity</dt>
-<dd><pre>
-0 ... oo    Number for the quantity
-</pre></dd>
+  <dt>quantity</dt>
+  <dd>Number of cycle to compare</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; If the game has run for 300 cycles.
-    (IfElapsed '&gt;= 300)
+-- True when the game has run for 300 cycles.
+IfElapsed("&gt;=", 300)
 </pre>
 
 <a name="IfKills"></a>
-<h3>(IfKills player op quantity)</h3>
+<h3>IfKills(player, op, quantity)</h3>
 
-Player has quantity of kills. Which quantity must be killed by the
-player for the action.
+Return true if the player's kills "op" quantity is true.
 
 
 <dl>
-<dt>player</dt>
-<dd><pre>
-0 .. 16    Player number
-'any       Matches any player
-'all       All players (Not used)
-'this      Player on the local computer, Human player in the campaign.
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>quantity</dt>
-<dd><pre>
-0 ... oo    Number for the quantity
-</pre></dd>
+  <dt>quantity</dt>
+  <dd>Number to compare with the quantity of kill</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (IfKills 'this '&gt;= 30)
+-- True when local player has killed 30 or more units.
+IfKills("this", "&gt;=", 30)
 </pre>
 
 <a name="IfNearUnit"></a>
-<h3>(IfNearUnit player op quantity unit unit)</h3>
-
-Player has the quantity of unit-type near to unit-type. Which unit 
-and how many units must the player have near to an other unit for 
-the action.
+<h3>IfNearUnit(player, op, quantity, unit1, unit2)</h3>
+ 
+Return true if the number of unit1 near of unit2 "op" quantity is true for the player.
 
 
 <dl>
-<dt>player</dt>
-<dd><pre>
-0 .. 16    Player number
-'any       Matches any player
-'all       All players (Not used)
-'this      Player on the local computer, Human player in the campaign.
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>quantity</dt>
-<dd><pre>
-0 ... oo    Number for the quantity
+  <dt>quantity</dt>
+  <dd>Number to compare with number of units</dd>
+  <dt>unit1</dt>
+  <dd><pre>
+unit-name    Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
 </pre></dd>
-<dt>unit</dt>
-<dd><pre>
-'unit-name  Unit type of this name
-'any        Matches any unit type
-'all        All units (sum of units and buildings)
-'units      All non building units
-'building   All building units
-</pre></dd>
+  <dt>unit2</dt>
+  <dd>unit-name, so unit type of this name.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; If the player on the console has 6 archers near the circle of power.
-    (IfNearUnit 'this '== 6 'unit-archer 'unit-circle-of-power)
+-- true when the player on the console has 6 archers near one of his/her circle of power.
+IfNearUnit("this", "==", 6, "unit-archer", "unit-circle-of-power")
 </pre>
 
 <a name="IfOpponents"></a>
-<h3>(IfOpponents player op quantity)</h3>
+<h3>IfOpponents(player, op, quantity)</h3>
 
-Player has the quantity of opponents.
+Return true when number of opponent's of the player "op" quantity is true.
 
 
 <dl>
-<dt>player</dt>
-<dd><pre>
-0 .. 16    Player number
-'any       Matches any player
-'all       All players (Not used)
-'this      Player on the local computer, Human player in the campaign.
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>quantity</dt>
-<dd><pre>
-0 ... oo    Number for the quantity
-</pre></dd>
+  <dt>quantity</dt>
+  <dd>Number to compare with number of opponent.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (IfOpponents 'this '== 0)
+-- True when player of the console doesn't have opponent
+IfOpponents("this", "==", 0)
 </pre>
 
 <a name="IfRescuedNearUnit"></a>
-<h3>(IfRescuedNearUnit player op quantity unit unit)</h3>
-
-Player has the quantity of rescued unit-type near to unit-type. Which 
-rescued unit and how many units must the player have near to a unit 
-for the action.
-
+<h3>IfRescuedNearUnit(player, op, quantity, unit1, unit2)</h3>
+ 
+Return true if the number of rescued-units of type unit1 which are currently near of unit2
+of the player "op" quantity is true.
 
 <dl>
-<dt>player</dt>
-<dd><pre>
-0 .. 16    Player number
-'any       Matches any player
-'all       All players (Not used)
-'this      Player on the local computer, Human player in the campaign.
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>quantity</dt>
-<dd><pre>
-0 ... oo    Number for the quantity
+  <dt>quantity</dt>
+  <dd>Number to compare with number of rescued-unit</dd>
+  <dt>unit1</dt>
+  <dd><pre>
+unit-name    Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
 </pre></dd>
-<dt>unit</dt>
-<dd><pre>
-'unit-name  Unit type of this name
-'any        Matches any unit type
-'all        All units (sum of units and buildings)
-'units      All non building units
-'building   All building units
-</pre></dd>
+  <dt>unit2</dt>
+  <dd>unit-name, so unit type of this name.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; The player on the console has 1 rescued archer near the circle of power.
-    (IfRescuedNearUnit 'this '== 1 'unit-archer 'unit-circle-of-power)
+-- True when The player on the console has 1 rescued archer near the circle of power.
+IfRescuedNearUnit("this", "==", 1, "unit-archer", "unit-circle-of-power")
 </pre>
 
 <a name="IfResource"></a>
-<h3>(IfResource player op quantity resource)</h3>
+<h3>IfResource(player, op, quantity, resource)</h3>
 
-Player has the quantity of resources. This condition is used to 
-specify how many or how little resources (gold, oil, lumber) a 
-player must have for the action.
+Return true if ressource of player "op" quantity is true.
 
 
 <dl>
-<dt>player</dt>
-<dd><pre>
-0 .. 16    Player number
-'any       Matches any player
-'all       All players (Not used)
-'this      Player on the local computer, Human player in the campaign.
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>quantity</dt>
-<dd><pre>
-0 ... oo    Number for the quantity
-</pre></dd>
-<dt>resource</dt>
-<dd><pre>
+  <dt>quantity</dt>
+  <dd>Number to compare with number of ressource</dd>
+  <dt>resource</dt>
+  <dd><pre>
 Name of the resource or:
-'all        Sum of all resources in store
-'any        Any resource
+"all"        Sum of all resources in store
+"any"        Any resource
 </pre></dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; If the player on the console has at least 5000 gold.
-    (IfResource 'this '&gt;= 5000 'gold)
+-- True when the player on the console has at least 5000 gold.
+IfResource("this", "&gt;=", 5000, "gold")
 </pre>
 
 <a name="IfScore"></a>
-<h3>(IfScore player op quantity)</h3>
-
-Player has the quantity of score. If the player reaches the 
-quantity of score the action is executed.
-
+<h3>IfScore(player, op, quantity)</h3>
+ 
+Return true if score of player "op" quantity is true.
 
 <dl>
-<dt>player</dt>
-<dd><pre>
-0 .. 16    Player number
-'any       Matches any player
-'all       All players (Not used)
-'this      Player on the local computer, Human player in the campaign.
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>quantity</dt>
-<dd><pre>
-0 ... oo    Number for the quantity
-</pre></dd>
-</dd>
+  <dt>quantity</dt>
+  <dd>Number to compare with score.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; If the player on the console has a score of at least 1000.
-    (IfScore 'this '&gt;= 1000)
+-- True when the player on the console has a score of at least 1000.
+IfScore("this", "&gt;=", 1000)
 </pre>
 
 <a name="IfSwitch"></a>
-<h3>(IfSwitch number set)</h3>
-
-Checks the value of a switch.
+<h3>IfSwitch(number, set)</h3>
+ 
+Return true if switch number is set.
 
 
 <dl>
-<dt>number</dt>
-<dd>Number of the switch
-</dd>
-<dt>set</dt>
-<dd>#t to check if the switch is on, #f for off
-</dd>
+  <dt>number</dt>
+  <dd>Number of the switch</dd>
+  <dt>set: true (or non null-number) or false (or 0)</dt>
+  <dd>true to check if the switch is on, false for off</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Checks if switch 1 is on.
-    (IfSwitch 1 #t)
+-- True when switch 1 is on.
+IfSwitch(1, true)
 </pre>
 
 <a name="IfTimer"></a>
-<h3>(IfTimer op cycles)</h3>
-
-Timer reaches quantity. If the timer reaches quantity the action is executed.
-
-
-<dl>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+<h3>IfTimer(op, cycles)</h3>
+ 
+Return true if Timer "op" cycles quantity is true.
+ 
+ 
+ <dl>
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>cycles</dt>
-<dd><pre>
-0 ... oo    Number of cycles
-</pre></dd>
+  <dt>cycles</dt>
+  <dd>Number to compare with number of cycles</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; If the timer is at 0 cycles.
-    (IfTimer '== 0)
+-- True when the timer is at 0 cycles.
+IfTimer("==", 0)
 </pre>
 
 <a name="IfUnit"></a>
-<h3>(IfUnit player op quantity unit)</h3>
+<h3>IfUnit(player, op, quantity, unit-type)</h3>
 
-Player has the quantity of unit-type. Which unit and how many 
-units must control the player for the action.
+Return true if number of unit of type unit-type of the player "op" quantity is true.
 
 
 <dl>
-<dt>player</dt>
-<dd><pre>
-0 .. 16    Player number
-'any       Matches any player
-'all       All players (Not used)
-'this      Player on the local computer, Human player in the campaign.
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>quantity</dt>
-<dd><pre>
-0 ... oo    Number for the quantity
-</pre></dd>
-<dt>unit</dt>
-<dd><pre>
-'unit-name  Unit type of this name
-'any        Matches any unit type
-'all        All units (sum of units and buildings)
-'units      All non building units
-'building   All building units
+  <dt>quantity</dt>
+  <dd>Number to compare with number of rescued-unit</dd>
+  <dt>unit-type</dt>
+  <dd><pre>
+unit-name    Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
 </pre></dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; If the player on the console has at least 8 archers.
-    (IfUnit 'this '&gt;= 8 'unit-archer)
+-- True when the player on the console has at least 8 archers.
+IfUnit("this", "&gt;=", 8, "unit-archer")
 </pre>
 
 <a name="IfUnitAt"></a>
-<h3>(IfUnitAt player op quantity unit location1 location2)</h3>
-
-Player has the quantity of unit-type at a location.
-
+<h3>IfUnitAt(player, op, quantity, unit-type, {x1, y1}, {x2, y2})</h3>
+ 
+Return true if number of unit of type unit-type which are in the rectangle defined with (x1, y1, x2, y2)
+of the player "op" quantity is true.
 
 <dl>
-<dt>player</dt>
-<dd><pre>
-0 .. 16    Player number
-'any       Matches any player
-'all       All players (Not used)
-'this      Player on the local computer, Human player in the campaign.
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-<dt>op</dt>
-<dd><pre>
-'==         operator equal
-'&gt;          operator greater than
-'&gt;=         operator greater than or equal
-'&lt;          operator less than
-'&lt;=         operator less than or equal
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
 </pre></dd>
-<dt>quantity</dt>
-<dd><pre>
-0 ... oo    Number for the quantity
+  <dt>quantity</dt>
+  <dd>Number to compare with number of units</dd>
+  <dt>unit</dt>
+  <dd><pre>
+unit-name    Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
 </pre></dd>
-<dt>unit</dt>
-<dd><pre>
-'unit-name  Unit type of this name
-'any        Matches any unit type
-'all        All units (sum of units and buildings)
-'units      All non building units
-'building   All building units
-</pre></dd>
-<dt>location1</dt>
-<dd><pre>
-'(x1 y1)   Upper left corner
-</pre></dd>
-<dt>location2</dt>
-<dd><pre>
-'(x2 y2)   Lower right corner
-</pre></dd>
+  <dt>{x1, y1}</dt>
+  <dd>Upper left corner</dd>
+  <dt>{x2, y2}</dt>
+  <dd>Lower right corner</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; If the player on the console has at least 8 archers in the rectangle
-    ;; (10 10) to (12 14).
-    (IfUnitAt 'this '&gt;= 8 'unit-archer '(10 10) '(12 14))
+-- True when the player on the console has at least 8 archers in the rectangle
+-- (10 10) to (12 14).
+IfUnitAt("this", "'&gt;=", 8, "unit-archer", {10, 10}, {12, 14})
 </pre>
 
 <hr>
