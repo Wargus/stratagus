@@ -207,7 +207,7 @@ extern void NetworkInitClientConnect(void); /// Setup network connect state mach
 extern void NetworkExitClientConnect(void); /// Terminate network connect state machine for clients
 extern void NetworkInitServerConnect(void); /// Setup network connect state machine for the server
 extern void NetworkExitServerConnect(void); /// Terminate network connect state machine for the server
-extern void NetworkParseSetupEvent(const char *buf, int size); /// Parse a network connect event
+extern int NetworkParseSetupEvent(const char *buf, int size); /// Parse a network connect event
 extern int NetworkSetupServerAddress(const char *serveraddr); /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest(void); /// Menu Loop: Send out client request messages
 extern void NetworkProcessServerRequest(void); /// Menu Loop: Send out server request messages
