@@ -147,6 +147,10 @@ global void HandleActionSpellCast(Unit* unit)
 		  {
 		  UnitShowAnimation(unit,unit->Type->Animations->Attack);
 		  if ( !unit->Reset ) return;
+		  if ( unit->Command.Data.Move.Goal &&
+		       unit->Command.Data.Move.Goal->Destroyed )
+		  repeat = 0;
+		  else
 		  repeat = SpellCast(unit->Command.Data.Move.SpellId, 
 				    unit, 
 				    unit->Command.Data.Move.Goal, 
