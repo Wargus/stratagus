@@ -162,7 +162,7 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
 	    }
 	}
     }
-    return 0;
+    return 1;
 }
 
 /**
@@ -335,7 +335,7 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	    caster->Refs++;
 	}
     }
-    return caster->Mana > spell->ManaCost;
+    return 1;
 }
 
 /**
@@ -414,7 +414,7 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
     missile->TargetUnit = target;
     RefsDebugCheck(!caster->Refs || caster->Destroyed);
     caster->Refs++;
-    return 0;
+    return 1;
 }
 
 /**
@@ -679,16 +679,20 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 	    target->CurrentSightRange = target->Stats->SightRange;
 	    MapMarkUnitSight(target);
 	} else {
+	    //	This is a hack to walk around behaviour of DropOutOnSide
+	    target->X++;
 	    DropOutOnSide(target, LookingW, 0, 0);
 	    CheckUnitToBeDrawn(target);
 	}
 	
 	caster->Mana -= spell->ManaCost;
+
+	MakeMissile(spell->Missile,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+	return 1;
     }
 
-    MakeMissile(spell->Missile,
-	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
     return 0;
 }
 
@@ -1172,6 +1176,8 @@ global int AutoCastSpell(Unit* caster, const SpellType* spell)
 global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
+    int cont;
+
     SpellActionType* act;
     DebugCheck(!spell);
     DebugCheck(!spell->Action->CastFunction);
@@ -1198,6 +1204,7 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	unit->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
     if (CanCastSpell(caster, spell, target, x, y)) {
 	act=spell->Action;
+	cont=1;
 	//
 	//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 	//
@@ -1208,11 +1215,24 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 	while (act) {
 	    DebugCheck(!act->CastFunction);
-	    act->CastFunction(caster, spell, act, target, x, y);
+	    cont = cont && act->CastFunction(caster, spell, act, target, x, y);
 	    act=act->Next;
 	}
+	//
+	//	Spells like blizzard are casted again.
+	//	This is sort of confusing, we do the test again, to
+	//	check if it will be possible to cast again. Otherwise,
+	//	when you're out of mana the caster will try again ( do the
+	//	anim but fail in this proc.
+	//
+	if (spell->RepeatCast && cont) {
+	    return CanCastSpell(caster, spell, target, x, y);
+	}
     }
-    return 0;
+    //
+    //	Can't cast, STOP.
+    //
+    return 0; 
 }
 
 /*

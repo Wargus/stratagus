@@ -252,7 +252,8 @@ typedef struct _spell_type_ {
     
     int Range;				/// Max range of the target.
 #define INFINITE_RANGE 0xFFFFFFF
-    int ManaCost;			/// required mana for each cast
+    int ManaCost;			/// Required mana for each cast.
+    int RepeatCast;			/// If the spell will be cast again until out of targets.
 
     int DependencyId;			/// Id of upgrade, -1 if no upgrade needed for cast the spell.
     ConditionInfo *Condition;		/// Conditions to cast the spell. (generic (no test for each target))
