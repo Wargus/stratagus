@@ -307,17 +307,17 @@ local Graphic* Menusbgnd;
 **	Items for the Game Menu
 */
 local Menuitem GameMenuItems[] = {
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, InitGameMenu, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, InitGameMenu, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitGameMenuItems() {
 #ifdef OLD_MENU
+local void InitGameMenuItems() {
     MenuitemText   i0 = { "Game Menu", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11};
     MenuitemButton i2 = { "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12};
@@ -334,21 +334,21 @@ local void InitGameMenuItems() {
     GameMenuItems[5].d.button = i5;
     GameMenuItems[6].d.button = i6;
     GameMenuItems[7].d.button = i7;
-#endif
 }
+#endif
 
 /**
 **	Items for the Victory Menu
 */
 local Menuitem VictoryMenuItems[] = {
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
 
-local void InitVictoryMenuItems() {
 #ifdef OLD_MENU
+local void InitVictoryMenuItems() {
     MenuitemText   i0 = { "Congratulations!", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { "You are victorious!", MI_TFLAGS_CENTERED};
     MenuitemButton i2 = { "~!Victory", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'};
@@ -357,45 +357,45 @@ local void InitVictoryMenuItems() {
     VictoryMenuItems[1].d.text   = i1;
     VictoryMenuItems[2].d.button = i2;
     VictoryMenuItems[3].d.button = i3;
-#endif
 }
+#endif
 
 /**
 **	Items for the Lost Menu
 */
 local Menuitem LostMenuItems[] = {
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitLostMenuItems() {
 #ifdef OLD_MENU
+local void InitLostMenuItems() {
     MenuitemText   i0 = { "You failed to", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { "achieve victory!", MI_TFLAGS_CENTERED};
     MenuitemButton i2 = { "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'};
     LostMenuItems[0].d.text   = i0;
     LostMenuItems[1].d.text   = i1;
     LostMenuItems[2].d.button = i2;
-#endif
 }
+#endif
 
 local Menuitem TipsMenuItems[] = {
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, InitTips, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 14, 256-75, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14+22, 256-75+4, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 14, 256-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 168, 256-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 35+16*0, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 35+16*1, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 35+16*2, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 35+16*3, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 35+16*4, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 35+16*5, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 35+16*6, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 35+16*7, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, InitTips, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 14, 256-75, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14+22, 256-75+4, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 14, 256-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 168, 256-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 35+16*0, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 35+16*1, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 35+16*2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 35+16*3, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 35+16*4, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 35+16*5, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 35+16*6, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 35+16*7, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitTipsMenuItems() {
 #ifdef OLD_MENU
+local void InitTipsMenuItems() {
     MenuitemText   i0  = { "Freecraft Tips", MI_TFLAGS_CENTERED};
     MenuitemGem    i1  = { MI_GSTATE_CHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetTips};
     MenuitemText   i2  = { "Show tips at startup", MI_TFLAGS_LALIGN};
@@ -422,24 +422,24 @@ local void InitTipsMenuItems() {
     TipsMenuItems[10].d.text  = i10;
     TipsMenuItems[11].d.text  = i11;
     TipsMenuItems[12].d.text  = i12;
-#endif
 }
+#endif
 
 local Menuitem ObjectivesMenuItems[] = {
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 38+21*0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 38+21*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 38+21*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 38+21*3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 38+21*4, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 38+21*5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 38+21*6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 38+21*7, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 14, 38+21*8, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 38+21*0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 38+21*1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 38+21*2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 38+21*3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 38+21*4, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 38+21*5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 38+21*6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 38+21*7, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 14, 38+21*8, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitObjectivesMenuItems() {
 #ifdef OLD_MENU
+local void InitObjectivesMenuItems() {
     MenuitemText   i0  = { "Objectives", MI_TFLAGS_CENTERED};
     MenuitemText   i1  = { NULL, 0};
     MenuitemButton i10 = { "~!OK", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'};
@@ -454,19 +454,19 @@ local void InitObjectivesMenuItems() {
     ObjectivesMenuItems[8].d.text    = i1;
     ObjectivesMenuItems[9].d.text    = i1;
     ObjectivesMenuItems[10].d.button = i10;
-#endif
 }
+#endif
 
 local Menuitem EndScenarioMenuItems[] = {
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36*0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36*3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitEndScenarioMenuItems() {
 #ifdef OLD_MENU
+local void InitEndScenarioMenuItems() {
     MenuitemText   i0 = { "End Scenario", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "~!Restart Scenario", 224, 27, MBUTTON_GM_FULL, EndScenarioRestart, 'r'};
     MenuitemButton i2 = { "~!Surrender", 224, 27, MBUTTON_GM_FULL, EndScenarioSurrender, 's'};
@@ -479,8 +479,8 @@ local void InitEndScenarioMenuItems() {
     EndScenarioMenuItems[3].d.button = i3;
     EndScenarioMenuItems[4].d.button = i4;
     EndScenarioMenuItems[5].d.button = i5;
-#endif
 }
+#endif
 
 /**
 **	Items for the SelectScen Menu
@@ -516,22 +516,22 @@ global MapInfo *ScenSelectPudInfo;		/// Selected pud info
 **	Scenario selection menu.
 */
 local Menuitem ScenSelectMenuItems[] = {
-    { MI_TYPE_TEXT, 176, 8, 0, LargeFont, ScenSelectInit, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 176, 8, 0, LargeFont, ScenSelectInit, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_LISTBOX, 24, 140, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit, {{NULL,0}} },
-    { MI_TYPE_VSLIDER, 312, 140, 0, 0, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_LISTBOX, 24, 140, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit, NULL, {{NULL,0}} },
+    { MI_TYPE_VSLIDER, 312, 140, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_BUTTON, 48, 318, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 198, 318, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 48, 318, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 198, 318, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitScenSelectMenuItems() {
 #ifdef OLD_MENU
+local void InitScenSelectMenuItems() {
     MenuitemText    i0 = { "Select scenario", MI_TFLAGS_CENTERED};
 
     MenuitemListbox  i1 = { NULL, 288, 6*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 6, 0, 0,
@@ -556,25 +556,25 @@ local void InitScenSelectMenuItems() {
     ScenSelectMenuItems[7].d.text     = i7;
     ScenSelectMenuItems[8].d.pulldown = i8;
     ScenSelectMenuItems[9].d.button   = i9;
-#endif
 }
+#endif
 
 /**
 **	Items for the Program Start Menu
 */
 local Menuitem PrgStartMenuItems[] = {
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 7, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 7, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitPrgStartMenuItems() {
 #ifdef OLD_MENU
+local void InitPrgStartMenuItems() {
     MenuitemDrawfunc i0 = { NameLineDrawFunc };
     MenuitemButton   i1 = { "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'};
     MenuitemButton   i2 = { "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'};
@@ -593,8 +593,8 @@ local void InitPrgStartMenuItems() {
     PrgStartMenuItems[6].d.button   = i6;
     PrgStartMenuItems[7].d.button   = i7;
     PrgStartMenuItems[8].d.button   = i8;
-#endif
 }
+#endif
 
 /**
 **	Items for the Custom Game Setup Menu
@@ -677,28 +677,28 @@ local unsigned char *mgptsoptions[] = {
 **	Single player custom game menu.
 */
 local Menuitem CustomGameMenuItems[] = {
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, GameSetupInit, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 640/2+12, 192, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, GameSetupInit, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 640/2+12, 192, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 640-224-16, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 640-224-16, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 640-224-16, 10+300-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+300, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitCustomGameMenuItems() {
 #ifdef OLD_MENU
+local void InitCustomGameMenuItems() {
     MenuitemDrawfunc i0  = { GameDrawFunc };
     MenuitemText     i1  = { "~<Single Player Game Setup~>", MI_TFLAGS_CENTERED};
     MenuitemButton   i2  = { "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, ScenSelectMenu, 'e'};
@@ -733,20 +733,20 @@ local void InitCustomGameMenuItems() {
     CustomGameMenuItems[14].d.pulldown = i14;
     CustomGameMenuItems[15].d.text     = i15;
     CustomGameMenuItems[16].d.pulldown = i16;
-#endif
 }
+#endif
 
 /**
 **	Items for the Enter Name Menu
 */
 local Menuitem EnterNameMenuItems[] = {
-    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 24, 80, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 154, 80, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 24, 80, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 154, 80, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitEnterNameMenuItems() {
 #ifdef OLD_MENU
+local void InitEnterNameMenuItems() {
     MenuitemText   i0 = { "Enter your name:", MI_TFLAGS_CENTERED};
     MenuitemInput  i1 = { NULL, 212, 20, MBUTTON_PULLDOWN, EnterNameAction, 0, 0};
     MenuitemButton i2 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
@@ -755,20 +755,20 @@ local void InitEnterNameMenuItems() {
     EnterNameMenuItems[1].d.input  = i1;
     EnterNameMenuItems[2].d.button = i2;
     EnterNameMenuItems[3].d.button = i3;
-#endif
 }
+#endif
 
 /**
 **	Items for the Enter Server Menu
 */
 local Menuitem EnterServerIPMenuItems[] = {
-    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 24, 80, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 154, 80, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 24, 80, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 154, 80, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitEnterServerIPMenuItems() {
 #ifdef OLD_MENU
+local void InitEnterServerIPMenuItems() {
     MenuitemText   i0 = { "Enter server IP-address:", MI_TFLAGS_CENTERED};
     MenuitemInput  i1 = { NULL, 212, 20, MBUTTON_PULLDOWN, EnterServerIPAction, 0, 0};
     MenuitemButton i2 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
@@ -777,128 +777,128 @@ local void InitEnterServerIPMenuItems() {
     EnterServerIPMenuItems[1].d.input  = i1;
     EnterServerIPMenuItems[2].d.button = i2;
     EnterServerIPMenuItems[3].d.button = i3;
-#endif
 }
+#endif
 
 /**
 **	Items for the Net Create Join Menu
 */
 local Menuitem NetCreateJoinMenuItems[] = {
-    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, NULL/*StartMenusSetBackground*/, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitNetCreateJoinMenuItems() {
 #ifdef OLD_MENU
+local void InitNetCreateJoinMenuItems() {
     MenuitemButton i0 = { "~!Join Game", 224, 27, MBUTTON_GM_FULL, JoinNetGameMenu, 'j'};
     MenuitemButton i1 = { "~!Create Game", 224, 27, MBUTTON_GM_FULL, CreateNetGameMenu, 'c'};
     MenuitemButton i2 = { "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'};
     NetCreateJoinMenuItems[0].d.button = i0;
     NetCreateJoinMenuItems[1].d.button = i1;
     NetCreateJoinMenuItems[2].d.button = i2;
-#endif
 }
+#endif
 
 
 /**
 **	Items for the Net Multiplayer Setup Menu
 */
 local Menuitem NetMultiButtonStorage[] = {
-    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitNetMultiButtonStorage() {
 //#ifdef OLD_MENU
+local void InitNetMultiButtonStorage() {
     MenuitemPulldown i0 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, -1, 0, 0, 0};
     MenuitemDrawfunc i1 = { NetMultiPlayerDrawFunc };
     NetMultiButtonStorage[0].d.pulldown = i0;
     NetMultiButtonStorage[1].d.drawfunc = i1;
-//#endif
 }
+//#endif
 
 /**
 **	Multi player custom game menu (server side).
 */
 local Menuitem NetMultiSetupMenuItems[] = {
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameSetupInit, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameSetupInit, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
     // 8+7 player slots (content here is overwritten!)
 #define SERVER_PLAYER_STATE	5
-    { MI_TYPE_PULLDOWN, 40, 32+22*0, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*1, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*0, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*1, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*0, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*1, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*0, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*1, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
     // 7+7 player ready buttons
 #define SERVER_PLAYER_READY	30
-    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     // FIXME: Slot 15 is reserved for neutral computer
-    //{ MI_TYPE_GEM, 330, 32+22*7, 0, LargeFont, NULL, NULL,
+    //{ MI_TYPE_GEM, 330, 32+22*7, 0, LargeFont, NULL, NULL, NULL,
     //	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL,0} } },
 
     // 7+7 player lag buttons
 #define SERVER_PLAYER_LAG	44
-    { MI_TYPE_GEM, 218, 32+22*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 218, 32+22*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 218, 32+22*3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 218, 32+22*4, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 218, 32+22*5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 218, 32+22*6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 218, 32+22*7, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 218, 32+22*1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 218, 32+22*2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 218, 32+22*3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 218, 32+22*4, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 218, 32+22*5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 218, 32+22*6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 218, 32+22*7, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_GEM, 538, 32+22*0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 538, 32+22*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 538, 32+22*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 538, 32+22*3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 538, 32+22*4, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 538, 32+22*5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 538, 32+22*6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 538, 32+22*0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 538, 32+22*1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 538, 32+22*2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 538, 32+22*3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 538, 32+22*4, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 538, 32+22*5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 538, 32+22*6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     // FIXME: Slot 15 is reserved for neutral computer
-    //{ MI_TYPE_GEM, 538, 32+22*7, 0, LargeFont, NULL, NULL,
+    //{ MI_TYPE_GEM, 538, 32+22*7, 0, LargeFont, NULL, NULL, NULL,
     //	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL,0} } },
 };
-local void InitNetMultiSetupMenuItems() {
 #ifdef OLD_MENU
+local void InitNetMultiSetupMenuItems() {
     MenuitemDrawfunc i0  = { MultiGameDrawFunc };
     MenuitemText     i1  = { "~<Multi Player Setup~>", MI_TFLAGS_CENTERED};
     MenuitemButton   i2  = { "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, MultiScenSelectMenu, 'e'};
@@ -1022,77 +1022,77 @@ local void InitNetMultiSetupMenuItems() {
     NetMultiSetupMenuItems[55].d.gem      = i55;
     NetMultiSetupMenuItems[56].d.gem      = i56;
     NetMultiSetupMenuItems[57].d.gem      = i57;
-#endif
 }
+#endif
 
 /**
 **	Multi player client game menu.
 */
 local Menuitem NetMultiClientMenuItems[] = {
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameClientInit, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameClientInit, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
     // 8+7 player slots
 #define CLIENT_PLAYER_STATE	5
-    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 #define CLIENT_RACE	21
-    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 #define CLIENT_RESOURCE	23
-    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 #define CLIENT_UNITS	25
-    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 #define CLIENT_FOG_OF_WAR	27
-    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 #define CLIENT_TILESET	29
-    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
     // 7+7 player state buttons
 #define CLIENT_PLAYER_READY	30
-    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    //{ MI_TYPE_GEM, 330, 32+22*7, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    //{ MI_TYPE_GEM, 330, 32+22*7, 0, LargeFont, NULL, NULL, NULL,
     //	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
 };
-local void InitNetMultiClientMenuItems() {
 #ifdef OLD_MENU
+local void InitNetMultiClientMenuItems() {
     MenuitemDrawfunc i0 = { MultiGameClientDrawFunc };
 
     MenuitemText     i1 = { "~<Multi Player Game~>", MI_TFLAGS_CENTERED};
@@ -1188,36 +1188,36 @@ local void InitNetMultiClientMenuItems() {
     NetMultiClientMenuItems[41].d.gem      = i41;
     NetMultiClientMenuItems[42].d.gem      = i42;
     NetMultiClientMenuItems[43].d.gem      = i43;
-#endif
 }
+#endif
 
 local Menuitem NetErrorMenuItems[] = {
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 144, 38, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 92, 80, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 38, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 92, 80, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitNetErrorMenuItems() {
 #ifdef OLD_MENU
+local void InitNetErrorMenuItems() {
     MenuitemText   i0 = { "Error:", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { NULL, MI_TFLAGS_CENTERED};
     MenuitemButton i2 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
     NetErrorMenuItems[0].d.text   = i0;
     NetErrorMenuItems[1].d.text   = i1;
     NetErrorMenuItems[2].d.button = i2;
-#endif
 }
+#endif
 
 /**
 **	Items for the Connecting Network Menu
 */
 local Menuitem ConnectingMenuItems[] = {
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 144, 53, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 144, 53, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitConnectingMenuItems() {
 #ifdef OLD_MENU
+local void InitConnectingMenuItems() {
     MenuitemText   i0 = { "Connecting to server", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { NetServerText, MI_TFLAGS_CENTERED};
     MenuitemText   i2 = { NetTriesText , MI_TFLAGS_CENTERED};
@@ -1226,22 +1226,22 @@ local void InitConnectingMenuItems() {
     ConnectingMenuItems[1].d.text   = i1;
     ConnectingMenuItems[2].d.text   = i2;
     ConnectingMenuItems[3].d.button = i3;
-#endif
 }
+#endif
 
 /**
 **	Items for the Campaign Select Menu
 */
 local Menuitem CampaignSelectMenuItems[] = {
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitCampaignSelectMenuItems() {
 #ifdef OLD_MENU
+local void InitCampaignSelectMenuItems() {
     MenuitemButton i0 = { NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu1, 'a'};
     MenuitemButton i1 = { NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu2, 'm'};
     MenuitemButton i2 = { NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu3, 'l'};
@@ -1254,53 +1254,53 @@ local void InitCampaignSelectMenuItems() {
     CampaignSelectMenuItems[3].d.button = i3;
     CampaignSelectMenuItems[4].d.button = i4;
     CampaignSelectMenuItems[5].d.button = i5;
-#endif
 }
+#endif
 
 /**
 **	Items for the Campaign Continue Menu
 */
 local Menuitem CampaignContMenuItems[] = {
-    { MI_TYPE_BUTTON, 508, 320 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 508, 320 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitCampaignContMenuItems() {
 #ifdef OLD_MENU
+local void InitCampaignContMenuItems() {
     MenuitemButton i0 = { "~!Continue", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     CampaignContMenuItems[0].d.button = i0;
-#endif
 }
+#endif
 
 local Menuitem SoundOptionsMenuItems[] = {
-    { MI_TYPE_TEXT, 176, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 176, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_TEXT, 16, 36*1, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 44, 36*2 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 218, 36*2 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 240, 36*1.5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 266, 36*1.5 + 2, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 16, 36*1, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 44, 36*2 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 218, 36*2 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 240, 36*1.5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 266, 36*1.5 + 2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_TEXT, 16, 36*3, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 44, 36*4 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 240, 36*3.5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 266, 36*3.5 + 2, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 16, 36*3, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 44, 36*4 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 240, 36*3.5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 266, 36*3.5 + 2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_TEXT, 16, 36*5, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 240, 36*5.5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 266, 36*5.5 + 2, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 32, 36*6.5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 58, 36*6.5 + 2, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_GEM, 154, 36*6.5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 180, 36*6.5 + 2, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 176 - (106 / 2), 352 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 16, 36*5, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 240, 36*5.5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 266, 36*5.5 + 2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 32, 36*6.5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 58, 36*6.5 + 2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 154, 36*6.5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 180, 36*6.5 + 2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 176 - (106 / 2), 352 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitSoundOptionsMenuItems() {
 #ifdef OLD_MENU
+local void InitSoundOptionsMenuItems() {
     MenuitemText    i0  = { "Sound Options", MI_TFLAGS_CENTERED};
 
     MenuitemText    i1  = { "Master Volume", MI_TFLAGS_LALIGN};
@@ -1353,22 +1353,22 @@ local void InitSoundOptionsMenuItems() {
     SoundOptionsMenuItems[21].d.gem     = i21;
     SoundOptionsMenuItems[22].d.text    = i22;
     SoundOptionsMenuItems[23].d.button  = i23;
-#endif
 }
+#endif
 
 local Menuitem PreferencesMenuItems[] = {
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_GEM, 16, 36*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 46, 36*1 + 2, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 16, 36*1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 46, 36*1 + 2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_GEM, 16, 36*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 46, 36*2 + 2, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_GEM, 16, 36*2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 46, 36*2 + 2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
-    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitPreferencesMenuItems() {
 #ifdef OLD_MENU
+local void InitPreferencesMenuItems() {
     MenuitemText   i0 = { "Preferences", MI_TFLAGS_CENTERED};
     MenuitemGem    i1 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetFogOfWar};
     MenuitemText   i2 = { "Fog of War Enabled", MI_TFLAGS_LALIGN};
@@ -1381,27 +1381,27 @@ local void InitPreferencesMenuItems() {
     PreferencesMenuItems[3].d.gem    = i3;
     PreferencesMenuItems[4].d.text   = i4;
     PreferencesMenuItems[5].d.button = i5;
-#endif
 }
+#endif
 
 local Menuitem SpeedSettingsMenuItems[] = {
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 36*1, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 34, 36*2 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 230, 36*2 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 36*3, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 34, 36*4 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 230, 36*4 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 36*5, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 34, 36*6 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 230, 36*6 + 6, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 16, 36*1, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 34, 36*2 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 230, 36*2 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 16, 36*3, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 34, 36*4 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 230, 36*4 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 16, 36*5, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 34, 36*6 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 230, 36*6 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitSpeedSettingsMenuItems() {
 #ifdef OLD_MENU
+local void InitSpeedSettingsMenuItems() {
     MenuitemText    i0  = { "Speed Settings", MI_TFLAGS_CENTERED};
     MenuitemText    i1  = { "Game Speed", MI_TFLAGS_LALIGN};
     MenuitemHslider i2  = { 0, 11*18, 18, GameSpeedHSAction, -1, 0, 0, 0, ScenSelectOk};
@@ -1430,22 +1430,22 @@ local void InitSpeedSettingsMenuItems() {
     SpeedSettingsMenuItems[11].d.text    = i11;
     SpeedSettingsMenuItems[12].d.text    = i12;
     SpeedSettingsMenuItems[13].d.button  = i13;
-#endif
 }
+#endif
 
 local Menuitem GameOptionsMenuItems[] = {
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 #ifdef WITH_SOUND
-    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 #else
-    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 #endif
-    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 128 - (224 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 128 - (224 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitGameOptionsMenuItems() {
 #ifdef OLD_MENU
+local void InitGameOptionsMenuItems() {
     MenuitemText   i0 = { "Game Options", MI_TFLAGS_CENTERED};
 #ifdef WITH_SOUND
     MenuitemButton i1 = { "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7};
@@ -1460,17 +1460,17 @@ local void InitGameOptionsMenuItems() {
     GameOptionsMenuItems[2].d.button = i2;
     GameOptionsMenuItems[3].d.button = i3;
     GameOptionsMenuItems[4].d.button = i4;
-#endif
 }
+#endif
 
 local Menuitem HelpMenuItems[] = {
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitHelpMenuItems() {
 #ifdef OLD_MENU
+local void InitHelpMenuItems() {
     MenuitemText   i0 = { "Help Menu", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "Keystroke ~!Help", 224, 27, MBUTTON_GM_FULL, KeystrokeHelpMenu, 'h'};
     MenuitemButton i2 = { "Freecraft ~!Tips", 224, 27, MBUTTON_GM_FULL, ShowTipsMenu, 't'};
@@ -1479,14 +1479,14 @@ local void InitHelpMenuItems() {
     HelpMenuItems[1].d.button = i1;
     HelpMenuItems[2].d.button = i2;
     HelpMenuItems[3].d.button = i3;
-#endif
 }
+#endif
 
 local Menuitem KeystrokeHelpMenuItems[] = {
-    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_DRAWFUNC, 16, 40+20, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 16, 40+20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
 // FIXME: ccl these...
 // FIXME: add newer helps
@@ -1530,8 +1530,8 @@ local unsigned char *keystrokehelptexts[] = {
     "F12    - load game",
 };
 
-local void InitKeystrokeHelpMenuItems() {
 #ifdef OLD_MENU
+local void InitKeystrokeHelpMenuItems() {
     MenuitemText     i0 = { "Keystroke Help Menu", MI_TFLAGS_CENTERED};
     MenuitemVslider  i1 = { 0, 18, 12*18, KeystrokeHelpVSAction, -1, 0, 0, 0, NULL};
     MenuitemButton   i2 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
@@ -1540,20 +1540,20 @@ local void InitKeystrokeHelpMenuItems() {
     KeystrokeHelpMenuItems[1].d.vslider  = i1;
     KeystrokeHelpMenuItems[2].d.button   = i2;
     KeystrokeHelpMenuItems[3].d.drawfunc = i3;
-#endif
 }
+#endif
 
 local Menuitem SaveGameMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, InitSaveGameMenu, NULL, {{NULL, 0}} },
-    { MI_TYPE_INPUT, 16, 11+36*1, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveLBInit, SaveLBExit, {{NULL,0}} },
-    { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, InitSaveGameMenu, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_INPUT, 16, 11+36*1, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveLBInit, SaveLBExit, NULL, {{NULL,0}} },
+    { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitSaveGameMenuItems() {
 #ifdef OLD_MENU
+local void InitSaveGameMenuItems() {
     MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
     MenuitemInput   i1 = { NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0};
     MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveLBAction, 0, 0, 0, 0, 7, 0, 0,
@@ -1569,18 +1569,18 @@ local void InitSaveGameMenuItems() {
     SaveGameMenuItems[4].d.button  = i4;
     SaveGameMenuItems[5].d.button  = i5;
     SaveGameMenuItems[6].d.button  = i6;
-#endif
 }
+#endif
 
 local Menuitem LoadGameMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, InitLoadGameMenu, NULL, {{NULL, 0}} },
-    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, LoadLBInit, LoadLBExit, {{NULL,0}} },
-    { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, InitLoadGameMenu, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, LoadLBInit, LoadLBExit, NULL, {{NULL,0}} },
+    { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitLoadGameMenuItems() {
 #ifdef OLD_MENU
+local void InitLoadGameMenuItems() {
     MenuitemText    i0 = { "Load Game", MI_TFLAGS_CENTERED};
     MenuitemListbox i1 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, LoadLBAction, 0, 0, 0, 0, 7, 0, 0,
 			   (void *)LoadLBRetrieve, ScenSelectOk};
@@ -1592,18 +1592,18 @@ local void InitLoadGameMenuItems() {
     LoadGameMenuItems[2].d.vslider = i2;
     LoadGameMenuItems[3].d.button  = i3;
     LoadGameMenuItems[4].d.button  = i4;
-#endif
 }
+#endif
 
 local Menuitem ConfirmSaveMenuItems[] = {
-    { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, ConfirmSaveInit, NULL, {{NULL, 0}} },
-    { MI_TYPE_TEXT, 16, 11+20*1.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
-    { MI_TYPE_TEXT, 16, 11+20*2.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
-    { MI_TYPE_BUTTON, 16, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 288-16-106, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, ConfirmSaveInit, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 16, 11+20*1.5, 0, GameFont, NULL, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 16, 11+20*2.5, 0, GameFont, NULL, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_BUTTON, 16, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 288-16-106, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitConfirmSaveMenuItems() {
 #ifdef OLD_MENU
+local void InitConfirmSaveMenuItems() {
     MenuitemText    i0 = { "Overwrite File", MI_TFLAGS_CENTERED};
     MenuitemText    i1 = { "Are you sure you want to overwrite", MI_TFLAGS_LALIGN};
     MenuitemText    i2 = { NULL, MI_TFLAGS_LALIGN};
@@ -1614,18 +1614,18 @@ local void InitConfirmSaveMenuItems() {
     ConfirmSaveMenuItems[2].d.text = i2;
     ConfirmSaveMenuItems[3].d.button = i3;
     ConfirmSaveMenuItems[4].d.button = i4;
-#endif
 }
+#endif
 
 local Menuitem ConfirmDeleteMenuItems[] = {
-    { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, FcDeleteInit, NULL, {{NULL, 0}} },
-    { MI_TYPE_TEXT, 16, 11+20*1.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
-    { MI_TYPE_TEXT, 16, 11+20*2.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
-    { MI_TYPE_BUTTON, 16, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 288-16-106, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, FcDeleteInit, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 16, 11+20*1.5, 0, GameFont, NULL, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 16, 11+20*2.5, 0, GameFont, NULL, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_BUTTON, 16, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 288-16-106, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitConfirmDeleteMenuItems() {
 #ifdef OLD_MENU
+local void InitConfirmDeleteMenuItems() {
     MenuitemText    i0 = { "Delete File", MI_TFLAGS_CENTERED};
     MenuitemText    i1 = { "Are you sure you want to delete", MI_TFLAGS_LALIGN};
     MenuitemText    i2 = { NULL, MI_TFLAGS_LALIGN};
@@ -1636,36 +1636,36 @@ local void InitConfirmDeleteMenuItems() {
     ConfirmDeleteMenuItems[2].d.text = i2;
     ConfirmDeleteMenuItems[3].d.button = i3;
     ConfirmDeleteMenuItems[4].d.button = i4;
-#endif
 }
+#endif
 
 local Menuitem EditorSelectMenuItems[] = {
-    { MI_TYPE_BUTTON, 208, 320 + 36 * 0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 320 + 36 * 1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 320 + 36 * 2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 320 + 36 * 0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 320 + 36 * 1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 320 + 36 * 2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitEditorSelectMenuItems() {
 #ifdef OLD_MENU
+local void InitEditorSelectMenuItems() {
     MenuitemButton i0 = { "~!New Map", 224, 27, MBUTTON_GM_FULL, EditorNewMap, 'n'};
     MenuitemButton i1 = { "~!Load Map", 224, 27, MBUTTON_GM_FULL, EditorLoadMap, 'l'};
     MenuitemButton i2 = { "~!Cancel", 224, 27, MBUTTON_GM_FULL, EndMenu, 'c'};
     EditorSelectMenuItems[0].d.button = i0;
     EditorSelectMenuItems[1].d.button = i1;
     EditorSelectMenuItems[2].d.button = i2;
-#endif
 }
+#endif
 
 local Menuitem EditorLoadMapMenuItems[] = {
-    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, EditorLoadInit, NULL, {{NULL,0}} },
-    { MI_TYPE_LISTBOX, (352-18-288)/2, 11+98, 0, GameFont, EditorLoadLBInit, EditorLoadLBExit, {{NULL,0}} },
-    { MI_TYPE_VSLIDER, (352-18-288)/2+288, 11+98, 0, 0, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 48, 308, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 198, 308, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, (352-18-288)/2-2, 11+98-28, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, EditorLoadInit, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_LISTBOX, (352-18-288)/2, 11+98, 0, GameFont, EditorLoadLBInit, EditorLoadLBExit, NULL, {{NULL,0}} },
+    { MI_TYPE_VSLIDER, (352-18-288)/2+288, 11+98, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 48, 308, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 198, 308, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, (352-18-288)/2-2, 11+98-28, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
 };
-local void InitEditorLoadMapMenuItems() {
 #ifdef OLD_MENU
+local void InitEditorLoadMapMenuItems() {
     MenuitemText    i0 = { "Select map", MI_TFLAGS_CENTERED};
 
     MenuitemListbox  i1 = { NULL, 288, 6*18, MBUTTON_PULLDOWN, EditorLoadLBAction, 0, 0, 0, 0, 6, 0, 0,
@@ -1681,8 +1681,8 @@ local void InitEditorLoadMapMenuItems() {
     EditorLoadMapMenuItems[3].d.button   = i3;
     EditorLoadMapMenuItems[4].d.button   = i4;
     EditorLoadMapMenuItems[5].d.button   = i5;
-#endif
 }
+#endif
 
 /**
 **	FIXME: Ari please look, this is now in TheUI.
@@ -7396,7 +7396,6 @@ global void ProcessMenu(const char *menu_id, int loop)
 	MustRedraw |= RedrawCursor;
     }
 
-
     VideoLockScreen();
     DrawMenu(CurrentMenu);
     MustRedraw&=~RedrawMenu;
@@ -7482,6 +7481,7 @@ global void InitMenus(unsigned int race)
 	// There go all my Gnuish compile time inits -
 	// Why is ANSI C so dumb that it cannot
 	// even initialize unions sanely?
+#ifdef OLD_MENU
 	InitGameMenuItems();
 	InitVictoryMenuItems();
 	InitLostMenuItems();
@@ -7494,7 +7494,6 @@ global void InitMenus(unsigned int race)
 	InitEnterNameMenuItems();
 	InitEnterServerIPMenuItems();
 	InitNetCreateJoinMenuItems();
-	InitNetMultiButtonStorage();
 	InitNetMultiSetupMenuItems();
 	InitNetMultiClientMenuItems();
 	InitNetErrorMenuItems();
@@ -7513,6 +7512,8 @@ global void InitMenus(unsigned int race)
 	InitConfirmDeleteMenuItems();
 	InitEditorSelectMenuItems();
 	InitEditorLoadMapMenuItems();
+#endif
+	InitNetMultiButtonStorage();
 
 	if (VideoWidth != 640) {
 	    MoveButtons();
