@@ -615,6 +615,30 @@ void LoadUnitTypes(void)
 }
 
 /**
+**  Clean animation
+*/
+static void CleanAnimation(NewAnimation* anim)
+{
+	int i;
+	NewAnimation* next;
+
+	while (anim) {
+		if (anim->Type == NewAnimationSound) {
+			free(anim->D.Sound.Name);
+		} else if (anim->Type == NewAnimationRandomSound) {
+			for (i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
+				free(anim->D.RandomSound.Name[i]);
+			}
+			free(anim->D.RandomSound.Name);
+			free(anim->D.RandomSound.Sound);
+		}
+		next = anim->Next;
+		free(anim);
+		anim = next;
+	}
+}
+
+/**
 **  Cleanup the unit-type module.
 */
 void CleanUnitTypes(void)
@@ -641,6 +665,10 @@ void CleanUnitTypes(void)
 
 	// FIXME: scheme contains references on this structure.
 	// Clean all animations.
+	for (i = 0; i < NumNewAnimations; ++i) {
+		CleanAnimation(NewAnimationsArray[i]);
+	}
+	NumNewAnimations = 0;
 
 	for (i = 0; i < NumUnitTypes; ++i) {
 		type = UnitTypes[i];

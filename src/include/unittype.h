@@ -620,6 +620,9 @@ typedef struct _new_animations_ {
 
 #define ANIMATIONS_MAXANIM 1024
 
+extern NewAnimation* NewAnimationsArray[ANIMATIONS_MAXANIM];
+extern int NumNewAnimations;
+
 	/// Hash table of all the newanimations
 typedef hashtable(NewAnimations*, ANIMATIONS_MAXANIM) _NewAnimationsHash;
 extern _NewAnimationsHash NewAnimationsHash;

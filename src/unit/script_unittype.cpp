@@ -57,6 +57,9 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+NewAnimation* NewAnimationsArray[ANIMATIONS_MAXANIM];
+int NumNewAnimations;
+
 _NewAnimationsHash NewAnimationsHash;/// NewAnimations hash table
 
 struct _UnitTypeVar_ UnitTypeVar;    /// Variables for UnitType and unit.
@@ -1447,6 +1450,9 @@ static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1);
 	}
+
+	NewAnimationsArray[NumNewAnimations++] = anim;
+	Assert(NumNewAnimations != ANIMATIONS_MAXANIM);
 
 	free(op1);
 	return anim;
