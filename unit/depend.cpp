@@ -143,12 +143,35 @@ global void AddDependency(const char* target,const char* required,int count
     }
 
     if( or_flag ) {
+    	// move rule to temp->next
 	temp->Next=node->Rule;		// insert rule
 	node->Rule=temp;
     } else {
+    	// move rule to temp->rule
 	temp->Rule=node->Rule;		// insert rule
+	
+	// also Link temp to old "or" list
+	if (node->Rule) {
+	    temp->Next=node->Rule->Next;
+	}
+	
 	node->Rule=temp;
     }
+    
+#ifdef DEBUG
+    printf("New rules are :");
+    node=node->Rule;
+    while(node){
+    	    temp=node;
+	    while(temp){
+    		printf("temp->Kind.UnitType=%p ",temp->Kind.UnitType);
+	    	temp=temp->Rule;
+	    }
+	    node=node->Next;
+	    printf("\n or ... ");
+    }	    
+    printf("\n");
+#endif
 }
 
 /**
