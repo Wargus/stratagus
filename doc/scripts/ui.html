@@ -50,6 +50,7 @@
 <A HREF="#define-menu-item">define-menu-item</A>
 <A HREF="#define-new-ui">define-new-ui</A>
 <A HREF="#define-ui">define-ui</A>
+<A HREF="#define-viewports">define-viewports</A>
 <A HREF="#display-picture">display-picture</A>
 <A HREF="#process-menu">process-menu</A>
 <A HREF="#set-game-cursor!">set-game-cursor!</A>
@@ -289,6 +290,43 @@ Everything around the UI.
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-viewports"></A>
+<H3>define-viewports</H3>
+
+<H4>Description</H4>
+
+Define the viewports.
+
+<H4>Syntax</H4>
+
+<CODE>(define-viewports 'mode mode 'viewport (mapx mapy) ...)</CODE>
+
+<DL>
+<DT>mode</DT>
+<DD>Number corresponding to the viewport mode.  See the ViewportMode enum.
+</DD>
+<DT>mapx</DT>
+<DD>X coordinate of the map tile.
+</DD>
+<DT>mapy</DT>
+<DD>Y coordinate of the map tile.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-viewports 'mode 1
+      'viewport '(82 31)
+      'viewport '(64 31))
+</PRE>
+
+<P>Defines the viewports to use mode 1 (split horizontal) with the first
+viewport having map coordinates 82,31 and the second having coordinates
+64,31.
+
+<H4>Not Used</H4>
 
 <A NAME="display-picture"></A>
 <H3>display-picture</H3>
