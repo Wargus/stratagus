@@ -1353,8 +1353,8 @@ global void UIHandleButtonDown(unsigned button)
 		// FIXME: error messages
 
 		explored=1;
-		for( j=0; explored && j<Selected[0]->Type->Height; ++j ) {
-		    for( i=0; i<Selected[0]->Type->Width; ++i ) {
+		for( j=0; explored && j<Selected[0]->Type->TileHeight; ++j ) {
+		    for( i=0; i<Selected[0]->Type->TileWidth; ++i ) {
 			if( !IsMapFieldExplored(ThisPlayer,x+i,y+j) ) {
 			    explored=0;
 			    break;
