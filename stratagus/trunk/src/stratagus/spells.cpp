@@ -845,9 +845,9 @@ global int CastHaste(Unit* caster, const SpellType* spell, Unit* target,
 			case flag_Mana:
 			{
 				target->Mana = haste->value;
-				if (MaxMana < target->Mana) // What is Maxmana per unit.
+				if (target->Type->_MaxMana < target->Mana)
 				{
-					target->Mana = MaxMana;
+					target->Mana = target->Type->_MaxMana;
 				}
 				break;
 			}
@@ -867,9 +867,9 @@ global int CastHaste(Unit* caster, const SpellType* spell, Unit* target,
 			case flag_Mana_percent:
 			{
 				target->Mana = target->Mana * haste->value / 100;
-				if (MaxMana < target->Mana)// What is Maxmana per unit.
+				if (target->Type->_MaxMana < target->Mana)
 				{
-					target->Mana = MaxMana;
+					target->Mana = target->Type->_MaxMana;
 				}
 				break;
 			}
@@ -1403,7 +1403,7 @@ global int		CheckUnitDurationEffect(const t_Conditions	*condition,
 		}
 		case flag_Mana_percent:
 		{
-			return (target->Mana * 100 >= ttl * MaxMana); // FIXME : MaxMana.
+			return (target->Mana * 100 >= ttl * target->Type->_MaxMana); // FIXME
 		}
 		/// Add here the other cases
 		default:

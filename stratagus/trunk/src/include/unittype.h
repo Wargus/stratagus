@@ -702,7 +702,7 @@ struct _unit_type_ {
     Construction*Construction;		/// What is shown in construction phase
     int		_SightRange;		/// Sight range
     int		_HitPoints;		/// Maximum hit points
-    unsigned	_MaxMana : 8;		/// Maximum mana points
+    int		_MaxMana;		/// Maximum mana points
     // FIXME: only flag
     int		Magic;			/// Unit can cast spells
 

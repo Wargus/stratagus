@@ -1466,8 +1466,8 @@ global void DoRunestones(void)
 	    }
 
 	    // Restore mana in all magical units
-	    if(units[j]->Type->CanCastSpell && units[j]->Mana != MaxMana)  {	
-		tmp = MaxMana - units[j]->Mana;
+	    if(units[j]->Type->CanCastSpell && units[j]->Mana != units[j]->Type->_MaxMana)  {	
+		tmp = units[j]->Type->_MaxMana - units[j]->Mana;
 		if (tmp > 2) {
 		    tmp = 2;
 		}
