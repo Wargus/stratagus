@@ -10,7 +10,7 @@
 //
 /**@name interface.c	-	The interface. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -612,7 +612,7 @@ local int InputKey(int key)
 	case '\r':
 	    if (Input[0] == '(') {
 		CclCommand(Input);
-	    } else {
+	    } else if( NetworkFildes!=-1 ) {
 		// Handle cheats
 		// FIXME: disable cheats
 		if (strcmp(Input, "there is no aliens level") == 0) {
@@ -688,8 +688,8 @@ local int InputKey(int key)
 		} else {
 		    // FIXME: only to selected players ...
 		}
-		NetworkChatMessage(Input);
 	    }
+	    NetworkChatMessage(Input);
 
 	case '\e':
 	    ClearStatusLine();
