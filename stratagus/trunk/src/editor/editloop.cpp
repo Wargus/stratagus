@@ -966,6 +966,15 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	}
     }
 
+    if (EditorState == EditorSelecting) {
+	if( (MouseButtons&RightButton && UnitUnderCursor) ) {
+	    if( UnitUnderCursor->Type->GoldMine || UnitUnderCursor->Type->OilPatch ) {
+		EditorEditResource();;
+		return;
+	    }
+	}
+    }
+
     //
     //	Click on map area
     //
