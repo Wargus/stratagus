@@ -74,7 +74,7 @@ global void HandleActionTrain(Unit* unit)
 	    // FIXME: GameMessage
 	    if( player==ThisPlayer ) {
 		// FIXME: PlayVoice :), see task.txt
-		SetMessage("You need more farms!");
+		SetMessage("Not enough food...build more farms.");
 	    } else {
 		// FIXME: Callback for AI!
 		// AiNeedMoreFarms(unit);
