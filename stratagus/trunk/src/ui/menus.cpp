@@ -2184,6 +2184,8 @@ local void KeystrokeHelpMenu(void)
     int j;
     int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
 
+    KeystrokeHelpMenuItems[1].d.hslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - 40) / -20 ) * 200 / (nitems - 9);
+
     for (j=3; j < nitems ;++j) {
 	if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
 	    KeystrokeHelpMenuItems[j].xofs = 400;
