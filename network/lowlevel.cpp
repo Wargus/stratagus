@@ -211,6 +211,31 @@ global void NetCloseTCP(int sockfd)
 #endif	// } !USE_SDL_NET && !USE_WINSOCK
 
 /**
+**	Set socket to non-blocking.
+**
+**	@param sockfd	Socket
+**
+**	@return		0 for success, -1 for error
+*/
+#ifdef USE_WINSOCK
+global int NetSetNonBlocking(int sockfd)
+{
+    unsigned long opt;
+
+    opt = 1;
+    return ioctlsocket(sockfd,FIONBIO,&opt);
+}
+#else
+global int NetSetNonBlocking(int sockfd)
+{
+    int flags;
+
+    flags = fcntl(sockfd,F_GETFL,0);
+    return fcntl(sockfd,F_SETFL,flags|O_NONBLOCK);
+}
+#endif
+
+/**
 **	Resolve host in name or dotted quad notation.
 **
 **	@param host	Host name (f.e. 192.168.0.0 or freecraft.net)
@@ -458,15 +483,14 @@ global int NetOpenTCP(int port)
 **	Open a TCP connection
 **
 **	@param sockfd	An open socket to use
-**	@param host	Host to connect to
+**	@param addr	Address returned from NetResolveHost
 **	@param port	Port on remote host to connect to
 **
 **	@return		0 if success, -1 if failure
 */
-global int NetConnectTCP(int sockfd,char* host,int port)
+global int NetConnectTCP(int sockfd,unsigned long addr,int port)
 {
     struct sockaddr_in sa;
-    unsigned long addr;
 #ifndef __BEOS__
     int opt;
 
@@ -476,7 +500,6 @@ global int NetConnectTCP(int sockfd,char* host,int port)
     setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (void*)&opt, sizeof(opt));
 #endif
 
-    addr=NetResolveHost(host);
     if( addr==INADDR_NONE ) {
 	return -1;
     }
@@ -487,7 +510,8 @@ global int NetConnectTCP(int sockfd,char* host,int port)
     sa.sin_port=htons(port);
 
     if( connect(sockfd,(struct sockaddr*)&sa,sizeof(sa)) < 0 ) {
-	fprintf(stderr,"connect to %s:%d failed\n", host, port);
+	fprintf(stderr,"connect to %d.%d.%d.%d:%d failed\n",
+	    NIPQUAD(ntohl(addr)), port);
 	return -1;
     }
 
@@ -623,7 +647,7 @@ global int NetSendUDP(int sockfd,unsigned long host,int port
 }
 
 /**
-**	Send through a TCP socket
+**	Send through a TCP socket.
 **
 **	@param sockfd	Socket
 **	@param buf	Send message buffer.
@@ -634,6 +658,34 @@ global int NetSendUDP(int sockfd,unsigned long host,int port
 global int NetSendTCP(int sockfd,const void* buf,int len)
 {
     return send(sockfd,buf,len,0);
+}
+
+/**
+**	Listen for connections on a TCP socket.
+**
+**	@param sockfd	Socket
+**
+**	@return		0 for success, -1 for error
+*/
+global int NetListenTCP(int sockfd)
+{
+    return listen(sockfd,PlayerMax);
+}
+
+/**
+**	Accept a connection on a TCP socket.
+**
+**	@param sockfd	Socket
+**
+**	@return		If success the new socket fildes, -1 otherwise.
+*/
+global int NetAcceptTCP(int sockfd)
+{
+    struct sockaddr_in sa;
+    int len;
+
+    len = sizeof(struct sockaddr_in);
+    return accept(sockfd,(struct sockaddr*)&sa,&len);
 }
 
 //@}

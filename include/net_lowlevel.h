@@ -140,6 +140,10 @@ extern int NetOpenTCP(int port);
 extern void NetCloseUDP(int sockfd);
     /// Close a TCP socket port.
 extern void NetCloseTCP(int sockfd);
+    /// Set socket to non-blocking
+extern int NetSetNonBlocking(int sockfd);
+    /// Open a TCP connection.
+extern int NetConnectTCP(int sockfd,unsigned long addr,int port);
     /// Send through a UPD socket to a host:port.
 extern int NetSendUDP(int sockfd,unsigned long host,int port
 	,const void* buf,int len);
@@ -151,6 +155,10 @@ extern int NetSocketReady(int sockfd,int timeout);
 extern int NetRecvUDP(int sockfd,void* buf,int len);
     /// Receive from a TCP socket.
 extern int NetRecvTCP(int sockfd,void* buf,int len);
+    /// Listen for connections on a TCP socket
+extern int NetListenTCP(int sockfd);
+    /// Accept a connection on a TCP socket
+extern int NetAcceptTCP(int sockfd);
 
 //@}
 
