@@ -663,10 +663,8 @@ local SCM CclUnit(SCM list)
     }
 
     // FIXME: johns: works only for debug code.
-    // latimerius: I don't know whether NewResetPath is needed but if the
-    // unit's current action is anything else than Move, NewResetPath corrupts
-    // the action's data - so I comment it out for now.
-    //NewResetPath(unit);
+    if (unit->Moving)
+	NewResetPath(unit);
     DebugLevel0Fn("FIXME: not written\n");
     DebugLevel0Fn ("unit #%d parsed\n", slot);
 
