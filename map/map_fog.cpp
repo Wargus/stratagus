@@ -10,7 +10,7 @@
 //
 /**@name map_fog.c	-	The map fog of war handling. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer and Vladi Shabanski
+//	(c) Copyright 1999-2002 by Lutz Sammer and Vladi Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -520,7 +520,9 @@ global void MapUpdateVisible(void)
 #endif
 
     // FIXME: rewrite this function, faster and better
+#ifdef DEBUG
     t=GetTicks();
+#endif
 
     //
     //	Clear all visible flags.
@@ -545,11 +547,11 @@ global void MapUpdateVisible(void)
     }
 #endif
 
-    DebugLevel0Fn("Ticks C %lu\n",GetTicks()-t);
+    DebugLevel0Fn("Ticks Clear %lu\n",GetTicks()-t);
 
     MarkDrawEntireMap();
 
-    DebugLevel0Fn("Ticks M %lu\n",GetTicks()-t);
+    DebugLevel0Fn("Ticks Mark  %lu\n",GetTicks()-t);
 
     //
     //	Mark all units visible range.
@@ -608,7 +610,7 @@ global void MapUpdateVisible(void)
 	}
     }
 
-    DebugLevel0Fn("Ticks E %lu\n",GetTicks()-t);
+    DebugLevel0Fn("Ticks Total %lu\n",GetTicks()-t);
 }
 
 /*----------------------------------------------------------------------------
