@@ -200,6 +200,8 @@ global void CreateGame(char* filename, WorldMap* map)
 
     if( GameIntro.Title ) {
 	ShowIntro(&GameIntro);
+    } else {
+	CallbackMusicOn();
     }
 
     if( FlagRevealMap ) {
