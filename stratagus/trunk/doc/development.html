@@ -228,7 +228,9 @@ You need a C compiler for Windows. Get <B>one</B> of the following.
     You will need to modify the paths to libpng, zlib, and SDL.  Change the 
     include paths in Project, Settings, C/C++, Preprocessor.  Remove the 
     libraries SDL.lib, SDLmain.lib, and libpng.lib and add your libraries to
-    the project.  You should now be able to compile FreeCraft.
+    the project.  You will also need to copy freecraft\contrib\stdint.h to 
+    freecraft\src\include since VC++ 6.0 does not come with this header.  You 
+    should now be able to compile FreeCraft.
     <LI>FreeCraft needs SDL.dll to run.  Copy this from the SDL development
     libraries to the FreeCraft directory and it should now run.
     </UL>
