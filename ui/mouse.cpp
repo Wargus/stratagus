@@ -1390,7 +1390,7 @@ global void UIHandleButtonDown(unsigned button)
 			    ,MaxSampleVolume);
 		    SendCommandBuildBuilding(Selected[0],x,y,CursorBuilding
 			    ,!(KeyModifiers&ModifierShift));
-		    if( !(KeyModifiers&ModifierAlt) ) {
+		    if( !((KeyModifiers&ModifierAlt)||(KeyModifiers&ModifierShift)) ) {
 			CancelBuildingMode();
 		    }
 		} else {

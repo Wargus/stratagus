@@ -1441,18 +1441,18 @@ global void AiNeedMoreFarms(Unit* unit,const UnitType* what)
 /**
 **      Called if work complete (Buildings).
 **
-**      @param unit     Pointer to unit what builds the building.
-**      @param what     Pointer to unit building that was build.
+**      @param unit     Pointer to unit that builds the building.
+**      @param what     Pointer to unit building that was built.
 */
 global void AiWorkComplete(Unit * unit, Unit * what)
 {
-    DebugLevel3("Ai: Player %d: %d Work %d complete\n" _C_
-		unit->Player - Players _C_ UnitNumber(unit) _C_ UnitNumber(what));
+    DebugLevel3("Ai: Player %d: Work %d(%s) complete\n" _C_
+		what->Player->Players _C_ UnitNumber(what) _C_ what->Type->Ident);
     // FIXME: correct position
-    if (unit->Player->Type == PlayerPerson) {
+    if (what->Player->Type == PlayerPerson) {
 	return;
     }
-    AiPlayer = &Ais[unit->Player->Player];
+    AiPlayer = &Ais[what->Player->Player];
     AiClearBuildUnitType(what->Type);
     if (!AiPlayer->MainHall
 	    && what->Type == UnitTypeByWcNum(AiChooseRace(UnitTownHall))) {
@@ -1464,16 +1464,18 @@ global void AiWorkComplete(Unit * unit, Unit * what)
 /**
 **      Called if building can't be build.
 **
-**      @param unit     Pointer to unit what builds the building.
+**      @param unit     Pointer to unit that builds the building.
 **      @param what     Pointer to unit-type.
 */
 global void AiCanNotBuild(Unit * unit, const UnitType * what)
 {
     int i;
 
-    DebugLevel1("Ai: Player %d: %d Can't build %d at %d,%d\n" _C_
+    if (unit) {
+	DebugLevel1("Ai: Player %d: %d Can't build %d at %d,%d\n" _C_
 		unit->Player - Players _C_ UnitNumber(unit) _C_ what->Type _C_ unit->X _C_
 		unit->Y);
+    }
     // FIXME: correct position
     if (unit->Player->Type == PlayerPerson) {
 	return;

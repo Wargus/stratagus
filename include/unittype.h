@@ -252,7 +252,9 @@
 **
 **	Unit::Revealer
 **
-**		A special unit used to reveal the map for a time.
+**		A special unit used to reveal the map for a time. This unit
+**		has active sight even when Removed. It's used for Reveal map
+**		type of spells.
 **
 **	UnitType::LandUnit
 **
@@ -272,11 +274,12 @@
 **
 **	UnitType::Critter
 **
-**		Unit is controlled by nobody
+**		Unit is marked as critter. The effect of this is that when
+**		idle the unit will move around randomly.
 **
 **	UnitType::Building
 **
-**		Building
+**		Unit is a Building
 **
 **	UnitType::Submarine
 **
@@ -286,9 +289,10 @@
 **
 **		Only this units can see Submarine
 **
-**	UnitType::CowerWorker
+**	UnitType::Coward
 **
-**		Is a worker, runs away if attcked
+**		Unit is a coward, and acts defensively. it will not attack
+**		at will and auto-casters will not buff it(bloodlust).
 **
 **	UnitType::Transporter
 **
@@ -298,10 +302,52 @@
 **
 **		Maximum units on board (for transporters)
 **
+**	UnitType::MaxWorkers
+**
+**		This limit the number of workers on a resource.
+**
 **	UnitType::GivesResource
 **
 **		This equals to the resource Id of the resource given
 **		or 0 (TimeCost) for other buildings.
+**
+**	UnitType::CanHarvest
+**
+**		Resource can be harvested. It's false for things like
+**		oil patches.
+**
+**	UnitType::Harvester
+**
+**		Unit is a resource worker.
+**
+**      UnitType::ResourceHarvested
+**
+**		The resource it can harvest. Needs Harvester flag. An unit
+**		can't harvest more than one type of resource.
+**		FIXME: implement something like TransformForOtherResource.
+**
+**	UnitType::WaitAtResource
+**
+**		Cycles the unit waits while inside a resource.
+**
+**	UnitType::WaitAtDepot
+**
+**		Cycles the unit waits while inside the depot to unload.
+**
+**	UnitType::ResourceCapacity
+**
+**		Maximum amount of resources a harvester can carry. The
+**		actual amount can be modified while unloading.
+**
+**	UnitType::TransformWhenEmpty;
+**	
+**		The harvester will transform into another unit when it is
+**		empty. FIXME: just change the animation.
+**
+**	UnitType::TransformWhenLoaded
+**
+**		The harvester will transform into another unit when it is
+**		loaded. FIXME: just change the animation.
 **
 **	UnitType::MustBuildOnTop
 **
@@ -336,21 +382,38 @@
 **
 **		FIXME: docu
 **
+**	UnitType::CanRepair
+**
+**		Unit can repair buildings.
+**
+**	UnitType::BuilderOutside
+**
+**		Only valid for buildings. When building the worker will
+**		remain outside inside the building.
+**
+**		WARNING: Workers that can build buildings with the 
+**		WARNING: BuilderOutside flag must have the CanRepair flag.
+**
+**	UnitType::BuilderLost
+**
+**		Only valid for buildings without the BuilderOutside flag.
+**		The worker is lost when the building is completed.
+**
 **	UnitType::Tower
 **
-**		FIXME: docu
+**		FIXME:  find a way to remove it.
+**		Used for towers(attacknig buildings.)
 **
 **	UnitType::Hero
 **
-**		FIXME: docu
+**		FIXME:	Unit is a hero. Where is this used?
+**		In st*rcr*ft heroes seem to be imune to spawn broodlings,
+**		maybe we could use it in the same way. Spawn broodlings is
+**		an instant kill for many units.
 **
 **	UnitType::Volatile
 **
 **		Invisiblity/unholy armor kills unit
-**
-**	UnitType::CowerMage
-**
-**		FIXME: docu
 **
 **	UnitType::Organic
 **
@@ -573,7 +636,7 @@ struct _unit_type_ {
     unsigned Building : 1;		/// Building
     unsigned Submarine : 1;		/// Is only visible by CanSeeSubmarine
     unsigned CanSeeSubmarine : 1;	/// Only this units can see Submarine
-    unsigned CowerWorker : 1;		/// Is a worker, runs away if attcked
+    unsigned Coward : 1;		/// Unit will only attack if instructed.
     unsigned Transporter : 1;		/// Can transport units
     unsigned MaxOnBoard;		/// Number of Transporter slots.
     unsigned Vanishes : 1;		/// Corpes & destroyed places.
@@ -583,23 +646,24 @@ struct _unit_type_ {
     unsigned CanCastSpell : 1;		/// Unit is able to use spells.
     unsigned CanAttack : 1;		/// Unit can attack.
     unsigned CanRepair : 1;		/// Unit can repair .
-    unsigned BuilderInside : 1;		/// The builder goes inside during the build.
+    unsigned BuilderOutside : 1;	/// The builder stays outside during the build.
     unsigned BuilderLost : 1;		/// The builder is lost after the build.
+    // FIXME: n0body: AutoBuildRate not implemented.
     unsigned AutoBuildRate;		/// The rate at which the building builds itself
     unsigned Tower : 1;			/// Unit can attack, but not move.
     unsigned Hero : 1;			/// Is hero only used for triggers .
     unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit.
-    unsigned CowerMage : 1;		/// FIXME: docu
     unsigned Organic : 1;		/// Organic can be healed.
     
     unsigned CanStore[MaxCosts];	/// Resources that we can store here.
     unsigned GivesResource;		/// The resource this unit gives.
-    unsigned CanHarvest : 1;		/// Resource can be harvested (false for oil patches).
+    unsigned MaxWorkers;		/// Maximum number of workers.
+    unsigned CanHarvest : 1;		/// Resource can be harvested.
     unsigned Harvester : 1;		/// Unit is a resource worker.
     unsigned ResourceHarvested;		/// The resource it can harvest.
     unsigned WaitAtResource;		/// Cycles the unit waits while mining.
     unsigned WaitAtDepot;		/// Cycles the unit waits while returning.
-    unsigned ResourceCapacity;		/// Maximum amount of resources it can carry.
+    unsigned ResourceCapacity;		/// Max amount of resources to carry.
     UnitType* TransformWhenEmpty;	/// UnitType to transform to when empty.
     UnitType* TransformWhenLoaded;	/// UnitType to transform to when loaded.
     UnitType* MustBuildOnTop;		/// Must be built on top of something.

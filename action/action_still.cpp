@@ -163,9 +163,9 @@ global void ActionStillGeneric(Unit* unit,int ground)
     }
 
     //
-    //	Workers and mage didn't attack automatic
+    //	Cowards dodn't attack unless instructed.
     //
-    if( type->CanAttack && !type->CowerWorker && !type->CowerMage ) {
+    if( type->CanAttack && !type->Coward ) {
 	//
 	//	Normal units react in reaction range.
 	//

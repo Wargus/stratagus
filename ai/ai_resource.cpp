@@ -272,8 +272,7 @@ local int AiBuildBuilding(const UnitType* type,UnitType* building)
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
 	if (unit->Orders[0].Action != UnitActionBuild
-		&& (unit->OrderCount==1
-		    || unit->Orders[1].Action != UnitActionBuild) ) {
+		&& unit->Orders[0].Action != UnitActionRepair ) {
 	    table[num++] = unit;
 	}
     }
@@ -1248,9 +1247,10 @@ local void AiCollectResources(void)
     units=AiPlayer->Player->Units;
     for( i=0; i<n; i++ ) {
 	unit=units[i];
-	if( !unit->Type->CowerWorker && !unit->Type->Harvester ) {
+	if( !unit->Type->Harvester ) {
 	    continue;
 	}
+	c=unit->Type->ResourceHarvested;
 
 	//
 	//	See if it's assigned already
@@ -1260,37 +1260,29 @@ local void AiCollectResources(void)
 		units_assigned[num_units_assigned[WoodCost]++][WoodCost]=unit;
 		continue;
 	    case UnitActionResource:
-		units_assigned[num_units_assigned[unit->Type->ResourceHarvested]++][unit->Type->ResourceHarvested]=unit;
+		units_assigned[num_units_assigned[c]++][c]=unit;
 		continue;
 	    default:
 		break;
 	}
 
 	//
+	//  Send workers with resources back home.
+	//
+	if (unit->Value) {
+	    units_with_resource[num_units_with_resource[c]++][c]=unit;
+	    if (unit->Orders[0].Action == UnitActionStill
+		    && unit->OrderCount==1 ) {
+		CommandReturnGoods(unit,0,FlushCommands);
+	    }
+	}
+	
+	//
 	//	Look what the unit can do
 	//
 	for( c=0; c<MaxCosts; ++c ) {
 	    int tn;
 	    UnitType** types;
-
-	    //
-	    //	Send workers with resource home
-	    //
-	    if( c>=AiHelpers.WithGoodsCount || !AiHelpers.WithGoods[c] ) {
-		continue;		// Nothing known about the resource
-	    }
-	    types=AiHelpers.WithGoods[c]->Table;
-	    tn=AiHelpers.WithGoods[c]->Count;
-	    for( j=0; j<tn; ++j ) {
-		if( unit->Type==types[j] ) {
-		    units_with_resource[num_units_with_resource[c]++][c]=unit;
-		    if (unit->Orders[0].Action == UnitActionStill
-			    && unit->OrderCount==1 ) {
-			CommandReturnGoods(unit,NULL,FlushCommands);
-		    }
-		    break;
-		}
-	    }
 
 	    //
 	    //	Look if it is a worker
