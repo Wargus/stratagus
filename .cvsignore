@@ -35,3 +35,4 @@ wartool___Win32_Debug
 wartool___Win32_Release
 *.log
 preferences*
+data.wc2
