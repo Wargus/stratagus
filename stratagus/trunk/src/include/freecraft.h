@@ -130,6 +130,7 @@
 #pragma warning(disable:4761)		// Integral size mismatch
 #define access(x,y) _access((x),(y))	/// Unix -> dumm
 #define snprintf _snprintf		/// Unix -> dumm
+#define mkdir(x) _mkdir((x))
 #endif
 
 #endif	// } m$
