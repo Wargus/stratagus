@@ -2059,17 +2059,18 @@ global void SavePreferences(void)
 
     fprintf(fd, "(set-video-resolution! %d %d)\n", VideoWidth, VideoHeight);
     fprintf(fd, "(set-group-keys \"");
+
     i = 0;
-    while (ui_group_keys[i]) {
-	if (ui_group_keys[i]!='"') {
-	    fprintf(fd, "%c", ui_group_keys[i]);
+    while (UiGroupKeys[i]) {
+	if (UiGroupKeys[i] != '"') {
+	    fprintf(fd, "%c", UiGroupKeys[i]);
 	} else {
 	    fprintf(fd, "\\\"");
 	}
-	i++;
+	++i;
     }
     fprintf(fd, "\")\n");
-    
+
     fclose(fd);
 #elif defined(USE_LUA)
 #ifdef USE_WIN32
