@@ -10,7 +10,7 @@
 //
 /**@name ccl_tileset.c	-	The tileset ccl functions. */
 //
-//	(c) Copyright 2000-2002 by Lutz Sammer
+//	(c) Copyright 2000-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -571,6 +571,8 @@ local SCM CclDefineTileset(SCM list)
 	ExitFatal(-1);
     }
     Tilesets[type]->Ident=ident;
+    Tilesets[type]->TileSizeX=32;
+    Tilesets[type]->TileSizeY=32;
 
     //
     //	Parse the list:	(still everything could be changed!)
@@ -592,6 +594,10 @@ local SCM CclDefineTileset(SCM list)
 	    tileset->ImageFile=gh_scm2newstr(data,NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("palette")) ) {
 	    tileset->PaletteFile=gh_scm2newstr(data,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+	    tileset->TileSizeX=gh_scm2int(gh_car(data));
+	    data=gh_cdr(data);
+	    tileset->TileSizeY=gh_scm2int(gh_car(data));
 	} else if( gh_eq_p(value,gh_symbol2scm("slots")) ) {
 	    DefineTilesetParseSlot(tileset,data);
 	} else if( gh_eq_p(value,gh_symbol2scm("animations")) ) {
