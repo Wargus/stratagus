@@ -28,6 +28,7 @@
 #include "upgrade.h"
 #include "depend.h"
 #include "interface.h"
+#include "network.h"
 
 /*----------------------------------------------------------------------------
 --      Defines
@@ -185,6 +186,17 @@ local int CheckNeedStronghold(const Unit* unit,const ButtonAction* button)
 {
     return HaveUnitTypeByIdent(unit->Player,"unit-stronghold") > 0
 	    || HaveUnitTypeByIdent(unit->Player,"unit-fortress") > 0;
+}
+
+/**
+**	Check if network play is enabled.
+**	Needed for walls, which could only be build in network play.
+**
+**	NOTE: this check could also be moved into intialisation.
+*/
+local int CheckNetwork(const Unit* unit,const ButtonAction* button)
+{
+    return NetworkFildes!=-1;
 }
 
 global int bc_NoWork(const Unit* unit,const ButtonAction* button )
@@ -469,10 +481,9 @@ global ButtonAction AllButtons[] = {
     't', "BUILD ~!TOWER",
     WORKERS_H
 },
-// FIXME: wall only in multiplayer!
 {   8, 1, { "icon-human-wall" },
     B_Build,		0, "unit-human-wall",
-    NULL,		NULL,
+    CheckNetwork,	NULL,
     'w', "BUILD ~!WALL",
     WORKERS_H
 },
@@ -1214,10 +1225,9 @@ global ButtonAction AllButtons[] = {
     't', "BUILD ~!TOWER",
     WORKERS_O 
 },
-// FIXME: wall only in multiplayer!
 {   8, 1, { "icon-orc-wall" },
     B_Build,		0, "unit-orc-wall",
-    NULL,		NULL,
+    CheckNetwork,	NULL,
     'w', "BUILD ~!WALL",
     WORKERS_O 
 },
@@ -1248,13 +1258,15 @@ global ButtonAction AllButtons[] = {
 },
 {   4, 2, { "icon-goblin-alchemist" },
     B_Build,		0, "unit-goblin-alchemist",
-    CheckNeedStronghold,	NULL,
+    // FIXME: CheckNeedStronghold,	NULL,
+    NULL,		NULL,
     'a', "BUILD GOBLIN ~!ALCHEMIST",
     WORKERS_O 
 },
 {   5, 2, { "icon-ogre-mound" },
     B_Build,		0, "unit-ogre-mound",
-    CheckNeedStronghold,	NULL,
+    // FIXME: CheckNeedStronghold,	NULL,
+    NULL,		NULL,
     'o', "BUILD ~!OGRE MOUND",
     WORKERS_O 
 },
