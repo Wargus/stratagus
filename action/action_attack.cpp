@@ -74,13 +74,10 @@
 */
 void AnimateActionAttack(Unit* unit)
 {
-	int flags;               // flag of animation.
-
 	//  No animation.
 	//  So direct fire missile.
 	//  FIXME : wait a little.
-	if (!unit->Type->Animations &&
-			(!unit->Type->NewAnimations || !unit->Type->NewAnimations->Attack)) {
+	if (!unit->Type->NewAnimations || !unit->Type->NewAnimations->Attack) {
 		if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
 			PlayUnitSound(unit, VoiceAttacking);
 		}
@@ -88,21 +85,7 @@ void AnimateActionAttack(Unit* unit)
 		unit->Invisible = 0; // unit is invisible until attacks
 		return;
 	}
-	if (unit->Type->Animations) {
-		Assert(unit->Type->Animations->Attack);
-		flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
-
-		if ((flags & AnimationSound) && (UnitVisible(unit, ThisPlayer) || ReplayRevealMap)) {
-			PlayUnitSound(unit, VoiceAttacking);
-		}
-
-		if (flags & AnimationMissile) { // time to fire projectil
-			FireMissile(unit);
-			unit->Invisible = 0; // unit is invisible until attacks
-		}
-	} else {
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Attack);
-	}
+	UnitShowNewAnimation(unit, unit->Type->NewAnimations->Attack);
 }
 
 /**
@@ -146,9 +129,6 @@ static int CheckForDeadGoal(Unit* unit)
 		// Restart order state.
 		unit->State = 0;
 		unit->SubAction = 0;
-		if (!unit->Type->NewAnimations) {
-			unit->Wait = 1;
-		}
 		NewResetPath(unit);
 		return 1;
 	}
@@ -250,8 +230,7 @@ static void MoveToTarget(Unit* unit)
 
 	err = DoActionMove(unit);
 
-	if ((!unit->Type->NewAnimations && !unit->Reset) ||
-			(unit->Type->NewAnimations && unit->Anim.Unbreakable)) {
+	if (unit->Anim.Unbreakable) {
 		return;
 	}
 	//
@@ -343,8 +322,7 @@ static void AttackTarget(Unit* unit)
 	Assert(unit->Orders[0].Goal || (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1));
 
 	AnimateActionAttack(unit);
-	if ((!unit->Type->NewAnimations && !unit->Reset) ||
-			(unit->Type->NewAnimations && unit->Anim.Unbreakable)) {
+	if (unit->Anim.Unbreakable) {
 		return;
 	}
 	//
@@ -537,10 +515,6 @@ void HandleActionAttack(Unit* unit)
 				unit->Orders[0] = unit->SavedOrder;
 				unit->SavedOrder.Action = UnitActionStill;
 				unit->SavedOrder.Goal = NoUnitP;
-				if (!unit->Type->NewAnimations) {
-					unit->Reset = 1;
-					unit->Wait = 1;
-				}
 				return;
 			}
 			MoveToTarget(unit);
@@ -552,7 +526,6 @@ void HandleActionAttack(Unit* unit)
 		case ATTACK_TARGET:
 		case ATTACK_TARGET + WEAK_TARGET:
 			AttackTarget(unit);
-			Assert(unit->Wait);
 			break;
 
 		case WEAK_TARGET:

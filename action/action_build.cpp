@@ -96,7 +96,8 @@ static void MoveToLocation(Unit* unit)
 		NewResetPath(unit);
 	}
 
-	if (unit->Type->NewAnimations && unit->Wait) {
+	if (unit->Wait) {
+		// FIXME: show still animation while we wait?
 		unit->Wait--;
 		return;
 	}
@@ -146,7 +147,8 @@ static Unit* CheckCanBuild(Unit* unit)
 	UnitType* type;
 	Unit* ontop;
 
-	if (unit->Type->NewAnimations && unit->Wait) {
+	if (unit->Wait) {
+		// FIXME: show still animation while we wait?
 		unit->Wait--;
 		return NULL;
 	}
@@ -296,7 +298,6 @@ static void StartBuilding(Unit* unit, Unit* ontop)
 
 	stats = build->Stats;
 
-	build->Wait = 1;
 	// Make sure the bulding doesn't cancel itself out right away.
 	build->Data.Built.Progress = 100;
 	build->HP = 1;
@@ -321,34 +322,11 @@ static void StartBuilding(Unit* unit, Unit* ontop)
 		unit->Orders[0].Range = unit->Type->RepairRange;
 		unit->SubAction = 40;
 		unit->Data.Build.Cycles = 0;
-		unit->Wait = 1;
 		RefsIncrease(build);
 		// Mark the new building seen.
 		MapMarkUnitSight(build);
 	}
 	UpdateConstructionFrame(build);
-}
-
-/**
-**  Animate unit build
-**
-**  @param unit Unit, for that the build animation is played.
-*/
-static int AnimateActionBuild(Unit* unit)
-{
-	if (unit->Type->Animations) {
-		int flags;
-
-		Assert(unit->Type->Animations->Repair);
-		flags = UnitShowAnimation(unit, unit->Type->Animations->Repair);
-		if ((flags & AnimationSound)) {
-			PlayUnitSound(unit, VoiceRepairing);
-		}
-	} else if (unit->Type->NewAnimations) {
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Build);
-	}
-
-	return 0;
 }
 
 /**
@@ -359,12 +337,10 @@ static void BuildBuilding(Unit* unit)
 	Unit* goal;
 	int hp;
 	int animlength;
-	Animation* anim;
 
-	AnimateActionBuild(unit);
+	UnitShowNewAnimation(unit, unit->Type->NewAnimations->Build);
 	unit->Data.Build.Cycles++;
-	if ((!unit->Type->NewAnimations && unit->Reset) ||
-			(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
+	if (!unit->Anim.Unbreakable) {
 		goal = unit->Orders[0].Goal;
 
 		// hp is the current damage taken by the unit.
@@ -373,15 +349,8 @@ static void BuildBuilding(Unit* unit)
 		//
 		// Calculate the length of the attack (repair) anim.
 		//
-		if (!unit->Type->NewAnimations) {
-			animlength = 0;
-			for (anim = unit->Type->Animations->Repair; !(anim->Flags & AnimationReset); ++anim) {
-				animlength += anim->Sleep;
-			}
-		} else {
-			animlength = unit->Data.Build.Cycles;
-			unit->Data.Build.Cycles = 0;
-		}
+		animlength = unit->Data.Build.Cycles;
+		unit->Data.Build.Cycles = 0;
 
 		// FIXME: implement this below:
 		// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
@@ -477,7 +446,6 @@ void HandleActionBuilt(Unit* unit)
 		if ((worker = unit->Data.Built.Worker)) {
 			worker->Orders[0].Action = UnitActionStill;
 			unit->Data.Built.Worker = NoUnitP;
-			worker->Reset = worker->Wait = 1;
 			worker->SubAction = 0;
 			DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
 		}
@@ -508,7 +476,6 @@ void HandleActionBuilt(Unit* unit)
 		} else {
 			unit->Frame = 0;
 		}
-		unit->Reset = unit->Wait = 1;
 
 		if ((worker = unit->Data.Built.Worker)) {
 			// Bye bye worker.
@@ -519,7 +486,6 @@ void HandleActionBuilt(Unit* unit)
 			} else {
 				worker->Orders[0].Action = UnitActionStill;
 				worker->SubAction = 0;
-				worker->Reset = worker->Wait = 1;
 				DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
 				//
 				// If we can harvest from the new building, do it.
@@ -580,8 +546,6 @@ void HandleActionBuilt(Unit* unit)
 	}
 
 	UpdateConstructionFrame(unit);
-
-	unit->Wait = 1;
 }
 
 //@}

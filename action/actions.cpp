@@ -49,6 +49,7 @@
 #include "interface.h"
 #include "map.h"
 #include "sound.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -147,7 +148,17 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				break;
 
 			case NewAnimationAttack:
-				FireMissile(unit);
+				if (unit->Orders[0].Action == UnitActionSpellCast) {
+					if (unit->Orders[0].Goal &&
+							!UnitVisibleAsGoal(unit->Orders->Goal, unit->Player)) {
+						unit->ReCast = 0;
+					} else {
+						unit->ReCast = SpellCast(unit, unit->Orders[0].Arg1.Spell,
+							unit->Orders[0].Goal, unit->Orders[0].X, unit->Orders[0].Y);
+					}
+				} else {
+					FireMissile(unit);
+				}
 				unit->Invisible = 0; // unit is invisible until attacks
 				break;
 
@@ -203,57 +214,6 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 		}
 	}
 	return move;
-}
-
-/**
-**  Show unit animation.
-**  Returns animation flags.
-**
-**  @param unit       Unit of the animation.
-**  @param animation  Animation script to handle.
-**
-**  @return           The flags of the current script step.
-*/
-int UnitShowAnimation(Unit* unit, const Animation* animation)
-{
-	int state;
-	int flags;
-
-	if (!(state = unit->State)) {
-		if (unit->Frame < 0) {
-			unit->Frame = -1;
-		} else {
-			unit->Frame = 0;
-		}
-		UnitUpdateHeading(unit); // FIXME: remove this!!
-	}
-
-	if (unit->Frame < 0) {
-		unit->Frame -= animation[state].Frame;
-	} else {
-		unit->Frame += animation[state].Frame;
-	}
-	unit->IX += animation[state].Pixel;
-	unit->IY += animation[state].Pixel;
-	unit->Wait = animation[state].Sleep;
-	if (unit->Slow) { // unit is slowed down
-		unit->Wait <<= 1;
-	}
-	if (unit->Haste && unit->Wait > 1) { // unit is accelerated
-		unit->Wait >>= 1;
-	}
-
-	flags = animation[state].Flags;
-	if (flags & AnimationReset) { // Reset can check for other actions
-		unit->Reset = 1;
-	}
-	if (flags & AnimationRestart) { // Restart animation script
-		unit->State = 0;
-	} else {
-		++unit->State; // Advance to next script
-	}
-
-	return flags;
 }
 
 /*----------------------------------------------------------------------------
@@ -532,9 +492,7 @@ static void HandleUnitAction(Unit* unit)
 	//
 	// If current action is breakable proceed with next one.
 	//
-	if ((unit->Type->NewAnimations && !unit->Anim.Unbreakable) ||
-			(!unit->Type->NewAnimations && unit->Reset)) {
-		unit->Reset = 0;
+	if (!unit->Anim.Unbreakable) {
 		//
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.
@@ -584,7 +542,6 @@ static void HandleUnitAction(Unit* unit)
 			// Note subaction 0 should reset.
 			//
 			unit->SubAction = unit->State = 0;
-			unit->Wait = 1;
 
 			if (IsOnlySelected(unit)) { // update display for new action
 				SelectedUnitChanged();
@@ -667,10 +624,6 @@ void UnitActions(void)
 			table[i] = table[--tabsize];
 		}
 		unit = table[i];
-
-		if (!unit->Type->NewAnimations && --unit->Wait) { // Wait until counter reached
-			continue;
-		}
 
 		HandleUnitAction(unit);
 

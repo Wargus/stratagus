@@ -58,24 +58,17 @@ void HandleActionDie(Unit* unit)
 	//
 	// Show death animation
 	//
-	if (unit->Type->Animations && unit->Type->Animations->Die) {
-		UnitShowAnimation(unit, unit->Type->Animations->Die);
-	} else if (unit->Type->NewAnimations && unit->Type->NewAnimations->Death) {
+	if (unit->Type->NewAnimations && unit->Type->NewAnimations->Death) {
 		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Death);
 	} else {
 		// some units has no death animation
-		if (!unit->Type->NewAnimations) {
-			unit->Reset = unit->Wait = 1;
-		} else {
-			unit->Anim.Unbreakable = 0;
-		}
+		unit->Anim.Unbreakable = 0;
 	}
 
 	//
 	// Die sequence terminated, generate corpse.
 	//
-	if ((!unit->Type->NewAnimations && unit->Reset) ||
-			(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
+	if (!unit->Anim.Unbreakable) {
 		if (!unit->Type->CorpseType) {
 			ReleaseUnit(unit);
 			return;
@@ -105,9 +98,7 @@ void HandleActionDie(Unit* unit)
 		unit->SubAction = 0;
 		unit->Frame = 0;
 		UnitUpdateHeading(unit);
-		if (unit->Type->Animations && unit->Type->Animations->Die) {
-			UnitShowAnimation(unit, unit->Type->Animations->Die);
-		} else if (unit->Type->NewAnimations && unit->Type->NewAnimations->Death) {
+		if (unit->Type->NewAnimations && unit->Type->NewAnimations->Death) {
 			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Death);
 		}
 
