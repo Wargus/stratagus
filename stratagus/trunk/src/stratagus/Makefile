@@ -31,9 +31,11 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = clone
 
-OBJS	= clone.$(OE) mainloop.$(OE) goal.$(OE) selection.$(OE) groups.$(OE) \
-	  unit.$(OE) unit_draw.$(OE) unitcache.$(OE) unit_find.$(OE) \
-	  construct.$(OE) player.$(OE) pud.$(OE) ccl.$(OE) iolib.$(OE) \
-	  spells.$(OE) ccl_player.$(OE)
+SRCS	= clone.c mainloop.c goal.c selection.c groups.c \
+	  unit.c unit_draw.c unitcache.c unit_find.c \
+	  construct.c player.c pud.c ccl.c iolib.c \
+	  spells.c ccl_player.c
+
+OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

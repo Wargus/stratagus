@@ -31,6 +31,8 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = game
 
-OBJS	= game.$(OE) savegame.$(OE) loadgame.$(OE)
+SRCS	= game.c savegame.c loadgame.c
+
+OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

@@ -83,22 +83,31 @@ doc++::
 src::
 	@$(MAKE) -C src all
 
-etlib/hash.o: etlib/hash.c
-etlib/getopt.o: etlib/getopt.c
-etlib/prgname.o: etlib/prgname.c
+etlib/$(OBJDIR)hash.$(OE): etlib/hash.c
+	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
+	$(CC) -c $(CFLAGS) $< -o $@
+
+etlib/$(OBJDIR)getopt.$(OE): etlib/getopt.c
+	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
+	$(CC) -c $(CFLAGS) $< -o $@
+
+etlib/$(OBJDIR)prgname.$(OE): etlib/prgname.c
+	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
+	$(CC) -c $(CFLAGS) $< -o $@
 
 # UNIX-TARGET
-freecraft:	src etlib/hash.o src/libclone.a
-	$(CCLD) -o freecraft src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
+freecraft:	src etlib/$(OBJDIR)hash.$(OE) src/$(OBJDIR)libclone.a
+	$(CCLD) -o freecraft src/$(OBJDIR)libclone.a etlib/$(OBJDIR)hash.$(OE) $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o \
-		src/freecraftrc.o src/libclone.a src/main.o
-	$(CCLD) -o freecraft$(EXE) src/main.o src/libclone.a src/freecraftrc.o \
+freecraft.exe:	src etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) etlib/$(OBJDIR)hash.$(OE) \
+		src/$(OBJDIR)freecraftrc.$(OE) src/$(OBJDIR)libclone.a src/$(OBJDIR)main.$(OE)
+	$(CCLD) -o freecraft$(EXE) src/$(OBJDIR)main.$(OE) src/$(OBJDIR)libclone.a src/$(OBJDIR)freecraftrc.$(OE) \
+	etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) etlib/$(OBJDIR)hash.$(OE) \
 	-lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
-src/freecraftrc.o: src/freecraft.rc
-	windres --include-dir contrib -osrc/freecraftrc.o src/freecraft.rc
+src/$(OBJDIR)freecraftrc.$(OE): src/freecraft.rc
+	windres --include-dir contrib -osrc/$(OBJDIR)freecraftrc.$(OE) src/freecraft.rc
 
 # -L. -lefence
 # -Lccmalloc-0.2.3/src -lccmalloc -ldl
@@ -112,7 +121,7 @@ tools::
 
 clean::
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i clean ; done
-	$(RM) core gmon.out cscope.out *.doc etlib/*.o .#*
+	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)*.$(OE) .#*
 
 clobber:	clean
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i clobber ; done

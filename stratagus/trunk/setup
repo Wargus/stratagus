@@ -692,6 +692,7 @@ if test "$WIN32" = 1 ; then
   echo "OUTFILE=\$(TOPDIR)/freecraft\$(EXE)" >> $RULESFILE
   echo "ARCH=win32" >> $RULESFILE
   echo "OE=o" >> $RULESFILE
+  echo "OBJDIR=winobj/" >> $RULESFILE
 else
 # LINUX
   echo "# Linux" >> $RULESFILE
@@ -699,6 +700,7 @@ else
   echo "OUTFILE=\$(TOPDIR)/freecraft" >> $RULESFILE
   echo "ARCH=linux" >> $RULESFILE
   echo "OE=o" >> $RULESFILE
+  echo "OBJDIR=obj/" >> $RULESFILE
 fi
 
 #------------------------------------------------------------------------------
@@ -744,19 +746,19 @@ echo >> $RULESFILE
 
 #------------------------------------------------------------------------------
 
-echo "%.o: %.c" >> $RULESFILE
+echo "\$(OBJDIR)%.\$(OE): %.c" >> $RULESFILE
 echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
-echo "	@\$(AR) cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
+echo "	@\$(AR) cru \$(TOPDIR)/src/\$(OBJDIR)libclone.a \$@" >> $RULESFILE
 if [ "$DARWIN" = "1" ] ; then
-  echo "	ranlib \$(TOPDIR)/src/libclone.a" >> $RULESFILE
+  echo "	ranlib \$(TOPDIR)/src/\$(OBJDIR)libclone.a" >> $RULESFILE
 fi
 echo >> $RULESFILE
 
-echo "%.o: %.cpp" >> $RULESFILE
+echo "\$(OBJDIR)%.\$(OE): %.cpp" >> $RULESFILE
 echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
-echo "	@\$(AR) cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
+echo "	@\$(AR) cru \$(TOPDIR)/src/\$(OBJDIR)libclone.a \$@" >> $RULESFILE
 if [ "$DARWIN" = "1" ] ; then
-  echo "	ranlib \$(TOPDIR)/src/libclone.a" >> $RULESFILE
+  echo "	ranlib \$(TOPDIR)/src/\$(OBJDIR)libclone.a" >> $RULESFILE
 fi
 echo >> $RULESFILE
 

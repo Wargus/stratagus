@@ -30,7 +30,10 @@ TOPDIR	= ../..
 include $(TOPDIR)/Rules.make
 
 MODULE	= beos
-OBJS	= beos.$(OE)
+
+CPPSRCS	= beos.cpp
+
+OBJS	= $(addprefix $(OBJDIR), $(CPPSRCS:.cpp=.$(OE)))
 
 #distlist::
 #	@echo src/$(MODULE)/beos.cpp >>$(DISTLIST)

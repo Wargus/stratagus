@@ -27,35 +27,35 @@
 
 all:	$(OBJS)
 
-doc:	$(OBJS:.o=.doc) $(HDRS:.h=.doc)
+doc:	$(SRCS:.c=.doc) $(CPPSRCS.cpp=.doc) $(HDRS:.h=.doc)
 
 clean::
 	$(RM) $(OBJS) core *.doc
 
 clobber: clean
-	$(RM) .depend .#* *~ *.o
+	$(RM) .depend .#* *~ *.$(OE)
 
 depend::
 	@echo -n >.depend
-	@for i in $(OBJS:.o=.c*) ; do\
+	@for i in $(SRCS) $(CPPSRCS) ; do\
 	$(CC) -MM $(IFLAGS) $(DFLAGS) $$i >>.depend ; done
 
 tags::
-	@for i in $(OBJS:.o=.c*) ; do\
+	@for i in $(SRCS) $(CPPSRCS) ; do\
 	cd .. ;\
 	ctags $(CTAGSFLAGS) $(TAGS) $(MODULE)/$$i ;\
 	cd $(MODULE) ;\
 	done
 
 ci::
-	ci -l $(OBJS:.o=.c*) $(HDRS) Makefile
+	ci -l $(SRCS) $(CPPSRCS) $(HDRS) Makefile
 
 lockver::
-	$(LOCKVER) $(OBJS:.o=.c*) $(HDRS) Makefile
+	$(LOCKVER) $(SRCS) $(CPPSRCS) $(HDRS) Makefile
 
 distlist::
 	@echo >>$(DISTLIST)
-	@for i in `echo $(OBJS:.o=.c*)` $(HDRS) Makefile $(EXTRA) ; do \
+	@for i in $(SRCS) $(CPPSRCS) $(HDRS) Makefile $(EXTRA) ; do \
 	echo src/$(MODULE)/$$i >>$(DISTLIST) ; done
 
 $(OBJS): $(TOPDIR)/Rules.make
