@@ -666,12 +666,62 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 }
 
 /**
-**	Return true if unit is visible on screen.
+**	Returns true, if unit is visible on the map.
+**	An unit is visible, if any field could be seen.
 **
 **	@param unit	Unit to be checked.
 **	@return		True if visible, false otherwise.
 */
-global int UnitVisible(const Unit* unit)
+global int UnitVisibleOnMap(const Unit* unit)
+{
+#ifdef NEW_FOW
+    DebugLevel0Fn("NOT WRITTEN\n");
+#else
+    unsigned x;
+    unsigned y;
+    int w;
+    int w0;
+    int h;
+
+    DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
+
+    //
+    //	FIXME: need extra checks for sub marines here.
+    //
+
+    if ( unit->Invisible && unit->Removed ) {
+	return 0;
+    }
+
+    x = unit->X;
+    y = unit->Y;
+    w = w0 = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
+
+    //
+    //	Check if visible, not under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //
+    for( ; h-->0; ) {
+	for( w=w0; w-->0; ) {
+	    if( IsMapFieldVisible(x+w,y+h) ) {
+		return 1;
+	    }
+	}
+    }
+
+    return 0;
+#endif
+}
+
+
+/**
+**	Returns true, if unit is visible on current map view.
+**
+**	@param unit	Unit to be checked.
+**	@return		True if visible, false otherwise.
+*/
+global int UnitVisibleOnScreen(const Unit* unit)
 {
 #ifdef NEW_FOW
     unsigned x;
@@ -785,34 +835,38 @@ global void GetUnitMapArea( const Unit* unit,
 **      @param unit     Unit to be checked.
 **      @return         True if map marked to be drawn, false otherwise.
 */
-global int CheckUnitToBeDrawn(const Unit* unit)
+global int CheckUnitToBeDrawn(const Unit * unit)
 {
-  #ifdef NEW_MAPDRAW
-    int sx,sy,ex,ey;
+#ifdef NEW_MAPDRAW
+    int sx, sy, ex, ey;
 
     // in debug-mode check unsupported displacement exceeding an entire Tile
     // FIXME: displacement could always be made positive and smaller than Tile
-    #if NEW_MAPDRAW > 1
-      if ( unit->IX <= -TileSizeX || unit->IX >= TileSizeX ||
-           unit->IY <= -TileSizeY || unit->IY >= TileSizeY )
-        printf( "internal error in CheckUnitToBeDrawn\n" );
-    #endif
+#if NEW_MAPDRAW > 1
+    if (unit->IX <= -TileSizeX || unit->IX >= TileSizeX
+	    || unit->IY <= -TileSizeY || unit->IY >= TileSizeY) {
+	printf("internal error in CheckUnitToBeDrawn\n");
+    }
+#endif
 
-    GetUnitMapArea( unit, &sx, &sy, &ex, &ey );
+    GetUnitMapArea(unit, &sx, &sy, &ex, &ey);
 
     // FIXME: extra tiles added here for attached statusbar/mana/shadow/..
-      sx--;sy--;ex++;ey++;
+    sx--;
+    sy--;
+    ex++;
+    ey++;
 
-    if ( MarkDrawAreaMap( sx, sy, ex, ey ) ) {
-    //  MustRedraw|=RedrawMinimap;
-      return 1;
+    if (MarkDrawAreaMap(sx, sy, ex, ey)) {
+	//  MustRedraw|=RedrawMinimap;
+	return 1;
     }
-  #else
-    if( UnitVisible( unit ) ) {
-      MustRedraw|=RedrawMap;
-      return 1;
+#else
+    if (UnitVisibleOnScreen(unit)) {
+	MustRedraw |= RedrawMap;
+	return 1;
     }
-  #endif
+#endif
     return 0;
 }
 

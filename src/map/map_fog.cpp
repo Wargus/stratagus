@@ -336,7 +336,8 @@ global void MapUpdateFogOfWar(int x,int y)
 
     for( i=0; i<n; ++i ) {
 	unit=table[i];
-	if( unit->Type->Building && !unit->Removed && UnitVisible(unit) ) {
+	if( unit->Type->Building && !unit->Removed
+		&& UnitVisibleOnScreen(unit) ) {
 	    CheckUnitToBeDrawn(unit);
 	}
     }
