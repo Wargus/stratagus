@@ -256,30 +256,12 @@ global void SaveGame(const char* filename)
 	CLprintf(file, "---  \"type\",    \"%s\",\n", "single-player");
 	CLprintf(file, "---  \"date\",    \"%s\",\n", s);
 	CLprintf(file, "---  \"map\",     \"%s\",\n", TheMap.Description);
+	CLprintf(file, "---  \"media-version\", \"%s\"", "Undefined");
 	CLprintf(file, "---  \"engine\",  {%d, %d, %d},\n",
 		StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	CLprintf(file, "  SyncHash = %d, \n", SyncHash);
 	CLprintf(file, "  SyncRandSeed = %d, \n", SyncRandSeed);
 	CLprintf(file, "  SaveFile = \"%s\"\n", TheMap.Info->Filename);
-	// Save media type
-	{
-#if defined(USE_GUILE) || defined(USE_SIOD)
-		SCM var;
-
-		CLprintf(file, "---  'media\t'");
-		var = gh_symbol2scm("media-version");
-		// FIXME : guile todo
-#if 0
-		if (symbol_boundp(var, NIL)) {
-			var = symbol_value(var, NIL);
-			lprin1CL(var, file);
-		} else {
-			CLprintf(file, "nil");
-		}
-#endif
-#elif defined(USE_LUA)
-#endif
-	}
 	CLprintf(file, "\n---  \"preview\", \"%s.pam\",\n", filename);
 	CLprintf(file, "} )\n\n");
 
