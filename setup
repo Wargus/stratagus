@@ -24,8 +24,8 @@ cat << .. > $RULESFILE
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
 EXTRA_CFLAGS="-DSLOW_INPUT -DNEW_UNIT -DNEW_NETWORK -DNEW_HEADING"
-# This could be used for experimental version
-# -DNEW_UNIT -DNEW_NETWORK -DNEW_HEADING # -DNEW_FOW # -DNEW_NAMES -DNEW_VIDEO
+# This could be used for experimental versions
+# -DNEW_UNIT -DNEW_NETWORK -DNEW_HEADING -DNEW_FOW -DNEW_NAMES -DNEW_VIDEO
 
 # Compile commands
 CC=gcc
