@@ -47,31 +47,31 @@
 <a href="tileset.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
-<a href="#define-game-sounds">DefineGameSounds()</a>
-<a href="#display-sounds">DisplaySounds()</a>
-<a href="#make-sound">MakeSound()</a>
-<a href="#make-sound-group">MakeSoundGroup()</a>
-<a href="#map-sound">MapSound()</a>
-<a href="#play-file">PlayFile()</a>
-<a href="#play-music">PlayMusic()</a>
-<a href="#play-sound">PlaySound()</a>
-<a href="#set-cd-mode!">SetCdMode()</a>
-<a href="#set-global-sound-range!">SetGlobalSoundRange()</a>
-<a href="#set-menu-music!">SetMenuMusic()</a>
-<a href="#set-music-volume!">SetMusicVolume()</a>
-<a href="#set-sound-range!">SetSoundRange()</a>
-<a href="#set-sound-volume!">SetSoundVolume()</a>
-<a href="#sound-for-name">SoundForName()</a>
-<a href="#sound-off">SoundOff()</a>
-<a href="#sound-on">SoundOn()</a>
-<a href="#sound-thread">SoundThread()</a>
-<a href="#stop-music">StopMusic()</a>
+<a href="#DefineGameSounds">DefineGameSounds</a>
+<a href="#DisplaySounds">DisplaySounds</a>
+<a href="#MakeSound">MakeSound</a>
+<a href="#MakeSoundGroup">MakeSoundGroup</a>
+<a href="#MapSound">MapSound</a>
+<a href="#PlayFile">PlayFile</a>
+<a href="#PlayMusic">PlayMusic</a>
+<a href="#PlaySound">PlaySound</a>
+<a href="#SetCdMode">SetCdMode</a>
+<a href="#SetGlobalSoundRange">SetGlobalSoundRange</a>
+<a href="#SetMenuMusic">SetMenuMusic</a>
+<a href="#SetMusicVolume">SetMusicVolume</a>
+<a href="#SetSoundRange">SetSoundRange</a>
+<a href="#SetSoundVolume">SetSoundVolume</a>
+<a href="#SoundForName">SoundForName</a>
+<a href="#SoundOff">SoundOff</a>
+<a href="#SoundOn">SoundOn</a>
+<a href="#SoundThread">SoundThread</a>
+<a href="#StopMusic">StopMusic</a>
 <hr>
 <h2>Intro - Introduction to sound functions and variables</h2>
 
 Everything around sound.
 <h2>Functions</h2>
-<a name="define-game-sounds"></a>
+<a name="DefineGameSounds"></a>
 <h3>DefineGameSounds("name", arg, [[name2, arg] ...])</h3>
 
 Specify some global sounds.
@@ -113,7 +113,7 @@ DefineGameSounds(
   "rescue", {"orc", MakeSound("orc rescue", "orc/rescue.wav")} )
 </pre>
 
-<a name="display-sounds"></a>
+<a name="DisplaySounds"></a>
 <h3>DisplaySounds()</h3>
 
 Ask the sound system to dump on the standard output the mapping 
@@ -126,7 +126,7 @@ between sound names and sound id.
 DisplaySounds()
 </pre>
 
-<a name="make-sound"></a>
+<a name="MakeSound"></a>
 <h3>MakeSound("name", "file" or {"file1", "file2", ...})</h3>
 
 Asks the sound system to register a sound under a given name, with an 
@@ -154,7 +154,7 @@ MakeSound("basic human voices acknowledge",
 	"human/basic_voices/acknowledgement/4.wav"})
 </pre>
 
-<a name="make-sound-group"></a>
+<a name="MakeSoundGroup"></a>
 <h3>MakeSoundGroup("name", "groupname1" or SoundId, "groupname2" or SoundId)</h3>
 
 Asks the sound system to build a special sound group.
@@ -177,7 +177,7 @@ MakeSoundGroup("footman-selected",
 	"basic human voices selected", "basic human voices annoyed")
 </pre>
 
-<a name="map-sound"></a>
+<a name="MapSound"></a>
 <h3>MapSound("name", "sound")</h3>
 
 Ask the sound system to remap a sound id to a given name.
@@ -198,7 +198,7 @@ Ask the sound system to remap a sound id to a given name.
 MapSound("footman-acknowledge", "basic human voices acknowledge")
 </pre>
 
-<a name="play-file"></a>
+<a name="PlayFile"></a>
 <h3>PlayFile("name")</h3>
 Play a sound file.
 <dl>
@@ -213,7 +213,7 @@ Play a sound file.
 PlayFile("spells/lightning.wav")
 </pre>
 
-<a name="play-music"></a>
+<a name="PlayMusic"></a>
 <h3>PlayMusic("name")</h3>
 
 Name of the music file to play.
@@ -230,7 +230,7 @@ Name of the music file to play.
 PlayMusic("music/default.mod")
 </pre>
 
-<a name="play-sound"></a>
+<a name="PlaySound"></a>
 <h3>PlaySound("name")</h3>
 
 Ask the sound system to play the specified sound.
@@ -247,7 +247,7 @@ Ask the sound system to play the specified sound.
 PlaySound("basic human voices ready")
 </pre>
 
-<a name="set-cd-mode!"></a>
+<a name="SetCdMode"></a>
 <h3>SetCdMode("mode")</h3>
 
 Set the cd mode.
@@ -269,7 +269,7 @@ Set the cd mode.
 SetCdMode("random")
 </pre>
 
-<a name="set-global-sound-range!"></a>
+<a name="SetGlobalSoundRange"></a>
 <h3>SetGlobalSoundRange(distance)</h3>
 
 Set the cut off distance.
@@ -285,7 +285,7 @@ Set the cut off distance.
 SetGlobalSoundRange(40)
 </pre>
 
-<a name="set-menu-music!"></a>
+<a name="SetMenuMusic"></a>
 <h3>SetMenuMusic("song")</h3>
 
 Set the default menu music.
@@ -301,7 +301,7 @@ Set the default menu music.
 SetMenuMusic("music/default.mod")
 </pre>
 
-<a name="set-music-volume!"></a>
+<a name="SetMusicVolume"></a>
 <h3>SetMusicVolume(volume)</h3>
 
 Set the music volume.
@@ -319,7 +319,7 @@ Set the music volume.
 SetMusicVolume(128)
 </pre>
 
-<a name="set-sound-range!"></a>
+<a name="SetSoundRange"></a>
 <h3>SetSoundRange("name", distance)</h3>
 
 Set the range of a given sound.
@@ -339,7 +339,7 @@ Set the range of a given sound.
 SetSoundRange("basic human voices ready", 20)
 </pre>
 
-<a name="set-sound-volume!"></a>
+<a name="SetSoundVolume"></a>
 <h3>SetSoundVolume(volume)</h3>
 
 Global volume support.
@@ -356,7 +356,7 @@ Global volume support.
 SetSoundVolume(128)
 </pre>
 
-<a name="sound-for-name"></a>
+<a name="SoundForName"></a>
 <h3>SoundForName("name")</h3>
 
 Ask the sound system to associate a sound id to a sound name.
@@ -372,7 +372,7 @@ Ask the sound system to associate a sound id to a sound name.
 <pre>
 SoundForName("peasant attack")
 </pre>
-<a name="sound-off"></a>
+<a name="SoundOff"></a>
 <h3>SoundOff()</h3>
 
 Turn off sound.
@@ -384,7 +384,7 @@ Turn off sound.
 SoundOff()
 </pre>
 
-<a name="sound-on"></a>
+<a name="SoundOn"></a>
 <h3>SoundOn()</h3>
 
 Turn on sound.
@@ -396,7 +396,7 @@ Turn on sound.
 SoundOn()
 </pre>
 
-<a name="sound-thread"></a>
+<a name="SoundThread"></a>
 <h3>SoundThread()</h3>
 
 Ask stratagus to use a sound thread.
@@ -406,7 +406,7 @@ Ask stratagus to use a sound thread.
 <pre>
 SoundThread()
 </pre>
-<a name="stop-music"></a>
+<a name="StopMusic"></a>
 <h3>StopMusic()</h3>
 
 Stop playing music.
