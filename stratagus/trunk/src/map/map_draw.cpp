@@ -42,7 +42,6 @@
 #include "tileset.h"
 #include "video.h"
 #include "map.h"
-#include "../video/intern_video.h"
 #include "player.h"
 #include "pathfinder.h"
 #include "ui.h"
@@ -62,122 +61,6 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Draw tile
-----------------------------------------------------------------------------*/
-
-/**
-**  Draw tile.
-**
-**  @param tile  tile number
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
-*/
-#ifndef USE_OPENGL
-/**
-**  Draw a tile clipped
-**
-**  @param tile  pointer to tile graphic data
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
-**
-*/
-void VideoDrawTile(const int tile, int x, int y)
-{
-	int tilepitch;
-	int oldx;
-	int oldy;
-	SDL_Rect srect;
-	SDL_Rect drect;
-
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-
-	srect.x = TileSizeX * (tile % tilepitch);
-	srect.y = TileSizeY * (tile / tilepitch);
-	srect.w = TileSizeX;
-	srect.h = TileSizeY;
-
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, srect.w, srect.h);
-	srect.x += x - oldx;
-	srect.y += y - oldy;
-
-
-	drect.x = x;
-	drect.y = y;
-
-	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect,
-		TheScreen, &drect);
-}
-#else
-void VideoDrawTile(const int tile, int x, int y)
-{
-	int tilepitch;
-	int gx;
-	int gy;
-	int sx;
-	int ex;
-	int sy;
-	int ey;
-	GLfloat stx;
-	GLfloat etx;
-	GLfloat sty;
-	GLfloat ety;
-	Graphic *g;
-	int oldx;
-	int oldy;
-	int w;
-	int h;
-
-	w = TileSizeX;
-	h = TileSizeY;
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, w, h);
-
-	g = TheMap.TileGraphic;
-	tilepitch = g->Width / TileSizeX;
-
-	gx = TileSizeX * (tile % tilepitch);
-	gy = TileSizeY * (tile / tilepitch);
-
-	sx = x;
-	ex = sx + w;
-	sy = y;
-	ey = sy + h;
-
-	stx = (GLfloat)(gx + x - oldx) / g->Width * g->TextureWidth;
-	etx = (GLfloat)(gx + x - oldx + w) / g->Width * g->TextureWidth;
-	sty = (GLfloat)(gy + y - oldy) / g->Height * g->TextureHeight;
-	ety = (GLfloat)(gy + y - oldy + h) / g->Height * g->TextureHeight;
-
-	glBindTexture(GL_TEXTURE_2D, g->Textures[0]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(stx, sty);
-	glVertex2i(sx, sy);
-	glTexCoord2f(stx, ety);
-	glVertex2i(sx, ey);
-	glTexCoord2f(etx, ety);
-	glVertex2i(ex, ey);
-	glTexCoord2f(etx, sty);
-	glVertex2i(ex, sy);
-	glEnd();
-}
-#endif
-
-/**
-**  Draw tile.
-**
-**  @param tile  Tile number to draw.
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
-*/
-void MapDrawTile(int tile, int x, int y)
-{
-	VideoDrawTile(tile, x, y);
-}
 
 /*----------------------------------------------------------------------------
 --  Global functions
@@ -290,14 +173,10 @@ void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 		sx = x + sy;
 		dx = vp->X - vp->OffsetX;
 		while (dx <= ex) {
-			//
-			//  draw only tiles which must be drawn
-			//
-			// FIXME: unexplored fields could be drawn faster
 			if (ReplayRevealMap) {
-				MapDrawTile(TheMap.Fields[sx].Tile, dx, dy);
+				VideoDrawClip(TheMap.TileGraphic, TheMap.Fields[sx].Tile, dx, dy);
 			} else {
-				MapDrawTile(TheMap.Fields[sx].SeenTile, dx, dy);
+				VideoDrawClip(TheMap.TileGraphic, TheMap.Fields[sx].SeenTile, dx, dy);
 			}
 
 			++sx;
