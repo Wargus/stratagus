@@ -54,6 +54,7 @@
 #include "network.h"
 #include "ui.h"
 #include "ccl.h"
+#include "editor.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -2169,9 +2170,10 @@ global int CanBuildHere(const UnitType* type,unsigned x,unsigned y)
 	return 0;
     }
     //
-    //	Flyers and naval units can only placed on odd tiles
+    //	Flyers and naval units can only placed on odd tiles in editor
     //
-    if( type->UnitType==UnitTypeFly || type->UnitType==UnitTypeNaval ) {
+    if( EditorRunning &&
+	    (type->UnitType==UnitTypeFly || type->UnitType==UnitTypeNaval) ) {
 	if( x&1 || y&1 ) {
 	    return 0;
 	}
