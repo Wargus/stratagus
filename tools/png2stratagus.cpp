@@ -26,7 +26,7 @@
 
 /* To compile this programm:
 
-    % g++ -o png2stratagus  png2stratagus.cxx -lpng
+    % g++ -o png2stratagus  png2stratagus.cpp -lpng
  */
 
 /* This programm can be used to fix the palette of a indexed png file
@@ -50,6 +50,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <png.h>
+#include <assert.h>
 
 #define MAX_COLORS 228
 
@@ -166,9 +167,11 @@ public:
 
     if (num_colors > MAX_COLORS)
       {
-	std::cout << "Image has more than " << MAX_COLORS
-		  << " colors (" << num_colors << "), bailout" << std::endl;
-	exit (EXIT_FAILURE);
+	std::cout << "WARNING: Image has more than " << MAX_COLORS
+		  << " colors (" << num_colors << ")" << std::endl;
+	std::cout << "Assuming colors > " << MAX_COLORS 
+		  << " are unused" << std::endl;
+	num_colors = MAX_COLORS;
       }
 
     m_palette.resize (256);
