@@ -96,6 +96,10 @@
 **
 **		Number of directions missile can face.
 **
+**	MissileType::Transparency
+**
+**		Set a missile transparency. Current supported value is 50 only.
+**
 **	MissileType::FiredSound
 **
 **		Sound of the missile, if fired. @note currently not used.
@@ -396,7 +400,7 @@ struct _missile_type_ {
 
     char*	Ident;			/// missile name
     char*	File;			/// missile sprite file
-
+	int		Transparency;	/// Missile transparency possible value is 50 (later 25 and 75)
     int		Width;			/// missile width in pixels
     int		Height;			/// missile height in pixels
     int		DrawLevel;		/// Level to draw missile at
