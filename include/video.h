@@ -37,6 +37,14 @@
 
 #include "SDL.h"
 
+#ifdef USE_OPENGL
+#define DrawIcon WinDrawIcon
+#define EndMenu WinEndMenu
+#include "SDL_opengl.h"
+#undef EndMenu
+#undef DrawIcon
+#endif
+
 typedef struct _graphic_
 {
 	SDL_Surface *Surface;
@@ -44,6 +52,14 @@ typedef struct _graphic_
 	int Width;
 	int Height;
 	int NumFrames;
+#ifdef USE_OPENGL
+	int GraphicWidth;       /// Original graphic width
+	int GraphicHeight;      /// Original graphic height
+	GLfloat TextureWidth;   /// Width of the texture
+	GLfloat TextureHeight;  /// Height of the texture
+	int NumTextureNames;    /// Number of textures
+	GLuint* TextureNames;   /// Texture names
+#endif
 } Graphic;
 
 typedef struct _unit_colors_
@@ -200,6 +216,14 @@ extern void ResizeGraphic(Graphic* g, int w, int h);
 
 	///		Load graphic from PNG file
 extern Graphic* LoadGraphicPNG(const char* name);
+
+#ifdef USE_OPENGL
+	/// Make an OpenGL texture
+extern void MakeTexture(Graphic* graphic, int width, int height);
+	/// Make an OpenGL texture of the player color pixels only.
+extern void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
+	unsigned char* map, int maplen);
+#endif
 
 	/// Load graphic
 extern Graphic* LoadGraphic(const char* file);
