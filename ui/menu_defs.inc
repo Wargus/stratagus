@@ -2045,8 +2045,11 @@ global void SaveMenus(FILE* file)
 			fprintf(file,"\"%s\" ", menu->items[j].d.pulldown.options[n]);
 		    }
 
-		    fprintf(file,")\n"
-				 "              default %d\n"
+		    fprintf(file,")\n");
+		    if (menu->items[j].d.pulldown.state & MI_PSTATE_PASSIVE) {
+			fprintf(file,"              state passive\n");
+		    }
+		    fprintf(file,"              default %d\n"
 				 "              current %d)\n",
 				 menu->items[j].d.pulldown.defopt,
 				 menu->items[j].d.pulldown.curopt);
