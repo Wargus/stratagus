@@ -573,13 +573,7 @@ global void VideoDrawOnlyFogAlpha(int x, int y)
 	    if (*p) {
 		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
 		// Saturation + Brightness
-		if (cdest.r > cdest.g && cdest.r > cdest.b) {
-		    max = cdest.r;
-		} else if (cdest.g > cdest.b) {
-		    max = cdest.g;
-		} else {
-		    max = cdest.b;
-		}
+		max = (cdest.r + cdest.g + cdest.b) / 3;
 		v = cdest.r + bright;
 		cdest.r = (v > 255 ? 255 : v) + (max - cdest.r) * sat / 100;
 		v = cdest.g + bright;
@@ -666,13 +660,7 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
 	    if (!(cdest.r | cdest.g | cdest.b) && *p) {
 		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
 		// Saturation + Brightness
-		if (cdest.r > cdest.g && cdest.r > cdest.b) {
-		    max = cdest.r;
-		} else if (cdest.g > cdest.b) {
-		    max = cdest.g;
-		} else {
-		    max = cdest.b;
-		}
+		max = (cdest.r + cdest.g + cdest.b) / 3;
 		v = cdest.r + bright;
 		cdest.r = (v > 255 ? 255 : v) + (max - cdest.r) * sat / 100;
 		v = cdest.g + bright;
