@@ -2473,7 +2473,7 @@ global int FindWoodInSight(const Unit* unit,int* x,int* y)
  **	@param px	OUT: Map X position of tile.
  **	@param py	OUT: Map Y position of tile.
  **
- **	@notes		Movement mask can be 0xFFFFFFFF to have no effect
+ **	@note		Movement mask can be 0xFFFFFFFF to have no effect
  **			Range is not circular, but square.
  **			Player is ignored if nil(search the entire map)
  **			Use rvresult if you search for a til;e that doesn't
@@ -2584,11 +2584,11 @@ global int FindTerrainType(int movemask,int resmask,int rvresult,int range,
  **
  **	@param unit	The unit that wants to find a resource.
  **	@param x	Closest to x
- **	@param x	Closest to y
+ **	@param y	Closest to y
  **	@param range    Maximum distance to the resource.
  **	@param resource The resource id.
  **
- **	@notes 		This will return an usable resource building that
+ **	@note 		This will return an usable resource building that
  **			belongs to "player" or is neutral.
  **
  **	@return		NoUnitP or resource unit
@@ -2729,12 +2729,13 @@ global Unit* FindResource(const Unit * unit,int x,int y,int range,int resource)
  **
  **	@param unit	The unit that wants to find a resource.
  **	@param x	Closest to x
- **	@param x	Closest to y
+ **	@param y	Closest to y
  **	@param range    Maximum distance to the deposit.
+ **	@param resource	Resource to find deposit from.
  **
- **	@notes		This will return a reachable allied depot.
+ **	@note		This will return a reachable allied depot.
  **
- **	@return		NoUnitP or oil deposit unit
+ **	@return		NoUnitP or deposit unit
  */
 global Unit* FindDeposit(const Unit* unit,int x,int y,int range,int resource)
 {

@@ -506,6 +506,8 @@
 **		over UnitType::Sprite.  Used with OpenGL only.
 **
 **
+*/
+/**
 **
 ** 	@struct _resource_info_ unittype.h
 **

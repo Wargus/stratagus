@@ -1755,5 +1755,3 @@ global int NetworkParseSetupEvent(const char *buf, int size)
 }
 
 //@}
-
-//@}

@@ -703,5 +703,3 @@ global int NetAcceptTCP(int sockfd)
 }
 
 //@}
-
-//@}
