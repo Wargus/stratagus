@@ -109,6 +109,7 @@ local void SetFullscreen(Menuitem *mi);
 local void SetShadowFogAlpha(Menuitem *mi);
 local void SetShadowFogGray(Menuitem *mi);
 
+local void InitSoundOptions(Menuitem *mi);
 local void SetMasterPower(Menuitem *mi);
 local void SetMusicPower(Menuitem *mi);
 local void SetCdPower(Menuitem *mi);
@@ -457,6 +458,7 @@ global void InitMenuFuncHash(void) {
 
 // Game options
     HASHADD(SoundOptions,"sound-options");
+    HASHADD(InitSoundOptions,"init-sound-options");
     HASHADD(SpeedSettings,"speed-settings");
     HASHADD(Preferences,"preferences");
 
@@ -1440,6 +1442,10 @@ global void SoundOptions(void)
     else
 	ProcessMenu("menu-sound-options", 1);
 #endif // with sound
+}
+
+local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
+{
 }
 
 local void GlobalOptions(void)
