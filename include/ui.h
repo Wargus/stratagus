@@ -195,6 +195,8 @@ typedef struct _ui_ {
     int		SelectedFont;
     int		SelectedTextX;
     int		SelectedTextY;
+    int		MaxSelectedTextX;	/// position to place '+#' text
+    int		MaxSelectedTextY;	/// if > maximum units selected
 
     Button*	SingleTrainingButton;
     char*	SingleTrainingText;

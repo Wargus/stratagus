@@ -674,13 +674,13 @@ struct _unit_ {
 /**
 **	How many units could be selected
 */
-#define MaxSelectable	9
+#define MaxSelectable	54
 
 // FIXME: hardcoded...
 /**
 **	How many units could be in a group
 */
-#define NUM_UNITS_PER_GROUP 9
+#define NUM_UNITS_PER_GROUP MaxSelectable
 
 /**
 **	How many groups supported
