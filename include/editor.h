@@ -72,7 +72,7 @@ extern void ChangeTile(int x, int y, int tile);
     /// Update surroundings for tile changes
 extern void EditorTileChanged(int x, int y);
     /// Make random map
-extern void EditorCreateRandomMap();
+extern void EditorCreateRandomMap(void);
 
 //@}
 
