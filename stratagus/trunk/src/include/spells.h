@@ -89,82 +89,81 @@ typedef enum {
 #endif
 }	TargetType;
 
+/*
+**	Pointer on function that cast the spell.
+*/
+typedef int SpellFunc(Unit* caster, const struct _spell_type_* spell, Unit* target,int x, int y);
 
-
-
-typedef union
+typedef struct
 {
-// FIXME rename structure more properly.
-// TTL's below are in ticks: approx: 500=13sec, 1000=25sec, 2000=50sec
-// FIXME use TTL, as in TICKS to live
-    struct {
-	int Fields;		/// The size of the affected square
-	int Shards;		/// Number of shards thrown.
-	int Damage;		/// Damage for every shard.
-	/// The offset of the missile start point to the hit location.
-	int StartOffsetX;
-	int StartOffsetY;
-    } AreaBombardment;
-    
-    struct {
-	UnitType *PortalType;	/// The unit type spawned
-    } SpawnPortal;
-    
-    struct {
-	int TTL;		/// time to live (ticks)
-	int Damage;		/// Damage.
-    } Fireball;
-    
-    struct {
-	int TTL;		/// time to live (ticks)
-    } FlameShield;
+    SpellFunc* CastFunction;
+    union {
+// FIXME time information doesn't work as it should.
+	struct {
+	    int Fields;		/// The size of the affected square
+	    int Shards;		/// Number of shards thrown.
+	    int Damage;		/// Damage for every shard.
+	    /// The offset of the missile start point to the hit location.
+	    int StartOffsetX;
+	    int StartOffsetY;
+	} AreaBombardment;
+	
+	struct {
+	    UnitType *PortalType;	/// The unit type spawned
+	} SpawnPortal;
+	
+	struct {
+	    int TTL;		/// time to live (ticks)
+	    int Damage;		/// Damage.
+	} Fireball;
+	
+	struct {
+	    int TTL;		/// time to live (ticks)
+	} FlameShield;
 
-    struct {
-	int HasteTicks;		/// Number of ticks to set Haste to.
-	int SlowTicks;		/// Number of ticks to set Slow to.
-	int BloodlustTicks;	/// Number of ticks to set Bloodlust to.
-	int InvisibilityTicks;	/// Number of ticks to set Invisibility to.
-	int InvincibilityTicks;	/// Number of ticks to set UnholyArmor to.
+	struct {
+	    int HasteTicks;		/// Number of ticks to set Haste to.
+	    int SlowTicks;		/// Number of ticks to set Slow to.
+	    int BloodlustTicks;	/// Number of ticks to set Bloodlust to.
+	    int InvisibilityTicks;	/// Number of ticks to set Invisibility to.
+	    int InvincibilityTicks;	/// Number of ticks to set UnholyArmor to.
 #define BUFF_NOT_AFFECTED 0xC0FF33 /// Don't like the value? The value doesn't like you!
-    } AdjustBuffs;
-    
-    struct {
-	int HP;			/// Target HP gain.(can be negative)
-	int Mana;		/// Target Mana gain.(can be negative)
-	/// This spell is designed to be used wit very small amounts. The spell
-	/// can scale up to MaxMultiCast times. Use 0 for infinite.
-	int MaxMultiCast; 
-    } AdjustVitals;
-    
-    struct {
-	UnitType *revealer;	/// Type of unit to be summoned: (unit-revealer).
-    } HolyVision;
-    
-    struct {
-	UnitType *NewForm;	/// The new form
-	//  TODO: temporary polymorphs would be awesome, but hard to implement
-    } Polymorph;
-    
-    struct {
-	UnitType *UnitType;	/// Type of unit to be summoned.
-	int TTL;		/// Time to live for summoned unit. 0 means infinite
-    } Summon;
-    
-    struct {
-	UnitType *UnitRaised;	/// The unit to spawn from corpses
-	int TTL;		/// Time to live for summon. 0 means infinite.
-    } RaiseDead;
-    //  What about a resurection spell?
+	} AdjustBuffs;
+	
+	struct {
+	    int HP;			/// Target HP gain.(can be negative)
+	    int Mana;		/// Target Mana gain.(can be negative)
+	    /// This spell is designed to be used wit very small amounts. The spell
+	    /// can scale up to MaxMultiCast times. Use 0 for infinite.
+	    int MaxMultiCast; 
+	} AdjustVitals;
+	
+	struct {
+	    UnitType *NewForm;	/// The new form
+	    //  TODO: temporary polymorphs would be awesome, but hard to implement
+	} Polymorph;
+	
+	struct {
+	    UnitType *UnitType;	/// Type of unit to be summoned.
+	    int TTL;		/// Time to live for summoned unit. 0 means infinite
+	} Summon;
+	
+	struct {
+	    UnitType *UnitRaised;	/// The unit to spawn from corpses
+	    int TTL;		/// Time to live for summon. 0 means infinite.
+	} RaiseDead;
+	//  What about a resurection spell?
 
-    struct {
-	int TTL;		/// time to live (ticks)
-	int Damage;		/// Damage.
-    } Runes;
-    
-    struct {
-	int  TTL;		/// time to live (ticks)
-	// FIXME: more configurations
-    } Whirlwind;
+	struct {
+	    int TTL;		/// time to live (ticks)
+	    int Damage;		/// Damage.
+	} Runes;
+	
+	struct {
+	    int  TTL;		/// time to live (ticks)
+	    // FIXME: more configurations
+	} Whirlwind;
+    } Data;
 } SpellActionType;
 
 /*
@@ -242,11 +241,6 @@ typedef struct {
 
 struct _spell_type_;
 
-/*
-**	Pointer on function that cast the spell.
-*/
-typedef int SpellFunc(Unit* caster, const struct _spell_type_* spell, Unit* target,int x, int y);
-
 /**
 **	Base structure of a spell type.
 */
@@ -258,8 +252,7 @@ typedef struct _spell_type_ {
 
     //	Spell Specifications
     TargetType	Target;			/// Targetting information. See TargetType.
-    SpellFunc *CastFunction;		/// function to cast the spell.
-    SpellActionType *SpellAction;	/// More arguments for spell (damage, delay, additional sounds...).
+    SpellActionType *Action;		/// More arguments for spell (damage, delay, additional sounds...).
 #define INFINITE_RANGE 0xFFFFFFF
     int Range;				/// Max range of the target.
     int ManaCost;			/// required mana for each cast
@@ -336,7 +329,6 @@ extern unsigned CclGetSpellByIdent(SCM value);
 **	Spelltype to cast.
 */
 
-SpellFunc CastHolyVision;
 SpellFunc CastAdjustVitals;
 SpellFunc CastAdjustBuffs;
 SpellFunc CastFireball;
@@ -349,7 +341,6 @@ SpellFunc CastDeathCoil;
 SpellFunc CastRaiseDead;
 SpellFunc CastWhirlwind;
 SpellFunc CastSpawnPortal;
-
 
 //@}
 
