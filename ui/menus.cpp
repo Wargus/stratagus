@@ -2703,6 +2703,10 @@ local void SaveOk(void)
     }
 }
 
+#ifndef O_BINARY
+#define O_BINARY	0
+#endif
+
 local int SaveRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
