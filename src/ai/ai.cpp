@@ -259,7 +259,7 @@ local void AiCheckUnits(void)
 	//
 	e=unit_types_count[t];
 	if( t<AiHelpers.EquivCount && AiHelpers.Equiv[t] ) {
-	    DebugLevel3Fn("Equivalence for %s\n",
+	    DebugLevel3Fn("Equivalence for %s\n" _C_
 		    AiPlayer->UpgradeToRequests[i]->Ident);
 	    for( j=0; j<AiHelpers.Equiv[t]->Count; ++j ) {
 		e+=unit_types_count[AiHelpers.Equiv[t]->Table[j]->Type];
