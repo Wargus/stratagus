@@ -17,23 +17,24 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--      Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
-#include "missile.h"
 #include "actions.h"
 #include "sound.h"
-#include "tileset.h"
 #include "map.h"
+#include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
---      Demolish
+--	Functions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -50,7 +51,7 @@ global void HandleActionDemolish(Unit* unit)
     Unit* goal;
     int err;
 
-    DebugLevel3("Demolish %d\n",unit-Units);
+    DebugLevel3Fn("Demolish %d\n",unit-Units);
 
     switch( unit->SubAction ) {
 	//
@@ -67,7 +68,7 @@ global void HandleActionDemolish(Unit* unit)
 		//
 		if( goal ) {
 		    if( goal->Destroyed ) {
-			DebugLevel0(__FUNCTION__": destroyed unit\n");
+			DebugLevel0Fn("Destroyed unit\n");
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
@@ -98,7 +99,7 @@ global void HandleActionDemolish(Unit* unit)
 #endif
 
 		//
-		//	Have reached target?
+		//	Have reached target? FIXME: could use result?
 		//
 		if( goal ) {
 		    if( MapDistanceToUnit(unit->X,unit->Y,goal)<=1 ) {
@@ -110,7 +111,7 @@ global void HandleActionDemolish(Unit* unit)
 			,unit->Command.Data.Move.DY)<=1 ) {
 		    unit->State=0;
 		    unit->SubAction=1;
-		} else if( err ) {
+		} else if( err==PF_UNREACHABLE ) {
 		    return;
 		}
 		unit->Command.Action=UnitActionDemolish;

@@ -17,6 +17,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--      Include
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -28,6 +32,11 @@
 #include "player.h"
 #include "unit.h"
 #include "actions.h"
+#include "pathfinder.h"
+
+/*----------------------------------------------------------------------------
+--      Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Return goods to gold/wood deposit.
@@ -50,7 +59,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	    unit->Command.Action=UnitActionStill;
 	    return;
 	}
-	unit->Command.Data.Move.Fast=1;
+	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=destu;
 #ifdef NEW_UNIT
 	++destu->Refs;
@@ -76,7 +85,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	    unit->Command.Action=UnitActionStill;
 	    return;
 	}
-	unit->Command.Data.Move.Fast=1;
+	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=destu;
 #ifdef NEW_UNIT
 	++destu->Refs;
@@ -106,7 +115,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	    unit->Command.Action=UnitActionStill;
 	    return;
 	}
-	unit->Command.Data.Move.Fast=1;
+	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=destu;
 #ifdef NEW_UNIT
 	++destu->Refs;

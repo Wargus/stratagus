@@ -25,17 +25,14 @@
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
 #include "missile.h"
 #include "actions.h"
 #include "sound.h"
-#include "tileset.h"
 #include "map.h"
+#include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -52,9 +49,9 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
     int flags;
 
     IfDebug(
-    int oframe;
+	int oframe;
 
-    oframe=unit->Frame;
+	oframe=unit->Frame;
     );
 
     flags=UnitShowAnimation(unit,attack);
@@ -62,7 +59,7 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 #ifdef NEW_VIDEO
     IfDebug(
 	if( (unit->Frame&127)>=VideoGraphicFrames(unit->Type->Sprite) ) {
-	    DebugLevel0("Oops what this %s %d,%d %d #%d\n"
+	    DebugLevel0Fn("Oops what this %s %d,%d %d #%d\n"
 		,unit->Type->Ident
 		,oframe,oframe&127
 		,unit->Frame&127
@@ -75,7 +72,7 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 #else
     IfDebug(
 	if( (unit->Frame&127)>=unit->Type->RleSprite->NumFrames ) {
-	    DebugLevel0("Oops what this %s %d,%d %d #%d\n"
+	    DebugLevel0Fn("Oops what this %s %d,%d %d #%d\n"
 		,unit->Type->Ident
 		,oframe,oframe&127
 		,unit->Frame&127
@@ -124,7 +121,6 @@ local void MoveToTarget(Unit* unit)
 
     if( unit->Command.Action==UnitActionAttackGround
 	|| WallOnMap(unit->Command.Data.Move.DX,unit->Command.Data.Move.DY) ) { 
-	// FIXME: I think also needed for attacking wall
 	// FIXME: workaround for pathfinder problem
 	unit->Command.Data.Move.DX-=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.DY-=unit->Command.Data.Move.Range;
@@ -137,7 +133,8 @@ local void MoveToTarget(Unit* unit)
     } else {
 	err=HandleActionMove(unit);
     }
-    // FIXME: Should handle new return codes here (for Fabrice)
+
+    // NEW return codes supported, FIXME: but I think not perfect.
 
     if( unit->Reset ) {
 	//
@@ -147,7 +144,7 @@ local void MoveToTarget(Unit* unit)
 	if( (goal=unit->Command.Data.Move.Goal) ) {
 	    // FIXME: Should be done by Action Move???????
 	    if( goal->Destroyed ) {
-		DebugLevel0(__FUNCTION__": destroyed unit\n");
+		DebugLevel0Fn("destroyed unit\n");
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
@@ -181,11 +178,11 @@ local void MoveToTarget(Unit* unit)
 		    unit->SavedCommand=unit->Command;
 		}
 		unit->Command.Data.Move.Goal=goal;
-		unit->Command.Data.Move.Fast=1;
+		ResetPath(unit->Command);
 		unit->Command.Data.Move.DX=goal->X;
 		unit->Command.Data.Move.DY=goal->Y;
 		unit->SubAction|=2;		// weak target
-		DebugLevel3(__FUNCTION__": %Zd in react range %Zd\n"
+		DebugLevel3Fn("%Zd in react range %Zd\n"
 			,UnitNumber(unit),UnitNumber(goal));
 	    }
 
@@ -206,14 +203,14 @@ local void MoveToTarget(Unit* unit)
 		    unit->SavedCommand=unit->Command;
 		}
 		unit->Command.Data.Move.Goal=goal=temp;
-		unit->Command.Data.Move.Fast=1;
+		ResetPath(unit->Command);
 		unit->Command.Data.Move.DX=goal->X;
 		unit->Command.Data.Move.DY=goal->Y;
 	    }
 	}
 
 	//
-	//	Have reached target?
+	//	Have reached target? FIXME: could use the new return code?
 	//
 	if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
 		<=unit->Stats->AttackRange ) {
@@ -226,7 +223,7 @@ local void MoveToTarget(Unit* unit)
 		&& MapDistance(unit->X,unit->Y
 		    ,unit->Command.Data.Move.DX,unit->Command.Data.Move.DY)
 			<=unit->Stats->AttackRange ) {
-	    DebugLevel3("Attacking wall\n");
+	    DebugLevel3Fn("Attacking wall or ground\n");
 	    unit->State=0;
 	    if( !unit->Type->Tower ) {
 		UnitHeadingFromDeltaXY(unit,unit->Command.Data.Move.DX-unit->X
@@ -234,10 +231,10 @@ local void MoveToTarget(Unit* unit)
 	    }
 	    unit->SubAction=1;
 	    return;
-	} else if( err ) {
+	} else if( err<0 ) {
 	    unit->State=0;
 	    unit->SubAction=0;
-	    // Return to old task!
+	    // Return to old task?
 	    if( unit->Command.Action==UnitActionStill ) {
 		unit->Command=unit->SavedCommand;
 		// Must finish if saved command finishes
@@ -268,7 +265,7 @@ local void AttackTarget(Unit* unit)
 	if( !goal && (WallOnMap(unit->Command.Data.Move.DX
 		     ,unit->Command.Data.Move.DY)
 		|| unit->Command.Action==UnitActionAttackGround) ) {
-	    DebugLevel3("attack a wall!!!!\n");
+	    DebugLevel3Fn("attack a wall!!!!\n");
 	    return;
 	}
 
@@ -278,7 +275,7 @@ local void AttackTarget(Unit* unit)
 #ifdef NEW_UNIT
 	if( goal ) {
 	    if( goal->Destroyed ) {
-		DebugLevel0(__FUNCTION__": destroyed unit\n");
+		DebugLevel0Fn("destroyed unit\n");
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
@@ -310,7 +307,7 @@ local void AttackTarget(Unit* unit)
 #ifdef NEW_UNIT
 	    goal->Refs++;
 #endif
-	    DebugLevel3(__FUNCTION__": %Zd Unit in react range %Zd\n"
+	    DebugLevel3Fn("%Zd Unit in react range %Zd\n"
 		    ,UnitNumber(unit),UnitNumber(goal));
 	    unit->Command.Data.Move.Goal=goal;
 	    unit->Command.Data.Move.DX=goal->X;
@@ -329,7 +326,7 @@ local void AttackTarget(Unit* unit)
 		return;
 	    }
 	    unit->SubAction|=2;
-	    DebugLevel3("Unit in react range %Zd\n",UnitNumber(goal));
+	    DebugLevel3Fn("Unit in react range %Zd\n",UnitNumber(goal));
 	    unit->Command.Data.Move.DX=goal->X;
 	    unit->Command.Data.Move.DY=goal->Y;
 	} else
@@ -366,7 +363,7 @@ local void AttackTarget(Unit* unit)
 		// Save current command to come back.
 		unit->SavedCommand=unit->Command;
 	    }
-	    unit->Command.Data.Move.Fast=1;
+	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.DX=goal->X;
 	    unit->Command.Data.Move.DY=goal->Y;
 	    unit->Frame=0;
@@ -393,7 +390,7 @@ local void AttackTarget(Unit* unit)
 */
 global void HandleActionAttack(Unit* unit)
 {
-    DebugLevel3(__FUNCTION__": Attack %Zd\n",UnitNumber(unit));
+    DebugLevel3Fn("Attack %Zd\n",UnitNumber(unit));
 
     switch( unit->SubAction ) {
 	//

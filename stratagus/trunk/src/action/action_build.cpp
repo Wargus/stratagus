@@ -17,23 +17,27 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--      Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
-#include "missile.h"
 #include "sound.h"
 #include "actions.h"
-#include "tileset.h"
 #include "map.h"
 #include "ai.h"
 #include "interface.h"
+#include "pathfinder.h"
+
+/*----------------------------------------------------------------------------
+--      Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Unit builds a building.
@@ -51,23 +55,22 @@ global void HandleActionBuild(Unit* unit)
     const UnitStats* stats;
     Unit* build;
     Unit* temp;
-    int reached;
-
-    if( !(reached=HandleActionMove(unit)) ) {	// reached end-point?
-	return;
-    }
-
-    DebugLevel3(__FUNCTION__": reached %d,%d\n",unit->X,unit->Y);
 
     type=unit->Command.Data.Build.BuildThis;
-
-    if( reached==-1 ) {		// can't reach
-        if( unit->Player==ThisPlayer ) {
-	    SetMessage("You cannot reach building place.");
-	} else {
-	    AiCanNotReach(unit,type);
-	}
-	return;
+    switch( HandleActionMove(unit) ) {	// reached end-point?
+	case PF_UNREACHABLE:
+	    // FIXME: use general notify/messages
+	    if( unit->Player==ThisPlayer ) {
+		SetMessage("You cannot reach building place.");
+	    } else {
+		AiCanNotReach(unit,type);
+	    }
+	    return;
+	case PF_REACHED:
+	    DebugLevel3Fn("reached %d,%d\n",unit->X,unit->Y);
+	    break;
+	default:
+	    return;
     }
 
     // Must be reached!
@@ -85,7 +88,7 @@ global void HandleActionBuild(Unit* unit)
 	//
 	//	Check if building place reached.
 	//
-	DebugLevel3(__FUNCTION__": `%s' %d,%d - %d,%d (%d)\n"
+	DebugLevel3Fn("`%s' %d,%d - %d,%d (%d)\n"
 		,type->Name
 		,dx-n,dy-n
 		,dx+type->TileWidth+n
@@ -94,14 +97,14 @@ global void HandleActionBuild(Unit* unit)
 
 	if( x<dx-n || x>=dx+type->TileWidth+n
 	        || y<dy-n || y>=dy+type->TileHeight+n ) {
-	    DebugLevel0(__FUNCTION__": Internal error\n");
+	    DebugLevel0Fn("Internal error\n");
 	    abort();
 	}
     );
 
     x=unit->Command.Data.Move.DX;
     y=unit->Command.Data.Move.DY;
-    if( type->ShoreBuilding ) {
+    if( type->ShoreBuilding ) {		// correct coordinates.
 	++x;
 	++y;
     }
@@ -110,6 +113,7 @@ global void HandleActionBuild(Unit* unit)
     //	Check if the building could be build there.
     //
     if( !CanBuildUnitType(unit,type,x,y) ) {
+	// FIXME: use general notify/messages
         if( unit->Player==ThisPlayer ) {
 	    SetMessage("You cannot build here.");
 	} else {
@@ -145,7 +149,7 @@ global void HandleActionBuild(Unit* unit)
     build->Command.Data.Builded.Sub=n;
     build->Command.Data.Builded.Cancel=0; // FIXME: Is it necessary?
     build->Command.Data.Builded.Worker=unit;
-    DebugLevel3("Build Sum %d, Add %d, Val %d, Sub %d\n"
+    DebugLevel3Fn("Build Sum %d, Add %d, Val %d, Sub %d\n"
 		,build->Command.Data.Builded.Sum
 		,build->Command.Data.Builded.Add
 		,build->Command.Data.Builded.Val
@@ -156,18 +160,18 @@ global void HandleActionBuild(Unit* unit)
     //	Building oil-platform, must remove oilpatch.
     //
     if( type->GivesOil ) {
-        DebugLevel0("Remove oil-patch\n");
+        DebugLevel0Fn("Remove oil-patch\n");
 	temp=OilPatchOnMap(x,y);
 	DebugCheck( !temp );
 	unit->Value=temp->Value;	// Let peon hold value while building
-	DestroyUnit(temp);		// Destroy oil patch - oil patch should NOT make sound
+	// FIXME: oil patch should NOT make sound
+	DestroyUnit(temp);		// Destroy oil patch
     }
 
     RemoveUnit(unit);
     unit->X=x;
     unit->Y=y;
     unit->Command.Action=UnitActionStill;
-    // unit->Wait=MAX_UNIT_WAIT;
 
     if( UnitVisible(build) ) {
         MustRedraw|=RedrawMaps;
@@ -181,7 +185,6 @@ global void HandleActionBuild(Unit* unit)
 */
 global void HandleActionBuilded(Unit* unit)
 {
-    //Unit* temp;
     Unit* peon;
     UnitType* type;
 
@@ -241,9 +244,8 @@ global void HandleActionBuilded(Unit* unit)
 	//
 	if( type->GivesOil ) {
 	    CommandHaulOil(peon,unit,0);	// Let the unit haul oil
-	    DebugLevel0("Update oil-platform\n");
-	    DebugLevel0(__FUNCTION__": =%d\n"
-		    ,unit->Command.Data.OilWell.Active);
+	    DebugLevel0Fn("Update oil-platform\n");
+	    DebugLevel0Fn(" =%d\n",unit->Command.Data.OilWell.Active);
 	    unit->Command.Data.OilWell.Active=0;
 	    unit->Value=peon->Value;		// peon was holding value while building
 	}

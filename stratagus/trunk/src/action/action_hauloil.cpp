@@ -17,22 +17,27 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
 #include "actions.h"
-#include "tileset.h"
 #include "map.h"
 #include "interface.h"
+#include "pathfinder.h"
 
 //	FIXME:	this could be generalized, one function for all oil+gold
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Move unit to oil platform.
@@ -43,15 +48,15 @@
 local int MoveToOilWell(Unit* unit)
 {
     Unit* well;
-    int ret;
 
-    if( !(ret=HandleActionMove(unit)) ) {	// reached end-point
-	return 0;
-    }
-    // FIXME: support new return values of the pathfinder
-    if( ret==-1 ) {
-	DebugLevel2("OIL-WELL NOT REACHED\n");
-	return -1;
+    switch( HandleActionMove(unit) ) {	// reached end-point?
+	case PF_UNREACHABLE:
+	    DebugLevel2Fn("OIL-WELL NOT REACHED\n");
+	    return -1;
+	case PF_REACHED:
+	    break;
+	default:
+	    return 0;
     }
 
     unit->Command.Action=UnitActionHaulOil;
@@ -68,7 +73,7 @@ local int MoveToOilWell(Unit* unit)
     }
 #endif
     if( !well ) {			// target lost?
-	DebugLevel2("OIL-WELL LOST\n");
+	DebugLevel2Fn("OIL-WELL LOST\n");
 	return -1;
     }
 
@@ -76,7 +81,7 @@ local int MoveToOilWell(Unit* unit)
 
     // FIXME: the oil well didn't completed, should wait!
     if( well->Command.Action==UnitActionBuilded ) {
-        DebugLevel2("Invalid Oil Well\n");
+        DebugLevel2Fn("Invalid Oil Well\n");
 	return -1;
     }
 
@@ -90,14 +95,14 @@ local int MoveToOilWell(Unit* unit)
 #ifndef NEW_UNIT
     if( !well->Type->GivesOil ) {
 	// OilWell destoryed.
-	DebugLevel3("WAIT after oil-well destroyed %d\n",unit->Wait);
+	DebugLevel3Fn("WAIT after oil-well destroyed %d\n",unit->Wait);
 	unit->Command.Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
     }
 #endif
     well->Command.Data.OilWell.Active++;
-    DebugLevel0(__FUNCTION__": +%d\n",well->Command.Data.OilWell.Active);
+    DebugLevel0Fn("+%d\n",well->Command.Data.OilWell.Active);
     well->Frame=2;			// FIXME: this shouldn't be hard coded!
 
     RemoveUnit(unit);
@@ -125,17 +130,17 @@ local int HaulInOilWell(Unit* unit)
     Unit* well;
     Unit* depot;
 
-    DebugLevel3("Waiting\n");
+    DebugLevel3Fn("Waiting\n");
 
     if( !unit->Value ) {
 	//
 	// Have oil
 	//
 	well=PlatformOnMap(unit->X,unit->Y);
-	DebugLevel3("Found %d,%d=%Zd\n",unit->X,unit->Y,UnitNumber(well));
+	DebugLevel3Fn("Found %d,%d=%Zd\n",unit->X,unit->Y,UnitNumber(well));
 	IfDebug(
 	    if( !well ) {
-		DebugLevel0("No unit? (%d,%d)\n",unit->X,unit->Y);
+		DebugLevel0Fn("No unit? (%d,%d)\n",unit->X,unit->Y);
 		abort();
 	    } );
 
@@ -143,7 +148,7 @@ local int HaulInOilWell(Unit* unit)
 	//	Update oil-well.
 	//
 	well->Value-=DEFAULT_INCOMES[OilCost];	// remove oil from store
-	DebugLevel0(__FUNCTION__": -%d\n",well->Command.Data.OilWell.Active);
+	DebugLevel0Fn("-%d\n",well->Command.Data.OilWell.Active);
 	if( !--well->Command.Data.OilWell.Active ) {
 	    well->Frame=0;
 	}
@@ -163,7 +168,7 @@ local int HaulInOilWell(Unit* unit)
 	    // Also remove oil-patch  FIXME: didn't work?
 	    well=OilPatchOnMap(unit->X,unit->Y);
 	    if( well ) {
-		DebugLevel0(__FUNCTION__": removing oil patch\n");
+		DebugLevel0Fn("removing oil patch\n");
 		DestroyUnit(well);
 	    }
 #endif
@@ -178,7 +183,7 @@ local int HaulInOilWell(Unit* unit)
 	} else if( unit->Type==UnitTypeOrcTanker ) {
 	    unit->Type=UnitTypeOrcTankerFull;
 	} else {
-	    DebugLevel0("Wrong unit-type for haul oil `%s'\n"
+	    DebugLevel0Fn("Wrong unit-type for haul oil `%s'\n"
 		    ,unit->Type->Ident);
 	}
 
@@ -202,7 +207,7 @@ local int HaulInOilWell(Unit* unit)
 	    } else {
 		DropOutNearest(unit,depot->X,depot->Y,1,1);
 	    }
-	    unit->Command.Data.Move.Fast=1;
+	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=depot;
 #ifdef NEW_UNIT
 	    ++depot->Refs;
@@ -251,19 +256,18 @@ local int HaulInOilWell(Unit* unit)
 */
 local int MoveToOilDepot(Unit* unit)
 {
-    int ret;
     int x;
     int y;
     Unit* depot;
 
-    if( !(ret=HandleActionMove(unit)) ) {	// reached end-point
-	return 0;
-    }
-    // FIXME: support new return values of the pathfinder
-    DebugLevel3("Result: %d\n",ret);
-    if( ret==-1 ) {
-	DebugLevel2("OIL-DEPOT NOT REACHED\n");
-	return -1;
+    switch( HandleActionMove(unit) ) {	// reached end-point?
+	case PF_UNREACHABLE:
+	    DebugLevel2Fn("OIL-DEPOT NOT REACHED\n");
+	    return -1;
+	case PF_REACHED:
+	    break;
+	default:
+	    return 0;
     }
 
     unit->Command.Action=UnitActionHaulOil;
@@ -280,7 +284,7 @@ local int MoveToOilDepot(Unit* unit)
     }
 #endif
     if( !depot ) {			// target lost?
-	DebugLevel2("OIL-DEPOT LOST\n");
+	DebugLevel2Fn("OIL-DEPOT LOST\n");
 	return -1;
     }
 
@@ -311,7 +315,7 @@ local int MoveToOilDepot(Unit* unit)
     } else if( unit->Type==UnitTypeOrcTankerFull ) {
 	unit->Type=UnitTypeOrcTanker;
     } else {
-	DebugLevel0("Wrong unit for returning oil `%s'\n",unit->Type->Ident);
+	DebugLevel0Fn("Wrong unit for returning oil `%s'\n",unit->Type->Ident);
     }
 
     if( WAIT_FOR_OIL<MAX_UNIT_WAIT ) {
@@ -334,7 +338,7 @@ local int WaitForOilDeliver(Unit* unit)
     Unit* depot;
     Unit* platform;
 
-    DebugLevel3("Waiting\n");
+    DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
 	depot=unit->Command.Data.Move.Goal;
 	// Could be destroyed, but than we couldn't be in?
@@ -348,7 +352,7 @@ local int WaitForOilDeliver(Unit* unit)
 	} else {
 	    DropOutNearest(unit,platform->X,platform->Y
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-	    unit->Command.Data.Move.Fast=1;
+	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=platform;
 #ifdef NEW_UNIT
 	    ++platform->Refs;
@@ -391,7 +395,7 @@ global void HandleActionHaulOil(Unit* unit)
 {
     int ret;
 
-    DebugLevel3(__FUNCTION__": %p (%Zd) SubAction %d\n"
+    DebugLevel3Fn("%p (%Zd) SubAction %d\n"
 	,unit,UnitNumber(unit),unit->SubAction);
 
     switch( unit->SubAction ) {

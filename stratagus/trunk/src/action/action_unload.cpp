@@ -17,20 +17,25 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
 #include "actions.h"
-#include "interface.h"
-#include "tileset.h"
 #include "map.h"
+#include "interface.h"
+#include "pathfinder.h"
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Move to coast.
@@ -40,18 +45,24 @@
 */
 local int MoveToCoast(Unit* unit)
 {
-    int i;
+    DebugLevel3Fn("%p\n",unit->Command.Data.Move.Goal);
 
-    DebugLevel3("%p\n",unit->Command.Data.Move.Goal);
+    switch( HandleActionMove(unit) ) {	// reached end-point?
+	case PF_UNREACHABLE:
+	    DebugLevel2Fn("COAST NOT REACHED\n");
+	    return -1;
+	case PF_REACHED:
+	    break;
+	default:
+	    return 0;
+    }
 
-    if( !(i=HandleActionMove(unit)) ) {	// reached end-point
-	return 0;
-    }
-    DebugLevel3(__FUNCTION__" Result: %d\n",i);
-    if( !CoastOnMap(unit->X,unit->Y) ) {
-	DebugLevel2("COAST NOT REACHED\n");
-	return -1;
-    }
+    IfDebug( 
+	if( !CoastOnMap(unit->X,unit->Y) ) {
+	    DebugLevel2Fn("COAST NOT REACHED\n");
+	    return -1;
+	}
+    )
 
     unit->Command.Action=UnitActionUnload;
     return 1;
@@ -68,11 +79,11 @@ local void LeaveTransporter(Unit* unit)
     Unit* goal;
 
     goal=unit->Command.Data.Move.Goal;
-    DebugLevel3("Goal %p\n",goal);
+    DebugLevel3Fn("Goal %p\n",goal);
     if( goal ) {
 #ifdef NEW_UNIT
 	if( goal->Destroyed ) {
-	    DebugLevel0(__FUNCTION__": destroyed unit\n");
+	    DebugLevel0Fn("destroyed unit\n");
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
@@ -121,7 +132,7 @@ global void HandleActionUnload(Unit* unit)
 {
     int i;
 
-    DebugLevel3(__FUNCTION__": %p(%Zd) SubAction %d\n"
+    DebugLevel3Fn("%p(%Zd) SubAction %d\n"
 	    ,unit,UnitNumber(unit),unit->SubAction);
 
     switch( unit->SubAction ) {
