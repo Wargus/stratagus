@@ -9,27 +9,31 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**name action_upgradeto.c -	The unit upgrading to new action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
-#include "unittype.h"
 #include "player.h"
+#include "unittype.h"
 #include "unit.h"
 #include "actions.h"
 #include "ai.h"
 #include "interface.h"
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Unit upgrades unit!
@@ -42,17 +46,16 @@ global void HandleActionUpgradeTo(Unit* unit)
     UnitType* type;
     const UnitStats* stats;
 
-    DebugLevel3(__FUNCTION__": %Zd\n",UnitNumber(unit));
+    DebugLevel3Fn(" %Zd\n",UnitNumber(unit));
 
     player=unit->Player;
     type=unit->Command.Data.UpgradeTo.What;
     stats=&type->Stats[player->Player];
 
-    unit->Command.Data.UpgradeTo.Ticks+=SpeedUpgrade;
     // FIXME: Should count down here
+    unit->Command.Data.UpgradeTo.Ticks+=SpeedUpgrade;
     if( unit->Command.Data.UpgradeTo.Ticks>=stats->Costs[TimeCost] ) {
 
-	// FIXME: HP, I add the difference to the new unit?
 	unit->HP+=stats->HitPoints-unit->Type->Stats[player->Player].HitPoints;
 	// don't have such unit now
 	player->UnitTypesCount[unit->Type->Type]--;
@@ -64,7 +67,8 @@ global void HandleActionUpgradeTo(Unit* unit)
 
 	// FIXME: SendNotify("upgrade-complete");
 	if( player==ThisPlayer ) {
-	    SetMessage2( unit->X, unit->Y, "Upgrade to %s complete", unit->Type->Name );
+	    SetMessage2( unit->X, unit->Y, "Upgrade to %s complete",
+		    unit->Type->Name );
 	} else {
 	    // FIXME: AiUpgradeToComplete(unit,type);
 	}
@@ -72,9 +76,14 @@ global void HandleActionUpgradeTo(Unit* unit)
 	unit->Wait=1;
 	unit->Command.Action=UnitActionStill;
 
+	//
+	//	Update possible changed buttons.
+	//
 	if( IsSelected(unit) ) {
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawPanels;
+	} else if( player==ThisPlayer ) {
+	    UpdateButtonPanel();
 	}
 
 	return;

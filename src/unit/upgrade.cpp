@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name upgrade.c	-	The upgrade/allow functions. */
-/*
-**	(c) Copyright 1999-2000 by Vladi Belperchinov-Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2000 by Vladi Belperchinov-Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -29,6 +28,7 @@
 #include "upgrade_structs.h"
 #include "upgrade.h"
 #include "player.h"
+#include "interface.h"
 
 #include "myendian.h"
 
@@ -300,13 +300,14 @@ local const char* UpgradeWcNames[] = {
 /**
 **	Add an upgrade.
 **
-**	@param aIdent	upgrade identifier.
-**
-**	FIXME: docu
+**	@param ident	upgrade identifier.
+**	@param icon	icon displayed for this upgrade,
+**			NULL for generated name (icon-<ident>). 
+**	@param costs	costs to upgrade.
 **
 **	@returns upgrade id or -1 for error
 */
-local Upgrade* AddUpgrade(const char* aIdent,const char* aIcon,int* aCosts)
+local Upgrade* AddUpgrade(const char* ident,const char* icon,const int* costs)
 {
     char buf[256];
     int i;
@@ -314,21 +315,22 @@ local Upgrade* AddUpgrade(const char* aIdent,const char* aIcon,int* aCosts)
     //	Check for free slot.
 
     if ( UpgradesCount == MAXUACOUNT ) {
+	DebugLevel0Fn("Upgrades limit reached.\n");
 	return NULL;
     }
 
     //	Fill upgrade structure
 
-    Upgrades[UpgradesCount].Ident = strdup( aIdent );
+    Upgrades[UpgradesCount].Ident = strdup( ident );
 
     for( i=0; i<MaxCosts; ++i ) {
-	Upgrades[UpgradesCount].Costs[i]=aCosts[i];
+	Upgrades[UpgradesCount].Costs[i]=costs[i];
     }
 
-    if( aIcon ) {
-	Upgrades[UpgradesCount].Icon = IconByIdent(aIcon);
+    if( icon ) {
+	Upgrades[UpgradesCount].Icon = IconByIdent(icon);
     } else {
-	sprintf(buf,"icon-%s",aIdent+8);
+	sprintf(buf,"icon-%s",ident+8);
 	Upgrades[UpgradesCount].Icon = IconByIdent(buf);
     }
 
@@ -386,7 +388,7 @@ global Upgrade* UpgradeByIdent(const char* ident)
 	return *upgrade;
     }
 
-    DebugLevel0(__FUNCTION__": upgrade %s not found\n",ident);
+    DebugLevel0Fn(" upgrade %s not found\n",ident);
 
     return NULL;
 }
@@ -398,7 +400,7 @@ global void InitUpgrades(void)
 {
     int z;
 
-    DebugLevel3(__FUNCTION__": ---------------------------------------\n");
+    DebugLevel3Fn(" ---------------------------------------\n");
     if( !UpgradesCount ) {
 	InitIcons();			// wired, but I need them here
 
@@ -546,7 +548,7 @@ global void ParsePudALOW(const char* alow,int length)
     int b;
     Player* player;
 
-    DebugLevel0(__FUNCTION__": Length %d\n",length);
+    DebugLevel0Fn(" Length %d\n",length);
     //SetupAllow();
     InitUpgrades();
 
@@ -558,11 +560,11 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel3(__FUNCTION__": %x\n",v);
+	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( units[i*16+0+b*2] ) {
-			DebugLevel3(__FUNCTION__": %s +\n",
+			DebugLevel3Fn(" %s +\n",
 				units[i*16+0+b*2]);
 				
 			AllowUnitByIdent(player,units[i*16+0+b*2],'A');
@@ -570,7 +572,7 @@ global void ParsePudALOW(const char* alow,int length)
 		    }
 		} else {
 		    if( units[i*16+0+b*2] ) {
-			DebugLevel3(__FUNCTION__": %s -\n",
+			DebugLevel3Fn(" %s -\n",
 				units[i*16+0+b*2]);
 
 			AllowUnitByIdent(player,units[i*16+0+b*2],'F');
@@ -589,17 +591,17 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0(__FUNCTION__": %x\n",v);
+	    DebugLevel0Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
-			DebugLevel0(__FUNCTION__": %s +R\n",spells[i*8+b]);
+			DebugLevel0Fn(" %s +R\n",spells[i*8+b]);
 				
 			AllowUpgradeByIdent(player,spells[i*8+b],'R');
 		    }
 		} else {
 		    if( spells[i*8+b] ) {
-			DebugLevel0(__FUNCTION__": %s -F\n",spells[i*8+b]);
+			DebugLevel0Fn(" %s -F\n",spells[i*8+b]);
 
 			AllowUpgradeByIdent(player,spells[i*8+b],'F');
 		    }
@@ -616,11 +618,11 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0(__FUNCTION__": %x\n",v);
+	    DebugLevel0Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
-			DebugLevel0(__FUNCTION__": %s +A\n",spells[i*8+b]);
+			DebugLevel0Fn(" %s +A\n",spells[i*8+b]);
 				
 			AllowUpgradeByIdent(player,spells[i*8+b],'A');
 		    }
@@ -637,11 +639,11 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0(__FUNCTION__": %x\n",v);
+	    DebugLevel0Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
-			DebugLevel0(__FUNCTION__": %s +U\n",spells[i*8+b]);
+			DebugLevel0Fn(" %s +U\n",spells[i*8+b]);
 				
 			AllowUpgradeByIdent(player,spells[i*8+b],'U');
 		    }
@@ -658,11 +660,11 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0(__FUNCTION__": %x\n",v);
+	    DebugLevel0Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( upgrades[i*16+b*2+0] ) {
-			DebugLevel0(__FUNCTION__": %s +A\n",upgrades[i*16+b*2]);
+			DebugLevel0Fn(" %s +A\n",upgrades[i*16+b*2]);
 				
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'A');
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+1],'A');
@@ -680,11 +682,11 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0(__FUNCTION__": %x\n",v);
+	    DebugLevel0Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( upgrades[i*16+b*2+0] ) {
-			DebugLevel0(__FUNCTION__": %s +U\n",upgrades[i*16+b*2]);
+			DebugLevel0Fn(" %s +U\n",upgrades[i*16+b*2]);
 				
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'U');
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+1],'U');
@@ -714,9 +716,9 @@ global void ParsePudUGRD(const char* ugrd,int length)
     int group;
     int flags;
 
-    DebugLevel3(__FUNCTION__": Length %d\n",length);
+    DebugLevel3Fn(" Length %d\n",length);
     DebugCheck( length!=780 );
-    DebugLevel3(__FUNCTION__": Upgrades %d\n",UpgradesCount);
+    DebugLevel3Fn(" Upgrades %d\n",UpgradesCount);
 
     for( i=0; i<52; ++i ) {
 	time=((unsigned char*)ugrd)[i];
@@ -726,7 +728,7 @@ global void ParsePudUGRD(const char* ugrd,int length)
 	icon=AccessLE16(	ugrd+52+(i+52+52+52)*2);
 	group=AccessLE16(	ugrd+52+(i+52+52+52+52)*2);
 	flags=AccessLE16(	ugrd+52+(i+52+52+52+52+52)*2);
-	DebugLevel3(__FUNCTION__": %s %d,%d,%d,%d %d %d %08X\n"
+	DebugLevel3Fn(" %s %d,%d,%d,%d %d %d %08X\n"
 		,UpgradeWcNames[i] 
 		,time,gold,lumber,oil
 		,icon,group,flags);
@@ -909,12 +911,12 @@ local SCM CclDefineModifier(SCM list)
     list=gh_cdr(list);
 
     str=gh_scm2newstr(value,NULL);
-    DebugLevel2(__FUNCTION__"\tName: %s\n",str);
+    DebugLevel2Fn(" %s\n",str);
 
     //CclFree(type->Name);
     //type->Name=str;
 
-    DebugLevel0(__FUNCTION__": not written\n");
+    DebugLevel0Fn(" not written\n");
 
     return SCM_UNSPECIFIED;
 }
@@ -931,12 +933,12 @@ local SCM CclDefineUpgrade(SCM list)
     list=gh_cdr(list);
 
     str=gh_scm2newstr(value,NULL);
-    DebugLevel2(__FUNCTION__"\tName: %s\n",str);
+    DebugLevel2Fn(" %s\n",str);
 
     //CclFree(type->Name);
     //type->Name=str;
 
-    DebugLevel0(__FUNCTION__": not written\n");
+    DebugLevel0Fn(" not written\n");
 
     return SCM_UNSPECIFIED;
 }
@@ -960,7 +962,7 @@ local SCM CclDefineAllow(SCM list)
 	list=gh_cdr(list);
 	ids=gh_scm2newstr(value,NULL);
 
-	DebugLevel3(__FUNCTION__"\tName: %s - %s\n",str,ids);
+	DebugLevel3Fn(" %s - %s\n",str,ids);
 
 	n=strlen(ids);
 	if( n>16 ) {
@@ -1158,7 +1160,7 @@ global int AddUpgradeModifier( int aUid,
     for( s2 = strtok( s1, "," ); s2; s2=strtok( NULL, "," ) ) {
 	int id;
 
-	DebugLevel3(__FUNCTION__": %s\n",s2);
+	DebugLevel3Fn(" %s\n",s2);
 	id = UnitTypeIdByIdent( s2 );
 	if ( id == -1 ) {
 	    break;		// cade: should we cancel all and return error?!
@@ -1226,7 +1228,7 @@ global int UnitTypeIdByIdent(const char* sid)
     if( (type=UnitTypeByIdent(sid)) ) {
 	return type->Type;
     }
-    DebugLevel0(__FUNCTION__": fix this %s\n",sid);
+    DebugLevel0Fn(" fix this %s\n",sid);
     return -1;
 }
 
@@ -1244,7 +1246,7 @@ global int UpgradeIdByIdent(const char* sid)
     if( upgrade ) {
 	return upgrade-Upgrades;
     }
-    DebugLevel0(__FUNCTION__": fix this %s\n",sid);
+    DebugLevel0Fn(" fix this %s\n",sid);
     return -1;
 }
 
@@ -1252,7 +1254,7 @@ global int UpgradeIdByIdent(const char* sid)
 global int ActionIdByIdent( const char* sid )
 {
   // FIXME: there's no actions table yet
-  DebugLevel0(__FUNCTION__": fix this %s\n",sid);
+  DebugLevel0Fn(" fix this %s\n",sid);
   return -1;
 }
 
@@ -1304,7 +1306,7 @@ void ApplyUpgradeModifier( Player* player, UpgradeModifier* um )
 	if ( um->apply_to[z] == 'X' )
 	{ // this modifier should be applied to unittype id == z
 
-	    DebugLevel3(__FUNCTION__": applied to %d\n",z);
+	    DebugLevel3Fn(" applied to %d\n",z);
 	    // upgrade stats
 	    UnitTypes[z].Stats[pn].AttackRange	+= um->mods.AttackRange;
 	    UnitTypes[z].Stats[pn].SightRange	+= um->mods.SightRange;
@@ -1340,6 +1342,13 @@ global void UpgradeAcquire( Player* player, Upgrade* upgrade )
 	    ApplyUpgradeModifier( player, UpgradeModifiers[z] );
 	}
     }
+
+    //
+    //	Upgrades could change the buttons displayed.
+    //
+    if( player==ThisPlayer ) {
+	UpdateButtonPanel();
+    }
 }
 
 // for now it will be empty?
@@ -1360,36 +1369,55 @@ void UpgradeLost( Player* player, int id )
 ----------------------------------------------------------------------------*/
 
 // all the following functions are just map handlers, no specific notes
+
+/**
+**	FIXME: docu
+*/
 void AllowUnitId( Player* player, int id, char af ) // id -- unit type id, af -- `A'llow/`F'orbid
 {
   DebugCheck(!( af == 'A' || af == 'F' ));
   player->Allow.Units[id] = af;
 }
 
+/**
+**	FIXME: docu
+*/
 void AllowActionId( Player* player,  int id, char af )
 {
   DebugCheck(!( af == 'A' || af == 'F' ));
   player->Allow.Actions[id] = af;
 }
 
+/**
+**	FIXME: docu
+*/
 void AllowUpgradeId( Player* player,  int id, char af )
 {
   DebugCheck(!( af == 'A' || af == 'F' || af == 'R' ));
   player->Allow.Upgrades[id] = af;
 }
 
+/**
+**	FIXME: docu
+*/
 char UnitIdAllowed(const Player* player,  int id )
 {
   if ( id < 0 || id >= MAXUACOUNT ) return 'F';
   return player->Allow.Units[id];
 }
 
+/**
+**	FIXME: docu
+*/
 char ActionIdAllowed(const Player* player,  int id )
 {
   if ( id < 0 || id >= MAXUACOUNT ) return 'F';
   return player->Allow.Actions[id];
 }
 
+/**
+**	FIXME: docu
+*/
 global char UpgradeIdAllowed(const Player* player,  int id )
 {
     // JOHNS: Don't be kind, the people should code correct!
@@ -1399,18 +1427,36 @@ global char UpgradeIdAllowed(const Player* player,  int id )
 }
 
 // ***************by sid's
+/**
+**	FIXME: docu
+*/
 void UpgradeIncTime2( Player* player, char* sid, int amount ) // by ident string
   { UpgradeIncTime( player, UpgradeIdByIdent(sid), amount ); }
+/**
+**	FIXME: docu
+*/
 void UpgradeLost2( Player* player, char* sid ) // by ident string
   { UpgradeLost( player, UpgradeIdByIdent(sid) ); }
 
+/**
+**	FIXME: docu
+*/
 void AllowUnitByIdent( Player* player,  const char* sid, char af )
      { AllowUnitId( player,  UnitTypeIdByIdent(sid), af ); };
+/**
+**	FIXME: docu
+*/
 void AllowActionByIdent( Player* player,  const char* sid, char af )
      { AllowActionId( player,  ActionIdByIdent(sid), af ); };
+/**
+**	FIXME: docu
+*/
 void AllowUpgradeByIdent( Player* player,  const char* sid, char af )
      { AllowUpgradeId( player,  UpgradeIdByIdent(sid), af ); };
 
+/**
+**	FIXME: docu
+*/
 void AllowByIdent(Player* player,  const char* sid, char af )
 {
     if( !strncmp(sid,"unit-",5) ) {
@@ -1418,15 +1464,32 @@ void AllowByIdent(Player* player,  const char* sid, char af )
     } else if( !strncmp(sid,"upgrade-",8) ) {
 	AllowUpgradeByIdent(player,sid,af);
     } else {
-	DebugLevel0(__FUNCTION__": wrong sid %s\n",sid);
+	DebugLevel0Fn(" wrong sid %s\n",sid);
     }
 }
 
+/**
+**	FIXME: docu
+*/
 char UnitIdentAllowed(const Player* player,const char* sid )
-     { return UnitIdAllowed( player,  UnitTypeIdByIdent(sid) ); };
+{
+    return UnitIdAllowed( player,  UnitTypeIdByIdent(sid) );
+}
+
+/**
+**	FIXME: docu
+*/
 char ActionIdentAllowed(const Player* player,const char* sid )
-     { return ActionIdAllowed( player,  ActionIdByIdent(sid) ); };
+{
+    return ActionIdAllowed( player,  ActionIdByIdent(sid) );
+}
+
+/**
+**	FIXME: docu
+*/
 char UpgradeIdentAllowed(const Player* player,const char* sid )
-     { return UpgradeIdAllowed( player,  UpgradeIdByIdent(sid) ); };
+{
+    return UpgradeIdAllowed( player,  UpgradeIdByIdent(sid) );
+}
 
 //@}
