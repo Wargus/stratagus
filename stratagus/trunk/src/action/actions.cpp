@@ -307,7 +307,8 @@ local void HandleUnitAction(Unit* unit)
 		}
 	    }
 	    if (unit->CurrentResource) {
-		if (unit->Type->ResInfo[unit->CurrentResource]->LoseResources) {
+		if (unit->Type->ResInfo[unit->CurrentResource]->LoseResources&&
+			unit->Value<unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) {
 		    unit->Value=0;
 		}
 	    }

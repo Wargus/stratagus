@@ -970,6 +970,8 @@ local void SendResource(int sx,int sy)
 	    if( Selected[i]->Type->Harvester &&
 		    Selected[i]->Type->ResInfo[res] &&
 		    Selected[i]->Type->ResInfo[res]->TerrainHarvester &&
+		    //  Full harvesters don't act.
+		    Selected[i]->Value<Selected[i]->Type->ResInfo[res]->ResourceCapacity &&
 		    IsMapFieldExplored(Selected[i]->Player,sx/TileSizeX,sy/TileSizeY) &&
 		    ForestOnMap(sx/TileSizeX,sy/TileSizeY) ) {
 		DebugLevel3("RESOURCE\n");
