@@ -218,7 +218,7 @@ win32-bin-dist2:: win32
 	@echo $(CONTRIB) >>$(DISTLIST)
 	@echo $(CCLS) >>$(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
-	@echo SDL.dll >>$(DISTLIST)
+	@echo SDL.dll README-SDL.txt >>$(DISTLIST)
 	@echo freecraft$(EXE) >>$(DISTLIST)
 	@echo tools/wartool$(EXE) >>$(DISTLIST)
 	@echo tools/build.bat >>$(DISTLIST)
