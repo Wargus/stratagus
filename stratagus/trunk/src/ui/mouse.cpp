@@ -917,6 +917,35 @@ local void SendCommand(int x,int y)
 //.............................................................................
 
 /**
+**	Mouse button press on selection area.
+**
+**	@param num	Button number.
+**	@param button	Mouse Button pressed.
+*/
+local void DoSelectionButtons(unsigned num,unsigned button)
+{
+    Unit* unit;
+
+    if( num>=NumSelected || !(MouseButtons&LeftButton) ) {
+	return;
+    }
+    unit=Selected[num];
+
+    if( (KeyModifiers&ModifierControl)
+	    || ((MouseButtons&LeftButton)<<MouseDoubleShift)) {
+	SelectUnitsByType(unit);
+    } else if( KeyModifiers&ModifierAlt ) {
+	SelectGroupFromUnit(unit);
+    } else if( KeyModifiers&ModifierShift ) {
+	ToggleSelectUnit(unit);
+    } else {
+	SelectSingleUnit(unit);
+    }
+}
+
+//.............................................................................
+
+/**
 **	Handle mouse button pressed in select state.
 **
 **	Select state is used for target of patrol, attack, move, ....
@@ -988,9 +1017,9 @@ local void UISelectStateButtonDown(unsigned button)
 /**
 **	Called if mouse button pressed down.
 **
-**	@param b	Button pressed down.
+**	@param button	Button pressed down.
 */
-global void UIHandleButtonDown(int b)
+global void UIHandleButtonDown(unsigned button)
 {
     if( CursorState==CursorStateRectangle ) {	// select mode
 	return;
@@ -1000,7 +1029,7 @@ global void UIHandleButtonDown(int b)
     //	Selecting target. (Move,Attack,Patrol,... commands);
     //
     if( CursorState==CursorStateSelect ) {
-	UISelectStateButtonDown(b);
+	UISelectStateButtonDown(button);
 	return;
     }
 
@@ -1073,7 +1102,9 @@ global void UIHandleButtonDown(int b)
 	    DoRightButton(Minimap2MapX(CursorX),Minimap2MapY(CursorY));
 	}
     } else if( CursorOn==CursorOnButton ) {
-	if( (MouseButtons&LeftButton) ) {
+	if( NumSelected>1 && ButtonUnderCursor && ButtonUnderCursor<10 ) {
+	    DoSelectionButtons(ButtonUnderCursor-1,button);
+	} else if( (MouseButtons&LeftButton) ) {
 	    if(	ButtonUnderCursor==0 && GameMenuButtonClicked==0 ) {
 		GameMenuButtonClicked = 1;
 		MustRedraw|=RedrawMenuButton;
@@ -1089,7 +1120,6 @@ global void UIHandleButtonDown(int b)
 				,!(KeyModifiers&ModifierShift));
 		    }
 		}
-		DebugLevel0("Button %d\n",ButtonUnderCursor);
 	    } else if( ButtonUnderCursor>9 ) {
 		DoButtonButtonClicked(ButtonUnderCursor-10);
 	    }
@@ -1100,9 +1130,9 @@ global void UIHandleButtonDown(int b)
 /**
 **	Called if mouse button released.
 **
-**	@param b	Button released.
+**	@param button	Button released.
 */
-global void UIHandleButtonUp(int b)
+global void UIHandleButtonUp(unsigned button)
 {
     //
     //	Move map.
@@ -1111,7 +1141,7 @@ global void UIHandleButtonUp(int b)
 	GameCursor=TheUI.Point.Cursor;		// Reset
 	return;
     }
-    if( (1<<b) == LeftButton && GameMenuButtonClicked == 1 ) {
+    if( (1<<button) == LeftButton && GameMenuButtonClicked == 1 ) {
 	GameMenuButtonClicked = 0;
 	MustRedraw|=RedrawMenuButton;
 	if( ButtonUnderCursor == 0 ) {
@@ -1183,9 +1213,11 @@ global void UIHandleButtonUp(int b)
 		    ,CursorY-TheUI.MapY+MapY*TileSizeY);
 	    }
 	    if( unit ) {
-		if( KeyModifiers&ModifierControl ) {
+		// FIXME: Not nice coded, button number hardcoded!
+		if( (KeyModifiers&ModifierControl)
+			|| (button&(1<<MouseDoubleShift))) {
 		    num=SelectUnitsByType(unit);
-		} else if( (KeyModifiers&ModifierAlt) && unit->GroupId!=-1 ) {
+		} else if( (KeyModifiers&ModifierAlt) && unit->LastGroup ) {
                     num=SelectGroupFromUnit(unit);
 
 		    // Don't allow to select own and enemy units.

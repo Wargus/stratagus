@@ -44,6 +44,8 @@ global Unit* Selected[MaxSelectable] = {
     NoUnitP,NoUnitP,NoUnitP
 };					/// All selected units
 
+local int GroupId;		/// Unique group id for automatic groups
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -54,6 +56,9 @@ global Unit* Selected[MaxSelectable] = {
 global void UnSelectAll(void)
 {
     Unit *unit;
+
+    while( !++GroupId ) {
+    }
 
     while( NumSelected ) {
         unit=Selected[--NumSelected];
@@ -80,6 +85,9 @@ global void ChangeSelectedUnits(Unit** units,int count)
     for( i=0; i<count; i++ ) {
         Selected[i]=u=units[i];
         u->Selected=1;
+	if( count>1 ) {
+	    u->LastGroup=GroupId;
+	}
         CheckUnitToBeDrawn(u);
     }
     NumSelected=count;
@@ -109,6 +117,9 @@ global int SelectUnit(Unit* unit)
 
     Selected[NumSelected++]=unit;
     unit->Selected=1;
+    if( NumSelected>1 ) {
+	Selected[0]->LastGroup=unit->LastGroup=GroupId;
+    }
     CheckUnitToBeDrawn(unit);
     return 1;
 }
@@ -144,6 +155,15 @@ global void UnSelectUnit(Unit* unit)
     if( i<--NumSelected ) {
         Selected[i]=Selected[NumSelected];
     }
+
+    if( NumSelected>1 ) {		// Assign new group to remaining units
+	while( !++GroupId ) {
+	}
+	for( i=0; i<NumSelected; ++i ) {
+	    Selected[i]->LastGroup=GroupId;
+	}
+    }
+
     Selected[NumSelected]=NoUnitP;	// FIXME: only needed for old code
     unit->Selected=0;
     CheckUnitToBeDrawn(unit);
@@ -236,6 +256,12 @@ global int SelectUnitsByType(Unit* base)
 	}
     }
 
+    if( NumSelected>1 ) {
+	for( i=0; i<NumSelected; ++i ) {
+	    Selected[i]->LastGroup=GroupId;
+	}
+    }
+
     return NumSelected;
 }
 
@@ -271,10 +297,28 @@ global int SelectGroup(int group_number)
  */
 global int SelectGroupFromUnit(Unit *unit)
 {
+    int i;
+    unsigned group;
+
+#if 0
     if( unit->GroupId==-1 ) {
         return 0;
     }
     return SelectGroup(unit->GroupId);
+#endif
+    DebugLevel0Fn("%d\n",unit->LastGroup);
+
+    if( !(group=unit->LastGroup) ) {	// belongs to no group
+        return 0;
+    }
+
+    UnSelectAll();
+    for( i=0; i<NumUnits; ++i ) {
+	if( Units[i]->LastGroup==group ) {
+	    SelectUnit(Units[i]);
+	}
+    }
+    return NumSelected;
 }
 
 /**

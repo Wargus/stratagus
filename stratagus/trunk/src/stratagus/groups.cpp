@@ -120,6 +120,9 @@ global void AddToGroup(Unit **units,int nunits,int num)
 
     group=&Groups[num];
     for( i=0; group->NumUnits<NUM_UNITS_PER_GROUP && i<nunits; i++ ) {
+	if( units[i]->GroupId!=-1 ) {
+	    RemoveUnitFromGroup(units[i]);
+	}
 	
         group->Units[group->NumUnits++]=units[i];
 	units[i]->GroupId=num;
