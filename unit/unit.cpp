@@ -157,7 +157,6 @@ global void ReleaseUnit(Unit* unit)
 	DebugCheck( *unit->UnitSlot!=unit );
 	temp=Units[--NumUnits];
 	temp->UnitSlot=unit->UnitSlot;
-	temp->Slot=unit->Slot;
 	*unit->UnitSlot=temp;
 	Units[NumUnits]=NULL;
 	//
