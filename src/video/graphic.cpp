@@ -282,13 +282,15 @@ global void FlipGraphic(Graphic* graphic)
 		graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
 #endif
 
+	SDL_LockSurface(graphic->Surface);
 	SDL_LockSurface(s);
 	for (i = 0; i < s->h; ++i) {
 		for (j = 0; j < s->w; ++j) {
-			((char*)s->pixels)[j + i * s->w] =
-				((char*)graphic->Surface->pixels)[s->w - j - 1 + i * s->w];
+			((char*)s->pixels)[j + i * s->pitch] =
+				((char*)graphic->Surface->pixels)[s->w - j - 1 + i * graphic->Surface->pitch];
 		}
 	}
+	SDL_UnlockSurface(graphic->Surface);
 	SDL_UnlockSurface(s);
 #endif
 }
