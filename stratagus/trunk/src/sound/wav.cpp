@@ -69,7 +69,6 @@ local int WavReadStream(Sample *sample, void *buf, int len)
     int i;
     int x;
     int y;
-    int f;
     int c;
     int freqratio;
     int chanratio;
@@ -87,30 +86,27 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 	memcpy(sample->Data, data->PointerInBuffer, sample->Length);
 	data->PointerInBuffer = sample->Data;
 
-	n = WAV_BUFFER_SIZE - sample->Length - 4;
+	n = WAV_BUFFER_SIZE - sample->Length;
 
 	freqratio = (44100 / sample->Frequency);
 	samplesize = sample->SampleSize / 8;		// number of bytes per sample
 	brratio = 4 / samplesize;
 	chansize = samplesize / sample->Channels;	// number of bytes per channel
 	chanratio = 2 / sample->Channels;
-	divide=freqratio*(brratio)/chanratio;
+	divide = freqratio*brratio/chanratio;
 
 	i = CLread(data->WavFile, sndbuf, n/divide);
 
-	f = 0;
 	for (x = 0; x < i*divide; x += 4) {			// x is the sample
 	    for (c = 0; c < 2; ++c) {				// c is the channel in the sample
 	        for (y = 0; y < 2; ++y) {			// y is the byte in the channel
-		    // FIXME: 11khz 16-bit per channel not supported
 		    offset=( ((x/4)/freqratio)*samplesize*chanratio + 
 			(c/chanratio)*chansize + y/(2/chansize));
-		    // FIXME: what's correct way?
-		    if (offset >= i*divide) {
-			break;
-		    }
+
+		    DebugCheck(offset >= i*divide);
 
 		    data->PointerInBuffer[sample->Length + x + c*2 + y] = 
+		    // FIXME: should this be 127 or 128?
 		    sndbuf[offset] + (chansize == 1 ? 127 : 0);
 		}
 	    }
