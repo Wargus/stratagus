@@ -213,7 +213,7 @@ local Unit *AllocUnit(void)
     //
     //	Can use released unit?
     //
-    if( ReleasedHead && ReleasedHead->Refs<GameCycle ) {
+    if( ReleasedHead && (unsigned)ReleasedHead->Refs<GameCycle ) {
 	unit=ReleasedHead;
 	ReleasedHead=unit->Next;
 	if( ReleasedTail==&unit->Next ) {	// last element
@@ -464,7 +464,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	}
     }
 
-#ifdef HIERARCHIC_PATHFINDER
+#ifdef not_needed_JOHNS_HIERARCHIC_PATHFINDER
     //
     //	Update hierarchic pathfinder structures.
     //
