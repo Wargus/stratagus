@@ -191,12 +191,12 @@ local void MoveToTarget(Unit* unit)
 		goal->Refs++;
 		if( unit->SavedOrder.Action==UnitActionStill ) {
 		    // Save current command to come back.
-		    unit->SavedOrder=unit->Command;
+		    unit->SavedOrder=unit->Orders[0];
 		}
 		unit->Orders[0].Goal=goal;
 		ResetPath(unit->Orders[0]);
-		unit->Orders[0].X=goal->X;
-		unit->Orders[0].Y=goal->Y;
+		unit->Orders[0].X=-1;
+		unit->Orders[0].Y=-1;
 		unit->SubAction|=2;		// weak target
 		DebugLevel3Fn("%Zd in react range %Zd\n"
 			,UnitNumber(unit),UnitNumber(goal));
@@ -235,6 +235,16 @@ local void MoveToTarget(Unit* unit)
 		DebugCheck( !goal->Refs );
 #endif
 		temp->Refs++;
+#ifdef NEW_ORDERS
+		if( unit->SavedOrder.Action==UnitActionStill ) {
+		    // Save current command to come back.
+		    unit->SavedOrder=unit->Orders[0];
+		}
+		unit->Orders[0].Goal=goal=temp;
+		ResetPath(unit->Orders[0]);
+		unit->Orders[0].X=goal->X;
+		unit->Orders[0].Y=goal->Y;
+#else
 		if( unit->SavedCommand.Action==UnitActionStill ) {
 		    // Save current command to come back.
 		    unit->SavedCommand=unit->Command;
@@ -243,6 +253,7 @@ local void MoveToTarget(Unit* unit)
 		ResetPath(unit->Command);
 		unit->Command.Data.Move.DX=goal->X;
 		unit->Command.Data.Move.DY=goal->Y;
+#endif
 	    }
 	}
 
@@ -256,6 +267,21 @@ local void MoveToTarget(Unit* unit)
 		UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
 	    }
 	    unit->SubAction++;
+#ifdef NEW_ORDERS
+	} else if( (wall || unit->Orders[0].Action==UnitActionAttackGround)
+		&& MapDistance(unit->X,unit->Y
+		    ,unit->Orders[0].X,unit->Orders[0].Y)
+			<=unit->Stats->AttackRange ) {
+	    DebugLevel3Fn("Attacking wall or ground\n");
+	    unit->State=0;
+	    if( !unit->Type->Tower ) {
+		UnitHeadingFromDeltaXY(unit,unit->Orders[0].X-unit->X
+		    ,unit->Orders[0].Y-unit->Y);
+	    }
+	    unit->SubAction=1;
+	    return;
+	} else if( err<0 ) {
+#else
 	} else if( (wall || unit->Command.Action==UnitActionAttackGround)
 		&& MapDistance(unit->X,unit->Y
 		    ,unit->Command.Data.Move.DX,unit->Command.Data.Move.DY)
@@ -269,18 +295,31 @@ local void MoveToTarget(Unit* unit)
 	    unit->SubAction=1;
 	    return;
 	} else if( err<0 ) {
+#endif
 	    unit->State=0;
 	    unit->SubAction=0;
 	    // Return to old task?
+#ifdef NEW_ORDERS
+	    if( unit->Orders[0].Action==UnitActionStill ) {
+		unit->Orders[0]=unit->SavedOrder;
+		// Must finish, if saved command finishes
+		unit->SavedOrder.Action=UnitActionStill;
+	    }
+#else
 	    if( unit->Command.Action==UnitActionStill ) {
 		unit->Command=unit->SavedCommand;
 		// Must finish if saved command finishes
 		unit->SavedCommand.Action=UnitActionStill;
 	    }
+#endif
 	    return;
 	}
 	DebugCheck( unit->Type->Vanishes || unit->Destroyed );
+#ifdef NEW_ORDERS
+	unit->Orders[0].Action=UnitActionAttack;
+#else
 	unit->Command.Action=UnitActionAttack;
+#endif
     }
 }
 
@@ -295,16 +334,28 @@ local void AttackTarget(Unit* unit)
 
     AnimateActionAttack(unit);
     if( unit->Reset ) {
+#ifdef NEW_ORDERS
+	goal=unit->Orders[0].Goal;
+#else
 	goal=unit->Command.Data.Move.Goal;
+#endif
 	//
 	//	Goal is "weak" or a wall.
 	//
+#ifdef NEW_ORDERS
+	if( !goal && (WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)
+		|| unit->Orders[0].Action==UnitActionAttackGround) ) {
+	    DebugLevel3Fn("attack a wall!!!!\n");
+	    return;
+	}
+#else
 	if( !goal && (WallOnMap(unit->Command.Data.Move.DX
 		     ,unit->Command.Data.Move.DY)
 		|| unit->Command.Action==UnitActionAttackGround) ) {
 	    DebugLevel3Fn("attack a wall!!!!\n");
 	    return;
 	}
+#endif
 
 	//
 	//	Target is dead, choose new one.
@@ -318,14 +369,23 @@ local void AttackTarget(Unit* unit)
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
+#ifdef NEW_ORDERS
+		unit->Orders[0].Goal=goal=NoUnitP;
+	    } else if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
+#else
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+#endif
 		// FIXME: goal->Removed???
 		--goal->Refs;
 #ifdef REFS_DEBUG
 		DebugCheck( !goal->Refs );
 #endif
+#ifdef NEW_ORDERS
+		unit->Orders[0].Goal=goal=NoUnitP;
+#else
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
+#endif
 	    }
 	}
 	//
@@ -334,24 +394,47 @@ local void AttackTarget(Unit* unit)
 	if( !goal ) {
 	    unit->State=0;
 	    goal=AttackUnitsInReactRange(unit);
+#ifdef NEW_ORDERS
+	    if( !goal ) {
+		unit->SubAction=0;
+		// Return to old task!
+		unit->Orders[0]=unit->SavedOrder;
+		// Must finish, if saved command finishes
+		unit->SavedOrder.Action=UnitActionStill;
+		ResetPath(unit->Orders[0]);
+		return;
+	    }
+	    if( unit->SavedOrder.Action==UnitActionStill ) {
+		// Save current command to come back.
+		unit->SavedOrder=unit->Orders[0];
+	    }
+#else
 	    if( !goal ) {
 		unit->SubAction=0;
 		// Return to old task!
 		unit->Command=unit->SavedCommand;
-		// Must finish if saved command finishes
+		// Must finish, if saved command finishes
 		unit->SavedCommand.Action=UnitActionStill;
+		ResetPath(unit->Command);
 		return;
 	    }
 	    if( unit->SavedCommand.Action==UnitActionStill ) {
 		// Save current command to come back.
 		unit->SavedCommand=unit->Command;
 	    }
+#endif
 	    goal->Refs++;
 	    DebugLevel3Fn("%Zd Unit in react range %Zd\n"
 		    ,UnitNumber(unit),UnitNumber(goal));
+#ifdef NEW_ORDERS
+	    unit->Orders[0].Goal=goal;
+	    unit->Orders[0].X=-1;
+	    unit->Orders[0].Y=-1;
+#else
 	    unit->Command.Data.Move.Goal=goal;
 	    unit->Command.Data.Move.DX=goal->X;
 	    unit->Command.Data.Move.DY=goal->Y;
+#endif
 	    unit->SubAction|=2;
 	} else
 
