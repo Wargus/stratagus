@@ -245,6 +245,8 @@ global void SavePlayers(FILE* file)
 	fprintf(file,")\n\n");
     }
 
+    DebugLevel0Fn("FIXME: must unit-stats?\n");
+
     //
     //	Dump local variables
     //
