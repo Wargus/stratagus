@@ -278,6 +278,67 @@ global void MapMarkNewSight(int tx,int ty,int range
 #endif
 
 /**
+**
+*/
+global void MapUpdateFogOfWar(int x,int y)
+{
+    Unit* unit;
+    Unit* table[MAX_UNITS];
+    char *redraw_row;
+    char *redraw_tile;
+    int n;
+    int i;
+    int sx,sy,ex,ey,dx,dy;
+    int vis;
+    int last;
+    int MapW;
+
+    // Tiles not visible last frame but are this frame must be redrawn.
+    redraw_row=MustRedrawRow;
+    redraw_tile=MustRedrawTile;
+
+    ex=TheUI.MapEndX;
+    sy=y*TheMap.Width;
+    dy=TheUI.MapY;
+    ey=TheUI.MapEndY;
+    MapW=TheUI.MapEndX-TheUI.MapX;
+
+    while( dy<=ey ) {
+	sx=x+sy;
+	dx=TheUI.MapX;
+	while( dx<=ex ) {
+	    last=TheMap.Fields[sx].VisibleLastFrame;
+#ifdef NEW_FOW
+	    vis=TheMap.Fields[sx].Visible&(1<<ThisPlayer->Player);
+#else
+	    vis=TheMap.Fields[sx].Flags&MapFieldVisible;
+#endif
+	    if( vis && (!last || last&MapFieldPartiallyVisible) ) {
+		*redraw_row=NEW_MAPDRAW;
+		*redraw_tile=NEW_MAPDRAW;
+	    }
+
+	    ++redraw_tile;
+	    ++sx;
+	    dx+=TileSizeX;
+	}
+	++redraw_row;
+	sy+=TheMap.Width;
+	dy+=TileSizeY;
+    }
+
+    // Buildings under fog of war must be redrawn
+    n=SelectUnits(MapX,MapY,MapX+MapWidth,MapY+MapHeight,table);
+
+    for( i=0; i<n; ++i ) {
+	unit=table[i];
+	if( unit->Type->Building && !unit->Removed && UnitVisible(unit) ) {
+	    CheckUnitToBeDrawn(unit);
+	}
+    }
+}
+
+/**
 **	Update visible of the map.
 */
 global void MapUpdateVisible(void)
@@ -322,6 +383,8 @@ global void MapUpdateVisible(void)
 	    }
 	}
     }
+
+    MarkDrawEntireMap();
 
     //
     //	Mark all units visible range.
@@ -1395,6 +1458,7 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 	}
     }
 
+    TheMap.Fields[sx].VisibleLastFrame=0;
     //
     //	Draw unexplored area
     //	If only partly or total invisible draw fog of war.
@@ -1404,12 +1468,19 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
     if( tile2) {
 	VideoDrawUnexplored(TheMap.Tiles[tile2],dx,dy);
 	if( tile2==tile ) {		// no same fog over unexplored
+	    if( tile != 0xf ) {
+		TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
+	    }
 	    tile=0;
 	}
     }
     if( TheMap.Fields[sx].Flags&MapFieldVisible ) {
 	if( tile ) {
 	    VideoDrawFog(TheMap.Tiles[tile],dx,dy);
+	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
+	}
+	else {
+	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldCompletelyVisible;
 	}
     } else {
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
@@ -1458,9 +1529,9 @@ global void DrawMapFogOfWar(int x,int y)
 	    dx=TheUI.MapX;
 	    while( dx<=ex ) {
 		if( *redraw_tile ) {
-                #if NEW_MAPDRAW > 1
+#if NEW_MAPDRAW > 1
                   (*redraw_tile)--;
-                #else
+#else
                   *redraw_tile=0;
 #ifdef NEW_FOW
 		    if( TheMap.Fields[sx].Explored&(1<<ThisPlayer->Player) ) {
@@ -1475,7 +1546,7 @@ global void DrawMapFogOfWar(int x,int y)
 			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
 		    }
 #endif
-                #endif
+#endif
 		}
                 ++redraw_tile;
 		++sx;
