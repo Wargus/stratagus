@@ -38,7 +38,7 @@
 /**
 **	Unit type type definition
 */
-global char UnitTypeType[] = "unit-type";
+global const char UnitTypeType[] = "unit-type";
 
 /*----------------------------------------------------------------------------
 --	Buttons

@@ -28,6 +28,7 @@
 
 #include "video.h"
 #include "upgrade_structs.h"
+#include "cursor.h"
 
 /*----------------------------------------------------------------------------
 --	Definitons
@@ -197,6 +198,26 @@ typedef struct _ui_ {
     Button	Buttons[MaxButtons];
     /// used for displaying unit training queues
     Button	Buttons2[6];
+
+    //
+    //	Cursors used.
+    //
+    CursorConfig	Point;		/// General pointing cursor
+    CursorConfig	Glass;		/// HourGlass, system is waiting
+    CursorConfig	Cross;		/// Multi-select cursor. 
+    CursorConfig	YellowHair;	/// Yellow action,attack cursor.
+    CursorConfig	GreenHair;	/// Green action,attack cursor.
+    CursorConfig	RedHair;	/// Red action,attack cursor.
+    CursorConfig	Scroll;		/// Cursor for scrolling map arround.
+
+    CursorConfig	ArrowE;		/// Cursor pointing east
+    CursorConfig	ArrowNE;	/// Cursor pointing north east
+    CursorConfig	ArrowN;		/// Cursor pointing north
+    CursorConfig	ArrowNW;	/// Cursor pointing north west
+    CursorConfig	ArrowW;		/// Cursor pointing west
+    CursorConfig	ArrowSW;	/// Cursor pointing south west
+    CursorConfig	ArrowS;		/// Cursor pointing south
+    CursorConfig	ArrowSE;	/// Cursor pointing south east
 
 // FIXME: could use different sounds/speach for the errors
 // Is in gamesounds?

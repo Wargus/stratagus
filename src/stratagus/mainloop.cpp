@@ -62,6 +62,9 @@ global enum _scroll_state_ MouseScrollState=ScrollNone;
 //	Functions
 //----------------------------------------------------------------------------
 
+/**
+**	FIXME: where is the docu?
+*/
 local void move_up( int step )
 {
    if( MapY>step) {
@@ -69,6 +72,10 @@ local void move_up( int step )
    }
    else MapY=0;
 }
+
+/**
+**	FIXME: where is the docu?
+*/
 local void move_left( int step )
 {
    if( MapX>step) {
@@ -76,6 +83,10 @@ local void move_left( int step )
    }
    else MapX=0;
 }
+
+/**
+**	FIXME: where is the docu?
+*/
 local void move_down( int step )
 {
    if( MapY<TheMap.Height-MapHeight-step ) {
@@ -83,6 +94,10 @@ local void move_down( int step )
    }
    else MapY=TheMap.Height-MapHeight;
 }
+
+/**
+**	FIXME: where is the docu?
+*/
 local void move_right( int step )
 {
    if( MapX<TheMap.Width-MapWidth-step ) {
@@ -380,7 +395,7 @@ global void GameMainLoop(void)
 {
     SetVideoSync();
     EnableDrawRefresh();
-    GameCursor=&Cursors[CursorTypePoint];
+    GameCursor=TheUI.Point.Cursor;
 
     for( ;; ) {
 	if(!GamePaused) {

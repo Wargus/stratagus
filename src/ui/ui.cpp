@@ -16,6 +16,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,6 +53,8 @@ global UI TheUI = {
     MOUSEADJUST,			// mouse speed
     MOUSESCALE,				// mouse scale
 };
+
+#ifndef USE_CCL
 
 /**
 **	User interface 1.
@@ -176,6 +182,25 @@ local UI UI1 = {
 	{  62+TOP_X,TOP_Y+103, 46,38 },
 	{ 118+TOP_X,TOP_Y+103, 46,38 }
     },
+
+    //
+    //	Define the cursors.
+    //
+    { "cursor-point"	},
+    { "cursor-glass"	},
+    { "cursor-cross"	},
+    { "cursor-yellow-hair"	},
+    { "cursor-green-hair"	},
+    { "cursor-red-hair"	},
+    { "cursor-scroll"	},
+    { "cursor-arror-e"	},
+    { "cursor-arror-ne"	},
+    { "cursor-arror-n"	},
+    { "cursor-arror-nw"	},
+    { "cursor-arror-w"	},
+    { "cursor-arror-s"	},
+    { "cursor-arror-sw"	},
+    { "cursor-arror-se"	},
 };
 
 // ----------------------------------------------------------------------------
@@ -297,20 +322,48 @@ local UI UI2 = {
 	{  62+TOP_X,TOP_Y+103, 46,38 },
 	{ 118+TOP_X,TOP_Y+103, 46,38 }
     },
+    //
+    //	Define the cursors.
+    //
+    { "cursor-point"	},
+    { "cursor-glass"	},
+    { "cursor-cross"	},
+    { "cursor-yellow-hair"	},
+    { "cursor-green-hair"	},
+    { "cursor-red-hair"	},
+    { "cursor-scroll"	},
+    { "cursor-arror-e"	},
+    { "cursor-arror-ne"	},
+    { "cursor-arror-n"	},
+    { "cursor-arror-nw"	},
+    { "cursor-arror-w"	},
+    { "cursor-arror-s"	},
+    { "cursor-arror-sw"	},
+    { "cursor-arror-se"	},
 };
+
+#endif
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
+
+#ifndef USE_CCL
 
 /**
 **	The default user interfaces.
 */
-local UI* UIn[] = { &UI1, &UI2, NULL };
+local UI* DefaultUIn[] = { &UI1, &UI2, NULL };
+
+#endif
 
 /**
 **	The available user interfaces.
 */
-global UI** UI_Table = UIn;
+global UI** UI_Table
+#ifndef USE_CCL
+     = DefaultUIn
+#endif
+    ;
 
 /**
 **	Initialize the user interface.
@@ -391,7 +444,25 @@ global void InitUserInterface(void)
 	TheUI.StatusLine.Graphic=LoadGraphic(TheUI.StatusLine.File);
     }
 
+    //
+    //	Cursors.
+    //
+    TheUI.Point.Cursor=CursorTypeByIdent(TheUI.Point.Name);
+    TheUI.Glass.Cursor=CursorTypeByIdent(TheUI.Glass.Name);
+    TheUI.Cross.Cursor=CursorTypeByIdent(TheUI.Cross.Name);
+    TheUI.YellowHair.Cursor=CursorTypeByIdent(TheUI.YellowHair.Name);
+    TheUI.GreenHair.Cursor=CursorTypeByIdent(TheUI.GreenHair.Name);
+    TheUI.RedHair.Cursor=CursorTypeByIdent(TheUI.RedHair.Name);
+    TheUI.Scroll.Cursor=CursorTypeByIdent(TheUI.Scroll.Name);
 
+    TheUI.ArrowE.Cursor=CursorTypeByIdent(TheUI.ArrowE.Name);
+    TheUI.ArrowNE.Cursor=CursorTypeByIdent(TheUI.ArrowNE.Name);
+    TheUI.ArrowN.Cursor=CursorTypeByIdent(TheUI.ArrowN.Name);
+    TheUI.ArrowNW.Cursor=CursorTypeByIdent(TheUI.ArrowNW.Name);
+    TheUI.ArrowW.Cursor=CursorTypeByIdent(TheUI.ArrowW.Name);
+    TheUI.ArrowSW.Cursor=CursorTypeByIdent(TheUI.ArrowSW.Name);
+    TheUI.ArrowS.Cursor=CursorTypeByIdent(TheUI.ArrowS.Name);
+    TheUI.ArrowSE.Cursor=CursorTypeByIdent(TheUI.ArrowSE.Name);
 
     //
     //	Calculations

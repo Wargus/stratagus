@@ -1,11 +1,11 @@
 //   ___________		     _________		      _____  __
-//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
-//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//   \_	  _____/______	 ____	____ \_	  ___ \____________ _/ ____\/  |_
+//    |	   __) \_  __ \_/ __ \_/ __ \/	  \  \/\_  __ \__  \\	__\\   __\ 
+//    |	    \	|  | \/\  ___/\	 ___/\	   \____|  | \// __ \|	|   |  |
+//    \___  /	|__|	\___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
-//  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
+//  ______________________			     ______________________
+//			  T H E	  W A R	  B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name cursor.c	-	The cursors. */
@@ -26,8 +26,6 @@
 
 #include "freecraft.h"
 #include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -41,86 +39,78 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef noNEW_VIDEO
+/**
+**	Cursor-type type definition
+*/
+global const char CursorTypeType[] = "unit-type";
+
+#ifndef USE_CCL
 
 /**
-**	Define cursor-types.
-**
-**	FIXME: Should move this to ui part.
+**	Define default cursor-types.
 */
-global CursorType Cursors[CursorMax] = {
+global CursorType DefaultCursors[] = {
 #ifdef NEW_NAMES
-    { "human",	"cursor-point",
+    { CursorTypeType,	"cursor-point",		"human",
 	"human/cursors/human gauntlet.png",	 3, 2,	28,32 },
-    { "orc",	"cursor-point",
+    { CursorTypeType,	"cursor-point",		"orc",
 	"orc/cursors/orcish claw.png",		 3, 2,	26,32 },
+    { NULL }
 #else
-    { "human",	"cursor-point",
+    { CursorTypeType,	"cursor-point",		"human",
 	"human gauntlet.png",			 3, 2,	28,32 },
-    { "orc",	"cursor-point",
+    { CursorTypeType,	"cursor-point",		"orc",
 	"orcish claw.png",			 3, 2,	26,32 },
-    { "any",	"cursor-glass",
+    { CursorTypeType,	"cursor-glass",		NULL,
 	"magnifying glass.png",			11,11,	34,35 },
+    { CursorTypeType,	"cursor-cross",		NULL,
+	"small green cross.png",		 8, 8,	18,18 },
+    { CursorTypeType,	"cursor-yellow-hair",	"human",
+	"yellow eagle.png",			15,15,	32,32 },
+    { CursorTypeType,	"cursor-yellow-hair",	"orc",
+	"yellow crosshairs.png",		15,15,	32,32 },
+    { CursorTypeType,	"cursor-green-hair",	"human",
+	"green eagle.png",			15,15,	32,32 },
+    { CursorTypeType,	"cursor-green-hair",	"orc",
+	"green crosshairs.png",			15,15,	32,32 },
+    { CursorTypeType,	"cursor-red-hair",	"human",
+	"red eagle.png",			15,15,	32,32 },
+    { CursorTypeType,	"cursor-red-hair",	"orc",
+	"red crosshairs.png",			15,15,	32,32 },
+    { CursorTypeType,	"cursor-scroll",	NULL,
+	"cross.png",				15,15,	32,32 },
+    { CursorTypeType,	"cursor-arrow-e",	NULL,
+	"arrow E.png",				22,10,	32,24 },
+    { CursorTypeType,	"cursor-arrow-ne",	NULL,
+	"arrow NE.png",				20, 2,	32,24 },
+    { CursorTypeType,	"cursor-arrow-n",	NULL,
+	"arrow N.png",				12, 2,	32,24 },
+    { CursorTypeType,	"cursor-arrow-nw",	NULL,
+	"arrow NW.png",				 2, 2,	32,24 },
+    { CursorTypeType,	"cursor-arrow-w",	NULL,
+	"arrow W.png",				 4,10,	32,24 },
+    { CursorTypeType,	"cursor-arrow-s",	NULL,
+	"arrow S.png",				12,22,	32,24 },
+    { CursorTypeType,	"cursor-arrow-sw",	NULL,
+	"arrow SW.png",				 2,18,	32,24 },
+    { CursorTypeType,	"cursor-arrow-se",	NULL,
+	"arrow SE.png",				20,18,	32,24 },
+    { NULL }
 #endif
 };
 
-#else
+#endif
 
 /**
 **	Define cursor-types.
 **
-**	FIXME: Should make this better configurable.
+**	FIXME: Should this be move to ui part?
 */
-global CursorType Cursors[CursorMax] = {
-    { { "human gauntlet.png"
-	,"orcish claw.png" }
-	, 3, 2,	28,32 },
-    { { "magnifying glass.png"
-	,NULL }
-	,11,11,	34,35 },
-    { { "small green cross.png"
-	,NULL }
-	, 8, 8,	18,18 },
-    { { "yellow eagle.png"
-	,"yellow crosshairs.png" }
-	,15,15,	32,32 },
-    { { "green eagle.png"
-	,"green crosshairs.png" }
-	,15,15,	32,32 },
-    { { "red eagle.png"
-	,"red crosshairs.png" }
-	,15,15,	32,32 },
-    { { "cross.png"
-	,NULL }
-	,15,15,	32,32 },
-
-    { { "arrow E.png"
-	,NULL }
-	,22,10,	32,24 },
-    { { "arrow N.png"
-	,NULL }
-	,12, 2,	32,24 },
-    { { "arrow NE.png"
-	,NULL }
-	,20, 2,	32,24 },
-    { { "arrow NW.png"
-	,NULL }
-	, 2, 2,	32,24 },
-    { { "arrow S.png"
-	,NULL }
-	,12,22,	32,24 },
-    { { "arrow SE.png"
-	,NULL }
-	,20,18,	32,24 },
-    { { "arrow SW.png"
-	,NULL }
-	, 2,18,	32,24 },
-    { { "arrow W.png"
-	,NULL }
-	, 4,10,	32,24 },
-};
-
+global CursorType* Cursors
+#ifndef USE_CCL
+    = DefaultCursors
 #endif
+    ;
 
 global enum CursorState_e CursorState;	/// cursor state
 global int CursorAction;		/// action for selection
@@ -173,6 +163,88 @@ local void (*LoadCursorRectangle)(int x,int y,int w,int h);
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	Load all cursor sprites.
+**
+**	@param race	Cursor graphics of this race to load.
+*/
+global void LoadCursors(unsigned int race)
+{
+    int i;
+    const char* file;
+    static int last_race = -1;
+    // FIXME: this should be configurable
+    static const char* names[]={ "human","orc","alliance","mythical" };
+
+    if (race == last_race) {	// same race? already loaded!
+	return;
+    }
+
+    if (last_race != -1) {	// free previous sprites for different race
+	for( i=0; Cursors[i].Type; ++i ) {
+	    VideoSaveFree(Cursors[i].Sprite);
+	    Cursors[i].Sprite = NULL;
+	}
+    }
+    last_race = race;
+
+    //
+    //	Load the graphics
+    //
+    for( i=0; Cursors[i].Type; ++i ) {
+	//
+	//	Only load cursors of this race or universal cursors.
+	//
+	if( Cursors[i].Race && strcmp(Cursors[i].Race,names[race]) ) {
+	    continue;
+	}
+
+	file=Cursors[i].File;
+	if( file ) {
+	    char* buf;
+
+	    buf=alloca(strlen(file)+9+1);
+#ifdef NEW_NAMES
+	    file=strcat(strcpy(buf,"graphics/"),file);
+#else
+	    file=strcat(strcpy(buf,"graphic/"),file);
+#endif
+	    ShowLoadProgress("\tCursor %s\n",file);
+	    // FIXME: real size?
+	    Cursors[i].Sprite=LoadSprite(file,
+		    Cursors[i].Width,Cursors[i].Height);
+	}
+    }
+}
+
+/**
+**	Find the cursor-type of with this identifier.
+**	If we have more cursors, we should add hash to find them faster.
+**
+**	@param ident	Identifier for the cursor (from config files).
+**
+**	@return		Returns the matching cursor-type.
+*/
+global CursorType* CursorTypeByIdent(const char* ident)
+{
+    CursorType* cursortype;
+
+    for( cursortype=Cursors; cursortype->Type; ++cursortype ) {
+	if( strcmp(cursortype->Ident,ident) ) {
+	    continue;
+	}
+	if( !cursortype->Race || cursortype->Sprite ) {
+	    return cursortype;
+	}
+    }
+    return NULL;
+}
+
+/*----------------------------------------------------------------------------
+--	Internal Functions
+----------------------------------------------------------------------------*/
+
 #define LOADCURSORRECTANGLE(video,memtype,x,y,w,h)  { \
     const memtype* sp; \
     memtype* dp; \
@@ -183,13 +255,14 @@ local void (*LoadCursorRectangle)(int x,int y,int w,int h);
       sp+=w; \
       dp+=VideoWidth; \
       while( --h ) { \
-        *dp     = *sp++; \
-        dp[w-1] = *sp++; \
-        dp+=VideoWidth; \
+	*dp	= *sp++; \
+	dp[w-1] = *sp++; \
+	dp+=VideoWidth; \
       } \
       memcpy(dp,sp,w*sizeof(memtype)); \
     } \
 }
+
 #define SAVECURSORRECTANGLE(video,memtype,x,y,w,h)  { \
     const memtype* sp; \
     memtype* dp; \
@@ -497,49 +570,6 @@ local void SaveCursorBackground32(int x,int y,int w,int h)
 }
 
 /**
-**	Load all cursor sprites.
-**
-**	@param race	Cursor graphics of this race to load.
-*/
-global void LoadCursors(unsigned int race)
-{
-    int i;
-    const char* file;
-    static int last_race = -1;
-
-    if (race == last_race) {	// same race? already loaded!
-	return;
-    }
-
-    if (last_race != -1) {	// free previous sprites for different race
-	for( i=0; i<sizeof(Cursors)/sizeof(*Cursors); ++i ) {
-	    VideoSaveFree(Cursors[i].Sprite);
-	    Cursors[i].Sprite = NULL;
-	}
-    }
-    last_race = race;
-
-    //
-    //	Load the graphics
-    //
-    for( i=0; i<sizeof(Cursors)/sizeof(*Cursors); ++i ) {
-	if( !(file=Cursors[i].File[race]) ) {
-	    file=Cursors[i].File[0];	// default one, no race specific
-	}
-	// FIXME: size and hot-point extra!
-	if( file ) {
-	    char* buf;
-
-	    buf=alloca(strlen(file)+9+1);
-	    file=strcat(strcpy(buf,"graphic/"),file);
-	    ShowLoadProgress("\tCursor %s\n",file);
-	    // FIXME: real size?
-	    Cursors[i].Sprite=LoadSprite(file,0,0);
-	}
-    }
-}
-
-/**
 **	Save image behind cursor.
 */
 local void SaveCursor(void)
@@ -637,11 +667,16 @@ local void RestoreCursor(void)
 /**
 **	Draw cursor.
 **
-**	@param type	Cursor type.
-**	FIXME: docu
+**	@param type	Cursor-type of the cursor to draw.
+**	@param x	Screen x pixel position.
+**	@param y	Screen y pixel position.
+**	@param frame	Animation frame # of the cursor.
 */
-global void DrawCursor(CursorType* type,int x,int y,int frame)
+global void DrawCursor(const CursorType* type,int x,int y,int frame)
 {
+    //
+    //	Save cursor position and size, for faster cursor redraw.
+    //
     OldCursorX=x-=type->HotX;
     OldCursorY=y-=type->HotY;
     OldCursorW=VideoGraphicWidth(type->Sprite);
@@ -764,7 +799,7 @@ local void DrawBuildingCursor(void)
 	    // FIXME: The field is covered by fog of war!
 	    if( f && (CanBuildOn(mx+w,my+h,mask) ||
 		    (Selected[0]->X==mx+w && Selected[0]->Y==my+h))
-                  && IsMapFieldExplored(mx+w,my+h) ) {
+		  && IsMapFieldExplored(mx+w,my+h) ) {
 		color=ColorGreen;
 	    } else {
 		color=ColorRed;
@@ -824,7 +859,7 @@ global void DrawRectangleCursor(void)
 
 #ifdef NEW_MAPDRAW
     SaveCursorRectangle(OldCursorRectangleX=x,OldCursorRectangleY=y,
-                        OldCursorRectangleW=w,OldCursorRectangleH=h);
+			OldCursorRectangleW=w,OldCursorRectangleH=h);
     VideoDrawHLine(ColorGreen,x,y,w);
     VideoDrawVLine(ColorGreen,x,y+1,--h);
     VideoDrawHLine(ColorGreen,x+1,y+h,--w);
@@ -878,21 +913,21 @@ global void DrawAnyCursor(void)
 */
 global int HideAnyCursor(void)
 {
-   if( RectangleCursor ) {
-     LoadCursorRectangle(OldCursorRectangleX,OldCursorRectangleY,
-                         OldCursorRectangleW,OldCursorRectangleH);
+    if( RectangleCursor ) {
+	LoadCursorRectangle(OldCursorRectangleX,OldCursorRectangleY,
+		OldCursorRectangleW,OldCursorRectangleH);
     }
     if( BuildingCursor ) {
-        //NOTE: this will restore tiles themselves later in next video update
-        MarkDrawAreaMap(BuildingCursorSX,BuildingCursorSY,
-                        BuildingCursorEX,BuildingCursorEY);
+    //NOTE: this will restore tiles themselves later in next video update
+	MarkDrawAreaMap(BuildingCursorSX,BuildingCursorSY,
+		BuildingCursorEX,BuildingCursorEY);
     }
 
     //
     //	Cursor complete on map and map must be redrawn, no restore.
     //StephanR: but prevented when not entire map is redrawn ;)
     //
-    #ifndef NEW_MAPDRAW
+#ifndef NEW_MAPDRAW
     if( OldCursorX>=TheUI.MapX
 	    && OldCursorX+OldCursorW-1<=TheUI.MapEndX
 	    && OldCursorY>=TheUI.MapY
@@ -901,7 +936,7 @@ global int HideAnyCursor(void)
 	    && (InterfaceState != IfaceStateMenu) ) {
 	return 0;
     }
-    #endif
+#endif
     HideCursor();
     return 1;
 }
@@ -922,7 +957,7 @@ global void InitCursor(void)
 	case 8:
 	    SaveCursorBackground=SaveCursorBackground8;
 	    LoadCursorBackground=LoadCursorBackground8;
-            memsize=sizeof(VMemType8);
+	    memsize=sizeof(VMemType8);
 	    SaveCursorRectangle=SaveCursorRectangle8;
 	    LoadCursorRectangle=LoadCursorRectangle8;
 	    break;
@@ -930,21 +965,21 @@ global void InitCursor(void)
 	case 16:
 	    SaveCursorBackground=SaveCursorBackground16;
 	    LoadCursorBackground=LoadCursorBackground16;
-            memsize=sizeof(VMemType16);
+	    memsize=sizeof(VMemType16);
 	    SaveCursorRectangle=SaveCursorRectangle16;
 	    LoadCursorRectangle=LoadCursorRectangle16;
 	    break;
 	case 24:
 	    SaveCursorBackground=SaveCursorBackground24;
 	    LoadCursorBackground=LoadCursorBackground24;
-            memsize=sizeof(VMemType24);
+	    memsize=sizeof(VMemType24);
 	    SaveCursorRectangle=SaveCursorRectangle24;
 	    LoadCursorRectangle=LoadCursorRectangle24;
 	    break;
 	case 32:
 	    SaveCursorBackground=SaveCursorBackground32;
 	    LoadCursorBackground=LoadCursorBackground32;
-            memsize=sizeof(VMemType32);
+	    memsize=sizeof(VMemType32);
 	    SaveCursorRectangle=SaveCursorRectangle32;
 	    LoadCursorRectangle=LoadCursorRectangle32;
 	    break;

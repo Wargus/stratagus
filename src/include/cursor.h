@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name cursor.h	-	The cursors header file. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __CURSOR_H__
 #define __CURSOR_H__
@@ -37,13 +36,16 @@
 typedef struct _cursor_type_ CursorType;
 
 /**
-**	private type which specifies current cursor type
+**	Private type which specifies current cursor type
 */
 struct _cursor_type_ {
-    const char*	File[PlayerMaxRaces];	/// resource filename one for each race
+    const void*	Type;			/// Object type (future extensions)
 
-// FIXME: this must be extra for each file (different sizes for the races)
-// FIXME: or must define that each image has the same size
+    char*	Ident;			/// Identifier to reference it.
+    char*	Race;			/// Race name.
+
+    char*	File;			/// graphic file of the cursor.
+
     int		HotX;			/// hot point x
     int		HotY;			/// hot point y
     int		Width;			/// width of cursor
@@ -54,31 +56,20 @@ struct _cursor_type_ {
     Graphic*	Sprite;			/// cursor sprite image
 };
 
-    /// cursor type (enumerated) FIXME: should remove the enumeration
-enum CursorType_e {
-    CursorTypePoint = 0,
-    CursorTypeGlass,
-    CursorTypeCross,
-    CursorTypeYellowHair,
-    CursorTypeGreenHair,
-    CursorTypeRedHair,
-    CursorTypeMove,
-    CursorTypeArrowE,
-    CursorTypeArrowN,
-    CursorTypeArrowNE,
-    CursorTypeArrowNW,
-    CursorTypeArrowS,
-    CursorTypeArrowSE,
-    CursorTypeArrowSW,
-    CursorTypeArrowW,
-    CursorMax
-};
+/**
+**	Cursor definition
+*/
+typedef struct _cursor_config_ {
+    char*	Name;			/// config cursor-type name
+    CursorType*	Cursor;			/// cursor-type 
+} CursorConfig;
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern CursorType Cursors[CursorMax];	/// cursor types description
+extern const char CursorTypeType[];	/// unit type type
+extern CursorType* Cursors;		/// cursor types description
 
 extern enum CursorState_e CursorState;	/// cursor state
 extern int CursorAction;		/// action for selection
@@ -96,7 +87,7 @@ extern int OldCursorY;			/// saved cursor position on screen Y
 extern int OldCursorW;			/// saved cursor width in pixel
 extern int OldCursorH;			/// saved cursor height in pixel
 extern int OldCursorSize;		/// size of saved cursor image
-extern void* OldCursorImage;		/// background saved behind cursor	
+extern void* OldCursorImage;		/// background saved behind cursor
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -105,13 +96,16 @@ extern void* OldCursorImage;		/// background saved behind cursor
     /// initialize all cursor
 extern void LoadCursors(unsigned int race);
 
+    /// cursor-type by identifier
+extern CursorType* CursorTypeByIdent(const char* ident);
+
     /** Draw cursor on screen in position x,y..
     **	@param type	cursor type pointer
     **	@param x	x coordinate on the screen
     **	@param y	y coordinate on the screen
     **	@param frame	sprite animation frame
     */
-extern void DrawCursor(CursorType* type,int x,int y,int frame);
+extern void DrawCursor(const CursorType* type,int x,int y,int frame);
 
     /// destroy the cursor background (for menu use!)
 extern void DestroyCursorBackground(void);
@@ -119,10 +113,10 @@ extern void DestroyCursorBackground(void);
     /// hide the cursor
 extern void HideCursor(void);
 
-    /// draw any cursor 
+    /// draw any cursor
 extern void DrawAnyCursor(void);
 
-    /// hide any cursor 
+    /// hide any cursor
 extern int HideAnyCursor(void);
 
     /// initialize the cursor module

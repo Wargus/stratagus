@@ -83,7 +83,7 @@ typedef struct _unit_type_ UnitType;
 **	Appearance, features...
 */
 struct _unit_type_ {
-    void*	OType;			/// Object type (future extensions)
+    const void*	OType;			/// Object type (future extensions)
 
     char*	Ident;			/// identifier
     char*	Name;			/// unit name shown from the engine
@@ -207,7 +207,7 @@ struct _unit_type_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern char	UnitTypeType[];			/// unit type type
+extern const char UnitTypeType[];		/// unit type type
 // FIXME: this limit must be removed!
 extern UnitType	UnitTypes[UnitTypeInternalMax];	/// all unit types
 

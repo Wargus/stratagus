@@ -46,7 +46,7 @@ typedef struct _missile_type_ MissileType;
 **	Base structure of missile types
 */
 struct _missile_type_ {
-    void*	OType;			/// Object type (future extensions)
+    const void*	OType;			/// Object type (future extensions)
 
     char*	Ident;			/// missile name
     char*	File;			/// missile sprite file

@@ -39,6 +39,7 @@
 #include "iolib.h"
 #include "network.h"
 #include "settings.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --	Prototypes for local functions
@@ -2052,7 +2053,8 @@ global void ProcessMenu(int MenuId, int Loop)
     DestroyCursorBackground();
     MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
-    GameCursor = &Cursors[CursorTypePoint];
+    // FIXME: Not yet available :( GameCursor = TheUI.Point.Cursor;
+    GameCursor=CursorTypeByIdent("cursor-point");
     CurrentMenu = MenuId;
     menu = Menus + CurrentMenu;
     MenuButtonCurSel = -1;

@@ -213,7 +213,105 @@ local SCM CclRaceAdd(SCM id)
 }
 
 /**
+**	Define a cursor.
+**
+**	FIXME: need some general data structure to make this parsing easier.
+*/
+local SCM CclDefineCursor(SCM list)
+{
+    SCM value;
+    char* s1;
+    char* s2;
+    int i;
+    CursorType* ct;
+
+    //	Get identifier
+    value=gh_car(list);
+    list=gh_cdr(list);
+    s1=gh_scm2newstr(value,NULL);
+    value=gh_car(list);
+    list=gh_cdr(list);
+    s2=gh_scm2newstr(value,NULL);
+    if( !strcmp(s2,"any") ) {
+	free(s2);
+	s2=NULL;
+    }
+
+    //
+    //	Look if this kind of cursor already exists.
+    //
+    ct=NULL;
+    i=0;
+    if( Cursors ) {
+	for( ; Cursors[i].Type; ++i ) {
+	    //
+	    //	Race not same, not found.
+	    //
+	    if( Cursors[i].Race && s2 ) {
+		if( strcmp(Cursors[i].Race,s2) ) {
+		    continue;
+		}
+	    } else if( Cursors[i].Race!=s2 ) {
+		continue;
+	    }
+	    if( !strcmp(Cursors[i].Ident,s1) ) {
+		ct=&Cursors[i];
+		break;
+	    }
+	}
+    }
+    //
+    //	Not found, make a new slot.
+    //
+    if( ct ) {
+	CclFree(s1);
+	CclFree(s2);
+    } else {
+	DebugLevel0Fn("Not written %d %d\n",i,i+2);
+	ct=calloc(i+2,sizeof(CursorType));
+	memcpy(ct,Cursors,sizeof(CursorType)*i);
+	CclFree(Cursors);
+	Cursors=ct;
+	ct=&Cursors[i];
+	ct->Type=CursorTypeType;
+	ct->Ident=s1;
+	ct->Race=s2;
+    }
+
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("image")) ) {
+	    CclFree(ct->File);
+	    ct->File=gh_scm2newstr(gh_car(list),NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("hot-spot")) ) {
+	    value=gh_car(list);
+	    ct->HotX=gh_scm2int(gh_car(value));
+	    value=gh_cdr(value);
+	    ct->HotY=gh_scm2int(gh_car(value));
+	} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+	    value=gh_car(list);
+	    ct->Width=gh_scm2int(gh_car(value));
+	    value=gh_cdr(value);
+	    ct->Height=gh_scm2int(gh_car(value));
+	} else {
+	    s1=gh_scm2newstr(value,NULL);
+	    fprintf(stderr,"Unsupported tag %s\n",s1);
+	    free(s1);
+	}
+	list=gh_cdr(list);
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Define the look+feel of the user interface.
+**
+**	FIXME: need some general data structure to make this parsing easier.
 */
 local SCM CclDefineUI(SCM list)
 {
@@ -239,11 +337,14 @@ local SCM CclDefineUI(SCM list)
 
     // Find slot: new or redefinition
     ui=NULL;
-    for( i=0; UI_Table[i]; ++i ) {
-	if( UI_Table[i]->Width==x && UI_Table[i]->Height==y
-		&& !strcmp(UI_Table[i]->Name,str) ) {
-	    ui=UI_Table[i];
-	    break;
+    i=0;
+    if( UI_Table ) {
+	for( ; UI_Table[i]; ++i ) {
+	    if( UI_Table[i]->Width==x && UI_Table[i]->Height==y
+		    && !strcmp(UI_Table[i]->Name,str) ) {
+		ui=UI_Table[i];
+		break;
+	    }
 	}
     }
     if( !ui ) {
@@ -754,12 +855,108 @@ local SCM CclDefineUI(SCM list)
 	ui->Buttons2[i].Height=y;
     }
 
+    //
+    //	Get the cursors definitions.
+    //
+    temp=gh_car(list);
+    list=gh_cdr(list);
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->Point.Name);
+    ui->Point.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->Glass.Name);
+    ui->Glass.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->Cross.Name);
+    ui->Cross.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->YellowHair.Name);
+    ui->YellowHair.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->GreenHair.Name);
+    ui->GreenHair.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->RedHair.Name);
+    ui->RedHair.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->Scroll.Name);
+    ui->Scroll.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->ArrowE.Name);
+    ui->ArrowE.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->ArrowNE.Name);
+    ui->ArrowNE.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->ArrowN.Name);
+    ui->ArrowN.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->ArrowNW.Name);
+    ui->ArrowNW.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->ArrowW.Name);
+    ui->ArrowW.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->ArrowSW.Name);
+    ui->ArrowSW.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->ArrowS.Name);
+    ui->ArrowS.Name=str;
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->ArrowSE.Name);
+    ui->ArrowSE.Name=str;
+
     return SCM_UNSPECIFIED;
 }
 
 /**
- **	Set Speed of Mouse Scrolling
- */
+**	Set Speed of Mouse Scrolling
+*/
 local SCM CclMouseScrollSpeed(SCM num)
 {
 	int speed;
@@ -848,6 +1045,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure0_0("original-resources",CclOriginalResources);
 
     gh_new_procedure1_0("race-add",CclRaceAdd);
+    gh_new_procedureN("define-cursor",CclDefineCursor);
     gh_new_procedureN("define-ui",CclDefineUI);
 
     gh_new_procedure1_0("key-scroll-speed", CclKeyScrollSpeed);
