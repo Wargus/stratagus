@@ -240,7 +240,7 @@ global void CreateGame(char* filename, WorldMap* map)
     int i, j;
     char* s;
 
-    if ( filename ) {
+    if ( filename && *filename ) {
 	s = NULL;
 	// FIXME: LibraryFile here?
 	strcpy(CurrentMapPath, filename);
