@@ -47,6 +47,7 @@
 #include "tileset.h"
 #include "ui.h"
 #include "menus.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

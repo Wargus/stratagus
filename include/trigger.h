@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-// T H E   W A R   B E G I N S
-// Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name trigger.h - The game trigger headerfile. */
 //
-// (c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 #ifndef __TRIGGER_H__
 #define __TRIGGER_H__
@@ -34,17 +34,14 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-#include "script.h"
-
-/*----------------------------------------------------------------------------
--- Declarations
-----------------------------------------------------------------------------*/
+struct lua_State;
+struct _CL_File_;
 
 /**
-** Timer structure
+**  Timer structure
 */
 typedef struct _timer_ {
 	char Init;                  ///< timer is initialized
@@ -60,21 +57,21 @@ typedef struct _timer_ {
 #define ALL_BUILDINGS ((const UnitType*)-3)
 
 /*----------------------------------------------------------------------------
--- Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 extern Timer GameTimer; ///< the game timer
 
 /*----------------------------------------------------------------------------
--- Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
-extern int TriggerGetPlayer(lua_State* l);///< get player number.
-extern const UnitType* TriggerGetUnitType(lua_State* l); ///< get the unit-type
+extern int TriggerGetPlayer(struct lua_State* l);///< get player number.
+extern const UnitType* TriggerGetUnitType(struct lua_State* l); ///< get the unit-type
 extern void TriggersEachCycle(void);    ///< test triggers
 
 extern void TriggerCclRegister(void);   ///< Register ccl features
-extern void SaveTriggers(CLFile* file); ///< Save the trigger module
+extern void SaveTriggers(struct _CL_File_* file); ///< Save the trigger module
 extern void InitTriggers(void);         ///< Setup triggers
 extern void CleanTriggers(void);        ///< Cleanup the trigger module
 

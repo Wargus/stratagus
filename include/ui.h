@@ -44,13 +44,13 @@
 #include "video.h"
 #include "upgrade_structs.h"
 #include "cursor.h"
-#include "interface.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 struct _unit_;
+struct _button_action_;
 struct _CL_File_;
 
 /*----------------------------------------------------------------------------
@@ -416,7 +416,7 @@ typedef hashtable(CheckboxStyle*,128) _CheckboxStyleHash;
 extern _CheckboxStyleHash CheckboxStyleHash;
 
 extern char RightButtonAttacks;         ///< right button 0 move, 1 attack.
-extern ButtonAction* CurrentButtons;    ///< Current Selected Buttons
+extern struct _button_action_* CurrentButtons;    ///< Current Selected Buttons
 extern char FancyBuildings;             ///< Mirror buildings 1 yes, 0 now.
 
 extern int SpeedKeyScroll;              ///< Keyboard Scrolling Speed, in Frames
