@@ -1912,7 +1912,7 @@ global void DrawUnits(const void* v)
     //
     corpses = &CorpseList;
     while( *corpses ) {
-	if( UnitVisibleInViewport(vp,*corpses) ) {
+	if( UnitVisibleInViewport(vp,*corpses) && !(*corpses)->Destroyed ) {
 	    DrawUnit(*corpses);
 	}
 	corpses=&(*corpses)->Next;
