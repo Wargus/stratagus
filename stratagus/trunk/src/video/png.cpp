@@ -100,15 +100,14 @@ int LoadGraphicPNG(Graphic* graphic)
 	volatile int ckey;
 	png_color_16* transv;
 	char name[PATH_MAX];
-	char buf[PATH_MAX];
 
 	ckey = -1;
 
 	if (!graphic->File) {
 		return -1;
 	}
-	strcat(strcpy(buf, "graphics/"), graphic->File);
-	LibraryFileName(buf, name);
+
+	LibraryFileName(graphic->File, name);
 	if (!name) {
 		return -1;
 	}
