@@ -291,6 +291,36 @@ local SCM CclSetAllPlayersTotalUnitLimit(SCM limit)
     return limit;
 }
 
+/**
+**	Change the diplomacy from ThisPlayer to another player.
+**
+**	@param player	Player number to change.
+**	@param state	To which state this should be changed.
+*/
+local SCM CclDiplomacy(SCM player,SCM state)
+{
+    int plynr;
+
+    plynr=gh_scm2int(player);
+
+    if( gh_eq_p(state,gh_symbol2scm("allied")) ) {
+	ThisPlayer->Enemy&=~(1<<plynr);
+	ThisPlayer->Allied|=1<<plynr;
+    } else if( gh_eq_p(state,gh_symbol2scm("neutral")) ) {
+	ThisPlayer->Enemy&=~(1<<plynr);
+	ThisPlayer->Allied&=~(1<<plynr);
+    } else if( gh_eq_p(state,gh_symbol2scm("crazy")) ) {
+	ThisPlayer->Enemy|=1<<plynr;
+	ThisPlayer->Allied|=1<<plynr;
+    } else if( gh_eq_p(state,gh_symbol2scm("enemy")) ) {
+	ThisPlayer->Enemy|=1<<plynr;
+	ThisPlayer->Allied&=~(1<<plynr);
+    }
+
+    // FIXME: we can return the old state
+    return SCM_UNSPECIFIED;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -307,6 +337,8 @@ global void PlayerCclRegister(void)
 		CclSetAllPlayersBuildingLimit);
     gh_new_procedure1_0("set-all-players-total-unit-limit!",
 		CclSetAllPlayersTotalUnitLimit);
+
+    gh_new_procedure2_0("diplomacy",CclDiplomacy);
 }
 
 #endif	// } USE_CCL
