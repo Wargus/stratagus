@@ -94,7 +94,8 @@ global void (*VideoDrawRawClip)( VMemType *pixels,
 /**
 **	Draw a RLE encoded graphic object unclipped into framebuffer.
 **
-**	NOTE: This macro looks nice, but is absolutly no debugable.
+**	@NOTE: This macro looks nice, but is absolutly no debugable.
+**	@TODO: Make this an inline function.
 **
 **	@param bpp	Bit depth of target framebuffer
 **	@param sprite	pointer to object
@@ -1360,6 +1361,10 @@ global void VideoDraw8to32ClipX(const Graphic* sprite,unsigned frame
     VMemType32* pp;
     const VMemType32* pixels;
     unsigned da;
+
+    ox=oy=0;
+    sw=w=sprite->Width;
+    h=sprite->Height;
 
     //
     // reduce to visible range
