@@ -282,7 +282,6 @@ static int CclSaveGame(lua_State* l)
 		if (!strcmp(value, "SaveFile")) {
 			strcpy(CurrentMapPath, LuaToString(l, -1));
 			// If .pud, we don't need to load anything from it
-			// MAPTODO: should we skip this for .smp too ?
 			if (!strcasestr(LuaToString(l, -1), ".pud")) {
 				strcpy(buf, StratagusLibPath);
 				strcat(buf, "/");
