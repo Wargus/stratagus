@@ -63,10 +63,6 @@ typedef struct _unit_colors_ {
 	SDL_Color Colors[4];
 } UnitColors;
 
-#ifdef DEBUG
-extern unsigned AllocatedGraphicMemory;		/// Allocated memory for objects
-#endif
-
 /**
 **  Event call back.
 **
@@ -135,11 +131,9 @@ extern void VideoPaletteListRemove(SDL_Surface* surface);
 	**  If =0, video framerate is not synchronized. 100 is exact
 	**  CYCLES_PER_SECOND (30). Game will try to redraw screen within
 	**  intervals of VideoSyncSpeed, not more, not less.
-	**  @see CYCLES_PER_SECOND @see VideoInterrupts
+	**  @see CYCLES_PER_SECOND
 	*/
 extern int VideoSyncSpeed;
-
-extern volatile int VideoInterrupts;
 
 extern int SkipFrames;
 
@@ -208,7 +202,7 @@ extern void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 #endif
 
 	/// Load graphic
-extern Graphic* LoadGraphic(const char* file);
+#define LoadGraphic(file) LoadSprite(file, 0, 0)
 
 	/// Flip graphic and store in graphic->SurfaceFlip
 extern void FlipGraphic(Graphic* graphic);
@@ -225,12 +219,6 @@ extern Graphic* MakeGraphic(SDL_Surface* surface);
 	/// Load a picture and display it on the screen (full screen),
 	/// changing the colormap and so on..
 extern void DisplayPicture(const char *name);
-
-	/// Init graphic
-extern void InitGraphic(void);
-
-	/// Init sprite
-extern void InitSprite(void);
 
 	/// Init line draw
 extern void InitLineDraw(void);
@@ -268,9 +256,6 @@ extern void SaveScreenshotPNG(const char* name);
 
 	/// Creates a hardware palette from an independent Palette struct.
 extern SDL_Palette* VideoCreateNewPalette(const SDL_Palette* palette);
-
-	/// Prints warning if video is too slow..
-extern void CheckVideoInterrupts(void);
 
 	/// Process all system events. Returns if the time for a frame is over
 extern void WaitEventsOneFrame(const EventCallback* callbacks);
