@@ -276,7 +276,7 @@ static void HandleRegenerations(Unit* unit)
 			unit->Orders[0].Action != UnitActionDie &&
 			unit->HP != 0) {
 		f = (100 * unit->HP) / unit->Stats->HitPoints;
-		if (f <= unit->Type->BurnPercent) {
+		if (f <= unit->Type->BurnPercent && unit->Type->BurnDamageRate) {
 			HitUnit(NoUnitP, unit, unit->Type->BurnDamageRate);
 			f = 1;
 		} else {
