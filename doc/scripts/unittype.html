@@ -40,10 +40,9 @@
 <A HREF="../faq.html">FAQ</A> 
 <A HREF="ccl.html">CCL</A> 
 <A HREF="icon.html">PREV</A> 
-<A HREF="ai.html">NEXT</A> 
+<A HREF="research.html">NEXT</A> 
 <HR>
 <A HREF="#define-unit-type">define-unit-type</A>
-<A HREF="#print-unit-type-table">print-unit-type-table</A>
 <HR>
 <H2>Intro - Introduction to unit-type functions and variables</H2>
 
@@ -58,8 +57,12 @@ Everything around the C UnitType structure.
     Define the unit types in game it is based on the UDTA.<P>
 
     The default unit types are defined in <A HREF="../../data/ccl/units.ccl">
-    $FREECRAFT_LIBRARY/data/units.ccl</A>.  This could also be defined in own
-    levels. <P>
+    $FREECRAFT_LIBRARY/data/units.ccl</A> and
+    <A HREF="../../data/ccl/human/units.ccl">
+    $FREECRAFT_LIBRARY/data/human/units.ccl</A> and
+    <A HREF="../../data/ccl/orc/units.ccl">
+    $FREECRAFT_LIBRARY/data/orc/units.ccl</A>. This could also be defined in
+    own levels. <P>
 
 <H4>Syntax</H4>
 
@@ -235,21 +238,6 @@ F.E. '( 1 1 ), '( 2 2 ).
       "footman-attack" )
 </PRE>
 	Define the unit-type "unit-footman" as footman.<P>
-
-<A NAME="print-unit-type-table"></A>
-<H3>print-unit-type-table</H3>
-
-<H4>Description</H4>
-
-    Print the current unit type table for the C code. (
-    <A HREF="../../src/unit/ut_table.c"> $FREECRAFT/src/unit/ut_table.c</A>
-    contains the result) Use "Save" to generate the scheme (FreeCraft
-    configuration language) tables. <P>
-
-<H4>Syntax</H4>
-
-    (print-unit-type-table)
-
 
 <!--
 
