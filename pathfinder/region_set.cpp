@@ -63,7 +63,6 @@ void RegionSetFindRegionsInArea (int x, int y)
 	int i, j;
 	int area_width = AreaGetWidth ();
 	int area_height = AreaGetHeight ();
-	int num_reg = 0;
 
 	for (j = y * area_height; j < (y+1) * area_height; j++)
 		for (i = x * area_width; i < (x+1) * area_width; i++) {
@@ -88,7 +87,6 @@ void RegionSetFindRegionsInArea (int x, int y)
 			if (MapFieldGetRegId (i, j))
 				continue;	// this field's been assigned to a region already
 			new = RegionNew (i, j);
-			++num_reg;
 
 			regid = RegidFind (&RegionSet.RegidSpace, REGID_LOWEST,
 									REGID_UNUSED);
@@ -101,7 +99,6 @@ void RegionSetFindRegionsInArea (int x, int y)
 
 			RegionChangeRegId (new, regid);
 			RegionSetInsert (new);
-			++RegionSet.NumRegions;
 
 			AreaAddRegion (x, y, new);
 
@@ -121,12 +118,16 @@ local void RegionSetFlush (void)
 local void RegionSetInsert (Region *reg)
 {
 	AvlAdd (&RegionSet.Regions, reg, reg->RegId);
+	++RegionSet.NumRegions;
+	//printf ("region %d added to the Set\n", reg->RegId);
 }
 
 void RegionSetDelete (Region *reg)
 {
 	AvlDelete (&RegionSet.Regions, reg->RegId);
 	RegidMarkUnused (&RegionSet.RegidSpace, reg->RegId);
+	--RegionSet.NumRegions;
+	//printf ("region %d deleted from the Set\n", reg->RegId);
 }
 
 Region *RegionSetFind (int regid)
@@ -161,6 +162,8 @@ void RegionSetCreateNeighborLists (int x0, int y0, int x1, int y1)
 				continue;
 
 			reg = RegionSetFind (regid);
+			DebugCheck (!reg);
+			DebugCheck (reg->Magic != 0xdeadbeef);
 
 			for (i=0; i<8; i++) {
 				FieldCoords Neighbor;
@@ -177,6 +180,7 @@ void RegionSetCreateNeighborLists (int x0, int y0, int x1, int y1)
 				if (nregid && nregid != regid) {
 					Region *nreg = RegionSetFind (nregid);
 
+					DebugCheck (nreg->Magic != 0xdeadbeef);
 					if ( !RegionIsNeighbor (reg, nreg)) {
 						int cost = RegionComputeCost (reg, nreg);
 						RegionInsertNeighbor (reg, nreg, cost);
