@@ -114,13 +114,13 @@ cat << .. > $RULESFILE
 CC=gcc
 CCLD=$CC
 RM="rm -f"
-if [ x`uname -a | grep -is bsd` != x ] ; then
+if [ "x`uname -a | grep -is bsd`" != x ] ; then
   MAKE=gmake
   EXTRA_CFLAGS="$EXTRA_CFLAGS -DBSD"
 else
   MAKE=make
 fi
-if [ x`uname -a | grep -is bsd` != x ] ; then
+if [ "x`uname -a | grep -is bsd`" != x ] ; then
   DL=
 else
   DL=-ldl
@@ -157,10 +157,10 @@ function check_for_libs() {
   cat << "  EOF" > $TEMPFILE.c
   int main(){ int i; }
   EOF
-  if test x`cc -o $TEMPFILE.a -w $TEMPFILE.c $LIBCHECK 2>&1` = x ; then
+  if [ "x`cc -o $TEMPFILE.a -w $TEMPFILE.c $LIBCHECK 2>&1`" = x ] ; then
     rm -f $TEMPFILE.[coa] > /dev/null 2>&1
     return 0
-  elif test x`gcc -o $TEMPFILE.a -w $TEMPFILE.c $LIBCHECK 2>&1` = x ; then
+  elif [ "x`gcc -o $TEMPFILE.a -w $TEMPFILE.c $LIBCHECK 2>&1`" = x ; then
     rm -f $TEMPFILE.[coa] > /dev/null 2>&1
     return 0
   else
@@ -172,7 +172,7 @@ function check_for_libs() {
 #------------------------------------------------------------------------------
 # Parse input arguments
 
-while test $# != 0 ; do
+while [ $# != 0 ] ; do
   case $1 in
     "-?"|"--help")
       echo
@@ -258,8 +258,8 @@ if [ "$UNIX" != "1" ] ; then
       if [ "$DARWIN" != "1" ] ; then
 
 if [ "$WIN32" = "0" ] ; then
-  if [ x`uname | grep -is cygwin` != x ] \
-  || [ x`uname | grep -is MINGW` != x ] ; then
+  if [ "x`uname | grep -is cygwin`" != x ] \
+  || [ "x`uname | grep -is MINGW`" != x ] ; then
     UNIX=0
     BEOS=0
     WIN32=1
@@ -269,7 +269,7 @@ if [ "$WIN32" = "0" ] ; then
 fi
 
 if [ "$BEOS" = "0" ] ; then
-  if [ x`uname -a | grep -is beos` != x ] ; then
+  if [ "x`uname -a | grep -is beos`" != x ] ; then
     UNIX=0
     BEOS=1
     WIN32=0
@@ -279,7 +279,7 @@ if [ "$BEOS" = "0" ] ; then
 fi
 
 if [ "$DARWIN" = "0" ] ; then
-  if [ x`uname -a | grep -is darwin` != x ] ; then
+  if [ "x`uname -a | grep -is darwin`" != x ] ; then
     DARWIN=1
     UNIX=0
     BEOS=0
@@ -323,12 +323,12 @@ echo -n "Checking for PNG library..."
 
 # libpng most likely requires libz.a, so check for it first..
 LIBCHECK="-lz"; check_for_libs
-if test "$?" = 0 ; then
+if [ "$?" = 0 ] ; then
   HAVE_LIBZ=1
   PNG_EXTRA="-lz"
 else
   LIBCHECK="-lz -L./$LOCAL_ZLIB"; check_for_libs
-  if test "$?" = 0 ; then
+  if [ "$?" = 0 ] ; then
     HAVE_LIBZ=2
     PNG_EXTRA="$LIBCHECK"
   fi
@@ -336,13 +336,13 @@ fi
 
 PNG_PATH="-L/usr/local/lib"
 PNG_LOCAL=0
-if test -d $LOCAL_PNG ; then
+if [ -d $LOCAL_PNG ] ; then
     PNG_PATH="-L./\$LOCAL_PNG"
     PNG_LOCAL=1
 fi
 LIBCHECK="$PNG_PATH -lpng $PNG_EXTRA"; check_for_libs
-if test "$?" = 0 ; then
-  if test "$PNG_LOCAL" = 1 ; then
+if [ "$?" = 0 ] ; then
+  if [ "$PNG_LOCAL" = 1 ] ; then
     echo " Found, (local: $LOCAL_PNG).";
   else
     echo " Found.";
@@ -415,12 +415,12 @@ echo >> $RULESFILE
 echo -n "Checking for various video libraries..."
 
 # Check for SDL >= 1.x
-if [ x`uname -a | grep -is bsd` != x ] ; then
+if [ "x`uname -a | grep -is bsd`" != x ] ; then
   SDL_CONFIG=sdl11-config
 else
   SDL_CONFIG=sdl-config
 fi
-if test x`$SDL_CONFIG --version 2>/dev/null` = x ; then
+if [ "x`$SDL_CONFIG --version 2>/dev/null`" = x ] ; then
   echo " SDL not found..."
   ALL_YOUR_BASE=0
 else
@@ -434,7 +434,7 @@ if [ "$DARWIN" != "1" ] && [ "$WIN32" != "1" ] ; then
   # Check for SVGALIB
   LIBCHECK="-lvga -lvgagl"
   check_for_libs
-  if test "$?" = 0 ; then
+  if [ "$?" = 0 ] ; then
     HAVESVGA=1
     echo "  Found SVGALIB..."
   else
@@ -443,19 +443,19 @@ if [ "$DARWIN" != "1" ] && [ "$WIN32" != "1" ] ; then
   fi
 fi
 
-if test "$WIN32" = 0 ; then
+if [ "$WIN32" = 0 ] ; then
   echo
   echo "What video outputs do you wish to be enabled?"
   echo
   echo "  X-X11 Support (default)"
 
-  if test "$HAVESDL" = 1 ; then
+  if [ $HAVESDL = 1 ] ; then
     echo "  S-SDL Support"
   fi
-  if test "$HAVESVGA" = 1 ; then
+  if [ "$HAVESVGA" = 1 ] ; then
     echo "  V-SVGALIB Support"
   fi
-  if (test "$HAVESVGA" = 1 && test "$HAVESDL" = 1) ; then
+  if (test "$HAVESVGA" = 1 && test $HAVESDL = 1) ; then
     echo "  B-SDL/SVGALIB Support"
   fi
   echo
@@ -466,7 +466,7 @@ fi
 
 else
 
-if [ "$HAVESDL" = 1 ] ; then
+if [ $HAVESDL = 1 ] ; then
   VIDSEL="S"
 else
   echo "FreeCraft on BeOS currently only supports SDL for video"
@@ -487,7 +487,7 @@ case $VIDSEL in
 	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
 	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
-	if test x$STATIC != x ; then
+	if [ x$STATIC != x ] ; then
 	  SDLLIB="\$(shell $SDL_CONFIG --static-libs)"
 	fi
 
@@ -517,7 +517,7 @@ case $VIDSEL in
 	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
 	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
-	if test x$STATIC != x ; then
+	if [ x$STATIC != x ] ; then
 	  SDLLIB="$SDLLIB -lesd"
 	fi
 
@@ -535,7 +535,7 @@ case $VIDSEL in
 	  SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
 	  echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
-	  if test x$STATIC != x ; then
+	  if [ x$STATIC != x ] ; then
 	    SDLLIB="$SDLLIB -lesd"
 	  fi
 	  echo "SDLLIB		= $SDLLIB" >> $RULESFILE
@@ -553,9 +553,9 @@ echo "" >> $RULESFILE
 #
 # Put in Cygwin/win32 stuff if necessary, and test for mingw32
 
-if test "$WIN32" = "1" ; then
+if [ "$WIN32" = 1 ] ; then
 	echo "VIDEO		= -DUSE_WIN32 \$(SDL)" >> $RULESFILE
-	if test x`gcc -v 2>&1 | grep -is mingw32` = x ; then
+	if [ "x`gcc -v 2>&1 | grep -is mingw32`" = x ] ; then
 	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32 -lws2_32" >> $RULESFILE
 	else
 	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32 -lws2_32" >> $RULESFILE
@@ -585,7 +585,7 @@ case $ANSWER in
 
 	echo -n "Checking for various sound libraries..."
 	# Check for arts client
-	if [ x`artsc-config --version 2>/dev/null` = x ] ; then
+	if [ "x`artsc-config --version 2>/dev/null`" = x ] ; then
 	  echo -n "  ARTS not found..."
 	else
 	  echo "  ARTS Found..."
@@ -613,7 +613,7 @@ case $ANSWER in
 	  # Check for libpthread
 	  LIBCHECK="-lpthread"
 	  check_for_libs
-	  if test "$?" = 0 ; then
+	  if [ "$?" = 0 ] ; then
 	    echo
 	    echo
 	    echo "Assuming you have a thread-safe X11 (libc6 or glibc),"
@@ -623,7 +623,7 @@ case $ANSWER in
 	    case $ANSWER2 in
 	    [yY])
 		echo "THREAD		= -D_REENTRANT -DUSE_THREAD" >> $RULESFILE
-		if [ x`uname -a | grep -is bsd` != x ] ; then
+		if [ "x`uname -a | grep -is bsd`" != x ] ; then
 		  echo "THREADLIB   = -pthread" >> $RULESFILE
 		else
 		  echo "THREADLIB   = -lpthread" >> $RULESFILE
@@ -642,7 +642,7 @@ case $ANSWER in
 	fi
 
 	LIBCHECK="-lFLAC -lm"; check_for_libs
-	if test "$?" = 0 ; then
+	if [ "$?" = 0 ] ; then
 	echo "	LibFLAC Found..."
 	echo -n "Would you like FLAC support? (n) "
 	read $N ANSWER
@@ -666,7 +666,7 @@ case $ANSWER in
 	fi
 
 	LIBCHECK="-lvorbisfile -lvorbis -logg"; check_for_libs
-	if test "$?" = 0 ; then
+	if [ "$?" = 0 ] ; then
 	echo "	Found Vorbis..."
 	echo -n "Would you like Vorbis OGG support? (n) "
 	read $N ANSWER
@@ -687,22 +687,22 @@ case $ANSWER in
 	esac
 	else
 	LIBCHECK="-lvorbisfile"; check_for_libs
-	if test "$?" != 0 ; then
+	if [ "$?" != 0 ] ; then
 	echo -n "libvorbisfile "
 	fi
 	LIBCHECK="-lvorbis"; check_for_libs
-	if test "$?" != 0 ; then
+	if [ "$?" != 0 ] ; then
 	echo -n "libvorbis "
 	fi
 	LIBCHECK="-logg"; check_for_libs
-	if test "$?" != 0 ; then
+	if [ "$?" != 0 ] ; then
 	echo -n "libogg "
 	fi
 	echo "not found"
 	fi
 
 	LIBCHECK="-lmad"; check_for_libs
-	if test "$?" = 0 ; then
+	if [ "$?" = 0 ] ; then
 	echo "	LibMAD found..."
 	echo -n "Would you like MAD MP3 support? (n) "
 	read $N ANSWER
@@ -723,7 +723,7 @@ case $ANSWER in
 	echo
 
 	echo -n "Would you like to use [I]nternal"
-	if test "$HAVESDL" = "1" ; then
+	if [ $HAVESDL = 1 ] ; then
 	echo -n ", [S]DL,"
 	fi
 	echo -n " or [N]o "
@@ -774,14 +774,14 @@ echo -n "Checking for compression libraries..."
 
 # libbz2
 LIBCHECK="-lbz2"; check_for_libs
-if test "$?" = 0 ; then
+if [ "$?" = 0 ] ; then
 HAVE_LIBBZ2=1
 echo -n "  LibBZ2 found..."
 fi
 
 # libzzip
 LIBCHECK="-lzzip"; check_for_libs
-if test "$?" = 0 ; then
+if [ "$?" = 0 ] ; then
 HAVE_LIBZZIP=1
 echo -n "  LibZZip found..."
 fi
@@ -790,9 +790,9 @@ fi
 
 if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1) ; then
   DEF4=" (default)"; COMPDEF="O"
-elif test "$HAVE_LIBBZ2" = 1 ; then
+elif [ "$HAVE_LIBBZ2" = 1 ] ; then
   DEF3=" (default)"; COMPDEF="B"
-elif test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 ; then
+elif [ "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 ] ; then
   DEF2=" (default)"; COMPDEF="G"
 else
   DEF1=" (default)"; COMPDEF="N"
@@ -803,13 +803,13 @@ echo
 echo Which compression types do you wish to enable?
 echo
 echo "	N-None"$DEF1
-if test "$HAVE_LIBZ" = 1 ; then
+if [ "$HAVE_LIBZ" = 1 ] ; then
   echo "  G-GZip"$DEF2
 fi
-if test "$HAVE_LIBZ" = 2 ; then
+if [ "$HAVE_LIBZ" = 2 ] ; then
   echo "  G-GZip"$DEF2 " (local: $LOCAL_ZLIB)"
 fi
-if test "$HAVE_LIBBZ2" = 1 ; then
+if [ "$HAVE_LIBBZ2" = 1 ] ; then
   echo "  B-Bzip2"$DEF3
 fi
 if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1) ; then
@@ -823,7 +823,7 @@ echo -n "Please enter selection ($COMPDEF): "
 read $N COMPOPT
 echo
 
-if test x$COMPOPT = x; then COMPOPT=$COMPDEF; fi
+if [ x$COMPOPT = x ]; then COMPOPT=$COMPDEF; fi
 
 echo "# Compression support" >> $RULESFILE
 
@@ -894,7 +894,7 @@ fi
 
 
 CFLAGS="$CFLAGS $NORMAL_CFLAGS"
-if test x`gcc -v 2>&1 | grep -is 3\.2` != x ; then
+if [ "x`gcc -v 2>&1 | grep -is 3\.2`" != x ] ; then
 if [ "$DEBUG" != "1" ] ; then
     echo
     echo
@@ -1043,21 +1043,21 @@ fi
 
 LOCAL_LDF=""
 LOCAL_IF=""
-if test "$HAVE_LIBZ" = 2 ; then
+if [ "$HAVE_LIBZ" = 2 ] ; then
   LOCAL_LDF=" -L\$(TOPDIR)/$LOCAL_ZLIB"
   LOCAL_IF="-I\$(TOPDIR)/$LOCAL_ZLIB"
-  if test "$DARWIN" = 1 ; then
+  if [ "$DARWIN" = 1 ] ; then
     LOCAL_IF="-I\$(TOPDIR)/$LOCAL_ZLIB -I/usr/include -I/usr/include/machine"
   fi
 else
-  if test "$DARWIN" = 1 ; then
+  if [ "$DARWIN" = 1 ] ; then
     LOCAL_IF="-I/usr/include -I/usr/include/machine " $LOCAL_IF
   fi
 fi
 
 LDF_PNG_PATH=""
 IF_PNG_PATH=""
-if test "$PNG_LOCAL" = 1 ; then
+if [ "$PNG_LOCAL" = 1 ] ; then
     LDF_PNG_PATH="-L\$(TOPDIR)/$LOCAL_PNG "
     IF_PNG_PATH="-I\$(TOPDIR)/$LOCAL_PNG "
 fi
@@ -1112,7 +1112,7 @@ echo "TAGS=\$(TOPDIR)/src/tags" >> $RULESFILE
 
 echo >> $RULESFILE
 # WIN32
-if test "$WIN32" = 1 ; then
+if [ "$WIN32" = 1 ] ; then
   echo "# Win32" >> $RULESFILE
   echo "EXE=.exe" >> $RULESFILE
   echo "OUTFILE=\$(TOPDIR)/freecraft\$(EXE)" >> $RULESFILE
@@ -1139,7 +1139,7 @@ echo "#ARCHOBJS=stdmman.\$(OE) svgalib.\$(OE) unix_lib.\$(OE) bitm_lnx.\$(OE)" >
 echo "IFLAGS=	-I\$(TOPDIR)/src/include \$(XIFLAGS)" >> $RULESFILE
 
 # define flags
-if test "$DEBUG" = 1 ; then
+if [ "$DEBUG" = 1 ] ; then
   echo "DEBUG=	-DDEBUG #-DFLAG_DEBUG" >> $RULESFILE
 fi
 echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
