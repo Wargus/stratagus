@@ -51,6 +51,7 @@
 #include "netconnect.h"
 #include "settings.h"
 #include "ui.h"
+#include "campaign.h"
 
 /*----------------------------------------------------------------------------
 --	Prototypes for local functions
@@ -64,12 +65,13 @@ local void EndMenu(void);
 
 local void GameMenuSave(void);
 local void GameMenuLoad(void);
+local void GameMenuEndDefeat(void);
 local void GameMenuEnd(void);
 local void GameMenuExit(void);
 local void GameMenuReturn(void);
 
 local void PrgStartInit(Menuitem *mi);		// master init
-local void StartMenusSetBackground(Menuitem *mi);	
+local void StartMenusSetBackground(Menuitem *mi);
 local void NameLineDrawFunc(Menuitem *mi);
 local void EnterNameAction(Menuitem *mi, int key);
 local void EnterNameCancel(void);
@@ -81,11 +83,13 @@ local void CreateNetGameMenu(void);
 
 local void SinglePlayerGameMenu(void);
 local void MultiPlayerGameMenu(void);
-local void CampainGameMenu(void);
+local void CampaignGameMenu(void);
 local void ScenSelectMenu(void);
 
-local void AllianceCampainMenu(void);
-local void MysticalCampainMenu(void);
+local void AllianceCampaignMenu(void);
+local void MysticalCampaignMenu(void);
+local void Alliance2CampaignMenu(void);
+local void Mystical2CampaignMenu(void);
 
 local void ScenSelectLBExit(Menuitem *mi);
 local void ScenSelectLBInit(Menuitem *mi);
@@ -211,7 +215,7 @@ local Menuitem GameMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, NULL, 'o'} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'e'} } },
+	{ button:{ "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEndDefeat, 'e'} } },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, GameMenuReturn, '\033'} } },
 #else
@@ -322,13 +326,15 @@ local Menuitem PrgStartMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL,
 	{ drawfunc:{ NameLineDrawFunc } } },
-    { MI_TYPE_BUTTON, 208, 284, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 248 + 36 * 0, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
-    { MI_TYPE_BUTTON, 208, 284 + 36, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 248 + 36 * 1, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
-    { MI_TYPE_BUTTON, 208, 284 + 36 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Campain Game", 224, 27, MBUTTON_GM_FULL, CampainGameMenu, 'c'} } },
-    { MI_TYPE_BUTTON, 208, 284 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 248 + 36 * 2, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Campaign Game", 224, 27, MBUTTON_GM_FULL, CampaignGameMenu, 'c'} } },
+    { MI_TYPE_BUTTON, 208, 248 + 36 * 3, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Load Game", 224, 27, MBUTTON_GM_FULL, GameMenuLoad, 'l'} } },
+    { MI_TYPE_BUTTON, 208, 248 + 36 * 4, 0, LargeFont, NULL, NULL,
 	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
 #else
     { 0 }
@@ -653,15 +659,21 @@ local Menuitem ConnectingMenuItems[] = {
 };
 
 /**
-**	Items for the Campain Select Menu
+**	Items for the Campaign Select Menu
 */
-local Menuitem CampainSelectMenuItems[] = {
+local Menuitem CampaignSelectMenuItems[] = {
 #ifdef __GNUC__
-    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Alliance Campain", 224, 27, MBUTTON_GM_FULL, AllianceCampainMenu, 'a'} } },
-    { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Mystical Campain", 224, 27, MBUTTON_GM_FULL, MysticalCampainMenu, 'm'} } },
-    { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 0, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Alliance Campaign", 224, 27, MBUTTON_GM_FULL, AllianceCampaignMenu, 'a'} } },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 1, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Mystical Campaign", 224, 27, MBUTTON_GM_FULL, MysticalCampaignMenu, 'm'} } },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 2, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Alliance Second Campaign", 224, 27, MBUTTON_GM_FULL, Alliance2CampaignMenu, 'a'} } },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Mystical Second Campaign", 224, 27, MBUTTON_GM_FULL, Mystical2CampaignMenu, 'm'} } },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Select Campaign", 224, 27, MBUTTON_GM_FULL, MysticalCampaignMenu, 'm'} } },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
 #else
     { 0 }
@@ -669,9 +681,9 @@ local Menuitem CampainSelectMenuItems[] = {
 };
 
 /**
-**	Items for the Campain Continue Menu
+**	Items for the Campaign Continue Menu
 */
-local Menuitem CampainContMenuItems[] = {
+local Menuitem CampaignContMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_BUTTON, 508, 320 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Continue", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'} } },
@@ -679,6 +691,7 @@ local Menuitem CampainContMenuItems[] = {
     { 0 }
 #endif
 };
+
 /**
 **	FIXME: Ari please look, this is now in TheUI.
 */
@@ -741,7 +754,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	1, 5,
+	1, 6,
 	PrgStartMenuItems,
 	NULL,
     },
@@ -816,23 +829,23 @@ global Menu Menus[] = {
 	TerminateNetConnect,
     },
     {
-	// Campain Select Menu
+	// Campaign Select Menu
 	0,
 	0,
 	640, 480,
 	ImageNone,
-	0, 3,
-	CampainSelectMenuItems,
+	0, 6,
+	CampaignSelectMenuItems,
 	NULL,
     },
     {
-	// Campain Continue Menu
+	// Campaign Continue Menu
 	0,
 	0,
 	640, 480,
 	ImageNone,
 	0, 1,
-	CampainContMenuItems,
+	CampaignContMenuItems,
 	NULL,
     },
 };
@@ -1328,6 +1341,7 @@ local void PrgStartInit(Menuitem *mi)	// Start menu master init
 #else
     mi[2].flags = MenuButtonDisabled;
 #endif
+    mi[4].flags = MenuButtonDisabled;
 }
 
 local void GameMenuReturn(void)
@@ -1353,9 +1367,19 @@ local void GameMenuLoad(void)
 /**
 **	End the running game from menu.
 */
+local void GameMenuEndDefeat(void)
+{
+    GameResult=GameDefeat;
+    GameRunning=0;
+}
+
+/**
+**	End the running game from menu.
+*/
 local void GameMenuEnd(void)
 {
     GameRunning=0;
+    EndMenu();
 }
 
 /**
@@ -1405,7 +1429,7 @@ local void SinglePlayerGameMenu(void)
     }
 }
 
-local void CampainGameMenu(void)
+local void CampaignGameMenu(void)
 {
     DestroyCursorBackground();
     StartMenusSetBackground(NULL);
@@ -1417,36 +1441,96 @@ local void CampainGameMenu(void)
     }
 }
 
-local void AllianceCampainMenu(void)
+local void AllianceCampaignMenu(void)
 {
     DestroyCursorBackground();
     StartMenusSetBackground(NULL);
     Invalidate();
-    // Any Campain info should be displayed through a DrawFunc() Item
+    // Any Campaign info should be displayed through a DrawFunc() Item
     // int the CAMPAIN_CONT menu processed below...
     ProcessMenu(MENU_CAMPAIN_CONT, 1);
     // Set GuiGameStarted = 1 to acctually run a game here...
     // But select and load the map first...
     // See CustomGameStart() for info...
+
+    PlayCampaign("human");
+    GuiGameStarted = 1;
+
     DestroyCursorBackground();
     StartMenusSetBackground(NULL);
     Invalidate();
+
+    // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
+    EndMenu();
 }
 
-local void MysticalCampainMenu(void)
+local void MysticalCampaignMenu(void)
 {
     DestroyCursorBackground();
     StartMenusSetBackground(NULL);
     Invalidate();
-    // Any Campain info should be displayed through a DrawFunc() Item
+    // Any Campaign info should be displayed through a DrawFunc() Item
     // int the CAMPAIN_CONT menu processed below...
     ProcessMenu(MENU_CAMPAIN_CONT, 1);
     // Set GuiGameStarted = 1 to acctually run a game here...
     // But select and load the map first...
     // See CustomGameStart() for info...
+
+    PlayCampaign("orc");
+    GuiGameStarted = 1;
+
     DestroyCursorBackground();
     StartMenusSetBackground(NULL);
     Invalidate();
+
+    // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
+    EndMenu();
+}
+
+local void Alliance2CampaignMenu(void)
+{
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    Invalidate();
+    // Any Campaign info should be displayed through a DrawFunc() Item
+    // int the CAMPAIN_CONT menu processed below...
+    ProcessMenu(MENU_CAMPAIN_CONT, 1);
+    // Set GuiGameStarted = 1 to acctually run a game here...
+    // But select and load the map first...
+    // See CustomGameStart() for info...
+
+    PlayCampaign("human-exp");
+    GuiGameStarted = 1;
+
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    Invalidate();
+
+    // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
+    EndMenu();
+}
+
+local void Mystical2CampaignMenu(void)
+{
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    Invalidate();
+    // Any Campaign info should be displayed through a DrawFunc() Item
+    // int the CAMPAIN_CONT menu processed below...
+    ProcessMenu(MENU_CAMPAIN_CONT, 1);
+    // Set GuiGameStarted = 1 to acctually run a game here...
+    // But select and load the map first...
+    // See CustomGameStart() for info...
+
+    PlayCampaign("orc-exp");
+    GuiGameStarted = 1;
+
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    Invalidate();
+
+    // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
+    EndMenu();
 }
 
 local void EnterNameCancel(void)
@@ -1950,6 +2034,7 @@ local void CustomGameStart(void)
 	strcat(ScenSelectPath, "/");
     }
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
+
     // FIXME: Johns is this here needed? Can the map loaded in create game?
     // ARI: Yes - This switches the menu gfx.. from def. Orc to Human, etc
     InitUnitTypes();
@@ -1958,6 +2043,7 @@ local void CustomGameStart(void)
     //  For an alternative Method see network games..
     //  That way it should work finally..
     LoadMap(ScenSelectPath, &TheMap);
+
     GuiGameStarted = 1;
     EndMenu();
 }
@@ -2105,7 +2191,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     /* FIXME: What this has to do:
 	analyze pudinfo for available slots, disable additional buttons - partially done
 	put names of net-connected players in slots
-    	announce changes by the game creator to connected clients
+	announce changes by the game creator to connected clients
     */
     for (c = h = i = 0; i < 16; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
@@ -2264,7 +2350,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 	    }
 	}
     }
-    /* FIXME: 
+    /* FIXME:
 	 further changes to implement client menu...
     */
 
@@ -2272,7 +2358,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     SetDefaultTextColors(rc, rc);
     DebugLevel3Fn("Hosts[%d].PlyName = %s\n", i, Hosts[i].PlyName);
     VideoDrawText(mi->xofs, mi->yofs, GameFont, Hosts[i].PlyName);
-    
+
     SetDefaultTextColors(nc, rc);
 }
 
@@ -2400,7 +2486,7 @@ global void NetClientUpdateState(void)
 
     GameRESAction(NULL, ServerSetupState.ResOpt);
     NetMultiClientMenuItems[16].d.pulldown.curopt = ServerSetupState.ResOpt;
- 
+
     GameUNSAction(NULL, ServerSetupState.UnsOpt);
     NetMultiClientMenuItems[18].d.pulldown.curopt = ServerSetupState.UnsOpt;
 
@@ -3110,6 +3196,7 @@ global void ProcessMenu(int MenuId, int Loop)
 	MenuButtonUnderCursor = MenuButtonUnderCursorSave;
 	MenuButtonCurSel = MenuButtonCurSelSave;
     }
+
     // FIXME: Johns good point?
     if (Menusbgnd) {
 	VideoFree(Menusbgnd);

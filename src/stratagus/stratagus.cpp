@@ -121,8 +121,10 @@
 **
 **	@subsection CCL CCL
 **
-**		@see ccl.h @see ccl.c
+**		CCL is Craft Configuration Language, which is used to
+**		configure and customize FreeCraft.
 **
+**		@see ccl.h @see ccl.c
 **
 **	@subsection Icon Icon
 **
@@ -181,6 +183,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "netconnect.h"
 #include "ai.h"
 #include "commands.h"
+#include "campaign.h"
 
 #ifdef DEBUG
 extern SCM CclUnits(void);
@@ -488,7 +491,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 
 	PreMenuSetup();
 
-	filename=NULL;
+	filename=NextChapter();
+	DebugLevel0Fn("Next chapter %s\n",filename);
     }
 }
 

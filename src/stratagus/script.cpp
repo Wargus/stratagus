@@ -51,6 +51,7 @@
 #include "font.h"
 #include "pathfinder.h"
 #include "ai.h"
+#include "campaign.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -572,6 +573,7 @@ global void InitCcl(void)
     FontsCclRegister();
     UserInterfaceCclRegister();
     AiCclRegister();
+    CampaignCclRegister();
 
     init_subr_1("load-pud",CclLoadPud);
     init_subr_2("define-map",CclDefineMap);

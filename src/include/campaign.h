@@ -33,16 +33,85 @@
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
+--	Declaration
+----------------------------------------------------------------------------*/
+
+/**
+**	Possible outcomes of the game.
+*/
+typedef enum _game_results_ {
+    GameNoResult,			/// Game has no result
+    GameVictory,			/// Game was won
+    GameDefeat,				/// Game was lost
+    GameDraw,				/// Game was draw
+} GameResults;				/// Game results
+
+/**
+**	Type of the chapters.
+*/
+typedef enum _chapter_types_ {
+    ChapterPlayVideo,			/// Play a video (NOT SUPPORTED)
+    ChapterShowPicture,			/// Show a picture (NOT SUPPORTED)
+    ChapterPlayLevel,			/// Play a level
+    ChapterDefeat,			/// Levels played on defeat
+    ChapterDraw,			/// Levels played on draw
+    ChapterEnd,				/// End chapter (NOT SUPPORTED)
+} ChapterTypes;
+
+/**
+**	Campaign chapter.
+*/
+typedef struct _campaign_chapter_ CampaignChapter;
+
+/**
+**	Campaign chapter structure.
+*/
+struct _campaign_chapter_ {
+    CampaignChapter*	Next;		/// Next campaign chapter
+    ChapterTypes	Type;		/// Type of the chapter (level,...)
+    char*		Name;		/// Chapter name
+    GameResults		Result;		/// Result of this chapter
+};
+
+/**
+**	Campaign structure.
+*/
+typedef struct _campaign_ {
+    const void*		OType;		/// Object type (future extensions)
+
+    char*		Ident;		/// Unique identifier
+    char*		Name;		/// Campaign name
+    int			Players;	/// Campaign for X players
+    // FIXME: next not yet used
+    char*		File;		/// File containing the campaign
+
+    CampaignChapter*	Chapters;	/// Campaign chapters
+} Campaign;
+
+/*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
+extern int GameResult;			/// Outcome of the game
+
+extern const char CampaignType[];	/// Campaign type
+extern Campaign* Campaigns;		/// Campaigns
+extern int NumCampaigns;		/// Number of campaigns
+extern Campaign* CurrentCampaign;	/// Playing this campaign
+extern CampaignChapter* CurrentChapter;	/// Playing this chapter of campaign
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
+    /// Play a campaign
+extern void PlayCampaign(const char* name);
+    /// Next chapter of a campaign
+extern char* NextChapter(void);
+
 extern void CampaignCclRegister(void);	/// Register ccl features
-extern void CleanCampaign(void);	/// Cleanup the campaign module
 extern void SaveCampaign(FILE*);	/// Save the campaign module
+extern void CleanCampaign(void);	/// Cleanup the campaign module
 
 //@}
 
