@@ -602,7 +602,7 @@ local Sample* ChooseSample(SoundRequest* sr)
 /*
 ** Free a channel and unregister its source
 */
-local void FreeOneChannel(int channel)
+global void FreeOneChannel(int channel)
 {
     Channels[channel].Command=ChannelFree;
     Channels[channel].Point=NextFreeChannel;
