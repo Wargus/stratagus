@@ -1464,7 +1464,8 @@ local void LoadAction(void)
     char *name;
     size_t nameLength;
 
-    menu = FindMenu("menu-load-game");
+    // menu = FindMenu("menu-load-game");
+    menu = CurrentMenu;
     fl = menu->items[1].d.listbox.options;
 
     name = fl[menu->items[1].d.listbox.curopt].name;
@@ -1718,12 +1719,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
     if (SoundFildes != -1) {
-#ifdef USE_SDLA
-	SDL_CloseAudio();
-#else
-        close(SoundFildes);
-#endif
-	SoundFildes=-1;
+	QuitSound();
 	SoundOff=1;
     } else {
 	SoundOff=0;
@@ -2471,9 +2467,7 @@ local void EnterNameAction(Menuitem *mi, int key)
 */
 local void EnterServerIPCancel(void)
 {
-    Menu *menu;
-    menu = FindMenu("menu-enter-server");
-    menu->items[1].d.input.nch = 0;
+    CurrentMenu->items[1].d.input.nch = 0;
     EndMenu();
 }
 
@@ -2497,7 +2491,7 @@ local void EnterServerIPAction(Menuitem *mi, int key)
 */
 local void JoinNetGameMenu(void)
 {
-    char server_host_buffer[32];
+    char server_host_buffer[28];
     Menu *menu;
 
     VideoLockScreen();
@@ -2509,7 +2503,8 @@ local void JoinNetGameMenu(void)
     //  Prepare enter ip/hostname menu
     //
     if (NetworkArg) {
-	strcpy(server_host_buffer, NetworkArg);
+	strncpy(server_host_buffer, NetworkArg, 24);
+	server_host_buffer[24] = 0;
     } else {
 	server_host_buffer[0] = '\0';
     }

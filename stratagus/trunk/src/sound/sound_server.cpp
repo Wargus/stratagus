@@ -68,11 +68,7 @@
 #include "sound_id.h"
 #include "unitsound.h"
 #include "tileset.h"
-#ifdef SPLIT_SCREEN_SUPPORT
 #include "ui.h"
-#else /* SPLIT_SCREEN_SUPPORT */
-#include "map.h"
-#endif /* SPLIT_SCREEN_SUPPORT */
 #include "iolib.h"
 
 #include "sound_server.h"
@@ -1000,6 +996,12 @@ global void WriteSound(void)
 
     MixIntoBuffer(buffer,sizeof(buffer)/sizeof(*buffer));
 
+#ifdef WITH_ARTSC
+    if (WriteArtsSound(buffer, sizeof(buffer)) < 0) {
+	DebugLevel0Fn("ARTSD: Write error - Shouldn't happen!\n");
+	
+    }
+#else
     while( write(SoundFildes,buffer,sizeof(buffer))==-1 ) {
 	switch( errno ) {
 	    case EAGAIN:
@@ -1009,6 +1011,7 @@ global void WriteSound(void)
 	perror("write");
 	break;
     }
+#endif
 }
 #endif
 
@@ -1094,6 +1097,12 @@ global void WriteSoundThreaded(void)
 		buffer);
 #endif
 
+#ifdef WITH_ARTSC
+	    if (WriteArtsSound(buffer, sizeof(buffer)) < 0) {
+		DebugLevel0Fn("ARTSD: Write error - Shouldn't happen!\n");
+	
+	    }
+#else
 	    while (write(SoundFildes, buffer, sizeof(buffer)) == -1) {
 		switch (errno) {
 		    case EAGAIN:
@@ -1103,6 +1112,7 @@ global void WriteSoundThreaded(void)
 		perror("write");
 		break;
 	    }
+#endif
 	    how_many_playing -= new_free_channels;
 	}
 	free_channels = MaxChannels - how_many_playing;
@@ -1138,6 +1148,14 @@ global int InitSound(void)
 	return 1;
     }
 #else
+#ifdef WITH_ARTSC
+    //
+    //	Connect to artsd, 8bit samples, stereo.
+    //
+    if( InitArtsSound(SoundFrequency,SoundSampleSize) ) {
+	return 1;
+    }
+#else
     //
     //	Open dsp device, 8bit samples, stereo.
     //
@@ -1145,6 +1163,7 @@ global int InitSound(void)
 	    WaitForSoundDevice) ) {
 	return 1;
     }
+#endif	// WITH_ARTSC
 #endif	// USE_SDLA
 
     //	ARI:	The following must be done here to allow sound to work in
@@ -1172,7 +1191,6 @@ global int InitSound(void)
 */
 global int InitSoundServer(void)
 {
-#ifdef SPLIT_SCREEN_SUPPORT
     int MapWidth = (TheUI.MapArea.EndX-TheUI.MapArea.X +TileSizeX) / TileSizeX;
     int MapHeight = (TheUI.MapArea.EndY-TheUI.MapArea.Y +TileSizeY) / TileSizeY;
     //FIXME: Valid only in shared memory context!
@@ -1180,13 +1198,6 @@ global int InitSoundServer(void)
     DebugLevel2("Distance Silent: %d\n" _C_ DistanceSilent);
     ViewPointOffset=max(MapWidth/2,MapHeight/2);
     DebugLevel2("ViewPointOffset: %d\n" _C_ ViewPointOffset);
-#else /* SPLIT_SCREEN_SUPPORT */
-    //FIXME: Valid only in shared memory context!
-    DistanceSilent=3*max(MapWidth,MapHeight);
-    DebugLevel2("Distance Silent: %d\n" _C_ DistanceSilent);
-    ViewPointOffset=max(MapWidth/2,MapHeight/2);
-    DebugLevel2("ViewPointOffset: %d\n" _C_ ViewPointOffset);
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 #ifdef USE_THREAD
     if (WithSoundThread) {
@@ -1221,12 +1232,15 @@ global void QuitSound(void)
     SDL_CloseAudio();
     SoundFildes=-1;
 #else
+#ifdef WITH_ARTSC
+    ExitArtsSound();
+#else // ! WITH_ARTSC
     if (SoundFildes != -1) {
 	close(SoundFildes);
 	SoundFildes=-1;
     }
-#endif
-    QuitCD();
+#endif // WITH_ARTSC
+#endif // USE_SDLA
 }
 
 global void QuitCD(void)

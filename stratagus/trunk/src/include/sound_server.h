@@ -280,6 +280,14 @@ extern int InitSound(void);
 extern int InitOssSound(const char* dev,int freq,int size,int wait);
     /// Initialize the sound card with SDL support.
 extern int InitSdlSound(const char* dev,int freq,int size,int wait);
+    /// Initialize connection to arts sound daemon.
+extern int InitArtsSound(int freq,int size);
+    /// Close the arts sound daemon connection.
+extern void ExitArtsSound(void);
+    /// Write out sound data to arts daemon.
+extern int WriteArtsSound(void* data,int len);
+    /// Query available sample buffer space from arts daemon.
+extern int ArtsGetSpace(void);
 
     /// Initialize the sound server.
 extern int InitSoundServer(void);
