@@ -37,6 +37,8 @@
 #include "video.h"
 #include "font.h"
 
+#include "intern_video.h"
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -491,23 +493,53 @@ global int VideoDrawTextCentered(int x,int y,unsigned font,const unsigned char* 
 **
 **	@return		The lenght of the printed text.
 */
-global int VideoDrawNumber(int x,int y,unsigned font,int number)
+global int VideoDrawNumber(int x, int y, unsigned font, int number)
 {
     //char buf[sizeof(int)*10+2];
     //sprintf(buf,"%d",number);
     char bufs[16];
     char bufd[16];
     int sl, s, d;
+
     sl = s = d = 0;
-    sprintf(bufs,"%d",number);
-    sl = strlen( bufs );
-    while(4)
-      {
-      if( s > 0 && s < sl && (s - (sl % 3)) % 3 == 0 ) bufd[d++] = ',';
-      bufd[d++] = bufs[s++];
-      if ( s > sl ) break;
-      }
-    return VideoDrawText(x,y,font,bufd);
+    sprintf(bufs, "%d", number);
+    sl = strlen(bufs);
+    while (4) {
+	if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0)
+	    bufd[d++] = ',';
+	bufd[d++] = bufs[s++];
+	if (s > sl)
+	    break;
+    }
+    return VideoDrawText(x, y, font, bufd);
+}
+
+/**
+**	Draw number with font at x,y clipped.
+**
+**	@param x	X screen position
+**	@param y	Y screen position
+**	@param font	Font number
+**	@param number	Number to be displayed.
+**
+**	@return		The lenght of the printed text.
+**
+**	@todo	Not real clipped, not drawn if too long!
+*/
+global int VideoDrawNumberClip(int x, int y, unsigned font, int number)
+{
+    char buf[sizeof(int) * 10 + 2];
+    const ColorFont* fp;
+    int n;
+
+    fp = Fonts + font;
+    sprintf(buf, "%d", number);
+    n = VideoTextLength(font, buf);
+
+    if( x<ClipX1 || x+n>ClipX2 || y<ClipY1 || y+fp->Height>ClipY2 ) {
+	return 0;
+    }
+    return VideoDrawText(x, y, font, buf);
 }
 
 /**
