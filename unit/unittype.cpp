@@ -474,12 +474,13 @@ local void SaveAnimations(const UnitType* type,FILE* file)
 /**
 **	Save state of an unit-type to file.
 **
-**	@param type	Unit-type to save.
 **	@param file	Output file.
+**	@param type	Unit-type to save.
+**	@param all	Flag save all values.
 **
 **	@todo	Arrange the variables more logical
 */
-local void NewSaveUnitType(const UnitType* type,FILE* file)
+local void NewSaveUnitType(FILE* file,const UnitType* type,int all)
 {
     int i;
     int flag;
@@ -495,13 +496,13 @@ local void NewSaveUnitType(const UnitType* type,FILE* file)
 	for( flag=i=0; i<TilesetMax; ++i ) {
 	    if( type->File[i] ) {
 		if( flag ) {
-		    fprintf(file,"\n  ");
+		    fputs("\n    ",file);
 		}
 		fprintf(file,"%s \"%s\"",Tilesets[i]->Ident,type->File[i]);
 		flag=1;
 	    }
 	}
-	fprintf(file,")");
+	fputs(")",file);
     }
     fprintf(file,"\n  'size '(%d %d)\n",type->Width,type->Height);
 
@@ -515,51 +516,84 @@ local void NewSaveUnitType(const UnitType* type,FILE* file)
     }
     fprintf(file,"  'animations 'animations-%s",temp->Ident+5);
     fprintf(file," 'icon '%s\n",IdentOfIcon(type->Icon.Icon));
-    fprintf(file,"  'costs #('%s %d '%s %d '%s %d '%s %d '%s %d '%s %d '%s %d)\n"
-	,DEFAULT_NAMES[TimeCost],type->_Costs[TimeCost]
-	,DEFAULT_NAMES[GoldCost],type->_Costs[GoldCost]
-	,DEFAULT_NAMES[WoodCost],type->_Costs[WoodCost]
-	,DEFAULT_NAMES[OilCost],type->_Costs[OilCost]
-	,DEFAULT_NAMES[OreCost],type->_Costs[OreCost]
-	,DEFAULT_NAMES[StoneCost],type->_Costs[StoneCost]
-	,DEFAULT_NAMES[CoalCost],type->_Costs[CoalCost]);
+    for( i=flag=0; i<MaxCosts; ++i ) {
+	if( all || type->_Costs[i] ) {
+	    if( !flag ) {
+		fputs("  'costs '(",file);
+		flag=1;
+	    } else {
+		fputs(" ",file);
+	    }
+	    fprintf(file,"%s %d",DEFAULT_NAMES[i],type->_Costs[i]);
+	}
+    }
+    if( flag ) {
+	fputs(")\n",file);
+    }
 
-    fprintf(file,"  'construction '%s\n",type->Construction->Ident);
+    if( type->Construction ) {
+	fprintf(file,"  'construction '%s\n",type->Construction->Ident);
+    }
     fprintf(file,"  'speed %d\n",type->_Speed);
     fprintf(file,"  'hit-points %d\n",type->_HitPoints);
-    fprintf(file,"  'magic %d\n",type->Magic);
+    if( all || type->Magic ) {
+	fprintf(file,"  'magic %d\n",type->Magic);
+    }
     fprintf(file,"  'tile-size '(%d %d)",type->TileWidth,type->TileHeight);
     fprintf(file," 'box-size '(%d %d)\n",type->BoxWidth,type->BoxHeight);
     fprintf(file,"  'sight-range %d",type->_SightRange);
-    fprintf(file," 'computer-reaction-range %d",type->ReactRangeComputer);
-    fprintf(file," 'person-reaction-range %d\n",type->ReactRangePerson);
+    if( all || type->ReactRangeComputer ) {
+	fprintf(file," 'computer-reaction-range %d",type->ReactRangeComputer);
+    }
+    if( all || type->ReactRangePerson ) {
+	fprintf(file," 'person-reaction-range %d",type->ReactRangePerson);
+    }
+    fputs("\n",file);
 
-    fprintf(file,"  'armor %d",type->_Armor);
+    if( all || type->_Armor ) {
+	fprintf(file,"  'armor %d",type->_Armor);
+    } else {
+	fputs(" ",file);
+    }
     fprintf(file," 'basic-damage %d",type->_BasicDamage);
     fprintf(file," 'piercing-damage %d",type->_PiercingDamage);
     fprintf(file," 'missile '%s\n",type->Missile.Name);
-    fprintf(file,"  'min-attack-range %d",type->MinAttackRange);
-    fprintf(file," 'max-attack-range %d\n",type->_AttackRange);
-
-    fprintf(file,"  'weapons-upgradable %d",type->WeaponsUpgradable);
-    fprintf(file," 'armor-upgradable %d\n",type->ArmorUpgradable);
+    if( all || type->MinAttackRange ) {
+	fprintf(file,"  'min-attack-range %d",type->MinAttackRange);
+	fprintf(file," 'max-attack-range %d\n",type->_AttackRange);
+    } else if( type->_AttackRange ) {
+	fprintf(file,"  'max-attack-range %d\n",type->_AttackRange);
+    }
+    if( all || type->WeaponsUpgradable ) {
+	fprintf(file,"  'weapons-upgradable %d",type->WeaponsUpgradable);
+	if( all || type->ArmorUpgradable ) {
+	    fprintf(file," 'armor-upgradable %d\n",type->ArmorUpgradable);
+	} else {
+	    fputs("\n",file);
+	}
+    } else if( type->ArmorUpgradable ) {
+	fprintf(file,"  'armor-upgradable %d\n",type->ArmorUpgradable);
+    }
     fprintf(file,"  'priority %d",type->Priority);
-    fprintf(file," 'annoy-computer-factor %d\n",type->AnnoyComputerFactor);
-    if( type->DecayRate ) {
+    if( all || type->AnnoyComputerFactor ) {
+	fprintf(file," 'annoy-computer-factor %d",type->AnnoyComputerFactor);
+    }
+    fputs("\n",file);
+    if( all || type->DecayRate ) {
 	fprintf(file,"  'decay-rate %d\n",type->DecayRate);
     }
-    if( type->Points ) {
+    if( all || type->Points ) {
 	fprintf(file,"  'points %d\n",type->Points);
     }
-    if( type->Demand ) {
+    if( all || type->Demand ) {
 	fprintf(file,"  'demand %d\n",type->Demand);
     }
-    if( type->Supply ) {
+    if( all || type->Supply ) {
 	fprintf(file,"  'supply %d\n",type->Supply);
     }
 
     if( type->CorpseName ) {
-	fprintf(file,"  'corpse '('%s %d)\n",
+	fprintf(file,"  'corpse '(%s %d)\n",
 		type->CorpseName,type->CorpseScript);
     }
     if( type->ExplodeWhenKilled ) {
@@ -569,16 +603,16 @@ local void NewSaveUnitType(const UnitType* type,FILE* file)
     fprintf(file,"  ");
     switch( type->UnitType ) {
 	case UnitTypeLand:
-	    fprintf(file,"'type-land");
+	    fputs("'type-land",file);
 	    break;
 	case UnitTypeFly:
-	    fprintf(file,"'type-fly");
+	    fputs("'type-fly",file);
 	    break;
 	case UnitTypeNaval:
-	    fprintf(file,"'type-naval");
+	    fputs("'type-naval",file);
 	    break;
 	default:
-	    fprintf(file,"'type-unknown");
+	    fputs("'type-unknown",file);
 	    break;
     }
     fprintf(file,"\n");
@@ -586,7 +620,9 @@ local void NewSaveUnitType(const UnitType* type,FILE* file)
     fprintf(file,"  ");
     switch( type->MouseAction ) {
 	case MouseActionNone:
-	    fprintf(file,"'right-none");
+	    if( all ) {
+		fprintf(file,"'right-none");
+	    }
 	    break;
 	case MouseActionAttack:
 	    fprintf(file,"'right-attack");
@@ -720,53 +756,42 @@ local void NewSaveUnitType(const UnitType* type,FILE* file)
 	fprintf(file,"  'teleporter\n");
     }
 
+    fprintf(file,"  'sounds '(");
     if( type->Sound.Selected.Name ) {
-	fprintf(file,"  'sounds #('selected \"%s\"\n",
-		type->Sound.Selected.Name);
-    } else {
-	fprintf(file,"  #( ()\n");
+	fprintf(file,"\n    selected \"%s\"",type->Sound.Selected.Name);
     }
     if( type->Sound.Acknowledgement.Name ) {
-	fprintf(file,"    'acknowledge \"%s\"\n",
+	fprintf(file,"\n    acknowledge \"%s\"",
 		type->Sound.Acknowledgement.Name);
-    } else {
-	fprintf(file,"    ()\n");
     }
     if( type->Sound.Ready.Name ) {
-	fprintf(file,"    'ready \"%s\"\n",type->Sound.Ready.Name);
-    } else {
-	fprintf(file,"    ()\n");
+	fprintf(file,"\n    ready \"%s\"",type->Sound.Ready.Name);
     }
     if( type->Sound.Help.Name ) {
-	fprintf(file,"    'help \"%s\"\n",type->Sound.Help.Name);
-    } else {
-	fprintf(file,"    ()\n");
+	fprintf(file,"\n    help \"%s\"",type->Sound.Help.Name);
     }
     if( type->Sound.Dead.Name ) {
-	fprintf(file,"    'dead \"%s\" )\n",type->Sound.Dead.Name);
-    } else {
-	fprintf(file,"    () )\n");
+	fprintf(file,"\n    dead \"%s\"",type->Sound.Dead.Name);
     }
+    // FIXME: Attack should be removed!
     if( type->Weapon.Attack.Name ) {
-	fprintf(file,"  'attack \"%s\" )\n",type->Weapon.Attack.Name);
-    } else {
-	fprintf(file,"  () )\n");
+	fprintf(file,"\n    attack \"%s\"",type->Weapon.Attack.Name);
     }
-    fprintf(file,"\n");
+    fprintf(file,")");
+    fprintf(file,")\n\n");
 }
 
+#if 0
 /**
 **	Save state of an unit-type to file.
 **
 **	@param type	Unit-type to save.
 **	@param file	Output file.
 */
-local void SaveUnitType(const UnitType* type,FILE* file)
+local void OldSaveUnitType(const UnitType* type,FILE* file)
 {
     int i;
     const UnitType* temp;
-
-    NewSaveUnitType(type,file);
 
     fprintf(file,"(define-unit-type \"%s\"",type->Ident);
     if( strlen(type->Ident)<12 ) {
@@ -1043,6 +1068,7 @@ local void SaveUnitType(const UnitType* type,FILE* file)
 	fprintf(file,"  () )\n");
     }
 }
+#endif
 
 /**
 **	Save state of an unit-stats to file.
@@ -1116,7 +1142,8 @@ global void SaveUnitTypes(FILE* file)
 
     for( type=UnitTypes; type->OType; ++type ) {
 	fputc('\n',file);
-	SaveUnitType(type,file);
+	NewSaveUnitType(file,type,0);
+	//OldSaveUnitType(type,file);
     }
 
     //	Save all stats
