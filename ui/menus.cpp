@@ -37,6 +37,10 @@
 #include "cursor.h"
 #include "new_video.h"
 
+#ifndef NEW_VIDEO
+#error ONLY WORKS WITH NEW VIDEO!
+#endif
+
 /*----------------------------------------------------------------------------
 --	Prototypes for action handlers
 ----------------------------------------------------------------------------*/
@@ -57,14 +61,8 @@ local struct {
     const char*	File[PlayerMaxRaces];
 	/// Width of button
     int		Width, Height;
-
-#ifdef NEW_VIDEO
 	/// sprite : FILLED
     Graphic*	Sprite;
-#else
-	/// sprite : FILLED
-    RleSprite*	RleSprite;
-#endif
 } MenuButtonGfx = {
     { "interface/buttons 1.png" ,"interface/buttons 2.png" },
     300, 7632
@@ -84,19 +82,19 @@ local int MenuButtonCurSel = -1;
 local Menuitem GameMenuItems[] = {
     { MI_TYPE_TEXT, { text:{ 128, 11, MI_FLAGS_CENTERED, LargeFont, "Game Menu"} } },
     { MI_TYPE_BUTTON, { button:{ 16, 40, MenuButtonDisabled, LargeFont,
-	 "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, KeyCodeF11, GameMenuSave} } },
+	 "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11} } },
     { MI_TYPE_BUTTON, { button:{ 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont,
-	 "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, KeyCodeF12, NULL} } },
+	 "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, NULL, KeyCodeF12} } },
     { MI_TYPE_BUTTON, { button:{ 16, 40 + 36, MenuButtonDisabled, LargeFont,
-	 "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, KeyCodeF5, NULL} } },
+	 "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF5} } },
     { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont,
-	 "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, KeyCodeF1, NULL} } },
+	 "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF1} } },
     { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36 + 36, MenuButtonDisabled, LargeFont,
-	 "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, 'o', NULL} } },
+	 "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, NULL, 'o'} } },
     { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont,
-	 "~!End Scenario", 224, 27, MBUTTON_GM_FULL, 'e', GameMenuEnd} } },
+	 "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'e'} } },
     { MI_TYPE_BUTTON, { button:{ 16, 288-40, MenuButtonSelected, LargeFont,
-	 "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, '\033', GameMenuReturn} } },
+	 "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, GameMenuReturn, '\033'} } },
 };
 
 /**
@@ -106,9 +104,9 @@ local Menuitem VictoryMenuItems[] = {
     { MI_TYPE_TEXT, { text:{ 144, 11, MI_FLAGS_CENTERED, LargeFont, "Congratulations!"} } },
     { MI_TYPE_TEXT, { text:{ 144, 32, MI_FLAGS_CENTERED, LargeFont, "You are victorious!"} } },
     { MI_TYPE_BUTTON, { button:{ 32, 90, MenuButtonSelected, LargeFont,
-	 "~!Victory", 106, 27, MBUTTON_GM_FULL, 'v', GameMenuEnd} } },
+	 "~!Victory", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'} } },
     { MI_TYPE_BUTTON, { button:{ 32, 56, MenuButtonDisabled, LargeFont,
-	 "Save Game (~<F11~>)", 224, 27, MBUTTON_GM_FULL, KeyCodeF11, NULL} } },
+	 "Save Game (~<F11~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF11} } },
 };
 
 /**
@@ -118,18 +116,37 @@ local Menuitem LostMenuItems[] = {
     { MI_TYPE_TEXT, { text:{ 144, 11, MI_FLAGS_CENTERED, LargeFont, "You failed to"} } },
     { MI_TYPE_TEXT, { text:{ 144, 32, MI_FLAGS_CENTERED, LargeFont, "achieve victory!"} } },
     { MI_TYPE_BUTTON, { button:{ 32, 90, MenuButtonSelected, LargeFont,
-	 "~!OK", 106, 27, MBUTTON_GM_FULL, 'o', GameMenuEnd} } },
+	 "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'} } },
 };
 
 /**
-**	Items for the SelectScen Menu - (WIP)
+**	Items for the SelectScen Menu
 */
+local unsigned char *ssmtoptions[] = {
+    "Built-in scenario",
+    "Custom scenario"
+};
+
+local unsigned char *ssmsoptions[] = {
+    "Any size",
+    "32 x 32",
+    "64 x 64",
+    "96 x 96",
+    "128 x 128",
+};
+
 local Menuitem SelectScenMenuItems[] = {
     { MI_TYPE_TEXT, { text:{ 176, 8, MI_FLAGS_CENTERED, LargeFont, "Select scenario"} } },
+    { MI_TYPE_TEXT, { text:{ 132, 40, MI_FLAGS_RALIGN, LargeFont, "Type:"} } },
+    { MI_TYPE_PULLDOWN, { pulldown:{ 140, 40, 0, GameFont, ssmtoptions,
+	      192, 20, MBUTTON_PULLDOWN, NULL, 2, 1, 1, 0} } },
+    { MI_TYPE_TEXT, { text:{ 132, 80, MI_FLAGS_RALIGN, LargeFont, "Map size:"} } },
+    { MI_TYPE_PULLDOWN, { pulldown:{ 140, 80, 0, GameFont, ssmsoptions,
+	      192, 20, MBUTTON_PULLDOWN, NULL, 5, 0, 0, 0} } },
     { MI_TYPE_BUTTON, { button:{ 48, 318, MenuButtonSelected, LargeFont,
-	 "OK", 106, 27, MBUTTON_GM_HALF, 0, NULL} } },
+	 "OK", 106, 27, MBUTTON_GM_HALF, NULL, 0} } },
     { MI_TYPE_BUTTON, { button:{ 198, 318, 0, LargeFont,
-	 "Cancel", 106, 27, MBUTTON_GM_HALF, 0, NULL} } },
+	 "Cancel", 106, 27, MBUTTON_GM_HALF, NULL, 0} } },
 };
 
 /**
@@ -169,7 +186,7 @@ global Menu Menus[] = {
 	(480-352)/2,
 	352, 352,
 	ImagePanel5,
-	1, 3,
+	5, 7,
 	SelectScenMenuItems
     },
 };
@@ -212,11 +229,7 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
 	    SetDefaultTextColors(rc,rc);
 	}
     }
-#ifdef NEW_VIDEO
     VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
-#else
-    DrawRleSprite(MenuButtonGfx.RleSprite, rb, x, y);
-#endif
     if (text) {
 	DrawTextCentered(s+x+w/2,s+y+(font == GameFont ? 4 : 7),font,text);
     }
@@ -227,6 +240,73 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
     SetDefaultTextColors(nc,rc);
 }
 
+/**
+**	Draw pulldown 'button' on menu mx, my
+**
+**	@param mi	menuitem pointer
+**	@param mx	menu X display position (offset)
+**	@param my	menu Y display position (offset)
+*/
+local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
+{
+    int i, nc, rc;
+    char *text;
+    MenuButtonId rb = mi->d.pulldown.button;
+    unsigned flags = mi->d.pulldown.flags;
+    unsigned w, h, x, y, oh;
+    w = mi->d.pulldown.xsize;
+    x = mx+mi->d.pulldown.xofs;
+    y = my+mi->d.pulldown.yofs;
+    oh = h = mi->d.pulldown.ysize - 2;
+
+    GetDefaultTextColors(&nc, &rc);
+    if (flags&MenuButtonClicked) {
+	y -= mi->d.pulldown.curopt * h;
+	i = mi->d.pulldown.noptions;
+	h *= i;
+	while (i--) {
+	    PushClipping();
+	    SetClipping(0,0,x+w,VideoHeight);
+	    VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1 + oh*i);
+	    PopClipping();
+	    text = mi->d.pulldown.options[i];
+	    if (text) {
+		if (i == mi->d.pulldown.cursel)
+		    SetDefaultTextColors(rc,rc);
+		else
+		    SetDefaultTextColors(nc,rc);
+		DrawText(x+2,y+2 + oh*i ,mi->d.pulldown.font,text);
+	    }
+	}
+	w += 2;
+    } else {
+	h = mi->d.pulldown.ysize;
+	y = my+mi->d.pulldown.yofs;
+	if (flags&MenuButtonDisabled) {
+	    rb--;
+	    SetDefaultTextColors(FontGrey,FontGrey);
+	} else {
+	    if (flags&MenuButtonActive) {
+		SetDefaultTextColors(rc,rc);
+	    }
+	}
+	
+	PushClipping();
+	SetClipping(0,0,x+w-20,VideoHeight);
+	VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1);
+	PopClipping();
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN, x-1 + w-20, y-2);
+	text = mi->d.pulldown.options[mi->d.pulldown.curopt];
+	if (text) {
+	    DrawText(x+2,y+2,mi->d.pulldown.font,text);
+	}
+    }
+    if (flags&MenuButtonSelected) {
+	VideoDrawRectangle(ColorYellow,x-2,y-2,w,h);
+	/// FIXME: use ColorGrey if selected button is disabled!
+    }
+    SetDefaultTextColors(nc,rc);
+}
 
 /**
 **	Draw menu  'menu'
@@ -235,7 +315,7 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
 */
 global void DrawMenu(int MenuId)
 {
-    int i, n;
+    int i, n, l;
     Menu *menu;
     Menuitem *mi;
 
@@ -254,7 +334,11 @@ global void DrawMenu(int MenuId)
 		if (mi->d.text.flags&MI_FLAGS_CENTERED)
 		    DrawTextCentered(menu->x+mi->d.text.xofs,menu->y+mi->d.text.yofs,
 			    mi->d.text.font,mi->d.text.text);
-		else
+		else if (mi->d.text.flags&MI_FLAGS_RALIGN) {
+		    l = TextLength(mi->d.text.font,mi->d.text.text);
+		    DrawText(menu->x+mi->d.text.xofs-l,menu->y+mi->d.text.yofs,
+			    mi->d.text.font,mi->d.text.text);
+		} else
 		    DrawText(menu->x+mi->d.text.xofs,menu->y+mi->d.text.yofs,
 			    mi->d.text.font,mi->d.text.text);
 		break;
@@ -263,6 +347,9 @@ global void DrawMenu(int MenuId)
 			    mi->d.button.xsize,mi->d.button.ysize,
 			    menu->x+mi->d.button.xofs,menu->y+mi->d.button.yofs,
 			    mi->d.button.font,mi->d.button.text);
+		break;
+	    case MI_TYPE_PULLDOWN:
+		    DrawPulldown(mi,menu->x,menu->y);
 		break;
 	    default:
 		break;
@@ -341,8 +428,28 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 		}
 	    }
 	    break;
-	case 9: 				/// TAB			// FIXME: Add Shift-TAB
+	case KeyCodeUp: case KeyCodeDown:
 	    if (MenuButtonCurSel != -1) {
+		mi = menu->items + MenuButtonCurSel;
+		if (mi->mitype == MI_TYPE_PULLDOWN && !(mi->d.pulldown.flags&MenuButtonClicked)) {
+		    if (key == KeyCodeDown) {
+			if (mi->d.pulldown.curopt + 1 < mi->d.pulldown.noptions)
+			    mi->d.pulldown.curopt++;
+			else
+			    break;
+		    } else {
+			if (mi->d.pulldown.curopt > 0)
+			    mi->d.pulldown.curopt--;
+			else
+			    break;
+		    }
+		    MustRedraw |= RedrawMenu;
+		    // FIXME: DISPLAY-ACTION HERE .....
+		}
+	    }
+	    break;
+	case 9: 				/// TAB			// FIXME: Add Shift-TAB
+	    if (MenuButtonCurSel != -1 && !(menu->items[MenuButtonCurSel].d.button.flags&MenuButtonClicked)) {
 		n = menu->nitems;
 		for (i = 0; i < n; ++i) {
 		    mi = menu->items + ((MenuButtonCurSel + i + 1) % n);
@@ -358,13 +465,23 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 			    MenuButtonCurSel = mi - menu->items;
 			    MustRedraw |= RedrawMenu;
 			    return 1;
+			case MI_TYPE_PULLDOWN:
+			    if (mi->d.pulldown.flags & MenuButtonDisabled) {
+				break;
+			    }
+			    mi->d.pulldown.flags |= MenuButtonSelected;
+			    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
+			    // FIXME: maybe different union member, not button!
+			    MenuButtonCurSel = mi - menu->items;
+			    MustRedraw |= RedrawMenu;
+			    return 1;
 			default:
 			    break;
 		    }
 		}
 	    }
 	    break;
-	case 'q':
+	case 'Q':
 	    Exit(0);
 	default:
 	    DebugLevel3("Key %d\n",key);
@@ -382,7 +499,7 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 */
 global void MenuHandleMouseMove(int x,int y)
 {
-    int i, n, xs, ys;
+    int h, i, j, n, xs, ys;
     Menuitem *mi;
     Menu *menu = Menus + CurrentMenu;
     int RedrawFlag = 0;
@@ -413,6 +530,42 @@ global void MenuHandleMouseMove(int x,int y)
 		    MenuButtonUnderCursor = i;
 		}
 		break;
+	    case MI_TYPE_PULLDOWN:
+		if (!(mi->d.pulldown.flags&MenuButtonDisabled)) {
+		    xs = menu->x + mi->d.pulldown.xofs;
+		    if (mi->d.pulldown.flags&MenuButtonClicked) {
+			ys = menu->y + mi->d.pulldown.yofs;
+			h = mi->d.pulldown.ysize - 2;
+			ys -= mi->d.pulldown.curopt * h;
+			if (x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + h*mi->d.pulldown.noptions) {
+			    continue;
+			}
+			j = (y - ys) / h;
+			if (j != mi->d.pulldown.cursel) {
+			    mi->d.pulldown.cursel = j;
+			    RedrawFlag = 1;
+			    // FIXME: DISPLAY-ACTION HERE .....
+			}
+		    } else {
+			ys = menu->y + mi->d.pulldown.yofs;
+			if (x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + mi->d.pulldown.ysize) {
+			    if (!(mi->d.pulldown.flags&MenuButtonClicked)) {
+				if (mi->d.pulldown.flags&MenuButtonActive) {
+				    RedrawFlag = 1;
+				    mi->d.pulldown.flags &= ~MenuButtonActive;
+				}
+			    }
+			    continue;
+			}
+		    }
+		    if (!(mi->d.pulldown.flags&MenuButtonActive)) {
+			RedrawFlag = 1;
+			mi->d.pulldown.flags |= MenuButtonActive;
+		    }
+		    DebugLevel3("On menu pulldown %d\n", i);
+		    MenuButtonUnderCursor = i;
+		}
+		break;
 	    default:
 		break;
 	}
@@ -435,12 +588,31 @@ global void MenuHandleButtonDown(int b)
     if (MouseButtons&LeftButton) {
 	if (MenuButtonUnderCursor != -1) {
 	    mi = menu->items + MenuButtonUnderCursor;
-	    if (!(mi->d.button.flags&MenuButtonClicked)) {
-		if (MenuButtonCurSel != -1) {
-		    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
-		}
-		mi->d.button.flags |= MenuButtonClicked|MenuButtonSelected;
-		MustRedraw |= RedrawMenu;
+	    switch (mi->mitype) {
+		case MI_TYPE_BUTTON:
+		    if (!(mi->d.button.flags&MenuButtonClicked)) {
+			if (MenuButtonCurSel != -1) {
+			    // FIXME: maybe different union member, not button!
+			    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
+			}
+			MenuButtonCurSel = MenuButtonUnderCursor;
+			mi->d.button.flags |= MenuButtonClicked|MenuButtonSelected;
+			MustRedraw |= RedrawMenu;
+		    }
+		    break;
+		case MI_TYPE_PULLDOWN:
+		    if (!(mi->d.pulldown.flags&MenuButtonClicked)) {
+			if (MenuButtonCurSel != -1) {
+			    // FIXME: maybe different union member, not button!
+			    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
+			}
+			MenuButtonCurSel = MenuButtonUnderCursor;
+			mi->d.pulldown.flags |= MenuButtonClicked|MenuButtonSelected;
+			mi->d.pulldown.cursel = mi->d.pulldown.curopt;
+			MustRedraw |= RedrawMenu;
+		    }
+		default:
+		    break;
 	    }
 	}
     }
@@ -473,6 +645,22 @@ global void MenuHandleButtonUp(int b)
 				(*mi->d.button.handler)();
 			    }
 			}
+		    }
+		    break;
+		case MI_TYPE_PULLDOWN:
+		    if (mi->d.pulldown.flags&MenuButtonClicked) {
+			RedrawFlag = 1;
+			mi->d.pulldown.flags &= ~MenuButtonClicked;
+			if (MenuButtonUnderCursor == i) {
+			    MenuButtonUnderCursor = -1;
+			    if (mi->d.pulldown.cursel != mi->d.pulldown.curopt) {
+				mi->d.pulldown.curopt = mi->d.pulldown.cursel;
+				if (mi->d.button.handler) {
+				    (*mi->d.button.handler)();
+				}
+			    }
+			}
+			mi->d.pulldown.cursel = 0;
 		    }
 		    break;
 		default:
@@ -517,6 +705,17 @@ global void ProcessMenu(int MenuId, int Loop)
 		}
 		// FIXME: Maybe activate if mouse-pointer is over it right now?
 		break;
+	    case MI_TYPE_PULLDOWN:
+		mi->d.pulldown.flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
+		mi->d.pulldown.cursel = 0;
+		if (mi->d.pulldown.defopt != -1)
+		    mi->d.pulldown.curopt = mi->d.pulldown.defopt;
+		if (i == menu->defsel) {
+		    mi->d.pulldown.flags |= MenuButtonSelected;
+		    MenuButtonCurSel = i;
+		}
+		// FIXME: Maybe activate if mouse-pointer is over it right now?
+		break;
 	    default:
 		break;
 	}
@@ -554,21 +753,13 @@ global void InitMenus(unsigned int race)
     if (race == last_race)	// same race? already loaded!
 	return;
     if (last_race != -1) {	// free previous sprites for different race
-#ifdef NEW_VIDEO
 	VideoFree(MenuButtonGfx.Sprite);
-#else
-	FreeRleSprite(MenuButtonGfx.RleSprite);
-#endif
     }
     last_race = race;
     file = MenuButtonGfx.File[race];
     buf = alloca(strlen(file) + 9 + 1);
     file = strcat(strcpy(buf, "graphic/"), file);
-#ifdef NEW_VIDEO
     MenuButtonGfx.Sprite = LoadSprite(file, 0, 144);
-#else
-    MenuButtonGfx.RleSprite = LoadRleSprite(file, 0, 144);
-#endif
 }
 
 //@}
