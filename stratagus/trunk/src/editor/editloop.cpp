@@ -924,6 +924,8 @@ local void EditorCallbackButtonUp(unsigned button)
 local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 {
     int i;
+    int percent = UnitIndex * 100 / (MaxUnitIndex / 9 * 9);
+    int j = (percent * (176 - 8 - 54)) / 100;
 
     DebugLevel3Fn("%x %x\n" _C_ button _C_ MouseButtons);
 
@@ -1000,7 +1002,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
     //
     if (EditorState == EditorEditUnit) {
 	if (TheUI.ButtonPanelX + 4 < CursorX
-		&& CursorX < TheUI.ButtonPanelX + 24
+		&& CursorX < TheUI.ButtonPanelX + 4 + 18 + j
 		&& TheUI.ButtonPanelY + 4 < CursorY
 		&& CursorY < TheUI.ButtonPanelY + 24) {
 
@@ -1009,7 +1011,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	    }
 	    return;
 	}
-	if (TheUI.ButtonPanelX + 176 - 24 < CursorX
+	if (TheUI.ButtonPanelX + 4 + 18 + j + 18 < CursorX
 		&& CursorX < TheUI.ButtonPanelX + 176 - 4
 		&& TheUI.ButtonPanelY + 4 < CursorY
 		&& CursorY < TheUI.ButtonPanelY + 24) {
