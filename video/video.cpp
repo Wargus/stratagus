@@ -173,6 +173,7 @@ global SDL_Surface* TheScreen;
 
 global int VideoSyncSpeed = 100;            /// 0 disable interrupts
 global volatile int VideoInterrupts;        /// be happy, were are quicker
+global int SkipFrames;						/// Skip this frames
 
 global int ColorWaterCycleStart;
 global int ColorWaterCycleEnd;

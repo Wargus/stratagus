@@ -142,6 +142,8 @@ extern int VideoSyncSpeed;
 
 extern volatile int VideoInterrupts;
 
+extern int SkipFrames;
+
 	/// Wanted videomode, fullscreen or windowed.
 extern char VideoFullScreen;
 
