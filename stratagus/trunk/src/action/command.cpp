@@ -97,17 +97,18 @@ static void ReleaseOrders(Unit* unit)
 */
 static Order* GetNextOrder(Unit* unit, int flush)
 {
-	Order *OldOrders;
+	Order* old_orders;
+
 	if (flush) {
 		// empty command queue
 		ReleaseOrders(unit);
 	} else if (unit->OrderCount == unit->TotalOrders) {
 		// Expand Order Queue if filled
-		OldOrders = unit->Orders;
+		old_orders = unit->Orders;
 		unit->Orders = realloc(unit->Orders, sizeof(Order) * unit->TotalOrders * 2);
 		// Realloc failed, fail gracefully
 		if (!unit->Orders) {
-			unit->Orders = OldOrders;
+			unit->Orders = old_orders;
 			NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
 				"Unable to add order to list");
 			return NULL;
@@ -119,7 +120,7 @@ static Order* GetNextOrder(Unit* unit, int flush)
 	return &unit->Orders[(int)unit->OrderCount++];
 }
 
-/*
+/**
 **  Remove an order from the list of orders pending
 **
 **  @param unit   pointer to unit
@@ -151,7 +152,7 @@ static void RemoveOrder(Unit* unit, int order)
 **
 **  @param unit  Unit pointer, that get the saved action cleared.
 **
-**  @note        If we make an new order, we must clear any saved actions.
+**  @note        If we make a new order, we must clear any saved actions.
 **  @note        Internal functions, must protect it, if needed.
 */
 static void ClearSavedAction(Unit* unit)
@@ -703,7 +704,7 @@ void CommandBuildBuilding(Unit* unit, int x, int y,
 /**
 **  Cancel the building construction, or kill an unit.
 **
-**  @param unit    pointer to unit.
+**  @param unit  pointer to unit.
 */
 void CommandDismiss(Unit* unit)
 {
