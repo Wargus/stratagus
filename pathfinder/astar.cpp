@@ -53,7 +53,7 @@ local int Threshold;
 local int OpenSetMaxSize;
 local int AStarMatrixSize;
 #define MAX_CLOSE_SET_RATIO 4 
-#define MAX_OPEN_SET_RATIO 16 
+#define MAX_OPEN_SET_RATIO 10 	// 16 to small
 
 /// see pathfinder.h
 global int AStarFixedUnitCrossingCost=MaxMapWidth*MaxMapHeight;
