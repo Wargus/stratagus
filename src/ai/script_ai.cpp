@@ -50,7 +50,7 @@
 local void AiHelperSetupTable(int* count,AiUnitTypeTable*** table,int n)
 {
     int i;
-    
+
     ++n;
     if( n>(i=*count) ) {
 	if( *table ) {
@@ -127,8 +127,9 @@ local SCM CclDefineAiHelper(SCM list)
     UnitType* base;
     UnitType* type;
     Upgrade* upgrade;
+    int cost;
 
-    IfDebug( type=NULL; upgrade=NULL; );	// keep the compiler happy
+    IfDebug( type=NULL; upgrade=NULL; cost=0; );// keep the compiler happy
     while( !gh_null_p(list) ) {
 	sub_list=gh_car(list);
 	list=gh_cdr(list);
@@ -146,6 +147,8 @@ local SCM CclDefineAiHelper(SCM list)
 	    what=2;
 	} else if( gh_eq_p(value,gh_symbol2scm("research")) ) {
 	    what=3;
+	} else if( gh_eq_p(value,gh_symbol2scm("collect")) ) {
+	    what=4;
 	} else {
 	    fprintf(stderr,"unknown tag\n");
 	    continue;
@@ -163,7 +166,7 @@ local SCM CclDefineAiHelper(SCM list)
 	    free(str);
 	    continue;
 	}
-	DebugLevel0Fn("%s\n",base->Name);
+	DebugLevel0Fn("%s\n" _C_ base->Name);
 	free(str);
 
 	//
@@ -180,7 +183,26 @@ local SCM CclDefineAiHelper(SCM list)
 		    free(str);
 		    continue;
 		}
-		DebugLevel0Fn("> %s\n",upgrade->Ident);
+		DebugLevel0Fn("> %s\n" _C_ upgrade->Ident);
+	    } else if( what==4 ) {
+		if( !strcmp(DEFAULT_NAMES[1],str) ) {
+		    cost=1;
+		} else if( !strcmp(DEFAULT_NAMES[2],str) ) {
+		    cost=2;
+		} else if( !strcmp(DEFAULT_NAMES[3],str) ) {
+		    cost=3;
+		} else if( !strcmp(DEFAULT_NAMES[4],str) ) {
+		    cost=4;
+		} else if( !strcmp(DEFAULT_NAMES[5],str) ) {
+		    cost=5;
+		} else if( !strcmp(DEFAULT_NAMES[6],str) ) {
+		    cost=6;
+		} else {
+		    fprintf(stderr,"unknown cost %s\n",str);
+		    free(str);
+		    continue;
+		}
+		DebugLevel0Fn("> %s\n" _C_ str);
 	    } else {
 		type=UnitTypeByIdent(str);
 		if( !type ) {
@@ -188,7 +210,7 @@ local SCM CclDefineAiHelper(SCM list)
 		    free(str);
 		    continue;
 		}
-		DebugLevel0Fn("> %s\n",type->Name);
+		DebugLevel0Fn("> %s\n" _C_ type->Name);
 	    }
 	    free(str);
 
@@ -219,6 +241,11 @@ local SCM CclDefineAiHelper(SCM list)
 		    AiHelperInsert(
 			    AiHelpers.Research+(upgrade-Upgrades),base);
 		    break;
+		case 4:			// collect
+		    AiHelperSetupTable(
+			    &AiHelpers.CollectCount,&AiHelpers.Collect,cost);
+		    AiHelperInsert( AiHelpers.Collect+cost,base);
+		    break;
 	    }
 	}
     }
@@ -245,7 +272,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel0Fn("%s\n",str);
+    DebugLevel0Fn("%s\n" _C_ str);
     aitype->Name=str;
 
     //
@@ -254,7 +281,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel0Fn("%s\n",str);
+    DebugLevel0Fn("%s\n" _C_ str);
     aitype->Race=str;
 
     //
@@ -263,7 +290,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel0Fn("%s\n",str);
+    DebugLevel0Fn("%s\n" _C_ str);
     aitype->Class=str;
 
     //
@@ -424,7 +451,8 @@ local SCM CclAiWait(SCM value)
 	return SCM_BOOL_F;
     }
     // units available?
-    DebugLevel0Fn("%d,%d\n",AiPlayer->Player->UnitTypesCount[type->Type],autt->Count);
+    DebugLevel0Fn("%d,%d\n"
+	    _C_ AiPlayer->Player->UnitTypesCount[type->Type] _C_ autt->Count);
     if( AiPlayer->Player->UnitTypesCount[type->Type]>=autt->Count ) {
 	return SCM_BOOL_F;
     }

@@ -65,6 +65,7 @@ struct _player_ {
     char*	Name;			/// name of non computer
 
     unsigned	Type;			/// type of player (human,computer,...)
+    char*	RaceName;		/// name of race.
     unsigned	Race;			/// race of player (orc,human,...)
     unsigned	AiNum;			/// AI for computer
 
