@@ -75,133 +75,143 @@
 **	Player::Race
 **
 **		Race number of the player (See #PlayerRaces). This field is
-**		setup from the level (PUD).
+**		setup from the level (PUD). This number is mapped with
+**		#RaceWcNames to the symbolic name Player::RaceName.
 **
 **	Player::AiNum
 **
 **		AI number for computer (See #PlayerAis). This field is setup
-**		from the level (PUD). Choosed to select the AI for the
-**		computer.
+**		from the level (PUD). Used to select the AI for the computer
+**		player.
 **
 **	Player::Team
 **
-**		FIXME: not written documentation
-**		team of player
+**		Team of player. Selected during network game setup. All players
+**		of the same team are allied and enemy to all other teams.
+**
+**		@note It is planned to show the team on the map.
 **
 **	Player::Enemy
 **
-**		FIXME: not written documentation
-**		enemy bit field for this player
+**		A bit field which contains the enemies of this player.
+**		If Player::Enemy & (1<<Player::Player) != 0 its an enemy.
+**		Setup during startup using the Player:Team, can later be
+**		changed with diplomacy. Player::Enemy and Player::Allied
+**		are combined. @note You can be allied to a player,
+**		which sees you as enemy.
 **
 **	Player::Allied
 **
-**		FIXME: not written documentation
-**		allied bit field for this player
+**		A bit field which contains the allies of this player.
+**		If Player::Allied & (1<<Player::Player) != 0 its an allied.
+**		Setup during startup using the Player:Team, can later be
+**		changed with diplomacy. Player::Enemy and Player::Allied
+**		are combined. @note You can be allied to a player,
+**		which sees you as enemy.
 **
-**	Player::X
+**	Player::X Player::Y
 **
-**		FIXME: not written documentation
-**		map tile start X position
-**
-**	Player::Y
-**
-**		FIXME: not written documentation
-**		map tile start Y position
+**		The tile map coordinates of the player start position. 0,0 is
+**		the upper left on the map. This members are setup from the
+**		level (PUD) and only important for the game start.
 **
 **	Player::Resources[MaxCosts]
 **
-**		FIXME: not written documentation
-**		resources in store
+**		How many resources the player owns. Needed for building
+**		units and structures.
 **
 **	Player::Incomes[MaxCosts]
 **
-**		FIXME: not written documentation
-**		income of the resources
+**		Income of the resources, when they are delivered at a store.
 **
 **	Player::UnitTypesCount[UnitTypeMax]
 **
-**		FIXME: not written documentation
-**		each type unit count
+**		Total count for each different unit type. Used by the AI and
+**		for dependencies checks.
 **
 **	Player::AiEnabled
 **
-**		FIXME: not written documentation
-**		handle AI on this computer
+**		If the player is played by the computer and this flag is true,
+**		than the player is handled by the AI on this local computer.
 **
 **	Player::Ai
 **
-**		FIXME: not written documentation
-**		AI structure pointer
+**		AI structure pointer. Please look at #PlayerAi for more
+**		informations.
 **
 **	Player::Units
 **
-**		FIXME: not written documentation
-**		units of this player
+**		A table of all (Player::TotalNumUnits) units of the player.
 **
 **	Player::TotalNumUnits
 **
-**		FIXME: not written documentation
-**		total # units for units' list
+**		Total number of units in the Player::Units table.
 **
 **	Player::NumFoodUnits
 **
-**		FIXME: not written documentation
-**		# units (need food)
+**		Total number of units that need food, used to check food limit.
+**		A player can only build up to Player::Food units and not more
+**		than Player::FoodUnitLimit units.
 **
 **	Player::NumBuildings
 **
-**		FIXME: not written documentation
-**		# buildings (don't need food)
+**		Total number buildings, units that don't need food.
 **
 **	Player::Food
 **
-**		FIXME: not written documentation
-**		food available/produced
+**		Number of food available/produced. Player can't train more
+**		Player::NumFoodUnits than this.
 **
 **	Player::FoodUnitLimit
 **
-**		FIXME: not written documentation
-**		# food units allowed
+**		Number of food units allowed. Player can't train more
+**		Player::NumFoodUnits than this.
 **
 **	Player::BuildingLimit
 **
-**		FIXME: not written documentation
-**		# buildings allowed
+**		Number of buildings allowed.  Player can't build more
+**		Player::NumBuildings than this.
 **
 **	Player::TotalUnitLimit
 **
-**		FIXME: not written documentation
-**		# total unit number allowed
+**		Number of total units allowed. Player can't have more
+**		Player::NumFoodUnits+Player::NumBuildings=Player::TotalNumUnits
+**		this.
 **
 **	Player::LastRepairResource
 **
-**		FIXME: not written documentation
-**		last resource for repair cycles
+**		Last resource used for repair cycles. @see RepairUnit.
 **
 **	Player::Score
 **
-**		FIXME: not written documentation
-**		points for killing ...
+**		Total number of points. You can get points for killing units,
+**		destroying buildings ...
 **
 **	Player::Color
 **
-**		FIXME: not written documentation
-**		color of units on minimap
+**		Color of units of this player on the minimap. Index number
+**		into the global palette.
 **
 **	Player::UnitColors
 **
-**		FIXME: not written documentation
-**		Unit colors for faster setup
+**		Unit colors of this player. Contains the hardware dependent
+**		pixel values for the player colors (palette index 208-211).
+**		Setup from the global palette.
 **
 **	Player::Allow
 **
-**		FIXME: not written documentation
-**		Allowed for player
+**		Contains which unit-types and upgrades are allowed for the
+**		player. Possible values are:
+**			`A' -- allowed,
+**			`F' -- forbidden,
+**			`R' -- acquired, perhaps other values
+**			`Q' -- acquired but forbidden (does it make sense?:))
+**			`E' -- enabled, allowed by level but currently forbidden
 **
 **	Player::UpgradeTimers
 **
-**		FIXME: not written documentation
-**		Timer for the upgrades
+**		Timer for the upgrades. One timer for all possible upgrades.
+**		@note it is planned to combine research for faster upgrades.
 */
 
 /*----------------------------------------------------------------------------
@@ -248,9 +258,9 @@ struct _player_ {
 //	(UnitTypeMax+BitsOf(unsigned)-1)
 //	    /BitsOf(unsigned)];		/// flags what units are available
     // FIXME: shouldn't use the constant
-    unsigned    UnitTypesCount[UnitTypeMax];       /// each type unit count
+    unsigned    UnitTypesCount[UnitTypeMax];	/// total units of unit-type
 
-    unsigned	AiEnabled;		/// handle ai on this computer
+    unsigned	AiEnabled;		/// handle AI on local computer
     void*	Ai;			/// Ai structure pointer
 
     Unit**	Units;			/// units of this player
@@ -292,6 +302,10 @@ struct _player_ {
 
 /**
 **	Races for the player (must fit to PUD!)
+**	Mapped with #RaceWcNames to a symbolic name, which will be used in
+**	the future.
+**
+**	@note FIXME: This and the use MUST be removed to allow more races.
 */
 enum PlayerRaces {
     PlayerRaceHuman	=0,		/// belongs to human
@@ -325,7 +339,7 @@ enum PlayerAis {
 };
 
 #define PlayerNumNeutral	15	/// this is the neutral player slot
-#define PlayerMax		16	/// maximal players supported
+//#define PlayerMax		16	/// maximal players supported
 
 /**
 **	Notify types. Noties are send to the player.
@@ -342,7 +356,7 @@ enum _notify_type_ {
 
 extern int NumPlayers;			/// Player in play
 extern Player Players[PlayerMax];	/// All players
-extern Player* ThisPlayer;		/// Player on this computer
+extern Player* ThisPlayer;		/// Player on local computer
 
 extern char** RaceWcNames;		/// pud original -> internal
 
