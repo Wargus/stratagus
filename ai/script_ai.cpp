@@ -999,6 +999,26 @@ local SCM CclDefineAiWcNames(SCM list)
 }
 
 /**
+**	Get the default resource number
+**
+**	@param type	The name of the resource to lookup
+**
+**	@return		The number of the resource in DEFAULT_NAMES
+*/
+local int DefaultResourceNumber(const char *type)
+{
+    int i;
+    for( i=0; i<MaxCosts; ++i ) {
+	if( !strcmp(DEFAULT_NAMES[i],type) ) {
+	    return i;
+	}
+    }
+    // Resource not found, should never happen
+    DebugCheck(1);
+    return -1;
+}
+
+/**
 **	Define an AI player.
 **
 **	@param list	List of the AI Player.
@@ -1011,8 +1031,6 @@ local SCM CclDefineAiPlayer(SCM list)
     char* str;
     PlayerAi* ai;
 
-    DebugLevel0Fn("FIXME: Ai Player loading not supported\n");
-
     i=gh_scm2int(gh_car(list));
     list=gh_cdr(list);
 
@@ -1022,6 +1040,7 @@ local SCM CclDefineAiPlayer(SCM list)
     // DebugCheck( Players[i].Ai || !Players[i].AiEnabled );
 
     ai=Players[i].Ai=calloc(1,sizeof(PlayerAi));
+    ai->Player=&Players[i];
 
     //
     //	Parse the list:	(still everything could be changed!)
@@ -1064,32 +1083,237 @@ local SCM CclDefineAiPlayer(SCM list)
 	    ai->ScriptDebug=gh_scm2bool(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("sleep-cycles")) ) {
-	    i=gh_scm2int(gh_car(list));
+	    ai->SleepCycles=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("force")) ) {
+	    sublist=gh_car(list);
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    i=gh_scm2int(value);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if( gh_eq_p(value,gh_symbol2scm("complete")) ) {
+		    ai->Force[i].Completed=1;
+		} else if( gh_eq_p(value,gh_symbol2scm("recruit")) ) {
+		    ai->Force[i].Completed=0;
+		} else if( gh_eq_p(value,gh_symbol2scm("attack")) ) {
+		    ai->Force[i].Attacking=1;
+		} else if( gh_eq_p(value,gh_symbol2scm("defend")) ) {
+		    ai->Force[i].Defending=1;
+		} else if( gh_eq_p(value,gh_symbol2scm("role")) ) {
+		    if( gh_eq_p(gh_car(sublist),gh_symbol2scm("attack")) ) {
+			ai->Force[i].Role=AiForceRoleAttack;
+		    } else if( gh_eq_p(gh_car(sublist),gh_symbol2scm("defend")) ) {
+			ai->Force[i].Role=AiForceRoleDefend;
+		    }
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("types")) ) {
+		    AiUnitType **queue;
+		    SCM subsublist;
+		    subsublist=gh_car(sublist);
+		    queue=&ai->Force[i].UnitTypes;
+		    while( !gh_null_p(subsublist) ) {
+			int num;
+			char *ident;
+			value=gh_car(subsublist);
+			subsublist=gh_cdr(subsublist);
+			num=gh_scm2int(value);
+			value=gh_car(subsublist);
+			subsublist=gh_cdr(subsublist);
+			ident=get_c_string(value);
+			*queue=malloc(sizeof(AiUnitType));
+			(*queue)->Next=NULL;
+			(*queue)->Want=num;
+			(*queue)->Type=UnitTypeByIdent(ident);
+			queue=&(*queue)->Next;
+		    }
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("units")) ) {
+		    AiUnit **queue;
+		    SCM subsublist;
+		    subsublist=gh_car(sublist);
+		    queue=&ai->Force[i].Units;
+		    while( !gh_null_p(subsublist) ) {
+			int num;
+			char *ident;
+			value=gh_car(subsublist);
+			subsublist=gh_cdr(subsublist);
+			num=gh_scm2int(value);
+			value=gh_car(subsublist);
+			subsublist=gh_cdr(subsublist);
+			ident=get_c_string(value);
+			*queue=malloc(sizeof(AiUnit));
+			(*queue)->Next=NULL;
+			(*queue)->Unit=UnitSlots[num];
+			queue=&(*queue)->Next;
+		    }
+		}
+	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("reserve")) ) {
+	    sublist=gh_car(list);
+	    while( !gh_null_p(sublist) ) {
+		char *type;
+		int num;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		type=get_c_string(value);
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		num=gh_scm2int(value);
+		ai->Reserve[DefaultResourceNumber(type)]=num;
+	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("used")) ) {
+	    sublist=gh_car(list);
+	    while( !gh_null_p(sublist) ) {
+		char *type;
+		int num;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		type=get_c_string(value);
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		num=gh_scm2int(value);
+		ai->Used[DefaultResourceNumber(type)]=num;
+	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("needed")) ) {
+	    sublist=gh_car(list);
+	    while( !gh_null_p(sublist) ) {
+		char *type;
+		int num;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		type=get_c_string(value);
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		num=gh_scm2int(value);
+		ai->Needed[DefaultResourceNumber(type)]=num;
+	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("collect")) ) {
+	    sublist=gh_car(list);
+	    while( !gh_null_p(sublist) ) {
+		char *type;
+		int num;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		type=get_c_string(value);
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		num=gh_scm2int(value);
+		ai->Collect[DefaultResourceNumber(type)]=num;
+	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("need-mask")) ) {
+	    sublist=gh_car(list);
+	    while( !gh_null_p(sublist) ) {
+		char *type;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		type=get_c_string(value);
+		ai->NeededMask|=(1<<DefaultResourceNumber(type));
+	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("need-food")) ) {
+	    ai->NeedFood=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("unit-type")) ) {
+	    sublist=gh_car(list);
+	    i=0;
+	    if( gh_length(sublist) ) {
+		ai->UnitTypeRequests=malloc(gh_length(sublist)/2*sizeof(AiUnitTypeTable));
+	    }
+	    while( !gh_null_p(sublist) ) {
+		char *ident;
+		int count;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ident=get_c_string(value);
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		count=gh_scm2int(value);
+		ai->UnitTypeRequests[i].Table[0]=UnitTypeByIdent(ident);
+		ai->UnitTypeRequests[i].Count=count;
+		++i;
+	    }
+	    ai->UnitTypeRequestsCount=i;
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("upgrade")) ) {
+	    sublist=gh_car(list);
+	    i=0;
+	    if( gh_length(sublist) ) {
+		ai->UpgradeToRequests=malloc(gh_length(sublist)*sizeof(UnitType*));
+	    }
+	    while( !gh_null_p(sublist) ) {
+		char *ident;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ident=get_c_string(value);
+		ai->UpgradeToRequests[i]=UnitTypeByIdent(ident);
+		++i;
+	    }
+	    ai->UpgradeToRequestsCount=i;
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("research")) ) {
+	    sublist=gh_car(list);
+	    i=0;
+	    if( gh_length(sublist) ) {
+		ai->ResearchRequests=malloc(gh_length(sublist)*sizeof(Upgrade*));
+	    }
+	    while( !gh_null_p(sublist) ) {
+		char *ident;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ident=get_c_string(value);
+		ai->ResearchRequests[i]=UpgradeByIdent(ident);
+		++i;
+	    }
+	    ai->ResearchRequestsCount=i;
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("building")) ) {
+	    AiBuildQueue **queue;
+	    sublist=gh_car(list);
+	    queue=&ai->UnitTypeBuilded;
+	    while( !gh_null_p(sublist) ) {
+		char *ident;
+		int made;
+		int want;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ident=get_c_string(value);
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		made=gh_scm2int(value);
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		want=gh_scm2int(value);
+		*queue=malloc(sizeof(AiBuildQueue));
+		(*queue)->Next=NULL;
+		(*queue)->Type=UnitTypeByIdent(ident);
+		(*queue)->Want=want;
+		(*queue)->Made=made;
+		queue=&(*queue)->Next;
+	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("repair-building")) ) {
+	    ai->LastRepairBuilding=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("repair-workers")) ) {
+	    sublist=gh_car(list);
+	    while( !gh_null_p(sublist) ) {
+		int num;
+		int workers;
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		num=gh_scm2int(value);
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		workers=gh_scm2int(value);
+		ai->TriedRepairWorkers[num]=workers;
+		++i;
+	    }
 	    list=gh_cdr(list);
 	} else {
 	   // FIXME: this leaves a half initialized ai player
