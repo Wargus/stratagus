@@ -1660,6 +1660,7 @@ global void UIHandleButtonUp(unsigned button)
 	    }
 #else /* SPLIT_SCREEN_SUPPORT */
 	    if( IsMapFieldVisible(Screen2MapX(CursorX),Screen2MapY(CursorY)) ) {
+		unit=UnitOnScreen(unit
 		    ,CursorX-TheUI.MapX+MapX*TileSizeX
 		    ,CursorY-TheUI.MapY+MapY*TileSizeY);
 	    }
