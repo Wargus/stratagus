@@ -966,7 +966,7 @@ void UnitLost(Unit* unit)
 
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
-		if (b->Data.OnTop.ReplaceOnDie) {
+		if (b->Data.OnTop.ReplaceOnDie && (unit->Type->GivesResource && unit->Value != 0)) {
 			temp = MakeUnitAndPlace(unit->X, unit->Y, b->Data.OnTop.Parent, &Players[PlayerNumNeutral]);
 			temp->Value = unit->Value;
 		}
