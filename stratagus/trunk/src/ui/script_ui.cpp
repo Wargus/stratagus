@@ -3523,6 +3523,9 @@ static int CclDefineMenuGraphics(lua_State* l)
 	int tables;
 	int args;
 	const char* value;
+	char* file;
+	int w;
+	int h;
 
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
@@ -3537,6 +3540,8 @@ static int CclDefineMenuGraphics(lua_State* l)
 		if (!lua_istable(l, -1)) {
 			LuaError(l, "incorrect argument");
 		}
+		file = NULL;
+		w = h = 0;
 		for (j = 0; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -3544,10 +3549,7 @@ static int CclDefineMenuGraphics(lua_State* l)
 			if (!strcmp(value, "file")) {
 				++j;
 				lua_rawgeti(l, -1, j + 1);
-				if (MenuButtonGfx.File[i]) {
-					free(MenuButtonGfx.File[i]);
-				}
-				MenuButtonGfx.File[i] = strdup(LuaToString(l, -1));
+				file = strdup(LuaToString(l, -1));
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "size")) {
 				++j;
@@ -3556,16 +3558,18 @@ static int CclDefineMenuGraphics(lua_State* l)
 					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1);
-				MenuButtonGfx.Width[i] = LuaToNumber(l, -1);
+				w = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 				lua_rawgeti(l, -1, 2);
-				MenuButtonGfx.Height[i] = LuaToNumber(l, -1);
+				h = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 				lua_pop(l, 1);
 			} else {
 				LuaError(l, "incorrect argument");
 			}
 		}
+		MenuButtonGraphics[i] = NewGraphic(file, w, h);
+		free(file);
 		++i;
 		lua_pop(l, 1);
 	}
