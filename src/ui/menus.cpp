@@ -1954,7 +1954,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
     }
 #endif 				
 #endif // with sound
-    EndMenu();
+    CurrentMenu=-1;
     SoundOptions();
 }
 
@@ -1979,7 +1979,7 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
             } 
     }
 #endif // with sound
-    EndMenu();
+    CurrentMenu=-1;
     SoundOptions();
 }
 
@@ -2004,7 +2004,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 	CDMode = ":stopped";
     }
 #endif
-    EndMenu();
+    CurrentMenu=-1;
     SoundOptions();
 }
 
@@ -2026,7 +2026,7 @@ local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":all";
 #endif
-    EndMenu();
+    CurrentMenu=-1;
     SoundOptions();
 
 }
@@ -2036,7 +2036,7 @@ local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":random";
 #endif
-    EndMenu();
+    CurrentMenu=-1;
     SoundOptions();
 
 }
