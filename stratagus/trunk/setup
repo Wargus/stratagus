@@ -72,7 +72,7 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
 
 # Compile commands
 CC=gcc
-CCLD=g++
+CCLD=$CC
 RM="rm -f"
 if [ "`uname -a | grep -is bsd` x" != " x" ] ; then
   MAKE=gmake
@@ -916,6 +916,7 @@ case $ANSWER in
 	echo
 	;;
  *)
+	echo
 	$MAKE depend
 	$MAKE$CROSS
 	;;
