@@ -26,7 +26,6 @@
 
 #include "freecraft.h"
 #include "interface.h"
-#include "image.h"
 #include "map.h"
 #include "ui.h"
 

@@ -33,7 +33,6 @@
 #include "ui.h"
 #include "video.h"
 #include "menus.h"
-#include "image.h"
 
 /*----------------------------------------------------------------------------
 --	Functions

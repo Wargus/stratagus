@@ -41,7 +41,6 @@
 #include "depend.h"
 #include "interface.h"
 #include "ui.h"
-#include "image.h"
 #include "sound.h"
 #include "actions.h"
 #include "cursor.h"

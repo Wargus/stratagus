@@ -46,7 +46,6 @@
 #include "map.h"
 #include "minimap.h"
 #include "font.h"
-#include "image.h"
 #include "sound_server.h"
 #include "missile.h"
 #include "sound.h"
