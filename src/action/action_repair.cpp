@@ -81,8 +81,9 @@ local void RepairUnit(Unit* unit,Unit* goal)
     int costs[MaxCosts];
     int i;
     int hp;
-#define GIVES_HP	8
-#define MUL		2
+    int lrr;
+#define GIVES_HP	4
+#define MUL		1
 #define DIVISOR		2
 
     player=unit->Player;
@@ -104,8 +105,11 @@ local void RepairUnit(Unit* unit,Unit* goal)
     DebugCheck( !goal->Stats->HitPoints );
 
     for( i=1; i<MaxCosts; ++i ) {
-	costs[i]=((goal->Stats->Costs[i]*hp)/goal->Stats->HitPoints)/DIVISOR;
-
+//	costs[i]=((goal->Stats->Costs[i]*hp)/goal->Stats->HitPoints)/DIVISOR;
+	if ( goal->Stats->Costs[i] ) {
+	    costs[i]=1;	//
+	}			// Prepare for repair cycles
+	else costs[i]=0;	//
 	// FIXME: unit costs something but to less costs calculated
 	IfDebug(
 	    if( !costs[i] && goal->Stats->Costs[i] ) {
@@ -113,6 +117,25 @@ local void RepairUnit(Unit* unit,Unit* goal)
 	    }
 	);
     }
+    lrr=player->LastRepairResource;
+    for( i=player->LastRepairResource; i<MaxCosts; ++i ) {
+	if ( costs[i] && lrr==player->LastRepairResource ) {
+	    lrr=i;
+	}	// Find next higher resource or...
+    }
+    if ( lrr == player->LastRepairResource ) {
+	for ( i=player->LastRepairResource; i>0; --i ) {
+	    if ( costs[i] ) {
+		lrr=i;
+	    }
+	}	// ...go through the beginning
+    }
+    player->LastRepairResource=lrr;
+    for( i=1; i<MaxCosts; ++i ) {
+	costs[i]=0;
+    }		// Thanx for the help, costs, you are reset!
+    costs[player->LastRepairResource]=1;
+		// The one we need
 
     //
     //	Check if enough resources are available
