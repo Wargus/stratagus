@@ -138,6 +138,8 @@ enum _ic_message_subtype_ {
     ICMServerQuit,		/// Server has quit game
     ICMGoodBye,			/// Client wants to leave game
     ICMSeeYou,			/// Client has left game
+
+    ICMGo,			/// Client is ready to run
 };
 
 /**

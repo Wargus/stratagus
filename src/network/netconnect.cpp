@@ -669,6 +669,8 @@ local const char *icmsgsubtypenames[] = {
     "ServerQuit",		// Server has quit game
     "GoodBye",			// Client wants to leave game
     "SeeYou",			// Client has left game
+
+    "Go",			// Client is ready to run
 };
 #endif
 
@@ -844,7 +846,7 @@ global void NetworkServerStartGame(void)
     int num[PlayerMax];
     char buf[1024];
     InitMessage *msg;
-    InitMessage message;
+    InitMessage message, statemsg;
 
     DebugCheck(ServerSetupState.CompOpt[0] != 0);
 
@@ -950,10 +952,11 @@ global void NetworkServerStartGame(void)
     Hosts[HostsCount] = Hosts[PlayerMax - 1];
     Hosts[PlayerMax - 1].PlyNr = 0;
 
-    // Prepare the config message:
+    // Prepare the final config message:
     message.Type = MessageInitReply;
     message.SubType = ICMConfig;
     message.HostsCount = NetPlayers;
+    message.MapUID = htonl(ScenSelectPudInfo->MapUID);
     for (i = 0; i < NetPlayers; ++i) {
 	message.u.Hosts[i].Host = Hosts[i].Host;
 	message.u.Hosts[i].Port = Hosts[i].Port;
@@ -965,6 +968,12 @@ global void NetworkServerStartGame(void)
 // ThisPlayer = &Players[Hosts[i].PlyNr];
 // PlayerSetName(ThisPlayer, NetworkName);
 
+    // Prepare the final state message:
+    statemsg.Type = MessageInitReply;
+    statemsg.SubType = ICMState;
+    statemsg.HostsCount = NetPlayers;
+    statemsg.u.State = ServerSetupState;
+    statemsg.MapUID = htonl(ScenSelectPudInfo->MapUID);
 
     msg = (InitMessage *)buf;
     DebugLevel1Fn("Ready, sending InitConfig to %d host(s)\n", HostsCount);
@@ -973,21 +982,27 @@ global void NetworkServerStartGame(void)
     //
     for (j = HostsCount; j;) {
 
+breakout:
 	// Send to all clients.
 	for (i = 0; i < HostsCount; ++i) {
-	    if (num[Hosts[i].PlyNr]) {		// not acknowledged yet
-		unsigned long host;
-		int port;
+	    unsigned long host;
+	    int port;
 
+	    if (num[Hosts[i].PlyNr] == 1) {		// not acknowledged yet
 		host = message.u.Hosts[i].Host;
 		port = message.u.Hosts[i].Port;
 		message.u.Hosts[i].Host = message.u.Hosts[i].Port = 0;
-		n = NetSendUDP(NetworkFildes, host, port, &message,
-			sizeof(message));
+		n = NetworkSendICMessage(host, port, &message);
 		DebugLevel0Fn("Sending InitConfig Message Config (%d) to %d.%d.%d.%d:%d\n",
 			n, NIPQUAD(ntohl(host)), ntohs(port));
 		message.u.Hosts[i].Host = host;
 		message.u.Hosts[i].Port = port;
+	    } else if (num[Hosts[i].PlyNr] == 2) {
+		host = message.u.Hosts[i].Host;
+		port = message.u.Hosts[i].Port;
+		n = NetworkSendICMessage(host, port, &statemsg);
+		DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n",
+			n, NIPQUAD(ntohl(host)),ntohs(port));
 	    }
 	}
 
@@ -999,30 +1014,39 @@ global void NetworkServerStartGame(void)
 		continue;
 	    }
 
-	    // DebugLevel0Fn("Received ack %d(%d) from %d.%d.%d.%d:%d\n",
-	    //	    msg->Type,n,
-	    //	    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
-	    
-
 	    if (msg->Type == MessageInitHello && n == sizeof(*msg)) {
 		switch (msg->SubType) {
+
 		    case ICMConfig:
 			DebugLevel0Fn("Got ack for InitConfig: (%d) from %d.%d.%d.%d:%d\n",
 				n, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
 			for (i = 0; i < HostsCount; ++i) {
 			    if (NetLastHost == Hosts[i].Host && NetLastPort == Hosts[i].Port) {
-				if (num[Hosts[i].PlyNr]) {
-				    num[Hosts[i].PlyNr] = -1;
+				if (num[Hosts[i].PlyNr] == 1) {
+				    num[Hosts[i].PlyNr]++;
+				}
+				goto breakout;
+			    }
+			}
+			break;
+
+		    case ICMGo:
+			DebugLevel0Fn("Got ack for InitState: (%d) from %d.%d.%d.%d:%d\n",
+				n, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+
+			for (i = 0; i < HostsCount; ++i) {
+			    if (NetLastHost == Hosts[i].Host && NetLastPort == Hosts[i].Port) {
+				if (num[Hosts[i].PlyNr] == 2) {
+				    num[Hosts[i].PlyNr] = 0;
 				    j--;
-				    DebugLevel0Fn("Removing host (j = %d)\n", j);
-				} else {
-				    DebugLevel0Fn("Already removed host\n");
+				    DebugLevel0Fn("Removing host %d from waiting list\n", j);
 				}
 				break;
 			    }
 			}
 			break;
+
 		    default:
 			DebugLevel0Fn("Server: Config ACK: Unhandled subtype %d\n", msg->SubType);
 			break;
@@ -1031,12 +1055,10 @@ global void NetworkServerStartGame(void)
 		DebugLevel0Fn("Unexpected Message Type %d while waiting for Config ACK\n", msg->Type);
 	    }
 	}
-
     }
 
-    DebugLevel0Fn("DONE: All configs acked - Now syncing ServerSetupState..\n");
+    DebugLevel0Fn("DONE: All configs acked - Now starting..\n");
 
-    // ARI FIXME: Fill here...
 
 }
 
@@ -1166,6 +1188,15 @@ changed:
 		NetLocalState = ccs_unreachable;
 		NetConnectRunning = 0;	// End the menu..
 		DebugLevel0Fn("ccs_goahead: Above message limit %d\n", NetStateMsgCnt);
+	    }
+	case ccs_started:
+	    if (NetStateMsgCnt < 20) {	// 20 retries
+		message.Type = MessageInitHello;
+		message.SubType = ICMGo;
+		NetworkSendRateLimitedClientMessage(&message, 250);
+	    } else {
+		DebugLevel3Fn("ccs_started: Final State Enough ICMGo sent - starting\n");
+		NetConnectRunning = 0;	// End the menu..
 	    }
 	    break;
 	default:
@@ -1437,11 +1468,10 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    break;
 
 			case ICMState:		// Server has sent final state info
-			    DebugLevel0Fn("ccs_goahead: Final State subtype %d received - starting\n",msg->SubType);
+			    DebugLevel3Fn("ccs_goahead: Final State subtype %d received - starting\n",msg->SubType);
 			    ServerSetupState = msg->u.State;
 			    NetLocalState = ccs_started;
 			    NetStateMsgCnt = 0;
-			    NetConnectRunning = 0;	// End the menu..
 			    break;
 
 			default:
