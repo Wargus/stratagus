@@ -118,7 +118,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
 local void ScenSelectLBAction(Menuitem *mi, int i);
 local void ScenSelectTPMSAction(Menuitem *mi, int i);
 local void ScenSelectVSAction(Menuitem *mi, int i);
-local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i);
+local void ScenSelectHSSpeedAction(Menuitem *mi, int i);
 local void ScenSelectFolder(void);
 local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
@@ -815,7 +815,7 @@ local Menuitem SpeedSettingsMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Speed Settings", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_HSLIDER, 108, 80, 0, 0, NULL, NULL,
-            { hslider:{ 0, 6*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+            { hslider:{ 0, 8*18, 18, ScenSelectHSSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_VSLIDER, 10, 100, 0, 0, NULL, NULL,
             { vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
@@ -1346,14 +1346,14 @@ local void DrawHSlider(Menuitem *mi, unsigned mx, unsigned my)
 
     if (flags&MenuButtonDisabled) {
 	PushClipping();
-	SetClipping(0,0,VideoHeight-1,x + w - 20);
+	SetClipping(0,0,x + w - 20,VideoHeight-1);
 	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
 	PopClipping();
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW - 1, x - 2, y);
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
     } else {
 	PushClipping();
-	SetClipping(0,0,VideoHeight-1,x + w - 20);
+	SetClipping(0,0,x + w - 20,VideoHeight-1);
 	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
 	PopClipping();
 	if (mi->d.hslider.cflags&MI_CFLAGS_LEFT) {
@@ -1696,6 +1696,11 @@ local void SetCdMode(Menuitem *mi)
 
 local void SpeedSettings(void)
 {
+    SpeedSettingsMenuItems[1].d.hslider.percent = VideoSyncSpeed - 50;
+    if (SpeedSettingsMenuItems[1].d.hslider.percent < 0)
+	SpeedSettingsMenuItems[1].d.hslider.percent = 0;
+    if (SpeedSettingsMenuItems[1].d.hslider.percent > 100)
+	SpeedSettingsMenuItems[1].d.hslider.percent = 100;
     ProcessMenu(MENU_SPEED_SETTINGS, 1);
 }
 
@@ -2446,11 +2451,10 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
+local void ScenSelectHSSpeedAction(Menuitem *mi, int i)
 {
-    int op, d1, d2;
-
     mi--;
+    
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
@@ -2469,7 +2473,6 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 		VideoSyncSpeed = mi[1].d.hslider.percent + 50;
 		SetVideoSync();
 	    }
-	    ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
@@ -2477,35 +2480,14 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
-			op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
-				 (mi->d.listbox.noptions - 1);
-			d1 = mi[1].d.hslider.curper - mi[1].d.hslider.percent;
-			d2 = op - mi[1].d.hslider.curper;
-			if (d2 < d1) {
-			    mi->d.listbox.curopt++;
-			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-				mi->d.listbox.curopt--;
-				mi->d.listbox.startline++;
-			    }
-			}
-		    }
+		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		    VideoSyncSpeed = mi[1].d.hslider.percent + 50;
+		    SetVideoSync();
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
-			op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
-				 (mi->d.listbox.noptions - 1);
-			d1 = mi[1].d.hslider.percent - mi[1].d.hslider.curper;
-			d2 = mi[1].d.hslider.curper - op;
-			if (d2 < d1) {
-			    mi->d.listbox.curopt--;
-			    if (mi->d.listbox.curopt < 0) {
-				mi->d.listbox.curopt++;
-				mi->d.listbox.startline--;
-			    }
-			}
-		    }
+		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		    VideoSyncSpeed = mi[1].d.hslider.percent + 50;
+		    SetVideoSync();
 		}
-		ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		MustRedraw |= RedrawMenu;
 	    }
