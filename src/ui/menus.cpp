@@ -780,9 +780,7 @@ local Menuitem GameOptionsMenuItems[] = {
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
 	{ text:{ "CD Audio Enabled", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!TEST1", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'} } },
-    { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "TEST2", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF11} } },
+	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'} } },
 #else
     { 0 }
 #endif
