@@ -974,30 +974,38 @@ global void SetPlayersPalette(void)
 	switch (VideoBpp) {
 	case 8:
 		for (i = 0; i < PlayerMax; ++i) {
-			memcpy(Players[o].UnitColors.Depth8.Pixels, PlayerColors[i],
-				sizeof(VMemType8) * 4);
+			Players[o].UnitColors.Depth8.Pixels[0] = PlayerColors[i][0].D8;
+			Players[o].UnitColors.Depth8.Pixels[1] = PlayerColors[i][1].D8;
+			Players[o].UnitColors.Depth8.Pixels[2] = PlayerColors[i][2].D8;
+			Players[o].UnitColors.Depth8.Pixels[3] = PlayerColors[i][3].D8;
 			o = (o + 1) % PlayerMax;
 		}
 		break;
 	case 15:
 	case 16:
 		for (i = 0; i < PlayerMax; ++i) {
-			memcpy(Players[o].UnitColors.Depth16.Pixels, PlayerColors[i],
-				sizeof(VMemType16) * 4);
+			Players[o].UnitColors.Depth16.Pixels[0] = PlayerColors[i][0].D16;
+			Players[o].UnitColors.Depth16.Pixels[1] = PlayerColors[i][1].D16;
+			Players[o].UnitColors.Depth16.Pixels[2] = PlayerColors[i][2].D16;
+			Players[o].UnitColors.Depth16.Pixels[3] = PlayerColors[i][3].D16;
 			o = (o + 1) % PlayerMax;
 		}
 		break;
 	case 24:
 		for (i = 0; i < PlayerMax; ++i) {
-			memcpy(Players[o].UnitColors.Depth24.Pixels, PlayerColors[i],
-				sizeof(VMemType24) * 4);
+			Players[o].UnitColors.Depth24.Pixels[0] = PlayerColors[i][0].D24;
+			Players[o].UnitColors.Depth24.Pixels[1] = PlayerColors[i][1].D24;
+			Players[o].UnitColors.Depth24.Pixels[2] = PlayerColors[i][2].D24;
+			Players[o].UnitColors.Depth24.Pixels[3] = PlayerColors[i][3].D24;
 			o = (o + 1) % PlayerMax;
 		}
 		break;
 	case 32:
 		for (i = 0; i < 7; ++i) {
-			memcpy(Players[o].UnitColors.Depth32.Pixels, PlayerColors[i],
-				sizeof(VMemType32) * 4);
+			Players[o].UnitColors.Depth32.Pixels[0] = PlayerColors[i][0].D32;
+			Players[o].UnitColors.Depth32.Pixels[1] = PlayerColors[i][1].D32;
+			Players[o].UnitColors.Depth32.Pixels[2] = PlayerColors[i][2].D32;
+			Players[o].UnitColors.Depth32.Pixels[3] = PlayerColors[i][3].D32;
 			o = (o + 1) % PlayerMax;
 		}
 		break;
