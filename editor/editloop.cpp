@@ -1014,8 +1014,11 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	    if( UnitUnderCursor->Type->GoldMine ||
 		UnitUnderCursor->Type->OilPatch ||
 		UnitUnderCursor->Type->GivesOil ) {
-		EditorEditResource();;
+		EditorEditResource();
 		return;
+	    }
+	    if( !UnitUnderCursor->Type->Building && UnitUnderCursor->HP > 0 ) {
+		EditorEditAiProperties();
 	    }
 	}
     }

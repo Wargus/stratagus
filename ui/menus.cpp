@@ -257,6 +257,9 @@ local void EditorMapPropertiesOk(void);
 local void EditorEditResourceEnterAction(Menuitem *mi,int key);
 local void EditorEditResourceOk(void);
 local void EditorEditResourceCancel(void);
+local void EditorEditAiPropertiesGem(Menuitem *mi);
+local void EditorEditAiPropertiesOk(void);
+local void EditorEditAiPropertiesCancel(void);
 local void EditorQuitMenu(void);
 
 /*----------------------------------------------------------------------------
@@ -534,6 +537,11 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorEditResourceEnterAction,"editor-edit-resource-enter-action");
     HASHADD(EditorEditResourceOk,"editor-edit-resource-ok");
     HASHADD(EditorEditResourceCancel,"editor-edit-resource-cancel");
+
+// Editor edit ai properties
+    HASHADD(EditorEditAiPropertiesGem,"editor-edit-ai-properties-gem");
+    HASHADD(EditorEditAiPropertiesOk,"editor-edit-ai-properties-ok");
+    HASHADD(EditorEditAiPropertiesCancel,"editor-edit-ai-properties-cancel");
 }
 
 /*----------------------------------------------------------------------------
@@ -4866,6 +4874,64 @@ local void EditorEditResourceCancel(void)
 {
     GameMenuReturn();
 }
+
+/**
+**	Edit ai properties
+*/
+global void EditorEditAiProperties(void)
+{
+    Menu *menu;
+
+    menu = FindMenu("menu-editor-edit-ai-properties");
+    if (UnitUnderCursor->Active) {
+	menu->items[1].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[3].d.gem.state = MI_GSTATE_UNCHECKED;
+    } else {
+	menu->items[1].d.gem.state = MI_GSTATE_UNCHECKED;
+	menu->items[3].d.gem.state = MI_GSTATE_CHECKED;
+    }
+
+    ProcessMenu("menu-editor-edit-ai-properties", 1);
+}
+
+/**
+**	Active or Passive gem clicked in menu-editor-edit-ai-properties
+*/
+local void EditorEditAiPropertiesGem(Menuitem *mi)
+{
+    if (&mi->menu->items[1] == mi) {
+	mi->d.gem.state = MI_GSTATE_CHECKED;
+	mi->menu->items[3].d.gem.state = MI_GSTATE_UNCHECKED;
+    } else {
+	mi->d.gem.state = MI_GSTATE_CHECKED;
+	mi->menu->items[1].d.gem.state = MI_GSTATE_UNCHECKED;
+    }
+}
+
+/**
+**	Ok button from menu-editor-edit-ai-properties
+*/
+local void EditorEditAiPropertiesOk(void)
+{
+    Menu *menu;
+
+    menu = FindMenu("menu-editor-edit-ai-properties");
+    if (menu->items[1].d.gem.state == MI_GSTATE_CHECKED) {
+	UnitUnderCursor->Active = 1;
+    } else {
+	UnitUnderCursor->Active = 0;
+    }
+    GameMenuReturn();
+}
+
+/**
+**	Cancel button from menu-editor-edit-ai-properties
+*/
+local void EditorEditAiPropertiesCancel(void)
+{
+    GameMenuReturn();
+}
+
 
 /**
 **	Called from menu, to quit editor to menu.
