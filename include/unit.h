@@ -231,8 +231,9 @@ struct _unit_ {
 
     unsigned	Direction : 8;		/// angle (0-255) unit looking
 
+    unsigned	Attacked : 4;		/// unit is attacked
+
     unsigned	Burning : 1;		/// unit is burning
-    unsigned	Attacked : 1;		/// unit is attacked
     // FIXME: next not used!
     //unsigned	Visible : 1;		/// unit is visible (submarine)
     unsigned	Destroyed : 1;		/// unit is destroyed pending reference

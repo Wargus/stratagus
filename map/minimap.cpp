@@ -314,7 +314,7 @@ global void DrawMinimap(int vx,int vy)
 	    if( unit->Attacked && RedPhase ) {
 		color=ColorRed;
 		// better to clear to fast, than to clear never :?)
-		unit->Attacked=0;
+		unit->Attacked--;
 	    } else if( MinimapShowSelected && unit->Selected ) {
 		color=ColorWhite;
 	    } else {
