@@ -2474,6 +2474,7 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
     rp=0;
     matrix[x+y*w]=1;			// mark start point
     ep=wp=1;				// start with one point
+    bestmine=NoUnitP;
 
     //
     //	Pop a point from stack, push all neighbors which could be entered.
