@@ -37,6 +37,11 @@
 #define USE_EXTENSIONS		/// Enable our extensions
 
 // Unit lists
+// FIXME: Write some comments, for the groups.
+
+/**
+**	All human workers.
+*/
 #define WORKERS_H \
     "unit-peasant,unit-peasant-with-gold,unit-peasant-with-wood"
 #define HUMAN_LAND_FORCES \
@@ -69,7 +74,7 @@
 #define ORC_LAND_FORCES2 \
     ORC_LAND_FORCES "," WORKERS_O
 #define ORC_LAND_FORCES3 \
-    ORC_LAND_FORCES2 "," ORC_HEROS
+    ORC_LAND_FORCES2 "," ORC_HEROS ",unit-skeleton"
 #define HALLS_O \
     "unit-great-hall,unit-stronghold,unit-fortress"
 #define ORC_AIR_FORCES \
@@ -1053,8 +1058,8 @@ global ButtonAction AllButtons[] = {
     B_Patrol,		0, NULL,
     NULL,		NULL,
     'p', "~!PATROL",
-    ORC_LAND_FORCES  "," ORC_HEROS1 ",unit-dragon" ",unit-deathwing"
-    ",orc-group"
+    ORC_LAND_FORCES "," ORC_HEROS1 ",unit-skeleton"
+    ",unit-dragon" ",unit-deathwing" ",orc-group"
 },
 // NOTE: this isn't compatible goblin-sapper didn't have this button
 {   5, 0, { "icon-orc-stand-ground" },
