@@ -63,6 +63,15 @@ local FontColorMapping* FontColor;
 	/// Font color mappings
 local FontColorMapping* FontColorMappings;
 
+	/// Font mapping
+typedef struct _font_mapping_ {
+	char* Ident;                            /// Font name
+	int Font;                               /// Ident number
+	struct _font_mapping_* Next;            /// Next pointer
+} FontMapping;
+
+local FontMapping* FontMappings;
+
 /**
 **  Fonts table
 **
@@ -93,27 +102,9 @@ local int FontBitmapWidths[MaxFonts];
 local int CurrentFont;
 #endif
 
-/**
-**  FIXME: should use the names of the real fonts.
-*/
-global char* FontNames[] = {
-	"small",
-	"game",
-	"large",
-	"small-title",
-	"large-title",
-	"user1",
-	"user2",
-	"user3",
-	"user4",
-	"user5",
-};
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-// FIXME: should use RLE encoded fonts, not color key fonts.
 
 /**
 **  Draw character with current color.
@@ -188,7 +179,7 @@ local FontColorMapping* GetFontColorMapping(char* color)
 		}
 		fcm = fcm->Next;
 	}
-	fprintf(stderr, "Font mapping not found: '%s'\n", color);
+	fprintf(stderr, "Font color mapping not found: '%s'\n", color);
 	ExitFatal(1);
 	return NULL;
 }
@@ -250,8 +241,8 @@ global int VideoTextLength(unsigned font, const unsigned char* text)
 			}
 		}
 		if (!isformat) {
-		width += widths[*s - 32] + 1;
-	}
+			width += widths[*s - 32] + 1;
+		}
 	}
 	return width;
 }
@@ -714,45 +705,55 @@ global void LoadFonts(void)
 	}
 }
 
+/**
+**  Find font by identifier.
+**
+**  @param ident  Font identifier
+**
+**  @return       Integer as font identifier.
+*/
+global int FontByIdent(const char* ident)
+{
+	FontMapping* fm;
+
+	fm = FontMappings;
+	while (fm) {
+		if (!strcmp(fm->Ident, ident)) {
+			return fm->Font;
+		}
+		fm = fm->Next;
+	}
+	fprintf(stderr, "Font not found: '%s'", ident);
+	ExitFatal(1);
+	return 0;
+}
+
+/**
+**  Find the name of a font.
+**
+**  @param font  Font identifier.
+**
+**  @return      Name of the font.
+*/
+global const char* FontName(int font)
+{
+	FontMapping* fm;
+
+	fm = FontMappings;
+	while (fm) {
+		if (fm->Font == font) {
+			return fm->Ident;
+		}
+		fm = fm->Next;
+	}
+	fprintf(stderr, "Font not found: %d", font);
+	ExitFatal(1);
+	return NULL;
+}
+
 /*----------------------------------------------------------------------------
 --  CCL
 ----------------------------------------------------------------------------*/
-
-/**
-**  Font symbol to id.
-**
-**  @param type  Type of the font (game,small,...)
-**
-**  @return      Integer as font identifier.
-*/
-global int CclFontByIdentifier(const char* type)
-{
-	if (!strcmp(type, "game")) {
-		return GameFont;
-	} else if (!strcmp(type, "small")) {
-		return SmallFont;
-	} else if (!strcmp(type, "large")) {
-		return LargeFont;
-	} else if (!strcmp(type, "small-title")) {
-		return SmallTitleFont;
-	} else if (!strcmp(type, "large-title")) {
-		return LargeTitleFont;
-	} else if (!strcmp(type, "user1")) {
-		return User1Font;
-	} else if (!strcmp(type, "user2")) {
-		return User2Font;
-	} else if (!strcmp(type, "user3")) {
-		return User3Font;
-	} else if (!strcmp(type, "user4")) {
-		return User4Font;
-	} else if (!strcmp(type, "user5")) {
-		return User5Font;
-	} else {
-		fprintf(stderr, "Unsupported font tag: %s", type);
-		exit(1);
-	}
-	return 0;
-}
 
 /**
 **  Define the used fonts.
@@ -766,6 +767,8 @@ local int CclDefineFont(lua_State* l)
 	int w;
 	int h;
 	char* file;
+	FontMapping** fm;
+	const char* str;
 
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
@@ -777,7 +780,22 @@ local int CclDefineFont(lua_State* l)
 	while (lua_next(l, 1)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
-			i = CclFontByIdentifier(LuaToString(l, -1));
+			str = LuaToString(l, -1);
+			fm = &FontMappings;
+			i = 0;
+			while (*fm) {
+				if (!strcmp((*fm)->Ident, str)) {
+					break;
+				}
+				fm = &(*fm)->Next;
+				++i;
+			}
+			if (!*fm) {
+				*fm = malloc(sizeof(**fm));
+				(*fm)->Ident = strdup(str);
+				(*fm)->Font = i;
+				(*fm)->Next = NULL;
+			}
 		} else if (!strcmp(value, "File")) {
 			file = strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "Size")) {

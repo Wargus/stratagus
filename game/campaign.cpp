@@ -236,7 +236,7 @@ local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 
 				if (!strcmp(value, "font")) {
 					lua_rawgeti(l, -1, k + 1);
-					(*text)->Font = CclFontByIdentifier(LuaToString(l, -1));
+					(*text)->Font = FontByIdent(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "x")) {
 					lua_rawgeti(l, -1, k + 1);
@@ -573,7 +573,7 @@ global void SaveCampaign(CLFile* file)
 				ch->Data.Picture.DisplayTime);
 			for (text = ch->Data.Picture.Text; text; text = text->Next) {
 				CLprintf(file, "      \"text\", {\n");
-				CLprintf(file, "        \"font\", \"%s\",\n", FontNames[text->Font]);
+				CLprintf(file, "        \"font\", \"%s\",\n", FontName(text->Font));
 				CLprintf(file, "        \"x\", %d,\n", text->X);
 				CLprintf(file, "        \"y\", %d,\n", text->Y);
 				CLprintf(file, "        \"width\", %d,\n", text->Width);
