@@ -263,7 +263,7 @@ void UpdateStats(int reset)
 }
 
 	/// Macro to fetch an 8bit value, to have some looking 8/16/32 bit funcs.
-#define Fetch8(p)   (*((unsigned char*)(p))++)
+#define Fetch8(p)   (*((unsigned char*)(p))); ++p
 
 /**
 **  Parse UDTA area from puds.
@@ -311,7 +311,7 @@ void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 //		unittype = UnitTypeByWcNum(i);
 //		v = Fetch8(udta);
 //		unittype->Magic = v;
-		Fetch8(udta);
+		++udta;
 	}
 	for (i = 0; i < 110; ++i) { // Build time * 6 = one second FRAMES
 		unittype = UnitTypeByWcNum(i);
@@ -406,10 +406,12 @@ void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	}
 #else
 	for (i = 0; i < 110; ++i) { // Skip weapons upgradable
-		Fetch8(udta);
+		//Fetch8(udta);
+		++udta;
 	}
 	for (i = 0; i < 110; ++i) { // Skip armor upgradable
-		Fetch8(udta);
+		//Fetch8(udta);
+		++udta;
 	}
 #endif
 	for (i = 0; i < 110; ++i) { // Missile Weapon
