@@ -604,8 +604,12 @@ global void UIHandleMouseMove(int x,int y)
     //	Move map.
     //
     if( GameCursor==TheUI.Scroll.Cursor ) {
-	int xo = MapX, yo = MapY;
+	int xo;
+	int yo;
 
+	// FIXME: Support with CTRL for faster scrolling.
+	xo = MapX;
+	yo = MapY;
 	if ( TheUI.ReverseMouseMove ) {
 	    if (x < CursorStartX) {
 		xo++;
