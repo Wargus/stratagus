@@ -107,10 +107,13 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
 	    || UnitTypeHumanWall->_HitPoints>=256 );
 
     if( map->Terrain<TilesetMax ) {
-	ctab=Tilesets[map->Terrain].Table;
+	// FIXME: should use terrain name!!
+	ctab=Tilesets[map->Terrain]->Table;
+	DebugLevel0Fn("FIXME: %s <-> %s\n",Tilesets[map->Terrain]->Class,
+		map->TerrainName);
     } else {
 	DebugLevel1("Unknown terrain!\n");
-	ctab=Tilesets[TilesetSummer].Table;
+	ctab=Tilesets[TilesetSummer]->Table;
     }
 
     for( h=0; h<height; ++h ) {
