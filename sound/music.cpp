@@ -182,9 +182,10 @@ local int PlayCDRom(const char* name)
 	if (!strncmp(name, ":", 1)) {
 	    SDL_Init(SDL_INIT_CDROM);
 	    CDRom = SDL_CDOpen(0);
-	    if (SDL_CDStatus(CDRom) == 0)
+	    if (!SDL_CDStatus(CDRom)) {
+		CDMode = ":off";
 		return 1;
-	    StopMusic();		// stop music before new music
+	    }
 	}
     }
     // CDPlayer command?
