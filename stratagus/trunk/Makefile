@@ -103,6 +103,10 @@ src/freecraftrc.o: src/freecraft.rc
 # -L. -lefence
 # -Lccmalloc-0.2.3/src -lccmalloc -ldl
 
+echo::
+	@-echo CFLAGS: $(CFLAGS)
+	@-echo LIBS: $(CLONELIBS)
+
 tools::
 	@$(MAKE) -C tools all
 
@@ -145,9 +149,9 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 	  doc/freecraft.html doc/datadir.html \
 	  doc/faq.html doc/ChangeLog.html doc/todo.html doc/freecraft.lsm \
 	  doc/development.html doc/gpl.txt doc/gpl.html doc/SIOD.txt \
-	  doc/ccl/ccl.html doc/ccl/tileset.html \
-	  doc/ccl/icon.html doc/ccl/unittype.html doc/graphic/*.html \
-	  doc/graphic/*.png
+	  doc/ccl/ai.html doc/ccl/ccl.html doc/ccl/config.html \
+	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
+	  doc/graphic/*.html doc/graphic/*.png
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
@@ -355,7 +359,7 @@ buildclean:
 	rm -rf data/*.rgb data/*.gimp data/puds data/sound data/graphic \
 	data/interface data/campaigns data/text data/health.png data/mana.png \
 	data/default.pud.gz data/freecraft.png
-	rm -rf data/graphics data/sounds data/texts
+	rm -rf data/graphics data/sounds data/texts data/music
 
 release:
 	$(MAKE) distclean
