@@ -258,23 +258,35 @@ typedef struct _decoration_ {
 /**
 **	Sprite to display the mana.
 */
-global Decoration ManaSprite = {
-    "mana.png",		-7,-7, 7,7
-};
+global Decoration ManaSprite
+#ifndef USE_CCL
+    = { "mana.png",		-7,-7, 7,7 }
+#endif
+    ;
 
 /**
 **	Sprite to display the health.
 */
-global Decoration HealthSprite = {
-    "health.png",	0,-7, 7,7
-};
+global Decoration HealthSprite
+#ifndef USE_CCL
+    = { "health.png",		0,-7, 7,7 }
+#endif
+    ;
 
 /**
 **	Sprite to display the shadow of flying units.
+**
+**	@todo	Made this configurable with CCL.
 */
-global Decoration ShadowSprite = {
-    "graphic/unit shadow.png",	0,42, 32,32
-};
+global Decoration ShadowSprite
+#ifndef laterUSE_CCL
+#ifdef NEW_NAMES
+     = { "graphics/missiles/unit shadow.png",	0,42, 32,32 };
+#else
+     = { "graphic/unit shadow.png",	0,42, 32,32 };
+#endif
+#endif
+    ;
 
 /**
 **	Sprite to display the active spells on units.
@@ -339,7 +351,12 @@ global void LoadDecorations(void)
     ShadowSprite.Sprite=LoadSprite(ShadowSprite.File
 		,ShadowSprite.Width,ShadowSprite.Height);
     // FIXME: make this configurable
+#ifdef NEW_NAMES
+    SpellSprites=LoadSprite("graphics/ui/bloodlust,haste,slow,invisible,shield.png"
+	,16,16);
+#else
     SpellSprites=LoadSprite("graphic/bloodlust,haste,slow,invis.,shield.png",16,16);
+#endif
 }
 
 #ifdef REFS_DEBUG
