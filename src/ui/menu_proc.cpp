@@ -2148,6 +2148,7 @@ global void InitMenus(int race)
     int height;
 
     InitMenuData();
+    InitMenuFunctions();
 
     if (race == last_race) {	// same race? already loaded!
 	return;
@@ -2175,7 +2176,6 @@ global void InitMenus(int race)
     height = MenuButtonGfx.Height[race];
     MenuButtonGfx.Sprite = LoadSprite(file, width, height);
 
-    InitMenuFunctions();
     CurrentMenu = NULL;
 }
 
