@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-"Update the command index in ccl-index.html."
+""" Print a line for each function in index.html.
+  Usefull to check if all functions are documented.
+"""
 
 import os
 

@@ -57,13 +57,13 @@
 <a href="#DefineBurningBuilding">DefineBurningBuilding</a>
 <a href="#DefineCampaign">DefineCampaign</a>
 <a href="#DefineConstruction">DefineConstruction</a>
-<a href="pud.html#DefineConstructionWcNames">DefineConstructionWcNames</a>
 <a href="#DefineEditorUnitTypes">DefineEditorUnitTypes</a>
 <a href="#DefineRaceNames">DefineRaceNames</a>
 <a href="#DefineRanks">DefineRanks</a>
 <a href="#Diplomacy">Diplomacy</a>
 <a href="#StratagusMap">StratagusMap</a>
 <a href="#GameCycle">GameCycle</a>
+<a href="#GetPlayerData">GetPlayerData</a>
 <a href="#GetThisPlayer">GetThisPlayer</a>
 <a href="#GetUnitMana">GetUnitMana</a>
 <a href="#GetUnitUnholyArmor">GetUnitUnholyArmor</a>
@@ -90,6 +90,7 @@
 <a href="#SetGroupId">SetGroupId</a>
 <a href="#SetLocalPlayerName">SetLocalPlayerName</a>
 <a href="#SetObjectives">SetObjectives</a>
+<a href="#SetPlayerData">SetPlayerData</a>
 <a href="#SetSharedVision">SetSharedVision</a>
 <a href="#SetThisPlayer">SetThisPlayer</a>
 <a href="#SetUnitMana">SetUnitMana</a>
@@ -597,6 +598,80 @@ Returns the current game cycle.
 <pre>
     cycle = GameCycle()
 </pre>
+
+
+<a name="GetPlayerData"></a>
+<h3>GetPlayerData(player, property)</h3>
+
+Returns the requested player property.
+
+The <i>player</i> argument is the number of the player.
+<p>
+
+Possible values for <i>property</i>:
+<dl>
+<dt>Name</dt>
+<dd>Name of the player. This name may be exposed in multiplayer games.
+</dd>
+<dt>RaceName</dt>
+<dd>Name of race.
+</dd>
+<dt>Ressources</dt>
+<dd>The amount of ressources available for the ressource whose name is given as third argument.
+</dd>
+<dt>UnitTypesCount</dt>
+<dd>The amount of units whose type is given as third argument.
+</dd>
+<dt>AiEnabled</dt>
+<dd>True if the player is controled by the computer.
+</dd>
+<dt>TotalNumUnits</dt>
+<dd>total # units for units' list.
+</dd>
+<dt>NumBuildings</dt>
+<dd>number of buildings owned by the player.
+</dd>
+<dt>Supply</dt>
+<dd>supply available/produced.
+</dd>
+<dt>Demand</dt>
+<dd>demand of player.
+</dd>
+<dt>UnitLimit</dt>
+<dd>maximum number of non-building units allowed.
+</dd>
+<dt>BuildingLimit</dt>
+<dd>maximum number of buildings allowed.
+</dd>
+<dt>TotalUnitLimit</dt>
+<dd>maximum number of units of any kind allowed.
+</dd>
+<dt>Score</dt>
+<dd>Points for killing ...
+</dd>
+<dt>TotalUnits</dt>
+<dd>Total number of units.
+</dd>
+<dt>TotalBuildings</dt>
+<dd>Total number of buildings.
+</dd>
+<dt>TotalResources</dt>
+<dd>Total ressources of the <i>resource</i> type collected by the player.
+</dd>
+<dt>TotalRazings</dt>
+<dd>Total buildings destroyed.
+</dd>
+<dt>TotalKills</dt>
+<dd>How many units killed.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    playername = GetPlayerData(player, "Name")
+</pre>
+
 
 <a name="GetThisPlayer"></a>
 <h3>GetThisPlayer()</h3>
@@ -1183,6 +1258,61 @@ Sets shared vision.
     -- Sets shared vision for player 0 to on with player 2.
     SetSharedVision(0, true, 2)
 </pre>
+
+
+
+
+<a name="SetPlayerData"></a>
+<h3>SetPlayerData(player, property, [resource], value)</h3>
+
+Set the requested player property to a given <i>value</i>.
+
+The <i>player</i> argument is the number of the player.
+<p>
+
+Possible values for <i>property</i>:
+<dl>
+<dt>Name</dt>
+<dd>Name of the player. This name may be exposed in multiplayer games.
+</dd>
+<dt>Ressources</dt>
+<dd>The amount of resources available of the <i>resource</i> kind.
+</dd>
+<dt>UnitLimit</dt>
+<dd>maximum number of non-building units allowed.
+</dd>
+<dt>BuildingLimit</dt>
+<dd>maximum number of buildings allowed.
+</dd>
+<dt>TotalUnitLimit</dt>
+<dd>maximum number of units of any kind allowed.
+</dd>
+<dt>Score</dt>
+<dd>Points for killing ...
+</dd>
+<dt>TotalUnits</dt>
+<dd>Total number of units.
+</dd>
+<dt>TotalBuildings</dt>
+<dd>Total number of buildings.
+</dd>
+<dt>TotalResources</dt>
+<dd>Total ressources of the <i>resource</i> type collected by the player.
+</dd>
+<dt>TotalRazings</dt>
+<dd>Total buildings destroyed.
+</dd>
+<dt>TotalKills</dt>
+<dd>How many units killed.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    SetPlayerData(player, "Name", "playername")
+</pre>
+
 
 <a name="SetThisPlayer"></a>
 <h3>SetThisPlayer(playernum)</h3>
