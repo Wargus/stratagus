@@ -48,7 +48,7 @@
 #include "missile.h"
 #include "tileset.h"
 #include "map.h"
-#include "ccl.h"
+#include "script.h"
 #include "ui.h"
 #include "ai.h"
 #include "campaign.h"

@@ -40,7 +40,7 @@
 #include <setjmp.h>
 
 #include "stratagus.h"
-#include "ccl.h"
+#include "script.h"
 #include "unittype.h"
 #include "player.h"
 #include "trigger.h"

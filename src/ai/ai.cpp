@@ -147,8 +147,8 @@
 
 #include "player.h"
 #include "unit.h"
-#include "ccl.h"
-#include "ccl_helpers.h"
+#include "script.h"
+#include "script_helpers.h"
 #include "actions.h"
 #include "map.h"
 

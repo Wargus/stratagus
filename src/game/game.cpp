@@ -64,7 +64,7 @@
 #include "trigger.h"
 #include "commands.h"
 
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

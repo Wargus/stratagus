@@ -51,7 +51,7 @@
 #include "ui.h"
 #include "map.h"
 #include "menus.h"
-#include "ccl.h"
+#include "script.h"
 #include "tileset.h"
 #include "minimap.h"
 #include "network.h"

@@ -47,7 +47,7 @@
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
-#include "ccl.h"
+#include "script.h"
 #include "pathfinder.h"
 
 /*----------------------------------------------------------------------------

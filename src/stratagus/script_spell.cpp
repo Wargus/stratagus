@@ -8,7 +8,7 @@
 //			  T H E	  W A R	  B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_spells.c	-	The spell ccl functions.. */
+/**@name script_spells.c	-	The spell script functions.. */
 //
 //	(c) Copyright 1998-2003 by Joris DAUPHIN
 //
@@ -44,8 +44,8 @@
 #include "unittype.h"
 */
 #include "spells.h"
-#include "ccl_sound.h"
-#include "ccl.h"
+#include "script_sound.h"
+#include "script.h"
 
 // **************************************************************************
 //				Action parsers for spellAction

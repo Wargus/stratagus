@@ -41,7 +41,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --		Variables

@@ -47,8 +47,8 @@
 #include "network.h"
 #include "netconnect.h"
 #include "campaign.h"						// for CurrentMapPath
-#include "ccl.h"
-#include "ccl_helpers.h"
+#include "script.h"
+#include "script_helpers.h"
 #include "commands.h"
 #include "interface.h"
 #include "iocompat.h"

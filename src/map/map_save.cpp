@@ -46,7 +46,7 @@
 #include "pud.h"
 #include "ui.h"
 
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --		Variables

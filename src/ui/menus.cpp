@@ -66,7 +66,7 @@
 #include "campaign.h"
 #include "sound_server.h"
 #include "sound.h"
-#include "ccl.h"
+#include "script.h"
 #include "editor.h"
 #include "commands.h"
 #include "actions.h"

@@ -50,7 +50,7 @@
 #include "iocompat.h"
 #include "network.h"
 #include "netconnect.h"
-#include "ccl.h"
+#include "script.h"
 #include "master.h"
 #include "net_lowlevel.h"
 

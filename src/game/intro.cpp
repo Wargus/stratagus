@@ -46,7 +46,7 @@
 #include "sound_server.h"
 #include "sound.h"
 #include "settings.h"
-#include "ccl.h"
+#include "script.h"
 #include "campaign.h"
 #include "cursor.h"
 #include "menus.h"

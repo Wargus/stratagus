@@ -44,7 +44,7 @@
 #include "video.h"
 #include "icons.h"
 #include "player.h"
-#include "ccl.h"
+#include "script.h"
 
 #include "etlib/hash.h"
 

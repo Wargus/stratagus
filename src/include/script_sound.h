@@ -28,8 +28,8 @@
 //
 //      $Id$
 
-#ifndef __CCL_SOUND_H__
-#define __CCL_SOUND_H__
+#ifndef __SCRIPT_SOUND_H__
+#define __SCRIPT_SOUND_H__
 
 //@{
 
@@ -39,7 +39,7 @@
 
 #ifdef WITH_SOUND // {
 
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

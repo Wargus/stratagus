@@ -48,7 +48,7 @@
 #include "ui.h"
 #include "editor.h"
 
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --		Variables

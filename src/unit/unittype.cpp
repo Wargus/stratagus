@@ -49,7 +49,7 @@
 #include "unittype.h"
 #include "player.h"
 #include "missile.h"
-#include "ccl.h"
+#include "script.h"
 #include "spells.h"
 
 #include "etlib/hash.h"

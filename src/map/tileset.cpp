@@ -38,7 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ccl.h"
+#include "script.h"
 #include "stratagus.h"
 #include "tileset.h"
 #include "map.h"
