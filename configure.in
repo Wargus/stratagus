@@ -28,6 +28,16 @@ else
     ARCH=linux
 fi
 
+dnl --- CHECK FOR WITH SOUND ---
+AC_ARG_ENABLE(sound,
+    [  --enable-sound	  [Use sound (default: yes)]], SOUND="$with_sound")
+SOUND_CFLAGS=
+if test "$SOUND" != "no"; then
+    SOUND_CFLAGS="-DWITH_SOUND"
+fi
+AC_SUBST(SOUND_CFLAGS)
+dnl ----------------------------
+
 AC_ARG_ENABLE(win32,
     [  --enable-win32	  Force win32, useful for cross-compiling (default: no)])
 if test "$enable_win32" = "yes"; then
@@ -141,15 +151,6 @@ AC_SUBST(ZZIPLIB_CFLAGS)
 AC_SUBST(ZZIPLIB_LIBS)
 dnl ----------------------------
 
-dnl --- CHECK FOR WITH SOUND ---
-AC_ARG_WITH(sound,
-    [  --with-sound		  [Use sound (default: yes)]], SOUND="$with_sound")
-SOUND_CFLAGS=
-if test "$SOUND" != "no"; then
-    SOUND_CFLAGS="-DWITH_SOUND"
-fi
-AC_SUBST(SOUND_CFLAGS)
-dnl ----------------------------
 
 dnl --- CHECK FOR OGG VORBIS ---
 AC_ARG_WITH(ogg, 
