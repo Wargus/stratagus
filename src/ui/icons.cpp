@@ -555,48 +555,28 @@ local int CclDefineIcon(lua_State* l)
 
     //  Identifier
 
-    if (!lua_isstring(l, j + 1)) {
-	lua_pushstring(l, "incorrect argument");
-	lua_error(l);
-    }
-    ident = lua_tostring(l, j + 1);
+    ident = LuaToString(l, j + 1);
     ++j;
 
     //
     //  Parse the arguments, tagged format.
     //
     for (; j < args; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, j + 1);
+	value = LuaToString(l, j + 1);
 	++j;
 
 	if (!strcmp(value, "tileset")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset = lua_tostring(l, j + 1);
+	    tileset = LuaToString(l, j + 1);
 	} else if (!strcmp(value, "size")) {
 	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
 	    lua_rawgeti(l, j + 1, 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    width = lua_tonumber(l, -1);
+	    width = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    lua_rawgeti(l, j + 1, 2);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    height = lua_tonumber(l, -1);
+	    height = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "normal")) {
 	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
@@ -604,18 +584,10 @@ local int CclDefineIcon(lua_State* l)
 		lua_error(l);
 	    }
 	    lua_rawgeti(l, j + 1, 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    index = lua_tonumber(l, -1);
+	    index = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    lua_rawgeti(l, j + 1, 2);
-	    if (!lua_isstring(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    filename = lua_tostring(l, -1);
+	    filename = LuaToString(l, -1);
 	    lua_pop(l, 1);
 	} else {
 	    lua_pushfstring(l, "Unsupported tag: %s", value);
@@ -653,13 +625,13 @@ local SCM CclDefineIconAlias(SCM alias, SCM icon)
 #elif defined(USE_LUA)
 local int CclDefineIconAlias(lua_State* l)
 {
-    if (lua_gettop(l) != 2 || !lua_isstring(l, 1) || !lua_isstring(l, 2)) {
+    if (lua_gettop(l) != 2) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     IconAliases = realloc(IconAliases, sizeof(char*) * 2 * (NumIconAliases + 1));
-    IconAliases[NumIconAliases * 2 + 0] = strdup(lua_tostring(l, 1));
-    IconAliases[NumIconAliases * 2 + 1] = strdup(lua_tostring(l, 2));
+    IconAliases[NumIconAliases * 2 + 0] = strdup(LuaToString(l, 1));
+    IconAliases[NumIconAliases * 2 + 1] = strdup(LuaToString(l, 2));
     ++NumIconAliases;
 
     return 0;
@@ -722,11 +694,7 @@ local int CclDefineIconWcNames(lua_State* l)
     }
 
     for (j = 0; j < i; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	*cp++ = strdup(lua_tostring(l, j + 1));
+	*cp++ = strdup(LuaToString(l, j + 1));
     }
     *cp = NULL;
 
@@ -751,12 +719,12 @@ local SCM CclSetIconSize(SCM width, SCM height)
 #elif defined(USE_LUA)
 local int CclSetIconSize(lua_State* l)
 {
-    if (lua_gettop(l) != 2 || !lua_isnumber(l, 1) || !lua_isnumber(l, 2)) {
+    if (lua_gettop(l) != 2) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    IconWidth = lua_tonumber(l, 1);
-    IconHeight = lua_tonumber(l, 2);
+    IconWidth = LuaToNumber(l, 1);
+    IconHeight = LuaToNumber(l, 2);
     return 0;
 }
 #endif

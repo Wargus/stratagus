@@ -987,11 +987,7 @@ local int CclDefineUpgradeWcNames(lua_State* l)
     }
 
     for (j = 0; j < i; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	*cp++ = strdup(lua_tostring(l, j + 1));
+	*cp++ = strdup(LuaToString(l, j + 1));
     }
     *cp = NULL;
 
@@ -1316,7 +1312,7 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 	    unit->Type = dst;
 	    unit->Stats = &dst->Stats[player->Player];
 	    // and we have new one...
-	    
+
 	    UpdateForNewUnit(unit, 1);
 	    if (dst->CanCastSpell) {
 		unit->Mana = MAGIC_FOR_NEW_UNITS;
@@ -1327,7 +1323,7 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 		unit->CurrentSightRange = dst->Stats[player->Player].SightRange;
 		MapMarkUnitSight(unit);
 	    }
-	    
+
 	    CheckUnitToBeDrawn(unit);
 	//
 	//	Convert trained units to this type.
@@ -1407,7 +1403,7 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 	if (um->ApplyTo[z] == 'X') {
 
 	    DebugLevel3Fn(" applied to %d\n" _C_ z);
-	    // upgrade stats     
+	    // upgrade stats
 	    UnitTypes[z]->Stats[pn].AttackRange += um->Modifier.AttackRange;
 	    UnitTypes[z]->Stats[pn].SightRange += um->Modifier.SightRange;
 	    //If Sight range is upgraded, we need to change EVERY unit
@@ -1415,7 +1411,7 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 	    if (um->Modifier.SightRange) {
 		int numunits;
 		Unit* sightupgrade[UnitMax];
-		
+
 		numunits = FindUnitsByType(UnitTypes[z], sightupgrade);
 		numunits--; // Change to 0 Start not 1 start
 		while (numunits >= 0) {
@@ -1425,7 +1421,7 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 			sightupgrade[numunits]->CurrentSightRange =
 			    UnitTypes[z]->Stats[pn].SightRange;
 			MapMarkUnitSight(sightupgrade[numunits]);
-		    }                                   
+		    }
 		    --numunits;
 		}
 	    }
