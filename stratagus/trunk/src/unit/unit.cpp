@@ -2822,7 +2822,9 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     }
     target->HP-=damage;		// UNSIGNED!
 #ifdef USE_HP_FOR_XP
-    attacker->XP+=damage;
+    if( attacker ) {
+	attacker->XP+=damage;
+    }
 #endif
 
 #if 0
