@@ -1903,7 +1903,9 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 	drawlevel2 = c2->Type->DrawLevel;
     }
     if( drawlevel1 == drawlevel2 ) {
-	return c1->Y*MaxMapWidth+c1->X < c2->Y*MaxMapWidth+c2->X ? -1 : 1;
+	return c1->Y*MaxMapWidth+c1->X - c2->Y*MaxMapWidth+c2->X ? 
+		c1->Y*MaxMapWidth+c1->X - c2->Y*MaxMapWidth+c2->X : 
+		c1->Slot - c2->Slot;
     } else {
 	return drawlevel1 <= drawlevel2 ? -1 : 1;
     }
