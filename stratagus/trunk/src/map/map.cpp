@@ -614,6 +614,8 @@ global void CleanMap(void)
 
     FreeMapInfo(TheMap.Info);
     memset(&TheMap,0,sizeof(TheMap));
+
+    CleanPud();
 }
 
 //@}
