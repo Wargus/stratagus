@@ -884,6 +884,8 @@ local int GameStatsDrawFunc(int frame)
 	char** ranks;
 	int* scores;
 
+	ranks = NULL;	/* .. -Wuninitialized .. */
+	scores = NULL;
 	for( i=0; RaceWcNames[i]; ++i ) {
 	    if( !strcmp(RaceWcNames[i],ThisPlayer->RaceName) ) {
 		ranks=Ranks[i].Ranks;
