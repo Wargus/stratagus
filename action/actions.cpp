@@ -560,7 +560,7 @@ static void HandleUnitAction(Unit* unit)
 					Assert(unit->Orders[0].Goal->Data.Resource.Active >= 0);
 				}
 				// Still shouldn't have a reference unless attacking
-				Assert(unit->Orders[0].Action != UnitActionStill && !unit->SubAction);
+				Assert(!(unit->Orders[0].Action == UnitActionStill && !unit->SubAction));
 				RefsDecrease(unit->Orders->Goal);
 			}
 			if (unit->CurrentResource) {
