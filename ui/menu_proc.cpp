@@ -1154,7 +1154,7 @@ local void PasteFromClipboard(Menuitem* mi)
 {
 #if defined(USE_WIN32) || defined(_XLIB_H_)
 	int i;
-	char* clipboard;
+	unsigned char* clipboard;
 #ifdef USE_WIN32
 	HGLOBAL handle;
 #elif defined(_XLIB_H_)
@@ -1204,8 +1204,7 @@ local void PasteFromClipboard(Menuitem* mi)
 	}
 
 	XGetWindowProperty(display, window, XA_STRING, 0, 1024, False,
-		XA_STRING, &rettype, &retform, &nitem, &dummy,
-		(unsigned char**)&clipboard);
+		XA_STRING, &rettype, &retform, &nitem, &dummy, &clipboard);
 
 	XDestroyWindow(display, window);
 	XCloseDisplay(display);
