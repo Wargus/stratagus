@@ -52,14 +52,17 @@ global int IOLoadingMode;
 global unsigned int IOTabLevel;
 global CLFile *IOOutFile;
 
-global void IOPrintTabs()
+/**
+**	Output tabs when saving a ccl value
+*/
+global void IOPrintTabs(void)
 {
     unsigned int tableft;
     unsigned int cur;
     char buffer[256];
     tableft = IOTabLevel;
     while (tableft) {
-	cur = (tableft >= sizeof(buffer) ? sizeof(buffer) - 1 : tableft);
+	cur = (tableft >= sizeof (buffer) ? sizeof (buffer) - 1 : tableft);
 
 	memset(buffer, 9, cur);
 	buffer[cur] = 0;
@@ -70,22 +73,27 @@ global void IOPrintTabs()
     }
 }
 
-local void saveData(CclFieldDef * defs, void *data)
+/**
+**	Save a structure.
+**
+**	@param defs	the structure definition
+**	@param data	pointer to the structure
+*/
+local void saveData(IOFieldDef * defs, void *data)
 {
     unsigned int i;
     while (defs->name) {
 	if (defs->convertfunc) {
 	    IOPrintTabs();
 	    for (i = 0; i < IOTabLevel; i++) {
-		DebugLevel3Fn( "\t" );
+		DebugLevel3Fn("\t");
 	    }
 	    DebugLevel3Fn("saving %s\n" _C_ defs->name);
 	    // name
 	    CLprintf(IOOutFile, "%s", defs->name);
 	    IOTabLevel++;
 	    // real output
-	    (*defs->convertfunc)(SCM_UNSPECIFIED,
-		((char*)data) + (int)defs->offset, defs->para);
+	    (*defs->convertfunc) (SCM_UNSPECIFIED, ((char *) data) + (int) defs->offset, defs->para);
 	    IOTabLevel--;
 	    CLprintf(IOOutFile, "\n");
 	}
@@ -93,11 +101,18 @@ local void saveData(CclFieldDef * defs, void *data)
     }
 }
 
-local void restoreData(CclFieldDef * defs, void *data, SCM desc)
+/**
+**	Load a structure.
+**
+**	@param defs	the structure definition
+**	@param data	pointer to the structure
+**	@param desc	SCM to parse
+*/
+local void restoreData(IOFieldDef * defs, void *data, SCM desc)
 {
     SCM ident;
     SCM value;
-    CclFieldDef *curdef;
+    IOFieldDef *curdef;
     while (!gh_null_p(desc)) {
 	ident = gh_car(desc);
 	desc = gh_cdr(desc);
@@ -105,7 +120,7 @@ local void restoreData(CclFieldDef * defs, void *data, SCM desc)
 	desc = gh_cdr(desc);
 	for (curdef = defs; curdef->name; curdef++) {
 	    if (curdef->convertfunc && gh_eq_p(ident, gh_symbol2scm(curdef->name))) {
-		(*curdef->convertfunc)(value, ((char*)data) + (int)curdef->offset,
+		(*curdef->convertfunc) (value, ((char *) data) + (int) curdef->offset,
 		    curdef->para);
 		break;
 	    }
@@ -120,17 +135,17 @@ local void restoreData(CclFieldDef * defs, void *data, SCM desc)
 /**
 **	Handle saving/loading of structure.
 **	binaryform points to the structure to load/save.
-**	para is used as a (CclStructDef*)
+**	para is used as a (IOStructDef*)
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the structure to load/save
-**	@param	para		Pointer to a CclStructDef structure.
+**	@param	para		Pointer to a IOStructDef structure.
 */
 global void IOStruct(SCM scmform, void *binaryform, void *para)
 {
-    CclStructDef *structDef;
+    IOStructDef *structDef;
 
-    structDef = (CclStructDef*)para;
+    structDef = (IOStructDef *) para;
 
     if (IOLoadingMode) {
 	restoreData(structDef->defs, binaryform, scmform);
@@ -151,23 +166,23 @@ global void IOStruct(SCM scmform, void *binaryform, void *para)
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the structure'reference to load/save ( <structure-type> ** )
-**	@param	para		Pointer to a CclStructDef structure.
+**	@param	para		Pointer to a IOStructDef structure.
 */
 global void IOStructPtr(SCM scmform, void *binaryform, void *para)
 {
     void **structptr;
-    CclStructDef *def;
+    IOStructDef *def;
 
     if (IOHandleNullPtr(scmform, binaryform)) {
 	return;
     }
 
-    def = (CclStructDef*)para;
+    def = (IOStructDef *) para;
 
-    structptr = (void**)binaryform;
+    structptr = (void **) binaryform;
 
     if (IOLoadingMode) {
-	(*structptr) = (void*)malloc(def->size);
+	(*structptr) = (void *) malloc(def->size);
 	memset((*structptr), 0, def->size);
 	IOStruct(scmform, (*structptr), para);
     } else {
@@ -177,26 +192,26 @@ global void IOStructPtr(SCM scmform, void *binaryform, void *para)
 
 /**
 **	Handle saving/loading an array of structures.
-**	The array size is found in the array_size field of the CclStructDef structure. 
+**	The array size is found in the array_size field of the IOStructDef structure. 
 **	The array is NOT malloc'ed. 
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the structure'reference to load/save ( <structure-type> * )
-**	@param	para		Pointer to a CclStructDef structure, describing format of the structure.
+**	@param	para		Pointer to a IOStructDef structure, describing format of the structure.
 */
 global void IOStructArray(SCM from, void *binaryform, void *para)
 {
-    CclStructDef *def;
+    IOStructDef *def;
     int i;
 
-    def = (CclStructDef*) para;
+    def = (IOStructDef *) para;
 
     if (IOLoadingMode) {
 	for (i = 0; i < def->array_size; ++i) {
 	    IOStruct(gh_car(from), binaryform, para);
 
 	    from = gh_cdr(from);
-	    (char*)binaryform += def->size;
+	    (char *) binaryform += def->size;
 	}
     } else {
 	CLprintf(IOOutFile, " (\n");
@@ -205,7 +220,7 @@ global void IOStructArray(SCM from, void *binaryform, void *para)
 	    IOPrintTabs();
 	    IOStruct(from, binaryform, para);
 	    CLprintf(IOOutFile, "\n");
-	    (char*)binaryform += def->size;
+	    (char *) binaryform += def->size;
 	}
 	--IOTabLevel;
 	IOPrintTabs();
@@ -216,23 +231,23 @@ global void IOStructArray(SCM from, void *binaryform, void *para)
 /**
 **	Handle saving/loading a linked list of structure.
 **	The binaryform is a pointer to the "first" field.
-**	The third parameter is a pointer to a CclStructDef, describing list elements.
+**	The third parameter is a pointer to a IOStructDef, describing list elements.
 **
 **	defs[0] must contain the reference to the next field on the loaded structure.  
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the "first"'ref ( <any-structure>** )
-**	@param	para		Pointer to the CclStructDef
+**	@param	para		Pointer to the IOStructDef
 */
 global void IOLinkedList(SCM scmfrom, void *binaryform, void *para)
 {
     SCM item;
-    CclStructDef *itemDef;
+    IOStructDef *itemDef;
     void **current;
-    itemDef = (CclStructDef*)para;
+    itemDef = (IOStructDef *) para;
 
     if (IOLoadingMode) {
-	current = (void**)binaryform;
+	current = (void **) binaryform;
 	while (!gh_null_p(scmfrom)) {
 	    item = gh_car(scmfrom);
 	    scmfrom = gh_cdr(scmfrom);
@@ -240,21 +255,22 @@ global void IOLinkedList(SCM scmfrom, void *binaryform, void *para)
 	    // Just to be safe... 
 	    if (!gh_null_p(item)) {
 		IOStructPtr(item, current, itemDef);
-		current = (void**)(((char*)(*current)) + (int)itemDef->defs->offset);
+		current =
+		    (void **) (((char *) (*current)) + (int) itemDef->defs->offset);
 	    }
 	}
     } else {
-	current = ((void**)binaryform);
+	current = ((void **) binaryform);
 
 	CLprintf(IOOutFile, " (\n");
 	++IOTabLevel;
-	while (*((void**)current)) {
+	while (*((void **) current)) {
 	    IOPrintTabs();
 	    IOStructPtr(gh_car(scmfrom), current, itemDef);
 	    CLprintf(IOOutFile, "\n");
 
 	    // Get the next...
-	    current = (void**)(((char*)(*current)) + (int)itemDef->defs->offset);
+	    current = (void **) (((char *) (*current)) + (int) itemDef->defs->offset);
 	}
 	--IOTabLevel;
 	IOPrintTabs();
@@ -266,8 +282,8 @@ global void IOLinkedList(SCM scmfrom, void *binaryform, void *para)
 /**
 **	Handle saving/loading a table of structure.
 **	The table is composed of two thing : a pointer to data and a counter. 
-**	The third parameter is a pointer to a CclStructDef, describing the table
-**	fields of the CclStructDef are :
+**	The third parameter is a pointer to a IOStructDef, describing the table
+**	fields of the IOStructDef are :
 **		size		indicate the size of one element of the table.
 **		defs[0]:	describe the data field ( should be <any-structure>** ) 
 **		defs[1]:	describe the counter field ( should be int )
@@ -275,39 +291,38 @@ global void IOLinkedList(SCM scmfrom, void *binaryform, void *para)
 **	
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the "first"'ref ( <any-structure>** )
-**	@param	para		Pointer to the CclStructDef
+**	@param	para		Pointer to the IOStructDef
 */
 global void IOTable(SCM scmfrom, void *binaryform, void *para)
 {
-    CclStructDef *def;
+    IOStructDef *def;
     int count;
     void *org;
 
-    def = (CclStructDef*)para;
+    def = (IOStructDef *) para;
     if (IOLoadingMode) {
 	count = 0;
 	org = 0;
 	while (!gh_null_p(scmfrom)) {
 	    ++count;
 	    org = realloc(org, def->size * count);
-	    (*def->defs[2].convertfunc)(gh_car(scmfrom),
-		(void*)((char*)org + (def->size * (count - 1))),
-		def->defs[2].para);
+	    (*def->defs[2].convertfunc) (gh_car(scmfrom),
+		(void *) ((char *) org + (def->size * (count - 1))), def->defs[2].para);
 	    scmfrom = gh_cdr(scmfrom);
 	}
-	*((void**)((char*)binaryform + (int)def->defs[0].offset)) = org;
-	*((int*)((char*)binaryform + (int)def->defs[1].offset)) = count;
+	*((void **) ((char *) binaryform + (int) def->defs[0].offset)) = org;
+	*((int *) ((char *) binaryform + (int) def->defs[1].offset)) = count;
     } else {
 	CLprintf(IOOutFile, " (\n");
 	++IOTabLevel;
-	count = *((int*)((char*)binaryform + (int)def->defs[1].offset));
-	org = *((void**)((char*)binaryform + (int)def->defs[0].offset));
+	count = *((int *) ((char *) binaryform + (int) def->defs[1].offset));
+	org = *((void **) ((char *) binaryform + (int) def->defs[0].offset));
 
 	while (count) {
 	    IOPrintTabs();
-	    (*def->defs[2].convertfunc)(scmfrom, org, def->defs[2].para);
+	    (*def->defs[2].convertfunc) (scmfrom, org, def->defs[2].para);
 	    CLprintf(IOOutFile, "\n");
-	    org = (void*)((char*)org + def->size);
+	    org = (void *) ((char *) org + def->size);
 	    --count;
 	}
 	--IOTabLevel;
@@ -328,9 +343,9 @@ global void IOTable(SCM scmfrom, void *binaryform, void *para)
 global void IOInt(SCM scmfrom, void *binaryform, void *para)
 {
     if (IOLoadingMode) {
-	(*((int*)binaryform)) = gh_scm2long(scmfrom);
+	(*((int *) binaryform)) = gh_scm2long(scmfrom);
     } else {
-	CLprintf(IOOutFile, " %d", (*((int*)binaryform)));
+	CLprintf(IOOutFile, " %d", (*((int *) binaryform)));
     }
 }
 
@@ -349,9 +364,9 @@ global void IOString(SCM scmfrom, void *binaryform, void *para)
 	return;
     }
     if (IOLoadingMode) {
-	(*((char**)binaryform)) = gh_scm2newstr(scmfrom, 0);
-    } else {			// FIXME : (pludov) better string support
-	CLprintf(IOOutFile, " \"%s\"", (*((char**)binaryform)));
+	(*((char **) binaryform)) = gh_scm2newstr(scmfrom, 0);
+    } else {				// FIXME : (pludov) better string support
+	CLprintf(IOOutFile, " \"%s\"", (*((char **) binaryform)));
     }
 }
 
@@ -367,9 +382,9 @@ global void IOString(SCM scmfrom, void *binaryform, void *para)
 global void IOBool(SCM scmfrom, void *binaryform, void *para)
 {
     if (IOLoadingMode) {
-	(*((int*)binaryform)) = gh_null_p(scmfrom) ? 0 : 1;
+	(*((int *) binaryform)) = gh_null_p(scmfrom) ? 0 : 1;
     } else {
-	CLprintf(IOOutFile, " %s", (*((int*)binaryform) ? "#t" : "#f"));
+	CLprintf(IOOutFile, " %s", (*((int *) binaryform) ? "#t" : "#f"));
     }
 }
 
@@ -385,9 +400,9 @@ global void IOBool(SCM scmfrom, void *binaryform, void *para)
 global void IOCharBool(SCM scmfrom, void *binaryform, void *para)
 {
     if (IOLoadingMode) {
-	(*((char*)binaryform)) = (gh_null_p(scmfrom) ? 0 : 1);
+	(*((char *) binaryform)) = (gh_null_p(scmfrom) ? 0 : 1);
     } else {
-	CLprintf(IOOutFile, " %s", (*((char*)binaryform) ? "#t" : "#f"));
+	CLprintf(IOOutFile, " %s", (*((char *) binaryform) ? "#t" : "#f"));
     }
 }
 
@@ -402,7 +417,7 @@ global void IOCharBool(SCM scmfrom, void *binaryform, void *para)
 global void IOCcl(SCM scmfrom, void *binaryform, void *para)
 {
     SCM *ptr;
-    ptr = (SCM*)binaryform;
+    ptr = (SCM *) binaryform;
     if (IOLoadingMode) {
 	*ptr = scmfrom;
 	CclGcProtect(*ptr);
@@ -414,25 +429,25 @@ global void IOCcl(SCM scmfrom, void *binaryform, void *para)
 
 /**
 **	Handle saving/loading a flag stored on a char
-**	Flag are defined as an array of CclFlagDef, terminated by {0,0}
+**	Flag are defined as an array of IOFlagDef, terminated by {0,0}
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the scm value to load/save ( char* )
-**	@param	para		Array of CclFlagDef, describing possible values ( CclFlagDef * ) 
+**	@param	para		Array of IOFlagDef, describing possible values ( IOFlagDef * ) 
 */
 global void IOCharFlag(SCM scmfrom, void *binaryform, void *para)
 {
-    CclFlagDef *flags;
+    IOFlagDef *flags;
 
     flags = para;
 
     if (IOLoadingMode) {
 	if (gh_exact_p(scmfrom)) {
-	    (*((char*)binaryform)) = gh_scm2int(scmfrom);
+	    (*((char *) binaryform)) = gh_scm2int(scmfrom);
 	}
 	while (flags->ident) {
 	    if (gh_eq_p(scmfrom, gh_symbol2scm(flags->ident))) {
-		(*((char*)binaryform)) = flags->value;
+		(*((char *) binaryform)) = flags->value;
 		return;
 	    }
 	    ++flags;
@@ -440,14 +455,14 @@ global void IOCharFlag(SCM scmfrom, void *binaryform, void *para)
 	errl("invalid flag", scmfrom);
     } else {
 	while (flags->ident) {
-	    if (flags->value == (*((char*)binaryform))) {
+	    if (flags->value == (*((char *) binaryform))) {
 		CLprintf(IOOutFile, " %s", flags->ident);
 		return;
 	    }
 	    ++flags;
 	}
 	CLprintf(IOOutFile, "\n;; WARNING : no flag defined for value %d\n",
-	    (*((char*)binaryform)));
+	    (*((char *) binaryform)));
 	CLprintf(IOOutFile, ";; defined flags are : ");
 	flags = para;
 	while (flags->ident) {
@@ -455,7 +470,7 @@ global void IOCharFlag(SCM scmfrom, void *binaryform, void *para)
 	    ++flags;
 	}
 	IOPrintTabs();
-	CLprintf(IOOutFile, "%d", (*((char*)binaryform)));
+	CLprintf(IOOutFile, "%d", (*((char *) binaryform)));
     }
 }
 
@@ -472,8 +487,8 @@ global void IOStrBuffer(SCM scmfrom, void *binaryform, void *para)
     char *buffer;
     char *str;
 
-    size = (int)para;
-    buffer = (char*)binaryform;
+    size = (int) para;
+    buffer = (char *) binaryform;
     if (IOLoadingMode) {
 	str = gh_scm2newstr(scmfrom, NULL);
 	strncpy(buffer, str, size);
@@ -497,11 +512,11 @@ global int IOHandleNullPtr(SCM scmfrom, void *binaryform)
 {
     if (IOLoadingMode) {
 	if (gh_null_p(scmfrom)) {
-	    *((void**)binaryform) = 0;
+	    *((void **) binaryform) = 0;
 	    return 1;
 	}
     } else {
-	if (!*((void**)binaryform)) {
+	if (!*((void **) binaryform)) {
 	    CLprintf(IOOutFile, " ()");
 	    return 1;
 	}
@@ -527,11 +542,11 @@ global void IOIntArrayPtr(SCM scmfrom, void *binaryform, void *para)
 	return;
     }
 
-    size = (int)para;
-    array = (int**)binaryform;
+    size = (int) para;
+    array = (int **) binaryform;
 
     if (IOLoadingMode) {
-	(*array) = (int*)malloc(sizeof(int) * size);
+	(*array) = (int *) malloc(sizeof (int) * size);
 	for (i = 0; i < size; ++i) {
 	    (*array)[i] = gh_scm2int(gh_car(scmfrom));
 	    scmfrom = gh_cdr(scmfrom);
@@ -540,7 +555,7 @@ global void IOIntArrayPtr(SCM scmfrom, void *binaryform, void *para)
 	i = 0;
 	CLprintf(IOOutFile, " (");
 	while (i < size) {
-	    CLprintf(IOOutFile, " %d", ( *array )[i]);
+	    CLprintf(IOOutFile, " %d", (*array)[i]);
 	    ++i;
 	}
 	CLprintf(IOOutFile, " )");
@@ -559,12 +574,12 @@ global void IOIntArray(SCM scmfrom, void *binaryform, void *para)
 {
     int i;
     int size;
-    
-    size = (int)para;
+
+    size = (int) para;
 
     if (IOLoadingMode) {
 	for (i = 0; i < size; ++i) {
-	    ((int*)binaryform)[i] = gh_scm2int(gh_car(scmfrom));
+	    ((int *) binaryform)[i] = gh_scm2int(gh_car(scmfrom));
 	    scmfrom = gh_cdr(scmfrom);
 	}
     } else {
@@ -576,8 +591,8 @@ global void IOIntArray(SCM scmfrom, void *binaryform, void *para)
 	}
 
 	for (i = 0; i < size; ++i) {
-	    CLprintf(IOOutFile, " %d", ((int*)binaryform)[i]);
-	    if (i > 0  &&  !( i & 15 )) {
+	    CLprintf(IOOutFile, " %d", ((int *) binaryform)[i]);
+	    if (i > 0 && !(i & 15)) {
 		CLprintf(IOOutFile, "\n");
 		IOPrintTabs();
 	    }
@@ -609,7 +624,7 @@ global void IOUnitTypePtr(SCM scmfrom, void *binaryform, void *para)
 	return;
     }
 
-    unittype = (UnitType**)binaryform;
+    unittype = (UnitType **) binaryform;
     if (IOLoadingMode) {
 	str = gh_scm2newstr(scmfrom, NULL);
 	(*unittype) = UnitTypeByIdent(str);
@@ -636,7 +651,7 @@ global void IOUpgradePtr(SCM scmfrom, void *binaryform, void *para)
 	return;
     }
 
-    upgrade = (Upgrade**)binaryform;
+    upgrade = (Upgrade **) binaryform;
     if (IOLoadingMode) {
 	str = gh_scm2newstr(scmfrom, NULL);
 	(*upgrade) = UpgradeByIdent(str);
@@ -658,16 +673,16 @@ global void IOUpgradePtr(SCM scmfrom, void *binaryform, void *para)
 global void IOUnitPtr(SCM scmfrom, void *binaryform, void *para)
 {
     int slot;
-    
+
     if (IOHandleNullPtr(scmfrom, binaryform)) {
 	return;
     }
     if (IOLoadingMode) {
 	slot = gh_scm2int(scmfrom);
-	*((Unit**)binaryform) = UnitSlots[slot];
+	*((Unit **) binaryform) = UnitSlots[slot];
 	// FIXME: (pludov) increment unit usage count!
     } else {
-	CLprintf(IOOutFile, " %d", (*((Unit**)binaryform))->Slot);
+	CLprintf(IOOutFile, " %d", (*((Unit **) binaryform))->Slot);
     }
 }
 
@@ -682,17 +697,17 @@ global void IOUnitPtr(SCM scmfrom, void *binaryform, void *para)
 global void IOPlayerPtr(SCM scmfrom, void *binaryform, void *para)
 {
     int playerid;
-    
+
     if (IOHandleNullPtr(scmfrom, binaryform)) {
 	return;
     }
     if (IOLoadingMode) {
 	// Load a player from scm
 	playerid = gh_scm2int(scmfrom);
-	*((Player**)binaryform) = Players + playerid;
+	*((Player **) binaryform) = Players + playerid;
     } else {
 	// Save a player to scm
-	playerid = (*((Player**)binaryform))->Player;
+	playerid = (*((Player **) binaryform))->Player;
 	CLprintf(IOOutFile, " %d", playerid);
     }
 }
