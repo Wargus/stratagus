@@ -350,17 +350,6 @@ local SCM CclSetMaxSelectable(SCM max)
 }
 
 /**
-**	Set NumUnitsPerGroup
-**
-**	@param num	Number of units per group.
-*/
-local SCM CclSetNumUnitsPerGroup(SCM num)
-{
-    NumUnitsPerGroup = gh_scm2int(num);
-    return num;
-}
-
-/**
 **	Set player unit limit.
 **
 **	@param limit	Unit limit.
@@ -655,8 +644,6 @@ global void PlayerCclRegister(void)
     gh_new_procedure1_0("set-this-player!", CclSetThisPlayer);
 
     gh_new_procedure1_0("set-max-selectable!", CclSetMaxSelectable);
-    gh_new_procedure1_0("set-num-units-per-group!",
-	CclSetNumUnitsPerGroup);
 
     gh_new_procedure1_0("set-all-players-food-unit-limit!",
 	CclSetAllPlayersFoodUnitLimit);

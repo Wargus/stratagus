@@ -55,7 +55,6 @@ typedef struct _unit_group_ {
 } UnitGroup;				/// group of units
 
 global UnitGroup Groups[NUM_GROUPS];	/// Number of groups predefined
-global int NumUnitsPerGroup;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -73,7 +72,7 @@ global void InitGroups(void)
     for (i = 0; i < NUM_GROUPS; ++i) {
 	int n;
 
-	Groups[i].Units = malloc(NumUnitsPerGroup * sizeof(Unit*));
+	Groups[i].Units = malloc(MaxSelectable * sizeof(Unit*));
 
 	if ((n = Groups[i].NumUnits)) {		// Cleanup after load
 	    while (n--) {
@@ -177,7 +176,7 @@ global void AddToGroup(Unit** units, int nunits, int num)
     DebugCheck(num > NUM_GROUPS);
 
     group = &Groups[num];
-    for (i = 0; group->NumUnits < NumUnitsPerGroup && i < nunits; ++i) {
+    for (i = 0; group->NumUnits < MaxSelectable && i < nunits; ++i) {
         group->Units[group->NumUnits++] = units[i];
 	units[i]->GroupId |= (1 << num);
     }
@@ -192,11 +191,7 @@ global void AddToGroup(Unit** units, int nunits, int num)
  */
 global void SetGroup(Unit** units, int nunits, int num)
 {
-    DebugCheck(num > NUM_GROUPS);
-
-    if (nunits > NumUnitsPerGroup) {
-	nunits = NumUnitsPerGroup;
-    }
+    DebugCheck(num > NUM_GROUPS || nunits > MaxSelectable);
 
     ClearGroup(num);
     AddToGroup(units, nunits, num);
