@@ -1151,7 +1151,10 @@ global void VideoSetPalette(const VMemType* palette)
 {
     DebugLevel2Fn("Palette %x used\n" _C_ (unsigned)palette);
 
-    Pixels=(VMemType*)palette;
+    if (Pixels) {
+	free(Pixels);
+    }
+    Pixels = (VMemType*)palette;
     SetPlayersPalette();
 }
 
