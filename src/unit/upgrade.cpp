@@ -608,31 +608,31 @@ static int CclDefineModifier(lua_State* l)
 		lua_pop(l, 1);
 		if (!strcmp(key, "attack-range")) {
 			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.AttackRange = LuaToNumber(l, -1);
+			um->Modifier.Variables[ATTACKRANGE_INDEX].Value = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(key, "sight-range")) {
 			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.SightRange = LuaToNumber(l, -1);
+			um->Modifier.Variables[SIGHTRANGE_INDEX].Value = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(key, "basic-damage")) {
 			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.BasicDamage = LuaToNumber(l, -1);
+			um->Modifier.Variables[BASICDAMAGE_INDEX].Value = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(key, "piercing-damage")) {
 			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.PiercingDamage = LuaToNumber(l, -1);
+			um->Modifier.Variables[PIERCINGDAMAGE_INDEX].Value = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(key, "armor")) {
 			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Armor = LuaToNumber(l, -1);
+			um->Modifier.Variables[ARMOR_INDEX].Value = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(key, "hit-points")) {
 			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.HitPoints = LuaToNumber(l, -1);
+			um->Modifier.Variables[HP_INDEX].Value = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(key, "regeneration-rate")) {
 			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.RegenerationRate = LuaToNumber(l, -1);
+			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(key, "cost")) {
 			int i;
@@ -1067,11 +1067,11 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 		if (um->ApplyTo[z] == 'X') {
 
 			// upgrade stats
-			UnitTypes[z]->Stats[pn].AttackRange += um->Modifier.AttackRange;
-			UnitTypes[z]->Stats[pn].SightRange += um->Modifier.SightRange;
+			UnitTypes[z]->Stats[pn].AttackRange += um->Modifier.Variables[ATTACKRANGE_INDEX].Value;
 			// If Sight range is upgraded, we need to change EVERY unit
 			// to the new range, otherwise the counters get confused.
-			if (um->Modifier.SightRange) {
+			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
+				UnitTypes[z]->Stats[pn].SightRange += um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
 				numunits = FindUnitsByType(UnitTypes[z], unitupgrade);
 				for (numunits--; numunits >= 0; --numunits) {
 					unit = unitupgrade[numunits];
@@ -1082,11 +1082,12 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 					}
 				}
 			}
-			UnitTypes[z]->Stats[pn].BasicDamage += um->Modifier.BasicDamage;
-			UnitTypes[z]->Stats[pn].PiercingDamage += um->Modifier.PiercingDamage;
-			UnitTypes[z]->Stats[pn].Armor += um->Modifier.Armor;
-			UnitTypes[z]->Stats[pn].HitPoints += um->Modifier.HitPoints;
-			UnitTypes[z]->Stats[pn].RegenerationRate += um->Modifier.RegenerationRate;
+			UnitTypes[z]->Stats[pn].BasicDamage += um->Modifier.Variables[BASICDAMAGE_INDEX].Value;
+			UnitTypes[z]->Stats[pn].PiercingDamage += um->Modifier.Variables[PIERCINGDAMAGE_INDEX].Value;
+			UnitTypes[z]->Stats[pn].Armor += um->Modifier.Variables[ARMOR_INDEX].Value;
+			UnitTypes[z]->Stats[pn].HitPoints += um->Modifier.Variables[HP_INDEX].Max;
+			UnitTypes[z]->Stats[pn].RegenerationRate += um->Modifier.Variables[HP_INDEX].Increase;
+			UnitTypes[z]->Stats[pn].Mana += um->Modifier.Variables[MANA_INDEX].Max;
 
 			// upgrade costs :)
 			for (j = 0; j < MaxCosts; ++j) {
@@ -1094,7 +1095,7 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 			}
 
 			varModified = 0;
-			for (j = 0; j < UnitTypeVar.NumberVariable; j++) {
+			for (j = NVARALREADYDEFINED; j < UnitTypeVar.NumberVariable; j++) {
 				varModified |= um->Modifier.Variables[j].Value
 					| um->Modifier.Variables[j].Max
 					| um->Modifier.Variables[j].Increase;

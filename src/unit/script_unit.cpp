@@ -818,15 +818,11 @@ static int CclUnit(lua_State* l)
 			// Allocate the space for orders
 			unit->Orders = calloc(unit->TotalOrders, sizeof(Order));
 		} else if (!strcmp(value, "orders")) {
-			int hp;
-
 			lua_pushvalue(l, j + 1);
 			CclParseOrders(l, unit);
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
-			hp = unit->HP;
 			AssignUnitToPlayer (unit, player);
-			unit->HP = hp;
 			if (unit->Orders[0].Action == UnitActionBuilded) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
@@ -1343,9 +1339,9 @@ static int CclSetUnitMana(lua_State* l)
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	mana = LuaToNumber(l, 2);
-	if (unit->Type->CanCastSpell && unit->Type->_MaxMana) {
-		if (mana > unit->Type->_MaxMana) {
-			unit->Mana = unit->Type->_MaxMana;
+	if (unit->Type->CanCastSpell && unit->Stats->Mana) {
+		if (mana > unit->Stats->Mana) {
+			unit->Mana = unit->Stats->Mana;
 		} else {
 			unit->Mana = mana;
 		}
