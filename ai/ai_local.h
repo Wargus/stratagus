@@ -144,6 +144,23 @@ struct _ai_force_ {
 };
 
 /**
+**	AI build queue typedef.
+*/
+typedef struct _ai_build_queue_ AiBuildQueue;
+
+/**
+**	AI build queue.
+**
+**	List of orders for the resource manager to handle
+*/
+struct _ai_build_queue_ {
+	AiBuildQueue*	Next;		/// next request
+	int		Want;		/// requested number
+	int		Made;		/// builded number
+	UnitType*	Type;		/// unit-type
+};
+
+/**
 **	AI variables.
 */
 typedef struct _player_ai_ {
@@ -167,13 +184,8 @@ typedef struct _player_ai_ {
 	/// unit-types to build/train requested and priority list
     AiUnitTypeTable*	UnitTypeRequests;
 
-	/// number of elements in UnitTypeBuilded
-    int			BuildedCount;
-    struct {
-	int		Want;		/// requested number
-	int		Made;		/// builded number
-	UnitType*	Type;		/// unit-type
-    }*		UnitTypeBuilded;	/// What the resource manager does
+	/// What the resource manager should build
+    AiBuildQueue*	UnitTypeBuilded;
 
 } PlayerAi;
 
@@ -211,10 +223,22 @@ typedef struct _ai_helper_ {
     AiUnitTypeTable**	Research;
     /**
     **	The index is the costs that should be collected, giving a table of all
-    **	untis/buildings which could collect this resource.
+    **	units/buildings which could collect this resource.
     */
     int			CollectCount;
     AiUnitTypeTable**	Collect;
+    /**
+    **	The index is the costs that should be collected, giving a table of all
+    **	units/buildings which could carray this resource.
+    */
+    int			WithGoodsCount;
+    AiUnitTypeTable**	WithGoods;
+    /**
+    **	The index is the unit-limit that should be solved, giving a table of all
+    **	units/buildings which could reduce this unit-limit.
+    */
+    int			UnitLimitCount;
+    AiUnitTypeTable**	UnitLimit;
 } AiHelper;
 
 /*----------------------------------------------------------------------------
