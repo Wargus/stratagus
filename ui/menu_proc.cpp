@@ -132,6 +132,9 @@ global void MenusSetBackground(void)
     DestroyCursorBackground();
     if (!Menusbgnd) {
 	Menusbgnd = LoadGraphic(MenuBackground);
+#ifdef USE_OPENGL
+	MakeTexture(Menusbgnd,Menusbgnd->Width,Menusbgnd->Height);
+#endif
 	// JOHNS: NO VideoSetPalette(Menusbgnd->Pixels);
     }
 

@@ -233,6 +233,49 @@ local void VideoDrawSub8to32(
 }
 
 /**
+**	Video draw part of graphic.
+**
+**	@param graphic	Pointer to object
+**	@param gx	X offset into object
+**	@param gy	Y offset into object
+**	@param w	width to display
+**	@param h	height to display
+**	@param x	X screen position
+**	@param y	Y screen position
+*/
+#ifdef USE_OPENGL
+local void VideoDrawSubOpenGL(
+	const Graphic* graphic,int gx,int gy,int w,int h,
+	int x,int y)
+{
+    GLfloat sx,ex,sy,ey;
+    GLfloat stx,etx,sty,ety;
+
+    sx=(GLfloat)x/VideoWidth;
+    ex=sx+(GLfloat)w/VideoWidth;
+    ey=1.0f-(GLfloat)y/VideoHeight;
+    sy=ey-(GLfloat)h/VideoHeight;
+
+    stx=(GLfloat)gx/graphic->Width*graphic->TextureWidth;
+    etx=(GLfloat)(gx+w)/graphic->Width*graphic->TextureWidth;
+    sty=(GLfloat)gy/graphic->Height*graphic->TextureHeight;
+    ety=(GLfloat)(gy+h)/graphic->Height*graphic->TextureHeight;
+
+    glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(stx, 1.0f-ety);
+    glVertex3f(sx, sy, 0.0f);
+    glTexCoord2f(stx, 1.0f-sty);
+    glVertex3f(sx, ey, 0.0f);
+    glTexCoord2f(etx, 1.0f-sty);
+    glVertex3f(ex, ey, 0.0f);
+    glTexCoord2f(etx, 1.0f-ety);
+    glVertex3f(ex, sy, 0.0f);
+    glEnd();
+}
+#endif
+
+/**
 **	Video draw part of 8bit graphic clipped into 8 bit framebuffer.
 **
 **	@param graphic	Pointer to object
@@ -309,6 +352,27 @@ local void VideoDrawSub8to32Clip(
 }
 
 /**
+**	Video draw part of graphic clipped.
+**
+**	@param graphic	Pointer to object
+**	@param gx	X offset into object
+**	@param gy	Y offset into object
+**	@param w	width to display
+**	@param h	height to display
+**	@param x	X screen position
+**	@param y	Y screen position
+*/
+#ifdef USE_OPENGL
+local void VideoDrawSubOpenGLClip(
+	const Graphic* graphic,int gx,int gy,int w,int h,
+	int x,int y)
+{
+    CLIP_RECTANGLE(x,y,w,h);
+    VideoDrawSubOpenGL(graphic,gx,gy,w,h,x,y);
+}
+#endif
+
+/**
 **	Free graphic object.
 */
 local void FreeGraphic8(Graphic* graphic)
@@ -316,6 +380,12 @@ local void FreeGraphic8(Graphic* graphic)
     IfDebug(AllocatedGraphicMemory -= graphic->Size);
     IfDebug(AllocatedGraphicMemory -= sizeof(Graphic));
 
+#ifdef USE_OPENGL
+    if( graphic->NumTextureNames ) {
+	glDeleteTextures(graphic->NumTextureNames, graphic->TextureNames);
+	free(graphic->TextureNames);
+    }
+#endif
     VideoFreeSharedPalette(graphic->Pixels);
     free(graphic->Frames);
     free(graphic);
@@ -505,6 +575,69 @@ global Graphic* NewGraphic(
 }
 
 /**
+**	Make an OpenGL texture or textures out of a graphic object.
+**
+**	@param graphic	The graphic object.
+**	@param width	Graphic width.
+**	@param height	Graphic height.
+*/
+#ifdef USE_OPENGL
+global void MakeTexture(Graphic* graphic,int width,int height)
+{
+    int i;
+    int j;
+    int h;
+    int w;
+    int x;
+    int n;
+    unsigned char* tex;
+    const unsigned char* sp;
+    int fl;
+
+    n=(graphic->Width/width)*(graphic->Height/height);
+    fl=graphic->Width/width;
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    graphic->NumTextureNames = n;
+    graphic->TextureNames = (GLuint*)malloc(n*sizeof(GLuint));
+    glGenTextures(n, graphic->TextureNames);
+    for( i=1; i<width; i<<=1 ) ;
+    w=i;
+    for( i=1; i<height; i<<=1 ) ;
+    h=i;
+    graphic->TextureWidth = (float)width/w;
+    graphic->TextureHeight = (float)height/h;
+    tex = (unsigned char*)malloc(w*h*4);
+    for( x=0; x<n; ++x ) {
+	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[x]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	for( i=0; i<height; ++i ) {
+	    sp=(const unsigned char*)graphic->Frames+(x%fl)*width+((x/fl)*height+i)*graphic->Width;
+	    for( j=0; j<width; ++j ) {
+		VMemType32 c;
+		if( *sp==255 ) {
+		    tex[(h-i-1)*w*4+j*4+3] = 0;
+		} else {
+		    c = ((VMemType32*)graphic->Pixels)[*sp];
+		    tex[(h-i-1)*w*4+j*4+0] = ((unsigned char*)&c)[2];
+		    tex[(h-i-1)*w*4+j*4+1] = ((unsigned char*)&c)[1];
+		    tex[(h-i-1)*w*4+j*4+2] = ((unsigned char*)&c)[0];
+		    tex[(h-i-1)*w*4+j*4+3] = 0xff;
+		}
+		++sp;
+	    }
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+	    GL_UNSIGNED_BYTE, tex);
+    }
+    free(tex);
+}
+#endif
+
+/**
 **	Load graphic from file.
 **
 **	@param name	File name.
@@ -537,6 +670,10 @@ global Graphic* LoadGraphic(const char *name)
 */
 global void InitGraphic(void)
 {
+#ifdef USE_OPENGL
+    GraphicImage8Type.DrawSub=VideoDrawSubOpenGL;
+    GraphicImage8Type.DrawSubClip=VideoDrawSubOpenGLClip;
+#else
     switch( VideoBpp ) {
 	case 8:
 	    GraphicImage8Type.DrawSub=VideoDrawSub8to8;
@@ -563,7 +700,7 @@ global void InitGraphic(void)
 	    DebugLevel0Fn("unsupported %d bpp\n" _C_ VideoBpp);
 	    abort();
     }
-
+#endif
     GraphicImage8Type.Free=FreeGraphic8;
 }
 

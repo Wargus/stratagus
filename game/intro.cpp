@@ -375,6 +375,9 @@ global void ShowIntro(const Intro *intro)
     callbacks.SoundReady=WriteSound;
 
     background=LoadGraphic(intro->Background);
+#ifdef USE_OPENGL
+    MakeTexture(background,background->Width,background->Height);
+#endif
 
     LibraryFileName(intro->TextFile,buf);
     if( !(file=CLopen(buf)) ) {
@@ -537,6 +540,9 @@ global void ShowCredits(Credits *credits)
     background=NULL;
     if( credits->Background ) {
 	background=LoadGraphic(credits->Background);
+#ifdef USE_OPENGL
+	MakeTexture(background,background->Width,background->Height);
+#endif
     }
 
     // play different music?
@@ -673,6 +679,9 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     callbacks.SoundReady=WriteSound;
 
     background=LoadGraphic(picture);
+#ifdef USE_OPENGL
+    MakeTexture(background,background->Width,background->Height);
+#endif
     DoFadeOut=1;
 
     //
@@ -1170,6 +1179,9 @@ global void ShowStats(void)
     callbacks.SoundReady=WriteSound;
 
     background=LoadGraphic(MenuBackground);
+#ifdef USE_OPENGL
+    MakeTexture(background,background->Width,background->Height);
+#endif
     // JOHNS: NO VideoCreatePalette(GlobalPalette);
 
     VideoLockScreen();

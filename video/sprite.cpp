@@ -137,7 +137,7 @@ global void (*VideoDrawRawClip)( VMemType *pixels,
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to8(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to8(const Graphic* sprite,unsigned frame,int x,int y)
 {
     RLE_BLIT(8,sprite,frame,x,y);
 }
@@ -150,7 +150,7 @@ global void VideoDraw8to8(const Graphic* sprite,unsigned frame,int x,int y)
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to16(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to16(const Graphic* sprite,unsigned frame,int x,int y)
 {
     RLE_BLIT(16,sprite,frame,x,y);
 }
@@ -163,7 +163,7 @@ global void VideoDraw8to16(const Graphic* sprite,unsigned frame,int x,int y)
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to24(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to24(const Graphic* sprite,unsigned frame,int x,int y)
 {
     RLE_BLIT(24,sprite,frame,x,y);
 }
@@ -176,10 +176,42 @@ global void VideoDraw8to24(const Graphic* sprite,unsigned frame,int x,int y)
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to32(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to32(const Graphic* sprite,unsigned frame,int x,int y)
 {
     RLE_BLIT(32,sprite,frame,x,y);
 }
+
+/**
+**	Draw graphic object unclipped.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+#ifdef USE_OPENGL
+local void VideoDrawOpenGL(const Graphic* sprite,unsigned frame,int x,int y)
+{
+    GLfloat sx,ex,sy,ey;
+
+    sx=(GLfloat)x/VideoWidth;
+    ex=sx+(GLfloat)sprite->Width/VideoWidth;
+    ey=1.0f-(GLfloat)y/VideoHeight;
+    sy=ey-(GLfloat)sprite->Height/VideoHeight;
+
+    glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 1.0f-sprite->TextureHeight);
+    glVertex3f(sx, sy, 0.0f);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(sx, ey, 0.0f);
+    glTexCoord2f(sprite->TextureWidth, 1.0f);
+    glVertex3f(ex, ey, 0.0f);
+    glTexCoord2f(sprite->TextureWidth, 1.0f-sprite->TextureHeight);
+    glVertex3f(ex, sy, 0.0f);
+    glEnd();
+}
+#endif
 
 /**
 **	Draw 8bit graphic object unclipped and flipped in X direction
@@ -190,7 +222,7 @@ global void VideoDraw8to32(const Graphic* sprite,unsigned frame,int x,int y)
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to8X(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to8X(const Graphic* sprite,unsigned frame,int x,int y)
 {
     const unsigned char* sp;
     unsigned w;
@@ -233,7 +265,7 @@ global void VideoDraw8to8X(const Graphic* sprite,unsigned frame,int x,int y)
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to16X(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to16X(const Graphic* sprite,unsigned frame,int x,int y)
 {
     const unsigned char* sp;
     unsigned w;
@@ -277,7 +309,7 @@ global void VideoDraw8to16X(const Graphic* sprite,unsigned frame,int x,int y)
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to24X(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to24X(const Graphic* sprite,unsigned frame,int x,int y)
 {
     const unsigned char* sp;
     unsigned w;
@@ -321,7 +353,7 @@ global void VideoDraw8to24X(const Graphic* sprite,unsigned frame,int x,int y)
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to32X(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to32X(const Graphic* sprite,unsigned frame,int x,int y)
 {
     const unsigned char* sp;
     unsigned w;
@@ -357,6 +389,38 @@ global void VideoDraw8to32X(const Graphic* sprite,unsigned frame,int x,int y)
 }
 
 /**
+**	Draw graphic object unclipped and flipped in X direction.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+#ifdef USE_OPENGL
+local void VideoDrawXOpenGL(const Graphic* sprite,unsigned frame,int x,int y)
+{
+    GLfloat sx,ex,sy,ey;
+
+    sx=(GLfloat)x/VideoWidth;
+    ex=sx+(GLfloat)sprite->Width/VideoWidth;
+    ey=1.0f-(GLfloat)y/VideoHeight;
+    sy=ey-(GLfloat)sprite->Height/VideoHeight;
+
+    glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 1.0f-sprite->TextureHeight);
+    glVertex3f(sx, sy, 0.0f);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(sx, ey, 0.0f);
+    glTexCoord2f(sprite->TextureWidth, 1.0f);
+    glVertex3f(ex, ey, 0.0f);
+    glTexCoord2f(sprite->TextureWidth, 1.0f-sprite->TextureHeight);
+    glVertex3f(ex, sy, 0.0f);
+    glEnd();
+}
+#endif
+
+/**
 **	Draw 8bit graphic object clipped into 8 bit framebuffer.
 **
 **	@param sprite	pointer to object
@@ -364,7 +428,7 @@ global void VideoDraw8to32X(const Graphic* sprite,unsigned frame,int x,int y)
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to8Clip(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to8Clip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
     int ex;
@@ -501,7 +565,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to16Clip(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to16Clip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
     int ex;
@@ -637,7 +701,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to24Clip(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to24Clip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
     int ex;
@@ -773,7 +837,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to32Clip(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to32Clip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
     int ex;
@@ -902,6 +966,53 @@ right_trans:
 }
 
 /**
+**	Draw graphic object clipped.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+#ifdef USE_OPENGL
+local void VideoDrawClipOpenGL(const Graphic* sprite,unsigned frame,int x,int y)
+{
+    GLfloat svx,evx,svy,evy;
+    GLfloat stx,etx,sty,ety;
+    int ox;
+    int oy;
+    int ex;
+    int w;
+    int h;
+
+    w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    svx=(GLfloat)x/VideoWidth;
+    evx=svx+(GLfloat)w/VideoWidth;
+    evy=1.0f-(GLfloat)y/VideoHeight;
+    svy=evy-(GLfloat)h/VideoHeight;
+
+    stx=(GLfloat)ox/sprite->Width*sprite->TextureWidth;
+    etx=(GLfloat)(ox+w)/sprite->Width*sprite->TextureWidth;
+    sty=(GLfloat)oy/sprite->Height;
+    ety=(GLfloat)(oy+h)/sprite->Height*sprite->TextureHeight;
+
+    glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(stx, 1.0f-ety);
+    glVertex3f(svx, svy, 0.0f);
+    glTexCoord2f(stx, 1.0f-sty);
+    glVertex3f(svx, evy, 0.0f);
+    glTexCoord2f(etx, 1.0f-sty);
+    glVertex3f(evx, evy, 0.0f);
+    glTexCoord2f(etx, 1.0f-ety);
+    glVertex3f(evx, svy, 0.0f);
+    glEnd();
+}
+#endif
+
+/**
 **	Draw 8bit graphic object clipped and flipped in X direction
 **	into 8 bit framebuffer.
 **
@@ -910,7 +1021,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to8ClipX(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to8ClipX(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
     int ex;
@@ -1047,7 +1158,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to16ClipX(const Graphic* sprite,unsigned frame
+local void VideoDraw8to16ClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
     int ox;
@@ -1186,7 +1297,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to24ClipX(const Graphic* sprite,unsigned frame
+local void VideoDraw8to24ClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
     int ox;
@@ -1324,7 +1435,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to32ClipX(const Graphic* sprite,unsigned frame
+local void VideoDraw8to32ClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
     int ex;
@@ -1454,6 +1565,54 @@ right_trans:
 }
 
 /**
+**	Draw graphic object clipped and flipped in X direction.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+#ifdef USE_OPENGL
+local void VideoDrawClipXOpenGL(const Graphic* sprite,unsigned frame
+	,int x,int y)
+{
+    GLfloat svx,evx,svy,evy;
+    GLfloat stx,etx,sty,ety;
+    int ox;
+    int oy;
+    int ex;
+    int w;
+    int h;
+
+    w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    svx=(GLfloat)x/VideoWidth;
+    evx=svx+(GLfloat)w/VideoWidth;
+    evy=1.0f-(GLfloat)y/VideoHeight;
+    svy=evy-(GLfloat)h/VideoHeight;
+
+    stx=(GLfloat)ox/sprite->Width*sprite->TextureWidth;
+    etx=(GLfloat)(ox+w)/sprite->Width*sprite->TextureWidth;
+    sty=(GLfloat)oy/sprite->Height;
+    ety=(GLfloat)(oy+h)/sprite->Height*sprite->TextureHeight;
+
+    glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(stx, 1.0f-ety);
+    glVertex3f(evx, svy, 0.0f);
+    glTexCoord2f(stx, 1.0f-sty);
+    glVertex3f(evx, evy, 0.0f);
+    glTexCoord2f(etx, 1.0f-sty);
+    glVertex3f(svx, evy, 0.0f);
+    glTexCoord2f(etx, 1.0f-ety);
+    glVertex3f(svx, svy, 0.0f);
+    glEnd();
+}
+#endif
+
+/**
 **	Draw 8bit shadow graphic object clipped into 8 bit framebuffer.
 **
 **	@param sprite	pointer to object
@@ -1461,7 +1620,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to8ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to8ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
     int ex;
@@ -1607,7 +1766,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to16ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to16ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
     int ex;
@@ -1766,7 +1925,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to24ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to24ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
     int ex;
@@ -1902,7 +2061,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to32ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
+local void VideoDraw8to32ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
     int ex;
@@ -2071,7 +2230,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to8ShadowClipX(const Graphic* sprite,unsigned frame
+local void VideoDraw8to8ShadowClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
     int ex;
@@ -2218,7 +2377,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to16ShadowClipX(const Graphic* sprite,unsigned frame
+local void VideoDraw8to16ShadowClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
     int ex;
@@ -2379,7 +2538,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to24ShadowClipX(const Graphic* sprite,unsigned frame
+local void VideoDraw8to24ShadowClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
     int ex;
@@ -2517,7 +2676,7 @@ right_trans:
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw8to32ShadowClipX(const Graphic* sprite,unsigned frame
+local void VideoDraw8to32ShadowClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
     int ex;
@@ -2812,6 +2971,12 @@ local void FreeSprite8(Graphic* graphic)
     IfDebug( AllocatedGraphicMemory-=graphic->Size );
     IfDebug( AllocatedGraphicMemory-=sizeof(Graphic) );
 
+#ifdef USE_OPENGL
+    if( graphic->NumTextureNames ) {
+	glDeleteTextures(graphic->NumTextureNames, graphic->TextureNames);
+	free(graphic->TextureNames);
+    }
+#endif
     VideoFreeSharedPalette(graphic->Pixels);
     free(graphic->Frames);
     free(graphic);
@@ -2902,6 +3067,15 @@ global Graphic* LoadSprite(const char* name,int width,int height)
     sprite->Palette=graphic->Palette;
     sprite->Pixels=graphic->Pixels;	// WARNING: if not shared freed below!
 
+#ifdef USE_OPENGL
+    MakeTexture(graphic,width,height);
+    sprite->NumTextureNames=graphic->NumTextureNames;
+    sprite->TextureNames=graphic->TextureNames;
+    sprite->TextureWidth=graphic->TextureWidth;
+    sprite->TextureHeight=graphic->TextureHeight;
+    graphic->NumTextureNames=0;
+#endif
+
     sprite->Size=0;
     sprite->Frames=NULL;
 
@@ -2988,6 +3162,15 @@ global Graphic* LoadSprite(const char* name,int width,int height)
 */
 global void InitSprite(void)
 {
+#ifdef USE_OPENGL
+    GraphicSprite8Type.Draw=VideoDrawOpenGL;
+    GraphicSprite8Type.DrawClip=VideoDrawClipOpenGL;
+    GraphicSprite8Type.DrawShadowClip=VideoDraw8to32ShadowClip;
+    GraphicSprite8Type.DrawX=VideoDrawXOpenGL;
+    GraphicSprite8Type.DrawClipX=VideoDrawClipXOpenGL;
+    GraphicSprite8Type.DrawShadowClipX=VideoDraw8to32ShadowClipX;
+    VideoDrawRawClip=VideoDrawRaw32Clip;
+#else
     switch( VideoBpp ) {
 	case 8:
 	    GraphicSprite8Type.Draw=VideoDraw8to8;
@@ -3034,6 +3217,7 @@ global void InitSprite(void)
 	    DebugLevel0Fn("Unsupported %d bpp\n" _C_ VideoBpp);
 	    abort();
     }
+#endif
 
     GraphicSprite8Type.Free=FreeSprite8;
 }
