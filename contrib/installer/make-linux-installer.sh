@@ -151,7 +151,7 @@ else
     echo "*** NOTE: you will need to 'cd \$DIR/freecraft' before running ./freecraft ***"
 fi
 mkdir -p ~/.freecraft
-echo "THIS FILE REQUIRED FOR FREECRAFT UNINSTALLATION, DO NOT REMOVE" > ~/.freecraft/freecraft.inst
+echo "THIS FILE REQUIRED FOR STRATAGUS UNINSTALLATION, DO NOT REMOVE" > ~/.freecraft/freecraft.inst
 echo "\$DIR/freecraft \$STARTDIR/freecraft" >> ~/.freecraft/freecraft.inst
 if [ -d /tmp/cdrom.tmp ]; then umount /tmp/cdrom.tmp; rm -rf /tmp/cdrom.tmp; fi
 echo

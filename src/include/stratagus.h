@@ -23,8 +23,8 @@
 //
 //	$Id$
 
-#ifndef __FREECRAFT_H__
-#define __FREECRAFT_H__
+#ifndef __STRATAGUS_H__
+#define __STRATAGUS_H__
 
 //@{
 
@@ -317,11 +317,11 @@
     /// Text string: Name, Version, Copyright
 extern char NameLine[];
 
-#ifndef FREECRAFT_LIB_PATH
-#define FREECRAFT_LIB_PATH "data"	/// Where to find the data files
+#ifndef STRATAGUS_LIB_PATH
+#define STRATAGUS_LIB_PATH "data"	/// Where to find the data files
 #endif
-#ifndef FREECRAFT_HOME_PATH
-#define FREECRAFT_HOME_PATH ".freecraft"/// Data files in user home dir
+#ifndef STRATAGUS_HOME_PATH
+#define STRATAGUS_HOME_PATH ".freecraft"/// Data files in user home dir
 #endif
 
 #define MAGIC_FOR_NEW_UNITS	33	/// How many percent of max mana for new units
@@ -557,4 +557,4 @@ extern long isqrt(long num);
 
 //@}
 
-#endif	// !__FREECRAFT_H__
+#endif	// !__STRATAGUS_H__

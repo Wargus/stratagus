@@ -113,7 +113,7 @@ global void CommandLog(const char* name,const Unit* unit,int flag,
 	strcat(buf,"/logs");
 	mkdir(buf);
 #else
-	sprintf(buf,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
+	sprintf(buf,"%s/%s",getenv("HOME"),STRATAGUS_HOME_PATH);
 	mkdir(buf,0777);
 	strcat(buf,"/");
 	strcat(buf,GameName);
