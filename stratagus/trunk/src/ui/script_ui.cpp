@@ -1186,6 +1186,10 @@ local SCM CclDefineButton(SCM list)
 		value=gh_cdr(value);
 	    }
 	    ba.UnitMask=s1;
+	    if( !strncmp(ba.UnitMask,",*,",3) ) {
+		free(ba.UnitMask);
+		ba.UnitMask=strdup("*");
+	    }
 	} else {
 	    s1=gh_scm2newstr(value,NULL);
 	    fprintf(stderr,"Unsupported tag %s\n",s1);
