@@ -591,7 +591,7 @@ local SCM CclUnit(SCM list)
 	    list=gh_cdr(list);
 	    unit->IX=gh_scm2int(gh_car(value));
 	    unit->IY=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(value,gh_symbol2scm("seenpixel")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("seen-pixel")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    unit->SeenIX=gh_scm2int(gh_car(value));
@@ -620,7 +620,7 @@ local SCM CclUnit(SCM list)
 	    unit->Burning=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("destroyed")) ) {
 	    unit->Destroyed=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("seendestroyed")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("seen-destroyed")) ) {
 	    unit->SeenDestroyed=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("removed")) ) {
 	    unit->Removed=1;
