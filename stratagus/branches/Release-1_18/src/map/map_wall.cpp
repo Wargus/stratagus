@@ -125,7 +125,7 @@ global void MapFixSeenWallTile(int x, int y)
 
     if (t == TileTypeHumanWall) {
 	tile = TheMap.Tileset->HumanWallTable[tile];
-	if (mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
+	if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
 	    while (TheMap.Tileset->Table[tile]){	// Skip good tiles
 		++tile;
 	    }
@@ -135,7 +135,7 @@ global void MapFixSeenWallTile(int x, int y)
 	}
     } else {
 	tile = TheMap.Tileset->OrcWallTable[tile];
-	if (mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
+	if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
 	    while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
 		++tile;
 	    }
@@ -225,7 +225,7 @@ global void MapFixWallTile(int x, int y)
 
     if (t & MapFieldHuman) {
 	tile = TheMap.Tileset->HumanWallTable[tile];
-	if (mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
+	if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
 	    while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
 		++tile;
 	    }
@@ -235,7 +235,7 @@ global void MapFixWallTile(int x, int y)
 	}
     } else {
 	tile = TheMap.Tileset->OrcWallTable[tile];
-	if (mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
+	if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
 	    while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
 		++tile;
 	    }
