@@ -201,7 +201,7 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Draw unit name centered, if too long split at space.
     //
-    i=TextLength(GameFont,type->Name);
+    i=VideoTextLength(GameFont,type->Name);
     if( i>110 ) {			// didn't fit on line
 	const char* s;
 
