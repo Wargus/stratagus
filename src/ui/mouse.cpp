@@ -819,9 +819,7 @@ void UIHandleMouseMove(int x, int y)
 		}
 	}
 
-	// NOTE: vladi: if unit is invisible, no cursor hint should be allowed
-	// FIXME: johns: not corrrect? Should I get informations about
-	// buildings under fog of war?
+	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
 	if (UnitUnderCursor && !UnitVisibleAsGoal(UnitUnderCursor, ThisPlayer) &&
 			!ReplayRevealMap) {
 		UnitUnderCursor = NULL;
