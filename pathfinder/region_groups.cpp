@@ -1,10 +1,39 @@
 
-/* $Id$ */
+//   ___________		     _________		      _____  __
+//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//	  \/		    \/	   \/	     \/		   \/
+//  ______________________                           ______________________
+//			  T H E   W A R   B E G I N S
+//	   FreeCraft - A free fantasy real time strategy game engine
+//
+/**@name region_groups.c	-	Pathfinder region groups functions. */
+//
+//	(c) Copyright 2002 by Latimerius
+//
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
+//	$Id$
+
+//@{
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
+
+#ifdef HIERARCHIC_PATHFINDER	// {
+
 #include "map.h"
 #include "unit.h"
 #if defined(DEBUG) && defined(TIMEIT)
@@ -15,7 +44,11 @@
 #include "region_set.h"
 #include "region_groups.h"
 
-#ifdef HIERARCHIC_PATHFINDER	// {
+
+#ifdef DEBUG
+#include <setjmp.h>
+extern jmp_buf MainLoopJmpBuf;
+#endif
 
 #define MOVEMENT_TYPE_TRANSPORTER	0
 #define MOVEMENT_TYPE_HOVERCRAFT	1
@@ -67,7 +100,7 @@ static MovementType MovementTypes[] = {
 	/* MOVEMENT_TYPE_TRANSPORTER */
 	{ MapFieldWaterAllowed | MapFieldCoastAllowed, 0, 0, NULL },
 	/* MOVEMENT_TYPE_HOVERCRAFT */
-	{ MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed, 
+	{ MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed,
 	  MapFieldForest, 0, NULL }
 };
 
@@ -230,7 +263,7 @@ local void RegGroupSetDeleteGroup (RegGroup *group)
 		group->NextInSet = NULL;	/* just to be safe */
 		return;
 	}
-		
+
 	for (p=RegGroupSet.Groups, g=p->NextInSet; g; p=g, g=g->NextInSet) {
 		if (g != group) {
 			continue;
@@ -517,7 +550,7 @@ local void SuperGroupDeleteRegGroup (SuperGroup *s, RegGroup *group)
 		group->NextInSGroup[type] = NULL;	/* just to be safe */
 		return;
 	}
-		
+
 	p=s->RegGroups;
 	g=p->NextInSGroup[type];
 	for ( ; g; p=g, g=g->NextInSGroup[type]) {
@@ -802,3 +835,5 @@ local void PrintSuperGroupDescriptor (SuperGroup *sg)
 #endif
 
 #endif	// } HIERARCHIC_PATHFINDER
+
+//@}

@@ -1,5 +1,30 @@
+//   ___________		     _________		      _____  __
+//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//	  \/		    \/	   \/	     \/		   \/
+//  ______________________                           ______________________
+//			  T H E   W A R   B E G I N S
+//	   FreeCraft - A free fantasy real time strategy game engine
+//
+/**@name pf_lowlevel.c	-	Pathfinder low level functions. */
+//
+//	(c) Copyright 2002 by Latimerius
+//
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
+//	$Id$
 
-/* $Id$ */
+//@{
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +32,9 @@
 #include <limits.h>
 
 #include "freecraft.h"
+
+#ifdef HIERARCHIC_PATHFINDER	// {
+
 #include "unit.h"
 #include "map.h"
 #if defined(DEBUG) && defined(TIMEIT)
@@ -18,7 +46,10 @@
 #include "pf_lowlevel.h"
 #include "pf_low_open.h"
 
-#ifdef HIERARCHIC_PATHFINDER	// {
+#ifdef DEBUG
+#include <setjmp.h>
+extern jmp_buf MainLoopJmpBuf;
+#endif
 
 #define COST_MOVING_UNIT	2
 #define COST_WAITING_UNIT	4
@@ -369,7 +400,7 @@ local MapField *LowAstarLoop (Unit *unit)
 #endif
 					if (obstacle->Moving) {
 						NeighCost = SCALE * COST_MOVING_UNIT;
-					} else if ((obstacle->Wait && 
+					} else if ((obstacle->Wait &&
 								obstacle->Orders[0].Action == UnitActionMove)) {
 							NeighCost = SCALE * COST_WAITING_UNIT;
 					} else
@@ -466,7 +497,7 @@ local int LowTraceback (Unit *unit, MapField *end)
 		//printf ("(%d,%d) ", x, y);
 		x += Neighbor[(int )mf->Traceback].dx;
 		y += Neighbor[(int )mf->Traceback].dy;
-		
+
 		++path_length;
 		if (prev_traceback >= 0) {
 			//printf ("path[%d] = %d", path_ptr,
@@ -707,3 +738,5 @@ void ExportMap (void)
 #endif
 
 #endif	// } HIERARCHIC_PATHFINDER
+
+//@}

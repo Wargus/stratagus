@@ -30,10 +30,10 @@
 //----------------------------------------------------------------------------
 
 #include <stdio.h>
-#if DEBUG
+#if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
 #include <stdlib.h>
 #include <setjmp.h>
-#endif /* DEBUG */
+#endif
 
 #include "freecraft.h"
 #include "video.h"
@@ -60,7 +60,7 @@
 #include "settings.h"
 #include "commands.h"
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined (USE_CDDA)
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 #include "sound_server.h"
 #endif
 
@@ -79,8 +79,8 @@ global enum _scroll_state_ KeyScrollState=ScrollNone;
     /// variable set when we are scrolling via mouse
 global enum _scroll_state_ MouseScrollState=ScrollNone;
 
-#if DEBUG
-global jmp_buf main_loop;
+#if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
+global jmp_buf MainLoopJmpBuf;		/// Hierarchic pathfinder error exit.
 #endif
 
 //----------------------------------------------------------------------------
@@ -164,7 +164,8 @@ local void MoveMapViewPointRight(int step)
 **	@param fast	Flag scroll faster.
 **
 **	@todo	Support dynamic acceleration of scroll speed.
-**		If the scroll key is longer pressed the area is scrolled faster.
+**	@todo	If the scroll key is longer pressed the area is scrolled faster.
+**	@todo	Scrolling pixel wise.
 **
 **	StephanR: above needs one row+column of tiles extra to be
 **		drawn (clipped), which also needs to be supported
@@ -250,6 +251,10 @@ global void DebugTestDisplay(void)
 
 /**
 **	Draw menu button area.
+**
+**	With debug it shows the used frame time and arrival of network packets.
+**
+**	@todo	Must be more configurable. Adding diplomacy menu here?
 */
 local void DrawMenuButtonArea(void)
 {
@@ -627,8 +632,8 @@ global void GameMainLoop(void)
     MultiPlayerReplayEachCycle();
 
     while( GameRunning ) {
-#if DEBUG
-	if (setjmp (main_loop)) {
+#if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
+	if (setjmp (MainLoopJmpBuf)) {
 	    GamePaused = 1;
 	}
 #endif

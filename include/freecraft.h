@@ -470,11 +470,6 @@ extern unsigned SyncRandSeed;		/// Sync random seed value
 
 extern unsigned long GameCycle;		/// Game simulation cycle counter
 
-#if DEBUG
-#include <setjmp.h>
-extern jmp_buf main_loop;
-#endif
-
 extern void LoadGame(char*);		/// Load saved game back
 extern void SaveGame(const char*);	/// Save game for later load
 
