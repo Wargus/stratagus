@@ -93,6 +93,7 @@
 <A HREF="#set-shared-vision!">set-shared-vision!</A>
 <A HREF="#set-this-player!">set-this-player!</A>
 <A HREF="#set-unit-unholy-armor!">set-unit-unholy-armor!</A>
+<A HREF="#show-map-location">show-map-location</A>
 <A HREF="#shared-vision">shared-vision</A>
 <A HREF="#slot-usage">slot-usage</A>
 <A HREF="#unit">unit</A>
@@ -1703,6 +1704,33 @@ Sets shared vision for the player at the computer.
 </PRE>
 
 <P>Sets shared vision on with player number 3.
+
+<H4>Not Used</H4>
+
+<A NAME="show-map-location"></A>
+<H3>show-map-location</H3>
+
+<H4>Description</H4>
+
+Show an area on the map for the given player.
+
+<H4>Syntax</H4>
+
+<CODE>(show-map-location x y radius cycles)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (show-map-location 10 10 6 500)
+</PRE>
+
+<P>Show an area of 6 tiles around location (10,10) for 500 cycles.
 
 <H4>Not Used</H4>
 
