@@ -149,6 +149,10 @@ local SCM CclDefineAiHelper(SCM list)
 	    what=3;
 	} else if( gh_eq_p(value,gh_symbol2scm("collect")) ) {
 	    what=4;
+	} else if( gh_eq_p(value,gh_symbol2scm("with-goods")) ) {
+	    what=5;
+	} else if( gh_eq_p(value,gh_symbol2scm("unit-limit")) ) {
+	    what=6;
 	} else {
 	    fprintf(stderr,"unknown tag\n");
 	    continue;
@@ -184,7 +188,7 @@ local SCM CclDefineAiHelper(SCM list)
 		    continue;
 		}
 		DebugLevel0Fn("> %s\n" _C_ upgrade->Ident);
-	    } else if( what==4 ) {
+	    } else if( what==4 || what==5 ) {
 		if( !strcmp(DEFAULT_NAMES[1],str) ) {
 		    cost=1;
 		} else if( !strcmp(DEFAULT_NAMES[2],str) ) {
@@ -199,6 +203,15 @@ local SCM CclDefineAiHelper(SCM list)
 		    cost=6;
 		} else {
 		    fprintf(stderr,"unknown cost %s\n",str);
+		    free(str);
+		    continue;
+		}
+		DebugLevel0Fn("> %s\n" _C_ str);
+	    } else if( what==6 ) {
+		if( !strcmp("food",str) ) {
+		    cost=0;
+		} else {
+		    fprintf(stderr,"unknown limit %s\n",str);
 		    free(str);
 		    continue;
 		}
@@ -245,6 +258,16 @@ local SCM CclDefineAiHelper(SCM list)
 		    AiHelperSetupTable(
 			    &AiHelpers.CollectCount,&AiHelpers.Collect,cost);
 		    AiHelperInsert( AiHelpers.Collect+cost,base);
+		    break;
+		case 5:			// with-goods
+		    AiHelperSetupTable(
+			&AiHelpers.WithGoodsCount,&AiHelpers.WithGoods,cost);
+		    AiHelperInsert( AiHelpers.WithGoods+cost,base);
+		    break;
+		case 6:			// unit-limit
+		    AiHelperSetupTable(
+			&AiHelpers.UnitLimitCount,&AiHelpers.UnitLimit,cost);
+		    AiHelperInsert( AiHelpers.UnitLimit+cost,base);
 		    break;
 	    }
 	}
