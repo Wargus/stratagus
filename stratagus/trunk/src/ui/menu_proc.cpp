@@ -2581,8 +2581,6 @@ void ProcessMenu(const char* menu_id, int loop)
 void InitMenus(int race)
 {
 	static int last_race = -1;
-	const char* file;
-	char* buf;
 	int width;
 	int height;
 
@@ -2608,12 +2606,9 @@ void InitMenus(int race)
 		VideoFree(MenuButtonGfx.Sprite);
 	}
 	last_race = race;
-	file = MenuButtonGfx.File[race];
-	buf = alloca(strlen(file) + 9 + 1);
-	file = strcat(strcpy(buf, "graphics/"), file);
 	width = MenuButtonGfx.Width[race];
 	height = MenuButtonGfx.Height[race];
-	MenuButtonGfx.Sprite = LoadSprite(file, width, height);
+	MenuButtonGfx.Sprite = LoadSprite(MenuButtonGfx.File[race], width, height);
 
 	CurrentMenu = NULL;
 }

@@ -207,7 +207,7 @@ void CleanIcons(void)
 			hash_del(IconHash, Icons[i]->Ident);
 
 			free(Icons[i]->Ident);
-//			FreeGraphic(Icons[i]->Sprite);
+			FreeGraphic(Icons[i]->Sprite);
 			free(Icons[i]);
 		}
 

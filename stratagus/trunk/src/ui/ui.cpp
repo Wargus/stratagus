@@ -191,9 +191,6 @@ void InitUserInterface(const char* race_name)
 /**
 **  Load the user interface graphics.
 **
-**  @todo  If sub images of the same graphic are used, they are loaded
-**  multiple into memory. Use the IconFile code and perhaps build
-**  a new layer, which supports image sharing.
 */
 void LoadUserInterface(void)
 {
@@ -210,7 +207,6 @@ void LoadUserInterface(void)
 	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
-		// FIXME: reuse same graphics?
 		if (TheUI.Resources[i].Icon.File) {
 			TheUI.Resources[i].Icon.Graphic =
 				LoadSprite(TheUI.Resources[i].Icon.File,

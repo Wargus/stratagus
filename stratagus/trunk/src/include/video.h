@@ -55,6 +55,7 @@ typedef struct _graphic_ {
 	int NumFrames;             ///< Number of frames
 	int GraphicWidth;          ///< Original graphic width
 	int GraphicHeight;         ///< Original graphic height
+	int Refs;                  ///< Uses of this graphic
 #ifdef USE_OPENGL
 	GLfloat TextureWidth;      ///< Width of the texture
 	GLfloat TextureHeight;     ///< Height of the texture
@@ -259,6 +260,9 @@ extern void VideoClearScreen(void);
 
 	/// Make graphic
 extern Graphic* NewGraphic(const char* file, int w, int h);
+
+	/// Free Graphic taking into account the number of uses.
+extern void FreeGraphic(Graphic* g);
 
 	/// Load a picture and display it on the screen (full screen),
 	/// changing the colormap and so on..

@@ -761,7 +761,6 @@ void InitUnitTypes(int reset_player_stats)
 void LoadUnitTypeSprite(UnitType* unittype)
 {
 	const char* file;
-	char buf[4096];
 	ResourceInfo* resinfo;
 	int res;
 	UnitType* type;
@@ -782,9 +781,8 @@ void LoadUnitTypeSprite(UnitType* unittype)
 		type = unittype;
 	}
 
-	if ((file = type->ShadowFile)) {
-		file = strcat(strcpy(buf, "graphics/"), file);
-		type->ShadowSprite = LoadSprite(file, type->ShadowWidth,
+	if (type->ShadowFile) {
+		type->ShadowSprite = LoadSprite(type->ShadowFile, type->ShadowWidth,
 			type->ShadowHeight);
 		FlipGraphic(type->ShadowSprite);
 		MakeShadowSprite(type->ShadowSprite);
@@ -793,16 +791,14 @@ void LoadUnitTypeSprite(UnitType* unittype)
 	if (type->Harvester) {
 		for (res = 0; res < MaxCosts; ++res) {
 			if ((resinfo = type->ResInfo[res])) {
-				if ((file = resinfo->FileWhenLoaded)) {
-					file = strcat(strcpy(buf, "graphics/"), file);
-					resinfo->SpriteWhenLoaded = LoadSprite(file, type->Width,
-						type->Height);
+				if (resinfo->FileWhenLoaded) {
+					resinfo->SpriteWhenLoaded = LoadSprite(resinfo->FileWhenLoaded,
+						type->Width, type->Height);
 					FlipGraphic(resinfo->SpriteWhenLoaded);
 				}
-				if ((file = resinfo->FileWhenEmpty)) {
-					file = strcat(strcpy(buf, "graphics/"), file);
-					resinfo->SpriteWhenEmpty = LoadSprite(file, type->Width,
-						type->Height);
+				if (resinfo->FileWhenEmpty) {
+					resinfo->SpriteWhenEmpty = LoadSprite(resinfo->FileWhenEmpty,
+						type->Width, type->Height);
 					FlipGraphic(resinfo->SpriteWhenEmpty);
 				}
 			}
@@ -814,9 +810,7 @@ void LoadUnitTypeSprite(UnitType* unittype)
 		file = type->File[0];
 	}
 	if (file) {
-		strcpy(buf, "graphics/");
-		strcat(buf, file);
-		type->Sprite = LoadSprite(buf, type->Width, type->Height);
+		type->Sprite = LoadSprite(file, type->Width, type->Height);
 		FlipGraphic(type->Sprite);
 	}
 }

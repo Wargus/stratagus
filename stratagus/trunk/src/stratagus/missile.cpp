@@ -146,15 +146,9 @@ BurningBuildingFrame* BurningBuildingFrames; /// Burning building frames
 */
 void LoadMissileSprite(MissileType* mtype)
 {
-	const char* file;
-
-	if ((file = mtype->File)) {
-		char* buf;
-
-		buf = alloca(strlen(file) + 9 + 1);
-		file = strcat(strcpy(buf, "graphics/"), file);
+	if (mtype->File) {
 		mtype->Sprite = LoadSprite(
-			file, mtype->Width, mtype->Height);
+			mtype->File, mtype->Width, mtype->Height);
 		FlipGraphic(mtype->Sprite);
 
 		// Correct the number of frames in graphic
