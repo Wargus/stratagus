@@ -528,7 +528,8 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	//
 	//	Take this target?
 	//
-	if( cost<best_cost && UnitReachable(unit,dest,attackrange) ) {
+	if( cost<best_cost
+		&& (d<attackrange || UnitReachable(unit,dest,attackrange)) ) {
 	    best_unit=dest;
 	    best_cost=cost;
 	}
