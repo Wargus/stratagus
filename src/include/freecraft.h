@@ -104,6 +104,12 @@
 
 #endif	// }
 
+#if defined(__GNUC__) && __GNUC__>=3	// {
+
+#define __FUNCTION__ __func__		// Use C99 key word, which works better
+
+#endif	// } __GNUC__>=3
+
 #ifdef _MSC_VER	// { m$ auto detection
 
 #define inline __inline			// fix m$ brain damage
@@ -113,7 +119,7 @@
     // I don't know, but eVC didn't has it, even it is documented
 #define __FUNCTION__ __FILE__ ":" /* __LINE__ */
 
-#endif
+#endif	// } m$
 
 /**
 **	Print debug information of level 0.
