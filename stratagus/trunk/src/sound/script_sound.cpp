@@ -189,19 +189,20 @@ local SCM CclMakeSound(SCM name, SCM file)
 **
 **	@return		The sound id of the created sound
 */
-local SCM CclMakeSoundGroup(SCM name,SCM first,SCM second)
+local SCM CclMakeSoundGroup(SCM name, SCM first, SCM second)
 {
-    char* c_name;
+    char *c_name;
 
-    if( !gh_string_p(name) && !gh_symbol_p(name) ) {
-	fprintf(stderr,"string or symbol expected\n");
+    if (!gh_string_p(name) && !gh_symbol_p(name)) {
+	fprintf(stderr, "string or symbol expected\n");
 	return SCM_UNSPECIFIED;
     }
-    c_name=gh_scm2newstr(name,NULL);
+    c_name = gh_scm2newstr(name, NULL);
 
-    return sound_id_ccl(MakeSoundGroup(c_name,
-	    CclGetSoundId(first),CclGetSoundId(second)));
-    // c_name consumed by MakeSoundGroup!
+    return sound_id_ccl(MakeSoundGroup(c_name, CclGetSoundId(first),
+	    CclGetSoundId(second)));
+    free(c_name);
+    // JOHNS: not anymore: c_name consumed by MakeSoundGroup!
 }
 
 /**
