@@ -338,29 +338,87 @@ Adds a tip.  Tips are shown at the start of a level.
 
 <H4>Description</H4>
 
-.
+Defines a construction.<BR>
+<BR>
+Constructions can specify multiple files and shadow files for use with
+different tilesets.  Note that shadows are optional.<BR>
+<BR>
+The construction frames should be ordered by increasing percentages and the
+first frame should be 0.
 
 <H4>Syntax</H4>
 
-<CODE>(define-construction)</CODE>
+<CODE><PRE>
+(define-construction ident
+  'file '(
+    tileset tileset
+    file filename
+    size (x y))
+  'shadow-file '(
+    tileset tileset
+    file filename
+    size (x y))
+  'constructions (list
+    '(percent percent
+      file construction-file
+      frame frame-number))
+</PRE></CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>ident</DT>
+<DD>Unique name of the construction.
+</DD>
+<DT>tileset</DT>
+<DD>Name of tileset or default to use with any tileset.
+</DD>
+<DT>filename</DT>
+<DD>Path of the graphic.
+</DD>
+<DT>percent</DT>
+<DD>Percentage of construction complete.
+</DD>
+<DT>construction-file</DT>
+<DD>Can be construction or main, specifies which image should be displayed.
+</DD>
+<DT>frame-number</DT>
+<DD>Specfies which frame number to display.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (define-construction)
+    (define-construction 'construction-land
+      'file '(
+        tileset summer
+        file "neutral/buildings/land construction site.png"
+        size (64 64))
+      'file '(
+        tileset winter
+        file "tilesets/winter/neutral/buildings/land construction site.png"
+        size (64 64))
+      'constructions (list
+        '(percent 0
+          file construction
+          frame 0)
+        '(percent 25
+          file construction
+          frame 1)
+        '(percent 50
+          file main
+          frame 1)))
 </PRE>
 
-<P>.
+<P>Defines construction-land with different graphics for summer and winter
+tilesets.  Buildings 0-24 percent complete use frame 0 of the construction
+image, 25-49 percent complete use frame 1 of the construction image, and 50-99
+percent complete use the frame 1 of the main building graphic.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/constructions.ccl"> $LIBARYPATH/ccl/constructions.ccl </A><BR>
+<A HREF="../../data/ccl/human/constructions.ccl"> $LIBARYPATH/ccl/human/constructions.ccl </A><BR>
+<A HREF="../../data/ccl/orc/constructions.ccl"> $LIBARYPATH/ccl/orc/constructions.ccl </A>
 
 <A NAME="define-construction-wc-names"></A>
 <H3>define-construction-wc-names</H3>
