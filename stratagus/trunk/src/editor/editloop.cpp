@@ -966,9 +966,14 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	}
     }
 
+    //
+    //	Right click on a resource
+    //
     if (EditorState == EditorSelecting) {
 	if( (MouseButtons&RightButton && UnitUnderCursor) ) {
-	    if( UnitUnderCursor->Type->GoldMine || UnitUnderCursor->Type->OilPatch ) {
+	    if( UnitUnderCursor->Type->GoldMine ||
+		UnitUnderCursor->Type->OilPatch ||
+		UnitUnderCursor->Type->GivesOil ) {
 		EditorEditResource();;
 		return;
 	    }
