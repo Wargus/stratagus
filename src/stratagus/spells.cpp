@@ -794,20 +794,19 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 		return 0;
 	}
 
-	// Check dead units.
-	if (target->Destroyed || target->Orders->Action == UnitActionDie) {
-		return 0;
-	}
 	//
 	//		Casting an unit spell without a target.
 	//
-	if (spell->Target == TargetUnit && !target) {
-		return 0;
+	if (spell->Target == TargetUnit) {
+		if ((!target) || target->Destroyed || target->Orders->Action == UnitActionDie) {
+			return 0;
+		}
 	}
 	if (!condition) {
 		// no condition, pass.
 		return 1;
 	}
+	// Check dead units.
 	//
 	//		Now check conditions regarding the target unit.
 	//
