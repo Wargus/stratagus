@@ -30,6 +30,10 @@
 
 #include "pathfinder.h"
 
+/*----------------------------------------------------------------------------
+--	Declarations
+----------------------------------------------------------------------------*/
+
 typedef struct _node_ {
     short	Direction;	/// Direction for trace back
     short       InGoal;         /// is this point in the goal
@@ -45,6 +49,10 @@ typedef struct _open_ {
 
 /// heuristic cost fonction for a star
 #define AStarCosts(sx,sy,ex,ey)	max(abs(sx-ex),abs(sy-ey))
+
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
 
 /// cost matrix
 local Node *AStarMatrix;
@@ -541,7 +549,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 **	@param pxd	Pointer for the x direction.
 **	@param pyd	Pointer for the y direction.
 **
-**	@returns	>0 remaining path length, 0 wait for path, -1
+**	@return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
 global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
@@ -605,7 +613,7 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
 **	@param pxd	Pointer for the x direction.
 **	@param pyd	Pointer for the y direction.
 **
-**	@returns	>0 remaining path length, 0 wait for path, -1
+**	@return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
 global int NextPathElement(Unit* unit,int* pxd,int *pyd)
@@ -614,14 +622,7 @@ global int NextPathElement(Unit* unit,int* pxd,int *pyd)
     if(AStarOn) {
 	return AStarNextPathElement(unit,pxd,pyd);
     } else {
-	switch( NewPath(unit,pxd,pyd) ) {
-	    case 0:
-		return 999;
-	    case 1:
-		return -1;
-	    default:
-		return -2;
-	}
+	return NewPath(unit,pxd,pyd);
     }
 }
 
