@@ -1,8 +1,9 @@
-<HTML><HEAD>
+<HTML>
+<HEAD>
 <!--
 ----	$Id$
 
-----	(c) Copyright 2002-2003 by Lutz Sammer, Alex.
+----	(c) Copyright 2002-2003 by Nehal Mistry.
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -13,480 +14,133 @@
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <TITLE>INSTALL: The FreeCraft Version 1.18</TITLE>
+    <TITLE>FreeCraft Installation</TITLE>
 </HEAD>
 <BODY>
-    <H1>INSTALL: The FreeCraft Version 1.18</H1>
-<HR><PRE WIDTH=80>
-     ___________		     _________		      _____  __
-     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
-      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
-	  \/		    \/	   \/	     \/		   \/
-    ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   FreeCraft - A free fantasy real time strategy game engine
-</PRE>
+    <H1>Installation instructions for FreeCraft 1.18</H1>
 <P><B>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
 <A HREF="gpl.html">"GNU General Public License"</A></B>
 <HR>
 
-<A HREF="#unix-src">Install Unix source</A> 
-<A HREF="#unix-bin">Install Unix binary</A> 
-<A HREF="#win32-src">Install Win32 source</A> 
-<A HREF="#win32-bin">Install Win32 binary</A> 
-
     <H2>Software Requirements</H2>
+    <UL>
+	<LI><b>A supported operating system:</b> Win32, Linux, Mac OS X, BSD, 
+	Possibly any other Unix/POSIX OS.<br>
+	<font color=red>NOTE: some features of Winsock2 (WS2_32.DLL) are used. So even 
+	if you plan to play single player only, 
+	WinNT4.0 users will need Service Pack 3 or higher and Windows 95 users 
+	will need the winsock 2 update from 
+	<A HREF="http://www.microsoft.com/windows95/downloads/contents/WUAdminTools/S_WUNetworkingTools/W95Sockets2/Default.asp">here</A>.</font><p>
 
-You need:
-<UL>
-	<LI>Operating system:
-	<UL>
-	<LI>Linux System with an installed X Windows System.
-	<LI>Linux System with console (graphic card) supported by svgalib.
-	<LI>Any BSD System with an installed X Windows System.
-	<LI>Maybe any other Unix/POSIX OS with X Windows System installed.
-	    You may have to create the configuration by hand and install
-	    additional non-common libraries (see below) and gcc (untested).
-	<LI>BeOS System with an installed X Windows System.
-	<LI>MacOS System with an installed X Windows System.
-	<LI>X Windows System with 8/15/16/24/32bit X Server.
-	    Remote displays aren't supported!
-	<LI>On Unix/BSD-like systems, you'll need bash for the setup script.
-	<LI>Win32 system:
-	    <UL>
-	    <LI>For network play, Win95 OSR2 (aka Win95b) or higher is required,
-		since some features of Winsock2 (WS2_32.DLL) are used. We will try
-		to emulate this using WSOCK32.DLL features in future versions, but
-		that code is not in yet.<BR>
-		For now this MS <A HREF="http://www.microsoft.com/windows95/downloads/contents/WUAdminTools/S_WUNetworkingTools/W95Sockets2/Default.asp">download</A> link might help. You must
-		install WS2_32.DLL even if you don't intend to play over a network,
-		otherwise FreeCraft won't start.
-	    <LI>WinNT needs to be WinNT4.0 + Service Pack 3 or higher, for the same
-		reasons.
-	    </UL>
-	</UL>
-	<LI>libpng.
-	<LI>zlib.
-	<LI>SIOD. (Included in the distribution)
-	<LI>The original game CD or expansion CD for manuals and maindat.war
-	    for graphics and sfxdat.sud for sounds.
-	    <BR>Or use the free replacements of graphics and sounds from the
-		FreeCraft Media Project.
-</UL>
-These are optional:
-<UL>
-	<LI>libpthread	(For threaded sound support)
-	<LI>SVGALib	(for console support)
-	<LI>SDL		(Additional SDK support)
-	<LI>Bzip2	(Freely available, high-quality data compressor) 
-	<LI>ZZIPlib	(Read access on ZIP-archives)
-</UL>
+	<LI><b>A supported graphics library:</b> SDL, svgalib, X11/Xlib 
+	(although X11 is supported, SDL is recommended).<br>
+	<font color=red>NOTE: remote displays aren't supported.</font><p>
+
+	<LI><a href="http://www.libpng.org/pub/png/">libpng</a> (required).<p>
+	<LI><a href="http://www.gzip.org/zlib/">zlib</a> (required).<p>
+	<LI><a href="http://sources.redhat.com/bzip2/">libbzip2</a> (optional).<p>
+	<LI><a href="http://zziplib.sourceforge.net/">zziplib</a> (optional).<p>
+
+	<LI>Either the original or expansion W*rcr*ft 2 CD, or the FcMP data.<br>
+	<font color="red">NOTE: the Battle.net CD edition is not supported</font><p>
+    </UL>
 
     <H2>Hardware Requirements</H2>
+    <UL>
+	<LI><b>Processor:</b> A 133 MHz CPU (faster recommended).<br>
+	<font color="red">NOTE: FreeCraft is believed to be endian and word size safe, so other
+	architectures like (big endian) PPC or (64bit) Alpha should also
+	work at least with Linux.</font><p>
 
-To use this program you need the following hardware:
+	<LI><b>Memory:</b> 16 MB of RAM (32 MB for mp3/ogg support).<br><p>
 
-<UL>
-	<LI>At least an i586 133 MHz (faster recommended) and 16 MB of RAM
-	    (32 MB for mp3/ogg support).
-	<LI>Any graphic card running with X11 or SVGALib or Win32 in 640x480.
-	<LI>with 8/16/24/32 bpp video modes working.
-	<LI>Freecraft is believed to be endian and word size safe, so other
-	    architectures like (big endian) PPC or (64bit) Alpha should also
-	    work at least with Linux.
-</UL>
+	<LI><b>Video Card:</b> Any graphics card that can handle 8 bpp 
+	and 640x480 is supported.<p>
+
+	<LI><b>Sound Card:</b> Optional. Windows (for Win32) or SDL 
+	(for unix) compatible sound cards are supported.<p>
+    </UL>
 
     <H2>Installation</H2>
 
-    <H3>Unix or BSD</H3>
-<A NAME="unix-src"></A>
+    Mac OS X users: Extract the "contrib/macosx.tgz" file to the 
+    top-level directory and read "Read Me.rtf"<p>
 
-    <H4>Unix or BSD source</H4>
-Please follow the following instructions to get a working program.
-<UL>
-	<LI>Unpack the archive freecraft-'data'.tar.gz to any directory.
-	    (stored <B>with</B> path)
-	<LI>Change to the top-level directory (cd freecraft-'date').
-	<LI>Read <A HREF="install.html">doc/install.html</A>.
-	<LI>Install the required libraries (development version!).
-	<LI>You own the original:
+    Binary users may skip to step 3<p>
+
+    <UL>
+	<LI><b>Step 1, Download and Extract:</b><p>
+
 	<UL>
-	<LI>Search the files maindat.war, sfxdat.sud,strdat.war  and rezdat.war
-	    from the original game.
-	    <B>This version supports the original or expansion CD!</B>
-	    If you have only the original CD, it should also work, ignore the
-	    warnings.
-	<LI>Edit tools/build.sh, and change ARCHIVE to the correct path.
-	    (You could use an installed version or the CD-ROM)
-	    Extract from "/cdrom" is the default. Just mount your CD on /cdrom.
+	    <LI>Download the source from 
+	    <a href="http://freecraft.sourceforge.net/download.html">here</a>.<br>
+	    <font color="red">NOTE: both the tar.gz and zip files are the same, 
+	    we provide both formats for convenience.</font><p>
+
+	    <LI>Unpack the source freecraft-DATE.tar.gz with 
+	    <pre>	tar -zxvf freecraft-DATE.tar.gz</pre>
 	</UL>
-	<LI><B>With the media from the FreeCraft Media Project:</B>
+
+	<LI><b>Step 2, Compile:</b><p>
+
 	<UL>
-	<LI>FcGP (graphic) and FcSP (sound) are now combined in the FcMP
-	    (media) archive.
-	<LI>Take the archive with the same version as the FreeCraft source.
-	<LI>FIXME: for final version add the direct download link.
-	<LI>Download FcMP from <A HREF="http://FreeCraft.Org/download.html">
-	    FreeCraft - Download</A>
-	<LI>Extract it into the freecraft source directory. It overwrites the
-	    content of data which is only needed with the original CD.
-	<LI>Read "readme" file that is in the archive for further
-	    instructions on how to setup the graphics and sounds packs.
-	    Note: The current version didn't contain it. 
-	</UL>
-	<LI>Copy Rules.make.orig to Rules.make and edit it or run the setup
-	    script.
- 	<LI>Type "./setup" to configure the graphics, sound, and compression
-	    options.
+	    <LI><b>GCC/Mingw users:</b> run the 'setup' script and answer 
+	    the questions instructions to create the Makefile. 
+	    When complete, type 'make depend && make' to compile, and it 
+	    should compile a working 'freecraft' ('freecraft.exe' for win32) 
+	    binary. To see all options of setup, type 'setup --help'.<p>
+
+	    <LI><b>MSVC users:</b>
 	    <UL>
-	    <LI>"./setup --help" shows a list of available setup options
-	    <LI>You have the option of running "make" from the script,
-		bypassing the next step.
+		<li>Extract the VC++ project and workspace files from freecraft\contrib\msvc.zip 
+		into the root freecraft directory.</LI>
+
+		<LI><a href="http://freecraft.sourceforge.net/snapshots/msvc-libs.zip">
+    		Download</a> the VC++ libraries and extract them into the root
+    		freecraft directory.
+
+		<LI>Copy freecraft\contrib\freecraft.ico to freecraft\src.
+		<LI>You should now be able to compile freecraft by opening 
+		the freecraft.dsw file.<p>
 	    </UL>
-  	<LI>If you have the original type "make buildit" or
-	    ". tools/build.sh", to extract and convert the needed graphics,
-	    sounds and puds. (You need to run this only once!)
- 	<LI>Now it's time for a coffee break.
-  	<LI>Type "make". (Should compile without errors :-)
-	<LI>Optional:
-	    <UL>
-	    <LI>Edit "data/ccl/freecraft.ccl" to configure FreeCraft
-		for your own needs.
 	</UL>
-	<LI>Now you could start with "./freecraft".
-	<LI>That's all, I hope you have enjoyed the game.
-	<LI>If you find any bug, look in <A HREF="todo.html">todo.html</A>
-	    if it is already known, if not please submit it to
-	    <A HREF="http://sourceforge.net/projects/freecraft">
-            The FreeCraft Project</A>.
-	<LI>ADVANCED: Type "make help" for more compile options.
-	<P>
-	<LI>If you get killed everytime by the computer, let the AI sleep with
-            the command line option "-s n" (sleep n frames) or set the build
-            costs and build times of the computer with -f 110 and -t 110 higher.
-</UL>
 
-    <H4>Unix or BSD binary</H4>
-<A NAME="unix-bin"></A>
+	<li><b>Step 3, Extract data:</b><p>
 
-Please follow the following instructions to get a working program.
-<UL>
-    <LI>Download the binary version from the web page.
-    <LI>Unpack it into a directory of your choice (~/freecraft)
-    <LI>Open a shell.
-    <LI>Change to the top level directory. ("cd ~/freecraft")
-	<LI>You own the original:
-	<UL>
-	<LI>Search the files maindat.war, sfxdat.sud,strdat.war  and rezdat.war
-	    from the original game.
-	    <B>This version supports the original or expansion CD!</B>
-	    If you have only the original CD, it should also work, ignore the
-	    warnings.
-	<LI>Edit tools/build.sh, and change ARCHIVE to the correct path.
-	    (You could use an installed version or the CD-ROM)
-	    Extract from "/cdrom" is the default. Just mount your cd to /cdrom.
-	</UL>
-	<LI><B>With the media from the FreeCraft Media Project:</B>
-	<UL>
-	<LI>FcGP (graphic) and FcSP (sound) are now combined in the FcMP
-	    (media) archive.
-	<LI>Take the archive with the same version as the FreeCraft source.
-	<LI>FIXME: for final version add the direct download link.
-	<LI>Download FcMP from <A HREF="http://FreeCraft.Org/download.html">
-	    FreeCraft - Download</A>
-	<LI>Extract it into the freecraft source directory. It overwrites the
-	    content of data which is only needed with the original CD.
-	<LI>Read "readme" file that is in the archive for further
-	    instructions on how to setup the graphics and sounds packs.
-	    Note: The current version didn't contain it. 
-	</UL>
-    <LI>Now you could enter "./freecraft" to play.
-	<LI>That's all, I hope you have enjoyed the game.
-	<LI>If you find any bug, look in <A HREF="todo.html">todo.html</A>
-	    if it is already known, if not please submit it to
-	    <A HREF="http://sourceforge.net/projects/freecraft">
-            The FreeCraft Project</A>.
-	<P>
-	<LI>If you get killed everytime by the computer, let the ai sleep with
-            the command line option "-s n" (sleep n frames) or set the build
-            costs and build times of the computer with -f 110 and -t 110 higher.
-</UL>
+	Now that you have a working engine, you need some media data before 
+	you can actually play the game. There are two options, use the data 
+	from the W*rcr*ft 2 CD, or use FcMP.<p>
 
-    <H3>Win32</H3>
-<A NAME="win32-src"></A>
+	<ul>
+	    <li><b>Using W*rcr*ft 2 data:</b><p>
+	    For Win32, run:
+	    <pre>	build.bat DIR</pre>
+	    where DIR is the directory to your CD or your 
+	    installation, (eg, 'e:\' or 'c:\war2\').<p>
+	    For Unix, run:
+	    <pre>	build.sh -p DIR</pre>
+	    where DIR is the directory to your mounted CD or your 
+	    installation, (eg, '/cdrom/' or '/mnt/win/war2').<p>
+	    <font color="red">NOTE: You will need to execute this 
+	    script from withing your root freecraft directory or 
+	    you will run into problems. It will take some 
+	    time to extract everything.</font><p>
 
-    <H4>Win32 source</H4>
-
-Please follow the following instructions to get a working program. <br>
-<b>Note:</b> If you have not used mingw32 before, remember that in the
-shell that comes with it, you must type '/' instead of '\' in path names.
-<UL>
-    <LI>If you do not have a gnu compiler (eg. mingw32) then download the
-    freecraft-compiler-'date'.zip archive from
-    <a href="http://sourceforge.net/project/showfiles.php?group_id=1965&release_id=128486">this page.</a>
-    Unzip it into to the C:\ directory.
-    <LI>Download freecraft-'date'.zip and unzip it into any directory.
-    <LI>Install all required libraries. (If you downloaded mingw32 from the link
-    above you should not need to do this)
-    <LI>Open a shell. (run mingw32.bat)
-    <LI>Change to the top level freecraft directory. (cd /freecraft)
-    <LI><B>You own the original:</B>
-    <UL>
-    <LI>Edit tools\build.bat to meet your requirements.<BR>
-	If your original cdrom is in drive D:\, you didn't need to edit.
-    <LI>Run tools\build.bat from the FreeCraft toplevel directory.<BR>
-	This extracts the graphics and sound from the original data files.
+	    <li><b>Using FcMP data:</b><p>
+	    Download FcMP from the download page and extract it to 
+	    the freecraft root directory (where the freecraft 
+	    binary exists)<br>
+	    <font color="red">NOTE if you extract to a different directory, 
+	    you will need to specify the directory by passing '-d DIR' flag 
+	    when you run the freecraft binary, by default the binary 
+	    looks for 'data' in the current directory.</font><p> 
+	</ul>
     </UL>
-    <LI><B>With the media from the FreeCraft Media Project:</B>
-    <UL>
-	<LI>FcGP (graphic) and FcSP (sound) are now combined in the FcMP
-	    (media) archive.
-	<LI>Take the archive with the same version as the FreeCraft source.
-	<LI>FIXME: for final version add the direct download link.
-	<LI>Download FcMP from <A HREF="http://FreeCraft.Org/download.html">
-	    FreeCraft - Download</A>
-	<LI>Extract it into the freecraft source directory. It overwrites the
-	    content of data which is only needed with the original CD.
-	<LI>Read "readme" file that is in the archive for further
-	    instructions on how to setup the graphics and sounds packs.
-	    Note: The current version didn't contain it. 
-    </UL>
-    <LI>Copy Rules.make.orig to Rules.make and edit it or run the setup
-	script.
-    <LI>Type "./setup" to configure the graphics, sound, and compression
-	options.
-	<UL>
-	<LI>"./setup --help" shows a list of available setup options
-	<LI>You have the option of running "make" from the script,
-	    bypassing the next step.
-	</UL>
-    <LI>Enter "freecraft" to play.
-    <LI>If you have problems look into <A HREF="../stdout.txt">stdout.txt</A>
-	or <A HREF="../stderr.txt">stderr.txt</A> for more information.
-	<LI>That's all, I hope you have enjoyed the game.
-	<LI>If you find any bug, look in <A HREF="todo.html">todo.html</A>
-	    if it is already known, if not please submit it to
-	    <A HREF="http://sourceforge.net/projects/freecraft">
-            The FreeCraft Project</A>.
-	<LI>ADVANCED: Type "make help" for more compile options.
-	<P>
-	<LI>If you get killed everytime by the computer, let the ai sleep with
-            the command line option "-s n" (sleep n frames) or set the build
-            costs and build times of the computer with -f 110 and -t 110 higher.
-</UL>
-
-    <H4>Win32 binary</H4>
-<A NAME="win32-bin"></A>
-
-Please follow the following instructions to get a working program.
-<UL>
-    <LI>Download the binary version from the web page.
-    <LI>Unzip it into a directory of your choice (C:\games\FreeCraft).
-    <LI>Open a DOS shell.
-    <LI>Enter "cd c:\games\FreeCr~1"
-    <LI><B>You own the original:</B>
-    <UL>
-    <LI>Edit tools\build.bat to meet your requirements.<BR>
-	If your original cdrom is in drive D:\, you didn't need to edit.
-    <LI>Run tools\build.bat from the FreeCraft toplevel directory.<BR>
-	This extracts the graphics and sound from the original data files.
-    </UL>
-    <LI><B>With the media from the FreeCraft Media Project:</B>
-    <UL>
-	<LI>FcGP (graphic) and FcSP (sound) are now combined in the FcMP
-	    (media) archive.
-	<LI>Take the archive with the same version as the FreeCraft source.
-	<LI>FIXME: for final version add the direct download link.
-	<LI>Download FcMP from <A HREF="http://FreeCraft.Org/download.html">
-	    FreeCraft - Download</A>
-	<LI>Extract it into the freecraft source directory. It overwrites the
-	    content of data which is only needed with the original CD.
-	<LI>Read "readme" file that is in the archive for further
-	    instructions on how to setup the graphics and sounds packs.
-	    Note: The current version didn't contain it. 
-    </UL>
-    <LI>Enter "freecraft" to play.
-    <LI>If you have problems look into <A HREF="../stdout.txt">stdout.txt</A>
-	or <A HREF="../stderr.txt">stderr.txt</A> for more information.
-	<LI>That's all, I hope you have enjoyed the game.
-	<LI>If you find any bug, look in <A HREF="todo.html">todo.html</A>
-	    if it is already known, if not please submit it to
-	    <A HREF="http://sourceforge.net/projects/freecraft">
-            The FreeCraft Project</A>.
-	<P>
-	<LI>If you get killed everytime by the computer, let the ai sleep with
-            the command line option "-s n" (sleep n frames) or set the build
-            costs and build times of the computer with -f 110 and -t 110 higher.
-</UL>
-
-
-    <H2>SVGALib support = console</H2>
-
-<P>Make sure that you have installed the SVGALib development kit.  The setup
-script should take care of the rest.
-
-    <P>You can find more information and the source on the
-    <A HREF="http://www.svgalib.org/">SVGALIB home</A>
-
-    <H2>SDL (Simple DirectMedia Layer) support</H2>
-
-<P>Make sure that you have installed the SDLlib development kit.  The setup
-script should take care of the rest.
-  
-    <P>You can find more information and the source on the
-    <A HREF="http://www.devolution.com/~slouken/SDL/">
-    Simple DirectMedia Layer Home</A>
-
-    <H2>Prepare multiplayer play</H2>
-
-You can play FreeCraft via network or internet or may run 2 or more clients on
-the same computer.  Install it on all computers with the above instructions. 
-You can now start it on each computer with:
-
-<H3>First you need one server:</H3>
-
-<UL>
-<LI>Start the server:<P>
-    <I>freecraft</I>
-<LI>Choose:<P>
-    "Multi Player Game"
-<LI>Enter your name: ...
-<LI>Press OK to continue
-<LI>Choose:<P>
-    "Create Game"
-<LI>Choose a multi player level with:<P>
-    "Select Scenario"
-<LI>Wait for clients to connect, you will see their names in the menu.
-    After all slots are filled the gray "Start Game" becomes colored.
-<LI>Press "Start Game" to play.
-<LI>The level is now loaded and the clients are started.
-</UL>
-
-Press ALT-'q' to quit the game. If you have won or lost the game exits.
-
-<H3>Then you need the clients:</H3>
-
-
-After the server is running!
-
-<UL>
-<LI>Every client does:<P>
-    <I>freecraft</I> or <I>freecraft -n [server]</I><P>
-    [server] may be the hostname (e.g. www.freecraft.org) or the IP address
-    (e.g. 192.168.0.1.) of the game server. If you want test on a single
-    computer use "localhost" or "127.0.0.1".
-<LI>Choose:<P>
-    "Multi Player Game"
-<LI>Enter your name: ...
-<LI>Press OK to continue
-<LI>Choose:<P>
-    "Join Game"
-<LI>Enter the server name or IP address, above is the default.<BR>
-    Possible inputs are www.freecraft.org or 127.0.0.1.
-<LI>Press OK to continue
-<LI>You new see a menu with the possible game options.
-<LI>Press "Ready" to show that you are ready.
-<LI>Wait now until all are ready and the server player presses "Start Game".
-</UL>
-    
-Press ALT-'q' to quit the game. If you have won or lost the game exits.
-
-    <H2>Hints</H2>
-
-<UL>
-	<LI>To run setup, if bash isn't in /bin installed use
-	    "bash -c ". ./setup" .
-
-	<P><LI>To run make, if gmake isn't called make, use
-	    "gmake MAKE=gmake" .
-
-	<P><LI>You can get support on our forums, mailing lists and IRC channel.
-
-	<P><LI>You find the FreeCraft Media Project here:<BR>
-	<A HREF="http://FreeCraft.Net/fcmp/">The FreeCraft Media Project</A>
-
-	<P><LI>You find multiplayer levels on our home page or with 
-	<A HREF="http://www.google.com/search?q=download+pud">
-	http://www.google.com/search?q=download+pud</A>
-
-	<P><LI>You'll get libpng and libz here:<BR>
-	<A HREF="http://www.libpng.org/pub/png/libpng.html">
-	    http://www.libpng.org/pub/png/libpng.html
-	</A>
-	<P><A HREF="ftp://ftp.uu.net/graphics/png">
-	    ftp://ftp.uu.net/graphics/png (old)
-	</A>
-	<P>Alternative: <A HREF="ftp://swrinde.nde.swri.edu/pub/png/src/">
-	    ftp://swrinde.nde.swri.edu/pub/png/src/
-	</A>
-	<P>Please see the PNG homepage for more information:<BR>
-	<A HREF="http://www.libpng.org/pub/png/">
-	    http://www.libpng.org/pub/png/
-	</A>
-	or
-	<A HREF="ftp://ftp.freesoftware.com/pub/png">
-	    ftp://ftp.freesoftware.com/pub/png
-	</A>
-	<P>You can also look at the zlib homepage for more information:<BR>
-	<A HREF="http://www.freesoftware.com/pub/infozip/zlib/zlib.html">
-	    http://www.freesoftware.com/pub/infozip/zlib/zlib.html
-	</A>
-	or
-	<A HREF="http://www.gzip.org/zlib/">http://www.gzip.org/zlib/</A>
-
-	<P><LI>You'll get pthread here:<BR>
-	Please see the LinuxThreads homepage for more information:<BR>
-	<A HREF="http://pauillac.inria.fr/~xleroy/linuxthreads">
-	        http://pauillac.inria.fr/~xleroy/linuxthreads
-	</A>
-
-	<P><LI>You can get SVGALIB here:<BR>
-	<A HREF="http://www.svgalib.org/">
-	    http://www.svgalib.org/</A>
-
-	<P><LI>You can get SDL here:<BR>
-	<A HREF="http://www.devolution.com/~slouken/SDL/">
-	    http://www.devolution.com/~slouken/SDL/</A>
-	<P>Or you can get SDL here:<BR>
-	<A HREF="http://www.libsdl.org/">
-	    http://www.libsdl.org/</A>
-
-	<P><LI>SIOD: Scheme in One Day<BR>
-	Not needed included in the source distribution.
-	The most recent release is available from
-	<A HREF="http://people.delphiforums.com/gjc/siod.html">this web page</a>,
-	and also from <A HREF="ftp://ftp.std.com/pub/gjc/">
-	ftp://ftp.std.com/pub/gjc/</A>
-
-	<P><LI>BZIP2: Freely available, patent free, high-quality data
-		compressor.<BR>
-	You can get it here <A HREF="http://sources.redhat.com/bzip2/">
-	http://sources.redhat.com/bzip2/</A>
-
-	<P><LI>ZZIP: Read access on ZIP-archives<BR>
-	You can get it here <A HREF="http://sourceforge.net/projects/zziplib">
-	http://sourceforge.net/projects/zziplib</A>
-
-	<P><LI>Ogg vorbis: A completely open, patent-free, professional audio
-	encoding and streaming technology with all the benefits of Open Source.
-	<BR>
-	You can get it here <A HREF="http://www.xiph.org/ogg/vorbis/">
-	http://www.xiph.org/ogg/vorbis/
-	</A>
-
-	<P><LI>FLAC: A Free Lossless Audio Codec<BR>
-	You can get it here <A HREF="http://sourceforge.net/project/showfiles.php?group_id=13478">
-	http://sourceforge.net/project/showfiles.php?group_id=13478</A>
-
-	<P><LI>MAD: A high-quality MPEG audio decoder capable of 24-bit output
-	<BR>You can get it here: <A HREF="ftp://ftp.mars.org/pub/mpeg/">
-	ftp://ftp.mars.org/pub/mpeg/</A>
-
-</UL>
+</ul>
 
 <HR>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS><A HREF="http://freecraft.org">The FreeCraft Project</A>
-</ADDRESS></BODY></HTML>
+<ADDRESS><A HREF="http://freecraft.sourceforge.net">The FreeCraft Project</A>
+</ADDRESS>
+</BODY>
+</HTML>
