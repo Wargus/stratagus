@@ -1186,7 +1186,8 @@ Use it at your own risk.\n\n");
     i=1;
     SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     if( TitleScreen ) {
-	if( (i=PlayMovie(TitleScreen,PlayMovieZoomScreen)) ) {
+	if( (i=PlayMovie(TitleScreen,
+		PlayMovieZoomScreen|PlayMovieKeepAspect)) ) {
 	    DisplayPicture(TitleScreen);
 	    Invalidate();
 	}
