@@ -871,7 +871,7 @@ global void LoadFonts(void)
 
     for (i = 0; i<sizeof(Fonts) / sizeof(*Fonts); ++i) {
 	if (Fonts[i].File) {
-	    ShowLoadProgress("\tFonts %s\n", Fonts[i].File);
+	    ShowLoadProgress("Fonts %s", Fonts[i].File);
 	    Fonts[i].Graphic = LoadGraphic(Fonts[i].File);
 	    FontMeasureWidths(Fonts + i);
 #ifdef USE_OPENGL
@@ -964,7 +964,7 @@ local SCM CclDefineFont(SCM type, SCM file, SCM width, SCM height)
     i = CclFontByIdentifier(type);
     free(Fonts[i].File);
     VideoSaveFree(Fonts[i].Graphic);
-    Fonts[i].Graphic=NULL;
+    Fonts[i].Graphic = NULL;
     Fonts[i].File = gh_scm2newstr(file, NULL);
     Fonts[i].Width = gh_scm2int(width);
     Fonts[i].Height = gh_scm2int(height);
