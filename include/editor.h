@@ -28,12 +28,17 @@
 
 //@{
 
+    /// Editor is running
+extern char EditorRunning;
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
     ///	Editor main event loop
 extern void EditorMainLoop(void);
+    /// Update editor display
+extern void EditorUpdateDisplay(void);
 
 //@}
 

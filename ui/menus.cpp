@@ -73,6 +73,7 @@
 ----------------------------------------------------------------------------*/
 
 local void EndMenu(void);
+local void EditorEndMenu(void);
 
 /*----------------------------------------------------------------------------
 --	Prototypes for action handlers and helper functions
@@ -236,6 +237,10 @@ local unsigned char *EditorLoadLBRetrieve(Menuitem *mi, int i);
 local void EditorLoadOk(void);
 local void EditorLoadCancel(void);
 local void EditorLoadVSAction(Menuitem *mi, int i);
+local void EditorMapProperties(void);
+local void EditorPlayerProperties(void);
+local void EditorEnterMapDescriptionAction(Menuitem *mi, int key);
+local void EditorQuitMenu(void);
 
 local Menu *FindMenu(const char *menu_id);
 global void SaveMenus(FILE* file);
@@ -1685,6 +1690,69 @@ local void InitEditorLoadMapMenuItems() {
 #endif
 
 /**
+**	Items for the main Editor Menu
+*/
+local Menuitem EditorMenuItems[] = {
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, InitGameMenu, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 288-40-36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+};
+#ifdef OLD_MENU
+local void InitEditorMenuItems() {
+    MenuitemText   i0 = { "Editor Menu", MI_TFLAGS_CENTERED};
+    MenuitemButton i1 = { "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11};
+    MenuitemButton i2 = { "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12};
+    MenuitemButton i3 = { "Map Properties (~<F5~>)", 224, 27, MBUTTON_GM_FULL, EditorMapProperties, KeyCodeF5};
+    MenuitemButton i4 = { "Player Properties (~<F6~>)", 224, 27, MBUTTON_GM_FULL, EditorPlayerProperties, KeyCodeF6};
+    MenuitemButton i5 = { "", 224, 27, MBUTTON_GM_FULL, GameMenuObjectives, 'o'};
+    MenuitemButton i6 = { "E~!xit to Menu", 224, 27, MBUTTON_GM_FULL, EditorQuitMenu, 'x'};
+    MenuitemButton i7 = { "Return to Editor (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, GameMenuReturn, '\033'};
+    EditorMenuItems[0].d.text   = i0;
+    EditorMenuItems[1].d.button = i1;
+    EditorMenuItems[2].d.button = i2;
+    EditorMenuItems[3].d.button = i3;
+    EditorMenuItems[4].d.button = i4;
+    EditorMenuItems[5].d.button = i5;
+    EditorMenuItems[6].d.button = i6;
+    EditorMenuItems[7].d.button = i7;
+}
+#endif
+
+local Menuitem EditorMapPropertiesMenuItems[] = {
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, (384-288)/2, 11+36, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_INPUT, (384-288)/2, 11+36+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 384/2 - (106 / 2), 256 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+};
+#ifdef OLD_MENU
+local void InitEditorMapPropertiesMenuItems() {
+    MenuitemText   i0 = { "Map Properties", MI_TFLAGS_CENTERED};
+    MenuitemText   i1 = { "Map Description:", MI_TFLAGS_LALIGN};
+    MenuitemInput  i2 = { NULL, 288, 16, MBUTTON_PULLDOWN, EditorEnterMapDescriptionAction, 0, 0};
+    MenuitemButton i3 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EditorEndMenu, 0};
+    EditorMapPropertiesMenuItems[0].d.text   = i0;
+    EditorMapPropertiesMenuItems[1].d.text   = i1;
+    EditorMapPropertiesMenuItems[2].d.input  = i2;
+    EditorMapPropertiesMenuItems[3].d.button = i3;
+}
+#endif
+
+local Menuitem EditorPlayerPropertiesMenuItems[] = {
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+};
+#ifdef OLD_MENU
+local void InitEditorPlayerPropertiesMenuItems() {
+    MenuitemText   i0 = { "Player Properties", MI_TFLAGS_CENTERED};
+    EditorPlayerPropertiesMenuItems[0].d.text   = i0;
+}
+#endif
+
+/**
 **	FIXME: Ari please look, this is now in TheUI.
 */
 enum {
@@ -2000,6 +2068,36 @@ global Menu Menus[] = {
 	EditorLoadMapMenuItems,
 	NULL,
     },
+    {
+	// Editor Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	7, 8,
+	EditorMenuItems,
+	NULL,
+    },
+    {
+	// Editor Map Properties Menu
+	176+(14*TileSizeX-384)/2,
+	16+(14*TileSizeY-256)/2,
+	384, 256,
+	ImagePanel3,
+	3, 4,
+	EditorMapPropertiesMenuItems,
+	NULL,
+    },
+    {
+	// Editor Player Properties Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	0, 1,
+	EditorPlayerPropertiesMenuItems,
+	NULL,
+    },
 };
 
 /*----------------------------------------------------------------------------
@@ -2195,6 +2293,11 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorLoadOk,"editor-load-ok");
     HASHADD(EditorLoadCancel,"editor-load-cancel");
     HASHADD(EditorLoadFolder,"editor-load-folder");
+    HASHADD(EditorMapProperties,"editor-map-properties");
+    HASHADD(EditorPlayerProperties,"editor-player-properties");
+
+// EditorMapProperties
+    HASHADD(EditorEnterMapDescriptionAction,"editor-map-description-action");
 }
 
 /**
@@ -6682,6 +6785,47 @@ local void EditorLoadVSAction(Menuitem *mi, int i)
     }
 }
 
+local void EditorMapProperties(void)
+{
+    Menu *menu;
+    char MapDescription[32];
+
+    menu = FindMenu(MENU_EDITOR_MAP_PROPERTIES);
+    menu->items[2].d.input.buffer = MapDescription;
+    strcpy(MapDescription, "FIXME");
+    strcat(MapDescription, "~!_");
+    menu->items[2].d.input.nch = strlen(MapDescription)-3;
+    menu->items[2].d.input.maxch = 32;
+    ProcessMenu(MENU_EDITOR_MAP_PROPERTIES, 1);
+}
+
+local void EditorEnterMapDescriptionAction(Menuitem *mi, int key)
+{
+}
+
+local void EditorPlayerProperties(void)
+{
+    ProcessMenu(MENU_EDITOR_PLAYER_PROPERTIES, 1);
+}
+
+local void EditorQuitMenu(void)
+{
+    EditorRunning=0;
+    GameMenuReturn();
+}
+
+local void EditorEndMenu(void)
+{
+    CursorOn = CursorOnUnknown;
+    CurrentMenu = NULL;
+
+    MustRedraw = RedrawEverything;
+    InterfaceState = IfaceStateNormal;
+    EditorUpdateDisplay();
+    InterfaceState = IfaceStateMenu;
+    MustRedraw = RedrawMenu;
+}
+
 /*----------------------------------------------------------------------------
 --	Menu operation functions
 ----------------------------------------------------------------------------*/
@@ -7651,6 +7795,9 @@ global void InitMenus(unsigned int race)
 	InitConfirmDeleteMenuItems();
 	InitEditorSelectMenuItems();
 	InitEditorLoadMapMenuItems();
+	InitEditorMenuItems();
+	InitEditorMapPropertiesMenuItems();
+	InitEditorPlayerPropertiesMenuItems();
 #endif
 	InitNetMultiButtonStorage();
 
@@ -7689,6 +7836,9 @@ global void InitMenus(unsigned int race)
 	*(Menu **)hash_add(MenuHash,MENU_CONFIRM_DELETE) = Menus + 27;
 	*(Menu **)hash_add(MenuHash,MENU_EDITOR_SELECT) = Menus + 28;
 	*(Menu **)hash_add(MenuHash,MENU_EDITOR_LOAD_MAP) = Menus + 29;
+	*(Menu **)hash_add(MenuHash,MENU_EDITOR) = Menus + 30;
+	*(Menu **)hash_add(MenuHash,MENU_EDITOR_MAP_PROPERTIES) = Menus + 31;
+	*(Menu **)hash_add(MenuHash,MENU_EDITOR_PLAYER_PROPERTIES) = Menus + 32;
 #endif
 
 	callbacks.ButtonPressed = &MenuHandleButtonDown;
@@ -7791,6 +7941,9 @@ char *menu_names[] = {
     MENU_CONFIRM_DELETE,
     MENU_EDITOR_SELECT,
     MENU_EDITOR_LOAD_MAP,
+    MENU_EDITOR,
+    MENU_EDITOR_MAP_PROPERTIES,
+    MENU_EDITOR_PLAYER_PROPERTIES,
 };
 
 char *menu_flags[] = {
