@@ -153,7 +153,7 @@ CCLLIB	= -lm
 #PROFILE=	-pg -a
 
 # Compile Version
-VERSION=	'-DVERSION="1.17pre1-build14"'
+VERSION=	'-DVERSION="1.17pre1-build15"'
 
 ############################################################################
 # below this, nothing should be changed!
@@ -198,7 +198,11 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## USE_SMART_TILECACHE:	Faster tile drawing, slow with hardware video memory.
 ## USE_HP_FOR_XP	Use hit-points for XP calculations.
 ## NEW_NETMENUS:	Include new network menues.
+## USE_LIBMODPLUG:	Use modplug support.
 ## This aren't working:
+## USE_FFMPEG		Use ffmpeg video player support.
+## USE_FLAC:		Use flac support.
+## USE_OGG:		Use ogg support.
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
 ## NEW_REGIONS:		Support for new regions code
