@@ -351,9 +351,11 @@ echo >> $RULESFILE
 #	Install part
 #------------------------------------------------------------------------------
 
-echo "# Prefix for 'make install'" >> $RULESFILE
-echo "PREFIX=/usr/local" >> $RULESFILE
-echo >> $RULESFILE
+if [ "$WIN32" = "0" ] ; then
+  echo "# Prefix for 'make install'" >> $RULESFILE
+  echo "PREFIX=/usr/local" >> $RULESFILE
+  echo >> $RULESFILE
+fi
 
 #------------------------------------------------------------------------------
 #       SIOD support part
