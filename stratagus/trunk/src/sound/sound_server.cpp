@@ -1273,7 +1273,7 @@ global void QuitCD(void)
 	CDMode = ":off";
     }
 #elif defined(USE_CDDA)
-
+    close(CDDrive);
 #endif
 }
 

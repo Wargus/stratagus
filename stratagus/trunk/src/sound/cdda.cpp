@@ -51,17 +51,23 @@ local int CDRead(Sample *sample, void *buf, int len)
 
     ++count;
 
-    if (count == 8) {
+    data.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + pos / 2352;
+    data.addr_format = CDROM_LBA;
+    data.nframes = 14;
+
+    if (count == 4) {
+	data.buf = bufstart;
+	ioctl(CDDrive, CDROMREADAUDIO, &data);
+    } else if (count == 8) {
 	count = 0;
 	sample->User = bufstart;
-	data.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + pos / 2352;
-	data.addr_format = CDROM_LBA;
-	data.nframes = len * 8 / 2352;
-	data.buf = sample->User;
+	data.buf = sample->User + 2352 * 14;
 	ioctl(CDDrive, CDROMREADAUDIO, &data);
-    } else {
+    } 
+    
+    if (count)
 	sample->User += len;
-    }
+
     pos += len;
 
     memcpy(buf, sample->User, len);
