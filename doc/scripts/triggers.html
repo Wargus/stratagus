@@ -55,7 +55,7 @@
 <a href="#IfNearUnit">IfNearUnit</a>
 <a href="#GetNumOpponents">GetNumOpponents</a>
 <a href="#IfRescuedNearUnit">IfRescuedNearUnit</a>
-<a href="#IfTimer">IfTimer</a>
+<a href="#GetTimer">GetTimer</a>
 <a href="#IfUnitAt">IfUnitAt</a>
 <hr>
 <h2>Intro - Introduction to trigger functions and variables</h2>
@@ -394,29 +394,15 @@ IfRescuedNearUnit("this", "==", 1, "unit-archer", "unit-circle-of-power")
 </pre>
 
 
-<a name="IfTimer"></a>
-<h3>IfTimer(op, cycles)</h3>
+<a name="GetTimer"></a>
+<h3>GetTimer()</h3>
  
-Return true if Timer "op" cycles quantity is true.
+Return the number of cycles the timer ran.
  
- 
- <dl>
-  <dt>op</dt>
-  <dd><pre>
-"=="         operator equal
-"&gt;"          operator greater than
-"&gt;="         operator greater than or equal
-"&lt;"          operator less than
-"&lt;="         operator less than or equal
-</pre></dd>
-  <dt>cycles</dt>
-  <dd>Number to compare with number of cycles</dd>
-</dl>
-
 <h4>Example</h4>
 <pre>
--- True when the timer is at 0 cycles.
-IfTimer("==", 0)
+-- True when the timer is at 17 cycles.
+time = GetTimer() == 17
 </pre>
 
 <a name="IfUnitAt"></a>

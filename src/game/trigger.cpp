@@ -502,35 +502,22 @@ static int CclGetNumOpponents(lua_State* l)
 /**
 **  Check the timer value
 */
-static int CclIfTimer(lua_State* l)
+static int CclGetTimer(lua_State* l)
 {
 	int q;
 	const char* op;
 	CompareFunction compare;
 
-	if (lua_gettop(l) != 2) {
+	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
 
 	if (!GameTimer.Init) {
-		lua_pushboolean(l, 0);
+		lua_pushnumber(l, 0);
 		return 1;
 	}
 
-	op = LuaToString(l, 1);
-	q = LuaToNumber(l, 2);
-
-	compare = GetCompareFunction(op);
-	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-timer: %s" _C_ op);
-	}
-
-	if (compare(GameTimer.Cycles, q)) {
-		lua_pushboolean(l, 1);
-		return 1;
-	}
-
-	lua_pushboolean(l, 0);
+	lua_pushnumber(l, GameTimer.Cycles);
 	return 1;
 }
 
@@ -841,7 +828,7 @@ void TriggerCclRegister(void)
 	lua_register(Lua, "IfNearUnit", CclIfNearUnit);
 	lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
 	lua_register(Lua, "GetNumOpponents", CclGetNumOpponents);
-	lua_register(Lua, "IfTimer", CclIfTimer);
+	lua_register(Lua, "GetTimer", CclGetTimer);
 	// Actions
 	lua_register(Lua, "ActionVictory", CclActionVictory);
 	lua_register(Lua, "ActionDefeat", CclActionDefeat);
