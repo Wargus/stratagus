@@ -154,6 +154,12 @@ CCL	= -DUSE_CCL
 CCLLIB	= -lm
 
 #------------------------------------------------------------------------------
+#	Where do you want it installed?
+
+# Prefix for 'make install'
+PREFIX=/usr/local
+
+#------------------------------------------------------------------------------
 
 # Uncomment next to profile
 #PROFILE=	-pg
