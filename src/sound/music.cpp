@@ -178,7 +178,7 @@ void PlaySectionMusic(PlaySectionType section)
 				++numfiles;
 			}
 		}
-		if (!found) {
+		if (found) {
 			if (PlaySections[i].FileOrder == PlaySectionOrderAll) {
 				PlayMusic(PlaySections[i].Files[0]);
 			} else if (PlaySections[i].FileOrder == PlaySectionOrderRandom) {
