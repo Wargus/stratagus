@@ -518,6 +518,7 @@ local void DrawUnitIcons(void)
 **	@param tilenum	Tile number to display
 **	@param x	X display position
 **	@param y	Y display position
+**	@param flags	State of the icon (::IconActive,::IconClicked,...)
 */
 local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 {

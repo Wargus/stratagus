@@ -90,7 +90,7 @@ local enum mad_flow MAD_read(void *user, struct mad_stream *stream)
     if (!i) {
 	return MAD_FLOW_STOP;
     }
-    DebugLevel3Fn("%d bytes\n", l + i);
+    DebugLevel3Fn("%d bytes\n" _C_ l + i);
     mad_stream_buffer(stream, u->Buffer, l + i);
 
     return MAD_FLOW_CONTINUE;
@@ -119,7 +119,7 @@ local enum mad_flow MAD_write(void *user,
     n=pcm->length;
     channels=pcm->channels;
 
-    DebugLevel3Fn("%d channels %d samples\n",channels,n);
+    DebugLevel3Fn("%d channels %d samples\n" _C_ channels _C_ n);
 
     sample = ((MyUser *) user)->Sample;
 
@@ -211,7 +211,7 @@ global Sample *LoadMp3(const char* name)
 	return NULL;
     }
 
-    DebugLevel2Fn("Have mp3 file %s\n", name);
+    DebugLevel2Fn("Have mp3 file %s\n" _C_ name);
 
     sample = malloc(sizeof(*sample));
     sample->Channels = 0;

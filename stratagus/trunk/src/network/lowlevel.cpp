@@ -10,12 +10,11 @@
 //
 /**@name lowlevel.c	-	The network lowlevel. */
 //
-//	(c) Copyright 2000,2001 by Lutz Sammer
+//	(c) Copyright 2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -298,29 +297,32 @@ global int NetSocketAddr(const int sock)
     struct ifreq ifreq, *ifr;
     struct sockaddr_in *sap, sa;
     int i, nif;
-	
+
     nif = 0;
     if (sock != -1) {
-	ifc.ifc_len = sizeof (buf);
+	ifc.ifc_len = sizeof(buf);
 	ifc.ifc_buf = buf;
 	if (ioctl(sock, SIOCGIFCONF, (char *)&ifc) < 0) {
-	    DebugLevel0Fn("SIOCGIFCONF - errno %d\n", errno);
+	    DebugLevel0Fn("SIOCGIFCONF - errno %d\n" _C_ errno);
 	    return 0;
 	}
-	/* with some inspiration from routed.. */
-        ifr = ifc.ifc_req;
-	cplim = buf + ifc.ifc_len; /*skip over if's with big ifr_addr's */
-	for (cp = buf; cp < cplim; cp += sizeof (ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
+	// with some inspiration from routed..
+	ifr = ifc.ifc_req;
+	cplim = buf + ifc.ifc_len;	// skip over if's with big ifr_addr's
+	for (cp = buf; cp < cplim;
+	    cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
 	    ifr = (struct ifreq *)cp;
 	    ifreq = *ifr;
 	    if (ioctl(sock, SIOCGIFFLAGS, (char *)&ifreq) < 0) {
-		DebugLevel0Fn("%s: SIOCGIFFLAGS - errno %d\n", ifr->ifr_name, errno);
+		DebugLevel0Fn("%s: SIOCGIFFLAGS - errno %d\n" _C_
+		    ifr->ifr_name _C_ errno);
 		continue;
 	    }
-	    if ((ifreq.ifr_flags & IFF_UP) == 0 || ifr->ifr_addr.sa_family == AF_UNSPEC) {
+	    if ((ifreq.ifr_flags & IFF_UP) == 0
+		|| ifr->ifr_addr.sa_family == AF_UNSPEC) {
 		continue;
 	    }
-	    /* argh, this'll have to change sometime */
+	    // argh, this'll have to change sometime
 	    if (ifr->ifr_addr.sa_family != AF_INET) {
 		continue;
 	    }
@@ -332,15 +334,16 @@ global int NetSocketAddr(const int sock)
 	    NetLocalAddrs[nif] = sap->sin_addr.s_addr;
 	    if (ifreq.ifr_flags & IFF_POINTOPOINT) {
 		if (ioctl(sock, SIOCGIFDSTADDR, (char *)&ifreq) < 0) {
-		    DebugLevel0Fn("%s: SIOCGIFDSTADDR - errno %d\n", ifr->ifr_name, errno);
-		    /* failed to obtain dst addr - ignore */
+		    DebugLevel0Fn("%s: SIOCGIFDSTADDR - errno %d\n" _C_
+			ifr->ifr_name _C_ errno);
+		    // failed to obtain dst addr - ignore
 		    continue;
 		}
 		if (ifr->ifr_addr.sa_family == AF_UNSPEC) {
 		    continue;
 		}
 	    }
-	    /* avoid p-t-p links with common src */
+	    // avoid p-t-p links with common src
 	    if (nif) {
 		for (i = 0; i < nif; i++) {
 		    if (sa.sin_addr.s_addr == NetLocalAddrs[i]) {
@@ -348,14 +351,16 @@ global int NetSocketAddr(const int sock)
 			break;
 		    }
 		}
-		if (i == -1)
+		if (i == -1) {
 		    continue;
+		}
 	    }
-	    DebugLevel3Fn("FOUND INTERFACE %s: %d.%d.%d.%d\n", ifr->ifr_name, 
-			NIPQUAD(ntohl(NetLocalAddrs[nif])));
+	    DebugLevel3Fn("FOUND INTERFACE %s: %d.%d.%d.%d\n" _C_
+		ifr->ifr_name _C_ NIPQUAD(ntohl(NetLocalAddrs[nif])));
 	    nif++;
-	    if (nif == MAX_LOC_IP)
+	    if (nif == MAX_LOC_IP) {
 		break;
+	    }
 	}
     }
     return nif;
