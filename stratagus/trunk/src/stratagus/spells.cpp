@@ -1544,16 +1544,17 @@ local int CastHolyVision(Unit* unit, const SpellType* spell, Unit* target,
     unit->Mana -= spell->ManaCost;	// get mana cost
     // FIXME: Don't use UnitTypeByIdent during runtime.
     target = MakeUnit(UnitTypeByIdent("unit-revealer"), unit->Player);
-    target->Revealer = 1;
     target->Orders[0].Action = UnitActionStill;
     target->HP = 0;
     target->X = x;
     target->Y = y;
     target->TTL=GameCycle+CYCLES_PER_SECOND+CYCLES_PER_SECOND/2;
     target->CurrentSightRange=target->Stats->SightRange;
+
+    target->Removed=1;
     MapMarkSight(target->Player,x,y,target->CurrentSightRange);
 
-    //target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
+    target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
     CheckUnitToBeDrawn(target);
     PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 

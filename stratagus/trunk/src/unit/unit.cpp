@@ -1115,7 +1115,7 @@ global int BuildingVisibleOnMap(const Unit* unit)
     int h;
 
     DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
-
+    
     x = unit->X;
     y = unit->Y;
     w = w0 = unit->Type->TileWidth;
@@ -4153,9 +4153,6 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	fprintf(file," 'moving");
     }
     fprintf(file," 'rs %d",unit->Rs);
-    if( unit->Revealer ) {
-	fprintf(file," 'revealer");
-    }
     fprintf(file," 'units-contained-count %d",unit->InsideCount);
     fprintf(file,"\n  'units-contained #(");
     uins=unit->UnitInside;
