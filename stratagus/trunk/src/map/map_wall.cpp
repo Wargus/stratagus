@@ -310,6 +310,9 @@ global void MapRemoveWall(unsigned x, unsigned y)
 		MarkDrawPosMap(x, y);
 		MustRedraw |= RedrawMinimap;
 	}
+#ifdef MAP_REGIONS
+	MapSplitterTilesCleared(x, y, x, y);
+#endif
 }
 
 /**
@@ -350,6 +353,9 @@ global void MapSetWall(unsigned x, unsigned y, int humanwall)
 		MarkDrawPosMap(x, y);
 		MustRedraw |= RedrawMinimap;
 	}
+#ifdef MAP_REGIONS
+	MapSplitterTilesOccuped(x, y, x, y);
+#endif
 }
 
 /**
@@ -367,9 +373,6 @@ global void HitWall(unsigned x, unsigned y, unsigned damage)
 	if( v <= damage ) {
 		TheMap.Fields[x + y * TheMap.Width].Value = 0;
 		MapRemoveWall(x, y);
-#ifdef MAP_REGIONS
-		MapSplitterTilesCleared(x, y, x, y);
-#endif
 	} else {
 		TheMap.Fields[x + y * TheMap.Width].Value = v - damage;
 		MapFixWallTile(x, y);
