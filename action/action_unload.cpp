@@ -268,8 +268,8 @@ local int ClosestFreeDropZone(Unit* transporter, int x, int y, int* resx, int* r
 	*resx=x;
 	*resy=y;
 	return 1;
-    }	
-        
+    }
+
     switch(transporterType) {
 	case UnitTypeLand:
 	    // in this case, loadedType==UnitTypeSea
@@ -406,6 +406,7 @@ global void HandleActionUnload(Unit* unit)
 		unit->Orders[0].X = x;
 		unit->Orders[0].Y = y;
 	    }
+	    
 	    NewResetPath(unit);
 	    unit->SubAction = 1;
 	case 1:

@@ -676,7 +676,7 @@ struct _unit_type_ {
 
     int		_Costs[MaxCosts];	/// How many resources needed
     int		RepairHP;		/// Amount of HP per repair
-    int		RepairCosts[MaxCosts]; /// How much it costs to repair
+    int		RepairCosts[MaxCosts];  /// How much it costs to repair
 
     int		TileWidth;		/// Tile size on map width
     int		TileHeight;		/// Tile size on map height

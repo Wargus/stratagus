@@ -202,6 +202,61 @@ global void CommandStopUnit(Unit* unit)
 }
 
 /**
+**	Order an already formed Order structure
+**
+**	@param unit	pointer to unit
+**	@param order	pointer to valid order
+**	@param flush	if true, flush command queue.
+*/
+global void CommandAnyOrder(Unit* unit,Order * cpyorder,int flush)
+{
+    Order* order;
+    if (!(order = GetNextOrder(unit, flush))) {
+	return;
+    }
+    
+    *order = *cpyorder;
+    if (order->Goal) {
+	RefsIncrease(order->Goal);
+    }
+    ClearSavedAction(unit);
+}
+
+/**
+**	Move an order in the order queue.
+**	( Cannot move the order 0 ! )
+**
+**	@param unit	pointer to unit
+**	@param src	the order to move
+**	@param dst	the new position of the order
+*/
+global void CommandMoveOrder(Unit * unit,int src,int dst)
+{
+    Order tmp;
+    int i;
+    DebugCheck(src == 0 || dst == 0 || src >= unit->OrderCount || dst >= unit->OrderCount);
+    
+    if (src == dst) {
+	return;
+    }
+    
+    if (src < dst) {
+	tmp = unit->Orders[src];
+	for(i = src; i < dst; i++) {
+	    unit->Orders[i] = unit->Orders[i+1];
+	}
+	unit->Orders[dst] = tmp;
+    } else {
+	// dst < src
+	tmp = unit->Orders[src];
+	for (i = src - 1 ; i >= dst; i--){
+	    unit->Orders[i + 1] = unit->Orders[i];
+	}
+	unit->Orders[dst] = tmp;
+    }
+}
+
+/**
 **	Stand ground.
 **
 **	@param unit	pointer to unit.
