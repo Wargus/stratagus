@@ -31,7 +31,7 @@ include $(TOPDIR)/$(RULESFILE)
 
 MODULE  = unit
 
-SRCS	= unittype.c ccl_unittype.c upgrade.c depend.c \
+SRCS	= unittype.c ccl_unittype.c upgrade.c depend.c unit_ai.c \
 	ccl_unit.c
 
 OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
