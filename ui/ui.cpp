@@ -457,12 +457,12 @@ local void SetViewportModeSingle (void)
     TheUI.NumViewports = 1;
 
     TheUI.VP[0].X = TheUI.MapArea.X;
-    TheUI.VP[0].EndX = TheUI.MapArea.X + TheMap.Width * TileSizeX;
+    TheUI.VP[0].EndX = TheUI.MapArea.X + TheMap.Width * TileSizeX - 1;
     if( TheUI.VP[0].EndX > TheUI.MapArea.EndX ) {       // Map fits
 	TheUI.VP[0].EndX = TheUI.MapArea.EndX;
     }
     TheUI.VP[0].Y = TheUI.MapArea.Y;
-    TheUI.VP[0].EndY = TheUI.MapArea.Y + TheMap.Height * TileSizeY;
+    TheUI.VP[0].EndY = TheUI.MapArea.Y + TheMap.Height * TileSizeY - 1;
     if( TheUI.VP[0].EndY > TheUI.MapArea.EndY ) {	// Map fits
 	TheUI.VP[0].EndY = TheUI.MapArea.EndY;
     }
@@ -471,6 +471,21 @@ local void SetViewportModeSingle (void)
 		TileSizeX;
     TheUI.VP[0].MapHeight = (TheUI.VP[0].EndY - TheUI.VP[0].Y + TileSizeY) /
 		TileSizeY;
+
+    //
+    //	Check if the viewport goes outside of the map
+    //	Needed for big viewports and small maps
+    //
+
+    if( TheUI.VP[0].MapX+TheUI.VP[0].MapWidth>TheMap.Width ) {
+	TheUI.VP[0].MapX -= TheUI.VP[0].MapWidth + TheUI.VP[0].MapX -
+		TheMap.Width;
+    }
+
+    if( TheUI.VP[0].MapY+TheUI.VP[0].MapHeight>=TheMap.Height ) {
+	TheUI.VP[0].MapY -= TheUI.VP[0].MapHeight + TheUI.VP[0].MapY -
+		TheMap.Height;
+    }
 
     TheUI.LastClickedVP = TheUI.ActiveViewport = 0;
 }
