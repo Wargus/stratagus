@@ -816,7 +816,7 @@ local void DoNextReplay(void)
 			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "No sync info for this replay !");
 		} else {
 			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync (%lu) !", GameCycle);
-			DebugLevel0("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
+			DebugPrint("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
 			Assert(0);
 			// ReplayStep = 0;
 			// NextLogCycle = ~0UL;
@@ -887,7 +887,7 @@ local void DoNextReplay(void)
 		} else if (!strcmp(val, "crazy")) {
 			state = DiplomacyCrazy;
 		} else {
-			DebugLevel0Fn("Invalid diplomacy command: %s" _C_ val);
+			DebugPrint("Invalid diplomacy command: %s" _C_ val);
 			state = -1;
 		}
 		SendCommandDiplomacy(posx, state, posy);
@@ -895,7 +895,7 @@ local void DoNextReplay(void)
 		int state;
 		state = atoi(val);
 		if (state != 0 && state != 1) {
-			DebugLevel0Fn("Invalid shared vision command: %s" _C_ val);
+			DebugPrint("Invalid shared vision command: %s" _C_ val);
 			state = 0;
 		}
 		SendCommandSharedVision(posx, state, posy);
@@ -908,7 +908,7 @@ local void DoNextReplay(void)
 	} else if (!strcmp(action, "quit")) {
 		CommandQuit(posx);
 	} else {
-		DebugLevel0Fn("Invalid action: %s" _C_ action);
+		DebugPrint("Invalid action: %s" _C_ action);
 	}
 
 	ReplayStep = ReplayStep->Next;
@@ -1490,15 +1490,13 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 	int id;
 	int status;
 
-	DebugLevel3Fn(" %d cycle %lu\n" _C_ msgnr _C_ GameCycle);
-
 	unit = UnitSlots[unum];
 	Assert(unit);
 	//
 	//		Check if unit is already killed?
 	//
 	if (unit->Destroyed) {
-		DebugLevel0Fn(" destroyed unit skipping %d\n" _C_ UnitNumber(unit));
+		DebugPrint(" destroyed unit skipping %d\n" _C_ UnitNumber(unit));
 		return;
 	}
 
@@ -1681,8 +1679,6 @@ global void ParseExtendedCommand(unsigned char type, int status,
 	unsigned char arg1, unsigned short arg2, unsigned short arg3,
 	unsigned short arg4)
 {
-	DebugLevel3Fn(" %d cycle %lu\n" _C_ type _C_ GameCycle);
-
 	// Note: destroyed units are handled by the action routines.
 
 	switch (type) {
@@ -1718,7 +1714,7 @@ global void ParseExtendedCommand(unsigned char type, int status,
 			CommandSharedVision(arg2, arg3, arg4);
 			break;
 		default:
-			DebugLevel0Fn("Unknown extended message %u/%s %u %u %u %u\n" _C_
+			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n" _C_
 				type _C_ status ? "flush" : "-" _C_
 				arg1 _C_ arg2 _C_ arg3 _C_ arg4);
 			break;

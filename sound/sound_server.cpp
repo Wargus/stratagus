@@ -215,8 +215,6 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 		right = 128;
 	}
 
-	DebugLevel3("Length %d\n" _C_ length);
-
 	Assert(!(index & 1));
 
 	if (size >= sample->Len / 2 - index) {
@@ -353,9 +351,6 @@ local void RegisterSource(SoundRequest* sr, int channel)
 
 	i = channel;
 	p = sr;
-	DebugLevel3Fn("FIXME: must write %p -> %d\n" _C_ sr _C_ channel);
-
-	DebugLevel3("Registering %p (channel %d)\n" _C_ sr->Source.Base _C_ channel);
 }
 
 /*
@@ -365,10 +360,6 @@ local void UnRegisterSource(int channel) {
 	int i;
 
 	i = channel;
-	DebugLevel3Fn("FIXME: must write %d\n" _C_ channel);
-
-	DebugLevel3("Removing %p (channel %d)\n" _C_
-		Channels[channel].Source.Base _C_ channel);
 }
 
 /**
@@ -392,7 +383,6 @@ local unsigned char VolumeForDistance(unsigned short d, unsigned char range) {
 			d -= ViewPointOffset;
 			d_tmp = d * MAX_SOUND_RANGE;
 			range_tmp = DistanceSilent * range;
-			DebugLevel3("Distance: %d, Range: %d\n" _C_ d_tmp _C_ range_tmp);
 			if (d_tmp > range_tmp) {
 				return 0;
 			} else {
@@ -452,17 +442,14 @@ local Sample* ChooseSample(SoundRequest* sr)
 			if (SelectionHandler.Source.Base == sr->Source.Base
 				&& SelectionHandler.Source.Id == sr->Source.Id) {
 				if (SelectionHandler.Sound == theSound->Sound.TwoGroups->First) {
-					DebugLevel3("First group\n");
 					result = SimpleChooseSample(SelectionHandler.Sound);
 					SelectionHandler.HowMany++;
 					if (SelectionHandler.HowMany >= 3) {
 						SelectionHandler.HowMany = 0;
 						SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->Second;
-						DebugLevel3("Switching to second group\n");
 					}
 				} else {
 					//FIXME: checks for error
-					DebugLevel3("Second group\n");
 					// check wether the second group is really a group
 					if (SelectionHandler.Sound->Number > 1) {
 						result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
@@ -470,13 +457,11 @@ local Sample* ChooseSample(SoundRequest* sr)
 						if(SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
 							SelectionHandler.HowMany = 0;
 							SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->First;
-							DebugLevel3("Switching to first group\n");
 						}
 					} else {
 						result = SelectionHandler.Sound->Sound.OneSound;
 						SelectionHandler.HowMany = 0;
 						SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->First;
-						DebugLevel3("Switching to first group\n");
 					}
 				}
 			} else {
@@ -532,7 +517,7 @@ local int FillOneChannel(SoundRequest* sr)
 		NextFreeChannel = next_free;
 	} else {
 		// should not happen
-		DebugLevel0("***** NO FREE CHANNEL *****\n");
+		DebugPrint("***** NO FREE CHANNEL *****\n");
 	}
 	return old_free;
 }
@@ -552,22 +537,17 @@ local void FillChannels(int free_channels,int* discarded,int* started)
 	*started = 0;
 	while (free_channels && sr->Used) {
 		if (KeepRequest(sr)) {
-			DebugLevel3("Source [%p]: start playing request %p at slot %d\n" _C_
-				sr->Source.Base _C_ sr->Sound _C_ NextSoundRequestOut);
 			channel = FillOneChannel(sr);
 			if (sr->Source.Base) {
 				//Register only sound with a valid origin
 				RegisterSource(sr, channel);
 			}
 			--free_channels;
-			DebugLevel3("Free channels: %d\n" _C_ free_channels);
 			sr->Used = 0;
 			++NextSoundRequestOut;
 			(*started)++;
 		} else {
 		  // Discarding request (for whatever reason)
-		  DebugLevel3("Discarding resquest %p from %p at slot %d\n" _C_
-			  sr->Sound _C_ sr->Source.Base _C_ NextSoundRequestOut);
 		  sr->Used = 0;
 		  ++NextSoundRequestOut;
 		  (*discarded)++;
@@ -606,8 +586,6 @@ local int MixChannelsToStereo32(int* buffer,int size)
 			if (Channels[channel].Point >= Channels[channel].Sample->Len / 2) {
 				// free channel as soon as possible (before playing)
 				// useful in multithreading
-				DebugLevel3("End playing request from %p\n" _C_
-					Channels[channel].Source.Base);
 				FreeOneChannel(channel);
 				++new_free_channels;
 			}
@@ -752,7 +730,6 @@ global SoundId RegisterSound(const char* files[], unsigned number)
 	if (number > 1) {						// load a sound group
 		id->Sound.OneGroup = malloc(sizeof(Sample*) * number);
 		for (i = 0; i < number; ++i) {
-			DebugLevel3("Registering `%s'\n" _C_ files[i]);
 			id->Sound.OneGroup[i] = LoadSample(files[i]);
 			if (!id->Sound.OneGroup[i]) {
 				free(id->Sound.OneGroup);
@@ -762,7 +739,6 @@ global SoundId RegisterSound(const char* files[], unsigned number)
 		}
 		id->Number = number;
 	} else {								// load an unique sound
-		DebugLevel3("Registering `%s'\n" _C_ files[0]);
 		id->Sound.OneSound = LoadSample(files[0]);
 		if (!id->Sound.OneSound) {
 			free(id);
@@ -809,7 +785,6 @@ global void SetSoundRange(SoundId sound, unsigned char range)
 {
 	if (sound != NO_SOUND) {
 		((ServerSoundId) sound)->Range = range;
-		DebugLevel3("Setting sound <%p> to range %u\n" _C_ sound _C_ range);
 	}
 }
 
@@ -862,8 +837,6 @@ global void FillAudio(void* udata __attribute__((unused)), Uint8* stream, int le
 #if SoundSampleSize == 16
 	len >>= 1;
 #endif
-	DebugLevel3Fn("%d\n" _C_ len);
-
 	MixIntoBuffer(stream, len);
 }
 
@@ -894,7 +867,7 @@ global int InitSound(void)
 
 	// initialize unit to channel hash table
 	// WARNING: creation is only valid for a hash table using pointers as key
-	DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
+	DebugPrint("FIXME: must write non GLIB hash functions\n");
 
 	return 0;
 }
@@ -911,9 +884,7 @@ global int InitSoundServer(void)
 	MapHeight = (TheUI.MapArea.EndY - TheUI.MapArea.Y + TileSizeY) / TileSizeY;
 	//FIXME: Valid only in shared memory context!
 	DistanceSilent = 3 * ((MapWidth > MapHeight) ? MapWidth : MapHeight);
-	DebugLevel2("Distance Silent: %d\n" _C_ DistanceSilent);
 	ViewPointOffset = ((MapWidth / 2 > MapHeight / 2) ? MapWidth / 2 : MapHeight / 2);
-	DebugLevel2("ViewPointOffset: %d\n" _C_ ViewPointOffset);
 
 	return 0;
 }

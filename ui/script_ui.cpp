@@ -1613,7 +1613,6 @@ local int CclDefineUI(lua_State* l)
 					h = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_pop(l, 1);
-					DebugLevel3Fn("Map are size is %d %d\n" _C_ w _C_ h);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -2299,8 +2298,6 @@ local int CclDefineMenu(lua_State* l)
 	int args;
 	int j;
 
-	DebugLevel3Fn("Define menu\n");
-
 	name = NULL;
 	TheUI.Offset640X = (VideoWidth - 640) / 2;
 	TheUI.Offset480Y = (VideoHeight - 480) / 2;
@@ -2518,8 +2515,6 @@ local int CclDefineMenuItem(lua_State* l)
 	int subargs;
 	int j;
 	int k;
-
-	DebugLevel3Fn("Define menu-item\n");
 
 	name = NULL;
 	item = (Menuitem*)calloc(1, sizeof(Menuitem));
@@ -3483,8 +3478,6 @@ local int CclDefineButton(lua_State* l)
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-
-	DebugLevel3Fn("Define button\n");
 
 	memset(&ba, 0, sizeof(ba));
 	//

@@ -253,7 +253,6 @@ local int CclIfUnit(lua_State* l)
 		}
 	} else {
 		for (; plynr < pn; ++plynr) {
-			DebugLevel3Fn("Player%d, %d == %s\n" _C_ plynr _C_ q _C_ unittype->Ident);
 			if (compare(Players[plynr].UnitTypesCount[unittype->Slot], q)) {
 				lua_pushboolean(l, 1);
 				return 1;
@@ -397,7 +396,6 @@ local int CclIfNearUnit(lua_State* l)
 	// Get all unit types 'near'.
 	//
 	n = FindUnitsByType(ut2, table);
-	DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
 	for (i = 0; i < n; ++i) {
 		Unit* unit;
 		Unit* around[UnitMax];
@@ -419,7 +417,6 @@ local int CclIfNearUnit(lua_State* l)
 				unit->X + unit->Type->TileWidth + 2,
 				unit->Y + unit->Type->TileHeight + 2, around);
 		}
-		DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
 		//
 		// Count the requested units
 		//
@@ -495,7 +492,6 @@ local int CclIfRescuedNearUnit(lua_State* l)
 	// Get all unit types 'near'.
 	//
 	n = FindUnitsByType(ut2, table);
-	DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
 	for (i = 0; i < n; ++i) {
 		Unit* unit;
 		Unit* around[UnitMax];
@@ -517,7 +513,6 @@ local int CclIfRescuedNearUnit(lua_State* l)
 				unit->X + unit->Type->TileWidth + 2,
 				unit->Y + unit->Type->TileHeight + 2, around);
 		}
-		DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
 		//
 		// Count the requested units
 		//
@@ -605,7 +600,6 @@ local int CclIfOpponents(lua_State* l)
 				++n;
 			}
 		}
-		DebugLevel3Fn("Opponents of %d = %d\n" _C_ plynr _C_ n);
 		if (compare(n, q)) {
 			lua_pushboolean(l, 1);
 			return 1;

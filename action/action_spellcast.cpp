@@ -146,7 +146,7 @@ local void SpellMoveToTarget(Unit* unit)
 		// on the caster anyway.
 		//
 		if ((spell = unit->Orders[0].Arg1)->Target == TargetSelf) {
-			DebugLevel0Fn("Increase range for spellcast.");
+			DebugPrint("Increase range for spellcast.");
 			unit->Orders->Range++;
 		} else {
 			//
@@ -174,10 +174,6 @@ global void HandleActionSpellCast(Unit* unit)
 	int flags;
 	const SpellType* spell;
 
-	DebugLevel3Fn("%d %d,%d+%d\n" _C_
-		UnitNumber(unit) _C_ unit->Orders[0].X _C_ unit->Orders[0].Y _C_
-		unit->Orders[0].Range);
-
 	switch (unit->SubAction) {
 		case 0:
 			//
@@ -201,7 +197,7 @@ global void HandleActionSpellCast(Unit* unit)
 				}
 
 				if (unit->Player->AiEnabled) {
-					DebugLevel0Fn("FIXME: need we an AI callback?\n");
+					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
 				unit->Orders[0].Action = UnitActionStill;
 				unit->SubAction = 0;

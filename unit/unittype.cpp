@@ -221,7 +221,7 @@ global void UpdateStats(int reset)
 				}
 				break;
 			default:
-				DebugLevel1Fn("Where moves this unit?\n");
+				DebugPrint("Where moves this unit?\n");
 				type->MovementMask = 0;
 				break;
 		}
@@ -255,7 +255,7 @@ global void UpdateStats(int reset)
 				type->FieldFlags = MapFieldSeaUnit;
 				break;
 			default:
-				DebugLevel1Fn("Where moves this unit?\n");
+				DebugPrint("Where moves this unit?\n");
 				type->FieldFlags = 0;
 				break;
 		}
@@ -281,12 +281,12 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	// FIXME: not the fastest, remove UnitTypeByWcNum from loops!
 #ifdef DEBUG
 	if (length != 5694 && length != 5948) {
-		DebugLevel0("\n***\n");
-		DebugLevel0Fn("%d\n" _C_ length);
-		DebugLevel0("***\n\n");
+		DebugPrint("\n***\n");
+		DebugPrint("%d\n" _C_ length);
+		DebugPrint("***\n\n");
 	}
 #endif
-	DebugLevel0Fn("This PUD has an UDTA section, we are not sure it works.\n");
+	DebugPrint("This PUD has an UDTA section, we are not sure it works.\n");
 	start = udta;
 
 	for (i = 0; i < 110; ++i) { // overlap frames
@@ -502,10 +502,10 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 		}
 
 #ifdef DEBUG
-		if (BIT(28, v)) DebugLevel0("Unused bit 28 used in %d\n" _C_ i);
-		if (BIT(29, v)) DebugLevel0("Unused bit 29 used in %d\n" _C_ i);
-		if (BIT(30, v)) DebugLevel0("Unused bit 30 used in %d\n" _C_ i);
-		if (BIT(31, v)) DebugLevel0("Unused bit 31 used in %d\n" _C_ i);
+		if (BIT(28, v)) DebugPrint("Unused bit 28 used in %d\n" _C_ i);
+		if (BIT(29, v)) DebugPrint("Unused bit 29 used in %d\n" _C_ i);
+		if (BIT(30, v)) DebugPrint("Unused bit 30 used in %d\n" _C_ i);
+		if (BIT(31, v)) DebugPrint("Unused bit 31 used in %d\n" _C_ i);
 #endif
 #undef BIT
 	}
@@ -513,7 +513,7 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	// FIXME: peon applies also to peon-with-gold and peon-with-wood
 	// FIXME: oil-tanker applies also to oil-tanker-full
 
-	DebugLevel0("\tUDTA used %d bytes\n" _C_ udta-start);
+	DebugPrint("\tUDTA used %d bytes\n" _C_ udta-start);
 
 	UpdateStats(1);
 }
@@ -534,7 +534,7 @@ global Animations* AnimationsByIdent(const char* ident)
 	if (tmp) {
 		return *tmp;
 	}
-	DebugLevel0Fn("Warning animation `%s' not found\n" _C_ ident);
+	DebugPrint("Warning animation `%s' not found\n" _C_ ident);
 	return NULL;
 }
 
@@ -666,8 +666,6 @@ global UnitType* NewUnitTypeSlot(char* ident)
 		ExitFatal(-1);
 	}
 	type->Slot = NumUnitTypes;
-	DebugLevel3Fn("Making a new unit, called %s, branded %d\n" _C_
-		ident _C_ type->Type);
 	type->Ident = ident;
 	UnitTypes[NumUnitTypes++] = type;
 	*(UnitType**)hash_add(UnitTypeHash, type->Ident) = type;
@@ -866,7 +864,7 @@ global void CleanUnitTypes(void)
 	int res;
 	Animations* anims;
 
-	DebugLevel0Fn("FIXME: icon, sounds not freed.\n");
+	DebugPrint("FIXME: icon, sounds not freed.\n");
 
 	//
 	//  Mapping the original unit-type numbers in puds to our internal strings

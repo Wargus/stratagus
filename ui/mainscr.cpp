@@ -242,7 +242,7 @@ local void DrawUnitInfo(const Unit* unit)
 	stats = unit->Stats;
 #ifdef DEBUG
 	if (!type) {
-		DebugLevel1Fn(" FIXME: free unit selected\n");
+		DebugPrint(" FIXME: free unit selected\n");
 		return;
 	}
 #endif

@@ -112,7 +112,7 @@ local void InsertSoundRequest(const Unit* unit, unsigned id,
 	//FIXME: valid only in a shared memory context...
 	if (!SoundOff && sound != NO_SOUND) {
 		if (SoundRequests[NextSoundRequestIn].Used) {
-			DebugLevel0("***** NO FREE SLOT IN SOUND FIFO *****\n");
+			DebugPrint("***** NO FREE SLOT IN SOUND FIFO *****\n");
 		} else {
 			SoundRequests[NextSoundRequestIn].Used = 1;
 			SoundRequests[NextSoundRequestIn].Source.Base = unit;
@@ -123,9 +123,6 @@ local void InsertSoundRequest(const Unit* unit, unsigned id,
 			SoundRequests[NextSoundRequestIn].Selection = selection ? 1 : 0;
 			SoundRequests[NextSoundRequestIn].IsVolume = volume ? 1 : 0;
 			SoundRequests[NextSoundRequestIn].Stereo = stereo;
-			DebugLevel3("Source[%p,%s]: registering request %p at slot %d=%d\n" _C_
-				unit _C_ unit ? unit->Type->Ident : "" _C_
-				sound _C_ NextSoundRequestIn _C_ power);
 
 			++NextSoundRequestIn;
 			if (NextSoundRequestIn >= MAX_SOUND_REQUESTS) {
@@ -230,7 +227,6 @@ global void PlayMissileSound(const Missile* missile, SoundId sound)
 */
 global void PlayGameSound(SoundId sound, unsigned char volume)
 {
-	DebugLevel3("Playing %p at volume %u\n" _C_ sound _C_ volume);
 	InsertSoundRequest(NULL, 0, volume, sound, 0, 0, 1, 0);
 }
 

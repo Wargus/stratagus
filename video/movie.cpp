@@ -247,7 +247,7 @@ global int PlayMovie(const char* name, int flags)
 	//  Prepare video
 	//
 	if (flags & PlayMovieFullScreen) {
-		DebugLevel0Fn("FIXME: full screen switch not supported\n");
+		DebugPrint("FIXME: full screen switch not supported\n");
 	}
 	overlay = SDL_CreateYUVOverlay(avi->Width, avi->Height,
 		SDL_YV12_OVERLAY, TheScreen);
@@ -256,7 +256,7 @@ global int PlayMovie(const char* name, int flags)
 		exit(1);
 	}
 	if (overlay->hw_overlay) {
-		DebugLevel0Fn("Got a hardware overlay.\n");
+		DebugPrint("Got a hardware overlay.\n");
 	}
 	oldspeed = VideoSyncSpeed;
 	VideoSyncSpeed = avi->FPS100 / FRAMES_PER_SECOND;
@@ -286,7 +286,7 @@ global int PlayMovie(const char* name, int flags)
 
 			wa = VideoWidth * 100 / avi->Width;
 			ha = VideoHeight * 100 / avi->Height;
-			DebugLevel0Fn(" %d x %d\n" _C_ wa _C_ ha);
+			DebugPrint(" %d x %d\n" _C_ wa _C_ ha);
 			if (wa < ha) {  // Keep the aspect ratio
 				rect.w = VideoWidth;
 				rect.h = avi->Height * wa / 100;
@@ -309,7 +309,7 @@ global int PlayMovie(const char* name, int flags)
 		int i;
 
 		GetPbParam(pbi, PBC_SET_POSTPROC, &i);
-		DebugLevel0Fn("Postprocess level %d\n" _C_ i);
+		DebugPrint("Postprocess level %d\n" _C_ i);
 		SetPbParam(pbi, PBC_SET_POSTPROC, 6);
 	}
 

@@ -175,7 +175,7 @@ global CursorType* CursorTypeByIdent(const char* ident)
 			return cursortype;
 		}
 	}
-	DebugLevel0Fn("Cursor `%s' not found, please check your code.\n" _C_ ident);
+	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident);
 	return NULL;
 }
 

@@ -137,7 +137,6 @@ local void RepairUnit(Unit* unit, Unit* goal)
 			animlength += anim->Sleep;
 		}
 
-		DebugLevel3("Repair animation is %d cycles long\n" _C_ animlength);
 		// FIXME: implement this below:
 #if 0
 		unit->Data.Builded.Worker->Type->BuilderSpeedFactor;
@@ -201,7 +200,7 @@ global void HandleActionRepair(Unit* unit)
 				// Check if goal is correct unit.
 				if (goal) {
 					if (!UnitVisibleAsGoal(goal, unit->Player)) {
-						DebugLevel0Fn("repair target gone. Booohooo\n");
+						DebugPrint("repair target gone.\n");
 						unit->Orders[0].X = goal->X;
 						unit->Orders[0].Y = goal->Y;
 						RefsDecrease(goal);
@@ -258,7 +257,7 @@ global void HandleActionRepair(Unit* unit)
 				// FIXME: should I do a function for this?
 				if (goal) {
 					if (!UnitVisibleAsGoal(goal, unit->Player)) {
-						DebugLevel0Fn("repair goal is gone\n");
+						DebugPrint("repair goal is gone\n");
 						unit->Orders[0].X = goal->X;
 						unit->Orders[0].Y = goal->Y;
 						RefsDecrease(goal);

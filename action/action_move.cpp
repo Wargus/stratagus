@@ -186,11 +186,6 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 		d = 0;
 	}
 
-	DebugLevel3Fn(": %d,%d State %2d " _C_ xd _C_ yd _C_ unit->State);
-	DebugLevel3("Walk %d Frame %2d Wait %3d Heading %d %d,%d\n" _C_
-		anim[state].Pixel _C_ anim[state].Frame _C_ anim[state].Sleep _C_
-		unit->Direction _C_ unit->IX _C_ unit->IY);
-
 	//
 	// Next animation.
 	//
@@ -235,11 +230,10 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 global int DoActionMove(Unit* unit)
 {
 	if (unit->Type->Animations && unit->Type->Animations->Move) {
-		DebugLevel3("%s: %p\n" _C_ unit->Type->Ident _C_ unit->Type->Animations);
 		return ActionMoveGeneric(unit, unit->Type->Animations->Move);
 	}
 
-	DebugLevel0Fn("Warning tried to move an object, which can't move\n");
+	DebugPrint("Warning tried to move an object, which can't move\n");
 
 	return PF_UNREACHABLE;
 }
@@ -257,10 +251,6 @@ global int DoActionMove(Unit* unit)
 global void HandleActionMove(Unit* unit)
 {
 	Unit* goal;
-
-	DebugLevel3Fn("%d: %d %d,%d \n" _C_ UnitNumber(unit) _C_
-		unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : -1 _C_
-		unit->Orders[0].X _C_ unit->Orders[0].Y);
 
 	if (!unit->SubAction) { // first entry
 		unit->SubAction = 1;
@@ -303,7 +293,7 @@ global void HandleActionMove(Unit* unit)
 	// Target destroyed?
 	//
 	if ((goal = unit->Orders[0].Goal) && goal->Destroyed) {
-		DebugLevel0Fn("Goal dead\n");
+		DebugPrint("Goal dead\n");
 		unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 		unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
 		unit->Orders[0].Goal = NoUnitP;

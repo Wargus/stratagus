@@ -172,7 +172,6 @@ global void DoRightButton(int sx, int sy)
 		}
 		type = unit->Type;
 		action = type->MouseAction;
-		DebugLevel3Fn("Mouse action %d\n" _C_ action);
 
 		//
 		//  Control + right click on unit is follow anything.
@@ -189,11 +188,11 @@ global void DoRightButton(int sx, int sy)
 		if (dest && dest->Type->Transporter && dest->Player == unit->Player &&
 				unit->Type->UnitType == UnitTypeLand) {
 			dest->Blink = 4;
-			DebugLevel0Fn("Board transporter\n");
+			DebugPrint("Board transporter\n");
 			// Let the transporter move to the unit. And QUEUE!!!
 			// Don't do it for buildings.
 			if (!dest->Type->Building) {
-				DebugLevel0Fn("Send command follow");
+				DebugPrint("Send command follow");
 				SendCommandFollow(dest, unit, 0);
 			}
 			SendCommandBoard(unit, -1, -1, dest, flush);
@@ -211,7 +210,6 @@ global void DoRightButton(int sx, int sy)
 							dest->Type->CanStore[unit->CurrentResource] &&
 							dest->Player == unit->Player) {
 						dest->Blink = 4;
-						DebugLevel3Fn("Return to deposit.\n");
 						SendCommandReturnGoods(unit, dest, flush);
 						continue;
 					}
@@ -235,7 +233,6 @@ global void DoRightButton(int sx, int sy)
 								ForestOnMap(x, y) &&
 								((unit->CurrentResource != res) ||
 									(unit->Value < unit->Type->ResInfo[res]->ResourceCapacity))) {
-							DebugLevel3("Sent worker to cut wood.\n");
 							SendCommandResourceLoc(unit, x, y,flush);
 							break;
 						}
@@ -291,16 +288,13 @@ global void DoRightButton(int sx, int sy)
 				}
 
 				if (WallOnMap(x, y)) {
-					DebugLevel3("WALL ON TILE\n");
 					if (unit->Player->Race == PlayerRaceHuman &&
 							OrcWallOnMap(x, y)) {
-						DebugLevel3("HUMAN ATTACKS ORC\n");
 						SendCommandAttack(unit, x, y, NoUnitP, flush);
 						continue;
 					}
 					if (unit->Player->Race == PlayerRaceOrc &&
 							HumanWallOnMap(x, y)) {
-						DebugLevel3("ORC ATTACKS HUMAN\n");
 						SendCommandAttack(unit, x, y, NoUnitP, flush);
 						continue;
 					}
@@ -349,16 +343,13 @@ global void DoRightButton(int sx, int sy)
 		if (type->Building) {
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
-				DebugLevel3("Set rally point to a resource.\n");
 				SendCommandResource(unit, dest, flush);
 				continue;
 			}
 			if (IsMapFieldExplored(unit->Player, x, y) && ForestOnMap(x, y)) {
-				DebugLevel3("Set rally point to a forest.\n");
 				SendCommandResourceLoc(unit, x, y, flush);
 				continue;
 			}
-			DebugLevel3("Set rally point to a location.\n");
 			SendCommandMove(unit, x, y, flush);
 			continue;
 		}
@@ -378,8 +369,6 @@ local void HandleMouseOn(int x, int y)
 	int i;
 
 	MouseScrollState = ScrollNone;
-
-	DebugLevel3Fn("%d, %d\n" _C_ x _C_ y);
 
 	//
 	//  Handle buttons
@@ -550,13 +539,12 @@ local void HandleMouseOn(int x, int y)
 			y >= TheUI.MapArea.Y && y <= TheUI.MapArea.EndY) {
 		Viewport* vp;
 
-		DebugLevel3Fn("viewport %d, %d\n" _C_ x _C_ y);
 		vp = GetViewport(x, y);
 		Assert(vp);
 		// viewport changed
 		if (TheUI.MouseViewport != vp) {
 			TheUI.MouseViewport = vp;
-			DebugLevel0Fn("current viewport changed to %d.\n" _C_
+			DebugPrint("current viewport changed to %d.\n" _C_
 				vp - TheUI.Viewports);
 		}
 
@@ -703,7 +691,6 @@ global void UIHandleMouseMove(int x, int y)
 	UnitUnderCursor = NULL;
 	GameCursor = TheUI.Point.Cursor;  // Reset
 	HandleMouseOn(x, y);
-	DebugLevel3("MouseOn %d\n" _C_ CursorOn);
 
 	// Restrict mouse to minimap when dragging
 	if (OldCursorOn == CursorOnMinimap && CursorOn != CursorOnMinimap &&
@@ -832,7 +819,7 @@ local int SendRepair(int sx, int sy)
 				SendCommandRepair(unit, x, y, dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
 			} else {
-				DebugLevel0Fn("Non-worker repairs\n");
+				DebugPrint("Non-worker repairs\n");
 			}
 		}
 	}
@@ -874,7 +861,6 @@ local int SendMove(int sx, int sy)
 		unit = Selected[i];
 		if (transporter && unit->Type->UnitType == UnitTypeLand) {
 			transporter->Blink = 4;
-			DebugLevel3Fn("Board transporter\n");
 			SendCommandFollow(transporter, unit, 0);
 			SendCommandBoard(unit, -1, -1, transporter, flush);
 			ret = 1;
@@ -916,7 +902,6 @@ local int SendAttack(int sx, int sy)
 		unit = Selected[i];
 		if (unit->Type->CanAttack || unit->Type->Building) {
 			if ((dest = UnitUnderCursor) && CanTarget(unit->Type, dest->Type)) {
-				DebugLevel3Fn("Attacking %p\n" _C_ dest);
 				dest->Blink = 4;
 			} else {
 				dest = NoUnitP;
@@ -1017,7 +1002,6 @@ local int SendResource(int sx, int sy)
 					dest->Type->CanHarvest &&
 					(dest->Player == unit->Player ||
 						(dest->Player->Player == PlayerMax - 1))) {
-				DebugLevel3("RESOURCE\n");
 				dest->Blink = 4;
 				SendCommandResource(Selected[i],dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
@@ -1031,7 +1015,6 @@ local int SendResource(int sx, int sy)
 							Selected[i]->Value < unit->Type->ResInfo[res]->ResourceCapacity &&
 							((unit->CurrentResource != res) ||
 								(unit->Value < unit->Type->ResInfo[res]->ResourceCapacity))) {
-						DebugLevel3("RESOURCE\n");
 						SendCommandResourceLoc(unit, x, y,
 							!(KeyModifiers & ModifierShift));
 						ret = 1;
@@ -1046,18 +1029,15 @@ local int SendResource(int sx, int sy)
 		if (unit->Type->Building) {
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
-				DebugLevel3("Set rally point to a resource.\n");
 				SendCommandResource(unit, dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;
 			}
 			if (IsMapFieldExplored(unit->Player, x, y) && ForestOnMap(x, y)) {
-				DebugLevel3("Set rally point to a forest.\n");
 				SendCommandResourceLoc(unit, x, y, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;
 			}
-			DebugLevel3("Set rally point to a location.\n");
 			SendCommandMove(unit, x, y, !(KeyModifiers & ModifierShift));
 			ret = 1;
 			continue;
@@ -1114,7 +1094,6 @@ local int SendSpellCast(int sx, int sy)
 
 	dest = UnitUnderCursor;
 
-	DebugLevel3Fn("SpellCast on: %p (%d,%d)\n" _C_ dest _C_ x _C_ y);
 	/*		NOTE: Vladi:
 	   This is a high-level function, it sends target spot and unit
 	   (if exists). All checks are performed at spell cast handle
@@ -1123,7 +1102,7 @@ local int SendSpellCast(int sx, int sy)
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
 		if (!unit->Type->CanCastSpell) {
-			DebugLevel0Fn("but unit %d(%s) can't cast spells?\n" _C_
+			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
 				unit->Slow _C_ unit->Type->Name);
 			// this unit cannot cast spell
 			continue;
@@ -1185,7 +1164,7 @@ local void SendCommand(int sx, int sy)
 			ret = SendSpellCast(sx, sy);
 			break;
 		default:
-			DebugLevel1("Unsupported send action %d\n" _C_ CursorAction);
+			DebugPrint("Unsupported send action %d\n" _C_ CursorAction);
 			break;
 	}
 
@@ -1404,7 +1383,7 @@ global void UIHandleButtonDown(unsigned button)
 		if ((MouseButtons & LeftButton) &&
 				TheUI.SelectedViewport != TheUI.MouseViewport) {
 			TheUI.SelectedViewport = TheUI.MouseViewport;
-			DebugLevel0Fn("selected viewport changed to %d.\n" _C_
+			DebugPrint("selected viewport changed to %d.\n" _C_
 				TheUI.SelectedViewport - TheUI.Viewports);
 		}
 
@@ -1467,7 +1446,6 @@ global void UIHandleButtonDown(unsigned button)
 			SubScrollX = 0;
 			SubScrollY = 0;
 			GameCursor = TheUI.Scroll.Cursor;
-			DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
 				Unit* unit;
@@ -1557,7 +1535,7 @@ global void UIHandleButtonDown(unsigned button)
 				if (!GameObserve && !GamePaused &&
 					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 					if (ButtonUnderCursor < Selected[0]->Data.Train.Count) {
-						DebugLevel0Fn("Cancel slot %d %s\n" _C_
+						DebugPrint("Cancel slot %d %s\n" _C_
 							ButtonUnderCursor _C_
 							Selected[0]->Data.Train.What[ButtonUnderCursor]->Ident);
 						SendCommandCancelTraining(Selected[0],
@@ -1572,7 +1550,7 @@ global void UIHandleButtonDown(unsigned button)
 				if (!GameObserve && !GamePaused &&
 					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
-						DebugLevel0Fn("Cancel upgrade %s\n" _C_
+						DebugPrint("Cancel upgrade %s\n" _C_
 							Selected[0]->Type->Ident);
 						SendCommandCancelUpgradeTo(Selected[0]);
 					}
@@ -1584,7 +1562,7 @@ global void UIHandleButtonDown(unsigned button)
 				if (!GameObserve && !GamePaused && 
 					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
-						DebugLevel0Fn("Cancel research %s\n" _C_
+						DebugPrint("Cancel research %s\n" _C_
 							Selected[0]->Type->Ident);
 						SendCommandCancelResearch(Selected[0]);
 					}

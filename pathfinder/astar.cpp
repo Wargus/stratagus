@@ -535,10 +535,6 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 	}
 #endif
 
-	DebugLevel3Fn("%d %d,%d->%d,%d\n" _C_
-			UnitNumber(unit) _C_
-			unit->X _C_ unit->Y _C_ x _C_ y);
-
 	if (abs(gx - unit->X) <= 1 && abs(gy - unit->Y) <= 1 && maxrange == 0) {
 		// Simplest case, move to adj cell
 		if (gx == unit->X && gy == unit->Y) {
@@ -602,7 +598,6 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 		if( AStarMatrix[o].InGoal==1 ) {
 			ex=x;
 			ey=y;
-			DebugLevel3Fn("a star goal reached\n");
 			break;
 		}
 
@@ -613,12 +608,11 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 			//
 			//		Select a "good" point from the open set.
 			//				Nearest point to goal.
-			DebugLevel0Fn("%d way too long\n" _C_ UnitNumber(unit));
+			DebugPrint("%d way too long\n" _C_ UnitNumber(unit));
 			AStarCleanUp(num_in_close);
 			return PF_FAILED;
 		}
 
-		DebugLevel3("Best point in Open Set: %d %d (%d)\n" _C_ x _C_ y _C_ OpenSetSize);
 		//
 		//		Generate successors of this node.
 
@@ -664,7 +658,6 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 				AStarMatrix[eo].Direction=i;
 				if( AStarAddNode(ex,ey,eo,AStarMatrix[eo].CostFromStart+AStarCosts(ex,ey,gx,gy)) == PF_FAILED ) {
 					AStarCleanUp(num_in_close);
-					DebugLevel3Fn("Tiles Visited: %d\n" _C_ (TheMap.Height*TheMap.Width)-counter);
 					return PF_FAILED;
 				}
 				// we add the point to the close set
@@ -683,7 +676,6 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 								 AStarMatrix[eo].CostFromStart+
 								 AStarCosts(ex,ey,gx,gy)) == PF_FAILED ) {
 						AStarCleanUp(num_in_close);
-						DebugLevel3Fn("Tiles Visited: %d\n" _C_ (TheMap.Height*TheMap.Width)-counter);
 						return PF_FAILED;
 					}
 				} else {
@@ -694,8 +686,6 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 			}
 		}
 		if( OpenSetSize<=0 ) {				// no new nodes generated
-			DebugLevel3Fn("%d unreachable\n" _C_ UnitNumber(unit));
-			DebugLevel3Fn("Tiles Visited: %d\n" _C_ (TheMap.Height*TheMap.Width)-counter);
 			AStarCleanUp(num_in_close);
 			return PF_UNREACHABLE;
 		}
@@ -729,7 +719,6 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 	while( (ex!=x || ey!=y) && path!=NULL ) {
 		eo=ey*TheMap.Width+ex;
 		i=AStarMatrix[eo].Direction;
-		DebugLevel3("%d %d %d %d (%d,%d)\n" _C_ x _C_ y _C_ ex _C_ ey _C_ Heading2X[i] _C_ Heading2Y[i]);
 		ex-=Heading2X[i];
 		ey-=Heading2Y[i];
 		--gx;
@@ -740,7 +729,6 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 
 	// let's clean up the matrix now
 	AStarCleanUp(num_in_close);
-	DebugLevel3Fn("Tiles Visited: %d\n" _C_ (TheMap.Height*TheMap.Width)-counter);
 	return path_length;
 }
 

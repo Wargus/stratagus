@@ -94,19 +94,18 @@ local int WaitForTransporter(Unit* unit)
 
 	if (!trans || !trans->Type->Transporter) {
 		// FIXME: destination destroyed??
-		DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n" _C_ unit->X _C_ unit->Y);
 		return 0;
 	}
 
 	if (!UnitVisibleAsGoal(trans, unit->Player)) {
-		DebugLevel0Fn("Transporter Gone\n");
+		DebugPrint("Transporter Gone\n");
 		RefsDecrease(trans);
 		unit->Orders[0].Goal = NoUnitP;
 		return 0;
 	}
 
 	if (MapDistanceBetweenUnits(unit,trans) == 1) {
-		DebugLevel3Fn("Enter transporter\n");
+		// enter transporter
 		return 1;
 	}
 
@@ -114,7 +113,6 @@ local int WaitForTransporter(Unit* unit)
 	// FIXME: any enemies in range attack them, while waiting.
 	//
 
-	DebugLevel3Fn("TRANSPORTER NOT REACHED %d,%d\n" _C_ unit->X _C_ unit->Y);
 	// n0b0dy: This means we have to search with a smaller range.
 	// It happens only when you reach the shore,and the transporter
 	// is not there. The unit searches with a big range, so it thinks
@@ -143,7 +141,7 @@ local void EnterTransporter(Unit* unit)
 
 	transporter = unit->Orders[0].Goal;
 	if (!UnitVisibleAsGoal(transporter, unit->Player)) {
-		DebugLevel0Fn("Transporter gone\n");
+		DebugPrint("Transporter gone\n");
 		RefsDecrease(transporter);
 		unit->Orders[0].Goal = NoUnitP;
 		return;
@@ -172,7 +170,7 @@ local void EnterTransporter(Unit* unit)
 		}
 		return;
 	}
-	DebugLevel0Fn("No free slot in transporter\n");
+	DebugPrint("No free slot in transporter\n");
 }
 
 /**
@@ -187,16 +185,12 @@ global void HandleActionBoard(Unit* unit)
 	int i;
 	Unit* goal;
 
-	DebugLevel3Fn("%p(%d) SubAction %d\n" _C_
-		unit _C_ UnitNumber(unit) _C_ unit->SubAction);
-
 	switch (unit->SubAction) {
 		//
 		// Wait for transporter
 		//
 		case 201:
 			// FIXME: show still animations
-			DebugLevel3Fn("Waiting\n");
 			if (WaitForTransporter(unit)) {
 				unit->SubAction = 202;
 			}

@@ -114,7 +114,7 @@ global void CreateMinimap(void)
 	MinimapX = (TheUI.MinimapW - (TheMap.Width * MinimapScaleX) / MINIMAP_FAC) / 2;
 	MinimapY = (TheUI.MinimapH - (TheMap.Height * MinimapScaleY) / MINIMAP_FAC) / 2;
 
-	DebugLevel0Fn("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
+	DebugPrint("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
 		MinimapScaleX / MINIMAP_FAC _C_ MinimapScaleY / MINIMAP_FAC _C_
 		MinimapScaleX _C_ MinimapScaleY _C_
 		MinimapX _C_ MinimapY);

@@ -648,9 +648,9 @@ local int CclDefineTileset(lua_State* l)
 			}
 			DefineTilesetParseSlot(l, tileset, j + 1);
 		} else if (!strcmp(value, "animations")) {
-			DebugLevel0Fn("Animations not supported.\n");
+			DebugPrint("Animations not supported.\n");
 		} else if (!strcmp(value, "objects")) {
-			DebugLevel0Fn("Objects not supported.\n");
+			DebugPrint("Objects not supported.\n");
 		} else if (!strcmp(value, "item-mapping")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

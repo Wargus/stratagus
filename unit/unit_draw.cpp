@@ -896,10 +896,8 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 				n = 3 - ((f - 75) / (25 / 3)) + 0;
 			} else if (f > 50) {
 				n = 3 - ((f - 50) / (25 / 3)) + 4;
-				DebugLevel3("%d - %d\n" _C_ f _C_ n);
 			} else {
 				n = 3 - (f / (50 / 3)) + 8;
-				DebugLevel3("%d - %d\n" _C_ f _C_ n);
 			}
 #endif
 			Assert(n >= 0);
@@ -1400,7 +1398,6 @@ local void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y
 			*y += (order->Type->TileHeight - 1) * TileSizeY / 2;
 		}
 	}
-	DebugLevel3Fn(": (%d,%d)\n" _C_ order->X _C_ order->Y);
 }
 
 /**
@@ -1526,7 +1523,7 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 
 		default:
 			e_color = color = ColorGray;
-			DebugLevel1Fn("Unknown action %d\n" _C_ order->Action);
+			DebugPrint("Unknown action %d\n" _C_ order->Action);
 			break;
 	}
 	VideoFillCircleClip(color, x1, y1, 2);
@@ -1849,7 +1846,6 @@ global void DrawUnit(const Unit* unit)
 	UnitType* type;
 	
 	if (unit->Type->Revealer) {				// Revealers are not drawn
-		DebugLevel3Fn("Drawing revealer %d\n" _C_ UnitNumber(unit));
 		return;
 	}
 
@@ -1887,7 +1883,7 @@ global void DrawUnit(const Unit* unit)
 #endif
 
 	if ((!UnitVisible(unit, ThisPlayer)) && frame == UnitNotSeen) {
-		DebugLevel0Fn("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
+		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
 			unit->Slot _C_ GameCycle);
 		return;
 	}

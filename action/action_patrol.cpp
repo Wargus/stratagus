@@ -91,14 +91,14 @@ global void HandleActionPatrol(Unit* unit)
 		if (unit->Type->CanAttack && unit->Stats->Speed) {
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
-				DebugLevel0Fn("Patrol attack %d\n" _C_ UnitNumber(goal));
+				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(goal));
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 				// Save current command to come back.
 				unit->SavedOrder = unit->Orders[0];
 				unit->Orders[0].Action = UnitActionStill;
 				unit->Orders[0].Goal = NoUnitP;
 				unit->SubAction = 0;
-				DebugLevel0Fn("Wait %d\n" _C_ unit->Wait);
+				DebugPrint("Wait %d\n" _C_ unit->Wait);
 			}
 		}
 	}

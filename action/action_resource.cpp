@@ -86,10 +86,9 @@ local int MoveToResource(Unit* unit)
 		if ((!ForestOnMap(x, y)) && (!unit->IX) && (!unit->IY)) {
 			if (!FindTerrainType(UnitMovementMask(unit), MapFieldForest, 0, 16,
 					unit->Player, unit->Orders->X, unit->Orders->Y, &x, &y)) {
-				DebugLevel3Fn("No wood in range\n");
+				// no wood in range
 				return -1;
 			} else {
-				DebugLevel3Fn("%d,%d -> %d,%d\n" _C_ unit->X _C_ unit->Y _C_ x _C_ y);
 				unit->Orders->X = x;
 				unit->Orders->Y = y;
 				NewResetPath(unit);
@@ -102,7 +101,7 @@ local int MoveToResource(Unit* unit)
 					unit->Orders->X = x;
 					unit->Orders->Y = y;
 					NewResetPath(unit);
-					DebugLevel0Fn("Found a better place to harvest %d,%d\n" _C_ x _C_ y);
+					DebugPrint("Found a better place to harvest %d,%d\n" _C_ x _C_ y);
 					// FIXME: can't this overflow? It really shouldn't, since
 					// x and y are really supossed to be reachable, checked thorugh a flood fill.
 					// I don't know, sometimes stuff happens.
@@ -177,7 +176,6 @@ local int StartGathering(Unit* unit)
 	// Target is dead, stop getting resources.
 	//
 	if (!UnitVisibleAsGoal(goal, unit->Player)) {
-		DebugLevel3Fn("Destroyed resource goal, stop gathering.\n");
 		RefsDecrease(goal);
 		// Find an alternative, but don't look too far.
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
@@ -194,7 +192,6 @@ local int StartGathering(Unit* unit)
 	}
 
 	// FIXME: 0 can happen, if to near placed by map designer.
-	DebugLevel3Fn("%d\n" _C_ MapDistanceBetweenUnits(unit, goal));
 	Assert(MapDistanceBetweenUnits(unit, goal) <= 1);
 
 	//
@@ -211,8 +208,6 @@ local int StartGathering(Unit* unit)
 	//
 	if ((goal->Type->MaxOnBoard && goal->Data.Resource.Active >= goal->Type->MaxOnBoard) ||
 			goal->Orders[0].Action == UnitActionBuilded) {
-		DebugLevel3Fn("Waiting at the resource with %d people inside.\n" _C_
-			goal->Data.Resource.Active);
 		// FIXME: Determine somehow when the resource will be free to use
 		// FIXME: Could we somehow find another resource? Think minerals
 		// FIXME: We should add a flag for that, and a limited range.
@@ -302,7 +297,7 @@ local void LoseResource(Unit* unit, const Unit* source)
 		unit->SubAction = SUB_MOVE_TO_DEPOT;
 		unit->Wait = unit->Reset = 1;
 		unit->State = 0;
-		DebugLevel0Fn("Sent unit %d to depot\n" _C_ unit->Slot);
+		DebugPrint("Sent unit %d to depot\n" _C_ unit->Slot);
 		return;
 	}
 	//
@@ -317,13 +312,13 @@ local void LoseResource(Unit* unit, const Unit* source)
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
 	if ((unit->Orders[0].Goal = FindResource(unit, unit->X, unit->Y,
 			10, unit->CurrentResource))) {
-		DebugLevel0Fn("Unit %d found another resource.\n" _C_ unit->Slot);
+		DebugPrint("Unit %d found another resource.\n" _C_ unit->Slot);
 		unit->SubAction = SUB_START_RESOURCE;
 		unit->Wait = unit->Reset = 1;
 		unit->State = 0;
 		RefsIncrease(unit->Orders[0].Goal);
 	} else {
-		DebugLevel0Fn("Unit %d just sits around confused.\n" _C_ unit->Slot);
+		DebugPrint("Unit %d just sits around confused.\n" _C_ unit->Slot);
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
 		unit->Wait = unit->Reset = 1;
@@ -364,7 +359,6 @@ local int GatherResource(Unit* unit)
 
 	// Target gone?
 	if (resinfo->TerrainHarvester && !ForestOnMap(unit->Orders->X, unit->Orders->Y)) {
-		DebugLevel3Fn("Wood gone for unit %d.\n" _C_ unit->Slot);
 		if (unit->Reset) {
 			// Action now breakable, move to resource again.
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
@@ -394,11 +388,9 @@ local int GatherResource(Unit* unit)
 		}
 
 		if (resinfo->TerrainHarvester) {
-			DebugLevel3Fn("Harvested another %d resources.\n" _C_ addload);
 			unit->Value += addload;
 
 			if (addload && unit->Value == resinfo->ResourceCapacity) {
-				DebugLevel3("Removed wood.\n");
 				MapRemoveWood(unit->Orders->X, unit->Orders->Y);
 			}
 		} else {
@@ -420,7 +412,6 @@ local int GatherResource(Unit* unit)
 					addload = source->Value;
 				}
 
-				DebugLevel3Fn("Harvested another %d resources.\n" _C_ addload);
 				unit->Value += addload;
 				source->Value -= addload;
 			}
@@ -430,7 +421,7 @@ local int GatherResource(Unit* unit)
 			// FIXME: implement depleted resources.
 			//
 			if ((!UnitVisibleAsGoal(source, unit->Player)) || (source->Value == 0)) {
-				DebugLevel0Fn("Resource is destroyed for unit %d\n" _C_ unit->Slot);
+				DebugPrint("Resource is destroyed for unit %d\n" _C_ unit->Slot);
 				uins = source->UnitInside;
 				//
 				// Improved version of DropOutAll that makes workers go to the depot.
@@ -455,7 +446,6 @@ local int GatherResource(Unit* unit)
 		if (resinfo->TerrainHarvester) {
 			if (unit->Value == resinfo->ResourceCapacity) {
 				// Mark as complete.
-				DebugLevel3Fn("Done Harvesting, waiting for reset.\n");
 				unit->Data.ResWorker.DoneHarvesting = 1;
 			}
 			return 0;
@@ -464,7 +454,6 @@ local int GatherResource(Unit* unit)
 		if (resinfo->HarvestFromOutside && !resinfo->TerrainHarvester) {
 			if ((unit->Value == resinfo->ResourceCapacity) || (source == NULL)) {
 				// Mark as complete.
-				DebugLevel3Fn("Done Harvesting, waiting for reset %X.\n" _C_ (unsigned)source);
 				unit->Data.ResWorker.DoneHarvesting = 1;
 			}
 			return 0;
@@ -509,11 +498,11 @@ local int StopGathering(Unit* unit)
 	// FIXME: is this the best way?
 	unit->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
 
+#ifdef DEBUG
 	if (!unit->Value) {
-		DebugLevel0Fn("Unit %d is empty???\n" _C_ unit->Slot);
-	} else {
-		DebugLevel3Fn("Unit %d is fine, search for a depot.\n" _C_ unit->Slot);
+		DebugPrint("Unit %d is empty???\n" _C_ unit->Slot);
 	}
+#endif
 	// Find and send to resource deposit.
 	if (!(depot = FindDeposit(unit, unit->X, unit->Y, 1000, unit->CurrentResource)) ||
 			!unit->Value) {
@@ -522,7 +511,7 @@ local int StopGathering(Unit* unit)
 			DropOutOnSide(unit, LookingW, source->Type->TileWidth,
 				source->Type->TileHeight);
 		}
-		DebugLevel0Fn("Can't find a resource deposit for unit %d.\n" _C_ unit->Slot);
+		DebugPrint("Can't find a resource deposit for unit %d.\n" _C_ unit->Slot);
 		unit->Orders[0].Action = UnitActionStill;
 		unit->Orders[0].Goal = NoUnitP;
 		unit->SubAction = 0;
@@ -583,7 +572,7 @@ local int MoveToDepot(Unit* unit)
 	// Target is dead, stop getting resources.
 	//
 	if (!UnitVisibleAsGoal(goal, unit->Player)) {
-		DebugLevel0Fn("Destroyed depot\n");
+		DebugPrint("Destroyed depot\n");
 		RefsDecrease(goal);
 		unit->Orders[0].Goal = NoUnitP;
 		// FIXME: perhaps we should choose an alternative
@@ -599,7 +588,6 @@ local int MoveToDepot(Unit* unit)
 	//
 	if (goal->Orders[0].Action == UnitActionBuilded) {
 		unit->Wait = 10;
-		DebugLevel3Fn("Invalid resource depot. WAIT!!! \n");
 		return 0;
 	}
 
@@ -680,7 +668,7 @@ local int WaitInDepot(Unit* unit)
 			unit->Orders[0].Range = 1;
 			unit->Orders[0].X = unit->Orders[0].Y = -1;
 		} else {
-			DebugLevel0Fn("Unit %d Resource gone. Sit and play dumb.\n" _C_ unit->Slot);
+			DebugPrint("Unit %d Resource gone. Sit and play dumb.\n" _C_ unit->Slot);
 			DropOutOnSide(unit, LookingW, depot->Type->TileWidth, depot->Type->TileHeight);
 			unit->Orders[0].Action = UnitActionStill;
 			unit->SubAction = 0;
@@ -698,7 +686,7 @@ local int WaitInDepot(Unit* unit)
 */
 void ResourceGiveUp(Unit* unit)
 {
-	DebugLevel0Fn("Unit %d gave up on resource gathering.\n" _C_ unit->Slot);
+	DebugPrint("Unit %d gave up on resource gathering.\n" _C_ unit->Slot);
 	unit->Orders[0].Action = UnitActionStill;
 	unit->Wait = 1;
 	unit->Reset = 1;
@@ -728,12 +716,6 @@ global void HandleActionResource(Unit* unit)
 	int ret;
 	int newres;
 
-	DebugLevel3Fn("%s(%d) SubAction %d TTH %d res %s goal %ul\n" _C_
-		unit->Type->Ident _C_ UnitNumber(unit) _C_ unit->SubAction _C_
-		unit->Data.ResWorker.TimeToHarvest _C_
-		DefaultResourceNames[unit->CurrentResource] _C_
-		(unsigned int)unit->Orders->Goal);
-
 	// Let's start mining.
 	if (unit->SubAction == SUB_START_RESOURCE) {
 		if (unit->Orders->Goal) {
@@ -747,7 +729,6 @@ global void HandleActionResource(Unit* unit)
 		}
 		if ((unit->CurrentResource = newres)) {
 			NewResetPath(unit);
-			DebugLevel3Fn("Started mining. reset path.\n");
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
 		} else {
 			unit->Value = 0;

@@ -81,8 +81,6 @@ local enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 	MadData *data;
 	int i;
 
-	DebugLevel3Fn("Read callback\n");
-
 	sample = user;
 	data = sample->User;
 
@@ -95,8 +93,6 @@ local enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 	if (!i) {
 		return MAD_FLOW_STOP;
 	}
-
-	DebugLevel3Fn("%d bytes\n" _C_ l + i);
 
 	data->BufferLen += i;
 	mad_stream_buffer(stream, data->Buffer, data->BufferLen);
@@ -125,8 +121,6 @@ local enum mad_flow MAD_write(void* user,
 	short *buf;
 	int s;
 	int comp;
-
-	DebugLevel3Fn("%d channels %d samples\n" _C_ channels _C_ n);
 
 	sample = user;
 
@@ -205,12 +199,12 @@ local int MadRead(Sample *sample, unsigned char* buf, int len)
 
 	decoder = &((MadData*)sample->User)->MadDecoder;
 
-	DebugLevel0Fn("%p %p %d\n" _C_ decoder _C_ buf _C_ len);
+	DebugPrint("%p %p %d\n" _C_ decoder _C_ buf _C_ len);
 
 	stream = &decoder->sync->stream;
 	frame = &decoder->sync->frame;
 	synth = &decoder->sync->synth;
-	DebugLevel0Fn("Error: %d\n" _C_ stream->error);
+	DebugPrint("Error: %d\n" _C_ stream->error);
 
 	MAD_read(sample, stream);
 
@@ -225,7 +219,7 @@ local int MadRead(Sample *sample, unsigned char* buf, int len)
 	return 0;
 
 	do {
-		DebugLevel0Fn("Read stream\n");
+		DebugPrint("Read stream\n");
 		switch (MAD_read(decoder->cb_data, stream)) {
 			case MAD_FLOW_STOP:
 				return 0;
@@ -296,7 +290,7 @@ local int Mp3ReadStream(Sample* sample, void* buf, int len)
 	int divide;
 	char sndbuf[SOUND_BUFFER_SIZE];
 
-	DebugLevel0Fn("%p %d\n" _C_ buf _C_ len);
+	DebugPrint("%p %d\n" _C_ buf _C_ len);
 
 	data = sample->User;
 
@@ -435,8 +429,6 @@ global Sample* LoadMp3(const char* name, int flags)
 
 	CLseek(f, 0, SEEK_SET);
 
-	DebugLevel2Fn("Have mp3 file %s\n" _C_ name);
-
 	data = malloc(sizeof(MadData));
 	data->MadFile = f;
 	data->BufferLen = 0;
@@ -486,7 +478,7 @@ global Sample* LoadMp3(const char* name, int flags)
 
 		sample->Type = &Mp3SampleType;
 
-		DebugLevel0Fn(" %d\n" _C_ sample->Len);
+		DebugPrint(" %d\n" _C_ sample->Len);
 	}
 
 	return sample;

@@ -130,7 +130,6 @@ global void HandleActionBuild(Unit* unit)
 			return;
 
 		case PF_REACHED:
-			DebugLevel3Fn("reached %d,%d\n" _C_ unit->X _C_ unit->Y);
 			break;
 
 		default:
@@ -317,7 +316,7 @@ global void HandleActionBuilded(Unit* unit)
 	// Check if construction should be canceled...
 	//
 	if (unit->Data.Builded.Cancel || unit->Data.Builded.Progress < 0) {
-		DebugLevel0Fn("%s canceled.\n" _C_ unit->Type->Name);
+		DebugPrint("%s canceled.\n" _C_ unit->Type->Name);
 		// Drop out unit
 		if ((worker = unit->Data.Builded.Worker)) {
 			worker->Orders[0].Action = UnitActionStill;
@@ -340,7 +339,7 @@ global void HandleActionBuilded(Unit* unit)
 	//
 	if (unit->Data.Builded.Progress >= unit->Stats->Costs[TimeCost] * 600 ||
 			unit->HP >= unit->Stats->HitPoints) {
-		DebugLevel0Fn("Building ready.\n");
+		DebugPrint("Building ready.\n");
 		if (unit->HP > unit->Stats->HitPoints) {
 			unit->HP = unit->Stats->HitPoints;
 		}

@@ -193,7 +193,6 @@ local int CclDefineAiHelper(lua_State* l)
 		if (!base) {
 			LuaError(l, "unknown unittype: %s" _C_ value);
 		}
-		DebugLevel3Fn("%s\n" _C_ base->Name);
 
 		//
 		// Get the unit types, which could be produced
@@ -207,20 +206,17 @@ local int CclDefineAiHelper(lua_State* l)
 				if (!upgrade) {
 					LuaError(l, "unknown upgrade: %s" _C_ value);
 				}
-				DebugLevel3Fn("> %s\n" _C_ upgrade->Ident);
 			} else if (what == 4) {
 				if (!strcmp("food", value)) {
 					cost = 0;
 				} else {
 					LuaError(l, "unknown limit: %s" _C_ value);
 				}
-				DebugLevel3Fn("> %s\n" _C_ str);
 			} else {
 				type = UnitTypeByIdent(value);
 				if (!type) {
 					LuaError(l, "unknown unittype: %s" _C_ value);
 				}
-				DebugLevel3Fn("> %s\n" _C_ type->Name);
 			}
 
 			switch (what) {
@@ -295,13 +291,11 @@ local int CclDefineAi(lua_State* l)
 	// AI Name
 	//
 	aitype->Name = strdup(LuaToString(l, 1));
-	DebugLevel3Fn("%s\n" _C_ aitype->Name);
 
 #ifdef DEBUG
 	for (ait = AiTypes->Next; ait; ait = ait->Next) {
 		if (!strcmp(aitype->Name, ait->Name)) {
-			DebugLevel0Fn("Warning two or more AI's with the same name '%s'\n" _C_ ait->
-				Name);
+			DebugPrint("Warning two or more AI's with the same name '%s'\n" _C_ ait->Name);
 		}
 	}
 #endif
@@ -310,7 +304,6 @@ local int CclDefineAi(lua_State* l)
 	// AI Race
 	//
 	value = LuaToString(l, 2);
-	DebugLevel3Fn("%s\n" _C_ value);
 	if (*value != '*') {
 		aitype->Race = strdup(value);
 	} else {
@@ -321,7 +314,6 @@ local int CclDefineAi(lua_State* l)
 	// AI Class
 	//
 	aitype->Class = strdup(LuaToString(l, 3));
-	DebugLevel3Fn("%s\n" _C_ aitype->Class);
 
 	//
 	// AI Script
@@ -657,7 +649,6 @@ local int CclAiWait(lua_State* l)
 		// Look if we have equivalent unit-types.
 		//
 		if (type->Slot < AiHelpers.EquivCount && AiHelpers.Equiv[type->Slot]) {
-			DebugLevel3Fn("Equivalence for %s\n" _C_ type->Ident);
 			for (j = 0; j < AiHelpers.Equiv[type->Slot]->Count; ++j) {
 				if (unit_types_count[AiHelpers.Equiv[type->Slot]->Table[j]->Slot]) {
 					lua_pushboolean(l, 0);
@@ -672,7 +663,7 @@ local int CclAiWait(lua_State* l)
 			lua_pushboolean(l, 1);
 			return 1;
 		}
-		DebugLevel0Fn("Broken? waiting on %s which wasn't requested.\n" _C_ type->Ident);
+		DebugPrint("Broken? waiting on %s which wasn't requested.\n" _C_ type->Ident);
 		lua_pushboolean(l, 0);
 		return 1;
 	}
@@ -686,7 +677,6 @@ local int CclAiWait(lua_State* l)
 		}
 	}
 	// units available?
-	DebugLevel3Fn("%d,%d\n" _C_ n _C_ autt->Count);
 
 	if (n >= autt->Count) {
 		lua_pushboolean(l, 0);
@@ -844,7 +834,7 @@ local int CclAiWaitForce(lua_State* l)
 		lua_pushboolean(l, 0);
 		return 1;
 	}
-	DebugLevel3Fn("Wait force %d\n" _C_ force);
+
 #if 0
 	// Debuging
 	AiCleanForces();
@@ -890,7 +880,7 @@ local int CclAiSleep(lua_State* l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	DebugLevel3Fn("%lu %d\n" _C_ GameCycle _C_ AiPlayer->SleepCycles);
+
 	if (AiPlayer->SleepCycles) {
 		if (AiPlayer->SleepCycles < GameCycle) {
 			AiPlayer->SleepCycles = 0;
@@ -1176,7 +1166,7 @@ local int CclDefineAiPlayer(lua_State* l)
 	++j;
 
 	Assert(i >= 0 && i <= PlayerMax);
-	DebugLevel0Fn("%p %d\n" _C_ Players[i].Ai _C_ Players[i].AiEnabled );
+	DebugPrint("%p %d\n" _C_ Players[i].Ai _C_ Players[i].AiEnabled );
 	// FIXME: lose this:
 	// Assert(!Players[i].Ai && Players[i].AiEnabled);
 

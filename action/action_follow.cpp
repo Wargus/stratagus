@@ -67,7 +67,7 @@ global void HandleActionFollow(Unit* unit)
 	if (unit->SubAction == 128) {
 		goal = unit->Orders[0].Goal;
 		if (!goal || !UnitVisibleAsGoal(goal, unit->Player)) {
-			DebugLevel0Fn("Goal gone\n");
+			DebugPrint("Goal gone\n");
 			if (goal) {
 				RefsDecrease(goal);
 			}
@@ -166,14 +166,14 @@ global void HandleActionFollow(Unit* unit)
 								!unit->Type->CanAttack) ||
 							(dest->NewOrder.Action == UnitActionBoard &&
 								unit->Type->UnitType != UnitTypeLand)) {
-						DebugLevel0Fn("Wrong order for unit\n");
+						DebugPrint("Wrong order for unit\n");
 						unit->Orders->Action = UnitActionStill;
 						unit->Orders->Goal = NoUnitP;
 					} else {
 						if (dest->NewOrder.Goal) {
 							if (dest->NewOrder.Goal->Destroyed) {
 								// FIXME: perhaps we should use another dest?
-								DebugLevel0Fn("Destroyed unit in teleport unit\n");
+								DebugPrint("Destroyed unit in teleport unit\n");
 								RefsDecrease(dest);
 								dest->NewOrder.Goal = NoUnitP;
 								dest->NewOrder.Action = UnitActionStill;
@@ -215,7 +215,7 @@ global void HandleActionFollow(Unit* unit)
 	// Target destroyed?
 	//
 	if ((goal = unit->Orders[0].Goal) && !UnitVisibleAsGoal(goal, unit->Player)) {
-		DebugLevel0Fn("Goal gone\n");
+		DebugPrint("Goal gone\n");
 		unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 		unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
 		unit->Orders[0].Goal = NoUnitP;
@@ -236,7 +236,6 @@ global void HandleActionFollow(Unit* unit)
 					goal->Orders[0].Action == UnitActionStill)) {
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
-				DebugLevel2Fn("Follow attack %d\n" _C_ UnitNumber(goal));
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 				// Save current command to come back.
 				unit->SavedOrder = unit->Orders[0];

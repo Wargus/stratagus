@@ -239,7 +239,7 @@ global Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 		if (tx < unit->X || tx >= unit->X + type->TileWidth ||
 				ty < unit->Y || ty >= unit->Y + type->TileHeight) {
 			// When does that happen???
-			DebugLevel0("This is a wierd world");
+			DebugPrint("This is a wierd world");
 			continue;
 		}
 		if (!CanTarget(source->Type, unit->Type)) {
@@ -751,8 +751,6 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 	const Player* player;
 	Unit* best_unit;
 
-	DebugLevel3Fn("(%d)%s\n" _C_ UnitNumber(unit) _C_ unit->Type->Ident);
-
 	// if necessary, take possible damage on allied units into account...
 	if (unit->Type->Missile.Missile->Range > 1 &&
 			(range + unit->Type->Missile.Missile->Range < 15)) {
@@ -829,7 +827,6 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 			cost -= CANATTACK_BONUS;
 		}
 
-		DebugLevel3Fn("%s -> %s\t%08x\n" _C_ type->Ident _C_ dtype->Ident _C_ cost);
 		//
 		//		Take this target?
 		//
@@ -839,13 +836,6 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 			best_cost = cost;
 		}
 	}
-
-/*
-	if (best_unit) {
-		DebugLevel3Fn("Attacking (%d)%s -> %s\n" _C_ UnitNumber(unit) _C_
-			unit->Type->Ident _C_ best_unit->Type->Ident);
-	}
-*/
 
 	return best_unit;
 }
@@ -864,7 +854,7 @@ global Unit* AttackUnitsInRange(Unit* unit)
 	//
 #ifdef DEBUG
 	if (!unit->Type->CanAttack) {
-		DebugLevel0Fn("Should be handled by caller?\n");
+		DebugPrint("Should be handled by caller?\n");
 		Assert(0);
 		return NoUnitP;
 	}
@@ -891,7 +881,7 @@ global Unit* AttackUnitsInReactRange(Unit* unit)
 	type = unit->Type;
 #ifdef DEBUG
 	if (!type->CanAttack) {
-		DebugLevel0Fn("Should be handled by caller?\n");
+		DebugPrint("Should be handled by caller?\n");
 		Assert(0);
 		return NoUnitP;
 	}

@@ -314,9 +314,6 @@ global Missile* MakeMissile(MissileType* mtype, int sx, int sy, int dx, int dy)
 {
 	Missile* missile;
 
-	DebugLevel3Fn("type %d(%s) at %d,%d to %d,%d\n" _C_
-		mtype - MissileTypes _C_ mtype->Ident _C_ sx _C_ sy _C_ dx _C_ dy);
-
 	if (!(missile = NewGlobalMissile())) {
 		return missile;
 	}
@@ -338,9 +335,6 @@ global Missile* MakeMissile(MissileType* mtype, int sx, int sy, int dx, int dy)
 global Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx, int dy)
 {
 	Missile* missile;
-
-	DebugLevel3Fn("type %d(%s) at %d,%d to %d,%d\n" _C_
-		mtype - MissileTypes _C_ mtype->Ident _C_ sx _C_ sy _C_ dx _C_ dy);
 
 	if (!(missile = NewLocalMissile())) {
 		return NULL;
@@ -418,7 +412,6 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 	if (bloodlust) {
 		basic_damage *= 2;
 		piercing_damage *= 2;
-		DebugLevel3Fn("bloodlust\n");
 	}
 
 	damage = (basic_damage - goal_stats->Armor) > 1 ?
@@ -426,9 +419,6 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
 	Assert(damage >= 0);
-
-	DebugLevel3Fn("\nDamage done [%d] %d %d ->%d\n" _C_ goal_stats->Armor _C_
-		basic_damage _C_ piercing_damage _C_ damage);
 
 	return damage;
 }
@@ -472,15 +462,13 @@ global void FireMissile(Unit* unit)
 		// Better let the caller/action handle this.
 
 		if (goal->Destroyed) {
-			DebugLevel0Fn("destroyed unit\n");
+			DebugPrint("destroyed unit\n");
 			return;
 		}
 		if (goal->Removed) {
-			DebugLevel3Fn("Missile-none hits removed unit!\n");
 			return;
 		}
 		if (!goal->HP || goal->Orders[0].Action == UnitActionDie) {
-			DebugLevel3Fn("Missile hits dead unit!\n");
 			return;
 		}
 
@@ -509,7 +497,7 @@ global void FireMissile(Unit* unit)
 				return;
 			}
 
-			DebugLevel1Fn("Missile-none hits no unit, shouldn't happen!\n");
+			DebugPrint("Missile-none hits no unit, shouldn't happen!\n");
 			return;
 		}
 
@@ -534,7 +522,7 @@ global void FireMissile(Unit* unit)
 		// Moved out of attack range?
 		//
 		if (MapDistanceBetweenUnits(unit, goal) < unit->Type->MinAttackRange) {
-			DebugLevel0Fn("Missile target too near %d,%d\n" _C_
+			DebugPrint("Missile target too near %d,%d\n" _C_
 				MapDistanceBetweenUnits(unit,goal) _C_ unit->Type->MinAttackRange);
 			// FIXME: do something other?
 			return;
@@ -546,7 +534,6 @@ global void FireMissile(Unit* unit)
 		} else {
 			NearestOfUnit(goal, unit->X, unit->Y, &dx, &dy);
 		}
-		DebugLevel3Fn("Fire to unit at %d,%d\n" _C_ dx _C_ dy);
 	} else {
 		dx = unit->Orders[0].X;
 		dy = unit->Orders[0].Y;
@@ -611,8 +598,6 @@ local int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
 	if (!AnyMapAreaVisibleInViewport(vp, min_x, min_y, max_x, max_y)) {
 		return 0;
 	}
-	DebugLevel3Fn("Missile bounding box %d %d %d %d\n" _C_ min_x _C_ max_x _C_
-		min_y _C_ max_y);
 
 	for (x = min_x; x <= max_x; ++x) {
 		for ( y = min_y; y <= max_y; ++y) {
@@ -928,7 +913,6 @@ local void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 local void MissileHitsWall(const Missile* missile, int x, int y, int splash)
 {
 	if (WallOnMap(x, y)) {
-		DebugLevel3Fn("Missile on wall?\n");
 		if (HumanWallOnMap(x, y)) {
 			if (missile->Damage) {  // direct damage, spells mostly
 				HitWall(x, y, missile->Damage / splash);
@@ -993,7 +977,6 @@ global void MissileHit(Missile* missile)
 	}
 
 	if (!missile->SourceUnit) {  // no owner - green-cross ...
-		DebugLevel3Fn("Missile has no owner!\n");
 		return;
 	}
 
@@ -1002,7 +985,7 @@ global void MissileHit(Missile* missile)
 
 	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 		// FIXME: this should handled by caller?
-		DebugLevel0Fn("Missile gone outside of map!\n");
+		DebugPrint("Missile gone outside of map!\n");
 		return;  // outside the map.
 	}
 
@@ -1124,8 +1107,7 @@ local int NextMissileFrame(Missile* missile, char sign, char LongAnimation)
 	if (neg) {
 		missile->SpriteFrame = -missile->SpriteFrame - 1;
 	}
-	DebugLevel3Fn("Frame %d of %d\n" _C_
-		missile->SpriteFrame _C_ missile->Type->SpriteFrames);
+
 	return AnimationIsFinished;
 }
 
@@ -1183,8 +1165,6 @@ local void MissilesActionLoop(Missile** missiles)
 	// NOTE: missiles[??] could be modified!!! Yes (freed)
 	//
 	while ((missile = *missiles)) {
-		DebugLevel3Fn("Missile %s ttl %d at %d, %d\n" _C_ missile->Type->Ident
-				_C_ missile->TTL _C_ missile->X _C_ missile->Y);
 		if (missile->Delay && missile->Delay--) {
 			++missiles;
 			continue;  // delay start of missile
@@ -1238,8 +1218,6 @@ global int ViewPointDistanceToMissile(const Missile* missile)
 
 	x = (missile->X + missile->Type->Width / 2) / TileSizeX;
 	y = (missile->Y + missile->Type->Height / 2) / TileSizeY;  // pixel -> tile
-
-	DebugLevel3Fn("Missile %p at %d %d\n" _C_ missile _C_ x _C_ y);
 
 	return ViewPointDistance(x, y);
 }
@@ -1541,7 +1519,6 @@ void MissileActionPointToPointBounce(Missile* missile)
 			missile->SourceY = missile->Y;
 			PointToPointMissile(missile);
 			//missile->State++;
-			DebugLevel3("HIT %d!\n" _C_ missile->State);
 			MissileHit(missile);
 			// FIXME: hits to left and right
 			// FIXME: reduce damage effects on later impacts
@@ -1748,7 +1725,7 @@ global void MissileActionLandMine(Missile* missile)
 		if (table[i]->Type->UnitType != UnitTypeFly &&
 				table[i]->HP &&
 				!(table[i] == missile->SourceUnit && !missile->Type->CanHitOwner)) {
-			DebugLevel0("Landmine explosion at %d,%d.\n" _C_ x _C_ y);
+			DebugPrint("Landmine explosion at %d,%d.\n" _C_ x _C_ y);
 			MissileHit(missile);
 			missile->TTL = 0;
 			return;
@@ -1812,7 +1789,6 @@ global void MissileActionWhirlwind(Missile* missile)
 	if (!(missile->TTL % (CYCLES_PER_SECOND/10))) {
 		// we should parameter this
 		n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
-		DebugLevel3Fn("Damage on %d,%d-%d,%d = %d\n" _C_ x-1 _C_ y-1 _C_ x+1 _C_ y+1 _C_ n);
 		for (i = 0; i < n; ++i) {
 			if( (table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
 				// should be in missile
@@ -1820,7 +1796,7 @@ global void MissileActionWhirlwind(Missile* missile)
 			}
 		}
 	}
-	DebugLevel0Fn( "Whirlwind: %d, %d, TTL: %d state: %d\n" _C_
+	DebugPrint( "Whirlwind: %d, %d, TTL: %d state: %d\n" _C_
 			missile->X _C_ missile->Y _C_ missile->TTL _C_ missile->State);
 #else
 	if (!(missile->TTL % CYCLES_PER_SECOND / 10)) {
@@ -1845,7 +1821,7 @@ global void MissileActionWhirlwind(Missile* missile)
 		missile->SourceX = missile->X;
 		missile->SourceY = missile->Y;
 		missile->State = 0;
-		DebugLevel0Fn( "Whirlwind new direction: %d, %d, TTL: %d\n" _C_
+		DebugPrint( "Whirlwind new direction: %d, %d, TTL: %d\n" _C_
 			missile->DX _C_ missile->DY _C_ missile->TTL );
 	}
 }

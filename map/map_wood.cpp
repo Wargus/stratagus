@@ -379,7 +379,7 @@ global void RegenerateForest(void)
 								tmp->Value >= ForestRegeneration &&
 								!(tmp->Flags & (MapFieldWall | MapFieldUnpassable |
 									  MapFieldLandUnit | MapFieldBuilding))) {
-							DebugLevel0("Real place wood\n");
+							DebugPrint("Real place wood\n");
 							tmp->Tile = TheMap.Tileset->TopOneTree;
 							tmp->Value = 0;
 							tmp->Flags |= MapFieldForest | MapFieldUnpassable;

@@ -80,9 +80,6 @@ global void AiCheckMagic(void)
 					success =  // Follow on next line (AutoCastSpell).
 #endif
 						AutoCastSpell(unit, SpellTypeTable[j]);
-					DebugLevel3Fn("Mage '%s' cast '%s' : %s\n" _C_
-						unit->Type->Ident _C_
-						SpellTypeTable[j]->Ident _C_ success ? "success" : "fail");
 				}
 			}
 		}

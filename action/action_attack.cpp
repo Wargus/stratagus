@@ -130,9 +130,6 @@ local Unit* CheckForDeadGoal(Unit* unit)
 			unit->Orders[0].MinRange = 0;
 			unit->Orders[0].Range = 0;
 
-			DebugLevel3Fn("attack target %d gone for %d(%s)\n" _C_
-				UnitNumber(goal) _C_ 
-				UnitNumber(unit) _C_ unit->Type->Name);
 			RefsDecrease(goal);
 
 			unit->Orders[0].Goal = goal = NoUnitP;
@@ -199,8 +196,6 @@ local int CheckForTargetInRange(Unit* unit)
 			unit->Orders[0].X = unit->Orders[0].Y = -1;
 			unit->SubAction |= WEAK_TARGET;				// weak target
 			NewResetPath(unit);
-			DebugLevel3Fn("%d in react range %d\n" _C_
-				UnitNumber(unit) _C_ UnitNumber(goal));
 		}
 
 	//
@@ -215,8 +210,6 @@ local int CheckForTargetInRange(Unit* unit)
 				// Save current command to come back.
 				unit->SavedOrder = unit->Orders[0];
 				if ((goal = unit->SavedOrder.Goal)) {
-					DebugLevel0Fn("Have goal to come back %d\n" _C_
-						UnitNumber(goal));
 					unit->SavedOrder.X = goal->X + goal->Type->TileWidth / 2;
 					unit->SavedOrder.Y = goal->Y + goal->Type->TileHeight / 2;
 					unit->SavedOrder.MinRange = 0;
@@ -249,7 +242,7 @@ local void MoveToTarget(Unit* unit)
 
 	if (!unit->Orders[0].Goal) {
 		if (unit->Orders[0].X == -1 || unit->Orders[0].Y == -1) {
-			DebugLevel0Fn("FIXME: Wrong goal position, check where set!\n");
+			DebugPrint("FIXME: Wrong goal position, check where set!\n");
 			unit->Orders[0].X = unit->Orders[0].Y = 0;
 		}
 	}
@@ -268,7 +261,6 @@ local void MoveToTarget(Unit* unit)
 			//
 			// Nothing to do, we're on the way moving.
 			//
-			DebugLevel3Fn("Nothing to do.\n");
 			return;
 		}
 		if (err == PF_REACHED) {
@@ -277,7 +269,7 @@ local void MoveToTarget(Unit* unit)
 			//
 			if (goal && MapDistanceBetweenUnits(unit, goal) <=
 					unit->Stats->AttackRange) {
-				DebugLevel3Fn("Reached another unit, now attacking it.\n");
+				// Reached another unit, now attacking it
 				unit->State = 0;
 				if (unit->Stats->Speed) {
 					UnitHeadingFromDeltaXY(unit,
@@ -294,7 +286,7 @@ local void MoveToTarget(Unit* unit)
 						unit->Orders[0].Action == UnitActionAttackGround) &&
 					MapDistanceToUnit(unit->Orders[0].X, unit->Orders[0].Y, unit) <=
 						unit->Stats->AttackRange) {
-				DebugLevel3Fn("Reached wall or ground, now attacking it.\n");
+				// Reached wall or ground, now attacking it
 				unit->State = 0;
 				if (unit->Stats->Speed) {
 					UnitHeadingFromDeltaXY(unit, unit->Orders[0].X - unit->X,
@@ -310,17 +302,10 @@ local void MoveToTarget(Unit* unit)
 		//
 		if (err == PF_UNREACHABLE) {
 			unit->State = unit->SubAction = 0;
-			DebugLevel3Fn("Target not reachable, unit: %d" _C_
-				UnitNumber(unit));
-			if (goal) {
-				DebugLevel3(", target %d range %d\n" _C_ UnitNumber(goal) _C_
-					unit->Orders[0].Range);
-			} else {
+			if (!goal) {
 				//
 				// When attack-moving we have to allow a bigger range
 				//
-				DebugLevel3(", (%d,%d) Tring with more range...\n" _C_
-					unit->Orders[0].X _C_ unit->Orders[0].Y);
 				if (unit->Orders[0].Range < TheMap.Width ||
 						unit->Orders[0].Range < TheMap.Height) {
 					// Try again with more range
@@ -333,7 +318,6 @@ local void MoveToTarget(Unit* unit)
 		// Return to old task?
 		//
 		unit->State = unit->SubAction = 0;
-		DebugLevel3Fn("Returning to old task.\n");
 		if (unit->Orders[0].Goal) {
 			RefsDecrease(unit->Orders->Goal);
 		}
@@ -363,7 +347,7 @@ local void AttackTarget(Unit* unit)
 
 	if (!unit->Orders[0].Goal) {
 		if (unit->Orders[0].X == -1 || unit->Orders[0].Y == -1) {
-			DebugLevel0Fn("FIXME: Wrong goal position, check where set!\n");
+			DebugPrint("FIXME: Wrong goal position, check where set!\n");
 			unit->Orders[0].X = unit->Orders[0].Y = 0;
 		}
 	}
@@ -376,7 +360,6 @@ local void AttackTarget(Unit* unit)
 		goal = unit->Orders[0].Goal;
 		if (!goal && (WallOnMap(unit->Orders[0].X, unit->Orders[0].Y) ||
 				unit->Orders[0].Action == UnitActionAttackGround)) {
-			DebugLevel3Fn("attack a wall or ground!!!!\n");
 			return;
 		}
 
@@ -423,7 +406,7 @@ local void AttackTarget(Unit* unit)
 			if (unit->SavedOrder.Action == UnitActionStill) {
 				unit->SavedOrder = unit->Orders[0];
 				if ((temp = unit->SavedOrder.Goal)) {
-					DebugLevel0Fn("Have unit to come back %d?\n" _C_
+					DebugPrint("Have unit to come back %d?\n" _C_
 						UnitNumber(temp));
 					unit->SavedOrder.X = temp->X + temp->Type->TileWidth / 2;
 					unit->SavedOrder.Y = temp->Y + temp->Type->TileHeight / 2;
@@ -434,8 +417,6 @@ local void AttackTarget(Unit* unit)
 			}
 
 			RefsIncrease(goal);
-			DebugLevel3Fn("%d Unit in react range %d\n" _C_
-				UnitNumber(unit) _C_ UnitNumber(goal));
 			unit->Orders[0].Goal = goal;
 			unit->Orders[0].X = unit->Orders[0].Y = -1;
 			unit->Orders[0].MinRange = unit->Type->MinAttackRange;
@@ -457,7 +438,7 @@ local void AttackTarget(Unit* unit)
 					// Save current order to come back or to continue it.
 					unit->SavedOrder = unit->Orders[0];
 					if ((goal = unit->SavedOrder.Goal)) {
-						DebugLevel0Fn("Have goal to come back %d\n" _C_
+						DebugPrint("Have goal to come back %d\n" _C_
 							UnitNumber(goal));
 						unit->SavedOrder.X = goal->X + goal->Type->TileWidth / 2;
 						unit->SavedOrder.Y = goal->Y + goal->Type->TileHeight / 2;
@@ -482,7 +463,7 @@ local void AttackTarget(Unit* unit)
 				// Save current order to come back or to continue it.
 				unit->SavedOrder = unit->Orders[0];
 				if ((temp = unit->SavedOrder.Goal)) {
-					DebugLevel0Fn("Have goal to come back %d\n" _C_
+					DebugPrint("Have goal to come back %d\n" _C_
 						UnitNumber(temp));
 					unit->SavedOrder.X = temp->X + temp->Type->TileWidth / 2;
 					unit->SavedOrder.Y = temp->Y + temp->Type->TileHeight / 2;
@@ -527,9 +508,6 @@ local void AttackTarget(Unit* unit)
 */
 global void HandleActionAttack(Unit* unit)
 {
-	DebugLevel3Fn("Attack %d range %d\n" _C_ UnitNumber(unit) _C_
-		unit->Orders->Range);
-
 	switch (unit->SubAction) {
 		//
 		// First entry
@@ -567,7 +545,7 @@ global void HandleActionAttack(Unit* unit)
 			break;
 
 		case WEAK_TARGET:
-			DebugLevel0("FIXME: wrong entry.\n");
+			DebugPrint("FIXME: wrong entry.\n");
 			break;
 	}
 }

@@ -214,7 +214,6 @@ global RegionId NewRegion(int iswater)
 	}
 	++RegionCount;
 
-	DebugLevel3Fn("New region %d, iswater = %d\n" _C_ result _C_ iswater);
 	Assert(!Regions[result].TileCount);
 
 	Regions[result].TileCount = 0;
@@ -570,8 +569,6 @@ global void RegionCheckConnex(RegionId reg)
 	int tilesleft;
 	RegionSegment* seg;
 
-	DebugLevel3Fn("Region %d checked for splitting\n" _C_ reg);
-
 	RegionTempStorageAllocate();
 
 	RegionTempStorageFillRegion(Regions + reg, 0);
@@ -600,7 +597,6 @@ global void RegionCheckConnex(RegionId reg)
 
 	if (nbarea > 1) {
 		// RegionDebugAllConnexions();
-		DebugLevel3Fn("Region %d must be splitted into %d...\n" _C_ reg _C_ nbarea);
 		Regions[reg].Dirty += 10;
 		RegionSplitUsingTemp(reg, nbarea, 1);
 		ZoneNeedRefresh = 1;
@@ -668,7 +664,6 @@ local void MapSplitterTileOccuped(int x, int y) {
 		return;
 	}
 
-	DebugLevel3Fn("Region %d should be checked\n" _C_ reg);
 	// Here we'll need to flood fill the region to be sure...
 	Regions[reg].NeedConnectTest = 1;
 }
@@ -703,8 +698,6 @@ global void MapSplitterTilesCleared(int x0, int y0, int x1, int y1) {
 	for (y = y0; y <= y1; ++y) {
 		for (x = x0; x <= x1; ++x) {
 			if (RegionMapping(x, y) != NoRegion) {
-				DebugLevel3Fn("Clearing an already clear tile %d %d -- applying ugly hack\n" _C_ x _C_ y);
-
 				for (y = y0; y <= y1; ++y) {
 					for (x = x0; x <= x1; ++x) {
 						if (RegionMapping(x, y) == NoRegion) {
@@ -955,7 +948,6 @@ global void InitaliseMapping(void)
 			}
 
 			CurrentIsWater = TileIsWater(x, y);
-			DebugLevel3Fn("CurrentIsWater %d at %d %d\n" _C_ CurrentIsWater _C_ x _C_ y);
 			FindHExtent(x, y, &x0, &x1, CurrentIsWater);
 
 			RegionFloodFill(x0, x1, y, NewRegion(CurrentIsWater), CurrentIsWater);
@@ -964,7 +956,6 @@ global void InitaliseMapping(void)
 	}
 	UpdateConnections();
 
-	DebugLevel3Fn( "Map FloodFill done\n");
 	RegionDebugAllConnexions();
 	RegionDebugWater();
 
@@ -980,7 +971,6 @@ global void InitaliseMapping(void)
 			if ((Regions[i].TileCount > 1024) ||
 						(Regions[i].TileCount > 64 &&
 					(x > y ? x : y) * (x > y ? x : y) > 3 * Regions[i].TileCount)) {
-				DebugLevel3Fn( "Split %d\n" _C_ i);
 				RegionSplit(i, 1);
 				// RegionDebugAllConnexions();
 				found = 1;
@@ -1150,7 +1140,6 @@ global void MapSplitterInit(void)
 	RefreshZones();
 	ZoneNeedRefresh = 0;
 
-	DebugLevel3Fn("Mapping initialised\n");
 	RegionDebugAllConnexions();
 }
 
@@ -1193,8 +1182,6 @@ global void MapSplitterEachCycle(void)
 		for (i = 0; i < RegionMax; ++i) {
 			if (Regions[i].Dirty && ShouldBreakRegion(Regions[i].MinX,Regions[i].MinY,
 					Regions[i].MaxX,Regions[i].MaxY,Regions[i].TileCount,1)) {
-				DebugLevel3Fn("Splitting region %d\n" _C_ i);
-
 
 				RegionSplit(i, 1);
 
@@ -1238,7 +1225,6 @@ global void MapSplitterEachCycle(void)
 
 				if (!ShouldBreakRegion(x0, y0, x1, y1,
 							Regions[i].TileCount + Regions[j].TileCount, 1)) {
-					DebugLevel3Fn("Joining regions %d - %d\n" _C_ i _C_ j);
 					RegionJoin(i, j);
 					// RegionDebugAllConnexions();
 					if (!Regions[i].TileCount) {
