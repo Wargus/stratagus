@@ -104,7 +104,7 @@ extern int HandleActionRepair(Unit* unit);
     /// Handle command patrol
 extern void HandleActionPatrol(Unit* unit);
     /// Handle command attack
-extern int HandleActionAttack(Unit* unit);
+extern void HandleActionAttack(Unit* unit);
     /// Handle command board
 extern void HandleActionBoard(Unit* unit);
     /// Handle command unload

@@ -263,6 +263,9 @@ struct _unit_ {
 #define NoUnitP		(Unit*)0	/// return value: for no unit found
 #define InfiniteDistance INT_MAX	/// the distance is unreachable
 
+
+#define FlushCommands	1		/// Flush commands in queue
+
 // FIXME: will be removed, we get player limits
 #define MAX_UNITS	1800		/// maximal number of units supported
 

@@ -25,21 +25,20 @@
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
+
+#include "missile.h"
 #include "unittype.h"
-#include "player.h"
-#include "unit.h"
 #include "actions.h"
+#include "unit.h"
 #include "tileset.h"
 #include "map.h"
-#include "sound_server.h"
-#include "missile.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+// FIXME: should combine stand ground and still.
+
 
 /**
 **	Unit stands still!
@@ -191,14 +190,30 @@ global void HandleActionStill(Unit* unit)
 	//
 	if( /*unit->Player->Type!=PlayerHuman &&*/ !type->Tower ) {
 	    if( (goal=AttackUnitsInReactRange(unit)) ) {
-		CommandAttack(unit,goal->X,goal->Y,NULL,0);
+		// Weak goal, can choose other unit, come back after attack
+		// FIXME: should rewrite command handling
+		CommandAttack(unit,unit->X,unit->Y,NULL,FlushCommands);
+		unit->SavedCommand=unit->NextCommand[0];
+		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
+		DebugLevel3(__FUNCTION__": %Zd Attacking in range %d\n"
+			,UnitNumber(unit),unit->SubAction);
 		unit->SubAction|=2;
+		unit->SavedCommand.Action=UnitActionAttack;
 	    }
 	} else if( (goal=AttackUnitsInRange(unit)) ) {
-	    // FIXME: johns, looks wired what I have written here
-	    // FIXME: Why have I written such a chaos? (johns)
+	    // FIXME: Johns should rewrite this
+	    // FIXME: Applies now only for towers
 	    if( !unit->SubAction || unit->Command.Data.Move.Goal!=goal ) {
+		// New target.
+#ifdef NEW_UNIT
+		if( unit->Command.Data.Move.Goal ) {
+		    unit->Command.Data.Move.Goal--;
+		}
 		unit->Command.Data.Move.Goal=goal;
+		goal->Refs++;
+#else
+		unit->Command.Data.Move.Goal=goal;
+#endif
 		unit->State=0;
 		unit->SubAction=1;
 		// Turn to target
@@ -211,7 +226,12 @@ global void HandleActionStill(Unit* unit)
 	}
     }
 
-    if( unit->SubAction ) {
+    if( unit->SubAction ) {		// was attacking.
+#ifdef NEW_UNIT
+	if( unit->Command.Data.Move.Goal ) {
+	    unit->Command.Data.Move.Goal--;
+	}
+#endif
 	unit->SubAction=unit->State=0;
     }
 

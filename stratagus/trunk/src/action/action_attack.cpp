@@ -72,7 +72,7 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 	}
     );
 
-    if( (flags&AnimationSound) ) {	
+    if( (flags&AnimationSound) ) {
 	PlayUnitSound(unit,VoiceAttacking);
     }
 
@@ -97,6 +97,257 @@ global int AnimateActionAttack(Unit* unit)
 }
 
 /**
+**	Handle moving to the target.
+**
+**	@param unit	Unit, for that the attack is handled.
+*/
+local void MoveToTarget(Unit* unit)
+{
+    Unit* goal;
+    int wall;
+    int err;
+
+    err=HandleActionMove(unit);
+    // FIXME: Should handle new return codes here (for Fabrice)
+
+    if( unit->Reset ) {
+	//
+	//	Target is dead, choose new one.
+	//
+#ifdef NEW_UNIT
+	if( (goal=unit->Command.Data.Move.Goal) ) {
+	    if( goal->Destroyed ) {
+		DebugLevel0(__FUNCTION__": destroyed unit\n");
+		if( !--goal->Refs ) {
+		    ReleaseUnit(goal);
+		}
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+	    }
+	}
+#else
+	goal=unit->Command.Data.Move.Goal;
+	if( goal && (!goal->HP || goal->Command.Action==UnitActionDie) ) {
+	    unit->Command.Data.Move.Goal=goal=NoUnitP;
+	}
+#endif
+
+	//
+	//	No goal: if meeting enemy attack it.
+	//
+	wall=0;
+	if( !goal && !(wall=WallOnMap(unit->Command.Data.Move.DX
+		     ,unit->Command.Data.Move.DY)) ) {
+	    goal=AttackUnitsInReactRange(unit);
+	    if( goal ) {
+#ifdef NEW_UNIT
+		goal->Refs++;
+#endif
+		if( unit->SavedCommand.Action==UnitActionStill ) {
+		    // Save current command to come back.
+		    unit->SavedCommand=unit->Command;
+		}
+		unit->Command.Data.Move.Goal=goal;
+		unit->Command.Data.Move.Fast=1;
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+		unit->SubAction|=2;		// weak target
+		DebugLevel3(__FUNCTION__": %Zd in react range %Zd\n"
+			,UnitNumber(unit),UnitNumber(goal));
+	    }
+
+	//
+	//	Have a weak target, try a better target.
+	//
+	} else if( goal && (unit->SubAction&2) ) {
+	    Unit* temp;
+
+	    temp=AttackUnitsInReactRange(unit);
+	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
+#ifdef NEW_UNIT
+		goal->Refs--;
+		temp->Refs++;
+#endif
+		if( unit->SavedCommand.Action==UnitActionStill ) {
+		    // Save current command to come back.
+		    unit->SavedCommand=unit->Command;
+		}
+		unit->Command.Data.Move.Goal=goal=temp;
+		unit->Command.Data.Move.Fast=1;
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+	    }
+	}
+
+	//
+	//	Have reached target?
+	//
+	if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
+		<=unit->Stats->AttackRange ) {
+	    unit->State=0;
+	    if( !unit->Type->Tower ) {
+		UnitNewHeadingFromXY(unit,goal->X-unit->X,goal->Y-unit->Y);
+	    }
+	    unit->SubAction++;
+	} else if( wall && MapDistance(unit->X,unit->Y
+		    ,unit->Command.Data.Move.DX,unit->Command.Data.Move.DY)
+			<=unit->Stats->AttackRange ) {
+	    DebugLevel3("Attacking wall\n");
+	    unit->State=0;
+	    if( !unit->Type->Tower ) {
+		UnitNewHeadingFromXY(unit,unit->Command.Data.Move.DX-unit->X
+		    ,unit->Command.Data.Move.DY-unit->Y);
+	    }
+	    unit->SubAction=1;
+	} else if( err ) {
+	    unit->SubAction=0;
+	    // Return to old task!
+	    if( unit->Command.Action==UnitActionStill ) {
+		unit->Command=unit->SavedCommand;
+		// Must finish if saved command finishes
+		unit->SavedCommand.Action=UnitActionStill;
+	    }
+	    return;
+	}
+	DebugCheck( unit->Type->Vanishes || unit->Destroyed );
+	unit->Command.Action=UnitActionAttack;
+    }
+}
+
+/**
+**	Handle attacking the target.
+**
+**	@param unit	Unit, for that the attack is handled.
+*/
+local void AttackTarget(Unit* unit)
+{
+    Unit* goal;
+
+    AnimateActionAttack(unit);
+    if( unit->Reset ) {
+	goal=unit->Command.Data.Move.Goal;
+	//
+	//	Goal is "weak" or a wall.
+	//
+	if( !goal && WallOnMap(unit->Command.Data.Move.DX
+		     ,unit->Command.Data.Move.DY) ) {
+	    DebugLevel3("attack a wall!!!!\n");
+	    return;
+	}
+
+	//
+	//	Target is dead, choose new one.
+	//
+#ifdef NEW_UNIT
+	if( goal ) {
+	    if( goal->Destroyed ) {
+		DebugLevel0(__FUNCTION__": destroyed unit\n");
+		if( !--goal->Refs ) {
+		    ReleaseUnit(goal);
+		}
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+	    }
+	}
+	//
+	//	No target choose one.
+	//
+	if( !goal ) {
+	    unit->State=0;
+	    goal=AttackUnitsInReactRange(unit);
+	    if( !goal ) {
+		unit->SubAction=0;
+		// Return to old task!
+		unit->Command=unit->SavedCommand;
+		// Must finish if saved command finishes
+		unit->SavedCommand.Action=UnitActionStill;
+		return;
+	    }
+	    if( unit->SavedCommand.Action==UnitActionStill ) {
+		// Save current command to come back.
+		unit->SavedCommand=unit->Command;
+	    }
+#ifdef NEW_UNIT
+	    goal->Refs++;
+#endif
+	    DebugLevel3(__FUNCTION__": %Zd Unit in react range %Zd\n"
+		    ,UnitNumber(unit),UnitNumber(goal));
+	    unit->Command.Data.Move.Goal=goal;
+	    unit->Command.Data.Move.DX=goal->X;
+	    unit->Command.Data.Move.DY=goal->Y;
+	    unit->SubAction|=2;
+	    if( !unit->Type->Tower ) {
+		UnitNewHeadingFromXY(unit,goal->X-unit->X,goal->Y-unit->Y);
+	    }
+	} else
+#else
+	if( !goal || !goal->HP || goal->Command.Action==UnitActionDie ) {
+	    unit->State=0;
+	    goal=AttackUnitsInReactRange(unit);
+	    unit->Command.Data.Move.Goal=goal;
+	    if( !goal ) {
+		unit->SubAction=0;
+		unit->Command.Action=UnitActionStill;	// cade?
+		return;
+	    }
+	    unit->SubAction|=2;
+	    DebugLevel3("Unit in react range %Zd\n",UnitNumber(goal));
+	    unit->Command.Data.Move.DX=goal->X;
+	    unit->Command.Data.Move.DY=goal->Y;
+	    if( !unit->Type->Tower ) {
+		UnitNewHeadingFromXY(unit
+		    ,goal->X-unit->X,goal->Y-unit->Y);
+	    }
+	} else
+#endif
+
+	//
+	//	Have a weak target, try a better target.
+	//
+	if( goal && (unit->SubAction&2) ) {
+	    Unit* temp;
+
+	    temp=AttackUnitsInReactRange(unit);
+	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
+#ifdef NEW_UNIT
+		goal->Refs--;
+		temp->Refs++;
+#endif
+		if( unit->SavedCommand.Action==UnitActionStill ) {
+		    // Save current command to come back.
+		    unit->SavedCommand=unit->Command;
+		}
+		unit->Command.Data.Move.Goal=goal=temp;
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+		if( !unit->Type->Tower ) {
+		    UnitNewHeadingFromXY(unit,goal->X-unit->X,goal->Y-unit->Y);
+		}
+	    }
+	}
+
+	//
+	//	Still near to target, if not goto target.
+	//
+	if( MapDistanceToUnit(unit->X,unit->Y,goal)
+		>unit->Stats->AttackRange ) {
+	    if( unit->SavedCommand.Action==UnitActionStill ) {
+		// Save current command to come back.
+		unit->SavedCommand=unit->Command;
+	    }
+	    unit->Command.Data.Move.Fast=1;
+	    unit->Command.Data.Move.DX=goal->X;
+	    unit->Command.Data.Move.DY=goal->Y;
+	    unit->Frame=0;
+	    unit->State=0;
+	    unit->SubAction--;
+	}
+    }
+}
+
+/**
 **	Unit attacks!
 **
 **	I added a little trick, if SubAction&2 is true the goal is a weak goal.
@@ -104,95 +355,17 @@ global int AnimateActionAttack(Unit* unit)
 **
 **	@param unit	Unit, for that the attack is handled.
 */
-global int HandleActionAttack(Unit* unit)
+global void HandleActionAttack(Unit* unit)
 {
-    Unit* goal;
-    int wall;
-    int err;
-
     DebugLevel3(__FUNCTION__": Attack %Zd\n",UnitNumber(unit));
 
     switch( unit->SubAction ) {
 	//
-	//	Move near to target.
+	//	Move near to the target.
 	//
 	case 0:
 	case 2:
-	    // FIXME: RESET FIRST!!
-	    err=HandleActionMove(unit); 
-	    if( unit->Reset ) {
-		//
-		//	Target is dead, choose new one.
-		//
-		goal=unit->Command.Data.Move.Goal;
-		if( goal && (!goal->HP
-			|| goal->Command.Action==UnitActionDie) ) {
-		    unit->Command.Data.Move.Goal=goal=NoUnitP;
-		}
-
-		//
-		//	No goal: if meeting enemy attack it.
-		//
-		wall=0;
-		if( !goal
-			&& !(wall=WallOnMap(unit->Command.Data.Move.DX
-			     ,unit->Command.Data.Move.DY)) ) {
-		    goal=AttackUnitsInReactRange(unit);
-		    if( goal ) {
-			unit->Command.Data.Move.Goal=goal;
-			unit->Command.Data.Move.Fast=1;
-			unit->Command.Data.Move.DX=goal->X;
-			unit->Command.Data.Move.DY=goal->Y;
-			unit->SubAction|=2;
-			DebugLevel3("Unit in react range %Zd\n",UnitNumber(goal));
-		    }
-		} else 
-
-		//
-		//	Have a weak target, try a better target.
-		//
-		if( goal && (unit->SubAction&2) ) {
-		    Unit* temp;
-
-		    temp=AttackUnitsInReactRange(unit);
-		    if( temp && temp->Type->Priority>goal->Type->Priority ) {
-			unit->Command.Data.Move.Goal=goal=temp;
-			unit->Command.Data.Move.Fast=1;
-			unit->Command.Data.Move.DX=temp->X;
-			unit->Command.Data.Move.DY=temp->Y;
-		    }
-		}
-
-		//
-		//	Have reached target?
-		//
-		if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
-			<=unit->Stats->AttackRange ) {
-		    unit->State=0;
-		    if( !unit->Type->Tower ) {
-			UnitNewHeadingFromXY(unit
-			    ,goal->X-unit->X,goal->Y-unit->Y);
-		    }
-		    unit->SubAction++;
-		} else if( wall && MapDistance(unit->X,unit->Y
-			    ,unit->Command.Data.Move.DX
-			    ,unit->Command.Data.Move.DY)
-				<=unit->Stats->AttackRange ) {
-		    DebugLevel3("Attacking wall\n");
-		    unit->State=0;
-		    if( !unit->Type->Tower ) {
-			UnitNewHeadingFromXY(unit
-			    ,unit->Command.Data.Move.DX-unit->X
-			    ,unit->Command.Data.Move.DY-unit->Y);
-		    }
-		    unit->SubAction=1;
-		} else if( err ) {
-		    unit->SubAction=0;
-		    return 1;
-		}
-		DebugCheck( unit->Type->Vanishes );
-		unit->Command.Action=UnitActionAttack;
-	    }
+	    MoveToTarget(unit);
 	    break;
 
 	//
@@ -200,77 +373,9 @@ global int HandleActionAttack(Unit* unit)
 	//
 	case 1:
 	case 3:
-	    AnimateActionAttack(unit);
-	    if( unit->Reset ) {
-		goal=unit->Command.Data.Move.Goal;
-		//
-		//	Goal is "weak" or a wall.
-		//
-		if( !goal && WallOnMap(unit->Command.Data.Move.DX
-			     ,unit->Command.Data.Move.DY) ) {
-		    DebugLevel3("attack a wall!!!!\n");
-		    break;
-		}
-
-		//
-		//	Target is dead, choose new one.
-		//
-		if( !goal || !goal->HP
-			|| goal->Command.Action==UnitActionDie ) {
-		    unit->State=0;
-		    goal=AttackUnitsInReactRange(unit);
-		    unit->Command.Data.Move.Goal=goal;
-		    if( !goal ) {
-			unit->SubAction=0;
-			unit->Command.Action=UnitActionStill;	// cade?
-			return 1;
-		    }
-		    unit->SubAction|=2;
-		    DebugLevel3("Unit in react range %Zd\n",UnitNumber(goal));
-		    unit->Command.Data.Move.DX=goal->X;
-		    unit->Command.Data.Move.DY=goal->Y;
-		    if( !unit->Type->Tower ) {
-			UnitNewHeadingFromXY(unit
-			    ,goal->X-unit->X,goal->Y-unit->Y);
-		    }
-		} else
-
-		//
-		//	Have a weak target, try a better target.
-		//
-		if( goal && (unit->SubAction&2) ) {
-		    Unit* temp;
-
-		    temp=AttackUnitsInReactRange(unit);
-		    if( temp && temp->Type->Priority>goal->Type->Priority ) {
-			unit->Command.Data.Move.Goal=goal=temp;
-			unit->Command.Data.Move.DX=goal->X;
-			unit->Command.Data.Move.DY=goal->Y;
-			if( !unit->Type->Tower ) {
-			    UnitNewHeadingFromXY(unit
-				,goal->X-unit->X,goal->Y-unit->Y);
-			}
-		    }
-		}
-
-		//
-		//	Still near to target, if not goto target.
-		//
-		if( MapDistanceToUnit(unit->X,unit->Y,goal)
-			>unit->Stats->AttackRange ) {
-		    unit->Command.Data.Move.Fast=1;
-		    unit->Command.Data.Move.DX=goal->X;
-		    unit->Command.Data.Move.DY=goal->Y;
-		    unit->Frame=0;
-		    unit->State=0;
-		    unit->SubAction--;
-		    break;
-		}
-	    }
+	    AttackTarget(unit);
 	    break;
     }
-
-    return 0;
 }
 
 //@}
