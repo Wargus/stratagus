@@ -51,7 +51,7 @@
 
 #include "etlib/hash.h"
 
-local int AddUpgradeModifierBase(int,int,int,int,int,int,int,int,int*,
+local int AddUpgradeModifierBase(int,int,int,int,int,int,int,int,int,int*,
 	const char*,const char*,const char*,UnitType*);
 local int AddUpgradeModifier(int,int,int,int,int,int,int,int,int*,
 	const char*,const char*,const char*);
@@ -618,6 +618,10 @@ global void SaveUpgrades(CLFile* file)
 	    CLprintf(file,"\n  '(hit-points %d)"
 		    ,UpgradeModifiers[i]->Modifier.HitPoints );
 	}
+	if( UpgradeModifiers[i]->Modifier.RegenerationRate ) {
+	    CLprintf(file,"\n  '(regeneration-rate %d)"
+		    ,UpgradeModifiers[i]->Modifier.RegenerationRate );
+	}
 
 	for( j=0; j<MaxCosts; ++j ) {
 	    if( UpgradeModifiers[i]->Modifier.Costs[j] ) {
@@ -721,6 +725,7 @@ local SCM CclDefineModifier(SCM list)
     int piercing_damage;
     int armor;
     int speed;
+    int regeneration_rate;
     int hit_points;
     int costs[MaxCosts];
     char units[UnitTypeMax];
@@ -735,6 +740,7 @@ local SCM CclDefineModifier(SCM list)
     armor=0;
     speed=0;
     hit_points=0;
+    regeneration_rate=0;
     memset(costs,0,sizeof(costs));
     memset(units,'?',sizeof(units));
     memset(upgrades,'?',sizeof(upgrades));
@@ -770,6 +776,8 @@ local SCM CclDefineModifier(SCM list)
 	    speed=gh_scm2int(gh_cadr(value));
 	} else if( gh_eq_p(temp,gh_symbol2scm("hit-points")) ) {
 	    hit_points=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("regeneration-rate")) ) {
+	    regeneration_rate=gh_scm2int(gh_cadr(value));
 	} else if( gh_eq_p(temp,gh_symbol2scm("time-cost")) ) {
 	    costs[0]=gh_scm2int(gh_cadr(value));
 	} else if( gh_eq_p(temp,gh_symbol2scm("gold-cost")) ) {
@@ -815,7 +823,7 @@ local SCM CclDefineModifier(SCM list)
     }
 
     AddUpgradeModifierBase(uid,attack_range,sight_range,
-	    basic_damage,piercing_damage,armor,speed,hit_points,costs,
+	    basic_damage,piercing_damage,armor,speed,hit_points,regeneration_rate,costs,
 	    units,upgrades,apply_to,convert_to);
 
     return SCM_UNSPECIFIED;
@@ -1027,7 +1035,7 @@ global void UpgradesCclRegister(void)
 */
 local int AddUpgradeModifierBase(int uid,int attack_range,int sight_range,
     int basic_damage,int piercing_damage,int armor,int speed,
-    int hit_points,int* costs,const char* af_units,
+    int hit_points,int regeneration_rate, int* costs,const char* af_units,
     const char* af_upgrades,const char* apply_to,UnitType* convert_to)
 {
     int i;
@@ -1048,6 +1056,7 @@ local int AddUpgradeModifierBase(int uid,int attack_range,int sight_range,
     um->Modifier.Armor		= armor;
     um->Modifier.Speed		= speed;
     um->Modifier.HitPoints	= hit_points;
+    um->Modifier.RegenerationRate = regeneration_rate;
 
     for( i=0; i<MaxCosts; ++i ) {
 	um->Modifier.Costs[i]	= costs[i];
@@ -1424,6 +1433,7 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 	    UnitTypes[z]->Stats[pn].Armor += um->Modifier.Armor;
 	    UnitTypes[z]->Stats[pn].Speed += um->Modifier.Speed;
 	    UnitTypes[z]->Stats[pn].HitPoints += um->Modifier.HitPoints;
+	    UnitTypes[z]->Stats[pn].RegenerationRate += um->Modifier.RegenerationRate;
 
 	    // upgrade costs :)
 	    for (j = 0; j < MaxCosts; ++j) {

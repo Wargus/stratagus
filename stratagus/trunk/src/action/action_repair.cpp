@@ -106,7 +106,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	//  Check if enough resources are available
 	//
 	for (i = 1; i < MaxCosts; ++i) {
-	    if (player->Resources[i] < goal->Type->_RepairCosts[i]) {
+	    if (player->Resources[i] < goal->Type->RepairCosts[i]) {
 		snprintf(buf,100,"We need more %s for repair!",DefaultResourceNames[i]);
 		NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,buf);
 		if( player->Ai ) {
@@ -129,7 +129,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	//
 	//  Subtract the resources
 	//
-	PlayerSubCosts(player, goal->Type->_RepairCosts);
+	PlayerSubCosts(player, goal->Type->RepairCosts);
     }
 
     //

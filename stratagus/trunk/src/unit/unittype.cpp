@@ -720,7 +720,7 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 		} else {
 		    CLprintf(file," ");
 		}
-		CLprintf(file,"%s %d",DefaultResourceNames[i],type->_RepairCosts[i]);
+		CLprintf(file,"%s %d",DefaultResourceNames[i],type->RepairCosts[i]);
 	    }
 	}
     }
@@ -737,6 +737,7 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     }
     CLprintf(file,"  'speed %d\n",type->_Speed);
     CLprintf(file,"  'hit-points %d\n",type->_HitPoints);
+    CLprintf(file,"  'regeneration-rate %d\n",type->_RegenerationRate);
     if( all || type->_MaxMana ) {
 	CLprintf(file,"  'max-mana %d\n",type->_MaxMana);
     }
@@ -1085,6 +1086,7 @@ local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
     CLprintf(file,"'basic-damage %d ",stats->BasicDamage);
     CLprintf(file,"'piercing-damage %d ",stats->PiercingDamage);
     CLprintf(file,"'hit-points %d\n  ",stats->HitPoints);
+    CLprintf(file,"  'regeneration-rate %d\n",stats->RegenerationRate);
     CLprintf(file,"'costs '(");
     for( j=0; j<MaxCosts; ++j ) {
 	if( j ) {

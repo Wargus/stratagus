@@ -125,6 +125,7 @@ typedef struct _unit_stats_ {
     int		PiercingDamage;		/// weapon piercing damage
     int		Speed;			/// movement speed
     int		HitPoints;		/// hit points
+    int		RegenerationRate;	/// HP regeration rate in HP
     int		Costs[MaxCosts];	/// current costs of the unit
     int		Level;			/// unit level (upgrades)
 } UnitStats;
@@ -157,6 +158,7 @@ typedef struct _modifiers_ {
     int	Armor;				/// armor modifier
     int	Speed;				/// speed modifier (FIXME: not working)
     int	HitPoints;			/// hit points modifier
+    int RegenerationRate;		/// HP regeneration rate modifier
 
     int	Costs[MaxCosts];		/// costs modifier
 } Modifiers;

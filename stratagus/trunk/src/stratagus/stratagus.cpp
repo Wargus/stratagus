@@ -1040,8 +1040,7 @@ global void PreMenuSetup(void)
     LoadCursors(PlayerRaces.Name[0]);
     InitSettings();
 
-    InitUserInterface(PlayerRaces.Count>1 ? PlayerRaces.Name[1] :
-	PlayerRaces.Name[0]);
+    InitUserInterface(PlayerRaces.Name[0]);
     LoadUserInterface();
 }
 
