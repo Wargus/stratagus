@@ -1093,7 +1093,7 @@ global void DrawUnitType(const UnitType* type,int frame,int x,int y)
 */
 global void InitUnitTypes(void)
 {
-    unsigned type;
+    int type;
 
     for( type=0; UnitTypes[type].OType; ++type ) {
 	//
