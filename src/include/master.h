@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//      Stratagus - A free fantasy real time strategy game engine
 //
-/**@name master.h	-	The master server headerfile. */
+/**@name master.h - The master server headerfile. */
 //
-//	(c) Copyright 2003 by Tom Zickel and Jimmy Salmon
+//      (c) Copyright 2003-2004 by Tom Zickel and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __MASTER_H__
 #define __MASTER_H__
@@ -34,22 +34,22 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Defines
+--  Defines
 ----------------------------------------------------------------------------*/
 
 #define MASTER_HOST "mohydine.no-ip.com"
 #define MASTER_PORT 7775
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 extern int MetaServerInUse;
@@ -61,4 +61,4 @@ extern int SendMetaCommand(char* command, char* format, ...);
 extern int RecvMetaReply(char** reply);
 extern int GetMetaParameter(char* reply, int pos, char** value);
 
-#endif		// !__MASTER_H__
+#endif // !__MASTER_H__
