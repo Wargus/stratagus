@@ -896,8 +896,10 @@ global void CommandCancelTraining(Unit* unit,int slot)
     //
     n=unit->Command.Data.Train.Count;
     if( unit->Command.Action==UnitActionTrain && slot<n ) {
-
-	PlayerAddUnitType(unit->Player,unit->Command.Data.Train.What[slot]);
+	PlayerAddCostsFactor(unit->Player,
+		unit->Command.Data.Train.What[slot]
+			->Stats[unit->Player->Player].Costs,
+		CancelTrainingCostsFactor);
 
 	if ( --n ) {
 	    for( i = slot; i < n; i++ ) {
@@ -998,7 +1000,8 @@ global void CommandCancelUpgradeTo(Unit* unit)
     if( unit->Command.Action == UnitActionUpgradeTo ) {
 		    
 	PlayerAddCostsFactor(unit->Player,
-		unit->Command.Data.UpgradeTo.What->Stats->Costs,75);
+		unit->Command.Data.UpgradeTo.What->Stats->Costs,
+		CancelUpgradeCostsFactor);
 
 	unit->Command.Action=UnitActionStill;
 
@@ -1087,8 +1090,9 @@ global void CommandCancelResearch(Unit* unit)
     //	Check if unit is still researching? (NETWORK!)
     //
     if( unit->Command.Action == UnitActionResearch ) {
-	PlayerAddCostsFactor(unit->Player
-		,unit->Command.Data.Research.What->Costs,75);
+	PlayerAddCostsFactor(unit->Player,
+		unit->Command.Data.UpgradeTo.What->Stats->Costs,
+		CancelResearchCostsFactor);
 
 	unit->Command.Action=UnitActionStill;
 
