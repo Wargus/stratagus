@@ -600,6 +600,8 @@ global void FireMissile(Unit* unit)
 
     if( goal && RevealAttacker ) {	// attacking units are seen
 #ifdef NEW_FOW
+	// FIXME: Need a way to temporarily mark this tile, place a TTL
+	// FIXME: Unit is the best solution, but need other fixes first.
 	MapMarkSight(goal->Player,unit->X,unit->Y,1);
 #else
 	if( goal->Player==ThisPlayer || IsSharedVision(ThisPlayer,goal) ) {
