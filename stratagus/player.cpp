@@ -73,10 +73,9 @@ local int PlayerColors[PlayerMax] = {
 /**
 **	Create a new player.
 **
-**	@param name	Player name.
 **	@param type	Player type (Computer,Human,...).
 */
-global void CreatePlayer(char* name,int type)
+global void CreatePlayer(int type)
 {
     int team;
     int i;
@@ -110,7 +109,6 @@ global void CreatePlayer(char* name,int type)
 	} else if( !NetPlayers && !NetworkArg ) {
 	    // FIXME: only for single players
 	    type=PlayerComputer;
-	    name="Computer";
 	}
     }
 #else
@@ -156,7 +154,7 @@ global void CreatePlayer(char* name,int type)
 	return;
     }
 
-    player->Name=name;
+    player->Name="Computer";
     player->Type=type;
     player->Race=PlayerRaceHuman;
     player->RaceName="human";
@@ -275,6 +273,17 @@ global void PlayerSetSide(Player* player,int side)
 	    player->RaceName="oops";
 	    break;
     }
+}
+
+/**
+**	Change player name.
+**
+**	@param player	Pointer to player.
+**	@param name	New name.
+*/
+global void PlayerSetName(Player* player,char *name)
+{
+    player->Name=name;
 }
 
 /**

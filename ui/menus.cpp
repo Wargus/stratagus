@@ -1045,6 +1045,7 @@ local void MultiPlayerGameMenu(void)
     }
 
     NameBuf[EnterNameMenuItems[1].d.input.nch] = 0;	// Now finally here is the name
+    memset(NetworkName, 0, 16);
     strcpy(NetworkName, NameBuf);
     // Here we really go...
     ProcessMenu(MENU_NET_CREATE_JOIN, 1);

@@ -850,7 +850,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			    }
 			}
 		    }
-		    CreatePlayer("Computer",p);
+		    CreatePlayer(p);
 		}
 		continue;
 	    } else {
