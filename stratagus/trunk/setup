@@ -28,7 +28,8 @@
 ##-----------------------------------------------------------------------------
 ##	HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
+EXTRA_CFLAGS="$CFLAGS -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
+EXTRA_LDFLAGS="$LDFLAGS"
 
 ## These could be used for experimental versions
 ## ---------------------------------------------
@@ -691,7 +692,9 @@ case $ANSWER in
 	if test "$HAVESDL" = "1" ; then
 	echo "  S - SDL driver (known to have problems with some drives)"
 	fi
+	if test "$UNIX" = "1" ; then
 	echo "  C - CDDA driver"
+	fi
 	echo "  N - None"
 	echo
 	echo -n "Please enter selection: (n) "
@@ -756,22 +759,21 @@ fi
 # Display menu
 
 echo "COMPRESSION OPTIONS"
-echo
-echo "  N-None"$DEF1
+echo "  N - None"$DEF1
 if test "$HAVE_LIBZ" = 1 ; then
-  echo "  G-GZ"$DEF2
+  echo "  G - GZ"$DEF2
 fi
 if test "$HAVE_LIBZ" = 2 ; then
-  echo "  G-GZ"$DEF2 " (local: $LOCAL_ZLIB)"
+  echo "  G - GZ"$DEF2 " (local: $LOCAL_ZLIB)"
 fi
 if test "$HAVE_LIBBZ2" = 1 ; then
-  echo "  B-Bzip2"$DEF3
+  echo "  B - Bzip2"$DEF3
 fi
 if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1) ; then
-  echo "  O-Both GZ and Bzip2"$DEF4
+  echo "  O - Both GZ and Bzip2"$DEF4
 fi
 if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1 && test "$HAVE_LIBZZIP" = 1 ) ; then
-  echo "  A-All ZZip and GZ and Bzip2"$DEF5
+  echo "  A- All ZZip and GZ and Bzip2"$DEF5
 fi
 echo
 echo -n "Please enter selection ($COMPDEF): "
@@ -1050,7 +1052,8 @@ if [ "$BEOS" != 1 ] ; then
     # Libraries needed to build freecraft
     echo "CLONELIBS=$CLONELIBS \$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
     echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS) \\" >> $RULESFILE
-    echo "	\$(ARTSCLIB) \$(FLACLIB) \$(OGGLIB) \$(MP3LIB) -lz -lm" >> $RULESFILE
+    echo "	\$(ARTSCLIB) \$(FLACLIB) \$(OGGLIB) \$(MP3LIB) \\" >> $RULESFILE
+    echo "	$EXTRA_LDFLAGS -lz -lm" >> $RULESFILE
   else
     # Libraries needed to build tools
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
