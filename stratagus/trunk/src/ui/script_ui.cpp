@@ -926,39 +926,35 @@ local SCM CclDefineUI(SCM list)
     ui->ButtonPanelY=y;
 
     // The map
-    temp=gh_car(list);
+    value=gh_car(list);
     list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("map-area")) ) {
+	int w;
+	int h;
 
-    if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
-    }
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->MapArea.X=x;
-    ui->MapArea.Y=y;
-    if ( ui->MapArea.X < 0 || ui->MapArea.Y < 0 ) {
-	fprintf(stderr,"map top-left point expected\n");
-	return SCM_UNSPECIFIED;
-    }
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    //StephanR: note that the bottom-right point is one pixel off
-    ui->MapArea.EndX = x-1;
-    ui->MapArea.EndY = y-1;
-    if ( x < 1 || y < 1 || ui->MapArea.EndX < ui->MapArea.X ||
-				ui->MapArea.EndY < ui->MapArea.Y ) {
-	fprintf(stderr,"map bottom-right point expected\n");
-	return SCM_UNSPECIFIED;
+	w=0;
+	h=0;
+	sublist=gh_car(list);
+	list=gh_cdr(list);
+	while( !gh_null_p(sublist) ) {
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->MapArea.X=gh_scm2int(gh_car(value));
+		ui->MapArea.Y=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		w=gh_scm2int(gh_car(value));
+		h=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else {
+		errl("Unsupported tag",value);
+	    }
+	}
+	ui->MapArea.EndX=ui->MapArea.X+w-1;
+	ui->MapArea.EndY=ui->MapArea.Y+h-1;
     }
 
     //	MenuButton
