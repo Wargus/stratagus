@@ -1035,6 +1035,9 @@ global void InitCursors(void)
 	    abort();
     }
     OldCursorRectangle=malloc((2*VideoWidth+2*(VideoHeight-2))*memsize);
+
+    CursorX=VideoWidth/2;
+    CursorY=VideoHeight/2;
 }
 
 /**
