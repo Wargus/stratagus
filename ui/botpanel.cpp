@@ -517,7 +517,7 @@ global void DrawButtonPanel(void)
 		    case ButtonTrain:
 		    case ButtonUpgradeTo:
 			// FIXME: store pointer in button table!
-			stats=&UnitTypes[v].Stats[ThisPlayer->Player];
+			stats=&UnitTypes[v]->Stats[ThisPlayer->Player];
 			DebugLevel3("Upgrade to %s %d %d %d %d %d\n"
 				_C_ UnitTypes[v].Ident
 				_C_ UnitTypes[v].Demand
@@ -526,7 +526,7 @@ global void DrawButtonPanel(void)
 				_C_ stats->Costs[GoldCost]
 				_C_ stats->Costs[WoodCost]);
 
-			SetCosts(0,UnitTypes[v].Demand,stats->Costs);
+			SetCosts(0,UnitTypes[v]->Demand,stats->Costs);
 
 			break;
 		    //case ButtonUpgrade:
@@ -1000,7 +1000,7 @@ global void DoButtonButtonClicked(int button)
 
 	case ButtonBuild:
 	    // FIXME: store pointer in button table!
-	    type=&UnitTypes[CurrentButtons[button].Value];
+	    type=UnitTypes[CurrentButtons[button].Value];
 	    if( !PlayerCheckUnitType(ThisPlayer,type) ) {
 		SetStatusLine("Select Location");
 		ClearCosts();
@@ -1014,7 +1014,7 @@ global void DoButtonButtonClicked(int button)
 
 	case ButtonTrain:
 	    // FIXME: store pointer in button table!
-	    type=&UnitTypes[CurrentButtons[button].Value];
+	    type=UnitTypes[CurrentButtons[button].Value];
 	    // FIXME: Johns: I want to place commands in queue, even if not
 	    // FIXME:	enough resources are available.
 	    // FIXME: training queue full check is not correct for network.
@@ -1036,7 +1036,7 @@ global void DoButtonButtonClicked(int button)
 
 	case ButtonUpgradeTo:
 	    // FIXME: store pointer in button table!
-	    type=&UnitTypes[CurrentButtons[button].Value];
+	    type=UnitTypes[CurrentButtons[button].Value];
 	    if( !PlayerCheckUnitType(ThisPlayer,type) ) {
 		DebugLevel3("Upgrade to %s %d %d\n"
 			_C_ type->Ident

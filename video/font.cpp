@@ -365,7 +365,8 @@ local void VideoDrawCharOpenGL(const Graphic* sprite,
     glDisable(GL_TEXTURE_2D);
 
     for( i=0; i<NumFontColors; ++i ) {
-	c=FontPixels[i];
+	//c=FontPixels[i];
+	memcpy(&c,FontPixels+i,sizeof(Palette));
 	glColor3ub(c.r,c.g,c.b);
 	glRasterPos2i(x,VideoHeight-y-h);
 	glBitmap(FontBitmapWidths[CurrentFont]*8,h,

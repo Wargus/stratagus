@@ -77,6 +77,7 @@ local SCM CclDefineUnitType(SCM list)
     SCM value;
     SCM sublist;
     UnitType* type;
+    UnitType* auxtype;
     char* str;
     int i;
     int redefine;
@@ -90,10 +91,11 @@ local SCM CclDefineUnitType(SCM list)
     type=UnitTypeByIdent(str);
     IfDebug( NoWarningUnitType=i; );
     if( type ) {
-	DebugLevel0Fn("Redefining unit-type `%s'\n" _C_ str);
+	DebugLevel3Fn("Redefining unit-type `%s'\n" _C_ str);
 	free(str);
 	redefine = 1;
     } else {
+	DebugLevel3Fn("Defining unit-type `%s'\n" _C_ str);
 	type=NewUnitTypeSlot(str);
 	redefine = 0;
     }
@@ -243,6 +245,16 @@ local SCM CclDefineUnitType(SCM list)
 	    list=gh_cdr(list);
 	    type->TileWidth=gh_scm2int(gh_car(sublist));
 	    type->TileHeight=gh_scm2int(gh_cadr(sublist));
+	} else if( gh_eq_p(value,gh_symbol2scm("must-build-on-top")) ){
+	    str=gh_scm2newstr(gh_car(list),NULL);
+	    auxtype=UnitTypeByIdent(str);
+	    if (!auxtype) {
+		DebugLevel0("Build on top of undefined unit \"%s\".\n" _C_ str);
+		exit(0);
+	    }
+	    type->MustBuildOnTop=auxtype;
+	    free(str);
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("box-size")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
@@ -373,7 +385,7 @@ local SCM CclDefineUnitType(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("tanker")) ) {
 	    type->Tanker=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("gives-oil")) ) {
-	    type->GivesOil=1;
+	    type->GivesResource=OilCost;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-store")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
@@ -391,9 +403,9 @@ local SCM CclDefineUnitType(SCM list)
 		}
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("oil-patch")) ) {
-	    type->OilPatch=1;
+	    type->GivesResource=OilCost;
 	} else if( gh_eq_p(value,gh_symbol2scm("gives-gold")) ) {
-	    type->GoldMine=1;
+	    type->GivesResource=GoldCost;
 	} else if( gh_eq_p(value,gh_symbol2scm("vanishes")) ) {
 	    type->Vanishes=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("tower")) ) {
@@ -501,10 +513,14 @@ local SCM CclDefineUnitStats(SCM list)
     char* str;
 
     type=UnitTypeByIdent(str=gh_scm2newstr(gh_car(list),NULL));
+    DebugCheck(!type);
+    
     free(str);
     list=gh_cdr(list);
     i=gh_scm2int(gh_car(list));
+    DebugCheck(i>=PlayerMax);
     list=gh_cdr(list);
+
     stats=&type->Stats[i];
 
     //

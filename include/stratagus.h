@@ -338,7 +338,7 @@ extern char NameLine[];
 
 #define TilesetMax	8		/// How many tilesets are supported
 #define PlayerMax	16		/// How many players are supported
-#define UnitTypeMax	0xFF		/// How many unit types supported
+#define UnitTypeMax	257		/// How many unit types supported
 #define UpgradeMax	256		/// How many upgrades supported
 #define UnitMax		2048		/// How many units supported
 
@@ -531,9 +531,9 @@ extern long isqrt(long num);
     // FIXME: more config stuff which needs a better place
 
     /// How long stay in a gold-mine
-#define MINE_FOR_GOLD	(UnitTypeGoldMine->_Costs[TimeCost]/SpeedResourcesHarvest[GoldCost])
+#define MINE_FOR_GOLD	(150/SpeedResourcesHarvest[GoldCost])
     /// How long stay in a gold-deposit
-#define WAIT_FOR_GOLD	(UnitTypeGoldMine->_Costs[TimeCost]/SpeedResourcesReturn[GoldCost])
+#define WAIT_FOR_GOLD	(150/SpeedResourcesReturn[GoldCost])
     /// How much I must chop for 1 wood
 #define CHOP_FOR_WOOD	(52/SpeedResourcesHarvest[WoodCost])
     /// How long stay in a wood-deposit
@@ -552,10 +552,8 @@ extern long isqrt(long num);
     /// How many resource get the player back if canceling upgrade
 #define CancelUpgradeCostsFactor	100
 
-    /// How near could a hall or gold-depot be build to a goldmine
-#define GOLDMINE_DISTANCE	3
-    /// How near could a oil-depot be build to a oil-patch
-#define OILPATCH_DISTANCE	3
+    /// How near could a depot be build to a resource
+#define RESOURCE_DISTANCE	3
 
     /// How near we could repair an unit
 #define REPAIR_RANGE		1

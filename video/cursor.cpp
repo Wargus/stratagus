@@ -737,11 +737,11 @@ local void DrawBuildingCursor(void)
 	while( w-- ) {
 	    int basex, basey;
 	    // FIXME: The field is covered by fog of war!
-	    if( f && CanBuildOn(mx+w,my+h,mask &
-		    ((Selected[0]
-			    && Selected[0]->X==mx+w && Selected[0]->Y==my+h)
-			? ~(MapFieldLandUnit|MapFieldSeaUnit) : -1))
-		  && IsMapFieldExplored(ThisPlayer,mx+w,my+h) ) {
+	    if( f && ( CursorBuilding->MustBuildOnTop || 
+		    CanBuildOn(mx+w,my+h,mask & ((Selected[0] && 
+			Selected[0]->X==mx+w && Selected[0]->Y==my+h)
+			? ~(MapFieldLandUnit|MapFieldSeaUnit) : -1)))
+		  && IsMapFieldExplored(ThisPlayer,mx+w,my+h) )  {
 		color=ColorGreen;
 	    } else {
 		color=ColorRed;

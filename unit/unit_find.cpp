@@ -498,7 +498,30 @@ global Unit* GoldMineOnMap(int tx,int ty)
 	if( UnitUnusable(table[i]) ) {
 	    continue;
 	}
-	if( table[i]->Type->GoldMine ) {
+	if( table[i]->Type->GivesResource==GoldCost ) {
+	    return table[i];
+	}
+    }
+    return NoUnitP;
+}
+
+/**
+** 	Find a unit on a map tile with a specific type
+**
+**	@param tx	X position on map, tile-based.
+**	@param ty	Y position on map, tile-based.
+**
+**	@return		Returns the unit if found, or NoUnitP.
+*/
+global Unit* UnitTypeOnMap(int tx,int ty,UnitType* type)
+{
+    Unit* table[UnitMax];
+    int i;
+    int n;
+    
+    n=SelectUnitsOnTile(tx,ty,table);
+    for( i=0; i<n; ++i ) {
+	if( table[i]->Type==type ) {
 	    return table[i];
 	}
     }
@@ -521,7 +544,7 @@ global Unit* OilPatchOnMap(int tx,int ty)
 
     n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
-	if( table[i]->Type->OilPatch ) {
+	if( table[i]->Type->GivesResource==OilCost ) {
 	    return table[i];
 	}
     }
@@ -547,7 +570,7 @@ global Unit* PlatformOnMap(int tx,int ty)
 	if( UnitUnusable(table[i]) ) {
 	    continue;
 	}
-	if( table[i]->Type->GivesOil ) {
+	if( table[i]->Type->GivesResource==OilCost ) {
 	    return table[i];
 	}
     }

@@ -677,8 +677,8 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	if( type->Building && !UnitVisibleOnMap(unit) ) {
 	    continue;
 	}
-	if( type->Critter || type->GoldMine
-	      || (type->OilPatch && !unit->Removed) ) {	 // no oil platform!
+	if( type->Critter || 
+		(type->GivesResource && !unit->Removed) ) { // no built resources.
 	    SelectSingleUnit(unit);
 	    return 1;
 	}

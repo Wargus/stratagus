@@ -226,6 +226,19 @@ global void HandleActionBuild(Unit* unit)
     build->CurrentSightRange=build->Type->TileWidth < build->Type->TileHeight
 				? build->Type->TileHeight : build->Type->TileWidth;
 
+    //	Building on top of something, must remove what is beneath it
+    if( type->MustBuildOnTop ) {
+	Unit* temp;
+	if( (temp=UnitTypeOnMap(x,y,type->MustBuildOnTop)) ) {
+	    build->Value=temp->Value;
+	    RemoveUnit(temp,NULL);	// Destroy building beneath
+	    UnitLost(temp);
+	    UnitClearOrders(temp);
+	    ReleaseUnit(temp);
+	} else {
+	    DebugCheck(1);
+	}
+    }
 
 /* Done by PlaceUnit now
 #ifdef HIERARCHIC_PATHFINDER
@@ -362,7 +375,7 @@ global void HandleActionBuilded(Unit* unit)
 	//
 	//	Building oil-platform, must update oil.
 	//
-	if( type->GivesOil ) {
+	if( type->GivesResource==OilCost ) {
 	    CommandHaulOil(worker,unit,0);	// Let the unit haul oil
 	    DebugLevel0Fn("Update oil-platform\n");
 	    DebugLevel0Fn(" =%d\n" _C_ unit->Data.Resource.Active);

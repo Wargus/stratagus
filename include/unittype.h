@@ -496,8 +496,6 @@ typedef struct _unit_type_ UnitType;
 
     /// Base structure of unit-type
 struct _unit_type_ {
-    const void*	OType;			/// Object type (future extensions)
-
     char*	Ident;			/// Identifier
     char*	Name;			/// Pretty name shown from the engine
     char*	SameSprite;		/// Unit-type shared sprites
@@ -582,8 +580,6 @@ struct _unit_type_ {
     unsigned Tanker : 1;		/// FIXME: used? Can transport oil
     unsigned Transporter : 1;		/// Can transport units
     unsigned MaxOnBoard;		/// Number of Transporter slots.
-    unsigned GivesOil : 1;		/// We get here oil
-    unsigned CanStore[MaxCosts];		/// Resources that we can store here.
     unsigned Vanishes : 1;		/// Corpes & destroyed places
     unsigned GroundAttack : 1;		/// Can do command ground attack
     unsigned IsUndead : 1;		/// Unit is already dead
@@ -591,12 +587,14 @@ struct _unit_type_ {
     unsigned CanCastSpell : 1;		/// Unit is able to use spells
     unsigned CanAttack : 1;		/// Unit can attack
     unsigned Tower : 1;			/// Unit can attack, but not move
-    unsigned OilPatch : 1;		/// Platform can be build here
-    unsigned GoldMine : 1;		/// Gold can be collected here
     unsigned Hero : 1;			/// Is hero only used for triggers 
     unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit
     unsigned CowerMage : 1;		/// FIXME: docu
     unsigned Organic : 1;		/// Organic can be healed
+    
+    unsigned CanStore[MaxCosts];	/// Resources that we can store here.
+    unsigned GivesResource;		/// The resource this unit gives.
+    UnitType* MustBuildOnTop;		/// Must be built on top of something
 
     unsigned SelectableByRectangle : 1;	/// Selectable with mouse rectangle
     unsigned Teleporter : 1;		/// Can teleport other units.
@@ -632,33 +630,30 @@ struct _unit_type_ {
 
     // FIXME: ARI: should be dynamic (ccl..), JOHNS: Pud only supports 255.
     /// How many unit-types are currently supported
-#define UnitTypeMax	0xFF
+#define UnitTypeMax	257
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern const char UnitTypeType[];	/// Unit-type type
-extern UnitType* UnitTypes;		/// All unit-types
-extern int NumUnitTypes;		/// Number of unit-types made
+extern UnitType* UnitTypes[UnitTypeMax];	/// All unit-types
+extern int NumUnitTypes;			/// Number of unit-types made
 
 // FIXME: this hardcoded unit-types must be removed!!
-extern UnitType*UnitTypeOilPatch;	/// Oil patch unit-type pointer
-extern UnitType*UnitTypeGoldMine;	/// Gold-mine unit-type pointer
-extern UnitType*UnitTypeHumanTanker;	/// Orc tanker unit-type pointer
-extern UnitType*UnitTypeOrcTanker;	/// Human tanker unit-type pointer
-extern UnitType*UnitTypeHumanTankerFull;/// Orc tanker full unit-type pointer
-extern UnitType*UnitTypeOrcTankerFull;	/// Human tanker full unit-type pointer
-extern UnitType*UnitTypeHumanWorker;	/// Human worker
-extern UnitType*UnitTypeOrcWorker;	/// Orc worker
+extern UnitType*UnitTypeHumanTanker;		/// Orc tanker unit-type pointer
+extern UnitType*UnitTypeOrcTanker;		/// Human tanker unit-type pointer
+extern UnitType*UnitTypeHumanTankerFull;	/// Orc tanker full unit-type pointer
+extern UnitType*UnitTypeOrcTankerFull;		/// Human tanker full unit-type pointer
+extern UnitType*UnitTypeHumanWorker;		/// Human worker
+extern UnitType*UnitTypeOrcWorker;		/// Orc worker
 extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
 extern UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold
 extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
 extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
-extern UnitType*UnitTypeHumanWall;	/// Human wall
-extern UnitType*UnitTypeOrcWall;	/// Orc wall
-extern UnitType*UnitTypeCritter;	/// Critter unit-type pointer
-extern UnitType*UnitTypeBerserker;	/// Berserker for berserker regeneration
+extern UnitType*UnitTypeHumanWall;		/// Human wall
+extern UnitType*UnitTypeOrcWall;		/// Orc wall
+extern UnitType*UnitTypeCritter;		/// Critter unit-type pointer
+extern UnitType*UnitTypeBerserker;		/// Berserker for berserker regeneration
 
 extern char** UnitTypeWcNames;		/// Mapping wc-number 2 symbol
 

@@ -65,33 +65,31 @@
 global const char UnitTypeType[] = "unit-type";
 
 IfDebug(
-global int NoWarningUnitType;		/// quiet ident lookup
+global int NoWarningUnitType;			/// quiet ident lookup
 );
 
-global UnitType* UnitTypes;		/// unit-types definition
-global int NumUnitTypes;		/// number of unit-types made
+global UnitType* UnitTypes[UnitTypeMax];	/// unit-types definition
+global int NumUnitTypes;			/// number of unit-types made
 
 /*
 **	Next unit type are used hardcoded in the source.
 **
 **	FIXME: find a way to make it configurable!
 */
-global UnitType*UnitTypeOilPatch;	/// Oil patch for oil patch removement
-global UnitType*UnitTypeGoldMine;	/// Gold mine unit type pointer
-global UnitType*UnitTypeOrcTanker;	/// Orc tanker unit type pointer
-global UnitType*UnitTypeHumanTanker;	/// Human tanker unit type pointer
-global UnitType*UnitTypeOrcTankerFull;	/// Orc tanker full unit type pointer
-global UnitType*UnitTypeHumanTankerFull;/// Human tanker full unit type pointer
-global UnitType*UnitTypeHumanWorker;	/// Human worker
-global UnitType*UnitTypeOrcWorker;	/// Orc worker
+global UnitType*UnitTypeOrcTanker;		/// Orc tanker unit type pointer
+global UnitType*UnitTypeHumanTanker;		/// Human tanker unit type pointer
+global UnitType*UnitTypeOrcTankerFull;		/// Orc tanker full unit type pointer
+global UnitType*UnitTypeHumanTankerFull;	/// Human tanker full unit type pointer
+global UnitType*UnitTypeHumanWorker;		/// Human worker
+global UnitType*UnitTypeOrcWorker;		/// Orc worker
 global UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
 global UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold
 global UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
 global UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
-global UnitType*UnitTypeHumanWall;	/// Human wall
-global UnitType*UnitTypeOrcWall;	/// Orc wall
-global UnitType*UnitTypeCritter;	/// Critter unit type pointer
-global UnitType*UnitTypeBerserker;	/// Berserker for berserker regeneration
+global UnitType*UnitTypeHumanWall;		/// Human wall
+global UnitType*UnitTypeOrcWall;		/// Orc wall
+global UnitType*UnitTypeCritter;		/// Critter unit type pointer
+global UnitType*UnitTypeBerserker;		/// Berserker for berserker regeneration
 
 /**
 **	Mapping of W*rCr*ft number to our internal unit-type symbol.
@@ -104,14 +102,14 @@ global char** UnitTypeWcNames;
 /**
 **	Lookup table for unit-type names
 */
-local UnitType* UnitTypeHash[61];
+local UnitType* UnitTypeHash[UnitTypeMax];
 
 #else
 
 /**
 **	Lookup table for unit-type names
 */
-local hashtable(UnitType*,61) UnitTypeHash;
+local hashtable(UnitType*,UnitTypeMax) UnitTypeHash;
 
 #endif
 
@@ -164,11 +162,13 @@ global void UpdateStats(int reset)
     UnitStats* stats;
     unsigned player;
     unsigned i;
+    unsigned j;
 
     //
     //  Update players stats
     //
-    for (type = UnitTypes; type->OType; ++type) {
+    for (j = 0; j<NumUnitTypes; ++j) {
+	type = UnitTypes[j];
         if (reset){
 	    // LUDO : FIXME : reset loading of player stats !
 	    for (player = 0; player < PlayerMax; ++player) {
@@ -247,8 +247,6 @@ global void UpdateStats(int reset)
 	    //
 	    if( type->_HitPoints ) {
 		type->FieldFlags = MapFieldBuilding;
-	    } else if( type->OilPatch ) {
-		type->FieldFlags = 0;
 	    } else {
 		type->FieldFlags = MapFieldNoBuilding;
 	    }
@@ -461,7 +459,6 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->CowerWorker=BIT(8,v);
 	unittype->Tanker=BIT(9,v);
 	unittype->Transporter=BIT(10,v);
-	unittype->GivesOil=BIT(11,v);
 	unittype->CanStore[GoldCost]=BIT(12,v);
 	unittype->Vanishes=BIT(13,v);
 	unittype->GroundAttack=BIT(14,v);
@@ -471,13 +468,18 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->CanStore[WoodCost]=BIT(18,v);
 	unittype->CanAttack=BIT(19,v);
 	unittype->Tower=BIT(20,v);
-	unittype->OilPatch=BIT(21,v);
-	unittype->GoldMine=BIT(22,v);
 	unittype->Hero=BIT(23,v);
 	unittype->CanStore[OilCost]=BIT(24,v);
 	unittype->Volatile=BIT(25,v);
 	unittype->CowerMage=BIT(26,v);
 	unittype->Organic=BIT(27,v);
+	
+	if (BIT(11,v)||BIT(21,v)) {
+	    unittype->GivesResource=OilCost;
+	}
+	if (BIT(22,v)) {
+	    unittype->GivesResource=GoldCost;
+	}
 
 #ifdef DEBUG
 	if( BIT(28,v) )	DebugLevel0("Unused bit 28 used in %d\n" _C_ i);
@@ -592,9 +594,9 @@ local void SaveAnimation(const char* name,const Animation* anim,FILE* file)
 */
 local void SaveAnimations(const UnitType* type,FILE* file)
 {
-    const UnitType* temp;
     const Animations* anims;
     int i;
+    int q;
 
     if( !(anims=type->Animations) ) {
 	return;
@@ -603,8 +605,8 @@ local void SaveAnimations(const UnitType* type,FILE* file)
     //
     //	Look if this is the first use of it.
     //
-    for( temp=UnitTypes; temp->OType && temp!=type ; ++temp ) {
-	if( temp->Animations==anims ) {
+    for( i=0; i<NumUnitTypes && UnitTypes[i]!=type ; ++i ) {
+	if( UnitTypes[i]->Animations==anims ) {
 	    return;			// allready handled.
 	}
     }
@@ -613,14 +615,14 @@ local void SaveAnimations(const UnitType* type,FILE* file)
     //
     //	Print all units that use this animation.
     //
-    i=0;
-    for( temp=UnitTypes; temp->OType; ++temp ) {
-	if( temp->Animations==anims ) {
-	    if( i ) {
+    q=0;
+    for( i=0 ; i<NumUnitTypes ; ++i ) {
+	if( UnitTypes[i]->Animations==anims ) {
+	    if( q ) {
 		fprintf(file,", ");
 	    }
-	    fprintf(file,"%s",temp->Name);
-	    i=1;
+	    fprintf(file,"%s",UnitTypes[i]->Name);
+	    q=1;
 	}
     }
     fprintf(file,"\n(define-animations 'animations-%s",type->Ident+5);
@@ -646,7 +648,6 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
 {
     int i;
     int flag;
-    const UnitType* temp;
 
     fprintf(file,"(define-unit-type '%s",type->Ident);
     fprintf(file," 'name \"%s\"\n  ",type->Name);
@@ -675,13 +676,13 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     //
     //	Animations are shared, find first use of the unit-type animation.
     //
-    for( temp=UnitTypes; temp->OType && temp!=type ; ++temp ) {
-	if( temp->Animations==type->Animations ) {
+    for( i=0; i<NumUnitTypes && UnitTypes[i]!=type ; ++i ) {
+	if( UnitTypes[i]->Animations==type->Animations ) {
 	    break;
 	}
     }
-    fprintf(file,"  'animations 'animations-%s",temp->Ident+5);
-    fprintf(file," 'icon '%s\n",IdentOfIcon(type->Icon.Icon));
+    fprintf(file,"  'animations 'animations-%s",UnitTypes[i]->Ident+5);
+    fprintf(file,"  'icon '%s\n",IdentOfIcon(type->Icon.Icon));
     for( i=flag=0; i<MaxCosts; ++i ) {
 	if( all || type->_Costs[i] ) {
 	    if( !flag ) {
@@ -709,13 +710,13 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
 	fprintf(file,"  'magic %d\n",type->Magic);
     }
     fprintf(file,"  'tile-size '(%d %d)",type->TileWidth,type->TileHeight);
-    fprintf(file," 'box-size '(%d %d)\n",type->BoxWidth,type->BoxHeight);
+    fprintf(file,"  'box-size '(%d %d)\n",type->BoxWidth,type->BoxHeight);
     fprintf(file,"  'sight-range %d",type->_SightRange);
     if( all || type->ReactRangeComputer ) {
-	fprintf(file," 'computer-reaction-range %d",type->ReactRangeComputer);
+	fprintf(file,"  'computer-reaction-range %d",type->ReactRangeComputer);
     }
     if( all || type->ReactRangePerson ) {
-	fprintf(file," 'person-reaction-range %d",type->ReactRangePerson);
+	fprintf(file,"  'person-reaction-range %d",type->ReactRangePerson);
     }
     fputs("\n",file);
 
@@ -724,13 +725,13 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     } else {
 	fputs(" ",file);
     }
-    fprintf(file," 'basic-damage %d",type->_BasicDamage);
-    fprintf(file," 'piercing-damage %d",type->_PiercingDamage);
-    fprintf(file," 'missile '%s\n",type->Missile.Name);
-    fprintf(file," 'draw-level %d",type->DrawLevel);
+    fprintf(file,"  'basic-damage %d",type->_BasicDamage);
+    fprintf(file,"  'piercing-damage %d",type->_PiercingDamage);
+    fprintf(file,"  'missile '%s\n",type->Missile.Name);
+    fprintf(file,"  'draw-level %d",type->DrawLevel);
     if( all || type->MinAttackRange ) {
 	fprintf(file,"  'min-attack-range %d",type->MinAttackRange);
-	fprintf(file," 'max-attack-range %d\n",type->_AttackRange);
+	fprintf(file,"  'max-attack-range %d\n",type->_AttackRange);
     } else if( type->_AttackRange ) {
 	fprintf(file,"  'max-attack-range %d\n",type->_AttackRange);
     }
@@ -746,7 +747,7 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     }
     fprintf(file,"  'priority %d",type->Priority);
     if( all || type->AnnoyComputerFactor ) {
-	fprintf(file," 'annoy-computer-factor %d",type->AnnoyComputerFactor);
+	fprintf(file,"  'annoy-computer-factor %d",type->AnnoyComputerFactor);
     }
     fputs("\n",file);
     if( all || type->DecayRate ) {
@@ -876,10 +877,9 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     if( type->Tanker ) {
 	fprintf(file,"  'tanker\n");
     }
-    if( type->GivesOil ) {
+    if( type->GivesResource==OilCost ) {
 	fprintf(file,"  'gives-oil\n");
     }
-
     // Save store info.
     for (flag=i=0;i<MaxCosts;i++)
 	if (type->CanStore[i]) {
@@ -892,12 +892,11 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
 	}
     if (flag)
 	fprintf(file,")");
-    
-    if( type->OilPatch ) {
-	fprintf(file,"  'oil-patch\n");
-    }
-    if( type->GoldMine ) {
+    if( type->GivesResource==GoldCost ) {
 	fprintf(file,"  'gives-gold\n");
+    }
+    if( type->MustBuildOnTop ) {
+	fprintf(file," 'must-build-on-top '%s\n",type->MustBuildOnTop->Ident);
     }
 
     if( type->Vanishes ) {
@@ -967,6 +966,7 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
 local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
 	FILE* file)
 {
+    DebugCheck(plynr>=PlayerMax);
     int j;
 
     fprintf(file,"(define-unit-stats '%s %d\n  ",ident,plynr);
@@ -1000,9 +1000,9 @@ local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
 */
 global void SaveUnitTypes(FILE* file)
 {
-    const UnitType* type;
     char* const* sp;
     int i;
+    int j;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: unittypes $Id$\n\n");
@@ -1020,23 +1020,23 @@ global void SaveUnitTypes(FILE* file)
 
     //	Save all animations.
 
-    for( type=UnitTypes; type->OType; ++type ) {
-	SaveAnimations(type,file);
+    for( i=0; i<NumUnitTypes; ++i ) {
+	SaveAnimations(UnitTypes[i],file);
     }
 
     //	Save all types
 
-    for( type=UnitTypes; type->OType; ++type ) {
+    for( i=0; i<NumUnitTypes; ++i ) {
 	fputc('\n',file);
-	SaveUnitType(file,type,0);
+	SaveUnitType(file,UnitTypes[i],0);
     }
 
     //	Save all stats
 
-    for( type=UnitTypes; type->OType; ++type ) {
+    for( i=0; i<NumUnitTypes; ++i ) {
 	fputc('\n',file);
-	for( i=0; i<PlayerMax; ++i ) {
-	    SaveUnitStats(&type->Stats[i],type->Ident,i,file);
+	for( j=0; j<PlayerMax; ++j ) {
+	    SaveUnitStats(&UnitTypes[i]->Stats[j],UnitTypes[i]->Ident,j,file);
 	}
     }
 }
@@ -1086,30 +1086,20 @@ global UnitType* UnitTypeByWcNum(unsigned num)
 global UnitType* NewUnitTypeSlot(char* ident)
 {
     UnitType* type;
-    int i;
 
-    // +2 for slot and an empty slot at end.
-    type=calloc(NumUnitTypes+2,sizeof(UnitType));
+    type=malloc(sizeof(UnitType));
     if( !type ) {
 	fprintf(stderr,"Out of memory\n");
 	ExitFatal(-1);
     }
-    memcpy(type,UnitTypes,sizeof(UnitType)*NumUnitTypes);
-    if( UnitTypes ) {
-	free(UnitTypes);
-    }
-    UnitTypes=type;
-    type=UnitTypes+NumUnitTypes;
-    type->OType=UnitTypeType;
-    type->Type=NumUnitTypes++;
+    memset(type,0,sizeof(UnitType));
+    type->Type=NumUnitTypes;
     type->Ident=ident;
+    UnitTypes[NumUnitTypes++]=type;
     //
     //	Rehash.
     //
-    for( i=0; i<NumUnitTypes; ++i ) {
-	*(UnitType**)hash_add(UnitTypeHash,UnitTypes[i].Ident)=&UnitTypes[i];
-    }
-
+    *(UnitType**)hash_add(UnitTypeHash,type->Ident)=type;
     return type;
 }
 
@@ -1145,49 +1135,49 @@ global void InitUnitTypes(int reset_player_stats)
 {
     int type;
 
-    for( type=0; UnitTypes[type].OType; ++type ) {
+    for( type=0; type<NumUnitTypes; ++type ) {
 	//
 	//	Initialize:
 	//
-	DebugCheck( UnitTypes[type].Type!=type );
+	DebugCheck( UnitTypes[type]->Type!=type );
 	//
 	//	Add idents to hash.
 	//
-	*(UnitType**)hash_add(UnitTypeHash,UnitTypes[type].Ident)
-		=&UnitTypes[type];
+	*(UnitType**)hash_add(UnitTypeHash,UnitTypes[type]->Ident)
+		=UnitTypes[type];
 	//
 	//	Hardcoded incomes, FIXME: should be moved to some configs.
 	//
-	if( !strcmp(UnitTypes[type].Ident,"unit-elven-lumber-mill") ) {
-	    UnitTypes[type].ImproveIncomes[WoodCost]=
+	if( !strcmp(UnitTypes[type]->Ident,"unit-elven-lumber-mill") ) {
+	    UnitTypes[type]->ImproveIncomes[WoodCost]=
 		    DefaultIncomes[WoodCost]+25;
 	}
-	if( !strcmp(UnitTypes[type].Ident,"unit-troll-lumber-mill") ) {
-	    UnitTypes[type].ImproveIncomes[WoodCost]=
+	if( !strcmp(UnitTypes[type]->Ident,"unit-troll-lumber-mill") ) {
+	    UnitTypes[type]->ImproveIncomes[WoodCost]=
 		    DefaultIncomes[WoodCost]+25;
 	}
-	if( !strcmp(UnitTypes[type].Ident,"unit-human-refinery") ) {
-	    UnitTypes[type].ImproveIncomes[OilCost]=
+	if( !strcmp(UnitTypes[type]->Ident,"unit-human-refinery") ) {
+	    UnitTypes[type]->ImproveIncomes[OilCost]=
 		    DefaultIncomes[OilCost]+25;
 	}
-	if( !strcmp(UnitTypes[type].Ident,"unit-orc-refinery") ) {
-	    UnitTypes[type].ImproveIncomes[OilCost]=
+	if( !strcmp(UnitTypes[type]->Ident,"unit-orc-refinery") ) {
+	    UnitTypes[type]->ImproveIncomes[OilCost]=
 		    DefaultIncomes[OilCost]+25;
 	}
-	if( !strcmp(UnitTypes[type].Ident,"unit-keep") ) {
-	    UnitTypes[type].ImproveIncomes[GoldCost]=
+	if( !strcmp(UnitTypes[type]->Ident,"unit-keep") ) {
+	    UnitTypes[type]->ImproveIncomes[GoldCost]=
 		    DefaultIncomes[GoldCost]+10;
 	}
-	if( !strcmp(UnitTypes[type].Ident,"unit-stronghold") ) {
-	    UnitTypes[type].ImproveIncomes[GoldCost]=
+	if( !strcmp(UnitTypes[type]->Ident,"unit-stronghold") ) {
+	    UnitTypes[type]->ImproveIncomes[GoldCost]=
 		    DefaultIncomes[GoldCost]+10;
 	}
-	if( !strcmp(UnitTypes[type].Ident,"unit-castle") ) {
-	    UnitTypes[type].ImproveIncomes[GoldCost]=
+	if( !strcmp(UnitTypes[type]->Ident,"unit-castle") ) {
+	    UnitTypes[type]->ImproveIncomes[GoldCost]=
 		    DefaultIncomes[GoldCost]+20;
 	}
-	if( !strcmp(UnitTypes[type].Ident,"unit-fortress") ) {
-	    UnitTypes[type].ImproveIncomes[GoldCost]=
+	if( !strcmp(UnitTypes[type]->Ident,"unit-fortress") ) {
+	    UnitTypes[type]->ImproveIncomes[GoldCost]=
 		    DefaultIncomes[GoldCost]+20;
 	}
     }
@@ -1198,8 +1188,6 @@ global void InitUnitTypes(int reset_player_stats)
     //
     //	Setup hardcoded unit types. FIXME: should be moved to some configs.
     //
-    UnitTypeOilPatch=UnitTypeByIdent("unit-oil-patch");
-    UnitTypeGoldMine=UnitTypeByIdent("unit-gold-mine");
     UnitTypeHumanTanker=UnitTypeByIdent("unit-human-oil-tanker");
     UnitTypeOrcTanker=UnitTypeByIdent("unit-orc-oil-tanker");
     UnitTypeHumanTankerFull=UnitTypeByIdent("unit-human-oil-tanker-full");
@@ -1223,8 +1211,10 @@ global void LoadUnitTypes(void)
 {
     UnitType* type;
     const char* file;
+    int i;
 
-    for( type=UnitTypes; type->OType; ++type ) {
+    for( i=0; i<NumUnitTypes; ++i ) {
+	type=UnitTypes[i];
 	if( (file=type->ShadowFile) ) {
 	    char *buf;
 	    buf=alloca(strlen(file)+9+1);
@@ -1258,7 +1248,8 @@ global void LoadUnitTypes(void)
 	}
     }
 
-    for( type=UnitTypes; type->OType; ++type ) {
+    for( i=0; i<NumUnitTypes; ++i ) {
+	type=UnitTypes[i];
 	//
 	//	Unit-type uses the same sprite as an other.
 	//
@@ -1303,9 +1294,8 @@ global void CleanUnitTypes(void)
 {
     UnitType* type;
     void** ptr;
-#ifdef USE_OPENGL
     int i;
-#endif
+    int j;
 
     DebugLevel0Fn("FIXME: icon, sounds not freed.\n");
 
@@ -1324,16 +1314,17 @@ global void CleanUnitTypes(void)
     //	FIXME: scheme contains references on this structure.
     //	Clean all animations.
 
-    for( type=UnitTypes; type->OType; ++type ) {
+    for( i=0; i<NumUnitTypes; ++i )
+    {
+	type=UnitTypes[i];
 	Animations* anims;
-	UnitType* temp;
 
 	if( !(anims=type->Animations) ) {	// Must be handled?
 	    continue;
 	}
-	for( temp=type; temp->OType; ++temp ) {	// remove all uses
-	    if( anims==temp->Animations ) {
-		temp->Animations=NULL;
+    	for( j=i; j<NumUnitTypes; ++j ) {	// Remove all uses.
+	    if( anims==UnitTypes[j]->Animations ) {
+		UnitTypes[j]->Animations=NULL;
 	    }
 	}
 	type->Animations=NULL;
@@ -1354,80 +1345,78 @@ global void CleanUnitTypes(void)
 
     //	Clean all unit-types
 
-    if( UnitTypes ) {
-	for( type=UnitTypes; type->OType; ++type ) {
-	    hash_del(UnitTypeHash,type->Ident);
+    for( i=0;i<NumUnitTypes;++i ) {
+	type=UnitTypes[i];
+	hash_del(UnitTypeHash,type->Ident);
 
-	    DebugCheck( !type->Ident );
-	    free(type->Ident);
-	    DebugCheck( !type->Name );
-	    free(type->Name);
+	DebugCheck( !type->Ident );
+	free(type->Ident);
+	DebugCheck( !type->Name );
+	free(type->Name);
 
-	    if( type->SameSprite ) {
-		free(type->SameSprite);
-	    }
-	    if( type->File[0] ) {
-		free(type->File[0]);
-	    }
-	    if( type->File[1] ) {
-		free(type->File[1]);
-	    }
-	    if( type->File[2] ) {
-		free(type->File[2]);
-	    }
-	    if( type->File[3] ) {
-		free(type->File[3]);
-	    }
-	    if( type->Icon.Name ) {
-		free(type->Icon.Name);
-	    }
-	    if( type->Missile.Name ) {
-		free(type->Missile.Name);
-	    }
-	    if( type->CorpseName ) {
-		free(type->CorpseName);
-	    }
-
-	    //
-	    //	FIXME: Sounds can't be freed, they still stuck in sound hash.
-	    //
-	    if( type->Sound.Selected.Name ) {
-		free(type->Sound.Selected.Name);
-	    }
-	    if( type->Sound.Acknowledgement.Name ) {
-		free(type->Sound.Acknowledgement.Name);
-	    }
-	    if( type->Sound.Ready.Name ) {
-		free(type->Sound.Ready.Name);
-	    }
-	    if( type->Sound.Help.Name ) {
-		free(type->Sound.Help.Name);
-	    }
-	    if( type->Sound.Dead.Name ) {
-		free(type->Sound.Dead.Name);
-	    }
-	    if( type->Weapon.Attack.Name ) {
-		free(type->Weapon.Attack.Name);
-	    }
-
-	    if( !type->SameSprite ) {	// our own graphics
-		VideoSaveFree(type->Sprite);
-	    }
-#ifdef USE_OPENGL
-	    for( i=0; i<PlayerMax; ++i ) {
-		VideoSaveFree(type->PlayerColorSprite[i]);
-	    }
-#endif
+    	if( type->SameSprite ) {
+	    free(type->SameSprite);
 	}
-	free(UnitTypes);
-	UnitTypes=NULL;
-	NumUnitTypes=0;
+	if( type->File[0] ) {
+	    free(type->File[0]);
+	}
+	if( type->File[1] ) {
+	    free(type->File[1]);
+	}
+	if( type->File[2] ) {
+	    free(type->File[2]);
+	}
+	if( type->File[3] ) {
+	    free(type->File[3]);
+	}
+	if( type->Icon.Name ) {
+	    free(type->Icon.Name);
+	}
+	if( type->Missile.Name ) {
+	    free(type->Missile.Name);
+	}
+	if( type->CorpseName ) {
+	    free(type->CorpseName);
+	}
+
+	//
+	//	FIXME: Sounds can't be freed, they still stuck in sound hash.
+	//
+	if( type->Sound.Selected.Name ) {
+	    free(type->Sound.Selected.Name);
+	}
+	if( type->Sound.Acknowledgement.Name ) {
+	    free(type->Sound.Acknowledgement.Name);
+	}
+	if( type->Sound.Ready.Name ) {
+	    free(type->Sound.Ready.Name);
+	}
+	if( type->Sound.Help.Name ) {
+	    free(type->Sound.Help.Name);
+	}
+	if( type->Sound.Dead.Name ) {
+	    free(type->Sound.Dead.Name);
+	}
+	if( type->Weapon.Attack.Name ) {
+	    free(type->Weapon.Attack.Name);
+	}
+
+	if( !type->SameSprite ) {	// our own graphics
+	    VideoSaveFree(type->Sprite);
+	}
+#ifdef USE_OPENGL
+	for( i=0; i<PlayerMax; ++i ) {
+	    VideoSaveFree(type->PlayerColorSprite[i]);
+	}
+#endif
+	free(UnitTypes[i]);
+	UnitTypes[i]=0;
     }
+    NumUnitTypes=0;
 
     //
     //	Clean hardcoded unit types.
     //
-    UnitTypeGoldMine=NULL;
     UnitTypeHumanTanker=NULL;
     UnitTypeOrcTanker=NULL;
     UnitTypeHumanTankerFull=NULL;

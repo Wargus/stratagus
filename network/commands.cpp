@@ -1313,9 +1313,9 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	    CommandUnload(unit,x,y,dest,status);
 	    break;
 	case MessageCommandBuild:
-	    CommandLog("build",unit,status,x,y,NoUnitP,UnitTypes[dstnr].Ident,
+	    CommandLog("build",unit,status,x,y,NoUnitP,UnitTypes[dstnr]->Ident,
 		    -1);
-	    CommandBuildBuilding(unit,x,y,UnitTypes+dstnr,status);
+	    CommandBuildBuilding(unit,x,y,UnitTypes[dstnr],status);
 	    break;
 	case MessageCommandCancelBuild:
 	    // dest is the worker building the unit...
@@ -1360,15 +1360,15 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	    break;
 	case MessageCommandTrain:
 	    CommandLog("train",unit,status,-1,-1,NoUnitP
-		    ,UnitTypes[dstnr].Ident,-1);
-	    CommandTrainUnit(unit,UnitTypes+dstnr,status);
+		    ,UnitTypes[dstnr]->Ident,-1);
+	    CommandTrainUnit(unit,UnitTypes[dstnr],status);
 	    break;
 	case MessageCommandCancelTrain:
 	    // We need (short)x for the last slot -1
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,
-			UnitTypes[dstnr].Ident,(short)x);
-		CommandCancelTraining(unit,(short)x,UnitTypes+dstnr);
+			UnitTypes[dstnr]->Ident,(short)x);
+		CommandCancelTraining(unit,(short)x,UnitTypes[dstnr]);
 	    } else {
 		CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,
 			NULL,(short)x);
@@ -1377,8 +1377,8 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	    break;
 	case MessageCommandUpgrade:
 	    CommandLog("upgrade-to",unit,status,-1,-1,NoUnitP
-		    ,UnitTypes[dstnr].Ident,-1);
-	    CommandUpgradeTo(unit,UnitTypes+dstnr,status);
+		    ,UnitTypes[dstnr]->Ident,-1);
+	    CommandUpgradeTo(unit,UnitTypes[dstnr],status);
 	    break;
 	case MessageCommandCancelUpgrade:
 	    CommandLog("cancel-upgrade-to",unit,FlushCommands,-1,-1,NoUnitP
