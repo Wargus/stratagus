@@ -60,6 +60,8 @@ global Player* ThisPlayer;		/// Player on this computer
 */
 global char** RaceWcNames;
 
+global int NoRescueCheck;		/// Disable rescue check
+
 /**
 **	Colors used for minimap.	FIXME: make this configurable
 */
@@ -129,6 +131,8 @@ global void CleanPlayers(void)
 	free(RaceWcNames);
 	RaceWcNames=NULL;
     }
+
+    NoRescueCheck=0;
 }
 
 /**
