@@ -10,7 +10,7 @@
 //
 /**@name missile.h - The missile headerfile. */
 //
-//      (c) Copyright 1998-2002 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -514,7 +514,7 @@ extern Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx,
 extern void FireMissile(struct _unit_* unit);
 
 	/// Draw all missiles
-extern void DrawMissile(MissileType* mtype, int frame, int x, int y);
+extern void DrawMissile(const Missile* missile);
 extern int FindAndSortMissiles(const struct _viewport_* vp, Missile** table);
 
 	/// handle all missiles

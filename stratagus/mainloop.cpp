@@ -10,7 +10,7 @@
 //
 /**@name mainloop.c - The main game loop. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -181,9 +181,8 @@ static void DrawMapViewport(Viewport* vp)
 	int nmissiles;
 	int i;
 	int j;
-	int x;
-	int y;
 
+	Assert(vp);
 	if (InterfaceState == IfaceStateNormal) {
 		//
 		// A unit is tracked, center viewport on this unit.
@@ -199,7 +198,6 @@ static void DrawMapViewport(Viewport* vp)
 		}
 
 		SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
-
 		DrawMapBackgroundInViewport(vp, vp->MapX, vp->MapY);
 
 		//
@@ -213,62 +211,18 @@ static void DrawMapViewport(Viewport* vp)
 		CurrentViewport = vp;
 		while (i < nunits && j < nmissiles) {
 			if (table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
-				if (UnitVisibleInViewport(table[i], vp)) {
-					DrawUnit(table[i]);
-				}
+				DrawUnit(table[i]);
 				++i;
 			} else {
-				x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
-				y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
-				// FIXME: I should copy SourcePlayer for second level missiles.
-				if (missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player) {
-#ifdef DYNAMIC_LOAD
-					if (!missiletable[j]->Type->Sprite) {
-						LoadMissileSprite(missiletable[j]->Type);
-					}
-#endif
-					GraphicPlayerPixels(missiletable[j]->SourceUnit->Player,
-						missiletable[j]->Type->G);
-				}
-				switch (missiletable[j]->Type->Class) {
-					case MissileClassHit:
-						VideoDrawNumberClip(x, y, GameFont, missiletable[j]->Damage);
-						break;
-					default:
-						DrawMissile(missiletable[j]->Type, missiletable[j]->SpriteFrame,
-							x, y);
-						break;
-				}
+				DrawMissile(missiletable[j]);
 				++j;
 			}
 		}
 		for (; i < nunits; ++i) {
-			if (UnitVisibleInViewport(table[i], vp)) {
-				DrawUnit(table[i]);
-			}
+			DrawUnit(table[i]);
 		}
 		for (; j < nmissiles; ++j) {
-			x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
-			y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
-			// FIXME: I should copy SourcePlayer for second level missiles.
-			if (missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player) {
-#ifdef DYNAMIC_LOAD
-				if (!missiletable[j]->Type->Sprite) {
-					LoadMissileSprite(missiletable[j]->Type);
-				}
-#endif
-				GraphicPlayerPixels(missiletable[j]->SourceUnit->Player,
-					missiletable[j]->Type->G);
-			}
-			switch (missiletable[j]->Type->Class) {
-				case MissileClassHit:
-					VideoDrawNumberClip(x, y, GameFont, missiletable[j]->Damage);
-					break;
-				default:
-					DrawMissile(missiletable[j]->Type, missiletable[j]->SpriteFrame,
-						x, y);
-					break;
-			}
+			DrawMissile(missiletable[j]);
 		}
 		DrawMapFogOfWar(vp, vp->MapX, vp->MapY);
 		//
