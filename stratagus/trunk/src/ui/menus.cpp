@@ -133,7 +133,6 @@ local void EnterServerIPCancel(void);
 
 local void InitSaveGameMenu(Menuitem *mi);
 local void EnterSaveGameAction(Menuitem *mi, int key);
-local void SaveAction(void);
 local void CreateSaveDir(void);
 
 local void SaveLBExit(Menuitem *mi);
@@ -526,7 +525,6 @@ global void InitMenuFuncHash(void) {
     HASHADD(SaveLBRetrieve,"save-lb-retrieve");
     HASHADD(SaveVSAction,"save-vs-action");
     HASHADD(SaveOk,"save-ok");
-    HASHADD(SaveAction,"save-action");
     HASHADD(FcDeleteMenu,"fc-delete-menu");
 
 // Load
@@ -542,7 +540,7 @@ global void InitMenuFuncHash(void) {
 // Confirm save
     HASHADD(SaveConfirmInit,"save-confirm-init");
     HASHADD(SaveConfirmOk,"save-confirm-ok");
-    HASHADD(SaveConfirmOk,"save-confirm-cancel");
+    HASHADD(SaveConfirmCancel,"save-confirm-cancel");
 
 // Confirm delete
     HASHADD(FcDeleteInit,"fc-delete-init");
@@ -681,7 +679,6 @@ local void GameMenuReturn(void)
 }
 
 local char *SaveDir;			/// FIXME: docu
-local int TypedFileName;		/// FIXME: docu
 
 /**
 **	Init callback for save game menu
@@ -703,18 +700,17 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
     } else {
 	mi[3].flags &= ~MenuButtonDisabled;
 	if (key == 10 || key == 13) {
-	    SaveAction();
+	    SaveOk();
 	    return;
 	}
     }
-    TypedFileName = 1;
     mi->menu->items[5].flags = MenuButtonDisabled;
 }
 
 /**
 **	Save game
 */
-local void SaveAction(void)
+local void SaveOk(void)
 {
     char filename[PATH_MAX];
     char *name;
@@ -724,10 +720,7 @@ local void SaveAction(void)
     menu = FindMenu("menu-save-game");
     name = menu->items[1].d.input.buffer;
 
-    nameLength = strlen(name);
-    if (TypedFileName) {
-	nameLength -= 3;
-    }
+    nameLength = strlen(name) - 3;
 
     strcpy(filename, SaveDir);
     strcat(filename, "/");
@@ -869,7 +862,6 @@ local void SaveLBAction(Menuitem *mi, int i)
 	    mi->menu->items[5].flags = MenuButtonDisabled;
 	}
     }
-    TypedFileName = 0;
 }
 
 /**
@@ -962,49 +954,6 @@ local void SaveVSAction(Menuitem *mi, int i)
 	    break;
 	default:
 	    break;
-    }
-    TypedFileName = 0;
-}
-
-/**
-**	FIXME: docu
-*/
-// FIXME: modify function
-local void SaveOk(void)
-{
-    FileList *fl;
-    Menuitem *mi;
-    Menu *menu;
-    int i;
-
-    menu = FindMenu("menu-select-scenario");
-    mi = &menu->items[1];
-    i = mi->d.listbox.curopt + mi->d.listbox.startline;
-
-    if (i < mi->d.listbox.noptions) {
-	fl = mi->d.listbox.options;
-	if (fl[i].type == 0) {
-	    strcat(ScenSelectPath, "/");
-	    strcat(ScenSelectPath, fl[i].name);
-	    if (menu->items[9].flags&MenuButtonDisabled) {
-		menu->items[9].flags &= ~MenuButtonDisabled;
-		menu->items[9].d.button.text = ScenSelectDisplayPath;
-	    } else {
-		strcat(ScenSelectDisplayPath, "/");
-	    }
-	    strcat(ScenSelectDisplayPath, fl[i].name);
-	    ScenSelectLBInit(mi);
-	    mi->d.listbox.cursel = -1;
-	    mi->d.listbox.startline = 0;
-	    mi->d.listbox.curopt = 0;
-	    mi[1].d.vslider.percent = 0;
-	    mi[1].d.hslider.percent = 0;
-	    MustRedraw |= RedrawMenu;
-	} else {
-	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
-	    EndMenu();
-	    menu->items[9].d.button.text = NULL;
-	}
     }
 }
 
@@ -1304,10 +1253,7 @@ local void SaveConfirmInit(Menuitem * mi)
     Menu *menu;
 
     menu = FindMenu("menu-save-game");
-    fileLength = strlen(menu->items[1].d.input.buffer);
-    if (TypedFileName) {
-	fileLength -= 3;
-    }
+    fileLength = strlen(menu->items[1].d.input.buffer) - 3;
 
     strcpy(name, "the file: ");
     strncat(name, menu->items[1].d.input.buffer, fileLength);
@@ -1327,10 +1273,7 @@ local void SaveConfirmOk(void)
     Menu *menu;
 
     menu = FindMenu("menu-save-game");
-    fileLength = strlen(menu->items[1].d.input.buffer);
-    if (TypedFileName) {
-	fileLength -= 3;
-    }
+    fileLength = strlen(menu->items[1].d.input.buffer) - 3;
 
     strcpy(name, SaveDir);
     strcat(name, "/");
@@ -1440,6 +1383,7 @@ local void LoadAction(void)
     LoadGame(filename);
     SetMessage("Loaded game: %s", filename);
     GameLoaded=1;
+    CurrentMapPath[0]='\0';
     EndMenu();
 }
 
