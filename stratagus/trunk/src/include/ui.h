@@ -317,7 +317,7 @@ extern int MapTileGetViewport(int, int);
     /// FIXME: Short one line docu
 extern void CycleViewportMode(int);
     /// FIXME: Short one line docu
-extern void SetViewportMode(void);
+extern void SetViewportMode(ViewportMode mode);
 
 #endif /* SPLIT_SCREEN_SUPPORT */
 
