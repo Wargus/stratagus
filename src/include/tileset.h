@@ -29,6 +29,12 @@
 //@{
 
 /*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
+#include "etlib/hash.h"
+
+/*----------------------------------------------------------------------------
 --	Documentation
 ----------------------------------------------------------------------------*/
 
@@ -213,6 +219,10 @@
 **	Tileset::OrcWallTable
 **
 **		Table of orc wall tiles, index depends on the surroundings.
+**
+**	Tileset::ItemsHash
+**
+**		Hash table of item numbers to unit names.
 */
 
 /*----------------------------------------------------------------------------
@@ -283,6 +293,8 @@ typedef struct _tileset_ {
 
     unsigned	HumanWallTable[16];	/// Human wall placement table
     unsigned	OrcWallTable[16];	/// Orc wall placement table
+
+    hashtable(char*,128) ItemsHash;	/// Items hash table
 } Tileset;
 
 // FIXME: this #define's should be removed
