@@ -54,7 +54,6 @@
 <a href="#define-ai-player">define-ai-player</a>
 <a href="pud.html#define-ai-wc-names">define-ai-wc-names</a>
 <a href="#ai:adhoc-force">ai:adhoc-force</a>
-<a href="#ai:attack-with-force">ai:attack-with-force</a>
 <a href="#ai:check-force">ai:check-force</a>
 <a href="#ai:clear-force">ai:clear-force</a>
 <a href="#ai:compute-gauges">ai:compute-gauges</a>
@@ -113,9 +112,8 @@ There are two kinds of scripts :
 Scripts can arrange and control units using forces : <br>
 A script can ask for some type of unit in a force (using <a href="#ai:force">ai:force</a>), 
 and then wait for them to be ready (using <a href="#ai:wait-force">ai:wait-force</a>).<br>
-Then it can send them to attack ( <a href="#ai:attack-with-force">ai:attack-with-force</a>, 
-<a href="#ai:hotspot-attack-with-force">ai:hotspot-attack-with-force</a> ) or back home 
-( <a href="#ai:force-go-home">ai:force-go-home</a> ).
+Then it can send them to attack ( <a href="#ai:hotspot-attack-with-force">ai:hotspot-attack-with-force</a> ) 
+or back home ( <a href="#ai:force-go-home">ai:force-go-home</a> ).
 <br>
 Each action/reaction script has a specific force which keeps all its units. ( see <a href="#ai:own-force">ai:own-force</a> )<br>
 <br>
@@ -435,45 +433,6 @@ its representation in the resulting force.
         ;; Not ok ? arg.
       (writes nil "Can't defend with grunts and trolls!"))
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:attack-with-force"></a>
-<h3>(ai:attack-with-force force)</h3>
-
-Attack the opponent with a force. The place is choosen by the AI. If there
-are flyers, ships and land units in the force they could attack different
-goals.
-
-
-<dl>
-<dt>force</dt>
-<dd>Number of the force to which the units should belong. 0 - 9 is currently
-supported.22
-</dd>
-</dl>
-
-<i>The force isn't moved as unit, faster units attacks first, than later the
-slower units will attack.</i>
-
-<h4>Example</h4>
-
-<pre>
-    ;; Force 0 is built with one footman. The script continues processing, if the
-    ;; footman is ready trained. Now attack the opponent with force 0.
-    (ai:force 0 'unit-footman 1)
-    (ai:wait-force 0)
-    (ai:attack-with-force 0)
-</pre>
-
-<h4>See also</h4>
-
-<a href="#ai:hotspot-attack-with-force">ai:hotspot-attack-with-force</a>
-
-<a href="#ai:force-go-home">ai:force-go-home</a>
-
 
 <h4>Used</h4>
 
