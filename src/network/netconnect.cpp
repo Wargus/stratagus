@@ -645,6 +645,28 @@ local const char *ncconstatenames[] = {
     "ccs_incompatibleengine",	// Incompatible engine version
     "ccs_incompatiblenetwork",	// Incompatible netowrk version
 };
+
+local const char *icmsgsubtypenames[] = {
+    "Hello",			// Client Request
+    "Config",			// Setup message configure clients
+
+    "EngineMismatch",		// FreeCraft engine version doesn't match
+    "ProtocolMismatch",		// Network protocol version doesn't match
+    "EngineConfMismatch",	// Engine configuration isn't identical
+    "MapUidMismatch",		// MAP UID doesn't match
+
+    "GameFull",			// No player slots available
+    "Welcome",			// Acknowledge for new client connections
+
+    "Waiting",			// Client has received Welcome and is waiting for Map/State
+    "Map",			// MapInfo (and Mapinfo Ack)
+    "State",			// StateInfo
+    "Resync",			// Ack StateInfo change
+
+    "ServerQuit",		// Server has quit game
+    "GoodBye",			// Client wants to leave game
+    "SeeYou",			// Client has left game
+};
 #endif
 
 /**
@@ -957,9 +979,9 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 	DebugLevel0Fn("Wrong message\n");
 	return;
     }
-    DebugLevel0Fn("Received Init Message %d:%d (%d) from %d.%d.%d.%d:%d\n",
-	    msg->Type, msg->SubType, size, NIPQUAD(ntohl(NetLastHost)),
-	    ntohs(NetLastPort));
+    DebugLevel0Fn("Received %s Init Message %d:%d (%d) from %d.%d.%d.%d:%d (%ld)\n",
+	    icmsgsubtypenames[msg->SubType], msg->Type, msg->SubType, size, NIPQUAD(ntohl(NetLastHost)),
+	    ntohs(NetLastPort), FrameCounter);
 
     if (NetConnectRunning == 2) {		// client
 	if (msg->Type == MessageInitReply) {
