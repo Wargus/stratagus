@@ -398,6 +398,8 @@ extern void MapMarkNewSight(int,int,int,int,int);
 #endif
     /// Mark tiles with fog of war to be redrawn
 extern void MapUpdateFogOfWar(int x,int y);
+    ///	Update fog of war
+extern void UpdateFogOfWarChange(void);
     /// Update visible areas for fog of war
 extern void MapUpdateVisible(void);
     /// Draw the map fog of war

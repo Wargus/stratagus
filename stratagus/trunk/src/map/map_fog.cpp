@@ -288,7 +288,10 @@ global void MapMarkNewSight(int tx,int ty,int range
 #endif
 
 /**
+**	Update the fog of war, for the view point. Called from UpdateDisplay.
 **
+**	@param x	Viewpoint X map tile position
+**	@param y	Viewpoint Y map tile position
 */
 global void MapUpdateFogOfWar(int x,int y)
 {
@@ -354,6 +357,37 @@ global void MapUpdateFogOfWar(int x,int y)
 }
 
 /**
+**	Update fog of war.
+*/
+global void UpdateFogOfWarChange(void)
+{
+    int x;
+    int y;
+    int w;
+
+    //
+    //	Mark all explored fields as visible.
+    //
+    if ( TheMap.NoFogOfWar ) {
+	w=TheMap.Width;
+	for( y=0; y<TheMap.Height; y++ ) {
+	    for( x=0; x<TheMap.Width; ++x ) {
+		if ( IsMapFieldExplored(x,y) ) {
+#ifdef NEW_FOW
+		    TheMap.Fields[x+y*w].Visible=-1;
+#else
+		    TheMap.Fields[x+y*w].Flags|=MapFieldVisible;
+#endif
+		    MapMarkSeenTile( x,y );
+		}
+	    }
+	}
+    }
+
+    MarkDrawEntireMap();
+}
+
+/**
 **	Update visible of the map.
 **
 **	@todo	This function could be improved in speed and functionality.
@@ -367,29 +401,21 @@ global void MapUpdateVisible(void)
     Unit** units;
     Unit* mine;
     int nunits,i;
+    unsigned long t;
+
+    if ( TheMap.NoFogOfWar ) {		// No fog - no work
+	return;
+    }
 
     // FIXME: rewrite this function, faster and better
+    t=GetTicks();
 
     //
     //	Clear all visible flags.
     //
-    w=TheMap.Width;
-    if ( TheMap.NoFogOfWar ) {
-	// FIXME: is this needed????
-	for( y=0; y<TheMap.Height; y++ ) {
-	    for( x=0; x<TheMap.Width; ++x ) {
-		if ( IsMapFieldExplored(x,y) ) {
-#ifdef NEW_FOW
-		    TheMap.Fields[x+y*w].Visible=-1;
-#else
-		    TheMap.Fields[x+y*w].Flags|=MapFieldVisible;
-#endif
-		    MapMarkSeenTile( x,y );
-		}
-	    }
-	}
-    } else {
 
+    w=TheMap.Width;
+    if( 1 ) {
 #if 0
 	int ye;
 
@@ -469,6 +495,8 @@ global void MapUpdateVisible(void)
 	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
 	}
     }
+
+    DebugLevel0Fn("Ticks %lu\n",GetTicks()-t);
 }
 
 /*----------------------------------------------------------------------------

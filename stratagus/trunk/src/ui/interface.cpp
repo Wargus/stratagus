@@ -622,10 +622,12 @@ local int InputKey(int key)
 		    RevealMap();
 		} else if (strcmp(Input, "fow on") == 0) {
 		    TheMap.NoFogOfWar = 0;
+		    UpdateFogOfWarChange();
 		    MapUpdateVisible();
 		    SetMessage("Fog Of War is now ON");
 		} else if (strcmp(Input, "fow off") == 0) {
 		    TheMap.NoFogOfWar = 1;
+		    UpdateFogOfWarChange();
 		    MapUpdateVisible();
 		    SetMessage("Fog Of War is now OFF");
 		} else if (strcmp(Input, "fast debug") == 0) {
