@@ -53,9 +53,8 @@
 #include "trigger.h"
 #include "campaign.h"
 
-#ifdef USE_SDL
-	// FIXME: move to system api part!
-#include <SDL.h>
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+#include "sound_server.h"
 #endif
 
 //----------------------------------------------------------------------------
@@ -431,6 +430,10 @@ local void EnableDrawRefresh(void)
 */
 global void GameMainLoop(void)
 {
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+    int counter = 30;
+#endif
+
     SetVideoSync();
     EnableDrawRefresh();
     GameCursor=TheUI.Point.Cursor;
@@ -453,7 +456,12 @@ global void GameMainLoop(void)
 	    MissileActions();		// handle missiles
 	    PlayersEachFrame();		// handle players
 	    TriggersEachFrame();	// handle triggers
-
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+	    if (counter --== 0) {
+		CDRomCheck();
+		counter = 30; // every second
+	    }
+#endif
 	    MustRedraw&=~RedrawMinimap;	// FIXME: this a little hack!
 
 	    //

@@ -540,6 +540,31 @@ echo >> $RULESFILE
 echo
 
 #------------------------------------------------------------------------------
+#	CDRom options part
+#------------------------------------------------------------------------------
+echo
+echo -n "Would you like to use the [i]nternal or [S]DL CD Audio support? (i) "
+read CDMode
+case $CDMode in
+  [sS])
+    echo "Using SDL cdrom support"
+    echo
+    USE_SDLCD = 1
+    USE_LIBCDA=0
+    echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
+    echo >> $RULESFILE
+    ;;
+  *)
+    echo "Using internal cdrom support"
+    echo
+    USE_SDLCD=0
+    USE_LIBCDA=1
+    echo "LIBCDA          = -DUSE_LIBCDA" >> $RULESFILE
+    echo >> $RULESFILE
+    ;;
+esac
+
+#------------------------------------------------------------------------------
 #	Compression options part
 #------------------------------------------------------------------------------
 
@@ -738,7 +763,7 @@ if test "$DEBUG" = 1 ; then
 fi
 echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
 echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
-echo -n "	\$(DEBUG)" >> $RULESFILE
+echo -n "	\$(DEBUG) \$(SDLCD) \$(LIBCDA) " >> $RULESFILE
 
 echo
 echo -n "Are you using the WarCraft 2 Expansion CD? (n): "

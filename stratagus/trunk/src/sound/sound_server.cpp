@@ -76,6 +76,10 @@
 #include "../libmodplug/modplug.h"
 #endif
 
+#ifdef USE_LIBCDA
+#include "libcda.h"
+#endif
+
 #ifdef USE_GLIB
 #include <glib.h>
 #else
@@ -84,7 +88,7 @@
 
 #include "myendian.h"
 
-#ifdef USE_SDL
+#ifdef USE_SDLCD
 #include <SDL.h>
 #endif
 
@@ -130,9 +134,15 @@ global int WithSoundThread;		/// FIXME: docu
 
 global int SoundThreadRunning;		/// FIXME: docu
 
-#ifdef USE_SDL
-global SDL_CD *cdrom;
-global char *cdmode = ":off";
+#ifdef USE_SDLCD
+global SDL_CD *CDRom;
+#endif
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+global char *CDMode = ":off";
+global int CDTrack;
+#endif
+#ifdef USE_LIBCDA
+global int NumCDTracks;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -156,9 +166,6 @@ global void PlayMusic(const char* name)
     char* buffer;
     int size;
     int i;
-#ifdef USE_SDL
-    int track;
-#endif
     
     ModPlug_GetSettings(&settings);
     settings.mFrequency=SoundFrequency;
@@ -171,38 +178,75 @@ global void PlayMusic(const char* name)
     settings.mLoopCount=0;		// Disable looping
     ModPlug_SetSettings(&settings);
     
-#ifdef USE_SDL
-    if (!strcmp(cdmode,":off")) {
+#ifdef USE_SDLCD
+    if (!strcmp(CDMode,":off")) {
 	if (!strncmp(name,":",1)) {
 	    SDL_Init(SDL_INIT_CDROM);
-	    cdrom = SDL_CDOpen(0);
-	    SDL_CDStatus(cdrom);
+	    CDRom = SDL_CDOpen(0);
+	    SDL_CDStatus(CDRom);
 	}
     }
     
     if (!strncmp(name,":",1)) {
-	if (!cdrom) {
+	if (!CDRom) {
 	    fprintf(stderr, "Couldn't open cdrom drive: %s\n", SDL_GetError());
 	    return;
 	}
 
 	// if mode is play all tracks
 	if (!strcmp(name, ":all")) {
-	    cdmode = ":all";
-	    SDL_CDPlayTracks(cdrom, 0, 0, 0, 0);
+	    CDMode = ":all";
+	    SDL_CDPlayTracks(CDRom, 0, 0, 0, 0);
 	    return;
 	}
 	
 	// if mode is play random tracks
 	if (!strcmp(name, ":random")) {
-	    cdmode = ":random";
-	    track = MyRand() % cdrom->numtracks;
-	    SDL_CDPlayTracks(cdrom, track, 0, 0, 0);
+	    CDMode = ":random";
+	    CDTrack = MyRand() % CDRom->numtracks;
+	    SDL_CDPlayTracks(CDRom, CDTrack, 0, 0, 0);
 	    return;
 	}
 	return;
     }
 #endif
+
+#ifdef USE_LIBCDA
+    if (!strcmp(CDMode,":off")) {
+	if (!strncmp(name,":",1)) {
+	    if (cd_init() < 0) {
+		fprintf(stderr,"Error initialising libcda \n");
+		return;
+	    }
+	    cd_get_tracks(&CDTrack, &NumCDTracks);
+	}
+    }
+
+    if (!strncmp(name,":",1)) {
+
+        // if mode is play all tracks
+	if (!strcmp(name, ":all")) {
+	    CDMode = ":all";
+	    do {
+		if (CDTrack > NumCDTracks)
+		    CDTrack = 1;
+		cd_play(CDTrack);
+	    } while (cd_is_audio(CDTrack++) < 1);
+	    return;
+	}
+	
+	// if mode is play random tracks
+	if (!strcmp(name, ":random")) {
+	    CDMode = ":random";
+	    do {
+		CDTrack = MyRand() % NumCDTracks;
+	    } while (cd_is_audio(CDTrack) < 1);
+	    cd_play(CDTrack);
+	    return;
+	}
+    }
+#endif
+
 
     if( PlayingMusic ) {
 	if( ModFile ) {
@@ -271,15 +315,6 @@ local void MixMusicToStereo32(int* buffer,int size)
     int i;
     int n;
     
-    #ifdef USE_SDL
-    if (strcmp(cdmode, ":off") && SDL_CDStatus(cdrom) == 1) {
-	if (!strcmp(cdmode, ":all")) {
-	    PlayMusic(":all");
-	} else if (!strcmp(cdmode, ":random")) {
-	    PlayMusic(":random");
-	}
-    }
-    #endif
 
     if( PlayingMusic ) {
 	DebugCheck( !ModFile );
@@ -333,6 +368,34 @@ global void StopMusic(void)
 #define MixMusicToStereo32(buffer,size)
 
 #endif
+
+global void CDRomCheck() 
+{
+#ifdef USE_SDLCD
+    if (strcmp(CDMode, ":off") && SDL_CDStatus(CDRom) == 1) {
+	if (!strcmp(CDMode, ":all")) {
+	    PlayMusic(":all");
+	} else if (!strcmp(CDMode, ":random")) {
+	    PlayMusic(":random");
+	}
+    }
+#endif
+
+#ifdef USE_LIBCDA
+    if (strcmp(CDMode, ":off") && !cd_current_track()) {
+	if (!strcmp(CDMode, ":all")) {
+	    PlayMusic(":all");
+	} else if (!strcmp(CDMode, ":random")) {
+	    PlayMusic(":random");
+	}
+    } else {
+        CDTrack = cd_current_track() + 1;
+	if (CDTrack > NumCDTracks)
+	    CDTrack = 1;
+    }
+#endif
+}
+
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -1459,9 +1522,15 @@ global void QuitSound(void)
     
 #endif
 
-#ifdef USE_SDL
-    SDL_CDStop(cdrom);
-    SDL_CDClose(cdrom);
+#ifdef USE_SDLCD
+    SDL_CDStop(CDRom);
+    SDL_CDClose(CDRom);
+#endif
+
+#ifdef USE_LIBCDA
+    cd_stop();
+    cd_close();
+    cd_exit();
 #endif
 
 }
