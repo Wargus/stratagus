@@ -39,7 +39,7 @@ INCLUDE_DIRS = src/include src/movie/vp31/include
 
 MODULES = src/action src/ai src/beos src/stratagus src/editor src/game src/map \
           src/missile src/movie src/movie/vp31 src/network src/pathfinder src/sound src/ui src/unit \
-          src/video etlib
+          src/video
 
 MODULES_ALL = $(MODULES)
 
@@ -118,7 +118,7 @@ stratagus: $(OBJ)
 	$(CCLD) -o stratagus $^ $(STRATAGUS_LIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-stratagus.exe:	$(OBJ) etlib/$(OBJDIR)/getopt.$(OE) \
+stratagus.exe:	$(OBJ) \
 	    src/$(OBJDIR)/stratagusrc.$(OE)
 	$(CCLD) -o stratagus$(EXE) $^ -lSDLmain $(STRATAGUS_LIBS) -I. $(CFLAGS)
 
@@ -137,7 +137,7 @@ echo::
 clean::
 	for i in $(MODULES_ALL); do \
 	$(RM) -rf $$i/$(OBJDIR)/*.o $$i/*.doc; done
-	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)/*.$(OE)
+	$(RM) core gmon.out cscope.out *.doc 
 	@echo
 
 distclean:	clean
