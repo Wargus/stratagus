@@ -135,7 +135,7 @@ int HighlevelInit (void)
 
 	Highlevel.BitmapSize = size;
 
-	if ( HighOpenInit (size) < 0)
+	if ( HighOpenInit (num_regions) < 0)
 		return -1;
 	return 0;
 }
