@@ -161,7 +161,26 @@ local void AiCheckUnits(void)
     //
     n=AiPlayer->UpgradeToRequestsCount;
     for( i=0; i<n; ++i ) {
-	DebugLevel0Fn("FIXME: %s\n",AiPlayer->UpgradeToRequests[i]->Ident);
+	t=AiPlayer->UpgradeToRequests[i]->Type;
+	x=1;
+
+	//
+	//	Add equivalent units
+	//
+	e=unit_types_count[t];
+	if( t<AiHelpers.EquivCount && AiHelpers.Equiv[t] ) {
+	    DebugLevel3Fn("Equivalence for %s\n",
+		    AiPlayer->UpgradeToRequests[i]->Ident);
+	    for( j=0; j<AiHelpers.Equiv[t]->Count; ++j ) {
+		e+=unit_types_count[AiHelpers.Equiv[t]->Table[j]->Type];
+	    }
+	}
+	
+	if( x>e+counter[t] ) {	// Request it.
+	    AiAddUpgradeToRequest(AiPlayer->UpgradeToRequests[i]);
+	    counter[t]+=x-e-counter[t];
+	}
+	counter[t]-=x;
     }
 
     //
@@ -220,13 +239,19 @@ global void AiInit(Player* player)
     //
     //	Search correct AI type.
     //
-    while( (!ait->Race || strcmp(ait->Race,player->RaceName))
-	    || (!ainame || strcmp(ainame,ait->Class)) ) {
-	ait=ait->Next;
-	DebugCheck( !ait );
+    for( ;; ) {
+    	if( ait->Race && strcmp(ait->Race,player->RaceName) ) {
+	    ait=ait->Next;
+	    DebugCheck( !ait );
+	}
+	if( ainame && strcmp(ainame,ait->Class) ) {
+	    ait=ait->Next;
+	    DebugCheck( !ait );
+	}
+	break;
     }
-    DebugLevel0Fn("AI: %s with %s\n", ait->Race ? ait->Race: player->RaceName,
-	    ainame );
+    DebugLevel0Fn("AI: %s:%s with %s:%s\n" _C_ player->RaceName _C_ ait->Race
+	    _C_ ainame _C_ ait->Class );
 
     pai->AiType=ait;
     pai->Script=ait->Script;
