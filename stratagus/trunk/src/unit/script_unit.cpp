@@ -893,7 +893,7 @@ local int CclUnit(lua_State* l)
 			unit->HP = hp;
 			if (unit->Orders[0].Action == UnitActionBuilded) {
 				// HACK: the building is not ready yet
-				unit->Player->UnitTypesCount[type->Type]--;
+				unit->Player->UnitTypesCount[type->Slot]--;
 			}
 		} else if (!strcmp(value, "saved-order")) {
 			lua_pushvalue(l, j + 1);

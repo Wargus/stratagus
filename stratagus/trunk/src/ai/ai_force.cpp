@@ -82,8 +82,8 @@ global void AiNewUnitTypeEquiv(UnitType* a, UnitType* b)
 	int replace;
 	int i;
 
-	find = UnitTypeEquivs[a->Type];
-	replace = UnitTypeEquivs[b->Type];
+	find = UnitTypeEquivs[a->Slot];
+	replace = UnitTypeEquivs[b->Slot];
 
 	// Always record equivalences with the lowest unittype.
 	if (find < replace) {
@@ -115,7 +115,7 @@ global int AiFindUnitTypeEquiv(const UnitType* unittype, int* result)
 	int search;
 	int count;
 
-	search = UnitTypeEquivs[unittype->Type];
+	search = UnitTypeEquivs[unittype->Slot];
 	count = 0;
 
 	for (i = 0; i < UnitTypeMax + 1; ++i) {
@@ -229,7 +229,7 @@ local void AiCleanForce(int force)
 	aiunit = AiPlayer->Force[force].Units;
 	while (aiunit) {
 		// FIXME: Should I use equivalent unit types?
-		counter[aiunit->Unit->Type->Type]++;
+		counter[aiunit->Unit->Type->Slot]++;
 		aiunit = aiunit->Next;
 	}
 
@@ -239,11 +239,11 @@ local void AiCleanForce(int force)
 	AiPlayer->Force[force].Completed = 1;
 	aitype = AiPlayer->Force[force].UnitTypes;
 	while (aitype) {
-		if (aitype->Want > counter[aitype->Type->Type]) {
+		if (aitype->Want > counter[aitype->Type->Slot]) {
 			DebugLevel3Fn("%d: missing %s.\n" _C_ force _C_ aitype->Type->Ident);
 			AiPlayer->Force[force].Completed = 0;
 		}
-		counter[aitype->Type->Type] -= aitype->Want;
+		counter[aitype->Type->Slot] -= aitype->Want;
 		aitype = aitype->Next;
 	}
 
@@ -253,9 +253,9 @@ local void AiCleanForce(int force)
 	if (!AiPlayer->Force[force].Attacking) {
 		prev = &AiPlayer->Force[force].Units;
 		while ((aiunit = *prev)) {
-			if (counter[aiunit->Unit->Type->Type] > 0) {
+			if (counter[aiunit->Unit->Type->Slot] > 0) {
 				DebugLevel3Fn("Release unit %s\n" _C_ aiunit->Unit->Type->Ident);
-				counter[aiunit->Unit->Type->Type]--;
+				counter[aiunit->Unit->Type->Slot]--;
 				RefsDecrease(aiunit->Unit);
 				*prev = aiunit->Next;
 				free(aiunit);
@@ -305,7 +305,7 @@ local int AiCheckBelongsToForce(int force, const UnitType* type)
 	aiunit = AiPlayer->Force[force].Units;
 	while (aiunit) {
 		// FIXME: Should I use equivalent unit types?
-		counter[aiunit->Unit->Type->Type]++;
+		counter[aiunit->Unit->Type->Slot]++;
 		aiunit = aiunit->Next;
 	}
 
@@ -316,9 +316,9 @@ local int AiCheckBelongsToForce(int force, const UnitType* type)
 	AiPlayer->Force[force].Completed = 1;
 	aitype = AiPlayer->Force[force].UnitTypes;
 	while (aitype) {
-		if (aitype->Want > counter[aitype->Type->Type]) {
+		if (aitype->Want > counter[aitype->Type->Slot]) {
 			if (type == aitype->Type) {
-				if (aitype->Want - 1 > counter[aitype->Type->Type]) {
+				if (aitype->Want - 1 > counter[aitype->Type->Slot]) {
 					AiPlayer->Force[force].Completed = 0;
 				}
 				flag = 1;

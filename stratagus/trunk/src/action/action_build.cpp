@@ -250,7 +250,7 @@ global void HandleActionBuild(Unit* unit)
 */
 
 	// HACK: the building is not ready yet
-	build->Player->UnitTypesCount[type->Type]--;
+	build->Player->UnitTypesCount[type->Slot]--;
 
 	stats = build->Stats;
 
@@ -356,7 +356,7 @@ global void HandleActionBuilded(Unit* unit)
 		}
 		unit->Orders[0].Action = UnitActionStill;
 		// HACK: the building is ready now
-		unit->Player->UnitTypesCount[type->Type]++;
+		unit->Player->UnitTypesCount[type->Slot]++;
 		unit->Constructed = 0;
 		if (unit->Frame < 0) {
 			unit->Frame = -1;

@@ -1193,8 +1193,8 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 #endif
 
 	DebugLevel0Fn(": %d casts %s at %d %d on %d\n" _C_
-		UnitNumber(unit) _C_ spell->IdentName _C_ x _C_ y _C_ dest ? UnitNumber(dest) : 0);
-	DebugCheck(!unit->Type->CanCastSpell[spell->Ident]);
+		UnitNumber(unit) _C_ spell->Ident _C_ x _C_ y _C_ dest ? UnitNumber(dest) : 0);
+	DebugCheck(!unit->Type->CanCastSpell[spell->Slot]);
 
 	//
 	// Check if unit is still valid? (NETWORK!)

@@ -239,18 +239,18 @@ local int CclDefineAiHelper(lua_State* l)
 			switch (what) {
 				case 0: // build
 					AiHelperSetupTable(&AiHelpers.BuildCount, &AiHelpers.Build,
-						type->Type);
-					AiHelperInsert(AiHelpers.Build + type->Type, base);
+						type->Slot);
+					AiHelperInsert(AiHelpers.Build + type->Slot, base);
 					break;
 				case 1: // train
 					AiHelperSetupTable(&AiHelpers.TrainCount, &AiHelpers.Train,
-						type->Type);
-					AiHelperInsert(AiHelpers.Train + type->Type, base);
+						type->Slot);
+					AiHelperInsert(AiHelpers.Train + type->Slot, base);
 					break;
 				case 2: // upgrade
 					AiHelperSetupTable(&AiHelpers.UpgradeCount, &AiHelpers.Upgrade,
-						type->Type);
-					AiHelperInsert(AiHelpers.Upgrade + type->Type, base);
+						type->Slot);
+					AiHelperInsert(AiHelpers.Upgrade + type->Slot, base);
 					break;
 				case 3: // research
 					AiHelperSetupTable(&AiHelpers.ResearchCount, &AiHelpers.Research,
@@ -264,15 +264,15 @@ local int CclDefineAiHelper(lua_State* l)
 					break;
 				case 5: // equivalence
 					AiHelperSetupTable(&AiHelpers.EquivCount, &AiHelpers.Equiv,
-						base->Type);
-					AiHelperInsert(AiHelpers.Equiv + base->Type, type);
+						base->Slot);
+					AiHelperInsert(AiHelpers.Equiv + base->Slot, type);
 
 					AiNewUnitTypeEquiv(base, type);
 					break;
 				case 6: // repair
 					AiHelperSetupTable(&AiHelpers.RepairCount, &AiHelpers.Repair,
-						type->Type);
-					AiHelperInsert(AiHelpers.Repair + type->Type, base);
+						type->Slot);
+					AiHelperInsert(AiHelpers.Repair + type->Slot, base);
 					break;
 			}
 		}
@@ -656,7 +656,7 @@ local int CclAiWait(lua_State* l)
 		//
 		// Look if we have this unit-type.
 		//
-		if (unit_types_count[type->Type]) {
+		if (unit_types_count[type->Slot]) {
 			lua_pushboolean(l, 0);
 			return 1;
 		}
@@ -664,10 +664,10 @@ local int CclAiWait(lua_State* l)
 		//
 		// Look if we have equivalent unit-types.
 		//
-		if (type->Type < AiHelpers.EquivCount && AiHelpers.Equiv[type->Type]) {
+		if (type->Slot < AiHelpers.EquivCount && AiHelpers.Equiv[type->Slot]) {
 			DebugLevel3Fn("Equivalence for %s\n" _C_ type->Ident);
-			for (j = 0; j < AiHelpers.Equiv[type->Type]->Count; ++j) {
-				if (unit_types_count[AiHelpers.Equiv[type->Type]->Table[j]->Type]) {
+			for (j = 0; j < AiHelpers.Equiv[type->Slot]->Count; ++j) {
+				if (unit_types_count[AiHelpers.Equiv[type->Slot]->Table[j]->Slot]) {
 					lua_pushboolean(l, 0);
 					return 1;
 				}
@@ -687,10 +687,10 @@ local int CclAiWait(lua_State* l)
 	//
 	// Add equivalent units
 	//
-	n = unit_types_count[type->Type];
-	if (type->Type < AiHelpers.EquivCount && AiHelpers.Equiv[type->Type]) {
-		for (j = 0; j < AiHelpers.Equiv[type->Type]->Count; ++j) {
-			n += unit_types_count[AiHelpers.Equiv[type->Type]->Table[j]->Type];
+	n = unit_types_count[type->Slot];
+	if (type->Slot < AiHelpers.EquivCount && AiHelpers.Equiv[type->Slot]) {
+		for (j = 0; j < AiHelpers.Equiv[type->Slot]->Count; ++j) {
+			n += unit_types_count[AiHelpers.Equiv[type->Slot]->Table[j]->Slot];
 		}
 	}
 	// units available?
@@ -745,14 +745,14 @@ local int CclAiForce(lua_State* l)
 		}
 
 		// Use the equivalent unittype.
-		type = UnitTypes[UnitTypeEquivs[type->Type]];
+		type = UnitTypes[UnitTypeEquivs[type->Slot]];
 
 		//
 		// Look if already in force.
 		//
 		for (prev = &AiPlayer->Force[force].UnitTypes; (aiut = *prev);
 				prev = &aiut->Next) {
-			if (UnitTypeEquivs[aiut->Type->Type] == type->Type) { // found
+			if (UnitTypeEquivs[aiut->Type->Slot] == type->Slot) { // found
 				if (count) {
 					aiut->Want = count;
 				} else {

@@ -374,7 +374,7 @@ global void AssignUnitToPlayer(Unit* unit, Player* player)
 		}
 		*unit->PlayerSlot = unit;
 
-		player->UnitTypesCount[type->Type]++;
+		player->UnitTypesCount[type->Slot]++;
 	}
 
 	if (type->Demand) {
@@ -731,7 +731,7 @@ global void UnitLost(Unit* unit)
 		}
 
 		if (unit->Orders[0].Action != UnitActionBuilded) {
-			player->UnitTypesCount[type->Type]--;
+			player->UnitTypesCount[type->Slot]--;
 		}
 	}
 
@@ -799,7 +799,7 @@ global void UnitLost(Unit* unit)
 	}
 	DebugCheck(player->NumBuildings > UnitMax);
 	DebugCheck(player->TotalNumUnits > UnitMax);
-	DebugCheck(player->UnitTypesCount[type->Type] > UnitMax);
+	DebugCheck(player->UnitTypesCount[type->Slot] > UnitMax);
 }
 
 /**
@@ -1572,7 +1572,7 @@ global void ChangeUnitOwner(Unit* unit, Player* newplayer)
 	if (unit->Type->Building) {
 		newplayer->NumBuildings++;
 	}
-	newplayer->UnitTypesCount[unit->Type->Type]++;
+	newplayer->UnitTypesCount[unit->Type->Slot]++;
 
 	UpdateForNewUnit(unit, 0);
 }
@@ -3508,7 +3508,7 @@ global void SaveOrder(const Order* order, CLFile* file)
 					(int)order->Arg1 >> 16, (int)order->Arg1 & 0xFFFF);
 				break;
 			case UnitActionSpellCast:
-				CLprintf(file, " \"spell\", \"%s\",", ((SpellType*)order->Arg1)->IdentName);
+				CLprintf(file, " \"spell\", \"%s\",", ((SpellType*)order->Arg1)->Ident);
 				break;
 			case UnitActionResearch:
 				CLprintf(file, " \"upgrade\", \"%s\",", ((Upgrade*)order->Arg1)->Ident);

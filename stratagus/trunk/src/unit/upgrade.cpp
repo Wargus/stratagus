@@ -360,17 +360,17 @@ global void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 				if (unit_for_bit[i * 16 + 0 + b * 2] >= 0) {
 					if (v & (1 << b)) {
 						AllowUnitId(player,
-							UnitTypeByWcNum(unit_for_bit[i * 16 + 0 + b * 2])->Type,
+							UnitTypeByWcNum(unit_for_bit[i * 16 + 0 + b * 2])->Slot,
 								UnitMax);
 						AllowUnitId(player,
-							UnitTypeByWcNum(unit_for_bit[i * 16 + 1 + b * 2])->Type,
+							UnitTypeByWcNum(unit_for_bit[i * 16 + 1 + b * 2])->Slot,
 								UnitMax);
 					} else {
 						AllowUnitId(player,
-							UnitTypeByWcNum(unit_for_bit[i * 16 + 0 + b * 2])->Type,
+							UnitTypeByWcNum(unit_for_bit[i * 16 + 0 + b * 2])->Slot,
 								0);
 						AllowUnitId(player,
-							UnitTypeByWcNum(unit_for_bit[i * 16 + 1 + b * 2])->Type,
+							UnitTypeByWcNum(unit_for_bit[i * 16 + 1 + b * 2])->Slot,
 								0);
 					}
 				}
@@ -1217,7 +1217,7 @@ global int UnitTypeIdByIdent(const char* ident)
 	UnitType* type;
 
 	if ((type = UnitTypeByIdent(ident))) {
-		return type->Type;
+		return type->Slot;
 	}
 	DebugLevel0Fn(" fix this %s\n" _C_ ident);
 	return -1;
@@ -1287,7 +1287,7 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 			unit->HP += dst->Stats[player->Player].HitPoints -
 				unit->Stats->HitPoints;
 			// don't have such unit now
-			player->UnitTypesCount[src->Type]--;
+			player->UnitTypesCount[src->Slot]--;
 			// UnMark the Unit sight for conversion if on map
 			if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
 					src->TileWidth != dst->TileWidth ||
