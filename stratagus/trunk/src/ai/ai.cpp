@@ -567,17 +567,36 @@ global void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
     //
     for( i=0; i<AI_MAX_FORCES; ++i ) {
 	const AiUnitType* aut;
+	const AiUnit* aiunit;
 
-	fprintf(file,"  'force '(%d %s %s %s\n",i,
+	fprintf(file,"  'force '(%d %s%s%s",i,
 		ai->Force[i].Completed ? "complete" : "recruit",
-		ai->Force[i].Attacking ? "attack" : "",
-		ai->Force[i].Defending ? "defend" : "");
+		ai->Force[i].Attacking ? " attack" : "",
+		ai->Force[i].Defending ? " defend" : "");
 
-	fprintf(file,"    units ( ");
+	fprintf(file," role ");
+	switch( ai->Force[i].Role ) {
+	    case AiForceRoleAttack:
+		fprintf(file,"attack");
+		break;
+	    case AiForceRoleDefend:
+		fprintf(file,"defend");
+		break;
+	    default:
+		fprintf(file,"unknown");
+		break;
+	}
+
+	fprintf(file,"\n    types ( ");
 	for( aut=ai->Force[i].UnitTypes; aut; aut=aut->Next ) {
 	    fprintf(file,"%d %s ",aut->Want,aut->Type->Ident);
 	}
-	fprintf(file,"))\n");
+	fprintf(file,")\n    units (");
+	for( aiunit=ai->Force[i].Units; aiunit; aiunit=aiunit->Next ) {
+	    fprintf(file," %d %s",UnitNumber(aiunit->Unit),
+		    aiunit->Unit->Type->Ident);
+	}
+	fprintf(file," ))\n");
     }
 
     fprintf(file,"  'reserve '(");

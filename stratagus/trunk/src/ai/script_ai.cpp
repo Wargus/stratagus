@@ -733,6 +733,7 @@ local SCM CclAiWaitForce(SCM value)
     if( AiPlayer->Force[force].Completed ) {
 	return SCM_BOOL_F;
     }
+    DebugLevel0Fn("Wait force\n");
 #if 0
     // Debuging
     AiCleanForces();
