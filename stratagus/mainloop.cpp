@@ -230,7 +230,7 @@ global void UpdateDisplay(void)
 
     VideoLockScreen();			// prepare video write
 
-    HideAnyCursor();	// remove cursor (when available)
+    HideAnyCursor();			// remove cursor (when available)
 
 #ifdef NEW_DECODRAW
 // Experimental new drawing mechanism, which can keep track of what is
@@ -277,7 +277,6 @@ global void UpdateDisplay(void)
 	}
     }
 #endif
-
 
     if( MustRedraw&(RedrawMessage|RedrawMap) ) {
 	DrawMessage();

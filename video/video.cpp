@@ -168,10 +168,14 @@ typedef struct _clip_ {
 --	Externals
 ----------------------------------------------------------------------------*/
 
-extern void InitVideoSdl(void);
-extern void InitVideoX11(void);
-extern void InitVideoSVGA(void);
-extern void InitVideoWin32(void);
+extern void InitVideoSdl(void);		/// Init SDL video hardware driver
+extern void InitVideoX11(void);		/// Init X11 video hardware driver
+extern void InitVideoSVGA(void);	/// Init SVGA video hardware driver
+extern void InitVideoWin32(void);	/// Init Win32 video hardware driver
+extern void InitVideoWinCE(void);	/// Init WinCE video hardware driver
+
+extern void SdlLockScreen(void);	/// Do SDL hardware lock
+extern void SdlUnlockScreen(void);	/// Do SDL hardware unlock
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -1174,11 +1178,7 @@ global void VideoCreatePalette(const Palette* palette)
 global void VideoLockScreen(void)
 {
 #ifdef USE_SDL
-    // FIXME: move to system api part!
-    extern SDL_Surface *Screen;			/// internal screen
-
-    SDL_LockSurface(Screen);
-    VideoMemory=Screen->pixels;
+    SdlLockScreen();
 #endif
 }
 
@@ -1188,11 +1188,7 @@ global void VideoLockScreen(void)
 global void VideoUnlockScreen(void)
 {
 #ifdef USE_SDL
-    // FIXME: move to system api part!
-    extern SDL_Surface *Screen;			/// internal screen
-
-    SDL_UnlockSurface(Screen);
-    VideoMemory=Screen->pixels;
+    SdlUnlockScreen();
 #endif
 }
 
