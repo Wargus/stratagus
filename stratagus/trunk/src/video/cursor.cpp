@@ -1079,6 +1079,7 @@ global void SaveCursors(FILE* file)
 	    CursorBuilding ? CursorBuilding->Ident : "()");
     fprintf(file,";;(cursor-position '(%d %d)\n",CursorX,CursorY);
     fprintf(file,";;(cursor-start '(%d %d)\n",CursorStartX,CursorStartY);
+    fprintf(file,";;(unit-under-cursor %s\n",UnitReference(UnitUnderCursor));
 }
 
 /**
@@ -1104,6 +1105,7 @@ global void CleanCursors(void)
 
     CursorBuilding=0;
     GameCursor=0;
+    UnitUnderCursor=NoUnitP;
 }
 
 //@}
