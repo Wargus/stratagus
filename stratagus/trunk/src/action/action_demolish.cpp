@@ -139,7 +139,7 @@ global void HandleActionDemolish(Unit* unit)
 
             x=unit->X;
             y=unit->Y;
-            DestroyUnit(unit);
+            LetUnitDie(unit);
 	    // FIXME: Must play explosion sound
 
 	    //	FIXME: Currently we take the X fields, the original only the O
