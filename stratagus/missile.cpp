@@ -718,6 +718,12 @@ local int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
     }
     DebugLevel3Fn("Missile bounding box %d %d %d %d\n" _C_ min_x _C_ max_x _C_
 	min_y _C_ max_y);
+
+    if( !IsMapFieldVisible((missile->X-TileSizeX/2)/TileSizeX,
+			   (missile->Y-TileSizeY/2)/TileSizeY)) {
+	return 0;
+    }
+
     return 1;
 }
 
