@@ -10,7 +10,7 @@
 //
 /**@name cursor.c - The cursors. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Nehal Mistry,
+//      (c) Copyright 1998-2005 by Lutz Sammer, Nehal Mistry,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -148,9 +148,9 @@ void LoadCursors(const char* race)
 */
 CursorType* CursorTypeByIdent(const char* ident)
 {
-	int i;  // iterator.
+	int i;
 
-	for (i = 0; i < CursorMax; i++) {
+	for (i = 0; i < CursorMax; ++i) {
 		if (strcmp(Cursors[i].Ident, ident)) {
 			continue;
 		}
@@ -333,7 +333,7 @@ static void DrawBuildingCursor(void)
 --  DRAW/HIDE CURSOR (interface for the outside world)
 ----------------------------------------------------------------------------*/
 /**
-**  Draw the cursor and prepare tobe restored by HideAnyCursor again.
+**  Draw the cursor and prepare to be restored by HideAnyCursor again.
 **  Note: This function can be called, without calling HideAnyCursor first,
 **        which means that this function should re-use/free memory of the
 **        last call.
@@ -381,7 +381,7 @@ void CursorAnimate(unsigned ticks)
 {
 	static unsigned last = 0;
 
-	if (!GameCursor) {
+	if (!GameCursor || !GameCursor->FrameRate) {
 		return;
 	}
 	if (ticks > last + GameCursor->FrameRate) {
@@ -399,8 +399,6 @@ void CursorAnimate(unsigned ticks)
 */
 void InitVideoCursors(void)
 {
-	CursorX = VideoWidth / 2;
-	CursorY = VideoHeight / 2;
 }
 
 /**
@@ -419,8 +417,8 @@ void CleanCursors(void)
 	Cursors = NULL;
 	CursorMax = 0;
 
-	CursorBuilding = 0;
-	GameCursor = 0;
+	CursorBuilding = NULL;
+	GameCursor = NULL;
 	UnitUnderCursor = NoUnitP;
 }
 

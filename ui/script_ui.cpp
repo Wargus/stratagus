@@ -10,7 +10,7 @@
 //
 /**@name script_ui.c - The ui ccl functions. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Jimmy Salmon, Martin Renold
+//      (c) Copyright 1999-2005 by Lutz Sammer, Jimmy Salmon, Martin Renold
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -431,8 +431,7 @@ static int CclDefineCursor(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	name = race = file = NULL;
-	hotx = hoty = w = h = 0;
-	rate = 200;
+	hotx = hoty = w = h = rate = 0;
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
 		value = LuaToString(l, -2);
