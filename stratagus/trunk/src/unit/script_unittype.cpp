@@ -516,8 +516,6 @@ local SCM CclDefineUnitType(SCM list)
 	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("vanishes"))) {
 	    type->Vanishes = 1;
-	} else if (gh_eq_p(value, gh_symbol2scm("volatile"))) {
-	    type->Volatile = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("can-cast-spell"))) {
 	    //
 	    //    Warning: can-cast-spell should only be used AFTER all spells

@@ -408,10 +408,6 @@
 **		Only valid for buildings without the BuilderOutside flag.
 **		The worker is lost when the building is completed.
 **
-**	UnitType::Volatile
-**
-**		Unit is a suicide bomber	
-**
 **	UnitType::SelectableByRectangle
 **
 **		Selectable with mouse rectangle
@@ -738,7 +734,6 @@ struct _unit_type_ {
     unsigned CanAttack : 1;		/// Unit can attack.
     unsigned BuilderOutside : 1;	/// The builder stays outside during the build.
     unsigned BuilderLost : 1;		/// The builder is lost after the build.
-    unsigned Volatile : 1;		/// Unit is a suicide bomber.
     unsigned CanHarvest : 1;		/// Resource can be harvested.
     unsigned Harvester : 1;		/// unit is a resource harvester.
     unsigned char *BoolFlag;		/// User defined flag. Used for (dis)allow target.
