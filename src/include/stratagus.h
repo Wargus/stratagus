@@ -44,7 +44,7 @@
 #define NEW_UNIT_CACHE
 
 // New Lua scripting.
-//#define META_LUA
+// #define META_LUA
 
 // Dynamic loading.
 //#define DYNAMIC_LOAD
@@ -52,12 +52,7 @@
 	//
 	//		Default speed for many things, set it higher for faster actions.
 	//
-#define SPEED_MINE		1				/// Speed factor for mine gold
-#define SPEED_GOLD		1				/// Speed factor for getting gold
-#define SPEED_CHOP		1				/// Speed factor for chop
-#define SPEED_WOOD		1				/// Speed factor for getting wood
-#define SPEED_HAUL		1				/// Speed factor for haul oil
-#define SPEED_OIL		1				/// Speed factor for getting oil
+#define SPEED_RESOURCE	1				/// Speed factor for resources
 #define SPEED_BUILD		1				/// Speed factor for building
 #define SPEED_TRAIN		1				/// Speed factor for training
 #define SPEED_UPGRADE	1				/// Speed factor for upgrading

@@ -959,14 +959,17 @@ global int CclCommand(const char* command)
 local int ScriptGet(lua_State* l)
 {
 	ScriptProxy* sp;
-	const char* key;
 
 	sp = (ScriptProxy*)lua_touserdata(l, -2);
-	key = LuaToString(l, -1);
-	DebugCheck((!sp) || (!key) || (!sp->Object) || (!sp->GetFunction));
-	DebugLevel3Fn("%p->(%s)\n" _C_ sp _C_ key);
+	DebugCheck((!sp) || (!sp->Type));
+	if (sp->Type->GetInt && lua_isnumber(l, -1)) {
+		return sp->Type->GetInt(sp->Object, lua_tonumber(l, -1), l);
+	}
+	if (sp->Type->GetStr && lua_isstring(l, -1)) {
+		return sp->Type->GetStr(sp->Object, lua_tostring(l, -1), l);
+	}
 
-	return sp->GetFunction(sp->Object, key, l);
+	LuaError(l, "Only int or string indexing available for userdata, sorry.\n");
 }
 
 /**
@@ -978,53 +981,56 @@ local int ScriptGet(lua_State* l)
 local int ScriptSet(lua_State* l)
 {
 	ScriptProxy* sp;
-	const char* key;
 
 	sp = (ScriptProxy*)lua_touserdata(l, -3);
-	key = LuaToString(l, -2);
-	DebugCheck((!sp) || (!key) || (!sp->Object) || (!sp->SetFunction));
-	DebugLevel3Fn("%p->(%s)\n" _C_ sp _C_ key);
 
-	return sp->SetFunction(sp->Object, key, l);
+	if (sp->Type->SetInt && lua_isnumber(l, -2)) {
+		return sp->Type->SetInt(sp->Object, lua_tonumber(l, -2), l);
+	}
+	if (sp->Type->SetStr && lua_isstring(l, -2)) {
+		return sp->Type->SetStr(sp->Object, lua_tostring(l, -2), l);
+	}
+
+	LuaError(l, "Only int or string indexing available for userdata, sorry.\n");
 }
 
 /**
-**  Garbage collector function for normal userdata. This is only used inside
-**	scripting, getting called when lua decides to collect the proxy for a C
-**  structure.
+**  Generic Collect Function for a script proxy. Delegate the call to the object's
+**  Collection function.
 **
-**  @param l            The lua state.
-**
-**	@see ScriptCreateUserdata for garbage details.
+**	@param l            The lua state.
 */
-local int ScriptCollectUserdata(lua_State* l)
+local int ScriptCollect(lua_State* l)
 {
 	ScriptProxy* sp;
 	char key[20];
 
 	sp = (ScriptProxy*)lua_touserdata(l, -1);
 	DebugLevel3Fn("Collecting ScriptProxy at %p for obj at %p.\n" _C_ sp _C_ sp->Object);
-
 	// Remove the key from the table.
 	lua_pushstring(l, "StratagusReferences");
 	lua_gettable(l, LUA_REGISTRYINDEX);
-	sprintf(key, "%p%p%p", sp->Object, sp->GetFunction, sp->SetFunction);
+	sprintf(key, "%p%p", sp->Object, sp->Type);
 	lua_pushstring(l, key);
 	lua_pushnil(l);
 	lua_settable(l, -3);
 	lua_remove(l, -1);
+
+	/// Call custom garbage collector, if any.
+	if (sp->Type->Collect) {
+		return sp->Type->Collect(sp);
+	}
 	return 0;
 }
 
 /**
-**  Create a lua proxy for a C structure. This will not always create new
+**  Push a lua proxy on the stack for a C structure. This will not always create new
 **  userdata, but use an old one for the same structure. The userdata is pushed on
 **  the lua stack anyway.
 **
 **  @param l            The lua state
-**  @param Object       The Object to create userdata for.
-**  @param GetFunction  The function called to "Get" a value from the structure.
-**	@param SetFunction  The function called to "Set" a value from the structure.
+**  @param object       The Object to create userdata for.
+**	@param Type         Type info for the object
 **
 **	@notes The Object is sent to the get/set functions, otherwise it is not touched.
 **	@notes Internals.  All lua proxies are kept inside a weak table inside the registry.
@@ -1033,15 +1039,13 @@ local int ScriptCollectUserdata(lua_State* l)
 **	Otherwise it create a new userdata, and sets it's metatable. A garbage collection
 **  proc is called to remove it from the table.
 */
-global void ScriptDoCreateUserdata(lua_State* l, void* Object,
-		ScriptGetSetFunction* GetFunction, ScriptGetSetFunction* SetFunction)
+global void ScriptCreateUserdata(lua_State* l, void* object, ScriptProxyType* type)
 {
 	char key[40];
 	ScriptProxy* sp;
 
 	// FIXME: FASTER?
-	sprintf(key, "%p%p%p", Object, GetFunction, SetFunction);
-
+	sprintf(key, "%p%p", object, type);
 	lua_pushstring(l, "StratagusReferences");
 	lua_gettable(l, LUA_REGISTRYINDEX);
 	lua_pushstring(l, key);
@@ -1051,9 +1055,8 @@ global void ScriptDoCreateUserdata(lua_State* l, void* Object,
 		lua_remove(l, -1);
 		// Create userdata.
 		sp = (ScriptProxy*)lua_newuserdata(l, sizeof(ScriptProxy));
-		sp->Object = Object;
-		sp->GetFunction = GetFunction;
-		sp->SetFunction = SetFunction;
+		sp->Object = object;
+		sp->Type = type;
 		// Get the standard metatable
 		lua_pushstring(l, "StratagusStandardMetatable");
 		lua_gettable(l, LUA_REGISTRYINDEX);
@@ -1064,18 +1067,27 @@ global void ScriptDoCreateUserdata(lua_State* l, void* Object,
 		lua_settable(l, -4);
 		// Remove StratagusReferences reference
 		lua_remove(l, -2);
-		DebugLevel3Fn("Creating ScriptProxy at %p for obj at %p.\n" _C_ lua_touserdata(l, -1) _C_ Object);
+		DebugLevel3Fn("Creating ScriptProxy at %p for obj at %p.\n" _C_ lua_touserdata(l, -1) _C_ object);
 	} else {
 		lua_remove(l, -2);
-		DebugLevel3Fn("Reusing ScriptProxy at %p for obj at %p.\n" _C_ lua_touserdata(l, -1) _C_ Object);
+		DebugLevel3Fn("Reusing ScriptProxy at %p for obj at %p.\n" _C_ lua_touserdata(l, -1) _C_ object);
 	}
 }
 
-global int ScriptSetValueBlock(lua_State* l)
+/**
+**  Really dumb set function that always goes into an error, with string key
+*/
+extern int ScriptGetSetStrBlock(void* object, const char* key, lua_State* l)
 {
-	lua_pushstring(l, "Structure is read-only, sorry.\n");
-	lua_error(l);
-	return 0;
+	LuaError(l, "Access denied");
+}
+
+/**
+**  Really dumb set function that always goes into an error, with int index
+*/
+extern int ScriptGetSetIntBlock(void* object, int index, lua_State* l)
+{
+	LuaError(l, "Access denied");
 }
 
 /**
@@ -1149,7 +1161,7 @@ local void InitScript(void)
 	lua_pushcfunction(Lua, ScriptSet);
 	lua_settable(Lua, -3);
 	lua_pushstring(Lua, "__gc");
-	lua_pushcfunction(Lua, ScriptCollectUserdata);
+	lua_pushcfunction(Lua, ScriptCollect);
 	lua_settable(Lua, -3);
 	lua_settable(Lua, LUA_REGISTRYINDEX);
 	
