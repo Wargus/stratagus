@@ -80,7 +80,7 @@ local void GameMenuReturn(void);
 local void GameShowCredits(void);
 local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
-local void GameOptions(void);
+local void SoundOptions(void);
 local void SetCdMode(Menuitem *mi);
 local void CDRomDisabled(void);
 
@@ -227,7 +227,7 @@ local Menuitem GameMenuItems[] = {
     { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12} } },
     { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, GameOptions, KeyCodeF5} } },
+	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF5} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF1} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
@@ -775,7 +775,7 @@ local Menuitem CampaignContMenuItems[] = {
 #endif
 };
 
-local Menuitem GameOptionsMenuItems[] = {
+local Menuitem SoundOptionsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
@@ -973,7 +973,7 @@ global Menu Menus[] = {
 	256, 288,
 	ImagePanel1,
 	2, 4,
-	GameOptionsMenuItems,
+	SoundOptionsMenuItems,
 	NULL,
     },
     {
@@ -1511,16 +1511,16 @@ local void GameMenuLoad(void)
     LoadAll();	// FIXME: Sample code
 }
 
-local void GameOptions(void)
+local void SoundOptions(void)
 {
     // TODO
 #if !defined(USE_SDLCD) && !defined(USE_LIBCDA)
-    GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+    SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
 #else
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
-	GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
+	SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
 #endif
-    ProcessMenu(MENU_GAME_OPTIONS, 1);
+    ProcessMenu(MENU_SOUND_OPTIONS, 1);
 }
 
 local void SetCdMode(Menuitem *mi)
@@ -1530,7 +1530,7 @@ local void SetCdMode(Menuitem *mi)
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
 	if (SDL_CDStatus(CDRom) <= 1)
-	    GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+	    SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
     /// Stop Playing CD
         SDL_CDStop(CDRom);
@@ -1541,7 +1541,7 @@ local void SetCdMode(Menuitem *mi)
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
 	if (!cd_current_track())
-	    GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+	    SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
     /// Stop Playing CD
         cd_stop();
@@ -1549,7 +1549,7 @@ local void SetCdMode(Menuitem *mi)
     }
 #else
     ProcessMenu(MENU_CDROM_DISABLED, 1);
-    GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+    SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
 #endif
 }
 
