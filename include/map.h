@@ -65,6 +65,7 @@ typedef struct _map_field_ {
     unsigned short	SeenTile;	/// last seen tile (FOW)
     unsigned short	Flags;		/// field flags
     unsigned char	Value;		/// HP for walls/ Wood Regeneration
+    unsigned char	VisibleLastFrame;   /// Visible last frame
 #ifdef NEW_FOW
     unsigned char	VisibleMask:4;	/// Visible mask
     unsigned char	ExploredMask:4;	/// Explored mask
@@ -85,6 +86,9 @@ typedef struct _map_field_ {
     UnitRef		SeaUnit;	/// Sea unit.
 #endif
 } MapField;
+
+#define MapFieldCompletelyVisible   0x0001  /// Field completely visible
+#define MapFieldPartiallyVisible    0x0002  /// Field partially visible
 
 #ifndef NEW_FOW
 #define MapFieldVisible		0x0001	/// Field visible
@@ -213,6 +217,8 @@ extern void MapMarkSight(int tx,int ty,int range);
     /// Mark the new sight in range
 extern void MapMarkNewSight(int,int,int,int,int);
 #endif
+    /// Mark tiles with fog of war to be redrawn
+extern void MapUpdateFogOfWar(int x,int y);
     /// Update visible areas for fog of war
 extern void MapUpdateVisible(void);
     /// Draw the map fog of war
