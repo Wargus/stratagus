@@ -1112,10 +1112,6 @@ SOURCE=.\src\include\editor.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\fc_types.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\include\font.h
 # End Source File
 # Begin Source File
