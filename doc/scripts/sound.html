@@ -1,0 +1,662 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<!--
+----	(c) Copyright 2002 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FreeCraft Configuration Language Description: Icon</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,tileset">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Sound</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 2002 by The FreeCraft Project. Distributed under the
+<A HREF="../gpl.html">"GNU General Public License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<A HREF="research.html">PREV</A> 
+<A HREF="tileset.html">NEXT</A> 
+<A HREF="ccl-index.html">Index</A> 
+<HR>
+<A HREF="#define-game-sounds">define-game-sounds</A>
+<A HREF="#display-sounds">display-sounds</A>
+<A HREF="#make-sound">make-sound</A>
+<A HREF="#make-sound-group">make-sound-group</A>
+<A HREF="#map-sound">map-sound</A>
+<A HREF="#play-file">play-file</A>
+<A HREF="#play-music">play-music</A>
+<A HREF="#play-sound">play-sound</A>
+<A HREF="#set-cd-mode!">set-cd-mode!</A>
+<A HREF="#set-global-sound-range!">set-global-sound-range!</A>
+<A HREF="#set-menu-music!">set-menu-music!</A>
+<A HREF="#set-music-volume!">set-music-volume!</A>
+<A HREF="#set-sound-range!">set-sound-range!</A>
+<A HREF="#set-sound-volume!">set-sound-volume!</A>
+<A HREF="#set-title-music!">set-title-music!</A>
+<A HREF="#sound-for-name">sound-for-name</A>
+<A HREF="#sound-off">sound-off</A>
+<A HREF="#sound-on">sound-on</A>
+<A HREF="#sound-thread">sound-thread</A>
+<A HREF="#stop-music">stop-music</A>
+<A HREF="#with-sound">with-sound</A>
+<HR>
+<H2>Intro - Introduction to sound functions and variables</H2>
+
+Everything around sound.
+<H2>Functions</H2>
+<A NAME="define-game-sounds"></A>
+<H3>define-game-sounds</H3>
+
+<H4>Description</H4>
+
+Specify some global sounds.
+
+<H4>Syntax</H4>
+
+<CODE>(define-game-sounds name sound [[name sound] ...])</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>One of the following:
+'click, 'placement-error, 'placement-success, 'repair, 'human-rescue, 'orc-rescue
+</DD>
+<DT>value</DT>
+<DD>The sound to use.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-game-sounds
+      'placement-error (make-sound "placement error" "ui/placement error.wav")
+      'placement-success (make-sound "placement success" "ui/placement success.wav")
+      'click sound-click
+      'human-rescue (make-sound "human rescue" "human/rescue.wav")
+      'orc-rescue (make-sound "orc rescue" "orc/rescue.wav") )))
+</PRE>
+
+<P>Defines some game sounds.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </A>
+
+<A NAME="display-sounds"></A>
+<H3>display-sounds</H3>
+
+<H4>Description</H4>
+
+Ask the sound system to dump on the standard output the mapping 
+between sound names and sound id.
+
+<H4>Syntax</H4>
+
+<CODE>(display-sounds)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (display-sounds)
+</PRE>
+
+<P>Displays the mapping between sound names and sound id.
+
+<H4>Not Used</H4>
+
+<A NAME="make-sound"></A>
+<H3>make-sound</H3>
+
+<H4>Description</H4>
+
+Asks the sound system to register a sound under a given name, with an 
+associated list of files (the list can be replaced by only one file).
+
+<H4>Syntax</H4>
+
+<CODE>(make-sound name file)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Name of the sound.
+</DD>
+<DT>file</DT>
+<DD>Name of the file or a list of files.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (make-sound "lightning" "spells/lightning.wav")
+    (make-sound "basic human voices acknowledge"
+      (list "human/basic_voices/acknowledgement/1.wav"
+            "human/basic_voices/acknowledgement/2.wav"
+            "human/basic_voices/acknowledgement/3.wav"
+            "human/basic_voices/acknowledgement/4.wav"))
+</PRE>
+
+<P>Makes the sounds "lightning" and "basic human voices acknowledge".
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </A>
+
+<A NAME="make-sound-group"></A>
+<H3>make-sound-group</H3>
+
+<H4>Description</H4>
+
+Asks the sound system to build a special sound group.
+
+<H4>Syntax</H4>
+
+<CODE>(make-sound-group name group group)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Name of the sound.
+</DD>
+<DT>group</DT>
+<DD>sound-id or string
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (make-sound-group "footman-selected"
+      "basic human voices selected" "basic human voices annoyed")
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </A>
+
+<A NAME="map-sound"></A>
+<H3>map-sound</H3>
+
+<H4>Description</H4>
+
+Ask the sound system to remap a sound id to a given name.
+
+<H4>Syntax</H4>
+
+<CODE>(map-sound name sound)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Name of the sound.
+</DD>
+<DT>sound</DT>
+<DD>Sound to map to.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (map-sound "footman-acknowledge" "basic human voices acknowledge")
+</PRE>
+
+<P>Maps the name "footman-acknowledge" to "basic human voices acknowledge".
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </A>
+
+<A NAME="play-file"></A>
+<H3>play-file</H3>
+
+<H4>Description</H4>
+
+Play a sound file.
+
+<H4>Syntax</H4>
+
+<CODE>(play-file name)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Name of the file to play.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (play-file "spells/lightning.wav")
+</PRE>
+
+<P>Play the file "spells/lightning.wav".
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </A>
+
+<A NAME="play-music"></A>
+<H3>play-music</H3>
+
+<H4>Description</H4>
+
+Name of the music file to play.
+
+<H4>Syntax</H4>
+
+<CODE>(play-music name)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Name of the music file.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (play-music "music/default.mod")
+</PRE>
+
+<P>Plays the music file "music/default.mod".
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </A>
+
+<A NAME="play-sound"></A>
+<H3>play-sound</H3>
+
+<H4>Description</H4>
+
+Ask the sound system to play the specified sound.
+
+<H4>Syntax</H4>
+
+<CODE>(play-sound name)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Name of the sound to play.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (play-sound "basic human voices ready")
+</PRE>
+
+<P>Play the sound "basic human voices ready".
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </A>
+
+<A NAME="set-cd-mode!"></A>
+<H3>set-cd-mode!</H3>
+
+<H4>Description</H4>
+
+Set the cd mode.
+
+<H4>Syntax</H4>
+
+<CODE>(set-cd-mode! mode)</CODE>
+
+<DL>
+<DT>mode</DT>
+<DD>":all", ":random", ":off"
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-cd-mode! ":random")
+</PRE>
+
+<P>Set the cd mode to play songs in a random order.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </A>
+
+<A NAME="set-global-sound-range!"></A>
+<H3>set-global-sound-range!</H3>
+
+<H4>Description</H4>
+
+Set the cut off distance.
+
+<H4>Syntax</H4>
+
+<CODE>(set-global-sound-range! distance)</CODE>
+
+<DL>
+<DT>distance</DT>
+<DD>Max tile distance to hear sounds.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-global-sound-range! 40)
+</PRE>
+
+<P>Set the sound range to 40.
+
+<H4>Not Used</H4>
+
+<A NAME="set-menu-music!"></A>
+<H3>set-menu-music!</H3>
+
+<H4>Description</H4>
+
+Set the default menu music.
+
+<H4>Syntax</H4>
+
+<CODE>(set-menu-music! song)</CODE>
+
+<DL>
+<DT>song</DT>
+<DD>Song to be played at menu screen, this is the second screen displayed.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-menu-music! "music/default.mod")
+</PRE>
+
+<P>This is the default song played.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="set-music-volume!"></A>
+<H3>set-music-volume!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-music-volume! volume)</CODE>
+
+<DL>
+<DT>volume</DT>
+<DD>Number between 0 and MaxVolume.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-music-volume! 128)
+</PRE>
+
+<P>Set the music volume to 128.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="set-sound-range!"></A>
+<H3>set-sound-range!</H3>
+
+<H4>Description</H4>
+
+Set the range of a given sound.
+
+<H4>Syntax</H4>
+
+<CODE>(set-sound-range! name distance)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Name of the sound.
+</DD>
+<DT>distance</DT>
+<DD>Max tile distance to hear the sound.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-sound-range! "basic human voices ready" 20)
+</PRE>
+
+<P>Set the range of the sound "basic human voices ready" to 20.
+
+<H4>Not Used</H4>
+
+<A NAME="set-sound-volume!"></A>
+<H3>set-sound-volume!</H3>
+
+<H4>Description</H4>
+
+Global volume support.
+
+<H4>Syntax</H4>
+
+<CODE>(set-sound-volume! volume)</CODE>
+
+<DL>
+<DT>volume</DT>
+<DD>Number between 0 and MaxVolume.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-sound-volume! 128)
+</PRE>
+
+<P>Set the sound volume to 128.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="set-title-music!"></A>
+<H3>set-title-music!</H3>
+
+<H4>Description</H4>
+
+Change the default title music.
+
+<H4>Syntax</H4>
+
+<CODE>(set-title-music! song)</CODE>
+
+<DL>
+<DT>song</DT>
+<DD>Song to be played at title screen, this is the first screen displayed.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-title-music! "music/default.mod")
+</PRE>
+
+<P>This is the default song played.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="sound-for-name"></A>
+<H3>sound-for-name</H3>
+
+<H4>Description</H4>
+
+Ask the sound system to associate a sound id to a sound name.
+
+<H4>Syntax</H4>
+
+<CODE>(sound-for-name name)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Name of the sound.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (sound-for-name "peasant attack")
+</PRE>
+
+<P>.
+
+<H4>Not Used</H4>
+
+<A NAME="sound-off"></A>
+<H3>sound-off</H3>
+
+<H4>Description</H4>
+
+Turn off sound.
+
+<H4>Syntax</H4>
+
+<CODE>(sound-off)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (sound-off)
+</PRE>
+
+<P>Turns off sound.
+
+<H4>Not Used</H4>
+
+<A NAME="sound-on"></A>
+<H3>sound-on</H3>
+
+<H4>Description</H4>
+
+Turn on sound.
+
+<H4>Syntax</H4>
+
+<CODE>(sound-on)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (sound-on)
+</PRE>
+
+<P>Turns on sound.
+
+<H4>Not Used</H4>
+
+<A NAME="sound-thread"></A>
+<H3>sound-thread</H3>
+
+<H4>Description</H4>
+
+Ask clone to use a sound thread.
+
+<H4>Syntax</H4>
+
+<CODE>(sound-thread)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (sound-thread)
+</PRE>
+
+<P>.
+
+<H4>Not Used</H4>
+
+<A NAME="stop-music"></A>
+<H3>stop-music</H3>
+
+<H4>Description</H4>
+
+Stop playing music.
+
+<H4>Syntax</H4>
+
+<CODE>(stop-music)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (stop-music)
+</PRE>
+
+<P>Stop playing music.
+
+<H4>Not Used</H4>
+
+<A NAME="with-sound"></A>
+<H3>with-sound</H3>
+
+<H4>Description</H4>
+
+Returns true if compiled with sound, false otherwise.
+
+<H4>Syntax</H4>
+
+<CODE>(with-sound)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (with-sound)
+</PRE>
+
+<P>Returns true if compiled with sound, false otherwise.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </A>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2002 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
