@@ -379,6 +379,10 @@ global void HandleActionBuilded(Unit* unit)
 		if (type->GivesResource) {
 			// Set to Zero as it's part of a union
 			unit->Data.Resource.Active = 0;
+			// Has StartingResources, Use those
+			if (type->StartingResources) {
+				unit->Value = type->StartingResources;
+			}
 		}
 
 		NotifyPlayer(unit->Player, NotifyGreen, unit->X, unit->Y,
