@@ -65,7 +65,8 @@ void ActionStillGeneric(Unit* unit, int ground)
 	Unit* goal;
 	int i;
 
-	Assert(unit->Orders[0].Action == UnitActionStill);
+	Assert(unit->Orders[0].Action == UnitActionStill ||
+		unit->Orders[0].Action == UnitActionStandGround);
 	//
 	// If unit is not bunkered and removed, wait
 	//
