@@ -268,9 +268,9 @@ global void DrawMinimap(int vx __attribute__((unused)),
 		}
 #else
 		flags=Minimap2MapX[mx]+Minimap2MapY[my];
-		if( TheMap.Fields[flags].Flags&MapFieldExplored &&
+		if( (TheMap.Fields[flags].Flags&MapFieldExplored &&
 			( (TheMap.Visible[0][flags/32]&(1<<(flags%32)))
-			    || ((mx&1)==(my&1)) )
+			    || ((mx&1)==(my&1)) ))
 			    || ReplayRevealMap ) {
 		    VideoDrawPixel(((unsigned char*)MinimapGraphic->Frames)
 			    [mx+my*MINIMAP_W],x+mx,y+my);
@@ -289,7 +289,7 @@ global void DrawMinimap(int vx __attribute__((unused)),
     for( table=Units; table<Units+NumUnits; table++ ) {
 	SysColors color;
 
-	unit=*table;
+	unit=*table;    
 
 	if( unit->Removed ) {		// Removed, inside another building
 	    continue;
