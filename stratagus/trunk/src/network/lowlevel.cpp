@@ -386,6 +386,8 @@ global int NetSocketReady(int sockfd,int timeout)
     fd_set mask;
     sigset_t sigmask;
 
+
+#if defined(linux) && defined(USE_X11)
     // FIXME: ARI: does this work with NON_UNIX hosts ? Posix, but..
     // Linux requires SIGALRM to be blocked, otherwise the
     // itimer set in VIDEO_X11 always kills the select() with EINTR.
@@ -395,6 +397,7 @@ global int NetSocketReady(int sockfd,int timeout)
     sigemptyset(&sigmask);
     sigaddset(&sigmask, SIGALRM);
     sigprocmask(SIG_BLOCK, &sigmask, NULL);
+#endif
 
     //	Check the file descriptors for available data
     do {
@@ -410,9 +413,11 @@ global int NetSocketReady(int sockfd,int timeout)
 	retval = select(sockfd+1, &mask, NULL, NULL, &tv);
     } while ( retval==-1 && errno == EINTR );
 
+#if defined(linux) && defined(USE_X11)
     sigemptyset(&sigmask);
     sigaddset(&sigmask, SIGALRM);
     sigprocmask(SIG_UNBLOCK, &sigmask, NULL);
+#endif
 
     return retval;
 }
