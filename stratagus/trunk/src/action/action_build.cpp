@@ -165,6 +165,22 @@ global void HandleActionBuild(Unit* unit)
 	}
 	return;
     }
+
+    //
+    //	Check if hiting any limits for the building.
+    //
+    if( !PlayerCheckLimits(unit->Player,type) ) {
+	if( unit->Player->Ai ) {
+	    AiCanNotBuild(unit,type);
+	}
+
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	if( unit->Selected ) {	// update display for new action
+	    UpdateButtonPanel();
+	}
+	return;
+    }
     PlayerSubUnitType(unit->Player,type);
 
     build=MakeUnitAndPlace(x,y,type,unit->Player);
