@@ -814,6 +814,11 @@ local int AiAssignHarvester(Unit * unit, int resource)
     //  This will hold the resulting gather destination.
     Unit *dest;
 
+    // It can't.
+    if (unit->Removed) {
+	return 0;
+    }
+
     resinfo = unit->Type->ResInfo[resource];
     DebugCheck(!resinfo);
     if (resinfo->TerrainHarvester) {
@@ -875,15 +880,23 @@ local void AiCollectResources(void)
     int num_units_assigned[MaxCosts];
     Unit *units_unassigned[UnitMax][MaxCosts];	// Unassigned workers
     int num_units_unassigned[MaxCosts];
+
     int total;				// Total of workers
     int c;
+    int src_c;
     int i;
+    int j;
+    int k;
     int n;
-    int o;
     Unit **units;
     Unit *unit;
     int percent[MaxCosts];
     int percent_total;
+    
+    int priority_resource[MaxCosts];
+    int priority_needed[MaxCosts];
+    int wanted[MaxCosts];
+    int total_harvester;
 
     //
     //  Collect statistics about the current assignment
@@ -900,36 +913,44 @@ local void AiCollectResources(void)
 	}
     }
 
+    total_harvester = 0;
+
     n = AiPlayer->Player->TotalNumUnits;
     units = AiPlayer->Player->Units;
     for (i = 0; i < n; i++) {
 	unit = units[i];
-	if ((!unit->Type->Harvester) || (unit->Removed)) {
+	if (!unit->Type->Harvester) {
 	    continue;
 	}
 
 	c = unit->CurrentResource;
+
 	//
 	//      See if it's assigned already
 	//
 	if (unit->Orders[0].Action == UnitActionResource && c) {
 	    units_assigned[num_units_assigned[c]++][c] = unit;
+	    total_harvester++;
 	    continue;
 	}
+
 	//
-	//      Ignore busy units.
+	//      Ignore busy units. ( building, fighting, ... )
 	//      
 	if (!UnitIdle(unit)) {
 	    continue;
 	}
+
 	//
 	//      Send workers with resources back home.
 	//
 	if (unit->Value && c) {
 	    units_with_resource[num_units_with_resource[c]++][c] = unit;
 	    CommandReturnGoods(unit, 0, FlushCommands);
+	    total_harvester++;
 	    continue;
 	}
+
 	//
 	//      Look what the unit can do
 	//
@@ -938,6 +959,7 @@ local void AiCollectResources(void)
 		units_unassigned[num_units_unassigned[c]++][c] = unit;
 	    }
 	}
+	total_harvester++;
     }
 
     total = 0;
@@ -960,108 +982,135 @@ local void AiCollectResources(void)
 #endif
 
     //
-    //  Reassign free workers
+    //  Turn percent values into harvester numbers.
     //
-    for (c = 0; c < MaxCosts; ++c) {
-	if (num_units_unassigned[c] == 0) {
-	    if (percent[c] == 0) {
-		continue;
-	    }
-	    for (i = 0; i < MaxCosts; ++i) {
-		if (i == c) {
-		    continue;
-		}
-		//  FIXME: Shouldn't this turn into a while? currently max one worker is transfered.
-		if ((percent[i] < percent[c] &&
-			((num_units_assigned[c] + num_units_with_resource[c] -
-				1) * percent_total > total * percent[c]
-			    || num_units_assigned[c] + num_units_with_resource[c] == 0))
-		    || (num_units_assigned[i] + num_units_with_resource[i] -
-			1) * percent_total > total * percent[i]) {
-		    //  We take workers from resource i and move them to resource c
-		    int j;
-		    for (j = num_units_assigned[i] - 1; j >= 0; --j) {
-			unit = units_assigned[j][i];
-			if (unit && unit->SubAction < 50) {
-			    units_assigned[j][i] =
-				units_assigned[--num_units_assigned[i]][i];
-			    --total;
-			    units_unassigned[num_units_unassigned[c]++][c] = unit;
-			    break;
-			}
-		    }
-		}
-	    }
+
+    // Wanted needs to be representative.
+    if (total_harvester < 5) {
+	total_harvester = 5;
+    }
+
+    for (c = 0; c < MaxCosts; ++c ) {
+	if (percent[c]) {
+	    wanted[c] = 1 + (percent[c] * total_harvester) / percent_total;
+	} else {
+	    wanted[c] = 0;
 	}
     }
 
     //
-    //  Now assign the free workers.
+    //  Initialise priority & mapping
     //
-    for (n = 0; n < MaxCosts; ++n) {
-	for (i = 0; i < num_units_unassigned[n]; i++) {
-	    int t;
-	    int max;
+    for (c = 0; c < MaxCosts; ++c) {
+	priority_resource[c] = c;
+	priority_needed[c] = wanted[c] - num_units_assigned[c] - num_units_with_resource[c];
+    }
 
-	    //
-	    //  Loop through all of the workers.
-	    //
-	    unit = units_unassigned[i][n];
-
-	    //
-	    //  Here we determine what to assign the worker to first. 
-	    //
-	    for (max = o = c = 0; c < MaxCosts; ++c) {
-		DebugLevel3Fn("%d, %d, %d\n" _C_
-		    (num_units_assigned[c] +
-			num_units_with_resource[c]) *
-		    percent_total _C_ percent[c] _C_ total * percent[c]);
-		t = (num_units_assigned[c] + num_units_with_resource[c]) * percent_total;
-		if (t < total * percent[c]) {
-		    if (total * percent[c] - t > max) {
-			max = total * percent[c] - t;
-			o = c;
-		    }
+    do {
+	//
+	// sort resources by priority
+	//
+	for (i = 0; i < MaxCosts; ++i) {
+	    for (j = i + 1; j < MaxCosts; ++j) {
+		if (priority_needed[j] > priority_needed[i]) {
+		    c = priority_needed[j];
+		    priority_needed[j] = priority_needed[i];
+		    priority_needed[i] = c;
+		    c = priority_resource[j];
+		    priority_resource[j] = priority_resource[i];
+		    priority_resource[i] = c;
 		}
 	    }
+	}
+	
+	//
+	//  Try to complete each ressource in the priority order
+	//
+	unit = 0;
+	for (i = 0; i < MaxCosts; i++) {
+	    c = priority_resource[i];
 
 	    //
-	    //  Look what the unit can do
+	    //     If there is a free worker for c, take it.
 	    //
-	    for (t = 0; t < MaxCosts; ++t) {
-		//
-		//  Now we have to assign it to resource c
-		//  
-		c = (t + o) % MaxCosts;
-		if (!unit->Type->ResInfo[c]) {
-		    continue;		//        Alas, we can't mine c
+	    if (num_units_unassigned[c]) {
+		// Take the unit.
+		j = 0;
+		while (j < num_units_unassigned[c] && !AiAssignHarvester(units_unassigned[j][c], c)) {
+		    // can't assign to c => remove from units_unassigned !
+		    units_unassigned[j][c] = units_unassigned[--num_units_unassigned[c]][c];
 		}
-		//
-		//  Look if it is a worker for this resource
-		//
-		if (AiAssignHarvester(unit, c)) {
-		    int n1, n2;
-		    DebugLevel3Fn("Assigned %d to %s\n" _C_ unit->
-			Slot _C_ DefaultResourceNames[c]);
-		    units_assigned[num_units_assigned[c]++][c] = unit;
-		    units_unassigned[i][c] =
-			units_unassigned[--num_units_unassigned[c]][c];
-		    for (n1 = 0; n1 < MaxCosts; ++n1) {
-			for (n2 = 0; n2 < num_units_unassigned[n1]; ++n2) {
-			    if (units_unassigned[n2][n1] == unit) {
-				units_unassigned[n2][n1] =
-				    units_unassigned[--num_units_unassigned[n1]][n1];
+		
+		// unit is assigned
+		if (j < num_units_unassigned[c]) {
+		    unit = units_unassigned[j][c];
+		    units_unassigned[j][c] = units_unassigned[--num_units_unassigned[c]][c];
+
+		    // remove it from other ressources
+		    for (j = 0; j < MaxCosts; j++) {
+			if (j == c || !unit->Type->ResInfo[j]) {
+			    continue;
+			}
+			for (k = 0; k < num_units_unassigned[j]; k++) {
+			    if (units_unassigned[k][j] == unit) {
+				units_unassigned[k][j] = units_unassigned[--num_units_unassigned[j]][j];
 				break;
 			    }
 			}
 		    }
-		    ++total;
-		    //  We assigned this worker to something already.
-		    break;
+		}
+	    } 
+
+	    //
+	    // 	    Else : Take from already assigned worker with lower priority.
+	    //
+	    if (!unit) {
+		// Take from lower priority only (i+1).
+		for (j = i + 1; j < MaxCosts; j++) {
+		    // Try to move worker from src_c to c
+		    src_c = priority_resource[j];
+
+		    // Don't complete with lower priority ones...
+		    if (wanted[src_c] <= wanted[c]) {
+			continue;
+		    }
+
+		    for (k = num_units_assigned[src_c]-1; k >= 0 ; --k) {
+			unit = units_assigned[k][src_c];
+
+			// unit can't harvest : next one
+			if (!unit->Type->ResInfo[c] || !AiAssignHarvester(unit, c)) {
+			    unit = 0;
+			    continue;
+			}
+
+			// Remove from src_c
+			units_assigned[k][src_c] = units_assigned[--num_units_assigned[src_c]][src_c];
+
+			// j need one more
+			priority_needed[j]++;
+		    }
 		}
 	    }
+
+	    //
+	    //     We just moved an unit. Adjust priority & retry
+	    //
+	    if (unit) {
+		// i got a new unit.
+		priority_needed[i]--;
+
+		// Add to the assigned
+		units_assigned[num_units_assigned[c]++][c] = unit;
+
+		// Recompute priority now
+		break;
+	    }
 	}
-    }
+    } while (unit);
+
+    // Unassigned units there can't be assigned ( ie : they can't move to ressource )
+    // IDEA : use transporter here.
 }
 
 /*----------------------------------------------------------------------------
