@@ -1655,7 +1655,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 	    || ((graphic->Height/height)*height!=graphic->Height) );
 
     n=(graphic->Width/width)*(graphic->Height/height);
-    DebugLevel3(__FUNCTION__": %dx%d in %dx%d = %d frames.\n"
+    DebugLevel3Fn("%dx%d in %dx%d = %d frames.\n"
 	    ,width,height,graphic->Width,graphic->Height,n);
 
     //
@@ -1740,7 +1740,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 	}
     }
 
-    DebugLevel3("\t%d => %d RLE compressed\n"
+    DebugLevel3Fn("\t%d => %d RLE compressed\n"
 	    ,graphic->Width*graphic->Height,dp-data);
 
     //
@@ -1749,13 +1749,12 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
     sprite->Frames=data;
     i=n*sizeof(unsigned char*)+dp-data;
     sprite->Size=i;
-    data=realloc(data,i);
-    if( sprite->Frames!=data ) {	// shrink only - happens rarely
-	dp=sprite->Frames;
+    dp=realloc(data,i);
+    if( dp!=data ) {			// shrink only - happens rarely
 	for( h=0; h<n; ++h ) {		// convert address
-	    ((unsigned char*)dp)[h]+=data-dp;
+	    ((unsigned char**)dp)[h]+=dp-data;
 	}
-	sprite->Frames=data;
+	sprite->Frames=dp;
     }
 
     IfDebug( CompressedGraphicMemory+=i; );
@@ -1801,7 +1800,7 @@ global void InitSprite(void)
 	    break;
 
 	default:
-	    DebugLevel0(__FUNCTION__": unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("Unsupported %d bpp\n",VideoDepth);
 	    abort();
     }
 
