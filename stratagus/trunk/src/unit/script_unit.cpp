@@ -120,7 +120,7 @@ local SCM CclSetRevealAttacker(SCM flag)
 }
 
 /**
-**	Get an unit pointer
+**	Get a unit pointer
 **
 **	@param value	Unit slot number.
 **
@@ -672,7 +672,7 @@ local SCM CclUnit(SCM list)
 }
 
 /**
-**	Make an unit.
+**	Make a unit.
 **
 **	@param type	Unit-type of the unit,
 **	@param player	Owning player number of the unit.
@@ -691,7 +691,7 @@ local SCM CclMakeUnit(SCM type,SCM player)
 }
 
 /**
-**	Place an unit on map.
+**	Place a unit on map.
 **
 **	@param unit	Unit (slot number) to be placed.
 **	@param x	X map tile position.
@@ -703,6 +703,32 @@ local SCM CclPlaceUnit(SCM unit,SCM x,SCM y)
 {
     PlaceUnit(CclGetUnit(unit),gh_scm2int(x),gh_scm2int(y));
     return unit;
+}
+
+/**
+**	Create a unit and place it on the map
+**
+**	@param type	Unit-type of the unit,
+**	@param player	Owning player number of the unit.
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**
+**	@return		Returns the slot number of the made unit.
+*/
+local SCM CclCreateUnit(SCM type,SCM player,SCM x,SCM y)
+{
+    UnitType* unittype;
+    Unit* unit;
+    int heading;
+
+    unittype=CclGetUnitType(type);
+    heading=MyRand()%256;
+    unit=MakeUnit(unittype,&Players[gh_scm2int(player)]);
+    unit->X=gh_scm2int(x);
+    unit->Y=gh_scm2int(y);
+    DropOutOnSide(unit,heading,unittype->TileWidth,unittype->TileHeight);
+
+    return gh_int2scm(unit->Slot);
 }
 
 /**
@@ -812,6 +838,7 @@ global void UnitCclRegister(void)
 
     gh_new_procedure2_0("make-unit",CclMakeUnit);
     gh_new_procedure3_0("place-unit",CclPlaceUnit);
+    gh_new_procedure4_0("create-unit",CclCreateUnit);
 
     // unit member access functions
     gh_new_procedure1_0("get-unit-unholy-armor",CclGetUnitUnholyArmor);
