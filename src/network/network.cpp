@@ -633,7 +633,7 @@ void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 }
 
 /**
-**  Sends My Selections to Teamates
+**  Sends My Selections to Teammates
 **
 **  @param units  Units to send
 **  @param count  Number of units to send
@@ -647,6 +647,19 @@ void NetworkSendSelection(Unit** units, int count)
 	int unitcount;
 	int ref;
 	int i;
+	int teammates[PlayerMax];
+	int numteammates;
+
+	// Check if we have any teammates to send to
+	numteammates = 0;
+	for (i = 0; i < HostsCount; ++i) {
+		if (Players[Hosts[i].PlyNr].Team == ThisPlayer->Team) {
+			teammates[numteammates++] = i;
+		}
+	}
+	if (!numteammates) {
+		return;
+	}
 
 	//
 	//  Build packet of Up to MaxNetworkCommands messages.
@@ -675,11 +688,9 @@ void NetworkSendSelection(Unit** units, int count)
 	//
 	// Send the Constructed packet to team members
 	//
-	for (i = 0; i < HostsCount; ++i) {
-		if (Players[Hosts[i].PlyNr].Team == ThisPlayer->Team) {
-			ref = NetSendUDP(NetworkFildes, Hosts[i].Host, Hosts[i].Port,
-				&packet, sizeof(NetworkPacketHeader) + sizeof(NetworkSelection) * unitcount);
-		}
+	for (i = 0; i < numteammates; ++i) {
+		ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,
+			&packet, sizeof(NetworkPacketHeader) + sizeof(NetworkSelection) * unitcount);
 	}
 
 }
