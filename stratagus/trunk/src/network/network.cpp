@@ -489,6 +489,9 @@ global void InitNetwork2(void)
 
     NetworkConnectSetupGame();
 
+    DebugLevel0Fn("Lag %d, Updates %d, Hosts %d\n"
+	_C_ NetworkLag _C_ NetworkUpdates _C_ HostsCount);
+
     //
     //	Prepare first time without syncs.
     //
