@@ -76,8 +76,8 @@ global unsigned char NetLocalState;	/// Network menu: Local Server/Client connec
 global int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
 global char NetTriesText[32];		/// Network menu: Client tries count text
 global char NetServerText[64];		/// Network menu: Text describing the Network Server IP
+global int NetLocalPlayerNumber;	/// Player number of local client
 
-local int NetLocalPlayerNumber;		/// Player number of local client
 local int NetStateMsgCnt;		/// Number of consecutive msgs of same type sent
 local unsigned char LastStateMsgType;	/// Subtype of last InitConfig message sent
 local unsigned long NetLastPacketSent;	/// Tick the last network packet was sent
