@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name command.c	-	Give units a command. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -38,6 +37,74 @@
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+#ifdef NEW_ORDERS
+/**
+**	Release an order.
+**
+**	@param order	Pointer to order.
+*/
+local void ReleaseOrder(Order* order)
+{
+    if( order->Goal ) {
+#ifdef REFS_DEBUG
+	DebugCheck( !order->Goal->Refs );
+#endif
+	if( !--order->Goal->Refs ) {
+	    ReleaseUnit(order->Goal);
+	}
+	order->Goal=NoUnitP;
+    }
+}
+
+/**
+**	Get next free order slot.
+**
+**	@param unit	pointer to unit.
+**	@param flush	if true, flush order queue.
+**
+**	@returns	Pointer to next free order slot.
+*/
+local Order* GetNextOrder(Unit* unit,int flush)
+{
+    if( flush ) {			// empty command queue
+	if( unit->OrderCount>1 ) {
+	    DebugLevel0Fn("FIXME: must free the order queue\n");
+	}
+	unit->OrderCount=unit->OrderFlush=1;
+	// Order 0 must stopped in the action loop.
+    } else if( unit->OrderCount==MAX_ORDERS ) {
+	// FIXME: johns: wrong place for an error message.
+	// FIXME: johns: should be checked by AI or the user interface
+	if( unit->Player==ThisPlayer ) {
+	    // FIXME: use a general notify call
+            SetMessage( "Unit order list is full" );
+	}
+	return NULL;
+    }
+
+    return &unit->Orders[(int)unit->OrderCount++];
+}
+
+/**
+**	Clear the saved action.
+**
+**	@param unit	Unit pointer, that get the saved action cleared.
+**
+**	If we make an new order, we must clear any saved actions.
+**	Internal functions, must protect it, if needed.
+*/
+local void ClearSavedAction(Unit* unit)
+{
+    unit->SavedOrder.Action=UnitActionStill;	// clear saved action
+    unit->SavedOrder.X=-1;
+    unit->SavedOrder.Y=-1;
+    ReleaseOrder(&unit->SavedOrder);
+    unit->SavedOrder.Type=NULL;
+    unit->SavedOrder.Arg1=NULL;
+}
+
+#else
 
 /**
 **	Get next command.
@@ -64,6 +131,21 @@ local Command* GetNextCommand(Unit* unit,int flush)
     return &unit->NextCommand[(int)unit->NextCount++];
 }
 
+/**
+**	Clear the saved action.
+**
+**	@param unit	Unit pointer, that get the saved action cleared.
+**
+**	If we make an new order, we must clear any saved actions.
+**	Internal functions, must protect it, if needed.
+*/
+local void ClearSavedAction(Unit* unit)
+{
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+}
+
+#endif
+
 /*----------------------------------------------------------------------------
 --	Commands
 ----------------------------------------------------------------------------*/
@@ -75,13 +157,28 @@ local Command* GetNextCommand(Unit* unit,int flush)
 */
 global void CommandStopUnit(Unit* unit)
 {
+#ifdef NEW_ORDERS
+    Order* order;
+
+    order=GetNextOrder(unit,1);		// Flush them.
+    order->Action=UnitActionStill;
+    order->X=-1;
+    order->Y=-1;
+    order->Goal=NoUnitP;
+    order->Type=NULL;
+    order->Arg1=NULL;
+    ReleaseOrder(&unit->SavedOrder);
+    ReleaseOrder(&unit->NewOrder);
+    unit->SavedOrder=unit->NewOrder=*order;
+#else
     unit->NextFlush=1;
     unit->NextCount=1;
     unit->NextCommand[0].Action=UnitActionStill;
 
     unit->PendCommand=unit->NextCommand[0];
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+    ClearSavedAction(unit);
+#endif
 }
 
 /**
@@ -92,6 +189,18 @@ global void CommandStopUnit(Unit* unit)
 */
 global void CommandStandGround(Unit* unit,int flush)
 {
+#ifdef NEW_ORDERS
+    Order* order;
+
+    if( (order=GetNextOrder(unit,flush)) ) {
+	order->Action=UnitActionStandGround;
+	order->X=-1;
+	order->Y=-1;
+	order->Goal=NoUnitP;
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
+#else
     Command* command;
 
     if( !(command=GetNextCommand(unit,flush)) ) {
@@ -100,7 +209,8 @@ global void CommandStandGround(Unit* unit,int flush)
 
     command->Action=UnitActionStandGround;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -112,6 +222,26 @@ global void CommandStandGround(Unit* unit,int flush)
 */
 global void CommandFollow(Unit* unit,Unit* dest,int flush)
 {
+#ifdef NEW_ORDERS
+    Order* order;
+
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending orders.
+	order=&unit->NewOrder;
+    } else if( !(order=GetNextOrder(unit,flush)) ) {
+	return;
+    }
+
+    order->Action=UnitActionFollow;
+    ResetPath(*order);
+    order->Goal=dest;
+    dest->Refs++;
+    order->RangeX=order->RangeY=1;
+    order->X=-1;
+    order->Y=-1;
+    order->Type=NULL;
+    order->Arg1=NULL;
+#else
     Command* command;
 
     if( !(command=GetNextCommand(unit,flush)) ) {
@@ -126,7 +256,8 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -139,6 +270,9 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
 */
 global void CommandMove(Unit* unit,int x,int y,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     IfDebug(
@@ -164,7 +298,8 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -178,6 +313,9 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
 */
 global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     IfDebug(
@@ -217,7 +355,8 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -231,6 +370,9 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 */
 global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     IfDebug(
@@ -274,7 +416,8 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -287,6 +430,9 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 */
 global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     IfDebug(
@@ -311,7 +457,8 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
     command->Data.Move.DY=y;
     // FIXME: pathfinder didn't support this kind of target
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -324,6 +471,9 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 */
 global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     IfDebug(
@@ -346,7 +496,8 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -358,6 +509,9 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
 */
 global void CommandBoard(Unit* unit,Unit* dest,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     if( !(command=GetNextCommand(unit,flush)) ) {
@@ -374,7 +528,8 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
     command->Data.Move.DX=dest->X;
     command->Data.Move.DY=dest->Y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -388,6 +543,9 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
 */
 global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     IfDebug(
@@ -413,7 +571,8 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -428,6 +587,9 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 global void CommandBuildBuilding(Unit* unit,int x,int y
 	,UnitType* what,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     if( !(command=GetNextCommand(unit,flush)) ) {
@@ -455,7 +617,8 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 
     command->Data.Build.BuildThis=what;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -466,6 +629,9 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 */
 global void CommandCancelBuilding(Unit* unit,Unit* worker)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     unit->NextCount=1;
     unit->NextFlush=1;
 
@@ -476,7 +642,8 @@ global void CommandCancelBuilding(Unit* unit,Unit* worker)
     unit->Wait=1;
     unit->Reset=1;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -489,6 +656,9 @@ global void CommandCancelBuilding(Unit* unit,Unit* worker)
 */
 global void CommandHarvest(Unit* unit,int x,int y,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     if( unit->Type->Building ) {
@@ -518,7 +688,8 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
     command->Data.Move.DX=x ? x-1 : x;
     command->Data.Move.DY=y ? y-1 : y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -530,6 +701,9 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 */
 global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     if( unit->Type->Building ) {
@@ -557,7 +731,8 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     command->Data.Move.DY=dest->Y;
 #endif
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -569,6 +744,9 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 */
 global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     Command* command;
 
     if( unit->Type->Building ) {
@@ -595,7 +773,8 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     command->Data.Move.DY=dest->Y;
 #endif
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -606,6 +785,9 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 */
 global void CommandReturnGoods(Unit* unit,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     // FIXME: flush, and command que not supported!
 
     unit->NextCount=1;
@@ -618,7 +800,8 @@ global void CommandReturnGoods(Unit* unit,int flush)
     unit->NextCommand[0].Data.Move.SX=unit->X;
     unit->NextCommand[0].Data.Move.SY=unit->Y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -630,6 +813,9 @@ global void CommandReturnGoods(Unit* unit,int flush)
 */
 global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
 #if 0
     unit->NextCount=1;
     unit->NextFlush=1;
@@ -673,16 +859,21 @@ global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
     unit->Wait=1;			// FIXME: correct this 
     unit->Reset=1;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
 **	Cancel the training an unit.
 **
 **	@param unit	pointer to unit.
+**	@param slot	slot number to cancel.
 */
 global void CommandCancelTraining(Unit* unit,int slot)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: not written\n");
+#else
     int i;
 
     DebugCheck( slot );
@@ -700,7 +891,8 @@ global void CommandCancelTraining(Unit* unit,int slot)
     unit->Wait=1;
     unit->Reset=1;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -712,6 +904,19 @@ global void CommandCancelTraining(Unit* unit,int slot)
 */
 global void CommandUpgradeTo(Unit* unit,UnitType* what,int flush)
 {
+#ifdef NEW_ORDERS
+    Order* order;
+
+    DebugLevel0Fn("FIXME: must support order queing!!");
+    order=GetNextOrder(unit,1);		// Flush them.
+
+    order->Action=UnitActionUpgradeTo;
+    order->X=-1;
+    order->Y=-1;
+    order->Goal=NoUnitP;
+    order->Type=NULL;
+    order->Arg1=what;
+#else
     unit->NextCount=1;
     unit->NextFlush=1;
 
@@ -722,23 +927,37 @@ global void CommandUpgradeTo(Unit* unit,UnitType* what,int flush)
     unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
-**	Cancel Building upgrading to.
+**	Cancel building upgrading to.
 **
 **	@param unit	pointer to unit.
-**	@param flush	if true, flush command queue.
 */
 global void CommandCancelUpgradeTo(Unit* unit)
 {
+#ifdef NEW_ORDERS
+    Order* order;
+
+    DebugLevel0Fn("FIXME: must support order queing!!");
+    order=GetNextOrder(unit,1);		// Flush them.
+
+    order->Action=UnitActionStill;
+    order->X=-1;
+    order->Y=-1;
+    order->Goal=NoUnitP;
+    order->Type=NULL;
+    order->Arg1=NULL;
+#else
     unit->Command.Action=UnitActionStill;
 
     unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -750,6 +969,19 @@ global void CommandCancelUpgradeTo(Unit* unit)
 */
 global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 {
+#ifdef NEW_ORDERS
+    Order* order;
+
+    DebugLevel0Fn("FIXME: must support order queing!!");
+    order=GetNextOrder(unit,1);		// Flush them.
+
+    order->Action=UnitActionResearch;
+    order->X=-1;
+    order->Y=-1;
+    order->Goal=NoUnitP;
+    order->Type=NULL;
+    order->Arg1=what;
+#else
     unit->NextCount=1;
     unit->NextFlush=1;
 
@@ -761,23 +993,37 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
     unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
 **	Cancel Building researching.
 **
 **	@param unit	pointer to unit.
-**	@param flush	if true, flush command queue.
 */
 global void CommandCancelResearch(Unit* unit)
 {
+#ifdef NEW_ORDERS
+    Order* order;
+
+    DebugLevel0Fn("FIXME: must support order queing!!");
+    order=GetNextOrder(unit,1);		// Flush them.
+
+    order->Action=UnitActionStill;
+    order->X=-1;
+    order->Y=-1;
+    order->Goal=NoUnitP;
+    order->Type=NULL;
+    order->Arg1=NULL;
+#else
     unit->Command.Action=UnitActionStill;
 
     unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -791,6 +1037,41 @@ global void CommandCancelResearch(Unit* unit)
 */
 global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
 {
+#ifdef NEW_ORDERS
+    Order* order;
+
+    IfDebug(
+	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	    DebugLevel0Fn("Internal movement error\n");
+	    return;
+	}
+    );
+
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending orders.
+	order=&unit->NewOrder;
+    } else if( !(order=GetNextOrder(unit,flush)) ) {
+	return;
+    }
+
+    order->Action=UnitActionDemolish;
+    ResetPath(*order);
+    // choose goal and good attack range
+    if( dest ) {
+	order->Goal=dest;
+	dest->Refs++;
+	order->RangeX=order->RangeY=1;
+    } else {
+	order->Goal=NoUnitP;
+	if( WallOnMap(x,y) || ForestOnMap(x,y) || RockOnMap(x,y) ) {
+	    order->RangeX=order->RangeY=1;
+	} else {
+	    order->RangeX=order->RangeY=0;
+	}
+    }
+    order->X=x;
+    order->Y=y;
+#else
     Command* command;
 
     IfDebug(
@@ -827,11 +1108,12 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
 
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 /**
-**	Demolish at position
+**	Cast a spell at position or unit.
 **
 **	@param unit	pointer to unit.
 **	@param x	X map position to spell cast on.
@@ -840,8 +1122,47 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
 **	@param spellid  Spell type id.
 **	@param flush	if true, flush command queue.
 */
-global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int flush)
+global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
+	,int flush)
 {
+#ifdef NEW_ORDERS
+    Order* order;
+    SpellType* spell;
+    
+    IfDebug(
+	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	    DebugLevel0("Internal movement error\n");
+	    return;
+	}
+	if( unit->Type->Vanishes ) {
+	    DebugLevel0("Internal error\n");
+	    abort();
+	}
+    );
+
+    DebugLevel3Fn(": %Zd spell-casts on %Zd\n"
+	,UnitNumber(unit),dest ? UnitNumber(dest) : 0);
+
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending commands.
+	order=&unit->NewOrder;
+    } else if( !(order=GetNextOrder(unit,flush)) ) {
+	return;
+    }
+
+    spell=SpellTypeById( spellid );
+
+    order->Action=UnitActionSpellCast;
+    ResetPath(*order);
+    order->RangeX=order->RangeY=spell->Range;
+    order->Goal=dest;
+    if (dest) {
+	dest->Refs++;
+    }
+    order->X=x;
+    order->Y=y;
+    order->Arg1=spell;
+#else
     Command* command;
     const SpellType* spell;
     
@@ -856,7 +1177,7 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int f
 	}
     );
 
-    DebugLevel3(__FUNCTION__": %Zd spell-casts on %Zd\n"
+    DebugLevel3Fn(": %Zd spell-casts on %Zd\n"
 	,UnitNumber(unit),dest ? UnitNumber(dest) : 0);
 
     if( unit->Type->Building ) {
@@ -882,14 +1203,8 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int f
     command->Data.Move.DY=y;
     command->Data.Move.SpellId = spellid;
     
-    /*
-    command->Data.Spell.Goal=dest;
-    command->Data.Spell.Range=spell->Range;
-    command->Data.Spell.DX=x;
-    command->Data.Spell.DY=y;
-    */
-    
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+#endif
+    ClearSavedAction(unit);
 }
 
 //@}
