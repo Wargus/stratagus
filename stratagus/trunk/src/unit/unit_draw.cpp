@@ -108,44 +108,6 @@ global const Viewport* CurrentViewport;		/// FIXME: quick hack for split screen
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 /**
-**		Choose color for selection.
-**
-**		@param unit		Pointer to the unit.
-**
-**		@return				Color for selection, or NULL if not selected.
-*/
-local Uint32 SelectionColor(const Unit* unit)
-{
-	// FIXME: make these colors customizable with scripts.
-
-	if (EditorRunning && unit == UnitUnderCursor &&
-			EditorState == EditorSelecting) {
-		return ColorWhite;
-	}
-
-	if (unit->Selected || (unit->Blink & 1)) {
-		if (unit->Player->Player == PlayerNumNeutral) {
-			return ColorYellow;
-		}
-		// FIXME: better allied?
-		if (unit->Player == ThisPlayer) {
-			return ColorGreen;
-		}
-		if (IsEnemy(ThisPlayer, unit)) {
-			return ColorRed;
-		}
-		return unit->Player->Color;
-	}
-
-	// If building mark all own buildings
-	if (CursorBuilding && unit->Type->Building &&
-			unit->Player == ThisPlayer) {
-		return ColorGray;
-	}
-	return 0;
-}
-
-/**
 **		Show selection marker around an unit.
 **
 **		@param unit		Pointer to unit.
@@ -159,16 +121,36 @@ global void DrawUnitSelection(const Unit* unit)
 
 	type = unit->Type;
 
-	color = SelectionColor(unit);
-	if (color) {
-		x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX +
-			type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
-			(type->Width - VideoGraphicWidth(type->Sprite)) / 2;
-		y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY +
-			type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
-			(type->Height - VideoGraphicHeight(type->Sprite)) / 2;
-		DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
+	// FIXME: make these colors customizable with scripts.
+
+	if (EditorRunning && unit == UnitUnderCursor &&
+			EditorState == EditorSelecting) {
+		color = ColorWhite;
+	} else if (unit->Selected || (unit->Blink & 1)) {
+		if (unit->Player->Player == PlayerNumNeutral) {
+			color = ColorYellow;
+		} else if (unit->Player == ThisPlayer) {
+			// FIXME: better allied?
+			color = ColorGreen;
+		} else if (IsEnemy(ThisPlayer, unit)) {
+			color = ColorRed;
+		} else {
+			color = unit->Player->Color;
+		}
+	} else if (CursorBuilding && unit->Type->Building && unit->Player == ThisPlayer) {
+		// If building mark all own buildings
+		color = ColorGray;
+	} else {
+		return;
 	}
+
+	x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX +
+		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
+		(type->Width - VideoGraphicWidth(type->Sprite)) / 2;
+	y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY +
+		type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
+		(type->Height - VideoGraphicHeight(type->Sprite)) / 2;
+	DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
 }
 
 /**
