@@ -1063,7 +1063,8 @@ local void PasteFromClipboard(Menuitem *mi)
 	return;
     }
 #endif
-    for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i) {
+    for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i] &&
+	    VideoTextLength(mi->font, mi->d.input.buffer) + 8 < mi->d.input.xsize; ++i) {
 	if (clipboard[i] >= 32 && clipboard[i] != '~') {
 	    mi->d.input.buffer[mi->d.input.nch] = clipboard[i];
 	    ++mi->d.input.nch;
@@ -1149,7 +1150,8 @@ inkey:
 			    MustRedraw |= RedrawMenu;
 			}
 		    } else if (key >= 32 && key < 0x100) {
-			if (mi->d.input.nch < mi->d.input.maxch) {
+			if (mi->d.input.nch < mi->d.input.maxch && 
+			    VideoTextLength(mi->font, mi->d.input.buffer) + 8 < mi->d.input.xsize) {
 			    mi->d.input.buffer[mi->d.input.nch++] = keychar;
 			    strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
 			    MustRedraw |= RedrawMenu;
