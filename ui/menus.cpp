@@ -4449,7 +4449,6 @@ local void EndMenu(void)
 
     MustRedraw = RedrawEverything;
     InterfaceState = IfaceStateNormal;
-    HideAnyCursor();
     UpdateDisplay();
     InterfaceState = IfaceStateMenu;
 }
