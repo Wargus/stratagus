@@ -493,6 +493,7 @@ local SCM CclUnit(SCM list)
     SCM sublist;
     Unit* unit;
     UnitType* type;
+    UnitType* seentype;
     Player* player;
     int slot;
     int i;
@@ -505,6 +506,7 @@ local SCM CclUnit(SCM list)
 
     unit=NULL;
     type=NULL;
+    seentype=NULL;
     player=NULL;
 
     //
@@ -517,6 +519,10 @@ local SCM CclUnit(SCM list)
 
 	if( gh_eq_p(value,gh_symbol2scm("type")) ) {
 	    type=UnitTypeByIdent(str=gh_scm2newstr(gh_car(list),NULL));
+	    free(str);
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("seentype")) ) {
+	    seentype=UnitTypeByIdent(str=gh_scm2newstr(gh_car(list),NULL));
 	    free(str);
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("name")) ) {
@@ -539,6 +545,7 @@ local SCM CclUnit(SCM list)
 	    DebugCheck( !type );
 	    unit = UnitSlots[slot];
 	    InitUnit(unit, type);
+	    unit->SeenType=seentype;
 	    unit->Active=0;
 	    unit->Removed=0;
 	    unit->Reset=0;		// JOHNS ????
@@ -625,6 +632,11 @@ local SCM CclUnit(SCM list)
 	    free(str);
 	} else if( gh_eq_p(value,gh_symbol2scm("constructed")) ) {
 	    unit->Constructed=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("seenconstructed")) ) {
+	    unit->SeenConstructed=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("seenstate")) ) {
+	    unit->SeenState=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("active")) ) {
 	    unit->Active=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("resource-active")) ) {
@@ -724,6 +736,13 @@ local SCM CclUnit(SCM list)
 		// HACK: the building is not ready yet
 		unit->Player->UnitTypesCount[type->Type]--;
 	    }
+#ifdef NEW_FOW
+	    if( unit->Orders[0].Action==UnitActionDie ) {
+		MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2,
+					unit->Y+unit->Type->TileHeight/2,
+					unit->CurrentSightRange);
+	    }
+#endif
 	} else if( gh_eq_p(value,gh_symbol2scm("saved-order")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
