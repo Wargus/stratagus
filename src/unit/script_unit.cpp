@@ -365,7 +365,7 @@ local void CclParseOrder(SCM list, Order* order)
 	    order->Arg1 = (void*)gh_scm2int(value);
 
 	} else {
-	   // FIXME: this leaves a half initialized unit
+	   // This leaves a half initialized unit
 	   errl("Unsupported tag", value);
 	}
     }
@@ -544,7 +544,7 @@ local void CclParseOrder(lua_State* l, Order* order)
 	    lua_pop(l, 1);
 
 	} else {
-	   // FIXME: this leaves a half initialized unit
+	   // This leaves a half initialized unit
 	   lua_pushfstring(l, "Unsupported tag: %s", value);
 	   lua_error(l);
 	}
@@ -1313,7 +1313,7 @@ local SCM CclUnit(SCM list)
 	    list = gh_cdr(list);
 	    free(str);
 	} else {
-	   // FIXME: this leaves a half initialized unit
+	   // This leaves a half initialized unit
 	   errl("Unsupported tag", value);
 	}
     }

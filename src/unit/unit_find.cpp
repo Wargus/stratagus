@@ -44,6 +44,7 @@
 #include "sound_id.h"
 #include "unitsound.h"
 #include "unittype.h"
+#include "actions.h"
 #include "player.h"
 #include "missile.h"
 #include "unit.h"
@@ -147,15 +148,19 @@ global int FindPlayerUnitsByType(const Player* player,const UnitType* type,
     Unit** units;
     int num;
     int nunits;
+    int typecount;
     int i;
 
     nunits = player->TotalNumUnits;
     units = player->Units;
-    // FIXME: Can't abort if all units are found: UnitTypeCount
-    for (num = 0, i = 0; i < nunits; ++i) {
+    typecount = player->UnitTypesCount[type->Type];
+    for (num = 0, i = 0; i < nunits && typecount; ++i) {
 	unit = units[i];
-	if (unit->Type == type && !UnitUnusable(unit)) {
-	    table[num++] = unit;
+	if (unit->Type == type) {
+	    if (!UnitUnusable(unit)) {
+		table[num++] = unit;
+	    }
+	    --typecount;
 	}
     }
     return num;
@@ -204,11 +209,8 @@ global Unit* RepairableOnMapTile(int tx, int ty)
 
     n = SelectUnitsOnTile(tx, ty, table);
     for (i = 0; i < n; ++i) {
-	// FIXME: could use more or less for repair? Repair of ships/catapults.
-	// Only repairable if target is a building or tansporter and it's HP is
-	// not at max
-	if ((table[i]->Type->Building || table[i]->Type->Transporter) &&
-		table[i]->HP < table[i]->Stats->HitPoints) {
+	if (table[i]->Type->RepairHP && table[i]->HP &&
+	    table[i]->HP < table[i]->Stats->HitPoints) {
 	    return table[i];
 	}
     }
@@ -237,13 +239,7 @@ global Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
     best = NoUnitP;
     for (i = 0; i < n; ++i) {
 	unit = table[i];
-	// unusable unit ?
-	// if (UnitUnusable(unit)) can't attack constructions
-	// FIXME: did SelectUnitsOnTile already filter this?
-	// Invisible and not Visible
-	if (unit->Removed || unit->Invisible || !unit->HP ||
-		!(unit->Visible & (1 << source->Player->Player)) ||
-		unit->Orders[0].Action == UnitActionDie) {
+	if (GoalGone(source, unit)) {
 	    continue;
 	}
 	type = unit->Type;
@@ -259,7 +255,7 @@ global Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 	//
 	//	Choose the best target.
 	//
-	if (!best || best->Type->Priority<unit->Type->Priority) {
+	if (!best || best->Type->Priority < unit->Type->Priority) {
 	    best = unit;
 	}
     }
@@ -290,13 +286,7 @@ global Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
     best = NoUnitP;
     for (i = 0; i < n; ++i) {
 	unit = table[i];
-	// unusable unit ?
-	// if (UnitUnusable(unit)) can't attack constructions
-	// FIXME: did SelectUnitsOnTile already filter this?
-	// Invisible and not Visible
-	if (unit->Removed || unit->Invisible || !unit->HP ||
-		!(unit->Visible & (1 << source->Player->Player)) ||
-		unit->Orders[0].Action == UnitActionDie) {
+	if (GoalGone(source, unit)) {
 	    continue;
 	}
 	type = unit->Type;
@@ -537,13 +527,7 @@ local Unit* FindRangeAttack(Unit* u, int range)
     for (i = 0; i < n; ++i) {
 	dest = table[i];
 	dtype = dest->Type;
-	//
-	//      unusable unit
-	//
-	// FIXME: did SelectUnits already filter this.
-	if (dest->Removed || dest->Invisible || !u->HP ||
-		!(dest->Visible & (1 << player->Player)) ||
-		dest->Orders[0].Action == UnitActionDie) {
+	if (GoalGone(u, dest)) {
 	    table[i] = 0;
 	    continue;
 	}
@@ -784,13 +768,7 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 
     for (i = 0; i < n; ++i) {
 	dest = table[i];
-	//
-	//	unusable unit
-	//
-	// FIXME: did SelectUnits already filter this.
-	if (dest->Removed || dest->Invisible || !unit->HP ||
-		!(dest->Visible & (1 << player->Player)) ||
-		dest->Orders[0].Action == UnitActionDie) {
+	if (GoalGone(unit, dest)) {	// unit attackable
 	    continue;
 	}
 
