@@ -188,9 +188,6 @@ global void MenusSetBackground(void)
 	if (!Menusbgnd) {
 		Menusbgnd = LoadGraphic(MenuBackground);
 		ResizeGraphic(Menusbgnd, VideoWidth, VideoHeight);
-#ifdef USE_OPENGL
-		MakeTexture(Menusbgnd, Menusbgnd->Width, Menusbgnd->Height);
-#endif
 	}
 
 	VideoDrawSubClip(Menusbgnd, 0, 0,

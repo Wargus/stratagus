@@ -395,9 +395,6 @@ global void DisplayPicture(const char* name)
 
 	picture = LoadGraphic(name);
 	ResizeGraphic(picture, VideoWidth, VideoHeight);
-#ifdef USE_OPENGL
-	MakeTexture(picture, picture->Width, picture->Height);
-#endif
 
 #ifndef USE_OPENGL
 	// Unset the alpha color key, not needed
@@ -410,34 +407,6 @@ global void DisplayPicture(const char* name)
 
 	VideoFree(picture);
 }
-
-// FIXME: this isn't 100% correct
-// Color cycling info - forest:
-// 3		flash red/green (attacked building on minimap)
-// 38-47		cycle				(water)
-// 48-56		cycle				(water-coast boundary)
-// 202		pulsates red		(Circle of Power)
-// 240-244		cycle				(water around ships, Runestone, Dark Portal)
-// Color cycling info - swamp:
-// 3		flash red/green (attacked building on minimap)
-// 4		pulsates red		(Circle of Power)
-// 5-9		cycle				(Runestone, Dark Portal)
-// 38-47		cycle				(water)
-// 88-95		cycle				(waterholes in coast and ground)
-// 240-244		cycle				(water around ships)
-// Color cycling info - wasteland:
-// 3		flash red/green (attacked building on minimap)
-// 38-47		cycle				(water)
-// 64-70		cycle				(coast)
-// 202		pulsates red		(Circle of Power)
-// 240-244		cycle				(water around ships, Runestone, Dark Portal)
-// Color cycling info - winter:
-// 3		flash red/green (attacked building on minimap)
-// 40-47		cycle				(water)
-// 48-54		cycle				(half-sunken ice-floe)
-// 202		pulsates red		(Circle of Power)
-// 205-207		cycle				(lights on christmas tree)
-// 240-244		cycle				(water around ships, Runestone, Dark Portal)
 
 /**
 **  Color cycle.
