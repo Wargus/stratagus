@@ -25,13 +25,12 @@
 
 #include <stdio.h>
 
-#include <errno.h>
-#include <time.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 
 #include "etlib/dllist.h"
+#include "net_lowlevel.h"
 #include "freecraft.h"
 #include "unit.h"
 #include "map.h"
@@ -40,35 +39,7 @@
 #include "network.h"
 #include "commands.h"
 
-// Include system network headers
-#ifdef USE_SDL_NET
-#include <SDLnet.h>
-#else
-#if defined(__WIN32__) || defined(WIN32)
-#  define USE_WINSOCK
-#  include <windows.h>
-#else	// UNIX
-#    include <sys/time.h>
-#    include <unistd.h>
-#  ifndef __BEOS__
-#    include <arpa/inet.h>
-#  endif
-#  include <netinet/in.h>
-#  include <netdb.h>
-#  include <sys/socket.h>
-#  define INVALID_SOCKET -1
-#endif	// !WIN32
-#endif // !USE_SDL_NET
-
-#ifndef INADDR_NONE
-#define INADDR_NONE -1
-#endif
-
 #define BASE_OF(type, elem, p) ((type *)((char *)(p) - offsetof(type, elem)))
-
-#define NIPQUAD(ad) \
-	(((ad) >> 24) & 0xff), (((ad) >> 16) & 0xff), \
-	(((ad) >> 8) & 0xff), ((ad) & 0xff)
 
 //----------------------------------------------------------------------------
 //	Declaration
@@ -148,270 +119,6 @@ global int NetworkUpdates = 5;		/// Network update each # frames
 global int NetworkLag = 10;		/// Network lag in # frames
 global char* NetworkArg;		/// Network command line argument
 
-//----------------------------------------------------------------------------
-//	Functions
-//----------------------------------------------------------------------------
-
-    /// Send packets
-local void NetworkSendPacket(NetworkCommandQueue* ncq);
-
-
-//----------------------------------------------------------------------------
-//	Low level
-//----------------------------------------------------------------------------
-
-/**@name lowlevel */
-//@{
-
-local unsigned long  NetLastHost;	/// Last host number (net format)
-local int NetLastPort;			/// Last port number (net format)
-
-#ifdef USE_SDL_NET	// {
-
-// FIXME: Not written, I (johns) leave this for other people.
-
-/**
-**	Hardware dependend network init.
-*/
-global int NetInit(void)
-{
-    return SDLNet_Init();
-}
-
-/**
-**	Hardware dependend network exit.
-*/
-global void NetExit(void)
-{
-    SDLNet_Exit();
-}
-
-/**
-**	Close an UDP socket port.
-**
-**	@param sockfd	Socket fildes;
-*/
-global void NetCloseUDP(sock)
-{
-    SDLNet_UDP_Close(UDPsocket sock);
-}
-
-#endif	// } USE_SDL_NET
-
-#ifdef USE_WINSOCK	// {
-
-/**
-**	Hardware dependend network init.
-*/
-global int NetInit(void)
-{
-    WSADATA wsaData;
-
-    // Start up the windows networking
-    if ( WSAStartup(MAKEWORD(1,1), &wsaData) ) {
-	fprintf(stderr,"Couldn't initialize Winsock 1.1\n");
-	return -1;
-    }
-    return 0;
-}
-
-/**
-**	Hardware dependend network exit.
-*/
-global void NetExit(void)
-{
-    // Clean up windows networking
-    if ( WSACleanup() == SOCKET_ERROR ) {
-	if ( WSAGetLastError() == WSAEINPROGRESS ) {
-	    WSACancelBlockingCall();
-	    WSACleanup();
-	}
-    }
-}
-
-/**
-**	Close an UDP socket port.
-**
-**	@param sockfd	Socket fildes;
-*/
-global void NetCloseUDP(int sockfd)
-{
-    closesocket(sockfd);
-}
-
-#endif	// } !USE_WINSOCK
-
-#if !defined(USE_SDL_NET) && !defined(USE_WINSOCK)	// {
-
-/**
-**	Hardware dependend network init.
-*/
-global int NetInit(void)
-{
-    return 0;
-}
-
-/**
-**	Hardware dependend network exit.
-*/
-global void NetExit(void)
-{
-}
-
-/**
-**	Close an UDP socket port.
-**
-**	@param sockfd	Socket fildes;
-*/
-global void NetCloseUDP(int sockfd)
-{
-    close(sockfd);
-}
-
-#endif	// } !USE_SDL_NET && !USE_WINSOCK
-
-/**
-**	Resolve host in name or or colon dot notation.
-**
-**	@param host	Host name.
-*/
-global unsigned long NetResolveHost(const char* host)
-{
-    unsigned long addr;
-
-    if( host ) {
-	addr=inet_addr(host);		// try dot notation
-	if( addr==INADDR_NONE ) {
-	    struct hostent *he;
-
-	    he=gethostbyname(host);
-	    if( he ) {
-		addr=0;
-		DebugCheck( he->h_length!=4 );
-		memcpy(&addr,he->h_addr,he->h_length);
-	    }
-	}
-	return addr;
-    }
-    return INADDR_NONE;
-}
-
-/**
-**	Open an UDP Socket port.
-**
-**	@param port	!=0 Port to bind in host notation.
-**
-**	@returns	If success the socket fildes, -1 otherwise.
-*/
-global int NetOpenUDP(int port)
-{
-    int sockfd;
-
-    // open the socket
-    sockfd=socket(AF_INET, SOCK_DGRAM, 0);
-    DebugLevel3Fn(" socket %d\n",sockfd);
-    if( sockfd==INVALID_SOCKET ) {
-	return -1;
-    }
-    // bind local port
-    if( port ) {
-	struct sockaddr_in sock_addr;
-
-	memset(&sock_addr, 0, sizeof(sock_addr));
-	sock_addr.sin_family = AF_INET;
-	sock_addr.sin_addr.s_addr = INADDR_ANY;
-	sock_addr.sin_port = htons(port);
-	// Bind the socket for listening
-	if ( bind(sockfd,(struct sockaddr*)&sock_addr,sizeof(sock_addr))<0 ) {
-	    fprintf(stderr,"Couldn't bind to local port\n");
-	    NetCloseUDP(sockfd);
-	    return -1;
-	}
-	DebugLevel3Fn(" bind ok\n");
-	NetLastHost=sock_addr.sin_addr.s_addr;
-	NetLastPort=sock_addr.sin_port;
-    }
-    return sockfd;
-}
-
-/**
-**	Wait for socket ready.
-**
-**	@param sockfd	Socket fildes to prove.
-**	@param timeout	Timeout in 1/1000 seconds.
-**
-**	@returns	1 if data is available, 0 if not, -1 if failure.
-*/
-global int NetSocketReady(int sockfd,int timeout)
-{
-    int retval;
-    struct timeval tv;
-    fd_set mask;
-
-    //	Check the file descriptors for available data
-    do {
-	// Set up the mask of file descriptors
-	FD_ZERO(&mask);
-	FD_SET(sockfd, &mask);
-
-	// Set up the timeout
-	tv.tv_sec = timeout/1000;
-	tv.tv_usec = (timeout%1000)*1000;
-
-	// Data available?
-	retval = select(sockfd+1, &mask, NULL, NULL, &tv);
-    } while ( retval==-1 && errno == EINTR );
-
-    return retval;
-}
-
-/**
-**	Receive from an UDP socket.
-*/
-global int NetRecvUDP(int sockfd,void* buf,int len)
-{
-    int n;
-    struct sockaddr_in sock_addr;
-
-    n=sizeof(struct sockaddr_in);
-    if( recvfrom(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,&n)<0 ) {
-	fprintf(stderr,__FUNCTION__": Could not read from UDP socket\n");
-	return 0;
-    }
-    NetLastHost=sock_addr.sin_addr.s_addr;
-    NetLastPort=sock_addr.sin_port;
-    DebugLevel3Fn(" %d.%d.%d.%d:%d\n",NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
-    return 1;
-}
-
-/**
-**	Send through an UPD socket to a host:port.
-*/
-global int NetSendUDP(int sockfd,unsigned long host,int port
-	,const void* buf,int len)
-{
-    int n;
-    struct sockaddr_in sock_addr;
-
-    n=sizeof(struct sockaddr_in);
-    sock_addr.sin_addr.s_addr = host;
-    sock_addr.sin_port = port;
-    sock_addr.sin_family = AF_INET;
-
-    return sendto(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,n);
-}
-
-// FIXME: TCP support missing (not needed currently for freecraft)
-
-//@}
-
-//----------------------------------------------------------------------------
-//	API init..
-//----------------------------------------------------------------------------
-
-/**@name api */
-//@{
-
 local int NetPlyNr[PlayerMax];		/// Player nummer
 local char NetMsgBuf[128][PlayerMax];	/// Chat message buffers
 local int NetMsgBufLen[PlayerMax];	/// Stored chat message length
@@ -425,6 +132,21 @@ local int NetworkDelay;			/// Delay counter for recover.
 local NetworkCommandQueue NetworkIn[256][PlayerMax]; /// Per-player network packet input queue
 local struct dl_head CommandsIn[1];	/// Network command input queue
 local struct dl_head CommandsOut[1];	/// Network command output queue
+
+//----------------------------------------------------------------------------
+//	Functions
+//----------------------------------------------------------------------------
+
+    /// Send packets
+local void NetworkSendPacket(NetworkCommandQueue* ncq);
+
+
+//----------------------------------------------------------------------------
+//	API init..
+//----------------------------------------------------------------------------
+
+/**@name api */
+//@{
 
 /**
 **	Send message to all clients.
@@ -546,7 +268,7 @@ local void NetworkServerSetup(void)
 	}
     }
     if( n<NetPlayers ) {
-	fprintf(stderr,"Not enought human slots\n");
+	fprintf(stderr,"Not enough human slots\n");
 	exit(-1);
     }
 
@@ -674,10 +396,10 @@ local void NetworkClientSetup(void)
 	    if( !NetRecvUDP(NetworkFildes,&message,sizeof(message)) ) {
 		exit(-1);
 	    }
-	    DebugLevel0Fn(" receive reply\n");
+	    DebugLevel0Fn(" received reply\n");
 	    IfDebug(
 		if( NetLastHost==MyHost && NetLastPort==MyPort  ) {
-		    fprintf(stderr,"speaking with me self\n");
+		    fprintf(stderr,"talking to myself\n");
 		    exit(-1);
 		}
 	    );
@@ -685,7 +407,7 @@ local void NetworkClientSetup(void)
 		    && message.Type==MessageInitReply ) {
 		break;
 	    }
-	    DebugLevel0Fn(" receive wrong packet\n");
+	    DebugLevel0Fn(" received wrong packet\n");
 	}
     }
 
@@ -698,10 +420,10 @@ local void NetworkClientSetup(void)
 
 	if( NetLastHost!=host || NetLastPort!=port 
 		|| message.Type!=MessageInitConfig ) {
-	    DebugLevel0Fn(" receive wrong packet\n");
+	    DebugLevel0Fn(" received wrong packet\n");
 	    continue;
 	}
-	DebugLevel0Fn(" receive clients\n");
+	DebugLevel0Fn(" received clients\n");
 
 	for( i=0; i<message.HostsCount-1; ++i ) {
 	    if( message.Hosts[i].Host || message.Hosts[i].Port ) {
