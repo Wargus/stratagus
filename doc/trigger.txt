@@ -42,6 +42,7 @@ For the following syntax I use:
 	0 .. 16	Player number
 	'any    Matches any player
 	'all	All players (Not used)
+	'this	Player on the local computer, Human player in the campaign.
 <resource>
 	'gold 'wood 'oil 'ore 'stone 'coal	Quantity in store
 	'all					Sum of all resources in store
