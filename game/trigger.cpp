@@ -64,16 +64,16 @@ extern UnitType* CclGetUnitType(lua_State* l);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM Trigger;			/// Current trigger
-#elif defined(USE_LUA)
-#endif
 global Timer GameTimer;			/// The game timer
 local unsigned long WaitFrame;		/// Frame to wait for
 #if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM Trigger;			/// Current trigger
 local SCM WaitScript;			/// Script to run after wait is over
 local SCM WaitTrigger;			/// Old Trigger value during wait
 #elif defined(USE_LUA)
+local int Trigger;
+local int WaitScript;
+local int WaitTrigger;
 #endif
 local unsigned char Switch[MAX_SWITCH];	/// Switches
 
@@ -215,7 +215,6 @@ typedef int (*CompareFunction)(int, int);
 **
 **	@return		Function pointer to the compare function
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
 local CompareFunction GetCompareFunction(const char* op)
 {
     if (op[0] == '=') {
@@ -239,8 +238,6 @@ local CompareFunction GetCompareFunction(const char* op)
     }
     return NULL;
 }
-#elif defined(USE_LUA)
-#endif
 
 /**
 **	Player has the quantity of unit-type.
@@ -312,6 +309,85 @@ local SCM CclIfUnit(SCM player, SCM operation, SCM quantity, SCM unit)
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfUnit(lua_State* l)
+{
+    int plynr;
+    int q;
+    int pn;
+    const UnitType* unittype;
+    const char* op;
+    CompareFunction compare;
+
+    if (lua_gettop(l) != 4) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    plynr = TriggerGetPlayer(l);
+    lua_pop(l, 1);
+    op = LuaToString(l, 2);
+    q = LuaToNumber(l, 3);
+    unittype = TriggerGetUnitType(l);
+
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operation in if-unit: %s", op);
+	lua_error(l);
+    }
+
+    if (plynr == -1) {
+	plynr = 0;
+	pn = PlayerMax;
+    } else {
+	pn = plynr + 1;
+    }
+
+    if (unittype == ANY_UNIT) {
+	for (; plynr < pn; ++plynr) {
+	    int j;
+
+	    for (j = 0; j < NumUnitTypes; ++j) {
+		if (compare(Players[plynr].UnitTypesCount[j], q)) {
+		    lua_pushboolean(l, 1);
+		    return 1;
+		}
+	    }
+	}
+    } else if (unittype == ALL_UNITS) {
+	for (; plynr < pn; ++plynr) {
+	    if (compare(Players[plynr].TotalNumUnits, q)) {
+		lua_pushboolean(l, 1);
+		return 1;
+	    }
+	}
+    } else if (unittype == ALL_FOODUNITS) {
+	for (; plynr < pn; ++plynr) {
+	    if (compare(Players[plynr].TotalNumUnits - Players[plynr].NumBuildings, q)) {
+		lua_pushboolean(l, 1);
+		return 1;
+	    }
+	}
+    } else if (unittype == ALL_BUILDINGS) {
+	for (; plynr < pn; ++plynr) {
+	    if (compare(Players[plynr].NumBuildings, q)) {
+		lua_pushboolean(l, 1);
+		return 1;
+	    }
+	}
+    } else {
+	for (; plynr < pn; ++plynr) {
+	    DebugLevel3Fn("Player%d, %d == %s\n" _C_ plynr _C_ q _C_ unittype->Ident);
+	    if (compare(Players[plynr].UnitTypesCount[unittype->Type], q)) {
+		lua_pushboolean(l, 1);
+		return 1;
+	    }
+	}
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -392,6 +468,101 @@ local SCM CclIfUnitAt(SCM list)
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfUnitAt(lua_State* l)
+{
+    int plynr;
+    int q;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    const UnitType* unittype;
+    const char* op;
+    CompareFunction compare;
+    Unit* table[UnitMax];
+    Unit* unit;
+    int an;
+    int j;
+    int s;
+
+    if (lua_gettop(l) != 6) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    plynr = TriggerGetPlayer(l);
+    lua_pop(l, 1);
+    op = LuaToString(l, 2);
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operator in if-unit-at: %s", op);
+	lua_error(l);
+    }
+    q = LuaToNumber(l, 3);
+    lua_pushvalue(l, 1);
+    unittype = TriggerGetUnitType(l);
+    lua_pop(l, 1);
+    if (!lua_istable(l, 5) || luaL_getn(l, 5) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_rawgeti(l, 5, 1);
+    x1 = LuaToNumber(l, -1);
+    lua_pop(l, 1);
+    lua_rawgeti(l, 5, 2);
+    y1 = LuaToNumber(l, -1);
+    lua_pop(l, 1);
+    if (!lua_istable(l, 6) || luaL_getn(l, 6) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_rawgeti(l, 6, 1);
+    x2 = LuaToNumber(l, -1);
+    lua_pop(l, 1);
+    lua_rawgeti(l, 6, 2);
+    y2 = LuaToNumber(l, -1);
+    lua_pop(l, 1);
+
+    //
+    //	Get all unit types in location.
+    //
+#ifdef UNIT_ON_MAP
+    // FIXME: could be done faster?
+#endif
+    // FIXME: I hope SelectUnits checks bounds?
+    // FIXME: Yes, but caller should check.
+    // NOTE: +1 right,bottom isn't inclusive :(
+    an = SelectUnits(x1, y1, x2 + 1, y2 + 1, table);
+    //
+    //	Count the requested units
+    //
+    for (j = s = 0; j < an; ++j) {
+	unit = table[j];
+	//
+	//	Check unit type
+	//
+	// FIXME: ALL_UNITS
+	if (unittype == ANY_UNIT ||
+		(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
+		(unittype == ALL_BUILDINGS && unit->Type->Building) ||
+		(unittype == unit->Type)) {
+	    //
+	    //	Check the player
+	    //
+	    if (plynr == -1 || plynr == unit->Player->Player) {
+		++s;
+	    }
+	}
+    }
+    if (compare(s, q)) {
+	lua_pushboolean(l, 1);
+	return 1;
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -487,6 +658,105 @@ local SCM CclIfNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfNearUnit(lua_State* l)
+{
+    int plynr;
+    int q;
+    int n;
+    int i;
+    const UnitType* unittype;
+    const UnitType* ut2;
+    const char* op;
+    Unit* table[UnitMax];
+    CompareFunction compare;
+
+    if (lua_gettop(l) != 4) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    plynr = TriggerGetPlayer(l);
+    lua_pop(l, 1);
+    op = LuaToString(l, 2);
+    q = LuaToNumber(l, 3);
+    lua_pushvalue(l, 4);
+    unittype = TriggerGetUnitType(l);
+    lua_pop(l, 1);
+    ut2 = CclGetUnitType(l);
+
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operation in if-near-unit: %s", op);
+	lua_error(l);
+    }
+
+    //
+    //	Get all unit types 'near'.
+    //
+    n = FindUnitsByType(ut2, table);
+    DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
+    for (i = 0; i < n; ++i) {
+	Unit* unit;
+	Unit* around[UnitMax];
+	int an;
+	int j;
+	int s;
+
+	unit = table[i];
+
+#ifdef UNIT_ON_MAP
+	// FIXME: could be done faster?
+#endif
+	// FIXME: I hope SelectUnits checks bounds?
+	// FIXME: Yes, but caller should check.
+	// NOTE: +1 right,bottom isn't inclusive :(
+	if (unit->Type->UnitType == UnitTypeLand) {
+	    an = SelectUnits(unit->X - 1, unit->Y - 1,
+		unit->X + unit->Type->TileWidth + 1,
+		unit->Y + unit->Type->TileHeight + 1, around);
+	} else {
+	    an = SelectUnits(unit->X - 2, unit->Y - 2,
+		unit->X + unit->Type->TileWidth + 2,
+		unit->Y + unit->Type->TileHeight + 2, around);
+	}
+	DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
+	//
+	//	Count the requested units
+	//
+	for (j = s = 0; j < an; ++j) {
+	    unit = around[j];
+	    //
+	    //	Check unit type
+	    //
+	    // FIXME: ALL_UNITS
+	    if (unittype == ANY_UNIT ||
+		    (unittype == ALL_FOODUNITS && !unit->Type->Building) ||
+		    (unittype == ALL_BUILDINGS && unit->Type->Building) ||
+		    (unittype == unit->Type)) {
+		//
+		//	Check the player
+		//
+		if (plynr == -1 || plynr == unit->Player->Player) {
+		    ++s;
+		}
+	    }
+	}
+	// Check if we counted the unit near itself
+	if (unittype == ANY_UNIT ||
+		(unittype == ALL_FOODUNITS && ut2->Building) ||
+		(unittype == ALL_BUILDINGS && ut2->Building)) {
+	    --s;
+	}
+	if (compare(s, q)) {
+	    lua_pushboolean(l, 1);
+	    return 1;
+	}
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -584,6 +854,107 @@ local SCM CclIfRescuedNearUnit(SCM player, SCM operation, SCM quantity, SCM unit
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfRescuedNearUnit(lua_State* l)
+{
+    int plynr;
+    int q;
+    int n;
+    int i;
+    const UnitType* unittype;
+    const UnitType* ut2;
+    const char* op;
+    Unit* table[UnitMax];
+    CompareFunction compare;
+
+    if (lua_gettop(l) != 5) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    plynr = TriggerGetPlayer(l);
+    lua_pop(l, 1);
+    op = LuaToString(l, 2);
+    q = LuaToNumber(l, 3);
+    lua_pushvalue(l, 4);
+    unittype = TriggerGetUnitType(l);
+    lua_pop(l, 1);
+    ut2 = CclGetUnitType(l);
+
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operation in if-rescued-near-unit: %s", op);
+	lua_error(l);
+    }
+
+    //
+    //	Get all unit types 'near'.
+    //
+    n = FindUnitsByType(ut2, table);
+    DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
+    for (i = 0; i < n; ++i) {
+	Unit* unit;
+	Unit* around[UnitMax];
+	int an;
+	int j;
+	int s;
+
+	unit = table[i];
+
+#ifdef UNIT_ON_MAP
+	// FIXME: could be done faster?
+#endif
+	// FIXME: I hope SelectUnits checks bounds?
+	// FIXME: Yes, but caller should check.
+	// NOTE: +1 right,bottom isn't inclusive :(
+	if (unit->Type->UnitType == UnitTypeLand) {
+	    an = SelectUnits(unit->X - 1, unit->Y - 1,
+		unit->X + unit->Type->TileWidth + 1,
+		unit->Y + unit->Type->TileHeight + 1, around);
+	} else {
+	    an = SelectUnits(unit->X - 2, unit->Y - 2,
+		unit->X + unit->Type->TileWidth + 2,
+		unit->Y + unit->Type->TileHeight + 2, around);
+	}
+	DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
+	//
+	//	Count the requested units
+	//
+	for (j = s = 0; j < an; ++j) {
+	    unit = around[j];
+	    if (unit->RescuedFrom) {	// only rescued units
+		//
+		//	Check unit type
+		//
+		// FIXME: ALL_UNITS
+		if (unittype == ANY_UNIT ||
+			(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
+			(unittype == ALL_BUILDINGS && unit->Type->Building) ||
+			(unittype == unit->Type)) {
+		    //
+		    //	Check the player
+		    //
+		    if (plynr == -1 || plynr == unit->Player->Player) {
+			++s;
+		    }
+		}
+	    }
+	}
+	// Check if we counted the unit near itself
+	if (unittype == ANY_UNIT ||
+		(unittype == ALL_FOODUNITS && ut2->Building) ||
+		(unittype == ALL_BUILDINGS && ut2->Building)) {
+	    --s;
+	}
+	if (compare(s, q)) {
+	    lua_pushboolean(l, 1);
+	    return 1;
+	}
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -638,6 +1009,63 @@ local SCM CclIfOpponents(SCM player, SCM operation, SCM quantity)
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfOpponents(lua_State* l)
+{
+    int plynr;
+    int q;
+    int pn;
+    int n;
+    const char* op;
+    CompareFunction compare;
+
+    if (lua_gettop(l) != 3) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    plynr = TriggerGetPlayer(l);
+    lua_pop(l, 1);
+    op = LuaToString(l, 2);
+    q = LuaToNumber(l, 3);
+
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operation in if-opponents: %s", op);
+	lua_error(l);
+    }
+
+    if (plynr == -1) {
+	plynr = 0;
+	pn = PlayerMax;
+    } else {
+	pn = plynr + 1;
+    }
+
+    //
+    //	Check the player opponents
+    //
+    for (n = 0; plynr < pn; ++plynr) {
+	int i;
+
+	for (i = 0; i < PlayerMax; ++i) {
+	    //
+	    //	This player is our enemy and has units left.
+	    //
+	    if ((Players[i].Enemy & (1 << plynr)) && Players[i].TotalNumUnits) {
+		++n;
+	    }
+	}
+	DebugLevel3Fn("Opponents of %d = %d\n" _C_ plynr _C_ n);
+	if (compare(n, q)) {
+	    lua_pushboolean(l, 1);
+	    return 1;
+	}
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -709,6 +1137,83 @@ local SCM CclIfResource(SCM player, SCM operation, SCM quantity, SCM resource)
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfResource(lua_State* l)
+{
+    int plynr;
+    int q;
+    int pn;
+    const char* res;
+    const char* op;
+    CompareFunction compare;
+    int i;
+
+    if (lua_gettop(l) != 4) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    plynr = TriggerGetPlayer(l);
+    lua_pop(l, 1);
+    op = LuaToString(l, 2);
+    q = LuaToNumber(l, 3);
+    res = LuaToString(l, 4);
+
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operation in if-resource: %s", op);
+	lua_error(l);
+    }
+
+    if (plynr == -1) {
+	plynr = 0;
+	pn = PlayerMax;
+    } else {
+	pn = plynr + 1;
+    }
+
+    for (i = 0; i < MaxCosts; ++i) {
+	if (!strcmp(res, DefaultResourceNames[i])) {
+	    for (; plynr < pn; ++plynr) {
+		if (compare(Players[plynr].Resources[i], q)) {
+		    lua_pushboolean(l, 1);
+		    return 1;
+		}
+	    }
+	    lua_pushboolean(l, 0);
+	    return 1;
+	}
+    }
+    if (!strcmp(res, "all")) {
+	int j;
+	int sum;
+
+	sum = 0;
+	for (; plynr < pn; ++plynr) {
+	    for (j = 1; j < MaxCosts; ++j) {
+		sum += Players[plynr].Resources[j];
+	    }
+	}
+	if (compare(sum, q)) {
+	    lua_pushboolean(l, 1);
+	    return 1;
+	}
+    } else if (!strcmp(res, "any")) {
+	int j;
+
+	for (; plynr < pn; ++plynr) {
+	    for (j = 1; j < MaxCosts; ++j) {
+		if (compare(Players[plynr].Resources[j], q)) {
+		    lua_pushboolean(l, 1);
+		    return 1;
+		}
+	    }
+	}
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -749,6 +1254,49 @@ local SCM CclIfKills(SCM player, SCM operation, SCM quantity)
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfKills(lua_State* l)
+{
+    int plynr;
+    int q;
+    int pn;
+    int n;
+    const char* op;
+    CompareFunction compare;
+
+    if (lua_gettop(l) != 3) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    plynr = TriggerGetPlayer(l);
+    lua_pop(l, 1);
+    op = LuaToString(l, 2);
+    q = LuaToNumber(l, 3);
+
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operation in if-kills: %s", op);
+	lua_error(l);
+    }
+
+    if (plynr == -1) {
+	plynr = 0;
+	pn = PlayerMax;
+    } else {
+	pn = plynr + 1;
+    }
+
+    for (n = 0; plynr < pn; ++plynr) {
+	if (compare(Players[plynr].TotalKills, q)) {
+	    lua_pushboolean(l, 1);
+	    return 1;
+	}
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -789,6 +1337,49 @@ local SCM CclIfScore(SCM player, SCM operation, SCM quantity)
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfScore(lua_State* l)
+{
+    int plynr;
+    int q;
+    int pn;
+    int n;
+    const char* op;
+    CompareFunction compare;
+
+    if (lua_gettop(l) != 3) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    plynr = TriggerGetPlayer(l);
+    lua_pop(l, 1);
+    op = LuaToString(l, 2);
+    q = LuaToNumber(l, 3);
+
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operation in if-score: %s", op);
+	lua_error(l);
+    }
+
+    if (plynr == -1) {
+	plynr = 0;
+	pn = PlayerMax;
+    } else {
+	pn = plynr + 1;
+    }
+
+    for (n = 0; plynr < pn; ++plynr) {
+	if (compare(Players[plynr].Score, q)) {
+	    lua_pushboolean(l, 1);
+	    return 1;
+	}
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -816,6 +1407,34 @@ local SCM CclIfElapsed(SCM operation, SCM quantity)
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfElapsed(lua_State* l)
+{
+    int q;
+    const char* op;
+    CompareFunction compare;
+
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    op = LuaToString(l, 1);
+    q = LuaToNumber(l, 2);
+
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operation in if-elapsed: %s", op);
+	lua_error(l);
+    }
+
+    if (compare(GameCycle, q)) {
+	lua_pushboolean(l, 1);
+	return 1;
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -847,6 +1466,39 @@ local SCM CclIfTimer(SCM operation, SCM quantity)
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfTimer(lua_State* l)
+{
+    int q;
+    const char* op;
+    CompareFunction compare;
+
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    if (!GameTimer.Init) {
+	lua_pushboolean(l, 0);
+	return 1;
+    }
+
+    op = LuaToString(l, 1);
+    q = LuaToNumber(l, 2);
+
+    compare = GetCompareFunction(op);
+    if (!compare) {
+	lua_pushfstring(l, "Illegal comparison operation in if-timer: %s", op);
+	lua_error(l);
+    }
+
+    if (compare(GameTimer.Cycles, q)) {
+	lua_pushboolean(l, 1);
+	return 1;
+    }
+
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 /**
@@ -878,6 +1530,38 @@ local SCM CclIfSwitch(SCM number, SCM set)
     return SCM_BOOL_F;
 }
 #elif defined(USE_LUA)
+local int CclIfSwitch(lua_State* l)
+{
+    int i;
+    unsigned char s;
+
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    i = LuaToNumber(l, 1);
+    if (i < 0 || i >= MAX_SWITCH) {
+	lua_pushfstring(l, "Invalid switch number", i);
+	lua_error(l);
+    }
+
+    if (lua_isboolean(l, 2)) {
+	s = LuaToBoolean(l, 2);
+    } else {
+	s = LuaToNumber(l, 2);
+	if (s) {
+	    s = 1;
+	}
+    }
+
+    if (Switch[i] == s) {
+	lua_pushboolean(l, 1);
+	return 1;
+    }
+    lua_pushboolean(l, 0);
+    return 1;
+}
 #endif
 
 // --------------------------------------------------------------------------
@@ -1133,11 +1817,11 @@ local SCM CclAddTrigger(SCM condition, SCM action)
     //
     var = gh_symbol2scm("*triggers*");
 
-    if (gh_null_p(symbol_value(var,NIL))) {
+    if (gh_null_p(symbol_value(var, NIL))) {
 	puts("Trigger not set, defining trigger");
-	setvar(var, cons(cons(condition,action),NIL), NIL);
+	setvar(var, cons(cons(condition, action), NIL), NIL);
     } else {
-        // Search for the last element in the list
+	// Search for the last element in the list
 	var = symbol_value(var, NIL);
 	while(!gh_null_p(gh_cdr(var))) {
 	    var = gh_cdr(var);
@@ -1148,6 +1832,57 @@ local SCM CclAddTrigger(SCM condition, SCM action)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclAddTrigger(lua_State* l)
+{
+    int i;
+    const char* str;
+    int args;
+    int j;
+
+    if (lua_gettop(l) != 2 || !lua_isfunction(l, 1) ||
+	    (!lua_isfunction(l, 2) && !lua_istable(l, 2))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    //
+    //	Make a list of all triggers.
+    //		A trigger is a pair of condition and action
+    //
+    lua_pushstring(l, "_triggers_");
+    lua_gettable(l, LUA_GLOBALSINDEX);
+
+    if (lua_isnil(l, -1)) {
+	puts("Trigger not set, defining trigger");
+	lua_pushstring(l, "_triggers_");
+	lua_newtable(l);
+	lua_settable(l, LUA_GLOBALSINDEX);
+	lua_pushstring(l, "_triggers_");
+	lua_gettable(l, LUA_GLOBALSINDEX);
+    }
+
+    i = luaL_getn(l, -1);
+    lua_pushvalue(l, 1);
+    lua_rawseti(l, -2, i + 1);
+    lua_newtable(l);
+    if (lua_isfunction(l, 2)) {
+	lua_pushvalue(l, 2);
+	lua_rawseti(l, -2, 1);
+    } else {
+	args = luaL_getn(l, 2);
+	for (j = 0; j < args; ++j) {
+	    lua_rawgeti(l, 2, j + 1);
+	    str = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    luaL_loadbuffer(l, str, strlen(str), str);
+	    lua_rawseti(l, -2, j + 1);
+	}
+    }
+    lua_rawseti(l, -2, i + 2);
+    lua_pop(l, 1);
+
+    return 0;
+}
 #endif
 
 /**
@@ -1215,6 +1950,36 @@ local int TriggerExecuteAction(SCM script)
     return 0;
 }
 #elif defined(USE_LUA)
+local int TriggerExecuteAction(int script)
+{
+    int ret;
+    int args;
+    int j;
+
+    ret = 0;
+
+    lua_rawgeti(Lua, -1, script + 1);
+    args = luaL_getn(Lua, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(Lua, -1, j + 1);
+	LuaCall(0, 0);
+	if (lua_gettop(Lua) > 2 && lua_toboolean(Lua, -1)) {
+	    ret = 1;
+	} else {
+	    ret = 0;
+	}
+	lua_settop(Lua, 2);
+	if (WaitFrame > FrameCounter) {
+	    WaitScript = script;
+	    lua_pop(Lua, 1);
+	    return 0;
+	}
+    }
+    lua_pop(Lua, 1);
+
+    // If action returns false remove it
+    return !ret;
+}
 #endif
 
 /**
@@ -1235,6 +2000,13 @@ local void TriggerRemoveTrigger(SCM trig)
     CclGcProtectedAssign(&Trigger, trig);
 }
 #elif defined(USE_LUA)
+local void TriggerRemoveTrigger(int trig)
+{
+    lua_pushnil(Lua);
+    lua_rawseti(Lua, -2, trig);
+    lua_pushnil(Lua);
+    lua_rawseti(Lua, -2, trig + 1);
+}
 #endif
 
 /**
@@ -1291,6 +2063,60 @@ global void TriggersEachCycle(void)
 	CclGcProtectedAssign(&Trigger, NULL);
     }
 #elif defined(USE_LUA)
+    int triggers;
+
+    lua_pushstring(Lua, "_triggers_");
+    lua_gettable(Lua, LUA_GLOBALSINDEX);
+    triggers = luaL_getn(Lua, -1);
+
+    if (Trigger >= triggers) {
+	Trigger = 0;
+    }
+
+    if (WaitFrame > FrameCounter) {
+	lua_pop(Lua, 1);
+	return;
+    }
+    if (WaitFrame && WaitFrame <= FrameCounter) {
+	WaitFrame = 0;
+	if (TriggerExecuteAction(WaitScript)) {
+	    TriggerRemoveTrigger(WaitTrigger);
+	}
+	lua_pop(Lua, 1);
+	return;
+    }
+
+    if (GamePaused) {
+	lua_pop(Lua, 1);
+	return;
+    }
+
+    // Skip to the next trigger
+    while (Trigger < triggers) {
+	lua_rawgeti(Lua, -1, Trigger + 1);
+	if (!lua_isnil(Lua, -1)) {
+	    break;
+	}
+	Trigger += 2;
+    }
+    if (Trigger < triggers) {
+	int top;
+
+	WaitTrigger = Trigger;
+	Trigger += 2;
+	top = lua_gettop(Lua);
+	LuaCall(0, 0);
+	// If condition is true execute action
+	top = lua_gettop(Lua);
+	if (lua_gettop(Lua) > 1 && lua_toboolean(Lua, -1)) {
+	    lua_settop(Lua, 1);
+	    if (TriggerExecuteAction(WaitTrigger + 1)) {
+		TriggerRemoveTrigger(WaitTrigger);
+	    }
+	}
+	lua_settop(Lua, 1);
+    }
+    lua_pop(Lua, 1);
 #endif
 }
 
@@ -1332,20 +2158,20 @@ global void TriggerCclRegister(void)
 
     gh_define("*triggers*", NIL);
 #elif defined(USE_LUA)
-//    lua_register(Lua, "AddTrigger", CclAddTrigger);
+    lua_register(Lua, "AddTrigger", CclAddTrigger);
 //    lua_register(Lua, "SetTriggerNumber!", CclSetTriggerNumber);
     // Conditions
-//    lua_register(Lua, "IfUnit", CclIfUnit);
-//    lua_register(Lua, "IfUnitAt", CclIfUnitAt);
-//    lua_register(Lua, "IfNearUnit", CclIfNearUnit);
-//    lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
-//    lua_register(Lua, "IfOpponents", CclIfOpponents);
-//    lua_register(Lua, "IfResource", CclIfResource);
-//    lua_register(Lua, "IfKills", CclIfKills);
-//    lua_register(Lua, "IfScore", CclIfScore);
-//    lua_register(Lua, "IfElapsed", CclIfElapsed);
-//    lua_register(Lua, "IfTimer", CclIfTimer);
-//    lua_register(Lua, "IfSwitch", CclIfSwitch);
+    lua_register(Lua, "IfUnit", CclIfUnit);
+    lua_register(Lua, "IfUnitAt", CclIfUnitAt);
+    lua_register(Lua, "IfNearUnit", CclIfNearUnit);
+    lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
+    lua_register(Lua, "IfOpponents", CclIfOpponents);
+    lua_register(Lua, "IfResource", CclIfResource);
+    lua_register(Lua, "IfKills", CclIfKills);
+    lua_register(Lua, "IfScore", CclIfScore);
+    lua_register(Lua, "IfElapsed", CclIfElapsed);
+    lua_register(Lua, "IfTimer", CclIfTimer);
+    lua_register(Lua, "IfSwitch", CclIfSwitch);
     // Actions
     lua_register(Lua, "ActionVictory", CclActionVictory);
     lua_register(Lua, "ActionDefeat", CclActionDefeat);
@@ -1513,6 +2339,14 @@ global void InitTriggers(void)
 	gh_apply(symbol_value(gh_symbol2scm("single-player-triggers"), NIL), NIL);
     }
 #elif defined(USE_LUA)
+    lua_pushstring(Lua, "_triggers_");
+    lua_gettable(Lua, LUA_GLOBALSINDEX);
+    if (lua_isnil(Lua, -1)) {
+	lua_pushstring(Lua, "SinglePlayerTriggers");
+	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	LuaCall(0, 1);
+    }
+    lua_pop(Lua, 1);
 #endif
 
     memset(Switch, 0, sizeof(Switch));
