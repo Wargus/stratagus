@@ -508,6 +508,11 @@ Possible tags:
 <dd>Panel name (FIXME: how is it used?).</dd>
 <dt>"default", number</dt>
 <dd>Initial selected item number</dd>
+<dt>"init", "function_name"</dt>
+<dd>FIXME (function = "save-replay-init" or "scen-select-init" ? )</dd>
+<dt>"exit", "function_name"</dt>
+<dd>FIXME ("speed-options-exit" or "load-game-exit" ? )</dd>
+
 <dt>"netaction", "menu-action"</dt>
 <dd>FIXME: which are menu-action ?</dd>
 <dl>
@@ -573,11 +578,6 @@ FIXME: incomplete docu<br>
 <dt>"font", "font-name"</dt>
 <dd>Use "game", "small", "large", "small-title", "large-title",
 "user1", "user2", "user3", "user4", "user5"</dd>
-<dt>"init", "function_name"</dt>
-<dd>FIXME (function = "save-replay-init" or "scen-select-init" ? )</dd>
-<dt>"exit", "function_name"</dt>
-<dd>FIXME ("speed-options-exit" or "load-game-exit" ? )</dd>
-
 <dt>type, {arg_type}</dt>
 <dd>type could be :</dd>
   <dl>
@@ -614,8 +614,8 @@ For example:
     <dd>FIXME.</dd>
     <dt>"hotkey", "key"</dt>
     <dd>A string like &quot;f8&quot;. FIXME</dd>
-    <dt>"func", "function-name"</dt>
-    <dd>C handler. FIXME: when called?</dd>
+    <dt>"func", "function-name" or Lua function</dt>
+    <dd>Called when a button is clicked</dd>
     <dt>"style", style-name</dt>
     <dd>Complete list of possible styles-name:
      FIXME (not all for buttons)
