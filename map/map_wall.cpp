@@ -72,7 +72,7 @@
 **	@param y	Map Y tile-position.
 **	@param walltype	Walltype to check. (-1 any kind)
 */
-global int MapIsSeenTileWall(int x, int y,int walltype)
+global int MapIsSeenTileWall(int x, int y, int walltype)
 {
     int t;
 
@@ -123,25 +123,33 @@ global void MapFixSeenWallTile(int x, int y)
 	tile |= 1 << 3;
     }
 
-    if( t==TileTypeHumanWall ) {
+    if (t == TileTypeHumanWall) {
 	tile = TheMap.Tileset->HumanWallTable[tile];
-	if( mf->Value<=UnitTypeHumanWall->_HitPoints/2 ) {
-	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
+	if (mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
+	    while (TheMap.Tileset->Table[tile]){	// Skip good tiles
 		++tile;
 	    }
-	    while( !TheMap.Tileset->Table[tile] ) {	// Skip separator
+	    while (!TheMap.Tileset->Table[tile]) {	// Skip separator
 		++tile;
 	    }
 	}
     } else {
 	tile = TheMap.Tileset->OrcWallTable[tile];
-	if( mf->Value<=UnitTypeOrcWall->_HitPoints/2 ) {
-	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
+	if (mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
+	    while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
 		++tile;
 	    }
-	    while( !TheMap.Tileset->Table[tile] ) {	// Skip separator
+	    while (!TheMap.Tileset->Table[tile]) {	// Skip separator
 		++tile;
 	    }
+	}
+    }
+    if (mf->Value == 0) {
+	while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
+	    ++tile;
+	}
+	while (!TheMap.Tileset->Table[tile]) {	// Skip separator
+	    ++tile;
 	}
     }
     tile = TheMap.Tileset->Table[tile];
@@ -151,9 +159,9 @@ global void MapFixSeenWallTile(int x, int y)
 
 	// FIXME: can this only happen if seen?
 #ifdef NEW_FOW
-	if (mf->Visible[ThisPlayer->Player]>1) {
+	if (mf->Visible[ThisPlayer->Player] > 1) {
 #else
-	if ( IsMapFieldVisible(x,y) ) {
+	if (IsMapFieldVisible(x, y)) {
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MarkDrawPosMap(x, y);
@@ -197,7 +205,7 @@ global void MapFixWallTile(int x, int y)
 	return;
     }
 
-    t=mf->Flags & (MapFieldHuman|MapFieldWall);
+    t = mf->Flags & (MapFieldHuman | MapFieldWall);
     //
     //  Calculate the correct tile. Depends on the surrounding.
     //
@@ -219,25 +227,33 @@ global void MapFixWallTile(int x, int y)
 	tile |= 1 << 3;
     }
 
-    if( t&MapFieldHuman ) {
+    if (t & MapFieldHuman) {
 	tile = TheMap.Tileset->HumanWallTable[tile];
-	if( mf->Value<=UnitTypeHumanWall->_HitPoints/2 ) {
-	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
+	if (mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
+	    while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
 		++tile;
 	    }
-	    while( !TheMap.Tileset->Table[tile] ) {	// Skip separator
+	    while (!TheMap.Tileset->Table[tile]) {	// Skip separator
 		++tile;
 	    }
 	}
     } else {
 	tile = TheMap.Tileset->OrcWallTable[tile];
-	if( mf->Value<=UnitTypeOrcWall->_HitPoints/2 ) {
-	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
+	if (mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
+	    while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
 		++tile;
 	    }
-	    while( !TheMap.Tileset->Table[tile] ) {	// Skip separator
+	    while (!TheMap.Tileset->Table[tile]) {	// Skip separator
 		++tile;
 	    }
+	}
+    }
+    if (mf->Value == 0) {
+	while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
+	    ++tile;
+	}
+	while (!TheMap.Tileset->Table[tile]) {	// Skip separator
+	    ++tile;
 	}
     }
     tile = TheMap.Tileset->Table[tile];
@@ -246,9 +262,9 @@ global void MapFixWallTile(int x, int y)
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
 #ifdef NEW_FOW
-	if (mf->Visible[ThisPlayer->Player]>1) {
+	if (mf->Visible[ThisPlayer->Player] > 1) {
 #else
-	if ( IsMapFieldVisible(x,y) ) {
+	if (IsMapFieldVisible(x, y)) {
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
@@ -278,34 +294,27 @@ local void MapFixWallNeighbors(int x, int y)
 **	@param x	Map X position.
 **	@param y	Map Y position.
 */
-global void MapRemoveWall(unsigned x,unsigned y)
+global void MapRemoveWall(unsigned x, unsigned y)
 {
     MapField* mf;
 
-    mf=TheMap.Fields+x+y*TheMap.Width;
+    mf = TheMap.Fields + x + y * TheMap.Width;
     // FIXME: support more walls of different races.
-    if( mf->Flags&MapFieldHuman ) {
-	// FIXME: must search the correct tile
-	mf->Tile=TheMap.Tileset->Table[TheMap.Tileset->HumanWallTable[0]+4];
-    } else {
-	// FIXME: must search the correct tile
-	mf->Tile=TheMap.Tileset->Table[TheMap.Tileset->OrcWallTable[0]+4];
-    }
-    mf->Flags &= ~(MapFieldHuman|MapFieldWall|MapFieldUnpassable);
+    mf->Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 
-    UpdateMinimapXY(x,y);
+    UpdateMinimapXY(x, y);
     MapFixWallTile(x, y);
     MapFixWallNeighbors(x, y);
 
 #ifdef NEW_FOW
-    if (mf->Visible[ThisPlayer->Player]>1) {
+    if (mf->Visible[ThisPlayer->Player] > 1) {
 #else
-    if ( IsMapFieldVisible(x,y) ) {
+    if (IsMapFieldVisible(x,y)) {
 #endif
-	UpdateMinimapSeenXY(x,y);
-	MapMarkSeenTile(x,y);
-        MarkDrawPosMap(x,y);
-	MustRedraw|=RedrawMinimap;
+	UpdateMinimapSeenXY(x, y);
+	MapMarkSeenTile(x, y);
+        MarkDrawPosMap(x, y);
+	MustRedraw |= RedrawMinimap;
     }
 }
 
@@ -318,38 +327,38 @@ global void MapRemoveWall(unsigned x,unsigned y)
 **
 **	@todo	FIXME: support for more races.
 */
-global void MapSetWall(unsigned x,unsigned y,int humanwall)
+global void MapSetWall(unsigned x, unsigned y, int humanwall)
 {
     MapField* mf;
 
-    mf=TheMap.Fields+x+y*TheMap.Width;
+    mf = TheMap.Fields + x + y * TheMap.Width;
 
     // FIXME: support more walls of different races.
-    if( humanwall ) {
+    if (humanwall) {
 	// FIXME: Set random walls
-	mf->Tile=TheMap.Tileset->Table[TheMap.Tileset->HumanWallTable[0]];
-	mf->Flags|=MapFieldWall|MapFieldUnpassable|MapFieldHuman;
-	mf->Value=UnitTypeHumanWall->_HitPoints;
+	mf->Tile = TheMap.Tileset->Table[TheMap.Tileset->HumanWallTable[0]];
+	mf->Flags |= MapFieldWall | MapFieldUnpassable | MapFieldHuman;
+	mf->Value = UnitTypeHumanWall->_HitPoints;
     } else {
 	// FIXME: Set random walls
-	mf->Tile=TheMap.Tileset->Table[TheMap.Tileset->OrcWallTable[0]];
-	mf->Flags|=MapFieldWall|MapFieldUnpassable;
-	mf->Value=UnitTypeOrcWall->_HitPoints;
+	mf->Tile = TheMap.Tileset->Table[TheMap.Tileset->OrcWallTable[0]];
+	mf->Flags |= MapFieldWall | MapFieldUnpassable;
+	mf->Value = UnitTypeOrcWall->_HitPoints;
     }
 
-    UpdateMinimapXY(x,y);
+    UpdateMinimapXY(x, y);
     MapFixWallTile(x, y);
     MapFixWallNeighbors(x, y);
 
 #ifdef NEW_FOW
-    if (mf->Visible[ThisPlayer->Player]>1) {
+    if (mf->Visible[ThisPlayer->Player] > 1) {
 #else
-    if ( IsMapFieldVisible(x,y) ) {
+    if (IsMapFieldVisible(x, y)) {
 #endif
-	UpdateMinimapSeenXY(x,y);
-	MapMarkSeenTile(x,y);
-        MarkDrawPosMap(x,y);
-	MustRedraw|=RedrawMinimap;
+	UpdateMinimapSeenXY(x, y);
+	MapMarkSeenTile(x, y);
+        MarkDrawPosMap(x, y);
+	MustRedraw |= RedrawMinimap;
     }
 }
 
@@ -360,19 +369,20 @@ global void MapSetWall(unsigned x,unsigned y,int humanwall)
 **	@param y	Map Y tile-position of wall.
 **	@param damage	Damage done to wall.
 */
-global void HitWall(unsigned x,unsigned y,unsigned damage)
+global void HitWall(unsigned x, unsigned y, unsigned damage)
 {
     unsigned v;
 
-    v=TheMap.Fields[x+y*TheMap.Width].Value;
-    if( v<damage ) {
-	MapRemoveWall(x,y);
+    v = TheMap.Fields[x + y * TheMap.Width].Value;
+    if( v <= damage ) {
+	TheMap.Fields[x + y * TheMap.Width].Value = 0;
+	MapRemoveWall(x, y);
 #ifdef HIERARCHIC_PATHFINDER
 	PfHierMapChangedCallback (x, y, x, y);
 #endif
     } else {
-	TheMap.Fields[x+y*TheMap.Width].Value=v-damage;
-	MapFixWallTile(x,y);
+	TheMap.Fields[x + y * TheMap.Width].Value = v - damage;
+	MapFixWallTile(x, y);
     }
 }
 
