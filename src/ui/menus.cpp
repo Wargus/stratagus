@@ -71,7 +71,6 @@
 #include "libcda.h"
 #endif
 
-//#define OLD_MENU		/// CCL menus not used
 //#define SAVE_MENU_CCL		/// SAVE (REWRITE!) the menus.ccl file
 
 /*----------------------------------------------------------------------------
@@ -593,7 +592,8 @@ global void InitMenuFuncHash(void) {
 */
 local void NameLineDrawFunc(Menuitem * mi __attribute__ ((unused)))
 {
-    int nc, rc;
+    int nc;
+    int rc;
 
     GetDefaultTextColors(&nc, &rc);
     MenusSetBackground();
@@ -641,15 +641,8 @@ local int TypedFileName;
 
 local void InitSaveGameMenu(Menuitem *mi)
 {
-    Menu *menu;
-
-#ifdef OLD_MENU
-    menu = FindMenu("menu-save-game");
-#else
-    menu = mi->menu;
-#endif
-    menu->items[4].flags = MenuButtonDisabled;    
-    menu->items[5].flags = MenuButtonDisabled;
+    mi->menu->items[4].flags = MenuButtonDisabled;    
+    mi->menu->items[5].flags = MenuButtonDisabled;
     CreateSaveDir();
 }
 
@@ -658,10 +651,6 @@ local void InitSaveGameMenu(Menuitem *mi)
 */
 local void EnterSaveGameAction(Menuitem *mi, int key)
 {
-#ifdef OLD_MENU
-    Menu *menu;
-#endif
-
     if (mi->d.input.nch == 0) {
 	mi[3].flags = MenuButtonDisabled;	/* mi[i]: Save button! */
     } else {
@@ -672,12 +661,7 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 	}
     }
     TypedFileName = 1;
-#ifdef OLD_MENU
-    menu = FindMenu("menu-save-game");
-    menu->items[5].flags = MenuButtonDisabled;
-#else
     mi->menu->items[5].flags = MenuButtonDisabled;
-#endif
 }
 
 local void SaveAction(void)
@@ -762,29 +746,17 @@ local void SaveLBExit(Menuitem *mi)
 local void SaveLBInit(Menuitem *mi)
 {
     int i;
-#ifdef OLD_MENU
-    Menu *menu;
 
-    menu = FindMenu("menu-save-game");
-#endif
     SaveLBExit(mi);
 
     i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir,
 	    NULL, (FileList **) & (mi->d.listbox.options));
     if (i != 0) {
-#ifdef OLD_MENU
-	if (i > 7) {
-	    menu->items[3].flags = MI_ENABLED;
-	} else {
-	    menu->items[3].flags = MI_DISABLED;
-	}
-#else
 	if (i > 7) {
 	    mi->menu->items[3].flags = MI_ENABLED;
 	} else {
 	    mi->menu->items[3].flags = MI_DISABLED;
 	}
-#endif
     }
     mi->d.listbox.curopt = -1;
 }
@@ -793,36 +765,31 @@ local void SaveLBInit(Menuitem *mi)
 local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
-    Menu *menu;
     MapInfo *info;
     static char buffer[1024];
-    int j, n;
+    int j;
+    int n;
 
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
-#ifdef OLD_MENU
-		    menu = FindMenu("menu-select-scenario");
-#else
-		    menu = mi->menu;
-#endif
 		    if (info->Description) {
-			VideoDrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
+			VideoDrawText(mi->menu->x+8,mi->menu->y+254,LargeFont,info->Description);
 		    }
 		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		    VideoDrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
+		    VideoDrawText(mi->menu->x+8,mi->menu->y+254+20,LargeFont,buffer);
 		    for (n = j = 0; j < PlayerMax; j++) {
 			if (info->PlayerType[j] == PlayerPerson) {
 			    n++;
 			}
 		    }
 		    if (n == 1) {
-			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
+			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,"1 player");
 		    } else {
 			sprintf(buffer, "%d players", n);
-			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
+			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,buffer);
 		    }
 		}
 	    }
@@ -839,13 +806,7 @@ local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 local void SaveLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
-    Menu *menu;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-save-game");
-#else
-    menu = mi->menu;
-#endif
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
@@ -854,13 +815,13 @@ local void SaveLBAction(Menuitem *mi, int i)
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
 	if (fl[i].type) {
-	    strcpy(menu->items[1].d.input.buffer, fl[i].name);
-	    menu->items[1].d.input.nch = strlen(fl[i].name);
-	    menu->items[4].flags = MI_ENABLED;
-	    menu->items[5].flags = MI_ENABLED;
+	    strcpy(mi->menu->items[1].d.input.buffer, fl[i].name);
+	    mi->menu->items[1].d.input.nch = strlen(fl[i].name);
+	    mi->menu->items[4].flags = MI_ENABLED;
+	    mi->menu->items[5].flags = MI_ENABLED;
 	} else {
-	    menu->items[4].flags = MenuButtonDisabled;
-	    menu->items[5].flags = MenuButtonDisabled;
+	    mi->menu->items[4].flags = MenuButtonDisabled;
+	    mi->menu->items[5].flags = MenuButtonDisabled;
 	}
     }
     TypedFileName = 0;
@@ -868,7 +829,9 @@ local void SaveLBAction(Menuitem *mi, int i)
 
 local void SaveVSAction(Menuitem *mi, int i)
 {
-    int op, d1, d2;
+    int op;
+    int d1;
+    int d2;
 
     mi--;
     switch (i) {
@@ -994,7 +957,10 @@ local void SaveOk(void)
 
 local int SaveRDFilter(char *pathbuf, FileList *fl)
 {
-    char *suf, *cp, *fsuffix, *np;
+    char *suf;
+    char *cp;
+    char *fsuffix;
+    char *np;
 
     np = strrchr(pathbuf, '/');
     if (np) {
@@ -1037,14 +1003,7 @@ local int SaveRDFilter(char *pathbuf, FileList *fl)
 
 local void InitLoadGameMenu(Menuitem *mi)
 {
-#ifdef OLD_MENU
-    Menu *menu;
-
-    menu = FindMenu("menu-load-game");
-    menu->items[3].flags = MI_DISABLED;
-#else
     mi->menu->items[3].flags = MI_DISABLED;
-#endif
     CreateSaveDir();
 }
 
@@ -1064,23 +1023,17 @@ local void LoadLBExit(Menuitem *mi)
 
 local void LoadLBInit(Menuitem *mi)
 {
-    Menu *menu;
     int i;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-load-game");
-#else
-    menu = mi->menu;
-#endif
     LoadLBExit(mi);
 
     i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, SaveRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i != 0) {
 	if (i > 7) {
-	    menu->items[2].flags = MenuButtonSelected;
+	    mi->menu->items[2].flags = MenuButtonSelected;
 	} else {
-	    menu->items[2].flags = MenuButtonDisabled;
+	    mi->menu->items[2].flags = MenuButtonDisabled;
 	}
     }
     mi->d.listbox.curopt = -1;
@@ -1090,36 +1043,31 @@ local void LoadLBInit(Menuitem *mi)
 local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
-    Menu *menu;
     MapInfo *info;
     static char buffer[1024];
-    int j, n;
+    int j;
+    int n;
 
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
-#ifdef OLD_MENU
-		    menu = FindMenu("menu-select-scenario");
-#else
-		    menu = mi->menu;
-#endif
 		    if (info->Description) {
-			VideoDrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
+			VideoDrawText(mi->menu->x+8,mi->menu->y+254,LargeFont,info->Description);
 		    }
 		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		    VideoDrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
+		    VideoDrawText(mi->menu->x+8,mi->menu->y+254+20,LargeFont,buffer);
 		    for (n = j = 0; j < PlayerMax; j++) {
 			if (info->PlayerType[j] == PlayerPerson) {
 			    n++;
 			}
 		    }
 		    if (n == 1) {
-			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
+			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,"1 player");
 		    } else {
 			sprintf(buffer, "%d players", n);
-			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
+			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,buffer);
 		    }
 		}
 	    }
@@ -1135,14 +1083,8 @@ local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
 
 local void LoadLBAction(Menuitem *mi, int i)
 {
-#ifdef OLD_MENU
-    Menu *menu;
-#endif
     FileList *fl;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-load-game");
-#endif
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
@@ -1150,25 +1092,19 @@ local void LoadLBAction(Menuitem *mi, int i)
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
-#ifdef OLD_MENU
-	if (fl[i].type) {
-	    menu->items[3].flags = MI_ENABLED;
-	} else {
-	    menu->items[3].flags = MI_DISABLED;
-	}
-#else
 	if (fl[i].type) {
 	    mi->menu->items[3].flags = MI_ENABLED;
 	} else {
 	    mi->menu->items[3].flags = MI_DISABLED;
 	}
-#endif
     }
 }
 
 local void LoadVSAction(Menuitem *mi, int i)
 {
-    int op, d1, d2;
+    int op;
+    int d1;
+    int d2;
 
     mi--;
     switch (i) {
@@ -1353,13 +1289,8 @@ local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
     static char name[PATH_MAX];		// FIXME: much memory wasted
     Menu *menu;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-save-game");
-#else
-    menu = mi->menu;
-#endif
     strcpy(name, "the file: ");
-    strcat(name, menu->items[1].d.input.buffer);
+    strcat(name, mi->menu->items[1].d.input.buffer);
     menu = FindMenu("menu-delete-confirm");
     menu->items[2].d.text.text = name;
 }
@@ -1975,21 +1906,9 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
 /**
 **	Show tips at startup gem callback
 */
-#ifdef OLD_MENU
-local void SetTips(Menuitem *mi __attribute__((unused)))
-#else
 local void SetTips(Menuitem *mi)
-#endif
 {
-#ifdef OLD_MENU
-    Menu *menu;
-
-    menu = FindMenu("menu-tips");
-    if (menu->items[1].d.gem.state == MI_GSTATE_CHECKED)
-#else
-    if (mi->menu->items[1].d.gem.state == MI_GSTATE_CHECKED)
-#endif
-	 {
+    if (mi->menu->items[1].d.gem.state == MI_GSTATE_CHECKED) {
 	ShowTips = 1;
     } else {
 	ShowTips = 0;
@@ -2607,43 +2526,26 @@ local void FreeMapInfos(FileList *fl, int n)
 /**
 **	Initialize the scenario selector menu.
 */
-#ifdef OLD_MENU
-local void ScenSelectInit(Menuitem *mi __attribute__ ((unused)))
-#else
 local void ScenSelectInit(Menuitem *mi)
-#endif
 {
-    Menu *menu;
-
-#ifdef OLD_MENU
-    menu = FindMenu("menu-select-scenario");
-#else
-    menu = mi->menu;
-#endif
     DebugCheck(!*ScenSelectPath);
-    menu->items[9].flags =
+    mi->menu->items[9].flags =
 	*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-    menu->items[9].d.button.text = ScenSelectDisplayPath;
+    mi->menu->items[9].d.button.text = ScenSelectDisplayPath;
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 local void ScenSelectLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
-    Menu *menu;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-select-scenario");
-#else
-    menu = mi->menu;
-#endif
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
-	    menu->items[3].d.button.text = "OK";
+	    mi->menu->items[3].d.button.text = "OK";
 	} else {
-	    menu->items[3].d.button.text = "Open";
+	    mi->menu->items[3].d.button.text = "Open";
 	}
 	if (mi->d.listbox.noptions > 5) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
@@ -2669,8 +2571,12 @@ local void ScenSelectLBExit(Menuitem *mi)
 local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
-    char *suf, *cp, *lcp, *np;
-    int p, sz;
+    char *suf;
+    char *cp;
+    char *lcp;
+    char *np;
+    int p;
+    int sz;
     static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
     Menu *menu;
 #ifdef USE_ZZIPLIB
@@ -2787,27 +2693,21 @@ usezzf:
 local void ScenSelectLBInit(Menuitem *mi)
 {
     int i;
-    Menu *menu;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-select-scenario");
-#else
-    menu = mi->menu;
-#endif
     ScenSelectLBExit(mi);
-    if (menu->items[6].d.pulldown.curopt == 0) {
-	menu->items[8].flags |= MenuButtonDisabled;
+    if (mi->menu->items[6].d.pulldown.curopt == 0) {
+	mi->menu->items[8].flags |= MenuButtonDisabled;
     } else {
-	menu->items[8].flags &= ~MenuButtonDisabled;
+	mi->menu->items[8].flags &= ~MenuButtonDisabled;
     }
     i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i == 0) {
-	menu->items[3].d.button.text = "OK";
-	menu->items[3].flags |= MenuButtonDisabled;
+	mi->menu->items[3].d.button.text = "OK";
+	mi->menu->items[3].flags |= MenuButtonDisabled;
     } else {
 	ScenSelectLBAction(mi, 0);
-	menu->items[3].flags &= ~MenuButtonDisabled;
+	mi->menu->items[3].flags &= ~MenuButtonDisabled;
 	if (i > 5) {
 	    mi[1].flags &= ~MenuButtonDisabled;
 	}
@@ -2817,36 +2717,31 @@ local void ScenSelectLBInit(Menuitem *mi)
 local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
-    Menu *menu;
     MapInfo *info;
     static char buffer[1024];
-    int j, n;
+    int j;
+    int n;
 
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
-#ifdef OLD_MENU
-		    menu = FindMenu("menu-select-scenario");
-#else
-		    menu = mi->menu;
-#endif
 		    if (info->Description) {
-			VideoDrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
+			VideoDrawText(mi->menu->x+8,mi->menu->y+254,LargeFont,info->Description);
 		    }
 		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		    VideoDrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
+		    VideoDrawText(mi->menu->x+8,mi->menu->y+254+20,LargeFont,buffer);
 		    for (n = j = 0; j < PlayerMax; j++) {
 			if (info->PlayerType[j] == PlayerPerson) {
 			    n++;
 			}
 		    }
 		    if (n == 1) {
-			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
+			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,"1 player");
 		    } else {
 			sprintf(buffer, "%d players", n);
-			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
+			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,buffer);
 		    }
 		}
 	    }
@@ -2862,13 +2757,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 
 local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 {
-#ifdef OLD_MENU
-    Menu *menu;
-    menu = FindMenu("menu-select-scenario");
-    mi = menu->items + 1;
-#else
     mi = mi->menu->items + 1;
-#endif
     ScenSelectLBInit(mi);
     mi->d.listbox.cursel = -1;
     mi->d.listbox.startline = 0;
@@ -2880,7 +2769,9 @@ local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 
 local void ScenSelectVSAction(Menuitem *mi, int i)
 {
-    int op, d1, d2;
+    int op;
+    int d1;
+    int d2;
 
     mi--;
     switch (i) {
@@ -2964,13 +2855,13 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 
 local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 {
-    int j, nitems = nKeyStrokeHelps;
+    int j;
 
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    j = ((mi->d.vslider.percent + 1) * (nitems - 11)) / 100;
-	    if (mi->d.vslider.cflags&MI_CFLAGS_DOWN && j < nitems - 11) {
+	    j = ((mi->d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
+	    if (mi->d.vslider.cflags&MI_CFLAGS_DOWN && j < nKeyStrokeHelps - 11) {
 		    j++;
 		    MustRedraw |= RedrawMenu;
 	    } else if (mi->d.vslider.cflags&MI_CFLAGS_UP && j > 0) {
@@ -2980,11 +2871,11 @@ local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 	    if (i == 2) {
 		mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
-	    mi->d.vslider.percent = j * 100 / (nitems - 11);
+	    mi->d.vslider.percent = j * 100 / (nKeyStrokeHelps - 11);
 	    break;
 	case 1:		// mouse - move
 	    if ((mi->d.vslider.cflags&MI_CFLAGS_KNOB) && (mi->flags&MenuButtonClicked)) {
-		j = ((mi->d.vslider.curper + 1) * (nitems - 11)) / 100;
+		j = ((mi->d.vslider.curper + 1) * (nKeyStrokeHelps - 11)) / 100;
 		mi->d.vslider.percent = mi->d.vslider.curper;
 		MustRedraw |= RedrawMenu;
 	    }
@@ -2999,18 +2890,14 @@ local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 */
 local void KeystrokeHelpDrawFunc(Menuitem *mi)
 {
-    int i, j, nitems = nitems = nKeyStrokeHelps;
-#ifdef OLD_MENU
-    Menu *menu = FindMenu("menu-keystroke-help");
-#else
-    Menu *menu = mi->menu;
-#endif
+    int i;
+    int j;
 
-    j = ((mi[-2].d.vslider.percent + 1) * (nitems - 11)) / 100;
+    j = ((mi[-2].d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
     for (i = 0; i < 11; i++) {
-	VideoDrawText(menu->x+mi->xofs,menu->y+mi->yofs+(i*20),
+	VideoDrawText(mi->menu->x+mi->xofs,mi->menu->y+mi->yofs+(i*20),
 			    mi->font,KeyStrokeHelps[j*2]);
-	VideoDrawText(menu->x+mi->xofs+80,menu->y+mi->yofs+(i*20),
+	VideoDrawText(mi->menu->x+mi->xofs+80,mi->menu->y+mi->yofs+(i*20),
 			    mi->font,KeyStrokeHelps[j*2+1]);
 	j++;
     }
@@ -3460,7 +3347,9 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 
 local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 {
-    int nc, rc, l;
+    int nc;
+    int rc;
+    int l;
     char buffer[32];
 
     GetDefaultTextColors(&nc, &rc);
@@ -3646,8 +3535,11 @@ local void MultiGameClientDrawFunc(Menuitem *mi)
 */
 local void NetworkGamePrepareGameSettings(void)
 {
-    int c, h, i;
-    int num[PlayerMax], comp[PlayerMax];
+    int c;
+    int h;
+    int i;
+    int num[PlayerMax];
+    int comp[PlayerMax];
 
     DebugCheck(!ScenSelectPudInfo);
 
@@ -3727,8 +3619,12 @@ local void NetworkGamePrepareGameSettings(void)
 local void MultiGamePlayerSelectorsUpdate(int initial)
 {
     Menu *menu;
-    int i, h, c;
-    int avail, ready, plyrs;
+    int i;
+    int h;
+    int c;
+    int avail;
+    int ready;
+    int plyrs;
 
     menu = FindMenu("menu-multi-setup");
 
@@ -3950,14 +3846,8 @@ local void MultiClientUpdate(int initial)
 
 local void MultiGameSetupInit(Menuitem *mi)
 {
-    Menu *menu;
-    int i, h;
-
-#ifdef OLD_MENU
-    menu = FindMenu("menu-multi-setup");
-#else
-    menu = mi->menu;
-#endif
+    int i;
+    int h;
 
     // FIXME: Remove this when .cm is supported
     if (*CurrentMapPath && strstr(CurrentMapPath, ".cm\0")) {
@@ -3966,8 +3856,8 @@ local void MultiGameSetupInit(Menuitem *mi)
 
     GameSetupInit(mi);
     NetworkInitServerConnect();
-    menu->items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
-    menu->items[SERVER_PLAYER_STATE].yofs = 32;
+    mi->menu->items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
+    mi->menu->items[SERVER_PLAYER_STATE].yofs = 32;
 
     memset(&ServerSetupState, 0, sizeof(ServerSetup));
     //	Calculate available slots from pudinfo
@@ -4004,7 +3894,9 @@ local void MultiGameCancel(void)
 local void NetMultiPlayerDrawFunc(Menuitem *mi)
 {
     Menu *menu;
-    int i, nc, rc;
+    int i;
+    int nc;
+    int rc;
 
     menu = FindMenu("menu-multi-setup");
     i = mi - menu->items - SERVER_PLAYER_STATE;
@@ -4067,28 +3959,16 @@ local void MultiClientCancel(void)
     // GameCancel();
 }
 
-#ifdef OLD_MENU
-local void MultiGameClientInit(Menuitem *mi __attribute__((unused)))
-#else
 local void MultiGameClientInit(Menuitem *mi)
-#endif
 {
-    Menu *menu;
-
-#ifdef OLD_MENU
-    menu = FindMenu("menu-net-multi-client");
-#else
-    menu = mi->menu;
-#endif
-
     // GameSetupInit(mi);
     MultiClientUpdate(1);
     if (LocalSetupState.Ready[NetLocalHostsSlot]) {
-	menu->items[2].flags = MenuButtonDisabled;
-	menu->items[3].flags = 0;
+	mi->menu->items[2].flags = MenuButtonDisabled;
+	mi->menu->items[3].flags = 0;
     } else {
-	menu->items[3].flags = MenuButtonDisabled;
-	menu->items[2].flags = 0;
+	mi->menu->items[3].flags = MenuButtonDisabled;
+	mi->menu->items[2].flags = 0;
     }
 }
 
@@ -4097,24 +3977,18 @@ local void MultiGameClientInit(Menuitem *mi)
 */
 local void MultiClientGemAction(Menuitem *mi)
 {
-    Menu *menu;
     int i;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-net-multi-client");
-#else
-    menu = mi->menu;
-#endif
-    i = mi - menu->items - CLIENT_PLAYER_READY + 1;
+    i = mi - mi->menu->items - CLIENT_PLAYER_READY + 1;
     DebugLevel3Fn("i = %d, NetLocalHostsSlot = %d\n" _C_ i _C_ NetLocalHostsSlot);
     if (i == NetLocalHostsSlot) {
 	LocalSetupState.Ready[i] = !LocalSetupState.Ready[i];
 	if (LocalSetupState.Ready[i]) {
-	    menu->items[2].flags = MenuButtonDisabled;
-	    menu->items[3].flags = 0;
+	    mi->menu->items[2].flags = MenuButtonDisabled;
+	    mi->menu->items[3].flags = 0;
 	} else {
-	    menu->items[3].flags = MenuButtonDisabled;
-	    menu->items[2].flags = 0;
+	    mi->menu->items[3].flags = MenuButtonDisabled;
+	    mi->menu->items[2].flags = 0;
 	}
 	MultiClientUpdate(0);
     }
@@ -4361,7 +4235,8 @@ local void EditorNewMapSizeEnterAction(Menuitem * mi,
 local void EditorNewOk(void)
 {
     Menu *menu;
-    unsigned value1, value2;
+    unsigned value1;
+    unsigned value2;
 
     menu = CurrentMenu;
     value1 = atoi(menu->items[4].d.input.buffer);
@@ -4451,46 +4326,29 @@ local void EditorMainLoadMap(void)
     EndMenu();
 }
 
-#ifdef OLD_MENU
-local void EditorMainLoadInit(Menuitem *mi __attribute__((unused)))
-#else
 local void EditorMainLoadInit(Menuitem *mi)
-#endif
 {
-    Menu *menu;
-
-#ifdef OLD_MENU
-    menu = FindMenu("menu-editor-main-load-map");
-#else
-    menu = mi->menu;
-#endif
     DebugCheck(!*ScenSelectPath);
-    menu->items[5].flags =
+    mi->menu->items[5].flags =
 	*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-    menu->items[5].d.button.text = ScenSelectDisplayPath;
+    mi->menu->items[5].d.button.text = ScenSelectDisplayPath;
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 local void EditorMainLoadLBInit(Menuitem *mi)
 {
-    Menu *menu;
     int i;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-editor-main-load-map");
-#else
-    menu = mi->menu;
-#endif
     EditorMainLoadLBExit(mi);
     i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorMainLoadRDFilter,
 	(FileList **)&(mi->d.listbox.options));
 
     if (i == 0) {
-	menu->items[3].d.button.text = "OK";
-	menu->items[3].flags |= MenuButtonDisabled;
+	mi->menu->items[3].d.button.text = "OK";
+	mi->menu->items[3].flags |= MenuButtonDisabled;
     } else {
 	EditorMainLoadLBAction(mi, 0);
-	menu->items[3].flags &= ~MenuButtonDisabled;
+	mi->menu->items[3].flags &= ~MenuButtonDisabled;
 	if (i > 5) {
 	    mi[1].flags &= ~MenuButtonDisabled;
 	}
@@ -4515,7 +4373,9 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
     char *suf;
-    char *np, *cp, *lcp;
+    char *np;
+    char *cp;
+    char *lcp;
 #ifdef USE_ZZIPLIB
     int sz;
     ZZIP_FILE *zzf;
@@ -4676,36 +4536,31 @@ local void EditorMainLoadCancel(void)
 local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
-    Menu *menu;
     MapInfo *info;
     static char buffer[1024];
-    int j, n;
+    int j;
+    int n;
 
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
-#ifdef OLD_MENU
-		    menu = FindMenu("menu-editor-main-load-map");
-#else
-		    menu = mi->menu;
-#endif
 		    if (info->Description) {
-			VideoDrawText(menu->x+8,menu->y+234,LargeFont,info->Description);
+			VideoDrawText(mi->menu->x+8,mi->menu->y+234,LargeFont,info->Description);
 		    }
 		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		    VideoDrawText(menu->x+8,menu->y+234+20,LargeFont,buffer);
+		    VideoDrawText(mi->menu->x+8,mi->menu->y+234+20,LargeFont,buffer);
 		    for (n = j = 0; j < PlayerMax; j++) {
 			if (info->PlayerType[j] == PlayerPerson) {
 			    n++;
 			}
 		    }
 		    if (n == 1) {
-			VideoDrawText(menu->x+8,menu->y+234+40,LargeFont,"1 player");
+			VideoDrawText(mi->menu->x+8,mi->menu->y+234+40,LargeFont,"1 player");
 		    } else {
 			sprintf(buffer, "%d players", n);
-			VideoDrawText(menu->x+8,menu->y+234+40,LargeFont,buffer);
+			VideoDrawText(mi->menu->x+8,mi->menu->y+234+40,LargeFont,buffer);
 		    }
 		}
 	    }
@@ -4721,21 +4576,15 @@ local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 
 local void EditorMainLoadLBAction(Menuitem *mi, int i)
 {
-    Menu *menu;
     FileList *fl;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-editor-main-load-map");
-#else
-    menu = mi->menu;
-#endif
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
-	    menu->items[3].d.button.text = "OK";
+	    mi->menu->items[3].d.button.text = "OK";
 	} else {
-	    menu->items[3].d.button.text = "Open";
+	    mi->menu->items[3].d.button.text = "Open";
 	}
 	if (mi->d.listbox.noptions > 5) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
@@ -4746,7 +4595,9 @@ local void EditorMainLoadLBAction(Menuitem *mi, int i)
 
 local void EditorMainLoadVSAction(Menuitem *mi, int i)
 {
-    int op, d1, d2;
+    int op;
+    int d1;
+    int d2;
 
     mi--;
     switch (i) {
@@ -5176,26 +5027,20 @@ global int EditorSave(void)
 */
 local void EditorSaveLBInit(Menuitem *mi)
 {
-    Menu *menu;
     int i;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-editor-save");
-#else
-    menu = mi->menu;
-#endif
     EditorSaveLBExit(mi);
     i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorSaveRDFilter,
 	(FileList **)&(mi->d.listbox.options));
 
     if (i == 0) {
-	menu->items[4].d.button.text = "Save";
-	menu->items[4].flags |= MenuButtonDisabled;
+	mi->menu->items[4].d.button.text = "Save";
+	mi->menu->items[4].flags |= MenuButtonDisabled;
     } else {
 	EditorSaveLBAction(mi, 0);
-	sprintf(menu->items[3].d.input.buffer, "%s~!_", ScenSelectFileName);
-	menu->items[3].d.input.nch = strlen(menu->items[3].d.input.buffer) - 3;
-	menu->items[4].flags &= ~MenuButtonDisabled;
+	sprintf(mi->menu->items[3].d.input.buffer, "%s~!_", ScenSelectFileName);
+	mi->menu->items[3].d.input.nch = strlen(mi->menu->items[3].d.input.buffer) - 3;
+	mi->menu->items[4].flags &= ~MenuButtonDisabled;
 	if (i > 5) {
 	    mi[1].flags &= ~MenuButtonDisabled;
 	}
@@ -5224,7 +5069,9 @@ local void EditorSaveLBExit(Menuitem *mi)
 local int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 {
     char *suf;
-    char *np, *cp, *lcp;
+    char *np;
+    char *cp;
+    char *lcp;
 #ifdef USE_ZZIPLIB
     int sz;
     ZZIP_FILE *zzf;
@@ -5399,25 +5246,19 @@ local unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i)
 */
 local void EditorSaveLBAction(Menuitem *mi, int i)
 {
-    Menu *menu;
     FileList *fl;
 
-#ifdef OLD_MENU
-    menu = FindMenu("menu-editor-save");
-#else
-    menu = mi->menu;
-#endif
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
-	    sprintf(menu->items[3].d.input.buffer, "%s~!_", fl[i].name);
-	    menu->items[3].d.input.nch = strlen(menu->items[3].d.input.buffer) - 3;
-	    menu->items[4].d.button.text = "Save";
+	    sprintf(mi->menu->items[3].d.input.buffer, "%s~!_", fl[i].name);
+	    mi->menu->items[3].d.input.nch = strlen(mi->menu->items[3].d.input.buffer) - 3;
+	    mi->menu->items[4].d.button.text = "Save";
 	} else {
-	    strcpy(menu->items[3].d.input.buffer, "~!_");
-	    menu->items[3].d.input.nch = strlen(menu->items[3].d.input.buffer) - 3;
-	    menu->items[4].d.button.text = "Open";
+	    strcpy(mi->menu->items[3].d.input.buffer, "~!_");
+	    mi->menu->items[3].d.input.nch = strlen(mi->menu->items[3].d.input.buffer) - 3;
+	    mi->menu->items[4].d.button.text = "Open";
 	}
 	if (mi->d.listbox.noptions > 5) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
@@ -5430,7 +5271,9 @@ local void EditorSaveLBAction(Menuitem *mi, int i)
 */
 local void EditorSaveVSAction(Menuitem *mi, int i)
 {
-    int op, d1, d2;
+    int op;
+    int d1;
+    int d2;
 
     mi--;
     switch (i) {
@@ -5578,53 +5421,17 @@ local void EditorEndMenu(void)
 ----------------------------------------------------------------------------*/
 
 /**
-**	Move buttons so they're centered on different resolutions
-*/
-#ifdef OLD_MENU
-local void CenterMenus(void)
-{
-    int menus;
-    int i;
-    int oldOffsetX;
-    int oldOffsetY;
-
-    oldOffsetX = TheUI.Offset640X;
-    oldOffsetY = TheUI.Offset480Y;
-    TheUI.Offset640X = (VideoWidth - 640) / 2;
-    TheUI.Offset480Y = (VideoHeight - 480) / 2;
-
-    if (TheUI.Offset640X == 0 && oldOffsetX == 0) {
-	return;
-    }
-
-    menus = sizeof(Menus) / sizeof(Menu);
-    for (i=0; i<menus; i++) {
-	Menus[i].x += TheUI.Offset640X - oldOffsetX;
-	Menus[i].y += TheUI.Offset480Y - oldOffsetY;
-    }
-}
-#endif
-
-/**
 **	Initialize the loaded menu data
 */
 global void InitMenuData(void)
 {
     Menu *menu;
 
-#ifdef OLD_MENU
-    InitOldMenuData();
-#endif
-
     // FIXME: Get rid of these..
     menu = FindMenu("menu-net-connecting");
     menu->items[1].d.text.text = NetServerText;
     menu->items[2].d.text.text = NetTriesText;
     InitNetMultiButtonStorage();
-
-#ifdef OLD_MENU
-    CenterMenus();
-#endif
 }
 
 /**
