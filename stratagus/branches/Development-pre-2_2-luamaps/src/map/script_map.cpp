@@ -515,9 +515,11 @@ static int CclDefinePlayerTypes(lua_State* l)
 			LuaError(l, "Unsupported tag: %s" _C_ type);
 		}
 	}
-	for (i = numplayers; i < PlayerMax; i++) {
+	for (i = numplayers; i < PlayerMax - 1; i++) {
 		TheMap.Info.PlayerType[i] = PlayerNobody;
 	}
+	if (numplayers < PlayerMax)
+		TheMap.Info.PlayerType[PlayerMax-1] = PlayerNeutral;
 	return 0;
 }
 
