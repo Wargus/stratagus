@@ -112,11 +112,10 @@ extern const SpellType* SpellTypeByIdent( const char* Ident );
 extern SpellType* SpellTypeById( int Id );
 
     /// returns != 0 if spell can be casted by this unit, enough mana?
-extern int CanCastSpell( const Unit*, int, const Unit*, const Unit*,int, int );
+extern int CanCastSpell( const Unit*, const SpellType*, const Unit*, int, int );
 
     /// fire spell on target unit or place at x,y
-extern int SpellCast( const SpellType* SpellId, Unit* unit, Unit* target,
-	int x, int y );
+extern int SpellCast( Unit*, const SpellType* , Unit* , int , int );
 
 //@}
 

@@ -122,10 +122,8 @@ local void SpellMoveToTarget(Unit * unit)
 */
 global void HandleActionSpellCast(Unit * unit)
 {
-    int repeat;
+    int flags;
     const SpellType *spell;
-
-    repeat = 0;			// repeat spell on next pass? (defaults to `no')
 
     DebugLevel3Fn("%d %d,%d+%d+%d\n",
 	UnitNumber(unit),unit->Orders[0].X,unit->Orders[0].Y,
@@ -134,7 +132,35 @@ global void HandleActionSpellCast(Unit * unit)
     switch (unit->SubAction) {
 
     case 0:				// first entry.
+	//
+	//	Check if we can cast the spell.
+	//
+	spell = unit->Orders[0].Arg1;
+	if( !CanCastSpell(unit,spell,unit->Orders[0].Goal,
+		unit->Orders[0].X,unit->Orders[0].Y) ) {
+	    // FIXME: Use the general unified message system.
+	    if (unit->Mana < spell->ManaCost) {
+		if (unit->Player == ThisPlayer) {
+		    SetMessage("%s: not enough mana for spell: %s",
+			       unit->Type->Name, spell->Name);
+		}
+		// FIXME: need we an AI callback?
+	    }
+	    unit->Orders[0].Action = UnitActionStill;
+	    unit->SubAction = 0;
+	    unit->Wait = 1;
+	    if (unit->Orders[0].Goal) {
+		RefsDebugCheck(!unit->Orders[0].Goal->Refs);
+		if (!--unit->Orders[0].Goal->Refs) {
+		    RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
+		    ReleaseUnit(unit->Orders[0].Goal);
+		}
+		unit->Orders[0].Goal=NoUnitP;
+	    }
+	    return;
+	}
 	NewResetPath(unit);
+	unit->Value=0;		// repeat spell on next pass? (defaults to `no')
 	unit->SubAction=1;
 	// FALL THROUGH
     case 1:				// Move to the target.
@@ -142,28 +168,21 @@ global void HandleActionSpellCast(Unit * unit)
 	break;
 
     case 2:				// Cast spell on the target.
-	spell = unit->Orders[0].Arg1;
-	// FIXME: Use the general unified message system.
-	if (unit->Mana < spell->ManaCost) {
-	    if (unit->Player == ThisPlayer) {
-		SetMessage("%s: not enough mana for spell: %s",
-			   unit->Type->Name, spell->Name);
-	    }
-	    repeat = 0;
-	} else {
-	    UnitShowAnimation(unit, unit->Type->Animations->Attack);
-	    if (!unit->Reset) {
-		return;
-	    }
+	flags=UnitShowAnimation(unit, unit->Type->Animations->Attack);
+	if( flags&AnimationMissile ) {
 	    // FIXME: what todo, if unit/goal is removed?
 	    if (unit->Orders[0].Goal && unit->Orders[0].Goal->Destroyed) {
-		repeat = 0;
+		unit->Value = 0;
 	    } else {
-		repeat = SpellCast(unit->Orders[0].Arg1, unit,
-		   unit->Orders[0].Goal,unit->Orders[0].X,unit->Orders[0].Y);
+		spell = unit->Orders[0].Arg1;
+		unit->Value = SpellCast(unit,spell,unit->Orders[0].Goal,
+			unit->Orders[0].X,unit->Orders[0].Y);
 	    }
 	}
-	if (!repeat) {
+	if ( !(flags&AnimationReset) ) {	// end of animation
+	    return;
+	}
+	if (!unit->Value) {
 	    unit->Orders[0].Action = UnitActionStill;
 	    unit->SubAction = 0;
 	    unit->Wait = 1;
@@ -179,7 +198,7 @@ global void HandleActionSpellCast(Unit * unit)
 	break;
 
     default:
-	unit->SubAction = 0;		// Move to the target
+	unit->SubAction = 0;		// Reset path, than move to target
 	break;
     }
 }
