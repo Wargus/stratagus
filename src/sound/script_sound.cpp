@@ -337,8 +337,7 @@ static int CclSetSoundVolume(lua_State* l)
 	}
 
 	SetGlobalVolume(LuaToNumber(l, 1));
-	lua_pushvalue(l, 1);
-	return 1;
+	return 0;
 }
 
 /**
@@ -353,8 +352,7 @@ static int CclSetMusicVolume(lua_State* l)
 	}
 
 	SetMusicVolume(LuaToNumber(l, 1));
-	lua_pushvalue(l, 1);
-	return 1;
+	return 0;
 }
 
 /**
@@ -388,8 +386,7 @@ static int CclSetCdMode(lua_State* l)
 
 	PlayCDRom(cdmode);
 #endif
-	lua_pushvalue(l, 1);
-	return 1;
+	return 0;
 }
 
 /**
@@ -549,7 +546,7 @@ static int CclSoundOn(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 
-	if (SoundEnabled()) {
+	if (SoundEnabled() && !SoundOff) {
 		lua_pushboolean(l, 1);
 		return 1;
 	}
@@ -609,8 +606,7 @@ static int CclSetGlobalSoundRange(lua_State* l)
 	if (d > 0) {
 		DistanceSilent = d;
 	}
-	lua_pushvalue(l, 1);
-	return 1;
+	return 0;
 }
 
 /**
