@@ -423,8 +423,10 @@ local SCM CclDefinePlaySections(SCM list)
 		p->Type=PlaySectionGame;
 	    } else if( gh_eq_p(value,gh_symbol2scm("briefing")) ) {
 		p->Type=PlaySectionBriefing;
-	    } else if( gh_eq_p(value,gh_symbol2scm("stats")) ) {
-		p->Type=PlaySectionStats;
+	    } else if( gh_eq_p(value,gh_symbol2scm("stats-victory")) ) {
+		p->Type=PlaySectionStatsVictory;
+	    } else if( gh_eq_p(value,gh_symbol2scm("stats-defeat")) ) {
+		p->Type=PlaySectionStatsDefeat;
 	    } else if( gh_eq_p(value,gh_symbol2scm("main-menu")) ) {
 		p->Type=PlaySectionMainMenu;
 	    } else {

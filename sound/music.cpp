@@ -355,8 +355,8 @@ global int PlayCDRom(int name)
     }
 
     if (name == CDModeDefined) {
-	return 0;
         CDMode = CDModeDefined;
+	return 0;
         track = cd_current_track();
         if (CurrentPlaySection == PlaySectionStats) {
 	    if (GameResult == GameVictory) {
