@@ -99,7 +99,7 @@ local void DrawSelectionRectangle(Unit* unit,UnitType* type,int x,int y)
 	    ,type->BoxWidth
 	    ,type->BoxHeight);
 #else
-    VideoDrawCircleClip(color
+    VideoFill25TransCircleClip(color
 	    ,x+type->TileWidth*TileSizeX/2
 	    ,y+type->TileHeight*TileSizeY/2
 	    ,min(type->BoxWidth,type->BoxHeight)/2);
