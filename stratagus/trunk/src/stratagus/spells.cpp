@@ -599,6 +599,8 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 int CastPolymorph(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
+	int i;
+	int j;
 	UnitType* type;
 
 	type = action->Data.Polymorph.NewForm;
@@ -623,9 +625,13 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 
 	// as said somewhere else -- no corpses :)
 	RemoveUnit(target, NULL);
-	if (!UnitTypeCanMoveTo(type, x, y)) {
-		PlaceUnit(target, target->X, target->Y);
-		return 0;
+	for (i = 0; i < type->TileWidth; ++i) {
+		for (j = 0; j < type->TileHeight; ++j) {
+			if (!UnitTypeCanMoveTo(x + i, y + j, type)) {
+				PlaceUnit(target, target->X, target->Y);
+				return 0;
+			}
+		}
 	}
 	caster->Mana -= spell->ManaCost;
 	if (action->Data.Polymorph.PlayerNeutral) {
