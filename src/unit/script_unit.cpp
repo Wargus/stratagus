@@ -252,7 +252,7 @@ global void CclParseOrder(lua_State* l, Order* order)
 			int slot;
 
 			++j;
-			lua_rawgeti(l, -1, 1);
+			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 
