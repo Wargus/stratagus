@@ -1473,12 +1473,6 @@ global void InputMouseButtonPress(const EventCallback* callbacks,
     LastMouseTicks=ticks;
 
     callbacks->ButtonPressed(button);
-#ifdef MACOSX
-    // MacOS X Only reports button press, no release
-    if ( 1<<button==UpButton || 1<<button==DownButton ) {
-	MouseButtons&=~(0x01010101<<button);
-    }
-#endif
 }
 
 /**
