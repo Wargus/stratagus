@@ -286,12 +286,12 @@ global void LoadUserInterface(void)
 **	@param file	Save file handle
 **	@param ui	User interface to save
 */
-local void OldSaveUi(FILE* file,const UI* ui)
+local void SaveUi(FILE* file,const UI* ui)
 {
     int i;
     MenuPanel* menupanel;
 
-    fprintf(file,"(define-old-ui '%s %d %d\t; Selector\n",
+    fprintf(file,"(define-ui '%s %d %d\t; Selector\n",
 	    ui->Name,ui->Width,ui->Height);
     fprintf(file,"  ; Filler 1\n");
     fprintf(file,"  (list \"%s\" %d %d)\n",
@@ -364,24 +364,24 @@ local void OldSaveUi(FILE* file,const UI* ui)
 		ui->Buttons2[i].Width,ui->Buttons2[i].Height);
     }
 
-    fprintf(file,"  ; Cursors\n");
-    fprintf(file,"  (list");
-    fprintf(file," '%s",ui->Point.Name);
-    fprintf(file," '%s",ui->Glass.Name);
-    fprintf(file," '%s\n",ui->Cross.Name);
-    fprintf(file,"    '%s",ui->YellowHair.Name);
-    fprintf(file," '%s",ui->GreenHair.Name);
-    fprintf(file,"    '%s\n",ui->RedHair.Name);
-    fprintf(file,"    '%s\n",ui->Scroll.Name);
+    fprintf(file, "\n  'cursors '(");
+    fprintf(file, "\n    point %s", ui->Point.Name);
+    fprintf(file, "\n    glass %s", ui->Glass.Name);
+    fprintf(file, "\n    cross %s", ui->Cross.Name);
+    fprintf(file, "\n    yellow %s", ui->YellowHair.Name);
+    fprintf(file, "\n    green %s", ui->GreenHair.Name);
+    fprintf(file, "\n    red %s", ui->RedHair.Name);
+    fprintf(file, "\n    scroll %s", ui->Scroll.Name);
 
-    fprintf(file,"    '%s",ui->ArrowE.Name);
-    fprintf(file," '%s",ui->ArrowNE.Name);
-    fprintf(file," '%s",ui->ArrowN.Name);
-    fprintf(file," '%s\n",ui->ArrowNW.Name);
-    fprintf(file,"    '%s",ui->ArrowW.Name);
-    fprintf(file," '%s",ui->ArrowSW.Name);
-    fprintf(file," '%s",ui->ArrowS.Name);
-    fprintf(file," '%s)\n",ui->ArrowSE.Name);
+    fprintf(file, "\n    arrow-e %s", ui->ArrowE.Name);
+    fprintf(file, "\n    arrow-ne %s", ui->ArrowNE.Name);
+    fprintf(file, "\n    arrow-n %s", ui->ArrowN.Name);
+    fprintf(file, "\n    arrow-nw %s", ui->ArrowNW.Name);
+    fprintf(file, "\n    arrow-w %s", ui->ArrowW.Name);
+    fprintf(file, "\n    arrow-sw %s", ui->ArrowSW.Name);
+    fprintf(file, "\n    arrow-s %s", ui->ArrowS.Name);
+    fprintf(file, "\n    arrow-se %s", ui->ArrowSE.Name);
+    fprintf(file, ")\n");
 
     menupanel=ui->MenuPanels;
     while( menupanel ) {
@@ -394,123 +394,6 @@ local void OldSaveUi(FILE* file,const UI* ui)
 
     fprintf(file," )\n\n");
 }
-
-#if 0
-/**
-**	Save the UI structure.
-**
-**	@param file	Save file handle
-**	@param ui	User interface to save
-*/
-local void NewSaveUi(FILE * file, const UI * ui)
-{
-    int i;
-
-    fprintf(file, "(define-ui '%s %d %d\t; Selector\n",
-	ui->Name, ui->Width, ui->Height);
-
-    fprintf(file, "  'normal-font-color '%s 'reverse-font-color '%s\n",
-	ui->NormalFontColor, ui->ReverseFontColor);
-
-    for( i=0; i<TheUI.NumFillers; ++i ) {
-	fprintf(file, "  'filler '(pos (%d %d) image \"%s\")\n",
-	    ui->FillerX[i], ui->FillerY[i], ui->Filler[i].File);
-    }
-
-    fprintf(file, "  'resources '(pos (%d %d) image \"%s\"",
-	ui->ResourceX, ui->ResourceY, ui->Resource.File);
-    for (i = 1; i < MaxCosts; ++i) {
-	// FIXME: use slot 0 for time displays!
-	fprintf(file, "\n    %s (icon-pos (%d %d) icon-file \"%s\"\n",
-	    DefaultResourceNames[i],
-	    ui->Resources[i].IconX, ui->Resources[i].IconY,
-	    ui->Resources[i].Icon.File);
-	fprintf(file,"      icon-frame %d icon-size (%d %d) text-pos (%d %d))",
-	    ui->Resources[i].IconRow,
-	    ui->Resources[i].IconW, ui->Resources[i].IconH,
-	    ui->Resources[i].TextX, ui->Resources[i].TextY);
-    }
-    fprintf(file, "\n    food (icon-pos (%d %d) icon-file \"%s\"\n",
-	ui->FoodIconX, ui->FoodIconY, ui->FoodIcon.File);
-    fprintf(file,"      icon-frame %d icon-size (%d %d) text-pos (%d %d))",
-	ui->FoodIconRow,
-	ui->FoodIconW, ui->FoodIconH, ui->FoodTextX, ui->FoodTextY);
-    fprintf(file, "\n    score (icon-pos (%d %d) icon-file \"%s\"\n",
-	ui->ScoreIconX, ui->ScoreIconY, ui->ScoreIcon.File);
-    fprintf(file,"      icon-frame %d icon-size (%d %d) text-pos (%d %d))",
-	ui->ScoreIconRow,
-	ui->ScoreIconW, ui->ScoreIconH, ui->ScoreTextX, ui->ScoreTextY);
-    fprintf(file, ")\n");
-
-    fprintf(file, "  'info-panel '(pos (%d %d) image \"%s\"\n",
-	ui->InfoPanelX, ui->InfoPanelY,
-	ui->InfoPanel.File);
-    fprintf(file, "    size (%d %d)\n",
-	ui->InfoPanelW, ui->InfoPanelH);
-
-    fprintf(file, "    complete-bar (color %d pos (%d %d) text-pos (%d %d)))\n",
-	ui->CompleteBarColor,
-	ui->CompleteBarX, ui->CompleteBarY,
-	ui->CompleteTextX, ui->CompleteTextY);
-
-    fprintf(file, "  'button-panel '(pos (%d %d) image \"%s\")\n",
-	ui->ButtonPanelX, ui->ButtonPanelY, ui->ButtonPanel.File);
-
-    fprintf(file, "  'map-area '(pos (%d %d) size (%d %d))\n",
-	ui->MapArea.X, ui->MapArea.Y,
-	ui->MapArea.EndX + 1, ui->MapArea.EndY + 1);
-
-    fprintf(file, "  'menu-button '(pos (%d %d) image \"%s\")\n",
-	ui->MenuButtonX, ui->MenuButtonY, ui->MenuButton.File);
-
-    fprintf(file, "  'minimap '(pos (%d %d) image \"%s\" 'viewport-color %d)\n",
-	ui->MinimapX, ui->MinimapY, ui->Minimap.File, ui->ViewportCursorColor);
-
-    fprintf(file, "  'status-line '(pos (%d %d) image \"%s\")\n",
-	ui->StatusLineX, ui->StatusLineY, ui->StatusLine.File);
-
-    fprintf(file, "; 0 Menu 1-9 Info 10-19 Button\n");
-    fprintf(file, "  'buttons '(");
-    for (i = 0; i < MaxButtons; ++i) {
-	fprintf(file, "\n    (pos (%3d %3d) size (%4d %3d))",
-	    ui->Buttons[i].X, ui->Buttons[i].Y,
-	    ui->Buttons[i].Width, ui->Buttons[i].Height);
-    }
-
-    fprintf(file, ")\n; 0-5 Training\n");
-    fprintf(file, "  'buttons-2 '(");
-    for (i = 0; i < 6; ++i) {
-	fprintf(file, "\n    (pos (%3d %3d) size (%4d %3d))",
-	    ui->Buttons2[i].X, ui->Buttons2[i].Y,
-	    ui->Buttons2[i].Width, ui->Buttons2[i].Height);
-    }
-
-    fprintf(file, ")\n  'cursors '(point %s\n", ui->Point.Name);
-    fprintf(file, "    glass %s\n", ui->Glass.Name);
-    fprintf(file, "    cross %s\n", ui->Cross.Name);
-    fprintf(file, "    yellow %s\n", ui->YellowHair.Name);
-    fprintf(file, "    green %s\n", ui->GreenHair.Name);
-    fprintf(file, "    red %s\n", ui->RedHair.Name);
-    fprintf(file, "    scroll %s\n", ui->Scroll.Name);
-
-    fprintf(file, "    arrow-e %s\n", ui->ArrowE.Name);
-    fprintf(file, "    arrow-ne %s\n", ui->ArrowNE.Name);
-    fprintf(file, "    arrow-n %s\n", ui->ArrowN.Name);
-    fprintf(file, "    arrow-nw %s\n", ui->ArrowNW.Name);
-    fprintf(file, "    arrow-w %s\n", ui->ArrowW.Name);
-    fprintf(file, "    arrow-sw %s\n", ui->ArrowSW.Name);
-    fprintf(file, "    arrow-s %s\n", ui->ArrowS.Name);
-    fprintf(file, "    arrow-se %s)\n", ui->ArrowSE.Name);
-
-    fprintf(file, "  'panels '(game-menu \"%s\"\n", ui->GameMenuPanel.File);
-    fprintf(file, "    menu-1 \"%s\"\n", ui->Menu1Panel.File);
-    fprintf(file, "    menu-2 \"%s\"\n", ui->Menu2Panel.File);
-    fprintf(file, "    victory \"%s\"\n", ui->VictoryPanel.File);
-    fprintf(file, "    scenario \"%s\")", ui->ScenarioPanel.File);
-
-    fprintf(file, " )\n\n");
-}
-#endif
 
 /**
 **	Save the viewports.
@@ -560,8 +443,7 @@ global void SaveUserInterface(FILE* file)
 	    TheUI.OriginalResources ? "#t" : "#f");
 
     // Save the current UI
-    OldSaveUi(file,&TheUI);
-    // NewSaveUi(file,&TheUI);
+    SaveUi(file,&TheUI);
     SaveViewports(file,&TheUI);
 }
 
