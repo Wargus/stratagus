@@ -1877,8 +1877,6 @@ local void GameMenuLoad(void)
 global void SoundOptions(void)
 {
 #ifdef WITH_SOUND
-    int i = 17;
-
     SoundOptionsMenuItems[2].flags = 0;				// master volume slider
     SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_CHECKED;	// master power
     SoundOptionsMenuItems[8].flags = 0;				// music volume slider
@@ -1915,6 +1913,8 @@ global void SoundOptions(void)
 	SoundOptionsMenuItems[21].flags = -1;
     } else {
 #ifdef USE_LIBCDA
+	int i = 17;
+
 	cd_get_volume(&i, &i);
 	SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
 #endif
@@ -2054,6 +2054,7 @@ local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 global void SpeedSettings(void)
 {
     int i = 2;
+
     SpeedSettingsMenuItems[i].d.hslider.percent = ((VideoSyncSpeed - MIN_GAME_SPEED) * 100) / (MAX_GAME_SPEED - MIN_GAME_SPEED);
     if (SpeedSettingsMenuItems[i].d.hslider.percent < 0)
 	SpeedSettingsMenuItems[i].d.hslider.percent = 0;
