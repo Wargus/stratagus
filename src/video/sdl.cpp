@@ -45,6 +45,7 @@
 #include "ui.h"
 #include "sound_server.h"
 #include "sound.h"
+#include "interface.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -54,6 +55,8 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+global SDL_Surface *Screen;		/// internal screen
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -62,10 +65,19 @@
 --	Sync
 ----------------------------------------------------------------------------*/
 
-/**
-**	Called from SIGALRM.
+#if 0
+
+/*
+**	The timer resolution is 10ms, which make the timer useless for us.
 */
-local Uint32 VideoSyncHandler(Uint32 unused)
+
+/**
+**	Called from another thread or what ever SDL uses..
+**
+**	@param unused	Need by library: interval of the timer.
+**	@param param	Parameter passed in by library.
+*/
+local Uint32 VideoSyncHandler(Uint32 unused,void* param)
 {
     DebugLevel3("Interrupt %d - %d\n"
 	    ,VideoInterrupts,(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
@@ -81,37 +93,48 @@ local Uint32 VideoSyncHandler(Uint32 unused)
 
 /**
 **	Initialise video sync.
+**
+**	@note	SDL has only a maximum resolution of 10 ms.
+**
+**	@see VideoSyncSpeed
 */
 global void SetVideoSync(void)
 {
+    static SDL_TimerID id;
+
+    if( id ) {				// Cancel old timer.
+	SDL_RemoveTimer(id);
+	id=NULL;
+    }
+
     if( !VideoSyncSpeed ) {
 	return;
     }
 
-#ifdef __linux__
-    // FIXME: doesn't work with SDL/SVGAlib 1.0
-    {
-	// ARI: kick svgalib's butt - WE handled SIGALRM, no bombing any more!
-	// JOHNS: I think this will no longer work with SDL 1.1, yes it doesn't
-	//extern void SDL_TimerInit();
-	//SDL_TimerInit();
-    }
-#endif
-    if( SDL_SetTimer(
-		(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed,
-		VideoSyncHandler) ) {
-	fprintf(stderr, "Can't set timer or you use SDL 1.1.X %d\n"
-		,(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
-    }
+
+    id=SDL_AddTimer((100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed,
+	VideoSyncHandler,NULL);
 
     // DebugLevel1("Timer installed\n");
 }
 
+#else
+
+/**
+**	Initialise video sync.
+**
+**	@see VideoSyncSpeed
+*/
+global void SetVideoSync(void)
+{
+    DebugLevel0Fn("%d\n",(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
+}
+
+#endif
+
 /*----------------------------------------------------------------------------
 --	Video
 ----------------------------------------------------------------------------*/
-
-global SDL_Surface *Screen;		/// internal screen
 
 /**
 **	Initialze the video part for SDL.
@@ -211,15 +234,6 @@ global void InitVideoSdl(void)
     // Make default character translation easier
     SDL_EnableUNICODE(1);
 
-#if 0
-    // FIXME: remove this, if it works everywhere, new freecraft didn't need
-    // FIXME: repeat, it works better without it.
-    // Enable keyboard repeat (with autodetection of SDL version :)
-#ifdef SDL_DEFAULT_REPEAT_DELAY
-    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
-#endif
-#endif
-
     DebugLevel3Fn("Video init ready %d %d\n",VideoDepth,VideoBpp);
 }
 
@@ -273,110 +287,110 @@ global void Invalidate(void)
 **
 **	@return		ASCII code or internal keycode.
 */
-local int Sdl2InternalKeycode(const SDL_keysym* code)
+local int Sdl2InternalKeycode(const SDL_keysym * code)
 {
     int icode;
 
-    /*
-    **	Convert SDL keycodes into internal keycodes.
-    */
-    switch( (icode=code->sym) ) {
+    //
+    //  Convert SDL keycodes into internal keycodes.
+    //
+    switch ((icode = code->sym)) {
 	case SDLK_ESCAPE:
-	    icode='\e';
+	    icode = '\e';
 	    break;
 	case SDLK_RETURN:
-	    icode='\r';
+	    icode = '\r';
 	    break;
 	case SDLK_BACKSPACE:
-	    icode='\b';
+	    icode = '\b';
 	    break;
 	case SDLK_TAB:
-	    icode='\t';
+	    icode = '\t';
 	    break;
 	case SDLK_UP:
-	    icode=KeyCodeUp;
+	    icode = KeyCodeUp;
 	    break;
 	case SDLK_DOWN:
-	    icode=KeyCodeDown;
+	    icode = KeyCodeDown;
 	    break;
 	case SDLK_LEFT:
-	    icode=KeyCodeLeft;
+	    icode = KeyCodeLeft;
 	    break;
 	case SDLK_RIGHT:
-	    icode=KeyCodeRight;
+	    icode = KeyCodeRight;
 	    break;
 	case SDLK_PAUSE:
-	    icode=KeyCodePause;
+	    icode = KeyCodePause;
 	    break;
 	case SDLK_F1:
-	    icode=KeyCodeF1;
+	    icode = KeyCodeF1;
 	    break;
 	case SDLK_F2:
-	    icode=KeyCodeF2;
+	    icode = KeyCodeF2;
 	    break;
 	case SDLK_F3:
-	    icode=KeyCodeF3;
+	    icode = KeyCodeF3;
 	    break;
 	case SDLK_F4:
-	    icode=KeyCodeF4;
+	    icode = KeyCodeF4;
 	    break;
 	case SDLK_F5:
-	    icode=KeyCodeF5;
+	    icode = KeyCodeF5;
 	    break;
 	case SDLK_F6:
-	    icode=KeyCodeF6;
+	    icode = KeyCodeF6;
 	    break;
 	case SDLK_F7:
-	    icode=KeyCodeF7;
+	    icode = KeyCodeF7;
 	    break;
 	case SDLK_F8:
-	    icode=KeyCodeF8;
+	    icode = KeyCodeF8;
 	    break;
 	case SDLK_F9:
-	    icode=KeyCodeF9;
+	    icode = KeyCodeF9;
 	    break;
 	case SDLK_F10:
-	    icode=KeyCodeF10;
+	    icode = KeyCodeF10;
 	    break;
 	case SDLK_F11:
-	    icode=KeyCodeF11;
+	    icode = KeyCodeF11;
 	    break;
 	case SDLK_F12:
-	    icode=KeyCodeF12;
+	    icode = KeyCodeF12;
 	    break;
 	case SDLK_KP0:
-	    icode=KeyCodeKP0;
+	    icode = KeyCodeKP0;
 	    break;
 	case SDLK_KP1:
-	    icode=KeyCodeKP1;
+	    icode = KeyCodeKP1;
 	    break;
 	case SDLK_KP2:
-	    icode=KeyCodeKP2;
+	    icode = KeyCodeKP2;
 	    break;
 	case SDLK_KP3:
-	    icode=KeyCodeKP3;
+	    icode = KeyCodeKP3;
 	    break;
 	case SDLK_KP4:
-	    icode=KeyCodeKP4;
+	    icode = KeyCodeKP4;
 	    break;
 	case SDLK_KP5:
-	    icode=KeyCodeKP5;
+	    icode = KeyCodeKP5;
 	    break;
 	case SDLK_KP6:
-	    icode=KeyCodeKP6;
+	    icode = KeyCodeKP6;
 	    break;
 	case SDLK_KP7:
-	    icode=KeyCodeKP7;
+	    icode = KeyCodeKP7;
 	    break;
 	case SDLK_KP8:
-	    icode=KeyCodeKP8;
+	    icode = KeyCodeKP8;
 	    break;
 	case SDLK_KP9:
-	    icode=KeyCodeKP9;
+	    icode = KeyCodeKP9;
 	    break;
 
-        // We need these because if you only hit a modifier key,
-        // the *ots from SDL don't report correct modifiers
+	    // We need these because if you only hit a modifier key,
+	    // the *ots from SDL don't report correct modifiers
 	case SDLK_LSHIFT:
 	case SDLK_RSHIFT:
 	    icode = KeyCodeShift;
@@ -396,28 +410,18 @@ local int Sdl2InternalKeycode(const SDL_keysym* code)
 	    icode = KeyCodeSuper;
 	    break;
 	default:
-	    // Note to X11-users: SDL (versions before 1.0.3) is buggy here.
-	    // Shifted keys may fail to be converted correctly.
-	    // Use SDL 1.0.3 or higher, which works ok.
-	    if (1) {
-		if (icode >= '0' && icode <= '9') {
-		    if( code->mod&(KMOD_CTRL|KMOD_ALT|KMOD_META) ) {
-			// Do not translate these to support grouping!
-			break;
-		    }
+	    if (icode >= '0' && icode <= '9') {
+		if (code->mod & (KMOD_CTRL | KMOD_ALT | KMOD_META)) {
+		    // Do not translate these to support grouping!
+		    break;
 		}
-		if ( (code->unicode & 0xFF80) == 0 ) {
-		    icode = code->unicode & 0x7F;
-		} else {
-		    // An international character..
-		    // let's asume latin 1 for now
-		    icode = code->unicode & 0xFF;
-		}
-	    } else if( code->mod&(KMOD_SHIFT) ) {
-		// FIXME: only letters handled here - implement shift keymap (punctuation!)
-		if(icode <= 'z' && icode >= 'a') {
-		    icode -= 32;
-		}
+	    }
+	    if ((code->unicode & 0xFF80) == 0) {
+		icode = code->unicode & 0x7F;
+	    } else {
+		// An international character..
+		// let's asume latin 1 for now
+		icode = code->unicode & 0xFF;
 	    }
 	    break;
     }
@@ -426,61 +430,75 @@ local int Sdl2InternalKeycode(const SDL_keysym* code)
 }
 
 /**
-**	Handle keyboard!
+**	Handle keyboard key press!
 **
+**	@param callback	Callback funktion for key down.
 **	@param code	SDL keysym structure pointer.
 */
-local void SdlHandleKey(const SDL_keysym* code)
+local void SdlHandleKeyPress(void (*const callback) (unsigned),
+    const SDL_keysym* code)
 {
     int icode;
 
-    icode=Sdl2InternalKeycode(code);
+    icode = Sdl2InternalKeycode(code);
 
-    if( HandleKeyDown(icode) ) {
-	return;
-    }
+    callback(icode);
 }
 
 /**
-**	Handle keyboard!
+**	Handle keyboard key release!
 **
+**	@param callback	Callback funktion for key up.
 **	@param code	SDL keysym structure pointer.
 */
-local void SdlHandleKeyUp(const SDL_keysym* code)
+local void SdlHandleKeyRelease(void (*const callback) (unsigned),
+    const SDL_keysym* code)
 {
     int icode;
 
     icode=Sdl2InternalKeycode(code);
 
-    HandleKeyUp(icode);
+    callback(icode);
 }
 
 /**
 **	Handle interactive input event.
+**
+**	@param callback	Callback structure for events.
+**	@param event	SDL event structure pointer.
 */
-local void DoEvent(SDL_Event* event)
+local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 {
-    switch( event->type ) {
+    switch (event->type) {
 	case SDL_MOUSEBUTTONDOWN:
-	    DebugLevel3("\tbutton press %d\n",event->button.button);
-	    HandleButtonDown(event->button.button);
+	    DebugLevel3("\tbutton press %d\n", event->button.button);
+	    //
+	    //  SDL has already a good order of the buttons.
+	    //
+	    InputMouseButtonPress(callbacks, SDL_GetTicks(),
+		event->button.button);
 	    break;
 
 	case SDL_MOUSEBUTTONUP:
-	    DebugLevel3("\tbutton release %d\n",event->button.button);
-	    HandleButtonUp(event->button.button);
+	    DebugLevel3("\tbutton release %d\n", event->button.button);
+	    //
+	    //  SDL has already a good order of the buttons.
+	    //
+	    InputMouseButtonRelease(callbacks, SDL_GetTicks(),
+		event->button.button);
 	    break;
 
 	    // FIXME SDL: check if this is only usefull for the cursor
 	    //            if this is the case we don't need this.
 	case SDL_MOUSEMOTION:
-	    DebugLevel3("\tmotion notify %d,%d\n"
-		    ,event->motion.x,event->motion.y);
-	    HandleMouseMove(event->motion.x,event->motion.y);
+	    DebugLevel3("\tmotion notify %d,%d\n", event->motion.x,
+		event->motion.y);
+	    InputMouseMove(callbacks, SDL_GetTicks(),
+		event->motion.x, event->motion.y);
 	    // FIXME: Same bug fix from X11
-	    if ( (TheUI.WarpX != -1 || TheUI.WarpY != -1)
-		    && (event->motion.x!=TheUI.WarpX
-			|| event->motion.y!=TheUI.WarpY) ) {
+	    if ((TheUI.WarpX != -1 || TheUI.WarpY != -1)
+		&& (event->motion.x != TheUI.WarpX
+		    || event->motion.y != TheUI.WarpY)) {
 		int xw;
 		int yw;
 
@@ -488,26 +506,26 @@ local void DoEvent(SDL_Event* event)
 		yw = TheUI.WarpY;
 		TheUI.WarpX = -1;
 		TheUI.WarpY = -1;
-		SDL_WarpMouse(xw,yw);
+		SDL_WarpMouse(xw, yw);
 	    }
-	    MustRedraw|=RedrawCursor;
+	    MustRedraw |= RedrawCursor;
 	    break;
 
 	case SDL_ACTIVEEVENT:
 	    DebugLevel3("\tFocus changed\n");
-	    if( !event->active.state ) {
-		CursorOn=-1;
+	    if (!event->active.state) {
+		CursorOn = -1;
 	    }
 	    break;
 
 	case SDL_KEYDOWN:
 	    DebugLevel3("\tKey press\n");
-	    SdlHandleKey(&event->key.keysym);
+	    SdlHandleKeyPress(callbacks->KeyPressed, &event->key.keysym);
 	    break;
 
 	case SDL_KEYUP:
 	    DebugLevel3("\tKey release\n");
-	    SdlHandleKeyUp(&event->key.keysym);
+	    SdlHandleKeyRelease(callbacks->KeyReleased, &event->key.keysym);
 	    break;
 
 	case SDL_QUIT:
@@ -516,9 +534,139 @@ local void DoEvent(SDL_Event* event)
 }
 
 /**
+**	Wait for interactive input event for one frame.
+**
+**	Handles system events, joystick, keyboard, mouse.
+**	Handles the network messages.
+**	Handles the sound queue.
+**
+**	All events available are fetched. Sound and network only if available.
+**	Returns if the time for one frame is over.
+**
+**	@param callbacks	Call backs that handle the events.
+*/
+global void WaitEventsOneFrame(const EventCallback* callbacks)
+{
+    struct timeval tv;
+    fd_set rfds;
+    fd_set wfds;
+    int maxfd;
+    Uint32 i;
+    SDL_Event event[1];
+
+#ifndef USE_SDLA
+    if( SoundFildes==-1 ) {
+	SoundOff=1;
+    }
+#endif
+    InputMouseTimeout(callbacks,SDL_GetTicks());
+    for(;;) {
+#if 1
+	static Uint32 LastTick;
+
+	//
+	//	Time of frame over? This makes the CPU happy. :(
+	//
+	i=SDL_GetTicks();
+	while( i>=LastTick ) {
+	    ++VideoInterrupts;
+	    LastTick+=(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
+	}
+#endif
+
+	//
+	//	Prepare select
+	//
+	maxfd=0;
+	tv.tv_sec=tv.tv_usec=0;
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
+
+	//
+	//	Network
+	//
+	if( NetworkFildes!=-1 ) {
+	    if( NetworkFildes>maxfd ) {
+		maxfd=NetworkFildes;
+	    }
+	    FD_SET(NetworkFildes,&rfds);
+	}
+
+#ifndef USE_SDLA
+	//
+	//	Sound
+	//
+	if( !SoundOff && !SoundThreadRunning ) {
+	    if( SoundFildes>maxfd ) {
+		maxfd=SoundFildes;
+	    }
+	    FD_SET(SoundFildes,&wfds);
+	}
+#endif
+
+#if 0
+	maxfd=select(maxfd+1,&rfds,&wfds,NULL
+		,(i=SDL_PollEvent(event)) ? &tv : NULL);
+#else
+	// QUICK HACK to fix the event/timer problem
+	//	The timer code didn't interrupt the select call.
+	//	Perhaps I could send a signal to the process
+	// Not very nice, but this is the problem if you use other libraries
+	// The event handling of SDL is wrong designed = polling only.
+	// There is hope on SDL 1.3 which will have this fixed.
+
+	maxfd=select(maxfd+1,&rfds,&wfds,NULL,&tv);
+	i=SDL_PollEvent(event);
+#endif
+
+	if ( i ) {			// Handle SDL event
+	    SdlDoEvent(callbacks,event);
+	}
+
+	if( maxfd>0 ) {
+#ifndef USE_SDLA
+	    //
+	    //	Sound
+	    //
+	    if( !SoundOff && !SoundThreadRunning
+		    && FD_ISSET(SoundFildes,&wfds) ) {
+		callbacks->SoundReady();
+	    }
+#endif
+
+	    //
+	    //	Not more input and network in syn and time for frame over
+	    //
+	    if( !i && NetworkInSync && VideoInterrupts ) {
+		break;
+	    }
+
+	    //
+	    //	Network
+	    //
+	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
+		callbacks->NetworkEvent();
+	    }
+	}
+
+	//
+	//	Not more input and time for frame over: return
+	//
+	if( !i && VideoInterrupts ) {
+	    break;
+	}
+    }
+
+    //
+    //	Prepare return, time for one frame is over.
+    //
+    VideoInterrupts=0;
+}
+
+/**
 **	Wait for interactive input event.
 **
-**	Handles X11 events, keyboard, mouse.
+**	Handles system events, keyboard, mouse.
 **	Video interrupt for sync.
 **	Network messages.
 **	Sound queue.
@@ -529,6 +677,8 @@ local void DoEvent(SDL_Event* event)
 */
 global void WaitEventsAndKeepSync(void)
 {
+    EventCallback callbacks;
+
     struct timeval tv;
     fd_set rfds;
     fd_set wfds;
@@ -536,23 +686,42 @@ global void WaitEventsAndKeepSync(void)
     int i;
 
     SDL_Event event[1];
+    static Uint32 LastTick;
 
+    callbacks.ButtonPressed=(void*)HandleButtonDown;
+    callbacks.ButtonReleased=(void*)HandleButtonUp;
+    callbacks.MouseMoved=(void*)HandleMouseMove;
+    callbacks.KeyPressed=HandleKeyDown;
+    callbacks.KeyReleased=HandleKeyUp;
+
+    callbacks.NetworkEvent=NetworkEvent;
+    callbacks.SoundReady=WriteSound;
+
+#ifndef USE_SDLA
+    if( SoundFildes==-1 ) {
+	SoundOff=1;
+    }
+#endif
+    InputMouseTimeout(&callbacks,SDL_GetTicks());
     for(;;) {
-	// Not very nice, but this is the problem if you use other libraries
-	// The event handling of SDL is wrong designed = polling only.
-	while( SDL_PollEvent(event) ) {
-	    // Handle SDL event
-	    DoEvent(event);
+#if 1
+	//
+	//	Time of frame over? This makes the CPU happy. :(
+	//
+	i=SDL_GetTicks();
+	while( i>=LastTick ) {
+	    ++VideoInterrupts;
+	    LastTick+=(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
 	}
+#endif
 
 	//
 	//	Prepare select
 	//
-	tv.tv_sec=0;
-	tv.tv_usec=0;
+	maxfd=0;
+	tv.tv_sec=tv.tv_usec=0;
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
-	maxfd=0;
 
 	//
 	//	Network
@@ -571,7 +740,7 @@ global void WaitEventsAndKeepSync(void)
 	//
 	//	Sound
 	//
-	if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 ) {
+	if( !SoundOff && !SoundThreadRunning ) {
 	    if( SoundFildes>maxfd ) {
 		maxfd=SoundFildes;
 	    }
@@ -583,14 +752,15 @@ global void WaitEventsAndKeepSync(void)
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL
 		,(i=SDL_PollEvent(event)) ? &tv : NULL);
 #else
+	// Not very nice, but this is the problem if you use other libraries
+	// The event handling of SDL is wrong designed = polling only.
 	// QUICK HACK to fix the event/timer problem
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL,&tv);
 	i=SDL_PollEvent(event);
 #endif
 
-	if ( i ) {
-	    // Handle SDL event
-	    DoEvent(event);
+	if ( i ) {			// Handle SDL event
+	    SdlDoEvent(&callbacks,event);
 	}
 
 	if( maxfd>0 ) {
@@ -598,9 +768,9 @@ global void WaitEventsAndKeepSync(void)
 	    //
 	    //	Sound
 	    //
-	    if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 
+	    if( !SoundOff && !SoundThreadRunning
 			&& FD_ISSET(SoundFildes,&wfds) ) {
-		WriteSound();
+		callbacks.SoundReady();
 	    }
 #endif
 
@@ -608,24 +778,29 @@ global void WaitEventsAndKeepSync(void)
 	    //	Network in sync and time for frame over: return
 	    //
 	    if( !i && NetworkInSync && VideoInterrupts ) {
-		return;
+		break;
 	    }
 
 	    //
 	    //	Network
 	    //
 	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
-		NetworkEvent();
+		callbacks.NetworkEvent();
 	    }
 	}
 
 	//
 	//	Network in sync and time for frame over: return
 	//
-	if( NetworkInSync && VideoInterrupts ) {
-	    return;
+	if( !i && NetworkInSync && VideoInterrupts ) {
+	    break;
 	}
     }
+
+    //
+    //	Prepare return, time for one frame is over.
+    //
+    VideoInterrupts=0;
 }
 
 /**
@@ -635,84 +810,87 @@ global void WaitEventsAndKeepSync(void)
 **
 **	@return		A hardware dependend pixel table.
 */
-global VMemType* VideoCreateNewPalette(const Palette *palette)
+global VMemType *VideoCreateNewPalette(const Palette * palette)
 {
     int i;
-    void* pixels;
+    void *pixels;
 
-    if( !Screen ) {			// no init
+    if (!Screen) {			// no init
 	return NULL;
     }
 
-    switch( VideoBpp ) {
-    case 8:
-	pixels=malloc(256*sizeof(VMemType8));
-	break;
-    case 15:
-    case 16:
-	pixels=malloc(256*sizeof(VMemType16));
-	break;
-    case 24:
-	pixels=malloc(256*sizeof(VMemType24));
-	break;
-    case 32:
-	pixels=malloc(256*sizeof(VMemType32));
-	break;
-    default:
-	DebugLevel0Fn("Unknown depth\n");
-	return NULL;
+    switch (VideoBpp) {
+	case 8:
+	    pixels = malloc(256 * sizeof(VMemType8));
+	    break;
+	case 15:
+	case 16:
+	    pixels = malloc(256 * sizeof(VMemType16));
+	    break;
+	case 24:
+	    pixels = malloc(256 * sizeof(VMemType24));
+	    break;
+	case 32:
+	    pixels = malloc(256 * sizeof(VMemType32));
+	    break;
+	default:
+	    DebugLevel0Fn("Unknown depth\n");
+	    return NULL;
     }
 
     //
-    //	Convert each palette entry into hardware format.
+    //  Convert each palette entry into hardware format.
     //
-    for( i=0; i<256; ++i ) {
+    for (i = 0; i < 256; ++i) {
 	int r;
 	int g;
 	int b;
 	int v;
 	char *vp;
 
-	r=(palette[i].r)&0xFF;
-	g=(palette[i].g)&0xFF;
-	b=(palette[i].b)&0xFF;
-	v=r+g+b;
+	r = (palette[i].r) & 0xFF;
+	g = (palette[i].g) & 0xFF;
+	b = (palette[i].b) & 0xFF;
+	v = r + g + b;
 
 	// Apply global saturation,contrast and brightness
-	r= ((((r*3-v)*TheUI.Saturation + v*100)
-	    *TheUI.Contrast)
-	    +TheUI.Brightness*25600*3)/30000;
-	g= ((((g*3-v)*TheUI.Saturation + v*100)
-	    *TheUI.Contrast)
-	    +TheUI.Brightness*25600*3)/30000;
-	b= ((((b*3-v)*TheUI.Saturation + v*100)
-	    *TheUI.Contrast)
-	    +TheUI.Brightness*25600*3)/30000;
+	r = ((((r * 3 - v) * TheUI.Saturation + v * 100)
+		* TheUI.Contrast)
+	    + TheUI.Brightness * 25600 * 3) / 30000;
+	g = ((((g * 3 - v) * TheUI.Saturation + v * 100)
+		* TheUI.Contrast)
+	    + TheUI.Brightness * 25600 * 3) / 30000;
+	b = ((((b * 3 - v) * TheUI.Saturation + v * 100)
+		* TheUI.Contrast)
+	    + TheUI.Brightness * 25600 * 3) / 30000;
 
 	// Boundings
-	r= r<0 ? 0 : r>255 ? 255 : r;
-	g= g<0 ? 0 : g>255 ? 255 : g;
-	b= b<0 ? 0 : b>255 ? 255 : b;
+	r = r < 0 ? 0 : r > 255 ? 255 : r;
+	g = g < 0 ? 0 : g > 255 ? 255 : g;
+	b = b < 0 ? 0 : b > 255 ? 255 : b;
 
 	// -> Video
-	switch( VideoBpp ) {
-	case 8:
-	    ((VMemType8*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);
-	    break;
-	case 15:
-	case 16:
-	    ((VMemType16*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);
-	    break;
-	case 24:
-	    v=SDL_MapRGB(Screen->format,r,g,b);
-	    vp = (char *)(&v);
-	    ((VMemType24*)pixels)[i].a=vp[0];	// endian safe ?
-	    ((VMemType24*)pixels)[i].b=vp[1];
-	    ((VMemType24*)pixels)[i].c=vp[2];
-	    break;
-	case 32:
-	    ((VMemType32*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);
-	    break;
+	switch (VideoBpp) {
+	    case 8:
+		((VMemType8 *) pixels)[i] =
+		    SDL_MapRGB(Screen->format, r, g, b);
+		break;
+	    case 15:
+	    case 16:
+		((VMemType16 *) pixels)[i] =
+		    SDL_MapRGB(Screen->format, r, g, b);
+		break;
+	    case 24:
+		v = SDL_MapRGB(Screen->format, r, g, b);
+		vp = (char *)(&v);
+		((VMemType24 *) pixels)[i].a = vp[0];	// endian safe ?
+		((VMemType24 *) pixels)[i].b = vp[1];
+		((VMemType24 *) pixels)[i].c = vp[2];
+		break;
+	    case 32:
+		((VMemType32 *) pixels)[i] =
+		    SDL_MapRGB(Screen->format, r, g, b);
+		break;
 	}
     }
 
@@ -728,6 +906,7 @@ global void CheckVideoInterrupts(void)
 {
     if( VideoInterrupts ) {
         //DebugLevel1("Slow frame\n");
+	// FIXME: need locking!
 	IfDebug(
 	    //DrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
 	);

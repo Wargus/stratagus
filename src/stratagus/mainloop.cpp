@@ -172,13 +172,7 @@ global void UpdateDisplay(void)
 {
     int update_old_cursor;
 
-#ifdef USE_SDL
-    // FIXME: move to system api part!
-    extern SDL_Surface *Screen;			/// internal screen
-
-    SDL_LockSurface(Screen);
-    VideoMemory=Screen->pixels;
-#endif
+    VideoLockScreen();			// prepare video write
     if (MustRedraw) {
 	update_old_cursor=HideAnyCursor();	// remove cursor
     } else {
@@ -296,19 +290,13 @@ global void UpdateDisplay(void)
     }
 
     if (!MustRedraw) {
-#ifdef USE_SDL
-	// FIXME: move to system api part!
-	SDL_UnlockSurface(Screen);
-#endif
+	VideoUnlockScreen();		// End write access
 	return;
     }
 
     DrawAnyCursor();
+    VideoUnlockScreen();		// End write access
 
-#ifdef USE_SDL
-	// FIXME: move to system api part!
-    SDL_UnlockSurface(Screen);
-#endif
     //
     //	Update changes to X11.
     //
@@ -360,7 +348,8 @@ global void UpdateDisplay(void)
 	}
 	/* if (MustRedraw) */ {
 	// FIXME: JOHNS: That didn't work: if (MustRedraw&RedrawCursor)
-	    DebugLevel3Fn("%d,%d,%d,%d\n",CursorX-GameCursor->HotX,CursorY-GameCursor->HotY
+	    DebugLevel3Fn("%d,%d,%d,%d\n",CursorX-GameCursor->HotX
+		,CursorY-GameCursor->HotY
 		,VideoGraphicWidth(GameCursor->Sprite)
 		,VideoGraphicHeight(GameCursor->Sprite));
 	    InvalidateArea(CursorX-GameCursor->HotX,CursorY-GameCursor->HotY
@@ -480,8 +469,6 @@ global void GameMainLoop(void)
 	CheckVideoInterrupts();		// look if already an interrupt
 
 	WaitEventsAndKeepSync();
-
-	VideoInterrupts=0;
     }
 }
 

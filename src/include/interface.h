@@ -129,14 +129,18 @@ enum _key_modifiers_ {
     ModifierHyper	= 16,		/// any hyper key pressed
 };
 
+#define MouseDoubleShift	8	/// shift for double click button
+#define MouseDragShift		16	/// shift for drag button
+#define MouseHoldShift		24	/// shift for hold button
+
     /// pressed mouse button flags
 enum _mouse_buttons_ {
     LeftButton		= 2,		/// Left button on mouse
     MiddleButton	= 4,		/// Middle button on mouse
     RightButton		= 8,		/// Right button on mouse
 
-    // FIXME: support wheel and more buttons
-    // FIXME: support for double click and long hold
+    UpButton		= 16,		/// Scroll up button on mouse
+    DownButton		= 32,		/// Scroll down button on mouse
 
 	/// Left+Middle button on mouse
     LeftAndMiddleButton = LeftButton|MiddleButton,
@@ -189,7 +193,7 @@ enum _scroll_state_ {
     /// Flag telling if the game is paused.
 extern char GamePaused;
 
-    /// pressed mouse buttons
+    /// pressed mouse buttons (normal,double,dragged,long)
 extern enum _mouse_buttons_ MouseButtons;
     /// current active modifiers
 extern enum _key_modifiers_ KeyModifiers;
@@ -250,17 +254,32 @@ extern int AddButton(int pos,int level,const char* IconIdent,
     /// Save all buttons
 extern void SaveButtons(FILE* file);
 
+//
+//	in interface.c
+//
     /// Called if any mouse button is pressed down
-extern void HandleButtonDown(int b);
+extern void HandleButtonDown(unsigned button);
     /// Called if any mouse button is released up
-extern void HandleButtonUp(int b);
+extern void HandleButtonUp(unsigned button);
     /// Called if the mouse is moved
 extern void HandleMouseMove(int x,int y);
     /// Called if a key is pressed
-extern int HandleKeyDown(int key);
+extern void HandleKeyDown(unsigned key);
     /// Called when a key is released
-extern int HandleKeyUp(int key);
+extern void HandleKeyUp(unsigned key);
 
+    /// Called if any mouse button is pressed down
+extern void InputMouseButtonPress(const EventCallback*,unsigned,unsigned);
+    /// Called if any mouse button is released up
+extern void InputMouseButtonRelease(const EventCallback*,unsigned,unsigned);
+    /// Called if the mouse is moved
+extern void InputMouseMove(const EventCallback*,unsigned,int,int);
+    /// Called to look for mouse timeout's
+extern void InputMouseTimeout(const EventCallback*,unsigned);
+
+//
+//	Chaos pur.
+//
     /// Called if right mouse button is pressed
 extern void DoRightButton(int x,int y);
     /// cancel the building input mode

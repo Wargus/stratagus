@@ -909,6 +909,75 @@ local void SendCommand(int x,int y)
 }
 
 /**
+**	Handle mouse button pressed in select state.
+**
+**	Select state is used for target of patrol, attack, move, ....
+**
+**	@param button	Button pressed down.
+*/
+local void UISelectStateButtonDown(unsigned button)
+{
+    //
+    //	Clicking on the map.
+    //
+    if( CursorOn==CursorOnMap ) {
+	ClearStatusLine();
+	ClearCosts();
+	CursorState=CursorStatePoint;
+	GameCursor=TheUI.Point.Cursor;
+	CurrentButtonLevel = 0;
+	UpdateButtonPanel();
+	MustRedraw|=RedrawButtonPanel|RedrawCursor;
+	if( MouseButtons&LeftButton ) {
+	    MakeMissile(MissileTypeGreenCross
+		    ,MapX*TileSizeX+CursorX-TheUI.MapX
+		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
+	    SendCommand(Screen2MapX(CursorX),Screen2MapY(CursorY));
+	}
+	return;
+    }
+
+    //
+    //	Clicking on the minimap.
+    //
+    if( CursorOn==CursorOnMinimap ) {
+	if( MouseButtons&LeftButton ) {
+	    ClearStatusLine();
+	    ClearCosts();
+	    CursorState=CursorStatePoint;
+	    GameCursor=TheUI.Point.Cursor;
+	    CurrentButtonLevel = 0; // reset unit buttons to normal
+	    UpdateButtonPanel();
+	    MustRedraw|=RedrawButtonPanel|RedrawCursor;
+	    MakeMissile(MissileTypeGreenCross
+		    ,Minimap2MapX(CursorX)*TileSizeX+TileSizeX/2
+		    ,Minimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
+	    SendCommand(Minimap2MapX(CursorX),Minimap2MapY(CursorY));
+	} else {
+	    MapSetViewpoint(Minimap2MapX(CursorX)-MapWidth/2
+		    ,Minimap2MapY(CursorY)-MapHeight/2);
+	}
+	return;
+    }
+
+    if( CursorOn==CursorOnButton ) {
+	// FIXME: other buttons?
+	if( ButtonUnderCursor>9 ) {
+	    DoButtonButtonClicked(ButtonUnderCursor-10);
+	    return;
+	}
+    }
+
+    ClearStatusLine();
+    ClearCosts();
+    CursorState=CursorStatePoint;
+    GameCursor=TheUI.Point.Cursor;
+    CurrentButtonLevel = 0; // reset unit buttons to normal
+    UpdateButtonPanel();
+    MustRedraw|=RedrawButtonPanel|RedrawCursor;
+}
+
+/**
 **	Called if mouse button pressed down.
 **
 **	@param b	Button pressed down.
@@ -923,52 +992,8 @@ global void UIHandleButtonDown(int b)
     //	Selecting target. (Move,Attack,Patrol,... commands);
     //
     if( CursorState==CursorStateSelect ) {
-	if( CursorOn==CursorOnMap ) {
-	    ClearStatusLine();
-	    ClearCosts();
-	    CursorState=CursorStatePoint;
-	    GameCursor=TheUI.Point.Cursor;
-            CurrentButtonLevel = 0;
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawButtonPanel|RedrawCursor;
-	    if( MouseButtons&LeftButton ) {
-		SendCommand(Screen2MapX(CursorX),Screen2MapY(CursorY));
-	    }
-	    return;
-	}
-	if( CursorOn==CursorOnMinimap ) {
-	    if( MouseButtons&LeftButton ) {
-		ClearStatusLine();
-		ClearCosts();
-		CursorState=CursorStatePoint;
-		GameCursor=TheUI.Point.Cursor;
-                CurrentButtonLevel = 0; // reset unit buttons to normal
-		UpdateButtonPanel();
-		MustRedraw|=RedrawButtonPanel|RedrawCursor;
-		MakeMissile(MissileTypeGreenCross
-			,Minimap2MapX(CursorX)*TileSizeX+TileSizeX/2
-			,Minimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
-		SendCommand(Minimap2MapX(CursorX),Minimap2MapY(CursorY));
-	    } else {
-		MapSetViewpoint(Minimap2MapX(CursorX)-MapWidth/2
-			,Minimap2MapY(CursorY)-MapHeight/2);
-	    }
-	    return;
-	}
-	if( CursorOn==CursorOnButton ) {
-	    // FIXME: other buttons?
-	    if( ButtonUnderCursor>9 ) {
-		DoButtonButtonClicked(ButtonUnderCursor-10);
-		return;
-	    }
-	}
-	ClearStatusLine();
-	ClearCosts();
-	CursorState=CursorStatePoint;
-	GameCursor=TheUI.Point.Cursor;
-        CurrentButtonLevel = 0; // reset unit buttons to normal
-	UpdateButtonPanel();
-	MustRedraw|=RedrawButtonPanel|RedrawCursor;
+	UISelectStateButtonDown(b);
+	return;
     }
 
     if( CursorOn==CursorOnMap ) {

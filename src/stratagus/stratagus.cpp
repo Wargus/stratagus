@@ -273,6 +273,60 @@ global char* strdcat3(const char* l, const char* m, const char* r) {
 ==	MAIN
 ============================================================================*/
 
+local int WaitNoEvent;			/// Flag got an event.
+
+/**
+**	Callback for input.
+*/
+local void WaitCallbackKey(unsigned dummy)
+{
+    DebugLevel3Fn("Pressed %8x %8x\n",MouseButtons,dummy);
+    WaitNoEvent=0;
+}
+
+/**
+**	Callback for input.
+*/
+local void WaitCallbackMouse(int dummy_x,int dummy_y)
+{
+    DebugLevel3Fn("Moved %d,%d\n",dummy_x,dummy_y);
+}
+
+/**
+**	Wait for any input.
+**
+**	@param time	Time in seconds to wait.	
+*/
+local void WaitForInput(int timeout)
+{
+    EventCallback callbacks;
+
+    SetVideoSync();
+
+    callbacks.ButtonPressed=WaitCallbackKey;
+    callbacks.ButtonReleased=WaitCallbackKey;
+    callbacks.MouseMoved=WaitCallbackMouse;
+    callbacks.KeyPressed=WaitCallbackKey;
+    callbacks.KeyReleased=WaitCallbackKey;
+
+    callbacks.NetworkEvent=NetworkEvent;
+    callbacks.SoundReady=WriteSound;
+
+    //
+    //	FIXME: more work needed, scrolling credits, animations, ...
+    VideoLockScreen();
+    DrawTextCentered(VideoWidth/2,5,LargeFont,"Press SPACE to continue.");
+    VideoUnlockScreen();
+    Invalidate();
+    RealizeVideoMemory();
+
+    WaitNoEvent=1;
+    timeout*=FRAMES_PER_SECOND;
+    while( timeout-- && WaitNoEvent ) {
+	WaitEventsOneFrame(&callbacks);
+    }
+}
+
 /**
 **	Main1, called from main.
 **
@@ -309,6 +363,9 @@ global int main1(int argc __attribute__ ((unused)),
 #endif
 #ifdef USE_BZ2LIB
     "BZ2LIB "
+#endif
+#ifdef USE_SVGALIB
+    "SVGALIB "
 #endif
 #ifdef USE_SDL
     "SDL "
@@ -402,6 +459,8 @@ Use it at your own risk.\n"
     LoadImages(1);
     LoadCursors(1);
     InitSettings();
+
+    WaitForInput(15);
 
     //
     //	Create the game.
