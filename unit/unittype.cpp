@@ -381,10 +381,12 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	v = Fetch8(udta);
 	unittype->_PiercingDamage = v;
     }
-    /*
-     * This is not used in stratagus. so it was simply removed.
-     * We use our own upgrade methods that are a lot more flexible.
-     * Maybe we could use this one day, not sure.
+    //
+    // This is not used in stratagus. so it was simply removed.
+    // We use our own upgrade methods that are a lot more flexible.
+    // Maybe we could use this one day, not sure.
+    //
+#if 0
     for (i = 0; i < 110; ++i) {		// Weapons upgradable
 	unittype = UnitTypeByWcNum(i);
 	v = Fetch8(udta);
@@ -394,7 +396,15 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	unittype = UnitTypeByWcNum(i);
 	v = Fetch8(udta);
 	unittype->ArmorUpgradable = v;
-    }*/
+    }
+#else
+    for (i = 0; i < 110; ++i) {		// Skip weapons upgradable
+	Fetch8(udta);
+    }
+    for (i = 0; i < 110; ++i) {		// Skip armor upgradable
+	Fetch8(udta);
+    }
+#endif
     for (i = 0; i < 110; ++i) {		// Missile Weapon
 	unittype = UnitTypeByWcNum(i);
 	v = Fetch8(udta);

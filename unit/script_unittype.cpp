@@ -519,12 +519,12 @@ local SCM CclDefineUnitType(SCM list)
 	    }
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
-	    type->Magic=0;
+	    type->Magic = 0;
 	    while (!gh_null_p(sublist)) {
 		DebugLevel3Fn("%d \n" _C_ CclGetSpellByIdent(gh_car(sublist)));
 		type->CanCastSpell[CclGetSpellByIdent(gh_car(sublist))] = 1;
 		sublist = gh_cdr(sublist);
-		type->Magic=1;
+		type->Magic = 1;
 	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("organic"))) {
 	    type->Organic = 1;
