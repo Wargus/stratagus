@@ -509,7 +509,7 @@ extern char* strdcat3(const char* l, const char *m, const char* r);
 #if !defined(BSD) || defined(__APPLE__)
     /// case insensitive strstr
 extern char* strcasestr(char* str, const char* substr);
-#endif // BSD
+#endif // !BSD || APPLE
 
 /*============================================================================
 ==	Misc

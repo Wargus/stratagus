@@ -32,7 +32,7 @@
 **	This combination didn't likes if main is in the freecraft lib.
 */
 
-#if defined(_MSC_VER) && !defined(_WIN32_WCE) && defined(USE_SDL)
+#if defined(USE_SDL)
 #include "SDL.h"
 #endif
 
