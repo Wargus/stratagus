@@ -10,12 +10,11 @@
 //
 /**@name action_repair.c	-	The repair action. */
 //
-//	(c) Copyright 1999-2001 by Vladi Shabanski
+//	(c) Copyright 1999-2002 by Vladi Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -83,20 +82,15 @@ local void RepairUnit(Unit* unit,Unit* goal)
     int hp;
     int lrr;
 #define GIVES_HP	4
-#define MUL		1
-#define DIVISOR		2
+#define COSTS		1
 
     player=unit->Player;
 
-    //	FIXME: Should substract the correct values for repair
     //
     //	Calculate the repair points
+    //		original per 100 hit points only 25 gold 25 wood
     //
-#if 0
-    hp=((goal->Stats->Costs[TimeCost]*GIVES_HP*FRAMES_PER_SECOND/6)
-	    /goal->Stats->HitPoints)*MUL;
-#endif
-    hp=GIVES_HP*MUL;
+    hp=GIVES_HP;
     DebugLevel2Fn("hitpoints %d\n",hp);
 
     //
@@ -105,17 +99,11 @@ local void RepairUnit(Unit* unit,Unit* goal)
     DebugCheck( !goal->Stats->HitPoints );
 
     for( i=1; i<MaxCosts; ++i ) {
-//	costs[i]=((goal->Stats->Costs[i]*hp)/goal->Stats->HitPoints)/DIVISOR;
 	if ( goal->Stats->Costs[i] ) {
-	    costs[i]=1;	//
-	}			// Prepare for repair cycles
-	else costs[i]=0;	//
-	// FIXME: unit costs something but to less costs calculated
-	IfDebug(
-	    if( !costs[i] && goal->Stats->Costs[i] ) {
-		DebugLevel0("Costs %d-%d\n",i,costs[i]);
-	    }
-	);
+	    costs[i]=COSTS;
+	} else {		// Prepare for repair cycles
+	    costs[i]=0;
+	}
     }
     lrr=player->LastRepairResource;
     for( i=player->LastRepairResource; i<MaxCosts; ++i ) {
