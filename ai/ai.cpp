@@ -1865,7 +1865,7 @@ global void AiEachSecond(Player* player)
 	ev = rdtsc();
 	sx = (ev - sv);
 	mv = (mv + sx) / 2;
-	DebugLevel1Fn("%ld %ld\n" _C_ sx / 1000 _C_ mv / 1000);
+	DebugPrint("%ld %ld\n" _C_ sx / 1000 _C_ mv / 1000);
 #endif
 }
 

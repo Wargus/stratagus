@@ -73,7 +73,7 @@ global void HandleActionResearch(Unit* unit)
 		// Check if an other building has already started?
 		//
 		if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]) {
-			DebugLevel0Fn("Two researches running\n");
+			DebugPrint("Two researches running\n");
 			PlayerAddCosts(unit->Player, upgrade->Costs);
 
 			unit->Reset = unit->Wait = 1;

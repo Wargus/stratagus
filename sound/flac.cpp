@@ -73,7 +73,7 @@ typedef struct _flac_data_ {
 static void FLAC_error_callback(const FLAC__StreamDecoder *stream,
 	FLAC__StreamDecoderErrorStatus status, void *user)
 {
-	DebugLevel0Fn(" %s\n" _C_ FLAC__StreamDecoderErrorStatusString[status]);
+	DebugPrint(" %s\n" _C_ FLAC__StreamDecoderErrorStatusString[status]);
 }
 
 /**
@@ -93,8 +93,6 @@ static FLAC__StreamDecoderReadStatus FLAC_read_callback(
 	Sample *sample;
 	FlacData *data;
 	unsigned int i;
-
-	DebugLevel3Fn("Read callback %d\n" _C_ *bytes);
 
 	sample = user;
 	data = sample->User;
@@ -131,9 +129,6 @@ static void FLAC_metadata_callback(const FLAC__StreamDecoder *stream,
 			Assert(metadata->data.stream_info.total_samples);
 			sample->Buffer = malloc(metadata->data.stream_info.total_samples * 4);
 		}
-
-		DebugLevel3Fn("Stream %d Channels, %d frequency, %d bits\n" _C_
-			sample->Channels _C_ sample->Frequency _C_ sample->SampleSize);
 	}
 }
 
@@ -158,10 +153,6 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	char *dest;
 	char *buf;
 	int ssize;
-
-	DebugLevel3Fn("Write callback %d bits, %d channel, %d bytes\n" _C_
-		frame->header.bits_per_sample _C_ frame->header.channels _C_
-		frame->header.blocksize);
 
 	sample = user;
 	data = sample->User;
@@ -330,8 +321,6 @@ global Sample* LoadFlac(const char *name, int flags)
 		CLclose(f);
 		return NULL;
 	}
-
-	DebugLevel2Fn("Loading flac file: %s\n" _C_ name);
 
 	CLseek(f, 0, SEEK_SET);
 
