@@ -36,6 +36,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "stratagus.h"
 #include "video.h"
@@ -73,12 +74,20 @@ void HandleActionReturnGoods(Unit* unit)
 				unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
 		DebugPrint("Unit can't return resources, it doesn't carry any.\n");
 		NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y, "No Resources to Return.");
+
+		if (unit->Orders[0].Goal) { // Depot (if not destroyed)
+			RefsDecrease(unit->Orders[0].Goal);
+		}
+		memset(unit->Orders, 0, sizeof(*unit->Orders));
 		unit->Orders[0].Action = UnitActionStill;
 		return;
 	}
+	// If depot was destroyed.
+	// Search for an another one.
 	if (!unit->Orders[0].Goal) {
 		if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
 				unit->CurrentResource))) {
+			memset(unit->Orders, 0, sizeof(*unit->Orders));
 			unit->Orders[0].Action = UnitActionStill;
 			return;
 		}
@@ -89,9 +98,9 @@ void HandleActionReturnGoods(Unit* unit)
 	unit->Orders[0].Action = UnitActionResource;
 	// Somewhere on the way the loaded worker could have change Arg1
 	// Bummer, go get the closest resource to the depot
-	unit->Orders[0].Arg1 = (void*)-1;
+	unit->Orders[0].Arg1.ResourcePos = -1;
 	NewResetPath(unit);
-	unit->SubAction = 70;
+	unit->SubAction = 70; // FIXME : Define value.
 	unit->Wait = 1;
 	return;
 }

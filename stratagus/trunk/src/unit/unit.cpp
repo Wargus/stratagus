@@ -240,12 +240,12 @@ void ReleaseUnit(Unit* unit)
 	free(unit->CacheLinks);
 
 	if (ReleasedOrderHead) {
-		ReleasedOrderTail->Arg1 = unit->Orders;
+		ReleasedOrderTail->Arg1.Order = unit->Orders;
 		ReleasedOrderTail = unit->Orders;
-		unit->Orders->Arg1 = NULL;
+		unit->Orders->Arg1.Order = NULL;
 	} else {
 		ReleasedOrderHead = ReleasedOrderTail = unit->Orders;
-		unit->Orders->Arg1 = NULL;
+		unit->Orders->Arg1.Order = NULL;
 	}
 	unit->Orders->X = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 	unit->Orders->Y = unit->TotalOrders; // store order count for when reused
@@ -368,7 +368,7 @@ void InitUnit(Unit* unit, UnitType* type)
 	if (ReleasedOrderHead && (unsigned)ReleasedOrderHead->X < GameCycle) {
 		unit->Orders = ReleasedOrderHead;
 		unit->TotalOrders = ReleasedOrderHead->Y;
-		ReleasedOrderHead = (Order*)ReleasedOrderHead->Arg1;
+		ReleasedOrderHead = ReleasedOrderHead->Arg1.Order;
 	} else {
 		// No Available Orders in Memory, create new ones
 		unit->TotalOrders = DEFAULT_START_ORDERS;
@@ -3547,23 +3547,28 @@ void SaveOrder(const Order* order, CLFile* file)
 	if (order->Type) {
 		CLprintf(file, " \"type\", \"%s\",", order->Type->Ident);
 	}
-	if (order->Arg1) {
-		// patrol=pos, research=upgrade, spell=spell
-		switch (order->Action) {
-			case UnitActionPatrol:
-				CLprintf(file, " \"patrol\", {%d, %d},",
-					(int)order->Arg1 >> 16, (int)order->Arg1 & 0xFFFF);
-				break;
-			case UnitActionSpellCast:
-				CLprintf(file, " \"spell\", \"%s\",", ((SpellType*)order->Arg1)->Ident);
-				break;
-			case UnitActionResearch:
-				CLprintf(file, " \"upgrade\", \"%s\",", ((Upgrade*)order->Arg1)->Ident);
-				break;
-			default:
-				CLprintf(file, " \"arg1\", %d,", (int)order->Arg1);
-				break;
-		}
+	// Extra arg.
+	switch (order->Action) {
+		case UnitActionPatrol:
+			CLprintf(file, " \"patrol\", {%d, %d},",
+				order->Arg1.Patrol.X, order->Arg1.Patrol.Y);
+			break;
+		case UnitActionSpellCast:
+			if (order->Arg1.Spell) {
+				CLprintf(file, " \"spell\", \"%s\",", order->Arg1.Spell->Ident);
+			}
+			break;
+		case UnitActionResearch:
+			if (order->Arg1.Upgrade) {
+				CLprintf(file, " \"upgrade\", \"%s\",", order->Arg1.Upgrade->Ident);
+			}
+			break;
+		case UnitActionResource :
+		case UnitActionReturnGoods :
+			CLprintf(file, " \"mine\", %d,", order->Arg1.ResourcePos);
+			break;
+		default:
+			break;
 	}
 	CLprintf(file, "}");
 }
@@ -3960,7 +3965,7 @@ void CleanUnits(void)
 	//
 	//  Release memory of Orders in the release queue.
 	while ((order = ReleasedOrderHead)) {
-		ReleasedOrderHead = order->Arg1;
+		ReleasedOrderHead = order->Arg1.Order;
 		free(order);
 	}
 

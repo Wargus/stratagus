@@ -282,57 +282,35 @@ void CclParseOrder(lua_State* l, Order* order)
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "patrol")) {
-			int x1;
-			int x2;
-
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			x1 = LuaToNumber(l, -1);
+			order->Arg1.Patrol.X = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, -1, 2);
-			x2 = LuaToNumber(l, -1);
+			order->Arg1.Patrol.Y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			order->Arg1 = (void*)((x1 << 16) | x2);
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "spell")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			order->Arg1 = SpellTypeByIdent(LuaToString(l, -1));
+			order->Arg1.Spell = SpellTypeByIdent(LuaToString(l, -1));
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "upgrade")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			order->Arg1 = UpgradeByIdent(LuaToString(l, -1));
+			order->Arg1.Upgrade = UpgradeByIdent(LuaToString(l, -1));
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "mine")) {
-			int x1;
-			int x2;
-
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			x1 = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			x2 = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			order->Arg1 = (void*)((x1 << 16) | x2);
-			lua_pop(l, 1);
-
-		} else if (!strcmp(value, "arg1")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Arg1 = (void*)(int)LuaToNumber(l, -1);
+			order->Arg1.ResourcePos = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 
 		} else {

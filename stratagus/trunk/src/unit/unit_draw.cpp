@@ -1438,9 +1438,9 @@ static void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order
 			VideoDrawLineClip(ColorGreen, x1, y1, x2, y2);
 			e_color = color = ColorBlue;
 			x1 = Map2ViewportX(CurrentViewport,
-				((int)order->Arg1) >> 16) + TileSizeX / 2;
+				order->Arg1.Patrol.X) + TileSizeX / 2;
 			y1 = Map2ViewportY(CurrentViewport,
-				((int)order->Arg1) & 0xFFFF) + TileSizeY / 2;
+				order->Arg1.Patrol.Y) + TileSizeY / 2;
 			dest = 1;
 			break;
 

@@ -133,9 +133,9 @@ static void SpellMoveToTarget(Unit* unit)
 			// FIXME: buildings could have directions
 			UnitHeadingFromDeltaXY(unit,
 				unit->Orders[0].X +
-					((SpellType*)unit->Orders[0].Arg1)->Range - unit->X,
+					unit->Orders[0].Arg1.Spell->Range - unit->X,
 				unit->Orders[0].Y +
-					((SpellType*)unit->Orders[0].Arg1)->Range - unit->Y);
+					unit->Orders[0].Arg1.Spell->Range - unit->Y);
 		}
 		unit->SubAction++; // cast the spell
 		return;
@@ -145,7 +145,7 @@ static void SpellMoveToTarget(Unit* unit)
 		// just as close as possible, since the spell is centered
 		// on the caster anyway.
 		//
-		if ((spell = unit->Orders[0].Arg1)->Target == TargetSelf) {
+		if ((spell = unit->Orders[0].Arg1.Spell)->Target == TargetSelf) {
 			DebugPrint("Increase range for spellcast.");
 			unit->Orders->Range++;
 		} else {
@@ -179,7 +179,7 @@ void HandleActionSpellCast(Unit* unit)
 			//
 			// Check if we can cast the spell.
 			//
-			spell = unit->Orders[0].Arg1;
+			spell = unit->Orders[0].Arg1.Spell;
 			if (!CanCastSpell(unit, spell, unit->Orders[0].Goal,
 					unit->Orders[0].X, unit->Orders[0].Y)) {
 
@@ -214,7 +214,7 @@ void HandleActionSpellCast(Unit* unit)
 			unit->SubAction = 1;
 			// FALL THROUGH
 		case 1:                         // Move to the target.
-			if ((spell = unit->Orders[0].Arg1)->Range != INFINITE_RANGE) {
+			if ((spell = unit->Orders[0].Arg1.Spell)->Range != INFINITE_RANGE) {
 				SpellMoveToTarget(unit);
 				break;
 			} else {
@@ -230,7 +230,7 @@ void HandleActionSpellCast(Unit* unit)
 					if (unit->Orders[0].Goal && !UnitVisibleAsGoal(unit->Orders->Goal, unit->Player)) {
 						unit->ReCast = 0;
 					} else {
-						spell = unit->Orders[0].Arg1;
+						spell = unit->Orders[0].Arg1.Spell;
 						unit->ReCast = SpellCast(unit, spell, unit->Orders[0].Goal,
 							unit->Orders[0].X, unit->Orders[0].Y);
 					}
@@ -243,7 +243,7 @@ void HandleActionSpellCast(Unit* unit)
 				if (unit->Orders[0].Goal && !UnitVisibleAsGoal(unit->Orders->Goal, unit->Player)) {
 					unit->ReCast = 0;
 				} else {
-					spell = unit->Orders[0].Arg1;
+					spell = unit->Orders[0].Arg1.Spell;
 					unit->ReCast = SpellCast(unit, spell, unit->Orders[0].Goal,
 						unit->Orders[0].X, unit->Orders[0].Y);
 				}
