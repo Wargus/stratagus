@@ -239,6 +239,7 @@ local void EditorLoadVSAction(Menuitem *mi, int i);
 local void EditorMapProperties(void);
 local void EditorPlayerProperties(void);
 local void EditorEnterMapDescriptionAction(Menuitem *mi, int key);
+local void EditorMapPropertiesOk(void);
 local void EditorQuitMenu(void);
 
 global void SaveMenus(FILE* file);
@@ -1445,7 +1446,6 @@ local Menuitem KeystrokeHelpMenuItems[] = {
     { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_DRAWFUNC, 16, 40+20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_DRAWFUNC, 16, 40+20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
 // FIXME: ccl these...
 // FIXME: add newer helps
@@ -1536,12 +1536,10 @@ local void InitKeystrokeHelpMenuItems() {
     MenuitemVslider  i1 = { 0, 18, 12*18, KeystrokeHelpVSAction, -1, 0, 0, 0, NULL};
     MenuitemButton   i2 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
     MenuitemDrawfunc i3 = { KeystrokeHelpDrawFunc };
-    MenuitemDrawfunc i4 = { NULL };
     KeystrokeHelpMenuItems[0].d.text     = i0;
     KeystrokeHelpMenuItems[1].d.vslider  = i1;
     KeystrokeHelpMenuItems[2].d.button   = i2;
     KeystrokeHelpMenuItems[3].d.drawfunc = i3;
-    KeystrokeHelpMenuItems[4].d.drawfunc = i4;
 }
 #endif
 
@@ -1691,8 +1689,8 @@ local void InitEditorLoadMapMenuItems() {
 */
 local Menuitem EditorMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, InitGameMenu, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16, 40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16, 40, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
@@ -1720,22 +1718,56 @@ local void InitEditorMenuItems() {
 }
 #endif
 
+local unsigned char *mptssoptions[] = {
+    "Forest",
+    "Winter",
+    "Wasteland",
+    "Orc Swamp",
+};
+
+local unsigned char *veroptions[] = {
+    "Original",
+    "Expansion",
+    "FreeCraft",
+};
+
 local Menuitem EditorMapPropertiesMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, (384-288)/2, 11+36, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_INPUT, (384-288)/2, 11+36+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 384/2 - (106 / 2), 256 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, (288-260)/2, 11+36, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_INPUT, (288-260)/2, 11+36+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, (288-260)/2, 11+36*2+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 288-(288-260)/2-152, 11+36*2+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, (288-260)/2, 11+36*3+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 288-(288-260)/2-152, 11+36*3+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, (288-260)/2, 11+36*4+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 288-(288-260)/2-152, 11+36*4+22, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, (288-106*2)/4, 256 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 288-(288-106*2)/4 - 106, 256 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
 #ifdef OLD_MENU
 local void InitEditorMapPropertiesMenuItems() {
-    MenuitemText   i0 = { "Map Properties", MI_TFLAGS_CENTERED};
-    MenuitemText   i1 = { "Map Description:", MI_TFLAGS_LALIGN};
-    MenuitemInput  i2 = { NULL, 288, 16, MBUTTON_PULLDOWN, EditorEnterMapDescriptionAction, 0, 0};
-    MenuitemButton i3 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EditorEndMenu, 0};
-    EditorMapPropertiesMenuItems[0].d.text   = i0;
-    EditorMapPropertiesMenuItems[1].d.text   = i1;
-    EditorMapPropertiesMenuItems[2].d.input  = i2;
-    EditorMapPropertiesMenuItems[3].d.button = i3;
+    MenuitemText     i0  = { "Map Properties", MI_TFLAGS_CENTERED};
+    MenuitemText     i1  = { "Map Description:", MI_TFLAGS_LALIGN};
+    MenuitemInput    i2  = { NULL, 260, 16, MBUTTON_PULLDOWN, EditorEnterMapDescriptionAction, 0, 0};
+    MenuitemText     i3  = { "Size:", MI_TFLAGS_LALIGN};
+    MenuitemText     i4  = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemText     i5  = { "Tileset:", MI_TFLAGS_LALIGN};
+    MenuitemPulldown i6  = { mptssoptions, 152, 20, MBUTTON_PULLDOWN, NULL, 4, 0, 0, 0, 0};
+    MenuitemText     i7  = { "Version:", MI_TFLAGS_LALIGN};
+    MenuitemPulldown i8  = { veroptions, 152, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemButton   i9  = { "OK", 106, 27, MBUTTON_GM_HALF, EditorMapPropertiesOk, 0};
+    MenuitemButton   i10 = { "Cancel (~<Esc~>)", 106, 27, MBUTTON_GM_HALF, EditorEndMenu, '\033'};
+    EditorMapPropertiesMenuItems[0].d.text     = i0;
+    EditorMapPropertiesMenuItems[1].d.text     = i1;
+    EditorMapPropertiesMenuItems[2].d.input    = i2;
+    EditorMapPropertiesMenuItems[3].d.text     = i3;
+    EditorMapPropertiesMenuItems[4].d.text     = i4;
+    EditorMapPropertiesMenuItems[5].d.text     = i5;
+    EditorMapPropertiesMenuItems[6].d.pulldown = i6;
+    EditorMapPropertiesMenuItems[7].d.text     = i7;
+    EditorMapPropertiesMenuItems[8].d.pulldown = i8;
+    EditorMapPropertiesMenuItems[9].d.button   = i9;
+    EditorMapPropertiesMenuItems[10].d.button  = i10;
 }
 #endif
 
@@ -2067,11 +2099,11 @@ global Menu Menus[] = {
     },
     {
 	// Editor Map Properties Menu
-	176+(14*TileSizeX-384)/2,
+	176+(14*TileSizeX-288)/2,
 	16+(14*TileSizeY-256)/2,
-	384, 256,
-	ImagePanel3,
-	3, 4,
+	288, 256,
+	ImagePanel2,
+	10, 11,
 	EditorMapPropertiesMenuItems,
 	NULL,
     },
@@ -2282,6 +2314,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorLoadCancel,"editor-load-cancel");
     HASHADD(EditorLoadFolder,"editor-load-folder");
     HASHADD(EditorMapProperties,"editor-map-properties");
+    HASHADD(EditorEnterMapDescriptionAction,"editor-enter-map-description-action");
     HASHADD(EditorPlayerProperties,"editor-player-properties");
 
 // Editor menu
@@ -2289,6 +2322,7 @@ global void InitMenuFuncHash(void) {
 
 // Editor map properties
     HASHADD(EditorEnterMapDescriptionAction,"editor-map-description-action");
+    HASHADD(EditorMapPropertiesOk,"editor-map-properties-ok");
     HASHADD(EditorEndMenu,"editor-end-menu");
 }
 
@@ -6253,16 +6287,26 @@ local void EditorMapProperties(void)
 {
     Menu *menu;
     char MapDescription[36];
+    char MapSize[30];
 
     menu = FindMenu(MENU_EDITOR_MAP_PROPERTIES);
+
     menu->items[2].d.input.buffer = MapDescription;
     strcpy(MapDescription, TheMap.Info->Description);
     strcat(MapDescription, "~!_");
     menu->items[2].d.input.nch = strlen(MapDescription)-3;
     menu->items[2].d.input.maxch = 31;
+
+    sprintf(MapSize, "%d x %d", TheMap.Width, TheMap.Height);
+    menu->items[4].d.text.text = MapSize;
+
+    menu->items[6].d.pulldown.defopt = TheMap.Terrain;
+
+    // FIXME: Set the correct pud version
+    menu->items[8].d.pulldown.defopt = 1;
+    menu->items[8].flags = -1;
+
     ProcessMenu(MENU_EDITOR_MAP_PROPERTIES, 1);
-    MapDescription[strlen(MapDescription)-3] = '\0';
-    strcpy(TheMap.Info->Description, MapDescription);
 }
 
 local void EditorEnterMapDescriptionAction(Menuitem *mi, int key)
@@ -6270,6 +6314,32 @@ local void EditorEnterMapDescriptionAction(Menuitem *mi, int key)
     if (key == 10 || key == 13) {
 	EditorEndMenu();
     }
+}
+
+local void EditorMapPropertiesOk(void)
+{
+    Menu *menu;
+    char *MapDescription;
+    // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
+    int v[] = { TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
+
+    menu = FindMenu(MENU_EDITOR_MAP_PROPERTIES);
+
+    MapDescription = menu->items[2].d.input.buffer;
+    MapDescription[strlen(MapDescription)-3] = '\0';
+    strcpy(TheMap.Info->Description, MapDescription);
+
+    // FIXME: Need to actually change the terrain
+    TheMap.Terrain = v[menu->items[6].d.pulldown.curopt];
+
+    // FIXME: Save the pud version somewhere
+
+    EditorEndMenu();
+}
+
+local void EditorMapPropertiesCancel(void)
+{
+    EditorEndMenu();
 }
 
 local void EditorPlayerProperties(void)
