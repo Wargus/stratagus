@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name interface.h	-	The user interface header file. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __INTERFACE_H__
 #define __INTERFACE_H__
@@ -102,6 +101,17 @@ enum _key_codes_ {
     KeyCodeF11,				/// internal keycode: F11 function keys
     KeyCodeF12,				/// internal keycode: F12 function keys
 
+    KeyCodeKP0,				/// internal keycode: keypad 0
+    KeyCodeKP1,				/// internal keycode: keypad 1
+    KeyCodeKP2,				/// internal keycode: keypad 2
+    KeyCodeKP3,				/// internal keycode: keypad 3
+    KeyCodeKP4,				/// internal keycode: keypad 4
+    KeyCodeKP5,				/// internal keycode: keypad 5
+    KeyCodeKP6,				/// internal keycode: keypad 6
+    KeyCodeKP7,				/// internal keycode: keypad 7
+    KeyCodeKP8,				/// internal keycode: keypad 8
+    KeyCodeKP9,				/// internal keycode: keypad 9
+
     KeyCodeShift,			/// internal keycode: shift modifier
     KeyCodeControl,			/// internal keycode: ctrl modifier
     KeyCodeAlt,				/// internal keycode: alt modifier
@@ -125,6 +135,7 @@ enum _mouse_buttons_ {
     RightButton		= 8,		/// Right button on mouse
 
     // FIXME: support wheel and more buttons
+    // FIXME: support for double click and long hold
 
 	/// Left+Middle button on mouse
     LeftAndMiddleButton	= LeftButton|MiddleButton,
@@ -221,6 +232,7 @@ extern void ConsoleClear(void);
 extern void ConsolePrintf(const char*,...);
     /// Redraw the console
 extern void DrawConsole(void);
+
 //
 //	in botpanel.c
 //
@@ -252,18 +264,29 @@ extern void CancelBuildingMode(void);
 
     /// FIXME: more docu
 extern void DrawMessage(void);
-
+    /// FIXME: more docu
 extern void DrawResources(void);
+    /// FIXME: more docu
 extern void DrawMessage(void);
+    /// FIXME: more docu
 extern void SetMessage( char* fmt, ... );
+    /// FIXME: more docu
 extern void DrawStatusLine(void);
+    /// FIXME: more docu
 extern void DrawCosts(void);
+    /// FIXME: more docu
 extern void SetCosts(int,const int* costs);	/// set costs to be displayed
+    /// FIXME: more docu
 extern void ClearCosts(void);
+    /// FIXME: more docu
 extern void DrawInfoPanel(void);
+    /// FIXME: more docu
 extern void DrawButtonPanel(void);
+    /// FIXME: more docu
 extern void UpdateButtonPanel(void);
+    /// FIXME: more docu
 extern void DoButtonButtonClicked(int button);
+    /// FIXME: more docu
 extern void DoButtonPanelKey(int key);
 
 //@}
