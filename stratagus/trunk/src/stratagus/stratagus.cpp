@@ -977,7 +977,7 @@ global int main(int argc, char** argv)
 	strcpy(LocalPlayerName, "Anonymous");
 #else
 	if (getenv("USER")) {
-		strncpy(LocalPlayerName, getenv("USERNAME"), 14);
+		strncpy(LocalPlayerName, getenv("USER"), sizeof(LocalPlayerName) - 1);
 	} else {
 		strcpy(LocalPlayerName, "Anonymous");
 	}

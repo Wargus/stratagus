@@ -93,11 +93,11 @@ typedef struct _viewport_ Viewport;		/// Viewport typedef
 struct _viewport_ {
 	int X;						/// Screen pixel left corner x coordinate
 	int Y;						/// Screen pixel upper corner y coordinate
-	int EndX;						/// Screen pixel right x coordinate
-	int EndY;						/// Screen pixel bottom y coordinate
+	int EndX;					/// Screen pixel right x coordinate
+	int EndY;					/// Screen pixel bottom y coordinate
 
-	int MapX;						/// Map tile left corner x coordinate
-	int MapY;						/// Map tile upper corner y coordinate
+	int MapX;					/// Map tile left corner x coordinate
+	int MapY;					/// Map tile upper corner y coordinate
 	int MapWidth;				/// Width in map tiles
 	int MapHeight;				/// Height in map tiles
 
