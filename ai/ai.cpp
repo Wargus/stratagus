@@ -822,9 +822,11 @@ global void SaveAi(CLFile* file)
 	CLprintf(file,
 		"--- MODULE: AI $Id$\n\n");
 
+#if 0
 	SaveAiTypesWcName(file);
 	SaveAiHelper(file);
 	SaveAiTypes(file);
+#endif
 	SaveAiPlayers(file);
 
 	DebugLevel0Fn("FIXME: Saving lua function definition isn't supported\n");
