@@ -299,6 +299,14 @@ local void MoveToTarget(Unit* unit)
 
     // NEW return codes supported, FIXME: but johns thinks not perfect.
 
+#ifdef HIERARCHIC_PATHFINDER
+    if( unit->Reset ) {
+	if( CheckForTargetInRange(unit) ) {
+	    return;
+	}
+    }
+    if (err==PF_REACHED) {
+#else /* HIERARCHIC_PATHDFINDER */
     if( unit->Reset ) {
 	//
 	//	Look if we have reached the target.
@@ -306,6 +314,7 @@ local void MoveToTarget(Unit* unit)
 	if( CheckForTargetInRange(unit) ) {
 	    return;
 	}
+#endif /* HIERARCHIC_PATHDFINDER */
 	goal=unit->Orders[0].Goal;
 
 	//
