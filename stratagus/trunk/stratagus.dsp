@@ -573,6 +573,10 @@ SOURCE=.\src\stratagus\spells.c
 
 SOURCE=.\src\stratagus\stratagus.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\stratagus\util.c
+# End Source File
 # End Group
 # Begin Group "ui"
 
@@ -695,10 +699,6 @@ SOURCE=.\src\video\video.c
 # End Source File
 # End Group
 # End Group
-# Begin Source File
-
-SOURCE=.\src\stratagus\util.c
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
