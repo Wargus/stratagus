@@ -66,7 +66,6 @@ global int NoWarningUnitType;		/// quiet ident lookup
 global UnitType* UnitTypes;		/// unit-types definition
 global int NumUnitTypes;		/// number of unit-types made
 
-
 /*
 **	Next unit type are used hardcoded in the source.
 **
@@ -120,8 +119,8 @@ local hashtable(UnitType*,61) UnitTypeHash;
 */
 global void UpdateStats(void)
 {
-    UnitType *type;
-    UnitStats *stats;
+    UnitType* type;
+    UnitStats* stats;
     unsigned player;
     unsigned i;
 
@@ -227,6 +226,7 @@ global void UpdateStats(void)
     }
 }
 
+    /// Macro to fetch an 8bit value, to have some looking 8/16/32 bit funcs.
 #define Fetch8(p)   (*((unsigned char*)(p))++)
 
 /**
@@ -245,7 +245,8 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
     // FIXME: not the fastest, remove UnitTypeByWcNum from loops!
     IfDebug(
 	if( length!=5694 && length!=5948 ) {
-	    DebugLevel0("\n"__FUNCTION__": ***\n"__FUNCTION__": %d\n" _C_ length);
+	    DebugLevel0("\n"__FUNCTION__": ***\n"__FUNCTION__": %d\n"
+		    _C_ length);
 	    DebugLevel0Fn("***\n\n");
 	}
     )
@@ -256,7 +257,7 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	v=FetchLE16(udta);
 	unittype->Construction=ConstructionByWcNum(v);
     }
-    for( i=0; i<508; ++i ) {		// skip obselete data
+    for( i=0; i<508; ++i ) {		// skip obsolete data
 	v=FetchLE16(udta);
     }
     for( i=0; i<110; ++i ) {		// sight range
@@ -362,7 +363,7 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
     for( i=0; i<110; ++i ) {		// Missile Weapon
 	unittype=UnitTypeByWcNum(i);
 	v=Fetch8(udta);
-	unittype->Missile.Name=MissileTypeWcNames[v];
+	unittype->Missile.Name=strdup(MissileTypeWcNames[v]);
 	DebugCheck( unittype->Missile.Missile );
     }
     for( i=0; i<110; ++i ) {		// Unit type
@@ -403,7 +404,7 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
     for( i=0; i<110; ++i ) {		// Flags
 	unittype=UnitTypeByWcNum(i);
 	v=FetchLE32(udta);
-	// unittype->Flags=v;
+    /// Nice looking bit macro
 #define BIT(b,v)	(((v>>b))&1)
 	unittype->LandUnit=BIT(0,v);
 	unittype->AirUnit=BIT(1,v);
@@ -454,7 +455,6 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
     // FIXME: oil-tanker applies also to oil-tanker-full
 
     DebugLevel0("\tUDTA used %d bytes\n" _C_ udta-start);
-
 
     UpdateStats();
 }
@@ -598,7 +598,7 @@ local void SaveAnimations(const UnitType* type,FILE* file)
 **
 **	@todo	Arrange the variables more logical
 */
-local void NewSaveUnitType(FILE* file,const UnitType* type,int all)
+local void SaveUnitType(FILE* file,const UnitType* type,int all)
 {
     int i;
     int flag;
@@ -974,8 +974,7 @@ global void SaveUnitTypes(FILE* file)
 
     for( type=UnitTypes; type->OType; ++type ) {
 	fputc('\n',file);
-	NewSaveUnitType(file,type,0);
-	//OldSaveUnitType(type,file);
+	SaveUnitType(file,type,0);
     }
 
     //	Save all stats
@@ -1256,7 +1255,6 @@ global void CleanUnitTypes(void)
 	UnitTypeWcNames=NULL;
     }
 
-#if 1
     //	FIXME: scheme contains references on this structure.
     //	Clean all animations.
 
@@ -1287,7 +1285,6 @@ global void CleanUnitTypes(void)
 	}
 	free(anims);
     }
-#endif
 
     //	Clean all unit-types
 
@@ -1315,18 +1312,12 @@ global void CleanUnitTypes(void)
 	    if( type->File[3] ) {
 		free(type->File[3]);
 	    }
-
-#if 0
-	    //
-	    //	FIXME: crashes if freed.
-	    //
 	    if( type->Icon.Name ) {
 		free(type->Icon.Name);
 	    }
 	    if( type->Missile.Name ) {
 		free(type->Missile.Name);
 	    }
-#endif
 	    if( type->CorpseName ) {
 		free(type->CorpseName);
 	    }

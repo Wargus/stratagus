@@ -914,15 +914,20 @@ global SoundId RegisterTwoGroups(SoundId first, SoundId second)
     id->Sound.TwoGroups->First = first;
     id->Sound.TwoGroups->Second = second;
     id->Range = MAX_SOUND_RANGE;
+
     return (SoundId) id;
 }
 
-/*
-** Modify the range of a given sound.
+/**
+**	Ask the sound server to change the range of a sound.
+**
+**	@param sound	the id of the sound to modify.
+**	@param range	the new range for this sound.
 */
-global void SetSoundRange(SoundId sound,unsigned char range) {
-    if (sound!=NO_SOUND) {
-	((ServerSoundId)sound)->Range=range;
+global void SetSoundRange(SoundId sound, unsigned char range)
+{
+    if (sound != NO_SOUND) {
+	((ServerSoundId) sound)->Range = range;
 	DebugLevel3("Setting sound <%p> to range %u\n" _C_ sound _C_ range);
     }
 }
