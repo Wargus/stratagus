@@ -917,18 +917,16 @@ local void Abort(void) { abort(); }
 */
 local Unit* NetworkValidUnit(int nr,int id)
 {
-    Unit* unit;
-#if 0
-	// Old code. deadlocks abound.
-    unit=UnitsPool+ntohl(nr);
+#ifdef NEW_UNIT
+    nr = ntohl(nr);
 
-    // Id is incremented when the unit's slot is freed.
-    if( unit->Id!=ntohl(id) ) {
-	DebugLevel0("Unit slot reused or empty?\n");
-	Abort();
-	return NoUnitP;
+    if( UnitSlots[nr]->Slot==nr ) {
+	return UnitSlots[nr];
     }
+    DebugLevel0("Couldn't find unit %x", nr);
+    return NoUnitP;
 #else
+    Unit* unit;
     int i;
 
     nr = ntohl(nr);
@@ -936,21 +934,26 @@ local Unit* NetworkValidUnit(int nr,int id)
 	if (UnitsPool[i].Id == nr)
 	    break;
     }
-    if (i >= NumUnits) {
-	DebugLevel0("Couldn't find unit %x", nr);
-	Abort();
-	return NoUnitP;
-    }
-    unit = UnitsPool + i;
-#endif
+    IfDebug(
+	if (i >= NumUnits) {
+	    DebugLevel0("Couldn't find unit %x", nr);
+	    Abort();
+	    return NoUnitP;
+	}
+    );
 
-    if( UnitUnusable(unit) ) {
-	DebugLevel0("Unit Dying?\n");
-	Abort();
-	return NoUnitP;
-    }
+    unit = UnitsPool + i;
+
+    IfDebug(
+	if( UnitUnusable(unit) ) {
+	    DebugLevel0("Unit Dying?\n");
+	    Abort();
+	    return NoUnitP;
+	}
+    );
 
     return unit;
+#endif
 }
 
 /**
@@ -1298,13 +1301,22 @@ global void NetworkSendCommand(int command,Unit* unit,int x,int y
     // We must find another solution than this one...
     // guess this is a networked crash :)
     message.Data.Command.UnitNr=htonl(UnitNumber(unit));
+#ifdef NEW_UNIT
+    message.Data.Command.DestId=0;
+#else
     message.Data.Command.UnitId=htonl(unit->Id);
+#endif
     message.Data.Command.X=htonl(x);
     message.Data.Command.Y=htonl(y);
     if( dest ) {
 	// We must find another solution than this one...
+#ifdef NEW_UNIT
+	message.Data.Command.DestNr=htonl(UnitNumber(dest));
+	message.Data.Command.DestId=0;
+#else
 	message.Data.Command.DestNr=htonl(UnitNumber(dest));
 	message.Data.Command.DestId=htonl(dest->Id);
+#endif
     } else {
 	message.Data.Command.DestNr=htonl(-1);
 	message.Data.Command.DestId=htonl(-1);

@@ -68,6 +68,7 @@ typedef struct __animations__ {
 */
 typedef struct _missile_config_ {
     char*	Name;			/// config missile name
+    // FIXME: void* is needed,because of recursive headers :(
     void*	Missile;		/// identifier to use to run time
 } MissileConfig;
 

@@ -514,9 +514,15 @@ global void FireMissile(Unit* unit)
 	    dx=unit->Command.Data.Move.DX;
 	    dy=unit->Command.Data.Move.DY;
 	    if( WallOnMap(dx,dy) ) {
-		// FIXME: don't use UnitTypeByIdent here, this is slow!
-		HitWall(dx,dy,CalculateDamageStats(unit->Stats,
-			UnitTypeByIdent("unit-human-wall")->Stats));
+		if( HumanWallOnMap(dx,dy) ) {
+		    // FIXME: don't use UnitTypeByIdent here, this is slow!
+		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
+			    UnitTypeByIdent("unit-human-wall")->Stats));
+		} else {
+		    // FIXME: don't use UnitTypeByIdent here, this is slow!
+		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
+			    UnitTypeByIdent("unit-orc-wall")->Stats));
+		}
 		return;
 	    }
 
@@ -525,11 +531,17 @@ global void FireMissile(Unit* unit)
 	}
 
 	// FIXME: make sure thats the correct unit.
+#ifdef NEW_UNIT
+	// Check if goal is correct unit.
+
+#endif
+
 	if( goal->Removed ) {
 	    DebugLevel1("Missile-none hits removed unit!\n");
 	    return;
 	}
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+	    DebugLevel1("Missile-none hits dead unit!\n");
 	    return;
 	}
 

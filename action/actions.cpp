@@ -228,6 +228,11 @@ local void HandleUnitAction(Unit* unit)
 */
 global void UnitActions(void)
 {
+#ifdef NEW_UNIT
+    UnitConflicts();			// start attacking
+
+    DebugLevel0("FIXME:\n");
+#else
     Unit* unit;
     int i;
 
@@ -243,6 +248,7 @@ global void UnitActions(void)
 	}
 	HandleUnitAction(unit);
     }
+#endif
 }
 
 //@}

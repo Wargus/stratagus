@@ -46,6 +46,13 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#ifdef NEW_UNIT
+global Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All possible units
+global Unit** UnitSlotFree; 		/// First free unit slot
+
+global Unit* Units[MAX_UNIT_SLOTS];	/// Array of used slots
+global int NumUnits;			/// Number of slots used
+#else
 // The pool is currently hardcoded to MAX_UNITS
 global Unit* UnitsPool;			/// All units in play
 
@@ -54,6 +61,7 @@ global Unit** Units;			/// Array of used slots
 
 static Unit** FreeUnits;		/// Array of free slots
 static int NumFreeUnits;		/// Number of free slots
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -64,6 +72,18 @@ static int NumFreeUnits;		/// Number of free slots
 */
 global void InitUnitsMemory(void)
 {
+#ifdef NEW_UNIT
+    Unit** slot;
+
+    // Initiallize the "list" of free unit slots
+
+    slot=UnitSlots+MAX_UNIT_SLOTS;
+    *--slot=NULL;
+    do {
+	slot[-1]=(void*)slot;
+    } while( --slot>UnitSlots );
+    UnitSlotFree=slot;
+#else
     int i;
 
     UnitsPool=(Unit*)calloc(MAX_UNITS,sizeof(Unit));
@@ -92,6 +112,7 @@ global void InitUnitsMemory(void)
     while( i-->0 ) {
 	FreeUnits[i]=&UnitsPool[MAX_UNITS-1-i];
     }
+#endif
 }
 
 /**
@@ -101,6 +122,34 @@ global void InitUnitsMemory(void)
 */
 global void FreeUnitMemory(Unit* unit)
 {
+#ifdef NEW_UNIT
+    Player* player;
+    Unit** slot;
+
+    if( unit->Refs>1 ) {
+	DebugLevel0(__FUNCTION__": too much references\n");
+    }
+
+    //	Remove the unit from the player's units list.
+    //		FIXME: a backpointer is faster
+
+    player=unit->Player;
+    if( player ) {
+	// looking for the unit slot...
+	for( slot=player->Units; *slot!=unit; slot++ ) {
+	    ;
+	}
+	*slot=player->Units[--player->TotalNumUnits];
+	player->Units[player->TotalNumUnits]=NULL;
+    }
+
+    slot=UnitSlots+unit->Slot;
+    DebugCheck( *slot!=unit );
+
+    *slot=(void*)UnitSlotFree;
+    free(unit);
+
+#else
     Unit** tmp;
     unsigned tmp_id;
     Player* player;
@@ -132,6 +181,7 @@ global void FreeUnitMemory(Unit* unit)
 
     // Update the 'free slots' array
     FreeUnits[NumFreeUnits++]=unit;
+#endif
 }
 
 /**
@@ -145,6 +195,9 @@ global void FreeUnitMemory(Unit* unit)
 global Unit* MakeUnit(UnitType* type,Player* player)
 {
     Unit* unit;
+#ifdef NEW_UNIT
+    Unit** slot;
+#endif
 
     IfDebug(
 	if( type>UnitTypes+sizeof(UnitTypes)/sizeof(*UnitTypes)
@@ -156,6 +209,18 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 
     DebugLevel3(__FUNCTION__": %s(%Zd)\n",type->Name,player-Players);
 
+#ifdef NEW_UNIT
+    if( !(slot=UnitSlotFree) ) {	// should not happen!
+	DebugLevel0(__FUNCTION__": Maximum of units reached\n");
+	return NoUnitP;
+    }
+    UnitSlotFree=(void*)*slot;
+    *slot=unit=calloc(1,sizeof(Unit));
+    unit->Refs=1;
+    unit->Slot=slot-UnitSlots;
+
+    ...
+#else
     if( NumFreeUnits ) {
 	unit=FreeUnits[--NumFreeUnits];
 	FreeUnits[NumFreeUnits]=NULL;
@@ -164,6 +229,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	DebugLevel0("Maximum of units reached\n");
 	return NoUnitP;
     }
+#endif
 
     DebugLevel3(__FUNCTION__": %p %Zd\n",unit,UnitNumber(unit));
 
@@ -597,6 +663,9 @@ global int UnitVisible(const Unit* unit)
 */
 global void UnitIncrementMana(void)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+#else
     Unit* unit;
     int i;
 
@@ -620,6 +689,7 @@ global void UnitIncrementMana(void)
 	    --unit->Blink;
 	}
     }
+#endif
 }
 
 /**
@@ -953,6 +1023,9 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 */
 global void DropOutAll(const Unit* source)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+#else
     Unit* unit;
     int i;
 
@@ -968,6 +1041,7 @@ global void DropOutAll(const Unit* source)
 		    ,source->Type->TileHeight);
 	}
     }
+#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -989,9 +1063,11 @@ global int CanBuildHere(UnitType* type,unsigned x,unsigned y)
     Unit* table[MAX_UNITS];
     int n;
     int i;
+#ifndef NEW_UNIT
     Unit* unit;
     int dx;
     int dy;
+#endif
 
     //
     //	Can't build outside the map
@@ -1008,6 +1084,9 @@ global int CanBuildHere(UnitType* type,unsigned x,unsigned y)
 	//	Gold deposit can't be build too near to gold-mine.
 	//
 	// FIXME: use unit-cache here.
+#ifdef NEW_UNIT
+	DebugLevel0("FIXME:");
+#else
         int i;
 	for( i=0; i<NumUnits; i++ ) {
 	  unit=Units[i];
@@ -1030,6 +1109,7 @@ global int CanBuildHere(UnitType* type,unsigned x,unsigned y)
 	    }
 	  }
 	}
+#endif
 	return 1;
     }
 
@@ -1056,6 +1136,9 @@ next:
 	//
 	//	Oil deposit can't be build too near to oil-patch.
 	//
+#ifdef NEW_UNIT
+	DebugLevel0("FIXME:");
+#else
 	// FIXME: use unit-cache here.
 	int i;
 	for( i=0; i<NumUnits; i++ ) {
@@ -1079,6 +1162,7 @@ next:
 	      }
 	    }
 	}
+#endif
     }
 
     if( type->GivesOil ) {
@@ -1192,6 +1276,11 @@ global int CanBuildUnitType(Unit* unit,UnitType* type,int x,int y)
 */
 global Unit* FindGoldMine(int x,int y)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+
+    return NULL;
+#else
     Unit* unit;
     Unit* best;
     int best_d;
@@ -1219,6 +1308,7 @@ global Unit* FindGoldMine(int x,int y)
     }
     DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
+#endif
 }
 
 /**
@@ -1226,6 +1316,10 @@ global Unit* FindGoldMine(int x,int y)
 */
 global Unit* GoldDepositOnMap(int tx,int ty)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+    return NULL;
+#else
     Unit* unit;
     UnitType* type;
     int i;
@@ -1247,6 +1341,7 @@ global Unit* GoldDepositOnMap(int tx,int ty)
 	return unit;
     }
     return NoUnitP;
+#endif
 }
 
 /**
@@ -1256,6 +1351,10 @@ global Unit* GoldDepositOnMap(int tx,int ty)
 */
 global Unit* FindGoldDeposit(const Player* player,int x,int y)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+    return NULL;
+#else
     Unit* unit;
     Unit* best;
     Unit** units;
@@ -1289,6 +1388,7 @@ global Unit* FindGoldDeposit(const Player* player,int x,int y)
 
     DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
+#endif
 }
 
 /**
@@ -1296,6 +1396,10 @@ global Unit* FindGoldDeposit(const Player* player,int x,int y)
 */
 global Unit* WoodDepositOnMap(int tx,int ty)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+    return NULL;
+#else
     Unit* unit;
     UnitType* type;
     int i;
@@ -1317,6 +1421,7 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 	return unit;
     }
     return NoUnitP;
+#endif
 }
 
 /**
@@ -1574,6 +1679,10 @@ global Unit* FindOilDeposit(const Player* player,int x,int y)
 */
 global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+    return NULL;
+#else
     Unit* unit;
     Unit* nunit;
     Unit* funit;			// first possible unit
@@ -1635,6 +1744,7 @@ global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
 	return funit;
     }
     return nunit;
+#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -1816,6 +1926,9 @@ global void DestroyAllInside(Unit* source)
 	return;
     }
 
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+#else
     //
     // Destroy all units in buildings or Resources (mines...)
     //
@@ -1828,6 +1941,7 @@ global void DestroyAllInside(Unit* source)
 	    DestroyUnit(unit);
 	}
     }
+#endif
 }
 
 /**
@@ -2237,9 +2351,11 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Attacked ) {
 	fprintf(file,"\t'attacked\n");
     }
+    /*
     if( unit->Visible ) {
 	fprintf(file,"\t'visible\n");
     }
+    */
     if( unit->Removed ) {
 	fprintf(file,"\t'removed\n");
     }
@@ -2281,6 +2397,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
 */
 global void SaveUnits(FILE* file)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+#else
     Unit** unit;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
@@ -2288,6 +2407,7 @@ global void SaveUnits(FILE* file)
     for( unit=Units; unit<&Units[NumUnits]; ++unit ) {
 	SaveUnit(*unit,file);
     }
+#endif
 }
 
 //@}

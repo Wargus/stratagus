@@ -247,7 +247,7 @@ local SCM CclDefineUI(SCM list)
 	}
     }
     if( !ui ) {
-	ui=calloc(sizeof(UI),1);
+	ui=calloc(1,sizeof(UI));
 	v=malloc(sizeof(UI*)*(i+2));
 	memcpy(v,UI_Table,i*sizeof(UI*));
 	CclFree(UI_Table);

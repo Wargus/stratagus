@@ -344,7 +344,7 @@ local const char* MapName;		/// Filename for the map to load
 
     /// Name, Version, Copyright
 local char NameLine[] =
-    "ALE Clone V" VERSION ", (c) 1998-2000 by The FreeCraft Project.";
+    "FreeCraft V" VERSION ", (c) 1998-2000 by The FreeCraft Project.";
 
 /**
 **	Main, called from guile main.
@@ -507,7 +507,7 @@ global volatile void Exit(int err)
 		,PfCounterFail,PfCounterNotReachable
 		,PfCounterOk,PfCounterDepth);
     );
-    fprintf(stderr,"Thanks for playing ALE Clone.\n");
+    fprintf(stderr,"Thanks for playing FreeCraft.\n");
     exit(err);
 }
 
