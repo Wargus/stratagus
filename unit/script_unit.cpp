@@ -267,9 +267,13 @@ local void CclParseOrder(SCM list,Order* order)
 	    free(str);
 
 	} else if( gh_eq_p(value,gh_symbol2scm("arg1")) ) {
+	    char* str;
+
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    order->Arg1=(void*)gh_scm2int(value);
+	    str = gh_scm2newstr (value, NULL);
+	    order->Arg1 = (void * )strtol (str, NULL, 16);
+	    free(str);
 
 	} else {
 	   // FIXME: this leaves a half initialized unit
@@ -511,6 +515,9 @@ local SCM CclUnit(SCM list)
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("last-group")) ) {
 	    unit->LastGroup=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("value")) ) {
+	    unit->Value=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("sub-action")) ) {
 	    unit->SubAction=gh_scm2int(gh_car(list));
