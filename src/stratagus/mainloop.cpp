@@ -83,6 +83,10 @@ global enum _scroll_state_ MouseScrollState=ScrollNone;
 global jmp_buf MainLoopJmpBuf;		/// Hierarchic pathfinder error exit.
 #endif
 
+EventCallback* Callbacks;		/// Current callbacks
+EventCallback GameCallbacks;		/// Game callbacks
+EventCallback MenuCallbacks;		/// Menu callbacks
+
 //----------------------------------------------------------------------------
 //	Functions
 //----------------------------------------------------------------------------
@@ -605,24 +609,23 @@ local void EnableDrawRefresh(void)
 */
 global void GameMainLoop(void)
 {
-    EventCallback callbacks;
 #ifdef DEBUG	// removes the setjmp warnings
     static int showtip;
 #else
     int showtip;
 #endif
 
-    callbacks.ButtonPressed=(void*)HandleButtonDown;
-    callbacks.ButtonReleased=(void*)HandleButtonUp;
-    callbacks.MouseMoved=(void*)HandleMouseMove;
-    callbacks.MouseExit=(void*)HandleMouseExit;
+    GameCallbacks.ButtonPressed=(void*)HandleButtonDown;
+    GameCallbacks.ButtonReleased=(void*)HandleButtonUp;
+    GameCallbacks.MouseMoved=(void*)HandleMouseMove;
+    GameCallbacks.MouseExit=(void*)HandleMouseExit;
+    GameCallbacks.KeyPressed=HandleKeyDown;
+    GameCallbacks.KeyReleased=HandleKeyUp;
+    GameCallbacks.KeyRepeated=HandleKeyRepeat;
+    GameCallbacks.NetworkEvent=NetworkEvent;
+    GameCallbacks.SoundReady=WriteSound;
 
-    callbacks.KeyPressed=HandleKeyDown;
-    callbacks.KeyReleased=HandleKeyUp;
-    callbacks.KeyRepeated=HandleKeyRepeat;
-
-    callbacks.NetworkEvent=NetworkEvent;
-    callbacks.SoundReady=WriteSound;
+    Callbacks=&GameCallbacks;
 
     SetVideoSync();
     EnableDrawRefresh();
@@ -751,6 +754,10 @@ global void GameMainLoop(void)
 #endif
 
 	if( MustRedraw /* && !VideoInterrupts */ ) {
+	    if( Callbacks==&MenuCallbacks ) {
+		MustRedraw|=RedrawMenu;
+	    }
+
 	    //For debuggin only: replace UpdateDisplay by DebugTestDisplay when
 	    //			 debugging linedraw routines..
 	    //FIXME: this might be better placed somewhere at front of the
@@ -772,13 +779,13 @@ global void GameMainLoop(void)
 
 	CheckVideoInterrupts();		// look if already an interrupt
 
-	WaitEventsOneFrame(&callbacks);
+	WaitEventsOneFrame(Callbacks);
 	if( !NetworkInSync ) {
 	    NetworkRecover();		// recover network
 	}
 
 	if( showtip ) {
-	    ProcessMenu("menu-tips", 1);
+	    ProcessMenu("menu-tips",1);
 	    InterfaceState = IfaceStateNormal;
 	    showtip=0;
 	}

@@ -236,6 +236,8 @@ local void KeyboardScrollHSAction(Menuitem *mi, int i);
 // Game options
 
 // Diplomacy options
+local void DiplomacyInit(Menuitem *mi);
+local void DiplomacyExit(Menuitem *mi);
 local void DiplomacyWait(Menuitem *mi);
 local void DiplomacyOk(void);
 
@@ -249,6 +251,7 @@ local void KeystrokeHelpDrawFunc(Menuitem *mi);
 
 // Save
 local void SaveGameInit(Menuitem *mi);
+local void SaveGameExit(Menuitem *mi);
 local void SaveGameLBInit(Menuitem *mi);
 local void SaveGameLBExit(Menuitem *mi);
 local void SaveGameEnterAction(Menuitem *mi, int key);
@@ -262,6 +265,7 @@ local void CreateSaveDir(void);
 
 // Load
 local void LoadGameInit(Menuitem *mi);
+local void LoadGameExit(Menuitem *mi);
 local void LoadGameLBInit(Menuitem *mi);
 local void LoadGameLBExit(Menuitem *mi);
 local void LoadGameLBAction(Menuitem *mi, int i);
@@ -280,6 +284,10 @@ local void DeleteConfirmInit(Menuitem *mi);
 local void DeleteConfirmExit(Menuitem *mi);
 local void DeleteConfirmOk(void);
 local void DeleteConfirmCancel(void);
+
+// Save replay
+local void SaveReplayInit(Menuitem *mi);
+local void SaveReplayExit(Menuitem *mi);
 
 // Editor select
 local void EditorNewMap(void);
@@ -390,8 +398,6 @@ local int GameLoaded;
 global int GuiGameStarted;
     /// Editor cancel button pressed
 local int EditorCancelled;
-    /// Confirmed, used for save and delete confirm menus
-local int Confirmed;
 
 /**
 **	Other client and server selection state for Multiplayer clients
@@ -608,6 +614,8 @@ global void InitMenuFuncHash(void) {
     HASHADD(DiplomacyMenu,"diplomacy-menu");
 
 // Diplomacy options
+    HASHADD(DiplomacyInit,"diplomacy-init");
+    HASHADD(DiplomacyExit,"diplomacy-exit");
     HASHADD(DiplomacyWait,"diplomacy-wait");
     HASHADD(DiplomacyOk,"diplomacy-ok");
 
@@ -621,6 +629,7 @@ global void InitMenuFuncHash(void) {
 
 // Save
     HASHADD(SaveGameInit,"save-game-init");
+    HASHADD(SaveGameExit,"save-game-exit");
     HASHADD(SaveGameLBInit,"save-game-lb-init");
     HASHADD(SaveGameLBExit,"save-game-lb-exit");
     HASHADD(SaveGameEnterAction,"save-game-enter-action");
@@ -632,6 +641,7 @@ global void InitMenuFuncHash(void) {
 
 // Load
     HASHADD(LoadGameInit,"load-game-init");
+    HASHADD(LoadGameExit,"load-game-exit");
     HASHADD(LoadGameLBInit,"load-game-lb-init");
     HASHADD(LoadGameLBExit,"load-game-lb-exit");
     HASHADD(LoadGameLBAction,"load-game-lb-action");
@@ -650,6 +660,10 @@ global void InitMenuFuncHash(void) {
     HASHADD(DeleteConfirmExit,"delete-confirm-exit");
     HASHADD(DeleteConfirmOk,"delete-confirm-ok");
     HASHADD(DeleteConfirmCancel,"delete-confirm-cancel");
+
+// Save replay
+    HASHADD(SaveReplayInit,"save-replay-init");
+    HASHADD(SaveReplayExit,"save-replay-exit");
 
 // Editor select
     HASHADD(EditorNewMap,"editor-new-map");
@@ -788,7 +802,9 @@ local void PrgStartInit(Menuitem *mi)
 */
 local void GameMenuReturn(void)
 {
-    EndMenu();
+    while (CurrentMenu) {
+	EndMenu();
+    }
     MustRedraw &= ~RedrawMenu;
     InterfaceState = IfaceStateNormal;
     ClearStatusLine();
@@ -800,11 +816,31 @@ local void GameMenuReturn(void)
 /**
 **	Init callback for save game menu
 */
-local void SaveGameInit(Menuitem *mi)
+local void SaveGameInit(Menuitem *mi __attribute__ ((unused)))
 {
-    mi->menu->items[4].flags = MenuButtonDisabled;
-    mi->menu->items[5].flags = MenuButtonDisabled;
+    Menu *menu;
+    char *buf;
+
+    menu = CurrentMenu;
+
+    buf = malloc(32);
+    strcpy(buf, "~!_");
+    menu->items[1].d.input.buffer = buf;
+    menu->items[1].d.input.nch = 0;
+    menu->items[1].d.input.maxch = 24;
+
+    menu->items[4].flags = MenuButtonDisabled;
+    menu->items[5].flags = MenuButtonDisabled;
     CreateSaveDir();
+}
+
+/**
+**	Exit callback for save game menu
+*/
+local void SaveGameExit(Menuitem *mi)
+{
+    free(mi->menu->items[1].d.input.buffer);
+    mi->menu->items[1].d.input.buffer = NULL;
 }
 
 /**
@@ -850,10 +886,7 @@ local void SaveGameOk(void)
 	    SetMessage("Saved game to: %s", TempPathBuf);
 	    EndMenu();
 	} else {
-	    ProcessMenu("menu-save-confirm", 1);
-	    if (Confirmed) {
-		EndMenu();
-	    }
+	    ProcessMenu("menu-save-confirm", 0);
 	}
     }
 }
@@ -886,16 +919,7 @@ local void CreateSaveDir(void)
 */
 global void SaveGameMenu(void)
 {
-    char savegame_buffer[32];
-    Menu *menu;
-
-    menu = FindMenu("menu-save-game");
-    strcpy(savegame_buffer, "~!_");
-    menu->items[1].d.input.buffer = savegame_buffer;
-    menu->items[1].d.input.nch = strlen(savegame_buffer) - 3;
-    menu->items[1].d.input.maxch = 24;
-    menu->items[4].flags = MenuButtonDisabled;	/* Save button! */
-    ProcessMenu("menu-save-game", 1);
+    ProcessMenu("menu-save-game", 0);
 }
 
 /**
@@ -1130,7 +1154,18 @@ local int SaveGameRDFilter(char *pathbuf, FileList *fl)
 local void LoadGameInit(Menuitem *mi)
 {
     mi->menu->items[3].flags = MI_DISABLED;
+    GameLoaded=0;
     CreateSaveDir();
+}
+
+/**
+**	Load game exit callback
+*/
+local void LoadGameExit(Menuitem *mi)
+{
+    if( GameLoaded ) {
+	GameMenuReturn();
+    }
 }
 
 /**
@@ -1342,7 +1377,6 @@ local void SaveConfirmInit(Menuitem *mi)
     int fileLength;
     Menu *menu;
 
-    Confirmed = 0;
     menu = FindMenu("menu-save-game");
     fileLength = strlen(menu->items[1].d.input.buffer) - 3;
 
@@ -1370,7 +1404,6 @@ local void SaveConfirmOk(void)
     int fileLength;
     Menu *menu;
 
-    Confirmed = 1;
     menu = FindMenu("menu-save-game");
     fileLength = strlen(menu->items[1].d.input.buffer) - 3;
 
@@ -1382,7 +1415,7 @@ local void SaveConfirmOk(void)
     }
     SaveGame(TempPathBuf);
     SetMessage("Saved game to: %s", TempPathBuf);
-    EndMenu();
+    GameMenuReturn();
 }
 
 /**
@@ -1398,14 +1431,7 @@ local void SaveConfirmCancel(void)
 */
 local void DeleteConfirmMenu(void)
 {
-    ProcessMenu("menu-delete-confirm", 1);
-
-    if (Confirmed) {
-	// Update list of files and clear input
-	SaveGameLBInit(&CurrentMenu->items[2]);
-	strcpy(CurrentMenu->items[1].d.input.buffer,"~!_");
-	CurrentMenu->items[1].d.input.nch = 0;
-    }
+    ProcessMenu("menu-delete-confirm", 0);
 }
 
 /**
@@ -1416,7 +1442,6 @@ local void DeleteConfirmInit(Menuitem *mi)
     Menu *menu;
     static char name[PATH_MAX];		// FIXME: much memory wasted
 
-    Confirmed = 0;
     menu = FindMenu("menu-save-game");
     strcpy(name, "the file: ");
     strcat(name, menu->items[1].d.input.buffer);
@@ -1439,7 +1464,6 @@ local void DeleteConfirmOk(void)
 {
     Menu *menu;
 
-    Confirmed = 1;
     menu = FindMenu("menu-save-game");
     strcpy(TempPathBuf, SaveDir);
     strcat(TempPathBuf, "/");
@@ -1447,6 +1471,11 @@ local void DeleteConfirmOk(void)
     TempPathBuf[strlen(TempPathBuf) - 3] = '\0';
     unlink(TempPathBuf);
     EndMenu();
+
+    // Update list of files and clear input
+    SaveGameLBInit(&CurrentMenu->items[2]);
+    strcpy(CurrentMenu->items[1].d.input.buffer,"~!_");
+    CurrentMenu->items[1].d.input.nch = 0;
 }
 
 /**
@@ -1462,15 +1491,7 @@ local void DeleteConfirmCancel(void)
 */
 global void LoadGameMenu(void)
 {
-    Menu *menu;
-
-    menu = FindMenu("menu-load-game");
-    menu->items[3].flags = MI_DISABLED;		// Load button!
-    GameLoaded=0;
-    ProcessMenu("menu-load-game", 1);
-    if( GameLoaded ) {
-	GameMenuReturn();
-    }
+    ProcessMenu("menu-load-game", 0);
 }
 
 /**
@@ -1498,7 +1519,7 @@ local void GameMenuInit(Menuitem *mi __attribute__((unused)))
 */
 global void SoundOptionsMenu(void)
 {
-    ProcessMenu("menu-sound-options", 1);
+    ProcessMenu("menu-sound-options", 0);
 }
 
 /**
@@ -1600,7 +1621,7 @@ local void SoundOptionsExit(Menuitem *mi __attribute__((unused)))
 */
 local void GlobalOptionsMenu(void)
 {
-    ProcessMenu("menu-global-options", 1);
+    ProcessMenu("menu-global-options", 0);
 }
 
 /**
@@ -1889,7 +1910,7 @@ local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 */
 global void SpeedOptionsMenu(void)
 {
-    ProcessMenu("menu-speed-options", 1);
+    ProcessMenu("menu-speed-options", 0);
 }
 
 /**
@@ -1935,11 +1956,19 @@ global void SpeedOptionsExit(Menuitem *mi __attribute__((unused)))
 */
 global void DiplomacyMenu(void)
 {
+    ProcessMenu("menu-diplomacy", 0);
+}
+
+/**
+**	Diplomacy init callback
+*/
+local void DiplomacyInit(Menuitem *mi)
+{
     Menu *menu;
     int i;
     int j;
 
-    menu = FindMenu("menu-diplomacy");
+    menu = CurrentMenu;
     j = 0;
 
     for (i=0; i<=PlayerMax-2; ++i) {
@@ -1980,8 +2009,17 @@ global void DiplomacyMenu(void)
 	menu->items[4*j+6].d.gem.state = MI_GSTATE_INVISIBLE;
 	menu->items[4*j+7].d.gem.state = MI_GSTATE_INVISIBLE;
     }
+}
 
-    ProcessMenu("menu-diplomacy", 1);
+/**
+**	Diplomacy exit callback
+*/
+local void DiplomacyExit(Menuitem *mi)
+{
+    Menu* menu;
+    int i;
+
+    menu = CurrentMenu;
 
     for (i=0; i<=PlayerMax-3; ++i) {
 	menu->items[4*i+4].d.text.text = NULL;
@@ -2091,7 +2129,7 @@ local void DiplomacyOk(void)
 */
 global void PreferencesMenu(void)
 {
-    ProcessMenu("menu-preferences", 1);
+    ProcessMenu("menu-preferences", 0);
 }
 
 /**
@@ -2136,7 +2174,7 @@ local void PreferencesExit(Menuitem *mi __attribute__((unused)))
 */
 local void GameOptionsMenu(void)
 {
-    ProcessMenu("menu-game-options", 1);
+    ProcessMenu("menu-game-options", 0);
 }
 
 /**
@@ -2152,10 +2190,7 @@ local void GameShowCredits(void)
 */
 global void RestartConfirmMenu(void)
 {
-    ProcessMenu("menu-restart-confirm", 1);
-    if (!GameRunning && CurrentMenu) {
-	EndMenu();
-    }
+    ProcessMenu("menu-restart-confirm", 0);
 }
 
 /**
@@ -2163,10 +2198,7 @@ global void RestartConfirmMenu(void)
 */
 local void SurrenderConfirmMenu(void)
 {
-    ProcessMenu("menu-surrender-confirm", 1);
-    if (!GameRunning && CurrentMenu) {
-	EndMenu();
-    }
+    ProcessMenu("menu-surrender-confirm", 0);
 }
 
 /**
@@ -2174,10 +2206,7 @@ local void SurrenderConfirmMenu(void)
 */
 global void QuitToMenuConfirmMenu(void)
 {
-    ProcessMenu("menu-quit-to-menu-confirm", 1);
-    if (!GameRunning && CurrentMenu) {
-	EndMenu();
-    }
+    ProcessMenu("menu-quit-to-menu-confirm", 0);
 }
 
 /**
@@ -2185,7 +2214,7 @@ global void QuitToMenuConfirmMenu(void)
 */
 global void ExitConfirmMenu(void)
 {
-    ProcessMenu("menu-exit-confirm", 1);
+    ProcessMenu("menu-exit-confirm", 0);
 }
 
 /**
@@ -2193,11 +2222,7 @@ global void ExitConfirmMenu(void)
 */
 local void EndScenarioMenu(void)
 {
-    ProcessMenu("menu-end-scenario", 1);
-    if (!GameRunning) {
-	EndMenu();
-	InterfaceState = IfaceStateNormal;
-    }
+    ProcessMenu("menu-end-scenario", 0);
 }
 
 /**
@@ -2207,7 +2232,7 @@ local void EndScenarioRestart(void)
 {
     RestartScenario = 1;
     GameRunning = 0;
-    EndMenu();
+    GameMenuReturn();
 }
 
 /**
@@ -2217,7 +2242,7 @@ local void EndScenarioSurrender(void)
 {
     GameResult = GameDefeat;
     GameRunning = 0;
-    EndMenu();
+    GameMenuReturn();
 }
 
 /**
@@ -2227,7 +2252,7 @@ local void EndScenarioQuitMenu(void)
 {
     QuitToMenu = 1;
     GameRunning = 0;
-    EndMenu();
+    GameMenuReturn();
 }
 
 /**
@@ -2246,16 +2271,33 @@ local void GameMenuEnd(void)
 */
 local void SaveReplay(void)
 {
-    char filename[32];
-    Menu *menu;
+    ProcessMenu("menu-save-replay", 0);
+}
 
-    menu = FindMenu("menu-save-replay");
-    menu->items[1].d.input.buffer = filename;
-    strcpy(filename, "~!_");
+/**
+**	Save replay menu init callback
+*/
+local void SaveReplayInit(Menuitem *mi __attribute__((unused)))
+{
+    Menu *menu;
+    char *buf;
+
+    menu = CurrentMenu;
+
+    buf = malloc(32);
+    strcpy(buf, "~!_");
+    menu->items[1].d.input.buffer = buf;
     menu->items[1].d.input.nch = 0;
     menu->items[1].d.input.maxch = 28;
+}
 
-    ProcessMenu("menu-save-replay", 1);
+/**
+**	Save replay menu exit callback
+*/
+local void SaveReplayExit(Menuitem *mi)
+{
+    free(mi->menu->items[1].d.input.buffer);
+    mi->menu->items[1].d.input.buffer = NULL;
 }
 
 /**
@@ -2320,7 +2362,7 @@ local void SaveReplayOk(void)
 */
 local void KeystrokeHelpMenu(void)
 {
-    ProcessMenu("menu-keystroke-help", 1);
+    ProcessMenu("menu-keystroke-help", 0);
 }
 
 /**
@@ -2328,7 +2370,7 @@ local void KeystrokeHelpMenu(void)
 */
 local void HelpMenu(void)
 {
-    ProcessMenu("menu-help", 1);
+    ProcessMenu("menu-help", 0);
 }
 
 /**
@@ -2336,7 +2378,7 @@ local void HelpMenu(void)
 */
 local void TipsMenu(void)
 {
-    ProcessMenu("menu-tips", 1);
+    ProcessMenu("menu-tips", 0);
 }
 
 /**
@@ -2581,7 +2623,7 @@ local void ObjectivesExit(Menuitem *mi)
 */
 local void ObjectivesMenu(void)
 {
-    ProcessMenu("menu-objectives", 1);
+    ProcessMenu("menu-objectives", 0);
 }
 
 /**
