@@ -23,7 +23,7 @@ clean::
 	$(RM) $(OBJS) core *.doc
 
 clobber: clean
-	$(RM) .depend
+	$(RM) .depend .#*
 
 depend::
 	@echo -n >.depend
