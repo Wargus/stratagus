@@ -104,11 +104,19 @@ void ComputeGoalBoundaries (Unit *unit, int *xmin, int *xmax,
 							int *ymin, int *ymax)
 {
 	Unit *GoalUnit;
+	UnitType *type = unit->Type;
 	FieldCoords Range;
 
 	GoalUnit = unit->Orders[0].Goal;
 	Range.X = unit->Orders[0].RangeX;
 	Range.Y = unit->Orders[0].RangeY;
+	if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
+		/* if we don't do this a tanker might not be able to enter an oil
+		 * platform (actions code use RangeX=RangeY=1 for this action - and
+		 * since tankers are ships they can enter even fields only) */
+		if (Range.X==1) ++Range.X;
+		if (Range.Y==1) ++Range.Y;
+	}
 
 	if (GoalUnit) {
 		/* our goal is another unit */
@@ -118,7 +126,6 @@ void ComputeGoalBoundaries (Unit *unit, int *xmin, int *xmax,
 		*ymax = GoalUnit->Y + GoalUnit->Type->TileHeight + Range.Y - 1;
 	} else {
 		/* our goal is a specific place on the map */
-		UnitType *type = unit->Type;
 		if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
 			unit->Orders[0].X &= ~1;
 			unit->Orders[0].Y &= ~1;
