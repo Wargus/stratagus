@@ -1372,17 +1372,11 @@ global void InitTriggers(void)
 */
 global void CleanTriggers(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	SCM var;
+	lua_pushstring(Lua, "_triggers_");
+	lua_pushnil(Lua);
+	lua_settable(Lua, LUA_GLOBALSINDEX);
 
-	DebugLevel0Fn("FIXME: Cleaning trigger not written\n");
-
-	var = gh_symbol2scm("*triggers*");
-	setvar(var, NIL, NIL);
-
-	CclGcProtectedAssign(&Trigger, NULL);
-#elif defined(USE_LUA)
-#endif
+	Trigger = 0;
 
 	memset(&GameTimer, 0, sizeof(GameTimer));
 }
