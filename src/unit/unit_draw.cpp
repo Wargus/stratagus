@@ -405,9 +405,9 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 			,type->BoxHeight+1
 			,5);
 		} else {
-#if defined(DEBUG) && !defined(NEW_ORDERS)
+#if defined(DEBUG)
 		    // Johns: I want to see fast moving.
-		    VideoFillRectangleClip(unit->Command.Data.Move.Fast 
+		    VideoFillRectangleClip(unit->Data.Move.Fast 
 			    ? ColorBlack : ColorWhite
 #else
 		    VideoFillRectangleClip(ColorBlack
@@ -629,9 +629,6 @@ local void DrawShadow(Unit* unit,UnitType* type,int x,int y)
 */
 global void DrawPath(Unit* unit)
 {
-#ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: later\n");
-#else
     int x1;
     int y1;
     int x2;
@@ -645,8 +642,13 @@ global void DrawPath(Unit* unit)
 
     x1=unit->X;
     y1=unit->Y;
-    x2=unit->Command.Data.Move.DX;
-    y2=unit->Command.Data.Move.DY;
+    if( unit->Orders[0].Goal ) {
+	x2=unit->Orders[0].Goal->X;
+	y2=unit->Orders[0].Goal->Y;
+    } else {
+	x2=unit->Orders[0].X;
+	y2=unit->Orders[0].Y;
+    }
 
     if( y1>y2 ) {			// exchange coordinates
 	x1^=x2; x2^=x1; x1^=x2;
@@ -741,7 +743,6 @@ global void DrawPath(Unit* unit)
 	    ,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 	    ,6,6);
     }
-#endif
 }
 
 /**
@@ -752,14 +753,12 @@ global void DrawPath(Unit* unit)
 */
 local void ShowOrder(const Unit* unit)
 {
-#ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: later\n");
-#else
     int x1;
     int y1;
     int x2;
     int y2;
     int color;
+    int dest;
     const Unit* goal;
 
     if( unit->Destroyed ) {
@@ -768,14 +767,15 @@ local void ShowOrder(const Unit* unit)
     x1=Map2ScreenX(unit->X)+unit->IX+unit->Type->TileWidth*TileSizeX/2;
     y1=Map2ScreenY(unit->Y)+unit->IY+unit->Type->TileHeight*TileSizeY/2;
 
-    if( (goal=unit->Command.Data.Move.Goal) && goal->Type ) {
+    if( (goal=unit->Orders[0].Goal) && goal->Type ) {
 	x2=Map2ScreenX(goal->X)+goal->IX+goal->Type->TileWidth*TileSizeX/2;
 	y2=Map2ScreenY(goal->Y)+goal->IY+goal->Type->TileHeight*TileSizeY/2;
     } else {
-	x2=Map2ScreenX(unit->Command.Data.Move.DX)+TileSizeX/2;
-	y2=Map2ScreenY(unit->Command.Data.Move.DY)+TileSizeY/2;
+	x2=Map2ScreenX(unit->Orders[0].X)+TileSizeX/2;
+	y2=Map2ScreenY(unit->Orders[0].Y)+TileSizeY/2;
     }
-    switch( unit->Command.Action ) {
+    dest=0;
+    switch( unit->Orders[0].Action ) {
 	case UnitActionNone:
 	    color=ColorGray;
 	    break;
@@ -791,30 +791,36 @@ local void ShowOrder(const Unit* unit)
 	case UnitActionFollow:
 	case UnitActionMove:
 	    color=ColorGreen;
+	    dest=1;
 	    break;
 
 	case UnitActionPatrol:
 	    VideoDrawLineClip(ColorGreen,x1,y1,x2,y2);
 	    color=ColorBlue;
-	    x1=Map2ScreenX(unit->Command.Data.Move.SX)+TileSizeX/2;
-	    y1=Map2ScreenY(unit->Command.Data.Move.SY)+TileSizeY/2;
+	    x1=Map2ScreenX(((int)unit->Orders[0].Arg1)>>16)+TileSizeX/2;
+	    y1=Map2ScreenY(((int)unit->Orders[0].Arg1)&0xFFFF)+TileSizeY/2;
+	    dest=1;
 	    break;
 
 	case UnitActionRepair:
 	    color=ColorGreen;
+	    dest=1;
 	    break;
 
 	case UnitActionAttack:
 	case UnitActionAttackGround:
 	    color=ColorRed;
+	    dest=1;
 	    break;
 
 	case UnitActionBoard:
 	    color=ColorGreen;
+	    dest=1;
 	    break;
 
 	case UnitActionUnload:
 	    color=ColorGreen;
+	    dest=1;
 	    break;
 
 	case UnitActionDie:
@@ -823,6 +829,7 @@ local void ShowOrder(const Unit* unit)
 
 	case UnitActionSpellCast:
 	    color=ColorBlue;
+	    dest=1;
 	    break;
 
 	case UnitActionTrain:
@@ -839,6 +846,7 @@ local void ShowOrder(const Unit* unit)
 
 	case UnitActionBuild:
 	    color=ColorGreen;
+	    dest=1;
 	    break;
 
 	case UnitActionBuilded:
@@ -847,35 +855,41 @@ local void ShowOrder(const Unit* unit)
 
 	case UnitActionHarvest:
 	    color=ColorGreen;
+	    dest=1;
 	    break;
 
 	case UnitActionMineGold:
 	    color=ColorGreen;
+	    dest=1;
 	    break;
 
 	case UnitActionHaulOil:
 	    color=ColorGreen;
+	    dest=1;
 	    break;
 
 	case UnitActionReturnGoods:
 	    color=ColorGreen;
+	    dest=1;
 	    break;
 
 	case UnitActionDemolish:
 	    color=ColorRed;
+	    dest=1;
 	    break;
 
 	default:
 	    color=ColorGray;
-	    DebugLevel1Fn("Unknown action %d\n",unit->Command.Action);
+	    DebugLevel1Fn("Unknown action %d\n",unit->Orders[0].Action);
 	    break;
     }
     VideoFillCircleClip(color,x1,y1,2);
-    VideoDrawLineClip(color,x1,y1,x2,y2);
-    VideoFillCircleClip(color,x2,y2,2);
+    if( dest ) {
+	VideoDrawLineClip(color,x1,y1,x2,y2);
+	VideoFillCircleClip(color,x2,y2,2);
+    }
 
     //DrawPath(unit);
-#endif
 }
 
 /*
@@ -920,11 +934,7 @@ local void DrawBuilding(Unit* unit)
     //
     //	Buildings under construction/upgrade/ready.
     //
-#ifdef NEW_ORDERS
     if( unit->Orders[0].Action==UnitActionBuilded ) {
-#else
-    if( unit->Command.Action==UnitActionBuilded ) {
-#endif
 	if( unit->Constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
 	    DrawConstruction(type->OverlapFrame
 		,frame&127
@@ -933,31 +943,22 @@ local void DrawBuilding(Unit* unit)
 	} else {
 	    DrawUnitType(type,frame,x,y);
 	}
-#ifdef NEW_ORDERS
     // Draw the future unit type, if upgrading to it.
     } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
 	DrawUnitType(unit->Orders[0].Type,(frame&128)+1,x,y);
-#else
-    } else if( unit->Command.Action==UnitActionUpgradeTo ) {
-	DrawUnitType(unit->Command.Data.UpgradeTo.What,(frame&128)+1,x,y);
-#endif
     } else {
 	DrawUnitType(type,frame,x,y);
     }
 
 #if 0
     // FIXME: johns: ugly check here, should be removed!
-    if( unit->Command.Action!=UnitActionDie ) {
+    if( unit->Orders[0].Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
 	DrawSelection(unit,type,x,y);
     }
 #else
     // FIXME: johns: ugly check here, should be removed!
-#ifdef NEW_ORDERS
     if( unit->Orders[0].Action!=UnitActionDie ) {
-#else
-    if( unit->Command.Action!=UnitActionDie ) {
-#endif
 	DrawDecoration(unit,type,x,y);
     }
 #endif
@@ -1038,11 +1039,7 @@ local void DrawUnit(Unit* unit)
     }
 
     // FIXME: johns: ugly check here, should be removed!
-#ifdef NEW_ORDERS
     if( unit->Orders[0].Action!=UnitActionDie ) {
-#else
-    if( unit->Command.Action!=UnitActionDie ) {
-#endif
 	DrawDecoration(unit,type,x,y);
     }
 }
@@ -1070,11 +1067,7 @@ global void DrawUnits(void)
     for( i=0; i<NumUnits; ++i ) {
 	unit=Units[i];
 	// FIXME: this tries to draw all corps, ohje
-#ifdef NEW_ORDERS
 	if( unit->Type->Vanishes || unit->Orders[0].Action==UnitActionDie ) {
-#else
-	if( unit->Type->Vanishes || unit->Command.Action==UnitActionDie ) {
-#endif
 	    DrawUnit(unit);
 	}
     }
