@@ -43,6 +43,7 @@
 /**
 **	Check if the surrounding are free.
 **
+**	@param worker	Worker to build.
 **	@param type	Type of building.
 **	@param x	X map tile position for the building.
 **	@param y	Y map tile position for the building.
@@ -51,28 +52,29 @@
 **
 **	@note		Can be faster written.
 */
-local int AiCheckSurrounding(const UnitType * type,int x, int y)
+local int AiCheckSurrounding(const Unit* worker,const UnitType* type,
+	int x, int y)
 {
     int i;
     int h;
     int w;
-    int f;
 
-    h=type->TileWidth+2;
-    w=type->TileHeight+2;
+    h=type->TileHeight+2;
+    w=type->TileWidth+2;
     --x;
     --y;
 
-    f=0;
     for( i=0; i<w; ++i ) {		// Top row
-	if( x+i<0 || x+i>TheMap.Width ) {	// FIXME: slow, worse,...
+	if( (x+i)<0 || (x+i)>TheMap.Width ) {	// FIXME: slow, worse,...
 	    continue;
 	}
-	if( y>=0 && TheMap.Fields[x+i+y*TheMap.Width].Flags&(MapFieldUnpassable
+	if( !((x+i)==worker->X && y==worker->Y) && y>=0
+		&& TheMap.Fields[x+i+y*TheMap.Width].Flags&(MapFieldUnpassable
 		|MapFieldWall|MapFieldRocks|MapFieldForest|MapFieldBuilding) ) {
 	    return 0;
 	}				// Bot row
-	if( (y+w)<TheMap.Height && TheMap.Fields[x+i+(y+w)*TheMap.Width].Flags&
+	if( !((x+i)==worker->X && (y+h)==worker->Y) && (y+h)<TheMap.Height
+		&& TheMap.Fields[x+i+(y+h)*TheMap.Width].Flags&
 		(MapFieldUnpassable|MapFieldWall|MapFieldRocks
 		|MapFieldForest|MapFieldBuilding) ) {
 	    return 0;
@@ -82,15 +84,17 @@ local int AiCheckSurrounding(const UnitType * type,int x, int y)
     ++y;
     h-=2;
     for( i=0; i<h; ++i ) {		// Left row
-	if( y+i<0 || y+i>TheMap.Height ) {	// FIXME: slow, worse,...
+	if( (y+i)<0 || (y+i)>TheMap.Height ) {	// FIXME: slow, worse,...
 	    continue;
 	}
-	if( x>=0 && TheMap.Fields[x+(y+i)*TheMap.Width].Flags&
+	if( !(x==worker->X && (y+i)==worker->Y) && x>=0
+		&& TheMap.Fields[x+(y+i)*TheMap.Width].Flags&
 		(MapFieldUnpassable|MapFieldWall|MapFieldRocks
 		|MapFieldForest|MapFieldBuilding) ) {
 	    return 0;
 	}				// Right row
-	if( (x+w)<TheMap.Width && TheMap.Fields[x+w+(y+i)*TheMap.Width].Flags&
+	if( !((x+w)==worker->X && (y+i)==worker->Y) && (x+w)<TheMap.Width
+		&& TheMap.Fields[x+w+(y+i)*TheMap.Width].Flags&
 		(MapFieldUnpassable|MapFieldWall|MapFieldRocks
 		|MapFieldForest|MapFieldBuilding) ) {
 	    return 0;
@@ -163,7 +167,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	    continue;
 	}
 	if (CanBuildUnitType(worker, type, x, y)
-		&& (!flag || AiCheckSurrounding(type, x, y))
+		&& (!flag || AiCheckSurrounding(worker,type, x, y))
 		&& PlaceReachable(worker, x, y, 1) ) {
 	    *dx=x;
 	    *dy=y;
@@ -207,6 +211,18 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     unsigned char* m;
     unsigned char* matrix;
 
+    x=worker->X;
+    y=worker->Y;
+    //
+    //	Look if we can build at current place.
+    //
+    if (CanBuildUnitType(worker, type, x, y)
+	    && (!flag || AiCheckSurrounding(worker,type, x, y)) ) {
+	*dx=x;
+	*dy=y;
+	return 1;
+    }
+
     //
     //	Make movement matrix.
     //
@@ -217,8 +233,8 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     // Ignore all possible mobile units.
     mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
 
-    points[0].X=x=worker->X;
-    points[0].Y=y=worker->Y;
+    points[0].X=x;
+    points[0].Y=y;
     matrix+=w+w+2;
     rp=0;
     matrix[x+y*w]=1;				// mark start point
@@ -243,7 +259,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 		//	Look if we can build here.
 		//
 		if (CanBuildUnitType(worker, type, x, y)
-			&& (!flag || AiCheckSurrounding(type, x, y)) ) {
+			&& (!flag || AiCheckSurrounding(worker,type, x, y)) ) {
 		    *dx=x;
 		    *dy=y;
 		    return 1;
@@ -295,7 +311,7 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
     }
 
     // FIXME: Should do this if all units can't build better!
-    // return AiFindBuildingPlace2(worker,type,dx,dy,0);
+    //return AiFindBuildingPlace2(worker,type,dx,dy,0);
 
     return 0;
 }
