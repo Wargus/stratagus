@@ -55,6 +55,9 @@ local void GameMenuEnd(void);
 local void GameMenuReturn(void);
 
 local void StartMenusSetBackground(Menuitem *mi);	
+local void NameLineDrawFunc(Menuitem *mi);
+local void EnterNameAction(Menuitem *mi, int key);
+local void EnterNameCancel(void);
 
 local void SinglePlayerGameMenu(void);
 local void MultiPlayerGameMenu(void);
@@ -213,8 +216,8 @@ local Menuitem ScenSelectMenuItems[] = {
 **	Items for the Prg Start Menu
 */
 local Menuitem PrgStartMenuItems[] = {
-    { MI_TYPE_TEXT, 640/2, 440, 0, GameFont, NULL, NULL,
-	{ text:{ NameLine, MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, NULL, NULL,
+	{ drawfunc:{ NameLineDrawFunc } } },
     { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, StartMenusSetBackground, NULL,
 	{ button:{ "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
     { MI_TYPE_BUTTON, 208, 320 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
@@ -298,6 +301,20 @@ local Menuitem CustomGameMenuItems[] = {
 };
 
 /**
+**	Items for the Enter Name Menu
+*/
+local Menuitem EnterNameMenuItems[] = {
+    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL,
+	{ text:{ "Enter your name:", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL,
+	{ input:{ NULL, 212, 20, MBUTTON_PULLDOWN, EnterNameAction, 0, 0} } },
+    { MI_TYPE_BUTTON, 24, 80, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
+    { MI_TYPE_BUTTON, 154, 80, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Cancel", 106, 27, MBUTTON_GM_HALF, EnterNameCancel, 'c'} } },
+};
+
+/**
 **	Menus
 */
 global Menu Menus[] = {
@@ -354,6 +371,15 @@ global Menu Menus[] = {
 	ImageNone,
 	3, 15,
 	CustomGameMenuItems
+    },
+    {
+	/// Enter Name Menu
+	(640-288)/2,
+	260,
+	288, 128,
+	ImagePanel4,
+	2, 4,
+	EnterNameMenuItems
     },
 };
 
@@ -605,6 +631,50 @@ local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
 
 }
 
+/**
+**	Draw input 'button' on menu mx, my
+**
+**	@param mi	menuitem pointer
+**	@param mx	menu X display position (offset)
+**	@param my	menu Y display position (offset)
+*/
+local void DrawInput(Menuitem *mi, unsigned mx, unsigned my)
+{
+    int nc, rc;
+    char *text;
+    unsigned flags = mi->flags;
+    MenuButtonId rb = mi->d.input.button;
+    unsigned w, h, x, y;
+
+    x = mx+mi->xofs;
+    y = my+mi->yofs;
+    w = mi->d.input.xsize;
+    h = mi->d.input.ysize;
+
+    GetDefaultTextColors(&nc, &rc);
+    if (flags&MenuButtonDisabled) {
+	rb--;
+	SetDefaultTextColors(FontGrey,FontGrey);
+    }
+    
+    PushClipping();
+    SetClipping(0,0,x+w,VideoHeight);
+    VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1);
+    PopClipping();
+    text = mi->d.input.buffer;
+    if (text) {
+	DrawText(x+2,y+2,mi->font,text);
+    }
+    if (flags&MenuButtonSelected) {
+	if (flags&MenuButtonDisabled) {
+	    VideoDrawRectangleClip(ColorGray,x-2,y-2,w,h);
+	} else {
+	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w,h);
+	}
+    }
+    SetDefaultTextColors(nc,rc);
+}
+
 
 /**
 **	Draw menu  'menu'
@@ -665,6 +735,9 @@ global void DrawMenu(int MenuId)
 		    (*mi->d.drawfunc.draw)(mi);
 		}
 		break;
+	    case MI_TYPE_INPUT:
+		DrawInput(mi,menu->x,menu->y);
+		break;
 	    default:
 		break;
 	}
@@ -685,6 +758,16 @@ local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
     HideCursor();
     DestroyCursorBackground();
     DisplayPicture("graphic/interface/Menu background without title.png");
+}
+
+local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
+{
+    int nc, rc;
+
+    GetDefaultTextColors(&nc, &rc);
+    SetDefaultTextColors(rc, rc);
+    DrawTextCentered(640/2, 440, GameFont, NameLine);
+    SetDefaultTextColors(nc, rc);
 }
 
 local void GameMenuReturn(void)
@@ -740,10 +823,43 @@ local void SinglePlayerGameMenu(void)
     }
 }
 
+local void EnterNameCancel(void)
+{
+    EnterNameMenuItems[1].d.input.nch = 0;
+    EndMenu();
+}
+
+local void EnterNameAction(Menuitem *mi, int key)
+{
+    if (mi->d.input.nch == 0) {
+	mi[1].flags = MenuButtonDisabled;
+    } else {
+	mi[1].flags &= ~MenuButtonDisabled;
+	if (key == 10 || key == 13) {
+	    EndMenu();
+	}
+    }
+}
+
 local void MultiPlayerGameMenu(void)
 {
-    // ProcessMenu( ??? , 1);
-    Exit(0);
+    char NameBuf[32];
+
+    StartMenusSetBackground(NULL);
+    Invalidate();
+    EnterNameMenuItems[1].d.input.buffer = NameBuf;
+    strcpy(NameBuf, "Anonymous~!_");
+    EnterNameMenuItems[1].d.input.nch = strlen(NameBuf) - 3;
+    EnterNameMenuItems[1].d.input.maxch = 15;
+    ProcessMenu(MENU_ENTER_NAME, 1);
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    if (EnterNameMenuItems[1].d.input.nch == 0) {
+	return;
+    }
+    
+    NameBuf[EnterNameMenuItems[1].d.input.nch] = 0;	// Now finally here is the name
+    // Here we really go...
 }
 
 
@@ -1217,8 +1333,50 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
     Menuitem *mi;
     Menu *menu = Menus + CurrentMenu;
 
-    i = menu->nitems;
+    if (CurrentMenu < 0) {
+	return 0;
+    }
+
+    if (MenuButtonCurSel != -1 && menu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
+	mi = menu->items + MenuButtonCurSel;
+	if (!(mi->flags & MenuButtonDisabled)) {
+inkey:
+	    if (key < 0) {
+		key &= 0xFF;
+	    }
+	    if (key >= 0x80 && key < 0x100) {
+		// FIXME ARI: ISO->WC2 Translation here!
+		key = 0;
+	    }
+	    switch(key) {
+		case '\b': case '\177':
+		    if (mi->d.input.nch > 0) {
+			strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
+			MustRedraw |= RedrawMenu;
+		    }
+		    break;
+		case 9:
+		    goto normkey;
+		default:
+		    if (key >= 32 && key < 0x100) {
+			if (mi->d.input.nch < mi->d.input.maxch) {
+			    mi->d.input.buffer[mi->d.input.nch++] = key;
+			    strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
+			    MustRedraw |= RedrawMenu;
+			}
+		    }
+		    break;
+	    }
+	    if (mi->d.input.action) {
+		(*mi->d.input.action)(mi, key);
+	    }
+	    return 1;
+	}
+    }
+
+normkey:
     mi = menu->items;
+    i = menu->nitems;
     while (i--) {
 	switch (mi->mitype) {
 	    case MI_TYPE_BUTTON:
@@ -1334,6 +1492,7 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 			case MI_TYPE_PULLDOWN:
 			case MI_TYPE_LISTBOX:
 			case MI_TYPE_VSLIDER:
+			case MI_TYPE_INPUT:
 			    if (mi->flags & MenuButtonDisabled) {
 				break;
 			    }
@@ -1351,6 +1510,23 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 	case 'Q':
 	    Exit(0);
 	default:
+	    mi = menu->items;
+	    i = menu->nitems;
+	    while (i--) {
+		switch (mi->mitype) {
+		    case MI_TYPE_INPUT:
+			if (!(mi->flags & MenuButtonDisabled)) {
+			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
+			    mi->flags |= MenuButtonSelected;
+			    MenuButtonCurSel = mi - menu->items;
+			    MustRedraw |= RedrawMenu;
+			    goto inkey;
+			}
+		    default:
+			break;
+		}
+		mi++;
+	    }
 	    DebugLevel3("Key %d\n",key);
 	    return 0;
     }
@@ -1381,6 +1557,19 @@ global void MenuHandleMouseMove(int x,int y)
 		    xs = menu->x + mi->xofs;
 		    ys = menu->y + mi->yofs;
 		    if (x < xs || x > xs + mi->d.button.xsize || y < ys || y > ys + mi->d.button.ysize) {
+			if (!(mi->flags&MenuButtonClicked)) {
+			    if (mi->flags&MenuButtonActive) {
+				RedrawFlag = 1;
+				mi->flags &= ~MenuButtonActive;
+			    }
+			}
+			continue;
+		    }
+		    break;
+		case MI_TYPE_INPUT:
+		    xs = menu->x + mi->xofs;
+		    ys = menu->y + mi->yofs;
+		    if (x<xs || x>xs + mi->d.input.xsize || y<ys || y>ys + mi->d.input.ysize) {
 			if (!(mi->flags&MenuButtonClicked)) {
 			    if (mi->flags&MenuButtonActive) {
 				RedrawFlag = 1;
@@ -1480,6 +1669,7 @@ global void MenuHandleMouseMove(int x,int y)
 		case MI_TYPE_PULLDOWN:
 		case MI_TYPE_LISTBOX:
 		case MI_TYPE_VSLIDER:
+		case MI_TYPE_INPUT:
 		    if (!(mi->flags&MenuButtonActive)) {
 			RedrawFlag = 1;
 			mi->flags |= MenuButtonActive;
@@ -1515,6 +1705,7 @@ global void MenuHandleButtonDown(int b)
 		    case MI_TYPE_PULLDOWN:
 		    case MI_TYPE_LISTBOX:
 		    case MI_TYPE_VSLIDER:
+		    case MI_TYPE_INPUT:
 			if (MenuButtonCurSel != -1) {
 			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
 			}
@@ -1668,6 +1859,7 @@ global void ProcessMenu(int MenuId, int Loop)
 	    case MI_TYPE_PULLDOWN:
 	    case MI_TYPE_LISTBOX:
 	    case MI_TYPE_VSLIDER:
+	    case MI_TYPE_INPUT:
 		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
 		// FIXME: Maybe activate if mouse-pointer is over it right now?
 		if (i == menu->defsel) {
