@@ -54,6 +54,10 @@
 **
 **		FIXME: continue docu.
 **
+**	Tileset::Class
+**
+**		FIXME: continue docu.
+**
 **	Tileset::Name
 **
 **		FIXME: continue docu.
@@ -64,31 +68,59 @@
 **
 **	Tileset::PaletteFile
 **
+**		FIXME: continue docu.
+**
 **	Tileset::Table
+**
+**		FIXME: continue docu.
 **
 **	Tileset::TileTypeTable
 **
+**		FIXME: continue docu.
+**
 **	Tileset::AnimationTable
+**
+**		FIXME: continue docu.
 **
 **	Tileset::ExtraTrees[6]
 **
+**		FIXME: continue docu.
+**
 **	Tileset::TopOneTree
+**
+**		FIXME: continue docu.
 **
 **	Tileset::MidOneTree
 **
+**		FIXME: continue docu.
+**
 **	Tileset::BotOneTree
+**
+**		FIXME: continue docu.
 **
 **	Tileset::RemovedTree
 **
+**		FIXME: continue docu.
+**
 **	Tileset::GrowingTree[2]
+**
+**		FIXME: continue docu.
 **
 **	Tileset::ExtraRocks[6]
 **
+**		FIXME: continue docu.
+**
 **	Tileset::TopOneRock
+**
+**		FIXME: continue docu.
 **
 **	Tileset::MidOneRock
 **
+**		FIXME: continue docu.
+**
 **	Tileset::BotOneRock
+**
+**		FIXME: continue docu.
 **
 **	Tileset::RemovedRock
 **
@@ -103,13 +135,15 @@
 #define TileSizeX	32		/// Size of a tile in X
 #define TileSizeY	32		/// Size of a tile in Y
 
+// This is only used for tile cache size
 #define MaxTilesInTileset	3072	/// Current limit of tiles in tileset
 
 /**
 **	These are used for lookup tiles types
 **	mainly used for the FOW implementation of the seen woods/rocks
 **
-**	@todo FIXME: I think this can be removed.
+**	@todo FIXME: I think this can be removed, we can use the flags?
+**	I'm not sure, we have seen and real time to considere.
 */
 typedef enum _tile_type_ {
     TileTypeUnknown,			/// unknown tile type
@@ -125,17 +159,18 @@ typedef enum _tile_type_ {
     TileTypeWater,			/// any water tile
 } TileType;
 
-    ///	Tileset definition.
+    ///	Tileset definition
 typedef struct _tileset_ {
     char*	Ident;			/// tileset identifier
-    char*	Name;			/// name for future extensions
+    char*	Class;			/// class for future extensions
+    char*	Name;			/// nice name to display
     char*	File;			/// file containing image data
     char*	PaletteFile;		/// file containing the global palette
 
-    const unsigned short* Table;	/// pud to internal conversion table
-    unsigned char* TileTypeTable;	/// for fast lookup of tile type
-    // FIXME: currently unsupported.
-    unsigned short* AnimationTable;	/// Tile Animation sequences
+    unsigned short*	Table;		/// pud to internal conversion table
+    unsigned char*	TileTypeTable;	/// for fast lookup of tile type
+    // FIXME: currently unsupported
+    unsigned short*	AnimationTable;	/// Tile Animation sequences
 
     unsigned	ExtraTrees[6];		/// extra tree tiles for removing
     unsigned	TopOneTree;		/// tile for one tree top
@@ -171,15 +206,15 @@ enum _tileset_nr_ {
 extern char** TilesetWcNames;		/// Mapping wc-number 2 symbol
 
 extern int NumTilesets;			/// Number of  of available tilesets
-extern Tileset Tilesets[TilesetMax];	/// Tileset information
+extern Tileset** Tilesets;		/// Tileset information
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
 extern void LoadTileset(void);		/// Load tileset definition
-extern void SaveTileset(FILE*);		/// Save the tileset configuration
-extern void CleanTileset(void);		/// Cleanup the tileset module
+extern void SaveTilesets(FILE*);	/// Save the tileset configuration
+extern void CleanTilesets(void);	/// Cleanup the tileset module
 
 extern void TilesetCclRegister(void);	/// Register CCL features for tileset
 
