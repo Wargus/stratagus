@@ -43,6 +43,7 @@
 #include "ai.h"
 #include "ccl_helpers.h"
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -82,6 +83,7 @@ global void IOPrintTabs(void)
 local void saveData(IOFieldDef * defs, void *data)
 {
     unsigned int i;
+
     while (defs->name) {
 	if (defs->convertfunc) {
 	    IOPrintTabs();
@@ -712,3 +714,5 @@ global void IOPlayerPtr(SCM scmfrom, void *binaryform, void *para)
 	CLprintf(IOOutFile, " %d", playerid);
     }
 }
+#elif defined(USE_LUA)
+#endif

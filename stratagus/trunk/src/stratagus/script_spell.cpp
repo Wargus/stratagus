@@ -60,6 +60,7 @@
 **	@note	This is only here to avoid code duplication. You don't have
 **	any reason to USE this:)
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclSpellMissileLocation(SCM list, SpellActionMissileLocation* location)
 {
     SCM value;
@@ -97,6 +98,8 @@ local void CclSpellMissileLocation(SCM list, SpellActionMissileLocation* locatio
 	}
     }
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Parse the action for spell.
@@ -104,6 +107,7 @@ local void CclSpellMissileLocation(SCM list, SpellActionMissileLocation* locatio
 **	@param list		SCM list object, with something like (action-type params).
 **	@param spellaction	Pointer to spellactopm.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclSpellAction(SCM list, SpellActionType* spellaction)
 {
     char* str;
@@ -306,6 +310,8 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 	errl("Unsupported action type", value);
     }
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Get a condition value from a scm object.
@@ -316,6 +322,7 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 **	@note 	This is a helper function to make CclSpellCondition shorter
 **		and easier to understand.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global char Scm2Condition(SCM value)
 {
     if (gh_eq_p(value, gh_symbol2scm("true"))) {
@@ -329,6 +336,8 @@ global char Scm2Condition(SCM value)
 	return -1;
     }
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Parse the Condition for spell.
@@ -338,6 +347,7 @@ global char Scm2Condition(SCM value)
 **
 **	@notes: conditions must be allocated. All data already in is LOST.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclSpellCondition(SCM list, ConditionInfo* condition)
 {
     SCM value;
@@ -420,6 +430,8 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
 	}
     }
 }
+#elif defined(USE_LUA)
+#endif
 
 /*
 **	Parse the Condition for spell.
@@ -429,6 +441,7 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
 **
 **	@notes: autocast must be allocated. All data already in is LOST.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclSpellAutocast(SCM list, AutoCastInfo* autocast)
 {
     SCM value;
@@ -456,12 +469,15 @@ local void CclSpellAutocast(SCM list, AutoCastInfo* autocast)
 	}
     }
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Parse Spell.
 **
 **	@param list	List describing Spell.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineSpell(SCM list)
 {
     char* identname;
@@ -587,13 +603,17 @@ local SCM CclDefineSpell(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for Spell.
 */
 global void SpellCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("define-spell", CclDefineSpell);
+#endif
 }
 
 /*

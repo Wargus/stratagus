@@ -1033,6 +1033,7 @@ global SpellType* SpellTypeByIdent(const char* ident)
 /**
 **	FIXME: docu
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global unsigned CclGetSpellByIdent(SCM value)
 {  
     int i;
@@ -1044,6 +1045,8 @@ global unsigned CclGetSpellByIdent(SCM value)
     }
     return -1;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Get spell-type struct ptr by id

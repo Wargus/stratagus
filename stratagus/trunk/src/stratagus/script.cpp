@@ -38,6 +38,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <signal.h>
 
 #include "stratagus.h"
 
@@ -89,6 +90,10 @@
 int siod_verbose_level;
 #endif
 
+#ifdef USE_LUA
+global lua_State* Lua;
+#endif
+
 global char* CclStartFile;		/// CCL start file
 global char* GameName;			/// Game Preferences
 global int CclInConfigFile;		/// True while config file parsing
@@ -119,6 +124,89 @@ local SCM    ProtectedCellValues[16384];
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_LUA
+local void lstop(lua_State *l, lua_Debug *ar)
+{
+    (void)ar;  // unused arg.
+    lua_sethook(l, NULL, 0, 0);
+    luaL_error(l, "interrupted!");
+}
+
+local void laction(int i)
+{
+    // if another SIGINT happens before lstop,
+    // terminate process (default action)
+    signal(i, SIG_DFL);
+    lua_sethook(Lua, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+}
+
+local void l_message(const char *pname, const char *msg)
+{
+    if (pname) {
+	fprintf(stderr, "%s: ", pname);
+    }
+    fprintf(stderr, "%s\n", msg);
+    exit(1);
+}
+
+local int report(int status)
+{
+    const char* msg;
+
+    if (status) {
+	msg = lua_tostring(Lua, -1);
+	if (msg == NULL) {
+	    msg = "(error with no message)";
+	}
+	l_message(NULL, msg);
+	lua_pop(Lua, 1);
+    }
+    return status;
+}
+
+local int lcall(int narg, int clear)
+{
+    int status;
+    int base;
+    
+    base = lua_gettop(Lua) - narg;  /* function index */
+    lua_pushliteral(Lua, "_TRACEBACK");
+    lua_rawget(Lua, LUA_GLOBALSINDEX);  /* get traceback function */
+    lua_insert(Lua, base);  /* put it under chunk and args */
+    signal(SIGINT, laction);
+    status = lua_pcall(Lua, narg, (clear ? 0 : LUA_MULTRET), base);
+    signal(SIGINT, SIG_DFL);
+    lua_remove(Lua, base);  /* remove traceback function */
+    return status;
+}
+
+local int docall(int status)
+{
+    if (status == 0) {
+	status = lcall(0, 1);
+    }
+    return report(status);
+}
+
+global int LuaLoadFile(const char* file)
+{
+    return docall(luaL_loadfile(Lua, file));
+}
+
+local int CclLoad(lua_State* l)
+{
+    char buf[1024];
+
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    LibraryFileName(lua_tostring(l, 1), buf);
+    LuaLoadFile(buf);
+    return 0;
+}
+#endif
+
 /** 
 **	Convert a SCM to a string, SCM must be a symbol or string, else 0
 **	is returned
@@ -128,6 +216,7 @@ local SCM    ProtectedCellValues[16384];
 **	@return a string representing the SCM or 0 in case the conversion
 **	failed, caller must free() the returned value
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global char* CclConvertToString(SCM scm)
 {
 #ifdef USE_GUILE
@@ -149,6 +238,8 @@ global char* CclConvertToString(SCM scm)
     }
 #endif
 }
+#elif defined(USE_LUA)
+#endif
 
 /** 
 **	Return the type of a smob
@@ -157,6 +248,7 @@ global char* CclConvertToString(SCM scm)
 **	
 **	@return type id of the smob
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global ccl_smob_type_t CclGetSmobType(SCM smob)
 {
 #ifdef USE_GUILE
@@ -169,6 +261,8 @@ global ccl_smob_type_t CclGetSmobType(SCM smob)
     return TYPE(smob);
 #endif
 }
+#elif defined(USE_LUA)
+#endif
 
 /** 
 **	Return the pointer that is stored in a smob
@@ -177,6 +271,7 @@ global ccl_smob_type_t CclGetSmobType(SCM smob)
 **	
 **	@return pointer that was inside the smob
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global void* CclGetSmobData(SCM smob)
 {
 #ifdef USE_GUILE
@@ -185,6 +280,8 @@ global void* CclGetSmobData(SCM smob)
     return smob->storage_as.cons.cdr;
 #endif
 }
+#elif defined(USE_LUA)
+#endif
 
 /** 
 **	Store a pointer inside a SMOB, aka convert a pointer to a SCM
@@ -192,6 +289,7 @@ global void* CclGetSmobData(SCM smob)
 **	@param tag The type of the pointer/smob
 **	@param ptr the pointer that should be converted to a SCM
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global SCM CclMakeSmobObj(ccl_smob_type_t tag, void* ptr)
 {
 #ifdef USE_GUILE
@@ -206,6 +304,8 @@ global SCM CclMakeSmobObj(ccl_smob_type_t tag, void* ptr)
     return value;
 #endif
 }
+#elif defined(USE_LUA)
+#endif
 
 /** 
 **	Create a tag for a new type.
@@ -214,6 +314,7 @@ global SCM CclMakeSmobObj(ccl_smob_type_t tag, void* ptr)
 **	
 **	@return The newly generated SMOB type
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global ccl_smob_type_t CclMakeSmobType(const char* name)
 {
     ccl_smob_type_t new_type;
@@ -226,6 +327,8 @@ global ccl_smob_type_t CclMakeSmobType(const char* name)
 
   return new_type;
 }
+#elif defined(USE_LUA)
+#endif
 
 
 #ifdef DEBUG_GC
@@ -306,6 +409,7 @@ local int CclNeedProtect(SCM val)
 **
 **	@param obj	Scheme object
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global void CclGcProtect(SCM * obj)
 {
 #ifdef DEBUG_GC
@@ -333,12 +437,15 @@ global void CclGcProtect(SCM * obj)
 #endif
 #endif
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Remove a SCM object from garbage collectors protection list.
 **
 **	@param obj	Scheme object
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global void CclGcUnprotect(SCM * obj)
 {
 #ifdef DEBUG_GC
@@ -386,7 +493,10 @@ global void CclGcUnprotect(SCM * obj)
 #endif
 #endif
 }
+#elif defined(USE_LUA)
+#endif
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global void CclGcProtectedAssign(SCM* obj, SCM value)
 {
     if (*obj == value) {
@@ -410,6 +520,8 @@ global void CclGcProtectedAssign(SCM* obj, SCM value)
     (*obj) = value;
 #endif	// GC_PROTECT_VALUE
 }
+#elif defined(USE_LUA)
+#endif
 
 global void CclFlushOutput(void)
 {
@@ -427,13 +539,12 @@ global void CclFlushOutput(void)
 */
 global void CclGarbageCollect(int fast)
 {
-    
-#ifdef USE_GUILE
+#if defined(USE_GUILE)
     if (!fast) {
 	// GUILE handle gc nicely by itself
     	scm_gc();
     }
-#else
+#elif defined(USE_SIOD)
 #ifdef SIOD_HEAP_GC
     static int cpt=0;
     
@@ -456,6 +567,7 @@ global void CclGarbageCollect(int fast)
 	default_used_cells = new_used_cells;
     }
 #endif
+#elif defined(USE_LUA)
 #endif
 }
 
@@ -468,20 +580,37 @@ global void CclGarbageCollect(int fast)
 **
 **	@return		Current libray path.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclStratagusLibraryPath(void)
 {
     return gh_str02scm(StratagusLibPath);
 }
+#elif defined(USE_LUA)
+local int CclStratagusLibraryPath(lua_State* l)
+{
+    lua_pushstring(l, StratagusLibPath);
+    return 1;
+}
+#endif
 
 /**
 **	Return the stratagus game-cycle
 **
 **	@return		Current game cycle.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclGameCycle(void)
 {
     return gh_int2scm(GameCycle);
 }
+#elif defined(USE_LUA)
+local int CclGameCycle(lua_State* l)
+{
+    lua_pushnumber(l, GameCycle);
+    return 1;
+}
+#endif
+
 /**
 **      Return of game name.
 **
@@ -489,6 +618,7 @@ local SCM CclGameCycle(void)
 **
 **      @return		Old game name.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetGameName(SCM gamename)
 {
     SCM old;
@@ -507,19 +637,61 @@ local SCM CclSetGameName(SCM gamename)
     }
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetGameName(lua_State* l)
+{
+    char* old;
+    int args;
+
+    args = lua_gettop(l);
+    if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = NULL;
+    if (GameName) {
+	old = strdup(GameName);
+    }
+    if (args == 1 && !lua_isnil(l, 1)) {
+	if (GameName) {
+	    free(GameName);
+	    GameName = NULL;
+	}
+
+	GameName = strdup(lua_tostring(l, 1));
+    }
+
+    lua_pushstring(l, old);
+    free(old);
+    return 1;
+}
+#endif
 										    
 /**
 **	Set the stratagus game-cycle
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetGameCycle(SCM cycle)
 {
     GameCycle = gh_scm2int(cycle);
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetGameCycle(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    GameCycle = lua_tonumber(l, 1);
+    return 0;
+}
+#endif
 
 /**
 **	Set the game paused or unpaused
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetGamePaused(SCM paused)
 {
     if (gh_boolean_p(paused)) {
@@ -529,19 +701,47 @@ local SCM CclSetGamePaused(SCM paused)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetGamePaused(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || (!lua_isnumber(l, 1) && !lua_isboolean(l, 1))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (lua_isboolean(l, 1)) {
+	GamePaused = lua_toboolean(l, 1);
+    } else {
+	GamePaused = lua_tonumber(l, 1);
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Set the video sync speed
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetVideoSyncSpeed(SCM speed)
 {
     VideoSyncSpeed = gh_scm2int(speed);
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetVideoSyncSpeed(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    VideoSyncSpeed = lua_tonumber(l, 1);
+    return 0;
+}
+#endif
 
 /**
 **	Set the local player name
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetLocalPlayerName(SCM name)
 {
     char* str;
@@ -551,6 +751,21 @@ local SCM CclSetLocalPlayerName(SCM name)
     LocalPlayerName[sizeof(LocalPlayerName) - 1] = '\0';
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetLocalPlayerName(lua_State* l)
+{
+    const char* str;
+
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    str = lua_tostring(l, 1);
+    strncpy(LocalPlayerName, str, sizeof(LocalPlayerName) - 1);
+    LocalPlayerName[sizeof(LocalPlayerName) - 1] = '\0';
+    return 0;
+}
+#endif
 
 /**
 **	Enable/disable Showing the tips at the start of a level.
@@ -558,6 +773,7 @@ local SCM CclSetLocalPlayerName(SCM name)
 **	@param flag	True = turn on, false = off.
 **	@return		The old state of tips displayed.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetShowTips(SCM flag)
 {
     int old;
@@ -567,6 +783,22 @@ local SCM CclSetShowTips(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetShowTips(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = ShowTips;
+    ShowTips = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set the current tip number.
@@ -574,6 +806,7 @@ local SCM CclSetShowTips(SCM flag)
 **	@param tip	Tip number.
 **	@return		The old tip number.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetCurrentTip(SCM tip)
 {
     int old;
@@ -586,6 +819,25 @@ local SCM CclSetCurrentTip(SCM tip)
 
     return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetCurrentTip(lua_State* l)
+{
+    lua_Number old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = CurrentTip;
+    CurrentTip = lua_tonumber(l, 1);
+    if (CurrentTip >= MAX_TIPS || Tips[CurrentTip] == NULL) {
+	CurrentTip = 0;
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Add a new tip to the list of tips.
@@ -595,6 +847,7 @@ local SCM CclSetCurrentTip(SCM tip)
 **	@todo	FIXME:	Memory for tips is never freed.
 **		FIXME:	Make Tips dynamic.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAddTip(SCM tip)
 {
     int i;
@@ -611,6 +864,31 @@ local SCM CclAddTip(SCM tip)
 
     return tip;
 }
+#elif defined(USE_LUA)
+local int CclAddTip(lua_State* l)
+{
+    int i;
+    const char* str;
+
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    str = lua_tostring(l, 1);
+    for (i = 0; i < MAX_TIPS; ++i) {
+	if (Tips[i] && !strcmp(str, Tips[i])) {
+	    break;
+	}
+	if (Tips[i] == NULL) {
+	    Tips[i] = strdup(str);
+	    break;
+	}
+    }
+
+    lua_pushstring(l, str);
+    return 1;
+}
+#endif
 
 /**
 **	Set resource harvesting speed.
@@ -618,6 +896,7 @@ local SCM CclAddTip(SCM tip)
 **	@param resource	Name of resource.
 **	@param speed	Speed factor of harvesting resource.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSpeedResourcesHarvest(SCM resource, SCM speed)
 {
     int i;
@@ -631,6 +910,29 @@ local SCM CclSetSpeedResourcesHarvest(SCM resource, SCM speed)
     errl("Resource not found", resource);
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetSpeedResourcesHarvest(lua_State* l)
+{
+    int i;
+    const char* resource;
+
+    if (lua_gettop(l) != 2 || !lua_isstring(l, 1) || !lua_isnumber(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    resource = lua_tostring(l, 1);
+    for (i = 0; i < MaxCosts; ++i) {
+	if (!strcmp(resource, DefaultResourceNames[i])) {
+	    SpeedResourcesHarvest[i] = lua_tonumber(l, 2);
+	    return 0;
+	}
+    }
+    lua_pushfstring(l, "Resource not found: %s", resource);
+    lua_error(l);
+
+    return 0;
+}
+#endif
 
 /**
 **	Set resource returning speed.
@@ -638,6 +940,7 @@ local SCM CclSetSpeedResourcesHarvest(SCM resource, SCM speed)
 **	@param resource	Name of resource.
 **	@param speed	Speed factor of returning resource.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSpeedResourcesReturn(SCM resource, SCM speed)
 {
     int i;
@@ -645,58 +948,136 @@ local SCM CclSetSpeedResourcesReturn(SCM resource, SCM speed)
     for (i = 0; i < MaxCosts; ++i) {
 	if (gh_eq_p(resource, gh_symbol2scm(DefaultResourceNames[i]))) {
 	    SpeedResourcesReturn[i] = gh_scm2int(speed);
-	    break;
+	    return SCM_UNSPECIFIED;
 	}
     }
-    if (i == MaxCosts) {
-	errl("Resource not found", resource);
-    }
-    return speed;
+    errl("Resource not found", resource);
+    return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetSpeedResourcesReturn(lua_State* l)
+{
+    int i;
+    const char* resource;
+
+    if (lua_gettop(l) != 2 || !lua_isstring(l, 1) || !lua_isnumber(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    resource = lua_tostring(l, 1);
+    for (i = 0; i < MaxCosts; ++i) {
+	if (!strcmp(resource, DefaultResourceNames[i])) {
+	    SpeedResourcesReturn[i] = lua_tonumber(l, 2);
+	    return 0;
+	}
+    }
+    lua_pushfstring(l, "Resource not found: %s", resource);
+    lua_error(l);
+
+    return 0;
+}
+#endif
 
 /**
 **	For debug increase building speed.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSpeedBuild(SCM speed)
 {
     SpeedBuild = gh_scm2int(speed);
 
     return speed;
 }
+#elif defined(USE_LUA)
+local int CclSetSpeedBuild(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    SpeedBuild = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, SpeedBuild);
+    return 1;
+}
+#endif
 
 /**
 **	For debug increase training speed.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSpeedTrain(SCM speed)
 {
     SpeedTrain = gh_scm2int(speed);
 
     return speed;
 }
+#elif defined(USE_LUA)
+local int CclSetSpeedTrain(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    SpeedTrain = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, SpeedTrain);
+    return 1;
+}
+#endif
 
 /**
 **	For debug increase upgrading speed.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSpeedUpgrade(SCM speed)
 {
     SpeedUpgrade = gh_scm2int(speed);
 
     return speed;
 }
+#elif defined(USE_LUA)
+local int CclSetSpeedUpgrade(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    SpeedUpgrade = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, SpeedUpgrade);
+    return 1;
+}
+#endif
 
 /**
 **	For debug increase researching speed.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSpeedResearch(SCM speed)
 {
     SpeedResearch = gh_scm2int(speed);
 
     return speed;
 }
+#elif defined(USE_LUA)
+local int CclSetSpeedResearch(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    SpeedResearch = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, SpeedResearch);
+    return 1;
+}
+#endif
 
 /**
 **	For debug increase all speeds.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSpeeds(SCM speed)
 {
     int i;
@@ -711,10 +1092,32 @@ local SCM CclSetSpeeds(SCM speed)
 
     return speed;
 }
+#elif defined(USE_LUA)
+local int CclSetSpeeds(lua_State* l)
+{
+    int i;
+    lua_Number s;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    s = lua_tonumber(l, 1);
+    for (i = 0; i < MaxCosts; ++i) {
+	SpeedResourcesHarvest[i] = s;
+	SpeedResourcesReturn[i] = s;
+    }
+    SpeedBuild = SpeedTrain = SpeedUpgrade = SpeedResearch = s;
+
+    lua_pushnumber(l, s);
+    return 1;
+}
+#endif
 
 /**
 **	Define default resources for a new player.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineDefaultResources(SCM list)
 {
     int i;
@@ -725,10 +1128,28 @@ local SCM CclDefineDefaultResources(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineDefaultResources(lua_State* l)
+{
+    int i;
+    int args;
+
+    args = lua_gettop(l);
+    for (i = 0; i < MaxCosts && i < args; ++i) {
+	if (!lua_isnumber(l, i + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	DefaultResources[i] = lua_tonumber(l, i + 1);
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Define default resources for a new player with low resources.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineDefaultResourcesLow(SCM list)
 {
     int i;
@@ -739,10 +1160,28 @@ local SCM CclDefineDefaultResourcesLow(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineDefaultResourcesLow(lua_State* l)
+{
+    int i;
+    int args;
+
+    args = lua_gettop(l);
+    for (i = 0; i < MaxCosts && i < args; ++i) {
+	if (!lua_isnumber(l, i + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	DefaultResourcesLow[i] = lua_tonumber(l, i + 1);
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Define default resources for a new player with mid resources.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineDefaultResourcesMedium(SCM list)
 {
     int i;
@@ -753,10 +1192,28 @@ local SCM CclDefineDefaultResourcesMedium(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineDefaultResourcesMedium(lua_State* l)
+{
+    int i;
+    int args;
+
+    args = lua_gettop(l);
+    for (i = 0; i < MaxCosts && i < args; ++i) {
+	if (!lua_isnumber(l, i + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	DefaultResourcesMedium[i] = lua_tonumber(l, i + 1);
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Define default resources for a new player with high resources.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineDefaultResourcesHigh(SCM list)
 {
     int i;
@@ -767,10 +1224,28 @@ local SCM CclDefineDefaultResourcesHigh(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineDefaultResourcesHigh(lua_State* l)
+{
+    int i;
+    int args;
+
+    args = lua_gettop(l);
+    for (i = 0; i < MaxCosts && i < args; ++i) {
+	if (!lua_isnumber(l, i + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	DefaultResourcesHigh[i] = lua_tonumber(l, i + 1);
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Define default incomes for a new player.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineDefaultIncomes(SCM list)
 {
     int i;
@@ -781,10 +1256,28 @@ local SCM CclDefineDefaultIncomes(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineDefaultIncomes(lua_State* l)
+{
+    int i;
+    int args;
+
+    args = lua_gettop(l);
+    for (i = 0; i < MaxCosts && i < args; ++i) {
+	if (!lua_isnumber(l, i + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	DefaultIncomes[i] = lua_tonumber(l, i + 1);
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Define default action for the resources.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineDefaultActions(SCM list)
 {
     int i;
@@ -799,10 +1292,32 @@ local SCM CclDefineDefaultActions(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineDefaultActions(lua_State* l)
+{
+    int i;
+    int args;
+
+    for (i = 0; i < MaxCosts; ++i) {
+	free(DefaultActions[i]);
+	DefaultActions[i] = NULL;
+    }
+    args = lua_gettop(l);
+    for (i = 0; i < MaxCosts && i < args; ++i) {
+	if (!lua_isstring(l, i + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	DefaultActions[i] = strdup(lua_tostring(l, i + 1));
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Define default names for the resources.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineDefaultResourceNames(SCM list)
 {
     int i;
@@ -817,10 +1332,32 @@ local SCM CclDefineDefaultResourceNames(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineDefaultResourceNames(lua_State* l)
+{
+    int i;
+    int args;
+
+    for (i = 0; i < MaxCosts; ++i) {
+	free(DefaultResourceNames[i]);
+	DefaultResourceNames[i] = NULL;
+    }
+    args = lua_gettop(l);
+    for (i = 0; i < MaxCosts && i < args; ++i) {
+	if (!lua_isstring(l, i + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	DefaultResourceNames[i] = strdup(lua_tostring(l, i + 1));
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Define default names for the resources.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineDefaultResourceAmounts(SCM list)
 {
     int i;
@@ -844,10 +1381,49 @@ local SCM CclDefineDefaultResourceAmounts(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineDefaultResourceAmounts(lua_State* l)
+{
+    int i;
+    int j;
+    const char* value;
+    int args;
+
+    args = lua_gettop(l);
+    if (args & 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    for (j = 0; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	for (i = 0; i < MaxCosts; ++i) {
+	    if (!strcmp(value, DefaultResourceNames[i])) {
+		++j;
+		if (!lua_isnumber(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		DefaultResourceAmounts[i] = lua_tonumber(l, j + 1);
+		break;
+	    }
+	}
+	if (i == MaxCosts) {
+	    lua_pushfstring(l, "Resource not found: %s", value);
+	    lua_error(l);
+	}
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Debug unit slots.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclUnits(void)
 {
     Unit** slot;
@@ -888,10 +1464,13 @@ local SCM CclUnits(void)
 
     return gh_int2scm(destroyed);
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Compiled with sound.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclWithSound(void)
 {
 #ifdef WITH_SOUND
@@ -900,10 +1479,22 @@ local SCM CclWithSound(void)
     return SCM_BOOL_F;
 #endif
 }
+#elif defined(USE_LUA)
+local int CclWithSound(lua_State* l)
+{
+#ifdef WITH_SOUND
+    lua_pushboolean(l, 1);
+#else
+    lua_pushboolean(l, 0);
+#endif
+    return 1;
+}
+#endif
 
 /**
 **	Get Stratagus home path.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclGetStratagusHomePath(void)
 {
     const char* cp;
@@ -919,14 +1510,40 @@ local SCM CclGetStratagusHomePath(void)
 
     return gh_str02scm(buf);
 }
+#elif defined(USE_LUA)
+local int CclGetStratagusHomePath(lua_State* l)
+{
+    const char* cp;
+    char* buf;
+
+    cp = getenv("HOME");
+    buf = alloca(strlen(cp) + strlen(GameName) + sizeof(STRATAGUS_HOME_PATH) + 3);
+    strcpy(buf, cp);
+    strcat(buf, "/");
+    strcat(buf, STRATAGUS_HOME_PATH);
+    strcat(buf, "/");
+    strcat(buf, GameName);
+
+    lua_pushstring(l, buf);
+    return 1;
+}
+#endif
 
 /**
 **	Get Stratagus library path.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclGetStratagusLibraryPath(void)
 {
     return gh_str02scm(STRATAGUS_LIB_PATH);
 }
+#elif defined(USE_LUA)
+local int CclGetStratagusLibraryPath(lua_State* l)
+{
+    lua_pushstring(l, STRATAGUS_LIB_PATH);
+    return 1;
+}
+#endif
 
 /*............................................................................
 ..	Tables
@@ -939,6 +1556,7 @@ local SCM CclGetStratagusLibraryPath(void)
 **
 **	@return		FIXME: Nothing.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclLoadPud(SCM file)
 {
     char* name;
@@ -951,6 +1569,8 @@ local SCM CclLoadPud(SCM file)
     // FIXME: LoadPud should return an error
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Load a map. (Try in library path first)
@@ -959,6 +1579,7 @@ local SCM CclLoadPud(SCM file)
 **
 **	@return		FIXME: Nothing.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclLoadMap(SCM file)
 {
     char* name;
@@ -973,6 +1594,8 @@ local SCM CclLoadMap(SCM file)
     // FIXME: LoadPud should return an error
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define a map.
@@ -980,6 +1603,7 @@ local SCM CclLoadMap(SCM file)
 **	@param width	Map width.
 **	@param height	Map height.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineMap(SCM width, SCM height)
 {
     TheMap.Width = gh_scm2int(width);
@@ -994,6 +1618,8 @@ local SCM CclDefineMap(SCM width, SCM height)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /*............................................................................
 ..	Commands
@@ -1006,6 +1632,7 @@ local SCM CclDefineMap(SCM width, SCM height)
 */
 global void CclCommand(const char* command)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     char msg[80];
 #ifndef USE_GUILE
     int retval;
@@ -1021,6 +1648,8 @@ global void CclCommand(const char* command)
     DebugLevel3("\n%d=%s\n" _C_ retval _C_ msg);
 #endif
     SetMessage("%s", msg);
+#elif defined(USE_LUA)
+#endif
 }
 
 /*............................................................................
@@ -1032,7 +1661,7 @@ global void CclCommand(const char* command)
 */
 global void InitCcl(void)
 {
-#ifdef USE_GUILE
+#if defined(USE_GUILE)
     scm_init_guile();
 
     gh_eval_str("(display \"Guile: Enabling debugging...\\n\")"
@@ -1040,7 +1669,7 @@ global void InitCcl(void)
 	"(debug-enable 'backtrace)"
 	"(read-enable 'positions)"
 	"(define *scheme* 'guile)");
-#else
+#elif defined(USE_SIOD)
     char* sargv[5];
     char* buf;
     char  msg[] = "(define *scheme* 'siod)";
@@ -1063,7 +1692,19 @@ global void InitCcl(void)
     
     siod_init(5, sargv);
     repl_c_string(msg, 0, 0, sizeof(msg));
+#elif defined(USE_LUA)
+    Lua = lua_open();
+    luaopen_base(Lua);
+    luaopen_table(Lua);
+    luaopen_io(Lua);
+    luaopen_string(Lua);
+    luaopen_math(Lua);
+    luaopen_debug(Lua);
+    luaopen_loadlib(Lua);
+    lua_settop(Lua, 0);	    // discard any results
 #endif
+
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure0_0("library-path", CclStratagusLibraryPath);
     gh_new_procedure0_0("game-cycle", CclGameCycle);
     gh_new_procedure1_0("set-game-name!", CclSetGameName);
@@ -1092,6 +1733,38 @@ global void InitCcl(void)
     gh_new_procedureN("define-default-actions", CclDefineDefaultActions);
     gh_new_procedureN("define-default-resource-names", CclDefineDefaultResourceNames);
     gh_new_procedureN("define-default-resource-amounts", CclDefineDefaultResourceAmounts);
+#elif defined(USE_LUA)
+    lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
+    lua_register(Lua, "GameCycle", CclGameCycle);
+    lua_register(Lua, "SetGameName", CclSetGameName);
+    lua_register(Lua, "SetGameCycle", CclSetGameCycle);
+    lua_register(Lua, "SetGamePaused", CclSetGamePaused);
+    lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
+    lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
+
+    lua_register(Lua, "SetShowTips", CclSetShowTips);
+    lua_register(Lua, "SetCurrentTip", CclSetCurrentTip);
+    lua_register(Lua, "AddTip", CclAddTip);
+
+    lua_register(Lua, "SetSpeedResourcesHarvest", CclSetSpeedResourcesHarvest);
+    lua_register(Lua, "SetSpeedResourcesReturn", CclSetSpeedResourcesReturn);
+    lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
+    lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
+    lua_register(Lua, "SetSpeedUpgrade", CclSetSpeedUpgrade);
+    lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
+    lua_register(Lua, "SetSpeeds", CclSetSpeeds);
+
+    lua_register(Lua, "DefineDefaultResources", CclDefineDefaultResources);
+    lua_register(Lua, "DefineDefaultResourcesLow", CclDefineDefaultResourcesLow);
+    lua_register(Lua, "DefineDefaultResourcesMedium", CclDefineDefaultResourcesMedium);
+    lua_register(Lua, "DefineDefaultResourcesHigh", CclDefineDefaultResourcesHigh);
+    lua_register(Lua, "DefineDefaultIncomes", CclDefineDefaultIncomes);
+    lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
+    lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
+    lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
+
+    lua_register(Lua, "Load", CclLoad);
+#endif
 
     NetworkCclRegister();
     IconCclRegister();
@@ -1120,6 +1793,7 @@ global void InitCcl(void)
 
     EditorCclRegister();
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure1_0("load-pud", CclLoadPud);
     gh_new_procedure1_0("load-map", CclLoadMap);
     gh_new_procedure2_0("define-map", CclDefineMap);
@@ -1196,6 +1870,18 @@ global void InitCcl(void)
 #endif
 
     print_welcome();
+#elif defined(USE_LUA)
+//    lua_register(Lua, "LoadPud", CclLoadPud);
+//    lua_register(Lua, "LoadMap", CclLoadMap);
+//    lua_register(Lua, "DefineMap", CclDefineMap);
+
+//    lua_register(Lua, "Units", CclUnits);
+
+    lua_register(Lua, "WithSound", CclWithSound);
+    lua_register(Lua, "GetStratagusHomePath", CclGetStratagusHomePath);
+    lua_register(Lua, "GetStratagusLibraryPath",
+	CclGetStratagusLibraryPath);
+#endif
 }
 
 /**
@@ -1206,16 +1892,28 @@ local void LoadPreferences1(void)
     FILE* fd;
     char buf[1024];
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 #ifdef USE_WIN32
     strcpy(buf, "preferences1.ccl");
 #else
     sprintf(buf, "%s/%s/preferences1.ccl", getenv("HOME"), STRATAGUS_HOME_PATH);
 #endif
+#elif defined(USE_LUA)
+#ifdef USE_WIN32
+    strcpy(buf, "preferences1.lua");
+#else
+    sprintf(buf, "%s/%s/preferences1.lua", getenv("HOME"), STRATAGUS_HOME_PATH);
+#endif
+#endif
 
     fd = fopen(buf, "r");
     if (fd) {
 	fclose(fd);
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	vload(buf, 0, 1);
+#elif defined(USE_LUA)
+	LuaLoadFile(buf);
+#endif
     }
 }
 
@@ -1227,17 +1925,30 @@ local void LoadPreferences2(void)
     FILE* fd;
     char buf[1024];
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 #ifdef USE_WIN32
     sprintf(buf, "%s/preferences2.ccl", GameName);
 #else
     sprintf(buf, "%s/%s/%s/preferences2.ccl", getenv("HOME"),
 	STRATAGUS_HOME_PATH, GameName);
 #endif
+#elif defined(USE_LUA)
+#ifdef USE_WIN32
+    sprintf(buf, "%s/preferences2.lua", GameName);
+#else
+    sprintf(buf, "%s/%s/%s/preferences2.lua", getenv("HOME"),
+	STRATAGUS_HOME_PATH, GameName);
+#endif
+#endif
 
     fd = fopen(buf, "r");
     if (fd) {
 	fclose(fd);
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	vload(buf, 0, 1);
+#elif defined(USE_LUA)
+	LuaLoadFile(buf);
+#endif
     }
 }
 
@@ -1254,6 +1965,7 @@ global void SavePreferences(void)
     //	    This file is loaded before stratagus.ccl
     //
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 #ifdef USE_WIN32
     strcpy(buf, "preferences1.ccl");
 #else
@@ -1273,13 +1985,35 @@ global void SavePreferences(void)
     fprintf(fd, "(set-video-resolution! %d %d)\n", VideoWidth, VideoHeight);
     
     fclose(fd);
+#elif defined(USE_LUA)
+#ifdef USE_WIN32
+    strcpy(buf, "preferences1.lua");
+#else
+    sprintf(buf, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
+    mkdir(buf, 0777);
+    strcat(buf, "/preferences1.lua");
+#endif
 
+    fd = fopen(buf, "w");
+    if (!fd) {
+	return;
+    }
+
+    fprintf(fd, "--[[\n");
+    fprintf(fd, "	$Id$\n");
+    fprintf(fd, "]]\n");
+
+    fprintf(fd, "SetVideoResolution(%d, %d)\n", VideoWidth, VideoHeight);
+    
+    fclose(fd);
+#endif
 
     //
     //	    preferences2.ccl
     //	    This file is loaded after stratagus.ccl
     //
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 #ifdef USE_WIN32
     sprintf(buf, "%s/preferences2.ccl", GameName);
 #else
@@ -1360,6 +2094,25 @@ global void SavePreferences(void)
     }
 #endif
 #endif
+#elif defined(USE_LUA)
+#ifdef USE_WIN32
+    sprintf(buf, "%s/preferences2.lua", GameName);
+#else
+    sprintf(buf, "%s/%s/%s/preferences2.lua", getenv("HOME"),
+	STRATAGUS_HOME_PATH, GameName);
+#endif
+
+    fd = fopen(buf, "w");
+    if (!fd) {
+	return;
+    }
+
+    fprintf(fd, "--[[\n");
+    fprintf(fd, "	$Id$\n");
+    fprintf(fd, "]]\n");
+
+    fprintf(fd, "SetVideoFullscreen(%s)\n", VideoFullScreen ? "true" : "false");
+#endif
 
     fclose(fd);
 }
@@ -1370,7 +2123,9 @@ global void SavePreferences(void)
 global void LoadCcl(void)
 {
     char* file;
+#if defined(USE_GUILE) || defined(USE_SIOD)
     char* s;
+#endif
     char buf[1024];
 
     //
@@ -1380,11 +2135,15 @@ global void LoadCcl(void)
     file = LibraryFileName(CclStartFile, buf);
     ShowLoadProgress("Script %s\n", file);
     LoadPreferences1();
+#if defined(USE_GUILE) || defined(USE_SIOD)
     if ((s = strrchr(file, '.')) && s[1] == 'C') {
 	fast_load(gh_str02scm(file), NIL);
     } else {
 	vload(file, 0, 1);
     }
+#elif defined(USE_LUA)
+    LuaLoadFile(file);
+#endif
     LoadPreferences2();
     CclInConfigFile = 0;
     CclGarbageCollect(0);		// Cleanup memory after load

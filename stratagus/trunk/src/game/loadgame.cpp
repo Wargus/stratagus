@@ -76,7 +76,9 @@
 */
 global void CleanModules(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM var;
+#endif
 
     EndReplayLog();
     CleanMessages();
@@ -114,8 +116,10 @@ global void CleanModules(void)
     //
     //	Free our protected objects, AI scripts, unit-type properties.
     //
+#if defined(USE_GUILE) || defined(USE_SIOD)
     var = gh_symbol2scm("*ccl-protect*");
     setvar(var, NIL, NIL);
+#endif
 }
 
 /**
@@ -217,18 +221,25 @@ global void LoadModules(void)
 */
 global void LoadGame(char* filename)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     int old_siod_verbose_level;
+#endif
     unsigned long game_cycle;
 
     CleanModules();
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
     old_siod_verbose_level = siod_verbose_level;
     siod_verbose_level = 4;
     CclGarbageCollect(0);
     siod_verbose_level = old_siod_verbose_level;
+#endif
     InitVisionTable();
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_load(filename);
     CclGarbageCollect(0);
+#elif defined(USE_LUA)
+#endif
 
     game_cycle = GameCycle;
     // FIXME: log should be loaded from the save game

@@ -1010,6 +1010,7 @@ global void CleanSelections(void)
 **	@param id	New group identifier
 **	@return		old value
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetGroupId(SCM id)
 {
     SCM old;
@@ -1019,6 +1020,8 @@ local SCM CclSetGroupId(SCM id)
 
     return old;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define the current selection.
@@ -1026,6 +1029,7 @@ local SCM CclSetGroupId(SCM id)
 **	@param num	Number of units in selection
 **	@param units	Units in selection
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSelection(SCM num, SCM units)
 {
     int i;
@@ -1044,14 +1048,18 @@ local SCM CclSelection(SCM num, SCM units)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for selections.
 */
 global void SelectionCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure1_0("set-group-id!", CclSetGroupId);
     gh_new_procedure2_0("selection", CclSelection);
+#endif
 }
 
 //@}

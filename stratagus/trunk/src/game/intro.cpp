@@ -1373,6 +1373,7 @@ global void CleanCclCredits()
 **
 **	@todo	'comment and 'title are only parsed, but not used.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclCredits(SCM list)
 {
     SCM value;
@@ -1416,6 +1417,8 @@ local SCM CclCredits(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for credits.
@@ -1424,7 +1427,9 @@ global void CreditsCclRegister(void)
 {
     GameCredits.Background = NULL;
     GameCredits.Names = NULL;
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("credits", CclCredits);
+#endif
 }
 
 /**
@@ -1434,6 +1439,7 @@ global void CreditsCclRegister(void)
 **	specifying where in the list it should be added.  If no number is
 **	given it is added at the end.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAddObjective(SCM list)
 {
     int i;
@@ -1481,10 +1487,13 @@ local SCM CclAddObjective(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Parse the remove objective ccl function
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclRemoveObjective(SCM objective)
 {
     int num;
@@ -1510,10 +1519,13 @@ local SCM CclRemoveObjective(SCM objective)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set the objectives
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetObjectives(SCM list)
 {
     int i;
@@ -1533,10 +1545,13 @@ local SCM CclSetObjectives(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Parse the define-ranks ccl function
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineRanks(SCM list)
 {
     PlayerRanks* rank;
@@ -1583,16 +1598,88 @@ local SCM CclDefineRanks(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineRanks(lua_State* l)
+{
+    PlayerRanks* rank;
+    const char* race;
+    int i;
+    int j;
+    int len;
+    int args;
+
+    if (lua_gettop(l) != 2 || !lua_isstring(l, 1) || !lua_istable(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    rank = NULL;
+    race = lua_tostring(l, 1);
+    for (i = 0; i < PlayerRaces.Count; ++i) {
+	if (!strcmp(PlayerRaces.Name[i], race)) {
+	    rank = &Ranks[i];
+	    break;
+	}
+    }
+    if (i == PlayerRaces.Count) {
+	lua_pushfstring(l, "Invalid race name: %s", race);
+	lua_error(l);
+    }
+
+    if (rank->Ranks) {
+	for (i = 0; rank->Ranks[i]; ++i) {
+	    free(rank->Ranks[i]);
+	}
+	free(rank->Ranks);
+	free(rank->Scores);
+    }
+
+    args = luaL_getn(l, 2);
+    len = args / 2;
+
+    rank->Ranks = (char**)malloc((len + 1) * sizeof(char*));
+    rank->Ranks[len] = NULL;
+    rank->Scores = (int*)malloc(len * sizeof(int));
+
+    i = 0;
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, 2, j + 1);
+	if (!lua_isnumber(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	rank->Scores[i] = lua_tonumber(l, -1);
+	lua_pop(l, 1);
+	++j;
+	lua_rawgeti(l, 2, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	rank->Ranks[i] = strdup(lua_tostring(l, -1));
+	lua_pop(l, 1);
+	++i;
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Register CCL functions for objectives
 */
 global void ObjectivesCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("add-objective", CclAddObjective);
     gh_new_procedure1_0("remove-objective", CclRemoveObjective);
     gh_new_procedureN("set-objectives!", CclSetObjectives);
     gh_new_procedureN("define-ranks", CclDefineRanks);
+#elif defined(USE_LUA)
+//    lua_register(Lua, "AddObjective", CclAddObjective);
+//    lua_register(Lua, "RemoveObjective", CclRemoveObjective);
+//    lua_register(Lua, "SetObjectives", CclSetObjectives);
+    lua_register(Lua, "DefineRanks", CclDefineRanks);
+#endif
 }
 
 /**
