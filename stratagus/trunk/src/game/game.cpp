@@ -296,7 +296,13 @@ global void CreateGame(char* filename, WorldMap* map)
     //
     //	Network part
     //
-    InitNetwork();
+    if( NetPlayers>1 || NetworkArg ) {	// with network
+	InitNetwork1();
+	InitNetwork2();
+    } else {
+	NetworkFildes=-1;
+	NetworkInSync=1;
+    }
 
     //
     //  Init units' groups
