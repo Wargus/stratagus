@@ -7390,7 +7390,8 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 
     // Don't display slots not in use
     //FIXME: HardCoded Number of Items in list
-    for (; j <= 5 * (numparams + 1); j += numparams + 1) {
+    // 5 is the hardcoded value
+    for (; j <= numparams * 5; j += numparams + 1) {
 	// fill the menus with the right info.
 	menu->Items[j].d.text.text = NULL;
 	menu->Items[j + 1].d.text.text = NULL;
