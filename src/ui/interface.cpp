@@ -1133,8 +1133,9 @@ global int HandleKeyModifiersUp(unsigned key,
 */
 global void HandleKeyDown(unsigned key,unsigned keychar)
 {
-    if( HandleKeyModifiersDown(key,keychar) )
+    if( HandleKeyModifiersDown(key,keychar) ) {
 	return;
+    }
 
     // Handle All other keys
 
