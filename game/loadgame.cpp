@@ -99,6 +99,7 @@ global void CleanModules(void)
     CleanMissiles();
     CleanTilesets();
     CleanMap();
+    CleanReplayLog();
 #ifdef HIERARCHIC_PATHFINDER
     PfHierClean ();
 #endif
