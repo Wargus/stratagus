@@ -212,8 +212,6 @@ extern void DrawIcon(const Player*, Icon*, int, int);
 	/// Draw icon of an unit
 extern void DrawUnitIcon(const Player*, Icon*, unsigned, int, int);
 
-	/// Save icons
-extern void SaveIcons(CLFile*);
 	/// Register CCL features
 extern void IconCclRegister(void);
 
