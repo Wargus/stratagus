@@ -293,9 +293,6 @@ enum _tileset_nr_ {
     TilesetSwamp,			/// Reference number for swamp
 };
 
-// FIXME: allow more tilesets
-#define TilesetMax		4	/// Biggest supported tileset number
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
