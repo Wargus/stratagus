@@ -10,7 +10,7 @@
 //
 /**@name ccl.c		-	The craft configuration language. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -153,7 +153,11 @@ local SCM CclSetGameCycle(SCM cycle)
 */
 local SCM CclSetGamePaused(SCM paused)
 {
-    GamePaused=gh_scm2int(paused);
+    if( gh_boolean_p(paused) ) {
+	GamePaused=gh_scm2bool(paused);
+    } else {
+	GamePaused=gh_scm2int(paused);
+    }
     return SCM_UNSPECIFIED;
 }
 
