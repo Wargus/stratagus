@@ -69,6 +69,7 @@ local int SavedMapPositionY[4];	/// Saved map position Y
 local char Input[80];		/// line input for messages/long commands
 local int InputIndex;		/// current index into input
 local char InputStatusLine[80];	/// Last input status line
+global char GameRunning;	/// Current running state
 global char GamePaused;		/// Current pause state
 global enum _iface_state_ InterfaceState; /// Current interface state
 
@@ -574,7 +575,8 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    Exit(0);
+	    GameRunning=0;
+	    break;
 
 	case KeyCodeUp:
 	case KeyCodeKP8:
