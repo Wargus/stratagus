@@ -1578,6 +1578,7 @@ static int CclLoadPud(lua_State* l)
 	LoadPud(name, &TheMap);
 
 	// FIXME: LoadPud should return an error
+
 	return 0;
 }
 
@@ -1594,11 +1595,16 @@ static int CclLoadMap(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	name = LuaToString(l, 1);
+
+	// TODO Check if there a map has already been loaded. 
+	//  If true, memory needs to be freed.
+
 	if (strcasestr(name, ".pud")) {
 		LoadPud(name, &TheMap);
+		return 0;
 	}
 
-	// FIXME: LoadPud should return an error
+	LuaError(l, "unknown map format");
 	return 0;
 }
 

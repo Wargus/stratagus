@@ -430,6 +430,28 @@ void FreeMapInfo(MapInfo* info)
 }
 
 /**
+**  Alocate and initialise map table
+**/
+void CreateMap(int width, int height) 
+{
+	if (!TheMap.Fields) {
+		TheMap.Fields=calloc(width * height, sizeof(*TheMap.Fields));
+		if (!TheMap.Fields) {
+			perror("calloc()");
+			ExitFatal(-1);
+		}
+		TheMap.Visible[0]=calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
+		if (!TheMap.Visible[0]) {
+			perror("calloc()");
+			ExitFatal(-1);
+		}
+		InitUnitCache();
+	} else { 
+		DebugPrint("Warning: Fields already allocated\n");
+	}
+}
+
+/**
 **  Cleanup the map module.
 */
 void CleanMap(void)
