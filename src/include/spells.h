@@ -344,14 +344,8 @@ SpellFunc CastSpawnPortal;
 SpellFunc CastSpawnMissile;
 
 #ifdef META_LUA
-
 	/// Initialize Spell scripting.
 extern void ScriptSpellInit(void);
-    /// Register the spell-table user-data.
-extern void ScriptSpellTableCreateUserdata(lua_State* l);
-	/// Register a spell user-data.
-extern void ScriptSpellCreateUserdata(lua_State* l, SpellType* spell);
-
 #endif
 
 //@}

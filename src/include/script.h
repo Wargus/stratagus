@@ -87,15 +87,42 @@ extern void CleanCclCredits();            /// Free Ccl Credits Memory
 #ifdef META_LUA
 
 /*----------------------------------------------------------------------------
---  Functions.
+--  Functions and data structures.
 ----------------------------------------------------------------------------*/
 
+	/// Script get/set function prototype. The values is on the lua stack.
+typedef int ScriptGetSetFunction(void* object, const char* key, lua_State* l);
+
+	/// Structure for a script proxy. Don't mess with this outside of scripting
+typedef struct {
+	void* Object;                          /// The actual Object
+	ScriptGetSetFunction* GetFunction;        /// Get function
+	ScriptGetSetFunction* SetFunction;        /// Set function
+} ScriptProxy;
+
+	/// Userdata Constructor.
+extern void ScriptDoCreateUserdata(lua_State* l, void* Object,
+		ScriptGetSetFunction* GetFunction, ScriptGetSetFunction* SetFunction);
 	/// Really dumb set function that always goes into an error.
 extern int ScriptSetValueBlock(lua_State* l);
 
 /*----------------------------------------------------------------------------
 --  Quick macros for meta lua. Use them in well-formed get/set functions.
 ----------------------------------------------------------------------------*/
+
+	/// Macro to call ScriptDoCreateUserdata w/o casts.
+#define ScriptCreateUserdata(l, o, g, s) (ScriptDoCreateUserdata(l, o, \
+		(ScriptGetSetFunction*)(g), (ScriptGetSetFunction*)(s)))
+
+    /// Quick way to fail in a function. You can use _C_ like in DebugLevelx
+#ifdef DEBUG
+#define LuaError(l, args) \
+	{ lua_pushfstring(l, args); lua_error(l); return 0; }
+#else
+	/// Save on memory.
+#define LuaError(l, args) \
+	{ lua_pushstring(l, "Lua error"); lua_error(l); return 0; }
+#endif
 
 //
 //	Pushing 0 as a string to lua is ok. strdup-ing 0 is not.

@@ -426,9 +426,107 @@ global void MissileCclRegister(void)
 }
 
 #ifdef META_LUA
+
+	/// Get func for SpellType 
+local int ScriptMissileTypeGet(MissileType* missiletype, const char* key, lua_State* l);
+	/// Set func for SpellType 
+local int ScriptMissileTypeSet(MissileType* missiletype, const char* key, lua_State* l);
+
 /**
-**  Register
+**  Create a new missile Type
+**
+**	@param l    Lua state
 */
+local int ScriptMissileTypesCreate(lua_State* l)
+{
+	LuaError(l, "Function not implemented.\n");
+}
+
+/**
+**	Get function for a missile type userdata.
+**
+**	@param missiletype	Pointer to the missile type.
+**	@param key      Key string.
+*/
+local int ScriptMissileTypeGet(MissileType* missiletype, const char* key, lua_State* l)
+{
+	LuaError(l, "Function not implemented.\n");
+}
+
+/**
+**	Set function for a missile type userdata.
+**
+**	@param missiletype	Pointer to the missile type.
+**	@param key      Key string.
+*/
+local int ScriptMissileTypeSet(MissileType* missiletype, const char* key, lua_State* l)
+{
+	LuaError(l, "Function not implemented.\n");
+}
+
+/**
+**	Get function for the big spell namespace.
+*/
+local int ScriptMissileTypesNamespaceGet(lua_State* l)
+{
+	int i;
+	const char* key;
+	MissileType* mtype;
+
+	//  Index with number
+	if (lua_isnumber(l, 2)) {
+		i = LuaToNumber(l, 2);
+		DebugLevel3Fn("(%d)\n" _C_ i);
+		if (i < 0 || i >= NumMissileTypes) {
+			LuaError(l, "Missile index out of range");
+		}
+		ScriptCreateUserdata(l, MissileTypes[i], ScriptMissileTypeGet, ScriptMissileTypeSet);
+		return 1;
+	}
+
+	//  Index with string.
+	key = LuaToString(l, 2);
+
+	META_GET_INT("n", NumMissileTypes);
+
+	if ((mtype = MissileTypeByIdent(key))) {
+		ScriptCreateUserdata(l, mtype, ScriptMissileTypeGet, ScriptMissileTypeSet);
+		return 1;
+	}
+
+	LuaError(l, "Spell \"%s\" doesn't exist.\n" _C_ key);
+}
+
+/**
+**	Initialize missile scripting. The main table is at -1
+**
+**	@param l   The lua state.
+*/
+global void ScriptMissileInit(void)
+{
+	// Create Stratagus.Missiles namespace.
+	// No userdata, there's no data. And no finalizer
+	lua_pushstring(Lua, "MissileTypes");
+	lua_newtable(Lua);
+
+	// Generate the metatable
+	lua_newtable(Lua);
+	lua_pushstring(Lua, "__index");
+	lua_pushcfunction(Lua, ScriptMissileTypesNamespaceGet);
+	lua_settable(Lua, -3);
+	lua_pushstring(Lua, "__newindex");
+	lua_pushcfunction(Lua, ScriptSetValueBlock); // Read-Only
+	lua_settable(Lua, -3);
+	lua_setmetatable(Lua, -2);
+
+	// Add functions.
+	lua_pushstring(Lua, "Create");
+	lua_pushcfunction(Lua, ScriptMissileTypesCreate);
+	lua_rawset(Lua, -3);
+
+	lua_rawset(Lua, -3);
+}
+
 #endif
 
 //@}
