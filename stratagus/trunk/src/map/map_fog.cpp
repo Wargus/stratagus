@@ -254,6 +254,12 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
     int width;
     int v;
     int p;
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+    int w;
+    int h;
+    Unit** corpses;
+    Unit** remove;
+#endif
 
     // Mark as seen
     if( !range ) {			// zero sight range is zero sight range
@@ -294,6 +300,30 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		    case 1:		// Unseen
 			// FIXME: mark for screen update
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=2;
+#ifdef BUILDING_DESTROYED
+			if( player->Type == PlayerPerson ) {
+			corpses = &DestroyedBuildings;
+			while( *corpses ) {
+			    if( !((*corpses)->Visible & 1 << player->Player) ) {
+				w = (*corpses)->Type->TileWidth;
+				h = (*corpses)->Type->TileHeight;
+				if( i >= (*corpses)->X && y >= (*corpses)->Y
+				    && i < (*corpses)->X+w && y < (*corpses)->Y+h ) {
+					(*corpses)->Visible |= (1 << player->Player);
+				}
+			    }
+			    remove = corpses;
+			    corpses=&(*corpses)->Next;
+			    if( (*remove)->Visible == 0xFFFF ) {
+				ReleaseUnit( *remove );
+			    }
+			}
+                        }
+#endif
+			if( IsTileVisible(ThisPlayer,i,y) > 1) {
+			    MapMarkSeenTile(i,y);
+			}
+                        
 			break;
 		    case 255:		// Overflow
 			DebugLevel0Fn("Visible overflow (Player): %d\n" _C_ p);
@@ -302,9 +332,6 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		    default:		// seen -> seen
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=v+1;
 			break;
-		}
-		if( IsTileVisible(ThisPlayer,i,y) > 1) {
-		    MapMarkSeenTile(i,y);
 		}
 	    }
 	}
@@ -364,9 +391,6 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 	for( i=x; i<=x+width; ++i ) {
 	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
 		v=TheMap.Fields[i+y*TheMap.Width].Visible[p];
-		if( IsTileVisible(ThisPlayer,i,y) > 1) {
-		    MapMarkSeenTile(i,y);
-		}
 		switch( v ) {
 		    case 255:
 			TheMap.Fields[i+y*TheMap.Width].Visible[p] =
@@ -374,8 +398,13 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 			++TheMap.Fields[i+y*TheMap.Width].Visible[p];
 		    case 0:		// Unexplored
 		    case 1:
-			//We are at minimum, don't do anything.
+			// We are at minimum, don't do anything.
 			break;
+		    case 2:
+		    	// Check visible Tile, then deduct...
+			if( IsTileVisible(ThisPlayer,i,y) > 1) {
+			    MapMarkSeenTile(i,y);
+			}
 		    default:		// seen -> seen
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=v-1;
 			break;
