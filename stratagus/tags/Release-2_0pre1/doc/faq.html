@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+----	$Id$
+
+----	(c) Copyright 2001-2003 by Lutz Sammer
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; version 2 dated June, 1991.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>FAQ for Stratagus Version 1.18</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body>
+
+<h1>FAQ for Stratagus Version 1.18</h1>
+<hr>
+
+For any questions not mentioned here, please visit
+<a href="http://stratagus.org">http://stratagus.org</a>.<p>
+
+    <b>Q: gzseek already defined or undefined.</b><br>
+    A: You have an incompatible libpng version, install the latest version.<p>
+
+    <b>Q: .depend:1: *** missing separator.  Stop.</b><br>
+    A: The .depend file is broken, simply 'rm .depend' and 'make depend' 
+    again. If the problem still occurs, you will need to 'make' without 
+    making dependencies first.<p>
+
+    <b>Q: Does Stratagus work with ALSA?</b><br>
+    A: Yes, if you compiled SDL with alsa support and you compiled stratagus
+    using SDL video mode.<p>
+
+    <b>Q: Does Stratagus work with the W*rcr*ft 2 BNE version?</b><br>
+    A: No. The file format of this version is currently not supported.<p>
+
+
+    <b>Q: What W*rcr*ft 2 CD's do work with Stratagus?</b><br>
+    A: If you have any trouble with extracting, please contact us. 
+    Also if you have a CD not listed here, please send us the test results.
+
+	<ul>
+	    <li>US Expansion (both MAC/DOS)
+	    <li>US Original (both MAC/DOS)
+	    <li>UK/Australian Original
+	    <li>UK/Australian Expansion
+	    <li>German Original
+	    <li>German Expansion
+	    <li>Spanish Original
+	</ul><p>
+
+    <b>Q: Can I use Stratagus to join in a W*rcr*ft 2 network game?</b><br>
+    A: Sorry, Stratagus use its own network protocol. 
+    The protocol needs the exact same code executed on all machines, 
+    and it is not possible to have this with the original WC2, 
+    therefore you can only connect to a Stratagus server.<p>
+
+    <b>Q: What about other RTS games?</b><br>
+    A: St*rcr*ft and W*rcr*ft 1 support is in development. T*ber*an Sun 
+    may be added in the distant future. For the old C&amp;C games, you can 
+    use freecnc.<p>
+
+    <b>Q: What ports does the Stratagus network protocol use?</b><br>
+    A: 6660 by default, you may start stratagus with '-Pxxxx' flag to 
+    use port xxxx instead.<p>
+
+    <b>Q: Does stratagus support internet/metaserver play?</b><br>
+    A: Not yet, but this is a planned feature and may be added for 1.19<p>
+
+    <b>Q: I get only a black window after I have installed it on windows.
+    What have I done wrong?</b><br>
+    A: Install Stratagus to the C: drive. This has solved the problem for
+    everybody who has had this bug.<p>
+
+    <b>Q: I have installed the windows version, when I start Stratagus I get
+    only the splash screen and the game stops, but consumes 100% CPU. What
+    have I done wrong?</b><br>
+    A: Please wait for a couple of minutes for the game to start. There are
+    some machines (Win98 and Win2000) that will still not start after some
+    time.  On all machines I have tested it, it works.  I have no idea where
+    the problem is, any help is welcome.<p>
+
+    <b>Q: My question isn't answered here.</b><br>
+    A: Send an e-mail to our hard working
+    <a href="mailto:nehal@canada.com">support</a> team. :)<p>
+
+<hr>
+(C) Copyright 1998-2003 by The <a href="http://stratagus.sf.net">Stratagus</a> Project 
+under the <a href="gpl.html">GNU General Public License</a>.<br>
+All trademarks and copyrights on this page are owned by their respective owners.<br>
+</body>
+</html>

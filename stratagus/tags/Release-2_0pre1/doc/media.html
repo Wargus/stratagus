@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+----	$Id$
+
+----	(c) Copyright 2003 by Nehal Mistry
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; version 2 dated June, 1991.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Stratagus 1.18 Media Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body>
+
+<h1>Stratagus 1.18 Media Documentation</h1>
+<hr>
+
+    <h2>Graphics</h2>
+
+    Please take a look at <a href="graphics/palette.html">graphics/palette.html</a> 
+    before working on graphics to get an idea of the palette.
+
+    <h4>Buildings</h4>
+
+    Buildings are simple to do. Each graphic consists of a .png file using 
+    the palette format specified in the link above. The top half of the graphic 
+    is used for the main image, and the bottom half is for the construction. 
+    Here is an example of 'farm.png'. Please also see the ccl files.<p>
+
+    <img src="graphics/farm.png" alt=farm><br>
+
+    <h4>Units</h4>
+
+    Units are a little more complex as there are more sections per graphic. 
+    The 5 columns represent the directions. The rows are varied among 
+    different type of graphics, see the ccl files for more info. Here is 
+    an example of 'peasant.png'. First 5 rows are used for movement, 
+    next 5 for chopping, and the next 3 for dieing. Note that the peasant 
+    has 2 other graphics, one for carrying gold, another for carrying wood.<p>
+
+    <img src="graphics/peasant.png" alt=peasant><br>
+
+    <h2>Sounds</h2>
+
+    Any format of sound will work with Stratagus, although to save space it is 
+    recommended that you use 16 bit, 22050 kHz, mono format. To save more 
+    space, it is recommended that you gzip the file too.<p>
+
+    All the sound entry data is in data/ccl/sound.ccl, 
+    Here is an example ccl entry for: data/sounds/human/buildings/farm.wav.gz<p>
+
+    <pre>(make-sound "farm-selected" "human/buildings/farm.wav")</pre><p>
+
+    Note how the '.gz' suffix isn't needed in the ccl entry, 
+    the Stratagus engine detects this automatically.<p>
+
+    You may look through the ccl file for more examples.<p>
+
+<hr>
+(C) Copyright 1998-2003 by The <a href="http://stratagus.sf.net">Stratagus</a> Project 
+under the <a href="gpl.html">GNU General Public License</a>.<br>
+All trademarks and copyrights on this page are owned by their respective owners.<br>
+</body>
+</html>

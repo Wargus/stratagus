@@ -1,0 +1,193 @@
+<!--
+----	$Id$
+
+----	(c) Copyright 2001-2003 by Lutz Sammer
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; version 2 dated June, 1991.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+<html><head>
+    <title>Stratagus tileset graphic format</title>
+</head>
+<body>
+    <h1>Stratagus tileset graphic format</h1>
+<hr>
+
+The stratagus playfield is build with tiles each with the size of 32x32 pixels.
+
+<h2>Tileset graphic file format</h2>
+
+The graphic data for tiles are stored in the directory:
+    $STRATAGUSHOME/data/graphic/tileset.<p>
+
+<h3>Fantasy warfare summer tileset</h3>
+
+<div align=center>
+<img src="summer_klein.png" alt="[SUMMER]">
+</div>
+
+<ul>
+<li>Fog of war mask.<br>
+<img src="fog_of_war.png" alt="[FOG OF WAR]">
+<li>Human walls.<br>
+<img src="human_wall.png" alt="[HUMAN WALL]">
+<li>Orc walls.<br>
+<img src="orc_wall.png" alt="[ORC WALL]">
+<li>Defect human walls.<br>
+<img src="defect_human_wall.png" alt="[DEFECT HUMAN WALL]">
+<li>Defect orc walls.<br>
+<img src="defect_orc_wall.png" alt="[DEFECT ORC WALL]">
+<li>Destroyed walls.<br>
+<img src="destroyed_wall.png" alt="[DESTROYED WALL]">
+<li>Forest and ground.<br>
+<img src="forest_and_ground.png" alt="[FOREST GROUND]">
+<li>Rocks and coast.<br>
+<img src="rocks_and_coast.png" alt="[ROCKS COAST]">
+<li>Light and dark coast.<br>
+<img src="light_and_dark_coast.png" alt="[LIGHT DARK COAST]">
+<li>Water and coast.<br>
+<img src="water_and_coast.png" alt="[WATER COAST]">
+<li>Light and dark ground.<br>
+<img src="light_and_dark_ground.png" alt="[LIGHT DARK GROUND]">
+<li>Water and light coast.<br>
+<img src="water_and_coast.png" alt="[WATER COAST]">
+<li>Light and dark water.<br>
+<img src="light_and_dark_water.png" alt="[LIGHT DARK WATER]">
+<li>Light coast.<br>
+<img src="light_coast.png" alt="[LIGHT COAST]">
+<li>Dark coast.<br>
+<img src="dark_coast.png" alt="[DARK COAST]">
+<li>Light ground.<br>
+<img src="light_ground.png" alt="[LIGHT GROUND]">
+<li>Dark ground.<br>
+<img src="dark_ground.png" alt="[DARK GROUND]">
+</ul>
+
+<h2>Tileset map file format</h2>
+
+The tiles are stored in the map with this numbers.<p>
+The mapping from the map tile number to the graphic tile number is stored
+in the file $STRATAGUSHOME/data/ccl/tileset.ccl.<p>
+
+The tiles in the map are numbered from 0 to 0x9DF (2527).
+
+<ul>
+<li>0x0000 - 0x000F unused
+<li>0x0010 - 0x001F solid light water
+<li>0x0020 - 0x002F solid dark water
+<li>0x0030 - 0x003F solid light coast
+<li>0x0040 - 0x004F solid dark coast
+<li>0x0050 - 0x005F solid light ground
+<li>0x0060 - 0x006F solid dark ground
+<li>0x0070 - 0x007F solid forest
+<li>0x0080 - 0x008F solid mountains
+<li>0x0090 - 0x009F solid human walls
+    <ul>
+    <li>0x0 Solid wall
+    <li>0x2 defect wall
+    <li>0x4 destroyed wall
+    </ul>
+<li>0x00A0 - 0x00AF solid orc walls
+    <br>See solid human walls.
+<li>0x00B0 - 0x00BF solid human walls
+    <br>See solid human walls.
+<li>0x00C0 - 0x00CF solid orc walls
+    <br>See solid human walls.
+<li>0x00D0 - 0x00FF unused
+<li>0x0100 - 0x01FF dark and light water
+    <ul>
+    <li>0x0* filled upper left
+    <li>0x1* filled upper right
+    <li>0x2* filled upper half
+    <li>0x3* filled lower left
+    <li>0x4* filled left half
+    <li>0x5* clear upper left and lower right
+    <li>0x6* clear lower right
+    <li>0x7* filled lower right
+    <li>0x8* filled upper left and lower right
+    <li>0x9* clear left half
+    <li>0xA* clear lower left
+    <li>0xB* clear upper half
+    <li>0xC* clear upper right
+    <li>0xD* clear upper left
+    <li>0xE* unused
+    <li>0xF* unused
+    </ul>
+<li>0x0200 - 0x02FF water and coast
+    <br>See dark and light water
+<li>0x0300 - 0x03FF dark and light coast
+    <br>See dark and light water
+<li>0x0400 - 0x04FF mountain and coast
+    <br>See dark and light water
+<li>0x0500 - 0x05FF coast and ground
+    <br>See dark and light water
+<li>0x0600 - 0x06FF dark and light ground
+    <br>See dark and light water
+<li>0x0700 - 0x07FF forest and ground
+    <br>See dark and light water
+<li>0x0800 - 0x08FF human wall
+    <br>See dark and light water
+<li>0x0900 - 0x09FF orc wall
+    <br>See dark and light water
+<li>0x0A00 - 0xFFFF unused
+</ul>
+
+<h3>Palette</h3>
+
+The palette are stored with the tilesets.<p>
+This will I change later.
+
+<table>
+<tr><td>  0	</td><td>black	</td></tr>
+<tr><td>  1	</td><td>blue player color on minimap	</td></tr>
+<tr><td>  2	</td><td>yellow player color on minimap	</td></tr>
+<tr><td>  3	</td><td>flash red/green attacked building on minimap</td></tr>
+<tr><td>12-15	</td><td>4 colors for yellow player	</td></tr>
+<tr><td>38- 47	</td><td>Water color cycle map	</td></tr>
+<tr><td>48- 56	</td><td>Water/Coast color cycle map	</td></tr>
+<tr><td>104	</td><td>Reverse color 1 font	</td></tr>
+<tr><td>149	</td><td>Dark green for hit points	</td></tr>
+<tr><td>192	</td><td>Color 0 font	</td></tr>
+<tr><td>199	</td><td>Color 1 font	</td></tr>
+<tr><td>200	</td><td>Color 2 font	</td></tr>
+<tr><td>202	</td><td>Pulsated red (circle of power) </td></tr>
+<tr><td>206	</td><td>Color for mana points	</td></tr>
+<tr><td>208	</td><td>red player color on minimap	</td></tr>
+<tr><td>208-211	</td><td>4 colors for red player	</td></tr>
+<tr><td>212-215	</td><td>4 colors for blue player	</td></tr>
+<tr><td>216	</td><td>green player color on minimap	</td></tr>
+<tr><td>216-219	</td><td>4 colors for green player	</td></tr>
+<tr><td>220	</td><td>violett player color on minimap	</td></tr>
+<tr><td>220-223	</td><td>4 colors for violett player	</td></tr>
+<tr><td>224	</td><td>orange player color on minimap	</td></tr>
+<tr><td>224-227	</td><td>4 colors for orange player	</td></tr>
+<tr><td>228	</td><td>black player color on minimap	</td></tr>
+<tr><td>228-231	</td><td>4 colors for black player	</td></tr>
+<tr><td>232-235	</td><td>4 colors for black player	</td></tr>
+<tr><td>239	</td><td>Color 3 font	</td></tr>
+<tr><td>240-244	</td><td>Water color cycle icons	</td></tr>
+<tr><td>246	</td><td>Reverse color 0 font (white)	</td></tr>
+<tr><td>247	</td><td>neutral on minimap	</td></tr>
+<tr><td>248	</td><td>Gray of icons	</td></tr>
+<tr><td>249	</td><td>red for hit points	</td></tr>
+<tr><td>250	</td><td>Green on minimap	</td></tr>
+<tr><td>251	</td><td>Gold on minimap (yellow)	</td></tr>
+<tr><td>252	</td><td>blink red/yellow on minimap	</td></tr>
+<tr><td>255	</td><td>white player color on minimap	</td></tr>
+<tr><td>255	</td><td>color for view point rectangle	</td></tr>
+</table>
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address><a href="http://stratagus.org">The Stratagus Project</a>
+</address></body></html>
