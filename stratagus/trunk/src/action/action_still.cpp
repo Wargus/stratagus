@@ -290,7 +290,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 	//
 	// Land units are turning left/right.
 	//
-	if (type->LandUnit) {
+	if (!type->NewAnimations && type->LandUnit) {
 		switch ((MyRand() >> 8) & 0x0FF) {
 			case 0: // Turn clockwise
 				unit->Direction += NextDirection;
