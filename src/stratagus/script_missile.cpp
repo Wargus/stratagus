@@ -200,19 +200,31 @@ local SCM CclMissile(SCM list)
 	    SCM sublist = gh_car (list);
 	    list = gh_cdr (list);
 	    x = gh_scm2int (gh_car (sublist));
-	    y = gh_scm2int (gh_cdr (sublist));
+	    y = gh_scm2int (gh_cadr (sublist));
 	} else if (gh_eq_p (value, gh_symbol2scm ("goal"))) {
 	    SCM sublist = gh_car (list);
 	    list = gh_cdr (list);
 	    dx = gh_scm2int (gh_car (sublist));
-	    dy = gh_scm2int (gh_cdr (sublist));
+	    dy = gh_scm2int (gh_cadr (sublist));
 	} else if (gh_eq_p (value, gh_symbol2scm ("local"))) {
 	    DebugCheck (!type);
 	    missile = MakeLocalMissile (type, x, y, dx, dy);
+		// we need to reinitialize position parameters - that's because of
+		// the way InitMissile() (called from MakeLocalMissile()) computes
+		// them - it works for creating a missile during a game but breaks
+		// loading the missile from a file.
+		missile->X = x;
+		missile->Y = y;
+		missile->DX = dx;
+		missile->DY = dy;
 	    missile->Local = 1;
 	} else if (gh_eq_p (value, gh_symbol2scm ("global"))) {
 	    DebugCheck (!type);
 	    missile = MakeMissile (type, x, y, dx, dy);
+		missile->X = x;
+		missile->Y = y;
+		missile->DX = dx;
+		missile->DY = dy;
 	    missile->Local = 0;
 	} else if (gh_eq_p (value, gh_symbol2scm ("frame"))) {
 	    DebugCheck (!missile);
