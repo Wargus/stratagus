@@ -925,7 +925,7 @@ extern void CleanDecorations(void);
 extern void DrawUnit(const Unit* unit);
 extern void DrawBuilding(const Unit* unit);
     /// Draw all units visible on map in viewport
-extern int DrawUnits(const Viewport* vp, Unit** table);
+extern int FindAndSortUnits(const Viewport* vp, Unit** table);
 
 //	in unit_find.c
     /// Select units in rectangle range

@@ -53,6 +53,7 @@
 #include "menus.h"
 #include "network.h"
 #include "ui.h"
+#include "unit.h"
 #include "deco.h"
 #include "trigger.h"
 #include "campaign.h"
@@ -377,8 +378,8 @@ local void DrawMapViewport(Viewport* vp)
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
 	DrawMapBackgroundInViewport(vp, vp->MapX, vp->MapY);
-	nunits = DrawUnits(vp,table);
-	nmissiles = DrawMissiles(vp, missiletable);
+	nunits = FindAndSortUnits(vp,table);
+	nmissiles = FindAndSortMissiles(vp, missiletable);
 	
 	i = 0;
 	j = 0;
