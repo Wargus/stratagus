@@ -1807,15 +1807,27 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     int y;
     int i;
     int mask;
+#ifndef NEW_FOW
     int n;
     int nb;
     Unit* table[UnitMax];
+#endif
 
     //FIXME: vladi: this debug check fails when used for teleporting...
     //DebugCheck( !unit->Removed );
 
     // FIXME: better and quicker solution, to find the building.
     x=y=-1;
+#ifdef NEW_FOW
+    if( unit->Next ) {
+	x=unit->Next->X;
+	y=unit->Next->Y;
+	DebugLevel0Fn("No building?\n");
+    } else {
+	x=unit->X;
+	y=unit->Y;
+    }
+#else
     n=SelectUnitsOnTile(unit->X,unit->Y,table);
     for( nb=i=0; i<n; ++i ) {
 	if( UnitUnusable(table[i]) ) {
@@ -1832,7 +1844,7 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
 	x=unit->X;
 	y=unit->Y;
     }
-
+#endif
     mask=UnitMovementMask(unit);
 
     if( heading<LookingNE || heading>LookingNW) {
@@ -1924,18 +1936,30 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
     int x;
     int y;
     int i;
-    int n;
     int bestx;
     int besty;
     int bestd;
     int mask;
+    int n;
+#ifndef NEW_FOW
     Unit* table[UnitMax];
+#endif
 
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     DebugCheck( !unit->Removed );
 
     // FIXME: better and quicker solution, to find the building.
     x=y=-1;
+#ifdef NEW_FOW
+    if( unit->Next ) {
+	x=unit->Next->X;
+	y=unit->Next->Y;
+    } else {
+	DebugLevel0Fn("No building?\n");
+	x=unit->X;
+	y=unit->Y;
+    }
+#else
     n=SelectUnitsOnTile(unit->X,unit->Y,table);
     for( i=0; i<n; ++i ) {
 	if( UnitUnusable(table[i]) ) {
@@ -1946,6 +1970,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    y=table[i]->Y;
 	}
     }
+#endif
     DebugCheck( x==-1 || y==-1 );
     mask=UnitMovementMask(unit);
 
@@ -2019,6 +2044,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 global void DropOutAll(const Unit* source)
 {
     // FIXME: Rewrite this use source->Next;
+    // FIXME: above is wrong, NEW_FOW use Next in another way.
     Unit** table;
     Unit* unit;
     int i;
@@ -2030,12 +2056,6 @@ global void DropOutAll(const Unit* source)
 	    ++i;
 	    DropOutOnSide(unit,LookingW
 		,source->Type->TileWidth,source->Type->TileHeight);
-#ifdef NEW_FOW
-	    // Worker is back on map, unmark sight
-	    MapUnmarkSight(unit->Player,source->X+source->Type->TileWidth/2,
-			source->Y+source->Type->TileHeight/2,
-			source->Stats->SightRange);
-#endif
 	    DebugCheck( unit->Orders[0].Goal );
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->Wait=unit->Reset=1;

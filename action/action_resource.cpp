@@ -157,7 +157,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     //
     //	Place unit inside the resource
     //
-    RemoveUnit(unit,NULL);
+    RemoveUnit(unit,goal);
 #if 0
     // This breaks the drop out code complete
     // FIXME: this is a hack, but solves the problem, a better solution is
