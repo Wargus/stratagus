@@ -665,19 +665,20 @@ All of those tags should be given:
       minimapx (+ minimapy 148))
 </pre>
 </dd>
-<dt>minimap-panel</dt>
+<dt>minimap</dt>
 <dd>
+There is a minimap panel an the minimap on it. The panel graphic has
+certain palette restrictions (FIXME: exactly? probably the same as the
+tileset?). Pos is the absoloute position of the minimap on the screen
+(the upper left corner of it). If you give 'transparent, the panel
+graphic will be displayed on unexplored terrain, black otherwise.
 <pre>
-    'minimap-panel (list
-      (string-append "graphics/ui/" race "/minimap.png")
-      minimapx minimapy)
-</pre>
-</dd>
-<dt>minimap-pos</dt>
-<dd>
-<pre>
-    'minimap-pos (list
-      (+ minimapx 27) (+ minimapy 13))
+    'minimap (list
+      'file (string-append "graphics/ui/" race "/minimap.png")
+      'panel-pos (list minimapx minimapy)
+      'pos (list (+ minimapx 27) (+ minimapy 13))
+      'size '(128 128)
+      'transparent)
 </pre>
 </dd>
 <dt>status-line</dt>
