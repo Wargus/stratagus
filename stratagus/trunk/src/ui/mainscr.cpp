@@ -354,6 +354,15 @@ global void DrawUnitInfo(const Unit* unit)
 		    unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost]);
 	    DrawText(x+126,y+8+93,GameFont,buf);
 	}
+    } else if( type->StoresOil ) {
+	DrawText(x+20,y+8+78,GameFont,"Production");
+	DrawText(x+52,y+8+93,GameFont,"Oil:");
+	DrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[OilCost]);
+	if( unit->Player->Incomes[OilCost]!=DEFAULT_INCOMES[OilCost] ) {
+	    sprintf(buf, "~<+%i~>",
+		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
+	    DrawText(x+126,y+8+93,GameFont,buf);
+	}
     } else if( type->StoresGold ) {
 	DrawText(x+20,y+8+61,GameFont,"Production");
 	DrawText(x+73,y+8+77,GameFont,"Gold:");
@@ -379,6 +388,7 @@ global void DrawUnitInfo(const Unit* unit)
 		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
 	    DrawText(x+126,y+8+109,GameFont,buf);
 	}
+
     } else if( type->Transporter && unit->Value ) {
 	for( i=0; i<6; ++i ) {
 	    if( unit->OnBoard[i]!=NoUnitP ) {

@@ -576,13 +576,16 @@ global void UnitLost(const Unit* unit)
 	}
     }
 
+    if( unit->Orders[0].Action!=UnitActionBuilded ) {
+	player->UnitTypesCount[type->Type]--;
+    }
+
     if( unit->Type->Building ) {
 	// FIXME: This should be complete rewritten
 	// FIXME: Slow and new members are available
 	// FIXME: most redraws only needed for player==ThisPlayer
 
 	// Still under construction
-	// FIXME: could use unit::Constructed?
 	if( unit->Orders[0].Action!=UnitActionBuilded ) {
 	    if( type->Supply ) {
 		player->Food-=type->Supply;
@@ -650,8 +653,6 @@ global void UnitLost(const Unit* unit)
 		,UnitTypeByIdent("unit-oil-patch"),&Players[15]);
 	temp->Value=unit->Value;
     }
-
-    player->UnitTypesCount[type->Type]--;
 
     DebugCheck( player->NumFoodUnits > UnitMax);
     DebugCheck( player->NumBuildings > UnitMax);
