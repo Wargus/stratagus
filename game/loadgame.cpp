@@ -47,6 +47,7 @@
 #include "ai.h"
 #include "campaign.h"
 #include "trigger.h"
+#include "actions.h"
 #ifdef HIERARCHIC_PATHFINDER
 #include "pathfinder.h"
 #endif
@@ -108,7 +109,8 @@ global void CleanModules(void)
 */
 global void InitModules(void)
 {
-    GameCycle=0;
+    GameCycle = 0;
+    SyncHash = 0;
 
     InitSyncRand();
     InitIcons();
@@ -129,7 +131,7 @@ global void InitModules(void)
 
     InitButtons();
 #ifdef HIERARCHIC_PATHFINDER
-    PfHierInitialize ();
+    PfHierInitialize();
 #endif
     InitMapFogOfWar();			// build tables for fog of war
 }
