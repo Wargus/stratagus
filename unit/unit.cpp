@@ -3293,47 +3293,6 @@ global int ViewPointDistanceToUnit(const Unit* dest)
 }
 
 /**
-**		Check if unit is an enemy.
-**
-**		@param player		The source player.
-**		@param dest		The destination unit.
-**
-**		@return				Returns true, if the destination unit is an enemy.
-*/
-global int IsEnemy(const Player* player, const Unit* dest)
-{
-	return player->Enemy & (1 << dest->Player->Player);
-}
-
-/**
-**		Check if unit is allied.
-**
-**		@param player		The source player.
-**		@param dest		The destination unit.
-**
-**		@return				Returns true, if the destination unit is allied.
-*/
-global int IsAllied(const Player* player, const Unit* dest)
-{
-	return player->Allied & (1 << dest->Player->Player);
-}
-
-/**
-**		Check if unit is shared vision.
-**
-**		@param player		The source player.
-**		@param dest		The destination unit.
-**
-**		@return				Returns true, if the destination unit is shared
-**						vision.
-*/
-global int IsSharedVision(const Player* player, const Unit* dest)
-{
-	return (player->SharedVision & (1 << dest->Player->Player)) &&
-		(dest->Player->SharedVision & (1 << player->Player));
-}
-
-/**
 **		Can the source unit attack the destination unit.
 **
 **		@param source		Unit type pointer of the attacker.
