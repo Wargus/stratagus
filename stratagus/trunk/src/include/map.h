@@ -317,9 +317,15 @@ typedef struct _world_map_ {
     int			Terrain;	/// terrain type (summer,winter,...)
     Tileset*		Tileset;	/// tileset data
 
+#ifdef USE_SDL_SURFACE
+    unsigned int	TileCount;	/// how many tiles, 
+					/// == TileGraphic->NFrames
+    Graphic*		TileGraphic;	/// graphic for all the tiles
+#else
     unsigned		TileCount;	/// how many tiles are available
     unsigned char**	Tiles;		/// pointer to tile data
     Graphic*		TileData;	/// tiles graphic for map
+#endif
 
     char		Description[32];/// map description short
 
@@ -336,10 +342,17 @@ extern char MustRedrawRow[MAXMAP_W];		/// Flags must redraw map row
 extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile
 
     /// Fast draw tile, display and video mode independ
+#ifdef USE_SDL_SURFACE
+extern void VideoDrawTile(int,int,int);
+#else
 extern void (*VideoDrawTile)(const unsigned char*,int,int);
+#endif
     /// Draws tiles display and video mode independ
+#ifdef USE_SDL_SURFACE
+extern void MapDrawTile(int,int,int);
+#else
 extern void (*MapDrawTile)(int,int,int);
-
+#endif
     /// Vision Table to see where to locate goals and vision
 extern unsigned char *VisionTable[3];
     /// Companion table for fast lookups

@@ -305,9 +305,15 @@ local SCM CclDefineUnitType(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("neutral-minimap-color"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
+#ifdef USE_SDL_SURFACE
+	    type->NeutralMinimapColorRGB.r = gh_scm2int(gh_car(sublist));
+	    type->NeutralMinimapColorRGB.g = gh_scm2int(gh_car(gh_cdr(sublist)));
+	    type->NeutralMinimapColorRGB.b = gh_scm2int(gh_car(gh_cdr(gh_cdr(sublist))));
+#else
 	    type->NeutralMinimapColorRGB.D24.a = gh_scm2int(gh_car(sublist));
 	    type->NeutralMinimapColorRGB.D24.b = gh_scm2int(gh_car(gh_cdr(sublist)));
 	    type->NeutralMinimapColorRGB.D24.c = gh_scm2int(gh_car(gh_cdr(gh_cdr(sublist))));
+#endif
 	} else if (gh_eq_p(value, gh_symbol2scm("box-size"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);

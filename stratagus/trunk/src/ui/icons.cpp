@@ -370,7 +370,11 @@ global void DrawIcon(const Player* player, Icon* icon, int x, int y)
 global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
     int x, int y)
 {
+#ifdef USE_SDL_SURFACE
+    SDL_Color color;
+#else
     VMemType color;
+#endif
     int width;
     int height;
 

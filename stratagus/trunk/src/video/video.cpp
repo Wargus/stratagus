@@ -10,7 +10,7 @@
 //
 /**@name video.c	-	The universal video functions. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -190,7 +190,11 @@ global int VideoTypeSize;
     **	@see InitVideo @see InitVideoSdl
     **	@see VMemType
     */
+#ifdef USE_SDL_SURFACE
+global SDL_Surface* TheScreen;
+#else
 global VMemType* VideoMemory;
+#endif
 
     /**
     **	Architecture-dependant system palette. Applies as conversion between
@@ -198,14 +202,21 @@ global VMemType* VideoMemory;
     **	Set by VideoCreatePalette or VideoSetPalette.
     **	@see VideoCreatePalette @see VideoSetPalette
     */
+#ifdef USE_SDL_SURFACE
+global SDL_Palette* Pixels;
+#else
 global VMemType* Pixels;
+#endif
 
 global int VideoSyncSpeed = 100;	/// 0 disable interrupts
 global volatile int VideoInterrupts;	/// be happy, were are quicker
 
     /// Loaded system palette. 256-entries long, active system palette.
+#ifdef USE_SDL_SURFACE
+global SDL_Palette GlobalPalette;
+#else
 global Palette GlobalPalette[256];
-
+#endif
     /**
     ** FIXME: this docu is added only to the first variable!
     **
@@ -236,6 +247,20 @@ global Palette GlobalPalette[256];
     **  VideoAllocPalette8:
     **  Funcytion to let hardware independent palette be converted (when set).
     */
+#ifdef USE_SDL_SURFACE
+global SDL_Palette* commonpalette;
+    // FIXME: docu
+//global unsigned long commonpalette_defined[8];
+    // FIXME: docu
+global SDL_Color* colorcube8;
+    // FIXME: docu
+global SDL_Color* lookup25trans8;
+    // FIXME: docu
+global SDL_Color* lookup50trans8;
+    // FIXME: docu
+global void VideoAllocPalette(SDL_Palette* palette, SDL_Palette* 
+    syspalette);
+#else
 global Palette* commonpalette;
     // FIXME: docu
 global unsigned long commonpalette_defined[8];
@@ -248,6 +273,7 @@ global VMemType8* lookup50trans8;
     // FIXME: docu
 global void (*VideoAllocPalette8)(Palette* palette, Palette* syspalette,
     unsigned long syspalette_defined[8]) = NULL;
+#endif
 
 global int ColorWaterCycleStart;
 global int ColorWaterCycleEnd;
@@ -257,6 +283,19 @@ global int ColorBuildingCycleStart;
 global int ColorBuildingCycleEnd;
 
     /// Does ColorCycling..
+#ifdef USE_SDL_SURFACE
+global void ColorCycle(void);
+
+SDL_Color ColorBlack;
+SDL_Color ColorDarkGreen;
+SDL_Color ColorBlue;
+SDL_Color ColorOrange;
+SDL_Color ColorWhite;
+SDL_Color ColorGray;
+SDL_Color ColorRed;
+SDL_Color ColorGreen;
+SDL_Color ColorYellow;
+#else
 global void (*ColorCycle)(void);
 
 VMemType ColorBlack;
@@ -269,6 +308,7 @@ VMemType ColorGray;
 VMemType ColorRed;
 VMemType ColorGreen;
 VMemType ColorYellow;
+#endif
 
 
 /*----------------------------------------------------------------------------
@@ -426,6 +466,22 @@ global void PopClipping(void)
 **
 **	@return		Calculated hash/checksum.
 */
+#ifdef USE_SDL_SURFACE
+local long GetPaletteChecksum(const SDL_Palette* palette)
+{
+    long retVal;
+    int i;
+
+    for (retVal = i = 0; i < palette->ncolors; ++i){
+	//This is designed to return different values if
+	// the pixels are in a different order.
+	retVal = ((palette->colors[i].r + i) & 0xff) + retVal;
+	retVal = ((palette->colors[i].g + i) & 0xff) + retVal;
+	retVal = ((palette->colors[i].b + i) & 0xff) + retVal;
+    }
+    return retVal;
+}
+#else
 local long GetPaletteChecksum(const Palette* palette)
 {
     long retVal;
@@ -440,6 +496,7 @@ local long GetPaletteChecksum(const Palette* palette)
     }
     return retVal;
 }
+#endif
 
 /**
 **	Creates a shared hardware palette from an independend Palette struct.
@@ -448,6 +505,9 @@ local long GetPaletteChecksum(const Palette* palette)
 **
 **	@return		A palette in hardware  dependend format.
 */
+#ifdef USE_SDL_SURFACE
+
+#else
 global VMemType* VideoCreateSharedPalette(const Palette* palette)
 {
     PaletteLink* current_link;
@@ -518,6 +578,7 @@ global void VideoFreeSharedPalette(VMemType* pixels)
 	}
     }
 }
+#endif
 
 /**
 **	Load a picture and display it on the screen (full screen),
@@ -535,12 +596,25 @@ global void DisplayPicture(const char* name)
     MakeTexture(picture, picture->Width, picture->Height);
 #endif
 
-    VideoLockScreen();
+#ifdef USE_SDL_SURFACE
+    SDL_Rect srect;
+    SDL_Rect drect;
 
+    srect.x = 0;
+    srect.y = 0;
+    srect.w = picture->Width;
+    srect.h = picture->Height;
+
+    drect.x = 0;
+    drect.y = 0;
+
+    SDL_BlitSurface(picture->Surface, &srect, TheScreen, &drect);
+#else
+    VideoLockScreen();
     VideoDrawSubClip(picture, 0, 0, picture->Width, picture->Height,
 	(VideoWidth - picture->Width) / 2, (VideoHeight - picture->Height) / 2);
-
     VideoUnlockScreen();
+#endif
 
     VideoFree(picture);
 }
@@ -554,6 +628,35 @@ global void DisplayPicture(const char* name)
 **
 **	@see VideoCreatePalette
 */
+#ifdef USE_SDL_SURFACE
+global void LoadRGB(SDL_Palette* pal, const char* name)
+{
+    CLFile* fp;
+    int i;
+    unsigned char* p;
+    unsigned char buffer[256 * 3];
+
+    if (!(fp = CLopen(name, CL_OPEN_READ)) || CLread(fp, buffer, 256 * 3) != 256 * 3) {
+	fprintf(stderr, "Can't load palette %s\n", name);
+	ExitFatal(-1);
+    }
+
+    // FIXME: malloc somewhere else ?!?!
+    pal = malloc(sizeof(SDL_Palette));
+    pal->colors = calloc(256, sizeof(SDL_Color));
+
+    pal->ncolors = 256;
+
+    p = buffer;
+    for (i = 0; i < 256; ++i) {
+	pal->colors[i].r = (*p++);
+	pal->colors[i].g = (*p++);
+	pal->colors[i].b = (*p++);
+    }
+
+    CLclose(fp);
+}
+#else
 global void LoadRGB(Palette* pal, const char* name)
 {
     CLFile* fp;
@@ -575,6 +678,7 @@ global void LoadRGB(Palette* pal, const char* name)
 
     CLclose(fp);
 }
+#endif
 
 // FIXME: this isn't 100% correct
 // Color cycling info - forest:
@@ -610,6 +714,12 @@ global void LoadRGB(Palette* pal, const char* name)
 **	FIXME: Also icons and some units use color cycling.
 **	FIXME: must be configured by the tileset or global.
 */
+#ifdef USE_SDL_SURFACE
+local void ColorCycle(void)
+{
+    // FIXME: todo
+}
+#else
 local void ColorCycle8(void)
 {
     int i;
@@ -903,6 +1013,7 @@ local void ColorCycle32(void)
     MapColorCycle();		// FIXME: could be little more informative
     MustRedraw |= RedrawColorCycle;
 }
+#endif
 
 /*===========================================================================
 Following functions support a single common palette for 8bpp
@@ -920,6 +1031,9 @@ Following functions support a single common palette for 8bpp
 **      FIXME: Use TheUI settings (brightness, contrast and saturation) and
 **      visual color range knowledge to reduce the ammount of colors needed.
 */
+#ifdef USE_SDL_SURFACE
+    // FIXME: todo
+#else
 local void VideoFillCommonPalette8(Palette* palette)
 {
 #ifdef BPP8_WINSAFE
@@ -1049,7 +1163,7 @@ local void VideoFillCommonPalette8(Palette* palette)
 #endif
 #endif
 }
-
+#endif
 
 /**
 **      Fill a colorcube to get from a RGB (5x5x5 bit) to a system 8bpp color
@@ -1064,6 +1178,9 @@ local void VideoFillCommonPalette8(Palette* palette)
 **      @param cube     Array of 32768 (32*32*32) bytes with RGB value (each in
 **                      range 0..31) as index, delivers color index.
 */
+#ifdef USE_SDL_SURFACE
+    // FIXME: todo
+#else
 local void VideoFillColorcube8(const Palette* palette,
     const unsigned long pal_def[8], VMemType8* cube)
 {
@@ -1110,6 +1227,7 @@ local void VideoFillColorcube8(const Palette* palette,
 	}
     }
 }
+#endif
 
 /**
 **      Find a new hardware dependend palette, re-using the colors as set in
@@ -1122,6 +1240,9 @@ local void VideoFillColorcube8(const Palette* palette,
 **      @return         A hardware dependend 8bpp pixel table.
 **
 */
+#ifdef USE_SDL_SURFACE
+    // FIXME: todo2
+#else
 global VMemType8* VideoFindNewPalette8(const VMemType8* cube,
     const Palette* palette)
 {
@@ -1201,13 +1322,18 @@ local void FillTransLookup8(const Palette* palette, const VMemType8* cube,
 	}
     }
 }
-
+#endif
 /**
 **      Initialize globals based on a single common palette of 256 colors.
 **      Only needed for 8bpp, which hasn't RGB encoded in its system color.
 **      FIXME: should be called again when it gets dependent of TheUI settings
 **             then call VideoFreePalette first to prevent "can not allocate"
 */
+#ifdef USE_SDL_SURFACE
+local void InitSingleCommonPalette(void)
+{
+}
+#else
 local void InitSingleCommonPalette8(void)
 {
     Palette* tmp;
@@ -1256,6 +1382,7 @@ local void InitSingleCommonPalette8(void)
 	exit(-1);
     }
 }
+#endif
 
 /*===========================================================================*/
 
@@ -1267,6 +1394,17 @@ local void InitSingleCommonPalette8(void)
 **
 **	@see SetPlayersPalette
 */
+#ifdef USE_SDL_SURFACE
+global void VideoSetPalette(const SDL_Palette* palette)
+{
+    if (!GlobalPalette.colors) {
+//    GlobalPalette = (SDL_Palette*)malloc(sizeof(SDL_Palette));
+        GlobalPalette.colors = calloc(256, sizeof(SDL_Color));
+    }
+//    TheScreen->format->palette = (SDL_Palette*)palette;
+    SetPlayersPalette();
+}
+#else
 global void VideoSetPalette(const VMemType* palette)
 {
     DebugLevel2Fn("Palette %x used\n" _C_ (unsigned)palette);
@@ -1277,6 +1415,7 @@ global void VideoSetPalette(const VMemType* palette)
     Pixels = (VMemType*)palette;
     SetPlayersPalette();
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -1287,6 +1426,15 @@ global void VideoSetPalette(const VMemType* palette)
 **
 **	@param palette	System independ palette structure.
 */
+#ifdef USE_SDL_SURFACE
+global void VideoCreatePalette(const SDL_Palette* palette)
+{
+//    SDL_SetPalette(
+//    SDL_Palette* temp;
+//    temp = VideoCreateNewPalette(palette);
+    VideoSetPalette(palette);
+}
+#else
 global void VideoCreatePalette(const Palette* palette)
 {
     VMemType* temp;
@@ -1295,6 +1443,7 @@ global void VideoCreatePalette(const Palette* palette)
 
     VideoSetPalette(temp);
 }
+#endif
 
 /**
 **	Lock the screen for write access.
@@ -1358,6 +1507,8 @@ global void InitVideo(void)
     //
     //	General (video) modules and settings
     //
+#ifdef USE_SDL_SURFACE
+#else
     switch (VideoBpp) {
 	case  8: ColorCycle = ColorCycle8; break;
 	case 15:
@@ -1367,6 +1518,7 @@ global void InitVideo(void)
         default: DebugLevel0Fn("Video %d bpp unsupported\n" _C_ VideoBpp);
     }
     VideoTypeSize = VideoBpp / 8;
+#endif
 
     //
     //	Init video sub modules

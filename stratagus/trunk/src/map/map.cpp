@@ -643,8 +643,11 @@ global void CleanMap(void)
 {
     free(TheMap.Fields);
     free(TheMap.TerrainName);
+#ifndef USE_SDL_SURFACE
+// FIXME: merge
     free(TheMap.TileData);
     free(TheMap.Tiles);
+#endif
     free(TheMap.Visible[0]);
 
     // Tileset freeed by Tileset?

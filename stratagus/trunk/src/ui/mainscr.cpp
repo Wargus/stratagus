@@ -80,7 +80,11 @@
 local void UiDrawLifeBar(const Unit* unit, int x, int y)
 {
     int f;
+#ifdef USE_SDL_SURFACE
+    SDL_Color color;
+#else
     VMemType color;
+#endif
 
     y += unit->Type->Icon.Icon->Height + 7;
     VideoFillRectangleClip(ColorBlack, x, y,

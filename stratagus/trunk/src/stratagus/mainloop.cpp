@@ -517,7 +517,11 @@ global void DrawMapArea(void)
     //	Separate the viewports and mark the active viewport.
     //
     for (vp = TheUI.Viewports; vp < evp; ++vp) {
+#ifdef USE_SDL_SURFACE
+	SDL_Color color;
+#else
 	VMemType color;
+#endif
 
 	if (vp == TheUI.SelectedViewport) {
 	    color = ColorOrange;
@@ -546,7 +550,9 @@ global void UpdateDisplay(void)
 {
     MustRedraw &= EnableRedraw;		// Don't redraw disabled parts
 
+#ifndef USE_SDL_SURFACE
     VideoLockScreen();			// prepare video write
+#endif
 
     HideAnyCursor();			// remove cursor (when available)
 
@@ -621,7 +627,9 @@ global void UpdateDisplay(void)
 
     DrawAnyCursor();
 
+#ifndef USE_SDL_SURFACE
     VideoUnlockScreen();		// End write access
+#endif
 
     //
     //	Update changes to display.
