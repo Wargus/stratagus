@@ -197,8 +197,8 @@ Define unit stats.
 <h4>Syntax</h4>
 
 <code>(define-unit-type ident name graphics pixel_size animations icon
-    speed overlay sight_range hitpoints magic costs tile_size box_size
-    attack_range computer_reaction_range human_reaction_range armor
+    speed overlay sight_range hitpoints magic costs improve_production tile_size
+    box_size attack_range computer_reaction_range human_reaction_range armor
     priorty damage piercing_damge weapon_upgradable armor_upgradeable
     decay annoy_factor points missle corpse type right_mouse can_target
     flags sounds attack_sound)</code>
@@ -271,14 +271,18 @@ NOTE: this will be changed to identifiers sometime.
 <dd>Flag to determine whether this unit is a spell user. 0 = false (not a magic
 user), 1 = true (magic user).  F.E. 1, 0</dd>
 <dt>costs</dt>
-<dd>Define the costs to build (or aquire) this unit. It is an array of #(
-time gold wood oil) or #(time gold wood oil ore stone coal). Time is in frames
-to build this unit.
+<dd>Define the costs to build (or aquire) this unit. It is an array of '(
+resource-name amount) pairs. Time is in frames to build this unit.
 Gold is the amount required to build this unit. Wood is the amount required
 to build this unit.  Oil is the amount required to build this unit.
-F.E.: #( 200 2000 1000 200 ).<p>
-NOTE: This is extendable more costs could be added. (using 6 resources insteed
-of 3. Or redefining the gold resource into a crytal resource)
+F.E.: '( time 200 gold 2000 wood 1000 oil 200 ).<p>
+</dd>
+<dt>improve_production</dt>
+<dd>Define the production increase from defaults that this unit adds. It is an array of '(
+rosource-name amount) pairs. 
+Gold is the amount it increase the default gold by. All other defined resources are
+treated the same way.
+F.E.: 'improve-production '( gold 20 wood 5 ).<p>
 </dd>
 <dt>tile_size</dt>
 <dd>Define the unit-type size in tiles. NOTE: currently only buildings could

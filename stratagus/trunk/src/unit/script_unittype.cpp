@@ -223,6 +223,16 @@ local SCM CclDefineUnitType(SCM list)
 		type->_Costs[CclGetResourceByName(value)]=gh_scm2int(gh_car(sublist));
 		sublist=gh_cdr(sublist);
 	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("improve-production")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		type->ImproveIncomes[CclGetResourceByName(value)]=
+			DefaultIncomes[CclGetResourceByName(value)]+gh_scm2int(gh_car(sublist));
+		sublist=gh_cdr(sublist);
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("construction")) ) {
 	    // FIXME: What if constructions arn't yet loaded?
 	    str=gh_scm2newstr(gh_car(list),NULL);
