@@ -103,7 +103,6 @@ local void MoveToTarget(Unit* unit)
     int wall;
     int err;
 
-    // FIXME: is this a a-star problem ?
 #ifdef NEW_ORDERS
     if( unit->Orders[0].Action==UnitActionAttackGround
 	    || WallOnMap(unit->Orders[0].X,unit->Orders[0].Y) ) {
@@ -130,22 +129,31 @@ local void MoveToTarget(Unit* unit)
 	unit->Command.Data.Move.DY-=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.Range*=2;
 	wall=unit->Command.Action;
+	// This fixes the bug: if wall is gone, debug code fails.
+	unit->Goal=unit->Command.Data.Move.Goal;
+	unit->GoalX=unit->Command.Data.Move.DX;
+	unit->GoalY=unit->Command.Data.Move.DY;
 	err=HandleActionMove(unit);
 	unit->Command.Data.Move.Range/=2;
 	unit->Command.Data.Move.DX+=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.DY+=unit->Command.Data.Move.Range;
 	unit->Command.Action=wall;
+	// This fixes the bug: if wall is gone, debug code fails.
+	unit->Goal=unit->Command.Data.Move.Goal;
+	unit->GoalX=unit->Command.Data.Move.DX;
+	unit->GoalY=unit->Command.Data.Move.DY;
     } else {
 	err=HandleActionMove(unit);
     }
 #endif
 
-    // NEW return codes supported, FIXME: but I think not perfect.
+    // NEW return codes supported, FIXME: but johns thinks not perfect.
 
     if( unit->Reset ) {
 	//
 	//	Target is dead, choose new one.
 	//
+	// FIXME: should I make a general function for this?
 #ifdef NEW_ORDERS
 	if( (goal=unit->Orders[0].Goal) ) {
 	    // FIXME: Should be done by Action Move???????
@@ -160,6 +168,14 @@ local void MoveToTarget(Unit* unit)
 		unit->Orders[0].Goal=goal=NoUnitP;
 		ResetPath(unit->Orders[0]);
 	    } else if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
+		RefsDebugCheck( !goal->Refs );
+		--goal->Refs;
+		RefsDebugCheck( !goal->Refs );
+		unit->Orders[0].X=goal->X;
+		unit->Orders[0].Y=goal->Y;
+		unit->Orders[0].Goal=goal=NoUnitP;
+		ResetPath(unit->Orders[0]);
+	    } else if( goal->Removed ) {
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
@@ -183,6 +199,14 @@ local void MoveToTarget(Unit* unit)
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 		ResetPath(unit->Command);
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+		RefsDebugCheck( !goal->Refs );
+		--goal->Refs;
+		RefsDebugCheck( !goal->Refs );
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+		ResetPath(unit->Command);
+	    } else if( goal->Removed ) {
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
@@ -229,8 +253,6 @@ local void MoveToTarget(Unit* unit)
 		}
 		unit->Command.Data.Move.Goal=goal;
 		ResetPath(unit->Command);
-		unit->Command.Data.Move.DX=goal->X;
-		unit->Command.Data.Move.DY=goal->Y;
 		unit->SubAction|=2;		// weak target
 		DebugLevel3Fn("%Zd in react range %Zd\n"
 			,UnitNumber(unit),UnitNumber(goal));
@@ -257,8 +279,8 @@ local void MoveToTarget(Unit* unit)
 		}
 		unit->Orders[0].Goal=goal=temp;
 		ResetPath(unit->Orders[0]);
-		unit->Orders[0].X=goal->X;
-		unit->Orders[0].Y=goal->Y;
+		unit->Orders[0].X=-1;
+		unit->Orders[0].Y=-1;
 #else
 		if( unit->SavedCommand.Action==UnitActionStill ) {
 		    // Save current command to come back.
@@ -266,8 +288,6 @@ local void MoveToTarget(Unit* unit)
 		}
 		unit->Command.Data.Move.Goal=goal=temp;
 		ResetPath(unit->Command);
-		unit->Command.Data.Move.DX=goal->X;
-		unit->Command.Data.Move.DY=goal->Y;
 #endif
 	    }
 	}
@@ -331,7 +351,7 @@ local void MoveToTarget(Unit* unit)
 #endif
 	    return;
 	}
-	DebugCheck( unit->Type->Vanishes || unit->Destroyed );
+	DebugCheck( unit->Type->Vanishes || unit->Destroyed || unit->Removed );
 #ifdef NEW_ORDERS
 	unit->Orders[0].Action=UnitActionAttack;
 #else
@@ -387,7 +407,6 @@ local void AttackTarget(Unit* unit)
 		unit->Orders[0].Goal=goal=NoUnitP;
 		ResetPath(unit->Orders[0]);
 	    } else if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
-		// FIXME: goal->Removed???
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
@@ -395,13 +414,21 @@ local void AttackTarget(Unit* unit)
 		unit->Orders[0].Y=goal->Y;
 		unit->Orders[0].Goal=goal=NoUnitP;
 		ResetPath(unit->Orders[0]);
+	    } else if( goal->Removed ) {
+		RefsDebugCheck( !goal->Refs );
+		--goal->Refs;
+		RefsDebugCheck( !goal->Refs );
+		unit->Orders[0].X=goal->X;
+		unit->Orders[0].Y=goal->Y;
+		unit->Orders[0].Goal=goal=NoUnitP;
+		ResetPath(unit->Orders[0]);
+	    }
 #else
 		unit->Command.Data.Move.DX=goal->X;
 		unit->Command.Data.Move.DY=goal->Y;
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 		ResetPath(unit->Command);
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
-		// FIXME: goal->Removed???
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
@@ -409,8 +436,16 @@ local void AttackTarget(Unit* unit)
 		unit->Command.Data.Move.DY=goal->Y;
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 		ResetPath(unit->Command);
-#endif
+	    } else if( goal->Removed ) {
+		RefsDebugCheck( !goal->Refs );
+		--goal->Refs;
+		RefsDebugCheck( !goal->Refs );
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+		ResetPath(unit->Command);
 	    }
+#endif
 	}
 
 	//
@@ -455,10 +490,10 @@ local void AttackTarget(Unit* unit)
 	    unit->Orders[0].Goal=goal;
 	    unit->Orders[0].X=-1;
 	    unit->Orders[0].Y=-1;
+	    ResetPath(unit->Orders[0]);
 #else
 	    unit->Command.Data.Move.Goal=goal;
-	    unit->Command.Data.Move.DX=goal->X;
-	    unit->Command.Data.Move.DY=goal->Y;
+	    ResetPath(unit->Command);
 #endif
 	    unit->SubAction|=2;
 	} else
@@ -481,6 +516,8 @@ local void AttackTarget(Unit* unit)
 		    unit->SavedOrder=unit->Orders[0];
 		}
 		unit->Orders[0].Goal=goal=temp;
+		unit->Orders[0].X=-1;
+		unit->Orders[0].Y=-1;
 		ResetPath(unit->Orders[0]);
 #else
 		if( unit->SavedCommand.Action==UnitActionStill ) {
@@ -488,8 +525,6 @@ local void AttackTarget(Unit* unit)
 		    unit->SavedCommand=unit->Command;
 		}
 		unit->Command.Data.Move.Goal=goal=temp;
-		unit->Command.Data.Move.DX=goal->X;
-		unit->Command.Data.Move.DY=goal->Y;
 		ResetPath(unit->Command);
 #endif
 	    }
