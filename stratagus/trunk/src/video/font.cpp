@@ -96,6 +96,10 @@ local const unsigned char* LastTextColor;
 local const unsigned char* DefaultTextColor;
     /// Reverse text color
 local const unsigned char* ReverseTextColor;
+    /// Default normal color index
+local int nc_font_idx;
+    /// Default reverse color index
+local int rc_font_idx;
 
     /// Draw character with current video depth.
 local void (*VideoDrawChar)(const Graphic*,int,int,int,int,int,int);
@@ -279,8 +283,22 @@ local void VideoDrawChar32(const Graphic* sprite,
 */
 global void SetDefaultTextColors(int normal,int reverse)
 {
+    nc_font_idx=normal;
+    rc_font_idx=reverse;
     LastTextColor=TextColor=DefaultTextColor=FontColors[normal];
     ReverseTextColor=FontColors[reverse];
+}
+
+/**
+**	Get the default text colors.
+**
+**	@param normalp	Normal text color pointer.
+**	@param reversep	Reverse text color pointer.
+*/
+global void GetDefaultTextColors(int *normalp,int *reversep)
+{
+    *normalp=nc_font_idx;
+    *reversep=rc_font_idx;
 }
 
 /**
