@@ -161,6 +161,7 @@ local void VideoDrawShadowClip(const Graphic* sprite, unsigned frame,
     SDL_Rect drect;
     int oldx;
     int oldy;
+    unsigned char alpha;
 
     srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
     srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
@@ -176,8 +177,10 @@ local void VideoDrawShadowClip(const Graphic* sprite, unsigned frame,
     drect.x = x;
     drect.y = y;
 
+    alpha = sprite->Surface->format->alpha;
+    SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
     SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
-
+    SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
 }
 
 local void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame,
@@ -187,6 +190,7 @@ local void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame,
     SDL_Rect drect;
     int oldx;
     int oldy;
+    unsigned char alpha;
 
     srect.x = (sprite->SurfaceFlip->w - (frame % (sprite->SurfaceFlip->w / 
 	    sprite->Width)) * sprite->Width) - sprite->Width;
@@ -203,7 +207,10 @@ local void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame,
     drect.x = x;
     drect.y = y;
 
+    alpha = sprite->Surface->format->alpha;
+    SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
     SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
+    SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
 }
 #else
 //
