@@ -165,7 +165,7 @@ global void DoRightButton(int x,int y)
 
     // FIXME: the next should be rewritten, must select the units with
     // FIXME: the box size and not with the tile position
-    // FIXME: and for a group of units slow!
+    // FIXME: and for a group of units this is slow!
     acknowledged=0;
     for( i=0; i<NumSelected; ++i ) {
         unit=Selected[i];
@@ -937,7 +937,7 @@ local void SendCommand(int x,int y)
 //.............................................................................
 
 /**
-**	Mouse button press on selection area.
+**	Mouse button press on selection/group area.
 **
 **	@param num	Button number.
 **	@param button	Mouse Button pressed.
@@ -961,6 +961,12 @@ local void DoSelectionButtons(unsigned num,unsigned button __attribute__((unused
     } else {
 	SelectSingleUnit(unit);
     }
+
+    ClearStatusLine();
+    ClearCosts();
+    CurrentButtonLevel = 0;		// reset unit buttons to normal
+    UpdateButtonPanel();
+    MustRedraw|=RedrawPanels;
 }
 
 //.............................................................................
@@ -1060,6 +1066,9 @@ global void UIHandleButtonDown(unsigned button)
 	return;
     }
 
+    //
+    //	Cursor is on the map area
+    //
     if( CursorOn==CursorOnMap ) {
 	if( CursorBuilding ) {
 	    // Possible Selected[0] was removed from map
@@ -1118,6 +1127,9 @@ global void UIHandleButtonDown(unsigned button)
 	    }
 	    DoRightButton(Screen2MapX(CursorX),Screen2MapY(CursorY));
 	}
+    //
+    //	Cursor is on the minimap area
+    //
     } else if( CursorOn==CursorOnMinimap ) {
 	if( MouseButtons&LeftButton ) {	// enter move mini-mode
 	    MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
@@ -1128,6 +1140,9 @@ global void UIHandleButtonDown(unsigned button)
 		    ,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
 	    DoRightButton(ScreenMinimap2MapX(CursorX),ScreenMinimap2MapY(CursorY));
 	}
+    //
+    //	Cursor is on the buttons: group or command
+    //
     } else if( CursorOn==CursorOnButton ) {
 	if( NumSelected>1 && ButtonUnderCursor && ButtonUnderCursor<10 ) {
 	    DoSelectionButtons(ButtonUnderCursor-1,button);
