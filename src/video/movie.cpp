@@ -268,6 +268,14 @@ global int PlayMovie(const char *name, int flags)
 	rect.h = avi->Height;
     }
 
+    if( 1 ) {
+	int i;
+
+	GetPbParam(pbi, PBC_SET_POSTPROC, &i);
+	DebugLevel0Fn("Postprocess level %d\n" _C_ i);
+	SetPbParam(pbi, PBC_SET_POSTPROC, 6);
+    }
+
     MovieKeyPressed = 1;
     while (MovieKeyPressed) {
 
