@@ -1074,9 +1074,12 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    // Start new music for menus?
 	    // FIXME: If second loop?
 
-	    if( !PlayingMusic && strcmp(TitleMusic,MenuMusic) 
-		&& (!strcmp(CDMode, ":off")) ) {
-		PlayMusic(MenuMusic);
+	    if( !PlayingMusic && strcmp(TitleMusic,MenuMusic) ) {
+		if (!strcmp(CDMode, ":off")) {
+		    PlayMusic(MenuMusic);
+		} else {
+		    CDRomCheck(NULL);
+		}
 	    }
 	    EnableRedraw=RedrawMenu;
 
