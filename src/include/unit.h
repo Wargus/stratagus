@@ -405,7 +405,7 @@ enum _unit_action_ {
 **	Unit order structure.
 */
 typedef struct _order_ {
-    UnitAction		Action : 8;	/// global action
+    unsigned char	Action;		/// global action
     unsigned char	Flags;		/// Order flags (unused)
     unsigned char	RangeX;		/// How near in X direction
     unsigned char	RangeY;		/// How near in Y direction
