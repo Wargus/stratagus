@@ -1419,6 +1419,7 @@ local void LoadAction(void)
     LoadGame(filename);
     SetMessage("Loaded game: %s", filename);
     GameLoaded=1;
+    GuiGameStarted = 1;
     CurrentMapPath[0]='\0';
     EndMenu();
 }
