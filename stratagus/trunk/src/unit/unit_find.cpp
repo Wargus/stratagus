@@ -57,6 +57,10 @@ global int SelectUnits(int x1,int y1,int x2,int y2,Unit** table)
 */
 global int FindUnitsByType(int type,Unit** table)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+    return 1;
+#else
     Unit* unit;
     int num,i;
 
@@ -67,6 +71,7 @@ global int FindUnitsByType(int type,Unit** table)
 	}
     }
     return num;
+#endif
 }
 
 /**
@@ -134,6 +139,9 @@ global Unit* UnitOnMapTile(unsigned tx,unsigned ty)
 */
 global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 {
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+#else
     Unit* unit;
     UnitType* type;
     int i;
@@ -143,7 +151,7 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
     for( i=0; i<NumUnits; i++ ) {
 	unit=Units[i];
 	// unusable unit ?
-	// if( UnitUnusable(unit) ) {
+	// if( UnitUnusable(unit) ) 
 	if( unit->Removed || unit->Command.Action==UnitActionDie ) {
 	    continue;
 	}
@@ -157,6 +165,7 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 	}
 	return unit;
     }
+#endif
     return NoUnitP;
 }
 

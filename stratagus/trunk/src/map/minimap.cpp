@@ -211,18 +211,20 @@ global void CreateMinimap(void)
 */
 global void DrawMinimap(int vx,int vy)
 {
-    Unit* unit;
+    static int RedPhase;
     int mx;
     int my;
+    int flags;
+    int x;
+    int y;
+#ifndef NEW_UNIT
+    UnitType* type;
+    Unit* unit;
+    int i;
     int w;
     int h;
     int h0;
-    UnitType* type;
-    int flags;
-    static int RedPhase;
-    int i;
-    int x;
-    int y;
+#endif
 
     RedPhase^=1;
 
@@ -250,6 +252,9 @@ global void DrawMinimap(int vx,int vy)
 	}
     }
 
+#ifdef NEW_UNIT
+    DebugLevel0("FIXME:");
+#else
     //
     //	Draw units on map
     //
@@ -309,6 +314,7 @@ global void DrawMinimap(int vx,int vy)
 	    }
 	}
     }
+#endif
 }
 
 local int OldMinimapCursorX;		/// Save MinimapCursorX
