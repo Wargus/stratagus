@@ -321,7 +321,7 @@ global int CLprintf(CLFile* file, char* format, ...)
 	char* p;
 	va_list ap;
 
-	size = 100;
+	size = 500;
 	ret = -1;
 	if ((p = malloc(size)) == NULL) {
 		return -1;
@@ -339,6 +339,7 @@ global int CLprintf(CLFile* file, char* format, ...)
 		if (n > -1) { /* glibc 2.1 */
 			size = n + 1; /* precisely what is needed */
 		} else {		   /* glibc 2.0 */
+			DebugLevel0Fn("Something could be wrong in CLprintf.\n");
 			size *= 2;  /* twice the old size */
 		}
 		if ((p = realloc(p, size)) == NULL) {
