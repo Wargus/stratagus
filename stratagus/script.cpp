@@ -168,7 +168,7 @@ local int lcall(int narg, int clear)
 {
     int status;
     int base;
-    
+
     base = lua_gettop(Lua) - narg;  /* function index */
     lua_pushliteral(Lua, "_TRACEBACK");
     lua_rawget(Lua, LUA_GLOBALSINDEX);  /* get traceback function */
@@ -225,12 +225,12 @@ global int LuaToBoolean(lua_State* l, int narg)
 }
 #endif
 
-/** 
+/**
 **	Convert a SCM to a string, SCM must be a symbol or string, else 0
 **	is returned
-**	
+**
 **	@param scm the SCM to convert to string
-**	
+**
 **	@return a string representing the SCM or 0 in case the conversion
 **	failed, caller must free() the returned value
 */
@@ -247,7 +247,7 @@ global char* CclConvertToString(SCM scm)
     }
 #else
     char* str;
-    
+
     str = try_get_c_string(scm);
     if (str) {
 	return strdup(str);
@@ -259,11 +259,11 @@ global char* CclConvertToString(SCM scm)
 #elif defined(USE_LUA)
 #endif
 
-/** 
+/**
 **	Return the type of a smob
-**	
+**
 **	@param smob
-**	
+**
 **	@return type id of the smob
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
@@ -275,18 +275,18 @@ global ccl_smob_type_t CclGetSmobType(SCM smob)
     } else {
 	return 0;
     }
-#else  
+#else
     return TYPE(smob);
 #endif
 }
 #elif defined(USE_LUA)
 #endif
 
-/** 
+/**
 **	Return the pointer that is stored in a smob
-**	
+**
 **	@param smob the smob that contains the pointer
-**	
+**
 **	@return pointer that was inside the smob
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
@@ -301,9 +301,9 @@ global void* CclGetSmobData(SCM smob)
 #elif defined(USE_LUA)
 #endif
 
-/** 
+/**
 **	Store a pointer inside a SMOB, aka convert a pointer to a SCM
-**	
+**
 **	@param tag The type of the pointer/smob
 **	@param ptr the pointer that should be converted to a SCM
 */
@@ -325,11 +325,11 @@ global SCM CclMakeSmobObj(ccl_smob_type_t tag, void* ptr)
 #elif defined(USE_LUA)
 #endif
 
-/** 
+/**
 **	Create a tag for a new type.
-**	
-**	@param name 
-**	
+**
+**	@param name
+**
 **	@return The newly generated SMOB type
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
@@ -382,7 +382,7 @@ local void AddProtectedCell(SCM * var)
 local void DelProtectedCell(int id)
 {
     ProtectedCellCount--;
-    
+
     ProtectedCells[id]=ProtectedCells[ProtectedCellCount];
 #ifdef CHECK_GC_VALUES
     ProtectedCellValues[id]=ProtectedCellValues[ProtectedCellCount];
@@ -496,15 +496,15 @@ global void CclGcUnprotect(SCM * obj)
 
     // FIXME: Doesn't handle nested protect/unprotects
     while (!gh_null_p(old_lst)) {
-        SCM el;
-	
+	SCM el;
+
 	el = gh_car(old_lst);
-        if (el != (*obj)) {
+	if (el != (*obj)) {
 	    new_lst = cons(el, new_lst);
 	}
 	old_lst = gh_cdr(old_lst);
-      }
-    
+    }
+
     setvar(sym, new_lst, NIL);
 #else
     gc_unprotect(obj);
@@ -564,8 +564,8 @@ global void CclGarbageCollect(int fast)
     }
 #elif defined(USE_SIOD)
 #ifdef SIOD_HEAP_GC
-    static int cpt=0;
-    
+    static int cpt = 0;
+
     // Very slow, so differ as much as possible...
     if (!(++cpt & 15)) {
     	user_gc(SCM_BOOL_F);
@@ -684,7 +684,7 @@ local int CclSetGameName(lua_State* l)
     return 1;
 }
 #endif
-										    
+
 /**
 **	Set the stratagus game-cycle
 */
@@ -1755,13 +1755,13 @@ global void InitCcl(void)
 #else
     // Stop & copy GC : scan only allocated cells
     sargv[2] = "-g1";
-    // Cells are allocated in chunck of 40000 cells ( => 160Ko ) 
+    // Cells are allocated in chunck of 40000 cells ( => 160Ko )
     sargv[3] = "-h40000";
 #endif
     buf = malloc(strlen(StratagusLibPath) + 4);
     sprintf(buf, "-l%s", StratagusLibPath);
     sargv[4] = buf;			// never freed
-    
+
     siod_init(5, sargv);
     repl_c_string(msg, 0, 0, sizeof(msg));
 #elif defined(USE_LUA)
@@ -2035,6 +2035,7 @@ global void SavePreferences(void)
     FILE* fd;
     char buf[1024];
     int i;
+
     //
     //	    preferences1.ccl
     //	    This file is loaded before stratagus.ccl
@@ -2091,7 +2092,7 @@ global void SavePreferences(void)
     fprintf(fd, "]]\n");
 
     fprintf(fd, "SetVideoResolution(%d, %d)\n", VideoWidth, VideoHeight);
-    
+
     fclose(fd);
 #endif
 
