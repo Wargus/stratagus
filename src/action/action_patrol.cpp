@@ -85,7 +85,8 @@ void HandleActionPatrol(Unit* unit)
 		NewResetPath(unit);
 	}
 
-	if (unit->Reset) {
+	if ((!unit->Type->NewAnimations && unit->Reset) ||
+			(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
 		//
 		// Attack any enemy in reaction range.
 		//  If don't set the goal, the unit can than choose a
