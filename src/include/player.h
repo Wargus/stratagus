@@ -46,8 +46,12 @@ struct _player_ {
 
     unsigned	Type;			/// type of player (human,computer,...)
     unsigned	Race;			/// race of player (orc,human,...)
-    unsigned	Team;			/// team of player
     unsigned	AiNum;			/// AI for computer
+
+    // friend enemy detection
+    unsigned	Team;			/// team of player
+    unsigned	Enemy;			/// enemy bit field for this player
+    unsigned	Allied;			/// allied bit field for this player
 
     unsigned	X;			/// map tile start X position
     unsigned	Y;			/// map tile start Y position
@@ -67,7 +71,7 @@ struct _player_ {
     unsigned	TotalNumUnits;		/// total # units for units' list.
 
     unsigned	Food;			/// food available/produced
-    unsigned	NumUnits;		/// # units (need food)
+    unsigned	NumFoodUnits;		/// # units (need food)
     unsigned	NumBuildings;		/// # buildings (don't need food)
 
     unsigned	Score;			/// points for killing ...
@@ -75,10 +79,24 @@ struct _player_ {
 // Display video
     unsigned	Color;			/// color of units on minimap
 
-    unsigned	UnitColor1;		/// Unit color 1 on map and icons
-    unsigned	UnitColor2;		/// Unit color 2 on map and icons
-    unsigned	UnitColor3;		/// Unit color 3 on map and icons
-    unsigned	UnitColor4;		/// Unit color 4 on map and icons
+    // FIXME: not used
+    union {
+	struct __4pixel8__ {
+	    VMemType8	Pixels[4];	/// palette colors #0 ... #3
+	}	Depth8;			/// player colors for 8bpp
+	struct __4pixel16__ {
+	    VMemType16	Pixels[4];	/// palette colors #0 ... #3
+	}	Depth16;		/// player colors for 16bpp
+	struct __4pixel32__ {
+	    VMemType32	Pixels[4];	/// palette colors #0 ... #3
+	}	Depth32;		/// player colors for 24/32bpp
+    }		UnitColors;		/// Unit colors for faster setup
+
+    // FIXME: this should be removed, use UnitColors insteed
+    //unsigned	UnitColor1;		/// Unit color 1 on map and icons
+    //unsigned	UnitColor2;		/// Unit color 2 on map and icons
+    //unsigned	UnitColor3;		/// Unit color 3 on map and icons
+    //unsigned	UnitColor4;		/// Unit color 4 on map and icons
 
 //  Upgrades/Allows:
 
