@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: stratagus.lua,v 1.23 2004/12/12 20:05:57 feb Exp $
+--	$Id$
 
 -- For documentation see stratagus/doc/ccl/ccl.html
 
@@ -46,7 +46,7 @@ print("Battle of Survival default config file loading ...\n")
 SetMenuMusic("music/title.ogg")
 
 --  Enable color cyclings.
-SetColorCycleAll(true)
+SetColorCycleAll(false)
 
 --	Set the game name
 SetGameName("bos")
