@@ -123,13 +123,14 @@ global void ChangeSelectedUnits(Unit** units,int count)
 
     DebugCheck(count > MaxSelectable);
 
-    if (count == 1 && units[0]->Type->ClicksToExplode) {
+    if (count == 1 && units[0]->Type->ClicksToExplode && 
+	units[0]->Type->Selectable) {
 	HandleSuicideClick(units[0]);
     }
 
     UnSelectAll();
     for (n = i = 0; i < count; ++i) {
-	if (!units[i]->Removed) {
+	if (!units[i]->Removed && units[i]->Type->Selectable) {
 	    Selected[n++] = unit = units[i];
 	    unit->Selected = 1;
 	    if (count > 1) {
@@ -166,6 +167,10 @@ global int SelectUnit(Unit* unit)
     }
 
     if (unit->Selected) {
+	return 0;
+    }
+
+    if (!unit->Type->Selectable) {
 	return 0;
     }
 
@@ -283,6 +288,10 @@ global int SelectUnitsByType(Unit* base)
 
     if (base->Type->ClicksToExplode) {
 	HandleSuicideClick(base);
+    }
+
+    if (!base->Type->Selectable) {
+	return 0;
     }
 
     UnSelectAll();

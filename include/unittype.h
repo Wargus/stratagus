@@ -358,6 +358,11 @@
 **		Points to the type of building it must be build on or
 **		NoUnitP otherwise. Buggy, works for oil platforms.
 **
+**	UnitType::NeutralMinimapColorRGB
+**
+**		Says what color a unit will have when it's neutral and
+**		is displayed on the minimap.
+**
 **	UnitType::CanStore[::MaxCosts]
 **
 **		What resource types we can store here.
@@ -756,13 +761,15 @@ struct _unit_type_ {
     unsigned Harvester : 1;		/// unit is a resource harvester.
 
     unsigned SelectableByRectangle : 1;	/// Selectable with mouse rectangle.
+    unsigned Selectable : 1;		/// Unit Is Selectable at all.
     unsigned Teleporter : 1;		/// Can teleport other units.
 
-    int		 CanStore[MaxCosts];	/// Resources that we can store here.
-    int		 GivesResource;		/// The resource this unit gives.
-    int		 MaxWorkers;		/// Maximum number of workers.
+    int		CanStore[MaxCosts];	/// Resources that we can store here.
+    int		GivesResource;		/// The resource this unit gives.
+    int		MaxWorkers;		/// Maximum number of workers.
     ResourceInfo* ResInfo[MaxCosts];	/// Resource information.
-    UnitType* MustBuildOnTop;		/// Must be built on top of something.
+    UnitType* 	MustBuildOnTop;		/// Must be built on top of something.
+    VMemType	NeutralMinimapColorRGB;	/// Minimap Color for Neutral Units.
 
 
     UnitSound Sound;			/// Sounds for events
