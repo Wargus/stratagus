@@ -10,7 +10,7 @@
 //
 /**@name ccl_sound.h	-	The Ccl sound header file. */
 /*
-**	(c) Copyright 1999 by Lutz Sammer and Fabrice Rossi
+**	(c) Copyright 1999,2000 by Lutz Sammer and Fabrice Rossi
 **
 **	$Id$
 */
