@@ -373,6 +373,7 @@ global Graphic* SpellSprites;
 global SCM CclManaSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 {
     free(ManaSprite.File);
+
     ManaSprite.File=gh_scm2newstr(file,NULL);
     ManaSprite.HotX=gh_scm2int(x);
     ManaSprite.HotY=gh_scm2int(y);
@@ -394,6 +395,7 @@ global SCM CclManaSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 global SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 {
     free(HealthSprite.File);
+
     HealthSprite.File=gh_scm2newstr(file,NULL);
     HealthSprite.HotX=gh_scm2int(x);
     HealthSprite.HotY=gh_scm2int(y);
@@ -417,6 +419,27 @@ global void LoadDecorations(void)
     // FIXME: make this configurable
     SpellSprites=LoadSprite("graphics/ui/bloodlust,haste,slow,invisible,shield.png"
 	,16,16);
+}
+
+/**
+**	Clean decorations.
+*/
+global void CleanDecorations(void)
+{
+    free(HealthSprite.File);
+    VideoSaveFree(HealthSprite.Sprite);
+    HealthSprite.File=NULL;
+    HealthSprite.Sprite=NULL;
+    free(ManaSprite.File);
+    VideoSaveFree(ManaSprite.Sprite);
+    ManaSprite.File=NULL;
+    ManaSprite.Sprite=NULL;
+    //free(ShadowSprite.File);
+    VideoSaveFree(ShadowSprite.Sprite);
+    //ShadowSprite.File=NULL;
+    ShadowSprite.Sprite=NULL;
+    VideoSaveFree(SpellSprites);
+    SpellSprites=NULL;
 }
 
 /**
