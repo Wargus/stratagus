@@ -320,8 +320,8 @@ global void ShowIntro(void)
     RealizeVideoMemory();
 
     CallbackMusicOn();
-    // FIXME: should make it configurable
-    PlayMusic("music/default.mod");
+    // FIXME: should this be GameMusic?
+    PlayMusic(MenuMusic);
 }
 
 //@}

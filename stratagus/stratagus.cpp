@@ -209,6 +209,10 @@ extern SCM CclUnits(void);
 #endif
 
 global char* TitleScreen;		/// Titlescreen to show at startup
+global char* MenuBackground;		/// file for menu background
+global char* MenuBackgroundWithTitle;	/// file for menu with title
+global char* TitleMusic;		/// file for title music
+global char* MenuMusic;			/// file for menu music
 global char* FreeCraftLibPath;		/// Path for data
 
     /// Name, Version, Copyright
@@ -638,6 +642,7 @@ global int main(int argc,char** argv)
     //	Setup some defaults.
     //
     FreeCraftLibPath=FREECRAFT_LIB_PATH;
+    // FIXME: Is this needed? JOHNS: I think not.
     TitleScreen=strdup("graphics/ui/title.png");
     CclStartFile="ccl/freecraft.ccl";
 
