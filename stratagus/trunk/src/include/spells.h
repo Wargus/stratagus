@@ -96,74 +96,74 @@ typedef union
 {
 // FIXME rename structure more properly.
 // TTL's below are in ticks: approx: 500=13sec, 1000=25sec, 2000=50sec
-// FIXME use TTL or nb_of_second ?
-	struct {
-	    int fields;			/// FIXME doc
-	    int shards;			/// FIXME doc
-	    int damage;			/// damage
-	} blizzard;
-	
-	struct {
-	    UnitType *goal;		/// FIXME: compact to Summon
-	} circleofpower;
-	
-	struct {
-	    int fields;			/// FIXME doc
-	    int shards;			/// FIXME doc
-	    int damage;			/// damage
-	} deathanddecay;
-	
-	struct {
-	    int TTL;			/// time to live (ticks)
-	    int damage;			/// Damage.
-	} fireball;
-	
-	struct {
-	    int	TTL;			/// time to live (ticks)
-	} flameshield;
+// FIXME use TTL, as in TICKS to live
+    struct {
+	int Fields;		/// FIXME doc
+	int Shards;		/// FIXME doc
+	int Damage;		/// damage
+    } Blizzard;
+    
+    struct {
+	UnitType *PortalType;	/// The unit type spawned
+    } SpawnPortal;
+    
+    struct {
+	int Fields;		/// FIXME doc
+	int Shards;		/// FIXME doc
+	int Damage;		/// damage
+    } DeathAndDecay;
+    
+    struct {
+	int TTL;		/// time to live (ticks)
+	int Damage;		/// Damage.
+    } Fireball;
+    
+    struct {
+	int TTL;		/// time to live (ticks)
+    } FlameShield;
 
-	struct s_haste {
-	    int flag;			/// flag for know what variable to set.
-	    int value;			/// the set value. (nb sec).
-    	struct s_haste	*next;		/// Other variable to set ?
-	} haste;
-	
-	struct {
-	    int	HP;			/// HP gain for manacost.(negative for exorcism)
-	} healing;
-	
-	struct {
-	    UnitType *revealer;		/// Type of unit to be summoned: (unit-revealer).
-	} holyvision;
-	
-	struct {
-	    int	flag;			/// unholyarmor or invisibility.
-	    int	value;			/// the set value. (nb sec).
-	    MissileType *missile;	/// missile for the target.
-	} invisibility;
-	
-	struct {
-	    UnitType *unit;		/// The new form :)
-	} polymorph;
-	
-	struct {
-	    UnitType *skeleton;		/// The unit to spwan from corpses
-	} raisedead;
-	
-	struct {
-	    int TTL;			/// time to live (ticks)
-	    int damage;			/// Damage.
-	} runes;
-	
-	struct {
-	    UnitType *unittype;		/// Type of unit to be summoned.
-	} summon;
-	
-	struct {
-	    int  TTL;			/// time to live (ticks)
-	    // FIXME: more configurations
-	} whirlwind;
-}	t_SpellAction;
+    struct s_haste {
+	int flag;		/// flag for know what variable to set.
+	int value;		/// the set value. (nb sec).
+    struct s_haste *next;	/// Other variable to set ?
+    } haste;
+    
+    struct {
+	int HP;			/// HP gain for manacost.(negative for exorcism)
+    } healing;
+    
+    struct {
+	UnitType *revealer;	/// Type of unit to be summoned: (unit-revealer).
+    } holyvision;
+    
+    struct {
+	int flag;		/// unholyarmor or invisibility.
+	int value;		/// the set value. (nb sec).
+	MissileType *missile;	/// missile for the target.
+    } invisibility;
+    
+    struct {
+	UnitType *unit;		/// The new form :)
+    } polymorph;
+    
+    struct {
+	UnitType *skeleton;		/// The unit to spwan from corpses
+    } raisedead;
+    
+    struct {
+	int TTL;			/// time to live (ticks)
+	int damage;			/// Damage.
+    } runes;
+    
+    struct {
+	UnitType *unittype;		/// Type of unit to be summoned.
+    } summon;
+    
+    struct {
+	int  TTL;			/// time to live (ticks)
+	// FIXME: more configurations
+    } whirlwind;
+} SpellActionType;
 
 /*
 ** *******************
@@ -194,12 +194,10 @@ struct s_Conditions;
 /*
 **	 Specific conditions.
 */
-typedef		int	f_specific_condition(const struct s_Conditions	*condition,
-										const Unit* caster,
-										const Unit* target, int x, int y);
+typedef	int f_specific_condition(const struct s_Conditions *condition,
+	const Unit* caster,const Unit* target,int x,int y);
 
-typedef		int	f_generic_condition(const struct s_Conditions	*condition,
-									const Unit* caster);
+typedef	int f_generic_condition(const struct s_Conditions *condition,const Unit* caster);
 
 
 /**
@@ -208,24 +206,24 @@ typedef		int	f_generic_condition(const struct s_Conditions	*condition,
 **	@todo	Move more parameters into this structure.
 */
 typedef struct s_Conditions {
-	int			expectvalue;				///< Value expected (condition is true or false)
-	union {
-		f_specific_condition	*specific;			///< Fonction that evaluate the condition.
-		f_generic_condition		*generic;			///< Fonction that evaluate the condition.
-	} f;
-	union	{
-			int range;	///< range
-//			struct {
-//				t_SpecificConditions c1;
-//				t_SpecificConditions c2;
-//			} or;		//
-			unsigned int flag;	///< flag
-			struct {
-				unsigned int	flag;
-				unsigned int	ttl;
-			} durationeffect;	///< durationeffect
-	}	u;
-	struct s_Conditions	*next;	///< for list.
+    int expectvalue;				/// Value expected (function expected result, true or false)
+    union {
+	f_specific_condition *specific;		/// Evaluation Function for the condition.
+	f_generic_condition  *generic;		/// Evaluation Function for the condition.
+    } f;
+    union {
+	int range;	/// range
+//	struct {
+//	    t_SpecificConditions c1;
+//	    t_SpecificConditions c2;
+//	} or;		//
+	unsigned int flag;	///< flag
+	struct {
+	    unsigned int	flag;
+	    unsigned int	ttl;
+	} durationeffect;	///< durationeffect
+    } u;
+    struct s_Conditions	*next;	///< for list.
 } t_Conditions;
 
 
@@ -261,10 +259,10 @@ typedef struct _spell_type_ {
     char *Name;				/// Spell name shown by the engine
 
     //	Spell Specifications
-    TargetType	which_sort_of_target;	/// for identify what sort of target is valid.
-    f_spell			*f;	/// function to cast the spell.
-    t_SpellAction	*SpellAction;	/// More arguments for spell (damage, delay, additional sounds...).
-    int  Range;				/// Max range of the target.
+    TargetType	Target;			/// Targetting information. See TargetType.
+    f_spell *f;				/// function to cast the spell.
+    SpellActionType *SpellAction;	/// More arguments for spell (damage, delay, additional sounds...).
+    int Range;				/// Max range of the target.
     unsigned int ManaCost;		/// required mana for each cast
 
     t_Conditions *Condition_generic;	/// Conditions to cast the spell. (generic (no test for each target))
@@ -273,8 +271,8 @@ typedef struct _spell_type_ {
     t_AutoCast	*AutoCast;					/// AutoCast information
 
 //	Uses for graphics and sounds
-    SoundConfig SoundWhenCasted;	/// sound played if casted
-    MissileType	*Missile;	/// missile fired on cast
+    SoundConfig SoundWhenCast;		/// sound played if cast
+    MissileType	*Missile;		/// missile fired on cast
 } SpellType;
 
 /*----------------------------------------------------------------------------
