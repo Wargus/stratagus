@@ -1651,10 +1651,29 @@ local SCM CclSetShowOrders(SCM flag)
 }
 
 /**
+**	Add a new message.
+**
+**	@param message	Message to display.
+*/
+global SCM CclSetMessage(SCM message)
+{
+    char *str;
+
+    str = gh_scm2newstr(message, NULL);
+    SetMessage(str);
+    free(str);
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
 {
+
+    gh_new_procedure1_0("add-message", CclSetMessage);
+
     gh_new_procedure1_0("set-color-cycle-all!",CclSetColorCycleAll);
     gh_new_procedure1_0("set-reverse-map-move!",CclSetReverseMapMove);
 
