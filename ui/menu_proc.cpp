@@ -74,7 +74,7 @@ global struct {
 /**
 **	The currently processed menu
 */
-global const char *CurrentMenu = NULL;
+global Menu *CurrentMenu;
 
 /**
 **	The background picture used by menus
@@ -543,13 +543,12 @@ local void DrawInput(Menuitem *mi, unsigned mx, unsigned my)
 **
 **	@param menu_id	The menu number to display
 */
-global void DrawMenu(const char *menu_id)
+global void DrawMenu(Menu *menu)
 {
     int i, n, l;
-    Menu *menu;
     Menuitem *mi, *mip;
 
-    if (menu_id == NULL || !(menu = FindMenu(menu_id))) {
+    if (menu == NULL) {
 	MustRedraw &= ~RedrawMenu;
 	return;
     }
@@ -668,17 +667,12 @@ local void MenuHandleKeyDown(unsigned key,unsigned keychar)
     Menuitem *mi;
     Menu *menu;
 
-    HandleKeyModifiersDown(key,keychar);
+    HandleKeyModifiersDown(key, keychar);
 
-    if (CurrentMenu == NULL) { // < 0
+    if (CurrentMenu == NULL) {
 	return;
     }
-
-    menu = FindMenu(CurrentMenu);
-    if (menu == NULL) {
-	return;
-    }
-
+    menu = CurrentMenu;
     if (MenuButtonCurSel != -1 && menu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
 	mi = menu->items + MenuButtonCurSel;
 	if (!(mi->flags & MenuButtonDisabled)) {
@@ -914,20 +908,13 @@ local void MenuHandleKeyUp(unsigned key,unsigned keychar)
 */
 local void MenuHandleKeyRepeat(unsigned key,unsigned keychar)
 {
-    Menu *menu;
-
     HandleKeyModifiersDown(key,keychar);
 
     if (CurrentMenu == NULL) {
 	return;
     }
 
-    menu = FindMenu(CurrentMenu);
-    if (menu == NULL) {
-	return;
-    }
-
-    if (MenuButtonCurSel != -1 && menu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
+    if (MenuButtonCurSel != -1 && CurrentMenu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
 	MenuHandleKeyDown(key,keychar);
     }
 }
@@ -955,10 +942,7 @@ local void MenuHandleMouseMove(int x,int y)
 	return;
     }
 
-    menu = FindMenu(CurrentMenu);
-    if (menu == NULL) {
-	return;
-    }
+    menu = CurrentMenu;
 
     n = menu->nitems;
     MenuButtonUnderCursor = -1;
@@ -1232,10 +1216,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	return;
     }
 
-    menu = FindMenu(CurrentMenu);
-    if (menu == NULL) {
-	return;
-    }
+    menu = CurrentMenu;
 
     if (MouseButtons&(LeftButton<<MouseHoldShift))
 	return;
@@ -1317,10 +1298,7 @@ local void MenuHandleButtonUp(unsigned b)
 	return;
     }
 
-    menu = FindMenu(CurrentMenu);
-    if (menu == NULL) {
-	return;
-    }
+    menu = CurrentMenu;
 
     if ((1<<b) == LeftButton) {
 	n = menu->nitems;
@@ -1446,9 +1424,8 @@ global void EndMenu(void)
 global void ProcessMenu(const char *menu_id, int loop)
 {
     int i, oldncr;
-    Menu *menu;
     Menuitem *mi;
-    const char *CurrentMenuSave = NULL;
+    Menu *menu, *CurrentMenuSave = NULL;
     int MenuButtonUnderCursorSave = -1;
     int MenuButtonCurSelSave = -1;
 
@@ -1473,7 +1450,7 @@ global void ProcessMenu(const char *menu_id, int loop)
     if (menu == NULL) {
 	return;
     }
-    CurrentMenu = menu_id;
+    CurrentMenu = menu;
     MenuButtonCurSel = -1;
     for (i = 0; i < menu->nitems; ++i) {
 	mi = menu->items + i;

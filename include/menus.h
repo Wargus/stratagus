@@ -250,7 +250,7 @@ typedef struct _menus_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern const char *CurrentMenu;		/// Currently processed menu
+extern Menu *CurrentMenu;		/// Currently processed menu
 extern char ScenSelectFullPath[1024];	/// Full path to currently selected map
 extern MapInfo *ScenSelectPudInfo;	/// MapInfo of currently selected map
 
@@ -284,7 +284,7 @@ extern void InitMenuFuncHash(void);
 extern void InitMenus(unsigned int race);
 
     /// Draw menu
-extern void DrawMenu(const char *MenuId);
+extern void DrawMenu(Menu *menu);
     /// Draw menu button
 extern void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigned h,unsigned x,unsigned y,const int font,const unsigned char *text);
     /// Set menu backgound and draw it
