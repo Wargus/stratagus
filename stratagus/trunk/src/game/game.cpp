@@ -214,6 +214,17 @@ global void CreateGame(char* filename, WorldMap* map)
 	}
     }
 
+    //
+    //	Network part
+    //
+    if( NetPlayers>1 || NetworkArg ) {	// with network
+	InitNetwork1();
+	InitNetwork2();
+    } else {
+	NetworkFildes=-1;
+	NetworkInSync=1;
+    }
+
     DebugLevel3("Terrain %d\n",TheMap.Terrain);
 
     // FIXME: must use palette from tileset!!
@@ -244,9 +255,12 @@ global void CreateGame(char* filename, WorldMap* map)
     //	Graphic part
     //
     LoadIcons();
+
+    // FIXME: Race only known in single player game:
     InitMenus(ThisPlayer->Race);
     LoadImages(ThisPlayer->Race);
     LoadCursors(ThisPlayer->Race);
+
     LoadTileset();
     InitUnitButtons();
     LoadMissileSprites();
@@ -294,6 +308,7 @@ global void CreateGame(char* filename, WorldMap* map)
     );
 #endif
 
+#if 0
     //
     //	Network part
     //
@@ -304,6 +319,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	NetworkFildes=-1;
 	NetworkInSync=1;
     }
+#endif
 
     //
     //  Init units' groups
@@ -367,7 +383,6 @@ global void CreateGame(char* filename, WorldMap* map)
 
 /**
 **	Init Game Setting to default values
-**
 */
 global void InitSettings(void)
 {
