@@ -2558,43 +2558,38 @@ local SCM CclDefineMenuItem(SCM list)
 		item->mitype=MI_TYPE_TEXT;
 		item->d.text.text = NULL;
 
-		if ( !gh_null_p(gh_car(sublist)) ) {
-		    item->d.text.text=gh_scm2newstr(gh_car(sublist), NULL);
-		    // FIXME: can be removed
-		    if (!strcmp(item->d.text.text, "null")) {
-			free(item->d.text.text);
-			item->d.text.text = NULL;
-		    }
-		}
-		sublist=gh_cdr(sublist);
-		value=gh_car(sublist);
-		if ( gh_eq_p(value,gh_symbol2scm("center")) ) {
-		    item->d.text.tflags=MI_TFLAGS_CENTERED;
-		} else if ( gh_eq_p(value,gh_symbol2scm("left")) ) {
-		    item->d.text.tflags=MI_TFLAGS_LALIGN;
-		} else if ( gh_eq_p(value,gh_symbol2scm("right")) ) {
-		    item->d.text.tflags=MI_TFLAGS_RALIGN;
-		} else if ( gh_eq_p(value,gh_symbol2scm("none")) ) {
-		    item->d.text.tflags=0;
-		} else {
-		    s1=gh_scm2newstr(gh_car(value),NULL);
-		    fprintf(stderr,"Unknow flag %s\n", s1);
-		    free(s1);
-		}
-
-		sublist=gh_cdr(sublist);
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
-	    	    s1 = gh_scm2newstr(gh_car(sublist),NULL);
-		    func = (void **)hash_find(MenuFuncHash,s1);
-		    if (func != NULL) {
-		        item->d.text.action=(void *)*func;
-		    } else {
-		        fprintf(stderr,"Can't find function: %s\n", s1);
-		    }
-		    free(s1);
+		while ( !gh_null_p(sublist) ) {
+		    value=gh_car(sublist);
 		    sublist=gh_cdr(sublist);
+
+		    if ( gh_eq_p(value,gh_symbol2scm("align")) ) {
+			value=gh_car(sublist);
+			if (gh_eq_p(value,gh_symbol2scm("left")) ) {
+			    item->d.text.align=MI_TFLAGS_LALIGN;
+			} else if (gh_eq_p(value,gh_symbol2scm("right")) ) {
+			    item->d.text.align=MI_TFLAGS_RALIGN;
+			} else if (gh_eq_p(value,gh_symbol2scm("center")) ) {
+			    item->d.text.align=MI_TFLAGS_CENTERED;
+			}
+		    } else if ( gh_eq_p(value,gh_symbol2scm("caption")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.text=gh_scm2newstr(gh_car(sublist), NULL);
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
+			value=gh_car(sublist);
+	    		s1 = gh_scm2newstr(value,NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+		    	item->d.text.action=(void *)*func;
+			} else {
+		    	    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+		    } else {
+			//s1=gh_scm2newstr(value, NULL);
+			//fprintf(stderr, "Unsupported property %s\n", s1);
+			//free(s1);
+		    }
 		}
 	    } else if ( gh_eq_p(value,gh_symbol2scm("button")) ) {
 		sublist=gh_car(list);
