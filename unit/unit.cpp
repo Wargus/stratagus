@@ -740,7 +740,7 @@ global void UnitLost(Unit* unit)
     //
     //	Call back to AI, for killed or lost units.
     //
-    if (player && player->Ai) {
+    if (player && player->AiEnabled) {
 	AiUnitKilled(unit);
     }
 

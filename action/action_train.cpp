@@ -96,7 +96,7 @@ global void HandleActionTrain(Unit* unit)
 	//
 	food = PlayerCheckLimits(player, unit->Data.Train.What[0]);
 	if (food < 0) {
-	    if (food == -3 && unit->Player->Ai) {
+	    if (food == -3 && unit->Player->AiEnabled) {
 		AiNeedMoreFarms(unit, unit->Orders[0].Type);
 	    }
 
@@ -130,7 +130,7 @@ global void HandleActionTrain(Unit* unit)
 	if (player == ThisPlayer) {
 	    PlayUnitSound(nunit, VoiceReady);
 	}
-	if (unit->Player->Ai) {
+	if (unit->Player->AiEnabled) {
 	    AiTrainingComplete(unit, nunit);
 	}
 

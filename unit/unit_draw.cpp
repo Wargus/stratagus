@@ -2172,8 +2172,10 @@ global void DrawUnit(const Unit* unit)
     //
     //	This should be obviousely false.
     //
-    DebugCheck(unit->VisCount[ThisPlayer->Player] >
+/*    DebugCheck(unit->VisCount[ThisPlayer->Player] >
 	    unit->Type->TileWidth * unit->Type->TileHeight);
+*/
+
     //
     //	If we are in replay reveal map or the unit is visible(not under fog).
     //

@@ -667,7 +667,12 @@ global void CommandBuildBuilding(Unit* unit, int x, int y,
 	    order->Range = unit->Type->RepairRange;
 	} else {
 	    // If building inside, but be next to stop
-	    order->Range = 0;
+	    if (what->ShoreBuilding && unit->Type->UnitType == UnitTypeLand) {
+	    	// Peon won't dive :-)
+		order->Range = 1;
+	    } else {
+		order->Range = 0;
+	    }
 	}
 	order->Type = what;
 	if (what->BuilderOutside) {
