@@ -102,10 +102,6 @@ void LoadConstructions(void)
 				(*cop)->Height = (*cop)->File[0].Height;
 			}
 			if (file && *file) {
-				char* buf;
-
-				buf = alloca(strlen(file) + 9 + 1);
-				file = strcat(strcpy(buf, "graphics/"), file);
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->Sprite = LoadSprite(file,
 					(*cop)->Width, (*cop)->Height);
@@ -121,10 +117,6 @@ void LoadConstructions(void)
 				(*cop)->ShadowHeight = (*cop)->ShadowFile[0].Height;
 			}
 			if (file && *file) {
-				char* buf;
-
-				buf = alloca(strlen(file) + 9 + 1);
-				file = strcat(strcpy(buf, "graphics/"), file);
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->ShadowSprite = LoadSprite(file,
 					(*cop)->ShadowWidth, (*cop)->ShadowHeight);

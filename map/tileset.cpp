@@ -96,7 +96,6 @@ void LoadTileset(void)
 	int solid;
 	int mixed;
 	unsigned char* data;
-	char* buf;
 	const unsigned short* table;
 
 	//
@@ -123,10 +122,8 @@ void LoadTileset(void)
 	//
 	//  Load and prepare the tileset
 	//
-	buf = alloca(strlen(Tilesets[i]->ImageFile) + 9 + 1);
-	strcat(strcpy(buf, "graphics/"), Tilesets[i]->ImageFile);
 	ShowLoadProgress("Tileset `%s'", Tilesets[i]->ImageFile);
-	TheMap.TileGraphic = LoadSprite(buf, 0, 0);
+	TheMap.TileGraphic = LoadSprite(Tilesets[i]->ImageFile, 0, 0);
 
 	TileSizeX = Tilesets[i]->TileSizeX;
 	TileSizeY = Tilesets[i]->TileSizeY;
