@@ -2126,7 +2126,7 @@ local void HelpMenu(void)
 
 local void ShowTipsMenu(void)
 {
-    ProcessMenu(MENU_TIPS, 1);
+    ProcessMenu(MENU_TIPS, 0);
 }
 
 /**
