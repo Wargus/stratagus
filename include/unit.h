@@ -959,14 +959,6 @@ extern Unit* RepairableOnMapTile(int tx,int ty);
 extern Unit* TargetOnMapTile(const Unit* unit,int tx,int ty);
     /// Return transporter unit on that map tile
 extern Unit* TransporterOnMapTile(int tx,int ty);
-    /// Return any unit on that screen map position
-extern Unit* UnitOnScreenMapPosition (int , int );
-    /// Return repairable unit on that screen map position
-extern Unit* RepairableOnScreenMapPosition (int , int );
-    /// Return possible attack target on that screen map position
-extern Unit* TargetOnScreenMapPosition (const Unit* unit,int , int );
-    /// Return transporter unit on that screen map position
-extern Unit* TransporterOnScreenMapPosition (int , int );
 
     /// Return unit of a fixed type on a map tile.
 extern Unit* UnitTypeOnMap(int tx,int ty,UnitType* type);
