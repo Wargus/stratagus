@@ -4,16 +4,13 @@
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
-//  ______________________			     ______________________
-//			  T H E	  W A R	  B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//  ______________________                           ______________________
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_draw.c	-	The map drawing.
-**
-**	@todo FIXME: Johns: More to come: zooming, scaling, 64x64 tiles...
-*/
+/**@name map_draw.c - The map drawing. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,40 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//		$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Documentation
-----------------------------------------------------------------------------*/
-
-/**
-**		@def USE_SMART_TILECACHE
-**
-**		If USE_SMART_TILECACHE is defined, the code is compiled with
-**		the smart-tile-cache support. With the smart-tile-cache support a
-**		tile is only converted once to the video format, each consequent access
-**		use the ready converted image form the video memory.
-**
-**		Nothing is cached between frames. Slow with hardware video memory.
-**
-**		@see USE_TILECACHE
-*/
-
-/**
-**		@def noUSE_TILECACHE
-**
-**		If USE_TILECACHE is defined, the code is compiled with the tile-cache
-**		support. With the tile-cache support a tile is only converted once to
-**		video format, each consequent access use the ready converted image form
-**		the cache memory. The LRU cache is of TileCacheSize.
-**
-**		@see TileCacheSize @see USE_SMART_TILECACHE
-*/
-
-/*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -84,176 +53,36 @@
 #endif
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
-
-#define noUSE_TILECACHE						/// defined use tile cache
-#define USE_SMART_TILECACHE				/// defined use a smart tile cache
-#define GRID				0				/// Map is shown with a grid, if 1
-
 
 #ifdef DEBUG
-#define noTIMEIT						/// defined time function
+#define noTIMEIT  /// defined time function
 #endif
-
-#ifdef USE_TILECACHE		// {
-
-/**
-**		Cache managment structure.
-*/
-typedef struct _tile_cache {
-	struct dl_node		DlNode;				/// double linked list for lru
-	unsigned				Tile;				/// for this tile (0 can't be cached)
-	unsigned char		Buffer[1];		/// memory
-} TileCache;
-
-/*----------------------------------------------------------------------------
---		Variables
-----------------------------------------------------------------------------*/
-
-/**
-**		Contains pointer, if the tile is cached.
-**
-**		@note FIXME: could save memory here and only use how many tiles exits.
-**
-**		@see MaxTilesInTileset
-*/
-local TileCache* TileCached[MaxTilesInTileset];
-
-/**
-**		Number of tile caches.
-**
-**		@todo FIXME: Not make this configurable by ccl
-*/
-global int TileCacheSize = 196;
-
-/**
-**		Last recent used cache tiles.
-*/
-local DL_LIST(TileCacheLRU);
-
-#endif		// } USE_TILECACHE
-
-#ifdef USE_SMART_TILECACHE
-
-/**
-**		Contains pointer, to last video position, where this tile was drawn.
-**
-**		@note FIXME: could save memory here and only use how many tiles exits.
-**
-**		@see MaxTilesInTileset
-*/
-local void* TileCached[MaxTilesInTileset];
-
-#endif
-
-/**
-**		Low word contains pixel data for 16 bit modes.
-**
-**		@note FIXME: should or could be moved into video part?
-*/
-local unsigned int PixelsLow[256];
-
-/**
-**		High word contains pixel data for 16 bit modes.
-**
-**		@note FIXME: should or could be moved into video part?
-*/
-local unsigned int PixelsHigh[256];
 
 #ifdef NEW_DECODRAW
 /**
-**		Decoration as registered for decoration mechanism to draw map tiles
+**  Decoration as registered for decoration mechanism to draw map tiles
 */
-global Deco *MapDecoration = NULL;
+global Deco* MapDecoration = NULL;
 #endif
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
-
-#if GRID == 1
-	/// Draw less for grid display
-#define GRID_SUB		TileSizeX
-#else
-	/// Draw all (no grid enabled)
-#define GRID_SUB		0
-#endif
-
-/**
-**		Do unroll 4x
-**
-**		@param x		Index passed to UNROLL2 incremented by 2.
-*/
-#define UNROLL4(x)		\
-	UNROLL2((x) + 0);		\
-	UNROLL2((x) + 2);
-
-/**
-**		Do unroll 8x
-**
-**		@param x		Index passed to UNROLL4 incremented by 4.
-*/
-#define UNROLL8(x)		\
-	UNROLL4((x) + 0);		\
-	UNROLL4((x) + 4);
-
-/**
-**		Do unroll 8x
-**
-**		@param x		Index passed to UNROLL4 incremented by 4.
-*/
-#define UNROLL12(x)		\
-	UNROLL4((x) + 0);		\
-	UNROLL4((x) + 4);		\
-	UNROLL4((x) + 8);
-
-/**
-**		Do unroll 16x
-**
-**		@param x		Index passed to UNROLL8 incremented by 8.
-*/
-#define UNROLL16(x)		\
-	UNROLL8((x) + 0);		\
-	UNROLL8((x) + 8)
-
-/**
-**		Do unroll 24x
-**
-**		@param x		Index passed to UNROLL8 incremented by 8.
-*/
-#define UNROLL24(x)		\
-	UNROLL8((x) + 0);		\
-	UNROLL8((x) + 8);		\
-	UNROLL8((x) + 16)
-
-/**
-**		Do unroll 32x
-**
-**		@param x		Index passed to UNROLL8 incremented by 8.
-*/
-#define UNROLL32(x)		\
-	UNROLL8((x) + 0);		\
-	UNROLL8((x) + 8);		\
-	UNROLL8((x) + 16);		\
-	UNROLL8((x) + 24)
 
 /*----------------------------------------------------------------------------
---		Draw tile
+--  Draw tile
 ----------------------------------------------------------------------------*/
 
 /**
-**		Fast draw tile.
+**  Draw tile.
 **
-**		@param tile		pointer to tile graphic data
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@note This is a hot spot in the program.
-**		(50% cpu time was needed for this, now only 32%)
-**
-**		@see GRID
+**  @param tile  tile number
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
 */
+#ifndef USE_OPENGL
 global void VideoDrawTile(const int tile, int x, int y)
 {
 	int tilepitch;
@@ -273,1217 +102,8 @@ global void VideoDrawTile(const int tile, int x, int y)
 	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect,
 		TheScreen, &drect);
 }
-
-#ifdef NEW_DECODRAW
-/**
-**		Draw TileSizeX x TileSizeY clipped for XX bpp video modes.
-**		(needed for decoration mechanism, which wants to draw tile partly)
-**		FIXME: this separate function is only needed for compatibility with
-**			 variable VideoDrawTile, can be replaced by MapDrawXXTileClip
-**
-**		@param data		pointer to tile graphic data
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void VideoDrawXXTileClip(const unsigned char* data, int x, int y)
-{
-#if GRID==1
-	VideoDrawRawClip((VMemType*)TheMap.TileData->Pixels,
-		data, x, y, TileSizeX, TileSizeY-1);
-	VideoDrawLineClip(ColorBlack, x + TileSizeX-1, y,
-			x + TileSizeX-1, y + TileSizeY);
-	VideoDrawLineClip(ColorBlack, x, y + TileSizeY-1,
-			x + TileSizeX, y + TileSizeY - 1);
 #else
-	VideoDrawRawClip((VMemType*)TheMap.TileData->Pixels,
-		data, x, y, TileSizeX, TileSizeY);
-#endif
-}
-
-/**
-**		Draw TileSizeX x TileSizeY clipped for XX bpp video modes.
-**		(needed for decoration mechanism, which wants to draw tile partly)
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDrawXXTileClip(int tile, int x, int y)
-{
-	VideoDrawXXTileClip(TheMap.Tiles[tile], x, y);
-}
-#endif
-
-/*----------------------------------------------------------------------------
---		Draw tile with zoom
-----------------------------------------------------------------------------*/
-
-// FIXME: write this
-
-/*----------------------------------------------------------------------------
---		Cache
-----------------------------------------------------------------------------*/
-
-#ifdef USE_TILECACHE		// {
-
-/**
-**		Draw 16x16 tile for 8 bpp video modes into cache and video memory.
-**
-**		@param graphic		Graphic structure for the tile
-**		@param cache		Cache to fill with tile
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@note This is a hot spot in the program.
-**
-**		@see GRID
-*/
-local void FillCache8AndDraw16(const unsigned char* data, VMemType8* cache,
-	int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* ep;
-	int va;
-	VMemType8* dp;
-	VMemType8* vp;
-
-	sp = data;
-	ep = sp + TileSizeY * TileSizeX - GRID_SUB;
-	dp = cache;
-	va = VideoWidth;
-	vp = VideoMemory8 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)sp) & 1) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)vp) & 3) {
-		DebugLevel0("Not aligned video memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)		\
-		vp[x + 0] = dp[x + 0] = ((VMemType8*)TheMap.TileData->Pixels)[sp[x + 0]]; \
-		vp[x + 0] = dp[x + 1] = ((VMemType8*)TheMap.TileData->Pixels)[sp[x + 1]]
-
-		UNROLL16(0);
-#if GRID == 1
-		vp[15] = dp[15] = ((VMemType8*)TheMap.TileData->Pixels)[0];
-#endif
-		vp += va;
-		sp += TileSizeX;
-		dp += TileSizeX;
-	}
-
-#if GRID == 1
-	for (va = TileSizeX; va--;) {		// no need to be fast with grid
-		vp[va] = dp[va] = ((VMemType8*)TheMap.TileData->Pixels)[0];
-	}
-#endif
-}
-
-/**
-**		Draw 16x16 tile for 16 bpp video modes into cache and video memory.
-**
-**		@param graphic		Graphic structure for the tile
-**		@param cache		Cache to fill with tile
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@note This is a hot spot in the program.
-**
-**		@see GRID
-*/
-local void FillCache16AndDraw16(const unsigned char* data, VMemType16* cache,
-	int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* ep;
-	int va;
-	VMemType16* dp;
-	VMemType16* vp;
-
-	sp = data;
-	ep = sp + TileSizeY * TileSizeX - GRID_SUB;
-	dp = cache;
-	va = VideoWidth;
-	vp = VideoMemory16 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)sp) & 1) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)vp) & 3) {
-		DebugLevel0("Not aligned video memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)		\
-		*(unsigned int*)(vp + x + 0) = *(unsigned int*)(dp + x + 0) = \
-			PixelsLow[sp[x + 0]] | PixelsHigh[sp[x + 1]]
-
-		UNROLL16(0);
-#if GRID == 1
-		vp[15] = dp[15] = Pixels[0];
-#endif
-		vp += va;
-		sp += TileSizeX;
-		dp += TileSizeX;
-	}
-
-#if GRID == 1
-	for (va = TileSizeX; va--;) {		// no need to be fast with grid
-		vp[va] = dp[va] = Pixels[0];
-	}
-#endif
-}
-
-/**
-**		Draw 16x16 tile for 24 bpp video modes into cache and video memory.
-**
-**		@param graphic		Graphic structure for the tile
-**		@param cache		Cache to fill with tile
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@note This is a hot spot in the program.
-**
-**		@see GRID
-*/
-local void FillCache24AndDraw16(const unsigned char* data, VMemType24* cache,
-	int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* ep;
-	int va;
-	VMemType24* dp;
-	VMemType24* vp;
-
-	sp = data;
-	ep = sp + TileSizeY * TileSizeX - GRID_SUB;
-	dp = cache;
-	va = VideoWidth;
-	vp = VideoMemory24 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)sp) & 1) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)vp) & 3) {
-		DebugLevel0("Not aligned video memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)		\
-		vp[x + 0] = dp[x + 0] = ((VMemType24*)TheMap.TileData->Pixels)[sp[x + 0]]; \
-		vp[x + 0] = dp[x + 1] = ((VMemType24*)TheMap.TileData->Pixels)[sp[x + 1]]
-
-		UNROLL16(0);
-#if GRID == 1
-		vp[15] = dp[15] = ((VMemType24*)TheMap.TileData->Pixels)[0];
-#endif
-		vp += va;
-		sp += TileSizeX;
-		dp += TileSizeX;
-	}
-
-#if GRID == 1
-	for (va = TileSizeX; va--;) {		// no need to be fast with grid
-		vp[va] = dp[va] = ((VMemType24*)TheMap.TileData->Pixels)[0];
-	}
-#endif
-}
-
-/**
-**		Draw 16x16 tile for 32 bpp video modes into cache and video memory.
-**
-**		@param graphic		Graphic structure for the tile
-**		@param cache		Cache to fill with tile
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@note This is a hot spot in the program.
-**
-**		@see GRID
-*/
-local void FillCache32AndDraw16(const unsigned char* data, VMemType32* cache,
-	int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* ep;
-	int va;
-	VMemType32* dp;
-	VMemType32* vp;
-
-	sp = data;
-	ep = sp + TileSizeY * TileSizeX - GRID_SUB;
-	dp = cache;
-	va = VideoWidth;
-	vp = VideoMemory32 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)sp) & 1) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)vp) & 3) {
-		DebugLevel0("Not aligned video memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)		\
-		vp[x + 0] = dp[x + 0] = ((VMemType32*)TheMap.TileData->Pixels)[sp[x + 0]]; \
-		vp[x + 0] = dp[x + 1] = ((VMemType32*)TheMap.TileData->Pixels)[sp[x + 1]]
-
-		UNROLL16(0);
-#if GRID == 1
-		vp[15] = dp[15] = ((VMemType32*)TheMap.TileData->Pixels)[0];
-#endif
-		vp += va;
-		sp += TileSizeX;
-		dp += TileSizeX;
-	}
-
-#if GRID == 1
-	for (va = TileSizeX; va--;) {		// no need to be fast with grid
-		vp[va] = dp[va] = ((VMemType32*)TheMap.TileData->Pixels)[0];
-	}
-#endif
-}
-
-/**
-**		Draw 32x32 tile for 8 bpp video modes into cache and video memory.
-**
-**		@param graphic		Graphic structure for the tile
-**		@param cache		Cache to fill with tile
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@note This is a hot spot in the program.
-**
-**		@see GRID
-*/
-local void FillCache8AndDraw32(const unsigned char* data, VMemType8* cache,
-	int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* ep;
-	int va;
-	VMemType8* dp;
-	VMemType8* vp;
-
-	sp = data;
-	ep = sp + TileSizeY * TileSizeX - GRID_SUB;
-	dp = cache;
-	va = VideoWidth;
-	vp = VideoMemory8 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)sp) & 1) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)vp) & 3) {
-		DebugLevel0("Not aligned video memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)		\
-		vp[x + 0] = dp[x + 0] = ((VMemType8*)TheMap.TileData->Pixels)[sp[x + 0]]; \
-		vp[x + 0] = dp[x + 1] = ((VMemType8*)TheMap.TileData->Pixels)[sp[x + 1]]
-
-		UNROLL32(0);
-#if GRID == 1
-		vp[31] = dp[31] = ((VMemType8*)TheMap.TileData->Pixels)[0];
-#endif
-		vp += va;
-		sp += TileSizeX;
-		dp += TileSizeX;
-	}
-
-#if GRID == 1
-	for (va = TileSizeX; va--;) {		// no need to be fast with grid
-		vp[va] = dp[va] = ((VMemType8*)TheMap.TileData->Pixels)[0];
-	}
-#endif
-}
-
-/**
-**		Draw 32x32 tile for 16 bpp video modes into cache and video memory.
-**
-**		@param graphic		Graphic structure for the tile
-**		@param cache		Cache to fill with tile
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@note This is a hot spot in the program.
-**
-**		@see GRID
-*/
-local void FillCache16AndDraw32(const unsigned char* data, VMemType16* cache,
-	int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* ep;
-	int va;
-	VMemType16* dp;
-	VMemType16* vp;
-
-	sp = data;
-	ep = sp + TileSizeY * TileSizeX - GRID_SUB;
-	dp = cache;
-	va = VideoWidth;
-	vp = VideoMemory16 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)sp) & 1) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)vp) & 3) {
-		DebugLevel0("Not aligned video memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)		\
-		*(unsigned int*)(vp + x + 0) = *(unsigned int*)(dp + x + 0)		= \
-			PixelsLow[sp[x + 0]] | PixelsHigh[sp[x + 1]]
-
-		UNROLL32(0);
-#if GRID == 1
-		vp[31] = dp[31] = Pixels[0];
-#endif
-		vp += va;
-		sp += TileSizeX;
-		dp += TileSizeX;
-	}
-
-#if GRID == 1
-	for (va = TileSizeX; va--;) {		// no need to be fast with grid
-		vp[va] = dp[va] = Pixels[0];
-	}
-#endif
-}
-
-/**
-**		Draw 32x32 tile for 24 bpp video modes into cache and video memory.
-**
-**		@param graphic		Graphic structure for the tile
-**		@param cache		Cache to fill with tile
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@note This is a hot spot in the program.
-**
-**		@see GRID
-*/
-local void FillCache24AndDraw32(const unsigned char* data, VMemType24* cache,
-	int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* ep;
-	int va;
-	VMemType24* dp;
-	VMemType24* vp;
-
-	sp = data;
-	ep = sp + TileSizeY * TileSizeX - GRID_SUB;
-	dp = cache;
-	va = VideoWidth;
-	vp = VideoMemory24 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)sp) & 1) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)vp) & 3) {
-		DebugLevel0("Not aligned video memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)		\
-		vp[x + 0] = dp[x + 0] = ((VMemType24*)TheMap.TileData->Pixels)[sp[x + 0]]; \
-		vp[x + 0] = dp[x + 1] = ((VMemType24*)TheMap.TileData->Pixels)[sp[x + 1]]
-
-		UNROLL32(0);
-#if GRID == 1
-		vp[31] = dp[31] = ((VMemType24*)TheMap.TileData->Pixels)[0];
-#endif
-		vp += va;
-		sp += TileSizeX;
-		dp += TileSizeX;
-	}
-
-#if GRID == 1
-	for (va = TileSizeX; va--;) {		// no need to be fast with grid
-		vp[va] = dp[va] = ((VMemType24*)TheMap.TileData->Pixels)[0];
-	}
-#endif
-}
-
-/**
-**		Draw 32x32 tile for 32 bpp video modes into cache and video memory.
-**
-**		@param graphic		Graphic structure for the tile
-**		@param cache		Cache to fill with tile
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@note This is a hot spot in the program.
-**
-**		@see GRID
-*/
-local void FillCache32AndDraw32(const unsigned char* data, VMemType32* cache,
-	int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* ep;
-	int va;
-	VMemType32* dp;
-	VMemType32* vp;
-
-	sp = data;
-	ep = sp + TileSizeY * TileSizeX - GRID_SUB;
-	dp = cache;
-	va = VideoWidth;
-	vp = VideoMemory32 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)sp) & 1) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)vp) & 3) {
-		DebugLevel0("Not aligned video memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)		\
-		vp[x + 0] = dp[x + 0] = ((VMemType32*)TheMap.TileData->Pixels)[sp[x + 0]]; \
-		vp[x + 0] = dp[x + 1] = ((VMemType32*)TheMap.TileData->Pixels)[sp[x + 1]]
-
-		UNROLL32(0);
-#if GRID == 1
-		vp[31] = dp[31] = ((VMemType32*)TheMap.TileData->Pixels)[0];
-#endif
-		vp += va;
-		sp += TileSizeX;
-		dp += TileSizeX;
-	}
-
-#if GRID == 1
-	for (va = TileSizeX; va--;) {		// no need to be fast with grid
-		vp[va] = dp[va] = ((VMemType32*)TheMap.TileData->Pixels)[0];
-	}
-#endif
-}
-
-// ---------------------------------------------------------------------------
-
-/**
-**		Fast draw 16x16 tile from cache for 8bpp.
-**
-**		@param graphic		Pointer to cached tile graphic
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@see GRID
-*/
-local void VideoDraw8Tile16FromCache(const VMemType8* graphic, int x, int y)
-{
-	const VMemType8* sp;
-	const VMemType8* ep;
-	VMemType8* dp;
-	int da;
-
-	sp = graphic;
-	ep = sp + TileSizeY * TileSizeX;
-	da = VideoWidth;
-	dp = VideoMemory8 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)sp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)				\
-		*(unsigned long*)(dp + x) = *(unsigned long*)(sp + x)
-
-		UNROLL8(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 16x16 tile from cache for 16bpp.
-**
-**		@param graphic		Pointer to cached tile graphic
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@see GRID
-*/
-local void VideoDraw16Tile16FromCache(const VMemType16* graphic, int x, int y)
-{
-	const VMemType16* sp;
-	const VMemType16* ep;
-	VMemType16* dp;
-	int da;
-
-	sp = graphic;
-	ep = sp + TileSizeY * TileSizeX;
-	da = VideoWidth;
-	dp = VideoMemory16 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)sp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)				\
-		*(unsigned long*)(dp + x) = *(unsigned long*)(sp + x)
-
-		UNROLL16(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 16x16 tile from cache for 24bpp.
-**
-**		@param graphic		Pointer to cached tile graphic
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@see GRID
-*/
-local void VideoDraw24Tile16FromCache(const VMemType24* graphic, int x, int y)
-{
-	const VMemType24* sp;
-	const VMemType24* ep;
-	VMemType24* dp;
-	int da;
-
-	sp = graphic;
-	ep = sp + TileSizeY * TileSizeX;
-	da = VideoWidth;
-	dp = VideoMemory24 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)sp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)				\
-		*(unsigned long*)(dp + x * 2 + 0) = *(unsigned long*)(sp + x * 2 + 0);		\
-		*(unsigned long*)(dp + x * 2 + 1) = *(unsigned long*)(sp + x * 2 + 1)
-
-		UNROLL12(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 16x16 tile from cache.
-**
-**		@param graphic		Pointer to cached tile graphic
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@see GRID
-*/
-local void VideoDraw32Tile16FromCache(const VMemType32* graphic, int x, int y)
-{
-	const VMemType32* sp;
-	const VMemType32* ep;
-	VMemType32* dp;
-	int da;
-
-	sp = graphic;
-	ep = sp + TileSizeY * TileSizeX;
-	da = VideoWidth;
-	dp = VideoMemory32 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)sp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)				\
-		*(unsigned long*)(dp + x * 2 + 0) = *(unsigned long*)(sp + x * 2 + 0);		\
-		*(unsigned long*)(dp + x * 2 + 1) = *(unsigned long*)(sp + x * 2 + 1)
-
-		UNROLL16(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 32x32 tile from cache for 8bpp.
-**
-**		@param graphic		Pointer to cached tile graphic
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@see GRID
-*/
-local void VideoDraw8Tile32FromCache(const VMemType8* graphic, int x, int y)
-{
-	const VMemType8* sp;
-	const VMemType8* ep;
-	VMemType8* dp;
-	int da;
-
-	sp = graphic;
-	ep = sp + TileSizeY * TileSizeX;
-	da = VideoWidth;
-	dp = VideoMemory8 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)sp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)				\
-		*(unsigned long*)(dp + x) = *(unsigned long*)(sp + x)
-
-		UNROLL16(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 32x32 tile from cache for 16bpp.
-**
-**		@param graphic		Pointer to cached tile graphic
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@see GRID
-*/
-local void VideoDraw16Tile32FromCache(const VMemType16* graphic, int x, int y)
-{
-	const VMemType16* sp;
-	const VMemType16* ep;
-	VMemType16* dp;
-	int da;
-
-	sp = graphic;
-	ep = sp + TileSizeY * TileSizeX;
-	da = VideoWidth;
-	dp = VideoMemory16 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)sp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)				\
-		*(unsigned long*)(dp + x) = *(unsigned long*)(sp + x)
-
-		UNROLL32(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 32x32 tile from cache for 24bpp.
-**
-**		@param graphic		Pointer to cached tile graphic
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@see GRID
-*/
-local void VideoDraw24Tile32FromCache(const VMemType24* graphic, int x, int y)
-{
-	const VMemType24* sp;
-	const VMemType24* ep;
-	VMemType24* dp;
-	int da;
-
-	sp = graphic;
-	ep = sp + TileSizeY * TileSizeX;
-	da = VideoWidth;
-	dp = VideoMemory24 + x + y * VideoWidth;
-
-#ifdef DEBUG
-	if (((long)dp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-	if (((long)sp) & 3) {
-		DebugLevel0("Not aligned memory\n");
-	}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)				\
-		*(unsigned long*)(dp + x * 2 + 0) = *(unsigned long*)(sp + x * 2 + 0);		\
-		*(unsigned long*)(dp + x * 2 + 1) = *(unsigned long*)(sp + x * 2 + 1)
-
-		UNROLL24(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 32x32 tile from cache.
-**
-**		@param graphic		Pointer to cached tile graphic
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		@see GRID
-*/
-local void VideoDraw32Tile32FromCache(const VMemType32* graphic, int x, int y)
-{
-	const VMemType32* sp;
-	const VMemType32* ep;
-	VMemType32* dp;
-	int da;
-
-	sp = graphic;
-	ep = sp + TileSizeY * TileSizeX;
-	da = VideoWidth;
-	dp = VideoMemory32 + x + y * VideoWidth;
-
-#ifdef DEBUG
-		if (((long)dp) & 3) {
-			DebugLevel0("Not aligned memory\n");
-		}
-		if (((long)sp) & 3) {
-			DebugLevel0("Not aligned memory\n");
-		}
-#endif
-
-	while (sp < ep) {						// loop unrolled
-#undef UNROLL2
-		/// basic unroll code
-#define UNROLL2(x)				\
-		*(unsigned long*)(dp + x * 2 + 0) = *(unsigned long*)(sp + x * 2 + 0);		\
-		*(unsigned long*)(dp + x * 2 + 1) = *(unsigned long*)(sp + x * 2 + 1)
-
-		UNROLL32(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-// ---------------------------------------------------------------------------
-
-/**
-**		Draw 16x16 tile for 8 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw8Tile16(int tile, int x, int y)
-{
-	TileCache* cache;
-
-	if (!(cache = TileCached[tile])) {
-		//
-		//		Not cached
-		//
-		if (TileCacheSize) {				// enough cache buffers?
-			--TileCacheSize;
-			cache = malloc(sizeof(TileCache) - sizeof(unsigned char) +
-				TileSizeX * TileSizeY * sizeof(VMemType16));
-		} else {
-			cache = (void*)TileCacheLRU->last;
-			if (cache->Tile) {
-				TileCached[cache->Tile] = NULL;		// now not cached
-			}
-			dl_remove_last(TileCacheLRU);
-			DebugLevel3("EMPTY CACHE\n");
-		}
-		TileCached[tile] = cache;
-		cache->Tile = tile;
-		dl_insert_first(TileCacheLRU, &cache->DlNode);
-
-		FillCache8AndDraw16(TheMap.Tiles[tile], (void*)&cache->Buffer, x, y);
-	} else {
-		VideoDraw8Tile16FromCache((void*)&cache->Buffer, x, y);
-	}
-}
-
-/**
-**		Draw 16x16 tile for 16 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw16Tile16(int tile, int x, int y)
-{
-	TileCache* cache;
-
-	if (!(cache = TileCached[tile])) {
-		//
-		//		Not cached
-		//
-		if (TileCacheSize) {				// enough cache buffers?
-			--TileCacheSize;
-			cache = malloc(sizeof(TileCache) - sizeof(unsigned char) +
-				TileSizeX * TileSizeY * sizeof(VMemType16));
-		} else {
-			cache = (void*)TileCacheLRU->last;
-			if (cache->Tile) {
-				TileCached[cache->Tile] = NULL;		// now not cached
-			}
-			dl_remove_last(TileCacheLRU);
-			DebugLevel3("EMPTY CACHE\n");
-		}
-		TileCached[tile] = cache;
-		cache->Tile = tile;
-		dl_insert_first(TileCacheLRU, &cache->DlNode);
-
-		FillCache16AndDraw16(TheMap.Tiles[tile], (void*)&cache->Buffer, x, y);
-	} else {
-		VideoDraw16Tile16FromCache((void*)&cache->Buffer, x, y);
-	}
-}
-
-/**
-**		Draw 16x16 tile for 24 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw24Tile16(int tile, int x, int y)
-{
-	TileCache* cache;
-
-	if (!(cache = TileCached[tile])) {
-		//
-		//		Not cached
-		//
-		if (TileCacheSize) {				// enough cache buffers?
-			--TileCacheSize;
-			cache = malloc(sizeof(TileCache) - sizeof(unsigned char) +
-				TileSizeX * TileSizeY * sizeof(VMemType24));
-		} else {
-			cache = (void*)TileCacheLRU->last;
-			if (cache->Tile) {
-				TileCached[cache->Tile] = NULL;		// now not cached
-			}
-			dl_remove_last(TileCacheLRU);
-			DebugLevel3("EMPTY CACHE\n");
-		}
-		TileCached[tile] = cache;
-		cache->Tile = tile;
-		dl_insert_first(TileCacheLRU, &cache->DlNode);
-
-		FillCache24AndDraw16(TheMap.Tiles[tile], (void*)&cache->Buffer, x, y);
-	} else {
-		VideoDraw24Tile16FromCache((void*)&cache->Buffer, x, y);
-	}
-}
-
-/**
-**		Draw 16x16 tile for 32 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw32Tile16(int tile, int x, int y)
-{
-	TileCache* cache;
-
-	if (!(cache = TileCached[tile])) {
-		//
-		//		Not cached
-		//
-		if (TileCacheSize) {				// enough cache buffers?
-			--TileCacheSize;
-			cache = malloc(sizeof(TileCache) - sizeof(unsigned char) +
-				TileSizeX * TileSizeY * sizeof(VMemType32));
-		} else {
-			cache = (void*)TileCacheLRU->last;
-			if (cache->Tile) {
-				TileCached[cache->Tile] = NULL;		// now not cached
-			}
-			dl_remove_last(TileCacheLRU);
-			DebugLevel3("EMPTY CACHE\n");
-		}
-		TileCached[tile] = cache;
-		cache->Tile = tile;
-		dl_insert_first(TileCacheLRU, &cache->DlNode);
-
-		FillCache32AndDraw16(TheMap.Tiles[tile], (void*)&cache->Buffer, x, y);
-	} else {
-		VideoDraw32Tile16FromCache((void*)&cache->Buffer, x, y);
-	}
-}
-
-/**
-**		Draw 32x32 tile for 8 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw8Tile32(int tile, int x, int y)
-{
-	TileCache* cache;
-
-	if (!(cache = TileCached[tile])) {
-		//
-		//		Not cached
-		//
-		if (TileCacheSize) {				// enough cache buffers?
-			--TileCacheSize;
-			cache = malloc(sizeof(TileCache) - sizeof(unsigned char) +
-				TileSizeX * TileSizeY * sizeof(VMemType16));
-		} else {
-			cache = (void*)TileCacheLRU->last;
-			if (cache->Tile) {
-				TileCached[cache->Tile] = NULL;		// now not cached
-			}
-			dl_remove_last(TileCacheLRU);
-			DebugLevel3("EMPTY CACHE\n");
-		}
-		TileCached[tile] = cache;
-		cache->Tile = tile;
-		dl_insert_first(TileCacheLRU, &cache->DlNode);
-
-		FillCache8AndDraw32(TheMap.Tiles[tile], (void*)&cache->Buffer, x, y);
-	} else {
-		VideoDraw8Tile32FromCache((void*)&cache->Buffer, x, y);
-	}
-}
-
-/**
-**		Draw 32x32 tile for 16 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw16Tile32(int tile, int x, int y)
-{
-	TileCache* cache;
-
-	if (!(cache = TileCached[tile])) {
-		//
-		//		Not cached
-		//
-		if (TileCacheSize) {				// enough cache buffers?
-			--TileCacheSize;
-			cache = malloc(sizeof(TileCache) - sizeof(unsigned char) +
-				TileSizeX * TileSizeY * sizeof(VMemType16));
-		} else {
-			cache = (void*)TileCacheLRU->last;
-			if (cache->Tile) {
-				TileCached[cache->Tile] = NULL;		// now not cached
-			}
-			dl_remove_last(TileCacheLRU);
-			DebugLevel3("EMPTY CACHE\n");
-		}
-		TileCached[tile] = cache;
-		cache->Tile = tile;
-		dl_insert_first(TileCacheLRU, &cache->DlNode);
-
-		FillCache16AndDraw32(TheMap.Tiles[tile], (void*)&cache->Buffer, x, y);
-	} else {
-		VideoDraw16Tile32FromCache((void*)&cache->Buffer, x, y);
-	}
-}
-
-/**
-**		Draw 32x32 tile for 24 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw24Tile32(int tile, int x, int y)
-{
-	TileCache* cache;
-
-	if (!(cache = TileCached[tile])) {
-		//
-		//		Not cached
-		//
-		if (TileCacheSize) {				// enough cache buffers?
-			--TileCacheSize;
-			cache = malloc(sizeof(TileCache) - sizeof(unsigned char) +
-				TileSizeX * TileSizeY * sizeof(VMemType24));
-		} else {
-			cache = (void*)TileCacheLRU->last;
-			if (cache->Tile) {
-				TileCached[cache->Tile] = NULL;		// now not cached
-			}
-			dl_remove_last(TileCacheLRU);
-			DebugLevel3("EMPTY CACHE\n");
-		}
-		TileCached[tile] = cache;
-		cache->Tile = tile;
-		dl_insert_first(TileCacheLRU, &cache->DlNode);
-
-		FillCache24AndDraw32(TheMap.Tiles[tile], (void*)&cache->Buffer, x, y);
-	} else {
-		VideoDraw24Tile32FromCache((void*)&cache->Buffer, x, y);
-	}
-}
-
-/**
-**		Draw 32x32 tile for 32 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw32Tile32(int tile, int x, int y)
-{
-	TileCache* cache;
-
-	if (!(cache = TileCached[tile])) {
-		//
-		//		Not cached
-		//
-		if (TileCacheSize) {				// enough cache buffers?
-			--TileCacheSize;
-			cache = malloc(sizeof(TileCache) - sizeof(unsigned char) +
-				TileSizeX * TileSizeY * sizeof(VMemType32));
-		} else {
-			cache = (void*)TileCacheLRU->last;
-			if (cache->Tile) {
-				TileCached[cache->Tile] = NULL;		// now not cached
-			}
-			dl_remove_last(TileCacheLRU);
-			DebugLevel3("EMPTY CACHE\n");
-		}
-		TileCached[tile] = cache;
-		cache->Tile = tile;
-		dl_insert_first(TileCacheLRU, &cache->DlNode);
-
-		FillCache32AndDraw32(TheMap.Tiles[tile], (void*)&cache->Buffer, x, y);
-	} else {
-		VideoDraw32Tile32FromCache((void*)&cache->Buffer, x, y);
-	}
-}
-
-#endif		// } USE_TILECACHE
-
-/*----------------------------------------------------------------------------
---		Smart Cache
-----------------------------------------------------------------------------*/
-
-#ifdef USE_SMART_TILECACHE		// {
-
-/**
-**		Draw tile.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-#ifndef USE_OPENGL
-global void MapDrawTile(int tile, int x, int y)
-{
-	VideoDrawTile(tile, x, y);
-}
-#else
-global void MapDrawTile(int tile, int x, int y)
+global void VideoDrawTile(const int tile, int x, int y)
 {
 	GLint sx;
 	GLint ex;
@@ -1523,135 +143,72 @@ global void MapDrawTile(int tile, int x, int y)
 }
 #endif
 
-#endif		// } USE_SMART_TILECACHE
+#ifdef NEW_DECODRAW
+/**
+**  Draw TileSizeX x TileSizeY clipped for XX bpp video modes.
+**  (needed for decoration mechanism, which wants to draw tile partly)
+**  FIXME: this separate function is only needed for compatibility with
+**         variable VideoDrawTile, can be replaced by MapDrawXXTileClip
+**
+**  @param data  pointer to tile graphic data
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
+*/
+local void VideoDrawXXTileClip(const unsigned char* data, int x, int y)
+{
+	VideoDrawRawClip((VMemType*)TheMap.TileData->Pixels,
+		data, x, y, TileSizeX, TileSizeY);
+}
+
+/**
+**  Draw TileSizeX x TileSizeY clipped for XX bpp video modes.
+**  (needed for decoration mechanism, which wants to draw tile partly)
+**
+**  @param tile  Tile number to draw.
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
+*/
+local void MapDrawXXTileClip(int tile, int x, int y)
+{
+	VideoDrawXXTileClip(TheMap.Tiles[tile], x, y);
+}
+#endif
+
+/**
+**  Draw tile.
+**
+**  @param tile  Tile number to draw.
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
+*/
+global void MapDrawTile(int tile, int x, int y)
+{
+	VideoDrawTile(tile, x, y);
+}
 
 /*----------------------------------------------------------------------------
---		Without Cache
-----------------------------------------------------------------------------*/
-
-#if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)		// {
-
-/**
-**		Draw 16x16 tile for 8 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw8Tile16(int tile, int x, int y)
-{
-	VideoDraw8Tile16(TheMap.Tiles[tile], x, y);
-}
-
-/**
-**		Draw 16x16 tile for 16 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw16Tile16(int tile, int x, int y)
-{
-	VideoDraw16Tile16(TheMap.Tiles[tile], x, y);
-}
-
-/**
-**		Draw 16x16 tile for 24 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw24Tile16(int tile, int x, int y)
-{
-	VideoDraw24Tile16(TheMap.Tiles[tile], x, y);
-}
-
-/**
-**		Draw 16x16 tile for 32 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw32Tile16(int tile, int x, int y)
-{
-	VideoDraw32Tile16(TheMap.Tiles[tile], x, y);
-}
-
-/**
-**		Draw 32x32 tile for 8 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw8Tile32(int tile, int x, int y)
-{
-	VideoDraw8Tile32(TheMap.Tiles[tile], x, y);
-}
-
-/**
-**		Draw 32x32 tile for 16 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw16Tile32(int tile, int x, int y)
-{
-	VideoDraw16Tile32(TheMap.Tiles[tile], x, y);
-}
-
-/**
-**		Draw 32x32 tile for 24 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw24Tile32(int tile, int x, int y)
-{
-	VideoDraw24Tile32(TheMap.Tiles[tile], x, y);
-}
-
-/**
-**		Draw 32x32 tile for 32 bpp video modes with cache support.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-local void MapDraw32Tile32(int tile, int x, int y)
-{
-	VideoDraw32Tile32(TheMap.Tiles[tile], x, y);
-}
-
-#endif		// }  !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)
-
-/*----------------------------------------------------------------------------
---		Global functions
+--  Global functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Mark position inside viewport be drawn for next display update.
+**  Mark position inside viewport be drawn for next display update.
 **
-**		@param x		X map tile position of point in Map to be marked.
-**		@param y		Y map tile position of point in Map to be marked.
+**  @param x  X map tile position of point in Map to be marked.
+**  @param y  Y map tile position of point in Map to be marked.
 **
-**		@return				True if inside and marked, false otherwise.
+**  @return   True if inside and marked, false otherwise.
 **
-**		@note latimerius: MarkDrawPosMap() in split screen environment
-**		schedules RedrawMap if (x,y) is visible inside *any* of the existing
-**		viewports.  Is this OK, johns?  Do you think it would pay having
-**		RedrawViewport0, RedrawViewport1 etc. variables and redraw just
-**		vp's that actually need redrawing?  We should evaluate this.
-**		JOHNS: A complete viewport redraw is still too much work. The final
-**		version should only redraw the needed tiles.
+**  @note latimerius: MarkDrawPosMap() in split screen environment
+**        schedules RedrawMap if (x,y) is visible inside *any* of the existing
+**        viewports.  Is this OK, johns?  Do you think it would pay having
+**        RedrawViewport0, RedrawViewport1 etc. variables and redraw just
+**        vp's that actually need redrawing?  We should evaluate this.
+**        JOHNS: A complete viewport redraw is still too much work. The final
+**        version should only redraw the needed tiles.
 */
 global int MarkDrawPosMap(int x, int y)
 {
-	Viewport *vp;
+	Viewport* vp;
 	
 	if ((vp = MapTileGetViewport(x, y))) {
 		MustRedraw |= RedrawMap;
@@ -1665,15 +222,15 @@ global int MarkDrawPosMap(int x, int y)
 }
 
 /**
-**		Denote wether area in map is overlapping with the viewport.
+**  Denote wether area in map is overlapping with the viewport.
 **
-**		@param vp		Viewport pointer.
-**		@param sx		X map tile position of area in map to be checked.
-**		@param sy		Y map tile position of area in map to be checked.
-**		@param ex		X map tile position of area in map to be checked.
-**		@param ey		Y map tile position of area in map to be checked.
+**  @param vp  Viewport pointer.
+**  @param sx  X map tile position of area in map to be checked.
+**  @param sy  Y map tile position of area in map to be checked.
+**  @param ex  X map tile position of area in map to be checked.
+**  @param ey  Y map tile position of area in map to be checked.
 **
-**		@return				True if overlapping, false otherwise.
+**  @return    True if overlapping, false otherwise.
 */
 global int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 	int ex, int ey)
@@ -1683,13 +240,13 @@ global int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 }
 
 /**
-**		Check if a point is visible (inside) a viewport.
+**  Check if a point is visible (inside) a viewport.
 **
-**		@param vp		Viewport pointer.
-**		@param x		X map tile position of point in map to be checked.
-**		@param y		Y map tile position of point in map to be checked.
+**  @param vp  Viewport pointer.
+**  @param x   X map tile position of point in map to be checked.
+**  @param y   Y map tile position of point in map to be checked.
 **
-**		@return				True if point is in the visible map, false otherwise
+**  @return    True if point is in the visible map, false otherwise
 */
 local inline int PointInViewport(const Viewport* vp, int x, int y)
 {
@@ -1698,38 +255,38 @@ local inline int PointInViewport(const Viewport* vp, int x, int y)
 }
 
 /**
-**		Check if any part of an area is visible in a viewport.
+**  Check if any part of an area is visible in a viewport.
 **
-**		@param vp		Viewport pointer.
-**		@param sx		X map tile position of area in map to be checked.
-**		@param sy		Y map tile position of area in map to be checked.
-**		@param ex		X map tile position of area in map to be checked.
-**		@param ey		Y map tile position of area in map to be checked.
+**  @param vp  Viewport pointer.
+**  @param sx  X map tile position of area in map to be checked.
+**  @param sy  Y map tile position of area in map to be checked.
+**  @param ex  X map tile position of area in map to be checked.
+**  @param ey  Y map tile position of area in map to be checked.
 **
-**		@return				True if any part of area is visible, false otherwise
+**  @return    True if any part of area is visible, false otherwise
 **
-**		@todo		Didn't works if all points lay outside and the area covers
-**				the complete viewport.
+**  @todo Doesn't work if all points lay outside and the area covers
+**        the complete viewport.
 */
 global int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 	int ex, int ey)
 {
-	// FIXME: Can be faster written
+	// FIXME: Can be written faster
 	return PointInViewport(vp, sx, sy) || PointInViewport(vp, sx, ey) ||
 		PointInViewport(vp, ex, sy) || PointInViewport(vp, ex, ey);
 }
 
 /**
-**		Mark overlapping area with viewport be drawn for next display update.
+**  Mark overlapping area with viewport be drawn for next display update.
 **
-**		@param sx		X map tile position of area in Map to be marked.
-**		@param sy		Y map tile position of area in Map to be marked.
-**		@param ex		X map tile position of area in Map to be marked.
-**		@param ey		Y map tile position of area in Map to be marked.
+**  @param sx  X map tile position of area in Map to be marked.
+**  @param sy  Y map tile position of area in Map to be marked.
+**  @param ex  X map tile position of area in Map to be marked.
+**  @param ey  Y map tile position of area in Map to be marked.
 **
-**		@return				True if overlapping and marked, false otherwise.
+**  @return    True if overlapping and marked, false otherwise.
 **
-**		@see MustRedrawRow @see MustRedrawTile.
+**  @see MustRedrawRow @see MustRedrawTile.
 */
 global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 {
@@ -1759,7 +316,7 @@ global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 }
 
 /**
-**		Enable entire map be drawn for next display update.
+**  Enable entire map be drawn for next display update.
 */
 global void MarkDrawEntireMap(void)
 {
@@ -1784,7 +341,7 @@ global void MarkDrawEntireMap(void)
 
 #ifdef NEW_DECODRAW
 	//
-	//		FIXME: This is soo slow.
+	//  FIXME: This is soo slow.
 	//
 	DecorationMark(MapDecoration);
 	for (unit = Units; unit < Units + NumUnits; ++unit) {
@@ -1796,11 +353,11 @@ global void MarkDrawEntireMap(void)
 }
 
 /**
-**		Draw the map backgrounds.
+**  Draw the map backgrounds.
 **
-**		@param vp		Viewport pointer.
-**		@param x		Map viewpoint x position.
-**		@param y		Map viewpoint y position.
+**  @param vp  Viewport pointer.
+**  @param x   Map viewpoint x position.
+**  @param y   Map viewpoint y position.
 **
 ** StephanR: variables explained below for screen:<PRE>
 ** *---------------------------------------*
@@ -1840,11 +397,8 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 	static long mv = 9999999;
 #endif
 
-#ifdef USE_SMART_TILECACHE
-	memset(TileCached, 0, sizeof(TileCached));
-#endif
-
-	redraw_row = vp->MustRedrawRow;				// flags must redraw or not
+	// flags must redrawn or not
+	redraw_row = vp->MustRedrawRow;
 	redraw_tile = vp->MustRedrawTile;
 
 	ex = vp->EndX;
@@ -1853,12 +407,13 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 	ey = vp->EndY;
 
 	while (dy < ey) {
-		if (*redraw_row++) {				// row must be redrawn
+		// row must be redrawn
+		if (*redraw_row++) {
 			sx = x + sy;
 			dx = vp->X;
 			while (dx < ex) {
 				//
-				//		draw only tiles which must be drawn
+				//  draw only tiles which must be drawn
 				//
 				if (*redraw_tile++) {
 					// FIXME: unexplored fields could be drawn faster
@@ -1906,9 +461,9 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 
 #ifdef NEW_DECODRAW
 /**
-**	  Decoration redraw function that will redraw map for set clip rectangle
+**  Decoration redraw function that will redraw map for set clip rectangle
 **
-**	  @param dummy_data  should be NULL; needed to make callback possible
+**  @param dummy_data  should be NULL; needed to make callback possible
 */
 local void mapdeco_draw(void* dummy_data)
 {
@@ -1958,8 +513,8 @@ local void mapdeco_draw(void* dummy_data)
 #endif
 
 /**
-**		Initialize the fog of war.
-**		Build tables, setup functions.
+**  Initialize the fog of war.
+**  Build tables, setup functions.
 */
 global void InitMap(void)
 {
