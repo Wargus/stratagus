@@ -2278,7 +2278,6 @@ local void TipsMenuEnd(void)
     FreeTips();
 
     EndMenu();
-    InterfaceState=IfaceStateNormal;
 }
 
 /**
