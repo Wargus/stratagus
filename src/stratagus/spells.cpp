@@ -176,9 +176,9 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 			} else if (n & MapFieldWall) {
 				MapRemoveWall(ix, iy);
 			} else if (n & MapFieldRocks) {
-				MapRemoveRock(ix, iy);
+				MapClearTile(MapFieldRocks, ix, iy);
 			} else if (n & MapFieldForest) {
-				MapRemoveWood(ix, iy);
+				MapClearTile(MapFieldForest, ix, iy);
 			}
 		}
 	}

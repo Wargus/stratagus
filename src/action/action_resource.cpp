@@ -390,7 +390,7 @@ static int GatherResource(Unit* unit)
 			unit->ResourcesHeld += addload;
 
 			if (addload && unit->ResourcesHeld == resinfo->ResourceCapacity) {
-				MapRemoveWood(unit->Orders->X, unit->Orders->Y);
+				MapClearTile(MapFieldForest, unit->Orders->X, unit->Orders->Y);
 			}
 		} else {
 			if (resinfo->HarvestFromOutside) {

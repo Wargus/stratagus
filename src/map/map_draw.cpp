@@ -122,6 +122,121 @@ int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 }
 
 /**
+**  Convert viewport x coordinate to map tile x coordinate.
+**
+**  @param vp  Viewport pointer.
+**  @param x   X coordinate into this viewport (in pixels, relative
+**             to origin of Stratagus's window - not the viewport
+**             itself!).
+**
+**  @return    X map tile coordinate.
+*/
+int Viewport2MapX(const Viewport* vp, int x)
+{
+	int r;
+
+	r = (x - vp->X + vp->MapX * TileSizeX + vp->OffsetX) / TileSizeX;
+	return r < TheMap.Width ? r : TheMap.Width - 1;
+}
+
+/**
+**  Convert viewport y coordinate to map tile y coordinate.
+**
+**  @param vp  Viewport pointer.
+**  @param y   Y coordinate into this viewport (in pixels, relative
+**             to origin of Stratagus's window - not the viewport
+**             itself!).
+**
+**  @return    Y map tile coordinate.
+*/
+int Viewport2MapY(const Viewport* vp, int y)
+{
+	int r;
+
+	r = (y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY) / TileSizeY;
+	return r < TheMap.Height ? r : TheMap.Height - 1;
+}
+
+/**
+**  Convert a map tile X coordinate into a viewport x pixel coordinate.
+**
+**  @param vp  Viewport pointer.
+**  @param x   The map tile's X coordinate.
+**
+**  @return    X screen coordinate in pixels (relative
+**             to origin of Stratagus's window).
+*/
+int Map2ViewportX(const Viewport* vp, int x)
+{
+	return vp->X + (x - vp->MapX) * TileSizeX - vp->OffsetX;
+}
+
+/**
+**  Convert a map tile Y coordinate into a viewport y pixel coordinate.
+**
+**  @param vp  Viewport pointer.
+**  @param y   The map tile's Y coordinate.
+**
+**  @return    Y screen coordinate in pixels (relative
+**             to origin of Stratagus's window).
+*/
+int Map2ViewportY(const Viewport* vp, int y)
+{
+	return vp->Y + (y - vp->MapY) * TileSizeY - vp->OffsetY;
+}
+
+/**
+**  Change viewpoint of map viewport v to x,y.
+**
+**  @param vp       Viewport pointer.
+**  @param x        X map tile position.
+**  @param y        Y map tile position.
+**  @param offsetx  X offset in tile.
+**  @param offsety  Y offset in tile.
+*/
+void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
+{
+	Assert(vp);
+
+	x = x * TileSizeX + offsetx;
+	y = y * TileSizeY + offsety;
+	if (x < 0) {
+		x = 0;
+	}
+	if (y < 0) {
+		y = 0;
+	}
+	if (x > TheMap.Width * TileSizeX - (vp->EndX - vp->X) - 1) {
+		x = TheMap.Width * TileSizeX - (vp->EndX - vp->X) - 1;
+	}
+	if (y > TheMap.Height * TileSizeY - (vp->EndY - vp->Y) - 1) {
+		y = TheMap.Height * TileSizeY - (vp->EndY - vp->Y) - 1;
+	}
+	vp->MapX = x / TileSizeX;
+	vp->MapY = y / TileSizeY;
+	vp->OffsetX = x % TileSizeX;
+	vp->OffsetY = y % TileSizeY;
+	vp->MapWidth = ((vp->EndX - vp->X) + vp->OffsetX - 1) / TileSizeX + 1;
+	vp->MapHeight = ((vp->EndY - vp->Y) + vp->OffsetY - 1) / TileSizeY + 1;
+}
+
+/**
+**  Center map viewport v on map tile (x,y).
+**
+**  @param vp  Viewport pointer.
+**  @param x   X map tile position.
+**  @param y   Y map tile position.
+**  @param offsetx  X offset in tile.
+**  @param offsety  Y offset in tile.
+*/
+void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
+{
+	x = x * TileSizeX + offsetx - (vp->EndX - vp->X) / 2;
+	y = y * TileSizeY + offsety - (vp->EndY - vp->Y) / 2;
+	ViewportSetViewpoint(vp, x / TileSizeX, y / TileSizeY, x % TileSizeX, y % TileSizeY);
+}
+
+/**
 **  Draw the map backgrounds.
 **
 **  @param vp  Viewport pointer.

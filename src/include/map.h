@@ -391,35 +391,6 @@ extern void MapRemoveWall(unsigned x, unsigned y);
 	/// Wall is hit
 extern void HitWall(unsigned x, unsigned y, unsigned damage);
 
-//
-// in map_wood.c
-//
-	/// Check if the seen tile-type is wood
-extern int MapIsSeenTileWood(int x, int y);
-	/// Correct the seen wood field, depending on the surrounding
-extern void MapFixSeenWoodTile(int x, int y);
-	/// Correct the surrounding seen wood fields
-extern void MapFixSeenWoodNeighbors(int x, int y);
-	/// Correct the real wood field, depending on the surrounding
-extern void MapFixWoodTile(int x, int y);
-	/// Remove wood from the map
-extern void MapRemoveWood(unsigned x, unsigned y);
-	/// Regenerate the forest
-extern void RegenerateForest(void);
-
-//
-// in map_rock.c
-//
-	/// Check if the seen tile-type is rock
-extern int MapIsSeenTileRock(int x, int y);
-	/// Correct the seen rock field, depending on the surrounding
-extern void MapFixSeenRockTile(int x, int y);
-	/// Correct the surrounding seen rock fields
-extern void MapFixSeenRockNeighbors(int x, int y);
-	/// Correct the real rock field, depending on the surrounding
-extern void MapFixRockTile(int x, int y);
-	/// Remove rock from the map
-extern void MapRemoveRock(unsigned x, unsigned y);
 
 //
 // in ccl_map.c
@@ -477,6 +448,17 @@ extern void PreprocessMap(void);
 
 	/// Set wall on field
 extern void MapSetWall(unsigned x, unsigned y, int humanwall);
+
+	/// Check if the seen tile-type is wood
+extern int MapIsSeenTile(unsigned short type, int x, int y);
+	/// Correct the seen wood field, depending on the surrounding
+extern void MapFixTile(unsigned short type, int seen, int x, int y);
+	/// Correct the surrounding seen wood fields
+extern void MapFixNeighbors(unsigned short type, int seen, int x, int y);
+	/// Remove wood from the map
+extern void MapClearTile(unsigned short type, unsigned x, unsigned y);
+	/// Regenerate the forest
+extern void RegenerateForest(void);
 
 // in unit.c
 
