@@ -384,7 +384,7 @@ global void AiInit(Player* player)
 /**
 **	Cleanup the AI.
 */
-local void CleanAi(void)
+global void CleanAi(void)
 {
     int i;
     int p;
