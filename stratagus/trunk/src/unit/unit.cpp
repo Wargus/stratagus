@@ -1979,7 +1979,7 @@ global void RescueUnits(void)
 			//	City center converts complete race
 			//	NOTE: I use a trick here, centers could
 			//		store gold. FIXME!!!
-			if( unit->Type->Stores[GoldCost] ) {
+			if( unit->Type->CanStore[GoldCost] ) {
 			    ChangePlayerOwner(p,around[i]->Player);
                             break;
 			}
@@ -2378,7 +2378,7 @@ global int CanBuildHere(const UnitType* type,int x,int y)
 	}
     }
 
-    if( type->Stores[GoldCost] ) {
+    if( type->CanStore[GoldCost] ) {
 	//
 	//	Gold deposit can't be build too near to gold-mine.
 	//
@@ -2427,7 +2427,7 @@ global int CanBuildHere(const UnitType* type,int x,int y)
     }
 
 next:
-    if( type->Stores[OilCost] ) {
+    if( type->CanStore[OilCost] ) {
 	//
 	//	Oil deposit can't be build too near to oil-patch or platform.
 	//
@@ -3184,7 +3184,7 @@ global Unit* FindDeposit(const Player* player,int x,int y,int resource)
 	if( UnitUnusable(unit) ) {
 	    continue;
 	}
-	if( unit->Type->Stores[resource] ) {
+	if( unit->Type->CanStore[resource] ) {
 	    d=MapDistanceToUnit(x,y,unit);
 	    if( d<best_d
 		    // FIXME: UnitReachable didn't work with unit inside

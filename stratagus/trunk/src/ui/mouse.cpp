@@ -206,14 +206,14 @@ global void DoRightButton(int sx,int sy)
 		if( UnitUnderCursor && (dest=UnitOnMapTile(x,y)) ) {
 		    if( dest->Player==unit->Player ) {
 			dest->Blink=4;
-			if( dest->Type->Stores[GoldCost]
+			if( dest->Type->CanStore[GoldCost]
 				&& (type==UnitTypeOrcWorkerWithGold
 				    || type==UnitTypeHumanWorkerWithGold) ) {
 			    DebugLevel3("GOLD-DEPOSIT\n");
 			    SendCommandReturnGoods(unit,dest,flush);
 			    continue;
 			}
-			if( (dest->Type->Stores[WoodCost])
+			if( (dest->Type->CanStore[WoodCost])
 				&& (type==UnitTypeOrcWorkerWithWood
 				    || type==UnitTypeHumanWorkerWithWood) ) {
 			    DebugLevel3("WOOD-DEPOSIT\n");
@@ -278,7 +278,7 @@ global void DoRightButton(int sx,int sy)
 		if( UnitUnderCursor && (dest=UnitOnMapTile(x,y))
 			&& dest->Player==unit->Player ) {
 		    dest->Blink=4;
-		    if( dest->Type->Stores[OilCost] ) {
+		    if( dest->Type->CanStore[OilCost] ) {
 			DebugLevel3("OIL-DEPOSIT\n");
 			SendCommandReturnGoods(unit,dest,flush);
 			continue;
