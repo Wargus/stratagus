@@ -182,7 +182,7 @@ global void (*VideoDrawTile)(const GraphicData*,int,int);
 **
 **	Draws tiles display and video mode independ
 */
-local void (*MapDrawTile)(int,int,int);
+global void (*MapDrawTile)(int,int,int);
 
 #ifdef NEW_DECODRAW
 /**
@@ -1297,7 +1297,7 @@ local void MapDraw32Tile32(int tile,int x,int y)
 }
 
 /**
-**	Draw 32x32 tile with cache support.
+**	Draw tile.
 **
 **	@param tile	Tile number to draw.
 **	@param x	X position into video memory
