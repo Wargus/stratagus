@@ -994,7 +994,10 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		TileToolDecoration ^= 1;
 		return;
 	}
-	TileCursor = ButtonUnderCursor - 100;
+	if (TheMap.Tileset->BasicNameTable[
+		16 + (ButtonUnderCursor - 100) * 16]) {
+	    TileCursor = ButtonUnderCursor - 100;
+	}
 	return;
     }
     //
@@ -1558,7 +1561,42 @@ local void CreateEditor(void)
 
     FlagRevealMap = 1;			// editor without fog and all visible
     TheMap.NoFogOfWar = 1;
-    CreateGame(CurrentMapPath, &TheMap);
+    if( !*CurrentMapPath ) {		// new map!
+	InitUnitTypes();
+	UpdateStats();
+	//
+	//	Inititialize TheMap / Players.
+	//
+	for (i = 0; i < PlayerMax; ++i) {
+	    if( i==PlayerNumNeutral ) {
+		CreatePlayer(PlayerNeutral);
+	    } else {
+		CreatePlayer(PlayerNobody);
+	    }
+	}
+
+	DebugCheck( TheMap.Info );
+	TheMap.Info = calloc(1,sizeof(MapInfo));
+
+	TheMap.Width=TheMap.Height=256;
+	TheMap.Fields=calloc(TheMap.Width*TheMap.Height,sizeof(MapField));
+	TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
+	InitUnitCache();
+
+	TheMap.TerrainName = strdup(Tilesets[0]->Ident);
+
+	for (i = 0; i < TheMap.Width * TheMap.Height; ++i ) {
+	    TheMap.Fields[i].Tile=TheMap.Fields[i].SeenTile=0;
+	    if (TheMap.Tileset) {
+		TheMap.Fields[i].Tile=TheMap.Fields[i].SeenTile=
+		    TheMap.Tileset->Table[16];
+		TheMap.Fields[i].Flags=TheMap.Tileset->FlagsTable[16];
+	    }
+	}
+	CreateGame(NULL, &TheMap);
+    } else {
+	CreateGame(CurrentMapPath, &TheMap);
+    }
     FlagRevealMap = 0;
 
     for (i = 0; i < PlayerMax; ++i) {
