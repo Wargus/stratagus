@@ -187,6 +187,7 @@ typedef struct _menuitem_ {
     /// for MI_TYPE_TEXT
 #define MI_TFLAGS_CENTERED 1
 #define MI_TFLAGS_RALIGN 2
+#define MI_TFLAGS_LALIGN 4
 
     /// for MI_TYPE_xSLIDER
 #define MI_CFLAGS_UP 1
