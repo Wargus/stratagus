@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	fonts.ccl	-	Define the used fonts.
+--	fonts.lua	-	Define the used fonts.
 --
 --	(c) Copyright 2000-2003 by Lutz Sammer, Jimmy Salmon and Crestez Leonard
 --
@@ -26,7 +26,7 @@
 --      along with this program-- if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: fonts.lua,v 1.3 2004/08/12 22:25:32 feb Exp $
+--	$Id$
 
 DefineFont({
 	Name = "small",
