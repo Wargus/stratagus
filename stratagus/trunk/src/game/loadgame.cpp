@@ -236,8 +236,8 @@ global void LoadGame(char* filename)
     GameCycle=game_cycle;
     //GameCursor=TheUI.Point.Cursor;	// FIXME: just a default.
     GameCursor=CursorTypeByIdent("cursor-point");	// TheUI not cleaned
-    UpdateButtonPanel();
-    MustRedraw=RedrawEverything;	// redraw everything
+    SelectionChanged();
+    MustRedraw=RedrawEverything;
 }
 
 /**
