@@ -38,6 +38,7 @@
 #include "pud.h"
 #include "iolib.h"
 #include "network.h"
+#include "netconnect.h"
 #include "settings.h"
 #include "ui.h"
 

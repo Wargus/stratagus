@@ -159,7 +159,6 @@ struct _player_ {
 ----------------------------------------------------------------------------*/
 
 extern int NumPlayers;			/// Player in play
-extern int NetPlayers;			/// Network players
 extern Player Players[PlayerMax];	/// All players
 extern Player* ThisPlayer;		/// Player on this computer
 
