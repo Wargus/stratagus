@@ -1186,8 +1186,8 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->GameMenuePanel.File);
-    ui->GameMenuePanel.File=str;
+    free(ui->GameMenuPanel.File);
+    ui->GameMenuPanel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -1195,8 +1195,8 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->Menue1Panel.File);
-    ui->Menue1Panel.File=str;
+    free(ui->Menu1Panel.File);
+    ui->Menu1Panel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -1204,8 +1204,8 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->Menue2Panel.File);
-    ui->Menue2Panel.File=str;
+    free(ui->Menu2Panel.File);
+    ui->Menu2Panel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -1333,9 +1333,11 @@ local SCM CclDefineNewUI(SCM list)
 	if( gh_eq_p(value,gh_symbol2scm("normal-font-color")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
+	    ui->NormalFontColor=gh_scm2newstr(value,NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("reverse-font-color")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
+	    ui->ReverseFontColor=gh_scm2newstr(value,NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("filler-1")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
@@ -1954,8 +1956,8 @@ local SCM CclDefineNewUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->GameMenuePanel.File);
-    ui->GameMenuePanel.File=str;
+    free(ui->GameMenuPanel.File);
+    ui->GameMenuPanel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -1963,8 +1965,8 @@ local SCM CclDefineNewUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->Menue1Panel.File);
-    ui->Menue1Panel.File=str;
+    free(ui->Menu1Panel.File);
+    ui->Menu1Panel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);
@@ -1972,8 +1974,8 @@ local SCM CclDefineNewUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     str=gh_scm2newstr(value,NULL);
-    free(ui->Menue2Panel.File);
-    ui->Menue2Panel.File=str;
+    free(ui->Menu2Panel.File);
+    ui->Menu2Panel.File=str;
 
     temp=gh_car(list);
     list=gh_cdr(list);

@@ -954,21 +954,21 @@ global void DrawMenu(Menu *menu)
 	    break;
 
 	case ImagePanel1:
-	    VideoDrawSub(TheUI.GameMenuePanel.Graphic,0,0,
-		    VideoGraphicWidth(TheUI.GameMenuePanel.Graphic),
-		    VideoGraphicHeight(TheUI.GameMenuePanel.Graphic),
+	    VideoDrawSub(TheUI.GameMenuPanel.Graphic,0,0,
+		    VideoGraphicWidth(TheUI.GameMenuPanel.Graphic),
+		    VideoGraphicHeight(TheUI.GameMenuPanel.Graphic),
 		    menu->x,menu->y);
 	    break;
 	case ImagePanel2:
-	    VideoDrawSub(TheUI.Menue1Panel.Graphic,0,0,
-		    VideoGraphicWidth(TheUI.Menue1Panel.Graphic),
-		    VideoGraphicHeight(TheUI.Menue1Panel.Graphic),
+	    VideoDrawSub(TheUI.Menu1Panel.Graphic,0,0,
+		    VideoGraphicWidth(TheUI.Menu1Panel.Graphic),
+		    VideoGraphicHeight(TheUI.Menu1Panel.Graphic),
 		    menu->x,menu->y);
 	    break;
 	case ImagePanel3:
-	    VideoDrawSub(TheUI.Menue2Panel.Graphic,0,0,
-		   VideoGraphicWidth(TheUI.Menue2Panel.Graphic),
-		   VideoGraphicHeight(TheUI.Menue2Panel.Graphic),
+	    VideoDrawSub(TheUI.Menu2Panel.Graphic,0,0,
+		   VideoGraphicWidth(TheUI.Menu2Panel.Graphic),
+		   VideoGraphicHeight(TheUI.Menu2Panel.Graphic),
 		   menu->x,menu->y);
 	    break;
 	case ImagePanel4:
