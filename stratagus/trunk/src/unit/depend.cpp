@@ -153,7 +153,7 @@ global void AddDependency(const char* target,const char* required,int count
 }
 
 /**
-**	Check if this upgrade or unit is availalbe.
+**	Check if this upgrade or unit is available.
 **
 **	@param player	For this player available.
 **	@param target	Unit or Upgrade.
