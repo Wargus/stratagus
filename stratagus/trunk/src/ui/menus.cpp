@@ -152,11 +152,12 @@ local int SaveRDFilter(char *pathbuf, FileList *fl);
 
 local void FcDeleteMenu(void);
 local void FcDeleteInit(Menuitem *mi);
-local void FcDeleteFile(void);
+local void FcDeleteOk(void);
+local void FcDeleteCancel(void);
 
-//local void ConfirmSaveMenu(void);
-local void ConfirmSaveInit(Menuitem *mi);
-local void ConfirmSaveFile(void);
+local void SaveConfirmInit(Menuitem *mi);
+local void SaveConfirmOk(void);
+local void SaveConfirmCancel(void);
 
 local void LoadAction(void);
 
@@ -229,9 +230,11 @@ local void MultiGamePlayerSelectorsUpdate(int initial);
 local void MultiScenSelectMenu(void);
 
 local void MultiGameClientInit(Menuitem *mi);	// master init
+local void MultiGameClientExit(Menuitem *mi);	// master exit
 local void MultiGameClientDrawFunc(Menuitem *mi);
 local void MultiClientUpdate(int initial);
 
+local void NetConnectingInit(Menuitem *mi);
 local void NetConnectingCancel(void);
 local void TerminateNetConnect(void);
 
@@ -435,6 +438,7 @@ global void InitMenuFuncHash(void) {
 
 // Net multi setup
     HASHADD(MultiGameSetupInit,"multi-game-setup-init");
+    HASHADD(MultiGameSetupExit,"multi-game-setup-exit");
     HASHADD(MultiGameDrawFunc,"multi-game-draw-func");
     HASHADD(MultiScenSelectMenu,"multi-scen-select");
     HASHADD(MultiGameStart,"multi-game-start");
@@ -448,6 +452,7 @@ global void InitMenuFuncHash(void) {
 // Net multi client
     HASHADD(TerminateNetConnect,"terminate-net-connect");
     HASHADD(MultiGameClientInit,"multi-game-client-init");
+    HASHADD(MultiGameClientExit,"multi-game-client-exit");
     HASHADD(MultiGameClientDrawFunc,"multi-client-draw-func");
     HASHADD(MultiClientReady,"multi-client-ready");
     HASHADD(MultiClientNotReady,"multi-client-not-ready");
@@ -456,6 +461,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(MultiClientGemAction,"multi-client-gem-action");
 
 // Net connecting
+    HASHADD(NetConnectingInit,"net-connecting-init");
     HASHADD(NetConnectingCancel,"net-connecting-cancel");
 
 // Campaign select
@@ -526,12 +532,14 @@ global void InitMenuFuncHash(void) {
     HASHADD(LoadAction,"load-action");
 
 // Confirm save
-    HASHADD(ConfirmSaveInit,"confirm-save-init");
-    HASHADD(ConfirmSaveFile,"confirm-save-file");
+    HASHADD(SaveConfirmInit,"save-confirm-init");
+    HASHADD(SaveConfirmOk,"save-confirm-ok");
+    HASHADD(SaveConfirmOk,"save-confirm-cancel");
 
 // Confirm delete
     HASHADD(FcDeleteInit,"fc-delete-init");
-    HASHADD(FcDeleteFile,"fc-delete-file");
+    HASHADD(FcDeleteOk,"fc-delete-ok");
+    HASHADD(FcDeleteCancel,"fc-delete-cancel");
 
 // Editor select
     HASHADD(EditorNewMap,"editor-new-map");
@@ -1011,6 +1019,7 @@ local void SaveOk(void)
 	} else {
 	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
 	    EndMenu();
+	    menu->items[9].d.button.text = NULL;
 	}
     }
 }
@@ -1307,6 +1316,7 @@ local void LoadOk(void)
 	} else {
 	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
 	    EndMenu();
+	    menu->items[9].d.button.text = NULL;
 	}
     }
 }
@@ -1325,7 +1335,7 @@ local void SaveMenu(void)
 /**
 **	FIXME: docu
 */
-local void ConfirmSaveInit(Menuitem * mi __attribute__ ((unused)))
+local void SaveConfirmInit(Menuitem * mi)
 {
     static char name[PATH_MAX];		// FIXME: much memory wasted
     int fileLength;
@@ -1342,14 +1352,13 @@ local void ConfirmSaveInit(Menuitem * mi __attribute__ ((unused)))
     if (strstr(name, ".sav") == NULL) {
 	strcat(name, ".sav");
     }
-    menu = FindMenu("menu-save-confirm");
-    menu->items[2].d.text.text = name;
+    mi->menu->items[2].d.text.text = name;
 }
 
 /**
 **	FIXME: docu
 */
-local void ConfirmSaveFile(void)
+local void SaveConfirmOk(void)
 {
     char name[PATH_MAX];
     int fileLength;
@@ -1370,6 +1379,21 @@ local void ConfirmSaveFile(void)
     SaveGame(name);
     SetMessage("Saved game to: %s", name);
     EndMenu();
+
+    menu = FindMenu("menu-save-confirm");
+    menu->items[2].d.text.text = NULL;
+}
+
+/**
+**	FIXME: docu
+*/
+local void SaveConfirmCancel(void)
+{
+    Menu *menu;
+
+    EndMenu();
+    menu = FindMenu("menu-save-confirm");
+    menu->items[2].d.text.text = NULL;
 }
 
 /**
@@ -1384,21 +1408,21 @@ local void FcDeleteMenu(void)
 /**
 **	FIXME: docu
 */
-local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
+local void FcDeleteInit(Menuitem *mi)
 {
-    static char name[PATH_MAX];		// FIXME: much memory wasted
     Menu *menu;
+    static char name[PATH_MAX];		// FIXME: much memory wasted
 
+    menu = FindMenu("menu-save-game");
     strcpy(name, "the file: ");
-    strcat(name, mi->menu->items[1].d.input.buffer);
-    menu = FindMenu("menu-delete-confirm");
-    menu->items[2].d.text.text = name;
+    strcat(name, menu->items[1].d.input.buffer);
+    mi->menu->items[2].d.text.text = name;
 }
   
 /**
 **	FIXME: docu
 */
-local void FcDeleteFile(void)
+local void FcDeleteOk(void)
 {
     Menu *menu;
     char name[PATH_MAX];
@@ -1412,6 +1436,21 @@ local void FcDeleteFile(void)
     *menu->items[1].d.input.buffer = '\0';
     menu->items[1].d.input.nch = 0;
     ProcessMenu("menu-save-game", 1);
+
+    menu = FindMenu("menu-delete-confirm");
+    menu->items[2].d.text.text = NULL;
+}
+
+/**
+**	FIXME: docu
+*/
+local void FcDeleteCancel(void)
+{
+    Menu *menu;
+
+    EndMenu();
+    menu = FindMenu("menu-delete-confirm");
+    menu->items[2].d.text.text = NULL;
 }
 
 /**
@@ -2500,6 +2539,7 @@ local void JoinNetGameMenu(void)
 	menu = FindMenu("menu-net-error");
 	menu->items[1].d.text.text = "Unable to lookup host.";
 	ProcessMenu("menu-net-error", 1);
+	menu->items[1].d.text.text = NULL;
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
@@ -2526,8 +2566,19 @@ local void JoinNetGameMenu(void)
 /**
 **	Cancel button of network connect menu pressed.
 */
+local void NetConnectingInit(Menuitem *mi)
+{
+    mi->menu->items[1].d.text.text = NetServerText;
+    mi->menu->items[2].d.text.text = NetTriesText;
+}
+
+/**
+**	Cancel button of network connect menu pressed.
+*/
 local void NetConnectingCancel(void)
 {
+    Menu *menu;
+
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
@@ -2535,6 +2586,10 @@ local void NetConnectingCancel(void)
     // Trigger TerminateNetConnect() to call us again and end the menu
     NetLocalState = ccs_usercanceled;
     EndMenu();
+
+    menu = FindMenu("menu-net-connecting");
+    menu->items[1].d.text.text = NULL;
+    menu->items[2].d.text.text = NULL;
 }
 
 /**
@@ -2549,36 +2604,42 @@ local void TerminateNetConnect(void)
 	case ccs_unreachable:
 	    menu->items[1].d.text.text = "Cannot reach server.";
 	    ProcessMenu("menu-net-error", 1);
+	    menu->items[1].d.text.text = NULL;
 
 	    NetConnectingCancel();
 	    return;
 	case ccs_nofreeslots:
 	    menu->items[1].d.text.text = "Server is full.";
 	    ProcessMenu("menu-net-error", 1);
+	    menu->items[1].d.text.text = NULL;
 
 	    NetConnectingCancel();
 	    return;
 	case ccs_serverquits:
 	    menu->items[1].d.text.text = "Server gone.";
 	    ProcessMenu("menu-net-error", 1);
+	    menu->items[1].d.text.text = NULL;
 
 	    NetConnectingCancel();
 	    return;
 	case ccs_incompatibleengine:
 	    menu->items[1].d.text.text = "Incompatible engine version.";
 	    ProcessMenu("menu-net-error", 1);
+	    menu->items[1].d.text.text = NULL;
 
 	    NetConnectingCancel();
 	    return;
 	case ccs_badmap:
 	    menu->items[1].d.text.text = "Map not available.";
 	    ProcessMenu("menu-net-error", 1);
+	    menu->items[1].d.text.text = NULL;
 
 	    NetConnectingCancel();
 	    return;
 	case ccs_incompatiblenetwork:
 	    menu->items[1].d.text.text = "Incompatible network version.";
 	    ProcessMenu("menu-net-error", 1);
+	    menu->items[1].d.text.text = NULL;
 
 	case ccs_usercanceled:
 	    NetConnectingCancel();
@@ -2716,10 +2777,11 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
+	free(mi->menu->items[3].d.button.text);
 	if (fl[i].type) {
-	    mi->menu->items[3].d.button.text = "OK";
+	    mi->menu->items[3].d.button.text = strdup("OK");
 	} else {
-	    mi->menu->items[3].d.button.text = "Open";
+	    mi->menu->items[3].d.button.text = strdup("Open");
 	}
 	if (mi->d.listbox.noptions > 5) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
@@ -2886,7 +2948,8 @@ local void ScenSelectLBInit(Menuitem *mi)
     i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i == 0) {
-	mi->menu->items[3].d.button.text = "OK";
+	free(mi->menu->items[3].d.button.text);
+	mi->menu->items[3].d.button.text = strdup("OK");
 	mi->menu->items[3].flags |= MenuButtonDisabled;
     } else {
 	ScenSelectLBAction(mi, 0);
@@ -3450,6 +3513,7 @@ local void ScenSelectOk(void)
 	} else {
 	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
 	    EndMenu();
+	    menu->items[9].d.button.text = NULL;
 	}
     }
 }
@@ -3459,6 +3523,7 @@ local void ScenSelectOk(void)
 */
 local void ScenSelectCancel(void)
 {
+    Menu *menu;
     char *s;
 
     //
@@ -3484,6 +3549,9 @@ local void ScenSelectCancel(void)
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
     EndMenu();
+
+    menu = FindMenu("menu-select-scenario");
+    menu->items[9].d.button.text = NULL;
 }
 
 /**
@@ -4126,9 +4194,17 @@ local void MultiGameSetupInit(Menuitem *mi)
 /**
 **	FIXME: docu
 */
-local void MultiGameSetupExit(Menuitem *mi __attribute__((unused)))
+local void MultiGameSetupExit(Menuitem *mi)
 {
+    int i;
+
     NetworkExitServerConnect();
+
+    // ugly hack to prevent NetMultiButtonStorage[0].d.pulldown.options
+    // from being freed
+    for (i=0; i<PlayerMax-1; ++i) {
+	mi->menu->items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
+    }
 }
 
 /**
@@ -4136,7 +4212,6 @@ local void MultiGameSetupExit(Menuitem *mi __attribute__((unused)))
 */
 local void MultiGameCancel(void)
 {
-    MultiGameSetupExit(NULL);
     NetPlayers = 0;		// Make single player menus work again!
     GameCancel();
 }
@@ -4225,6 +4300,20 @@ local void MultiGameClientInit(Menuitem *mi)
     } else {
 	mi->menu->items[3].flags = MenuButtonDisabled;
 	mi->menu->items[2].flags = 0;
+    }
+}
+
+/**
+**	FIXME: docu
+*/
+local void MultiGameClientExit(Menuitem *mi)
+{
+    int i;
+
+    // ugly hack to prevent NetMultiButtonStorage[0].d.pulldown.options
+    // from being freed
+    for (i=0; i<PlayerMax-1; ++i) {
+	mi->menu->items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
     }
 }
 
@@ -4534,6 +4623,7 @@ local void EditorNewOk(void)
 	menu = FindMenu("menu-net-error");
 	menu->items[1].d.text.text = "Size smaller than 32";
 	ProcessMenu("menu-net-error", 1);
+	menu->items[1].d.text.text = NULL;
     } else if (value1 > 1024 || value2 > 1024) {
 	if (value1 == 0) {
 	    sprintf(menu->items[4].d.input.buffer, "1024~!_");
@@ -4546,6 +4636,7 @@ local void EditorNewOk(void)
 	menu = FindMenu("menu-net-error");
 	menu->items[1].d.text.text = "Size larger than 1024";
 	ProcessMenu("menu-net-error", 1);
+	menu->items[1].d.text.text = NULL;
     } else if (value1/32*32 != value1 || value2/32*32 != value2) {
 	if (value1/32*32 != value1) {
 	    sprintf(menu->items[4].d.input.buffer, "%d~!_", (value1+16)/32*32);
@@ -4558,6 +4649,7 @@ local void EditorNewOk(void)
 	menu = FindMenu("menu-net-error");
 	menu->items[1].d.text.text = "Size must be a multiple of 32";
 	ProcessMenu("menu-net-error", 1);
+	menu->items[1].d.text.text = NULL;
     }
     else {
 	EndMenu();
@@ -4636,7 +4728,8 @@ local void EditorMainLoadLBInit(Menuitem *mi)
 	(FileList **)&(mi->d.listbox.options));
 
     if (i == 0) {
-	mi->menu->items[3].d.button.text = "OK";
+	free(mi->menu->items[3].d.button.text);
+	mi->menu->items[3].d.button.text = strdup("OK");
 	mi->menu->items[3].flags |= MenuButtonDisabled;
     } else {
 	EditorMainLoadLBAction(mi, 0);
@@ -4802,6 +4895,7 @@ local void EditorMainLoadOk(void)
 	} else {
 	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
 	    EndMenu();
+	    menu->items[5].d.button.text = NULL;
 	}
     }
 }
@@ -4811,7 +4905,8 @@ local void EditorMainLoadOk(void)
 */
 local void EditorMainLoadCancel(void)
 {
-    char* s;
+    Menu *menu;
+    char *s;
 
     EditorCancelled=1;
 
@@ -4838,6 +4933,9 @@ local void EditorMainLoadCancel(void)
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
     EndMenu();
+
+    menu = FindMenu("menu-editor-main-load-map");
+    menu->items[5].d.button.text = NULL;
 }
 
 /**
@@ -4894,10 +4992,11 @@ local void EditorMainLoadLBAction(Menuitem *mi, int i)
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
+	free(mi->menu->items[3].d.button.text);
 	if (fl[i].type) {
-	    mi->menu->items[3].d.button.text = "OK";
+	    mi->menu->items[3].d.button.text = strdup("OK");
 	} else {
-	    mi->menu->items[3].d.button.text = "Open";
+	    mi->menu->items[3].d.button.text = strdup("Open");
 	}
 	if (mi->d.listbox.noptions > 5) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
@@ -5023,6 +5122,8 @@ local void EditorMapProperties(void)
     menu->items[8].flags = -1;
 
     ProcessMenu("menu-editor-map-properties", 1);
+
+    menu->items[4].d.text.text = NULL;
 }
 
 /**
@@ -5213,6 +5314,7 @@ global void EditorEditResource(void)
     menu->items[1].d.input.nch = strlen(buf) - 3;
     menu->items[1].d.input.maxch = 6;
     ProcessMenu("menu-editor-edit-resource", 1);
+    menu->items[0].d.text.text = NULL;
 }
 
 /**
@@ -5243,12 +5345,14 @@ local void EditorEditResourceOk(void)
 	menu = FindMenu("menu-editor-error");
 	menu->items[1].d.text.text = "Must be greater than 2500";
 	ProcessMenu("menu-editor-error", 1);
+	menu->items[1].d.text.text = NULL;
     } else if (value > 655000) {
 	strcpy(menu->items[1].d.text.text, "655000~!_");
 	menu->items[1].d.input.nch = strlen(menu->items[1].d.text.text) - 3;
 	menu = FindMenu("menu-editor-error");
 	menu->items[1].d.text.text = "Must be smaller than 655000";
 	ProcessMenu("menu-editor-error", 1);
+	menu->items[1].d.text.text = NULL;
     } else if (value/2500*2500 != value) {
 	value = (value+1250)/2500*2500;
 	sprintf(menu->items[1].d.text.text, "%d~!_", value);
@@ -5256,6 +5360,7 @@ local void EditorEditResourceOk(void)
 	menu = FindMenu("menu-editor-error");
 	menu->items[1].d.text.text = "Must be a multiple of 2500";
 	ProcessMenu("menu-editor-error", 1);
+	menu->items[1].d.text.text = NULL;
     } else {
 	UnitUnderCursor->Value = value;
 	GameMenuReturn();
@@ -5377,7 +5482,8 @@ local void EditorSaveLBInit(Menuitem *mi)
 	(FileList **)&(mi->d.listbox.options));
 
     if (i == 0) {
-	mi->menu->items[4].d.button.text = "Save";
+	free(mi->menu->items[4].d.button.text);
+	mi->menu->items[4].d.button.text = strdup("Save");
 	mi->menu->items[4].flags |= MenuButtonDisabled;
     } else {
 	EditorSaveLBAction(mi, 0);
@@ -5550,6 +5656,7 @@ local void EditorSaveOk(void)
 		}
 	    }
 	    EditorEndMenu();
+	    menu->items[6].d.button.text = NULL;
 	}
     }
 }
@@ -5559,8 +5666,13 @@ local void EditorSaveOk(void)
 */
 local void EditorSaveCancel(void)
 {
+    Menu *menu;
+
     EditorCancelled = 1;
     EditorEndMenu();
+
+    menu = FindMenu("menu-editor-save");
+    menu->items[6].d.button.text = NULL;
 }
 
 /**
@@ -5594,14 +5706,15 @@ local void EditorSaveLBAction(Menuitem *mi, int i)
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
+	free(mi->menu->items[4].d.button.text);
 	if (fl[i].type) {
 	    sprintf(mi->menu->items[3].d.input.buffer, "%s~!_", fl[i].name);
 	    mi->menu->items[3].d.input.nch = strlen(mi->menu->items[3].d.input.buffer) - 3;
-	    mi->menu->items[4].d.button.text = "Save";
+	    mi->menu->items[4].d.button.text = strdup("Save");
 	} else {
 	    strcpy(mi->menu->items[3].d.input.buffer, "~!_");
 	    mi->menu->items[3].d.input.nch = strlen(mi->menu->items[3].d.input.buffer) - 3;
-	    mi->menu->items[4].d.button.text = "Open";
+	    mi->menu->items[4].d.button.text = strdup("Open");
 	}
 	if (mi->d.listbox.noptions > 5) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
@@ -5722,7 +5835,12 @@ local void EditorSaveConfirmInit(Menuitem *mi)
 */
 local void EditorSaveConfirmOk(void)
 {
+    Menu *menu;
+
     EditorEndMenu();
+
+    menu = FindMenu("menu-save-confirm");
+    menu->items[2].d.text.text = NULL;
 }
 
 /**
@@ -5730,8 +5848,13 @@ local void EditorSaveConfirmOk(void)
 */
 local void EditorSaveConfirmCancel(void)
 {
+    Menu *menu;
+
     EditorCancelled = 1;
     EditorEndMenu();
+
+    menu = FindMenu("menu-save-confirm");
+    menu->items[2].d.text.text = NULL;
 }
 
 /**
@@ -5819,7 +5942,8 @@ local void ReplayGameLBInit(Menuitem *mi)
 	(FileList **)&(mi->d.listbox.options));
 
     if (i == 0) {
-	mi->menu->items[3].d.button.text = "OK";
+	free(mi->menu->items[3].d.button.text);
+	mi->menu->items[3].d.button.text = strdup("OK");
 	mi->menu->items[3].flags |= MenuButtonDisabled;
     } else {
 	ReplayGameLBAction(mi, 0);
@@ -5919,10 +6043,11 @@ local void ReplayGameLBAction(Menuitem *mi, int i)
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
+	free(mi->menu->items[3].d.button.text);
 	if (fl[i].type) {
-	    mi->menu->items[3].d.button.text = "OK";
+	    mi->menu->items[3].d.button.text = strdup("OK");
 	} else {
-	    mi->menu->items[3].d.button.text = "Open";
+	    mi->menu->items[3].d.button.text = strdup("Open");
 	}
 	if (mi->d.listbox.noptions > 5) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
@@ -6131,6 +6256,7 @@ local void ReplayGameOk(void)
 
 	    GuiGameStarted = 1;
 	    EndMenu();
+	    menu->items[5].d.button.text = NULL;
 	}
     }
 }
@@ -6140,7 +6266,8 @@ local void ReplayGameOk(void)
 */
 local void ReplayGameCancel(void)
 {
-    char* s;
+    Menu *menu;
+    char *s;
 
     //
     //  Use last selected map.
@@ -6165,6 +6292,9 @@ local void ReplayGameCancel(void)
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
     EndMenu();
+
+    menu = FindMenu("menu-replay-game");
+    menu->items[5].d.button.text = NULL;
 }
 
 /*----------------------------------------------------------------------------
@@ -6176,12 +6306,6 @@ local void ReplayGameCancel(void)
 */
 global void InitMenuData(void)
 {
-    Menu *menu;
-
-    // FIXME: Get rid of these..
-    menu = FindMenu("menu-net-connecting");
-    menu->items[1].d.text.text = NetServerText;
-    menu->items[2].d.text.text = NetTriesText;
     InitNetMultiButtonStorage();
 }
 
