@@ -369,28 +369,31 @@ global void DrawUnitInfo(const Unit* unit)
 
     } else if( type->StoresGold ) {
 	VideoDrawText(x+20,y+8+61,GameFont,"Production");
-	VideoDrawText(x+73,y+8+77,GameFont,"Gold:");
-	VideoDrawNumber(x+108,y+8+77,GameFont,DEFAULT_INCOMES[GoldCost]);
+	VideoDrawText(x+43,y+8+77,GameFont,"Gold:");
+	VideoDrawNumber(x+78,y+8+77,GameFont,DEFAULT_INCOMES[GoldCost]);
 	// Keep/Stronghold, Castle/Fortress
 	if( unit->Player->Incomes[GoldCost] != DEFAULT_INCOMES[GoldCost] ) {
-		sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[GoldCost]-DEFAULT_INCOMES[GoldCost]);
-		VideoDrawText(x+126,y+8+77,GameFont,buf);
+		sprintf(buf, "~<+%i~> (%+.1f)",
+		    unit->Player->Incomes[GoldCost]-DEFAULT_INCOMES[GoldCost],
+		    unit->Player->Revenue[GoldCost] / 1000.0);
+		VideoDrawText(x+96,y+8+77,GameFont,buf);
 	}
-	VideoDrawText(x+52,y+8+93,GameFont,"Lumber:");
-	VideoDrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
+	VideoDrawText(x+22,y+8+93,GameFont,"Lumber:");
+	VideoDrawNumber(x+78,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
 	// Lumber mill
 	if( unit->Player->Incomes[WoodCost]!=DEFAULT_INCOMES[WoodCost] ) {
-	    sprintf(buf, "~<+%i~>",
-		unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost]);
-	    VideoDrawText(x+126,y+8+93,GameFont,buf);
+	    sprintf(buf, "~<+%i~> (%+.1f)",
+		unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost],
+		unit->Player->Revenue[WoodCost] / 1000.0);
+	    VideoDrawText(x+96,y+8+93,GameFont,buf);
 	}
-	VideoDrawText(x+84,y+8+109,GameFont,"Oil:");
-	VideoDrawNumber(x+108,y+8+109,GameFont,DEFAULT_INCOMES[OilCost]);
+	VideoDrawText(x+54,y+8+109,GameFont,"Oil:");
+	VideoDrawNumber(x+78,y+8+109,GameFont,DEFAULT_INCOMES[OilCost]);
 	if( unit->Player->Incomes[OilCost]!=DEFAULT_INCOMES[OilCost] ) {
-	    sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
-	    VideoDrawText(x+126,y+8+109,GameFont,buf);
+	    sprintf(buf, "~<+%i~> (%+.1f)",
+		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost],
+		    unit->Player->Revenue[OilCost] / 1000.0);
+	    VideoDrawText(x+96,y+8+109,GameFont,buf);
 	}
 	return;
 
