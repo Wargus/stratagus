@@ -262,13 +262,13 @@ MYDATE	= $(shell date +%y%m%d)
 PCRAFT= freecraft-$(MYDATE).tar.bz2
 LCRAFT= freecraft-$(MYDATE)-bin.tar.bz2
 WCRAFT= freecraft-$(MYDATE)-win32bin.zip
-FCRAFT=	../fcraft-0.14.tar.gz
-SCRAFT= ../sclone-0.01.tar.bz2
+FCRAFT=	../fcraft-0.14pre1.tar.gz
+SCRAFT= ../sclone-0.02.tar.bz2
 
 linux-complete:
 	tar xzf $(FCRAFT)
 	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
-	cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
+	#cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
 	tar xjf $(SCRAFT)
 	tar xjf $(PCRAFT)
 	tar xjf $(LCRAFT)
@@ -279,14 +279,14 @@ linux-complete:
 	rm -rf freecraft-$(MYDATE)
 	rm -rf fcraft
 	rm -rf fclone
-	tar chzf freecraft-$(MYDATE)-complete-linux.tar.gz freecraft-complete
-	tar cjhf freecraft-$(MYDATE)-complete-linux.tar.bz2 freecraft-complete
+	-tar czhf freecraft-$(MYDATE)-complete-linux.tar.gz freecraft-complete
+	-tar cjhf freecraft-$(MYDATE)-complete-linux.tar.bz2 freecraft-complete
 	rm -rf freecraft-complete
 
 win32-complete:
 	tar xzf $(FCRAFT)
 	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
-	cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
+	#cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
 	tar xjf $(SCRAFT)
 	tar xjf $(PCRAFT)
 	unzip -oq $(WCRAFT)
@@ -297,7 +297,7 @@ win32-complete:
 	rm -rf freecraft-$(MYDATE)
 	rm -rf fcraft
 	rm -rf fclone
-	mv freecraft-complete/CONTRIB freecraft-complete/CONTRIB.txt
+	mv freecraft-complete/CONTRIB.fgp freecraft-complete/CONTRIB-fgp.txt
 	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(MYDATE)-complete-win32.zip freecraft-complete
 	cat tools/SFXWiz32-gcc.exe freecraft-$(MYDATE)-complete-win32.zip \
