@@ -664,10 +664,12 @@ local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
 	    LastStateMsgType = msg->SubType;
 	}
 	n = NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), msg);
+#ifdef DEBUG
 	DebugLevel0Fn("Sending Init Message (%s:%d): %d:%d(%d) %d.%d.%d.%d:%d\n",
 		ncconstatenames[NetLocalState], NetStateMsgCnt, msg->Type,
 		msg->SubType, n,
 		NIPQUAD(ntohl(NetworkServerIP)), NetworkServerPort);
+#endif
     }
 }
 

@@ -155,27 +155,27 @@ local CompareFunction GetCompareFunction(const char* op)
 {
     if( op[0]=='=' ) {
 	if( (op[1]=='=' && op[2]=='\0') || (op[1]=='\0') ) {
-	    return CompareEq;
+	    return &CompareEq;
 	}
     }
     else if( op[0]=='>' ) {
 	if( op[1]=='=' && op[2]=='\0' ) {
-	    return CompareGrEq;
+	    return &CompareGrEq;
 	}
 	else if( op[1]=='\0' ) {
-	    return CompareGr;
+	    return &CompareGr;
 	}
     }
     else if( op[0]=='<' ) {
 	if( op[1]=='=' && op[2]=='\0' ) {
-	    return CompareLeEq;
+	    return &CompareLeEq;
 	}
 	else if( op[1]=='\0' ) {
-	    return CompareLe;
+	    return &CompareLe;
 	}
     }
     else if( op[0]=='!' && op[1]=='=' && op[2]=='\0' ) {
-	return CompareNEq;
+	return &CompareNEq;
     }
     return NULL;
 }
@@ -253,7 +253,8 @@ local SCM CclIfUnit(SCM player,SCM operation,SCM quantity,SCM unit)
 /**
 **	Player has the quantity of unit-type near to unit-type.
 */
-local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,SCM near)
+local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
+                        SCM nearunit)
 {
     int plynr;
     int q;
@@ -269,7 +270,7 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,SCM near)
     op=get_c_string(operation);
     q=gh_scm2int(quantity);
     unittype=TriggerGetUnitType(unit);
-    ut2=CclGetUnitType(near);
+    ut2=CclGetUnitType(nearunit);
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
@@ -341,7 +342,7 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,SCM near)
 **	Player has the quantity of rescued unit-type near to unit-type.
 */
 local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
-                               SCM near)
+                               SCM nearunit)
 {
     int plynr;
     int q;
@@ -357,7 +358,7 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
     op=get_c_string(operation);
     q=gh_scm2int(quantity);
     unittype=TriggerGetUnitType(unit);
-    ut2=CclGetUnitType(near);
+    ut2=CclGetUnitType(nearunit);
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
