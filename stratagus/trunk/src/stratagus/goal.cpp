@@ -66,8 +66,11 @@ global void CheckGoals(void)
 
     DebugLevel3Fn("\n");
 
+    //
+    //	FIXME: not correct, must check teams.
+    //
     for( i=n=0; i<NumPlayers; ++i ) {
-	if( Players[i].Race!=PlayerRaceNeutral ) {
+	if( Players[i].Type!=PlayerNeutral && Players[i].Type!=PlayerNobody ) {
 	    DebugLevel3("%d: %d %d\n",i,Players[i].NumFoodUnits
 			,Players[i].NumBuildings);
 	    if( Players[i].NumFoodUnits+Players[i].NumBuildings ) {
