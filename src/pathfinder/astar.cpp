@@ -631,6 +631,13 @@ global int NextPathElement(Unit* unit,int* pxd,int *pyd)
     int result;
 
     //
+    //  Convert heading into direction.
+    //                            //  N NE  E SE  S SW  W NW
+    local const int Heading2X[8] = {  0,+1,+1,+1, 0,-1,-1,-1 };
+    local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
+			
+
+    //
     //	Reduce the load, stop handling pathes if too many UNREACHABLE results.
     //
     if( GameCycle!=LastGameCycle ) {
@@ -647,7 +654,18 @@ global int NextPathElement(Unit* unit,int* pxd,int *pyd)
     if(AStarOn) {
 	result=AStarNextPathElement(unit,pxd,pyd);
     } else {
-	result=NewPath(unit,pxd,pyd);
+	// Attempt to use path cache
+        if( unit->Data.Move.Length > 0 ) {
+	    *pxd = Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
+	    *pyd = Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
+	    result = unit->Data.Move.Length;
+	    unit->Data.Move.Length--;
+	    if( !CheckedCanMoveToMask(*pxd+unit->X,*pyd+unit->Y,UnitMovementMask(unit)) ) {
+		result=NewPath(unit,pxd,pyd);
+	    }
+	} else {
+	    result=NewPath(unit,pxd,pyd);
+	}
     }
     if( result==PF_UNREACHABLE ) {
 	--UnreachableCounter;

@@ -563,7 +563,7 @@ struct _unit_ {
     struct _order_move_ {
 	char	Fast;			/// Flag fast move (one step)
 	char	Length;			/// stored path length
-#define MAX_PATH_LENGTH	14		/// max length of precalculated path
+#define MAX_PATH_LENGTH 28		/// max length of precalculated path
 	char	Path[MAX_PATH_LENGTH];	/// directions of stored path
     }		Move;			/// ActionMove,...
     struct _order_builded_ {
