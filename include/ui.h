@@ -235,7 +235,7 @@ typedef struct _ui_ {
                                         ///< +2 for food and score
 
 	// Info panel
-	Graphic* InfoPanelG;                 ///< Info panel background
+	Graphic* InfoPanelG;                ///< Info panel background
 	int InfoPanelX;                     ///< Info panel screen X position
 	int InfoPanelY;                     ///< Info panel screen Y position
 
@@ -266,24 +266,24 @@ typedef struct _ui_ {
 	int     TrainingTextX;              ///< FIXME: docu
 	int     TrainingTextY;              ///< FIXME: docu
 
-	Button* UpgradingButton; ///< FIXME: docu
-	char*   UpgradingText; ///< FIXME: docu
-	int     UpgradingFont; ///< FIXME: docu
-	int     UpgradingTextX; ///< FIXME: docu
-	int     UpgradingTextY; ///< FIXME: docu
+	Button* UpgradingButton;            ///< FIXME: docu
+	char*   UpgradingText;              ///< FIXME: docu
+	int     UpgradingFont;              ///< FIXME: docu
+	int     UpgradingTextX;             ///< FIXME: docu
+	int     UpgradingTextY;             ///< FIXME: docu
 
-	Button* ResearchingButton; ///< FIXME: docu
-	char*   ResearchingText; ///< FIXME: docu
-	int     ResearchingFont; ///< FIXME: docu
-	int     ResearchingTextX; ///< FIXME: docu
-	int     ResearchingTextY; ///< FIXME: docu
+	Button* ResearchingButton;          ///< FIXME: docu
+	char*   ResearchingText;            ///< FIXME: docu
+	int     ResearchingFont;            ///< FIXME: docu
+	int     ResearchingTextX;           ///< FIXME: docu
+	int     ResearchingTextY;           ///< FIXME: docu
 
-	Button* TransportingButtons; ///< FIXME: docu
+	Button* TransportingButtons;        ///< FIXME: docu
 	int     NumTransportingButtons;     ///< Number of transporting buttons
-	char*   TransportingText; ///< FIXME: docu
-	int     TransportingFont; ///< FIXME: docu
-	int     TransportingTextX; ///< FIXME: docu
-	int     TransportingTextY; ///< FIXME: docu
+	char*   TransportingText;           ///< FIXME: docu
+	int     TransportingFont;           ///< FIXME: docu
+	int     TransportingTextX;          ///< FIXME: docu
+	int     TransportingTextY;          ///< FIXME: docu
 
 	// Completed bar
 	SDL_Color CompletedBarColorRGB;     ///< color for completed bar
@@ -299,7 +299,7 @@ typedef struct _ui_ {
 	int       CompletedBarTextY;        ///< completed bar text Y position
 
 	// Button panel
-	Graphic*      ButtonPanelG;          ///< Button panel background
+	Graphic*      ButtonPanelG;         ///< Button panel background
 	int           ButtonPanelX;         ///< Button panel screen X position
 	int           ButtonPanelY;         ///< Button panel screen Y position
 	Button*       ButtonButtons;        ///< Button panel buttons
@@ -307,10 +307,10 @@ typedef struct _ui_ {
 	SDL_Color     ButtonAutoCastBorderColorRGB; ///< Auto cast border color
 
 	// Pie Menu
-	Graphic* PieMenuBackgroundG;         ///< Optional background image for the piemenu
-	enum _mouse_buttons_ PieMouseButton; ///< Which mouse button pops up the piemenu. Deactivate with the NoButton value.
-	int PieX[8];                         ///< X position of the pies
-	int PieY[8];                         ///< Y position of the pies
+	Graphic* PieMenuBackgroundG;        ///< Optional background image for the piemenu
+	enum _mouse_buttons_ PieMouseButton;///< Which mouse button pops up the piemenu. Deactivate with the NoButton value.
+	int PieX[8];                        ///< X position of the pies
+	int PieY[8];                        ///< Y position of the pies
 
 	// Map area
 	ViewportMode ViewportMode;          ///< Current viewport mode
