@@ -190,6 +190,7 @@ global void ShowIntro(void)
     int line;
     int i;
     int l;
+    int x;
     int y;
     const Intro* intro;
     CLFile* file;
@@ -238,9 +239,11 @@ global void ShowIntro(void)
     StopMusic();
     PlayFile(intro->VoiceFile1);
 
+    x=(VideoWidth-640)/2;
     stage=line=0;
     IntroNoEvent=1;
     while( IntroNoEvent ) {
+	y=(VideoHeight-480)/2;
 	if( !PlayingMusic && !stage && intro->VoiceFile2 ) {
 	    PlayFile(intro->VoiceFile2);
 	    stage++;
@@ -256,19 +259,19 @@ global void ShowIntro(void)
 	//
 	//	Draw title
 	//
-	VideoDrawTextCentered(424,28,LargeFont,intro->Title);
+	VideoDrawTextCentered(x+424,y+28,LargeFont,intro->Title);
 	//
 	//	Draw scrolling text
 	//
 	PushClipping();
-	SetClipping(268,80,640-1,480-1);
-	ScrollText(268,80,line,text);
+	SetClipping(x+268,y+80,x+640-1,y+480-1);
+	ScrollText(x+268,y+80,line,text);
 	PopClipping();
 	//
 	//	Draw objectives
 	//
-	VideoDrawText(372,306,LargeFont,"Objectives:");
-	y=330;
+	VideoDrawText(x+372,y+306,LargeFont,"Objectives:");
+	y+=330;
 	for( i=0; i<MAX_OBJECTIVES && intro->Objectives[i]; ++i ) {
 	    char buf[1024];
 
@@ -286,7 +289,7 @@ global void ShowIntro(void)
 		    *strrchr(buf,' ')='\0';
 		}
 
-		VideoDrawText(372,y,LargeFont,buf);
+		VideoDrawText(x+372,y,LargeFont,buf);
 		y+=22;
 		l+=strlen(buf);
 		if( !intro->Objectives[i][l] ) {
