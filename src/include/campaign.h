@@ -136,7 +136,7 @@ extern int GameResult;           ///< Outcome of the game
 extern int RestartScenario;      ///< Restart the scenario
 extern int QuitToMenu;           ///< Quit to menu
 extern char CurrentMapPath[];    ///< Path of the current map
-extern char DefaultMap[];        ///< Default map path
+extern char DefaultMap[1024];    ///< Default map path
 extern char DefaultObjective[];  ///< The default scenario objective
 
 extern Campaign* Campaigns;      ///< Campaigns
