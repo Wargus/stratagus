@@ -91,13 +91,11 @@
 **		walls, contains the remaining hit points of the wall and
 **		for forest, contains the frames until they grow.
 **
-**	MapField::VisibleLastFrame
+**	MapField::Visible[]
 **
-**		Currently contains the two flags ::MapFieldCompletelyVisible,
-**		field completely visible and ::MapFieldPartiallyVisible field
-**		partially visible. Used for optimized map redraw.
-**		This can be coded into the 2 bits in MapField::Flags:
-**		0 Unexplored, 1 Explored, 2 PartialVisible, 3 CompleteVisible.
+**		Counter how many units of the player can see this field. 0 the
+**		field is not explored, 1 explored, n-1 unit see it. Currently
+**		no more than 253 units can see a field.
 **
 **	MapField::Here MapField::Here::Units
 **
@@ -105,6 +103,10 @@
 **		Note: currently units are only inserted at the insert point.
 **		This means units of the size of 2x2 fields are inserted at the
 **		top and right most map coordinate.
+**
+**	MapField::Region
+**
+**		Number of the region to that the tile belongs.
 */
 
 /**
@@ -192,6 +194,31 @@
 #define MaxMapHeight	1024		/// maximal map height supported
 
 /*----------------------------------------------------------------------------
+--	Map - region
+----------------------------------------------------------------------------*/
+
+#ifdef NEW_REGIONS
+
+/**
+**	Map region typedef
+*/
+typedef struct _map_region_  MapRegion;
+
+/**
+**	A region of the map
+*/
+struct _map_region_ {
+    unsigned short	X;		/// X tile map center of region
+    unsigned short	Y;		/// Y tile map center of region
+    char	Forest;			/// Region contains forest
+    int		NumNeighbors;		/// How many neighbors
+    MapRegion** Neightbors;		/// Neightbors of this region
+    int		MoveCosts;		/// Costs to move to this field
+};
+
+#endif
+
+/*----------------------------------------------------------------------------
 --	Map - field
 ----------------------------------------------------------------------------*/
 
@@ -235,6 +262,9 @@ typedef struct _map_field_ {
     UnitRef		AirUnit;	/// Air unit
     UnitRef		LandUnit;	/// Land unit
     UnitRef		SeaUnit;	/// Sea unit
+#endif
+#ifdef NEW_REGIONS
+    MapRegion*		Region;		/// Region to which the field belongs
 #endif
 } MapField;
 
@@ -301,6 +331,10 @@ typedef struct _world_map_ {
     unsigned		Height;		/// the map height
 
     MapField*		Fields;		/// fields on map
+
+#ifdef NEW_REGIONS
+    MapRegion**		Regions;	/// Regions of this map
+#endif
 
     unsigned char	NoFogOfWar;	/// fog of war disabled
 
@@ -374,15 +408,13 @@ extern void InitMap(void);
     /// Mark position inside screenmap be drawn for next display update
 extern int MarkDrawPosMap( int x, int y );
     /// Denote wether area in map is overlapping
-extern int AreaVisibleInMap( int sx, int sy, int ex, int ey );
-    /// Check if any area is visible
-extern int AnyAreaVisibleInMap( int sx, int sy, int ex, int ey );
+extern int MapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
+    /// Check if any part of an area is visible
+extern int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
     /// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
 extern  int MarkDrawAreaMap( int sx, int sy, int ex, int ey );
     /// Set all entries in MustRedrawRow and MustRedrawTile
 extern  void MarkDrawEntireMap(void);
-    /// Check if any part of an area is visible
-extern int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
 
 //
 //	in map_fog.c
@@ -533,6 +565,7 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 	!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
 
 #ifdef NEW_FOW
+
     /// Check if a field for the user is explored
 #define IsMapFieldExplored(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Explored&(1<<ThisPlayer->Player))
@@ -541,6 +574,7 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #define IsMapFieldVisible(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Visible&(1<<ThisPlayer->Player))
 #else
+
     /// Check if a field for the user is explored
 #define IsMapFieldExplored(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldExplored)
@@ -548,6 +582,7 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
     /// Check if a field for the user is visibile
 #define IsMapFieldVisible(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldVisible)
+
 #endif
 
 //@}
