@@ -318,7 +318,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 	enum _button_cmd_ action, const char *value, const ButtonCheckFunc func,
 	const void *allow, int key, const char *hint, const char *umask)
 #else
-global void AddButton(int pos, char *icon_ident, SCM action, int key, char *hint)
+global void AddButton(int pos, char *icon_ident, SCM action, int key, char *hint, int highlight)
 #endif
 {
 #ifndef NEW_UI
@@ -410,6 +410,7 @@ global void AddButton(int pos, char *icon_ident, SCM action, int key, char *hint
     ba->Hint = hint;
     MustRedraw|=RedrawButtonPanel;
     ba->Key = key;
+    ba->Highlight = highlight;
 #endif
 }
 
@@ -480,9 +481,7 @@ global void DrawButtonPanel(void)
     const ButtonAction* buttons;
     char buf[8];
 #else
-    //const UnitStats* stats;
     const ButtonAction* ba;
-    //char buf[8];
 #endif
 
     //
@@ -513,8 +512,6 @@ global void DrawButtonPanel(void)
     for( i=0; i<9; ++i ) {
 	ba = CurrentButtons + i;
 	if( ba->Icon.Icon != NoIcon ) {
-	    //int j;
-	    //int action;
 #endif
 
 	    // cursor is on that button
@@ -619,6 +616,10 @@ global void DrawButtonPanel(void)
 		    default:
 			break;
 		}
+	    }
+#else
+	    if( ba->Highlight ) {
+		v|=IconSelected;
 	    }
 #endif
 
