@@ -1709,7 +1709,7 @@ global int SavePud(const char* pud,const WorldMap* map)
 **	@param pud	File name.
 **	@param map	Map to save.
 */
-global void SavePud(const char* pud __attribute__((unused)),
+global int SavePud(const char* pud __attribute__((unused)),
 	const WorldMap* map __attribute__((unused)))
 {
     DebugLevel0Fn("Only supported with ZLIB\n");
