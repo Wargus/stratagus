@@ -39,7 +39,12 @@
 #include "sound_server.h"
 #include "ui.h"
 #include "interface.h"
+#include "font.h"
 #include "editor.h"
+
+#include "ccl.h"
+
+extern void PreMenuSetup(void);		/// FIXME: not here!
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -128,7 +133,9 @@ local void EditorCallbackExit(void)
 local void CreateEditor(void)
 {
     FlagRevealMap=1;
+    TheMap.NoFogOfWar=1;
     CreateGame("default.pud",&TheMap);
+    FlagRevealMap=0;
 }
 
 /**
@@ -162,6 +169,19 @@ global void EditorMainLoop(void)
 
 	WaitEventsOneFrame(&callbacks);
     }
+
+    //
+    //	Restore all for menu
+    //
+    CleanModules();
+    CleanFonts();
+
+    LoadCcl();			// Reload the main config file
+
+    PreMenuSetup();
+
+    InterfaceState = IfaceStateMenu;
+    GameCursor = TheUI.Point.Cursor;
 }
 
 //@}
