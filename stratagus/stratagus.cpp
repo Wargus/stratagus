@@ -941,6 +941,9 @@ int main(int argc, char** argv)
 #ifdef USE_OPENGL
 		"OPENGL "
 #endif
+#ifdef USE_MNG
+		"MNG "
+#endif
 	;
 
 #ifdef USE_BEOS
