@@ -989,7 +989,17 @@ global void UpgradesCclRegister(void)
 **	@param uid		Upgrade identifier of the modifier.
 **	@param attack_range	Attack range modification.
 **	@param sight_range	Sight range modification.
-**	FIXME: continue docu!!
+**	@param basic_damage	Basic damage modification.
+**	@param piercing_damage	Piercing damage modification.
+**	@param armor		Armor modification.
+**	@param speed		Speed modification (Currently not possible).
+**	@param hit_points	Hitpoint modification.
+**	@param costs		Costs modification.
+**	@param af_units		Changes in allow units.
+**	@param af_upgrades	Changes in allow upgrades.
+**	@param apply_to		Applies to this units.
+**	@param convert_to	Converts units to this unit-type.
+**
 **	@return			upgrade modifier id or -1 for error
 **			( actually this id is useless, just error checking )
 */
