@@ -10,7 +10,7 @@
 //
 /**@name player.c	-	The players. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -134,7 +134,9 @@ global void InitPlayers(void)
 
     for( p=0; p<PlayerMax; ++p ) {
 	Players[p].Player=p;
-	Players[p].Type=PlayerNobody;
+	if( !Players[p].Type ) {
+	    Players[p].Type=PlayerNobody;
+	}
     }
 }
 
