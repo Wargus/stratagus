@@ -64,9 +64,9 @@ global int NumCDTracks;			/// Number of tracks on the cd
 local SDL_CD *CDRom;			/// SDL cdrom device
 #elif defined(USE_CDDA) 
 global int CDDrive;			/// CDRom device
-global struct cdrom_tochdr CDchdr;		/// TOC header struct
 global struct cdrom_tocentry CDtocentry[64];	/// TOC track header struct
-global struct cdrom_read_audio CDdata;		/// struct for reading data
+local struct cdrom_tochdr CDchdr;		/// TOC header struct
+local struct cdrom_read_audio CDdata;		/// struct for reading data
 #endif
 
 global CDModes CDMode;			/// CD mode
