@@ -8,7 +8,7 @@
 --                        T H E   W A R   B E G I N S
 --         Stratagus - A free fantasy real time strategy game engine
 --
---      widgets.lua - Define the widgets
+--      ui.lua - Define the widgets
 --
 --      (c) Copyright 2000 - 2004 by Lutz Sammer and Crestez Leonard.
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---      $Id: ui.lua,v 1.8 2004/07/25 16:27:05 jsalmon3 Exp $
+--      $Id$
 
 Load("scripts/widgets.lua")
 
