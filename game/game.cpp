@@ -54,6 +54,10 @@ global Settings GameSettings;		/// Game Settings
 global int lcm_prevent_recurse = 0;	/// prevent recursion through LoadGameMap
 
 /*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
 --	Map loading/saving
 ----------------------------------------------------------------------------*/
 
@@ -371,3 +375,5 @@ global void InitSettings(void)
     GameSettings.Opponents = SettingsPresetMapDefault;
     GameSettings.Terrain = SettingsPresetMapDefault;
 }
+
+//@}
