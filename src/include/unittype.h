@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name unittype.h	-	The unit-types headerfile. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __UNITTYPE_H__
 #define __UNITTYPE_H__
@@ -543,7 +543,7 @@
 */
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include "video.h"
@@ -555,36 +555,35 @@
 #include "etlib/hash.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**		Defines the animation for different actions.
+**  Defines the animation for different actions.
 */
 typedef struct _animation_ {
-	unsigned char		Flags;				/// Flags for actions
-	signed char				Pixel;				/// Change the position in pixels
-	unsigned char		Sleep;				/// Wait for next animation
-	int						Frame;				/// Sprite-frame to display
+	unsigned char Flags;            /// Flags for actions
+	signed char   Pixel;            /// Change the position in pixels
+	unsigned char Sleep;            /// Wait for next animation
+	int           Frame;            /// Sprite-frame to display
 } Animation;
 
-#define AnimationRestart		1		/// Restart animation
-#define AnimationReset				2		/// Animation could here be aborted
-#define AnimationSound				4		/// Play sound
-#define AnimationMissile		8		/// Fire projectil
-#define AnimationEnd				0x80		/// Animation end in memory
+#define AnimationRestart  1         /// Restart animation
+#define AnimationReset    2         /// Animation could here be aborted
+#define AnimationSound    4         /// Play sound
+#define AnimationMissile  8         /// Fire projectil
+#define AnimationEnd      0x80      /// Animation end in memory
 
 /**
-**		Define all animations scripts of an unittype.
+**  Define all animations scripts of an unittype.
 */
 typedef struct __animations__ {
-	Animation*		Still;						/// Standing still
-	Animation*		Move;						/// Unit moving
-	Animation*		Attack;						/// Unit attacking/working
-	Animation*		Repair;						/// Unit repairing
-	Animation*		Harvest[MaxCosts];		/// Unit harvesting
-	Animation*		Die;						/// Unit dieing
-	Animation**		Extend;						/// For future extensions
+	Animation*  Still;              /// Standing still
+	Animation*  Move;               /// Unit moving
+	Animation*  Attack;             /// Unit attacking/working
+	Animation*  Repair;             /// Unit repairing
+	Animation*  Harvest[MaxCosts];  /// Unit harvesting
+	Animation*  Die;                /// Unit dying
 } Animations;
 
 #define ANIMATIONS_MAXANIM 1024
@@ -594,227 +593,228 @@ typedef hashtable(Animations*,ANIMATIONS_MAXANIM) _AnimationsHash;
 extern _AnimationsHash AnimationsHash;
 
 /**
-**	  Missile type definition (used in config tables)
+**  Missile type definition (used in config tables)
 **
-**		@todo Shouldn't I move this into missle.h?
+**  @todo Move this to missle.h?
 */
 typedef struct _missile_config_ {
-	char*		Name;						/// Config missile name
-	MissileType*Missile;				/// Identifier to use to run time
+	char*        Name;              /// Config missile name
+	MissileType* Missile;           /// Identifier to use to run time
 } MissileConfig;
 
 typedef struct _resource_info_ {
-	char* 		FileWhenLoaded;						/// Change the graphic when the unit is loaded.
-	char* 		FileWhenEmpty;						/// Change the graphic when the unit is empty.
-	unsigned 		HarvestFromOutside;				/// Unit harvests without entering the building.
-	unsigned 		WaitAtResource;						/// Cycles the unit waits while mining.
-	unsigned 		ResourceStep;						/// Resources the unit gains per mining cycle.
-	int 		ResourceCapacity;				/// Max amount of resources to carry.
-	unsigned 		WaitAtDepot;						/// Cycles the unit waits while returning.
-	unsigned		ResourceId;						/// Id of the resource harvested. Redundant.
-	unsigned 		FinalResource;						/// Convert resource when delivered.
-	unsigned 		TerrainHarvester;				/// Unit will harvest terrain(wood only for now).
-	unsigned		LoseResources;						/// The unit will lose it's resource when distracted.
+	char*    FileWhenLoaded;        /// Change the graphic when the unit is loaded.
+	char*    FileWhenEmpty;         /// Change the graphic when the unit is empty.
+	unsigned HarvestFromOutside;    /// Unit harvests without entering the building.
+	unsigned WaitAtResource;        /// Cycles the unit waits while mining.
+	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
+	int      ResourceCapacity;      /// Max amount of resources to carry.
+	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
+	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
+	unsigned FinalResource;         /// Convert resource when delivered.
+	unsigned TerrainHarvester;      /// Unit will harvest terrain(wood only for now).
+	unsigned LoseResources;         /// The unit will lose it's resource when distracted.
 	//  Runtime info:
-	Graphic *   SpriteWhenLoaded;				/// The graphic corresponding to FileWhenLoaded.
-	Graphic *   SpriteWhenEmpty;				/// The graphic corresponding to FileWhenEmpty
+	Graphic* SpriteWhenLoaded;      /// The graphic corresponding to FileWhenLoaded.
+	Graphic* SpriteWhenEmpty;       /// The graphic corresponding to FileWhenEmpty
 } ResourceInfo;
 
 /**
-**		Typedef of base structure of unit-type
+**  Typedef of base structure of unit-type
 */
 typedef struct _unit_type_ UnitType;
 
 	/// Base structure of unit-type
 struct _unit_type_ {
-	char*		Ident;						/// Identifier
-	char*		Name;						/// Pretty name shown from the engine
-	char*		SameSprite;				/// Unit-type shared sprites
-	char*		File[TilesetMax];		/// Sprite files
-	char*		ShadowFile;				/// Shadow file
+	char* Ident;                    /// Identifier
+	char* Name;                     /// Pretty name shown from the engine
+	char* SameSprite;               /// Unit-type shared sprites
+	char* File[TilesetMax];         /// Sprite files
+	char* ShadowFile;               /// Shadow file
 
-	int				Width;						/// Sprite width
-	int				Height;						/// Sprite height
-	int				DrawLevel;				/// Level to Draw UnitType at
-	int				ShadowWidth;				/// Shadow sprite width
-	int				ShadowHeight;				/// Shadow sprite height
-	int				ShadowOffsetX;				/// Shadow horizontal offset
-	int				ShadowOffsetY;				/// Shadow vertical offset
+	int Width;                      /// Sprite width
+	int Height;                     /// Sprite height
+	int DrawLevel;                  /// Level to Draw UnitType at
+	int ShadowWidth;                /// Shadow sprite width
+	int ShadowHeight;               /// Shadow sprite height
+	int ShadowOffsetX;              /// Shadow horizontal offset
+	int ShadowOffsetY;              /// Shadow vertical offset
 
-	Animations*		Animations;				/// Animation scripts
+	Animations* Animations;         /// Animation scripts
 
-	IconConfig		Icon;						/// Icon to display for this unit
-	MissileConfig Missile;				/// Missile weapon
-	MissileConfig Explosion;				/// Missile for unit explosion
+	IconConfig Icon;                /// Icon to display for this unit
+	MissileConfig Missile;          /// Missile weapon
+	MissileConfig Explosion;        /// Missile for unit explosion
 
-	char*		CorpseName;				/// Corpse type name
-	UnitType*		CorpseType;				/// Corpse unit-type
-	int				CorpseScript;				/// Corpse script start
+	char* CorpseName;               /// Corpse type name
+	UnitType* CorpseType;           /// Corpse unit-type
+	int CorpseScript;               /// Corpse script start
 
-	int				_Speed;						/// Movement speed
+	int _Speed;                     /// Movement speed
 
-// this is taken from the UDTA section
-	Construction*Construction;				/// What is shown in construction phase
-	int				_SightRange;				/// Sight range
-	int				_HitPoints;				/// Maximum hit points
-	int				_MaxMana;				/// Maximum mana points
+	// this is taken from the UDTA section
+	Construction* Construction;     /// What is shown in construction phase
+	int _SightRange;                /// Sight range
+	int _HitPoints;                 /// Maximum hit points
+	int _MaxMana;                   /// Maximum mana points
 
-	int				_Costs[MaxCosts];		/// How many resources needed
-	int				RepairHP;				/// Amount of HP per repair
-	int				RepairCosts[MaxCosts];  /// How much it costs to repair
+	int _Costs[MaxCosts];           /// How many resources needed
+	int RepairHP;                   /// Amount of HP per repair
+	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
-	int				TileWidth;				/// Tile size on map width
-	int				TileHeight;				/// Tile size on map height
-	int				BoxWidth;				/// Selected box size width
-	int				BoxHeight;				/// Selected box size height
-	int				NumDirections;				/// Number of directions unit can face
-	int				MinAttackRange;				/// Minimal attack range
-	int				_AttackRange;				/// How far can the unit attack
-	int				ReactRangeComputer;		/// Reacts on enemy for computer
-	int				ReactRangePerson;		/// Reacts on enemy for person player
-	int				_Armor;						/// Amount of armor this unit has
-	int				Priority;				/// Priority value / AI Treatment
-	int				_BasicDamage;				/// Basic damage dealt
-	int				_PiercingDamage;		/// Piercing damage dealt
-	int				_RegenerationRate;		/// HP regeneration rate per sec
-	int				BurnPercent;				/// Burning percent.
-	int				BurnDamageRate;				/// HP burn rate per sec
-	int 		RepairRange;				/// Units repair range.
-	char 		*CanCastSpell;				/// Unit is able to use spells.
+	int TileWidth;                  /// Tile size on map width
+	int TileHeight;                 /// Tile size on map height
+	int BoxWidth;                   /// Selected box size width
+	int BoxHeight;                  /// Selected box size height
+	int NumDirections;              /// Number of directions unit can face
+	int MinAttackRange;             /// Minimal attack range
+	int _AttackRange;               /// How far can the unit attack
+	int ReactRangeComputer;         /// Reacts on enemy for computer
+	int ReactRangePerson;           /// Reacts on enemy for person player
+	int _Armor;                     /// Amount of armor this unit has
+	int Priority;                   /// Priority value / AI Treatment
+	int _BasicDamage;               /// Basic damage dealt
+	int _PiercingDamage;            /// Piercing damage dealt
+	int _RegenerationRate;          /// HP regeneration rate per sec
+	int BurnPercent;                /// Burning percent.
+	int BurnDamageRate;             /// HP burn rate per sec
+	int RepairRange;                /// Units repair range.
+	char *CanCastSpell;             /// Unit is able to use spells.
 	// FIXME: n0body: AutoBuildRate not implemented.
-	int				AutoBuildRate;				/// The rate at which the building builds itself
-	int 		RandomMovementProbability;		/// Probability to move randomly.
-	int				ClicksToExplode;		/// Number of consecutive clicks until unit suicides.
-	int				MaxOnBoard;				/// Number of Transporter slots.
+	int AutoBuildRate;              /// The rate at which the building builds itself
+	int RandomMovementProbability;  /// Probability to move randomly.
+	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
+	int MaxOnBoard;                 /// Number of Transporter slots.
 	// FIXME: original only visual effect, we do more with this!
 	enum {
-		UnitTypeLand,						/// Unit lives on land
-		UnitTypeFly,						/// Unit lives in air
-		UnitTypeNaval,						/// Unit lives on water
-	}				UnitType;				/// Land / fly / naval
-	int				DecayRate;				/// Decay rate in 1/6 seconds
+		UnitTypeLand,               /// Unit lives on land
+		UnitTypeFly,                /// Unit lives in air
+		UnitTypeNaval,              /// Unit lives on water
+	} UnitType;                     /// Land / fly / naval
+	int DecayRate;                  /// Decay rate in 1/6 seconds
 	// FIXME: not used
-	int				AnnoyComputerFactor;		/// How much this annoys the computer
-	int				MouseAction;				/// Right click action
-#define MouseActionNone				0				/// Nothing
-#define MouseActionAttack		1				/// Attack
-#define MouseActionMove				2				/// Move
-#define MouseActionHarvest		3				/// Harvest resources
-#define MouseActionSpellCast		5				/// Cast the first spell known
-#define MouseActionSail				6				/// Sail
-	int				Points;						/// How many points you get for unit
-	int				CanTarget;				/// Which units can it attack
-#define CanTargetLand		1						/// Can attack land units
-#define CanTargetSea		2						/// Can attack sea units
-#define CanTargetAir		4						/// Can attack air units
+	int AnnoyComputerFactor;        /// How much this annoys the computer
+	int MouseAction;                /// Right click action
+#define MouseActionNone      0      /// Nothing
+#define MouseActionAttack    1      /// Attack
+#define MouseActionMove      2      /// Move
+#define MouseActionHarvest   3      /// Harvest resources
+#define MouseActionSpellCast 5      /// Cast the first spell known
+#define MouseActionSail      6      /// Sail
+	int Points;                     /// How many points you get for unit
+	int CanTarget;                  /// Which units can it attack
+#define CanTargetLand 1             /// Can attack land units
+#define CanTargetSea  2             /// Can attack sea units
+#define CanTargetAir  4             /// Can attack air units
 
-	unsigned Revealer : 1;				/// reveal the fog of war
-	unsigned LandUnit : 1;				/// Land animated
-	unsigned AirUnit : 1;				/// Air animated
-	unsigned SeaUnit : 1;				/// Sea animated
-	unsigned ExplodeWhenKilled : 1;		/// Death explosion animated
-	unsigned Building : 1;				/// Building
-	unsigned VisibleUnderFog : 1;		/// Unit is visible under fog of war.
-	unsigned PermanentCloak : 1;		/// Is only visible by CloakDetectors.
-	unsigned DetectCloak : 1;				/// Can see Cloaked units.
-	unsigned Coward : 1;				/// Unit will only attack if instructed.
-	unsigned Transporter : 1;				/// Can transport units
-	unsigned Vanishes : 1;				/// Corpes & destroyed places.
-	unsigned GroundAttack : 1;				/// Can do command ground attack.
-	unsigned ShoreBuilding : 1;				/// Building must be build on coast.
-	unsigned CanAttack : 1;				/// Unit can attack.
-	unsigned BuilderOutside : 1;		/// The builder stays outside during the build.
-	unsigned BuilderLost : 1;				/// The builder is lost after the build.
-	unsigned CanHarvest : 1;				/// Resource can be harvested.
-	unsigned Harvester : 1;				/// unit is a resource harvester.
-	unsigned char *BoolFlag;				/// User defined flag. Used for (dis)allow target.
-	unsigned char *CanTargetFlag;		/// Flag needed to target with missile.
+	unsigned Flip : 1;              /// Flip image when facing left
+	unsigned Revealer : 1;          /// reveal the fog of war
+	unsigned LandUnit : 1;          /// Land animated
+	unsigned AirUnit : 1;           /// Air animated
+	unsigned SeaUnit : 1;           /// Sea animated
+	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
+	unsigned Building : 1;          /// Building
+	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.
+	unsigned PermanentCloak : 1;    /// Is only visible by CloakDetectors.
+	unsigned DetectCloak : 1;       /// Can see Cloaked units.
+	unsigned Coward : 1;            /// Unit will only attack if instructed.
+	unsigned Transporter : 1;       /// Can transport units
+	unsigned Vanishes : 1;          /// Corpes & destroyed places.
+	unsigned GroundAttack : 1;      /// Can do command ground attack.
+	unsigned ShoreBuilding : 1;     /// Building must be build on coast.
+	unsigned CanAttack : 1;         /// Unit can attack.
+	unsigned BuilderOutside : 1;    /// The builder stays outside during the build.
+	unsigned BuilderLost : 1;       /// The builder is lost after the build.
+	unsigned CanHarvest : 1;        /// Resource can be harvested.
+	unsigned Harvester : 1;         /// unit is a resource harvester.
+	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
+	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
 
-	unsigned SelectableByRectangle : 1;		/// Selectable with mouse rectangle.
-	unsigned Selectable : 1;				/// Unit Is Selectable at all.
-	unsigned Teleporter : 1;				/// Can teleport other units.
+	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
+	unsigned Selectable : 1;            /// Unit Is Selectable at all.
+	unsigned Teleporter : 1;            /// Can teleport other units.
 
-	int				CanStore[MaxCosts];		/// Resources that we can store here.
-	int				GivesResource;				/// The resource this unit gives.
-	ResourceInfo* ResInfo[MaxCosts];		/// Resource information.
-	UnitType* 		MustBuildOnTop;				/// Must be built on top of something.
+	int CanStore[MaxCosts];             /// Resources that we can store here.
+	int GivesResource;                  /// The resource this unit gives.
+	ResourceInfo* ResInfo[MaxCosts];    /// Resource information.
+	UnitType* MustBuildOnTop;           /// Must be built on top of something.
 #ifdef USE_SDL_SURFACE
-	SDL_Color		NeutralMinimapColorRGB;		/// Minimap Color for Neutral Units.
+	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 #else
-	VMemType		NeutralMinimapColorRGB;		/// Minimap Color for Neutral Units.
+	VMemType NeutralMinimapColorRGB;    /// Minimap Color for Neutral Units.
 #endif
 
-	UnitSound Sound;						/// Sounds for events
+	UnitSound Sound;                /// Sounds for events
 	// FIXME: temporary solution
-	WeaponSound Weapon;				 /// Currently sound for weapon
+	WeaponSound Weapon;             /// Currently sound for weapon
 
-	int				Supply;						/// Food supply
-	int				Demand;						/// Food demand
+	int Supply;                     /// Food supply
+	int Demand;                     /// Food demand
 
 // --- FILLED UP ---
 
-	int				ImproveIncomes[MaxCosts];/// Gives player an improved income
+	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
 
-	unsigned		FieldFlags;				/// Unit map field flags
-	unsigned		MovementMask;				/// Unit check this map flags for move
+	unsigned FieldFlags;            /// Unit map field flags
+	unsigned MovementMask;          /// Unit check this map flags for move
 
-		// FIXME: This stats should? be moved into the player struct
-	UnitStats Stats[PlayerMax];				/// Unit status for each player
+	// FIXME: This stats should? be moved into the player struct
+	UnitStats Stats[PlayerMax];     /// Unit status for each player
 
-		// FIXME: Should us a general name f.e. Slot here?
-	int				Type;						/// Type as number
+	// FIXME: Should use a general name f.e. Slot here?
+	int Type;                       /// Type as number
 
-	Graphic*		Sprite;						/// Sprite images
-	Graphic*		ShadowSprite;				/// Shadow sprite image
+	Graphic* Sprite;                /// Sprite images
+	Graphic* ShadowSprite;          /// Shadow sprite image
 #ifdef USE_OPENGL
-	Graphic*		PlayerColorSprite[PlayerMax];		/// Sprites with player colors
+	Graphic* PlayerColorSprite[PlayerMax];  /// Sprites with player colors
 #endif
 };
 
 	// FIXME: ARI: should be dynamic (ccl..), JOHNS: Pud only supports 255.
 	/// How many unit-types are currently supported
-#define UnitTypeMax		257
+#define UnitTypeMax 257
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-extern UnitType* UnitTypes[UnitTypeMax];		/// All unit-types
-extern int NumUnitTypes;						/// Number of unit-types made
+extern UnitType* UnitTypes[UnitTypeMax];    /// All unit-types
+extern int NumUnitTypes;                    /// Number of unit-types made
 
 // FIXME: this hardcoded unit-types must be removed!!
-extern UnitType*UnitTypeHumanWall;				/// Human wall
-extern UnitType*UnitTypeOrcWall;				/// Orc wall
+extern UnitType*UnitTypeHumanWall;          /// Human wall
+extern UnitType*UnitTypeOrcWall;            /// Orc wall
 
-extern char** UnitTypeWcNames;						/// Mapping wc-number 2 symbol
+extern char** UnitTypeWcNames;              /// Mapping wc-number 2 symbol
 
-extern char **BoolFlagName;						/// Array of name of user defined bool flag.
-extern int NumberBoolFlag;						/// Number of user defined bool flag.
+extern char **BoolFlagName;                 /// Array of name of user defined bool flag.
+extern int NumberBoolFlag;                  /// Number of user defined bool flag.
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
-extern void UnitTypeCclRegister(void);				/// Register ccl features
+extern void UnitTypeCclRegister(void);          /// Register ccl features
 
-extern void UpdateStats(int reset_to_default);				/// Update unit stats
-extern void ParsePudUDTA(const char*,int); 				/// Parse pud udta table
-extern UnitType* UnitTypeByIdent(const char*);				/// Get unit-type by ident
-extern UnitType* UnitTypeByWcNum(unsigned);				/// Get unit-type by wc number
+extern void UpdateStats(int reset_to_default);  /// Update unit stats
+extern void ParsePudUDTA(const char*,int);      /// Parse pud udta table
+extern UnitType* UnitTypeByIdent(const char*);  /// Get unit-type by ident
+extern UnitType* UnitTypeByWcNum(unsigned);     /// Get unit-type by wc number
 
 	/// Get the animations structure by ident
 extern Animations* AnimationsByIdent(const char* ident);
 
-extern void SaveFlags(CLFile* file);						/// Save declaration of user defined flas.
-extern void SaveUnitTypeDefs(CLFile* file);				/// Declare the unit-type table first.
-extern void SaveUnitTypes(CLFile* file);				/// Save the unit-type table
-extern UnitType* NewUnitTypeSlot(char*);				/// Allocate an empty unit-type slot
+extern void SaveFlags(CLFile* file);            /// Save declaration of user defined flas.
+extern void SaveUnitTypeDefs(CLFile* file);     /// Declare the unit-type table first.
+extern void SaveUnitTypes(CLFile* file);        /// Save the unit-type table
+extern UnitType* NewUnitTypeSlot(char*);        /// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
 extern void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y);
 
-extern void InitUnitTypes(int reset_player_stats);		/// Init unit-type table
-extern void LoadUnitTypes(void);						/// Load the unit-type data
-extern void CleanUnitTypes(void);						/// Cleanup unit-type module
+extern void InitUnitTypes(int reset_player_stats);  /// Init unit-type table
+extern void LoadUnitTypes(void);                    /// Load the unit-type data
+extern void CleanUnitTypes(void);                   /// Cleanup unit-type module
 
 //@}
 
