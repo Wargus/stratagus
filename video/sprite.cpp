@@ -425,7 +425,7 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 		height = g->Height;
 	}
 
-	DebugCheck(width > g->Width || height > g->Height);
+	Assert(width <= g->Width && height <= g->Height);
 
 	if ((g->Width / width) * width != g->Width ||
 			(g->Height / height) * height != g->Height) {
