@@ -60,6 +60,10 @@ global int ShowHealthHorizontal=1;
 global int ShowManaHorizontal=1;
     /// Flag: show bars and dot energy only for selected
 global int ShowEnergySelectedOnly; 
+    /// Flag: show health bar always full sized
+global int ShowFullSizedHealthBar=1;
+    /// Flag: show mana bar always full sized
+global int ShowFullSizedManaBar=1;
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two?
@@ -344,6 +348,8 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 {
     int f;
     int color;
+    int deco_x;
+    int deco_y;
     UnitStats* stats;
 
 
@@ -354,8 +360,10 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	return;
     }
 
+    // FIXME: Should split this into small functions?
+
     //
-    //	Health bar on left side of unit.
+    //	Health bar of the unit.
     //
     stats=unit->Stats;
     if( ShowHealthBar ) {
@@ -369,26 +377,31 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	    } else {
 		color=ColorRed;
 	    }
-	    if ( ShowHealthHorizontal == 0)  {
-		    VideoFillRectangleClip(color
-			,x+(type->TileWidth*TileSizeX
-				-type->BoxWidth)/2
-			,y+(type->TileHeight*TileSizeY
-				-type->BoxHeight)/2
-			,2,(f*type->BoxHeight)/100);
-	    }  else  {
+	    if( ShowHealthHorizontal )  {
+		deco_x=x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)-1;
+		deco_y=y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
+			+type->BoxHeight;
+		if( !ShowFullSizedHealthBar ) {
 		    VideoFillRectangleClip(ColorBlack
-			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)-1
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
-				+type->BoxHeight+1
-			,((f*type->BoxHeight)/100)+2
-			,5);
-		    VideoFillRectangleClip(color
-			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
-				+type->BoxHeight+2
-			,(f*type->BoxHeight)/100
-			,3);
+			,deco_x,deco_y,type->BoxWidth+2,4);
+		} else {
+		    VideoDrawRectangleClip(ColorBlack
+			,deco_x,deco_y,(f*type->BoxWidth)/100+1,3);
+		}
+		VideoFillRectangleClip(color
+		    ,deco_x+1,deco_y+1,(f*type->BoxWidth)/100,2);
+	    } else {
+		deco_x=x+(type->TileWidth*TileSizeX-type->BoxWidth)/2-3;
+		deco_y=y+(type->TileHeight*TileSizeY-type->BoxHeight)/2;
+		if( ShowFullSizedHealthBar ) {
+		    VideoFillRectangleClip(ColorBlack
+			,deco_x,deco_y,4,type->BoxHeight+1);
+		} else {
+		    VideoDrawRectangleClip(ColorBlack
+			,deco_x,deco_y,3,(f*type->BoxHeight)/100);
+		}
+		VideoFillRectangleClip(color
+		    ,deco_x+1,deco_y+1,2,(f*type->BoxHeight)/100-1);
 	    }
 	}
     }
@@ -399,8 +412,6 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
     if( ShowHealthDot ) {
 	if( stats->HitPoints
 		&& !(ShowNoFull && unit->HP==stats->HitPoints) ) {
-	    int x1;
-	    int y1;
 	    int n;
 
 	    f=(100*unit->HP)/stats->HitPoints;
@@ -415,55 +426,61 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	    }
 	    DebugCheck( n<0 );
 	    if( HealthSprite.HotX<0 ) {
-		x1=x+HealthSprite.HotX
+		deco_x=x+HealthSprite.HotX
 			+(type->TileWidth*TileSizeX
 			+type->BoxWidth+1)/2;
 	    } else {
-		x1=x-HealthSprite.HotX
+		deco_x=x-HealthSprite.HotX
 			+(type->TileWidth*TileSizeX
 			-type->BoxWidth+1)/2;
 	    }
 	    if( HealthSprite.HotY<0 ) {
-		y1=y+HealthSprite.HotY
+		deco_y=y+HealthSprite.HotY
 			+(type->TileHeight*TileSizeY
 			+type->BoxHeight+1)/2;
 	    } else {
-		y1=y-HealthSprite.HotY
+		deco_y=y-HealthSprite.HotY
 			+(type->TileHeight*TileSizeY
 			-type->BoxHeight+1)/2;
 	    }
-	    VideoDrawClip(HealthSprite.Sprite,n,x1,y1);
+	    VideoDrawClip(HealthSprite.Sprite,n,deco_x,deco_y);
 	}
     }
 
     //
-    //	Mana bar on right side of unit.
+    //	Mana bar for the unit.
     //
     if( ShowManaBar ) {
 	if( type->CanCastSpell
 		&& !(ShowNoFull && unit->Mana==255) ) {
-	    if ( ShowManaHorizontal == 0)  {
-	    	f=(100*unit->Mana)/255;
-		    VideoFillRectangleClip(ColorBlue
-			,x+(type->TileWidth*TileSizeX
-				+type->BoxWidth)/2
-			,y+(type->TileHeight*TileSizeY
-				-type->BoxHeight)/2
-			,2,(f*type->BoxHeight)/100);
-	    }  else  {
-		    f=(100*unit->Mana)/255;
+	    if( ShowManaHorizontal )  {
+		f=(100*unit->Mana)/255;
+		deco_x=x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)-1;
+		deco_y=y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
+			+type->BoxHeight+4;
+		if( ShowFullSizedManaBar ) {
 		    VideoFillRectangleClip(ColorBlack
-			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)-1
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+6
-			,(type->BoxHeight)+2
-			,5);
-		    VideoFillRectangleClip(ColorBlue
-			,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+7
-			,(f*type->BoxHeight)/100
-			,3);
+			,deco_x,deco_y,type->BoxHeight+2,4);
+		} else {
+		    VideoDrawRectangleClip(ColorBlack
+			,deco_x,deco_y,(f*type->BoxHeight)/100+1,3);
+		}
+		VideoFillRectangleClip(ColorBlue
+		    ,deco_x+1,deco_y+1,(f*type->BoxHeight)/100,2);
+	    } else {
+		deco_x=x+(type->TileWidth*TileSizeX+type->BoxWidth)/2;
+		deco_y=y+(type->TileHeight*TileSizeY-type->BoxHeight)/2;
+	    	f=(100*unit->Mana)/255;
+		if( ShowFullSizedManaBar ) {
+		    VideoFillRectangleClip(ColorBlack
+			,deco_x,deco_y,4,type->BoxHeight+1);
+		} else {
+		    VideoDrawRectangleClip(ColorBlack
+			,deco_x,deco_y,3,(f*type->BoxHeight)/100);
+		}
+		VideoFillRectangleClip(ColorBlue
+		    ,deco_x+1,deco_y+1,2,(f*type->BoxHeight)/100-1);
 	    }
-
 	}
     }
 
@@ -473,8 +490,6 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
     if( ShowManaDot ) {
 	if( type->CanCastSpell
 		&& !(ShowNoFull && unit->Mana==255) ) {
-	    int x1;
-	    int y1;
 	    int n;
 
 	    f=(100*unit->Mana)/255;
@@ -492,24 +507,24 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 		n=4;
 	    }
 	    if( ManaSprite.HotX<0 ) {
-		x1=x+ManaSprite.HotX
+		deco_x=x+ManaSprite.HotX
 			+(type->TileWidth*TileSizeX
 			+type->BoxWidth+1)/2;
 	    } else {
-		x1=x-ManaSprite.HotX
+		deco_x=x-ManaSprite.HotX
 			+(type->TileWidth*TileSizeX
 			-type->BoxWidth+1)/2;
 	    }
 	    if( ManaSprite.HotY<0 ) {
-		y1=y+ManaSprite.HotY
+		deco_y=y+ManaSprite.HotY
 			+(type->TileHeight*TileSizeY
 			+type->BoxHeight+1)/2;
 	    } else {
-		y1=y-ManaSprite.HotY
+		deco_y=y-ManaSprite.HotY
 			+(type->TileHeight*TileSizeY
 			-type->BoxHeight+1)/2;
 	    }
-	    VideoDrawClip(ManaSprite.Sprite,n,x1,y1);
+	    VideoDrawClip(ManaSprite.Sprite,n,deco_x,deco_y);
 	}
     }
 
@@ -544,6 +559,7 @@ local void DrawShadow(Unit* unit,UnitType* type,int x,int y)
 	    ,x+ShadowSprite.HotX,y+ShadowSprite.HotY);
 }
 
+#if 0
 /**
 **	Draw path from current postion to the destination of the move.
 **
@@ -665,15 +681,134 @@ global void DrawPath(Unit* unit)
 	    ,6,6);
     }
 }
+#endif
 
 /**
 **	Show the current order of an unit.
 **
 **	@param unit	Pointer to the unit.
-**
 */
 local void ShowOrder(const Unit* unit)
 {
+#ifdef NEW_ORDERS
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    int color;
+    const Unit* goal;
+    int i;
+
+    if( unit->Destroyed ) {
+	return;
+    }
+    x1=Map2ScreenX(unit->X)+unit->IX+unit->Type->TileWidth*TileSizeX/2;
+    y1=Map2ScreenY(unit->Y)+unit->IY+unit->Type->TileHeight*TileSizeY/2;
+    VideoFillCircleClip(ColorGreen,x1,y1,1);
+
+    for( i=0; i<=unit->OrderCount; ++i ) {
+	if( (goal=unit->Orders[i].Goal) ) {
+	    x2=Map2ScreenX(goal->X)+goal->IX+goal->Type->TileWidth*TileSizeX/2;
+	    y2=Map2ScreenY(goal->Y)+goal->IY+goal->Type->TileHeight*TileSizeY/2;
+	} else {
+	    x2=Map2ScreenX(unit->Orders[i].X)+TileSizeX/2;
+	    y2=Map2ScreenY(unit->Orders[i].Y)+TileSizeY/2;
+	}
+	switch( unit->Orders[i].Action ) {
+	    case UnitActionNone:
+		color=ColorGray;
+		break;
+
+	    case UnitActionStill:
+		color=ColorGray;
+		break;
+
+	    case UnitActionStandGround:
+		color=ColorGray;
+		break;
+
+	    case UnitActionFollow:
+	    case UnitActionMove:
+		color=ColorGreen;
+		break;
+
+	    case UnitActionPatrol:
+		VideoDrawLineClip(ColorGreen,x1,y1,x2,y2);
+		color=ColorBlue;
+		break;
+
+	    case UnitActionRepair:
+		color=ColorGreen;
+		break;
+
+	    case UnitActionAttack:
+	    case UnitActionAttackGround:
+		color=ColorRed;
+		break;
+
+	    case UnitActionBoard:
+		color=ColorGreen;
+		break;
+
+	    case UnitActionUnload:
+		color=ColorGreen;
+		break;
+
+	    case UnitActionDie:
+		color=ColorGray;
+		break;
+
+	    case UnitActionTrain:
+		color=ColorGray;
+		break;
+
+	    case UnitActionUpgradeTo:
+		color=ColorGray;
+		break;
+
+	    case UnitActionResearch:
+		color=ColorGray;
+		break;
+
+	    case UnitActionBuild:
+		color=ColorGreen;
+		break;
+
+	    case UnitActionBuilded:
+		color=ColorGray;
+		break;
+
+	    case UnitActionHarvest:
+		color=ColorGreen;
+		break;
+
+	    case UnitActionMineGold:
+		color=ColorGreen;
+		break;
+
+	    case UnitActionHaulOil:
+		color=ColorGreen;
+		break;
+
+	    case UnitActionReturnGoods:
+		color=ColorGreen;
+		break;
+
+	    case UnitActionDemolish:
+		color=ColorRed;
+		break;
+
+	    default:
+		color=ColorGray;
+		DebugLevel1Fn("Unknown action %d\n",unit->Orders[i].Action);
+		break;
+	}
+	VideoDrawLineClip(color,x1,y1,x2,y2);
+	VideoFillCircleClip(color,x2,y2,2);
+	x1=x2;
+	y1=y2;
+    }
+#else
     int x1;
     int y1;
     int x2;
@@ -790,6 +925,7 @@ local void ShowOrder(const Unit* unit)
     VideoFillCircleClip(color,x2,y2,2);
 
     //DrawPath(unit);
+#endif
 }
 
 /*
@@ -797,6 +933,7 @@ local void ShowOrder(const Unit* unit)
 **
 **	1) Must draw underground/underwater units. (FUTURE extension)
 **	2) Must draw buildings and corpse.
+**	FIXME: Bridges?
 **	3) Must draw land/sea units.
 **	4) Must draw decoration units. (FUTURE extension)
 **	5) Must draw low air units.
@@ -861,6 +998,34 @@ local void DrawBuilding(Unit* unit)
     DrawSelection(unit,type,x,y);
 #endif
 
+#ifdef NEW_ORDERS
+    //
+    //	Buildings under construction/upgrade/ready.
+    //
+    if( unit->Orders[0].Action==UnitActionBuilded ) {
+	if( unit->Constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
+	    DrawConstruction(type->OverlapFrame
+		,frame&127
+		,x+(type->TileWidth*TileSizeX)/2
+		,y+(type->TileHeight*TileSizeY)/2);
+	} else {
+	    DrawUnitType(type,frame,x,y);
+	}
+    } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
+	// FIXME: update frame hard coded.
+	DrawUnitType(unit->Orders[0].Type,(frame&128)+1,x,y);
+    } else {
+	DrawUnitType(type,frame,x,y);
+    }
+
+    // FIXME: johns: ugly check here should be removed!
+    if( unit->Orders[0].Action!=UnitActionDie ) {
+	DrawDecoration(unit,type,x,y);
+#if 0
+	DrawSelection(unit,type,x,y);
+#endif
+    }
+#else
     //
     //	Buildings under construction/upgrade/ready.
     //
@@ -879,16 +1044,12 @@ local void DrawBuilding(Unit* unit)
 	DrawUnitType(type,frame,x,y);
     }
 
+    // FIXME: johns: ugly check here should be removed!
+    if( unit->Command.Action!=UnitActionDie ) {
+	DrawDecoration(unit,type,x,y);
 #if 0
-    // FIXME: johns: ugly check here should be removed!
-    if( unit->Command.Action!=UnitActionDie ) {
-	DrawDecoration(unit,type,x,y);
 	DrawSelection(unit,type,x,y);
-    }
-#else
-    // FIXME: johns: ugly check here should be removed!
-    if( unit->Command.Action!=UnitActionDie ) {
-	DrawDecoration(unit,type,x,y);
+#endif
     }
 #endif
 }
@@ -963,10 +1124,17 @@ local void DrawUnit(Unit* unit)
 	ShowOrder(unit);
     }
 
+#ifdef NEW_ORDERS
+    // FIXME: johns: ugly check here should be removed!
+    if( unit->Orders[0].Action!=UnitActionDie ) {
+	DrawDecoration(unit,type,x,y);
+    }
+#else
     // FIXME: johns: ugly check here should be removed!
     if( unit->Command.Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
     }
+#endif
 }
 
 /**
@@ -991,9 +1159,17 @@ global void DrawUnits(void)
     for( i=0; i<NumUnits; ++i ) {
 	unit=Units[i];
 	// FIXME: this tries to draw all corps, ohje
-	if( unit->Type->Vanishes || unit->Command.Action==UnitActionDie ) {
+#ifdef NEW_ORDERS
+	if( (unit->Type->Vanishes || unit->Orders[0].Action==UnitActionDie)
+		&& UnitVisible(unit) ) {
 	    DrawUnit(unit);
 	}
+#else
+	if( (unit->Type->Vanishes || unit->Command.Action==UnitActionDie)
+		&& UnitVisible(unit) ) {
+	    DrawUnit(unit);
+	}
+#endif
     }
     //
     //	2b) buildings
