@@ -2213,7 +2213,6 @@ local void SaveReplay(void)
     menu->items[1].d.input.nch = 0;
     menu->items[1].d.input.maxch = 28;
 
-    EndMenu();
     ProcessMenu("menu-save-replay", 1);
 }
 
@@ -2237,46 +2236,38 @@ local void SaveReplayEnterAction(Menuitem *mi, int key)
 */
 local void SaveReplayOk(void)
 {
-    char filename[128];
-    char tmpname[128];
-    FILE *tmpfile;
-    FILE *newfile; 
+    FILE *fd;
     Menu *menu;
     char *buf;
     struct stat s;
+    char *ptr;
 
     menu = FindMenu("menu-save-replay");
 
 #ifdef WIN32
-    sprintf(tmpname,"logs");
+    sprintf(TempPathBuf, "logs/");
 #else
-    sprintf(tmpname,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
-    strcat(tmpname,"/logs");
+    sprintf(TempPathBuf, "%s/%s", getenv("HOME"), FREECRAFT_HOME_PATH);
+    strcat(TempPathBuf, "/logs/");
 #endif
-    strcpy(filename, tmpname);
-    strcat(filename,"/");
-    strncat(filename, menu->items[1].d.input.buffer,
-	    menu->items[1].d.input.nch);
+    ptr = TempPathBuf + strlen(TempPathBuf);
+    sprintf(ptr, "log_of_freecraft_%d.log", ThisPlayer->Player);
 
-    if (!strstr(menu->items[1].d.input.buffer + menu->items[1].d.input.nch - 4, 
-	        ".log"))
-    {
-	strcat(filename, ".log");
-    }
-	
-    sprintf(tmpname,"%s/log_of_freecraft_%d.log",tmpname,ThisPlayer->Player);
-
-    stat(tmpname, &s);
+    stat(TempPathBuf, &s);
     buf = (char*)malloc(s.st_size);
+    fd = fopen(TempPathBuf, "rb");
+    fread(buf, s.st_size, 1, fd);
+    fclose(fd);
 
-    tmpfile = fopen(tmpname,"rb");
-    newfile = fopen(filename,"wb");
+    strncpy(ptr, menu->items[1].d.input.buffer, menu->items[1].d.input.nch);
+    ptr[menu->items[1].d.input.nch] = '\0';
+    if (!strcasestr(menu->items[1].d.input.buffer, ".log\0")) {
+	strcat(ptr, ".log");
+    }
 
-    fread(buf, s.st_size, 1, tmpfile);
-    fwrite(buf, s.st_size, 1, newfile);
-    
-    fclose(tmpfile);
-    fclose(newfile);
+    fd = fopen(TempPathBuf, "wb");
+    fwrite(buf, s.st_size, 1, fd);
+    fclose(fd);
 
     EndMenu();
 }
