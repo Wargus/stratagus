@@ -1,11 +1,11 @@
 //   ___________		     _________		      _____  __
-//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
-//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//   \_	  _____/______	 ____	____ \_	  ___ \____________ _/ ____\/  |_
+//    |	   __) \_  __ \_/ __ \_/ __ \/	  \  \/\_  __ \__  \\	__\\   __\ 
+//    |	    \	|  | \/\  ___/\	 ___/\	   \____|  | \// __ \|	|   |  |
+//    \___  /	|__|	\___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
-//  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
+//  ______________________			     ______________________
+//			  T H E	  W A R	  B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name missile.h	-	The missile headerfile. */
@@ -148,7 +148,7 @@
 **
 **		Missile current map position in pixels. To convert a map tile
 **		position to pixel position use: (mapx*::TileSizeX+::TileSizeX/2)
-**		and (mapy*::TileSizeY+::TileSizeY/2) 
+**		and (mapy*::TileSizeY+::TileSizeY/2)
 **
 **	Missile::DX Missile::DY
 **
@@ -193,7 +193,7 @@
 **
 **	Missile::Damage
 **
-**		Damage done by missile. 
+**		Damage done by missile.
 **
 **	Missile::TTL
 **
@@ -236,15 +236,13 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Missile-type typedef.
+**	Missile-type typedef
 */
 typedef struct _missile_type_ MissileType;
 
-/**
-**	Base structure of missile-types
-*/
+    ///		Base structure of missile-types
 struct _missile_type_ {
-    const void*	OType;			/// Object type (future extensions)
+    const void* OType;			/// Object type (future extensions)
 
     char*	Ident;			/// missile name
     char*	File;			/// missile sprite file
@@ -255,7 +253,7 @@ struct _missile_type_ {
 
 	// FIXME: FireSound defined but not used!
     SoundConfig FiredSound;		/// fired sound
-    SoundConfig	ImpactSound;		/// impact sound for this missile-type
+    SoundConfig ImpactSound;		/// impact sound for this missile-type
 
     int		Class;			/// missile class
     int		Delay;			/// missile delay
@@ -282,9 +280,7 @@ struct _missile_type_ {
 */
 typedef struct _missile_ Missile;
 
-/**
-**	Missile on the map.
-*/
+    /// Missile on the map
 struct _missile_ {
     int		X;			/// missile pixel position
     int		Y;			/// missile pixel position
@@ -297,9 +293,9 @@ struct _missile_ {
     int short	Delay;			/// delay to showup
 
     Unit*	SourceUnit;		/// unit that fires (could be killed)
-    Unit*	TargetUnit;             /// target unit, used for spells
+    Unit*	TargetUnit;		/// target unit, used for spells
 
-    int		Damage;                 /// direct damage that missile applies
+    int		Damage;			/// direct damage that missile applies
 
     int		TTL;			/// time to live (ticks) used for spells
     void (*Controller)( Missile* );	/// used to controll spells
@@ -322,7 +318,7 @@ extern MissileType* MissileTypes;		/// all missile-types
 extern MissileType* MissileTypeSmallFire;	/// Small fire missile-type
 extern MissileType* MissileTypeBigFire;		/// Big fire missile-type
 extern MissileType* MissileTypeGreenCross;	/// Green cross missile-type
-extern MissileType* MissileTypeExplosion; 	/// Explosion missile-type
+extern MissileType* MissileTypeExplosion;	/// Explosion missile-type
 
 extern const char* MissileClassNames[];		/// Missile class names
 
@@ -341,7 +337,7 @@ extern void MissileCclRegister(void);
 extern void LoadMissileSprites(void);
     /// allocate an empty missile-type slot
 extern MissileType* NewMissileTypeSlot(char*);
-    /// Get missile-type by ident.
+    /// Get missile-type by ident
 extern MissileType* MissileTypeByIdent(const char*);
     /// create a missile
 extern Missile* MakeMissile(MissileType*,int,int,int,int);
