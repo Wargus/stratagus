@@ -204,12 +204,12 @@ global int MapFogFilterFlags(Player* player, int x, int y, int mask)
 	int unitcount;
 	int fogmask;
 	Unit* table[UnitMax];
-	
+
 	// Calculate Mask for tile with fog
     if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 		return mask;
 	}
-	
+
 	nunits = UnitCacheOnTile(x, y, table);
 	fogmask = -1;
 	unitcount = 0;
@@ -535,7 +535,7 @@ global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 	srect.y = TileSizeY * (tile / tilepitch);
 	srect.w = TileSizeX;
 	srect.h = TileSizeY;
-	
+
 	oldx = x;
 	oldy = y;
 	CLIP_RECTANGLE(x, y, srect.w, srect.h);
@@ -862,8 +862,6 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 	int ex;
 	int dy;
 	int ey;
-	char* redraw_row;
-	char* redraw_tile;
 	int p;
 	int my;
 	int mx;
@@ -875,9 +873,16 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 #endif
 
 	// flags must redraw or not
+#ifdef NEW_MAPDRAW
+	char* redraw_row;
+	char* redraw_tile;
+
 	redraw_row = vp->MustRedrawRow;
 	redraw_tile = vp->MustRedrawTile;
-
+#endif
+	if (ReplayRevealMap) {
+		return;
+	}
 	p = ThisPlayer->Player;
 
 	sx = vp->MapX - 1;
@@ -896,18 +901,20 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 	if (ey > TheMap.Height) {
 		ey = TheMap.Height;
 	}
-	for (; my < ey; ++my) {
+	// Update for visibility all tile in viewport
+	// and 1 tile around viewport (for fog-of-war connection display)
+	for (my = vp->MapY; my < ey; ++my) {
 		for (mx = sx; mx < ex; ++mx) {
 			VisibleTable[my * TheMap.Width + mx] = IsTileVisible(ThisPlayer, mx, my);
 		}
 	}
-
 	ex = vp->EndX;
 	sy = y * TheMap.Width;
 	dy = vp->Y - vp->OffsetY;
 	ey = vp->EndY;
 
 	while (dy <= ey) {
+#ifdef NEW_MAPDRAW
 		// row must be redrawn
 		if (*redraw_row) {
 #if NEW_MAPDRAW > 1
@@ -915,22 +922,25 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 #else
 			*redraw_row = 0;
 #endif
+#endif
 			sx = x + sy;
 			dx = vp->X - vp->OffsetX;
 			while (dx <= ex) {
+#ifdef NEW_MAPDRAW
 				if (*redraw_tile) {
 #if NEW_MAPDRAW > 1
 					(*redraw_tile)--;
 #else
 					*redraw_tile = 0;
+#endif
+#endif
 					mx = (dx - vp->X + vp->OffsetX) / TileSizeX + vp->MapX;
 					my = (dy - vp->Y + vp->OffsetY) / TileSizeY + vp->MapY;
-					if (VisibleTable[my * TheMap.Width + mx] || ReplayRevealMap) {
+					if (VisibleTable[my * TheMap.Width + mx]) {
 						DrawFogOfWarTile(sx, sy, dx, dy);
 					} else {
 						VideoFillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
 					}
-#endif
 
 // Used to debug NEW_FOW problems
 #if defined(DEBUG_FOG_OF_WAR)
@@ -962,15 +972,19 @@ extern int VideoDrawText(int x, int y, unsigned font, const unsigned char* text)
 #endif
 					}
 #endif
+#ifdef NEW_MAPDRAW
 				}
 				++redraw_tile;
+#endif
 				++sx;
 				dx += TileSizeX;
 			}
+#ifdef NEW_MAPDRAW
 		} else {
 			redraw_tile += vp->MapWidth;
 		}
 		++redraw_row;
+#endif
 		sy += TheMap.Width;
 		dy += TileSizeY;
 	}
@@ -1001,7 +1015,7 @@ global void InitMapFogOfWar(void)
 #else
 	//
 	//	Generate Only Fog surface.
-	//	
+	//
 	{
 		unsigned char r;
 		unsigned char g;

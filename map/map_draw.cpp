@@ -112,7 +112,7 @@ global void VideoDrawTile(const int tile, int x, int y)
 	CLIP_RECTANGLE(x, y, srect.w, srect.h);
 	srect.x += x - oldx;
 	srect.y += y - oldy;
-					
+
 
 	drect.x = x;
 	drect.y = y;
@@ -227,13 +227,13 @@ global void MapDrawTile(int tile, int x, int y)
 global int MarkDrawPosMap(int x, int y)
 {
 	Viewport* vp;
-	
+
 	if ((vp = MapTileGetViewport(x, y))) {
 		MustRedraw |= RedrawMap;
-#if NEW_MAPDRAW
+#ifdef NEW_MAPDRAW
 		vp->MustRedrawRow[y - vp->MapY] = 1;
 		vp->MustRedrawTile[x - vp->MapX + (y - vp->MapY) * vp->MapWidth] = 1;
-#endif				 
+#endif
 		return 1;
 	}
 	return 0;
@@ -407,17 +407,19 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 	int ex;
 	int dy;
 	int ey;
-	const char* redraw_row;
-	const char* redraw_tile;
 #ifdef TIMEIT
 	u_int64_t sv = rdtsc();
 	u_int64_t ev;
 	static long mv = 9999999;
 #endif
+#ifdef NEW_MAPDRAW
+	const char* redraw_row;
+	const char* redraw_tile;
 
 	// flags must redrawn or not
 	redraw_row = vp->MustRedrawRow;
 	redraw_tile = vp->MustRedrawTile;
+#endif
 
 	ex = vp->EndX;
 	sy = y * TheMap.Width;
@@ -425,15 +427,19 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 	ey = vp->EndY;
 
 	while (dy <= ey) {
+#ifdef NEW_MAPDRAW
 		// row must be redrawn
 		if (*redraw_row++) {
+#endif
 			sx = x + sy;
 			dx = vp->X - vp->OffsetX;
 			while (dx <= ex) {
 				//
 				//  draw only tiles which must be drawn
 				//
+#ifdef NEW_MAPDRAW
 				if (*redraw_tile++) {
+#endif
 					// FIXME: unexplored fields could be drawn faster
 					if (ReplayRevealMap) {
 						MapDrawTile(TheMap.Fields[sx].Tile, dx, dy);
@@ -442,7 +448,9 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 					}
 
 				// StephanR: debug-mode denote tiles that are redrawn
+#ifdef NEW_MAPDRAW
 				}
+#endif
 #ifdef NEW_MAPDRAW_
 				VideoDrawRectangle(redraw_tile[-1] == 1 ? ColorWhite : ColorRed,
 					dx, dy, 32, 32);
@@ -450,6 +458,7 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 				++sx;
 				dx += TileSizeX;
 			}
+#ifdef NEW_MAPDRAW
 		} else {
 #ifdef NEW_MAPDRAW_
 			sx = x + sy;
@@ -462,6 +471,7 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 #endif
 			redraw_tile += vp->MapWidth;
 		}
+#endif
 		sy += TheMap.Width;
 		dy += TileSizeY;
 	}

@@ -51,21 +51,21 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-global char RightButtonAttacks;				/// right button 0 move, 1 attack
-global char FancyBuildings;				/// Mirror buildings 1 yes, 0 now.
+global char RightButtonAttacks; /// right button 0 move, 1 attack
+global char FancyBuildings;     /// Mirror buildings 1 yes, 0 now.
 
-	/// keyboard scroll speed
+/// keyboard scroll speed
 global int SpeedKeyScroll = KEY_SCROLL_SPEED;
-	/// mouse scroll speed
+/// mouse scroll speed
 global int SpeedMouseScroll = MOUSE_SCROLL_SPEED;
 
 /**
-**		The user interface configuration
+**  The user interface configuration
 */
 global UI TheUI;
 
 /**
-**		The available user interfaces.
+**  The available user interfaces.
 */
 global UI** UI_Table;
 
@@ -108,13 +108,13 @@ local void CleanUIGraphics(UI* ui)
 }
 
 /**
-**		Initialize the user interface.
+**  Initialize the user interface.
 **
-**		The function looks through ::UI_Table, to find a matching user
-**		interface. It uses the race_name and the current video window sizes to
-**		find it.
+**  The function looks through ::UI_Table, to find a matching user
+**  interface. It uses the race_name and the current video window sizes to
+**  find it.
 **
-**		@param race_name		The race identifier, to select the interface.
+**  @param race_name  The race identifier, to select the interface.
 */
 global void InitUserInterface(const char* race_name)
 {
@@ -161,7 +161,7 @@ global void InitUserInterface(const char* race_name)
 	TheUI.Offset480Y = (VideoHeight - 480) / 2;
 
 	//
-	//		Calculations
+	// Calculations
 	//
 	if (TheUI.MapArea.EndX > TheMap.Width * TileSizeX - 1) {
 		TheUI.MapArea.EndX = TheMap.Width * TileSizeX - 1;
@@ -191,11 +191,11 @@ global void InitUserInterface(const char* race_name)
 }
 
 /**
-**		Load the user interface graphics.
+**  Load the user interface graphics.
 **
-**		@todo		If sub images of the same graphic are used, they are loaded
-**				multiple into memory. Use the IconFile code and perhaps build
-**				a new layer, which supports image sharing.
+**  @todo  If sub images of the same graphic are used, they are loaded
+**  multiple into memory. Use the IconFile code and perhaps build
+**  a new layer, which supports image sharing.
 */
 global void LoadUserInterface(void)
 {
@@ -409,7 +409,7 @@ global void CleanUI(UI* ui)
 }
 
 /**
-**		Clean up the user interface module.
+**  Clean up the user interface module.
 */
 global void CleanUserInterface(void)
 {
@@ -419,7 +419,7 @@ global void CleanUserInterface(void)
 	CleanUIGraphics(&TheUI);
 
 	//
-	//		Free the available user interfaces.
+	// Free the available user interfaces.
 	//
 	if (UI_Table) {
 		for (i = 0; UI_Table[i]; ++i) {
@@ -429,7 +429,7 @@ global void CleanUserInterface(void)
 		UI_Table = NULL;
 	}
 
-	//		Free Title screen.
+	// Free Title screen.
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
 			free(TitleScreens[i]->File);
@@ -451,17 +451,17 @@ global void CleanUserInterface(void)
 }
 
 /**
-**		Takes coordinates of a pixel in stratagus's window and computes
-**		the map viewport which contains this pixel.
+**  Takes coordinates of a pixel in stratagus's window and computes
+**  the map viewport which contains this pixel.
 **
-**		@param x		x pixel coordinate with origin at UL corner of screen
-**		@param y		y pixel coordinate with origin at UL corner of screen
+**  @param x  x pixel coordinate with origin at UL corner of screen
+**  @param y  y pixel coordinate with origin at UL corner of screen
 **
-**		@return				viewport pointer or NULL if this pixel is not inside
-**						any of the viewports.
+**  @return viewport pointer or NULL if this pixel is not inside
+**  any of the viewports.
 **
-**		@note		This functions only works with rectangular viewports, when
-**				we support shaped map window, this must be rewritten.
+**  @note This functions only works with rectangular viewports, when
+**  we support shaped map window, this must be rewritten.
 */
 global Viewport* GetViewport(int x, int y)
 {
@@ -476,19 +476,19 @@ global Viewport* GetViewport(int x, int y)
 }
 
 /**
-**		Takes coordinates of a map tile and computes the number of the map
-**		viewport (if any) inside which the tile is displayed.
+**  Takes coordinates of a map tile and computes the number of the map
+**  viewport (if any) inside which the tile is displayed.
 **
-**		@param tx		x coordinate of the map tile
-**		@param ty		y coordinate of the map tile
+**  @param tx  x coordinate of the map tile
+**  @param ty  y coordinate of the map tile
 **
-**		@return				viewport pointer (index into TheUI.Viewports) or NULL
-**						if this map tile is not displayed in any of
-**						the viewports.
+**  @return viewport pointer (index into TheUI.Viewports) or NULL
+**   if this map tile is not displayed in any of
+**   the viewports.
 **
-**		@note				If the tile (tx,ty) is currently displayed in more
-**						than one viewports (may well happen) this function
-**						returns the first one it finds.
+**  @note If the tile (tx,ty) is currently displayed in more
+**  than one viewports (may well happen) this function
+**  returns the first one it finds.
 */
 global Viewport* MapTileGetViewport(int tx, int ty)
 {
@@ -504,61 +504,46 @@ global Viewport* MapTileGetViewport(int tx, int ty)
 }
 
 /**
-**		Takes an array of new Viewports which are supposed to have their
-**		pixel geometry (Viewport::[XY] and Viewport::End[XY]) already
-**		computed. Using this information as well as old viewport's
-**		parameters fills in new viewports' Viewport::Map* parameters.
-**		Then it replaces the old viewports with the new ones and finishes
-**		the set-up of the new mode.
+**  Takes an array of new Viewports which are supposed to have their
+**  pixel geometry (Viewport::[XY] and Viewport::End[XY]) already
+**  computed. Using this information as well as old viewport's
+**  parameters fills in new viewports' Viewport::Map* parameters.
+**  Then it replaces the old viewports with the new ones and finishes
+**  the set-up of the new mode.
 **
-**		@param new_vps		The array of the new viewports
-**		@param num_vps		The number of elements in the new_vps[] array.
+**  @param new_vps  The array of the new viewports
+**  @param num_vps  The number of elements in the new_vps[] array.
 */
 local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 {
 	int i;
 
-	// If the number of viewports increases we need to compute what to display
-	// in the newly created ones.  We need to do this before we store new
-	// geometry information in the TheUI.Viewports field because we use the old
-	// geometry information for map origin computation.
-	if (TheUI.NumViewports < num_vps) {
-		for (i = 0; i < num_vps; ++i) {
-			const Viewport* vp;
+	//  Compute location of the viewport using oldviewport
+	for (i = 0; i < num_vps; ++i) {
+		const Viewport* vp;
 
-			vp = GetViewport(new_vps[i].X, new_vps[i].Y);
-			if (vp) {
-				TheUI.Viewports[i].MapX = Viewport2MapX(vp, new_vps[i].X);
-				TheUI.Viewports[i].MapY = Viewport2MapY(vp, new_vps[i].Y);
-			} else {
-				TheUI.Viewports[i].MapX = 0;
-				TheUI.Viewports[i].MapY = 0;
-			}
+		new_vps[i].MapX = 0;
+		new_vps[i].MapY = 0;
+		vp = GetViewport(new_vps[i].X, new_vps[i].Y);
+		if (vp) {
+			new_vps[i].OffsetX = new_vps[i].X - vp->X + vp->MapX * TileSizeX + vp->OffsetX;
+			new_vps[i].OffsetY = new_vps[i].Y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY;
+		} else {
+			new_vps[i].OffsetX = 0;
+			new_vps[i].OffsetY = 0;
 		}
 	}
 
+	// Affect the old viewport.
 	for (i = 0; i < num_vps; ++i) {
-		TheUI.Viewports[i].X = new_vps[i].X;
-		TheUI.Viewports[i].EndX = new_vps[i].EndX;
-		TheUI.Viewports[i].Y = new_vps[i].Y;
-		TheUI.Viewports[i].EndY = new_vps[i].EndY;
-		TheUI.Viewports[i].MapWidth =
-			(new_vps[i].EndX - new_vps[i].X + TileSizeX) / TileSizeX + 1;
-		TheUI.Viewports[i].MapHeight =
-			(new_vps[i].EndY - new_vps[i].Y + TileSizeY) / TileSizeY + 1;
+		Viewport* vp;
 
-		if (TheUI.Viewports[i].MapWidth + TheUI.Viewports[i].MapX >
-			TheMap.Width) {
-			TheUI.Viewports[i].MapX -=
-				(TheUI.Viewports[i].MapWidth + TheUI.Viewports[i].MapX) -
-				TheMap.Width;
-		}
-		if (TheUI.Viewports[i].MapHeight + TheUI.Viewports[i].MapY >
-			TheMap.Height) {
-			TheUI.Viewports[i].MapY -=
-				(TheUI.Viewports[i].MapHeight + TheUI.Viewports[i].MapY) -
-				TheMap.Height;
-		}
+		vp = TheUI.Viewports + i;
+		vp->X = new_vps[i].X;
+		vp->EndX = new_vps[i].EndX;
+		vp->Y = new_vps[i].Y;
+		vp->EndY = new_vps[i].EndY;
+		ViewportSetViewpoint(vp, new_vps[i].MapX, new_vps[i].MapY, new_vps[i].OffsetX, new_vps[i].OffsetY);
 	}
 	TheUI.NumViewports = num_vps;
 
@@ -572,20 +557,20 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 }
 
 /**
-**		Takes a viewport which is supposed to have its Viewport::[XY]
-**		correctly filled-in and computes Viewport::End[XY] attributes
-**		according to clipping information passed in other two arguments.
+**  Takes a viewport which is supposed to have its Viewport::[XY]
+**  correctly filled-in and computes Viewport::End[XY] attributes
+**  according to clipping information passed in other two arguments.
 **
-**		@param vp		The viewport.
-**		@param ClipX		Maximum x-coordinate of the viewport's right side
-**						as dictated by current UI's geometry and ViewportMode.
-**		@param ClipY		Maximum y-coordinate of the viewport's bottom side
-**						as dictated by current UI's geometry and ViewportMode.
+**  @param vp     The viewport.
+**  @param ClipX  Maximum x-coordinate of the viewport's right side
+**                as dictated by current UI's geometry and ViewportMode.
+**  @param ClipY  Maximum y-coordinate of the viewport's bottom side
+**                as dictated by current UI's geometry and ViewportMode.
 **
-**		@note				It is supposed that values passed in Clip[XY] will
-**						never be greater than TheUI::MapArea::End[XY].
-**						However, they can be smaller according to the place
-**						the viewport vp takes in context of current ViewportMode.
+**  @note It is supposed that values passed in Clip[XY] will
+**  never be greater than TheUI::MapArea::End[XY].
+**  However, they can be smaller according to the place
+**  the viewport vp takes in context of current ViewportMode.
 */
 local void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 {
@@ -603,15 +588,17 @@ local void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 		vp->EndY = ClipY;
 	}
 
+	DebugCheck(vp->EndX > TheUI.MapArea.EndX);
+	DebugCheck(vp->EndY > TheUI.MapArea.EndY);
 }
 
 /**
-**		Compute viewport parameters for single viewport mode.
+**  Compute viewport parameters for single viewport mode.
 **
-**		The parameters 		include viewport's width and height expressed
-**		in pixels, its position with respect to Stratagus's window
-**		origin, and the corresponding map parameters expressed in map
-**		tiles with origin at map origin (map tile (0,0)).
+**  The parameters include viewport's width and height expressed
+**  in pixels, its position with respect to Stratagus's window
+**  origin, and the corresponding map parameters expressed in map
+**  tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeSingle(void)
 {
@@ -627,14 +614,14 @@ local void SetViewportModeSingle(void)
 }
 
 /**
-**		Compute viewport parameters for horizontally split viewport mode.
-**		This mode splits the TheUI::MapArea with a horizontal line to
-**		2 (approximately) equal parts.
+**  Compute viewport parameters for horizontally split viewport mode.
+**  This mode splits the TheUI::MapArea with a horizontal line to
+**  2 (approximately) equal parts.
 **
-**		The parameters 		include viewport's width and height expressed
-**		in pixels, its position with respect to Stratagus's window
-**		origin, and the corresponding map parameters expressed in map
-**		tiles with origin at map origin (map tile (0,0)).
+**  The parameters include viewport's width and height expressed
+**  in pixels, its position with respect to Stratagus's window
+**  origin, and the corresponding map parameters expressed in map
+**  tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeSplitHoriz(void)
 {
@@ -655,15 +642,15 @@ local void SetViewportModeSplitHoriz(void)
 }
 
 /**
-**		Compute viewport parameters for horizontal 3-way split viewport mode.
-**		This mode splits the TheUI::MapArea with a horizontal line to
-**		2 (approximately) equal parts, then splits the bottom part vertically
-**		to another 2 parts.
+**  Compute viewport parameters for horizontal 3-way split viewport mode.
+**  This mode splits the TheUI::MapArea with a horizontal line to
+**  2 (approximately) equal parts, then splits the bottom part vertically
+**  to another 2 parts.
 **
-**		The parameters 		include viewport's width and height expressed
-**		in pixels, its position with respect to Stratagus's window
-**		origin, and the corresponding map parameters expressed in map
-**		tiles with origin at map origin (map tile (0,0)).
+**  The parameters include viewport's width and height expressed
+**  in pixels, its position with respect to Stratagus's window
+**  origin, and the corresponding map parameters expressed in map
+**  tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeSplitHoriz3(void)
 {
@@ -690,14 +677,14 @@ local void SetViewportModeSplitHoriz3(void)
 }
 
 /**
-**		Compute viewport parameters for vertically split viewport mode.
-**		This mode splits the TheUI::MapArea with a vertical line to
-**		2 (approximately) equal parts.
+**  Compute viewport parameters for vertically split viewport mode.
+**  This mode splits the TheUI::MapArea with a vertical line to
+**  2 (approximately) equal parts.
 **
-**		The parameters 		include viewport's width and height expressed
-**		in pixels, its position with respect to Stratagus's window
-**		origin, and the corresponding map parameters expressed in map
-**		tiles with origin at map origin (map tile (0,0)).
+**  The parameters  include viewport's width and height expressed
+**  in pixels, its position with respect to Stratagus's window
+**  origin, and the corresponding map parameters expressed in map
+**  tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeSplitVert(void)
 {
@@ -719,14 +706,14 @@ local void SetViewportModeSplitVert(void)
 }
 
 /**
-**		Compute viewport parameters for 4-way split viewport mode.
-**		This mode splits the TheUI::MapArea vertically *and* horizontally
-**		to 4 (approximately) equal parts.
+**  Compute viewport parameters for 4-way split viewport mode.
+**  This mode splits the TheUI::MapArea vertically *and* horizontally
+**  to 4 (approximately) equal parts.
 **
-**		The parameters 		include viewport's width and height expressed
-**		in pixels, its position with respect to Stratagus's window
-**		origin, and the corresponding map parameters expressed in map
-**		tiles with origin at map origin (map tile (0,0)).
+**  The parameters  include viewport's width and height expressed
+**  in pixels, its position with respect to Stratagus's window
+**  origin, and the corresponding map parameters expressed in map
+**  tiles with origin at map origin (map tile (0,0)).
 */
 local void SetViewportModeQuad(void)
 {
@@ -760,9 +747,9 @@ local void SetViewportModeQuad(void)
 }
 
 /**
-**		Sets up (calls geometry setup routines for) a new viewport mode.
+**  Sets up (calls geometry setup routines for) a new viewport mode.
 **
-**		@param new_mode				New mode's number.
+**  @param new_mode  New mode's number.
 */
 global void SetViewportMode(ViewportMode new_mode)
 {
@@ -789,12 +776,12 @@ global void SetViewportMode(ViewportMode new_mode)
 }
 
 /**
-**		Cycles through predefined viewport modes (geometry configurations)
-**		in order defined by the ViewportMode enumerated type.
+**  Cycles through predefined viewport modes (geometry configurations)
+**  in order defined by the ViewportMode enumerated type.
 **
-**		@param step		The size of step used for cycling. Values that
-**						make sense are mostly 1 (next viewport mode) and
-*						-1 (previous viewport mode).
+**  @param step	  The size of step used for cycling. Values that
+**               make sense are mostly 1 (next viewport mode) and
+**               -1 (previous viewport mode).
 */
 global void CycleViewportMode(int step)
 {
