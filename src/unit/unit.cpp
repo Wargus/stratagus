@@ -279,7 +279,11 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Reset=1;
     unit->Removed=1;
 
-    unit->Visible=!type->Submarine;
+    if( type->Submarine ) {
+	unit->Visible=0;		// Invisible as default
+    } else {
+	unit->Visible=-1;		// Visible as default
+    }
 
     unit->Rs=MyRand()%100; // used for random fancy buildings and other things
 
@@ -383,7 +387,7 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
     }
 #endif
     if( type->CanSeeSubmarine ) {
-	MarkSubmarineSeen(unit->X,unit->Y,unit->Stats->SightRange);
+	MarkSubmarineSeen(player,unit->X,unit->Y,unit->Stats->SightRange);
     }
 
     unit->Removed=0;
@@ -682,11 +686,12 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 /**
 **	Mark submarine seen by an submarine detector.
 **
-**	@param x	X map tile center position.
-**	@param y	Y map tile center position.
-**	@param r	Range arround center.
+**	@param player	Player pointer that can see the submarine
+**	@param x	X map tile center position
+**	@param y	Y map tile center position
+**	@param r	Range arround center
 */
-global void MarkSubmarineSeen(int x,int y,int r)
+global void MarkSubmarineSeen(const Player* player,int x,int y,int r)
 {
     Unit* table[UnitMax];
     int n;
@@ -694,13 +699,15 @@ global void MarkSubmarineSeen(int x,int y,int r)
 
     n=SelectUnits(x-r,y-r,x+r,y+r,table);
     for( i=0; i<n; ++i ) {
-	table[i]->Visible=1;
+	table[i]->Visible|=(1<<player->Player);
     }
 }
 
 /**
-**	Returns true, if unit is visible on the map.
+**	Returns true, if unit is visible for this player on the map.
 **	An unit is visible, if any field could be seen.
+**
+**	@warning	This is only true for ::ThisPlayer.
 **
 **	@param unit	Unit to be checked.
 **	@return		True if visible, false otherwise.
@@ -721,7 +728,8 @@ global int UnitVisibleOnMap(const Unit* unit)
     //
     //	Unit invisible (by spell), removed or submarine.
     //
-    if ( unit->Invisible || unit->Removed || !unit->Visible ) {
+    if ( unit->Invisible || unit->Removed
+	    || !(unit->Visible&(1<<ThisPlayer->Player)) ) {
 	return 0;
     }
 
@@ -763,15 +771,16 @@ global int UnitKnownOnMap(const Unit* unit)
     unsigned m;
     MapField* mf;
 
-    // Invisible by spell
-    if ( unit->Invisible && unit->Player != ThisPlayer ) {
+    if( unit->Player != ThisPlayer ) {
 	//FIXME: vladi: should handle teams and shared vision
-	return 0;
-    }
-    // Visible submarine
-    if ( !unit->Visible && unit->Player != ThisPlayer ) {
-	//FIXME: vladi: should handle teams and shared vision
-	return 0;
+	// Invisible by spell
+	if ( unit->Invisible ) {
+	    return 0;
+	}
+	// Visible submarine
+	if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
+	    return 0;
+	}
     }
 
     //
@@ -803,15 +812,16 @@ global int UnitKnownOnMap(const Unit* unit)
 
     DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
 
-    // Invisible by spell
-    if ( unit->Invisible && unit->Player != ThisPlayer ) {
+    if( unit->Player != ThisPlayer ) {
 	//FIXME: vladi: should handle teams and shared vision
-	return 0;
-    }
-    // Visible submarine
-    if ( !unit->Visible && unit->Player != ThisPlayer ) {
-	//FIXME: vladi: should handle teams and shared vision
-	return 0;
+	// Invisible by spell
+	if ( unit->Invisible ) {
+	    return 0;
+	}
+	// Visible submarine
+	if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
+	    return 0;
+	}
     }
 
     //
@@ -859,15 +869,16 @@ global int UnitVisibleOnScreen(const Unit* unit)
     unsigned m;
     MapField* mf;
 
-    // Invisible by spell
-    if ( unit->Invisible && unit->Player != ThisPlayer ) {
+    if( unit->Player != ThisPlayer ) {
 	//FIXME: vladi: should handle teams and shared vision
-	return 0;
-    }
-    // Visible submarine
-    if ( !unit->Visible && unit->Player != ThisPlayer ) {
-	//FIXME: vladi: should handle teams and shared vision
-	return 0;
+	// Invisible by spell
+	if ( unit->Invisible ) {
+	    return 0;
+	}
+	// Visible submarine
+	if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
+	    return 0;
+	}
     }
 
     //
@@ -909,15 +920,16 @@ global int UnitVisibleOnScreen(const Unit* unit)
 
     DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
 
-    // Invisible by spell
-    if ( unit->Invisible && unit->Player != ThisPlayer ) {
+    if( unit->Player != ThisPlayer ) {
 	//FIXME: vladi: should handle teams and shared vision
-	return 0;
-    }
-    // Visible submarine
-    if ( !unit->Visible && unit->Player != ThisPlayer ) {
-	//FIXME: vladi: should handle teams and shared vision
-	return 0;
+	// Invisible by spell
+	if ( unit->Invisible ) {
+	    return 0;
+	}
+	// Visible submarine
+	if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
+	    return 0;
+	}
     }
 
     //
@@ -1097,7 +1109,7 @@ global void UnitIncrementMana(void)
 		unit->UnholyArmor);
 
 	if (  unit->Type->Submarine ) {
-	    if( !flag && unit->Visible ) {
+	    if( !flag && (unit->Visible&(1<<ThisPlayer->Player)) ) {
                 flag=CheckUnitToBeDrawn(unit);
 	    }
 	    unit->Visible=0;
@@ -1519,7 +1531,7 @@ found:
     }
 #endif
     if( unit->Type->CanSeeSubmarine ) {
-	MarkSubmarineSeen(unit->X,unit->Y,unit->Stats->SightRange);
+	MarkSubmarineSeen(unit->Player,unit->X,unit->Y,unit->Stats->SightRange);
     }
 
     MustRedraw|=RedrawMinimap;
@@ -1631,7 +1643,8 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    }
 #endif
 	    if( unit->Type->CanSeeSubmarine ) {
-		MarkSubmarineSeen(unit->X,unit->Y,unit->Stats->SightRange);
+		MarkSubmarineSeen(unit->Player,unit->X,unit->Y,
+			unit->Stats->SightRange);
 	    }
 
 	    MustRedraw|=RedrawMinimap;

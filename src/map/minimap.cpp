@@ -279,8 +279,8 @@ global void DrawMinimap(int vx,int vy)
 	if( unit->Invisible ) {		// Can't be seen
 	    continue;
 	}
-	if( !unit->Visible ) {		// Submarine not visible
-	    continue;
+	if( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
+	    continue;			// Submarine not visible
 	}
 
 
