@@ -124,8 +124,6 @@ global int* VisionLookup;
 local unsigned char* VisibleTable;
 
 #ifdef USE_SDL_SURFACE
-SDL_Surface* SolidFog;
-
 local void (*VideoDrawUnexplored)(const int, int, int);
 local void (*VideoDrawFog)(const int, int, int);
 local void (*VideoDrawOnlyFog)(int x, int y);
@@ -540,54 +538,6 @@ global void VideoDrawOnlyFogSolid(int x, int y)
 */
 }
 
-// FIXME: VERY MESSY
-// NOTE: Saturation is correct, unlike old video code
-global void VideoDrawOnlyFogAlpha(int x, int y)
-{
-    int i;
-    int j;
-    Uint16* p;
-    SDL_Rect drect;
-    SDL_Color csrc;
-    SDL_Color cdest;
-    unsigned char bright;
-    unsigned char sat;
-    unsigned char max;
-    int v;
-
-    drect.x = x;
-    drect.y = y;
-
-    // Contrast
-    SDL_BlitSurface(SolidFog, NULL, TheScreen, &drect);
-
-    csrc.r = 255;
-    csrc.g = 255;
-    csrc.b = 255;
-
-    bright = FogOfWarBrightness * 255 / 100;
-    sat = 100 - FogOfWarSaturation;
-
-    VideoLockScreen();
-    for (i = y; i < y + TileSizeY; ++i) {
-	for (j = x; j < x + TileSizeX; ++j) {
-	    p = &((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
-	    SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
-	    // Saturation + Brightness
-	    max = (cdest.r + cdest.g + cdest.b) / 3;
-	    v = cdest.r + bright;
-	    cdest.r = (v > 255 ? 255 : v) + (max - cdest.r) * sat / 100;
-	    v = cdest.g + bright;
-	    cdest.g = (v > 255 ? 255 : v) + (max - cdest.g) * sat / 100;
-	    v = cdest.b + bright;
-	    cdest.b = (v > 255 ? 255 : v) + (max - cdest.b) * sat / 100;
-
-	    *p = SDL_MapRGB(TheScreen->format, cdest.r, cdest.g, cdest.b);
-	}
-    }
-    VideoUnlockScreen();
-}
-
 global void VideoDrawUnexploredSolid(const int tile, int x, int y)
 {
     int tilepitch;
@@ -607,73 +557,187 @@ global void VideoDrawUnexploredSolid(const int tile, int x, int y)
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 }
 
-// FIXME: VERY MESSY
-global void VideoDrawFogAlpha(const int tile, int x, int y)
+// Routines for 16 bit displays .. -------------------------------------------
+
+global void VideoDraw16OnlyFogAlpha(int x, int y)
+{
+    int i;
+    int j;
+    Uint16* p;
+    int ex;
+    int ey;
+
+    ex = x + TileSizeX;
+    ey = y + TileSizeY;
+
+    VideoLockScreen();
+    for (i = y; i < ey; ++i) {
+	p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
+	for (j = x; j < ex; ++j) {
+	    *p = ((Uint16*)FogOfWarAlphaTable)[*p];
+	    ++p;
+	}
+    }
+    VideoUnlockScreen();
+}
+
+global void VideoDraw16FogAlpha(const int tile, int x, int y)
 {
     int i;
     int j;
     Uint16* p;
     Uint8* ptile;
     int tilepitch;
-    SDL_Rect srect;
-    SDL_Rect drect;
-    SDL_Color csrc;
-    SDL_Color cdest;
-    unsigned char alpha;
-    unsigned char sat;
-    unsigned char max;
-    unsigned char bright;
-    int v;
+    int sx;
+    int sy;
+    int ex;
+    int ey;
 
     tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+    sx = TileSizeX * (tile % tilepitch);
+    sy = TileSizeY * (tile / tilepitch);
 
-    srect.x = TileSizeX * (tile % tilepitch);
-    srect.y = TileSizeY * (tile / tilepitch);
-    srect.w = TileSizeX;
-    srect.h = TileSizeY;
-
-    drect.x = x;
-    drect.y = y;
-
-    // Contrast
-    alpha = TheMap.TileGraphic->Surface->format->alpha;
-    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA | SDL_RLEACCEL,
-	(100 - FogOfWarContrast) * 255 / 100);
-    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
-    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
-
-    csrc.r = 255;
-    csrc.g = 255;
-    csrc.b = 255;
-
-    bright = FogOfWarBrightness * 255 / 100;
-    sat = 100 - FogOfWarSaturation;
+    ex = x + TileSizeX;
+    ey = y + TileSizeY;
 
     VideoLockScreen();
-    for (i = y; i < y + TileSizeY; ++i) {
-	for (j = x; j < x + TileSizeX; ++j) {
-	    p = &((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
-	    ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[srect.x + j - x 
-		+ srect.y + (i - y) * TheMap.TileGraphic->Surface->w];
-	    SDL_GetRGBA(*ptile, TheMap.TileGraphic->Surface->format, 
-		&cdest.r, &cdest.g, &cdest.b, &alpha);
-	    if (!(cdest.r | cdest.g | cdest.b)) {
-		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
-		// Saturation + Brightness
-		max = (cdest.r + cdest.g + cdest.b) / 3;
-		v = cdest.r + bright;
-		cdest.r = (v > 255 ? 255 : v) + (max - cdest.r) * sat / 100;
-		v = cdest.g + bright;
-		cdest.g = (v > 255 ? 255 : v) + (max - cdest.g) * sat / 100;
-		v = cdest.b + bright;
-		cdest.b = (v > 255 ? 255 : v) + (max - cdest.b) * sat / 100;
-
-		*p = SDL_MapRGB(TheScreen->format, cdest.r, cdest.g, cdest.b);
+    for (i = y; i < ey; ++i) {
+	p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
+	ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[
+	    sy + (i - y) * TheMap.TileGraphic->Surface->w + sx];
+	for (j = x; j < ex; ++j) {
+	    if (COLOR_FOG_P(*ptile)) {
+		*p = ((Uint16*)FogOfWarAlphaTable)[*p];
 	    }
+	    ++p;
+	    ++ptile;
 	}
     }
     VideoUnlockScreen();
 }
+
+// Routines for 24 bit displays .. -------------------------------------------
+
+// FIXME: not written
+global void VideoDraw24OnlyFogAlpha(int x, int y)
+{
+    int i;
+    int j;
+    Uint16* p;
+    int ex;
+    int ey;
+
+    ex = x + TileSizeX;
+    ey = y + TileSizeY;
+
+    VideoLockScreen();
+    for (i = y; i < ey; ++i) {
+	p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
+	for (j = x; j < ex; ++j) {
+	    *p = ((Uint16*)FogOfWarAlphaTable)[*p];
+	    ++p;
+	}
+    }
+    VideoUnlockScreen();
+}
+
+// FIXME: not written
+global void VideoDraw24FogAlpha(const int tile, int x, int y)
+{
+    int i;
+    int j;
+    Uint16* p;
+    Uint8* ptile;
+    int tilepitch;
+    int sx;
+    int sy;
+    int ex;
+    int ey;
+
+    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+    sx = TileSizeX * (tile % tilepitch);
+    sy = TileSizeY * (tile / tilepitch);
+
+    ex = x + TileSizeX;
+    ey = y + TileSizeY;
+
+    VideoLockScreen();
+    for (i = y; i < ey; ++i) {
+	p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
+	ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[
+	    sy + (i - y) * TheMap.TileGraphic->Surface->w + sx];
+	for (j = x; j < ex; ++j) {
+	    if (COLOR_FOG_P(*ptile)) {
+		*p = ((Uint16*)FogOfWarAlphaTable)[*p];
+	    }
+	    ++p;
+	    ++ptile;
+	}
+    }
+    VideoUnlockScreen();
+}
+
+// Routines for 32 bit displays .. -------------------------------------------
+
+// FIXME: not written
+global void VideoDraw32OnlyFogAlpha(int x, int y)
+{
+    int i;
+    int j;
+    Uint16* p;
+    int ex;
+    int ey;
+
+    ex = x + TileSizeX;
+    ey = y + TileSizeY;
+
+    VideoLockScreen();
+    for (i = y; i < ey; ++i) {
+	p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
+	for (j = x; j < ex; ++j) {
+	    *p = ((Uint16*)FogOfWarAlphaTable)[*p];
+	    ++p;
+	}
+    }
+    VideoUnlockScreen();
+}
+
+// FIXME: not written
+global void VideoDraw32FogAlpha(const int tile, int x, int y)
+{
+    int i;
+    int j;
+    Uint16* p;
+    Uint8* ptile;
+    int tilepitch;
+    int sx;
+    int sy;
+    int ex;
+    int ey;
+
+    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+    sx = TileSizeX * (tile % tilepitch);
+    sy = TileSizeY * (tile / tilepitch);
+
+    ex = x + TileSizeX;
+    ey = y + TileSizeY;
+
+    VideoLockScreen();
+    for (i = y; i < ey; ++i) {
+	p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
+	ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[
+	    sy + (i - y) * TheMap.TileGraphic->Surface->w + sx];
+	for (j = x; j < ex; ++j) {
+	    if (COLOR_FOG_P(*ptile)) {
+		*p = ((Uint16*)FogOfWarAlphaTable)[*p];
+	    }
+	    ++p;
+	    ++ptile;
+	}
+    }
+    VideoUnlockScreen();
+}
+
 #else
 // Routines for 8 bit displays .. --------------------------------------------
 
@@ -3016,24 +3080,104 @@ global void InitMapFogOfWar(void)
 #else
 
 #ifdef USE_SDL_SURFACE
-    if (!SolidFog) {
-	SDL_Surface* s;
-	s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
-	    32, RMASK, GMASK, BMASK, AMASK);
-	SDL_FillRect(s, NULL, SDL_MapRGBA(s->format, 0, 0, 0,
-	    (100 - FogOfWarContrast) * 255 / 100));
-//	SolidFog = SDL_DisplayFormatAlpha(s);
-//	SDL_FreeSurface(s);
-	SolidFog = s;
-    }
     if (!OriginalFogOfWar) {
-	VideoDrawFog = VideoDrawFogAlpha;
-	VideoDrawOnlyFog = VideoDrawOnlyFogAlpha;
+	int i;
+	int n;
+	int v;
+	int r, g, b;
+	int rmask, gmask, bmask;
+	int rshft, gshft, bshft;
+	int rloss, gloss, bloss;
+
 	VideoDrawUnexplored = VideoDrawUnexploredSolid;
+	switch (VideoDepth) {
+	    case 8:
+		DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
+		break;
+	    case 15:
+		rshft = ( 0);
+		gshft = ( 5);
+		bshft = (10);
+		rmask = (0x1F << rshft);
+		gmask = (0x1F << gshft);
+		bmask = (0x1F << bshft);
+		rloss = ( 3);
+		gloss = ( 3);
+		bloss = ( 3);
+		goto build_table;
+	    case 16:
+		rshft = ( 0);
+		gshft = ( 5);
+		bshft = (11);
+		rmask = (0x1F << rshft);
+		gmask = (0x3F << gshft);
+		bmask = (0x1F << bshft);
+		rloss = ( 3);
+		gloss = ( 2);
+		bloss = ( 3);
+build_table:
+		n = 1 << (sizeof(Uint16) * 8);
+		if (!FogOfWarAlphaTable) {
+		    FogOfWarAlphaTable = malloc(n * sizeof(Uint16));
+		}
+		for (i = 0; i < n; ++i) {
+		    r = (i & rmask) >> rshft << rloss;
+		    g = (i & gmask) >> gshft << gloss;
+		    b = (i & bmask) >> bshft << bloss;
+		    v = r + g + b;
+
+		    r = ((((r * 3 - v) * FogOfWarSaturation + v * 100) *
+			FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
+		    g = ((((g * 3 - v) * FogOfWarSaturation + v * 100) *
+			FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
+		    b = ((((b * 3 - v) * FogOfWarSaturation + v * 100) *
+			FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
+
+		    // Boundings
+		    r = r < 0 ? 0 : r > 255 ? 255 : r;
+		    g = g < 0 ? 0 : g > 255 ? 255 : g;
+		    b = b < 0 ? 0 : b > 255 ? 255 : b;
+		    ((Uint16*)FogOfWarAlphaTable)[i] =
+			((r >> rloss) << rshft) | ((g >> gloss) << gshft) |
+			((b >> bloss) << bshft);
+		}
+		VideoDrawFog = VideoDraw16FogAlpha;
+		VideoDrawOnlyFog = VideoDraw16OnlyFogAlpha;
+		break;
+	    case 24:
+		VideoDrawFog = VideoDraw24FogAlpha;
+		VideoDrawOnlyFog = VideoDraw24OnlyFogAlpha;
+		break;
+	    case 32:
+		VideoDrawFog = VideoDraw32FogAlpha;
+		VideoDrawOnlyFog = VideoDraw32OnlyFogAlpha;
+		break;
+	    default:
+		DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
+		break;
+	}
     } else {
+	VideoDrawUnexplored = VideoDrawUnexploredSolid;
 	VideoDrawFog = VideoDrawFogSolid;
 	VideoDrawOnlyFog = VideoDrawOnlyFogSolid;
-	VideoDrawUnexplored = VideoDrawUnexploredSolid;
+#if 0
+	switch (VideoDepth) {
+	    case 8:
+		break;
+	    case 15:
+	    case 16:
+		VideoDrawFog = VideoDrawFogSolid;
+		VideoDrawOnlyFog = VideoDrawOnlyFogSolid;
+		break;
+	    case 24:
+		break;
+	    case 32:
+		break;
+	    default:
+		DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
+		break;
+	}
+#endif
     }
 
 #else
