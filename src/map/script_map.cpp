@@ -162,8 +162,9 @@ local SCM CclFreeCraftMap(SCM list)
 
 #ifdef NEW_FOW
 			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("visible")) ) {
-				DebugLevel0Fn("FIXME:\n");
+					gh_symbol2scm("explored")) ) {
+				field=gh_cdr(field);
+				TheMap.Fields[i].Visible[gh_scm2int(gh_car(field))] = 1;
 #else
 			    } else if( gh_eq_p(gh_car(field),
 					gh_symbol2scm("visible")) ) {
