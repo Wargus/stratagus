@@ -153,8 +153,6 @@ global void CreateMinimap(void)
 /**
 **		Update a mini-map from the tiles of the map.
 **
-**		@todo		FIXME: this is not correct should use SeenTile.
-**
 **		FIXME: this can surely be sped up??
 */
 global void UpdateMinimapTerrain(void)
@@ -218,6 +216,10 @@ global void UpdateMinimapXY(int tx, int ty)
 	int yofs;
 	int tilepitch;
 
+	if (!MinimapTerrainSurface) {
+		return;
+	}
+
 	scalex = MinimapScaleX / MINIMAP_FAC;
 	if (scalex == 0) {
 		scalex = 1;
@@ -256,7 +258,10 @@ global void UpdateMinimapXY(int tx, int ty)
 				break;
 			}
 
-			tile = TheMap.Fields[x + y].Tile;
+			tile = TheMap.Fields[x + y].SeenTile;
+			if (!tile) {
+				tile = TheMap.Fields[x + y].Tile;
+			}
 
 			xofs = TileSizeX * (tile % tilepitch);
 			yofs = TileSizeY * (tile / tilepitch);
