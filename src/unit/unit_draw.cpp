@@ -59,6 +59,10 @@ global int ShowHealthHorizontal=1;
 global int ShowManaHorizontal=1;
     /// Flag: show bars and dot energy only for selected
 global int ShowEnergySelectedOnly;
+    /// Flag: show the health background long
+global int ShowHealthBackgroundLong=1;
+    /// Flag: show the mana background long
+global int ShowManaBackgroundLong=1;
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two?
@@ -376,18 +380,30 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 		color=ColorRed;
 	    }
 	    if ( ShowHealthHorizontal )  {
+		//
+		//	Draw the black rectangle in full size?
+		//
+		if( ShowHealthBackgroundLong ) {
+		    VideoFillRectangleClip(ColorBlack
+			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+1
+			,type->BoxHeight+1
+			,5);
+		} else {
 #if defined(DEBUG) && !defined(NEW_ORDERS)
-		// Johns: I want to see fast moving.
-		VideoFillRectangleClip(unit->Command.Data.Move.Fast 
-			? ColorBlack : ColorWhite
+		    // Johns: I want to see fast moving.
+		    VideoFillRectangleClip(unit->Command.Data.Move.Fast 
+			    ? ColorBlack : ColorWhite
 #else
-		VideoFillRectangleClip(ColorBlack
+		    VideoFillRectangleClip(ColorBlack
 #endif
-		    ,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
-		    ,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
-			    +type->BoxHeight+1
-		    ,((f*type->BoxHeight)/100)+1
-		    ,5);
+			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+1
+			,((f*type->BoxHeight)/100)+1
+			,5);
+		}
 		VideoFillRectangleClip(color
 		    ,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)+1
 		    ,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
@@ -452,26 +468,39 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
     //	Mana bar on right side of unit.
     //
     if( ShowManaBar ) {
-	if( type->CanCastSpell
-		&& !(ShowNoFull && unit->Mana==255) ) {
+	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==255) ) {
 	    if ( ShowManaHorizontal == 0)  {
 		f=(100*unit->Mana)/255;
-		    VideoFillRectangleClip(ColorBlue
+		VideoFillRectangleClip(ColorBlue
 			,x+(type->TileWidth*TileSizeX
 				+type->BoxWidth)/2
 			,y+(type->TileHeight*TileSizeY
 				-type->BoxHeight)/2
 			,2,(f*type->BoxHeight)/100);
 	    }  else  {
-		    f=(100*unit->Mana)/255;
+		f=(100*unit->Mana)/255;
+		//
+		//	Draw the black rectangle in full size?
+		//
+		if( ShowManaBackgroundLong ) {
 		    VideoFillRectangleClip(ColorBlack
 			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+5
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+5
 			,(type->BoxHeight)+1
 			,5);
-		    VideoFillRectangleClip(ColorBlue
+		} else {
+		    VideoDrawRectangleClip(ColorBlack
+			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+5
+			,(f*type->BoxHeight)/100
+			,4);
+		}
+		VideoFillRectangleClip(ColorBlue
 			,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+6
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+6
 			,(f*type->BoxHeight)/100-1
 			,3);
 	    }
