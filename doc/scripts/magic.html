@@ -94,7 +94,7 @@ value to determine the draw order.
 <dt>Class = "class-type"</dt>
 <dd>Various missiles can have wierd behaviours. This tag is followed by an 
 identifier that specifies some of that behaviour. Here is a list of currently
-supported missile classes:<p>
+supported missile classes:
 <dl>
     <dt>"missile-class-none"</dt>
     <dd>Missile does nothing. Shouldn't really be used.
@@ -112,11 +112,11 @@ supported missile classes:<p>
     projectile bigger mid-way to the target
     </dd>
     <dt>"missile-class-point-to-point-bounce"</dt>
-    <dl>Missile flies straight to destination, and the "bounces" by hitting
+    <dd>Missile flies straight to destination, and the "bounces" by hitting
 	every other tile on the path onward. This will also add one aditional flag:
-	<dt>num-bounces</dt>
+	<dl><dt>num-bounces</dt>
 	<dd>This if folowed by an integer, representing the number of bounces(hits)</dd>
-    </dl>
+    </dl></dd>
     <dt>"missile-class-stay"</dt>
     <dd>Missile will just go through it's animation once and vanish. booooring.
     </dd>
@@ -215,7 +215,9 @@ conditions. Be very carefull, defining random flags will probably make the game 
 <dd>A neatly formatted string to be shown by the engine on the screen.
 </dd>
 <dt>"manacost", number</dt>
-<dd>The mana cost of the spell. Maybe this should be set on a per-caster basis?
+<dd>The mana cost of the spell. But some actions (AdjustVitals, Summon, Polymorph) use it
+for their own mana calculation and so. If spell use at least of these actions, mana is computed
+by these action (which use manacost also),else it was substract from caster mana.
 </dd>
 <dt>"repeat-cast" </dt>
 <dd>If specified, the caster will cast it again. To be used with spells like
@@ -244,7 +246,7 @@ on the unit properties. Here is how a condition looks like:
 <pre>"condition", {
   "building", "false"
   "max-slow-ticks", 10}</pre>
-Here are the supported parameters:<p>
+Here are the supported parameters:
 <dl>
     <dt>"alliance", "true" or "false" or "only"</dt>
     <dd>This is one of the bool parameters (can't think of a better name). It is
@@ -274,7 +276,7 @@ Here are the supported parameters:<p>
     </dd>
     <dt>variable, {flag = value}</dt>
     <dd>There is no parameter called variable. You can however use variables defined
-    by <a href="unittype.html#DefineVariables">DefineVariables()</a></dd>
+    by <a href="unittype.html#DefineVariables">DefineVariables()</a>
     <dl>
       <dt>Enable, "true" or "false" or "only" </dt>
       <dd>variable is enable ?</dd>
@@ -288,7 +290,7 @@ Here are the supported parameters:<p>
       <dd>maximal value allowed in percent with Max value</dd>
       <dt>ConditionApplyOnCaster, boolean </dt>
       <dd>if true, check caster instead of target</dd>
-    <dl>
+    </dl></dd>
     <dt>"min-hp-percent", number</dt>
     <dd>Minimum hp percent of the target. If not specified the minimum is around -10
     You can use this to avoid casting damage spells on enemies that are dying anyway.
@@ -299,7 +301,7 @@ Here are the supported parameters:<p>
     </dd>
     <dt>"min-mana-percent", number</dt>
     <dd>Minimum mana percent of the target. If not specified the minimum is around -10
-    You can use this to avoid spells like mana drain on units that are empty. 
+    You can use this to avoid spells like mana drain on units that are empty.
     </dd>
     <dt>"max-mana-percent", number</dt>
     <dd>Maximum mana percent of the target. If not specified the maximum is around 1000
@@ -321,7 +323,7 @@ Here are the supported parameters:<p>
     <dd>Followed by a number, to avoid casting invincibility on an unit that already has it.
     </dd>
 </dl>
-</dd><p>
+</dd>
 <dt>"autocast", {flag, value}</dt>
 <dd>Autocast works very closely with conditions.
 It functions by selecting every unit in range and trying to check of they fit the
@@ -329,7 +331,7 @@ condition. If they do, the spell is casted. Of course, this is a very primitive
 mechanism, but it works for simple spells like heal. As you might have noticed, some
 of the finer restrictions in conditions are designed for autocast (like not casting
 buffs on cowards). Autocasting position target spells is not supported, sorry.
-Here is a formal list of parameters:</dd>
+Here is a formal list of parameters:
 <dl>
     <dt>"range", number</dt>
     <dd>The range in which autocast runs. I think it's square?
@@ -353,15 +355,15 @@ Here is a formal list of parameters:</dd>
 player) rather then by a human players units. In general this should be a little better
 than autocast (and make human players think some more). There no reason to repeat the
 syntax of autocast here.
-</dd><p>
+</dd>
 <dt>"action", {{"operation-name", flag, value, ...} , ...}</dt>
 <dd>The effect of the spells. You can add multiple actions.
-Here are the supported operations, their paramenters, and what they do.</dd><p>
+Here are the supported operations, their paramenters, and what they do.
 <dl>
     <dt>"area-bombardment"</dt>
-    <dl>This will a number of missiles to be thrown in a square area. Here are
+    <dd>This will a number of missiles to be thrown in a square area. Here are
     the available tags:
-	<dt>"fields", number</dt>
+	<dl><dt>"fields", number</dt>
 	<dd>The size of the affected square. This will get centered on the target
 	It should really be an odd number, or it will look wierd (not centered.)
 	</dd>
@@ -376,14 +378,14 @@ Here are the supported operations, their paramenters, and what they do.</dd><p>
 	<dd>A missile hitting x,y will start at x + start-offset-x, y + start-offset-y.
 	This value is in pixels, for better precision.
 	</dd>
-    </dl>
+    </dl></dd>
     <dt>"adjust-buffs", "buff-name", number</dt>
-    <dl>This spell with set the time left for every buff. Buffs are temporary
+    <dd>This spell with set the time left for every buff. Buffs are temporary
 	bonuses or penalties for units, like better damage or reduced speed(on enemies)
 	when setting buff-1-ticks 567 the unit will have 567 ticks of buff-1 left. 0 is
 	also a value, in fact acting like some sort of dispel magic. Unfortunately
 	this is quite limited at the moment, here are the buffs provided and what they do.
-    	<dt>"haste-ticks"</dt>
+    	<dl><dt>"haste-ticks"</dt>
 	<dd>The number of haste ticks. Haste gives the unit almost double speed
 	for any activity.
 	</dd>
@@ -405,11 +407,11 @@ Here are the supported operations, their paramenters, and what they do.</dd><p>
 	<dd>The number of invincibility ticks. This makes the unit completely imune
 	to all forms of damage. Try using very low values for this :).
 	</dd>
-    </dl>
+    </dl></dd>
     <dt>"adjust-variable", {tag, ...}</dt>
-    <dl>This will adjust variable of the unit
+    <dd>This will adjust variable of the unit
       (defined by <a href="unittype.html#DefineVariables">DefineVariables()</a>)
-      <dt>Index = variable-name</dt>
+      <dl><dt>Index = variable-name</dt>
       <dd>Variable to modify.</dd>
       <dt>Enable = boolean</dt>
       <dd>Set Enable value.</dd>
@@ -431,11 +433,14 @@ Here are the supported operations, their paramenters, and what they do.</dd><p>
       <dd>add number time Increase to the value.</dd>
       <dt>TargetIsCaster = "target" or "caster"</dt>
       <dd>Apply to target or caster.</dd>
-    </dl>
+    </dl></dd>
     <dt>"adjust-vitals", tag, ...</dt>
-    <dl>This will adjust vitals of the unit. Vitals are health, mana, and on a sunny
-	day maybe even shield. Possible tags:
-	<dt>"hit-points", number</dt>
+    <dd>This will adjust vitals of the unit. Vitals are health, mana, and on a sunny
+	day maybe even shield. mana of caster is modified like this :
+	newmana = oldmana - manacost * castcount.
+	Where castcount is the number of time vitals are inc/decreased.
+	Possible tags:
+	<dl><dt>"hit-points", number</dt>
 	<dd>Unit hit-point gain, or loss if negative.
 	</dd>
 	<dt>"mana", number</dt>
@@ -448,23 +453,24 @@ Here are the supported operations, their paramenters, and what they do.</dd><p>
 	value so the spell can only get casted so many times at once. Like heal
 	2 hit-points for 1 caster mana up to 20 hit-points/10 mana per cast
 	</dd>
-    </dl>
+    </dl></dd>
     <dt>"demolish", tag, ...</dt>
-    <dl>This will remove any trees/rocks/walls in and inflict a fixed damage
+    <dd>This will remove any trees/rocks/walls in and inflict a fixed damage
     to a fixed area. Possible tags:
-    	<dt>"damage", number</dt>
+    	<dl><dt>"damage", number</dt>
 	<dd>Each and every unit in range will receive that damage. FIXME: no
 	support for dampening damage.
 	</dd>
 	<dt>"range", number</dt>
 	<dd>The range of the terrain and unit damage.
 	</dd>
-    </dl>
+    </dl></dd>
     <dt>"summon", tag, ...</dt>
-    <dl>This will summon a new unit. Possible tags:
-	<dt>"unit-type", "unit-type-name"</dt>
-	<dd>Type of the unit to summon. Must be already defined.
-	</dd>
+    <dd>This will summon a new unit.
+		Manacost is substracted if action success (failed when no corpse or no place).
+		Possible tags:
+	<dl><dt>"unit-type", "unit-type-name"</dt>
+	<dd>Type of the unit to summon. Must be already defined.</dd>
 	<dt>"ttl", number</dt>
 	<dd>Time to live. The unit will only survive for that time, afterward it
 	will receive 1 damage every game cycle, ending it's life. If this is 0
@@ -474,26 +480,26 @@ Here are the supported operations, their paramenters, and what they do.</dd><p>
 	<dd>This flag does not take a value. When specified, the caster will
 	summon an unit from a corpse, and consume the corpse in the process.
 	You should make sure the summoned unit dies without a corpse.
-	</dd>
-	How to do a reveal-map spell: define a special unit, give it the 
+	</dd></dl>
+	How to do a reveal-map spell: define a special unit, give it the
 	revealer flag, and set the spell's range to "infinite". Please see
 	<a href="unittype.html#DefineUnitType">DefineUnitType()</a>
 	</dd>
-    </dl>
     <dt>"polymorph", tag, ...</dt>
-    <dl>This will tranform the unit, giving it a new unit type. Before you
+    <dd>This will tranform the unit, giving it a new unit type. Before you
 	ask, temporary polymorphing is not supported, but it would be a nice
-	feature to add in the future. There is only one tag:
-	<dt>"new-form", unit-type-name"</dt>
+	feature to add in the future. Mana is substracted if action sucess (fail if no place for the new unit)
+	There is only one tag:
+	<dl><dt>"new-form", "unit-type-name"</dt>
 	<dd>Type of the unit to transform to. Must be already defined. This spell
 	can be used as an instant-kill spell by polymorphing into a harmless unit,
 	like a chicken.
 	</dd>
-    </dl>
+    </dl></dd>
     <dt>"spawn-missile", tag, ...</dt>
-    <dl>This will spawn a missile in the game. It's one of the most versatile
+    <dd>This will spawn a missile in the game. It's one of the most versatile
     spell variants. Here are the paramenters:
-    	<dt>"ttl", number</dt>
+    	<dl><dt>"ttl", number</dt>
 	<dd>Time to live for the missile. Usually means that the missile is
 	gone after this time, but for some missile classes it means something else.
 	</dd>
@@ -507,9 +513,9 @@ Here are the supported operations, their paramenters, and what they do.</dd><p>
 	</dd>
 	<dt>"start-point", {flag, value, ...}</dt>
 	<dt>"end-point", {flag, value, ...}</dt>
-	<dl>Point to point-ish missiles need a start and an end point for the
+	<dd>Point to point-ish missiles need a start and an end point for the
 	    trajectory.
-	    <dt>"base", "caster" or "target"</dt>
+	    <dl><dt>"base", "caster" or "target"</dt>
 	    <dd>The base for the location calculation. Can be either caster or target.
 	    </dd>
 	    <dt>"add-x", number</dt>
@@ -520,14 +526,13 @@ Here are the supported operations, their paramenters, and what they do.</dd><p>
 	    <dt>"add-rand-y", number</dt>
 	    <dd>Add a random from 0 to number to the x or y coordinate, in pixels
 	    </dd>
-	</dl>
-    </dl>
+	</dl></dd>
+    </dl></dd>
 </dl>
 </dd>
 <dt>"depend-upgrade", "upgrade-name"</dt>
 <dd>The dependency of the spell. Spell is available only once the upgrade is searched.
-Upgrade must be already declare.</dd><p>
-<dl>
+Upgrade must be already declare.</dd>
 </dl>
 
 <h4>Example</h4>
