@@ -351,6 +351,7 @@ global void HandleActionBuilded(Unit* unit)
 	    MapSetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
             RemoveUnit(unit);
 	    UnitLost(unit);
+	    UnitClearOrders(unit);
 	    ReleaseUnit(unit);
 	    return;
         }

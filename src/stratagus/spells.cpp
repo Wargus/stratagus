@@ -920,6 +920,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    if( target->Type->Volatile ) {
 		RemoveUnit(target);
 		UnitLost(target);
+		UnitClearOrders(target);
 		ReleaseUnit(target);
 		MakeMissile(MissileTypeExplosion,
 			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
@@ -951,6 +952,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    // as said somewhere else -- no corpses :)
 	    RemoveUnit(target);
 	    UnitLost(target);
+	    UnitClearOrders(target);
 	    ReleaseUnit(target);
 	    type=UnitTypeCritter;
 	    if( UnitTypeCanMoveTo(x,y,type) ) {
@@ -1223,6 +1225,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    if( target->Type->Volatile ) {
 		RemoveUnit(target);
 		UnitLost(target);
+		UnitClearOrders(target);
 		ReleaseUnit(target);
 		MakeMissile(MissileTypeExplosion,
 			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
