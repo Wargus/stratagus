@@ -39,6 +39,7 @@
 #include "map.h"
 #include "ui.h"
 #include "cursor.h"
+#include "iolib.h"
 
 #ifdef USE_SDL
 #include <SDL/SDL.h>
@@ -323,26 +324,24 @@ global void DisplayPicture(const char *name)
 */
 global void LoadRGB(Palette *pal, const char *name)
 {
-    FILE *fp;
+    CLFile *fp;
     int i;
     unsigned char *p;
     unsigned char buffer[256*3];
 
-    if( (fp=fopen(name,"rb")) == NULL ||
-        fread(buffer,sizeof(unsigned char),256*3,fp)<256*3 )
-    {
+    if( !(fp=CLopen(name)) || CLread(fp,buffer,256*3)!=256*3 ) {
 	fprintf(stderr,"Can't load palette %s\n",name);
 	exit(-1);
     }
 
     p=buffer;
-    for(i=0;i<256;i++){
+    for( i=0;i<256;i++ ) {
 	pal[i].r=(*p++)<<2;
 	pal[i].g=(*p++)<<2;
 	pal[i].b=(*p++)<<2;
     }
 
-    fclose(fp);
+    CLclose(fp);
 }
 
 // FIXME: this isn't 100% correct
