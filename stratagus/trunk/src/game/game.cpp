@@ -336,6 +336,15 @@ global void CreateGame(char* filename, WorldMap* map)
 	    case SettingsGameTypeFreeForAll:
 		GameTypeFreeForAll();
 		break;
+	    case SettingsGameTypeTopVsBottom:
+		GameTypeTopVsBottom();
+		break;
+	    case SettingsGameTypeLeftVsRight:
+		GameTypeLeftVsRight();
+		break;
+
+	    // Future game type ideas
+#if 0
 	    case SettingsGameTypeOneOnOne:
 		break;
 	    case SettingsGameTypeCaptureTheFlag:
@@ -350,12 +359,7 @@ global void CreateGame(char* filename, WorldMap* map)
 		break;
 	    case SettingsGameTypeTeamCaptureTheFlag:
 		break;
-	    case SettingsGameTypeTopVsBottom:
-		GameTypeTopVsBottom();
-		break;
-	    case SettingsGameTypeLeftVsRight:
-		GameTypeLeftVsRight();
-		break;
+#endif
 	}
     }
 
