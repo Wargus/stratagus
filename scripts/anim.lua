@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	anim.ccl	-	The unit animation definitions.
+--	anim.lua	-	The unit animation definitions.
 --
 --	(c) Copyright 2000-2004 by Josh Cogliati, Lutz Sammer, Crestez Leonard
 --
@@ -189,12 +189,6 @@ DefineAnimations("animations-vfac",
 		{0, 0, 3, 0}, {0, 0, 3, 1}, {0, 0, 3, 2}, {0, 0, 3, 3},
 		{0, 0, 3, 4}, {0, 0, 3, 5}, {0, 0, 3, 6}, {0, 0, 3, 7},
 		{3, 0, 3, 8}}) 
-
-DefineAnimations("animations-gturret",
-	"still", {{3, 0, 1, 4}},
-	"attack", {
-		{0, 0, 1, 0}, {0, 0, 1, 5}, {0, 0, 1, 0}, {0, 0, 1, 5},{0, 0, 1, 0}, {12, 0, 1, 5},
-		{3, 0, 1, 0}})
 
 ----------------------
 -------- Nature ------

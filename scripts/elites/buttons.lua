@@ -145,11 +145,6 @@ DefineButton({
 	ForUnit = {"unit-engineer"}})
 
 DefineButton({
-	Pos = 2, Level = 3, Icon = "icon-gturret_b", Action = "build",
-	Value = "unit-gturret", Key = "g", Hint = "BUILD ~!GUN TURRET",
-	ForUnit = {"unit-engineer"}})
-
-DefineButton({
 	Pos = 4, Level = 3, Icon = "icon-msilo_b", Action = "build",
 	Value = "unit-msilo", Key = "m", Hint = "BUILD ~!MISSILE SILO",
 	ForUnit = {"unit-engineer"}})

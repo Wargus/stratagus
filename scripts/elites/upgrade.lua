@@ -46,7 +46,6 @@ DefineAllow("unit-apcs", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-human-wall", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-msilo", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-plate1", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-gturret", "AAAAAAAAAAAAAAAA")
 
 --	- upgrades
 
@@ -106,4 +105,4 @@ DefineDependency("unit-gen", {"unit-vault"})
 DefineDependency("unit-hosp", {"unit-vault", "unit-camp"})
 DefineDependency("unit-vfac", {"unit-vault", "unit-rfac"})
 DefineDependency("unit-msilo", {"unit-vault", "unit-rfac", "unit-dev-yard"})
-DefineDependency("unit-gturret", {"unit-vault"})
+
