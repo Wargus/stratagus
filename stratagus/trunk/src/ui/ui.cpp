@@ -10,12 +10,11 @@
 //
 /**@name ui.c		-	The user interface globals. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer and Andreas Arens
+//	(c) Copyright 1999-2002 by Lutz Sammer and Andreas Arens
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -53,98 +52,8 @@ global int SpeedMouseScroll=MOUSE_SCROLL_SPEED;
 
 /**
 **	The user interface configuration
-**
-**	@todo FIXME: check if everything is initialized from ccl.
 */
-global UI TheUI
-#if 0	// FIXME: 0
-= {
-    "default", 640, 480,		// interface selector
-    100, 0, 100,			// contrast, brightness, saturation
-
-    1,					// mouse scrolling
-    0,					// reverse mouse
-    -1,					// warp x
-    -1,					// warp y
-    MOUSEADJUST,			// mouse speed
-    MOUSESCALE,				// mouse scale
-
-    { NULL, NULL }, 0, 0,
-    { NULL, NULL }, 0, 0,
-
-    0,
-
-    {
-	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
-	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
-	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
-	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
-	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
-	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
-    },
-    { NULL, NULL }, 0, 0, 0, 0, 0, 0, 0,
-    { NULL, NULL }, 0, 0, 0, 0, 0, 0, 0,
-
-    { NULL, NULL }, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
-
-    { NULL, NULL }, 0, 0,
-
-    0, 0,
-    0, 0,
-
-    { NULL, NULL }, 0, 0,
-    { NULL, NULL }, 0, 0,
-    { NULL, NULL }, 0, 0,
-
-    {
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-    },
-    {
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-	{ 0,0, 0,0 },
-    },
-
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-    { NULL, NULL },
-};
-#else
-    ;
-#endif
+global UI TheUI;
 
 /**
 **	The available user interfaces.
@@ -448,8 +357,20 @@ global void CleanUserInterface(void)
     VideoSaveFree(TheUI.VictoryPanel.Graphic);
     VideoSaveFree(TheUI.ScenarioPanel.Graphic);
 
-    // FIXME: Johns: Implement this correctly or we will lose memory!
+#if 0
+    //
+    //	Free the available user interfaces.
+    //
+    if( UI_Table ) {
+	for( i=0; UI_Table[i]; ++i ) {
+	    DebugLevel0Fn("FIXME: not completely written\n");
+	}
+	free(UI_Table);
+	UI_Table=NULL;
+    }
+#endif
 
+    // FIXME: Johns: Implement this correctly or we will lose memory!
     DebugLevel0Fn("FIXME: not completely written\n");
 
     memset(&TheUI,0,sizeof(TheUI));

@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -50,6 +49,7 @@
 #include "minimap.h"
 #include "network.h"
 #include "font.h"
+#include "campaign.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -575,6 +575,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
+	    GameResult=GameDefeat;
 	    GameRunning=0;
 	    break;
 
@@ -634,6 +635,8 @@ local int InputKey(int key)
 		    SetMessage("!!! :)");
 		} else if (strcmp(Input, "on screen") == 0) {
 		    RevealMap();
+		} else if (!strcmp(Input, "showpath")) {
+		    RevealMap();
 		} else if (strcmp(Input, "fow on") == 0) {
 		    TheMap.NoFogOfWar = 0;
 		    UpdateFogOfWarChange();
@@ -687,6 +690,12 @@ local int InputKey(int key)
 		    ThisPlayer->Resources[CoalCost] += 32000;
 		    MustRedraw |= RedrawResources;
 		    SetMessage("SO!");
+		} else if (!strcmp(Input, "unite the clans") ) {
+		    GameRunning=0;
+		    GameResult=GameVictory;
+		} else if (!strcmp(Input, "you pitiful worm") ) {
+		    GameRunning=0;
+		    GameResult=GameDefeat;
 		} else {
 		    // FIXME: only to selected players ...
 		}

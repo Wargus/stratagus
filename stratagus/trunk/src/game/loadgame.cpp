@@ -45,6 +45,7 @@
 #include "ccl.h"
 #include "ui.h"
 #include "ai.h"
+#include "campaign.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -66,6 +67,7 @@ global void CleanModules(void)
     CleanIcons();
     CleanCursors();
     CleanUserInterface();
+    CleanCampaign();
     CleanAi();
     CleanPlayers();
     CleanConstructions();

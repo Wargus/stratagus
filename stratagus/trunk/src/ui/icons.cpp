@@ -241,14 +241,6 @@ global void CleanIcons(void)
 	    hash_del(IconHash,str);
 	    free(str);
 	    hash_del(IconHash,Icons[i]->Ident);
-#if 0
-	    // NOTE hash_del not supported
-	    ptr=(void**)hash_find(IconHash,str);
-	    free(str);
-	    *ptr=NULL;
-	    ptr=(void**)hash_find(IconHash,Icons[i]->Ident);
-	    *ptr=NULL;
-#endif
 
 	    free(Icons[i]->Ident);
 	    free(Icons[i]->Tileset);
@@ -283,10 +275,6 @@ global void CleanIcons(void)
     if( IconAliases ) {
 	for( i=0; i<NumIconAliases; ++i ) {
 	    hash_del(IconHash,IconAliases[i*2+0]);
-	    // NOTE hash_del not supported
-	    //ptr=(void**)hash_find(IconHash,IconAliases[i*2+0]);
-	    //*ptr=NULL;
-
 	    free(IconAliases[i*2+0]);
 	    free(IconAliases[i*2+1]);
 	}

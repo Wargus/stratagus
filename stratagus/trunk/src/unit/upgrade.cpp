@@ -187,8 +187,6 @@ global void CleanUpgrades(void)
     //
     for( i=0; i<UpgradesCount; ++i ) {
 	hash_del(UpgradeHash,Upgrades[i].Ident);
-	// FIXME: hash_del not supported
-	//*(Upgrade**)hash_add(UpgradeHash,Upgrades[i].Ident)=NULL;
 	free(Upgrades[i].Ident);
 	free(Upgrades[i].Icon.Name);
     }
