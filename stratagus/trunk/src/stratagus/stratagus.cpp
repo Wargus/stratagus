@@ -1075,7 +1075,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    // FIXME: If second loop?
 
 	    if( !PlayingMusic && strcmp(TitleMusic,MenuMusic) ) {
-		if (!strcmp(CDMode, ":off")) {
+		if (CDMode == CDModeOff) {
 		    PlayMusic(MenuMusic);
 		} else {
 		    CDRomCheck(NULL);

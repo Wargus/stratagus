@@ -376,12 +376,23 @@ local SCM CclSetMusicVolume(SCM volume)
 local SCM CclSetCdMode(SCM mode)
 {
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
-    char *str;
+    int cdmode;
+    char *str = gh_scm2newstr(mode, NULL);
 
-    if ( !gh_null_p(mode) ) {
-        PlayCDRom(str = gh_scm2newstr(mode,NULL));
-        free(str);
+    if (!strcmp(str, "all")) {
+	cdmode = CDModeAll;
+    } else if (!strcmp(str, "random")) {
+	cdmode = CDModeRandom;
+    } else if (!strcmp(str, "defined")) {
+	cdmode = CDModeDefined;
+    } else {
+	free(str);
+	return mode;
     }
+
+    free(str);
+
+    PlayCDRom(cdmode);
 #endif
     return mode;
 }

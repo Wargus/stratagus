@@ -230,22 +230,22 @@ global void StopMusic(void)
 global int CDRomCheck(void *unused __attribute__ ((unused)))
 {
 #if defined(USE_SDLCD)
-    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
+    if (CDMode != CDModeOff && CDMode != CDModeStopped)
 	    && SDL_CDStatus(CDRom) == 1) {
 	DebugLevel0Fn("Playing new track\n");
-	if (!strcmp(CDMode, ":all")) {
+	if (CDMode == CDModeAll) {
 	    PlayCDRom(":all");
-	} else if (!strcmp(CDMode, ":random")) {
+	} else if (CDMode == CDModeRandom) {
 	    PlayCDRom(":random");
 	}
     }
 #elif defined(USE_LIBCDA)
-    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
-	    && !cd_current_track() && strcmp(CDMode, ":defined")) {
+    if (CDMode != CDModeRandom && CDMode != CDModeStopped
+	    && !cd_current_track() && CDMode != CDModeDefined) {
 	DebugLevel0Fn("Playing new track\n");
 	PlayCDRom(CDMode);
-    } else if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")) {
-	if (!strcmp(CDMode, ":defined")) {
+    } else if (CDMode != CDModeOff && CDMode != CDModeStopped) {
+	if (CDMode == CDModeDefined) {
 	    PlayCDRom(CDMode);
 	}
 	DebugLevel0Fn("get track\n");
@@ -255,12 +255,12 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
 	}
     }
 #elif defined(USE_CDDA)
-    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
+    if (CDMode != CDModeOff && CDMode != CDModeStopped)
 	    && !PlayingMusic) {
 	DebugLevel0Fn("Playing new track\n");
-	if (!strcmp(CDMode, ":all")) {
+	if (CDMode == CDModeAll) {
 	    PlayCDRom(":all");
-	} else if (!strcmp(CDMode, ":random")) {
+	} else if (CDMode == CDModeRandom) {
 	    PlayCDRom(":random");
 	}
     }
@@ -1199,7 +1199,7 @@ global int InitSound(void)
     DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
 #endif
 
-    if( TitleMusic && (!strcmp(CDMode, ":off")) ) {
+    if( TitleMusic && (CDMode == CDModeOff || CDMode == CDModeStopped) ) {
 	PlayMusic(TitleMusic);
     }
 
@@ -1272,21 +1272,21 @@ global void QuitSound(void)
 global void QuitCD(void)
 {
 #if defined(USE_SDLCD)
-    if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped"))
+    if (CDMode != CDModeOff && CDMode != CDModeStopped)
 	SDL_CDStop(CDRom);
-	CDMode = ":stopped";
-    if (strcmp(CDMode,":off")) {
+	CDMode = CDModeStopped;
+    if (CDMode != CDModeStopped) {
         SDL_CDClose(CDRom);
-	CDMode = ":off";
+	CDMode = CDModeOff;
     }
 #elif defined(USE_LIBCDA)
-    if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped"))
+    if (CDMode != CDModeOff && CDMode != CDModeStopped)
         cd_stop();
-	CDMode = ":stopped";
-    if (strcmp(CDMode,":off")) {
+	CDMode = CDModeStopped;
+    if (CDMode == CDModeStopped) {
         cd_close();
         cd_exit();
-	CDMode = ":off";
+	CDMode = CDModeOff;
     }
 #elif defined(USE_CDDA)
     close(CDDrive);
