@@ -1642,13 +1642,11 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 #ifdef USE_WIN32
     HGLOBAL handle;
 #elif defined(_XLIB_H_)
-/*
     Display *display;
-    Window w;
+    Window window;
     Atom rettype;
-    unsigned long nitem, bytes;
+    unsigned long nitem, bytes, dummy;
     int retform, ret;
-*/
 #endif
 #endif
 
@@ -1743,23 +1741,32 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			    break;
 			}
 #elif defined(_XLIB_H_)
-
-/*
 			if (!(display = XOpenDisplay(NULL)))
-			    break;			
-//			if ((w = XGetSelectionOwner(display, XA_PRIMARY)) == None)
-			if ((w = DefaultRootWindow(display)) == None)
-			    break;
+				break;
 
-			ret = XGetWindowProperty(display, w, XA_CUT_BUFFER0,
-					   0, 1024, False, AnyPropertyType,
-					   &rettype, &retform, &nitem, &bytes,
-					   (unsigned char **)&clipboard);
+			if ((window = XGetSelectionOwner(display, XA_PRIMARY)) == None) {
+				XCloseDisplay(display);
+				break;
+			}
+
+			XConvertSelection(display, XA_PRIMARY, XA_STRING, XA_STRING,
+					  window, CurrentTime);
+
+			XFlush(display);
+
+			XGetWindowProperty(display, window, XA_STRING, 0, 0, 0,
+					   AnyPropertyType, &rettype, &retform,
+					   &nitem, &bytes, (unsigned char **)&clipboard);
+
+			if (bytes > 0) {
+			    ret = XGetWindowProperty(display, window, XA_STRING, 0, bytes, False, 
+						     AnyPropertyType, &rettype, &retform, &nitem, 
+						     &dummy, (unsigned char **)&clipboard);
+			} else {
+			    break;
+			}
 
 			XCloseDisplay(display);
-*/
-			clipboard = "";
-
 #endif
 			for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i) {
 			    if (clipboard[i] != '\r' && clipboard[i] != '\n') {
@@ -1771,6 +1778,9 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 #ifdef USE_WIN32
 			GlobalUnlock(handle);
 			CloseClipboard();
+#elif defined(_XLIB_H_)
+			if (clipboard != NULL)
+				XFree(clipboard);
 #endif
 			MustRedraw |= RedrawMenu;
 #endif
