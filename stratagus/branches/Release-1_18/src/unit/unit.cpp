@@ -4390,7 +4390,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
 		    unit->Data.Builded.Sum,unit->Data.Builded.Add,
 		    unit->Data.Builded.Val,unit->Data.Builded.Sub);
 	    if( unit->Data.Builded.Cancel ) {
-		fprintf(file,"cancel");
+		fprintf(file," cancel");
 	    }
 	    fprintf(file,")");
 	    break;
