@@ -553,6 +553,13 @@ global void PlayMusic(const char* name)
 
     name = LibraryFileName(name, buffer);
 
+    if ((sample = LoadWav(name, PlayAudioStream))) {
+	StopMusic();
+	MusicSample = sample;
+	PlayingMusic = 1;
+	return;
+    }
+
 #ifdef USE_OGG
     if ((sample = LoadOgg(name, PlayAudioStream))) {
 	if ((sample->Channels != 1 && sample->Channels != 2)
