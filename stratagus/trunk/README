@@ -9,12 +9,13 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 
-Read doc/gpl.html for the software license informations.
-Read doc/gpl.html for the content (art) license informations.
+Read doc/gpl.html for the FreeCraft software license informations.
+Read doc/gpl.html for the FreeCraft content (art) license informations.
 Read doc/readme.html for more informations.
 Read doc/install.html to install or upgrade FreeCraft.
 
 Note:
+  Extracted graphics and sounds are copyright by the original creator.
   SIOD Copyright by PARADIGM ASSOCIATES INCORPORATED, CAMBRIDGE, MASSACHUSETTS.
   ETLIB Copyright by Edgar Toernig.
   libmodplug Copyright by Kenton Varda & Olivier Lapique.
