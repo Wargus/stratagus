@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 #include <string.h>
 #include <stdio.h>
@@ -51,27 +51,28 @@
 #include "spells.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 #ifdef DEBUG
-extern int NoWarningUnitType;				/// quiet ident lookup.
+extern int NoWarningUnitType;               /// quiet ident lookup.
 #endif
 
-global _AnimationsHash AnimationsHash;		/// Animations hash table
+global _AnimationsHash AnimationsHash;      /// Animations hash table
 
-global char** BoolFlagName = NULL;		/// Name of user defined flag
-global int NumberBoolFlag = 0;				/// Number of defined flags.
+global char** BoolFlagName;                 /// Name of user defined flag
+global int NumberBoolFlag;                  /// Number of defined flags.
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-** 		Get the resource ID from a SCM object.
+**  Get the resource ID from a SCM object.
 **
-** 		@param value		SCM thingie
-**		@return 		the resource id
+**  @param value  SCM thingie
+**
+**  @return       the resource id
 */
 global unsigned CclGetResourceByName(lua_State* l)
 {
@@ -90,11 +91,11 @@ global unsigned CclGetResourceByName(lua_State* l)
 }
 
 /**
-**		Parse unit-type.
+**  Parse unit-type.
 **
-**		@note Should write a general parser for this.
+**  @note Should write a general parser for this.
 **
-**		@param list		List describing the unit-type.
+**  @param list  List describing the unit-type.
 */
 local int CclDefineUnitType(lua_State* l)
 {
@@ -113,7 +114,7 @@ local int CclDefineUnitType(lua_State* l)
 		lua_error(l);
 	}
 
-	//		Slot identifier
+	// Slot identifier
 	str = strdup(LuaToString(l, 1));
 
 #ifdef DEBUG
@@ -131,20 +132,16 @@ local int CclDefineUnitType(lua_State* l)
 	} else {
 		DebugLevel3Fn("Defining unit-type `%s'\n" _C_ str);
 		type = NewUnitTypeSlot(str);
+		type->BoolFlag = calloc(NumberBoolFlag, sizeof(*type->BoolFlag));
+		type->CanTargetFlag = calloc(NumberBoolFlag, sizeof(*type->CanTargetFlag));
 		redefine = 0;
-		//Set some default values
-		type->_RegenerationRate = 0;
 	}
-	type->BoolFlag = realloc(type->BoolFlag, NumberBoolFlag * sizeof (*type->BoolFlag));
-	memset(type->BoolFlag, 0, NumberBoolFlag * sizeof (*type->BoolFlag));
-	type->CanTargetFlag = realloc(type->CanTargetFlag, NumberBoolFlag * sizeof (*type->CanTargetFlag));
-	memset(type->CanTargetFlag, 0, NumberBoolFlag * sizeof (*type->CanTargetFlag));
 
 	type->NumDirections = 8;
 	type->Flip = 1;
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	//  Parse the list: (still everything could be changed!)
 	//
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
