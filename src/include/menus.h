@@ -44,6 +44,8 @@ typedef unsigned MenuButtonId;
 #define MBUTTON_GM_HALF		10
 #define MBUTTON_132		13
 #define MBUTTON_GM_FULL		16
+#define MBUTTON_DOWN_ARROW	32
+#define MBUTTON_PULLDOWN	46
 
 /*----------------------------------------------------------------------------
 --	Menus
@@ -71,18 +73,35 @@ typedef struct _menuitem_ {
 	    unsigned xsize;
 	    unsigned ysize;
 	    MenuButtonId button;
-	    int hotkey;
 	    void (*handler)(void);
+	    int hotkey;
 	} button;
+	struct {
+	    unsigned xofs;
+	    unsigned yofs;
+	    unsigned flags;
+	    int font;
+	    unsigned char **options;
+	    unsigned xsize;
+	    unsigned ysize;
+	    MenuButtonId button;
+	    void (*handler)(void);
+	    int noptions;
+	    int defopt;
+	    int curopt;
+	    int cursel;		/* used in popup state */
+	} pulldown;
 	/// ... add here ...
     } d;
 } Menuitem;
 
 #define MI_TYPE_TEXT 1
 #define MI_TYPE_BUTTON 2
+#define MI_TYPE_PULLDOWN 3
 
     /// for MI_TYPE_TEXT
 #define MI_FLAGS_CENTERED 1
+#define MI_FLAGS_RALIGN 2
 
 /**
 **	Menu definition.
