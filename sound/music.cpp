@@ -226,13 +226,15 @@ local int PlayCDRom(const char* name)
 {
     if (!strcmp(CDMode, ":off")) {
 	if (!strncmp(name, ":", 1)) {
-	    if (cd_init() < 0) {
+	    if (cd_init()) {
 		fprintf(stderr, "Error initialising libcda \n");
+		CDMode = ":off";
 		return 1;
 	    }
-	    if (cd_get_tracks(&CDTrack, &NumCDTracks) == -1)
+	    if (cd_get_tracks(&CDTrack, &NumCDTracks))
 		return 1;
 	    if (NumCDTracks == 0) {
+		CDMode = ":off";
 		return 1;
 	    }
 	    --CDTrack;
