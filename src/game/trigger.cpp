@@ -62,6 +62,9 @@ extern UnitType* CclGetUnitType(SCM ptr);
 
 local SCM Trigger;			/// Current trigger
 global Timer GameTimer;			/// The game timer
+local unsigned long WaitFrame;		/// Frame to wait for
+local SCM WaitScript;			/// Script to run after wait is over
+local SCM WaitTrigger;			/// Old Trigger value during wait
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -742,6 +745,16 @@ local SCM CclActionStopTimer(void)
 }
 
 /**
+**	Action wait
+*/
+local SCM CclActionWait(SCM ms)
+{
+    WaitFrame=FrameCounter+
+	(FRAMES_PER_SECOND*VideoSyncSpeed/100*gh_scm2int(ms)+999)/1000;
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Add a trigger.
 */
 local SCM CclAddTrigger(SCM condition,SCM action)
@@ -799,31 +812,97 @@ local SCM CclSetTriggerNumber(SCM number)
 }
 
 /**
+**	Execute a trigger action
+**
+**	@param script	Script to execute
+**
+**	@return		1 if the trigger should be removed
+*/
+local int TriggerExecuteAction(SCM script)
+{
+    SCM value;
+
+    value=NIL;
+
+    while( !gh_null_p(script) ) {
+	value=gh_eval(gh_car(script),NIL);
+	script=gh_cdr(script);
+	if( WaitFrame>FrameCounter ) {
+	    WaitScript=script;
+	    return 0;
+	}
+    }
+
+    // If action returns false remove it
+    if( gh_null_p(value) ) {
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Remove a trigger
+**
+**	@param trig	Current trigger
+*/
+local void TriggerRemoveTrigger(SCM trig)
+{
+    if( !gh_null_p(Trigger) ) {
+	setcar(trig,gh_car(Trigger));
+	setcdr(trig,gh_cdr(Trigger));
+    } else {
+	setcar(trig,NIL);
+	setcdr(trig,NIL);
+    }
+    Trigger=trig;
+}
+
+/**
 **	Check trigger each game cycle.
 */
 global void TriggersEachCycle(void)
 {
     SCM pair;
     SCM trig;
+    SCM value;
+    SCM script;
 
     if( !Trigger ) {
 	Trigger=symbol_value(gh_symbol2scm("*triggers*"),NIL);
     }
+    trig=Trigger;
 
-    if( !gh_null_p(trig=Trigger) ) {		// Next trigger
+    if( WaitFrame>FrameCounter ) {
+	return;
+    }
+    if( WaitFrame && WaitFrame<=FrameCounter ) {
+	WaitFrame=0;
+	if( TriggerExecuteAction(WaitScript) ) {
+	    TriggerRemoveTrigger(WaitTrigger);
+	}
+	return;
+    }
+
+    if( GamePaused ) {
+	return;
+    }
+
+    if( !gh_null_p(trig) ) {		// Next trigger
 	pair=gh_car(trig);
 	Trigger=gh_cdr(trig);
+	WaitTrigger=trig;
 	// Pair is condition action
-	if( !gh_null_p(pair) && !gh_null_p(gh_apply(car(pair),NIL)) ) {
-	    if( gh_null_p(gh_apply(cdr(pair),NIL)) ) {
-		if( !gh_null_p(Trigger) ) {
-		    setcar(trig,gh_car(Trigger));
-		    setcdr(trig,gh_cdr(Trigger));
-		} else {
-		    setcar(trig,NIL);
-		    setcdr(trig,NIL);
+	if( !gh_null_p(pair) ) {
+	    script=gh_car(pair);
+	    while( !gh_null_p(script) ) {
+		value=gh_eval(gh_car(script),NIL);
+		script=gh_cdr(script);
+	    }
+	    // If condition is true execute action
+	    if( !gh_null_p(value) ) {
+		if( TriggerExecuteAction(gh_cdr(pair)) ) {
+		    TriggerRemoveTrigger(trig);
 		}
-		Trigger=trig;
 	    }
 	}
     } else {
@@ -855,6 +934,7 @@ global void TriggerCclRegister(void)
     gh_new_procedure2_0("action-set-timer",CclActionSetTimer);
     gh_new_procedure0_0("action-start-timer",CclActionStartTimer);
     gh_new_procedure0_0("action-stop-timer",CclActionStopTimer);
+    gh_new_procedure1_0("action-wait",CclActionWait);
 
     gh_define("*triggers*",NIL);
 }
@@ -995,6 +1075,7 @@ global void InitTriggers(void)
     //
     //	Setup default triggers
     //
+    WaitFrame=0;
 
     // FIXME: choose the triggers for game type
 
