@@ -166,8 +166,8 @@ local struct _default_depend_ {
     { "upgrade-catapult2",	-1 },{ "upgrade-catapult1",		1 },
 
     { "upgrade-berserker",	-1 },{ "unit-stronghold",		1 },
-				     { "unit-fortress",			1 },
-    { "upgrade-berserker-scouting",	-1 },{ "upgrade-berserker",	1 },
+    { "upgrade-berserker",	-1 },{ "unit-fortress",			1 },
+    { "upgrade-berserker-scouting",-1 },{ "upgrade-berserker",	1 },
 				     { "unit-fortress",			1 },
     { "upgrade-light-axes",	-1 },{ "upgrade-berserker",		1 },
 				     { "unit-fortress",			1 },
