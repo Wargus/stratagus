@@ -319,29 +319,37 @@ that are located in the area (0,0)-(10,10).
 
 <h4>Description</h4>
 
-.
+Create a unit at a location.  If the location is occupied the unit will be
+placed in the closest available spot.
 
 <h4>Syntax</h4>
 
-<code>(create-unit)</code>
+<code>(create-unit type player x y)</code>
 
 <dl>
-<dt></dt>
-<dd>.
+<dt>type</dt>
+<dd>Type of unit to create.
+</dd>
+<dt>player</dt>
+<dd>Player number that owns the unit.
+</dd>
+<dt>x</dt>
+<dd>X map tile location.
+</dd>
+<dt>y</dt>
+<dd>Y map tile location.
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    (create-unit)
+    (create-unit 'unit-footman 2 31 34)
 </pre>
 
-<p>.
+<p>Creates a footman for player 2 at location 31x34.
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
+<h4>Not Used</h4>
 
 <a name="credits"></a>
 <h3>credits</h3>
