@@ -106,12 +106,12 @@ global void DisplayPicture(const char *name)
     memcpy(GlobalPalette,title->Palette,sizeof(GlobalPalette));
     VideoCreatePalette(GlobalPalette);
 
-    // FIXME: bigger window ?
 #ifdef USE_SDL
     { extern SDL_Surface *Screen;		/// internal screen
     SDL_LockSurface(Screen);
 #endif
 
+    // FIXME: bigger window ?
     VideoDrawSubClip(title,0,0
 	,title->Width,title->Height
 	,(VideoWidth-title->Width)/2,(VideoHeight-title->Height)/2);
