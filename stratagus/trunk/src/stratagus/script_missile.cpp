@@ -45,6 +45,7 @@
 #include "missile.h"
 #include "script_sound.h"
 #include "script.h"
+#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -285,9 +285,16 @@
 ----------------------------------------------------------------------------*/
 
 #include "upgrade_structs.h"
-#include "unittype.h"
-#include "unit.h"
 #include "video.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+struct _unit_;
+struct _unit_type_;
+struct _player_;
+struct _CL_File_;
 
 /*----------------------------------------------------------------------------
 --  Player type
@@ -328,7 +335,7 @@ struct _player_ {
 	int   AiEnabled;  ///< handle AI on local computer
 	void* Ai;         ///< Ai structure pointer
 
-	Unit** Units;          ///< units of this player
+	struct _unit_** Units;          ///< units of this player
 	int    TotalNumUnits;  ///< total # units for units' list
 	int    NumBuildings;   ///< # buildings
 	int    Supply;         ///< supply available/produced
@@ -458,7 +465,7 @@ extern int NumPlayers;             ///< How many player slots used
 extern Player Players[PlayerMax];  ///< All players
 extern Player* ThisPlayer;         ///< Player on local computer
 extern int NoRescueCheck;          ///< Disable rescue check
-extern Uint32 PlayerColors[PlayerMax][4];
+extern Uint32 PlayerColors[PlayerMax][4];  ///< Player colors
 extern char* PlayerColorNames[PlayerMax];  ///< Player color names
 
 extern PlayerRace PlayerRaces;  ///< Player races
@@ -475,46 +482,54 @@ extern void InitPlayers(void);
 	/// Clean up players
 extern void CleanPlayers(void);
 	/// Save players
-extern void SavePlayers(CLFile*);
+extern void SavePlayers(struct _CL_File_* file);
 
 	/// Create a new player
 extern void CreatePlayer(int type);
 
 	/// Change player side
-extern void PlayerSetSide(Player* player, int side);
+extern void PlayerSetSide(struct _player_* player, int side);
 	/// Change player name
-extern void PlayerSetName(Player* player, const char* name);
+extern void PlayerSetName(struct _player_* player, const char* name);
 	/// Change player AI
-extern void PlayerSetAiNum(Player* player, int ai);
+extern void PlayerSetAiNum(struct _player_* player, int ai);
 
 	/// Set a resource of the player
 extern void PlayerSetResource(Player* player, int resource, int value);
 
 	/// Check if the unit-type didn't break any unit limits and supply/demand
-extern int PlayerCheckLimits(const Player* player, const UnitType* type);
+extern int PlayerCheckLimits(const struct _player_* player,
+	const struct _unit_type_* type);
 
 	/// Check if enough resources are available for costs
-extern int PlayerCheckCosts(const Player* player, const int* costs);
+extern int PlayerCheckCosts(const struct _player_* player, const int* costs);
 	/// Check if enough resources are available for a new unit-type
-extern int PlayerCheckUnitType(const Player* player, const UnitType* type);
+extern int PlayerCheckUnitType(const struct _player_* player,
+	const struct _unit_type_* type);
 
 	/// Add costs to the resources
-extern void PlayerAddCosts(Player* player, const int* costs);
+extern void PlayerAddCosts(struct _player_* player, const int* costs);
 	/// Add costs for an unit-type to the resources
-extern void PlayerAddUnitType(Player* player, const UnitType* type);
+extern void PlayerAddUnitType(struct _player_* player,
+	const struct _unit_type_* type);
 	/// Add a factor of costs to the resources
-extern void PlayerAddCostsFactor(Player* player, const int* costs, int factor);
+extern void PlayerAddCostsFactor(struct _player_* player, const int* costs,
+	int factor);
 	/// Remove costs from the resources
-extern void PlayerSubCosts(Player* player, const int* costs);
+extern void PlayerSubCosts(struct _player_* player, const int* costs);
 	/// Remove costs for an unit-type from the resources
-extern void PlayerSubUnitType(Player* player, const UnitType* type);
+extern void PlayerSubUnitType(struct _player_* player,
+	const struct _unit_type_* type);
 	/// Remove a factor of costs from the resources
-extern void PlayerSubCostsFactor(Player* player, const int* costs, int factor);
+extern void PlayerSubCostsFactor(struct _player_* player, const int* costs,
+	int factor);
 
 	/// Has the player units of that type
-extern int HaveUnitTypeByType(const Player* player, const UnitType* type);
+extern int HaveUnitTypeByType(const struct _player_* player,
+	const struct _unit_type_* type);
 	/// Has the player units of that type
-extern int HaveUnitTypeByIdent(const Player* player, const char* ident);
+extern int HaveUnitTypeByIdent(const struct _player_* player,
+	const char* ident);
 
 	/// Initialize the computer opponent AI
 extern void PlayersInitAi(void);
@@ -524,25 +539,31 @@ extern void PlayersEachCycle(void);
 extern void PlayersEachSecond(int player);
 
 	/// Change current color set to new player of the sprite
-extern void GraphicPlayerPixels(const Player* player, const Graphic * sprite);
+extern void GraphicPlayerPixels(const struct _player_* player,
+	const Graphic* sprite);
 
 	/// Output debug informations for players
 extern void DebugPlayers(void);
 
 	/// Notify player about a problem
-extern void NotifyPlayer(const Player*, int, int, int, const char*, ...);
+extern void NotifyPlayer(const struct _player_* player, int type, int x,
+	int y, const char* fmt, ...);
 
 	/// register ccl features
 extern void PlayerCclRegister(void);
 
 	/// Two players share vision
-#define PlayersShareVision(a, b) ((Players[a].SharedVision & (1 << (b))) && (Players[b].SharedVision & (1 << (a))) )
+#define PlayersShareVision(a, b) \
+	((Players[a].SharedVision & (1 << (b))) && (Players[b].SharedVision & (1 << (a))))
 	/// Players are on the same team (FIXME: use team)
-#define PlayersTeamed(a, b) (Players[a].Team == Players[b].Team)
+#define PlayersTeamed(a, b) \
+	(Players[a].Team == Players[b].Team)
 	/// Players are allied together
-#define PlayersAllied(a, b) ((Players[a].Allied & (1 << (b))) && (Players[b].Allied & (1 << (a))) )
+#define PlayersAllied(a, b) \
+	((Players[a].Allied & (1 << (b))) && (Players[b].Allied & (1 << (a))))
 	/// Allowed to select multiple units, maybe not mine
-#define CanSelectMultipleUnits(player) ((player) == ThisPlayer || PlayersTeamed(ThisPlayer->Player, (player)->Player))
+#define CanSelectMultipleUnits(player) \
+	((player) == ThisPlayer || PlayersTeamed(ThisPlayer->Player, (player)->Player))
 
 //@}
 

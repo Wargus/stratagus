@@ -54,6 +54,7 @@
 #include "interface.h"
 #include "ui.h"
 #include "map.h"
+#include "tileset.h"
 #include "trigger.h"
 #include "network.h"
 #include "menus.h"

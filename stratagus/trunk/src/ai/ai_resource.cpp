@@ -44,6 +44,7 @@
 #include "pathfinder.h"
 #include "ai_local.h"
 #include "actions.h"
+#include "player.h"
 
 static int AiMakeUnit(UnitType* type);
 

@@ -47,6 +47,7 @@
 #include "menus.h"
 #include "font.h"
 #include "util.h"
+#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

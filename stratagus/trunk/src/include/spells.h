@@ -6,11 +6,11 @@
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
-// Stratagus - A free fantasy real time strategy game engine
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name spells.h - The Spells. */
 //
-// (c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski and Joris DAUPHIN
+//      (c) Copyright 1999-2004 by Vladi Belperchinov-Shabanski and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 #ifndef __SPELLS_H__
 #define __SPELLS_H__
@@ -34,18 +34,19 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
+#include "unitsound.h"
 
-#include "stratagus.h"
-#include "sound_id.h"
-#include "sound.h"
-#include "unittype.h"
-#include "unit.h"
-#include "missile.h"
-#include "script.h"
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+struct _unit_;
+struct _unit_type_;
+struct _player_;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -61,11 +62,12 @@ typedef enum {
 }  TargetType;
 
 typedef struct _spell_action_type_ SpellActionType;
-/*
+/**
 **  Pointer on function that cast the spell.
 */
-typedef int SpellFunc(Unit* caster, const struct _spell_type_* spell,
-		const struct _spell_action_type_* action, Unit* target, int x, int y);
+typedef int SpellFunc(struct _unit_* caster, const struct _spell_type_* spell,
+	const struct _spell_action_type_* action, struct _unit_* target, int x,
+	int y);
 
 /**
 **  Different targets.
@@ -75,13 +77,12 @@ typedef enum {
 	LocBaseTarget
 }  LocBaseType;
 
-/*
+/**
 **  This struct is used for defining a missile start/stop location.
 **
 **  It's evaluated like this, and should be more or less flexible.:
 **  base coordinates(caster or target) + (AddX,AddY) + (rand()%AddRandX,rand()%AddRandY)
-**
-**/
+*/
 typedef struct {
 	LocBaseType Base;   ///< The base for the location (caster/target)
 	int AddX;           ///< Add to the X coordinate
@@ -124,7 +125,7 @@ struct _spell_action_type_ {
 		} AreaBombardment;
 
 		struct {
-			UnitType* PortalType;   ///< The unit type spawned
+			struct _unit_type_* PortalType;   ///< The unit type spawned
 		} SpawnPortal;
 
 		struct {
@@ -166,13 +167,13 @@ struct _spell_action_type_ {
 		} AdjustVitals;
 
 		struct {
-			UnitType* NewForm;          ///< The new form
+			struct _unit_type_* NewForm;///< The new form
 			int PlayerNeutral;          ///< Convert the unit to the neutral player.
 			// TODO: temporary polymorphs would be awesome, but hard to implement
 		} Polymorph;
 
 		struct {
-			UnitType* UnitType;     ///< Type of unit to be summoned.
+			struct _unit_type_* UnitType;///< Type of unit to be summoned.
 			int TTL;                ///< Time to live for summoned unit. 0 means infinite
 			int RequireCorpse;      ///< Corpse consumed while summoning.
 		} Summon;
@@ -188,10 +189,10 @@ struct _spell_action_type_ {
 */
 
 typedef struct {
-	TargetType which_sort_of_target;    ///< for identify what sort of target.
-	int X;                              ///< x coord.
-	int Y;                              ///< y coord.
-	Unit* unit;                         ///< Unit target.
+	TargetType which_sort_of_target;  ///< for identify what sort of target.
+	int X;                            ///< x coord.
+	int Y;                            ///< y coord.
+	struct _unit_* unit;              ///< Unit target.
 } Target;
 
 /*
@@ -332,18 +333,18 @@ extern void InitSpells(void);
 extern void CleanSpells(void);
 
 /// return 1 if spell is availible, 0 if not (must upgrade)
-extern int SpellIsAvailable(const Player* player, int SpellId);
+extern int SpellIsAvailable(const struct _player_* player, int SpellId);
 
 /// returns != 0 if spell can be casted (enough mana, valid target)
-extern int CanCastSpell(const Unit* caster, const SpellType*,
-						const Unit* target, int x, int y);
+extern int CanCastSpell(const struct _unit_* caster, const SpellType*,
+	const struct _unit_* target, int x, int y);
 
 /// cast spell on target unit or place at x,y
-extern int SpellCast(Unit* caster, const SpellType*,
-					Unit* target, int x, int y);
+extern int SpellCast(struct _unit_* caster, const SpellType*,
+	struct _unit_* target, int x, int y);
 
 /// auto cast the spell if possible
-extern int AutoCastSpell(Unit* caster, const SpellType* spell);
+extern int AutoCastSpell(struct _unit_* caster, const SpellType* spell);
 
 /// returns != 0 if spell can be auto cast
 extern int CanAutoCastSpell(const SpellType* spell);
@@ -357,10 +358,10 @@ extern SpellType* SpellTypeByIdent(const char* Ident);
 /// return spell type by spell id
 extern SpellType* SpellTypeById(int Id);
 
-extern unsigned CclGetSpellByIdent(lua_State* l);
+extern unsigned CclGetSpellByIdent(struct lua_State* l);
 
 /// return 0, 1, 2 for true, only, false.
-extern char Ccl2Condition(lua_State* l, const char* value);
+extern char Ccl2Condition(struct lua_State* l, const char* value);
 
 /*
 ** Spelltype to cast.

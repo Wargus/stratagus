@@ -45,6 +45,7 @@
 #include "ai.h"
 #include "pathfinder.h"
 #include "ai_local.h"
+#include "player.h"
 
 
 /**

@@ -44,6 +44,7 @@
 #include "pathfinder.h"
 #include "actions.h"
 #include "ai_local.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

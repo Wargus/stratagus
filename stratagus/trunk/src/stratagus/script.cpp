@@ -52,6 +52,7 @@
 #include "construct.h"
 #include "unit.h"
 #include "map.h"
+#include "tileset.h"
 #include "pud.h"
 #include "script_sound.h"
 #include "ui.h"

@@ -46,17 +46,21 @@
 #include "map.h"
 #include "script.h"
 #include "spells.h"
+#include "unit.h"
+#include "unittype.h"
 
 #include "myendian.h"
 
 #include "util.h"
 
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+struct _unit_type_;
+
 static int AddUpgradeModifierBase(int, int, int, int, int, int, int, int, int,
-	int*, const int[UnitTypeMax], const char*, const char*, UnitType*);
-#if 0
-static int AddUpgradeModifier(int, int, int, int, int, int, int, int,
-	int*, const int[UnitTypeMax], const char*, const char*);
-#endif
+	int*, const int[UnitTypeMax], const char*, const char*, struct _unit_type_*);
 
 static void AllowUnitId(Player* player, int id, int units);
 static void AllowUpgradeId(Player* player, int id, char af);

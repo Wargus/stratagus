@@ -58,9 +58,10 @@ extern SoundId MakeSound(const char* sound_name,const char* file[], int nb);
 	/// Get the sound id bound to an identifier
 extern SoundId SoundIdForName(const char* sound_name);
 	/// Map sound to identifier
-extern void MapSound(const char* sound_name,const SoundId id);
+extern void MapSound(const char* sound_name, const SoundId id);
 	/// Make a sound group bound to identifier
-extern SoundId MakeSoundGroup(const char* name,SoundId first,SoundId second);
+extern SoundId MakeSoundGroup(const char* name, SoundId first,
+	SoundId second);
 	/// Helper function, displays the mapping between sound names and sound ids
 extern void DisplaySoundHashTable(void);
 

@@ -41,6 +41,7 @@
 #include "stratagus.h"
 #include "script.h"
 #include "map.h"
+#include "tileset.h"
 #include "minimap.h"
 #include "actions.h"
 #include "campaign.h"

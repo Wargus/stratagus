@@ -43,6 +43,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "iolib.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
