@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1998-2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -302,13 +312,20 @@ local SCM CclShowAttackRange(void)
 }
 
 /**
-**	Enable display of orders.
+**	Set display of orders.
+**
+**	@param flag	True = turning display of orders on, false = off.
+**
+**	@return		The old state of display of orders.
 */
-local SCM CclShowOrders(void)
+local SCM CclSetShowOrders(SCM flag)
 {
-    ShowOrders=1;
+    int old;
 
-    return SCM_UNSPECIFIED;
+    old=!ShowOrders;
+    ShowOrders=!gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
 }
 
 /**
@@ -563,108 +580,6 @@ local SCM CclDefineMap(SCM width,SCM height)
     return SCM_UNSPECIFIED;
 }
 
-/**
-**	Parse a freecraft map.
-**
-**	@param list	list of tuples keyword data
-*/
-local SCM CclFreeCraftMap(SCM list)
-{
-#if 0
-
-    SCM value;
-    SCM name;
-    SCM data;
-
-    //
-    //	Parse the list:	(still everything could be changed!)
-    //
-    while( !gh_null_p(list) ) {
-
-	value=gh_car(list);
-	//gh_display(value);
-	//gh_newline();
-	if( gh_list_p(value) ) {
-	    name=gh_car(value);
-	    data=gh_cdr(value);
-	    if( !gh_symbol_p(name) ) {
-		fprintf(stderr,__FUNCTION__": symbol expected\n");
-		return list;
-	    }
-	    if( gh_eq_p(name,gh_symbol2scm("version")) ) {
-		DebugLevel1("VERSION:\n");
-		gh_display(data);
-		gh_newline();
-		// FIXME:
-	    } else if( gh_eq_p(name,gh_symbol2scm("description")) ) {
-		DebugLevel1("DESCRIPTION:\n");
-		gh_display(data);
-		gh_newline();
-		// FIXME:
-	    } else if( gh_eq_p(name,gh_symbol2scm("terrain")) ) {
-		int terrain;
-
-		DebugLevel1("TERRAIN:\n");
-		gh_display(data);
-		gh_newline();
-		value=gh_car(data);
-		data=gh_cdr(data);
-		terrain=gh_scm2int(value);
-		TheMap.Terrain=terrain;
-		// FIXME:
-	    } else if( gh_eq_p(name,gh_symbol2scm("dimension")) ) {
-		int width;
-		int height;
-
-		DebugLevel1("DIMENSION:\n");
-		gh_display(data);
-		gh_newline();
-		value=gh_car(data);
-		width=gh_scm2int(value);
-		data=gh_cdr(data);
-		value=gh_car(data);
-		height=gh_scm2int(value);
-		TheMap.Width=width;
-		TheMap.Height=height;
-
-		TheMap.Fields=calloc(width*height,sizeof(*TheMap.Fields));
-		InitUnitCache();
-
-	    } else if( gh_eq_p(name,gh_symbol2scm("tiles")) ) {
-		int i;
-		int l;
-
-		DebugLevel1("TILES:\n");
-		value=gh_car(data);
-		if( !gh_vector_p(value) ) {
-		    fprintf(stderr,"vector expected\n");
-		    return SCM_UNSPECIFIED;
-		}
-		l=gh_vector_length(value);
-		if( l!=TheMap.Width*TheMap.Height ) {
-		    fprintf(stderr,"Wrong tile table length %d\n",l);
-		}
-		for( i=0; i<l; ++i ) {
-		    TheMap.Fields[i].Tile=
-			    Tilesets[0].Table[
-				gh_scm2int(gh_vector_ref(value,gh_int2scm(i)))
-			    ];
-		}
-	    } else {
-		;
-	    }
-	} else {
-	    fprintf(stderr,"list expected\n");
-	    return list;
-	}
-
-	list=gh_cdr(list);
-    }
-#endif
-
-    return list;
-}
-
 /*............................................................................
 ..	Commands
 ............................................................................*/
@@ -740,7 +655,7 @@ global void CclInit(void)
     init_subr_0("show-sight-range",CclShowSightRange);
     init_subr_0("show-react-range",CclShowReactRange);
     init_subr_0("show-attack-range",CclShowAttackRange);
-    init_subr_0("show-orders",CclShowOrders);
+    gh_new_procedure1_0("set-show-orders!",CclSetShowOrders);
 
     gh_new_procedure1_0("speed-mine",CclSpeedMine);
     gh_new_procedure1_0("speed-gold",CclSpeedGold);
@@ -771,8 +686,6 @@ global void CclInit(void)
 
     init_subr_1("load-pud",CclLoadPud);
     init_subr_2("define-map",CclDefineMap);
-
-    init_lsubr("freecraft-map",CclFreeCraftMap);
 
     gh_new_procedure0_0("mouse-scroll-off",CclMouseScrollOff);
     gh_new_procedure0_0("units",CclUnits);

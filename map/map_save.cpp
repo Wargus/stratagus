@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -60,10 +70,12 @@ global void SaveMap(FILE* file)
     fprintf(file,"  'version \"" FreeCraftFormatString "\"\n",
 	    FreeCraftFormatArgs(FreeCraftVersion));
     fprintf(file,"  'description \"%s\"\n",TheMap.Description);
-    fprintf(file,"  'terrain '(%s \"%s\")\n"
-	    ,TheMap.TerrainName,Tilesets[TheMap.Terrain].Name);
 
     fprintf(file,"  'the-map '(\n");
+
+    fprintf(file,"  terrain (%s \"%s\")\n"
+	    ,TheMap.TerrainName,Tilesets[TheMap.Terrain].Name);
+
     fprintf(file,"  size (%d %d)\n",TheMap.Width,TheMap.Height);
     fprintf(file,"  %s\n",TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
 
@@ -79,49 +91,49 @@ global void SaveMap(FILE* file)
 		fprintf(file," %d",mf->Value);
 	    }
 	    if( mf->Flags&MapFieldVisible ) {
-		fprintf(file," 'visible");
+		fprintf(file," visible");
 	    }
 	    if( mf->Flags&MapFieldExplored ) {
-		fprintf(file," 'explored");
+		fprintf(file," explored");
 	    }
 	    if( mf->Flags&MapFieldHuman ) {
-		fprintf(file," 'human");
+		fprintf(file," human");
 	    }
 	    if( mf->Flags&MapFieldLandAllowed ) {
-		fprintf(file," 'land");
+		fprintf(file," land");
 	    }
 	    if( mf->Flags&MapFieldCoastAllowed ) {
-		fprintf(file," 'coast");
+		fprintf(file," coast");
 	    }
 	    if( mf->Flags&MapFieldWaterAllowed ) {
-		fprintf(file," 'water");
+		fprintf(file," water");
 	    }
 	    if( mf->Flags&MapFieldNoBuilding ) {
-		fprintf(file," 'mud");
+		fprintf(file," mud");
 	    }
 	    if( mf->Flags&MapFieldUnpassable ) {
-		fprintf(file," 'block");
+		fprintf(file," block");
 	    }
 	    if( mf->Flags&MapFieldWall ) {
-		fprintf(file," 'wall");
+		fprintf(file," wall");
 	    }
 	    if( mf->Flags&MapFieldRocks ) {
-		fprintf(file," 'rock");
+		fprintf(file," rock");
 	    }
 	    if( mf->Flags&MapFieldForest ) {
-		fprintf(file," 'forest");
+		fprintf(file," wood");
 	    }
 	    if( mf->Flags&MapFieldLandUnit ) {
-		fprintf(file," 'ground");
+		fprintf(file," ground");
 	    }
 	    if( mf->Flags&MapFieldAirUnit ) {
-		fprintf(file," 'air");
+		fprintf(file," air");
 	    }
 	    if( mf->Flags&MapFieldSeaUnit ) {
-		fprintf(file," 'sea");
+		fprintf(file," sea");
 	    }
 	    if( mf->Flags&MapFieldBuilding ) {
-		fprintf(file," 'building");
+		fprintf(file," building");
 	    }
 	    if( w&1 ) {
 		fprintf(file,")\n");
