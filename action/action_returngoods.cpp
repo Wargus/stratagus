@@ -65,8 +65,8 @@ void HandleActionReturnGoods(Unit* unit)
 	//
 	// Select target to return goods.
 	//
-	Assert(type->Harvester );
-	if (!unit->CurrentResource ||
+	Assert(type->Harvester);
+	if (!unit->CurrentResource || unit->ResourcesHeld == 0 ||
 			(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
 				unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
 		DebugPrint("Unit can't return resources, it doesn't carry any.\n");
