@@ -51,6 +51,7 @@
 #include "sound.h"
 #include "map.h"
 #include "pathfinder.h"
+#include <string.h>
 #ifdef NEW_UI
 #include "interface.h"
 #endif
@@ -263,11 +264,6 @@ local int CheckForTargetInRange(Unit* unit)
     return 0;
 }
 
-/**
-**	Handle moving to the target.
-**
-**	@param unit	Unit, for that the attack is handled.
-*/
 local void MoveToTarget(Unit* unit)
 {
     Unit* goal;
@@ -282,99 +278,111 @@ local void MoveToTarget(Unit* unit)
 
     err=DoActionMove(unit);
 
-    // NEW return codes supported, FIXME: but johns thinks not perfect.
-
-#ifdef HIERARCHIC_PATHFINDER
     if( unit->Reset ) {
-	if( CheckForTargetInRange(unit) ) {
-	    return;
-	}
-    }
-    if (err==PF_REACHED) {
-#else /* HIERARCHIC_PATHDFINDER */
-    if (err==PF_REACHED) {
 	//
-	//	Look if we have reached the target.
+	//  Look if we have reached the target.
 	//
 	if( CheckForTargetInRange(unit) ) {
 	    return;
 	}
-#endif /* HIERARCHIC_PATHDFINDER */
 	goal=unit->Orders[0].Goal;
-
-	//
-	//	Have reached target? FIXME: could use the new return code?
-	//
-	if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
-		<=unit->Stats->AttackRange ) {
-	    unit->State=0;
-	    if( !unit->Type->Tower ) {
-		UnitHeadingFromDeltaXY(unit,
-		    goal->X+(goal->Type->TileWidth-1)/2-unit->X,
-		    goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);
-		// FIXME: only if heading changes
-		CheckUnitToBeDrawn(unit);
-	    }
-	    unit->SubAction++;
-	} else if( !goal && (WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)
-		    || unit->Orders[0].Action==UnitActionAttackGround)
-		&& MapDistance(unit->X,unit->Y
-		    ,unit->Orders[0].X,unit->Orders[0].Y)
-			<=unit->Stats->AttackRange ) {
-	    DebugLevel2Fn("Attacking wall or ground\n");
-	    unit->State=0;
-	    if( !unit->Type->Tower ) {
-		UnitHeadingFromDeltaXY(unit,unit->Orders[0].X-unit->X
-		    ,unit->Orders[0].Y-unit->Y);
-		// FIXME: only if heading changes
-		CheckUnitToBeDrawn(unit);
-	    }
-	    unit->SubAction&=WEAK_TARGET;
-	    unit->SubAction|=ATTACK_TARGET;
+	if (err>=0) {
+	    //
+	    //  Nothing to do, we're on the way moving.
+	    //
+	    DebugLevel3Fn("Nothing to do.\n");
 	    return;
-	} else if( err<0 ) {
+	}
+	if (err==PF_REACHED) {
+	    //
+	    //	Have reached target? FIXME: could use the new return code?
+	    //
+	    if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
+		    <=unit->Stats->AttackRange ) {
+		DebugLevel3Fn("Reached another unit, now attacking it.\n");
+		unit->State=0;
+		if( !unit->Type->Tower ) {
+		    UnitHeadingFromDeltaXY(unit,
+			goal->X+(goal->Type->TileWidth-1)/2-unit->X,
+			goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);
+		    // FIXME: only if heading changes
+		    CheckUnitToBeDrawn(unit);
+		}
+		unit->SubAction++;
+		return;
+	    }
+	    //
+	    //  Attacking wall or ground.
+	    //
+	    if( !goal && (WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)
+			|| unit->Orders[0].Action==UnitActionAttackGround)
+		    && MapDistance(unit->X,unit->Y
+			,unit->Orders[0].X,unit->Orders[0].Y)
+			    <=unit->Stats->AttackRange ) {
+		DebugLevel3Fn("Reached wall or ground, now attacking it.\n");
+		unit->State=0;
+		if( !unit->Type->Tower ) {
+		    UnitHeadingFromDeltaXY(unit,unit->Orders[0].X-unit->X
+			,unit->Orders[0].Y-unit->Y);
+		    // FIXME: only if heading changes
+		    CheckUnitToBeDrawn(unit);
+		}
+		unit->SubAction&=WEAK_TARGET;
+		unit->SubAction|=ATTACK_TARGET;
+		return;
+	    }
+	} 
+	//
+	//  Unreachable.
+	//
+	if( err==PF_UNREACHABLE ) {
 	    unit->State=unit->SubAction=0;
-	    // Return to old task?
-	    if( err==PF_UNREACHABLE ) {
-		DebugLevel3Fn("Target not reachable, unit: %d" _C_ UnitNumber(unit));
-		if( goal ) {
-		    DebugLevel3(", target %d range %d\n" _C_ UnitNumber(goal) _C_ unit->Orders[0].RangeX);
-		} else {
-		    DebugLevel0(", (%d,%d) Tring with more range...\n" _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
-		    if( unit->Orders[0].RangeX < TheMap.Width
-			|| unit->Orders[0].RangeY < TheMap.Height ) {
-			// Try again with more range
-			unit->Orders[0].RangeX++;
-			unit->Orders[0].RangeY++;
-			return;
-		    }
+	    DebugLevel3Fn("Target not reachable, unit: %d" _C_ UnitNumber(unit));
+	    if( goal ) {
+		DebugLevel3(", target %d range %d\n" _C_ UnitNumber(goal) _C_ unit->Orders[0].RangeX);
+	    } else {
+		//
+		//  When attack-moving we have to allow a bigger range
+		//
+		DebugLevel3(", (%d,%d) Tring with more range...\n" _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
+		if( unit->Orders[0].RangeX < TheMap.Width
+		    || unit->Orders[0].RangeY < TheMap.Height ) {
+		    // Try again with more range
+		    unit->Orders[0].RangeX++;
+		    unit->Orders[0].RangeY++;
+		    return;
 		}
 	    }
-	    if( unit->Orders[0].Goal ) {
-		RefsDebugCheck( !unit->Orders[0].Goal->Refs );
-		unit->Orders[0].Goal->Refs--;
-		RefsDebugCheck( !unit->Orders[0].Goal->Refs );
-	    }
-	    unit->Orders[0]=unit->SavedOrder;
-	    NewResetPath(unit);
-
-	    // Must finish, if saved command finishes
-	    unit->SavedOrder.Action=UnitActionStill;
-	    unit->SavedOrder.Goal=NoUnitP;
-
-	    if( unit->Selected && unit->Player==ThisPlayer ) {
-#ifndef NEW_UI
-		MustRedraw|=RedrawButtonPanel;
-#else
-		SelectedUnitChanged();
-#endif
-	    }
-	    return;
 	}
-	DebugCheck( unit->Type->Vanishes || unit->Destroyed || unit->Removed );
-	DebugCheck( unit->Orders[0].Action!=UnitActionAttack 
-		&& unit->Orders[0].Action!=UnitActionAttackGround );
+	//
+	//  Return to old task?
+	//  
+	unit->State=unit->SubAction=0;
+	DebugLevel3Fn("Returning to old task.\n");
+	if( unit->Orders[0].Goal ) {
+	    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
+	    unit->Orders[0].Goal->Refs--;
+	    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
+	}
+	unit->Orders[0]=unit->SavedOrder;
+	NewResetPath(unit);
+
+	// Must finish, if saved command finishes
+	unit->SavedOrder.Action=UnitActionStill;
+	unit->SavedOrder.Goal=NoUnitP;
+
+	if( unit->Selected && unit->Player==ThisPlayer ) {
+#ifndef NEW_UI
+	    MustRedraw|=RedrawButtonPanel;
+#else
+	    SelectedUnitChanged();
+#endif
+	}
+	return;
     }
+    DebugCheck( unit->Type->Vanishes || unit->Destroyed || unit->Removed );
+    DebugCheck( unit->Orders[0].Action!=UnitActionAttack 
+	    && unit->Orders[0].Action!=UnitActionAttackGround );
 }
 
 /**
@@ -561,7 +569,8 @@ local void AttackTarget(Unit* unit)
 */
 global void HandleActionAttack(Unit* unit)
 {
-    DebugLevel3Fn("Attack %d\n" _C_ UnitNumber(unit));
+    DebugLevel3Fn("Attack %d r %d,%d\n" _C_ UnitNumber(unit) 
+	    _C_ unit->Orders->RangeX _C_ unit->Orders->RangeY);
 
     switch( unit->SubAction ) {
 	//

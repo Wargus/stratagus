@@ -409,6 +409,10 @@ local void DrawMapViewport(Viewport* vp)
 	SetClipping(vp->X,vp->Y,vp->EndX,vp->EndY);
 
 	DrawMapBackgroundInViewport(vp,vp->MapX,vp->MapY);
+	
+	//
+	//	We find and sort units after draw level.
+	//
 	nunits=FindAndSortUnits(vp,table);
 	nmissiles=FindAndSortMissiles(vp,missiletable);
 
@@ -471,6 +475,16 @@ local void DrawMapViewport(Viewport* vp)
 	    }
 	}
 	DrawMapFogOfWar(vp, vp->MapX, vp->MapY);
+	//
+	//	Draw orders of selected units.
+	//	Drawn here so that they are shown even when the unit is out of the screen.
+	//
+	if( ShowOrders==SHOW_ORDERS_ALWAYS ||
+		((ShowOrdersCount>=GameCycle ||(KeyModifiers&ModifierShift))) ) {
+	    for (i=0;i<NumSelected;i++) {
+		ShowOrder(Selected[i]);
+	    }
+	}
 	DrawConsole();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     }

@@ -349,23 +349,18 @@ global void DoRightButton(int sx,int sy)
 #endif
 
         if (type->Building) {
-	    if( dest && dest->Type->GivesResource==OilCost ) {
+	    if( dest && dest->Type->GivesResource ) {
                 dest->Blink=4;
-	        DebugLevel3("RALY POINT TO PLATFORM\n");
+	        DebugLevel3("Set rally point to a resource.\n");
                 SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
-	        continue;
-            }
-	    if( dest && dest->Type->GivesResource==GoldCost ) {
-	        dest->Blink=4;
-                DebugLevel3("RALY POINT TO GOLD-MINE\n");
-	        SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	        continue;
 	    }
 	    if( IsMapFieldExplored(unit->Player,x,y) && ForestOnMap(x,y) ) {
-                DebugLevel3("RALY POINT TO FOREST\n");                
+	        DebugLevel3("Set rally point to a forest.\n");
 	        SendCommandResourceLoc(Selected[i],x,y,!(KeyModifiers&ModifierShift));
                 continue;
             }
+	    DebugLevel3("Set rally point to a location.\n");
 	    SendCommandMove(unit,x,y,flush);
             continue;
         }

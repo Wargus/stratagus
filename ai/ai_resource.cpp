@@ -959,7 +959,7 @@ local void AiCollectResources(void)
 		//
 		if( AiAssignHarvester(unit,c) ) {
 		    int n1,n2;
-		    DebugLevel0Fn("Assigned %d to %s\n" _C_ unit->Slot _C_ DefaultResourceNames[c]);
+		    DebugLevel3Fn("Assigned %d to %s\n" _C_ unit->Slot _C_ DefaultResourceNames[c]);
 		    units_assigned[num_units_assigned[c]++][c]=unit;
 		    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];
 		    for( n1=0; n1<MaxCosts; ++n1 ) {
