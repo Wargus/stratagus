@@ -27,7 +27,7 @@
 #include <errno.h>
 
 #include "freecraft.h"
-#include "compression.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --	Defines
