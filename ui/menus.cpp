@@ -5901,10 +5901,11 @@ void UpdateMenuItemButton(Menuitem* items)
 	if (handler == MultiScenSelectMenu || handler == MultiGameStart) {
 		char plyrs; // other player has connected.
 		char ready; // all player are here.
+		int i;
 
 		plyrs = 0;
 		ready = 1;
-		int i;
+
 
 		// Calculate available slots from pudinfo
 		for (i = 1; i < PlayerMax; i++) {
