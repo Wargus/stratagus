@@ -973,7 +973,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 local void PrintHeader(void)
 {
     // vvv---- looks wired, but is needed for GNU brain damage
-    fprintf(stdout,"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
+    fprintf(stdout,"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others. (http://FreeCraft.Org)"
     "\n  SIOD Copyright by George J. Carrette."
     "\n  libmodplug Copyright by Kenton Varda & Olivier Lapique."
 #ifdef USE_SDL
