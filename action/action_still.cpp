@@ -82,6 +82,7 @@ global void HandleActionStill(Unit* unit)
 	return;
     }
 
+#if 0
     //
     //	Building:	burning FIXME: must moved to general point
     //
@@ -111,6 +112,7 @@ global void HandleActionStill(Unit* unit)
 	    }
 	}
     }
+#endif
 
 #if 1  // a unit with type->Vanishes is _dying_.
     //

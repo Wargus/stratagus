@@ -2505,6 +2505,41 @@ global void HitUnit(Unit* unit,int damage)
 		,0,0);
     }
 #endif
+    if( type->Building && !unit->Burning ) {
+	int f;
+	Missile* missile;
+
+	f=(100*unit->HP)/unit->Stats->HitPoints;
+	if( f>75) {
+	    ; // No fire for this
+	} else if( f>50 ) {
+	    missile=MakeMissile(MissileTypeByIdent("missile-small-fire")
+		    ,unit->X*TileSizeX
+			    +(type->TileWidth*TileSizeX)/2
+		    ,unit->Y*TileSizeY
+			    +(type->TileHeight*TileSizeY)/2
+			    -TileSizeY
+		    ,0,0);
+	    missile->SourceUnit=unit;
+	    unit->Burning=1;
+#ifdef NEW_UNIT
+	    ++unit->Refs;
+#endif
+	} else {
+	    missile=MakeMissile(MissileTypeByIdent("missile-big-fire")
+		    ,unit->X*TileSizeX
+			    +(type->TileWidth*TileSizeX)/2
+		    ,unit->Y*TileSizeY
+			    +(type->TileHeight*TileSizeY)/2
+			    -TileSizeY
+		    ,0,0);
+	    missile->SourceUnit=unit;
+	    unit->Burning=1;
+#ifdef NEW_UNIT
+	    ++unit->Refs;
+#endif
+	}
+    }
 
     if( unit->Command.Action!=UnitActionStill ) {
 	return;

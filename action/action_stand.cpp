@@ -85,6 +85,7 @@ global void HandleActionStandGround(Unit* unit)
 	return;
     }
 
+#if 0
     //
     //	Building:	burning FIXME: must moved to general point
     //
@@ -114,6 +115,7 @@ global void HandleActionStandGround(Unit* unit)
 	    }
 	}
     }
+#endif
 
 #if 0
     // JOHNS: critters removed here
