@@ -10,7 +10,7 @@
 //
 /**@name action_train.c -	The building train action. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer
+//	(c) Copyright 1998,2000-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -122,7 +122,9 @@ global void HandleActionTrain(Unit* unit)
 
 	NotifyPlayer(player,NotifyYellow,nunit->X,nunit->Y,
 	    "New %s ready",nunit->Type->Name);
-	PlayUnitSound(nunit,VoiceReady);
+	if( player==ThisPlayer ) {
+	    PlayUnitSound(nunit,VoiceReady);
+	}
 	if( unit->Player->Ai ) {
 	    AiTrainingComplete(unit,nunit);
 	}
