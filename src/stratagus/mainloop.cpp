@@ -610,15 +610,11 @@ global void UpdateDisplay(void)
     }
     if( MustRedraw&RedrawStatusLine ) {
 	DrawStatusLine();
-#ifndef NEW_UI
 	MustRedraw|=RedrawCosts;
-#endif
     }
-#ifndef NEW_UI
     if( MustRedraw&RedrawCosts ) {
 	DrawCosts();
     }
-#endif
     if( MustRedraw&RedrawTimer ) {
 	DrawTimer();
     }
@@ -708,11 +704,7 @@ global void UpdateDisplay(void)
 		    ,TheUI.Resource.Graphic->Width
 		    ,TheUI.Resource.Graphic->Height);
 	}
-#ifndef NEW_UI
 	if( (MustRedraw&RedrawStatusLine || MustRedraw&RedrawCosts) && TheUI.StatusLine.Graphic ) {
-#else
-	if( MustRedraw&RedrawStatusLine && TheUI.StatusLine.Graphic ) {
-#endif
 	    InvalidateAreaAndCheckCursor(
 		     TheUI.StatusLineX,TheUI.StatusLineY
 		    ,TheUI.StatusLine.Graphic->Width

@@ -154,11 +154,9 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 	MapMarkUnitSight(unit);
 	//  Remove unit from the current selection
 	if (unit->Selected && !IsMapFieldVisible(ThisPlayer, unit->X, unit->Y)) {
-#ifndef NEW_UI
 	    if (NumSelected == 1) {          //  Remove building cursor
 		CancelBuildingMode();
 	    }
-#endif
 	    UnSelectUnit(unit);
 	    SelectionChanged();
 	}

@@ -179,11 +179,7 @@ extern CursorType* Cursors;		/// cursor-types description
 
 extern CursorStates CursorState;	/// current cursor state (point,...)
 extern int CursorAction;		/// action for selection
-#ifndef NEW_UI
 extern int CursorValue;			/// value for action (spell type f.e.)
-#else
-extern int CursorSpell;		/// spell type for target selection
-#endif
 extern UnitType* CursorBuilding;	/// building cursor
 
 extern CursorType* GameCursor;		/// cursor-type

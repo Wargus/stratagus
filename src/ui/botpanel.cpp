@@ -56,10 +56,8 @@
 --      Defines
 ----------------------------------------------------------------------------*/
 
-#ifndef NEW_UI
     /// How many different buttons are allowed
 #define MAX_BUTTONS	2048
-#endif
 
 /*----------------------------------------------------------------------------
 --      Variables
@@ -68,14 +66,12 @@
     /// Display the command key in the buttons.
 global char ShowCommandKey;
 
-#ifndef NEW_UI
     /// for unit buttons sub-menus etc.
 global int CurrentButtonLevel;
     /// All buttons for units
 local ButtonAction* UnitButtonTable[MAX_BUTTONS];
     /// buttons in UnitButtonTable
 local int NumUnitButtons;
-#endif
 
 /*----------------------------------------------------------------------------
 --      Functions
@@ -86,7 +82,6 @@ local int NumUnitButtons;
 */
 global void InitButtons(void)
 {
-#ifndef NEW_UI
     int z;
 
     //
@@ -96,10 +91,6 @@ global void InitButtons(void)
 	UnitButtonTable[z]->Icon.Icon =
 	    IconByIdent(UnitButtonTable[z]->Icon.Name);
     }
-#else
-    // FIXME: proabably not necessary
-    //CleanButtons();
-#endif
 }
 
 /**
@@ -107,16 +98,13 @@ global void InitButtons(void)
 */
 global void SaveButtons(CLFile* file)
 {
-#ifndef NEW_UI
     int i;
     int n;
     char* cp;
-#endif
 
     CLprintf(file, "\n;;; -----------------------------------------\n");
     CLprintf(file, ";;; MODULE: buttons $Id$\n\n");
 
-#ifndef NEW_UI
     for (i = 0; i < NumUnitButtons; ++i) {
 	CLprintf(file, "(define-button 'pos %d 'level %d 'icon '%s\n",
 	    UnitButtonTable[i]->Pos, UnitButtonTable[i]->Level,
@@ -250,25 +238,6 @@ global void SaveButtons(CLFile* file)
 	}
 	CLprintf(file, "))\n\n");
     }
-#else
-
-    CLprintf(file, "(set-selection-changed-hook '");
-    lprin1CL(SelectionChangedHook, file);
-    CLprintf(file, ")\n");
-
-    CLprintf(file, "(set-selected-unit-changed-hook '");
-    lprin1CL(SelectedUnitChangedHook, file);
-    CLprintf(file, ")\n");
-
-    CLprintf(file, "(set-choose-target-begin-hook '");
-    lprin1CL(ChooseTargetBeginHook, file);
-    CLprintf(file, ")\n");
-
-    CLprintf(file, "(set-choose-target-finish-hook '");
-    lprin1CL(ChooseTargetFinishHook, file);
-    CLprintf(file, ")\n");
-
-#endif
 
     CLprintf(file, "(set-show-command-key! %s)\n\n",
 	ShowCommandKey ? "#t" : "#f");
@@ -291,42 +260,18 @@ global void SaveButtons(CLFile* file)
 --      Buttons structures
 ----------------------------------------------------------------------------*/
 
-#ifndef NEW_UI
 global ButtonAction* CurrentButtons;	/// Pointer to current buttons
 local ButtonAction  _current_buttons[9];	/// FIXME: this is just for test
-#else
-global ButtonAction CurrentButtons[9];	/// Pointer to current buttons
-#endif
 
-#ifdef NEW_UI
-local void CleanButton(ButtonAction* ba)
-{
-    if (!ba->Icon.Name) {
-	return;
-    }
-    free(ba->Icon.Name);
-    CclGcUnprotect(ba->Action);
-    memset(ba, 0, sizeof(*ba));
-    MustRedraw |= RedrawButtonPanel;
-}
-#endif
 
 /// FIXME: docu
-#ifndef NEW_UI
 int AddButton(int pos, int level, const char* icon_ident,
     enum _button_cmd_ action, const char* value, const ButtonCheckFunc func,
     const void* allow, int key, const char* hint, const char* umask)
-#else
-global void AddButton(int pos, char *icon_ident, SCM action, int key,
-    char* hint, int highlight)
-#endif
 {
-#ifndef NEW_UI
     char buf[2048];
-#endif
     ButtonAction* ba;
 
-#ifndef NEW_UI
     ba = (ButtonAction*)malloc(sizeof(ButtonAction));
     DebugCheck(!ba);			//FIXME: perhaps should return error?
 
@@ -383,56 +328,14 @@ global void AddButton(int pos, char *icon_ident, SCM action, int key,
     // FIXME: check if already initited
     //DebugCheck(ba->Icon.Icon == NoIcon);// just checks, that's why at the end
     return 1;
-#else
-    if (pos < 1 || pos > 9) {
-	DebugLevel0Fn("Bad button positon %d (Icon.Name=%s)\n" _C_
-	    pos _C_ icon_ident);
-	// FIXME: better way to kill the program?
-	DebugCheck(1);
-    }
-    ba = CurrentButtons + (pos - 1);
-    CleanButton(ba);
-
-    // maxy: the caller does not free this pointer
-    ba->Icon.Name = icon_ident;
-    ba->Icon.Icon = IconByIdent(ba->Icon. Name);
-    if (ba->Icon.Icon == NoIcon) {
-	ba->Icon.Icon = IconByIdent(ba->Icon. Name);
-	DebugLevel0Fn("Icon not found: Icon.Name = %s\n" _C_ ba->Icon.Name);
-	// FIXME: better way to kill the program? or draw a
-	// Unknown-Icon and add a hint so the user can test the rest of the ccl?
-	DebugCheck(1);
-    }
-
-    // maxy: the caller protected this from the GC
-    ba->Action = action;
-
-    // maxy: the caller does not free this pointer
-    ba->Hint = hint;
-    MustRedraw |= RedrawButtonPanel;
-    ba->Key = key;
-    ba->Highlight = highlight;
-#endif
 }
 
-#ifdef NEW_UI
-global void RemoveButton(int pos)
-{
-    if (pos < 1 || pos > 9) {
-	DebugLevel0Fn("Bad button positon %d\n" _C_ pos);
-	// FIXME: better way to kill the program?
-	DebugCheck(1);
-    }
-    CleanButton(CurrentButtons + (pos - 1));
-}
-#endif
 
 /**
 **	Cleanup buttons.
 */
 global void CleanButtons(void)
 {
-#ifndef NEW_UI
     int z;
 
     //
@@ -461,14 +364,6 @@ global void CleanButtons(void)
 
     CurrentButtonLevel = 0;
     CurrentButtons = NULL;
-#else
-    int i;
-
-    DebugLevel0Fn("CleanButtons()\n");
-    for (i = 0; i < 9; ++i) {
-	CleanButton(CurrentButtons + i);
-    }
-#endif
 }
 
 /**
@@ -478,13 +373,9 @@ global void DrawButtonPanel(void)
 {
     int i;
     int v;
-#ifndef NEW_UI
     const UnitStats* stats;
     const ButtonAction* buttons;
     char buf[8];
-#else
-    const ButtonAction* ba;
-#endif
 
     //
     //	Draw background
@@ -495,26 +386,17 @@ global void DrawButtonPanel(void)
 	    TheUI.ButtonPanelX, TheUI.ButtonPanelY);
     }
 
-#ifndef NEW_UI
     if (!(buttons = CurrentButtons)) {	// no buttons
 	return;
     }
-#endif
 
     // FIXME: this is unneeded DrawUnitIcon does it self
     PlayerPixels(ThisPlayer);		// could only select own units.
 
-#ifndef NEW_UI
     for (i = 0; i < TheUI.NumButtonButtons; ++i) {
 	if (buttons[i].Pos != -1) {
 	    int j;
 	    int action;
-#else
-    //for (i = 0; i < TheUI.NumButtonButtons; ++i) {
-    for (i = 0; i < 9; ++i) {
-	ba = CurrentButtons + i;
-	if (ba->Icon.Icon != NoIcon) {
-#endif
 
 	    // cursor is on that button
 	    if (ButtonAreaUnderCursor == ButtonAreaButton &&
@@ -538,7 +420,6 @@ global void DrawButtonPanel(void)
 		should be re-enabled from ccl as a boolean button option,
 		together with something like (selected-action-is 'patrol) */
 
-#ifndef NEW_UI
 	    action = UnitActionNone;
 	    switch (buttons[i].Action) {
 		case ButtonStop:
@@ -617,26 +498,15 @@ global void DrawButtonPanel(void)
 			break;
 		}
 	    }
-#else
-	    if (ba->Highlight) {
-		v |= IconSelected;
-	    }
-#endif
 
-#ifndef NEW_UI
 	    DrawUnitIcon(ThisPlayer,buttons[i].Icon.Icon,
 		v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y);
-#else
-	    DrawUnitIcon(ThisPlayer,ba->Icon.Icon,
-		v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y);
-#endif
 
 	    //
 	    //	Update status line for this button
 	    //
 	    if (ButtonAreaUnderCursor == ButtonAreaButton &&
 		    ButtonUnderCursor == i && KeyState != KeyStateInput) {
-#ifndef NEW_UI
 		SetStatusLine(buttons[i].Hint);
 		// FIXME: Draw costs
 		v = buttons[i].Value;
@@ -668,9 +538,6 @@ global void DrawButtonPanel(void)
 			ClearCosts();
 			break;
 		}
-#else
-		SetStatusLine(ba->Hint);
-#endif
 	    }
 
 	    //
@@ -678,26 +545,15 @@ global void DrawButtonPanel(void)
 	    //
 	    if (ShowCommandKey) {
 		Button* b;
-#ifdef NEW_UI
-		char buf[4];
-#endif
 
 		b = &TheUI.ButtonButtons[i];
-#ifndef NEW_UI
 		if (CurrentButtons[i].Key == 27) {
-#else
-		if (ba->Key == 27) {
-#endif
 		    strcpy(buf, "ESC");
 		    VideoDrawText(b->X + 4 + b->Width - VideoTextLength(GameFont, buf),
 			b->Y + 5 + b->Height - VideoTextHeight(GameFont), GameFont, buf);
 		} else {
 		    // FIXME: real DrawChar would be useful
-#ifndef NEW_UI
 		    buf[0] = toupper(CurrentButtons[i].Key);
-#else
-		    buf[0] = toupper(ba->Key);
-#endif
 		    buf[1] = '\0';
 		    VideoDrawText(b->X + 4 + b->Width - VideoTextLength(GameFont, buf),
 			b->Y + 5 + b->Height - VideoTextHeight(GameFont), GameFont, buf);
@@ -711,7 +567,6 @@ global void DrawButtonPanel(void)
 --	Functions
 ----------------------------------------------------------------------------*/
 
-#ifndef NEW_UI
 /**
 **	Update bottom panel for multiple units.
 */
@@ -1199,39 +1054,7 @@ global void DoButtonButtonClicked(int button)
 	    break;
     }
 }
-#endif
 
-#ifdef NEW_UI
-global void DoButtonButtonClicked(int pos)
-{
-    ButtonAction* ba;
-
-    ba = CurrentButtons + pos;
-    //
-    //	Handle action on button.
-    //
-    //FIXME DebugLevel3Fn("Button clicked (button hint: %s).", ba->Hint);
-
-    if (!gh_null_p(ba->Action)) {
-	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-	
-	/*
-	  if ([ccl debugging]) {         // display executed command
-	  gh_display(...);
-	  gh_newline();
-	  }
-	*/
-	gh_apply(ba->Action, NIL);
-    } else {
-	if (ba->Hint) {
-	    DebugLevel0Fn("Missing button action (button hint: %s)." _C_ ba->Hint);
-	} else {
-	    // FIXME: remove this after testing
-	    DebugLevel0Fn("You are clicking on empty space, aren't you ;)");
-	}
-    }
-}
-#endif
 
 /**
 **	Lookup key for bottom panel buttons.
@@ -1244,7 +1067,6 @@ global int DoButtonPanelKey(int key)
 {
     int i;
 
-#ifndef NEW_UI
     if (CurrentButtons) {		// buttons
 
 	// cade: this is required for action queues SHIFT+M should be `m'
@@ -1259,22 +1081,6 @@ global int DoButtonPanelKey(int key)
 	    }
 	}
     }
-#else
-    ButtonAction* ba;
-
-    // cade: this is required for action queues SHIFT+M should be `m'
-    if (key >= 'A' && key <= 'Z') {
-	key = tolower(key);
-    }
-
-    for (i = 0; i < 9; ++i) {
-	ba = CurrentButtons + i;
-	if (key == CurrentButtons[i].Key) {
-	    DoButtonButtonClicked(i);
-	    return 1;
-	}
-    }
-#endif
     return 0;
 }
 

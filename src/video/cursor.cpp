@@ -74,11 +74,7 @@ global CursorType* Cursors;
 
 global CursorStates CursorState;/// current cursor state (point,...)
 global int CursorAction;	/// action for selection
-#ifndef NEW_UI
 global int CursorValue;		/// value for CursorAction (spell type f.e.)
-#else
-global int CursorSpell;		/// spell type while selecting target
-#endif
 
 	//Event changed mouse position, can alter at any moment
 global int CursorX;		/// cursor position on screen X
@@ -1150,11 +1146,7 @@ global void SaveCursors(CLFile* file)
 	    break;
     }
     CLprintf(file, ";;(cursor-action %d)\n", CursorAction);
-#ifndef NEW_UI
     CLprintf(file, ";;(cursor-value %d)\n", CursorValue);
-#else
-    CLprintf(file, ";;(cursor-spell %d)\n", CursorSpell);
-#endif
     CLprintf(file, ";;(cursor-building '%s)\n",
 	CursorBuilding ? CursorBuilding->Ident : "()");
     CLprintf(file, ";;(cursor-position '(%d %d)\n", CursorX, CursorY);

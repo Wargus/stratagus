@@ -192,7 +192,6 @@ global void SavePlayers(CLFile* file)
     CLprintf(file,"\n;;; -----------------------------------------\n");
     CLprintf(file,";;; MODULE: players $Id$\n\n");
 
-#ifndef NEW_UI
     //
     //	Dump table wc2 race numbers -> internal symbol.
     //
@@ -210,7 +209,6 @@ global void SavePlayers(CLFile* file)
 	}
 	CLprintf(file,")\n\n");
     }
-#endif
 
     //
     //	Dump table wc2 race numbers -> internal symbol.
