@@ -1215,7 +1215,12 @@ global int InitSound(void)
 	wanted.format=AUDIO_S16;
     }
     wanted.channels=2;
-    wanted.samples=1024;
+#if SoundSampleSize==8
+    wanted.samples=2048;
+#endif
+#if SoundSampleSize==16
+    wanted.samples=4096;
+#endif
     wanted.callback=FillAudio;
     wanted.userdata=NULL;
     //	Open the audio device, forcing the desired format
