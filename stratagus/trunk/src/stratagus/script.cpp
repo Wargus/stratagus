@@ -904,7 +904,23 @@ global void SavePreferences(void)
     }
     fprintf(fd,"(set-music-volume! %d)\n", MusicVolume);
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
-    fprintf(fd,"(set-cd-mode! \"%d\")\n", CDMode);
+    buf[0] = '\0';
+    switch (CDMode) {
+	case CDModeAll:
+	    strcpy(buf, "all");
+	    break;
+	case CDModeRandom:
+	    strcpy(buf, "random");
+	    break;
+	case CDModeDefined:
+	    strcpy(buf, "defined");
+	    break;
+	default:
+	    break;
+    }
+    if (buf[0]) {
+	fprintf(fd,"(set-cd-mode! \"%s\")\n", buf);
+    }
 #endif
 #endif
 
