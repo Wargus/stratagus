@@ -1812,12 +1812,12 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		switch (mi->mitype) {
 		    case MI_TYPE_INPUT:
 			PasteFromClipboard(mi);
+			if (mi->d.input.action) {
+			    (*mi->d.input.action)(mi, 'x');
+			}
 			break;
 		    default:
 			break;
-		}
-		if (mi->d.input.action) {
-		    (*mi->d.input.action)(mi, 'x');
 		}
 	    }
 	}
