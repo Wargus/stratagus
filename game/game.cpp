@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -529,10 +529,10 @@ global void CreateGame(char* filename, WorldMap* map)
     for( i=0; i<NumUnits; ++i ) {
         //  I don't really think that there can be any rescued
         //  units at this point.
-        if (Units[i]->Rescued) { 
-            Units[i]->Colors=Units[i]->RescuedFrom->UnitColors;
+        if (Units[i]->RescuedFrom) { 
+            Units[i]->Colors=&Units[i]->RescuedFrom->UnitColors;
         } else {
-            Units[i]->Colors=Units[i]->Player->UnitColors;
+            Units[i]->Colors=&Units[i]->Player->UnitColors;
         }
     }
 

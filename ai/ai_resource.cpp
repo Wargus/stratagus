@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -774,7 +774,7 @@ local Unit* AiFindGoldMine(const Unit* unit)
     //
     //	Find the nearest gold depot
     //
-    if( (destu=FindGoldDeposit(unit,x,y)) ) {
+    if( (destu=FindDeposit(unit->Player,x,y,GoldCost)) ) {
 	NearestOfUnit(destu,x,y,&destx,&desty);
     }
     bestd=99999;
@@ -1079,7 +1079,7 @@ local int AiHarvest(Unit * unit)
     //
     //	Find the nearest wood depot
     //
-    if( (destu=FindWoodDeposit(unit->Player,x,y)) ) {
+    if( (destu=FindDeposit(unit->Player,x,y,WoodCost)) ) {
 	NearestOfUnit(destu,x,y,&destx,&desty);
     }
     bestd=99999;

@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -470,8 +470,9 @@ local void AiLoadForce(AiForce* force)
 		    }
 		    CommandBoard(unit,table[i],FlushCommands);
 		    ++o;
-		    if( o==MAX_UNITS_ONBOARD ) {
-			DebugLevel0Fn("FIXME: next transporter\n");
+		    // FIXME
+		    if( o==table[i]->Type->MaxOnBoard ) {
+			DebugLevel0Fn("FIXME: next transporter for AI boarding\n");
 			return;
 		    }
 		}
@@ -532,7 +533,6 @@ local void AiWaitLanded(AiForce* force)
 {
     AiUnit* aiunit;
     int i;
-    int j;
 
     DebugLevel0Fn("Waiting\n");
     //
@@ -544,13 +544,11 @@ local void AiWaitLanded(AiForce* force)
 	if( aiunit->Unit->Type->Transporter ) {
 	    if( aiunit->Unit->Orders[0].Action==UnitActionStill ) {
 		DebugLevel0Fn("Unloading\n");
-		for( j=0; j<MAX_UNITS_ONBOARD; ++j ) {
-		    if( aiunit->Unit->OnBoard[j] ) {
-			CommandUnload(aiunit->Unit,force->GoalX,force->GoalY,
-			    NoUnitP,FlushCommands);
-			i=0;
-			break;
-		    }
+		// Don't tell empty transporters to unload.
+		if (aiunit->Unit->InsideCount) {
+		    CommandUnload(aiunit->Unit,force->GoalX,force->GoalY,
+			NoUnitP,FlushCommands);
+		    i=0;
 		}
 	    } else {
 		i=0;

@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -69,7 +69,7 @@ global void HandleActionReturnGoods(Unit* unit)
     //
     if( type==UnitTypeHumanWorkerWithGold || type==UnitTypeOrcWorkerWithGold ) {
 	if( !unit->Orders[0].Goal ) {
-	    if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
+	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,GoldCost)) ) {
 		// No deposit -> can't return
 		unit->Orders[0].Action=UnitActionStill;
 		return;
@@ -89,7 +89,7 @@ global void HandleActionReturnGoods(Unit* unit)
 
     if( type==UnitTypeHumanWorkerWithWood || type==UnitTypeOrcWorkerWithWood ) {
 	if( !unit->Orders[0].Goal ) {
-	    if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
+	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,WoodCost)) ) {
 		// No deposit -> can't return
 		unit->Orders[0].Action=UnitActionStill;
 		return;
@@ -114,7 +114,7 @@ global void HandleActionReturnGoods(Unit* unit)
 
     if( type==UnitTypeHumanTankerFull || type==UnitTypeOrcTankerFull ) {
 	if( !unit->Orders[0].Goal ) {
-	    if( !(destu=FindOilDeposit(unit,unit->X,unit->Y)) ) {
+	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,OilCost)) ) {
 		// No deposit -> can't return
 		unit->Orders[0].Action=UnitActionStill;
 		return;

@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -47,6 +47,7 @@
 #include "map.h"
 #include "interface.h"
 #include "pathfinder.h"
+#include "upgrade_structs.h"
 
 // FIXME: Should combine all the resource functions
 // FIXME: Should update buttons if the action changes?
@@ -243,7 +244,7 @@ local int ChopWood(Unit* unit)
 	    // NOTE: unit->Orders[0].X && unit->Orders[0].Y holds return place.
 	    unit->Orders[0].X=unit->X;
 	    unit->Orders[0].Y=unit->Y;
-	    if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
+	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,WoodCost)) ) {
 		unit->Orders[0].Action=UnitActionStill;
 		unit->SubAction=0;
 	    } else {
@@ -413,7 +414,7 @@ local int WaitInWoodDeposit(Unit* unit)
 	//
 	//	Drop out unit at nearest point to target.
 	//
-	destu=WoodDepositOnMap(unit->X,unit->Y);
+	destu=ResourceDepositOnMap(unit->X,unit->Y,WoodCost);
 	DebugCheck( !destu );		// there must be a depot!
 
 	DropOutNearest(unit

@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -443,7 +443,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 			    break;
 			}
 			// Town hall near mine
-			if( units[j]->Type->StoresGold ) {
+			if( units[j]->Type->Stores[GoldCost] ) {
 			    break;
 			}
 			// Town hall may not be near but we may be using it, check
@@ -626,14 +626,14 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
     //
     //	Find a good place for a new hall
     //
-    if( type->StoresGold && AiFindHallPlace(worker,type,dx,dy) ) {
+    if( type->Stores[GoldCost] && AiFindHallPlace(worker,type,dx,dy) ) {
 	return 1;
     }
 
     //
     //	Find a place near wood for a lumber mill
     //
-    if( type->StoresWood && AiFindLumberMillPlace(worker,type,dx,dy) ) {
+    if( type->Stores[WoodCost] && AiFindLumberMillPlace(worker,type,dx,dy) ) {
 	return 1;
     }
 

@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -372,7 +372,7 @@ global void HandleActionBuilded(Unit* unit)
 	//
 	//	Building lumber mill, let worker automatic chopping wood.
 	//
-	if( type->StoresWood ) {
+	if( type->Stores[WoodCost] ) {
 	    CommandHarvest(worker,unit->X+unit->Type->TileWidth/2,
 		    unit->Y+unit->Type->TileHeight/2,0);
 	}

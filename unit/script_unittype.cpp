@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -223,7 +223,7 @@ local SCM CclDefineUnitType(SCM list)
 	    type->DrawLevel=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("max-on-board")) ) {
-	    // FIXME: need to write code to use this
+	    type->MaxOnBoard=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("hit-points")) ) {
 	    type->_HitPoints=gh_scm2int(gh_car(list));
@@ -374,16 +374,26 @@ local SCM CclDefineUnitType(SCM list)
 	    type->Tanker=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("gives-oil")) ) {
 	    type->GivesOil=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("stores-gold")) ) {
-	    type->StoresGold=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("stores-wood")) ) {
-	    type->StoresWood=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("can-store")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+	    	for( i=0; i<MaxCosts; ++i ) {
+		    if( gh_eq_p(value,gh_symbol2scm(DefaultResourceNames[i])) ) {
+			type->Stores[i]=1;
+			break;
+		    }
+		}
+		if( i==MaxCosts ) {
+		   errl("Unsupported resource tag",value);
+		}
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("oil-patch")) ) {
 	    type->OilPatch=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("gives-gold")) ) {
 	    type->GoldMine=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("stores-oil")) ) {
-	    type->StoresOil=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("vanishes")) ) {
 	    type->Vanishes=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("tower")) ) {
