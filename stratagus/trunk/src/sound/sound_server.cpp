@@ -1225,18 +1225,16 @@ global void QuitSound(void)
 global void QuitCD(void)
 {
 #ifdef USE_SDLCD
-    if (strcmp(CDMode,":off")) {
+    if (strcmp(CDMode,":off"))
 	SDL_CDStop(CDRom);
-        SDL_CDClose(CDRom);
-    }
+    SDL_CDClose(CDRom);
 #endif
 
 #ifdef USE_LIBCDA
-    if (strcmp(CDMode,":off")) {
+    if (strcmp(CDMode,":off"))
         cd_stop();
-        cd_close();
-        cd_exit();
-    }
+    cd_close();
+    cd_exit();
 #endif
 }
 
