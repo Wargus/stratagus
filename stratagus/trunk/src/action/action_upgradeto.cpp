@@ -81,7 +81,7 @@ global void HandleActionUpgradeTo(Unit* unit)
 
 	// FIXME: SendNotify("upgrade-complete");
 	if( player==ThisPlayer ) {
-	    SetMessage2( unit->X, unit->Y, "Upgrade to %s complete",
+	    SetMessageEvent( unit->X, unit->Y, "Upgrade to %s complete",
 		    unit->Type->Name );
 	} else if( unit->Player->Ai ) {
 	    AiUpgradeToComplete(unit,type);

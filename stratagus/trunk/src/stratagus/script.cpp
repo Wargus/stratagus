@@ -599,7 +599,7 @@ global void CclCommand(char* command)
     retval=repl_c_string(msg,0,0,sizeof(msg));
     DebugLevel3("\n%d=%s\n",retval,msg);
 
-    SetMessageDup(msg);
+    SetMessage(msg);
 }
 
 /*............................................................................

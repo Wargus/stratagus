@@ -320,7 +320,7 @@ global void HandleActionBuilded(Unit* unit)
 	// FIXME: General message system
 	// NotifyPlayer("",unit,type);
 	if( unit->Player==ThisPlayer ) {
-	    SetMessage2( unit->X, unit->Y, "New %s done", type->Name );
+	    SetMessageEvent( unit->X, unit->Y, "New %s done", type->Name );
 	    PlayUnitSound(worker,VoiceWorkCompleted);
 	} else if( unit->Player->Ai ) {
 	    AiWorkComplete(worker,unit);

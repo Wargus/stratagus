@@ -2792,18 +2792,29 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 
     type=target->Type;
     if( !target->Attacked ) {
+	// NOTE: perhaps this should also be moved into the notify?
 	if( target->Player==ThisPlayer ) {
 	    static int LastFrame;
+	    static int LastX;
+	    static int LastY;
 
 	    //
 	    //	One help cry each 2 second is enough
-	    //	FIXME: Should this be moved into the sound part???
+	    //	If on same area ignore it for 2 minutes.
 	    //
 	    if( LastFrame<FrameCounter ) {
-		LastFrame=FrameCounter+FRAMES_PER_SECOND*2;
-		PlayUnitSound(target,VoiceHelpMe);
+		if( LastFrame+FRAMES_PER_SECOND*120<FrameCounter ||
+			target->X<LastX-14 || target->X>LastX+14 
+			    || target->Y<LastY-14 || target->Y>LastY+14  ) {
+		    LastFrame=FrameCounter+FRAMES_PER_SECOND*2;
+		    LastX=target->X;
+		    LastY=target->Y;
+		    PlayUnitSound(target,VoiceHelpMe);
+		}
 	    }
 	}
+	NotifyPlayer(target->Player,NotifyRed,target->X,target->Y,
+		"%s attacked",target->Type->Ident);
 	if( target->Player->AiEnabled ) {
 	    AiHelpMe(attacker,target);
 	}

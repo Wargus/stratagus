@@ -73,7 +73,7 @@ global void HandleActionResearch(Unit* unit)
 
 	// FIXME: should als speak and tell ai. generic notify/message.
 	if( unit->Player==ThisPlayer ) {
-	    SetMessage2(unit->X, unit->Y, "%s: Upgrade complete"
+	    SetMessageEvent(unit->X, unit->Y, "%s: Upgrade complete"
 		,unit->Type->Name );
 	} else if( unit->Player->Ai ) {
 	    AiResearchComplete(unit,upgrade);
