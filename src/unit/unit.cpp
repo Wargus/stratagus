@@ -4244,7 +4244,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     fprintf(file, "'stats %d\n  " ,unit->Player->Player);
 #endif
     fprintf(file,"'pixel '(%d %d) ",unit->IX,unit->IY);
-    fprintf(file,"'seenpixel '(%d %d) ",unit->SeenIX,unit->SeenIY);
+    fprintf(file,"'seen-pixel '(%d %d) ",unit->SeenIX,unit->SeenIY);
     fprintf(file,"'%sframe %d ",
 	    unit->Frame<0 ? "flipped-" : "" ,unit->Frame<0?-unit->Frame:unit->Frame);
     if( unit->SeenFrame!=UnitNotSeen ) {
@@ -4265,7 +4265,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	fprintf(file," 'destroyed");
     }
     if( unit->SeenDestroyed ) {
-	fprintf(file," 'seendestroyed");
+	fprintf(file," 'seen-destroyed");
     }
     if( unit->Removed ) {
 	fprintf(file," 'removed");
