@@ -522,6 +522,7 @@ global int AiGetGaugeValue(int gauge)
 **	@param symbol	the gauge's scheme identifier
 **	@return 	the gauge id, or -1 if not found
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global int AiFindGaugeId(SCM symbol)
 {
     int gauge;
@@ -542,14 +543,19 @@ global int AiFindGaugeId(SCM symbol)
     free(tmp);
     return -1;
 }
+#elif defined(USE_LUA)
+#endif
 
 local int AiFindUnusedScript(void)
 {
     int i;
     for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; i++) {
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	if (gh_null_p(AiPlayer->Scripts[i].Script)) {
 	    return i;
 	}
+#elif defined(USE_LUA)
+#endif
     }
     return -1;
 }
@@ -563,6 +569,7 @@ local int AiFindUnusedScript(void)
 **	@return 		-1 if running script now is not possible, 
 **				else a value indicating how long/costly it would be to become 100% OK
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local int AiEvaluateScript(SCM script)
 {
     SCM get_need_lambda, rslt, willeval;
@@ -576,6 +583,8 @@ local int AiEvaluateScript(SCM script)
 
     return gh_scm2int(rslt);
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Evaluate the cost to build a force (time to build + ressources)
@@ -750,6 +759,7 @@ local void AiUpdateForce(int dst_force, int force)
 */
 local int AiFindBestScript(int defend, AiScriptAction * *foundBestScriptAction)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     AiScriptAction *aiScriptAction, *bestScriptAction;
     int bestValue, curValue;
     int i;
@@ -762,7 +772,7 @@ local int AiFindBestScript(int defend, AiScriptAction * *foundBestScriptAction)
 	aiScriptAction = AiScriptActions + i;
 
 	if ((defend && (aiScriptAction->Defensive))
-	    || ((!defend) && (aiScriptAction->Offensive))) {
+		|| ((!defend) && (aiScriptAction->Offensive))) {
 	    curValue = AiEvaluateScript(aiScriptAction->Action);
 	    DebugLevel3Fn("evaluate script ");
 #if 0
@@ -780,6 +790,9 @@ local int AiFindBestScript(int defend, AiScriptAction * *foundBestScriptAction)
 
     (*foundBestScriptAction) = bestScriptAction;
     return bestValue;
+#elif defined(USE_LUA)
+    return 0;
+#endif
 }
 
 /**
@@ -826,6 +839,7 @@ local int AiPrepareScript(int HotSpot_X, int HotSpot_Y, int HotSpot_Ray, int def
 
 local void AiStartScript(AiScriptAction * script, char *ident)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM code;
 
     // Compute force requirements.
@@ -840,6 +854,8 @@ local void AiStartScript(AiScriptAction * script, char *ident)
     AiPlayer->Force[AiScript->ownForce].PopulateMode = AiForceDontPopulate;
 
     snprintf(AiScript->ident, 10, "%s", ident);
+#elif defined(USE_LUA)
+#endif
 }
 
 
@@ -863,7 +879,10 @@ global void AiFindDefendScript(int attackX, int attackY)
 	return;
     }
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
     AiEvaluateScript(bestScriptAction->Action);
+#elif defined(USE_LUA)
+#endif
 
     leftCost = AiEvaluateForceCost(AiScript->ownForce, 0);
     totalCost = AiEvaluateForceCost(AiScript->ownForce, 1);
@@ -1085,7 +1104,10 @@ global void AiPeriodicAttack(void)
 	AiPrepareScript(bestActionEvaluation->hotSpotX, bestActionEvaluation->hotSpotY,
 	    16, 0);
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	AiEvaluateScript(bestActionEvaluation->aiScriptAction->Action);
+#elif defined(USE_LUA)
+#endif
 
 	leftCost = AiEvaluateForceCost(AiScript->ownForce, 0);
 	totalCost = AiEvaluateForceCost(AiScript->ownForce, 1);

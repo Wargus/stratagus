@@ -385,6 +385,7 @@ global void CleanDependencies(void)
 **
 **	@param list	List of the dependency.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineDependency(SCM list)
 {
     char* target;
@@ -462,15 +463,19 @@ local SCM CclCheckDependency(SCM target __attribute__((unused)))
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for dependencies.
 */
 global void DependenciesCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("define-dependency", CclDefineDependency);
     gh_new_procedure1_0("get-dependency", CclGetDependency);
     gh_new_procedure1_0("check-dependency", CclCheckDependency);
+#endif
 }
 
 //@}

@@ -49,6 +49,7 @@
 #include "ccl_helpers.h"
 
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 /*----------------------------------------------------------------------------
 --	Forwards
 ----------------------------------------------------------------------------*/
@@ -1934,12 +1935,15 @@ local SCM CclAiDump(void)
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define AI mapping from original number to internal symbol
 **
 **	@param list	List of all names.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineAiWcNames(SCM list)
 {
     int i;
@@ -1964,6 +1968,42 @@ local SCM CclDefineAiWcNames(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineAiWcNames(lua_State* l)
+{
+    int i;
+    int j;
+    char** cp;
+
+    if ((cp = AiTypeWcNames)) {	// Free all old names
+	while (*cp) {
+	    free(*cp++);
+	}
+	free(AiTypeWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i = lua_gettop(l);
+    AiTypeWcNames = cp = malloc((i + 1) * sizeof(char*));
+    if (!cp) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+
+    for (j = 0; j < i; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	*cp++ = strdup(lua_tostring(l, j + 1));
+    }
+    *cp = NULL;
+
+    return 0;
+}
+#endif
 
 /**
 **	Get the default resource number
@@ -2001,6 +2041,7 @@ local int DefaultResourceNumber(const char *type)
 **				
 **	@param list	List of the AI Player.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineAiPlayer(SCM list)
 {
     //SCM value;
@@ -2019,12 +2060,15 @@ local SCM CclDefineAiPlayer(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for unit-type.
 */
 global void AiCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     // FIXME: Need to save memory here.
     // Loading all into memory isn't necessary.
 
@@ -2099,6 +2143,9 @@ global void AiCclRegister(void)
     gh_new_procedureN("define-ai-wc-names", CclDefineAiWcNames);
 
     gh_new_procedureN("define-ai-player", CclDefineAiPlayer);
+#elif defined(USE_LUA)
+    lua_register(Lua, "DefineAiWcNames", CclDefineAiWcNames);
+#endif
 }
 
 

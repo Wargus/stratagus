@@ -57,10 +57,13 @@
 ** C representation for the siod sound type
 ** ALPHA VERSION!!!!!!!!!
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local ccl_smob_type_t SiodSoundTag;
 
 #define CCL_SOUNDP(x)	(CclGetSmobType(x) == SiodSoundTag)
 #define CCL_SOUND_ID(x) ((SoundId)CclGetSmobData(x))
+#elif defined(USE_LUA)
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -73,6 +76,7 @@ local ccl_smob_type_t SiodSoundTag;
 **
 **	@return		its siod version
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM sound_id_ccl(SoundId id)
 {
     SCM sound_id;
@@ -675,12 +679,15 @@ local SCM CclStopMusic(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for sound.
 */
 global void SoundCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SiodSoundTag = CclMakeSmobType("Sound");
 
     gh_new_procedure1_0("set-sound-volume!", CclSetSoundVolume);
@@ -707,6 +714,7 @@ global void SoundCclRegister(void)
     gh_new_procedure1_0("play-music", CclPlayMusic);
     gh_new_procedure1_0("play-file", CclPlayFile);
     gh_new_procedure0_0("stop-music", CclStopMusic);
+#endif
 }
 
 #else	// }{ WITH_SOUND

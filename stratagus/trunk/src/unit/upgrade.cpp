@@ -707,6 +707,7 @@ global void SaveUpgrades(CLFile* file)
 **
 **	@param list	List of modifiers.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineModifier(SCM list)
 {
     SCM temp;
@@ -927,12 +928,15 @@ local SCM CclDefineAllow(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define upgrade mapping from original number to internal symbol
 **
 **	@param list	List of all names.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineUpgradeWcNames(SCM list)
 {
     int i;
@@ -958,17 +962,61 @@ local SCM CclDefineUpgradeWcNames(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineUpgradeWcNames(lua_State* l)
+{
+    int i;
+    int j;
+    char** cp;
+
+    if ((cp = UpgradeWcNames)) {	// Free all old names
+	while (*cp) {
+	    free(*cp++);
+	}
+	free(UpgradeWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i = lua_gettop(l);
+    UpgradeWcNames = cp = malloc((i + 1) * sizeof(char*));
+    if (!cp) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+
+    for (j = 0; j < i; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	*cp++ = strdup(lua_tostring(l, j + 1));
+    }
+    *cp = NULL;
+
+    return 0;
+}
+#endif
 
 /**
 **	Register CCL features for upgrades.
 */
 global void UpgradesCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("define-modifier", CclDefineModifier);
     gh_new_procedureN("define-upgrade", CclDefineUpgrade);
     gh_new_procedureN("define-allow", CclDefineAllow);
 
     gh_new_procedureN("define-upgrade-wc-names", CclDefineUpgradeWcNames);
+#elif defined(USE_LUA)
+//    lua_register(Lua, "DefineModifier", CclDefineModifier);
+//    lua_register(Lua, "DefineUpgrade", CclDefineUpgrade);
+//    lua_register(Lua, "DefineAllow", CclDefineAllow);
+
+    lua_register(Lua, "DefineUpgradeWcNames", CclDefineUpgradeWcNames);
+#endif
 }
 
 
