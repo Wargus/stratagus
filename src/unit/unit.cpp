@@ -130,31 +130,15 @@ global void ReleaseUnit(Unit* unit)
 	    unit,UnitNumber(unit),unit->Type->Ident);
 
     DebugCheck( !unit->Type );		// already free.
+    DebugCheck( unit->OrderCount!=1 );
+    RefsDebugCheck( unit->Orders[0].Goal );
 
     //
     //	First release, remove from lists/tables.
     //
     if( !unit->Destroyed ) {
-	Player* player;
 	Unit* temp;
 
-	//
-	//	Call back to AI, for killed units.
-	//
-	if( (player=unit->Player) && player->Ai ) {
-	    AiUnitKilled(unit);
-	}
-
-	//
-	//	Remove the unit from the player's units table.
-	//
-	if( player ) {
-	    DebugCheck( *unit->PlayerSlot!=unit );
-	    temp=player->Units[--player->TotalNumUnits];
-	    player->Units[player->TotalNumUnits]=NULL;
-	    temp->PlayerSlot=unit->PlayerSlot;
-	    *unit->PlayerSlot=temp;
-	}
 	//
 	//	Remove the unit from the global units table.
 	//
@@ -561,16 +545,35 @@ global void RemoveUnit(Unit* unit)
 **
 **	@param unit	Pointer to unit.
 */
-global void UnitLost(const Unit* unit)
+global void UnitLost(Unit* unit)
 {
     Unit* temp;
-    UnitType* type;
+    const UnitType* type;
     Player* player;
+    int i;
 
     DebugCheck( !unit );
 
     type=unit->Type;
     player=unit->Player;
+
+    //
+    //	Call back to AI, for killed units.
+    //
+    if( player && player->Ai ) {
+	AiUnitKilled(unit);
+    }
+
+    //
+    //	Remove the unit from the player's units table.
+    //
+    if( player ) {
+	DebugCheck( *unit->PlayerSlot!=unit );
+	temp=player->Units[--player->TotalNumUnits];
+	player->Units[player->TotalNumUnits]=NULL;
+	temp->PlayerSlot=unit->PlayerSlot;
+	*unit->PlayerSlot=temp;
+    }
 
     //
     //	Handle unit demand. (Currently only food supported.)
@@ -658,6 +661,21 @@ global void UnitLost(const Unit* unit)
 	temp=MakeUnitAndPlace(unit->X,unit->Y
 		,UnitTypeByIdent("unit-oil-patch"),&Players[15]);
 	temp->Value=unit->Value;
+    }
+
+    //
+    //	Release all references of the unit.
+    //
+    for( i=unit->OrderCount; i-->0; ) {
+	if( unit->Orders[i].Goal ) {
+	    RefsDebugCheck( !unit->Orders[i].Goal->Refs );
+	    if( !--unit->Orders[i].Goal->Refs ) {
+		RefsDebugCheck( !unit->Orders[i].Goal->Destroyed );
+		ReleaseUnit(unit->Orders[i].Goal);
+	    }
+	    unit->Orders[i].Goal=NoUnitP;
+	}
+	unit->OrderCount=1;
     }
 
     DebugCheck( player->NumFoodUnits > UnitMax);
@@ -1266,7 +1284,6 @@ global void UnitIncrementHealth(void)
 */
 global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
 {
-    Unit* temp;
     int i;
 
     // For st*rcr*ft (dark archons),
@@ -1283,12 +1300,14 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     //
     UnitLost(unit);
 
+#if 0
     //	Remove from old player table
 
     temp=oldplayer->Units[--oldplayer->TotalNumUnits];
     oldplayer->Units[oldplayer->TotalNumUnits]=NULL;
     temp->PlayerSlot=unit->PlayerSlot;
     *unit->PlayerSlot=temp;
+#endif
 
     //
     //	Now the new side!
@@ -2595,34 +2614,16 @@ global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
 }
 
 /**
-**	Destroy an unit.
+**	Let an unit die.
 **
 **	@param unit	Unit to be destroyed.
 */
 global void LetUnitDie(Unit* unit)
 {
-    UnitType* type;
-    int i;
+    const UnitType* type;
 
     unit->HP=0;
     unit->Moving=0;
-
-    MustRedraw|=RedrawResources; // for food usage indicator
-
-    //
-    //	Release all references
-    //
-    for( i=unit->OrderCount; i-->0; ) {
-	if( unit->Orders[i].Goal ) {
-	    RefsDebugCheck( !unit->Orders[i].Goal->Refs );
-	    if( !--unit->Orders[i].Goal->Refs ) {
-		RefsDebugCheck( !unit->Orders[i].Goal->Destroyed );
-		ReleaseUnit(unit->Orders[i].Goal);
-	    }
-	    unit->Orders[i].Goal=NoUnitP;
-	}
-	unit->OrderCount=1;
-    }
 
     type=unit->Type;
 
@@ -2677,9 +2678,9 @@ global void LetUnitDie(Unit* unit)
 
 	// FIXME: buildings should get a die sequence
 
-	if( (type=type->CorpseType) ) {
+	if( type->CorpseType ) {
 	    unit->State=unit->Type->CorpseScript;
-	    unit->Type=type;
+	    type=unit->Type=type->CorpseType;
 
 	    unit->IX=(type->Width-VideoGraphicWidth(type->Sprite))/2;
 	    unit->IY=(type->Height-VideoGraphicHeight(type->Sprite))/2;
