@@ -60,12 +60,7 @@
 #include "sound.h"
 #include "cdaudio.h"
 #include "script.h"
-
-#ifdef USE_GLIB
-#include <glib.h>
-#else
 #include "etlib/hash.h"
-#endif
 
 /*----------------------------------------------------------------------------
 --		Defines
@@ -291,11 +286,7 @@ SelectionHandling SelectionHandler;
 **		Source registration
 */
 /// hash table used to store unit to channel mapping
-#ifdef USE_GLIB
-local GHashTable* UnitToChannel;
-#else
 //local hashtable(int, 61) UnitToChannel;
-#endif
 
 /**
 **		Distance to Volume Mapping
@@ -329,34 +320,22 @@ local int KeepRequest(SoundRequest* sr) {
 	if (sr->Sound == NO_SOUND) {
 		return 0;
 	}
-#ifdef USE_GLIB
-	if ((channel = (int)(long)g_hash_table_lookup(UnitToChannel,
-			(gpointer)(sr->Source.Base)))) {
-		--channel;
-		if (Channels[channel].Source.Id == sr->Source.Id) {
+
+	const SoundChannel* theChannel;
+
+	// slow but working solution: we look for the source in the channels
+	theChannel = Channels;
+	for (channel = 0; channel < MaxChannels; ++channel) {
+		if ((*theChannel).Command == ChannelPlay &&
+				(*theChannel).Source.Base == sr->Source.Base &&
+				(*theChannel).Sound == sr->Sound &&
+				(*theChannel).Source.Id == sr->Source.Id) {
 			//FIXME: decision should take into account the sound
 			return 0;
 		}
-		return 1;
+		++theChannel;
 	}
-#else
-	{
-		const SoundChannel* theChannel;
 
-		// slow but working solution: we look for the source in the channels
-		theChannel = Channels;
-		for (channel = 0; channel < MaxChannels; ++channel) {
-			if ((*theChannel).Command == ChannelPlay &&
-					(*theChannel).Source.Base == sr->Source.Base &&
-					(*theChannel).Sound == sr->Sound &&
-					(*theChannel).Source.Id == sr->Source.Id) {
-				//FIXME: decision should take into account the sound
-				return 0;
-			}
-			++theChannel;
-		}
-	}
-#endif
 	return 1;
 }
 
@@ -369,17 +348,13 @@ local void RegisterSource(SoundRequest* sr, int channel)
 	// use channel+1 to avoid inserting null values
 	//FIXME: we should use here the unique identifier of the source, not only
 	// the pointer
-#ifdef USE_GLIB
-	g_hash_table_insert(UnitToChannel, (gpointer)(long)(sr->Source.Base),
-		(gpointer)(channel+1));
-#else
 	int i;
 	void* p;
 
 	i = channel;
 	p = sr;
 	DebugLevel3Fn("FIXME: must write %p -> %d\n" _C_ sr _C_ channel);
-#endif
+
 	DebugLevel3("Registering %p (channel %d)\n" _C_ sr->Source.Base _C_ channel);
 }
 
@@ -387,18 +362,11 @@ local void RegisterSource(SoundRequest* sr, int channel)
 ** Remove the source of a channel from the selection handling hash table.
 */
 local void UnRegisterSource(int channel) {
-#ifdef USE_GLIB
-	if ((int)(long)g_hash_table_lookup(UnitToChannel,
-			(gpointer)(Channels[channel].Source.Base)) == channel + 1) {
-		g_hash_table_remove(UnitToChannel,
-			(gpointer)(long)(Channels[channel].Source.Base));
-	}
-#else
 	int i;
 
 	i = channel;
 	DebugLevel3Fn("FIXME: must write %d\n" _C_ channel);
-#endif
+
 	DebugLevel3("Removing %p (channel %d)\n" _C_
 		Channels[channel].Source.Base _C_ channel);
 }
@@ -926,11 +894,7 @@ global int InitSound(void)
 
 	// initialize unit to channel hash table
 	// WARNING: creation is only valid for a hash table using pointers as key
-#ifdef USE_GLIB
-	UnitToChannel = g_hash_table_new(g_direct_hash, NULL);
-#else
 	DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
-#endif
 
 	return 0;
 }
