@@ -80,7 +80,7 @@ local Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
 		// FIXME: did SelectUnitsOnTile already filter this?
 		// Invisible and not Visible
 		if (unit->Removed || unit->Invisible || !unit->HP ||
-				!(unit->Visible & (1 << source->Player->Player)) ||
+				//(!UnitVisible(unit, source->Player)) ||
 				unit->Orders[0].Action == UnitActionDie) {
 			continue;
 		}

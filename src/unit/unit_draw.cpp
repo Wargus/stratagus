@@ -1744,6 +1744,15 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 	const UnitStats* stats;
 	int r;
 
+#if 0 // This is for showing vis counts and refs.
+	char buf[10];
+	sprintf(buf, "%d%c%c%d", unit->VisCount[ThisPlayer->Player],
+		unit->Seen.ByPlayer & (1 << ThisPlayer->Player) ? 'Y' : 'N',
+		unit->Seen.Destroyed & (1 << ThisPlayer->Player) ? 'Y' : 'N',
+		unit->Refs);
+	VideoDrawTextClip(x + 10, y + 10, 1, buf);
+#endif
+
 	stats = unit->Stats;
 
 	//
@@ -1980,40 +1989,30 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 **		@param x		X position.
 **		@param y		Y position.
 */
-local void DrawConstruction(const Unit* unit, int frame, int x, int y)
+local void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
+		const UnitType* type, int frame, int x, int y)
 {
-	ConstructionFrame* cframe;
-
-	cframe = unit->Data.Builded.Frame;
 	if (cframe->File == ConstructionFileConstruction) {
 		const Construction* construction;
 
-		construction = unit->Type->Construction;
+		construction = type->Construction;
 		x -= construction->Width / 2;
 		y -= construction->Height / 2;
 		GraphicUnitPixels(unit, construction->Sprite);
 		VideoDrawClip(construction->Sprite, frame, x, y);
 	} else {
-		x -= unit->Type->TileWidth * TileSizeX / 2;
-		y -= unit->Type->TileHeight * TileSizeY / 2;
-		GraphicUnitPixels(unit, unit->Type->Sprite);
-		DrawUnitType(unit->Type, unit->Type->Sprite, frame, x, y);
+		x -= type->TileWidth * TileSizeX / 2;
+		y -= type->TileHeight * TileSizeY / 2;
+		GraphicUnitPixels(unit, type->Sprite);
+		DrawUnitType(type, type->Sprite, frame, x, y);
 #ifdef USE_OPENGL
-		DrawUnitPlayerColor(unit->Type, unit->Player->Player, frame, x, y);
+		DrawUnitPlayerColor(type, unit->Player->Player, frame, x, y);
 #endif
 	}
 }
 
 /**
 **		Units on map:
-**
-**		1) Must draw underground/underwater units. (FUTURE extension)
-**		2) Must draw buildings and corpse.
-**		3) Must draw land/sea units.
-**		4) Must draw decoration units. (FUTURE extension)
-**		5) Must draw low air units.
-**		6) Must draw middle air units. (FUTURE extension)
-**		7) Must draw hight air units. (FUTURE extension)
 */
 
 /**
@@ -2030,14 +2029,18 @@ global void DrawUnit(const Unit* unit)
 	int constructed;
 	Graphic* sprite;
 	ResourceInfo* resinfo;
+	ConstructionFrame* cframe;
 	const UnitType* type;
-
+	
 	if (unit->Type->Revealer) {				// Revealers are not drawn
 		DebugLevel3Fn("Drawing revealer %d\n" _C_ UnitNumber(unit));
 		return;
 	}
 
-	if (ReplayRevealMap || !unit->Type->VisibleUnderFog) {
+	//  Those should have been filtered. Check doesn't make sense with ReplayRevealMap
+	DebugCheck((!ReplayRevealMap) && (!unit->Type->VisibleUnderFog) && (!UnitVisible(unit, ThisPlayer)));
+
+	if (ReplayRevealMap || UnitVisible(unit, ThisPlayer)) {
 		type = unit->Type;
 		frame = unit->Frame;
 		y = unit->IY;
@@ -2045,16 +2048,19 @@ global void DrawUnit(const Unit* unit)
 		state = (unit->Orders[0].Action == UnitActionBuilded) |
 			((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
 		constructed = unit->Constructed;
+		// This is trash unless the unit is being built, and that's when we use it.
+		cframe = unit->Data.Builded.Frame;
 	} else {
-		y = unit->SeenIY;
-		x = unit->SeenIX;
-		frame = unit->SeenFrame;
-		type = unit->SeenType;
-		constructed = unit->SeenConstructed;
-		state = unit->SeenState;
+		y = unit->Seen.IY;
+		x = unit->Seen.IX;
+		frame = unit->Seen.Frame;
+		type = unit->Seen.Type;
+		constructed = unit->Seen.Constructed;
+		state = unit->Seen.State;
+		cframe = unit->Seen.CFrame;
 	}
 
-	if (frame == UnitNotSeen) {
+	if ((!UnitVisible(unit, ThisPlayer)) && frame == UnitNotSeen) {
 		DebugLevel0Fn("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
 			unit->Slot _C_ GameCycle);
 		return;
@@ -2106,7 +2112,7 @@ global void DrawUnit(const Unit* unit)
 	//
 	if (state == 1) {
 		if (constructed) {
-			DrawConstruction(unit, frame,
+			DrawConstruction(unit, cframe, type, frame,
 				x + (type->TileWidth * TileSizeX) / 2,
 				y + (type->TileHeight * TileSizeY) / 2);
 		}
@@ -2175,7 +2181,6 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 */
 global int FindAndSortUnits(const Viewport* vp, Unit** table)
 {
-	Unit** corpses;
 	int n;
 
 	//
@@ -2184,30 +2189,6 @@ global int FindAndSortUnits(const Viewport* vp, Unit** table)
 	n = SelectUnits(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
 
-	//
-	//  Add Corpses to the list.
-	//
-	corpses = &CorpseList;
-	while (*corpses) {
-		if (UnitVisibleInViewport(vp,*corpses) && !(*corpses)->Destroyed) {
-			table[n++] = *corpses;
-		}
-		corpses = &(*corpses)->Next;
-	}
-
-	//
-	//  Add Destroyed Buildings
-	//
-	corpses = &DestroyedBuildings;
-	while (*corpses) {
-		if (UnitVisibleInViewport(vp, *corpses) && !(*corpses)->SeenDestroyed &&
-				(((*corpses)->Visible & 1 << ThisPlayer->Player) ||
-					!(*corpses)->Destroyed)) {
-			table[n++] = *corpses;
-		}
-		corpses = &(*corpses)->Next;
-	}
-	// Only draw if there are units to draw :)
 	if (n) {
 		qsort((void *)table, n, sizeof(Unit*), DrawLevelCompare);
 	}

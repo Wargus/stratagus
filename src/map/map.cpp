@@ -134,43 +134,27 @@ global void MapMarkSeenTile(int x, int y)
 */
 global void RevealMap(void)
 {
-	int ix;
-	int iy;
-	Unit* unit;
-
-	for (ix = 0; ix < TheMap.Width; ++ix) {
-		for (iy = 0; iy < TheMap.Height; ++iy) {
+	int x;
+	int y;
+	//
+	//	Mark every explored tile as visible. 1 turns into 2.
+	//
+	for (x = 0; x < TheMap.Width; ++x) {
+		for (y = 0; y < TheMap.Height; ++y) {
 			int i;
 			for (i = 0; i < PlayerMax; ++i) {
-				if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
-					TheMap.Fields[ix+iy*TheMap.Width].Visible[i] = 1;
+				if (!TheMap.Fields[x+y*TheMap.Width].Visible[i]) {
+					TheMap.Fields[x+y*TheMap.Width].Visible[i] = 1;
 				}
 			}
-			MapMarkSeenTile(ix, iy);
-			UnitsMarkSeen(ix, iy);
+			MapMarkSeenTile(x, y);
 		}
 	}
-	for (ix = 0; ix < Players[PlayerNumNeutral].TotalNumUnits; ++ix) {
-		unit = Players[PlayerNumNeutral].Units[ix];
-		unit->SeenIY = unit->IY;
-		unit->SeenIX = unit->IX;
-		if (unit->SeenFrame == UnitNotSeen) {
-			DebugLevel3Fn("unit %d at %d,%d first seen at %lu.\n" _C_
-				unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
-		}
-		unit->SeenFrame = unit->Frame;
-		unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
-			((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
-		if (unit->Orders[0].Action == UnitActionDie) {
-			unit->SeenState = 3;
-		}
-		if (unit->SeenState == 2) {
-			unit->SeenType = unit->Orders[0].Type;
-		} else {
-			unit->SeenType = unit->Type;
-		}
-		unit->SeenConstructed = unit->Constructed;
-		unit->SeenDestroyed = unit->Destroyed;
+	//
+	//	Global seen recount. Simple and effective.
+	//
+	for (x = 0; x < NumUnits; ++x) {
+		UnitCountSeen(Units[x]);
 	}
 }
 

@@ -399,7 +399,7 @@ local void DrawMapViewport(Viewport* vp)
 		CurrentViewport = vp;
 		while (i < nunits && j < nmissiles) {
 			if (table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
-				if (UnitVisibleInViewport(vp, table[i])) {
+				if (UnitVisibleInViewport(table[i], vp)) {
 					DrawUnit(table[i]);
 				}
 				++i;
@@ -424,7 +424,7 @@ local void DrawMapViewport(Viewport* vp)
 			}
 		}
 		for (; i < nunits; ++i) {
-			if (UnitVisibleInViewport(vp, table[i])) {
+			if (UnitVisibleInViewport(table[i], vp)) {
 				DrawUnit(table[i]);
 			}
 		}
@@ -804,7 +804,6 @@ global void GameMainLoop(void)
 					CclGarbageCollect(1);
 					break;
 				case 1:
-					HandleCloak();
 					break;
 				case 2:
 					break;

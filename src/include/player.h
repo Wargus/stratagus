@@ -117,6 +117,11 @@
 **    are combined, if none bit is set, the player is neutral.
 **    @note You can be allied to a player, which sees you as enemy.
 **
+**  Player::SharedVision
+**
+**    A bit field which contains shared vision for this player.
+**    Shared vision only works when it's activated both ways. Really.
+**
 **  Player::StartX Player::StartY
 **
 **    The tile map coordinates of the player start position. 0,0 is
@@ -537,6 +542,9 @@ extern void NotifyPlayer(const Player*, int, int, int, const char*, ...);
 
 	/// register ccl features
 extern void PlayerCclRegister(void);
+
+	/// Two players share vision
+#define PlayersShareVision(a, b) ((Players[a].SharedVision & (1 << (b))) && (Players[b].SharedVision & (1 << (a))) )
 
 //@}
 

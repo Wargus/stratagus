@@ -217,13 +217,10 @@ global int EnemyUnitsInDistance(const Unit* unit, unsigned range)
 	for (e = i = 0; i < n; ++i) {
 		dest = table[i];
 		//
-		// unusable unit
+		// Those can't attack anyway.
 		//
-		// FIXME: did SelectUnits already filter this.
 		if (dest->Removed || dest->Invisible || !unit->HP
-			|| !(dest->Visible & (1 << player->Player))
-			|| dest->Orders[0].Action == UnitActionDie) {
-			DebugLevel0Fn("NO\n");
+				|| dest->Orders[0].Action == UnitActionDie) {
 			continue;
 		}
 

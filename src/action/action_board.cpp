@@ -98,7 +98,7 @@ local int WaitForTransporter(Unit* unit)
 		return 0;
 	}
 
-	if (GoalGone(unit, trans)) {
+	if (!UnitVisibleAsGoal(trans, unit->Player)) {
 		DebugLevel0Fn("Transporter Gone\n");
 		RefsDecrease(trans);
 		unit->Orders[0].Goal = NoUnitP;
@@ -142,7 +142,7 @@ local void EnterTransporter(Unit* unit)
 	unit->SubAction = 0;
 
 	transporter = unit->Orders[0].Goal;
-	if (GoalGone(unit,transporter)) {
+	if (!UnitVisibleAsGoal(transporter, unit->Player)) {
 		DebugLevel0Fn("Transporter gone\n");
 		RefsDecrease(transporter);
 		unit->Orders[0].Goal = NoUnitP;

@@ -1610,7 +1610,7 @@ global void AiCanNotMove(Unit* unit)
 	int minrange;
 	int maxrange;
 
-	DebugLevel2Fn("%s at %d %d\n" _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
+	DebugLevel3Fn("%s at %d %d\n" _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 
 	AiPlayer = unit->Player->Ai;
 
@@ -1636,7 +1636,7 @@ global void AiCanNotMove(Unit* unit)
 	if (PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange) ||
 			unit->Type->UnitType == UnitTypeFly) {
 		// Path probably closed by unit here
-		DebugLevel2Fn("Place reacheable, move unit in the way.\n");
+		DebugLevel3Fn("Place reacheable, move unit in the way.\n");
 		AiMoveUnitInTheWay(unit);
 		return;
 	}

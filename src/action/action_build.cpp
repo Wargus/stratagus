@@ -80,7 +80,6 @@ local void UpdateConstructionFrame(Unit* unit)
 		unit->Data.Builded.Frame = cframe;
 		unit->Frame = cframe->Frame;
 		CheckUnitToBeDrawn(unit);
-		UnitMarkSeen(unit);
 	}
 }
 
@@ -279,12 +278,10 @@ global void HandleActionBuild(Unit* unit)
 		unit->SubAction = 0;
 		unit->Wait = 1;
 		RefsIncrease(build);
-		UnitMarkSeen(unit);
 		// Mark the new building seen.
 		MapMarkUnitSight(build);
 	}
 	UpdateConstructionFrame(build);
-	UnitMarkSeen(build);
 }
 
 /**

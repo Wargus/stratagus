@@ -239,7 +239,7 @@ global Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
-		if (GoalGone(source, unit)) {
+		if (!UnitVisibleAsGoal(unit, source->Player)) {
 			continue;
 		}
 		type = unit->Type;
@@ -286,7 +286,7 @@ global Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
-		if (GoalGone(source, unit)) {
+		if (!UnitVisibleAsGoal(unit, source->Player)) {
 			continue;
 		}
 		type = unit->Type;
@@ -527,7 +527,7 @@ local Unit* FindRangeAttack(Unit* u, int range)
 	for (i = 0; i < n; ++i) {
 		dest = table[i];
 		dtype = dest->Type;
-		if (GoalGone(u, dest)) {
+		if (!UnitVisibleAsGoal(dest, u->Player)) {
 			table[i] = 0;
 			continue;
 		}
@@ -768,7 +768,10 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 
 	for (i = 0; i < n; ++i) {
 		dest = table[i];
-		if (GoalGone(unit, dest)) {		// unit attackable
+
+		// Do NOT check vision.
+		if (dest->Removed || dest->Invisible || !unit->HP
+				|| dest->Orders[0].Action == UnitActionDie) {
 			continue;
 		}
 

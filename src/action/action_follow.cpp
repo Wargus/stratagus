@@ -66,7 +66,7 @@ global void HandleActionFollow(Unit* unit)
 	//
 	if (unit->SubAction == 128) {
 		goal = unit->Orders[0].Goal;
-		if (!goal || GoalGone(unit,goal)) {
+		if (!goal || !UnitVisibleAsGoal(goal, unit->Player)) {
 			DebugLevel0Fn("Goal gone\n");
 			if (goal) {
 				RefsDecrease(goal);
@@ -219,7 +219,7 @@ global void HandleActionFollow(Unit* unit)
 	//
 	// Target destroyed?
 	//
-	if ((goal = unit->Orders[0].Goal) && GoalGone(unit, goal)) {
+	if ((goal = unit->Orders[0].Goal) && !UnitVisibleAsGoal(goal, unit->Player)) {
 		DebugLevel0Fn("Goal gone\n");
 		unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 		unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
