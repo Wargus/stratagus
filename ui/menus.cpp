@@ -2188,9 +2188,9 @@ local void KeystrokeHelpMenu(void)
 
     for (j=3; j < nitems ;++j) {
 	if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
-	    KeystrokeHelpMenuItems[j].xofs = 400;
+	    KeystrokeHelpMenuItems[j].mitype = 0;
 	else
-	    KeystrokeHelpMenuItems[j].xofs = 16;
+	    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
     }
     ProcessMenu(MENU_KEYSTROKE_HELP, 1);
 }
@@ -3014,18 +3014,18 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 		    for (j=3; j < nitems ;++j) {
 			KeystrokeHelpMenuItems[j].yofs -= 20;
 			if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
-			    KeystrokeHelpMenuItems[j].xofs = 400;
+			    KeystrokeHelpMenuItems[j].mitype = 0;
 			else
-			    KeystrokeHelpMenuItems[j].xofs = 16;
+			    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
 		    }
 		    MustRedraw |= RedrawMenu;
 	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP && KeystrokeHelpMenuItems[3].yofs < 40) {
 		    for (j=3; j < nitems ;++j) {
 		    KeystrokeHelpMenuItems[j].yofs += 20;
 		    if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
-			KeystrokeHelpMenuItems[j].xofs = 400;
+			KeystrokeHelpMenuItems[j].mitype = 0;
 		    else
-			KeystrokeHelpMenuItems[j].xofs = 16;
+			KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
 		    }
 		    MustRedraw |= RedrawMenu;
 	    }
@@ -3045,9 +3045,9 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 		for (j=3; j < nitems; ++j) {
 		    KeystrokeHelpMenuItems[j].yofs = ( mi[1].d.vslider.percent * (nitems - 9 - 3) / 100 * (-20) ) + 40 + (j-3)*20;
 		    if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
-			KeystrokeHelpMenuItems[j].xofs = 400;
+			KeystrokeHelpMenuItems[j].mitype = 0;
 		    else
-			KeystrokeHelpMenuItems[j].xofs = 16;
+			KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
 		}
 		MustRedraw |= RedrawMenu;
 	    }
