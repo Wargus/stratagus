@@ -107,7 +107,8 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
 	    || UnitTypeHumanWall->_HitPoints>=256 );
 
     if( map->Terrain<TilesetMax ) {
-	// FIXME: should use terrain name!!
+	// FIXME: should use terrain name or better map->Tileset!!
+	//DebugCheck( map->Tileset->Table != Tilesets[map->Terrain]->Table );
 	ctab=Tilesets[map->Terrain]->Table;
 	DebugLevel0Fn("FIXME: %s <-> %s\n" _C_ Tilesets[map->Terrain]->Class _C_
 		map->TerrainName);
@@ -899,6 +900,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		}
 		map->TerrainName=strdup(TilesetWcNames[t]);
 		map->Terrain=t;
+		// FIXME: Should set tileset here!
 		continue;
 	    } else {
 		DebugLevel1("Wrong terrain type length\n");
