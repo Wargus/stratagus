@@ -1103,7 +1103,9 @@ local int InputKey(int key)
 	    }
 	    // FIXME: only to selected players ...
 	    sprintf(ChatMessage, "<%s> %s", ThisPlayer->Name, Input);
-	    NetworkChatMessage(ChatMessage);
+	    if (strlen(Input)) {
+		NetworkChatMessage(ChatMessage);
+	    }
 	    // FALL THROUGH
 	case '\033':
 	    KeyState = KeyStateCommand;
