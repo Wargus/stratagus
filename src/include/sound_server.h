@@ -236,11 +236,11 @@ extern unsigned CompressedSoundMemory;
 
     /// cd play mode, ":off" ":random" ":all" or ":defined"
 extern char *CDMode;
+    /// FIXME: docu
+extern char *CDPlaySection;
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     /// FIXME: docu
 extern int CDTrack;
-    /// FIXME: docu
-extern char *CDPlaySection;
 #endif
 
 #if defined(USE_SDLCD)
