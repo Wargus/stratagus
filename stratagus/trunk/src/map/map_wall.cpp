@@ -79,7 +79,7 @@
 ** @param y Map Y tile-position.
 ** @param walltype Walltype to check. (-1 any kind)
 */
-int MapIsSeenTileWall(int x, int y, int walltype)
+static int MapIsSeenTileWall(int x, int y, int walltype)
 {
 	int t;
 

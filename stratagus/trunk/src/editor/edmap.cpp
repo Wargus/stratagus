@@ -483,16 +483,7 @@ static void EditorTileChanged2(int x, int y, int d)
 	//
 	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
 	if (mf->Flags & MapFieldWall) {
-		if (mf->Flags & MapFieldHuman) {
-			mf->Value = UnitTypeHumanWall->_HitPoints;
-		} else {
-			mf->Value = UnitTypeOrcWall->_HitPoints;
-		}
-		MapFixWallTile(x + 0, y + 0);
-		MapFixWallTile(x + 1, y + 0);
-		MapFixWallTile(x + 0, y + 1);
-		MapFixWallTile(x - 1, y + 0);
-		MapFixWallTile(x + 0, y - 1);
+		MapSetWall(x, y, mf->Flags & MapFieldHuman);
 		return;
 	}
 
