@@ -566,6 +566,12 @@ local unsigned X112InternalKeycode(const KeySym code)
 	case XK_KP_9:
 	    icode=KeyCodeKP9;
 	    break;
+	case XK_KP_Add:
+	    icode=KeyCodeKPPlus;
+	    break;
+	case XK_KP_Subtract:
+	    icode=KeyCodeKPMinus;
+	    break;
 
         // We need these because if you only hit a modifier key,
         // X doesn't set its state (modifiers) field in the keyevent.
