@@ -2016,36 +2016,6 @@ global void DropOutAll(const Unit* source)
 	}
     }
     DebugLevel0Fn("Drop out %d of %d\n" _C_ i _C_ source->Data.Resource.Active);
-#if 0
-    // FIXME: Rewrite this use source->Next;
-    Unit** table;
-    Unit* unit;
-    Unit* table2[UnitMax];
-    int i;
-    int n;
-
-    for( table=Units; table<Units+NumUnits; table++ ) {
-	unit=*table;
-	if( unit->Removed ) {
-	    n=SelectUnitsOnTile(unit->X,unit->Y,table2);
-	    for( i=0; i<n; ++i ) {
-		if( UnitUnusable(table2[i]) ) {
-		    continue;
-		}
-		if( table2[i]->Type->Building ) {
-		    if ( table2[i]->X==source->X && table2[i]->Y==source->Y ) {
-			DropOutOnSide(unit,LookingW
-			    ,source->Type->TileWidth,source->Type->TileHeight);
-			DebugCheck( unit->Orders[0].Goal );
-			unit->Orders[0].Action=UnitActionStill;
-			unit->Wait=unit->Reset=1;
-			unit->SubAction=0;
-		    }
-		}
-	    }
-	}
-    }
-#endif
 }
 
 /*----------------------------------------------------------------------------
