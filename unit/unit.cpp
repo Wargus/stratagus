@@ -3457,8 +3457,12 @@ int CanTransport(const Unit* transporter, const Unit* unit)
 		return 0;
 	}
 	// FIXME: remove UnitTypeLand requirement
-	if (PlayersTeamed(transporter->Player->Player, unit->Player->Player) &&
-			unit->Type->UnitType != UnitTypeLand) {
+	if (unit->Type->UnitType != UnitTypeLand) {
+		return 0;
+	}
+	// Can transport only allied unit.
+	// FIXME : should be parametrable.
+	if (!PlayersTeamed(transporter->Player->Player, unit->Player->Player)) {
 		return 0;
 	}
 	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
