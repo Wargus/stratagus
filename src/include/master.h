@@ -62,4 +62,6 @@ extern int SendMetaCommand(char* command, char* format, ...);
 extern int RecvMetaReply(char** reply);
 extern int GetMetaParameter(char* reply, int pos, char** value);
 
+//@}
+
 #endif // !__MASTER_H__

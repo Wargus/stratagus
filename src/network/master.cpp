@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <errno.h>
@@ -58,7 +58,7 @@
 
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 //###### For Magnant META SERVER
@@ -66,14 +66,15 @@ static Socket MetaServerFildes;  // This is a TCP socket.
 int MetaServerInUse;
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 
 /**
-**		Initialize the TCP connection to the Meta Server.
+**  Initialize the TCP connection to the Meta Server.
 **
-**		@return		-1 fail, 0 success.
+**  @return  -1 fail, 0 success.
+**  @todo Make a dynamic port allocation.
 */
 int MetaInit(void)
 {
@@ -87,7 +88,7 @@ int MetaInit(void)
 	reply = NULL;
 	MetaServerFildes = NetworkFildes;
 	for (i = port_range_min; i < port_range_max; ++i) {
-		MetaServerFildes = NetOpenTCP(i);		//FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
+		MetaServerFildes = NetOpenTCP(i);  //FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
 		if (MetaServerFildes != (Socket)-1) {
 			if (NetConnectTCP(MetaServerFildes, NetResolveHost(MASTER_HOST), MASTER_PORT) != -1) {
 				break;
@@ -117,9 +118,10 @@ int MetaInit(void)
 	return 0;
 }
 
-/**		Close Connection to Master Server
+/**
+**  Close Connection to Master Server
 **
-**		@return		nothing
+**  @return  nothing
 */
 int MetaClose(void)
 {
@@ -128,22 +130,23 @@ int MetaClose(void)
 }
 
 /**
-**		Checks if a Message was OK or ERR
+**  Checks if a Message was OK or ERR
 **
-**		@return 1 OK, 0 Error.
+**  @return 1 OK, 0 Error.
 */
 int MetaServerOK(char* reply)
 {
 	return !strcmp("OK\r\n", reply) || !strcmp("OK\n", reply);
 }
 
-/**		Retrieves the value of the parameter at position paramNumber
+/**
+**  Retrieves the value of the parameter at position paramNumber
 **
-**		@param		reply		The reply from the metaserver
-**		@param		pos		the parameter number
-**		@param		value		the returned value
+**  @param reply    The reply from the metaserver
+**  @param pos      The parameter number
+**  @param value    The returned value
 **
-**		@returns -1 if error.
+**  @returns -1 if error.
 */
 int GetMetaParameter(char* reply, int pos, char** value)
 {
@@ -183,13 +186,13 @@ int GetMetaParameter(char* reply, int pos, char** value)
 
 
 /**
-**		Send a command to the meta server
+**  Send a command to the meta server
 **
-**		@param command		command to send
-**		@param format		format of parameters
-**		@param ...		parameters
+**  @param command   command to send
+**  @param format    format of parameters
+**  @param ...       parameters
 **
-**		@returns		-1 fail, length of command
+**  @returns  -1 fail, length of command
 */
 int SendMetaCommand(char* command, char* format, ...)
 {
@@ -239,8 +242,8 @@ int SendMetaCommand(char* command, char* format, ...)
 		/* Else try again with more space. */
 		if (n > -1) { /* glibc 2.1 */
 			size = n + 1; /* precisely what is needed */
-		} else {		   /* glibc 2.0 */
-			size *= 2;  /* twice the old size */
+		} else {              /* glibc 2.0 */
+			size *= 2;    /* twice the old size */
 		}
 		if ((p = realloc(p, size)) == NULL) {
 			return -1;
@@ -260,10 +263,11 @@ int SendMetaCommand(char* command, char* format, ...)
 }
 
 /**
-**		Receive reply from Meta Server
+**  Receive reply from Meta Server
 **
-**		@param		reply		Text of the reply
-**		@return		error or number of bytes
+**  @param  reply  Text of the reply
+**
+**  @return error or number of bytes
 */
 int RecvMetaReply(char** reply)
 {
@@ -292,3 +296,5 @@ int RecvMetaReply(char** reply)
 	*reply = p;
 	return n;
 }
+
+//@}
