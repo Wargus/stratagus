@@ -42,7 +42,7 @@
 #endif
 
 #ifdef USE_SDL
-#include <SDL.h>
+#include "SDL.h"
 #endif
 
 #include "iolib.h"

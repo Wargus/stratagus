@@ -38,7 +38,7 @@
 #ifdef WITH_SOUND	// {
 
 #ifdef USE_SDLA
-#include <SDL_audio.h>
+#include "SDL_audio.h"
 #endif
 
 #include "video.h"

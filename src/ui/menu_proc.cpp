@@ -66,8 +66,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #elif defined(USE_SDL)
-#include <SDL.h>
-#include <SDL_syswm.h>
+#include "SDL.h"
+#include "SDL_syswm.h"
 #endif
 
 /*----------------------------------------------------------------------------

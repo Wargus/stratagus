@@ -112,7 +112,7 @@
 #include "intern_video.h"
 
 #ifdef USE_SDL
-#include <SDL.h>
+#include "SDL.h"
 #endif
 
 /*----------------------------------------------------------------------------

@@ -53,7 +53,7 @@
 #ifdef USE_THREAD
 #error "not USE_SDLA and USE_THREAD"
 #endif
-#include <SDL_audio.h>
+#include "SDL_audio.h"
 #else
 #ifdef __linux__
 #   include <sys/ioctl.h>
@@ -80,7 +80,7 @@
 #endif
 
 #if defined(USE_SDLCD)
-#include <SDL.h>
+#include "SDL.h"
 #elif defined(USE_LIBCDA)
 #include "libcda.h"
 #elif defined(USE_CDDA)
