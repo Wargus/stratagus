@@ -148,8 +148,12 @@ local int CommandKey(int key)
 	    break;
     );
 #endif
+	case 'p':			// If pause-key didn't work
+	case 'P':
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
         case KeyCodePause:
-	case 'P':			// If pause-key didn't work
             if(GamePaused) {
                 GamePaused=0;
                 SetStatusLine("Game Resumed");
@@ -166,6 +170,11 @@ local int CommandKey(int key)
 	    DebugLevel0("FIXME: not written\n");
 	    break;
 
+	case 'm':
+	case 'M':			/// ALT+M, F10 Game menu
+	    if( !(KeyModifiers&ModifierAlt) ) {
+		break;
+	    }
 	case KeyCodeF10:
 	    GamePaused=1;
 	    SetStatusLine("Game Paused");
@@ -187,21 +196,44 @@ local int CommandKey(int key)
 	    SetStatusLine("Slower");
 	    break;
 
-	case 'S':			// SMALL s is needed for panel
+	case 'l':			// ALT l F12 load game menu
+	case 'L':
+	    if( !(KeyModifiers&ModifierAlt) ) {
+		break;
+	    }
+	case KeyCodeF12:
+	    SetStatusLine("Slower");
+	    break;
+
+	case 's':			// ALT s F11 save game menu
+	case 'S':
+	    if( !(KeyModifiers&ModifierAlt) ) {
+		break;
+	    }
+	case KeyCodeF11:
 	    SaveAll();
 	    break;
 
 	case 'c':			// center on selected units
+	case 'C':
 	    if(	NumSelected==1 ) {
 		MapCenter(Selected[0]->X,Selected[0]->Y);
 	    }
 	    break;
 
-	case 'G':			// grab mouse pointer
+	case 'g':
+	case 'G':			// ALT+G, CTRL+G grab mouse pointer
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
 	    ToggleGrabMouse();
 	    break;
 
+	case 'f':
 	case 'F':			// toggle fullscreen
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
 #ifdef USE_SDL
 //#if SDL_VERSIONNUM(SDL_MAJOR_VERSION,SDL_MINOR_VERSION,SDL_PATCHLEVEL)>=1008
 #if (SDL_MAJOR_VERSION*1000+SDL_MINOR_VERSION+100+SDL_PATCHLEVEL)>=1008
@@ -228,7 +260,18 @@ local int CommandKey(int key)
 	    MustRedraw|=RedrawMinimap;
 	    break;
 
-	case 'Q':			// should be better protected
+	case 'x':
+	case 'X':			// ALT+X, CTRL+X: Exit game
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
+	    Exit(0);
+
+	case 'q':
+	case 'Q':			// ALT+Q, CTRL+Q: Quit level
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
 	    Exit(0);
 
 	case KeyCodeUp:
