@@ -258,6 +258,9 @@ extern Graphic* NewGraphic(const char* file, int w, int h);
 	/// Free Graphic taking into account the number of uses.
 extern void FreeGraphic(Graphic* g);
 
+	/// Check if a pixel is transparent
+extern int GraphicTransparentPixel(Graphic* g, int x, int y);
+
 	/// Load a picture and display it on the screen (full screen),
 	/// changing the colormap and so on..
 extern void DisplayPicture(const char* name);
