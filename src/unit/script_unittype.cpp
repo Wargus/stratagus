@@ -441,7 +441,7 @@ local SCM CclDefineUnitType(SCM list)
     type->GoldMine=0;
     type->Hero=0;
     type->StoresOil=0;
-    type->Explodes=0;
+    type->Volatile=0;
     type->CowerMage=0;
     type->Organic=0;
     type->SelectableByRectangle=0;
@@ -534,7 +534,7 @@ local SCM CclDefineUnitType(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("stores-oil")) ) {
 	    type->StoresOil=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("volatile")) ) {
-	    type->Explodes=1;
+	    type->Volatile=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("cower-mage")) ) {
 	    type->CowerMage=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("organic")) ) {

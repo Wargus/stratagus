@@ -483,7 +483,7 @@ global void PrintUnitTypeTable(void)
 	printf("\t,%5d,%5d,%10d,%6d,%8d,%6d\n"
 	    ,type->Hero
 	    ,type->StoresOil
-	    ,type->Explodes
+	    ,type->Volatile
 	    ,type->CowerMage
 	    ,type->Organic
 	    ,type->SelectableByRectangle);
@@ -764,7 +764,7 @@ global void ParsePudUDTA(const char* udta,int length)
 	unittype->GoldMine=BIT(22,v);
 	unittype->Hero=BIT(23,v);
 	unittype->StoresOil=BIT(24,v);
-	unittype->Explodes=BIT(25,v);
+	unittype->Volatile=BIT(25,v);
 	unittype->CowerMage=BIT(26,v);
 	unittype->Organic=BIT(27,v);
 
@@ -1129,7 +1129,7 @@ local void SaveUnitType(const UnitType* type,FILE* file)
     if( type->StoresOil ) {
 	fprintf(file,"  'stores-oil\n");
     }
-    if( type->Explodes ) {
+    if( type->Volatile ) {
 	fprintf(file,"  'volatile\n");
     }
     if( type->CowerMage ) {
