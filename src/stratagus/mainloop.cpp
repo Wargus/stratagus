@@ -639,7 +639,7 @@ global void GameMainLoop(void)
 
     MultiPlayerReplayEachCycle();
 
-    PlaySection = PlaySectionGame;
+    CurrentPlaySection = PlaySectionGame;
     CDRomCheck(NULL);
 
     while( GameRunning ) {
@@ -813,7 +813,7 @@ global void GameMainLoop(void)
     }
 
     if( GameResult==GameVictory || GameResult==GameDefeat ) {
-	PlaySection = PlaySectionStats;
+	CurrentPlaySection = PlaySectionStats;
 	CDRomCheck(NULL);
 	ShowStats();
     }

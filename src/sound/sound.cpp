@@ -86,6 +86,12 @@ global GameSound GameSounds
 #endif
     ;
 
+global PlaySection *PlaySections;	    /// Play sections
+global int NumPlaySections;		    /// Number of play sections
+global PlaySectionType CurrentPlaySection;  /// Current play section
+
+global CDModes CDMode;			    /// CD mode
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
