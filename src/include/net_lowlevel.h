@@ -33,14 +33,16 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#ifndef _MSC_VER
 #include <errno.h>
 #include <time.h>
+#endif
 
 // Include system network headers
 #ifdef USE_SDL_NET
 #include <SDLnet.h>
 #else
-#if defined(__WIN32__) || defined(WIN32)
+#if defined(__WIN32__) || defined(WIN32) || defined(_WIN32)
 #  define USE_WINSOCK
 #ifdef NEW_NETMENUS
 #define _WIN32_WINNT 0x0400
