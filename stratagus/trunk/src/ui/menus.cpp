@@ -1861,7 +1861,11 @@ global void SpeedSettings(void)
     if (SpeedSettingsMenuItems[i].d.hslider.percent > 100)
 	SpeedSettingsMenuItems[i].d.hslider.percent = 100;
     SpeedSettingsMenuItems[i + 4].d.hslider.percent = 100 - (SpeedMouseScroll - 1) * 100 / 10;
+    if (TheUI.MouseScroll == 0)
+	SpeedSettingsMenuItems[i + 4].d.hslider.percent = 0;
     SpeedSettingsMenuItems[i + 8].d.hslider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 10;
+    if (TheUI.KeyScroll == 0)
+	SpeedSettingsMenuItems[i + 8].d.hslider.percent = 0;
     ProcessMenu(MENU_SPEED_SETTINGS, 1);
 }
 
