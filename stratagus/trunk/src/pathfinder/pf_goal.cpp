@@ -104,19 +104,11 @@ void ComputeGoalBoundaries (Unit *unit, int *xmin, int *xmax,
 							int *ymin, int *ymax)
 {
 	Unit *GoalUnit;
-	UnitType *type = unit->Type;
 	FieldCoords Range;
 
 	GoalUnit = unit->Orders[0].Goal;
 	Range.X = unit->Orders[0].RangeX;
 	Range.Y = unit->Orders[0].RangeY;
-	if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
-		/* if we don't do this a tanker might not be able to enter an oil
-		 * platform (actions code use RangeX=RangeY=1 for this action - and
-		 * since tankers are ships they can enter even fields only) */
-		if (Range.X==1) ++Range.X;
-		if (Range.Y==1) ++Range.Y;
-	}
 
 	if (GoalUnit) {
 		/* our goal is another unit */
@@ -126,10 +118,6 @@ void ComputeGoalBoundaries (Unit *unit, int *xmin, int *xmax,
 		*ymax = GoalUnit->Y + GoalUnit->Type->TileHeight + Range.Y - 1;
 	} else {
 		/* our goal is a specific place on the map */
-		if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
-			unit->Orders[0].X &= ~1;
-			unit->Orders[0].Y &= ~1;
-		}
 		*xmin = unit->Orders[0].X;
 		*xmax = unit->Orders[0].X + Range.X;
 		*ymin = unit->Orders[0].Y;
@@ -372,16 +360,10 @@ void MarkLowlevelGoal (Unit *unit, HighlevelPath *h_path)
 	int x, y, xmin, xmax, ymin, ymax;
 	FieldCoords Goal;
 	Region *BestRegion;
-	UnitType *type = unit->Type;
 
 	ComputeGoalBoundaries (unit, &xmin, &xmax, &ymin, &ymax);
 	Goal.X = (xmin+xmax)/2;
 	Goal.Y = (ymin+ymax)/2;
-	/* is this necessary? well, it certainly doesn't hurt */
-	if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
-		Goal.X &= ~1;
-		Goal.Y &= ~1;
-	}
 	LowlevelSetGoal (Goal.X, Goal.Y);
 
 	if (h_path->OriginalGoalReachable) {

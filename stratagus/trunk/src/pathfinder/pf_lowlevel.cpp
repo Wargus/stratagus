@@ -73,9 +73,7 @@ struct pf_lowlevel {
 #endif /* GATHER_STATS */
 };
 
-LowlevelNeighbor NeighborEvery[8];
-LowlevelNeighbor NeighborEveryOther[8];
-LowlevelNeighbor *Neighbor;
+LowlevelNeighbor Neighbor[8];
 
 static struct pf_lowlevel Lowlevel;
 
@@ -103,57 +101,31 @@ int LowlevelInit (void)
 	if ( LowOpenInit (size) < 0)
 		return -1;
 
-	NeighborEvery[0].Offset = -TheMap.Width;          /* up */
-	NeighborEvery[1].Offset = 1;                      /* right */
-	NeighborEvery[2].Offset = TheMap.Width;           /* down */
-	NeighborEvery[3].Offset = -1;                     /* left */
-	NeighborEvery[4].Offset = -TheMap.Width + 1;      /* upper right */
-	NeighborEvery[5].Offset = TheMap.Width + 1;       /* lower right */
-	NeighborEvery[6].Offset = TheMap.Width - 1;       /* lower left */
-	NeighborEvery[7].Offset = -TheMap.Width - 1;      /* upper left */
+	Neighbor[0].Offset = -TheMap.Width;          /* up */
+	Neighbor[1].Offset = 1;                      /* right */
+	Neighbor[2].Offset = TheMap.Width;           /* down */
+	Neighbor[3].Offset = -1;                     /* left */
+	Neighbor[4].Offset = -TheMap.Width + 1;      /* upper right */
+	Neighbor[5].Offset = TheMap.Width + 1;       /* lower right */
+	Neighbor[6].Offset = TheMap.Width - 1;       /* lower left */
+	Neighbor[7].Offset = -TheMap.Width - 1;      /* upper left */
 
-	NeighborEvery[0].dx = 0;
-	NeighborEvery[0].dy = -1;
-	NeighborEvery[1].dx = 1;
-	NeighborEvery[1].dy = 0;
-	NeighborEvery[2].dx = 0;
-	NeighborEvery[2].dy = 1;
-	NeighborEvery[3].dx = -1;
-	NeighborEvery[3].dy = 0;
-	NeighborEvery[4].dx = 1;
-	NeighborEvery[4].dy = -1;
-	NeighborEvery[5].dx = 1;
-	NeighborEvery[5].dy = 1;
-	NeighborEvery[6].dx = -1;
-	NeighborEvery[6].dy = 1;
-	NeighborEvery[7].dx = -1;
-	NeighborEvery[7].dy = -1;
-
-	NeighborEveryOther[0].Offset = -2 * TheMap.Width;		/* up */
-	NeighborEveryOther[1].Offset =  2;						/* right */
-	NeighborEveryOther[2].Offset =  2 * TheMap.Width;		/* down */
-	NeighborEveryOther[3].Offset = -2;						/* left */
-	NeighborEveryOther[4].Offset = -2 * TheMap.Width + 2;	/* upper right */
-	NeighborEveryOther[5].Offset =  2 * TheMap.Width + 2;	/* lower right */
-	NeighborEveryOther[6].Offset =  2 * TheMap.Width - 2;	/* lower left */
-	NeighborEveryOther[7].Offset = -2 * TheMap.Width - 2;	/* upper left */
-
-	NeighborEveryOther[0].dx = 0;
-	NeighborEveryOther[0].dy = -2;
-	NeighborEveryOther[1].dx = 2;
-	NeighborEveryOther[1].dy = 0;
-	NeighborEveryOther[2].dx = 0;
-	NeighborEveryOther[2].dy = 2;
-	NeighborEveryOther[3].dx = -2;
-	NeighborEveryOther[3].dy = 0;
-	NeighborEveryOther[4].dx = 2;
-	NeighborEveryOther[4].dy = -2;
-	NeighborEveryOther[5].dx = 2;
-	NeighborEveryOther[5].dy = 2;
-	NeighborEveryOther[6].dx = -2;
-	NeighborEveryOther[6].dy = 2;
-	NeighborEveryOther[7].dx = -2;
-	NeighborEveryOther[7].dy = -2;
+	Neighbor[0].dx = 0;
+	Neighbor[0].dy = -1;
+	Neighbor[1].dx = 1;
+	Neighbor[1].dy = 0;
+	Neighbor[2].dx = 0;
+	Neighbor[2].dy = 1;
+	Neighbor[3].dx = -1;
+	Neighbor[3].dy = 0;
+	Neighbor[4].dx = 1;
+	Neighbor[4].dy = -1;
+	Neighbor[5].dx = 1;
+	Neighbor[5].dy = 1;
+	Neighbor[6].dx = -1;
+	Neighbor[6].dy = 1;
+	Neighbor[7].dx = -1;
+	Neighbor[7].dy = -1;
 
 	Lowlevel.Traceback[0] = 2;
 	Lowlevel.Traceback[1] = 3;
@@ -378,6 +350,10 @@ local MapField *LowAstarLoop (Unit *unit)
 					continue;	/* we are blocked by a permanent obstacle */
 				} else {
 					Unit *obstacle = UnitOnMapTile (neighx, neighy);
+#ifdef DEBUG
+					if (!obstacle)
+						longjmp (main_loop, 1);
+#endif
 					if (obstacle->Moving) {
 						NeighCost = SCALE * COST_MOVING_UNIT;
 					} else if ((obstacle->Wait && 
