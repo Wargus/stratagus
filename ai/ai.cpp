@@ -489,7 +489,7 @@ global void AiHelpMe(const Unit* attacker,Unit * defender)
 	    defender->Player->Player _C_ UnitNumber(defender) _C_
 	    defender->Type->Ident _C_ defender->X _C_ defender->Y);
 
-    pai=defender->Player->Ai;
+    AiPlayer=pai=defender->Player->Ai;
     if( pai->Force[0].Attacking ) {		// Force 0 busy
 	return;
     }
@@ -510,13 +510,22 @@ global void AiHelpMe(const Unit* attacker,Unit * defender)
 	}
     }
 
+    DebugLevel3Fn("Sending force 0 and 1 to defend\n");
     //
-    //	Send force 0 defending
+    //	Send force 0 defending, also send force 1 of this is home.
     //
     if( attacker ) {
 	AiAttackWithForceAt(0,attacker->X,attacker->Y);
+	if( !pai->Force[1].Attacking ) {	// none attacking
+	    pai->Force[1].Defending=1;
+	    AiAttackWithForceAt(1,attacker->X,attacker->Y);
+	}
     } else {
 	AiAttackWithForceAt(0,defender->X,defender->Y);
+	if( !pai->Force[1].Attacking ) {	// none attacking
+	    pai->Force[1].Defending=1;
+	    AiAttackWithForceAt(1,defender->X,defender->Y);
+	}
     }
     pai->Force[0].Defending=1;
 }
