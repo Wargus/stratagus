@@ -10,12 +10,11 @@
 //
 /**@name upgrade_structs.h	-	The upgrade/allow headerfile. */
 //
-//	(c) Copyright 1999-2001 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2002 by Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,7 +50,7 @@
 #define DEFAULT_RESOURCES \
 	((int[]){ 0,  2000, 1000, 1000,  1000, 1000, 1000 })
 /**
-**	Default resources for a new player with low resources..
+**	Default resources for a new player with low resources.
 */
 #define DEFAULT_RESOURCES_LOW \
 	((int[]){ 0,  2000, 1000, 1000,  1000, 1000, 1000 })
@@ -94,7 +93,7 @@ static const int DEFAULT_RESOURCES[7] = {
 };
 
 /**
-**	Default resources for a new player with low resources..
+**	Default resources for a new player with low resources.
 */
 static const int DEFAULT_RESOURCES_LOW[7] = {
     0,   2000, 1000, 1000,  1000, 1000, 1000
@@ -142,7 +141,7 @@ static const char* DEFAULT_NAMES[7] __attribute__((unused)) = {
 **	Indices into costs/resource/income array. (A litte future here :)
 */
 enum _costs_ {
-    TimeCost,				/// time in frames
+    TimeCost,				/// time in game cycles
 
 // standard
     GoldCost,				/// gold  resource
@@ -167,7 +166,7 @@ typedef struct _unit_stats_ {
     int		PiercingDamage;		/// weapon piercing damage
     int		Speed;			/// movement speed
     int		HitPoints;		/// hit points
-    int		Costs[MaxCosts];	/// Current costs of the unit.
+    int		Costs[MaxCosts];	/// current costs of the unit
     int		Level;			/// unit level (upgrades)
 } UnitStats;
 
@@ -175,7 +174,7 @@ typedef struct _unit_stats_ {
 **	The main useable upgrades.
 */
 typedef struct _upgrade_ {
-    const void*	OType;			/// Object type (future extensions)
+    const void*	OType;			/// object type (future extensions)
     char*	Ident;			/// identifier
     int		Costs[MaxCosts];	/// costs for the upgrade
 	// FIXME: not used by buttons
@@ -238,10 +237,11 @@ typedef struct _upgrade_modifier_ {
 **		`R' -- acquired, perhaps other values
 **		`Q' -- acquired but forbidden (does it make sense?:))
 **		`E' -- enabled, allowed by level but currently forbidden
+***		`X' -- fixed, acquired can't be disabled
 */
 typedef struct _allow_ {
-    char	Units[UnitTypeMax];	/// Units allowed/disallowed
-    char	Upgrades[UpgradeMax];	/// Upgrades allowed/disallowed
+    char	Units[UnitTypeMax];	/// units allowed/disallowed
+    char	Upgrades[UpgradeMax];	/// upgrades allowed/disallowed
 } Allow;
 
 /**
@@ -254,7 +254,7 @@ typedef struct _upgrade_timers_ {
     **	all 0 at the beginning, all upgrade actions do increment values in
     **	this struct.
     */
-    int	Upgrades[UpgradeMax];		/// Counter for each upgrade
+    int	Upgrades[UpgradeMax];		/// counter for each upgrade
 
 } UpgradeTimers;
 
@@ -263,7 +263,7 @@ typedef struct _upgrade_timers_ {
 ----------------------------------------------------------------------------*/
 
 extern const char UpgradeType[];	/// upgrade type
-extern Upgrade Upgrades[UpgradeMax];	/// The main user useable upgrades
+extern Upgrade Upgrades[UpgradeMax];	/// the main user useable upgrades
 
 //@}
 
