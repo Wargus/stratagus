@@ -2619,7 +2619,6 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	return;
     }
     target->HP-=damage;		// UNSIGNED!
-    DebugLevel0Fn("%d\n",target->HP);
 
 #if 0
     // FIXME: want to show hits.
