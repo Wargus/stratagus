@@ -711,25 +711,60 @@ local void AddMessage(const char *msg)
 {
     char *ptr;
     char *message;
+    char *next;
 
     if (MessagesCount == MESSAGES_MAX) {
 	ShiftMessages();
     }
 
     message = Messages[MessagesCount];
-    strncpy(message, msg, sizeof(Messages[0])-1);
-    message[sizeof(Messages[0])-1] = '\0';
-
-    ptr = message + strlen(message);
+    if (strlen(msg) >= sizeof(Messages[0])) {
+	strncpy(message, msg, sizeof(Messages[0])-1);
+	ptr = message + sizeof(Messages[0])-1;
+	*ptr-- = '\0';
+	next = ptr+1;
+	while (ptr >= message) {
+	    if (*ptr == ' ') {
+		*ptr = '\0';
+		next = ptr+1;
+		break;
+	    }
+	    --ptr;
+	}
+	if (ptr < message) {
+	    ptr = next-1;
+	}
+    } else {
+	strcpy(message, msg);
+	next = ptr = message + strlen(message);
+    }
 
     while (VideoTextLength(GameFont, message) >= 440+(VideoWidth-640) ) {
-	*--ptr = '\0';
+	while (1) {
+	    --ptr;
+	    if (*ptr == ' ') {
+		*ptr = '\0';
+		next = ptr+1;
+		break;
+	    } else if (ptr == message) {
+		break;
+	    }
+	}
+	// No space found, wrap in the middle of a word
+	if (ptr == message) {
+	    ptr = next-1;
+	    while (VideoTextLength(GameFont, message) >= 440+(VideoWidth-640) ) {
+		*--ptr = '\0';
+	    }
+	    next = ptr+1;
+	    break;
+	}
     }
 
     MessagesCount++;
 
     if (strlen(msg) != ptr-message) {
-	AddMessage(msg+(ptr-message));
+	AddMessage(msg+(next-message));
     }
 }
 
@@ -768,7 +803,7 @@ global int CheckRepeatMessage(const char *msg)
 */
 global void SetMessage(const char *fmt, ...)
 {
-    char temp[128];
+    char temp[512];
     va_list va;
 
     va_start(va, fmt);
