@@ -79,7 +79,7 @@ local void VideoDrawSub8to8(
     int da;
 
     pixels=graphic->Pixels;
-    sp=graphic->Frames+gx+gy*graphic->Width;
+    sp=(const unsigned char*)graphic->Frames+gx+gy*graphic->Width;
     gp=sp+graphic->Width*h;
     sa=graphic->Width-w;
     dp=VideoMemory8+x+y*VideoWidth;
@@ -123,7 +123,7 @@ local void VideoDrawSub8to16(
     int da;
 
     pixels=(VMemType16*)graphic->Pixels;
-    sp=graphic->Frames+gx+gy*graphic->Width;
+    sp=(const unsigned char*)graphic->Frames+gx+gy*graphic->Width;
     gp=sp+graphic->Width*h;
     sa=graphic->Width-w;
     dp=VideoMemory16+x+y*VideoWidth;
@@ -169,7 +169,7 @@ local void VideoDrawSub8to24(
     int da;
 
     pixels=(VMemType24*)graphic->Pixels;
-    sp=graphic->Frames+gx+gy*graphic->Width;
+    sp=(const unsigned char*)graphic->Frames+gx+gy*graphic->Width;
     gp=sp+graphic->Width*h;
     sa=graphic->Width-w;
     dp=VideoMemory24+x+y*VideoWidth;
@@ -213,7 +213,7 @@ local void VideoDrawSub8to32(
     int da;
 
     pixels=(VMemType32*)graphic->Pixels;
-    sp=graphic->Frames+gx+gy*graphic->Width;
+    sp=(const unsigned char*)graphic->Frames+gx+gy*graphic->Width;
     gp=sp+graphic->Width*h;
     sa=graphic->Width-w;
     dp=VideoMemory32+x+y*VideoWidth;

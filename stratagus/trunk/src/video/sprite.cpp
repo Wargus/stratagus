@@ -1709,7 +1709,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
     for( i=0; i<n; ++i ) {		// each frame
 	((unsigned char**)data)[i]=dp;
 	for( h=0; h<height; ++h ) {	// each line
-	    sp=graphic->Frames+(i%fl)*width+((i/fl)*height+h)*graphic->Width;
+	    sp=(const unsigned char*)graphic->Frames+(i%fl)*width+((i/fl)*height+h)*graphic->Width;
 
 	    for (counter=w=0; w<width; ++w ) {
 		if( *sp==255 || *sp==0) {			// start transparency
