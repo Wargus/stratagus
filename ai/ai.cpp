@@ -164,6 +164,12 @@ local void AiCheckUnits(void)
     for( i=0; i<AI_MAX_FORCES; ++i ) {
 	const AiUnitType* aiut;
 
+	// No troops for attacking force
+	if( !AiPlayer->Force[i].Defending
+		&& AiPlayer->Force[i].Attacking ) {
+	    continue;
+	}
+
 	for( aiut=AiPlayer->Force[i].UnitTypes; aiut; aiut=aiut->Next ) {
 	    t=aiut->Type->Type;
 	    x=aiut->Want;
@@ -612,7 +618,7 @@ global void AiHelpMe(const Unit* attacker,Unit * defender)
 	}
     }
 
-    DebugLevel3Fn("Sending force 0 and 1 to defend\n");
+    DebugLevel2Fn("Sending force 0 and 1 to defend\n");
     //
     //	Send force 0 defending, also send force 1 if this is home.
     //
@@ -757,6 +763,7 @@ global void AiTrainingComplete(Unit* unit,Unit* what)
     AiRemoveFromBuilded(unit->Player->Ai,what->Type);
 
     AiPlayer=unit->Player->Ai;
+    AiCleanForces();
     AiAssignToForce(what);
 }
 
