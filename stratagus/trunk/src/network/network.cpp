@@ -284,6 +284,7 @@ local int NetworkSyncHashs[256];	/// Network sync hashs.
 local NetworkCommandQueue NetworkIn[256][PlayerMax]; /// Per-player network packet input queue
 local DL_LIST(CommandsIn);		/// Network command input queue
 local DL_LIST(CommandsOut);		/// Network command output queue
+local DL_LIST(MsgCommandsIn);		/// Network message input queue
 
 #ifdef DEBUG
 local int NetworkReceivedPackets;	/// Packets received packets
@@ -453,6 +454,7 @@ global void InitNetwork1(void)
 
     dl_init(CommandsIn);
     dl_init(CommandsOut);
+    dl_init(MsgCommandsIn);
 }
 
 /**
@@ -819,7 +821,7 @@ global void NetworkChatMessage(const char *msg)
 	n = strlen(msg);
 	while (n >= (int)sizeof(ncm->Text)) {
 	    ncq = malloc(sizeof(NetworkCommandQueue));
-	    dl_insert_last(CommandsIn, ncq->List);
+	    dl_insert_first(MsgCommandsIn, ncq->List);
 	    ncq->Data.Type = MessageChat;
 	    ncm = (NetworkChat *)(&ncq->Data);
 	    ncm->Player = ThisPlayer->Player;
@@ -828,7 +830,7 @@ global void NetworkChatMessage(const char *msg)
 	    n -= sizeof(ncm->Text);
 	}
 	ncq = malloc(sizeof(NetworkCommandQueue));
-	dl_insert_last(CommandsIn, ncq->List);
+	dl_insert_first(MsgCommandsIn, ncq->List);
 	ncq->Data.Type = MessageChatTerm;
 	ncm = (NetworkChat *)(&ncq->Data);
 	ncm->Player = ThisPlayer->Player;
@@ -946,7 +948,7 @@ local void NetworkSendCommands(void)
     //
     //	No command available, send sync.
     //
-    if (dl_empty(CommandsIn)) {
+    if (dl_empty(CommandsIn) && dl_empty(MsgCommandsIn)) {
 	ncq = malloc(sizeof(NetworkCommandQueue));
 	ncq->Data.Type = MessageSync;
 	ncq->Data.Unit = htons(SyncHash&0xFFFF);
@@ -955,21 +957,22 @@ local void NetworkSendCommands(void)
 	// FIXME: can compress sync-messages.
     } else {
 	DebugLevel3Fn("command in remove\n");
-	ncq = (NetworkCommandQueue *)CommandsIn->first;
-	// ncq = BASE_OF(NetworkCommandQueue,List[0], CommandsIn->first);
-
-	IfDebug(
-	if (ncq->Data.Type != MessageChat
-		&& ncq->Data.Type != MessageChatTerm
-		&& ncq->Data.Type != MessageExtendedCommand) {
-	    // FIXME: we can send destoyed units over network :(
-	    if (UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed) {
-		DebugLevel0Fn("Sending destroyed unit %d over network!!!!!!\n" _C_
-			ntohs(ncq->Data.Unit));
+	if (!dl_empty(CommandsIn)) {
+	    ncq = (NetworkCommandQueue *)CommandsIn->last;
+	    IfDebug(
+	    if (ncq->Data.Type != MessageExtendedCommand) {
+		// FIXME: we can send destoyed units over network :(
+		if (UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed) {
+		    DebugLevel0Fn("Sending destroyed unit %d over network!!!!!!\n" _C_
+			    ntohs(ncq->Data.Unit));
+		}
 	    }
+	    );
+	    dl_remove_last(CommandsIn);
+	} else {
+	    ncq = (NetworkCommandQueue *)MsgCommandsIn->last;
+	    dl_remove_last(MsgCommandsIn);
 	}
-	);
-	dl_remove_first(CommandsIn);
     }
 
     //	Insert in output queue.
