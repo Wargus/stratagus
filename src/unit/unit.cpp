@@ -2095,6 +2095,15 @@ global int CanBuildHere(const UnitType* type,int x,int y)
 	    if( !(x&1 && y&1) ) {
 		return 0;
 	    }
+	    // Don't allow oil patches on oil patches
+	    if( type->OilPatch ) {
+		n=UnitCacheSelect(x,y,x+type->TileWidth,y+type->TileHeight,table);
+		for( i=0; i<n; ++i ) {
+		    if( table[i]->Type->OilPatch ) {
+			return 0;
+		    }
+		}
+	    }
 	} else if( type->UnitType==UnitTypeFly || type->UnitType==UnitTypeNaval ) {
 	    // Flyers and naval units can only be placed on odd tiles
 	    if( x&1 || y&1 ) {
