@@ -293,10 +293,10 @@ local SCM CclPlayer(SCM list)
 /**
 **	Change unit owner
 **
-**	@param pos1	top left tile
-**	@param pos2	bottom right tile
-**	@param old	old player number
-**	@param new	new player number
+**	@param pos1	 top left tile
+**	@param pos2	 bottom right tile
+**	@param oldplayer old player number
+**	@param newplayer new player number
 **/
 local SCM CclChangeUnitsOwner(SCM pos1, SCM pos2, SCM oldplayer, SCM newplayer)
 {
@@ -560,7 +560,7 @@ local SCM CclNewPlayerColors(void)
 /**
 **	Get player resources.
 **
-**	@param plyr	Player
+**	@param player	Player
 **	@param resource	Resource name
 **
 **	@return		Player resource

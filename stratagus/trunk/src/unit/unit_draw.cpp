@@ -1735,7 +1735,7 @@ local void DrawUnitPlayerColor(const UnitType* type,int player,int frame,int x,i
 /**
 **	Draw construction.
 **
-**	@param construction	Construction pointer.
+**	@param unit	Unit pointer.
 **	@param frame	Frame number to draw.
 **	@param x	X position.
 **	@param y	Y position.
@@ -1928,7 +1928,8 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 /**
 **	Find all units to draw in viewport.
 **
-**	@param v	Viewport to be drawn.
+**	@param vp	Viewport to be drawn.
+**	@param table
 **
 **	@todo FIXME: Must use the redraw tile flags in this function
 */

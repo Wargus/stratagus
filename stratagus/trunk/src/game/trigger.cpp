@@ -260,7 +260,7 @@ local SCM CclIfUnit(SCM player,SCM operation,SCM quantity,SCM unit)
 /**
 **	Player has the quantity of unit-type at a location.
 **
-**	(if-unit-at <player> <op> <quantity> <unit> <location> <location>)
+**	(if-unit-at {player} {op} {quantity} {unit} {location} {location})
 */
 local SCM CclIfUnitAt(SCM list)
 {
@@ -1093,7 +1093,7 @@ global void TriggerCclRegister(void)
 /**
 **	Print a trigger from a LISP object.
 **	This is a modified version of lprin1g that prints
-**	(lambda) instead of #<CLOSURE>
+**	(lambda) instead of #&lt;CLOSURE&gt;
 **
 **	@param exp	Expression
 **	@param f	File to print to

@@ -123,8 +123,6 @@ local int FindUnloadPosition(int x,int y,int *resx,int *resy,int mask)
 **	Reappear unit on map.
 **
 **	@param unit	Unit to drop out.
-**	@param addx	Tile size in x.
-**	@param addy	Tile size in y.
 **
 **	@return		True if unit can be unloaded.
 **

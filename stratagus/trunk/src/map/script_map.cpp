@@ -277,10 +277,10 @@ local SCM CclCenterMap(SCM x,SCM y)
 /**
 **	Show Map Location
 **
-**	@param		X tile location.
-**	@param		Y tile location.
-**	@param		radius of view.
-**	@param		cycles show vision for.
+**	@param	x	X tile location.
+**	@param	y	Y tile location.
+**	@param	radius	radius of view.
+**	@param	cycle	cycles show vision for.
 */
 local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle)
 {
