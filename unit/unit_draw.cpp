@@ -1881,7 +1881,7 @@ global void DrawUnits(const void* v)
     for (i = 0; i < NumUnits; ++i) {
 	unit = Units[i];
 	// FIXME: this tries to draw all corps, ohje
-	if ((unit->Type->Vanishes && unit->State==unit->Type->CorpseScript) ||
+	if ((unit->Type->Vanishes && (int)unit->State==unit->Type->CorpseScript) ||
 	    (UnitVisibleInViewport(vp,unit) &&
 		unit->Orders[0].Action == UnitActionDie) ) {
 	    DrawUnit(unit);
