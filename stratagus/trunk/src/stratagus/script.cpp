@@ -701,7 +701,6 @@ global void CclInit(void)
     //
     //	Make some sombols for the compile options/features.
     //
-    gh_define("freecraft-feature-use-ccl",SCM_BOOL_T);
 #ifdef USE_SDL
     gh_define("freecraft-feature-use-sdl",SCM_BOOL_T);
 #endif
@@ -711,11 +710,17 @@ global void CclInit(void)
 #ifdef DEBUG
     gh_define("freecraft-feature-debug",SCM_BOOL_T);
 #endif
+#ifdef DEBUG_FLAGS
+    gh_define("freecraft-feature-debug-flags",SCM_BOOL_T);
+#endif
 #ifdef USE_ZLIB
     gh_define("freecraft-feature-zlib",SCM_BOOL_T);
 #endif
 #ifdef USE_BZ2LIB
     gh_define("freecraft-feature-bz2lib",SCM_BOOL_T);
+#endif
+#ifdef USE_ZZIPLIB
+    gh_define("freecraft-feature-zziplib",SCM_BOOL_T);
 #endif
 #ifdef USE_SDL
     gh_define("freecraft-feature-sdl",SCM_BOOL_T);
@@ -734,6 +739,9 @@ global void CclInit(void)
 #endif
 #ifdef UNIT_ON_MAP
     gh_define("freecraft-feature-unit-on-map",SCM_BOOL_T);
+#endif
+#ifdef UNITS_ON_MAP
+    gh_define("freecraft-feature-units-on-map",SCM_BOOL_T);
 #endif
 #ifdef NEW_MAPDRAW
     gh_define("freecraft-feature-new-mapdraw",SCM_BOOL_T);
