@@ -1762,7 +1762,8 @@ local int myatan(int val)
     }
     if( !init ) {
 	for( ; init<2608; ++init ) {
-	    atan_table[init]=atan((double)init/64)*(64*4/6.2831853);
+	    atan_table[init]=
+		(unsigned char)(atan((double)init/64)*(64*4/6.2831853));
 	}
     }
 
