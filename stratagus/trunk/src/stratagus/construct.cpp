@@ -106,6 +106,15 @@ global void LoadConstructions(void)
 	    Constructions[i].Sprite=LoadSprite(file
 		    ,Constructions[i].Width,Constructions[i].Height);
 	}
+	if( (file=Constructions[i].ShadowFile) ) {
+	    char *buf;
+
+	    buf=alloca(strlen(file)+9+1);
+	    file=strcat(strcpy(buf,"graphics/"),file);
+	    ShowLoadProgress("\tConstruction %s\n",file);
+	    Constructions[i].ShadowSprite=LoadSprite(file
+		    ,Constructions[i].ShadowWidth,Constructions[i].ShadowHeight);
+	}
     }
 }
 
@@ -158,8 +167,14 @@ global void SaveConstructions(FILE* file)
 	    }
 	}
 	fprintf(file,")\n");
-	fprintf(file,"  'size '(%d %d))\n\n", Constructions[i].Width,
+	fprintf(file,"  'size '(%d %d)", Constructions[i].Width,
 		Constructions[i].Height);
+	if( Constructions[i].ShadowFile ) {
+	    fprintf(file,"\n  'shadow '(file \"%s\" width %d height %d)",
+		    Constructions[i].ShadowFile, Constructions[i].ShadowWidth,
+		    Constructions[i].ShadowHeight);
+	}
+	fprintf(file,")\n\n");
     }
 }
 
@@ -196,6 +211,10 @@ global void CleanConstructions(void)
 	    }
 	}
 	VideoSaveFree(Constructions[i].Sprite);
+	if( Constructions[i].ShadowFile ) {
+	    free(Constructions[i].ShadowFile);
+	}
+	VideoSaveFree(Constructions[i].ShadowSprite);
     }
     memset(Constructions,0,sizeof(Constructions));
 }
@@ -360,6 +379,23 @@ local SCM CclDefineConstruction(SCM list)
 	    value=gh_cdr(value);
 	    construction->Height=gh_scm2int(gh_car(value));
 
+	} else if( gh_eq_p(value,gh_symbol2scm("shadow")) ) {
+	    sublist=gh_car(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+
+		if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+		    construction->ShadowFile=gh_scm2newstr(gh_car(sublist),NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("width")) ) {
+		    construction->ShadowWidth=gh_scm2int(gh_car(sublist));
+		} else if( gh_eq_p(value,gh_symbol2scm("height")) ) {
+		    construction->ShadowHeight=gh_scm2int(gh_car(sublist));
+		} else {
+		    errl("Unsupported shadow tag",value);
+		}
+		sublist=gh_cdr(sublist);
+	    }
 	} else {
 	    // FIXME: this leaves a half initialized construction
 	    errl("Unsupported tag",value);

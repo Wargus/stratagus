@@ -1454,6 +1454,1231 @@ right_trans:
 }
 
 /**
+**	Draw 8bit shadow graphic object clipped into 8 bit framebuffer.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+global void VideoDraw8to8ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
+{
+    int ox;
+    int ex;
+    int oy;
+    int w;
+    int h;
+    const unsigned char* sp;
+    unsigned sw;
+    VMemType8* dp;
+    const VMemType8* lp;
+    const VMemType8* ep;
+    VMemType8* pp;
+    const VMemType8* pixels;
+    unsigned da;
+
+    //
+    // reduce to visible range
+    //
+    sw=w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    //
+    //	Draw the clipped sprite
+    //
+    pixels=(VMemType8*)sprite->Pixels;
+    sp=((unsigned char**)sprite->Frames)[frame];
+
+    //
+    //	Skip top lines, if needed.
+    //
+    while( oy-- ) {
+	da=0;
+	do {
+	    da+=*sp++;			// transparent
+	    da+=*sp;			// opaque
+	    sp+=*sp+1;
+	} while( da<sw );
+    }
+
+    da=VideoWidth-sw;
+    dp=VideoMemory8+x+y*VideoWidth;
+    ep=dp+VideoWidth*h;
+
+    if( w==sw ) {			// Unclipped horizontal
+
+	do {
+	    lp=dp+sw;
+	    do {			// 1 line
+		dp+=*sp++;		// transparent
+		pp=dp-1+*sp++;		// opaque
+		while( dp<pp ) {	// unroll
+		    *dp=lookup50trans8[(Pixels8[ColorBlack]>>8)|*dp];
+		    ++dp;
+		    ++sp;
+		    *dp=lookup50trans8[(Pixels8[ColorBlack]>>8)|*dp];
+		    ++dp;
+		    ++sp;
+		}
+		if( dp<=pp ) {
+		    *dp=lookup50trans8[(Pixels8[ColorBlack]>>8)|*dp];
+		    ++dp;
+		    ++sp;
+		}
+	    } while( dp<lp );
+	    dp+=da;
+	} while( dp<ep );		// all lines
+
+    } else {				// Clip horizontal
+
+	da+=ox;
+	do {
+	    lp=dp+w;
+	    //
+	    //	Clip left
+	    //
+	    pp=dp-ox;
+	    for( ;; ) {
+		pp+=*sp++;		// transparent
+		if( pp>=dp ) {
+		    dp=pp;
+		    goto middle_trans;
+		}
+		pp+=*sp;		// opaque
+		if( pp>=dp ) {
+		    sp+=*sp-(pp-dp)+1;
+		    goto middle_pixel;
+		}
+		sp+=*sp+1;
+	    }
+
+	    //
+	    //	Draw middle
+	    //
+	    for( ;; ) {
+		dp+=*sp++;		// transparent
+middle_trans:
+		if( dp>=lp ) {
+		    lp+=sw-w-ox;
+		    goto right_trans;
+		}
+		pp=dp+*sp++;		// opaque
+middle_pixel:
+		if( pp<lp ) {
+		    while( dp<pp ) {
+			*dp=lookup50trans8[(Pixels8[ColorBlack]>>8)|*dp];
+			++dp;
+			++sp;
+		    }
+		    continue;
+		}
+		while( dp<lp ) {
+		    *dp=lookup50trans8[(Pixels8[ColorBlack]>>8)|*dp];
+		    ++dp;
+		    ++sp;
+		}
+		sp+=pp-dp;
+		dp=pp;
+		break;
+	    }
+
+	    //
+	    //	Clip right
+	    //
+	    lp+=sw-w-ox;
+	    while( dp<lp ) {
+		dp+=*sp++;		// transparent
+right_trans:
+		dp+=*sp;		// opaque
+		sp+=*sp+1;
+	    }
+	    dp+=da;
+	} while( dp<ep );		// all lines
+
+    }
+}
+
+/**
+**	Draw 8bit shadow graphic object clipped into 16 bit framebuffer.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+global void VideoDraw8to16ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
+{
+    int ox;
+    int ex;
+    int oy;
+    int w;
+    int h;
+    const unsigned char* sp;
+    unsigned sw;
+    VMemType16* dp;
+    const VMemType16* lp;
+    const VMemType16* ep;
+    VMemType16* pp;
+    const VMemType16* pixels;
+    unsigned da;
+    unsigned long dp1;
+    unsigned long mask;
+
+    //
+    // reduce to visible range
+    //
+    sw=w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    //
+    //	Draw the clipped sprite
+    //
+    pixels=(VMemType16*)sprite->Pixels;
+    sp=((unsigned char**)sprite->Frames)[frame];
+
+    //
+    //	Skip top lines, if needed.
+    //
+    while( oy-- ) {
+	da=0;
+	do {
+	    da+=*sp++;			// transparent
+	    da+=*sp;			// opaque
+	    sp+=*sp+1;
+	} while( da<sw );
+    }
+
+    da=VideoWidth-sw;
+    dp=VideoMemory16+x+y*VideoWidth;
+    ep=dp+VideoWidth*h;
+
+    if( VideoBpp==15 ) {
+	mask=0x03E07C1F;
+    } else {
+	mask=0x07E0F81F;
+    }
+
+    if( w==sw ) {			// Unclipped horizontal
+
+	do {
+	    lp=dp+sw;
+	    do {			// 1 line
+		dp+=*sp++;		// transparent
+		pp=dp-1+*sp++;		// opaque
+		while( dp<pp ) {	// unroll
+		    dp1=*dp;
+		    dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+		    *dp++=(dp1>>16)|dp1;
+		    ++sp;
+		    dp1=*dp;
+		    dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+		    *dp++=(dp1>>16)|dp1;
+		    ++sp;
+		}
+		if( dp<=pp ) {
+		    dp1=*dp;
+		    dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+		    *dp++=(dp1>>16)|dp1;
+		    ++sp;
+		}
+	    } while( dp<lp );
+	    dp+=da;
+	} while( dp<ep );		// all lines
+
+    } else {				// Clip horizontal
+
+	da+=ox;
+	do {
+	    lp=dp+w;
+	    //
+	    //	Clip left
+	    //
+	    pp=dp-ox;
+	    for( ;; ) {
+		pp+=*sp++;		// transparent
+		if( pp>=dp ) {
+		    dp=pp;
+		    goto middle_trans;
+		}
+		pp+=*sp;		// opaque
+		if( pp>=dp ) {
+		    sp+=*sp-(pp-dp)+1;
+		    goto middle_pixel;
+		}
+		sp+=*sp+1;
+	    }
+
+	    //
+	    //	Draw middle
+	    //
+	    for( ;; ) {
+		dp+=*sp++;		// transparent
+middle_trans:
+		if( dp>=lp ) {
+		    lp+=sw-w-ox;
+		    goto right_trans;
+		}
+		pp=dp+*sp++;		// opaque
+middle_pixel:
+		if( pp<lp ) {
+		    while( dp<pp ) {
+			dp1=*dp;
+			dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+			*dp++=(dp1>>16)|dp1;
+			++sp;
+		    }
+		    continue;
+		}
+		while( dp<lp ) {
+		    dp1=*dp;
+		    dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+		    *dp++=(dp1>>16)|dp1;
+		    ++sp;
+		}
+		sp+=pp-dp;
+		dp=pp;
+		break;
+	    }
+
+	    //
+	    //	Clip right
+	    //
+	    lp+=sw-w-ox;
+	    while( dp<lp ) {
+		dp+=*sp++;		// transparent
+right_trans:
+		dp+=*sp;		// opaque
+		sp+=*sp+1;
+	    }
+	    dp+=da;
+	} while( dp<ep );		// all lines
+
+    }
+}
+
+/**
+**	Draw 8bit shadow graphic object clipped into 24 bit framebuffer.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+global void VideoDraw8to24ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
+{
+    int ox;
+    int ex;
+    int oy;
+    int w;
+    int h;
+    const unsigned char* sp;
+    unsigned sw;
+    VMemType24* dp;
+    const VMemType24* lp;
+    const VMemType24* ep;
+    VMemType24* pp;
+    const VMemType24* pixels;
+    unsigned da;
+
+    //
+    // reduce to visible range
+    //
+    sw=w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    //
+    //	Draw the clipped sprite
+    //
+    pixels=(VMemType24*)sprite->Pixels;
+    sp=((unsigned char**)sprite->Frames)[frame];
+
+    //
+    //	Skip top lines, if needed.
+    //
+    while( oy-- ) {
+	da=0;
+	do {
+	    da+=*sp++;			// transparent
+	    da+=*sp;			// opaque
+	    sp+=*sp+1;
+	} while( da<sw );
+    }
+
+    da=VideoWidth-sw;
+    dp=VideoMemory24+x+y*VideoWidth;
+    ep=dp+VideoWidth*h;
+
+    if( w==sw ) {			// Unclipped horizontal
+
+	do {
+	    lp=dp+sw;
+	    do {			// 1 line
+		dp+=*sp++;		// transparent
+		pp=dp-1+*sp++;		// opaque
+		while( dp<pp ) {	// unroll
+		    *dp++=pixels[*sp++];
+		    *dp++=pixels[*sp++];
+		}
+		if( dp<=pp ) {
+		    *dp++=pixels[*sp++];
+		}
+	    } while( dp<lp );
+	    dp+=da;
+	} while( dp<ep );		// all lines
+
+    } else {				// Clip horizontal
+
+	da+=ox;
+	do {
+	    lp=dp+w;
+	    //
+	    //	Clip left
+	    //
+	    pp=dp-ox;
+	    for( ;; ) {
+		pp+=*sp++;		// transparent
+		if( pp>=dp ) {
+		    dp=pp;
+		    goto middle_trans;
+		}
+		pp+=*sp;		// opaque
+		if( pp>=dp ) {
+		    sp+=*sp-(pp-dp)+1;
+		    goto middle_pixel;
+		}
+		sp+=*sp+1;
+	    }
+
+	    //
+	    //	Draw middle
+	    //
+	    for( ;; ) {
+		dp+=*sp++;		// transparent
+middle_trans:
+		if( dp>=lp ) {
+		    lp+=sw-w-ox;
+		    goto right_trans;
+		}
+		pp=dp+*sp++;		// opaque
+middle_pixel:
+		if( pp<lp ) {
+		    while( dp<pp ) {
+			*dp++=pixels[*sp++];
+		    }
+		    continue;
+		}
+		while( dp<lp ) {
+		    *dp++=pixels[*sp++];
+		}
+		sp+=pp-dp;
+		dp=pp;
+		break;
+	    }
+
+	    //
+	    //	Clip right
+	    //
+	    lp+=sw-w-ox;
+	    while( dp<lp ) {
+		dp+=*sp++;		// transparent
+right_trans:
+		dp+=*sp;		// opaque
+		sp+=*sp+1;
+	    }
+	    dp+=da;
+	} while( dp<ep );		// all lines
+
+    }
+}
+
+/**
+**	Draw 8bit shadow graphic object clipped into 32 bit framebuffer.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+global void VideoDraw8to32ShadowClip(const Graphic* sprite,unsigned frame,int x,int y)
+{
+    int ox;
+    int ex;
+    int oy;
+    int w;
+    int h;
+    const unsigned char* sp;
+    unsigned sw;
+    VMemType32* dp;
+    const VMemType32* lp;
+    const VMemType32* ep;
+    VMemType32* pp;
+    const VMemType32* pixels;
+    unsigned da;
+    unsigned long dp1;
+    unsigned long dp2;
+
+    //
+    // reduce to visible range
+    //
+    sw=w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    //
+    //	Draw the clipped sprite
+    //
+    pixels=(VMemType32*)sprite->Pixels;
+    sp=((unsigned char**)sprite->Frames)[frame];
+
+    //
+    //	Skip top lines, if needed.
+    //
+    while( oy-- ) {
+	da=0;
+	do {
+	    da+=*sp++;			// transparent
+	    da+=*sp;			// opaque
+	    sp+=*sp+1;
+	} while( da<sw );
+    }
+
+    da=VideoWidth-sw;
+    dp=VideoMemory32+x+y*VideoWidth;
+    ep=dp+VideoWidth*h;
+
+    if( w==sw ) {			// Unclipped horizontal
+
+	do {
+	    lp=dp+sw;
+	    do {			// 1 line
+		dp+=*sp++;		// transparent
+		pp=dp-1+*sp++;		// opaque
+		while( dp<pp ) {	// unroll
+		    dp1=*dp;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(dp1>>1)&0x00FF00FF;
+		    dp2=(dp2>>1)&0x00FF00FF;
+		    *dp++=(dp1|(dp2<<8));
+		    ++sp;
+		    dp1=*dp;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(dp1>>1)&0x00FF00FF;
+		    dp2=(dp2>>1)&0x00FF00FF;
+		    *dp++=(dp1|(dp2<<8));
+		    ++sp;
+		}
+		if( dp<=pp ) {
+		    dp1=*dp;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(dp1>>1)&0x00FF00FF;
+		    dp2=(dp2>>1)&0x00FF00FF;
+		    *dp++=(dp1|(dp2<<8));
+		    ++sp;
+		}
+	    } while( dp<lp );
+	    dp+=da;
+	} while( dp<ep );		// all lines
+
+    } else {				// Clip horizontal
+
+	da+=ox;
+	do {
+	    lp=dp+w;
+	    //
+	    //	Clip left
+	    //
+	    pp=dp-ox;
+	    for( ;; ) {
+		pp+=*sp++;		// transparent
+		if( pp>=dp ) {
+		    dp=pp;
+		    goto middle_trans;
+		}
+		pp+=*sp;		// opaque
+		if( pp>=dp ) {
+		    sp+=*sp-(pp-dp)+1;
+		    goto middle_pixel;
+		}
+		sp+=*sp+1;
+	    }
+
+	    //
+	    //	Draw middle
+	    //
+	    for( ;; ) {
+		dp+=*sp++;		// transparent
+middle_trans:
+		if( dp>=lp ) {
+		    lp+=sw-w-ox;
+		    goto right_trans;
+		}
+		pp=dp+*sp++;		// opaque
+middle_pixel:
+		if( pp<lp ) {
+		    while( dp<pp ) {
+			dp1=*dp;
+			dp2=(dp1&0xFF00FF00)>>8;
+			dp1&=0x00FF00FF;
+			dp1=(dp1>>1)&0x00FF00FF;
+			dp2=(dp2>>1)&0x00FF00FF;
+			*dp++=(dp1|(dp2<<8));
+			++sp;
+		    }
+		    continue;
+		}
+		while( dp<lp ) {
+		    dp1=*dp;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(dp1>>1)&0x00FF00FF;
+		    dp2=(dp2>>1)&0x00FF00FF;
+		    *dp++=(dp1|(dp2<<8));
+		    ++sp;
+		}
+		sp+=pp-dp;
+		dp=pp;
+		break;
+	    }
+
+	    //
+	    //	Clip right
+	    //
+	    lp+=sw-w-ox;
+	    while( dp<lp ) {
+		dp+=*sp++;		// transparent
+right_trans:
+		dp+=*sp;		// opaque
+		sp+=*sp+1;
+	    }
+	    dp+=da;
+	} while( dp<ep );		// all lines
+
+    }
+}
+
+/**
+**	Draw 8bit shadow graphic object clipped and flipped in X direction
+**	into 8bit framebuffer.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+global void VideoDraw8to8ShadowClipX(const Graphic* sprite,unsigned frame
+	,int x,int y)
+{
+    int ex;
+    int ox;
+    int oy;
+    int w;
+    int h;
+    const unsigned char* sp;
+    unsigned sw;
+    VMemType8* dp;
+    const VMemType8* lp;
+    const VMemType8* ep;
+    VMemType8* pp;
+    const VMemType8* pixels;
+    unsigned da;
+
+    //
+    // reduce to visible range
+    //
+    sw=w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    //
+    //	Draw the clipped sprite
+    //
+    pixels=(VMemType8*)sprite->Pixels;
+    sp=((unsigned char**)sprite->Frames)[frame];
+
+    //
+    // Skip top lines
+    //
+    while( oy-- ) {
+	da=0;
+	do {
+	    da+=*sp++;			// transparent
+	    da+=*sp;			// opaque
+	    sp+=*sp+1;
+	} while( da<sw );
+    }
+
+    da=VideoWidth+sw;
+    dp=VideoMemory8+x+y*VideoWidth+w;
+    ep=dp+VideoWidth*h;
+
+    if( w==sw ) {			// Unclipped horizontal
+	while( dp<ep ) {		// all lines
+	    lp=dp-w;
+	    do {			// 1 line
+		dp-=*sp++;		// transparent
+		pp=dp+1-*sp++;		// opaque
+		while( dp>pp ) {
+		    *dp=lookup50trans8[(Pixels8[ColorBlack]<<8)|*dp];
+		    --dp;
+		    ++sp;
+		    *dp=lookup50trans8[(Pixels8[ColorBlack]<<8)|*dp];
+		    --dp;
+		    ++sp;
+		}
+		if( dp>=pp ) {
+		    *dp=lookup50trans8[(Pixels8[ColorBlack]<<8)|*dp];
+		    --dp;
+		    ++sp;
+		}
+	    } while( dp>lp );
+	    dp+=da;
+	}
+
+    } else {				// Clip horizontal
+
+	da-=sw-w-ox;
+	while( dp<ep ) {		// all lines
+	    lp=dp-w;
+	    //
+	    //	Clip right side
+	    //
+	    pp=dp+sw-w-ox;
+	    for( ;; ) {
+		pp-=*sp++;		// transparent
+		if( pp<=dp ) {
+		    dp=pp;
+		    goto middle_trans;
+		}
+		pp-=*sp;		// opaque
+		if( pp<=dp ) {
+		    sp+=*sp-(dp-pp)+1;
+		    goto middle_pixel;
+		}
+		sp+=*sp+1;
+	    }
+
+	    //
+	    //	Draw middle
+	    //
+	    for( ;; ) {
+		dp-=*sp++;		// transparent
+middle_trans:
+		if( dp<=lp ) {
+		    lp-=ox;
+		    goto right_trans;
+		}
+		pp=dp-*sp++;		// opaque
+middle_pixel:
+		if( pp>lp ) {
+		    while( dp>pp ) {
+			*dp=lookup50trans8[(Pixels8[ColorBlack]<<8)|*dp];
+			--dp;
+			++sp;
+		    }
+		    continue;
+		}
+		while( dp>lp ) {
+		    *dp=lookup50trans8[(Pixels8[ColorBlack]<<8)|*dp];
+		    --dp;
+		    ++sp;
+		}
+		sp+=dp-pp;
+		dp=pp;
+		break;
+	    }
+
+	    //
+	    //	Clip left side
+	    //
+	    lp-=ox;
+	    while( dp>lp ) {
+		dp-=*sp++;		// transparent
+right_trans:
+		dp-=*sp;		// opaque
+		sp+=*sp+1;
+	    }
+	    dp+=da;
+
+	}
+    }
+}
+
+/**
+**	Draw 8bit shadow graphic object clipped and flipped in X direction
+**	into 16bit framebuffer.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+global void VideoDraw8to16ShadowClipX(const Graphic* sprite,unsigned frame
+	,int x,int y)
+{
+    int ex;
+    int ox;
+    int oy;
+    int w;
+    int h;
+    const unsigned char* sp;
+    unsigned sw;
+    VMemType16* dp;
+    const VMemType16* lp;
+    const VMemType16* ep;
+    VMemType16* pp;
+    const VMemType16* pixels;
+    unsigned da;
+    unsigned long dp1;
+    unsigned long mask;
+
+    //
+    // reduce to visible range
+    //
+    sw=w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    //
+    //	Draw the clipped sprite
+    //
+    pixels=(VMemType16*)sprite->Pixels;
+    sp=((unsigned char**)sprite->Frames)[frame];
+
+    //
+    // Skip top lines
+    //
+    while( oy-- ) {
+	da=0;
+	do {
+	    da+=*sp++;			// transparent
+	    da+=*sp;			// opaque
+	    sp+=*sp+1;
+	} while( da<sw );
+    }
+
+    da=VideoWidth+sw;
+    dp=VideoMemory16+x+y*VideoWidth+w;
+    ep=dp+VideoWidth*h;
+
+    if( VideoBpp==15 ) {
+	mask=0x03E07C1F;
+    } else {
+	mask=0x07E0F81F;
+    }
+
+    if( w==sw ) {			// Unclipped horizontal
+
+	while( dp<ep ) {		// all lines
+	    lp=dp-w;
+	    do {			// 1 line
+		dp-=*sp++;		// transparent
+		pp=dp+1-*sp++;		// opaque
+		while( dp>pp ) {
+		    dp1=*dp;
+		    dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+		    *dp--=(dp1>>16)|dp1;
+		    ++sp;
+		    dp1=*dp;
+		    dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+		    *dp--=(dp1>>16)|dp1;
+		    ++sp;
+		}
+		if( dp>=pp ) {
+		    dp1=*dp;
+		    dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+		    *dp--=(dp1>>16)|dp1;
+		    ++sp;
+		}
+	    } while( dp>lp );
+	    dp+=da;
+	}
+
+    } else {				// Clip horizontal
+
+	da-=sw-w-ox;
+	while( dp<ep ) {		// all lines
+	    lp=dp-w;
+	    //
+	    //	Clip right side
+	    //
+	    pp=dp+sw-w-ox;
+	    for( ;; ) {
+		pp-=*sp++;		// transparent
+		if( pp<=dp ) {
+		    dp=pp;
+		    goto middle_trans;
+		}
+		pp-=*sp;		// opaque
+		if( pp<=dp ) {
+		    sp+=*sp-(dp-pp)+1;
+		    goto middle_pixel;
+		}
+		sp+=*sp+1;
+	    }
+
+	    //
+	    //	Draw middle
+	    //
+	    for( ;; ) {
+		dp-=*sp++;		// transparent
+middle_trans:
+		if( dp<=lp ) {
+		    lp-=ox;
+		    goto right_trans;
+		}
+		pp=dp-*sp++;		// opaque
+middle_pixel:
+		if( pp>lp ) {
+		    while( dp>pp ) {
+			dp1=*dp;
+			dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+			*dp--=(dp1>>16)|dp1;
+			++sp;
+		    }
+		    continue;
+		}
+		while( dp>lp ) {
+		    dp1=*dp;
+		    dp1=((((dp1<<16)|dp1)&mask)>>1)&mask;
+		    *dp--=(dp1>>16)|dp1;
+		    ++sp;
+		}
+		sp+=dp-pp;
+		dp=pp;
+		break;
+	    }
+
+	    //
+	    //	Clip left side
+	    //
+	    lp-=ox;
+	    while( dp>lp ) {
+		dp-=*sp++;		// transparent
+right_trans:
+		dp-=*sp;		// opaque
+		sp+=*sp+1;
+	    }
+	    dp+=da;
+
+	}
+    }
+}
+
+/**
+**	Draw 8bit shadow graphic object clipped and flipped in X direction
+**	into 24bit framebuffer.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+global void VideoDraw8to24ShadowClipX(const Graphic* sprite,unsigned frame
+	,int x,int y)
+{
+    int ex;
+    int ox;
+    int oy;
+    int w;
+    int h;
+    const unsigned char* sp;
+    unsigned sw;
+    VMemType24* dp;
+    const VMemType24* lp;
+    const VMemType24* ep;
+    VMemType24* pp;
+    const VMemType24* pixels;
+    unsigned da;
+
+    //
+    // reduce to visible range
+    //
+    sw=w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    //
+    //	Draw the clipped sprite
+    //
+    pixels=(VMemType24*)sprite->Pixels;
+    sp=((unsigned char**)sprite->Frames)[frame];
+
+    //
+    // Skip top lines
+    //
+    while( oy-- ) {
+	da=0;
+	do {
+	    da+=*sp++;			// transparent
+	    da+=*sp;			// opaque
+	    sp+=*sp+1;
+	} while( da<sw );
+    }
+
+    da=VideoWidth+sw;
+    dp=VideoMemory24+x+y*VideoWidth+w;
+    ep=dp+VideoWidth*h;
+
+    if( w==sw ) {			// Unclipped horizontal
+
+	while( dp<ep ) {		// all lines
+	    lp=dp-w;
+	    do {			// 1 line
+		dp-=*sp++;		// transparent
+		pp=dp+1-*sp++;		// opaque
+		while( dp>pp ) {
+		    *dp--=pixels[*sp++];
+		    *dp--=pixels[*sp++];
+		}
+		if( dp>=pp ) {
+		    *dp--=pixels[*sp++];
+		}
+	    } while( dp>lp );
+	    dp+=da;
+	}
+
+    } else {				// Clip horizontal
+
+	da-=sw-w-ox;
+	while( dp<ep ) {		// all lines
+	    lp=dp-w;
+	    //
+	    //	Clip right side
+	    //
+	    pp=dp+sw-w-ox;
+	    for( ;; ) {
+		pp-=*sp++;		// transparent
+		if( pp<=dp ) {
+		    dp=pp;
+		    goto middle_trans;
+		}
+		pp-=*sp;		// opaque
+		if( pp<=dp ) {
+		    sp+=*sp-(dp-pp)+1;
+		    goto middle_pixel;
+		}
+		sp+=*sp+1;
+	    }
+
+	    //
+	    //	Draw middle
+	    //
+	    for( ;; ) {
+		dp-=*sp++;		// transparent
+middle_trans:
+		if( dp<=lp ) {
+		    lp-=ox;
+		    goto right_trans;
+		}
+		pp=dp-*sp++;		// opaque
+middle_pixel:
+		if( pp>lp ) {
+		    while( dp>pp ) {
+			*dp--=pixels[*sp++];
+		    }
+		    continue;
+		}
+		while( dp>lp ) {
+		    *dp--=pixels[*sp++];
+		}
+		sp+=dp-pp;
+		dp=pp;
+		break;
+	    }
+
+	    //
+	    //	Clip left side
+	    //
+	    lp-=ox;
+	    while( dp>lp ) {
+		dp-=*sp++;		// transparent
+right_trans:
+		dp-=*sp;		// opaque
+		sp+=*sp+1;
+	    }
+	    dp+=da;
+
+	}
+    }
+}
+
+/**
+**	Draw 8bit shadow graphic object clipped and flipped in X direction
+**	into 32bit framebuffer.
+**
+**	@param sprite	pointer to object
+**	@param frame	number of frame (object index)
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+global void VideoDraw8to32ShadowClipX(const Graphic* sprite,unsigned frame
+	,int x,int y)
+{
+    int ex;
+    int ox;
+    int oy;
+    int w;
+    int h;
+    const unsigned char* sp;
+    unsigned sw;
+    VMemType32* dp;
+    const VMemType32* lp;
+    const VMemType32* ep;
+    VMemType32* pp;
+    const VMemType32* pixels;
+    unsigned da;
+    unsigned long dp1;
+    unsigned long dp2;
+
+    //
+    // reduce to visible range
+    //
+    sw=w=sprite->Width;
+    h=sprite->Height;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+
+    //
+    //	Draw the clipped sprite
+    //
+    pixels=(VMemType32*)sprite->Pixels;
+    sp=((unsigned char**)sprite->Frames)[frame];
+
+    //
+    // Skip top lines
+    //
+    while( oy-- ) {
+	da=0;
+	do {
+	    da+=*sp++;			// transparent
+	    da+=*sp;			// opaque
+	    sp+=*sp+1;
+	} while( da<sw );
+    }
+
+    da=VideoWidth+sw;
+    dp=VideoMemory32+x+y*VideoWidth+w;
+    ep=dp+VideoWidth*h;
+
+    if( w==sw ) {			// Unclipped horizontal
+
+	while( dp<ep ) {		// all lines
+	    lp=dp-w;
+	    do {			// 1 line
+		dp-=*sp++;		// transparent
+		pp=dp+1-*sp++;		// opaque
+		while( dp>pp ) {
+		    dp1=*dp;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(dp1>>1)&0x00FF00FF;
+		    dp2=(dp2>>1)&0x00FF00FF;
+		    *dp--=(dp1|(dp2<<8));
+		    ++sp;
+		    dp1=*dp;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(dp1>>1)&0x00FF00FF;
+		    dp2=(dp2>>1)&0x00FF00FF;
+		    *dp--=(dp1|(dp2<<8));
+		    ++sp;
+		}
+		if( dp>=pp ) {
+		    dp1=*dp;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(dp1>>1)&0x00FF00FF;
+		    dp2=(dp2>>1)&0x00FF00FF;
+		    *dp--=(dp1|(dp2<<8));
+		    ++sp;
+		}
+	    } while( dp>lp );
+	    dp+=da;
+	}
+
+    } else {				// Clip horizontal
+
+	da-=ex;
+	while( dp<ep ) {		// all lines
+	    lp=dp-w;
+	    //
+	    //	Clip right side
+	    //
+	    pp=dp+ex;
+	    for( ;; ) {
+		pp-=*sp++;		// transparent
+		if( pp<=dp ) {
+		    dp=pp;
+		    goto middle_trans;
+		}
+		pp-=*sp;		// opaque
+		if( pp<=dp ) {
+		    sp+=*sp-(dp-pp)+1;
+		    goto middle_pixel;
+		}
+		sp+=*sp+1;
+	    }
+
+	    //
+	    //	Draw middle
+	    //
+	    for( ;; ) {
+		dp-=*sp++;		// transparent
+middle_trans:
+		if( dp<=lp ) {
+		    lp-=ox;
+		    goto right_trans;
+		}
+		pp=dp-*sp++;		// opaque
+middle_pixel:
+		if( pp>lp ) {
+		    while( dp>pp ) {
+			dp1=*dp;
+			dp2=(dp1&0xFF00FF00)>>8;
+			dp1&=0x00FF00FF;
+			dp1=(dp1>>1)&0x00FF00FF;
+			dp2=(dp2>>1)&0x00FF00FF;
+			*dp--=(dp1|(dp2<<8));
+			++sp;
+		    }
+		    continue;
+		}
+		while( dp>lp ) {
+		    dp1=*dp;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(dp1>>1)&0x00FF00FF;
+		    dp2=(dp2>>1)&0x00FF00FF;
+		    *dp--=(dp1|(dp2<<8));
+		    ++sp;
+		}
+		sp+=dp-pp;
+		dp=pp;
+		break;
+	    }
+
+	    //
+	    //	Clip left side
+	    //
+	    lp-=ox;
+	    while( dp>lp ) {
+		dp-=*sp++;		// transparent
+right_trans:
+		dp-=*sp;		// opaque
+		sp+=*sp+1;
+	    }
+	    dp+=da;
+
+	}
+    }
+}
+
+/**
 **	Draw 8bit raw graphic data clipped, using given pixel pallette
 **	of a given color-depth in bytes: 8=1, 16=2, 24=3, 32=4
 **
@@ -1767,8 +2992,10 @@ global void InitSprite(void)
 	case 8:
 	    GraphicSprite8Type.Draw=VideoDraw8to8;
 	    GraphicSprite8Type.DrawClip=VideoDraw8to8Clip;
+	    GraphicSprite8Type.DrawShadowClip=VideoDraw8to8ShadowClip;
 	    GraphicSprite8Type.DrawX=VideoDraw8to8X;
 	    GraphicSprite8Type.DrawClipX=VideoDraw8to8ClipX;
+	    GraphicSprite8Type.DrawShadowClipX=VideoDraw8to8ShadowClipX;
             VideoDrawRawClip=VideoDrawRaw8Clip;
 	    break;
 
@@ -1776,24 +3003,30 @@ global void InitSprite(void)
 	case 16:
 	    GraphicSprite8Type.Draw=VideoDraw8to16;
 	    GraphicSprite8Type.DrawClip=VideoDraw8to16Clip;
+	    GraphicSprite8Type.DrawShadowClip=VideoDraw8to16ShadowClip;
 	    GraphicSprite8Type.DrawX=VideoDraw8to16X;
 	    GraphicSprite8Type.DrawClipX=VideoDraw8to16ClipX;
+	    GraphicSprite8Type.DrawShadowClipX=VideoDraw8to16ShadowClipX;
             VideoDrawRawClip=VideoDrawRaw16Clip;
 	    break;
 
 	case 24:
 	    GraphicSprite8Type.Draw=VideoDraw8to24;
 	    GraphicSprite8Type.DrawClip=VideoDraw8to24Clip;
+	    GraphicSprite8Type.DrawShadowClip=VideoDraw8to24ShadowClip;
 	    GraphicSprite8Type.DrawX=VideoDraw8to24X;
 	    GraphicSprite8Type.DrawClipX=VideoDraw8to24ClipX;
+	    GraphicSprite8Type.DrawShadowClipX=VideoDraw8to24ShadowClipX;
             VideoDrawRawClip=VideoDrawRaw24Clip;
 	    break;
 
 	case 32:
 	    GraphicSprite8Type.Draw=VideoDraw8to32;
 	    GraphicSprite8Type.DrawClip=VideoDraw8to32Clip;
+	    GraphicSprite8Type.DrawShadowClip=VideoDraw8to32ShadowClip;
 	    GraphicSprite8Type.DrawX=VideoDraw8to32X;
 	    GraphicSprite8Type.DrawClipX=VideoDraw8to32ClipX;
+	    GraphicSprite8Type.DrawShadowClipX=VideoDraw8to32ShadowClipX;
             VideoDrawRawClip=VideoDrawRaw32Clip;
 	    break;
 

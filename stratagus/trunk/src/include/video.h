@@ -196,6 +196,24 @@ typedef struct _graphic_type_ {
 	*/
     void (*DrawClipX)	(const Graphic* o,unsigned f,int x,int y);
 	/**
+	**	Draw the shadow object clipped to the current clipping.
+	**
+	**	@param o	pointer to object
+	**	@param f	number of frame (object index)
+	**	@param x	x coordinate on the screen
+	**	@param y	y coordinate on the screen
+	*/
+    void (*DrawShadowClip)	(const Graphic* o,unsigned f,int x,int y);
+	/**
+	**	Draw the shadow object clipped and flipped in X direction.
+	**
+	**	@param o	pointer to object
+	**	@param f	number of frame (object index)
+	**	@param x	x coordinate on the screen
+	**	@param y	y coordinate on the screen
+	*/
+    void (*DrawShadowClipX)	(const Graphic* o,unsigned f,int x,int y);
+	/**
 	**	Draw part of the object unclipped.
 	**
 	**	@param o	pointer to object
@@ -1056,6 +1074,10 @@ extern void VideoDrawSubClipFaded(Graphic* graphic,int gx,int gy,
 #define VideoDrawClip(o,f,x,y)	((o)->Type->DrawClip)((o),(f),(x),(y))
     ///	Draw a graphic object clipped and flipped in X direction.
 #define VideoDrawClipX(o,f,x,y)	((o)->Type->DrawClipX)((o),(f),(x),(y))
+    ///	Draw a shadow graphic object clipped to the current clipping.
+#define VideoDrawShadowClip(o,f,x,y)	((o)->Type->DrawShadowClip)((o),(f),(x),(y))
+    ///	Draw a shadow graphic object clipped and flipped in X direction.
+#define VideoDrawShadowClipX(o,f,x,y)	((o)->Type->DrawShadowClipX)((o),(f),(x),(y))
 
     ///	Draw a part of graphic object unclipped.
 #define VideoDrawSub(o,ix,iy,w,h,x,y) \

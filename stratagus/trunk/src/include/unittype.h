@@ -72,11 +72,21 @@
 **		@note It is planned to change this to support more and 
 **		better tilesets.
 **
+**	UnitType::SpriteFile
+**
+**		Path file name of shadow sprite file for the different tilesets.
+**
 **	UnitType::Width UnitType::Height
 **
 **		Size of a sprite frame in pixels. All frames of a sprite have
 **		the same size. Also all sprites (tilesets) must have the same
 **		size.
+**
+**	UnitType::ShadowWidth UnitType::ShadowHeight
+**
+**		Size of a shadow sprite frame in pixels. All frames of a sprite
+**		have the same size. Also all sprites (tilesets) must have the
+**		same size.
 **
 **	UnitType::Animations
 **
@@ -400,6 +410,10 @@
 **	UnitType::Sprite
 **
 **		Sprite images
+**
+**	UnitType::ShadowSprite
+**
+**		Shadow sprite images
 */
 
 /*----------------------------------------------------------------------------
@@ -472,9 +486,12 @@ struct _unit_type_ {
     char*	Name;			/// Pretty name shown from the engine
     char*	SameSprite;		/// Unit-type shared sprites
     char*	File[TilesetMax];	/// Sprite files
+    char*	ShadowFile;		/// Shadow file
 
     int		Width;			/// Sprite width
     int		Height;			/// Sprite height
+    int		ShadowWidth;		/// Shadow sprite width
+    int		ShadowHeight;		/// Shadow sprite height
 
     Animations*	Animations;		/// Animation scripts
 
@@ -590,6 +607,7 @@ struct _unit_type_ {
     void*	Property;		/// CCL property storage
 
     Graphic*	Sprite;			/// Sprite images
+    Graphic*	ShadowSprite;		/// Shadow sprite image
 };
 
     // FIXME: ARI: should be dynamic (ccl..), JOHNS: Pud only supports 255.
