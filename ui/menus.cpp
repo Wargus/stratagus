@@ -4201,7 +4201,7 @@ local void GameTSSAction(Menuitem *mi, int i)
     // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
     int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
-    DebugLevel0Fn("FIXME: The enums TilesetSummer, TilesetWinter, ... will be removed in version 1.18\n");
+    DebugLevel0Fn("FIXME: The enums TilesetSummer, TilesetWinter, ... will be removed in version 1.19\n");
 
     if (!mi || mi->d.pulldown.curopt == i) {
 	GameSettings.Terrain = v[i];
