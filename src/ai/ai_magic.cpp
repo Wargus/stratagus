@@ -81,7 +81,7 @@ local void AiInitMagic(void)
 	"spell-invisibility"
 	"spell-polymorph"
 	"spell-blizzard"
-	
+
 	"spell-runes"
 	"spell-death-coil"
 	"spell-haste"
@@ -97,7 +97,7 @@ local void AiInitMagic(void)
 **
 **	If the spell is available and the unit has enough mana, the surrounding
 **	of the unit is checked if any enemy units are in sight. If enemy units
-**	are in sight the spell is casted on own units in range. 
+**	are in sight the spell is casted on own units in range.
 **
 **	@param unit	Magic unit.
 **
@@ -132,6 +132,7 @@ local int AiBloodlustSpell(Unit* unit)
 	    //
 	    best = NoUnitP;
 	    for (i = 0; i < n; ++i) {
+		// FIXME: Spell castable checks must be done global by spells.
 		// not self, not already bloodlust and can attack
 		if (table[i] == unit || table[i]->Bloodlust
 			|| !table[i]->Type->CanAttack) {
@@ -241,9 +242,9 @@ local int AiHolyVisionSpell(Unit* unit)
 		&& UpgradeIdentAvailable(AiPlayer->Player,
 		    "upgrade-paladin") ) {
 	    r=SyncRand();
-	        /* s0m3body: each unit can have different MaxMana, the original condition is testing MaxMana-10,
-		 *              * so let's take unit's maxmana * 245/255 as a new treshold */
-
+	    // s0m3body: each unit can have different MaxMana, the original
+	    //		condition is testing MaxMana-10, so let's take unit's
+	    //		maxmana * 245/255 as a new treshold
 	    if( unit->Mana>((unit->Type->_MaxMana * 245)/255) && !(r%32) ) {
 		if( unit->Mana>AiHolyVision->ManaCost ) {
 		    int x;
@@ -266,11 +267,92 @@ local int AiHolyVisionSpell(Unit* unit)
 }
 
 /**
+**	Check if the unit should cast the "heal" spell.
+**
+**	If the spell is available and the unit has enough mana, the surrounding
+**	of the unit is checked if any ally damaged units are in sight. If ally
+**	damaged units are in sight the spell is casted on own units in range.
+**
+**	@param unit	Magic unit.
+**
+**	@return		True, if a spell is casted.
+**
+**	@note This function can also be used for auto heal.
+*/
+local int AiHealingSpell(Unit* unit)
+{
+    Unit* best;
+    Unit* table[UnitMax];
+    int r;
+    int i;
+    int n;
+
+    // FIXME : minimum Mana for Ai Healing should be configurable.
+    if (UpgradeIdentAvailable(AiPlayer->Player, "upgrade-healing")
+	    && unit->Mana > AiHealing->ManaCost+20) {
+
+	r = unit->Type->ReactRangeComputer;
+	n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	    unit->Y + r + 1, table);
+
+	for (i = 0; i < n; ++i) {
+
+	    // an ally
+	    if (IsEnemy(unit->Player, table[i])) {
+		continue;
+	    }
+	    //
+	    //      We have an ally in range...
+	    //
+	    best = NoUnitP;
+	    for (i = 0; i < n; ++i) {
+		// not self, organic and somewhat in need with healing
+		//	(HP<8/10*max), ...
+		// FIXME: Spell castable checks must be done global by spells.
+		if (table[i] == unit || !table[i]->Type->Organic
+			|| table[i]->HP>=((table[i]->Type->_HitPoints*9)/10)) {
+		    continue;
+		}
+
+		// Allied unit
+		// FIXME: should ally to self
+		if (unit->Player != table[i]->Player
+			&& !IsAllied(unit->Player, table[i])) {
+		    continue;
+		}
+		r = MapDistanceBetweenUnits(unit, table[i]);
+		DebugLevel0Fn("Distance %d\n" _C_ r);
+		if (r <= 1) {
+		    DebugLevel0Fn("`%s' cast healing\n" _C_ unit->Type->
+			Ident);
+		    CommandSpellCast(unit, 0, 0, table[i], AiHealing,
+			FlushCommands);
+		    return 1;
+		}
+		if (r == 2) {
+		    best = table[i];
+		}
+	    }
+	    if (best) {
+		CommandSpellCast(unit, 0, 0, best, AiHealing,
+		    FlushCommands);
+		return 1;
+	    }
+	    break;
+	}
+    }
+    return 0;
+}
+
+/**
 **	Do magic for paladin.
 */
 local void AiDoPaladin(Unit* unit)
 {
-    if( AiHolyVisionSpell(unit) ) {
+    if (AiHealingSpell(unit)) {
+	return;
+    }
+    if (AiHolyVisionSpell(unit)) {
 	return;
     }
 }
