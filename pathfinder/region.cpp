@@ -270,8 +270,6 @@ local void RegionExpandNode (Region *reg, int x, int y, NodeOperation opcode,
 	int nx, ny;			/* neighbor map field coordinates */
 	static int xoffsets[] = {  0, 1, 0, -1,  1, 1, -1, -1 };
 	static int yoffsets[] = { -1, 0, 1,  0, -1, 1,  1, -1 };
-	int movement_mask = opargs[0];
-
 
 	for (i=0; i<8; i++) {
 		nx = x + xoffsets[i];

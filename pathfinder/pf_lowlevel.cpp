@@ -316,7 +316,9 @@ local MapField *LowAstarLoop (Unit *unit)
 			//rdtsc (ts0);
 			byte = neigho >> 3;
 			bit = 1 << (neigho & 0x7);
+#undef SEEN
 #define SEEN(byte, bit)     (Lowlevel.Seen[(byte)] & (bit))
+#undef SET_SEEN
 #define SET_SEEN(byte, bit) (Lowlevel.Seen[(byte)] |= (bit))
 			if ( !SEEN (byte, bit)) {
 				neigh->f = f;
@@ -376,17 +378,17 @@ local int LowTraceback (Unit *unit, MapField *end)
 	/* we store 2 path segments in 1B */
 	char path[MAX_PATH_LENGTH * 2];
 	int i, path_ptr = 0;
-	char prev_traceback = -1;
+	int prev_traceback = -1;
 	int path_length = 0;
 
 	for (i=0; i < MAX_PATH_LENGTH * 2; i++)
 		path[i] = -1;
 
 	for (mf = end; mf->Traceback != -1;
-							mf += Neighbor[mf->Traceback].Offset) {
+							mf += Neighbor[(int )mf->Traceback].Offset) {
 		//printf ("(%d,%d) ", x, y);
-		x += Neighbor[mf->Traceback].dx;
-		y += Neighbor[mf->Traceback].dy;
+		x += Neighbor[(int )mf->Traceback].dx;
+		y += Neighbor[(int )mf->Traceback].dy;
 		
 		++path_length;
 		if (prev_traceback >= 0) {

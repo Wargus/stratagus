@@ -25,7 +25,7 @@ local void RegionSetFindRegions (void);
 local void RegionSetFindRegionsInArea (int , int );
 local void RegionSetFlush (void);
 local void RegionSetInsert (Region * );
-local void RegionSetDelete (Region * );
+//local void RegionSetDelete (Region * );
 local void RegionSetCreateNeighborLists (int , int , int , int);
 
 void RegionSetInitialize (void)
@@ -109,10 +109,12 @@ local void RegionSetInsert (Region *reg)
 	AvlAdd (&RegionSet.Regions, reg, reg->RegId);
 }
 
+#if 0
 local void RegionSetDelete (Region *reg)
 {
 	AvlDelete (&RegionSet.Regions, reg->RegId);
 }
+#endif
 
 Region *RegionSetFind (int regid)
 {

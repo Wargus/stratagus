@@ -211,7 +211,6 @@ local void HighMarkGoalSubstitute (Unit *unit, int xmin, int xmax,
 						int ymin, int ymax)
 {
 	int x, y, found;
-	unsigned short regid;
 	int MovementMask = UnitMovementMask (unit);
 
 	found = 0;
@@ -355,9 +354,6 @@ local Region *HighAstarLoop (Unit *unit)
 
 local unsigned char *HighTraceback (Region *reg)
 {
-	unsigned char *path;
-
-//	Highlevel.Path = (unsigned char * )malloc (Highlevel.BitmapSize);
 	//printf ("highlevel:");
 	do {
 		Highlevel.Path[reg->RegId / 8] |= 1 << reg->RegId % 8;
