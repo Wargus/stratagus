@@ -1383,6 +1383,7 @@ global void InputMouseTimeout(const EventCallback* callbacks,unsigned ticks)
 
 
 global int HoldKeyDelay=250;		/// Time to detect hold key
+global int HoldKeyAdditionalDelay=50;	/// Time to detect additional hold key
 
 local unsigned LastIKey;		/// last key handled
 local unsigned LastIKeyChar;		/// last keychar handled
@@ -1409,6 +1410,7 @@ global void InputKeyButtonRelease(const EventCallback* callbacks,
 global void InputKeyTimeout(const EventCallback* callbacks,unsigned ticks)
 {
     if( LastIKey && ticks>LastKeyTicks+HoldKeyDelay) {
+	LastKeyTicks=ticks-(HoldKeyDelay-HoldKeyAdditionalDelay);
 	callbacks->KeyRepeated(LastIKey, LastIKeyChar);
     }
 }
