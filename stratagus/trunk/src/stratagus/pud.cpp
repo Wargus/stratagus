@@ -480,7 +480,7 @@ global MapInfo* GetPudInfo(const char* pud)
 	    buf[0] = temp_short & 0xFF;
 	    buf[1] = (temp_short >> 8) & 0xFF;
 	    info->MapUID += ChksumArea(buf, 2);
-	    if( length<sizeof(buf) ) {
+	    if( length<(long)sizeof(buf) ) {
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
@@ -502,7 +502,7 @@ global MapInfo* GetPudInfo(const char* pud)
 	if( !memcmp(header,"ALOW",4) ) {
 	    char* bufp;
 
-	    if( length<sizeof(buf) ) {
+	    if( length<(long)sizeof(buf) ) {
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
@@ -529,7 +529,7 @@ global MapInfo* GetPudInfo(const char* pud)
 	    buf[0] = temp_short & 0xFF;
 	    buf[1] = (temp_short >> 8) & 0xFF;
 	    info->MapUID += ChksumArea(buf, 2);
-	    if( length<sizeof(buf) ) {
+	    if( length<(long)sizeof(buf) ) {
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
@@ -970,7 +970,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		DebugLevel3("\tUsing default data\n");
 		CLseek(input,length,SEEK_CUR);
 	    } else {
-		if( length<sizeof(buf) ) {
+		if( length<(long)sizeof(buf) ) {
 		    bufp=buf;
 		} else if( !(bufp=alloca(length)) ) {
 		    perror("alloca()");
@@ -991,7 +991,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	if( !memcmp(header,"ALOW",4) ) {
 	    char* bufp;
 
-	    if( length<sizeof(buf) ) {
+	    if( length<(long)sizeof(buf) ) {
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
@@ -1016,7 +1016,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		DebugLevel3("\tUsing default data\n");
 		CLseek(input,length,SEEK_CUR);
 	    } else {
-		if( length<sizeof(buf) ) {
+		if( length<(long)sizeof(buf) ) {
 		    bufp=buf;
 		} else if( !(bufp=alloca(length)) ) {
 		    perror("alloca()");
