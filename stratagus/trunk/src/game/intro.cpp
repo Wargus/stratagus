@@ -347,7 +347,7 @@ global void ShowIntro(const Intro *intro)
     int OldVideoSyncSpeed;
 
     UseContinueButton=1;
-    InitContinueButton((VideoWidth-640)/2+455,(VideoHeight-480)/2+440);
+    InitContinueButton(TheUI.Offset640X+455,TheUI.Offset480Y+440);
     GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 
@@ -405,13 +405,13 @@ global void ShowIntro(const Intro *intro)
 	}
     }
 
-    x=(VideoWidth-640)/2;
+    x=TheUI.Offset640X;
     line=0;
     stage=1;
     IntroNoEvent=1;
     c=0;
     while( 1 ) {
-	y=(VideoHeight-480)/2;
+	y=TheUI.Offset480Y;
 	if( !PlayingMusic && stage<MAX_BRIEFING_VOICES &&
 		intro->VoiceFile[stage] ) {
 	    PlayFile(intro->VoiceFile[stage]);
@@ -543,12 +543,12 @@ global void ShowCredits(Credits *credits)
     }
 
     UseContinueButton=1;
-    InitContinueButton((VideoWidth-640)/2+455,(VideoHeight-480)/2+440);
+    InitContinueButton(TheUI.Offset640X+455,TheUI.Offset480Y+440);
     GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 
-    x=(VideoWidth-640)/2;
-    y=(VideoHeight-480)/2;
+    x=TheUI.Offset640X;
+    y=TheUI.Offset480Y;
     IntroNoEvent=1;
     line=0;
     scrolling=1;
@@ -800,8 +800,8 @@ local int GameStatsDrawFunc(int frame)
     if( (frame%StatsPause)!=0 )
 	return done;
 
-    x=(VideoWidth-640)/2;
-    y=(VideoHeight-480)/2;
+    x=TheUI.Offset640X;
+    y=TheUI.Offset480Y;
     dodraw=frame/StatsPause;
 
     for( i=0,c=0; i<PlayerMax; i++) {
@@ -1147,7 +1147,7 @@ global void ShowStats(void)
     VideoUnlockScreen();
 
     UseContinueButton=1;
-    InitContinueButton((VideoWidth-640)/2+455,(VideoHeight-480)/2+440);
+    InitContinueButton(TheUI.Offset640X+455,TheUI.Offset480Y+440);
     GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 

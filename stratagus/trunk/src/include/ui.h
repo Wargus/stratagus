@@ -256,6 +256,10 @@ typedef struct _ui_ {
 	/// used for displaying unit training queues
     Button	Buttons2[6];
 
+    // Offsets for 640x480 center used by menus
+    int		Offset640X;		/// Offset for 640x480 X position
+    int		Offset480Y;		/// Offset for 640x480 Y position
+
     //
     //	Cursors used.
     //
