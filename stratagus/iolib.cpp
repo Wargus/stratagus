@@ -504,7 +504,8 @@ global char* LibraryFileName(const char* file, char* buffer)
 		return buffer;
 	}
 #endif
-#else
+#endif
+
 	if ((s = getenv("HOME"))) {
 		//
 		//  In user home directory
@@ -526,7 +527,6 @@ global char* LibraryFileName(const char* file, char* buffer)
 		}
 #endif
 	}
-#endif
 
 	//
 	//		In global shared directory
