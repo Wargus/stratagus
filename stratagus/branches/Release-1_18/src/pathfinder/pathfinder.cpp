@@ -376,6 +376,14 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
 {
     unsigned char* matrix;
     int depth;
+    int x1;
+    int x2;
+    int y1;
+    int y2;
+    int x;
+    int y;
+    int reachable;
+    
 
     DebugLevel3Fn("%d(%d,%d,%s)->%d(%d,%d,%s)+%d "
 	_C_ UnitNumber(src) _C_ src->X _C_ src->Y _C_ src->Type->Ident
@@ -384,6 +392,39 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
     //
     //	Setup movement.
     //
+    x1 = dst->X-range;
+    if( x1 < 0 ) {
+	x1 = 0;
+    }
+    x2 = dst->X + range + dst->Type->TileWidth - 1;
+    if( x2 > TheMap.Width ) {
+	x2 = TheMap.Width;
+    }
+    y1 = dst->Y-range;
+    if( y1 < 0 ) {
+	y1 = 0;
+    }
+    y2 = dst->Y + range + dst->Type->TileHeight - 1;
+    if( y2 > TheMap.Height ) {
+	y2 = TheMap.Height;
+    }
+    // Find a reachable target, otherwise, don't search
+    reachable=0;
+    for( x=x1;x<=x2;x++ ) {
+	if( CheckedCanMoveToMask(x,y1,UnitMovementMask(src)) ||
+	    CheckedCanMoveToMask(x,y2,UnitMovementMask(src)) ) {
+	    reachable=1;
+	}
+    }
+    for( y=y1;y<y2;y++ ) {
+	if( CheckedCanMoveToMask(x1,y,UnitMovementMask(src)) ||
+	    CheckedCanMoveToMask(x2,y,UnitMovementMask(src)) ) {
+	    reachable=1;
+	}
+    }
+    if( !reachable ) {
+	return 0;
+    }
     matrix=CreateMatrix();
     MarkGoalInMatrix(dst,range,matrix);
 
