@@ -308,14 +308,16 @@ local void SaveUi(FILE* file,const UI* ui)
 	    ui->NormalFontColor, ui->ReverseFontColor);
     fprintf(file,"\n");
 
-    fprintf(file,"  ; Filler 1\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    ui->Filler[0].File,ui->FillerX[0],ui->FillerY[0]);
-    fprintf(file,"  ; Resource line\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
+    fprintf(file,"\n  'filler (list");
+    fprintf(file,"\n    'file \"%s\"",ui->Filler[0].File);
+    fprintf(file,"\n    'pos '(%3d %3d)",ui->FillerX[0],ui->FillerY[0]);
+    fprintf(file,")\n");
+
+    fprintf(file,"\n  ; Resource line");
+    fprintf(file,"\n  (list \"%s\" %d %d)",
 	    ui->Resource.File,ui->ResourceX,ui->ResourceY);
 
-    fprintf(file,"  'resources (list");
+    fprintf(file,"\n  'resources (list");
     for( i=1; i<MaxCosts+2; ++i ) {
 	if( !ui->Resources[i].Icon.File ) {
 	    continue;
@@ -352,10 +354,13 @@ local void SaveUi(FILE* file,const UI* ui)
     fprintf(file,"  (list \"%s\" %d %d)\n",
 	    ui->ButtonPanel.File,ui->ButtonPanelX,ui->ButtonPanelY);
 
-    fprintf(file,"  ; The map area\n");
-    fprintf(file,"  (list %d %d %d %d)\n",
-	    ui->MapArea.X, ui->MapArea.Y,
-	    ui->MapArea.EndX+1,ui->MapArea.EndY+1);
+    fprintf(file,"\n  'map-area (list");
+    fprintf(file,"\n    'pos '(%3d %3d)",
+	    ui->MapArea.X, ui->MapArea.Y);
+    fprintf(file,"\n    'size '(%d %d)",
+	    ui->MapArea.EndX-ui->MapArea.X+1,
+	    ui->MapArea.EndY-ui->MapArea.Y+1);
+    fprintf(file,")\n\n");
 
     fprintf(file,"  ; Menu button background\n");
     fprintf(file,"  (list \"%s\" %d %d)\n",
