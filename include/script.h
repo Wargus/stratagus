@@ -94,6 +94,7 @@ extern LISP sym_t;
 
 extern char* CclStartFile;		/// CCL start file
 extern int CclInConfigFile;		/// True while config file parsing
+extern SCM CclEachSecond;		/// Scheme function called each second
 
 /*----------------------------------------------------------------------------
 --	Functions
