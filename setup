@@ -467,14 +467,14 @@ case $VIDSEL in
 	echo -n "Using SDL"
   	USESDL=1
 	SDLLIB="\$(shell $SDL_CONFIG --libs)"
-	echo "SDL		:= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	echo "SDL_CFLAGS	:= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
+	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
+	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
         if test "$STATIC x" != " x" ; then
 	  SDLLIB="\$(shell $SDL_CONFIG --static-libs)"
 	fi
 
-	echo "SDLLIB		:= $SDLLIB" >> $RULESFILE
+	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
 	echo "VIDEO             = \$(SDL)" >> $RULESFILE
     if [ "$BEOS" != "1" ] ; then
@@ -498,13 +498,13 @@ case $VIDSEL in
   	USESDL=1
 	SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	echo "SDL_CFLAGS	:= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
+	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
         if test "$STATIC x" != " x" ; then
 	  SDLLIB="$SDLLIB -lesd"
 	fi
 
-	echo "SDLLIB		:= $SDLLIB" >> $RULESFILE
+	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
 	echo "VIDEO		= \$(SDL)" >> $RULESFILE
 	echo "VIDEOLIB	= \$(SDLLIB) -lvga -lvgagl $DL" >> $RULESFILE
@@ -517,11 +517,11 @@ case $VIDSEL in
   	  USESDL=1
 	  SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	  echo "SDL_CFLAGS	:= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
+	  echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
           if test "$STATIC x" != " x" ; then
 	    SDLLIB="$SDLLIB -lesd"
 	  fi
-	  echo "SDLLIB		:= $SDLLIB" >> $RULESFILE
+	  echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	  echo >> $RULESFILE
 	else  
 	  echo "Using X11"
@@ -578,8 +578,8 @@ case $ANSWER in
 		;;
 	    *)
 		HAVEARTS=1
-		echo "ARTSC		:= -DWITH_ARTSC \$(shell artsc-config --cflags)" >> $RULESFILE
-		echo "ARTSCLIB	:= \$(shell artsc-config --libs)" >> $RULESFILE
+		echo "ARTSC		= -DWITH_ARTSC \$(shell artsc-config --cflags)" >> $RULESFILE
+		echo "ARTSCLIB	= \$(shell artsc-config --libs)" >> $RULESFILE
 	        echo
 		echo "Compiling with arts daemon support"
 		;;
@@ -688,8 +688,8 @@ case $ANSWER in
 		USE_LIBCDA=0
 		echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
 		if [ "$USESDL" != "1" ]; then
-		    echo "SDLCD	:= $SDLCD \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
-		    echo "CLONELIBS	:= \$(shell $SDL_CONFIG --libs)" >> $RULESFILE
+		    echo "SDLCD	= $SDLCD \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
+		    echo "CLONELIBS	= \$(shell $SDL_CONFIG --libs)" >> $RULESFILE
 		fi
 		echo >> $RULESFILE
 		;;
