@@ -291,8 +291,8 @@ typedef struct _world_map_ {
 
 	char Description[32];///< map description short
 
-	MapInfo* Info;  ///< descriptive information
-	// TODO: (MapInfo* Info DUPLICATES!)
+	MapInfo Info;  ///< descriptive information
+	// TODO: (remove MapInfo Info DUPLICATES!)
 } WorldMap;
 
 /*----------------------------------------------------------------------------

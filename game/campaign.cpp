@@ -168,7 +168,8 @@ void PlayCampaign(const char* name)
 	SkipCurrentChapter = 1;
 	GameResult = GameNoResult;
 
-	strcpy(CurrentMapPath, filename);
+	FreeMapInfo(&TheMap.Info);
+	sprintf(CurrentMapPath, "%s/%s", StratagusLibPath, filename);
 }
 
 /**

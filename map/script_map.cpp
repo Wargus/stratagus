@@ -71,10 +71,6 @@ static int CclStratagusMap(lua_State* l)
 	//  Parse the list: (still everything could be changed!)
 	//
 
-	if (!TheMap.Info) {
-		TheMap.Info = calloc(1, sizeof(MapInfo));
-	}
-
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
 		value = LuaToString(l, j + 1);
@@ -89,11 +85,11 @@ static int CclStratagusMap(lua_State* l)
 				fprintf(stderr, "Warning not saved with this version.\n");
 			}
 		} else if (!strcmp(value, "uid")) {
-			TheMap.Info->MapUID = LuaToNumber(l, j + 1);
+			TheMap.Info.MapUID = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "description")) {
 			value = LuaToString(l, j + 1);
 			strncpy(TheMap.Description, value, sizeof(TheMap.Description));
-			TheMap.Info->Description = strdup(value);
+			TheMap.Info.Description = strdup(value);
 		} else if (!strcmp(value, "the-map")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -154,7 +150,7 @@ static int CclStratagusMap(lua_State* l)
 					--k;
 				} else if (!strcmp(value, "filename")) {
 					 lua_rawgeti(l, j + 1, k + 1);
-					TheMap.Info->Filename = strdup(LuaToString(l, -1));
+					TheMap.Info.Filename = strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "map-fields")) {
 					int i;
@@ -446,6 +442,43 @@ static int CclSetFogOfWarGraphics(lua_State* l)
 }
 
 /**
+** Define the type of each player available for the map
+**
+**  @param l  Lua state.
+*/
+static int CclDefinePlayerTypes(lua_State* l)
+{
+	const char* type;
+	int numplayers;
+	int i;
+
+	numplayers = lua_gettop(l); /* Number of players == number of arguments */
+	if (numplayers < 2) {
+		LuaError(l, "Not enough players");
+	}
+
+	for (i = 0; i < numplayers; i++) {
+		type = LuaToString(l, i + 1);
+		if (!strcmp(type, "neutral")) {
+			TheMap.Info.PlayerType[i] = PlayerNeutral;
+		} else if (!strcmp(type, "nobody")) {
+			TheMap.Info.PlayerType[i] = PlayerNobody;
+		} else if (!strcmp(type, "computer")) {
+			TheMap.Info.PlayerType[i] = PlayerComputer;
+		} else if (!strcmp(type, "person")) {
+			TheMap.Info.PlayerType[i] = PlayerPerson;
+		} else if (!strcmp(type, "rescue-passive")) {
+			TheMap.Info.PlayerType[i] = PlayerRescuePassive;
+		} else if (!strcmp(type, "rescue-active")) {
+			TheMap.Info.PlayerType[i] = PlayerRescueActive;
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ type);
+		}
+	}
+	return 0;
+}
+
+/**
 **  Register CCL features for map.
 */
 void MapCclRegister(void)
@@ -463,6 +496,8 @@ void MapCclRegister(void)
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 
 	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
+
+	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
 }
 
 //@}
