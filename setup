@@ -1096,7 +1096,7 @@ if test "$DEBUG" = 1 ; then
 fi
 echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
 echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
-echo "	\$(DEBUG) \$(SDLCD) \$(LIBCDA) \\" >> $RULESFILE
+echo "	\$(DEBUG) \$(SDLCD) \$(LIBCDA) \$(CDDA) \\" >> $RULESFILE
 echo -n "	\$(ARTSC) \$(FLAC) \$(OGG) \$(MAD) " >> $RULESFILE
 
 echo "" >> $RULESFILE
