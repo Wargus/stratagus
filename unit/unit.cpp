@@ -2168,6 +2168,14 @@ global int CanBuildHere(const UnitType* type,unsigned x,unsigned y)
     if( y+type->TileHeight>TheMap.Height ) {
 	return 0;
     }
+    //
+    //	Flyers and naval units can only placed on odd tiles
+    //
+    if( type->UnitType==UnitTypeFly || type->UnitType==UnitTypeNaval ) {
+	if( x&1 || y&1 ) {
+	    return 0;
+	}
+    }
 
     if( type->StoresGold ) {
 	//
@@ -2340,6 +2348,8 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 		| MapFieldNoBuilding;
 	    break;
 	case UnitTypeFly:
+	    mask=MapFieldAirUnit;	// already occuppied
+	    break;
 	default:
 	    DebugLevel1Fn("Were moves this unit?\n");
 	    return 0;
