@@ -52,7 +52,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-unsigned SyncHash;			/// Hash calculated to find sync failures
+unsigned SyncHash; ///< Hash calculated to find sync failures
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -82,7 +82,7 @@ int UnitShowAnimation(Unit* unit, const Animation* animation)
 		} else {
 			unit->Frame = 0;
 		}
-		UnitUpdateHeading(unit);	// FIXME: remove this!!
+		UnitUpdateHeading(unit); // FIXME: remove this!!
 	}
 
 	if (unit->Frame < 0) {
@@ -93,21 +93,21 @@ int UnitShowAnimation(Unit* unit, const Animation* animation)
 	unit->IX += animation[state].Pixel;
 	unit->IY += animation[state].Pixel;
 	unit->Wait = animation[state].Sleep;
-	if (unit->Slow) {				// unit is slowed down
+	if (unit->Slow) { // unit is slowed down
 		unit->Wait <<= 1;
 	}
-	if (unit->Haste && unit->Wait > 1) {		// unit is accelerated
+	if (unit->Haste && unit->Wait > 1) { // unit is accelerated
 		unit->Wait >>= 1;
 	}
 
 	flags = animation[state].Flags;
-	if (flags & AnimationReset) {		// Reset can check for other actions
+	if (flags & AnimationReset) { // Reset can check for other actions
 		unit->Reset = 1;
 	}
-	if (flags & AnimationRestart) {		// Restart animation script
+	if (flags & AnimationRestart) { // Restart animation script
 		unit->State = 0;
 	} else {
-		++unit->State;			// Advance to next script
+		++unit->State; // Advance to next script
 	}
 
 	return flags;
@@ -153,7 +153,7 @@ static void (*HandleActionTable[256])(Unit*) = {
 	HandleActionFollow,
 	HandleActionMove,
 	HandleActionAttack,
-	HandleActionAttack,				// HandleActionAttackGround,
+	HandleActionAttack, // HandleActionAttackGround,
 	HandleActionDie,
 	HandleActionSpellCast,
 	HandleActionTrain,
@@ -383,7 +383,7 @@ static void HandleUnitAction(Unit* unit)
 		if (unit->OrderCount > 1 &&
 				(unit->Orders[0].Action == UnitActionStill || unit->OrderFlush)) {
 
-			if (unit->Removed) {	// FIXME: johns I see this as an error
+			if (unit->Removed) { // FIXME: johns I see this as an error
 				DebugPrint("Flushing removed unit\n");
 				// This happens, if building with ALT+SHIFT.
 				return;
@@ -509,7 +509,7 @@ void UnitActions(void)
 		}
 		unit = table[i];
 
-		if (--unit->Wait) {			// Wait until counter reached
+		if (--unit->Wait) { // Wait until counter reached
 			continue;
 		}
 

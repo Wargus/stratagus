@@ -692,7 +692,7 @@ void ResourceGiveUp(Unit* unit)
 	unit->Reset = 1;
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
 	unit->SubAction = 0;
-	if (unit->CurrentResource && 
+	if (unit->CurrentResource &&
 			unit->Type->ResInfo[unit->CurrentResource]->LoseResources &&
 			unit->Value < unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) {
 		unit->Value = 0;
