@@ -32,7 +32,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -57,25 +57,16 @@
 #include "trigger.h"
 
 /*----------------------------------------------------------------------------
---		Defines
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---		Functions
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---		Icons
+--  Icons
 ----------------------------------------------------------------------------*/
 
 /**
-**		Draw life bar of an unit at x,y.
+**  Draw life bar of a unit at x,y.
+**  Placed under icons on top-panel.
 **
-**		Placed under icons on top-panel.
-**
-**		@param unit		Pointer to unit.
-**		@param x		Screen X postion of icon
-**		@param y		Screen Y postion of icon
+**  @param unit  Pointer to unit.
+**  @param x     Screen X postion of icon
+**  @param y     Screen Y postion of icon
 */
 local void UiDrawLifeBar(const Unit* unit, int x, int y)
 {
@@ -102,13 +93,12 @@ local void UiDrawLifeBar(const Unit* unit, int x, int y)
 }
 
 /**
-**		Draw mana bar of an unit at x,y.
+**  Draw mana bar of a unit at x,y.
+**  Placed under icons on top-panel.
 **
-**		Placed under icons on top-panel.
-**
-**		@param unit		Pointer to unit.
-**		@param x		Screen X postion of icon
-**		@param y		Screen Y postion of icon
+**  @param unit  Pointer to unit.
+**  @param x     Screen X postion of icon
+**  @param y     Screen Y postion of icon
 */
 local void UiDrawManaBar(const Unit* unit, int x, int y)
 {
@@ -127,12 +117,12 @@ local void UiDrawManaBar(const Unit* unit, int x, int y)
 }
 
 /**
-**		Draw completed bar into top-panel.
+**  Draw completed bar into top-panel.
 **
-**		@param full		the 100% value
-**		@param ready		how much till now completed
+**  @param full   the 100% value
+**  @param ready  how much till now completed
 */
-local void UiDrawCompleted(int full, int ready)
+local void UiDrawCompletedBar(int full, int ready)
 {
 	int f;
 
@@ -145,7 +135,7 @@ local void UiDrawCompleted(int full, int ready)
 		TheUI.CompletedBarX, TheUI.CompletedBarY, f, TheUI.CompletedBarH);
 
 	if (TheUI.CompletedBarShadow) {
-		//Shadow
+		// Shadow
 		VideoDrawVLine(ColorGray, TheUI.CompletedBarX + f, TheUI.CompletedBarY, TheUI.CompletedBarH );
 		VideoDrawHLine(ColorGray, TheUI.CompletedBarX, TheUI.CompletedBarY + TheUI.CompletedBarH, f );
 
@@ -161,12 +151,12 @@ local void UiDrawCompleted(int full, int ready)
 }
 
 /**
-**		Draw the stat for an unit in top-panel.
+**  Draw the stats for a unit in top-panel.
 **
-**		@param x		Screen X position
-**		@param y		Screen Y position
-**		@param modified		The modified stat value
-**		@param original		The original stat value
+**  @param x         Screen X position
+**  @param y         Screen Y position
+**  @param modified  The modified stat value
+**  @param original  The original stat value
 */
 local void DrawStats(int x, int y, int modified, int original)
 {
@@ -181,9 +171,9 @@ local void DrawStats(int x, int y, int modified, int original)
 }
 
 /**
-**		Draw the unit info into top-panel.
+**  Draw the unit info into top-panel.
 **
-**		@param unit		Pointer to unit.
+**  @param unit  Pointer to unit.
 */
 global void DrawUnitInfo(const Unit* unit)
 {
@@ -206,7 +196,7 @@ global void DrawUnitInfo(const Unit* unit)
 #endif
 
 	//
-	//		Draw icon in upper left corner
+	// Draw icon in upper left corner
 	//
 	if (TheUI.SingleSelectedText) {
 		VideoDrawText(TheUI.SingleSelectedTextX, TheUI.SingleSelectedTextY,
@@ -224,9 +214,9 @@ global void DrawUnitInfo(const Unit* unit)
 		UiDrawLifeBar(unit, x, y);
 
 		if (unit->Player == ThisPlayer ||
-			PlayersTeamed(ThisPlayer->Player, unit->Player->Player) ||
-			PlayersAllied(ThisPlayer->Player, unit->Player->Player) ||
-			ReplayRevealMap) {		// Only for own units.
+				PlayersTeamed(ThisPlayer->Player, unit->Player->Player) ||
+				PlayersAllied(ThisPlayer->Player, unit->Player->Player) ||
+				ReplayRevealMap) {  // Only for own units.
 			if (unit->HP && unit->HP < 10000) {
 				sprintf(buf, "%d/%d", unit->HP, stats->HitPoints);
 				VideoDrawTextCentered(x + (type->Icon.Icon->Width + 7) / 2,
@@ -239,10 +229,10 @@ global void DrawUnitInfo(const Unit* unit)
 	y = TheUI.InfoPanelY;
 
 	//
-	//		Draw unit name centered, if too long split at space.
+	//  Draw unit name centered, if too long split at space.
 	//
 	i = VideoTextLength(GameFont, type->Name);
-	if (i > 110) {						// didn't fit on line
+	if (i > 110) {  // doesn't fit on line
 		const char* s;
 
 		s = strchr(type->Name, ' ');
@@ -257,7 +247,7 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 
 	//
-	//		Draw unit level.
+	//  Draw unit level.
 	//
 	if (stats->Level) {
 		sprintf(buf, "Level ~<%d~>", stats->Level);
@@ -265,17 +255,17 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 
 #ifdef DEBUG_UNITNUMBER
-	// Draw Unit Number for debug Purposes
+	// Draw unit number for debug purposes
 	VideoDrawNumber(x + 10, y + 8 + 150, GameFont, unit->Slot);
 #endif
 
 	//
-	//		Show How much a resource has left for owner and neutral.
+	//  Show how much a resource has left for owner and neutral.
 	//
 	if (unit->Player == ThisPlayer || unit->Player->Player == PlayerNumNeutral ||
-		PlayersTeamed(ThisPlayer->Player, unit->Player->Player) ||
-		PlayersAllied(ThisPlayer->Player, unit->Player->Player) ||
-		ReplayRevealMap) {
+			PlayersTeamed(ThisPlayer->Player, unit->Player->Player) ||
+			PlayersAllied(ThisPlayer->Player, unit->Player->Player) ||
+			ReplayRevealMap) {
 		if (type->GivesResource) {
 			sprintf(buf, "%s Left:", DefaultResourceNames[type->GivesResource]);
 			VideoDrawText(x + 108 - VideoTextLength(GameFont, buf), y + 8 + 78,
@@ -292,17 +282,18 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 
 	//
-	//		Only for owning player.
+	//  Only for owning player.
 	//
 #ifndef DEBUG
-	if (unit->Player != ThisPlayer && !PlayersTeamed(ThisPlayer->Player, unit->Player->Player) &&
-		!PlayersAllied(ThisPlayer->Player, unit->Player->Player) && !ReplayRevealMap) {
+	if (unit->Player != ThisPlayer &&
+			!PlayersTeamed(ThisPlayer->Player, unit->Player->Player) &&
+			!PlayersAllied(ThisPlayer->Player, unit->Player->Player) && !ReplayRevealMap) {
 		return;
 	}
 #endif
 
 	//
-	//		Draw unit kills and experience.
+	//  Draw unit kills and experience.
 	//
 	if (stats->Level && !(type->Transporter && unit->BoardCount)) {
 		sprintf(buf, "XP:~<%d~> Kills:~<%d~>", unit->XP, unit->Kills);
@@ -310,11 +301,11 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 
 	//
-	//		Show progress for buildings only, if they are selected.
+	//  Show progress for buildings only, if they are selected.
 	//
 	if (type->Building && NumSelected == 1 && Selected[0] == unit) {
 		//
-		//		Building under constuction.
+		//  Building under constuction.
 		//
 		if (unit->Orders[0].Action == UnitActionBuilded) {
 			if (unit->Data.Builded.Worker) {
@@ -324,12 +315,12 @@ global void DrawUnitInfo(const Unit* unit)
 					0, x + 107, y + 8 + 70);
 			}
 			// FIXME: not correct must use build time!!
-			UiDrawCompleted(stats->HitPoints, unit->HP);
+			UiDrawCompletedBar(stats->HitPoints, unit->HP);
 			return;
 		}
 
 		//
-		//		Building training units.
+		//  Building training units.
 		//
 		if (unit->Orders[0].Action == UnitActionTrain) {
 			if (unit->Data.Train.Count == 1) {
@@ -345,7 +336,7 @@ global void DrawUnitInfo(const Unit* unit)
 						TheUI.SingleTrainingButton->X, TheUI.SingleTrainingButton->Y);
 				}
 
-				UiDrawCompleted(unit->Data.Train.What[0]->Stats[
+				UiDrawCompletedBar(unit->Data.Train.What[0]->Stats[
 					unit->Player->Player].Costs[TimeCost],
 					unit->Data.Train.Ticks);
 			} else {
@@ -364,7 +355,7 @@ global void DrawUnitInfo(const Unit* unit)
 					}
 				}
 
-				UiDrawCompleted(unit->Data.Train.What[0]->Stats[
+				UiDrawCompletedBar(unit->Data.Train.What[0]->Stats[
 					unit->Player->Player].Costs[TimeCost],
 					unit->Data.Train.Ticks);
 			}
@@ -372,7 +363,7 @@ global void DrawUnitInfo(const Unit* unit)
 		}
 
 		//
-		//		Building upgrading to better type.
+		//  Building upgrading to better type.
 		//
 		if (unit->Orders[0].Action == UnitActionUpgradeTo) {
 			if (TheUI.UpgradingText) {
@@ -387,14 +378,14 @@ global void DrawUnitInfo(const Unit* unit)
 					TheUI.UpgradingButton->X, TheUI.UpgradingButton->Y);
 			}
 
-			UiDrawCompleted(unit->Orders[0].Type->Stats[
+			UiDrawCompletedBar(unit->Orders[0].Type->Stats[
 				unit->Player->Player].Costs[TimeCost],
 				unit->Data.UpgradeTo.Ticks);
 			return;
 		}
 
 		//
-		//		Building research new technologie.
+		//  Building research new technology.
 		//
 		if (unit->Orders[0].Action == UnitActionResearch) {
 			if (TheUI.ResearchingText) {
@@ -409,13 +400,16 @@ global void DrawUnitInfo(const Unit* unit)
 					TheUI.ResearchingButton->X, TheUI.ResearchingButton->Y);
 			}
 
-			UiDrawCompleted(unit->Data.Research.Upgrade->Costs[TimeCost],
+			UiDrawCompletedBar(unit->Data.Research.Upgrade->Costs[TimeCost],
 				unit->Player->UpgradeTimers.Upgrades[
 					unit->Data.Research.Upgrade - Upgrades]);
 			return;
 		}
 	}
 
+	//
+	//  Transporting units.
+	//
 	if (type->Transporter && unit->BoardCount) {
 		int j;
 
@@ -443,6 +437,9 @@ global void DrawUnitInfo(const Unit* unit)
 		return;
 	}
 
+	//
+	//  Stores resources.
+	//
 	vpos = 77; // Start of resource drawing
 	for (i = 1; i < MaxCosts; ++i) {
 		if (type->CanStore[i]) {
@@ -469,6 +466,9 @@ global void DrawUnitInfo(const Unit* unit)
 		return;
 	}
 
+	//
+	//  Non-attacking buildings.
+	//
 	if (type->Building && !type->CanAttack) {
 		if (type->Supply) {				// Supply unit
 			VideoDrawText(x + 16, y + 8 + 63, GameFont, "Usage");
@@ -492,12 +492,7 @@ global void DrawUnitInfo(const Unit* unit)
 		DrawStats(x + 108, y + 8 + 63, stats->Armor, type->_Armor);
 
 		VideoDrawText(x + 47, y + 8 + 78, GameFont, "Damage:");
-		if ((i = type->_BasicDamage+type->_PiercingDamage)) {
-			// FIXME: this seems not correct
-			//				Catapult has 25-80
-			//				turtle has 10-50
-			//				jugger has 50-130
-			//				ship has 2-35
+		if ((i = type->_BasicDamage + type->_PiercingDamage)) {
 			if (stats->PiercingDamage != type->_PiercingDamage) {
 				if (stats->PiercingDamage < 30 && stats->BasicDamage < 30) {
 					sprintf(buf, "%d-%d~<+%d+%d~>",
@@ -537,12 +532,12 @@ global void DrawUnitInfo(const Unit* unit)
 				DefaultResourceNames[unit->CurrentResource]);
 			VideoDrawText(x + 61, y + 8 + 141, GameFont, buf);
 		}
-		if ((unit->Type->Harvester) &&
-				(unit->Orders->Action == UnitActionResource) &&
-				(unit->CurrentResource) &&
-				(unit->Type->ResInfo[unit->CurrentResource]) &&
-				(unit->SubAction == 60) &&
-				(!unit->Type->ResInfo[unit->CurrentResource]->ResourceStep)) {
+		if (unit->Type->Harvester &&
+				unit->Orders->Action == UnitActionResource &&
+				unit->CurrentResource &&
+				unit->Type->ResInfo[unit->CurrentResource] &&
+				unit->SubAction == 60 &&
+				!unit->Type->ResInfo[unit->CurrentResource]->ResourceStep) {
 			sprintf(buf, "%s: %d%%", DefaultResourceNames[unit->CurrentResource],
 					100 * (unit->Type->ResInfo[unit->CurrentResource]->WaitAtResource -
 						unit->Data.ResWorker.TimeToHarvest) /
@@ -552,7 +547,7 @@ global void DrawUnitInfo(const Unit* unit)
 
 	}
 	//
-	//		Unit can cast spell without mana, so only show mana bar for units with mana
+	//  Unit can cast spell without mana, so only show mana bar for units with mana
 	//
 	if (type->_MaxMana) {
 		if (0) {
@@ -566,14 +561,15 @@ global void DrawUnitInfo(const Unit* unit)
 			VideoDrawNumber(x + 128, y + 8 + 140 + 1, GameFont, unit->Mana);
 		} else {
 			int w;
+
 			w = 140;
-			/* fix to display mana bar properly for any maxmana value */
-			/* max mana can vary for the unit */
+			// fix to display mana bar properly for any maxmana value
+			// max mana can vary for the unit
 			i = (100 * unit->Mana) / unit->Type->_MaxMana;
 			i = (i * w) / 100;
-			VideoDrawRectangleClip(ColorGray, x + 16,	 y + 8 + 140,	 w + 4, 16	);
+			VideoDrawRectangleClip(ColorGray, x + 16,     y + 8 + 140,     w + 4, 16	);
 			VideoDrawRectangleClip(ColorBlack,x + 16 + 1, y + 8 + 140 + 1, w + 2, 16 - 2);
-			VideoFillRectangleClip(ColorBlue, x + 16 + 2, y + 8 + 140 + 2, i,	 16 - 4);
+			VideoFillRectangleClip(ColorBlue, x + 16 + 2, y + 8 + 140 + 2, i,     16 - 4);
 
 			VideoDrawNumber(x + 16 + w / 2, y + 8 + 140 + 1, GameFont, unit->Mana);
 		}
@@ -581,11 +577,11 @@ global void DrawUnitInfo(const Unit* unit)
 }
 
 /*----------------------------------------------------------------------------
---		RESOURCES
+--  RESOURCES
 ----------------------------------------------------------------------------*/
 
 /**
-**		Draw the player resource in top line.
+**  Draw the player resource in top line.
 */
 global void DrawResources(void)
 {
@@ -646,32 +642,32 @@ global void DrawResources(void)
 }
 
 /*----------------------------------------------------------------------------
---		MESSAGE
+--  MESSAGE
 ----------------------------------------------------------------------------*/
 
 // FIXME: move messages to console code.
 
-#define MESSAGES_TIMEOUT  (FRAMES_PER_SECOND * 5)		/// Message timeout 5 seconds
+#define MESSAGES_TIMEOUT (FRAMES_PER_SECOND * 5)/// Message timeout 5 seconds
 
-local unsigned long   MessagesFrameTimeout;		/// Frame to expire message
+local unsigned long MessagesFrameTimeout;       /// Frame to expire message
 
 
-#define MESSAGES_MAX  10						/// How many can be displayed
+#define MESSAGES_MAX  10                        /// How many can be displayed
 
-local char Messages[MESSAGES_MAX][128];				/// Array of messages
-local int  MessagesCount;						/// Number of messages
-local int  MessagesSameCount;						/// Counts same message repeats
-local int  MessagesScrollY;						/// Used for smooth scrolling
+local char Messages[MESSAGES_MAX][128];         /// Array of messages
+local int  MessagesCount;                       /// Number of messages
+local int  MessagesSameCount;                   /// Counts same message repeats
+local int  MessagesScrollY;                     /// Used for smooth scrolling
 
-local char MessagesEvent[MESSAGES_MAX][64];		/// Array of event messages
-local int  MessagesEventX[MESSAGES_MAX];		/// X coordinate of event
-local int  MessagesEventY[MESSAGES_MAX];		/// Y coordinate of event
-local int  MessagesEventCount;						/// Number of event messages
-local int  MessagesEventIndex;						/// FIXME: docu
+local char MessagesEvent[MESSAGES_MAX][64];     /// Array of event messages
+local int  MessagesEventX[MESSAGES_MAX];        /// X coordinate of event
+local int  MessagesEventY[MESSAGES_MAX];        /// Y coordinate of event
+local int  MessagesEventCount;                  /// Number of event messages
+local int  MessagesEventIndex;                  /// FIXME: docu
 
 
 /**
-**		Shift messages array by one.
+**  Shift messages array by one.
 */
 local void ShiftMessages(void)
 {
@@ -686,7 +682,7 @@ local void ShiftMessages(void)
 }
 
 /**
-**		Shift messages events array by one.
+**  Shift messages events array by one.
 */
 local void ShiftMessagesEvent(void)
 {
@@ -703,9 +699,9 @@ local void ShiftMessagesEvent(void)
 }
 
 /**
-**		Update messages
+**  Update messages
 **
-**		@todo FIXME: make scroll speed configurable.
+**  @todo FIXME: make scroll speed configurable.
 */
 global void UpdateMessages(void)
 {
@@ -728,9 +724,9 @@ global void UpdateMessages(void)
 }
 
 /**
-**		Draw message(s).
+**  Draw message(s).
 **
-**		@todo FIXME: make message font configurable.
+**  @todo FIXME: make message font configurable.
 */
 global void DrawMessages(void)
 {
@@ -756,9 +752,9 @@ global void DrawMessages(void)
 }
 
 /**
-**		Adds message to the stack
+**  Adds message to the stack
 **
-**		@param msg		Message to add.
+**  @param msg  Message to add.
 */
 local void AddMessage(const char* msg)
 {
@@ -831,10 +827,11 @@ local void AddMessage(const char* msg)
 }
 
 /**
-**		Check if this message repeats
+**  Check if this message repeats
 **
-**		@param msg		Message to check.
-**		@return				non-zero to skip this message
+**  @param msg  Message to check.
+**
+**  @return     non-zero to skip this message
 */
 local int CheckRepeatMessage(const char* msg)
 {
@@ -859,9 +856,9 @@ local int CheckRepeatMessage(const char* msg)
 }
 
 /**
-**		Set message to display.
+**  Set message to display.
 **
-**		@param fmt		To be displayed in text overlay.
+**  @param fmt  To be displayed in text overlay.
 */
 global void SetMessage(const char* fmt, ...)
 {
@@ -869,7 +866,7 @@ global void SetMessage(const char* fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	vsprintf(temp, fmt, va);				// BUG ALERT: buffer overrun
+	vsnprintf(temp, sizeof(temp), fmt, va);
 	va_end(va);
 	if (CheckRepeatMessage(temp)) {
 		return;
@@ -881,14 +878,14 @@ global void SetMessage(const char* fmt, ...)
 }
 
 /**
-**		Set message to display.
+**  Set message to display.
 **
-**		@param x		Message X map origin.
-**		@param y		Message Y map origin.
-**		@param fmt		To be displayed in text overlay.
+**  @param x    Message X map origin.
+**  @param y    Message Y map origin.
+**  @param fmt  To be displayed in text overlay.
 **
-**		@note FIXME: vladi: I know this can be just separated func w/o msg but
-**				it is handy to stick all in one call, someone?
+**  @note FIXME: vladi: I know this can be just separated func w/o msg but
+**               it is handy to stick all in one call, someone?
 */
 global void SetMessageEvent(int x, int y, const char* fmt, ...)
 {
@@ -896,7 +893,7 @@ global void SetMessageEvent(int x, int y, const char* fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	vsprintf(temp, fmt, va);
+	vsnprintf(temp, sizeof(temp), fmt, va);
 	va_end(va);
 	if (CheckRepeatMessage(temp) == 0) {
 		AddMessage(temp);
@@ -918,7 +915,7 @@ global void SetMessageEvent(int x, int y, const char* fmt, ...)
 }
 
 /**
-**		Goto message origin.
+**  Goto message origin.
 */
 global void CenterOnMessage(void)
 {
@@ -936,7 +933,7 @@ global void CenterOnMessage(void)
 }
 
 /**
-**		Cleanup messages.
+**  Cleanup messages.
 */
 global void CleanMessages(void)
 {
@@ -948,14 +945,13 @@ global void CleanMessages(void)
 }
 
 /*----------------------------------------------------------------------------
---		STATUS LINE
+--  STATUS LINE
 ----------------------------------------------------------------------------*/
 
-#define STATUS_LINE_LEN 256
-local char StatusLine[STATUS_LINE_LEN];						/// status line/hints
+local char StatusLine[256];                                /// status line/hints
 
 /**
-**		Draw status line.
+**  Draw status line.
 */
 global void DrawStatusLine(void)
 {
@@ -981,21 +977,21 @@ global void DrawStatusLine(void)
 }
 
 /**
-**		Change status line to new text.
+**  Change status line to new text.
 **
-**		@param status		New status line information.
+**  @param status  New status line information.
 */
 global void SetStatusLine(char* status)
 {
 	if (KeyState != KeyStateInput && strcmp(StatusLine, status)) {
 		MustRedraw |= RedrawStatusLine;
-		strncpy(StatusLine, status, STATUS_LINE_LEN - 1);
-		StatusLine[STATUS_LINE_LEN - 1] = '\0';
+		strncpy(StatusLine, status, sizeof(StatusLine) - 1);
+		StatusLine[sizeof(StatusLine) - 1] = '\0';
 	}
 }
 
 /**
-**		Clear status line.
+**  Clear status line.
 */
 global void ClearStatusLine(void)
 {
@@ -1005,15 +1001,15 @@ global void ClearStatusLine(void)
 }
 
 /*----------------------------------------------------------------------------
---		COSTS
+--  COSTS
 ----------------------------------------------------------------------------*/
 
-local int CostsFood;						/// mana cost to display in status line
+local int CostsFood;                        /// mana cost to display in status line
 local int CostsMana;						/// mana cost to display in status line
-local int Costs[MaxCosts];				/// costs to display in status line
+local int Costs[MaxCosts];                  /// costs to display in status line
 
 /**
-**		Draw costs in status line.
+**  Draw costs in status line.
 */
 global void DrawCosts(void)
 {
@@ -1025,7 +1021,7 @@ global void DrawCosts(void)
 		// FIXME: hardcoded image!!!
 		VideoDrawSubClip(TheUI.Resources[GoldCost].Icon.Graphic,
 			/* 0, TheUI.Resources[GoldCost].IconRow *
-				TheUI.Resources[GoldCost].IconH */
+			   TheUI.Resources[GoldCost].IconH */
 			0, 3 * TheUI.Resources[GoldCost].IconH,
 			TheUI.Resources[GoldCost].IconW, TheUI.Resources[GoldCost].IconH,
 			x, TheUI.StatusLineTextY);
@@ -1062,11 +1058,11 @@ global void DrawCosts(void)
 }
 
 /**
-**		Set costs in status line.
+**  Set costs in status line.
 **
-**		@param mana		Mana costs.
-**		@param food		Food costs.
-**		@param costs		Resource costs, NULL pointer if all are zero.
+**  @param mana   Mana costs.
+**  @param food   Food costs.
+**  @param costs  Resource costs, NULL pointer if all are zero.
 */
 global void SetCosts(int mana, int food, const int* costs)
 {
@@ -1100,7 +1096,7 @@ global void SetCosts(int mana, int food, const int* costs)
 }
 
 /**
-**		Clear costs in status line.
+**  Clear costs in status line.
 */
 global void ClearCosts(void)
 {
@@ -1108,13 +1104,13 @@ global void ClearCosts(void)
 }
 
 /*----------------------------------------------------------------------------
---		INFO PANEL
+--  INFO PANEL
 ----------------------------------------------------------------------------*/
 
 /**
-**		Draw info panel background.
+**  Draw info panel background.
 **
-**		@param frame		frame nr. of the info panel background.
+**  @param frame  frame nr. of the info panel background.
 */
 local void DrawInfoPanelBackground(unsigned frame)
 {
@@ -1127,13 +1123,13 @@ local void DrawInfoPanelBackground(unsigned frame)
 }
 
 /**
-**		Draw info panel.
+**  Draw info panel.
 **
-**		Panel:
-**				neutral				- neutral or opponent
-**				normal				- not 1,3,4
-**				magic unit		    - magic units
-**				construction		- under construction
+**  Panel:
+**    neutral      - neutral or opponent
+**    normal       - not 1,3,4
+**    magic unit   - magic units
+**    construction - under construction
 */
 global void DrawInfoPanel(void)
 {
@@ -1162,17 +1158,18 @@ global void DrawInfoPanel(void)
 			}
 			if (NumSelected > TheUI.NumSelectedButtons) {
 				char buf[5];
+
 				sprintf(buf, "+%d", NumSelected - TheUI.NumSelectedButtons);
 				VideoDrawText(TheUI.MaxSelectedTextX, TheUI.MaxSelectedTextY,
 					TheUI.MaxSelectedFont, buf);
 			}
 			return;
 		} else {
-			// FIXME: not correct for enemies units
+			// FIXME: not correct for enemy's units
 			if (Selected[0]->Player == ThisPlayer ||
-				PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player) ||
-				PlayersAllied(ThisPlayer->Player, Selected[0]->Player->Player) ||
-				ReplayRevealMap) {
+					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player) ||
+					PlayersAllied(ThisPlayer->Player, Selected[0]->Player->Player) ||
+					ReplayRevealMap) {
 				if (Selected[0]->Type->Building &&
 						(Selected[0]->Orders[0].Action == UnitActionBuilded ||
 							Selected[0]->Orders[0].Action == UnitActionResearch ||
@@ -1196,13 +1193,13 @@ global void DrawInfoPanel(void)
 		}
 	}
 
-	//		Nothing selected
+	//  Nothing selected
 
 	DrawInfoPanelBackground(0);
-	if (UnitUnderCursor && UnitVisible(UnitUnderCursor, ThisPlayer)  &&
-		(!UnitUnderCursor->Type->Decoration || !GameRunning)) {
-			// FIXME: not correct for enemies units
-			DrawUnitInfo(UnitUnderCursor);
+	if (UnitUnderCursor && UnitVisible(UnitUnderCursor, ThisPlayer) &&
+			(!UnitUnderCursor->Type->Decoration || !GameRunning)) {
+		// FIXME: not correct for enemies units
+		DrawUnitInfo(UnitUnderCursor);
 	} else {
 		int x;
 		int y;
@@ -1247,11 +1244,11 @@ global void DrawInfoPanel(void)
 }
 
 /*----------------------------------------------------------------------------
---		TIMER
+--  TIMER
 ----------------------------------------------------------------------------*/
 
 /**
-**		Draw the timer
+**  Draw the timer
 */
 global void DrawTimer(void)
 {
@@ -1280,7 +1277,7 @@ global void DrawTimer(void)
 }
 
 /**
-**		Update the timer
+**  Update the timer
 */
 global void UpdateTimer(void)
 {
