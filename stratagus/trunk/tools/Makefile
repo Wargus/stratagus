@@ -26,7 +26,8 @@
 ##
 
 TOPDIR= ..
-include $(TOPDIR)/Rules.make
+RULESFILE ?= Rules.make
+include $(TOPDIR)/$(RULESFILE)
 
 EXECS=	gfx2png$(EXE) gfu2png$(EXE) img2png$(EXE) cur2png$(EXE) fnt2png$(EXE) \
 	tile2png$(EXE) extract$(EXE) aledoc$(EXE) wartool$(EXE)
