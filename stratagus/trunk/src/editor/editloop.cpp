@@ -1921,10 +1921,8 @@ static void CreateEditor(void)
 	RecalculateShownUnits();
 	UpdateMinimap();
 
-	if (1) {
-		ProcessMenu("menu-editor-tips", 1);
-		InterfaceState = IfaceStateNormal;
-	}
+	ProcessMenu("menu-editor-tips", 1);
+	InterfaceState = IfaceStateNormal;
 }
 
 /**
