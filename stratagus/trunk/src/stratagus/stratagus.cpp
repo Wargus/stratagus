@@ -10,7 +10,7 @@
 //
 /**@name clone.c	-	The main file. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -438,6 +438,9 @@ local void PrintHeader(void)
 #endif
 #ifdef NEW_FOW
     "NEW-FOW "
+#endif
+#ifdef NEW_FOW2
+    "NEW-FOW2 "
 #endif
 #ifdef NEW_AI
     "NEW-AI "
