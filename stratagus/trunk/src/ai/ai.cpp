@@ -730,8 +730,33 @@ local void SaveAiPlayer(CLFile* file, int plynr, PlayerAi* ai)
 	//
 	//  Requests
 	//
-	// FIXME: FirstExplorationRequest
-	// FIXME: TransportRequests
+	if (ai->FirstExplorationRequest) {
+		AiExplorationRequest* ptr;
+
+		CLprintf(file, "  \"exploration\", {");
+		ptr = ai->FirstExplorationRequest;
+		while (ptr) {
+			CLprintf(file, "{%d, %d, %d}, ",
+				ptr->X, ptr->Y, ptr->Mask);
+			ptr = ptr->Next;
+		}
+		CLprintf(file, "},\n");
+	}
+	CLprintf(file, "  \"last-exploration-cycle\", %lu,\n", ai->LastExplorationGameCycle);
+	if (ai->TransportRequests) {
+		AiTransportRequest* ptr;
+
+		CLprintf(file, "  \"transport\", {");
+		ptr = ai->TransportRequests;
+		while (ptr) {
+			CLprintf(file, "{%d, ", UnitNumber(ptr->Unit));
+			SaveOrder(&ptr->Order, file);
+			CLprintf(file, "}, ");
+			ptr = ptr->Next;
+		}
+		CLprintf(file, "},\n");
+	}
+	CLprintf(file, "  \"last-can-not-move-cycle\", %lu,\n", ai->LastCanNotMoveGameCycle);
 	CLprintf(file, "  \"unit-type\", {");
 	for (i = 0; i < ai->UnitTypeRequestsCount; ++i) {
 		CLprintf(file, "\"%s\", ", ai->UnitTypeRequests[i].Table[0]->Ident);
