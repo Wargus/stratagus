@@ -90,7 +90,6 @@ local SCM CclSoundForName(SCM name) {
     return sound_id_ccl(id);
 }
 
-
 /** Get a Game Sound Id from either a guile sound id or a sound name
  */
 local SoundId CclGetSoundId(SCM sound) {
@@ -555,8 +554,9 @@ local SCM CclDisplaySounds(void) {
     return SCM_UNSPECIFIED;
 }
 
-/** Glue between c and scheme. Allows to specify some global game sounds in a
-    ccl file.
+/**
+**	Glue between c and scheme. Allows to specify some global game sounds
+**	in a ccl file.
 */
 local SCM CclDefineGameSounds(SCM list) {
     //based on Johns CclGameMap function
@@ -708,6 +708,126 @@ global void SoundCclRegister(void)
 
 #endif	// } USE_CCL2
 
-#endif	// } WITH_SOUND
+#else	// }{ WITH_SOUND
+
+#include "ccl.h"
+
+/**
+**	Global volume support
+**
+**	@param volume new global sound volume
+*/
+local SCM CclSetSoundVolume(SCM volume)
+{
+    return volume;
+}
+
+/**
+**	Turn Off Sound (client side)
+*/
+local SCM CclSoundOff(void)
+{
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Turn On Sound (client side)
+**
+**	@return true if and only if the sound is REALLY turned on
+**		(uses SoundFildes)
+*/
+local SCM CclSoundOn(void)
+{
+    return SCM_BOOL_T;
+}
+
+/**
+**	Set the cut off distance.
+**
+**	@param distance new cut off distance for sounds
+*/
+local SCM CclSetGlobalSoundRange(SCM distance)
+{
+    return distance;
+}
+
+/**
+**	Set the range of a given sound.
+**
+**	@param sound the sound id or name of the sound
+*	@range the new range for this sound
+*/
+local SCM CclSetSoundRange(SCM sound,SCM range)
+{
+    return sound;
+}
+
+/**
+**	Ask clone to use a sound thread
+*/
+local SCM CclSoundThread(void) 
+{
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Glue between c and scheme. Ask the sound system to dump on the
+**	standard output the mapping between sound names and sound id.
+*/
+local SCM CclDisplaySounds(void)
+{
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Glue between c and scheme. Ask the sound system to associate a sound
+**	id to a sound name.
+*/
+local SCM CclSoundForName(SCM name)
+{
+    return NIL;
+}
+
+/**
+**	Glue between c and scheme. Allows to specify some global game sounds
+**	in a ccl file.
+*/
+local SCM CclDefineGameSounds(SCM list)
+{
+    return NIL;
+}
+
+/**
+**	Glue between c and scheme. Ask to the sound system to remap a sound id
+**	to a given name.
+**
+**	@param name the new name for the sound
+**	@param sound the sound object
+**
+**	@return the sound object
+*/
+local SCM CclMapSound(SCM name,SCM sound)
+{
+    return sound;
+}
+
+/**
+**	Register CCL features for sound. Dummy version.
+*/
+global void SoundCclRegister(void)
+{
+    gh_new_procedure1_0("set-sound-volume",CclSetSoundVolume);
+    gh_new_procedure0_0("sound-off",CclSoundOff);
+    gh_new_procedure0_0("sound-on",CclSoundOn);
+    gh_new_procedure0_0("sound-thread",CclSoundThread);
+    gh_new_procedure1_0("set-global-sound-range",CclSetGlobalSoundRange);
+    gh_new_procedureN("define-game-sounds",CclDefineGameSounds);
+    gh_new_procedure0_0("display-sounds",CclDisplaySounds);
+    gh_new_procedure2_0("map-sound",CclMapSound);
+    gh_new_procedure1_0("sound-for-name",CclSoundForName);
+    gh_new_procedure2_0("set-sound-range",CclSetSoundRange);
+}
+
+#endif	// } !WITH_SOUND
 
 //@}
