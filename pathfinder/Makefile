@@ -31,7 +31,9 @@ include $(TOPDIR)/$(RULESFILE)
 
 MODULE  = pathfinder
 
-SRCS	= pathfinder.c astar.c ccl_pathfinder.c
+SRCS	= pathfinder.c astar.c ccl_pathfinder.c avl_tree.c hierarchical.c \
+          regid.c region.c region_set.c pf_highlevel.c pf_high_open.c \
+          pf_lowlevel.c pf_low_open.c
 
 OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
