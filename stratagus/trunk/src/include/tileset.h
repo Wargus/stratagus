@@ -233,7 +233,7 @@
 **
 **  TileInfo::MixTerrain
 **
-**  @fixme This is the terrain the tile is mixed with. This is 0 for
+**  @todo This is the terrain the tile is mixed with. This is 0 for
 **    a solid tile, we should make it equal to BaseTerrain
 **
 */
@@ -253,7 +253,7 @@ extern int TileSizeY; ///< Size of a tile in Y
 **  These are used for lookup tiles types
 **  mainly used for the FOW implementation of the seen woods/rocks
 **
-**  @fixme I think this can be removed, we can use the flags?
+**  @todo I think this can be removed, we can use the flags?
 **  I'm not sure, if we have seen and real time to considere.
 */
 typedef enum _tile_type_ {
@@ -276,7 +276,7 @@ typedef struct _tile_info_ {
 typedef struct _solid_terrain_info_ {
 	char* TerrainName;  ///< Name of the terrain
 	int NumSolidTiles;  ///< How many solid tile variants
-	/// @fixme When drawing with the editor add some kind fo probabilities for every tile.
+	/// @todo When drawing with the editor add some kind fo probabilities for every tile.
 	unsigned short* SolidTiles; ///< Solid tile IDs
 } SolidTerrainInfo;
 
@@ -297,9 +297,9 @@ typedef struct _tileset_ {
 	TileInfo* Tiles; ///< Tile descriptions
 
 
-	/// @fixme currently hardcoded
+	/// @todo currently hardcoded
 	unsigned char* TileTypeTable;   ///< For fast lookup of tile type
-	/// @fixme currently unsupported
+	/// @todo currently unsupported
 	unsigned short* AnimationTable; ///< Tile animation sequences
 
 	int NumTerrainTypes;                 ///< Number of different terrain types
@@ -324,7 +324,7 @@ typedef struct _tileset_ {
 	hashtable(char*,128) ItemsHash; ///< Items hash table
 } Tileset;
 
-/// @fixme this #define's should be removed
+/// @todo this #define's should be removed
 
 enum _tileset_nr_ {
 	TilesetSummer,      ///< Reference number for summer

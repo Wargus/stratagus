@@ -38,7 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** @fixme docu
+** @todo docu
 **/
 typedef struct DecorationSingle {
   struct DecorationSingle *nxt; ///< next single-tile decoration belonging to the same decoration

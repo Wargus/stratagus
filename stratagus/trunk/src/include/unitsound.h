@@ -68,7 +68,7 @@ typedef struct _unit_sound_ {
 	SoundConfig Dead;               ///< unit is killed
 } UnitSound;
 
-/// @fixme temporary solution should perhaps be a member of a more general weapon structure.
+/// @todo temporary solution should perhaps be a member of a more general weapon structure.
 
 /**
 ** Attack sounds

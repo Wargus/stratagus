@@ -406,7 +406,7 @@ struct _missile_type_ {
 	int   SpriteFrames;   ///< number of sprite frames in graphic
 	int   NumDirections;  ///< number of directions missile can face
 
-	/// @fixme FireSound defined but not used!
+	/// @todo FireSound defined but not used!
 	SoundConfig FiredSound;   ///< fired sound
 	SoundConfig ImpactSound;  ///< impact sound for this missile-type
 

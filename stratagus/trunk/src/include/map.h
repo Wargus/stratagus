@@ -254,7 +254,7 @@ typedef struct _map_info_ {
 	char*  Description;     ///< Map description
 	char*  MapTerrainName;  ///< Map terrain name
 	char*  Filename;        ///< Map filename
-	/// @fixme Map Terrain Nr. should be removed.
+	/// @todo Map Terrain Nr. should be removed.
 	int MapTerrain;  ///< Map terrain
 	int MapWidth;    ///< Map width
 	int MapHeight;   ///< Map height
@@ -280,7 +280,7 @@ typedef struct _world_map_ {
 	unsigned char NoFogOfWar;  ///< fog of war disabled
 
 	char* TerrainName;  ///< terrain as name
-	/// @fixme terrain nr. should be removed?
+	/// @todo terrain nr. should be removed?
 	int      Terrain; ///< terrain type (summer,winter,...)
 	Tileset* Tileset; ///< tileset data
 
@@ -290,7 +290,7 @@ typedef struct _world_map_ {
 	char Description[32];///< map description short
 
 	MapInfo* Info;  ///< descriptive information
-	/// @fixme (MapInfo* Info DUPLICATES!)
+	/// @todo (MapInfo* Info DUPLICATES!)
 } WorldMap;
 
 /*----------------------------------------------------------------------------
@@ -309,7 +309,7 @@ extern unsigned char *VisionTable[3];
 extern int *VisionLookup;
 
 #ifdef NEW_DECODRAW
-	/// @fixme docu
+	/// @todo docu
 extern void InitMapDecoration(void);
 	/// Decoration for the map.
 extern Deco* MapDecoration;

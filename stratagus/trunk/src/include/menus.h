@@ -62,9 +62,9 @@
 */
 typedef int MenuButtonId;
 
-/// @fixme FILL IN THIS TABLE!!!!
+/// @todo FILL IN THIS TABLE!!!!
 
-#define MBUTTON_MAIN    4 /// @fixme write docu
+#define MBUTTON_MAIN    4 /// @todo write docu
 #define MBUTTON_NETWORK 7
 #define MBUTTON_GM_HALF 10
 #define MBUTTON_132     13
@@ -114,7 +114,7 @@ typedef int MenuButtonId;
 
 /**
 **  Menuitem definition.
-**  @fixme docu.
+**  @todo docu.
 */
 struct _menuitem_;
 typedef struct _menuitem_text_ {
@@ -218,7 +218,7 @@ typedef struct _menuitem_gem_ {
 
 struct _menus_;
 typedef struct _menuitem_ {
-	int mitype;  ///< @fixme write docu
+	int mitype;  ///< @todo write docu
 	int xofs;
 	int yofs;
 	unsigned flags;
@@ -242,7 +242,7 @@ typedef struct _menuitem_ {
 	} d;
 } Menuitem;
 
-#define MI_TYPE_TEXT 1  ///< @fixme write docu
+#define MI_TYPE_TEXT 1  ///< @todo write docu
 #define MI_TYPE_BUTTON 2
 #define MI_TYPE_PULLDOWN 3
 #define MI_TYPE_LISTBOX 4
@@ -281,7 +281,7 @@ typedef struct _menuitem_ {
 **  Menu definition.
 */
 typedef struct _menus_ {
-	/// @fixme char* Name; ///< menu name
+	/// @todo char* Name; ///< menu name
 	int       X;         ///< menu area x pos
 	int       Y;         ///< menu area y pos
 	int       Width;     ///< menu area width
@@ -317,8 +317,8 @@ extern char MenuMapFullPath[1024];  ///< Full path to currently selected map
 extern int nKeyStrokeHelps;    ///< Number of loaded keystroke helps
 extern char **KeyStrokeHelps;  ///< Keystroke help pairs
 
-#define MENUS_MAXMENU 128  ///< @fixme wrong place, docu
-#define MENUS_MAXFUNC 128  ///< @fixme wrong place, docu
+#define MENUS_MAXMENU 128  ///< @todo wrong place, docu
+#define MENUS_MAXFUNC 128  ///< @todo wrong place, docu
 
 #ifdef DOXYGEN  // no real code, only for document
 

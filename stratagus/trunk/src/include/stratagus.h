@@ -456,8 +456,8 @@ extern long isqrt(long num);
 ==  Misc
 ============================================================================*/
 
-// @fixme configurable. maybe we could move it into one big global
-// @fixme settings struct?
+// @todo configurable. maybe we could move it into one big global
+// @todo settings struct?
 	/// How many resources the player gets back if canceling building
 #define CancelBuildingCostsFactor  75
 	/// How many resources the player gets back if canceling training
