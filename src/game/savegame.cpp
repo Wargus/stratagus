@@ -251,7 +251,7 @@ void SaveGame(const char* filename)
 	CLprintf(file, "---  \"comment\", \"$Id$\",\n");
 	CLprintf(file, "---  \"type\",    \"%s\",\n", "single-player");
 	CLprintf(file, "---  \"date\",    \"%s\",\n", s);
-	CLprintf(file, "---  \"map\",     \"%s\",\n", TheMap.Description);
+	CLprintf(file, "---  \"map\",     \"%s\",\n", TheMap.Info.Description);
 	CLprintf(file, "---  \"media-version\", \"%s\"", "Undefined");
 	CLprintf(file, "---  \"engine\",  {%d, %d, %d},\n",
 		StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
