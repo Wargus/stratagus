@@ -425,7 +425,7 @@ global void DrawUnitInfo(const Unit* unit)
 	uins = unit->UnitInside;
 	for (i = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
 	    DrawUnitIcon(unit->Player,uins->Type->Icon.Icon,
-		(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
+		(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == i) ?
 		    (IconActive | (MouseButtons & LeftButton)) : 0,
 		TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
 	    UiDrawLifeBar(uins, TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
