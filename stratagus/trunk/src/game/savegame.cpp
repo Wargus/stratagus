@@ -132,12 +132,4 @@ global void SaveGame(const char* filename)
     fclose(file);
 }
 
-/**
-**	Test function for the later save functions.
-*/
-global void SaveAll(void)
-{
-    SaveGame("save_file_of_freecraft.ccl");
-}
-
 //@}
