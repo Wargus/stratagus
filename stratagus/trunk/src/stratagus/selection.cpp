@@ -168,12 +168,14 @@ global int ToggleSelectUnit(Unit* unit)
  **	@return		Number of units found, 0 means selection unchanged
  **
  **	FIXME: 0 can't happen. Maybe when scripting will use it?
+ **
+ **	FIXME: should always select the nearest 9 units to the base!
  */
 global int SelectUnitsByType(Unit* base)
 {
     Unit* unit;
     Unit* table[MAX_UNITS];
-    UnitType* type;
+    const UnitType* type;
     int r;
     int i;
 
