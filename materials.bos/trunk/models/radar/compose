@@ -1,0 +1,42 @@
+#!/bin/bash
+# script by Frank Loeffler (c) 2004
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+function create
+{
+  for i in `seq 1 8 23`; do
+    ji=1
+    for j in `seq -f "%03g" $i $[$i+7]`; do
+      n[$ji]=$j
+      let ji=ji+1
+    done
+    convert +append $10${n[1]}.png $10${n[2]}.png $10${n[3]}.png $10${n[4]}.png \
+                    $10${n[5]}.png $10${n[6]}.png $10${n[7]}.png $10${n[8]}.png \
+                    tmp$i.png
+  done
+  mmv "tmp?.png" "tmp0#1.png"
+  mmv "tmp??.png" "tmp0#1#2.png"
+  convert -append tmp???.png $2
+  rm tmp???.png
+  rm $1*
+}
+
+export BLENDER_SCRIPT_FILE_TO_RENDER="radar.blend"
+blender -P blender.py
+
+create normal unit_radar.png
+create shadow unit_radar_s.png
+
