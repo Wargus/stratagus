@@ -59,6 +59,8 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#define LimitSearch 1			/// Limit the search.
+
 global Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All possible units
 global Unit** UnitSlotFree;		/// First free unit slot
 local Unit* ReleasedHead;		/// List of released units.
@@ -2029,6 +2031,10 @@ global Unit* FindGoldMine(const Unit* source __attribute__((unused)),
 	}
     }
     DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+
+    if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
+	return NoUnitP;
+    }
     return best;
 }
 
@@ -2428,6 +2434,9 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
     }
 
     DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+    if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
+	return NoUnitP;
+    }
     return best;
 }
 
