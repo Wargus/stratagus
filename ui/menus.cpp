@@ -4557,6 +4557,8 @@ global void ProcessMenu(int menu_id, int loop)
     int MenuButtonUnderCursorSave = -1;
     int MenuButtonCurSelSave = -1;
 
+    CancelBuildingMode();
+
     // Recursion protection:
     if (loop) {
 	CurrentMenuSave = CurrentMenu;
