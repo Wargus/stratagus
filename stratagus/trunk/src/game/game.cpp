@@ -262,7 +262,7 @@ global void CreateGame(char* filename, WorldMap* map)
     // FIXME: Race only known in single player game:
     InitMenus(ThisPlayer->Race);
     LoadImages(ThisPlayer->Race);
-    LoadCursors(ThisPlayer->Race);
+    LoadCursors(ThisPlayer->RaceName);
 
     LoadMissileSprites();
     LoadUnitTypes();
@@ -287,6 +287,7 @@ global void CreateGame(char* filename, WorldMap* map)
     MapColorCycle();			// Setup color cycle
 
     InitUserInterface();		// Setup the user interface.
+    LoadUserInterface();		// Load the user interface grafics
 
     //
     //	Sound part
