@@ -270,7 +270,7 @@ global void AiAttackWithForce(int force)
 	enemy=NoUnitP;
 	while( aiunit && !enemy ) {	// Use an unit that can attack
 	    if( aiunit->Unit->Type->CanAttack ) {
-		enemy = AttackUnitsInDistance(aiunit->Unit, 1000);
+		enemy = AttackUnitsInDistance(aiunit->Unit, MaxMapWidth);
 	    }
 	    aiunit=aiunit->Next;
 	}
