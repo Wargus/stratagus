@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name minimap.c	-	The minimap. */
+/**@name minimap.c - The minimap. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -50,13 +50,15 @@
 #include "editor.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_OPENGL
 local GLuint MinimapTexture;
 local unsigned char* MinimapSurface;
 local unsigned char* MinimapTerrainSurface;
+local int MinimapTextureWidth;
+local int MinimapTextureHeight;
 #else
 local SDL_Surface* MinimapSurface;		/// generated minimap
 local SDL_Surface* MinimapTerrainSurface;		/// generated minimap terrain
@@ -143,8 +145,12 @@ global void CreateMinimap(void)
 	MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, TheUI.MinimapW,
 		TheUI.MinimapH, 8, 0, 0, 0, 0);
 #else
-	MinimapTerrainSurface = malloc(TheUI.MinimapW * TheUI.MinimapH * 4);
-	MinimapSurface = malloc(TheUI.MinimapW * TheUI.MinimapH * 4);
+	for (MinimapTextureWidth = 1; MinimapTextureWidth < TheUI.MinimapW; MinimapTextureWidth <<= 1) {
+	}
+	for (MinimapTextureHeight = 1; MinimapTextureHeight < TheUI.MinimapH; MinimapTextureHeight <<= 1) {
+	}
+	MinimapTerrainSurface = malloc(MinimapTextureWidth * MinimapTextureHeight * 4);
+	MinimapSurface = malloc(MinimapTextureWidth * MinimapTextureHeight * 4);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &MinimapTexture);
 	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
@@ -152,9 +158,9 @@ global void CreateMinimap(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	memset(MinimapSurface, 0, TheUI.MinimapW * TheUI.MinimapH * 4);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TheUI.MinimapW, 
-		TheUI.MinimapH, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
+	memset(MinimapSurface, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth,
+		MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 		MinimapSurface);
 #endif
 
@@ -191,6 +197,7 @@ global void CreateMinimap(void)
 					c = s->format->palette->colors[*sp++];
 					*dp++ = VideoMapRGB(0, c.r, c.g, c.b);
 				}
+				dp += MinimapTextureWidth - TheUI.MinimapW;
 			}
 		} else {
 			Uint32* sp;
@@ -201,6 +208,7 @@ global void CreateMinimap(void)
 					VideoGetRGBA(*sp, &c.r, &c.g, &c.b, &c.unused);
 					*dp++ = VideoMapRGBA(0, c.r, c.g, c.b, c.unused);
 				}
+				dp += MinimapTextureWidth - TheUI.MinimapW;
 			}
 		}
 		SDL_UnlockSurface(s);
@@ -218,9 +226,9 @@ global void CreateMinimap(void)
 }
 
 /**
-**		Update a mini-map from the tiles of the map.
+**  Update a mini-map from the tiles of the map.
 **
-**		FIXME: this can surely be sped up??
+**  FIXME: this can surely be sped up??
 */
 global void UpdateMinimapTerrain(void)
 {
@@ -276,7 +284,7 @@ global void UpdateMinimapTerrain(void)
 			c = TheMap.TileGraphic->Surface->format->palette->colors[((Uint8*)TheMap.TileGraphic->Surface->pixels)
 				[xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8)
 				* TheMap.TileGraphic->Surface->pitch]];
-			*(Uint32*)&(MinimapTerrainSurface[(mx + my * TheUI.MinimapW) * 4]) =
+			*(Uint32*)&(MinimapTerrainSurface[(mx + my * MinimapTextureWidth) * 4]) =
 				VideoMapRGB(0, c.r, c.g, c.b);
 #endif
 		}
@@ -288,7 +296,9 @@ global void UpdateMinimapTerrain(void)
 	SDL_UnlockSurface(TheMap.TileGraphic->Surface);
 }
 
-// FIXME: todo
+/**
+**  FIXME: docu
+*/
 global void UpdateMinimapXY(int tx, int ty)
 {
 	int mx;
@@ -365,7 +375,7 @@ global void UpdateMinimapXY(int tx, int ty)
 			c = TheMap.TileGraphic->Surface->format->palette->colors[((Uint8*)TheMap.TileGraphic->Surface->pixels)
 				[xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8)
 				* TheMap.TileGraphic->Surface->pitch]];
-			*(Uint32*)&(MinimapTerrainSurface[(mx + my * TheUI.MinimapW) * 4]) =
+			*(Uint32*)&(MinimapTerrainSurface[(mx + my * MinimapTextureWidth) * 4]) =
 				VideoMapRGB(0, c.r, c.g, c.b);
 #endif
 		}
@@ -378,7 +388,7 @@ global void UpdateMinimapXY(int tx, int ty)
 }
 
 /**
-**      Draw an unit on the minimap. 
+**  Draw an unit on the minimap. 
 */
 local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 {
@@ -440,12 +450,15 @@ local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 			((Uint8*)MinimapSurface->pixels)[mx + w + (my + h) * MinimapSurface->pitch] =
 				VideoMapRGB(MinimapSurface->format, c.r, c.g, c.b);
 #else
-			*(Uint32*)&(MinimapSurface[((mx + w) + (my + h) * TheUI.MinimapW) * 4]) = color;
+			*(Uint32*)&(MinimapSurface[((mx + w) + (my + h) * MinimapTextureWidth) * 4]) = color;
 #endif
 		}
 	}
 }
 
+/**
+**  FIXME: docu
+*/
 global void UpdateMinimap(void)
 {
 	static int red_phase;
@@ -481,15 +494,15 @@ global void UpdateMinimap(void)
 				((Uint8*)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
 					((Uint8*)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch];
 #else
-				*(Uint32*)&(MinimapSurface[(mx + my * TheUI.MinimapW) * 4]) =
-					*(Uint32*)&(MinimapTerrainSurface[(mx + my * TheUI.MinimapW) * 4]);
+				*(Uint32*)&(MinimapSurface[(mx + my * MinimapTextureWidth) * 4]) =
+					*(Uint32*)&(MinimapTerrainSurface[(mx + my * MinimapTextureWidth) * 4]);
 #endif
 			} else if (visiontype > 0) {
 #ifndef USE_OPENGL
 				((Uint8*)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
 					VideoMapRGB(MinimapSurface->format, 0, 0, 0);
 #else
-				*(Uint32*)&(MinimapSurface[(mx + my * TheUI.MinimapW) * 4]) =
+				*(Uint32*)&(MinimapSurface[(mx + my * MinimapTextureWidth) * 4]) =
 					VideoMapRGB(0, 0, 0, 0);
 #endif
 			}
@@ -513,6 +526,9 @@ global void UpdateMinimap(void)
 #endif
 }
 
+/**
+**  FIXME: docu
+*/
 global void DrawMinimap(int vx __attribute__((unused)),
 	int vy __attribute__((unused)))
 {
@@ -525,17 +541,17 @@ global void DrawMinimap(int vx __attribute__((unused)),
 	SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
 #else
 	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TheUI.MinimapW, TheUI.MinimapH,
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth, MinimapTextureHeight,
 		GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurface);
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex2i(TheUI.MinimapPosX, TheUI.MinimapPosY);
-	glTexCoord2f(0.0f, 1.0f);
+	glTexCoord2f(0.0f, (float)TheUI.MinimapH / MinimapTextureHeight);
 	glVertex2i(TheUI.MinimapPosX, TheUI.MinimapPosY + TheUI.MinimapH);
-	glTexCoord2f(1.0f, 1.0f);
+	glTexCoord2f((float)TheUI.MinimapW / MinimapTextureWidth, (float)TheUI.MinimapH / MinimapTextureHeight);
 	glVertex2i(TheUI.MinimapPosX + TheUI.MinimapW, TheUI.MinimapPosY + TheUI.MinimapH);
-	glTexCoord2f(1.0f, 0.0f);
+	glTexCoord2f((float)TheUI.MinimapW / MinimapTextureWidth, 0.0f);
 	glVertex2i(TheUI.MinimapPosX + TheUI.MinimapW, TheUI.MinimapPosY);
 	glEnd();
 #endif
@@ -543,10 +559,11 @@ global void DrawMinimap(int vx __attribute__((unused)),
 
 
 /**
-**		Convert minimap cursor X position to tile map coordinate.
+**  Convert minimap cursor X position to tile map coordinate.
 **
-**		@param x		Screen X pixel coordinate.
-**		@return				Tile X coordinate.
+**  @param x  Screen X pixel coordinate.
+**
+**  @return   Tile X coordinate.
 */
 global int ScreenMinimap2MapX(int x)
 {
@@ -560,10 +577,11 @@ global int ScreenMinimap2MapX(int x)
 }
 
 /**
-**		Convert minimap cursor Y position to tile map coordinate.
+**  Convert minimap cursor Y position to tile map coordinate.
 **
-**		@param y		Screen Y pixel coordinate.
-**		@return				Tile Y coordinate.
+**  @param y  Screen Y pixel coordinate.
+**
+**  @return   Tile Y coordinate.
 */
 global int ScreenMinimap2MapY(int y)
 {
@@ -577,7 +595,7 @@ global int ScreenMinimap2MapY(int y)
 }
 
 /**
-**		Destroy mini-map.
+**  Destroy mini-map.
 */
 global void DestroyMinimap(void)
 {
@@ -603,7 +621,7 @@ global void DestroyMinimap(void)
 }
 
 /**
-**		Hide minimap cursor.
+**  Hide minimap cursor.
 */
 global void HideMinimapCursor(void)
 {
@@ -616,10 +634,10 @@ global void HideMinimapCursor(void)
 }
 
 /**
-**		Draw minimap cursor.
+**  Draw minimap cursor.
 **
-**		@param vx		View point X position.
-**		@param vy		View point Y position.
+**  @param vx  View point X position.
+**  @param vy  View point Y position.
 */
 global void DrawMinimapCursor(int vx, int vy)
 {
