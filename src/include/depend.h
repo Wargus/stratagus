@@ -92,16 +92,12 @@
 */
 
 /*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "player.h"
-#include "unittype.h"
-#include "upgrade.h"
-
-/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+struct _player_;
+struct _unit_type_;
+struct _upgrade_;
 
 	/// Dependency rule typedef
 typedef struct _depend_rule_ DependRule;
@@ -117,15 +113,11 @@ struct _depend_rule_ {
 	unsigned char Count;  ///< how many required
 	char          Type;   ///< an unit-type or upgrade
 	union {
-		UnitType* UnitType;  ///< unit-type pointer
-		Upgrade*  Upgrade;   ///< upgrade pointer
+		struct _unit_type_* UnitType;  ///< unit-type pointer
+		struct _upgrade_*  Upgrade;    ///< upgrade pointer
 	} Kind;                  ///< required object
 	DependRule* Rule;        ///< requirements, and rule
 };
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -135,16 +127,16 @@ struct _depend_rule_ {
 extern void DependenciesCclRegister(void);
 	/// Init the dependencies
 extern void InitDependencies(void);
-	/// Load the dependencies
-extern void LoadDependencies(FILE* file);
 	/// Cleanup dependencies module
 extern void CleanDependencies();
 
 
 	/// Add a new dependency
-extern void AddDependency(const char*,const char*,int,int);
+extern void AddDependency(const char* target, const char* required, int count,
+	int or_flag);
 	/// Check a dependency by identifier
-extern int CheckDependByIdent(const Player*,const char*);
+extern int CheckDependByIdent(const struct _player_* player,
+	const char* target);
 
 //@}
 

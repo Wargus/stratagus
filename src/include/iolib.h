@@ -70,12 +70,12 @@ typedef struct _filelist_ {
 // FIXME: but we can avoid it anyway.
 // use plain file routines directly
 
-#define CLFile                      FILE
-#define CLopen(file,whatever)       fopen(file,"rwb")
-#define CLread(file,buf,len)        fread(buf,1,len,file)
-#define CLseek(file,offset,whence)  fseek(file,offset,whence)
-#define CLflush(file)               fflush(file)
-#define CLclose(file)               fclose(file)
+#define CLFile                        FILE
+#define CLopen(file, whatever)        fopen(file, "rwb")
+#define CLread(file, buf, len)        fread(buf, 1, len, file)
+#define CLseek(file, offset, whence)  fseek(file, offset, whence)
+#define CLflush(file)                 fflush(file)
+#define CLclose(file)                 fclose(file)
 
 #else  // !USE_ZLIB && !USE_BZ2LIB
 
@@ -88,10 +88,10 @@ typedef struct _CL_File_ {
 	int   cl_type;   ///< type of CLFile
 	FILE* cl_plain;  ///< standard file pointer
 #ifdef USE_ZLIB
-	gzFile *cl_gz;  ///< gzip file pointer
+	gzFile* cl_gz;   ///< gzip file pointer
 #endif // !USE_ZLIB
 #ifdef USE_BZ2LIB
-	BZFILE* cl_bz;  ///< bzip2 file pointer
+	BZFILE* cl_bz;   ///< bzip2 file pointer
 #endif // !USE_BZ2LIB
 } CLFile;
 
@@ -130,7 +130,7 @@ extern int CLprintf(CLFile* file, char* format, ...);
 #endif // USE_ZLIB || USE_BZ2LIB
 
 	/// Build libary path name
-extern char* LibraryFileName(const char* file,char* buffer);
+extern char* LibraryFileName(const char* file, char* buffer);
 
 	/// Read the contents of a directory
 extern int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), FileList** flp);

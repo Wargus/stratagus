@@ -122,11 +122,11 @@
 */
 
 /*----------------------------------------------------------------------------
---  Includes
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-#include "player.h"
-#include "video.h"
+struct _graphic_;
+struct _unit_type_;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -152,7 +152,7 @@ struct _cursor_type_ {
 
 // --- FILLED UP ---
 
-	Graphic* Sprite; ///< Cursor sprite image
+	struct _graphic_* Sprite; ///< Cursor sprite image
 };
 
 	/// Cursor config reference
@@ -179,7 +179,7 @@ extern CursorType* Cursors;          ///< cursor-types description
 extern CursorStates CursorState;  ///< current cursor state (point,...)
 extern int CursorAction;          ///< action for selection
 extern int CursorValue;           ///< value for action (spell type f.e.)
-extern UnitType* CursorBuilding;  ///< building cursor
+extern struct _unit_type_* CursorBuilding;  ///< building cursor
 
 extern CursorType* GameCursor;  ///< cursor-type
 extern int CursorX;             ///< cursor position on screen X

@@ -45,6 +45,7 @@
 #include "actions.h"
 #include "pathfinder.h"
 #include "interface.h"
+#include "sound.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

@@ -107,15 +107,10 @@
 */
 
 /*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "tileset.h"
-#include "video.h"
-
-/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+struct _graphic_;
 
 	/// Construction frame
 typedef struct _construction_frame_ {
@@ -141,12 +136,12 @@ typedef struct _construction_ {
 
 // --- FILLED UP ---
 
-	Graphic* Sprite;        ///< construction sprite image
-	int      Width;         ///< sprite width
-	int      Height;        ///< sprite height
-	Graphic* ShadowSprite;  ///< construction shadow sprite image
-	int      ShadowWidth;   ///< shadow sprite width
-	int      ShadowHeight;  ///< shadow sprite height
+	struct _graphic_* Sprite;        ///< construction sprite image
+	int               Width;         ///< sprite width
+	int               Height;        ///< sprite height
+	struct _graphic_* ShadowSprite;  ///< construction shadow sprite image
+	int               ShadowWidth;   ///< shadow sprite width
+	int               ShadowHeight;  ///< shadow sprite height
 } Construction;
 
 /*----------------------------------------------------------------------------

@@ -126,13 +126,6 @@
 */
 
 /*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "video.h"
-//#include "iolib.h"
-
-/*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
 
@@ -145,6 +138,9 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+struct _graphic_;
+struct _player_;
 
 /**
 **  A structure describing an icon file, which could contain one or more
@@ -164,9 +160,9 @@ typedef struct _icon_file_ {
 #endif
 
 // --- FILLED UP ---
-	Graphic* Sprite;  ///< Graphic data loaded
+	struct _graphic_* Sprite;  ///< Graphic data loaded
 #ifdef USE_OPENGL
-	Graphic* PlayerColorSprite[PlayerMax];  ///< Sprites with player colors
+	struct _graphic_* PlayerColorSprite[PlayerMax];  ///< Sprites with player colors
 #endif
 } IconFile;
 
@@ -182,9 +178,9 @@ typedef struct _icon_ {
 	int Height;  ///< Icon height
 
 // --- FILLED UP ---
-	Graphic* Sprite;  ///< Graphic data loaded
+	struct _graphic_* Sprite;  ///< Graphic data loaded
 #ifdef USE_OPENGL
-	Graphic** PlayerColorSprite;  ///< Sprites with player colors
+	struct _graphic_** PlayerColorSprite;  ///< Sprites with player colors
 #endif
 } Icon;
 
@@ -215,9 +211,10 @@ extern Icon* IconByIdent(const char* ident);
 	/// Icon -> name
 extern const char* IdentOfIcon(const Icon* icon);
 	/// Draw icon
-extern void DrawIcon(const Player*, Icon*, int, int);
+extern void DrawIcon(const struct _player_* player, Icon* icon, int x, int y);
 	/// Draw icon of an unit
-extern void DrawUnitIcon(const Player*, Icon*, unsigned, int, int);
+extern void DrawUnitIcon(const struct _player_* player, Icon* icon,
+	unsigned flags, int x, int y);
 
 	/// Register CCL features
 extern void IconCclRegister(void);
