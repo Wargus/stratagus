@@ -737,6 +737,32 @@ local void Draw25TransPixel32(SysColors color,int x,int y)
 }
 
 /**
+**	Draw 25% translucent pixel unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+#ifdef USE_OPENGL
+local void Draw25TransPixelOpenGL(SysColors color,int x,int y)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 192);
+    glBegin(GL_POINTS);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
+
+/**
 **	Draw 50% translucent pixel unclipped into 8bit framebuffer.
 **
 **	@param color	Color index.
@@ -838,6 +864,32 @@ local void Draw50TransPixel32(SysColors color,int x,int y)
 }
 
 /**
+**	Draw 50% translucent pixel unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+#ifdef USE_OPENGL
+local void Draw50TransPixelOpenGL(SysColors color,int x,int y)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 128);
+    glBegin(GL_POINTS);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
+
+/**
 **	Draw 75% translucent pixel unclipped into 8bit framebuffer.
 **
 **	@param color	Color index.
@@ -937,6 +989,32 @@ local void Draw75TransPixel32(SysColors color,int x,int y)
     dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
     *p=(dp1|(dp2<<8));
 }
+
+/**
+**	Draw 75% translucent pixel unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+#ifdef USE_OPENGL
+local void Draw75TransPixelOpenGL(SysColors color,int x,int y)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 64);
+    glBegin(GL_POINTS);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Draw translucent pixel unclipped into 8bit framebuffer.
@@ -1116,6 +1194,33 @@ local void DrawTransPixel32(SysColors color,int x,int y
     dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
     *p=(dp1|(dp2<<8));
 }
+
+/**
+**	Draw translucent pixel unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**      @param alpha    alpha value of pixel.
+*/
+#ifdef USE_OPENGL
+local void DrawTransPixelOpenGL(SysColors color,int x,int y,unsigned char alpha)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 255-alpha);
+    glBegin(GL_POINTS);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Draw pixel clipped to current clip setting into 8bit framebuffer.
@@ -1551,6 +1656,34 @@ local void Draw25TransHLine32(SysColors color,int x,int y,int width)
 }
 
 /**
+**	Draw 25% translucent horizontal line unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param width	width of line (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void Draw25TransHLineOpenGL(SysColors color,int x,int y,int width)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 192);
+    glBegin(GL_LINES);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
+
+/**
 **	Draw 50% translucent horizontal line unclipped into 8bit framebuffer.
 **
 **	@param color	Color index.
@@ -1684,6 +1817,34 @@ local void Draw50TransHLine32(SysColors color,int x,int y,int width)
 }
 
 /**
+**	Draw 50% translucent horizontal line unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param width	width of line (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void Draw50TransHLineOpenGL(SysColors color,int x,int y,int width)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 128);
+    glBegin(GL_LINES);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
+
+/**
 **	Draw 75% translucent horizontal line unclipped into 8bit framebuffer.
 **
 **	@param color	Color index.
@@ -1815,6 +1976,34 @@ local void Draw75TransHLine32(SysColors color,int x,int y,int width)
         *p++=(dp1|(dp2<<8));
     }
 }
+
+/**
+**	Draw 75% translucent horizontal line unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param width	width of line (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void Draw75TransHLineOpenGL(SysColors color,int x,int y,int width)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 64);
+    glBegin(GL_LINES);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Draw translucent horizontal line unclipped into 8bit framebuffer.
@@ -2059,6 +2248,34 @@ local void DrawTransHLine32(SysColors color,int x,int y,int width
     } \
 }
 
+/**
+**	Draw translucent horizontal line unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param width	width of line (0=don't draw).
+**	@param alpha	alpha value of pixels.
+*/
+#ifdef USE_OPENGL
+local void DrawTransHLineOpenGL(SysColors color,int x,int y,int width,unsigned char alpha)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 255-alpha);
+    glBegin(GL_LINES);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 /**
 **	Draw horizontal line clipped.
 **
@@ -2399,6 +2616,34 @@ local void Draw25TransVLine32(SysColors color,int x,int y,int height)
 }
 
 /**
+**	Draw 25% translucent vertical line unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param height	height of line (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void Draw25TransVLineOpenGL(SysColors color,int x,int y,int height)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 192);
+    glBegin(GL_LINES);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
+
+/**
 **	Draw 50% translucent vertical line unclipped into 8bit framebuffer.
 **
 **	@param color	Color index.
@@ -2530,6 +2775,34 @@ local void Draw50TransVLine32(SysColors color,int x,int y,int height)
         p+=w;
     }
 }
+
+/**
+**	Draw 50% translucent vertical line unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param height	height of line (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void Draw50TransVLineOpenGL(SysColors color,int x,int y,int height)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 128);
+    glBegin(GL_LINES);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Draw 75% translucent vertical line unclipped into 8bit framebuffer.
@@ -2664,6 +2937,34 @@ local void Draw75TransVLine32(SysColors color,int x,int y,int height)
         p+=w;
     }
 }
+
+/**
+**	Draw 75% translucent vertical line unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param height	height of line (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void Draw75TransVLineOpenGL(SysColors color,int x,int y,int height)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 64);
+    glBegin(GL_LINES);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Draw translucent vertical line unclipped into 8bit framebuffer.
@@ -2874,6 +3175,35 @@ local void DrawTransVLine32(SysColors color,int x,int y,int height
         height=ClipY2-y+1; \
     } \
 }
+
+/**
+**	Draw translucent vertical line unclipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param height	height of line (0=don't draw).
+**	@param alpha	alpha value of pixels.
+*/
+#ifdef USE_OPENGL
+local void DrawTransVLineOpenGL(SysColors color,int x,int y,int height,unsigned char alpha)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 255-alpha);
+    glBegin(GL_LINES);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Draw vertical line clipped.
@@ -3960,6 +4290,38 @@ local void Draw25TransRectangle32(SysColors color,int x,int y
 }
 
 /**
+**	Draw 25% translucent rectangle.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param h	height of rectangle (0=don't draw).
+**	@param w	width of rectangle (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void Draw25TransRectangleOpenGL(SysColors color,int x,int y
+	,int w,int h)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 192);
+    glBegin(GL_LINE_LOOP);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
+
+/**
 **	Draw 50% translucent rectangle into 8bpp frame buffer.
 **
 **	@param color	Color index.
@@ -4238,6 +4600,38 @@ local void Draw50TransRectangle32(SysColors color,int x,int y
 }
 
 /**
+**	Draw 50% translucent rectangle into 32bpp frame buffer.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param h	height of rectangle (0=don't draw).
+**	@param w	width of rectangle (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void Draw50TransRectangleOpenGL(SysColors color,int x,int y
+	,int w,int h)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 128);
+    glBegin(GL_LINE_LOOP);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
+
+/**
 **	Draw 75% translucent rectangle into 8bpp frame buffer.
 **
 **	@param color	Color index.
@@ -4514,6 +4908,38 @@ local void Draw75TransRectangle32(SysColors color,int x,int y
 	}
     }
 }
+
+/**
+**	Draw 75% translucent rectangle.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param h	height of rectangle (0=don't draw).
+**	@param w	width of rectangle (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void Draw75TransRectangleOpenGL(SysColors color,int x,int y
+	,int w,int h)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 64);
+    glBegin(GL_LINE_LOOP);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Draw translucent rectangle into 8bpp frame buffer.
@@ -4799,6 +5225,39 @@ local void DrawTransRectangle32(SysColors color,int x,int y
 	}
     }
 }
+
+/**
+**	Draw translucent rectangle.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param h	height of rectangle (0=don't draw).
+**	@param w	width of rectangle (0=don't draw).
+**      @param alpha    alpha value of pixel.
+*/
+#ifdef USE_OPENGL
+local void DrawTransRectangleOpenGL(SysColors color,int x,int y
+	,int w,int h,unsigned char alpha)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 255-alpha);
+    glBegin(GL_LINE_LOOP);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Draw rectangle clipped.
@@ -5411,6 +5870,38 @@ local void DrawFill25TransRectangle32(SysColors color,int x,int y
 }
 
 /**
+**	Fill rectangle 25% translucent clipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param h	height of rectangle (0=don't draw).
+**	@param w	width of rectangle (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void DrawFill25TransRectangleOpenGL(SysColors color,int x,int y
+	,int w,int h)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 192);
+    glBegin(GL_TRIANGLE_STRIP);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
+
+/**
 **	Fill rectangle 50% translucent clipped into 8bpp frame buffer.
 **
 **	@param color	Color index.
@@ -5583,6 +6074,38 @@ local void DrawFill50TransRectangle32(SysColors color,int x,int y
 }
 
 /**
+**	Fill rectangle 50% translucent clipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param h	height of rectangle (0=don't draw).
+**	@param w	width of rectangle (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void DrawFill50TransRectangleOpenGL(SysColors color,int x,int y
+	,int w,int h)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 128);
+    glBegin(GL_TRIANGLE_STRIP);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
+
+/**
 **	Fill rectangle 75% translucent clipped into 8bpp frame buffer.
 **
 **	@param color	Color index.
@@ -5753,6 +6276,38 @@ local void DrawFill75TransRectangle32(SysColors color,int x,int y
 	}
     }
 }
+
+/**
+**	Fill rectangle 75% translucent clipped.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param h	height of rectangle (0=don't draw).
+**	@param w	width of rectangle (0=don't draw).
+*/
+#ifdef USE_OPENGL
+local void DrawFill75TransRectangleOpenGL(SysColors color,int x,int y
+	,int w,int h)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 64);
+    glBegin(GL_TRIANGLE_STRIP);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Draw translucent rectangle into 8bpp frame buffer.
@@ -5988,6 +6543,39 @@ local void DrawFillTransRectangle32(SysColors color,int x,int y
 	}
     }
 }
+
+/**
+**	Draw translucent rectangle.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param h	height of rectangle (0=don't draw).
+**	@param w	width of rectangle (0=don't draw).
+**      @param alpha    alpha value of pixel.
+*/
+#ifdef USE_OPENGL
+local void DrawFillTransRectangleOpenGL(SysColors color,int x,int y
+	,int w,int h,unsigned char alpha)
+{
+    VMemType32 c;
+    GLubyte r,g,b;
+
+    c=Pixels32[color];
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
+    glDisable(GL_TEXTURE_2D);
+    glColor4ub(r, g, b, 255-alpha);
+    glBegin(GL_TRIANGLE_STRIP);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+}
+#endif
 
 /**
 **	Fill rectangle clipped.
@@ -6269,32 +6857,32 @@ global void InitLineDraw(void)
 {
 #ifdef USE_OPENGL
     VideoDrawPixel            = DrawPixelOpenGL;
-    VideoDraw25TransPixel     = Draw25TransPixel32;
-    VideoDraw50TransPixel     = Draw50TransPixel32;
-    VideoDraw75TransPixel     = Draw75TransPixel32;
-    VideoDrawTransPixel       = DrawTransPixel32;
+    VideoDraw25TransPixel     = Draw25TransPixelOpenGL;
+    VideoDraw50TransPixel     = Draw50TransPixelOpenGL;
+    VideoDraw75TransPixel     = Draw75TransPixelOpenGL;
+    VideoDrawTransPixel       = DrawTransPixelOpenGL;
     VideoDrawPixelClip        = DrawPixelClipOpenGL;
     VideoDrawHLine            = DrawHLineOpenGL;
-    VideoDraw25TransHLine     = Draw25TransHLine32;
-    VideoDraw50TransHLine     = Draw50TransHLine32;
-    VideoDraw75TransHLine     = Draw75TransHLine32;
-    VideoDrawTransHLine       = DrawTransHLine32;
+    VideoDraw25TransHLine     = Draw25TransHLineOpenGL;
+    VideoDraw50TransHLine     = Draw50TransHLineOpenGL;
+    VideoDraw75TransHLine     = Draw75TransHLineOpenGL;
+    VideoDrawTransHLine       = DrawTransHLineOpenGL;
     VideoDrawVLine            = DrawVLineOpenGL;
-    VideoDraw25TransVLine     = Draw25TransVLine32;
-    VideoDraw50TransVLine     = Draw50TransVLine32;
-    VideoDraw75TransVLine     = Draw75TransVLine32;
-    VideoDrawTransVLine       = DrawTransVLine32;
+    VideoDraw25TransVLine     = Draw25TransVLineOpenGL;
+    VideoDraw50TransVLine     = Draw50TransVLineOpenGL;
+    VideoDraw75TransVLine     = Draw75TransVLineOpenGL;
+    VideoDrawTransVLine       = DrawTransVLineOpenGL;
     VideoDrawLine             = DrawLineOpenGL;
     VideoDrawRectangle        = DrawRectangleOpenGL;
-    VideoDraw25TransRectangle = Draw25TransRectangle32;
-    VideoDraw50TransRectangle = Draw50TransRectangle32;
-    VideoDraw75TransRectangle = Draw75TransRectangle32;
-    VideoDrawTransRectangle   = DrawTransRectangle32;
+    VideoDraw25TransRectangle = Draw25TransRectangleOpenGL;
+    VideoDraw50TransRectangle = Draw50TransRectangleOpenGL;
+    VideoDraw75TransRectangle = Draw75TransRectangleOpenGL;
+    VideoDrawTransRectangle   = DrawTransRectangleOpenGL;
     VideoFillRectangle        = DrawFillRectangleOpenGL;
-    VideoFill25TransRectangle = DrawFill25TransRectangle32;
-    VideoFill50TransRectangle = DrawFill50TransRectangle32;
-    VideoFill75TransRectangle = DrawFill75TransRectangle32;
-    VideoFillTransRectangle   = DrawFillTransRectangle32;
+    VideoFill25TransRectangle = DrawFill25TransRectangleOpenGL;
+    VideoFill50TransRectangle = DrawFill50TransRectangleOpenGL;
+    VideoFill75TransRectangle = DrawFill75TransRectangleOpenGL;
+    VideoFillTransRectangle   = DrawFillTransRectangleOpenGL;
 #else
     switch( VideoBpp ) {
 	case 8:
