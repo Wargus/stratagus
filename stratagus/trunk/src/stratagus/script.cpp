@@ -1794,6 +1794,11 @@ global void InitCcl(void)
     EditorCclRegister();
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
+
+#if defined(USE_GUILE)
+    gh_eval_str("(define as-string (lambda (obj) (with-output-to-string (lambda () (write obj)))))");
+#endif
+
     gh_new_procedure1_0("load-pud", CclLoadPud);
     gh_new_procedure1_0("load-map", CclLoadMap);
     gh_new_procedure2_0("define-map", CclDefineMap);
