@@ -836,7 +836,7 @@ static void AiCollectResources(void)
 {
 	Unit* units_with_resource[UnitMax][MaxCosts]; // Worker with resource
 	Unit* units_assigned[UnitMax][MaxCosts]; // Worker assigned to resource
-	Unit *units_unassigned[UnitMax][MaxCosts]; // Unassigned workers
+	Unit* units_unassigned[UnitMax][MaxCosts]; // Unassigned workers
 	int num_units_with_resource[MaxCosts];
 	int num_units_assigned[MaxCosts];
 	int num_units_unassigned[MaxCosts];

@@ -57,7 +57,7 @@ extern void AiEachSecond(Player* player);  ///< Called each second
 extern void InitAiModule(void);       ///< Init AI global structures
 extern void AiInit(Player* player);   ///< Init AI for this player
 extern void CleanAi(void);            ///< Cleanup the AI module
-extern void SaveAi(CLFile*file);      ///< Save the AI state
+extern void SaveAi(CLFile* file);     ///< Save the AI state
 
 extern void AiCclRegister(void);      ///< Register ccl features
 
@@ -66,25 +66,25 @@ extern void AiCclRegister(void);      ///< Register ccl features
 --------------------------------------------------------*/
 
 	/// Called if AI unit is attacked
-extern void AiHelpMe(const Unit* attacker,Unit* defender);
+extern void AiHelpMe(const Unit* attacker, Unit* defender);
 	/// Called if AI unit is killed
 extern void AiUnitKilled(Unit* unit);
 	/// Called if AI needs more farms
-extern void AiNeedMoreSupply(const Unit* unit,const UnitType* what);
+extern void AiNeedMoreSupply(const Unit* unit, const UnitType* what);
 	/// Called if AI unit has completed work
 extern void AiWorkComplete(Unit* unit,Unit* what);
 	/// Called if AI unit can't build
-extern void AiCanNotBuild(Unit* unit,const UnitType* what);
+extern void AiCanNotBuild(Unit* unit, const UnitType* what);
 	/// Called if AI unit can't reach building place
-extern void AiCanNotReach(Unit* unit,const UnitType* what);
+extern void AiCanNotReach(Unit* unit, const UnitType* what);
 	/// Called if an AI unit can't move
-extern void AiCanNotMove(Unit * unit);
+extern void AiCanNotMove(Unit* unit);
 	/// Called if AI unit has completed training
-extern void AiTrainingComplete(Unit* unit,Unit* what);
+extern void AiTrainingComplete(Unit* unit, Unit* what);
 	/// Called if AI unit has completed upgrade to
-extern void AiUpgradeToComplete(Unit* unit,const UnitType* what);
+extern void AiUpgradeToComplete(Unit* unit, const UnitType* what);
 	/// Called if AI unit has completed research
-extern void AiResearchComplete(Unit* unit,const Upgrade* what);
+extern void AiResearchComplete(Unit* unit, const Upgrade* what);
 
 //@}
 
