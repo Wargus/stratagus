@@ -71,7 +71,7 @@ local Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
 	int n;
 	int i;
 
-	n = SelectUnitsOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table);
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];

@@ -2054,7 +2054,7 @@ global int FindAndSortUnits(const Viewport* vp, Unit** table)
 	//
 	//  Select all units touching the viewpoint.
 	//
-	n = SelectUnits(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
+	n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
 
 	if (n) {

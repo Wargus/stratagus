@@ -186,33 +186,6 @@ global int UnitCacheOnTile(int x, int y, Unit** table)
 }
 
 /**
-**		Select unit on X,Y of type naval,fly,land.
-**
-**		@param x		Map X tile position.
-**		@param y		Map Y tile position.
-**		@param type		UnitType::UnitType, naval,fly,land.
-**
-**		@return				Unit, if an unit of correct type is on the field.
-*/
-global Unit* UnitCacheOnXY(int x, int y, unsigned type)
-{
-	Unit* table[UnitMax];
-	int n;
-
-	n = UnitCacheOnTile(x, y, table);
-	while (n--) {
-		if ((unsigned)table[n]->Type->UnitType == type) {
-			break;
-		}
-	}
-	if (n > -1) {
-		return table[n];
-	} else {
-		return NoUnitP;
-	}
-}
-
-/**
 **		Print unit-cache statistic.
 */
 global void UnitCacheStatistic(void)
@@ -326,6 +299,11 @@ global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 	int n;
 	UnitListItem* listitem;
 
+	// Optimize small searches.
+	if (x1 == x2 && y1 == y2) {
+		return UnitCacheOnTile(x1, y1, table);
+	}
+
 	//
 	//		Reduce to map limits. FIXME: should the caller check?
 	//
@@ -398,33 +376,6 @@ global int UnitCacheOnTile(int x, int y, Unit** table)
 	}
 
 	return n;
-}
-
-/**
-**		Select unit on X,Y of type naval,fly,land.
-**
-**		@param x		Map X tile position.
-**		@param y		Map Y tile position.
-**		@param type		UnitType::UnitType, naval,fly,land.
-**
-**		@return				Unit, if an unit of correct type is on the field.
-*/
-global Unit* UnitCacheOnXY(int x, int y, unsigned type)
-{
-	Unit* table[UnitMax];
-	int n;
-
-	n = UnitCacheOnTile(x, y, table);
-	while (n--) {
-		if ((unsigned)table[n]->Type->UnitType == type) {
-			break;
-		}
-	}
-	if (n > -1) {
-		return table[n];
-	} else {
-		return NoUnitP;
-	}
 }
 
 /**
