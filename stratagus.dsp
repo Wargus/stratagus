@@ -271,19 +271,11 @@ SOURCE=.\src\map\map_fog.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\map_rock.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\map\map_save.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\map\map_wall.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\map\map_wood.c
 # End Source File
 # Begin Source File
 
@@ -997,7 +989,7 @@ SOURCE=.\src\pathfinder\splitter_local.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
-SOURCE=.\src\stratagus.ico
+SOURCE=.\contrib\stratagus.ico
 # End Source File
 # Begin Source File
 
