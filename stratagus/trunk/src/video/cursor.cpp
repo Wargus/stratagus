@@ -950,13 +950,13 @@ global void HideAnyCursor(void)
 */
 global void CursorAnimate(unsigned ticks)
 {
-    static int Last = 0;
+    static unsigned last = 0;
 
     if (!GameCursor) {
 	return;
     }
-    if (ticks > Last + GameCursor->FrameRate) {
-	Last = ticks + GameCursor->FrameRate;
+    if (ticks > last + GameCursor->FrameRate) {
+	last = ticks + GameCursor->FrameRate;
 	GameCursor->SpriteFrame++;
 	if ((GameCursor->SpriteFrame & 127)
 		>= VideoGraphicFrames(GameCursor->Sprite)) {

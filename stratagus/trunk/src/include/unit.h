@@ -502,7 +502,7 @@ struct _unit_ {
     int		XP;			/// experience points
     int		Kills;			/// how many unit has this unit killed
 
-    int		TTL;			/// time to life
+    unsigned long	TTL;		/// time to life
     int		Bloodlust;		/// ticks bloodlust
     int		Haste;			/// ticks haste (disables slow)
     int		Slow;			/// ticks slow (disables haste)
