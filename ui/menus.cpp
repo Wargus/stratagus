@@ -1775,9 +1775,13 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 		(*menu->Items[i].initfunc)(menu->Items + i);
 	    }
 	}
+#ifdef USE_SDL_SURFACE
+	DrawMenu(menu);
+#else
 	VideoLockScreen();
 	DrawMenu(menu);
 	VideoUnlockScreen();
+#endif
     }
     GlobalOptionsInit(NULL);
 }
@@ -2815,6 +2819,7 @@ local void CampaignGameMenu(void)
 
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -2870,6 +2875,7 @@ local void StartCampaignFromMenu(int number)
 {
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -3016,6 +3022,7 @@ local void JoinNetGameMenu(void)
 
 #ifdef USE_SDL_SURFACE
     VideoUnlockScreen();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -3052,9 +3059,13 @@ local void JoinNetGameMenu(void)
 
     ProcessMenu("menu-enter-server", 1);
 
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
+#endif
 
     if (menu->Items[1].d.input.nch == 0) {
 	return;
@@ -3069,9 +3080,13 @@ local void JoinNetGameMenu(void)
     server_host_buffer[menu->Items[1].d.input.nch] = 0;
     if (NetworkSetupServerAddress(server_host_buffer)) {
 	NetErrorMenu("Unable to lookup host.");
+#ifdef USE_SDL_SURFACE
+	MenusSetBackground();
+#else
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
+#endif
 	return;
     }
     NetworkInitClientConnect();
@@ -3091,6 +3106,7 @@ local void JoinNetGameMenu(void)
     if (GuiGameStarted) {
 #ifdef USE_SDL_SURFACE
 	MenusSetBackground();
+	Invalidate();
 #else
 	VideoLockScreen();
 	MenusSetBackground();
@@ -3124,9 +3140,13 @@ local void NetConnectingExit(Menuitem *mi)
 */
 local void NetConnectingCancel(void)
 {
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
+#endif
     NetworkExitClientConnect();
     // Trigger TerminateNetConnect() to call us again and end the menu
     NetLocalState = ccs_usercanceled;
@@ -3222,6 +3242,7 @@ local void MultiGameStart(void)
 {
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -3251,6 +3272,7 @@ local void MultiPlayerGameMenu(void)
 
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -3268,9 +3290,13 @@ local void MultiPlayerGameMenu(void)
 
     ProcessMenu("menu-enter-name", 1);
 
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
+#endif
 
     if (menu->Items[1].d.input.nch == 0) {
 	return;
@@ -3916,9 +3942,13 @@ local void ScenSelectCancel(void)
 */
 local void GameCancel(void)
 {
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
+#endif
     FreeMapInfo(MenuMapInfo);
     MenuMapInfo = NULL;
     EndMenu();
@@ -4899,6 +4929,7 @@ local void StartEditor(void)
 {
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -4969,6 +5000,7 @@ local void EditorNewMap(void)
 
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -4995,9 +5027,13 @@ local void EditorNewMap(void)
     ProcessMenu("menu-editor-new", 1);
 
     if (EditorCancelled) {
+#ifdef USE_SDL_SURFACE
+	MenusSetBackground();
+#else
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
+#endif
 	return;
     }
 
@@ -5121,9 +5157,13 @@ local void EditorMainLoadMap(void)
     GetInfoFromSelectPath();
 
     if (EditorCancelled) {
+#ifdef USE_SDL_SURFACE
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
+#else
+	MenusSetBackground();
+#endif
 	return;
     }
 
@@ -7081,6 +7121,7 @@ local void MultiGameMasterReport(void)
 //	EndMenu();
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -7102,6 +7143,7 @@ local void ShowMetaServerList(void)
 {
     EndMenu();
 #ifdef USE_SDL_SURFACE
+    Invalidate();
     MenusSetBackground();
 #else
     Invalidate();
@@ -7226,6 +7268,7 @@ local void MultiMetaServerGameSetupExit(Menuitem *mi)
     //EndMenu();	
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -7249,6 +7292,7 @@ local void SelectGameServer(Menuitem *mi)
     mi->menu->Items[j].d.gem.state = MI_GSTATE_UNCHECKED;
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -7270,9 +7314,13 @@ local void SelectGameServer(Menuitem *mi)
     //server_host_buffer[menu->Items[1].d.input.nch] = 0;
     if (NetworkSetupServerAddress(server_host_buffer)) {
 	NetErrorMenu("Unable to lookup host.");
+#ifdef USE_SDL_SURFACE
+	MenusSetBackground();
+#else
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
+#endif
 	ProcessMenu("metaserver-list", 1);
 	return;
     }
@@ -7293,6 +7341,7 @@ local void SelectGameServer(Menuitem *mi)
     if (GuiGameStarted) {
 #ifdef USE_SDL_SURFACE
 	MenusSetBackground();
+	Invalidate();
 #else
 	VideoLockScreen();
 	MenusSetBackground();
@@ -7349,6 +7398,7 @@ local void ChangeGameServer(void)
 local int MetaServerConnectError(void)
 {
 #ifdef USE_SDL_SURFACE
+    Invalidate();
     NetErrorMenu("Cannot Connect to Meta-Server");
     MenusSetBackground();
 #else
