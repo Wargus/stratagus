@@ -836,10 +836,6 @@ SOURCE=.\src\include\cursor.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\deco.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\include\depend.h
 # End Source File
 # Begin Source File
@@ -937,14 +933,6 @@ SOURCE=.\src\include\script_sound.h
 # Begin Source File
 
 SOURCE=.\src\include\settings.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\siod.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\siodp.h
 # End Source File
 # Begin Source File
 

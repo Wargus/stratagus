@@ -764,9 +764,6 @@ global void UpdateMessages(void)
 			MessagesScrollY = 0;
 			ShiftMessages();
 		}
-		MustRedraw |= RedrawMessage;
-		// FIXME: for performance the minimal area covered by msg's should be used
-		MarkDrawEntireMap();
 	}
 }
 
@@ -919,9 +916,6 @@ global void SetMessage(const char* fmt, ...)
 		return;
 	}
 	AddMessage(temp);
-	MustRedraw |= RedrawMessage;
-	// FIXME: for performance the minimal area covered by msg's should be used
-	MarkDrawEntireMap();
 }
 
 /**
@@ -955,10 +949,6 @@ global void SetMessageEvent(int x, int y, const char* fmt, ...)
 	MessagesEventY[MessagesEventCount] = y;
 	MessagesEventIndex = MessagesEventCount;
 	++MessagesEventCount;
-
-	MustRedraw |= RedrawMessage;
-	//FIXME: for performance the minimal area covered by msg's should be used
-	MarkDrawEntireMap();
 }
 
 /**
@@ -1031,7 +1021,6 @@ global void DrawStatusLine(void)
 global void SetStatusLine(char* status)
 {
 	if (KeyState != KeyStateInput && strcmp(StatusLine, status)) {
-		MustRedraw |= RedrawStatusLine;
 		strncpy(StatusLine, status, sizeof(StatusLine) - 1);
 		StatusLine[sizeof(StatusLine) - 1] = '\0';
 	}
@@ -1112,26 +1101,22 @@ global void SetCosts(int mana, int food, const int* costs)
 
 	if (CostsMana != mana) {
 		CostsMana = mana;
-		MustRedraw |= RedrawCosts;
 	}
 
 	if (CostsFood != food) {
 		CostsFood = food;
-		MustRedraw |= RedrawCosts;
 	}
 
 	if (costs) {
 		for (i = 0; i < MaxCosts; ++i) {
 			if (Costs[i] != costs[i]) {
 				Costs[i] = costs[i];
-				MustRedraw |= RedrawCosts;
 			}
 		}
 	} else {
 		for (i = 0; i < MaxCosts; ++i) {
 			if (Costs[i]) {
 				Costs[i] = 0;
-				MustRedraw |= RedrawCosts;
 			}
 		}
 	}
@@ -1333,8 +1318,6 @@ global void UpdateTimer(void)
 			}
 		}
 		GameTimer.LastUpdate = GameCycle;
-		// FIXME: only redraw when the displayed time changes
-		MustRedraw |= RedrawTimer;
 	}
 }
 

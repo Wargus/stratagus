@@ -911,13 +911,6 @@ global void CommandTrainUnit(Unit* unit, UnitType* type,
 			unit->Orders[1].Arg1 = NULL;
 		} else {
 			//
-			// Update interface.
-			//
-			if (unit->Player == ThisPlayer && unit->Selected) {
-				MustRedraw |= RedrawInfoPanel;
-			}
-
-			//
 			// Training slots are all already full. (NETWORK!)
 			//
 			if (!EnableTrainingQueue || unit->Data.Train.Count >= MAX_UNIT_TRAIN) {
@@ -995,7 +988,6 @@ global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 		//
 		if (unit->Player == ThisPlayer && unit->Selected) {
 			SelectedUnitChanged();
-			MustRedraw |= RedrawInfoPanel;
 		}
 	}
 }
@@ -1072,7 +1064,6 @@ global void CommandCancelUpgradeTo(Unit* unit)
 		//
 		if (unit->Player == ThisPlayer && unit->Selected) {
 			SelectedUnitChanged();
-			MustRedraw |= RedrawInfoPanel;
 		}
 
 		unit->Wait = unit->Reset = 1;		// immediately start next command.
@@ -1168,7 +1159,6 @@ global void CommandCancelResearch(Unit* unit)
 		//
 		if (unit->Player == ThisPlayer && unit->Selected) {
 			SelectedUnitChanged();
-			MustRedraw |= RedrawInfoPanel;
 		}
 
 		unit->Wait = unit->Reset = 1;		// immediately start next command.

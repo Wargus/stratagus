@@ -81,7 +81,6 @@ local void UpdateConstructionFrame(Unit* unit)
 		} else {
 			unit->Frame = cframe->Frame;
 		}
-		CheckUnitToBeDrawn(unit);
 	}
 }
 
@@ -417,22 +416,17 @@ global void HandleActionBuilded(Unit* unit)
 
 		if (IsOnlySelected(unit)) {
 			SelectedUnitChanged();
-			MustRedraw |= RedrawInfoPanel;
 		} else if (unit->Player == ThisPlayer) {
 			SelectedUnitChanged();
 		}
 		unit->CurrentSightRange = unit->Stats->SightRange;
 		MapMarkUnitSight(unit);
-		CheckUnitToBeDrawn(unit);
 		return;
 	}
 
 	UpdateConstructionFrame(unit);
 
 	unit->Wait = 1;
-	if (IsOnlySelected(unit)) {
-		MustRedraw |= RedrawInfoPanel;
-	}
 }
 
 //@}

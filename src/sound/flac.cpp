@@ -227,7 +227,6 @@ static int FlacStreamRead(Sample *sample, void *buf, int len)
 	}
 
 	memcpy(buf, sample->Buffer + sample->Pos, len);
-
 	sample->Pos += len;
 	sample->Len -= len;
 

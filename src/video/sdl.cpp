@@ -533,7 +533,6 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 				TheUI.MouseWarpY = -1;
 				SDL_WarpMouse(xw, yw);
 			}
-			MustRedraw |= RedrawCursor;
 			break;
 
 		case SDL_ACTIVEEVENT:
@@ -556,7 +555,6 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 				} else if (!IsVisible && event->active.gain) {
 					IsVisible = 1;
 					UiTogglePause();
-					MustRedraw = RedrawEverything & ~RedrawMinimap;
 				}
 			}
 			break;
@@ -713,12 +711,12 @@ global void RealizeVideoMemory(void)
 #ifdef USE_OPENGL
 	SDL_GL_SwapBuffers();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	MustRedraw = RedrawEverything;
 #else
 	if (NumRects) {
 		SDL_UpdateRects(TheScreen, NumRects, Rects);
 		NumRects = 0;
 	}
+	VideoClearScreen();
 #endif
 }
 

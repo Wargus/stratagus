@@ -160,8 +160,6 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 
 	// This recalulates some values
 	HandleMouseMove(CursorX, CursorY);
-	MarkDrawEntireMap();
-	MustRedraw |= RedrawMinimap | RedrawCursors;
 }
 
 /**
@@ -281,11 +279,6 @@ local void DrawMapViewport(Viewport* vp)
 		}
 		SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
 	}
-
-	// Resources over map
-	if (TheUI.ResourceX == -1 || TheUI.ResourceY == -1) {
-		MustRedraw |= RedrawResources;
-	}
 }
 
 /**
@@ -334,47 +327,18 @@ global void DrawMapArea(void)
 }
 
 /**
-**		Display update.
+**  Display update.
 **
-*		This functions updates everything on screen. The map, the gui, the
-**		cursors.
+**  This functions updates everything on screen. The map, the gui, the
+**  cursors.
 */
 global void UpdateDisplay(void)
 {
-	MustRedraw &= EnableRedraw; // Don't redraw disabled parts
-
-	HideAnyCursor(); // remove cursor (when available)
-
-	if (MustRedraw & RedrawMap) {
-		DrawMapArea();
-
-		//
-		// Force Redraw Items that are on top of map, they don't have a panel
-		//
-		if (!TheUI.MinimapPanel.Graphic) {
-			MustRedraw |= RedrawMinimapBorder;
-			MustRedraw |= RedrawMinimap;
-		}
-		if (!TheUI.InfoPanel.Graphic) {
-			MustRedraw |= RedrawInfoPanel;
-		}
-		if (!TheUI.ButtonPanel.Graphic) {
-			MustRedraw |= RedrawButtonPanel;
-		}
-		if (!TheUI.Resource.Graphic) {
-			MustRedraw |= RedrawResources;
-		}
-		if (!TheUI.StatusLine.Graphic) {
-			MustRedraw |= RedrawStatusLine;
-		}
-	}
-
-	if (MustRedraw & (RedrawMessage | RedrawMap)) {
-		DrawMessages();
-	}
-
-	if (MustRedraw & RedrawFillers) {
+	if (EnableRedraw != RedrawMenu) {
 		int i;
+
+		DrawMapArea();
+		DrawMessages();
 
 		for (i = 0; i < TheUI.NumFillers; ++i) {
 			VideoDrawSubClip(TheUI.Filler[i].Graphic, 0, 0,
@@ -382,12 +346,8 @@ global void UpdateDisplay(void)
 				TheUI.Filler[i].Graphic->Height,
 				TheUI.FillerX[i], TheUI.FillerY[i]);
 		}
-	}
-
-	if (MustRedraw & RedrawMenuButton) {
 		DrawMenuButtonArea();
-	}
-	if (MustRedraw & RedrawMinimapBorder) {
+
 		if (TheUI.MinimapPanel.Graphic) {
 			VideoDrawSubClip(TheUI.MinimapPanel.Graphic, 0, 0,
 				TheUI.MinimapPanel.Graphic->Width,
@@ -398,153 +358,29 @@ global void UpdateDisplay(void)
 				TheUI.MinimapPosX - 1, TheUI.MinimapPosY - 1,
 				TheUI.MinimapW + 2, TheUI.MinimapH + 2);
 		}
-	}
 
-	if (MustRedraw & RedrawMinimap) {
 		// FIXME: redraw only 1* per second!
 		// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
 		DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
 		DrawMinimapCursor(TheUI.SelectedViewport->MapX,
 			TheUI.SelectedViewport->MapY);
-	} else if (MustRedraw & RedrawMinimapCursor) {
-		HideMinimapCursor();
-		DrawMinimapCursor(TheUI.SelectedViewport->MapX,
-			TheUI.SelectedViewport->MapY);
-	}
 
-	if (MustRedraw & RedrawInfoPanel) {
 		DrawInfoPanel();
-	}
-	if (MustRedraw & RedrawButtonPanel) {
 		DrawButtonPanel();
-	}
-	if (MustRedraw & RedrawResources) {
 		DrawResources();
-	}
-	if (MustRedraw & RedrawStatusLine) {
 		DrawStatusLine();
-		MustRedraw |= RedrawCosts;
-	}
-	if (MustRedraw & RedrawCosts) {
 		DrawCosts();
-	}
-	if (MustRedraw & RedrawTimer) {
 		DrawTimer();
 	}
 
-	if (MustRedraw & RedrawMenu) {
-		DrawMenu(CurrentMenu);
-	}
+	DrawMenu(CurrentMenu);
 
 	DrawAnyCursor();
 
 	//
 	// Update changes to display.
 	//
-	if (MustRedraw & RedrawAll) {
-		// refresh entire screen, so no further invalidate needed
-		InvalidateAreaAndCheckCursor(0, 0, VideoWidth, VideoHeight);
-	} else {
-		if (MustRedraw & RedrawMap) {
-			// FIXME: split into small parts see RedrawTile and RedrawRow
-			InvalidateAreaAndCheckCursor(
-				 TheUI.MapArea.X, TheUI.MapArea.Y,
-				 TheUI.MapArea.EndX - TheUI.MapArea.X + 1,
-				 TheUI.MapArea.EndY - TheUI.MapArea.Y + 1);
-		}
-		if (MustRedraw & RedrawFillers) {
-			int i;
-
-			for (i = 0; i < TheUI.NumFillers; ++i) {
-				InvalidateAreaAndCheckCursor(
-					 TheUI.FillerX[i], TheUI.FillerY[i],
-					 TheUI.Filler[i].Graphic->Width,
-					 TheUI.Filler[i].Graphic->Height);
-			}
-		}
-		if (MustRedraw & RedrawMenuButton) {
-			if (!IsNetworkGame()) {
-				if (TheUI.MenuButton.X != -1) {
-					InvalidateAreaAndCheckCursor(
-						TheUI.MenuButton.X, TheUI.MenuButton.Y,
-						TheUI.MenuButton.Width,
-						TheUI.MenuButton.Height);
-				}
-			} else {
-				if (TheUI.NetworkMenuButton.X != -1) {
-					InvalidateAreaAndCheckCursor(
-						TheUI.NetworkMenuButton.X,
-						TheUI.NetworkMenuButton.Y,
-						TheUI.NetworkMenuButton.Width,
-						TheUI.NetworkMenuButton.Height);
-				}
-				if (TheUI.NetworkDiplomacyButton.X != -1) {
-					InvalidateAreaAndCheckCursor(
-						TheUI.NetworkDiplomacyButton.X,
-						TheUI.NetworkDiplomacyButton.Y,
-						TheUI.NetworkDiplomacyButton.Width,
-						TheUI.NetworkDiplomacyButton.Height);
-				}
-			}
-		}
-		if (MustRedraw & RedrawMinimapBorder) {
-			if (TheUI.MinimapPanel.Graphic) {
-				InvalidateAreaAndCheckCursor(
-					TheUI.MinimapPanelX, TheUI.MinimapPanelY,
-					TheUI.MinimapPanel.Graphic->Width,
-					TheUI.MinimapPanel.Graphic->Height);
-			}
-		} else if ((MustRedraw & RedrawMinimap) ||
-				(MustRedraw & RedrawMinimapCursor)) {
-			// FIXME: Redraws too much of the minimap
-			InvalidateAreaAndCheckCursor(
-				TheUI.MinimapPosX, TheUI.MinimapPosY,
-				TheUI.MinimapW, TheUI.MinimapH);
-		}
-		if (MustRedraw & RedrawInfoPanel) {
-			InvalidateAreaAndCheckCursor(
-				TheUI.InfoPanelX, TheUI.InfoPanelY,
-				TheUI.InfoPanelW, TheUI.InfoPanelH);
-		}
-		if ((MustRedraw & RedrawButtonPanel) && TheUI.ButtonPanel.Graphic) {
-			InvalidateAreaAndCheckCursor(
-				TheUI.ButtonPanelX, TheUI.ButtonPanelY,
-				TheUI.ButtonPanel.Graphic->Width,
-				TheUI.ButtonPanel.Graphic->Height);
-		}
-		if (MustRedraw&RedrawResources && TheUI.Resource.Graphic) {
-			InvalidateAreaAndCheckCursor(
-				TheUI.ResourceX, TheUI.ResourceY,
-				TheUI.Resource.Graphic->Width,
-				TheUI.Resource.Graphic->Height);
-		}
-		if (((MustRedraw & RedrawStatusLine) || MustRedraw&RedrawCosts) &&
-				TheUI.StatusLine.Graphic) {
-			InvalidateAreaAndCheckCursor(
-				TheUI.StatusLineX, TheUI.StatusLineY,
-				TheUI.StatusLine.Graphic->Width,
-				TheUI.StatusLine.Graphic->Height);
-		}
-		if (MustRedraw & RedrawTimer) {
-			// FIXME: Invalidate timer area
-		}
-		if (MustRedraw & RedrawMenu) {
-			InvalidateMenuAreas();
-		}
-
-		// And now as very last.. checking if the cursor needs a refresh
-		InvalidateCursorAreas();
-	}
-}
-
-/**
-**  Enable everything to be drawn for next display update.
-**  Used at start of mainloop (and possible refresh as user option)
-*/
-local void EnableDrawRefresh(void)
-{
-	MustRedraw = RedrawEverything;
-	MarkDrawEntireMap();
+	Invalidate();
 }
 
 /**
@@ -579,7 +415,6 @@ global void GameMainLoop(void)
 	Callbacks = &GameCallbacks;
 
 	SetVideoSync();
-	EnableDrawRefresh();
 	GameCursor = TheUI.Point.Cursor;
 	GameRunning = 1;
 
@@ -643,7 +478,6 @@ global void GameMainLoop(void)
 					break;
 				case 3:	// minimap update
 					UpdateMinimap();
-					MustRedraw |= RedrawMinimap;
 					break;
 				case 4:
 					break;
@@ -698,9 +532,6 @@ global void GameMainLoop(void)
 		if (!(FrameCounter % COLOR_CYCLE_SPEED)) {
 			if (ColorCycleAll >= 0) {
 				ColorCycle();
-			} else {
-				// FIXME: should only update when needed
-				MustRedraw |= RedrawInfoPanel;
 			}
 		}
 
@@ -709,20 +540,7 @@ global void GameMainLoop(void)
 			RealVideoSyncSpeed = VideoSyncSpeed;
 			VideoSyncSpeed = 3000;
 		}
-		if (FastForwardCycle >= GameCycle) {
-			MustRedraw = RedrawEverything;
-		}
-		if (MustRedraw &&
-				(FastForwardCycle <= GameCycle || GameCycle <= 10 ||
-					!(GameCycle & 0x3f))) {
-			if (Callbacks == &MenuCallbacks) {
-				MustRedraw |= RedrawMenu;
-			}
-			if (CurrentMenu && CurrentMenu->Panel &&
-					!strcmp(CurrentMenu->Panel, ScPanel)) {
-				MustRedraw = RedrawEverything;
-			}
-
+		if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0x3f)) {
 			//FIXME: this might be better placed somewhere at front of the
 			// program, as we now still have a game on the background and
 			// need to go through hte game-menu or supply a pud-file
@@ -734,9 +552,6 @@ global void GameMainLoop(void)
 			// XFlush
 			//
 			RealizeVideoMemory();
-#ifndef USE_OPENGL
-			MustRedraw = 0;
-#endif
 		}
 
 		if (FastForwardCycle == GameCycle) {
@@ -774,8 +589,7 @@ global void GameMainLoop(void)
 		fprintf(stderr, "You have lost!\n");
 		SetStatusLine("You have lost!");
 		ProcessMenu("menu-defeated", 1);
-	}
-	else if (GameResult == GameVictory) {
+	} else if (GameResult == GameVictory) {
 		fprintf(stderr, "You have won!\n");
 		SetStatusLine("You have won!");
 		ProcessMenu("menu-victory", 1);

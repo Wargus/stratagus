@@ -834,11 +834,8 @@ local void GameMenuReturn(void)
 	while (CurrentMenu) {
 		EndMenu();
 	}
-	MustRedraw &= ~RedrawMenu;
 	InterfaceState = IfaceStateNormal;
 	ClearStatusLine();
-	MarkDrawEntireMap();		//FIXME: some tiles could be left as they were?
-	MustRedraw=RedrawEverything;
 	GamePaused = 0;
 }
 
@@ -1074,7 +1071,6 @@ local void SaveGameVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt--;
 						mi->d.listbox.startline++;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			} else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
 				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
@@ -1083,7 +1079,6 @@ local void SaveGameVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt++;
 						mi->d.listbox.startline--;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			}
 			SaveGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
@@ -1140,7 +1135,6 @@ local void SaveGameVSAction(Menuitem *mi, int i)
 					mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
 				SaveGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-				MustRedraw |= RedrawMenu;
 			}
 			break;
 		default:
@@ -1319,7 +1313,6 @@ local void LoadGameVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt--;
 						mi->d.listbox.startline++;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
 				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
@@ -1328,7 +1321,6 @@ local void LoadGameVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt++;
 						mi->d.listbox.startline--;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			}
 			LoadGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
@@ -1385,7 +1377,6 @@ local void LoadGameVSAction(Menuitem *mi, int i)
 					mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
 				LoadGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-				MustRedraw |= RedrawMenu;
 			}
 			break;
 		default:
@@ -2560,7 +2551,6 @@ local void TipsShowTipsText(Menuitem *mi)
 		ShowTips = 0;
 		mi->menu->Items[1].d.gem.state = MI_GSTATE_UNCHECKED;
 	}
-	MustRedraw |= RedrawMenu;
 }
 
 /**
@@ -2759,7 +2749,6 @@ local void MultiScenSelectMenu(void)
 */
 local void SinglePlayerGameMenu(void)
 {
-	DestroyCursorBackground();
 	GuiGameStarted = 0;
 	ProcessMenu("menu-custom-game", 1);
 	if (GuiGameStarted) {
@@ -3102,7 +3091,6 @@ local void TerminateNetConnect(void)
 
 	DebugLevel1Fn("NetLocalState %d\n" _C_ NetLocalState);
 	NetConnectRunning = 2;
-	DestroyCursorBackground();
 	GuiGameStarted = 0;
 	ProcessMenu("menu-net-multi-client", 1);
 	if (GuiGameStarted) {
@@ -3117,7 +3105,6 @@ local void TerminateNetConnect(void)
 */
 local void CreateNetGameMenu(void)
 {
-	DestroyCursorBackground();
 	GuiGameStarted = 0;
 	ProcessMenu("menu-multi-setup", 1);
 	if (GuiGameStarted) {
@@ -3131,7 +3118,6 @@ local void CreateNetGameMenu(void)
 */
 local void CreateInternetGameMenu(void)
 {
-	DestroyCursorBackground();
 	GuiGameStarted = 0;
 	AddGameServer();
 	ProcessMenu("menu-multi-setup", 1);
@@ -3486,7 +3472,6 @@ local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 	mi->d.listbox.curopt = 0;
 	mi[1].d.vslider.percent = 0;
 	mi[1].d.hslider.percent = 0;
-	MustRedraw |= RedrawMenu;
 }
 
 /**
@@ -3509,7 +3494,6 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt--;
 						mi->d.listbox.startline++;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
 				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
@@ -3518,7 +3502,6 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt++;
 						mi->d.listbox.startline--;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			}
 			ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
@@ -3571,7 +3554,6 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 					mi->d.listbox.startline + mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
 				ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-				MustRedraw |= RedrawMenu;
 			}
 			break;
 		default:
@@ -3591,11 +3573,9 @@ local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 		case 2:				// key - down
 			j = ((mi->d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
 			if (mi->d.vslider.cflags&MI_CFLAGS_DOWN && j < nKeyStrokeHelps - 11) {
-					j++;
-					MustRedraw |= RedrawMenu;
+				j++;
 			} else if (mi->d.vslider.cflags  & MI_CFLAGS_UP && j > 0) {
-					j--;
-					MustRedraw |= RedrawMenu;
+				j--;
 			}
 			if (i == 2) {
 				mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
@@ -3606,7 +3586,6 @@ local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 			if ((mi->d.vslider.cflags&MI_CFLAGS_KNOB) && (mi->flags&MenuButtonClicked)) {
 				j = ((mi->d.vslider.curper + 1) * (nKeyStrokeHelps - 11)) / 100;
 				mi->d.vslider.percent = mi->d.vslider.curper;
-				MustRedraw |= RedrawMenu;
 			}
 			break;
 		default:
@@ -3727,7 +3706,6 @@ local void ScenSelectFolder(void)
 			mi->d.listbox.curopt = 0;
 			mi[1].d.vslider.percent = 0;
 			mi[1].d.hslider.percent = 0;
-			MustRedraw |= RedrawMenu;
 		}
 	}
 }
@@ -3763,7 +3741,6 @@ local void ScenSelectOk(void)
 			mi->d.listbox.curopt = 0;
 			mi[1].d.vslider.percent = 0;
 			mi[1].d.hslider.percent = 0;
-			MustRedraw |= RedrawMenu;
 		} else {
 			strcpy(ScenSelectFileName, fl[i].name);		// Final map name
 			EndMenu();
@@ -4749,7 +4726,6 @@ global int NetClientSelectScenario(void)
 global void NetConnectForceDisplayUpdate(void)
 {
 	MultiGamePlayerSelectorsUpdate(2);
-	MustRedraw |= RedrawMenu;
 }
 
 /**
@@ -4783,8 +4759,6 @@ global void NetClientUpdateState(void)
 
 	MultiClientUpdate(0);
 	DebugLevel1Fn("MultiClientMenuRedraw\n");
-
-	MustRedraw |= RedrawMenu;
 }
 
 /**
@@ -5168,7 +5142,6 @@ local void EditorMainLoadFolder(void)
 			mi->d.listbox.curopt = 0;
 			mi[1].d.vslider.percent = 0;
 			mi[1].d.hslider.percent = 0;
-			MustRedraw |= RedrawMenu;
 		}
 	}
 }
@@ -5204,7 +5177,6 @@ local void EditorMainLoadOk(void)
 			mi->d.listbox.curopt = 0;
 			mi[1].d.vslider.percent = 0;
 			mi[1].d.hslider.percent = 0;
-			MustRedraw |= RedrawMenu;
 		} else {
 			strcpy(ScenSelectFileName, fl[i].name);		// Final map name
 			EndMenu();
@@ -5336,7 +5308,6 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt--;
 						mi->d.listbox.startline++;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
 				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
@@ -5345,7 +5316,6 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt++;
 						mi->d.listbox.startline--;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			}
 			EditorMainLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
@@ -5401,7 +5371,6 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 					mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
 				EditorMainLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-				MustRedraw |= RedrawMenu;
 			}
 			break;
 		default:
@@ -5474,7 +5443,6 @@ local void EditorLoadOk(void)
 			mi->d.listbox.curopt = 0;
 			mi[1].d.vslider.percent = 0;
 			mi[1].d.hslider.percent = 0;
-			MustRedraw |= RedrawMenu;
 		} else {
 			strcpy(ScenSelectFileName, fl[i].name);		// Final map name
 			EndMenu();
@@ -6028,7 +5996,6 @@ local void EditorSaveFolder(void)
 			mi->d.listbox.startline = 0;
 			mi->d.listbox.curopt = 0;
 			mi[1].d.vslider.percent = 0;
-			MustRedraw |= RedrawMenu;
 		}
 	}
 }
@@ -6063,7 +6030,6 @@ local void EditorSaveOk(void)
 			mi->d.listbox.startline = 0;
 			mi->d.listbox.curopt = 0;
 			mi[1].d.vslider.percent = 0;
-			MustRedraw |= RedrawMenu;
 		} else {
 			strcpy(ScenSelectFileName, menu->Items[3].d.input.buffer);		// Final map name
 			ScenSelectFileName[strlen(ScenSelectFileName) - 3] = '\0';
@@ -6166,7 +6132,6 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt--;
 						mi->d.listbox.startline++;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
 				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
@@ -6175,7 +6140,6 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt++;
 						mi->d.listbox.startline--;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			}
 			EditorSaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
@@ -6228,7 +6192,6 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 					mi->d.listbox.startline + mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
 				EditorSaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-				MustRedraw |= RedrawMenu;
 			}
 			break;
 		default:
@@ -6302,11 +6265,9 @@ local void EditorEndMenu(void)
 	CursorOn = CursorOnUnknown;
 	CurrentMenu = NULL;
 
-	MustRedraw = RedrawEverything;
 	InterfaceState = IfaceStateNormal;
 	EditorUpdateDisplay();
 	InterfaceState = IfaceStateMenu;
-	MustRedraw = RedrawMenu;
 }
 
 /**
@@ -6511,7 +6472,6 @@ local void ReplayGameVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt--;
 						mi->d.listbox.startline++;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
 				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
@@ -6520,7 +6480,6 @@ local void ReplayGameVSAction(Menuitem *mi, int i)
 						mi->d.listbox.curopt++;
 						mi->d.listbox.startline--;
 					}
-					MustRedraw |= RedrawMenu;
 				}
 			}
 			ReplayGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
@@ -6577,7 +6536,6 @@ local void ReplayGameVSAction(Menuitem *mi, int i)
 					mi->d.listbox.startline + mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
 				ReplayGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-				MustRedraw |= RedrawMenu;
 			}
 			break;
 		default:
@@ -6615,7 +6573,6 @@ local void ReplayGameFolder(void)
 			mi->d.listbox.curopt = 0;
 			mi[1].d.vslider.percent = 0;
 			mi[1].d.hslider.percent = 0;
-			MustRedraw |= RedrawMenu;
 		}
 	}
 }
@@ -6658,7 +6615,6 @@ local void ReplayGameOk(void)
 			mi->d.listbox.curopt = 0;
 			mi[1].d.vslider.percent = 0;
 			mi[1].d.hslider.percent = 0;
-			MustRedraw |= RedrawMenu;
 		} else {
 			strcpy(ScenSelectFileName, fl[i].name);		// Final map name
 
@@ -6887,7 +6843,6 @@ local void ShowMetaServerList(void)
 	Invalidate();
 	MenusSetBackground();
 
-	DestroyCursorBackground();
 	GuiGameStarted = 0;
 	ProcessMenu("metaserver-list", 1);
 	if (GuiGameStarted) {

@@ -212,14 +212,9 @@ global void HandleActionTrain(Unit* unit)
 
 		if (IsOnlySelected(unit)) {
 			UpdateButtonPanel();
-			MustRedraw |= RedrawPanels;
 		}
 
 		return;
-	}
-
-	if (IsOnlySelected(unit)) {
-		MustRedraw |= RedrawInfoPanel;
 	}
 
 	unit->Reset = 1;

@@ -802,8 +802,6 @@ extern int UnitVisibleOnMinimap(const Unit* unit);
 	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
 extern int UnitVisibleInViewport(const Unit* unit, const Viewport* vp);
 
-	/// To be called when the look of the unit changes.
-extern int CheckUnitToBeDrawn(Unit* unit);
 	/// @todo more docu
 extern void GetUnitMapArea(const Unit* unit, int *sx, int *sy,
 	int *ex, int *ey);

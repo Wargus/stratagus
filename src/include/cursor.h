@@ -202,32 +202,13 @@ extern CursorType* CursorTypeByIdent(const char* ident);
 
 	/// Draw any cursor
 extern void DrawAnyCursor(void);
-	/// Hide any cursor
-extern void HideAnyCursor(void);
 	/// Animate the cursor
 extern void CursorAnimate(unsigned ticks);
-
-	/// Save/load rectangle region from/to screen
-	/// Note: this is made extern for minimap only
-#ifndef USE_OPENGL
-extern void SaveCursorRectangle(void *buffer, int x, int y, int w, int h);
-extern void LoadCursorRectangle(void *buffer, int x, int y, int w, int h);
-#else
-#define SaveCursorRectangle(buffer, x, y, w, h)
-#define LoadCursorRectangle(buffer, x, y, w, h)
-#endif
-
-	/// Invalidate given area and check if cursor won't need any
-extern void InvalidateAreaAndCheckCursor(int x, int y, int w, int h);
-	/// Invalidate (remaining) cursor areas
-extern void InvalidateCursorAreas(void);
 
 	/// Initialize the cursor module
 extern void InitVideoCursors(void);
 	/// Cleanup the cursor module
 extern void CleanCursors(void);
-	/// Destroy image behind cursor.
-extern void DestroyCursorBackground(void);
 
 //@}
 

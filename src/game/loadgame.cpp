@@ -243,7 +243,6 @@ global void LoadGame(char* filename)
 	SyncRandSeed = syncrand;
 	SyncHash = synchash;
 	SelectionChanged();
-	MustRedraw = RedrawEverything;
 }
 
 /**

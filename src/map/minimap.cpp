@@ -621,19 +621,6 @@ global void DestroyMinimap(void)
 }
 
 /**
-**  Hide minimap cursor.
-*/
-global void HideMinimapCursor(void)
-{
-	if (OldMinimapCursorW) {
-		LoadCursorRectangle(OldMinimapCursorImage,
-			OldMinimapCursorX, OldMinimapCursorY,
-			OldMinimapCursorW, OldMinimapCursorH);
-		OldMinimapCursorW = 0;
-	}
-}
-
-/**
 **  Draw minimap cursor.
 **
 **  @param vx  View point X position.
@@ -648,27 +635,12 @@ global void DrawMinimapCursor(int vx, int vy)
 	int i;
 
 	// Determine and save region below minimap cursor
-	OldMinimapCursorX = x =
-		TheUI.MinimapPosX + MinimapX + (vx * MinimapScaleX) / MINIMAP_FAC;
-	OldMinimapCursorY = y =
-		TheUI.MinimapPosY + MinimapY + (vy * MinimapScaleY) / MINIMAP_FAC;
-	OldMinimapCursorW = w =
-		(TheUI.SelectedViewport->MapWidth * MinimapScaleX) / MINIMAP_FAC;
-	OldMinimapCursorH = h =
-		(TheUI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
+	x = TheUI.MinimapPosX + MinimapX + (vx * MinimapScaleX) / MINIMAP_FAC;
+	y = TheUI.MinimapPosY + MinimapY + (vy * MinimapScaleY) / MINIMAP_FAC;
+	w = (TheUI.SelectedViewport->MapWidth * MinimapScaleX) / MINIMAP_FAC;
+	h = (TheUI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
 
 	i = (w + 1 + h) * 2 * TheScreen->format->BytesPerPixel;
-
-	if (OldMinimapCursorSize < i) {
-		if (OldMinimapCursorImage) {
-			OldMinimapCursorImage = realloc(OldMinimapCursorImage, i);
-		} else {
-			OldMinimapCursorImage = malloc(i);
-		}
-		DebugLevel3("Cursor memory %d\n" _C_ i);
-		OldMinimapCursorSize = i;
-	}
-	SaveCursorRectangle(OldMinimapCursorImage, x, y, w, h);
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
 	VideoDrawTransRectangle(TheUI.ViewportCursorColor, x, y, w, h, 128);
