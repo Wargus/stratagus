@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name X11.c		-	XWindows support. */
+/**@name new_X11.c		-	XWindows support. */
 /*
 **	(c) Copyright 1998-2000 by Lutz Sammer and Valery Shchedrin
 **
