@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name pathfinder.h	-	The path finder headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef	__PATH_FINDER_H__
 #define	__PATH_FINDER_H__
@@ -44,7 +43,11 @@ enum _move_return_ {
 /**
 **	To remove pathfinder internals. Called if path destination changed.
 */
+#ifdef NEW_ORDERS
+#define ResetPath(command) // Hope I didn't need this?
+#else
 #define ResetPath(command) ((command).Data.Move.Fast=1)
+#endif
 
 /*----------------------------------------------------------------------------
 --	Variables
