@@ -509,8 +509,9 @@ global void UnitActions(void)
 	// 1) Blink flag.
 	if (blinkthiscycle) {
 		for (i = 0; i < tabsize; ++i) {
-			while(table[i]->Destroyed) {
-				table[i] = table[--tabsize];
+			if (table[i]->Destroyed) {
+				table[i--] = table[--tabsize];
+				continue;
 			}
 			if (table[i]->Blink) {
 				--table[i]->Blink;
@@ -521,8 +522,9 @@ global void UnitActions(void)
 	// 2) Buffs...
 	if (buffsthiscycle) {
 		for (i = 0; i < tabsize; ++i) {
-			while(table[i]->Destroyed) {
-				table[i] = table[--tabsize];
+			if (table[i]->Destroyed) {
+				table[i--] = table[--tabsize];
+				continue;
 			}
 			HandleBuffs(table[i], CYCLES_PER_SECOND);
 		}
@@ -531,8 +533,9 @@ global void UnitActions(void)
 	// 3) Increase health mana, burn and stuff
 	if (regenthiscycle) {
 		for (i = 0; i < tabsize; ++i) {
-			while(table[i]->Destroyed) {
-				table[i] = table[--tabsize];
+			if (table[i]->Destroyed) {
+				table[i--] = table[--tabsize];
+				continue;
 			}
 			HandleRegenerations(table[i]);
 		}
