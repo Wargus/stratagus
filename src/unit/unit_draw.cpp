@@ -499,6 +499,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		color=ColorDarkGreen;
 	    } else if( f>50 ) {
 		color=ColorYellow;
+	    } else if( f>25 ) {
+		color=ColorOrange;
 	    } else {
 		color=ColorRed;
 	    }

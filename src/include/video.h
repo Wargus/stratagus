@@ -130,6 +130,7 @@ enum _sys_colors_ {
     ColorBlack = 0,			/// use for black
     ColorDarkGreen = 149,
     ColorBlue = 206,
+    ColorOrange = 224,
     ColorWhite = 246,
     ColorNPC = 247,
     ColorGray = 248,
