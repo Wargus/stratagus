@@ -106,7 +106,6 @@ global void CleanModules(void)
         FreeAStar();
     }
 
-
     //
     //	Free our protected objects, AI scripts, unit-type properties.
     //
