@@ -122,7 +122,7 @@ static void LoadStratagusMap(const char* mapname,
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
-	TheMap.Info->Filename = strdup(mapname);
+	TheMap.Info.Filename = strdup(mapname);
 }
 
 /**
@@ -133,7 +133,7 @@ static void LoadStratagusMap(const char* mapname,
 */
 static void LoadMap(const char* filename, WorldMap* map)
 {
-	const char* tmp;
+	char* tmp;
 
 	tmp = strrchr(filename, '.');
 	if (tmp) {
@@ -149,6 +149,15 @@ static void LoadMap(const char* filename, WorldMap* map)
 			}
 		}
 #endif
+		if (!strcmp(tmp, ".smp")) {
+			if (!TheMap.Info.Filename) {
+				// The map info hasn't been loaded yet => do it now
+				LuaLoadFile(filename);
+			}
+			Assert(TheMap.Info.Filename);
+			LoadStratagusMap(TheMap.Info.Filename, map);
+			return;
+		}
 		if (!strcmp(tmp, ".cm")
 #ifdef USE_ZLIB
 				|| !strcmp(tmp, ".cm.gz")
@@ -164,8 +173,11 @@ static void LoadMap(const char* filename, WorldMap* map)
 	// ARI: This bombs out, if no pud, so will be safe.
 	if (strcasestr(filename, ".pud")) {
 		LoadPud(filename, map);
-		map->Info->Filename = strdup(filename);
+		map->Info.Filename = strdup(filename);
+		return;
 	}
+
+	printf("Unrecognized map format\n");
 }
 
 /*----------------------------------------------------------------------------

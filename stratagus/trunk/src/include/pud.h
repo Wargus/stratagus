@@ -93,7 +93,7 @@ struct _world_map_;
 ----------------------------------------------------------------------------*/
 
 	/// Return info for pud
-extern MapInfo* GetPudInfo(const char* pud);
+extern MapInfo* GetPudInfo(const char* pud, MapInfo* info);
 
 	/// Load a pud file
 extern void LoadPud(const char* pud, struct _world_map_* map);

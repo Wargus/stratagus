@@ -669,8 +669,7 @@ void MenuLoop(char* filename, WorldMap* map)
 		//    - FIXME: not the ideal place for this..
 		//
 		DebugPrint("Freeing map info, wrong place\n");
-		FreeMapInfo(map->Info);
-		map->Info = NULL;
+		FreeMapInfo(&map->Info);
 
 		//
 		//  No filename given, choose with the menus
@@ -730,6 +729,7 @@ void MenuLoop(char* filename, WorldMap* map)
 			//
 			//  Create the game.
 			//
+			DebugPrint("Creating game with map: %s\n" _C_ filename);
 			CreateGame(filename, map);
 
 			SetStatusLine(NameLine);
@@ -750,7 +750,9 @@ void MenuLoop(char* filename, WorldMap* map)
 		PreMenuSetup();
 
 		filename = NextChapter();
-		DebugPrint("Next chapter %s\n" _C_ filename);
+		sprintf(CurrentMapPath, "%s/%s", StratagusLibPath, filename);
+		filename = CurrentMapPath;
+		DebugPrint("Next chapter %s\n" _C_ CurrentMapPath);
 	}
 }
 

@@ -36,13 +36,14 @@
 <p><b>(C) Copyright 1998-2004 by The Stratagus Project. Distributed under the
 <a href="../gpl.html">"GNU General Public License"</a></b>
 <hr>
-<a href="../index.html">Stratagus</a> 
-<a href="../faq.html">FAQ</a> 
-<a href="magic.html">PREV</a> 
+<a href="../index.html">Stratagus</a>
+<a href="../faq.html">FAQ</a>
+<a href="magic.html">PREV</a>
 <a href="mapsetup.html">NEXT</a>
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#PresentMap">PresentMap</a>
+<a href="#DefinePlayerTypes">DefinePlayerTypes</a>
 <a href="#SetMapMiniImage">SetMapMiniImage</a>
 <a href="#DefineMapSetup">DefineMapSetup</a>
 <a href="#GetMapOption">GetMapOption</a>
@@ -64,16 +65,14 @@ the needed tilesets and the whole map are loaded into the engine.</li>
 This page documents map presentation functions.
 
 <p>
-Note: This is for the new map format. Not implented yet. 
+Note: This is for the new map format. Not implented yet.
 
 <h2>Functions</h2>
 
-<a name="CreateMap"></a>
-<h3>PresentMap(name, description, numplayers, mapwidth, mapheight)</h3>
+<a name="PresentMap"></a>
+<h3>PresentMap(description, numplayers, mapwidth, mapheight)</h3>
 
 <dl>
-<dt>Name</dt>
-<dd>Name of the map as displayed to the user.</dd>
 <dt>Description</dt>
 <dd>A textual description of the map that can be displayed to the user.</dd>
 <dt>numplayers</dt>
@@ -82,16 +81,10 @@ Note: This is for the new map format. Not implented yet.
 <dd>The sizes of the map.</dd>
 </dl>
 
-<p>
-Note: This is for the new map format. Not implented yet. 
-
 <h4>Example</h4>
 
 <pre>
-    PresentMap("Doom World", 
-              "As you enter hell, you encounter the home of Doom monster. " +
-                 "Be careful for the worst of them all: John Carmack.",
-	      4, 64, 64)
+    PresentMap("Doom World", 4, 64, 64)
 </pre>
 
 <a name="SetMapMiniImage"></a>
@@ -106,7 +99,7 @@ Path to the file with the graphic.
 </dd></dl>
 
 <p>
-Note: This is for the new map format. Not implented yet. 
+Note: This is for the new map format. Not implented yet.
 
 <h4>Example</h4>
 
@@ -114,14 +107,29 @@ Note: This is for the new map format. Not implented yet.
     SetMiniImage("doomworld/doomworld.png")
 </pre>
 
+<a name="DefinePlayerTypes"></a>
+<h3>DefinePlayerType(player1, player2, ...)</h3>
+
+Define the number of players and their type on the map. Possible values for player type are:
+<ul>
+<li>"neutral"</li>
+<li>"nobody"</li>
+<li>"computer"</li>
+<li>"person"</li>
+<li>"rescue-passive"</li>
+<li>"rescue-active"</li>
+</ul>
+
+<h4>Example</h4>
+
+<pre>
+    DefinePlayerTypes("person", "person")
+</pre>
+
 <a name="DefineMapSetup"></a>
 <h3>DefineMapSetup(luafile)</h3>
 
 Define the map setup file that will be loaded if the player starts a game with this map.
-
-<p>
-Note: This is for the new map format. Not implented yet. 
-
 
 <h4>Example</h4>
 
@@ -139,7 +147,7 @@ A map can define configuration options. A player can modify those
 options just before starting a game. For example: the tileset to use, your race, game type,
 number of opponents or the amount of resources on the map.
 <p>
-Note: This is for the new map format. Not implented yet. 
+Note: This is for the new map format. Not implented yet.
 
 <h4>Example</h4>
 

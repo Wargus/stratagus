@@ -257,7 +257,7 @@ void SaveGame(const char* filename)
 		StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	CLprintf(file, "  SyncHash = %d, \n", SyncHash);
 	CLprintf(file, "  SyncRandSeed = %d, \n", SyncRandSeed);
-	CLprintf(file, "  SaveFile = \"%s\"\n", TheMap.Info->Filename);
+	CLprintf(file, "  SaveFile = \"%s\"\n", CurrentMapPath);
 	CLprintf(file, "\n---  \"preview\", \"%s.pam\",\n", filename);
 	CLprintf(file, "} )\n\n");
 

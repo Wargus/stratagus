@@ -533,14 +533,14 @@ static void DrawUnitIcons(void)
 		if (i == PlayerMax / 2) {
 			y += 20;
 		}
-		if (i == CursorPlayer && TheMap.Info->PlayerType[i] != PlayerNobody) {
+		if (i == CursorPlayer && TheMap.Info.PlayerType[i] != PlayerNobody) {
 			VideoDrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
 		}
 		VideoDrawRectangle(
-			i == CursorPlayer && TheMap.Info->PlayerType[i] != PlayerNobody ?
+			i == CursorPlayer && TheMap.Info.PlayerType[i] != PlayerNobody ?
 				ColorWhite : ColorGray,
 			x + i % 8 * 20, y, 19, 19);
-		if (TheMap.Info->PlayerType[i] != PlayerNobody) {
+		if (TheMap.Info.PlayerType[i] != PlayerNobody) {
 			VideoFillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1,
 				17, 17);
 		}
@@ -555,10 +555,10 @@ static void DrawUnitIcons(void)
 	y += 18 * 1 + 4;
 	if (SelectedPlayer != -1) {
 		i = sprintf(buf,"Plyr %d %s ", SelectedPlayer,
-				PlayerRaces.Name[TheMap. Info->PlayerSide[SelectedPlayer]]);
+				PlayerRaces.Name[TheMap. Info.PlayerSide[SelectedPlayer]]);
 		// Players[SelectedPlayer].RaceName);
 
-		switch (TheMap.Info->PlayerType[SelectedPlayer]) {
+		switch (TheMap.Info.PlayerType[SelectedPlayer]) {
 			case PlayerNeutral:
 				strcat(buf, "Neutral");
 				break;
@@ -1134,7 +1134,7 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		}
 		// Cursor on player icons
 		if (CursorPlayer != -1) {
-			if (TheMap.Info->PlayerType[CursorPlayer] != PlayerNobody) {
+			if (TheMap.Info.PlayerType[CursorPlayer] != PlayerNobody) {
 				SelectedPlayer = CursorPlayer;
 				ThisPlayer = Players + SelectedPlayer;
 			}
@@ -1588,7 +1588,7 @@ static void EditorCallbackMouse(int x, int y)
 				by += 20;
 			}
 			if (bx < x && x < bx + 20 && by < y && y < by + 20) {
-				if (TheMap.Info->PlayerType[i] != PlayerNobody) {
+				if (TheMap.Info.PlayerType[i] != PlayerNobody) {
 					sprintf(buf,"Select player #%d",i);
 					SetStatusLine(buf);
 				} else {
@@ -1819,35 +1819,35 @@ static void CreateEditor(void)
 		//
 		// Inititialize TheMap / Players.
 		//
-		TheMap.Info->MapTerrainName =
-			strdup(Tilesets[TheMap.Info->MapTerrain]->Ident);
+		TheMap.Info.MapTerrainName =
+			strdup(Tilesets[TheMap.Info.MapTerrain]->Ident);
 		InitPlayers();
 		for (i = 0; i < PlayerMax; ++i) {
 			int j;
 
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(PlayerNeutral);
-				TheMap.Info->PlayerType[i] = PlayerNeutral;
-				TheMap.Info->PlayerSide[i] = Players[i].Race = PlayerRaceNeutral;
+				TheMap.Info.PlayerType[i] = PlayerNeutral;
+				TheMap.Info.PlayerSide[i] = Players[i].Race = PlayerRaceNeutral;
 			} else {
 				CreatePlayer(PlayerNobody);
-				TheMap.Info->PlayerType[i] = PlayerNobody;
+				TheMap.Info.PlayerType[i] = PlayerNobody;
 			}
 			for (j = 1; j < MaxCosts; ++j) {
-				TheMap.Info->PlayerResources[i][j] = Players[i].Resources[j];
+				TheMap.Info.PlayerResources[i][j] = Players[i].Resources[j];
 			}
 		}
 
-		strncpy(TheMap.Description, TheMap.Info->Description, 32);
-		TheMap.Width = TheMap.Info->MapWidth;
-		TheMap.Height = TheMap.Info->MapHeight;
+		strncpy(TheMap.Description, TheMap.Info.Description, 32);
+		TheMap.Width = TheMap.Info.MapWidth;
+		TheMap.Height = TheMap.Info.MapHeight;
 		TheMap.Fields = calloc(TheMap.Width * TheMap.Height, sizeof(MapField));
 		TheMap.Visible[0] = calloc(TheMap.Width * TheMap.Height / 8, 1);
 		InitUnitCache();
 
-		TheMap.Terrain = TheMap.Info->MapTerrain;
-		TheMap.TerrainName = strdup(Tilesets[TheMap.Info->MapTerrain]->Ident);
-		TheMap.Tileset = Tilesets[TheMap.Info->MapTerrain];
+		TheMap.Terrain = TheMap.Info.MapTerrain;
+		TheMap.TerrainName = strdup(Tilesets[TheMap.Info.MapTerrain]->Ident);
+		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
 		LoadTileset();
 
 		for (i = 0; i < TheMap.Width * TheMap.Height; ++i) {
@@ -1870,14 +1870,14 @@ static void CreateEditor(void)
 	// Place the start points, which the loader discarded.
 	//
 	for (i = 0; i < PlayerMax; ++i) {
-		if (TheMap.Info->PlayerType[i] != PlayerNobody) {
+		if (TheMap.Info.PlayerType[i] != PlayerNobody) {
 			// Set SelectedPlayer to a valid player
 			if (SelectedPlayer == 15) {
 				SelectedPlayer = i;
 			}
 #if 0
 			// FIXME: must support more races
-			switch (TheMap.Info->PlayerSide[i]) {
+			switch (TheMap.Info.PlayerSide[i]) {
 				case PlayerRaceHuman:
 					MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
 						UnitTypeByWcNum(WC_StartLocationHuman),
