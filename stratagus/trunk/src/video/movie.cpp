@@ -228,7 +228,9 @@ int PlayMovie(const char* name)
 		data->tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
 	if (yuv_overlay == NULL) {
+		OggFree(data);
 		free(data);
+		CLclose(f);
 		return -1;
 	}
 
@@ -238,7 +240,10 @@ int PlayMovie(const char* name)
 				sample->SampleSize != 16) {
 			DebugPrint("Not supported music format\n");
 			SoundFree(sample);
+			SDL_FreeYUVOverlay(yuv_overlay);
+			OggFree(data);
 			free(data);
+			CLclose(f);
 			return 0;
 		}
 		MusicSample = sample;
