@@ -17,7 +17,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---      Include
+--      Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -149,7 +149,7 @@ global int HandleActionRepair(Unit* unit)
     Unit* goal;
     int err;
 
-    DebugLevel3("Repair %d\n",unit-Units);
+    DebugLevel3("Repair %Zd\n",UnitNumber(unit));
 
     switch( unit->SubAction ) {
 	//

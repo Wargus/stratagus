@@ -37,7 +37,7 @@
 **		The unit patrols between two points.
 **		Any enemy unit in reaction range is attacked.
 **	FIXME:
-**  		Should do some tries to reach the end-points.
+**		Should do some tries to reach the end-points.
 **		Should support patrol between more points!
 **		Patrol between units.
 **
