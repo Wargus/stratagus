@@ -56,7 +56,7 @@
 **
 **	@param dev	Device name ("/dev/dsp").
 **	@param freq	Sample frequenz (44100,22050,11025 hz).
-**	@param size	Sampe size (8bit, 16bit)
+**	@param size	Sample size (8bit, 16bit)
 **	@param wait	Flag, if true wait for sound device to open.
 **
 **	@return		True if failure, false if everything ok.
@@ -105,16 +105,16 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
 
     switch( freq ) {
 	case 11025:
-	    dummy=((8<<16) |  8);   // 8 Buffers a  256 Bytes
+	    dummy=((8<<16) |  8);   // 8 Buffers of  256 Bytes
 	    break;
 	case 22050:
-	    dummy=((8<<16) |  9);   // 8 Buffers a  512 Bytes
+	    dummy=((8<<16) |  9);   // 8 Buffers of  512 Bytes
 	    break;
 	default:
-	    DebugLevel0Fn("Unexpected sample frequenze %d\n" _C_ freq);
+	    DebugLevel0Fn("Unexpected sample frequency %d\n" _C_ freq);
 	    // FALL THROUGH
 	case 44100:
-	    dummy=((8<<16) | 10);   // 8 Buffers a 1024 Bytes
+	    dummy=((8<<16) | 10);   // 8 Buffers of 1024 Bytes
 	    break;
     }
     if( size==16 ) {			//  8 bit
