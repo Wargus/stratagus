@@ -123,8 +123,11 @@
 **
 **		There are currently two AI's. The old one is very hardcoded,
 **		but does things like placing buildings better than the new.
-**		The new is very flexible, but very basic. It includes none
-**		optimations.
+**		The old AI shouldn't be used.  The new is very flexible, but
+**		very basic. It includes none optimations.
+**
+**		See page @ref AiModule for more information upon supported
+**		features and API.
 **
 **		@see new_ai.c ai_local.h
 **		@see ai.h @see ai.c
@@ -340,8 +343,8 @@ global char* strdcat3(const char* l, const char* m, const char* r)
 /**
 **	Case insensitive version of strstr
 **
-**	@param a 	String to search in
-**	@param b 	Substring to search for
+**	@param a	String to search in
+**	@param b	Substring to search for
 **
 **	@return		Pointer to first occurence of b or NULL if not found.
 */
@@ -618,7 +621,7 @@ local void VideoEffect0(int frame)
 		buf1[y*VideoWidth+x+1]+
 		buf1[y*VideoWidth-VideoWidth+x]+
 		buf1[y*VideoWidth+VideoWidth+x])>>1) - buf2[y*VideoWidth+x];
-	    buf2[y*VideoWidth+x] = i - (i >> 6);
+	    buf2[y*VideoWidth+x] = i - (i >> 7);
 	}
     }
 
@@ -763,6 +766,37 @@ local void VideoEffect0(int frame)
     buf2=tmp;
 }
 
+#ifdef _DEBUG
+/**
+**	Draw the fonts, for screen shots.
+*/
+local void DebugDrawFonts(void)
+{
+    VideoLockScreen();
+    VideoClearScreen();
+
+    VideoFillRectangle(ColorWhite,0,0,40,VideoHeight-1);
+    VideoDrawText(8,   0+ 10,SmallFont,"FreeCraft");
+    VideoDrawText(8,   0+ 20,SmallFont,
+	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+    VideoDrawText(8,   0+ 30,SmallFont,"abdefgABCDEFQ");
+
+    VideoDrawText(8,  40+ 10,GameFont,"FreeCraft");
+    VideoDrawText(8,  40+ 25,GameFont,
+	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+    VideoDrawText(8,  40+ 40,GameFont,"abdefgABCDEFQ");
+
+    VideoDrawText(8, 100+ 10,LargeFont,"FreeCraft");
+    VideoDrawText(8, 100+ 25,LargeFont,
+	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+    VideoDrawText(8, 100+ 40,LargeFont,"abdefgABCDEFQ");
+
+    VideoUnlockScreen();
+    Invalidate();
+    RealizeVideoMemory();
+}
+#endif
+
 /**
 **	Wait for any input.
 **
@@ -790,6 +824,14 @@ local void WaitForInput(int timeout)
 
     //
     //	FIXME: more work needed, scrolling credits, animations, ...
+#ifdef _DEBUG
+    ddfile=NULL; ddate[0]='\0';
+    WaitNoEvent=1;
+    while( WaitNoEvent ) {
+	DebugDrawFonts();
+	WaitEventsOneFrame(&callbacks);
+    }
+#else
     VideoLockScreen();
     //VideoDrawTextCentered(VideoWidth/2,5,LargeTitleFont,"Press SPACE to continue.");
     VideoDrawTextCentered(VideoWidth/2,5,LargeFont,"Press SPACE to continue.");
@@ -810,6 +852,7 @@ local void WaitForInput(int timeout)
 	WaitEventsOneFrame(&callbacks);
     }
     VideoEffect0(-1);
+#endif
 
     VideoLockScreen();
     VideoDrawTextCentered(VideoWidth/2,5,LargeFont,
@@ -817,6 +860,7 @@ local void WaitForInput(int timeout)
     VideoUnlockScreen();
     Invalidate();
     RealizeVideoMemory();
+
 }
 
 /**
@@ -973,7 +1017,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 local void PrintHeader(void)
 {
     // vvv---- looks wired, but is needed for GNU brain damage
-    fprintf(stdout,"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others. (http://FreeCraft.Org)"
+    fprintf(stdout,"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others.\n"
+    "\t(http://FreeCraft.Org)"
     "\n  SIOD Copyright by George J. Carrette."
     "\n  libmodplug Copyright by Kenton Varda & Olivier Lapique."
 #ifdef USE_SDL
@@ -1166,8 +1211,9 @@ local void Usage(void)
     PrintHeader();
     printf(
 "\n\nUsage: freecraft [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
+\t-c file.ccl\tccl start file (default freecraft.ccl)\n\
 \t-d datapath\tpath to freecraft data\n\
-\t-c file.ccl\tccl start file\n\
+\t-e\t\tStart editor\n\
 \t-f factor\tComputer units cost factor\n\
 \t-h\t\tHelp shows this page\n\
 \t-l\t\tEnable command log to \"command.log\"\n\
@@ -1179,7 +1225,7 @@ local void Usage(void)
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 \t-t factor\tComputer units built time factor\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
-\t\t\t\t3=1024x768,4=1600x1200)\n\
+\t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
 \t-w\t\tWait for sound device (OSS sound driver only)\n\
 \t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
 \t-F\t\tFull screen video mode (only supported with SDL)\n\
@@ -1201,6 +1247,7 @@ global int mymain(int argc,char** argv)
 global int main(int argc,char** argv)
 #endif
 {
+    int start_editor;
 
 #ifdef USE_BEOS
     //
@@ -1218,19 +1265,24 @@ global int main(int argc,char** argv)
     memset(NetworkName, 0, 16);
     strcpy(NetworkName, "Anonymous");
 
+    start_editor=0;
+
     // FIXME: Parse options before or after ccl?
 
     //
     //	Parse commandline
     //
     for( ;; ) {
-	switch( getopt(argc,argv,"c:d:f:hln:P:s:t:v:wD:N:FL:S:U:W?") ) {
+	switch( getopt(argc,argv,"c:d:ef:hln:P:s:t:v:wD:N:FL:S:U:W?") ) {
 	    case 'c':
 		CclStartFile=optarg;
 		continue;
             case 'd':
                 FreeCraftLibPath=optarg;
                 continue;
+	    case 'e':
+		start_editor=1;
+		continue;
 	    case 'f':
 		AiCostFactor=atoi(optarg);
 		continue;
@@ -1270,12 +1322,12 @@ global int main(int argc,char** argv)
 			VideoHeight=768;
 			continue;
 		    case 4:
-			VideoWidth=1600;
-			VideoHeight=1200;
+			VideoWidth=1280;
+			VideoHeight=960;
 			continue;
 		    case 5:
-			VideoWidth=1280;
-			VideoHeight=1024;
+			VideoWidth=1600;
+			VideoHeight=1200;
 			continue;
 		    default:
 			Usage();
