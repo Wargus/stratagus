@@ -434,6 +434,7 @@ typedef struct _order_ {
     unsigned char	Flags;		/// Order flags (unused)
     unsigned int	RangeX;		/// How near in X direction
     unsigned int	RangeY;		/// How near in Y direction
+    unsigned int	MinRange;	/// How far away minimum
     unsigned char	IsRect:1;	/// For goal as a square, not circle
 
     Unit*		Goal;		/// goal of the order (if any)

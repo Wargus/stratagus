@@ -65,21 +65,7 @@ local SCM CclAStar(SCM list)
     while( !gh_null_p(list) ) {
 	value=gh_car(list);
 	list=gh_cdr(list);
-
-	if( gh_eq_p(value,gh_symbol2scm("on")) ) {
-	    AStarOn=1;
-	    if(!CclInConfigFile) {
-		// allocation is done directly in this alternate case
-		InitAStar();
-	    }
-	    DebugLevel0("A* is ON :-)\n");
-	} else if( gh_eq_p(value,gh_symbol2scm("off")) ) {
-	    AStarOn=0;
-	    if(!CclInConfigFile) {
-		FreeAStar();
-	    }
-	    DebugLevel0("A* is OFF :-(\n");
-	} else if( gh_eq_p(value,gh_symbol2scm("fixed-unit-cost")) ) {
+	if( gh_eq_p(value,gh_symbol2scm("fixed-unit-cost")) ) {
 	    i=gh_scm2int(gh_car(list));
             list=gh_cdr(list);
 	    if( i <=3 ) {

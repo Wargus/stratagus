@@ -89,7 +89,6 @@ local int AStarMatrixSize;
 /// see pathfinder.h
 global int AStarFixedUnitCrossingCost=MaxMapWidth*MaxMapHeight;
 global int AStarMovingUnitCrossingCost=5;
-global int AStarOn=1;
 global int AStarKnowUnknown=0;
 global int AStarUnknownTerrainCost=2;
 
@@ -109,15 +108,13 @@ local int OpenSetSize;
 */
 global void InitAStar(void)
 {
-    if( AStarOn ) {
-	if( !AStarMatrix ) {
-	    AStarMatrixSize=sizeof(Node)*TheMap.Width*TheMap.Height;
-	    AStarMatrix=(Node *)calloc(TheMap.Width*TheMap.Height,sizeof(Node));
-	    Threshold=TheMap.Width*TheMap.Height/MAX_CLOSE_SET_RATIO;
-	    CloseSet=(int *)malloc(sizeof(int)*Threshold);
-	    OpenSetMaxSize=TheMap.Width*TheMap.Height/MAX_OPEN_SET_RATIO;
-	    OpenSet=(Open *)malloc(sizeof(Open)*OpenSetMaxSize);
-	}
+    if( !AStarMatrix ) {
+	AStarMatrixSize=sizeof(Node)*TheMap.Width*TheMap.Height;
+	AStarMatrix=(Node *)calloc(TheMap.Width*TheMap.Height,sizeof(Node));
+	Threshold=TheMap.Width*TheMap.Height/MAX_CLOSE_SET_RATIO;
+	CloseSet=(int *)malloc(sizeof(int)*Threshold);
+	OpenSetMaxSize=TheMap.Width*TheMap.Height/MAX_OPEN_SET_RATIO;
+	OpenSet=(Open *)malloc(sizeof(Open)*OpenSetMaxSize);
     }
 }
 
@@ -126,13 +123,11 @@ global void InitAStar(void)
 */
 global void FreeAStar(void)
 {
-    if( AStarOn ) {
-	if( AStarMatrix ) {
-	    free(AStarMatrix);
-	    AStarMatrix=NULL;
-	    free(CloseSet);
-	    free(OpenSet);
-	}
+    if( AStarMatrix ) {
+	free(AStarMatrix);
+	AStarMatrix=NULL;
+	free(CloseSet);
+	free(OpenSet);
     }
 }
 
@@ -339,7 +334,8 @@ local int CostMoveTo(Unit* unit, int ex,int ey,int mask,int current_cost) {
 /**
 **	MarkAStarGoal
 */
-local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int range, int mask, int* num_in_close)
+local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, 
+		int mask, int* num_in_close)
 {
     int cx[4]; 
     int cy[4];
@@ -351,10 +347,11 @@ local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int range, i
     int quad;
     int eo;
     int filler;
+    int range;
 
     goal_reachable=0;
 
-    if( range == 0 && gw == 0 && gh == 0 ) {
+    if( minrange == 0 && maxrange == 0 && gw == 0 && gh == 0 ) {
 	if( CostMoveTo(unit,gx,gy,mask,AStarFixedUnitCrossingCost)>=0 ) {
 	    AStarMatrix[gx+gy*TheMap.Width].InGoal=1;
 	    return 1;
@@ -364,87 +361,115 @@ local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int range, i
     }
 
     // Mark top, bottom, left, right
-
-    // Mark Top and Bottom of Goal
-    for(x=gx;x<=gx+gw;x++) {
-	if( x >= 0 && x < TheMap.Width) {
-	    if( gy-range >= 0 && CostMoveTo(unit,x,gy-range,mask,AStarFixedUnitCrossingCost)>=0 ) {
-		AStarMatrix[(gy-range)*TheMap.Width+x].InGoal=1;
-		goal_reachable=1;
-		if( *num_in_close<Threshold ) {
-                   CloseSet[(*num_in_close)++]=(gy-range)*TheMap.Width+x;
-		}						    
-	    }
-	    if( gy+range+gh < TheMap.Height && CostMoveTo(unit,x,gy+gh+range,mask,AStarFixedUnitCrossingCost)>=0 ) {
-		AStarMatrix[(gy+range+gh)*TheMap.Width+x].InGoal=1;
-		if( *num_in_close<Threshold ) {
-		    CloseSet[(*num_in_close)++]=(gy+range+gh)*TheMap.Width+x;
+    for(range=minrange; range <= maxrange; range++) {
+	// Mark Top and Bottom of Goal
+	for(x=gx;x<=gx+gw;x++) {
+	    if( x >= 0 && x < TheMap.Width) {
+		if( gy-range >= 0 && CostMoveTo(unit,x,gy-range,mask,AStarFixedUnitCrossingCost)>=0 ) {
+		    AStarMatrix[(gy-range)*TheMap.Width+x].InGoal=1;
+		    goal_reachable=1;
+		    if( *num_in_close<Threshold ) {
+			CloseSet[(*num_in_close)++]=(gy-range)*TheMap.Width+x;
+		    }						    
 		}
-		goal_reachable=1;
+		if( gy+range+gh < TheMap.Height && 
+			CostMoveTo(unit,x,gy+gh+range,mask,AStarFixedUnitCrossingCost)>=0 ) {
+		    AStarMatrix[(gy+range+gh)*TheMap.Width+x].InGoal=1;
+		    if( *num_in_close<Threshold ) {
+			CloseSet[(*num_in_close)++]=(gy+range+gh)*TheMap.Width+x;
+		    }
+		    goal_reachable=1;
+		}
 	    }
 	}
-    }
 
-    for(y=gy;y<=gy+gh;y++) {
-	if( y >= 0 && y < TheMap.Height) {
-	    if( gx-range >=0 && CostMoveTo(unit,gx-range,y,mask,AStarFixedUnitCrossingCost)>=0 ) {
-		AStarMatrix[y*TheMap.Width+gx-range].InGoal=1;
-		if( *num_in_close<Threshold ) {
-		    CloseSet[(*num_in_close)++]=y*TheMap.Width+gx-range;
+	for(y=gy;y<=gy+gh;y++) {
+	    if( y >= 0 && y < TheMap.Height) {
+		if( gx-range >=0 && CostMoveTo(unit,gx-range,y,mask,AStarFixedUnitCrossingCost)>=0 ) {
+		    AStarMatrix[y*TheMap.Width+gx-range].InGoal=1;
+		    if( *num_in_close<Threshold ) {
+			CloseSet[(*num_in_close)++]=y*TheMap.Width+gx-range;
+		    }
+		    goal_reachable=1;
 		}
-		goal_reachable=1;
-	    }
-	    if( gx+gw+range < TheMap.Width && CostMoveTo(unit,gx+gw+range,y,mask,AStarFixedUnitCrossingCost)>=0 ) {
-		AStarMatrix[y*TheMap.Width+gx+gw+range].InGoal=1;
-		if( *num_in_close<Threshold ) {
-		    CloseSet[(*num_in_close)++]=y*TheMap.Width+gx+gw+range;
+		if( gx+gw+range < TheMap.Width && 
+			CostMoveTo(unit,gx+gw+range,y,mask,AStarFixedUnitCrossingCost)>=0 ) {
+		    AStarMatrix[y*TheMap.Width+gx+gw+range].InGoal=1;
+		    if( *num_in_close<Threshold ) {
+			CloseSet[(*num_in_close)++]=y*TheMap.Width+gx+gw+range;
+		    }
+		    goal_reachable=1;
 		}
-		goal_reachable=1;
 	    }
 	}
-    }
+
+    } // Go Through the Ranges
 
     // Mark Goal Border in Matrix
 
     // Mark Edges of goal
 
-    steps=0;
-    // Find place to start. (for marking curves)
-    while(VisionTable[0][steps] != range && VisionTable[1][steps] == 0 && VisionTable[2][steps] == 0) {
-	steps++;
-    }
-    // 0 - Top right Quadrant
-    cx[0] = gx+gw;
-    cy[0] = gy-VisionTable[0][steps];
-    // 1 - Top left Quadrant
-    cx[1] = gx;
-    cy[1] = gy-VisionTable[0][steps];
-    // 2 - Bottom Left Quadrant
-    cx[2] = gx;
-    cy[2] = gy+VisionTable[0][steps]+gh;
-    // 3 - Bottom Right Quadrant
-    cx[3] = gx+gw;
-    cy[3] = gy+VisionTable[0][steps]+gh;
+    steps=VisionLookup[minrange];
 
-    steps++;  // Move past blank marker
-    while(VisionTable[1][steps] != 0 || VisionTable[2][steps] != 0 ) {
-	// Loop through for repeat cycle
-	cycle=0;
-	while( cycle++ < VisionTable[0][steps] ) {
-	    // If we travelled on an angle, mark down as well.
-	    if( VisionTable[1][steps] == VisionTable[2][steps] ) {
-		// do down
+    while( VisionTable[0][steps] <= maxrange ) {
+	// 0 - Top right Quadrant
+	cx[0] = gx+gw;
+	cy[0] = gy-VisionTable[0][steps];
+	// 1 - Top left Quadrant
+	cx[1] = gx;
+	cy[1] = gy-VisionTable[0][steps];
+	// 2 - Bottom Left Quadrant
+	cx[2] = gx;
+	cy[2] = gy+VisionTable[0][steps]+gh;
+	// 3 - Bottom Right Quadrant
+	cx[3] = gx+gw;
+	cy[3] = gy+VisionTable[0][steps]+gh;
+
+	steps++;  // Move past blank marker
+	while( VisionTable[1][steps] != 0 || VisionTable[2][steps] != 0 ) {
+	    // Loop through for repeat cycle
+	    cycle=0;
+	    while( cycle++ < VisionTable[0][steps] ) {
+		// If we travelled on an angle, mark down as well.
+		if( VisionTable[1][steps] == VisionTable[2][steps] ) {
+		    // do down
+		    quad = 0;
+		    while( quad < 4 ) {
+			if( quad < 2 ) {
+			    filler=1;
+			} else {
+			    filler=-1;
+			}
+			if( cx[quad] >= 0 && cx[quad] < TheMap.Width && cy[quad]+filler >= 0 && 
+			    cy[quad]+filler < TheMap.Height &&
+			    CostMoveTo(unit,cx[quad],cy[quad]+filler,mask,AStarFixedUnitCrossingCost)>=0 ) {
+			    eo=(cy[quad]+filler)*TheMap.Width+cx[quad];
+			    AStarMatrix[eo].InGoal=1;
+			    if( *num_in_close<Threshold ) {
+				CloseSet[(*num_in_close)++]=eo;
+			    }
+			    goal_reachable=1;
+			}
+			quad++;
+		    }
+		}
+		
+		cx[0]+=VisionTable[1][steps];
+		cy[0]+=VisionTable[2][steps];
+		cx[1]-=VisionTable[1][steps];
+		cy[1]+=VisionTable[2][steps];
+		cx[2]-=VisionTable[1][steps];
+		cy[2]-=VisionTable[2][steps];
+		cx[3]+=VisionTable[1][steps];
+		cy[3]-=VisionTable[2][steps];
+	    
+		// Mark Actually Goal curve change
 		quad = 0;
 		while( quad < 4 ) {
-		    if( quad < 2 ) {
-			filler=1;
-		    } else {
-			filler=-1;
-		    }
-		    if( cx[quad] >= 0 && cx[quad] < TheMap.Width && cy[quad]+filler >= 0 && 
-			cy[quad]+filler < TheMap.Height &&
-			CostMoveTo(unit,cx[quad],cy[quad]+filler,mask,AStarFixedUnitCrossingCost)>=0 ) {
-			eo=(cy[quad]+filler)*TheMap.Width+cx[quad];
+		    if( cx[quad] >= 0 && cx[quad] < TheMap.Width && cy[quad] >= 0 &&
+			cy[quad] < TheMap.Height &&
+			CostMoveTo(unit,cx[quad],cy[quad],mask,AStarFixedUnitCrossingCost)>=0 ) {
+			eo=cy[quad]*TheMap.Width+cx[quad];
 			AStarMatrix[eo].InGoal=1;
 			if( *num_in_close<Threshold ) {
 			    CloseSet[(*num_in_close)++]=eo;
@@ -454,40 +479,15 @@ local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int range, i
 		    quad++;
 		}
 	    }
-		
-	    cx[0]+=VisionTable[1][steps];
-	    cy[0]+=VisionTable[2][steps];
-	    cx[1]-=VisionTable[1][steps];
-	    cy[1]+=VisionTable[2][steps];
-	    cx[2]-=VisionTable[1][steps];
-	    cy[2]-=VisionTable[2][steps];
-	    cx[3]+=VisionTable[1][steps];
-	    cy[3]-=VisionTable[2][steps];
-	    
-	    // Mark Actually Goal curve change
-	    quad = 0;
-	    while( quad < 4 ) {
-		if( cx[quad] >= 0 && cx[quad] < TheMap.Width && cy[quad] >= 0 &&
-		    cy[quad] < TheMap.Height &&
-		    CostMoveTo(unit,cx[quad],cy[quad],mask,AStarFixedUnitCrossingCost)>=0 ) {
-		    eo=cy[quad]*TheMap.Width+cx[quad];
-		    AStarMatrix[eo].InGoal=1;
-		    if( *num_in_close<Threshold ) {
-			CloseSet[(*num_in_close)++]=eo;
-		    }
-		    goal_reachable=1;
-		}
-		quad++;
-	    }
+	    steps++;
 	}
-	steps++;
     }
     return goal_reachable;
 }
 /**
 **	Find path.
 */
-global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int range, char* path)
+global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char* path)
 {
     int i;
     int j;
@@ -518,7 +518,7 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int range, 
     y=unit->Y;
 
     // if goal is not directory reachable, punch out
-    if( !AStarMarkGoal(unit, gx, gy, gw, gh, range, mask, &num_in_close) ) {
+    if( !AStarMarkGoal(unit, gx, gy, gw, gh, minrange, maxrange, mask, &num_in_close) ) {
 	AStarCleanUp(num_in_close);
 	return PF_UNREACHABLE;
     }
