@@ -60,6 +60,10 @@
 #include "SDL.h"
 #endif
 
+#ifdef USE_LIBCDA
+#include "libcda.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --	Prototypes for local functions
 ----------------------------------------------------------------------------*/
@@ -795,9 +799,9 @@ local Menuitem SoundOptionsMenuItems[] = {
     { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL,
         { hslider:{ 0, 11*18, 18, ScenSelectHSMasterVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 44, 36*2 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+	{ text:{ "min", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*2 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
+	{ text:{ "max", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_GEM, 240, 36*1.5, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetMasterPower} } },
     { MI_TYPE_TEXT, 266, 36*1.5 + 2, 0, LargeFont, NULL, NULL,
@@ -808,9 +812,9 @@ local Menuitem SoundOptionsMenuItems[] = {
     { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL,
         { hslider:{ 0, 11*18, 18, ScenSelectHSMusicVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 44, 36*4 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+	{ text:{ "min", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
+	{ text:{ "max", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_GEM, 240, 36*3.5, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetMusicPower} } },
     { MI_TYPE_TEXT, 266, 36*3.5 + 2, 0, LargeFont, NULL, NULL,
@@ -821,9 +825,9 @@ local Menuitem SoundOptionsMenuItems[] = {
     { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
         { hslider:{ 0, 11*18, 18, ScenSelectHSCdVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+	{ text:{ "min", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
+	{ text:{ "max", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_GEM, 240, 36*5.5, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdPower} } },
     { MI_TYPE_TEXT, 266, 36*5.5 + 2, 0, LargeFont, NULL, NULL,
@@ -1726,6 +1730,11 @@ global void SoundOptions(void)
     if (PlayingMusic == 1);
         SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_CHECKED;
     SoundOptionsMenuItems[8].d.hslider.percent = (MusicVolume * 100) / 255;
+    
+#ifdef USE_LIBCDA
+    cd_get_volume(&i, &i);
+    SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
+#endif
 
     ProcessMenu(MENU_SOUND_OPTIONS, 1);    
 }
@@ -2701,13 +2710,13 @@ local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing keyboard speed\n");
+		DebugLevel0Fn("Increasing master volume\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
 		SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing keyboard speed\n");
+		DebugLevel0Fn("Decreasing master volume\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
@@ -2743,13 +2752,13 @@ local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing keyboard speed\n");
+		DebugLevel0Fn("Increasing music volume\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
 		SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing keyboard speed\n");
+		DebugLevel0Fn("Decreasing music volume\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
@@ -2785,40 +2794,32 @@ local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing keyboard speed\n");
+		DebugLevel0Fn("Increasing cd volume\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		TheUI.KeyScroll = 1;
-		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing keyboard speed\n");
+		DebugLevel0Fn("Decreasing cd volume\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		TheUI.KeyScroll = 1;
-		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
-	    if (mi[1].d.hslider.percent == 0)
-		TheUI.KeyScroll = 0;
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.KeyScroll = 1;
-		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		    cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.KeyScroll = 1;
-		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		    cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
-		if (mi[1].d.hslider.percent == 0)
-		    TheUI.KeyScroll = 0;
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
