@@ -796,6 +796,9 @@ global void UnitLost(Unit* unit)
     DebugCheck( player->UnitTypesCount[type->Type] > UnitMax);
 }
 
+/**
+**	FIXME: Docu
+*/
 global void UnitClearOrders(Unit *unit)
 {
     int i;
@@ -832,7 +835,6 @@ global void UnitClearOrders(Unit *unit)
     unit->Orders[0].Action=UnitActionStill;
     unit->SubAction=unit->State=0;
 }
-
 
 /**
 **	Update for new unit. Food and income ...
@@ -3232,6 +3234,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     if( !target->Attacked ) {
 	// NOTE: perhaps this should also be moved into the notify?
 	if( target->Player==ThisPlayer ) {
+	    // FIXME: Problem with load+save and restart.
 	    static unsigned long LastCycle;
 	    static int LastX;
 	    static int LastY;
