@@ -1516,13 +1516,13 @@ global RleSprite* LoadRleSprite(const char* name,unsigned width,unsigned height)
 #if 1
 		for( ; w<width; ++w ) {	// non-transparent
 		    *dp++=*sp++;
-		    if( ++counter==256 ) {
+		    if( ++counter==255 ) {
 			*cp=255;
 			*dp++=0;
 			cp=dp++;
-			counter=1;
+			counter=0;
 		    }
-		    if( w+1!=width && *sp==255 ) {	// transparent
+		    if( w+1!=width && *sp==255 ) {	// transparent		// ARI: FIXME - wrong position
 			break;
 		    }
 		}
