@@ -503,6 +503,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	unit->Command.Data.Move.Goal=0;
 	unit->Command.Data.Move.DX=ex;
 	unit->Command.Data.Move.DY=ey;
+	ResetPath(unit->Command);
     }
     // now we need to backtrack
     path_length=0;
