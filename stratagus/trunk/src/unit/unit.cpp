@@ -2361,48 +2361,182 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 /**
 **	Find the nearest gold mine for unit from x,y.
 **
-**	@param source	Pointer for source unit.
+**	@param unit	Pointer for source unit.
 **	@param x	X tile position to start.
 **	@param y	Y tile position to start.
 **
 **	@return		Pointer to the nearest gold mine.
 */
-global Unit* FindGoldMine(const Unit* source __attribute__((unused)),
-	int x,int y)
+global Unit* FindGoldMine(const Unit* unit,int x,int y)
 {
-    Unit** table;
-    Unit* unit;
-    Unit* best;
-    int best_d;
-    int d;
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+	unsigned short X;
+	unsigned short Y;
+    } * points;
+    int size;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    int n;
+    unsigned char* m;
+    unsigned char* matrix;
+    const Unit* destu;
+    Unit* mine;
+    Unit* bestmine;
+    int destx;
+    int desty;
+    int bestx;
+    int besty;
+    int bestd;
 
-    //	FIXME:	this is not the best one
-    //		We need the deposit with the shortest way!
-    //		At least it must be reachable!
-    //		Should use the same pathfinder flood fill, like the attacking
-    //		code.
+    destx=x;
+    desty=y;
+    size=TheMap.Width*TheMap.Height/4;
+    points=alloca(size*sizeof(*points));
 
-    best=NoUnitP;
-    best_d=99999;
-    for( table=Units; table<Units+NumUnits; table++ ) {
-	unit=*table;
-	// Want gold-mine and not dieing.
-	if( !unit->Type->GoldMine || UnitUnusable(unit) ) {
-	    continue;
-	}
-	d=MapDistanceToUnit(x,y,unit);
-	// FIXME: UnitReachable didn't work with unit inside
-	if( d<best_d /* && (d=UnitReachable(source,unit,1)) && d<best_d */ ) {
-	    best_d=d;
-	    best=unit;
-	}
+    //
+    //	Find the nearest gold depot
+    //
+    if( (destu=FindGoldDeposit(unit,x,y)) ) {
+	NearestOfUnit(destu,x,y,&destx,&desty);
     }
-    DebugLevel3Fn("%d %d,%d\n" _C_ UnitNumber(best) _C_ best->X _C_ best->Y);
+    bestd=99999;
+    IfDebug( bestx=besty=0; );		// keep the compiler happy
 
-    if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
-	return NoUnitP;
+    //
+    //	Make movement matrix. FIXME: can create smaller matrix.
+    //
+    matrix=CreateMatrix();
+    w=TheMap.Width+2;
+    matrix+=w+w+2;
+
+    //
+    //	Mark sight range as border. FIXME: matrix didn't need to be bigger.
+    //
+    n=unit->Stats->SightRange;
+    rx=x-n;
+    if( rx<0 ) {
+	rx=0;
     }
-    return best;
+    ep=x+n;
+    if( ep>TheMap.Width ) {
+	ep=TheMap.Width;
+    }
+    ry=y-n;
+    if( ry<0 ) {
+	ry=0;
+    }
+    wp=y+n;
+    if( wp>TheMap.Height ) {
+	wp=TheMap.Height;
+    }
+    for( i=rx; i<ep; ++i ) {		// top bottom line
+	matrix[i+ry*w]=matrix[i+wp*w]=66;
+    }
+    for( i=ry+1; i<wp-1; ++i ) {
+	matrix[rx+i*w]=matrix[ep+i*w]=66;
+    }
+
+#if 0
+    matrix[x+n+(y+n)*w]=matrix[x-n+(y+n)*w]=
+	matrix[x+n+(y-n)*w]=matrix[x-n+(y-n)*w]=66;
+    for( i=n; i--; ) {
+	// FIXME: marks out of map area
+	DebugCheck( x-i+(y-n)*w<0 || x+i+(y+n)*w>w*TheMap.Hight );
+	matrix[x+n+(y+i)*w]=matrix[x-n+(y+i)*w]=
+	    matrix[x+n+(y-i)*w]=matrix[x-n+(y-i)*w]=
+	    matrix[x-i+(y+n)*w]=matrix[x+i+(y+n)*w]=
+	    matrix[x-i+(y-n)*w]=matrix[x+i+(y-n)*w]=66;
+    }
+#endif
+
+    mask=UnitMovementMask(unit);
+
+    points[0].X=x;
+    points[0].Y=y;
+    rp=0;
+    matrix[x+y*w]=1;			// mark start point
+    ep=wp=1;				// start with one point
+
+    //
+    //	Pop a point from stack, push all neighbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		m=matrix+x+y*w;
+		if( *m ) {			// already checked
+		    continue;
+		}
+
+		//
+		//	Look if there is a mine
+		//
+#ifdef NEW_FOW
+		if ( (mine=GoldMineOnMap(x,y)) && IsMapFieldExplored(unit->Player,x,y) ) {
+#else
+		if ( mine=GoldMineOnMap(x,y) ) {
+#endif
+		    if( destu ) {
+			n=max(abs(destx-x),abs(desty-y));
+			if( n<bestd ) {
+			    bestd=n;
+			    bestx=x;
+			    besty=y;
+			    bestmine=mine;
+			}
+			*m=22;
+		    } else {			// no goal take the first
+			return mine;
+		    }
+		}
+
+		if( CanMoveToMask(x,y,mask) ) {	// reachable
+		    *m=1;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+		    if( ++wp>=size ) {		// round about
+			wp=0;
+		    }
+		} else {			// unreachable
+		    *m=99;
+		}
+	    }
+	    if( ++rp>=size ) {			// round about
+		rp=0;
+	    }
+	}
+
+	//
+	//	Take best of this frame, if any.
+	//
+	if( bestd!=99999 ) {
+	    return bestmine;
+	}
+
+	//
+	//	Continue with next frame.
+	//
+	if( rp==wp ) {			// unreachable, no more points available
+	    break;
+	}
+	ep=wp;
+    }
+
+    DebugLevel3Fn("no mine in sight-range\n");
+
+    return NoUnitP;
 }
 
 /**
@@ -2625,8 +2759,8 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
     struct {
-		unsigned short X;
-		unsigned short Y;
+	unsigned short X;
+	unsigned short Y;
     } * points;
     int size;
     int x;
@@ -2654,7 +2788,6 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     size=TheMap.Width*TheMap.Height/4;
     points=alloca(size*sizeof(*points));
 	
-
     //
     //	Find the nearest wood depot
     //
@@ -2720,7 +2853,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     ep=wp=1;				// start with one point
 
     //
-    //	Pop a point from stack, push all neightbors which could be entered.
+    //	Pop a point from stack, push all neighbors which could be entered.
     //
     for( ;; ) {
 	while( rp!=ep ) {
@@ -2761,16 +2894,16 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		    *m=1;
 		    points[wp].X=x;		// push the point
 		    points[wp].Y=y;
-			if( ++wp>=size ) {			// round about
-				wp=0;
-			}
+		    if( ++wp>=size ) {		// round about
+			wp=0;
+		    }
 		} else {			// unreachable
 		    *m=99;
 		}
 	    }
-		if( ++rp>=size ) {			// round about
-			rp=0;
-		}
+	    if( ++rp>=size ) {			// round about
+		rp=0;
+	    }
 	}
 
 	//
