@@ -560,7 +560,8 @@ global void UnitLost(const Unit* unit)
     if( type->GivesOil && unit->Value > 0 ) {
 	// NOTE: I wasn't sure the best UnitType/Player
 	// NOTE: This should really NOT be hardcoded?!
-	temp=MakeUnitAndPlace(unit->X,unit->Y,UnitTypeByWcNum(93),&Players[15]);
+	temp=MakeUnitAndPlace(unit->X,unit->Y
+		,UnitTypeByIdent("unit-oil-patch"),&Players[15]);
 	temp->Value=unit->Value;
     }
 
