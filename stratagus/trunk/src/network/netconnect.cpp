@@ -846,7 +846,7 @@ changed:
 	    for (i = 0; i < 5; i++) {
 		NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
 	    }
-	    NetLocalState = ccs_unreachable;
+	    NetLocalState = ccs_usercanceled;
 	    NetConnectRunning = 0;	// End the menu..
 	    break;
 	case ccs_detaching:
@@ -1527,7 +1527,12 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				ServerSetupState.Ready[h] = 0;
 				ServerSetupState.Race[h] = 0;
 
-				// FIXME: Resync other clients here!
+				// Resync other clients
+				for (i = 1; i < HostsCount; i++) {
+				    if (i != h && Hosts[i].PlyNr) {
+					NetStates[i].State = ccs_async;
+				    }
+				}
 				NetConnectForceDisplayUpdate();
 				break;
 
