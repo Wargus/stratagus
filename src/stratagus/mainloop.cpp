@@ -801,6 +801,7 @@ global void GameMainLoop(void)
     PlaySectionMusic(PlaySectionGame);
 
     while (GameRunning) {
+
 #if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
 	if (setjmp(MainLoopJmpBuf)) {
 	    GamePaused = 1;
@@ -891,6 +892,8 @@ global void GameMainLoop(void)
 
 	TriggersEachCycle();		// handle triggers
 	UpdateMessages();		// update messages
+	
+	PlayListAdvance();		// Check for next song
 
 	//
 	//	Map scrolling
