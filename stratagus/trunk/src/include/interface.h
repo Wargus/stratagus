@@ -85,6 +85,21 @@ struct _button_action_ {
     char*	UnitMask;		/// for which units is it available
 };
 
+    /// Button area under cursor
+enum _button_area_ {
+    ButtonAreaInfo,			/// Info panel button
+    ButtonAreaTraining,			/// Training button
+    ButtonAreaButton,			/// Button panel button
+    ButtonAreaMenu,			/// Menu button
+};   
+
+    /// Menu button under cursor
+enum _menu_button_under_ {
+    ButtonUnderMenu,			/// Menu button
+    ButtonUnderNetworkMenu,		/// Network menu button
+    ButtonUnderNetworkDiplomacy,	/// Diplomacy button
+}; 
+
     /// current interface state
 enum _iface_state_ {
     IfaceStateNormal,			/// Normal Game state
@@ -232,10 +247,14 @@ extern enum _scroll_state_ MouseScrollState;
 extern enum _key_state_ KeyState;
     /// pointer to unit under the cursor
 extern Unit* UnitUnderCursor;
+    /// button area under the cursor
+extern int ButtonAreaUnderCursor;
     /// button number under the cursor
 extern int ButtonUnderCursor;
-    /// button 0 (Game Menu) was clicked down
+    /// menu button was clicked down
 extern char GameMenuButtonClicked;
+    /// diplomacy button was clicked down
+extern char GameDiplomacyButtonClicked;
     /// Mouse leaves windows stops scroll
 extern char LeaveStops;
     /// current CursorOn field

@@ -98,11 +98,11 @@ local void MoveMapViewPointUp(int step)
 {
     Viewport* vp;
 
-    vp = TheUI.SelectedViewport;
-    if (vp->MapY > step) {
-	vp->MapY -= step;
+    vp=TheUI.SelectedViewport;
+    if( vp->MapY>step ) {
+	vp->MapY-=step;
     } else {
-	vp->MapY = 0;
+	vp->MapY=0;
     }
 }
 
@@ -115,11 +115,11 @@ local void MoveMapViewPointLeft(int step)
 {
     Viewport* vp;
 
-    vp = TheUI.SelectedViewport;
-    if (vp->MapX > step) {
-	vp->MapX -= step;
+    vp=TheUI.SelectedViewport;
+    if( vp->MapX>step ) {
+	vp->MapX-=step;
     } else {
-	vp->MapX = 0;
+	vp->MapX=0;
     }
 }
 
@@ -132,12 +132,12 @@ local void MoveMapViewPointDown(int step)
 {
     Viewport* vp;
 
-    vp = TheUI.SelectedViewport;
-    if (TheMap.Height > vp->MapHeight
-	    && vp->MapY < TheMap.Height - vp->MapHeight - step) {
-	vp->MapY += step;
+    vp=TheUI.SelectedViewport;
+    if( TheMap.Height>vp->MapHeight
+	    && vp->MapY<TheMap.Height-vp->MapHeight-step ) {
+	vp->MapY+=step;
     } else {
-	vp->MapY = TheMap.Height - vp->MapHeight;
+	vp->MapY=TheMap.Height-vp->MapHeight;
     }
 }
 
@@ -150,12 +150,12 @@ local void MoveMapViewPointRight(int step)
 {
     Viewport* vp;
 
-    vp = TheUI.SelectedViewport;
-    if (TheMap.Width > vp->MapWidth
-	    && vp->MapX < TheMap.Width - vp->MapWidth - step) {
-	vp->MapX += step;
+    vp=TheUI.SelectedViewport;
+    if( TheMap.Width>vp->MapWidth
+	    && vp->MapX<TheMap.Width-vp->MapWidth-step) {
+	vp->MapX+=step;
     } else {
-	vp->MapX = TheMap.Width - vp->MapWidth;
+	vp->MapX=TheMap.Width-vp->MapWidth;
     }
 }
 
@@ -178,14 +178,14 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
     int stepx;
     int stepy;
 
-    if (fast) {
-	stepx = TheUI.SelectedViewport->MapWidth / 2;
-	stepy = TheUI.SelectedViewport->MapHeight / 2;
+    if( fast ) {
+	stepx=TheUI.SelectedViewport->MapWidth/2;
+	stepy=TheUI.SelectedViewport->MapHeight/2;
     } else {		// dynamic: let these variables increase upto fast..
-	stepx = stepy = 1;
+	stepx=stepy=1;
     }
 
-    switch (state) {
+    switch( state ) {
 	case ScrollUp:
 	    MoveMapViewPointUp(stepy);
 	    break;
@@ -217,9 +217,9 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 	default:
 	    return;			// skip marking map
     }
-    HandleMouseMove(CursorX, CursorY);	// This recalulates some values
+    HandleMouseMove(CursorX,CursorY);	// This recalulates some values
     MarkDrawEntireMap();
-    MustRedraw |= RedrawMinimap | RedrawCursors;
+    MustRedraw|=RedrawMinimap|RedrawCursors;
 }
 
 #ifdef DEBUG	// {
@@ -232,13 +232,13 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 */
 global void DebugTestDisplay(void)
 {
-    static int a = 0;
+    static int a=0;
     extern void DebugTestDisplayLines(void);
 
-    if (a) {
+    if( a ) {
 	return;
     }
-    a = 1;
+    a=1;
 
     //Enable one function-call as type of test to show one time
     DebugTestDisplayLines();
@@ -246,7 +246,7 @@ global void DebugTestDisplay(void)
     //DebugTestDisplayColorCube();
 
     // put it all on screen (when it is not already there ;)
-    InvalidateArea(0, 0, VideoWidth, VideoHeight);
+    InvalidateArea(0,0,VideoWidth,VideoHeight);
 }
 
 #endif	// } DEBUG
@@ -260,17 +260,42 @@ global void DebugTestDisplay(void)
 */
 local void DrawMenuButtonArea(void)
 {
-    VideoDrawSub(TheUI.MenuButton.Graphic,0,0
-	    ,TheUI.MenuButton.Graphic->Width
-	    ,TheUI.MenuButton.Graphic->Height
-	    ,TheUI.MenuButtonX,TheUI.MenuButtonY);
-
-    DrawMenuButton(MBUTTON_MAIN,
-	    (ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
-	    (GameMenuButtonClicked ? MenuButtonClicked : 0),
-	    128, 19,
-	    TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
-	    GameFont,"Menu (~<F10~>)",NULL,NULL);
+    if (TheUI.MenuButtonGraphic.Graphic) {
+	VideoDrawSub(TheUI.MenuButtonGraphic.Graphic,0,0,
+		TheUI.MenuButtonGraphic.Graphic->Width,
+		TheUI.MenuButtonGraphic.Graphic->Height,
+		TheUI.MenuButtonGraphicX, TheUI.MenuButtonGraphicY);
+    }
+    if( NetworkFildes==-1 ) {
+	if( TheUI.MenuButton.X!=-1 ) {
+	    DrawMenuButton(TheUI.MenuButton.Button,
+		    (ButtonAreaUnderCursor==ButtonAreaMenu
+			&& ButtonUnderCursor==ButtonUnderMenu ? MenuButtonActive : 0) |
+		    (GameMenuButtonClicked ? MenuButtonClicked : 0),
+		    TheUI.MenuButton.Width, TheUI.MenuButton.Height,
+		    TheUI.MenuButton.X,TheUI.MenuButton.Y,
+		    GameFont,TheUI.MenuButton.Text,NULL,NULL);
+	}
+    } else {
+	if( TheUI.NetworkMenuButton.X!=-1 ) {
+	    DrawMenuButton(TheUI.NetworkMenuButton.Button,
+		    (ButtonAreaUnderCursor==ButtonAreaMenu
+			&& ButtonUnderCursor==ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
+		    (GameMenuButtonClicked ? MenuButtonClicked : 0),
+		    TheUI.NetworkMenuButton.Width, TheUI.NetworkMenuButton.Height,
+		    TheUI.NetworkMenuButton.X,TheUI.NetworkMenuButton.Y,
+		    GameFont,TheUI.NetworkMenuButton.Text,NULL,NULL);
+	}
+	if( TheUI.NetworkDiplomacyButton.X!=-1 ) {
+	    DrawMenuButton(TheUI.NetworkDiplomacyButton.Button,
+		    (ButtonAreaUnderCursor==ButtonAreaMenu
+			&& ButtonUnderCursor==ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
+		    (GameDiplomacyButtonClicked ? MenuButtonClicked : 0),
+		    TheUI.NetworkDiplomacyButton.Width, TheUI.NetworkDiplomacyButton.Height,
+		    TheUI.NetworkDiplomacyButton.X,TheUI.NetworkDiplomacyButton.Y,
+		    GameFont,TheUI.NetworkDiplomacyButton.Text,NULL,NULL);
+	}
+    }
 
 #ifdef DRAW_DEBUG
     //
@@ -342,13 +367,13 @@ local void DrawMapViewport(Viewport* vp)
     // overlapping and draw only that what has changed..
     // Every to-be-drawn item added to this mechanism, can be handed by this
     // call.
-    if (InterfaceState == IfaceStateNormal) {
+    if( InterfaceState==IfaceStateNormal ) {
 	// DecorationRefreshDisplay();
 	DecorationUpdateDisplay();
     }
 
 #else
-    if (InterfaceState == IfaceStateNormal) {
+    if( InterfaceState==IfaceStateNormal ) {
 #ifdef NEW_MAPDRAW
 	MapUpdateFogOfWar(vp->MapX, vp->MapY);
 #else
@@ -366,27 +391,27 @@ local void DrawMapViewport(Viewport* vp)
 	//
 	//	An unit is tracked, center viewport on this unit.
 	//
-	if (vp->Unit) {
-	    if (vp->Unit->Destroyed ||
-		    vp->Unit->Orders[0].Action == UnitActionDie) {
-		vp->Unit = NoUnitP;
+	if( vp->Unit ) {
+	    if( vp->Unit->Destroyed ||
+		    vp->Unit->Orders[0].Action==UnitActionDie ) {
+		vp->Unit=NoUnitP;
 	    } else {
-		ViewportCenterViewpoint(vp, vp->Unit->X, vp->Unit->Y);
+		ViewportCenterViewpoint(vp,vp->Unit->X,vp->Unit->Y);
 	    }
 	}
 
-	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
+	SetClipping(vp->X,vp->Y,vp->EndX,vp->EndY);
 
-	DrawMapBackgroundInViewport(vp, vp->MapX, vp->MapY);
-	nunits = FindAndSortUnits(vp,table);
-	nmissiles = FindAndSortMissiles(vp, missiletable);
-	
-	i = 0;
-	j = 0;
-	CurrentViewport = vp;
-	while( i < nunits && j < nmissiles ) {
+	DrawMapBackgroundInViewport(vp,vp->MapX,vp->MapY);
+	nunits=FindAndSortUnits(vp,table);
+	nmissiles=FindAndSortMissiles(vp,missiletable);
+
+	i=0;
+	j=0;
+	CurrentViewport=vp;
+	while( i<nunits && j<nmissiles ) {
 	    if( table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel ) {
-		if ( UnitVisibleInViewport(vp, table[i]) ) {
+		if( UnitVisibleInViewport(vp,table[i]) ) {
 		    if( table[i]->Type->Building ) {
 			DrawBuilding(table[i]);
 		    } else {
@@ -413,7 +438,7 @@ local void DrawMapViewport(Viewport* vp)
 		j++;
 	    }
 	}
-	for( ; i < nunits; i++ ) {
+	for( ; i<nunits; ++i ) {
 	    if ( UnitVisibleInViewport(vp, table[i]) ) {
 		if( table[i]->Type->Building ) {
 		    DrawBuilding(table[i]);
@@ -422,7 +447,7 @@ local void DrawMapViewport(Viewport* vp)
 		}
 	    }
 	}
-	for( ; j < nmissiles; j++ ) {
+	for( ; j<nmissiles; ++j ) {
 	    x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X;
 	    y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y;
 	    // FIXME: I should copy SourcePlayer for second level missiles.
@@ -447,9 +472,9 @@ local void DrawMapViewport(Viewport* vp)
     // Resources over map!
     // FIXME: trick17! must find a better solution
     // FIXME: must take resource end into account
-    if (TheUI.MapArea.X<=TheUI.ResourceX && TheUI.MapArea.EndX>=TheUI.ResourceX
+    if( TheUI.MapArea.X<=TheUI.ResourceX && TheUI.MapArea.EndX>=TheUI.ResourceX
 	    && TheUI.MapArea.Y<=TheUI.ResourceY
-	    && TheUI.MapArea.EndY>=TheUI.ResourceY) {
+	    && TheUI.MapArea.EndY>=TheUI.ResourceY ) {
 	MustRedraw|=RedrawResources;
     }
 #endif
@@ -467,26 +492,26 @@ global void DrawMapArea(void)
     const Viewport* evp;
 
     // Draw all map viewports
-    evp = TheUI.Viewports + TheUI.NumViewports;
-    for (vp = TheUI.Viewports; vp < evp; vp++) {
+    evp=TheUI.Viewports+TheUI.NumViewports;
+    for( vp=TheUI.Viewports; vp<evp; ++vp) {
 	DrawMapViewport(vp);
     }
 
     // if we a single viewport, no need to denote the "selected" one
-    if (TheUI.NumViewports == 1) {
+    if( TheUI.NumViewports==1 ) {
 	return;
     }
 
     //
     //	Separate the viewports and mark the active viewport.
     //
-    for (vp = TheUI.Viewports; vp < evp; vp++) {
+    for( vp=TheUI.Viewports; vp<evp; ++vp ) {
 	enum _sys_colors_ color;
 
-	if (vp == TheUI.SelectedViewport) {
-	    color = ColorOrange;
+	if( vp==TheUI.SelectedViewport ) {
+	    color=ColorOrange;
 	} else {
-	    color = ColorBlack;
+	    color=ColorBlack;
 	}
 
 	// -
@@ -550,7 +575,7 @@ global void UpdateDisplay(void)
 	DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
 	DrawMinimapCursor(TheUI.SelectedViewport->MapX,
 		TheUI.SelectedViewport->MapY);
-    } else if (MustRedraw&RedrawMinimapCursor) {
+    } else if( MustRedraw&RedrawMinimapCursor ) {
 	HideMinimapCursor();
 	DrawMinimapCursor(TheUI.SelectedViewport->MapX,
 		TheUI.SelectedViewport->MapY);
@@ -611,10 +636,29 @@ global void UpdateDisplay(void)
 	    }
 	}
 	if(MustRedraw&RedrawMenuButton ) {
-	    InvalidateAreaAndCheckCursor(
-		     TheUI.MenuButtonX,TheUI.MenuButtonY
-		    ,TheUI.MenuButton.Graphic->Width
-		    ,TheUI.MenuButton.Graphic->Height);
+	    if( NetworkFildes==-1 ) {
+		if( TheUI.MenuButton.X!=-1 ) {
+		    InvalidateAreaAndCheckCursor(
+			    TheUI.MenuButton.X,TheUI.MenuButton.Y,
+			    TheUI.MenuButton.Width,
+			    TheUI.MenuButton.Height);
+		}
+	    } else {
+		if( TheUI.NetworkMenuButton.X!=-1 ) {
+		    InvalidateAreaAndCheckCursor(
+			    TheUI.NetworkMenuButton.X,
+			    TheUI.NetworkMenuButton.Y,
+			    TheUI.NetworkMenuButton.Width,
+			    TheUI.NetworkMenuButton.Height);
+		}
+		if( TheUI.NetworkDiplomacyButton.X!=-1 ) {
+		    InvalidateAreaAndCheckCursor(
+			    TheUI.NetworkDiplomacyButton.X,
+			    TheUI.NetworkDiplomacyButton.Y,
+			    TheUI.NetworkDiplomacyButton.Width,
+			    TheUI.NetworkDiplomacyButton.Height);
+		}
+	    }
 	}
 	if( MustRedraw&RedrawMinimapBorder ) {
 	    InvalidateAreaAndCheckCursor(
@@ -720,14 +764,14 @@ global void GameMainLoop(void)
 
     while( GameRunning ) {
 #if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
-	if (setjmp (MainLoopJmpBuf)) {
+	if( setjmp(MainLoopJmpBuf) ) {
 	    GamePaused = 1;
 	}
 #endif
 	//
 	//	Game logic part
 	//
-	if (!GamePaused && NetworkInSync && !SkipGameCycle) {
+	if( !GamePaused && NetworkInSync && !SkipGameCycle ) {
 	    SinglePlayerReplayEachCycle();
 	    if( !++GameCycle ) {
 		// FIXME: tests with game cycle counter now fails :(
