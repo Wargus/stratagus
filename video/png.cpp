@@ -262,7 +262,7 @@ global void SaveScreenshotPNG(const char* name)
     png_write_info(png_ptr, info_ptr);
 
     for (i=0; i<VideoHeight; ++i) {
-	switch (VideoBpp) {
+	switch (VideoDepth) {
 	case 8:
 	    // FIXME: Finish
 	    break;
@@ -283,8 +283,11 @@ global void SaveScreenshotPNG(const char* name)
 	    }
 	    break;
 	case 24:
-	    memcpy(row, VideoMemory24+i*VideoWidth, VideoWidth*3);
-	    break;
+	    if (VideoBpp==24) {
+		memcpy(row, VideoMemory24+i*VideoWidth, VideoWidth*3);
+		break;
+	    }
+	    // FALL THROUGH
 	case 32:
 	    for (j=0; j<VideoWidth; ++j) {
 		VMemType32 c = VideoMemory32[i*VideoWidth+j];
