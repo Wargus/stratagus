@@ -1154,7 +1154,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    unsigned short* mtxm;
 
 	    if( length!=(uint32_t)width*height*2 ) {
-		DebugLevel1("wrong length of MTXM section %ld\n" _C_ length);
+		DebugLevel1("wrong length of MTXM section %u\n" _C_ length);
 		ExitFatal(-1);
 	    }
 	    if( !(mtxm=malloc(length)) ) {
@@ -1179,7 +1179,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    unsigned short* sqm;
 
 	    if( length!=(uint32_t)width*height*sizeof(short) ) {
-		DebugLevel1("wrong length of SQM  section %ld\n" _C_ length);
+		DebugLevel1("wrong length of SQM  section %u\n" _C_ length);
 		ExitFatal(-1);
 	    }
 	    if( !(sqm=malloc(length)) ) {
@@ -1204,7 +1204,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    unsigned short* regm;
 
 	    if( length!=(uint32_t)width*height*sizeof(short) ) {
-		DebugLevel1("wrong length of REGM section %ld\n" _C_ length);
+		DebugLevel1("wrong length of REGM section %u\n" _C_ length);
 		ExitFatal(-1);
 	    }
 	    if( !(regm=malloc(length)) ) {
