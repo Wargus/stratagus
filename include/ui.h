@@ -96,8 +96,6 @@ typedef struct _viewport_ Viewport;	/// Viewport typedef
 **		Viewport is bound to an unit. If the unit moves the viewport
 **		changes the position together with the unit.
 **		@todo binding to a group.
-**
-**	@todo mixing unsigned and int is dangerous!!!
 */
 struct _viewport_ {
     int X;			/// Screen pixel left corner x coordinate
