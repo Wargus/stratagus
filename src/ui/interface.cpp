@@ -99,16 +99,16 @@ local void ShowInput(void)
 {
     char* input;
 
-    sprintf(InputStatusLine,"MESSAGE:%s~!_",Input);
-    input=InputStatusLine;
+    sprintf(InputStatusLine, "MESSAGE:%s~!_", Input);
+    input = InputStatusLine;
     // FIXME: This is slow!
-    while( VideoTextLength(GameFont,input)>TheUI.StatusLine.Graphic->Width ) {
+    while (VideoTextLength(GameFont,input) > TheUI.StatusLine.Graphic->Width) {
 	++input;
     }
-    KeyState=KeyStateCommand;
+    KeyState = KeyStateCommand;
     ClearStatusLine();
     SetStatusLine(input);
-    KeyState=KeyStateInput;
+    KeyState = KeyStateInput;
 }
 
 /**
@@ -116,9 +116,9 @@ local void ShowInput(void)
 */
 local void UiBeginInput(void)
 {
-    KeyState=KeyStateInput;
-    Input[0]='\0';
-    InputIndex=0;
+    KeyState = KeyStateInput;
+    Input[0] = '\0';
+    InputIndex = 0;
 #ifndef NEW_UI
     ClearCosts();
 #endif
@@ -155,18 +155,18 @@ local void UiCenterOnGroup(unsigned group)
     int x;
     int y;
 
-    n=GetNumberUnitsOfGroup(group);
-    if( n-- ) {
-	units=GetUnitsOfGroup(group);
+    n = GetNumberUnitsOfGroup(group);
+    if (n--) {
+	units = GetUnitsOfGroup(group);
 	// FIXME: what should we do with the removed units? ignore?
 
-	x=units[n]->X;
-	y=units[n]->Y;
-	while( n-- ) {
-	    x+=(units[n]->X-x)/2;
-	    y+=(units[n]->Y-y)/2;
+	x = units[n]->X;
+	y = units[n]->Y;
+	while (n--) {
+	    x += (units[n]->X - x) / 2;
+	    y += (units[n]->Y - y) / 2;
 	}
-	ViewportCenterViewpoint(TheUI.SelectedViewport,x,y);
+	ViewportCenterViewpoint(TheUI.SelectedViewport, x, y);
     }
 }
 
@@ -183,14 +183,14 @@ local void UiSelectGroup(unsigned group)
     //
     //	Check if group is already selected.
     //
-    n=GetNumberUnitsOfGroup(group);
-    if( n && NumSelected==n ) {
-	units=GetUnitsOfGroup(group);
+    n = GetNumberUnitsOfGroup(group);
+    if (n && NumSelected == n) {
+	units = GetUnitsOfGroup(group);
 
 	// FIXME: what should we do with the removed units? ignore?
-	while( n-- && units[n]==Selected[n] ) {
+	while (n-- && units[n] == Selected[n]) {
 	}
-	if( n==-1 ) {
+	if (n == -1) {
 	    UiCenterOnGroup(group);
 	    return;
 	}
@@ -198,7 +198,7 @@ local void UiSelectGroup(unsigned group)
 
     SelectGroup(group);
     SelectionChanged();
-    MustRedraw|=RedrawMap|RedrawInfoPanel;
+    MustRedraw |= RedrawMap | RedrawInfoPanel;
 }
 
 /**
@@ -211,30 +211,30 @@ local void UiAddGroupToSelection(unsigned group)
     Unit** units;
     int n;
 
-    if( !(n=GetNumberUnitsOfGroup(group)) ) {
+    if (!(n = GetNumberUnitsOfGroup(group))) {
         return;
     }
 
     //
     //	Don't allow to mix units and buildings
     //
-    if( NumUnits && Selected[0]->Type->Building ) {
+    if (NumUnits && Selected[0]->Type->Building) {
 	return;
     }
 
-    units=GetUnitsOfGroup(group);
-    if( units[0]->Type->Building ) {
+    units = GetUnitsOfGroup(group);
+    if (units[0]->Type->Building) {
 	return;
     }
 
-    while( n-- ) {
-	if( !units[n]->Removed ) {
+    while (n--) {
+	if (!units[n]->Removed) {
 	    SelectUnit(units[n]);
 	}
     }
 
     SelectionChanged();
-    MustRedraw|=RedrawMap|RedrawInfoPanel;
+    MustRedraw |= RedrawMap | RedrawInfoPanel;
 }
 
 /**
@@ -244,7 +244,7 @@ local void UiAddGroupToSelection(unsigned group)
 */
 local void UiDefineGroup(unsigned group)
 {
-    SetGroup(Selected,NumSelected,group);
+    SetGroup(Selected, NumSelected, group);
 }
 
 /**
@@ -254,7 +254,7 @@ local void UiDefineGroup(unsigned group)
 */
 local void UiAddToGroup(unsigned group)
 {
-    AddToGroup(Selected,NumSelected,group);
+    AddToGroup(Selected, NumSelected, group);
 }
 
 #if 0
@@ -287,10 +287,10 @@ local void UiAddToAlternateGroup(unsigned group)
 local void UiToggleSound(void)
 {
 #ifdef WITH_SOUND
-    if( SoundFildes != -1 ) {
-	SoundOff^=1;
+    if (SoundFildes != -1) {
+	SoundOff ^= 1;
     }
-    if( SoundOff ) {
+    if (SoundOff) {
 	SetStatusLine("Sound is off.");
     } else {
 	SetStatusLine("Sound is on.");
@@ -325,8 +325,8 @@ local void UiToggleMusic(void)
 */
 global void UiTogglePause(void)
 {
-    GamePaused^=1;
-    if( GamePaused ) {
+    GamePaused ^= 1;
+    if (GamePaused) {
 	SetStatusLine("Game Paused");
     } else {
 	SetStatusLine("Game Resumed");
@@ -338,8 +338,8 @@ global void UiTogglePause(void)
 */
 local void UiEnterMenu(void)
 {
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     ProcessMenu("menu-game", 0);
@@ -350,8 +350,8 @@ local void UiEnterMenu(void)
 */
 local void UiEnterHelpMenu(void)
 {
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     ProcessMenu("menu-help", 0);
@@ -362,8 +362,8 @@ local void UiEnterHelpMenu(void)
 */
 local void UiEnterOptionsMenu(void)
 {
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     ProcessMenu("menu-game-options", 0);
@@ -374,8 +374,8 @@ local void UiEnterOptionsMenu(void)
 */
 local void UiEnterSoundOptionsMenu(void)
 {
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     SoundOptionsMenu();
@@ -386,8 +386,8 @@ local void UiEnterSoundOptionsMenu(void)
 */
 local void UiEnterSpeedOptionsMenu(void)
 {
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     SpeedOptionsMenu();
@@ -398,8 +398,8 @@ local void UiEnterSpeedOptionsMenu(void)
 */
 local void UiEnterPreferencesOptionsMenu(void)
 {
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     PreferencesMenu();
@@ -415,8 +415,8 @@ local void UiEnterSaveGameMenu(void)
 	return;
     }
 
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     SaveGameMenu();
@@ -432,8 +432,8 @@ local void UiEnterLoadGameMenu(void)
 	return;
     }
 
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     LoadGameMenu();
@@ -444,8 +444,8 @@ local void UiEnterLoadGameMenu(void)
 */
 local void UiExitConfirmMenu(void)
 {
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     ExitConfirmMenu();
@@ -456,8 +456,8 @@ local void UiExitConfirmMenu(void)
 */
 local void UiQuitToMenuConfirmMenu(void)
 {
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     QuitToMenuConfirmMenu();
@@ -468,8 +468,8 @@ local void UiQuitToMenuConfirmMenu(void)
 */
 local void UiRestartConfirmMenu(void)
 {
-    if( NetworkFildes==(Socket)-1 ) {
-	GamePaused=1;
+    if (NetworkFildes == (Socket)-1) {
+	GamePaused = 1;
 	SetStatusLine("Game Paused");
     }
     RestartConfirmMenu();
@@ -530,7 +530,7 @@ local void UiToggleBigMap(void)
 */
 local void UiIncrementGameSpeed(void)
 {
-    VideoSyncSpeed+=10;
+    VideoSyncSpeed += 10;
     SetVideoSync();
     SetStatusLine("Faster");
 }
@@ -540,12 +540,12 @@ local void UiIncrementGameSpeed(void)
 */
 local void UiDecrementGameSpeed(void)
 {
-    if( VideoSyncSpeed<=0 ) {
-	VideoSyncSpeed=0;
-    } else if( VideoSyncSpeed<11 ) {
-	VideoSyncSpeed-=1;
+    if (VideoSyncSpeed <= 0) {
+	VideoSyncSpeed = 0;
+    } else if (VideoSyncSpeed < 11) {
+	VideoSyncSpeed -= 1;
     } else {
-	VideoSyncSpeed-=10;
+	VideoSyncSpeed -= 10;
     }
     SetVideoSync();
     SetStatusLine("Slower");
@@ -563,14 +563,14 @@ local void UiCenterOnSelected(void)
     int y;
     int n;
 
-    if(	(n=NumSelected) ) {
-	x=Selected[--n]->X;
-	y=Selected[n]->Y;
-	while( n-- ) {
-	    x+=(Selected[n]->X-x)/2;
-	    y+=(Selected[n]->Y-y)/2;
+    if ((n = NumSelected)) {
+	x = Selected[--n]->X;
+	y = Selected[n]->Y;
+	while (n--) {
+	    x += (Selected[n]->X - x) / 2;
+	    y += (Selected[n]->Y - y) / 2;
 	}
-	ViewportCenterViewpoint(TheUI.SelectedViewport,x,y);
+	ViewportCenterViewpoint(TheUI.SelectedViewport, x, y);
     }
 }
 
@@ -601,13 +601,13 @@ local void UiRecallMapPosition(unsigned position)
 */
 local void UiToggleTerrain(void)
 {
-    MinimapWithTerrain^=1;
-    if( MinimapWithTerrain ) {
+    MinimapWithTerrain ^= 1;
+    if (MinimapWithTerrain) {
 	SetStatusLine("Terrain displayed.");
     } else {
 	SetStatusLine("Terrain hidden.");
     }
-    MustRedraw|=RedrawMinimap;
+    MustRedraw |= RedrawMinimap;
 }
 
 /**
@@ -617,23 +617,23 @@ local void UiFindIdleWorker(void)
 {
     Unit* unit;
     // FIXME: static variable, is not needed.
-    static Unit* LastIdleWorker=NoUnitP;
+    static Unit* LastIdleWorker = NoUnitP;
 
-    unit=FindIdleWorker(ThisPlayer,LastIdleWorker);
-    if( unit!=NoUnitP ) {
-	LastIdleWorker=unit;
+    unit = FindIdleWorker(ThisPlayer, LastIdleWorker);
+    if (unit != NoUnitP) {
+	LastIdleWorker = unit;
 	SelectSingleUnit(unit);
 	ClearStatusLine();
 #ifndef NEW_UI
 	ClearCosts();
-	CurrentButtonLevel=0;
+	CurrentButtonLevel = 0;
 #else
 	// stupid trick, just in case SelectionChanged() should be slow it
 	// will probably feel faster if you hear the sound at once :)
 #endif
-	PlayUnitSound(Selected[0],VoiceSelected);
+	PlayUnitSound(Selected[0], VoiceSelected);
 	SelectionChanged();
-	ViewportCenterViewpoint(TheUI.SelectedViewport,unit->X,unit->Y);
+	ViewportCenterViewpoint(TheUI.SelectedViewport, unit->X, unit->Y);
     }
 }
 
@@ -652,7 +652,7 @@ local void UiToggleGrabMouse(void)
 */
 local void UiTrackUnit(void)
 {
-    if( TheUI.SelectedViewport->Unit == Selected[0] ) {
+    if (TheUI.SelectedViewport->Unit == Selected[0]) {
 	TheUI.SelectedViewport->Unit = NULL;
     } else {
 	TheUI.SelectedViewport->Unit = Selected[0];
@@ -667,7 +667,7 @@ local void UiTrackUnit(void)
 */
 local int CommandKey(int key)
 {
-    switch( key ) {
+    switch (key) {
 	case '\r':			// Return enters chat/input mode.
 	    UiBeginInput();
 	    return 1;
@@ -681,51 +681,51 @@ local int CommandKey(int key)
         case '3': case '4': case '5':
         case '6': case '7': case '8':
         case '9':
-            if( KeyModifiers&ModifierShift ) {
-		if( KeyModifiers&ModifierAlt ) {
+            if (KeyModifiers & ModifierShift) {
+		if (KeyModifiers & ModifierAlt) {
 		    //UiAddToAlternateGroup(key-'0');
-		    UiCenterOnGroup(key-'0');
-		} else if( KeyModifiers&ModifierControl ) {
-		    UiAddToGroup(key-'0');
+		    UiCenterOnGroup(key - '0');
+		} else if (KeyModifiers & ModifierControl) {
+		    UiAddToGroup(key - '0');
 		} else {
-		    UiAddGroupToSelection(key-'0');
+		    UiAddGroupToSelection(key - '0');
 		}
 	    } else {
-		if( KeyModifiers&ModifierAlt ) {
-		    // UiDefineAlternateGroup(key-'0');
-		    UiCenterOnGroup(key-'0');
-		} else if( KeyModifiers&ModifierControl ) {
-		    UiDefineGroup(key-'0');
+		if (KeyModifiers & ModifierAlt) {
+		    // UiDefineAlternateGroup(key - '0');
+		    UiCenterOnGroup(key - '0');
+		} else if (KeyModifiers & ModifierControl) {
+		    UiDefineGroup(key - '0');
 		} else {
-		    UiSelectGroup(key-'0');
+		    UiSelectGroup(key - '0');
 		}
 	    }
             break;
 
 #if 0
-    IfDebug(
+#ifdef DEBUG
 	case '0':
 	    ++ThisPlayer;
-	    if( ThisPlayer==&Players[PlayerMax] ) {
-		ThisPlayer=&Players[0];
+	    if (ThisPlayer == &Players[PlayerMax]) {
+		ThisPlayer = &Players[0];
 	    }
-	    MustRedraw=RedrawEverything;
+	    MustRedraw = RedrawEverything;
 	    break;
 
 	case '1':
 	    --ThisPlayer;
-	    if( ThisPlayer<&Players[0] ) {
-		ThisPlayer=&Players[PlayerMax-1];
+	    if (ThisPlayer < &Players[0]) {
+		ThisPlayer = &Players[PlayerMax - 1];
 	    }
-	    MustRedraw=RedrawEverything;
+	    MustRedraw = RedrawEverything;
 	    break;
-    );
+#endif
 #endif
 
-	case 'p'&0x1F:
+	case 'p' & 0x1F:
 	case 'p':			// If pause-key didn't work
 	case 'P':			// CTRL-P, ALT-P Toggle pause
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
         case KeyCodePause:
@@ -739,50 +739,50 @@ local int CommandKey(int key)
 	case KeyCodeF2:
 	case KeyCodeF3:
 	case KeyCodeF4:			// Set/Goto place
-	    if( KeyModifiers&ModifierShift ) {
-		UiSaveMapPosition(key-KeyCodeF1);
+	    if (KeyModifiers & ModifierShift) {
+		UiSaveMapPosition(key - KeyCodeF1);
 	    } else {
-		UiRecallMapPosition(key-KeyCodeF1);
+		UiRecallMapPosition(key - KeyCodeF1);
 	    }
 	    break;
 
 	case 'm':
 	case 'M':			// ALT+M, F10 Game menu
-	    if( KeyModifiers&ModifierControl ) {
+	    if (KeyModifiers & ModifierControl) {
 		UiToggleMusic();
 		SavePreferences();
 		break;
 	    }
-	    if( !(KeyModifiers&ModifierAlt) ) {
+	    if (!(KeyModifiers & ModifierAlt)) {
 		break;
 	    }
 
 	case KeyCodeF5:			// Options menu
-	    if( KeyState!=KeyStateInput ) {
+	    if (KeyState != KeyStateInput) {
 		UiEnterOptionsMenu();
 	    }
 	    break;
 
 	case KeyCodeF7:			// Sound Options menu
-	    if( KeyState!=KeyStateInput ) {
+	    if (KeyState != KeyStateInput) {
 		UiEnterSoundOptionsMenu();
 	    }
 	    break;
 
 	case KeyCodeF8:			// Speed Options menu
-	    if( KeyState!=KeyStateInput ) {
+	    if (KeyState != KeyStateInput) {
 		UiEnterSpeedOptionsMenu();
 	    }
 	    break;
 
 	case KeyCodeF9:			// Preferences menu
-	    if( KeyState!=KeyStateInput ) {
+	    if (KeyState != KeyStateInput) {
 		UiEnterPreferencesOptionsMenu();
 	    }
 	    break;
 
 	case KeyCodeF10:		// Game Options menu
-	    if( KeyState!=KeyStateInput ) {
+	    if (KeyState != KeyStateInput) {
 		UiEnterMenu();
 	    }
 	    break;
@@ -798,35 +798,35 @@ local int CommandKey(int key)
 	    UiDecrementGameSpeed();
 	    break;
 
-	case 'l'&0x1F:
+	case 'l' & 0x1F:
 	case 'l':			// ALT l F12 load game menu
 	case 'L':
 #ifdef DEBUG
-	    if( KeyModifiers&ModifierControl ) {// Ctrl + L - load - all debug
+	    if (KeyModifiers & ModifierControl) {// Ctrl + L - load - all debug
 		LoadAll();
 		SetMessage("All loaded");
 		break;
 	    }
 #endif
-	    if( !(KeyModifiers&ModifierAlt) ) {
+	    if (!(KeyModifiers & ModifierAlt)) {
 		break;
 	    }
 	case KeyCodeF12:
 	    UiEnterLoadGameMenu();
 	    break;
 
-	case 's'&0x1F:			// Ctrl + S - Turn sound on / off
+	case 's' & 0x1F:			// Ctrl + S - Turn sound on / off
 	    UiToggleSound();
 	    SavePreferences();
 	    break;
 
 	case 's':			// ALT s F11 save game menu
 	case 'S':
-	    if( KeyModifiers&ModifierControl ) {
+	    if (KeyModifiers & ModifierControl) {
 		UiToggleSound();
 		break;
 	    }
-	    if( !(KeyModifiers&ModifierAlt) ) {
+	    if (!(KeyModifiers & ModifierAlt)) {
 		break;
 	    }
 	    // FALL THROUGH (ALT+S)
@@ -834,19 +834,19 @@ local int CommandKey(int key)
 	    UiEnterSaveGameMenu();
 	    break;
 
-	case 't'&0x1F:
+	case 't' & 0x1F:
 	case 't':
 	case 'T':			// ALT-T, CTRL-T Track unit
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
 	    UiTrackUnit();
 	    break;
 
-	case 'b'&0x1F:
+	case 'b' & 0x1F:
 	case 'b':
 	case 'B':			// ALT+B, CTRL+B Toggle big map
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
 	    UiToggleBigMap();
@@ -857,29 +857,29 @@ local int CommandKey(int key)
 	    UiCenterOnSelected();
 	    break;
 
-	case 'f'&0x1F:
+	case 'f' & 0x1F:
 	case 'f':
 	case 'F':			// ALT+F, CTRL+F toggle fullscreen
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
 	    ToggleFullScreen();
 	    SavePreferences();
 	    break;
 
-	case 'g'&0x1F:
+	case 'g' & 0x1F:
 	case 'g':
 	case 'G':			// ALT+G, CTRL+G grab mouse pointer
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
 	    UiToggleGrabMouse();
 	    break;
 
-	case 'h'&0x1F:
+	case 'h' & 0x1F:
 	case 'h':
 	case 'H':			// ALT+H, CTRL+H Help menu
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
 	    UiEnterHelpMenu();
@@ -892,34 +892,34 @@ local int CommandKey(int key)
 	case '\t':			// TAB toggles minimap.
 					// FIXME: more...
 					// FIXME: shift+TAB
-	    if( KeyModifiers&ModifierAlt ) {
+	    if (KeyModifiers & ModifierAlt) {
 		break;
 	    }
 	    UiToggleTerrain();
 	    break;
 
-	case 'x'&0x1F:
+	case 'x' & 0x1F:
 	case 'x':
 	case 'X':			// ALT+X, CTRL+X: Exit game
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
 	    UiExitConfirmMenu();
 	    break;
 
-	case 'q'&0x1F:
+	case 'q' & 0x1F:
 	case 'q':
 	case 'Q':			// ALT+Q, CTRL+Q: Quit level
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
 	    UiQuitToMenuConfirmMenu();
 	    break;
 
-	case 'r'&0x1F:
+	case 'r' & 0x1F:
 	case 'r':
 	case 'R':			// ALT+R, CTRL+R: Restart scenario
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
 	    UiRestartConfirmMenu();
@@ -928,7 +928,7 @@ local int CommandKey(int key)
 	case '.':
 	case 'i':
 	case 'I':			// ., ALT+I, CTRL+I: Find idle worker
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
 	    UiFindIdleWorker();
@@ -1007,7 +1007,7 @@ global int HandleCheats(const char* Input)
 	UpdateFogOfWarChange();
 	SetMessage("Fog Of War is now OFF");
     } else if (strcmp(Input, "fast debug") == 0) {
-	for (i=1; i<MaxCosts; ++i) {
+	for (i = 1; i < MaxCosts; ++i) {
 	    SpeedResourcesHarvest[i] = 10;
 	    SpeedResourcesReturn[i] = 10;
 	}
@@ -1017,7 +1017,7 @@ global int HandleCheats(const char* Input)
 	SpeedResearch = 10;	// speed factor for researching
 	SetMessage("FAST DEBUG SPEED");
     } else if (strcmp(Input, "normal debug") == 0) {
-	for (i=1; i<MaxCosts; ++i) {
+	for (i = 1; i < MaxCosts; ++i) {
 	    SpeedResourcesHarvest[i] = 1;
 	    SpeedResourcesReturn[i] = 1;
 	}
@@ -1029,7 +1029,7 @@ global int HandleCheats(const char* Input)
     } else if (strcmp(Input, "make it so") == 0) {
 	if (SpeedCheat) {
 	    SpeedCheat = 0;
-	    for (i=1; i<MaxCosts; ++i) {
+	    for (i = 1; i < MaxCosts; ++i) {
 		SpeedResourcesHarvest[i] = 1;
 		SpeedResourcesReturn[i] = 1;
 	    }
@@ -1040,7 +1040,7 @@ global int HandleCheats(const char* Input)
 	    SetMessage("NO SO!");
 	} else {
 	    SpeedCheat = 1;
-	    for (i=1; i<MaxCosts; ++i) {
+	    for (i = 1; i < MaxCosts; ++i) {
 		SpeedResourcesHarvest[i] = 10;
 		SpeedResourcesReturn[i] = 10;
 	    }
@@ -1057,13 +1057,13 @@ global int HandleCheats(const char* Input)
 	    MustRedraw |= RedrawResources;
 	    SetMessage("SO!");
 	}
-    } else if (!strcmp(Input, "unite the clans") ) {
+    } else if (!strcmp(Input, "unite the clans")) {
 	GameRunning = 0;
 	GameResult = GameVictory;
-    } else if (!strcmp(Input, "you pitiful worm") ) {
+    } else if (!strcmp(Input, "you pitiful worm")) {
 	GameRunning = 0;
 	GameResult = GameDefeat;
-    } else if (!strcmp(Input, "it is a good day to die") ) {
+    } else if (!strcmp(Input, "it is a good day to die")) {
 	GodMode = !GodMode;
 	if (GodMode) {
 	    SetMessage("God Mode ON");
@@ -1071,16 +1071,16 @@ global int HandleCheats(const char* Input)
 	    SetMessage("God Mode OFF");
 	}
 #ifdef DEBUG
-    } else if (!strcmp(Input, "ai me") ) {
-	if( ThisPlayer->AiEnabled ) {
+    } else if (!strcmp(Input, "ai me")) {
+	if (ThisPlayer->AiEnabled) {
 	    ThisPlayer->AiEnabled = 0;
 	    ThisPlayer->Type = PlayerPerson;
 	    SetMessage("AI is off, Normal Player");
 	} else {
 	    ThisPlayer->AiEnabled = 1;
 	    ThisPlayer->Type = PlayerComputer;
-	    if( !ThisPlayer->Ai ) {
-	    	AiInit( ThisPlayer );
+	    if (!ThisPlayer->Ai) {
+	    	AiInit(ThisPlayer);
 	    }
 	    SetMessage("I'm the BORG, resistance is futile!");
 	}
@@ -1100,16 +1100,16 @@ global int HandleCheats(const char* Input)
 */
 local int InputKey(int key)
 {
-    char ChatMessage[sizeof(Input)+40];
+    char ChatMessage[sizeof(Input) + 40];
     int i;
-    char *namestart;
-    char *p;
-    char *q;
+    char* namestart;
+    char* p;
+    char* q;
 
     switch (key) {
 	case '\r':
 	    // Replace ~~ with ~
-	    for (p = q = Input; *p; ) {
+	    for (p = q = Input; *p;) {
 		if (*p == '~') {
 		    ++p;
 		}
@@ -1118,22 +1118,22 @@ local int InputKey(int key)
 	    *q = '\0';
 	    if (Input[0] == '(') {
 		if (!GameObserve && !GamePaused) {
-		    CommandLog("input", NoUnitP,FlushCommands,-1,-1,NoUnitP,Input,-1);
+		    CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
 		    CclCommand(Input);
 		}
-	    } else if (NetworkFildes==(Socket)-1) {
+	    } else if (NetworkFildes == (Socket)-1) {
 		if (!GameObserve && !GamePaused) {
 		    int ret;
 		    ret = HandleCheats(Input);
 		    if (ret) {
-			CommandLog("input", NoUnitP,FlushCommands,-1,-1,NoUnitP,Input,-1);
+			CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
 		    }
 		}
 	    }
 	    
 	    // Check for Replay and ffw x
 #ifdef DEBUG
-	    if (strncmp(Input,"ffw ",4) == 0 ) {
+	    if (strncmp(Input,"ffw ",4) == 0) {
 #else
 	    if (strncmp(Input,"ffw ",4) == 0 && ReplayGameType != ReplayNone) {
 #endif
@@ -1153,8 +1153,9 @@ local int InputKey(int key)
 			++p;
 		    }
 		}
-		sprintf(ChatMessage, "~%s~<%s>~> %s", PlayerColorNames[ThisPlayer->Player],
-			ThisPlayer->Name, Input);
+		sprintf(ChatMessage, "~%s~<%s>~> %s",
+		    PlayerColorNames[ThisPlayer->Player],
+		    ThisPlayer->Name, Input);
 		// FIXME: only to selected players ...
 		NetworkChatMessage(ChatMessage);
 	    }
@@ -1200,8 +1201,8 @@ local int InputKey(int key)
 	    return 1;
 	default:
 	    if (key >= ' ' && key <= 256) {
-		if ((key == '~' && InputIndex < (int)sizeof(Input) - 2)
-			|| InputIndex < (int)sizeof(Input) - 1) {
+		if ((key == '~' && InputIndex < (int)sizeof(Input) - 2) ||
+			InputIndex < (int)sizeof(Input) - 1) {
 		    DebugLevel3("Key %c\n" _C_ key);
 		    Input[InputIndex++] = key;
 		    Input[InputIndex] = '\0';
@@ -1223,14 +1224,14 @@ local int InputKey(int key)
 */
 local void Screenshot(void)
 {
-    CLFile *fd;
+    CLFile* fd;
     char filename[30];
     int i;
 
-    for( i=1; i<99; ++i ) {
+    for (i = 1; i < 99; ++i) {
 	// FIXME: what if we can't write to this directory?
 	sprintf(filename, "screen%02d.png", i);
-	if( !(fd = CLopen(filename,CL_OPEN_READ)) ) {
+	if (!(fd = CLopen(filename, CL_OPEN_READ))) {
 	    break;
 	}
 	CLclose(fd);
@@ -1290,17 +1291,17 @@ global int HandleKeyModifiersDown(unsigned key, unsigned keychar
 **	@return		1 if modifier found, 0 otherwise
 */
 global int HandleKeyModifiersUp(unsigned key,
-                                 unsigned keychar __attribute__((unused)))
+    unsigned keychar __attribute__((unused)))
 {
-    switch( key ) {
+    switch (key) {
 	case KeyCodeShift:
-	    KeyModifiers&=~ModifierShift;
+	    KeyModifiers &= ~ModifierShift;
 	    return 1;
 	case KeyCodeControl:
-	    KeyModifiers&=~ModifierControl;
+	    KeyModifiers &= ~ModifierControl;
 	    return 1;
 	case KeyCodeAlt:
-	    KeyModifiers&=~ModifierAlt;
+	    KeyModifiers &= ~ModifierAlt;
 	    // maxy: disabled
 #ifndef NEW_UI
 	    if (InterfaceState == IfaceStateNormal) {
@@ -1309,10 +1310,10 @@ global int HandleKeyModifiersUp(unsigned key,
 #endif
 	    return 1;
 	case KeyCodeSuper:
-	    KeyModifiers&=~ModifierSuper;
+	    KeyModifiers &= ~ModifierSuper;
 	    return 1;
 	case KeyCodeHyper:
-	    KeyModifiers&=~ModifierHyper;
+	    KeyModifiers &= ~ModifierHyper;
 	    return 1;
     }
     return 0;
@@ -1324,23 +1325,23 @@ global int HandleKeyModifiersUp(unsigned key,
 **	@param key	Key scancode.
 **	@param keychar	Character code.
 */
-global void HandleKeyDown(unsigned key,unsigned keychar)
+global void HandleKeyDown(unsigned key, unsigned keychar)
 {
-    if( HandleKeyModifiersDown(key,keychar) ) {
+    if (HandleKeyModifiersDown(key, keychar)) {
 	return;
     }
 
     // Handle All other keys
 
     // Command line input: for message or cheat
-    if( KeyState==KeyStateInput && keychar ) {
+    if (KeyState == KeyStateInput && keychar) {
 	InputKey(keychar);
     } else {
 	// If no modifier look if button bound
-	if( !(KeyModifiers&(ModifierControl|ModifierAlt
-		|ModifierSuper|ModifierHyper)) ) {
-	    if( !GameObserve && !GamePaused ) {
-		if( DoButtonPanelKey(key) ) {
+	if (!(KeyModifiers & (ModifierControl | ModifierAlt |
+		ModifierSuper | ModifierHyper))) {
+	    if (!GameObserve && !GamePaused) {
+		if (DoButtonPanelKey(key)) {
 		    return;
 		}
 	    }
@@ -1355,12 +1356,13 @@ global void HandleKeyDown(unsigned key,unsigned keychar)
 **	@param key	Key scancode.
 **	@param keychar	Character code.
 */
-global void HandleKeyUp(unsigned key,unsigned keychar)
+global void HandleKeyUp(unsigned key, unsigned keychar)
 {
-    if( HandleKeyModifiersUp(key,keychar) )
+    if (HandleKeyModifiersUp(key, keychar)) {
 	return;
+    }
 
-    switch( key ) {
+    switch (key) {
 	case KeyCodeUp:
 	case KeyCodeKP8:
 	    KeyScrollState &= ~ScrollUp;
@@ -1389,9 +1391,9 @@ global void HandleKeyUp(unsigned key,unsigned keychar)
 **	@param keychar	Character code.
 */
 global void HandleKeyRepeat(unsigned key __attribute__((unused)),
-			    unsigned keychar)
+    unsigned keychar)
 {
-    if( KeyState==KeyStateInput && keychar ) {
+    if (KeyState == KeyStateInput && keychar) {
 	InputKey(keychar);
     }
 }
@@ -1404,53 +1406,53 @@ global void HandleKeyRepeat(unsigned key __attribute__((unused)),
 **
 **	@return		1 if the mouse is in the scroll area, 0 otherwise
 */
-global int HandleMouseScrollArea(int x,int y)
+global int HandleMouseScrollArea(int x, int y)
 {
     //	FIXME: perhaps I should change the complete scroll handling.
     //	FIXME: show scrolling cursor only, if scrolling is possible
     //	FIXME: scrolling with edge resistance
-    if( x<SCROLL_LEFT ) {
-	CursorOn=CursorOnScrollLeft;
+    if (x < SCROLL_LEFT) {
+	CursorOn = CursorOnScrollLeft;
 	MouseScrollState = ScrollLeft;
-	GameCursor=TheUI.ArrowW.Cursor;
-	if( y<SCROLL_UP ) {
-	    CursorOn=CursorOnScrollLeftUp;
+	GameCursor = TheUI.ArrowW.Cursor;
+	if (y < SCROLL_UP) {
+	    CursorOn = CursorOnScrollLeftUp;
 	    MouseScrollState = ScrollLeftUp;
-	    GameCursor=TheUI.ArrowNW.Cursor;
+	    GameCursor = TheUI.ArrowNW.Cursor;
 	}
-	if( y>SCROLL_DOWN ) {
-	    CursorOn=CursorOnScrollLeftDown;
+	if (y > SCROLL_DOWN) {
+	    CursorOn = CursorOnScrollLeftDown;
 	    MouseScrollState = ScrollLeftDown;
-	    GameCursor=TheUI.ArrowSW.Cursor;
+	    GameCursor = TheUI.ArrowSW.Cursor;
 	}
 	return 1;
     }
-    if( x>SCROLL_RIGHT ) {
-	CursorOn=CursorOnScrollRight;
+    if (x > SCROLL_RIGHT) {
+	CursorOn = CursorOnScrollRight;
 	MouseScrollState = ScrollRight;
-	GameCursor=TheUI.ArrowE.Cursor;
-	if( y<SCROLL_UP ) {
-	    CursorOn=CursorOnScrollRightUp;
+	GameCursor = TheUI.ArrowE.Cursor;
+	if (y < SCROLL_UP) {
+	    CursorOn = CursorOnScrollRightUp;
 	    MouseScrollState = ScrollRightUp;
-	    GameCursor=TheUI.ArrowNE.Cursor;
+	    GameCursor = TheUI.ArrowNE.Cursor;
 	}
-	if( y>SCROLL_DOWN ) {
-	    CursorOn=CursorOnScrollRightDown;
+	if (y > SCROLL_DOWN) {
+	    CursorOn = CursorOnScrollRightDown;
 	    MouseScrollState = ScrollRightDown;
-	    GameCursor=TheUI.ArrowSE.Cursor;
+	    GameCursor = TheUI.ArrowSE.Cursor;
 	}
 	return 1;
     }
-    if( y<SCROLL_UP ) {
-	CursorOn=CursorOnScrollUp;
+    if (y < SCROLL_UP) {
+	CursorOn = CursorOnScrollUp;
 	MouseScrollState = ScrollUp;
-	GameCursor=TheUI.ArrowN.Cursor;
+	GameCursor = TheUI.ArrowN.Cursor;
 	return 1;
     }
-    if( y>SCROLL_DOWN ) {
-	CursorOn=CursorOnScrollDown;
+    if (y > SCROLL_DOWN) {
+	CursorOn = CursorOnScrollDown;
 	MouseScrollState = ScrollDown;
-	GameCursor=TheUI.ArrowS.Cursor;
+	GameCursor = TheUI.ArrowS.Cursor;
 	return 1;
     }
 
@@ -1463,24 +1465,24 @@ global int HandleMouseScrollArea(int x,int y)
 **	@param x	screen pixel X position.
 **	@param y	screen pixel Y position.
 */
-global void HandleCursorMove(int* x,int* y)
+global void HandleCursorMove(int* x, int* y)
 {
     //
     //	Reduce coordinates to window-size.
     //
-    if( *x<0 ) {
-	*x=0;
-    } else if( *x>=VideoWidth ) {
-	*x=VideoWidth-1;
+    if (*x < 0) {
+	*x = 0;
+    } else if (*x >= VideoWidth) {
+	*x = VideoWidth - 1;
     }
-    if( *y<0 ) {
-	*y=0;
-    } else if( *y>=VideoHeight ) {
-	*y=VideoHeight-1;
+    if (*y < 0) {
+	*y = 0;
+    } else if (*y >= VideoHeight) {
+	*y = VideoHeight - 1;
     }
 
-    CursorX=*x;
-    CursorY=*y;
+    CursorX = *x;
+    CursorY = *y;
 }
 
 /**
@@ -1489,9 +1491,9 @@ global void HandleCursorMove(int* x,int* y)
 **	@param x	screen pixel X position.
 **	@param y	screen pixel Y position.
 */
-global void HandleMouseMove(int x,int y)
+global void HandleMouseMove(int x, int y)
 {
-    HandleCursorMove(&x,&y);
+    HandleCursorMove(&x, &y);
     UIHandleMouseMove(x, y);
 }
 
@@ -1522,13 +1524,13 @@ global void HandleButtonUp(unsigned button)
 --	Lowlevel input functions
 ----------------------------------------------------------------------------*/
 
-global int DoubleClickDelay=300;	/// Time to detect double clicks.
-global int HoldClickDelay=1000;		/// Time to detect hold clicks.
+global int DoubleClickDelay = 300;	/// Time to detect double clicks.
+global int HoldClickDelay = 1000;	/// Time to detect hold clicks.
 
 local enum {
     InitialMouseState,			/// start state
     ClickedMouseState,			/// button is clicked
-}	MouseState;			/// Current state of mouse
+} MouseState;				/// Current state of mouse
 
 local int MouseX;			/// Last mouse X position
 local int MouseY;			/// Last mouse Y position
@@ -1548,28 +1550,27 @@ local unsigned LastMouseTicks;		/// Ticks of last mouse event
 **	@param button		Mouse button pressed.
 */
 global void InputMouseButtonPress(const EventCallback* callbacks,
-	unsigned ticks,unsigned button)
+    unsigned ticks, unsigned button)
 {
     //
     //	Button new pressed.
     //
-    if( !(MouseButtons&(1<<button)) ) {
-	MouseButtons|=1<<button;
+    if (!(MouseButtons & (1 << button))) {
+	MouseButtons |= (1 << button);
 	//
 	//	Detect double click
 	//
-	if( MouseState==ClickedMouseState
-		&& button==LastMouseButton
-		&& ticks<StartMouseTicks+DoubleClickDelay ) {
-	    MouseButtons|=(1<<button)<<MouseDoubleShift;
-	    button|=button<<MouseDoubleShift;
+	if (MouseState == ClickedMouseState && button == LastMouseButton &&
+		ticks < StartMouseTicks + DoubleClickDelay) {
+	    MouseButtons |= (1 << button) << MouseDoubleShift;
+	    button |= button << MouseDoubleShift;
 	} else {
-	    MouseState=InitialMouseState;
-	    StartMouseTicks=ticks;
-	    LastMouseButton=button;
+	    MouseState = InitialMouseState;
+	    StartMouseTicks = ticks;
+	    LastMouseButton = button;
 	}
     }
-    LastMouseTicks=ticks;
+    LastMouseTicks = ticks;
 
     callbacks->ButtonPressed(button);
 }
@@ -1582,34 +1583,34 @@ global void InputMouseButtonPress(const EventCallback* callbacks,
 **	@param button		Mouse button released.
 */
 global void InputMouseButtonRelease(const EventCallback* callbacks,
-	unsigned ticks,unsigned button)
+    unsigned ticks, unsigned button)
 {
     unsigned mask;
 
     //
     //	Same button before pressed.
     //
-    if( button==LastMouseButton && MouseState==InitialMouseState ) {
-	MouseState=ClickedMouseState;
+    if (button == LastMouseButton && MouseState == InitialMouseState) {
+	MouseState = ClickedMouseState;
     } else {
-	LastMouseButton=0;
-	MouseState=InitialMouseState;
+	LastMouseButton = 0;
+	MouseState = InitialMouseState;
     }
-    LastMouseTicks=ticks;
+    LastMouseTicks = ticks;
 
-    mask=0;
-    if( MouseButtons&((1<<button)<<MouseDoubleShift) ) {
-	mask|=button<<MouseDoubleShift;
+    mask = 0;
+    if (MouseButtons & ((1 << button) << MouseDoubleShift)) {
+	mask |= button << MouseDoubleShift;
     }
-    if( MouseButtons&((1<<button)<<MouseDragShift) ) {
-	mask|=button<<MouseDragShift;
+    if (MouseButtons & ((1 << button) << MouseDragShift)) {
+	mask |= button << MouseDragShift;
     }
-    if( MouseButtons&((1<<button)<<MouseHoldShift) ) {
-	mask|=button<<MouseHoldShift;
+    if (MouseButtons & ((1 << button) << MouseHoldShift)) {
+	mask |= button << MouseHoldShift;
     }
-    MouseButtons&=~(0x01010101<<button);
+    MouseButtons &= ~(0x01010101 << button);
 
-    callbacks->ButtonReleased(button|mask);
+    callbacks->ButtonReleased(button | mask);
 }
 
 /**
@@ -1621,16 +1622,16 @@ global void InputMouseButtonRelease(const EventCallback* callbacks,
 **	@param y		Y movement
 */
 global void InputMouseMove(const EventCallback* callbacks,
-	unsigned ticks,int x,int y)
+    unsigned ticks, int x, int y)
 {
     // Don't reset the mouse state unless we really moved
-    if( MouseX!=x || MouseY!=y ) {
-	MouseState=InitialMouseState;
-	LastMouseTicks=ticks;
-	MouseX=x;
-	MouseY=y;
+    if (MouseX != x || MouseY != y) {
+	MouseState = InitialMouseState;
+	LastMouseTicks = ticks;
+	MouseX = x;
+	MouseY = y;
     }
-    callbacks->MouseMoved(x,y);
+    callbacks->MouseMoved(x, y);
 }
 
 /**
@@ -1641,7 +1642,7 @@ global void InputMouseMove(const EventCallback* callbacks,
 **
 */
 global void InputMouseExit(const EventCallback* callbacks,
-	unsigned ticks __attribute__((unused)))
+    unsigned ticks __attribute__((unused)))
 {
 //FIXME: should we do anything here with ticks? don't know, but conform others
     // JOHNS: called by callback HandleMouseExit();
@@ -1654,24 +1655,24 @@ global void InputMouseExit(const EventCallback* callbacks,
 **	@param callbacks	Callback structure for events.
 **	@param ticks		Denotes time-stamp of video-system
 */
-global void InputMouseTimeout(const EventCallback* callbacks,unsigned ticks)
+global void InputMouseTimeout(const EventCallback* callbacks, unsigned ticks)
 {
-    if( MouseButtons&(1<<LastMouseButton) ) {
-	if( ticks>StartMouseTicks+DoubleClickDelay ) {
-	    MouseState=InitialMouseState;
+    if (MouseButtons & (1 << LastMouseButton)) {
+	if (ticks > StartMouseTicks + DoubleClickDelay) {
+	    MouseState = InitialMouseState;
 	}
-	if( ticks>LastMouseTicks+HoldClickDelay ) {
-	    LastMouseTicks=ticks;
-	    MouseButtons|=(1<<LastMouseButton)<<MouseHoldShift;
-	    callbacks->ButtonPressed(LastMouseButton|
-		    (LastMouseButton<<MouseHoldShift));
+	if (ticks > LastMouseTicks + HoldClickDelay) {
+	    LastMouseTicks = ticks;
+	    MouseButtons |= (1 << LastMouseButton) << MouseHoldShift;
+	    callbacks->ButtonPressed(LastMouseButton |
+		(LastMouseButton << MouseHoldShift));
 	}
     }
 }
 
 
-global int HoldKeyDelay=250;		/// Time to detect hold key
-global int HoldKeyAdditionalDelay=50;	/// Time to detect additional hold key
+local int HoldKeyDelay = 250;		/// Time to detect hold key
+local int HoldKeyAdditionalDelay = 50;	/// Time to detect additional hold key
 
 local unsigned LastIKey;		/// last key handled
 local unsigned LastIKeyChar;		/// last keychar handled
@@ -1686,11 +1687,11 @@ local unsigned LastKeyTicks;		/// Ticks of last key
 **	@param ikeychar		Character code.
 */
 global void InputKeyButtonPress(const EventCallback* callbacks,
-	unsigned ticks, unsigned ikey, unsigned ikeychar)
+    unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
-    LastIKey=ikey;
-    LastIKeyChar=ikeychar;
-    LastKeyTicks=ticks;
+    LastIKey = ikey;
+    LastIKeyChar = ikeychar;
+    LastKeyTicks = ticks;
     callbacks->KeyPressed(ikey, ikeychar);
 }
 
@@ -1703,11 +1704,11 @@ global void InputKeyButtonPress(const EventCallback* callbacks,
 **	@param ikeychar		Character code.
 */
 global void InputKeyButtonRelease(const EventCallback* callbacks,
-	unsigned ticks __attribute__((unused)), unsigned ikey,
-	unsigned ikeychar)
+    unsigned ticks __attribute__((unused)), unsigned ikey,
+    unsigned ikeychar)
 {
-    if( ikey==LastIKey ) {
-	LastIKey=0;
+    if (ikey == LastIKey) {
+	LastIKey = 0;
     }
     callbacks->KeyReleased(ikey, ikeychar);
 }
@@ -1718,10 +1719,10 @@ global void InputKeyButtonRelease(const EventCallback* callbacks,
 **	@param callbacks	Callback structure for events.
 **	@param ticks		Denotes time-stamp of video-system
 */
-global void InputKeyTimeout(const EventCallback* callbacks,unsigned ticks)
+global void InputKeyTimeout(const EventCallback* callbacks, unsigned ticks)
 {
-    if( LastIKey && ticks>LastKeyTicks+HoldKeyDelay) {
-	LastKeyTicks=ticks-(HoldKeyDelay-HoldKeyAdditionalDelay);
+    if (LastIKey && ticks > LastKeyTicks + HoldKeyDelay) {
+	LastKeyTicks = ticks - (HoldKeyDelay - HoldKeyAdditionalDelay);
 	callbacks->KeyRepeated(LastIKey, LastIKeyChar);
     }
 }
