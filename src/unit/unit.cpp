@@ -1017,7 +1017,7 @@ global void MarkSubmarineSeen(const Player* player,int x,int y,int r)
     int pm;
 
     n=SelectUnits(x-r,y-r,x+r,y+r,table);
-    pm=(1<<player->Player);
+    pm=((1<<player->Player)|player->SharedVision);
     for( i=0; i<n; ++i ) {
 	table[i]->Visible|=pm;
     }
