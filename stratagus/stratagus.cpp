@@ -1122,7 +1122,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	CleanModules();
 	CleanFonts();
 
-	PlaySection = PlaySectionMainMenu;
+	CurrentPlaySection = PlaySectionMainMenu;
 
 	LoadCcl();			// Reload the main config file
 

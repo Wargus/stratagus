@@ -10,7 +10,7 @@
 //
 /**@name sound_server.h	-	The sound server header file. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -234,21 +234,6 @@ extern unsigned AllocatedSoundMemory;
 extern unsigned CompressedSoundMemory;
 #endif
 
-    /// cd play mode, ":off" ":random" ":all" or ":defined"
-enum _cd_mode_ {
-    CDModeStopped = -1,
-    CDModeOff,
-    CDModeAll,
-    CDModeRandom,
-    CDModeDefined,
-} CDMode;
-    /// FIXME: docu
-enum _play_section_ {
-    PlaySectionMainMenu,
-    PlaySectionGame,
-    PlaySectionStats,
-    PlaySectionBriefing,
-} PlaySection;
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     /// FIXME: docu
 extern int CDTrack;
