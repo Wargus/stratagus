@@ -1838,7 +1838,7 @@ local void SetCdPower(Menuitem *mi)
 	PlayMusic(":random");
     } else {
     /// Stop Playing CD
-        cd_stop();
+        cd_pause();
 	CDMode = ":stopped";
     }
 #endif
