@@ -44,6 +44,7 @@
 ----------------------------------------------------------------------------*/
 
 struct _unit_;
+struct _event_callback_;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -326,27 +327,30 @@ extern void HandleKeyRepeat(unsigned keycode, unsigned keychar);
 // in interface.c (for link between video and mouse.c)
 //
 	/// Called if any mouse button is pressed down
-extern void InputMouseButtonPress(const EventCallback* callbacks,
+extern void InputMouseButtonPress(const struct _event_callback_* callbacks,
 	unsigned ticks, unsigned button);
 	/// Called if any mouse button is released up
-extern void InputMouseButtonRelease(const EventCallback* callbacks,
+extern void InputMouseButtonRelease(const struct _event_callback_* callbacks,
 	unsigned ticks, unsigned button);
 	/// Called if the mouse is moved
-extern void InputMouseMove(const EventCallback* callbacks, unsigned ticks,
-	int x, int y);
+extern void InputMouseMove(const struct _event_callback_* callbacks,
+	unsigned ticks, int x, int y);
 	/// Called if the mouse exits the game window (when supported by videomode)
-extern void InputMouseExit(const EventCallback* callbacks, unsigned ticks);
+extern void InputMouseExit(const struct _event_callback_* callbacks,
+	unsigned ticks);
 	/// Called to look for mouse timeouts
-extern void InputMouseTimeout(const EventCallback* callbacks, unsigned ticks);
+extern void InputMouseTimeout(const struct _event_callback_* callbacks,
+	unsigned ticks);
 
 	/// Called if any key button is pressed down
-extern void InputKeyButtonPress(const EventCallback* callbacks,
+extern void InputKeyButtonPress(const struct _event_callback_* callbacks,
 	unsigned ticks, unsigned ikey, unsigned ikeychar);
 	/// Called if any key button is released up
-extern void InputKeyButtonRelease(const EventCallback* callbacks,
+extern void InputKeyButtonRelease(const struct _event_callback_* callbacks,
 	unsigned ticks, unsigned ikey, unsigned ikeychar);
 	/// Called to look for key timeouts
-extern void InputKeyTimeout(const EventCallback* callbacks, unsigned ticks);
+extern void InputKeyTimeout(const struct _event_callback_* callbacks,
+	unsigned ticks);
 
 	/// Toggle pause mode
 extern void UiTogglePause(void);

@@ -43,6 +43,7 @@
 #include "depend.h"
 #include "interface.h"
 #include "network.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
