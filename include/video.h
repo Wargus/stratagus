@@ -146,6 +146,9 @@ extern volatile int VideoInterrupts;
 	///		Wanted videomode, fullscreen or windowed.
 extern char VideoFullScreen;
 
+	///		Fullscreen or windowed set from commandline.
+extern char VideoForceFullScreen;
+
 	///		Initialize Pixels[] for all players.
 	///		(bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette(void);
