@@ -277,7 +277,6 @@ global void CreateGame(char* filename, WorldMap* map)
 	return;
     }
 
-    LoadCcl();
     LoadFonts();
     InitVideoCursors();
 

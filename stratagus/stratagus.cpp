@@ -1120,6 +1120,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    //	Create the game.
 	    //
 	    CleanModules();
+	    LoadCcl();
 	    CreateGame(filename,map);
 
 	    SetStatusLine(NameLine);
