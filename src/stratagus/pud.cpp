@@ -72,9 +72,10 @@ local int MapOffsetY;			/// Offset Y for combined maps
 */
 local unsigned int ChksumArea(const unsigned char* adr,int length)
 {
-    unsigned int res = 0U;
-    unsigned int rem = 0;
+    unsigned int res;
+    unsigned int rem;
 
+    res = 0U;
     while (length--) {
 	rem = res & 0xff000000;
 	res <<= 8;
