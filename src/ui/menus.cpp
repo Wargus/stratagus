@@ -5699,6 +5699,8 @@ local void EditorEditAiPropertiesCancel(void)
 
 /**
 **	Save map from the editor
+**
+**	@return		0 for success, -1 for error
 */
 global int EditorSave(void)
 {
@@ -5706,7 +5708,9 @@ global int EditorSave(void)
     char path[PATH_MAX];
     char *s;
     char *p;
+    int ret;
 
+    ret = 0;
     menu = FindMenu("menu-editor-save");
 
     EditorCancelled = 0;
@@ -5723,16 +5727,17 @@ global int EditorSave(void)
 
     if (!EditorCancelled) {
 	sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
-	EditorSavePud(path);
+	if (EditorSavePud(path) == -1) {
+	    ret = -1;
+	}
 	s = ScenSelectPath + strlen(ScenSelectPath);
 	*s = '/';
 	strcpy(s+1, ScenSelectFileName);	// Final map name with path
 	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
 	strcpy(CurrentMapPath, p);
 	*s = '\0';
-	return 1;
     }
-    return 0;
+    return ret;
 }
 
 /**

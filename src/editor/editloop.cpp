@@ -1272,7 +1272,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	case 's':			// ALT s F11 save pud menu
 	case 'S':
 	case KeyCodeF11:
-	    if (EditorSave()) {
+	    if (EditorSave() != -1) {
 		SetStatusLine("Pud saved");
 	    }
 	    InterfaceState = IfaceStateNormal;
@@ -1862,11 +1862,13 @@ local void CreateEditor(void)
 **
 **	@param file	Save the level to this file.
 **
+**	@return		0 for success, -1 for error
+**
 **	@todo	FIXME: Check if the pud is valid, contains no failures.
-**		Alteast two players, one human slot, every player a startpoint
+**		At least two players, one human slot, every player a startpoint
 **		...
 */
-global void EditorSavePud(const char *file)
+global int EditorSavePud(const char *file)
 {
     int i;
 
@@ -1881,7 +1883,15 @@ global void EditorSavePud(const char *file)
 		~MapFieldLandUnit;
 	}
     }
-    SavePud(file, &TheMap);
+    if (SavePud(file, &TheMap) == -1) {
+	ErrorMenu("Cannot save map");
+	MustRedraw = RedrawEverything;
+	InterfaceState = IfaceStateNormal;
+	EditorUpdateDisplay();
+	InterfaceState = IfaceStateMenu;
+	MustRedraw = RedrawMenu;
+	return -1;
+    }
     for (i = 0; i < NumUnits; ++i) {
 	const UnitType *type;
 
@@ -1893,6 +1903,7 @@ global void EditorSavePud(const char *file)
 		MapFieldLandUnit;
 	}
     }
+    return 0;
 }
 
 /*----------------------------------------------------------------------------
