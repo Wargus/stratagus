@@ -216,7 +216,8 @@ global void ShowIntro(const Intro *intro)
     }
 
     x=(VideoWidth-640)/2;
-    stage=line=0;
+    line=0;
+    stage=1;
     IntroNoEvent=1;
     while( IntroNoEvent ) {
 	y=(VideoHeight-480)/2;
