@@ -371,9 +371,9 @@ struct _missile_ {
     int		DY;			/// missile pixel destination
     MissileType*Type;			/// missile-type pointer
     int		SpriteFrame;		/// sprite frame counter
-    int short	State;			/// state
-    int short	Wait;			/// delay between frames
-    int short	Delay;			/// delay to showup
+    int		State;			/// state
+    int		Wait;			/// delay between frames
+    int		Delay;			/// delay to showup
 
     Unit*	SourceUnit;		/// unit that fires (could be killed)
     Unit*	TargetUnit;		/// target unit, used for spells
