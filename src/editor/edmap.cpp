@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -46,701 +46,701 @@
 #include "player.h"
 
 /*----------------------------------------------------------------------------
---	Defines
+--		Defines
 ----------------------------------------------------------------------------*/
 
-#define TH_QUAD_M	0xFFFF0000	/// Top half quad mask
-#define BH_QUAD_M	0x0000FFFF	/// Bottom half quad mask
-#define LH_QUAD_M	0xFF00FF00	/// Left half quad mask
-#define RH_QUAD_M	0x00FF00FF	/// Right half quad mask
+#define TH_QUAD_M		0xFFFF0000		/// Top half quad mask
+#define BH_QUAD_M		0x0000FFFF		/// Bottom half quad mask
+#define LH_QUAD_M		0xFF00FF00		/// Left half quad mask
+#define RH_QUAD_M		0x00FF00FF		/// Right half quad mask
 
-    /// Callback for changed tile (with direction mask)
+	/// Callback for changed tile (with direction mask)
 local void EditorTileChanged2(int x, int y, int d);
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Get quad from tile.
+**		Get quad from tile.
 **
-**	A quad is a 32 bit value defining the content of the tile.
+**		A quad is a 32 bit value defining the content of the tile.
 **
-**	A tile is split into 4 parts, the basic tile type of this part
-**	is stored as 8bit value in the quad.
+**		A tile is split into 4 parts, the basic tile type of this part
+**		is stored as 8bit value in the quad.
 **
-**	ab
-**	cd -> abcd
+**		ab
+**		cd -> abcd
 **
-**	If the tile is 100% light grass the value is 0x5555.
-**	If the tile is 3/4 light grass and dark grass in upper left corner
-**	the value is 0x6555.
+**		If the tile is 100% light grass the value is 0x5555.
+**		If the tile is 3/4 light grass and dark grass in upper left corner
+**		the value is 0x6555.
 **
-**	@param x	X map tile position
-**	@param y	Y map tile position
+**		@param x		X map tile position
+**		@param y		Y map tile position
 **
-**	@return		the 'quad' of the tile.
+**		@return				the 'quad' of the tile.
 **
-**	@todo	Make a lookup table to speed up the things.
+**		@todo		Make a lookup table to speed up the things.
 */
 local unsigned QuadFromTile(int x, int y)
 {
-    int tile;
-    int i;
-    unsigned base;
-    unsigned mix;
+	int tile;
+	int i;
+	unsigned base;
+	unsigned mix;
 
-    //
-    //  find the abstact tile number
-    //
-    tile = TheMap.Fields[y * TheMap.Width + x].Tile;
-    for (i = 0; i < TheMap.Tileset->NumTiles; ++i) {
-	if (tile == TheMap.Tileset->Table[i]) {
-	    break;
+	//
+	//  find the abstact tile number
+	//
+	tile = TheMap.Fields[y * TheMap.Width + x].Tile;
+	for (i = 0; i < TheMap.Tileset->NumTiles; ++i) {
+		if (tile == TheMap.Tileset->Table[i]) {
+			break;
+		}
 	}
-    }
-    DebugCheck(i == TheMap.Tileset->NumTiles);
+	DebugCheck(i == TheMap.Tileset->NumTiles);
 
-    base = TheMap.Tileset->Tiles[i].BaseTerrain;
-    mix = TheMap.Tileset->Tiles[i].MixTerrain;
+	base = TheMap.Tileset->Tiles[i].BaseTerrain;
+	mix = TheMap.Tileset->Tiles[i].MixTerrain;
 
-    DebugLevel3Fn("Tile %d:%04x %d,%d\n" _C_ tile _C_ i _C_ quad _C_ mix);
+	DebugLevel3Fn("Tile %d:%04x %d,%d\n" _C_ tile _C_ i _C_ quad _C_ mix);
 
-    if (!mix) {				// a solid tile
+	if (!mix) {								// a solid tile
+		return base | (base << 8) | (base << 16) | (base << 24);
+	}
+	//
+	//  Mixed tiles, mix together
+	//
+	switch ((i & 0x00F0) >> 4) {
+		case 0:
+			return (base << 24) | (mix << 16) | (mix << 8) | mix;
+		case 1:
+			return (mix << 24) | (base << 16) | (mix << 8) | mix;
+		case 2:
+			return (base << 24) | (base << 16) | (mix << 8) | mix;
+		case 3:
+			return (mix << 24) | (mix << 16) | (base << 8) | mix;
+		case 4:
+			return (base << 24) | (mix << 16) | (base << 8) | mix;
+		case 5:
+			return (base << 24) | (base << 16) | (base << 8) | mix;
+		case 6:
+			return (base << 24) | (base << 16) | (base << 8) | mix;
+		case 7:
+			return (mix << 24) | (mix << 16) | (mix << 8) | base;
+		case 8:
+			return (base << 24) | (mix << 16) | (mix << 8) | base;
+		case 9:
+			return (mix << 24) | (base << 16) | (mix << 8) | base;
+		case 10:
+			return (base << 24) | (base << 16) | (mix << 8) | base;
+		case 11:
+			return (mix << 24) | (mix << 16) | (base << 8) | base;
+		case 12:
+			return (base << 24) | (mix << 16) | (base << 8) | base;
+		case 13:
+			return (mix << 24) | (base << 16) | (base << 8) | base;
+	}
+
+	DebugCheck(1);
+
 	return base | (base << 8) | (base << 16) | (base << 24);
-    }
-    //
-    //  Mixed tiles, mix together
-    //
-    switch ((i & 0x00F0) >> 4) {
-	case 0:
-	    return (base << 24) | (mix << 16) | (mix << 8) | mix;
-	case 1:
-	    return (mix << 24) | (base << 16) | (mix << 8) | mix;
-	case 2:
-	    return (base << 24) | (base << 16) | (mix << 8) | mix;
-	case 3:
-	    return (mix << 24) | (mix << 16) | (base << 8) | mix;
-	case 4:
-	    return (base << 24) | (mix << 16) | (base << 8) | mix;
-	case 5:
-	    return (base << 24) | (base << 16) | (base << 8) | mix;
-	case 6:
-	    return (base << 24) | (base << 16) | (base << 8) | mix;
-	case 7:
-	    return (mix << 24) | (mix << 16) | (mix << 8) | base;
-	case 8:
-	    return (base << 24) | (mix << 16) | (mix << 8) | base;
-	case 9:
-	    return (mix << 24) | (base << 16) | (mix << 8) | base;
-	case 10:
-	    return (base << 24) | (base << 16) | (mix << 8) | base;
-	case 11:
-	    return (mix << 24) | (mix << 16) | (base << 8) | base;
-	case 12:
-	    return (base << 24) | (mix << 16) | (base << 8) | base;
-	case 13:
-	    return (mix << 24) | (base << 16) | (base << 8) | base;
-    }
-
-    DebugCheck(1);
-
-    return base | (base << 8) | (base << 16) | (base << 24);
 }
 
 /**
-**	Find a tile path.
+**		Find a tile path.
 **
-**	@param base	Start tile type.
-**	@param goal	Goal tile type.
-**	@param length	Best found path length.
-**	@param marks	Already visited tile types.
-**	@param tile	Tile pointer.
+**		@param base		Start tile type.
+**		@param goal		Goal tile type.
+**		@param length		Best found path length.
+**		@param marks		Already visited tile types.
+**		@param tile		Tile pointer.
 */
 local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 {
-    int i;
-    int l;
-    int j;
-    int n;
+	int i;
+	int l;
+	int j;
+	int n;
 
-    DebugLevel0Fn("base %X goal %X\n" _C_ base _C_ goal);
+	DebugLevel0Fn("base %X goal %X\n" _C_ base _C_ goal);
 
-    //
-    //  Find any mixed tile
-    //
-    l = INT_MAX;
-    for (i = 0; i < TheMap.Tileset->NumTiles;) {
-	// goal found.
-	if (base == TheMap.Tileset->Tiles[i].BaseTerrain &&
-		goal == TheMap.Tileset->Tiles[i].MixTerrain) {
-	    *tile = i;
-	    return length;
-	}
-	// goal found.
-	if (goal == TheMap.Tileset->Tiles[i].BaseTerrain &&
-		base == TheMap.Tileset->Tiles[i].MixTerrain) {
-	    *tile = i;
-	    return length;
-	}
-
-	// possible path found
-	if (base == TheMap.Tileset->Tiles[i].BaseTerrain &&
-		TheMap.Tileset->Tiles[i].MixTerrain) {
-	    j = TheMap.Tileset->Tiles[i].MixTerrain;
-	    if (!marks[j]) {
-		marks[j] = j;
-		n = FindTilePath(j, goal, length + 1, marks, &n);
-		marks[j] = 0;
-		if (n < l) {
-		    *tile = i;
-		    l = n;
+	//
+	//  Find any mixed tile
+	//
+	l = INT_MAX;
+	for (i = 0; i < TheMap.Tileset->NumTiles;) {
+		// goal found.
+		if (base == TheMap.Tileset->Tiles[i].BaseTerrain &&
+				goal == TheMap.Tileset->Tiles[i].MixTerrain) {
+			*tile = i;
+			return length;
 		}
-	    }
-	// possible path found
-	} else if (TheMap.Tileset->Tiles[i].BaseTerrain &&
-		base == TheMap.Tileset->Tiles[i].MixTerrain) {
-	    j = TheMap.Tileset->Tiles[i].BaseTerrain;
-	    if (!marks[j]) {
-		marks[j] = j;
-		n = FindTilePath(j, goal, length + 1, marks, &n);
-		marks[j] = 0;
-		if (n < l) {
-		    *tile = i;
-		    l = n;
+		// goal found.
+		if (goal == TheMap.Tileset->Tiles[i].BaseTerrain &&
+				base == TheMap.Tileset->Tiles[i].MixTerrain) {
+			*tile = i;
+			return length;
 		}
-	    }
-	}
-	// Advance solid or mixed.
-	if (!TheMap.Tileset->Tiles[i].MixTerrain) {
-	    i += 16;
-	} else {
-	    i += 256;
-	}
-    }
-    return l;
-}
 
-/**
-**	Get tile from quad.
-**
-**	@param fixed	Part can't be changed.
-**	@param quad	Quad of the tile type.
-**	@return		Best matching tile.
-*/
-local int TileFromQuad(unsigned fixed, unsigned quad)
-{
-    int i;
-    unsigned type1;
-    unsigned type2;
-    int base;
-    int direction;
-    //                 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
-    char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
-
-    DebugLevel3Fn("%x %x\n" _C_ fixed _C_ quad);
-
-    //
-    //  Get tile type from fixed.
-    //
-    while (!(type1 = (fixed & 0xFF))) {
-	fixed >>= 8;
-	if (!fixed) {
-	    abort();
-	}
-    }
-    fixed >>= 8;
-    while (!(type2 = (fixed & 0xFF)) && fixed) {
-	fixed >>= 8;
-    }
-    //
-    //  Need an second type.
-    //
-    if (!type2 || type2 == type1) {
-	fixed = quad;
-	while ((type2 = (fixed & 0xFF)) == type1 && fixed) {
-	    fixed >>= 8;
-	}
-	if (type1 == type2) {		// Oooh a solid tile.
-	  find_solid:
-	    //
-	    //  Find the solid tile
-	    //
-	    for (i = 0; i < TheMap.Tileset->NumTiles;) {
-		if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain &&
-			!TheMap.Tileset->Tiles[i].MixTerrain) {
-		    break;
+		// possible path found
+		if (base == TheMap.Tileset->Tiles[i].BaseTerrain &&
+				TheMap.Tileset->Tiles[i].MixTerrain) {
+			j = TheMap.Tileset->Tiles[i].MixTerrain;
+			if (!marks[j]) {
+				marks[j] = j;
+				n = FindTilePath(j, goal, length + 1, marks, &n);
+				marks[j] = 0;
+				if (n < l) {
+					*tile = i;
+					l = n;
+				}
+			}
+		// possible path found
+		} else if (TheMap.Tileset->Tiles[i].BaseTerrain &&
+				base == TheMap.Tileset->Tiles[i].MixTerrain) {
+			j = TheMap.Tileset->Tiles[i].BaseTerrain;
+			if (!marks[j]) {
+				marks[j] = j;
+				n = FindTilePath(j, goal, length + 1, marks, &n);
+				marks[j] = 0;
+				if (n < l) {
+					*tile = i;
+					l = n;
+				}
+			}
 		}
 		// Advance solid or mixed.
 		if (!TheMap.Tileset->Tiles[i].MixTerrain) {
-		    i += 16;
+			i += 16;
 		} else {
-		    i += 256;
+			i += 256;
 		}
-	    }
-	    DebugCheck(i >= TheMap.Tileset->NumTiles);
-	    return i;
 	}
-    } else {
-	char* marks;
-
-	marks = alloca(TheMap.Tileset->NumTerrainTypes);
-	memset(marks, 0, TheMap.Tileset->NumTerrainTypes);
-	marks[type1] = type1;
-	marks[type2] = type2;
-
-	//
-	//      What fixed tile-type should replace the non useable tile-types.
-	//      FIXME: write a loop.
-	//
-	fixed = (quad >> 0) & 0xFF;
-	if (fixed != type1 && fixed != type2) {
-	    quad &= 0xFFFFFF00;
-	    if (FindTilePath(type1, fixed, 0, marks, &i) <
-		    FindTilePath(type2, fixed, 0, marks, &i)) {
-		quad |= type1 << 0;
-	    } else {
-		quad |= type2 << 0;
-	    }
-	}
-	fixed = (quad >> 8) & 0xFF;
-	if (fixed != type1 && fixed != type2) {
-	    quad &= 0xFFFF00FF;
-	    if (FindTilePath(type1, fixed, 0, marks, &i) <
-		    FindTilePath(type2, fixed, 0, marks, &i)) {
-		quad |= type1 << 8;
-	    } else {
-		quad |= type2 << 8;
-	    }
-	}
-	fixed = (quad >> 16) & 0xFF;
-	if (fixed != type1 && fixed != type2) {
-	    quad &= 0xFF00FFFF;
-	    if (FindTilePath(type1, fixed, 0, marks, &i) <
-		    FindTilePath(type2, fixed, 0, marks, &i)) {
-		quad |= type1 << 16;
-	    } else {
-		quad |= type2 << 16;
-	    }
-	}
-	fixed = (quad >> 24) & 0xFF;
-	if (fixed != type1 && fixed != type2) {
-	    quad &= 0x00FFFFFF;
-	    if (FindTilePath(type1, fixed, 0, marks, &i) <
-		    FindTilePath(type2, fixed, 0, marks, &i)) {
-		quad |= type1 << 24;
-	    } else {
-		quad |= type2 << 24;
-	    }
-	}
-    }
-
-    DebugLevel3Fn("type1 %x type2 %x\n" _C_ type1 _C_ type2);
-
-    //
-    //  Need a mixed tile
-    //
-    for (i = 0; i < TheMap.Tileset->NumTiles;) {
-	if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain &&
-		type2 == TheMap.Tileset->Tiles[i].MixTerrain) {
-	    break;
-	}
-	if (type2 == TheMap.Tileset->Tiles[i].BaseTerrain &&
-		type1 == TheMap.Tileset->Tiles[i].MixTerrain) {
-	    // Other mixed
-	    type1 ^= type2;
-	    type2 ^= type1;
-	    type1 ^= type2;
-	    break;
-	}
-	// Advance solid or mixed.
-	if (!TheMap.Tileset->Tiles[i].MixTerrain) {
-	    i += 16;
-	} else {
-	    i += 256;
-	}
-    }
-
-    if (i >= TheMap.Tileset->NumTiles) {
-	char* marks;
-
-	DebugLevel3Fn("No good mix found\n");
-	//
-	//      Find the best tile path.
-	//
-	marks = alloca(TheMap.Tileset->NumTerrainTypes);
-	memset(marks, 0, TheMap.Tileset->NumTerrainTypes);
-	marks[type1] = type1;
-	if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
-	    DebugLevel0Fn("Huch, no mix found!!!!!!!!!!!\n");
-	    goto find_solid;
-	}
-	if (type1 == TheMap.Tileset->Tiles[i].MixTerrain) {
-	    // Other mixed
-	    type1 ^= type2;
-	    type2 ^= type1;
-	    type1 ^= type2;
-	}
-    }
-
-    base = i;
-
-    direction = 0;
-    if (((quad >> 24) & 0xFF) == type1) {
-	direction |= 8;
-    }
-    if (((quad >> 16) & 0xFF) == type1) {
-	direction |= 4;
-    }
-    if (((quad >> 8) & 0xFF) == type1) {
-	direction |= 2;
-    }
-    if (((quad >> 0) & 0xFF) == type1) {
-	direction |= 1;
-    }
-
-    DebugLevel3Fn("%08x %x %x %d\n" _C_ quad _C_ type1 _C_ type2 _C_
-	direction);
-
-    return base | (table[direction] << 4);
+	return l;
 }
 
 /**
-**	Change tile from abstract tile-type.
+**		Get tile from quad.
 **
-**	@param x	X map tile coordinate.
-**	@param y	Y map tile coordinate.
-**	@param tile	Abstract tile type to edit.
+**		@param fixed		Part can't be changed.
+**		@param quad		Quad of the tile type.
+**		@return				Best matching tile.
+*/
+local int TileFromQuad(unsigned fixed, unsigned quad)
+{
+	int i;
+	unsigned type1;
+	unsigned type2;
+	int base;
+	int direction;
+	//				 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
+	char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
+
+	DebugLevel3Fn("%x %x\n" _C_ fixed _C_ quad);
+
+	//
+	//  Get tile type from fixed.
+	//
+	while (!(type1 = (fixed & 0xFF))) {
+		fixed >>= 8;
+		if (!fixed) {
+			abort();
+		}
+	}
+	fixed >>= 8;
+	while (!(type2 = (fixed & 0xFF)) && fixed) {
+		fixed >>= 8;
+	}
+	//
+	//  Need an second type.
+	//
+	if (!type2 || type2 == type1) {
+		fixed = quad;
+		while ((type2 = (fixed & 0xFF)) == type1 && fixed) {
+			fixed >>= 8;
+		}
+		if (type1 == type2) {				// Oooh a solid tile.
+		  find_solid:
+			//
+			//  Find the solid tile
+			//
+			for (i = 0; i < TheMap.Tileset->NumTiles;) {
+				if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain &&
+						!TheMap.Tileset->Tiles[i].MixTerrain) {
+					break;
+				}
+				// Advance solid or mixed.
+				if (!TheMap.Tileset->Tiles[i].MixTerrain) {
+					i += 16;
+				} else {
+					i += 256;
+				}
+			}
+			DebugCheck(i >= TheMap.Tileset->NumTiles);
+			return i;
+		}
+	} else {
+		char* marks;
+
+		marks = alloca(TheMap.Tileset->NumTerrainTypes);
+		memset(marks, 0, TheMap.Tileset->NumTerrainTypes);
+		marks[type1] = type1;
+		marks[type2] = type2;
+
+		//
+		//	  What fixed tile-type should replace the non useable tile-types.
+		//	  FIXME: write a loop.
+		//
+		fixed = (quad >> 0) & 0xFF;
+		if (fixed != type1 && fixed != type2) {
+			quad &= 0xFFFFFF00;
+			if (FindTilePath(type1, fixed, 0, marks, &i) <
+					FindTilePath(type2, fixed, 0, marks, &i)) {
+				quad |= type1 << 0;
+			} else {
+				quad |= type2 << 0;
+			}
+		}
+		fixed = (quad >> 8) & 0xFF;
+		if (fixed != type1 && fixed != type2) {
+			quad &= 0xFFFF00FF;
+			if (FindTilePath(type1, fixed, 0, marks, &i) <
+					FindTilePath(type2, fixed, 0, marks, &i)) {
+				quad |= type1 << 8;
+			} else {
+				quad |= type2 << 8;
+			}
+		}
+		fixed = (quad >> 16) & 0xFF;
+		if (fixed != type1 && fixed != type2) {
+			quad &= 0xFF00FFFF;
+			if (FindTilePath(type1, fixed, 0, marks, &i) <
+					FindTilePath(type2, fixed, 0, marks, &i)) {
+				quad |= type1 << 16;
+			} else {
+				quad |= type2 << 16;
+			}
+		}
+		fixed = (quad >> 24) & 0xFF;
+		if (fixed != type1 && fixed != type2) {
+			quad &= 0x00FFFFFF;
+			if (FindTilePath(type1, fixed, 0, marks, &i) <
+					FindTilePath(type2, fixed, 0, marks, &i)) {
+				quad |= type1 << 24;
+			} else {
+				quad |= type2 << 24;
+			}
+		}
+	}
+
+	DebugLevel3Fn("type1 %x type2 %x\n" _C_ type1 _C_ type2);
+
+	//
+	//  Need a mixed tile
+	//
+	for (i = 0; i < TheMap.Tileset->NumTiles;) {
+		if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain &&
+				type2 == TheMap.Tileset->Tiles[i].MixTerrain) {
+			break;
+		}
+		if (type2 == TheMap.Tileset->Tiles[i].BaseTerrain &&
+				type1 == TheMap.Tileset->Tiles[i].MixTerrain) {
+			// Other mixed
+			type1 ^= type2;
+			type2 ^= type1;
+			type1 ^= type2;
+			break;
+		}
+		// Advance solid or mixed.
+		if (!TheMap.Tileset->Tiles[i].MixTerrain) {
+			i += 16;
+		} else {
+			i += 256;
+		}
+	}
+
+	if (i >= TheMap.Tileset->NumTiles) {
+		char* marks;
+
+		DebugLevel3Fn("No good mix found\n");
+		//
+		//	  Find the best tile path.
+		//
+		marks = alloca(TheMap.Tileset->NumTerrainTypes);
+		memset(marks, 0, TheMap.Tileset->NumTerrainTypes);
+		marks[type1] = type1;
+		if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
+			DebugLevel0Fn("Huch, no mix found!!!!!!!!!!!\n");
+			goto find_solid;
+		}
+		if (type1 == TheMap.Tileset->Tiles[i].MixTerrain) {
+			// Other mixed
+			type1 ^= type2;
+			type2 ^= type1;
+			type1 ^= type2;
+		}
+	}
+
+	base = i;
+
+	direction = 0;
+	if (((quad >> 24) & 0xFF) == type1) {
+		direction |= 8;
+	}
+	if (((quad >> 16) & 0xFF) == type1) {
+		direction |= 4;
+	}
+	if (((quad >> 8) & 0xFF) == type1) {
+		direction |= 2;
+	}
+	if (((quad >> 0) & 0xFF) == type1) {
+		direction |= 1;
+	}
+
+	DebugLevel3Fn("%08x %x %x %d\n" _C_ quad _C_ type1 _C_ type2 _C_
+		direction);
+
+	return base | (table[direction] << 4);
+}
+
+/**
+**		Change tile from abstract tile-type.
 **
-**	@note  this is a rather dumb function, doesn't do any tile fixing.
+**		@param x		X map tile coordinate.
+**		@param y		Y map tile coordinate.
+**		@param tile		Abstract tile type to edit.
+**
+**		@note  this is a rather dumb function, doesn't do any tile fixing.
 */
 global void ChangeTile(int x, int y, int tile)
 {
-    MapField *mf;
+	MapField *mf;
 
-    DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
-    DebugCheck(tile < 0 || tile >= TheMap.Tileset->NumTiles);
+	DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
+	DebugCheck(tile < 0 || tile >= TheMap.Tileset->NumTiles);
 
-    mf = &TheMap.Fields[y * TheMap.Width + x];
-    mf->Tile = mf->SeenTile = TheMap.Tileset->Table[tile];
+	mf = &TheMap.Fields[y * TheMap.Width + x];
+	mf->Tile = mf->SeenTile = TheMap.Tileset->Table[tile];
 }
 
-#define DIR_UP		8	/// Go up allowed
-#define DIR_DOWN	4	/// Go down allowed
-#define DIR_LEFT	2	/// Go left allowed
-#define DIR_RIGHT	1	/// Go right allowed
+#define DIR_UP				8		/// Go up allowed
+#define DIR_DOWN		4		/// Go down allowed
+#define DIR_LEFT		2		/// Go left allowed
+#define DIR_RIGHT		1		/// Go right allowed
 
 /**
-**	Editor change tile.
+**		Editor change tile.
 **
-**	@param x	X map tile coordinate.
-**	@param y	Y map tile coordinate.
-**	@param tile	Tile type to edit.
-**	@param d	Fix direction flag 8 up, 4 down, 2 left, 1 right.
+**		@param x		X map tile coordinate.
+**		@param y		Y map tile coordinate.
+**		@param tile		Tile type to edit.
+**		@param d		Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
 local void EditorChangeTile(int x, int y, int tile, int d)
 {
-    MapField* mf;
+	MapField* mf;
 
-    DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
+	DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
 
-    ChangeTile(x, y, tile);
+	ChangeTile(x, y, tile);
 
-    //
-    //  Change the flags
-    //
-    mf = &TheMap.Fields[y * TheMap.Width + x];
-    mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
-	MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
-	MapFieldWall | MapFieldRocks | MapFieldForest);
+	//
+	//  Change the flags
+	//
+	mf = &TheMap.Fields[y * TheMap.Width + x];
+	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
+		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
+		MapFieldWall | MapFieldRocks | MapFieldForest);
 
-    mf->Flags |= TheMap.Tileset->FlagsTable[tile];
+	mf->Flags |= TheMap.Tileset->FlagsTable[tile];
 
-    UpdateMinimapSeenXY(x, y);
-    UpdateMinimapXY(x, y);
+	UpdateMinimapSeenXY(x, y);
+	UpdateMinimapXY(x, y);
 
-    EditorTileChanged2(x, y, d);
+	EditorTileChanged2(x, y, d);
 }
 
 /**
-**	Update surroundings for tile changes.
+**		Update surroundings for tile changes.
 **
-**	@param x	Map X tile position of change.
-**	@param y	Map Y tile position of change.
-**	@param d	Fix direction flag 8 up, 4 down, 2 left, 1 right.
+**		@param x		Map X tile position of change.
+**		@param y		Map Y tile position of change.
+**		@param d		Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
 local void EditorTileChanged2(int x, int y, int d)
 {
-    unsigned quad;
-    unsigned q2;
-    unsigned u;
-    int tile;
-    MapField* mf;
+	unsigned quad;
+	unsigned q2;
+	unsigned u;
+	int tile;
+	MapField* mf;
 
-    quad = QuadFromTile(x, y);
-    DebugLevel0Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
-	TheMap.Fields[y * TheMap.Width + x].Tile);
+	quad = QuadFromTile(x, y);
+	DebugLevel0Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
+		TheMap.Fields[y * TheMap.Width + x].Tile);
 
-    //
-    //  Change the surrounding
-    //
+	//
+	//  Change the surrounding
+	//
 
-    //
-    //	Special case 1) Walls.
-    //
-    mf = &TheMap.Fields[y * TheMap.Width + x];
-    if (mf->Flags & MapFieldWall) {
-	if (mf->Flags & MapFieldHuman) {
-	    mf->Value = UnitTypeHumanWall->_HitPoints;
-	} else {
-	    mf->Value = UnitTypeOrcWall->_HitPoints;
+	//
+	//		Special case 1) Walls.
+	//
+	mf = &TheMap.Fields[y * TheMap.Width + x];
+	if (mf->Flags & MapFieldWall) {
+		if (mf->Flags & MapFieldHuman) {
+			mf->Value = UnitTypeHumanWall->_HitPoints;
+		} else {
+			mf->Value = UnitTypeOrcWall->_HitPoints;
+		}
+		MapFixWallTile(x + 0, y + 0);
+		MapFixWallTile(x + 1, y + 0);
+		MapFixWallTile(x + 0, y + 1);
+		MapFixWallTile(x - 1, y + 0);
+		MapFixWallTile(x + 0, y - 1);
+		return;
 	}
-        MapFixWallTile(x + 0, y + 0);
-	MapFixWallTile(x + 1, y + 0);
-	MapFixWallTile(x + 0, y + 1);
-	MapFixWallTile(x - 1, y + 0);
-	MapFixWallTile(x + 0, y - 1);
-	return;
-    }
 
-    // 
-    // 	How this works:
-    // 	first get the quad of the neighbouring tile, then
-    // 	check if the margin matches. otherwise, call 
-    // 	EditorChangeTile again.
-    //
-    if (d & DIR_UP && y) {
 	//
-	//      Insert into the bottom the new tile.
+	// 		How this works:
+	// 		first get the quad of the neighbouring tile, then
+	// 		check if the margin matches. otherwise, call
+	// 		EditorChangeTile again.
 	//
-	q2 = QuadFromTile(x, y - 1);
-	u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
-	if (u != q2) {
-	    DebugLevel3Fn("U+    %08x -> %08x\n" _C_ q2 _C_ u);
-	    tile = TileFromQuad(u & BH_QUAD_M, u);
-	    DebugLevel3Fn("= %08x\n" _C_ tile);
-	    EditorChangeTile(x, y - 1, tile, d&~DIR_DOWN);
+	if (d & DIR_UP && y) {
+		//
+		//	  Insert into the bottom the new tile.
+		//
+		q2 = QuadFromTile(x, y - 1);
+		u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
+		if (u != q2) {
+			DebugLevel3Fn("U+	%08x -> %08x\n" _C_ q2 _C_ u);
+			tile = TileFromQuad(u & BH_QUAD_M, u);
+			DebugLevel3Fn("= %08x\n" _C_ tile);
+			EditorChangeTile(x, y - 1, tile, d&~DIR_DOWN);
+		}
 	}
-    }
-    if (d & DIR_DOWN && y < TheMap.Height - 1) {
-	//
-	//      Insert into the top the new tile.
-	//
-	q2 = QuadFromTile(x, y + 1);
-	u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
-	if (u != q2) {
-	    DebugLevel3Fn("D+    %08x -> %08x\n" _C_ q2 _C_ u);
-	    tile = TileFromQuad(u & TH_QUAD_M, u);
-	    EditorChangeTile(x, y + 1, tile, d&~DIR_UP);
+	if (d & DIR_DOWN && y < TheMap.Height - 1) {
+		//
+		//	  Insert into the top the new tile.
+		//
+		q2 = QuadFromTile(x, y + 1);
+		u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
+		if (u != q2) {
+			DebugLevel3Fn("D+	%08x -> %08x\n" _C_ q2 _C_ u);
+			tile = TileFromQuad(u & TH_QUAD_M, u);
+			EditorChangeTile(x, y + 1, tile, d&~DIR_UP);
+		}
 	}
-    }
-    if (d & DIR_LEFT && x) {
-	//
-	//      Insert into the left the new tile.
-	//
-	q2 = QuadFromTile(x - 1, y);
-	u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
-	if (u != q2) {
-	    DebugLevel3Fn("L+    %08x -> %08x\n" _C_ q2 _C_ u);
-	    tile = TileFromQuad(u & RH_QUAD_M, u);
-	    EditorChangeTile(x - 1, y, tile, d&~DIR_RIGHT);
+	if (d & DIR_LEFT && x) {
+		//
+		//	  Insert into the left the new tile.
+		//
+		q2 = QuadFromTile(x - 1, y);
+		u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
+		if (u != q2) {
+			DebugLevel3Fn("L+	%08x -> %08x\n" _C_ q2 _C_ u);
+			tile = TileFromQuad(u & RH_QUAD_M, u);
+			EditorChangeTile(x - 1, y, tile, d&~DIR_RIGHT);
+		}
 	}
-    }
-    if (d & DIR_RIGHT && x < TheMap.Width - 1) {
-	//
-	//      Insert into the right the new tile.
-	//
-	q2 = QuadFromTile(x + 1, y);
-	u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
-	if (u != q2) {
-	    DebugLevel3Fn("R+    %08x -> %08x\n" _C_ q2 _C_ u);
-	    tile = TileFromQuad(u & LH_QUAD_M, u);
-	    EditorChangeTile(x + 1, y, tile, d&~DIR_LEFT);
+	if (d & DIR_RIGHT && x < TheMap.Width - 1) {
+		//
+		//	  Insert into the right the new tile.
+		//
+		q2 = QuadFromTile(x + 1, y);
+		u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
+		if (u != q2) {
+			DebugLevel3Fn("R+	%08x -> %08x\n" _C_ q2 _C_ u);
+			tile = TileFromQuad(u & LH_QUAD_M, u);
+			EditorChangeTile(x + 1, y, tile, d&~DIR_LEFT);
+		}
 	}
-    }
 }
 
 /**
-**	Update surroundings for tile changes.
+**		Update surroundings for tile changes.
 **
-**	@param x	Map X tile position of change.
-**	@param y	Map Y tile position of change.
+**		@param x		Map X tile position of change.
+**		@param y		Map Y tile position of change.
 */
 global void EditorTileChanged(int x, int y)
 {
-    EditorTileChanged2(x, y, 0xF);
+	EditorTileChanged2(x, y, 0xF);
 }
 
 /**
-**	Make random map
-**      FIXME: vladi: we should have parameters control here...
+**		Make random map
+**	  FIXME: vladi: we should have parameters control here...
 */
 
 /**
-**	TileFill
+**		TileFill
 **
-**	@param x	X map tile coordinate for area center.
-**	@param y	Y map tile coordinate for area center.
-**	@param tile	Tile type to edit.
-**	@param size	Size of surrounding rectangle.
+**		@param x		X map tile coordinate for area center.
+**		@param y		Y map tile coordinate for area center.
+**		@param tile		Tile type to edit.
+**		@param size		Size of surrounding rectangle.
 **
-**      TileFill(centerx, centery, tile_type_water, map_width)
-**      will fill map with water...
+**	  TileFill(centerx, centery, tile_type_water, map_width)
+**	  will fill map with water...
 */
 local void TileFill(int x, int y, int tile, int size)
 {
-    int ix;
-    int ax;
-    int iy;
-    int ay;
+	int ix;
+	int ax;
+	int iy;
+	int ay;
 
 
-    ix = x - size / 2;
-    ax = x + size / 2;
-    iy = y - size / 2;
-    ay = y + size / 2;
+	ix = x - size / 2;
+	ax = x + size / 2;
+	iy = y - size / 2;
+	ay = y + size / 2;
 
-    if (ix < 0) {
-	ix = 0;
-    }
-    if (ax >= TheMap.Width) {
-	ax = TheMap.Width - 1;
-    }
-    if (iy < 0) {
-	iy = 0;
-    }
-    if (ay >= TheMap.Height) {
-	ay = TheMap.Height - 1;
-    }
-
-    for (x = ix; x <= ax; ++x) {
-	for (y = iy; y <= ay; ++y) {
-	    EditorChangeTile(x, y, tile, 15);
+	if (ix < 0) {
+		ix = 0;
 	}
-    }
+	if (ax >= TheMap.Width) {
+		ax = TheMap.Width - 1;
+	}
+	if (iy < 0) {
+		iy = 0;
+	}
+	if (ay >= TheMap.Height) {
+		ay = TheMap.Height - 1;
+	}
+
+	for (x = ix; x <= ax; ++x) {
+		for (y = iy; y <= ay; ++y) {
+			EditorChangeTile(x, y, tile, 15);
+		}
+	}
 }
 
-#define WATER_TILE      0x10
-#define COAST_TILE      0x30
-#define GRASS_TILE      0x50
-#define WOOD_TILE       0x70
-#define ROCK_TILE       0x80
+#define WATER_TILE	  0x10
+#define COAST_TILE	  0x30
+#define GRASS_TILE	  0x50
+#define WOOD_TILE	   0x70
+#define ROCK_TILE	   0x80
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 local void EditorRandomizeTile(int tile, int count, int max_size)
 {
-    int mx;
-    int my;
-    int i;
-    int rx;
-    int ry;
-    int rz;
+	int mx;
+	int my;
+	int i;
+	int rx;
+	int ry;
+	int rz;
 
-    mx = TheMap.Width;
-    my = TheMap.Height;
+	mx = TheMap.Width;
+	my = TheMap.Height;
 
-    for (i = 0; i < count; ++i) {
-	rx = rand() % (mx / 2);
-	ry = rand() % (my / 2);
-	rz = rand() % max_size + 1;
-    
-	TileFill(rx, ry, tile, rz);
-	TileFill(mx - rx - 1, ry, tile, rz);
-	TileFill(rx, my - ry - 1, tile, rz);
-	TileFill(mx - rx - 1, mx - ry - 1, tile, rz);
-    }
+	for (i = 0; i < count; ++i) {
+		rx = rand() % (mx / 2);
+		ry = rand() % (my / 2);
+		rz = rand() % max_size + 1;
+
+		TileFill(rx, ry, tile, rz);
+		TileFill(mx - rx - 1, ry, tile, rz);
+		TileFill(rx, my - ry - 1, tile, rz);
+		TileFill(mx - rx - 1, mx - ry - 1, tile, rz);
+	}
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 local void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
-    int mx;
-    int my;
-    int i;
-    int rx;
-    int ry;
-    int tile;
-    int z;
-    int tw;
-    int th;
-    UnitType* type;
-    Unit* unit;
+	int mx;
+	int my;
+	int i;
+	int rx;
+	int ry;
+	int tile;
+	int z;
+	int tw;
+	int th;
+	UnitType* type;
+	Unit* unit;
 
-    mx = TheMap.Width;
-    my = TheMap.Height;
-    type = UnitTypeByIdent(unit_type);
-    tw = type->TileWidth;
-    th = type->TileHeight;
+	mx = TheMap.Width;
+	my = TheMap.Height;
+	type = UnitTypeByIdent(unit_type);
+	tw = type->TileWidth;
+	th = type->TileHeight;
 
-    for (i = 0; i < count; ++i) {
-	rx = rand() % (mx / 2 - tw + 1);
-	ry = rand() % (my / 2 - th + 1);
-	tile = GRASS_TILE;
-	z = type->TileHeight;
+	for (i = 0; i < count; ++i) {
+		rx = rand() % (mx / 2 - tw + 1);
+		ry = rand() % (my / 2 - th + 1);
+		tile = GRASS_TILE;
+		z = type->TileHeight;
 
-	// FIXME: vladi: the idea is simple: make proper land for unit(s) :)
-	// FIXME: handle units larger than 1 square
-	TileFill(rx, ry, tile, z * 2);
-	TileFill(mx - rx - 1, ry, tile, z * 2);
-	TileFill(rx, my - ry - 1, tile, z * 2);
-	TileFill(mx - rx - 1, mx - ry - 1, tile, z * 2);
+		// FIXME: vladi: the idea is simple: make proper land for unit(s) :)
+		// FIXME: handle units larger than 1 square
+		TileFill(rx, ry, tile, z * 2);
+		TileFill(mx - rx - 1, ry, tile, z * 2);
+		TileFill(rx, my - ry - 1, tile, z * 2);
+		TileFill(mx - rx - 1, mx - ry - 1, tile, z * 2);
 
-	// FIXME: can overlap units
-	unit = MakeUnitAndPlace(rx, ry , type, &Players[15]);
-	unit->Value = value;
-	unit = MakeUnitAndPlace(mx - rx - tw, ry, type, &Players[15]);
-	unit->Value = value;
-	unit = MakeUnitAndPlace(rx, my - ry - th, type, &Players[15]);
-	unit->Value = value;
-	unit = MakeUnitAndPlace(mx - rx - tw, mx - ry - th, type, &Players[15]);
-	unit->Value = value;
-    }
+		// FIXME: can overlap units
+		unit = MakeUnitAndPlace(rx, ry , type, &Players[15]);
+		unit->Value = value;
+		unit = MakeUnitAndPlace(mx - rx - tw, ry, type, &Players[15]);
+		unit->Value = value;
+		unit = MakeUnitAndPlace(rx, my - ry - th, type, &Players[15]);
+		unit->Value = value;
+		unit = MakeUnitAndPlace(mx - rx - tw, mx - ry - th, type, &Players[15]);
+		unit->Value = value;
+	}
 }
 
 /**
-**	Destroy all units
+**		Destroy all units
 */
 local void EditorDestroyAllUnits(void)
 {
-    Unit* unit;
+	Unit* unit;
 
-    while (NumUnits != 0) {
-	unit = Units[0];
-	RemoveUnit(unit, NULL);
-	UnitLost(unit);
-	UnitClearOrders(unit);
-	ReleaseUnit(unit);
-    }
+	while (NumUnits != 0) {
+		unit = Units[0];
+		RemoveUnit(unit, NULL);
+		UnitLost(unit);
+		UnitClearOrders(unit);
+		ReleaseUnit(unit);
+	}
 }
 
 /**
-**	Create a random map
+**		Create a random map
 */
 global void EditorCreateRandomMap(void)
 {
-    int mz;
- 
-    mz = TheMap.Width > TheMap.Height ? TheMap.Width : TheMap.Height;
+	int mz;
 
-    // make water-base
-    TileFill(0, 0, WATER_TILE, mz * 3);
-    // remove all units
-    EditorDestroyAllUnits();
+	mz = TheMap.Width > TheMap.Height ? TheMap.Width : TheMap.Height;
 
-    EditorRandomizeTile(COAST_TILE, 10, 16);
-    EditorRandomizeTile(GRASS_TILE, 20, 16);
-    EditorRandomizeTile(WOOD_TILE,  60,  4);
-    EditorRandomizeTile(ROCK_TILE,  30,  2);
+	// make water-base
+	TileFill(0, 0, WATER_TILE, mz * 3);
+	// remove all units
+	EditorDestroyAllUnits();
 
-    EditorRandomizeUnit("unit-gold-mine",  5,  50000);
+	EditorRandomizeTile(COAST_TILE, 10, 16);
+	EditorRandomizeTile(GRASS_TILE, 20, 16);
+	EditorRandomizeTile(WOOD_TILE,  60,  4);
+	EditorRandomizeTile(ROCK_TILE,  30,  2);
+
+	EditorRandomizeUnit("unit-gold-mine",  5,  50000);
 }
 
 //@}

@@ -17,7 +17,7 @@ extern char *tkbuffer;
 #define MAX_HEAPS_CHUNCK 256
 extern LISP dyn_heaps[MAX_HEAPS_CHUNCK];
 extern int dyn_heaps_pos[MAX_HEAPS_CHUNCK];
-extern int cur_dyn_heap; 
+extern int cur_dyn_heap;
 
 extern LISP heap,heap_end,heap_org;
 extern long heap_size;
@@ -56,22 +56,22 @@ struct gc_protected
  struct gc_protected *next;};
 
 #define ALLOCATED_CELLS (gc_kind_copying?\
-	(cur_dyn_heap*heap_size)+dyn_heaps_pos[cur_dyn_heap]:\
-	heap-heap_org)
- 
-#define NEWCELL(_into,_type)          \
-{if (gc_kind_copying == 1)            \
+		(cur_dyn_heap*heap_size)+dyn_heaps_pos[cur_dyn_heap]:\
+		heap-heap_org)
+
+#define NEWCELL(_into,_type)		  \
+{if (gc_kind_copying == 1)			\
    {if (dyn_heaps_pos[cur_dyn_heap]>=heap_size)   \
-      { new_dyn_heap();}  	      \
-    _into = dyn_heaps[cur_dyn_heap]+(dyn_heaps_pos[cur_dyn_heap]++); \
-    }      		              \
- else                                 \
-   {if NULLP(freelist)                \
-      gc_for_newcell();               \
-    _into = freelist;                 \
-    freelist = CDR(freelist);         \
-    ++gc_cells_allocated;}            \
- (*_into).gc_mark = 0;                \
+	  { new_dyn_heap();}  			  \
+	_into = dyn_heaps[cur_dyn_heap]+(dyn_heaps_pos[cur_dyn_heap]++); \
+	}	  							  \
+ else								 \
+   {if NULLP(freelist)				\
+	  gc_for_newcell();			   \
+	_into = freelist;				 \
+	freelist = CDR(freelist);		 \
+	++gc_cells_allocated;}			\
+ (*_into).gc_mark = 0;				\
  (*_into).type = (short) _type;}
 
 #if defined(THINK_C)

@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,58 +34,58 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include "player.h"
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
-extern int AiSleepCycles;			/// Ai sleeps # cycles
-extern int AiTimeFactor;			/// Adjust the AI build times
-extern int AiCostFactor;			/// Adjust the AI costs
+extern int AiSleepCycles;						/// Ai sleeps # cycles
+extern int AiTimeFactor;						/// Adjust the AI build times
+extern int AiCostFactor;						/// Adjust the AI costs
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
-extern void AiEachCycle(Player* player);	/// Called each game cycle
-extern void AiEachSecond(Player* player);	/// Called each second
+extern void AiEachCycle(Player* player);		/// Called each game cycle
+extern void AiEachSecond(Player* player);		/// Called each second
 
-extern void InitAiModule(void);			/// Init AI global structures
-extern void AiInit(Player* player);		/// Init AI for this player
-extern void CleanAi(void);			/// Cleanup the AI module
-extern void SaveAi(CLFile*file);		/// Save the AI state
+extern void InitAiModule(void);						/// Init AI global structures
+extern void AiInit(Player* player);				/// Init AI for this player
+extern void CleanAi(void);						/// Cleanup the AI module
+extern void SaveAi(CLFile*file);				/// Save the AI state
 
-extern void AiCclRegister(void);		/// Register ccl features
+extern void AiCclRegister(void);				/// Register ccl features
 
 /*--------------------------------------------------------
---     Call Backs/Triggers
+--	 Call Backs/Triggers
 --------------------------------------------------------*/
 
-    /// Called if AI unit is attacked
+	/// Called if AI unit is attacked
 extern void AiHelpMe(const Unit* attacker,Unit* defender);
-    /// Called if AI unit is killed
+	/// Called if AI unit is killed
 extern void AiUnitKilled(Unit* unit);
-    /// Called if AI needs more farms
+	/// Called if AI needs more farms
 extern void AiNeedMoreSupply(const Unit* unit,const UnitType* what);
-    /// Called if AI unit has completed work
+	/// Called if AI unit has completed work
 extern void AiWorkComplete(Unit* unit,Unit* what);
-    /// Called if AI unit can't build
+	/// Called if AI unit can't build
 extern void AiCanNotBuild(Unit* unit,const UnitType* what);
-    /// Called if AI unit can't reach building place
+	/// Called if AI unit can't reach building place
 extern void AiCanNotReach(Unit* unit,const UnitType* what);
-    /// Called if an AI unit can't move
+	/// Called if an AI unit can't move
 extern void AiCanNotMove(Unit * unit);
-    /// Called if AI unit has completed training
+	/// Called if AI unit has completed training
 extern void AiTrainingComplete(Unit* unit,Unit* what);
-    /// Called if AI unit has completed upgrade to
+	/// Called if AI unit has completed upgrade to
 extern void AiUpgradeToComplete(Unit* unit,const UnitType* what);
-    /// Called if AI unit has completed research
+	/// Called if AI unit has completed research
 extern void AiResearchComplete(Unit* unit,const Upgrade* what);
 
 //@}
 
-#endif	// !__AI_H__
+#endif		// !__AI_H__

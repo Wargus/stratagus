@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,7 +34,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Platform dependant IO-related Includes and Definitions
+--		Platform dependant IO-related Includes and Definitions
 ----------------------------------------------------------------------------*/
 
 #ifndef _MSC_VER
@@ -49,8 +49,8 @@
 
 #else // _MSC_VER
 
-#define R_OK	4
-#define F_OK	0
+#define R_OK		4
+#define F_OK		0
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>
@@ -65,9 +65,9 @@
 #endif // _MSC_VER
 
 #ifndef O_BINARY
-#define O_BINARY	0
+#define O_BINARY		0
 #endif
 
 //@}
 
-#endif	// !__IOCOMPAT_H__
+#endif		// !__IOCOMPAT_H__

@@ -3,7 +3,7 @@
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,38 +34,38 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
---	Declarations
+--		Declarations
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
-     /// upgrade of identifier
+	 /// upgrade of identifier
 extern Upgrade* UpgradeByIdent(const char*);
 
-    /// init upgrade/allow structures
+	/// init upgrade/allow structures
 extern void InitUpgrades(void);
-    /// save the upgrades
+	/// save the upgrades
 extern void SaveUpgrades(CLFile*);
-    /// cleanup upgrade module
+	/// cleanup upgrade module
 extern void CleanUpgrades();
 
-    /// parse pud alow (upgrade/spell/units allow) table
+	/// parse pud alow (upgrade/spell/units allow) table
 extern void ParsePudALOW(const char*,int);
-    /// parse pud ugrd (upgrade cost) table
+	/// parse pud ugrd (upgrade cost) table
 extern void ParsePudUGRD(const char*,int);
-    /// Register CCL features for upgrades
+	/// Register CCL features for upgrades
 extern void UpgradesCclRegister(void);
 
 // CHAOS PUR
@@ -82,19 +82,19 @@ extern void UpgradesCclRegister(void);
 
   uid=AddUpgrade( "UpgradeBerserker", 100, 200, 300, 0, IconUpgradeBerserkerId)
   AddUpgradeModifier( uid,
-	  1, 1,    // more sight
-	  +10, +5, // more damage
-	  -5,      // less armor
-	  0, 0,    // speed and HP are the same
-	  0, 0, 0, 0, // costs are the same
-		 // allow berserker and forbid axethrower
-	  "A:UnitBerserker,F:UnitAxeThrower",
-		  // allows BerserkerRange1 upgrade
-	  "A:UpgradeBerserkerRange1",
-		  // there are no allow/frobid actions
-	  "",
-		  // apply to Berserker units
-	  "UnitBerserker"
+		  1, 1,	// more sight
+		  +10, +5, // more damage
+		  -5,	  // less armor
+		  0, 0,	// speed and HP are the same
+		  0, 0, 0, 0, // costs are the same
+				 // allow berserker and forbid axethrower
+		  "A:UnitBerserker,F:UnitAxeThrower",
+				  // allows BerserkerRange1 upgrade
+		  "A:UpgradeBerserkerRange1",
+				  // there are no allow/frobid actions
+		  "",
+				  // apply to Berserker units
+		  "UnitBerserker"
   );
 
   UpgradesDone(); // this should be called at the end of the game
@@ -107,7 +107,7 @@ extern void UpgradesCclRegister(void);
 */
 
 /*----------------------------------------------------------------------------
---	Init/Done/Add functions
+--		Init/Done/Add functions
 ----------------------------------------------------------------------------*/
 
 // this function is used for define `simple' upgrades
@@ -122,7 +122,7 @@ extern void AddSimpleUpgrade( const char*,
   );
 
 /*----------------------------------------------------------------------------
---	General/Map functions
+--		General/Map functions
 ----------------------------------------------------------------------------*/
 
 // AllowStruct and UpgradeTimers will be static in the player so will be
@@ -133,13 +133,13 @@ extern int UpgradeIdByIdent( const char* sid );
 extern int ActionIdByIdent( const char* sid );
 
 /*----------------------------------------------------------------------------
---	Upgrades
+--		Upgrades
 ----------------------------------------------------------------------------*/
 
-    /// Upgrade will be acquired, called by UpgradeIncTime() when timer reached
+	/// Upgrade will be acquired, called by UpgradeIncTime() when timer reached
 extern void UpgradeAcquire( Player* player,const Upgrade* upgrade );
 
-    /// Increment the upgrade timer.
+	/// Increment the upgrade timer.
 extern void UpgradeIncTime( Player* player, int id, int amount );
 extern void UpgradeIncTime2( Player* player, char* sid, int amount ); // by ident string
 
@@ -155,7 +155,7 @@ extern void UpgradeLost( Player* player, int id );
 extern void UpgradeLost2( Player* player, char* sid ); // by ident string
 
 /*----------------------------------------------------------------------------
---	Allow(s)
+--		Allow(s)
 ----------------------------------------------------------------------------*/
 
 // all the following functions are just map handlers, no specific notes
@@ -180,13 +180,13 @@ extern char ActionIdentAllowed(const Player* player,const char* sid );
 extern char UpgradeIdAllowed(const Player* player,  int id );
 extern char UpgradeIdentAllowed(const Player* player,const char* sid );
 
-    /// Check if the upgrade is researched.
+	/// Check if the upgrade is researched.
 extern int UpgradeIdentAvailable(const Player* player,const char* ident);
 
 /*----------------------------------------------------------------------------
---	eof
+--		eof
 ----------------------------------------------------------------------------*/
 
 //@}
 
-#endif	// !__UPGRADE_H__
+#endif		// !__UPGRADE_H__

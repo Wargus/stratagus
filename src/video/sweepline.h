@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \|/ __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,47 +34,47 @@
 //@{
 
 /*----------------------------------------------------------------------------
---      Declarations
+--	  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-** 
+**
 **
 */
 
 /*----------------------------------------------------------------------------
---      Functions
+--	  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**      Given horizontal segment in pixel x-coordinates leftx..rightx and
-**      seen at given pixel y-coordinate will be stored (merged or not) with
-**      the existing segments, so they can later be extracted as rectangles.
-**      Merging is done when segments are in range (leftx-SWEEPLINE_MERGE) upto
-**      (rightx+SWEEPLINE_MERGE).
-**      It also remembers given y and denotes the resulting segment to be
-**      invalidate at (y+SWEEPLINE_MERGE), unless another segment added later
-**      is to be merged with it. This way we can get rectangles covering all
-**      added horizontal segments.
+**	  Given horizontal segment in pixel x-coordinates leftx..rightx and
+**	  seen at given pixel y-coordinate will be stored (merged or not) with
+**	  the existing segments, so they can later be extracted as rectangles.
+**	  Merging is done when segments are in range (leftx-SWEEPLINE_MERGE) upto
+**	  (rightx+SWEEPLINE_MERGE).
+**	  It also remembers given y and denotes the resulting segment to be
+**	  invalidate at (y+SWEEPLINE_MERGE), unless another segment added later
+**	  is to be merged with it. This way we can get rectangles covering all
+**	  added horizontal segments.
 **
-**      @note: For this to work all segments should be added with an increasing
-**      or equal y-coordinate, to make the merge possible and ensure the
-**      invalidate order.
+**	  @note: For this to work all segments should be added with an increasing
+**	  or equal y-coordinate, to make the merge possible and ensure the
+**	  invalidate order.
 */
 extern void SweeplineAdd(int leftx, int rightx, int y);
 
 /**
-**      Invalidate all segments which exist too long (have bottomyshadow
-**      greater or equal to given y-position as rectangles, removing them from
-**      the existing structure.
-**      @note: This leaves segments which might still be 'merged' with new ones
-**      or are the last and need to be invalidated separetely with
-**      SweeplineInvalidateAll
+**	  Invalidate all segments which exist too long (have bottomyshadow
+**	  greater or equal to given y-position as rectangles, removing them from
+**	  the existing structure.
+**	  @note: This leaves segments which might still be 'merged' with new ones
+**	  or are the last and need to be invalidated separetely with
+**	  SweeplineInvalidateAll
 */
 extern void SweeplineInvalidate(int y);
 
 /**
-**      Invalidate all segments still available in this structure.
+**	  Invalidate all segments still available in this structure.
 */
 extern void SweeplineInvalidateAll(void);
 
@@ -82,4 +82,4 @@ extern void SweeplineInvalidateAll(void);
 
 //@}
 
-#endif	// !__SWEEPLINE_H__
+#endif		// !__SWEEPLINE_H__

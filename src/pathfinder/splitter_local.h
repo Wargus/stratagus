@@ -3,7 +3,7 @@
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -33,96 +33,96 @@
 #define __SPLITTER_LOCAL_H__
 
 /*----------------------------------------------------------------------------
---	Structures
+--		Structures
 ----------------------------------------------------------------------------*/
 typedef struct _region_line_ RegionSegment;
 
 struct _region_line_{
-    int			Y;		/// y pos of the line
-    int 		MinX,MaxX;	/// X bounds (including)
-    RegionSegment	*Prev;		/// previous in region
-    RegionSegment	*Next;		/// Next in region
+	int						Y;				/// y pos of the line
+	int 				MinX,MaxX;		/// X bounds (including)
+	RegionSegment		*Prev;				/// previous in region
+	RegionSegment		*Next;				/// Next in region
 };
 
 typedef struct _region_definition_{
-    int			TileCount;	/// Nb of tile assigned to it
-    int			MinX,MinY;	/// Upper left corner
-    int			MaxX,MaxY;	/// Bottom right corner
+	int						TileCount;		/// Nb of tile assigned to it
+	int						MinX,MinY;		/// Upper left corner
+	int						MaxX,MaxY;		/// Bottom right corner
 
-    long		SumX,SumY;	// May limit map to ~512x512
+	long				SumX,SumY;		// May limit map to ~512x512
 
-    int			ConnectionsNumber;
-    int* 		Connections;
-    int*		ConnectionsCount;
+	int						ConnectionsNumber;
+	int* 				Connections;
+	int*				ConnectionsCount;
 
-    int			Color;		/// For debugging only.
+	int						Color;				/// For debugging only.
 
-    char		IsWater;	/// This region is water ?
-    int			Dirty;		/// Should be checked for split & joins ?
-    char		NeedConnectTest;/// Do we need to test connection for this region ?
-    RegionSegment*	FirstSegment;	/// All lines. ( double linked list )
-    RegionSegment*	LastSegment;
-    int			Zone;		/// 8-connex tile zone
+	char				IsWater;		/// This region is water ?
+	int						Dirty;				/// Should be checked for split & joins ?
+	char				NeedConnectTest;/// Do we need to test connection for this region ?
+	RegionSegment*		FirstSegment;		/// All lines. ( double linked list )
+	RegionSegment*		LastSegment;
+	int						Zone;				/// 8-connex tile zone
 } RegionDefinition;
 
 typedef struct {
-    unsigned short int	X;
-    unsigned short int	Y;
+	unsigned short int		X;
+	unsigned short int		Y;
 } MapPoint;
 
 typedef struct _circular_filler_{
-    int 		NextOne;
-    int 		LastOne;
-    int			FillValue;
-    MapPoint*		Points;
-    RegionId		RestrictTo;
-    int			Direction;
+	int 				NextOne;
+	int 				LastOne;
+	int						FillValue;
+	MapPoint*				Points;
+	RegionId				RestrictTo;
+	int						Direction;
 }CircularFiller;
 
 
 /*----------------------------------------------------------------------------
---	Macros
+--		Macros
 ----------------------------------------------------------------------------*/
-#define	MaxZone			1024
-#define InMap(x,y)		(((unsigned)(x)<(unsigned)TheMap.Width)&&(((unsigned)(y)<(unsigned)TheMap.Height)))
-#define MapFlag(x,y)		TheMap.Fields[x + TheMap.Width * y].Flags
-#define RegionMapping(x,y) 	(RegionMappingStorage[(x) + TheMap.Width * (y)])
+#define		MaxZone						1024
+#define InMap(x,y)				(((unsigned)(x)<(unsigned)TheMap.Width)&&(((unsigned)(y)<(unsigned)TheMap.Height)))
+#define MapFlag(x,y)				TheMap.Fields[x + TheMap.Width * y].Flags
+#define RegionMapping(x,y) 		(RegionMappingStorage[(x) + TheMap.Width * (y)])
 #define TileMappable(x,y)\
-    (	(MapFlag(x,y) & (MapFieldLandAllowed | MapFieldWaterAllowed | MapFieldCoastAllowed)) &&\
-	(!(MapFlag(x,y) & (MapFieldBuilding | MapFieldWall | MapFieldRocks | MapFieldForest))))
+	(		(MapFlag(x,y) & (MapFieldLandAllowed | MapFieldWaterAllowed | MapFieldCoastAllowed)) &&\
+		(!(MapFlag(x,y) & (MapFieldBuilding | MapFieldWall | MapFieldRocks | MapFieldForest))))
 #define TilePassable(x,y)\
-    ((MapFlag(x,y) & (MapFieldLandUnit + MapFieldSeaUnit)) == 0)
- 
+	((MapFlag(x,y) & (MapFieldLandUnit + MapFieldSeaUnit)) == 0)
+
 #define TileIsWater(x,y)\
-    ((TheMap.Fields[x + TheMap.Width * y].Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed)) != 0)
+	((TheMap.Fields[x + TheMap.Width * y].Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed)) != 0)
 
 
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
 /// Coordinates of adjacents cells of a cell
-extern int 		adjacents[8][2]; 
+extern int 				adjacents[8][2];
 /// Tile => region mapping
-extern RegionId* 	RegionMappingStorage;
+extern RegionId* 		RegionMappingStorage;
 /// All regions
-extern RegionDefinition	Regions[MaxRegionNumber];
+extern RegionDefinition		Regions[MaxRegionNumber];
 /// Temporary storage
-extern int* 		RegionTempStorage;
+extern int* 				RegionTempStorage;
 /// Number of region
-extern int		RegionCount;
+extern int				RegionCount;
 /// Highest region + 1
-extern int		RegionMax;
-/// Lowest free region ID 
-extern int		NextFreeRegion;
+extern int				RegionMax;
+/// Lowest free region ID
+extern int				NextFreeRegion;
 /// Zone marked dirty ?
-extern int		ZoneNeedRefresh;
+extern int				ZoneNeedRefresh;
 
 
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 // Region handling
@@ -150,7 +150,7 @@ global void RegionUpdateMinMax(RegionDefinition* adef,int x,int y);
 global void RegionAssignTile(RegionId region,int x,int y);
 /// Unassign a tile from a region
 global void RegionUnassignTile(RegionId region,int x,int y);
-/// Find the closest point on a region with shortest horizontal distance to x 
+/// Find the closest point on a region with shortest horizontal distance to x
 global void RegionFindPointOnX(RegionDefinition * def,int x,int * vx,int * vy);
 /// Find the closest point on a region with shortest vertical distance to y
 global void RegionFindPointOnY(RegionDefinition * def,int y,int * vx,int * vy);
