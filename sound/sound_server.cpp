@@ -35,6 +35,7 @@
 #if !defined(USE_LIBMODPLUG) && !defined(noUSE_LIBMODPLUG)
 #define USE_LIBMODPLUG			/// Include lib modplug support
 #endif
+#define _USE_LIBMODPLUG32		/// Test with 32bit resolution
 
 #include <stdlib.h>
 #include <string.h>
@@ -148,7 +149,11 @@ global void PlayMusic(const char* name)
 
     ModPlug_GetSettings(&settings);
     settings.mFrequency=SoundFrequency;
+#ifdef USE_LIBMODPLUG32
+    settings.mBits=32;
+#else
     settings.mBits=16;
+#endif
 
     ModPlug_SetSettings(&settings);
 
@@ -191,20 +196,28 @@ global void PlayMusic(const char* name)
 */
 local void MixMusicToStereo32(int* buffer,int size)
 {
+#ifdef USE_LIBMODPLUG32
+    long* buf;
+#else
     short* buf;
+#endif
     int i;
     int n;
 
     if( PlayingMusic ) {
-	buf=alloca(size*sizeof(short)*2);
+	buf=alloca(size*sizeof(*buf));
 
-	n=ModPlug_Read(buf,size*2);
+	n=ModPlug_Read(buf,size*sizeof(*buf));
 
-	for( i=0; i<n/2; ++i ) {	// Add to our samples
+	for( i=0; i<n/sizeof(*buf); ++i ) {	// Add to our samples
+#ifdef USE_LIBMODPLUG32
+	    buffer[i]+=((buf[i]>>16)*MusicVolume)/256;
+#else
 	    buffer[i]+=(buf[i]*MusicVolume)/256;
+#endif
 	}
 
-	if( n!=size*2 ) {		// End reached
+	if( n!=size*sizeof(*buf) ) {		// End reached
 	    SCM cb;
 
 	    DebugLevel2Fn("End of music %d\n",i);
