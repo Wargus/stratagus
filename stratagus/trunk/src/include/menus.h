@@ -393,7 +393,7 @@ extern void SetupEditor(void);
 extern void ErrorMenu(char*);
 
 	/// Menu Loop
-extern void MenuLoop(char* filename, struct _world_map_* map);
+extern void MenuLoop(const char* filename, struct _world_map_* map);
 
 	/// Pre menu setup
 extern void PreMenuSetup(void);

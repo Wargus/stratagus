@@ -647,7 +647,7 @@ void PreMenuSetup(void)
 **  @param filename  map filename
 **  @param map       map loaded
 */
-void MenuLoop(char* filename, WorldMap* map)
+void MenuLoop(const char* filename, WorldMap* map)
 {
 	for (;;) {
 		//
@@ -751,7 +751,7 @@ void MenuLoop(char* filename, WorldMap* map)
 
 		filename = NextChapter();
 		sprintf(CurrentMapPath, "%s/%s", StratagusLibPath, filename);
-		filename = CurrentMapPath;
+//		filename = CurrentMapPath;
 		DebugPrint("Next chapter %s\n" _C_ CurrentMapPath);
 	}
 }
