@@ -10,7 +10,7 @@
 //
 /**@name missile.c	-	The missiles. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -887,6 +887,9 @@ local int PointToPointMissile(Missile* missile)
 	    // must not call MissileNewHeading nor frame change
 	} else if( missile->Type->Class == MissileClassBlizzard ) {
 	    missile->SpriteFrame = 0;
+	} else if( missile->Type->Class == MissileClassPointToPoint3Bounces ) {
+	    missile->DX-=xstep*TileSizeX/2;
+	    missile->DY-=ystep*TileSizeY/2;
 	} else {
 	    MissileNewHeadingFromXY(missile,dx*xstep,dy*ystep);
 	}
@@ -1238,8 +1241,8 @@ local void MissileAction(Missile* missile)
 		    case 3:
 		    case 5:
 			missile->State+=2;
-			missile->DX+=missile->Xstep*TileSizeX*2;
-			missile->DY+=missile->Ystep*TileSizeY*2;
+			missile->DX+=missile->Xstep*TileSizeX*3/2;
+			missile->DY+=missile->Ystep*TileSizeY*3/2;
 			MissileHit(missile);
 			// FIXME: hits to left and right
 			// FIXME: reduce damage effects on later impacts
