@@ -426,7 +426,15 @@ global void DrawUnitInfo(const Unit* unit)
 			    ,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
 		}
 		if( ButtonUnderCursor==i+4 ) {
-		    SetStatusLine(unit->OnBoard[i]->Type->Name);
+		    if( unit->OnBoard[i]->Name ) {
+			char buf[128];
+
+			sprintf(buf,"%s %s\n",unit->OnBoard[i]->Type->Name,
+			    unit->OnBoard[i]->Name);
+			SetStatusLine(buf);
+		    } else {
+			SetStatusLine(unit->OnBoard[i]->Type->Name);
+		    }
 		}
 	    }
 	}
@@ -997,7 +1005,15 @@ global void DrawInfoPanel(void)
 			,TheUI.Buttons[i+1].X,TheUI.Buttons[i+1].Y);
 
 		if( ButtonUnderCursor==1+i ) {
-		    SetStatusLine(Selected[i]->Type->Name);
+		    if( Selected[i]->Name ) {
+			char buf[128];
+
+			sprintf(buf,"%s %s\n",Selected[i]->Type->Name,
+			    Selected[i]->Name);
+			SetStatusLine(buf);
+		    } else {
+			SetStatusLine(Selected[i]->Type->Name);
+		    }
 		}
 	    }
 	    return;
@@ -1021,7 +1037,15 @@ global void DrawInfoPanel(void)
 	    DrawInfoPanelBackground(i);
 	    DrawUnitInfo(Selected[0]);
 	    if( ButtonUnderCursor==1 ) {
-		SetStatusLine(Selected[0]->Type->Name);
+		if( Selected[0]->Name ) {
+		    char buf[128];
+
+		    sprintf(buf,"%s %s\n",Selected[0]->Type->Name,
+			Selected[0]->Name);
+		    SetStatusLine(buf);
+		} else {
+		    SetStatusLine(Selected[0]->Type->Name);
+		}
 	    }
 	    return;
 	}

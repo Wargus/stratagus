@@ -53,6 +53,7 @@
 #include "pathfinder.h"
 #include "network.h"
 #include "ui.h"
+#include "ccl.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -165,6 +166,13 @@ global void ReleaseUnit(Unit* unit)
 
     RefsDebugCheck( unit->Refs );
 
+    //
+    //	Free used memory
+    //
+    if( unit->Name ) {
+	free(unit->Name);
+    }
+
 #ifdef UNIT_ON_MAP
     if( 0 ) {		// debug check
 	Unit* list;
@@ -269,6 +277,21 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     //
     unit->Type=type;
     unit->SeenFrame=0xFF;
+
+    if( 1 ) {				// Call CCL for name generation
+	SCM fun;
+
+	fun = gh_symbol2scm("gen-unit-name");
+	if (!gh_null_p(symbol_boundp(fun, NIL))) {
+	    SCM value;
+
+	    value = symbol_value(fun, NIL);
+	    if (!gh_null_p(value)) {
+		value=gh_apply(value, cons(gh_symbol2scm(type->Ident),NIL));
+		unit->Name=gh_scm2newstr(value,NULL);
+	    }
+	}
+    }
 
     if( type->Demand ) {
         player->NumFoodUnits+=type->Demand;	// food needed
@@ -3138,10 +3161,10 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	Missile* missile;
 
 	missile=MakeLocalMissile(MissileTypeHit,
-	    target->X*TileSizeX+TileSizeX/2,
-	    target->Y*TileSizeY+TileSizeY/2,
-	    target->X*TileSizeX+TileSizeX/2+3,
-	    target->Y*TileSizeY+TileSizeY/2-MissileTypeHit->Range);
+	    target->X*TileSizeX+target->Type->Width/2,
+	    target->Y*TileSizeY+target->Type->Height/2,
+	    target->X*TileSizeX+target->Type->Width/2+3,
+	    target->Y*TileSizeY+target->Type->Height/2-MissileTypeHit->Range);
 	missile->Damage=damage;
     }
 
@@ -3604,6 +3627,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
     fprintf(file,"\n(unit '%s ",ref=UnitReference(unit));
     free(ref);
     // Needed to create the unit slot
+    if( unit->Name ) {
+	fprintf(file,"'name \"%s\" ",unit->Name);
+    }
     fprintf(file,"'type '%s ",unit->Type->Ident);
     fprintf(file,"'player %d\n  ",unit->Player->Player);
 
@@ -3806,6 +3832,9 @@ global void CleanUnits(void)
     //	Free memory for all units in unit table.
     //
     for( table=Units; table<&Units[NumUnits]; ++table ) {
+	if( (*table)->Name ) {
+	    free((*table)->Name);
+	}
 	free(*table);
 	*table=NULL;
     }
