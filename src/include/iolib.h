@@ -45,7 +45,7 @@
 #endif
 
 #ifdef USE_ZZIPLIB
-#include "zziplib.h"
+#include <zzip.h>
 #endif
 
 /*----------------------------------------------------------------------------
