@@ -503,7 +503,9 @@ void LoadUnitTypeSprite(UnitType* type)
 		type->ShadowSprite = NewGraphic(type->ShadowFile, type->ShadowWidth,
 			type->ShadowHeight);
 		LoadGraphic(type->ShadowSprite);
-		FlipGraphic(type->ShadowSprite);
+		if (type->Flip) {
+			FlipGraphic(type->ShadowSprite);
+		}
 		MakeShadowSprite(type->ShadowSprite);
 	}
 
@@ -514,13 +516,17 @@ void LoadUnitTypeSprite(UnitType* type)
 					resinfo->SpriteWhenLoaded = NewGraphic(resinfo->FileWhenLoaded,
 						type->Width, type->Height);
 					LoadGraphic(resinfo->SpriteWhenLoaded);
-					FlipGraphic(resinfo->SpriteWhenLoaded);
+					if (type->Flip) {
+						FlipGraphic(resinfo->SpriteWhenLoaded);
+					}
 				}
 				if (resinfo->FileWhenEmpty) {
 					resinfo->SpriteWhenEmpty = NewGraphic(resinfo->FileWhenEmpty,
 						type->Width, type->Height);
 					LoadGraphic(resinfo->SpriteWhenEmpty);
-					FlipGraphic(resinfo->SpriteWhenEmpty);
+					if (type->Flip) {
+						FlipGraphic(resinfo->SpriteWhenEmpty);
+					}
 				}
 			}
 		}
@@ -533,7 +539,9 @@ void LoadUnitTypeSprite(UnitType* type)
 	if (file) {
 		type->Sprite = NewGraphic(file, type->Width, type->Height);
 		LoadGraphic(type->Sprite);
-		FlipGraphic(type->Sprite);
+		if (type->Flip) {
+			FlipGraphic(type->Sprite);
+		}
 	}
 }
 
