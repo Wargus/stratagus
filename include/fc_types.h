@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name fc_types.h	-	Stratagus Types. */
+/**@name fc_types.h - Stratagus Types. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//      (c) Copyright 2002-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __FC_TYPES_H__
 #define __FC_TYPES_H__
@@ -34,10 +34,10 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-//		This is needed to have recursive forward references
+// This is needed to have recursive forward references
 
 #if !defined(__STRUCT_PLAYER__) && !defined(DOXYGEN)
 #define __STRUCT_PLAYER__
@@ -56,4 +56,4 @@ typedef struct _missile_type_ MissileType;
 
 //@}
 
-#endif		// !__FC_TYPES_H__
+#endif // !__FC_TYPES_H__
