@@ -121,7 +121,7 @@ global void ChangeSelectedUnits(Unit** units,int count)
 
     DebugCheck(count > MaxSelectable);
 
-    if (count == 1 && units[0]->Type->ClicksToExplode && 
+    if (count == 1 && units[0]->Type->ClicksToExplode &&
 	units[0]->Type->Selectable) {
 	HandleSuicideClick(units[0]);
     }
@@ -144,9 +144,9 @@ global void ChangeSelectedUnits(Unit** units,int count)
 **	Add a unit to the other selected units.
 **
 **	@param unit	Pointer to unit to add.
-**	@return		true if added to selection, false otherwise 
+**	@return		true if added to selection, false otherwise
 **			(if NumSelected == MaxSelectable or
-**			unit is already selected or unselectable) 
+**			unit is already selected or unselectable)
 */
 global int SelectUnit(Unit* unit)
 {
@@ -513,10 +513,10 @@ local int SelectOrganicUnitsInTable(Unit** table,int num_units)
 **	of its upper left and lower right corner expressed in screen map
 **	coordinate system.
 **
-**	@param sx0	x-coord of upper left corner of the rectangle 
-**	@param sy0	y-coord of upper left corner of the rectangle 
-**	@param sx1	x-coord of lower right corner of the rectangle 
-**	@param sy1	y-coord of lower right corner of the rectangle 
+**	@param sx0	x-coord of upper left corner of the rectangle
+**	@param sy0	y-coord of upper left corner of the rectangle
+**	@param sx1	x-coord of lower right corner of the rectangle
+**	@param sy1	y-coord of lower right corner of the rectangle
 **	@param table	table of units
 **	@param num_units	number of units in table
 **
@@ -1025,12 +1025,12 @@ local int CclSetGroupId(lua_State* l)
 {
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     old = GroupId;
-    GroupId = lua_tonumber(l, 1);
+    GroupId = LuaToNumber(l, 1);
 
     lua_pushnumber(l, old);
     return 1;
@@ -1069,23 +1069,19 @@ local int CclSelection(lua_State* l)
     int args;
     int j;
 
-    if (lua_gettop(l) != 2 || !lua_isnumber(l, 1) || !lua_istable(l, 2)) {
+    if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     InitSelections();
-    NumSelected = lua_tonumber(l, 1);
+    NumSelected = LuaToNumber(l, 1);
     i = 0;
     args = luaL_getn(l, 2);
     for (j = 0; j < args; ++j) {
 	const char* str;
 
 	lua_rawgeti(l, 2, j + 1);
-	if (!lua_isstring(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	str = lua_tostring(l, -1);
+	str = LuaToString(l, -1);
 	lua_pop(l, 1);
 	Selected[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
     }

@@ -150,7 +150,7 @@ global void SaveConstructions(CLFile* file)
     CLprintf(file, ";;; MODULE: constructions $Id$\n\n");
 
     // FIXME: needed?
-    
+
     //
     //	Dump table wc2 construction numbers -> internal symbol.
     //
@@ -364,11 +364,7 @@ local int CclDefineConstructionWcNames(lua_State* l)
     }
 
     for (j = 0; j < i; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	*cp++ = strdup(lua_tostring(l, j + 1));
+	*cp++ = strdup(LuaToString(l, j + 1));
     }
     *cp = NULL;
 
