@@ -96,7 +96,7 @@ local SCM CclDefineMissileType(SCM list)
 	    value=gh_cdr(value);
 	    mtype->Height=gh_scm2int(gh_car(value));
 	} else if( gh_eq_p(value,gh_symbol2scm("frames")) ) {
-	    mtype->Frames=gh_scm2int(gh_car(list));
+	    mtype->SpriteFrames=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("fired-sound")) ) {
 	    CclFree(mtype->FiredSound.Name);
 	    mtype->FiredSound.Name=gh_scm2newstr(gh_car(list),NULL);
@@ -117,7 +117,7 @@ local SCM CclDefineMissileType(SCM list)
 		errl("Unsupported class",value);
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("delay")) ) {
-	    mtype->Delay=gh_scm2int(gh_car(list));
+	    mtype->StartDelay=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("sleep")) ) {
 	    mtype->Sleep=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {
