@@ -55,7 +55,7 @@
 #include "tileset.h"
 #include "ui.h"
 #include "iolib.h"
-
+#include "iocompat.h"
 #include "sound_server.h"
 #include "sound.h"
 #include "cdaudio.h"
@@ -652,7 +652,7 @@ static void ClipMixToStereo16(const int* mix, int size, short* output)
 static Sample* LoadSample(const char* name)
 {
 	Sample* sample;
-	char buf[MAX_PATH];
+	char buf[PATH_MAX];
 
 	LibraryFileName(name, buf);
 
