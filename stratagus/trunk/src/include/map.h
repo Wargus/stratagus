@@ -165,6 +165,8 @@ extern int FogOfWarBrightness;
 extern int FogOfWarSaturation;
     /// Forest regeneration
 extern int ForestRegeneration;
+    /// Flag must reveal the map
+extern int FlagRevealMap;
 
 /*----------------------------------------------------------------------------
 --	Functions
