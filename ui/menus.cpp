@@ -40,6 +40,7 @@
 #include <unistd.h>
 #else
 #ifndef _WIN32_WCE
+#include <direct.h>
 #include <io.h>
 #define F_OK 4
 #endif
