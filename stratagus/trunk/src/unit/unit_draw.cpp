@@ -58,9 +58,120 @@ global int ShowOrders;			/// Flag: show orders of unit on map
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two?
 
+local void DrawSelectionCircle(const Unit* unit,const UnitType* type
+	,int x,int y);
+local void DrawSelectionCircleWithTrans(const Unit* unit,const UnitType* type
+	,int x,int y);
+local void DrawSelectionRectangle(const Unit* unit,const UnitType* type
+	,int x,int y);
+local void DrawSelectionRectangleWithTrans(const Unit* unit,const UnitType* type
+	,int x,int y);
+
+/**
+**	Show that units are selection.
+**
+**	@param unit	Pointer to the unit.
+**	@param type	Type of the unit.
+**	@param x	Screen X position of the unit.
+**	@param y	Screen Y position of the unit.
+*/
+local void (*DrawSelection)(const Unit*,const UnitType*,int,int)
+	=DrawSelectionRectangle;
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	Choose color for selection.
+**
+**	@param unit	Pointer to the unit.
+**	@param type	Type of the unit.
+**
+**	@returns	Color for selection, or -1 if not selected.
+*/
+local int SelectionColor(const Unit* unit,const UnitType* type)
+{
+    if( unit->Selected || (unit->Blink&1) ) {
+	if( unit->Player->Player==PlayerNumNeutral ) {
+	    return ColorYellow;
+	}
+	// FIXME: better allied?
+	if( unit->Player==ThisPlayer ) {
+	    return ColorGreen;
+	}
+	if( IsEnemy(ThisPlayer,unit) ) {
+	    return ColorRed;
+	}
+	return unit->Player->Color;
+    }
+
+    // If building mark all own buildings
+    if( CursorBuilding && type->Building && unit->Player==ThisPlayer ) {
+	return ColorGray;
+    }
+    return -1;
+}
+
+/**
+**	Show selected units with circle.
+**
+**	@param unit	Pointer to the unit.
+**	@param type	Type of the unit.
+**	@param x	Screen X position of the unit.
+**	@param y	Screen Y position of the unit.
+*/
+local void DrawSelectionCircle(const Unit* unit,const UnitType* type
+	,int x,int y)
+{
+    int color;
+
+    //
+    //	Select color for the circle.
+    //
+    if( (color=SelectionColor(unit,type))<0 ) {
+	return;
+    }
+    VideoDrawCircleClip(color
+	    ,x+type->TileWidth*TileSizeX/2
+	    ,y+type->TileHeight*TileSizeY/2
+	    ,min(type->BoxWidth,type->BoxHeight)/2);
+
+    VideoDrawCircleClip(color
+	    ,x+type->TileWidth*TileSizeX/2
+	    ,y+type->TileHeight*TileSizeY/2
+	    ,min(type->BoxWidth+2,type->BoxHeight+2)/2);
+}
+
+/**
+**	Show selected units with circle.
+**
+**	@param unit	Pointer to the unit.
+**	@param type	Type of the unit.
+**	@param x	Screen X position of the unit.
+**	@param y	Screen Y position of the unit.
+*/
+local void DrawSelectionCircleWithTrans(const Unit* unit,const UnitType* type
+	,int x,int y)
+{
+    int color;
+
+    //
+    //	Select color for the circle.
+    //
+    if( (color=SelectionColor(unit,type))<0 ) {
+	return;
+    }
+    VideoDrawCircleClip(color
+	    ,x+type->TileWidth*TileSizeX/2
+	    ,y+type->TileHeight*TileSizeY/2
+	    ,min(type->BoxWidth,type->BoxHeight)/2);
+
+    VideoFill75TransCircleClip(color
+	    ,x+type->TileWidth*TileSizeX/2
+	    ,y+type->TileHeight*TileSizeY/2
+	    ,min(type->BoxWidth-2,type->BoxHeight-2)/2);
+}
 
 /**
 **	Draw selected rectangle around the unit.
@@ -70,51 +181,55 @@ global int ShowOrders;			/// Flag: show orders of unit on map
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-local void DrawSelectionRectangle(Unit* unit,UnitType* type,int x,int y)
+local void DrawSelectionRectangle(const Unit* unit,const UnitType* type
+	,int x,int y)
 {
     int color;
 
     //
     //	Select color for the rectangle
     //
-    if( unit->Selected || (unit->Blink&1) ) {
-#if 1
-	if( unit->Player->Player==PlayerNumNeutral ) {
-	    color=ColorYellow;
-	} else if( unit->Player==ThisPlayer ) {
-	    color=ColorGreen;
-	} else {
-	    color=ColorRed;
-	}
-#else
-	color=unit->Player->Color;
-#endif
-    } else if( CursorBuilding && type->Building && unit->Player==ThisPlayer ) {
-	// If building mark all buildings
-	color=ColorGray;
-    } else {
+    if( (color=SelectionColor(unit,type))<0 ) {
 	return;
     }
 
-#if 1
     VideoDrawRectangleClip(color
 	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
 	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
 	    ,type->BoxWidth
 	    ,type->BoxHeight);
-#if 0
+}
+
+/**
+**	Draw selected rectangle around the unit.
+**
+**	@param unit	Pointer to the unit.
+**	@param type	Type of the unit.
+**	@param x	Screen X position of the unit.
+**	@param y	Screen Y position of the unit.
+*/
+local void DrawSelectionRectangleWithTrans(const Unit* unit,const UnitType* type
+	,int x,int y)
+{
+    int color;
+
+    //
+    //	Select color for the rectangle
+    //
+    if( (color=SelectionColor(unit,type))<0 ) {
+	return;
+    }
+
+    VideoDrawRectangleClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
+	    ,type->BoxWidth
+	    ,type->BoxHeight);
     VideoFill75TransRectangleClip(color
 	    ,x+1+(type->TileWidth*TileSizeX-type->BoxWidth)/2
 	    ,y+1+(type->TileHeight*TileSizeY-type->BoxHeight)/2
 	    ,type->BoxWidth-2
 	    ,type->BoxHeight-2);
-#endif
-#else
-    VideoFill25TransCircleClip(color
-	    ,x+type->TileWidth*TileSizeX/2
-	    ,y+type->TileHeight*TileSizeY/2
-	    ,min(type->BoxWidth,type->BoxHeight)/2);
-#endif
 }
 
 /**
@@ -573,7 +688,7 @@ local void DrawBuilding(Unit* unit)
 #if 0
 #else
     // FIXME: Johns: don't remember why I have draw this after the unit type.
-    DrawSelectionRectangle(unit,type,x,y);
+    DrawSelection(unit,type,x,y);
 #endif
 
     //
@@ -598,7 +713,7 @@ local void DrawBuilding(Unit* unit)
     // FIXME: johns: ugly check here should be removed!
     if( unit->Command.Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
-	DrawSelectionRectangle(unit,type,x,y);
+	DrawSelection(unit,type,x,y);
     }
 #else
     // FIXME: johns: ugly check here should be removed!
@@ -630,7 +745,7 @@ local void DrawUnit(Unit* unit)
 	DrawShadow(unit,type,x,y);
     }
 
-    DrawSelectionRectangle(unit,type,x,y);
+    DrawSelection(unit,type,x,y);
 
     GraphicPlayerPixels(unit->Player,unit->Type->Sprite);
     DrawUnitType(type,unit->Frame,x,y);
