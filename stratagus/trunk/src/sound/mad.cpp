@@ -170,7 +170,7 @@ local enum mad_flow MAD_write(void *user,
 */
 local enum mad_flow MAD_error(void *user __attribute__((unused)),
     struct mad_stream *stream,
-    struct mad_frame *frame __attribute((unused)))
+    struct mad_frame *frame __attribute__((unused)))
 {
     fprintf(stderr, "decoding error 0x%04x (%s)\n",
 	stream->error, mad_stream_errorstr(stream));

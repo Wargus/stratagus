@@ -130,7 +130,7 @@ local void IntroCallbackKey1(unsigned key __attribute__((unused)),
 **	Callback for input.
 */
 local void IntroCallbackKey2(unsigned key,
-	unsigned keychar __attribute((unused)))
+	unsigned keychar __attribute__((unused)))
 {
     if( UseContinueButton ) {
 	if( (key =='c' || key =='\r') &&

@@ -3081,7 +3081,7 @@ local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 }
 #else
 local void ScenSelectHSCdVolumeAction(Menuitem *mi __attribute__((unused)),
-	int i __attribute((unused)))
+	int i __attribute__((unused)))
 {
 }
 #endif

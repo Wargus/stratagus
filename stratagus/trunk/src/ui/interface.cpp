@@ -878,7 +878,7 @@ local int InputKey(int key)
 	    }
 	    NetworkChatMessage(Input);
 
-	case '\e':
+	case '\033':
 	    ClearStatusLine();
 	    KeyState = KeyStateCommand;
 	    return 1;
