@@ -444,8 +444,8 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->SeaUnit=BIT(3,v);
 	unittype->Critter=BIT(4,v);
 	unittype->Building=BIT(5,v);
-	unittype->Submarine=BIT(6,v);
-	unittype->CanSeeSubmarine=BIT(7,v);
+	unittype->PermanentCloak=BIT(6,v);
+	unittype->DetectCloak=BIT(7,v);
 	// Cowards
 	unittype->Coward=BIT(8,v)|BIT(26,v);
 	if (BIT(9,v)) {
@@ -891,11 +891,11 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( type->Revealer ) {
 	CLprintf(file,"  'revealer\n");
     }
-    if( type->Submarine ) {
-	CLprintf(file,"  'submarine\n");
+    if( type->PermanentCloak ) {
+	CLprintf(file,"  'permanent-cloak\n");
     }
-    if( type->CanSeeSubmarine ) {
-	CLprintf(file,"  'can-see-submarine\n");
+    if( type->DetectCloak ) {
+	CLprintf(file,"  'detect-cloak\n");
     }
     if( type->Transporter ) {
 	CLprintf(file,"  'transporter\n");

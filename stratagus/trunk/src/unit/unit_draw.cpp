@@ -1611,14 +1611,6 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 	}
     }
 
-    //
-    //	Show order.
-    //
-    if( ShowOrders==SHOW_ORDERS_ALWAYS || (unit->Selected
-	    && (ShowOrdersCount>=GameCycle ||(KeyModifiers&ModifierShift))) ) {
-	ShowOrder(unit);
-    }
-
     // FIXME: johns: ugly check here, should be removed!
     if( unit->Orders[0].Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);

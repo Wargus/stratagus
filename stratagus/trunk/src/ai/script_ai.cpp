@@ -161,16 +161,12 @@ local SCM CclDefineAiHelper(SCM list)
 	    what=2;
 	} else if( gh_eq_p(value,gh_symbol2scm("research")) ) {
 	    what=3;
-	} else if( gh_eq_p(value,gh_symbol2scm("collect")) ) {
-	    what=4;
-	} else if( gh_eq_p(value,gh_symbol2scm("with-goods")) ) {
-	    what=5;
 	} else if( gh_eq_p(value,gh_symbol2scm("unit-limit")) ) {
-	    what=6;
+	    what=4;
 	} else if( gh_eq_p(value,gh_symbol2scm("unit-equiv")) ) {
-	    what=7;
+	    what=5;
 	} else if( gh_eq_p(value,gh_symbol2scm("repair")) ) {
-	    what=8;
+	    what=6;
 	} else {
 	    fprintf(stderr,"unknown tag\n");
 	    continue;
@@ -208,26 +204,7 @@ local SCM CclDefineAiHelper(SCM list)
 		    continue;
 		}
 		DebugLevel3Fn("> %s\n" _C_ upgrade->Ident);
-	    } else if( what==4 || what==5 ) {
-		if( !strcmp(DefaultResourceNames[1],str) ) {
-		    cost=1;
-		} else if( !strcmp(DefaultResourceNames[2],str) ) {
-		    cost=2;
-		} else if( !strcmp(DefaultResourceNames[3],str) ) {
-		    cost=3;
-		} else if( !strcmp(DefaultResourceNames[4],str) ) {
-		    cost=4;
-		} else if( !strcmp(DefaultResourceNames[5],str) ) {
-		    cost=5;
-		} else if( !strcmp(DefaultResourceNames[6],str) ) {
-		    cost=6;
-		} else {
-		    fprintf(stderr,"unknown cost %s\n",str);
-		    free(str);
-		    continue;
-		}
-		DebugLevel3Fn("> %s\n" _C_ str);
-	    } else if( what==6 ) {
+	    } else if( what==4 ) {
 		if( !strcmp("food",str) ) {
 		    cost=0;
 		} else {
@@ -270,27 +247,17 @@ local SCM CclDefineAiHelper(SCM list)
 			    upgrade-Upgrades);
 		    AiHelperInsert(AiHelpers.Research+(upgrade-Upgrades),base);
 		    break;
-		case 4:			// collect
-		    AiHelperSetupTable(
-			    &AiHelpers.CollectCount,&AiHelpers.Collect,cost);
-		    AiHelperInsert(AiHelpers.Collect+cost,base);
-		    break;
-		case 5:			// with-goods
-		    AiHelperSetupTable(
-			&AiHelpers.WithGoodsCount,&AiHelpers.WithGoods,cost);
-		    AiHelperInsert(AiHelpers.WithGoods+cost,base);
-		    break;
-		case 6:			// unit-limit
+		case 4:			// unit-limit
 		    AiHelperSetupTable(
 			&AiHelpers.UnitLimitCount,&AiHelpers.UnitLimit,cost);
 		    AiHelperInsert(AiHelpers.UnitLimit+cost,base);
 		    break;
-		case 7:			// equivalence
+		case 5:			// equivalence
 		    AiHelperSetupTable(
 			    &AiHelpers.EquivCount,&AiHelpers.Equiv,base->Type);
 		    AiHelperInsert(AiHelpers.Equiv+base->Type,type);
 		    break;
-		case 8:			// repair
+		case 6:			// repair
 		    AiHelperSetupTable(
 			&AiHelpers.RepairCount,&AiHelpers.Repair,type->Type);
 		    AiHelperInsert(AiHelpers.Repair+type->Type,base);

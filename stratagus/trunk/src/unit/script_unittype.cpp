@@ -419,10 +419,10 @@ local SCM CclDefineUnitType(SCM list)
 	    type->SeaUnit=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("critter")) ) {
 	    type->Critter=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("submarine")) ) {
-	    type->Submarine=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("can-see-submarine")) ) {
-	    type->CanSeeSubmarine=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("permanent-cloak")) ) {
+	    type->PermanentCloak=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("detect-cloak")) ) {
+	    type->DetectCloak=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("transporter")) ) {
 	    type->Transporter=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("coward")) ) {

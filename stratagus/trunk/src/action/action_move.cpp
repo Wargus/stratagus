@@ -168,7 +168,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	}
 
 	//  Reveal Submarines and stuff.
-	if( unit->Type->CanSeeSubmarine ) {
+	if( unit->Type->DetectCloak ) {
 	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
 	}
 
@@ -282,7 +282,7 @@ global void HandleActionMove(Unit* unit)
     if( !unit->SubAction ) {		// first entry
 	unit->SubAction=1;
 	NewResetPath(unit);
-				    
+	
 	DebugCheck( unit->State!=0 );
     }
 
