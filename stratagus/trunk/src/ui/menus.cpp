@@ -85,6 +85,11 @@ local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
 local void GameOptions(void);
 
+local void InitTips(Menuitem *mi);
+local void TipsMenuEnd(void);
+local void SetTips(Menuitem *mi);
+local void ShowNextTip();
+
 local void SetMasterPower(Menuitem *mi);
 local void SetMusicPower(Menuitem *mi);
 local void SetCdPower(Menuitem *mi);
@@ -288,6 +293,39 @@ local Menuitem LostMenuItems[] = {
 	{ text:{ "achieve victory!", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'} } },
+#else
+    { 0 }
+#endif
+};
+
+local Menuitem TipsMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, InitTips, NULL,
+	{ text:{ "Freecraft Tips", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 14, 256-75, 0, GameFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_CHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetTips} } },
+    { MI_TYPE_TEXT, 14+22, 256-75+4, 0, GameFont, NULL, NULL,
+	{ text:{ "Show tips at startup", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_BUTTON, 14, 256-40, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!Next Tip", 106, 27, MBUTTON_GM_HALF, ShowNextTip, 'n'} } },
+    { MI_TYPE_BUTTON, 168, 256-40, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!Close", 106, 27, MBUTTON_GM_HALF, TipsMenuEnd, 'c'} } },
+    { MI_TYPE_TEXT, 14, 35+16*0, 0, GameFont, NULL, NULL,
+	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 14, 35+16*1, 0, GameFont, NULL, NULL,
+	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 14, 35+16*2, 0, GameFont, NULL, NULL,
+	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 14, 35+16*3, 0, GameFont, NULL, NULL,
+	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 14, 35+16*4, 0, GameFont, NULL, NULL,
+	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 14, 35+16*5, 0, GameFont, NULL, NULL,
+	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 14, 35+16*6, 0, GameFont, NULL, NULL,
+	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 14, 35+16*7, 0, GameFont, NULL, NULL,
+	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
 #else
     { 0 }
 #endif
@@ -1159,6 +1197,16 @@ global Menu Menus[] = {
 	NetErrorMenuItems,
 	NULL,
     },
+    {
+	// Tips Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	288, 256,
+	ImagePanel2,
+	4, 13,
+	TipsMenuItems,
+	NULL,
+    },
     
 };
 
@@ -1988,6 +2036,122 @@ local void GameMenuEnd(void)
     InterfaceState = IfaceStateNormal;
     GameRunning=0;
     EndMenu();
+}
+
+
+/**
+**	Free the tips from the menu
+*/
+local void FreeTips()
+{
+    int i;
+
+    for( i=5; i<13; i++ ) {
+	if( TipsMenuItems[i].d.text.text ) {
+	    free(TipsMenuItems[i].d.text.text);
+	    TipsMenuItems[i].d.text.text=NULL;
+	}
+    }
+}
+
+/**
+**	Initialize the tips menu
+*/
+local void InitTips(Menuitem *mi)
+{
+    int i;
+    int line;
+    char* p;
+    char* s;
+    char* str;
+    int w;
+    int font;
+    int l;
+
+    if( ShowTips )
+	TipsMenuItems[1].d.gem.state=MI_GSTATE_CHECKED;
+    else
+	TipsMenuItems[1].d.gem.state=MI_GSTATE_UNCHECKED;
+
+    FreeTips();
+
+    w=Menus[MENU_TIPS].xsize-2*TipsMenuItems[5].xofs;
+    font=TipsMenuItems[5].font;
+    i=0;
+    line=5;
+
+    p=Tips[CurrentTip];
+
+    l=0;
+    s=str=strdup(p);
+
+    while( line<13 ) {
+	char* s1;
+	char* space;
+
+	space=NULL;
+	for( ;; ) {
+	    if( VideoTextLength(font,s)<w ) {
+		break;
+	    }
+	    s1=strrchr(s,' ');
+	    if( !s1 ) {
+		fprintf(stderr, "line too long: \"%s\"\n", s);
+		break;
+	    }
+	    if( space )
+		*space=' ';
+	    space=s1;
+	    *space='\0';
+	}
+	TipsMenuItems[line++].d.text.text=strdup(s);
+	l+=strlen(s);
+	if( !p[l] ) {
+	    break;
+	}
+	++l;
+	s=str+l;
+    }
+
+    free(str);
+}
+
+/**
+**	Show tips at startup gem callback
+*/
+local void SetTips(Menuitem* mi)
+{
+    if( TipsMenuItems[1].d.gem.state==MI_GSTATE_CHECKED )
+	ShowTips=1;
+    else
+	ShowTips=0;
+}
+
+local void NextTip()
+{
+    CurrentTip++;
+    if( Tips[CurrentTip]==NULL )
+	CurrentTip=0;
+}
+
+/**
+**	Cycle through the tips
+*/
+local void ShowNextTip()
+{
+    NextTip();
+    InitTips(NULL);
+}
+
+/**
+**	Exit the tips menu
+*/
+local void TipsMenuEnd(void)
+{
+    NextTip();
+    FreeTips();
+
+    GameMenuReturn();
 }
 
 /**

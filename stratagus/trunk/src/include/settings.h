@@ -105,6 +105,13 @@ typedef struct _credits_ {
     char*	Names;			/// Names
 } Credits;
 
+// ----------------------------------------------------------------------------
+
+#define MAX_TIPS	50		/// How many tips supported
+
+extern char*	Tips[MAX_TIPS+1];	/// Array of tips
+extern int	ShowTips;		/// Show tips at start of level
+extern int	CurrentTip;		/// Current tip to display
 
 /*----------------------------------------------------------------------------
 --	Variables

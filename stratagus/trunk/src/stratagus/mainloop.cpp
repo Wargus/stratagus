@@ -495,6 +495,7 @@ local void EnableDrawRefresh(void)
 global void GameMainLoop(void)
 {
     EventCallback callbacks;
+    int showtip;
 
     callbacks.ButtonPressed=(void*)HandleButtonDown;
     callbacks.ButtonReleased=(void*)HandleButtonUp;
@@ -511,6 +512,8 @@ global void GameMainLoop(void)
     EnableDrawRefresh();
     GameCursor=TheUI.Point.Cursor;
     GameRunning=1;
+
+    showtip=ShowTips;
 
     for( ; GameRunning; ) {
 	//
@@ -618,6 +621,11 @@ global void GameMainLoop(void)
 	WaitEventsOneFrame(&callbacks);
 	if( !NetworkInSync ) {
 	    NetworkRecover();		// recover network
+	}
+
+	if( showtip ) {
+	    ProcessMenu(MENU_TIPS, 1);
+	    showtip=0;
 	}
     }
 

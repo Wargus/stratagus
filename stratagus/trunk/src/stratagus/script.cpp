@@ -62,6 +62,10 @@
 global char* CclStartFile;		/// CCL start file
 global int CclInConfigFile;		/// True while config file parsing
 
+global char*	Tips[MAX_TIPS+1];	/// Array of tips
+global int	ShowTips=0;		/// Show tips at start of level
+global int	CurrentTip=0;		/// Current tip to display
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -228,6 +232,39 @@ local SCM CclDecorationOnTop(void)
     DecorationOnTop=1;
 
     return SCM_UNSPECIFIED;
+}
+
+/**
+**	Show tips at the start of a level.
+*/
+local SCM CclShowTips(void)
+{
+    static int InitTips=1;
+
+    if( !InitTips )
+	return SCM_UNSPECIFIED;
+
+    InitTips=0;
+    ShowTips=1;
+    memset(Tips,0,sizeof(Tips));
+    return SCM_UNSPECIFIED;
+}
+
+local SCM CclAddTip(SCM tip)
+{
+    int i;
+
+    for( i=0; i<MAX_TIPS; i++ ) {
+	if( Tips[i] && !strcmp(get_c_string(tip),Tips[i]) ) {
+	    break;
+	}
+	if( Tips[i]==NULL ) {
+	    Tips[i]=gh_scm2newstr(tip,NULL);
+	    break;
+	}
+    }
+
+    return tip;
 }
 
 /**
@@ -546,6 +583,9 @@ global void InitCcl(void)
     init_subr_0("show-full",CclShowFull);
     init_subr_0("show-no-full",CclShowNoFull);
     init_subr_0("decoration-on-top",CclDecorationOnTop);
+
+    init_subr_0("show-tips",CclShowTips);
+    gh_new_procedure1_0("add-tip",CclAddTip);
 
     gh_new_procedure1_0("speed-mine",CclSpeedMine);
     gh_new_procedure1_0("speed-gold",CclSpeedGold);
