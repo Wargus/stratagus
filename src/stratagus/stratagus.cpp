@@ -830,7 +830,6 @@ global void Exit(int err)
 	DebugLevel0("Frames %lu, Slow frames %d = %ld%%\n" _C_
 		FrameCounter _C_ SlowFrameCounter _C_
 		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
-	UnitCacheStatistic();
 	CclUnits(Lua);
 	CleanModules();
 	lua_close(Lua);
@@ -926,9 +925,6 @@ global int main(int argc, char** argv)
 #endif
 #ifdef USE_MIKMOD
 		"MIKMOD "
-#endif
-#ifdef NEW_UNIT_CACHE
-		"NEW-UNIT-CACHE "
 #endif
 #ifdef MAP_REGIONS
 		"MAP-REGIONS "
