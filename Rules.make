@@ -11,7 +11,7 @@
 
 # Compile commands
 CC=gcc
-CCLD=g++
+CCLD=gcc
 RM=rm -f
 MAKE=make
 
@@ -27,11 +27,13 @@ SDL		= -DUSE_SDL -DUSE_SDLA $(SDL_CFLAGS)
 SDL_CFLAGS	= $(shell sdl-config --cflags)
 SDLLIB		= $(shell sdl-config --libs)
 
-VIDEO		= $(SDL)
+VIDEO             = $(SDL)
 VIDEOLIB	= $(SDLLIB) -ldl
 
 # Sound support
 DSOUND		= -DWITH_SOUND
+SDLCD           = -DUSE_SDLCD
+
 
 # Compression support
 ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB
@@ -43,12 +45,13 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include
 #####################################################################
 # Don't change anything below here unless you know what you're doing!
 
-VERSION=	'-DVERSION="1.17pre1-build16"'
+VERSION=	'-DVERSION="1.17-build19"'
 PROFILE=
 
 TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm $(THREADLIB)
-CLONELIBS=$(XLDFLAGS) -lpng -lz -lm \
-	$(THREADLIB) $(CCLLIB) $(VIDEOLIB) $(ZLIBS)
+CLONELIBS= $(XLDFLAGS) -lpng -lz -lm \
+	$(THREADLIB) $(CCLLIB) $(VIDEOLIB) $(ZLIBS) \
+	$(FLACLIB) $(OGGLIB) $(MP3LIB) -lz -lm
 DISTLIST=$(TOPDIR)/distlist
 TAGS=$(TOPDIR)/src/tags
 
@@ -63,8 +66,9 @@ OBJDIR=obj
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) \
 	$(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG) -DHAVE_EXPANSION
-CFLAGS=-O2 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP
+	$(DEBUG) $(SDLCD) $(LIBCDA) \
+	$(FLAC) $(OGG) $(MAD) 
+CFLAGS=-O2 -pipe -fsigned-char -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DNEW_NETMENUS -DSPLIT_SCREEN_SUPPORT
 CTAGSFLAGS=-i defptvS -a -f 
 
 # Locks versions with a symbolic name

@@ -441,7 +441,7 @@ if test "$WIN32" = 0 ; then
   fi
   echo
   echo -n "Please enter selection: "
-  read -n 1 VIDSEL
+  read  VIDSEL
   echo
 fi
 
@@ -549,7 +549,7 @@ fi
 
 echo
 echo -n "Do you want to compile with sound? (y) "
-read -n 1 ANSWER
+read  ANSWER
 echo
 case $ANSWER in
   [nN])
@@ -570,7 +570,7 @@ case $ANSWER in
 	    echo
 	    echo "Assuming you have a thread-safe X11 (libc6 or glibc),"
 	    echo -n "do you want to compile with threaded sound? (n) "
-	    read -n 1 ANSWER2
+	    read  ANSWER2
 	    echo
 	    case $ANSWER2 in [yY])
 	      echo "THREAD		= -D_REENTRANT -DUSE_THREAD" >> $RULESFILE
@@ -587,7 +587,7 @@ case $ANSWER in
 	LIBCHECK="-lFLAC -lm"; check_for_libs
 	if test "$?" = 0 ; then 
 	echo -n "Would you like FLAC support? (n) "
-	read -n 1 ANSWER
+	read  ANSWER
 	echo
 	case $ANSWER in 
 	    [yY])
@@ -605,7 +605,7 @@ case $ANSWER in
 	LIBCHECK="-lvorbisfile -lvorbis -logg"; check_for_libs
 	if test "$?" = 0 ; then 
 	echo -n "Would you like OGG support? (n) "
-	read -n 1 ANSWER
+	read  ANSWER
 	echo
 	case $ANSWER in 
 	    [yY])
@@ -635,7 +635,7 @@ case $ANSWER in
 	LIBCHECK="-lmad"; check_for_libs
 	if test "$?" = 0 ; then 
 	echo -n "Would you like MAD MP3 support? (n) "
-	read -n 1 ANSWER
+	read  ANSWER
 	echo
 	case $ANSWER in 
 	    [yY])
@@ -655,7 +655,7 @@ case $ANSWER in
 	echo -n "or [S]DL "
 	fi
 	echo -n "CD Audio support? (n) "
-	read -n 1 CDMode
+	read CDMode
 	echo
 	case $CDMode in
 	    [sS])
@@ -739,7 +739,7 @@ if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1 && test
 fi
 echo
 echo -n "Please enter selection ($COMPDEF): "
-read -n 1 COMPOPT
+read  COMPOPT
 echo
 
 if test "$COMPOPT x" = " x" ; then COMPOPT=$COMPDEF; fi
@@ -897,7 +897,7 @@ echo -n "	\$(FLAC) \$(OGG) \$(MAD) " >> $RULESFILE
 
 echo
 echo -n "Are you using the WarCraft 2 Expansion CD? (n): "
-read -n 1 YESORNO
+read  YESORNO
 echo
 if [ "$YESORNO" = "Y" -o "$YESORNO" = "y" ] ; then
 echo -n " -DHAVE_EXPANSION" >> $RULESFILE
@@ -965,7 +965,7 @@ echo
 echo "Done generating $RULESFILE."
 echo
 echo -n "Would you like to compile it now? (y) "
-read -n 1 ANSWER
+read  ANSWER
 echo
 
 case $ANSWER in
