@@ -721,25 +721,31 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     SetVideoSync();
 }
 
+/**
+**	FIXME: docu.
+*/
 enum {
-    STATS_OUTCOME,
-    STATS_RANK,
-    STATS_SCORE,
-    STATS_UNITS,
-    STATS_BUILDINGS,
-    STATS_GOLD,
-    STATS_WOOD,
-    STATS_OIL,
-    STATS_KILLS,
-    STATS_RAZINGS,
+    STATS_OUTCOME,			/// FIXME: docu
+    STATS_RANK,				/// FIXME: docu
+    STATS_SCORE,			/// FIXME: docu
+    STATS_UNITS,			/// FIXME: docu
+    STATS_BUILDINGS,			/// FIXME: docu
+    STATS_GOLD,				/// FIXME: docu
+    STATS_WOOD,				/// FIXME: docu
+    STATS_OIL,				/// FIXME: docu
+    STATS_KILLS,			/// FIXME: docu
+    STATS_RAZINGS,			/// FIXME: docu
     MAX_STATS_TEXT
 };
 
-local char* GameStatsText[MAX_STATS_TEXT];
-local int OldVideoSyncSpeed;
-local int GameStatsFrameCounter;
+local char* GameStatsText[MAX_STATS_TEXT];	/// FIXME: docu
+local int OldVideoSyncSpeed;			/// FIXME: docu
+local int GameStatsFrameCounter;		/// FIXME: docu
 
-local void GameStatsInit()
+/**
+**	FIXME: docu.
+*/
+local void GameStatsInit(void)
 {
     Graphic* background;
     char buf[20];
@@ -790,7 +796,10 @@ local void GameStatsInit()
     GameStatsText[STATS_RAZINGS]=strdup(buf);
 }
 
-local int GameStatsDrawFunc()
+/**
+**	FIXME: docu.
+*/
+local int GameStatsDrawFunc(void)
 {
     int x;
     int y;
@@ -894,11 +903,14 @@ local int GameStatsDrawFunc()
     return done;
 }
 
+/**
+**	FIXME: docu.
+*/
 local void GameStatsEnd(void)
 {
     int i;
 
-    for( i=0; i<MAX_STATS_TEXT; i++ ) {
+    for( i=2; i<MAX_STATS_TEXT; i++ ) {
 	free(GameStatsText[i]);
     }
 
@@ -906,7 +918,10 @@ local void GameStatsEnd(void)
     SetVideoSync();
 }
 
-global void ShowStats()
+/**
+**	FIXME: docu.
+*/
+global void ShowStats(void)
 {
     EventCallback callbacks;
     int done;
