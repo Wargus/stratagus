@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
+<html><head>
 <!--
 ----	(c) Copyright 2002-2003 by Lutz Sammer
 
@@ -12,15 +12,15 @@
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <TITLE>FreeCraft Configuration Language Description: Icon</TITLE>
-    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
-    <META NAME="Author" CONTENT="johns98@gmx.net">
-    <META NAME="Keyword" CONTENT="ccl,tileset">
-    <META NAME="Description" CONTENT="">
-</HEAD>
-<BODY>
-    <H1>FreeCraft Configuration Language Description: Research</H1>
-<HR><PRE WIDTH=80>
+    <title>FreeCraft Configuration Language Description: Icon</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <meta name="Author" content="johns98@gmx.net">
+    <meta name="Keyword" content="ccl,tileset">
+    <meta name="Description" content="">
+</head>
+<body>
+    <h1>FreeCraft Configuration Language Description: Research</h1>
+<hr><pre width=80>
      ___________		     _________		      _____  __
      \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
       |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
@@ -30,400 +30,400 @@
     ______________________                           ______________________
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
-</PRE>
-<P><B>(C) Copyright 2002-2003 by The FreeCraft Project. Distributed under the
-<A HREF="../gpl.html">"GNU General Public License"</A></B>
-<HR>
-<A HREF="../freecraft.html">FreeCraft</A> 
-<A HREF="../readme.html">Readme</A> 
-<A HREF="../faq.html">FAQ</A> 
-<A HREF="ccl.html">CCL</A> 
-<A HREF="icon.html">PREV</A> 
-<A HREF="sound.html">NEXT</A> 
-<A HREF="ccl-index.html">Index</A> 
-<HR>
-<A HREF="#check-dependency">check-dependency</A>
-<A HREF="#define-allow">define-allow</A>
-<A HREF="#define-dependency">define-dependency</A>
-<A HREF="#define-modifier">define-modifier</A>
-<A HREF="#define-upgrade">define-upgrade</A>
-<A HREF="#define-upgrade-wc-names">define-upgrade-wc-names</A>
-<A HREF="#get-dependency">get-dependency</A>
-<HR>
-<H2>Intro - Introduction to research functions and variables</H2>
+</pre>
+<p><b>(C) Copyright 2002-2003 by The FreeCraft Project. Distributed under the
+<a href="../gpl.html">"GNU General Public License"</a></b>
+<hr>
+<a href="../freecraft.html">FreeCraft</a> 
+<a href="../readme.html">Readme</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="ccl.html">CCL</a> 
+<a href="icon.html">PREV</a> 
+<a href="sound.html">NEXT</a> 
+<a href="ccl-index.html">Index</a> 
+<hr>
+<a href="#check-dependency">check-dependency</a>
+<a href="#define-allow">define-allow</a>
+<a href="#define-dependency">define-dependency</a>
+<a href="#define-modifier">define-modifier</a>
+<a href="#define-upgrade">define-upgrade</a>
+<a href="#define-upgrade-wc-names">define-upgrade-wc-names</a>
+<a href="#get-dependency">get-dependency</a>
+<hr>
+<h2>Intro - Introduction to research functions and variables</h2>
 
 Everything around researching and upgrades.
-<H2>Functions</H2>
+<h2>Functions</h2>
 
-<A NAME="check-dependency"></A>
-<H3>check-dependency</H3>
+<a name="check-dependency"></a>
+<h3>check-dependency</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 NOT WRITTEN YET.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(check-dependency)</CODE>
+<code>(check-dependency)</code>
 
-<DL>
-<DT>.</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>.</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (check-dependency)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
-<A NAME="define-allow"></A>
-<H3>define-allow</H3>
+<a name="define-allow"></a>
+<h3>define-allow</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define what unit-types and upgrades are enabled for each player during
 a level.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-allow name str16)</CODE>
+<code>(define-allow name str16)</code>
 
-<DL>
-<DT>name</DT>
-<DD>Name of an unit-type or an upgrade to be defined.
-</DD>
-<DT>str16</DT>
-<DD>
+<dl>
+<dt>name</dt>
+<dd>Name of an unit-type or an upgrade to be defined.
+</dd>
+<dt>str16</dt>
+<dd>
   The initial allow state for the unit-type or upgrade at level start:
-  <UL>
-  <LI>A - Allowed
-  <LI>E - Enabled, allowed by level but currently forbidden
-  <LI>F - Forbidden
-  <LI>R - Researched or acquired
-  <LI>Q - Acquired but currently forbidden (does it make sense?:)
-  </UL>
+  <ul>
+  <li>A - Allowed
+  <li>E - Enabled, allowed by level but currently forbidden
+  <li>F - Forbidden
+  <li>R - Researched or acquired
+  <li>Q - Acquired but currently forbidden (does it make sense?:)
+  </ul>
   Each player has his own character, the first is for player 0 and the last
   is for player 15.
-</DD>
-</DL>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-allow 'unit-catapult                    "AAAAAAAAAAAAAAAA")
-</PRE>
+</pre>
 
-<P>Allow the catapult for all 16 players.
+<p>Allow the catapult for all 16 players.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
-<A NAME="define-dependency"></A>
-<H3>define-dependency</H3>
+<a name="define-dependency"></a>
+<h3>define-dependency</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define the dependencies for an unit-type or an upgrade. The dependency
 must be full filled before an unit or research can be used.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-dependency unit-type/upgrade '( unit-type/upgrade count ... )
+<code>(define-dependency unit-type/upgrade '( unit-type/upgrade count ... )
     ['or '( unit-type/upgrade count ... ) ...] )
-</CODE><P>
-<CODE>(define-dependency unit-type/upgrade '( required-part )
+</code><p>
+<code>(define-dependency unit-type/upgrade '( required-part )
      ['or '( optional-or-part ) ...] )
-</CODE>
+</code>
 
-<DL>
-<DT>required-part</DT>
-<DD><CODE>unit/upgrade [count]</CODE><P>
+<dl>
+<dt>required-part</dt>
+<dd><code>unit/upgrade [count]</code><p>
    A list of unit-types or upgrades required.
-   <DL>
-   <DT>unit/upgrade</DT>
-   <DD>Unit-type name or upgrade name required.
-   </DD>
-   <DT>count</DT>
-   <DD>Optional count, how many units of the unit-type are required.
-   </DL>
-</DD>
-<DT>'or optional-or-part</DT>
-<DD><CODE>unit/upgrade [count]</CODE><P>
-    Optional list of or parts. One or list must be complete full filled.<P>
-   <DL>
-   <DT>unit/upgrade</DT>
-   <DD>Unit-type name or upgrade name required.
-   </DD>
-   <DT>count</DT>
-   <DD>Optional count, how many units of the unit-type are required.
-   </DL>
-</DD>
-</DL>
+   <dl>
+   <dt>unit/upgrade</dt>
+   <dd>Unit-type name or upgrade name required.
+   </dd>
+   <dt>count</dt>
+   <dd>Optional count, how many units of the unit-type are required.
+   </dl>
+</dd>
+<dt>'or optional-or-part</dt>
+<dd><code>unit/upgrade [count]</code><p>
+    Optional list of or parts. One or list must be complete full filled.<p>
+   <dl>
+   <dt>unit/upgrade</dt>
+   <dd>Unit-type name or upgrade name required.
+   </dd>
+   <dt>count</dt>
+   <dd>Optional count, how many units of the unit-type are required.
+   </dl>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-dependency 'upgrade-sword2 '(upgrade-sword1))
-</PRE>
+</pre>
 
-<P>The second sword upgrade is only possible, if the first sword upgrade is
+<p>The second sword upgrade is only possible, if the first sword upgrade is
    researched.
 
-<PRE>
+<pre>
     (define-dependency 'upgrade-ranger '(unit-keep) 'or '(unit-castle))
-</PRE>
+</pre>
 
-<P>The ranger upgrade is only available if a keep or castle is available.
+<p>The ranger upgrade is only available if a keep or castle is available.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
-<A NAME="define-modifier"></A>
-<H3>define-modifier</H3>
+<a name="define-modifier"></a>
+<h3>define-modifier</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define the effects (modifier) of an upgrade. An upgrade can have multiple 
 modifiers. It can activate, enable or disable other upgrades and allows
 complex reactions.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-modifier name '(effect1 effect1-arg) ...)</CODE>
+<code>(define-modifier name '(effect1 effect1-arg) ...)</code>
 
-<DL>
-<DT>name</DT>
-<DD>Name of the upgrade, which has this effects. See
-<A HREF="#define-modifier">(define-modifier)</A>. All effects change all old
+<dl>
+<dt>name</dt>
+<dd>Name of the upgrade, which has this effects. See
+<a href="#define-modifier">(define-modifier)</a>. All effects change all old
 units and any new unit of a player.
-</DD>
-<DT>'(effectN effectN-arg)</DT>
-<DD>A list of effects of the upgrade. Here are all possible effects:
-  <DL>
-  <DT>'(attack-range N)</DT>
-  <DD>Change the attack range of all units of the unit-types given with
+</dd>
+<dt>'(effectN effectN-arg)</dt>
+<dd>A list of effects of the upgrade. Here are all possible effects:
+  <dl>
+  <dt>'(attack-range N)</dt>
+  <dd>Change the attack range of all units of the unit-types given with
   '(apply-to ...). Note it can be increased with positive numbers and decreased
   with negative numbers.
-  </DD>
-  <DT>'(sight-range N)</DT>
-  <DD>Change the sight range of all units of the unit-types given with
+  </dd>
+  <dt>'(sight-range N)</dt>
+  <dd>Change the sight range of all units of the unit-types given with
   '(apply-to ...).
-  </DD>
-  <DT>'(basic-damage N)</DT>
-  <DD>Change the basic damage of all units of the unit-types given with
+  </dd>
+  <dt>'(basic-damage N)</dt>
+  <dd>Change the basic damage of all units of the unit-types given with
   '(apply-to ...).
-  </DD>
-  <DT>'(piercing-damage N)</DT>
-  <DD>Change the piercing damage of all units of the unit-types given with
+  </dd>
+  <dt>'(piercing-damage N)</dt>
+  <dd>Change the piercing damage of all units of the unit-types given with
   '(apply-to ...).
-  </DD>
-  <DT>'(armor N)</DT>
-  <DD>Change the armor of all units of the unit-types given with
+  </dd>
+  <dt>'(armor N)</dt>
+  <dd>Change the armor of all units of the unit-types given with
   '(apply-to ...).
-  </DD>
-  <DT>'(speed N)</DT>
-  <DD>Change the speed of all units of the unit-types given with
-  '(apply-to ...). <B>Attention</B>: This changes only the displayed value
+  </dd>
+  <dt>'(speed N)</dt>
+  <dd>Change the speed of all units of the unit-types given with
+  '(apply-to ...). <b>Attention</b>: This changes only the displayed value
   and not the real unit-speed!
-  </DD>
-  <DT>'(hit-points N)</DT>
-  <DD>Change the hit points of all units of the unit-types given with
+  </dd>
+  <dt>'(hit-points N)</dt>
+  <dd>Change the hit points of all units of the unit-types given with
   '(apply-to ...).
-  </DD>
-  <DT>'(time-cost N)</DT>
-  <DD>Change the time costs (research time or build time) of all unit-types
+  </dd>
+  <dt>'(time-cost N)</dt>
+  <dd>Change the time costs (research time or build time) of all unit-types
   or upgrade-ids given with '(apply-to ...).
-  <DD>
-  </DD>
-  <DT>'(gold-cost N)</DT>
-  <DD>Change the gold costs of all unit-types or upgrade-ids given with
+  <dd>
+  </dd>
+  <dt>'(gold-cost N)</dt>
+  <dd>Change the gold costs of all unit-types or upgrade-ids given with
   '(apply-to ...).
-  </DD>
-  <DT>'(wood-cost N)</DT>
-  <DD>Change the wood costs of all unit-types or upgrade-ids given with
+  </dd>
+  <dt>'(wood-cost N)</dt>
+  <dd>Change the wood costs of all unit-types or upgrade-ids given with
   '(apply-to ...).
-  </DD>
-  <DT>'(oil-cost N)</DT>
-  <DD>Change the oil costs of all unit-types or upgrade-ids given with
+  </dd>
+  <dt>'(oil-cost N)</dt>
+  <dd>Change the oil costs of all unit-types or upgrade-ids given with
   '(apply-to ...).
-  </DD>
-  <DT>'(ore-cost N)</DT>
-  <DD>Change the ore costs of all unit-types or upgrade-ids given with
+  </dd>
+  <dt>'(ore-cost N)</dt>
+  <dd>Change the ore costs of all unit-types or upgrade-ids given with
   '(apply-to ...).
-  </DD>
-  <DT>'(stone-cost N)</DT>
-  <DD>Change the stone costs of all unit-types or upgrade-ids given with
+  </dd>
+  <dt>'(stone-cost N)</dt>
+  <dd>Change the stone costs of all unit-types or upgrade-ids given with
   '(apply-to ...).
-  </DD>
-  <DT>'(coal-cost N)</DT>
-  <DD>Change the coal costs of all unit-types or upgrade-ids given with
+  </dd>
+  <dt>'(coal-cost N)</dt>
+  <dd>Change the coal costs of all unit-types or upgrade-ids given with
   '(apply-to ...).
-  </DD>
-  <DT>'(allow unit-type-id N) or '(allow upgrade-id N)</DT>
-  <DD>Change the state of an unit-type or upgrade. N can be
-      <UL>
-      <LI>A - Allowed
-      <LI>E - Enabled, allowed by level but currently forbidden
-      <LI>F - Forbidden
-      <LI>R - Researched or acquired
-      <LI>Q - Acquired but currently forbidden (does it make sense?:)
-      </UL>
+  </dd>
+  <dt>'(allow unit-type-id N) or '(allow upgrade-id N)</dt>
+  <dd>Change the state of an unit-type or upgrade. N can be
+      <ul>
+      <li>A - Allowed
+      <li>E - Enabled, allowed by level but currently forbidden
+      <li>F - Forbidden
+      <li>R - Researched or acquired
+      <li>Q - Acquired but currently forbidden (does it make sense?:)
+      </ul>
       FIXME: The correct possible changed must be described.
-  </DD>
-  <DT>'(apply-to unit-type-id) or '(apply-to upgrade-id)</DT>
-  <DD>The modifiers are applied to this unit-type or upgrade.
-  </DD>
-  <DT>'(convert-to unit-type-id)</DT>
-  <DD>All units of the unit-types given with '(apply-to ...) are converted
+  </dd>
+  <dt>'(apply-to unit-type-id) or '(apply-to upgrade-id)</dt>
+  <dd>The modifiers are applied to this unit-type or upgrade.
+  </dd>
+  <dt>'(convert-to unit-type-id)</dt>
+  <dd>All units of the unit-types given with '(apply-to ...) are converted
   into this unit-type.
-  </DD>
-  </DL>
-</DD>
-</DL>
+  </dd>
+  </dl>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
   (define-modifier 'upgrade-sword1
     '(piercing-damage 2)
     '(apply-to unit-footman) '(apply-to unit-knight) '(apply-to unit-paladin)
     '(apply-to unit-dwarves) '(apply-to unit-d_____) '(apply-to unit-l_____)
     '(apply-to unit-u____-l___________) '(apply-to unit-t_______))
-</PRE>
+</pre>
 
-<P>This is the default effect of the first sword upgrade. The piercing damage
+<p>This is the default effect of the first sword upgrade. The piercing damage
 of the listed units is increased.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
-<A NAME="define-upgrade"></A>
-<H3>define-upgrade</H3>
+<a name="define-upgrade"></a>
+<h3>define-upgrade</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define an upgrade, how it is shown and how much it costs.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-upgrade name 'icon icon-id 'costs #( costs ... ))</CODE>
+<code>(define-upgrade name 'icon icon-id 'costs #( costs ... ))</code>
 
-<DL>
-<DT>name</DT>
-<DD>Name of the upgrade, used in buttons (define-button) and 
-<A HREF="#define-modifier">(define-modifier)</A>.
-</DD>
-<DT>'icon icon-id</DT>
-<DD>Name of the upgrade icon, shown in buttons or during the research of the
+<dl>
+<dt>name</dt>
+<dd>Name of the upgrade, used in buttons (define-button) and 
+<a href="#define-modifier">(define-modifier)</a>.
+</dd>
+<dt>'icon icon-id</dt>
+<dd>Name of the upgrade icon, shown in buttons or during the research of the
 upgrade.  The icon is defined with 
-<A HREF="icon.html#define-icon">(define-icon)</A> or
-<A HREF="icon.html#define-icon-alias">(define-icon-alias)</A>
-<DT>'costs #( time resource1 resource2 resource3 resource4 resource5 resource6)</DT>
-<DD>This are the costs for the upgrade. The costs (resource1-resource6) could
+<a href="icon.html#define-icon">(define-icon)</a> or
+<a href="icon.html#define-icon-alias">(define-icon-alias)</a>
+<dt>'costs #( time resource1 resource2 resource3 resource4 resource5 resource6)</dt>
+<dd>This are the costs for the upgrade. The costs (resource1-resource6) could
 be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
-</DD>
-</DL>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-upgrade 'upgrade-sword1 'icon 'icon-sword2
       'costs #(   200   800     0     0     0     0     0))
-</PRE>
+</pre>
 
-<P>This is the default definition of the first sword upgrade. The icon
+<p>This is the default definition of the first sword upgrade. The icon
 "icon-sword2" is shown in buttons and during the upgrade. The upgrade costs
 200 frame cycles to research and 800 gold from the store.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
-<A NAME="define-upgrade-wc-names"></A>
-<H3>define-upgrade-wc-names</H3>
+<a name="define-upgrade-wc-names"></a>
+<h3>define-upgrade-wc-names</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-upgrade-wc-names sword1 sword2 ...)</CODE>
+<code>(define-upgrade-wc-names sword1 sword2 ...)</code>
 
-<DL>
-<DT>.</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>.</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-upgrade-wc-names 'upgrade-sword1 'upgrade-sword2 ...)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
-<A NAME="get-dependency"></A>
-<H3>get-dependency</H3>
+<a name="get-dependency"></a>
+<h3>get-dependency</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 NOT WRITTEN YET.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(get-dependency)</CODE>
+<code>(get-dependency)</code>
 
-<DL>
-<DT>.</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>.</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (get-dependency)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
-<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
-<HR>
-Last changed: $Id$<BR>
+<hr>
+Last changed: $Id$<br>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS>(c) 2002-2003 by<A HREF="http://freecraft.org">
-The FreeCraft Project</A></ADDRESS></BODY></HTML>
+<address>(c) 2002-2003 by<a href="http://freecraft.org">
+The FreeCraft Project</a></address></body></html>

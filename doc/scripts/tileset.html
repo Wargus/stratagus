@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
+<html><head>
 <!--
 ----	(c) Copyright 2002-2003 by Lutz Sammer
 
@@ -12,15 +12,15 @@
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <TITLE>FreeCraft Configuration Language Description: Tileset</TITLE>
-    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
-    <META NAME="Author" CONTENT="johns98@gmx.net">
-    <META NAME="Keyword" CONTENT="ccl,tileset">
-    <META NAME="Description" CONTENT="">
-</HEAD>
-<BODY>
-    <H1>FreeCraft Configuration Language Description: Tileset</H1>
-<HR><PRE WIDTH=80>
+    <title>FreeCraft Configuration Language Description: Tileset</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <meta name="Author" content="johns98@gmx.net">
+    <meta name="Keyword" content="ccl,tileset">
+    <meta name="Description" content="">
+</head>
+<body>
+    <h1>FreeCraft Configuration Language Description: Tileset</h1>
+<hr><pre width=80>
      ___________		     _________		      _____  __
      \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
       |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
@@ -30,111 +30,111 @@
     ______________________                           ______________________
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
-</PRE>
-<P><B>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
-<A HREF="../gpl.html">"GNU General Public License"</A></B>
-<HR>
-<A HREF="../freecraft.html">FreeCraft</A> 
-<A HREF="../readme.html">Readme</A> 
-<A HREF="../faq.html">FAQ</A> 
-<A HREF="ccl.html">CCL</A> 
-<A HREF="sound.html">PREV</A> 
-<A HREF="triggers.html">NEXT</A> 
-<A HREF="ccl-index.html">Index</A> 
-<HR>
-<A HREF="#define-tileset">define-tileset</A>
-<A HREF="#define-tileset-wc-names">define-tileset-wc-names</A>
-<HR>
-<H2>Intro - Introduction to tileset functions and variables</H2>
+</pre>
+<p><b>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
+<a href="../gpl.html">"GNU General Public License"</a></b>
+<hr>
+<a href="../freecraft.html">FreeCraft</a> 
+<a href="../readme.html">Readme</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="ccl.html">CCL</a> 
+<a href="sound.html">PREV</a> 
+<a href="triggers.html">NEXT</a> 
+<a href="ccl-index.html">Index</a> 
+<hr>
+<a href="#define-tileset">define-tileset</a>
+<a href="#define-tileset-wc-names">define-tileset-wc-names</a>
+<hr>
+<h2>Intro - Introduction to tileset functions and variables</h2>
 
 Everything around the C Tileset structure.
-<H2>Functions</H2>
-<A NAME="define-tileset"></A>
-<H3>define-tileset</H3>
+<h2>Functions</h2>
+<a name="define-tileset"></a>
+<h3>define-tileset</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
-    Define a tileset for the engine.<P>
+    Define a tileset for the engine.<p>
 
-    This could also be defined in own levels. <P>
+    This could also be defined in own levels. <p>
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-tileset ident class name image palette slots animations)</CODE>
+<code>(define-tileset ident class name image palette slots animations)</code>
 
 FIXME:
 
-<DL>
-<DT>ident</DT>
-<DD>.
-</DD>
-<DT>class</DT>
-<DD>.
-</DD>
-<DT>name</DT>
-<DD>.
-</DD>
-<DT>image</DT>
-<DD>.
-</DD>
-<DT>palette</DT>
-<DD>.
-</DD>
-<DT>slots</DT>
-<DD>.
-</DD>
-<DT>animations</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>ident</dt>
+<dd>.
+</dd>
+<dt>class</dt>
+<dd>.
+</dd>
+<dt>name</dt>
+<dd>.
+</dd>
+<dt>image</dt>
+<dd>.
+</dd>
+<dt>palette</dt>
+<dd>.
+</dd>
+<dt>slots</dt>
+<dd>.
+</dd>
+<dt>animations</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-tileset
-</PRE>
+</pre>
 
-<A NAME="define-tileset-wc-names"></A>
-<H3>define-tileset-wc-names</H3>
+<a name="define-tileset-wc-names"></a>
+<h3>define-tileset-wc-names</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
     Define the mapping of the tileset numbers in puds, to the tileset names.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-tileset-wc-names tileset0 tileset1 tileset2 tileset3)</CODE>
+<code>(define-tileset-wc-names tileset0 tileset1 tileset2 tileset3)</code>
 
-<DL>
-<DT>tileset0</DT>
-<DD>Name of the tileset assigned to index 0 (summer).
-</DD>
-<DT>tileset1</DT>
-<DD>Name of the tileset assigned to index 1 (winter).
-</DD>
-<DT>tileset2</DT>
-<DD>Name of the tileset assigned to index 2 (wasteland).
-</DD>
-<DT>tileset3</DT>
-<DD>Name of the tileset assigned to index 3 (orc swamp).
-</DD>
-</DL>
+<dl>
+<dt>tileset0</dt>
+<dd>Name of the tileset assigned to index 0 (summer).
+</dd>
+<dt>tileset1</dt>
+<dd>Name of the tileset assigned to index 1 (winter).
+</dd>
+<dt>tileset2</dt>
+<dd>Name of the tileset assigned to index 2 (wasteland).
+</dd>
+<dt>tileset3</dt>
+<dd>Name of the tileset assigned to index 3 (orc swamp).
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-tileset-wc-names 
       'tileset-summer 'tileset-winter 'tileset-wasteland 'tileset-swamp )
-</PRE>
+</pre>
 
-<P>This is the default tileset mapping.
+<p>This is the default tileset mapping.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
-<HR>
-Last changed: $Id$<BR>
+<hr>
+Last changed: $Id$<br>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS>(c) 2002-2003 by <A HREF="http://freecraft.org">
-The FreeCraft Project</A></ADDRESS></BODY></HTML>
+<address>(c) 2002-2003 by <a href="http://freecraft.org">
+The FreeCraft Project</a></address></body></html>

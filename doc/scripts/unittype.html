@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
+<html><head>
 <!--
 ----	(c) Copyright 2002-2003 by Lutz Sammer
 
@@ -12,15 +12,15 @@
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <TITLE>FreeCraft Configuration Language Description: UnitType</TITLE>
-    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
-    <META NAME="Author" CONTENT="johns98@gmx.net">
-    <META NAME="Keyword" CONTENT="ccl,unittype">
-    <META NAME="Description" CONTENT="">
-</HEAD>
-<BODY>
-    <H1>FreeCraft Configuration Language Description: UnitType</H1>
-<HR><PRE WIDTH=80>
+    <title>FreeCraft Configuration Language Description: UnitType</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <meta name="Author" content="johns98@gmx.net">
+    <meta name="Keyword" content="ccl,unittype">
+    <meta name="Description" content="">
+</head>
+<body>
+    <h1>FreeCraft Configuration Language Description: UnitType</h1>
+<hr><pre width=80>
      ___________		     _________		      _____  __
      \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
       |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
@@ -30,52 +30,52 @@
     ______________________                           ______________________
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
-</PRE>
-<P><B>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
-<A HREF="../gpl.html">"GNU General Public License"</A></B>
-<HR>
-<A HREF="../clone.html">FreeCraft</A> 
-<A HREF="../readme.html">Readme</A> 
-<A HREF="../faq.html">FAQ</A> 
-<A HREF="ccl.html">CCL</A> 
-<A HREF="ui.html">PREV</A> 
-<A HREF="ai.html">NEXT</A> 
-<A HREF="ccl-index.html">Index</A> 
-<HR>
-<A HREF="#define-animations">define-animations</A>
-<A HREF="#define-unit-stats">define-unit-stats</A>
-<A HREF="#define-unit-type">define-unit-type</A>
-<A HREF="#define-unittype-wc-names">define-unittype-wc-names</A>
-<A HREF="#get-unit-type-ident">get-unit-type-ident</A>
-<A HREF="#get-unit-type-name">get-unit-type-name</A>
-<A HREF="#get-unit-type-property">get-unit-type-property</A>
-<A HREF="#set-unit-type-name">set-unit-type-name</A>
-<A HREF="#set-unit-type-property">set-unit-type-property</A>
-<A HREF="#unit-type">unit-type</A>
-<A HREF="#unit-type-array">unit-type-array</A>
-<HR>
-<H2>Intro - Introduction to unit-type functions and variables</H2>
+</pre>
+<p><b>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
+<a href="../gpl.html">"GNU General Public License"</a></b>
+<hr>
+<a href="../clone.html">FreeCraft</a> 
+<a href="../readme.html">Readme</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="ccl.html">CCL</a> 
+<a href="ui.html">PREV</a> 
+<a href="ai.html">NEXT</a> 
+<a href="ccl-index.html">Index</a> 
+<hr>
+<a href="#define-animations">define-animations</a>
+<a href="#define-unit-stats">define-unit-stats</a>
+<a href="#define-unit-type">define-unit-type</a>
+<a href="#define-unittype-wc-names">define-unittype-wc-names</a>
+<a href="#get-unit-type-ident">get-unit-type-ident</a>
+<a href="#get-unit-type-name">get-unit-type-name</a>
+<a href="#get-unit-type-property">get-unit-type-property</a>
+<a href="#set-unit-type-name">set-unit-type-name</a>
+<a href="#set-unit-type-property">set-unit-type-property</a>
+<a href="#unit-type">unit-type</a>
+<a href="#unit-type-array">unit-type-array</a>
+<hr>
+<h2>Intro - Introduction to unit-type functions and variables</h2>
 
 Everything around the C UnitType structure.
 
-<H2>Functions</H2>
-<A NAME="define-animations"></A>
-<H3>define-animations</H3>
+<h2>Functions</h2>
+<a name="define-animations"></a>
+<h3>define-animations</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define animations.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-animations ident 'still script 'move script 'die script 'attack script)</CODE>
+<code>(define-animations ident 'still script 'move script 'die script 'attack script)</code>
 
-<DL>
-<DT>ident</DT>
-<DD>Name of the animation to define.
-</DD>
-<DT>script</DT>
-<DD><PRE>
+<dl>
+<dt>ident</dt>
+<dd>Name of the animation to define.
+</dd>
+<dt>script</dt>
+<dd><pre>
 	A script is a list of quad numbers.
 		(#(Flags Pixel Sleep Frame) (#Flags Pixel Sleep Frame) ...)
 	* Format of quad numbers:
@@ -88,12 +88,12 @@ Define animations.
 	o Pixel is the number of pixels to move (if this is a moving animation)
 	o Sleep is the number of frames to wait for the next animation
 	o Frame is increment to the frame of the image
-</PRE></DD>
-</DL>
+</pre></dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-animations 'animation-footman
       'still '(	; #5
         #( 0 0   4   0) #( 3 0   1   0))
@@ -107,226 +107,226 @@ Define animations.
       'die '(	; #107
         #( 0 0   3  45) #( 0 0   3  50) #( 0 0 100  55) #( 3 0   1  55)))
 
-</PRE>
+</pre>
 
-<P>Defines the animations for the footman.
+<p>Defines the animations for the footman.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/anim.ccl"> $LIBRARYPATH/ccl/anim.ccl </A>
+<a href="../../data/ccl/anim.ccl"> $LIBRARYPATH/ccl/anim.ccl </a>
 
-<A NAME="define-unit-stats"></A>
-<H3>define-unit-stats</H3>
+<a name="define-unit-stats"></a>
+<h3>define-unit-stats</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define unit stats.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-unit-stats ident player 'level level 'speed speed 'attack-range arange
+<code>(define-unit-stats ident player 'level level 'speed speed 'attack-range arange
 'sight-range srange 'armor armor 'basic-damage bdamage 'piercing-damage pdamage 
-'hit-points hp 'costs costs)</CODE>
+'hit-points hp 'costs costs)</code>
 
-<DL>
-<DT>ident</DT>
-<DD>Ident of the unit.
-</DD>
-<DT>player</DT>
-<DD>Player number.
-</DD>
-<DT>level</DT>
-<DD>.
-</DD>
-<DT>speed</DT>
-<DD>.
-</DD>
-<DT>arange</DT>
-<DD>.
-</DD>
-<DT>srange</DT>
-<DD>.
-</DD>
-<DT>armor</DT>
-<DD>.
-</DD>
-<DT>bdamage</DT>
-<DD>.
-</DD>
-<DT>pdamage</DT>
-<DD>.
-</DD>
-<DT>hp</DT>
-<DD>.
-</DD>
-<DT>costs</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>ident</dt>
+<dd>Ident of the unit.
+</dd>
+<dt>player</dt>
+<dd>Player number.
+</dd>
+<dt>level</dt>
+<dd>.
+</dd>
+<dt>speed</dt>
+<dd>.
+</dd>
+<dt>arange</dt>
+<dd>.
+</dd>
+<dt>srange</dt>
+<dd>.
+</dd>
+<dt>armor</dt>
+<dd>.
+</dd>
+<dt>bdamage</dt>
+<dd>.
+</dd>
+<dt>pdamage</dt>
+<dd>.
+</dd>
+<dt>hp</dt>
+<dd>.
+</dd>
+<dt>costs</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-unit-stats)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="define-unit-type"></A>
-<H3>define-unit-type</H3>
+<a name="define-unit-type"></a>
+<h3>define-unit-type</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
-    Define the unit types in game it is based on the UDTA.<P>
+    Define the unit types in game it is based on the UDTA.<p>
 
-    The default unit types are defined in <A HREF="../../data/ccl/units.ccl">
-    $FREECRAFT_LIBRARY/data/units.ccl</A> and
-    <A HREF="../../data/ccl/human/units.ccl">
-    $FREECRAFT_LIBRARY/data/human/units.ccl</A> and
-    <A HREF="../../data/ccl/orc/units.ccl">
-    $FREECRAFT_LIBRARY/data/orc/units.ccl</A>. This could also be defined in
-    own levels. <P>
+    The default unit types are defined in <a href="../../data/ccl/units.ccl">
+    $FREECRAFT_LIBRARY/data/units.ccl</a> and
+    <a href="../../data/ccl/human/units.ccl">
+    $FREECRAFT_LIBRARY/data/human/units.ccl</a> and
+    <a href="../../data/ccl/orc/units.ccl">
+    $FREECRAFT_LIBRARY/data/orc/units.ccl</a>. This could also be defined in
+    own levels. <p>
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-unit-type ident name graphics pixel_size animations icon
+<code>(define-unit-type ident name graphics pixel_size animations icon
     speed overlay sight_range hitpoints magic costs tile_size box_size
     attack_range computer_reaction_range human_reaction_range armor
     priorty damage piercing_damge weapon_upgradable armor_upgradeable
     decay annoy_factor points missle corpse type right_mouse can_target
-    flags sounds attack_sound)</CODE>
+    flags sounds attack_sound)</code>
 
-<DL>
-<DT>ident</DT>
-<DD>The unit-type unique identifier.  It is used to reference unit-types in
+<dl>
+<dt>ident</dt>
+<dd>The unit-type unique identifier.  It is used to reference unit-types in
 game. F.E: "unit-knight", "unit-gold-mine".
-</DD>
-<DT>name</DT>
-<DD>The unit-type name shown in the game. F.E: "Knight", "Gold Mine".
+</dd>
+<dt>name</dt>
+<dd>The unit-type name shown in the game. F.E: "Knight", "Gold Mine".
 If the name is too long, it is split at space.
-</DD>
-<DD></DD>
-<DT>graphics</DT>
-<DD>Defines the graphics used to display the unit-type in game. This could
+</dd>
+<dd></dd>
+<dt>graphics</dt>
+<dd>Defines the graphics used to display the unit-type in game. This could
 be an array "#( summer winter wasteland swamp) with different files for the
 tilesets. Or an indentifier "unit-xyz" if the graphics from an other unit-type
-should be reused.<P>
+should be reused.<p>
 
 Examples:
-    <DL>
-    <DT>#( "knight.png" () () () )</DT>
-    <DD>For all tilesets are the same graphics "knight.png" used. </DD>
-    <DT>#( "gold mine (summer).png" "gold mine (winter).png"
-	"gold mine (wasteland).png" "gold mine (swamp).png")</DT>
-    <DD>"gold mine (summer).png" is used for the summer tileset.<BR>
-	"gold mine (winter).png" is used for the winter tileset.<BR>
-	"gold mine (wasteland).png" is used for the wasteland tileset.<BR>
-	"gold mine (swamp).png" is used for the swamp tileset. </DD>
-    <DT>"unit-knight"</DT>
-    <DD>The graphics from the unit-type "unit-knight" is also used for the
-	this unit-type (here paladin).</DD>
-    </DL>
-</DD>
-<DT>pixel_size</DT>
-<DD>Size of the unit-type graphic in pixeln. A list of X (width) and Y (height)
-sizes.  F.E. '( 72 72 ), '( 96 96 ).</DD>
-<DT>animations</DT>
-<DD>Identifier to reference the animation sequences (scripts) for the
-unit-type. F.E. "animations-knight", "animations-gold-mine".</DD>
-<DT>icon</DT>
-<DD>Identifier to reference the icon shown in game for this unit-type.
-F.E. "icon-knight", "icon-gold-mine".</DD>
-<DT>speed</DT>
-<DD>The speed shown for this unit-type in game. (NOTE: this is
-only shown and *not* used). F.E. 10, 13.</DD>
-<DT>overlay</DT>
-<DD>Define the overlay shown if this unit is constructed (build).
+    <dl>
+    <dt>#( "knight.png" () () () )</dt>
+    <dd>For all tilesets are the same graphics "knight.png" used. </dd>
+    <dt>#( "gold mine (summer).png" "gold mine (winter).png"
+	"gold mine (wasteland).png" "gold mine (swamp).png")</dt>
+    <dd>"gold mine (summer).png" is used for the summer tileset.<br>
+	"gold mine (winter).png" is used for the winter tileset.<br>
+	"gold mine (wasteland).png" is used for the wasteland tileset.<br>
+	"gold mine (swamp).png" is used for the swamp tileset. </dd>
+    <dt>"unit-knight"</dt>
+    <dd>The graphics from the unit-type "unit-knight" is also used for the
+	this unit-type (here paladin).</dd>
+    </dl>
+</dd>
+<dt>pixel_size</dt>
+<dd>Size of the unit-type graphic in pixeln. A list of X (width) and Y (height)
+sizes.  F.E. '( 72 72 ), '( 96 96 ).</dd>
+<dt>animations</dt>
+<dd>Identifier to reference the animation sequences (scripts) for the
+unit-type. F.E. "animations-knight", "animations-gold-mine".</dd>
+<dt>icon</dt>
+<dd>Identifier to reference the icon shown in game for this unit-type.
+F.E. "icon-knight", "icon-gold-mine".</dd>
+<dt>speed</dt>
+<dd>The speed shown for this unit-type in game. (NOTE: this is
+only shown and *not* used). F.E. 10, 13.</dd>
+<dt>overlay</dt>
+<dd>Define the overlay shown if this unit is constructed (build).
 Currently are available:
-<UL>
-<LI> 6 land construction site
-<LI> 7 human shipyard construction site
-<LI> 8 orc shipyard construction site
-<LI> 9 human oil well construction site
-<LI>10 orc oil well construction site
-<LI>11 human refinery construction site
-<LI>12 orc refinery construction site
-<LI>13 human foundry construction site
-<LI>14 orc foundry construction site
-<LI>15 wall construction site
-</UL>
+<ul>
+<li> 6 land construction site
+<li> 7 human shipyard construction site
+<li> 8 orc shipyard construction site
+<li> 9 human oil well construction site
+<li>10 orc oil well construction site
+<li>11 human refinery construction site
+<li>12 orc refinery construction site
+<li>13 human foundry construction site
+<li>14 orc foundry construction site
+<li>15 wall construction site
+</ul>
 NOTE: this will be changed to identifiers sometime.
-</DD>
-<DT>sight_range</DT>
-<DD>Sight range (in tiles) of this unit. F.E. 6, 14.</DD>
-<DT>hitpoints</DT>
-<DD>Hitpoints for this Unit. F.E. 90, 1000</DD>
-<DT>magic</DT>
-<DD>Flag to determine whether this unit is a spell user. 0 = false (not a magic
-user), 1 = true (magic user).  F.E. 1, 0</DD>
-<DT>costs</DT>
-<DD>Define the costs to build (or aquire) this unit. It is an array of #(
+</dd>
+<dt>sight_range</dt>
+<dd>Sight range (in tiles) of this unit. F.E. 6, 14.</dd>
+<dt>hitpoints</dt>
+<dd>Hitpoints for this Unit. F.E. 90, 1000</dd>
+<dt>magic</dt>
+<dd>Flag to determine whether this unit is a spell user. 0 = false (not a magic
+user), 1 = true (magic user).  F.E. 1, 0</dd>
+<dt>costs</dt>
+<dd>Define the costs to build (or aquire) this unit. It is an array of #(
 time gold wood oil) or #(time gold wood oil ore stone coal). Time is in frames
 to build this unit.
 Gold is the amount required to build this unit. Wood is the amount required
 to build this unit.  Oil is the amount required to build this unit.
-F.E.: #( 200 2000 1000 200 ).<P>
+F.E.: #( 200 2000 1000 200 ).<p>
 NOTE: This is extendable more costs could be added. (using 6 resources insteed
 of 3. Or redefining the gold resource into a crytal resource)
-</DD>
-<DT>tile_size</DT>
-<DD>Define the unit-type size in tiles. NOTE: currently only buildings could
+</dd>
+<dt>tile_size</dt>
+<dd>Define the unit-type size in tiles. NOTE: currently only buildings could
 be bigger than one tile. A list of X (width) and Y (height) sizes. 
 F.E. '( 1 1 ), '( 2 2 ).
-</DD>
-<DT>box_size</DT>
-<DD></DD>
-<DT>attack_range</DT>
-<DD></DD>
-<DT>computer_reaction_range</DT>
-<DD></DD>
-<DT>human_reaction_range</DT>
-<DD></DD>
-<DT>armor</DT>
-<DD></DD>
-<DT>priorty</DT>
-<DD></DD>
-<DT>damage</DT>
-<DD></DD>
-<DT>piercing_damge</DT>
-<DD></DD>
-<DT>weapon_upgradable</DT>
-<DD></DD>
-<DT>armor_upgradeable</DT>
-<DD></DD>
-<DT>decay</DT>
-<DD></DD>
-<DT>annoy_factor</DT>
-<DD></DD>
-<DT>points</DT>
-<DD></DD>
-<DT>missile</DT>
-<DD></DD>
-<DT>corpse</DT>
-<DD></DD>
-<DT>type</DT>
-<DD></DD>
-<DT>right_mouse</DT>
-<DD></DD>
-<DT>can_target</DT>
-<DD></DD>
-<DT>flags</DT>
-<DD></DD>
-<DT>sounds</DT>
-<DD></DD>
-<DT>attack_sound</DT>
-<DD></DD>
-</DL>
+</dd>
+<dt>box_size</dt>
+<dd></dd>
+<dt>attack_range</dt>
+<dd></dd>
+<dt>computer_reaction_range</dt>
+<dd></dd>
+<dt>human_reaction_range</dt>
+<dd></dd>
+<dt>armor</dt>
+<dd></dd>
+<dt>priorty</dt>
+<dd></dd>
+<dt>damage</dt>
+<dd></dd>
+<dt>piercing_damge</dt>
+<dd></dd>
+<dt>weapon_upgradable</dt>
+<dd></dd>
+<dt>armor_upgradeable</dt>
+<dd></dd>
+<dt>decay</dt>
+<dd></dd>
+<dt>annoy_factor</dt>
+<dd></dd>
+<dt>points</dt>
+<dd></dd>
+<dt>missile</dt>
+<dd></dd>
+<dt>corpse</dt>
+<dd></dd>
+<dt>type</dt>
+<dd></dd>
+<dt>right_mouse</dt>
+<dd></dd>
+<dt>can_target</dt>
+<dd></dd>
+<dt>flags</dt>
+<dd></dd>
+<dt>sounds</dt>
+<dd></dd>
+<dt>attack_sound</dt>
+<dd></dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-unit-type "unit-footman"		"Footman"
       ;; graphic data
       #("footman.png"
@@ -361,257 +361,257 @@ F.E. '( 1 1 ), '( 2 2 ).
 	"footman-help"
 	"footman-dead" )
       "footman-attack" )
-</PRE>
-	Define the unit-type "unit-footman" as footman.<P>
+</pre>
+	Define the unit-type "unit-footman" as footman.<p>
 
 <!--
 
-<LI><VAR>unit-type</VAR><BR>
-    Get the pointer to the unit type structure.<P>
+<LI><var>unit-type</var><br>
+    Get the pointer to the unit type structure.<p>
     (unit-type ident)
-    <DL>
-    <DT>ident</DT>
-    <DD>The unit-type unique identifier.</DD>
-    </DL>
-    <P>
-    <H4>Example:</H4>
-    (unit-type "unit-peon")<P>
-    Get the unit type structure of the peon. #<UnitType 0x80ac350 unit-peon><P>
+    <dl>
+    <dt>ident</dt>
+    <dd>The unit-type unique identifier.</dd>
+    </dl>
+    <p>
+    <h4>Example:</h4>
+    (unit-type "unit-peon")<p>
+    Get the unit type structure of the peon. #<unittype 0x80ac350 unit-peon><p>
 
-<LI><VAR>unit-type-array</VAR><BR>
-    Get an array of all currently defined unit type structures.<P>
+<li><var>unit-type-array</var><br>
+    Get an array of all currently defined unit type structures.<p>
     (unit-type-array)
-    <P>
+    <p>
 
-<LI><VAR>get-unit-type-ident</VAR><BR>
-    Get the unique identfier of the unit type structure.<P>
+<li><var>get-unit-type-ident</var><br>
+    Get the unique identfier of the unit type structure.<p>
     (get-unit-type-ident type)
-    <DL>
-    <DT>type</DT>
-    <DD>Unit type pointer</DD>
-    </DL>
-    <P>
-    <H4>Example:</H4>
-    (get-unit-type-ident (unit-type "unit-peon"))<P>
-    Get the identifier of the unit type peon.<P>
+    <dl>
+    <dt>type</dt>
+    <dd>Unit type pointer</dd>
+    </dl>
+    <p>
+    <h4>Example:</h4>
+    (get-unit-type-ident (unit-type "unit-peon"))<p>
+    Get the identifier of the unit type peon.<p>
 -->
 
-<A NAME="define-unittype-wc-names"></A>
-<H3>define-unittype-wc-names</H3>
+<a name="define-unittype-wc-names"></a>
+<h3>define-unittype-wc-names</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define unit-type mapping from original number to internal symbol.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-unittype-wc-names footman grunt ...)</CODE>
+<code>(define-unittype-wc-names footman grunt ...)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-unittype-wc-names)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBRARYPATH/ccl/wc2.ccl </A>
+<a href="../../data/ccl/wc2.ccl"> $LIBRARYPATH/ccl/wc2.ccl </a>
 
-<A NAME="get-unit-type-ident"></A>
-<H3>get-unit-type-ident</H3>
+<a name="get-unit-type-ident"></a>
+<h3>get-unit-type-ident</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Get the ident of the unit-type structure.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(get-unit-type-ident unit-type)</CODE>
+<code>(get-unit-type-ident unit-type)</code>
 
-<DL>
-<DT>unit-type</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>unit-type</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (get-unit-type-ident)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="get-unit-type-property"></A>
-<H3>get-unit-type-property</H3>
+<a name="get-unit-type-property"></a>
+<h3>get-unit-type-property</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Get the property of the unit-type structure.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(get-unit-type-property unit-type)</CODE>
+<code>(get-unit-type-property unit-type)</code>
 
-<DL>
-<DT>unit-type</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>unit-type</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (get-unit-type-property)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="get-unit-type-name"></A>
-<H3>get-unit-type-name</H3>
+<a name="get-unit-type-name"></a>
+<h3>get-unit-type-name</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Get the name of the unit-type structure.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(get-unit-type-name unit-type)</CODE>
+<code>(get-unit-type-name unit-type)</code>
 
-<DL>
-<DT>unit-type</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>unit-type</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (get-unit-type-name)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="set-unit-type-name!"></A>
-<H3>set-unit-type-name!</H3>
+<a name="set-unit-type-name!"></a>
+<h3>set-unit-type-name!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set the name of the unit-type structure.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-unit-type-name! unit-type name)</CODE>
+<code>(set-unit-type-name! unit-type name)</code>
 
-<DL>
-<DT>unit-type</DT>
-<DD>.
-</DD>
-<DT>name</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>unit-type</dt>
+<dd>.
+</dd>
+<dt>name</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-unit-type-name!)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="set-unit-type-property"></A>
-<H3>set-unit-type-property</H3>
+<a name="set-unit-type-property"></a>
+<h3>set-unit-type-property</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set the property of the unit-type structure.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-unit-type-property unit-type property)</CODE>
+<code>(set-unit-type-property unit-type property)</code>
 
-<DL>
-<DT>unit-type</DT>
-<DD>.
-</DD>
-<DT>property</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>unit-type</dt>
+<dd>.
+</dd>
+<dt>property</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-unit-type-property)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="unit-type"></A>
-<H3>unit-type</H3>
+<a name="unit-type"></a>
+<h3>unit-type</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Get unit-type structure.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(unit-type ident)</CODE>
+<code>(unit-type ident)</code>
 
-<DL>
-<DT>ident</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>ident</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (unit-type 'unit-great-hall)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/ai.ccl"> $LIBRARYPATH/ccl/ai.ccl </A>
+<a href="../../data/ccl/ai.ccl"> $LIBRARYPATH/ccl/ai.ccl </a>
 
-<A NAME="unit-type-array"></A>
-<H3>unit-type-array</H3>
+<a name="unit-type-array"></a>
+<h3>unit-type-array</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Get all unit-type structures.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(unit-type-array)</CODE>
+<code>(unit-type-array)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (unit-type-array)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<HR>
-Last changed: $Id$<BR>
+<hr>
+Last changed: $Id$<br>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS>(c) 2002-2003 by <A HREF="http://freecraft.org">
-The FreeCraft Project</A></ADDRESS></BODY></HTML>
+<address>(c) 2002-2003 by <a href="http://freecraft.org">
+The FreeCraft Project</a></address></body></html>

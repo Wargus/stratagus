@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
+<html><head>
 <!--
 ----	(c) Copyright 2002-2003 by Lutz Sammer
 
@@ -12,15 +12,15 @@
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <TITLE>FreeCraft Configuration Language Description: User Interface (UI)</TITLE>
-    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
-    <META NAME="Author" CONTENT="johns98@gmx.net">
-    <META NAME="Keyword" CONTENT="ccl,tileset">
-    <META NAME="Description" CONTENT="">
-</HEAD>
-<BODY>
-    <H1>FreeCraft Configuration Language Description: User Interface (UI)</H1>
-<HR><PRE WIDTH=80>
+    <title>FreeCraft Configuration Language Description: User Interface (UI)</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <meta name="Author" content="johns98@gmx.net">
+    <meta name="Keyword" content="ccl,tileset">
+    <meta name="Description" content="">
+</head>
+<body>
+    <h1>FreeCraft Configuration Language Description: User Interface (UI)</h1>
+<hr><pre width=80>
      ___________		     _________		      _____  __
      \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
       |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
@@ -30,495 +30,495 @@
     ______________________                           ______________________
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
-</PRE>
-<P><B>(C) Copyright 2002-2003 by The FreeCraft Project. Distributed under the
-<A HREF="../gpl.html">"GNU General Public License"</A></B>
-<HR>
-<A HREF="../freecraft.html">FreeCraft</A> 
-<A HREF="../readme.html">Readme</A> 
-<A HREF="../faq.html">FAQ</A> 
-<A HREF="ccl.html">CCL</A> 
-<A HREF="triggers.html">PREV</A> 
-<A HREF="unittype.html">NEXT</A> 
-<A HREF="ccl-index.html">Index</A> 
-<HR>
-<A HREF="#define-button">define-button</A>
-<A HREF="#define-cursor">define-cursor</A>
-<A HREF="#define-font">define-font</A>
-<A HREF="#define-font-colors">define-font-colors</A>
-<A HREF="#define-menu">define-menu</A>
-<A HREF="#define-menu-graphics">define-menu-graphics</A>
-<A HREF="#define-menu-item">define-menu-item</A>
-<A HREF="#define-new-ui">define-new-ui</A>
-<A HREF="#define-ui">define-ui</A>
-<A HREF="#define-viewports">define-viewports</A>
-<A HREF="#display-picture">display-picture</A>
-<A HREF="#process-menu">process-menu</A>
-<A HREF="#set-game-cursor!">set-game-cursor!</A>
-<HR>
-<H2>Intro - Introduction to UI functions and variables</H2>
+</pre>
+<p><b>(C) Copyright 2002-2003 by The FreeCraft Project. Distributed under the
+<a href="../gpl.html">"GNU General Public License"</a></b>
+<hr>
+<a href="../freecraft.html">FreeCraft</a> 
+<a href="../readme.html">Readme</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="ccl.html">CCL</a> 
+<a href="triggers.html">PREV</a> 
+<a href="unittype.html">NEXT</a> 
+<a href="ccl-index.html">Index</a> 
+<hr>
+<a href="#define-button">define-button</a>
+<a href="#define-cursor">define-cursor</a>
+<a href="#define-font">define-font</a>
+<a href="#define-font-colors">define-font-colors</a>
+<a href="#define-menu">define-menu</a>
+<a href="#define-menu-graphics">define-menu-graphics</a>
+<a href="#define-menu-item">define-menu-item</a>
+<a href="#define-new-ui">define-new-ui</a>
+<a href="#define-ui">define-ui</a>
+<a href="#define-viewports">define-viewports</a>
+<a href="#display-picture">display-picture</a>
+<a href="#process-menu">process-menu</a>
+<a href="#set-game-cursor!">set-game-cursor!</a>
+<hr>
+<h2>Intro - Introduction to UI functions and variables</h2>
 
 Everything around the UI.
-<H2>Functions</H2>
-<A NAME="define-button"></A>
-<H3>define-button</H3>
+<h2>Functions</h2>
+<a name="define-button"></a>
+<h3>define-button</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define a button.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-button 'pos pos 'level level 'icon icon<BR>
-&nbsp;&nbsp;'action action ['value value]<BR>
-&nbsp;&nbsp;['allowed allowed 'allow-arg allowarg]<BR>
-&nbsp;&nbsp;'key key 'hint hint<BR>
-&nbsp;&nbsp;'for-unit '(forunit))</CODE>
+<code>(define-button 'pos pos 'level level 'icon icon<br>
+&nbsp;&nbsp;'action action ['value value]<br>
+&nbsp;&nbsp;['allowed allowed 'allow-arg allowarg]<br>
+&nbsp;&nbsp;'key key 'hint hint<br>
+&nbsp;&nbsp;'for-unit '(forunit))</code>
 
-<DL>
-<DT>pos</DT>
-<DD>Position number.
-</DD>
-<DT>level</DT>
-<DD>Level number.
-</DD>
-<DT>icon</DT>
-<DD>Name of the icon to display.
-</DD>
-<DT>action</DT>
-<DD>Action to perform when the button is clicked.  Can be any of the following:
+<dl>
+<dt>pos</dt>
+<dd>Position number.
+</dd>
+<dt>level</dt>
+<dd>Level number.
+</dd>
+<dt>icon</dt>
+<dd>Name of the icon to display.
+</dd>
+<dt>action</dt>
+<dd>Action to perform when the button is clicked.  Can be any of the following:
 move, stop, attack, repair, harvest, button, build, train-unit, patrol,
 stand-ground, attack-ground, return-goods, demolish, cast-spell, research,
 upgrade-to, unload, cancel, cancel-upgrade, cancel-train-unit, cancel-build.
-</DD>
-<DT>value</DT>
-<DD>Optional value associated with the action.
-</DD>
-<DT>allowed</DT>
-<DD>Optional check to see if a button is allowed.  Can be any of the following:
+</dd>
+<dt>value</dt>
+<dd>Optional value associated with the action.
+</dd>
+<dt>allowed</dt>
+<dd>Optional check to see if a button is allowed.  Can be any of the following:
 check-true, check-false, check-upgrade, check-units-or, check-units-and,
 check-network, check-no-work, check-no-research, check-attack,
 check-upgrade-to, check-research, check-single-research.
-</DD>
-<DT>allowarg</DT>
-<DD>Optional argument used by the allowed function.
-</DD>
-<DT>key</DT>
-<DD>Shortcut key for the button.
-</DD>
-<DT>hint</DT>
-<DD>Hint to be displayed for the button.
-</DD>
-<DT>forunit</DT>
-<DD>List of units the button applies to.
-</DD>
-</DL>
+</dd>
+<dt>allowarg</dt>
+<dd>Optional argument used by the allowed function.
+</dd>
+<dt>key</dt>
+<dd>Shortcut key for the button.
+</dd>
+<dt>hint</dt>
+<dd>Hint to be displayed for the button.
+</dd>
+<dt>forunit</dt>
+<dd>List of units the button applies to.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-button 'pos 1 'level 0 'icon 'icon-move-peasant
       'action 'move
       'key "m" 'hint "~MOVE"
       'for-unit '(unit-footman unit-knight))
-</PRE>
+</pre>
 
-<P>Defines the move button for the footman and knight.
+<p>Defines the move button for the footman and knight.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/human/buttons.ccl"> $LIBARYPATH/ccl/human/buttons.ccl </A> ,
-<A HREF="../../data/ccl/orc/buttons.ccl"> $LIBARYPATH/ccl/orc/buttons.ccl </A>
+<a href="../../data/ccl/human/buttons.ccl"> $LIBARYPATH/ccl/human/buttons.ccl </a> ,
+<a href="../../data/ccl/orc/buttons.ccl"> $LIBARYPATH/ccl/orc/buttons.ccl </a>
 
-<A NAME="define-cursor"></A>
-<H3>define-cursor</H3>
+<a name="define-cursor"></a>
+<h3>define-cursor</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define a cursor.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-cursor ident race 'image image<BR>
-&nbsp;&nbsp;'hot-spot '(x y) 'size '(width height) ['rate rate])</CODE>
+<code>(define-cursor ident race 'image image<br>
+&nbsp;&nbsp;'hot-spot '(x y) 'size '(width height) ['rate rate])</code>
 
-<DL>
-<DT>ident</DT>
-<DD>Unique identifier of the cursor, used to reference it in config files and
+<dl>
+<dt>ident</dt>
+<dd>Unique identifier of the cursor, used to reference it in config files and
 during startup.
-</DD>
-<DT>race</DT>
-<DD>Race to use this cursor with or "any" to use with any race.
-</DD>
-<DT>image</DT>
-<DD>Path to the image graphic.
-</DD>
-<DT>hot-spot</DT>
-<DD>Hot spot of the cursor in pixels. Relative to the sprite origin (0,0). The
+</dd>
+<dt>race</dt>
+<dd>Race to use this cursor with or "any" to use with any race.
+</dd>
+<dt>image</dt>
+<dd>Path to the image graphic.
+</dd>
+<dt>hot-spot</dt>
+<dd>Hot spot of the cursor in pixels. Relative to the sprite origin (0,0). The
 hot spot of a cursor is the point to which FreeCraft refers in tracking the
 cursor's position.
-</DD>
-<DT>size</DT>
-<DD>Size of the cursor in pixels.
-</DD>
-<DT>rate</DT>
-<DD>Rate of changing the frames if using an animated cursor. The "rate" tells
+</dd>
+<dt>size</dt>
+<dd>Size of the cursor in pixels.
+</dd>
+<dt>rate</dt>
+<dd>Rate of changing the frames if using an animated cursor. The "rate" tells
 the engine how many milliseconds to hold each frame of the animation.
-</DD>
-</DL>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-cursor 'cursor-cross 'any
       'image "ui/cursors/small green cross.png"
       'hot-spot '(8 8) 'size '(18 18))
-</PRE>
+</pre>
 
-<P>Defines the cross cursor for any race.
+<p>Defines the cross cursor for any race.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/ui.ccl"> $LIBARYPATH/ccl/ui.ccl </A> ,
-<A HREF="../../data/ccl/human/ui.ccl"> $LIBARYPATH/ccl/human/ui.ccl </A> ,
-<A HREF="../../data/ccl/orc/ui.ccl"> $LIBARYPATH/ccl/orc/ui.ccl </A>
+<a href="../../data/ccl/ui.ccl"> $LIBARYPATH/ccl/ui.ccl </a> ,
+<a href="../../data/ccl/human/ui.ccl"> $LIBARYPATH/ccl/human/ui.ccl </a> ,
+<a href="../../data/ccl/orc/ui.ccl"> $LIBARYPATH/ccl/orc/ui.ccl </a>
 
-<A NAME="define-font"></A>
-<H3>define-font</H3>
+<a name="define-font"></a>
+<h3>define-font</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define a font.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-font type file size)</CODE>
+<code>(define-font type file size)</code>
 
-<DL>
-<DT>type</DT>
-<DD>Type of font.  Supported types are: 'game, 'small, 'large, 'small-title,
+<dl>
+<dt>type</dt>
+<dd>Type of font.  Supported types are: 'game, 'small, 'large, 'small-title,
 and 'large-title.
-</DD>
-<DT>file</DT>
-<DD>File name for font file.  Currently only multicolor bitmap fonts supported.
-</DD>
-<DT>size</DT>
-<DD>Font size width and height.
-</DD>
-</DL>
+</dd>
+<dt>file</dt>
+<dd>File name for font file.  Currently only multicolor bitmap fonts supported.
+</dd>
+<dt>size</dt>
+<dd>Font size width and height.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-font 'game "graphics/ui/fonts/game.png" 13 14)
-</PRE>
+</pre>
 
-<P>Define the game font.
+<p>Define the game font.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/fonts.ccl"> $LIBARYPATH/ccl/fonts.ccl </A>
+<a href="../../data/ccl/fonts.ccl"> $LIBARYPATH/ccl/fonts.ccl </a>
 
-<A NAME="define-font-colors"></A>
-<H3>define-font-colors</H3>
+<a name="define-font-colors"></a>
+<h3>define-font-colors</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-font-colors)</CODE>
+<code>(define-font-colors)</code>
 
-<DL>
-<DT></DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt></dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-font-colors)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/fonts.ccl"> $LIBARYPATH/ccl/fonts.ccl </A>
+<a href="../../data/ccl/fonts.ccl"> $LIBARYPATH/ccl/fonts.ccl </a>
 
-<A NAME="define-menu"></A>
-<H3>define-menu</H3>
+<a name="define-menu"></a>
+<h3>define-menu</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-menu)</CODE>
+<code>(define-menu)</code>
 
-<DL>
-<DT></DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt></dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-menu)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/menus.ccl"> $LIBARYPATH/ccl/menus.ccl </A>
+<a href="../../data/ccl/menus.ccl"> $LIBARYPATH/ccl/menus.ccl </a>
 
-<A NAME="define-menu-graphics"></A>
-<H3>define-menu-graphics</H3>
+<a name="define-menu-graphics"></a>
+<h3>define-menu-graphics</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define the menu graphics for each of the races.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-menu-graphics '(file filename size (w h)) ...)</CODE>
+<code>(define-menu-graphics '(file filename size (w h)) ...)</code>
 
-<DL>
-<DT>filename</DT>
-<DD>Path to the file containing the menu graphics.
-</DD>
-<DT>w,h</DT>
-<DD>Width and height of an image in the menu graphic.
-</DD>
-</DL>
+<dl>
+<dt>filename</dt>
+<dd>Path to the file containing the menu graphics.
+</dd>
+<dt>w,h</dt>
+<dd>Width and height of an image in the menu graphic.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-menu-graphics
       '(file "ui/buttons 1.png" size (300 144))
       '(file "ui/buttons 2.png" size (300 144)))
-</PRE>
+</pre>
 
-<P>Defines the menu graphics for all races.
+<p>Defines the menu graphics for all races.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/menus.ccl"> $LIBARYPATH/ccl/menus.ccl </A>
+<a href="../../data/ccl/menus.ccl"> $LIBARYPATH/ccl/menus.ccl </a>
 
-<A NAME="define-menu-item"></A>
-<H3>define-menu-item</H3>
+<a name="define-menu-item"></a>
+<h3>define-menu-item</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-menu-item)</CODE>
+<code>(define-menu-item)</code>
 
-<DL>
-<DT></DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt></dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-menu-item)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/menus.ccl"> $LIBARYPATH/ccl/menus.ccl </A>
+<a href="../../data/ccl/menus.ccl"> $LIBARYPATH/ccl/menus.ccl </a>
 
-<A NAME="define-new-ui"></A>
-<H3>define-new-ui</H3>
+<a name="define-new-ui"></a>
+<h3>define-new-ui</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-new-ui)</CODE>
+<code>(define-new-ui)</code>
 
-<DL>
-<DT></DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt></dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-new-ui)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
-<A NAME="define-ui"></A>
-<H3>define-ui</H3>
+<a name="define-ui"></a>
+<h3>define-ui</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-ui)</CODE>
+<code>(define-ui)</code>
 
-<DL>
-<DT></DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt></dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-ui)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
-<A NAME="define-viewports"></A>
-<H3>define-viewports</H3>
+<a name="define-viewports"></a>
+<h3>define-viewports</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Define the viewports.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(define-viewports 'mode mode 'viewport (mapx mapy) ...)</CODE>
+<code>(define-viewports 'mode mode 'viewport (mapx mapy) ...)</code>
 
-<DL>
-<DT>mode</DT>
-<DD>Number corresponding to the viewport mode.  See the ViewportMode enum.
-</DD>
-<DT>mapx</DT>
-<DD>X coordinate of the map tile.
-</DD>
-<DT>mapy</DT>
-<DD>Y coordinate of the map tile.
-</DD>
-</DL>
+<dl>
+<dt>mode</dt>
+<dd>Number corresponding to the viewport mode.  See the ViewportMode enum.
+</dd>
+<dt>mapx</dt>
+<dd>X coordinate of the map tile.
+</dd>
+<dt>mapy</dt>
+<dd>Y coordinate of the map tile.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (define-viewports 'mode 1
       'viewport '(82 31)
       'viewport '(64 31))
-</PRE>
+</pre>
 
-<P>Defines the viewports to use mode 1 (split horizontal) with the first
+<p>Defines the viewports to use mode 1 (split horizontal) with the first
 viewport having map coordinates 82,31 and the second having coordinates
 64,31.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="display-picture"></A>
-<H3>display-picture</H3>
+<a name="display-picture"></a>
+<h3>display-picture</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Display a picture.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(display-picture file)</CODE>
+<code>(display-picture file)</code>
 
-<DL>
-<DT>file</DT>
-<DD>Path to the image graphic.
-</DD>
-</DL>
+<dl>
+<dt>file</dt>
+<dd>Path to the image graphic.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (display-picture "graphics/ui/freecraft.png")
-</PRE>
+</pre>
 
-<P>Displays the picture.
+<p>Displays the picture.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="process-menu"></A>
-<H3>process-menu</H3>
+<a name="process-menu"></a>
+<h3>process-menu</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Process a menu.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(process-menu id)</CODE>
+<code>(process-menu id)</code>
 
-<DL>
-<DT>id</DT>
-<DD>ID of the menu.
-</DD>
-</DL>
+<dl>
+<dt>id</dt>
+<dd>ID of the menu.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (process-menu 'menu-program-start)
-</PRE>
+</pre>
 
-<P>Process the menu 'menu-program-start.
+<p>Process the menu 'menu-program-start.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="set-game-cursor!"></A>
-<H3>set-game-cursor!</H3>
+<a name="set-game-cursor!"></a>
+<h3>set-game-cursor!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set the game cursor.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-game-cursor! ident)</CODE>
+<code>(set-game-cursor! ident)</code>
 
-<DL>
-<DT>ident</DT>
-<DD>Unique identifier of the cursor.
-</DD>
-</DL>
+<dl>
+<dt>ident</dt>
+<dd>Unique identifier of the cursor.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-game-cursor! 'cursor-point)
-</PRE>
+</pre>
 
-<P>Set the game cursor to 'cursor-point.
+<p>Set the game cursor to 'cursor-point.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<HR>
-Last changed: $Id$<BR>
+<hr>
+Last changed: $Id$<br>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS>(c) 2002-2003 by <A HREF="http://freecraft.org">
-The FreeCraft Project</A></ADDRESS></BODY></HTML>
+<address>(c) 2002-2003 by <a href="http://freecraft.org">
+The FreeCraft Project</a></address></body></html>
 

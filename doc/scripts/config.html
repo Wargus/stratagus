@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
+<html><head>
 <!--
 ----	(c) Copyright 2002-2003 by Lutz Sammer
 
@@ -12,15 +12,15 @@
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <TITLE>FreeCraft Configuration Language Description: Config</TITLE>
-    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
-    <META NAME="Author" CONTENT="johns98@gmx.net">
-    <META NAME="Keyword" CONTENT="ccl,config">
-    <META NAME="Description" CONTENT="">
-</HEAD>
-<BODY>
-    <H1>FreeCraft Configuration Language Description: Config</H1>
-<HR><PRE WIDTH=80>
+    <title>FreeCraft Configuration Language Description: Config</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <meta name="Author" content="johns98@gmx.net">
+    <meta name="Keyword" content="ccl,config">
+    <meta name="Description" content="">
+</head>
+<body>
+    <h1>FreeCraft Configuration Language Description: Config</h1>
+<hr><pre width=80>
      ___________		     _________		      _____  __
      \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
       |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
@@ -30,2273 +30,2273 @@
     ______________________                           ______________________
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
-</PRE>
-<P><B>(C) Copyright 2002-2003 by The FreeCraft Project. Distributed under the
-<A HREF="../gpl.html">"GNU General Public License"</A></B>
-<HR>
-<A HREF="../freecraft.html">FreeCraft</A> 
-<A HREF="../readme.html">Readme</A> 
-<A HREF="../faq.html">FAQ</A> 
-<A HREF="ccl.html">CCL</A> 
-<A HREF="ccl.html">PREV</A> 
-<A HREF="game.html">NEXT</A> 
-<A HREF="ccl-index.html">Index</A> 
-<HR>
-<A HREF="#a-star">a-star</A>
-<A HREF="#a-star-fixed-unit-cost">a-star-fixed-unit-cost</A>
-<A HREF="#a-star-moving-unit-cost">a-star-moving-unit-cost</A>
-<A HREF="#alpha-fog-of-war">alpha-fog-of-war</A>
-<A HREF="#decoration-on-top">decoration-on-top</A>
-<A HREF="#health-sprite">health-sprite</A>
-<A HREF="#mana-sprite">mana-sprite</A>
-<A HREF="#no-a-star">no-a-star</A>
-<A HREF="#original-fog-of-war">original-fog-of-war</A>
-<A HREF="#reveal-map">reveal-map</A>
-<A HREF="#right-button-attacks">right-button-attacks</A>
-<A HREF="#right-button-moves">right-button-moves</A>
-<A HREF="#set-all-players-building-limit!">set-all-players-building-limit!</A>
-<A HREF="#set-all-players-food-unit-limit!">set-all-players-food-unit-limit!</A>
-<A HREF="#set-all-players-total-unit-limit!">set-all-players-total-unit-limit!</A>
-<A HREF="#set-brightness!">set-brightness!</A>
-<A HREF="#set-building-capture!">set-building-capture!</A>
-<A HREF="#set-burn-buildings!">set-burn-buildings!</A>
-<A HREF="#set-color-cycle-all!">set-color-cycle-all!</A>
-<A HREF="#set-contrast!">set-contrast!</A>
-<A HREF="#set-double-click-delay!">set-double-click-delay!</A>
-<A HREF="#set-editor-select-icon!">set-editor-select-icon!</A>
-<A HREF="#set-editor-units-icon!">set-editor-units-icon!</A>
-<A HREF="#set-fancy-buildings!">set-fancy-buildings!</A>
-<A HREF="#set-fog-of-war!">set-fog-of-war!</A>
-<A HREF="#set-fog-of-war-brightness!">set-fog-of-war-brightness!</A>
-<A HREF="#set-fog-of-war-contrast!">set-fog-of-war-contrast!</A>
-<A HREF="#set-fog-of-war-saturation!">set-fog-of-war-saturation!</A>
-<A HREF="#set-forest-regeneration!">set-forest-regeneration!</A>
-<A HREF="#set-goldmine-depleted!">set-goldmine-depleted!</A>
-<A HREF="#set-grab-mouse!">set-grab-mouse!</A>
-<A HREF="#set-hitpoint-regeneration!">set-hitpoint-regeneration!</A>
-<A HREF="#set-hold-click-delay!">set-hold-click-delay!</A>
-<A HREF="#set-key-scroll!">set-key-scroll!</A>
-<A HREF="#set-key-scroll-speed!">set-key-scroll-speed!</A>
-<A HREF="#set-leave-stops!">set-leave-stops!</A>
-<A HREF="#set-menu-background!">set-menu-background!</A>
-<A HREF="#set-menu-background-with-title!">set-menu-background-with-title!</A>
-<A HREF="#set-minimap-terrain!">set-minimap-terrain!</A>
-<A HREF="#set-mouse-adjust!">set-mouse-adjust!</A>
-<A HREF="#set-mouse-scale!">set-mouse-scale!</A>
-<A HREF="#set-mouse-scroll!">set-mouse-scroll!</A>
-<A HREF="#set-mouse-scroll-speed!">set-mouse-scroll-speed!</A>
-<A HREF="#set-original-resources!">set-original-resources!</A>
-<A HREF="#set-reveal-attacker!">set-reveal-attacker!</A>
-<A HREF="#set-reverse-map-move!">set-reverse-map-move!</A>
-<A HREF="#set-saturation!">set-saturation!</A>
-<A HREF="#set-selection-style!">set-selection-style!</A>
-<A HREF="#set-show-attack-range!">set-show-attack-range!</A>
-<A HREF="#set-show-command-key!">set-show-command-key!</A>
-<A HREF="#set-show-orders!">set-show-orders!</A>
-<A HREF="#set-show-reaction-range!">set-show-reaction-range!</A>
-<A HREF="#set-show-sight-range!">set-show-sight-range!</A>
-<A HREF="#set-show-tips!">set-show-tips!</A>
-<A HREF="#set-speed-build!">set-speed-build!</A>
-<A HREF="#set-speed-research!">set-speed-research!</A>
-<A HREF="#set-speed-resources-harvest!">set-speed-resources-harvest!</A>
-<A HREF="#set-speed-resources-return!">set-speed-resources-return!</A>
-<A HREF="#set-speed-train!">set-speed-train!</A>
-<A HREF="#set-speed-upgrade!">set-speed-upgrade!</A>
-<A HREF="#set-speeds!">set-speeds!</A>
-<A HREF="#set-title-screen!">set-title-screen!</A>
-<A HREF="#set-training-queue!">set-training-queue!</A>
-<A HREF="#set-xp-damage!">set-xp-damage!</A>
-<A HREF="#shadow-sprite">shadow-sprite</A>
-<A HREF="#show-energy-selected-only">show-energy-selected-only</A>
-<A HREF="#show-full">show-full</A>
-<A HREF="#show-health-bar">show-health-bar</A>
-<A HREF="#show-health-dot">show-health-dot</A>
-<A HREF="#show-health-horizontal">show-health-horizontal</A>
-<A HREF="#show-health-vertical">show-health-vertical</A>
-<A HREF="#show-mana-bar">show-mana-bar</A>
-<A HREF="#show-mana-dot">show-mana-dot</A>
-<A HREF="#show-mana-horizontal">show-mana-horizontal</A>
-<A HREF="#show-mana-vertical">show-mana-vertical</A>
-<A HREF="#show-no-full">show-no-full</A>
-<A HREF="#spell-sprite">spell-sprite</A>
-<HR>
-<H2>Intro - Introduction to config functions and variables</H2>
+</pre>
+<p><b>(C) Copyright 2002-2003 by The FreeCraft Project. Distributed under the
+<a href="../gpl.html">"GNU General Public License"</a></b>
+<hr>
+<a href="../freecraft.html">FreeCraft</a> 
+<a href="../readme.html">Readme</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="ccl.html">CCL</a> 
+<a href="ccl.html">PREV</a> 
+<a href="game.html">NEXT</a> 
+<a href="ccl-index.html">Index</a> 
+<hr>
+<a href="#a-star">a-star</a>
+<a href="#a-star-fixed-unit-cost">a-star-fixed-unit-cost</a>
+<a href="#a-star-moving-unit-cost">a-star-moving-unit-cost</a>
+<a href="#alpha-fog-of-war">alpha-fog-of-war</a>
+<a href="#decoration-on-top">decoration-on-top</a>
+<a href="#health-sprite">health-sprite</a>
+<a href="#mana-sprite">mana-sprite</a>
+<a href="#no-a-star">no-a-star</a>
+<a href="#original-fog-of-war">original-fog-of-war</a>
+<a href="#reveal-map">reveal-map</a>
+<a href="#right-button-attacks">right-button-attacks</a>
+<a href="#right-button-moves">right-button-moves</a>
+<a href="#set-all-players-building-limit!">set-all-players-building-limit!</a>
+<a href="#set-all-players-food-unit-limit!">set-all-players-food-unit-limit!</a>
+<a href="#set-all-players-total-unit-limit!">set-all-players-total-unit-limit!</a>
+<a href="#set-brightness!">set-brightness!</a>
+<a href="#set-building-capture!">set-building-capture!</a>
+<a href="#set-burn-buildings!">set-burn-buildings!</a>
+<a href="#set-color-cycle-all!">set-color-cycle-all!</a>
+<a href="#set-contrast!">set-contrast!</a>
+<a href="#set-double-click-delay!">set-double-click-delay!</a>
+<a href="#set-editor-select-icon!">set-editor-select-icon!</a>
+<a href="#set-editor-units-icon!">set-editor-units-icon!</a>
+<a href="#set-fancy-buildings!">set-fancy-buildings!</a>
+<a href="#set-fog-of-war!">set-fog-of-war!</a>
+<a href="#set-fog-of-war-brightness!">set-fog-of-war-brightness!</a>
+<a href="#set-fog-of-war-contrast!">set-fog-of-war-contrast!</a>
+<a href="#set-fog-of-war-saturation!">set-fog-of-war-saturation!</a>
+<a href="#set-forest-regeneration!">set-forest-regeneration!</a>
+<a href="#set-goldmine-depleted!">set-goldmine-depleted!</a>
+<a href="#set-grab-mouse!">set-grab-mouse!</a>
+<a href="#set-hitpoint-regeneration!">set-hitpoint-regeneration!</a>
+<a href="#set-hold-click-delay!">set-hold-click-delay!</a>
+<a href="#set-key-scroll!">set-key-scroll!</a>
+<a href="#set-key-scroll-speed!">set-key-scroll-speed!</a>
+<a href="#set-leave-stops!">set-leave-stops!</a>
+<a href="#set-menu-background!">set-menu-background!</a>
+<a href="#set-menu-background-with-title!">set-menu-background-with-title!</a>
+<a href="#set-minimap-terrain!">set-minimap-terrain!</a>
+<a href="#set-mouse-adjust!">set-mouse-adjust!</a>
+<a href="#set-mouse-scale!">set-mouse-scale!</a>
+<a href="#set-mouse-scroll!">set-mouse-scroll!</a>
+<a href="#set-mouse-scroll-speed!">set-mouse-scroll-speed!</a>
+<a href="#set-original-resources!">set-original-resources!</a>
+<a href="#set-reveal-attacker!">set-reveal-attacker!</a>
+<a href="#set-reverse-map-move!">set-reverse-map-move!</a>
+<a href="#set-saturation!">set-saturation!</a>
+<a href="#set-selection-style!">set-selection-style!</a>
+<a href="#set-show-attack-range!">set-show-attack-range!</a>
+<a href="#set-show-command-key!">set-show-command-key!</a>
+<a href="#set-show-orders!">set-show-orders!</a>
+<a href="#set-show-reaction-range!">set-show-reaction-range!</a>
+<a href="#set-show-sight-range!">set-show-sight-range!</a>
+<a href="#set-show-tips!">set-show-tips!</a>
+<a href="#set-speed-build!">set-speed-build!</a>
+<a href="#set-speed-research!">set-speed-research!</a>
+<a href="#set-speed-resources-harvest!">set-speed-resources-harvest!</a>
+<a href="#set-speed-resources-return!">set-speed-resources-return!</a>
+<a href="#set-speed-train!">set-speed-train!</a>
+<a href="#set-speed-upgrade!">set-speed-upgrade!</a>
+<a href="#set-speeds!">set-speeds!</a>
+<a href="#set-title-screen!">set-title-screen!</a>
+<a href="#set-training-queue!">set-training-queue!</a>
+<a href="#set-xp-damage!">set-xp-damage!</a>
+<a href="#shadow-sprite">shadow-sprite</a>
+<a href="#show-energy-selected-only">show-energy-selected-only</a>
+<a href="#show-full">show-full</a>
+<a href="#show-health-bar">show-health-bar</a>
+<a href="#show-health-dot">show-health-dot</a>
+<a href="#show-health-horizontal">show-health-horizontal</a>
+<a href="#show-health-vertical">show-health-vertical</a>
+<a href="#show-mana-bar">show-mana-bar</a>
+<a href="#show-mana-dot">show-mana-dot</a>
+<a href="#show-mana-horizontal">show-mana-horizontal</a>
+<a href="#show-mana-vertical">show-mana-vertical</a>
+<a href="#show-no-full">show-no-full</a>
+<a href="#spell-sprite">spell-sprite</a>
+<hr>
+<h2>Intro - Introduction to config functions and variables</h2>
 
 General configurations.
 
-<H2>Functions</H2>
-<A NAME="a-star"></A>
-<H3>a-star</H3>
+<h2>Functions</h2>
+<a name="a-star"></a>
+<h3>a-star</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(a-star)</CODE>
+<code>(a-star)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (a-star)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="a-star-fixed-unit-cost"></A>
-<H3>a-star-fixed-unit-cost</H3>
+<a name="a-star-fixed-unit-cost"></a>
+<h3>a-star-fixed-unit-cost</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(a-star-fixed-unit-cost cost)</CODE>
+<code>(a-star-fixed-unit-cost cost)</code>
 
-<DL>
-<DT>cost</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>cost</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (a-star-fixed-unit-cost)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="a-star-moving-unit-cost"></A>
-<H3>a-star-moving-unit-cost</H3>
+<a name="a-star-moving-unit-cost"></a>
+<h3>a-star-moving-unit-cost</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(a-star-moving-unit-cost cost)</CODE>
+<code>(a-star-moving-unit-cost cost)</code>
 
-<DL>
-<DT>cost</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>cost</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (a-star-moving-unit-cost)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="alpha-fog-of-war"></A>
-<H3>alpha-fog-of-war</H3>
+<a name="alpha-fog-of-war"></a>
+<h3>alpha-fog-of-war</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Use alpha style fog of war.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(alpha-fog-of-war)</CODE>
+<code>(alpha-fog-of-war)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (alpha-fog-of-war)
-</PRE>
+</pre>
 
-<P>Use alpha style fog of war.
+<p>Use alpha style fog of war.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="decoration-on-top"></A>
-<H3>decoration-on-top</H3>
+<a name="decoration-on-top"></a>
+<h3>decoration-on-top</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Show bars and dots always on top. (Planned feature)
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(decoration-on-top)</CODE>
+<code>(decoration-on-top)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (decoration-on-top)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="health-sprite"></A>
-<H3>health-sprite</H3>
+<a name="health-sprite"></a>
+<h3>health-sprite</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(health-sprite file hotx hoty width height)</CODE>
+<code>(health-sprite file hotx hoty width height)</code>
 
-<DL>
-<DT>file</DT>
-<DD>.
-<DT>hotx</DT>
-<DD>.
-<DT>hoty</DT>
-<DD>.
-<DT>width</DT>
-<DD>.
-<DT>height</DT>
-<DD>.
-</DD>
-</DD>
-</DL>
+<dl>
+<dt>file</dt>
+<dd>.
+<dt>hotx</dt>
+<dd>.
+<dt>hoty</dt>
+<dd>.
+<dt>width</dt>
+<dd>.
+<dt>height</dt>
+<dd>.
+</dd>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (health-sprite "graphics/ui/health2.png" 0 -4 31 4)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="mana-sprite"></A>
-<H3>mana-sprite</H3>
+<a name="mana-sprite"></a>
+<h3>mana-sprite</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(mana-sprite file hotx hoty width height))</CODE>
+<code>(mana-sprite file hotx hoty width height))</code>
 
-<DL>
-<DT>file</DT>
-<DD>.
-<DT>hotx</DT>
-<DD>.
-<DT>hoty</DT>
-<DD>.
-<DT>width</DT>
-<DD>.
-<DT>height</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>file</dt>
+<dd>.
+<dt>hotx</dt>
+<dd>.
+<dt>hoty</dt>
+<dd>.
+<dt>width</dt>
+<dd>.
+<dt>height</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (mana-sprite graphics/ui/mana2.png" 0 -1 31 4)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="no-a-star"></A>
-<H3>no-a-star</H3>
+<a name="no-a-star"></a>
+<h3>no-a-star</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(no-a-star)</CODE>
+<code>(no-a-star)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (no-a-star)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="original-fog-of-war"></A>
-<H3>original-fog-of-war</H3>
+<a name="original-fog-of-war"></a>
+<h3>original-fog-of-war</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Use original style fog of war.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(original-fog-of-war)</CODE>
+<code>(original-fog-of-war)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (original-fog-of-war)
-</PRE>
+</pre>
 
-<P>Use original style fog of war.
+<p>Use original style fog of war.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="reveal-map"></A>
-<H3>reveal-map</H3>
+<a name="reveal-map"></a>
+<h3>reveal-map</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Reveal the entire map.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(reveal-map)</CODE>
+<code>(reveal-map)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (reveal-map)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="right-button-attacks"></A>
-<H3>right-button-attacks</H3>
+<a name="right-button-attacks"></a>
+<h3>right-button-attacks</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(right-button-attacks)</CODE>
+<code>(right-button-attacks)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (right-button-attacks)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="right-button-moves"></A>
-<H3>right-button-moves</H3>
+<a name="right-button-moves"></a>
+<h3>right-button-moves</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(right-button-moves)</CODE>
+<code>(right-button-moves)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (right-button-moves)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-all-players-building-limit!"></A>
-<H3>set-all-players-building-limit!</H3>
+<a name="set-all-players-building-limit!"></a>
+<h3>set-all-players-building-limit!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-all-players-building-limit! limit)</CODE>
+<code>(set-all-players-building-limit! limit)</code>
 
-<DL>
-<DT>limit</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>limit</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-all-players-building-limit! 200)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-all-players-food-unit-limit!"></A>
-<H3>set-all-players-food-unit-limit!</H3>
+<a name="set-all-players-food-unit-limit!"></a>
+<h3>set-all-players-food-unit-limit!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-all-players-food-unit-limit! limit)</CODE>
+<code>(set-all-players-food-unit-limit! limit)</code>
 
-<DL>
-<DT>limit</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>limit</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-all-players-food-unit-limit! 200)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-all-players-total-unit-limit!"></A>
-<H3>set-all-players-total-unit-limit!</H3>
+<a name="set-all-players-total-unit-limit!"></a>
+<h3>set-all-players-total-unit-limit!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-all-players-total-unit-limit! limit)</CODE>
+<code>(set-all-players-total-unit-limit! limit)</code>
 
-<DL>
-<DT>limit</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>limit</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-all-players-total-unit-limit! 400)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-brightness!"></A>
-<H3>set-brightness!</H3>
+<a name="set-brightness!"></a>
+<h3>set-brightness!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Change the global game brightness. Use this to adapt FreeCraft to your monitor
 settings.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-brightness! brightness)</CODE>
+<code>(set-brightness! brightness)</code>
 
-<DL>
-<DT>brightness</DT>
-<DD>Your brightness, can be a value from -100 to 100. 0 is the neutral point.
-</DD>
-</DL>
+<dl>
+<dt>brightness</dt>
+<dd>Your brightness, can be a value from -100 to 100. 0 is the neutral point.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-brightness! 15)
-</PRE>
+</pre>
 
-<P>This is the default brightness. A little lighter than the original.
+<p>This is the default brightness. A little lighter than the original.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-building-capture!"></A>
-<H3>set-building-capture!</H3>
+<a name="set-building-capture!"></a>
+<h3>set-building-capture!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Enable or disable building capture.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-building-capture! capture)</CODE>
+<code>(set-building-capture! capture)</code>
 
-<DL>
-<DT>capture</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>capture</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-building-capture! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-burn-buildings!"></A>
-<H3>set-burn-buildings!</H3>
+<a name="set-burn-buildings!"></a>
+<h3>set-burn-buildings!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-burn-buildings! percent rate)</CODE>
+<code>(set-burn-buildings! percent rate)</code>
 
-<DL>
-<DT>percent</DT>
-<DD>.
-<DT>rate</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>percent</dt>
+<dd>.
+<dt>rate</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-burn-buildings! 25 2)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-color-cycle-all!"></A>
-<H3>set-color-cycle-all!</H3>
+<a name="set-color-cycle-all!"></a>
+<h3>set-color-cycle-all!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Change how the color cycling is working. This is used to make the water moving
 or the circle in the dark portal rotating.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-color-cycle-all! flag)</CODE>
+<code>(set-color-cycle-all! flag)</code>
 
-<DL>
-<DT>flag</DT>
-<DD>If flag is true (#t) all images are color cycled. If flag is false (#f) only the tileset and global palettes  are color cycled.
-</DD>
-</DL>
+<dl>
+<dt>flag</dt>
+<dd>If flag is true (#t) all images are color cycled. If flag is false (#f) only the tileset and global palettes  are color cycled.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-color-cycle-all! #t)
-</PRE>
+</pre>
 
-<P>This is the default, all images are color cycled.
+<p>This is the default, all images are color cycled.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-contrast!"></A>
-<H3>set-contrast!</H3>
+<a name="set-contrast!"></a>
+<h3>set-contrast!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Change the global game contrast. Use this to adapt FreeCraft to your monitor
 settings.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-contrast! contrast)</CODE>
+<code>(set-contrast! contrast)</code>
 
-<DL>
-<DT>contrast</DT>
-<DD>Your contrast, can be a value from 0 to 400. 100 is the neutral point.
-</DD>
-</DL>
+<dl>
+<dt>contrast</dt>
+<dd>Your contrast, can be a value from 0 to 400. 100 is the neutral point.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-contrast! 110)
-</PRE>
+</pre>
 
-<P>This is the default contrast. A little more than the original.
+<p>This is the default contrast. A little more than the original.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-double-click-delay!"></A>
-<H3>set-double-click-delay!</H3>
+<a name="set-double-click-delay!"></a>
+<h3>set-double-click-delay!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-double-click-delay! delay)</CODE>
+<code>(set-double-click-delay! delay)</code>
 
-<DL>
-<DT>delay</DT>
-<DD>The delay in ms.
-</DD>
-</DL>
+<dl>
+<dt>delay</dt>
+<dd>The delay in ms.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-double-click-delay! 300)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-editor-select-icon!"></A>
-<H3>set-editor-select-icon!</H3>
+<a name="set-editor-select-icon!"></a>
+<h3>set-editor-select-icon!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-editor-select-icon! icon)</CODE>
+<code>(set-editor-select-icon! icon)</code>
 
-<DL>
-<DT>icon</DT>
-<DD>The name of the icon.
-</DD>
-</DL>
+<dl>
+<dt>icon</dt>
+<dd>The name of the icon.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-editor-select-icon! 'icon-human-patrol-land)
-</PRE>
+</pre>
 
-<P>Use "icon-human-patrol-land" for the editor's select icon.
+<p>Use "icon-human-patrol-land" for the editor's select icon.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/editor.ccl"> $LIBARYPATH/ccl/editor.ccl </A>
+<a href="../../data/ccl/editor.ccl"> $LIBARYPATH/ccl/editor.ccl </a>
 
-<A NAME="set-editor-units-icon!"></A>
-<H3>set-editor-units-icon!</H3>
+<a name="set-editor-units-icon!"></a>
+<h3>set-editor-units-icon!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-editor-units-icon! icon)</CODE>
+<code>(set-editor-units-icon! icon)</code>
 
-<DL>
-<DT>icon</DT>
-<DD>The name of the icon.
-</DD>
-</DL>
+<dl>
+<dt>icon</dt>
+<dd>The name of the icon.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-editor-units-icon! 'unit-footman)
-</PRE>
+</pre>
 
-<P>Use "icon-footman" for the editor's units icon.
+<p>Use "icon-footman" for the editor's units icon.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/editor.ccl"> $LIBARYPATH/ccl/editor.ccl </A>
+<a href="../../data/ccl/editor.ccl"> $LIBARYPATH/ccl/editor.ccl </a>
 
-<A NAME="set-fancy-buildings!"></A>
-<H3>set-fancy-buildings!</H3>
+<a name="set-fancy-buildings!"></a>
+<h3>set-fancy-buildings!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-fancy-buildings! fancy)</CODE>
+<code>(set-fancy-buildings! fancy)</code>
 
-<DL>
-<DT>fancy</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>fancy</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-fancy-buildings! #t)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-fog-of-war!"></A>
-<H3>set-fog-of-war!</H3>
+<a name="set-fog-of-war!"></a>
+<h3>set-fog-of-war!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-fog-of-war! fow)</CODE>
+<code>(set-fog-of-war! fow)</code>
 
-<DL>
-<DT>fow</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>fow</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-fog-of-war! #t)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-fog-of-war-brightness!"></A>
-<H3>set-fog-of-war-brightness!</H3>
+<a name="set-fog-of-war-brightness!"></a>
+<h3>set-fog-of-war-brightness!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-fog-of-war-brightness! brightness)</CODE>
+<code>(set-fog-of-war-brightness! brightness)</code>
 
-<DL>
-<DT>brightness</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>brightness</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-fog-of-war-brightness! 10)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-fog-of-war-contrast!"></A>
-<H3>set-fog-of-war-contrast!</H3>
+<a name="set-fog-of-war-contrast!"></a>
+<h3>set-fog-of-war-contrast!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-fog-of-war-contrast! contrast)</CODE>
+<code>(set-fog-of-war-contrast! contrast)</code>
 
-<DL>
-<DT>contrast</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>contrast</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-fog-of-war-contrast! 30)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-fog-of-war-saturation!"></A>
-<H3>set-fog-of-war-saturation!</H3>
+<a name="set-fog-of-war-saturation!"></a>
+<h3>set-fog-of-war-saturation!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-fog-of-war-saturation! saturation)</CODE>
+<code>(set-fog-of-war-saturation! saturation)</code>
 
-<DL>
-<DT>saturation</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>saturation</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-fog-of-war-saturation! 100)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-forest-regeneration!"></A>
-<H3>set-forest-regeneration!</H3>
+<a name="set-forest-regeneration!"></a>
+<h3>set-forest-regeneration!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-forest-regeneration! speed)</CODE>
+<code>(set-forest-regeneration! speed)</code>
 
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>speed</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-forest-regeneration! 0)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-goldmine-depleted!"></A>
-<H3>set-goldmine-depleted!</H3>
+<a name="set-goldmine-depleted!"></a>
+<h3>set-goldmine-depleted!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set the option to use depleted goldmines.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-goldmine-depleted! percent)</CODE>
+<code>(set-goldmine-depleted! percent)</code>
 
-<DL>
-<DT>percent</DT>
-<DD>Players mining a depleted mine receive this percent of the default amount
+<dl>
+<dt>percent</dt>
+<dd>Players mining a depleted mine receive this percent of the default amount
 of gold.  Use 0 to disable using depleted mines.
-</DD>
-</DL>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-goldmine-depleted! 0)
     (set-goldmine-depleted! 20)
-</PRE>
+</pre>
 
-<P>The first example disables using depleted mines.  The second example lets
+<p>The first example disables using depleted mines.  The second example lets
 players mine depleted mines and gives them 20% of the default amount of gold.
 
-<H4>Not Used</H4>
+<h4>Not Used</h4>
 
-<A NAME="set-grab-mouse!"></A>
-<H3>set-grab-mouse!</H3>
+<a name="set-grab-mouse!"></a>
+<h3>set-grab-mouse!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-grab-mouse! grab)</CODE>
+<code>(set-grab-mouse! grab)</code>
 
-<DL>
-<DT>grab</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>grab</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-grab-mouse! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-hitpoint-regeneration!"></A>
-<H3>set-hitpoint-regeneration!</H3>
+<a name="set-hitpoint-regeneration!"></a>
+<h3>set-hitpoint-regeneration!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-hitpoint-regeneration! regen)</CODE>
+<code>(set-hitpoint-regeneration! regen)</code>
 
-<DL>
-<DT>regen</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>regen</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-hitpoint-regeneration! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-hold-click-delay!"></A>
-<H3>set-hold-click-delay!</H3>
+<a name="set-hold-click-delay!"></a>
+<h3>set-hold-click-delay!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-hold-click-delay! delay)</CODE>
+<code>(set-hold-click-delay! delay)</code>
 
-<DL>
-<DT>delay</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>delay</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-hold-click-delay! 1000)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-key-scroll!"></A>
-<H3>set-key-scroll!</H3>
+<a name="set-key-scroll!"></a>
+<h3>set-key-scroll!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-key-scroll! scroll)</CODE>
+<code>(set-key-scroll! scroll)</code>
 
-<DL>
-<DT>scroll</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>scroll</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-key-scroll! #t)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-key-scroll-speed!"></A>
-<H3>set-key-scroll-speed!</H3>
+<a name="set-key-scroll-speed!"></a>
+<h3>set-key-scroll-speed!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-key-scroll-speed! speed)</CODE>
+<code>(set-key-scroll-speed! speed)</code>
 
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>speed</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-key-scroll-speed! 1)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-leave-stops!"></A>
-<H3>set-leave-stops!</H3>
+<a name="set-leave-stops!"></a>
+<h3>set-leave-stops!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-leave-stops! leave)</CODE>
+<code>(set-leave-stops! leave)</code>
 
-<DL>
-<DT>leave</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>leave</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-leave-stops! #t)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-menu-background!"></A>
-<H3>set-menu-background!</H3>
+<a name="set-menu-background!"></a>
+<h3>set-menu-background!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set the default menu background.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-menu-background! image)</CODE>
+<code>(set-menu-background! image)</code>
 
-<DL>
-<DT>image</DT>
-<DD>Image to be displayed as menu background, this is the second screen 
+<dl>
+<dt>image</dt>
+<dd>Image to be displayed as menu background, this is the second screen 
 displayed. The image should be a png file with 640x480 8-bit indexed colormap.
-</DD>
-</DL>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-menu-background! "graphics/ui/Menu background without title.png")
-</PRE>
+</pre>
 
-<P>This is the default menu background displayed.
+<p>This is the default menu background displayed.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-menu-background-with-title!"></A>
-<H3>set-menu-background-with-title!</H3>
+<a name="set-menu-background-with-title!"></a>
+<h3>set-menu-background-with-title!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set the default menu background with title.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-menu-background-with-title! image)</CODE>
+<code>(set-menu-background-with-title! image)</code>
 
-<DL>
-<DT>image</DT>
-<DD>Image to be displayed as menu background with title, this is the second screen 
+<dl>
+<dt>image</dt>
+<dd>Image to be displayed as menu background with title, this is the second screen 
 displayed. The image should be a png file with 640x480 8-bit indexed colormap.
-</DD>
-</DL>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-menu-background-with-title! "graphics/ui/Menu background with title.png")
-</PRE>
+</pre>
 
-<P>This is the default menu background with title displayed.
+<p>This is the default menu background with title displayed.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-minimap-terrain!"></A>
-<H3>set-minimap-terrain!</H3>
+<a name="set-minimap-terrain!"></a>
+<h3>set-minimap-terrain!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-minimap-terrain! terrain)</CODE>
+<code>(set-minimap-terrain! terrain)</code>
 
-<DL>
-<DT>terrain</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>terrain</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-minimap-terrain! #t)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-mouse-adjust!"></A>
-<H3>set-mouse-adjust!</H3>
+<a name="set-mouse-adjust!"></a>
+<h3>set-mouse-adjust!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 (Only with SVGALIB).
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-mouse-adjust! speed)</CODE>
+<code>(set-mouse-adjust! speed)</code>
 
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>speed</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-mouse-adjust! 15)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-mouse-scale!"></A>
-<H3>set-mouse-scale!</H3>
+<a name="set-mouse-scale!"></a>
+<h3>set-mouse-scale!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 (Only with SVGALIB).
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-mouse-scale! scale)</CODE>
+<code>(set-mouse-scale! scale)</code>
 
-<DL>
-<DT>scale</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>scale</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-mouse-scale! 1)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-mouse-scroll!"></A>
-<H3>set-mouse-scroll!</H3>
+<a name="set-mouse-scroll!"></a>
+<h3>set-mouse-scroll!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-mouse-scroll! scroll)</CODE>
+<code>(set-mouse-scroll! scroll)</code>
 
-<DL>
-<DT>scroll</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>scroll</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-mouse-scroll! #t)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-mouse-scroll-speed!"></A>
-<H3>set-mouse-scroll-speed!</H3>
+<a name="set-mouse-scroll-speed!"></a>
+<h3>set-mouse-scroll-speed!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-mouse-scroll-speed! speed)</CODE>
+<code>(set-mouse-scroll-speed! speed)</code>
 
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>speed</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-mouse-scroll-speed! 1)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-original-resources!"></A>
-<H3>set-original-resources!</H3>
+<a name="set-original-resources!"></a>
+<h3>set-original-resources!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-original-resources! resources)</CODE>
+<code>(set-original-resources! resources)</code>
 
-<DL>
-<DT>resources</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>resources</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-original-resources! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-reveal-attacker!"></A>
-<H3>set-reveal-attacker!</H3>
+<a name="set-reveal-attacker!"></a>
+<h3>set-reveal-attacker!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-reveal-attacker! reveal)</CODE>
+<code>(set-reveal-attacker! reveal)</code>
 
-<DL>
-<DT>reveal</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>reveal</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-reveal-attacker! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-reverse-map-move!"></A>
-<H3>set-reverse-map-move!</H3>
+<a name="set-reverse-map-move!"></a>
+<h3>set-reverse-map-move!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-reverse-map-move! reverse)</CODE>
+<code>(set-reverse-map-move! reverse)</code>
 
-<DL>
-<DT>reverse</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>reverse</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-reverse-map-move! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-saturation!"></A>
-<H3>set-saturation!</H3>
-<H4>Description</H4>
+<a name="set-saturation!"></a>
+<h3>set-saturation!</h3>
+<h4>Description</h4>
 
 Change the global game saturation. Use this to adapt FreeCraft to your monitor
 settings.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-saturation! saturation)</CODE>
+<code>(set-saturation! saturation)</code>
 
-<DL>
-<DT>saturation</DT>
-<DD>Your saturation, can be a value from -100 to 200. 100 is the neutral point.
-</DD>
-</DL>
+<dl>
+<dt>saturation</dt>
+<dd>Your saturation, can be a value from -100 to 200. 100 is the neutral point.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-saturation! 100)
-</PRE>
+</pre>
 
-<P>This is the default saturation.
+<p>This is the default saturation.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-selection-style!"></A>
-<H3>set-selection-style!</H3>
+<a name="set-selection-style!"></a>
+<h3>set-selection-style!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-selection-style! style)</CODE>
+<code>(set-selection-style! style)</code>
 
-<DL>
-<DT>style</DT>
-<DD>#f,'rectangle,'circle,'alpha-rectangle,'alpha-circle,'corners.
-</DD>
-</DL>
+<dl>
+<dt>style</dt>
+<dd>#f,'rectangle,'circle,'alpha-rectangle,'alpha-circle,'corners.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-selection-style! 'corners)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-show-attack-range!"></A>
-<H3>set-show-attack-range!</H3>
+<a name="set-show-attack-range!"></a>
+<h3>set-show-attack-range!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-show-attack-range! show)</CODE>
+<code>(set-show-attack-range! show)</code>
 
-<DL>
-<DT>show</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>show</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-show-attack-range! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-show-command-key!"></A>
-<H3>set-show-command-key!</H3>
+<a name="set-show-command-key!"></a>
+<h3>set-show-command-key!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-show-command-key! show)</CODE>
+<code>(set-show-command-key! show)</code>
 
-<DL>
-<DT>show</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>show</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-show-command-key! #t)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-show-orders!"></A>
-<H3>set-show-orders!</H3>
+<a name="set-show-orders!"></a>
+<h3>set-show-orders!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Show unit orders.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-show-orders! show)</CODE>
+<code>(set-show-orders! show)</code>
 
-<DL>
-<DT>show</DT>
-<DD>Use #t to always show unit orders, #f to never show orders.  Or use a
+<dl>
+<dt>show</dt>
+<dd>Use #t to always show unit orders, #f to never show orders.  Or use a
 number to specify the number of seconds an order should be shown.
-</DD>
-</DL>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-show-orders! #f)
     (set-show-orders! 2)
-</PRE>
+</pre>
 
-<P>The first example never shows unit orders.  The second example only shows
+<p>The first example never shows unit orders.  The second example only shows
 orders for 2 seconds.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-show-reaction-range!"></A>
-<H3>set-show-reaction-range!</H3>
+<a name="set-show-reaction-range!"></a>
+<h3>set-show-reaction-range!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-show-reaction-range! show)</CODE>
+<code>(set-show-reaction-range! show)</code>
 
-<DL>
-<DT>show</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>show</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-show-reaction-reaction-range! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-show-sight-range!"></A>
-<H3>set-show-sight-range!</H3>
+<a name="set-show-sight-range!"></a>
+<h3>set-show-sight-range!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-show-sight-range! range)</CODE>
+<code>(set-show-sight-range! range)</code>
 
-<DL>
-<DT>range</DT>
-<DD>#f,'rectangle,'circle,'#t.
-</DD>
-</DL>
+<dl>
+<dt>range</dt>
+<dd>#f,'rectangle,'circle,'#t.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-show-sight-range! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-show-tips!"></A>
-<H3>set-show-tips!</H3>
+<a name="set-show-tips!"></a>
+<h3>set-show-tips!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-show-tips! tips)</CODE>
+<code>(set-show-tips! tips)</code>
 
-<DL>
-<DT>tips</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>tips</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-show-tips! #t)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-speed-build!"></A>
-<H3>set-speed-build!</H3>
+<a name="set-speed-build!"></a>
+<h3>set-speed-build!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set build speed.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-speed-build! speed)</CODE>
+<code>(set-speed-build! speed)</code>
 
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>speed</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-speed-build! 10)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-speed-research!"></A>
-<H3>set-speed-research!</H3>
+<a name="set-speed-research!"></a>
+<h3>set-speed-research!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set research speed.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-speed-research! speed)</CODE>
+<code>(set-speed-research! speed)</code>
 
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>speed</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-speed-research! 10)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-speed-resources-harvest!"></A>
-<H3>set-speed-resources-harvest!</H3>
+<a name="set-speed-resources-harvest!"></a>
+<h3>set-speed-resources-harvest!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set the harvesting speed of a resource.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-speed-resources-harvest! resource speed)</CODE>
+<code>(set-speed-resources-harvest! resource speed)</code>
 
-<DL>
-<DT>resource</DT>
-<DD>Name of the resource.
-</DD>
-<DT>speed</DT>
-<DD>Speed factor to increase harvesting time.
-</DD>
-</DL>
+<dl>
+<dt>resource</dt>
+<dd>Name of the resource.
+</dd>
+<dt>speed</dt>
+<dd>Speed factor to increase harvesting time.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-speed-resources-harvest! 'gold 10)
-</PRE>
+</pre>
 
-<P>Speeds up gold mining time by a factor of 10.
+<p>Speeds up gold mining time by a factor of 10.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-speed-resources-return!"></A>
-<H3>set-speed-resources-return!</H3>
+<a name="set-speed-resources-return!"></a>
+<h3>set-speed-resources-return!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set the returning speed of a resource.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-speed-resources-return! resource speed)</CODE>
+<code>(set-speed-resources-return! resource speed)</code>
 
-<DL>
-<DT>resource</DT>
-<DD>Name of the resource.
-</DD>
-<DT>speed</DT>
-<DD>Speed factor to increase returning time.
-</DD>
-</DL>
+<dl>
+<dt>resource</dt>
+<dd>Name of the resource.
+</dd>
+<dt>speed</dt>
+<dd>Speed factor to increase returning time.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-speed-resources-return! 'gold 10)
-</PRE>
+</pre>
 
-<P>Speeds up the time spent returning gold by a factor of 10.
+<p>Speeds up the time spent returning gold by a factor of 10.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-speed-train!"></A>
-<H3>set-speed-train!</H3>
+<a name="set-speed-train!"></a>
+<h3>set-speed-train!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set train speed.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-speed-train! speed)</CODE>
+<code>(set-speed-train! speed)</code>
 
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>speed</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-speed-train! 10)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-speed-upgrade!"></A>
-<H3>set-speed-upgrade!</H3>
+<a name="set-speed-upgrade!"></a>
+<h3>set-speed-upgrade!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set upgrade speed.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-speed-upgrade! speed)</CODE>
+<code>(set-speed-upgrade! speed)</code>
 
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>speed</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-speed-upgrade! 10)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-speeds!"></A>
-<H3>set-speeds!</H3>
+<a name="set-speeds!"></a>
+<h3>set-speeds!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Set all speeds.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-speeds! speed)</CODE>
+<code>(set-speeds! speed)</code>
 
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>speed</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-speeds! 1)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-title-screen!"></A>
-<H3>set-title-screen!</H3>
+<a name="set-title-screen!"></a>
+<h3>set-title-screen!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 Change the default title screen.
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-title-screen! image)</CODE>
+<code>(set-title-screen! image)</code>
 
-<DL>
-<DT>image</DT>
-<DD>Image to be displayed as title screen, this is the first screen 
+<dl>
+<dt>image</dt>
+<dd>Image to be displayed as title screen, this is the first screen 
 displayed. The image should be a png file with 640x480 8-bit indexed colormap.
-</DD>
-</DL>
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-title-screen! "graphics/ui/freecraft.png")
-</PRE>
+</pre>
 
-<P>This is the default title displayed.
+<p>This is the default title displayed.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-training-queue!"></A>
-<H3>set-training-queue!</H3>
+<a name="set-training-queue!"></a>
+<h3>set-training-queue!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-training-queue! queue)</CODE>
+<code>(set-training-queue! queue)</code>
 
-<DL>
-<DT>queue</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>queue</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-training-queue! #t)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="set-xp-damage!"></A>
-<H3>set-xp-damage!</H3>
+<a name="set-xp-damage!"></a>
+<h3>set-xp-damage!</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(set-xp-damage! damage)</CODE>
+<code>(set-xp-damage! damage)</code>
 
-<DL>
-<DT>damage</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>damage</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (set-xp-damage! #f)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="shadow-sprite"></A>
-<H3>shadow-sprite</H3>
+<a name="shadow-sprite"></a>
+<h3>shadow-sprite</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(shadow-sprite file hotx hoty width height)</CODE>
+<code>(shadow-sprite file hotx hoty width height)</code>
 
-<DL>
-<DT>file</DT>
-<DD>.
-<DT>hotx</DT>
-<DD>.
-<DT>hoty</DT>
-<DD>.
-<DT>width</DT>
-<DD>.
-<DT>height</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>file</dt>
+<dd>.
+<dt>hotx</dt>
+<dd>.
+<dt>hoty</dt>
+<dd>.
+<dt>width</dt>
+<dd>.
+<dt>height</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (shadow-sprite "graphics/missiles/unit shadow.png" 3 42 32 32)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-energy-selected-only"></A>
-<H3>show-energy-selected-only</H3>
+<a name="show-energy-selected-only"></a>
+<h3>show-energy-selected-only</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-energy-selected-only)</CODE>
+<code>(show-energy-selected-only)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-energy-selected-only)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-full"></A>
-<H3>show-full</H3>
+<a name="show-full"></a>
+<h3>show-full</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-full)</CODE>
+<code>(show-full)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-full)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-health-bar"></A>
-<H3>show-health-bar</H3>
+<a name="show-health-bar"></a>
+<h3>show-health-bar</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-health-bar)</CODE>
+<code>(show-health-bar)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-health-bar)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-health-dot"></A>
-<H3>show-health-dot</H3>
+<a name="show-health-dot"></a>
+<h3>show-health-dot</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-health-dot)</CODE>
+<code>(show-health-dot)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-health-dot)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-health-horizontal"></A>
-<H3>show-health-horizontal</H3>
+<a name="show-health-horizontal"></a>
+<h3>show-health-horizontal</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-health-horizontal)</CODE>
+<code>(show-health-horizontal)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-health-horizontal)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-health-vertical"></A>
-<H3>show-health-vertical</H3>
+<a name="show-health-vertical"></a>
+<h3>show-health-vertical</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-health-vertical)</CODE>
+<code>(show-health-vertical)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-health-vertical)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-mana-bar"></A>
-<H3>show-mana-bar</H3>
+<a name="show-mana-bar"></a>
+<h3>show-mana-bar</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-mana-bar)</CODE>
+<code>(show-mana-bar)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-mana-bar)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-mana-dot"></A>
-<H3>show-mana-dot</H3>
+<a name="show-mana-dot"></a>
+<h3>show-mana-dot</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-mana-dot)</CODE>
+<code>(show-mana-dot)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-mana-dot)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-mana-horizontal"></A>
-<H3>show-mana-horizontal</H3>
+<a name="show-mana-horizontal"></a>
+<h3>show-mana-horizontal</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-mana-horizontal)</CODE>
+<code>(show-mana-horizontal)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-mana-horizontal)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-mana-vertical"></A>
-<H3>show-mana-vertical</H3>
+<a name="show-mana-vertical"></a>
+<h3>show-mana-vertical</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-mana-vertical)</CODE>
+<code>(show-mana-vertical)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-mana-vertical)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="show-no-full"></A>
-<H3>show-no-full</H3>
+<a name="show-no-full"></a>
+<h3>show-no-full</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(show-no-full)</CODE>
+<code>(show-no-full)</code>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (show-no-full)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<A NAME="spell-sprite"></A>
-<H3>spell-sprite</H3>
+<a name="spell-sprite"></a>
+<h3>spell-sprite</h3>
 
-<H4>Description</H4>
+<h4>Description</h4>
 
 .
 
-<H4>Syntax</H4>
+<h4>Syntax</h4>
 
-<CODE>(spell-sprite file hotx hoty width height)</CODE>
+<code>(spell-sprite file hotx hoty width height)</code>
 
-<DL>
-<DT>file</DT>
-<DD>.
-<DT>hotx</DT>
-<DD>.
-<DT>hoty</DT>
-<DD>.
-<DT>width</DT>
-<DD>.
-<DT>height</DT>
-<DD>.
-</DD>
-</DL>
+<dl>
+<dt>file</dt>
+<dd>.
+<dt>hotx</dt>
+<dd>.
+<dt>hoty</dt>
+<dd>.
+<dt>width</dt>
+<dd>.
+<dt>height</dt>
+<dd>.
+</dd>
+</dl>
 
-<H4>Example</H4>
+<h4>Example</h4>
 
-<PRE>
+<pre>
     (spell-sprite "graphics/ui/bloodlust,haste,slow,invisible,shield.png" 1 1 16 16)
-</PRE>
+</pre>
 
-<P>.
+<p>.
 
-<H4>Used</H4>
+<h4>Used</h4>
 
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<a href="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </a>
 
-<HR>
-Last changed: $Id$<BR>
+<hr>
+Last changed: $Id$<br>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS>(c) 2002-2003 by <A HREF="http://freecraft.org">
-The FreeCraft Project</A></ADDRESS></BODY></HTML>
+<address>(c) 2002-2003 by <a href="http://freecraft.org">
+The FreeCraft Project</a></address></body></html>
