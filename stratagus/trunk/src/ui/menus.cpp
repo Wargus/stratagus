@@ -47,10 +47,6 @@
 #include "map.h"
 #include "pud.h"
 #include "iolib.h"
-#ifndef USE_WIN32
-#warning "NOT HERE LOW-LEVEL = LOW-LEVEL!!!"
-#include "net_lowlevel.h"
-#endif
 #include "network.h"
 #include "netconnect.h"
 #include "settings.h"
@@ -1243,7 +1239,6 @@ local void EnterServerIPAction(Menuitem *mi, int key)
 local void JoinNetGameMenu(void)
 {
     char ServerHostBuf[32];
-    unsigned long addr;
 
     StartMenusSetBackground(NULL);
     Invalidate();
@@ -1260,24 +1255,9 @@ local void JoinNetGameMenu(void)
     }
 
     ServerHostBuf[EnterServerIPMenuItems[1].d.input.nch] = 0;	// Now finally here is the address
-
-    addr = NetResolveHost(ServerHostBuf);
-#ifndef USE_WIN32
-    DebugLevel0Fn("Didn't work with win32\n");
-    if (addr == INADDR_NONE) {
+    if (NetworkSetupServerAddress(ServerHostBuf, NetworkServerText) != 0) {
 	return;
     }
-#endif
-    NetworkServerIP = addr;
-
-#ifndef USE_WIN32
-    DebugLevel0Fn("Didn't work with win32\n");
-    DebugLevel1Fn("SELECTED SERVER: %s (%d.%d.%d.%d)\n", ServerHostBuf,
-		    NIPQUAD(ntohl(addr)));
-
-    sprintf(NetworkServerText, "%d.%d.%d.%d", NIPQUAD(ntohl(addr)));
-#endif
-
     NetworkInitClientConnect();
 
     // Here we really go...
@@ -1289,6 +1269,7 @@ local void NetConnectingCancel(void)
     DestroyCursorBackground();
     StartMenusSetBackground(NULL);
     NetworkExitClientConnect();
+    NetLocalState = ccs_unreachable;	// Trigger TerminateNetConnect() to call us again and end the menu
     EndMenu();
 }
 
@@ -2691,8 +2672,7 @@ global void InitMenus(unsigned int race)
 #else
     file = strcat(strcpy(buf, "graphic/"), file);
 #endif
-    // FIXME: johns 300 added, please check this
-    MenuButtonGfx.Sprite = LoadSprite(file, 300, 144);	// 53 images!
+    MenuButtonGfx.Sprite = LoadSprite(file, 300, 144);	// 50/53 images!
 
     strcpy(ScenSelectPath, FreeCraftLibPath);
     if (ScenSelectPath[0]) {
