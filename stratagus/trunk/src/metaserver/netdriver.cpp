@@ -10,7 +10,7 @@
 //
 /**@name netdriver.c - Session mangement (SDL_net Socket Implementation). */
 //
-//      (c) Copyright 2005 by Edward Haase
+//      (c) Copyright 2005 by Edward Haase and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@
 
 #include "stratagus.h"
 #include "netdriver.h"
+#include "net_lowlevel.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -91,8 +92,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static IPaddress IP;
-static TCPsocket MasterSocket;
+static Socket MasterSocket;
 
 SessionPool* Pool;
 ServerStruct Server;
@@ -110,30 +110,40 @@ int InitServer(int port)
 {
 	Pool = NULL;
 
-	if (SDLNet_Init() == -1) {
+	if (NetInit() == -1) {
 		return -1;
 	}
 
-	if (SDLNet_ResolveHost(&IP, NULL, (unsigned short)port) == -1) {
-   		fprintf(stderr, "SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+	if ((MasterSocket = NetOpenTCP(port)) == -1) {
+   		fprintf(stderr, "NetOpenTCP failed\n");
    		return -2;
 	}
 
-	if (!(MasterSocket = SDLNet_TCP_Open(&IP))) {
-   		fprintf(stderr, "SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-   		return -3;
+	if (NetSetNonBlocking(MasterSocket) == -1) {
+		fprintf(stderr, "NetSetNonBlocking failed\n");
+		NetCloseTCP(MasterSocket);
+		NetExit();
+		return -3;
+	}
+
+	if (NetListenTCP(MasterSocket) == -1) {
+   		fprintf(stderr, "NetListenTCP failed\n");
+		NetCloseTCP(MasterSocket);
+		NetExit();
+   		return -4;
 	}
 
 	if (!(Pool = (SessionPool*)calloc(1, sizeof(SessionPool)))) {
-		SDLNet_TCP_Close(MasterSocket);
-		SDLNet_Quit();
-		return -4;
+		fprintf(stderr, "Out of memory\n");
+		NetCloseTCP(MasterSocket);
+		NetExit();
+		return -5;
 	}
 
-	if (!(Pool->StatusQue = SDLNet_AllocSocketSet(Server.MaxConnections))) {
-		SDLNet_TCP_Close(MasterSocket);
-		SDLNet_Quit();
-		return -5;
+	if (!(Pool->SocketSet = NetAllocSocketSet())) {
+		NetCloseTCP(MasterSocket);
+		NetExit();
+		return -6;
 	}
 
 	Pool->First = NULL;
@@ -148,7 +158,7 @@ int InitServer(int port)
 */
 int TermServer(void)
 {
-	SDLNet_TCP_Close(MasterSocket);
+	NetCloseTCP(MasterSocket);
 	// begin clean up of any remaining sockets
 	if (Pool) {
 		Session *ptr;
@@ -156,15 +166,15 @@ int TermServer(void)
 		while (Pool->First) {
 			ptr = Pool->First;
 			UNLINK(Pool->First, Pool->First, Pool->Last, Pool->Count);
-			SDLNet_TCP_Close(ptr->Socket);
+			NetCloseTCP(ptr->Socket);
 			free(ptr);
 		}
 
-		SDLNet_FreeSocketSet(Pool->StatusQue);
+		NetFreeSocketSet(Pool->SocketSet);
 		free(Pool);
 	}
 
-	SDLNet_Quit();
+	NetExit();
 	return 0;
 }
 
@@ -186,8 +196,8 @@ static int IdleSeconds(Session* ptr)
 static int KillSession(Session* ptr)
 {
 	DebugPrint("Closing connection from '%s'\n" _C_ ptr->AddrData.IPStr);
-	SDLNet_TCP_Close(ptr->Socket);
-	SDLNet_TCP_DelSocket(Pool->StatusQue, ptr->Socket);
+	NetCloseTCP(ptr->Socket);
+	NetDelSocket(Pool->SocketSet, ptr->Socket);
 	UNLINK(Pool->First, ptr, Pool->Last, Pool->Count);
 	free(ptr);
 	return 0;
@@ -199,13 +209,13 @@ static int KillSession(Session* ptr)
 static void AcceptConnections(void)
 {
 	Session* new_session;
-	TCPsocket new_socket;
+	Socket new_socket;
 
-	while ((new_socket = SDLNet_TCP_Accept(MasterSocket))) {
+	while ((new_socket = NetAcceptTCP(MasterSocket)) != -1) {
 		// Check if we're at MaxConnections
 		if (Pool->Count == Server.MaxConnections) {
-			SDLNet_TCP_Send(new_socket, "Server Full\n", 12);
-			SDLNet_TCP_Close(new_socket);
+			NetSendTCP(new_socket, "Server Full\n", 12);
+			NetCloseTCP(new_socket);
 			break;
 		}
 
@@ -218,24 +228,14 @@ static void AcceptConnections(void)
 		new_session->Socket = new_socket;
 		new_session->Idle = time(0);
 
-		if (!(new_session->AddrData.Address = SDLNet_TCP_GetPeerAddress(new_socket))) {
-			printf("SDLNet_TCP_GetPeerAddress: %s\n", SDLNet_GetError());
-		} else {
-			Uint32 tipaddr;
-
-			new_session->AddrData.Port = new_session->AddrData.Address->port;
-
-			tipaddr = SDL_SwapBE32(new_session->AddrData.Address->host);
-
-			// build useable string
-			sprintf(new_session->AddrData.IPStr, "%d.%d.%d.%d",
-				tipaddr >> 24, (tipaddr >> 16) & 0xff,
-				(tipaddr >> 8) & 0xff, tipaddr & 0xff);
-			DebugPrint("New connection from '%s'\n" _C_ new_session->AddrData.IPStr);
-		}
+		new_session->AddrData.Host = NetLastHost;
+		sprintf(new_session->AddrData.IPStr, "%d.%d.%d.%d",
+			NIPQUAD(ntohl(NetLastHost)));
+		new_session->AddrData.Port = NetLastPort;
+		DebugPrint("New connection from '%s'\n" _C_ new_session->AddrData.IPStr);
 
 		LINK(Pool->First, new_session, Pool->Last, Pool->Count);
-		SDLNet_TCP_AddSocket(Pool->StatusQue, new_socket);
+		NetAddSocket(Pool->SocketSet, new_socket);
 	}
 
 }
@@ -267,7 +267,7 @@ static int ReadData(void)
 	Session* next;
 	int result;
 
-	result = SDLNet_CheckSockets(Pool->StatusQue, 0);
+	result = NetSocketSetReady(Pool->SocketSet, 0);
 	if (result == 0) {
 		// No sockets ready
 		return 0;
@@ -280,13 +280,13 @@ static int ReadData(void)
 	// ready sockets
 	for (ptr = Pool->First; ptr; ) {
 		next = ptr->Next;
-		if (SDLNet_SocketReady(ptr->Socket)) {
+		if (NetSocketSetSocketReady(Pool->SocketSet, ptr->Socket)) {
 			int clen;
 
 			// socket ready
 			ptr->Idle = time(0);
 			clen = strlen(ptr->Buffer);
-			result = SDLNet_TCP_Recv(ptr->Socket, ptr->Buffer + clen,
+			result = NetRecvTCP(ptr->Socket, ptr->Buffer + clen,
 				sizeof(ptr->Buffer) - clen);
 			if (result <= 0) {
 				KillSession(ptr);

@@ -10,7 +10,7 @@
 //
 /**@name cmd.c - Client/Server Command Interpreter. */
 //
-//      (c) Copyright 2005 by Edward Haase
+//      (c) Copyright 2005 by Edward Haase and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ static int ParseBuffer(Session* ptr)
 	// Take command-specific action.
 	//
 	if (!strcmp(cmd, "Login")) {
-		SDLNet_TCP_Send(ptr->Socket, "OK\r\n", 4);
+		NetSendTCP(ptr->Socket, "OK\r\n", 4);
 		return 0;
 	}
 
@@ -88,7 +88,7 @@ static int ParseBuffer(Session* ptr)
 			ptr->GameData.Slots.Open, ptr->GameData.Slots.Max);
 
 		memset(&ptr->GameData, 0, sizeof(ptr->GameData));
-		SDLNet_TCP_Send(ptr->Socket, "OK\r\n", 4);
+		NetSendTCP(ptr->Socket, "OK\r\n", 4);
 		return 0;
 	}
 
@@ -106,7 +106,7 @@ static int ParseBuffer(Session* ptr)
 			ptr->GameData.Map,
 			ptr->GameData.Slots.Open, ptr->GameData.Slots.Max);
 
-		SDLNet_TCP_Send(ptr->Socket, "OK\r\n", 4);
+		NetSendTCP(ptr->Socket, "OK\r\n", 4);
 		return 0;
 	}
 
@@ -118,7 +118,7 @@ static int ParseBuffer(Session* ptr)
 			ptr->GameData.Slots.Open, ptr->GameData.Slots.Max);
 
 		memset(&ptr->GameData, 0, sizeof(ptr->GameData));
-		SDLNet_TCP_Send(ptr->Socket, "OK\r\n", 4);
+		NetSendTCP(ptr->Socket, "OK\r\n", 4);
 		return 0;
 	}
 
@@ -134,7 +134,7 @@ static int ParseBuffer(Session* ptr)
 			ptr->GameData.Map,
 			ptr->GameData.Slots.Open, ptr->GameData.Slots.Max);
 
-		SDLNet_TCP_Send(ptr->Socket, "OK\r\n", 4);
+		NetSendTCP(ptr->Socket, "OK\r\n", 4);
 		return 0;
 	}
 

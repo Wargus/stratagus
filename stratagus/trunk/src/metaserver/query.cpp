@@ -134,7 +134,7 @@ int StartQuery(Session* ptr)
 			(ptr->QueryData.Count + 1),
 			(ptr->QueryData.Count + 1),
 			(ptr->QueryData.Count + 1));
-		SDLNet_TCP_Send(ptr->Socket, query_result_string, i);
+		NetSendTCP(ptr->Socket, query_result_string, i);
 		return 0;
 	}
 
@@ -156,7 +156,7 @@ int StartQuery(Session* ptr)
 		(ptr->QueryData.Count + 1),
 		(ptr->QueryData.Count + 1));
 
-	SDLNet_TCP_Send(ptr->Socket, query_result_string, i);
+	NetSendTCP(ptr->Socket, query_result_string, i);
 	return 0;
 }
 
@@ -171,7 +171,7 @@ int QueryGame(Session* ptr, int n)
 	if (!ptr->QueryData.List || n > ptr->QueryData.Count) {
 		// handle error?
 	} else {
-		SDLNet_TCP_Send(ptr->Socket, ptr->QueryData.List[n - 1],
+		NetSendTCP(ptr->Socket, ptr->QueryData.List[n - 1],
 			strlen(ptr->QueryData.List[n - 1]));
 		if (n == ptr->QueryData.Count) {
 			CleanUpQuery(ptr);

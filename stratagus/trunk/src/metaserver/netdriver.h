@@ -10,7 +10,7 @@
 //
 /**@name optargs.h - Command line parser header. */
 //
-//      (c) Copyright 2005 by Edward Haase
+//      (c) Copyright 2005 by Edward Haase and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <time.h>
-#include "SDL_net.h"
+#include "net_lowlevel.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -91,10 +91,10 @@ typedef struct _session_ {
 	char Buffer[XLB];
 	time_t Idle;
 
-	TCPsocket Socket;
+	Socket Socket;
 
 	struct {
-		IPaddress* Address;
+		unsigned long Host;
 		char IPStr[16];
 		int Port;
 	} AddrData;               /// Remote address data.
@@ -127,7 +127,7 @@ typedef struct _session_pool_ {
 	Session* Last;
 	int Count;
 
-	SDLNet_SocketSet StatusQue;
+	SocketSet* SocketSet;
 } SessionPool;
 
 	/// external reference to session tracking.
