@@ -778,7 +778,7 @@ local Menuitem GameOptionsMenuItems[] = {
     { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
-	{ text:{ "CD Audio Enabled", MI_TFLAGS_CENTERED} } },
+	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
 #else
@@ -1511,10 +1511,10 @@ local void GameOptions(void)
 {
     // TODO
 #if !defined(USE_SDLCD) && !defined(USE_LIBCDA)
-    GameOptionsMenuItems[1].d.gem.state = 0;
+    GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
 #else
     if (strcmp(":off", CDMode))
-	GameOptionsMenuItems[1].d.gem.state = 4;
+	GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
 #endif
     ProcessMenu(MENU_GAME_OPTIONS, 1);
 }
@@ -1540,7 +1540,7 @@ local void SetCdMode(Menuitem *mi)
     }
 #else
     ProcessMenu(MENU_CDROM_DISABLED, 1);
-    GameOptionsMenuItems[1].d.gem.state = 0;
+    GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
 #endif
 }
 
