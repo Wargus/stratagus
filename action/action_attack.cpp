@@ -88,6 +88,9 @@ global void AnimateActionAttack(Unit* unit)
 /**
 **	Check for dead goal.
 **
+**	@warning
+**		The caller must check, if he likes the restored SavedOrder!
+**
 **	@todo
 **		If an unit enters an building, than the attack choose an
 **		other goal, perhaps it is better to wait for the goal?
@@ -149,8 +152,6 @@ local Unit* CheckForDeadGoal(Unit* unit)
 		    MustRedraw|=RedrawButtonPanel;
 		}
 		
-		// Only this is supported
-		DebugCheck( unit->Orders[0].Action!=UnitActionAttack );
 	    }
 	    NewResetPath(unit);
 	}
@@ -211,9 +212,15 @@ local void MoveToTarget(Unit* unit)
 
     if( unit->Reset ) {
 	//
-	//	Target is dead, choose new one.
+	//	Target is dead?
 	//
 	goal=CheckForDeadGoal(unit);
+	// Fall back to last order.
+	if( unit->Orders[0].Action!=UnitActionAttackGround
+		&& unit->Orders[0].Action!=UnitActionAttack ) {
+	    unit->State=unit->SubAction=0;
+	    return;
+	}
 
 	//
 	//	No goal: if meeting enemy attack it.
@@ -353,7 +360,17 @@ local void AttackTarget(Unit* unit)
 	    return;
 	}
 
+	//
+	//	Target is dead?
+	//
 	goal=CheckForDeadGoal(unit);
+	// Fall back to last order.
+	if( unit->Orders[0].Action!=UnitActionAttackGround
+		&& unit->Orders[0].Action!=UnitActionAttack ) {
+	    unit->State=unit->SubAction=0;
+	    return;
+	}
+
 	//
 	//	No target choose one.
 	//
