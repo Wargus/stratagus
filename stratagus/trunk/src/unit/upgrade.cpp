@@ -1165,16 +1165,16 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 		//  FIXME: what about buildings?
 		//
 		} else {
-			if (unit->Orders[0].Action == UnitActionTrain) {
-				for (j = 0; j < unit->Data.Train.Count; ++j) {
-					if (unit->Data.Train.What[j] == src) {
-						unit->Data.Train.What[j] = dst;
-					}
-				}
-			}
-			for (j = 1; j < unit->OrderCount; ++j) {
+			for (j = 0; j < unit->OrderCount; ++j) {
 				if (unit->Orders[j].Action == UnitActionTrain &&
 						unit->Orders[j].Type == src) {
+						if (j == 0) {
+							// Must Adjust Ticks to the fraction that was trained
+							unit->Data.Train.Ticks = 
+								unit->Data.Train.Ticks *
+								dst->Stats[player->Player].Costs[TimeCost] /
+								src->Stats[player->Player].Costs[TimeCost];
+						}
 					unit->Orders[j].Type = dst;
 				}
 			}

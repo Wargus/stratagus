@@ -1513,7 +1513,6 @@ static int FindTransporterOnZone(int waterzone, ZoneSet* destzones,
 		// If transporter is moving, check if it is moving on our coast
 		if (!unitok &&
 				unit->OrderCount + (unit->OrderFlush ? 1 : 0) >= 2 &&
-				unit->OrderCount < MAX_ORDERS - 1 &&
 				unit->Orders[unit->OrderFlush ? 1 : 0].Action == UnitActionFollow &&
 				unit->Orders[unit->OrderCount - 1].Action == UnitActionUnload &&
 				unit->BoardCount + unit->OrderCount - (unit->OrderFlush ? 1 : 0) <= unit->Type->MaxOnBoard) {

@@ -176,7 +176,6 @@ void MapFixSeenWoodTile(int x, int y)
 	// FIXME: can this only happen if seen?
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 		UpdateMinimapSeenXY(x, y);
-		MustRedraw |= RedrawMinimap;
 	}
 }
 
@@ -313,7 +312,6 @@ void MapFixWoodTile(int x, int y)
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
 			UpdateMinimapSeenXY(x, y);
 			MapMarkSeenTile(x, y);
-			MustRedraw |= RedrawMinimap;
 		}
 	}
 }
@@ -341,7 +339,6 @@ void MapRemoveWood(unsigned x, unsigned y)
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 		UpdateMinimapSeenXY(x, y);
 		MapMarkSeenTile(x, y);
-		MustRedraw |= RedrawMinimap;
 	}
 #ifdef MAP_REGIONS
 	MapSplitterTilesCleared(x, y, x, y);

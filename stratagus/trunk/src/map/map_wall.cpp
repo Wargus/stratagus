@@ -165,7 +165,6 @@ void MapFixSeenWallTile(int x, int y)
 		// FIXME: can this only happen if seen?
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
 			UpdateMinimapSeenXY(x, y);
-			MustRedraw |= RedrawMinimap;
 		}
 	}
 }
@@ -265,7 +264,6 @@ void MapFixWallTile(int x, int y)
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
 			UpdateMinimapSeenXY(x, y);
 			MapMarkSeenTile(x, y);
-			MustRedraw |= RedrawMinimap;
 		}
 	}
 }
@@ -305,7 +303,6 @@ void MapRemoveWall(unsigned x, unsigned y)
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 		UpdateMinimapSeenXY(x, y);
 		MapMarkSeenTile(x, y);
-		MustRedraw |= RedrawMinimap;
 	}
 #ifdef MAP_REGIONS
 	MapSplitterTilesCleared(x, y, x, y);
@@ -347,7 +344,6 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 		UpdateMinimapSeenXY(x, y);
 		MapMarkSeenTile(x, y);
-		MustRedraw |= RedrawMinimap;
 	}
 #ifdef MAP_REGIONS
 	MapSplitterTilesOccuped(x, y, x, y);

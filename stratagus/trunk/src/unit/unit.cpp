@@ -74,6 +74,9 @@ Unit** UnitSlotFree;                      ///< First free unit slot
 Unit* ReleasedHead;                       ///< List of released units.
 Unit* ReleasedTail;                       ///< List tail of released units.
 
+Order* ReleasedOrderHead;                 ///< List of released Orders.
+Order* ReleasedOrderTail;                 ///< List tail of released orders.
+
 Unit* Units[MAX_UNIT_SLOTS];              ///< Array of used slots
 int NumUnits;                             ///< Number of slots used
 
@@ -225,6 +228,18 @@ void ReleaseUnit(Unit* unit)
 	unit->Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 	unit->Type = 0;  // for debugging.
 	free(unit->CacheLinks);
+
+	if (ReleasedOrderHead) {
+		ReleasedOrderTail->Arg1 = unit->Orders;
+		ReleasedOrderTail = unit->Orders;
+		unit->Orders->Arg1 = NULL;
+	} else {
+		ReleasedOrderHead = ReleasedOrderTail = unit->Orders;
+		unit->Orders->Arg1 = NULL;
+	}
+	unit->Orders->X = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
+	unit->Orders->Y = unit->TotalOrders; // store order count for when reused
+	unit->Orders = NULL;
 }
 
 /**
@@ -338,6 +353,18 @@ void InitUnit(Unit* unit, UnitType* type)
 	unit->Removed = 1;
 
 	unit->Rs = MyRand() % 100; // used for fancy buildings and others
+
+	// Init Orders and Default to Still/None
+	if (ReleasedOrderHead && (unsigned)ReleasedOrderHead->X < GameCycle) {
+		unit->Orders = ReleasedOrderHead;
+		unit->TotalOrders = ReleasedOrderHead->Y;
+		ReleasedOrderHead = (Order*)ReleasedOrderHead->Arg1;
+	} else {
+		// No Available Orders in Memory, create new ones
+		unit->TotalOrders = DEFAULT_START_ORDERS;
+		unit->Orders = calloc(unit->TotalOrders, sizeof(Order));
+	}
+
 
 	unit->OrderCount = 1; // No orders
 	unit->Orders[0].Action = UnitActionStill;
@@ -596,7 +623,6 @@ static void MarkUnitFieldFlags(const Unit* unit)
 		MapSplitterTilesOccuped(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
 	}
 #endif
-
 }
 
 /**
@@ -761,7 +787,6 @@ void PlaceUnit(Unit* unit, int x, int y)
 	// Vision
 	MapMarkUnitSight(unit);
 
-	MustRedraw |= RedrawMinimap;
 	UnitCountSeen(unit);
 }
 
@@ -832,7 +857,6 @@ void RemoveUnit(Unit* unit, Unit* host)
 	if (unit == UnitUnderCursor) {
 		UnitUnderCursor = NULL;
 	}
-	MustRedraw |= RedrawMinimap;
 }
 
 /**
@@ -3576,8 +3600,9 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	}
 	CLprintf(file, "\"order-count\", %d,\n  ", unit->OrderCount);
 	CLprintf(file, "\"order-flush\", %d,\n  ", unit->OrderFlush);
+	CLprintf(file, "\"order-total\", %d,\n	", unit->TotalOrders);
 	CLprintf(file, "\"orders\", {");
-	for (i = 0; i < MAX_ORDERS; ++i) {
+	for (i = 0; i < unit->TotalOrders; ++i) {
 		CLprintf(file, "\n ");
 		SaveOrder(&unit->Orders[i], file);
 		CLprintf(file, ",");
@@ -3643,17 +3668,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 		case UnitActionTrain:
 			CLprintf(file, ",\n  \"data-train\", {");
 			CLprintf(file, "\"ticks\", %d, ", unit->Data.Train.Ticks);
-			CLprintf(file, "\"count\", %d, ", unit->Data.Train.Count);
-			CLprintf(file, "\"queue\", {");
-			for (i = 0; i < MAX_UNIT_TRAIN; ++i) {
-				if (i < unit->Data.Train.Count) {
-					CLprintf(file, "\"%s\", ", unit->Data.Train.What[i]->Ident);
-				} else {
-					/* this slot is currently unused */
-					CLprintf(file, "\"unit-none\", ");
-				}
-			}
-			CLprintf(file, "}}");
+			CLprintf(file, "}");
 			break;
 		default:
 			CLprintf(file, ",\n  \"data-move\", {");
@@ -3791,6 +3806,7 @@ void CleanUnits(void)
 {
 	Unit** table;
 	Unit* unit;
+	Order* order;
 
 	//
 	//  Free memory for all units in unit table.
@@ -3809,6 +3825,14 @@ void CleanUnits(void)
 		ReleasedHead = unit->Next;
 		free(unit);
 	}
+
+	//
+	//  Release memory of Orders in the release queue.
+	while ((order = ReleasedOrderHead)) {
+		ReleasedOrderHead = order->Arg1;
+		free(order);
+	}
+
 	InitUnitsMemory();
 
 	XpDamage = 0;

@@ -375,20 +375,20 @@ static void DrawUnitInfo(const Unit* unit)
 		//  Building training units.
 		//
 		if (unit->Orders[0].Action == UnitActionTrain) {
-			if (unit->Data.Train.Count == 1) {
+			if (unit->Orders[1].Action != UnitActionTrain) {
 				if (TheUI.SingleTrainingText) {
 					VideoDrawText(TheUI.SingleTrainingTextX, TheUI.SingleTrainingTextY,
 						TheUI.SingleTrainingFont, TheUI.SingleTrainingText);
 				}
 				if (TheUI.SingleTrainingButton) {
-					DrawUnitIcon(unit->Player, unit->Data.Train.What[0]->Icon.Icon,
+					DrawUnitIcon(unit->Player, unit->Orders[0].Type->Icon.Icon,
 						(ButtonAreaUnderCursor == ButtonAreaTraining &&
 							ButtonUnderCursor == 0) ?
 							(IconActive | (MouseButtons & LeftButton)) : 0,
 						TheUI.SingleTrainingButton->X, TheUI.SingleTrainingButton->Y);
 				}
 
-				UiDrawCompletedBar(unit->Data.Train.What[0]->Stats[
+				UiDrawCompletedBar(unit->Orders[0].Type->Stats[
 					unit->Player->Player].Costs[TimeCost],
 					unit->Data.Train.Ticks);
 			} else {
@@ -397,17 +397,19 @@ static void DrawUnitInfo(const Unit* unit)
 						TheUI.TrainingFont, TheUI.TrainingText);
 				}
 				if (TheUI.TrainingButtons) {
-					for (i = 0; i < unit->Data.Train.Count &&
+					for (i = 0; i < unit->OrderCount &&
 							i < TheUI.NumTrainingButtons; ++i) {
-						DrawUnitIcon(unit->Player, unit->Data.Train.What[i]->Icon.Icon,
-							(ButtonAreaUnderCursor == ButtonAreaTraining &&
-								ButtonUnderCursor == i) ?
-								(IconActive | (MouseButtons & LeftButton)) : 0,
-							TheUI.TrainingButtons[i].X, TheUI.TrainingButtons[i].Y);
+						if (unit->Orders[i].Action == UnitActionTrain) {
+							DrawUnitIcon(unit->Player, unit->Orders[i].Type->Icon.Icon,
+								(ButtonAreaUnderCursor == ButtonAreaTraining &&
+									ButtonUnderCursor == i) ?
+									(IconActive | (MouseButtons & LeftButton)) : 0,
+								TheUI.TrainingButtons[i].X, TheUI.TrainingButtons[i].Y);
+						}
 					}
 				}
 
-				UiDrawCompletedBar(unit->Data.Train.What[0]->Stats[
+				UiDrawCompletedBar(unit->Orders[0].Type->Stats[
 					unit->Player->Player].Costs[TimeCost],
 					unit->Data.Train.Ticks);
 			}

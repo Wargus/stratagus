@@ -348,12 +348,9 @@ void CclParseOrder(lua_State* l, Order* order)
 */
 static void CclParseOrders(lua_State* l, Unit* unit)
 {
-	int args;
 	int j;
 
-	args = luaL_getn(l, -1);
-	Assert(args == MAX_ORDERS);
-	for (j = 0; j < args; ++j) {
+	for (j = 0; j < unit->TotalOrders; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		CclParseOrder(l, &unit->Orders[j]);
 		lua_pop(l, 1);
@@ -514,7 +511,6 @@ static void CclParseUpgradeTo(lua_State* l, Unit* unit)
 static void CclParseTrain(lua_State* l, Unit* unit)
 {
 	const char* value;
-	int i;
 	int args;
 	int j;
 
@@ -530,30 +526,6 @@ static void CclParseTrain(lua_State* l, Unit* unit)
 		if (!strcmp(value, "ticks")) {
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.Train.Ticks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "count")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Train.Count = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "queue")) {
-			int subargs;
-			int k;
-
-			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, -1);
-			for (i = 0, k = 0; i < MAX_UNIT_TRAIN && k < subargs; ++i, ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				if (!strcmp(value, "unit-none")) {
-					unit->Data.Train.What[i] = NULL;
-				} else {
-					unit->Data.Train.What[i] = UnitTypeByIdent(value);
-				}
-			}
 			lua_pop(l, 1);
 		}
 	}
@@ -859,6 +831,11 @@ static int CclUnit(lua_State* l)
 			unit->OrderCount = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "order-flush")) {
 			unit->OrderFlush = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "order-total")) {
+			unit->TotalOrders = LuaToNumber(l, j + 1);
+			free(unit->Orders);
+			// Allocate the space for orders
+			unit->Orders = calloc(unit->TotalOrders, sizeof(Order));
 		} else if (!strcmp(value, "orders")) {
 			int hp;
 

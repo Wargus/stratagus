@@ -38,7 +38,15 @@
 ----------------------------------------------------------------------------*/
 
 	/// Editor is running
-extern char EditorRunning;
+typedef enum _editor_running_state_ {
+	EditorNotRunning = 0,   ///< Not Running
+	EditorStarted = 1,      ///< Editor Enabled at all
+	EditorCommandLine = 2,  ///< Called from Command Line
+	EditorEditing = 4       ///< Editor is fully running
+} EditorRunningType;
+
+extern EditorRunningType EditorRunning;
+
 	/// Map loaded in editor
 extern char EditorMapLoaded;
 	/// Current editor state type.

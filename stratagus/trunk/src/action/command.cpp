@@ -36,6 +36,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "stratagus.h"
 #include "unittype.h"
@@ -96,19 +97,55 @@ static void ReleaseOrders(Unit* unit)
 */
 static Order* GetNextOrder(Unit* unit, int flush)
 {
+	Order *OldOrders;
 	if (flush) {
 		// empty command queue
 		ReleaseOrders(unit);
-	} else if (unit->OrderCount == MAX_ORDERS) {
-		// FIXME: johns: wrong place for an error message.
-		// FIXME: johns: should be checked by AI or the user interface
-		// NOTE: But must still be checked here.
-		NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
-			"Unit order list is full");
-		return NULL;
+	} else if (unit->OrderCount == unit->TotalOrders) {
+		// Expand Order Queue if filled
+		OldOrders = unit->Orders;
+		unit->Orders = realloc(unit->Orders, sizeof(Order) * unit->TotalOrders * 2);
+		// Realloc failed, fail gracefully
+		if (!unit->Orders) {
+			unit->Orders = OldOrders;
+			NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
+				"Unable to add order to list");
+			return NULL;
+		}
+		memset(&unit->Orders[unit->TotalOrders], 0, sizeof(Order) * unit->TotalOrders);
+		unit->TotalOrders *= 2;
 	}
 
 	return &unit->Orders[(int)unit->OrderCount++];
+}
+
+/*
+**  Remove an order from the list of orders pending
+**
+**  @param unit   pointer to unit
+**  @param order  number of the order to remove
+*/
+static void RemoveOrder(Unit* unit, int order)
+{
+	int i;
+	
+	i = order;
+	while(i < unit->OrderCount - 1) {
+		unit->Orders[i] = unit->Orders[i + 1];
+		++i;
+	}
+
+	if (unit->OrderCount > 1) {
+		--unit->OrderCount;
+	} else {
+		unit->Orders[i].Action = UnitActionStill;
+		unit->Orders[i].X = unit->Orders[i].Y = -1;
+		unit->SubAction = 0;
+		unit->Orders[i].Type = NULL;
+		unit->Orders[i].Arg1 = NULL;
+	}
+
+	return;
 }
 
 /**
@@ -839,6 +876,8 @@ void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 void CommandTrainUnit(Unit* unit, UnitType* type,
 	int flush __attribute__((unused)))
 {
+	Order* order;
+
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
@@ -855,32 +894,19 @@ void CommandTrainUnit(Unit* unit, UnitType* type,
 		//
 		// Not already training?
 		//
-		if (unit->Orders[0].Action != UnitActionTrain) {
-			if (unit->OrderCount == 2 && unit->Orders[1].Action == UnitActionTrain) {
-				DebugPrint("FIXME: not supported. Unit queue full!\n");
-				return;
-			} else {
-				ReleaseOrders(unit);
-				unit->Orders[1].Action = UnitActionTrain;
-			}
-			Assert(unit->OrderCount == 1 && unit->OrderFlush == 1);
-
-			unit->OrderCount = 2;
-			unit->Orders[1].Type = type;
-			unit->Orders[1].X = unit->Orders[1].Y = -1;
-			unit->Orders[1].Goal = NoUnitP;
-			unit->Orders[1].Arg1 = NULL;
-		} else {
-			//
-			// Training slots are all already full. (NETWORK!)
-			//
-			if (!EnableTrainingQueue || unit->Data.Train.Count >= MAX_UNIT_TRAIN) {
-				DebugPrint("Unit queue full!\n");
-				return;
-			}
-
-			unit->Data.Train.What[unit->Data.Train.Count++] = type;
+		if (!EnableTrainingQueue && unit->Orders[0].Action == UnitActionTrain) {
+			DebugPrint("Unit queue full!\n");
+			return;
 		}
+		if (!(order = GetNextOrder(unit, 0))) {
+			return;
+		}
+
+		order->Action = UnitActionTrain;
+		order->Type = type;
+		order->X = order->Y = -1;
+		order->Goal = NoUnitP;
+		order->Arg1 = NULL;
 		// FIXME: if you give quick an other order, the resources are lost!
 		PlayerSubUnitType(unit->Player, type);
 	}
@@ -896,8 +922,6 @@ void CommandTrainUnit(Unit* unit, UnitType* type,
 */
 void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 {
-	int i;
-	int n;
 
 	DebugPrint("Cancel %d type: %s\n" _C_ slot _C_
 		type ? type->Ident : "-any-");
@@ -907,42 +931,45 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 	//
 	// Check if unit is still training 'slot'? (NETWORK!)
 	//
-	if (unit->Orders[0].Action == UnitActionTrain) {
-		n = unit->Data.Train.Count;
-		Assert(n >= 1);
-		if (slot == -1) { // default last slot!
-			slot += n;
+
+	if (slot == -1) {
+		// Cancel All training
+		while(unit->Orders[0].Action == UnitActionTrain) {
+			PlayerAddCostsFactor(unit->Player,
+				unit->Orders[0].Type->Stats[unit->Player->Player].Costs,
+				CancelTrainingCostsFactor);
+			RemoveOrder(unit, 0);
+		}	
+		unit->Data.Train.Ticks = 0;
+		unit->Wait = unit->Reset = 1; // immediately start next training
+		if (unit->Player == ThisPlayer && unit->Selected) {
+			SelectedUnitChanged();
 		}
-		//
-		// Check if slot and unit-type is still trained? (NETWORK!)
-		//
-		if (slot >= n || (type && unit->Data.Train.What[slot] != type)) {
-			// FIXME: we can look if this is now in an earlier slot.
+	} else if (unit->OrderCount < slot) {
+		// Order has moved
+		return;
+	} else if (unit->Orders[slot].Action != UnitActionTrain) {
+		// Order has moved, we are not training
+		return;
+	} else if (unit->Orders[slot].Action == UnitActionTrain) {
+		// Still training this order, same unit?
+		if (type && unit->Orders[slot].Type != type) {
+			// Different unit being trained
 			return;
 		}
 
 		DebugPrint("Cancel training\n");
 
 		PlayerAddCostsFactor(unit->Player,
-			unit->Data.Train.What[slot]->Stats[unit->Player->Player].Costs,
+			unit->Orders[slot].Type->Stats[unit->Player->Player].Costs,
 			CancelTrainingCostsFactor);
 
-		if (--n) {
-			// Copy the other slots down
-			for (i = slot; i < n; ++i) {
-				unit->Data.Train.What[i] = unit->Data.Train.What[i + 1];
-			}
-			if (!slot) { // Canceled in work slot
-				unit->Data.Train.Ticks = 0;
-				unit->Wait = unit->Reset = 1; // immediately start next training
-			}
-			unit->Data.Train.Count = n;
-		} else {
-			DebugPrint("Last slot\n");
-			unit->Orders[0].Action = UnitActionStill;
-			unit->SubAction = 0;
-			unit->Wait = unit->Reset = 1;
+	
+		if (!slot) { // Canceled in work slot
+			unit->Data.Train.Ticks = 0;
+			unit->Wait = unit->Reset = 1; // immediately start next training
 		}
+		RemoveOrder(unit, slot);
 
 		//
 		// Update interface.

@@ -811,8 +811,7 @@ void DoButtonButtonClicked(int button)
 			break;
 
 		case ButtonCancelTrain:
-			Assert(Selected[0]->Orders[0].Action == UnitActionTrain &&
-				Selected[0]->Data.Train.Count);
+			Assert(Selected[0]->Orders[0].Action == UnitActionTrain);
 			SendCommandCancelTraining(Selected[0], -1, NULL);
 			ClearStatusLine();
 			ClearCosts();
@@ -848,8 +847,7 @@ void DoButtonButtonClicked(int button)
 			// FIXME: training queue full check is not correct for network.
 			// FIXME: this can be correct written, with a little more code.
 			if (Selected[0]->Orders[0].Action == UnitActionTrain &&
-					(Selected[0]->Data.Train.Count == MAX_UNIT_TRAIN ||
-						!EnableTrainingQueue)) {
+					!EnableTrainingQueue) {
 				NotifyPlayer(Selected[0]->Player, NotifyYellow, Selected[0]->X,
 					Selected[0]->Y, "Unit training queue is full");
 			} else if (PlayerCheckLimits(Selected[0]->Player, type) >= 0 &&
