@@ -300,7 +300,7 @@ global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h)
 {
     int i;
     int bpp;
-    void *sp;
+    char* sp;
 
     bpp = TheScreen->format->BytesPerPixel;
 
@@ -309,10 +309,10 @@ global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h)
     sp = buffer;
     memcpy(&((unsigned char*)TheScreen->pixels)
 	[x * bpp + y * TheScreen->pitch], sp, w * bpp);
-    sp = sp + w * bpp;
+    sp += w * bpp;
     memcpy(&((unsigned char*)TheScreen->pixels)
 	[x * bpp + (y + h) * TheScreen->pitch], sp, w * bpp);
-    sp = sp + w * bpp;
+    sp += w * bpp;
     for (i = 1; i < h; ++i) {
 	memcpy(&((unsigned char*)TheScreen->pixels)
 	    [x * bpp + (y + i) * TheScreen->pitch], sp, bpp);
@@ -329,7 +329,7 @@ global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h)
 {
     int i;
     int bpp;
-    void *dp;
+    char* dp;
 
     bpp = TheScreen->format->BytesPerPixel;
     
@@ -338,10 +338,10 @@ global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h)
     dp = buffer;
     memcpy(dp, &((unsigned char*)TheScreen->pixels)
 	[x * bpp + y * TheScreen->pitch], w * bpp);
-    dp = dp + w * bpp;
+    dp += w * bpp;
     memcpy(dp, &((unsigned char*)TheScreen->pixels)
 	[x * bpp + (y + h) * TheScreen->pitch], w * bpp);
-    dp = dp + w * bpp;
+    dp += w * bpp;
     for (i = 1; i < h; ++i) {
 	memcpy(dp, &((unsigned char*)TheScreen->pixels)
 	    [x * bpp + (y + i) * TheScreen->pitch], bpp);
