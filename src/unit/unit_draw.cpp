@@ -666,6 +666,132 @@ global void DrawPath(Unit* unit)
     }
 }
 
+/**
+**	Show the current order of an unit.
+**
+**	@param unit	Pointer to the unit.
+**
+*/
+local void ShowOrder(const Unit* unit)
+{
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    int color;
+    const Unit* goal;
+
+    if( unit->Destroyed ) {
+	return;
+    }
+    x1=Map2ScreenX(unit->X)+unit->IX+unit->Type->TileWidth*TileSizeX/2;
+    y1=Map2ScreenY(unit->Y)+unit->IY+unit->Type->TileHeight*TileSizeY/2;
+
+    if( (goal=unit->Command.Data.Move.Goal) ) {
+	x2=Map2ScreenX(goal->X)+goal->IX+goal->Type->TileWidth*TileSizeX/2;
+	y2=Map2ScreenY(goal->Y)+goal->IY+goal->Type->TileHeight*TileSizeY/2;
+    } else {
+	x2=Map2ScreenX(unit->Command.Data.Move.DX)+TileSizeX/2;
+	y2=Map2ScreenY(unit->Command.Data.Move.DY)+TileSizeY/2;
+    }
+    switch( unit->Command.Action ) {
+	case UnitActionNone:
+	    color=ColorGray;
+	    break;
+
+	case UnitActionStill:
+	    color=ColorGray;
+	    break;
+
+	case UnitActionStandGround:
+	    color=ColorGray;
+	    break;
+
+	case UnitActionFollow:
+	case UnitActionMove:
+	    color=ColorGreen;
+	    break;
+
+	case UnitActionPatrol:
+	    VideoDrawLineClip(ColorGreen,x1,y1,x2,y2);
+	    color=ColorBlue;
+	    x1=Map2ScreenX(unit->Command.Data.Move.SX)+TileSizeX/2;
+	    y1=Map2ScreenY(unit->Command.Data.Move.SY)+TileSizeY/2;
+	    break;
+
+	case UnitActionRepair:
+	    color=ColorGreen;
+	    break;
+
+	case UnitActionAttack:
+	case UnitActionAttackGround:
+	    color=ColorRed;
+	    break;
+
+	case UnitActionBoard:
+	    color=ColorGreen;
+	    break;
+
+	case UnitActionUnload:
+	    color=ColorGreen;
+	    break;
+
+	case UnitActionDie:
+	    color=ColorGray;
+	    break;
+
+	case UnitActionTrain:
+	    color=ColorGray;
+	    break;
+
+	case UnitActionUpgradeTo:
+	    color=ColorGray;
+	    break;
+
+	case UnitActionResearch:
+	    color=ColorGray;
+	    break;
+
+	case UnitActionBuild:
+	    color=ColorGreen;
+	    break;
+
+	case UnitActionBuilded:
+	    color=ColorGray;
+	    break;
+
+	case UnitActionHarvest:
+	    color=ColorGreen;
+	    break;
+
+	case UnitActionMineGold:
+	    color=ColorGreen;
+	    break;
+
+	case UnitActionHaulOil:
+	    color=ColorGreen;
+	    break;
+
+	case UnitActionReturnGoods:
+	    color=ColorGreen;
+	    break;
+
+	case UnitActionDemolish:
+	    color=ColorRed;
+	    break;
+
+	default:
+	    color=ColorGray;
+	    DebugLevel1Fn("Unknown action %d\n",unit->Command.Action);
+	    break;
+    }
+    VideoFillCircleClip(color,x1,y1,2);
+    VideoDrawLineClip(color,x1,y1,x2,y2);
+    VideoFillCircleClip(color,x2,y2,2);
+
+    //DrawPath(unit);
+}
+
 /*
 **	Units on map:
 **
@@ -831,10 +957,10 @@ local void DrawUnit(Unit* unit)
     }
 
     //
-    //	For debug draw destination. FIXME: should become orders
+    //	Show order.
     //
-    if( ShowOrders && unit->Selected && (KeyModifiers&ModifierShift)) {
-	DrawPath(unit);
+    if( ShowOrders /*&& unit->Selected && (KeyModifiers&ModifierShift) */) {
+	ShowOrder(unit);
     }
 
     // FIXME: johns: ugly check here should be removed!

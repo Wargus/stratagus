@@ -82,38 +82,6 @@ global void HandleActionStill(Unit* unit)
 	return;
     }
 
-#if 0
-    //
-    //	Building:	burning FIXME: must moved to general point
-    //
-    if( type->Building ) {
-	if( unit->HP ) {
-	    int f;
-
-	    f=(100*unit->HP)/unit->Stats->HitPoints;
-	    if( f>75) {
-		; // No fire for this
-	    } else if( f>50 ) {
-		MakeMissile(MissileTypeByIdent("missile-small-fire")
-			,unit->X*TileSizeX
-				+(type->TileWidth*TileSizeX)/2
-			,unit->Y*TileSizeY
-				+(type->TileHeight*TileSizeY)/2
-				-TileSizeY
-			,0,0);
-	    } else {
-		MakeMissile(MissileTypeByIdent("missile-big-fire")
-			,unit->X*TileSizeX
-				+(type->TileWidth*TileSizeX)/2
-			,unit->Y*TileSizeY
-				+(type->TileHeight*TileSizeY)/2
-				-TileSizeY
-			,0,0);
-	    }
-	}
-    }
-#endif
-
 #if 1  // a unit with type->Vanishes is _dying_.
     //
     //	Corpse:		vanishes
@@ -208,7 +176,9 @@ global void HandleActionStill(Unit* unit)
 	    if( !unit->SubAction || unit->Command.Data.Move.Goal!=goal ) {
 		// New target.
 		if( unit->Command.Data.Move.Goal ) {
-		    unit->Command.Data.Move.Goal--;
+		    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+		    unit->Command.Data.Move.Goal->Refs--;
+		    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
 		}
 		unit->Command.Data.Move.Goal=goal;
 		goal->Refs++;

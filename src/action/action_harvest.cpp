@@ -256,6 +256,7 @@ local int ReturnWithWood(Unit* unit)
     if( destu ) {
 	if( destu->Destroyed ) {
 	    DebugLevel0Fn("Destroyed unit\n");
+	    DebugCheck( !destu->Refs );
 	    if( !--destu->Refs ) {
 		ReleaseUnit(destu);
 	    }
@@ -265,14 +266,18 @@ local int ReturnWithWood(Unit* unit)
 	    return 0;
 	} else if( destu->Removed || !destu->HP
 		    || destu->Command.Action==UnitActionDie ) {
+	    DebugCheck( !destu->Refs );
 	    --destu->Refs;
+	    DebugCheck( !destu->Refs );
 	    unit->Command.Data.Move.Goal=NoUnitP;
 	    // FIXME: perhaps I should choose an alternative
 	    unit->Command.Action=UnitActionStill;
 	    return 0;
 	}
 	unit->Command.Data.Move.Goal=NoUnitP;
+	DebugCheck( !destu->Refs );
 	--destu->Refs;
+	DebugCheck( !destu->Refs );
     }
 
     x=unit->Command.Data.Move.DX;

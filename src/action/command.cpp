@@ -545,6 +545,7 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
+    DebugLevel0Fn("Mine gold refs %d\n",dest->Refs);
 #if 1
     // FIXME: move to any point of gold mine.
     NearestOfUnit(dest,unit->X,unit->Y
