@@ -52,7 +52,7 @@
 #include "script.h"
 #include "spells.h"
 
-#include "etlib/hash.h"
+#include "util.h"
 
 #include "myendian.h"
 

@@ -2078,7 +2078,8 @@ global int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 
 	destx = x;
 	desty = y;
-	size = min(TheMap.Width * TheMap.Height / 4, range * range * 5);
+	size = (TheMap.Width * TheMap.Height / 4 < range * range * 5) ?
+		TheMap.Width * TheMap.Height / 4 : range * range * 5;
 	points = malloc(size * sizeof(*points));
 
 	//		Make movement matrix. FIXME: can create smaller matrix.
@@ -2195,7 +2196,8 @@ global Unit* FindResource(const Unit* unit, int x, int y, int range, int resourc
 
 	destx = x;
 	desty = y;
-	size = min(TheMap.Width * TheMap.Height / 4, range * range * 5);
+	size = (TheMap.Width * TheMap.Height / 4 < range * range * 5) ?
+		TheMap.Width * TheMap.Height / 4 : range * range * 5;
 	points = malloc(size * sizeof(*points));
 
 	//		Find the nearest gold depot
@@ -2248,7 +2250,7 @@ global Unit* FindResource(const Unit* unit, int x, int y, int range, int resourc
 							mine->Player == unit->Player ||
 							IsAllied(unit->Player, mine))) {
 					if (destu) {
-						n = max(abs(destx - x), abs(desty - y));
+						n = (abs(destx - x) > abs(desty - y)) ? abs(destx - x) : abs(desty - y);
 						if (n < bestd) {
 							bestd = n;
 							bestmine = mine;
@@ -2338,7 +2340,8 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
 
 	destx = x;
 	desty = y;
-	size = min(TheMap.Width * TheMap.Height / 4, range * range * 5);
+	size = (TheMap.Width * TheMap.Height / 4 < range * range * 5) ?
+		TheMap.Width * TheMap.Height / 4 : range * range * 5;
 	points = malloc(size * sizeof(*points));
 
 	//		Make movement matrix. FIXME: can create smaller matrix.

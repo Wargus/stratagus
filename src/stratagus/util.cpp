@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "etlib/generic.h"
-#include "etlib/hash.h"
+#include "util.h"
 
 /*
     Mixture of hash table and binary tree.
@@ -47,15 +46,14 @@ struct symbol
 {
     struct symbol *left;
     struct symbol *right;
-    u8 misc[2];		/* contains user struct and name */
+	// contains user struct and name
+    Uint8 misc[2];
 };
 
 
-
-static inline u32
-hash(const u8 *str)
+static inline Uint32 hash(const Uint8 *str)
 {
-    u32 h = 0;
+    Uint32 h = 0;
 
     while (*str)
 	h = (h << 4) ^ (h >> 28) ^ *str++;
@@ -68,11 +66,10 @@ hash(const u8 *str)
     Find a symbol. Return 0 if not found.
 */
 
-const void *
-_hash_find(const u8 *id, const void *tab, int size, int usize)
+const void *_hash_find(const Uint8 *id, const void *tab, int size, int usize)
 {
     const struct symbol *s;
-    u32 h;
+    Uint32 h;
     int i;
 
     h = hash(id);
@@ -80,7 +77,7 @@ _hash_find(const u8 *id, const void *tab, int size, int usize)
 
     while (s)
     {
-	i = (u8)h - s->misc[usize];
+	i = (Uint8)h - s->misc[usize];
 	if (i == 0)
 	{
 	    i = strcmp(id, s->misc + usize + 1);
@@ -98,11 +95,11 @@ _hash_find(const u8 *id, const void *tab, int size, int usize)
     Get a symbol. Create if not found.
 */
 
-void *
-_hash_get(const u8 *id, void *tab, int size, int usize)
+void *_hash_get(const Uint8 *id, void *tab, int size, int usize)
 {
-    struct symbol *s, **ss;
-    u32 h;
+    struct symbol *s;
+	struct symbol **ss;
+    Uint32 h;
     int i;
     
     h = hash(id);
@@ -110,7 +107,7 @@ _hash_get(const u8 *id, void *tab, int size, int usize)
 
     while ( (s = *ss) )
     {
-	i = (u8)h - s->misc[usize];
+	i = (Uint8)h - s->misc[usize];
 	if (i == 0)
 	{
 	    i = strcmp(id, s->misc + usize + 1);
@@ -125,7 +122,7 @@ _hash_get(const u8 *id, void *tab, int size, int usize)
     s->left = 0;
     s->right = 0;
     memset(s->misc, 0, usize);
-    s->misc[usize] = (u8)h;
+    s->misc[usize] = (Uint8)h;
     strcpy(s->misc + usize + 1, id);
 
     return s->misc;
@@ -134,12 +131,11 @@ _hash_get(const u8 *id, void *tab, int size, int usize)
 /*
     Delete a symbol.
 */
-
-void
-_hash_del(const u8 *id, void *tab, int size, int usize)
+void _hash_del(const Uint8 *id, void *tab, int size, int usize)
 {
-    struct symbol *s, **ss;
-    u32 h;
+    struct symbol *s;
+	struct symbol **ss;
+    Uint32 h;
     int i;
 
     h = hash(id);
@@ -147,7 +143,7 @@ _hash_del(const u8 *id, void *tab, int size, int usize)
 
     while ( (s = *ss) )
     {
-	i = (u8)h - s->misc[usize];
+	i = (Uint8)h - s->misc[usize];
 	if (i == 0)
 	{
 	    i = strcmp(id, s->misc + usize + 1);
@@ -179,8 +175,7 @@ _hash_del(const u8 *id, void *tab, int size, int usize)
 
 
 
-static void
-_stat(int depth, struct symbol *s, struct hash_st *st)
+static void _stat(int depth, struct symbol *s, struct hash_st *st)
 {
     while (s)
     {
@@ -201,8 +196,7 @@ _stat(int depth, struct symbol *s, struct hash_st *st)
 
 
 
-void
-_hash_stat(void *tab, int size, struct hash_st *st)
+void _hash_stat(void *tab, int size, struct hash_st *st)
 {
     struct symbol **s;
 
@@ -221,44 +215,84 @@ _hash_stat(void *tab, int size, struct hash_st *st)
 }
 
 
+/*
+ * Standard implementation of getopt(3).
+ *
+ * One extension: If the first character of the optionsstring is a ':'
+ * the error return for 'argument required' is a ':' not a '?'.
+ * This makes it easier to differentiate between an 'illegal option' and
+ * an 'argument required' error.
+ */
+
+#ifdef  _MSC_VER
+
+#include <stdio.h>
+#include <string.h>
+
+int	opterr = 1;
+int	optind = 1;
+int	optopt;
+char *optarg;
 
 
-#if 0
 
-/* some primes:
-    11 23 31 41 53 61 71 83 97
-    101 211 307 401 503 601 701 809 907
-    1009 2003 3001 4001 5003 6007 7001 8009 9001
-    10007 20011 30011 40009 50021 60013 70001 80021 90001
-    100003
-*/
-
-//hashtable(int, 97) pseudoop;
-hashtable(int, 1) pseudoop;
-
-main()
+static void getopt_err(char *argv0, char *str, char opt)
 {
-    struct hash_st st;
-    u8 buf[256];
+    if (opterr) {
+		char errbuf[2];
+		char *x;
 
-#if 1
-    hash_add(pseudoop, "0");
-    hash_add(pseudoop, "5");
-    hash_add(pseudoop, "1");
-    hash_add(pseudoop, "6");
+		errbuf[0] = opt;
+		errbuf[1] = '\n';
 
-    hash_stat(pseudoop, &st);	printf("-----------\n");
-    hash_del(pseudoop, "5");
+		while ((x = strchr(argv0, '/'))) {
+		    argv0 = x + 1;
+		}
 
-#else
-    while (gets(buf))
-	if (buf[0])
-	    hash_add(pseudoop, buf);
-#endif
-    hash_stat(pseudoop, &st);
-    printf("nelem   : %d\n", st.nelem);
-    printf("hashsize: %d\n", st.hashsize);
-    printf("maxdepth: %d\n", st.maxdepth);
-    printf("middepth: %d.%03d\n", st.middepth / 1000, st.middepth % 1000);
+		write(2, argv0, strlen(argv0));
+		write(2, str, strlen(str));
+		write(2, errbuf, 2);
+    }
 }
-#endif
+
+
+
+int getopt(int argc, char** argv, char *opts)
+{
+    static int sp = 1;
+    register int c;
+    register char *cp;
+
+    optarg = NULL;
+
+    if (sp == 1) {
+		if (optind >= argc || argv[optind][0] != '-' || argv[optind][1] == '\0') {
+		    return EOF;
+		} else if (strcmp(argv[optind], "--") == NULL) {
+	    	optind++;
+		    return EOF;
+		}
+    }
+    optopt = c = argv[optind][sp];
+    if (c == ':' || (cp = strchr(opts, c)) == NULL) {
+		getopt_err(argv[0], ": illegal option -", (char)c);
+		cp = "xx";	/* make the next if false */
+		c = '?';
+    }
+    if (*++cp == ':') {
+		if (argv[optind][++sp] != '\0') {
+		    optarg = &argv[optind++][sp];
+		} else if (++optind < argc) {
+		    optarg = argv[optind++];
+		} else {
+		    getopt_err(argv[0], ": option requires an argument -", (char)c);
+		    c = (*opts == ':') ? ':' : '?';
+		}
+		sp = 1;
+    } else if (argv[optind][++sp] == '\0') {
+		optind++;
+		sp = 1;
+    }
+    return c;
+}
+#endif /* _MSVC */

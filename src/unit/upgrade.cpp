@@ -49,7 +49,7 @@
 
 #include "myendian.h"
 
-#include "etlib/hash.h"
+#include "util.h"
 
 local int AddUpgradeModifierBase(int, int, int, int, int, int, int, int, int,
 	int*, const int[UnitTypeMax], const char*, const char*, UnitType*);

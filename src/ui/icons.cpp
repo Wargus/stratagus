@@ -45,7 +45,7 @@
 #include "player.h"
 #include "script.h"
 
-#include "etlib/hash.h"
+#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

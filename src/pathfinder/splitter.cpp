@@ -427,10 +427,10 @@ global void RegionJoin(RegionId a, RegionId b)
 	Regions[a].SumX += Regions[b].SumX;
 	Regions[a].SumY += Regions[b].SumY;
 	Regions[a].Dirty = 0;
-	Regions[a].MinX = min(Regions[a].MinX, Regions[b].MinX);
-	Regions[a].MinY = min(Regions[a].MinY, Regions[b].MinY);
-	Regions[a].MaxX = max(Regions[a].MaxX, Regions[b].MaxX);
-	Regions[a].MaxY = max(Regions[a].MaxY, Regions[b].MaxY);
+	Regions[a].MinX = (Regions[a].MinX < Regions[b].MinX) ? Regions[a].MinX : Regions[b].MinX;
+	Regions[a].MinY = (Regions[a].MinY < Regions[b].MinY) ? Regions[a].MinY : Regions[b].MinY;
+	Regions[a].MaxX = (Regions[a].MaxX > Regions[b].MaxX) ? Regions[a].MaxX : Regions[b].MaxX;
+	Regions[a].MaxY = (Regions[a].MaxY > Regions[b].MaxY) ? Regions[a].MaxY : Regions[b].MaxY;
 
 	// Update connections : a receive all that b has
 	while (Regions[b].ConnectionsNumber) {
@@ -979,7 +979,7 @@ global void InitaliseMapping(void)
 			// Split region which are big or are not square at all...
 			if ((Regions[i].TileCount > 1024) ||
 						(Regions[i].TileCount > 64 &&
-					max(x, y) * max(x, y) > 3 * Regions[i].TileCount)) {
+					(x > y ? x : y) * (x > y ? x : y) > 3 * Regions[i].TileCount)) {
 				DebugLevel3Fn( "Split %d\n" _C_ i);
 				RegionSplit(i, 1);
 				// RegionDebugAllConnexions();
@@ -1231,10 +1231,10 @@ global void MapSplitterEachCycle(void)
 					continue;
 				}
 
-				x0 = min(Regions[i].MinX,Regions[j].MinX);
-				y0 = min(Regions[i].MinY,Regions[j].MinY);
-				x1 = max(Regions[i].MaxX,Regions[j].MaxX);
-				y1 = max(Regions[i].MaxY,Regions[j].MaxY);
+				x0 = (Regions[i].MinX < Regions[j].MinX) ? Regions[i].MinX : Regions[j].MinX;
+				y0 = (Regions[i].MinY < Regions[j].MinY) ? Regions[i].MinY : Regions[j].MinY;
+				x1 = (Regions[i].MaxX > Regions[j].MaxX) ? Regions[i].MaxX : Regions[j].MaxX;
+				y1 = (Regions[i].MaxY > Regions[j].MaxY) ? Regions[i].MaxY : Regions[j].MaxY;
 
 				if (!ShouldBreakRegion(x0, y0, x1, y1,
 							Regions[i].TileCount + Regions[j].TileCount, 1)) {

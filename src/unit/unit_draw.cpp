@@ -56,6 +56,28 @@
 #include "script.h"
 
 /*----------------------------------------------------------------------------
+--  Definitions
+----------------------------------------------------------------------------*/
+#ifndef min
+#ifdef __GNUC__
+#define min(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a < _b ? _a : _b; })
+#else
+#define min min
+static inline min(int a, int b) { return a < b ? a : b; }
+#endif
+#endif
+
+#ifndef max
+#ifdef __GNUC__
+#define max(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a > _b ? _a : _b; })
+#else
+#define max max
+static inline max(int a, int b) { return a > b ? a : b; }
+#endif
+#endif
+
+
+/*----------------------------------------------------------------------------
 --		Variables
 ----------------------------------------------------------------------------*/
 
