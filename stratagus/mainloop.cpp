@@ -508,26 +508,26 @@ global void DrawMapArea(void)
     const Viewport* evp;
 
     // Draw all map viewports
-    evp=TheUI.Viewports+TheUI.NumViewports;
-    for( vp=TheUI.Viewports; vp<evp; ++vp) {
+    evp = TheUI.Viewports+TheUI.NumViewports;
+    for (vp = TheUI.Viewports; vp < evp; ++vp) {
 	DrawMapViewport(vp);
     }
 
     // if we a single viewport, no need to denote the "selected" one
-    if( TheUI.NumViewports==1 ) {
+    if (TheUI.NumViewports == 1) {
 	return;
     }
 
     //
     //	Separate the viewports and mark the active viewport.
     //
-    for( vp=TheUI.Viewports; vp<evp; ++vp ) {
-	enum _sys_colors_ color;
+    for (vp = TheUI.Viewports; vp < evp; ++vp) {
+	VMemType color;
 
-	if( vp==TheUI.SelectedViewport ) {
-	    color=ColorOrange;
+	if (vp == TheUI.SelectedViewport) {
+	    color = ColorOrange;
 	} else {
-	    color=ColorBlack;
+	    color = ColorBlack;
 	}
 
 	// -

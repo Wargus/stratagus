@@ -259,6 +259,17 @@ global void InitVideoSdl(void)
     InitOpenGL();
 #endif
 
+    ColorBlack = VideoMapRGB(0, 0, 0);
+    ColorDarkGreen = VideoMapRGB(48, 100, 4);
+    ColorBlue = VideoMapRGB(0, 0, 252);
+    ColorOrange = VideoMapRGB(248, 140, 20);
+    ColorWhite = VideoMapRGB(252, 248, 240);
+    ColorNPC = VideoMapRGB(160, 160, 164);
+    ColorGray = VideoMapRGB(128, 128, 128);
+    ColorRed = VideoMapRGB(252, 0, 0);
+    ColorGreen = VideoMapRGB(0, 252, 0);
+    ColorYellow = VideoMapRGB(252, 252, 0);
+
     DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
 
     // FIXME: Setup InMainWindow correct.
@@ -779,11 +790,16 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 **
 **	@return		A hardware dependent pixel.
 */
-global unsigned long VideoMapRGB(int r, int g, int b)
+global VMemType VideoMapRGB(int r, int g, int b)
 {
+    VMemType c;
+    unsigned long map;
+
     DebugCheck(!Screen);
 
-    return SDL_MapRGB(Screen->format, r, g, b);
+    map = SDL_MapRGB(Screen->format, r, g, b);
+    memcpy(&c, &map, sizeof(c));
+    return c;
 }
 
 /**

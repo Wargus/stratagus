@@ -838,8 +838,6 @@ global void LoadFonts(void)
     unsigned i;
     FontColorMapping* fcm;
     void* pixels;
-    int v;
-    char* vp;
 
     //
     //	First select the font drawing procedure.
@@ -886,27 +884,27 @@ global void LoadFonts(void)
     while (fcm) {
 	pixels = fcm->Pixels;
 	for (i = 0; i < NumFontColors; ++i) {
+	    VMemType c;
+
+	    c = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
+
 	    switch (VideoBpp) {
 		case 8:
-		    ((VMemType8*)pixels)[i] = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
+		    ((VMemType8*)pixels)[i] = c.D8;
 		    break;
 		case 15:
 		case 16:
-		    ((VMemType16*)pixels)[i] = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
+		    ((VMemType16*)pixels)[i] = c.D16;
 		    break;
 		case 24:
-		    v = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
-		    vp = (char*)(&v);
-		    ((VMemType24*)pixels)[i].a = vp[0];
-		    ((VMemType24*)pixels)[i].b = vp[1];
-		    ((VMemType24*)pixels)[i].c = vp[2];
+		    ((VMemType24*)pixels)[i] = c.D24;
 		    break;
 		case 32:
-		    ((VMemType32*)pixels)[i] = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
+		    ((VMemType32*)pixels)[i] = c.D32;
 		    break;
 	    }
 	}
-	fcm=fcm->Next;
+	fcm = fcm->Next;
     }
 }
 

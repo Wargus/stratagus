@@ -266,7 +266,8 @@ global void DrawMenuButton(MenuButtonId button, unsigned flags, int w, int h,
 	    if (flags & MenuButtonDisabled) {
 		VideoDrawRectangleClip(ColorGray, x, y, w - 1, h);
 	    } else {
-		VideoDrawRectangleClip(165, x, y, w - 1, h);
+		// FIXME: wrong color
+		VideoDrawRectangleClip(ColorRed, x, y, w - 1, h);
 	    }
 	}
     } else {

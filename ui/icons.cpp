@@ -371,7 +371,7 @@ global void DrawIcon(const Player* player, Icon* icon, int x, int y)
 global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
     int x, int y)
 {
-    int color;
+    VMemType color;
     int width;
     int height;
 
