@@ -353,13 +353,13 @@ void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 			Assert(0);
 			}
 		} else {
-			value = unit->Variable[index].Value;
-			diff = unit->Variable[index].Max - value;
+			value = unit->Type->Variable[index].Value;
+			diff = unit->Stats->Variables[index].Value - value;
 
 			if (!diff) {
 				VideoDrawNumber(x, y, font, value);
 			} else {
-				sprintf(buf, "%d~<+%d~>", value, diff);
+				sprintf(buf, diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
 				VideoDrawText(x, y, font, buf);
 			}
 		}
