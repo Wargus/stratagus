@@ -3882,6 +3882,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Active ) {
 	fprintf(file," 'active");
     }
+    fprintf(file," 'resource-active %d",unit->Data.Resource.Active);
     fprintf(file," 'mana %d",unit->Mana);
     fprintf(file," 'hp %d",unit->HP);
     fprintf(file," 'xp %d",unit->XP);

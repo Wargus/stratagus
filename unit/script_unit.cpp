@@ -629,6 +629,9 @@ local SCM CclUnit(SCM list)
 	    unit->Constructed=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("active")) ) {
 	    unit->Active=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("resource-active")) ) {
+	    unit->Data.Resource.Active=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("mana")) ) {
 	    unit->Mana=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
