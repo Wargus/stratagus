@@ -905,6 +905,9 @@ global void WaitEventsAndKeepSync(void)
 	//
 	if(NetworkFildes != -1) {
 	    FD_SET(NetworkFildes, &rfds);
+	    if( !NetworkInSync ) {
+		NetworkRecover();	// recover network
+	    }
 	}
 
 	//
