@@ -42,56 +42,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Parse tileset definition.
-**
-**	@param slot	Slot name
-**	@param name	Reference name
-**	@param file	Graphic file
-**	@param palette	Palette file
-**	@param table	Conversion table
-*/
-local SCM CclTileset(SCM slot,SCM name,SCM file,SCM palette,SCM table)
-{
-    int type;
-    int i;
-    unsigned short* wp;
-
-    if( !gh_symbol_p(slot) ) {
-	fprintf(stderr,"Illegal tileset slot name\n");
-	return SCM_UNSPECIFIED;
-    }
-    if( slot==gh_symbol2scm("tileset-summer") ) {
-	type=TilesetSummer;
-    } else if( slot==gh_symbol2scm("tileset-winter") ) {
-	type=TilesetWinter;
-    } else if( slot==gh_symbol2scm("tileset-wasteland") ) {
-	type=TilesetWasteland;
-    } else if( slot==gh_symbol2scm("tileset-swamp") ) {
-	type=TilesetSwamp;
-    } else {
-	fprintf(stderr,"Wrong tileset slot name\n");
-	return SCM_UNSPECIFIED;
-    }
-    //Tilesets[type].Ident=gh_scm2newstr(slot,NULL);
-    Tilesets[type].Name=gh_scm2newstr(name,NULL);
-    Tilesets[type].File=gh_scm2newstr(file,NULL);
-    Tilesets[type].PaletteFile=gh_scm2newstr(palette,NULL);
-
-    // CONVERT TABLE!!
-    if( gh_vector_length(table)!=2528 ) {	// 0x9E0
-	fprintf(stderr,"Wrong conversion table length\n");
-	return SCM_UNSPECIFIED;
-    }
-
-    Tilesets[type].Table=wp=malloc(sizeof(*Tilesets[type].Table)*2528);
-    for( i=0; i<2528; ++i ) {
-	wp[i]=gh_scm2int(gh_vector_ref(table,gh_int2scm(i)));
-    }
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
 **	Define tileset mapping from original number to internal symbol
 **
 **	@param list	List of all names.
@@ -113,6 +63,10 @@ local SCM CclDefineTilesetWcNames(SCM list)
     //
     i=gh_length(list);
     TilesetWcNames=cp=malloc((i+1)*sizeof(char*));
+    if( !cp ) {
+	fprintf(stderr,"out of memory.\n");
+	exit(-1);
+    }
     while( i-- ) {
 	*cp++=gh_scm2newstr(gh_car(list),NULL);
 	list=gh_cdr(list);
@@ -123,15 +77,360 @@ local SCM CclDefineTilesetWcNames(SCM list)
 }
 
 /**
+**	Parse the special slot part of a tileset definition
+**
+**	@param list	Tagged list defining a special slot.
+*/
+local void DefineTilesetParseSpecial(Tileset* tileset,SCM list)
+{
+    SCM value;
+    SCM data;
+    int i;
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	data=gh_car(list);
+	list=gh_cdr(list);
+
+	//
+	//	Extra-trees
+	//
+	if( gh_eq_p(value,gh_symbol2scm("extra-trees")) ) {
+	    if( gh_vector_length(data)!=6 ) {
+		errl("extra-trees: Wrong vector length",data);
+	    }
+	    for( i=0; i<6; ++i ) {
+		value=gh_vector_ref(data,gh_int2scm(i));
+		tileset->ExtraTrees[i]=gh_scm2int(value);
+	    }
+	//
+	//	top-one-tree, mid-one-tree, bot-one-tree
+	//
+	} else if( gh_eq_p(value,gh_symbol2scm("top-one-tree")) ) {
+	    tileset->TopOneTree=gh_scm2int(data);
+	} else if( gh_eq_p(value,gh_symbol2scm("mid-one-tree")) ) {
+	    tileset->MidOneTree=gh_scm2int(data);
+	} else if( gh_eq_p(value,gh_symbol2scm("bot-one-tree")) ) {
+	    tileset->BotOneTree=gh_scm2int(data);
+	//
+	//	removed-tree
+	//
+	} else if( gh_eq_p(value,gh_symbol2scm("removed-tree")) ) {
+	    tileset->RemovedTree=gh_scm2int(data);
+	//
+	//	growing-tree
+	//
+	} else if( gh_eq_p(value,gh_symbol2scm("growing-tree")) ) {
+	    if( gh_vector_length(data)!=2 ) {
+		errl("growing-tree: Wrong vector length",data);
+	    }
+	    for( i=0; i<2; ++i ) {
+		value=gh_vector_ref(data,gh_int2scm(i));
+		tileset->GrowingTree[i]=gh_scm2int(value);
+	    }
+
+	//
+	//	extra-rocks
+	//
+	} else if( gh_eq_p(value,gh_symbol2scm("extra-rocks")) ) {
+	    if( gh_vector_length(data)!=6 ) {
+		errl("extra-rocks: Wrong vector length",data);
+	    }
+	    for( i=0; i<6; ++i ) {
+		value=gh_vector_ref(data,gh_int2scm(i));
+		tileset->ExtraRocks[i]=gh_scm2int(value);
+	    }
+	//
+	//	top-one-rock, mid-one-rock, bot-one-rock
+	//
+	} else if( gh_eq_p(value,gh_symbol2scm("top-one-rock")) ) {
+	    tileset->TopOneRock=gh_scm2int(data);
+	} else if( gh_eq_p(value,gh_symbol2scm("mid-one-rock")) ) {
+	    tileset->MidOneRock=gh_scm2int(data);
+	} else if( gh_eq_p(value,gh_symbol2scm("bot-one-rock")) ) {
+	    tileset->BotOneRock=gh_scm2int(data);
+	//
+	//	removed-rock
+	//
+	} else if( gh_eq_p(value,gh_symbol2scm("removed-rock")) ) {
+	    tileset->RemovedRock=gh_scm2int(data);
+	} else {
+	    errl("special: unsupported tag",value);
+	}
+    }
+}
+
+/**
+**	Parse the solid slot part of a tileset definition
+**
+**	@param list	Tagged list defining a solid slot.
+*/
+local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
+{
+    SCM value;
+    SCM data;
+    int i;
+    int l;
+
+    tileset->Table=realloc(tileset->Table,(index+16)*sizeof(*tileset->Table));
+    if( !tileset->Table ) {
+	fprintf(stderr,"out of memory.\n");
+	exit(-1);
+    }
+
+    value=gh_car(list);			// name
+    list=gh_cdr(list);
+
+    //
+    //	Parse the list:	flags of the slot
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	if( !gh_symbol_p(value) ) {
+	    break;
+	}
+
+	//
+	//	Flags are only needed for the editor
+	//
+	if( gh_eq_p(value,gh_symbol2scm("water")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("no-building")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("forest")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("rock")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("wall")) ) {
+	} else {
+	    errl("solid: unsupported tag",value);
+	}
+    }
+
+    //
+    //	Vector: the tiles.
+    //
+    l=gh_vector_length(value);
+    for( i=0; i<l; ++i ) {
+	data=gh_vector_ref(value,gh_int2scm(i));
+	tileset->Table[index+i]=gh_scm2int(data);
+    }
+    while( i<16 ) {
+	tileset->Table[index+i++]=0;
+    }
+
+    return index+16;
+}
+
+/**
+**	Parse the mixed slot part of a tileset definition
+**
+**	@param list	Tagged list defining a mixed slot.
+*/
+local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
+{
+    SCM value;
+    SCM data;
+    int i;
+    int l;
+
+    tileset->Table=realloc(tileset->Table,(index+256)*sizeof(*tileset->Table));
+    if( !tileset->Table ) {
+	fprintf(stderr,"out of memory.\n");
+	exit(-1);
+    }
+
+    value=gh_car(list);			// base name
+    list=gh_cdr(list);
+    value=gh_car(list);			// mixed name
+    list=gh_cdr(list);
+
+    //
+    //	Parse the list:	flags of the slot
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+
+	if( !gh_symbol_p(value) ) {
+	    break;
+	}
+	list=gh_cdr(list);
+
+	//
+	//	Flags are only needed for the editor
+	//
+	if( gh_eq_p(value,gh_symbol2scm("water")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("no-building")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("forest")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("rock")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("wall")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("coast")) ) {
+	} else {
+	    errl("solid: unsupported tag",value);
+	}
+    }
+
+    //
+    //	Parse the list:	slots FIXME: no error checking number of slots
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+
+	//
+	//	Vector: the tiles.
+	//
+	l=gh_vector_length(value);
+	for( i=0; i<l; ++i ) {
+	    data=gh_vector_ref(value,gh_int2scm(i));
+	    tileset->Table[index+i]=gh_scm2int(data);
+	}
+	while( i<16 ) {
+	    tileset->Table[index+i++]=0;
+	}
+	index+=16;
+    }
+
+    return index;
+}
+
+/**
+**	Parse the slot part of a tileset definition
+**
+**	@param list	Tagged list defining a slot.
+*/
+local void DefineTilesetParseSlot(Tileset* tileset,SCM list)
+{
+    SCM value;
+    SCM data;
+    int index;
+
+    index=0;
+    tileset->Table=malloc(16*sizeof(*tileset->Table));
+    if( !tileset->Table ) {
+	fprintf(stderr,"out of memory.\n");
+	exit(-1);
+    }
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	data=gh_car(list);
+	list=gh_cdr(list);
+
+	//
+	//	special part
+	//
+	if( gh_eq_p(value,gh_symbol2scm("special")) ) {
+	    DefineTilesetParseSpecial(tileset,data);
+	//
+	//	solid part
+	//
+	} else if( gh_eq_p(value,gh_symbol2scm("solid")) ) {
+	    index=DefineTilesetParseSolid(tileset,index,data);
+	//
+	//	mixed part
+	//
+	} else if( gh_eq_p(value,gh_symbol2scm("mixed")) ) {
+	    index=DefineTilesetParseMixed(tileset,index,data);
+	} else {
+	    errl("slots: unsupported tag",value);
+	}
+    }
+}
+
+/**
 **	Define tileset
 **
+**	@param list	Tagged list defining a tileset.
 */
 local SCM CclDefineTileset(SCM list)
 {
-    DebugLevel0Fn("FIXME: define-tileset not supported\n");
+    SCM value;
+    SCM data;
+    int type;
+    Tileset* tileset;
+    char* ident;
 
-    // FIXME: write this
+    value=gh_car(list);
+    list=gh_cdr(list);
 
+    if( !gh_symbol_p(value) ) {
+	errl("illegal tileset slot name",value);
+    }
+    ident=gh_scm2newstr(value,NULL);
+
+    //
+    //	Find the tile set.
+    //
+    if( Tilesets ) {
+	for( type=0; type<NumTilesets; ++type ) {
+	    if( !strcmp(Tilesets[type]->Ident,ident) ) {
+		free(Tilesets[type]->Ident);
+		free(Tilesets[type]->Class);
+		free(Tilesets[type]->Name);
+		free(Tilesets[type]->File);
+		free(Tilesets[type]->PaletteFile);
+		free(Tilesets[type]->Table);
+		free(Tilesets[type]->TileTypeTable);
+		free(Tilesets[type]->AnimationTable);
+		free(Tilesets[type]);
+		break;
+	    }
+	}
+	if( type==NumTilesets ) {
+	    Tilesets=realloc(Tilesets,++NumTilesets*sizeof(*Tilesets));
+	}
+    } else {
+	Tilesets=malloc(sizeof(*Tilesets));
+	type=0;
+	++NumTilesets;
+    }
+    if( !Tilesets ) {
+	fprintf(stderr,"out of memory.\n");
+	exit(-1);
+    }
+    Tilesets[type]=tileset=malloc(sizeof(Tileset));
+    if( !tileset ) {
+	fprintf(stderr,"out of memory.\n");
+	exit(-1);
+    }
+    Tilesets[type]->Ident=ident;
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+
+	value=gh_car(list);
+	list=gh_cdr(list);
+	data=gh_car(list);
+	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("class")) ) {
+	    tileset->Class=gh_scm2newstr(data,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("name")) ) {
+	    tileset->Name=gh_scm2newstr(data,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("image")) ) {
+	    tileset->File=gh_scm2newstr(data,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("palette")) ) {
+	    tileset->PaletteFile=gh_scm2newstr(data,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("slots")) ) {
+	    DefineTilesetParseSlot(tileset,data);
+	} else if( gh_eq_p(value,gh_symbol2scm("animations")) ) {
+	    DebugLevel0Fn("Animations not supported.\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("objects")) ) {
+	    DebugLevel0Fn("objects not supported.\n");
+	} else {
+	    errl("Unsupported tag",value);
+	}
+    }
     return list;
 }
 
@@ -140,9 +439,6 @@ local SCM CclDefineTileset(SCM list)
 */
 global void TilesetCclRegister(void)
 {
-    // FIXME: will be removed
-    gh_new_procedure5_0("tileset",CclTileset);
-
     gh_new_procedureN("define-tileset-wc-names",CclDefineTilesetWcNames);
     gh_new_procedureN("define-tileset",CclDefineTileset);
 }
