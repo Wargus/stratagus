@@ -994,7 +994,7 @@ local SCM CclCreateUnit(SCM type, SCM player, SCM x, SCM y)
     heading = SyncRand() % 256;
     playerno = TriggerGetPlayer(player);
     if (playerno == -1) {
-	printf("CreateUnit: You cannot use 'any in create unit, specify a player\n");
+	printf("CreateUnit: You cannot use 'any in create-unit, specify a player\n");
 	errl("bad player", player);
 	return SCM_UNSPECIFIED;
     }
@@ -1035,14 +1035,19 @@ local SCM CclOrderUnit(SCM list)
     int j;
     char* order;
 
-    plynr=TriggerGetPlayer(gh_car(list));
+    plynr = TriggerGetPlayer(gh_car(list));
     list = gh_cdr(list);
     unittype = TriggerGetUnitType(gh_car(list));
     list = gh_cdr(list);
     x1 = gh_scm2int(gh_car(gh_car(list)));
     y1 = gh_scm2int(gh_car(gh_cdr(gh_car(list))));
-    x2 = gh_scm2int(gh_car(gh_cdr(gh_cdr(gh_car(list)))));
-    y2 = gh_scm2int(gh_car(gh_cdr(gh_cdr(gh_cdr(gh_car(list))))));
+    if (!gh_null_p(gh_cdr(gh_cdr(gh_car(list))))) {
+	x2 = gh_scm2int(gh_car(gh_cdr(gh_cdr(gh_car(list)))));
+	y2 = gh_scm2int(gh_car(gh_cdr(gh_cdr(gh_cdr(gh_car(list))))));
+    } else {
+	x2 = x1;
+	y2 = y1;
+    }
     list = gh_cdr(list);
     dx1 = gh_scm2int(gh_car(gh_car(list)));
     dy1 = gh_scm2int(gh_car(gh_cdr(gh_car(list))));
