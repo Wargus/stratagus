@@ -28,6 +28,10 @@
 #include <sys/time.h>
 #include <SDL/SDL.h>
 
+#ifdef USE_BEOS
+#include <sys/socket.h>
+#endif
+
 #ifdef USE_WIN32
 #include <winsock.h>
 #undef DrawText
