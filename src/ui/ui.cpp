@@ -219,7 +219,7 @@ global void LoadUserInterface(void)
 #endif
 		}
 	}
-	if (TheUI.Resource.File) {
+	if (TheUI.Resource.File && *TheUI.Resource.File) {
 		TheUI.Resource.Graphic = LoadGraphic(TheUI.Resource.File);
 #ifdef USE_OPENGL
 		MakeTexture(TheUI.Resource.Graphic, TheUI.Resource.Graphic->Width,
