@@ -9,8 +9,8 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 
-Read doc/LICENSE for the software license informations.
-Read doc/OPL for the content (art) license informations.
+Read doc/gpl.html for the software license informations.
+Read doc/gpl.html for the content (art) license informations.
 Read doc/readme.html for more informations.
 Read doc/install.html to install or upgrade FreeCraft.
 
@@ -19,9 +19,21 @@ Note:
   ETLIB Copyright by Edgar Toernig.
   other parts copyrights please look into the doc directory.
 
-Warning: 
-	THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR   
-	IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
-	WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+This file is part of FreeCraft
 
-     (C) 1998-2001 Johns of The FreeCraft Project (aleclone@FreeCraft.org)     
+    FreeCraft is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+Warning: 
+    FreeCraft is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FreeCraft; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    (C) 1998-2001 Johns of The FreeCraft Project (aleclone@FreeCraft.org)     

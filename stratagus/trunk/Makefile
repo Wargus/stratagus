@@ -12,6 +12,16 @@
 ##
 ##	(c) Copyright 1998-2001 by Lutz Sammer
 ##
+##	FreeCraft is free software; you can redistribute it and/or modify
+##	it under the terms of the GNU General Public License as published
+##	by the Free Software Foundation; either version 2 of the License,
+##	or (at your option) any later version.
+##
+##	FreeCraft is distributed in the hope that it will be useful,
+##	but WITHOUT ANY WARRANTY; without even the implied warranty of
+##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##	GNU General Public License for more details.
+##
 ##	$Id$
 ##
 
@@ -134,8 +144,8 @@ depend::
 DOCS    = README README.BeOS doc/readme.html doc/install.html \
 	  doc/freecraft.html doc/datadir.html \
 	  doc/faq.html doc/ChangeLog.html doc/todo.html doc/freecraft.lsm \
-	  doc/development.html doc/LICENSE doc/OPL doc/opl.html \
-	  doc/artistic-license.html doc/ccl/ccl.html doc/ccl/tileset.html \
+	  doc/development.html doc/gpl.txt doc/gpl.html doc/SIOD.txt \
+	  doc/ccl/ccl.html doc/ccl/tileset.html \
 	  doc/ccl/icon.html doc/ccl/unittype.html doc/graphic/*.html \
 	  doc/graphic/*.png
 
@@ -234,7 +244,7 @@ win32-bin-dist2:: win32
 	@echo $(CONTRIB) >>$(DISTLIST)
 	@echo $(CCLS) >>$(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
-	@echo SDL.dll README-SDL.txt doc/ZIP-LICENSE >>$(DISTLIST)
+	@echo SDL.dll doc/README-SDL.txt doc/ZIP-LICENSE >>$(DISTLIST)
 	@echo freecraft$(EXE) >>$(DISTLIST)
 	@echo tools/wartool$(EXE) >>$(DISTLIST)
 	@echo tools/build.bat >>$(DISTLIST)
