@@ -989,7 +989,10 @@ local void AiCheckRepair(void)
     for( i=0; i<n; ++i ) {
 	unit=AiPlayer->Player->Units[i];
 	// Unit defekt?
-	if( unit->Type->Building && unit->HP<unit->Stats->HitPoints ) {
+	if( unit->Type->Building 
+		&& unit->Orders[0].Action!=UnitActionBuilded
+		&& unit->Orders[0].Action!=UnitActionUpgradeTo
+		&& unit->HP<unit->Stats->HitPoints ) {
 	    DebugLevel0Fn("Have building to repair %d(%s)\n" _C_
 		    UnitNumber(unit) _C_ unit->Type->Ident);
 	    //
