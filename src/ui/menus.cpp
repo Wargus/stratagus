@@ -54,6 +54,10 @@
 #include "campaign.h"
 #include "sound_server.h"
 
+#ifdef USE_SDLCD
+#include "SDL.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --	Prototypes for local functions
 ----------------------------------------------------------------------------*/
