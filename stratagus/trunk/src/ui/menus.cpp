@@ -1179,21 +1179,21 @@ local void DrawInput(Menuitem *mi, unsigned mx, unsigned my)
 
 
 /**
-**	Draw menu  'menu'
+**	Draw a menu.
 **
-**	@param Menu	The menu number to display
+**	@param menu_id	The menu number to display
 */
-global void DrawMenu(int MenuId)
+global void DrawMenu(int menu_id)
 {
     int i, n, l;
     Menu *menu;
     Menuitem *mi, *mip;
 
     MustRedraw &= ~RedrawMenu;
-    if (MenuId == -1) {
+    if (menu_id == -1) {
 	return;
     }
-    menu = Menus + MenuId;
+    menu = Menus + menu_id;
     switch( menu->image ) {
 	case ImagePanel1:
 	    VideoDrawSub(TheUI.GameMenuePanel.Graphic,0,0,
@@ -3091,12 +3091,12 @@ local void EndMenu(void)
 
 
 /**
-**	Process menu  'menu'
+**	Process a menu.
 **
-**	@param Menu	The menu number to process
-**	@param Loop	Indicates to setup handlers and really 'Process'
+**	@param menu_id	The menu number to process
+**	@param loop	Indicates to setup handlers and really 'Process'
 */
-global void ProcessMenu(int MenuId, int Loop)
+global void ProcessMenu(int menu_id, int loop)
 {
     int i, oldncr;
     Menu *menu;
@@ -3104,7 +3104,7 @@ global void ProcessMenu(int MenuId, int Loop)
     int CurrentMenuSave = -1, MenuButtonUnderCursorSave = -1, MenuButtonCurSelSave = -1;
 
     // Recursion protection:
-    if (Loop) {
+    if (loop) {
 	CurrentMenuSave = CurrentMenu;
 	MenuButtonUnderCursorSave = MenuButtonUnderCursor;
 	MenuButtonCurSelSave = MenuButtonCurSel;
@@ -3116,7 +3116,7 @@ global void ProcessMenu(int MenuId, int Loop)
     MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
     GameCursor = TheUI.Point.Cursor;
-    CurrentMenu = MenuId;
+    CurrentMenu = menu_id;
     menu = Menus + CurrentMenu;
     MenuButtonCurSel = -1;
     for (i = 0; i < menu->nitems; ++i) {
@@ -3127,7 +3127,8 @@ global void ProcessMenu(int MenuId, int Loop)
 	    case MI_TYPE_LISTBOX:
 	    case MI_TYPE_VSLIDER:
 	    case MI_TYPE_INPUT:
-		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
+		mi->flags &= ~(MenuButtonClicked|MenuButtonActive
+				|MenuButtonSelected);
 		if (i == menu->defsel) {
 		    mi->flags |= MenuButtonSelected;
 		    MenuButtonCurSel = i;
@@ -3159,7 +3160,7 @@ global void ProcessMenu(int MenuId, int Loop)
 	}
     }
     MenuButtonUnderCursor = -1;
-    if (Loop) {
+    if (loop) {
 	SetVideoSync();
 	MustRedraw = 0;
 	MenuHandleMouseMove(CursorX,CursorY);	// This activates buttons as appropriate!
@@ -3167,7 +3168,7 @@ global void ProcessMenu(int MenuId, int Loop)
     }
     DrawMenu(CurrentMenu);
 
-    if (Loop) {
+    if (loop) {
 	while (CurrentMenu != -1) {
 	    DebugLevel3("MustRedraw: 0x%08x\n",MustRedraw);
 	    UpdateDisplay();
@@ -3192,7 +3193,7 @@ global void ProcessMenu(int MenuId, int Loop)
 	}
     }
 
-    if (Loop) {
+    if (loop) {
 	CurrentMenu = CurrentMenuSave;
 	MenuButtonUnderCursor = MenuButtonUnderCursorSave;
 	MenuButtonCurSel = MenuButtonCurSelSave;

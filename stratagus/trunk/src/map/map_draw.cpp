@@ -13,12 +13,11 @@
 **	@todo FIXME: Johns: More to come: zooming, scaling, 64x64 tiles...
 */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,7 +46,7 @@
 */
 
 /**
-**	@relates USE_TILECACHE
+**	@def noUSE_TILECACHE
 **
 **	If USE_TILECACHE is defined, the code is compiled with the tile-cache
 **	support. With the tile-cache support a tile is only converted once to
@@ -252,7 +251,6 @@ local Deco *mapdeco = NULL;
 /**
 **	Fast draw 32x32 tile for 8 bpp video modes.
 **
-**	@param graphic	Graphic structure for the tile
 **	@param data	pointer to tile graphic data
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
@@ -299,7 +297,6 @@ global void VideoDraw8Tile32(const unsigned char* data,int x,int y)
 /**
 **	Fast draw 32x32 tile for 16 bpp video modes.
 **
-**	@param graphic	Graphic structure for the tile
 **	@param data	pointer to tile graphic data
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
@@ -354,7 +351,6 @@ global void VideoDraw16Tile32(const unsigned char* data,int x,int y)
 /**
 **	Fast draw 32x32 tile for 24 bpp video modes.
 **
-**	@param graphic	Graphic structure for the tile
 **	@param data	pointer to tile graphic data
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
@@ -1400,9 +1396,10 @@ global void MapColorCycle(void)
 /**
 **	Mark position inside screenmap be drawn for next display update.
 **
-**	@param x,y  position in Map to be checked.
+**	@param x	X map tile position of point in Map to be marked.
+**	@param y	Y map tile position of point in Map to be marked.
 **
-**	@return	    True if inside and marked, false otherwise.
+**	@return		True if inside and marked, false otherwise.
 */
 global int MarkDrawPosMap( int x, int y )
 {
@@ -1419,9 +1416,12 @@ global int MarkDrawPosMap( int x, int y )
 /**
 **	Denote wether area in screenmap is overlapping
 **
-**	@param sx,sy,ex,ey  area in Map to be checked.
+**	@param sx	X map tile position of area in Map to be checked.
+**	@param sy	Y map tile position of area in Map to be checked.
+**	@param ex	X map tile position of area in Map to be checked.
+**	@param ey	Y map tile position of area in Map to be checked.
 **
-**	@return		    True if overlapping, false otherwise.
+**	@return		True if overlapping, false otherwise.
 */
 global int MapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
 {
@@ -1431,7 +1431,8 @@ global int MapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
 /**
 **	Check if a point is visible
 **
-**	@param x,y	point in Map to be checked.
+**	@param x	X map tile position of point in Map to be checked.
+**	@param y	Y map tile position of point in Map to be checked.
 **
 **	@return		True if point is in the visible map, false otherwise
 */
@@ -1443,9 +1444,12 @@ local inline int PointOnScreen(int x, int y)
 /**
 **	Check if any part of an area is visible
 **
-**	@param sx,sy,ex,ey  area in Map to be checked.
+**	@param sx	X map tile position of area in Map to be checked.
+**	@param sy	Y map tile position of area in Map to be checked.
+**	@param ex	X map tile position of area in Map to be checked.
+**	@param ey	Y map tile position of area in Map to be checked.
 **
-**	@return		    True if any part of area is visible, false otherwise
+**	@return		True if any part of area is visible, false otherwise
 */
 global int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
 {
@@ -1457,9 +1461,12 @@ global int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
 /**
 **	Mark overlapping area with screenmap be drawn for next display update.
 **
-**	@param sx,sy,ex,ey  area in Map to be checked.
+**	@param sx	X map tile position of area in Map to be marked.
+**	@param sy	Y map tile position of area in Map to be marked.
+**	@param ex	X map tile position of area in Map to be marked.
+**	@param ey	Y map tile position of area in Map to be marked.
 **
-**	@return		    True if overlapping and marked, false otherwise.
+**	@return		True if overlapping and marked, false otherwise.
 **
 **	@see MustRedrawRow @see MustRedrawTile.
 */

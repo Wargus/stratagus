@@ -342,6 +342,9 @@ global void MapRemoveWall(unsigned x,unsigned y)
 **
 **	@param x	Map X position.
 **	@param y	Map Y position.
+**	@param humanwall	Flag, if true set a human wall.
+**
+**	@todo	FIXME: support for more races.
 */
 global void MapSetWall(unsigned x,unsigned y,int humanwall)
 {

@@ -442,8 +442,10 @@ local void DebugBits(unsigned long bits)
 
 #endif
 
+#if 0
+
 // ===========================================================================
-//	Color
+//	Color - unused!
 // ===========================================================================
 
 /**
@@ -532,7 +534,7 @@ local unsigned long irgb2rgb( unsigned char irgb )
 **	Convert unsigned long RGB to IRGB
 **      FIXME: will not work, improve and move to video.c?
 **
-**	@param r	Color Red-value.
+**	@param rbg	Color Red-value.
 **
 **	|0000|0000|RRRR|0000|00GG|GG00|0000|BBBB| --> |IIRR|GGBB|
 */
@@ -551,6 +553,7 @@ local unsigned char rgb2irgb( unsigned long rgb )
   return i;
 }
 
+#endif
 
 // ===========================================================================
 //	Pixel
@@ -1753,10 +1756,11 @@ local void DrawTransHLine8(SysColors color,int x,int y,unsigned width
 /**
 **	Draw horizontal line unclipped into 8bit framebuffer (ignoring alpha).
 **
-**	@param color	Color index.
-**	@param x	x coordinate on the screen
-**	@param y	y coordinate on the screen
-**      @param alpha    alpha value of pixel.
+**	@param color	Color index
+**	@param x	x pixel coordinate on the screen
+**	@param y	y pixel coordinate on the screen
+**	@param width	Line width in pixel
+**      @param alpha    alpha value of pixel
 */
 local void DrawNoTransHLine8(SysColors color,int x,int y,unsigned width
         ,unsigned char alpha __attribute__((unused)))
@@ -1990,11 +1994,11 @@ global void VideoDraw75TransHLineClip(SysColors color,int x,int y,unsigned width
 /**
 **	Draw translucent horizontal line clipped.
 **
-**	@param color	Color index.
-**	@param x	x coordinate on the screen
-**	@param y	y coordinate on the screen
-**	@param width	width of line.
-**	@param alpha	alpha value of pixels.
+**	@param color	Color index
+**	@param x	X pixel coordinate on the screen
+**	@param y	Y c pixeloordinate on the screen
+**	@param width	Width of line (0=don't draw)
+**	@param alpha	Alpha value of pixels
 */
 global void VideoDrawTransHLineClip(SysColors color,int x,int y,unsigned width
 	,unsigned char alpha)
@@ -2564,6 +2568,7 @@ local void DrawTransVLine8(SysColors color,int x,int y,unsigned height
 **	@param color	Color index.
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
+**	@param height	Height = length of the line.
 **      @param alpha    alpha value of pixel.
 */
 local void DrawNoTransVLine8(SysColors color,int x,int y,unsigned height
@@ -4278,10 +4283,12 @@ local void DrawTransRectangle8(SysColors color,int x,int y
 /**
 **	Draw rectangle into 8bpp frame buffer (ignoring alpha).
 **
-**	@param color	Color index.
-**	@param x	x coordinate on the screen
-**	@param y	y coordinate on the screen
-**      @param alpha    alpha value of pixel.
+**	@param color	Color index
+**	@param x	X pixel coordinate on the screen
+**	@param y	Y pixel coordinate on the screen
+**	@param w	Width in pixel of the rectangle
+**	@param h	Height in pixel of the rectangle
+**      @param alpha    Alpha value of pixel
 */
 local void DrawNoTransRectangle8(SysColors color,int x,int y
 	,unsigned w,unsigned h,unsigned char alpha __attribute__((unused)))

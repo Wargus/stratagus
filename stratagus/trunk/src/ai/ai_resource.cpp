@@ -144,7 +144,7 @@ local int AiCheckFood(const PlayerAi* pai,const UnitType* type)
 **
 **	Take reserve and already used resources into account.
 **
-**	@param costs	Costs for something.
+**	@param type	Unit-type to check the costs for.
 **
 **	@return		A bit field of the missing costs.
 */
@@ -700,9 +700,9 @@ local void AiCheckingWork(void)
 /**
 **	Find the nearest gold mine for unit from x,y.
 **
-**	@param unit	Pointer for source unit.
-**	@param x	X tile position to start.
-**	@param y	Y tile position to start.
+**	@param source	Pointer for source unit.
+**	@param x	X tile position to start (Unused).
+**	@param y	Y tile position to start (Unused).
 **
 **	@return		Pointer to the nearest reachable gold mine.
 **

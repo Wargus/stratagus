@@ -344,6 +344,7 @@ local Missile* NewLocalMissile(void)
 /**
 **	Initialize a new made missle.
 **
+**	@param missile	Pointer to new uninitialized missile.
 **	@param mtype	Type pointer of missile.
 **	@param sx	Missile x start point in pixel.
 **	@param sy	Missile y start point in pixel.
@@ -498,14 +499,14 @@ local void FreeMissile(Missile* missile)
 **	NOTE: hidden targets are hit worser.
 **	NOTE: targets higher are hit worser.
 **
-**	@param attack_stats	Attacker attributes.
+**	@param attacker_stats	Attacker attributes.
 **	@param goal_stats	Goal attributes.
 **	@param bloodlust	If attacker has bloodlust
 **
 **	@return			damage produces on goal.
 */
-local int CalculateDamageStats(const UnitStats * attacker_stats,
-	const UnitStats * goal_stats, int bloodlust)
+local int CalculateDamageStats(const UnitStats* attacker_stats,
+	const UnitStats* goal_stats, int bloodlust)
 {
     int damage;
     int basic_damage;
@@ -536,7 +537,7 @@ local int CalculateDamageStats(const UnitStats * attacker_stats,
 /**
 **	Calculate damage.
 **
-**	@param attack_stats	Attacker attributes.
+**	@param attacker_stats	Attacker attributes.
 **	@param goal		Goal unit.
 **	@param bloodlust	If attacker has bloodlust
 **	@return			damage produces on goal.
@@ -660,10 +661,14 @@ global void FireMissile(Unit* unit)
 **      Get area of tiles covered by missile
 **
 **      @param missile  Missile to be checked and set.
+**	@param sx	OUT: Pointer to X of top left corner in map tiles.
+**	@param sy	OUT: Pointer to Y of top left corner in map tiles.
+**	@param ex	OUT: Pointer to X of bottom right corner in map tiles.
+**	@param ey	OUT: Pointer to Y of bottom right corner in map tiles.
 **      @return         sx,sy,ex,ey defining area in Map
 */
 local void GetMissileMapArea( const Missile* missile,
-			      int *sx, int *sy, int *ex, int *ey )
+			      int* sx, int* sy, int* ex, int* ey )
 {
     *sx=missile->X/TileSizeX;
     *sy=missile->Y/TileSizeY;
@@ -949,9 +954,11 @@ local void MissileHitsGoal(const Missile* missile,Unit* goal,int splash)
 **	Missile hits wall.
 **
 **	@param missile	Missile hitting the goal.
-**	@param X	Wall X position.
-**	@param Y	Wall Y position.
+**	@param x	Wall X map tile position.
+**	@param y	Wall Y map tile position.
 **	@param splash	Splash damage divisor.
+**
+**	@todo	FIXME: Support for more races.
 */
 local void MissileHitsWall(const Missile* missile,int x,int y,int splash)
 {

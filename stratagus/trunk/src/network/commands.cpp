@@ -70,7 +70,7 @@ global int CommandLogEnabled;		/// True if command log is on
 **	@param x	optional X map position.
 **	@param y	optional y map position.
 **	@param dest	optional destination unit.
-**	@param type	optional command argument (unit-type,...).
+**	@param value	optional command argument (unit-type,...).
 **	@param num	optional number argument
 */
 local void CommandLog(const char* name,const Unit* unit,int flag,
@@ -182,8 +182,7 @@ global void SendCommandStandGround(Unit* unit,int flush)
 **	Send command: Follow unit to position.
 **
 **	@param unit	pointer to unit.
-**	@param x	X map tile position to move to.
-**	@param y	Y map tile position to move to.
+**	@param dest	follow this unit.
 **	@param flush	Flag flush all pending commands.
 */
 global void SendCommandFollow(Unit* unit,Unit* dest,int flush)
@@ -292,6 +291,8 @@ global void SendCommandPatrol(Unit* unit,int x,int y,int flush)
 **	Send command: Unit board unit.
 **
 **	@param unit	pointer to unit.
+**	@param x	X map tile position (unused).
+**	@param y	Y map tile position (unused).
 **	@param dest	Destination to be boarded.
 **	@param flush	Flag flush all pending commands.
 */
@@ -348,6 +349,7 @@ global void SendCommandBuildBuilding(Unit* unit,int x,int y
 **	Send command: Cancel this building construction.
 **
 **	@param unit	pointer to unit.
+**	@param worker	Worker which should stop.
 */
 global void SendCommandCancelBuilding(Unit* unit,Unit* worker)
 {
@@ -557,7 +559,7 @@ global void SendCommandDemolish(Unit* unit,int x,int y,Unit* attack,int flush)
 **	@param unit	pointer to unit.
 **	@param x	X map tile position where to cast spell.
 **	@param y	Y map tile position where to cast spell.
-**	@param attack	Cast spell on unit (if exist).
+**	@param dest	Cast spell on unit (if exist).
 **	@param spellid  Spell type id.
 **	@param flush	Flag flush all pending commands.
 */

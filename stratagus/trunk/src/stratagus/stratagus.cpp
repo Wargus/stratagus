@@ -358,7 +358,7 @@ local void WaitCallbackExit(void)
 /**
 **	Wait for any input.
 **
-**	@param time	Time in seconds to wait.
+**	@param timeout	Time in seconds to wait.
 */
 local void WaitForInput(int timeout)
 {
