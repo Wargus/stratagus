@@ -1244,11 +1244,11 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 
     if (x1<0) x1=0;
     if (y1<0) y1=0;
-    if( x2>TheMap.Width ) {
-	x2=TheMap.Width;
+    if( x2>TheMap.Width-1 ) {
+	x2=TheMap.Width-1;
     }
-    if( y2>TheMap.Height ) {
-	y2=TheMap.Height;
+    if( y2>TheMap.Height-1 ) {
+	y2=TheMap.Height-1;
     }
 
     mf = TheMap.Fields + y1*TheMap.Width + x1;
@@ -1264,18 +1264,22 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 
 	if (BuildingOnMapField (mfptr))
 	    if (NeighborCheck (mfptr, MapFieldBuilding, checktype)) {
+		DebugCheck (!UnitSlots[mfptr->Building]);
 		table[n++]=UnitSlots[mfptr->Building];
 	    }
 	if (LandUnitOnMapField (mfptr))
 	    if (NeighborCheck (mfptr, MapFieldLandUnit, checktype)) {
+		DebugCheck (!UnitSlots[mfptr->LandUnit]);
 		table[n++]=UnitSlots[mfptr->LandUnit];
 	    }
 	if (SeaUnitOnMapField (mfptr))
 	    if (NeighborCheck (mfptr, MapFieldSeaUnit, checktype)) {
+		DebugCheck (!UnitSlots[mfptr->SeaUnit]);
 		table[n++]=UnitSlots[mfptr->SeaUnit];
 	    }
 	if (AirUnitOnMapField (mfptr))
 	    if (NeighborCheck (mfptr, MapFieldAirUnit, checktype)) {
+		DebugCheck (!UnitSlots[mfptr->AirUnit]);
 		table[n++]=UnitSlots[mfptr->AirUnit];
 	    }
     }
@@ -1292,18 +1296,22 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 
 	    if (BuildingOnMapField (mfptr))
 		if (NeighborCheck (mfptr, MapFieldBuilding, checktype)) {
+		    DebugCheck (!UnitSlots[mfptr->Building]);
 		    table[n++]=UnitSlots[mfptr->Building];
 		}
 	    if (LandUnitOnMapField (mfptr))
 		if (NeighborCheck (mfptr, MapFieldLandUnit, checktype)) {
+		    DebugCheck (!UnitSlots[mfptr->LandUnit]);
 		    table[n++]=UnitSlots[mfptr->LandUnit];
 		}
 	    if (SeaUnitOnMapField (mfptr))
 		if (NeighborCheck (mfptr, MapFieldSeaUnit, checktype)) {
+		    DebugCheck (!UnitSlots[mfptr->SeaUnit]);
 		    table[n++]=UnitSlots[mfptr->SeaUnit];
 		}
 	    if (AirUnitOnMapField (mfptr))
 		 if (NeighborCheck (mfptr, MapFieldAirUnit, checktype)) {
+		    DebugCheck (!UnitSlots[mfptr->AirUnit]);
 		    table[n++]=UnitSlots[mfptr->AirUnit];
 		}
 	    mfptr++;
