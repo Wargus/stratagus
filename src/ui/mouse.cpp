@@ -136,7 +136,11 @@ global void DoRightButton(int sx, int sy)
 	//
 	flush = !(KeyModifiers & ModifierShift);
 
-	dest = UnitUnderCursor;
+	if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration) {
+		dest = UnitUnderCursor;
+	} else {
+		dest = NULL;
+	}
 
 	// don't allow stopping enemy transporters!
 	if (dest && dest->Type->Transporter && (!dest->Type->Building) &&
@@ -773,7 +777,7 @@ global void UIHandleMouseMove(int x, int y)
 	if (CursorState == CursorStateSelect) {
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
 			GameCursor = TheUI.YellowHair.Cursor;
-			if (UnitUnderCursor) {
+			if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration) {
 				if (IsAllied(ThisPlayer, UnitUnderCursor)) {
 					GameCursor = TheUI.GreenHair.Cursor;
 				} else if (UnitUnderCursor->Player->Player != PlayerNumNeutral) {
@@ -800,8 +804,8 @@ global void UIHandleMouseMove(int x, int y)
 		//
 		//		Map
 		//
-		if (UnitUnderCursor && (UnitVisible(UnitUnderCursor, ThisPlayer) ||
-				ReplayRevealMap)) {
+		if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration &&
+				(UnitVisible(UnitUnderCursor, ThisPlayer) || ReplayRevealMap)) {
 			if (NumSelected == 0) {
 				MustRedraw |= RedrawInfoPanel;
 			}
@@ -1504,7 +1508,8 @@ global void UIHandleButtonDown(unsigned button)
 					y = (TheMap.Height - 1) * TileSizeY;
 				}
 
-				if (UnitUnderCursor && (unit = UnitOnMapTile(x / TileSizeX, y / TileSizeY))) {
+				if (UnitUnderCursor && (unit = UnitOnMapTile(x / TileSizeX, y / TileSizeY)) &&
+					!UnitUnderCursor->Type->Decoration) {
 					unit->Blink = 4;		// if right click on building -- blink
 				} else {		// if not not click on building -- green cross
 					if (ClickMissile) {
