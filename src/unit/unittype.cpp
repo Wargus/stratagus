@@ -286,6 +286,7 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 		DebugLevel0("***\n\n");
 	}
 #endif
+	DebugLevel0Fn("This PUD has an UDTA section, we are not sure it works.\n");
 	start = udta;
 
 	for (i = 0; i < 110; ++i) {				// overlap frames
@@ -335,9 +336,9 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	for (i = 0; i < 110; ++i) {				// Unit size in tiles
 		unittype = UnitTypeByWcNum(i);
 		v = FetchLE16(udta);
-		unittype->TileWidth = v;
+		//unittype->TileWidth = v;
 		v = FetchLE16(udta);
-		unittype->TileHeight = v;
+		//unittype->TileHeight = v
 	}
 	for (i = 0; i < 110; ++i) {				// Box size in pixel
 		unittype = UnitTypeByWcNum(i);
@@ -482,11 +483,10 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 		unittype->CanStore[GoldCost] = BIT(12, v);
 		unittype->Vanishes = BIT(13, v);
 		unittype->GroundAttack = BIT(14, v);
+//		No idea on what do about commented stuff.
 //		unittype->IsUndead = BIT(15, v);
 		unittype->ShoreBuilding = BIT(16, v);
 //		unittype->CanCastSpell = BIT(17,v);
-//		unittype->CanCastSpell = (char*)malloc(/*nb_spell*/);
-		unittype->CanCastSpell = NULL;//
 		unittype->CanStore[WoodCost] = BIT(18, v);
 		unittype->CanAttack = BIT(19, v);
 //		unittype->Hero = BIT(23, v);
