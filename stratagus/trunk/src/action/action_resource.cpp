@@ -84,8 +84,8 @@ local int MoveToResource(Unit* unit)
 	y = unit->Orders->Y;
 	// Wood gone, look somewhere else.
 	if ((!ForestOnMap(x, y)) && (!unit->IX) && (!unit->IY)) {
-	    if (!FindTerrainType(UnitMovementMask(unit), MapFieldForest, 0, 10,
-		    unit->Player, unit->X, unit->Y, &x, &y)) {
+	    if (!FindTerrainType(UnitMovementMask(unit), MapFieldForest, 0, 16,
+		    unit->Player, unit->Orders->X, unit->Orders->Y, &x, &y)) {
 		DebugLevel3Fn("No wood in range\n");
 		return -1;
 	    } else {

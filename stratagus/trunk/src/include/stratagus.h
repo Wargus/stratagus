@@ -326,7 +326,6 @@ extern char NameLine[];
 #endif
 
 #define MAGIC_FOR_NEW_UNITS	33	/// How many percent of max mana for new units
-#define DEMOLISH_DAMAGE		400	/// Damage for demolish attack
 
 /*----------------------------------------------------------------------------
 --	Some limits
