@@ -45,10 +45,7 @@
 #endif
 #include <SDL.h>
 #ifdef USE_OPENGL
-#ifdef USE_WIN32
-#include <windows.h>
-#endif
-#include <GL/gl.h>
+#include <SDL_opengl.h>
 #endif
 
 #ifdef USE_BEOS
