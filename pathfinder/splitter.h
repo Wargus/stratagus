@@ -3,7 +3,7 @@
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -33,17 +33,17 @@
 #define __SPLITTER_H__
 
 /*----------------------------------------------------------------------------
---	Constants
+--		Constants
 ----------------------------------------------------------------------------*/
 
 // Should be enough for every one :-)
-#define MaxZoneNumber		512	/// Max number of zone ( separated area )
-#define MaxRegionNumber		4096	/// Max number of regions ( divisions of zones )
+#define MaxZoneNumber				512		/// Max number of zone ( separated area )
+#define MaxRegionNumber				4096		/// Max number of regions ( divisions of zones )
 
-#define NoRegion 		((RegionId)~0UL)
+#define NoRegion 				((RegionId)~0UL)
 
 /*----------------------------------------------------------------------------
---	Structures
+--		Structures
 ----------------------------------------------------------------------------*/
 
 /// Region identifier
@@ -52,14 +52,14 @@ typedef unsigned short int RegionId;
 
 /// Zone marque list. Must be a global variable, with MarqueId initialised to 0
 typedef struct _zone_set_ {
-    int		Id;			/// Internal - must be initialised to 0
-    int		ZoneCount;		/// N° of marqued zones
-    int		Marks[MaxZoneNumber];	/// ZoneMarque[zone] ?= MarqueId
-    int		Zones[MaxZoneNumber];	/// List of marqued zones
+	int				Id;						/// Internal - must be initialised to 0
+	int				ZoneCount;				/// N° of marqued zones
+	int				Marks[MaxZoneNumber];		/// ZoneMarque[zone] ?= MarqueId
+	int				Zones[MaxZoneNumber];		/// List of marqued zones
 }ZoneSet;
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 /// Initialise the region system

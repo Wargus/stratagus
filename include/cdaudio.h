@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -44,81 +44,81 @@
 #endif
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_SDLCD) 
-#include "SDL.h" 
-#elif defined(USE_LIBCDA) 
-#include "libcda.h" 
-#elif defined(USE_CDDA) 
-#include <linux/cdrom.h> 
-#include <fcntl.h> 
-#include <sys/ioctl.h> 
+#if defined(USE_SDLCD)
+#include "SDL.h"
+#elif defined(USE_LIBCDA)
+#include "libcda.h"
+#elif defined(USE_CDDA)
+#include <linux/cdrom.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 #include "iocompat.h"
-#endif 
+#endif
 
 #include "sound_server.h"
 
 /*----------------------------------------------------------------------------
---	Declarations
+--		Declarations
 ----------------------------------------------------------------------------*/
 
 typedef enum _cd_modes_ {
-    CDModeStopped = -1,                 /// Stopped
-    CDModeOff,                          /// Off
-    CDModeAll,                          /// All
-    CDModeRandom,                       /// Random
-    CDModeDefined,                      /// Defined
+	CDModeStopped = -1,				 /// Stopped
+	CDModeOff,						  /// Off
+	CDModeAll,						  /// All
+	CDModeRandom,					   /// Random
+	CDModeDefined,					  /// Defined
 } CDModes;
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
-extern CDModes CDMode;                  /// CD mode
-extern int CDTrack;			/// Current track
-extern int NumCDTracks;			/// Number of tracks on CD
+extern CDModes CDMode;				  /// CD mode
+extern int CDTrack;						/// Current track
+extern int NumCDTracks;						/// Number of tracks on CD
 
 #ifdef USE_CDDA
-extern int CDDrive;				/// CDRom device
-extern struct cdrom_tocentry CDtocentry[64];	/// TOC track header struct
+extern int CDDrive;								/// CDRom device
+extern struct cdrom_tocentry CDtocentry[64];		/// TOC track header struct
 #endif
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_CDDA
-    /// Load a cd track
-extern Sample* LoadCD(const char* name,int flags);      
-#endif 
+	/// Load a cd track
+extern Sample* LoadCD(const char* name,int flags);
+#endif
 
-    /// Play CDMode 'name'
+	/// Play CDMode 'name'
 extern int PlayCDRom(int name);
-    /// Play 'track'
+	/// Play 'track'
 extern int PlayCDTrack(int track);
-    /// Is 'track' an audio track?
+	/// Is 'track' an audio track?
 extern int IsAudioTrack(int track);
-    /// Get cd volume (0-255)
+	/// Get cd volume (0-255)
 extern int GetCDVolume(void);
-    /// Set cd volume (0-255)
+	/// Set cd volume (0-255)
 extern void SetCDVolume(int vol);
-    /// Resume CD
+	/// Resume CD
 extern void ResumeCD(void);
-    /// Pause CD
+	/// Pause CD
 extern void PauseCD(void);
-    /// Close CD
+	/// Close CD
 extern void QuitCD(void);
-    /// Check the cdrom status
+	/// Check the cdrom status
 extern int CDRomCheck(void *);
 
 #else
 
-#define QuitCD()                        /// Dummy macro for without cd
+#define QuitCD()						/// Dummy macro for without cd
 
 #endif
 
 //@}
 
-#endif	// !__CDAUDIO_H__
+#endif		// !__CDAUDIO_H__

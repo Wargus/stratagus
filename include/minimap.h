@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,56 +34,56 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Declarations
+--		Declarations
 ----------------------------------------------------------------------------*/
 
-#define MINIMAP_FAC	(16*3)		/// integer scale factor
+#define MINIMAP_FAC		(16*3)				/// integer scale factor
 
-    /// unit attacked are shown red for at least this amount of cycles
-#define ATTACK_RED_DURATION	(1*CYCLES_PER_SECOND)
-    /// unit attacked are shown blinking for this amount of cycles
-#define ATTACK_BLINK_DURATION	(7*CYCLES_PER_SECOND)
+	/// unit attacked are shown red for at least this amount of cycles
+#define ATTACK_RED_DURATION		(1*CYCLES_PER_SECOND)
+	/// unit attacked are shown blinking for this amount of cycles
+#define ATTACK_BLINK_DURATION		(7*CYCLES_PER_SECOND)
 
-    /// Update seen tile change in minimap
+	/// Update seen tile change in minimap
 #define UpdateMinimapSeenXY(tx,ty)
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
-extern int MinimapX;			/// Minimap drawing position x offset
-extern int MinimapY;			/// Minimap drawing position y offset
+extern int MinimapX;						/// Minimap drawing position x offset
+extern int MinimapY;						/// Minimap drawing position y offset
 
-extern int MinimapWithTerrain;		/// display minimap with terrain
-extern int MinimapFriendly;		/// switch colors of friendly units
-extern int MinimapShowSelected;		/// highlight selected units
+extern int MinimapWithTerrain;				/// display minimap with terrain
+extern int MinimapFriendly;				/// switch colors of friendly units
+extern int MinimapShowSelected;				/// highlight selected units
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
-    /// Update tile change in minimap
+	/// Update tile change in minimap
 extern void UpdateMinimapXY(int tx,int ty);
-    /// Update minimap terrain
+	/// Update minimap terrain
 extern void UpdateMinimapTerrain(void);
-    /// Update complete minimap
+	/// Update complete minimap
 extern void UpdateMinimap(void);
-    /// Create new minimap
+	/// Create new minimap
 extern void CreateMinimap(void);
-    /// Destroy minimap
+	/// Destroy minimap
 extern void DestroyMinimap(void);
-    /// Draw minimap with viewpoint
+	/// Draw minimap with viewpoint
 extern void DrawMinimap(int vx,int vy);
-    /// Hide minimap cursor
+	/// Hide minimap cursor
 extern void HideMinimapCursor(void);
-    /// Draw minimap viewpoint cursor
+	/// Draw minimap viewpoint cursor
 extern void DrawMinimapCursor(int vx,int vy);
 
-    ///	Convert minimap cursor X position to tile map coordinate
+	///		Convert minimap cursor X position to tile map coordinate
 extern int ScreenMinimap2MapX(int);
-    ///	Convert minimap cursor Y position to tile map coordinate
+	///		Convert minimap cursor Y position to tile map coordinate
 extern int ScreenMinimap2MapY(int);
 
 //@}
 
-#endif	// !__MINIMAP_H__
+#endif		// !__MINIMAP_H__

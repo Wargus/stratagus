@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,7 +34,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #define DrawIcon WinDrawIcon
@@ -55,16 +55,16 @@
 #undef FindResource
 
 /*----------------------------------------------------------------------------
---	Definitons
+--		Definitons
 ----------------------------------------------------------------------------*/
 
 /**
-**	FileList struct used by directory access routine
+**		FileList struct used by directory access routine
 */
 typedef struct _filelist_ {
-    char	*name;			/// Name of the file
-    int		type;			/// Type of the file
-    void	*xdata;			/// Extra data attached by high level
+	char		*name;						/// Name of the file
+	int				type;						/// Type of the file
+	void		*xdata;						/// Extra data attached by high level
 } FileList;
 
 
@@ -74,40 +74,40 @@ typedef struct _filelist_ {
 // FIXME: but we can avoid it anyway.
 // use plain file routines directly
 
-#define CLFile				FILE
-#define CLopen(file,whatever)		fopen(file,"rwb")
-#define CLread(file,buf,len)		fread(buf,1,len,file)
-#define CLseek(file,offset,whence)	fseek(file,offset,whence)
-#define CLflush(file)			fflush(file)
-#define CLclose(file)			fclose(file)
+#define CLFile								FILE
+#define CLopen(file,whatever)				fopen(file,"rwb")
+#define CLread(file,buf,len)				fread(buf,1,len,file)
+#define CLseek(file,offset,whence)		fseek(file,offset,whence)
+#define CLflush(file)						fflush(file)
+#define CLclose(file)						fclose(file)
 
-#else	// !USE_ZLIB && !USE_BZ2LIB && !defined(USE_ZZIPLIB)
+#else		// !USE_ZLIB && !USE_BZ2LIB && !defined(USE_ZZIPLIB)
 
 /**
-**	Defines a library file
+**		Defines a library file
 **
-**	@todo	zip archive support
+**		@todo		zip archive support
 */
 typedef struct _CL_File_ {
-    int		cl_type;		/// type of CLFile
-    FILE	*cl_plain;		/// standard file pointer
+	int				cl_type;				/// type of CLFile
+	FILE		*cl_plain;				/// standard file pointer
 #ifdef USE_ZLIB
-    gzFile	*cl_gz;			/// gzip file pointer
-#endif	// !USE_ZLIB
+	gzFile		*cl_gz;						/// gzip file pointer
+#endif		// !USE_ZLIB
 #ifdef USE_BZ2LIB
-    BZFILE	*cl_bz;			/// bzip2 file pointer
-#endif	// !USE_BZ2LIB
+	BZFILE		*cl_bz;						/// bzip2 file pointer
+#endif		// !USE_BZ2LIB
 #ifdef USE_ZZIPLIB
-    ZZIP_FILE	*cl_zz;			/// zzip file pointer
-#endif	// !USE_ZZIPLIB
+	ZZIP_FILE		*cl_zz;						/// zzip file pointer
+#endif		// !USE_ZZIPLIB
 } CLFile;
 
 enum {
-    CLF_TYPE_INVALID,			/// invalid file handle
-    CLF_TYPE_PLAIN,			/// plain text file handle
-    CLF_TYPE_GZIP,			/// gzip file handle
-    CLF_TYPE_BZIP2,			/// bzip2 file handle
-    CLF_TYPE_ZZIP,			/// zzip file handle
+	CLF_TYPE_INVALID,						/// invalid file handle
+	CLF_TYPE_PLAIN,						/// plain text file handle
+	CLF_TYPE_GZIP,						/// gzip file handle
+	CLF_TYPE_BZIP2,						/// bzip2 file handle
+	CLF_TYPE_ZZIP,						/// zzip file handle
 };
 
 #define CL_OPEN_READ 0x1
@@ -116,31 +116,31 @@ enum {
 #define CL_WRITE_BZ2 0x8
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
-    ///  Library file open
+	///  Library file open
 extern CLFile *CLopen(const char *fn,long flags);
-    ///  Library file close
+	///  Library file close
 extern int CLclose(CLFile *file);
-    ///  Library file flush
+	///  Library file flush
 extern void CLflush(CLFile *file);
-    ///  Library file read
+	///  Library file read
 extern int CLread(CLFile *file, void *buf, size_t len);
-    ///  Library file seek
+	///  Library file seek
 extern int CLseek(CLFile *file, long offset, int whence);
-    ///  Library file write
+	///  Library file write
 extern int CLprintf(CLFile *file, char *format, ...);
 
 
-#endif	// USE_ZLIB || USE_BZ2LIB || USE_ZZIPLIB
+#endif		// USE_ZLIB || USE_BZ2LIB || USE_ZZIPLIB
 
-    /// Build libary path name
+	/// Build libary path name
 extern char* LibraryFileName(const char* file,char* buffer);
 
-    /// Read the contents of a directory
+	/// Read the contents of a directory
 extern int ReadDataDirectory(const char* dirname,int (*filter)(char *,FileList *),FileList **flp);
 
 //@}
 
-#endif	// !__IOLIB_H__
+#endif		// !__IOLIB_H__

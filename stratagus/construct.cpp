@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -46,699 +46,699 @@
 #include "ccl.h"
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**	Construction type definition
+**		Construction type definition
 */
 global const char ConstructionType[] = "construction";
 
 /**
-**	Constructions.
+**		Constructions.
 */
 local Construction** Constructions;
 
 /**
-**	Table mapping the original construction numbers in puds to
-**	our internal string.
+**		Table mapping the original construction numbers in puds to
+**		our internal string.
 */
 global char** ConstructionWcNames;
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Initialize  the constructions.
+**		Initialize  the constructions.
 */
 global void InitConstructions(void)
 {
 }
 
 /**
-**	Load the graphics for the constructions.
+**		Load the graphics for the constructions.
 **
-**	HELPME:	who make this better terrain depended and extendable
-**	HELPME: filename constuction.
+**		HELPME:		who make this better terrain depended and extendable
+**		HELPME: filename constuction.
 */
 global void LoadConstructions(void)
 {
-    const char* file;
-    Construction** cop;
+	const char* file;
+	Construction** cop;
 
-    if ((cop = Constructions)) {
-	while (*cop) {
-	    if (!(*cop)->Ident) {
-		continue;
-	    }
-	    file = (*cop)->File[TheMap.Terrain].File;
-	    if (file) {			// default one
-		(*cop)->Width = (*cop)->File[TheMap.Terrain].Width;
-		(*cop)->Height = (*cop)->File[TheMap.Terrain].Height;
-	    } else {
-		file = (*cop)->File[0].File;
-		(*cop)->Width = (*cop)->File[0].Width;
-		(*cop)->Height = (*cop)->File[0].Height;
-	    }
-	    if (file && *file) {
-		char* buf;
+	if ((cop = Constructions)) {
+		while (*cop) {
+			if (!(*cop)->Ident) {
+				continue;
+			}
+			file = (*cop)->File[TheMap.Terrain].File;
+			if (file) {						// default one
+				(*cop)->Width = (*cop)->File[TheMap.Terrain].Width;
+				(*cop)->Height = (*cop)->File[TheMap.Terrain].Height;
+			} else {
+				file = (*cop)->File[0].File;
+				(*cop)->Width = (*cop)->File[0].Width;
+				(*cop)->Height = (*cop)->File[0].Height;
+			}
+			if (file && *file) {
+				char* buf;
 
-		buf = alloca(strlen(file) + 9 + 1);
-		file = strcat(strcpy(buf, "graphics/"), file);
-		ShowLoadProgress("Construction %s", file);
-		(*cop)->Sprite = LoadSprite(file,
-		    (*cop)->Width, (*cop)->Height);
-	    }
-	    file = (*cop)->ShadowFile[TheMap.Terrain].File;
-	    if (file) {
-		(*cop)->ShadowWidth = (*cop)->ShadowFile[TheMap.Terrain].Width;
-		(*cop)->ShadowHeight = (*cop)->ShadowFile[TheMap.Terrain].Height;
-	    } else {
-		file = (*cop)->ShadowFile[0].File;
-		(*cop)->ShadowWidth = (*cop)->ShadowFile[0].Width;
-		(*cop)->ShadowHeight = (*cop)->ShadowFile[0].Height;
-	    }
-	    if (file && *file) {
-		char* buf;
+				buf = alloca(strlen(file) + 9 + 1);
+				file = strcat(strcpy(buf, "graphics/"), file);
+				ShowLoadProgress("Construction %s", file);
+				(*cop)->Sprite = LoadSprite(file,
+					(*cop)->Width, (*cop)->Height);
+			}
+			file = (*cop)->ShadowFile[TheMap.Terrain].File;
+			if (file) {
+				(*cop)->ShadowWidth = (*cop)->ShadowFile[TheMap.Terrain].Width;
+				(*cop)->ShadowHeight = (*cop)->ShadowFile[TheMap.Terrain].Height;
+			} else {
+				file = (*cop)->ShadowFile[0].File;
+				(*cop)->ShadowWidth = (*cop)->ShadowFile[0].Width;
+				(*cop)->ShadowHeight = (*cop)->ShadowFile[0].Height;
+			}
+			if (file && *file) {
+				char* buf;
 
-		buf = alloca(strlen(file) + 9 + 1);
-		file = strcat(strcpy(buf, "graphics/"), file);
-		ShowLoadProgress("Construction %s", file);
-		(*cop)->ShadowSprite = LoadSprite(file,
-		    (*cop)->ShadowWidth, (*cop)->ShadowHeight);
-	    }
-	    ++cop;
+				buf = alloca(strlen(file) + 9 + 1);
+				file = strcat(strcpy(buf, "graphics/"), file);
+				ShowLoadProgress("Construction %s", file);
+				(*cop)->ShadowSprite = LoadSprite(file,
+					(*cop)->ShadowWidth, (*cop)->ShadowHeight);
+			}
+			++cop;
+		}
 	}
-    }
 }
 
 /**
-**	Save state of constructions to file.
+**		Save state of constructions to file.
 **
-**	@param file	Output file.
+**		@param file		Output file.
 */
 global void SaveConstructions(CLFile* file)
 {
-    int j;
-    int i;
-    char** cp;
-    Construction** cop;
-    ConstructionFrame* cframe;
+	int j;
+	int i;
+	char** cp;
+	Construction** cop;
+	ConstructionFrame* cframe;
 
-    CLprintf(file, "\n;;; -----------------------------------------\n");
-    CLprintf(file, ";;; MODULE: constructions $Id$\n\n");
+	CLprintf(file, "\n;;; -----------------------------------------\n");
+	CLprintf(file, ";;; MODULE: constructions $Id$\n\n");
 
-    // FIXME: needed?
+	// FIXME: needed?
 
-    //
-    //	Dump table wc2 construction numbers -> internal symbol.
-    //
-    if ((cp = ConstructionWcNames)) {
-	CLprintf(file, "(define-construction-wc-names");
+	//
+	//		Dump table wc2 construction numbers -> internal symbol.
+	//
+	if ((cp = ConstructionWcNames)) {
+		CLprintf(file, "(define-construction-wc-names");
 
-	i = 90;
-	while (*cp) {
-	    if (i + strlen(*cp) > 79) {
-		i = CLprintf(file, "\n ");
-	    }
-	    i += CLprintf(file, " '%s", *cp++);
+		i = 90;
+		while (*cp) {
+			if (i + strlen(*cp) > 79) {
+				i = CLprintf(file, "\n ");
+			}
+			i += CLprintf(file, " '%s", *cp++);
+		}
+		CLprintf(file, ")\n\n");
 	}
-	CLprintf(file, ")\n\n");
-    }
 
-    //
-    //	Dump table of all constructions
-    //
-    if ((cop = Constructions)) {
-	while (*cop) {
-	    if (!(*cop)->Ident) {
-		continue;
-	    }
-	    CLprintf(file, "(define-construction '%s\n", (*cop)->Ident);
-	    for (j = 0; j < TilesetMax; ++j) {
-		if (!(*cop)->File[j].File) {
-		    continue;
+	//
+	//		Dump table of all constructions
+	//
+	if ((cop = Constructions)) {
+		while (*cop) {
+			if (!(*cop)->Ident) {
+				continue;
+			}
+			CLprintf(file, "(define-construction '%s\n", (*cop)->Ident);
+			for (j = 0; j < TilesetMax; ++j) {
+				if (!(*cop)->File[j].File) {
+					continue;
+				}
+				CLprintf(file, "  'file '(\n");
+				CLprintf(file, "	tileset %s\n", Tilesets[j]->Class);
+				CLprintf(file, "	file  \"%s\"\n", (*cop)->File[j].File);
+				CLprintf(file, "	size (%d %d))\n", (*cop)->File[j].Width,
+					(*cop)->File[j].Height);
+			}
+			for (j = 0; j < TilesetMax; ++j) {
+				if (!(*cop)->ShadowFile[j].File) {
+					continue;
+				}
+				CLprintf(file, "  'shadow-file '(\n");
+				CLprintf(file, "	tileset %s\n", Tilesets[j]->Class);
+				CLprintf(file, "	file  \"%s\"\n", (*cop)->ShadowFile[j].File);
+				CLprintf(file, "	size (%d %d))\n", (*cop)->ShadowFile[j].Width,
+					(*cop)->ShadowFile[j].Height);
+			}
+			cframe = (*cop)->Frames;
+			if (cframe) {
+				CLprintf(file, "  'constructions (list");
+				while (cframe) {
+					CLprintf(file, "\n	'(percent %d\n", cframe->Percent);
+					if (cframe->File == ConstructionFileConstruction) {
+						CLprintf(file, "	  file construction\n");
+					} else {
+						CLprintf(file, "	  file main\n");
+					}
+					CLprintf(file, "	  frame %d)",cframe->Frame);
+					cframe = cframe->Next;
+				}
+				CLprintf(file, ")\n");
+			}
+			CLprintf(file, ")\n\n");
+			++cop;
 		}
-		CLprintf(file, "  'file '(\n");
-		CLprintf(file, "    tileset %s\n", Tilesets[j]->Class);
-		CLprintf(file, "    file  \"%s\"\n", (*cop)->File[j].File);
-		CLprintf(file, "    size (%d %d))\n", (*cop)->File[j].Width,
-		    (*cop)->File[j].Height);
-	    }
-	    for (j = 0; j < TilesetMax; ++j) {
-		if (!(*cop)->ShadowFile[j].File) {
-		    continue;
-		}
-		CLprintf(file, "  'shadow-file '(\n");
-		CLprintf(file, "    tileset %s\n", Tilesets[j]->Class);
-		CLprintf(file, "    file  \"%s\"\n", (*cop)->ShadowFile[j].File);
-		CLprintf(file, "    size (%d %d))\n", (*cop)->ShadowFile[j].Width,
-		    (*cop)->ShadowFile[j].Height);
-	    }
-	    cframe = (*cop)->Frames;
-	    if (cframe) {
-		CLprintf(file, "  'constructions (list");
-		while (cframe) {
-		    CLprintf(file, "\n    '(percent %d\n", cframe->Percent);
-		    if (cframe->File == ConstructionFileConstruction) {
-			CLprintf(file, "      file construction\n");
-		    } else {
-			CLprintf(file, "      file main\n");
-		    }
-		    CLprintf(file, "      frame %d)",cframe->Frame);
-		    cframe = cframe->Next;
-		}
-		CLprintf(file, ")\n");
-	    }
-	    CLprintf(file, ")\n\n");
-	    ++cop;
 	}
-    }
 }
 
 /**
-**	Cleanup the constructions.
+**		Cleanup the constructions.
 */
 global void CleanConstructions(void)
 {
-    char** cp;
-    int j;
-    Construction** cop;
-    ConstructionFrame* cframe;
-    ConstructionFrame* tmp;
+	char** cp;
+	int j;
+	Construction** cop;
+	ConstructionFrame* cframe;
+	ConstructionFrame* tmp;
 
-    //
-    //	Mapping original construction numbers in puds to our internal strings
-    //
-    if ((cp = ConstructionWcNames)) {	// Free all old names
-	while (*cp) {
-	    free(*cp++);
+	//
+	//		Mapping original construction numbers in puds to our internal strings
+	//
+	if ((cp = ConstructionWcNames)) {		// Free all old names
+		while (*cp) {
+			free(*cp++);
+		}
+		free(ConstructionWcNames);
+		ConstructionWcNames = NULL;
 	}
-	free(ConstructionWcNames);
-	ConstructionWcNames = NULL;
-    }
 
-    //
-    //	Free the construction table.
-    //
-    if ((cop = Constructions)) {
-	while (*cop) {
-	    if ((*cop)->Ident) {
-		free((*cop)->Ident);
-	    }
-	    for (j = 0; j < TilesetMax; ++j) {
-		if ((*cop)->File[j].File) {
-		    free((*cop)->File[j].File);
+	//
+	//		Free the construction table.
+	//
+	if ((cop = Constructions)) {
+		while (*cop) {
+			if ((*cop)->Ident) {
+				free((*cop)->Ident);
+			}
+			for (j = 0; j < TilesetMax; ++j) {
+				if ((*cop)->File[j].File) {
+					free((*cop)->File[j].File);
+				}
+			}
+			VideoSaveFree((*cop)->Sprite);
+			for (j = 0; j < TilesetMax; ++j) {
+				if ((*cop)->ShadowFile[j].File) {
+					free((*cop)->ShadowFile[j].File);
+				}
+			}
+			VideoSaveFree((*cop)->ShadowSprite);
+			cframe = (*cop)->Frames;
+			while (cframe) {
+				tmp = cframe->Next;
+				free(cframe);
+				cframe = tmp;
+			}
+			free(*cop);
+			++cop;
 		}
-	    }
-	    VideoSaveFree((*cop)->Sprite);
-	    for (j = 0; j < TilesetMax; ++j) {
-		if ((*cop)->ShadowFile[j].File) {
-		    free((*cop)->ShadowFile[j].File);
-		}
-	    }
-	    VideoSaveFree((*cop)->ShadowSprite);
-	    cframe = (*cop)->Frames;
-	    while (cframe) {
-		tmp = cframe->Next;
-		free(cframe);
-		cframe = tmp;
-	    }
-	    free(*cop);
-	    ++cop;
+		free(Constructions);
+		Constructions = NULL;
 	}
-	free(Constructions);
-	Constructions = NULL;
-    }
 }
 
 /**
-**	Get construction by identifier.
+**		Get construction by identifier.
 **
-**	@param ident	Identfier of the construction
+**		@param ident		Identfier of the construction
 **
-**	@return		Construction structure pointer
+**		@return				Construction structure pointer
 */
 global Construction* ConstructionByIdent(const char* ident)
 {
-    Construction** cop;
+	Construction** cop;
 
-    if ((cop = Constructions)) {
-	while (*cop) {
-	    if ((*cop)->Ident && !strcmp(ident, (*cop)->Ident)) {
-		return *cop;
-	    }
-	    ++cop;
+	if ((cop = Constructions)) {
+		while (*cop) {
+			if ((*cop)->Ident && !strcmp(ident, (*cop)->Ident)) {
+				return *cop;
+			}
+			++cop;
+		}
 	}
-    }
-    DebugLevel0Fn("Construction `%s' not found.\n" _C_ ident);
-    return NULL;
+	DebugLevel0Fn("Construction `%s' not found.\n" _C_ ident);
+	return NULL;
 }
 
 /**
-**	Get construction by original wc number.
+**		Get construction by original wc number.
 **
-**	@param num	Original number used in puds.
+**		@param num		Original number used in puds.
 */
 global Construction* ConstructionByWcNum(int num)
 {
-    return ConstructionByIdent(ConstructionWcNames[num]);
+	return ConstructionByIdent(ConstructionWcNames[num]);
 }
 
 // ----------------------------------------------------------------------------
 
 /**
-**	Define construction mapping from original number to internal symbol
+**		Define construction mapping from original number to internal symbol
 **
-**	@param list	List of all names.
+**		@param list		List of all names.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineConstructionWcNames(SCM list)
 {
-    int i;
-    char** cp;
+	int i;
+	char** cp;
 
-    if ((cp = ConstructionWcNames)) {		// Free all old names
-	while (*cp) {
-	    free(*cp++);
+	if ((cp = ConstructionWcNames)) {				// Free all old names
+		while (*cp) {
+			free(*cp++);
+		}
+		free(ConstructionWcNames);
 	}
-	free(ConstructionWcNames);
-    }
 
-    //
-    //	Get new table.
-    //
-    i = gh_length(list);
-    ConstructionWcNames = cp = malloc((i + 1) * sizeof(char*));
-    while (i--) {
-	*cp++ = gh_scm2newstr(gh_car(list), NULL);
-	list = gh_cdr(list);
-    }
-    *cp = NULL;
+	//
+	//		Get new table.
+	//
+	i = gh_length(list);
+	ConstructionWcNames = cp = malloc((i + 1) * sizeof(char*));
+	while (i--) {
+		*cp++ = gh_scm2newstr(gh_car(list), NULL);
+		list = gh_cdr(list);
+	}
+	*cp = NULL;
 
-    return SCM_UNSPECIFIED;
+	return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
 local int CclDefineConstructionWcNames(lua_State* l)
 {
-    int i;
-    int j;
-    char** cp;
+	int i;
+	int j;
+	char** cp;
 
-    if ((cp = ConstructionWcNames)) {	// Free all old names
-	while (*cp) {
-	    free(*cp++);
+	if ((cp = ConstructionWcNames)) {		// Free all old names
+		while (*cp) {
+			free(*cp++);
+		}
+		free(ConstructionWcNames);
 	}
-	free(ConstructionWcNames);
-    }
 
-    //
-    //	Get new table.
-    //
-    i = lua_gettop(l);
-    ConstructionWcNames = cp = malloc((i + 1) * sizeof(char*));
-    if (!cp) {
-	fprintf(stderr, "out of memory.\n");
-	ExitFatal(-1);
-    }
+	//
+	//		Get new table.
+	//
+	i = lua_gettop(l);
+	ConstructionWcNames = cp = malloc((i + 1) * sizeof(char*));
+	if (!cp) {
+		fprintf(stderr, "out of memory.\n");
+		ExitFatal(-1);
+	}
 
-    for (j = 0; j < i; ++j) {
-	*cp++ = strdup(LuaToString(l, j + 1));
-    }
-    *cp = NULL;
+	for (j = 0; j < i; ++j) {
+		*cp++ = strdup(LuaToString(l, j + 1));
+	}
+	*cp = NULL;
 
-    return 0;
+	return 0;
 }
 #endif
 
 /**
-**	Parse the construction.
+**		Parse the construction.
 **
-**	@param list	List describing the construction.
+**		@param list		List describing the construction.
 **
-**	@note make this more flexible
+**		@note make this more flexible
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineConstruction(SCM list)
 {
-    SCM value;
-    SCM sublist;
-    char* str;
-    Construction* construction;
-    Construction** cop;
-    int i;
+	SCM value;
+	SCM sublist;
+	char* str;
+	Construction* construction;
+	Construction** cop;
+	int i;
 
-    //	Slot identifier
+	//		Slot identifier
 
-    str = gh_scm2newstr(gh_car(list), NULL);
-    list = gh_cdr(list);
-
-    if ((cop = Constructions) == NULL) {
-	Constructions = malloc(2 * sizeof(Construction*));
-	Constructions[0] = calloc(1, sizeof(Construction));
-	Constructions[1] = NULL;
-	construction = Constructions[0];
-    } else {
-	for (i = 0; *cop; ++i, ++cop) {
-	}
-	Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
-	Constructions[i] = calloc(1, sizeof(Construction));
-	Constructions[i + 1] = NULL;
-	construction = Constructions[i];
-    }
-    construction->OType = ConstructionType;
-    construction->Ident = str;
-
-    //
-    //	Parse the arguments, in tagged format.
-    //
-    while (!gh_null_p(list)) {
-	int files;
-
-	value = gh_car(list);
+	str = gh_scm2newstr(gh_car(list), NULL);
 	list = gh_cdr(list);
 
-	if ((files = gh_eq_p(value, gh_symbol2scm("file"))) ||
-		gh_eq_p(value, gh_symbol2scm("shadow-file"))) {
-	    int tileset;
-	    char* file;
-	    int w;
-	    int h;
-
-	    tileset = 0;
-	    file = NULL;
-	    w = 0;
-	    h = 0;
-
-	    sublist = gh_car(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-
-		if (gh_eq_p(value, gh_symbol2scm("tileset"))) {
-		    str = gh_scm2newstr(gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
-
-		    // FIXME: use a general get tileset function here!
-		    i = 0;
-		    if (strcmp(str, "default")) {
-			for (; i < NumTilesets; ++i) {
-			    if (!strcmp(str, Tilesets[i]->Ident)) {
-				break;
-			    }
-			    if (!strcmp(str, Tilesets[i]->Class)) {
-				break;
-			    }
-			}
-			if (i == NumTilesets) {
-			    fprintf(stderr, "Tileset `%s' not available\n", str);
-			    errl("tileset not available", gh_car(sublist));
-			}
-		    }
-		    tileset = i;
-		    free(str);
-		} else if (gh_eq_p(value, gh_symbol2scm("file"))) {
-		    file = gh_scm2newstr(gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
-		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    w = gh_scm2int(gh_car(value));
-		    value = gh_cdr(value);
-		    h = gh_scm2int(gh_car(value));
-		} else {
-		    errl("Unsupported tag", value);
-		}
-	    }
-	    if (files) {
-		free(construction->File[tileset].File);
-		construction->File[tileset].File = file;
-		construction->File[tileset].Width = w;
-		construction->File[tileset].Height = h;
-	    } else {
-		free(construction->ShadowFile[tileset].File);
-		construction->ShadowFile[tileset].File = file;
-		construction->ShadowFile[tileset].Width = w;
-		construction->ShadowFile[tileset].Height = h;
-	    }
-	} else if (gh_eq_p(value, gh_symbol2scm("constructions"))) {
-	    sublist = gh_car(list);
-	    while (!gh_null_p(sublist)) {
-		SCM slist;
-		int percent;
-		int file;
-		int frame;
-		ConstructionFrame** cframe;
-
-		percent = 0;
-		file = 0;
-		frame = 0;
-
-		slist = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		while (!gh_null_p(slist)) {
-		    value = gh_car(slist);
-		    slist = gh_cdr(slist);
-
-		    if (gh_eq_p(value, gh_symbol2scm("percent"))) {
-			percent = gh_scm2int(gh_car(slist));
-			slist = gh_cdr(slist);
-		    } else if (gh_eq_p(value, gh_symbol2scm("file"))) {
-			value = gh_car(slist);
-			if (gh_eq_p(value, gh_symbol2scm("construction"))) {
-			    file = ConstructionFileConstruction;
-			} else if (gh_eq_p(value, gh_symbol2scm("main"))) {
-			    file = ConstructionFileMain;
-			} else {
-			    errl("Unsupported tag", value);
-			}
-			slist = gh_cdr(slist);
-		    } else if (gh_eq_p(value, gh_symbol2scm("frame"))) {
-			frame = gh_scm2int(gh_car(slist));
-			slist = gh_cdr(slist);
-		    } else {
-			errl("Unsupported tag", value);
-		    }
-		}
-		cframe = &construction->Frames;
-		while (*cframe) {
-		    cframe = &((*cframe)->Next);
-		}
-		(*cframe) = malloc(sizeof(ConstructionFrame));
-		(*cframe)->Percent = percent;
-		(*cframe)->File = file;
-		(*cframe)->Frame = frame;
-		(*cframe)->Next = NULL;
-	    }
+	if ((cop = Constructions) == NULL) {
+		Constructions = malloc(2 * sizeof(Construction*));
+		Constructions[0] = calloc(1, sizeof(Construction));
+		Constructions[1] = NULL;
+		construction = Constructions[0];
 	} else {
-	    // FIXME: this leaves a half initialized construction
-	    errl("Unsupported tag", value);
+		for (i = 0; *cop; ++i, ++cop) {
+		}
+		Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
+		Constructions[i] = calloc(1, sizeof(Construction));
+		Constructions[i + 1] = NULL;
+		construction = Constructions[i];
 	}
-	list = gh_cdr(list);
-    }
+	construction->OType = ConstructionType;
+	construction->Ident = str;
 
-    return SCM_UNSPECIFIED;
+	//
+	//		Parse the arguments, in tagged format.
+	//
+	while (!gh_null_p(list)) {
+		int files;
+
+		value = gh_car(list);
+		list = gh_cdr(list);
+
+		if ((files = gh_eq_p(value, gh_symbol2scm("file"))) ||
+				gh_eq_p(value, gh_symbol2scm("shadow-file"))) {
+			int tileset;
+			char* file;
+			int w;
+			int h;
+
+			tileset = 0;
+			file = NULL;
+			w = 0;
+			h = 0;
+
+			sublist = gh_car(list);
+			while (!gh_null_p(sublist)) {
+				value = gh_car(sublist);
+				sublist = gh_cdr(sublist);
+
+				if (gh_eq_p(value, gh_symbol2scm("tileset"))) {
+					str = gh_scm2newstr(gh_car(sublist), NULL);
+					sublist = gh_cdr(sublist);
+
+					// FIXME: use a general get tileset function here!
+					i = 0;
+					if (strcmp(str, "default")) {
+						for (; i < NumTilesets; ++i) {
+							if (!strcmp(str, Tilesets[i]->Ident)) {
+								break;
+							}
+							if (!strcmp(str, Tilesets[i]->Class)) {
+								break;
+							}
+						}
+						if (i == NumTilesets) {
+							fprintf(stderr, "Tileset `%s' not available\n", str);
+							errl("tileset not available", gh_car(sublist));
+						}
+					}
+					tileset = i;
+					free(str);
+				} else if (gh_eq_p(value, gh_symbol2scm("file"))) {
+					file = gh_scm2newstr(gh_car(sublist), NULL);
+					sublist = gh_cdr(sublist);
+				} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+					value = gh_car(sublist);
+					sublist = gh_cdr(sublist);
+					w = gh_scm2int(gh_car(value));
+					value = gh_cdr(value);
+					h = gh_scm2int(gh_car(value));
+				} else {
+					errl("Unsupported tag", value);
+				}
+			}
+			if (files) {
+				free(construction->File[tileset].File);
+				construction->File[tileset].File = file;
+				construction->File[tileset].Width = w;
+				construction->File[tileset].Height = h;
+			} else {
+				free(construction->ShadowFile[tileset].File);
+				construction->ShadowFile[tileset].File = file;
+				construction->ShadowFile[tileset].Width = w;
+				construction->ShadowFile[tileset].Height = h;
+			}
+		} else if (gh_eq_p(value, gh_symbol2scm("constructions"))) {
+			sublist = gh_car(list);
+			while (!gh_null_p(sublist)) {
+				SCM slist;
+				int percent;
+				int file;
+				int frame;
+				ConstructionFrame** cframe;
+
+				percent = 0;
+				file = 0;
+				frame = 0;
+
+				slist = gh_car(sublist);
+				sublist = gh_cdr(sublist);
+				while (!gh_null_p(slist)) {
+					value = gh_car(slist);
+					slist = gh_cdr(slist);
+
+					if (gh_eq_p(value, gh_symbol2scm("percent"))) {
+						percent = gh_scm2int(gh_car(slist));
+						slist = gh_cdr(slist);
+					} else if (gh_eq_p(value, gh_symbol2scm("file"))) {
+						value = gh_car(slist);
+						if (gh_eq_p(value, gh_symbol2scm("construction"))) {
+							file = ConstructionFileConstruction;
+						} else if (gh_eq_p(value, gh_symbol2scm("main"))) {
+							file = ConstructionFileMain;
+						} else {
+							errl("Unsupported tag", value);
+						}
+						slist = gh_cdr(slist);
+					} else if (gh_eq_p(value, gh_symbol2scm("frame"))) {
+						frame = gh_scm2int(gh_car(slist));
+						slist = gh_cdr(slist);
+					} else {
+						errl("Unsupported tag", value);
+					}
+				}
+				cframe = &construction->Frames;
+				while (*cframe) {
+					cframe = &((*cframe)->Next);
+				}
+				(*cframe) = malloc(sizeof(ConstructionFrame));
+				(*cframe)->Percent = percent;
+				(*cframe)->File = file;
+				(*cframe)->Frame = frame;
+				(*cframe)->Next = NULL;
+			}
+		} else {
+			// FIXME: this leaves a half initialized construction
+			errl("Unsupported tag", value);
+		}
+		list = gh_cdr(list);
+	}
+
+	return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
 local int CclDefineConstruction(lua_State* l)
 {
-    const char* value;
-    char* str;
-    Construction* construction;
-    Construction** cop;
-    int i;
-    int subargs;
-    int k;
+	const char* value;
+	char* str;
+	Construction* construction;
+	Construction** cop;
+	int i;
+	int subargs;
+	int k;
 
-    if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
-	lua_pushstring(l, "incorrect argument");
-	lua_error(l);
-    }
-
-    //	Slot identifier
-
-    str = strdup(LuaToString(l, 1));
-
-    if ((cop = Constructions) == NULL) {
-	Constructions = malloc(2 * sizeof(Construction*));
-	Constructions[0] = calloc(1, sizeof(Construction));
-	Constructions[1] = NULL;
-	construction = Constructions[0];
-    } else {
-	for (i = 0; *cop; ++i, ++cop) {
+	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
 	}
-	Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
-	Constructions[i] = calloc(1, sizeof(Construction));
-	Constructions[i + 1] = NULL;
-	construction = Constructions[i];
-    }
-    construction->OType = ConstructionType;
-    construction->Ident = str;
 
-    //
-    //	Parse the arguments, in tagged format.
-    //
-    lua_pushnil(l);
-    while (lua_next(l, 2)) {
-	int files;
+	//		Slot identifier
 
-	value = LuaToString(l, -2);
+	str = strdup(LuaToString(l, 1));
 
-	if ((files = !strcmp(value, "Files")) ||
-		!strcmp(value, "ShadowFiles")) {
-	    subargs = luaL_getn(l, -1);
-	    for (k = 0; k < subargs; ++k) {
-		int tileset;
-		char* file;
-		int w;
-		int h;
-
-		tileset = 0;
-		file = NULL;
-		w = 0;
-		h = 0;
-
-		lua_rawgeti(l, -1, k + 1);
-		if (!lua_istable(l, -1)) {
-		    lua_pushstring(l, "incorrect argument");
-		    lua_error(l);
-		}
-		lua_pushnil(l);
-		while (lua_next(l, -2)) {
-		    value = LuaToString(l, -2);
-
-		    if (!strcmp(value, "Tileset")) {
-			value = strdup(LuaToString(l, -1));
-
-			// FIXME: use a general get tileset function here!
-			i = 0;
-			if (strcmp(value, "default")) {
-			    for (; i < NumTilesets; ++i) {
-				if (!strcmp(value, Tilesets[i]->Ident)) {
-				    break;
-				}
-				if (!strcmp(value, Tilesets[i]->Class)) {
-				    break;
-				}
-			    }
-			    if (i == NumTilesets) {
-				fprintf(stderr, "Tileset `%s' not available\n", value);
-				lua_pushfstring(l, "tileset not available: %s", value);
-				lua_error(l);
-			    }
-			}
-			tileset = i;
-		    } else if (!strcmp(value, "File")) {
-			file = strdup(LuaToString(l, -1));
-		    } else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-			    lua_pushstring(l, "incorrect argument");
-			    lua_error(l);
-			}
-			lua_rawgeti(l, -1, 1);
-			w = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			h = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		    } else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
-		    }
-		    lua_pop(l, 1);
-		}
-		lua_pop(l, 1);
-		if (files) {
-		    free(construction->File[tileset].File);
-		    construction->File[tileset].File = file;
-		    construction->File[tileset].Width = w;
-		    construction->File[tileset].Height = h;
-		} else {
-		    free(construction->ShadowFile[tileset].File);
-		    construction->ShadowFile[tileset].File = file;
-		    construction->ShadowFile[tileset].Width = w;
-		    construction->ShadowFile[tileset].Height = h;
-		}
-	    }
-	} else if (!strcmp(value, "Constructions")) {
-	    subargs = luaL_getn(l, -1);
-	    for (k = 0; k < subargs; ++k) {
-		int percent;
-		int file;
-		int frame;
-		ConstructionFrame** cframe;
-
-		percent = 0;
-		file = 0;
-		frame = 0;
-
-		lua_rawgeti(l, -1, k + 1);
-		if (!lua_istable(l, -1)) {
-		    lua_pushstring(l, "incorrect argument");
-		    lua_error(l);
-		}
-		lua_pushnil(l);
-		while (lua_next(l, -2)) {
-		    value = LuaToString(l, -2);
-
-		    if (!strcmp(value, "Percent")) {
-			percent = LuaToNumber(l, -1);
-		    } else if (!strcmp(value, "File")) {
-			value = LuaToString(l, -1);
-			if (!strcmp(value, "construction")) {
-			    file = ConstructionFileConstruction;
-			} else if (!strcmp(value, "main")) {
-			    file = ConstructionFileMain;
-			} else {
-			    lua_pushfstring(l, "Unsupported tag: %s", value);
-			    lua_error(l);
-			}
-		    } else if (!strcmp(value, "Frame")) {
-			frame = LuaToNumber(l, -1);
-		    } else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
-		    }
-		    lua_pop(l, 1);
-		}
-		lua_pop(l, 1);
-		cframe = &construction->Frames;
-		while (*cframe) {
-		    cframe = &((*cframe)->Next);
-		}
-		(*cframe) = malloc(sizeof(ConstructionFrame));
-		(*cframe)->Percent = percent;
-		(*cframe)->File = file;
-		(*cframe)->Frame = frame;
-		(*cframe)->Next = NULL;
-	    }
+	if ((cop = Constructions) == NULL) {
+		Constructions = malloc(2 * sizeof(Construction*));
+		Constructions[0] = calloc(1, sizeof(Construction));
+		Constructions[1] = NULL;
+		construction = Constructions[0];
 	} else {
-	    lua_pushfstring(l, "Unsupported tag: %s", value);
-	    lua_error(l);
+		for (i = 0; *cop; ++i, ++cop) {
+		}
+		Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
+		Constructions[i] = calloc(1, sizeof(Construction));
+		Constructions[i + 1] = NULL;
+		construction = Constructions[i];
 	}
-	lua_pop(l, 1);
-    }
+	construction->OType = ConstructionType;
+	construction->Ident = str;
 
-    return 0;
+	//
+	//		Parse the arguments, in tagged format.
+	//
+	lua_pushnil(l);
+	while (lua_next(l, 2)) {
+		int files;
+
+		value = LuaToString(l, -2);
+
+		if ((files = !strcmp(value, "Files")) ||
+				!strcmp(value, "ShadowFiles")) {
+			subargs = luaL_getn(l, -1);
+			for (k = 0; k < subargs; ++k) {
+				int tileset;
+				char* file;
+				int w;
+				int h;
+
+				tileset = 0;
+				file = NULL;
+				w = 0;
+				h = 0;
+
+				lua_rawgeti(l, -1, k + 1);
+				if (!lua_istable(l, -1)) {
+					lua_pushstring(l, "incorrect argument");
+					lua_error(l);
+				}
+				lua_pushnil(l);
+				while (lua_next(l, -2)) {
+					value = LuaToString(l, -2);
+
+					if (!strcmp(value, "Tileset")) {
+						value = strdup(LuaToString(l, -1));
+
+						// FIXME: use a general get tileset function here!
+						i = 0;
+						if (strcmp(value, "default")) {
+							for (; i < NumTilesets; ++i) {
+								if (!strcmp(value, Tilesets[i]->Ident)) {
+									break;
+								}
+								if (!strcmp(value, Tilesets[i]->Class)) {
+									break;
+								}
+							}
+							if (i == NumTilesets) {
+								fprintf(stderr, "Tileset `%s' not available\n", value);
+								lua_pushfstring(l, "tileset not available: %s", value);
+								lua_error(l);
+							}
+						}
+						tileset = i;
+					} else if (!strcmp(value, "File")) {
+						file = strdup(LuaToString(l, -1));
+					} else if (!strcmp(value, "Size")) {
+						if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+							lua_pushstring(l, "incorrect argument");
+							lua_error(l);
+						}
+						lua_rawgeti(l, -1, 1);
+						w = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						lua_rawgeti(l, -1, 2);
+						h = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+					} else {
+						lua_pushfstring(l, "Unsupported tag: %s", value);
+						lua_error(l);
+					}
+					lua_pop(l, 1);
+				}
+				lua_pop(l, 1);
+				if (files) {
+					free(construction->File[tileset].File);
+					construction->File[tileset].File = file;
+					construction->File[tileset].Width = w;
+					construction->File[tileset].Height = h;
+				} else {
+					free(construction->ShadowFile[tileset].File);
+					construction->ShadowFile[tileset].File = file;
+					construction->ShadowFile[tileset].Width = w;
+					construction->ShadowFile[tileset].Height = h;
+				}
+			}
+		} else if (!strcmp(value, "Constructions")) {
+			subargs = luaL_getn(l, -1);
+			for (k = 0; k < subargs; ++k) {
+				int percent;
+				int file;
+				int frame;
+				ConstructionFrame** cframe;
+
+				percent = 0;
+				file = 0;
+				frame = 0;
+
+				lua_rawgeti(l, -1, k + 1);
+				if (!lua_istable(l, -1)) {
+					lua_pushstring(l, "incorrect argument");
+					lua_error(l);
+				}
+				lua_pushnil(l);
+				while (lua_next(l, -2)) {
+					value = LuaToString(l, -2);
+
+					if (!strcmp(value, "Percent")) {
+						percent = LuaToNumber(l, -1);
+					} else if (!strcmp(value, "File")) {
+						value = LuaToString(l, -1);
+						if (!strcmp(value, "construction")) {
+							file = ConstructionFileConstruction;
+						} else if (!strcmp(value, "main")) {
+							file = ConstructionFileMain;
+						} else {
+							lua_pushfstring(l, "Unsupported tag: %s", value);
+							lua_error(l);
+						}
+					} else if (!strcmp(value, "Frame")) {
+						frame = LuaToNumber(l, -1);
+					} else {
+						lua_pushfstring(l, "Unsupported tag: %s", value);
+						lua_error(l);
+					}
+					lua_pop(l, 1);
+				}
+				lua_pop(l, 1);
+				cframe = &construction->Frames;
+				while (*cframe) {
+					cframe = &((*cframe)->Next);
+				}
+				(*cframe) = malloc(sizeof(ConstructionFrame));
+				(*cframe)->Percent = percent;
+				(*cframe)->File = file;
+				(*cframe)->Frame = frame;
+				(*cframe)->Next = NULL;
+			}
+		} else {
+			lua_pushfstring(l, "Unsupported tag: %s", value);
+			lua_error(l);
+		}
+		lua_pop(l, 1);
+	}
+
+	return 0;
 }
 #endif
 
 // ----------------------------------------------------------------------------
 
 /**
-**	Register CCL features for construction.
+**		Register CCL features for construction.
 */
 global void ConstructionCclRegister(void)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    gh_new_procedureN("define-construction-wc-names",
-	CclDefineConstructionWcNames);
-    gh_new_procedureN("define-construction", CclDefineConstruction);
+	gh_new_procedureN("define-construction-wc-names",
+		CclDefineConstructionWcNames);
+	gh_new_procedureN("define-construction", CclDefineConstruction);
 #elif defined(USE_LUA)
-    lua_register(Lua, "DefineConstructionWcNames",
-	CclDefineConstructionWcNames);
-    lua_register(Lua, "DefineConstruction", CclDefineConstruction);
+	lua_register(Lua, "DefineConstructionWcNames",
+		CclDefineConstructionWcNames);
+	lua_register(Lua, "DefineConstruction", CclDefineConstruction);
 #endif
 }
 //@}

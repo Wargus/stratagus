@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ | 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,59 +34,59 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
-    /// Editor is running
+	/// Editor is running
 extern char EditorRunning;
-    /// Map loaded in editor
+	/// Map loaded in editor
 extern char EditorMapLoaded;
-    /// Current editor state type.
+	/// Current editor state type.
 typedef enum _editor_state_type_ {
-    EditorSelecting,			/// Select
-    EditorEditTile,			/// Edit tiles
-    EditorEditUnit,			/// Edit units
-} EditorStateType;			/// Current editor state
-    /// Current editor state.
+	EditorSelecting,						/// Select
+	EditorEditTile,						/// Edit tiles
+	EditorEditUnit,						/// Edit units
+} EditorStateType;						/// Current editor state
+	/// Current editor state.
 extern EditorStateType EditorState;
 
-    /// Editor CCL start file
+	/// Editor CCL start file
 extern const char* EditorStartFile;
 
-extern char** EditorUnitTypes;		/// Sorted editor unit-type table
+extern char** EditorUnitTypes;				/// Sorted editor unit-type table
 
-extern int MaxUnitIndex;		/// Max unit icon draw index
+extern int MaxUnitIndex;				/// Max unit icon draw index
 
-extern char* EditorSelectIcon;		/// Editor's select icon
-extern char* EditorUnitsIcon;		/// Editor's units icon
+extern char* EditorSelectIcon;				/// Editor's select icon
+extern char* EditorUnitsIcon;				/// Editor's units icon
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
-    ///	Editor main event loop
+	///		Editor main event loop
 extern void EditorMainLoop(void);
-    /// Update editor display
+	/// Update editor display
 extern void EditorUpdateDisplay(void);
 
-    /// Save a pud from editor
+	/// Save a pud from editor
 extern int EditorSavePud(const char *file);
 
-    /// Register ccl features
+	/// Register ccl features
 extern void EditorCclRegister(void);
-   
+
    /// Edit tile
 extern void EditTile(int x, int y, int tile);
    /// Edit tiles
 extern void EditTiles(int x, int y, int tile, int size);
 
-    /// Change the view of a tile
+	/// Change the view of a tile
 extern void ChangeTile(int x, int y, int tile);
-    /// Update surroundings for tile changes
+	/// Update surroundings for tile changes
 extern void EditorTileChanged(int x, int y);
-    /// Make random map
+	/// Make random map
 extern void EditorCreateRandomMap(void);
 
 //@}
 
-#endif	// !__EDITOR_H__
+#endif		// !__EDITOR_H__

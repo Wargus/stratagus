@@ -3,7 +3,7 @@
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -62,228 +62,228 @@
 #include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Cleanup modules.
+**		Cleanup modules.
 **
-**	Call each module to clean up.
+**		Call each module to clean up.
 */
 global void CleanModules(void)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    SCM var;
+	SCM var;
 #endif
 
-    EndReplayLog();
-    CleanMessages();
+	EndReplayLog();
+	CleanMessages();
 
-    CleanIcons();
-    CleanCursors();
-    // CleanMenus();
-    CleanUserInterface();
-    CleanCampaign();
-    CleanTriggers();
-    CleanAi();
-    CleanPlayers();
-    CleanConstructions();
-    CleanDecorations();
-    CleanUnitTypes();
-    CleanUnits();
-    CleanSelections();
-    CleanGroups();
-    CleanUpgrades();
-    CleanDependencies();
-    CleanButtons();
-    CleanMissileTypes();
-    CleanMissiles();
-    CleanTilesets();
-    CleanMap();
-    CleanReplayLog();
-    CleanCclCredits();
-    CleanSpells();
-    FreeVisionTable();
+	CleanIcons();
+	CleanCursors();
+	// CleanMenus();
+	CleanUserInterface();
+	CleanCampaign();
+	CleanTriggers();
+	CleanAi();
+	CleanPlayers();
+	CleanConstructions();
+	CleanDecorations();
+	CleanUnitTypes();
+	CleanUnits();
+	CleanSelections();
+	CleanGroups();
+	CleanUpgrades();
+	CleanDependencies();
+	CleanButtons();
+	CleanMissileTypes();
+	CleanMissiles();
+	CleanTilesets();
+	CleanMap();
+	CleanReplayLog();
+	CleanCclCredits();
+	CleanSpells();
+	FreeVisionTable();
 #ifdef HIERARCHIC_PATHFINDER
-    PfHierClean ();
+	PfHierClean ();
 #endif
 #ifdef MAP_REGIONS
-    MapSplitterClean();
+	MapSplitterClean();
 #endif
-    FreeAStar();
+	FreeAStar();
 
-    //
-    //	Free our protected objects, AI scripts, unit-type properties.
-    //
+	//
+	//		Free our protected objects, AI scripts, unit-type properties.
+	//
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    var = gh_symbol2scm("*ccl-protect*");
-    setvar(var, NIL, NIL);
+	var = gh_symbol2scm("*ccl-protect*");
+	setvar(var, NIL, NIL);
 #endif
 }
 
 /**
-**	Initialize all modules.
+**		Initialize all modules.
 **
-**	Call each module to initialize.
+**		Call each module to initialize.
 */
 global void InitModules(void)
 {
-    GameCycle = 0;
-    FastForwardCycle = 0;
-    SyncHash = 0;
+	GameCycle = 0;
+	FastForwardCycle = 0;
+	SyncHash = 0;
 
-    CallbackMusicOn();
-    InitSyncRand();
-    InitIcons();
-    InitVideoCursors();
-    InitUserInterface(ThisPlayer->RaceName);
-    InitMenus(ThisPlayer->Race);
-    InitPlayers();
-    InitMissileTypes();
-    InitMissiles();
-    InitConstructions();
-    // InitDecorations();
+	CallbackMusicOn();
+	InitSyncRand();
+	InitIcons();
+	InitVideoCursors();
+	InitUserInterface(ThisPlayer->RaceName);
+	InitMenus(ThisPlayer->Race);
+	InitPlayers();
+	InitMissileTypes();
+	InitMissiles();
+	InitConstructions();
+	// InitDecorations();
 
-    // LUDO : 0 = don't reset player stats ( units level , upgrades, ... ) !
-    InitUnitTypes(0);
+	// LUDO : 0 = don't reset player stats ( units level , upgrades, ... ) !
+	InitUnitTypes(0);
 
-    InitUnits();
-    InitSelections();
-    InitGroups();
-    InitSpells();
-    InitUpgrades();
-    InitDependencies();
+	InitUnits();
+	InitSelections();
+	InitGroups();
+	InitSpells();
+	InitUpgrades();
+	InitDependencies();
 
-    InitButtons();
+	InitButtons();
 
-    InitAiModule();
+	InitAiModule();
 
 #ifdef HIERARCHIC_PATHFINDER
-    PfHierInitialize();
+	PfHierInitialize();
 #endif
-    InitMap();
-    InitMapFogOfWar();			// build tables for fog of war
+	InitMap();
+	InitMapFogOfWar();						// build tables for fog of war
 }
 
 /**
-**	Load all.
+**		Load all.
 **
-**	Call each module to load additional files (graphics,sounds).
+**		Call each module to load additional files (graphics,sounds).
 */
 global void LoadModules(void)
 {
-    char* s;
+	char* s;
 
-    LoadIcons();
-    LoadCursors(ThisPlayer->RaceName);
-    LoadUserInterface();
-    // LoadPlayers();
-    LoadMissileSprites();
-    LoadConstructions();
-    LoadDecorations();
-    LoadUnitTypes();
+	LoadIcons();
+	LoadCursors(ThisPlayer->RaceName);
+	LoadUserInterface();
+	// LoadPlayers();
+	LoadMissileSprites();
+	LoadConstructions();
+	LoadDecorations();
+	LoadUnitTypes();
 
-    LoadUnitSounds();
-    MapUnitSounds();
-    InitAStar();
+	LoadUnitSounds();
+	MapUnitSounds();
+	InitAStar();
 #ifdef WITH_SOUND
-    if (SoundFildes != -1) {
-	//FIXME: must be done after map is loaded
-	if (InitSoundServer()) {
-	    SoundOff = 1;
-	    SoundFildes = -1;
-	} else {
-	    // must be done after sounds are loaded
-	    InitSoundClient();
+	if (SoundFildes != -1) {
+		//FIXME: must be done after map is loaded
+		if (InitSoundServer()) {
+			SoundOff = 1;
+			SoundFildes = -1;
+		} else {
+			// must be done after sounds are loaded
+			InitSoundClient();
+		}
 	}
-    }
 #endif
 
 #ifdef USE_SDL_SURFACE
-    GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath, "/graphics/",
-		TheMap.Tileset->PaletteFile));
-    free(s);
-    SetPlayersPalette();
+	GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath, "/graphics/",
+				TheMap.Tileset->PaletteFile));
+	free(s);
+	SetPlayersPalette();
 #else
-    LoadRGB(GlobalPalette,
-	    s = strdcat3(StratagusLibPath, "/graphics/",
-		TheMap.Tileset->PaletteFile));
-    free(s);
-    VideoCreatePalette(GlobalPalette);
+	LoadRGB(GlobalPalette,
+			s = strdcat3(StratagusLibPath, "/graphics/",
+				TheMap.Tileset->PaletteFile));
+	free(s);
+	VideoCreatePalette(GlobalPalette);
 #endif
-    CreateMinimap();
+	CreateMinimap();
 
-    SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
+	SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
 
-    // LoadButtons();
+	// LoadButtons();
 }
 
 /**
-**	Load a game to file.
+**		Load a game to file.
 **
-**	@param filename	File name to be loaded.
+**		@param filename		File name to be loaded.
 **
-**	@note	Later we want to store in a more compact binary format.
+**		@note		Later we want to store in a more compact binary format.
 */
 global void LoadGame(char* filename)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    int old_siod_verbose_level;
+	int old_siod_verbose_level;
 #endif
-    unsigned long game_cycle;
+	unsigned long game_cycle;
 
-    CleanModules();
-    // log will be enabled if found in the save game
-    CommandLogDisabled = 1;
+	CleanModules();
+	// log will be enabled if found in the save game
+	CommandLogDisabled = 1;
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    old_siod_verbose_level = siod_verbose_level;
-    siod_verbose_level = 4;
-    CclGarbageCollect(0);
-    siod_verbose_level = old_siod_verbose_level;
+	old_siod_verbose_level = siod_verbose_level;
+	siod_verbose_level = 4;
+	CclGarbageCollect(0);
+	siod_verbose_level = old_siod_verbose_level;
 #endif
-    InitVisionTable();
+	InitVisionTable();
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    gh_load(filename);
-    CclGarbageCollect(0);
+	gh_load(filename);
+	CclGarbageCollect(0);
 #elif defined(USE_LUA)
-    LuaLoadFile(filename);
+	LuaLoadFile(filename);
 #endif
 
-    game_cycle = GameCycle;
+	game_cycle = GameCycle;
 
-    InitModules();
-    LoadModules();
+	InitModules();
+	LoadModules();
 
 #ifdef MAP_REGIONS
-    MapSplitterInit();
+	MapSplitterInit();
 #endif
 
-    GameCycle = game_cycle;
-    SelectionChanged();
-    MustRedraw = RedrawEverything;
+	GameCycle = game_cycle;
+	SelectionChanged();
+	MustRedraw = RedrawEverything;
 }
 
 /**
-**	Load all game data.
+**		Load all game data.
 **
-**	Test function for the later load/save functions.
+**		Test function for the later load/save functions.
 */
 global void LoadAll(void)
 {
 #if 1
-    SaveGame("save_file_of_stratagus0.ccl");
-    LoadGame("save_file_of_stratagus0.ccl");
-    SaveGame("save_file_of_stratagus1.ccl");
-    LoadGame("save_file_of_stratagus1.ccl");
-    SaveGame("save_file_of_stratagus2.ccl");
-    LoadGame("save_file_of_stratagus2.ccl");
+	SaveGame("save_file_of_stratagus0.ccl");
+	LoadGame("save_file_of_stratagus0.ccl");
+	SaveGame("save_file_of_stratagus1.ccl");
+	LoadGame("save_file_of_stratagus1.ccl");
+	SaveGame("save_file_of_stratagus2.ccl");
+	LoadGame("save_file_of_stratagus2.ccl");
 #endif
-    //LoadGame ("save_file_of_stratagus.ccl");
+	//LoadGame ("save_file_of_stratagus.ccl");
 }
 
 //@}

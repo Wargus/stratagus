@@ -3,7 +3,7 @@
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -32,7 +32,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -67,518 +67,518 @@
 #include "ccl.h"
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
-global Settings GameSettings;		/// Game Settings
-local int LcmPreventRecurse;		/// prevent recursion through LoadGameMap
+global Settings GameSettings;				/// Game Settings
+local int LcmPreventRecurse;				/// prevent recursion through LoadGameMap
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Map loading/saving
+--		Map loading/saving
 ----------------------------------------------------------------------------*/
 
 /**
-**	Load a Stratagus map.
+**		Load a Stratagus map.
 **
-**	@param filename	map filename
-**	@param map	map loaded
+**		@param filename		map filename
+**		@param map		map loaded
 */
 local void LoadStratagusMap(const char* filename,
-    WorldMap* map __attribute__((unused)))
+	WorldMap* map __attribute__((unused)))
 {
-    DebugLevel3Fn("%p \n" _C_ map);
+	DebugLevel3Fn("%p \n" _C_ map);
 
-    if (LcmPreventRecurse) {
-	fprintf(stderr,"recursive use of load Stratagus map!\n");
-	ExitFatal(-1);
-    }
-    InitPlayers();
-    LcmPreventRecurse = 1;
+	if (LcmPreventRecurse) {
+		fprintf(stderr,"recursive use of load Stratagus map!\n");
+		ExitFatal(-1);
+	}
+	InitPlayers();
+	LcmPreventRecurse = 1;
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    gh_load((char*)filename);
+	gh_load((char*)filename);
 #elif defined(USE_LUA)
-    LuaLoadFile(filename);
+	LuaLoadFile(filename);
 #endif
-    LcmPreventRecurse = 0;
+	LcmPreventRecurse = 0;
 
 #if 0
-    // Not true if multiplayer levels!
-    if (!ThisPlayer) {		/// ARI: bomb if nothing was loaded!
-	fprintf(stderr, "%s: invalid Stratagus map\n", filename);
-	ExitFatal(-1);
-    }
-    // FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
+	// Not true if multiplayer levels!
+	if (!ThisPlayer) {				/// ARI: bomb if nothing was loaded!
+		fprintf(stderr, "%s: invalid Stratagus map\n", filename);
+		ExitFatal(-1);
+	}
+	// FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
 #endif
-    if (!TheMap.Width || !TheMap.Height) {
-	fprintf(stderr, "%s: invalid Stratagus map\n", filename);
-	ExitFatal(-1);
-    }
+	if (!TheMap.Width || !TheMap.Height) {
+		fprintf(stderr, "%s: invalid Stratagus map\n", filename);
+		ExitFatal(-1);
+	}
 }
 
 /**
-**	Load any map.
+**		Load any map.
 **
-**	@param filename	map filename
-**	@param map	map loaded
+**		@param filename		map filename
+**		@param map		map loaded
 */
 local void LoadMap(const char* filename, WorldMap* map)
 {
-    const char* tmp;
+	const char* tmp;
 
-    tmp = strrchr(filename, '.');
-    if (tmp) {
+	tmp = strrchr(filename, '.');
+	if (tmp) {
 #ifdef USE_ZLIB
-	if (!strcmp(tmp, ".gz")) {
-	    while (tmp - 1 > filename && *--tmp != '.') {
-	    }
-	} else
+		if (!strcmp(tmp, ".gz")) {
+			while (tmp - 1 > filename && *--tmp != '.') {
+			}
+		} else
 #endif
 #ifdef USE_BZ2LIB
-	if (!strcmp(tmp, ".bz2")) {
-	    while (tmp - 1 > filename && *--tmp != '.') {
-	    }
-	}
+		if (!strcmp(tmp, ".bz2")) {
+			while (tmp - 1 > filename && *--tmp != '.') {
+			}
+		}
 #endif
-	if (!strcmp(tmp, ".cm")
+		if (!strcmp(tmp, ".cm")
 #ifdef USE_ZLIB
-		|| !strcmp(tmp, ".cm.gz")
+				|| !strcmp(tmp, ".cm.gz")
 #endif
 #ifdef USE_BZ2LIB
-		|| !strcmp(tmp, ".cm.bz2")
+				|| !strcmp(tmp, ".cm.bz2")
 #endif
-	) {
-	    LoadStratagusMap(filename, map);
-	    return;
+		) {
+			LoadStratagusMap(filename, map);
+			return;
+		}
 	}
-    }
-    // ARI: This bombs out, if no pud, so will be safe.
-    if (strcasestr(filename, ".pud")) {
-	LoadPud(filename, map);
-    }
+	// ARI: This bombs out, if no pud, so will be safe.
+	if (strcasestr(filename, ".pud")) {
+		LoadPud(filename, map);
+	}
 }
 
 /*----------------------------------------------------------------------------
---	Game creation
+--		Game creation
 ----------------------------------------------------------------------------*/
 
 /**
-**	Free for all
+**		Free for all
 */
 local void GameTypeFreeForAll(void)
 {
-    int i;
-    int j;
+	int i;
+	int j;
 
-    for (i = 0; i < 15; ++i) {
-	for (j = 0; j < 15; ++j) {
-	    if (i != j) {
-		CommandDiplomacy(i, DiplomacyEnemy, j);
-	    }
+	for (i = 0; i < 15; ++i) {
+		for (j = 0; j < 15; ++j) {
+			if (i != j) {
+				CommandDiplomacy(i, DiplomacyEnemy, j);
+			}
+		}
 	}
-    }
 }
 
 /**
-**	Top vs Bottom
+**		Top vs Bottom
 */
 local void GameTypeTopVsBottom(void)
 {
-    int i;
-    int j;
-    int top;
-    int middle;
+	int i;
+	int j;
+	int top;
+	int middle;
 
-    middle = TheMap.Height / 2;
-    for (i = 0; i < 15; ++i) {
-	top = Players[i].StartY <= middle;
-	for (j = 0; j < 15; ++j) {
-	    if (i != j) {
-		if ((top && Players[j].StartY <= middle) ||
-			(!top && Players[j].StartY > middle)) {
-		    CommandDiplomacy(i, DiplomacyAllied, j);
-		    Players[i].SharedVision |= (1 << j);
-		} else {
-		    CommandDiplomacy(i, DiplomacyEnemy, j);
+	middle = TheMap.Height / 2;
+	for (i = 0; i < 15; ++i) {
+		top = Players[i].StartY <= middle;
+		for (j = 0; j < 15; ++j) {
+			if (i != j) {
+				if ((top && Players[j].StartY <= middle) ||
+						(!top && Players[j].StartY > middle)) {
+					CommandDiplomacy(i, DiplomacyAllied, j);
+					Players[i].SharedVision |= (1 << j);
+				} else {
+					CommandDiplomacy(i, DiplomacyEnemy, j);
+				}
+			}
 		}
-	    }
 	}
-    }
 }
 
 /**
-**	Left vs Right
+**		Left vs Right
 */
 local void GameTypeLeftVsRight(void)
 {
-    int i;
-    int j;
-    int left;
-    int middle;
+	int i;
+	int j;
+	int left;
+	int middle;
 
-    middle = TheMap.Width / 2;
-    for (i = 0; i < 15; ++i) {
-	left = Players[i].StartX <= middle;
-	for (j = 0; j < 15; ++j) {
-	    if (i != j) {
-		if ((left && Players[j].StartX <= middle) ||
-			(!left && Players[j].StartX > middle)) {
-		    CommandDiplomacy(i, DiplomacyAllied, j);
-		    Players[i].SharedVision |= (1 << j);
-		} else {
-		    CommandDiplomacy(i, DiplomacyEnemy, j);
+	middle = TheMap.Width / 2;
+	for (i = 0; i < 15; ++i) {
+		left = Players[i].StartX <= middle;
+		for (j = 0; j < 15; ++j) {
+			if (i != j) {
+				if ((left && Players[j].StartX <= middle) ||
+						(!left && Players[j].StartX > middle)) {
+					CommandDiplomacy(i, DiplomacyAllied, j);
+					Players[i].SharedVision |= (1 << j);
+				} else {
+					CommandDiplomacy(i, DiplomacyEnemy, j);
+				}
+			}
 		}
-	    }
 	}
-    }
 }
 
 /**
-**	Man vs Machine
+**		Man vs Machine
 */
 local void GameTypeManVsMachine(void)
 {
-    int i;
-    int j;
+	int i;
+	int j;
 
-    for (i = 0; i < 15; ++i) {
-	if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer ) {
-	    continue;
-	}
-	for (j = 0; j < 15; ++j) {
-	    if (i != j) {
-		if (Players[i].Type == Players[j].Type) {
-		    CommandDiplomacy(i, DiplomacyAllied, j);
-		    Players[i].SharedVision |= (1 << j);
-		} else {
-		    CommandDiplomacy(i, DiplomacyEnemy, j);
+	for (i = 0; i < 15; ++i) {
+		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer ) {
+			continue;
 		}
-	    }
+		for (j = 0; j < 15; ++j) {
+			if (i != j) {
+				if (Players[i].Type == Players[j].Type) {
+					CommandDiplomacy(i, DiplomacyAllied, j);
+					Players[i].SharedVision |= (1 << j);
+				} else {
+					CommandDiplomacy(i, DiplomacyEnemy, j);
+				}
+			}
+		}
 	}
-    }
 }
 
 /**
-**	CreateGame.
+**		CreateGame.
 **
-**	Load map, graphics, sounds, etc
+**		Load map, graphics, sounds, etc
 **
-**	@param filename	map filename
-**	@param map	map loaded
+**		@param filename		map filename
+**		@param map		map loaded
 **
-**	@todo 	FIXME: use in this function InitModules / LoadModules!!!
+**		@todo 		FIXME: use in this function InitModules / LoadModules!!!
 */
 global void CreateGame(char* filename, WorldMap* map)
 {
-    int i;
-    int j;
-    char* s;
+	int i;
+	int j;
+	char* s;
 
-    if (filename && !*filename) {
-	// Load game, already created game with Init/LoadModules
-	return;
-    }
-
-    InitVisionTable();			// build vision table for fog of war
-    InitPlayers();
-
-    if (filename) {
-	s = NULL;
-	// FIXME: LibraryFile here?
-	strcpy(CurrentMapPath, filename);
-	if (filename[0] != '/' && filename[0] != '.') {
-	    s = filename = strdcat3(StratagusLibPath, "/", filename);
+	if (filename && !*filename) {
+		// Load game, already created game with Init/LoadModules
+		return;
 	}
 
-	//
-	//	Load the map.
-	//
-	InitUnitTypes(1);
-	LoadMap(filename, map);
+	InitVisionTable();						// build vision table for fog of war
+	InitPlayers();
 
-	if (s) {
-	    free(s);
-	}
-    }
-
-    GameCycle = 0;
-    FastForwardCycle = 0;
-    SyncHash = 0;
-    InitSyncRand();
-
-    if (NetworkFildes != (Socket)-1) {		// Prepare network play
-	DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
-	InitNetwork2();
-    } else {
-	if (LocalPlayerName && strcmp(LocalPlayerName, "Anonymous")) {
-          ThisPlayer->Name = strdup(LocalPlayerName);
-	}
-    }
-
-    if (GameIntro.Title) {
-	ShowIntro(&GameIntro);
-    } else {
-	CallbackMusicOn();
-    }
-    //GamePaused = 1;
-
-    if (FlagRevealMap) {
-	RevealMap();
-    }
-
-    if (GameSettings.Resources != SettingsResourcesMapDefault) {
-	for (j = 0; j < PlayerMax; ++j) {
-	    if (Players[j].Type == PlayerNobody) {
-		continue;
-	    }
-	    for (i = 1; i < MaxCosts; ++i) {
-		switch (GameSettings.Resources) {
-		    case SettingsResourcesLow:
-			Players[j].Resources[i] = DefaultResourcesLow[i];
-			break;
-		    case SettingsResourcesMedium:
-			Players[j].Resources[i] = DefaultResourcesMedium[i];
-			break;
-		    case SettingsResourcesHigh:
-			Players[j].Resources[i] = DefaultResourcesHigh[i];
-			break;
-		    default:
-			break;
+	if (filename) {
+		s = NULL;
+		// FIXME: LibraryFile here?
+		strcpy(CurrentMapPath, filename);
+		if (filename[0] != '/' && filename[0] != '.') {
+			s = filename = strdcat3(StratagusLibPath, "/", filename);
 		}
-	    }
+
+		//
+		//		Load the map.
+		//
+		InitUnitTypes(1);
+		LoadMap(filename, map);
+
+		if (s) {
+			free(s);
+		}
 	}
-    }
 
-    //
-    //	Setup game types
-    //
-    // FIXME: implement more game types
-    if (GameSettings.GameType != SettingsGameTypeMapDefault) {
-	switch (GameSettings.GameType) {
-	    case SettingsGameTypeMelee:
-		break;
-	    case SettingsGameTypeFreeForAll:
-		GameTypeFreeForAll();
-		break;
-	    case SettingsGameTypeTopVsBottom:
-		GameTypeTopVsBottom();
-		break;
-	    case SettingsGameTypeLeftVsRight:
-		GameTypeLeftVsRight();
-		break;
-	    case SettingsGameTypeManVsMachine:
-		GameTypeManVsMachine();
-		break;
+	GameCycle = 0;
+	FastForwardCycle = 0;
+	SyncHash = 0;
+	InitSyncRand();
 
-	    // Future game type ideas
-#if 0
-	    case SettingsGameTypeOneOnOne:
-		break;
-	    case SettingsGameTypeCaptureTheFlag:
-		break;
-	    case SettingsGameTypeGreed:
-		break;
-	    case SettingsGameTypeSlaughter:
-		break;
-	    case SettingsGameTypeSuddenDeath:
-		break;
-	    case SettingsGameTypeTeamMelee:
-		break;
-	    case SettingsGameTypeTeamCaptureTheFlag:
-		break;
-#endif
-	}
-    }
-
-    //
-    //	Graphic part
-    //
-#ifdef USE_SDL_SURFACE
-    GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath, "/graphics/",
-		TheMap.Tileset->PaletteFile));
-    free(s);
-    SetPlayersPalette();
-#else
-    LoadRGB(GlobalPalette,
-	    s = strdcat3(StratagusLibPath, "/graphics/",
-		TheMap.Tileset->PaletteFile));
-    free(s);
-    VideoCreatePalette(GlobalPalette);
-#endif
-    InitIcons();
-    LoadIcons();
-
-    // FIXME: Race only known in single player game:
-    InitMenus(ThisPlayer->Race);
-    LoadCursors(ThisPlayer->RaceName);
-
-    InitMissileTypes();
-    LoadMissileSprites();
-    InitConstructions();
-    LoadConstructions();
-    LoadUnitTypes();
-    LoadDecorations();
-
-    InitSelections();
-
-    DebugLevel0("Graphics uses %d bytes (%d KB, %d MB)\n" _C_
-	AllocatedGraphicMemory _C_
-	AllocatedGraphicMemory / 1024 _C_
-	AllocatedGraphicMemory / 1024 / 1024);
-    DebugLevel0("Compressed graphics uses %d bytes (%d KB, %d MB)\n" _C_
-	CompressedGraphicMemory _C_
-	CompressedGraphicMemory / 1024 _C_
-	CompressedGraphicMemory / 1024 / 1024);
-
-    CreateMinimap();			// create minimap for pud
-    InitMap();				// setup draw functions
-    InitMapFogOfWar();			// build tables for fog of war
-    PreprocessMap();			// Adjust map for use
-    MapColorCycle();			// Setup color cycle
-
-    InitUserInterface(ThisPlayer->RaceName);	// Setup the user interface
-    LoadUserInterface();		// Load the user interface grafics
-
-    //
-    //	Sound part
-    //
-    //FIXME: check if everything is really loaded
-    LoadUnitSounds();
-    MapUnitSounds();
-
-#ifdef WITH_SOUND
-    DebugLevel0("Sounds uses %d bytes (%d KB, %d MB)\n" _C_
-	AllocatedSoundMemory _C_
-	AllocatedSoundMemory / 1024 _C_
-	AllocatedSoundMemory / 1024 / 1024);
-#endif
-
-    //
-    //	Spells
-    //
-    InitSpells();
-
-    //
-    //  Init units' groups
-    //
-    InitGroups();
-
-    //
-    //	Init players?
-    //
-    DebugPlayers();
-    PlayersInitAi();
-
-    //
-    //  Upgrades
-    //
-    InitUpgrades();
-
-    //
-    //  Dependencies
-    //
-    InitDependencies();
-
-    //
-    //  Buttons (botpanel)
-    //
-    InitButtons();
-
-    //
-    //	Triggers
-    //
-    InitTriggers();
-
-#ifdef WITH_SOUND
-    if (SoundFildes != -1) {
-	//FIXME: must be done after map is loaded
-	if (InitSoundServer()) {
-	    SoundOff = 1;
-	    SoundFildes = -1;
+	if (NetworkFildes != (Socket)-1) {				// Prepare network play
+		DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
+		InitNetwork2();
 	} else {
-	    // must be done after sounds are loaded
-	    InitSoundClient();
+		if (LocalPlayerName && strcmp(LocalPlayerName, "Anonymous")) {
+		  ThisPlayer->Name = strdup(LocalPlayerName);
+		}
 	}
-    }
+
+	if (GameIntro.Title) {
+		ShowIntro(&GameIntro);
+	} else {
+		CallbackMusicOn();
+	}
+	//GamePaused = 1;
+
+	if (FlagRevealMap) {
+		RevealMap();
+	}
+
+	if (GameSettings.Resources != SettingsResourcesMapDefault) {
+		for (j = 0; j < PlayerMax; ++j) {
+			if (Players[j].Type == PlayerNobody) {
+				continue;
+			}
+			for (i = 1; i < MaxCosts; ++i) {
+				switch (GameSettings.Resources) {
+					case SettingsResourcesLow:
+						Players[j].Resources[i] = DefaultResourcesLow[i];
+						break;
+					case SettingsResourcesMedium:
+						Players[j].Resources[i] = DefaultResourcesMedium[i];
+						break;
+					case SettingsResourcesHigh:
+						Players[j].Resources[i] = DefaultResourcesHigh[i];
+						break;
+					default:
+						break;
+				}
+			}
+		}
+	}
+
+	//
+	//		Setup game types
+	//
+	// FIXME: implement more game types
+	if (GameSettings.GameType != SettingsGameTypeMapDefault) {
+		switch (GameSettings.GameType) {
+			case SettingsGameTypeMelee:
+				break;
+			case SettingsGameTypeFreeForAll:
+				GameTypeFreeForAll();
+				break;
+			case SettingsGameTypeTopVsBottom:
+				GameTypeTopVsBottom();
+				break;
+			case SettingsGameTypeLeftVsRight:
+				GameTypeLeftVsRight();
+				break;
+			case SettingsGameTypeManVsMachine:
+				GameTypeManVsMachine();
+				break;
+
+			// Future game type ideas
+#if 0
+			case SettingsGameTypeOneOnOne:
+				break;
+			case SettingsGameTypeCaptureTheFlag:
+				break;
+			case SettingsGameTypeGreed:
+				break;
+			case SettingsGameTypeSlaughter:
+				break;
+			case SettingsGameTypeSuddenDeath:
+				break;
+			case SettingsGameTypeTeamMelee:
+				break;
+			case SettingsGameTypeTeamCaptureTheFlag:
+				break;
+#endif
+		}
+	}
+
+	//
+	//		Graphic part
+	//
+#ifdef USE_SDL_SURFACE
+	GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath, "/graphics/",
+				TheMap.Tileset->PaletteFile));
+	free(s);
+	SetPlayersPalette();
+#else
+	LoadRGB(GlobalPalette,
+			s = strdcat3(StratagusLibPath, "/graphics/",
+				TheMap.Tileset->PaletteFile));
+	free(s);
+	VideoCreatePalette(GlobalPalette);
+#endif
+	InitIcons();
+	LoadIcons();
+
+	// FIXME: Race only known in single player game:
+	InitMenus(ThisPlayer->Race);
+	LoadCursors(ThisPlayer->RaceName);
+
+	InitMissileTypes();
+	LoadMissileSprites();
+	InitConstructions();
+	LoadConstructions();
+	LoadUnitTypes();
+	LoadDecorations();
+
+	InitSelections();
+
+	DebugLevel0("Graphics uses %d bytes (%d KB, %d MB)\n" _C_
+		AllocatedGraphicMemory _C_
+		AllocatedGraphicMemory / 1024 _C_
+		AllocatedGraphicMemory / 1024 / 1024);
+	DebugLevel0("Compressed graphics uses %d bytes (%d KB, %d MB)\n" _C_
+		CompressedGraphicMemory _C_
+		CompressedGraphicMemory / 1024 _C_
+		CompressedGraphicMemory / 1024 / 1024);
+
+	CreateMinimap();						// create minimap for pud
+	InitMap();								// setup draw functions
+	InitMapFogOfWar();						// build tables for fog of war
+	PreprocessMap();						// Adjust map for use
+	MapColorCycle();						// Setup color cycle
+
+	InitUserInterface(ThisPlayer->RaceName);		// Setup the user interface
+	LoadUserInterface();				// Load the user interface grafics
+
+	//
+	//		Sound part
+	//
+	//FIXME: check if everything is really loaded
+	LoadUnitSounds();
+	MapUnitSounds();
+
+#ifdef WITH_SOUND
+	DebugLevel0("Sounds uses %d bytes (%d KB, %d MB)\n" _C_
+		AllocatedSoundMemory _C_
+		AllocatedSoundMemory / 1024 _C_
+		AllocatedSoundMemory / 1024 / 1024);
 #endif
 
-    SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
+	//
+	//		Spells
+	//
+	InitSpells();
+
+	//
+	//  Init units' groups
+	//
+	InitGroups();
+
+	//
+	//		Init players?
+	//
+	DebugPlayers();
+	PlayersInitAi();
+
+	//
+	//  Upgrades
+	//
+	InitUpgrades();
+
+	//
+	//  Dependencies
+	//
+	InitDependencies();
+
+	//
+	//  Buttons (botpanel)
+	//
+	InitButtons();
+
+	//
+	//		Triggers
+	//
+	InitTriggers();
+
+#ifdef WITH_SOUND
+	if (SoundFildes != -1) {
+		//FIXME: must be done after map is loaded
+		if (InitSoundServer()) {
+			SoundOff = 1;
+			SoundFildes = -1;
+		} else {
+			// must be done after sounds are loaded
+			InitSoundClient();
+		}
+	}
+#endif
+
+	SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
 
 #if 0
-    if (!TheUI.SelectedViewport) {
-	TheUI.SelectedViewport = TheUI.Viewports;
-    }
+	if (!TheUI.SelectedViewport) {
+		TheUI.SelectedViewport = TheUI.Viewports;
+	}
 #endif
-    ViewportCenterViewpoint(TheUI.SelectedViewport,
-	ThisPlayer->StartX, ThisPlayer->StartY);
+	ViewportCenterViewpoint(TheUI.SelectedViewport,
+		ThisPlayer->StartX, ThisPlayer->StartY);
 
-    //
-    //	Various hacks wich must be done after the map is loaded.
-    //
-    //FIXME: must be done after map is loaded
-    InitAStar();
+	//
+	//		Various hacks wich must be done after the map is loaded.
+	//
+	//FIXME: must be done after map is loaded
+	InitAStar();
 #ifdef HIERARCHIC_PATHFINDER
-    PfHierInitialize();
+	PfHierInitialize();
 #endif // HIERARCHIC_PATHFINDER
 #ifdef MAP_REGIONS
-    MapSplitterInit();
+	MapSplitterInit();
 #endif
-    //
-    //	FIXME: The palette is loaded after the units are created.
-    //	FIXME: This loops fixes the colors of the units.
-    //
-    for (i = 0; i < NumUnits; ++i) {
-        //  I don't really think that there can be any rescued
-        //  units at this point.
-        if (Units[i]->RescuedFrom) { 
-            Units[i]->Colors = &Units[i]->RescuedFrom->UnitColors;
-        } else {
-            Units[i]->Colors = &Units[i]->Player->UnitColors;
-        }
-    }
+	//
+	//		FIXME: The palette is loaded after the units are created.
+	//		FIXME: This loops fixes the colors of the units.
+	//
+	for (i = 0; i < NumUnits; ++i) {
+		//  I don't really think that there can be any rescued
+		//  units at this point.
+		if (Units[i]->RescuedFrom) {
+			Units[i]->Colors = &Units[i]->RescuedFrom->UnitColors;
+		} else {
+			Units[i]->Colors = &Units[i]->Player->UnitColors;
+		}
+	}
 
-    GameResult = GameNoResult;
+	GameResult = GameNoResult;
 
-    CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
-    DestroyCursorBackground();
+	CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
+	DestroyCursorBackground();
 #ifdef USE_SDL_SURFACE
-    VideoClearScreen();
+	VideoClearScreen();
 #else
-    VideoLockScreen();
-    VideoClearScreen();
-    VideoUnlockScreen();
+	VideoLockScreen();
+	VideoClearScreen();
+	VideoUnlockScreen();
 #endif
 }
 
 /**
-**	Init Game Setting to default values
+**		Init Game Setting to default values
 **
-**	@todo FIXME: this should not be executed for restart levels!
+**		@todo FIXME: this should not be executed for restart levels!
 */
 global void InitSettings(void)
 {
-    int i;
+	int i;
 
-    if (RestartScenario) {
-	TheMap.NoFogOfWar = GameSettings.NoFogOfWar;
-	FlagRevealMap = GameSettings.RevealMap;
-	return;
-    }
+	if (RestartScenario) {
+		TheMap.NoFogOfWar = GameSettings.NoFogOfWar;
+		FlagRevealMap = GameSettings.RevealMap;
+		return;
+	}
 
-    for (i = 0; i < PlayerMax; ++i) {
-	GameSettings.Presets[i].Race = SettingsPresetMapDefault;
-	GameSettings.Presets[i].Team = SettingsPresetMapDefault;
-	GameSettings.Presets[i].Type = SettingsPresetMapDefault;
-    }
-    GameSettings.Resources = SettingsResourcesMapDefault;
-    GameSettings.NumUnits = SettingsNumUnitsMapDefault;
-    GameSettings.Opponents = SettingsPresetMapDefault;
-    GameSettings.Terrain = SettingsPresetMapDefault;
-    GameSettings.GameType = SettingsPresetMapDefault;
-    GameSettings.NetGameType = SettingsSinglePlayerGame;
+	for (i = 0; i < PlayerMax; ++i) {
+		GameSettings.Presets[i].Race = SettingsPresetMapDefault;
+		GameSettings.Presets[i].Team = SettingsPresetMapDefault;
+		GameSettings.Presets[i].Type = SettingsPresetMapDefault;
+	}
+	GameSettings.Resources = SettingsResourcesMapDefault;
+	GameSettings.NumUnits = SettingsNumUnitsMapDefault;
+	GameSettings.Opponents = SettingsPresetMapDefault;
+	GameSettings.Terrain = SettingsPresetMapDefault;
+	GameSettings.GameType = SettingsPresetMapDefault;
+	GameSettings.NetGameType = SettingsSinglePlayerGame;
 }
 
 //@}

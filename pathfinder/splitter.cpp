@@ -3,7 +3,7 @@
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -33,7 +33,7 @@
 #ifdef MAP_REGIONS
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -50,7 +50,7 @@
 #include "splitter_local.h"
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
 
@@ -67,1223 +67,1223 @@ global int ZoneNeedRefresh;
 
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 
 /**
-**	Unassign a tile to a region.
-**	Connections are not updated here
+**		Unassign a tile to a region.
+**		Connections are not updated here
 **
-**	@param region	the region ID
-**	@param x	X coord of the tile
-**	@param y	Y coord of the tile
+**		@param region		the region ID
+**		@param x		X coord of the tile
+**		@param y		Y coord of the tile
 */
 global void RegionUnassignTile(RegionId region, int x, int y)
 {
-    RegionDefinition* adef;
-    RegionSegment* cur;
+	RegionDefinition* adef;
+	RegionSegment* cur;
 
-    adef = Regions + region;
+	adef = Regions + region;
 
-    // Unmap the tile
-    RegionMapping(x, y) = NoRegion;
+	// Unmap the tile
+	RegionMapping(x, y) = NoRegion;
 
-    // Remove from tile count
-    adef->TileCount--;
-    adef->SumX -= x;
-    adef->SumY -= y;
+	// Remove from tile count
+	adef->TileCount--;
+	adef->SumX -= x;
+	adef->SumY -= y;
 
 
-    // Remove from segments
-    cur = adef->FirstSegment;
-    while (cur) {
-    	if (cur->Y == y && cur->MinX <= x && cur->MaxX >= x){
-	    if (x == cur->MinX) {
-		cur->MinX++;
-		if (cur->MinX > cur->MaxX){
-		    RegionDelSegment(adef, cur);
+	// Remove from segments
+	cur = adef->FirstSegment;
+	while (cur) {
+			if (cur->Y == y && cur->MinX <= x && cur->MaxX >= x){
+			if (x == cur->MinX) {
+				cur->MinX++;
+				if (cur->MinX > cur->MaxX){
+					RegionDelSegment(adef, cur);
+				}
+			} else if (x == cur->MaxX) {
+				cur->MaxX--;
+				if (cur->MinX > cur->MaxX){
+					RegionDelSegment(adef, cur);
+				}
+			} else {
+				RegionAddSegment(adef, x + 1, cur->MaxX, y);
+				cur->MaxX = x - 1;
+			}
+			break;
 		}
-	    } else if (x == cur->MaxX) {
-		cur->MaxX--;
-		if (cur->MinX > cur->MaxX){
-		    RegionDelSegment(adef, cur);
+		cur = cur->Next;
+	}
+
+	// update min & max
+	adef->MinX = 0x7fffffff;
+	adef->MinY = 0x7fffffff;
+	adef->MaxX = -1;
+	adef->MaxY = -1;
+
+	cur = adef->FirstSegment;
+
+	while (cur) {
+		if (cur->Y > adef->MaxY) {
+			adef->MaxY = cur->Y;
 		}
-	    } else {
-		RegionAddSegment(adef, x + 1, cur->MaxX, y);
-		cur->MaxX = x - 1;
-	    }
-	    break;
-	}
-	cur = cur->Next;
-    }
 
-    // update min & max
-    adef->MinX = 0x7fffffff;
-    adef->MinY = 0x7fffffff;
-    adef->MaxX = -1;
-    adef->MaxY = -1;
-
-    cur = adef->FirstSegment;
-
-    while (cur) {
-	if (cur->Y > adef->MaxY) {
-	    adef->MaxY = cur->Y;
+		if (cur->Y < adef->MinY) {
+			adef->MinY = cur->Y;
+		}
+		if (cur->MinX < adef->MinX) {
+			adef->MinX = cur->MinX;
+		}
+		if (cur->MaxX > adef->MaxX) {
+			adef->MaxX = cur->MaxX;
+		}
+		cur = cur->Next;
 	}
-	
-	if (cur->Y < adef->MinY) {
-	    adef->MinY = cur->Y;
-	}
-	if (cur->MinX < adef->MinX) {
-	    adef->MinX = cur->MinX;
-	}
-	if (cur->MaxX > adef->MaxX) {
-	    adef->MaxX = cur->MaxX;
-	}
-	cur = cur->Next;
-    }
 }
 
 /**
-**	Assign a tile to a region.
-**	Connections are not updated here
+**		Assign a tile to a region.
+**		Connections are not updated here
 **
-**	@param region	the region ID
-**	@param x	X coord of the tile
-**	@param y	Y coord of the tile
+**		@param region		the region ID
+**		@param x		X coord of the tile
+**		@param y		Y coord of the tile
 */
 global void RegionAssignTile(RegionId region, int x, int y)
 {
-    RegionDefinition* adef;
-    RegionSegment* left;
-    RegionSegment* right;
-    RegionSegment* cur;
+	RegionDefinition* adef;
+	RegionSegment* left;
+	RegionSegment* right;
+	RegionSegment* cur;
 
-    RegionMapping(x,y) = region;
-    adef = Regions + region;
+	RegionMapping(x,y) = region;
+	adef = Regions + region;
 
-    RegionUpdateMinMax(adef, x, y);
+	RegionUpdateMinMax(adef, x, y);
 
-    adef->TileCount++;
+	adef->TileCount++;
 
-    left = 0;
-    right = 0;
+	left = 0;
+	right = 0;
 
-    cur = adef->FirstSegment;
+	cur = adef->FirstSegment;
 
-    while (cur) {
-	if (cur->Y == y) {
-	    if (cur->MaxX == x - 1) {
-		left = cur;
-	    }
-	    if (cur->MinX == x + 1) {
-		right = cur;
-	    }
+	while (cur) {
+		if (cur->Y == y) {
+			if (cur->MaxX == x - 1) {
+				left = cur;
+			}
+			if (cur->MinX == x + 1) {
+				right = cur;
+			}
+		}
+		cur = cur->Next;
 	}
-	cur = cur->Next;
-    }
 
-    if (left && right) {
-	left->MaxX = right->MaxX;
-	RegionDelSegment(adef, right);
-    } else if (left) {
-	left->MaxX = x;
-    } else if (right) {
-	right->MinX = x;
-    } else {
-	// New segment.
-	RegionAddSegment(adef, x, x, y);
-    }
+	if (left && right) {
+		left->MaxX = right->MaxX;
+		RegionDelSegment(adef, right);
+	} else if (left) {
+		left->MaxX = x;
+	} else if (right) {
+		right->MinX = x;
+	} else {
+		// New segment.
+		RegionAddSegment(adef, x, x, y);
+	}
 }
 
 /**
-**	Allocate a new region
+**		Allocate a new region
 **
-**	@param iswater	Indicate if the region is water/sea/...
-**	@return 	the new RegionID
+**		@param iswater		Indicate if the region is water/sea/...
+**		@return 		the new RegionID
 */
 global RegionId NewRegion(int iswater)
 {
-    RegionId result;
+	RegionId result;
 
-    result = NextFreeRegion;
+	result = NextFreeRegion;
 
-    DebugCheck(NextFreeRegion >= MaxRegionNumber);
+	DebugCheck(NextFreeRegion >= MaxRegionNumber);
 
-    if (RegionMax <= result) {
-	RegionMax = result + 1;
-    }
-    ++RegionCount;
+	if (RegionMax <= result) {
+		RegionMax = result + 1;
+	}
+	++RegionCount;
 
-    DebugLevel3Fn("New region %d, iswater = %d\n" _C_ result _C_ iswater);
-    DebugCheck(Regions[result].TileCount);
+	DebugLevel3Fn("New region %d, iswater = %d\n" _C_ result _C_ iswater);
+	DebugCheck(Regions[result].TileCount);
 
-    Regions[result].TileCount = 0;
-    Regions[result].IsWater = iswater;
-    Regions[result].Connections = 0;
-    Regions[result].ConnectionsCount = 0;
-    Regions[result].ConnectionsNumber = 0;
-    Regions[result].FirstSegment = 0;
-    Regions[result].LastSegment = 0;
-    Regions[result].NeedConnectTest = 0;
-    Regions[result].MinX = 0x7ffffff;
-    Regions[result].MinY = 0x7ffffff;
-    Regions[result].MaxX = -1;
-    Regions[result].MaxY = -1;
-    Regions[result].SumX = 0;
-    Regions[result].SumY = 0;
-    Regions[result].Zone = -1;
-    Regions[result].Dirty = -1;
+	Regions[result].TileCount = 0;
+	Regions[result].IsWater = iswater;
+	Regions[result].Connections = 0;
+	Regions[result].ConnectionsCount = 0;
+	Regions[result].ConnectionsNumber = 0;
+	Regions[result].FirstSegment = 0;
+	Regions[result].LastSegment = 0;
+	Regions[result].NeedConnectTest = 0;
+	Regions[result].MinX = 0x7ffffff;
+	Regions[result].MinY = 0x7ffffff;
+	Regions[result].MaxX = -1;
+	Regions[result].MaxY = -1;
+	Regions[result].SumX = 0;
+	Regions[result].SumY = 0;
+	Regions[result].Zone = -1;
+	Regions[result].Dirty = -1;
 
-    ++NextFreeRegion;
-    while (NextFreeRegion < RegionMax && Regions[NextFreeRegion].TileCount){
 	++NextFreeRegion;
-    }
-    return result;
+	while (NextFreeRegion < RegionMax && Regions[NextFreeRegion].TileCount){
+		++NextFreeRegion;
+	}
+	return result;
 }
 
 /**
-**	Free a region
+**		Free a region
 **
-**	@param regid	The region to free
+**		@param regid		The region to free
 */
 global void RegionFree(RegionId regid)
 {
-    RegionSegment* cur;
-    RegionSegment* next;
+	RegionSegment* cur;
+	RegionSegment* next;
 
-    --RegionCount;
-    if (regid < NextFreeRegion) {
-	NextFreeRegion = regid;
-    }
-    Regions[regid].TileCount = 0;
-    if (Regions[regid].ConnectionsNumber) {
-	free(Regions[regid].Connections);
-	free(Regions[regid].ConnectionsCount);
-    }
-    Regions[regid].Connections = 0;
-    Regions[regid].ConnectionsCount = 0;
+	--RegionCount;
+	if (regid < NextFreeRegion) {
+		NextFreeRegion = regid;
+	}
+	Regions[regid].TileCount = 0;
+	if (Regions[regid].ConnectionsNumber) {
+		free(Regions[regid].Connections);
+		free(Regions[regid].ConnectionsCount);
+	}
+	Regions[regid].Connections = 0;
+	Regions[regid].ConnectionsCount = 0;
 
-    cur = Regions[regid].FirstSegment;
-    while (cur) {
-	next = cur->Next;
-	free(cur);
-	cur = next;
-    }
-    Regions[regid].FirstSegment = 0;
-    Regions[regid].LastSegment = 0;
+	cur = Regions[regid].FirstSegment;
+	while (cur) {
+		next = cur->Next;
+		free(cur);
+		cur = next;
+	}
+	Regions[regid].FirstSegment = 0;
+	Regions[regid].LastSegment = 0;
 }
 
 /**
-**	Update connections for all regions (slow)
+**		Update connections for all regions (slow)
 **
 */
 global void UpdateConnections(void)
 {
-    int x;
-    int y;
-    RegionId reg;
+	int x;
+	int y;
+	RegionId reg;
 
-    for (x = 0; x < TheMap.Width; ++x) {
-    	for (y = 0; y < TheMap.Height; ++y) {
-	    reg = RegionMapping(x, y);
-	    if (reg != NoRegion) {
-		RegionUpdateConnection(reg, x, y, 1, 0);
-	    }
+	for (x = 0; x < TheMap.Width; ++x) {
+			for (y = 0; y < TheMap.Height; ++y) {
+			reg = RegionMapping(x, y);
+			if (reg != NoRegion) {
+				RegionUpdateConnection(reg, x, y, 1, 0);
+			}
+		}
 	}
-    }
 }
 
 /**
-**	Split region according to the content of the "TempStorage"
-**	All tile with equal value will go in the same region
+**		Split region according to the content of the "TempStorage"
+**		All tile with equal value will go in the same region
 **
-**	@param reg	The region to split
-**	@param nbarea	The number of area
-**	@param updateConnections	indicate if connection should be updated
+**		@param reg		The region to split
+**		@param nbarea		The number of area
+**		@param updateConnections		indicate if connection should be updated
 */
 global void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
 {
-    RegionSegment* oldsegs;
-    RegionSegment* seg;
-    RegionDefinition** newregions;
-    RegionId* newregionsid;
-    int minx;
-    int maxx;
-    int initval;
-    int x;
-    int y;
-    int i;
-    int* tempptr;
+	RegionSegment* oldsegs;
+	RegionSegment* seg;
+	RegionDefinition** newregions;
+	RegionId* newregionsid;
+	int minx;
+	int maxx;
+	int initval;
+	int x;
+	int y;
+	int i;
+	int* tempptr;
 
-    newregions = alloca(nbarea * sizeof(RegionDefinition*));
-    newregionsid = alloca(nbarea * sizeof(RegionId));
+	newregions = alloca(nbarea * sizeof(RegionDefinition*));
+	newregionsid = alloca(nbarea * sizeof(RegionId));
 
-    oldsegs = Regions[reg].FirstSegment;
+	oldsegs = Regions[reg].FirstSegment;
 
-    newregions[0] = Regions + reg;
-    newregionsid[0] = reg;
-    for (i = 1; i < nbarea; ++i) {
-	newregionsid[i] = NewRegion(newregions[0]->IsWater);
-	newregions[i] = Regions + newregionsid[i];
-	newregions[i]->Zone = newregions[0]->Zone;
-	newregions[i]->Dirty = newregions[0]->Dirty;
-    }
-
-    newregions[0]->FirstSegment = 0;
-    newregions[0]->LastSegment = 0;
-    newregions[0]->TileCount = 0;
-    newregions[0]->MinX = 0x7ffffff;
-    newregions[0]->MaxX = -1;
-    newregions[0]->MinY = 0x7ffffff;
-    newregions[0]->MaxY = -1;
-    newregions[0]->SumX = 0;
-    newregions[0]->SumY = 0;
-
-    seg = oldsegs;
-
-    while (seg) {
-	minx = seg->MinX;
-	maxx = seg->MinX;
-	
-	tempptr = RegionTempStorage + seg->Y * TheMap.Width + seg->MinX;
-	
-	while (minx <= seg->MaxX) {
-	    initval = *tempptr;
-	    DebugCheck(initval == 0);
-
-	    while ((maxx < seg->MaxX) && (tempptr[1] == initval)) {
-		tempptr++;
-		maxx++;
-	    }
-
-	    RegionAddSegment(newregions[initval - 1], minx, maxx, seg->Y);
-	    RegionUpdateMinMax(newregions[initval - 1], minx, seg->Y);
-	    RegionUpdateMinMax(newregions[initval - 1], maxx, seg->Y);
-	    newregions[initval - 1]->TileCount += maxx - minx + 1;
-
-	    y = seg->Y;
-	    for (x = minx; x <= maxx; ++x) {
-		RegionMapping(x,y) = newregionsid[initval - 1];
-	    }
-
-	    ++maxx;
-	    ++tempptr;
-	    minx = maxx;
+	newregions[0] = Regions + reg;
+	newregionsid[0] = reg;
+	for (i = 1; i < nbarea; ++i) {
+		newregionsid[i] = NewRegion(newregions[0]->IsWater);
+		newregions[i] = Regions + newregionsid[i];
+		newregions[i]->Zone = newregions[0]->Zone;
+		newregions[i]->Dirty = newregions[0]->Dirty;
 	}
-	
-	seg = seg->Next;
-    }
 
-    while (oldsegs) {
-	seg = oldsegs->Next;
-	free(oldsegs);
-	oldsegs = seg;
-    }
+	newregions[0]->FirstSegment = 0;
+	newregions[0]->LastSegment = 0;
+	newregions[0]->TileCount = 0;
+	newregions[0]->MinX = 0x7ffffff;
+	newregions[0]->MaxX = -1;
+	newregions[0]->MinY = 0x7ffffff;
+	newregions[0]->MaxY = -1;
+	newregions[0]->SumX = 0;
+	newregions[0]->SumY = 0;
 
-    if (!updateConnections) {
-	return;
-    }
+	seg = oldsegs;
 
-    for (i = 0; i < nbarea; ++i) {
-	RegionRescanAdjacents(newregionsid[i]);
-    }
+	while (seg) {
+		minx = seg->MinX;
+		maxx = seg->MinX;
+
+		tempptr = RegionTempStorage + seg->Y * TheMap.Width + seg->MinX;
+
+		while (minx <= seg->MaxX) {
+			initval = *tempptr;
+			DebugCheck(initval == 0);
+
+			while ((maxx < seg->MaxX) && (tempptr[1] == initval)) {
+				tempptr++;
+				maxx++;
+			}
+
+			RegionAddSegment(newregions[initval - 1], minx, maxx, seg->Y);
+			RegionUpdateMinMax(newregions[initval - 1], minx, seg->Y);
+			RegionUpdateMinMax(newregions[initval - 1], maxx, seg->Y);
+			newregions[initval - 1]->TileCount += maxx - minx + 1;
+
+			y = seg->Y;
+			for (x = minx; x <= maxx; ++x) {
+				RegionMapping(x,y) = newregionsid[initval - 1];
+			}
+
+			++maxx;
+			++tempptr;
+			minx = maxx;
+		}
+
+		seg = seg->Next;
+	}
+
+	while (oldsegs) {
+		seg = oldsegs->Next;
+		free(oldsegs);
+		oldsegs = seg;
+	}
+
+	if (!updateConnections) {
+		return;
+	}
+
+	for (i = 0; i < nbarea; ++i) {
+		RegionRescanAdjacents(newregionsid[i]);
+	}
 }
 
 /**
-**	Join to region into only one. Either a or b is destroyed
+**		Join to region into only one. Either a or b is destroyed
 **
-**	@param a	One of the two regions
-**	@param b	One of the two regions
+**		@param a		One of the two regions
+**		@param b		One of the two regions
 */
 global void RegionJoin(RegionId a, RegionId b)
 {
-    RegionSegment* cur;
-    RegionId tmp;
-    RegionId* mapptr;
-    int i;
+	RegionSegment* cur;
+	RegionId tmp;
+	RegionId* mapptr;
+	int i;
 
-    DebugCheck(Regions[a].IsWater != Regions[b].IsWater);
-    if (a > b) {
-	tmp = a;
-	a = b;
-	b = tmp;
-    }
-
-    cur = Regions[b].FirstSegment;
-    while (cur) {
-	mapptr = RegionMappingStorage + cur->MinX + cur->Y * TheMap.Width;
-	for ( i = cur->MaxX - cur->MinX + 1; i > 0; --i) {
-	    *(mapptr++) = a;
+	DebugCheck(Regions[a].IsWater != Regions[b].IsWater);
+	if (a > b) {
+		tmp = a;
+		a = b;
+		b = tmp;
 	}
-	RegionAppendSegment(Regions + a, cur->MinX, cur->MaxX, cur->Y);
-	cur = cur->Next;
-    }
-    Regions[a].TileCount += Regions[b].TileCount;
-    Regions[a].SumX += Regions[b].SumX;
-    Regions[a].SumY += Regions[b].SumY;
-    Regions[a].Dirty = 0;
-    Regions[a].MinX = min(Regions[a].MinX, Regions[b].MinX);
-    Regions[a].MinY = min(Regions[a].MinY, Regions[b].MinY);
-    Regions[a].MaxX = max(Regions[a].MaxX, Regions[b].MaxX);
-    Regions[a].MaxY = max(Regions[a].MaxY, Regions[b].MaxY);
 
-    // Update connections : a receive all that b has
-    while (Regions[b].ConnectionsNumber) {
-	if (Regions[b].Connections[0] != a) {
-	    RegionAddBidirConnection(a, Regions[b].Connections[0], Regions[b].ConnectionsCount[0]);
+	cur = Regions[b].FirstSegment;
+	while (cur) {
+		mapptr = RegionMappingStorage + cur->MinX + cur->Y * TheMap.Width;
+		for ( i = cur->MaxX - cur->MinX + 1; i > 0; --i) {
+			*(mapptr++) = a;
+		}
+		RegionAppendSegment(Regions + a, cur->MinX, cur->MaxX, cur->Y);
+		cur = cur->Next;
 	}
-	RegionAddBidirConnection(b, Regions[b].Connections[0], -Regions[b].ConnectionsCount[0]);
-    }
+	Regions[a].TileCount += Regions[b].TileCount;
+	Regions[a].SumX += Regions[b].SumX;
+	Regions[a].SumY += Regions[b].SumY;
+	Regions[a].Dirty = 0;
+	Regions[a].MinX = min(Regions[a].MinX, Regions[b].MinX);
+	Regions[a].MinY = min(Regions[a].MinY, Regions[b].MinY);
+	Regions[a].MaxX = max(Regions[a].MaxX, Regions[b].MaxX);
+	Regions[a].MaxY = max(Regions[a].MaxY, Regions[b].MaxY);
 
-    RegionFree(b);
+	// Update connections : a receive all that b has
+	while (Regions[b].ConnectionsNumber) {
+		if (Regions[b].Connections[0] != a) {
+			RegionAddBidirConnection(a, Regions[b].Connections[0], Regions[b].ConnectionsCount[0]);
+		}
+		RegionAddBidirConnection(b, Regions[b].Connections[0], -Regions[b].ConnectionsCount[0]);
+	}
+
+	RegionFree(b);
 }
 
 /**
-**	Split a region in two parts
+**		Split a region in two parts
 **
-**	@param regid	the region to broke
-**	@param updateConnections	indicate if connection should be updated as well
+**		@param regid		the region to broke
+**		@param updateConnections		indicate if connection should be updated as well
 */
 global void RegionSplit(RegionId regid, int updateConnections)
 {
-    RegionDefinition* adef;
-    int tileleft;
-    int x;
-    int y;
-    int obstacle;
-    int nv_obstacle;
-    int done;
-    int erodelevel;
-    int blocker;
-    int oldZoneNeedRefresh;
-    int i;
-    CircularFiller fillers[2];	// We have 2 concurrent floodfiller
+	RegionDefinition* adef;
+	int tileleft;
+	int x;
+	int y;
+	int obstacle;
+	int nv_obstacle;
+	int done;
+	int erodelevel;
+	int blocker;
+	int oldZoneNeedRefresh;
+	int i;
+	CircularFiller fillers[2];		// We have 2 concurrent floodfiller
 
-    oldZoneNeedRefresh = ZoneNeedRefresh;
+	oldZoneNeedRefresh = ZoneNeedRefresh;
 
-    adef = Regions + regid;
+	adef = Regions + regid;
 
-    DebugCheck(adef->TileCount <= 1);
+	DebugCheck(adef->TileCount <= 1);
 
-    RegionTempStorageAllocate();
+	RegionTempStorageAllocate();
 
-    // Start filling the region with 0
-    RegionTempStorageFillRegion(adef, 0);
+	// Start filling the region with 0
+	RegionTempStorageFillRegion(adef, 0);
 
-    tileleft = adef->TileCount;
+	tileleft = adef->TileCount;
 
-    obstacle = 0;
-    erodelevel = 2;
-    while ((erodelevel < 8) && (obstacle <= tileleft / 4)) {
-    	if (erodelevel == 2) {
-	    // Mark limits points for putting obstacle
-	    nv_obstacle = RegionTempStorageMarkObstacle(regid, tileleft - 10 - obstacle, ++erodelevel);
-    	} else {
-	    // Make existing obstacle bigger
-	    nv_obstacle = RegionTempStorageEmbossObstacle(regid, tileleft - 10 - obstacle, erodelevel++);
+	obstacle = 0;
+	erodelevel = 2;
+	while ((erodelevel < 8) && (obstacle <= tileleft / 4)) {
+			if (erodelevel == 2) {
+			// Mark limits points for putting obstacle
+			nv_obstacle = RegionTempStorageMarkObstacle(regid, tileleft - 10 - obstacle, ++erodelevel);
+			} else {
+			// Make existing obstacle bigger
+			nv_obstacle = RegionTempStorageEmbossObstacle(regid, tileleft - 10 - obstacle, erodelevel++);
+		}
+		if (!nv_obstacle) {
+			// Nothing marked, undo & time to break
+			erodelevel--;
+			break;
+		}
+		obstacle += nv_obstacle;
 	}
-	if (!nv_obstacle) {
-	    // Nothing marked, undo & time to break
-	    erodelevel--;
-	    break;
+
+	// Find two correct starting place for flood filling
+	if (adef->MaxX - adef->MinX > adef->MaxY - adef->MinY) {
+		RegionFindPointOnX(adef, adef->MinX, &x, &y);
+		DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
+		CircularFillerInit(fillers, regid, x, y, 1);
+
+		RegionFindPointOnX(adef, adef->MaxX, &x, &y);
+		DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
+		CircularFillerInit(fillers + 1, regid, x, y, 2);
+	} else {
+		RegionFindPointOnY(adef, adef->MinY, &x, &y);
+		DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
+		CircularFillerInit(fillers, regid, x, y, 1);
+
+		RegionFindPointOnY(adef, adef->MaxY, &x, &y);
+		DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
+		CircularFillerInit(fillers + 1, regid, x, y, 2);
 	}
-	obstacle += nv_obstacle;
-    }
 
-    // Find two correct starting place for flood filling
-    if (adef->MaxX - adef->MinX > adef->MaxY - adef->MinY) {
-	RegionFindPointOnX(adef, adef->MinX, &x, &y);
-	DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
-	CircularFillerInit(fillers, regid, x, y, 1);
-	
-	RegionFindPointOnX(adef, adef->MaxX, &x, &y);
-	DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
-	CircularFillerInit(fillers + 1, regid, x, y, 2);
-    } else {
-	RegionFindPointOnY(adef, adef->MinY, &x, &y);
-	DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
-	CircularFillerInit(fillers, regid, x, y, 1);
+	tileleft -= 2;
 
-	RegionFindPointOnY(adef, adef->MaxY, &x, &y);
-	DebugCheck(RegionTempStorage[x + TheMap.Width * y]);
-	CircularFillerInit(fillers + 1, regid, x, y, 2);
-    }
+	while (tileleft) {
+		// Search with the two
+		done = 0;
+		blocker = -1;
+		while (blocker == -1) {
+			i = (fillers[0].NextOne < fillers[1].NextOne ? 0 : 1);
+			if (CircularFillerStep(fillers + i)) {
+				++done;
+			} else {
+				blocker = i;
+			}
+		}
 
-    tileleft -= 2;
+		// Other take advance
+		while (CircularFillerStep(fillers + 1 - blocker)) {
+			++done;
+		}
 
-    while (tileleft) {
-	// Search with the two
-	done = 0;
-	blocker = -1;
-	while (blocker == -1) {
-	    i = (fillers[0].NextOne < fillers[1].NextOne ? 0 : 1);
-	    if (CircularFillerStep(fillers + i)) {
-		++done;
-	    } else {
-		blocker = i;
-	    }
+		// Need to unmark ?
+		if (done < tileleft) {
+			DebugCheck(erodelevel < 3);
+
+			RegionTempStorageUnmarkPoints(regid, erodelevel--);
+
+			// Restart both fillers
+			fillers[0].NextOne = 0;
+			fillers[1].NextOne = 0;
+		}
+
+		tileleft -= done;
 	}
-	
-	// Other take advance
-	while (CircularFillerStep(fillers + 1 - blocker)) {
-	    ++done;
-	}
-		
-	// Need to unmark ?
-	if (done < tileleft) {
-	    DebugCheck(erodelevel < 3);
 
-	    RegionTempStorageUnmarkPoints(regid, erodelevel--);
+	CircularFillerDone(fillers);
+	CircularFillerDone(fillers + 1);
 
-	    // Restart both fillers
-	    fillers[0].NextOne = 0;
-	    fillers[1].NextOne = 0;
-	}
-	
-	tileleft -= done;
-    }
+	RegionSplitUsingTemp(regid, 2, updateConnections);
 
-    CircularFillerDone(fillers);
-    CircularFillerDone(fillers + 1);
-
-    RegionSplitUsingTemp(regid, 2, updateConnections);
-
-    RegionTempStorageFree();
-    ZoneNeedRefresh = oldZoneNeedRefresh || ! updateConnections;
+	RegionTempStorageFree();
+	ZoneNeedRefresh = oldZoneNeedRefresh || ! updateConnections;
 }
 
 /**
-**	Check that the given region is 8 - connex
-**	( all its tiles are reachable )
-**	
-**	@param reg	the region ID
+**		Check that the given region is 8 - connex
+**		( all its tiles are reachable )
+**
+**		@param reg		the region ID
 */
 global void RegionCheckConnex(RegionId reg)
 {
-    CircularFiller filler;
-    int nbarea;
-    int tilesleft;
-    RegionSegment* seg;
+	CircularFiller filler;
+	int nbarea;
+	int tilesleft;
+	RegionSegment* seg;
 
-    DebugLevel3Fn("Region %d checked for splitting\n" _C_ reg);
+	DebugLevel3Fn("Region %d checked for splitting\n" _C_ reg);
 
-    RegionTempStorageAllocate();
+	RegionTempStorageAllocate();
 
-    RegionTempStorageFillRegion(Regions + reg, 0);
+	RegionTempStorageFillRegion(Regions + reg, 0);
 
-    nbarea = 0;
+	nbarea = 0;
 
-    Regions[reg].NeedConnectTest = 0;
+	Regions[reg].NeedConnectTest = 0;
 
-    tilesleft = Regions[reg].TileCount;
-    seg = Regions[reg].FirstSegment;
-    while (seg) {
-	if (!RegionTempStorage[seg->MinX + TheMap.Width * seg->Y]) {
-	    nbarea++;
-	    CircularFillerInit(&filler, reg, seg->MinX, seg->Y, nbarea);
-	    --tilesleft;
-	    while (CircularFillerStep(&filler)) {
-		--tilesleft;
-	    }
-	    CircularFillerDone(&filler);
-	    if (!tilesleft) {
-		break;
-	    }
+	tilesleft = Regions[reg].TileCount;
+	seg = Regions[reg].FirstSegment;
+	while (seg) {
+		if (!RegionTempStorage[seg->MinX + TheMap.Width * seg->Y]) {
+			nbarea++;
+			CircularFillerInit(&filler, reg, seg->MinX, seg->Y, nbarea);
+			--tilesleft;
+			while (CircularFillerStep(&filler)) {
+				--tilesleft;
+			}
+			CircularFillerDone(&filler);
+			if (!tilesleft) {
+				break;
+			}
+		}
+		seg = seg->Next;
 	}
-	seg = seg->Next;
-    }
 
-    if (nbarea > 1) {
-	// RegionDebugAllConnexions();
-	DebugLevel3Fn("Region %d must be splitted into %d...\n" _C_ reg _C_ nbarea);
-	Regions[reg].Dirty += 10;
-	RegionSplitUsingTemp(reg, nbarea, 1);
-	ZoneNeedRefresh = 1;
-	// RegionDebugAllConnexions();
-    }
+	if (nbarea > 1) {
+		// RegionDebugAllConnexions();
+		DebugLevel3Fn("Region %d must be splitted into %d...\n" _C_ reg _C_ nbarea);
+		Regions[reg].Dirty += 10;
+		RegionSplitUsingTemp(reg, nbarea, 1);
+		ZoneNeedRefresh = 1;
+		// RegionDebugAllConnexions();
+	}
 
-    RegionTempStorageFree();
+	RegionTempStorageFree();
 }
 
 /**
-**	Called when a tile should no more belong to any regions
+**		Called when a tile should no more belong to any regions
 **
-**	@param x	x position of the tile
-**	@param y	y position of the tile
+**		@param x		x position of the tile
+**		@param y		y position of the tile
 */
 local void MapSplitterTileOccuped(int x, int y) {
-    RegionId reg;
-    int tx;
-    int ty;
-    int pathcount;
-    int hasadjacent[8];
-    int i;
-    int lastival;
+	RegionId reg;
+	int tx;
+	int ty;
+	int pathcount;
+	int hasadjacent[8];
+	int i;
+	int lastival;
 
-    reg = RegionMapping(x, y);
-    if (reg == NoRegion) {
-	return;
-    }
-
-    Regions[reg].Dirty++;
-
-    RegionUnassignTile(reg, x, y);
-
-    RegionUpdateConnection(reg, x, y, -1, 1);
-
-    if (!Regions[reg].TileCount) {
-	RegionFree(reg);
-	return;
-    }
-
-    if (Regions[reg].TileCount == 1) {
-	// No problem of Connection here
-	return;
-    }
-
-    // Count different path from the removed cell.
-    for (i = 0; i < 8; ++i){
-	tx = x + adjacents[i][0];
-	ty = y + adjacents[i][1];
-
-	hasadjacent[i] = (InMap(tx, ty) && RegionMapping(tx, ty) == reg);
-    }
-
-    pathcount = 0;
-    lastival = hasadjacent[7];
-    for (i = 0; i < 8; ++i) {
-	if (lastival && !hasadjacent[i]) {
-	    ++pathcount;
+	reg = RegionMapping(x, y);
+	if (reg == NoRegion) {
+		return;
 	}
-	lastival = hasadjacent[i];
-    }
 
-    if (pathcount <= 1) {
-	// No problem of disconnection
-	return;
-    }
+	Regions[reg].Dirty++;
 
-    DebugLevel3Fn("Region %d should be checked\n" _C_ reg);
-    // Here we'll need to flood fill the region to be sure...
-    Regions[reg].NeedConnectTest = 1;
+	RegionUnassignTile(reg, x, y);
+
+	RegionUpdateConnection(reg, x, y, -1, 1);
+
+	if (!Regions[reg].TileCount) {
+		RegionFree(reg);
+		return;
+	}
+
+	if (Regions[reg].TileCount == 1) {
+		// No problem of Connection here
+		return;
+	}
+
+	// Count different path from the removed cell.
+	for (i = 0; i < 8; ++i){
+		tx = x + adjacents[i][0];
+		ty = y + adjacents[i][1];
+
+		hasadjacent[i] = (InMap(tx, ty) && RegionMapping(tx, ty) == reg);
+	}
+
+	pathcount = 0;
+	lastival = hasadjacent[7];
+	for (i = 0; i < 8; ++i) {
+		if (lastival && !hasadjacent[i]) {
+			++pathcount;
+		}
+		lastival = hasadjacent[i];
+	}
+
+	if (pathcount <= 1) {
+		// No problem of disconnection
+		return;
+	}
+
+	DebugLevel3Fn("Region %d should be checked\n" _C_ reg);
+	// Here we'll need to flood fill the region to be sure...
+	Regions[reg].NeedConnectTest = 1;
 }
 
 /**
-**	Add a rectangle of tiles to region mapping. Called when map change
+**		Add a rectangle of tiles to region mapping. Called when map change
 **
-**	@param x0	x0 coord of the changed rectangle
-**	@param y0	y0 coord of the changed rectangle
-**	@param x1	x1 coord of the changed rectangle
-**	@param y1	y1 coord of the changed rectangle
+**		@param x0		x0 coord of the changed rectangle
+**		@param y0		y0 coord of the changed rectangle
+**		@param x1		x1 coord of the changed rectangle
+**		@param y1		y1 coord of the changed rectangle
 */
 global void MapSplitterTilesCleared(int x0, int y0, int x1, int y1) {
-    static int directions[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
-    int x;
-    int y;
-    int i;
-    RegionId regid;
-    RegionId oppreg;
-    RegionId adjacents[256];
-    int adjacentsCount[256];
-    int adjacentsNb;
-    int bestAdjacent;
-    int dir;
-    int iswater;
+	static int directions[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
+	int x;
+	int y;
+	int i;
+	RegionId regid;
+	RegionId oppreg;
+	RegionId adjacents[256];
+	int adjacentsCount[256];
+	int adjacentsNb;
+	int bestAdjacent;
+	int dir;
+	int iswater;
 
-    if (!MapSplitterInitialised) {
-	return;
-    }
+	if (!MapSplitterInitialised) {
+		return;
+	}
 
 #ifdef DEBUG
-    for (y = y0; y <= y1; ++y) {
-	for (x = x0; x <= x1; ++x) {
-	    if (RegionMapping(x, y) != NoRegion) {
-		DebugLevel3Fn("Clearing an already clear tile %d %d -- applying ugly hack\n" _C_ x _C_ y);
-		
-		for (y = y0; y <= y1; ++y) {
-		    for (x = x0; x <= x1; ++x) {
-			if (RegionMapping(x, y) == NoRegion) {
-			    MapSplitterTilesCleared(x, y, x, y);
+	for (y = y0; y <= y1; ++y) {
+		for (x = x0; x <= x1; ++x) {
+			if (RegionMapping(x, y) != NoRegion) {
+				DebugLevel3Fn("Clearing an already clear tile %d %d -- applying ugly hack\n" _C_ x _C_ y);
+
+				for (y = y0; y <= y1; ++y) {
+					for (x = x0; x <= x1; ++x) {
+						if (RegionMapping(x, y) == NoRegion) {
+							MapSplitterTilesCleared(x, y, x, y);
+						}
+					}
+				}
+
+				return;
 			}
-		    }
 		}
-		
-		return;
-	    }
 	}
-    }
 #endif
 
-    iswater = TileIsWater(x0, y0) != 0;
+	iswater = TileIsWater(x0, y0) != 0;
 
-    // Find adjacent regions
-    x = x0 - 1;
-    y = y0 - 1;
-    dir = -1;
-    adjacentsNb = 0;
-    do {
-	// Check x,y
-	if (InMap(x, y)) {
-	    oppreg = RegionMapping(x, y);
-	    if (oppreg != NoRegion && Regions[oppreg].IsWater == iswater) {
-		for (i = 0; i < adjacentsNb; ++i) {
-		    if (adjacents[i] == oppreg) {
-		    	adjacentsCount[i]++;
-		    	oppreg = NoRegion;
-		    	break;
-		    }
+	// Find adjacent regions
+	x = x0 - 1;
+	y = y0 - 1;
+	dir = -1;
+	adjacentsNb = 0;
+	do {
+		// Check x,y
+		if (InMap(x, y)) {
+			oppreg = RegionMapping(x, y);
+			if (oppreg != NoRegion && Regions[oppreg].IsWater == iswater) {
+				for (i = 0; i < adjacentsNb; ++i) {
+					if (adjacents[i] == oppreg) {
+							adjacentsCount[i]++;
+							oppreg = NoRegion;
+							break;
+					}
+				}
+				if (oppreg != NoRegion) {
+					adjacents[adjacentsNb] = oppreg;
+					adjacentsCount[adjacentsNb] = 1;
+					adjacentsNb++;
+				}
+			}
 		}
-		if (oppreg != NoRegion) {
-		    adjacents[adjacentsNb] = oppreg;
-		    adjacentsCount[adjacentsNb] = 1;
-		    adjacentsNb++;
+
+		// Increment x, y
+		if ((x == x0 - 1 || x == x1 + 1) && (y == y0 - 1 || y == y1 + 1)) {
+			dir++;
 		}
-	    }
-	}
-	
-	// Increment x, y
-	if ((x == x0 - 1 || x == x1 + 1) && (y == y0 - 1 || y == y1 + 1)) {
-	    dir++;
-	}
-	
-	x += directions[dir][0];
-	y += directions[dir][1];
-    } while (dir < 4);
 
-    bestAdjacent = -1;
-    for (i = 0; i < adjacentsNb; ++i) {
-	if (bestAdjacent == -1 || adjacentsCount[i] > adjacentsCount[bestAdjacent]) {
-	    bestAdjacent = i;
-	}
-    }
+		x += directions[dir][0];
+		y += directions[dir][1];
+	} while (dir < 4);
 
-    // Create new region if no connection, or connection to big area is only 1 cell
-    if (bestAdjacent == -1 || (adjacentsCount[bestAdjacent] < 2 && (x0 != x1 || y0 != y1))) {
-	// create new region
-	regid = NewRegion(TileIsWater(x0, y0));
-    } else {
-	// Find most interesting region
-	regid = adjacents[bestAdjacent];
-    }
-
-    for (y = y0; y <= y1; ++y) {
-	for (x = x0; x <= x1; ++x) {
-	    RegionAssignTile(regid, x, y);
-	    RegionUpdateConnection(regid, x, y, 1, 1);
-	    Regions[regid].Dirty++;
+	bestAdjacent = -1;
+	for (i = 0; i < adjacentsNb; ++i) {
+		if (bestAdjacent == -1 || adjacentsCount[i] > adjacentsCount[bestAdjacent]) {
+			bestAdjacent = i;
+		}
 	}
-    }
+
+	// Create new region if no connection, or connection to big area is only 1 cell
+	if (bestAdjacent == -1 || (adjacentsCount[bestAdjacent] < 2 && (x0 != x1 || y0 != y1))) {
+		// create new region
+		regid = NewRegion(TileIsWater(x0, y0));
+	} else {
+		// Find most interesting region
+		regid = adjacents[bestAdjacent];
+	}
+
+	for (y = y0; y <= y1; ++y) {
+		for (x = x0; x <= x1; ++x) {
+			RegionAssignTile(regid, x, y);
+			RegionUpdateConnection(regid, x, y, 1, 1);
+			Regions[regid].Dirty++;
+		}
+	}
 }
 
 /**
-**	Remove a rectangle of tiles from region mapping. Called when map change
+**		Remove a rectangle of tiles from region mapping. Called when map change
 **
-**	@param x0	x0 coord of the changed rectangle
-**	@param y0	y0 coord of the changed rectangle
-**	@param x1	x1 coord of the changed rectangle
-**	@param y1	y1 coord of the changed rectangle
+**		@param x0		x0 coord of the changed rectangle
+**		@param y0		y0 coord of the changed rectangle
+**		@param x1		x1 coord of the changed rectangle
+**		@param y1		y1 coord of the changed rectangle
 */
 global void MapSplitterTilesOccuped(int x0, int y0, int x1, int y1)
 {
-    int x;
-    int y;
+	int x;
+	int y;
 
-    if (!MapSplitterInitialised) {
-	return;
-    }
-
-    for (y = y0; y <= y1; ++y) {
-	for (x = x0; x <= x1; ++x) {
-	    MapSplitterTileOccuped(x, y);
+	if (!MapSplitterInitialised) {
+		return;
 	}
-    }
+
+	for (y = y0; y <= y1; ++y) {
+		for (x = x0; x <= x1; ++x) {
+			MapSplitterTileOccuped(x, y);
+		}
+	}
 }
 
 /**
-**	Decide if region should be broken, regarding size & nb of tiles
+**		Decide if region should be broken, regarding size & nb of tiles
 **
 */
 local int ShouldBreakRegion(int x0, int y0, int x1, int y1, int tilecount, int hardlimit)
 {
-    int sx;
-    int sy;
-    int square;
+	int sx;
+	int sy;
+	int square;
 
-    // Don't break very small cells
-    if (tilecount < 48) {
-	return 0;
-    }
+	// Don't break very small cells
+	if (tilecount < 48) {
+		return 0;
+	}
 
-    // Break very big ones
-    if (tilecount > (hardlimit ? 512 : 1024)) {
-	return 1;
-    }
+	// Break very big ones
+	if (tilecount > (hardlimit ? 512 : 1024)) {
+		return 1;
+	}
 
-    sx = x1 - x0 + 1;
-    sy = y1 - y0 + 1;
-    square = (sy > sx ? sy : sx);
+	sx = x1 - x0 + 1;
+	sy = y1 - y0 + 1;
+	square = (sy > sx ? sy : sx);
 
-    return 10 * tilecount < 6 * square * square;
+	return 10 * tilecount < 6 * square * square;
 }
 
 /**
-**	Extend A segment, fill it.
+**		Extend A segment, fill it.
 **
 */
 local void FindHExtent(int x, int y, int* vx0, int* vx1, int water)
 {
-    int x0;
-    int x1;
+	int x0;
+	int x1;
 
-    if (x > 0) {
-    	x0 = x;
-    	x1 = x - 1;
-    } else {
-	x0 = x + 1;
-	x1 = x;
-    }
+	if (x > 0) {
+			x0 = x;
+			x1 = x - 1;
+	} else {
+		x0 = x + 1;
+		x1 = x;
+	}
 
-    // Try extending to the left
-    while ((x0 > 0) && (TileMappable(x0 - 1, y)) &&
-	    ((TileIsWater(x0 - 1, y) != 0) == water)) {
-	--x0;
-    }
+	// Try extending to the left
+	while ((x0 > 0) && (TileMappable(x0 - 1, y)) &&
+			((TileIsWater(x0 - 1, y) != 0) == water)) {
+		--x0;
+	}
 
-    // Try extending to the right
-    while ((x1 + 1 < TheMap.Width && (TileMappable(x1 + 1, y)) &&
-	    ((TileIsWater(x1 + 1, y) != 0) == water))) {
-	++x1;
-    }
+	// Try extending to the right
+	while ((x1 + 1 < TheMap.Width && (TileMappable(x1 + 1, y)) &&
+			((TileIsWater(x1 + 1, y) != 0) == water))) {
+		++x1;
+	}
 
-    *vx0 = x0;
-    *vx1 = x1;
+	*vx0 = x0;
+	*vx1 = x1;
 }
 
 /**
-**	Flood fill a region in the mapping area
+**		Flood fill a region in the mapping area
 */
 local void RegionFloodFill(int x0, int x1, int starty, int RegId, int IsWater)
 {
-    int subx0;
-    int subx1;
-    int x;
-    int y;
-    int i;
+	int subx0;
+	int subx1;
+	int x;
+	int y;
+	int i;
 
-    DebugCheck(x0 > x1);
-    DebugCheck(IsWater != 0 && IsWater != 1);
+	DebugCheck(x0 > x1);
+	DebugCheck(IsWater != 0 && IsWater != 1);
 
-    y = starty;
+	y = starty;
 
-    for (x = x0; x <= x1; ++x) {
-	DebugCheck(TileIsWater(x, y) != IsWater);
-	RegionAssignTile(RegId, x, y);
-    }
-
-    // Try in yinc dir
-    for (i = 0; i < 2; ++i){
-	y = starty + (i ? -1 : 1);
-    	for (x = x0 - 1;x <= x1 + 1; ++x) {
-	    if (!InMap(x, y)) {
-	    	continue;
-	    }
-
-	    if (!TileMappable(x, y)) {
-		continue;
-	    }
-
-	    if (TileIsWater(x, y) != IsWater) {
-		continue;
-	    }
-
-	    if (RegionMapping(x, y) != NoRegion) {
-		continue;
-	    }
-
-	    FindHExtent(x, y, &subx0, &subx1, IsWater);
-	    DebugCheck(TileIsWater(subx0,y) != IsWater);
-	    DebugCheck(TileIsWater(subx1,y) != IsWater);
-	    RegionFloodFill(subx0, subx1, y, RegId, IsWater);
-
-	    x = subx1;
+	for (x = x0; x <= x1; ++x) {
+		DebugCheck(TileIsWater(x, y) != IsWater);
+		RegionAssignTile(RegId, x, y);
 	}
-    }
+
+	// Try in yinc dir
+	for (i = 0; i < 2; ++i){
+		y = starty + (i ? -1 : 1);
+			for (x = x0 - 1;x <= x1 + 1; ++x) {
+			if (!InMap(x, y)) {
+					continue;
+			}
+
+			if (!TileMappable(x, y)) {
+				continue;
+			}
+
+			if (TileIsWater(x, y) != IsWater) {
+				continue;
+			}
+
+			if (RegionMapping(x, y) != NoRegion) {
+				continue;
+			}
+
+			FindHExtent(x, y, &subx0, &subx1, IsWater);
+			DebugCheck(TileIsWater(subx0,y) != IsWater);
+			DebugCheck(TileIsWater(subx1,y) != IsWater);
+			RegionFloodFill(subx0, subx1, y, RegId, IsWater);
+
+			x = subx1;
+		}
+	}
 }
 
 /**
-**	Initialise the region mapping ( map tile => regions )
-**	Need an already initialised map to work correctly
+**		Initialise the region mapping ( map tile => regions )
+**		Need an already initialised map to work correctly
 */
 global void InitaliseMapping(void)
 {
-    int found;
-    int i;
-    int total;
-    int x;
-    int y;
-    int x0;
-    int x1;
-    int CurrentIsWater;
+	int found;
+	int i;
+	int total;
+	int x;
+	int y;
+	int x0;
+	int x1;
+	int CurrentIsWater;
 
-    for (i = 0; i < MaxRegionNumber; ++i) {
-	Regions[i].TileCount = 0;
-	Regions[i].Connections = 0;
-	Regions[i].ConnectionsCount = 0;
-	Regions[i].ConnectionsNumber = 0;
-	Regions[i].FirstSegment = 0;
-	Regions[i].LastSegment = 0;
-    }
-
-    total = TheMap.Width * TheMap.Height;
-    for (i = 0; i < total; ++i) {
-	RegionMappingStorage[i] = NoRegion;
-    }
-
-    for (y = 0; y < TheMap.Height; ++y) {
-    	for (x = 0; x < TheMap.Width; ++x) {
-	    if (!TileMappable(x, y)) {
-		continue;
-	    }
-
-	    if (RegionMapping(x, y) != NoRegion) {
-		continue;
-	    }
-
-	    CurrentIsWater = TileIsWater(x, y);
-	    DebugLevel3Fn("CurrentIsWater %d at %d %d\n" _C_ CurrentIsWater _C_ x _C_ y);
-	    FindHExtent(x, y, &x0, &x1, CurrentIsWater);
-
-	    RegionFloodFill(x0, x1, y, NewRegion(CurrentIsWater), CurrentIsWater);
-	    x = x1;
+	for (i = 0; i < MaxRegionNumber; ++i) {
+		Regions[i].TileCount = 0;
+		Regions[i].Connections = 0;
+		Regions[i].ConnectionsCount = 0;
+		Regions[i].ConnectionsNumber = 0;
+		Regions[i].FirstSegment = 0;
+		Regions[i].LastSegment = 0;
 	}
-    }
-    UpdateConnections();
 
-    DebugLevel3Fn( "Map FloodFill done\n");
-    RegionDebugAllConnexions();
-    RegionDebugWater();
-
-    do {
-	// FIXME : detect regions with holes not well connected
-	found = 0;
-	for (i = 0; i < RegionMax; ++i) {
-	    // Get region size
-	    x = Regions[i].MaxX - Regions[i].MinX + 1;
-	    y = Regions[i].MaxY - Regions[i].MinY + 1;
-
-	    // Split region which are big or are not square at all...
-	    if ((Regions[i].TileCount > 1024) ||
-	    	    (Regions[i].TileCount > 64 &&
-		    max(x, y) * max(x, y) > 3 * Regions[i].TileCount)) {
-		DebugLevel3Fn( "Split %d\n" _C_ i);
-		RegionSplit(i, 1);
-		// RegionDebugAllConnexions();
-		found = 1;
-		break;
-	    }
+	total = TheMap.Width * TheMap.Height;
+	for (i = 0; i < total; ++i) {
+		RegionMappingStorage[i] = NoRegion;
 	}
-    } while (found);
+
+	for (y = 0; y < TheMap.Height; ++y) {
+			for (x = 0; x < TheMap.Width; ++x) {
+			if (!TileMappable(x, y)) {
+				continue;
+			}
+
+			if (RegionMapping(x, y) != NoRegion) {
+				continue;
+			}
+
+			CurrentIsWater = TileIsWater(x, y);
+			DebugLevel3Fn("CurrentIsWater %d at %d %d\n" _C_ CurrentIsWater _C_ x _C_ y);
+			FindHExtent(x, y, &x0, &x1, CurrentIsWater);
+
+			RegionFloodFill(x0, x1, y, NewRegion(CurrentIsWater), CurrentIsWater);
+			x = x1;
+		}
+	}
+	UpdateConnections();
+
+	DebugLevel3Fn( "Map FloodFill done\n");
+	RegionDebugAllConnexions();
+	RegionDebugWater();
+
+	do {
+		// FIXME : detect regions with holes not well connected
+		found = 0;
+		for (i = 0; i < RegionMax; ++i) {
+			// Get region size
+			x = Regions[i].MaxX - Regions[i].MinX + 1;
+			y = Regions[i].MaxY - Regions[i].MinY + 1;
+
+			// Split region which are big or are not square at all...
+			if ((Regions[i].TileCount > 1024) ||
+						(Regions[i].TileCount > 64 &&
+					max(x, y) * max(x, y) > 3 * Regions[i].TileCount)) {
+				DebugLevel3Fn( "Split %d\n" _C_ i);
+				RegionSplit(i, 1);
+				// RegionDebugAllConnexions();
+				found = 1;
+				break;
+			}
+		}
+	} while (found);
 }
 
 /**
-**	Find a point of connexion between two zone.
-**	The point closer to (refx,refy) in (a) is returned
+**		Find a point of connexion between two zone.
+**		The point closer to (refx,refy) in (a) is returned
 **
-**	@param a	a zone number
-**	@param b	the other zone number
-**	@param refx	Search closest to (refx,refy)
-**	@param refy	Search closest to (refx,refy)
-**	@param rsltx	Will hold result X
-**	@param rsltx	Will hold result Y
+**		@param a		a zone number
+**		@param b		the other zone number
+**		@param refx		Search closest to (refx,refy)
+**		@param refy		Search closest to (refx,refy)
+**		@param rsltx		Will hold result X
+**		@param rsltx		Will hold result Y
 */
 global void ZoneFindConnexion(int a, int b, int refx, int refy, int* rsltx, int* rslty)
 {
-    int oppzone;
-    RegionId oppregion;
-    RegionSegment* rg;
-    int x;
-    int y;
-    int tx;
-    int ty;
-    int i;
-    int j;
-    int k;
-    int dst;
-    int bestdst;
+	int oppzone;
+	RegionId oppregion;
+	RegionSegment* rg;
+	int x;
+	int y;
+	int tx;
+	int ty;
+	int i;
+	int j;
+	int k;
+	int dst;
+	int bestdst;
 
-    bestdst = -1;
-    for (i = 0; i < RegionMax; ++i) {
-	if (Regions[i].Zone == a) {
-	    for (j = 0; j < Regions[i].ConnectionsNumber; ++j) {
-		oppregion = Regions[i].Connections[j];
-		oppzone = Regions[oppregion].Zone;
-		if (oppzone != b) {
-		    continue;
-		}
-		
-		// OK, find a point in region i, adjacent to oppregion
-		rg = Regions[i].FirstSegment;
-		while (rg) {
-		    y = rg->Y;
-		    for (x = rg->MinX; x <= rg->MaxX; ++x) {
-			for (k = 0; k < 8; ++k) {
-			    tx = x + adjacents[k][0];
-			    ty = y + adjacents[k][1];
+	bestdst = -1;
+	for (i = 0; i < RegionMax; ++i) {
+		if (Regions[i].Zone == a) {
+			for (j = 0; j < Regions[i].ConnectionsNumber; ++j) {
+				oppregion = Regions[i].Connections[j];
+				oppzone = Regions[oppregion].Zone;
+				if (oppzone != b) {
+					continue;
+				}
 
-			    if (!InMap(tx,ty)) {
-				continue;
-			    }
-			    oppregion = RegionMapping(tx, ty);
-			    if (oppregion == NoRegion || Regions[oppregion].Zone != b) {
-				continue;
-			    }
-			    dst = (x - refx) * (x - refx) + (y - refy) * (y - refy);
-			    if (bestdst == -1 || dst < bestdst){
-				*rsltx = x;
-				*rslty = y;
-				bestdst = dst;
-			    }
+				// OK, find a point in region i, adjacent to oppregion
+				rg = Regions[i].FirstSegment;
+				while (rg) {
+					y = rg->Y;
+					for (x = rg->MinX; x <= rg->MaxX; ++x) {
+						for (k = 0; k < 8; ++k) {
+							tx = x + adjacents[k][0];
+							ty = y + adjacents[k][1];
+
+							if (!InMap(tx,ty)) {
+								continue;
+							}
+							oppregion = RegionMapping(tx, ty);
+							if (oppregion == NoRegion || Regions[oppregion].Zone != b) {
+								continue;
+							}
+							dst = (x - refx) * (x - refx) + (y - refy) * (y - refy);
+							if (bestdst == -1 || dst < bestdst){
+								*rsltx = x;
+								*rslty = y;
+								bestdst = dst;
+							}
+						}
+					}
+					rg = rg->Next;
+				}
+				break;
 			}
-		    }
-		    rg = rg->Next;
 		}
-		break;
-	    }
 	}
-    }
 
-    DebugCheck(bestdst == -1);
+	DebugCheck(bestdst == -1);
 }
 
 /**
-**	Refresh connection between zones
+**		Refresh connection between zones
 */
 local void RefreshZones(void)
 {
-    int* regions_stack;
-    RegionId regid;
-    RegionId adjid;
-    int stack_size;
-    int stack_ptr;
-    int i;
-    int j;
-    int zoneid;
+	int* regions_stack;
+	RegionId regid;
+	RegionId adjid;
+	int stack_size;
+	int stack_ptr;
+	int i;
+	int j;
+	int zoneid;
 
-    DebugCheck(!RegionCount);
-    regions_stack = alloca(RegionCount * sizeof(int));
+	DebugCheck(!RegionCount);
+	regions_stack = alloca(RegionCount * sizeof(int));
 
-    for (i = 0; i < RegionMax; ++i) {
-	Regions[i].Zone = -1;
-    }
-
-    zoneid = 0;
-
-    i = 0;
-    do {
-	while (i < RegionMax && ((!Regions[i].TileCount) || Regions[i].Zone != -1)) {
-	    ++i;
-    	}
-	
-	if (i == RegionMax) {
-	    return;
+	for (i = 0; i < RegionMax; ++i) {
+		Regions[i].Zone = -1;
 	}
 
-	Regions[i].Zone = zoneid;
-	
-	stack_ptr = 0;
-	regions_stack[0] = i;
-	stack_size = 1;
+	zoneid = 0;
 
-	while (stack_ptr < stack_size) {
-	    regid = regions_stack[stack_ptr++];
-	    for (j = 0; j < Regions[regid].ConnectionsNumber; ++j) {
-		adjid = Regions[regid].Connections[j];
-		if (Regions[adjid].Zone != -1) {
-		    continue;
+	i = 0;
+	do {
+		while (i < RegionMax && ((!Regions[i].TileCount) || Regions[i].Zone != -1)) {
+			++i;
+			}
+
+		if (i == RegionMax) {
+			return;
 		}
 
-		if (Regions[adjid].IsWater != Regions[regid].IsWater) {
-		    continue;
+		Regions[i].Zone = zoneid;
+
+		stack_ptr = 0;
+		regions_stack[0] = i;
+		stack_size = 1;
+
+		while (stack_ptr < stack_size) {
+			regid = regions_stack[stack_ptr++];
+			for (j = 0; j < Regions[regid].ConnectionsNumber; ++j) {
+				adjid = Regions[regid].Connections[j];
+				if (Regions[adjid].Zone != -1) {
+					continue;
+				}
+
+				if (Regions[adjid].IsWater != Regions[regid].IsWater) {
+					continue;
+				}
+				regions_stack[stack_size++] = adjid;
+				Regions[adjid].Zone = zoneid;
+			}
 		}
-		regions_stack[stack_size++] = adjid;
-		Regions[adjid].Zone = zoneid;
-	    }
-	}
-	
-	++zoneid;
-    } while (1);
+
+		++zoneid;
+	} while (1);
 }
 
 /**
-**	Allocate space for tile=>region mapping
+**		Allocate space for tile=>region mapping
 */
 local void AllocateMapping(void)
 {
-    int total;
+	int total;
 
-    total = TheMap.Width * TheMap.Height;
-    RegionMappingStorage = (RegionId*) malloc(sizeof(RegionId) * total);
-    NextFreeRegion = 0;
-    RegionCount = 0;
-    RegionMax = 0;
+	total = TheMap.Width * TheMap.Height;
+	RegionMappingStorage = (RegionId*) malloc(sizeof(RegionId) * total);
+	NextFreeRegion = 0;
+	RegionCount = 0;
+	RegionMax = 0;
 }
 
 /**
-** 	Initialise all data structures of the MapSplitter
+** 		Initialise all data structures of the MapSplitter
 **
 */
 global void MapSplitterInit(void)
 {
-    MapSplitterInitialised = 1;
+	MapSplitterInitialised = 1;
 
-    AllocateMapping();
-    InitaliseMapping();
-    RefreshZones();
-    ZoneNeedRefresh = 0;
+	AllocateMapping();
+	InitaliseMapping();
+	RefreshZones();
+	ZoneNeedRefresh = 0;
 
-    DebugLevel3Fn("Mapping initialised\n");
-    RegionDebugAllConnexions();
+	DebugLevel3Fn("Mapping initialised\n");
+	RegionDebugAllConnexions();
 }
 
 /**
-**	Free all structure owned by the MapSplitter
+**		Free all structure owned by the MapSplitter
 **
 */
 global void MapSplitterClean(void)
 {
-    // FIXME : free !
-    MapSplitterInitialised = 0;
+	// FIXME : free !
+	MapSplitterInitialised = 0;
 }
 
 /**
-**	Called each cycle to maintain correctness of the mapping
+**		Called each cycle to maintain correctness of the mapping
 **
 */
 global void MapSplitterEachCycle(void)
 {
-    int k;
-    int x0;
-    int y0;
-    int x1;
-    int y1;
-    RegionId i;
-    RegionId j;
+	int k;
+	int x0;
+	int y0;
+	int x1;
+	int y1;
+	RegionId i;
+	RegionId j;
 
-    DebugCheck(!MapSplitterInitialised);
+	DebugCheck(!MapSplitterInitialised);
 
-    // Check for connection in regions
-    for (i = 0; i < RegionMax; ++i) {
-	if (Regions[i].TileCount && Regions[i].NeedConnectTest) {
-	    RegionCheckConnex(i);
-	}
-    }
-
-    // split big & diform regions
-    if (RegionCount < MaxRegionNumber / 4) {
-	// Try to split regions
+	// Check for connection in regions
 	for (i = 0; i < RegionMax; ++i) {
-	    if (Regions[i].Dirty && ShouldBreakRegion(Regions[i].MinX,Regions[i].MinY,
-	    	Regions[i].MaxX,Regions[i].MaxY,Regions[i].TileCount,1)) {
-		DebugLevel3Fn("Splitting region %d\n" _C_ i);
-		
-		
-		RegionSplit(i, 1);
-		
-		// RegionDebugAllConnexions();
-		if (RegionCount >= MaxRegionNumber / 4) {
-		    break;
+		if (Regions[i].TileCount && Regions[i].NeedConnectTest) {
+			RegionCheckConnex(i);
 		}
-	    }
 	}
-    }
 
-    // find smalls & really connected regions
-    for (i = 0; i < RegionMax; ++i) {
-	// Try to complete this region
-	if (Regions[i].Dirty && Regions[i].TileCount && Regions[i].TileCount < 1024) {
-	    for (k = 0; k < Regions[i].ConnectionsNumber; ++k) {
-		j = Regions[i].Connections[k];
-		
-		
-		if (Regions[i].TileCount + Regions[j].TileCount > 1024) {
-		    continue;
+	// split big & diform regions
+	if (RegionCount < MaxRegionNumber / 4) {
+		// Try to split regions
+		for (i = 0; i < RegionMax; ++i) {
+			if (Regions[i].Dirty && ShouldBreakRegion(Regions[i].MinX,Regions[i].MinY,
+					Regions[i].MaxX,Regions[i].MaxY,Regions[i].TileCount,1)) {
+				DebugLevel3Fn("Splitting region %d\n" _C_ i);
+
+
+				RegionSplit(i, 1);
+
+				// RegionDebugAllConnexions();
+				if (RegionCount >= MaxRegionNumber / 4) {
+					break;
+				}
+			}
 		}
-		
-		
-		if (Regions[i].IsWater != Regions[j].IsWater) {
-		    continue;
-		}
-		
-		// ConnectionsCount == ~ 3 * n°of tile connected
-		if ((Regions[i].TileCount > 256 && Regions[j].TileCount> 256) &&
-		    Regions[i].ConnectionsCount[j] / 3 < sqrt(Regions[i].TileCount) / 2 &&
-		    Regions[i].ConnectionsCount[j] / 3 < sqrt(Regions[j].TileCount) / 2) {
-		    continue;
-		}
-		
-		x0 = min(Regions[i].MinX,Regions[j].MinX);
-		y0 = min(Regions[i].MinY,Regions[j].MinY);
-		x1 = max(Regions[i].MaxX,Regions[j].MaxX);
-		y1 = max(Regions[i].MaxY,Regions[j].MaxY);
-		
-		if (!ShouldBreakRegion(x0, y0, x1, y1,
-		    	Regions[i].TileCount + Regions[j].TileCount, 1)) {
-		    DebugLevel3Fn("Joining regions %d - %d\n" _C_ i _C_ j);
-		    RegionJoin(i, j);
-		    // RegionDebugAllConnexions();
-		    if (!Regions[i].TileCount) {
-			break;
-		    }
-		}
-	    }
 	}
-	Regions[i].Dirty = 0;
-    }
 
-    ClearZoneNeedRefresh();
+	// find smalls & really connected regions
+	for (i = 0; i < RegionMax; ++i) {
+		// Try to complete this region
+		if (Regions[i].Dirty && Regions[i].TileCount && Regions[i].TileCount < 1024) {
+			for (k = 0; k < Regions[i].ConnectionsNumber; ++k) {
+				j = Regions[i].Connections[k];
+
+
+				if (Regions[i].TileCount + Regions[j].TileCount > 1024) {
+					continue;
+				}
+
+
+				if (Regions[i].IsWater != Regions[j].IsWater) {
+					continue;
+				}
+
+				// ConnectionsCount == ~ 3 * n°of tile connected
+				if ((Regions[i].TileCount > 256 && Regions[j].TileCount> 256) &&
+					Regions[i].ConnectionsCount[j] / 3 < sqrt(Regions[i].TileCount) / 2 &&
+					Regions[i].ConnectionsCount[j] / 3 < sqrt(Regions[j].TileCount) / 2) {
+					continue;
+				}
+
+				x0 = min(Regions[i].MinX,Regions[j].MinX);
+				y0 = min(Regions[i].MinY,Regions[j].MinY);
+				x1 = max(Regions[i].MaxX,Regions[j].MaxX);
+				y1 = max(Regions[i].MaxY,Regions[j].MaxY);
+
+				if (!ShouldBreakRegion(x0, y0, x1, y1,
+							Regions[i].TileCount + Regions[j].TileCount, 1)) {
+					DebugLevel3Fn("Joining regions %d - %d\n" _C_ i _C_ j);
+					RegionJoin(i, j);
+					// RegionDebugAllConnexions();
+					if (!Regions[i].TileCount) {
+						break;
+					}
+				}
+			}
+		}
+		Regions[i].Dirty = 0;
+	}
+
+	ClearZoneNeedRefresh();
 }
 
 /**
-**	Can the unit 'src' reach the place x,y.
+**		Can the unit 'src' reach the place x,y.
 **
-**	@param src	Unit for the path.
-**	@param x	Map X tile position.
-**	@param y	Map Y tile position.
-**	@param w	Width of Goal
-**	@param h	Height of Goal
-**	@param range	Range to the tile.
+**		@param src		Unit for the path.
+**		@param x		Map X tile position.
+**		@param y		Map Y tile position.
+**		@param w		Width of Goal
+**		@param h		Height of Goal
+**		@param range		Range to the tile.
 **
-**	@return		Distance to place.
+**		@return				Distance to place.
 */
 global int PlaceReachable(Unit* src, int goal_x, int goal_y, int w, int h, int minrange, int maxrange)
 {
-    static ZoneSet source = {0};
-    static ZoneSet dest = {0};
+	static ZoneSet source = {0};
+	static ZoneSet dest = {0};
 
-    if (src->Type->UnitType == UnitTypeFly) {
-	return 1;
-    }
+	if (src->Type->UnitType == UnitTypeFly) {
+		return 1;
+	}
 
-    ZoneSetClear(&source);
-    ZoneSetClear(&dest);
+	ZoneSetClear(&source);
+	ZoneSetClear(&dest);
 
-    ZoneSetAddUnitZones(&source, src);
-    ZoneSetAddGoalZones(&dest, src, goal_x, goal_y, w, h, minrange, maxrange);
+	ZoneSetAddUnitZones(&source, src);
+	ZoneSetAddGoalZones(&dest, src, goal_x, goal_y, w, h, minrange, maxrange);
 
-    ZoneSetIntersect(&source, &dest);
-    return source.ZoneCount != 0;
+	ZoneSetIntersect(&source, &dest);
+	return source.ZoneCount != 0;
 }
 
 /**
-**	Check if zone connections need a refresh & do it
+**		Check if zone connections need a refresh & do it
 */
 global void ClearZoneNeedRefresh(void)
 {
-    if (ZoneNeedRefresh) {
-	RefreshZones();
-	ZoneNeedRefresh = 0;
-    }
+	if (ZoneNeedRefresh) {
+		RefreshZones();
+		ZoneNeedRefresh = 0;
+	}
 }
 
 #endif // MAP_REGIONS
