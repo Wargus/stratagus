@@ -85,7 +85,7 @@ void SaveMap(CLFile* file)
 
 	CLprintf(file, "  \"size\", {%d, %d},\n", TheMap.Width, TheMap.Height);
 	CLprintf(file, "  \"%s\",\n", TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
-	CLprintf(file, "  \"filename\", \"%s\",\n", TheMap.Info->Filename);
+	CLprintf(file, "  \"filename\", \"%s\",\n", TheMap.Info.Filename);
 
 	CLprintf(file, "  \"map-fields\", {\n");
 	for (h = 0; h < TheMap.Height; ++h) {

@@ -353,13 +353,12 @@ static int PudReadByte(CLFile* input)
 /**
 ** Get the info for a pud.
 */
-MapInfo* GetPudInfo(const char* pud)
+MapInfo* GetPudInfo(const char* pud, MapInfo* info)
 {
 	CLFile* input;
 	uint32_t length;
 	char header[5];
 	char buf[1024];
-	MapInfo* info;
 	unsigned short temp_short;
 	// FIXME: Reuse the temporary alloca buffer...
 
@@ -387,10 +386,7 @@ MapInfo* GetPudInfo(const char* pud)
 		return NULL;
 	}
 
-	info=calloc(1, sizeof(MapInfo)); // clears with 0
-	if (!info) {
-		return NULL;
-	}
+	memset(info, 0, sizeof(MapInfo)); // clears with 0
 
 	info->Filename = strdup(pud);
 
@@ -813,9 +809,7 @@ void LoadPud(const char* pud,WorldMap* map)
 	strcat(pudfull, "/");
 	strcat(pudfull, pud);
 
-	if (!map->Info) {
-		map->Info = GetPudInfo(pudfull);
-	}
+	GetPudInfo(pudfull, &map->Info);
 	if( !(input=CLopen(pudfull,CL_OPEN_READ)) ) {
 		fprintf(stderr,"Try ./path/name\n");
 		fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
@@ -1577,10 +1571,10 @@ int SavePud(const char* pud,const WorldMap* map)
 	buf[0x9]=0x00;
 	buf[0xA]=0x0A;
 	buf[0xB]=0xFF;
-	buf[0xC]=map->Info->MapUID >>  0;
-	buf[0xD]=map->Info->MapUID >>  8;
-	buf[0xE]=map->Info->MapUID >> 16;
-	buf[0xF]=map->Info->MapUID >> 24;
+	buf[0xC]=map->Info.MapUID >>  0;
+	buf[0xD]=map->Info.MapUID >>  8;
+	buf[0xE]=map->Info.MapUID >> 16;
+	buf[0xF]=map->Info.MapUID >> 24;
 	gzwrite(f,buf,16);
 
 	PudWriteHeader(f,"VER ",2);
@@ -1590,18 +1584,18 @@ int SavePud(const char* pud,const WorldMap* map)
 
 	PudWriteHeader(f,"DESC",32);
 	memset(buf,0,32);
-	strncpy(buf,map->Info->Description,32);
+	strncpy(buf,map->Info.Description,32);
 	gzwrite(f,buf,32);
 
 	PudWriteHeader(f,"OWNR",16);
 	for( i=0; i<16; ++i ) {
-		buf[i]=map->Info->PlayerType[i];
+		buf[i]=map->Info.PlayerType[i];
 	}
 	gzwrite(f,buf,16);
 
 	PudWriteHeader(f,"ERAX",2);
-	buf[0]=map->Info->MapTerrain >> 0;
-	buf[1]=map->Info->MapTerrain >> 8;
+	buf[0]=map->Info.MapTerrain >> 0;
+	buf[1]=map->Info.MapTerrain >> 8;
 	gzwrite(f,buf,2);
 
 	PudWriteHeader(f,"DIM ",4);
@@ -1633,34 +1627,34 @@ int SavePud(const char* pud,const WorldMap* map)
 
 	PudWriteHeader(f,"SIDE",16);
 	for( i=0; i<16; ++i ) {
-		buf[i]=map->Info->PlayerSide[i];
+		buf[i]=map->Info.PlayerSide[i];
 	}
 	gzwrite(f,buf,16);
 
 	PudWriteHeader(f,"SGLD",32);
 	for( i=0; i<16; ++i ) {
-		buf[i*2+0]=map->Info->PlayerResources[i][GoldCost] >> 0;
-		buf[i*2+1]=map->Info->PlayerResources[i][GoldCost] >> 8;
+		buf[i*2+0]=map->Info.PlayerResources[i][GoldCost] >> 0;
+		buf[i*2+1]=map->Info.PlayerResources[i][GoldCost] >> 8;
 	}
 	gzwrite(f,buf,32);
 
 	PudWriteHeader(f,"SLBR",32);
 	for( i=0; i<16; ++i ) {
-		buf[i*2+0]=map->Info->PlayerResources[i][WoodCost] >> 0;
-		buf[i*2+1]=map->Info->PlayerResources[i][WoodCost] >> 8;
+		buf[i*2+0]=map->Info.PlayerResources[i][WoodCost] >> 0;
+		buf[i*2+1]=map->Info.PlayerResources[i][WoodCost] >> 8;
 	}
 	gzwrite(f,buf,32);
 
 	PudWriteHeader(f,"SOIL",32);
 	for( i=0; i<16; ++i ) {
-		buf[i*2+0]=map->Info->PlayerResources[i][OilCost] >> 0;
-		buf[i*2+1]=map->Info->PlayerResources[i][OilCost] >> 8;
+		buf[i*2+0]=map->Info.PlayerResources[i][OilCost] >> 0;
+		buf[i*2+1]=map->Info.PlayerResources[i][OilCost] >> 8;
 	}
 	gzwrite(f,buf,32);
 
 	PudWriteHeader(f,"AIPL",16);
 	for( i=0; i<16; ++i ) {
-		buf[i]=map->Info->PlayerAi[i];
+		buf[i]=map->Info.PlayerAi[i];
 	}
 	gzwrite(f,buf,16);
 

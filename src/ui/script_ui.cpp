@@ -4438,6 +4438,38 @@ static int CclSetGroupKeys(lua_State* l)
 }
 
 /**
+** Set basic map caracteristics.
+**
+**  @param l  Lua state.
+*/
+static int CclPresentMap(lua_State* l)
+{
+	if (lua_gettop(l) != 4) {
+		LuaError(l, "incorrect argument");
+	}
+	TheMap.Info.Description = strdup(LuaToString(l, 1));
+	// Number of players in LuaToNumber(l, 3); // Not used yet.
+	TheMap.Info.MapWidth = LuaToNumber(l, 3);
+	TheMap.Info.MapHeight = LuaToNumber(l, 4);
+
+	return 0;
+}
+
+/**
+** Define the lua file that will be build the map
+**
+**  @param l  Lua state.
+*/
+static int CclDefineMapSetup(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "incorrect argument");
+	}
+	TheMap.Info.Filename = strdup(LuaToString(l, 1));
+	return 0;
+}
+
+/**
 **  Add a keystroke help
 **
 **  @param l  Lua state.
@@ -4522,6 +4554,9 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "DefineMenuItem", CclDefineMenuItem);
 	lua_register(Lua, "DefineMenu", CclDefineMenu);
 	lua_register(Lua, "DefineMenuGraphics", CclDefineMenuGraphics);
+
+	lua_register(Lua, "PresentMap", CclPresentMap);
+	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
 
 	//
 	// Color cycling

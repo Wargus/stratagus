@@ -10,7 +10,7 @@
 //
 /**@name map.c - The map. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Vladi Shabanski
+//      (c) Copyright 1998-2004 by Lutz Sammer, Vladi Shabanski and François Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -414,7 +414,7 @@ void FreeMapInfo(MapInfo* info)
 		if (info->Filename) {
 			free(info->Filename);
 		}
-		free(info);
+		memset(info, 0, sizeof(MapInfo));
 	}
 }
 
@@ -429,7 +429,7 @@ void CleanMap(void)
 
 	// Tileset freed by Tileset?
 
-	FreeMapInfo(TheMap.Info);
+	FreeMapInfo(&TheMap.Info);
 	memset(&TheMap, 0, sizeof(TheMap));
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

@@ -299,7 +299,6 @@ extern Menu* CurrentMenu;                     ///< Current menu
 extern struct _graphic_* MenuButtonGraphics[];///< Menu button graphics
 extern struct _graphic_* MenuButtonG;         ///< Current menu button graphics
 
-extern struct _map_info_* MenuMapInfo;        ///< MapInfo of map used in gui menus
 extern char MenuMapFullPath[1024];  ///< Full path to currently selected map
 
 extern int nKeyStrokeHelps;    ///< Number of loaded keystroke helps

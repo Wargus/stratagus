@@ -428,7 +428,6 @@ static char ScenSelectPath[1024];        ///< Scenario selector path
 static char ScenSelectDisplayPath[1024]; ///< Displayed selector path
 static char ScenSelectFileName[128];     ///< Scenario selector name
 
-MapInfo *MenuMapInfo;                    ///< Selected map info
 char MenuMapFullPath[1024];              ///< Selected map path+name
 
 static char *SaveDir;                    ///< Save game directory
@@ -2485,9 +2484,6 @@ static void GetInfoFromSelectPath(void)
 {
 	int i;
 
-	FreeMapInfo(MenuMapInfo);
-	MenuMapInfo = NULL;
-
 	if (ScenSelectPath[0]) {
 		i = strlen(ScenSelectPath);
 		strcat(ScenSelectPath, "/");
@@ -2496,10 +2492,10 @@ static void GetInfoFromSelectPath(void)
 	}
 	strcat(ScenSelectPath, ScenSelectFileName); // Final map name with path
 	if (strcasestr(ScenSelectFileName, ".pud")) {
-		MenuMapInfo = GetPudInfo(ScenSelectPath);
+		GetPudInfo(ScenSelectPath, &TheMap.Info);
 		strcpy(MenuMapFullPath, ScenSelectPath);
-	} else {
-		// FIXME: GetCmInfo();
+	} else if(strcasestr(ScenSelectFileName, ".smp")) {
+		LuaLoadFile(ScenSelectPath);
 	}
 	ScenSelectPath[i] = '\0'; // Remove appended part
 }
@@ -2519,21 +2515,15 @@ static void ScenSelectMenu(void)
 	GetInfoFromSelectPath();
 
 	menu = FindMenu("menu-custom-game");
-	// FIXME: This check is only needed until GetCmInfo works
-	if (!MenuMapInfo) {
-		menu->Items[12].D.Pulldown.noptions = PlayerMax-1;
+	for (n = j = 0; j < PlayerMax; ++j) {
+		t = TheMap.Info.PlayerType[j];
+		if (t == PlayerPerson || t == PlayerComputer) {
+			n++;
+		}
+	}
+	menu->Items[12].D.Pulldown.noptions = n;
+	if (menu->Items[12].D.Pulldown.curopt >= n) {
 		menu->Items[12].D.Pulldown.curopt = 0;
-	} else {
-		for (n = j = 0; j < PlayerMax; ++j) {
-			t = MenuMapInfo->PlayerType[j];
-			if (t == PlayerPerson || t == PlayerComputer) {
-				n++;
-			}
-		}
-		menu->Items[12].D.Pulldown.noptions = n;
-		if (menu->Items[12].D.Pulldown.curopt >= n) {
-			menu->Items[12].D.Pulldown.curopt = 0;
-		}
 	}
 }
 
@@ -3009,6 +2999,28 @@ static void MultiPlayerInternetGame(void)
 }
 
 /**
+** Allocate and deep copy a MapInfo structure
+*/
+static MapInfo* DuplicateMapInfo(MapInfo *orig)
+{
+	MapInfo* dest;
+
+	dest = malloc(sizeof(MapInfo));
+	memcpy(dest, orig, sizeof(MapInfo));
+	if (orig->Description) {
+		dest->Description = strdup(orig->Description);
+	}
+	if (dest->MapTerrainName) {
+		dest->MapTerrainName = strdup(orig->MapTerrainName);
+	}
+	if (dest->Filename) {
+		dest->Filename = strdup(orig->Filename);
+	}
+
+	return dest;
+}
+
+/**
 ** Free map info data
 */
 static void FreeMapInfos(FileList *fl, int n)
@@ -3018,6 +3030,7 @@ static void FreeMapInfos(FileList *fl, int n)
 	for (i = 0; i < n; i++) {
 		if (fl[i].type && fl[i].xdata) {
 			FreeMapInfo(fl[i].xdata);
+			free(fl[i].xdata);
 			fl[i].xdata = NULL;
 		}
 		free(fl[i].name);
@@ -3092,7 +3105,7 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 
 	curopt = menu->Items[6].D.Pulldown.curopt;
 	if (curopt == 0) {
-		suf[0] = ".cm";
+		suf[0] = ".smp";
 		suf[1] = NULL;
 	} else if (curopt == 1) {
 		suf[0] = ".pud";
@@ -3141,20 +3154,22 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #endif
 		if (*cp == 0) {
 			if (curopt == 0) {
-				// info = GetCmInfo(pathbuf);
 				info = NULL;
 				fl->type = 1;
 				fl->name = strdup(np);
-				fl->xdata = info;
+				FreeMapInfo(&TheMap.Info);
+				LuaLoadFile(pathbuf);
+				fl->xdata = DuplicateMapInfo(&TheMap.Info);
 				return 1;
 			} else if (curopt == 1) {
-				info = GetPudInfo(pathbuf);
+				FreeMapInfo(&TheMap.Info);
+				info = GetPudInfo(pathbuf, &TheMap.Info);
 				if (info) {
 					sz = szl[menu->Items[8].D.Pulldown.curopt];
 					if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
 						fl->type = 1;
 						fl->name = strdup(np);
-						fl->xdata = info;
+						fl->xdata = DuplicateMapInfo(info);
 						return 1;
 					} else {
 						FreeMapInfo(info);
@@ -3474,8 +3489,6 @@ static void ScenSelectCancel(void)
 */
 static void GameCancel(void)
 {
-	FreeMapInfo(MenuMapInfo);
-	MenuMapInfo = NULL;
 	EndMenu();
 }
 
@@ -3486,9 +3499,6 @@ static void CustomGameStart(void)
 {
 	int i;
 	char *p;
-
-	FreeMapInfo(MenuMapInfo);
-	MenuMapInfo = NULL;
 
 	if (ScenSelectPath[0]) {
 		strcat(ScenSelectPath, "/");
@@ -3551,21 +3561,15 @@ static void GameSetupInit(Menuitem* mi __attribute__ ((unused)))
 	GetInfoFromSelectPath();
 
 	menu = FindMenu("menu-custom-game");
-	// FIXME: This check is only needed until GetCmInfo works
-	if (!MenuMapInfo) {
-		menu->Items[12].D.Pulldown.noptions = PlayerMax-1;
+	for (n = j = 0; j < PlayerMax; ++j) {
+		t = TheMap.Info.PlayerType[j];
+		if (t == PlayerPerson || t == PlayerComputer) {
+			n++;
+		}
+	}
+	menu->Items[12].D.Pulldown.noptions = n;
+	if (menu->Items[12].D.Pulldown.curopt >= n) {
 		menu->Items[12].D.Pulldown.curopt = 0;
-	} else {
-		for (n = j = 0; j < PlayerMax; ++j) {
-			t = MenuMapInfo->PlayerType[j];
-			if (t == PlayerPerson || t == PlayerComputer) {
-				n++;
-			}
-		}
-		menu->Items[12].D.Pulldown.noptions = n;
-		if (menu->Items[12].D.Pulldown.curopt >= n) {
-			menu->Items[12].D.Pulldown.curopt = 0;
-		}
 	}
 }
 
@@ -3584,13 +3588,12 @@ static void GameDrawFunc(Menuitem* mi __attribute__((unused)))
 	l = VideoTextLength(GameFont, "Scenario:");
 	VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360, GameFont, "Scenario:");
 	VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360 + 24 , GameFont, ScenSelectFileName);
-	if (MenuMapInfo) {
-		if (MenuMapInfo->Description) {
-			VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 360, GameFont, MenuMapInfo->Description);
-		}
-		sprintf(buffer, " (%d x %d)", MenuMapInfo->MapWidth, MenuMapInfo->MapHeight);
-		VideoDrawText(TheUI.Offset640X + 16 + l + 8 + VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 360 + 24, GameFont, buffer);
+	if (TheMap.Info.Description) {
+		VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 360, GameFont, TheMap.Info.Description);
 	}
+	sprintf(buffer, " (%d x %d)", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
+	VideoDrawText(TheUI.Offset640X + 16 + l + 8 + VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 360 + 24, GameFont, buffer);
+
 #if 0
 	for (n = j = 0; j < PlayerMax; j++) {
 		if (info->PlayerType[j] == PlayerPerson) {
@@ -3803,8 +3806,6 @@ static void NetworkGamePrepareGameSettings(void)
 	int x;
 	int v;
 
-	Assert(MenuMapInfo);
-
 	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
 
 	GameSettings.NetGameType=SettingsMultiPlayerGame;
@@ -3825,10 +3826,10 @@ static void NetworkGamePrepareGameSettings(void)
 
 	// Make a list of the available player slots.
 	for (c = h = i = 0; i < PlayerMax; i++) {
-		if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
+		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
 			num[h++] = i;
 		}
-		if (MenuMapInfo->PlayerType[i] == PlayerComputer) {
+		if (TheMap.Info.PlayerType[i] == PlayerComputer) {
 			comp[c++] = i; // available computer player slots
 		}
 	}
@@ -3902,10 +3903,10 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 
 	// Calculate available slots from pudinfo
 	for (c = h = i = 0; i < PlayerMax; i++) {
-		if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
+		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
 			h++; // available interactive player slots
 		}
-		if (MenuMapInfo->PlayerType[i] == PlayerComputer) {
+		if (TheMap.Info.PlayerType[i] == PlayerComputer) {
 			c++; // available computer player slots
 		}
 	}
@@ -4039,10 +4040,10 @@ static void MultiClientUpdate(int initial)
 
 	//  Calculate available slots from pudinfo
 	for (c = h = i = 0; i < PlayerMax; i++) {
-		if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
+		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
 			h++; // available interactive player slots
 		}
-		if (MenuMapInfo->PlayerType[i] == PlayerComputer) {
+		if (TheMap.Info.PlayerType[i] == PlayerComputer) {
 			c++; // available computer player slots
 		}
 	}
@@ -4134,7 +4135,7 @@ static void MultiGameSetupInit(Menuitem* mi)
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
 	// Calculate available slots from pudinfo
 	for (h = i = 0; i < PlayerMax; i++) {
-		if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
+		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
 			h++; // available interactive player slots
 		}
 	}
@@ -4369,9 +4370,6 @@ int NetClientSelectScenario(void)
 {
 	char *cp;
 
-	FreeMapInfo(MenuMapInfo);
-	MenuMapInfo = NULL;
-
 	cp = strrchr(MenuMapFullPath, '/');
 	if (cp) {
 		strcpy(ScenSelectFileName, cp + 1);
@@ -4383,12 +4381,13 @@ int NetClientSelectScenario(void)
 		ScenSelectPath[0] = 0;
 	}
 
+	FreeMapInfo(&TheMap.Info);
 	if (strcasestr(ScenSelectFileName, ".pud")) {
-		MenuMapInfo = GetPudInfo(MenuMapFullPath);
+		GetPudInfo(MenuMapFullPath, &TheMap.Info);
 	} else {
-		// FIXME: GetCmInfo();
+		LuaLoadFile(MenuMapFullPath);
 	}
-	return MenuMapInfo == NULL;
+	return 1;
 }
 
 /**
@@ -4520,12 +4519,11 @@ static void EditorNewMap(void)
 		return;
 	}
 
-	TheMap.Info = calloc(1, sizeof(MapInfo));
 	description[strlen(description) - 3] = '\0';
-	TheMap.Info->Description = strdup(description);
-	TheMap.Info->MapTerrain = menu->Items[7].D.Pulldown.curopt;
-	TheMap.Info->MapWidth = atoi(width);
-	TheMap.Info->MapHeight = atoi(height);
+	TheMap.Info.Description = strdup(description);
+	TheMap.Info.MapTerrain = menu->Items[7].D.Pulldown.curopt;
+	TheMap.Info.MapWidth = atoi(width);
+	TheMap.Info.MapHeight = atoi(height);
 
 	VideoClearScreen();
 
@@ -4761,13 +4759,21 @@ static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 #endif
 		if (*cp == 0) {
 			if (strcasestr(np, ".pud")) {
-				info = GetPudInfo(pathbuf);
+				info = GetPudInfo(pathbuf, &TheMap.Info);
 				if (info) {
 					fl->type = 1;
 					fl->name = strdup(np);
-					fl->xdata = info;
+					fl->xdata = DuplicateMapInfo(info);
 					return 1;
 				}
+			} else {
+				info = NULL;
+				fl->type = 1;
+				fl->name = strdup(np);
+				FreeMapInfo(&TheMap.Info);
+				LuaLoadFile(pathbuf);
+				fl->xdata = DuplicateMapInfo(&TheMap.Info);
+				return 1;
 			}
 		}
 	}
@@ -5074,7 +5080,7 @@ static void EditorMapPropertiesMenu(void)
 	menu = FindMenu("menu-editor-map-properties");
 
 	menu->Items[2].D.Input.buffer = description;
-	strcpy(description, TheMap.Info->Description);
+	strcpy(description, TheMap.Info.Description);
 	strcat(description, "~!_");
 	menu->Items[2].D.Input.nch = strlen(description) - 3;
 	menu->Items[2].D.Input.maxch = 31;
@@ -5114,19 +5120,19 @@ static void EditorMapPropertiesOk(void)
 
 	description = menu->Items[2].D.Input.buffer;
 	description[strlen(description)-3] = '\0';
-	free(TheMap.Info->Description);
-	TheMap.Info->Description = strdup(description);
+	free(TheMap.Info.Description);
+	TheMap.Info.Description = strdup(description);
 
 	// Change the terrain
-	old = TheMap.Info->MapTerrain;
+	old = TheMap.Info.MapTerrain;
 	if (old != menu->Items[6].D.Pulldown.curopt) {
-		TheMap.Info->MapTerrain = menu->Items[6].D.Pulldown.curopt;
-		free(TheMap.Info->MapTerrainName);
-		TheMap.Info->MapTerrainName = strdup(TilesetWcNames[TheMap.Info->MapTerrain]);
-		TheMap.Terrain = TheMap.Info->MapTerrain;
+		TheMap.Info.MapTerrain = menu->Items[6].D.Pulldown.curopt;
+		free(TheMap.Info.MapTerrainName);
+		TheMap.Info.MapTerrainName = strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
+		TheMap.Terrain = TheMap.Info.MapTerrain;
 		free(TheMap.TerrainName);
-		TheMap.TerrainName = strdup(TilesetWcNames[TheMap.Info->MapTerrain]);
-		TheMap.Tileset = Tilesets[TheMap.Info->MapTerrain];
+		TheMap.TerrainName = strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
+		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
 
 		LoadTileset();
 		ChangeTilesetPud(old, &TheMap);
@@ -5244,12 +5250,12 @@ static void EditorPlayerPropertiesMenu(void)
 #define OIL_POSITION 106
 
 	for (i = 0; i < PlayerMax; ++i) {
-		menu->Items[RACE_POSITION + i].D.Pulldown.defopt = TheMap.Info->PlayerSide[i];
-		menu->Items[TYPE_POSITION + i].D.Pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info->PlayerType[i]];
-		menu->Items[AI_POSITION + i].D.Pulldown.defopt = PlayerAiFcToMenu(TheMap.Info->PlayerAi[i]);
-		sprintf(gold[i], "%d~!_", TheMap.Info->PlayerResources[i][GoldCost]);
-		sprintf(lumber[i], "%d~!_", TheMap.Info->PlayerResources[i][WoodCost]);
-		sprintf(oil[i], "%d~!_", TheMap.Info->PlayerResources[i][OilCost]);
+		menu->Items[RACE_POSITION + i].D.Pulldown.defopt = TheMap.Info.PlayerSide[i];
+		menu->Items[TYPE_POSITION + i].D.Pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info.PlayerType[i]];
+		menu->Items[AI_POSITION + i].D.Pulldown.defopt = PlayerAiFcToMenu(TheMap.Info.PlayerAi[i]);
+		sprintf(gold[i], "%d~!_", TheMap.Info.PlayerResources[i][GoldCost]);
+		sprintf(lumber[i], "%d~!_", TheMap.Info.PlayerResources[i][WoodCost]);
+		sprintf(oil[i], "%d~!_", TheMap.Info.PlayerResources[i][OilCost]);
 		menu->Items[GOLD_POSITION + i].D.Input.buffer = gold[i];
 		menu->Items[GOLD_POSITION + i].D.Input.nch = strlen(gold[i]) - 3;
 		menu->Items[GOLD_POSITION + i].D.Input.maxch = 7;
@@ -5264,12 +5270,12 @@ static void EditorPlayerPropertiesMenu(void)
 	ProcessMenu("menu-editor-player-properties", 1);
 
 	for (i = 0; i < PlayerMax; ++i) {
-		TheMap.Info->PlayerSide[i] = menu->Items[RACE_POSITION + i].D.Pulldown.curopt;
-		TheMap.Info->PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].D.Pulldown.curopt];
-		TheMap.Info->PlayerAi[i] = PlayerAiMenuToFc(menu->Items[AI_POSITION + i].D.Pulldown.curopt);
-		TheMap.Info->PlayerResources[i][GoldCost] = atoi(gold[i]);
-		TheMap.Info->PlayerResources[i][WoodCost] = atoi(lumber[i]);
-		TheMap.Info->PlayerResources[i][OilCost] = atoi(oil[i]);
+		TheMap.Info.PlayerSide[i] = menu->Items[RACE_POSITION + i].D.Pulldown.curopt;
+		TheMap.Info.PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].D.Pulldown.curopt];
+		TheMap.Info.PlayerAi[i] = PlayerAiMenuToFc(menu->Items[AI_POSITION + i].D.Pulldown.curopt);
+		TheMap.Info.PlayerResources[i][GoldCost] = atoi(gold[i]);
+		TheMap.Info.PlayerResources[i][WoodCost] = atoi(lumber[i]);
+		TheMap.Info.PlayerResources[i][OilCost] = atoi(oil[i]);
 	}
 }
 
@@ -6414,7 +6420,7 @@ static void ChangeGameServer(void)
 	freespots = 0;
 	players = 0;
 	for (i = 0; i < PlayerMax - 1; ++i) {
-		if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
+		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
 			++players;
 		}
 		if (ServerSetupState.CompOpt[i] == 0) {
