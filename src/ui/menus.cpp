@@ -756,7 +756,7 @@ local void NameLineDrawFunc(Menuitem * mi __attribute__ ((unused)))
     SetDefaultTextColors(rc, rc);
 
 #ifdef WITH_SOUND
-    if (SoundFildes == -1) {
+    if (SoundFildes == -1 && !SoundOff) {
 	VideoDrawText(16, 16, LargeFont, "Sound disabled, please check!");
     }
 #endif
