@@ -35,9 +35,14 @@
 #include <ctype.h>
 #include <limits.h>
 
-#include "iocompat.h"
+#ifndef _MSC_VER
+#include <fcntl.h>
+#endif
 
 #include "freecraft.h"
+
+#include "iocompat.h"
+
 #include "video.h"
 #include "player.h"
 #include "font.h"

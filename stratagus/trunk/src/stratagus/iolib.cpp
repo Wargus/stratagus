@@ -32,9 +32,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "iocompat.h"
+#ifndef _MSC_VER
+#include <fcntl.h>
+#endif
 
 #include "freecraft.h"
+#include "iocompat.h"
+
 #include "campaign.h"			// for CurrentMapPath
 
 #include "iolib.h"
