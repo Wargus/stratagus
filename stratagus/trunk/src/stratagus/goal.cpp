@@ -43,6 +43,7 @@
 #include "interface.h"
 
 #include "unit.h"
+#include "map.h"
 #include "menus.h"
 #include "network.h"
 
