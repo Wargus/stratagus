@@ -74,8 +74,6 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local EventCallback callbacks;
-
 /**
 **	Menu button graphics
 */
@@ -1962,16 +1960,72 @@ local void MenuHandleButtonUp(unsigned b)
     }
 }
 
+typedef struct _menu_stack_ {
+    Menu* Menu;
+    int CurSel;
+    struct _menu_stack_* Next;
+} MenuStack;
+
+MenuStack* Menus;
+
+/**
+**	Push the current menu onto the stack.
+*/
+local void PushMenu(void)
+{
+    MenuStack* menu;
+
+    menu = malloc(sizeof(MenuStack));
+    menu->Menu = CurrentMenu;
+    menu->CurSel = MenuButtonCurSel;
+    menu->Next = Menus;
+    Menus = menu;
+}
+
+/**
+**	Pop the stack and set the current menu
+*/
+local void PopMenu(void)
+{
+    MenuStack* menu;
+    Menuitem* mi;
+    int i;
+
+    for (i = 0; i < CurrentMenu->nitems; ++i) {
+	mi = CurrentMenu->items + i;
+	if (mi->exitfunc) {
+	    (*mi->exitfunc)(mi);		// action/destructor
+	}
+    }
+
+    MenuButtonUnderCursor = -1;
+    MenuButtonCurSel = -1;
+    CurrentMenu = NULL;
+
+    if (Menus) {
+	MenuButtonCurSel = Menus->CurSel;
+	menu = Menus;
+	Menus = Menus->Next;
+	free(menu);
+	if (Menus) {
+	    CurrentMenu = Menus->Menu;
+	}
+    }
+}
+
 /**
 **	End process menu
-**
 */
 global void EndMenu(void)
 {
     CursorOn = CursorOnUnknown;
-    CurrentMenu = NULL;
-
     MustRedraw = RedrawEverything;
+    PopMenu();
+
+    if (!CurrentMenu && Callbacks!=&GameCallbacks) {
+	InterfaceState=IfaceStateNormal;
+	Callbacks=&GameCallbacks;
+    }
 }
 
 /**
@@ -2003,9 +2057,9 @@ global void ProcessMenu(const char *menu_id, int loop)
 	CurrentMenuSave = CurrentMenu;
 	MenuButtonUnderCursorSave = MenuButtonUnderCursor;
 	MenuButtonCurSelSave = MenuButtonCurSel;
+	InterfaceState = IfaceStateMenu;
     }
 
-    InterfaceState = IfaceStateMenu;
     VideoLockScreen();
     HideAnyCursor();
     VideoUnlockScreen();
@@ -2018,6 +2072,12 @@ global void ProcessMenu(const char *menu_id, int loop)
 	return;
     }
     CurrentMenu = menu;
+
+    if (!loop) {
+	Callbacks = &MenuCallbacks;
+	PushMenu();
+    }
+
     MenuButtonCurSel = -1;
     for (i = 0; i < menu->nitems; ++i) {
 	mi = menu->items + i;
@@ -2072,8 +2132,8 @@ global void ProcessMenu(const char *menu_id, int loop)
 	MenuHandleMouseMove(CursorX,CursorY);	// This activates buttons as appropriate!
     }
 
+    MustRedraw = RedrawEverything;
     if (loop) {
-	MustRedraw = RedrawEverything;
 	while (CurrentMenu != NULL) {
 	    DebugLevel3("MustRedraw: 0x%08x\n" _C_ MustRedraw);
 	    if (MustRedraw) {
@@ -2091,7 +2151,7 @@ global void ProcessMenu(const char *menu_id, int loop)
 	    }
 	    RealizeVideoMemory();
 	    oldncr = NetConnectRunning;
-	    WaitEventsOneFrame(&callbacks);
+	    WaitEventsOneFrame(&MenuCallbacks);
 	    if (NetConnectRunning == 2) {
 		NetworkProcessClientRequest();
 		MustRedraw |= RedrawMenu;
@@ -2109,19 +2169,18 @@ global void ProcessMenu(const char *menu_id, int loop)
     } else {
 	VideoLockScreen();
 	DrawMenu(CurrentMenu);
-	MustRedraw&=~RedrawMenu;
+	MustRedraw &= ~RedrawMenu;
 	VideoUnlockScreen();
 	InvalidateAreaAndCheckCursor(MenuRedrawX,MenuRedrawY,MenuRedrawW,MenuRedrawH);
     }
 
-    for (i = 0; i < menu->nitems; ++i) {
-	mi = menu->items + i;
-	if (mi->exitfunc) {
-	    (*mi->exitfunc)(mi);		// action/destructor
-	}
-    }
-
     if (loop) {
+	for (i = 0; i < menu->nitems; ++i) {
+	    mi = menu->items + i;
+	    if (mi->exitfunc) {
+		(*mi->exitfunc)(mi);		// action/destructor
+	    }
+	}
 	CurrentMenu = CurrentMenuSave;
 	MenuButtonUnderCursor = MenuButtonUnderCursorSave;
 	MenuButtonCurSel = MenuButtonCurSelSave;
@@ -2155,15 +2214,15 @@ global void InitMenus(int race)
     }
 
     if (last_race == -1) {
-	callbacks.ButtonPressed = &MenuHandleButtonDown;
-	callbacks.ButtonReleased = &MenuHandleButtonUp;
-	callbacks.MouseMoved = &MenuHandleMouseMove;
-	callbacks.MouseExit = &HandleMouseExit;
-	callbacks.KeyPressed = &MenuHandleKeyDown;
-	callbacks.KeyReleased = &MenuHandleKeyUp;
-	callbacks.KeyRepeated = &MenuHandleKeyRepeat;
-	callbacks.NetworkEvent = NetworkEvent;
-	callbacks.SoundReady = WriteSound;
+	MenuCallbacks.ButtonPressed = &MenuHandleButtonDown;
+	MenuCallbacks.ButtonReleased = &MenuHandleButtonUp;
+	MenuCallbacks.MouseMoved = &MenuHandleMouseMove;
+	MenuCallbacks.MouseExit = &HandleMouseExit;
+	MenuCallbacks.KeyPressed = &MenuHandleKeyDown;
+	MenuCallbacks.KeyReleased = &MenuHandleKeyUp;
+	MenuCallbacks.KeyRepeated = &MenuHandleKeyRepeat;
+	MenuCallbacks.NetworkEvent = NetworkEvent;
+	MenuCallbacks.SoundReady = WriteSound;
     } else {
 	// free previous sprites for different race
 	VideoFree(MenuButtonGfx.Sprite);

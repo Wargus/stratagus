@@ -316,7 +316,7 @@ local void UiToggleMusic(void)
 global void UiTogglePause(void)
 {
     GamePaused^=1;
-    if(GamePaused) {
+    if( GamePaused ) {
 	SetStatusLine("Game Paused");
     } else {
 	SetStatusLine("Game Resumed");
@@ -328,9 +328,11 @@ global void UiTogglePause(void)
 */
 local void UiEnterMenu(void)
 {
-    GamePaused=1;
-    SetStatusLine("Game Paused");
-    ProcessMenu("menu-game", 1);
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
+    ProcessMenu("menu-game", 0);
 }
 
 /**
@@ -338,13 +340,11 @@ local void UiEnterMenu(void)
 */
 local void UiEnterHelpMenu(void)
 {
-    GamePaused=1;
-    ProcessMenu("menu-help", 1);
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
+    ProcessMenu("menu-help", 0);
 }
 
 /**
@@ -352,14 +352,11 @@ local void UiEnterHelpMenu(void)
 */
 local void UiEnterOptionsMenu(void)
 {
-    GamePaused=1;
-    SetStatusLine("Game Paused");
-    ProcessMenu("menu-game-options", 1);
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
+    ProcessMenu("menu-game-options", 0);
 }
 
 /**
@@ -367,14 +364,11 @@ local void UiEnterOptionsMenu(void)
 */
 local void UiEnterSoundOptionsMenu(void)
 {
-    GamePaused=1;
-    SetStatusLine("Game Paused");
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
     SoundOptionsMenu();
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
 }
 
 /**
@@ -382,14 +376,11 @@ local void UiEnterSoundOptionsMenu(void)
 */
 local void UiEnterSpeedOptionsMenu(void)
 {
-    GamePaused=1;
-    SetStatusLine("Game Paused");
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
     SpeedOptionsMenu();
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
 }
 
 /**
@@ -397,14 +388,11 @@ local void UiEnterSpeedOptionsMenu(void)
 */
 local void UiEnterPreferencesOptionsMenu(void)
 {
-    GamePaused=1;
-    SetStatusLine("Game Paused");
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
     PreferencesMenu();
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
 }
 
 /**
@@ -417,14 +405,11 @@ local void UiEnterSaveGameMenu(void)
 	return;
     }
 
-    GamePaused=1;
-    SetStatusLine("Game Paused");
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
     SaveGameMenu();
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
 }
 
 /**
@@ -437,14 +422,11 @@ local void UiEnterLoadGameMenu(void)
 	return;
     }
 
-    GamePaused=1;
-    SetStatusLine("Game Paused");
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
     LoadGameMenu();
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
 }
 
 /**
@@ -452,14 +434,11 @@ local void UiEnterLoadGameMenu(void)
 */
 local void UiExitConfirmMenu(void)
 {
-    GamePaused=1;
-    SetStatusLine("Game Paused");
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
     ExitConfirmMenu();
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
 }
 
 /**
@@ -467,14 +446,11 @@ local void UiExitConfirmMenu(void)
 */
 local void UiQuitToMenuConfirmMenu(void)
 {
-    GamePaused=1;
-    SetStatusLine("Game Paused");
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
     QuitToMenuConfirmMenu();
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
 }
 
 /**
@@ -482,14 +458,11 @@ local void UiQuitToMenuConfirmMenu(void)
 */
 local void UiRestartConfirmMenu(void)
 {
-    GamePaused=1;
-    SetStatusLine("Game Paused");
+    if( NetworkFildes==-1 ) {
+	GamePaused=1;
+	SetStatusLine("Game Paused");
+    }
     RestartConfirmMenu();
-    InterfaceState=IfaceStateNormal;
-    ClearStatusLine();
-    MarkDrawEntireMap();
-    MustRedraw=RedrawEverything;
-    GamePaused=0;
 }
 
 /**
