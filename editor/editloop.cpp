@@ -339,12 +339,13 @@ local int CalculateUnitIcons(void)
     i = 0;
     count = 0;
     x = TheUI.ButtonPanelY + 24;
-    while (x < TheUI.ButtonPanelEndY - IconHeight) {
+    while (x < TheUI.ButtonPanelY + TheUI.ButtonPanel.Graphic->Height
+	    - IconHeight) {
 	++i;
 	x += IconHeight + 2;
     }
     x = TheUI.ButtonPanelX + 10;
-    while (x < TheUI.ButtonPanelEndX) {
+    while (x < TheUI.ButtonPanelX + 146) {
 	count += i;
 	x += IconWidth + 8;
     }
@@ -618,7 +619,8 @@ local void DrawUnitIcons(void)
     y = TheUI.ButtonPanelY + 24;
 
     i = UnitIndex;
-    while (y < TheUI.ButtonPanelEndY - IconHeight) {
+    while (y < TheUI.ButtonPanelY
+	    + TheUI.ButtonPanel.Graphic->Height - IconHeight) {
 	if (i >= MaxShownUnits) {
 	    break;
 	}
@@ -806,31 +808,6 @@ local void DrawEditorInfo(void)
     int y;
     unsigned flags;
     char buf[256];
-    int resx;
-    int resy;
-
-    resx = resy = 9999;
-    for (i = 1; i < MaxCosts; ++i) {
-	x = TheUI.Resources[i].IconX;
-	if (TheUI.Resources[i].Icon.Graphic && x < resx) {
-	    resx = x;
-	}
-	x = TheUI.Resources[i].TextX;
-	if (x != -1 && x < resx) {
-	    resx = TheUI.Resources[i].IconX;
-	}
-	y = TheUI.Resources[i].IconY;
-	if (TheUI.Resources[i].Icon.Graphic && y < resy) {
-	    resy = y;
-	}
-	y = TheUI.Resources[i].TextY;
-	if (y != -1 && y < resx) {
-	    resy = TheUI.Resources[i].IconY;
-	}
-    }
-    if (resx == 9999 || resy == 9999) {
-	return;
-    }
 
     x = y = 0;
     if (TheUI.MouseViewport) {
@@ -839,7 +816,7 @@ local void DrawEditorInfo(void)
     }
 
     sprintf(buf, "Editor (%d %d)", x, y);
-    VideoDrawText(resx + 2, resy + 2, GameFont, buf);
+    VideoDrawText(TheUI.ResourceX + 2, TheUI.ResourceY + 2, GameFont, buf);
 
     //
     //	Flags info
@@ -860,7 +837,7 @@ local void DrawEditorInfo(void)
 	flags & MapFieldAirUnit		? 'a' : '-',
 	flags & MapFieldSeaUnit		? 's' : '-',
 	flags & MapFieldBuilding	? 'b' : '-');
-    VideoDrawText(resx + 118, resy + 2, GameFont, buf);
+    VideoDrawText(TheUI.ResourceX + 118, TheUI.ResourceY + 2, GameFont, buf);
 
     //
     //	Tile info
@@ -881,7 +858,7 @@ local void DrawEditorInfo(void)
 	    ? TheMap.Tileset->TileNames[TheMap.Tileset->MixedNameTable[i]]
 	    : "");
 
-    VideoDrawText(resx + 252, resy + 2, GameFont, buf);
+    VideoDrawText(TheUI.ResourceX + 252, TheUI.ResourceY + 2, GameFont, buf);
 }
 
 /**
@@ -917,16 +894,6 @@ global void EditorUpdateDisplay(void)
 
     DrawMapArea();			// draw the map area
 
-    //
-    //  Panels
-    //
-    for (i = 0; i < TheUI.NumPanels; ++i) {
-	if (TheUI.Panel[i].Graphic) {
-	    VideoDraw(TheUI.Panel[i].Graphic, 0,
-		    TheUI.PanelX[i], TheUI.PanelY[i]);
-	}
-    }
-
     if (CursorOn == CursorOnMap) {
 	DrawMapCursor();			// cursor on map
     }
@@ -934,14 +901,25 @@ global void EditorUpdateDisplay(void)
     //
     //  Menu button
     //
-    DrawMenuButton(TheUI.MenuButton.Button,
-	    (ButtonAreaUnderCursor == ButtonAreaMenu
-		&& ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
+    if (TheUI.MenuButton.Graphic) {
+	VideoDrawSub(TheUI.MenuButton.Graphic, 0, 0,
+	    TheUI.MenuButton.Graphic->Width, TheUI.MenuButton.Graphic->Height,
+	    TheUI.MenuButtonX, TheUI.MenuButtonY);
+    }
+    DrawMenuButton(MBUTTON_MAIN,
+	    (ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
 	    (GameMenuButtonClicked ? MenuButtonClicked : 0),
-	    TheUI.MenuButton.Width, TheUI.MenuButton.Height,
-	    TheUI.MenuButton.X,TheUI.MenuButton.Y,
-	    GameFont,TheUI.MenuButton.Text,NULL,NULL);
+	    128, 19,
+	    TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
+	    GameFont,"Menu (~<F10~>)",NULL,NULL);
 
+    //
+    //  Minimap border
+    //
+    if (TheUI.Minimap.Graphic) {
+	VideoDrawSub(TheUI.Minimap.Graphic, 0, 0, TheUI.Minimap.Graphic->Width,
+	    TheUI.Minimap.Graphic->Height, TheUI.MinimapX, TheUI.MinimapY);
+    }
     //
     //  Minimap
     //
@@ -958,12 +936,40 @@ global void EditorUpdateDisplay(void)
 	    TheUI.InfoPanel.Graphic->Width, TheUI.InfoPanel.Graphic->Height/4,
 	    TheUI.InfoPanelX, TheUI.InfoPanelY);
     }
+    //
+    //  Button panel
+    //
+    if (TheUI.ButtonPanel.Graphic) {
+	VideoDrawSub(TheUI.ButtonPanel.Graphic, 0, 0,
+	    TheUI.ButtonPanel.Graphic->Width,
+	    TheUI.ButtonPanel.Graphic->Height, TheUI.ButtonPanelX,
+	    TheUI.ButtonPanelY);
+    }
     DrawEditorPanel();
 
+    //
+    //  Resource
+    //
+    if (TheUI.Resource.Graphic) {
+	VideoDrawSub(TheUI.Resource.Graphic, 0, 0,
+	    TheUI.Resource.Graphic->Width, TheUI.Resource.Graphic->Height,
+	    TheUI.ResourceX, TheUI.ResourceY);
+    }
     if (CursorOn==CursorOnMap) {
 	DrawEditorInfo();
     }
 
+    //
+    //  Fillers
+    //
+    for (i = 0; i < TheUI.NumFillers; ++i) {
+	if (TheUI.Filler[i].Graphic) {
+	    VideoDrawSub(TheUI.Filler[i].Graphic, 0, 0,
+		    TheUI.Filler[i].Graphic->Width,
+		    TheUI.Filler[i].Graphic->Height,
+		    TheUI.FillerX[i], TheUI.FillerY[i]);
+	}
+    }
     //
     //  Status line
     //
@@ -999,8 +1005,7 @@ local void EditorCallbackButtonUp(unsigned button)
 
     if ((1<<button) == LeftButton && GameMenuButtonClicked == 1) {
 	GameMenuButtonClicked = 0;
-	if (ButtonAreaUnderCursor == ButtonAreaMenu
-		&& ButtonUnderCursor == ButtonUnderMenu) {
+	if (ButtonUnderCursor == 0) {
 	    ProcessMenu("menu-editor", 1);
 	}
     }
@@ -1021,8 +1026,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
     //
     //  Click on menu button
     //
-    if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu
-	    && ButtonUnderCursor == ButtonUnderMenu
+    if (CursorOn == CursorOnButton && ButtonUnderCursor == 0
 	    && (MouseButtons & LeftButton) && !GameMenuButtonClicked) {
 	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 	GameMenuButtonClicked = 1;
@@ -1567,14 +1571,13 @@ local void EditorCallbackMouse(int x, int y)
     CursorOn = -1;
     CursorPlayer = -1;
     CursorUnitIndex = -1;
-    ButtonAreaUnderCursor = -1;
     ButtonUnderCursor = -1;
 
     //
     //	Minimap
     //
-    if (x >= TheUI.MinimapX && x < TheUI.MinimapX+TheUI.MinimapW
-	    && y >= TheUI.MinimapY && y < TheUI.MinimapY+TheUI.MinimapH) {
+    if (x >= TheUI.MinimapX+24 && x < TheUI.MinimapX+24+MINIMAP_W
+	    && y >= TheUI.MinimapY+2 && y < TheUI.MinimapY+2+MINIMAP_H) {
 	CursorOn = CursorOnMinimap;
     }
 
@@ -1606,7 +1609,8 @@ local void EditorCallbackMouse(int x, int y)
 
 	i = UnitIndex;
 	by = TheUI.ButtonPanelY + 24;
-	while (by < TheUI.ButtonPanelEndY - IconHeight) {
+	while (by < TheUI.ButtonPanelY
+		+ TheUI.ButtonPanel.Graphic->Height - IconHeight) {
 	    if (i >= MaxShownUnits || !ShownUnitTypes[i]) {
 		break;
 	    }
@@ -1709,24 +1713,25 @@ local void EditorCallbackMouse(int x, int y)
 	SetStatusLine("Tile mode");
 	return;
     }
-    if( TheUI.MenuButton.X!=-1 ) {
-	if( x>=TheUI.MenuButton.X
-		&& x<=TheUI.MenuButton.X+TheUI.MenuButton.Width
-		&& y>TheUI.MenuButton.Y
-		&& y<=TheUI.MenuButton.Y+TheUI.MenuButton.Height ) {
-	    ButtonAreaUnderCursor=ButtonAreaMenu;
-	    ButtonUnderCursor=ButtonUnderMenu;
-	    CursorOn=CursorOnButton;
-	    MustRedraw|=RedrawMenuButton;
-	    return;
+    for (i = 0; i < (int)(sizeof(TheUI.Buttons)/sizeof(*TheUI.Buttons)); ++i) {
+	if (x < TheUI.Buttons[i].X
+		|| x > TheUI.Buttons[i].X + TheUI.Buttons[i].Width
+		|| y < TheUI.Buttons[i].Y
+		|| y > TheUI.Buttons[i].Y + TheUI.Buttons[i].Height) {
+	    continue;
 	}
+	DebugLevel3("On button %d\n" _C_ i);
+	ButtonUnderCursor = i;
+	CursorOn = CursorOnButton;
+	ClearStatusLine();
+	return;
     }
 
     //
     //  Minimap
     //
-    if (x >= TheUI.MinimapX && x < TheUI.MinimapX + TheUI.MinimapW
-	    && y >= TheUI.MinimapY && y < TheUI.MinimapY + TheUI.MinimapH) {
+    if (x >= TheUI.MinimapX + 24 && x < TheUI.MinimapX + 24 + MINIMAP_W
+	    && y >= TheUI.MinimapY + 2 && y < TheUI.MinimapY + 2 + MINIMAP_H) {
 	CursorOn = CursorOnMinimap;
 	return;
     }

@@ -60,7 +60,6 @@ typedef int MenuButtonId;
 /// FIXME: FILL IN THIS TABLE!!!!
 
 #define MBUTTON_MAIN		 4	/// FIXME: write docu
-#define MBUTTON_NETWORK		 7
 #define MBUTTON_GM_HALF		10
 #define MBUTTON_132		13
 #define MBUTTON_GM_FULL		16
@@ -329,9 +328,6 @@ extern _MenuFuncHash MenuFuncHash;
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
-
-    /// Menu button style to char*
-extern char *MenuButtonStyle(int style);
 
     /// Initialize the hash tables for the menus
 extern void InitMenuFuncHash(void);
