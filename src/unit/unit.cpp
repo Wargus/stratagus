@@ -2664,6 +2664,9 @@ void DestroyAllInside(Unit* source)
 	// No Corpses, we are inside something, and we can't be seen
 	unit = source->UnitInside;
 	for (i = source->InsideCount; i; --i, unit = unit->NextContained) {
+		if (unit->UnitInside) {
+			DestroyAllInside(unit);
+		}
 		RemoveUnit(unit, NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);
