@@ -188,6 +188,7 @@ typedef struct _menuitem_ {
 #define MI_PSTATE_PASSIVE 1
 
     /// for MI_TYPE_GEM
+#define MI_GSTATE_UNCHECKED 0
 #define MI_GSTATE_PASSIVE 1
 #define MI_GSTATE_INVISIBLE 2
 #define MI_GSTATE_CHECKED 4
