@@ -4518,8 +4518,21 @@ local void DrawTransRectangle32(SysColors color,int x,int y
 global void VideoDrawRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h)
 {
-    CLIP_RECTANGLE(x,y,w,h);
-    VideoDrawRectangle(color,x,y,w,h);
+    #define _x              x
+    #define _y              y
+    #define _w              w
+    #define _h              h
+    #define _hline(x,y,w)   VideoDrawHLine(color,x,y,w)
+    #define _vline(x,y,h)   VideoDrawVLine(color,x,y,h)
+
+    #include "_clip_rectangle"
+
+    #undef _x
+    #undef _y
+    #undef _w
+    #undef _h
+    #undef _hline
+    #undef _vline
 }
 
 /**
@@ -4534,8 +4547,21 @@ global void VideoDrawRectangleClip(SysColors color,int x,int y
 global void VideoDraw25TransRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h)
 {
-    CLIP_RECTANGLE(x,y,w,h);
-    VideoDraw25TransRectangle(color,x,y,w,h);
+    #define _x              x
+    #define _y              y
+    #define _w              w
+    #define _h              h
+    #define _hline(x,y,w)   VideoDraw25TransHLine(color,x,y,w)
+    #define _vline(x,y,h)   VideoDraw25TransVLine(color,x,y,h)
+
+    #include "_clip_rectangle"
+
+    #undef _x
+    #undef _y
+    #undef _w
+    #undef _h
+    #undef _hline
+    #undef _vline
 }
 
 /**
@@ -4550,8 +4576,21 @@ global void VideoDraw25TransRectangleClip(SysColors color,int x,int y
 global void VideoDraw50TransRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h)
 {
-    CLIP_RECTANGLE(x,y,w,h);
-    VideoDraw50TransRectangle(color,x,y,w,h);
+    #define _x              x
+    #define _y              y
+    #define _w              w
+    #define _h              h
+    #define _hline(x,y,w)   VideoDraw50TransHLine(color,x,y,w)
+    #define _vline(x,y,h)   VideoDraw50TransVLine(color,x,y,h)
+
+    #include "_clip_rectangle"
+
+    #undef _x
+    #undef _y
+    #undef _w
+    #undef _h
+    #undef _hline
+    #undef _vline
 }
 
 /**
@@ -4566,8 +4605,21 @@ global void VideoDraw50TransRectangleClip(SysColors color,int x,int y
 global void VideoDraw75TransRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h)
 {
-    CLIP_RECTANGLE(x,y,w,h);
-    VideoDraw75TransRectangle(color,x,y,w,h);
+    #define _x              x
+    #define _y              y
+    #define _w              w
+    #define _h              h
+    #define _hline(x,y,w)   VideoDraw75TransHLine(color,x,y,w)
+    #define _vline(x,y,h)   VideoDraw75TransVLine(color,x,y,h)
+
+    #include "_clip_rectangle"
+
+    #undef _x
+    #undef _y
+    #undef _w
+    #undef _h
+    #undef _hline
+    #undef _vline
 }
 
 /**
@@ -4583,8 +4635,21 @@ global void VideoDraw75TransRectangleClip(SysColors color,int x,int y
 global void VideoDrawTransRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h,unsigned char alpha)
 {
-    CLIP_RECTANGLE(x,y,w,h);
-    VideoDrawTransRectangle(color,x,y,w,h,alpha);
+    #define _x              x
+    #define _y              y
+    #define _w              w
+    #define _h              h
+    #define _hline(x,y,w)   VideoDrawTransHLine(color,x,y,w,alpha)
+    #define _vline(x,y,h)   VideoDrawTransVLine(color,x,y,h,alpha)
+
+    #include "_clip_rectangle"
+
+    #undef _x
+    #undef _y
+    #undef _w
+    #undef _h
+    #undef _hline
+    #undef _vline
 }
 
 // ===========================================================================
