@@ -1578,8 +1578,8 @@ local void EditorCallbackMouse(int x, int y)
     //
     //	Minimap
     //
-    if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + MINIMAP_W &&
-	    y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + MINIMAP_H) {
+    if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
+	    y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
 	CursorOn = CursorOnMinimap;
     }
 
@@ -1731,8 +1731,8 @@ local void EditorCallbackMouse(int x, int y)
     //
     //  Minimap
     //
-    if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + MINIMAP_W &&
-	    y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + MINIMAP_H) {
+    if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
+	    y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
 	CursorOn = CursorOnMinimap;
 	return;
     }

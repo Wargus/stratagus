@@ -372,12 +372,15 @@ local void SaveUi(CLFile* file, const UI* ui)
 	ui->MenuButtonGraphic.File, ui->MenuButtonGraphicX,
 	ui->MenuButtonGraphicY);
 
-    CLprintf(file, "  ; Minimap background\n");
-    CLprintf(file, "  'minimap-panel (list \"%s\" %d %d)\n",
-	ui->MinimapPanel.File, ui->MinimapPanelX, ui->MinimapPanelY);
-    CLprintf(file, "  ; Minimap position\n");
-    CLprintf(file, "  'minimap-pos (list %d %d)\n",
+    CLprintf(file, "  ; Minimap\n");
+    CLprintf(file, "  'minimap-panel (list\n");
+    CLprintf(file, "    'file \"%s\"\n", ui->MinimapPanel.File);
+    CLprintf(file, "    'panel-pos (%d %d)\n",
+	ui->MinimapPanelX, ui->MinimapPanelY);
+    CLprintf(file, "    'pos (%d %d)\n",
 	ui->MinimapPosX, ui->MinimapPosY);
+    CLprintf(file, "    'size (%d %d))\n",
+	ui->MinimapW, ui->MinimapH);
 
     CLprintf(file, "\n  'status-line '(");
     CLprintf(file, "\n    file \"%s\"",ui->StatusLine.File);

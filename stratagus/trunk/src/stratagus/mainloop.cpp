@@ -689,7 +689,7 @@ global void UpdateDisplay(void)
 	    // FIXME: Redraws too much of the minimap
 	    InvalidateAreaAndCheckCursor(
 		     TheUI.MinimapPosX,TheUI.MinimapPosY
-		    ,MINIMAP_W,MINIMAP_H);
+		    ,TheUI.MinimapW,TheUI.MinimapH);
 	}
 	if( MustRedraw&RedrawInfoPanel ) {
 	    InvalidateAreaAndCheckCursor(
