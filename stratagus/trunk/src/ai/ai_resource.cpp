@@ -831,7 +831,7 @@ local int AiHarvest(Unit * unit)
 		    } else {			// no goal take the first
 			DebugCheck(unit->Type!=UnitTypeHumanWorker
 				&& unit->Type!=UnitTypeOrcWorker);
-			CommandHarvest(unit, bestx, besty,FlushCommands);
+			CommandHarvest(unit,x,y,FlushCommands);
 			return 1;
 		    }
 		}
