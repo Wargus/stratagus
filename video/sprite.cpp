@@ -51,8 +51,8 @@ local GraphicType GraphicSprite16Type;	/// sprite type 16bit palette
 
 global void (*VideoDrawRawClip)( VMemType *pixels,
                                  const unsigned char *data,
-                                 unsigned int x, unsigned int y,
-                                 unsigned int w, unsigned int h );
+                                 int x, int y,
+                                 int w, int h );
 
 /*----------------------------------------------------------------------------
 --	Local functions
@@ -372,13 +372,13 @@ global void VideoDraw8to8Clip(const Graphic* sprite,unsigned frame,int x,int y)
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType8* dp;
     const VMemType8* lp;
     const VMemType8* ep;
     VMemType8* pp;
     const VMemType8* pixels;
-    unsigned da;
+    int da;
 
 
     //
@@ -509,13 +509,13 @@ global void VideoDraw8to16Clip(const Graphic* sprite,unsigned frame,int x,int y)
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType16* dp;
     const VMemType16* lp;
     const VMemType16* ep;
     VMemType16* pp;
     const VMemType16* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -645,13 +645,13 @@ global void VideoDraw8to24Clip(const Graphic* sprite,unsigned frame,int x,int y)
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType24* dp;
     const VMemType24* lp;
     const VMemType24* ep;
     VMemType24* pp;
     const VMemType24* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -781,13 +781,13 @@ global void VideoDraw8to32Clip(const Graphic* sprite,unsigned frame,int x,int y)
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType32* dp;
     const VMemType32* lp;
     const VMemType32* ep;
     VMemType32* pp;
     const VMemType32* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -918,13 +918,13 @@ global void VideoDraw8to8ClipX(const Graphic* sprite,unsigned frame,int x,int y)
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType8* dp;
     const VMemType8* lp;
     const VMemType8* ep;
     VMemType8* pp;
     const VMemType8* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -1056,13 +1056,13 @@ global void VideoDraw8to16ClipX(const Graphic* sprite,unsigned frame
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType16* dp;
     const VMemType16* lp;
     const VMemType16* ep;
     VMemType16* pp;
     const VMemType16* pixels;
-    unsigned da;
+    int da;
 
 
     //
@@ -1195,13 +1195,13 @@ global void VideoDraw8to24ClipX(const Graphic* sprite,unsigned frame
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType24* dp;
     const VMemType24* lp;
     const VMemType24* ep;
     VMemType24* pp;
     const VMemType24* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -1333,13 +1333,13 @@ global void VideoDraw8to32ClipX(const Graphic* sprite,unsigned frame
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType32* dp;
     const VMemType32* lp;
     const VMemType32* ep;
     VMemType32* pp;
     const VMemType32* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -1469,13 +1469,13 @@ global void VideoDraw8to8ShadowClip(const Graphic* sprite,unsigned frame,int x,i
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType8* dp;
     const VMemType8* lp;
     const VMemType8* ep;
     VMemType8* pp;
     const VMemType8* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -1615,13 +1615,13 @@ global void VideoDraw8to16ShadowClip(const Graphic* sprite,unsigned frame,int x,
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType16* dp;
     const VMemType16* lp;
     const VMemType16* ep;
     VMemType16* pp;
     const VMemType16* pixels;
-    unsigned da;
+    int da;
     unsigned long dp1;
     unsigned long mask;
 
@@ -1774,13 +1774,13 @@ global void VideoDraw8to24ShadowClip(const Graphic* sprite,unsigned frame,int x,
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType24* dp;
     const VMemType24* lp;
     const VMemType24* ep;
     VMemType24* pp;
     const VMemType24* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -1910,13 +1910,13 @@ global void VideoDraw8to32ShadowClip(const Graphic* sprite,unsigned frame,int x,
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType32* dp;
     const VMemType32* lp;
     const VMemType32* ep;
     VMemType32* pp;
     const VMemType32* pixels;
-    unsigned da;
+    int da;
     unsigned long dp1;
     unsigned long dp2;
 
@@ -2080,13 +2080,13 @@ global void VideoDraw8to8ShadowClipX(const Graphic* sprite,unsigned frame
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType8* dp;
     const VMemType8* lp;
     const VMemType8* ep;
     VMemType8* pp;
     const VMemType8* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -2227,13 +2227,13 @@ global void VideoDraw8to16ShadowClipX(const Graphic* sprite,unsigned frame
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType16* dp;
     const VMemType16* lp;
     const VMemType16* ep;
     VMemType16* pp;
     const VMemType16* pixels;
-    unsigned da;
+    int da;
     unsigned long dp1;
     unsigned long mask;
 
@@ -2388,13 +2388,13 @@ global void VideoDraw8to24ShadowClipX(const Graphic* sprite,unsigned frame
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType24* dp;
     const VMemType24* lp;
     const VMemType24* ep;
     VMemType24* pp;
     const VMemType24* pixels;
-    unsigned da;
+    int da;
 
     //
     // reduce to visible range
@@ -2526,13 +2526,13 @@ global void VideoDraw8to32ShadowClipX(const Graphic* sprite,unsigned frame
     int w;
     int h;
     const unsigned char* sp;
-    unsigned sw;
+    int sw;
     VMemType32* dp;
     const VMemType32* lp;
     const VMemType32* ep;
     VMemType32* pp;
     const VMemType32* pixels;
-    unsigned da;
+    int da;
     unsigned long dp1;
     unsigned long dp2;
 
@@ -2695,37 +2695,37 @@ right_trans:
 global void VideoDrawRawXXClip( char *pixels,
                                 const unsigned char *data,
                                 int x, int y,
-                                unsigned int w, unsigned int h,
+                                int w, int h,
                                 char bytes )
 {
-  char *dest;
-  unsigned int ofsx, ofsy, skipx, nextline;
+    char *dest;
+    int ofsx;
+    int ofsy;
+    int skipx;
+    int nextline;
 
-// Clip given rectangle area, keeping track of start- and end-offsets
-  nextline=w;
-  CLIP_RECTANGLE_OFS(x,y,w,h,ofsx,ofsy,skipx);
-  data+=(ofsy*nextline)+ofsx;
-  skipx+=ofsx;
+    // Clip given rectangle area, keeping track of start- and end-offsets
+    nextline=w;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ofsx,ofsy,skipx);
+    data+=(ofsy*nextline)+ofsx;
+    skipx+=ofsx;
 
-// Draw the raw data, through the given palette
-  dest     = (char *)VideoMemory + (y * VideoWidth + x) * bytes;
-  nextline = (VideoWidth - w) * bytes;
+    // Draw the raw data, through the given palette
+    dest     = (char *)VideoMemory + (y * VideoWidth + x) * bytes;
+    nextline = (VideoWidth - w) * bytes;
 
-  do
-  {
-    int w2 = w;
+    do {
+	int w2;
+	w2 = w;
 
-    do
-    {
-      memcpy( dest, pixels + *data++ * bytes, bytes );
-      dest+=bytes;
-    }
-    while ( --w2 > 0 );
+	do {
+	    memcpy( dest, pixels + *data++ * bytes, bytes );
+	    dest+=bytes;
+	} while ( --w2 > 0 );
 
-    data += skipx;
-    dest += nextline;
-  }
-  while ( --h > 0 );
+	data += skipx;
+	dest += nextline;
+    } while ( --h > 0 );
 }
 
 /**
@@ -2741,8 +2741,8 @@ global void VideoDrawRawXXClip( char *pixels,
 */
 local void VideoDrawRaw8Clip( VMemType *pixels,
                               const unsigned char *data,
-                              unsigned int x, unsigned int y,
-                              unsigned int w, unsigned int h )
+                              int x, int y,
+                              int w, int h )
 {
   VideoDrawRawXXClip( (char *)pixels, data, x, y, w, h, sizeof(VMemType8) );
 }
@@ -2760,8 +2760,8 @@ local void VideoDrawRaw8Clip( VMemType *pixels,
 */
 local void VideoDrawRaw16Clip( VMemType *pixels,
                                const unsigned char *data,
-                               unsigned int x, unsigned int y,
-                               unsigned int w, unsigned int h )
+                               int x, int y,
+                               int w, int h )
 {
   VideoDrawRawXXClip( (char *)pixels, data, x, y, w, h, sizeof(VMemType16) );
 }
@@ -2779,8 +2779,8 @@ local void VideoDrawRaw16Clip( VMemType *pixels,
 */
 local void VideoDrawRaw24Clip( VMemType *pixels,
                                const unsigned char *data,
-                               unsigned int x, unsigned int y,
-                               unsigned int w, unsigned int h )
+                               int x, int y,
+                               int w, int h )
 {
   VideoDrawRawXXClip( (char *)pixels, data, x, y, w, h, sizeof(VMemType24) );
 }
@@ -2798,8 +2798,8 @@ local void VideoDrawRaw24Clip( VMemType *pixels,
 */
 local void VideoDrawRaw32Clip( VMemType *pixels,
                                const unsigned char *data,
-                               unsigned int x, unsigned int y,
-                               unsigned int w, unsigned int h )
+                               int x, int y,
+                               int w, int h )
 {
   VideoDrawRawXXClip( (char *)pixels, data, x, y, w, h, sizeof(VMemType32) );
 }
@@ -2838,7 +2838,7 @@ local void FreeSprite8(Graphic* graphic)
 **
 **	@see	LoadGraphic
 */
-global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
+global Graphic* LoadSprite(const char* name,int width,int height)
 {
     Graphic* sprite;
     Graphic* graphic;

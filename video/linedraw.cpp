@@ -130,7 +130,7 @@ global void (*VideoDrawPixelClip)(SysColors color,int x,int y);
     **	@param height	height of line.
     */
 global void (*VideoDrawVLine)(SysColors color,int x,int y
-	,unsigned height);
+	,int height);
 
     /**
     **	Draw 25% translucent vertical line unclipped.
@@ -141,7 +141,7 @@ global void (*VideoDrawVLine)(SysColors color,int x,int y
     **	@param height	height of line.
     */
 global void (*VideoDraw25TransVLine)(SysColors color,int x,int y
-	,unsigned height);
+	,int height);
 
     /**
     **	Draw 50% translucent vertical line unclipped.
@@ -152,7 +152,7 @@ global void (*VideoDraw25TransVLine)(SysColors color,int x,int y
     **	@param height	height of line.
     */
 global void (*VideoDraw50TransVLine)(SysColors color,int x,int y
-	,unsigned height);
+	,int height);
 
     /**
     **	Draw 75% translucent vertical line unclipped.
@@ -163,7 +163,7 @@ global void (*VideoDraw50TransVLine)(SysColors color,int x,int y
     **	@param height	height of line.
     */
 global void (*VideoDraw75TransVLine)(SysColors color,int x,int y
-	,unsigned height);
+	,int height);
 
     /**
     **	Draw translucent vertical line unclipped.
@@ -175,7 +175,7 @@ global void (*VideoDraw75TransVLine)(SysColors color,int x,int y
     **	@param alpha	alpha value of pixel.
     */
 global void (*VideoDrawTransVLine)(SysColors color,int x,int y
-	,unsigned height,unsigned char alpha);
+	,int height,unsigned char alpha);
 
     /**
     **	Draw horizontal line unclipped.
@@ -186,7 +186,7 @@ global void (*VideoDrawTransVLine)(SysColors color,int x,int y
     **	@param width	width of line.
     */
 global void (*VideoDrawHLine)(SysColors color,int x,int y
-	,unsigned width);
+	,int width);
 
     /**
     **	Draw 25% translucent horizontal line unclipped.
@@ -197,7 +197,7 @@ global void (*VideoDrawHLine)(SysColors color,int x,int y
     **	@param width	width of line.
     */
 global void (*VideoDraw25TransHLine)(SysColors color,int x,int y
-	,unsigned width);
+	,int width);
 
     /**
     **	Draw 50% translucent horizontal line unclipped.
@@ -208,7 +208,7 @@ global void (*VideoDraw25TransHLine)(SysColors color,int x,int y
     **	@param width	width of line.
     */
 global void (*VideoDraw50TransHLine)(SysColors color,int x,int y
-	,unsigned width);
+	,int width);
 
     /**
     **	Draw 75% translucent horizontal line unclipped.
@@ -219,7 +219,7 @@ global void (*VideoDraw50TransHLine)(SysColors color,int x,int y
     **	@param width	width of line.
     */
 global void (*VideoDraw75TransHLine)(SysColors color,int x,int y
-	,unsigned width);
+	,int width);
 
     /**
     **	Draw translucent horizontal line unclipped.
@@ -231,7 +231,7 @@ global void (*VideoDraw75TransHLine)(SysColors color,int x,int y
     **	@param alpha	alpha value of pixel.
     */
 global void (*VideoDrawTransHLine)(SysColors color,int x,int y
-	,unsigned width,unsigned char alpha);
+	,int width,unsigned char alpha);
 
     /**
     **	Draw line unclipped.
@@ -303,7 +303,7 @@ global void (*VideoDrawTransLine)(SysColors color,int sx,int sy,int dx,int dy
     **	@param w	width of rectangle.
     */
 global void (*VideoDrawRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h);
+	,int w,int h);
 
     /**
     **	Draw 25% translucent rectangle.
@@ -315,7 +315,7 @@ global void (*VideoDrawRectangle)(SysColors color,int x,int y
     **	@param w	width of rectangle.
     */
 global void (*VideoDraw25TransRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h);
+	,int w,int h);
 
     /**
     **	Draw 50% translucent rectangle.
@@ -327,7 +327,7 @@ global void (*VideoDraw25TransRectangle)(SysColors color,int x,int y
     **	@param w	width of rectangle.
     */
 global void (*VideoDraw50TransRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h);
+	,int w,int h);
 
     /**
     **	Draw 75% translucent rectangle.
@@ -339,7 +339,7 @@ global void (*VideoDraw50TransRectangle)(SysColors color,int x,int y
     **	@param w	width of rectangle.
     */
 global void (*VideoDraw75TransRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h);
+	,int w,int h);
 
     /**
     **	Draw translucent rectangle.
@@ -352,7 +352,7 @@ global void (*VideoDraw75TransRectangle)(SysColors color,int x,int y
     **	@param alpha	alpha value of pixel.
     */
 global void (*VideoDrawTransRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha);
+	,int w,int h,unsigned char alpha);
 
     /**
     **	Fill rectangle.
@@ -364,7 +364,7 @@ global void (*VideoDrawTransRectangle)(SysColors color,int x,int y
     **	@param w	width of rectangle.
     */
 global void (*VideoFillRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h);
+	,int w,int h);
 
     /**
     **	Draw 25% translucent filled rectangle.
@@ -376,7 +376,7 @@ global void (*VideoFillRectangle)(SysColors color,int x,int y
     **	@param w	width of rectangle.
     */
 global void (*VideoFill25TransRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h);
+	,int w,int h);
 
     /**
     **	Draw 50% translucent filled rectangle.
@@ -388,7 +388,7 @@ global void (*VideoFill25TransRectangle)(SysColors color,int x,int y
     **	@param w	width of rectangle.
     */
 global void (*VideoFill50TransRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h);
+	,int w,int h);
 
     /**
     **	Draw 75% translucent filled rectangle.
@@ -400,7 +400,7 @@ global void (*VideoFill50TransRectangle)(SysColors color,int x,int y
     **	@param w	width of rectangle.
     */
 global void (*VideoFill75TransRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h);
+	,int w,int h);
 
     /**
     **	Draw translucent filled rectangle.
@@ -413,7 +413,7 @@ global void (*VideoFill75TransRectangle)(SysColors color,int x,int y
     **	@param alpha	alpha value of pixel.
     */
 global void (*VideoFillTransRectangle)(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha);
+	,int w,int h,unsigned char alpha);
 
 /*----------------------------------------------------------------------------
 --	Local functions
@@ -456,16 +456,16 @@ local void DebugBits(unsigned long bits)
 **	@param g	Color Green-value.
 **	@param b	Color Blue-value.
 */
-local unsigned char RGBtoBrightness( unsigned char r,
-                                      unsigned char g,
-                                      unsigned char b )
+local unsigned char RGBtoBrightness(unsigned char r,
+				    unsigned char g,
+				    unsigned char b )
 {
-  unsigned int brightness;
-// "The weights to compute true CIE luminance from linear red, green and blue
-// (indicated without prime symbols), for the Rec.  709, are these:"
-// brightness = 0.2125*r+0.7154*g+0.0721*b" (from Poynton's color FAQ)
-  brightness = (unsigned int)r*3+(unsigned int)g*10+(unsigned int)b;
-  return brightness/14;
+    unsigned int brightness;
+    // "The weights to compute true CIE luminance from linear red, green and blue
+    // (indicated without prime symbols), for the Rec.  709, are these:"
+    // brightness = 0.2125*r+0.7154*g+0.0721*b" (from Poynton's color FAQ)
+    brightness = (unsigned int)r*3+(unsigned int)g*10+(unsigned int)b;
+    return brightness/14;
 }
 
 /**
@@ -477,24 +477,23 @@ local unsigned char RGBtoBrightness( unsigned char r,
 **	@param g	Color Green-value.
 **	@param b	Color Blue-value.
 */
-local void ScaleRGB( unsigned char alpha,
-                               unsigned char *r,
-                               unsigned char *g,
-                               unsigned char *b )
+local void ScaleRGB(unsigned char alpha,
+		    unsigned char *r,
+		    unsigned char *g,
+		    unsigned char *b )
 {
-  unsigned long int f;
+    unsigned long int f;
 
-  f = (*r * alpha * 3) >> 8; // could overflow with 0b10
-  if ( f & 0xFF00 )
-    f = 0xFF;
-  *r = f;
-  f = (*g * alpha * 10) >> 8; // could overflow with 0b101
-  if ( f & 0xFF00 )
-    f = 0xFF;
-  *g = f;
-  f = (*b * alpha) >> 8;
-  *b = f;
-
+    f = (*r * alpha * 3) >> 8; // could overflow with 0b10
+    if ( f & 0xFF00 )
+	f = 0xFF;
+    *r = f;
+    f = (*g * alpha * 10) >> 8; // could overflow with 0b101
+    if ( f & 0xFF00 )
+	f = 0xFF;
+    *g = f;
+    f = (*b * alpha) >> 8;
+    *b = f;
 }
 
 /**
@@ -505,13 +504,13 @@ local void ScaleRGB( unsigned char alpha,
 **	@param g	Color Green-value in 0..15
 **	@param b	Color Blue-value  in 0..15
 */
-local unsigned char rgb2intensity( unsigned char r,
-                                    unsigned char g,
-                                    unsigned char b )
+local unsigned char rgb2intensity(unsigned char r,
+				  unsigned char g,
+				  unsigned char b )
 {
-  unsigned int i;
-  i = (r + g + b) / 3;
-  return i;
+    unsigned int i;
+    i = (r + g + b) / 3;
+    return i;
 }
 
 /**
@@ -524,10 +523,10 @@ local unsigned char rgb2intensity( unsigned char r,
 */
 local unsigned long irgb2rgb( unsigned char irgb )
 {
-  unsigned long f;
+    unsigned long f;
 
-  f=(((irgb<<16)|(irgb<<8)|irgb)&0x00300C03)*(1+(irgb&0xC0));
-  return f;
+    f=(((irgb<<16)|(irgb<<8)|irgb)&0x00300C03)*(1+(irgb&0xC0));
+    return f;
 }
 
 /**
@@ -540,17 +539,17 @@ local unsigned long irgb2rgb( unsigned char irgb )
 */
 local unsigned char rgb2irgb( unsigned long rgb )
 {
-  unsigned char i, r, g, b;
+    unsigned char i, r, g, b;
 
-  r=(rgb&0x00F00000)>>20;
-  g=(rgb&0x00003C00)>>10;
-  b=rgb&0x0000000F;
-  i=rgb2intensity( r, g, b );
+    r=(rgb&0x00F00000)>>20;
+    g=(rgb&0x00003C00)>>10;
+    b=rgb&0x0000000F;
+    i=rgb2intensity( r, g, b );
 //  r=r%;
 //  g=g%;
 //  b=b%;
-  i=(i<<6)|(r<<4)|(g<<2)|b;
-  return i;
+    i=(i<<6)|(r<<4)|(g<<2)|b;
+    return i;
 }
 
 #endif
@@ -616,10 +615,10 @@ local void DrawPixel32(SysColors color,int x,int y)
 */
 local void Draw25TransPixel8(SysColors color,int x,int y)
 {
-  VMemType8 *p;
+    VMemType8 *p;
 
-  p = VideoMemory8+x+y*VideoWidth;
-  *p = lookup25trans8[ (Pixels8[color]<<8) | *p ];
+    p = VideoMemory8+x+y*VideoWidth;
+    *p = lookup25trans8[ (Pixels8[color]<<8) | *p ];
 }
 
 /**
@@ -632,7 +631,9 @@ local void Draw25TransPixel8(SysColors color,int x,int y)
 local void Draw25TransPixel15(SysColors color,int x,int y)
 {
     VMemType16 *p;
-    unsigned long sp,dp;
+    unsigned long sp;
+    unsigned long dp;
+
     p=VideoMemory16+x+y*VideoWidth;
     sp=Pixels16[color];
     // FIXME: pre multiply?
@@ -653,7 +654,9 @@ local void Draw25TransPixel15(SysColors color,int x,int y)
 local void Draw25TransPixel16(SysColors color,int x,int y)
 {
     VMemType16 *p;
-    unsigned long sp,dp;
+    unsigned long sp;
+    unsigned long dp;
+
     p=VideoMemory16+x+y*VideoWidth;
     sp=Pixels16[color];
     // FIXME: pre multiply?
@@ -687,7 +690,10 @@ local void Draw25TransPixel24(SysColors color,int x,int y)
 local void Draw25TransPixel32(SysColors color,int x,int y)
 {
     VMemType32 *p;
-    unsigned long sp1, sp2, dp1, dp2;
+    unsigned long sp1;
+    unsigned long sp2;
+    unsigned long dp1;
+    unsigned long dp2;
 
     sp1=Pixels32[color];
     // FIXME: pre multiply?
@@ -713,10 +719,10 @@ local void Draw25TransPixel32(SysColors color,int x,int y)
 */
 local void Draw50TransPixel8(SysColors color,int x,int y)
 {
-  VMemType8 *p;
+    VMemType8 *p;
 
-  p = VideoMemory8+x+y*VideoWidth;
-  *p = lookup50trans8[ (Pixels8[color]<<8) | *p ];
+    p = VideoMemory8+x+y*VideoWidth;
+    *p = lookup50trans8[ (Pixels8[color]<<8) | *p ];
 }
 
 /**
@@ -729,7 +735,9 @@ local void Draw50TransPixel8(SysColors color,int x,int y)
 local void Draw50TransPixel15(SysColors color,int x,int y)
 {
     VMemType16 *p;
-    unsigned long sp,dp;
+    unsigned long sp;
+    unsigned long dp;
+
     p=VideoMemory16+x+y*VideoWidth;
     sp=Pixels16[color];
     sp=((sp<<16)|sp)&0x03E07C1F;
@@ -749,7 +757,9 @@ local void Draw50TransPixel15(SysColors color,int x,int y)
 local void Draw50TransPixel16(SysColors color,int x,int y)
 {
     VMemType16 *p;
-    unsigned long sp,dp;
+    unsigned long sp;
+    unsigned long dp;
+
     p=VideoMemory16+x+y*VideoWidth;
     sp=Pixels16[color];
     sp=((sp<<16)|sp)&0x07E0F81F;
@@ -782,7 +792,10 @@ local void Draw50TransPixel24(SysColors color,int x,int y)
 local void Draw50TransPixel32(SysColors color,int x,int y)
 {
     VMemType32 *p;
-    unsigned long sp1, sp2, dp1, dp2;
+    unsigned long sp1;
+    unsigned long sp2;
+    unsigned long dp1;
+    unsigned long dp2;
 
     sp1=Pixels32[color];
     sp2=(sp1&0xFF00FF00)>>8;
@@ -807,10 +820,10 @@ local void Draw50TransPixel32(SysColors color,int x,int y)
 */
 local void Draw75TransPixel8(SysColors color,int x,int y)
 {
-  VMemType8 *p;
+    VMemType8 *p;
 
-  p = VideoMemory8+x+y*VideoWidth;
-  *p = lookup25trans8[ (*p<<8) | Pixels8[color] ];
+    p = VideoMemory8+x+y*VideoWidth;
+    *p = lookup25trans8[ (*p<<8) | Pixels8[color] ];
 }
 
 /**
@@ -823,7 +836,9 @@ local void Draw75TransPixel8(SysColors color,int x,int y)
 local void Draw75TransPixel15(SysColors color,int x,int y)
 {
     VMemType16 *p;
-    unsigned long sp,dp;
+    unsigned long sp;
+    unsigned long dp;
+
     p=VideoMemory16+x+y*VideoWidth;
     sp=Pixels16[color];
     sp=((sp<<16)|sp)&0x03E07C1F;
@@ -843,7 +858,9 @@ local void Draw75TransPixel15(SysColors color,int x,int y)
 local void Draw75TransPixel16(SysColors color,int x,int y)
 {
     VMemType16 *p;
-    unsigned long sp,dp;
+    unsigned long sp;
+    unsigned long dp;
+
     p=VideoMemory16+x+y*VideoWidth;
     sp=Pixels16[color];
     sp=((sp<<16)|sp)&0x07E0F81F;
@@ -876,7 +893,10 @@ local void Draw75TransPixel24(SysColors color,int x,int y)
 local void Draw75TransPixel32(SysColors color,int x,int y)
 {
     VMemType32 *p;
-    unsigned long sp1, sp2, dp1, dp2;
+    unsigned long sp1;
+    unsigned long sp2;
+    unsigned long dp1;
+    unsigned long dp2;
 
     sp1=Pixels32[color];
     sp2=(sp1&0xFF00FF00)>>8;
@@ -903,24 +923,26 @@ local void Draw75TransPixel32(SysColors color,int x,int y)
 local void DrawTransPixel8(SysColors color,int x,int y
         ,unsigned char alpha)
 {
-  VMemType8 *p = VideoMemory8+x+y*VideoWidth;
-  switch ( ((unsigned int)alpha * 4) / 255 )
-  {
-  case 0:
-    *p = Pixels8[color];
-    break;
-  case 1:
-    *p = lookup25trans8[ (Pixels8[color]<<8) | *p ];
-    break;
-  case 2:
-    *p = lookup50trans8[ (*p<<8) | Pixels8[color] ];
-    break;
-  case 3:
-    *p = lookup25trans8[ (*p<<8) | Pixels8[color] ];
-    break;
-  default:
-    break;
-  }
+    VMemType8 *p;
+
+    p = VideoMemory8+x+y*VideoWidth;
+    switch ( ((unsigned int)alpha * 4) / 255 )
+    {
+	case 0:
+	    *p = Pixels8[color];
+	    break;
+	case 1:
+	    *p = lookup25trans8[ (Pixels8[color]<<8) | *p ];
+	    break;
+	case 2:
+	    *p = lookup50trans8[ (*p<<8) | Pixels8[color] ];
+	    break;
+	case 3:
+	    *p = lookup25trans8[ (*p<<8) | Pixels8[color] ];
+	    break;
+	default:
+	    break;
+    }
 }
 
 /**
@@ -958,7 +980,9 @@ local void DrawTransPixel15(SysColors color,int x,int y
         ,unsigned char alpha)
 {
     VMemType16 *p;
-    unsigned long sp,dp;
+    unsigned long sp;
+    unsigned long dp;
+
     p=VideoMemory16+x+y*VideoWidth;
     sp=Pixels16[color];
     sp=((sp<<16)|sp)&0x03E07C1F;
@@ -991,7 +1015,9 @@ local void DrawTransPixel16(SysColors color,int x,int y
         ,unsigned char alpha)
 {
     VMemType16 *p;
-    unsigned long sp,dp;
+    unsigned long sp;
+    unsigned long dp;
+
     p=VideoMemory16+x+y*VideoWidth;
     sp=Pixels16[color];
     sp=((sp<<16)|sp)&0x07E0F81F;
@@ -1045,7 +1071,10 @@ local void DrawTransPixel32(SysColors color,int x,int y
         ,unsigned char alpha)
 {
     VMemType32 *p;
-    unsigned long sp1, sp2, dp1, dp2;
+    unsigned long sp1;
+    unsigned long sp2;
+    unsigned long dp1;
+    unsigned long dp2;
 
     sp1=Pixels32[color];
     sp2=(sp1&0xFF00FF00)>>8;
@@ -1204,7 +1233,7 @@ global void VideoDrawTransPixelClip(SysColors color,int x,int y
 **	@param y	y coordinate on the screen
 **	@param width	width of line.
 */
-local void DrawHLine8(SysColors color,int x,int y,unsigned width)
+local void DrawHLine8(SysColors color,int x,int y,int width)
 {
     VMemType8* p;
     VMemType8* e;
@@ -1229,7 +1258,7 @@ local void DrawHLine8(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void DrawHLine16(SysColors color,int x,int y,unsigned width)
+local void DrawHLine16(SysColors color,int x,int y,int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1258,7 +1287,7 @@ local void DrawHLine16(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void DrawHLine24(SysColors color,int x,int y,unsigned width)
+local void DrawHLine24(SysColors color,int x,int y,int width)
 {
     VMemType24* p;
     VMemType24* e;
@@ -1283,7 +1312,7 @@ local void DrawHLine24(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void DrawHLine32(SysColors color,int x,int y,unsigned width)
+local void DrawHLine32(SysColors color,int x,int y,int width)
 {
     VMemType32* p;
     VMemType32* e;
@@ -1308,7 +1337,7 @@ local void DrawHLine32(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine8(SysColors color,int x,int y,unsigned width)
+local void Draw25TransHLine8(SysColors color,int x,int y,int width)
 {
     VMemType8 *p, *e;
     unsigned int c;
@@ -1331,7 +1360,7 @@ local void Draw25TransHLine8(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine15(SysColors color,int x,int y,unsigned width)
+local void Draw25TransHLine15(SysColors color,int x,int y,int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1363,7 +1392,7 @@ local void Draw25TransHLine15(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine16(SysColors color,int x,int y,unsigned width)
+local void Draw25TransHLine16(SysColors color,int x,int y,int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1395,10 +1424,10 @@ local void Draw25TransHLine16(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine24(SysColors color,int x,int y,unsigned width)
+local void Draw25TransHLine24(SysColors color,int x,int y,int width)
 {
-    // FIXME: does 24bpp holds R|G|B ?
-  DrawHLine24(color,x,y,width); // no trans functionaility for the moment :(
+// FIXME: does 24bpp holds R|G|B ?
+    DrawHLine24(color,x,y,width); // no trans functionaility for the moment :(
 }
 
 /**
@@ -1409,7 +1438,7 @@ local void Draw25TransHLine24(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine32(SysColors color,int x,int y,unsigned width)
+local void Draw25TransHLine32(SysColors color,int x,int y,int width)
 {
     VMemType32 *p, *e;
     unsigned long sp1, sp2;
@@ -1444,7 +1473,7 @@ local void Draw25TransHLine32(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine8(SysColors color,int x,int y,unsigned width)
+local void Draw50TransHLine8(SysColors color,int x,int y,int width)
 {
     VMemType8 *p, *e;
     unsigned int c;
@@ -1467,7 +1496,7 @@ local void Draw50TransHLine8(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine15(SysColors color,int x,int y,unsigned width)
+local void Draw50TransHLine15(SysColors color,int x,int y,int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1498,7 +1527,7 @@ local void Draw50TransHLine15(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine16(SysColors color,int x,int y,unsigned width)
+local void Draw50TransHLine16(SysColors color,int x,int y,int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1529,10 +1558,10 @@ local void Draw50TransHLine16(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine24(SysColors color,int x,int y,unsigned width)
+local void Draw50TransHLine24(SysColors color,int x,int y,int width)
 {
-    // FIXME: does 24bpp holds R|G|B ?
-  DrawHLine24(color,x,y,width); // no trans functionaility for the moment :(
+// FIXME: does 24bpp holds R|G|B ?
+    DrawHLine24(color,x,y,width); // no trans functionaility for the moment :(
 }
 
 /**
@@ -1543,7 +1572,7 @@ local void Draw50TransHLine24(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine32(SysColors color,int x,int y,unsigned width)
+local void Draw50TransHLine32(SysColors color,int x,int y,int width)
 {
     VMemType32 *p, *e;
     unsigned long sp1, sp2;
@@ -1577,7 +1606,7 @@ local void Draw50TransHLine32(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine8(SysColors color,int x,int y,unsigned width)
+local void Draw75TransHLine8(SysColors color,int x,int y,int width)
 {
     VMemType8 *p, *e;
     unsigned int c;
@@ -1600,7 +1629,7 @@ local void Draw75TransHLine8(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine15(SysColors color,int x,int y,unsigned width)
+local void Draw75TransHLine15(SysColors color,int x,int y,int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1631,7 +1660,7 @@ local void Draw75TransHLine15(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine16(SysColors color,int x,int y,unsigned width)
+local void Draw75TransHLine16(SysColors color,int x,int y,int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1662,10 +1691,10 @@ local void Draw75TransHLine16(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine24(SysColors color,int x,int y,unsigned width)
+local void Draw75TransHLine24(SysColors color,int x,int y,int width)
 {
-    // FIXME: does 24bpp holds R|G|B ?
-  DrawHLine24(color,x,y,width); // no trans functionaility for the moment :(
+// FIXME: does 24bpp holds R|G|B ?
+    DrawHLine24(color,x,y,width); // no trans functionaility for the moment :(
 }
 
 /**
@@ -1676,7 +1705,7 @@ local void Draw75TransHLine24(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine32(SysColors color,int x,int y,unsigned width)
+local void Draw75TransHLine32(SysColors color,int x,int y,int width)
 {
     VMemType32 *p, *e;
     unsigned long sp1, sp2;
@@ -1711,11 +1740,12 @@ local void Draw75TransHLine32(SysColors color,int x,int y,unsigned width)
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine8(SysColors color,int x,int y,unsigned width
+local void DrawTransHLine8(SysColors color,int x,int y,int width
         ,unsigned char alpha)
 {
-    VMemType8 *p, *e;
-    unsigned int c;
+    VMemType8 *p;
+    VMemType8 *e;
+    unsigned c;
 
     p=VideoMemory8+x+y*VideoWidth;
     e=p+width;
@@ -1762,7 +1792,7 @@ local void DrawTransHLine8(SysColors color,int x,int y,unsigned width
 **	@param width	Line width in pixel
 **      @param alpha    alpha value of pixel
 */
-local void DrawNoTransHLine8(SysColors color,int x,int y,unsigned width
+local void DrawNoTransHLine8(SysColors color,int x,int y,int width
         ,unsigned char alpha __attribute__((unused)))
 {
     DrawHLine8(color,x,y,width);
@@ -1777,10 +1807,11 @@ local void DrawNoTransHLine8(SysColors color,int x,int y,unsigned width
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine15(SysColors color,int x,int y,unsigned width
+local void DrawTransHLine15(SysColors color,int x,int y,int width
 	,unsigned char alpha)
 {
-    VMemType16 *p, *e;
+    VMemType16 *p;
+    VMemType16 *e;
     unsigned long sp;
 
     p=VideoMemory16+y*VideoWidth+x;
@@ -1809,10 +1840,11 @@ local void DrawTransHLine15(SysColors color,int x,int y,unsigned width
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine16(SysColors color,int x,int y,unsigned width
+local void DrawTransHLine16(SysColors color,int x,int y,int width
 	,unsigned char alpha)
 {
-    VMemType16 *p, *e;
+    VMemType16 *p;
+    VMemType16 *e;
     unsigned long sp;
 
     p=VideoMemory16+y*VideoWidth+x;
@@ -1841,11 +1873,15 @@ local void DrawTransHLine16(SysColors color,int x,int y,unsigned width
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine24(SysColors color,int x,int y,unsigned width
+local void DrawTransHLine24(SysColors color,int x,int y,int width
 	,unsigned char alpha)
 {
-    VMemType24 c, *p, *e;
-    unsigned int spR, spG, spB;
+    VMemType24 c;
+    VMemType24 *p;
+    VMemType24 *e;
+    unsigned spR;
+    unsigned spG;
+    unsigned spB;
 
     p=VideoMemory24+y*VideoWidth+x;
     e=p+width;
@@ -1886,11 +1922,13 @@ local void DrawTransHLine24(SysColors color,int x,int y,unsigned width
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine32(SysColors color,int x,int y,unsigned width
+local void DrawTransHLine32(SysColors color,int x,int y,int width
 	,unsigned char alpha)
 {
-    VMemType32 *p, *e;
-    unsigned long sp1, sp2;
+    VMemType32 *p;
+    VMemType32 *e;
+    unsigned long sp1;
+    unsigned long sp2;
 
     p=VideoMemory32+y*VideoWidth+x;
     e=p+width;
@@ -1901,7 +1939,8 @@ local void DrawTransHLine32(SysColors color,int x,int y,unsigned width
     alpha>>=1;
 
     while( p<e ) {
-	unsigned long dp1,dp2;
+	unsigned long dp1;
+	unsigned long dp2;
 
 	dp1=*p;
 	dp2=(dp1&0xFF00FF00)>>8;
@@ -1943,7 +1982,7 @@ local void DrawTransHLine32(SysColors color,int x,int y,unsigned width
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-global void VideoDrawHLineClip(SysColors color,int x,int y,unsigned width)
+global void VideoDrawHLineClip(SysColors color,int x,int y,int width)
 {
     CLIP_HLINE(x,y,width);
     VideoDrawHLine(color,x,y,width);
@@ -1957,7 +1996,7 @@ global void VideoDrawHLineClip(SysColors color,int x,int y,unsigned width)
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-global void VideoDraw25TransHLineClip(SysColors color,int x,int y,unsigned width)
+global void VideoDraw25TransHLineClip(SysColors color,int x,int y,int width)
 {
     CLIP_HLINE(x,y,width);
     VideoDraw25TransHLine(color,x,y,width);
@@ -1971,7 +2010,7 @@ global void VideoDraw25TransHLineClip(SysColors color,int x,int y,unsigned width
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-global void VideoDraw50TransHLineClip(SysColors color,int x,int y,unsigned width)
+global void VideoDraw50TransHLineClip(SysColors color,int x,int y,int width)
 {
     CLIP_HLINE(x,y,width);
     VideoDraw50TransHLine(color,x,y,width);
@@ -1985,7 +2024,7 @@ global void VideoDraw50TransHLineClip(SysColors color,int x,int y,unsigned width
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-global void VideoDraw75TransHLineClip(SysColors color,int x,int y,unsigned width)
+global void VideoDraw75TransHLineClip(SysColors color,int x,int y,int width)
 {
     CLIP_HLINE(x,y,width);
     VideoDraw75TransHLine(color,x,y,width);
@@ -2000,7 +2039,7 @@ global void VideoDraw75TransHLineClip(SysColors color,int x,int y,unsigned width
 **	@param width	Width of line (0=don't draw)
 **	@param alpha	Alpha value of pixels
 */
-global void VideoDrawTransHLineClip(SysColors color,int x,int y,unsigned width
+global void VideoDrawTransHLineClip(SysColors color,int x,int y,int width
 	,unsigned char alpha)
 {
     CLIP_HLINE(x,y,width);
@@ -2019,7 +2058,7 @@ global void VideoDrawTransHLineClip(SysColors color,int x,int y,unsigned width
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void DrawVLine8(SysColors color,int x,int y,unsigned height)
+local void DrawVLine8(SysColors color,int x,int y,int height)
 {
     VMemType8* p;
     VMemType8* e;
@@ -2044,7 +2083,7 @@ local void DrawVLine8(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void DrawVLine16(SysColors color,int x,int y,unsigned height)
+local void DrawVLine16(SysColors color,int x,int y,int height)
 {
     VMemType16* p;
     VMemType16* e;
@@ -2069,7 +2108,7 @@ local void DrawVLine16(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void DrawVLine24(SysColors color,int x,int y,unsigned height)
+local void DrawVLine24(SysColors color,int x,int y,int height)
 {
     VMemType24* p;
     VMemType24* e;
@@ -2094,7 +2133,7 @@ local void DrawVLine24(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void DrawVLine32(SysColors color,int x,int y,unsigned height)
+local void DrawVLine32(SysColors color,int x,int y,int height)
 {
     VMemType32* p;
     VMemType32* e;
@@ -2119,10 +2158,11 @@ local void DrawVLine32(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine8(SysColors color,int x,int y,unsigned height)
+local void Draw25TransVLine8(SysColors color,int x,int y,int height)
 {
     VMemType8 *p;
-    unsigned int c, w;
+    unsigned int c;
+    int w;
 
     w = VideoWidth;
     p = VideoMemory8+x+y*w;
@@ -2141,11 +2181,11 @@ local void Draw25TransVLine8(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine15(SysColors color,int x,int y,unsigned height)
+local void Draw25TransVLine15(SysColors color,int x,int y,int height)
 {
     VMemType16 *p;
     unsigned long sp;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory16+y*w+x;
@@ -2172,11 +2212,11 @@ local void Draw25TransVLine15(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine16(SysColors color,int x,int y,unsigned height)
+local void Draw25TransVLine16(SysColors color,int x,int y,int height)
 {
     VMemType16 *p;
     unsigned long sp;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory16+y*w+x;
@@ -2203,10 +2243,10 @@ local void Draw25TransVLine16(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine24(SysColors color,int x,int y,unsigned height)
+local void Draw25TransVLine24(SysColors color,int x,int y,int height)
 {
     // FIXME: does 24bpp holds R|G|B ?
-  DrawVLine24(color,x,y,height); // no trans functionaility for the moment :(
+    DrawVLine24(color,x,y,height); // no trans functionaility for the moment :(
 }
 
 /**
@@ -2217,11 +2257,11 @@ local void Draw25TransVLine24(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine32(SysColors color,int x,int y,unsigned height)
+local void Draw25TransVLine32(SysColors color,int x,int y,int height)
 {
     VMemType32 *p;
     unsigned long sp1,sp2;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory32+y*w+x;
@@ -2253,10 +2293,11 @@ local void Draw25TransVLine32(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine8(SysColors color,int x,int y,unsigned height)
+local void Draw50TransVLine8(SysColors color,int x,int y,int height)
 {
     VMemType8 *p;
-    unsigned int c, w;
+    unsigned int c;
+    int w;
 
     w = VideoWidth;
     p = VideoMemory8+x+y*w;
@@ -2275,11 +2316,11 @@ local void Draw50TransVLine8(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine15(SysColors color,int x,int y,unsigned height)
+local void Draw50TransVLine15(SysColors color,int x,int y,int height)
 {
     VMemType16 *p;
     unsigned long sp;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory16+y*w+x;
@@ -2305,11 +2346,11 @@ local void Draw50TransVLine15(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine16(SysColors color,int x,int y,unsigned height)
+local void Draw50TransVLine16(SysColors color,int x,int y,int height)
 {
     VMemType16 *p;
     unsigned long sp;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory16+y*w+x;
@@ -2336,10 +2377,10 @@ local void Draw50TransVLine16(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine24(SysColors color,int x,int y,unsigned height)
+local void Draw50TransVLine24(SysColors color,int x,int y,int height)
 {
     // FIXME: does 24bpp holds R|G|B ?
-  DrawVLine24(color,x,y,height); // no trans functionaility for the moment :(
+    DrawVLine24(color,x,y,height); // no trans functionaility for the moment :(
 }
 
 /**
@@ -2350,11 +2391,11 @@ local void Draw50TransVLine24(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine32(SysColors color,int x,int y,unsigned height)
+local void Draw50TransVLine32(SysColors color,int x,int y,int height)
 {
     VMemType32 *p;
     unsigned long sp1,sp2;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory32+y*w+x;
@@ -2385,10 +2426,11 @@ local void Draw50TransVLine32(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine8(SysColors color,int x,int y,unsigned height)
+local void Draw75TransVLine8(SysColors color,int x,int y,int height)
 {
     VMemType8 *p;
-    unsigned int c, w;
+    unsigned int c;
+    int w;
 
     w = VideoWidth;
     p = VideoMemory8+x+y*w;
@@ -2407,11 +2449,11 @@ local void Draw75TransVLine8(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine15(SysColors color,int x,int y,unsigned height)
+local void Draw75TransVLine15(SysColors color,int x,int y,int height)
 {
     VMemType16 *p;
     unsigned long sp;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory16+y*w+x;
@@ -2438,11 +2480,11 @@ local void Draw75TransVLine15(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine16(SysColors color,int x,int y,unsigned height)
+local void Draw75TransVLine16(SysColors color,int x,int y,int height)
 {
     VMemType16 *p;
     unsigned long sp;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory16+y*w+x;
@@ -2469,10 +2511,10 @@ local void Draw75TransVLine16(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine24(SysColors color,int x,int y,unsigned height)
+local void Draw75TransVLine24(SysColors color,int x,int y,int height)
 {
     // FIXME: does 24bpp holds R|G|B ?
-  DrawVLine24(color,x,y,height); // no trans functionaility for the moment :(
+    DrawVLine24(color,x,y,height); // no trans functionaility for the moment :(
 }
 
 /**
@@ -2483,11 +2525,11 @@ local void Draw75TransVLine24(SysColors color,int x,int y,unsigned height)
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine32(SysColors color,int x,int y,unsigned height)
+local void Draw75TransVLine32(SysColors color,int x,int y,int height)
 {
     VMemType32 *p;
     unsigned long sp1,sp2;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory32+y*w+x;
@@ -2519,47 +2561,48 @@ local void Draw75TransVLine32(SysColors color,int x,int y,unsigned height)
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine8(SysColors color,int x,int y,unsigned height
+local void DrawTransVLine8(SysColors color,int x,int y,int height
         ,unsigned char alpha)
 {
-  VMemType8 *p;
-  unsigned int c, w;
+    VMemType8 *p;
+    unsigned int c;
+    int w;
 
-  w = VideoWidth;
-  p = VideoMemory8+x+y*w;
-  c = Pixels8[color];
+    w = VideoWidth;
+    p = VideoMemory8+x+y*w;
+    c = Pixels8[color];
 
-  switch ( ((unsigned int)alpha * 4) / 255 )
-  {
-  case 0:
-    while( height-- ) {
-        *p = c;
-        p+=w;
+    switch ( ((unsigned int)alpha * 4) / 255 )
+    {
+	case 0:
+	    while( height-- ) {
+		*p = c;
+		p+=w;
+	    }
+	    break;
+	case 1:
+	    while( height-- ) {
+		*p = lookup25trans8[ (*p<<8) | c ];
+		p+=w;
+	    }
+	    break;
+	case 2:
+	    c<<=8;
+	    while( height-- ) {
+		*p = lookup50trans8[ c | *p ];
+		p+=w;
+	    }
+	    break;
+	case 3:
+	    c<<=8;
+	    while( height-- ) {
+		*p = lookup25trans8[ c | *p ];
+		p+=w;
+	    }
+	    break;
+	default:
+	    break;
     }
-    break;
-  case 1:
-    while( height-- ) {
-        *p = lookup25trans8[ (*p<<8) | c ];
-        p+=w;
-    }
-    break;
-  case 2:
-    c<<=8;
-    while( height-- ) {
-        *p = lookup50trans8[ c | *p ];
-        p+=w;
-    }
-    break;
-  case 3:
-    c<<=8;
-    while( height-- ) {
-        *p = lookup25trans8[ c | *p ];
-        p+=w;
-    }
-    break;
-  default:
-    break;
-  }
 }
 
 /**
@@ -2571,7 +2614,7 @@ local void DrawTransVLine8(SysColors color,int x,int y,unsigned height
 **	@param height	Height = length of the line.
 **      @param alpha    alpha value of pixel.
 */
-local void DrawNoTransVLine8(SysColors color,int x,int y,unsigned height
+local void DrawNoTransVLine8(SysColors color,int x,int y,int height
         ,unsigned char alpha __attribute__((unused)))
 {
     DrawVLine8(color,x,y,height);
@@ -2586,12 +2629,12 @@ local void DrawNoTransVLine8(SysColors color,int x,int y,unsigned height
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine15(SysColors color,int x,int y,unsigned height
+local void DrawTransVLine15(SysColors color,int x,int y,int height
 	,unsigned char alpha)
 {
     VMemType16 *p;
     unsigned long sp;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory16+y*w+x;
@@ -2620,12 +2663,12 @@ local void DrawTransVLine15(SysColors color,int x,int y,unsigned height
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine16(SysColors color,int x,int y,unsigned height
+local void DrawTransVLine16(SysColors color,int x,int y,int height
 	,unsigned char alpha)
 {
     VMemType16 *p;
     unsigned long sp;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory16+y*w+x;
@@ -2654,7 +2697,7 @@ local void DrawTransVLine16(SysColors color,int x,int y,unsigned height
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine24(SysColors color,int x,int y,unsigned height
+local void DrawTransVLine24(SysColors color,int x,int y,int height
 	,unsigned char alpha __attribute__((unused)))
 {
     // FIXME: does 24bpp holds R|G|B ?
@@ -2670,12 +2713,12 @@ local void DrawTransVLine24(SysColors color,int x,int y,unsigned height
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine32(SysColors color,int x,int y,unsigned height
+local void DrawTransVLine32(SysColors color,int x,int y,int height
 	,unsigned char alpha)
 {
     VMemType32 *p;
     unsigned long sp1,sp2;
-    unsigned int w;
+    int w;
 
     w=VideoWidth;
     p=VideoMemory32+y*w+x;
@@ -2727,7 +2770,7 @@ local void DrawTransVLine32(SysColors color,int x,int y,unsigned height
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-global void VideoDrawVLineClip(SysColors color,int x,int y,unsigned height)
+global void VideoDrawVLineClip(SysColors color,int x,int y,int height)
 {
     CLIP_VLINE(x,y,height);
     VideoDrawVLine(color,x,y,height);
@@ -2742,10 +2785,10 @@ global void VideoDrawVLineClip(SysColors color,int x,int y,unsigned height)
 **	@param height	height of line (0=don't draw).
 */
 global void VideoDraw25TransVLineClip(SysColors color,int x,int y,
-                                      unsigned height)
+                                      int height)
 {
-  CLIP_VLINE(x,y,height);
-  VideoDraw25TransVLine(color,x,y,height);
+    CLIP_VLINE(x,y,height);
+    VideoDraw25TransVLine(color,x,y,height);
 }
 
 /**
@@ -2757,10 +2800,10 @@ global void VideoDraw25TransVLineClip(SysColors color,int x,int y,
 **	@param height	height of line (0=don't draw).
 */
 global void VideoDraw50TransVLineClip(SysColors color,int x,int y,
-                                      unsigned height)
+                                      int height)
 {
-  CLIP_VLINE(x,y,height);
-  VideoDraw50TransVLine(color,x,y,height);
+    CLIP_VLINE(x,y,height);
+    VideoDraw50TransVLine(color,x,y,height);
 }
 
 /**
@@ -2772,10 +2815,10 @@ global void VideoDraw50TransVLineClip(SysColors color,int x,int y,
 **	@param height	height of line (0=don't draw).
 */
 global void VideoDraw75TransVLineClip(SysColors color,int x,int y,
-                                      unsigned height)
+                                      int height)
 {
-  CLIP_VLINE(x,y,height);
-  VideoDraw75TransVLine(color,x,y,height);
+    CLIP_VLINE(x,y,height);
+    VideoDraw75TransVLine(color,x,y,height);
 }
 
 /**
@@ -2788,10 +2831,10 @@ global void VideoDraw75TransVLineClip(SysColors color,int x,int y,
 **	@param alpha	alpha value of pixels.
 */
 global void VideoDrawTransVLineClip(SysColors color,int x,int y,
-                                    unsigned height,unsigned char alpha)
+                                    int height,unsigned char alpha)
 {
-  CLIP_VLINE(x,y,height);
-  VideoDrawTransVLine(color,x,y,height,alpha);
+    CLIP_VLINE(x,y,height);
+    VideoDrawTransVLine(color,x,y,height,alpha);
 }
 
 // ===========================================================================
@@ -3209,16 +3252,19 @@ static ClipCode ClipCodeLine( int x, int y )
 {
     ClipCode result;
 
-    if ( y < ClipY1 )
-        result = ClipCodeAbove;
-    else if ( y > ClipY2 )
-      result = ClipCodeBelow;
-    else result = ClipCodeInside;
+    if ( y < ClipY1 ) {
+	result = ClipCodeAbove;
+    } else if ( y > ClipY2 ) {
+	result = ClipCodeBelow;
+    } else {
+	result = ClipCodeInside;
+    }
 
-    if ( x < ClipX1 )
-        result |= ClipCodeLeft;
-    else if ( x > ClipX2 )
-        result |= ClipCodeRight;
+    if ( x < ClipX1 ) {
+	result |= ClipCodeLeft;
+    } else if ( x > ClipX2 ) {
+	result |= ClipCodeRight;
+    }
 
     return result;
 }
@@ -3232,8 +3278,7 @@ static ClipCode ClipCodeLine( int x, int y )
 */
 static ClipCode LineIsUnclippedOnSameSide( int code1, int code2 )
 {
-   int newmask = code1 & code2;
-   return newmask;
+   return code1 & code2;
 }
 
 /**
@@ -3245,8 +3290,7 @@ static ClipCode LineIsUnclippedOnSameSide( int code1, int code2 )
 */
 static ClipCode LineIsUnclipped( int code1, int code2 )
 {
-   int newmask = code1 | code2;
-   return newmask;
+   return code1 | code2;
 }
 
 /**
@@ -3264,7 +3308,8 @@ static ClipCode LineIsUnclipped( int code1, int code2 )
 global void VideoDrawLineClip(SysColors color,int x1,int y1,int x2,int y2)
 /* Based on Sutherland-Cohen clipping technique */
 {
-    ClipCode code1, code2;
+    ClipCode code1;
+    ClipCode code2;
     int temp;
 
 // Make sure coordinates or on/in clipped rectangle
@@ -3328,28 +3373,30 @@ global void VideoDrawLineClip(SysColors color,int x1,int y1,int x2,int y2)
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType8 *p, f;
-  unsigned swidth, ofs;
+    VMemType8 *p;
+    VMemType8 f;
+    int swidth;
+    int ofs;
 
-  f=Pixels8[color];
-  swidth=VideoWidth;
-  p=VideoMemory8+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do *p++=f; // Draw top horizontal line, FIXME: 4 bytes in one go
-    while( --ofs );
-    if ( --h ) {
-      p+=(swidth-w);
-      ofs=w-1;
-      while( --h ) { // Draw vertical line(s)
-        p[ofs]=*p=f; //FIXME: draws pixel twice for w==1 :(
-        p+=swidth;
-      }
-      do *p++=f; // Draw bottom horizontal line, FIXME: 4 bytes in one go
-      while( ofs-- );
+    f=Pixels8[color];
+    swidth=VideoWidth;
+    p=VideoMemory8+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do *p++=f; // Draw top horizontal line, FIXME: 4 bytes in one go
+	while( --ofs );
+	if ( --h ) {
+	    p+=(swidth-w);
+	    ofs=w-1;
+	    while( --h ) { // Draw vertical line(s)
+		p[ofs]=*p=f; //FIXME: draws pixel twice for w==1 :(
+		p+=swidth;
+	    }
+	    do *p++=f; // Draw bottom horizontal line, FIXME: 4 bytes in one go
+	    while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3362,28 +3409,28 @@ local void DrawRectangle8(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p, f;
-  unsigned swidth, ofs;
+    VMemType16 *p, f;
+    int swidth, ofs;
 
-  f=Pixels16[color];
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do *p++=f; // Draw top horizontal line
-    while( --ofs );
-    if ( --h ) {
-      p+=(swidth-w);
-      ofs=w-1;
-      while( --h ) { // Draw vertical line(s)
-        p[ofs]=*p=f; //FIXME: draws pixel twice for w==1 :(
-        p+=swidth;
-      }
-      do *p++=f; // Draw bottom horizontal line
-      while( ofs-- );
+    f=Pixels16[color];
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do *p++=f; // Draw top horizontal line
+	while( --ofs );
+	if ( --h ) {
+	    p+=(swidth-w);
+	    ofs=w-1;
+	    while( --h ) { // Draw vertical line(s)
+		p[ofs]=*p=f; //FIXME: draws pixel twice for w==1 :(
+		p+=swidth;
+	    }
+	    do *p++=f; // Draw bottom horizontal line
+	    while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3396,28 +3443,30 @@ local void DrawRectangle16(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType24 *p, f;
-  unsigned swidth, ofs;
+    VMemType24 *p;
+    VMemType24 f;
+    int swidth;
+    int ofs;
 
-  f=Pixels24[color];
-  swidth=VideoWidth;
-  p=VideoMemory24+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do *p++=f; // Draw top horizontal line
-    while( --ofs );
-    if ( --h ) {
-      p+=(swidth-w);
-      ofs=w-1;
-      while( --h ) { // Draw vertical line(s)
-        p[ofs]=*p=f; //FIXME: draws pixel twice for w==1 :(
-        p+=swidth;
-      }
-      do *p++=f; // Draw bottom horizontal line
-      while( ofs-- );
+    f=Pixels24[color];
+    swidth=VideoWidth;
+    p=VideoMemory24+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do *p++=f; // Draw top horizontal line
+	while( --ofs );
+	if ( --h ) {
+	    p+=(swidth-w);
+	    ofs=w-1;
+	    while( --h ) { // Draw vertical line(s)
+		p[ofs]=*p=f; //FIXME: draws pixel twice for w==1 :(
+		p+=swidth;
+	    }
+	    do *p++=f; // Draw bottom horizontal line
+	    while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3430,28 +3479,30 @@ local void DrawRectangle24(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType32 *p, f;
-  unsigned swidth, ofs;
+    VMemType32 *p;
+    VMemType32 f;
+    int swidth;
+    int ofs;
 
-  f=Pixels32[color];
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do *p++=f; // Draw top horizontal line
-    while( --ofs );
-    if ( --h ) {
-      p+=(swidth-w);
-      ofs=w-1;
-      while( --h ) { // Draw vertical line(s)
-        p[ofs]=*p=f; //FIXME: draws pixel twice for w==1 :(
-        p+=swidth;
-      }
-      do *p++=f; // Draw bottom horizontal line
-      while( ofs-- );
+    f=Pixels32[color];
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do *p++=f; // Draw top horizontal line
+	while( --ofs );
+	if ( --h ) {
+	    p+=(swidth-w);
+	    ofs=w-1;
+	    while( --h ) { // Draw vertical line(s)
+		p[ofs]=*p=f; //FIXME: draws pixel twice for w==1 :(
+		p+=swidth;
+	    }
+	    do *p++=f; // Draw bottom horizontal line
+	    while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3464,40 +3515,43 @@ local void DrawRectangle32(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw25TransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType8 *p;
-  unsigned int swidth, ofs, c;
+    VMemType8 *p;
+    int swidth;
+    int ofs;
+    unsigned c;
 
-  swidth=VideoWidth;
-  p=VideoMemory8+y*swidth+x;
-  c=Pixels8[color]<<8;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-      *p = lookup25trans8[ c | *p ];
-      ++p;
-    } while( --ofs );
+    swidth=VideoWidth;
+    p=VideoMemory8+y*swidth+x;
+    c=Pixels8[color]<<8;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    *p = lookup25trans8[ c | *p ];
+	    ++p;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          p[ofs] = lookup25trans8[ c | p[ofs] ];
-          *p = lookup25trans8[ c | *p ];
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          *p = lookup25trans8[ c | *p ];
-          p+=swidth;
-        }
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    p[ofs] = lookup25trans8[ c | p[ofs] ];
+		    *p = lookup25trans8[ c | *p ];
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    *p = lookup25trans8[ c | *p ];
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        *p = lookup25trans8[ c | *p ];
-	++p;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		*p = lookup25trans8[ c | *p ];
+		++p;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3510,58 +3564,61 @@ local void Draw25TransRectangle8(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw25TransRectangle15(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp,dp;
-  unsigned swidth, ofs;
+    VMemType16 *p;
+    unsigned long sp;
+    unsigned long dp;
+    int swidth;
+    int ofs;
 
-  sp=Pixels16[color];
+    sp=Pixels16[color];
     // FIXME: pre multiply?
-  sp=(((sp<<16)|sp)&0x03E07C1F)*3;
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-     dp=*p;
-     dp=((dp<<16)|dp)&0x03E07C1F;
-     dp=((dp+sp)>>2)&0x03E07C1F;
-     *p++=(dp>>16)|dp;
-    } while( --ofs );
+    sp=(((sp<<16)|sp)&0x03E07C1F)*3;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp=*p;
+	    dp=((dp<<16)|dp)&0x03E07C1F;
+	    dp=((dp+sp)>>2)&0x03E07C1F;
+	    *p++=(dp>>16)|dp;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp=p[ofs];
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=((dp+sp)>>2)&0x03E07C1F;
-          p[ofs]=(dp>>16)|dp;
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp=p[ofs];
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=((dp+sp)>>2)&0x03E07C1F;
+		    p[ofs]=(dp>>16)|dp;
 
-          dp=*p;
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=((dp+sp)>>2)&0x03E07C1F;
-          *p=(dp>>16)|dp;
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=((dp+sp)>>2)&0x03E07C1F;
+		    *p=(dp>>16)|dp;
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp=*p;
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=((dp+sp)>>2)&0x03E07C1F;
-          *p=(dp>>16)|dp;
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=((dp+sp)>>2)&0x03E07C1F;
+		    *p=(dp>>16)|dp;
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp=*p;
-        dp=((dp<<16)|dp)&0x03E07C1F;
-        dp=((dp+sp)>>2)&0x03E07C1F;
-        *p++=(dp>>16)|dp;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp=*p;
+		dp=((dp<<16)|dp)&0x03E07C1F;
+		dp=((dp+sp)>>2)&0x03E07C1F;
+		*p++=(dp>>16)|dp;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3574,58 +3631,61 @@ local void Draw25TransRectangle15(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw25TransRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp,dp;
-  unsigned swidth, ofs;
+    VMemType16 *p;
+    unsigned long sp;
+    unsigned long dp;
+    int swidth;
+    int ofs;
 
-  sp=Pixels16[color];
+    sp=Pixels16[color];
     // FIXME: pre multiply?
-  sp=(((sp<<16)|sp)&0x07E0F81F)*3;
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-     dp=*p;
-     dp=((dp<<16)|dp)&0x07E0F81F;
-     dp=((dp+sp)>>2)&0x07E0F81F;
-     *p++=(dp>>16)|dp;
-    } while( --ofs );
+    sp=(((sp<<16)|sp)&0x07E0F81F)*3;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp=*p;
+	    dp=((dp<<16)|dp)&0x07E0F81F;
+	    dp=((dp+sp)>>2)&0x07E0F81F;
+	    *p++=(dp>>16)|dp;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp=p[ofs];
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=((dp+sp)>>2)&0x07E0F81F;
-          p[ofs]=(dp>>16)|dp;
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp=p[ofs];
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=((dp+sp)>>2)&0x07E0F81F;
+		    p[ofs]=(dp>>16)|dp;
 
-          dp=*p;
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=((dp+sp)>>2)&0x07E0F81F;
-          *p=(dp>>16)|dp;
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=((dp+sp)>>2)&0x07E0F81F;
+		    *p=(dp>>16)|dp;
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp=*p;
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=((dp+sp)>>2)&0x07E0F81F;
-          *p=(dp>>16)|dp;
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=((dp+sp)>>2)&0x07E0F81F;
+		    *p=(dp>>16)|dp;
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp=*p;
-        dp=((dp<<16)|dp)&0x07E0F81F;
-        dp=((dp+sp)>>2)&0x07E0F81F;
-        *p++=(dp>>16)|dp;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp=*p;
+		dp=((dp<<16)|dp)&0x07E0F81F;
+		dp=((dp+sp)>>2)&0x07E0F81F;
+		*p++=(dp>>16)|dp;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3638,10 +3698,10 @@ local void Draw25TransRectangle16(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw25TransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
 //FIXME: does 24bpp represents R|G|B?
-  DrawRectangle24(color,x,y,w,h); // no trans functionaility for the moment :(
+    DrawRectangle24(color,x,y,w,h); // no trans functionaility for the moment :(
 }
 
 /**
@@ -3654,70 +3714,75 @@ local void Draw25TransRectangle24(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw25TransRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType32 *p;
-  unsigned long sp1,sp2,dp1,dp2;
-  unsigned swidth, ofs;
+    VMemType32 *p;
+    unsigned long sp1;
+    unsigned long sp2;
+    unsigned long dp1;
+    unsigned long dp2;
+    int swidth;
+    int ofs;
 
-  sp1=Pixels32[color];
-  // FIXME: pre multiply?
-  sp2=((sp1&0xFF00FF00)>>8)*3;
-  sp1=(sp1&0x00FF00FF)*3;
+    sp1=Pixels32[color];
+    // FIXME: pre multiply?
+    sp2=((sp1&0xFF00FF00)>>8)*3;
+    sp1=(sp1&0x00FF00FF)*3;
 
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-      dp1=*p;
-      dp2=(dp1&0xFF00FF00)>>8;
-      dp1&=0x00FF00FF;
-      dp1=((dp1+sp1)>>2)&0x00FF00FF;
-      dp2=((dp2+sp2)>>2)&0x00FF00FF;
-      *p++=(dp1|(dp2<<8));
-    } while( --ofs );
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp1=*p;
+	    dp2=(dp1&0xFF00FF00)>>8;
+	    dp1&=0x00FF00FF;
+	    dp1=((dp1+sp1)>>2)&0x00FF00FF;
+	    dp2=((dp2+sp2)>>2)&0x00FF00FF;
+	    *p++=(dp1|(dp2<<8));
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp1=p[ofs];
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=((dp1+sp1)>>2)&0x00FF00FF;
-          dp2=((dp2+sp2)>>2)&0x00FF00FF;
-          p[ofs]=(dp1|(dp2<<8));
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp1=p[ofs];
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=((dp1+sp1)>>2)&0x00FF00FF;
+		    dp2=((dp2+sp2)>>2)&0x00FF00FF;
+		    p[ofs]=(dp1|(dp2<<8));
 
-          dp1=*p;
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=((dp1+sp1)>>2)&0x00FF00FF;
-          dp2=((dp2+sp2)>>2)&0x00FF00FF;
-          *p=(dp1|(dp2<<8));
+		    dp1=*p;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=((dp1+sp1)>>2)&0x00FF00FF;
+		    dp2=((dp2+sp2)>>2)&0x00FF00FF;
+		    *p=(dp1|(dp2<<8));
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp1=*p;
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=((dp1+sp1)>>2)&0x00FF00FF;
-          dp2=((dp2+sp2)>>2)&0x00FF00FF;
-          *p++=(dp1|(dp2<<8));
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp1=*p;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=((dp1+sp1)>>2)&0x00FF00FF;
+		    dp2=((dp2+sp2)>>2)&0x00FF00FF;
+		    *p++=(dp1|(dp2<<8));
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp1=*p;
-        dp2=(dp1&0xFF00FF00)>>8;
-        dp1&=0x00FF00FF;
-        dp1=((dp1+sp1)>>2)&0x00FF00FF;
-        dp2=((dp2+sp2)>>2)&0x00FF00FF;
-        *p++=(dp1|(dp2<<8));
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp1=*p;
+		dp2=(dp1&0xFF00FF00)>>8;
+		dp1&=0x00FF00FF;
+		dp1=((dp1+sp1)>>2)&0x00FF00FF;
+		dp2=((dp2+sp2)>>2)&0x00FF00FF;
+		*p++=(dp1|(dp2<<8));
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3730,40 +3795,43 @@ local void Draw25TransRectangle32(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw50TransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType8 *p;
-  unsigned int swidth, ofs, c;
+    VMemType8 *p;
+    int swidth;
+    int ofs;
+    unsigned c;
 
-  swidth=VideoWidth;
-  p=VideoMemory8+y*swidth+x;
-  c=Pixels8[color]<<8;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-      *p = lookup50trans8[ c | *p ];
-      ++p;
-    } while( --ofs );
+    swidth=VideoWidth;
+    p=VideoMemory8+y*swidth+x;
+    c=Pixels8[color]<<8;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    *p = lookup50trans8[ c | *p ];
+	    ++p;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          p[ofs] = lookup50trans8[ c | p[ofs] ];
-          *p = lookup50trans8[ c | *p ];
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          *p = lookup50trans8[ c | *p ];
-          p+=swidth;
-        }
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    p[ofs] = lookup50trans8[ c | p[ofs] ];
+		    *p = lookup50trans8[ c | *p ];
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    *p = lookup50trans8[ c | *p ];
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        *p = lookup50trans8[ c | *p ];
-	++p;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		*p = lookup50trans8[ c | *p ];
+		++p;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3776,57 +3844,60 @@ local void Draw50TransRectangle8(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw50TransRectangle15(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp,dp;
-  unsigned swidth, ofs;
+    VMemType16 *p;
+    unsigned long sp;
+    unsigned long dp;
+    int swidth;
+    int ofs;
 
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x03E07C1F;
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-     dp=*p;
-     dp=((dp<<16)|dp)&0x03E07C1F;
-     dp=((dp+sp)>>1)&0x03E07C1F;
-     *p++=(dp>>16)|dp;
-    } while( --ofs );
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x03E07C1F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp=*p;
+	    dp=((dp<<16)|dp)&0x03E07C1F;
+	    dp=((dp+sp)>>1)&0x03E07C1F;
+	    *p++=(dp>>16)|dp;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp=p[ofs];
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=((dp+sp)>>1)&0x03E07C1F;
-          p[ofs]=(dp>>16)|dp;
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp=p[ofs];
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=((dp+sp)>>1)&0x03E07C1F;
+		    p[ofs]=(dp>>16)|dp;
 
-          dp=*p;
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=((dp+sp)>>1)&0x03E07C1F;
-          *p=(dp>>16)|dp;
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=((dp+sp)>>1)&0x03E07C1F;
+		    *p=(dp>>16)|dp;
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp=*p;
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=((dp+sp)>>1)&0x03E07C1F;
-          *p=(dp>>16)|dp;
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=((dp+sp)>>1)&0x03E07C1F;
+		    *p=(dp>>16)|dp;
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp=*p;
-        dp=((dp<<16)|dp)&0x03E07C1F;
-        dp=((dp+sp)>>1)&0x03E07C1F;
-        *p++=(dp>>16)|dp;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp=*p;
+		dp=((dp<<16)|dp)&0x03E07C1F;
+		dp=((dp+sp)>>1)&0x03E07C1F;
+		*p++=(dp>>16)|dp;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3839,57 +3910,60 @@ local void Draw50TransRectangle15(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw50TransRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp,dp;
-  unsigned swidth, ofs;
+    VMemType16 *p;
+    unsigned long sp;
+    unsigned long dp;
+    int swidth;
+    int ofs;
 
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x07E0F81F;
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-     dp=*p;
-     dp=((dp<<16)|dp)&0x07E0F81F;
-     dp=((dp+sp)>>1)&0x07E0F81F;
-     *p++=(dp>>16)|dp;
-    } while( --ofs );
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x07E0F81F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp=*p;
+	    dp=((dp<<16)|dp)&0x07E0F81F;
+	    dp=((dp+sp)>>1)&0x07E0F81F;
+	    *p++=(dp>>16)|dp;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp=p[ofs];
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=((dp+sp)>>1)&0x07E0F81F;
-          p[ofs]=(dp>>16)|dp;
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp=p[ofs];
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=((dp+sp)>>1)&0x07E0F81F;
+		    p[ofs]=(dp>>16)|dp;
 
-          dp=*p;
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=((dp+sp)>>1)&0x07E0F81F;
-          *p=(dp>>16)|dp;
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=((dp+sp)>>1)&0x07E0F81F;
+		    *p=(dp>>16)|dp;
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp=*p;
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=((dp+sp)>>1)&0x07E0F81F;
-          *p=(dp>>16)|dp;
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=((dp+sp)>>1)&0x07E0F81F;
+		    *p=(dp>>16)|dp;
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp=*p;
-        dp=((dp<<16)|dp)&0x07E0F81F;
-        dp=((dp+sp)>>1)&0x07E0F81F;
-        *p++=(dp>>16)|dp;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp=*p;
+		dp=((dp<<16)|dp)&0x07E0F81F;
+		dp=((dp+sp)>>1)&0x07E0F81F;
+		*p++=(dp>>16)|dp;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3902,10 +3976,10 @@ local void Draw50TransRectangle16(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw50TransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
 //FIXME: does 24bpp represents R|G|B?
-  DrawRectangle24(color,x,y,w,h); // no trans functionaility for the moment :(
+    DrawRectangle24(color,x,y,w,h); // no trans functionaility for the moment :(
 }
 
 /**
@@ -3918,70 +3992,75 @@ local void Draw50TransRectangle24(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw50TransRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType32 *p;
-  unsigned long sp1,sp2,dp1,dp2;
-  unsigned swidth, ofs;
+    VMemType32 *p;
+    unsigned long sp1;
+    unsigned long sp2;
+    unsigned long dp1;
+    unsigned long dp2;
+    int swidth;
+    int ofs;
 
-  sp1=Pixels32[color];
-  // FIXME: pre multiply?
-  sp2=(sp1&0xFF00FF00)>>8;
-  sp1&=0x00FF00FF;
+    sp1=Pixels32[color];
+    // FIXME: pre multiply?
+    sp2=(sp1&0xFF00FF00)>>8;
+    sp1&=0x00FF00FF;
 
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-      dp1=*p;
-      dp2=(dp1&0xFF00FF00)>>8;
-      dp1&=0x00FF00FF;
-      dp1=((dp1+sp1)>>1)&0x00FF00FF;
-      dp2=((dp2+sp2)>>1)&0x00FF00FF;
-      *p++=(dp1|(dp2<<8));
-    } while( --ofs );
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp1=*p;
+	    dp2=(dp1&0xFF00FF00)>>8;
+	    dp1&=0x00FF00FF;
+	    dp1=((dp1+sp1)>>1)&0x00FF00FF;
+	    dp2=((dp2+sp2)>>1)&0x00FF00FF;
+	    *p++=(dp1|(dp2<<8));
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp1=p[ofs];
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=((dp1+sp1)>>1)&0x00FF00FF;
-          dp2=((dp2+sp2)>>1)&0x00FF00FF;
-          p[ofs]=(dp1|(dp2<<8));
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp1=p[ofs];
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=((dp1+sp1)>>1)&0x00FF00FF;
+		    dp2=((dp2+sp2)>>1)&0x00FF00FF;
+		    p[ofs]=(dp1|(dp2<<8));
 
-          dp1=*p;
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=((dp1+sp1)>>1)&0x00FF00FF;
-          dp2=((dp2+sp2)>>1)&0x00FF00FF;
-          *p=(dp1|(dp2<<8));
+		    dp1=*p;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=((dp1+sp1)>>1)&0x00FF00FF;
+		    dp2=((dp2+sp2)>>1)&0x00FF00FF;
+		    *p=(dp1|(dp2<<8));
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp1=*p;
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=((dp1+sp1)>>1)&0x00FF00FF;
-          dp2=((dp2+sp2)>>1)&0x00FF00FF;
-          *p++=(dp1|(dp2<<8));
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp1=*p;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=((dp1+sp1)>>1)&0x00FF00FF;
+		    dp2=((dp2+sp2)>>1)&0x00FF00FF;
+		    *p++=(dp1|(dp2<<8));
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp1=*p;
-        dp2=(dp1&0xFF00FF00)>>8;
-        dp1&=0x00FF00FF;
-        dp1=((dp1+sp1)>>1)&0x00FF00FF;
-        dp2=((dp2+sp2)>>1)&0x00FF00FF;
-        *p++=(dp1|(dp2<<8));
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp1=*p;
+		dp2=(dp1&0xFF00FF00)>>8;
+		dp1&=0x00FF00FF;
+		dp1=((dp1+sp1)>>1)&0x00FF00FF;
+		dp2=((dp2+sp2)>>1)&0x00FF00FF;
+		*p++=(dp1|(dp2<<8));
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -3994,40 +4073,43 @@ local void Draw50TransRectangle32(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw75TransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType8 *p;
-  unsigned int swidth, ofs, c;
+    VMemType8 *p;
+    int swidth;
+    int ofs;
+    unsigned c;
 
-  swidth=VideoWidth;
-  p=VideoMemory8+y*swidth+x;
-  c=Pixels8[color];
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-      *p = lookup25trans8[ (*p<<8) | c ];
-      ++p;
-    } while( --ofs );
+    swidth=VideoWidth;
+    p=VideoMemory8+y*swidth+x;
+    c=Pixels8[color];
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    *p = lookup25trans8[ (*p<<8) | c ];
+	    ++p;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          p[ofs] = lookup25trans8[ (p[ofs]<<8) | c ];
-          *p = lookup25trans8[ (*p<<8) | c ];
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          *p = lookup25trans8[ (*p<<8) | c ];
-          p+=swidth;
-        }
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    p[ofs] = lookup25trans8[ (p[ofs]<<8) | c ];
+		    *p = lookup25trans8[ (*p<<8) | c ];
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    *p = lookup25trans8[ (*p<<8) | c ];
+		    p+=swidth;
+		}
 
-      do { // Draw bottom horizontal line
-        *p = lookup25trans8[ (*p<<8) | c ];
-	++p;
-      } while( ofs-- );
+		do { // Draw bottom horizontal line
+		    *p = lookup25trans8[ (*p<<8) | c ];
+		    ++p;
+		} while( ofs-- );
+	    }
+	}
     }
-  }
 }
 
 /**
@@ -4040,57 +4122,60 @@ local void Draw75TransRectangle8(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw75TransRectangle15(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp,dp;
-  unsigned swidth, ofs;
+    VMemType16 *p;
+    unsigned long sp;
+    unsigned long dp;
+    int swidth;
+    int ofs;
 
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x03E07C1F;
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-     dp=*p;
-     dp=((dp<<16)|dp)&0x03E07C1F;
-     dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
-     *p++=(dp>>16)|dp;
-    } while( --ofs );
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x03E07C1F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp=*p;
+	    dp=((dp<<16)|dp)&0x03E07C1F;
+	    dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
+	    *p++=(dp>>16)|dp;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp=p[ofs];
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
-          p[ofs]=(dp>>16)|dp;
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp=p[ofs];
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
+		    p[ofs]=(dp>>16)|dp;
 
-          dp=*p;
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
-          *p=(dp>>16)|dp;
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
+		    *p=(dp>>16)|dp;
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp=*p;
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
-          *p=(dp>>16)|dp;
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
+		    *p=(dp>>16)|dp;
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp=*p;
-        dp=((dp<<16)|dp)&0x03E07C1F;
-        dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
-        *p++=(dp>>16)|dp;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp=*p;
+		dp=((dp<<16)|dp)&0x03E07C1F;
+		dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
+		*p++=(dp>>16)|dp;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -4103,57 +4188,60 @@ local void Draw75TransRectangle15(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw75TransRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp,dp;
-  unsigned swidth, ofs;
+    VMemType16 *p;
+    unsigned long sp;
+    unsigned long dp;
+    int swidth;
+    int ofs;
 
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x07E0F81F;
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-     dp=*p;
-     dp=((dp<<16)|dp)&0x07E0F81F;
-     dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
-     *p++=(dp>>16)|dp;
-    } while( --ofs );
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x07E0F81F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp=*p;
+	    dp=((dp<<16)|dp)&0x07E0F81F;
+	    dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
+	    *p++=(dp>>16)|dp;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp=p[ofs];
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
-          p[ofs]=(dp>>16)|dp;
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp=p[ofs];
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
+		    p[ofs]=(dp>>16)|dp;
 
-          dp=*p;
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
-          *p=(dp>>16)|dp;
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
+		    *p=(dp>>16)|dp;
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp=*p;
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
-          *p=(dp>>16)|dp;
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
+		    *p=(dp>>16)|dp;
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp=*p;
-        dp=((dp<<16)|dp)&0x07E0F81F;
-        dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
-        *p++=(dp>>16)|dp;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp=*p;
+		dp=((dp<<16)|dp)&0x07E0F81F;
+		dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
+		*p++=(dp>>16)|dp;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -4166,10 +4254,10 @@ local void Draw75TransRectangle16(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw75TransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
 //FIXME: does 24bpp represents R|G|B?
-  DrawRectangle24(color,x,y,w,h); // no trans functionaility for the moment :(
+    DrawRectangle24(color,x,y,w,h); // no trans functionaility for the moment :(
 }
 
 /**
@@ -4182,70 +4270,75 @@ local void Draw75TransRectangle24(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void Draw75TransRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType32 *p;
-  unsigned long sp1,sp2,dp1,dp2;
-  unsigned swidth, ofs;
+    VMemType32 *p;
+    unsigned long sp1;
+    unsigned long sp2;
+    unsigned long dp1;
+    unsigned long dp2;
+    int swidth;
+    int ofs;
 
-  sp1=Pixels32[color];
-  // FIXME: pre multiply?
-  sp2=(sp1&0xFF00FF00)>>8;
-  sp1&=0x00FF00FF;
+    sp1=Pixels32[color];
+    // FIXME: pre multiply?
+    sp2=(sp1&0xFF00FF00)>>8;
+    sp1&=0x00FF00FF;
 
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-      dp1=*p;
-      dp2=(dp1&0xFF00FF00)>>8;
-      dp1&=0x00FF00FF;
-      dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
-      dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
-      *p++=(dp1|(dp2<<8));
-    } while( --ofs );
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp1=*p;
+	    dp2=(dp1&0xFF00FF00)>>8;
+	    dp1&=0x00FF00FF;
+	    dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
+	    dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
+	    *p++=(dp1|(dp2<<8));
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp1=p[ofs];
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
-          dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
-          p[ofs]=(dp1|(dp2<<8));
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp1=p[ofs];
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
+		    dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
+		    p[ofs]=(dp1|(dp2<<8));
 
-          dp1=*p;
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
-          dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
-          *p=(dp1|(dp2<<8));
+		    dp1=*p;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
+		    dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
+		    *p=(dp1|(dp2<<8));
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp1=*p;
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
-          dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
-          *p++=(dp1|(dp2<<8));
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp1=*p;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
+		    dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
+		    *p++=(dp1|(dp2<<8));
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp1=*p;
-        dp2=(dp1&0xFF00FF00)>>8;
-        dp1&=0x00FF00FF;
-        dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
-        dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
-        *p++=(dp1|(dp2<<8));
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp1=*p;
+		dp2=(dp1&0xFF00FF00)>>8;
+		dp1&=0x00FF00FF;
+		dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
+		dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
+		*p++=(dp1|(dp2<<8));
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -4259,25 +4352,25 @@ local void Draw75TransRectangle32(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawTransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
-  switch ( ((unsigned int)alpha * 4) / 255 )
-  {
-  case 0:
-    DrawRectangle8(color,x,y,w,h);
-    break;
-  case 1:
-    Draw25TransRectangle8(color,x,y,w,h);
-    break;
-  case 2:
-    Draw50TransRectangle8(color,x,y,w,h);
-    break;
-  case 3:
-    Draw75TransRectangle8(color,x,y,w,h);
-    break;
-  default:
-    break;
-  }
+    switch ( ((unsigned int)alpha * 4) / 255 )
+    {
+	case 0:
+	    DrawRectangle8(color,x,y,w,h);
+	    break;
+	case 1:
+	    Draw25TransRectangle8(color,x,y,w,h);
+	    break;
+	case 2:
+	    Draw50TransRectangle8(color,x,y,w,h);
+	    break;
+	case 3:
+	    Draw75TransRectangle8(color,x,y,w,h);
+	    break;
+	default:
+	    break;
+    }
 }
 
 /**
@@ -4291,7 +4384,7 @@ local void DrawTransRectangle8(SysColors color,int x,int y
 **      @param alpha    Alpha value of pixel
 */
 local void DrawNoTransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha __attribute__((unused)))
+	,int w,int h,unsigned char alpha __attribute__((unused)))
 {
     DrawRectangle8(color,x,y,w,h);
 }
@@ -4307,59 +4400,62 @@ local void DrawNoTransRectangle8(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawTransRectangle15(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
-  VMemType16 *p;
-  unsigned long sp,dp;
-  unsigned swidth, ofs;
+    VMemType16 *p;
+    unsigned long sp;
+    unsigned long dp;
+    int swidth;
+    int ofs;
 
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x03E07C1F;
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  //FIXME: alpha==256 unreached
-  alpha>>=3;                          //FIXME: only 5bits
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-     dp=*p;
-     dp=((dp<<16)|dp)&0x03E07C1F;
-     dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
-     *p++=(dp>>16)|dp;
-    } while( --ofs );
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x03E07C1F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    //FIXME: alpha==256 unreached
+    alpha>>=3;                          //FIXME: only 5bits
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp=*p;
+	    dp=((dp<<16)|dp)&0x03E07C1F;
+	    dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
+	    *p++=(dp>>16)|dp;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp=p[ofs];
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
-          p[ofs]=(dp>>16)|dp;
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp=p[ofs];
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
+		    p[ofs]=(dp>>16)|dp;
 
-          dp=*p;
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
-          *p=(dp>>16)|dp;
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
+		    *p=(dp>>16)|dp;
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp=*p;
-          dp=((dp<<16)|dp)&0x03E07C1F;
-          dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
-          *p=(dp>>16)|dp;
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x03E07C1F;
+		    dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
+		    *p=(dp>>16)|dp;
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp=*p;
-        dp=((dp<<16)|dp)&0x03E07C1F;
-        dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
-        *p++=(dp>>16)|dp;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp=*p;
+		dp=((dp<<16)|dp)&0x03E07C1F;
+		dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F;
+		*p++=(dp>>16)|dp;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -4373,59 +4469,62 @@ local void DrawTransRectangle15(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawTransRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
-  VMemType16 *p;
-  unsigned long sp,dp;
-  unsigned swidth, ofs;
+    VMemType16 *p;
+    unsigned long sp;
+    unsigned long dp;
+    int swidth;
+    int ofs;
 
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x07E0F81F;
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  //FIXME: alpha==256 unreached
-  alpha>>=3;                          //FIXME: only 5bits
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-     dp=*p;
-     dp=((dp<<16)|dp)&0x07E0F81F;
-     dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
-     *p++=(dp>>16)|dp;
-    } while( --ofs );
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x07E0F81F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    //FIXME: alpha==256 unreached
+    alpha>>=3;                          //FIXME: only 5bits
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp=*p;
+	    dp=((dp<<16)|dp)&0x07E0F81F;
+	    dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
+	    *p++=(dp>>16)|dp;
+	} while( --ofs );
 
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp=p[ofs];
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
-          p[ofs]=(dp>>16)|dp;
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp=p[ofs];
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
+		    p[ofs]=(dp>>16)|dp;
 
-          dp=*p;
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
-          *p=(dp>>16)|dp;
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
+		    *p=(dp>>16)|dp;
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp=*p;
-          dp=((dp<<16)|dp)&0x07E0F81F;
-          dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
-          *p=(dp>>16)|dp;
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp=*p;
+		    dp=((dp<<16)|dp)&0x07E0F81F;
+		    dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
+		    *p=(dp>>16)|dp;
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp=*p;
-        dp=((dp<<16)|dp)&0x07E0F81F;
-        dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
-        *p++=(dp>>16)|dp;
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp=*p;
+		dp=((dp<<16)|dp)&0x07E0F81F;
+		dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F;
+		*p++=(dp>>16)|dp;
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -4439,7 +4538,7 @@ local void DrawTransRectangle16(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawTransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha __attribute__((unused)))
+	,int w,int h,unsigned char alpha __attribute__((unused)))
 {
 //FIXME: does 24bpp represents R|G|B?
     DrawRectangle24(color,x,y,w,h); // no trans functionaility for the moment :(
@@ -4456,70 +4555,75 @@ local void DrawTransRectangle24(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawTransRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
-  VMemType32 *p;
-  unsigned long sp1,sp2,dp1,dp2;
-  unsigned swidth, ofs;
+    VMemType32 *p;
+    unsigned long sp1;
+    unsigned long sp2;
+    unsigned long dp1;
+    unsigned long dp2;
+    int swidth;
+    int ofs;
 
-  sp1=Pixels32[color];
-  // FIXME: pre multiply?
-  sp2=(sp1&0xFF00FF00)>>8;
-  sp1&=0x00FF00FF;
+    sp1=Pixels32[color];
+    // FIXME: pre multiply?
+    sp2=(sp1&0xFF00FF00)>>8;
+    sp1&=0x00FF00FF;
 
-  //FIXME: alpha==256 unreached
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  if ( h && (ofs=w) ) {
-    do { // Draw top horizontal line
-      dp1=*p;
-      dp2=(dp1&0xFF00FF00)>>8;
-      dp1&=0x00FF00FF;
-      dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
-      dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
-      *p++=(dp1|(dp2<<8));
-    } while( --ofs );
-    if ( --h ) {
-      p+=(swidth-w);
-      if ((ofs=w-1))
-        while( --h ) { // Draw two vertical lines
-          dp1=p[ofs];
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
-          dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
-          p[ofs]=(dp1|(dp2<<8));
+    //FIXME: alpha==256 unreached
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    if ( h && (ofs=w) ) {
+	do { // Draw top horizontal line
+	    dp1=*p;
+	    dp2=(dp1&0xFF00FF00)>>8;
+	    dp1&=0x00FF00FF;
+	    dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
+	    dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
+	    *p++=(dp1|(dp2<<8));
+	} while( --ofs );
+	if ( --h ) {
+	    p+=(swidth-w);
+	    if ((ofs=w-1)) {
+		while( --h ) { // Draw two vertical lines
+		    dp1=p[ofs];
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
+		    dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
+		    p[ofs]=(dp1|(dp2<<8));
 
-          dp1=*p;
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
-          dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
-          *p=(dp1|(dp2<<8));
+		    dp1=*p;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
+		    dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
+		    *p=(dp1|(dp2<<8));
 
-          p+=swidth;
-        }
-      else
-        while( --h ) { // Draw one vertical line
-          dp1=*p;
-          dp2=(dp1&0xFF00FF00)>>8;
-          dp1&=0x00FF00FF;
-          dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
-          dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
-          *p=(dp1|(dp2<<8));
-          p+=swidth;
-        }
+		    p+=swidth;
+		}
+	    } else {
+		while( --h ) { // Draw one vertical line
+		    dp1=*p;
+		    dp2=(dp1&0xFF00FF00)>>8;
+		    dp1&=0x00FF00FF;
+		    dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
+		    dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
+		    *p=(dp1|(dp2<<8));
+		    p+=swidth;
+		}
+	    }
 
-      do { // Draw bottom horizontal line
-        dp1=*p;
-        dp2=(dp1&0xFF00FF00)>>8;
-        dp1&=0x00FF00FF;
-        dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
-        dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
-        *p++=(dp1|(dp2<<8));
-      } while( ofs-- );
+	    do { // Draw bottom horizontal line
+		dp1=*p;
+		dp2=(dp1&0xFF00FF00)>>8;
+		dp1&=0x00FF00FF;
+		dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
+		dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
+		*p++=(dp1|(dp2<<8));
+	    } while( ofs-- );
+	}
     }
-  }
 }
 
 /**
@@ -4532,7 +4636,7 @@ local void DrawTransRectangle32(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 global void VideoDrawRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
     #define _x              x
     #define _y              y
@@ -4561,7 +4665,7 @@ global void VideoDrawRectangleClip(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 global void VideoDraw25TransRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
     #define _x              x
     #define _y              y
@@ -4590,7 +4694,7 @@ global void VideoDraw25TransRectangleClip(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 global void VideoDraw50TransRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
     #define _x              x
     #define _y              y
@@ -4619,7 +4723,7 @@ global void VideoDraw50TransRectangleClip(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 global void VideoDraw75TransRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
     #define _x              x
     #define _y              y
@@ -4649,7 +4753,7 @@ global void VideoDraw75TransRectangleClip(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 global void VideoDrawTransRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
     #define _x              x
     #define _y              y
@@ -4682,7 +4786,7 @@ global void VideoDrawTransRectangleClip(SysColors color,int x,int y
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoDrawCircle(SysColors color,int x,int y,unsigned r)
+global void VideoDrawCircle(SysColors color,int x,int y,int r)
 {
     int cx;
     int cy;
@@ -4742,7 +4846,7 @@ global void VideoDrawCircle(SysColors color,int x,int y,unsigned r)
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoDrawCircleClip(SysColors color,int x,int y,unsigned r)
+global void VideoDrawCircleClip(SysColors color,int x,int y,int r)
 {
     int cx;
     int cy;
@@ -4807,21 +4911,25 @@ global void VideoDrawCircleClip(SysColors color,int x,int y,unsigned r)
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFillRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType8 *p, f;
-  unsigned int swidth, i;
+    VMemType8 *p;
+    VMemType8 f;
+    int swidth;
+    int i;
 
-  f=Pixels8[color];
-  swidth=VideoWidth;
-  p=VideoMemory8+y*swidth+x;
-  swidth-=w;
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do *p++=f;
-      while ( --i );
-      p+=swidth;
+    f=Pixels8[color];
+    swidth=VideoWidth;
+    p=VideoMemory8+y*swidth+x;
+    swidth-=w;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		*p++=f;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -4835,21 +4943,25 @@ local void DrawFillRectangle8(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFillRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p, f;
-  unsigned int swidth, i;
+    VMemType16 *p;
+    VMemType16 f;
+    int swidth;
+    int i;
 
-  f=Pixels16[color];
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  swidth-=w;
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do *p++=f;
-      while ( --i );
-      p+=swidth;
+    f=Pixels16[color];
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    swidth-=w;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		*p++=f;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -4863,21 +4975,25 @@ local void DrawFillRectangle16(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFillRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType24 *p, f;
-  unsigned int swidth, i;
+    VMemType24 *p;
+    VMemType24 f;
+    int swidth;
+    int i;
 
-  f=Pixels24[color];
-  swidth=VideoWidth;
-  p=VideoMemory24+y*swidth+x;
-  swidth-=w;
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do *p++=f;
-      while ( --i );
-      p+=swidth;
+    f=Pixels24[color];
+    swidth=VideoWidth;
+    p=VideoMemory24+y*swidth+x;
+    swidth-=w;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		*p++=f;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -4891,21 +5007,25 @@ local void DrawFillRectangle24(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFillRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType32 *p, f;
-  unsigned int swidth, i;
+    VMemType32 *p;
+    VMemType32 f;
+    int swidth;
+    int i;
 
-  f=Pixels32[color];
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  swidth-=w;
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do *p++=f;
-      while ( --i );
-      p+=swidth;
+    f=Pixels32[color];
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    swidth-=w;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		*p++=f;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -4919,24 +5039,27 @@ local void DrawFillRectangle32(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill25TransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType8 *p;
-  unsigned int i, swidth, c;
+    VMemType8 *p;
+    int i;
+    int swidth;
+    unsigned c;
 
-  swidth=VideoWidth;
-  p=VideoMemory8+y*swidth+x;
-  swidth-=w;
-  c=Pixels8[color]<<8;
+    swidth=VideoWidth;
+    p=VideoMemory8+y*swidth+x;
+    swidth-=w;
+    c=Pixels8[color]<<8;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        *p = lookup25trans8[ c | *p ];
-	++p;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		*p = lookup25trans8[ c | *p ];
+		++p;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -4950,29 +5073,32 @@ local void DrawFill25TransRectangle8(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill25TransRectangle15(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp;
-  unsigned int i, swidth;
+    VMemType16 *p;
+    unsigned long sp;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  swidth-=w;
-  sp=Pixels16[color];
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    swidth-=w;
+    sp=Pixels16[color];
     // FIXME: pre multiply?
-  sp=(((sp<<16)|sp)&0x03E07C1F)*3;
+    sp=(((sp<<16)|sp)&0x03E07C1F)*3;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp = *p;
-        dp=((dp<<16)|dp)&0x03E07C1F;
-        dp=((dp+sp)>>2)&0x03E07C1F;
-        *p++=(dp>>16)|dp;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp;
+		dp = *p;
+		dp=((dp<<16)|dp)&0x03E07C1F;
+		dp=((dp+sp)>>2)&0x03E07C1F;
+		*p++=(dp>>16)|dp;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -4986,29 +5112,32 @@ local void DrawFill25TransRectangle15(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill25TransRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp;
-  unsigned int i, swidth;
+    VMemType16 *p;
+    unsigned long sp;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  swidth-=w;
-  sp=Pixels16[color];
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    swidth-=w;
+    sp=Pixels16[color];
     // FIXME: pre multiply?
-  sp=(((sp<<16)|sp)&0x07E0F81F)*3;
+    sp=(((sp<<16)|sp)&0x07E0F81F)*3;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp = *p;
-        dp=((dp<<16)|dp)&0x07E0F81F;
-        dp=((dp+sp)>>2)&0x07E0F81F;
-        *p++=(dp>>16)|dp;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp;
+		dp = *p;
+		dp=((dp<<16)|dp)&0x07E0F81F;
+		dp=((dp+sp)>>2)&0x07E0F81F;
+		*p++=(dp>>16)|dp;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5022,10 +5151,10 @@ local void DrawFill25TransRectangle16(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill25TransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  // FIXME: does 24bpp holds R|G|B ?
-  DrawFillRectangle24(color,x,y,w,h); // no trans functionaility :(
+// FIXME: does 24bpp holds R|G|B ?
+    DrawFillRectangle24(color,x,y,w,h); // no trans functionaility :(
 }
 
 /**
@@ -5038,36 +5167,40 @@ local void DrawFill25TransRectangle24(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill25TransRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType32 *p;
-  unsigned long sp1, sp2;
-  unsigned int i, swidth;
+    VMemType32 *p;
+    unsigned long sp1;
+    unsigned long sp2;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  swidth-=w;
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    swidth-=w;
 
-  sp1=Pixels32[color];
+    sp1=Pixels32[color];
     // FIXME: pre multiply?
-  sp2=((sp1&0xFF00FF00)>>8)*3;
-  sp1=(sp1&0x00FF00FF)*3;
+    sp2=((sp1&0xFF00FF00)>>8)*3;
+    sp1=(sp1&0x00FF00FF)*3;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp1, dp2;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp1;
+		unsigned long dp2;
 
-        dp1=*p;
-        dp2=(dp1&0xFF00FF00)>>8;
-        dp1&=0x00FF00FF;
+		dp1=*p;
+		dp2=(dp1&0xFF00FF00)>>8;
+		dp1&=0x00FF00FF;
 
-        dp1=((dp1+sp1)>>2)&0x00FF00FF;
-        dp2=((dp2+sp2)>>2)&0x00FF00FF;
-        *p++=(dp1|(dp2<<8));
-      } while ( --i );
-      p+=swidth;
+		dp1=((dp1+sp1)>>2)&0x00FF00FF;
+		dp2=((dp2+sp2)>>2)&0x00FF00FF;
+		*p++=(dp1|(dp2<<8));
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5081,24 +5214,27 @@ local void DrawFill25TransRectangle32(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill50TransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType8 *p;
-  unsigned int i, swidth, c;
+    VMemType8 *p;
+    int i;
+    int swidth;
+    unsigned c;
 
-  swidth=VideoWidth;
-  p=VideoMemory8+y*swidth+x;
-  swidth-=w;
-  c=Pixels8[color]<<8;
+    swidth=VideoWidth;
+    p=VideoMemory8+y*swidth+x;
+    swidth-=w;
+    c=Pixels8[color]<<8;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        *p = lookup50trans8[ c | *p ];
-	++p;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		*p = lookup50trans8[ c | *p ];
+		++p;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5112,28 +5248,31 @@ local void DrawFill50TransRectangle8(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill50TransRectangle15(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp;
-  unsigned int i, swidth;
+    VMemType16 *p;
+    unsigned long sp;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  swidth-=w;
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x03E07C1F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    swidth-=w;
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x03E07C1F;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp = *p;
-        dp=((dp<<16)|dp)&0x03E07C1F;
-        dp=((dp+sp)>>1)&0x03E07C1F;
-        *p++=(dp>>16)|dp;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp;
+		dp = *p;
+		dp=((dp<<16)|dp)&0x03E07C1F;
+		dp=((dp+sp)>>1)&0x03E07C1F;
+		*p++=(dp>>16)|dp;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5147,28 +5286,31 @@ local void DrawFill50TransRectangle15(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill50TransRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp;
-  unsigned int i, swidth;
+    VMemType16 *p;
+    unsigned long sp;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  swidth-=w;
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x07E0F81F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    swidth-=w;
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x07E0F81F;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp = *p;
-        dp=((dp<<16)|dp)&0x07E0F81F;
-        dp=((dp+sp)>>1)&0x07E0F81F;
-        *p++=(dp>>16)|dp;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp;
+		dp = *p;
+		dp=((dp<<16)|dp)&0x07E0F81F;
+		dp=((dp+sp)>>1)&0x07E0F81F;
+		*p++=(dp>>16)|dp;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5182,10 +5324,10 @@ local void DrawFill50TransRectangle16(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill50TransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  // FIXME: how does 24bpp represents RGB ?
-  DrawFillRectangle24(color,x,y,w,h); // no trans functionaility :(
+// FIXME: how does 24bpp represents RGB ?
+    DrawFillRectangle24(color,x,y,w,h); // no trans functionaility :(
 }
 
 /**
@@ -5198,35 +5340,39 @@ local void DrawFill50TransRectangle24(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill50TransRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType32 *p;
-  unsigned long sp1, sp2;
-  unsigned int i, swidth;
+    VMemType32 *p;
+    unsigned long sp1;
+    unsigned long sp2;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  swidth-=w;
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    swidth-=w;
 
-  sp1=Pixels32[color];
-  sp2=(sp1&0xFF00FF00)>>8;
-  sp1&=0x00FF00FF;
+    sp1=Pixels32[color];
+    sp2=(sp1&0xFF00FF00)>>8;
+    sp1&=0x00FF00FF;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp1, dp2;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp1;
+		unsigned long dp2;
 
-        dp1=*p;
-        dp2=(dp1&0xFF00FF00)>>8;
-        dp1&=0x00FF00FF;
+		dp1=*p;
+		dp2=(dp1&0xFF00FF00)>>8;
+		dp1&=0x00FF00FF;
 
-        dp1=((dp1+sp1)>>1)&0x00FF00FF;
-        dp2=((dp2+sp2)>>1)&0x00FF00FF;
-        *p++=(dp1|(dp2<<8));
-      } while ( --i );
-      p+=swidth;
+		dp1=((dp1+sp1)>>1)&0x00FF00FF;
+		dp2=((dp2+sp2)>>1)&0x00FF00FF;
+		*p++=(dp1|(dp2<<8));
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5240,24 +5386,27 @@ local void DrawFill50TransRectangle32(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill75TransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType8 *p;
-  unsigned int i, swidth, c;
+    VMemType8 *p;
+    int i;
+    int swidth;
+    unsigned c;
 
-  swidth=VideoWidth;
-  p=VideoMemory8+y*swidth+x;
-  swidth-=w;
-  c=Pixels8[color];
+    swidth=VideoWidth;
+    p=VideoMemory8+y*swidth+x;
+    swidth-=w;
+    c=Pixels8[color];
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        *p = lookup25trans8[ (*p<<8) | c ];
-	++p;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		*p = lookup25trans8[ (*p<<8) | c ];
+		++p;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5271,28 +5420,31 @@ local void DrawFill75TransRectangle8(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill75TransRectangle15(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp;
-  unsigned int i, swidth;
+    VMemType16 *p;
+    unsigned long sp;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  swidth-=w;
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x03E07C1F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    swidth-=w;
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x03E07C1F;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp = *p;
-        dp=((dp<<16)|dp)&0x03E07C1F;
-        dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
-        *p++=(dp>>16)|dp;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp;
+		dp = *p;
+		dp=((dp<<16)|dp)&0x03E07C1F;
+		dp=(((dp<<1)+dp+sp)>>2)&0x03E07C1F;
+		*p++=(dp>>16)|dp;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5306,28 +5458,31 @@ local void DrawFill75TransRectangle15(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill75TransRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType16 *p;
-  unsigned long sp;
-  unsigned int i, swidth;
+    VMemType16 *p;
+    unsigned long sp;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  swidth-=w;
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x07E0F81F;
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    swidth-=w;
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x07E0F81F;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp = *p;
-        dp=((dp<<16)|dp)&0x07E0F81F;
-        dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
-        *p++=(dp>>16)|dp;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp;
+		dp = *p;
+		dp=((dp<<16)|dp)&0x07E0F81F;
+		dp=(((dp<<1)+dp+sp)>>2)&0x07E0F81F;
+		*p++=(dp>>16)|dp;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5341,10 +5496,10 @@ local void DrawFill75TransRectangle16(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill75TransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  // FIXME: does 24bpp holds R|G|B ?
-  DrawFillRectangle24(color,x,y,w,h); // no trans functionaility :(
+// FIXME: does 24bpp holds R|G|B ?
+    DrawFillRectangle24(color,x,y,w,h); // no trans functionaility :(
 }
 
 /**
@@ -5357,35 +5512,39 @@ local void DrawFill75TransRectangle24(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 local void DrawFill75TransRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
-  VMemType32 *p;
-  unsigned long sp1, sp2;
-  unsigned int i, swidth;
+    VMemType32 *p;
+    unsigned long sp1;
+    unsigned long sp2;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  swidth-=w;
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    swidth-=w;
 
-  sp1=Pixels32[color];
-  sp2=(sp1&0xFF00FF00)>>8;
-  sp1&=0x00FF00FF;
+    sp1=Pixels32[color];
+    sp2=(sp1&0xFF00FF00)>>8;
+    sp1&=0x00FF00FF;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp1, dp2;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp1;
+		unsigned long dp2;
 
-        dp1=*p;
-        dp2=(dp1&0xFF00FF00)>>8;
-        dp1&=0x00FF00FF;
+		dp1=*p;
+		dp2=(dp1&0xFF00FF00)>>8;
+		dp1&=0x00FF00FF;
 
-        dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
-        dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
-        *p++=(dp1|(dp2<<8));
-      } while ( --i );
-      p+=swidth;
+		dp1=(((dp1<<1)+dp1+sp1)>>2)&0x00FF00FF;
+		dp2=(((dp2<<1)+dp2+sp2)>>2)&0x00FF00FF;
+		*p++=(dp1|(dp2<<8));
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5400,63 +5559,66 @@ local void DrawFill75TransRectangle32(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawFillTransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
-  VMemType8 *p;
-  unsigned int i, swidth, c;
+    VMemType8 *p;
+    int i;
+    int swidth;
+    unsigned c;
 
-  swidth=VideoWidth;
-  p=VideoMemory8+y*swidth+x;
-  swidth-=w;
-  c=Pixels8[color];
+    swidth=VideoWidth;
+    p=VideoMemory8+y*swidth+x;
+    swidth-=w;
+    c=Pixels8[color];
 
-  if ( w )
-    switch ( ((unsigned int)alpha * 4) / 255 )
-    {
-    case 0:
-      while( h-- ) {
-        i=w;
-        do {
-          *p = c;
-	  ++p;
-        } while ( --i );
-        p+=swidth;
-      }
-      break;
-    case 1:
-      c<<=8;
-      while( h-- ) {
-        i=w;
-        do {
-          *p = lookup25trans8[ *p | c ];
-	  ++p;
-        } while ( --i );
-        p+=swidth;
-      }
-      break;
-    case 2:
-      c<<=8;
-      while( h-- ) {
-        i=w;
-        do {
-          *p = lookup50trans8[ *p | c ];
-	  ++p;
-        } while ( --i );
-        p+=swidth;
-      }
-      break;
-    case 3:
-      while( h-- ) {
-        i=w;
-        do {
-          *p = lookup25trans8[ (*p<<8) | c ];
-	  ++p;
-        } while ( --i );
-        p+=swidth;
-      }
-      break;
-    default:
-      break;
+    if ( w ) {
+	switch ( ((unsigned int)alpha * 4) / 255 )
+	{
+	    case 0:
+		while( h-- ) {
+		    i=w;
+		    do {
+			*p = c;
+			++p;
+		    } while ( --i );
+		    p+=swidth;
+		}
+		break;
+	    case 1:
+		c<<=8;
+		while( h-- ) {
+		    i=w;
+		    do {
+			*p = lookup25trans8[ *p | c ];
+			++p;
+		    } while ( --i );
+		    p+=swidth;
+		}
+		break;
+	    case 2:
+		c<<=8;
+		while( h-- ) {
+		    i=w;
+		    do {
+			*p = lookup50trans8[ *p | c ];
+			++p;
+		    } while ( --i );
+		    p+=swidth;
+		}
+		break;
+	    case 3:
+		while( h-- ) {
+		    i=w;
+		    do {
+			*p = lookup25trans8[ (*p<<8) | c ];
+			++p;
+		    } while ( --i );
+		    p+=swidth;
+		}
+		break;
+	    default:
+		break;
+	}
     }
 }
 
@@ -5471,7 +5633,7 @@ local void DrawFillTransRectangle8(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawFillNoTransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha __attribute__((unused)))
+	,int w,int h,unsigned char alpha __attribute__((unused)))
 {
     DrawFillRectangle8(color,x,y,w,h);
 }
@@ -5487,29 +5649,32 @@ local void DrawFillNoTransRectangle8(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawFillTransRectangle15(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
-  VMemType16 *p;
-  unsigned long sp;
-  unsigned int i, swidth;
+    VMemType16 *p;
+    unsigned long sp;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  swidth-=w;
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x07E0F81F;
-  alpha>>=3;                          //FIXME: only 5bits
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    swidth-=w;
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x07E0F81F;
+    alpha>>=3;                          //FIXME: only 5bits
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp = *p;
-        dp=((dp<<16)|dp)&0x07E0F81F;
-        dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F; //FIXME: alpha==256 unreached
-        *p++=(dp>>16)|dp;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp;
+		dp = *p;
+		dp=((dp<<16)|dp)&0x07E0F81F;
+		dp=((((dp-sp)*alpha)>>5)+sp)&0x03E07C1F; //FIXME: alpha==256 unreached
+		*p++=(dp>>16)|dp;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5524,29 +5689,32 @@ local void DrawFillTransRectangle15(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawFillTransRectangle16(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
-  VMemType16 *p;
-  unsigned long sp;
-  unsigned int i, swidth;
+    VMemType16 *p;
+    unsigned long sp;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory16+y*swidth+x;
-  swidth-=w;
-  sp=Pixels16[color];
-  sp=((sp<<16)|sp)&0x07E0F81F;
-  alpha>>=3;                          //FIXME: only 5bits
+    swidth=VideoWidth;
+    p=VideoMemory16+y*swidth+x;
+    swidth-=w;
+    sp=Pixels16[color];
+    sp=((sp<<16)|sp)&0x07E0F81F;
+    alpha>>=3;                          //FIXME: only 5bits
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp = *p;
-        dp=((dp<<16)|dp)&0x07E0F81F;
-        dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F; //FIXME: alpha==256 unreached
-        *p++=(dp>>16)|dp;
-      } while ( --i );
-      p+=swidth;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp;
+		dp = *p;
+		dp=((dp<<16)|dp)&0x07E0F81F;
+		dp=((((dp-sp)*alpha)>>5)+sp)&0x07E0F81F; //FIXME: alpha==256 unreached
+		*p++=(dp>>16)|dp;
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5561,7 +5729,7 @@ local void DrawFillTransRectangle16(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawFillTransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha __attribute__((unused)))
+	,int w,int h,unsigned char alpha __attribute__((unused)))
 {
 //FIXME: does 24bpp represents R|G|B?
     DrawFillRectangle24(color,x,y,w,h); // no trans functionaility :(
@@ -5578,36 +5746,40 @@ local void DrawFillTransRectangle24(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawFillTransRectangle32(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
-  VMemType32 *p;
-  unsigned long sp1, sp2;
-  unsigned int i, swidth;
+    VMemType32 *p;
+    unsigned long sp1;
+    unsigned long sp2;
+    int i;
+    int swidth;
 
-  swidth=VideoWidth;
-  p=VideoMemory32+y*swidth+x;
-  swidth-=w;
+    swidth=VideoWidth;
+    p=VideoMemory32+y*swidth+x;
+    swidth-=w;
 
-  sp1=Pixels32[color];
-  sp2=(sp1&0xFF00FF00)>>8;
-  sp1&=0x00FF00FF;
+    sp1=Pixels32[color];
+    sp2=(sp1&0xFF00FF00)>>8;
+    sp1&=0x00FF00FF;
 
-  if ( w )
-    while( h-- ) {
-      i=w;
-      do {
-        unsigned long dp1, dp2;
+    if ( w ) {
+	while( h-- ) {
+	    i=w;
+	    do {
+		unsigned long dp1;
+		unsigned long dp2;
 
-        dp1=*p;
-        dp2=(dp1&0xFF00FF00)>>8;
-        dp1&=0x00FF00FF;
+		dp1=*p;
+		dp2=(dp1&0xFF00FF00)>>8;
+		dp1&=0x00FF00FF;
 
-        //FIXME: alpha==256 unreached
-        dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
-        dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
-        *p++=(dp1|(dp2<<8));
-      } while ( --i );
-      p+=swidth;
+		//FIXME: alpha==256 unreached
+		dp1=((((dp1-sp1)*alpha)>>8)+sp1)&0x00FF00FF;
+		dp2=((((dp2-sp2)*alpha)>>8)+sp2)&0x00FF00FF;
+		*p++=(dp1|(dp2<<8));
+	    } while ( --i );
+	    p+=swidth;
+	}
     }
 }
 
@@ -5621,7 +5793,7 @@ local void DrawFillTransRectangle32(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 global void VideoFillRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
     CLIP_RECTANGLE(x,y,w,h);
     VideoFillRectangle(color,x,y,w,h);
@@ -5637,7 +5809,7 @@ global void VideoFillRectangleClip(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 global void VideoFill25TransRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
     CLIP_RECTANGLE(x,y,w,h);
     VideoFill25TransRectangle(color,x,y,w,h);
@@ -5653,7 +5825,7 @@ global void VideoFill25TransRectangleClip(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 global void VideoFill50TransRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
     CLIP_RECTANGLE(x,y,w,h);
     VideoFill50TransRectangle(color,x,y,w,h);
@@ -5669,7 +5841,7 @@ global void VideoFill50TransRectangleClip(SysColors color,int x,int y
 **	@param w	width of rectangle (0=don't draw).
 */
 global void VideoFill75TransRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h)
+	,int w,int h)
 {
     CLIP_RECTANGLE(x,y,w,h);
     VideoFill75TransRectangle(color,x,y,w,h);
@@ -5686,7 +5858,7 @@ global void VideoFill75TransRectangleClip(SysColors color,int x,int y
 **	@param alpha	alpha value of pixels.
 */
 global void VideoFillTransRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,int w,int h,unsigned char alpha)
 {
     CLIP_RECTANGLE(x,y,w,h);
     VideoFillTransRectangle(color,x,y,w,h,alpha);
@@ -5704,7 +5876,7 @@ global void VideoFillTransRectangleClip(SysColors color,int x,int y
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoFillCircleClip(SysColors color,int x,int y,unsigned r)
+global void VideoFillCircleClip(SysColors color,int x,int y,int r)
 {
     int cx;
     int cy;
@@ -5750,7 +5922,7 @@ global void VideoFillCircleClip(SysColors color,int x,int y,unsigned r)
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoFill25TransCircleClip(SysColors color,int x,int y,unsigned r)
+global void VideoFill25TransCircleClip(SysColors color,int x,int y,int r)
 {
     int cx;
     int cy;
@@ -5796,7 +5968,7 @@ global void VideoFill25TransCircleClip(SysColors color,int x,int y,unsigned r)
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoFill50TransCircleClip(SysColors color,int x,int y,unsigned r)
+global void VideoFill50TransCircleClip(SysColors color,int x,int y,int r)
 {
     int cx;
     int cy;
@@ -5842,7 +6014,7 @@ global void VideoFill50TransCircleClip(SysColors color,int x,int y,unsigned r)
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoFill75TransCircleClip(SysColors color,int x,int y,unsigned r)
+global void VideoFill75TransCircleClip(SysColors color,int x,int y,int r)
 {
     int cx;
     int cy;
@@ -6099,155 +6271,154 @@ global void InitLineDraw(void)
 */
 global void DebugTestDisplayVarious(void)
 {
-  int x,y,i,j;
+    int x;
+    int y;
+    int i;
+    int j;
 
-  x=y=i=j=0;
- //Should not show anything (segmentation fault when not properly clipped)
-  VideoDrawPixelClip(ColorRed,-1,0);
-  VideoDrawPixelClip(ColorRed,0,-1);
-  VideoDrawPixelClip(ColorRed,VideoWidth,0);
-  VideoDrawPixelClip(ColorRed,0,VideoHeight);
-  VideoDraw25TransPixelClip(ColorRed,-1,0);
-  VideoDraw25TransPixelClip(ColorRed,0,-1);
-  VideoDraw25TransPixelClip(ColorRed,VideoWidth,0);
-  VideoDraw25TransPixelClip(ColorRed,0,VideoHeight);
-  VideoDraw50TransPixelClip(ColorRed,-1,0);
-  VideoDraw50TransPixelClip(ColorRed,0,-1);
-  VideoDraw50TransPixelClip(ColorRed,VideoWidth,0);
-  VideoDraw50TransPixelClip(ColorRed,0,VideoHeight);
-  VideoDraw75TransPixelClip(ColorRed,-1,0);
-  VideoDraw75TransPixelClip(ColorRed,0,-1);
-  VideoDraw75TransPixelClip(ColorRed,VideoWidth,0);
-  VideoDraw75TransPixelClip(ColorRed,0,VideoHeight);
-  VideoDrawTransPixelClip(ColorRed,-1,0,0);
-  VideoDrawTransPixelClip(ColorRed,0,-1,0);
-  VideoDrawTransPixelClip(ColorRed,VideoWidth,0,0);
-  VideoDrawTransPixelClip(ColorRed,0,VideoHeight,0);
+    x=y=i=j=0;
+    //Should not show anything (segmentation fault when not properly clipped)
+    VideoDrawPixelClip(ColorRed,-1,0);
+    VideoDrawPixelClip(ColorRed,0,-1);
+    VideoDrawPixelClip(ColorRed,VideoWidth,0);
+    VideoDrawPixelClip(ColorRed,0,VideoHeight);
+    VideoDraw25TransPixelClip(ColorRed,-1,0);
+    VideoDraw25TransPixelClip(ColorRed,0,-1);
+    VideoDraw25TransPixelClip(ColorRed,VideoWidth,0);
+    VideoDraw25TransPixelClip(ColorRed,0,VideoHeight);
+    VideoDraw50TransPixelClip(ColorRed,-1,0);
+    VideoDraw50TransPixelClip(ColorRed,0,-1);
+    VideoDraw50TransPixelClip(ColorRed,VideoWidth,0);
+    VideoDraw50TransPixelClip(ColorRed,0,VideoHeight);
+    VideoDraw75TransPixelClip(ColorRed,-1,0);
+    VideoDraw75TransPixelClip(ColorRed,0,-1);
+    VideoDraw75TransPixelClip(ColorRed,VideoWidth,0);
+    VideoDraw75TransPixelClip(ColorRed,0,VideoHeight);
+    VideoDrawTransPixelClip(ColorRed,-1,0,0);
+    VideoDrawTransPixelClip(ColorRed,0,-1,0);
+    VideoDrawTransPixelClip(ColorRed,VideoWidth,0,0);
+    VideoDrawTransPixelClip(ColorRed,0,VideoHeight,0);
 
-  //Should show blue area getting transparent from left-to-right
-   for (y=0;y<50;y++)
-    for (x=0;x<50;x++)
-      VideoDrawPixel(ColorBlue,x,y);
-   for (y=0;y<50;y++)
-    for (x=50;x<100;x++)
-      VideoDraw25TransPixel(ColorBlue,x,y);
-   for (y=0;y<50;y++)
-    for (x=100;x<150;x++)
-      VideoDraw50TransPixel(ColorBlue,x,y);
-   for (y=0;y<50;y++)
-    for (x=150;x<200;x++)
-      VideoDraw75TransPixel(ColorBlue,x,y);
-   for (y=50;y<100;y++)
+    //Should show blue area getting transparent from left-to-right
+    for (y=0;y<50;y++)
+	for (x=0;x<50;x++)
+	    VideoDrawPixel(ColorBlue,x,y);
+    for (y=0;y<50;y++)
+	for (x=50;x<100;x++)
+	    VideoDraw25TransPixel(ColorBlue,x,y);
+    for (y=0;y<50;y++)
+	for (x=100;x<150;x++)
+	    VideoDraw50TransPixel(ColorBlue,x,y);
+    for (y=0;y<50;y++)
+	for (x=150;x<200;x++)
+	    VideoDraw75TransPixel(ColorBlue,x,y);
+    for (y=50;y<100;y++)
+	for (x=0;x<256;x++)
+	    VideoDrawTransPixel(ColorBlue,x,y,x);
+
+    // Should show blue+red horizontal bars just below above drawpixel tests
+    //getting transparent from top-to-bottom. Clipping should prevent segm.fault
+    for (y=0;y<10;y++) {
+	VideoDrawHLine(ColorBlue,0,y+100,VideoWidth-1);
+	VideoDrawHLineClip(ColorRed,-100,-1,VideoWidth+200);
+	VideoDrawHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
+	VideoDrawHLineClip(ColorRed,-100,y+110,VideoWidth+200);
+	VideoDraw25TransHLine(ColorBlue,0,y+120,VideoWidth-1);
+	VideoDraw25TransHLineClip(ColorRed,-100,-1,VideoWidth+200);
+	VideoDraw25TransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
+	VideoDraw25TransHLineClip(ColorRed,-100,y+130,VideoWidth+200);
+	VideoDraw50TransHLine(ColorBlue,0,y+140,VideoWidth-1);
+	VideoDraw50TransHLineClip(ColorRed,-100,-1,VideoWidth+200);
+	VideoDraw50TransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
+	VideoDraw50TransHLineClip(ColorRed,-100,y+150,VideoWidth+200);
+	VideoDraw75TransHLine(ColorBlue,0,y+160,VideoWidth-1);
+	VideoDraw75TransHLineClip(ColorRed,-100,-1,VideoWidth+200);
+	VideoDraw75TransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
+	VideoDraw75TransHLineClip(ColorRed,-100,y+170,VideoWidth+200);
+    }
+    for (y=0;y<64;y++) {
+	VideoDrawTransHLine(ColorBlue,0,y+180,VideoWidth-1,y*4);
+	VideoDrawTransHLineClip(ColorRed,-100,-1,VideoWidth+200,y*4);
+	VideoDrawTransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200,y*4);
+	VideoDrawTransHLineClip(ColorRed,-100,y+180+64+6+6,VideoWidth+200,(63-y)*4);
+    }
+
+    // Should show blue+red vertical bars at the right of the screen
+    //getting transparent from left-to-right. Clipping should prevent segm.fault
+    i = ((VideoWidth-70-70-50)/10)*10; // starting grid pos for two colums
+    for (x=0;x<64;x++) {
+	VideoDrawTransVLine(ColorBlue,i+x,0,VideoHeight-1,x*4);
+	VideoDrawTransVLineClip(ColorRed,-1,-100,VideoHeight+200,x*4);
+	VideoDrawTransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200,x*4);
+	VideoDrawTransVLineClip(ColorRed,i+76+x,-100,VideoHeight+200,(63-x)*4);
+    }
+    i -= 4*2*10;
+    for (x=0;x<10;x++) {
+	VideoDrawVLine(ColorBlue,i+x,0,VideoHeight-1);
+	VideoDrawVLineClip(ColorRed,-1,-100,VideoHeight+200);
+	VideoDrawVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
+	VideoDrawVLineClip(ColorRed,i+x+10,-100,VideoHeight+200);
+	VideoDraw25TransVLine(ColorBlue,i+x+20,0,VideoHeight-1);
+	VideoDraw25TransVLineClip(ColorRed,-1,-100,VideoHeight+200);
+	VideoDraw25TransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
+	VideoDraw25TransVLineClip(ColorRed,i+x+30,-100,VideoHeight+200);
+	VideoDraw50TransVLine(ColorBlue,i+x+40,0,VideoHeight-1);
+	VideoDraw50TransVLineClip(ColorRed,-1,-100,VideoHeight+200);
+	VideoDraw50TransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
+	VideoDraw50TransVLineClip(ColorRed,i+x+50,-100,VideoHeight+200);
+	VideoDraw75TransVLine(ColorBlue,i+x+60,0,VideoHeight-1);
+	VideoDraw75TransVLineClip(ColorRed,-1,-100,VideoHeight+200);
+	VideoDraw75TransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
+	VideoDraw75TransVLineClip(ColorRed,i+x+70,-100,VideoHeight+200);
+    }
+
+    //Should show filled rectangles in screen's top-right corners
+    VideoFillRectangleClip(ColorGray,VideoWidth-30,-20,60,40);
+    VideoFill25TransRectangleClip(ColorBlue,VideoWidth-29,-19,58,38);
+    VideoFill50TransRectangleClip(ColorRed,VideoWidth-28,-18,56,36);
+    VideoFill75TransRectangleClip(ColorGreen,VideoWidth-27,-17,54,34);
+    VideoFillTransRectangleClip(ColorBlue,VideoWidth-26,-16,52,32,64);
+
+    //Should show red area in lower-left getting transparent from left-to-right
+    i = ((VideoHeight-20)/10)*10; // starting grid pos for two colums
+    VideoFillRectangle(ColorRed,0,i,50,20);
+    VideoFill25TransRectangle(ColorRed,50,i,50,20);
+    VideoFill50TransRectangle(ColorRed,100,i,50,20);
+    VideoFill75TransRectangle(ColorRed,150,i,50,20);
+    i -= 20;
     for (x=0;x<256;x++)
-      VideoDrawTransPixel(ColorBlue,x,y,x);
+	VideoFillTransRectangle(ColorRed,x,i,1,20,x);
 
-  // Should show blue+red horizontal bars just below above drawpixel tests
-  //getting transparent from top-to-bottom. Clipping should prevent segm.fault
-  for (y=0;y<10;y++)
-  {
-    VideoDrawHLine(ColorBlue,0,y+100,VideoWidth-1);
-    VideoDrawHLineClip(ColorRed,-100,-1,VideoWidth+200);
-    VideoDrawHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
-    VideoDrawHLineClip(ColorRed,-100,y+110,VideoWidth+200);
-    VideoDraw25TransHLine(ColorBlue,0,y+120,VideoWidth-1);
-    VideoDraw25TransHLineClip(ColorRed,-100,-1,VideoWidth+200);
-    VideoDraw25TransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
-    VideoDraw25TransHLineClip(ColorRed,-100,y+130,VideoWidth+200);
-    VideoDraw50TransHLine(ColorBlue,0,y+140,VideoWidth-1);
-    VideoDraw50TransHLineClip(ColorRed,-100,-1,VideoWidth+200);
-    VideoDraw50TransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
-    VideoDraw50TransHLineClip(ColorRed,-100,y+150,VideoWidth+200);
-    VideoDraw75TransHLine(ColorBlue,0,y+160,VideoWidth-1);
-    VideoDraw75TransHLineClip(ColorRed,-100,-1,VideoWidth+200);
-    VideoDraw75TransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
-    VideoDraw75TransHLineClip(ColorRed,-100,y+170,VideoWidth+200);
-  }
-  for (y=0;y<64;y++)
-  {
-    VideoDrawTransHLine(ColorBlue,0,y+180,VideoWidth-1,y*4);
-    VideoDrawTransHLineClip(ColorRed,-100,-1,VideoWidth+200,y*4);
-    VideoDrawTransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200,y*4);
-    VideoDrawTransHLineClip(ColorRed,-100,y+180+64+6+6,VideoWidth+200,(63-y)*4);  }
+    //Should show red/green/blue rectangles in lower-left transparent from
+    //left-to-right
+    i -= 20;
+    for (x=0;x<10;x++) {
+	VideoDrawRectangle(ColorBlue,x,i+x,50-2*x,20-2*x);
+	VideoDraw25TransRectangle(ColorBlue,50+x,i+x,50-2*x,20-2*x);
+	VideoDraw50TransRectangle(ColorBlue,100+x,i+x,50-2*x,20-2*x);
+	VideoDraw75TransRectangle(ColorBlue,150+x,i+x,50-2*x,20-2*x);
+    }
+    i -= 20;
+    for (x=0;x<256;x++)
+	VideoDrawTransRectangle(ColorGreen,x,i,1,20,x);
+    i -= 20;
+    for (x=0;x<128;x++)
+	VideoDrawTransRectangle(ColorRed,2*x,i,2,20,x*2);
 
-  // Should show blue+red vertical bars at the right of the screen
-  //getting transparent from left-to-right. Clipping should prevent segm.fault
-  i = ((VideoWidth-70-70-50)/10)*10; // starting grid pos for two colums
-  for (x=0;x<64;x++)
-  {
-    VideoDrawTransVLine(ColorBlue,i+x,0,VideoHeight-1,x*4);
-    VideoDrawTransVLineClip(ColorRed,-1,-100,VideoHeight+200,x*4);
-    VideoDrawTransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200,x*4);
-    VideoDrawTransVLineClip(ColorRed,i+76+x,-100,VideoHeight+200,(63-x)*4);
-  }
-  i -= 4*2*10;
-  for (x=0;x<10;x++)
-  {
-    VideoDrawVLine(ColorBlue,i+x,0,VideoHeight-1);
-    VideoDrawVLineClip(ColorRed,-1,-100,VideoHeight+200);
-    VideoDrawVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
-    VideoDrawVLineClip(ColorRed,i+x+10,-100,VideoHeight+200);
-    VideoDraw25TransVLine(ColorBlue,i+x+20,0,VideoHeight-1);
-    VideoDraw25TransVLineClip(ColorRed,-1,-100,VideoHeight+200);
-    VideoDraw25TransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
-    VideoDraw25TransVLineClip(ColorRed,i+x+30,-100,VideoHeight+200);
-    VideoDraw50TransVLine(ColorBlue,i+x+40,0,VideoHeight-1);
-    VideoDraw50TransVLineClip(ColorRed,-1,-100,VideoHeight+200);
-    VideoDraw50TransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
-    VideoDraw50TransVLineClip(ColorRed,i+x+50,-100,VideoHeight+200);
-    VideoDraw75TransVLine(ColorBlue,i+x+60,0,VideoHeight-1);
-    VideoDraw75TransVLineClip(ColorRed,-1,-100,VideoHeight+200);
-    VideoDraw75TransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
-    VideoDraw75TransVLineClip(ColorRed,i+x+70,-100,VideoHeight+200);
-  }
+    //Should show rectangles in screen's bottom-right corners
+    VideoDrawRectangleClip(ColorGray,VideoWidth-30,VideoHeight-20,60,40);
+    VideoDraw25TransRectangleClip(ColorBlue,VideoWidth-29,VideoHeight-19,58,38);
+    VideoDraw50TransRectangleClip(ColorRed,VideoWidth-28,VideoHeight-18,56,36);
+    VideoDraw75TransRectangleClip(ColorGreen,VideoWidth-27,VideoHeight-17,54,34);
+    VideoDrawTransRectangleClip(ColorBlue,VideoWidth-26,VideoHeight-16,52,32,64);
 
-  //Should show filled rectangles in screen's top-right corners
-  VideoFillRectangleClip(ColorGray,VideoWidth-30,-20,60,40);
-  VideoFill25TransRectangleClip(ColorBlue,VideoWidth-29,-19,58,38);
-  VideoFill50TransRectangleClip(ColorRed,VideoWidth-28,-18,56,36);
-  VideoFill75TransRectangleClip(ColorGreen,VideoWidth-27,-17,54,34);
-  VideoFillTransRectangleClip(ColorBlue,VideoWidth-26,-16,52,32,64);
+    //Display grid of 10x10 (to detect errors more easier)
+    for (y=0;y<VideoHeight;y+=10)
+	for (x=0;x<VideoWidth;x+=10)
+	VideoDrawPixel(ColorWhite,x,y);
 
-  //Should show red area in lower-left getting transparent from left-to-right
-  i = ((VideoHeight-20)/10)*10; // starting grid pos for two colums
-  VideoFillRectangle(ColorRed,0,i,50,20);
-  VideoFill25TransRectangle(ColorRed,50,i,50,20);
-  VideoFill50TransRectangle(ColorRed,100,i,50,20);
-  VideoFill75TransRectangle(ColorRed,150,i,50,20);
-  i -= 20;
-  for (x=0;x<256;x++)
-    VideoFillTransRectangle(ColorRed,x,i,1,20,x);
-
-  //Should show red/green/blue rectangles in lower-left transparent from
-  //left-to-right
-  i -= 20;
-  for (x=0;x<10;x++)
-  {
-    VideoDrawRectangle(ColorBlue,x,i+x,50-2*x,20-2*x);
-    VideoDraw25TransRectangle(ColorBlue,50+x,i+x,50-2*x,20-2*x);
-    VideoDraw50TransRectangle(ColorBlue,100+x,i+x,50-2*x,20-2*x);
-    VideoDraw75TransRectangle(ColorBlue,150+x,i+x,50-2*x,20-2*x);
-  }
-  i -= 20;
-  for (x=0;x<256;x++)
-    VideoDrawTransRectangle(ColorGreen,x,i,1,20,x);
-  i -= 20;
-  for (x=0;x<128;x++)
-    VideoDrawTransRectangle(ColorRed,2*x,i,2,20,x*2);
-
-  //Should show rectangles in screen's bottom-right corners
-  VideoDrawRectangleClip(ColorGray,VideoWidth-30,VideoHeight-20,60,40);
-  VideoDraw25TransRectangleClip(ColorBlue,VideoWidth-29,VideoHeight-19,58,38);
-  VideoDraw50TransRectangleClip(ColorRed,VideoWidth-28,VideoHeight-18,56,36);
-  VideoDraw75TransRectangleClip(ColorGreen,VideoWidth-27,VideoHeight-17,54,34);
-  VideoDrawTransRectangleClip(ColorBlue,VideoWidth-26,VideoHeight-16,52,32,64);
-
-  //Display grid of 10x10 (to detect errors more easier)
-  for (y=0;y<VideoHeight;y+=10)
-   for (x=0;x<VideoWidth;x+=10)
-     VideoDrawPixel(ColorWhite,x,y);
-
-  //Should show white pixel in lower-right corner (not prevented by clippingi)
-  VideoDrawPixelClip(ColorWhite,VideoWidth-1,VideoHeight-1);
+    //Should show white pixel in lower-right corner (not prevented by clippingi)
+    VideoDrawPixelClip(ColorWhite,VideoWidth-1,VideoHeight-1);
 }
 
 /**
@@ -6255,27 +6426,29 @@ global void DebugTestDisplayVarious(void)
 */
 global void DebugTestDisplayColorCube(void)
 {
-  int i,x,y;
+    int i;
+    int x;
+    int y;
 
-  for (i=0;i<32;i++)
-    for (y=0;y<32;y++)
-     for (x=0;x<32;x++)
-     {
-        int a,b;
-        a=(x+(i%10)*32)*2;
-        b=(y+(i/10)*32)*2;
-        VideoMemory8[a+b*VideoWidth] =
-        VideoMemory8[a+1+b*VideoWidth] =
-        VideoMemory8[a+(b+1)*VideoWidth] =
-        VideoMemory8[a+1+(b+1)*VideoWidth] =
-          colorcube8[ (i<<10)|(y<<5)|x ];
-     }
-  for (i=0;i<256;i++)
-        VideoMemory8[i+400*VideoWidth] =
-        VideoMemory8[i+401*VideoWidth] = i;
-  for (i=0;i<256;i++)
-        VideoMemory8[i+403*VideoWidth] =
-        VideoMemory8[i+404*VideoWidth] = Pixels8[ i ];
+    for (i=0;i<32;i++)
+	for (y=0;y<32;y++)
+	    for (x=0;x<32;x++) {
+		int a;
+		int b;
+		a=(x+(i%10)*32)*2;
+		b=(y+(i/10)*32)*2;
+		VideoMemory8[a+b*VideoWidth] =
+		VideoMemory8[a+1+b*VideoWidth] =
+		VideoMemory8[a+(b+1)*VideoWidth] =
+		VideoMemory8[a+1+(b+1)*VideoWidth] =
+		colorcube8[ (i<<10)|(y<<5)|x ];
+	    }
+    for (i=0;i<256;i++)
+	VideoMemory8[i+400*VideoWidth] =
+	VideoMemory8[i+401*VideoWidth] = i;
+    for (i=0;i<256;i++)
+	VideoMemory8[i+403*VideoWidth] =
+	VideoMemory8[i+404*VideoWidth] = Pixels8[ i ];
 }
 
 /**
@@ -6286,43 +6459,46 @@ global void DebugTestDisplayColorCube(void)
 */
 global void DebugTestDisplayLines(void)
 {
-  int x,y,i,j;
+    int x;
+    int y;
+    int i;
+    int j;
 
-/* ClearScreen */
-  for ( y=0;y<VideoHeight;y++)
-    for ( x=0;x<VideoWidth;x++)
-      VideoDrawPixel(ColorBlack,x,y);
+    /* ClearScreen */
+    for ( y=0;y<VideoHeight;y++)
+	for ( x=0;x<VideoWidth;x++)
+	    VideoDrawPixel(ColorBlack,x,y);
 
-/* draw lines in each possible direction
-  y = VideoHeight < VideoWidth ? VideoHeight : VideoWidth;
-  for ( x=0;x<y;x+=10)
-    VideoDrawLine(ColorBlue,0,x,y-x-1,0);
-*/
-  i = (VideoWidth/10)*10;
-  j = (VideoHeight/10)*10;
-  for ( x=0;x<=i;x+=10)
-    VideoDrawLine(ColorBlue,0,0,x,j);
-  for ( y=0;y<=j;y+=10)
-    VideoDrawLine(ColorBlue,0,0,i,y);
+    /* draw lines in each possible direction
+    y = VideoHeight < VideoWidth ? VideoHeight : VideoWidth;
+    for ( x=0;x<y;x+=10)
+	VideoDrawLine(ColorBlue,0,x,y-x-1,0);
+    */
+    i = (VideoWidth/10)*10;
+    j = (VideoHeight/10)*10;
+    for ( x=0;x<=i;x+=10)
+	VideoDrawLine(ColorBlue,0,0,x,j);
+    for ( y=0;y<=j;y+=10)
+	VideoDrawLine(ColorBlue,0,0,i,y);
 
-  SetClipping( 20, 20, (VideoWidth/10)*10-20, (VideoHeight/10)*10-20 );
-  for ( x=0;x<=i;x+=10)
-    VideoDrawLineClip(ColorRed,0,0,x,j);
-  for ( y=0;y<=j;y+=10)
-    VideoDrawLineClip(ColorRed,0,0,i,y);
-/*
-  i = (VideoWidth/10)*10+15;
-  j = (VideoHeight/10)*10+15;
-  for ( x=i;x>=-15;x-=10)
-    VideoDrawLineClip(ColorRed,i,0,x,j);
-  for ( y=j;y>=-15;y-=10)
-    VideoDrawLineClip(ColorRed,i,0,-15,y);
-*/
+    SetClipping( 20, 20, (VideoWidth/10)*10-20, (VideoHeight/10)*10-20 );
+    for ( x=0;x<=i;x+=10)
+	VideoDrawLineClip(ColorRed,0,0,x,j);
+    for ( y=0;y<=j;y+=10)
+	VideoDrawLineClip(ColorRed,0,0,i,y);
+    /*
+    i = (VideoWidth/10)*10+15;
+    j = (VideoHeight/10)*10+15;
+    for ( x=i;x>=-15;x-=10)
+	VideoDrawLineClip(ColorRed,i,0,x,j);
+    for ( y=j;y>=-15;y-=10)
+	VideoDrawLineClip(ColorRed,i,0,-15,y);
+    */
 
-/* Display grid of 10x10 (to detect errors more easier) */
-  for (y=0;y<VideoHeight;y+=10)
-   for (x=0;x<VideoWidth;x+=10)
-     VideoDrawPixel(ColorWhite,x,y);
+    /* Display grid of 10x10 (to detect errors more easier) */
+    for (y=0;y<VideoHeight;y+=10)
+	for (x=0;x<VideoWidth;x+=10)
+	    VideoDrawPixel(ColorWhite,x,y);
 }
 
 #endif	// } DEBUG

@@ -92,7 +92,7 @@ global jmp_buf main_loop;
 **
 **	@param step	How many tiles.
 */
-local void MoveMapViewPointUp(unsigned step)
+local void MoveMapViewPointUp(int step)
 {
     Viewport* v;
 
@@ -109,7 +109,7 @@ local void MoveMapViewPointUp(unsigned step)
 **
 **	@param step	How many tiles.
 */
-local void MoveMapViewPointLeft(unsigned step)
+local void MoveMapViewPointLeft(int step)
 {
 #ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
@@ -133,7 +133,7 @@ local void MoveMapViewPointLeft(unsigned step)
 **
 **	@param step	How many tiles.
 */
-local void MoveMapViewPointDown(unsigned step)
+local void MoveMapViewPointDown(int step)
 {
 #ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
@@ -158,7 +158,7 @@ local void MoveMapViewPointDown(unsigned step)
 **
 **	@param step	How many tiles.
 */
-local void MoveMapViewPointRight(unsigned step)
+local void MoveMapViewPointRight(int step)
 {
 #ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
@@ -364,7 +364,7 @@ local void DrawMapViewport(int v)
 #ifdef NEW_MAPDRAW
 	MapUpdateFogOfWar(TheUI.VP[v].MapX, TheUI.VP[v].MapY);
 #else
-	unsigned u;
+	int u;
 
 	// FIXME: Johns: this didn't work correct with viewports!
 	// FIXME: only needed until flags are correct set

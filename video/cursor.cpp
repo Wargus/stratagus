@@ -117,7 +117,7 @@ local int HiddenCursorW;	/// saved cursor width in pixel
 local int HiddenCursorH;	/// saved cursor height in pixel
 
         /// Memory re-use, so can be defined although no save present!
-local unsigned int OldCursorSize;	/// size of saved cursor image
+local int OldCursorSize;	/// size of saved cursor image
 local void* OldCursorImage;		/// background saved behind cursor
 
     /**
@@ -642,8 +642,11 @@ global void DestroyCursorBackground(void)
 */
 local void DrawCursor(const CursorType* type,int x,int y,int frame)
 {
-    unsigned int size,w,h;
-    int spritex,spritey;
+    int size;
+    int w;
+    int h;
+    int spritex;
+    int spritey;
 
     //
     //	Save cursor position and size, for faster cursor redraw.
@@ -654,7 +657,7 @@ local void DrawCursor(const CursorType* type,int x,int y,int frame)
     h=VideoGraphicHeight(type->Sprite);
 
     //Reserve enough memory for background of sprite (also for future calls)
-    size=(unsigned int)w*(unsigned int)h*MemSize;
+    size=w*h*MemSize;
     if( OldCursorSize<size ) {
 	if( OldCursorImage ) {
 	    OldCursorImage=realloc(OldCursorImage,size);

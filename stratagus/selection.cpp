@@ -407,7 +407,7 @@ global int SelectGroup(int group_number)
 global int AddGroupFromUnitToSelection(Unit* unit)
 {
     int i;
-    unsigned group;
+    int group;
 
     if( !(group=unit->LastGroup) ) {	// belongs to no group
 	return 0;
@@ -455,7 +455,8 @@ global int SelectGroupFromUnit(Unit* unit)
 local int SelectOrganicUnitsInTable(Unit** table,int num_units)
 {
     Unit* unit;
-    int n,i;
+    int n;
+    int i;
 
     for( n=i=0; i<num_units; i++ ) {
 	unit=table[i];
@@ -491,7 +492,8 @@ local int SelectOrganicUnitsInTable(Unit** table,int num_units)
 local int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 		Unit **table, int num_units)
 {
-    int n, i;
+    int n;
+    int i;
 
     for (i=n=0; i<num_units; i++) {
 	int sprite_x, sprite_y;
@@ -591,7 +593,10 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     int r;
     int n;
     int i;
-    int tx0, ty0, tx1, ty1;
+    int tx0;
+    int ty0;
+    int tx1;
+    int ty1;
 
     DebugLevel3Fn(" (%d,%d,%d,%d)\n" _C_ sx0 _C_ sy0 _C_ sx1 _C_ sy1);
 

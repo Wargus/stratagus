@@ -320,9 +320,11 @@ global void InitUnit(Unit* unit, UnitType* type)
 /**
 **	FIXME: Docu
 */
-global void AssignUnitToPlayer (Unit *unit, Player *player)
+global void AssignUnitToPlayer(Unit *unit, Player *player)
 {
-    UnitType *type = unit->Type;
+    UnitType *type;
+ 
+    type = unit->Type;
 
     //
     //	Build player unit table
@@ -837,7 +839,7 @@ global void UpdateForNewUnit(const Unit* unit,int upgrade)
 {
     const UnitType* type;
     Player* player;
-    unsigned u;
+    int u;
 
     player=unit->Player;
     type=unit->Type;
@@ -939,8 +941,8 @@ global void MarkSubmarineSeen(const Player* player,int x,int y,int r)
 global int UnitVisibleOnMap(const Unit* unit)
 {
 #ifdef NEW_FOW
-    unsigned x;
-    unsigned y;
+    int x;
+    int y;
     int w;
     int w0;
     int h;
@@ -975,8 +977,8 @@ global int UnitVisibleOnMap(const Unit* unit)
 
     return 0;
 #else
-    unsigned x;
-    unsigned y;
+    int x;
+    int y;
     int w;
     int w0;
     int h;
@@ -1020,8 +1022,8 @@ global int UnitVisibleOnMap(const Unit* unit)
 */
 global int UnitKnownOnMap(const Unit* unit)
 {
-    unsigned x;
-    unsigned y;
+    int x;
+    int y;
     int w;
     int w0;
     int h;
@@ -1145,7 +1147,7 @@ global int UnitVisibleOnScreen(const Unit* unit)
 {
     int i;
     for (i=0; i < TheUI.NumViewports; i++) {
-	if (UnitVisibleInViewport (i, unit))
+	if (UnitVisibleInViewport(i, unit))
 	    return 1;
     }
     return 0;
@@ -1307,7 +1309,10 @@ local void AddUnitDeco( Unit *u, int x, int y, int w, int h )
 global int CheckUnitToBeDrawn(const Unit * unit)
 {
 #ifdef NEW_MAPDRAW
-    int sx, sy, ex, ey;
+    int sx;
+    int sy;
+    int ex;
+    int ey;
 
     // in debug-mode check unsupported displacement exceeding an entire Tile
     // FIXME: displacement could always be made positive and smaller than Tile
@@ -2130,7 +2135,7 @@ global void DropOutAll(const Unit* source)
 **	@param y	Map Y position.
 **	@return		True if could build here, otherwise false.
 */
-global int CanBuildHere(const UnitType* type,unsigned x,unsigned y)
+global int CanBuildHere(const UnitType* type,int x,int y)
 {
     Unit* table[UnitMax];
     int n;
@@ -2856,7 +2861,8 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
     Unit** units;
     int nunits;
     int best_d;
-    int d,i;
+    int d;
+    int i;
 
     //	FIXME:	this is not the best one
     //		We need the deposit with the shortest way!
@@ -3013,7 +3019,7 @@ global Unit* FindIdleWorker(const Player* player,const Unit* last)
 **
 **	@return		An unit on X,Y position.
 */
-global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
+global Unit* UnitOnScreen(Unit* ounit,int x,int y)
 {
     Unit** table;
     Unit* unit;
@@ -3021,8 +3027,8 @@ global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
     Unit* funit;			// first possible unit
     UnitType* type;
     int flag;				// flag take next unit
-    unsigned gx;
-    unsigned gy;
+    int gx;
+    int gy;
 
     funit=NULL;
     nunit=NULL;
@@ -3298,7 +3304,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     if( !target->Attacked ) {
 	// NOTE: perhaps this should also be moved into the notify?
 	if( target->Player==ThisPlayer ) {
-	    static int LastCycle;
+	    static unsigned long LastCycle;
 	    static int LastX;
 	    static int LastY;
 
@@ -4039,7 +4045,7 @@ global void SaveUnits(FILE* file)
 
     memset (SlotUsage, 0, MAX_UNIT_SLOTS/8 + 1);
     for (i=0; i<NumUnits; i++) {
-	unsigned slot = Units[i]->Slot;
+	int slot = Units[i]->Slot;
 	SlotUsage[slot/8] |= 1 << (slot%8);
     }
 #if 0
