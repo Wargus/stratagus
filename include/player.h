@@ -79,9 +79,8 @@
 **	Player::Race
 **
 **		Race number of the player. This field is setup from the level
-**		(PUD). This number is mapped with #RaceWcNames to the symbolic
+**		(PUD). This number is mapped with #PlayerRaces to the symbolic
 **		name Player::RaceName.
-**		@see #PlayerRaces.
 **
 **	Player::AiNum
 **
@@ -358,18 +357,24 @@ struct _player_ {
 };
 
 /**
-**	Races for the player (must fit to PUD!)
-**	Mapped with #RaceWcNames to a symbolic name, which will be used in
+**	Races for the player
+**	Mapped with #PlayerRaces to a symbolic name, which will be used in
 **	the future.
-**
-**	@note FIXME: This and the use MUST be removed to allow more races.
 */
-enum PlayerRaces {
+#define MAX_RACES 8
+typedef struct _player_race_ {
+    int 	Race[MAX_RACES];	/// race number
+    char	Visible[MAX_RACES];	/// race should be visible in pulldown
+    char* 	Name[MAX_RACES];	/// race names
+    char* 	Display[MAX_RACES];	/// text to display in pulldown
+    int 	Count;			/// number of races
+} PlayerRace;
+
+
+enum PlayerRacesOld {
     PlayerRaceHuman	=0,		/// belongs to human
     PlayerRaceOrc	=1,		/// belongs to orc
     PlayerRaceNeutral	=2,		/// belongs to none
-
-    PlayerMaxRaces	=3		/// maximal races supported
 };
 
 /**
@@ -455,11 +460,14 @@ extern int NoRescueCheck;		/// Disable rescue check
 extern int PlayerColors[PlayerMax];	/// Player colors
 extern char* PlayerColorNames[PlayerMax];	/// Player color names
 
-extern char** RaceWcNames;		/// pud original -> internal
+extern PlayerRace PlayerRaces;		/// Player races
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+    /// Get race array index by race type
+extern int PlayerRacesIndex(int race);
 
     /// Init players
 extern void InitPlayers(void);
