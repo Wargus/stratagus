@@ -10,7 +10,7 @@
 //
 /**@name sdl.c		-	SDL video support. */
 //
-//	(c) Copyright 1999-2000 by Lutz Sammer
+//	(c) Copyright 1999-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -158,11 +158,11 @@ global void InitVideoSdl(void)
 	exit(1);
     }
 
-    if( SDL_MUSTLOCK(Screen) ) {
-	DebugLevel0Fn("Must locksurface!\n");
-	fflush(stdout);
-	fflush(stderr);
-    }
+    IfDebug(
+	if( SDL_MUSTLOCK(Screen) ) {
+	    DebugLevel0Fn("Must locksurface!\n");
+	}
+    );
 
     // Turn cursor off, we use our own.
     SDL_ShowCursor(0);
@@ -189,11 +189,13 @@ global void InitVideoSdl(void)
 
 	    for( i=0; j&(1<<i); ++i ) {
 	    }
+
 #ifdef USE_BEOS
 	    if( i==24 ) {	// beos compatibility hack
 		i=32;
 	    }
 #endif
+
 	    VideoDepth=i;
 	} else {
 	    VideoDepth=Screen->format->BitsPerPixel;
@@ -202,9 +204,14 @@ global void InitVideoSdl(void)
 
     // Make default character translation easier
     SDL_EnableUNICODE(1);
+
+#if 0
+    // FIXME: remove this, if it works everywhere, new freecraft didn't need
+    // FIXME: repeat, it works better without it.
     // Enable keyboard repeat (with autodetection of SDL version :)
 #ifdef SDL_DEFAULT_REPEAT_DELAY
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
+#endif
 #endif
 
     DebugLevel0Fn("Video init ready %d\n",VideoDepth);
@@ -212,10 +219,16 @@ global void InitVideoSdl(void)
 
 /**
 **	Invalidate some area
+**
+**	@param x	screen pixel X position.
+**	@param y	screen pixel Y position.
+**	@param w	width of rectangle in pixels.
+**	@param h	height of rectangle in pixels.
 */
 global void InvalidateArea(int x,int y,int w,int h)
 {
     // FIXME: This checks should be done at higher level
+    // FIXME: did SDL version >1.1, check this now also?
     if( x<0 ) {
 	w+=x;
 	x=0;
@@ -248,9 +261,13 @@ global void Invalidate(void)
 }
 
 /**
-**	Handle keyboard!
+**	Convert SDL keysym into internal keycode.
+**
+**	@param code	SDL keysym structure pointer.
+**
+**	@returns	ASCII code or internal keycode.
 */
-local void SdlHandleKey(const SDL_keysym* code)
+local int Sdl2InternalKeycode(const SDL_keysym* code)
 {
     int icode;
 
@@ -321,6 +338,36 @@ local void SdlHandleKey(const SDL_keysym* code)
 	case SDLK_F12:
 	    icode=KeyCodeF12;
 	    break;
+	case SDLK_KP0:
+	    icode=KeyCodeKP0;
+	    break;
+	case SDLK_KP1:
+	    icode=KeyCodeKP1;
+	    break;
+	case SDLK_KP2:
+	    icode=KeyCodeKP2;
+	    break;
+	case SDLK_KP3:
+	    icode=KeyCodeKP3;
+	    break;
+	case SDLK_KP4:
+	    icode=KeyCodeKP4;
+	    break;
+	case SDLK_KP5:
+	    icode=KeyCodeKP5;
+	    break;
+	case SDLK_KP6:
+	    icode=KeyCodeKP6;
+	    break;
+	case SDLK_KP7:
+	    icode=KeyCodeKP7;
+	    break;
+	case SDLK_KP8:
+	    icode=KeyCodeKP8;
+	    break;
+	case SDLK_KP9:
+	    icode=KeyCodeKP9;
+	    break;
 
         // We need these because if you only hit a modifier key,
         // the *ots from SDL don't report correct modifiers
@@ -348,7 +395,7 @@ local void SdlHandleKey(const SDL_keysym* code)
 	    // Use SDL 1.0.3 or higher, which works ok.
 	    if (1) {
 		if (icode >= '0' && icode <= '9') {
-		    if( code->mod&(KMOD_LCTRL|KMOD_RCTRL|KMOD_LALT|KMOD_RALT|KMOD_LMETA|KMOD_RMETA) ) {
+		    if( code->mod&(KMOD_CTRL|KMOD_ALT|KMOD_META) ) {
 			// Do not translate these to support grouping!
 			break;
 		    }
@@ -360,7 +407,7 @@ local void SdlHandleKey(const SDL_keysym* code)
 		    // let's asume latin 1 for now
 		    icode = code->unicode & 0xFF;
 		}
-	    } else if( code->mod&(KMOD_LSHIFT|KMOD_RSHIFT) ) {
+	    } else if( code->mod&(KMOD_SHIFT) ) {
 		// FIXME: only letters handled here - implement shift keymap (punctuation!)
 		if(icode <= 'z' && icode >= 'a') {
 		    icode -= 32;
@@ -369,56 +416,37 @@ local void SdlHandleKey(const SDL_keysym* code)
 	    break;
     }
 
+    return icode;
+}
+
+/**
+**	Handle keyboard!
+**
+**	@param code	SDL keysym structure pointer.
+*/
+local void SdlHandleKey(const SDL_keysym* code)
+{
+    int icode;
+
+    icode=Sdl2InternalKeycode(code);
+
     if( HandleKeyDown(icode) ) {
 	return;
     }
-    // FIXME: Should come first
+    // FIXME: Should come first, move this into low level!!!!
     DoButtonPanelKey(icode);
 }
 
 /**
 **	Handle keyboard!
+**
+**	@param code	SDL keysym structure pointer.
 */
 local void SdlHandleKeyUp(const SDL_keysym* code)
 {
     int icode;
 
-    switch( (icode=code->sym) ) {
-        // We need these because if you only hit a modifier key,
-        // the *ots from SDL don't report correct modifiers
-	case SDLK_LSHIFT:
-	case SDLK_RSHIFT:
-	    icode = KeyCodeShift;
-	    break;
-	case SDLK_LCTRL:
-	case SDLK_RCTRL:
-	    icode=KeyCodeControl;
-	    break;
-	case SDLK_LALT:
-	case SDLK_RALT:
-	case SDLK_LMETA:
-	case SDLK_RMETA:
-	    icode=KeyCodeAlt;
-	    break;
-	case SDLK_LSUPER:
-	case SDLK_RSUPER:
-	    icode=KeyCodeSuper;
-	    break;
-        case SDLK_UP:
-	    icode=KeyCodeUp;
-	    break;
-        case SDLK_DOWN:
-	    icode=KeyCodeDown;
-	    break;
-        case SDLK_LEFT:
-	    icode=KeyCodeLeft;
-	    break;
-        case SDLK_RIGHT:
-	    icode=KeyCodeRight;
-	    break;
-	default:
-	    break;
-    }
+    icode=Sdl2InternalKeycode(code);
 
     HandleKeyUp(icode);
 }
