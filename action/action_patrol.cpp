@@ -36,7 +36,7 @@
 **	Unit Patrol:
 **		The unit patrols between two points.
 **		Any enemy unit in reaction range is attacked.
-**	FIXME:
+**	@todo FIXME:
 **		Should do some tries to reach the end-points.
 **		Should support patrol between more points!
 **		Patrol between units.
@@ -46,6 +46,13 @@
 global void HandleActionPatrol(Unit* unit)
 {
     const Unit* goal;
+
+#ifdef NEW_ORDERS
+    if( !unit->SubAction ) {		// first entry.
+	NewResetPath(unit);
+	unit->SubAction=1;
+    }
+#endif
 
     if( DoActionMove(unit)<0 ) {	// reached end-point or stop
 
@@ -88,12 +95,14 @@ global void HandleActionPatrol(Unit* unit)
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
 		DebugLevel0("Patrol attack %Zd\n",UnitNumber(goal));
-		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		// Save current command to come back.
 #ifdef NEW_ORDERS
 		unit->SavedOrder=unit->Orders[0];
-		unit->SavedOrder.Action=UnitActionPatrol;
+		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
+		unit->Orders[0].Action=UnitActionStill;
+		unit->SubAction=0;
 #else
+		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		unit->SavedCommand=unit->Command;
 		unit->SavedCommand.Action=UnitActionPatrol;
 #endif
