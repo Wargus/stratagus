@@ -157,6 +157,7 @@ int TheoraProcessData(OggData *data)
 			ogg_stream_pagein(&data->vstream, &data->page);
 		} else {
 			theora_decode_packetin(&data->tstate, &packet);
+			data->tstate.internal_encode = NULL;	// needed, maybe a bug in libtheora?
 			return 0;
 		}
 	}
@@ -181,6 +182,7 @@ int PlayMovie(const char* name)
 	EventCallback callbacks;
 	unsigned int start_ticks;
 	int need_data;
+	int diff;
 	char buffer[PATH_MAX];
 
 	name = LibraryFileName(name, buffer);
@@ -248,11 +250,17 @@ int PlayMovie(const char* name)
 				break;
 			}
 			need_data = 0;
-			data->tstate.internal_encode = NULL;	// needed, maybe a bug in libtheora?
 		}
-		
-		if (SDL_GetTicks() - start_ticks > theora_granule_time(&data->tstate,
-		  data->tstate.granulepos) * 1000) {
+
+		diff = SDL_GetTicks() - start_ticks - theora_granule_time(&data->tstate,
+		  data->tstate.granulepos) * 1000;
+
+		if (diff > 100) {
+			// too far behind, skip some frames
+			need_data = 1;
+			continue;
+		}
+		if (diff > 0) {
 			OutputTheora(data, yuv_overlay, &rect);
 			need_data = 1;
 		}
