@@ -157,7 +157,7 @@ local int CclDefineMissileType(lua_State* l)
 			free(mtype->ImpactName);
 			mtype->ImpactName = strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "SmokeMissile")) {
-			free(mtype->ImpactName);
+			free(mtype->SmokeName);
 			mtype->SmokeName = strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "CanHitOwner")) {
 			mtype->CanHitOwner = LuaToBoolean(l, -1);
