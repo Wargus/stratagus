@@ -43,38 +43,38 @@
 #define noUSE_SVGALIB			/// Remove no for svgalib support
 #define noUSE_WINCE			/// Remove no for win-ce video support
 
-/**
-**	Define this to support load of compressed (gzip) pud files
-**	and other data files. (If defined you need libz)
-**	Comment if you have problems with gzseek, ... and other gz functions.
-*/
+    /**
+    **	Define this to support load of compressed (gzip) pud files
+    **	and other data files. (If defined you need libz)
+    **	Comment if you have problems with gzseek, ... and other gz functions.
+    */
 #define noUSE_ZLIB
 
-/**
-**	Define this to support load of compressed (libbz2) pud files
-**	and other data files. (If defined you need libbz2)
-*/
+    /**
+    **	Define this to support load of compressed (libbz2) pud files
+    **	and other data files. (If defined you need libbz2)
+    */
 #define noUSE_BZ2LIB
 
-/**
-**	Define this to support data files stored in a single zip archive or
-**	multiple archives. (If defined you need libzziplib)
-*/
+    /**
+    **	Define this to support data files stored in a single zip archive or
+    **	multiple archives. (If defined you need libzziplib)
+    */
 #define noUSE_ZZIPLIB
 
-//
-//	Default speed for many things, set it higher for faster actions.
-//
-#define SPEED_MINE	1		/// speed factor for mine gold
-#define SPEED_GOLD	1		/// speed factor for getting gold
-#define SPEED_CHOP	1		/// speed factor for chop
-#define SPEED_WOOD	1		/// speed factor for getting wood
-#define SPEED_HAUL	1		/// speed factor for haul oil
-#define SPEED_OIL	1		/// speed factor for getting oil
-#define SPEED_BUILD	1		/// speed factor for building
-#define SPEED_TRAIN	1		/// speed factor for training
-#define SPEED_UPGRADE	1		/// speed factor for upgrading
-#define SPEED_RESEARCH	1		/// speed factor for researching
+    //
+    //	Default speed for many things, set it higher for faster actions.
+    //
+#define SPEED_MINE	1		/// Speed factor for mine gold
+#define SPEED_GOLD	1		/// Speed factor for getting gold
+#define SPEED_CHOP	1		/// Speed factor for chop
+#define SPEED_WOOD	1		/// Speed factor for getting wood
+#define SPEED_HAUL	1		/// Speed factor for haul oil
+#define SPEED_OIL	1		/// Speed factor for getting oil
+#define SPEED_BUILD	1		/// Speed factor for building
+#define SPEED_TRAIN	1		/// Speed factor for training
+#define SPEED_UPGRADE	1		/// Speed factor for upgrading
+#define SPEED_RESEARCH	1		/// Speed factor for researching
 
 /*============================================================================
 ==	Compiler repairs
@@ -104,13 +104,13 @@
 
 #ifndef __GNUC__	// { disable GNU C Compiler features
 
-#define __attribute__(args)		// does nothing
+#define __attribute__(args)		// Does nothing
 
 #endif	// }
 
 #ifdef _MSC_VER	// { m$ auto detection
 
-#define inline __inline			// fix m$ brain damage
+#define inline __inline			// Fix m$ brain damage
 #define alloca _alloca			// I hope this works with all VC..
 
 #ifndef __FUNCTION__
@@ -119,11 +119,11 @@
 #endif
 
 #ifndef _WIN32_WCE
-#pragma warning(disable:4018)		// signed/unsigned mismatch
-#pragma warning(disable:4244)		// conversion from double to uchar
-#pragma warning(disable:4761)		// integral size mismatch
-#define access(x,y) _access((x),(y))
-#define snprintf _snprintf
+#pragma warning(disable:4018)		// Signed/unsigned mismatch
+#pragma warning(disable:4244)		// Conversion from double to uchar
+#pragma warning(disable:4761)		// Integral size mismatch
+#define access(x,y) _access((x),(y))	/// Unix -> dumm
+#define snprintf _snprintf		/// Unix -> dumm
 #endif
 
 #endif	// } m$
@@ -136,103 +136,116 @@
 
 #ifdef DEBUG	// {
 
-/**
-**	Include code only if debugging.
-*/
+    /**
+    **	Include code only if debugging.
+    */
 #define IfDebug(code)	code
 
-/**
-**	Debug check condition
-*/
+    /**
+    **	Debug check condition. If cond is true abort with file,line.
+    */
 #define DebugCheck(cond)	do{ if( cond ) { \
 	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
 	abort(); } }while( 0 )
 
-#ifndef __GNUC__	// { GNUC supports vararg macros
+#ifdef __GNUC__	// { GNUC supports vararg macros
 
-/**
-**	Print debug information of level 0.
-*/
-static inline void DebugLevel0(const char* fmt,...) {};
-/**
-**	Print debug information of level 1
-*/
-static inline void DebugLevel1(const char* fmt,...) {};
-/**
-**	Print debug information of level 2
-*/
-static inline void DebugLevel2(const char* fmt,...) {};
-/**
-**	Print debug information of level 3
-*/
-static inline void DebugLevel3(const char* fmt,...) {};
-/**
-**	Print debug information of level 0 with function name.
-*/
-static inline void DebugLevel0Fn(const char* fmt,...) {};
-/**
-**	Print debug information of level 1 with function name.
-*/
-static inline void DebugLevel1Fn(const char* fmt,...) {};
-/**
-**	Print debug information of level 2 with function name.
-*/
-static inline void DebugLevel2Fn(const char* fmt,...) {};
-/**
-**	Print debug information of level 3 with function name.
-*/
-static inline void DebugLevel3Fn(const char* fmt,...) {};
+    /**
+    **	Print debug information of level 0.
+    */
+#define DebugLevel0(fmt,args...)	printf(fmt,##args)
+
+    /**
+    **	Print debug information of level 1.
+    */
+#define DebugLevel1(fmt,args...)	printf(fmt,##args)
+
+    /**
+    **	Print debug information of level 2.
+    */
+#define DebugLevel2(fmt,args...)	printf(fmt,##args)
+
+    /**
+    **	Print debug information of level 3.
+    */
+#define DebugLevel3(fmt,args...)	/* TURNED OFF: printf(fmt,##args) */
+
+    /**
+    **	Print debug information of level 0 with function name.
+    */
+#define DebugLevel0Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
+
+    /**
+    **	Print debug information of level 1 with function name.
+    */
+#define DebugLevel1Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
+
+    /**
+    **	Print debug information of level 2 with function name.
+    */
+#define DebugLevel2Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
+
+    /**
+    **	Print debug information of level 3 with function name.
+    */
+#define DebugLevel3Fn(fmt,args...)	/* TURNED OFF: printf(__FUNCTION__": "fmt,##args) */
 
 #else	// }{ !__GNUC__
 
-/**
-**	Print debug information of level 0.
-*/
-#define DebugLevel0(fmt,args...)	printf(fmt,##args)
+    // FIXME: need useful code for this debug functions!
 
-/**
-**	Print debug information of level 1.
-*/
-#define DebugLevel1(fmt,args...)	printf(fmt,##args)
+    /**
+    **	Print debug information of level 0.
+    */
+static inline void DebugLevel0(const char* fmt,...) {};
+    /**
+    **	Print debug information of level 1
+    */
+static inline void DebugLevel1(const char* fmt,...) {};
+    /**
+    **	Print debug information of level 2
+    */
+static inline void DebugLevel2(const char* fmt,...) {};
+    /**
+    **	Print debug information of level 3
+    */
+static inline void DebugLevel3(const char* fmt,...) {};
+    /**
+    **	Print debug information of level 0 with function name.
+    */
+static inline void DebugLevel0Fn(const char* fmt,...) {};
+    /**
+    **	Print debug information of level 1 with function name.
+    */
+static inline void DebugLevel1Fn(const char* fmt,...) {};
+    /**
+    **	Print debug information of level 2 with function name.
+    */
+static inline void DebugLevel2Fn(const char* fmt,...) {};
+    /**
+    **	Print debug information of level 3 with function name.
+    */
+static inline void DebugLevel3Fn(const char* fmt,...) {};
 
-/**
-**	Print debug information of level 2.
-*/
-#define DebugLevel2(fmt,args...)	printf(fmt,##args)
-
-/**
-**	Print debug information of level 3.
-*/
-#define DebugLevel3(fmt,args...)	/* TURNED OFF: printf(fmt,##args) */
-
-/**
-**	Print debug information of level 0 with function name.
-*/
-#define DebugLevel0Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
-
-/**
-**	Print debug information of level 1 with function name.
-*/
-#define DebugLevel1Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
-
-/**
-**	Print debug information of level 2 with function name.
-*/
-#define DebugLevel2Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
-
-/**
-**	Print debug information of level 3 with function name.
-*/
-#define DebugLevel3Fn(fmt,args...)	/* TURNED OFF: printf(__FUNCTION__": "fmt,##args) */
-
-#endif	// } __GNUC__
+#endif	// } !__GNUC__
 
 #else	// }{ DEBUG
 
-#define IfDebug(code)
-#define DebugCheck(cond)
+#define IfDebug(code)		/* disabled */
+#define DebugCheck(cond)	/* disabled */
 
-#ifndef __GNUC__	// { m$ auto detection
+#ifdef __GNUC__	// { GNUC auto detection
+
+#define DebugLevel0(fmt...)	/* disabled */
+#define DebugLevel1(fmt...)	/* disabled */
+#define DebugLevel2(fmt...)	/* disabled */
+#define DebugLevel3(fmt...)	/* disabled */
+#define DebugLevel0Fn(fmt...)	/* disabled */
+#define DebugLevel1Fn(fmt...)	/* disabled */
+#define DebugLevel2Fn(fmt...)	/* disabled */
+#define DebugLevel3Fn(fmt...)	/* disabled */
+
+#else	// }{ __GNUC__
 
 static inline void DebugLevel0(const char* fmt,...) {};
 static inline void DebugLevel1(const char* fmt,...) {};
@@ -243,26 +256,15 @@ static inline void DebugLevel1Fn(const char* fmt,...) {};
 static inline void DebugLevel2Fn(const char* fmt,...) {};
 static inline void DebugLevel3Fn(const char* fmt,...) {};
 
-#else	// }{ _MSC_VER
-
-#define DebugLevel0(fmt...)
-#define DebugLevel1(fmt...)
-#define DebugLevel2(fmt...)
-#define DebugLevel3(fmt...)
-#define DebugLevel0Fn(fmt...)
-#define DebugLevel1Fn(fmt...)
-#define DebugLevel2Fn(fmt...)
-#define DebugLevel3Fn(fmt...)
-
-#endif	// } __GNUC__
+#endif	// } !__GNUC__
 
 #endif	// } !DEBUG
 
 #ifdef REFS_DEBUG	// {
 
-/**
-**	Debug check condition
-*/
+    /**
+    **	Debug check condition for refrences
+    */
 #define RefsDebugCheck(cond)	do{ if( cond ) { \
 	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
 	abort(); } }while( 0 )
@@ -277,10 +279,10 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 ==	Storage types
 ============================================================================*/
 
-#define global				/// defines global visible names
+#define global				/// Defines global visible names
 
 #ifdef DEBUG
-#define local				/// defines local visible names
+#define local				/// Defines local visible names
 #else
 #define local static
 #endif
@@ -316,14 +318,14 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 #endif
 
 #ifndef FREECRAFT_LIB_PATH
-#define FREECRAFT_LIB_PATH "data"	/// where to find the data files
+#define FREECRAFT_LIB_PATH "data"	/// Where to find the data files
 #endif
 #ifndef FREECRAFT_HOME_PATH
-#define FREECRAFT_HOME_PATH ".freecraft"/// data files in user home dir
+#define FREECRAFT_HOME_PATH ".freecraft"/// Data files in user home dir
 #endif
 
-#define MAGIC_FOR_NEW_UNITS	85	/// magic value, new units start with
-#define DEMOLISH_DAMAGE		400	/// damage for demolish attack
+#define MAGIC_FOR_NEW_UNITS	85	/// Magic value, new units start with
+#define DEMOLISH_DAMAGE		400	/// Damage for demolish attack
 
 /*----------------------------------------------------------------------------
 --	Some limits
@@ -339,44 +341,43 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 --	Screen
 ----------------------------------------------------------------------------*/
 
-// FIXME: this values should go into a general ui structure
+    // FIXME: this values should go into a general ui structure
 
-#define noGRID		1		/// Map is shown with a grid, if 1
 #define noGRID		1		/// Map is shown with a grid, if 1
 
 #define DEFAULT_VIDEO_WIDTH	640	/// Default video width
 #define DEFAULT_VIDEO_HEIGHT	480	/// Default video height
 
-// This is for 1600x1200
-#define MAXMAP_W	50		/// maximum map width in tiles on screen
-#define MAXMAP_H	40		/// maximum map height in tiles
+    // This is for 1600x1200
+#define MAXMAP_W	50		/// Maximum map width in tiles on screen
+#define MAXMAP_H	40		/// Maximum map height in tiles
 
-#define MINIMAP_W	128		/// minimap width in pixels
-#define MINIMAP_H	128		/// minimap height in pixels
+#define MINIMAP_W	128		/// Minimap width in pixels
+#define MINIMAP_H	128		/// Minimap height in pixels
 
-    /// scrolling area (<= 15 y)
+    /// Scrolling area (<= 15 y)
 #define SCROLL_UP	15
-    /// scrolling area (>= VideoHeight-16 y)
+    /// Scrolling area (>= VideoHeight-16 y)
 #define SCROLL_DOWN	(VideoHeight-16)
-    /// scrolling area (<= 15 y)
+    /// Scrolling area (<= 15 y)
 #define SCROLL_LEFT	15
-    /// scrolling area (>= VideoWidth-16 x)
+    /// Scrolling area (>= VideoWidth-16 x)
 #define SCROLL_RIGHT	(VideoWidth-16)
 
-    /// mouse scrolling magnify
+    /// Mouse scrolling magnify
 #define MOUSE_SCROLL_SPEED	3
 
-    /// keyboard scrolling magnify
+    /// Keyboard scrolling magnify
 #define KEY_SCROLL_SPEED	3
 
-    /// frames per second to display (original 30-40)
+    /// Frames per second to display (original 30-40)
 #define FRAMES_PER_SECOND	30	// 1/30s
-    /// game cycles per second to simulate (original 30-40)
+    /// Game cycles per second to simulate (original 30-40)
 #define CYCLES_PER_SECOND	30	// 1/30s 0.33ms
 
-    /// must redraw flags
+    /// Must redraw flags
 enum _must_redraw_flags_ {
-    RedrawNothing	= 1<< 0,	/// nothing to do
+    RedrawNothing	= 1<< 0,	/// Nothing to do
     RedrawMinimap	= 1<< 1,	/// Minimap area
     RedrawMap		= 1<< 2,	/// Map area
     RedrawCursor	= 1<< 3,	/// Cursor changed
@@ -403,8 +404,10 @@ enum _must_redraw_flags_ {
     RedrawMinimapCursor	= 1<<21,	/// Minimap cursor changed
     RedrawMenu		= 1<<22,	/// Menu
 
+    // Bits 23-29 are unused.
+
     RedrawAll		= 1<<30,	/// All flag set by RedrawEverything
-    RedrawEverything	= -1,		/// must redraw everything
+    RedrawEverything	= -1,		/// Must redraw everything
 };
 
     /// Must redraw all maps
@@ -413,24 +416,6 @@ enum _must_redraw_flags_ {
 #define RedrawCursors		(RedrawMinimapCursor|RedrawCursor)
     /// Must redraw all panels
 #define RedrawPanels		(RedrawInfoPanel|RedrawButtonPanel)
-
-#ifdef _MSC_VER	// { m$ auto detection
-
-/**
-**	Show load progress.
-**	FIXME: Some time this should be shown in tile screen.
-*/
-static inline void ShowLoadProgress(const char* fmt,...) {};
-
-#else	// }{ _MSC_VER
-
-/**
-**	Show load progress.
-**	FIXME: Some time this should be shown in tile screen.
-*/
-#define ShowLoadProgress(fmt,args...)	//printf(fmt,##args)
-
-#endif	// } !_MSC_VER
 
     /// Mainscreen pitch (default VideoWidth)
 extern int VideoPitch;
@@ -469,39 +454,33 @@ extern int Map2ScreenY(int y);		/// Convert map tile to screen pixel
 --	clone.c
 ----------------------------------------------------------------------------*/
 
-/**
-**	SyncRand():	should become a syncron rand on all machines
-**			for network play.
-*/
-#define NoSyncRand()	rand()
-
-/**
-**	MyRand():	rand only used on this computer.
-*/
+    /**
+    **	MyRand():	rand only used on this computer.
+    */
 #define MyRand()	rand()
 
-extern char* TitleScreen;		/// file for title screen
-extern char* MenuBackground;		/// file for menu background
-extern char* MenuBackgroundWithTitle;	/// file for menu with title
-extern char* TitleMusic;		/// file for title music
-extern char* MenuMusic;			/// file for menu music
-extern char* FreeCraftLibPath;		/// location of freecraft data
+extern char* TitleScreen;		/// File for title screen
+extern char* MenuBackground;		/// File for menu background
+extern char* MenuBackgroundWithTitle;	/// File for menu with title
+extern char* TitleMusic;		/// File for title music
+extern char* MenuMusic;			/// File for menu music
+extern char* FreeCraftLibPath;		/// Location of freecraft data
 
-extern int SpeedMine;			/// speed factor for mine gold
-extern int SpeedGold;			/// speed factor for getting gold
-extern int SpeedChop;			/// speed factor for chop
-extern int SpeedWood;			/// speed factor for getting wood
-extern int SpeedHaul;			/// speed factor for haul oil
-extern int SpeedOil;			/// speed factor for getting oil
-extern int SpeedBuild;			/// speed factor for building
-extern int SpeedTrain;			/// speed factor for training
-extern int SpeedUpgrade;		/// speed factor for upgrading
-extern int SpeedResearch;		/// speed factor for researching
+extern int SpeedMine;			/// Speed factor for mine gold
+extern int SpeedGold;			/// Speed factor for getting gold
+extern int SpeedChop;			/// Speed factor for chop
+extern int SpeedWood;			/// Speed factor for getting wood
+extern int SpeedHaul;			/// Speed factor for haul oil
+extern int SpeedOil;			/// Speed factor for getting oil
+extern int SpeedBuild;			/// Speed factor for building
+extern int SpeedTrain;			/// Speed factor for training
+extern int SpeedUpgrade;		/// Speed factor for upgrading
+extern int SpeedResearch;		/// Speed factor for researching
 
-//FIXME: all game global options should be moved in structure like `TheUI'
-extern int OptionUseDepletedMines;      /// use depleted mines or destroy them
+    //FIXME: all game global options should be moved in structure like `TheUI'
+extern int OptionUseDepletedMines;      /// Use depleted mines or destroy them
 
-extern unsigned SyncRandSeed;		/// sync random seed value.
+extern unsigned SyncRandSeed;		/// Sync random seed value
 
 extern unsigned long GameCycle;		/// Game simulation cycle counter
 
@@ -516,24 +495,28 @@ extern void SaveGame(const char*);	/// Save game for later load
 extern void SaveAll(void);		/// Call all modules to save states
 extern void LoadAll(void);		/// Load all data back
 
+extern void InitSyncRand(void);		/// Initialize the syncron rand
 extern int SyncRand(void);		/// Syncron rand
 
-extern int main1(int argc,char* argv[]);/// init freecraft
-extern volatile void Exit(int err);	/// exit freecraft
-extern volatile void ExitFatal(int err);/// exit freecraft with fatal error
+extern int main1(int argc,char* argv[]);/// Init freecraft
+extern volatile void Exit(int err);	/// Exit freecraft
+extern volatile void ExitFatal(int err);/// Exit freecraft with fatal error
 
-extern void UpdateDisplay(void);	/// game display update
+extern void UpdateDisplay(void);	/// Game display update
 extern void InitModules(void);		/// Initinalize all modules
 extern void LoadModules(void);		/// Load all modules
 extern void CleanModules(void);		/// Cleanup all modules
-extern void GameMainLoop(void);		/// game main loop
+extern void GameMainLoop(void);		/// Game main loop
 
-     /// strdup + strcat
+    ///	Show load progress
+extern void ShowLoadProgress(const char* fmt,...);
+
+    /// strdup + strcat
 extern char* strdcat(const char* l, const char* r);
-     /// strdup + strcat + strcat
+    /// strdup + strcat + strcat
 extern char* strdcat3(const char* l, const char *m, const char* r);
-     /// case insensitive strstr
 #ifndef BSD
+    /// case insensitive strstr
 extern char* strcasestr(char* str, const char* substr);
 #endif // BSD
 
@@ -550,6 +533,8 @@ extern char* strcasestr(char* str, const char* substr);
 
     /// bits macro
 #define BitsOf(n)	(sizeof(n)*8)
+
+    // FIXME: more config stuff which needs a better place
 
     /// How long stay in a gold-mine
 #define MINE_FOR_GOLD	(UnitTypeGoldMine->_Costs[TimeCost]/SpeedMine)
