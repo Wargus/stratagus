@@ -112,7 +112,7 @@ local void SpellMoveToTarget(Unit* unit)
     goal = unit->Orders[0].Goal;
 
     if (goal && MapDistanceBetweenUnits(unit, goal) <=
-	    unit->Orders[0].RangeX) {
+	    unit->Orders[0].Range) {
 
 	// there is goal and it is in range
 	unit->State = 0;
@@ -125,7 +125,7 @@ local void SpellMoveToTarget(Unit* unit)
 	unit->SubAction++;		// cast the spell
 	return;
     } else if (!goal && MapDistanceToUnit(unit->Orders[0].X,
-	    unit->Orders[0].Y, unit) <= unit->Orders[0].RangeX) {
+	    unit->Orders[0].Y, unit) <= unit->Orders[0].Range) {
 	// there is no goal and target spot is in range
 	unit->State = 0;
 	if (!unit->Type->Building) {
@@ -165,9 +165,9 @@ global void HandleActionSpellCast(Unit* unit)
     int flags;
     const SpellType* spell;
 
-    DebugLevel3Fn("%d %d,%d+%d+%d\n" _C_
+    DebugLevel3Fn("%d %d,%d+%d\n" _C_
 	UnitNumber(unit) _C_ unit->Orders[0].X _C_ unit->Orders[0].Y _C_
-	unit->Orders[0].RangeX _C_ unit->Orders[0].RangeY);
+	unit->Orders[0].Range);
 
     switch (unit->SubAction) {
 	case 0:				// first entry.

@@ -547,7 +547,7 @@ local int StopGathering(Unit* unit)
 	unit->Orders[0].Goal = depot;
 	RefsDebugCheck(!depot->Refs);
 	++depot->Refs;
-	unit->Orders[0].RangeX = unit->Orders[0].RangeY = 1;
+	unit->Orders[0].Range = 1;
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
 	unit->SubAction = SUB_MOVE_TO_DEPOT;
 	NewResetPath(unit);
@@ -707,7 +707,7 @@ local int WaitInDepot(Unit* unit)
 	    unit->Orders[0].Goal = goal;
 	    RefsDebugCheck(!goal->Refs);
 	    ++goal->Refs;
-	    unit->Orders[0].RangeX = unit->Orders[0].RangeY = 1;
+	    unit->Orders[0].Range = 1;
 	    unit->Orders[0].X = unit->Orders[0].Y = -1;
 	} else {
 	    DropOutOnSide(unit, LookingW, depot->Type->TileWidth, depot->Type->TileHeight);

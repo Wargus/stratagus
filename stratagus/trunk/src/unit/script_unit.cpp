@@ -224,11 +224,17 @@ local void CclParseOrder(SCM list,Order* order)
 	    order->Flags = gh_scm2int(value);
 
 	} else if (gh_eq_p(value, gh_symbol2scm("range"))) {
-	    sublist = gh_car(list);
+	    order->Range = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
-	    order->RangeX = gh_scm2int(gh_car(sublist));
-	    order->RangeY = gh_scm2int(gh_cadr(sublist));
-
+	} else if (gh_eq_p(value, gh_symbol2scm("min-range"))) {
+	    order->MinRange = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("width"))) {
+	    order->Width = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("height"))) {
+	    order->Height = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("goal"))) {
 	    char* str;
 	    int slot;

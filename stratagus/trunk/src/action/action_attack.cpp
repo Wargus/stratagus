@@ -129,7 +129,7 @@ local Unit* CheckForDeadGoal(Unit* unit)
 	    unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 	    unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
 	    unit->Orders[0].MinRange = 0;
-	    unit->Orders[0].RangeX = unit->Orders[0].RangeY = 0;
+	    unit->Orders[0].Range = 0;
 
 	    DebugLevel0Fn("destroyed unit %d\n" _C_ UnitNumber(goal));
 	    RefsDebugCheck(!goal->Refs);
@@ -146,7 +146,7 @@ local Unit* CheckForDeadGoal(Unit* unit)
 	    unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 	    unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
 	    unit->Orders[0].MinRange = 0;
-	    unit->Orders[0].RangeX = unit->Orders[0].RangeY = 0;
+	    unit->Orders[0].Range = 0;
 
 	    RefsDebugCheck(!goal->Refs);
 	    --goal->Refs;
@@ -213,8 +213,7 @@ local int CheckForTargetInRange(Unit* unit)
 	    goal->Refs++;
 	    unit->Orders[0].Goal = goal;
 	    unit->Orders[0].MinRange = unit->Type->MinAttackRange;
-	    unit->Orders[0].RangeX = unit->Orders[0].RangeY =
-		unit->Stats->AttackRange;
+	    unit->Orders[0].Range = unit->Stats->AttackRange;
 	    unit->Orders[0].X = unit->Orders[0].Y = -1;
 	    unit->SubAction |= WEAK_TARGET;		// weak target
 	    NewResetPath(unit);
@@ -242,7 +241,7 @@ local int CheckForTargetInRange(Unit* unit)
 		    unit->SavedOrder.X = goal->X + goal->Type->TileWidth / 2;
 		    unit->SavedOrder.Y = goal->Y + goal->Type->TileHeight / 2;
 		    unit->SavedOrder.MinRange = 0;
-		    unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
+		    unit->SavedOrder.Range = 0;
 		    unit->SavedOrder.Goal = NoUnitP;
 		}
 	    }
@@ -338,18 +337,17 @@ local void MoveToTarget(Unit* unit)
 		UnitNumber(unit));
 	    if (goal) {
 		DebugLevel3(", target %d range %d\n" _C_ UnitNumber(goal) _C_
-		    unit->Orders[0].RangeX);
+		    unit->Orders[0].Range);
 	    } else {
 		//
 		//  When attack-moving we have to allow a bigger range
 		//
 		DebugLevel3(", (%d,%d) Tring with more range...\n" _C_
 		    unit->Orders[0].X _C_ unit->Orders[0].Y);
-		if (unit->Orders[0].RangeX < TheMap.Width ||
-			unit->Orders[0].RangeY < TheMap.Height) {
+		if (unit->Orders[0].Range < TheMap.Width ||
+			unit->Orders[0].Range < TheMap.Height) {
 		    // Try again with more range
-		    unit->Orders[0].RangeX++;
-		    unit->Orders[0].RangeY++;
+		    unit->Orders[0].Range++;
 		    return;
 		}
 	    }
@@ -462,7 +460,7 @@ local void AttackTarget(Unit* unit)
 		    unit->SavedOrder.X = temp->X + temp->Type->TileWidth / 2;
 		    unit->SavedOrder.Y = temp->Y + temp->Type->TileHeight / 2;
 		    unit->SavedOrder.MinRange = 0;
-		    unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
+		    unit->SavedOrder.Range = 0;
 		    unit->SavedOrder.Goal = NoUnitP;
 		}
 	    }
@@ -474,8 +472,7 @@ local void AttackTarget(Unit* unit)
 	    unit->Orders[0].Goal = goal;
 	    unit->Orders[0].X = unit->Orders[0].Y = -1;
 	    unit->Orders[0].MinRange = unit->Type->MinAttackRange;
-	    unit->Orders[0].RangeX = unit->Orders[0].RangeY =
-		unit->Stats->AttackRange;
+	    unit->Orders[0].Range = unit->Stats->AttackRange;
 	    NewResetPath(unit);
 	    unit->SubAction |= WEAK_TARGET;
 
@@ -501,7 +498,7 @@ local void AttackTarget(Unit* unit)
 			unit->SavedOrder.X = goal->X + goal->Type->TileWidth / 2;
 			unit->SavedOrder.Y = goal->Y + goal->Type->TileHeight / 2;
 			unit->SavedOrder.MinRange = 0;
-			unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
+			unit->SavedOrder.Range = 0;
 			unit->SavedOrder.Goal = NoUnitP;
 		    }
 		}
@@ -526,7 +523,7 @@ local void AttackTarget(Unit* unit)
 		    unit->SavedOrder.X = temp->X + temp->Type->TileWidth / 2;
 		    unit->SavedOrder.Y = temp->Y + temp->Type->TileHeight / 2;
 		    unit->SavedOrder.MinRange = 0;
-		    unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
+		    unit->SavedOrder.Range = 0;
 		    unit->SavedOrder.Goal = NoUnitP;
 		}
 	    }
@@ -569,8 +566,8 @@ local void AttackTarget(Unit* unit)
 */
 global void HandleActionAttack(Unit* unit)
 {
-    DebugLevel3Fn("Attack %d r %d,%d\n" _C_ UnitNumber(unit) _C_
-	unit->Orders->RangeX _C_ unit->Orders->RangeY);
+    DebugLevel3Fn("Attack %d range %d\n" _C_ UnitNumber(unit) _C_
+	unit->Orders->Range);
 
     switch (unit->SubAction) {
 	//

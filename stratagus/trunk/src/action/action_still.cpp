@@ -146,7 +146,7 @@ global void ActionStillGeneric(Unit* unit, int ground)
 		unit->Orders[0].Action = UnitActionMove;
 		DebugCheck(unit->Orders[0].Goal);
 		unit->Orders[0].Goal = NoUnitP;
-		unit->Orders[0].RangeX = unit->Orders[0].RangeY = 0;
+		unit->Orders[0].Range = 0;
 		unit->Orders[0].X = x;
 		unit->Orders[0].Y = y;
 		unit->State = 0;
@@ -179,7 +179,7 @@ global void ActionStillGeneric(Unit* unit, int ground)
 		DebugCheck(unit->SavedOrder.Action != UnitActionStill);
 		DebugCheck(unit->SavedOrder.Goal);
 		unit->SavedOrder.Action = UnitActionAttack;
-		unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
+		unit->SavedOrder.Range = 0;
 		unit->SavedOrder.X = unit->X;
 		unit->SavedOrder.Y = unit->Y;
 		unit->SavedOrder.Goal = NoUnitP;

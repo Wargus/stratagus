@@ -3419,8 +3419,11 @@ local void SaveOrder(const Order* order,CLFile* file)
 	default:
 	    DebugLevel0Fn("Unknown action in order\n");
     }
-    CLprintf(file," flags %d",order->Flags);
-    CLprintf(file," range (%d %d)",order->RangeX,order->RangeY);
+    CLprintf(file," flags %d", order->Flags);
+    CLprintf(file," range %d", order->Range);
+    CLprintf(file," width %d", order->Width);
+    CLprintf(file," height %d", order->Height);
+    CLprintf(file," min-range %d", order->MinRange);
     if( order->Goal ) {
 	if (order->Goal->Destroyed) {
 	    /* this unit is destroyed so it's not in the global unit
