@@ -189,6 +189,9 @@ local int PlayCDRom(const char* name)
 	    }
 	}
     }
+
+    StopMusic();
+
     // CDPlayer command?
     if (!strncmp(name, ":", 1)) {
 	if (!CDRom) {
@@ -261,6 +264,8 @@ local int PlayCDRom(const char* name)
 	}
     }
 
+    StopMusic();
+
     if (!strncmp(name, ":", 1)) {
 
 	if (cd_get_tracks(NULL, NULL) == -1)
@@ -322,6 +327,73 @@ global void PlayMusic(const char* name)
     if (PlayCDRom(name)) {
 	return;
     }
+#endif
+    name = LibraryFileName(name, buffer);
+
+    if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped")) {
+	return;
+    }
+
+#ifdef USE_OGG
+    if ((sample = LoadOgg(name))) {
+	if( sample->Channels!=2
+		|| sample->SampleSize!=16
+		|| sample->Frequency!=SoundFrequency ) {
+	    DebugLevel0Fn("Not supported music format\n");
+	    free(sample);
+	    return;
+	}
+	StopMusic();
+	MusicSample = sample;
+	MusicIndex = 0;
+	PlayingMusic = 1;
+	return;
+    }
+#endif
+#ifdef USE_MAD
+    if ((sample = LoadMp3(name))) {
+	if( sample->Channels!=2
+		|| sample->SampleSize!=16
+		|| sample->Frequency!=SoundFrequency ) {
+	    DebugLevel0Fn("Not supported music format\n");
+	    free(sample);
+	    return;
+	}
+	StopMusic();
+	MusicSample = sample;
+	MusicIndex = 0;
+	PlayingMusic = 1;
+	return;
+    }
+#endif
+#ifdef USE_FLAC
+    if ((sample = LoadFlac(name))) {
+	if( sample->Channels!=2
+		|| sample->SampleSize!=16
+		|| sample->Frequency!=SoundFrequency ) {
+	    DebugLevel0Fn("Not supported music format\n");
+	    free(sample);
+	    return;
+	}
+	StopMusic();
+	MusicSample = sample;
+	MusicIndex = 0;
+	PlayingMusic = 1;
+	return;
+    }
+#endif
+#ifdef USE_LIBMODPLUG
+    if (LoadMod(name)) {
+	return;
+    }
+#endif
+}
+
+global void PlayFile(const char* name)
+{
+    char buffer[1024];
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
+    Sample *sample;
 #endif
     name = LibraryFileName(name, buffer);
 #ifdef USE_OGG
