@@ -86,6 +86,8 @@ enum _font_color {
 
     /// Set the default text colors for normal and reverse text.
 extern void SetDefaultTextColors(int normal,int reverse);
+    /// Get the default text colors for normal and reverse text.
+extern void GetDefaultTextColors(int *normalp,int *reversep);
     /// Returns the pixel length of a text.
 extern int TextLength(unsigned font,const unsigned char* text);
     /// Draw text unclipped.
