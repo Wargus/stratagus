@@ -47,21 +47,15 @@
 <hr>
 <a href="#ActionDefeat">ActionDefeat</a>
 <a href="#ActionDraw">ActionDraw</a>
-<a href="#ActionSetSwitch">ActionSetSwitch</a>
 <a href="#ActionSetTimer">ActionSetTimer</a>
 <a href="#ActionStartTimer">ActionStartTimer</a>
 <a href="#ActionStopTimer">ActionStopTimer</a>
 <a href="#ActionVictory">ActionVictory</a>
 <a href="#ActionWait">ActionWait</a>
 <a href="#AddTrigger">AddTrigger</a>
-<a href="#IfElapsed">IfElapsed</a>
-<a href="#IfKills">IfKills</a>
 <a href="#IfNearUnit">IfNearUnit</a>
 <a href="#IfOpponents">IfOpponents</a>
 <a href="#IfRescuedNearUnit">IfRescuedNearUnit</a>
-<a href="#IfResource">IfResource</a>
-<a href="#IfScore">IfScore</a>
-<a href="#IfSwitch">IfSwitch</a>
 <a href="#IfTimer">IfTimer</a>
 <a href="#IfUnit">IfUnit</a>
 <a href="#IfUnitAt">IfUnitAt</a>
@@ -203,26 +197,6 @@ AddTrigger(
 The condition player is set to draw. (NOT SUPPORTED)
 
 
-<a name="ActionSetSwitch"></a>
-<h3>ActionSetSwitch(switch-number, boolean or number)</h3>
-
-Set a switch.
-
-
-<dl>
-  <dt>switch-number</dt>
-  <dd>The switch number.</dd>
-  <dt>boolean or number</dt>
-  <dd>if it is a number, 0 is equivalent to false, non-null value is equivalent to true.
-  true to set the switch on, false to clear or turn the switch off</dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
--- Sets switch 1 on.
-ActionSetSwitch(1, true)
-</pre>
-
 <a name="ActionSetTimer"></a>
 <h3>ActionSetTimer(cycles, increasing)</h3>
 
@@ -319,61 +293,6 @@ Creates a new trigger.
 AddTrigger(
   function() return IfOpponents("this", "==", 0) end,
   function() return ActionVictory() end)
-</pre>
-
-<a name="IfElapsed"></a>
-<h3>IfElapsed(op, quantity)</h3>
- 
-Return true if the game-cycle "op" quantity is true.
-
-<dl>
-  <dt>op</dt>
-  <dd><pre>
-"=="         operator equal
-"&gt;"          operator greater than
-"&gt;="         operator greater than or equal
-"&lt;"          operator less than
-"&lt;="         operator less than or equal
-</pre></dd>
-  <dt>quantity</dt>
-  <dd>Number of cycle to compare</dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
--- True when the game has run for 300 cycles.
-IfElapsed("&gt;=", 300)
-</pre>
-
-<a name="IfKills"></a>
-<h3>IfKills(player, op, quantity)</h3>
-
-Return true if the player's kills "op" quantity is true.
-
-
-<dl>
-  <dt>player</dt>
-  <dd><pre>
-0 .. 16     Player number
-"any"       Matches any player
-"this"      Player on the local computer, Human player in the campaign.
-</pre></dd>
-  <dt>op</dt>
-  <dd><pre>
-"=="         operator equal
-"&gt;"          operator greater than
-"&gt;="         operator greater than or equal
-"&lt;"          operator less than
-"&lt;="         operator less than or equal
-</pre></dd>
-  <dt>quantity</dt>
-  <dd>Number to compare with the quantity of kill</dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
--- True when local player has killed 30 or more units.
-IfKills("this", "&gt;=", 30)
 </pre>
 
 <a name="IfNearUnit"></a>
@@ -489,91 +408,6 @@ unit-name    Unit type of this name
 IfRescuedNearUnit("this", "==", 1, "unit-archer", "unit-circle-of-power")
 </pre>
 
-<a name="IfResource"></a>
-<h3>IfResource(player, op, quantity, resource)</h3>
-
-Return true if ressource of player "op" quantity is true.
-
-
-<dl>
-  <dt>player</dt>
-  <dd><pre>
-0 .. 16     Player number
-"any"       Matches any player
-"this"      Player on the local computer, Human player in the campaign.
-</pre></dd>
-  <dt>op</dt>
-  <dd><pre>
-"=="         operator equal
-"&gt;"          operator greater than
-"&gt;="         operator greater than or equal
-"&lt;"          operator less than
-"&lt;="         operator less than or equal
-</pre></dd>
-  <dt>quantity</dt>
-  <dd>Number to compare with number of ressource</dd>
-  <dt>resource</dt>
-  <dd><pre>
-Name of the resource or:
-"all"        Sum of all resources in store
-"any"        Any resource
-</pre></dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
--- True when the player on the console has at least 5000 gold.
-IfResource("this", "&gt;=", 5000, "gold")
-</pre>
-
-<a name="IfScore"></a>
-<h3>IfScore(player, op, quantity)</h3>
- 
-Return true if score of player "op" quantity is true.
-
-<dl>
-  <dt>player</dt>
-  <dd><pre>
-0 .. 16     Player number
-"any"       Matches any player
-"this"      Player on the local computer, Human player in the campaign.
-</pre></dd>
-  <dt>op</dt>
-  <dd><pre>
-"=="         operator equal
-"&gt;"          operator greater than
-"&gt;="         operator greater than or equal
-"&lt;"          operator less than
-"&lt;="         operator less than or equal
-</pre></dd>
-  <dt>quantity</dt>
-  <dd>Number to compare with score.</dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
--- True when the player on the console has a score of at least 1000.
-IfScore("this", "&gt;=", 1000)
-</pre>
-
-<a name="IfSwitch"></a>
-<h3>IfSwitch(number, set)</h3>
- 
-Return true if switch number is set.
-
-
-<dl>
-  <dt>number</dt>
-  <dd>Number of the switch</dd>
-  <dt>set: true (or non null-number) or false (or 0)</dt>
-  <dd>true to check if the switch is on, false for off</dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
--- True when switch 1 is on.
-IfSwitch(1, true)
-</pre>
 
 <a name="IfTimer"></a>
 <h3>IfTimer(op, cycles)</h3>
