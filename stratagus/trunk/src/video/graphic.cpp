@@ -438,6 +438,10 @@ void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 	const unsigned char* sp;
 	int fl;
 	int bpp;
+	Uint32 b;
+	Uint32 c;
+	Uint32 pc;
+	SDL_PixelFormat* f;
 
 	if (!*g) {
 		*g = calloc(1, sizeof(Graphic));
@@ -468,6 +472,7 @@ void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 	h = i;
 
 	tex = (unsigned char*)malloc(w * h * 4);
+	f = graphic->Surface->format;
 
 	glBindTexture(GL_TEXTURE_2D, (*g)->TextureNames[frame]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -479,28 +484,49 @@ void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 		sp = (const unsigned char*)graphic->Surface->pixels + (frame % fl) * graphic->Width * bpp +
 			((frame / fl) * graphic->Height + i) * graphic->Surface->pitch;
 		for (j = 0; j < graphic->Width; ++j) {
-			int c;
+			int y;
 			int z;
 			SDL_Color p;
 
-			c = i * w * 4 + j * 4;
+			y = i * w * 4 + j * 4;
 			if (bpp == 1) {
 				for (z = 0; z < 4; ++z) {
 					if (*sp == 208 + z) {
 						p = colors->Colors[z];
-						tex[c + 0] = p.r;
-						tex[c + 1] = p.g;
-						tex[c + 2] = p.b;
-						tex[c + 3] = 0xff;
+						tex[y + 0] = p.r;
+						tex[y + 1] = p.g;
+						tex[y + 2] = p.b;
+						tex[y + 3] = 0xff;
 						break;
 					}
 				}
 				if (z == 4) {
-					tex[c + 3] = 0;
+					tex[y + 3] = 0;
 				}
 				++sp;
 			} else {
-				// FIXME: not done
+				if (bpp == 4) {
+					c = *(Uint32*)sp;
+				} else {
+					c = (sp[f->Rshift >> 3] << f->Rshift) |
+						(sp[f->Gshift >> 3] << f->Gshift) |
+						(sp[f->Bshift >> 3] << f->Bshift);
+				}
+				b = (c & f->Bmask) >> f->Bshift;
+				if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
+						((c & f->Gmask) >> f->Gshift) == b) {
+					pc = ((colors->Colors[0].r * b / 255) << f->Rshift) |
+						((colors->Colors[0].g * b / 255) << f->Gshift) |
+						((colors->Colors[0].b * b / 255) << f->Bshift);
+					if (bpp == 4) {
+						pc |= (c & f->Amask);
+					} else {
+						pc |= (0xFFFFFFFF ^ (f->Rmask | f->Gmask | f->Bmask));
+					}
+					*(Uint32*)(tex + y) = pc;
+				} else {
+					*(Uint32*)(tex + y) = 0;
+				}
 				sp += bpp;
 			}
 		}
