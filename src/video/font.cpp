@@ -698,9 +698,11 @@ global void LoadFonts(void)
     }
 
     for( i=0; i<sizeof(Fonts)/sizeof(*Fonts); ++i ) {
-	ShowLoadProgress("\tFonts %s\n",Fonts[i].File);
-	Fonts[i].Graphic=LoadGraphic(Fonts[i].File);
-	FontMeasureWidths(Fonts+i);
+	if( Fonts[i].File ) {
+	    ShowLoadProgress("\tFonts %s\n",Fonts[i].File);
+	    Fonts[i].Graphic=LoadGraphic(Fonts[i].File);
+	    FontMeasureWidths(Fonts+i);
+	}
     }
 }
 
@@ -709,6 +711,41 @@ global void LoadFonts(void)
 ----------------------------------------------------------------------------*/
 
 #include "ccl.h"
+
+/**
+**	Font symbol to id.
+**
+**	@param type	Type of the font (game,small,...)
+**
+**	@return		Integer as font identifier.
+*/
+global int CclFontByIdentifier(SCM type)
+{
+    if (gh_eq_p(type, gh_symbol2scm("game"))) {
+	return GameFont;
+    } else if (gh_eq_p(type, gh_symbol2scm("small"))) {
+	return SmallFont;
+    } else if (gh_eq_p(type, gh_symbol2scm("large"))) {
+	return LargeFont;
+    } else if (gh_eq_p(type, gh_symbol2scm("small-title"))) {
+	return SmallTitleFont;
+    } else if (gh_eq_p(type, gh_symbol2scm("large-title"))) {
+	return LargeTitleFont;
+    } else if (gh_eq_p(type, gh_symbol2scm("user1"))) {
+	return User1Font;
+    } else if (gh_eq_p(type, gh_symbol2scm("user2"))) {
+	return User2Font;
+    } else if (gh_eq_p(type, gh_symbol2scm("user3"))) {
+	return User3Font;
+    } else if (gh_eq_p(type, gh_symbol2scm("user4"))) {
+	return User4Font;
+    } else if (gh_eq_p(type, gh_symbol2scm("user5"))) {
+	return User5Font;
+    } else {
+	errl("Unsupported font tag", type);
+    }
+    return 0;
+}
 
 /**
 **	Define the used fonts.
@@ -720,39 +757,17 @@ global void LoadFonts(void)
 **
 **	@todo	make the font name functions more general, support more fonts.
 */
-local SCM CclDefineFont(SCM type,SCM file,SCM width,SCM height)
+local SCM CclDefineFont(SCM type, SCM file, SCM width, SCM height)
 {
     int i;
 
-    if( gh_eq_p(type,gh_symbol2scm("game")) ) {
-	i=GameFont;
-    } else if( gh_eq_p(type,gh_symbol2scm("small")) ) {
-	i=SmallFont;
-    } else if( gh_eq_p(type,gh_symbol2scm("large")) ) {
-	i=LargeFont;
-    } else if( gh_eq_p(type,gh_symbol2scm("small-title")) ) {
-	i=SmallTitleFont;
-    } else if( gh_eq_p(type,gh_symbol2scm("large-title")) ) {
-	i=LargeTitleFont;
-    } else if( gh_eq_p(type,gh_symbol2scm("user1")) ) {
-	i=User1Font;
-    } else if( gh_eq_p(type,gh_symbol2scm("user2")) ) {
-	i=User2Font;
-    } else if( gh_eq_p(type,gh_symbol2scm("user3")) ) {
-	i=User3Font;
-    } else if( gh_eq_p(type,gh_symbol2scm("user4")) ) {
-	i=User4Font;
-    } else if( gh_eq_p(type,gh_symbol2scm("user5")) ) {
-	i=User5Font;
-    } else {
-	fprintf(stderr,"unsupported font type\n");
-	return SCM_UNSPECIFIED;
-    }
-
+    i = CclFontByIdentifier(type);
     free(Fonts[i].File);
-    Fonts[i].File=gh_scm2newstr(file,NULL);
-    Fonts[i].Width=gh_scm2int(width);
-    Fonts[i].Height=gh_scm2int(height);
+    VideoSaveFree(Fonts[i].Graphic);
+    Fonts[i].Graphic=NULL;
+    Fonts[i].File = gh_scm2newstr(file, NULL);
+    Fonts[i].Width = gh_scm2int(width);
+    Fonts[i].Height = gh_scm2int(height);
 
     return SCM_UNSPECIFIED;
 }
@@ -767,16 +782,16 @@ local SCM CclDefineFontColors(SCM list)
     SCM value;
     SCM temp;
 
-    for( i=0; i<16; ++i ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
+    for (i = 0; i < 16; ++i) {
+	value = gh_car(list);
+	list = gh_cdr(list);
 
-	if( gh_vector_length(value)!=7 ) {
-	    fprintf(stderr,"Wrong vector length\n");
+	if (gh_vector_length(value) != 7) {
+	    fprintf(stderr, "Wrong vector length\n");
 	}
-	for( j=0; j<7; ++j ) {
-	    temp=gh_vector_ref(value,gh_int2scm(j));
-	    FontColors[i][j]=gh_scm2int(temp);
+	for (j = 0; j < 7; ++j) {
+	    temp = gh_vector_ref(value, gh_int2scm(j));
+	    FontColors[i][j] = gh_scm2int(temp);
 	}
     }
 
@@ -812,7 +827,7 @@ global void CleanFonts(void)
 
     for( i=0; i<sizeof(Fonts)/sizeof(*Fonts); ++i ) {
 	free(Fonts[i].File);
-	VideoFree(Fonts[i].Graphic);
+	VideoSaveFree(Fonts[i].Graphic);
 	Fonts[i].File=NULL;
 	Fonts[i].Graphic=NULL;
     }
