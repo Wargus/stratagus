@@ -111,6 +111,7 @@ local void MultiClientReady(void);
 local void MultiClientNotReady(void);
 local void MultiClientGemAction(Menuitem *mi);
 local void MultiClientCancel(void);
+local void MultiClientRCSAction(Menuitem *mi, int i);
 
 local void MultiGameCancel(void);
 local void MultiGameSetupInit(Menuitem *mi);	// master init
@@ -587,7 +588,7 @@ local Menuitem NetMultiClientMenuItems[] = {
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0, 0} } },
+	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, MultiClientRCSAction, 3, 2, 2, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
@@ -1865,40 +1866,47 @@ local void GameDrawFunc(Menuitem *mi)
     SetDefaultTextColors(nc, rc);
 }
 
-local void GameRCSAction(Menuitem *mi __attribute__((unused)), int i)
+local void GameRCSAction(Menuitem *mi, int i)
 {
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
 
-    GameSettings.Presets[0].Race = v[i];
-    ServerSetupState.Race[0] = i;
-    NetworkServerResyncClients();
-    						/// FIXME : Do similar for clients
+    if (mi->d.pulldown.curopt == i) {
+	GameSettings.Presets[0].Race = v[i];
+	ServerSetupState.Race[0] = i;
+	NetworkServerResyncClients();
+    }
 }
 
-local void GameRESAction(Menuitem *mi __attribute__((unused)), int i)
+local void GameRESAction(Menuitem *mi, int i)
 {
     int v[] = { SettingsResourcesMapDefault, SettingsResourcesLow,
 		SettingsResourcesMedium, SettingsResourcesHigh };
 
-    GameSettings.Resources = v[i];
-    ServerSetupState.ResOpt = i;
-    NetworkServerResyncClients();
+    if (!mi || mi->d.pulldown.curopt == i) {
+	GameSettings.Resources = v[i];
+	ServerSetupState.ResOpt = i;
+	NetworkServerResyncClients();
+    }
 }
 
-local void GameUNSAction(Menuitem *mi __attribute__((unused)), int i)
+local void GameUNSAction(Menuitem *mi, int i)
 {
-    GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
-    ServerSetupState.UnsOpt = i;
-    NetworkServerResyncClients();
+    if (!mi || mi->d.pulldown.curopt == i) {
+	GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
+	ServerSetupState.UnsOpt = i;
+	NetworkServerResyncClients();
+    }
 }
 
-local void GameTSSAction(Menuitem *mi __attribute__((unused)), int i)
+local void GameTSSAction(Menuitem *mi, int i)
 {
     int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
-    GameSettings.Terrain = v[i];
-    ServerSetupState.TssOpt = i;
-    NetworkServerResyncClients();
+    if (!mi || mi->d.pulldown.curopt == i) {
+	GameSettings.Terrain = v[i];
+	ServerSetupState.TssOpt = i;
+	NetworkServerResyncClients();
+    }
 }
 
 local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
@@ -1906,11 +1914,13 @@ local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
     GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
 
-local void MultiGameFWSAction(Menuitem *mi __attribute__((unused)), int i)
+local void MultiGameFWSAction(Menuitem *mi, int i)
 {
-    FlagRevealMap = i;
-    ServerSetupState.FwsOpt = i;
-    NetworkServerResyncClients();
+    if (!mi || mi->d.pulldown.curopt == i) {
+	FlagRevealMap = i;
+	ServerSetupState.FwsOpt = i;
+	NetworkServerResyncClients();
+    }
 }
 
 local void MultiGamePTSAction(Menuitem *mi, int o)
@@ -2153,6 +2163,17 @@ local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
     }
 }
 
+local void MultiClientRCSAction(Menuitem *mi, int i)
+{
+    int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
+
+    if (mi->d.pulldown.curopt == i) {
+	LocalSetupState.Race[NetLocalHostsSlot] = i;
+	GameSettings.Presets[NetLocalHostsSlot].Race = v[i];
+	MultiClientUpdate(0);
+    }
+}
+
 local void MultiClientReady(void)
 {
     NetMultiClientMenuItems[2].flags = MenuButtonDisabled;
@@ -2180,7 +2201,11 @@ global void NetClientCheckLocalState(void)
 	NetLocalState = ccs_changed;
 	return;
     }
-    /* ADD HERE  (FIXME: Race) */
+    if (LocalSetupState.Race[NetLocalHostsSlot] != ServerSetupState.Race[NetLocalHostsSlot]) {
+	NetLocalState = ccs_changed;
+	return;
+    }
+    /* ADD HERE */
 }
 
 global int NetClientSelectScenario(void)
