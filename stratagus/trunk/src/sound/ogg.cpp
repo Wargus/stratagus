@@ -52,6 +52,13 @@
 
 /**
 **	OGG vorbis read callback.
+**
+**	@param ptr		Pointer to memory to fill.
+**	@param size		Size of the element.
+**	@param nmemb		Number of elements to fill.
+**	@param user		User argument.
+**
+**	@return			The number of elements loaded.
 */
 local size_t OGG_read(void *ptr, size_t size, size_t nmemb, void *user)
 {
@@ -61,22 +68,38 @@ local size_t OGG_read(void *ptr, size_t size, size_t nmemb, void *user)
 
 /**
 **	OGG vorbis seek callback.
+**
+**	@param user		User argument.
+**	@param offset		Seek offset.
+**	@param whence		How to seek.
+**
+**	@return			Seek position, -1 if failure.
 */
-local int OGG_seek(void* user,int64_t offset,int whence)
+local int OGG_seek(void* user __attribute__((unused)),
+	int64_t offset __attribute__((unused)),
+	int whence __attribute__((unused)))
 {
     return -1;
 }
 
 /**
 **	OGG vorbis tell callback.
+**
+**	@param user		User argument.
+**
+**	@return			Current seek postition.
 */
-local long OGG_tell(void* user)
+local long OGG_tell(void* user __attribute__((unused)))
 {
     return -1;
 }
 
 /**
 **	OGG vorbis close callback.
+**
+**	@param user		User argument.
+**
+**	@return			Success status.
 */
 local int OGG_close(void* user)
 {

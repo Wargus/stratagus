@@ -412,28 +412,29 @@ typedef struct _selection_handling_ {
     unsigned char HowMany;	// number of sound played in this group
 } SelectionHandling;
 
-SelectionHandling SelectionHandler={{NULL,0},NULL,0};
+/// FIXME: docu
+SelectionHandling SelectionHandler;
 
-/*
-** Source registration
+/**
+**	Source registration
 */
 /// hash table used to store unit to channel mapping
 #ifdef USE_GLIB
 local GHashTable* UnitToChannel;
 #else
-local hashtable(int,61) UnitToChannel;
+//local hashtable(int,61) UnitToChannel;
 #endif
 
-
 /**
-** Distance to Volume Mapping
+**	Distance to Volume Mapping
 */
 local int ViewPointOffset;
 
 /**
 ** Number of free channels
 */
-local int HowManyFree(void) {
+local int HowManyFree(void)
+{
   int channel;
   int nb;
   nb=0;

@@ -10,12 +10,11 @@
 //
 /**@name depend.c	-	The units/upgrade dependencies */
 //
-//	(c) Copyright 2000,2001 by Vladi Belperchinov-Shabanski and Lutz Sammer
+//	(c) Copyright 2000-2002 by Vladi Belperchinov-Shabanski and Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -251,7 +250,7 @@ global void InitDependencies(void){}
 */
 global void SaveDependencies(FILE* file)
 {
-    int i;
+    unsigned u;
     const DependRule* node;
     const DependRule* rule;
     const DependRule* temp;
@@ -261,8 +260,8 @@ global void SaveDependencies(FILE* file)
 
     // Save all dependencies
 
-    for( i=0; i<sizeof(DependHash)/sizeof(*DependHash); ++i ) {
-	node=DependHash[i];
+    for( u=0; u<sizeof(DependHash)/sizeof(*DependHash); ++u ) {
+	node=DependHash[u];
 	while( node ) {			// all hash links
 	    fprintf(file,"(define-dependency '");
 	    switch( node->Type ) {
@@ -312,7 +311,7 @@ global void SaveDependencies(FILE* file)
 */
 global void CleanDependencies(void)
 {
-    int i;
+    unsigned u;
     DependRule* node;
     DependRule* rule;
     DependRule* temp;
@@ -320,8 +319,8 @@ global void CleanDependencies(void)
 
     // Free all dependencies
 
-    for( i=0; i<sizeof(DependHash)/sizeof(*DependHash); ++i ) {
-	node=DependHash[i];
+    for( u=0; u<sizeof(DependHash)/sizeof(*DependHash); ++u ) {
+	node=DependHash[u];
 	while( node ) {			// all hash links
 	    // All or cases
 
@@ -343,7 +342,7 @@ global void CleanDependencies(void)
 	    node=node->Next;
 	    free(temp);
 	}
-	DependHash[i]=NULL;
+	DependHash[u]=NULL;
     }
 }
 
@@ -415,7 +414,7 @@ local SCM CclDefineDependency(SCM list)
 **
 **	@param target	Unit type or upgrade.
 */
-local SCM CclGetDependency(SCM target)
+local SCM CclGetDependency(SCM target __attribute__((unused)))
 {
     DebugLevel0Fn("FIXME: write this %p\n",target);
 
@@ -429,7 +428,7 @@ local SCM CclGetDependency(SCM target)
 **
 **	@param target	Unit type or upgrade.
 */
-local SCM CclCheckDependency(SCM target)
+local SCM CclCheckDependency(SCM target __attribute__((unused)))
 {
     DebugLevel0Fn("FIXME: write this %p\n",target);
 

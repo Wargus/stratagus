@@ -100,8 +100,11 @@ local enum mad_flow MAD_read(void *user, struct mad_stream *stream)
 **	This is the output callback function. It is called after each frame of
 **	MPEG audio data has been completely decoded. The purpose of this
 **	callback is to output the decoded PCM audio.
+**
+**	@param user	User argument.
 */
-local enum mad_flow MAD_write(void *user, struct mad_header const *header,
+local enum mad_flow MAD_write(void *user,
+    struct mad_header const *header __attribute__((unused)),
     struct mad_pcm *pcm)
 {
     int i;
@@ -163,8 +166,9 @@ local enum mad_flow MAD_write(void *user, struct mad_header const *header,
 **	possible MAD_ERROR_* errors can be found in the mad.h (or
 **	libmad/stream.h) header file.
 */
-local enum mad_flow MAD_error(void *user, struct mad_stream *stream,
-    struct mad_frame *frame)
+local enum mad_flow MAD_error(void *user __attribute__((unused)),
+    struct mad_stream *stream,
+    struct mad_frame *frame __attribute((unused)))
 {
     fprintf(stderr, "decoding error 0x%04x (%s)\n",
 	stream->error, mad_stream_errorstr(stream));

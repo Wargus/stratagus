@@ -95,10 +95,6 @@ local void SetMusicPower(Menuitem *mi);
 local void SetCdPower(Menuitem *mi);
 local void SetFogOfWar(Menuitem *mi);
 
-global void SoundOptions(void);
-global void SpeedSettings(void);
-global void Preferences(void);
-
 local void EndScenarioRestart(void);
 local void EndScenarioSurrender(void);
 local void EndScenarioQuitMenu(void);
@@ -1836,7 +1832,7 @@ global void SoundOptions(void)
 #endif // with sound
 }
 
-local void SetMasterPower(Menuitem *mi)
+local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
 #ifdef USE_SDLA
@@ -1867,7 +1863,7 @@ local void SetMasterPower(Menuitem *mi)
     SoundOptions();
 }
 
-local void SetMusicPower(Menuitem *mi)
+local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
     SCM cb;
@@ -1892,7 +1888,7 @@ local void SetMusicPower(Menuitem *mi)
     SoundOptions();
 }
 
-local void SetCdPower(Menuitem *mi)
+local void SetCdPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef USE_SDLCD
     // Start Playing CD
@@ -1917,7 +1913,7 @@ local void SetCdPower(Menuitem *mi)
     SoundOptions();
 }
 
-local void SetFogOfWar(Menuitem *mi)
+local void SetFogOfWar(Menuitem *mi __attribute__((unused)))
 {
     if (!TheMap.NoFogOfWar) {
         TheMap.NoFogOfWar = 1;
@@ -2057,7 +2053,7 @@ local void FreeTips()
 /**
 **	Initialize the tips menu
 */
-local void InitTips(Menuitem *mi)
+local void InitTips(Menuitem *mi __attribute__((unused)))
 {
     int i;
     int line;
@@ -2119,15 +2115,16 @@ local void InitTips(Menuitem *mi)
 /**
 **	Show tips at startup gem callback
 */
-local void SetTips(Menuitem* mi)
+local void SetTips(Menuitem* mi __attribute__((unused)))
 {
-    if( TipsMenuItems[1].d.gem.state==MI_GSTATE_CHECKED )
+    if( TipsMenuItems[1].d.gem.state==MI_GSTATE_CHECKED ) {
 	ShowTips=1;
-    else
+    } else {
 	ShowTips=0;
+    }
 }
 
-local void NextTip()
+local void NextTip(void)
 {
     CurrentTip++;
     if( Tips[CurrentTip]==NULL )
@@ -3042,9 +3039,9 @@ local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
     }
 }
 
+#ifdef USE_LIBCDA
 local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 {
-#ifdef USE_LIBCDA
     mi--;
     
     switch (i) {
@@ -3081,8 +3078,13 @@ local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 	default:
 	    break;
     }
-#endif
 }
+#else
+local void ScenSelectHSCdVolumeAction(Menuitem *mi __attribute__((unused)),
+	int i __attribute((unused)))
+{
+}
+#endif
 
 local void ScenSelectFolder(void)
 {
