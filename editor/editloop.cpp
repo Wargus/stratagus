@@ -940,13 +940,6 @@ void EditorUpdateDisplay(void)
 	//
 	// Menu button
 	//
-	if (TheUI.MenuPanel.Graphic) {
-		VideoDrawSub(TheUI.MenuPanel.Graphic, 0, 0,
-			TheUI.MenuPanel.Graphic->Width,
-			TheUI.MenuPanel.Graphic->Height,
-			TheUI.MenuPanelX, TheUI.MenuPanelY);
-	}
-	// FIXME: Transparent flag, 3rd param, has been hardcoded.
 	DrawMenuButton(TheUI.MenuButton.Style,
 		(ButtonAreaUnderCursor == ButtonAreaMenu
 			&& ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
