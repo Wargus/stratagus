@@ -59,14 +59,14 @@ local int AddUpgradeModifier(int,int,int,int,int,int,int,int,int*,
 global const char UpgradeType[] = "upgrade";
 
 global Upgrade Upgrades[UpgradeMax];	/// The main user useable upgrades
-local int UpgradesCount;		/// Upgrades used
+local int NumUpgrades;			/// Number of upgrades used
 
     /// How many upgrades modifiers supported
-#define UPGRADE_MODIFIERS_MAX	1024
+#define UPGRADE_MODIFIERS_MAX	(UpgradeMax*4)
     /// Upgrades modifiers
 local UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
-    /// Upgrades modifiers used
-local int UpgradeModifiersCount;
+    /// Number of upgrades modifiers used
+local int NumUpgradeModifiers;
 
 #ifdef DOXYGEN				// no real code, only for document
 
@@ -79,7 +79,8 @@ local hashtable(Upgrade*,61) UpgradeHash;/// lookup table for upgrade names
 #endif
 
 /**
-**	W*rCr*ft number to internal upgrade name.
+**	Mapping of W*rCr*ft number to our internal upgrade symbol.
+**	The numbers are used in puds.
 */
 local char** UpgradeWcNames;
 
@@ -88,7 +89,8 @@ local char** UpgradeWcNames;
 ----------------------------------------------------------------------------*/
 
 /**
-**	Add an upgrade.
+**	Add an upgrade. If the ident didn't exist a new upgrade is created,
+**	if the ident is alreay used, the old value is overwritten.
 **
 **	@param ident	upgrade identifier.
 **	@param icon	icon displayed for this upgrade,
@@ -97,42 +99,42 @@ local char** UpgradeWcNames;
 **
 **	@return		upgrade id or -1 for error
 */
-local Upgrade* AddUpgrade(const char* ident,const char* icon,const int* costs)
+local Upgrade* AddUpgrade(const char* ident, const char* icon,
+    const int* costs)
 {
-    char buf[256];
     Upgrade* upgrade;
     Upgrade** tmp;
     int i;
 
-    //	Check for free slot.
+    //  Check for free slot.
 
-    if ( UpgradesCount == UpgradeMax ) {
+    if (NumUpgrades == UpgradeMax) {
 	DebugLevel0Fn("Upgrades limit reached.\n");
 	return NULL;
     }
+    //  Fill upgrade structure
 
-    //	Fill upgrade structure
-
-    if( (tmp=(Upgrade**)hash_find(UpgradeHash,(char*)ident)) && *tmp ) {
-	// FIXME: memory loose!
-	DebugLevel0Fn("Already defined upgrade `%s'\n",ident);
-	upgrade=*tmp;
+    if ((tmp = (Upgrade **) hash_find(UpgradeHash, (char *)ident)) && *tmp) {
+	DebugLevel0Fn("Already defined upgrade `%s'\n", ident);
+	upgrade = *tmp;
+	free(upgrade->Icon.Name);
     } else {
-	upgrade=Upgrades+UpgradesCount++;
+	upgrade = Upgrades + NumUpgrades++;
 	upgrade->OType = UpgradeType;
-	upgrade->Ident = strdup( ident );
-	*(Upgrade**)hash_add(UpgradeHash,upgrade->Ident)=upgrade;
+	upgrade->Ident = strdup(ident);
+	*(Upgrade **) hash_add(UpgradeHash, upgrade->Ident) = upgrade;
     }
 
-    if( icon ) {
+    if (icon) {
 	upgrade->Icon.Name = strdup(icon);
     } else {				// automatic generated icon-name
-	sprintf(buf,"icon-%s",ident+8);
-	upgrade->Icon.Name = strdup(buf);
+	upgrade->Icon.Name = malloc(strlen(ident) + 5 - 8 + 1);
+	strcpy(upgrade->Icon.Name,"icon-");
+	strcpy(upgrade->Icon.Name + 5,ident + 8);
     }
 
-    for( i=0; i<MaxCosts; ++i ) {
-	upgrade->Costs[i]=costs[i];
+    for (i = 0; i < MaxCosts; ++i) {
+	upgrade->Costs[i] = costs[i];
     }
 
     return upgrade;
@@ -167,7 +169,7 @@ global void InitUpgrades(void)
     //
     //	Resolve the icons.
     //
-    for( i=0; i<UpgradesCount; ++i ) {
+    for( i=0; i<NumUpgrades; ++i ) {
 	Upgrades[i].Icon.Icon=IconByIdent(Upgrades[i].Icon.Name);
     }
 }
@@ -178,27 +180,36 @@ global void InitUpgrades(void)
 global void CleanUpgrades(void)
 {
     int i;
-
-    DebugLevel0Fn("FIXME: not complete written\n");
+    char** cp;
 
     //
-    //	Free the upgrades.
+    //  Free the upgrades.
     //
-    for( i=0; i<UpgradesCount; ++i ) {
-	hash_del(UpgradeHash,Upgrades[i].Ident);
+    for (i = 0; i < NumUpgrades; ++i) {
+	hash_del(UpgradeHash, Upgrades[i].Ident);
 	free(Upgrades[i].Ident);
 	free(Upgrades[i].Icon.Name);
     }
-    UpgradesCount=0;
+    NumUpgrades = 0;
 
     //
-    //	Free the upgrade modifiers.
+    //  Free the upgrade modifiers.
     //
-    for( i=0; i<UpgradeModifiersCount; ++i ) {
+    for (i = 0; i < NumUpgradeModifiers; ++i) {
 	free(UpgradeModifiers[i]);
     }
+    NumUpgradeModifiers = 0;
 
-    UpgradeModifiersCount = 0;
+    //
+    //  Free mapping of original upgrade numbers in puds to our internal strings
+    //
+    if ((cp = UpgradeWcNames)) {
+	while (*cp) {
+	    free(*cp++);
+	}
+	free(UpgradeWcNames);
+	UpgradeWcNames = NULL;
+    }
 }
 
 /**
@@ -538,7 +549,7 @@ global void SaveUpgrades(FILE* file)
     //
     //	Save all upgrades
     //
-    for( i=0; i<UpgradesCount; ++i ) {
+    for( i=0; i<NumUpgrades; ++i ) {
 	fprintf(file,"(define-upgrade '%s 'icon '%s\n"
 		,Upgrades[i].Ident,Upgrades[i].Icon.Name);
 	fprintf(file,"  'costs #(");
@@ -553,7 +564,7 @@ global void SaveUpgrades(FILE* file)
     //
     //	Save all upgrade modifiers.
     //
-    for( i=0; i<UpgradeModifiersCount; ++i ) {
+    for( i=0; i<NumUpgradeModifiers; ++i ) {
 	fprintf(file,"(define-modifier '%s",
 		Upgrades[UpgradeModifiers[i]->UpgradeId].Ident);
 
@@ -646,7 +657,7 @@ global void SaveUpgrades(FILE* file)
     //
     //	Save the upgrades
     //
-    for( i=0; i<UpgradesCount; ++i ) {
+    for( i=0; i<NumUpgrades; ++i ) {
 	fprintf(file,"(define-allow '%s\t",Upgrades[i].Ident);
 	if( strlen(Upgrades[i].Ident)<9 ) {
 	    fprintf(file,"\t\t\t\"");
@@ -972,7 +983,16 @@ global void UpgradesCclRegister(void)
 --	Init/Done/Add functions
 ----------------------------------------------------------------------------*/
 
-// returns upgrade modifier id or -1 for error ( actually this id is useless, just error checking )
+/**
+**	Add a upgrade modifier.
+**
+**	@param uid		Upgrade identifier of the modifier.
+**	@param attack_range	Attack range modification.
+**	@param sight_range	Sight range modification.
+**	FIXME: continue docu!!
+**	@return			upgrade modifier id or -1 for error
+**			( actually this id is useless, just error checking )
+*/
 local int AddUpgradeModifierBase(int uid,int attack_range,int sight_range,
     int basic_damage,int piercing_damage,int armor,int speed,
     int hit_points,int* costs,const char* af_units,
@@ -1007,9 +1027,9 @@ local int AddUpgradeModifierBase(int uid,int attack_range,int sight_range,
 
     um->ConvertTo=convert_to;
 
-    UpgradeModifiers[UpgradeModifiersCount] = um;
+    UpgradeModifiers[NumUpgradeModifiers] = um;
 
-    return UpgradeModifiersCount++;
+    return NumUpgradeModifiers++;
 }
 
 
@@ -1117,10 +1137,10 @@ local int AddUpgradeModifier( int uid,
     }
     free(s1);
 
-    UpgradeModifiers[UpgradeModifiersCount] = um;
-    UpgradeModifiersCount++;
+    UpgradeModifiers[NumUpgradeModifiers] = um;
+    NumUpgradeModifiers++;
 
-    return UpgradeModifiersCount-1;
+    return NumUpgradeModifiers-1;
 }
 
 // this function is used for define `simple' upgrades
@@ -1373,7 +1393,7 @@ global void UpgradeAcquire( Player* player, const Upgrade* upgrade )
     player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
     AllowUpgradeId( player, id, 'R' );		// research done
 
-    for ( z = 0; z < UpgradeModifiersCount; z++ ) {
+    for ( z = 0; z < NumUpgradeModifiers; z++ ) {
 	if ( UpgradeModifiers[z]->UpgradeId == id ) {
 	    ApplyUpgradeModifier( player, UpgradeModifiers[z] );
 	}
