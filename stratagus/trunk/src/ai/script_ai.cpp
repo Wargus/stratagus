@@ -346,6 +346,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     aitype->Script=value;
+    // FIXME: Johns: is not needed ???
     //gc_protect(&aitype->Script);
 
 #if 0

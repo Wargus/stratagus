@@ -44,6 +44,7 @@
 #include "map.h"
 #include "ccl.h"
 #include "ui.h"
+#include "ai.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -63,6 +64,7 @@ global void CleanModules(void)
     CleanIcons();
     CleanCursors();
     CleanUserInterface();
+    CleanAi();
     CleanPlayers();
     CleanConstructions();
     CleanUnitTypes();
