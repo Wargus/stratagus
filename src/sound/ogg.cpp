@@ -292,7 +292,7 @@ global Sample* LoadOgg(const char* name,int flags)
     unsigned int magic[1];
     vorbis_info* info;
 
-    if (!(f = CLopen(name))) {
+    if (!(f = CLopen(name,CL_OPEN_READ))) {
 	fprintf(stderr, "Can't open file `%s'\n", name);
 	return NULL;
     }

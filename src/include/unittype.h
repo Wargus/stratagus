@@ -658,30 +658,30 @@ extern UnitType*UnitTypeOrcWall;		/// Orc wall
 extern UnitType*UnitTypeCritter;		/// Critter unit-type pointer
 extern UnitType*UnitTypeBerserker;		/// Berserker for berserker regeneration
 
-extern char** UnitTypeWcNames;		/// Mapping wc-number 2 symbol
+extern char** UnitTypeWcNames;			/// Mapping wc-number 2 symbol
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void UnitTypeCclRegister(void);	/// Register ccl features
+extern void UnitTypeCclRegister(void);		/// Register ccl features
 
 extern void UpdateStats(int reset_to_default);		/// Update unit stats
-extern void ParsePudUDTA(const char*,int); /// Parse pud udta table
-extern UnitType* UnitTypeByIdent(const char*);	/// Get unit-type by ident
-extern UnitType* UnitTypeByWcNum(unsigned);	/// Get unit-type by wc number
+extern void ParsePudUDTA(const char*,int); 		/// Parse pud udta table
+extern UnitType* UnitTypeByIdent(const char*);		/// Get unit-type by ident
+extern UnitType* UnitTypeByWcNum(unsigned);		/// Get unit-type by wc number
 
     /// Get the animations structure by ident
 extern Animations* AnimationsByIdent(const char* ident);
 
-extern void SaveUnitTypes(FILE* file);	/// Save the unit-type table
-extern UnitType* NewUnitTypeSlot(char*);/// Allocate an empty unit-type slot
+extern void SaveUnitTypes(CLFile* file);		/// Save the unit-type table
+extern UnitType* NewUnitTypeSlot(char*);		/// Allocate an empty unit-type slot
     /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const UnitType* type,int frame,int x,int y);
 
 extern void InitUnitTypes(int reset_player_stats);	/// Init unit-type table
-extern void LoadUnitTypes(void);	/// Load the unit-type data
-extern void CleanUnitTypes(void);	/// Cleanup unit-type module
+extern void LoadUnitTypes(void);			/// Load the unit-type data
+extern void CleanUnitTypes(void);			/// Cleanup unit-type module
 
 //@}
 

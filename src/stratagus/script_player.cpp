@@ -508,6 +508,7 @@ local SCM CclDefineRaceNames(SCM list)
     SCM value;
     int i;
 
+    PlayerRaces.Count=0;
     while( !gh_null_p(list) ) {
 	value=gh_car(list);
 	list=gh_cdr(list);

@@ -646,63 +646,63 @@ global void LoadDecorations(void)
 /**
 **	Save decorations.
 */
-global void SaveDecorations(FILE* file)
+global void SaveDecorations(CLFile* file)
 {
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: decorations $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: decorations $Id$\n\n");
 
-    fprintf(file,"(mana-sprite \"%s\"  %d %d  %d %d)\n",
+    CLprintf(file,"(mana-sprite \"%s\"  %d %d  %d %d)\n",
 	ManaSprite.File,ManaSprite.HotX,ManaSprite.HotY,
 	ManaSprite.Width,ManaSprite.Height);
-    fprintf(file,"(health-sprite \"%s\"  %d %d  %d %d)\n",
+    CLprintf(file,"(health-sprite \"%s\"  %d %d  %d %d)\n",
 	HealthSprite.File,HealthSprite.HotX,HealthSprite.HotY,
 	HealthSprite.Width,HealthSprite.Height);
-    fprintf(file,"(shadow-sprite \"%s\"  %d %d  %d %d)\n",
+    CLprintf(file,"(shadow-sprite \"%s\"  %d %d  %d %d)\n",
 	ShadowSprite.File,ShadowSprite.HotX,ShadowSprite.HotY,
 	ShadowSprite.Width,ShadowSprite.Height);
-    fprintf(file,"(spell-sprite \"%s\"  %d %d  %d %d)\n",
+    CLprintf(file,"(spell-sprite \"%s\"  %d %d  %d %d)\n",
 	SpellSprite.File,SpellSprite.HotX,SpellSprite.HotY,
 	SpellSprite.Width,SpellSprite.Height);
 
     // This belongs to the config and not save file
     if( ShowHealthBar ) {
-	fprintf(file,";(show-health-bar)\n");
+	CLprintf(file,";(show-health-bar)\n");
     }
     if( ShowHealthDot ) {
-	fprintf(file,";(show-health-dot)\n");
+	CLprintf(file,";(show-health-dot)\n");
     }
     if( ShowHealthHorizontal ) {
-	fprintf(file,";(show-health-horizontal)\n");
+	CLprintf(file,";(show-health-horizontal)\n");
     } else {
-	fprintf(file,";(show-health-vertical)\n");
+	CLprintf(file,";(show-health-vertical)\n");
     }
     if( ShowHealthBackgroundLong ) {
-	fprintf(file,";(show-health-blackground-long)\n");
+	CLprintf(file,";(show-health-blackground-long)\n");
     }
     if( ShowManaBar ) {
-	fprintf(file,";(show-mana-bar)\n");
+	CLprintf(file,";(show-mana-bar)\n");
     }
     if( ShowManaDot ) {
-	fprintf(file,";(show-mana-dot)\n");
+	CLprintf(file,";(show-mana-dot)\n");
     }
     if( ShowManaHorizontal ) {
-	fprintf(file,";(show-mana-horizontal)\n");
+	CLprintf(file,";(show-mana-horizontal)\n");
     } else {
-	fprintf(file,";(show-mana-vertical)\n");
+	CLprintf(file,";(show-mana-vertical)\n");
     }
     if( ShowManaBackgroundLong ) {
-	fprintf(file,";(show-mana-blackground-long)\n");
+	CLprintf(file,";(show-mana-blackground-long)\n");
     }
     if( ShowEnergySelectedOnly ) {
-	fprintf(file,";(show-energy-selected-only)\n");
+	CLprintf(file,";(show-energy-selected-only)\n");
     }
     if( ShowNoFull ) {
-	fprintf(file,";(show-no-full)\n");
+	CLprintf(file,";(show-no-full)\n");
     } else {
-	fprintf(file,";(show-full)\n");
+	CLprintf(file,";(show-full)\n");
     }
     if( DecorationOnTop ) {
-	fprintf(file,";(decoration-on-top)\n");
+	CLprintf(file,";(decoration-on-top)\n");
     }
 }
 
@@ -1914,7 +1914,7 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 	drawlevel2 = c2->Type->DrawLevel;
     }
     if( drawlevel1 == drawlevel2 ) {
-	return c1->Slot < c2->Slot ? -1 : 1;
+        return c1->Y*MaxMapWidth+c1->X < c2->Y*MaxMapWidth+c2->X ? -1 : 1;
     } else {
 	return drawlevel1 <= drawlevel2 ? -1 : 1;
     }

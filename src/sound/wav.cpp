@@ -153,7 +153,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
     int i;
     Sample* sample;
 
-    if (!(f = CLopen(name))) {
+    if (!(f = CLopen(name,CL_OPEN_READ))) {
 	printf("Can't open file `%s'\n", name);
 	return NULL;
     }

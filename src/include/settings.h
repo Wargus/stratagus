@@ -172,7 +172,7 @@ extern void CreditsCclRegister(void);
     /// Register CCL functions for objectives
 extern void ObjectivesCclRegister(void);
     /// Save the objectives
-extern void SaveObjectives(FILE *file);
+extern void SaveObjectives(CLFile *file);
     /// Create a game
 extern void CreateGame(char* filename,WorldMap* map);
     /// Init Setting to default values

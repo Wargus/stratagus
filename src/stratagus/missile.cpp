@@ -1517,96 +1517,96 @@ global int ViewPointDistanceToMissile(const Missile* missile)
 **
 **	@todo FIXME: CanHitOwner and FriendlyFire not supported!
 */
-global void SaveMissileTypes(FILE* file)
+global void SaveMissileTypes(CLFile * file)
 {
     MissileType* mtype;
     char** sp;
     int i;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: missile-types $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: missile-types $Id$\n\n");
 
     //
     //	Original number to internal missile-type name.
     //
-    i=fprintf(file,"(define-missiletype-wc-names");
+    i=CLprintf(file,"(define-missiletype-wc-names");
     for( sp=MissileTypeWcNames; *sp; ++sp ) {
 	if( i+strlen(*sp)>79 ) {
-	    i=fprintf(file,"\n ");
+	    i=CLprintf(file,"\n ");
 	}
-	i+=fprintf(file," '%s",*sp);
+	i+=CLprintf(file," '%s",*sp);
     }
-    fprintf(file,")\n\n");
+    CLprintf(file,")\n\n");
 
     //
     //	Missile types
     //
     for( mtype=MissileTypes; mtype<&MissileTypes[NumMissileTypes]; ++mtype ) {
-	fprintf(file,"(define-missile-type '%s\n ",mtype->Ident);
+	CLprintf(file,"(define-missile-type '%s\n ",mtype->Ident);
 	if( mtype->File ) {
-	    fprintf(file," 'file \"%s\"",mtype->File);
+	    CLprintf(file," 'file \"%s\"",mtype->File);
 	}
-	fprintf(file," 'size '(%d %d)",mtype->Width,mtype->Height);
+	CLprintf(file," 'size '(%d %d)",mtype->Width,mtype->Height);
 	if( mtype->Sprite ) {
-	    fprintf(file," 'frames %d",mtype->SpriteFrames);
+	    CLprintf(file," 'frames %d",mtype->SpriteFrames);
 	}
-	fprintf(file,"\n  'num-directions %d",mtype->NumDirections);
-	fprintf(file,"\n ");
+	CLprintf(file,"\n  'num-directions %d",mtype->NumDirections);
+	CLprintf(file,"\n ");
 	if( mtype->FiredSound.Name ) {
-	    fprintf(file," 'fired-sound \"%s\"",mtype->FiredSound.Name);
+	    CLprintf(file," 'fired-sound \"%s\"",mtype->FiredSound.Name);
 	}
 	if( mtype->ImpactSound.Name ) {
-	    fprintf(file," 'impact-sound \"%s\"",mtype->ImpactSound.Name);
+	    CLprintf(file," 'impact-sound \"%s\"",mtype->ImpactSound.Name);
 	}
 	if( mtype->FiredSound.Name || mtype->ImpactSound.Name ) {
-	    fprintf(file,"\n ");
+	    CLprintf(file,"\n ");
 	}
-	fprintf(file," 'class '%s",MissileClassNames[mtype->Class]);
-	fprintf(file," 'draw-level %d ",mtype->DrawLevel);
+	CLprintf(file," 'class '%s",MissileClassNames[mtype->Class]);
+	CLprintf(file," 'draw-level %d ",mtype->DrawLevel);
 	if( mtype->StartDelay ) {
-	    fprintf(file," 'delay %d",mtype->StartDelay);
+	    CLprintf(file," 'delay %d",mtype->StartDelay);
 	}
-	fprintf(file," 'sleep %d",mtype->Sleep);
-	fprintf(file," 'speed %d",mtype->Speed);
-	fprintf(file," 'range %d",mtype->Range);
+	CLprintf(file," 'sleep %d",mtype->Sleep);
+	CLprintf(file," 'speed %d",mtype->Speed);
+	CLprintf(file," 'range %d",mtype->Range);
 	if( mtype->ImpactMissile ) {
-	    fprintf(file,"\n  'impact-missile '%s",mtype->ImpactMissile->Ident);
+	    CLprintf(file,"\n  'impact-missile '%s",mtype->ImpactMissile->Ident);
 	}
-	fprintf(file,"\n ");
-	fprintf(file," 'can-hit-owner #%c",mtype->CanHitOwner ? 't' : 'f');
-	fprintf(file," 'friendly-fire #%c",mtype->FriendlyFire ? 't' : 'f');
-	fprintf(file,")\n");
+	CLprintf(file,"\n ");
+	CLprintf(file," 'can-hit-owner #%c",mtype->CanHitOwner ? 't' : 'f');
+	CLprintf(file," 'friendly-fire #%c",mtype->FriendlyFire ? 't' : 'f');
+	CLprintf(file,")\n");
     }
 }
 
 /**
 **	Save the state of a missile to file.
 */
-local void SaveMissile(const Missile* missile,FILE* file)
+local void SaveMissile(const Missile* missile,CLFile* file)
 {
     char* s1;
 
-    fprintf(file,"(missile 'type '%s",missile->Type->Ident);
-    fprintf(file," 'pos '(%d %d) 'goal '(%d %d)",
+    CLprintf(file,"(missile 'type '%s",missile->Type->Ident);
+    CLprintf(file," 'pos '(%d %d) 'goal '(%d %d)",
 	missile->X,missile->Y,missile->DX,missile->DY);
-    fprintf(file," '%s", missile->Local ? "local" : "global");
-    fprintf(file,"\n  'frame %d 'state %d 'wait %d 'delay %d\n ",
+    CLprintf(file," '%s", missile->Local ? "local" : "global");
+    CLprintf(file,"\n  'frame %d 'state %d 'wait %d 'delay %d\n ",
 	missile->SpriteFrame,missile->State,missile->Wait,missile->Delay);
     if( missile->SourceUnit ) {
-	fprintf(file," 'source '%s",s1=UnitReference(missile->SourceUnit));
+	CLprintf(file," 'source '%s",s1=UnitReference(missile->SourceUnit));
 	free(s1);
     }
     if( missile->TargetUnit ) {
-	fprintf(file," 'target '%s",s1=UnitReference(missile->TargetUnit));
+	CLprintf(file," 'target '%s",s1=UnitReference(missile->TargetUnit));
 	free(s1);
     }
-    fprintf(file," 'damage %d",missile->Damage);
+    CLprintf(file," 'damage %d",missile->Damage);
     // FIXME: need symbolic names for controller
-    fprintf(file," 'ttl %d 'controller %ld",
+    CLprintf(file," 'ttl %d 'controller %ld",
 	missile->TTL,(long)missile->Controller);
-    fprintf(file," 'data '(%d %d %d %d %d)",
+    CLprintf(file," 'data '(%d %d %d %d %d)",
 	missile->D,missile->Dx,missile->Dy,missile->Xstep,missile->Ystep);
-    fprintf(file,")\n");
+    CLprintf(file,")\n");
 }
 
 /**
@@ -1614,12 +1614,12 @@ local void SaveMissile(const Missile* missile,FILE* file)
 **
 **	@param file	Output file.
 */
-global void SaveMissiles(FILE* file)
+global void SaveMissiles(CLFile* file)
 {
     Missile* const* missiles;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: missiles $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: missiles $Id$\n\n");
 
     for( missiles=GlobalMissiles; *missiles; ++missiles ) {
 	SaveMissile(*missiles,file);

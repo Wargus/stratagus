@@ -106,18 +106,25 @@ enum {
     CLF_TYPE_ZZIP,			/// zzip file handle
 };
 
+#define CL_OPEN_READ 0x1
+#define CL_OPEN_WRITE 0x2
+#define CL_WRITE_GZ 0x4
+#define CL_WRITE_BZ2 0x8
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
     ///  Library file open
-extern CLFile *CLopen(const char *fn);
+extern CLFile *CLopen(const char *fn,long flags);
     ///  Library file close
 extern int CLclose(CLFile *file);
     ///  Library file read
 extern int CLread(CLFile *file, void *buf, size_t len);
     ///  Library file seek
 extern int CLseek(CLFile *file, long offset, int whence);
+    ///  Library file write
+extern int CLprintf(CLFile *file, char *format, ...);
 
 
 #endif	// USE_ZLIB || USE_BZ2LIB || USE_ZZIPLIB

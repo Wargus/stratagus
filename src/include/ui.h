@@ -335,7 +335,7 @@ extern int SpeedMouseScroll;		/// Mouse Scrolling Speed, in Frames
 
 extern void InitUserInterface(const char*);	/// initialize the ui
 extern void LoadUserInterface(void);		/// load ui graphics
-extern void SaveUserInterface(FILE*);		/// save the ui state
+extern void SaveUserInterface(CLFile*);		/// save the ui state
 extern void CleanUI(UI*);			/// clean up a ui
 extern void CleanUserInterface(void);		/// clean up the ui module
 extern void UserInterfaceCclRegister(void);	/// register ccl features

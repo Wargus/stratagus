@@ -530,9 +530,9 @@ extern void MissileActions(void);
 extern int ViewPointDistanceToMissile(const Missile*);
 
     /// Save missile-types
-extern void SaveMissileTypes(FILE*);
+extern void SaveMissileTypes(CLFile *);
     /// Save missiles
-extern void SaveMissiles(FILE*);
+extern void SaveMissiles(CLFile*);
 
     /// Initialize missile-types
 extern void InitMissileTypes(void);

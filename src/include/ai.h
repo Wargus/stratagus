@@ -43,20 +43,20 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern int AiSleepCycles;		/// Ai sleeps # cycles
-extern int AiTimeFactor;		/// Adjust the AI build times
-extern int AiCostFactor;		/// Adjust the AI costs
+extern int AiSleepCycles;			/// Ai sleeps # cycles
+extern int AiTimeFactor;			/// Adjust the AI build times
+extern int AiCostFactor;			/// Adjust the AI costs
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void AiEachCycle(Player* player);/// Called each game cycle
-extern void AiEachSecond(Player* player);/// Called each second
+extern void AiEachCycle(Player* player);	/// Called each game cycle
+extern void AiEachSecond(Player* player);	/// Called each second
 
-extern void AiInit(Player* player);	/// Init AI for this player
-extern void CleanAi(void);		/// Cleanup the AI module
-extern void SaveAi(FILE* file);		/// Save the AI state
+extern void AiInit(Player* player);		/// Init AI for this player
+extern void CleanAi(void);			/// Cleanup the AI module
+extern void SaveAi(CLFile*file);		/// Save the AI state
 
 extern void AiCclRegister(void);	/// Register ccl features
 

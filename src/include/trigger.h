@@ -74,7 +74,7 @@ extern const UnitType* TriggerGetUnitType(SCM);	/// get the unit-type
 extern void TriggersEachCycle(void);	/// test triggers
 
 extern void TriggerCclRegister(void);	/// Register ccl features
-extern void SaveTriggers(FILE*);	/// Save the trigger module
+extern void SaveTriggers(CLFile*);	/// Save the trigger module
 extern void InitTriggers(void);		/// Setup triggers
 extern void CleanTriggers(void);	/// Cleanup the trigger module
 

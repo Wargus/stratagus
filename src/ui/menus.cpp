@@ -896,7 +896,17 @@ local void SaveGameOk(void)
 	strcpy(TempPathBuf, SaveDir);
 	strcat(TempPathBuf, "/");
 	strncat(TempPathBuf, name, nameLength);
-	if (strstr(TempPathBuf, ".sav") == NULL) {
+
+	// Strip .gz extension.
+	if (!strcmp(TempPathBuf+strlen(TempPathBuf)-3,".gz")) {
+	    TempPathBuf[strlen(TempPathBuf)-3]=0;
+	}
+	// Strip .bz2 extension.
+	if (!strcmp(TempPathBuf+strlen(TempPathBuf)-4,".bz2")) {
+	    TempPathBuf[strlen(TempPathBuf)-4]=0;
+	}
+	// Add .sav if not already there.
+	if (strcmp(TempPathBuf+strlen(TempPathBuf)-4,".sav")) {
 	    strcat(TempPathBuf, ".sav");
 	}
 

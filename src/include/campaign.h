@@ -37,6 +37,8 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include "iolib.h"
+
 /*----------------------------------------------------------------------------
 --	Declaration
 ----------------------------------------------------------------------------*/
@@ -157,7 +159,7 @@ extern void PlayCampaign(const char* name);
 extern char* NextChapter(void);
 
 extern void CampaignCclRegister(void);	/// Register ccl features
-extern void SaveCampaign(FILE*);	/// Save the campaign module
+extern void SaveCampaign(CLFile*);	/// Save the campaign module
 extern void CleanCampaign(void);	/// Cleanup the campaign module
 
 //@}

@@ -168,7 +168,7 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 
     ticks=GetTicks();
     DebugLevel0Fn("Trying `%s'\n" _C_ name);
-    if (!(f = CLopen(name))) {
+    if (!(f = CLopen(name,CL_OPEN_READ))) {
 	printf("Can't open file `%s'\n", name);
 	return NULL;
     }

@@ -479,7 +479,7 @@ extern void InitPlayers(void);
     /// Clean up players
 extern void CleanPlayers(void);
     /// Save players
-extern void SavePlayers(FILE*);
+extern void SavePlayers(CLFile*);
 
     /// Create a new player
 extern void CreatePlayer(int type);

@@ -169,7 +169,7 @@ extern void InitConstructions(void);
     ///	Load the graphics for constructions
 extern void LoadConstructions(void);
     /// Save current construction state
-extern void SaveConstructions(FILE* file);
+extern void SaveConstructions(CLFile* file);
     ///	Clean up the constructions module
 extern void CleanConstructions(void);
     /// Get construction by wc number
