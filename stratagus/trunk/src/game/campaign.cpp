@@ -347,6 +347,7 @@ local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 			    value);
 			lua_error(l);
 		    }
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "text")) {
 		    lua_rawgeti(l, -1, k + 1);
 		    (*text)->Text = strdup(LuaToString(l, -1));
@@ -599,7 +600,7 @@ local int CclDefineCampaign(lua_State* l)
 
 		if (!strcmp(value, "show-picture")) {
 		    lua_rawgeti(l, j + 1, k + 1);
-//		    ParseShowPicture(l, chapter);
+		    ParseShowPicture(l, chapter);
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "play-movie")) {
 		    DebugLevel0Fn("FIXME: not supported\n");
@@ -706,7 +707,7 @@ local SCM CclBriefing(SCM list)
 
 	if (gh_eq_p(value, gh_symbol2scm("type"))) {
 	    if (!gh_eq_p(gh_car(list), gh_symbol2scm("wc2")) &&
-		!gh_eq_p(gh_car(list), gh_symbol2scm("sc")) ) {
+		    !gh_eq_p(gh_car(list), gh_symbol2scm("sc")) ) {
 	       // FIXME: this leaves a half initialized briefing
 	       errl("Unsupported briefing type", value);
 	    }
@@ -741,7 +742,7 @@ local SCM CclBriefing(SCM list)
 	    ++voice;
 	} else if (gh_eq_p(value, gh_symbol2scm("objective"))) {
 	    if (objective == MAX_OBJECTIVES) {
-	       errl("too much objectives", value);
+	       errl("too many objectives", value);
 	    }
 	    if (GameIntro.Objectives[objective]) {
 		free(GameIntro.Objectives[objective]);
@@ -758,6 +759,72 @@ local SCM CclBriefing(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclBriefing(lua_State* l)
+{
+    const char* value;
+    int voice;
+    int objective;
+    int args;
+    int j;
+
+    voice = objective = 0;
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	value = LuaToString(l, j + 1);
+	++j;
+
+	if (!strcmp(value, "type")) {
+	    value = LuaToString(l, j + 1);
+	    if (strcmp(value, "wc2") && strcmp(value, "sc")) {
+	       lua_pushfstring(l, "Unsupported briefing type: %s", value);
+	       lua_error(l);
+	    }
+	} else if (!strcmp(value, "title")) {
+	    if (GameIntro.Title) {
+		free(GameIntro.Title);
+	    }
+	    GameIntro.Title = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "background")) {
+	    if (GameIntro.Background) {
+		free(GameIntro.Background);
+	    }
+	    GameIntro.Background = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "text")) {
+	    if (GameIntro.TextFile) {
+		free(GameIntro.TextFile);
+	    }
+	    GameIntro.TextFile = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "voice")) {
+	    if (voice == MAX_BRIEFING_VOICES) {
+	       lua_pushfstring(l, "too many voices");
+	       lua_error(l);
+	    }
+	    if (GameIntro.VoiceFile[voice]) {
+		free(GameIntro.VoiceFile[voice]);
+	    }
+	    GameIntro.VoiceFile[voice] = strdup(LuaToString(l, j + 1));
+	    ++voice;
+	} else if (!strcmp(value, "objective")) {
+	    if (objective == MAX_OBJECTIVES) {
+	       lua_pushfstring(l, "too many objectives");
+	       lua_error(l);
+	    }
+	    if (GameIntro.Objectives[objective]) {
+		free(GameIntro.Objectives[objective]);
+	    }
+	    GameIntro.Objectives[objective] = strdup(LuaToString(l, j + 1));
+	    ++objective;
+	} else {
+	   lua_pushfstring(l, "Unsupported tag: %s", value);
+	   lua_error(l);
+	}
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -772,7 +839,7 @@ global void CampaignCclRegister(void)
 #elif defined(USE_LUA)
     lua_register(Lua, "DefineCampaign", CclDefineCampaign);
     lua_register(Lua, "SetCurrentChapter", CclSetCurrentChapter);
-//    lua_register(Lua, "Briefing", CclBriefing);
+    lua_register(Lua, "Briefing", CclBriefing);
 #endif
 }
 
