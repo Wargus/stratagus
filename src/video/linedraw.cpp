@@ -669,19 +669,19 @@ global void VideoDrawLineClip(SDL_Color color, int sx, int sy, int dx, int dy)
     int h;
 
     // FIXME: messy
-    if (dx > sx && dy > sy) {
+    if (dx >= sx && dy >= sy) {
 	w = dx - sx;
 	h = dy - sy;
 	CLIP_RECTANGLE(sx, sy, w, h);
 	dx = sx + w;
 	dy = sy + h;
-    } else if (dx > sx && dy < sy) {
+    } else if (dx >= sx && dy < sy) {
 	w = dx - sx;
 	h = sy - dy;
 	CLIP_RECTANGLE(sx, dy, w, h);
 	dx = sx + w;
 	sy = dy + h;
-    } else if (dx < sx && dy > sy) {
+    } else if (dx < sx && dy >= sy) {
 	w = sx - dx;
 	h = dy - sy;
 	CLIP_RECTANGLE(dx, sy, w, h);
