@@ -270,7 +270,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     matrix[x+y*w]=1;				// mark start point
 
     //
-    //	Pop a point from stack, push all neightbors which could be entered.
+    //	Pop a point from stack, push all neighbours which could be entered.
     //
     for( ;; ) {
 	while( rp!=ep ) {
@@ -284,6 +284,9 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 		    continue;
 		}
 
+		DebugLevel3Fn("Checking to build %s(%s) at %d,%d\n"
+			_C_ type->Ident _C_ type->Name _C_ x _C_ y);
+
 		//
 		//	Look if we can build here.
 		//
@@ -292,6 +295,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 		    *dx=x;
 		    *dy=y;
 		    free(points);
+		    DebugLevel3Fn("Found a building place!!!\n");
 		    return 1;
 		}
 
@@ -569,7 +573,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 		//	Look if there is wood
 		//
 		if ( ForestOnMap(x,y) ) {
-		    if( AiFindBuildingPlace2(worker,type,x,y,dx,dy,0) ) {
+		    if( AiFindBuildingPlace2(worker,type,x,y,dx,dy,1) ) {
 			free(morg);
 			free(points);
 			return 1;
@@ -626,7 +630,9 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
     //
     //	Find a good place for a new hall
     //
+    DebugLevel3Fn("building is  a %s(%s)\n" _C_ type->Ident _C_ type->Name);
     if( type->CanStore[GoldCost] && AiFindHallPlace(worker,type,dx,dy) ) {
+    	DebugLevel3Fn("found for town hall (%s,%s)\n" _C_ type->Ident _C_ type->Name);
 	return 1;
     }
 

@@ -130,6 +130,7 @@ local int AiCheckFood(const PlayerAi* pai,const UnitType* type)
     int remaining;
     const AiBuildQueue* queue;
 
+    DebugLevel3Fn(" for player %d\n" _C_ pai->Player->Player);
     //
     //	Count food supplies under construction.
     //
@@ -141,13 +142,14 @@ local int AiCheckFood(const PlayerAi* pai,const UnitType* type)
 	    remaining+=queue->Made*queue->Type->Supply;
 	}
     }
-    DebugLevel3Fn("Remain %d\n" _C_ remaining);
+    DebugLevel3Fn("Remain %d" _C_ remaining);
     //
     //	We are already out of food.
     //
     remaining+=pai->Player->Food-pai->Player->NumFoodUnits-type->Demand;
     DebugLevel3Fn("-Demand %d\n" _C_ remaining);
     if( remaining<0 ) {
+	DebugLevel3Fn(" player %d needs more food\n" _C_ pai->Player->Player);
 	return 0;
     }
 
@@ -159,6 +161,7 @@ local int AiCheckFood(const PlayerAi* pai,const UnitType* type)
 	    DebugLevel3Fn("Trained %d remain %d\n"
 		_C_ queue->Made _C_ remaining);
 	    if( (remaining-=queue->Made*queue->Type->Demand)<0 ) {
+		DebugLevel3Fn(" player %d needs more food\n" _C_ pai->Player->Player);
 		return 0;
 	    }
 	}
@@ -271,8 +274,13 @@ local int AiBuildBuilding(const UnitType* type,UnitType* building)
     nunits = FindPlayerUnitsByType(AiPlayer->Player,type,table);
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
-	if (unit->Orders[0].Action != UnitActionBuild
-		&& unit->Orders[0].Action != UnitActionRepair ) {
+	for (x=0;x<unit->OrderCount;x++) {
+	    if (unit->Orders[x].Action == UnitActionBuild
+		    || unit->Orders[x].Action == UnitActionRepair ) {
+		break;
+	    }
+	}
+	if (x==unit->OrderCount) {
 	    table[num++] = unit;
 	}
     }
@@ -289,7 +297,7 @@ local int AiBuildBuilding(const UnitType* type,UnitType* building)
 	    continue;
 	}
 
-	DebugLevel3Fn("Have a building place %d,%d :)\n" _C_ x _C_ y);
+	DebugLevel3Fn("Have a building place %d,%d for %s:)\n" _C_ x _C_ y _C_ building->Name);
 
 	CommandBuildBuilding(unit, x, y, building,FlushCommands);
 
@@ -329,7 +337,7 @@ local void AiRequestFarms(void)
 	    return;
 	}
 
-	DebugLevel3Fn("Must build: %s " _C_ type->Ident);
+	DebugLevel3Fn("Must build: %s\n" _C_ type->Ident);
 	//
 	//	Check if resources available.
 	//
@@ -411,6 +419,8 @@ local int AiMakeUnit(UnitType* type)
     AiUnitTypeTable* const* tablep;
     const AiUnitTypeTable* table;
 
+    DebugLevel3Fn(":%s\n" _C_ type->Name);
+
     //
     //	Check if we have a place for building or an unit to build.
     //
@@ -438,6 +448,7 @@ local int AiMakeUnit(UnitType* type)
 	//	The type for builder/trainer is available
 	//
 	if( unit_count[table->Table[i]->Type] ) {
+	    DebugLevel3("Found a builder for a %s.\n" _C_ type->ident);
 	    if( type->Building ) {
 		if( AiBuildBuilding(table->Table[i],type) ) {
 		    return 1;
@@ -660,6 +671,7 @@ local void AiCheckingWork(void)
 
     // Food has the highest priority
     if( AiPlayer->NeedFood ) {
+	DebugLevel3Fn("player %d needs food.\n" _C_ AiPlayer->Player->Player);
 	if( !(AiPlayer->UnitTypeBuilded && AiPlayer->UnitTypeBuilded->Type->Supply) ) {
 	    AiPlayer->NeedFood=0;
 	    AiRequestFarms();
@@ -672,7 +684,7 @@ local void AiCheckingWork(void)
     for( queue=AiPlayer->UnitTypeBuilded; queue; queue=queue->Next ) {
 	if( queue->Want>queue->Made ) {
 	    type=queue->Type;
-	    DebugLevel3Fn("Must build: %s " _C_ type->Ident);
+	    DebugLevel3Fn("Must build: %s\n" _C_ type->Ident);
 
 	    //
 	    //	FIXME: must check if requirements are fulfilled.
@@ -692,7 +704,6 @@ local void AiCheckingWork(void)
 	    if( !type->Building ) {
 		// Count future
 		if(  !AiCheckFood(AiPlayer,type) ) {
-		    DebugLevel3Fn("Need food\n");
 		    AiPlayer->NeedFood=1;
 		    AiRequestFarms();
 		}
@@ -924,7 +935,7 @@ local int AiMineGold(Unit* unit)
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     dest = AiFindGoldMine(unit);
     if (!dest) {
-	DebugLevel0Fn("goldmine not reachable by %s(%d,%d)\n"
+	DebugLevel3Fn("goldmine not reachable by %s(%d,%d)\n"
 		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 	return 0;
     }
@@ -1172,7 +1183,7 @@ local int AiHarvest(Unit * unit)
 	ep=wp;
     }
 
-    DebugLevel0Fn("no wood in range by %s(%d,%d)\n"
+    DebugLevel3Fn("no wood in range by %s(%d,%d)\n"
 	    _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 
     free(points);
@@ -1191,7 +1202,7 @@ local int AiHaulOil(Unit * unit)
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     dest = FindResource(unit->Player, unit->X, unit->Y ,unit->Type->ResourceHarvested);
     if (!dest) {
-	DebugLevel0Fn("oil platform not reachable by %s(%d,%d)\n"
+	DebugLevel3Fn("oil platform not reachable by %s(%d,%d)\n"
 		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 	return 0;
     }
@@ -1269,7 +1280,8 @@ local void AiCollectResources(void)
 	//
 	//  Send workers with resources back home.
 	//
-	if (unit->Value) {
+	if (unit->Value||unit->Type==UnitTypeHumanWorkerWithWood
+		||unit->Type==UnitTypeOrcWorkerWithWood) {
 	    units_with_resource[num_units_with_resource[c]++][c]=unit;
 	    if (unit->Orders[0].Action == UnitActionStill
 		    && unit->OrderCount==1 ) {
@@ -1325,8 +1337,8 @@ local void AiCollectResources(void)
 	total+=num_units_assigned[c]+num_units_with_resource[c];
 	DebugLevel3Fn("Assigned %d = %d\n" _C_ c _C_ num_units_assigned[c]);
 	DebugLevel3Fn("Resource %d = %d\n" _C_ c _C_ num_units_with_resource[c]);
+	DebugLevel3Fn("Unassigned %d of total %d\n" _C_ num_units_unassigned[c] _C_ total);
     }
-    DebugLevel3Fn("Unassigned %d of total %d\n" _C_ num_units_unassigned _C_ total);
 
     //
     //	Reassign workers
@@ -1636,13 +1648,13 @@ local void AiCheckRepair(void)
     for( i=k; i<n; ++i ) {
 	unit=AiPlayer->Player->Units[i];
 	repair_flag=1;
-	// Unit defekt?
+	// Unit damaged?
 	if( unit->Type->Building
 		&& unit->Orders[0].Action!=UnitActionBuilded
 		&& unit->Orders[0].Action!=UnitActionUpgradeTo
 		&& unit->HP<unit->Stats->HitPoints ) {
 
-	    DebugLevel0Fn("Have building to repair %d(%s)\n" _C_
+	    DebugLevel2Fn("Have building to repair %d(%s)\n" _C_
 		    UnitNumber(unit) _C_ unit->Type->Ident);
 
 	    //
@@ -1716,7 +1728,7 @@ global void AiResourceManager(void)
     //
     if( !AiPlayer->NeedFood
 	    && AiPlayer->Player->NumFoodUnits==AiPlayer->Player->Food ) {
-	DebugLevel1Fn("Farm in advance request\n");
+	DebugLevel3Fn("Farm in advance request\n");
 	AiRequestFarms();
     }
     //

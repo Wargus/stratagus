@@ -249,6 +249,7 @@ local int AiFindFreeWorkers(Unit ** table)
     int nunits;
     int num;
     int i;
+    int x;
     Unit *unit;
 
     nunits = FindPlayerUnitsByType(AiPlayer->Player,
@@ -259,9 +260,13 @@ local int AiFindFreeWorkers(Unit ** table)
     //
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
-	if (unit->Orders[0].Action != UnitActionBuild
-		&& (unit->OrderCount==1
-		    || unit->Orders[1].Action != UnitActionBuild) ) {
+	for (x=0;x<unit->OrderCount;x++) {
+	    if (unit->Orders[x].Action == UnitActionBuild ||
+		    unit->Orders[x].Action == UnitActionRepair ) {
+		break;
+	    }
+	}
+	if (x==unit->OrderCount) {
 	    table[num++] = unit;
 	}
     }
@@ -915,7 +920,7 @@ local int AiHarvest(Unit * unit)
 	}
 	++addy;
     }
-    DebugLevel0Fn("no wood reachable\n");
+    DebugLevel3Fn("no wood reachable\n");
     return 0;
 }
 
@@ -1185,6 +1190,7 @@ local int AiNeedFood(const UnitType * type)
 	return 1;
     }
     if (!PlayerCheckFood(player, type)) {
+	DebugLevel3Fn("%d needs food.\n" _C_ AiPLayer->Player->Player);
 	// already building new food (farm or hall)
 	if (AiBuildingUnitType(UnitTypeByWcNum(AiChooseRace(UnitFarm)))
 		|| AiBuildingUnitType(
@@ -1267,7 +1273,7 @@ local int AiNeedBuilding(int type)
 */
 local int AiCommandBuild(int type, int number, int action)
 {
-    DebugLevel3Fn("%s(%d), %d, %d\n" _C_
+    DebugLevel0Fn("%s(%d), %d, %d\n" _C_
 	    UnitTypeByWcNum(type)->Ident _C_ type _C_ number _C_ action);
 
     if (number == 0)
@@ -1431,7 +1437,7 @@ global void AiUnitKilled(Unit* unit)
 */
 global void AiNeedMoreFarms(Unit* unit,const UnitType* what)
 {
-    DebugLevel1Fn("%d: %d(%s) need more farms %s at %d,%d\n" _C_
+    DebugLevel3Fn("%d: %d(%s) need more farms %s at %d,%d\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 

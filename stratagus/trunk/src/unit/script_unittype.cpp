@@ -643,11 +643,12 @@ local SCM CclDefineUnitStats(SCM list)
 global UnitType* CclGetUnitType(SCM ptr)
 {
     char* str;
+    UnitType* type;
 
     // Be kind allow also strings or symbols
     if( (str = CclConvertToString(ptr)) != NULL )  {
         DebugLevel3("CclGetUnitType: %s\n"_C_ str);
-        UnitType* type = UnitTypeByIdent(str);
+        type = UnitTypeByIdent(str);
         free(str);
         return type;
     } else if (CclGetSmobType(ptr) == SiodUnitTypeTag)  {

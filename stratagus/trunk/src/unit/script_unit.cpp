@@ -344,20 +344,8 @@ local void CclParseBuilded(Unit* unit, SCM list)
 	    ++UnitSlots[slot]->Refs;
 	    free(str);
 	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("sum"))) {
-	    unit->Data.Builded.Sum = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("add"))) {
-	    unit->Data.Builded.Add = gh_scm2int(gh_car(list));
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("val"))) {
-	    unit->Data.Builded.Val = gh_scm2int(gh_car(list));
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("sub"))) {
-	    unit->Data.Builded.Sub = gh_scm2int(gh_car(list));
-	    value = gh_car(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("progress"))) {
+	    unit->Data.Builded.Progress = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("cancel"))) {
 	    unit->Data.Builded.Cancel = 1;

@@ -130,7 +130,7 @@ local int SelectionColor(const Unit* unit)
 
     // If building mark all own buildings
     if( CursorBuilding && unit->Type->Building && unit->Player==ThisPlayer ) {
-	return ColorGray;
+	return ColorGray;	
     }
     return -1;
 }
@@ -145,16 +145,21 @@ global void DrawUnitSelection(const Unit* unit)
     int color;
     int x;
     int y;
+    UnitType* type;
+
+    type=unit->Type;
     
     color=SelectionColor(unit);
     if (color<0) {
 	return;
     }
     x=Map2ViewportX(CurrentViewport,unit->X)+unit->IX
-	+unit->Type->TileWidth*TileSizeX/2-unit->Type->BoxWidth/2;
+	+type->TileWidth*TileSizeX/2-type->BoxWidth/2
+	-(type->Width-VideoGraphicWidth(type->Sprite))/2;
     y=Map2ViewportY(CurrentViewport,unit->Y)+unit->IY
-	+unit->Type->TileHeight*TileSizeY/2-unit->Type->BoxHeight/2;
-    DrawSelection(color,x,y,x+unit->Type->BoxWidth,y+unit->Type->BoxHeight);
+	+type->TileHeight*TileSizeY/2-type->BoxHeight/2
+	-(type->Height-VideoGraphicHeight(type->Sprite))/2;
+    DrawSelection(color,x,y,x+type->BoxWidth,y+type->BoxHeight);
 }
 
 /**
@@ -815,40 +820,51 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		if( ShowHealthBackgroundLong ) {
 #if defined(DEBUG)
 		    // Johns: I want to see fast moving.
-		    //VideoFillRectangleClip(unit->Data.Move.Fast
+		    // VideoFillRectangleClip(unit->Data.Move.Fast
 		    // Johns: I want to see the AI active flag
-		    VideoFillRectangleClip(unit->Active
-			    ? ColorBlack : ColorWhite
-#else
-		    VideoFillRectangleClip(ColorBlack
-#endif
+		    VideoFillRectangleClip(unit->Active? ColorBlack : ColorWhite
 			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
 			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
 				+type->BoxHeight+1
 			,type->BoxHeight+1
 			,5);
+#else
+		    VideoFillRectangleClip(ColorBlack
+			 ,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+1
+			,type->BoxHeight+1
+			,5);
+
+#endif
 		} else {
 #if defined(DEBUG)
 		    // Johns: I want to see fast moving.
-		    VideoFillRectangleClip(unit->Data.Move.Fast
-			    ? ColorBlack : ColorWhite
-#else
-		    VideoFillRectangleClip(ColorBlack
-#endif
+		    VideoFillRectangleClip(unit->Data.Move.Fast?ColorBlack:ColorWhite
 			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
 			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
 				+type->BoxHeight+1
 			,((f*type->BoxHeight)/100)+1
 			,5);
+
+#else
+		    VideoFillRectangleClip(ColorBlack
+			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+1
+			,((f*type->BoxHeight)/100)+1
+			,5);
+#endif
 		}
-              w = (f*type->BoxHeight)/100-1;
-              if ( w > 0 ) // Prevents -1 turning into unsigned int
+                w = (f*type->BoxHeight)/100-1;
+                if ( w > 0 ) { // Prevents -1 turning into unsigned int
 		VideoFillRectangleClip(color
 		    ,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)+1
 		    ,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
 			    +type->BoxHeight+2
 		    ,w
 		    ,3);
+		}
 	    }  else  {
 		VideoFillRectangleClip(color
 		    ,x+(type->TileWidth*TileSizeX
@@ -1330,28 +1346,41 @@ global void DrawPath(const Unit* unit)
 }
 
 /**
-**	Get the location of an order.
+**	Get the location of an unit's order.
 **	
+**	@param order	Pointer to unit.
 **	@param order	Pointer to order.
 **	@param x	Resulting screen X cordinate.
 **	@param x	Resulting screen Y cordinate.
 */
-local void GetOrderPosition(const Order* order,int* x,int* y)
+local void GetOrderPosition(const Unit* unit,const Order* order,int* x,int* y)
 {
     Unit* goal;
     // FIXME: n0body: Check for goal gone?
     if ((goal=order->Goal)&&(!goal->Removed)) {
+	// Order has a goal, get it's location.
 	*x = Map2ViewportX(CurrentViewport,goal->X)+goal->IX+goal->Type->TileWidth*TileSizeX/2;
 	*y = Map2ViewportY(CurrentViewport,goal->Y)+goal->IY+goal->Type->TileHeight*TileSizeY/2;
     } else {
-	*x = Map2ViewportX(CurrentViewport,order->X)+TileSizeX/2;
-	*y = Map2ViewportY(CurrentViewport,order->Y)+TileSizeY/2;
+	if (order->X>=0 && order->Y >=0) {
+	    // Order is for a location, show that.
+	    *x = Map2ViewportX(CurrentViewport,order->X)+TileSizeX/2;
+	    *y = Map2ViewportY(CurrentViewport,order->Y)+TileSizeY/2;
+	} else {
+	    // Some orders ignore x,y (like StandStill).
+	    // Use the unit's position instead.
+	    *x=Map2ViewportX(CurrentViewport,unit->X)+unit->IX+unit->Type->TileWidth*TileSizeX/2;
+	    *y=Map2ViewportY(CurrentViewport,unit->Y)+unit->IY+unit->Type->TileHeight*TileSizeY/2;
+	}
 	if (order->Action==UnitActionBuild) {
+	    // FIXME: mr-russ, can this be removed? since the build order now has a goal?
+	    // When building a building point to the center of the would-be building.
 	    // The -1 is because of what we have above.
 	    *x += (order->Type->TileWidth-1)*TileSizeX/2;
 	    *y += (order->Type->TileHeight-1)*TileSizeY/2;
 	}
     }
+    DebugLevel3Fn(": (%d,%d)\n" _C_ order->X _C_ order->Y);
 }
 
 /**
@@ -1370,7 +1399,7 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
     int e_color;
     int dest;
 
-    GetOrderPosition(order,&x2,&y2);
+    GetOrderPosition(unit,order,&x2,&y2);
     
     dest = 0;
     switch (order->Action) {
@@ -1519,7 +1548,7 @@ local void ShowOrder(const Unit* unit)
     ShowSingleOrder(unit, x1, y1, unit->Orders);
 #if 1
     for (i=1;i<unit->OrderCount;i++) {
-	GetOrderPosition(unit->Orders+i-1,&x1,&y1);
+	GetOrderPosition(unit,unit->Orders+i-1,&x1,&y1);
 	ShowSingleOrder(unit,x1,y1,unit->Orders+i);
     }
 #endif
@@ -1755,11 +1784,15 @@ global void DrawBuilding(const Unit* unit)
 	state = unit->SeenState;
     }
 
-    DebugCheck( frame==UnitNotSeen );
-
     x+=Map2ViewportX(CurrentViewport,unit->X);
     y+=Map2ViewportY(CurrentViewport,unit->Y);
 
+    if( frame==UnitNotSeen ) {
+	DebugLevel0Fn("Something is wrong, please send us the log of your game.\n");
+	DrawUnitSelection(unit);
+	return;
+    }
+    
     DrawShadow(unit,x,y);
 
     //

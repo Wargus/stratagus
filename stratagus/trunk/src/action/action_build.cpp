@@ -55,7 +55,7 @@
 /**
 **	Update construction frame
 **
-**	@param unit	Unit
+**	@param unit	the building under construction.
 */
 local void UpdateConstructionFrame(Unit* unit)
 {
@@ -63,7 +63,8 @@ local void UpdateConstructionFrame(Unit* unit)
     ConstructionFrame* tmp;
     int percent;
 
-    percent=unit->Data.Builded.Sum*100/unit->Stats->HitPoints;
+//    percent=unit->Data.Builded.Progress*100/(unit->Type->Stats->Costs[TimeCost]*600);
+    percent=unit->Data.Builded.Progress/(unit->Type->Stats->Costs[TimeCost]*6);
     cframe=tmp=unit->Type->Construction->Frames;
     while( tmp ) {
 	if( percent<tmp->Percent ) {
@@ -75,6 +76,7 @@ local void UpdateConstructionFrame(Unit* unit)
     if( cframe!=unit->Data.Builded.Frame ) {
 	unit->Data.Builded.Frame=cframe;
 	unit->Frame=cframe->Frame;
+    	CheckUnitToBeDrawn(unit);
 	UnitMarkSeen(unit);
     }
 }
@@ -88,7 +90,7 @@ global void HandleActionBuild(Unit* unit)
 {
     int x;
     int y;
-    int n;
+    //int n;
     UnitType* type;
     const UnitStats* stats;
     Unit* build;
@@ -250,26 +252,18 @@ global void HandleActionBuild(Unit* unit)
 
     // HACK: the building is not ready yet
     build->Player->UnitTypesCount[type->Type]--;
-    build->HP=0;
 
     stats=build->Stats;
 
+    build->Wait=1;
+    //  Make sure the bulding doesn't cancel itself out right away.
+    build->Data.Builded.Progress=100;
     build->Orders[0].Action=UnitActionBuilded;
-    build->Data.Builded.Sum=0;  // FIXME: Is it necessary?
-    build->Data.Builded.Cancel=0; // FIXME: Is it necessary?
-    build->Data.Builded.Val=stats->HitPoints;
-    n=(stats->Costs[TimeCost]*CYCLES_PER_SECOND/6)/(SpeedBuild*5);
-    if( n ) {
-	build->Data.Builded.Add=stats->HitPoints/n;
-    } else {				// No build time pops-up?
-	build->Data.Builded.Add=stats->HitPoints;
-	// This checks if the value fits in the data type
-	DebugCheck( build->Data.Builded.Add!=stats->HitPoints );
-    }
-    build->Data.Builded.Sub=n;
-    build->Wait=CYCLES_PER_SECOND/6;
+    build->HP=1;
     UpdateConstructionFrame(build);
 
+    // We need somebody to work on it.
+    build->HP=1;
     if (!type->BuilderOutside) {
 	//  Place the builder inside the building
     	build->Data.Builded.Worker=unit;
@@ -292,12 +286,7 @@ global void HandleActionBuild(Unit* unit)
 	UnitMarkSeen(unit);
 	//  Mark the new building seen.
 	MapMarkSight(build->Player,x+build->Type->TileWidth/2,y+build->Type->TileHeight/2,build->CurrentSightRange);
-	
-	// We need somebody to work on it.
-	build->Data.Builded.Sub=build->Data.Builded.Add=0;
-	build->HP=1;
     }
-    build->Wait=CYCLES_PER_SECOND/6;
     UpdateConstructionFrame(build);
     UnitMarkSeen(build);
 }
@@ -314,11 +303,30 @@ global void HandleActionBuilded(Unit* unit)
     int n;
 
     type=unit->Type;
+    
+    //  n is the current damage taken by the unit.
+    n=(unit->Data.Builded.Progress*unit->Stats->HitPoints)/
+	    (type->Stats->Costs[TimeCost]*600)-unit->HP;
+    //  This below is most often 0
+    if (type->BuilderOutside) {
+	unit->Data.Builded.Progress+=unit->Type->AutoBuildRate;
+    } else {
+	unit->Data.Builded.Progress+=100;
+	    // FIXME: implement this below:
+	    //unit->Data.Builded.Worker->Type->BuilderSpeedFactor;
+    }
+    //  Keep the same level of damage while increasing HP.
+    unit->HP=(unit->Data.Builded.Progress*unit->Stats->HitPoints)/
+	    (type->Stats->Costs[TimeCost]*600)-n;
+    if (unit->HP>unit->Stats->HitPoints) {
+	unit->HP=unit->Stats->HitPoints;
+    }
 
     //
     // Check if construction should be canceled...
     //
-    if( unit->Data.Builded.Cancel ) {
+    if( unit->Data.Builded.Cancel || unit->Data.Builded.Progress<0 ) {
+	DebugLevel0Fn("%s canceled.\n" _C_ unit->Type->Name);
 	// Drop out unit
 	if ((worker=unit->Data.Builded.Worker)) {
 	    worker->Orders[0].Action=UnitActionStill;
@@ -336,32 +344,12 @@ global void HandleActionBuilded(Unit* unit)
 	return;
     }
 
-    if (!type->BuilderOutside) {
-	//
-	//	Fixed point HP calculation
-	//
-	unit->Data.Builded.Val-=unit->Data.Builded.Sub;
-	if( unit->Data.Builded.Val<0 ) {
-	    unit->Data.Builded.Val+=unit->Stats->HitPoints;
-	    unit->HP++;
-	    unit->Data.Builded.Sum++;
-	}
-
-	
-	n=(unit->Stats->Costs[TimeCost]*CYCLES_PER_SECOND/6)/(SpeedBuild*5);
-	if( unit->Data.Builded.Add!=unit->Stats->HitPoints/(n?n:1) ) {
-	    unit->Data.Builded.Add=unit->Stats->HitPoints/(n?n:1);
-	}
-
-	unit->HP+=unit->Data.Builded.Add;
-	unit->Data.Builded.Sum+=unit->Data.Builded.Add;
-    }
-
     //
-    //	Check if building ready. Note we can build and repair.
+    //	Check if building ready. Note we can both build and repair.
     //
-    if( unit->Data.Builded.Sum>=unit->Stats->HitPoints
-		|| unit->HP>=unit->Stats->HitPoints ) {
+    if( unit->Data.Builded.Progress>=unit->Stats->Costs[TimeCost]*600 ||
+	    unit->HP>=unit->Stats->HitPoints) {
+	DebugLevel0Fn("Building ready.\n");
 	if( unit->HP>unit->Stats->HitPoints ) {
 	    unit->HP=unit->Stats->HitPoints;
 	}
@@ -389,13 +377,6 @@ global void HandleActionBuilded(Unit* unit)
 		if (worker->Type->Harvester&&worker->Type->ResourceHarvested==type->GivesResource) {
 		    CommandResource(worker,unit,0);
 		}
-		//
-		//	Building lumber mill, let worker automatic chopping wood.
-		//
-		if( type->CanStore[WoodCost] ) {
-		    CommandHarvest(worker,unit->X+unit->Type->TileWidth/2,
-			    unit->Y+unit->Type->TileHeight/2,0);
-		}
 	    }
 	}
 	
@@ -414,7 +395,8 @@ global void HandleActionBuilded(Unit* unit)
 	    } else {
 		PlayUnitSound(unit,VoiceBuilding);
 	    }
-	} else if( unit->Player->Ai ) {
+	}
+	if( unit->Player->Ai ) {
 	    AiWorkComplete(worker,unit);
 	}
 
@@ -448,9 +430,8 @@ global void HandleActionBuilded(Unit* unit)
     }
 
     UpdateConstructionFrame(unit);
-    CheckUnitToBeDrawn(unit);
 
-    unit->Wait=5;
+    unit->Wait=1;
     if( IsOnlySelected(unit) ) {
         MustRedraw|=RedrawInfoPanel;
     }

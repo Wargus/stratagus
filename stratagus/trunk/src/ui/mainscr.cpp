@@ -528,6 +528,12 @@ global void DrawUnitInfo(const Unit* unit)
 		    ,(100*(CHOP_FOR_WOOD-unit->Value))/CHOP_FOR_WOOD);
 	    VideoDrawText(x+63,y+8+141,GameFont,buf);
         }
+	// FIXME: Ugly hack.
+	if( unit->Type->Harvester&&unit->Value&&unit->Orders[0].Action!=UnitActionHarvest ) {
+	    sprintf(buf,"Carry: %d %s",unit->Value,
+		    DefaultResourceNames[unit->Type->ResourceHarvested]);
+	    VideoDrawText(x+61,y+8+141,GameFont,buf);	    
+	}
 
     }
 	if( type->CanCastSpell ) {
@@ -542,9 +548,8 @@ global void DrawUnitInfo(const Unit* unit)
 		VideoDrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
 	    } else {
 		int w = 140;
-		/* s0m3body: fix to display mana bar properly for any maxmana
-		   value */
-		/* s0m3body: max mana can vary for the unit */
+		/* fix to display mana bar properly for any maxmana value */
+		/* max mana can vary for the unit */
 		i=(100*unit->Mana)/unit->Type->_MaxMana;
 		i=(i*w)/100;
 		VideoDrawRectangleClip(ColorGray, x+16,  y+8+140, w+4,  16  );

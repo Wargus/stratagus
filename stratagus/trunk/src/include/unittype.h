@@ -330,14 +330,24 @@
 **
 **		Cycles the unit waits while inside a resource.
 **
-**	UnitType::WaitAtDepot
+**	UnitType::ResourceStep
 **
-**		Cycles the unit waits while inside the depot to unload.
+**		The unit makes so-caled mining cycles. Each mining cycle
+**		it does some sort of animation and gains ResourceStep
+**		resources. You can stop after any number of steps.
+**		when the quantity in the harvester reaches the maximum
+**		(ResourceCapacity) it will return home. I this is 0 then
+**		it's considered infinity, and ResourceCapacity will now
+**		be the limit.
 **
 **	UnitType::ResourceCapacity
 **
 **		Maximum amount of resources a harvester can carry. The
 **		actual amount can be modified while unloading.
+**
+**	UnitType::WaitAtDepot
+**
+**		Cycles the unit waits while inside the depot to unload.
 **
 **	UnitType::TransformWhenEmpty;
 **	
@@ -662,8 +672,9 @@ struct _unit_type_ {
     unsigned Harvester : 1;		/// Unit is a resource worker.
     unsigned ResourceHarvested;		/// The resource it can harvest.
     unsigned WaitAtResource;		/// Cycles the unit waits while mining.
-    unsigned WaitAtDepot;		/// Cycles the unit waits while returning.
+    unsigned ResourceStep;		/// Resources the unit gains per mining cycle.
     unsigned ResourceCapacity;		/// Max amount of resources to carry.
+    unsigned WaitAtDepot;		/// Cycles the unit waits while returning.
     UnitType* TransformWhenEmpty;	/// UnitType to transform to when empty.
     UnitType* TransformWhenLoaded;	/// UnitType to transform to when loaded.
     UnitType* MustBuildOnTop;		/// Must be built on top of something.
