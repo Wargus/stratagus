@@ -225,6 +225,7 @@ local void CclParseOrder(SCM list,Order* order)
 	    if( !UnitSlots[slot] ) {
 		DebugLevel0Fn("FIXME: Forward reference not supported\n");
 	    }
+	    ++UnitSlots[slot]->Refs;
 	    free(str);
 
 	} else if( gh_eq_p(value,gh_symbol2scm("tile")) ) {
@@ -266,14 +267,16 @@ local void CclParseOrder(SCM list,Order* order)
 	    order->Arg1=UpgradeByIdent(str);
 	    free(str);
 
-	} else if( gh_eq_p(value,gh_symbol2scm("arg1")) ) {
-	    char* str;
+	} else if( gh_eq_p(value,gh_symbol2scm("mine")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    order->Arg1=(void*)((gh_scm2int(gh_car(sublist))<<16)|
+		    gh_scm2int(gh_cadr(sublist)));
 
+	} else if( gh_eq_p(value,gh_symbol2scm("arg1")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    str = gh_scm2newstr (value, NULL);
-	    order->Arg1 = (void * )strtol (str, NULL, 16);
-	    free(str);
+	    order->Arg1 = (void * )gh_scm2int (value);
 
 	} else {
 	   // FIXME: this leaves a half initialized unit
@@ -553,6 +556,7 @@ local SCM CclUnit(SCM list)
 		    if( !UnitSlots[slot] ) {
 			DebugLevel0Fn("FIXME: Forward reference not supported\n");
 		    }
+		    ++UnitSlots[slot]->Refs;
 		    free(str);
 		}
 	    }
