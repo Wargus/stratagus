@@ -149,10 +149,6 @@ global void InitVideoSdl(void)
     // Turn cursor off, we use our own.
     SDL_ShowCursor(0);
 
-    SDL_LockSurface(Screen);
-    VideoMemory=Screen->pixels;		// This isn't constant!
-    SDL_UnlockSurface(Screen);
-
     //
     //	I need the used bits per pixel.
     //	You see it's better making all self, than using wired libaries :)
@@ -667,7 +663,7 @@ global void CheckVideoInterrupts(void)
     if( VideoInterrupts ) {
         //DebugLevel1("Slow frame\n");
 	IfDebug(
-	    DrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    //DrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
 	);
         ++SlowFrameCounter;
     }
