@@ -814,7 +814,7 @@ static int CclSetPlayerData(lua_State* l)
 		free(p->RaceName);
 		p->RaceName = strdup(LuaToString(l, 3));
 		p->Race = PlayerRaceNeutral;
-		for (i = 0; i < MAX_RACES; ++i) {
+		for (i = 0; i < PlayerRaces.Count; ++i) {
 			if(!strcmp(p->RaceName, PlayerRaces.Name[i])) {
 				p->Race = i;
 				break;
