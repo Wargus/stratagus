@@ -105,6 +105,9 @@ global void InitUserInterface(const char *race_name)
     // ARI: Yes, it does :(((
     TheUI=*UI_Table[best];
 
+    TheUI.Offset640X = (VideoWidth - 640) / 2;
+    TheUI.Offset480Y = (VideoHeight - 480) / 2;
+
     //
     //	Calculations
     //
