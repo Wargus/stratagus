@@ -189,7 +189,7 @@ MissileType* NewMissileTypeSlot(char* ident)
 	int i;
 
 	MissileTypes = realloc(MissileTypes, (NumMissileTypes + 1) * sizeof(MissileType*));
-	mtype = MissileTypes[NumMissileTypes++] = (MissileType*)calloc(1, sizeof(MissileType));
+	mtype = MissileTypes[NumMissileTypes++] = calloc(1, sizeof(MissileType));
 	mtype->Ident = ident;
 
 	// Rehash.

@@ -94,7 +94,7 @@ static char* MakeQueryString(Session* ptr)
 {
 	char* buffer;
 
-	if (!(buffer = (char*)malloc(1024))) {
+	if (!(buffer = malloc(1024))) {
 		printf("ERROR: %s\n", strerror(errno));
 		return NULL;
 	}
@@ -139,7 +139,7 @@ int StartQuery(Session* ptr)
 	}
 
 	// create array of strings
-	ptr->QueryData.List = (char**)calloc(ptr->QueryData.Count, sizeof(char*));
+	ptr->QueryData.List = calloc(ptr->QueryData.Count, sizeof(char*));
 	if (!ptr->QueryData.List) {
 		return 1;
 	}

@@ -467,7 +467,7 @@ static void MakeTextures(Graphic* g, GLuint* textures, UnitColors* colors)
 	}
 	g->TextureWidth = (float)g->Width / w;
 	g->TextureHeight = (float)g->Height / h;
-	tex = (unsigned char*)malloc(w * h * 4);
+	tex = malloc(w * h * 4);
 	if (g->Surface->flags & SDL_SRCALPHA) {
 		alpha = f->alpha;
 	} else {
@@ -565,7 +565,7 @@ void MakeTexture(Graphic* g)
 		return;
 	}
 
-	g->Textures = (GLuint*)malloc(g->NumFrames * sizeof(GLuint));
+	g->Textures = malloc(g->NumFrames * sizeof(GLuint));
 	glGenTextures(g->NumFrames, g->Textures);
 	MakeTextures(g, g->Textures, NULL);
 }
@@ -615,7 +615,7 @@ void ResizeGraphic(Graphic* g, int w, int h)
 
 	SDL_LockSurface(g->Surface);
 
-	data = (unsigned char*)malloc(w * h);
+	data = malloc(w * h);
 	x = 0;
 
 	for (i = 0; i < h; ++i) {

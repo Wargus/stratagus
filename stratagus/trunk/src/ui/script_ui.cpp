@@ -3218,7 +3218,7 @@ static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 				if (item->D.Pulldown.options) {
 					free(item->D.Pulldown.options);
 				}
-				item->D.Pulldown.options = (unsigned char**)malloc(sizeof(unsigned char*) * subsubargs);
+				item->D.Pulldown.options = malloc(sizeof(unsigned char*) * subsubargs);
 				for (subk = 0; subk < subsubargs; ++subk) {
 					lua_rawgeti(l, -1, subk + 1);
 					s1 = strdup(LuaToString(l, -1));
@@ -3857,7 +3857,7 @@ static int CclDefineMenuItem(lua_State* l)
 	int k;
 
 	name = NULL;
-	item = (Menuitem*)calloc(1, sizeof(Menuitem));
+	item = calloc(1, sizeof(Menuitem));
 
 	//
 	// Parse the arguments, already the new tagged format.
@@ -3935,9 +3935,9 @@ static int CclDefineMenuItem(lua_State* l)
 	if ((tmp = (Menu**)hash_find(MenuHash, name))) {
 		menu = *tmp;
 		if (menu->Items) {
-			menu->Items = (Menuitem*)realloc(menu->Items, sizeof(Menuitem) * (menu->NumItems + 1));
+			menu->Items = realloc(menu->Items, sizeof(Menuitem) * (menu->NumItems + 1));
 		} else {
-			menu->Items = (Menuitem*)malloc(sizeof(Menuitem));
+			menu->Items = malloc(sizeof(Menuitem));
 		}
 		item->Menu = menu;
 		memcpy(menu->Items + menu->NumItems, item, sizeof(Menuitem));

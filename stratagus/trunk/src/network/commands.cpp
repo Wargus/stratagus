@@ -470,7 +470,7 @@ void CommandLog(const char* action, const Unit* unit, int flush,
 		return;
 	}
 
-	log = (LogEntry*)malloc(sizeof(LogEntry));
+	log = malloc(sizeof(LogEntry));
 
 	//
 	// Frame, unit, (type-ident only to be better readable).

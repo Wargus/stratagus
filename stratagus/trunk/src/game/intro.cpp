@@ -284,7 +284,7 @@ static void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 			*space = '\0';
 		}
 
-		*ptr = (TextLines*)malloc(sizeof(TextLines));
+		*ptr = malloc(sizeof(TextLines));
 		(*ptr)->Text = strdup(s);
 		(*ptr)->Next = NULL;
 		ptr = &((*ptr)->Next);
@@ -1292,7 +1292,7 @@ static int CclCredits(lua_State* l)
 	GameCredits.Background = NULL;
 	if (GameCredits.Names) {
 		free(GameCredits.Names);
-		GameCredits.Names = (char*)malloc(1);
+		GameCredits.Names = malloc(1);
 		GameCredits.Names[0] = '\0';
 	}
 	len = 0;
@@ -1308,7 +1308,7 @@ static int CclCredits(lua_State* l)
 				!strcmp(value, "comment")) {
 			n = LuaToString(l, j + 1);
 			nlen = strlen(n);
-			GameCredits.Names = (char*)realloc(GameCredits.Names, len + nlen + 2);
+			GameCredits.Names = realloc(GameCredits.Names, len + nlen + 2);
 			if (len != 0) {
 				GameCredits.Names[len++] = '\n';
 			}
@@ -1484,9 +1484,9 @@ static int CclDefineRanks(lua_State* l)
 	args = luaL_getn(l, 2);
 	len = args / 2;
 
-	rank->Ranks = (char**)malloc((len + 1) * sizeof(char*));
+	rank->Ranks = malloc((len + 1) * sizeof(char*));
 	rank->Ranks[len] = NULL;
-	rank->Scores = (int*)malloc(len * sizeof(int));
+	rank->Scores = malloc(len * sizeof(int));
 
 	i = 0;
 	for (j = 0; j < args; ++j) {

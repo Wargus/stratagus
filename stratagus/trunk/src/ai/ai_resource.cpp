@@ -1311,7 +1311,7 @@ void AiExplore(int x, int y, int mask)
 	AiExplorationRequest* req;
 
 	// Alloc a new struct,
-	req = (AiExplorationRequest*) malloc(sizeof(AiExplorationRequest));
+	req = malloc(sizeof(AiExplorationRequest));
 
 	// Link into the exploration requests list
 	req->X = x;

@@ -676,7 +676,7 @@ static void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "condition")) {
 			if (!autocast->Condition) {
-				autocast->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
+				autocast->Condition = malloc(sizeof(ConditionInfo));
 			}
 			lua_rawgeti(l, -1, j + 1);
 			CclSpellCondition(l, autocast->Condition);
@@ -766,7 +766,7 @@ static int CclDefineSpell(lua_State* l)
 			int subargs;
 			int k;
 
-			spell->Action = (SpellActionType*)malloc(sizeof(SpellActionType));
+			spell->Action = malloc(sizeof(SpellActionType));
 			act = spell->Action;
 			memset(act, 0, sizeof(SpellActionType));
 			if (!lua_istable(l, i + 1)) {
@@ -779,7 +779,7 @@ static int CclDefineSpell(lua_State* l)
 			lua_pop(l, 1);
 			++k;
 			for (; k < subargs; ++k) {
-				act->Next = (SpellActionType*)malloc(sizeof(SpellActionType));
+				act->Next = malloc(sizeof(SpellActionType));
 				act = act->Next;
 				memset(act, 0, sizeof(SpellActionType));
 				lua_rawgeti(l, i + 1, k + 1);
@@ -788,14 +788,14 @@ static int CclDefineSpell(lua_State* l)
 			}
 		} else if (!strcmp(value, "condition")) {
 			if (!spell->Condition) {
-				spell->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
+				spell->Condition = malloc(sizeof(ConditionInfo));
 			}
 			lua_pushvalue(l, i + 1);
 			CclSpellCondition(l, spell->Condition);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "autocast")) {
 			if (!spell->AutoCast) {
-				spell->AutoCast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
+				spell->AutoCast = malloc(sizeof(AutoCastInfo));
 				memset(spell->AutoCast, 0, sizeof(AutoCastInfo));
 			}
 			lua_pushvalue(l, i + 1);
@@ -803,7 +803,7 @@ static int CclDefineSpell(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "ai-cast")) {
 			if (!spell->AICast) {
-				spell->AICast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
+				spell->AICast = malloc(sizeof(AutoCastInfo));
 				memset(spell->AICast, 0, sizeof(AutoCastInfo));
 			}
 			lua_pushvalue(l, i + 1);
