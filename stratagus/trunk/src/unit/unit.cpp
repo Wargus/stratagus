@@ -3833,7 +3833,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
 
     // 'type and 'player must be first, needed to create the unit slot
     fprintf(file,"'type '%s ",unit->Type->Ident);
-    fprintf(file,"'seentype '%s ",unit->Type->Ident);
+    fprintf(file,"'seen-type '%s ",unit->Type->Ident);
     fprintf(file,"'player %d\n  ",unit->Player->Player);
 
     if( unit->Name ) {
@@ -3873,7 +3873,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     fprintf(file,"'direction %d\n  ",unit->Direction);
     fprintf(file,"'attacked %d\n ",unit->Attacked);
 #ifdef NEW_FOW
-    fprintf(file," 'currentsightrange %d",unit->CurrentSightRange);
+    fprintf(file," 'current-sight-range %d",unit->CurrentSightRange);
 #endif
     if( unit->Burning ) {
 	fprintf(file," 'burning");
@@ -3889,7 +3889,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     }
 #ifdef NEW_FOW
     if( unit->Next && unit->Removed ) {
-	fprintf(file," 'hosttile '(%d %d) ",
+	fprintf(file," 'host-tile '(%d %d) ",
 		unit->Next->X+unit->Next->Type->TileWidth/2,
 		unit->Next->Y+unit->Next->Type->TileHeight/2);
     }
@@ -3903,9 +3903,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	fprintf(file," 'constructed");
     }
     if( unit->SeenConstructed ) {
-	fprintf(file," 'seenconstructed");
+	fprintf(file," 'seen-constructed");
     }
-    fprintf(file," 'seenstate %d ",unit->SeenState);
+    fprintf(file," 'seen-state %d ",unit->SeenState);
     if( unit->Active ) {
 	fprintf(file," 'active");
     }
