@@ -286,24 +286,27 @@ local SCM CclPlayer(SCM list)
 }
 
 /**
-**	Change Unit Owner
+**	Change unit owner
 **
 **	@param pos1	top left tile
 **	@param pos2	bottom right tile
 **	@param old	old player number
 **	@param new	new player number
 **/
-local SCM CclChangeUnitsOwner(SCM pos1, SCM pos2, SCM old, SCM new)
+local SCM CclChangeUnitsOwner(SCM pos1, SCM pos2, SCM oldplayer, SCM newplayer)
 {
     Unit* table[UnitMax];
     int n;
+    int oldp;
+    int newp;
     
-    n = SelectUnits(gh_scm2int(gh_car(pos1)), gh_scm2int(gh_cadr(pos1)),
-		gh_scm2int(gh_car(pos2)), gh_scm2int(gh_cadr(pos2)), table);
+    n=SelectUnits(gh_scm2int(gh_car(pos1)), gh_scm2int(gh_cadr(pos1)),
+	    gh_scm2int(gh_car(pos2)), gh_scm2int(gh_cadr(pos2)), table);
+    oldp=gh_scm2int(oldplayer);
+    newp=gh_scm2int(newplayer);
     while( n ) {
-        if(table[n-1]->Player->Player == gh_scm2int(old)) {
-	    ChangeUnitOwner(table[n-1],&Players[gh_scm2int(old)],
-			&Players[gh_scm2int(new)]);
+        if( table[n-1]->Player->Player == oldp ) {
+	    ChangeUnitOwner(table[n-1],&Players[newp]);
 	}
 	n--;
     }
