@@ -59,6 +59,7 @@
 <A HREF="#if-score">if-score</A>
 <A HREF="#if-timer">if-timer</A>
 <A HREF="#if-unit">if-unit</A>
+<A HREF="#if-unit-at">if-unit-at</A>
 <A HREF="#set-trigger-number!">set-trigger-number!</A>
 <HR>
 <H2>Intro - Introduction to trigger functions and variables</H2>
@@ -710,6 +711,68 @@ units must control the player for the action.
 </PRE>
 
 <P>If the player on the console has at least 8 archers.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="if-unit-at"></A>
+<H3>if-unit-at</H3>
+
+<H4>Description</H4>
+
+Player has the quantity of unit-type at a location.
+
+<H4>Syntax</H4>
+
+<CODE>(if-unit-at player op quantity unit location1 location2)</CODE>
+
+<DL>
+<DT>player</DT>
+<DD><PRE>
+0 .. 16    Player number
+'any       Matches any player
+'all       All players (Not used)
+'this      Player on the local computer, Human player in the campaign.
+</PRE></DD>
+<DT>op</DT>
+<DD><PRE>
+'==         operator equal
+'&gt;          operator greater than
+'&gt;=         operator greater than or equal
+'&lt;          operator less than
+'&lt;=         operator less than or equal
+</PRE></DD>
+<DT>quantity</DT>
+<DD><PRE>
+0 ... oo    Number for the quantity
+</PRE></DD>
+<DT>unit</DT>
+<DD><PRE>
+'unit-name  Unit type of this name
+'any        Matches any unit type
+'all        All units (sum of units and buildings)
+'units      All non building units
+'building   All building units
+</PRE></DD>
+<DT>location1</DT>
+<DD><PRE>
+'(x1 y1)   Upper left corner
+</PRE></DD>
+<DT>location2</DT>
+<DD><PRE>
+'(x2 y2)   Lower right corner
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-unit-at 'this '&gt;= 1 'unit-archer '(10 10) '(12 14))
+</PRE>
+
+<P>If the player on the console has at least 8 archers in the rectangle
+(10 10) to (12 14).
 
 <H4>Used</H4>
 
