@@ -43,6 +43,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -176,6 +177,91 @@ local long X11GetTicks(void)
 }
 
 /**
+**	Converts a hardware independend 256 color palette to a hardware
+**      dependent palette. Letting a system color as index in the result,
+**      correspond with the right RGB value.
+**
+**	@param palette	   Hardware independent 256 color palette.
+**
+**	@param syspalette  Hardware dependent 256 color palette, to be filled.
+**
+**	@param palette	   Array denoting which entries in above palette are
+**                         defined by this function.
+*/
+local void AllocPalette8( Palette *palette,
+                          Palette *syspalette,
+                          unsigned long syspalette_defined[8] )
+{
+  XWindowAttributes xwa;
+  XColor color;
+  int average, i, warning_given;
+
+  XGetWindowAttributes( TheDisplay, TheMainWindow, &xwa );
+  average     = 0;
+  color.pad   = 0;
+  color.flags = DoRed | DoGreen | DoBlue;
+  warning_given=0;
+
+  for ( i = 0; i <= 7; i++ )
+    syspalette_defined[i]=0;
+
+  for ( i = 0; i <= 255; i++, palette++ )
+  {
+    unsigned int r, g, b;
+
+  // -> Video
+    color.red   = (r=palette->r) << 8;
+    color.green = (g=palette->g) << 8;
+    color.blue  = (b=palette->b) << 8;
+    if ( XAllocColor( TheDisplay, xwa.colormap, &color ) )
+    {
+      unsigned long bit;
+      int j;
+
+      if ( color.pixel > 255 ) // DEBUG: should not happen?
+      {
+        fprintf( stderr, "System 8bit color above unsupported 255\n" );
+        exit( -1 );
+      }
+
+    // Fill palette, to get from system to RGB
+      j   = color.pixel>>5;
+      bit = 1 << (color.pixel&0x1F);
+      if ( syspalette_defined[j] & bit )
+      {
+      // multiple RGB matches for one sytem color, average RGB values
+      // Note: happens when a palette with duplicate RGB values is used, but
+      //       might also happen for another reason?
+        r += syspalette[color.pixel].r + 1;
+        r >>= 1;
+        g += syspalette[color.pixel].g + 1;
+        g >>= 1;
+        b += syspalette[color.pixel].b + 1;
+        b >>= 1;
+        average++;
+      }
+      else syspalette_defined[j] |= bit;
+
+      syspalette[color.pixel].r = r;
+      syspalette[color.pixel].g = g;
+      syspalette[color.pixel].b = b;
+    }
+    else if ( !warning_given )
+    {//Note: this may also happen when more then 256 colors are tried..
+     //      Use VideoFreePalette to unallocate..
+      warning_given=1;
+      fprintf( stderr,
+               "Cannot allocate 8pp color\n"
+               "Probably another application has taken some colors..\n" );
+    }
+  }
+
+// Denote missing colors
+ if ( average )
+   fprintf( stderr, "Only %d unique colors available\n", 256-average );
+}
+
+/**
 **	X11 initialize.
 */
 global void GameInitDisplay(void)
@@ -248,6 +334,7 @@ foundvisual:
 	VideoDepth=xvi.depth;
     }
     VideoBpp=xpfv[i].bits_per_pixel;
+    printf( "Video X11, %d color, %d bpp\n", VideoDepth, VideoBpp );
 
     if( !VideoWidth ) {
 	VideoWidth = DEFAULT_VIDEO_WIDTH;
@@ -397,6 +484,11 @@ foundvisual:
     XAddConnectionWatch(TheDisplay,MyConnectionWatch,NULL);
 
     XFlush(TheDisplay);
+
+    //
+    //	Let hardware independent palette be converted.
+    //
+    VideoAllocPalette8=AllocPalette8;
 }
 
 /**
@@ -1126,11 +1218,66 @@ global void WaitEventsAndKeepSync(void)
 }
 
 /**
-**	Create a new hardware dependend palette palette.
+**	Free a hardware dependend palette.
 **
-**	@param palette	Hardware independend palette.
+**	@param palette	Hardware dependend palette.
 **
-**	@return		A hardware dependend pixel table.
+**      FIXME: XFreeColors planes can be used to free an entire range
+**             of colors; couldn't get it working though..
+*/
+local void VideoFreePallette(void *pixels)
+{
+  XWindowAttributes xwa;
+  int i;
+  char *vp;
+  unsigned long oldpal[256];
+
+  if ( !TheDisplay || !TheMainWindow )
+    return;
+
+  XGetWindowAttributes( TheDisplay, TheMainWindow, &xwa );
+
+  if ( pixels )
+  {
+    switch( VideoBpp ) {
+    case 8:
+      for (i=0;i<256;i++)
+        oldpal[ i ] = ((VMemType8 *)pixels)[ i ];
+      break;
+    case 15:
+    case 16:
+      for (i=0;i<256;i++)
+        oldpal[ i ] = ((VMemType16 *)pixels)[ i ];
+      break;
+    case 24:
+      for (i=0;i<256;i++)
+      {
+        vp = (char *)(oldpal + i);
+        vp[0]=((VMemType24*)pixels)[i].a;
+        vp[1]=((VMemType24*)pixels)[i].b;
+        vp[2]=((VMemType24*)pixels)[i].c;
+      }
+      break;
+    case 32:
+      for (i=0;i<256;i++)
+        oldpal[ i ] = ((VMemType32 *)pixels)[ i ];
+      break;
+    default:
+      DebugLevel0Fn(": Unknown depth\n");
+      return;
+    }
+    XFreeColors(TheDisplay,xwa.colormap,oldpal,256,0);
+  }
+}
+
+/**
+**      Allocate a new hardware dependend palette palette.
+**
+**      @param palette  Hardware independend palette.
+**
+**      @return         A hardware dependend pixel table.
+**
+**      FIXME: VideoFreePallette should be used to free unused colors
 */
 global VMemType* VideoCreateNewPalette(const Palette *palette)
 {
@@ -1145,6 +1292,10 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 
     switch( VideoBpp ) {
     case 8:
+        if ( colorcube8 )
+        // Shortcut: get palette from already allocated common palette.
+        // FIXME: shortcut should be placed in video.c, for all video support.
+          return (VMemType*)VideoFindNewPalette8( colorcube8, palette );
 	pixels=malloc(256*sizeof(VMemType8));
 	break;
     case 15:

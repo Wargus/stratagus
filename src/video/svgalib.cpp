@@ -1231,12 +1231,12 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 
 	// -> Video
 	switch( VideoDepth ) {
-	case 15:
+	case 15: // RGB=[5bit|5bit|5bit]
 	    ((VMemType16*)pixels)[i] = ((r >> 1) << 10)
 		    + ((g >>1) << 5)
 		    + (b >> 1);
 	    break;
-	case 16:
+	case 16: // RGB=[5bit|6bit|5bit]
 	    ((VMemType16*)pixels)[i] = ((r >> 1) << 11)
 		    + (g << 5)
 		    + (b >> 1);

@@ -382,7 +382,7 @@ global void LoadDecorations(void)
 */
 local void DrawManaBar(int x,int y,const UnitType* type,int full,int ready)
 {
-    int f;
+    int f, w;
 
     f=(100*ready)/full;
     if ( ShowManaHorizontal == 0)  {
@@ -411,11 +411,13 @@ local void DrawManaBar(int x,int y,const UnitType* type,int full,int ready)
 		,(f*type->BoxHeight)/100
 		,4);
 	}
-	VideoFillRectangleClip(ColorBlue
+        w=(f*type->BoxHeight)/100-1;
+        if (  w > 0 ) // Prevents -1 turning into unsigned int
+ 	    VideoFillRectangleClip(ColorBlue
 		,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
 		,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
 			+type->BoxHeight+6
-		,(f*type->BoxHeight)/100-1
+		,w
 		,3);
     }
 }
@@ -431,7 +433,7 @@ local void DrawManaBar(int x,int y,const UnitType* type,int full,int ready)
 local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 {
     int f;
-    int color;
+    int color, w;
     const UnitStats* stats;
 
 #ifdef REFS_DEBUG
@@ -498,11 +500,13 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 			,((f*type->BoxHeight)/100)+1
 			,5);
 		}
+              w = (f*type->BoxHeight)/100-1;
+              if ( w > 0 ) // Prevents -1 turning into unsigned int
 		VideoFillRectangleClip(color
 		    ,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)+1
 		    ,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
 			    +type->BoxHeight+2
-		    ,(f*type->BoxHeight)/100-1
+		    ,w
 		    ,3);
 	    }  else  {
 		VideoFillRectangleClip(color
