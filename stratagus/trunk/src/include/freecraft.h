@@ -455,6 +455,9 @@ extern int SpeedTrain;			/// speed factor for training
 extern int SpeedUpgrade;		/// speed factor for upgrading
 extern int SpeedResearch;		/// speed factor for researching
 
+//FIXME: all game global options should be moved in structure like `TheUI'
+extern int OptionUseDepletedMines;      /// use depleted mines or destroy them
+
 extern unsigned SyncRandSeed;		/// sync random seed value.
 
 extern void LoadGame(char*);		/// Load saved game back
