@@ -1043,7 +1043,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	//
 	if( EditorRunning ) {
 	    EditorMainLoop();
-	} else if (GameRunning) {
+	} else {
 	    //
 	    //	Create the game.
 	    //
