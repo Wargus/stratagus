@@ -1773,6 +1773,11 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 #endif
 }
 
+#ifdef HIERARCHIC_PATHFINDER
+/* hack */
+#include "../pathfinder/region_set.h"
+#endif /* HIERARCHIC_PATHFINDER */
+
 /**
 **	Draw the map fog of war.
 **
@@ -1843,14 +1848,19 @@ global void DrawMapFogOfWar(int x,int y)
 #ifdef HIERARCHIC_PATHFINDER
 		    {
 			char regidstr[8];
+			char groupstr[8];
 			int regid;
 extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 #define GameFont 1
-			regid = MapFieldGetRegId ((dx-TheUI.MapX)/TileSizeX + MapX,
-			     						(dy-TheUI.MapY)/TileSizeY + MapY);
+			regid =
+			    MapFieldGetRegId ((dx-TheUI.MapX)/TileSizeX + MapX,
+					    (dy-TheUI.MapY)/TileSizeY + MapY);
 			if (regid) {
+			    Region *r = RegionSetFind (regid);
 			    snprintf (regidstr, 8, "%d", regid);
 			    VideoDrawText (dx, dy, GameFont, regidstr);
+			    snprintf (groupstr, 8, "%d", r->GroupId);
+			    VideoDrawText (dx, dy+19, GameFont, groupstr);
 			}
 		    }
 #endif /* HIERARCHIC_PATHFINDER */
