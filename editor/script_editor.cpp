@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_editor.c - Editor CCL functions. */
+/**@name script_editor.c - Editor CCL functions. */
 //
 //      (c) Copyright 2002-2004 by Lutz Sammer
 //
@@ -60,7 +60,7 @@ global char* EditorUnitsIcon;
 /**
 **  Define an editor unit-type list.
 **
-**  @param list  List of all names.
+**  @param l  Lua state.
 */
 local int CclDefineEditorUnitTypes(lua_State* l)
 {
@@ -91,6 +91,8 @@ local int CclDefineEditorUnitTypes(lua_State* l)
 
 /**
 **  Set the editor's select icon
+**
+**  @param l  Lua state.
 */
 local int CclSetEditorSelectIcon(lua_State* l)
 {
@@ -104,6 +106,8 @@ local int CclSetEditorSelectIcon(lua_State* l)
 
 /**
 **  Set the editor's units icon
+**
+**  @param l  Lua state.
 */
 local int CclSetEditorUnitsIcon(lua_State* l)
 {

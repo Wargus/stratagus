@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_unit.c	-	The unit ccl functions. */
+/**@name script_unit.c - The unit ccl functions. */
 //
 //      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -49,22 +49,22 @@
 #include "actions.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 	/// Get resource by name
 extern unsigned CclGetResourceByName(lua_State* l);
 
 /**
-**		Set xp damage
+**  Set xp damage
 **
-**		@param flag Flag enabling or disabling it.
+**  @param l  Lua state.
 **
-**		@return	 The old state of the xp damage
+**  @return   The old state of the xp damage
 */
 local int CclSetXpDamage(lua_State* l)
 {
@@ -81,11 +81,11 @@ local int CclSetXpDamage(lua_State* l)
 }
 
 /**
-**		Set training queue
+**  Set training queue
 **
-**		@param flag		Flag enabling or disabling it.
+**  @param l  Lua state.
 **
-**		@return				The old state of the training queue
+**  @return  The old state of the training queue
 */
 local int CclSetTrainingQueue(lua_State* l)
 {
@@ -102,11 +102,11 @@ local int CclSetTrainingQueue(lua_State* l)
 }
 
 /**
-**		Set capture buildings
+**  Set capture buildings
 **
-**		@param flag		Flag enabling or disabling it.
+**  @param l  Lua state.
 **
-**		@return				The old state of the flag
+**  @return   The old state of the flag
 */
 local int CclSetBuildingCapture(lua_State* l)
 {
@@ -123,11 +123,11 @@ local int CclSetBuildingCapture(lua_State* l)
 }
 
 /**
-**		Set reveal attacker
+**  Set reveal attacker
 **
-**		@param flag		Flag enabling or disabling it.
+**  @param l  Lua state.
 **
-**		@return				The old state of the flag
+**  @return   The old state of the flag
 */
 local int CclSetRevealAttacker(lua_State* l)
 {
@@ -144,11 +144,11 @@ local int CclSetRevealAttacker(lua_State* l)
 }
 
 /**
-**		Get a unit pointer
+**  Get a unit pointer
 **
-**		@param value		Unit slot number.
+**  @param l  Lua state.
 **
-**		@return				The unit pointer
+**  @return   The unit pointer
 */
 local Unit* CclGetUnit(lua_State* l)
 {
@@ -156,10 +156,10 @@ local Unit* CclGetUnit(lua_State* l)
 }
 
 /**
-**		Parse order
+**  Parse order
 **
-**		@param list		All options of the order.
-**		@param order		OUT: resulting order.
+**  @param l      Lua state.
+**  @param order  OUT: resulting order.
 */
 global void CclParseOrder(lua_State* l, Order* order)
 {
@@ -339,10 +339,10 @@ global void CclParseOrder(lua_State* l, Order* order)
 }
 
 /**
-**		Parse orders.
+**  Parse orders.
 **
-**		@param unit		Unit pointer which should get the orders.
-**		@param vector		All options of the order.
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should get the orders.
 */
 local void CclParseOrders(lua_State* l, Unit* unit)
 {
@@ -359,10 +359,10 @@ local void CclParseOrders(lua_State* l, Unit* unit)
 }
 
 /**
-**		Parse builded
+**  Parse builded
 **
-**		@param unit		Unit pointer which should be filled with the data.
-**		@param list		All options of the builded data.
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
 */
 local void CclParseBuilded(lua_State* l, Unit* unit)
 {
@@ -413,10 +413,10 @@ local void CclParseBuilded(lua_State* l, Unit* unit)
 }
 
 /**
-**		Parse res worker data
+**  Parse res worker data
 **
-**		@param unit		Unit pointer which should be filled with the data.
-**		@param list		All options of the resource worker data.
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
 */
 local void CclParseResWorker(lua_State* l, Unit* unit)
 {
@@ -446,10 +446,10 @@ local void CclParseResWorker(lua_State* l, Unit* unit)
 }
 
 /**
-**		Parse research
+**  Parse research
 **
-**		@param unit		Unit pointer which should be filled with the data.
-**		@param list		All options of the research data.
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
 */
 local void CclParseResearch(lua_State* l, Unit* unit)
 {
@@ -476,10 +476,10 @@ local void CclParseResearch(lua_State* l, Unit* unit)
 }
 
 /**
-**		Parse upgrade to
+**  Parse upgrade to
 **
-**		@param unit		Unit pointer which should be filled with the data.
-**		@param list		All options of the upgrade to data.
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
 */
 local void CclParseUpgradeTo(lua_State* l, Unit* unit)
 {
@@ -505,10 +505,10 @@ local void CclParseUpgradeTo(lua_State* l, Unit* unit)
 }
 
 /**
-**		Parse stored data for train order
+**  Parse stored data for train order
 **
-**		@param unit		Unit pointer which should be filled with the data.
-**		@param list		All options of the trained order
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
 */
 local void CclParseTrain(lua_State* l, Unit* unit)
 {
@@ -559,10 +559,10 @@ local void CclParseTrain(lua_State* l, Unit* unit)
 }
 
 /**
-**		Parse stored data for move order
+**  Parse stored data for move order
 **
-**		@param unit		Unit pointer which should be filled with the data.
-**		@param list		All options of the move order
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
 */
 local void CclParseMove(lua_State* l, Unit* unit)
 {
@@ -603,9 +603,9 @@ local void CclParseMove(lua_State* l, Unit* unit)
 }
 
 /**
-**		Parse unit
+**  Parse unit
 **
-**		@param list		List describing unit
+**  @param l  Lua state.
 */
 local int CclUnit(lua_State* l)
 {
@@ -964,12 +964,11 @@ local int CclUnit(lua_State* l)
 }
 
 /**
-**		Make a unit.
+**  Make a unit.
 **
-**		@param type		Unit-type of the unit,
-**		@param player		Owning player number of the unit.
+**  @param l  Lua state.
 **
-**		@return				Returns the slot number of the made unit.
+**  @return   Returns the slot number of the made unit.
 */
 local int CclMakeUnit(lua_State* l)
 {
@@ -990,13 +989,11 @@ local int CclMakeUnit(lua_State* l)
 }
 
 /**
-**		Place a unit on map.
+**  Place a unit on map.
 **
-**		@param unit		Unit (slot number) to be placed.
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
+**  @param l  Lua state.
 **
-**		@return				Returns the slot number of the made placed.
+**  @return   Returns the slot number of the made placed.
 */
 local int CclPlaceUnit(lua_State* l)
 {
@@ -1015,14 +1012,11 @@ local int CclPlaceUnit(lua_State* l)
 }
 
 /**
-**		Create a unit and place it on the map
+**  Create a unit and place it on the map
 **
-**		@param type		Unit-type of the unit,
-**		@param player		Owning player number of the unit.
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
+**  @param l  Lua state.
 **
-**		@return				Returns the slot number of the made unit.
+**  @return   Returns the slot number of the made unit.
 */
 local int CclCreateUnit(lua_State* l)
 {
@@ -1069,9 +1063,11 @@ local int CclCreateUnit(lua_State* l)
 }
 
 /**
-**		Order a unit
+**  Order a unit
 **
-**		(order-unit player unit-type sloc dloc order)
+**  @param l  Lua state.
+**
+**  OrderUnit(player, unit-type, sloc, dloc, order)
 */
 local int CclOrderUnit(lua_State* l)
 {
@@ -1171,12 +1167,11 @@ local int CclOrderUnit(lua_State* l)
 }
 
 /**
-**		Kill a unit
+**  Kill a unit
 **
-**		@param type		Unit-type of the unit,
-**		@param player		Owning player number of the unit.
+**  @param l  Lua state.
 **
-**		@return				Returns true if a unit was killed.
+**  @return   Returns true if a unit was killed.
 */
 local int CclKillUnit(lua_State* l)
 {
@@ -1219,14 +1214,11 @@ local int CclKillUnit(lua_State* l)
 }
 
 /**
-**		Kill a unit at a location
+**  Kill a unit at a location
 **
-**		@param type		Unit-type of the unit,
-**		@param player		Owning player number of the unit.
-**		@param quantity		Number of units to kill.
-**		@param loc		Co-ordinates list (x1 y1 x2 y2)
+**  @param l  Lua state.
 **
-**		@return				Returns the number of units killed.
+**  @return   Returns the number of units killed.
 */
 local int CclKillUnitAt(lua_State* l)
 {
@@ -1289,11 +1281,11 @@ local int CclKillUnitAt(lua_State* l)
 }
 
 /**
-**		Get a player's units
+**  Get a player's units
 **
-**		@param player		Player number.
+**  @param l  Lua state.
 **
-**		@return				Array of units.
+**  @return   Array of units.
 */
 local int CclGetUnits(lua_State* l)
 {
@@ -1322,11 +1314,11 @@ local int CclGetUnits(lua_State* l)
 }
 
 /**
-**		Get the mana of the unit structure.
+**  Get the mana of the unit structure.
 **
-**		@param ptr		Unit object.
+**  @param l  Lua state.
 **
-**		@return				The mana of the unit.
+**  @return   The mana of the unit.
 */
 local int CclGetUnitMana(lua_State* l)
 {
@@ -1342,12 +1334,11 @@ local int CclGetUnitMana(lua_State* l)
 }
 
 /**
-**		Set the mana of the unit structure.
+**  Set the mana of the unit structure.
 **
-**		@param ptr		Unit object.
-**		@param value		The value to set.
+**  @param l  Lua state.
 **
-**		@return				The new mana of the unit.
+**  @return				The new mana of the unit.
 */
 local int CclSetUnitMana(lua_State* l)
 {
@@ -1375,11 +1366,11 @@ local int CclSetUnitMana(lua_State* l)
 }
 
 /**
-**		Get the unholy-armor of the unit structure.
+**  Get the unholy-armor of the unit structure.
 **
-**		@param ptr		Unit object.
+**  @param l  Lua state.
 **
-**		@return				The unholy-armor of the unit.
+**  @return   The unholy-armor of the unit.
 */
 local int CclGetUnitUnholyArmor(lua_State* l)
 {
@@ -1395,12 +1386,11 @@ local int CclGetUnitUnholyArmor(lua_State* l)
 }
 
 /**
-**		Set the unholy-armor of the unit structure.
+**  Set the unholy-armor of the unit structure.
 **
-**		@param ptr		Unit object.
-**		@param value		The value to set.
+**  @param l  Lua state.
 **
-**		@return				The value of the unit.
+**  @return   The value of the unit.
 */
 local int CclSetUnitUnholyArmor(lua_State* l)
 {
@@ -1420,7 +1410,9 @@ local int CclSetUnitUnholyArmor(lua_State* l)
 }
 
 /**
-**		FIXME: docu
+**  FIXME: docu
+**
+**  @param l  Lua state.
 */
 local int CclSlotUsage(lua_State* l)
 {
@@ -1472,7 +1464,10 @@ local int CclSlotUsage(lua_State* l)
 
 /**
 **	Load the unit allocator state.
-**	We need to do this in order to make sure that the game allocates units in the exact same way.
+**	We need to do this in order to make sure that the game allocates units
+**  in the exact same way.
+**
+**  @param l  Lua state.
 */
 local int CclUnitAllocQueue(lua_State* l)
 {
@@ -1513,7 +1508,7 @@ local int CclUnitAllocQueue(lua_State* l)
 }
 
 /**
-**		Register CCL features for unit.
+**  Register CCL features for unit.
 */
 global void UnitCclRegister(void)
 {

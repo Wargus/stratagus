@@ -8,7 +8,7 @@
 //			  T H E	  W A R	  B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script_spells.c	-	The spell script functions.. */
+/**@name script_spell.c - The spell script functions.. */
 //
 //	(c) Copyright 1998-2003 by Joris Dauphin and Crestez Leonard
 //
@@ -52,13 +52,13 @@
 // **************************************************************************
 
 /**
-** 		Parse the missile location description for a spell action.
+**  Parse the missile location description for a spell action.
 **
-**		@param list				SCM list object, with the description.
-**		@param location				Pointer to missile location description.
+**  @param l         Lua state.
+**  @param location  Pointer to missile location description.
 **
-**		@note		This is only here to avoid code duplication. You don't have
-**		any reason to USE this:)
+**  @note This is only here to avoid code duplication. You don't have
+**        any reason to USE this:)
 */
 local void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* location)
 {
@@ -114,10 +114,10 @@ local void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* loc
 }
 
 /**
-**		Parse the action for spell.
+**  Parse the action for spell.
 **
-**		@param list				SCM list object, with something like (action-type params).
-**		@param spellaction		Pointer to spellactopm.
+**  @param l            Lua state.
+**  @param spellaction  Pointer to spellaction.
 */
 local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 {
@@ -411,13 +411,14 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 }
 
 /**
-**		Get a condition value from a scm object.
+**  Get a condition value from a scm object.
 **
-**		@param 		value				scm value to convert.
+**  @param l      Lua state.
+**  @param value  scm value to convert.
 **
-**		@return CONDITION_TRUE, CONDITION_FALSE, CONDITION_ONLY or -1 on error.
-**		@note 		This is a helper function to make CclSpellCondition shorter
-**				and easier to understand.
+**  @return CONDITION_TRUE, CONDITION_FALSE, CONDITION_ONLY or -1 on error.
+**  @note This is a helper function to make CclSpellCondition shorter
+**        and easier to understand.
 */
 global char Ccl2Condition(lua_State* l, const char* value)
 {
@@ -434,12 +435,12 @@ global char Ccl2Condition(lua_State* l, const char* value)
 }
 
 /**
-**		Parse the Condition for spell.
+**  Parse the Condition for spell.
 **
-**		@param list				SCM object to parse
-**		@param condition		pointer to condition to fill with data.
+**  @param l          Lua state.
+**  @param condition  pointer to condition to fill with data.
 **
-**		@notes: conditions must be allocated. All data already in is LOST.
+**  @note Conditions must be allocated. All data already in is LOST.
 */
 local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 {
@@ -591,9 +592,9 @@ local void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 }
 
 /**
-**		Parse Spell.
+**  Parse Spell.
 **
-**		@param list		List describing Spell.
+**  @param l  Lua state.
 */
 local int CclDefineSpell(lua_State* l)
 {
@@ -853,10 +854,10 @@ local void SaveSpellAction(CLFile* file, SpellActionType* action)
 }
 
 /**
-**		Save a spell action to a file.
+**  Save a spell condition to a file.
 **
-** 		@param file		File pointer to save to
-**		@param action		Pointer to action to save.
+**  @param file       File pointer to save to
+**  @param condition  Pointer to condition to save.
 */
 local void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 {

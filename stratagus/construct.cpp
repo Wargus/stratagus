@@ -230,7 +230,7 @@ global Construction* ConstructionByWcNum(int num)
 /**
 **  Define construction mapping from original number to internal symbol
 **
-**  @param list  List of all names.
+**  @param l  Lua state.
 */
 local int CclDefineConstructionWcNames(lua_State* l)
 {
@@ -266,7 +266,7 @@ local int CclDefineConstructionWcNames(lua_State* l)
 /**
 **  Parse the construction.
 **
-**  @param list  List describing the construction.
+**  @param l  Lua state.
 **
 **  @note make this more flexible
 */

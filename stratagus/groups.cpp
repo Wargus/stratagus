@@ -233,9 +233,7 @@ global void RemoveUnitFromGroups(Unit* unit)
 /**
 **  Define the group.
 **
-**  @param group  Group number
-**  @param num    Number of units in group
-**  @param units  Units in group
+**  @param l  Lua state.
 */
 local int CclGroup(lua_State* l)
 {

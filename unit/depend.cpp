@@ -321,7 +321,7 @@ global void CleanDependencies(void)
 /**
 **  Define a new dependency.
 **
-**  @param list  List of the dependency.
+**  @param l  Lua state.
 */
 local int CclDefineDependency(lua_State* l)
 {
@@ -387,7 +387,7 @@ local int CclDefineDependency(lua_State* l)
 **
 **  @todo not written.
 **
-**  @param target  Unit type or upgrade.
+**  @param l  Lua state.
 */
 local int CclGetDependency(lua_State* l __attribute__((unused)))
 {
@@ -401,7 +401,7 @@ local int CclGetDependency(lua_State* l __attribute__((unused)))
 **
 **  @todo not written.
 **
-**  @param target  Unit type or upgrade.
+**  @param l  Lua state.
 */
 local int CclCheckDependency(lua_State* l __attribute__((unused)))
 {

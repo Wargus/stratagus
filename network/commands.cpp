@@ -148,9 +148,6 @@ local void AppendLog(LogEntry* log, CLFile* dest);
 //		Log commands
 //----------------------------------------------------------------------------
 
-/**@name log */
-//@{
-
 /**
 **		Allocate & fill a new FullReplay structure, from GameSettings.
 **
@@ -375,6 +372,7 @@ local void SaveFullLog(CLFile* dest)
 /**
 **  Append the LogEntry structure at the end of currentLog, and to LogFile
 **
+**  @param log   FIXME: docu
 **  @param dest  The file to output to
 */
 local void AppendLog(LogEntry* log, CLFile* dest)
@@ -1185,10 +1183,9 @@ global void SendCommandBuildBuilding(Unit* unit, int x, int y,
 }
 
 /**
-**		Send command: Cancel this building construction.
+**  Send command: Cancel this building construction.
 **
-**		@param unit		pointer to unit.
-**		@param worker		Worker which should stop.
+**  @param unit  pointer to unit.
 */
 global void SendCommandDismiss(Unit* unit)
 {

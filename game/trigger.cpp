@@ -71,9 +71,9 @@ local int* ActiveTriggers;
 /**
 **  Get player number.
 **
-**  @param player  The player
+**  @param l  Lua state.
 **
-**  @return  The player number, -1 matches any.
+**  @return   The player number, -1 matches any.
 */
 global int TriggerGetPlayer(lua_State* l)
 {
@@ -101,9 +101,9 @@ global int TriggerGetPlayer(lua_State* l)
 /**
 **  Get the unit-type.
 **
-**  @param unit  The unit type.
+**  @param l  Lua state.
 **
-**  @return      The unit-type pointer.
+**  @return   The unit-type pointer.
 */
 global const UnitType* TriggerGetUnitType(lua_State* l)
 {

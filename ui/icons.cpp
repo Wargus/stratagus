@@ -417,7 +417,7 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 /**
 **  Parse icon definition.
 **
-**  @param list  Icon definition list.
+**  @param l  Lua state.
 */
 local int CclDefineIcon(lua_State* l)
 {

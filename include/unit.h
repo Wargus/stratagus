@@ -638,7 +638,7 @@ struct _unit_ {
 	struct _order_train_ {
 		int Ticks;                      ///< Ticks to complete
 		int Count;                      ///< Units in training queue
-		/// @todo vladi: later we should train more units or automatic
+		// TODO: vladi: later we should train more units or automatic
 #define MAX_UNIT_TRAIN 6 ///< max number of units in queue
 		UnitType* What[MAX_UNIT_TRAIN]; ///< Unit trained
 	} Train; ///< Train units action

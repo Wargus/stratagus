@@ -935,10 +935,10 @@ local void UnitFillSeenValues(Unit* unit)
 }
 
 /**
-**	This function should get called when an unit goes under fog of war.
+**  This function should get called when a unit goes under fog of war.
 **
-**	@param unit	The unit that goes under fog.
-**	@param p	The player the unit goes out of fog for.
+**  @param unit    The unit that goes under fog.
+**  @param player  The player the unit goes out of fog for.
 */
 global void UnitGoesUnderFog(Unit* unit, const Player* player)
 {
@@ -973,10 +973,10 @@ global void UnitGoesUnderFog(Unit* unit, const Player* player)
 }
 
 /**
-**	This function should get called when an unit goes out of fog of war.
+**  This function should get called when an unit goes out of fog of war.
 **
-**	@param unit	The unit that goes out of fog.
-**	@param p	The player the unit goes out of fog for.
+**  @param unit    The unit that goes out of fog.
+**  @param player  The player the unit goes out of fog for.
 **
 **	@note For units that are visible under fog (mostly buildings)
 **	we use reference counts, from the players that know about
@@ -1006,12 +1006,12 @@ global void UnitGoesOutOfFog(Unit* unit, const Player* player)
 }
 
 /**
-**		Mark all units on a tile as now visible.
+**  Mark all units on a tile as now visible.
 **
-**		@param p		The player this is for.
-**		@param x		x location to check
-**		@param y		y location to check
-**		@param clock	If we mark cloaked units too.
+**  @param player  The player this is for.
+**  @param x       x location to check
+**  @param y       y location to check
+**  @param cloak   If we mark cloaked units too.
 */
 global void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 {
@@ -1984,6 +1984,7 @@ global void DropOutAll(const Unit* source)
 **  Hall to near to goldmine.
 **  Refinery or shipyard to near to oil patch.
 **
+**  @param unit  Unit doing the building
 **  @param type  unit-type to be checked.
 **  @param x     Map X position.
 **  @param y     Map Y position.

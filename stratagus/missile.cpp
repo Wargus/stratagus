@@ -141,7 +141,7 @@ global BurningBuildingFrame* BurningBuildingFrames; /// Burning building frames
 /**
 **  Load the graphics for a missile type
 **
-**  @param missile  Type of missile to Load
+**  @param mtype  Type of missile to Load
 */
 global void LoadMissileSprite(MissileType* mtype)
 {

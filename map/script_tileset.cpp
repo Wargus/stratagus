@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_tileset.c - The tileset ccl functions. */
+/**@name script_tileset.c - The tileset ccl functions. */
 //
 //      (c) Copyright 2000-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -50,7 +50,7 @@
 /**
 **  Define tileset mapping from original number to internal symbol
 **
-**  @param list		List of all names.
+**  @param l  Lua state.
 */
 local int CclDefineTilesetWcNames(lua_State* l)
 {
@@ -114,8 +114,8 @@ local void ExtendTilesetTables(Tileset* tileset, int tiles)
 /**
 **  Parse the name field in tileset definition.
 **
+**  @param l        Lua state.
 **  @param tileset  Tileset currently parsed.
-**  @param list     List with name.
 */
 local int TilesetParseName(lua_State* l, Tileset* tileset)
 {
@@ -141,8 +141,9 @@ local int TilesetParseName(lua_State* l, Tileset* tileset)
 /**
 **  Parse the flag section of a tile definition.
 **
-**  @param list  list of flags.
+**  @param l     Lua state.
 **  @param back  pointer for the flags (return).
+**  @param j     FIXME: docu
 **
 **  @return      remaining list
 */
@@ -204,8 +205,8 @@ local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 /**
 **  Parse the special slot part of a tileset definition
 **
+**  @param l        Lua state.
 **  @param tileset  Tileset to be filled.
-**  @param list     Tagged list defining a special slot.
 */
 local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 {
@@ -307,9 +308,9 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 /**
 **  Parse the solid slot part of a tileset definition
 **
+**  @param l        Lua state.
 **  @param tileset  Tileset to be filled.
 **  @param index    Current table index.
-**  @param list     Tagged list defining a solid slot.
 */
 local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 {
@@ -375,9 +376,9 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 /**
 **  Parse the mixed slot part of a tileset definition
 **
+**  @param l        Lua state.
 **  @param tileset  Tileset to be filled.
 **  @param index    Current table index.
-**  @param list     Tagged list defining a mixed slot.
 */
 local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 {
@@ -452,8 +453,9 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 /**
 **  Parse the slot part of a tileset definition
 **
+**  @param l        Lua state.
 **  @param tileset  Tileset to be filled.
-**  @param list     Tagged list defining a slot.
+**  @param t        FIXME: docu
 */
 local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 {
@@ -528,8 +530,9 @@ local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 /**
 **  Parse the item mapping part of a tileset definition
 **
+**  @param l        Lua state.
 **  @param tileset  Tileset to be filled.
-**  @param list     List defining item mapping.
+**  @param t        FIXME: docu
 */
 local void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
 {
@@ -560,7 +563,7 @@ local void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
 /**
 **  Define tileset
 **
-**  @param list  Tagged list defining a tileset.
+**  @param l  Lua state.
 */
 local int CclDefineTileset(lua_State* l)
 {

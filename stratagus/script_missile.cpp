@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_missile.c - The missile-type ccl functions. */
+/**@name script_missile.c - The missile-type ccl functions. */
 //
 //      (c) Copyright 2002-2003 by Lutz Sammer
 //
@@ -61,7 +61,7 @@ extern int NoWarningMissileType; /// quiet ident lookup.
 /**
 **  Parse missile-type.
 **
-**  @param list  List describing missile-type.
+**  @param l  Lua state.
 */
 local int CclDefineMissileType(lua_State* l)
 {
@@ -177,7 +177,7 @@ local int CclDefineMissileType(lua_State* l)
 /**
 **  Define missile type mapping from original number to internal symbol
 **
-**  @param list  List of all names.
+**  @param l  Lua state.
 */
 local int CclDefineMissileTypeWcNames(lua_State* l)
 {
@@ -213,7 +213,7 @@ local int CclDefineMissileTypeWcNames(lua_State* l)
 /**
 **  Create a missile.
 **
-**  @param list  List of all names.
+**  @param l  Lua state.
 */
 local int CclMissile(lua_State* l)
 {
@@ -352,7 +352,7 @@ local int CclMissile(lua_State* l)
 /**
 **  Define burning building missiles.
 **
-**  @param list  FIXME: docu.
+**  @param l  Lua state.
 */
 local int CclDefineBurningBuilding(lua_State* l)
 {
