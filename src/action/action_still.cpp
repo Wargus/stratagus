@@ -180,6 +180,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->SavedOrder.Y=unit->Y;
 		unit->SavedOrder.Goal=NoUnitP;
 		ResetPath(unit->SavedOrder);
+		// FIXME: next isn't used: unit->SubAction|=2;
 #else
 		unit->SavedCommand.Action=UnitActionAttack;
 		unit->SavedCommand.Data.Move.Range=0;
@@ -187,8 +188,8 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->SavedCommand.Data.Move.DY=unit->Y;
 		unit->SavedCommand.Data.Move.Goal=NoUnitP;
 		ResetPath(unit->SavedCommand);
-#endif
 		unit->SubAction|=2;
+#endif
 	    }
 	} else if( (goal=AttackUnitsInRange(unit)) ) {
 	    DebugLevel3Fn(" %Zd #%d\n",UnitNumber(goal),goal->Refs);
@@ -229,7 +230,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 #endif
 		goal->Refs++;
 		unit->State=0;
-		unit->SubAction=1;
+		unit->SubAction=1;	// Mark attacking.
 		if( !type->Tower ) {
 		    UnitHeadingFromDeltaXY(unit,goal->X-unit->X
 			    ,goal->Y-unit->Y);
@@ -262,7 +263,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    unit->Command.Data.Move.Goal=NoUnitP;
 #endif
 	}
-	unit->SubAction=unit->State=0;
+	unit->SubAction=unit->State=0;	// No attacking, restart
     }
 
     //
