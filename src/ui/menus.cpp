@@ -4223,6 +4223,8 @@ local void NetworkGamePrepareGameSettings(void)
 
     DebugLevel0Fn("NetPlayers = %d\n" _C_ NetPlayers);
 
+    GameSettings.NetGameType=SettingsMultiPlayerGame;
+
 #ifdef DEBUG
     for (i = 0; i < PlayerMax-1; i++) {
 	printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
