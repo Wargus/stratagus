@@ -4045,17 +4045,13 @@ local void ScenSelectFolder(void)
 local void ScenSelectOk(void)
 {
     FileList *fl;
-    char *cp;
     Menuitem *mi = ScenSelectMenuItems + 1;
     int i = mi->d.listbox.curopt + mi->d.listbox.startline;
 
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type == 0) {
-	    cp = strrchr(ScenSelectPath, '/');
-	    if (!cp || cp[1]) {
-		strcat(ScenSelectPath, "/");
-	    }
+	    strcat(ScenSelectPath, "/");
 	    strcat(ScenSelectPath, fl[i].name);
 	    if (ScenSelectMenuItems[9].flags&MenuButtonDisabled) {
 		ScenSelectMenuItems[9].flags &= ~MenuButtonDisabled;
