@@ -1512,8 +1512,8 @@ local void MenuHandleMouseMove(int x,int y)
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
 			if ((!mi->d.gem.text || x < xs - 4 || x > xs + 
-				VideoTextLength(GameFont, mi->d.gem.text)+32 || y < ys - 4 || 
-				y > ys + VideoTextHeight(GameFont)+10) && (x < xs || 
+				VideoTextLength(GameFont, mi->d.gem.text)+30 || y < ys - 4 || 
+				y > ys + VideoTextHeight(GameFont)+12) && (x < xs || 
 				x > xs + mi->d.gem.xsize || y < ys || y > ys + mi->d.gem.ysize)) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
