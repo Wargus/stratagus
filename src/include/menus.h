@@ -118,6 +118,7 @@ typedef int MenuButtonId;
 struct _button_style_;
 struct _map_info_;
 struct _world_map_;
+struct _graphic_;
 
 /*----------------------------------------------------------------------------
 --  Menus
@@ -155,7 +156,7 @@ typedef struct _menuitem_pulldown_ {
 	unsigned int state;
 } MenuitemPulldown;
 typedef struct _menuitem_listbox_ {
-	void *options;
+	void* options;
 	int xsize;
 	int ysize;
 	MenuButtonId button;
@@ -167,7 +168,7 @@ typedef struct _menuitem_listbox_ {
 	int nlines;
 	int startline;
 	int dohandler;
-	void *(*retrieveopt)(struct _menuitem_*, int);
+	void* (*retrieveopt)(struct _menuitem_*, int);
 	void (*handler)(void);  /* for return key */
 } MenuitemListbox;
 typedef struct _menuitem_vslider_ {
@@ -284,7 +285,7 @@ typedef struct _menu_ {
 	int       Height;     ///< menu area height
 	char*     Panel;      ///< optional background panel
 	char*     Background; ///< optional background image behind the menu panel
-	Graphic*  BackgroundG;///< optional background image behind the menu panel
+	struct _graphic_*  BackgroundG;///< optional background image behind the menu panel
 	int       DefSel;     ///< initial selected item number (or -1)
 	int       NumItems;   ///< number of items to follow
 	Menuitem* Items;      ///< buttons, etc
@@ -298,7 +299,7 @@ typedef struct _menu_graphics_ {
 	char* File[MAX_RACES];    ///< resource filename one for each race
 	int   Width[MAX_RACES];   ///< Width of button
 	int   Height[MAX_RACES];  ///< Height of button
-	Graphic* Sprite;          ///< sprite : FILLED
+	struct _graphic_* Sprite; ///< sprite : FILLED
 } MenuGraphics;
 
 /*----------------------------------------------------------------------------
@@ -349,11 +350,11 @@ extern void DrawMenuButton(struct _button_style_* style, unsigned flags,
 	/// Set menu backgound and draw it
 extern void MenusSetBackground(void);
 	/// Draw and process a menu
-extern void ProcessMenu(const char* MenuId, int Loop);
+extern void ProcessMenu(const char* menu_id, int loop);
 	/// End the current menu
 extern void EndMenu(void);
 	/// Find a menu by id
-extern Menu *FindMenu(const char* MenuId);
+extern Menu* FindMenu(const char* menu_id);
 
 	/// The scenario path received from server, Update the client menu
 extern int NetClientSelectScenario(void);

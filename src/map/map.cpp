@@ -40,6 +40,7 @@
 
 #include "stratagus.h"
 #include "map.h"
+#include "tileset.h"
 #include "minimap.h"
 #include "player.h"
 #include "unit.h"

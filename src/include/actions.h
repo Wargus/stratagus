@@ -49,6 +49,7 @@ struct _unit_type_;
 struct _upgrade_;
 struct _spell_type_;
 struct _order_;
+struct _animation_;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -192,7 +193,7 @@ extern void HandleActionSpellCast(struct _unit_* unit);
 ----------------------------------------------------------------------------*/
 
 	/// Handle the animation of a unit
-extern int UnitShowAnimation(struct _unit_* unit, const Animation* animation);
+extern int UnitShowAnimation(struct _unit_* unit, const struct _animation_* animation);
 	/// Handle the actions of all units each game cycle
 extern void UnitActions(void);
 	/// Unload an unit.

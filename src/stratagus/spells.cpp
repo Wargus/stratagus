@@ -58,6 +58,7 @@
 #include "sound_id.h"
 #include "missile.h"
 #include "map.h"
+#include "tileset.h"
 #include "ui.h"
 #include "actions.h"
 

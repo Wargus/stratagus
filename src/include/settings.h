@@ -34,17 +34,12 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-#ifndef __STRUCT_SETTINGS__
-#define __STRUCT_SETTINGS__
-typedef struct _settings_ Settings;
-#endif
-
-#include "player.h"
-#include "map.h"
-#include "campaign.h"
+struct _CL_File_;
+struct _world_map_;
+struct _campaign_chapter_;
 
 /*----------------------------------------------------------------------------
 --  Settings  __WIP__
@@ -59,7 +54,7 @@ typedef struct _settings_ Settings;
 **  simplifies load/save/reinitialization, etc...
 **
 */
-struct _settings_ {
+typedef struct _settings_ {
 	int NetGameType;   ///< Multiplayer or single player
 
 //  Individual presets:
@@ -78,22 +73,22 @@ struct _settings_ {
 	int GameType;    ///< Game type (melee, free for all,...)
 	int NoFogOfWar;  ///< No fog of war
 	int RevealMap;   ///< Reveal map
-};
+} Settings;
 
 #define SettingsPresetMapDefault  -1  ///< Special: Use pud/cm supplied
 
 /**
 **  Single or multiplayer settings
 */
-#define SettingsSinglePlayerGame 1
-#define SettingsMultiPlayerGame 2
+#define SettingsSinglePlayerGame  1
+#define SettingsMultiPlayerGame   2
 
 /*
 **  Resource-Preset factor
 */
 #define SettingsResourcesMapDefault  SettingsPresetMapDefault
-#define SettingsResourcesLow    0
-#define SettingsResourcesMedium    1
+#define SettingsResourcesLow     0
+#define SettingsResourcesMedium  1
 #define SettingsResourcesHigh    2
 
 /*
@@ -152,9 +147,9 @@ typedef struct _credits_ {
 
 #define MAX_TIPS 50    ///< How many tips supported
 
-extern char* Tips[MAX_TIPS+1];  ///< Array of tips
-extern int   ShowTips;          ///< Show tips at start of level
-extern int   CurrentTip;        ///< Current tip to display
+extern char* Tips[MAX_TIPS + 1];  ///< Array of tips
+extern int   ShowTips;            ///< Show tips at start of level
+extern int   CurrentTip;          ///< Current tip to display
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -173,7 +168,7 @@ extern void ShowIntro(const Intro* intro);
 	/// Show game credits
 extern void ShowCredits();
 	/// Show picture
-extern void ShowPicture(CampaignChapter* chapter);
+extern void ShowPicture(struct _campaign_chapter_* chapter);
 	/// Show stats
 extern void ShowStats();
 	/// Register CCL functions for credits
@@ -181,9 +176,9 @@ extern void CreditsCclRegister(void);
 	/// Register CCL functions for objectives
 extern void ObjectivesCclRegister(void);
 	/// Save the objectives
-extern void SaveObjectives(CLFile* file);
+extern void SaveObjectives(struct _CL_File_* file);
 	/// Create a game
-extern void CreateGame(char* filename, WorldMap* map);
+extern void CreateGame(char* filename, struct _world_map_* map);
 	/// Init Setting to default values
 extern void InitSettings(void);
 

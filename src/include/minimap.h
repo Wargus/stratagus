@@ -37,12 +37,12 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-#define MINIMAP_FAC (16*3)  ///< integer scale factor
+#define MINIMAP_FAC (16 * 3)  ///< integer scale factor
 
 	/// unit attacked are shown red for at least this amount of cycles
-#define ATTACK_RED_DURATION (1*CYCLES_PER_SECOND)
+#define ATTACK_RED_DURATION (1 * CYCLES_PER_SECOND)
 	/// unit attacked are shown blinking for this amount of cycles
-#define ATTACK_BLINK_DURATION (7*CYCLES_PER_SECOND)
+#define ATTACK_BLINK_DURATION (7 * CYCLES_PER_SECOND)
 
 	/// Update seen tile change in minimap
 #define UpdateMinimapSeenXY(tx, ty)
@@ -78,9 +78,9 @@ extern void DrawMinimap(int vx, int vy);
 extern void DrawMinimapCursor(int vx, int vy);
 
 	/// Convert minimap cursor X position to tile map coordinate
-extern int ScreenMinimap2MapX(int);
+extern int ScreenMinimap2MapX(int x);
 	/// Convert minimap cursor Y position to tile map coordinate
-extern int ScreenMinimap2MapY(int);
+extern int ScreenMinimap2MapY(int y);
 
 //@}
 

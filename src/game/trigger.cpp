@@ -46,6 +46,7 @@
 #include "trigger.h"
 #include "campaign.h"
 #include "interface.h"
+#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

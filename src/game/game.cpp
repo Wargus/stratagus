@@ -41,6 +41,7 @@
 
 #include "stratagus.h"
 #include "map.h"
+#include "tileset.h"
 #include "minimap.h"
 #include "player.h"
 #include "unit.h"
@@ -48,6 +49,7 @@
 #include "pud.h"
 #include "ui.h"
 #include "font.h"
+#include "sound.h"
 #include "sound_server.h"
 #include "menus.h"
 #include "depend.h"

@@ -46,6 +46,7 @@
 #include "map.h"
 #include "depend.h"
 #include "pathfinder.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

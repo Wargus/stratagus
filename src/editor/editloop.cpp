@@ -40,6 +40,7 @@
 #include "stratagus.h"
 #include "video.h"
 #include "map.h"
+#include "tileset.h"
 #include "minimap.h"
 #include "settings.h"
 #include "network.h"

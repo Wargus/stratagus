@@ -34,10 +34,10 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-#include "map.h"
+struct _world_map_;
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -93,15 +93,15 @@
 ----------------------------------------------------------------------------*/
 
 	/// Return info for pud
-extern MapInfo* GetPudInfo(const char*);
+extern MapInfo* GetPudInfo(const char* pud);
 
 	/// Load a pud file
-extern void LoadPud(const char* pud,WorldMap* map);
+extern void LoadPud(const char* pud, struct _world_map_* map);
 
 	/// Save a pud file
-extern int SavePud(const char* pud,const WorldMap* map);
+extern int SavePud(const char* pud, const struct _world_map_* map);
 	/// Change a pud's tileset
-extern void ChangeTilesetPud(int old,WorldMap* map);
+extern void ChangeTilesetPud(int old, struct _world_map_* map);
 
 	/// Clean the pud module
 extern void CleanPud(void);

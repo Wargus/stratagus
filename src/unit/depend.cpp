@@ -45,6 +45,7 @@
 #include "depend.h"
 #include "player.h"
 #include "script.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
