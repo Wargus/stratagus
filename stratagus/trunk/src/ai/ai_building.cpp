@@ -271,6 +271,9 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	    for( i=0; i<8; ++i ) {		// mark all neighbors
 		x=rx+xoffset[i];
 		y=ry+yoffset[i];
+		if( x<0 || x>= TheMap.Width || y<0 || y>=TheMap.Height ) {
+		    continue;
+		}
 		m=matrix+x+y*w;
 		if( *m ) {			// already checked
 		    continue;
@@ -497,6 +500,9 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 	    for( i=0; i<8; ++i ) {		// mark all neighbors
 		x=rx+xoffset[i];
 		y=ry+yoffset[i];
+		if( x<0 || x>= TheMap.Width || y<0 || y>=TheMap.Height ) {
+		    continue;
+		}
 		m=matrix+x+y*w;
 		if( *m ) {			// already checked
 		    continue;
@@ -515,9 +521,9 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 		    *m=1;
 		    points[wp].X=x;		// push the point
 		    points[wp].Y=y;
-			if( ++wp>=size ) {			// round about
-				wp=0;
-			}
+		    if( ++wp>=size ) {		// round about
+			    wp=0;
+		    }
 		} else {			// unreachable
 		    *m=99;
 		}
