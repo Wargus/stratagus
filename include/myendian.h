@@ -135,7 +135,7 @@ extern unsigned inline _FetchLE32(unsigned char **pp) {
 #include <sys/types.h>
 #else
 #include <endian.h>
-#endif /* __FreeBSD__ */
+#endif	// __FreeBSD__
 
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 #include <byteswap.h>

@@ -210,7 +210,6 @@ local void MixMusicToStereo32(int* buffer, int size)
 	if (n) {			// End reached
 	    SCM cb;
 
-	    DebugLevel3Fn("End of music %d\n", i);
 	    PlayingMusic = 0;
 	    if (ModFile) {
 		ModPlug_Unload(ModFile);
@@ -979,7 +978,7 @@ global void WriteSound(void)
 	audio_buf_info info;
 
 	ioctl(SoundFildes,SNDCTL_DSP_GETOSPACE,&info);
-	DebugLevel0("%d Free bytes %d\n",FrameCounter,info.bytes);
+	DebugLevel0("%lu Free bytes %d\n",GameCycle,info.bytes);
 	if( info.bytes<sizeof(buffer) ) {
 	    return;
 	}

@@ -104,7 +104,7 @@ global void HandleActionFollow(Unit* unit)
 	    //
 	    if( unit->SubAction++<10 ) {
 		//	To keep the load low, retry delayed.
-		unit->Wait=FRAMES_PER_SECOND/10+unit->SubAction;
+		unit->Wait=CYCLES_PER_SECOND/10+unit->SubAction;
 		break;
 	    }
 	    // FALL THROUGH

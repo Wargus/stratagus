@@ -643,7 +643,8 @@ char *ncconstatenames[] = {
 #endif
 
 /**
-**	Send a message to the server, but only if the last packet was a while ago
+**	Send a message to the server, but only if the last packet was a while
+**	ago
 **
 **	@param msg	The message to send
 **	@param msecs	microseconds to delay
@@ -664,7 +665,8 @@ local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
 	}
 	n = NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), msg);
 	DebugLevel0Fn("Sending Init Message (%s:%d): %d:%d(%d) %d.%d.%d.%d:%d\n",
-		ncconstatenames[NetLocalState], NetStateMsgCnt, msg->Type, msg->SubType, n,
+		ncconstatenames[NetLocalState], NetStateMsgCnt, msg->Type,
+		msg->SubType, n,
 		NIPQUAD(ntohl(NetworkServerIP)), NetworkServerPort);
     }
 }

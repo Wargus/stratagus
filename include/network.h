@@ -10,12 +10,11 @@
 //
 /**@name network.h	-	The network header file. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -41,7 +40,7 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#define NetworkMaxLag	250		/// Debuging network lag (# frames)
+#define NetworkMaxLag	250		/// Debuging network lag (# game cycles)
 
 #define NetworkDups	4		/// Repeat old commands
 
@@ -105,7 +104,7 @@ typedef struct _ack_message_ {
 */
 typedef struct _network_command_ {
     unsigned char	Type;		/// Network command type.
-    unsigned char	Frame;		/// Destination frame.
+    unsigned char	Cycle;		/// Destination game cycle.
     UnitRef		Unit;		/// Command for unit.
     unsigned short	X;		/// Map position X.
     unsigned short	Y;		/// Map position Y.
@@ -126,7 +125,7 @@ typedef struct _network_packet_ {
 **	Network chat message.
 */
 typedef struct _network_chat_ {
-    unsigned char	Frame;		/// Destination frame
+    unsigned char	Cycle;		/// Destination game cycle
     unsigned char	Type;		/// Network command type
     unsigned char	Player;		/// Sending player
     char		Text[7];	/// Message bytes
@@ -139,8 +138,8 @@ typedef struct _network_chat_ {
 extern int NetworkNumInterfaces;	/// Network number of interfaces
 extern int NetworkFildes;		/// Network file descriptor
 extern int NetworkInSync;		/// Network is in sync
-extern int NetworkUpdates;		/// Network update each # frames
-extern int NetworkLag;			/// Network lag (# frames)
+extern int NetworkUpdates;		/// Network update each # game cycles
+extern int NetworkLag;			/// Network lag (# game cycles)
 
 /*----------------------------------------------------------------------------
 --	Functions

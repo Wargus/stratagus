@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; either only 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -280,7 +279,7 @@ global void HandleActionMove(Unit* unit)
 	    //
 	    if( unit->SubAction++<10 ) {
 		//	To keep the load low, retry delayed.
-		unit->Wait=FRAMES_PER_SECOND/10+unit->SubAction;
+		unit->Wait=CYCLES_PER_SECOND/10+unit->SubAction;
 		// FIXME: Now the units didn't defend themself :(((((((
 		break;
 	    }

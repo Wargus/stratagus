@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -125,9 +124,9 @@ global void SetVideoSync(void)
     }
 
     itv.it_interval.tv_sec=itv.it_value.tv_sec=
-	(100/FRAMES_PER_SECOND)/VideoSyncSpeed;
+	(100/CYCLES_PER_SECOND)/VideoSyncSpeed;
     itv.it_interval.tv_usec=itv.it_value.tv_usec=
-	(100000000/FRAMES_PER_SECOND)/VideoSyncSpeed-
+	(100000000/CYCLES_PER_SECOND)/VideoSyncSpeed-
 	itv.it_value.tv_sec*100000;
     if( setitimer(ITIMER_REAL,&itv,NULL) ) {
 	fprintf(stderr,"Can't set itimer\n");
