@@ -18,6 +18,8 @@
 
 //@{
 
+#define noTIMEIT			/// Enable cpu use debugging
+
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
@@ -29,6 +31,9 @@
 
 #include "player.h"
 #include "unit.h"
+#if defined(DEBUG) && defined(TIMEIT)
+#include "rdtsc.h"
+#endif
 
 #include "ai_local.h"
 
@@ -235,7 +240,7 @@ local void AiCheckUnits(void)
 	    t=aiut->Type->Type;
 	    x=aiut->Want;
 	    if( x>unit_types_count[t]+counter[t] ) {	// Request it.
-		DebugLevel2Fn("Force %d need %s * %d\n" _C_ i _C_
+		DebugLevel3Fn("Force %d need %s * %d\n" _C_ i _C_
 			aiut->Type->Ident,x);
 		AiAddUnitTypeRequest(aiut->Type,
 			x-unit_types_count[t]-counter[t]);
@@ -605,6 +610,12 @@ global void AiEachFrame(Player* player)
 */
 global void AiEachSecond(Player* player)
 {
+#ifdef TIMEIT
+    u_int64_t sv=rdtsc();
+    u_int64_t ev;
+    static long mv;
+    long sx;
+#endif
 
     DebugLevel3Fn("%d:\n" _C_ player->Player);
 
@@ -625,6 +636,13 @@ global void AiEachSecond(Player* player)
     //	Handle the force manager.
     //
     AiForceManager();
+
+#ifdef TIMEIT
+    ev=rdtsc();
+    sx=(ev-sv);
+    mv=(mv+sx)/2;
+    DebugLevel1Fn("%ld %ld\n",sx/1000,mv/1000);
+#endif
 }
 
 //@}
