@@ -24,3 +24,11 @@ freecraft.dsp
 freecraft.dsw
 freecraft.plg
 freecraft.ncb
+startool.dsp
+startool.plg
+startool___Win32_Debug
+startool___Win32_Release
+wartool.dsp
+wartool.plg
+wartool___Win32_Debug
+wartool___Win32_Release
