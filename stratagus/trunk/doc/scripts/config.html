@@ -79,13 +79,11 @@
 <A HREF="#set-leave-stops!">set-leave-stops!</A>
 <A HREF="#set-menu-background!">set-menu-background!</A>
 <A HREF="#set-menu-background-with-title!">set-menu-background-with-title!</A>
-<A HREF="#set-menu-music!">set-menu-music!</A>
 <A HREF="#set-minimap-terrain!">set-minimap-terrain!</A>
 <A HREF="#set-mouse-adjust!">set-mouse-adjust!</A>
 <A HREF="#set-mouse-scale!">set-mouse-scale!</A>
 <A HREF="#set-mouse-scroll!">set-mouse-scroll!</A>
 <A HREF="#set-mouse-scroll-speed!">set-mouse-scroll-speed!</A>
-<A HREF="#set-music-volume!">set-music-volume!</A>
 <A HREF="#set-original-resources!">set-original-resources!</A>
 <A HREF="#set-reveal-attacker!">set-reveal-attacker!</A>
 <A HREF="#set-reverse-map-move!">set-reverse-map-move!</A>
@@ -97,7 +95,6 @@
 <A HREF="#set-show-reaction-range!">set-show-reaction-range!</A>
 <A HREF="#set-show-sight-range!">set-show-sight-range!</A>
 <A HREF="#set-show-tips!">set-show-tips!</A>
-<A HREF="#set-sound-volume!">set-sound-volume!</A>
 <A HREF="#set-speed-build!">set-speed-build!</A>
 <A HREF="#set-speed-chop!">set-speed-chop!</A>
 <A HREF="#set-speed-gold!">set-speed-gold!</A>
@@ -109,7 +106,6 @@
 <A HREF="#set-speed-upgrade!">set-speed-upgrade!</A>
 <A HREF="#set-speed-wood!">set-speed-wood!</A>
 <A HREF="#set-speeds!">set-speeds!</A>
-<A HREF="#set-title-music!">set-title-music!</A>
 <A HREF="#set-title-screen!">set-title-screen!</A>
 <A HREF="#set-training-queue!">set-training-queue!</A>
 <A HREF="#set-xp-damage!">set-xp-damage!</A>
@@ -1152,35 +1148,6 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 
 <A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
 
-<A NAME="set-menu-music!"></A>
-<H3>set-menu-music!</H3>
-
-<H4>Description</H4>
-
-Set the default menu music.
-
-<H4>Syntax</H4>
-
-<CODE>(set-menu-music! song)</CODE>
-
-<DL>
-<DT>song</DT>
-<DD>Song to be played at menu screen, this is the second screen displayed.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-menu-music! "music/default.mod")
-</PRE>
-
-<P>This is the default song played.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
 <A NAME="set-minimap-terrain!"></A>
 <H3>set-minimap-terrain!</H3>
 
@@ -1318,35 +1285,6 @@ Set the default menu music.
 
 <PRE>
     (set-mouse-scroll-speed! 1)
-</PRE>
-
-<P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
-<A NAME="set-music-volume!"></A>
-<H3>set-music-volume!</H3>
-
-<H4>Description</H4>
-
-.
-
-<H4>Syntax</H4>
-
-<CODE>(set-music-volume! volume)</CODE>
-
-<DL>
-<DT>volume</DT>
-<DD>.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-music-volume! 128)
 </PRE>
 
 <P>.
@@ -1674,35 +1612,6 @@ settings.
 
 <A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
 
-<A NAME="set-sound-volume!"></A>
-<H3>set-sound-volume!</H3>
-
-<H4>Description</H4>
-
-.
-
-<H4>Syntax</H4>
-
-<CODE>(set-sound-volume! volume)</CODE>
-
-<DL>
-<DT>volume</DT>
-<DD>.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-sound-volume! 128)
-</PRE>
-
-<P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
 <A NAME="set-speed-build!"></A>
 <H3>set-speed-build!</H3>
 
@@ -2017,35 +1926,6 @@ Set all speeds.
 </PRE>
 
 <P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
-<A NAME="set-title-music!"></A>
-<H3>set-title-music!</H3>
-
-<H4>Description</H4>
-
-Change the default title music.
-
-<H4>Syntax</H4>
-
-<CODE>(set-title-music! song)</CODE>
-
-<DL>
-<DT>song</DT>
-<DD>Song to be played at title screen, this is the first screen displayed.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-title-music! "music/default.mod")
-</PRE>
-
-<P>This is the default song played.
 
 <H4>Used</H4>
 
