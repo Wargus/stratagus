@@ -444,6 +444,10 @@ local void DrawTileIcons(void)
     while (y < TheUI.ButtonPanelY + 100) {
 	x = TheUI.ButtonPanelX + 4;
 	while (x < TheUI.ButtonPanelX + 144) {
+	    if (!TheMap.Tileset->BasicNameTable[0x10 + i * 16]) {
+		y = TheUI.ButtonPanelY + 100;
+		break;
+	    }
 #ifdef USE_OPENGL
 	    MapDrawTile(TheMap.Tileset->Table[0x10 + i * 16], x, y);
 #else
@@ -457,10 +461,10 @@ local void DrawTileIcons(void)
 	    if (CursorOn == CursorOnButton && ButtonUnderCursor == i + 100) {
 		VideoDrawRectangle(ColorWhite, x - 1, y - 1, TileSizeX+2, TileSizeY+2);
 	    }
-	    x += 34;
-	    i++;
+	    x += TileSizeX+2;
+	    ++i;
 	}
-	y += 34;
+	y += TileSizeY+2;
     }
 }
 
@@ -1630,6 +1634,10 @@ local void EditorCallbackMouse(int x, int y)
 	while (by < TheUI.ButtonPanelY + 100) {
 	    bx = TheUI.ButtonPanelX + 4;
 	    while (bx < TheUI.ButtonPanelX + 144) {
+		if (!TheMap.Tileset->BasicNameTable[0x10 + i * 16]) {
+		    by = TheUI.ButtonPanelY + 100;
+		    break;
+		}
 		if (bx < x && x < bx + TileSizeX
 			&& by < y && y < by + TileSizeY) {
 		    int j;
@@ -1641,10 +1649,16 @@ local void EditorCallbackMouse(int x, int y)
 		    CursorOn = CursorOnButton;
 		    return;
 		}
-		bx += 34;
-		i++;
+		bx += TileSizeX+2;
+		++i;
 	    }
-	    by += 34;
+	    by += TileSizeY+2;
+	}
+
+	if (TheUI.InfoPanelX <= x && x <= TheUI.ButtonPanelX + 144 + TileSizeX
+		&& TheUI.InfoPanelY <= y && y <= TheUI.ButtonPanelY + 100) {
+	    ClearStatusLine();
+	    return;
 	}
     }
 
