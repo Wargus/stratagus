@@ -118,7 +118,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
 local void ScenSelectLBAction(Menuitem *mi, int i);
 local void ScenSelectTPMSAction(Menuitem *mi, int i);
 local void ScenSelectVSAction(Menuitem *mi, int i);
-local void ScenSelectHSAction(Menuitem *mi, int i);
+local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i);
 local void ScenSelectFolder(void);
 local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
@@ -815,7 +815,7 @@ local Menuitem SpeedSettingsMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Speed Settings", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_HSLIDER, 108, 80, 0, 0, NULL, NULL,
-            { hslider:{ 0, 6*18, 18, ScenSelectHSAction, -1, 0, 0, 0, ScenSelectOk} } },
+            { hslider:{ 0, 6*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_VSLIDER, 10, 100, 0, 0, NULL, NULL,
             { vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
@@ -2446,7 +2446,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSAction(Menuitem *mi, int i)
+local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 {
     int op, d1, d2;
 
@@ -2455,23 +2455,19 @@ local void ScenSelectHSAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
-		    mi->d.listbox.curopt++;
-		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-			mi->d.listbox.curopt--;
-			mi->d.listbox.startline++;
-		    }
-		    MustRedraw |= RedrawMenu;
-		}
+		DebugLevel0Fn("Increasing game speed by 10%");
+		mi[1].d.hslider.percent += 10;
+		if (mi[1].d.hslider.percent > 100)
+		    mi[1].d.hslider.percent = 100;
+		VideoSyncSpeed = mi[1].d.hslider.percent + 50;
+		SetVideoSync();
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
-		    mi->d.listbox.curopt--;
-		    if (mi->d.listbox.curopt < 0) {
-			mi->d.listbox.curopt++;
-			mi->d.listbox.startline--;
-		    }
-		    MustRedraw |= RedrawMenu;
-		}
+		DebugLevel0Fn("Decreasing game speed by 10%");
+		mi[1].d.hslider.percent -= 10;
+		if (mi[1].d.hslider.percent < 0)
+		    mi[1].d.hslider.percent = 0;
+		VideoSyncSpeed = mi[1].d.hslider.percent + 50;
+		SetVideoSync();
 	    }
 	    ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
