@@ -688,8 +688,10 @@ if test "$PNG_LOCAL" = 1 ; then
     IF_PNG_PATH="-I\$(TOPDIR)/$LOCAL_PNG "
 fi
 
-echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib $LDF_PNG_PATH $LOCAL_LDF" >> $RULESFILE
-echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include $IF_PNG_PATH $LOCAL_IF" >> $RULESFILE
+if [ "$WIN32" = "0" ] ; then
+    echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib $LDF_PNG_PATH $LOCAL_LDF" >> $RULESFILE
+    echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include $IF_PNG_PATH $LOCAL_IF" >> $RULESFILE
+fi
 
 echo >> $RULESFILE
 
