@@ -42,6 +42,10 @@ extern sem_t SoundThreadChannelSemaphore;
 
 #include "sound_id.h"
 
+#ifdef USE_LIBCDA
+#include "libcda.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --	Definitons
 ----------------------------------------------------------------------------*/
