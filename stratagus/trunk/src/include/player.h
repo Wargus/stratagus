@@ -63,6 +63,7 @@ struct _player_ {
 //    unsigned	UnitFlags[
 //	(UnitTypeInternalMax+BitsOf(unsigned)-1)
 //	    /BitsOf(unsigned)];		/// flags what units are available
+    // FIXME: shouldn't use the constant
     unsigned    UnitTypesCount[UnitTypeInternalMax];       /// each type unit count
 
     unsigned	AiEnabled;		/// handle ai on this computer

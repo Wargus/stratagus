@@ -94,9 +94,10 @@ global unsigned char* CreateMatrix(void)
     unsigned h;
     unsigned e;
 
-    matrix=Matrix;
     w=TheMap.Width+2;
     h=TheMap.Height;
+    matrix=Matrix;
+    //matrix=malloc(w*(h+2));
 
     i=w+w+1;
     memset(matrix,98,i);		// +1 for ships!

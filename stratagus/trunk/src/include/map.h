@@ -32,10 +32,11 @@
 ----------------------------------------------------------------------------*/
 
 // JOHNS:	only limited by computer memory
-//	 512x512:	  2 MB
-//	1024x1024:	  8 MB
-//	2048*2048:	 32 MB
-//	4096*4096:	128 MB
+//			OLD	NEW Code
+//	 512x512:	  2 MB	 3 MB
+//	1024x1024:	  8 MB  12 MB
+//	2048*2048:	 32 MB  48 MB
+//	4096*4096:	128 MB 192 MB
 #define MaxMapWidth	1024		/// maximal map width supported
 #define MaxMapHeight	1024		/// maximal map height supported
 
@@ -65,6 +66,7 @@ typedef struct _map_field_ {
     unsigned short	SeenTile;	/// last seen tile (FOW)
     unsigned short	Flags;		/// field flags
     unsigned char	Value;		/// HP for walls/ Wood Regeneration
+    // FIXME: this could be removed and encoded into visible/expored
     unsigned char	VisibleLastFrame;   /// Visible last frame
 #ifdef NEW_FOW
     unsigned char	VisibleMask:4;	/// Visible mask
@@ -91,11 +93,12 @@ typedef struct _map_field_ {
 #define MapFieldPartiallyVisible    0x0002  /// Field partially visible
 
 #ifndef NEW_FOW
+// 0 Unexplored, 1 Explored, 2 PartialVisible, 3 CompleteVisible
 #define MapFieldVisible		0x0001	/// Field visible
 #define MapFieldExplored	0x0002	/// Field explored
 #endif
 
-#define MapFieldArray		0x0004	/// More than one unit on the field
+//#define MapFieldArray		0x0004	/// More than one unit on the field
 
 #define MapFieldHuman		0x0008	/// Human is owner of the field (walls)
 

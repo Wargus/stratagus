@@ -39,7 +39,7 @@
 */
 global const char UnitTypeType[] = "unit-type";
 
-#ifndef laterUSE_CCL
+#ifndef USE_CCL
 
 /*----------------------------------------------------------------------------
 --	Animations
@@ -1793,7 +1793,7 @@ global UnitType DefaultUnitTypes[] = {
    },   {	 { "teron-gorefiend-attack" }
    } },
 
-{   UnitTypeType, "unit-kurdan-and-sky'ree"
+{   UnitTypeType, "unit-kurdan-and-sky-ree"
     ,"Kurdan and Sky'ree"
     ,NULL, {
 	"gryphon rider.png"
@@ -1802,7 +1802,7 @@ global UnitType DefaultUnitTypes[] = {
 	,DEFAULT }
     , 80, 80			// graphic size
    ,KurdanAndSky_reeAnimations	// animations
-   ,{ "icon-kurdan-and-sky'ree" }
+   ,{ "icon-kurdan-and-sky-ree" }
    ,{ "missile-griffon-hammer" }		// Missile
    ,NULL, NULL, 0
 	//Speed	Overlay	SightR	Hitpnt	Magic
@@ -1824,12 +1824,12 @@ global UnitType DefaultUnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       1,     1
    ,{		// sound
-	 { "kurdan-and-sky'ree-selected" }
-	,{ "kurdan-and-sky'ree-acknowledge" }
-	,{ "kurdan-and-sky'ree-ready" }
+	 { "kurdan-and-sky-ree-selected" }
+	,{ "kurdan-and-sky-ree-acknowledge" }
+	,{ "kurdan-and-sky-ree-ready" }
 	,{ "basic human voices help 1" }
 	,{ "basic human voices dead" }
-   },   {	 { "kurdan-and-sky'ree-attack" }
+   },   {	 { "kurdan-and-sky-ree-attack" }
    } },
 
 {   UnitTypeType, "unit-dentarg"
@@ -2575,7 +2575,7 @@ global UnitType DefaultUnitTypes[] = {
 
 {   UnitTypeType, "unit-gryphon-rider"
     ,"Gryphon Rider"
-    ,"unit-kurdan-and-sky'ree", {
+    ,"unit-kurdan-and-sky-ree", {
 	DEFAULT
 	,DEFAULT
 	,DEFAULT
@@ -2846,7 +2846,7 @@ global UnitType DefaultUnitTypes[] = {
    },   {	 { }
    } },
 
-{   UnitTypeType, "unit-cho'gall"
+{   UnitTypeType, "unit-cho-gall"
     ,"Cho'gall"
     ,"unit-ogre", {
 	DEFAULT
@@ -2855,7 +2855,7 @@ global UnitType DefaultUnitTypes[] = {
 	,DEFAULT }
     , 72, 72			// graphic size
    ,Cho_gallAnimations	// animations
-   ,{ "icon-cho'gall" }
+   ,{ "icon-cho-gall" }
    ,{ "missile-none" }		// Missile
    ,"unit-dead-body", NULL, 0
 	//Speed	Overlay	SightR	Hitpnt	Magic
@@ -2877,12 +2877,12 @@ global UnitType DefaultUnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    1,    0,         0,     0,       1,     1
    ,{		// sound
-	 { "cho'gall-selected" }
-	,{ "cho'gall-acknowledge" }
-	,{ "cho'gall-ready" }
+	 { "cho-gall-selected" }
+	,{ "cho-gall-acknowledge" }
+	,{ "cho-gall-ready" }
 	,{ "basic orc voices help 1" }
 	,{ "basic orc voices dead" }
-   },   {	 { "cho'gall-attack" }
+   },   {	 { "cho-gall-attack" }
    } },
 
 {   UnitTypeType, "unit-lothar"
@@ -2924,7 +2924,7 @@ global UnitType DefaultUnitTypes[] = {
    },   {	 { "lothar-attack" }
    } },
 
-{   UnitTypeType, "unit-gul'dan"
+{   UnitTypeType, "unit-gul-dan"
     ,"Gul'dan"
     ,"unit-death-knight", {
 	DEFAULT
@@ -2933,7 +2933,7 @@ global UnitType DefaultUnitTypes[] = {
 	,DEFAULT }
     , 72, 72			// graphic size
    ,Gul_danAnimations	// animations
-   ,{ "icon-gul'dan" }
+   ,{ "icon-gul-dan" }
    ,{ "missile-touch-of-death" }		// Missile
    ,NULL, NULL, 0
 	//Speed	Overlay	SightR	Hitpnt	Magic
@@ -2955,12 +2955,12 @@ global UnitType DefaultUnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    1,    0,         0,     0,       1,     1
    ,{		// sound
-	 { "gul'dan-selected" }
-	,{ "gul'dan-acknowledge" }
-	,{ "gul'dan-ready" }
+	 { "gul-dan-selected" }
+	,{ "gul-dan-acknowledge" }
+	,{ "gul-dan-ready" }
 	,{ "basic orc voices help 1" }
 	,{ "basic orc voices dead" }
-   },   {	 { "gul'dan-attack" }
+   },   {	 { "gul-dan-attack" }
    } },
 
 {   UnitTypeType, "unit-uther-lightbringer"
@@ -5470,7 +5470,7 @@ global UnitType DefaultUnitTypes[] = {
 **	Unit-types definition
 */
 global UnitType* UnitTypes
-#ifndef laterUSE_CCL
+#ifndef USE_CCL
     = DefaultUnitTypes
 #endif
     ;

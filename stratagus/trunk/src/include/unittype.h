@@ -191,16 +191,17 @@ struct _unit_type_ {
 	// FIXME: This stats should? be moved into the player struct
     UnitStats Stats[PlayerMax];		/// Unit status for each player
 
-    unsigned Type;			/// Type as number
+	// FIXME: Should us a general name f.e. Slot here?
+    unsigned	Type;			/// Type as number
 
     void*	Property;		/// CCL property storage
 
     Graphic*	Sprite;			/// sprite images
 };
 
+    // FIXME: ARI: should be dynamic (ccl..)
     /// How many unit-types are currently supported.
-    /// FIXME: ARI: should be dynamic (ccl..)
-#define UnitTypeInternalMax	0x74
+#define UnitTypeInternalMax	0xFF
 
 /*----------------------------------------------------------------------------
 --	Variables
