@@ -2684,7 +2684,7 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 	}
 	}
 #endif 
-#if defined(HIERARCHIC_PATHFINDER) && defined(DEBUG)
+#if defined(HIERARCHIC_PATHFINDER) && defined(DEBUG) && 0
 		    {
 			char regidstr[8];
 			char groupstr[8];

@@ -123,6 +123,8 @@ global void SaveMap(FILE* file)
 	    if( mf->Flags&MapFieldForest ) {
 		fprintf(file," wood");
 	    }
+#if 0
+	    // Not Required for save
 	    if( mf->Flags&MapFieldLandUnit ) {
 		fprintf(file," ground");
 	    }
@@ -135,6 +137,7 @@ global void SaveMap(FILE* file)
 	    if( mf->Flags&MapFieldBuilding ) {
 		fprintf(file," building");
 	    }
+#endif
 	    if( w&1 ) {
 		fprintf(file,")\n");
 	    } else {

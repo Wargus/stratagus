@@ -738,7 +738,7 @@ local void ExpandGroup (int type, SuperGroup *s, RegGroup *g)
 					ExpandGroup (type, s, ng);
 				} else {
 					if (ng->SuperGroup[type] != g->SuperGroup[type]) {
-#ifdef DEBUG
+#ifdef DEBUG_NO
 						longjmp (main_loop, 1);
 #endif
 					}
