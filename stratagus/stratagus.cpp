@@ -191,7 +191,6 @@ global void FreeCraftInit(void)
 	    break;
     }
     LoadRGB(GlobalPalette, PalettePath);
-    // GlobalPalette=(typeof(GlobalPalette))PalettePNG);
 
     VideoCreatePalette(GlobalPalette);
 
@@ -528,6 +527,9 @@ local void Usage(void)
 \t-h\t\tHelp shows this page\n\
 \t-l\t\tEnable command log to \"command.log\"\n\
 \t-p players\tNumber of players\n\
+\t-n host[:port]\tNetwork argument (port default 6660)\n\
+\t-L lag\t\tNetwork lag in # frames\n\
+\t-U update\tNetwork update frequence in # frames\n\
 \t-s sleep\tNumber of frames for the AI to sleep before they starts\n\
 \t-t factor\tComputer units built time factor\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
@@ -570,7 +572,7 @@ global int main(int argc,char** argv)
     //	Parse commandline
     //
     for( ;; ) {
-	switch( getopt(argc,argv,"c:d:f:hlp:s:t:v:D:FW?") ) {
+	switch( getopt(argc,argv,"c:d:f:hln:p:s:t:v:D:FL:U:W?") ) {
 #if defined(USE_CCL) || defined(USE_CCL2)
 	    case 'c':
 		CclStartFile=optarg;
@@ -587,6 +589,9 @@ global int main(int argc,char** argv)
 		continue;
 	    case 'p':
 		NetPlayers=atoi(optarg);
+		continue;
+	    case 'n':
+		NetworkArg=strdup(optarg);
 		continue;
 	    case 's':
 		AiSleep=atoi(optarg);
@@ -618,6 +623,13 @@ global int main(int argc,char** argv)
 			Usage();
 			exit(-1);
 		}
+		continue;
+
+	    case 'L':
+		NetworkLag=atoi(optarg);
+		continue;
+	    case 'U':
+		NetworkUpdates=atoi(optarg);
 		continue;
 
 	    case 'F':
