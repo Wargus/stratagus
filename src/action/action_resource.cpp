@@ -10,12 +10,11 @@
 //
 /**@name action_resource.c -	The generic resource action. */
 //
-//	(c) Copyright 2001 by Lutz Sammer
+//	(c) Copyright 2001,2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -100,7 +99,8 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 
     DebugCheck( !goal );
     DebugCheck( unit->Wait!=1 );
-    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
+    // FIXME: 0 can happen, if to near placed by map designer.
+    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)>1 );
 
     //
     //	Target is dead, stop getting resources.
