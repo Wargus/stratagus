@@ -322,7 +322,7 @@ global MissileType DefaultMissileTypes[] = {
     0,
     1,
     16,
-    .,
+    1,
     },
 { MissileTypeType,
     "missile-rune",
@@ -541,7 +541,7 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassCycleOnce,
     0,
-    FRAMES_PER_SECOND/30
+    FRAMES_PER_SECOND/30,
     16,
     1,
     },
