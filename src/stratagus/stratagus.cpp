@@ -563,6 +563,14 @@ global void EffectDrawCircle(int* ptr,int depth,int x,int y,int r)
 **	@param frame		Current frame.
 **	@param callbacks	Call backs that handle events.
 */
+#ifdef USE_OPENGL
+local void VideoEffect0(int frame __attribute__((unused)),
+	const EventCallback* callbacks __attribute__((unused)))
+{
+}
+
+#else
+
 local void VideoEffect0(int frame,
 	const EventCallback* callbacks __attribute__((unused)))
 {
@@ -782,6 +790,7 @@ local void VideoEffect0(int frame,
     buf1=buf2;
     buf2=tmp;
 }
+#endif
 
 #ifdef _DEBUG
 /**
