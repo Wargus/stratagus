@@ -48,7 +48,7 @@ typedef struct _resource_ {
 	 /// Find the source of resource
     Unit* (*FindResource)(const Player*,int,int);
 	 /// Find the deposit of resource
-    Unit* (*FindDeposit)(const Player*,int,int);
+    Unit* (*FindDeposit)(const Unit*,int,int);
     int Cost;				/// How many can the unit carry.
     UnitType** Human;			/// Human worker
     UnitType** HumanWithResource;	/// Human worker with resource
@@ -233,7 +233,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	//	Find and send to resource deposit.
 	//
-	if( !(depot=resource->FindDeposit(unit->Player,unit->X,unit->Y)) ) {
+	if( !(depot=resource->FindDeposit(unit,unit->X,unit->Y)) ) {
 	    if( source ) {
 		DropOutOnSide(unit,LookingW
 		    ,source->Type->TileWidth,source->Type->TileHeight);
