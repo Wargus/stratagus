@@ -629,13 +629,13 @@ changed:
 	    }
 	    break;
 	case ccs_connecting:		// connect to server
-	    if (NetStateMsgCnt < 60) {	// 60 retries = 30 seconds
+	    if (NetStateMsgCnt < 48) {	// 48 retries = 24 seconds
 		message.Type = MessageInitHello;
 		message.SubType = ICMHello;
 		memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, 16);
 		message.MapUID = 0L;
 		NetworkSendRateLimitedClientMessage(&message, 500);
-		sprintf(NetTriesText, "Connecting try %d of 60", NetStateMsgCnt);
+		sprintf(NetTriesText, "Connecting try %d of 48", NetStateMsgCnt);
 	    } else {
 		NetLocalState = ccs_unreachable;
 		NetConnectRunning = 0;	// End the menu..
@@ -740,6 +740,33 @@ changed:
 }
 
 /**
+**	Kick a client that doesn't answer to our packets
+**
+**	@param c	The client (host slot) to kick
+*/
+local void KickDeadClient(int c)
+{
+    int n;
+
+    DebugLevel0Fn("kicking client %d\n" _C_ Hosts[c].PlyNr);
+    NetStates[c].State = ccs_unused;
+    Hosts[c].Host = 0;
+    Hosts[c].Port = 0;
+    Hosts[c].PlyNr = 0;
+    memset(Hosts[c].PlyName, 0, 16);
+    ServerSetupState.Ready[c] = 0;
+    ServerSetupState.Race[c] = 0;
+    ServerSetupState.LastFrame[c] = 0L;
+
+    // Resync other clients
+    for (n = 1; n < PlayerMax-1; n++) {
+	if (n != c && Hosts[n].PlyNr) {
+	    NetStates[n].State = ccs_async;
+	}
+    }
+}
+
+/**
 **	Server Menu Loop: Send out server request messages
 */
 global void NetworkProcessServerRequest(void)
@@ -758,25 +785,8 @@ global void NetworkProcessServerRequest(void)
 	    fcd = FrameCounter - ServerSetupState.LastFrame[i];
 	    if (fcd >= CLIENT_LIVE_BEAT) {
 		if (fcd > CLIENT_IS_DEAD) {
-		    // kick client...
-		    DebugLevel0Fn("kicking client %d\n" _C_ Hosts[i].PlyNr);
-		    NetStates[i].State = ccs_unused;
-		    Hosts[i].Host = 0;
-		    Hosts[i].Port = 0;
-		    Hosts[i].PlyNr = 0;
-		    memset(Hosts[i].PlyName, 0, 16);
-		    ServerSetupState.Ready[i] = 0;
-		    ServerSetupState.Race[i] = 0;
-		    ServerSetupState.LastFrame[i] = 0L;
-
-		    // Resync other clients
-		    for (n = 1; n < PlayerMax-1; n++) {
-			if (n != i && Hosts[n].PlyNr) {
-			    NetStates[n].State = ccs_async;
-			}
-		    }
+		    KickDeadClient(i);
 		    NetConnectForceDisplayUpdate();
-
 		} else if (fcd % 5 == 0) {
 		    message.Type = MessageInitReply;
 		    message.SubType = ICMAYT;	// Probe for the client
@@ -1128,7 +1138,7 @@ local void ClientParseBadMap(
 }
 
 /**
-**	FIXME: docu
+**	Parse the initial 'Hello' message of new client that wants to join the game
 **
 **	@param msg	message received
 */
@@ -1201,9 +1211,10 @@ local void ServerParseHello(const InitMessage* msg)
     DebugLevel0Fn("Sending InitReply Message Welcome: (%d) [PlyNr: %d] to %d.%d.%d.%d:%d\n" _C_
 		n _C_ k _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
     NetStates[k].MsgCnt++;
-    if (NetStates[k].MsgCnt > 50) {
-	// FIXME: Client sends hellos, but doesn't receive our welcome acks....
-	;
+    if (NetStates[k].MsgCnt > 48) {
+	// Detects UDP input firewalled or behind NAT firewall clients
+	// If packets are missed, clients are kicked by AYT check later..
+	KickDeadClient(k);
     }
     NetConnectForceDisplayUpdate();
 }
