@@ -398,7 +398,12 @@ global const char* IdentOfIcon(IconId icon)
 **	@param x	X display position
 **	@param y	Y display position
 */
+#ifdef NEW_VIDEO
+global void DrawUnitIcon(const void* player,IconId icon,unsigned flags
+	,unsigned x,unsigned y)
+#else
 global void DrawUnitIcon(IconId icon,unsigned flags,unsigned x,unsigned y)
+#endif
 {
     int color;
 
@@ -424,6 +429,9 @@ global void DrawUnitIcon(IconId icon,unsigned flags,unsigned x,unsigned y)
 	++x; ++y;
     }
 
+#ifdef NEW_VIDEO
+    GraphicPlayerPixels(player,Icons[0].IconGraphic);
+#endif
     VideoDrawSub(Icons[0].IconGraphic
 	    ,(icon%5)*Icons[0].Width,(icon/5)*Icons[0].Height
 	    ,Icons[0].Width,Icons[0].Height,x+4,y+4);
