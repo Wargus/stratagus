@@ -88,80 +88,13 @@ local int AiCheckUnitTypeCosts(const UnitType* type)
 }
 
 /**
-**      Find free building place.
-**
-**	@param worker	Worker to build building.
-**	@param type	Type of building.
-**	@param dx	Pointer for X position returned.
-**	@param dy	Pointer for Y position returned.
-**	@return		True if place found, false if no found.
-*/
-global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
-	int *dx, int *dy)
-{
-    int wx, wy, x, y, addx, addy;
-    int end, state;
-
-    wx = worker->X;
-    wy = worker->Y;
-    x = wx;
-    y = wy;
-    addx = 1;
-    addy = 1;
-
-    state = 0;
-    end = y + addy - 1;
-    for (;;) {				// test rectangles arround the place
-	switch (state) {
-	case 0:
-	    if (y++ == end) {
-		++state;
-		end = x + addx++;
-	    }
-	    break;
-	case 1:
-	    if (x++ == end) {
-		++state;
-		end = y - addy++;
-	    }
-	    break;
-	case 2:
-	    if (y-- == end) {
-		++state;
-		end = x - addx++;
-	    }
-	    break;
-	case 3:
-	    if (x-- == end) {
-		state = 0;
-		end = y + addy++;
-		if( addx>=TheMap.Width && addy>=TheMap.Height ) {
-		    return 0;
-		}
-	    }
-	    break;
-	}
-
-	// FIXME: this check outside the map could be speeded up.
-	if (y < 0 || x < 0 || y >= TheMap.Height || x >= TheMap.Width) {
-	    continue;
-	}
-	if (CanBuildUnitType(worker, type, x, y)
-		&& PlaceReachable(worker, x, y, 1)) {
-	    *dx=x;
-	    *dy=y;
-	    return 1;
-	}
-    }
-    return 0;
-}
-
-/**
 **	Check if we can build the building.
 **
 **	@param type	Unit that can build the building.
 **	@param building	Building to be build.
 **	@return		True if made, false if can't be made.
+**
+**	@note 	We must check if the dependencies are fulfilled.
 */
 local int AiBuildBuilding(const UnitType* type,UnitType* building)
 {
@@ -250,7 +183,6 @@ local void AiRequestFarms(void)
 	    AiPlayer->NeededMask|=c;
 	    return;
 	} else {
-	    AiPlayer->NeededMask=0;
 	    DebugLevel0("- enough resources\n");
 	    if( AiMakeUnit(type) ) {
 		queue=malloc(sizeof(*AiPlayer->UnitTypeBuilded));
@@ -268,8 +200,10 @@ local void AiRequestFarms(void)
 **	Check if we can train the unit.
 **
 **	@param type	Unit that can train the unit.
-**	@param what	what to be trained.
+**	@param what	What to be trained.
 **	@return		True if made, false if can't be made.
+**
+**	@note 	We must check if the dependencies are fulfilled.
 */
 local int AiTrainUnit(const UnitType* type,UnitType* what)
 {
@@ -311,6 +245,8 @@ local int AiTrainUnit(const UnitType* type,UnitType* what)
 **
 **	@param type	Unit-type that must be made.
 **	@return		True if made, false if can't be made.
+**
+**	@note 	We must check if the dependencies are fulfilled.
 */
 local int AiMakeUnit(UnitType* type)
 {
@@ -372,22 +308,33 @@ local void AiCheckingWork(void)
     UnitType* type;
     AiBuildQueue* queue;
 
-    DebugLevel0Fn("%d %d %d\n" _C_
+    DebugLevel3Fn("%d %d %d\n" _C_
 	    AiPlayer->Player->Resources[1] _C_
 	    AiPlayer->Player->Resources[2] _C_
 	    AiPlayer->Player->Resources[3]);
 
+    AiPlayer->NeededMask=0;
+
+    if( AiPlayer->NeedFood ) {		// Food has the highest priority
+	AiPlayer->NeedFood=0;
+	AiRequestFarms();
+    }
+
+    //
+    //	Look to the build requests, what can be done.
+    //
     for( queue=AiPlayer->UnitTypeBuilded; queue; queue=queue->Next ) {
 	if( queue->Want>queue->Made ) {
 	    type=queue->Type;
-	    DebugLevel0Fn("Must build: %s " _C_ type->Ident);
+	    DebugLevel3Fn("Must build: %s " _C_ type->Ident);
 
 	    //
 	    //	Check if we have enough food.
 	    //
 	    if( !type->Building && AiPlayer->Player->Food
 			<=AiPlayer->Player->NumFoodUnits ) {
-		DebugLevel0Fn("Need food\n");
+		DebugLevel3Fn("Need food\n");
+		AiPlayer->NeedFood=1;
 		AiRequestFarms();
 		return;
 	    }
@@ -396,12 +343,11 @@ local void AiCheckingWork(void)
 	    //	Check if resources available.
 	    //
 	    if( (c=AiCheckUnitTypeCosts(type)) ) {
-		DebugLevel0("- no resources\n");
-		AiPlayer->NeededMask=c;
+		DebugLevel3("- no resources\n");
+		AiPlayer->NeededMask|=c;
 		return;
 	    } else {
-		AiPlayer->NeededMask=0;
-		DebugLevel0("- enough resources\n");
+		DebugLevel3("- enough resources\n");
 		if( AiMakeUnit(type) ) {
 		    ++queue->Made;
 		}
@@ -420,7 +366,7 @@ local void AiCheckingWork(void)
 **      IDEA: If no way to goldmine, we must dig the way.
 **      IDEA: If goldmine is on an other island, we must transport the workers.
 */
-local void AiMineGold(Unit * unit)
+local int AiMineGold(Unit * unit)
 {
     Unit *dest;
 
@@ -428,9 +374,12 @@ local void AiMineGold(Unit * unit)
     dest = FindGoldMine(unit, unit->X, unit->Y);
     if (!dest) {
 	DebugLevel0Fn("goldmine not reachable\n");
-	return;
+	return 0;
     }
+    DebugCheck(unit->Type!=UnitTypeHumanWorker && unit->Type!=UnitTypeOrcWorker);
     CommandMineGold(unit, dest,FlushCommands);
+
+    return 1;
 }
 
 /**
@@ -514,6 +463,7 @@ local int AiHarvest(Unit * unit)
 	}
 	if (cost != 99999) {
 	    DebugLevel3Fn("wood on %d,%d\n", x, y);
+	    DebugCheck(unit->Type!=UnitTypeHumanWorker && unit->Type!=UnitTypeOrcWorker);
 	    CommandHarvest(unit, bestx, besty,FlushCommands);
 	    return 1;
 	}
@@ -525,6 +475,9 @@ local int AiHarvest(Unit * unit)
 
 /**
 **	Assign workers to collect resources.
+**
+**	If we have a shortage of a resource, let many workers collecting this.
+**	If no shortage, split workers to all resources.
 */
 local void AiCollectResources(void)
 {
@@ -535,7 +488,7 @@ local void AiCollectResources(void)
     Unit* table[UnitMax];
     int nunits;
 
-    DebugLevel0Fn("%x\n" _C_ AiPlayer->NeededMask);
+    DebugLevel3Fn("Needed resources %x\n" _C_ AiPlayer->NeededMask);
 
     //
     //	Look through all costs, if needed.
@@ -545,6 +498,10 @@ local void AiCollectResources(void)
 		|| !(AiPlayer->NeededMask&(1<<c)) ) {
 	    continue;
 	}
+
+	//
+	//	Get all workers that can collect this resource.
+	//
 	types=AiHelpers.Collect[c]->Table;
 	n=AiHelpers.Collect[c]->Count;
 	nunits=0;
@@ -552,7 +509,7 @@ local void AiCollectResources(void)
 	    nunits += FindPlayerUnitsByType(AiPlayer->Player,
 		    types[i],table+nunits);
 	}
-	DebugLevel0Fn("%s: units %d\n" _C_ DEFAULT_NAMES[c] _C_ nunits);
+	DebugLevel3Fn("%s: units %d\n" _C_ DEFAULT_NAMES[c] _C_ nunits);
 
 	//
 	//	Assign the worker
@@ -560,8 +517,7 @@ local void AiCollectResources(void)
 	for( i=0; i<nunits; ++i ) {
 	    // Unit is already *very* busy
 	    if (table[i]->Orders[0].Action != UnitActionBuild
-		    && (table[i]->OrderCount==1
-			|| table[i]->Orders[1].Action != UnitActionBuild) ) {
+		    && table[i]->OrderCount==1 ) {
 		switch( c ) {
 		    case 1:
 			if (table[i]->Orders[0].Action != UnitActionMineGold ) {
@@ -587,6 +543,10 @@ local void AiCollectResources(void)
 	if( c>=AiHelpers.CollectCount || !AiHelpers.Collect[c] ) {
 	    continue;
 	}
+
+	//
+	//	Get all workers that can collect this resource.
+	//
 	types=AiHelpers.Collect[c]->Table;
 	n=AiHelpers.Collect[c]->Count;
 	nunits=0;
@@ -594,7 +554,7 @@ local void AiCollectResources(void)
 	    nunits += FindPlayerUnitsByType(AiPlayer->Player,
 		    types[i],table+nunits);
 	}
-	DebugLevel0Fn("%s: units %d\n" _C_ DEFAULT_NAMES[c] _C_ nunits);
+	DebugLevel3Fn("%s: units %d\n" _C_ DEFAULT_NAMES[c] _C_ nunits);
 
 	//
 	//	Assign the worker
@@ -633,7 +593,7 @@ local void AiCollectResources(void)
 		    types[i],table+nunits);
 	}
     }
-    DebugLevel0Fn("Return: units %d\n" _C_ nunits);
+    DebugLevel3Fn("Return: units %d\n" _C_ nunits);
 
     //
     //	Assign the workers with goods
