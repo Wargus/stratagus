@@ -393,7 +393,7 @@ local void SelectGameServer(Menuitem *mi); // Game Server selection so that clie
 local void AddGameServer(void); //Add Game Server on Meta server
 local void ChangeGameServer(void); //Change Game Parameters on Meta server
 local int MetaServerConnectError(void); // Display error message
-local void MultiMetaServerClose(void);
+local void MultiMetaServerClose(void); //Close Master Server connection
 //others
 local void GameMenuReturn(void);
 local void NetErrorMenu(char *error);
@@ -424,7 +424,8 @@ local int EditorCancelled;
 /**
 **	Other client and server selection state for Multiplayer clients
 */
-global ServerSetup ServerSetupState, LocalSetupState;
+global ServerSetup ServerSetupState;
+global ServerSetup LocalSetupState;
 
 local char ScenSelectPath[1024];		/// Scenario selector path
 local char ScenSelectDisplayPath[1024];		/// Displayed selector path
@@ -913,15 +914,15 @@ local void SaveGameOk(void)
 	strncat(TempPathBuf, name, nameLength);
 
 	// Strip .gz extension.
-	if (!strcmp(TempPathBuf+strlen(TempPathBuf)-3,".gz")) {
-	    TempPathBuf[strlen(TempPathBuf)-3]=0;
+	if (!strcmp(TempPathBuf + strlen(TempPathBuf)-3, ".gz")) {
+	    TempPathBuf[strlen(TempPathBuf) - 3]=0;
 	}
 	// Strip .bz2 extension.
-	if (!strcmp(TempPathBuf+strlen(TempPathBuf)-4,".bz2")) {
-	    TempPathBuf[strlen(TempPathBuf)-4]=0;
+	if (!strcmp(TempPathBuf + strlen(TempPathBuf) - 4,".bz2")) {
+	    TempPathBuf[strlen(TempPathBuf) - 4]=0;
 	}
 	// Add .sav if not already there.
-	if (strcmp(TempPathBuf+strlen(TempPathBuf)-4,".sav")) {
+	if (strcmp(TempPathBuf + strlen(TempPathBuf) - 4,".sav")) {
 	    strcat(TempPathBuf, ".sav");
 	}
 
@@ -945,21 +946,21 @@ local void CreateSaveDir(void)
     }
 
 #ifdef USE_WIN32
-    strcpy(TempPathBuf,GameName);
+    strcpy(TempPathBuf, GameName);
     mkdir(TempPathBuf);
-    strcat(TempPathBuf,"/save");
+    strcat(TempPathBuf, "/save");
     SaveDir=strdup(TempPathBuf);
     mkdir(SaveDir);
 #else
-    strcpy(TempPathBuf,getenv("HOME"));
-    strcat(TempPathBuf,"/");
-    strcat(TempPathBuf,STRATAGUS_HOME_PATH);
-    mkdir(TempPathBuf,0777);
-    strcat(TempPathBuf,"/");
-    strcat(TempPathBuf,GameName);
-    mkdir(TempPathBuf,0777);
-    strcat(TempPathBuf,"/save");
-    mkdir(TempPathBuf,0777);
+    strcpy(TempPathBuf, getenv("HOME"));
+    strcat(TempPathBuf, "/");
+    strcat(TempPathBuf, STRATAGUS_HOME_PATH);
+    mkdir(TempPathBuf, 0777);
+    strcat(TempPathBuf, "/");
+    strcat(TempPathBuf, GameName);
+    mkdir(TempPathBuf, 0777);
+    strcat(TempPathBuf, "/save");
+    mkdir(TempPathBuf, 0777);
     SaveDir = strdup(TempPathBuf);
 #endif
 }
@@ -1073,7 +1074,7 @@ local void SaveGameVSAction(Menuitem *mi, int i)
 	    mi->d.listbox.curopt = 0;
 
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 		    mi->d.listbox.curopt++;
 		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 			mi->d.listbox.curopt--;
@@ -1082,7 +1083,7 @@ local void SaveGameVSAction(Menuitem *mi, int i)
 		    MustRedraw |= RedrawMenu;
 		}
 	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 		    mi->d.listbox.curopt--;
 		    if (mi->d.listbox.curopt < 0) {
 			mi->d.listbox.curopt++;
@@ -1097,23 +1098,25 @@ local void SaveGameVSAction(Menuitem *mi, int i)
 	    }
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
 				 (mi->d.listbox.noptions - 1);
 			    d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
 			    d2 = op - mi[1].d.vslider.curper;
-			    if (d2 >= d1)
+			    if (d2 >= d1) {
 				break;
+			    }
 			    mi->d.listbox.curopt++;
 			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 				mi->d.listbox.curopt--;
 				mi->d.listbox.startline++;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline + 1 == mi->d.listbox.noptions) {
 				break;
+			    }
 			}
 		    }
 		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
@@ -1123,15 +1126,17 @@ local void SaveGameVSAction(Menuitem *mi, int i)
 				     (mi->d.listbox.noptions - 1);
 			    d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
 			    d2 = mi[1].d.vslider.curper - op;
-			    if (d2 >= d1)
+			    if (d2 >= d1) {
 				break;
+			    }
 			    mi->d.listbox.curopt--;
 			    if (mi->d.listbox.curopt < 0) {
 				mi->d.listbox.curopt++;
 				mi->d.listbox.startline--;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0) {
 				break;
+			    }
 			}
 		    }
 		}
@@ -1179,12 +1184,12 @@ local int SaveGameRDFilter(char *pathbuf, FileList *fl)
 	cp = fsuffix + strlen(suf);
 #ifdef USE_ZLIB
 	if (strcmp(cp, ".gz") == 0) {
-	    fl->type='z';
+	    fl->type = 'z';
 	}
 #endif
 #ifdef USE_BZ2LIB
 	if (strcmp(cp, ".bz2") == 0) {
-	    fl->type='b';
+	    fl->type = 'b';
 	}
 #endif
 	if (strcasestr(pathbuf, ".sav")) {
@@ -1313,8 +1318,8 @@ local void LoadGameVSAction(Menuitem *mi, int i)
 	    if (mi->d.listbox.curopt == -1)
 	    mi->d.listbox.curopt = 0;
 
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 		    mi->d.listbox.curopt++;
 		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 			mi->d.listbox.curopt--;
@@ -1322,8 +1327,8 @@ local void LoadGameVSAction(Menuitem *mi, int i)
 		    }
 		    MustRedraw |= RedrawMenu;
 		}
-	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+	    } else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 		    mi->d.listbox.curopt--;
 		    if (mi->d.listbox.curopt < 0) {
 			mi->d.listbox.curopt++;
@@ -1338,41 +1343,45 @@ local void LoadGameVSAction(Menuitem *mi, int i)
 	    }
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		    if (mi->d.listbox.curopt  +mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
 				 (mi->d.listbox.noptions - 1);
 			    d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
 			    d2 = op - mi[1].d.vslider.curper;
-			    if (d2 >= d1)
+			    if (d2 >= d1) {
 				break;
+			    }
 			    mi->d.listbox.curopt++;
 			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 				mi->d.listbox.curopt--;
 				mi->d.listbox.startline++;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions) {
 				break;
+			    }
 			}
 		    }
 		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
 				     (mi->d.listbox.noptions - 1);
 			    d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
 			    d2 = mi[1].d.vslider.curper - op;
-			    if (d2 >= d1)
+			    if (d2 >= d1) {
 				break;
+			    }
 			    mi->d.listbox.curopt--;
 			    if (mi->d.listbox.curopt < 0) {
 				mi->d.listbox.curopt++;
 				mi->d.listbox.startline--;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+			    if (mi->d.listbox.curopt + mi->d.listbox.startline == 0) {
 				break;
+			    }
 			}
 		    }
 		}
@@ -1521,7 +1530,7 @@ local void DeleteConfirmOk(void)
 
     // Update list of files and clear input
     SaveGameLBInit(&CurrentMenu->Items[2]);
-    strcpy(CurrentMenu->Items[1].d.input.buffer,"~!_");
+    strcpy(CurrentMenu->Items[1].d.input.buffer, "~!_");
     CurrentMenu->Items[1].d.input.nch = 0;
 }
 
@@ -1753,7 +1762,7 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 	SavePreferences();
 	InitVideo();
 	DestroyCursorBackground();
-	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	SetClipping(0,0,VideoWidth - 1,VideoHeight - 1);
 	CleanModules();
 	CleanFonts();
 	LoadCcl();
@@ -1786,7 +1795,7 @@ local void GlobalOptionsFullscreenGem(Menuitem *mi __attribute__((unused)))
 */
 local void GlobalOptionsFogOriginalGem(Menuitem *mi __attribute__((unused)))
 {
-    OriginalFogOfWar=1;
+    OriginalFogOfWar = 1;
     GlobalOptionsInit(NULL);
 }
 
@@ -1795,7 +1804,7 @@ local void GlobalOptionsFogOriginalGem(Menuitem *mi __attribute__((unused)))
 */
 local void GlobalOptionsFogAlphaGem(Menuitem *mi __attribute__((unused)))
 {
-    OriginalFogOfWar=0;
+    OriginalFogOfWar = 0;
     GlobalOptionsInit(NULL);
 }
 
@@ -1807,12 +1816,12 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 #ifdef WITH_SOUND
     if (SoundFildes != -1) {
 	QuitSound();
-	SoundOff=1;
+	SoundOff = 1;
     } else {
-	SoundOff=0;
-	if( InitSound() ) {
-	    SoundOff=1;
-	    SoundFildes=-1;
+	SoundOff = 0;
+	if(InitSound()) {
+	    SoundOff = 1;
+	    SoundFildes = -1;
 	}
 	MapUnitSounds();
 	InitSoundServer();
@@ -1988,42 +1997,42 @@ local void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
     j = 0;
 
     for (i=0; i<=PlayerMax-2; ++i) {
-	if (Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
+	if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
 	    menu->Items[4*j+4].d.text.text = Players[i].Name;
 	    if (ThisPlayer->Allied&(1<<Players[i].Player)) {
-		menu->Items[4*j+5].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[4 * j + 5].d.gem.state = MI_GSTATE_CHECKED;
 	    } else {
-		menu->Items[4*j+5].d.gem.state = MI_GSTATE_UNCHECKED;
+		menu->Items[4 * j + 5].d.gem.state = MI_GSTATE_UNCHECKED;
 	    }
 	    if (ThisPlayer->Enemy&(1<<Players[i].Player)) {
-		menu->Items[4*j+6].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[4 * j + 6].d.gem.state = MI_GSTATE_CHECKED;
 	    } else {
-		menu->Items[4*j+6].d.gem.state = MI_GSTATE_UNCHECKED;
+		menu->Items[4 * j + 6].d.gem.state = MI_GSTATE_UNCHECKED;
 	    }
 	    if (ThisPlayer->SharedVision&(1<<Players[i].Player)) {
-		menu->Items[4*j+7].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[4 * j + 7].d.gem.state = MI_GSTATE_CHECKED;
 	    } else {
-		menu->Items[4*j+7].d.gem.state = MI_GSTATE_UNCHECKED;
+		menu->Items[4 * j + 7].d.gem.state = MI_GSTATE_UNCHECKED;
 	    }
 
 	    if (ReplayGameType != ReplayNone) {
-		menu->Items[4*j+5].d.gem.state |= MI_GSTATE_PASSIVE;
-		menu->Items[4*j+6].d.gem.state |= MI_GSTATE_PASSIVE;
-		menu->Items[4*j+7].d.gem.state |= MI_GSTATE_PASSIVE;
+		menu->Items[4 * j + 5].d.gem.state |= MI_GSTATE_PASSIVE;
+		menu->Items[4 * j + 6].d.gem.state |= MI_GSTATE_PASSIVE;
+		menu->Items[4 * j + 7].d.gem.state |= MI_GSTATE_PASSIVE;
 	    } else {
-		menu->Items[4*j+5].d.gem.state &= ~MI_GSTATE_PASSIVE;
-		menu->Items[4*j+6].d.gem.state &= ~MI_GSTATE_PASSIVE;
-		menu->Items[4*j+7].d.gem.state &= ~MI_GSTATE_PASSIVE;
+		menu->Items[4 * j + 5].d.gem.state &= ~MI_GSTATE_PASSIVE;
+		menu->Items[4 * j + 6].d.gem.state &= ~MI_GSTATE_PASSIVE;
+		menu->Items[4 * j + 7].d.gem.state &= ~MI_GSTATE_PASSIVE;
 	    }
 
 	    ++j;
 	}
     }
-    for (; j<=PlayerMax-3; ++j ) {
-	menu->Items[4*j+4].d.text.text = NULL;
-	menu->Items[4*j+5].d.gem.state = MI_GSTATE_INVISIBLE;
-	menu->Items[4*j+6].d.gem.state = MI_GSTATE_INVISIBLE;
-	menu->Items[4*j+7].d.gem.state = MI_GSTATE_INVISIBLE;
+    for (; j<=PlayerMax - 3; ++j ) {
+	menu->Items[4 * j + 4].d.text.text = NULL;
+	menu->Items[4 * j + 5].d.gem.state = MI_GSTATE_INVISIBLE;
+	menu->Items[4 * j + 6].d.gem.state = MI_GSTATE_INVISIBLE;
+	menu->Items[4 * j + 7].d.gem.state = MI_GSTATE_INVISIBLE;
     }
 }
 
@@ -2037,8 +2046,8 @@ local void DiplomacyExit(Menuitem *mi __attribute__ ((unused)))
 
     menu = CurrentMenu;
 
-    for (i=0; i<=PlayerMax-3; ++i) {
-	menu->Items[4*i+4].d.text.text = NULL;
+    for (i=0; i<=PlayerMax - 3; ++i) {
+	menu->Items[4 * i + 4].d.text.text = NULL;
     }
 }
 
@@ -2054,12 +2063,12 @@ local void DiplomacyWait(Menuitem *mi)
     player = (item - 4) / 4;
 
     // Don't allow allies and enemies at the same time
-    if (item == 4*player+5) {
-	mi->menu->Items[4*player+5].d.gem.state |= MI_GSTATE_CHECKED;
-	mi->menu->Items[4*player+6].d.gem.state &= ~MI_GSTATE_CHECKED;
-    } else if (item == 4*player+6) {
-	mi->menu->Items[4*player+5].d.gem.state &= ~MI_GSTATE_CHECKED;
-	mi->menu->Items[4*player+6].d.gem.state |= MI_GSTATE_CHECKED;
+    if (item == 4 * player + 5) {
+	mi->menu->Items[4 * player + 5].d.gem.state |= MI_GSTATE_CHECKED;
+	mi->menu->Items[4 * player + 6].d.gem.state &= ~MI_GSTATE_CHECKED;
+    } else if (item == 4 * player + 6) {
+	mi->menu->Items[4 * player + 5].d.gem.state &= ~MI_GSTATE_CHECKED;
+	mi->menu->Items[4 * player + 6].d.gem.state |= MI_GSTATE_CHECKED;
     }
 
     // Don't set diplomacy until clicking ok
@@ -2077,11 +2086,11 @@ local void DiplomacyOk(void)
     menu = CurrentMenu;
     j = 0;
 
-    for (i=0; i<=PlayerMax-2; ++i) {
-	if (Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
+    for (i=0; i<=PlayerMax - 2; ++i) {
+	if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
 	    // Menu says to ally
-	    if (menu->Items[4*j+5].d.gem.state == MI_GSTATE_CHECKED &&
-		menu->Items[4*j+6].d.gem.state == MI_GSTATE_UNCHECKED) {
+	    if (menu->Items[4 * j + 5].d.gem.state == MI_GSTATE_CHECKED &&
+		menu->Items[4 * j + 6].d.gem.state == MI_GSTATE_UNCHECKED) {
 		// Are they allied?
 		if (!(ThisPlayer->Allied&(1<<Players[i].Player) &&
 		    !(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
@@ -2090,8 +2099,8 @@ local void DiplomacyOk(void)
 		}
 	    }
 	    // Menu says to be enemies
-	    if (menu->Items[4*j+5].d.gem.state == MI_GSTATE_UNCHECKED &&
-		menu->Items[4*j+6].d.gem.state == MI_GSTATE_CHECKED) {
+	    if (menu->Items[4 * j + 5].d.gem.state == MI_GSTATE_UNCHECKED &&
+		menu->Items[4 * j + 6].d.gem.state == MI_GSTATE_CHECKED) {
 		// Are they enemies?
 		if( !(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
 		    ThisPlayer->Enemy&(1<<Players[i].Player))) {
@@ -7315,7 +7324,6 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     char* reply;
     Menu* menu;
     char* port;
-	
 
     SendMetaCommand("NumberOfGames","");
     menu = FindMenu("metaserver-list");
