@@ -845,7 +845,7 @@ global void UnitIncrementHealth(void)
     for( i=0; i< NumUnits; i++) {
 	unit=Units[i];
 	if( unit->Type==berserker
-		&& unit->HP<unit->Stats->HP
+		&& unit->HP<unit->Stats->HitPoints
 		&& UpgradeIdAllowed(unit->Player,regeneration)=='R' ) {
 	    ++unit->HP;			// FIXME: how fast do we regenerate
 	}

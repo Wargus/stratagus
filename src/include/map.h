@@ -50,8 +50,20 @@
 typedef struct _map_field_ {
     unsigned short	Tile;		/// graphic tile number
     unsigned short	SeenTile;	/// last seen tile (FOW)
-    unsigned char	Value;		/// HP for walls
     unsigned short	Flags;		/// field flags
+    unsigned char	Value;		/// HP for walls/ Wood Regeneration
+#ifdef NEW_FOW
+    unsigned char	VisibileMask:4;	/// Visibile mask
+    unsigned char	ExploredMask:4;	/// Explored mask
+    unsigned short	Visibile;	/// Visibile flags for all players.
+    unsigned short	Explored;	/// Explored flags for all players.
+#endif
+#ifdef UNIT_ON_MAP
+    union {
+	Unit*		Units;		/// An unit on the map field.
+	Unit**		Array;		/// More units on the map field.
+    }			Here;		/// What is on the field.
+#endif
 #ifdef UNITS_ON_MAP
     UnitRef		Building;	/// Building or corpse.
     UnitRef		AirUnit;	/// Air unit.
@@ -62,6 +74,8 @@ typedef struct _map_field_ {
 
 #define MapFieldVisible		0x0001	/// Field visible
 #define MapFieldExplored	0x0002	/// Field explored
+
+#define MapFieldArray		0x0004	/// More than one unit on the field
 
 #define MapFieldHuman		0x0008	/// Human is owner of the field (walls)
 

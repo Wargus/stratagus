@@ -137,6 +137,9 @@ extern void NetworkSendCommand(int command,Unit* unit,int x,int y
 
 global int NetworkFildes = -1;		/// Network file descriptor
 global int NetworkInSync = 1;		/// Network is in sync
+global int NetworkUpdates = 5;		/// Network update each # frames
+global char* NetworkArg;		/// Network command line argument
+global int NetworkLag = 10;		/// Network lag in # frames
 
 /*----------------------------------------------------------------------------
 --	Communication over the network.
