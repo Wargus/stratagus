@@ -717,6 +717,8 @@ global void LoadFonts(void)
 **	@param file	File name of the graphic file
 **	@param width	Font width in pixels
 **	@param height	Font height in pixels
+**
+**	@todo	make the font name functions more general, support more fonts.
 */
 local SCM CclDefineFont(SCM type,SCM file,SCM width,SCM height)
 {
