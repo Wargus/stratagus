@@ -1029,7 +1029,7 @@ global int InitSound(void)
     //	Open the audio device, forcing the desired format
     if ( SDL_OpenAudio(&wanted, NULL) < 0 ) {
 	fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-	return(-1);
+	return -1;
     }
     SoundFildes=0;
     SDL_PauseAudio(0);
