@@ -2181,8 +2181,10 @@ local int CastRaiseDead(Unit* unit, const SpellType* spell, Unit* target,
 	    // FIXME: did they count on food?
 	    // Can there be more than 1 skeleton created on the same tile? yes
 	    // FIXME: Don't use UnitTypeByIdent during runtime.
-	    target = MakeUnitAndPlace((*corpses)->X, (*corpses)->Y,
-		    UnitTypeByIdent("unit-skeleton"), unit->Player);
+	    target = MakeUnit(UnitTypeByIdent("unit-skeleton"), unit->Player);
+	    target->X = (*corpses)->X;
+	    target->Y = (*corpses)->Y;
+	    DropOutOnSide(target,LookingW,0,0);
 	    // set life span
 	    target->TTL = GameCycle+
 		    target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
