@@ -237,6 +237,11 @@ local void TerminateNetConnect(void);
 
 local void StartEditor(void);
 local void EditorNewMap(void);
+local void EditorNewDrawFunc(Menuitem *mi);
+local void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key);
+local void EditorNewMapSizeEnterAction(Menuitem *mi, int key);
+local void EditorNewOk(void);
+local void EditorNewCancel(void);
 local void EditorMainLoadMap(void);
 local void EditorMainLoadInit(Menuitem *mi);
 local void EditorMainLoadLBInit(Menuitem *mi);
@@ -252,7 +257,7 @@ local void EditorMapProperties(void);
 local void EditorPlayerProperties(void);
 local void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
 local void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
-local void EditorEnterMapDescriptionAction(Menuitem *mi, int key);
+local void EditorMapPropertiesEnterAction(Menuitem *mi, int key);
 local void EditorMapPropertiesOk(void);
 local void EditorEditResourceEnterAction(Menuitem *mi,int key);
 local void EditorEditResourceOk(void);
@@ -517,6 +522,13 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorNewMap,"editor-new-map");
     HASHADD(EditorMainLoadMap,"editor-main-load-map");
 
+// Editor new
+    HASHADD(EditorNewDrawFunc,"editor-new-draw-func");
+    HASHADD(EditorNewMapDescriptionEnterAction,"editor-new-map-description-enter-action");
+    HASHADD(EditorNewMapSizeEnterAction,"editor-new-map-size-enter-action");
+    HASHADD(EditorNewOk,"editor-new-ok");
+    HASHADD(EditorNewCancel,"editor-new-cancel");
+
 // Editor main load map
     HASHADD(EditorMainLoadInit,"editor-main-load-init");
     HASHADD(EditorMainLoadLBInit,"editor-main-load-lb-init");
@@ -527,15 +539,14 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorMainLoadOk,"editor-main-load-ok");
     HASHADD(EditorMainLoadCancel,"editor-main-load-cancel");
     HASHADD(EditorMainLoadFolder,"editor-main-load-folder");
-    HASHADD(EditorMapProperties,"menu-editor-map-properties");
-    HASHADD(EditorEnterMapDescriptionAction,"editor-enter-map-description-action");
-    HASHADD(EditorPlayerProperties,"menu-editor-player-properties");
+    HASHADD(EditorMapProperties,"editor-map-properties");
+    HASHADD(EditorPlayerProperties,"editor-player-properties");
 
 // Editor menu
     HASHADD(EditorQuitMenu,"editor-quit-menu");
 
 // Editor map properties
-    HASHADD(EditorEnterMapDescriptionAction,"editor-map-description-action");
+    HASHADD(EditorMapPropertiesEnterAction,"editor-map-properties-enter-action");
     HASHADD(EditorMapPropertiesOk,"editor-map-properties-ok");
     HASHADD(EditorEndMenu,"editor-end-menu");
 
@@ -4229,6 +4240,50 @@ local void StartEditor(void)
 */
 local void EditorNewMap(void)
 {
+    Menu *menu;
+    char width[10];
+    char height[10];
+    char description[36];
+    // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
+    int v[] = { TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
+
+    VideoLockScreen();
+    MenusSetBackground();
+    VideoUnlockScreen();
+    Invalidate();
+
+    EditorCancelled=0;
+
+    menu = FindMenu("menu-editor-new");
+    menu->items[2].d.input.buffer = description;
+    strcpy(description, "~!_");
+    menu->items[2].d.input.nch = strlen(description) - 3;
+    menu->items[2].d.input.maxch = 31;
+    menu->items[4].d.input.buffer = width;
+    strcpy(width, "128~!_");
+    menu->items[4].d.input.nch = strlen(width) - 3;
+    menu->items[4].d.input.maxch = 4;
+    menu->items[5].d.input.buffer = height;
+    strcpy(height, "128~!_");
+    menu->items[5].d.input.nch = strlen(width) - 3;
+    menu->items[5].d.input.maxch = 4;
+
+    ProcessMenu("menu-editor-new", 1);
+
+    if (EditorCancelled) {
+	VideoLockScreen();
+	MenusSetBackground();
+	VideoUnlockScreen();
+	return;
+    }
+
+    TheMap.Info = calloc(1, sizeof(MapInfo));
+    description[strlen(description)-3] = '\0';
+    TheMap.Info->Description = strdup(description);
+    TheMap.Info->MapTerrain = v[menu->items[7].d.pulldown.curopt];
+    TheMap.Info->MapWidth = atoi(width);
+    TheMap.Info->MapHeight = atoi(height);
+
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
@@ -4237,6 +4292,79 @@ local void EditorNewMap(void)
 
     // FIXME: Use EditorRunning and main-loop.
     EditorMainLoop();
+    EndMenu();
+}
+
+local void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
+{
+    MenusSetBackground();
+}
+
+local void EditorNewMapDescriptionEnterAction(Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
+{
+}
+
+local void EditorNewMapSizeEnterAction(Menuitem *mi, int key)
+{
+    if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch-1])) {
+	strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
+    }
+}
+
+local void EditorNewOk(void)
+{
+    Menu *menu;
+    unsigned value1, value2;
+
+    menu = CurrentMenu;
+    value1 = atoi(menu->items[4].d.input.buffer);
+    value2 = atoi(menu->items[5].d.input.buffer);
+
+    if (value1 < 32 || value2 < 32) {
+	if (value1 < 32) {
+	    sprintf(menu->items[4].d.input.buffer, "32~!_");
+	    menu->items[4].d.input.nch = strlen(menu->items[4].d.text.text) - 3;
+	}
+	if (value2 < 32) {
+	    sprintf(menu->items[5].d.input.buffer, "32~!_");
+	    menu->items[5].d.input.nch = strlen(menu->items[5].d.text.text) - 3;
+	}
+	menu = FindMenu("menu-net-error");
+	menu->items[1].d.text.text = "Size smaller than 32";
+	ProcessMenu("menu-net-error", 1);
+    } else if (value1 > 1024 || value2 > 1024) {
+	if (value1 == 0) {
+	    sprintf(menu->items[4].d.input.buffer, "1024~!_");
+	    menu->items[4].d.input.nch = strlen(menu->items[4].d.text.text) - 3;
+	}
+	if (value2 == 0) {
+	    sprintf(menu->items[5].d.input.buffer, "1024~!_");
+	    menu->items[5].d.input.nch = strlen(menu->items[5].d.text.text) - 3;
+	}
+	menu = FindMenu("menu-net-error");
+	menu->items[1].d.text.text = "Size larger than 1024";
+	ProcessMenu("menu-net-error", 1);
+    } else if (value1/32*32 != value1 || value2/32*32 != value2) {
+	if (value1/32*32 != value1) {
+	    sprintf(menu->items[4].d.input.buffer, "%d~!_", (value1+16)/32*32);
+	    menu->items[4].d.input.nch = strlen(menu->items[4].d.text.text) - 3;
+	}
+	if (value2/32*32 != value2) {
+	    sprintf(menu->items[5].d.input.buffer, "%d~!_", (value2+16)/32*32);
+	    menu->items[5].d.input.nch = strlen(menu->items[5].d.text.text) - 3;
+	}
+	menu = FindMenu("menu-net-error");
+	menu->items[1].d.text.text = "Size must be a multiple of 32";
+	ProcessMenu("menu-net-error", 1);
+    }
+    else {
+	EndMenu();
+    }
+}
+
+local void EditorNewCancel(void)
+{
+    EditorCancelled=1;
     EndMenu();
 }
 
@@ -4656,19 +4784,19 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 local void EditorMapProperties(void)
 {
     Menu *menu;
-    char MapDescription[36];
-    char MapSize[30];
+    char description[36];
+    char size[30];
 
     menu = FindMenu("menu-editor-map-properties");
 
-    menu->items[2].d.input.buffer = MapDescription;
-    strcpy(MapDescription, TheMap.Info->Description);
-    strcat(MapDescription, "~!_");
-    menu->items[2].d.input.nch = strlen(MapDescription)-3;
+    menu->items[2].d.input.buffer = description;
+    strcpy(description, TheMap.Info->Description);
+    strcat(description, "~!_");
+    menu->items[2].d.input.nch = strlen(description)-3;
     menu->items[2].d.input.maxch = 31;
 
-    sprintf(MapSize, "%d x %d", TheMap.Width, TheMap.Height);
-    menu->items[4].d.text.text = MapSize;
+    sprintf(size, "%d x %d", TheMap.Width, TheMap.Height);
+    menu->items[4].d.text.text = size;
 
     menu->items[6].d.pulldown.defopt = TheMap.Terrain;
 
@@ -4679,7 +4807,7 @@ local void EditorMapProperties(void)
     ProcessMenu("menu-editor-map-properties", 1);
 }
 
-local void EditorEnterMapDescriptionAction(
+local void EditorMapPropertiesEnterAction(
 	Menuitem *mi __attribute__((unused)), int key)
 {
     if (key == 10 || key == 13) {
@@ -4690,15 +4818,15 @@ local void EditorEnterMapDescriptionAction(
 local void EditorMapPropertiesOk(void)
 {
     Menu *menu;
-    char *MapDescription;
+    char *description;
     // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
     int v[] = { TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
     menu = FindMenu("menu-editor-map-properties");
 
-    MapDescription = menu->items[2].d.input.buffer;
-    MapDescription[strlen(MapDescription)-3] = '\0';
-    strcpy(TheMap.Info->Description, MapDescription);
+    description = menu->items[2].d.input.buffer;
+    description[strlen(description)-3] = '\0';
+    strcpy(TheMap.Info->Description, description);
 
     // FIXME: Need to actually change the terrain
     TheMap.Terrain = v[menu->items[6].d.pulldown.curopt];
