@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1998-2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -85,7 +95,7 @@ global void UpdateMinimapXY(int tx,int ty)
     //	Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
     //
     ty*=TheMap.Width;
-    for( my=0; my<MINIMAP_H; my++ ) {
+    for( my=MinimapY; my<MINIMAP_H-MinimapY; my++ ) {
 	y=Minimap2MapY[my];
 	if( y<ty ) {
 	    continue;
@@ -94,7 +104,7 @@ global void UpdateMinimapXY(int tx,int ty)
 	    break;
 	}
 
-	for( mx=0; mx<MINIMAP_W; mx++ ) {
+	for( mx=MinimapX; mx<MINIMAP_W-MinimapX; mx++ ) {
 	    int tile;
 
 	    x=Minimap2MapX[mx];
@@ -132,8 +142,8 @@ global void UpdateMinimap(void)
     //
     //	Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
     //
-    for( my=0; my<MINIMAP_H; my++ ) {
-	for( mx=0; mx<MINIMAP_W; mx++ ) {
+    for( my=MinimapY; my<MINIMAP_H-MinimapY; my++ ) {
+	for( mx=MinimapX; mx<MINIMAP_W-MinimapX; mx++ ) {
 	    int tile;
 
 	    tile=TheMap.Fields[Minimap2MapX[mx]+Minimap2MapY[my]].Tile;
@@ -159,18 +169,22 @@ global void CreateMinimap(void)
     }
     MinimapScale=(MINIMAP_W*MINIMAP_FAC)/n;
 
-    // FIXME: X,Y offset not supported!!
-    MinimapX=0;
-    MinimapY=0;
+    MinimapX=((MINIMAP_W*MINIMAP_FAC)/MinimapScale-TheMap.Width)/2;
+    MinimapY=((MINIMAP_H*MINIMAP_FAC)/MinimapScale-TheMap.Height)/2;
+    MinimapX=(MINIMAP_W-(TheMap.Width*MinimapScale)/MINIMAP_FAC)/2;
+    MinimapY=(MINIMAP_H-(TheMap.Height*MinimapScale)/MINIMAP_FAC)/2;
+
+    DebugLevel0Fn("MinimapScale %d(%d), X off %d, Y off %d\n",
+	    MinimapScale/MINIMAP_FAC,MinimapScale,MinimapX,MinimapY);
 
     //
     //	Calculate minimap fast lookup tables.
     //
-    for( n=0; n<MINIMAP_W; ++n ) {
-	Minimap2MapX[n]=(n*MINIMAP_FAC)/MinimapScale;
+    for( n=MinimapX; n<MINIMAP_W-MinimapX; ++n ) {
+	Minimap2MapX[n]=((n-MinimapX)*MINIMAP_FAC)/MinimapScale;
     }
-    for( n=0; n<MINIMAP_H; ++n ) {
-	Minimap2MapY[n]=((n*MINIMAP_FAC)/MinimapScale)*TheMap.Width;
+    for( n=MinimapY; n<MINIMAP_H-MinimapY; ++n ) {
+	Minimap2MapY[n]=(((n-MinimapY)*MINIMAP_FAC)/MinimapScale)*TheMap.Width;
     }
     for( n=0; n<TheMap.Width; ++n ) {
 	Map2MinimapX[n]=(n*MinimapScale)/MINIMAP_FAC;
@@ -180,6 +194,7 @@ global void CreateMinimap(void)
     }
 
     MinimapGraphic=NewGraphic(8,MINIMAP_W,MINIMAP_H);
+    memset(MinimapGraphic->Frames,0,MINIMAP_W*MINIMAP_H);
 
     UpdateMinimap();
 }
@@ -445,8 +460,10 @@ global void DrawMinimapCursor(int vx,int vy)
     int h;
     int i;
 
-    OldMinimapCursorX=x=TheUI.MinimapX+24+(vx*MinimapScale)/MINIMAP_FAC;
-    OldMinimapCursorY=y=TheUI.MinimapY+2+(vy*MinimapScale)/MINIMAP_FAC;
+    OldMinimapCursorX=x=TheUI.MinimapX+24+MinimapX+
+	    (vx*MinimapScale)/MINIMAP_FAC;
+    OldMinimapCursorY=y=TheUI.MinimapY+2+MinimapY+
+	    (vy*MinimapScale)/MINIMAP_FAC;
     OldMinimapCursorW=w=(MapWidth*MinimapScale)/MINIMAP_FAC-1;
     OldMinimapCursorH=h=(MapHeight*MinimapScale)/MINIMAP_FAC-1;
 
