@@ -1189,7 +1189,9 @@ global int InitSound(void)
     DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
 #endif
 
-    PlayMusic(TitleMusic);
+    if( TitleMusic ) {
+	PlayMusic(TitleMusic);
+    }
 
     return 0;
 }
