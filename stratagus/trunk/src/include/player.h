@@ -55,7 +55,7 @@
 
 #ifndef __STRUCT_PLAYER__
 #define __STRUCT_PLAYER__
-typedef struct _player_ Player;
+typedef struct _player_ Player;		/// player typedef
 #endif
 
 #include "upgrade_structs.h"
@@ -67,9 +67,7 @@ typedef struct _player_ Player;
 --	Player type
 ----------------------------------------------------------------------------*/
 
-/**
-**	Player structure
-*/
+    ///	Player structure
 struct _player_ {
     unsigned	Player;			/// player as number
     char*	Name;			/// name of non computer
@@ -170,7 +168,7 @@ struct _player_ {
 #define PlayerMax		16	/// maximal players supported
 
 /**
-**	Notify types.
+**	Notify types. Noties are send to the player.
 */
 enum _notify_type_ {
     NotifyRed,				/// Red alram
