@@ -131,7 +131,6 @@ void AvlAdd (AvlTree *root, void *data, int key)
 void *AvlDelete (AvlTree *root, int key)
 {
 	AvlTreeNode *ptr;
-	AvlTreeNode *child;
 	AvlTreeNode *stack[20];		/* stack of nodes traversed */
 	unsigned char dir[20];		/* stack[i]->subtree[dir[i]] == stack[i+1] */
 	int k;
@@ -162,10 +161,15 @@ void *AvlDelete (AvlTree *root, int key)
 	/* let's see how many subtrees we'll have to deal with after we delete
 	 * the node */
 	if (ptr->subtree[LEFT] == NULL || ptr->subtree[RIGHT] == NULL) {
+		AvlTreeNode *child;
+
 		/* zero or one subtree */
 		if (ptr->subtree[LEFT] == NULL) {
 			child = ptr->subtree[RIGHT];
+		/* JOHNS: See above if this must be true!
 		} else if (ptr->subtree[RIGHT] == NULL) {
+		*/
+		} else {
 			child = ptr->subtree[LEFT];
 		}
 		retval = ptr->data;
