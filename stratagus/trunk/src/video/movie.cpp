@@ -257,16 +257,30 @@ global int PlayMovie(const char *name, int flags)
     callbacks.SoundReady=WriteSound;
 
     if (flags & PlayMovieZoomScreen) {
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = VideoWidth;
-	rect.h = VideoHeight;
+	if (flags & PlayMovieKeepAspect) {
+	    int wa;
+	    int ha;
+
+	    wa = VideoWidth * 100 / avi->Width;
+	    ha = VideoHeight * 100 / avi->Height;
+	    DebugLevel0Fn(" %d x %d\n" _C_ wa _C_ ha);
+	    if( wa < ha ) {			// Keep the aspect ratio
+		rect.w = VideoWidth;
+		rect.h = avi->Height * wa / 100;
+	    } else {
+		rect.w = avi->Width * ha / 100;
+		rect.h = VideoHeight;
+	    }
+	} else {			// Just zoom to max
+	    rect.w = VideoWidth;
+	    rect.h = VideoHeight;
+	}
     } else {
-	rect.x = (VideoWidth - avi->Width) / 2;
-	rect.y = (VideoHeight - avi->Height) / 2;
 	rect.w = avi->Width;
 	rect.h = avi->Height;
     }
+    rect.x = (VideoWidth - rect.w) / 2;
+    rect.y = (VideoHeight - rect.h) / 2;
 
     if( 1 ) {
 	int i;
