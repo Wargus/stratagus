@@ -776,6 +776,8 @@ extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if building is known on the map
 extern int BuildingVisibleOnMap(const Unit* unit);
 
+    /// Fill in values, considering the unit was just recently seen.
+extern void UnitFillSeenValues(Unit* unit);
     /// Marks unit seen. (increases visibility count)
 extern void UnitsMarkSeen(const Player* player, int x, int y);
     /// Unmarks unit seen. (decreases visibility count)

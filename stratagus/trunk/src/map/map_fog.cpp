@@ -469,10 +469,15 @@ global void UpdateFogOfWarChange(void)
 	    for (x = 0; x < TheMap.Width; ++x) {
 		if (IsMapFieldExplored(ThisPlayer, x, y)) {
 		    MapMarkSeenTile(x, y);
-		    //UnitsMarkSeen(x, y);
 		}
 	    }
 	}
+    }
+    //
+    //	Start a global unit seen recount. It's the best way.
+    //
+    for (x = 0; x < NumUnits; ++x) {
+	UnitCountSeen(Units[x]);
     }
     MarkDrawEntireMap();
 }
