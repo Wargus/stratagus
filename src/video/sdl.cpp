@@ -74,12 +74,13 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global SDL_Surface *Screen;		/// internal screen
+global SDL_Surface *Screen;		/// Internal screen
+global int InMainWindow = 1;		/// Cursor inside freecraft window
+
 local int FrameTicks;			/// Frame length in ms
 local int FrameRemainder;		/// Frame remainder 0.1 ms
 local int FrameFraction;		/// Frame fractional term
 local int SkipFrames;			/// Skip this frames
-global int InMainWindow = 1;		/// cursor inside freecraft window
 
 #ifdef USE_OPENGL
 // FIXME: When all the drawing functions are done this isn't needed anymore
@@ -257,6 +258,8 @@ global void InitVideoSdl(void)
 #endif
 
     DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
+
+    // FIXME: Setup InMainWindow correct.
 }
 
 /**
@@ -551,9 +554,12 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 
 	case SDL_ACTIVEEVENT:
 	    DebugLevel3("\tFocus changed\n");
-	    InMainWindow = !InMainWindow;
-	    if (!InMainWindow)
+	    // FIXME: Johns: I think this was not correct?
+	    // FIXME: InMainWindow = !InMainWindow;
+	    InMainWindow = event->active.gain;
+	    if (!InMainWindow) {
                 InputMouseExit(callbacks,SDL_GetTicks());
+	    }
 	    break;
 
 	case SDL_KEYDOWN:
