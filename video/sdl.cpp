@@ -581,6 +581,9 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//	Time of frame over? This makes the CPU happy. :(
 	//
 	i=SDL_GetTicks();
+	if( !VideoInterrupts && i+10<LastTick ) {
+	    SDL_Delay(10);
+	}
 	while( i>=LastTick ) {
 	    ++VideoInterrupts;
 	    LastTick+=(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
@@ -722,6 +725,9 @@ global void WaitEventsAndKeepSync(void)
 	//	Time of frame over? This makes the CPU happy. :(
 	//
 	i=SDL_GetTicks();
+	if( !VideoInterrupts && i+10<LastTick ) {
+	    SDL_Delay(10);
+	}
 	while( i>=LastTick ) {
 	    ++VideoInterrupts;
 	    LastTick+=(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
