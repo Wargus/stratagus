@@ -775,10 +775,18 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 	}
 	if (condition->Alliance != CONDITION_TRUE) {
 		if ((condition->Alliance == CONDITION_ONLY) ^
-				(IsAllied(caster->Player,target) || target->Player == caster->Player)) {
+				// own units could be not allied ?
+				(IsAllied(caster->Player, target) || target->Player == caster->Player)) {
 			return 0;
 		}
 	}
+	if (condition->Opponent != CONDITION_TRUE) {
+		if ((condition->Opponent == CONDITION_ONLY) ^
+				IsEnemy(caster->Player, target)) {
+			return 0;
+		}
+	}
+
 	if (condition->TargetSelf != CONDITION_TRUE) {
 		if ((condition->TargetSelf == CONDITION_ONLY) ^ (caster == target)) {
 			return 0;
