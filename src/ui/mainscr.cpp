@@ -721,7 +721,7 @@ local void AddMessage(const char *msg)
 
     ptr = message + strlen(message);
 
-    while (VideoTextLength(GameFont, message) >= 440+(VideoWidth-640)/2 ) {
+    while (VideoTextLength(GameFont, message) >= 440+(VideoWidth-640) ) {
 	*--ptr = '\0';
     }
 
