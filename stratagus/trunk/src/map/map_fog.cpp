@@ -203,7 +203,9 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		switch( v ) {
 		    case 0:		// Unexplored
 		    case 1:		// Unseen
-			if( player==ThisPlayer ) {
+			if( player==ThisPlayer ||
+			    ( (ThisPlayer->SharedVision&(1<<player)) &&
+			      (Players[player]->SharedVision&(1<<ThisPlayer->Player)) ) ) {
 			    MapMarkSeenTile(i,y);
 			}
 			// FIXME: mark for screen update
@@ -457,7 +459,9 @@ global void MapUpdateVisible(void)
     Unit* unit;
     Unit** units;
     Unit* mine;
-    int nunits,i;
+    int nunits;
+    int i;
+    int j;
 #ifdef DEBUG
     unsigned long t;
 #endif
@@ -504,57 +508,65 @@ global void MapUpdateVisible(void)
     //
     //	Mark all units visible range.
     //
-    nunits=ThisPlayer->TotalNumUnits;
-    units=ThisPlayer->Units;
-    for( i=0; i<nunits; i++ ) {
-	unit=units[i];
-	x=unit->X+unit->Type->TileWidth/2;
-	y=unit->Y+unit->Type->TileHeight/2;
-	if( unit->Removed ) {
-	    if( unit->Revealer ) {
-#ifdef NEW_FOW
-		MapMarkSight(unit->Player,x,y,10);
-#else
-		MapMarkSight(x,y,10);
-#endif
-		continue;
-	    }
-	    //
-	    //	If peon is in the mine, the mine has a sight range too.
-	    //  This is quite dirty code...
-	    //  This is not a big deal as far as only mines are
-	    //  concerned, but for more units (like parasited ones
-	    //  in *craft), maybe we should create a dedicated queue...
-	    if( unit->Orders[0].Action==UnitActionMineGold ) {
-	        mine=GoldMineOnMap(unit->X,unit->Y);
-		if( mine ) {  // Somtimes, the peon is at home :).
-#ifdef NEW_FOW
-		    MapMarkSight(unit->Player,mine->X+mine->Type->TileWidth/2
-			    ,mine->Y+mine->Type->TileHeight/2
-			    ,mine->Stats->SightRange);
-#else
-		    MapMarkSight(mine->X+mine->Type->TileWidth/2
-				 ,mine->Y+mine->Type->TileHeight/2
-				 ,mine->Stats->SightRange);
-#endif
-		}
-	    } else {
-	        continue;
-	    }
+    for( j=0; j<NumPlayers; ++j ) {
+	if( &Players[j]!=ThisPlayer &&
+	    !( (ThisPlayer->SharedVision&(1<<j)) &&
+	       (Players[j].SharedVision&(1<<ThisPlayer->Player)) ) ) {
+	    continue;
 	}
 
-	if( unit->Orders[0].Action==UnitActionBuilded ) {
+	nunits=Players[j].TotalNumUnits;
+	units=Players[j].Units;
+	for( i=0; i<nunits; i++ ) {
+	    unit=units[i];
+	    x=unit->X+unit->Type->TileWidth/2;
+	    y=unit->Y+unit->Type->TileHeight/2;
+	    if( unit->Removed ) {
+		if( unit->Revealer ) {
 #ifdef NEW_FOW
-	    MapMarkSight(unit->Player,x,y,3);
+		    MapMarkSight(unit->Player,x,y,10);
 #else
-	    MapMarkSight(x,y,3);
+		    MapMarkSight(x,y,10);
 #endif
-	} else {
+		    continue;
+		}
+		//
+		//	If peon is in the mine, the mine has a sight range too.
+		//  This is quite dirty code...
+		//  This is not a big deal as far as only mines are
+		//  concerned, but for more units (like parasited ones
+		//  in *craft), maybe we should create a dedicated queue...
+		if( unit->Orders[0].Action==UnitActionMineGold ) {
+		    mine=GoldMineOnMap(unit->X,unit->Y);
+		    if( mine ) {  // Somtimes, the peon is at home :).
 #ifdef NEW_FOW
-	    MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
+			MapMarkSight(unit->Player,mine->X+mine->Type->TileWidth/2
+				,mine->Y+mine->Type->TileHeight/2
+				,mine->Stats->SightRange);
 #else
-	    MapMarkSight(x,y,unit->Stats->SightRange);
+			MapMarkSight(mine->X+mine->Type->TileWidth/2
+				     ,mine->Y+mine->Type->TileHeight/2
+				     ,mine->Stats->SightRange);
 #endif
+		    }
+		} else {
+		    continue;
+		}
+	    }
+
+	    if( unit->Orders[0].Action==UnitActionBuilded ) {
+#ifdef NEW_FOW
+		MapMarkSight(unit->Player,x,y,3);
+#else
+		MapMarkSight(x,y,3);
+#endif
+	    } else {
+#ifdef NEW_FOW
+		MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
+#else
+		MapMarkSight(x,y,unit->Stats->SightRange);
+#endif
+	    }
 	}
     }
 
@@ -1566,8 +1578,26 @@ global void VideoDrawFogAlphaOpenGL(
 #ifdef USE_OPENGL
 global void VideoDrawOnlyFogAlphaOpenGL(
     const GraphicData* data __attribute__((unused)),
-    int x __attribute__((unused)),int y __attribute__((unused)))
+    int x,int y)
 {
+    GLfloat sx,ex,sy,ey;
+    Graphic *g;
+
+    g=TheMap.TileData;
+    sx=(GLfloat)x/VideoWidth;
+    ex=sx+(GLfloat)TileSizeX/VideoWidth;
+    ey=1.0f-(GLfloat)y/VideoHeight;
+    sy=ey-(GLfloat)TileSizeY/VideoHeight;
+
+    glDisable(GL_TEXTURE_2D);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+    glBegin(GL_QUADS);
+    glVertex3f(sx, sy, 0.0f);
+    glVertex3f(sx, ey, 0.0f);
+    glVertex3f(ex, ey, 0.0f);
+    glVertex3f(ex, sy, 0.0f);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
 }
 #endif
 

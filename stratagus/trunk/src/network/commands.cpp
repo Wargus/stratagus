@@ -566,6 +566,14 @@ local void DoNextReplay(void)
 	    state=-1;
 	}
 	SendCommandDiplomacy(posx,state,posy);
+    } else if( !strcmp(name,"shared-vision") ) {
+	int state;
+	state=atoi(val);
+	if( state!=0 && state!=1 ) {
+	    DebugLevel0Fn("Invalid shared vision command: %s" _C_ val);
+	    state=0;
+	}
+	SendCommandSharedVision(posx,state,posy);
     } else if( !strcmp(name,"input") ) {
 	if (val[0]=='(') {
 	    CclCommand(val);
@@ -1106,6 +1114,30 @@ global void SendCommandDiplomacy(int player,int state,int opponent)
     }
 }
 
+/**
+**	Send command: Shared vision changed.
+**
+**	@param player	Player which changes his state.
+**	@param state	New shared vision state.
+**	@param opponent	Opponent.
+*/
+global void SendCommandSharedVision(int player,int state,int opponent)
+{
+    if( NetworkFildes==-1 ) {
+	if( state==0 ) {
+	    CommandLog("shared-vision",NoUnitP,0,player,opponent,
+		    NoUnitP,"0",-1);
+	} else {
+	    CommandLog("shared-vision",NoUnitP,0,player,opponent,
+		    NoUnitP,"1",-1);
+	}
+	CommandSharedVision(player,state,opponent);
+    } else {
+	NetworkSendExtendedCommand(ExtendedMessageSharedVision,
+		-1,player,state,opponent,0);
+    }
+}
+
 //@}
 
 //----------------------------------------------------------------------------
@@ -1366,6 +1398,16 @@ global void ParseExtendedCommand(unsigned char type,int status,
 		    break;
 	    }
 	    CommandDiplomacy(arg2,arg3,arg4);
+	    break;
+	case ExtendedMessageSharedVision:
+	    if( arg3==0 ) {
+		CommandLog("shared-vision",NoUnitP,0,arg2,arg4,
+			NoUnitP,"0",-1);
+	    } else {
+		CommandLog("shared-vision",NoUnitP,0,arg2,arg4,
+			NoUnitP,"1",-1);
+	    }
+	    CommandSharedVision(arg2,arg3,arg4);
 	    break;
 	default:
 	    DebugLevel0Fn("Unknown extended message %u/%s %u %u %u %u\n" _C_
