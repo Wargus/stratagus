@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_stand.c	-	The stand ground action. */
-/*
-**	(c) Copyright 2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -97,7 +96,7 @@ global void HandleActionStandGround(Unit* unit)
 	if( type->Type==UnitCritter ) {
 	    int x;
 	    int y;
-	
+
 	    x=unit->X;
 	    y=unit->Y;
 	    switch( (SyncRand()>>12)&15 ) {
@@ -116,7 +115,7 @@ global void HandleActionStandGround(Unit* unit)
 		x=0;
 	    } else if( x>=TheMap.Width ) {
 		x=TheMap.Width-1;
-	    } 
+	    }
 	    if( y<0 ) {
 		y=0;
 	    } else if( y>=TheMap.Height ) {
@@ -141,7 +140,7 @@ global void HandleActionStandGround(Unit* unit)
 
     //
     //	Workers and mage didn't attack automatic
-    //	removed with standground && !type->CowerWorker && !type->CowerMage 
+    //	removed with standground && !type->CowerWorker && !type->CowerMage
     if( type->CanAttack ) {
 	//
 	//	Units attacks in attacking range.
@@ -179,16 +178,12 @@ global void HandleActionStandGround(Unit* unit)
 	    case 0:			// Turn clockwise
 		unit->Direction+=NextDirection;
 		UnitUpdateHeading(unit);
-		if( UnitVisible(unit) ) {
-		    MustRedraw|=RedrawMap;
-		}
+                CheckUnitToBeDrawn(unit);
 		break;
 	    case 1:			// Turn counter clockwise
 		unit->Direction-=NextDirection;
 		UnitUpdateHeading(unit);
-		if( UnitVisible(unit) ) {
-		    MustRedraw|=RedrawMap;
-		}
+                CheckUnitToBeDrawn(unit);
 		break;
 	    default:			// does nothing
 		break;

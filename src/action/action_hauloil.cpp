@@ -212,9 +212,7 @@ local int HaulInOilWell(Unit* unit)
 	    unit->Command.Action=UnitActionHaulOil;
 	}
 
-	if( UnitVisible(unit) ) {
-	    MustRedraw|=RedrawMap;
-	}
+        CheckUnitToBeDrawn(unit);
 	if( IsSelected(unit) ) {
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel;
@@ -362,9 +360,7 @@ local int WaitForOilDeliver(Unit* unit)
 	    unit->Command.Action=UnitActionHaulOil;
 	}
 
-	if( UnitVisible(unit) ) {
-	    MustRedraw|=RedrawMap;
-	}
+        CheckUnitToBeDrawn(unit);
 	unit->Wait=1;
 	unit->SubAction=0;
 	return 1;

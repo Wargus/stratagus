@@ -549,7 +549,7 @@ global void DrawMessage(void)
     DrawText(TheUI.MapX+8,TheUI.MapY+8 + z*16,GameFont,Messages[z] );
     }
   if ( MessagesCount < 1 )
-    SameMessageCount = 0;  
+    SameMessageCount = 0;
 }
 
 /**
@@ -590,8 +590,8 @@ global int CheckRepeatMessage( const char* msg )
       // NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
       sprintf( temp, "Last message repeated ~<%d~> times", n+1 );
       AddMessage( temp );
-      }  
-    return 0;  
+      }
+    return 0;
 }
 
 /**
@@ -609,7 +609,9 @@ global void SetMessage( char* fmt, ... )
     if ( CheckRepeatMessage( temp ) )
       return;
     AddMessage( temp );
-    MustRedraw|=RedrawMessage|RedrawMap;
+    MustRedraw|=RedrawMessage;
+    //FIXME: for performance the minimal area covered by msg's should be used
+    MarkDrawEntireMap();
     MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
 }
 
@@ -634,17 +636,19 @@ global void SetMessage2( int x, int y, char* fmt, ... )
       {
       AddMessage( temp );
       }
- 
+
     if ( MessagesEventCount == MESSAGES_MAX )
       ShiftMessagesEvent();
-    
+
     strcpy( MessagesEvent[ MessagesEventCount ], temp );
     MessagesEventX[ MessagesEventCount ] = x;
     MessagesEventY[ MessagesEventCount ] = y;
     MessagesEventIndex = MessagesEventCount;
     MessagesEventCount++;
- 
-    MustRedraw|=RedrawMessage|RedrawMap;
+
+    MustRedraw|=RedrawMessage;
+    //FIXME: for performance the minimal area covered by msg's should be used
+    MarkDrawEntireMap();
     MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
 }
 

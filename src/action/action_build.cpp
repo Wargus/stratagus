@@ -10,7 +10,7 @@
 //
 /**@name action_build.c -	The build building action. */
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -107,7 +107,7 @@ global void HandleActionBuild(Unit* unit)
 	++x;
 	++y;
     }
-    
+
     //
     //	Check if the building could be build there.
     //
@@ -167,14 +167,14 @@ global void HandleActionBuild(Unit* unit)
 	DestroyUnit(temp);		// Destroy oil patch
     }
 
-    RemoveUnit(unit);
+    RemoveUnit(unit);/* automaticly: CheckUnitToBeDrawn(unit) */
+
     unit->X=x;
     unit->Y=y;
     unit->Command.Action=UnitActionStill;
 
-    if( UnitVisible(build) ) {
-        MustRedraw|=RedrawMaps;
-    }
+    CheckUnitToBeDrawn(build);
+    MustRedraw|=RedrawMinimap;
 }
 
 /**
@@ -219,7 +219,7 @@ global void HandleActionBuilded(Unit* unit)
     //
     //	Check if building ready.
     //
-    if( unit->Command.Data.Builded.Sum>=unit->Stats->HitPoints 
+    if( unit->Command.Data.Builded.Sum>=unit->Stats->HitPoints
 		|| unit->HP>=unit->Stats->HitPoints ) {
 	if( unit->HP>unit->Stats->HitPoints ) {
 	    unit->HP=unit->Stats->HitPoints;
@@ -258,16 +258,13 @@ global void HandleActionBuilded(Unit* unit)
 	}
 
 	// FIXME: Vladi: this is just a hack to test wall fixing,
-	// FIXME: 	also not sure if the right place...
+	// FIXME:	also not sure if the right place...
 	// FIXME: Johns: and now this is also slow
 	if ( unit->Type == UnitTypeByIdent("unit-orc-wall")
 		    || unit->Type == UnitTypeByIdent("unit-human-wall")) {
 	    MapSetWall(unit->X, unit->Y,
 		    unit->Type == UnitTypeByIdent("unit-human-wall"));
-	    if( UnitVisible(unit) ) {
-		MustRedraw|=RedrawMap;
-	    }
-	    RemoveUnit( unit );
+            RemoveUnit(unit);/* automaticly: CheckUnitToBeDrawn(unit) */
 	    UnitLost(unit);
 	    ReleaseUnit(unit);
 	    return;
@@ -281,9 +278,7 @@ global void HandleActionBuilded(Unit* unit)
 	} else if( unit->Player==ThisPlayer ) {
 	    UpdateButtonPanel();
 	}
-	if( UnitVisible(unit) ) {
-	    MustRedraw|=RedrawMap;
-	}
+        CheckUnitToBeDrawn(unit);
 	return;
     }
 
@@ -291,19 +286,18 @@ global void HandleActionBuilded(Unit* unit)
     //	Update building states
     //
     if( unit->Command.Data.Builded.Sum*2>=unit->Stats->HitPoints ) {
-        if( (unit->Frame!=1 || unit->Constructed)
-	        && UnitVisible(unit) ) {
-	    MustRedraw|=RedrawMap;
+        if( (unit->Frame!=1 || unit->Constructed) ) {
+	  CheckUnitToBeDrawn(unit);
 	}
 	unit->Constructed=0;
 	unit->Frame=1;
     } else if( unit->Command.Data.Builded.Sum*4>=unit->Stats->HitPoints ) {
-        if( unit->Frame!=1 && UnitVisible(unit) ) {
-	    MustRedraw|=RedrawMap;
+        if( unit->Frame!=1 ) {
+	  CheckUnitToBeDrawn(unit);
 	}
 	unit->Frame=1;
     }
-    
+
     unit->Wait=5;
     if( IsSelected(unit) ) {
         MustRedraw|=RedrawInfoPanel;

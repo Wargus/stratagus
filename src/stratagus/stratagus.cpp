@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name clone.c	-	The main file. */
-/*
-**	(c) Copyright 1998-2001 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -294,7 +293,7 @@ Use it at your own risk.\n"
     //
     //	Show title screen.
     //
-    SetClipping(0,0,VideoWidth,VideoHeight);
+    SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     if( TitleScreen ) {
 	DisplayPicture(TitleScreen);
     }
@@ -307,7 +306,7 @@ Use it at your own risk.\n"
     UpdateStats();
     InitUnitTypes();
 
-    // 
+    //
     //  Inital menues require some gfx..
     //
     LoadRGB(GlobalPalette, strdcat(FreeCraftLibPath, "/summer.rgb"));

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name map_rock.c	-	The map rock handling. */
-/*
-**	(c) Copyright 1999,2000 by Vladi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Vladi Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -52,7 +51,7 @@ global int RockTable[20] = {
 /**
 **	Check if the tile type is rock.
 **
-** 	Used by @see FixRock and @see PreprocessMap
+**	Used by @see FixRock and @see PreprocessMap
 */
 local int MapRockChk(int x,int y)
 {
@@ -144,7 +143,8 @@ global void MapRemoveRock(unsigned x,unsigned y)
 #else
     if( mf->Flags&MapFieldVisible ) {
 #endif
-	MustRedraw|=RedrawMaps;
+        MarkDrawPosMap(x,y);
+	MustRedraw|=RedrawMinimap;
 	// FIXME: didn't make it better MapMarkSeenTile(x,y);
     }
 }

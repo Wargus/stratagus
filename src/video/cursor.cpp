@@ -10,7 +10,7 @@
 //
 /**@name cursor.c	-	The cursors. */
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -138,16 +138,131 @@ global int OldCursorY;			/// saved cursor position on screen Y
 global int OldCursorW;			/// saved cursor width in pixel
 global int OldCursorH;			/// saved cursor height in pixel
 global int OldCursorSize;		/// size of saved cursor image
-global void* OldCursorImage;		/// background saved behind cursor	
+global void* OldCursorImage;		/// background saved behind cursor
+
+global int OldCursorRectangleX;		/// saved cursor position on screen X
+global int OldCursorRectangleY;		/// saved cursor position on screen Y
+global int OldCursorRectangleW;		/// saved cursor width in pixel
+global int OldCursorRectangleH;		/// saved cursor height in pixel
+global void* OldCursorRectangle=NULL;	/// background saved behind rectangle
 
 	/// Function pointer: Save background behind cursor
 local void (*SaveCursorBackground)(int,int,int,int);
 	/// Function pointer: Load background behind cursor
 local void (*LoadCursorBackground)(int,int,int,int);
 
+/* Function pointer: Save rectangle behind cursor
+**	@param x	Screen X pixels coordinate for left-top corner.
+**	@param y	Screen Y pixels coordinate for left-top corner.
+**	@param w	Width in pixels for rectangle starting at left-top.
+**	@param h	Height in pixels for rectangle starting at left-top.
+**Pre: the complete rectangle should be in Screen (no clipping) and non-empty
+**     ( x>=0,y>=0,w>0,h>0,(x+w-1)<=VideoWidth,(y+h-1)<=VideoHeight )
+*/
+local void (*SaveCursorRectangle)(int x,int y,int w,int h);
+
+/* Function pointer: Load rectangle behind cursor
+**	@param x	Screen X pixels coordinate.
+**	@param y	Screen Y pixels coordinate.
+**	@param w	Width in pixels.
+**	@param h	Height in pixels.
+**Pre: rectangle previously saved with SaveCursorRectangle(x,y,w,h)
+*/
+local void (*LoadCursorRectangle)(int x,int y,int w,int h);
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+#define LOADCURSORRECTANGLE(video,memtype,x,y,w,h)  { \
+    const memtype* sp; \
+    memtype* dp; \
+    sp=OldCursorRectangle; \
+    dp=video+y*VideoWidth+x; \
+    memcpy(dp,sp,w*sizeof(memtype)); \
+    if ( --h ) { \
+      sp+=w; \
+      dp+=VideoWidth; \
+      while( --h ) { \
+        *dp     = *sp++; \
+        dp[w-1] = *sp++; \
+        dp+=VideoWidth; \
+      } \
+      memcpy(dp,sp,w*sizeof(memtype)); \
+    } \
+}
+#define SAVECURSORRECTANGLE(video,memtype,x,y,w,h)  { \
+    const memtype* sp; \
+    memtype* dp; \
+    sp=video+y*VideoWidth+x; \
+    dp=OldCursorRectangle; \
+    memcpy(dp,sp,w*sizeof(memtype)); \
+    if ( --h ) { \
+      dp+=w; \
+      sp+=VideoWidth; \
+      while( --h ) { \
+       *dp++ = *sp; \
+       *dp++ = sp[w-1]; \
+       sp+=VideoWidth; \
+      } \
+      memcpy(dp,sp,w*sizeof(memtype)); \
+    } \
+}
+
+/**  Restore cursor rectangle for 8bpp frame buffer.
+**   (See description function pointer LoadCursorRectangle)
+*/
+local void LoadCursorRectangle8(int x,int y,int w,int h) {
+  LOADCURSORRECTANGLE(VideoMemory8,VMemType8,x,y,w,h);
+}
+
+/** Restore cursor rectangle for 16bpp frame buffer.
+**   (See description function pointer LoadCursorRectangle)
+*/
+local void LoadCursorRectangle16(int x,int y,int w,int h) {
+  LOADCURSORRECTANGLE(VideoMemory16,VMemType16,x,y,w,h);
+}
+
+/** Restore cursor rectangle for 24bpp frame buffer.
+**   (See description function pointer LoadCursorRectangle)
+*/
+local void LoadCursorRectangle24(int x,int y,int w,int h) {
+  LOADCURSORRECTANGLE(VideoMemory24,VMemType24,x,y,w,h);
+}
+
+/** Restore cursor rectangle for 32bpp frame buffer.
+**   (See description function pointer LoadCursorRectangle)
+*/
+local void LoadCursorRectangle32(int x,int y,int w,int h) {
+  LOADCURSORRECTANGLE(VideoMemory32,VMemType32,x,y,w,h);
+}
+
+/** Save cursor rectangle for 8bpp frame buffer.
+**   (See description function pointer SaveCursorRectangle)
+*/
+local void SaveCursorRectangle8(int x,int y,int w,int h) {
+  SAVECURSORRECTANGLE(VideoMemory8,VMemType8,x,y,w,h);
+}
+
+/** Save cursor rectangle for 16bpp frame buffer.
+**   (See description function pointer SaveCursorRectangle)
+*/
+local void SaveCursorRectangle16(int x,int y,int w,int h) {
+  SAVECURSORRECTANGLE(VideoMemory16,VMemType16,x,y,w,h);
+}
+
+/** Save cursor rectangle for 24bpp frame buffer.
+**   (See description function pointer SaveCursorRectangle)
+*/
+local void SaveCursorRectangle24(int x,int y,int w,int h) {
+  SAVECURSORRECTANGLE(VideoMemory24,VMemType24,x,y,w,h);
+}
+
+/** Save cursor rectangle for 32bpp frame buffer.
+**   (See description function pointer SaveCursorRectangle)
+*/
+local void SaveCursorRectangle32(int x,int y,int w,int h) {
+  SAVECURSORRECTANGLE(VideoMemory32,VMemType32,x,y,w,h);
+}
 
 /**
 **	Restore cursor background for 8bpp frame buffer.
@@ -516,7 +631,9 @@ global void DrawCursor(CursorType* type,int x,int y,int frame)
     OldCursorW=VideoGraphicWidth(type->Sprite);
     OldCursorH=VideoGraphicHeight(type->Sprite);
 
+/* FIXME: SaveCusor done before rectangle
     SaveCursor();
+*/
     VideoDrawClip(type->Sprite,frame,x,y);
 }
 
@@ -534,6 +651,12 @@ global void HideCursor(void)
 
 local int RectangleCursor;		/// Flag: last cursor was rectangle
 local int BuildingCursor;		/// Flag: last cursor was building
+
+// area of tiles covered by building cursor (SX,SY;EX,EY)
+local int BuildingCursorSX;
+local int BuildingCursorSY;
+local int BuildingCursorEX;
+local int BuildingCursorEY;
 
 /**
 **	Draw cursor for selecting building position.
@@ -553,16 +676,17 @@ local void DrawBuildingCursor(void)
     int h;
     int mask;
 
-    x=((CursorX-TheUI.MapX)/TileSizeX)*TileSizeX+TheUI.MapX;	// Align to grid
-    y=((CursorY-TheUI.MapY)/TileSizeY)*TileSizeY+TheUI.MapY;
-    mx=Screen2MapX(x);
-    my=Screen2MapY(y);
+    // Align to grid
+    x=CursorX-(CursorX-TheUI.MapX)%TileSizeX;
+    y=CursorY-(CursorY-TheUI.MapY)%TileSizeY;
+    BuildingCursorSX=mx=Screen2MapX(x);
+    BuildingCursorSY=my=Screen2MapY(y);
 
     //
     //	Draw building
     //
     PushClipping();
-    SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapWidth,TheUI.MapHeight);
+    SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapEndX,TheUI.MapEndY);
     GraphicPlayerPixels(ThisPlayer,CursorBuilding->Sprite);
     DrawUnitType(CursorBuilding,0,x,y);
     PopClipping();
@@ -609,10 +733,12 @@ local void DrawBuildingCursor(void)
     }
 
     h=CursorBuilding->TileHeight;
+    BuildingCursorEY=my+h-1;
     if( my+h>MapY+MapHeight ) {		// reduce to view limits
 	h=MapY+MapHeight-my;
     }
     w0=CursorBuilding->TileWidth;	// reduce to view limits
+    BuildingCursorEX=mx+w0-1;
     if( mx+w0>MapX+MapWidth ) {
 	w0=MapX+MapWidth-mx;
     }
@@ -654,32 +780,42 @@ global void DrawRectangleCursor(void)
     x1=CursorX;
     if( x1<TheUI.MapX ) {
 	x1=TheUI.MapX;
-    } else if( x1>=TheUI.MapWidth ) {
-	x1=TheUI.MapWidth-1;
+    } else if( x1>TheUI.MapEndX ) {
+	x1=TheUI.MapEndX;
     }
     y1=CursorY;
     if( y1<TheUI.MapY ) {
 	y1=TheUI.MapY;
-    } else if( y1>=TheUI.MapHeight ) {
-	y1=TheUI.MapHeight-1;
+    } else if( y1>TheUI.MapEndY ) {
+	y1=TheUI.MapEndY;
     }
 
     x=CursorStartX;
     if( x>x1 ) {
 	x=x1;
-	w=CursorStartX-x;
+	w=CursorStartX-x+1;
     } else {
-	w=x1-x;
+	w=x1-x+1;
     }
     y=CursorStartY;
     if( y>y1 ) {
 	y=y1;
-	h=CursorStartY-y;
+	h=CursorStartY-y+1;
     } else {
-	h=y1-y;
+	h=y1-y+1;
     }
 
-    VideoDrawRectangleClip(ColorGreen,x,y,w,h);
+#ifdef NEW_MAPDRAW
+    SaveCursorRectangle(OldCursorRectangleX=x,OldCursorRectangleY=y,
+                        OldCursorRectangleW=w,OldCursorRectangleH=h);
+    VideoDrawHLine(ColorGreen,x,y,w);
+    VideoDrawVLine(ColorGreen,x,y+1,--h);
+    VideoDrawHLine(ColorGreen,x+1,y+h,--w);
+    VideoDrawVLine(ColorGreen,x+w,y,h);
+#else
+    //FIXME VideoDrawRectangleClip uses different definition for w and h
+    VideoDrawRectangleClip(ColorGreen,x,y,w-1,h-1);
+#endif
 }
 
 /**
@@ -688,6 +824,14 @@ global void DrawRectangleCursor(void)
 global void DrawAnyCursor(void)
 {
     RectangleCursor=BuildingCursor=0;
+
+/*FIXME: temporary, as SaveCursor must happen before rectangle
+*/
+    OldCursorX=CursorX-GameCursor->HotX;
+    OldCursorY=CursorY-GameCursor->HotY;
+    OldCursorW=VideoGraphicWidth(GameCursor->Sprite);
+    OldCursorH=VideoGraphicHeight(GameCursor->Sprite);
+    SaveCursor();
 
     //
     //	Selecting rectangle
@@ -717,52 +861,77 @@ global void DrawAnyCursor(void)
 */
 global int HideAnyCursor(void)
 {
-    if( RectangleCursor || BuildingCursor ) {
-	MustRedraw|=RedrawMap;
+   if( RectangleCursor ) {
+     LoadCursorRectangle(OldCursorRectangleX,OldCursorRectangleY,
+                         OldCursorRectangleW,OldCursorRectangleH);
+    }
+    if( BuildingCursor ) {
+        //NOTE: this will restore tiles themselves later in next video update
+        MarkDrawAreaMap(BuildingCursorSX,BuildingCursorSY,
+                        BuildingCursorEX,BuildingCursorEY);
     }
 
     //
     //	Cursor complete on map and map must be redrawn, no restore.
+    //StephanR: but prevented when not entire map is redrawn ;)
     //
+    #ifndef NEW_MAPDRAW
     if( OldCursorX>=TheUI.MapX
-	    && OldCursorX+OldCursorW<TheUI.MapWidth
+	    && OldCursorX+OldCursorW-1<=TheUI.MapEndX
 	    && OldCursorY>=TheUI.MapY
-	    && OldCursorY+OldCursorH<TheUI.MapHeight
+	    && OldCursorY+OldCursorH-1<=TheUI.MapEndY
 	    && (MustRedraw&RedrawMap)
 	    && (InterfaceState != IfaceStateMenu) ) {
 	return 0;
     }
+    #endif
     HideCursor();
     return 1;
 }
 
 /**
 **	Setup the cursor part.
+**FIXME: Now max possible memory for OldCursorRectangle, to be limited to Map?
 */
 global void InitCursor(void)
 {
+    int memsize;
+    free( OldCursorRectangle ); // memory of possible previous video-setting?
+
     switch( VideoDepth ) {
 	case 8:
 	    SaveCursorBackground=SaveCursorBackground8;
 	    LoadCursorBackground=LoadCursorBackground8;
+            memsize=sizeof(VMemType8);
+	    SaveCursorRectangle=SaveCursorRectangle8;
+	    LoadCursorRectangle=LoadCursorRectangle8;
 	    break;
 	case 15:
 	case 16:
 	    SaveCursorBackground=SaveCursorBackground16;
 	    LoadCursorBackground=LoadCursorBackground16;
+            memsize=sizeof(VMemType16);
+	    SaveCursorRectangle=SaveCursorRectangle16;
+	    LoadCursorRectangle=LoadCursorRectangle16;
 	    break;
 	case 24:
 	    SaveCursorBackground=SaveCursorBackground24;
 	    LoadCursorBackground=LoadCursorBackground24;
+            memsize=sizeof(VMemType24);
+	    SaveCursorRectangle=SaveCursorRectangle24;
+	    LoadCursorRectangle=LoadCursorRectangle24;
 	    break;
 	case 32:
 	    SaveCursorBackground=SaveCursorBackground32;
-	    LoadCursorBackground=LoadCursorBackground32;
+            memsize=sizeof(VMemType32);
+	    SaveCursorRectangle=SaveCursorRectangle32;
+	    LoadCursorRectangle=LoadCursorRectangle32;
 	    break;
 	default:
 	    DebugLevel0(__FUNCTION__": unsupported %d bpp\n",VideoDepth);
 	    abort();
     }
+    OldCursorRectangle=malloc((2*VideoWidth+2*(VideoHeight-2))*memsize);
 }
 
 //@}

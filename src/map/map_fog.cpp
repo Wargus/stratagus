@@ -361,12 +361,12 @@ global void MapUpdateVisible(void)
 #ifdef NEW_FOW
 	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
 		,unit->Y+unit->Type->TileHeight/2
-		,unit->Stats->SightRange*(unit->Revealer == 0) 
+		,unit->Stats->SightRange*(unit->Revealer == 0)
 		                    + 12*(unit->Revealer != 0));
 #else
 	MapMarkSight(unit->X+unit->Type->TileWidth/2
 		,unit->Y+unit->Type->TileHeight/2
-		,unit->Stats->SightRange*(unit->Revealer == 0) 
+		,unit->Stats->SightRange*(unit->Revealer == 0)
 		                    + 12*(unit->Revealer != 0));
 #endif
     }
@@ -1431,8 +1431,8 @@ global void DrawMapFogOfWar(int x,int y)
     int ex;
     int dy;
     int ey;
-    const char* redraw_row;
-    const char* redraw_tile;
+    char* redraw_row;
+    char* redraw_tile;
 #ifdef TIMEIT
     u_int64_t sv=rdtsc();
     u_int64_t ev;
@@ -1441,17 +1441,27 @@ global void DrawMapFogOfWar(int x,int y)
     redraw_row=MustRedrawRow;		// flags must redraw or not
     redraw_tile=MustRedrawTile;
 
-    ex=TheUI.MapX+MapWidth*TileSizeX;
+    ex=TheUI.MapEndX;
     sy=y*TheMap.Width;
     dy=TheUI.MapY;
-    ey=dy+MapHeight*TileSizeX;
+    ey=TheUI.MapEndY;
 
-    while( dy<ey ) {
-	if( *redraw_row++ ) {		// row must be redrawn
+    while( dy<=ey ) {
+	if( *redraw_row ) {		// row must be redrawn
+            #if NEW_MAPDRAW > 1
+              (*redraw_row)--;
+            #else
+              *redraw_row=0;
+            #endif
+
 	    sx=x+sy;
 	    dx=TheUI.MapX;
-	    while( dx<ex ) {
-		if( *redraw_tile++ ) {
+	    while( dx<=ex ) {
+		if( *redraw_tile ) {
+                #if NEW_MAPDRAW > 1
+                  (*redraw_tile)--;
+                #else
+                  *redraw_tile=0;
 #ifdef NEW_FOW
 		    if( TheMap.Fields[sx].Explored&(1<<ThisPlayer->Player) ) {
 			DrawFogOfWarTile(sx,sy,dx,dy);
@@ -1465,13 +1475,16 @@ global void DrawMapFogOfWar(int x,int y)
 			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
 		    }
 #endif
+                #endif
 		}
+                ++redraw_tile;
 		++sx;
 		dx+=TileSizeX;
 	    }
 	} else {
 	    redraw_tile+=MapWidth;
 	}
+        ++redraw_row;
 	sy+=TheMap.Width;
 	dy+=TileSizeY;
     }

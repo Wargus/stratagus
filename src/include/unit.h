@@ -432,6 +432,11 @@ extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
     /// FIXME: more docu
 extern int UnitVisible(const Unit* unit);
     /// FIXME: more docu
+extern int CheckUnitToBeDrawn(const Unit* unit);
+    /// FIXME: more docu
+extern void GetUnitMapArea( const Unit* unit,
+                            int *sx, int *sy, int *ex, int *ey );
+    /// FIXME: more docu
 extern void RemoveUnit(Unit* unit);
     /// Increment mana of all magic units each second.
 extern void UnitIncrementMana(void);

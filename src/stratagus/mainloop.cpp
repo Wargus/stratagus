@@ -10,7 +10,7 @@
 //
 /**@name mainloop.c	-	The main game loop. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -62,6 +62,35 @@ global enum _scroll_state_ MouseScrollState=ScrollNone;
 //	Functions
 //----------------------------------------------------------------------------
 
+local void move_up( int step )
+{
+   if( MapY>step) {
+     MapY-=step;
+   }
+   else MapY=0;
+}
+local void move_left( int step )
+{
+   if( MapX>step) {
+     MapX-=step;
+   }
+   else MapX=0;
+}
+local void move_down( int step )
+{
+   if( MapY<TheMap.Height-MapHeight-step ) {
+     MapY+=step;
+   }
+   else MapY=TheMap.Height-MapHeight;
+}
+local void move_right( int step )
+{
+   if( MapX<TheMap.Width-MapWidth-step ) {
+     MapX+=step;
+   }
+   else MapX=TheMap.Width-MapWidth;
+}
+
 /**
 **	Handle scrolling area.
 **
@@ -69,175 +98,56 @@ global enum _scroll_state_ MouseScrollState=ScrollNone;
 **	@param FastScroll	Flag scroll faster.
 **
 **	FIXME: Support dynamic acceleration of scroll speed.
+**             StephanR: above needs one row+column of tiles extra to be
+**                       drawn (clipped), which also needs to be supported
+**                       by various functions using MustRedrawTile,..
 */
 local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 {
-    switch( TempScrollState ) {
-	case ScrollUp:
-	    if( MapY ) {
-		if( FastScroll ) {
-		    if( MapY<MapHeight/2 ) {
-			MapY=0;
-		    } else {
-			MapY-=MapHeight/2;
-		    }
-		} else {
-		    --MapY;
-		}
-		MustRedraw|=RedrawMaps|RedrawCursors;
-	    }
-	    break;
+    int stepx,stepy;
 
-	case ScrollDown:
-	    if( MapY<TheMap.Height-MapHeight ) {
-		if( FastScroll ) {
-		    if( MapY<TheMap.Height-MapHeight-MapHeight/2 ) {
-			MapY+=MapHeight/2;
-		    } else {
-			MapY=TheMap.Height-MapHeight;
-		    }
-		} else {
-		    ++MapY;
-		}
-		MustRedraw|=RedrawMaps|RedrawCursors;
-	    }
-	    break;
-	case ScrollLeft:
-	    if( MapX ) {
-		if( FastScroll ) {
-		    if( MapX<MapWidth/2 ) {
-			MapX=0;
-		    } else {
-			MapX-=MapWidth/2;
-		    }
-		} else {
-		    --MapX;
-		}
-		MustRedraw|=RedrawMaps|RedrawCursors;
-	    }
-	    break;
-
-	case ScrollLeftUp:
-	    if( MapX ) {
-		if( FastScroll ) {
-		    if( MapX<MapWidth/2 ) {
-			MapX=0;
-		    } else {
-			MapX-=MapWidth/2;
-		    }
-		} else {
-		    --MapX;
-		}
-		MustRedraw|=RedrawMaps|RedrawCursors;
-	    }
-	    if( MapY ) {
-		if( FastScroll ) {
-		    if( MapY<MapHeight/2 ) {
-			MapY=0;
-		    } else {
-			MapY-=MapHeight/2;
-		    }
-		} else {
-		    --MapY;
-		}
-		MustRedraw|=RedrawMaps|RedrawCursors;
-	    }
-	    break;
-	case ScrollLeftDown:
-	    if( MapX ) {
-		if( FastScroll ) {
-		    if( MapX<MapWidth/2 ) {
-			MapX=0;
-		    } else {
-			MapX-=MapWidth/2;
-		    }
-		} else {
-		    --MapX;
-		}
-		MustRedraw|=RedrawMaps|RedrawCursors;
-	    }
-	    if( MapY<TheMap.Height-MapHeight ) {
-		if( FastScroll ) {
-		    if( MapY<TheMap.Height-MapHeight-MapHeight/2 ) {
-			MapY+=MapHeight/2;
-		    } else {
-			MapY=TheMap.Height-MapHeight;
-		    }
-		} else {
-		    ++MapY;
-		}
-		MustRedraw|=RedrawMaps|RedrawCursors;
-	    }
-	    break;
-	case ScrollRight:
-	    if( MapX<TheMap.Width-MapWidth ) {
-		if( FastScroll ) {
-		    if( MapX<TheMap.Width-MapWidth-MapWidth/2 ) {
-			MapX+=MapWidth/2;
-		    } else {
-			MapX=TheMap.Width-MapWidth;
-		    }
-		} else {
-		    ++MapX;
-		}
-		MustRedraw|=RedrawMaps|RedrawMinimapCursor;
-	    }
-	    break;
-	case ScrollRightUp:
-	    if( MapX<TheMap.Width-MapWidth ) {
-		if( FastScroll ) {
-		    if( MapX<TheMap.Width-MapWidth-MapWidth/2 ) {
-			MapX+=MapWidth/2;
-		    } else {
-			MapX=TheMap.Width-MapWidth;
-		    }
-		} else {
-		    ++MapX;
-		}
-		MustRedraw|=RedrawMaps|RedrawMinimapCursor;
-	    }
-	    if( MapY ) {
-		if( FastScroll ) {
-		    if( MapY<MapHeight/2 ) {
-			MapY=0;
-		    } else {
-			MapY-=MapHeight/2;
-		    }
-		} else {
-		    --MapY;
-		}
-		MustRedraw|=RedrawMaps|RedrawCursors;
-	    }
-	    break;
-	case ScrollRightDown:
-	    if( MapX<TheMap.Width-MapWidth ) {
-		if( FastScroll ) {
-		    if( MapX<TheMap.Width-MapWidth-MapWidth/2 ) {
-			MapX+=MapWidth/2;
-		    } else {
-			MapX=TheMap.Width-MapWidth;
-		    }
-		} else {
-		    ++MapX;
-		}
-		MustRedraw|=RedrawMaps|RedrawMinimapCursor;
-	    }
-	    if( MapY<TheMap.Height-MapHeight ) {
-		if( FastScroll ) {
-		    if( MapY<TheMap.Height-MapHeight-MapHeight/2 ) {
-			MapY+=MapHeight/2;
-		    } else {
-			MapY=TheMap.Height-MapHeight;
-		    }
-		} else {
-		    ++MapY;
-		}
-		MustRedraw|=RedrawMaps|RedrawCursors;
-	    }
-	    break;
-	default:
-	    break;
+    if( FastScroll ) {
+      stepx=MapWidth/2;
+      stepy=MapHeight/2;
     }
+    else {
+      stepx=stepy=1;// dynamic: let these variables increase upto FastScroll..
+    }
+
+    switch( TempScrollState ) {
+        case ScrollUp:
+            move_up( stepy );
+            break;
+        case ScrollDown:
+            move_down( stepy );
+            break;
+        case ScrollLeft:
+            move_left( stepx );
+            break;
+        case ScrollLeftUp:
+            move_left( stepx );
+            move_up( stepy );
+            break;
+        case ScrollLeftDown:
+            move_left( stepx );
+            move_down( stepy );
+            break;
+        case ScrollRight:
+            move_right( stepx );
+            break;
+        case ScrollRightUp:
+            move_right( stepx );
+            move_up( stepy );
+            break;
+        case ScrollRightDown:
+            move_right( stepx );
+            move_down( stepy );
+            break;
+        default:
+            return; // skip marking map
+    }
+    MarkDrawEntireMap();
+    MustRedraw|=RedrawMinimap|RedrawCursors;
 }
 
 /**
@@ -262,6 +172,7 @@ global void UpdateDisplay(void)
 
     if( MustRedraw&RedrawMap ) {
 	if (InterfaceState == IfaceStateNormal) {
+            #ifndef NEW_MAPDRAW
 	    int i;
 
 	    // FIXME: only needed until flags are correct set
@@ -271,20 +182,21 @@ global void UpdateDisplay(void)
 	    for( i=0; i<MapHeight*MapWidth; ++i ) {
 		MustRedrawTile[i]=1;
 	    }
+            #endif
 
-	    SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapWidth,TheUI.MapHeight);
+	    SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapEndX,TheUI.MapEndY);
 
 	    DrawMapBackground(MapX,MapY);
 	    DrawUnits();
 	    DrawMapFogOfWar(MapX,MapY);
 	    DrawMissiles();
 	    DrawConsole();
-	    SetClipping(0,0,VideoWidth,VideoHeight);
+	    SetClipping(0,0,VideoWidth-1,VideoHeight-1);
 	}
 
 	// FIXME: trick17! must find a better solution
 	// Resources over map!
-	if( TheUI.MapX<TheUI.ResourceX && TheUI.MapWidth>TheUI.ResourceX ) {
+	if( TheUI.MapX<=TheUI.ResourceX && TheUI.MapEndX>=TheUI.ResourceX ) {
 	    MustRedraw|=RedrawResources;
 	}
     }
@@ -358,7 +270,7 @@ global void UpdateDisplay(void)
     // FIXME: this could be written better, less drawing
     if( update_old_cursor && MustRedraw!=-1  ) {
 	// Draw restored area only if not same.
-	if( OldCursorX!=(CursorX-GameCursor->HotX) 
+	if( OldCursorX!=(CursorX-GameCursor->HotX)
 		|| OldCursorY!=(CursorY-GameCursor->HotY)
 		|| OldCursorW!=VideoGraphicWidth(GameCursor->Sprite)
 		|| OldCursorH!=VideoGraphicHeight(GameCursor->Sprite) ) {
@@ -389,7 +301,7 @@ global void UpdateDisplay(void)
 	if( MustRedraw&RedrawMap ) {
 	    // FIXME: split into small parts see RedrawTile and RedrawRow
 	    InvalidateArea(TheUI.MapX,TheUI.MapY
-		    ,TheUI.MapWidth-TheUI.MapX,TheUI.MapHeight-TheUI.MapY);
+		    ,TheUI.MapEndX-TheUI.MapX+1,TheUI.MapEndY-TheUI.MapY+1);
 	}
 	if( (MustRedraw&RedrawFiller1) && TheUI.Filler1.Graphic ) {
 	    InvalidateArea(TheUI.Filler1X,TheUI.Filler1Y
@@ -430,7 +342,7 @@ global void UpdateDisplay(void)
 		    ,TheUI.StatusLine.Graphic->Height);
 	}
 	/* if (MustRedraw) */ {
-	// FIXME: JOHNS: That didn't work: if (MustRedraw&RedrawCursor) 
+	// FIXME: JOHNS: That didn't work: if (MustRedraw&RedrawCursor)
 	    DebugLevel3Fn("%d,%d,%d,%d\n",CursorX-GameCursor->HotX,CursorY-GameCursor->HotY
 		,VideoGraphicWidth(GameCursor->Sprite)
 		,VideoGraphicHeight(GameCursor->Sprite));
@@ -439,6 +351,17 @@ global void UpdateDisplay(void)
 		,VideoGraphicHeight(GameCursor->Sprite));
 	}
     }
+}
+
+/**
+**      Enable everything to be drawn for next display update.
+**      Used at start of mainloop (and possible refresh as user option)
+**
+*/
+local void EnableDrawRefresh(void)
+{
+    MustRedraw=RedrawEverything;
+    MarkDrawEntireMap();
 }
 
 /**
@@ -454,7 +377,7 @@ global void UpdateDisplay(void)
 global void GameMainLoop(void)
 {
     SetVideoSync();
-    MustRedraw=RedrawEverything;
+    EnableDrawRefresh();
     GameCursor=&Cursors[CursorTypePoint];
 
     for( ;; ) {

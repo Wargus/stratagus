@@ -101,7 +101,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
     if( type->Critter && type==UnitTypeCritter ) {
 	int x;
 	int y;
-    
+
 	x=unit->X;
 	y=unit->Y;
 	switch( (SyncRand()>>12)&15 ) {
@@ -120,7 +120,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    x=0;
 	} else if( x>=TheMap.Width ) {
 	    x=TheMap.Width-1;
-	} 
+	}
 	if( y<0 ) {
 	    y=0;
 	} else if( y>=TheMap.Height ) {
@@ -262,16 +262,12 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    case 0:			// Turn clockwise
 		unit->Direction+=NextDirection;
 		UnitUpdateHeading(unit);
-		if( UnitVisible(unit) ) {
-		    MustRedraw|=RedrawMap;
-		}
+                CheckUnitToBeDrawn(unit);
 		break;
 	    case 1:			// Turn counter clockwise
 		unit->Direction-=NextDirection;
 		UnitUpdateHeading(unit);
-		if( UnitVisible(unit) ) {
-		    MustRedraw|=RedrawMap;
-		}
+                CheckUnitToBeDrawn(unit);
 		break;
 	    default:			// does nothing
 		break;
