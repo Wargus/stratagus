@@ -520,18 +520,18 @@ global int AiFindGaugeId( SCM symbol )
     char buffer[256];
     char *tmp;
 
-    tmp = gh_scm2newstr( symbol, NULL );
+    tmp = gh_scm2newstr(symbol, NULL);
 
-    for ( gauge = 0; gauge < GAUGE_NB; gauge++ ) {
-	AiGetGaugeName( gauge, buffer, 256 );
+    for (gauge = 0; gauge < GAUGE_NB; ++gauge) {
+	AiGetGaugeName(gauge, buffer, 256);
 
-	if ( !strcasecmp( tmp, buffer ) ) {
-	    free( tmp );
+	if (!strcmp(tmp, buffer)) {
+	    free(tmp);
 	    return gauge;
 	}
     }
-    DebugLevel3Fn( "didn't found %s\n" _C_ tmp );
-    free( tmp );
+    DebugLevel3Fn("didn't found %s\n" _C_ tmp);
+    free(tmp);
     return -1;
 }
 

@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -64,7 +64,7 @@
 **
 **	@note		Can be faster written.
 */
-local int AiCheckSurrounding( const Unit * worker, const UnitType * type, int x, int y )
+local int AiCheckSurrounding(const Unit * worker, const UnitType * type, int x, int y)
 {
     int i;
     int h;
@@ -75,35 +75,33 @@ local int AiCheckSurrounding( const Unit * worker, const UnitType * type, int x,
     --x;
     --y;
 
-    for ( i = 0; i < w; ++i ) {	// Top row
-	if ( ( x + i ) < 0 || ( x + i ) > TheMap.Width ) {	// FIXME: slow, worse,...
+    for (i = 0; i < w; ++i) {	// Top row
+	// FIXME: (pludov) slow, worse,...
+	if (x + i < 0 || x + i > TheMap.Width) {
 	    continue;
 	}
-	if ( !( ( x + i ) == worker->X && y == worker->Y ) && y >= 0 &&
-	     TheMap.Fields[x + i + y * TheMap.Width].Flags & ( MapFieldUnpassable |
-							       MapFieldWall | MapFieldRocks |
-							       MapFieldForest |
-							       MapFieldBuilding ) ) {
+	if (!(x + i == worker->X && y == worker->Y ) && y >= 0 &&
+	    TheMap.Fields[x + i + y * TheMap.Width].Flags &
+		(MapFieldUnpassable | MapFieldWall | MapFieldRocks |
+		    MapFieldForest | MapFieldBuilding)) {
 	    return 0;
 	}			// Bot row
-	if ( !( ( x + i ) == worker->X && ( y + h ) == worker->Y ) && ( y + h ) < TheMap.Height
-	     && TheMap.Fields[x + i +
-			      ( y +
-				h ) *
-			      TheMap.Width].
-	     Flags & ( MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest |
-		       MapFieldBuilding ) ) {
+	if (!(x + i == worker->X && y + h == worker->Y ) && y + h < TheMap.Height &&
+	    TheMap.Fields[x + i + (y + h) * TheMap.Width].Flags &
+		(MapFieldUnpassable | MapFieldWall | MapFieldRocks |
+		    MapFieldForest | MapFieldBuilding)) {
 	    return 0;
 	}
     }
 
     ++y;
     h -= 2;
-    for ( i = 0; i < h; ++i ) {	// Left row
-	if ( ( y + i ) < 0 || ( y + i ) > TheMap.Height ) {	// FIXME: slow, worse,...
+    for (i = 0; i < h; ++i) {	// Left row
+	// FIXME: (pludov) slow, worse,...
+	if (y + i < 0 || y + i > TheMap.Height) {
 	    continue;
 	}
-	if ( !( x == worker->X && ( y + i ) == worker->Y ) && x >= 0 &&
+	if (!( x == worker->X && ( y + i ) == worker->Y ) && x >= 0 &&
 	     TheMap.Fields[x + ( y + i ) * TheMap.Width].Flags & ( MapFieldUnpassable |
 								   MapFieldWall | MapFieldRocks
 								   | MapFieldForest |
