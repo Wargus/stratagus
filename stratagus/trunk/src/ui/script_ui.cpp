@@ -4494,6 +4494,7 @@ local int scm2style(lua_State* l, const char* value)
     } else {
 	lua_pushfstring(l, "Unsupported style: %s", value);
 	lua_error(l);
+	return 0;
     }
     return id;
 }
@@ -6438,7 +6439,7 @@ local int CclDefineButton(lua_State* l)
 		lua_error(l);
 	    }
 	    if (lua_isnumber(l, j + 1)) {
-		sprintf(buf, "%ld", (int)lua_tonumber(l, j + 1));
+		sprintf(buf, "%ld", (long int)lua_tonumber(l, j + 1));
 		s1 = strdup(buf);
 	    } else {
 		s1 = strdup(lua_tostring(l, j + 1));
