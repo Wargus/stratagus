@@ -3062,7 +3062,7 @@ local void MultiGameStart(void)
     VideoUnlockScreen();
     Invalidate();
 
-    DebugLevel0Fn("Send start to all clients.\n");
+    NetworkServerStartGame();
 
     CustomGameStart();
 }
@@ -4265,7 +4265,7 @@ local void MultiGameSetupInit(Menuitem *mi)
 	    h++;	// available interactive player slots
 	}
     }
-    for (i = h; i < PlayerMax-1; i++) {
+    for (i = h; i < PlayerMax - 1; i++) {
 	ServerSetupState.CompOpt[i] = 1;
     }
     MultiGamePlayerSelectorsUpdate(1);
