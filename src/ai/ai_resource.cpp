@@ -33,6 +33,8 @@
 #include "ai_local.h"
 #include "actions.h"
 
+local int AiMakeUnit(UnitType* type);
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -133,6 +135,9 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
 	    if (x-- == end) {
 		state = 0;
 		end = y + addy++;
+		if( addx>=TheMap.Width && addy>=TheMap.Height ) {
+		    return 0;
+		}
 	    }
 	    break;
 	}
@@ -141,7 +146,7 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
 	if (y < 0 || x < 0 || y >= TheMap.Height || x >= TheMap.Width) {
 	    continue;
 	}
-	if (CanBuildUnitType(worker, type, x, y) 
+	if (CanBuildUnitType(worker, type, x, y)
 		&& PlaceReachable(worker, x, y, 1)) {
 	    *dx=x;
 	    *dy=y;
@@ -184,24 +189,121 @@ local int AiBuildBuilding(const UnitType* type,UnitType* building)
 	}
     }
 
-    if( !num ) {			// No available unit.
-	return 0;
+    for( i=0; i<num; ++i ) {
+
+	unit=table[i];
+	DebugLevel0Fn("Have an unit to build %d :)\n" _C_ UnitNumber(unit));
+
+	//
+	//  Find place on that could be build.
+	//
+	if ( !AiFindBuildingPlace(unit,building,&x,&y) ) {
+	    continue;
+	}
+
+	DebugLevel0Fn("Have a building place %d,%d :)\n" _C_ x _C_ y);
+
+	CommandBuildBuilding(unit, x, y, building,FlushCommands);
+
+	return 1;
     }
 
-    DebugLevel0Fn("Have an unit to build :)\n");
+    return 0;
+}
+
+/**
+**	Build new units to reduce the food shortage.
+*/
+local void AiRequestFarms(void)
+{
+    int i;
+    int n;
+    int c;
+    UnitType* type;
+    AiBuildQueue* queue;
+    int counter[UnitTypeMax];
 
     //
-    //  Find place on that could be build.
+    //	Count the already made build requests.
     //
-    if ( !AiFindBuildingPlace(unit,building,&x,&y) ) {
-	return 0;
+    memset(counter,0,sizeof(counter));
+    for( queue=AiPlayer->UnitTypeBuilded; queue; queue=queue->Next ) {
+	counter[queue->Type->Type]+=queue->Want;
     }
 
-    DebugLevel0Fn("Have a building place :)\n");
+    //
+    //	Check if we can build this?
+    //
+    n=AiHelpers.UnitLimit[0]->Count;
+    for( i=0; i<n; ++i ) {
+	type=AiHelpers.UnitLimit[0]->Table[i];
+	if( counter[type->Type] ) {	// Already ordered.
+	    return;
+	}
 
-    CommandBuildBuilding(unit, x, y, building,FlushCommands);
+	DebugLevel0Fn("Must build: %s " _C_ type->Ident);
+	//
+	//	Check if resources available.
+	//
+	if( (c=AiCheckUnitTypeCosts(type)) ) {
+	    DebugLevel0("- no resources\n");
+	    AiPlayer->NeededMask|=c;
+	    return;
+	} else {
+	    AiPlayer->NeededMask=0;
+	    DebugLevel0("- enough resources\n");
+	    if( AiMakeUnit(type) ) {
+		queue=malloc(sizeof(*AiPlayer->UnitTypeBuilded));
+		queue->Next=AiPlayer->UnitTypeBuilded;
+		queue->Type=type;
+		queue->Want=1;
+		queue->Made=1;
+		AiPlayer->UnitTypeBuilded=queue;
+	    }
+	}
+    }
+}
 
-    return 1;
+/**
+**	Check if we can train the unit.
+**
+**	@param type	Unit that can train the unit.
+**	@param what	what to be trained.
+**	@return		True if made, false if can't be made.
+*/
+local int AiTrainUnit(const UnitType* type,UnitType* what)
+{
+    Unit* table[UnitMax];
+    Unit* unit;
+    int nunits;
+    int i;
+    int num;
+
+    DebugLevel0Fn("%s can made %s\n" _C_ type->Ident _C_ what->Ident);
+
+    IfDebug( unit=NoUnitP; );
+    //
+    //  Remove all units already doing something.
+    //
+    nunits = FindPlayerUnitsByType(AiPlayer->Player,type,table);
+    for (num = i = 0; i < nunits; i++) {
+	unit = table[i];
+	if (unit->Orders[0].Action==UnitActionStill && unit->OrderCount==1 ) {
+	    table[num++] = unit;
+	}
+    }
+
+    for( i=0; i<num; ++i ) {
+
+	unit=table[i];
+	DebugLevel0Fn("Have an unit to train %d :)\n" _C_ UnitNumber(unit));
+
+	CommandTrainUnit(unit, what,FlushCommands);
+
+	return 1;
+    }
+
+    return 0;
 }
 
 /**
@@ -246,8 +348,14 @@ local int AiMakeUnit(UnitType* type)
 	//	The type is available
 	//
 	if( unit_count[table->Table[i]->Type] ) {
-	    if( AiBuildBuilding(table->Table[i],type) ) {
-		return 1;
+	    if( type->Building ) {
+		if( AiBuildBuilding(table->Table[i],type) ) {
+		    return 1;
+		}
+	    } else {
+		if( AiTrainUnit(table->Table[i],type) ) {
+		    return 1;
+		}
 	    }
 	}
     }
@@ -260,17 +368,30 @@ local int AiMakeUnit(UnitType* type)
 */
 local void AiCheckingWork(void)
 {
-    int i;
-    int n;
     int c;
     UnitType* type;
+    AiBuildQueue* queue;
 
-    n=AiPlayer->BuildedCount;
-    for( i=0; i<n; ++i ) {
-	if( AiPlayer->UnitTypeBuilded[i].Want
-		>AiPlayer->UnitTypeBuilded[i].Made ) {
-	    type=AiPlayer->UnitTypeBuilded[i].Type;
+    DebugLevel0Fn("%d %d %d\n" _C_
+	    AiPlayer->Player->Resources[1] _C_
+	    AiPlayer->Player->Resources[2] _C_
+	    AiPlayer->Player->Resources[3]);
+
+    for( queue=AiPlayer->UnitTypeBuilded; queue; queue=queue->Next ) {
+	if( queue->Want>queue->Made ) {
+	    type=queue->Type;
 	    DebugLevel0Fn("Must build: %s " _C_ type->Ident);
+
+	    //
+	    //	Check if we have enough food.
+	    //
+	    if( !type->Building && AiPlayer->Player->Food
+			<=AiPlayer->Player->NumFoodUnits ) {
+		DebugLevel0Fn("Need food\n");
+		AiRequestFarms();
+		return;
+	    }
+
 	    //
 	    //	Check if resources available.
 	    //
@@ -279,9 +400,10 @@ local void AiCheckingWork(void)
 		AiPlayer->NeededMask=c;
 		return;
 	    } else {
+		AiPlayer->NeededMask=0;
 		DebugLevel0("- enough resources\n");
 		if( AiMakeUnit(type) ) {
-		    ++AiPlayer->UnitTypeBuilded[i].Made;
+		    ++queue->Made;
 		}
 	    }
 	}
@@ -413,7 +535,7 @@ local void AiCollectResources(void)
     Unit* table[UnitMax];
     int nunits;
 
-    DebugLevel0Fn("%x\n",AiPlayer->NeededMask);
+    DebugLevel0Fn("%x\n" _C_ AiPlayer->NeededMask);
 
     //
     //	Look through all costs, if needed.
@@ -430,7 +552,7 @@ local void AiCollectResources(void)
 	    nunits += FindPlayerUnitsByType(AiPlayer->Player,
 		    types[i],table+nunits);
 	}
-	DebugLevel0Fn("%s: units %d\n",DEFAULT_NAMES[c],nunits);
+	DebugLevel0Fn("%s: units %d\n" _C_ DEFAULT_NAMES[c] _C_ nunits);
 
 	//
 	//	Assign the worker
@@ -472,7 +594,7 @@ local void AiCollectResources(void)
 	    nunits += FindPlayerUnitsByType(AiPlayer->Player,
 		    types[i],table+nunits);
 	}
-	DebugLevel0Fn("%s: units %d\n",DEFAULT_NAMES[c],nunits);
+	DebugLevel0Fn("%s: units %d\n" _C_ DEFAULT_NAMES[c] _C_ nunits);
 
 	//
 	//	Assign the worker
@@ -495,6 +617,35 @@ local void AiCollectResources(void)
 	    }
 	}
     }
+
+    //
+    //	Let all workers with resource return it.
+    //
+    nunits=0;
+    for( c=0; c<OreCost; ++c ) {
+	if( c>=AiHelpers.WithGoodsCount || !AiHelpers.WithGoods[c] ) {
+	    continue;
+	}
+	types=AiHelpers.WithGoods[c]->Table;
+	n=AiHelpers.WithGoods[c]->Count;
+	for( i=0; i<n; ++i ) {
+	    nunits+=FindPlayerUnitsByType(AiPlayer->Player,
+		    types[i],table+nunits);
+	}
+    }
+    DebugLevel0Fn("Return: units %d\n" _C_ nunits);
+
+    //
+    //	Assign the workers with goods
+    //
+    for( i=0; i<nunits; ++i ) {
+	// Unit is already busy
+	if (table[i]->Orders[0].Action != UnitActionStill
+		|| table[i]->OrderCount>1 ) {
+	    continue;
+	}
+	CommandReturnGoods(table[i],NULL,FlushCommands);
+    }
 }
 
 /**
@@ -505,21 +656,21 @@ local void AiCollectResources(void)
 */
 global void AiAddUnitTypeRequest(UnitType* type,int count)
 {
-    int n;
+    AiBuildQueue** queue;
 
     DebugLevel0Fn("%s %d\n" _C_ type->Ident _C_ count);
-    if( AiPlayer->UnitTypeBuilded ) {
-	n=AiPlayer->BuildedCount;
-	AiPlayer->UnitTypeBuilded=realloc(AiPlayer->UnitTypeBuilded,
-		(n+1)*sizeof(*AiPlayer->UnitTypeBuilded));
-    } else {
-	AiPlayer->UnitTypeBuilded=malloc(sizeof(*AiPlayer->UnitTypeBuilded));
-	n=0;
+
+    //
+    //	Find end of the list.
+    //
+    for( queue=&AiPlayer->UnitTypeBuilded; *queue; queue=&(*queue)->Next ) {
     }
-    AiPlayer->UnitTypeBuilded[n].Type=type;
-    AiPlayer->UnitTypeBuilded[n].Want=count;
-    AiPlayer->UnitTypeBuilded[n].Made=0;
-    AiPlayer->BuildedCount=n+1;
+
+    *queue=malloc(sizeof(*AiPlayer->UnitTypeBuilded));
+    (*queue)->Next=NULL;
+    (*queue)->Type=type;
+    (*queue)->Want=count;
+    (*queue)->Made=0;
 }
 
 /**

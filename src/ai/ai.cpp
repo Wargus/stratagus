@@ -76,6 +76,7 @@ local void AiExecuteScript(void)
 local void AiCheckUnits(void)
 {
     int counter[UnitTypeMax];
+    AiBuildQueue* queue;
     int i;
     int n;
     int t;
@@ -85,13 +86,10 @@ local void AiCheckUnits(void)
     //
     //	Count the already made build requests.
     //
-    n=AiPlayer->BuildedCount;
-    for( i=0; i<n; ++i ) {
-	counter[AiPlayer->UnitTypeBuilded[i].Type->Type]
-		+=AiPlayer->UnitTypeBuilded[i].Want;
-	DebugLevel0Fn("Already in build queue: %s %d\n" _C_
-		AiPlayer->UnitTypeBuilded[i].Type->Ident _C_
-		AiPlayer->UnitTypeBuilded[i].Want);
+    for( queue=AiPlayer->UnitTypeBuilded; queue; queue=queue->Next ) {
+	counter[queue->Type->Type]+=queue->Want;
+	DebugLevel0Fn("Already in build queue: %s %d/%d\n" _C_
+		queue->Type->Ident _C_ queue->Made _C_ queue->Want);
     }
 
     //
@@ -171,6 +169,30 @@ global void AiHelpMe(Unit* unit)
 */
 global void AiWorkComplete(Unit* unit,Unit* what)
 {
+    AiBuildQueue** queue;
+    AiBuildQueue* next;
+    PlayerAi* pai;
+
+    DebugLevel1Fn("AiPlayer %d: %d build %s at %d,%d completed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit), what->Type->Ident _C_
+	    unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+
+    //
+    //	Search the unit-type order.
+    //
+    pai=unit->Player->Ai;
+    for( queue=&pai->UnitTypeBuilded; (next=*queue); queue=&next->Next ) {
+	if( what->Type==next->Type && next->Want && next->Made ) {
+	    if( next->Want==next->Made ) {
+		*queue=next->Next;
+		free(next);
+	    }
+	    return;
+	}
+    }
+    DebugCheck( 1 );
 }
 
 /**
@@ -181,6 +203,26 @@ global void AiWorkComplete(Unit* unit,Unit* what)
 */
 global void AiCanNotBuild(Unit* unit,const UnitType* what)
 {
+    AiBuildQueue* queue;
+    const PlayerAi* pai;
+
+    DebugLevel1Fn("AiPlayer %d: %d Can't build %s at %d,%d\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit), what->Ident _C_
+	    unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+
+    //
+    //	Search the unit-type order.
+    //
+    pai=unit->Player->Ai;
+    for( queue=pai->UnitTypeBuilded; queue; queue=queue->Next ) {
+	if( what==queue->Type && queue->Made ) {
+	    queue->Made--;
+	    return;
+	}
+    }
+    DebugCheck( 1 );
 }
 
 /**
@@ -191,6 +233,26 @@ global void AiCanNotBuild(Unit* unit,const UnitType* what)
 */
 global void AiCanNotReach(Unit* unit,const UnitType* what)
 {
+    AiBuildQueue* queue;
+    const PlayerAi* pai;
+
+    DebugLevel1Fn("AiPlayer %d: %d Can't reach %s at %d,%d\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit), what->Ident _C_
+	    unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+
+    //
+    //	Search the unit-type order.
+    //
+    pai=unit->Player->Ai;
+    for( queue=pai->UnitTypeBuilded; queue; queue=queue->Next ) {
+	if( what==queue->Type && queue->Made ) {
+	    queue->Made--;
+	    return;
+	}
+    }
+    DebugCheck( 1 );
 }
 
 /**
@@ -201,6 +263,40 @@ global void AiCanNotReach(Unit* unit,const UnitType* what)
 */
 global void AiTrainingComplete(Unit* unit,Unit* what)
 {
+    AiBuildQueue** queue;
+    AiBuildQueue* next;
+    PlayerAi* pai;
+
+    DebugLevel1Fn("AiPlayer %d: %d training %s at %d,%d completed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit), what->Type->Ident _C_
+	    unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+
+    //
+    //	Search the unit-type order.
+    //
+    pai=unit->Player->Ai;
+    for( queue=&pai->UnitTypeBuilded; (next=*queue); queue=&next->Next ) {
+	if( what->Type==next->Type && next->Want && next->Made ) {
+	    if( next->Want==next->Made ) {
+		*queue=next->Next;
+		free(next);
+	    }
+	    return;
+	}
+    }
+    DebugCheck( 1 );
+}
+
+/**
+**	Called if an unit is killed.
+**
+**	@param unit	Pointer to unit.
+*/
+global void AiUnitKilled(Unit* unit)
+{
+    // FIXME: if the unit builds something for us it must restartet!!!!
 }
 
 /**
