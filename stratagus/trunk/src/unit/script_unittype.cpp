@@ -525,8 +525,13 @@ local SCM CclDefineUnitType(SCM list)
 	    list = gh_cdr(list);
 	    type->Magic = 0;
 	    while (!gh_null_p(sublist)) {
-		DebugLevel3Fn("%d \n" _C_ CclGetSpellByIdent(gh_car(sublist)));
-		type->CanCastSpell[CclGetSpellByIdent(gh_car(sublist))] = 1;
+		int id;
+		id = CclGetSpellByIdent(gh_car(sublist));
+		DebugLevel3Fn("%d \n" _C_ id);
+		if (id == -1) {
+		    errl("Unknown spell type", gh_car(sublist));
+		}
+		type->CanCastSpell[id] = 1;
 		sublist = gh_cdr(sublist);
 		type->Magic = 1;
 	    }
