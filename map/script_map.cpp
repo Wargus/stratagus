@@ -65,183 +65,177 @@ local SCM CclStratagusMap(SCM list)
     //	Parse the list:	(still everything could be changed!)
     //
 
-    if( !TheMap.Info ) {
-	TheMap.Info=calloc(1, sizeof(MapInfo));
+    if (!TheMap.Info) {
+	TheMap.Info = calloc(1, sizeof(MapInfo));
     }
 
-    while( !gh_null_p(list) ) {
+    while (!gh_null_p(list)) {
 
-	value=gh_car(list);
-	list=gh_cdr(list);
+	value = gh_car(list);
+	list = gh_cdr(list);
 
-	if( gh_eq_p(value,gh_symbol2scm("version")) ) {
+	if (gh_eq_p(value, gh_symbol2scm("version"))) {
 	    char buf[32];
 
-	    data=gh_car(list);
-	    list=gh_cdr(list);
-	    str=gh_scm2newstr(data,NULL);
-	    sprintf(buf,StratagusFormatString,
-		    StratagusFormatArgs(StratagusVersion));
-	    if( strcmp(buf,str) ) {
-		fprintf(stderr,"Warning not saved with this version.\n");
+	    data = gh_car(list);
+	    list = gh_cdr(list);
+	    str = gh_scm2newstr(data, NULL);
+	    sprintf(buf, StratagusFormatString, StratagusFormatArgs(StratagusVersion));
+	    if (strcmp(buf, str)) {
+		fprintf(stderr, "Warning not saved with this version.\n");
 	    }
 	    free(str);
-	} else if( gh_eq_p(value,gh_symbol2scm("uid")) ) {
+	} else if (gh_eq_p(value, gh_symbol2scm("uid"))) {
 	    TheMap.Info->MapUID = gh_scm2int(gh_car(list));
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("description")) ) {
-	    data=gh_car(list);
-	    list=gh_cdr(list);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("description"))) {
+	    data = gh_car(list);
+	    list = gh_cdr(list);
 
-	    str=gh_scm2newstr(data,NULL);
-	    strncpy(TheMap.Description,str,sizeof(TheMap.Description));
+	    str = gh_scm2newstr(data, NULL);
+	    strncpy(TheMap.Description, str, sizeof(TheMap.Description));
 	    TheMap.Info->Description = strdup(str);
 	    free(str);
-	} else if( gh_eq_p(value,gh_symbol2scm("the-map")) ) {
-	    data=gh_car(list);
-	    list=gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("the-map"))) {
+	    data = gh_car(list);
+	    list = gh_cdr(list);
 
-	    while( !gh_null_p(data) ) {
-		value=gh_car(data);
-		data=gh_cdr(data);
+	    while (!gh_null_p(data)) {
+		value = gh_car(data);
+		data = gh_cdr(data);
 
-		if( gh_eq_p(value,gh_symbol2scm("terrain")) ) {
+		if (gh_eq_p(value, gh_symbol2scm("terrain"))) {
 		    int i;
 
-		    value=gh_car(data);
-		    data=gh_cdr(data);
+		    value = gh_car(data);
+		    data = gh_cdr(data);
 
 		    free(TheMap.TerrainName);
-		    TheMap.TerrainName=str=gh_scm2newstr(gh_car(value),NULL);
+		    TheMap.TerrainName = str = gh_scm2newstr(gh_car(value), NULL);
 		    //
 		    //	Lookup the index of this tileset.
 		    //
-		    for( i=0; TilesetWcNames[i]
-			    && strcmp(str,TilesetWcNames[i]); ++i ) {
+		    for (i = 0; TilesetWcNames[i] &&
+			    strcmp(str, TilesetWcNames[i]); ++i) {
 		    }
-		    TheMap.Terrain=i;
+		    TheMap.Terrain = i;
 		    // Ignore: str=gh_scm2newstr(gh_cadr(value),NULL);
 		    LoadTileset();
 		   
-		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		    value=gh_car(data);
-		    data=gh_cdr(data);
+		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+		    value = gh_car(data);
+		    data = gh_cdr(data);
 
-		    TheMap.Width=gh_scm2int(gh_car(value));
-		    TheMap.Height=gh_scm2int(gh_cadr(value));
+		    TheMap.Width = gh_scm2int(gh_car(value));
+		    TheMap.Height = gh_scm2int(gh_cadr(value));
 
 		    free(TheMap.Fields);
-		    TheMap.Fields=calloc(TheMap.Width*TheMap.Height,
-			    sizeof(*TheMap.Fields));
-		    TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
+		    TheMap.Fields = calloc(TheMap.Width * TheMap.Height,
+			sizeof(*TheMap.Fields));
+		    TheMap.Visible[0] = calloc(TheMap.Width * TheMap.Height / 8, 1);
 		    InitUnitCache();
 		    // FIXME: this should be CreateMap or InitMap?
 
-		} else if( gh_eq_p(value,gh_symbol2scm("fog-of-war")) ) {
-
+		} else if (gh_eq_p(value, gh_symbol2scm("fog-of-war"))) {
 		    TheMap.NoFogOfWar=0;
-
-		} else if( gh_eq_p(value,gh_symbol2scm("no-fog-of-war")) ) {
-
+		} else if (gh_eq_p(value, gh_symbol2scm("no-fog-of-war"))) {
 		    TheMap.NoFogOfWar=1;
-
-		} else if( gh_eq_p(value,gh_symbol2scm("map-fields")) ) {
+		} else if (gh_eq_p(value, gh_symbol2scm("map-fields"))) {
 		    int i;
 
-		    value=gh_car(data);
-		    data=gh_cdr(data);
+		    value = gh_car(data);
+		    data = gh_cdr(data);
 
-		    i=gh_length(value);
-		    if( i!=TheMap.Width*TheMap.Height ) {
-			fprintf(stderr,"Wrong tile table length %d\n",i);
+		    i = gh_length(value);
+		    if (i != TheMap.Width * TheMap.Height) {
+			fprintf(stderr, "Wrong tile table length %d\n", i);
 		    }
-		    i=0;
-		    while( !gh_null_p(value) ) {
+		    i = 0;
+		    while (!gh_null_p(value)) {
 			SCM field;
 
-			field=gh_car(value);
-			value=gh_cdr(value);
+			field = gh_car(value);
+			value = gh_cdr(value);
 
-			TheMap.Fields[i].Tile=gh_scm2int(gh_car(field));
-			field=gh_cdr(field);
-			TheMap.Fields[i].SeenTile=gh_scm2int(gh_car(field));
-			field=gh_cdr(field);
+			TheMap.Fields[i].Tile = gh_scm2int(gh_car(field));
+			field = gh_cdr(field);
+			TheMap.Fields[i].SeenTile = gh_scm2int(gh_car(field));
+			field = gh_cdr(field);
 #ifdef UNITS_ON_MAP
 			TheMap.Fields[i].Building = 0xffff;
 			TheMap.Fields[i].AirUnit = 0xffff;
 			TheMap.Fields[i].LandUnit = 0xffff;
 			TheMap.Fields[i].SeaUnit = 0xffff;
 #endif /* UNITS_ON_MAP */
-			while( !gh_null_p(field) ) {
-			    if( gh_exact_p(gh_car(field)) ) {
-				TheMap.Fields[i].Value=
-					gh_scm2int(gh_car(field));
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("explored")) ) {
-				field=gh_cdr(field);
+			while (!gh_null_p(field)) {
+			    if (gh_exact_p(gh_car(field))) {
+				TheMap.Fields[i].Value = gh_scm2int(gh_car(field));
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("explored"))) {
+				field = gh_cdr(field);
 				TheMap.Fields[i].Visible[gh_scm2int(gh_car(field))] = 1;
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("human")) ) {
-				TheMap.Fields[i].Flags|=MapFieldHuman;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("human"))) {
+				TheMap.Fields[i].Flags |= MapFieldHuman;
 
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("land")) ) {
-				TheMap.Fields[i].Flags|=MapFieldLandAllowed;
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("coast")) ) {
-				TheMap.Fields[i].Flags|=MapFieldCoastAllowed;
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("water")) ) {
-				TheMap.Fields[i].Flags|=MapFieldWaterAllowed;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("land"))) {
+				TheMap.Fields[i].Flags |= MapFieldLandAllowed;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("coast"))) {
+				TheMap.Fields[i].Flags |= MapFieldCoastAllowed;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("water"))) {
+				TheMap.Fields[i].Flags |= MapFieldWaterAllowed;
 
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("mud")) ) {
-				TheMap.Fields[i].Flags|=MapFieldNoBuilding;
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("block")) ) {
-				TheMap.Fields[i].Flags|=MapFieldUnpassable;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("mud"))) {
+				TheMap.Fields[i].Flags |= MapFieldNoBuilding;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("block"))) {
+				TheMap.Fields[i].Flags |= MapFieldUnpassable;
 
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("wall"))) {
+				TheMap.Fields[i].Flags |= MapFieldWall;
 			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("wall")) ) {
-				TheMap.Fields[i].Flags|=MapFieldWall;
+				    gh_symbol2scm("rock")) ) {
+				TheMap.Fields[i].Flags |= MapFieldRocks;
 			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("rock")) ) {
-				TheMap.Fields[i].Flags|=MapFieldRocks;
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("wood")) ) {
-				TheMap.Fields[i].Flags|=MapFieldForest;
+				    gh_symbol2scm("wood")) ) {
+				TheMap.Fields[i].Flags |= MapFieldForest;
 
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("ground")) ) {
-				TheMap.Fields[i].Flags|=MapFieldLandUnit;
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("air")) ) {
-				TheMap.Fields[i].Flags|=MapFieldAirUnit;
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("sea")) ) {
-				TheMap.Fields[i].Flags|=MapFieldSeaUnit;
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("building")) ) {
-				TheMap.Fields[i].Flags|=MapFieldBuilding;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("ground"))) {
+				TheMap.Fields[i].Flags |= MapFieldLandUnit;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("air"))) {
+				TheMap.Fields[i].Flags |= MapFieldAirUnit;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("sea"))) {
+				TheMap.Fields[i].Flags |= MapFieldSeaUnit;
+			    } else if (gh_eq_p(gh_car(field),
+				    gh_symbol2scm("building"))) {
+				TheMap.Fields[i].Flags |= MapFieldBuilding;
 
 			    } else {
 			       // FIXME: this leaves a half initialized map
-			       errl("Unsupported tag",value);
+			       errl("Unsupported tag", value);
 			    }
-			    field=gh_cdr(field);
+			    field = gh_cdr(field);
 			}
 			++i;
 		    }
 
 		} else {
 		   // FIXME: this leaves a half initialized map
-		   errl("Unsupported tag",value);
+		   errl("Unsupported tag", value);
 		}
 	    }
 
 	} else {
 	   // FIXME: this leaves a half initialized map
-	   errl("Unsupported tag",value);
+	   errl("Unsupported tag", value);
 	}
     }
 
@@ -254,11 +248,11 @@ local SCM CclStratagusMap(SCM list)
 */
 local SCM CclRevealMap(void)
 {
-    if( !CclInConfigFile ) {
+    if (!CclInConfigFile) {
 	PrintFunction();
-	fprintf(stdout,"Only supported within config file\n");
+	fprintf(stdout, "Only supported within config file\n");
     }
-    FlagRevealMap=1;
+    FlagRevealMap = 1;
 
     return SCM_UNSPECIFIED;
 }
@@ -269,9 +263,9 @@ local SCM CclRevealMap(void)
 **	@param x	X tile location.
 **	@param y	Y tile location.
 */
-local SCM CclCenterMap(SCM x,SCM y)
+local SCM CclCenterMap(SCM x, SCM y)
 {
-    ViewportCenterViewpoint(TheUI.SelectedViewport,gh_scm2int(x),gh_scm2int(y));
+    ViewportCenterViewpoint(TheUI.SelectedViewport, gh_scm2int(x), gh_scm2int(y));
     return SCM_UNSPECIFIED;
 }
 
@@ -297,8 +291,8 @@ local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle, SCM unit)
     target->HP = 0;
     target->X = gh_scm2int(x);
     target->Y = gh_scm2int(y);
-    target->TTL=GameCycle+gh_scm2int(cycle);
-    target->CurrentSightRange=gh_scm2int(radius);
+    target->TTL = GameCycle + gh_scm2int(cycle);
+    target->CurrentSightRange = gh_scm2int(radius);
     MapMarkUnitSight(target);
     free(unitname);
     return SCM_UNSPECIFIED;
@@ -315,11 +309,11 @@ local SCM CclSetDefaultMap(SCM map)
     SCM old;
     char* str;
 
-    old=NIL;
-    if( !gh_null_p(map) ) {
-	old=gh_str02scm(DefaultMap);
-	str=gh_scm2newstr(map,NULL);
-	strcpy(DefaultMap,str);
+    old = NIL;
+    if (!gh_null_p(map)) {
+	old = gh_str02scm(DefaultMap);
+	str = gh_scm2newstr(map, NULL);
+	strcpy(DefaultMap, str);
 	free(str);
     }
     return old;
@@ -336,8 +330,8 @@ local SCM CclSetFogOfWar(SCM flag)
 {
     int old;
 
-    old=!TheMap.NoFogOfWar;
-    TheMap.NoFogOfWar=!gh_scm2bool(flag);
+    old = !TheMap.NoFogOfWar;
+    TheMap.NoFogOfWar = !gh_scm2bool(flag);
 
     return gh_bool2scm(old);
 }
@@ -353,8 +347,8 @@ local SCM CclSetMinimapTerrain(SCM flag)
 {
     int old;
 
-    old=MinimapWithTerrain;
-    MinimapWithTerrain=gh_scm2bool(flag);
+    old = MinimapWithTerrain;
+    MinimapWithTerrain = gh_scm2bool(flag);
 
     return gh_bool2scm(old);
 }
@@ -364,9 +358,9 @@ local SCM CclSetMinimapTerrain(SCM flag)
 */
 local SCM CclOriginalFogOfWar(void)
 {
-    OriginalFogOfWar=1;
+    OriginalFogOfWar = 1;
 
-    if( !CclInConfigFile ) {
+    if (!CclInConfigFile) {
 	InitMapFogOfWar();
     }
 
@@ -378,9 +372,9 @@ local SCM CclOriginalFogOfWar(void)
 */
 local SCM CclAlphaFogOfWar(void)
 {
-    OriginalFogOfWar=0;
+    OriginalFogOfWar = 0;
 
-    if( !CclInConfigFile ) {
+    if (!CclInConfigFile) {
 	InitMapFogOfWar();
     }
 
@@ -395,16 +389,16 @@ local SCM CclSetFogOfWarContrast(SCM contrast)
     int i;
     int o;
 
-    i=gh_scm2int(contrast);
-    if( i<0 || i>400 ) {
+    i = gh_scm2int(contrast);
+    if (i < 0 || i > 400) {
 	PrintFunction();
-	fprintf(stdout,"Contrast should be 0-400\n");
-	i=100;
+	fprintf(stdout, "Contrast should be 0-400\n");
+	i = 100;
     }
-    o=FogOfWarContrast;
-    FogOfWarContrast=i;
+    o = FogOfWarContrast;
+    FogOfWarContrast = i;
 
-    if( !CclInConfigFile ) {
+    if (!CclInConfigFile) {
 	InitMapFogOfWar();
     }
 
@@ -419,16 +413,16 @@ local SCM CclSetFogOfWarBrightness(SCM brightness)
     int i;
     int o;
 
-    i=gh_scm2int(brightness);
-    if( i<-100 || i>100 ) {
+    i = gh_scm2int(brightness);
+    if (i < -100 || i > 100) {
 	PrintFunction();
-	fprintf(stdout,"Brightness should be -100-100\n");
-	i=0;
+	fprintf(stdout, "Brightness should be -100-100\n");
+	i = 0;
     }
-    o=FogOfWarBrightness;
-    FogOfWarBrightness=i;
+    o = FogOfWarBrightness;
+    FogOfWarBrightness = i;
 
-    if( !CclInConfigFile ) {
+    if (!CclInConfigFile) {
 	InitMapFogOfWar();
     }
 
@@ -443,16 +437,16 @@ local SCM CclSetFogOfWarSaturation(SCM saturation)
     int i;
     int o;
 
-    i=gh_scm2int(saturation);
-    if( i<-100 || i>200 ) {
+    i = gh_scm2int(saturation);
+    if (i < -100 || i > 200) {
 	PrintFunction();
-	fprintf(stdout,"Saturation should be -100-200\n");
-	i=0;
+	fprintf(stdout, "Saturation should be -100-200\n");
+	i = 0;
     }
-    o=FogOfWarSaturation;
-    FogOfWarSaturation=i;
+    o = FogOfWarSaturation;
+    FogOfWarSaturation = i;
 
-    if( !CclInConfigFile ) {
+    if (!CclInConfigFile) {
 	InitMapFogOfWar();
     }
 
@@ -471,14 +465,14 @@ local SCM CclSetForestRegeneration(SCM speed)
     int i;
     int o;
 
-    i=gh_scm2int(speed);
-    if( i<0 || i>255 ) {
+    i = gh_scm2int(speed);
+    if (i < 0 || i > 255) {
 	PrintFunction();
-	fprintf(stdout,"Regneration speed should be 0-255\n");
-	i=0;
+	fprintf(stdout, "Regneration speed should be 0-255\n");
+	i = 0;
     }
-    o=ForestRegeneration;
-    ForestRegeneration=i;
+    o = ForestRegeneration;
+    ForestRegeneration = i;
 
     return gh_int2scm(o);
 }
@@ -495,14 +489,14 @@ local SCM CclSetGoldmineDepleted(SCM rate)
     int i;
     int o;
 
-    i=gh_scm2int(rate);
-    if( i<0 || i>100 ) {
+    i = gh_scm2int(rate);
+    if (i < 0 || i > 100) {
 	PrintFunction();
-	fprintf(stdout,"Deplated rate should be 0-100\n");
-	i=0;
+	fprintf(stdout, "Deplated rate should be 0-100\n");
+	i = 0;
     }
-    o=OptionUseDepletedMines;
-    OptionUseDepletedMines=i;
+    o = OptionUseDepletedMines;
+    OptionUseDepletedMines = i;
 
     return gh_int2scm(o);
 }
@@ -513,25 +507,25 @@ local SCM CclSetGoldmineDepleted(SCM rate)
 **	@param percent	    Max percent needed to burn buildings
 **	@param rate	    HP per second to damage buildings
 */
-local SCM CclSetBurnBuildings(SCM percent,SCM rate)
+local SCM CclSetBurnBuildings(SCM percent, SCM rate)
 {
     int p;
     int r;
 
-    p=gh_scm2int(percent);
-    r=gh_scm2int(rate);
-    if( p<0 || p>100 ) {
+    p = gh_scm2int(percent);
+    r = gh_scm2int(rate);
+    if (p < 0 || p > 100) {
 	PrintFunction();
-	fprintf(stdout,"Burn percent should be 0-100\n");
-	p=0;
+	fprintf(stdout, "Burn percent should be 0-100\n");
+	p = 0;
     }
-    if( r<=0 ) {
+    if (r <= 0) {
 	PrintFunction();
-	fprintf(stderr,"Burn rate should be greater than 0\n");
-	p=0;
+	fprintf(stderr, "Burn rate should be greater than 0\n");
+	p = 0;
     }
-    BurnBuildingPercent=p;
-    BurnBuildingDamageRate=r;
+    BurnBuildingPercent = p;
+    BurnBuildingDamageRate = r;
 
     return SCM_UNSPECIFIED;
 }
@@ -541,26 +535,26 @@ local SCM CclSetBurnBuildings(SCM percent,SCM rate)
 */
 global void MapCclRegister(void)
 {
-    gh_new_procedureN("stratagus-map",CclStratagusMap);
-    gh_new_procedure0_0("reveal-map",CclRevealMap);
-    gh_new_procedure2_0("center-map",CclCenterMap);
-    gh_new_procedure5_0("show-map-location",CclShowMapLocation);
+    gh_new_procedureN("stratagus-map", CclStratagusMap);
+    gh_new_procedure0_0("reveal-map", CclRevealMap);
+    gh_new_procedure2_0("center-map", CclCenterMap);
+    gh_new_procedure5_0("show-map-location", CclShowMapLocation);
 
-    gh_new_procedure1_0("set-default-map!",CclSetDefaultMap);
-    gh_new_procedure1_0("set-fog-of-war!",CclSetFogOfWar);
-    gh_new_procedure1_0("set-minimap-terrain!",CclSetMinimapTerrain);
+    gh_new_procedure1_0("set-default-map!", CclSetDefaultMap);
+    gh_new_procedure1_0("set-fog-of-war!", CclSetFogOfWar);
+    gh_new_procedure1_0("set-minimap-terrain!", CclSetMinimapTerrain);
 
-    gh_new_procedure0_0("original-fog-of-war",CclOriginalFogOfWar);
-    gh_new_procedure0_0("alpha-fog-of-war",CclAlphaFogOfWar);
+    gh_new_procedure0_0("original-fog-of-war", CclOriginalFogOfWar);
+    gh_new_procedure0_0("alpha-fog-of-war", CclAlphaFogOfWar);
 
-    gh_new_procedure1_0("set-fog-of-war-contrast!",CclSetFogOfWarContrast);
-    gh_new_procedure1_0("set-fog-of-war-brightness!",CclSetFogOfWarBrightness);
-    gh_new_procedure1_0("set-fog-of-war-saturation!",CclSetFogOfWarSaturation);
+    gh_new_procedure1_0("set-fog-of-war-contrast!", CclSetFogOfWarContrast);
+    gh_new_procedure1_0("set-fog-of-war-brightness!", CclSetFogOfWarBrightness);
+    gh_new_procedure1_0("set-fog-of-war-saturation!", CclSetFogOfWarSaturation);
 
-    gh_new_procedure1_0("set-forest-regeneration!",CclSetForestRegeneration);
-    gh_new_procedure1_0("set-goldmine-depleted!",CclSetGoldmineDepleted);
+    gh_new_procedure1_0("set-forest-regeneration!", CclSetForestRegeneration);
+    gh_new_procedure1_0("set-goldmine-depleted!", CclSetGoldmineDepleted);
 
-    gh_new_procedure2_0("set-burn-buildings!",CclSetBurnBuildings);
+    gh_new_procedure2_0("set-burn-buildings!", CclSetBurnBuildings);
 }
 
 //@}
