@@ -1131,18 +1131,10 @@ extern void Invalidate(void);
     */
 extern void RealizeVideoMemory(void);
 
-    /**
-    **	Process all system events. Returns if the time for a frame is over.
-    */
+    ///	Process all system events. Returns if the time for a frame is over
 extern void WaitEventsOneFrame(const EventCallback* callbacks);
 
-    /**
-    **	Process all system events. This function also keeps synchronization
-    **	of game.
-    */
-extern void WaitEventsAndKeepSync(void);
-
-    ///	Load graphic from PNG file.
+    ///	Load graphic from PNG file
 extern Graphic* LoadGraphicPNG(const char* name);
 
     /// New graphic
