@@ -45,15 +45,143 @@
 #include "ai_local.h"
 #include "actions.h"
 #include "map.h"
+#include "depend.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
+global int UnitTypeEquivs[UnitTypeMax + 1];/// equivalence between unittypes
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
+
+/**
+**	Remove any equivalence between unittypes
+*/
+global void AiResetUnitTypeEquiv(void)
+{
+    int i;
+    for (i = 0; i <= UnitTypeMax; i++) {
+	UnitTypeEquivs[i] = i;
+    }
+}
+
+/**
+**	Make two unittypes equivalents from the AI's point of vue
+**
+**	@param a	the first unittype
+**	@param b	the second unittype
+*/
+global void AiNewUnitTypeEquiv(UnitType * a,UnitType * b)
+{
+    int find,replace,i;
+    
+    find = UnitTypeEquivs[a->Type];
+    replace = UnitTypeEquivs[b->Type];
+    
+    // Always record equivalences with the lowest unittype.
+    if (find < replace) {
+	i = find;
+	find = replace;
+	replace = i;
+    }
+    
+    // Then just find & replace in UnitTypeEquivs...
+    for (i = 0; i <= UnitTypeMax; i++) {
+	if (UnitTypeEquivs[i] == find) {
+	    UnitTypeEquivs[i] = replace;
+	}
+    }
+}
+
+
+/**
+**	Find All unittypes equivalent to a given one
+**
+**	@param unittype	the unittype to find equivalence for
+**	@param result	int array which will hold the result. (Size UnitTypeMax+1)
+**	@return		the number of unittype found
+*/
+global int AiFindUnitTypeEquiv(const UnitType * unittype,int * result)
+{
+    int i;
+    int search;
+    int count;
+
+    search = UnitTypeEquivs[unittype->Type];
+    count = 0;
+
+    for (i = 0; i < UnitTypeMax + 1; i++) {
+	if (UnitTypeEquivs[i] == search) {
+	    // Found one
+	    result[count] = i;
+	    count++;
+	}
+    }
+
+    return count;
+}
+
+/**
+**	Find All unittypes equivalent to a given one, and which are available
+**	UnitType are returned in the prefered order ( ie palladin >> knight... )
+**
+**	@param unittype	the unittype to find equivalence for
+**	@param result	int array which will hold the result. (Size UnitTypeMax+1)
+**	@return		the number of unittype found
+*/
+global int AiFindAvailableUnitTypeEquiv(const UnitType * unittype,int * usableTypes)
+{
+    int usableTypesCount;
+    int i, j;
+    int tmp;
+    int playerid;
+    int bestlevel, curlevel;
+
+    // 1 - Find equivalents
+    usableTypesCount = AiFindUnitTypeEquiv(unittype,  usableTypes);
+
+    // 2 - Remove unavailable unittypes
+    for (i = 0; i < usableTypesCount; ) {
+	if (! CheckDependByIdent(AiPlayer->Player, UnitTypes[usableTypes[i]]->Ident)) {
+	    // Not available, remove it
+	    usableTypes[i] = usableTypes[usableTypesCount - 1];
+	    usableTypesCount--;
+	} else {
+	    i++;
+	}
+    }
+
+    // 3 - Sort by level
+    playerid = AiPlayer->Player->Player;
+
+    // We won't have usableTypesCount>4, so simple sort should do it
+    for (i = 0; i < usableTypesCount-1; i++) {
+	bestlevel = UnitTypes[usableTypes[i]]->Priority;
+	for (j = i + 1; j < usableTypesCount; j++) {
+	    curlevel = UnitTypes[usableTypes[j]]->Priority;
+	    
+	    if (curlevel > bestlevel) {
+		// Swap
+		tmp = usableTypes[j];
+		usableTypes[j] = usableTypes[i];
+		usableTypes[i] = tmp;
+		
+		bestlevel = curlevel;
+	    }
+	}
+    }
+    DebugLevel0Fn("prefered order for %s is " _C_ unittype->Ident);
+    for (i = 0; i < usableTypesCount; i++) {
+	DebugLevel0(" %s" _C_ UnitTypes[usableTypes[i]]->Ident);
+    }
+    DebugLevel0("\n");
+    
+    return usableTypesCount;
+}
 
 /**
 ** 	Count available units by type in a force.
@@ -69,12 +197,11 @@ global void AiForceCountUnits(int force, int *countByType)
     AiUnit *aiunit;
     memset(countByType, 0, sizeof (int) * (UnitTypeMax + 1));
 
-    // FIXME: Should I use equivalent unit types?
     aiunit = AiPlayer->Force[force].Units;
     while (aiunit) {
 	if ((!aiunit->Unit->Destroyed) &&
 	    (aiunit->Unit->HP) && (aiunit->Unit->Orders[0].Action != UnitActionDie)) {
-	    type = aiunit->Unit->Type->Type;
+	    type = UnitTypeEquivs[aiunit->Unit->Type->Type];
 
 	    DebugCheck((type < 0) || (type > UnitTypeMax));
 	    countByType[type]++;
@@ -93,14 +220,16 @@ global void AiForceCountUnits(int force, int *countByType)
 global int AiForceSubstractWant(int force, int *countByType)
 {
     int missing;
+    int type;
     const AiUnitType *aitype;
 
     missing = 0;
     aitype = AiPlayer->Force[force].UnitTypes;
     while (aitype) {
-	countByType[aitype->Type->Type] -= aitype->Want;
-	if (countByType[aitype->Type->Type] < 0) {
-	    missing -= countByType[aitype->Type->Type];
+	type=UnitTypeEquivs[aitype->Type->Type];
+	countByType[type] -= aitype->Want;
+	if (countByType[type] < 0) {
+	    missing -= countByType[type];
 	}
 	aitype = aitype->Next;
     }
@@ -111,6 +240,8 @@ global int AiForceSubstractWant(int force, int *countByType)
 /**
 **	Complete dst force with units from src force.
 **
+**	FIXME : should check that unit can reach dst force's hotspot.
+**
 **	@param src the force from which units are taken
 **	@param dst the force into which units go
 */
@@ -118,7 +249,7 @@ global void AiForceTransfert(int src, int dst)
 {
     AiUnit **prev;
     AiUnit *aiunit;
-
+    int type;
     int counter[UnitTypeMax + 1];
 
     //
@@ -133,18 +264,20 @@ global void AiForceTransfert(int src, int dst)
 	// Nothing missing => abort.
 	return;
     }
+
     // Iterate the source force, moving needed units into dest...
     prev = &AiPlayer->Force[src].Units;
     while (*prev) {
 	aiunit = (*prev);
-	if (counter[aiunit->Unit->Type->Type] < 0) {
+	type = UnitTypeEquivs[aiunit->Unit->Type->Type];
+	if (counter[type] < 0) {
 	    // move in dest force...
 	    *prev = aiunit->Next;
 
 	    aiunit->Next = AiPlayer->Force[dst].Units;
 	    AiPlayer->Force[dst].Units = aiunit;
 
-	    counter[aiunit->Unit->Type->Type]++;
+	    counter[type]++;
 	} else {
 	    // Just iterate
 	    prev = &aiunit->Next;
@@ -248,6 +381,10 @@ global void AiEraseForce(int force)
 
     aiu = AiPlayer->Force[force].Units;
     while (aiu) {
+	// Decrease usage count
+	RefsDebugCheck(!aiu->Unit->Refs);
+	--aiu->Unit->Refs;
+
 	next_u = aiu->Next;
 	free(aiu);
 	aiu = next_u;
@@ -284,6 +421,7 @@ local int AiCheckBelongsToForce(int force, const UnitType * type)
 {
     int counter[UnitTypeMax + 1];
     int missing;
+    int realtype;
 
     //
     //  Count units in force.
@@ -296,10 +434,12 @@ local int AiCheckBelongsToForce(int force, const UnitType * type)
     missing = AiForceSubstractWant(force, counter);
     AiPlayer->Force[force].Completed = (missing == 0);
 
-    if (counter[type->Type] < 0) {
+    realtype = UnitTypeEquivs[type->Type];
+
+    if (counter[realtype] < 0) {
 	// Ok we will put this unit in this force !
-	// Just one missing...
-	if ((counter[type->Type] == -1) && (missing == 1)) {
+	// Just one missing ?
+	if ((counter[realtype] == -1) && (missing == 1)) {
 	    AiPlayer->Force[force].Completed = 1;
 	}
 	return 1;
@@ -381,6 +521,9 @@ global void AiForceComplete(int force)
 
 /**
 ** 	Enrole a unit in the specific force.
+**	Does not take equivalence into account
+**
+**	FIXME : currently iterate all units (slow)
 **	FIXME : should take units which are closer to the hotspot.
 **	FIXME : should ensure that units can move to the hotspot.
 **
@@ -413,8 +556,7 @@ global int AiEnroleSpecificUnitType(int force, UnitType * ut, int count)
 	aiUnit = AiPlayer->Force[src_force].Units;
 	prev = &AiPlayer->Force[src_force].Units;
 	while (aiUnit) {
-	    // FIXME : comparaison should match equivalent unit as well
-	    if (aiUnit->Unit->Type == ut) {
+	    if (aiUnit->Unit->Type->Type == ut->Type) {
 		*prev = aiUnit->Next;
 
 		// Move to dstForce 
@@ -441,15 +583,17 @@ global int AiEnroleSpecificUnitType(int force, UnitType * ut, int count)
 local void AiFinalizeForce(int force)
 {
     int i;
+    int type;
     int unitcount[UnitTypeMax + 1];
     AiUnitType *aitype;
 
     AiForceCountUnits(force, unitcount);
     aitype = AiPlayer->Force[force].UnitTypes;
     while (aitype) {
-	if (unitcount[aitype->Type->Type] > aitype->Want) {
-	    aitype->Want = unitcount[aitype->Type->Type];
-	    unitcount[aitype->Type->Type] = 0;
+	type = UnitTypeEquivs[aitype->Type->Type];
+	if (unitcount[type] > aitype->Want) {
+	    aitype->Want = unitcount[type];
+	    unitcount[type] = 0;
 	}
 	aitype = aitype->Next;
     }
@@ -480,11 +624,19 @@ global int AiCreateSpecificForce(int *power, int *unittypes, int unittypescount)
     int id, maxPower, forceUpdated;
     UnitType *ut;
     int curpower[3];
+    int maxadd;
+    int lefttoadd;
+    int unittypeforce;
+    int equivalents[UnitTypeMax + 1];
+    int equivalentscount;
+    int equivalentid;
 
     curpower[0] = power[0];
     curpower[1] = power[1];
     curpower[2] = power[2];
     AiEraseForce(AiScript->ownForce);
+
+    
 
     do {
 	forceUpdated = 0;
@@ -492,23 +644,39 @@ global int AiCreateSpecificForce(int *power, int *unittypes, int unittypescount)
 	    (curpower[0] > curpower[2] ? 0 : 2) : (curpower[1] > curpower[2] ? 1 : 2));
 
 	for (id = 0; id < unittypescount; id++) {
-	    ut = UnitTypes[unittypes[id]];
-	    if (!(ut->CanTarget & (1 << maxPower))) {
-		continue;
-	    }
-	    // Try to respond to the most important power ...
-	    if (AiEnroleSpecificUnitType(AiScript->ownForce, ut, 1) == 1) {
-		continue;
-	    }
+	    // Search in equivalents
+	    equivalentscount = AiFindAvailableUnitTypeEquiv(UnitTypes[unittypes[id]], equivalents);
+	    for (equivalentid = 0; equivalentid < equivalentscount; equivalentid++) {
+		ut = UnitTypes[equivalents[equivalentid]];
+		if (!(ut->CanTarget & (1 << maxPower))) {
+		    continue;
+		}
 
-	    curpower[maxPower] -= AiUnittypeForce(ut);
-	    forceUpdated = 1;
-	    maxPower = (curpower[0] > curpower[1] ?
-		(curpower[0] > curpower[2] ? 0 : 2) :
-		(curpower[1] > curpower[2] ? 1 : 2));
-	    if (curpower[maxPower] <= 0) {
-		AiFinalizeForce(AiScript->ownForce);
-		return 0;
+		unittypeforce = AiUnittypeForce(ut) / 8;
+		unittypeforce = (unittypeforce ? unittypeforce : 1);
+
+		// Try to respond to the most important power ...
+		maxadd = 1 + curpower[maxPower] / unittypeforce;
+
+		lefttoadd = AiEnroleSpecificUnitType(AiScript->ownForce, ut, maxadd);
+
+		// Nothing added, continue.
+		if (lefttoadd == maxadd) {
+		    continue;
+		}
+
+		// FIXME : don't always use the right unittype here...
+		curpower[maxPower] -= (maxadd - lefttoadd) * unittypeforce;
+		
+		forceUpdated = 1;
+		
+		maxPower = (curpower[0] > curpower[1] ?
+		    (curpower[0] > curpower[2] ? 0 : 2) :
+		    (curpower[1] > curpower[2] ? 1 : 2));
+		if (curpower[maxPower] <= 0) {
+		    AiFinalizeForce(AiScript->ownForce);
+		    return 0;
+		}
 	    }
 	}
     } while (forceUpdated);
@@ -950,7 +1118,7 @@ global void AiForceHelpMe(int force, const Unit * attacker, Unit * defender)
 	    return;
 
 	case AiForceHelpForce:
-	    // Send all idles units to help
+	    // Send all idles units in the attacked force for help
 	    rescue = aiForce->Units;
 	    while (rescue) {
 		// TODO : check that dead units does appear there

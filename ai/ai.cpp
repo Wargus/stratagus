@@ -57,6 +57,11 @@
 **
 **	Manage the inititialse and cleanup of the AI players.
 **
+**	::InitAiModule(void)
+**
+**		Initialise all global varaibles and structures.
+**		Called before AiInit, or before game loading.
+**
 **	::AiInit(::Player)
 **
 **		Called for each player, to setup the AI structures
@@ -176,44 +181,55 @@ global char **AiTypeWcNames;
 
 local void debugForces(void)
 {
-    const AiUnit *aiunit;
-    const AiUnitType *aiunittype;
+    const AiActionEvaluation * aiaction;
     int force, i;
-    int count[UnitTypeMax];
+    int count[UnitTypeMax+1];
+    int want[UnitTypeMax+1];
+    char * str;
 
-    DebugLevel3Fn(" ! : completed    A/D : attacking/defending\n");
+    DebugLevel2Fn(" AI MEMORY (%d)\n" _C_ AiPlayer->EvaluationCount);
+    aiaction = AiPlayer->FirstEvaluation;
+    while (aiaction) {
+	str = gh_scm2newstr(gh_car(gh_car(aiaction->aiScriptAction->Action)),NULL);
+	DebugLevel2(" %8d: (%3d,%3d) => points:%9d, needs: %9d ( %s )\n" _C_
+	    aiaction->gamecycle _C_
+	    aiaction->hotSpotX _C_
+	    aiaction->hotSpotY _C_
+	    aiaction->hotSpotValue _C_
+	    aiaction->value _C_
+	    str);
+	free(str);
+	aiaction = aiaction->Next;
+    }
+    DebugLevel2Fn(" AI FORCES      ! : completed    A/D : attacking/defending\n");
     for (force = 0; force < AI_MAX_FORCES; force++) {
-	DebugLevel3Fn("force %5d %c%c :" _C_
+	DebugLevel2("force %5d %c%c :" _C_
 	    force _C_
 	    (AiPlayer->Force[force].Role == AiForceRoleAttack ? 'A' : 'D') _C_
 	    (AiPlayer->Force[force].Completed ? '!' : ' '));
 
+	AiForceCountUnits(force, count);
+	
+	for (i = 0; i <= UnitTypeMax; i++) {
+	    want[i] = 0;
+	}
+	AiForceSubstractWant(force, want);
+	
 	for (i = 0; i < UnitTypeMax; i++) {
-	    count[i] = 0;
-	}
-
-	aiunit = AiPlayer->Force[force].Units;
-
-	while (aiunit) {
-	    count[aiunit->Unit->Type->Type]++;
-	    aiunit = aiunit->Next;
-	}
-
-	aiunittype = AiPlayer->Force[force].UnitTypes;
-	while (aiunittype) {
-	    DebugLevel3Fn(" %s(%d/%d)" _C_ aiunittype->Type->
-		Ident _C_ count[aiunittype->Type->Type] _C_ aiunittype->Want);
-	    count[aiunittype->Type->Type] = 0;
-	    aiunittype = aiunittype->Next;
-	}
-
-	for (i = 0; i < UnitTypeMax; i++) {
-	    if (count[i]) {
-		DebugLevel3Fn(" %s(%d/0)" _C_ UnitTypes[i]->Ident _C_ count[i]);
+	    if (count[i] || want[i]) {
+		DebugLevel2(" %s(%d/%d)" _C_ UnitTypes[i]->Ident _C_ count[i] _C_ want[i]);
 	    }
 	}
 
-	DebugLevel3Fn("\n");
+	if (force > AI_GENERIC_FORCES || force == 0) {
+	    if (!gh_null_p(AiPlayer->Scripts[force ? force - AI_GENERIC_FORCES : 0].Script)) {
+	    	DebugLevel2(" => ");
+		fflush(stdout);
+	    	gh_display(gh_car(AiPlayer->Scripts[force ? force - AI_GENERIC_FORCES : 0].Script));
+		CclFlushOutput();
+	    }
+	}
+	DebugLevel2("\n");
     }
 }
 
@@ -227,20 +243,22 @@ local void AiExecuteScripts(void)
     SCM value;
 
     pai = AiPlayer;
+
+    // Debugging
     debugForces();
+
     for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; i++) {
 	AiScript = pai->Scripts + i;
 	if (!gh_null_p(AiScript->Script)) {
-	    /*
-	       if( pai->ScriptDebug ) {         // display executed command
-	       DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_ pai->Player->Player _C_ i _C_ AiScript->ident _C_ AiScript->HotSpot_X _C_ AiScript->HotSpot_Y);
-	       gh_display(AiScript->Script);
-	       gh_newline();
-	       } */
+	    /*DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_ pai->Player->Player _C_ i _C_ AiScript->ident _C_ AiScript->HotSpot_X _C_ AiScript->HotSpot_Y);
+	    gh_display(AiScript->Script);
+	    gh_newline();*/
+
 	    value = gh_eval(gh_car(AiScript->Script), NIL);
 	    if (!gh_eq_p(value, SCM_BOOL_T)) {
 		AiScript->Script = gh_cdr(AiScript->Script);
 	    }
+
 	    if ((gh_null_p(AiScript->Script)) && (AiScript->ownForce)) {
 		AiEraseForce(AiScript->ownForce);
 	    }
@@ -865,6 +883,14 @@ global void AiInit(Player * player)
 }
 
 /**
+**	Initialise global structures of the AI
+*/
+global void InitAiModule(void)
+{
+    AiResetUnitTypeEquiv();
+}
+
+/**
 **	Cleanup the AI.
 */
 global void CleanAi(void)
@@ -996,6 +1022,9 @@ global void CleanAi(void)
 	free(AiTypeWcNames);
 	AiTypeWcNames = NULL;
     }
+
+    AiResetUnitTypeEquiv();
+    
     // TODO : AiScriptActions are not freed
     AiScriptActionNum = 0;
 }
@@ -1042,19 +1071,20 @@ local int AiRemoveFromBuilded2(PlayerAi * pai, const UnitType * type)
 local void AiRemoveFromBuilded(PlayerAi * pai, const UnitType * type)
 {
     int i;
+    int equivalents[UnitTypeMax+1];
+    int equivalentsCount;
 
     if (AiRemoveFromBuilded2(pai, type)) {
 	return;
     }
+
     //
     //  This could happen if an upgrade is ready, look for equivalent units.
     //
-    if (type->Type < AiHelpers.EquivCount && AiHelpers.Equiv[type->Type]) {
-	DebugLevel2Fn("Equivalence for %s\n" _C_ type->Ident);
-	for (i = 0; i < AiHelpers.Equiv[type->Type]->Count; ++i) {
-	    if (AiRemoveFromBuilded2(pai, AiHelpers.Equiv[type->Type]->Table[i])) {
-		return;
-	    }
+    equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
+    for (i = 0; i < equivalentsCount; i++) {
+	if (AiRemoveFromBuilded2(pai, UnitTypes[equivalents[i]])) {
+	    return;
 	}
     }
 
@@ -1063,6 +1093,7 @@ local void AiRemoveFromBuilded(PlayerAi * pai, const UnitType * type)
 	    ("My guess is that you built something under ai me. naughty boy!\n");
 	return;
     }
+
     DebugCheck(1);
 }
 
