@@ -218,8 +218,9 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 	// unusable unit ?
 	// if( UnitUnusable(unit) ) can't attack constructions
 	// FIXME: did SelectUnitsOnTile already filter this?
-	// Invisible and Visible not
-	if( unit->Removed || unit->Invisible || !unit->Visible
+	// Invisible and not Visible
+	if( unit->Removed || unit->Invisible
+		|| !(unit->Visible&(1<<source->Player->Player))
 		|| unit->Orders[0].Action==UnitActionDie ) {
 	    continue;
 	}
@@ -480,7 +481,8 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	//	unusable unit
 	//
 	// FIXME: did SelectUnits already filter this.
-	if( dest->Removed || dest->Invisible || !dest->Visible
+	if( dest->Removed || dest->Invisible
+		|| !(dest->Visible&(1<<player->Player))
 		|| dest->Orders[0].Action==UnitActionDie ) {
 	    continue;
 	}
