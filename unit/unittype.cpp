@@ -1054,6 +1054,8 @@ global void CleanUnitTypes(void)
     UnitType* type;
     void** ptr;
 
+    DebugLevel0Fn("FIXME: animations, icon, sounds not freed.\n");
+
     //
     //	Mapping the original unit-type numbers in puds to our internal strings
     //
@@ -1126,6 +1128,10 @@ global void CleanUnitTypes(void)
 		free(type->File[3]);
 	    }
 
+#if 0
+	    //
+	    //	FIXME: crashes if freed.
+	    //
 	    if( type->Icon.Name ) {
 		free(type->Icon.Name);
 	    }
@@ -1135,7 +1141,12 @@ global void CleanUnitTypes(void)
 	    if( type->CorpseName ) {
 		free(type->CorpseName);
 	    }
+#endif
 
+#if 0
+	    //
+	    //	FIXME: Sounds can't be freed, they still stuck in sound hash.
+	    //
 	    if( type->Sound.Selected.Name ) {
 		free(type->Sound.Selected.Name);
 	    }
@@ -1154,6 +1165,7 @@ global void CleanUnitTypes(void)
 	    if( type->Weapon.Attack.Name ) {
 		free(type->Weapon.Attack.Name);
 	    }
+#endif
 
 	    if( !type->SameSprite ) {	// our own graphics
 		VideoSaveFree(type->Sprite);
@@ -1163,9 +1175,6 @@ global void CleanUnitTypes(void)
 	UnitTypes=NULL;
 	NumUnitTypes=0;
     }
-
-    DebugLevel0Fn("FIXME: Not complete\n");
-
 
     //
     //	Clean hardcoded unit types.
