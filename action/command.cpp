@@ -668,9 +668,17 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 	return;
     }
 
-#if 0
+#ifdef NEW_ORDERS
+    unit->Data.Harvest.WoodToHarvest=CHOP_FOR_WOOD;
+#else
+    unit->WoodToHarvest=CHOP_FOR_WOOD;
+#endif
+
     command->Action=UnitActionHarvest;
     ResetPath(*command);
+
+#if 0
+    // FIXME: reimplement this version
     command->Data.Move.Goal=NoUnitP;
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
@@ -678,8 +686,7 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
 #endif
-    command->Action=UnitActionHarvest;
-    ResetPath(*command);
+
     command->Data.Move.Goal=NoUnitP;
     command->Data.Move.Range=2;
     command->Data.Move.SX=unit->X;
@@ -835,7 +842,7 @@ global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
 
     unit->Command.Data.Train.What[unit->Command.Data.Train.Count++]=what;
 
-    unit->Wait=1;			// FIXME: correct this 
+    unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
 #endif
 
@@ -856,7 +863,7 @@ global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
 	unit->Command.Data.Train.What[unit->Command.Data.Train.Count++]=what;
     }
 
-    unit->Wait=1;			// FIXME: correct this 
+    unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
 
 #endif
@@ -1128,7 +1135,7 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 #ifdef NEW_ORDERS
     Order* order;
     SpellType* spell;
-    
+
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
 	    DebugLevel0("Internal movement error\n");
@@ -1165,7 +1172,7 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 #else
     Command* command;
     const SpellType* spell;
-    
+
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
 	    DebugLevel0("Internal movement error\n");
@@ -1191,10 +1198,10 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 
     command->Action=UnitActionSpellCast;
     ResetPath(*command);
-    
+
     if (dest)
       dest->Refs++;
-    
+
     command->Data.Move.Goal=dest;
     command->Data.Move.Range=spell->Range;
     command->Data.Move.SX=unit->X;
@@ -1202,7 +1209,7 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
     command->Data.Move.SpellId = spellid;
-    
+
 #endif
     ClearSavedAction(unit);
 }

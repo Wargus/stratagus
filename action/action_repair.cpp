@@ -162,7 +162,11 @@ global int HandleActionRepair(Unit* unit)
 		//
 		//	No goal: if meeting enemy attack it.
 		//
+#ifdef NEW_ORDERS
+		goal=unit->Orders[0].Goal;
+#else
 		goal=unit->Command.Data.Move.Goal;
+#endif
 
 		//
 		//	Target is dead, choose new one.
@@ -178,12 +182,21 @@ global int HandleActionRepair(Unit* unit)
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
+#ifdef NEW_ORDERS
 			// FIXME: should I clear this here?
-			unit->Command.Data.Move.Goal=goal=NULL;
+			unit->Orders[0].X=goal->X;
+			unit->Orders[0].Y=goal->Y;
+			unit->Orders[0].Goal=goal=NULL;
+		    } else if( !goal->HP ||
+				goal->Orders[0].Action==UnitActionDie ) {
+#else
+			// FIXME: should I clear this here?
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
+			unit->Command.Data.Move.Goal=goal=NULL;
 		    } else if( !goal->HP ||
 				goal->Command.Action==UnitActionDie ) {
+#endif
 
 #ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
@@ -193,9 +206,15 @@ global int HandleActionRepair(Unit* unit)
 			DebugCheck( !goal->Refs );
 #endif
 			// FIXME: should I clear this here?
-			unit->Command.Data.Move.Goal=goal=NULL;
+#ifdef NEW_ORDERS
+			unit->Orders[0].X=goal->X;
+			unit->Orders[0].Y=goal->Y;
+			unit->Orders[0].Goal=goal=NULL;
+#else
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
+			unit->Command.Data.Move.Goal=goal=NULL;
+#endif
 		    }
 		}
 		//
@@ -206,7 +225,11 @@ global int HandleActionRepair(Unit* unit)
 		    unit->State=0;
 		    unit->SubAction=1;
 		} else if( err<0 ) {
+#ifdef NEW_ORDERS
+		    DebugCheck( unit->Orders[0].Action!=UnitActionStill );
+#else
 		    DebugCheck( unit->Command.Action!=UnitActionStill );
+#endif
 		    if( goal ) {		// release reference
 #ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
@@ -215,11 +238,19 @@ global int HandleActionRepair(Unit* unit)
 #ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
 #endif
+#ifdef NEW_ORDERS
+			unit->Orders[0].Goal=NoUnitP;
+		    }
+		    return 1;
+		}
+		unit->Orders[0].Action=UnitActionRepair;
+#else
 			unit->Command.Data.Move.Goal=NoUnitP;
 		    }
 		    return 1;
 		}
 		unit->Command.Action=UnitActionRepair;
+#endif
 	    }
 	    break;
 
@@ -229,7 +260,11 @@ global int HandleActionRepair(Unit* unit)
 	case 1:
 	    AnimateActionRepair(unit);
 	    if( unit->Reset ) {
+#ifdef NEW_ORDERS
+		goal=unit->Orders[0].Goal;
+#else
 		goal=unit->Command.Data.Move.Goal;
+#endif
 
 		//
 		//	Target is dead, choose new one.
@@ -245,16 +280,29 @@ global int HandleActionRepair(Unit* unit)
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
+#ifdef NEW_ORDERS
 			// FIXME: should I clear this here?
-			unit->Command.Data.Move.Goal=goal=NULL;
+			unit->Orders[0].X=goal->X;
+			unit->Orders[0].Y=goal->Y;
+			unit->Orders[0].Goal=goal=NULL;
+		    } else if( !goal->HP
+				|| goal->Orders[0].Action==UnitActionDie ) {
+			// FIXME: should I clear this here?
+			unit->Orders[0].X=goal->X;
+			unit->Orders[0].Y=goal->Y;
+			unit->Orders[0].Goal=goal=NULL;
+#else
+			// FIXME: should I clear this here?
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
+			unit->Command.Data.Move.Goal=goal=NULL;
 		    } else if( !goal->HP
 				|| goal->Command.Action==UnitActionDie ) {
 			// FIXME: should I clear this here?
-			unit->Command.Data.Move.Goal=goal=NULL;
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
+			unit->Command.Data.Move.Goal=goal=NULL;
+#endif
 		    }
 		}
 		if( goal ) {
@@ -273,9 +321,15 @@ global int HandleActionRepair(Unit* unit)
 #ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
 #endif
+#ifdef NEW_ORDERS
+			unit->Orders[0].Goal=NULL;
+		    }
+                    unit->Orders[0].Action=UnitActionStill;
+#else
 			unit->Command.Data.Move.Goal=NULL;
 		    }
                     unit->Command.Action=UnitActionStill;
+#endif
 		    unit->SubAction=0;
 		    unit->State=0;
                     return 1;
