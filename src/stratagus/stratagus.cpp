@@ -1088,7 +1088,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    NetPlayers = 0;
 
 	    // Start new music for menus
-	    if (PlayingMusic && strcmp(CurrentMusicFile, MenuMusic)) {
+	    if (PlayingMusic && MenuMusic != NULL &&
+		strcmp(CurrentMusicFile, MenuMusic)) {
 		StopMusic();
 	    }
 	    PlaySectionMusic(PlaySectionMainMenu);

@@ -177,9 +177,9 @@
 **		Total number of units (incl. buildings) in the Player::Units
 **		table.
 **
-**	Player::NumFoodUnits
+**	Player::Demand
 **
-**		Total number of units that need food, used to check food limit.
+**		Total unit demand, used to demand limit.
 **		A player can only build up to Player::Food units and not more
 **		than Player::FoodUnitLimit units.
 **
@@ -317,10 +317,6 @@ struct _player_ {
     int		Incomes[MaxCosts];	/// income of the resources
     int		Revenue[MaxCosts];	/// income rate of the resources
 
-//  FIXME: needed again? if not remove
-//    unsigned	UnitFlags[
-//	(UnitTypeMax+BitsOf(unsigned)-1)
-//	    /BitsOf(unsigned)];		/// flags what units are available
     // FIXME: shouldn't use the constant
     int		UnitTypesCount[UnitTypeMax];	/// total units of unit-type
 
@@ -330,11 +326,12 @@ struct _player_ {
     Unit**	Units;			/// units of this player
     int		TotalNumUnits;		/// total # units for units' list
 
-    int		NumFoodUnits;		/// # units (need food)
-    int		NumBuildings;		/// # buildings (don't need food)
+    int		NumBuildings;		/// # buildings
 
-    int		Food;			/// food available/produced
-    int		FoodUnitLimit;		/// # food units allowed
+    int		Supply;			/// supply available/produced
+    int		Demand;			/// demand of player
+    
+    int		UnitLimit;		/// # food units allowed
     int		BuildingLimit;		/// # buildings allowed
     int		TotalUnitLimit;		/// # total unit number allowed
 
@@ -488,11 +485,8 @@ extern void PlayerSetAiNum(Player* player,int ai);
     /// Set a resource of the player
 extern void PlayerSetResource(Player* player,int resource,int value);
 
-    /// Check if the unit-type didn't break any unit limits
+    /// Check if the unit-type didn't break any unit limits and supply/demand
 extern int PlayerCheckLimits(const Player* player,const UnitType* type);
-
-    /// Check if enough food is available for unit-type
-extern int PlayerCheckFood(const Player* player,const UnitType* type);
 
     /// Check if enough resources are available for costs
 extern int PlayerCheckCosts(const Player* player,const int* costs);

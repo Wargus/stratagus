@@ -223,11 +223,14 @@ local SCM CclPlayer(SCM list)
 	    player->AiEnabled = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("ai-disabled"))) {
 	    player->AiEnabled = 0;
-	} else if (gh_eq_p(value, gh_symbol2scm("food"))) {
-	    player->Food = gh_scm2int(gh_car(list));
+	} else if (gh_eq_p(value, gh_symbol2scm("supply"))) {
+	    player->Supply = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("food-unit-limit"))) {
-	    player->FoodUnitLimit = gh_scm2int(gh_car(list));
+	} else if (gh_eq_p(value, gh_symbol2scm("demand"))) {
+	    player->Demand = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("unit-limit"))) {
+	    player->UnitLimit = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("building-limit"))) {
 	    player->BuildingLimit = gh_scm2int(gh_car(list));
@@ -475,18 +478,18 @@ local int CclSetMaxSelectable(lua_State* l)
 **	@param limit	Unit limit.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSetAllPlayersFoodUnitLimit(SCM limit)
+local SCM CclSetAllPlayersUnitLimit(SCM limit)
 {
     int i;
 
     for (i = 0; i < PlayerMax; ++i) {
-	Players[i].FoodUnitLimit = gh_scm2int(limit);
+	Players[i].UnitLimit = gh_scm2int(limit);
     }
 
     return limit;
 }
 #elif defined(USE_LUA)
-local int CclSetAllPlayersFoodUnitLimit(lua_State* l)
+local int CclSetAllPlayersUnitLimit(lua_State* l)
 {
     int i;
 
@@ -495,7 +498,7 @@ local int CclSetAllPlayersFoodUnitLimit(lua_State* l)
 	lua_error(l);
     }
     for (i = 0; i < PlayerMax; ++i) {
-	Players[i].FoodUnitLimit = lua_tonumber(l, 1);
+	Players[i].UnitLimit = lua_tonumber(l, 1);
     }
 
     lua_pushnumber(l, lua_tonumber(l, 1));
@@ -966,8 +969,8 @@ global void PlayerCclRegister(void)
 
     gh_new_procedure1_0("set-max-selectable!", CclSetMaxSelectable);
 
-    gh_new_procedure1_0("set-all-players-food-unit-limit!",
-	CclSetAllPlayersFoodUnitLimit);
+    gh_new_procedure1_0("set-all-players-unit-limit!",
+	CclSetAllPlayersUnitLimit);
     gh_new_procedure1_0("set-all-players-building-limit!",
 	CclSetAllPlayersBuildingLimit);
     gh_new_procedure1_0("set-all-players-total-unit-limit!",
@@ -993,8 +996,8 @@ global void PlayerCclRegister(void)
 
     lua_register(Lua, "SetMaxSelectable", CclSetMaxSelectable);
 
-    lua_register(Lua, "SetAllPlayersFoodUnitLimit",
-	CclSetAllPlayersFoodUnitLimit);
+    lua_register(Lua, "SetAllPlayersUnitLimit",
+	CclSetAllPlayersUnitLimit);
     lua_register(Lua, "SetAllPlayersBuildingLimit",
 	CclSetAllPlayersBuildingLimit);
     lua_register(Lua, "SetAllPlayersTotalUnitLimit",

@@ -1002,7 +1002,7 @@ global void DoButtonButtonClicked(int button)
 			!EnableTrainingQueue)) {
 		NotifyPlayer(Selected[0]->Player, NotifyYellow, Selected[0]->X,
 		    Selected[0]->Y, "Unit training queue is full");
-	    } else if (PlayerCheckFood(ThisPlayer, type) &&
+	    } else if (PlayerCheckLimits(ThisPlayer, type) >= 0 &&
 		    !PlayerCheckUnitType(ThisPlayer, type)) {
 		//PlayerSubUnitType(ThisPlayer,type);
 		SendCommandTrainUnit(Selected[0], type,
