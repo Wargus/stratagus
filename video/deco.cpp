@@ -903,8 +903,9 @@ void MarkArea( int x, int y, int w, int h )
 static void DrawArea( int x, int y, int w, int h,
                       void *data, void (*drawclip)(void *data) )
 {
-  SetClipping( x, y, x+w-1, y+h-1 );
-  drawclip( data );
+//    SetClipping( 0, 0, 640, 480 );
+    SetClipping( x, y, x+w-1, y+h-1 );
+    drawclip( data );
 }
 
 /**
@@ -1458,6 +1459,11 @@ void DecorationRefreshDisplay(void)
 {
     Deco *d;
     int i;
+#ifdef DEBUG 
+    //  Count total decos.
+    int numdeco;
+    numdeco = 0;
+#endif
 
     // save clip rectangle
     PushClipping();
@@ -1466,8 +1472,12 @@ void DecorationRefreshDisplay(void)
     for (i = 0; i < LevCount; i++) {
 	for (d = dhead[i]; d; d = d->nxt) {
 	    DrawArea(d->x, d->y, d->w, d->h, d->data, d->drawclip);
+#ifdef DEBUG
+	    numdeco++;
+#endif
 	}
     }
+    DebugLevel0Fn("Drawn a total amount of %d decos in redraw\n" _C_ numdeco);
 
     Invalidate();
 

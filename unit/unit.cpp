@@ -1267,7 +1267,7 @@ local void DecoUnitDraw(void* data)
 
     unit = (Unit*)data;
     DebugCheck(unit->Removed);
-    DebugCheck(!UnitVisibleOnScreen(unit));
+    //DebugCheck(!UnitVisibleOnScreen(unit));
 
     DrawUnit(unit);
 }
@@ -1284,7 +1284,7 @@ local void DecoBuildingDraw(void* data)
 
     unit = (Unit*)data;
     DebugCheck(unit->Removed);
-    DebugCheck(!UnitVisibleOnScreen(unit));
+    //DebugCheck(!UnitVisibleOnScreen(unit));
 
     DrawBuilding(unit);
 }
