@@ -3264,15 +3264,13 @@ static void KeystrokeHelpVSAction(Menuitem* mi)
 {
 	int j;
 
-	if (mi->flags & MenuButtonClicked) {
-		j = ((mi->d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
-		if ((mi->d.vslider.cflags & MI_CFLAGS_DOWN) && j < nKeyStrokeHelps - 11) {
-			++j;
-		} else if ((mi->d.vslider.cflags & MI_CFLAGS_UP) && j > 0) {
-			--j;
-		}
-		mi->d.vslider.percent = j * 100 / (nKeyStrokeHelps - 11);
+	j = ((mi->d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
+	if ((mi->d.vslider.cflags & MI_CFLAGS_DOWN) && j < nKeyStrokeHelps - 11) {
+		++j;
+	} else if ((mi->d.vslider.cflags & MI_CFLAGS_UP) && j > 0) {
+		--j;
 	}
+	mi->d.vslider.percent = j * 100 / (nKeyStrokeHelps - 11);
 }
 
 /**
