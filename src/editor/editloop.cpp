@@ -1822,9 +1822,9 @@ local void CreateEditor(void)
 		CreatePlayer(PlayerNobody);
 		TheMap.Info->PlayerType[i] = PlayerNobody;
 	    }
-	    TheMap.Info->PlayerGold[i] = Players[i].Resources[GoldCost];
-	    TheMap.Info->PlayerWood[i] = Players[i].Resources[WoodCost];
-	    TheMap.Info->PlayerOil[i] = Players[i].Resources[OilCost];
+	    TheMap.Info->PlayerResources[i][GoldCost] = Players[i].Resources[GoldCost];
+	    TheMap.Info->PlayerResources[i][WoodCost] = Players[i].Resources[WoodCost];
+	    TheMap.Info->PlayerResources[i][OilCost] = Players[i].Resources[OilCost];
 	}
 
 	strncpy(TheMap.Description, TheMap.Info->Description, 32);

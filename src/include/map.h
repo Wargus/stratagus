@@ -10,7 +10,8 @@
 //
 /**@name map.h		-	The map headerfile. */
 //
-//	(c) Copyright 1998-2002 by Vladi Shabanski and Lutz Sammer
+//	(c) Copyright 1998-2003 by Vladi Shabanski, Lutz Sammer,
+//	                           and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -285,13 +286,11 @@ typedef struct _map_info_ {
     int		MapTerrain;		/// Map terrain
     int		MapWidth;		/// Map width
     int		MapHeight;		/// Map height
-    int		PlayerType[16];		/// Same player->Type
-    int		PlayerSide[16];		/// Same player->Side
-    int		PlayerGold[16];		/// Same player->Gold
-    int		PlayerWood[16];		/// Same player->Wood
-    int		PlayerOil[16];		/// Same player->Oil
+    int		PlayerType[PlayerMax];	/// Same player->Type
+    int		PlayerSide[PlayerMax];	/// Same player->Side
+    int		PlayerResources[PlayerMax][MaxCosts];	/// Same player->Gold
     // FIXME: Add NEW RESOURCES
-    int		PlayerAi[16];		/// Same player->Ai
+    int		PlayerAi[PlayerMax];	/// Same player->Ai
     unsigned int MapUID;		/// Unique Map ID (hash)
 } MapInfo;
 
