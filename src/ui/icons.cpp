@@ -60,7 +60,6 @@ global char** IconWcNames;
 // FIXME: Can be removed:
 global int IconWidth;			/// Icon width in panels
 global int IconHeight;			/// Icon height in panels
-global int IconsPerRow;			/// Icons per row
 
 local Icon** Icons;			/// Table of all icons.
 local int NumIcons;			/// Number of icons in Icons.
@@ -594,18 +593,6 @@ local SCM CclSetIconSize(SCM width, SCM height)
 }
 
 /**
-**	Set icons per row
-** FIXME: can be removed:
-**
-**	@param icons	Icons per row.
-*/
-local SCM CclSetIconsPerRow(SCM icons)
-{
-    IconsPerRow = gh_scm2int(icons);
-    return SCM_UNSPECIFIED;
-}
-
-/**
 **	Register CCL features for icons.
 **
 **	@todo
@@ -620,7 +607,6 @@ global void IconCclRegister(void)
 
     // FIXME: can be removed:
     gh_new_procedure2_0("set-icon-size!", CclSetIconSize);
-    gh_new_procedure1_0("set-icons-per-row!", CclSetIconsPerRow);
 }
 
 //@}
