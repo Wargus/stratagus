@@ -70,7 +70,6 @@ typedef struct _network_host_ {
 */
 typedef struct _network_state_ {
     unsigned char	State;		/// Menu: ConnectState
-    unsigned char	Ready;		/// Menu: Player is ready
     unsigned short	MsgCnt;		/// Menu: Counter for state msg of same type (detect unreachable)
     // Fill in here...
 } NetworkState;
@@ -131,6 +130,8 @@ enum _ic_message_subtype_ {
     ICMResync,				/// Ack StateInfo change
 
     ICMServerQuit,			/// Server has quit game
+    ICMGoodBye,				/// Client wants to leave game
+    ICMSeeYou,				/// Client has left game
 };
 
 /**
@@ -145,6 +146,8 @@ enum _net_client_con_state_ {
     ccs_synced,
     ccs_async,			/* server user has changed selection */
     ccs_changed,		/* client user has made menu selection */
+    ccs_detaching,		/* client user wants to detach */
+    ccs_disconnected,		/* client has detached */
     ccs_unreachable,
 };
 
@@ -184,6 +187,7 @@ extern void NetworkParseSetupEvent(const char *buf, int size); /// parse a netwo
 extern void NetworkProcessClientRequest(void); /// Menu Loop: Send out client request messages
 extern int NetworkSetupServerAddress(const char *serveraddr, char *ipbuf); /// Menu: Setup the server IP
 extern void NetworkServerResyncClients(void); /// Menu Loop: Server: Mark clients state to send stateinfo message
+extern void NetworkDetachFromServer(void); /// Menu Loop: Client: Send GoodBye to the server and detach
 
 //@}
 
