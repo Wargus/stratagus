@@ -23,9 +23,9 @@ extern void RegidSpaceInitialize (RegidSpace * , int );
 extern void RegidSpaceDestroy (RegidSpace * );
 extern void RegidBitmapInflate (RegidSpace * );
 extern void RegidBitmapShrink (RegidSpace * );
-extern int  RegidInUse (RegidSpace * , int );
-extern void RegidMarkUnused (RegidSpace * , int );
-extern void RegidMarkUsed (RegidSpace * , int );
+extern int  RegidInUse (RegidSpace * , unsigned int );
+extern void RegidMarkUnused (RegidSpace * , unsigned int );
+extern void RegidMarkUsed (RegidSpace * , unsigned int );
 extern int  RegidFind (RegidSpace * , enum regid_dir , enum regid_usage );
 
 #endif /* REGID_H */

@@ -15,7 +15,11 @@
 #include "pf_lowlevel.h"
 #include "pf_goal.h"
 
+#if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
+#endif
+
+#ifdef HIERARCHIC_PATHFINDER	// {
 
 typedef struct region_array {
 	int Ptr;
@@ -142,7 +146,7 @@ local void MarkGoalSubstitute (Unit *unit, int xmin, int xmax,
 	int x, y, found, i, widened;
 	int axmin, axmax, aymin, aymax;
 	CandidateSet BestInArea;
-	Region *area_regs[AreaGetWidth() * AreaGetHeight() / 4];
+	Region **area_regs;
 	/*
 	 * This is an estimate of the max possible number of goal candidate
 	 * regions. It based on that 1) the longest boundary being searched is
@@ -150,7 +154,10 @@ local void MarkGoalSubstitute (Unit *unit, int xmin, int xmax,
 	 * average of 1 goal candidate in each border area (just a proposition)
 	 */
 	int set_size = 2 * AreaMapWidth() + 2 * AreaMapHeight();
-	Region *regs[set_size];
+	Region **regs;
+
+	area_regs = alloca((AreaGetWidth() * AreaGetHeight() / 4) * sizeof(Region));
+	regs = alloca(set_size * sizeof(Region));
 
 //	ts0 = rdtsc ();
 
@@ -390,3 +397,5 @@ void MarkLowlevelGoal (Unit *unit, HighlevelPath *h_path)
 		RegionMarkBest (BestRegion, Goal.X, Goal.Y);
 	}
 }
+
+#endif	// } HIERARCHIC_PATHFINDER

@@ -3,11 +3,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "freecraft.h"
 #include "map.h"
 #include "hierarchical.h"
 #include "region.h"
+
+#ifdef HIERARCHIC_PATHFINDER	// {
 
 Region *AllRegions = NULL;
 
@@ -458,3 +461,5 @@ local void RegionListDeleteRegion (Region **listp, Region *reg)
 			break;
 		}
 }
+
+#endif	// } HIERARCHIC_PATHFINDER

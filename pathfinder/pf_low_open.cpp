@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include "freecraft.h"
 #include "map.h"
 #if defined(DEBUG) && defined(TIMEIT)
@@ -10,6 +12,8 @@
 #endif
 #define PRINTING
 #include "pf_low_open.h"
+
+#ifdef HIERARCHIC_PATHFINDER	// {
 
 /*
  * This implementation of Open set for the lowlevel part of the hierarchical
@@ -274,3 +278,5 @@ static void heap_print_reset (void)
 }
 
 #endif /* PRINTING */
+
+#endif	// } HIERARCHIC_PATHFINDER
