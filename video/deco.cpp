@@ -362,7 +362,7 @@
 **      DirtyScreenY	= no. 2-byte tiles vertically (screen height)
 **      DirtyScreenSize	= the total size in bytes of the array
 **/
-static unsigned char *DirtyScreen = NULL;
+static unsigned short *DirtyScreen = NULL;
 static int DirtyScreenX, DirtyScreenY, DirtyScreenSize,
                 DirtyScreenXBitmaps, DirtyScreenYBitmaps;
 
@@ -380,16 +380,16 @@ static int DirtyScreenX, DirtyScreenY, DirtyScreenSize,
 **	for any row/column inside a single 4x4 matrix.
 **/
 static unsigned xbitmaskhead[4] = {
-  0xFFFF /*1111*/, 0xEEEE /*1110*/, 0xCCCC /*1100*/, 0x8888 /*1000*/,
-         /*1111*/         /*1110*/         /*1100*/         /*1000*/
-         /*1111*/         /*1110*/         /*1100*/         /*1000*/
-         /*1111*/         /*1110*/         /*1100*/         /*1000*/
+  0xFFFF /*1111*/, 0xEEEE /*0111*/, 0xCCCC /*0011*/, 0x8888 /*0001*/,
+         /*1111*/         /*0111*/         /*0011*/         /*0001*/
+         /*1111*/         /*0111*/         /*0011*/         /*0001*/
+         /*1111*/         /*0111*/         /*0011*/         /*0001*/
 };
 static unsigned xbitmasktail[4] = {
-  0xFFFF /*1111*/, 0x1111 /*0001*/, 0x3333 /*0011*/, 0x7777 /*0111*/,
-         /*1111*/         /*0001*/         /*0011*/         /*0111*/
-         /*1111*/         /*0001*/         /*0011*/         /*0111*/
-         /*1111*/         /*0001*/         /*0011*/         /*0111*/
+  0x1111 /*1000*/, 0x3333 /*1100*/, 0x7777 /*1110*/, 0xFFFF /*1111*/,
+         /*1000*/         /*1100*/         /*1110*/         /*1111*/
+         /*1000*/         /*1100*/         /*1110*/         /*1111*/
+         /*1000*/         /*1100*/         /*1110*/         /*1111*/
 };
 static unsigned ybitmaskhead[4] = {
   0xFFFF /*1111*/, 0xFFF0 /*0000*/, 0xFF00 /*0000*/, 0xF000 /*0000*/,
@@ -398,10 +398,10 @@ static unsigned ybitmaskhead[4] = {
          /*1111*/         /*1111*/         /*1111*/         /*1111*/
 };
 static unsigned ybitmasktail[4] = {
-  0xFFFF /*1111*/, 0x000F /*1111*/, 0x00FF /*1111*/, 0x0FFF /*1111*/,
-         /*1111*/         /*0000*/         /*1111*/         /*1111*/
-         /*1111*/         /*0000*/         /*0000*/         /*1111*/
-         /*1111*/         /*0000*/         /*0000*/         /*0000*/
+  0x000F /*1111*/, 0x00FF /*1111*/, 0x0FFF /*1111*/, 0xFFFF /*1111*/,
+         /*0000*/         /*1111*/         /*1111*/         /*1111*/
+         /*0000*/         /*0000*/         /*1111*/         /*1111*/
+         /*0000*/         /*0000*/         /*0000*/         /*1111*/
 };
 
 /**
@@ -668,8 +668,7 @@ void DecorationInit(void)
 */
 local int GetDirtyBit(int x, int y)
 {
-    char *p;
-    int tile;
+    unsigned short p;
     //  Now p points to the 4*4 16bit tile with our bit.
     //    <--------x
     //    3  2  1  0 y  This is
@@ -678,10 +677,9 @@ local int GetDirtyBit(int x, int y)
     //   15 14 13 12 v  p[1]
     //
     //	tile=((p[1] << 8) | p[0]) is the tile in 16bit form
-    p = DirtyScreen + (y>>2) * DirtyScreenXBitmaps * 2 + (x>>2) * 2;
-    tile = ((p[1] << 8) | p[0]);
+    p = DirtyScreen[(y>>2) * DirtyScreenXBitmaps + (x>>2)];
             /*This is the row!*/
-    return (((tile >> (y&3) * 4) >> (x&3)) & 1);
+    return (((p >> (y&3) * 4) >> (x&3)) & 1);
 }
 
 /*
@@ -691,7 +689,7 @@ local int GetDirtyBit(int x, int y)
 */
 local void DebugDirtyScreen(void)
 {
-    char *p;
+    unsigned short *p;
     int x, y, xbit, ybit, mask;
     
 #if 1
@@ -709,9 +707,9 @@ local void DebugDirtyScreen(void)
     for ( y=0; y<DirtyScreenYBitmaps; y++ ) {
 	for ( ybit=0; ybit<4; ybit++ ) {
 	    DebugLevel0("%3d" _C_ y * 4 + ybit);
-	    p = DirtyScreen + y * DirtyScreenXBitmaps * 2;
-	    for (x=0; x<DirtyScreenXBitmaps; x++, p += 2) {
-		mask = ((p[1] << 8) | p[0]) >> (ybit*4);
+	    p = DirtyScreen + y * DirtyScreenXBitmaps;
+	    for (x=0; x<DirtyScreenXBitmaps; x++, p++) {
+		mask = (*p) >> (ybit*4);
 		DebugLevel0(" ");
 		for (xbit=0; xbit<4; xbit++) {
 		    if ( ((mask & (1<<xbit))!=0) !=
@@ -729,47 +727,6 @@ local void DebugDirtyScreen(void)
 }
 
 /**
-**	Marks given position on screen as 'dirty',  which can later be checked
-**	to determine if something is overlapping it and to denote what needs to
-**	be invalidated.
-**	@param x	= x-position in pixels on screen
-**	@param y	= y-position in pixels on screen
-**	pre : given (x,y) should be inside screen resolution as given through
-**	      DecorationInit
-**/
-/*static void MarkPos( unsigned x, unsigned y )
-{
-  char *p;
-  unsigned bits;
-
-  // Scale (x,y) down to the tile-index as it is stored in array DirtyScreen
-  x >>= DIRTYSCREEN_BITDETAIL;
-  y >>= DIRTYSCREEN_BITDETAIL;
-
-  // As the array DirtyScreen denotes each tile as an individual bit (to reduce
-  // memory), we use an easy to use 4x4 bit format that fits exactly into a
-  // 16bit element:    <--------x
-  //                   3  2  1  0 y
-  //                   7  6  5  4 |
-  //                  11 10  9  8 |
-  //                  15 14 13 12 v
-  // As the type of the DirtyScreen elements is char, we are also sure we
-  // don't waste memory as it's element size is exactly twice (16bit) the size
-  // of char (8bit), where as sizeof(unsigned) can be bigger.
-  // But to perform bit-operation on the 16bit element, we need to get the
-  // 4x4bit matrix as type unsigned at tile-index y*DirtyScreenX+x,
-  // which is translated into 16bit bitmap-index as:
-  // p = DirtyScreen + ((y/4)*DirtyScreenXBitmaps+(x/4))*2
-  p    = DirtyScreen + (((y>>2)*DirtyScreenXBitmaps+(x>>2))<<1);
-
-  // Mark the one bit refering to the tile (x,y) in least sig. 4x4 bits
-  bits = (p[1] << 8) | p[0];
-  bits |= ( 1 << ((x & 0x000F) + ((y & 0x000F)<<2)) );
-  p[0] = bits & 0x00FF;
-  p[1] = (bits >> 8);
-}*/
-
-/**
 **      Marks given area on screen as 'dirty',  which can later be checked
 **      to determine if something is overlapping it and to denote what needs to
 **      be invalidated.
@@ -782,138 +739,133 @@ local void DebugDirtyScreen(void)
 **/
 void MarkArea( int x, int y, int w, int h )
 {
-  char *tiles;
-  unsigned int xmaskhead, xmasktail, ymaskhead, ymasktail, bits;
-  int w2, nextline, bitindex;
+    DebugLevel0Fn("I bet this function is broken don't use it.\n");
+#if 0
+    char *tiles;
+    unsigned int xmaskhead, xmasktail, ymaskhead, ymasktail, bits;
+    int w2, nextline, bitindex;
 
-  DebugCheck( x <= 0 || y <= 0 || w <= 0 || h <= 0 ||
-              (x+w) >= VideoWidth || (y+h) >= VideoHeight );
+    DebugCheck( x <= 0 || y <= 0 || w <= 0 || h <= 0 ||
+	      (x+w) >= VideoWidth || (y+h) >= VideoHeight );
 
-  // First scale (x,y) down to the tile-index as it is stored in array
-  // DirtyScreen and let w,h denote the width/height in tiles iso pixels
-  x >>= DIRTYSCREEN_BITDETAIL;
-  y >>= DIRTYSCREEN_BITDETAIL;
-  w = ((w - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
-  h = ((h - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
-  DebugCheck( w > DirtyScreenX || h > DirtyScreenY );
+    // First scale (x,y) down to the tile-index as it is stored in array
+    // DirtyScreen and let w,h denote the width/height in tiles iso pixels
+    x >>= DIRTYSCREEN_BITDETAIL;
+    y >>= DIRTYSCREEN_BITDETAIL;
+    w = ((w - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
+    h = ((h - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
+    DebugCheck( w > DirtyScreenX || h > DirtyScreenY );
 
-  // Reference to top-left 4x4bit matrix containing tile (x,y) in DirtyScreen
-  tiles = DirtyScreen + (((y>>2)*DirtyScreenXBitmaps+(x>>2))<<1);
+    // Reference to top-left 4x4bit matrix containing tile (x,y) in DirtyScreen
+    tiles = DirtyScreen + (((y>>2)*DirtyScreenXBitmaps+(x>>2))<<1);
 
-  // Now scale (w,h) down to the number of 16bit elements (in a 4x4 bit matrix)
-  // to check and denote when we need to check the four sides with a bitmask
-  // or just check wether the 4x4 matrix(es) should be entirely zero.
-  bitindex = (x & 0x3);
-  xmaskhead = xbitmaskhead[ bitindex ];
-  xmasktail = xbitmasktail[ (x+w) & 0x3 ];
-  if ( w < 4 && w <= 4 - bitindex )
-  { // xmaskhead and xmasktail in same 4x4 matrix column  --> combine to one
-    if ( x >= DirtyScreenX - 4 ) // at rightmost side of screen
-    { // move one 4x4 matrix to the left to prevent acces outside 2D dimension
-      tiles  -= 4 * 2;
-      xmasktail &= xmaskhead;
-      xmaskhead = 0;
+    // Now scale (w,h) down to the number of 16bit elements (in a 4x4 bit matrix)
+    // to check and denote when we need to check the four sides with a bitmask
+    // or just check wether the 4x4 matrix(es) should be entirely zero.
+    bitindex = (x & 0x3);
+    xmaskhead = xbitmaskhead[ bitindex ];
+    xmasktail = xbitmasktail[ (x+w) & 0x3 ];
+    if ( w < 4 && w <= 4 - bitindex ) {
+	// xmaskhead and xmasktail in same 4x4 matrix column  --> combine to one
+	if ( x >= DirtyScreenX - 4 ) { // at rightmost side of screen
+	    // move one 4x4 matrix to the left to prevent acces outside 2D dimension
+	    tiles  -= 4 * 2;
+	    xmasktail &= xmaskhead;
+	    xmaskhead = 0;
+	} else {
+	  xmaskhead &= xmasktail;
+	  xmasktail = 0;
+	}
     }
-    else
-    {
-      xmaskhead &= xmasktail;
-      xmasktail = 0;
+    bitindex = (y & 0x3);
+    ymaskhead = ybitmaskhead[ bitindex ];
+    ymasktail = ybitmasktail[ (y+h) & 0x3 ];
+    if ( h < 4 && h <= 4 - bitindex ) {
+	// ymaskhead and ymasktail in same 4x4 matrix row  --> combine to one
+	if ( y >= DirtyScreenY - 4 ) {// at bottom side of screen
+	    // move one 4x4 matrix upwards to prevent acces outside 2D dimension
+	    tiles  -= 2 * DirtyScreenXBitmaps;
+	    ymasktail &= ymaskhead;
+	    ymaskhead = 0;
+	} else {
+	    ymaskhead &= ymasktail;
+	    ymasktail  = 0;
+	}
     }
-  }
-  bitindex  = (y & 0x3);
-  ymaskhead = ybitmaskhead[ bitindex ];
-  ymasktail = ybitmasktail[ (y+h) & 0x3 ];
-  if ( h < 4 && h <= 4 - bitindex )
-  { // ymaskhead and ymasktail in same 4x4 matrix row  --> combine to one
-    if ( y >= DirtyScreenY - 4 ) // at bottom side of screen
-    { // move one 4x4 matrix upwards to prevent acces outside 2D dimension
-      tiles  -= 2 * DirtyScreenXBitmaps;
-      ymasktail &= ymaskhead;
-      ymaskhead = 0;
-    }
-    else
-    {
-      ymaskhead &= ymasktail;
-      ymasktail  = 0;
-    }
-  }
 
-  //
-  // Mark the tiles with above bitmasks..
-  //
-  nextline=(DirtyScreenXBitmaps-(w>>2))*2;
-  w-=2;
-  h-=2;
+    //
+    // Mark the tiles with above bitmasks..
+    //
+    nextline=(DirtyScreenXBitmaps-(w>>2))*2;
+    w-=2;
+    h-=2;
 
-  // upper-left 4x4 matrixes
-  bits = (tiles[1] << 8) | tiles[0];
-  bits |= (ymaskhead&xmaskhead);
-  tiles[0] = bits & 0x00FF;
-  tiles[1] = bits & 0xFF00;
-
-  // upper-middle 4x4 matrixes
-  w2=2;
-  while (  tiles+=2, w2-- > 0 )
-  {
+    // upper-left 4x4 matrixes
     bits = (tiles[1] << 8) | tiles[0];
-    bits |= ymaskhead;
+    bits |= (ymaskhead&xmaskhead);
     tiles[0] = bits & 0x00FF;
     tiles[1] = bits & 0xFF00;
-  }
 
-  // upper-right 4x4 matrix
-  bits = (tiles[1] << 8) | tiles[0];
-  bits |= (ymaskhead&xmasktail);
-  tiles[0] = bits & 0x00FF;
-  tiles[1] = bits & 0xFF00;
+    // upper-middle 4x4 matrixes
+    w2=2;
+    while (tiles+=2, w2-- > 0) {
+	bits = (tiles[1] << 8) | tiles[0];
+	bits |= ymaskhead;
+	tiles[0] = bits & 0x00FF;
+	tiles[1] = bits & 0xFF00;
+    }
 
-  h--;
-
-  // middle 4x4 matrixes
-  while (  tiles+=nextline, h-- > 0 )
-  {
-    // left-middle 4x4 matrix
+    // upper-right 4x4 matrix
     bits = (tiles[1] << 8) | tiles[0];
-    bits |= xmaskhead;
+    bits |= (ymaskhead&xmasktail);
     tiles[0] = bits & 0x00FF;
     tiles[1] = bits & 0xFF00;
+
+    h--;
 
     // middle 4x4 matrixes
-    w2 = w;
-    while (  tiles+=2, w2-- > 0 )
-    {
-      tiles[0] |= 0xFF;
-      tiles[1] |= 0xFF;
+    while (  tiles+=nextline, h-- > 0 ) {
+	// left-middle 4x4 matrix
+	bits = (tiles[1] << 8) | tiles[0];
+	bits |= xmaskhead;
+	tiles[0] = bits & 0x00FF;
+	tiles[1] = bits & 0xFF00;
+
+	// middle 4x4 matrixes
+	w2 = w;
+	while (  tiles+=2, w2-- > 0 ) {
+  	    tiles[0] |= 0xFF;
+	    tiles[1] |= 0xFF;
+	}
+
+	// right-middle 4x4 matrix
+	bits = (tiles[1] << 8) | tiles[0];
+	bits |= xmasktail;
+	tiles[0] = bits & 0x00FF;
+	tiles[1] = bits & 0xFF00;
     }
 
-    // right-middle 4x4 matrix
+    // lower-left 4x4 matrix
     bits = (tiles[1] << 8) | tiles[0];
-    bits |= xmasktail;
+    bits |= (ymasktail&xmaskhead);
     tiles[0] = bits & 0x00FF;
     tiles[1] = bits & 0xFF00;
-  }
 
-  // lower-left 4x4 matrix
-  bits = (tiles[1] << 8) | tiles[0];
-  bits |= (ymasktail&xmaskhead);
-  tiles[0] = bits & 0x00FF;
-  tiles[1] = bits & 0xFF00;
+    // lower-middle 4x4 matrixes
+    w2 = w;
+    while (  tiles+=2, w2-- > 0 ) {
+        bits = (tiles[1] << 8) | tiles[0];
+        bits |= ymasktail;
+        tiles[0] = bits & 0x00FF;
+        tiles[1] = bits & 0xFF00;
+    }
 
-  // lower-middle 4x4 matrixes
-  w2 = w;
-  while (  tiles+=2, w2-- > 0 )
-  {
+    // lower-right 4x4 matrix
     bits = (tiles[1] << 8) | tiles[0];
-    bits |= ymasktail;
+    bits |= (ymasktail&xmasktail);
     tiles[0] = bits & 0x00FF;
     tiles[1] = bits & 0xFF00;
-  }
-
-  // lower-right 4x4 matrix
-  bits = (tiles[1] << 8) | tiles[0];
-  bits |= (ymasktail&xmasktail);
-  tiles[0] = bits & 0x00FF;
-  tiles[1] = bits & 0xFF00;
+#endif
 }	
 
 /**
@@ -932,18 +884,20 @@ static void DrawArea(int x, int y, int w, int h,
 {
     PushClipping();
 
-#if 0
-    VideoFill50TransRectangleClip(ColorWhite, x+1, y+1, w-2, h-2);
-    if (data==NULL) {
-	VideoFill50TransRectangleClip(ColorRed, x+1, y+1, w-2, h-2);
-    } else {
-	VideoFill50TransRectangleClip(ColorBlue, x+1, y+1, w-2, h-2);
-    }
-#endif
-
     SetClipToClip(x, y, x + w - 1, y + h - 1);
     drawclip(data);
     PopClipping();
+
+#if 0
+//    VideoFill50TransRectangleClip(ColorWhite, x+1, y+1, w-2, h-2);
+    if (data==NULL) {
+	//VideoFill50TransRectangleClip(ColorWhite, x+1, y+1, w-2, h-2);
+    } else {
+	VideoFillRectangleClip(ColorBlack, x+1, y+1, w-2, h-2);
+    }
+#endif
+
+
 }
 
 /**
@@ -955,215 +909,58 @@ static void DrawArea(int x, int y, int w, int h,
 **/
 static void CheckRedraw( Deco *d, DecorationSingle *t )
 {
-  char *top, *bottom;
-  unsigned long topbits, bottombits, leftbits, rightbits, bits;
+    unsigned short bits;
 
-  top    = t->tiles;
-  bottom = top + DirtyScreenXBitmaps * 2;
+    bits = *t->tiles;
 
-  // Get left-top and -bottom 16bit 4x4 matrixes, masked to get the 'dirty'
-  // area overlapped by this decoration in a single 32bit back to 16bit
-  topbits     = (top[1] << 8) | top[0];
-  topbits    &= t->lefttopmask;
-  bottombits  = (bottom[1] << 8) | bottom[0];
-  bottombits &= t->leftbottommask;
-  leftbits    = (bottombits << 16) | topbits;
-  leftbits  >>= t->bity4;
-  leftbits = ((leftbits & 0xF000) << 12)
-           | ((leftbits & 0x0F00) <<  8)
-           | ((leftbits & 0x00F0) <<  4)
-           |  (leftbits & 0x000F);
-
-  // Get right-top and -bottom 16bit 4x4 matrixes, masked to get the 'dirty'
-  // area overlapped by this decoration in a single 32bit back to 16bit
-  topbits     = (top[3] << 8) | top[2];
-  topbits    &= t->righttopmask;
-  bottombits  = (bottom[3] << 8) | bottom[2];
-  bottombits &= t->rightbottommask;
-  rightbits   = (bottombits << 16) | topbits;
-  rightbits >>= t->bity4;
-  rightbits = ((rightbits & 0xF000) << 16)
-            | ((rightbits & 0x0F00) << 12)
-            | ((rightbits & 0x00F0) <<  8)
-            | ((rightbits & 0x000F) <<  4);
-
-  // Now combine both left+right 16bit into one 32bit
-  bits = rightbits | leftbits;
-
-  // Check this 32bit as a 8x4 tile area
-  // FIXME: try merging neighbouring 'dirty' bits, to minimize DrawIt calls
-  if ( bits )
-  {
-    int x, y;
-    x = t->topleftx;
-    y = t->toplefty;
-    bits >>= t->bitx;
-    do
-    {
-      if ( bits & 0x1 ) // bit 0 is 'dirty'
-        DrawArea( x, y, DIRTYSCREEN_DETAILSIZE, DIRTYSCREEN_DETAILSIZE,
-                  d->data, d->drawclip );
-
-      if ( bits & 0x2 ) // bit 1 is 'dirty'
-        DrawArea( x+DIRTYSCREEN_DETAILSIZE, y,
-                  DIRTYSCREEN_DETAILSIZE, DIRTYSCREEN_DETAILSIZE,
-                  d->data, d->drawclip );
-
-      if ( bits & 0x4 ) // bit 2 is 'dirty'
-        DrawArea( x+2*DIRTYSCREEN_DETAILSIZE, y,
-                  DIRTYSCREEN_DETAILSIZE, DIRTYSCREEN_DETAILSIZE,
-                  d->data, d->drawclip );
-
-      if ( bits & 0x8 ) // bit 3 is 'dirty'
-        DrawArea( x+3*DIRTYSCREEN_DETAILSIZE, y,
-                  DIRTYSCREEN_DETAILSIZE, DIRTYSCREEN_DETAILSIZE,
-                  d->data, d->drawclip );
-
-      y += DIRTYSCREEN_DETAILSIZE;
-      bits >>= 8; // next line of 8 bits
-    } while ( bits );
-  }
+    // Check this 32bit as a 8x4 tile area
+    // FIXME: try merging neighbouring 'dirty' bits, to minimize DrawIt calls
+    if ( bits ) {
+	int x, y;
+	x = t->cornerx;
+	y = t->cornery;
+	for (; bits; bits >>= 4) {
+	    // bit 0 is 'dirty'
+	    if ( bits & 0x1 ) {
+	        DrawArea( x, y, DIRTYSCREEN_DETAILSIZE, DIRTYSCREEN_DETAILSIZE,
+			d->data, d->drawclip );
+	    }
+	    // bit 1 is 'dirty'
+	    if ( bits & 0x2 ) {
+	        DrawArea( x+DIRTYSCREEN_DETAILSIZE, y,
+			DIRTYSCREEN_DETAILSIZE, DIRTYSCREEN_DETAILSIZE,
+			d->data, d->drawclip );
+	    }
+	    // bit 2 is 'dirty'
+	    if ( bits & 0x4 ) {
+	        DrawArea( x+2*DIRTYSCREEN_DETAILSIZE, y,
+		        DIRTYSCREEN_DETAILSIZE, DIRTYSCREEN_DETAILSIZE,
+		        d->data, d->drawclip );
+	    }
+	    // bit 3 is 'dirty'
+	    if ( bits & 0x8 ) {
+	        DrawArea( x+3*DIRTYSCREEN_DETAILSIZE, y,
+		        DIRTYSCREEN_DETAILSIZE, DIRTYSCREEN_DETAILSIZE,
+		        d->data, d->drawclip );
+	    }
+	    y += DIRTYSCREEN_DETAILSIZE;
+	}
+    }
 }
 
 /*
 **	FOR DEBUG PURPOSE ONLY
 **	Will print the given 16bit as 4x4 tiles.
 */
-global void debugdecobits( unsigned int bits )
+global void DebugPrint16Bit(unsigned int bits)
 {
-  int y;
-  printf( "16bits as 4x4: 3210\n" );
-  for ( y=0; y<=3; y++ )
-  {
-    printf( "             %d %c%c%c%c\n", y,
-            bits&8?'1':'0', bits&4?'1':'0',
-            bits&2?'1':'0', bits&1?'1':'0' );
-    bits >>= 4;
-  }
-}
-
-/*
-**	Convert 8x8 tiles from 4 16bit masks into 8x4 tiles in one 32bit,
-**	moving the set bits up with given bitshift in y-direction.
-**	For this to work only a 4x4 area within above 8x8 tiles might be set.
-**
-**	@param ybitshift       = a (full) bitshift to move bits to upper tile
-**	@param topleftmask     = 16bit bitmask for top-left     4x4 tiles
-**	@param toprightmask    = 16bit bitmask for top-right    4x4 tiles
-**	@param bottomleftmas k = 16bit bitmask for bottom-left  4x4 tiles
-**	@param bottomrightmask = 16bit bitmask for bottom-right 4x4 tiles
-*/
-local unsigned long convert8x8to8x4(
-  int ybitshift,
-  unsigned int topleftmask,    unsigned int toprightmask,
-  unsigned int bottomleftmask, unsigned int bottomrightmask )
-{
-  unsigned long leftmask, rightmask;
-
-  leftmask   = (unsigned long)bottomleftmask << 16;
-  leftmask  |= topleftmask;
-  leftmask >>= ybitshift;
-
-  leftmask = ((leftmask & 0xF000) << 12)
-           | ((leftmask & 0x0F00) <<  8)
-           | ((leftmask & 0x00F0) <<  4)
-           |  (leftmask & 0x000F);
-
-  rightmask   = (unsigned long)bottomrightmask << 16;
-  rightmask  |= toprightmask;
-  rightmask >>= ybitshift;
-
-  rightmask = ((rightmask & 0xF000) << 16)
-            | ((rightmask & 0x0F00) << 12)
-            | ((rightmask & 0x00F0) <<  8)
-            | ((rightmask & 0x000F) <<  4);
-
-  return leftmask | rightmask;
-}
-
-/*
-**	FOR DEBUG PURPOSE ONLY
-**	Will print the given t as separate bitvalues.
-*/
-global void debugsinglebits( DecorationSingle *t )
-{
-  char *p;
-  unsigned long topleftscreen, toprightscreen, bottomleftscreen, 
-                bottomrightscreen, leftbits, rightbits, bits32, mark32;
-  int y, x;
-
-// 2x2 16bit matrixes for 8x8 tiles translated to 8x4 tiles in one 32bit
-  bits32 = convert8x8to8x4( t->bity4, t->lefttopmask,    t->righttopmask,
-                                      t->leftbottommask, t->rightbottommask );
-
-// now the same for marked bits
-  p = t->tiles;
-  topleftscreen  = (p[1] << 8) | p[0];
-  toprightscreen = (p[3] << 8) | p[2];
-  p = t->tiles + DirtyScreenXBitmaps * 2;
-  bottomleftscreen  = (p[1] << 8) | p[0];
-  bottomrightscreen = (p[3] << 8) | p[2];
-  mark32 = convert8x8to8x4( t->bity4, topleftscreen     & t->lefttopmask,
-                                      toprightscreen    & t->righttopmask,
-                                      bottomleftscreen  & t->leftbottommask,
-                                      bottomrightscreen & t->rightbottommask );
-
-// print 8x8 and 9x4 tiles representations
-  printf( "DecorationSingle as 8x8 tiles\n" );
-  printf( "     76543210 76543210 76543210  76543210\n     ");
-  for ( x=7; t->bitx<x; x-- )
-    printf( " " );
-  printf( "^\n" );
-  leftbits  = t->lefttopmask;
-  rightbits = t->righttopmask;
-  for ( y=0; y<=7; y++ )
-  {
-    printf( "%s%d ", (y * 4 == t->bity4) ? "-->" : "   ", y );
-
-    for ( x=8; x; x>>=1 )
-      printf( "%c", toprightscreen & x ? '1' : '0' );
-    for ( x=8; x; x>>=1 )
-      printf( "%c", topleftscreen & x ? '1' : '0' );
-
-    printf( " " );
-    for ( x=8; x; x>>=1 )
-      printf( "%c", rightbits & x ? '1' : '0' );
-    for ( x=8; x; x>>=1 )
-      printf( "%c", leftbits & x ? '1' : '0' );
-
-    printf( " " );
-    for ( x=8; x; x>>=1 )
-      printf( "%c", rightbits & toprightscreen & x ? '1' : '0' );
-    for ( x=8; x; x>>=1 )
-      printf( "%c", leftbits & topleftscreen & x ? '1' : '0' );
-
-    topleftscreen  >>= 4;
-    toprightscreen >>= 4;
-    leftbits       >>= 4;
-    rightbits      >>= 4;
-
-    if ( y < 4 )
-    {
-      printf( "  " );
-      for ( x=128; x; x>>=1 )
-        printf( "%c", bits32 & x ? '1' : '0' );
-      bits32  >>= 8;
-      printf( "  " );
-      for ( x=128; x; x>>=1 )
-        printf( "%c", mark32 & x ? '1' : '0' );
-      mark32  >>= 8;
+    int y;
+    for ( y=0; y<=3; y++ ) {
+        printf("%c%c%c%c\n",
+        	bits&8?'1':'0', bits&4?'1':'0',
+		bits&2?'1':'0', bits&1?'1':'0');
+	bits >>= 4;
     }
-
-    printf( "\n" );
-    if ( y == 3 )
-    {
-      leftbits  = t->leftbottommask;
-      rightbits = t->rightbottommask;
-      topleftscreen  = bottomleftscreen;
-      toprightscreen = bottomrightscreen;
-    }
-  }
-  printf( "     (screen)&( deco )=(redraw)  ( deco )  (redraw)\n");
 }
 
 /**
@@ -1173,34 +970,7 @@ global void debugsinglebits( DecorationSingle *t )
 **/
 static void DecorationSingleMark( DecorationSingle *t )
 {
-    char *p;
-    unsigned long bits;
-    
-    // Mark left-top 16bit 4x4 matrix with area overlapped by this decoration
-    p = t->tiles;
-    bits  = (p[1] << 8) | p[0];
-    bits |= t->lefttopmask;
-    p[0] = bits & 0x00FF;
-    p[1] = (bits >> 8);
-    
-    // Mark right-top 16bit 4x4 matrix with area overlapped by this decoration
-    bits  = (p[3] << 8) | p[2];
-    bits |= t->righttopmask;
-    p[2] = bits & 0x00FF;
-    p[3] = (bits >> 8);
-    
-    // Mark left-bottom 16bit 4x4 matrix with area overlapped by this decoration
-    p += DirtyScreenXBitmaps * 2;
-    bits  = (p[1] << 8) | p[0];
-    bits |= t->leftbottommask;
-    p[0] = bits & 0x00FF;
-    p[1] = (bits >> 8);
-    
-    // Mark right-bottom 16bit 4x4 matrix with area overlapped by this decoration
-    bits  = (p[3] << 8) | p[2];
-    bits |= t->rightbottommask;
-    p[2] = bits & 0x00FF;
-    p[3] = (bits >> 8);
+    *t->tiles = (*t->tiles | t->bitmask);
 }
 
 /**
@@ -1227,7 +997,7 @@ void DecorationMark( Deco *d )
 static DecorationSingle *DecorationSingleNew( int x, int y, int w, int h )
 {
     DecorationSingle *t;
-    int bitindex, xmaskhead, xmasktail, ymaskhead, ymasktail;
+//    int bitindex, xmaskhead, xmasktail, ymaskhead, ymasktail;
 
     DebugLevel3Fn("%d %d %d %d\n" _C_ x _C_ y _C_ w _C_ h);
 
@@ -1236,68 +1006,34 @@ static DecorationSingle *DecorationSingleNew( int x, int y, int w, int h )
     
     // Fill in this new Decoration so it can be used
     t = DecorationSingleAllocate();
-    t->topleftx = x;
-    t->toplefty = y;
+#ifdef DEBUG
+    t->x = x;
+    t->y = y;
+    t->h = h;
+    t->w = w;
+#endif
 
     // Instead of storing given (x,y,w,h), we use prepared pointer and bitmasks
     // to the DirtyScreen array, as these are fast and can be used again..
     //
     // First scale (x,y) down to the tile-index as it is stored in array
     // DirtyScreen and let w,h denote the width/height in tiles iso pixels
-    x >>= DIRTYSCREEN_BITDETAIL;
-    y >>= DIRTYSCREEN_BITDETAIL;
-    w = ((w - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
-    h = ((h - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
-    DebugCheck( w > DECOSINGLE_TILES || h > DECOSINGLE_TILES );
+    t->cornerx = (x >> (DIRTYSCREEN_BITDETAIL + 2)) << (DIRTYSCREEN_BITDETAIL + 2);
+    t->cornery = (y >> (DIRTYSCREEN_BITDETAIL + 2)) << (DIRTYSCREEN_BITDETAIL + 2);
+    w = ((x + w - 1) >> DIRTYSCREEN_BITDETAIL);
+    h = ((y + h - 1) >> DIRTYSCREEN_BITDETAIL);
+    x = x >> DIRTYSCREEN_BITDETAIL;
+    y = y >> DIRTYSCREEN_BITDETAIL;
 
     // Reference to top-left 4x4bit matrix containing tile (x,y) in DirtyScreen
-    t->tiles = DirtyScreen + (((y>>2)*DirtyScreenXBitmaps+(x>>2))<<1);
+    t->tiles = DirtyScreen + (y >> 2) * DirtyScreenXBitmaps +(x >> 2);
 
-    // Now scale (w,h) down to the number of 16bit elements (in a 4x4 bit matrix)
-    // to check and denote when we need to check the four sides with a bitmask
-    // or just check wether the 4x4 matrix(es) should be entirely zero.
-    t->bitx  = bitindex = (x & 0x3);
-    xmaskhead = xbitmaskhead[ bitindex ];
-    xmasktail = xbitmasktail[ (x+w) & 0x3 ];
-    if ( w < 4 && w <= 4 - bitindex ) {
-	// xmaskhead and xmasktail in same 4x4 matrix column  --> combine to one
-	// at rightmost side of screen
-	if ( x >= DirtyScreenX - 4 ) {
-	    // move one 4x4 matrix to the left to prevent acces outside 2D dimension
-            t->tiles  -= 4 * 2;
-	    xmasktail &= xmaskhead;
-	    xmaskhead = 0;
-	} else {
-	    xmaskhead &= xmasktail;
-	    xmasktail = 0;
-	}
-    }
-    bitindex  = (y & 0x3);
-    t->bity4  = (bitindex * 4);
-    ymaskhead = ybitmaskhead[ bitindex ];
-    ymasktail = ybitmasktail[ (y+h) & 0x3 ];
-    if ( h < 4 && h <= 4 - bitindex ) {
-	// ymaskhead and ymasktail in same 4x4 matrix row  --> combine to one
-	// at bottom side of screen
-	if ( y >= DirtyScreenY - 4 ) {
-	    // move one 4x4 matrix upwards to prevent acces outside 2D dimension
-  	    t->tiles  -= 2 * DirtyScreenXBitmaps;
-	    ymasktail &= ymaskhead;
-	    ymaskhead = 0;
-	} else {
-	    ymaskhead &= ymasktail;
-	    ymasktail  = 0;
-	}
-    }
-
-    // Check is this 'single' really is restricted to a 2x2 16bit area
-    DebugCheck( (((w-1)>>2) + 1) > 2 || (((h-1)>>2) + 1) > 2 );
-
-    // now using above head+tail masks, combine them to get 2x2 16bit masks
-    t->lefttopmask     = xmaskhead & ymaskhead;
-    t->righttopmask    = xmasktail & ymaskhead;
-    t->leftbottommask  = xmaskhead & ymasktail;
-    t->rightbottommask = xmasktail & ymasktail;
+    //
+    //	We assume that x and x+w fall in the same 64*64 square, and thus in the
+    //	same 4x4 screen tile region. Marking is trivial, just a bitwise and.
+    //
+    t->bitmask = xbitmaskhead[x & 0x3] & xbitmasktail[w & 0x3] & 
+	    ybitmaskhead[y & 0x3] & ybitmasktail[h & 0x3];
 
     return t;
 }
@@ -1324,8 +1060,15 @@ static DecorationSingle *DecorationSingleNew( int x, int y, int w, int h )
 Deco *DecorationAdd(void *data, void (*drawclip)(void *data),
 	 int level, int x, int y, int w, int h)
 {
-    DecorationSingle **prevt;
-    Deco *list, *d, *prv, **pprv;
+    DecorationSingle *prevt;
+    Deco *list;
+    Deco *d;
+    Deco *prv;
+    Deco **pprv;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
 
     DebugLevel3Fn("%d %d %d %d\n" _C_ x _C_ y _C_ w _C_ h);
     // Allocate and fill in this new DecorationType so it can be used
@@ -1333,10 +1076,6 @@ Deco *DecorationAdd(void *data, void (*drawclip)(void *data),
     d->drawclip  = drawclip;
     d->data      = data;
     d->level     = level;
-    d->x         = x;
-    d->y         = y;
-    d->w         = w;
-    d->h         = h;
 
     // Restrict to screen (keeping original total location in d for check later)
     if( x<0 ) {
@@ -1349,11 +1088,11 @@ Deco *DecorationAdd(void *data, void (*drawclip)(void *data),
         w-=ofs;
     }
     if( (x+w)>VideoWidth ) {
-        if( x>=VideoWidth ) {
+	if( x>=VideoWidth ) {
             DecorationDelete( d );
             return NULL;
-         }
-         w=VideoWidth-x;
+	}
+	w=VideoWidth-x;
     }
     if( y<0 ) {
         int ofs=-y;
@@ -1373,7 +1112,11 @@ Deco *DecorationAdd(void *data, void (*drawclip)(void *data),
     }
     DebugCheck(x < 0 || y < 0 || w <= 0 || h <= 0 ||
               (x+w) > VideoWidth || (y+h) > VideoHeight);
-  
+
+    d->x = x;
+    d->y = y;
+    d->w = w;
+    d->h = h;
 
     // Find entry for this decoration ordered on z(l):y:x and add it
     // @note we only need z-level really, but also do y:x to be able to draw
@@ -1392,39 +1135,23 @@ Deco *DecorationAdd(void *data, void (*drawclip)(void *data),
         list->prv = d;
     }
 
-    // Split given area up into multiple Decorations of DIRTYSCREEN_DETAILSIZE
-    // FIXME: can be done faster, or maybe we should do without?
-    prevt = &d->singles;
-    while ( h > DECOSINGLE_PIXELS ) {
-        int x2 = x;
-        int w2 = w;
-        while ( w2 > DECOSINGLE_PIXELS ) {
-            *prevt = DecorationSingleNew(x2, y, DECOSINGLE_PIXELS, DECOSINGLE_PIXELS);
-            prevt = &(*prevt)->nxt;
-	    DebugLevel3Fn("small deco is %d %d %d %d\n"
-		    _C_ x2 _C_ y _C_ DECOSINGLE_PIXELS _C_ DECOSINGLE_PIXELS);
-            x2 += DECOSINGLE_PIXELS;
-            w2 -= DECOSINGLE_PIXELS;
-        }
-        *prevt = DecorationSingleNew( x2, y, w2, DECOSINGLE_PIXELS );
-        prevt = &(*prevt)->nxt;
-	DebugLevel3Fn("small deco is %d %d %d %d\n"
-		_C_ x2 _C_ y _C_ w2 _C_ DECOSINGLE_PIXELS);
-        y += DECOSINGLE_PIXELS;
-        h -= DECOSINGLE_PIXELS;
+    //  Split the deco into small tiny max 64*64 sized pieces, bit aligned!
+    d->singles = NULL;
+    for (x1 = (x / DECOSINGLE_PIXELS) * DECOSINGLE_PIXELS;
+	    x1 < x + w;
+	    x1 += DECOSINGLE_PIXELS) {
+    	for (y1 = (y / DECOSINGLE_PIXELS) * DECOSINGLE_PIXELS;
+	    y1 < y + h;
+	    y1 += DECOSINGLE_PIXELS) {
+	    x2 = max(x1, x);
+	    y2 = max(y1, y);
+	    prevt = DecorationSingleNew(x2, y2,
+		    min(x + w - x2, x1 + DECOSINGLE_PIXELS - x2),
+		    min(y + h - y2, y1 + DECOSINGLE_PIXELS - y2));
+	    prevt->nxt = d->singles;
+	    d->singles = prevt;
+	}
     }
-    while (w > DECOSINGLE_PIXELS) {
-	*prevt = DecorationSingleNew( x, y, DECOSINGLE_PIXELS, h );
-	prevt = &(*prevt)->nxt;
-	DebugLevel3Fn("small deco is %d %d %d %d\n"
-		_C_ x _C_ y _C_ DECOSINGLE_PIXELS _C_ h);
-	x += DECOSINGLE_PIXELS;
-	w -= DECOSINGLE_PIXELS;
-    }
-    *prevt = DecorationSingleNew( x, y, w, h );
-    (*prevt)->nxt = NULL;
-    DebugLevel3Fn("small deco is %d %d %d %d\n"
-	    _C_ x _C_ y _C_ w _C_ h);
 #if 0
     x = 0;
     prevt = &d->singles;
@@ -1552,10 +1279,11 @@ void DecorationUpdateDisplay(void)
 
     // save clip rectangle
     PushClipping();
-
+#if 0
     VideoFillTransRectangleClip(ColorGreen, TheUI.SelectedViewport->X, TheUI.SelectedViewport->Y,
 	    (TheUI.SelectedViewport->EndX - TheUI.SelectedViewport->X - 1),
-	    (TheUI.SelectedViewport->EndY - TheUI.SelectedViewport->Y - 1), 254);
+	    (TheUI.SelectedViewport->EndY - TheUI.SelectedViewport->Y - 1), 214);
+#endif
     SetClipping(TheUI.SelectedViewport->X, TheUI.SelectedViewport->Y,
 	    (TheUI.SelectedViewport->EndX - 1),
 	    (TheUI.SelectedViewport->EndY - 1));
@@ -1567,15 +1295,27 @@ void DecorationUpdateDisplay(void)
 	    }
 	}
     }
-
+#if 0
     {
 	int x,y;
 	for (x = 0;x < DirtyScreenX; x++) {
 	    for (y = 0;y < DirtyScreenX; y++) {
-		
+		if (GetDirtyBit(x, y)) {
+		    VideoDrawRectangleClip(ColorRed, (x<<4) + 1, (y<<4) + 1, 15, 15);
+		} else {
+		    VideoDrawRectangleClip(ColorGreen, (x<<4) + 1, (y<<4) + 1, 15, 15);
+		}
 	    }		
 	}
     }
+#endif
+#if 0
+    if (Selected[0] && NumSelected && Selected[0]->Decoration) {
+	for (t = Selected[0]->Decoration->singles; t; t = t->nxt) {
+	    VideoFill25TransRectangleClip(ColorBlue, t->x + 1, t->y + 1, t->w - 1, t->h - 1);
+	}
+    }
+#endif
 // FIXME: use followin function instead for speed.. never tried out though
 //  InvalidateDirtyscreen();
     Invalidate();
