@@ -178,7 +178,7 @@ extern void ObjectivesCclRegister(void);
 	/// Save the objectives
 extern void SaveObjectives(struct _CL_File_* file);
 	/// Create a game
-extern void CreateGame(char* filename, struct _world_map_* map);
+extern void CreateGame(const char* filename, struct _world_map_* map);
 	/// Init Setting to default values
 extern void InitSettings(void);
 
