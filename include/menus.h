@@ -297,6 +297,8 @@ extern void NetClientCheckLocalState(void);
 extern void SoundOptions(void);
     /// Speed options menu
 extern void SpeedSettings(void);
+    /// Preferences menu
+extern void Preferences(void);
 
 //@}
 
