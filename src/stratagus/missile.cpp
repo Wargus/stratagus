@@ -1617,6 +1617,7 @@ global void SaveMissileTypes(FILE* file)
 	if( mtype->Sprite ) {
 	    fprintf(file," 'frames %d",mtype->SpriteFrames);
 	}
+	fprintf(file,"\n  'num-directions %d",mtype->NumDirections);
 	fprintf(file,"\n ");
 	if( mtype->FiredSound.Name ) {
 	    fprintf(file," 'fired-sound \"%s\"",mtype->FiredSound.Name);
@@ -1637,6 +1638,9 @@ global void SaveMissileTypes(FILE* file)
 	if( mtype->ImpactMissile ) {
 	    fprintf(file,"\n  'impact-missile '%s",mtype->ImpactMissile->Ident);
 	}
+	fprintf(file,"\n ");
+	fprintf(file," 'can-hit-owner #%c",mtype->CanHitOwner ? 't' : 'f');
+	fprintf(file," 'friendly-fire #%c",mtype->FriendlyFire ? 't' : 'f');
 	fprintf(file,")\n");
     }
 }
