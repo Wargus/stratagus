@@ -10,7 +10,7 @@
 //
 /**@name ccl_ui.c	-	The ui ccl functions. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer
+//	(c) Copyright 1999-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -3160,6 +3160,8 @@ local SCM CclDefineButton(SCM list)
 		ba.Allowed=ButtonCheckUnitsAnd;
 	    } else if( gh_eq_p(value,gh_symbol2scm("check-network")) ) {
 		ba.Allowed=ButtonCheckNetwork;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-no-network")) ) {
+		ba.Allowed=ButtonCheckNoNetwork;
 	    } else if( gh_eq_p(value,gh_symbol2scm("check-no-work")) ) {
 		ba.Allowed=ButtonCheckNoWork;
 	    } else if( gh_eq_p(value,gh_symbol2scm("check-no-research")) ) {
