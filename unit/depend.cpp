@@ -10,7 +10,7 @@
 //
 /**@name depend.c	-	The units/upgrade dependencies */
 //
-//	(c) Copyright 2000-2002 by Vladi Belperchinov-Shabanski and Lutz Sammer
+//	(c) Copyright 2000-2003 by Vladi Belperchinov-Shabanski and Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@
 #include "upgrade.h"
 #include "depend.h"
 #include "player.h"
+#include "ccl.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -105,7 +106,7 @@ global void AddDependency(const char* target, const char* required, int count,
 		node = temp;
 		break;
 	    }
-	    node=node->Next;
+	    node = node->Next;
 	}
     } else {				// create new slow
 	node = malloc(sizeof(DependRule));
@@ -206,7 +207,7 @@ global int CheckDependByIdent(const Player* player, const char* target)
     } else if (!strncmp(target, "upgrade-", 8)) {
 	// target string refers to upgrade-XXX
 	rule.Kind.Upgrade = UpgradeByIdent(target);
-	if (UpgradeIdAllowed(player, rule.Kind.Upgrade-Upgrades) != 'A') {
+	if (UpgradeIdAllowed(player, rule.Kind.Upgrade - Upgrades) != 'A') {
 	    return 0;
 	}
 	rule.Type = DependRuleUpgrade;
@@ -248,7 +249,7 @@ global int CheckDependByIdent(const Player* player, const char* target)
 		    }
 		    break;
 		case DependRuleUpgrade:
-		    i = UpgradeIdAllowed(player, temp->Kind.Upgrade-Upgrades) != 'R';
+		    i = UpgradeIdAllowed(player, temp->Kind.Upgrade - Upgrades) != 'R';
 		    if (temp->Count ? i : !i) {
 			goto try_or;
 		    }
@@ -379,8 +380,6 @@ global void CleanDependencies(void)
 --	Ccl part of dependencies
 ----------------------------------------------------------------------------*/
 
-#include "ccl.h"
-
 /**
 **	Define a new dependency.
 **
@@ -397,7 +396,7 @@ local SCM CclDefineDependency(SCM list)
 
     value = gh_car(list);
     list = gh_cdr(list);
-    target = gh_scm2newstr(value,NULL);
+    target = gh_scm2newstr(value, NULL);
 
     //
     //	All or rules.
