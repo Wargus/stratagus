@@ -113,6 +113,9 @@ extern void LoadCursors(unsigned int race);
     */
 extern void DrawCursor(CursorType* type,int x,int y,int frame);
 
+    /// destroy the cursor background (for menu use!)
+extern void DestroyCursorBackground(void);
+
     /// hide the cursor
 extern void HideCursor(void);
 
