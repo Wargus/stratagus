@@ -10,7 +10,7 @@
 //
 /**@name ai.c - The computer player AI main file. */
 //
-//      (c) Copyright 2000-2004 by Lutz Sammer and Ludovic Pollet
+//      (c) Copyright 2000-2005 by Lutz Sammer and Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -158,8 +158,6 @@
 ----------------------------------------------------------------------------*/
 
 int AiSleepCycles; /// Ai sleeps # cycles
-int AiTimeFactor = 100; /// Adjust the AI build times
-int AiCostFactor = 100; /// Adjust the AI costs
 
 AiType* AiTypes; /// List of all AI types.
 AiHelper AiHelpers; /// AI helper variables
