@@ -48,103 +48,51 @@
 #include "ccl.h"
 
 /**
-	Syntax : 
-;;		// Warning, Some names and specifications should be changed
-;;		// Todo parameter coherency ? negative for dealing damage, positive for healing ?
-;;
-;;		... 		: for list.
-;;		{a, b, c}	: choice between a, b, or c.
-;;		name#n		: name is of type number.
-;;		#n			: Number.
-;;		#t			: {true, false}
-;;		#target		: {'self, 'Unit, 'position}
-;;		#f_inv		: {unholyarmor, invisibility}
-;;		#f_haste	: {bloodlust, slow, haste, HP, mana, HP_percent, mana_percent}
-;;		#f_flag		: {invisibility, bloodlust, unholyarmor, slow, haste, flameshield,
-;;				  HP, mana, HP_percent, mana_percent
-;;		#flagtype	: {coward, organic, undead, canattack, building}
-;;		<condition>	: Same syntax as 'condition
-;;
-;;	(define-spell	"IdentName"	// Ident name for call in unit
-;;		'Showname "ShowName"	// Name show in the engine
-;;		'ManaCost #n		// Mana to cast the spell
-;;		'range #n		// Range of the spell (0)
-;;		'Target #target		// Which target is allowed (None by default)
-;;		'Action '({
-;;			Blizzard ('fields #n 'shards #n 'damage #n),
-;;			CircleOfPower "unit-goal",
-;;			DeathAndDecay(fields #n shards #n damage #n),
-;;			DeathCoil,
-;;			FireBall (ttl #n damage #n),
-;;			FlameShield (ttl #n),
-;;			Haste (#f_haste #n ...),
-;;			Healing (HP#n), // Healing (HP >0) or exorcism (HP < 0)
-;;			HolyVision "unit-revealer",
-;;			Invisibility (flag #f_inv value #n missile "MissileType")
-;;			Polymorph "unittype",
-;;			RaiseDead "skeleton",
-;;			Runes (ttl #n damage #n),
-;;			Summon "UnitType",
-;;			Whirlwind (ttl #n)
-;;				} )
-;;		'sound-when-cast "SoundConfig"
-;;		'missile-when-cast "MissileType"
-;;		'condition '( {
-;;			Enemypresence	(#t range #n),			// enemy in range
-;;			DurationEffect	(#t flag #f_flag value #n),	// "f_flag" < #n
-;;			Alliance 	#t,				// check the target is allied.
-;;			UnitTypeflag	(#t #flagtype),			// Unit is a "type"
-;;			...}
-;;			)
-;;		'autocast '(
-;;				range #n
-;;				condition (<condition>)// Additional condition
-;;				+++order () // which target choose.
-;;		)
-*/
-
-/*
-**	Todo:
-**		Some warnings are displayed only to developers (debugging),
-**	but should be useful for users who modofify or create ccl.
-**	Replace DebugLevel0Fn by appropriated functions.
-*/
-
-/**
 **	pointer on function.
 **	@param	id		: last keyword recognized.
 **	@param	list	: list to be parsed. (just the args).
 **	@param	spell	: spelltype to modify.
+**	FIXME: remove all this cruft
 */
-typedef void	f_ccl_spell(const char *id, SCM list, SpellType	*spell);
+typedef void f_ccl_spell(const char *id, SCM list, SpellType	*spell);
 
 // **************************************************************************
 //		Direct affectation for spell
 // **************************************************************************
 
-/*
-**	Parse the missile for spell.
-**	list = "MissileType"
+/**
+**      Parse the dependency of spell.
+**      list = (upgrade "upgradename")
 */
-local void ccl_spell_missilewhencast(const char *id, SCM list, SpellType *spell)
+local void ccl_spell_dependency(const char *id, SCM list, SpellType *spell)
 {
-    char *missilewhencastname = NULL;
-    MissileType *missile = spell->Missile;
-
     assert (id != NULL);
     assert (spell != NULL);
-    missilewhencastname = gh_scm2newstr(list, NULL);
-    spell->Missile = MissileTypeByIdent(missilewhencastname);
-    if (missile != NULL && spell->Missile != missile) {
-	DebugLevel3Fn("Redefinition in spell-type '%s' : %s : '%s' -> '%s'\n"
-		_C_ spell->IdentName _C_ id _C_ spell->Missile->Ident _C_ missilewhencastname);
+
+    char *dependencyName = NULL;
+    SCM  value;
+    int  dependencyId = -1;
+
+    value = gh_car(list);
+
+    if (!gh_eq_p(value, gh_symbol2scm("upgrade"))) {
+	return;
     }
-    if (spell->Missile == NULL) {
-	DebugLevel0Fn("in spell-type '%s' : %s : '%s' %s\n"
-		_C_ spell->Name _C_ id _C_  missilewhencastname _C_ "does not exist");
+    list = gh_cdr(list);
+    value = gh_car(list);
+
+    dependencyName = gh_scm2newstr(value, NULL);
+    dependencyId = UpgradeIdByIdent(dependencyName);
+    if (dependencyId == -1)
+    {// warn user
+	DebugLevel0Fn("Bad upgrade-name '%s'\n" _C_ dependencyName);
+	free(dependencyName);
+	return ;
     }
-    free(missilewhencastname);
+    spell->DependencyId = dependencyId;
+    free(dependencyName);
 }
+
 
 // **************************************************************************
 //		Action parsers for spellAction
@@ -154,51 +102,36 @@ local void ccl_spell_missilewhencast(const char *id, SCM list, SpellType *spell)
 **	For blizzard and DeathAndDecay.
 **	list = fields #n shards #n damage #n
 */
-local char ccl_spell_action_blizzard(const char *SpellName, SCM list, SpellActionType *spellaction)
+local char CclSpellParseActionAreaBombardment(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
-    int fields;
-    int	shards;
-    int	damage;
     SCM	value;
 
     assert(SpellName);
     assert(spellaction != NULL);
 
-    fields = 0;
-    shards = 0;
-    damage = 0;
+    memset(spellaction,sizeof(spellaction),0);
     for (; !gh_null_p(list); list = gh_cdr(list)) {
 	value = gh_car(list);
 	list = gh_cdr(list);
-	// Todo, Warn for redefinitions ???
 	if (gh_eq_p(value, gh_symbol2scm("fields"))) {
-	    fields = gh_scm2int(gh_car(list));
+	    spellaction->AreaBombardment.Fields = gh_scm2int(gh_car(list));
 	    continue;
-	}
-	if (gh_eq_p(value, gh_symbol2scm("shards"))) {
-	    shards = gh_scm2int(gh_car(list));
+	} else if (gh_eq_p(value, gh_symbol2scm("shards"))) {
+	    spellaction->AreaBombardment.Shards = gh_scm2int(gh_car(list));
 	    continue;
-	}
-	if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-	    damage = gh_scm2int(gh_car(list));
+	} else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
+	    spellaction->AreaBombardment.Damage = gh_scm2int(gh_car(list));
+	    continue;
+	} else if (gh_eq_p(value, gh_symbol2scm("start-offset-x"))) {
+	    spellaction->AreaBombardment.StartOffsetX = gh_scm2int(gh_car(list));
+	    continue;
+	} else if (gh_eq_p(value, gh_symbol2scm("start-offset-y"))) {
+	    spellaction->AreaBombardment.StartOffsetY = gh_scm2int(gh_car(list));
 	    continue;
 	}
 	// warning user : unknow tag
 	DebugLevel0Fn("FIXME : better WARNING : unknow tag");
     }
-    if (damage == 0) {
-	DebugLevel0Fn("in spell-type %s : %s" _C_ SpellName _C_
-		"damage == 0 have no sense : Positive to deal damage, negative for healing.");
-	return 0;
-    }
-    if (fields <= 0 || shards <= 0) {
-	DebugLevel0Fn("in spell-type %s : %s" _C_ SpellName _C_
-		"fields <= 0 or shards <= 0 have no sense");
-	return 0;
-    }
-    spellaction->Blizzard.Fields = fields;
-    spellaction->Blizzard.Shards = shards;
-    spellaction->Blizzard.Damage = damage;
     return 1;
 }
 
@@ -206,7 +139,7 @@ local char ccl_spell_action_blizzard(const char *SpellName, SCM list, SpellActio
 **	For fireball and Runes.
 **	list = 'ttl #n 'damage #n
 */
-local char ccl_spell_action_fireball(const char *SpellName, SCM list, SpellActionType *spellaction)
+local char CclSpellParseActionFireball(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
     int	ttl;
     int	damage;
@@ -252,7 +185,7 @@ local char ccl_spell_action_fireball(const char *SpellName, SCM list, SpellActio
 **	For flameshield and whirlwind.
 **	list = 'ttl #n
 */
-local char ccl_spell_action_flameshield(const char *SpellName, SCM list, SpellActionType *spellaction)
+local char CclSpellParseActionFlameShield(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
     int ttl;
     SCM	value;
@@ -288,7 +221,7 @@ local char ccl_spell_action_flameshield(const char *SpellName, SCM list, SpellAc
 **	One or more.
 **	@todo Free when an error occurs. Do a function to do this.
 */
-local char ccl_spell_action_haste(const char *SpellName, SCM list, SpellActionType	*spellaction)
+local char CclSpellParseActionHaste(const char *SpellName, SCM list, SpellActionType	*spellaction)
 {
     struct {
 	const char *id;
@@ -355,7 +288,7 @@ local char ccl_spell_action_haste(const char *SpellName, SCM list, SpellActionTy
 **	HP positive for healing, negative for dealing damage.
 **	list = (HP #n)
 */
-local char ccl_spell_action_healing(const char *SpellName, SCM list, SpellActionType *spellaction)
+local char CclSpellParseActionHealing(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
    
 
@@ -392,7 +325,7 @@ local char ccl_spell_action_healing(const char *SpellName, SCM list, SpellAction
 **	For invisibility and unholyarmor.
 **	list = flag #f_inv value #n missile "missile-name"
 */
-local char ccl_spell_action_invisibility(const char *SpellName, SCM list, SpellActionType	*spellaction)
+local char CclSpellParseActionInvisibility(const char *SpellName, SCM list, SpellActionType	*spellaction)
 {
     const struct {
 	const char *id;
@@ -476,22 +409,19 @@ local char ccl_spell_action_invisibility(const char *SpellName, SCM list, SpellA
 **	list = ("unittypename")
 **	@note	WARNING, use for other functions than summon, see ccl_spell_action.
 */
-local char ccl_spell_action_summon(const char *SpellName, SCM list, SpellActionType *spellaction)
+local char CclSpellParseActionSummon(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
-    
-
     char *str;
     UnitType *unittype;
 
-	assert(SpellName);
+    assert(SpellName);
     assert(spellaction != NULL);
 
     str = gh_scm2newstr(list, NULL);
     unittype = UnitTypeByIdent(str);
-    spellaction->summon.unittype = unittype;
+    spellaction->Summon.UnitType = unittype;
     if (unittype == NULL) {
-	DebugLevel0Fn("in spell-type %s : Unittype '%s'doesn't exist" _C_
-		SpellName _C_ str);
+	DebugLevel0Fn("in spell-type %s : Unittype '%s'doesn't exist" _C_ SpellName _C_ str);
 	free(str);
 	return 0;
     }
@@ -518,26 +448,25 @@ typedef char	f_ccl_action(const char *spellname, SCM list, SpellActionType	*spel
 local void ccl_spell_action(const char *id, SCM list, SpellType *spell)
 {
     int		i;
-    static struct {
-	    f_spell		*fspell;
+    struct {
+	    SpellFunc *fspell;
 	    const char *id;
 	    f_ccl_action *f;
     }	parser[] = {
-	{CastBlizzard, "Blizzard", ccl_spell_action_blizzard},
-	{CastCircleOfPower, "CircleOfPower", ccl_spell_action_summon/*circleofpower*/},
-	{CastBlizzard, "DeathAndDecay", ccl_spell_action_blizzard/*deathanddecay*/},
-	{CastDeathCoil, "DeathCoil", NULL},
-	{CastFireball, "FireBall", ccl_spell_action_fireball},
-	{CastFlameShield, "FlameShield", ccl_spell_action_flameshield},
-	{CastHaste, "Haste", ccl_spell_action_haste},
-	{CastHealing, "Healing", ccl_spell_action_healing},
-	{CastHolyVision, "HolyVision", ccl_spell_action_summon/*holyvision*/},
-	{CastInvisibility, "Invisibility", ccl_spell_action_invisibility},
-	{CastPolymorph, "Polymorph", ccl_spell_action_summon/*polymorph*/},
-	{CastRaiseDead, "RaiseDead", ccl_spell_action_summon/*raisedead*/},
-	{CastRunes, "Runes", ccl_spell_action_fireball/*runes*/},
-	{CastSummon, "Summon", ccl_spell_action_summon},
-	{CastWhirlwind, "Whirlwind", ccl_spell_action_flameshield/*whirlwind*/},
+	{CastAreaBombardment, "area-bombardment", CclSpellParseActionAreaBombardment},
+	{CastSpawnPortal, "spawn-portal", CclSpellParseActionSummon/*circleofpower*/},
+	{CastDeathCoil, "death-coil", NULL},
+	{CastFireball, "fireball", CclSpellParseActionFireball},
+	{CastFlameShield, "flame-shield", CclSpellParseActionFlameShield},
+	{CastHaste, "haste", CclSpellParseActionHaste},
+	{CastHealing, "healing", CclSpellParseActionHealing},
+	{CastHolyVision, "HolyVision", CclSpellParseActionSummon/*holyvision*/},
+	{CastInvisibility, "Invisibility", CclSpellParseActionInvisibility},
+	{CastPolymorph, "Polymorph", CclSpellParseActionSummon/*polymorph*/},
+	{CastRaiseDead, "RaiseDead", CclSpellParseActionSummon/*raisedead*/},
+	{CastRunes, "Runes", CclSpellParseActionFireball/*runes*/},
+	{CastSummon, "Summon", CclSpellParseActionSummon},
+	{CastWhirlwind, "Whirlwind", CclSpellParseActionFlameShield/*whirlwind*/},
 	{0, NULL, NULL}
     };
     
@@ -942,6 +871,7 @@ local void ccl_spell_autocast(const char *id, SCM list, SpellType *spell)
 local SCM CclDefineSpell(SCM list)
 {
     char *identname;
+    char *str;
     SpellType *spell;
     SCM	value;
 
@@ -957,6 +887,7 @@ local SCM CclDefineSpell(SCM list)
 	memset(spell,0,sizeof(SpellType));
 	spell->Ident=SpellTypeCount-1;
 	spell->IdentName=identname;
+	spell->DependencyId = -1;
     }
     while (!gh_null_p(list)) {
 	value = gh_car(list);
@@ -1008,9 +939,19 @@ local SCM CclDefineSpell(SCM list)
 	    }
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("missile-when-cast"))) {
-	    ccl_spell_missilewhencast("missile-when-cast",gh_car(list),spell);
+	    str = gh_scm2newstr(gh_car(list), NULL);
+	    spell->Missile = MissileTypeByIdent(str);
+	    if (spell->Missile == NULL) {
+		DebugLevel0Fn("in spell-type '%s' : missile %s does not exist\n"
+			_C_ spell->Name _C_ str);
+	    }
+	    free(str);
 	    list=gh_cdr(list);
-	} else {
+	} else if (gh_eq_p(value,gh_symbol2scm("depend"))) {
+	    ccl_spell_dependency("depend", gh_car(list), spell);
+	    list = gh_cdr(list);
+	} else 
+	{
 	    errl("Unsupported tag", value);
 	}
     }
@@ -1050,7 +991,7 @@ global void SaveSpells(CLFile* file)
 	    CLprintf(file,"    'sound-when-cast \"%s\"\n",spell->SoundWhenCast.Name);
 	}
 	if (spell->Missile) {
-	    CLprintf(file,"    'missile-when-casted \"%s\"\n",spell->Missile->Ident);
+	    CLprintf(file,"    'missile-when-cast \"%s\"\n",spell->Missile->Ident);
 	}
 	//
 	//  Target type.
@@ -1077,23 +1018,25 @@ global void SaveSpells(CLFile* file)
 	//  Save the action(effect of the spell)
 	//
 	CLprintf(file,"    'action");
-	if (spell->f==CastBlizzard) {
-	    CLprintf(file," '(Blizzard (fields %d shards %d damage %d) )\n",
-		    spell->SpellAction->Blizzard.Fields,
-		    spell->SpellAction->Blizzard.Shards,
-		    spell->SpellAction->Blizzard.Damage);
+	if (spell->f==CastAreaBombardment) {
+	    CLprintf(file," '(area-bombardment (fields %d shards %d damage %d start-offset-x %d start-offset-y %d) )\n",
+		    spell->SpellAction->AreaBombardment.Fields,
+		    spell->SpellAction->AreaBombardment.Shards,
+		    spell->SpellAction->AreaBombardment.Damage,
+		    spell->SpellAction->AreaBombardment.StartOffsetX,
+		    spell->SpellAction->AreaBombardment.StartOffsetY);
 	} else if (spell->f==CastFireball) {
-	    CLprintf(file," '(FireBall (ttl %d damage %d) )\n",
+	    CLprintf(file," '(fireball (ttl %d damage %d) )\n",
 		    spell->SpellAction->Fireball.TTL,
 		    spell->SpellAction->Fireball.Damage);
 	} else if (spell->f==CastHolyVision) {
 	    CLprintf(file," '(HolyVision \"%s\" )\n",spell->SpellAction->holyvision.revealer->Ident);
 	} else if (spell->f==CastHealing) {
-	    CLprintf(file," '(Healing (HP %d) )\n",spell->SpellAction->healing.HP);
+	    CLprintf(file," '(healing (HP %d) )\n",spell->SpellAction->healing.HP);
 	} else if (spell->f==CastSummon) {
-	    CLprintf(file," '(Summon \"%s\")\n",spell->SpellAction->summon.unittype->Ident);
+	    CLprintf(file," '(Summon \"%s\")\n",spell->SpellAction->Summon.UnitType->Ident);
 	} else if (spell->f==CastHaste) {
-	    CLprintf(file," '(Haste ( ");
+	    CLprintf(file," '(haste ( ");
 	    hinfo=&spell->SpellAction->haste;
 	    while (hinfo) {
 		switch (hinfo->flag) {
@@ -1141,22 +1084,22 @@ global void SaveSpells(CLFile* file)
 		    spell->SpellAction->invisibility.missile->Ident);
 	} else if (spell->f==CastPolymorph) {
 	    CLprintf(file," '(Polymorph \"%s\")\n",
-		    spell->SpellAction->polymorph.unit->Ident);
+		    spell->SpellAction->Polymorph.NewForm->Ident);
 	} else if (spell->f==CastRaiseDead) {
 	    CLprintf(file," '(RaiseDead \"%s\")\n",
-		    spell->SpellAction->raisedead.skeleton->Ident);
+		    spell->SpellAction->RaiseDead.Skeleton->Ident);
 	} else if (spell->f==CastFlameShield) {
-	    CLprintf(file," '(FlameShield (ttl %d) )\n",
+	    CLprintf(file," '(flame-shield (ttl %d) )\n",
 		    spell->SpellAction->FlameShield.TTL);
 	} else if (spell->f==CastRunes) {
 	    CLprintf(file," '(Runes (ttl %d damage %d) )\n",
 		    spell->SpellAction->runes.TTL,
-		    spell->SpellAction->runes.damage);
-	} else if (spell->f==CastCircleOfPower) {
-	    CLprintf(file," '(CircleOfPower \"%s\")\n",
+		    spell->SpellAction->runes.Damage);
+	} else if (spell->f==CastSpawnPortal) {
+	    CLprintf(file," '(spawn-portal \"%s\")\n",
 		    spell->SpellAction->SpawnPortal.PortalType->Ident);
 	} else if (spell->f==CastDeathCoil) {
-	    CLprintf(file," '(DeathCoil)\n");
+	    CLprintf(file," '(death-coil)\n");
 	    // FIXME: more?
 	} else if (spell->f==CastWhirlwind) {
 	    CLprintf(file," '(Whirlwind (ttl %d) )\n",
