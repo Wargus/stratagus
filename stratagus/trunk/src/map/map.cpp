@@ -622,6 +622,9 @@ global void FreeMapInfo(MapInfo* info)
 		if (info->MapTerrainName) {
 			free(info->MapTerrainName);
 		}
+		if (info->Filename) {
+			free(info->Filename);
+		}
 		free(info);
 	}
 }

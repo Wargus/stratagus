@@ -83,6 +83,7 @@ global lua_State* Lua;
 global char* CclStartFile;              /// CCL start file
 global char* GameName;                  /// Game Preferences
 global int CclInConfigFile;             /// True while config file parsing
+global int SaveGameLoading;					/// If a Saved Game is Loading
 
 global char* Tips[MAX_TIPS + 1];        /// Array of tips
 global int  ShowTips;                   /// Show tips at start of level
@@ -231,6 +232,47 @@ local int CclLoad(lua_State* l)
 	if (LuaLoadFile(buf) == -1) {
 		DebugLevel0Fn("Load failed: %s" _C_ LuaToString(l, 1));
 	}
+	return 0;
+}
+
+/**
+**  Load the SaveGame Header
+**
+**  @param l  Lua variable stack
+*/
+local int CclSaveGame(lua_State* l)
+{
+	const char* value;
+	char buf[1024];
+
+    if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+    }
+
+	lua_pushnil(l);
+	while (lua_next(l, 1)) {
+		value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "SaveFile")) {
+			value = LuaToString(l, -1);
+			strcpy(CurrentMapPath, value);
+			if (strcasestr(value, ".pud")) {
+				//LoadPud(LibraryFileName(value, buf), &TheMap);
+			} else {
+				LibraryFileName(value, buf);
+				if (LuaLoadFile(buf) == -1) {
+					DebugLevel0Fn("Load failed: %s" _C_ value);
+				}
+			}
+			lua_pop(l, 1);
+		} else {
+			lua_pushfstring(l, "Unsupported tag: %s", value);
+			lua_error(l);
+			DebugCheck(1);
+		}
+	}
+
 	return 0;
 }
 
@@ -895,6 +937,10 @@ local int CclLoadPud(lua_State* l)
 	const char* name;
 	char buffer[1024];
 
+	if (SaveGameLoading) {
+		return 0;
+	}
+
 	if (lua_gettop(l) != 1) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
@@ -1292,6 +1338,7 @@ global void InitCcl(void)
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
 
 	lua_register(Lua, "Load", CclLoad);
+	lua_register(Lua, "SaveGame", CclSaveGame);
 
 	NetworkCclRegister();
 	IconCclRegister();

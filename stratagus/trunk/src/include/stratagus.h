@@ -415,6 +415,7 @@ extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
 extern void LoadGame(char*);                /// Load saved game back
 extern void SaveGame(const char*);          /// Save game for later load
+extern int SaveGameLoading;                 /// Save game is in progress of loading
 
 extern void LoadAll(void);                  /// Load all data back
 
