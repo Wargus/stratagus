@@ -35,7 +35,7 @@
 	+NetworkProtocolPatchLevel)
 
     /// Network protocol printf format string
-#define NetworkProtocolFormatString	"%d,%d,%d"
+#define NetworkProtocolFormatString	"%d.%d.%d"
     /// Network protocol printf format arguments
 #define NetworkProtocolFormatArgs(v)	(v)/10000,((v)/100)%100,(v)%100
 
