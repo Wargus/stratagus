@@ -142,7 +142,7 @@ typedef struct _upgrade_ {
 	const void* OType;                      ///< object type (future extensions)
 	char*       Ident;                      ///< identifier
 	int         Costs[MaxCosts];            ///< costs for the upgrade
-		/// @todo not used by buttons
+		// TODO: not used by buttons
 	IconConfig Icon;                        ///< icon to display to the user
 } Upgrade;
 
@@ -181,13 +181,13 @@ typedef struct _upgrade_modifier_ {
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
-	/// @todo see below allow more semantics?
-	/// @todo pointers or ids would be faster and less memory use
+	// TODO: see below allow more semantics?
+	// TODO: pointers or ids would be faster and less memory use
 	int  ChangeUnits[UnitTypeMax];      ///< add/remove allowed units
 	char ChangeUpgrades[UpgradeMax];    ///< allow/forbid upgrades
 	char ApplyTo[UnitTypeMax];          ///< which unit types are affected
 
-	/// @todo void* cshould be UnitType*
+	// TODO: void* cshould be UnitType*
 	void* ConvertTo;                    ///< convert to this unit-type.
 
 } UpgradeModifier;

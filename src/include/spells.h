@@ -147,7 +147,7 @@ struct _spell_action_type_ {
 		struct {
 			UnitType* NewForm;          ///< The new form
 			int PlayerNeutral;          ///< Convert the unit to the neutral player.
-			/// @todo temporary polymorphs would be awesome, but hard to implement
+			// TODO: temporary polymorphs would be awesome, but hard to implement
 		} Polymorph;
 
 		struct {
@@ -196,7 +196,7 @@ typedef struct ConditionInfo {
 	char Building;          ///< Target is a building.
 	char TargetSelf;        ///< Target is the same as the caster.
 	char *BoolFlag;         ///< User defined boolean flag.
-		/// @todo NOT IMPLEMENTED:
+		// TODO: NOT IMPLEMENTED:
 	char UnitBuffed;        ///< Target is buffed(haste/slow/bloodlust). Dispel magic?
 	//
 	//  Conditions related to vitals:

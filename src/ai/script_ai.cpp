@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_ai.c - The AI ccl functions. */
+/**@name script_ai.c - The AI ccl functions. */
 //
 //      (c) Copyright 2000-2004 by Lutz Sammer, Ludovic Pollet,
 //                                 and Jimmy Salmon
@@ -124,16 +124,9 @@ local void PrintAiHelperTable(void)
 /**
 **  Define helper for AI.
 **
-**  @param list  List of all helpers.
+**  @param l  Lua state.
 **
 **  @todo  FIXME: the first unit could be a list see ../doc/ccl/ai.html
-*/
-/**
-**  FIXME: docu
-**
-**  @param l  FIXME: docu
-**
-**  @return   FIXME: docu
 */
 local int CclDefineAiHelper(lua_State* l)
 {
@@ -278,7 +271,7 @@ local int CclDefineAiHelper(lua_State* l)
 /**
 **  Define an AI engine.
 **
-**  @param l  FIXME: docu
+**  @param l  Lua state.
 **
 **  @return   FIXME: docu
 */
@@ -483,7 +476,7 @@ local void InsertResearchRequests(Upgrade* upgrade)
 /**
 **  Get the race of the current AI player.
 **
-**  @param l  FIXME: docu
+**  @param l  Lua state.
 */
 local int CclAiGetRace(lua_State* l)
 {
@@ -585,9 +578,9 @@ local int CclAiDebugPlayer(lua_State* l)
 }
 
 /**
-**  Need an unit.
+**  Need a unit.
 **
-**  @param l  Unit-type as string/symbol/object.
+**  @param l  Lua state.
 **
 **  @return   Number of return values
 */
@@ -707,7 +700,7 @@ local int CclAiWait(lua_State* l)
 /**
 **  Define a force, a groups of units.
 **
-**  @param list  Pairs of unit-types and counts.
+**  @param l  Lua state.
 */
 local int CclAiForce(lua_State* l)
 {
@@ -780,8 +773,7 @@ local int CclAiForce(lua_State* l)
 /**
 **  Define the role of a force.
 **
-**  @param value  Force number.
-**  @param flag   Which role of the force.
+**  @param l  Lua state.
 */
 local int CclAiForceRole(lua_State* l)
 {
@@ -811,8 +803,7 @@ local int CclAiForceRole(lua_State* l)
 /**
 **  Check if a force ready.
 **
-**  @param value  Force number.
-**  @return       #t if ready, #f otherwise.
+**  @param l  Lua state.
 */
 local int CclAiCheckForce(lua_State* l)
 {
@@ -836,7 +827,7 @@ local int CclAiCheckForce(lua_State* l)
 /**
 **  Wait for a force ready.
 **
-**  @param value  Force number.
+**  @param l  Lua state.
 */
 local int CclAiWaitForce(lua_State* l)
 {
@@ -867,7 +858,7 @@ local int CclAiWaitForce(lua_State* l)
 /**
 **  Attack with force.
 **
-**  @param value  Force number.
+**  @param l  Lua state.
 */
 local int CclAiAttackWithForce(lua_State* l)
 {
@@ -890,7 +881,7 @@ local int CclAiAttackWithForce(lua_State* l)
 /**
 **  Sleep n cycles.
 **
-**  @param value  Number of cycles to delay.
+**  @param l  Lua state.
 */
 local int CclAiSleep(lua_State* l)
 {
@@ -918,7 +909,7 @@ local int CclAiSleep(lua_State* l)
 /**
 **  Research an upgrade.
 **
-**  @param value  Upgrade as string/symbol/object.
+**  @param l  Lua state.
 */
 local int CclAiResearch(lua_State* l)
 {
@@ -944,7 +935,7 @@ local int CclAiResearch(lua_State* l)
 /**
 **  Upgrade an unit to an new unit-type.
 **
-**  @param value  Unit-type as string/symbol/object.
+**  @param l  Lua state.
 */
 local int CclAiUpgradeTo(lua_State* l)
 {
@@ -963,6 +954,8 @@ local int CclAiUpgradeTo(lua_State* l)
 /**
 **  Return the player of the running AI.
 **
+**  @param l  Lua state.
+**
 **  @return  Player number of the AI.
 */
 local int CclAiPlayer(lua_State* l)
@@ -977,7 +970,8 @@ local int CclAiPlayer(lua_State* l)
 /**
 **  Set AI player resource reserve.
 **
-**  @param vec  Resources vector
+**  @param l  Lua state.
+**
 **  @return     Old resource vector
 */
 local int CclAiSetReserve(lua_State* l)
@@ -1003,7 +997,7 @@ local int CclAiSetReserve(lua_State* l)
 /**
 **  Set AI player resource collect percent.
 **
-**  @param vec  Resources vector
+**  @param l  Lua state.
 **
 **  @return     Old resource vector
 */
@@ -1030,6 +1024,8 @@ local int CclAiSetCollect(lua_State* l)
 
 /**
 **  Dump some AI debug informations.
+**
+**  @param l  Lua state.
 */
 local int CclAiDump(lua_State* l)
 {
@@ -1104,7 +1100,7 @@ local int CclAiDump(lua_State* l)
 /**
 **  Define AI mapping from original number to internal symbol
 **
-**  @param list  List of all names.
+**  @param l  Lua state.
 */
 local int CclDefineAiWcNames(lua_State* l)
 {
@@ -1140,16 +1136,16 @@ local int CclDefineAiWcNames(lua_State* l)
 /**
 **  Get the default resource number
 **
-**  @param type  The name of the resource to lookup
+**  @param name  Resource name.
 **
-**  @return      The number of the resource in DEFAULT_NAMES
+**  @return   The number of the resource in DefaultResourceNames
 */
-local int DefaultResourceNumber(const char* type)
+local int DefaultResourceNumber(const char* name)
 {
 	int i;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(DefaultResourceNames[i], type)) {
+		if (!strcmp(DefaultResourceNames[i], name)) {
 			return i;
 		}
 	}
@@ -1161,7 +1157,7 @@ local int DefaultResourceNumber(const char* type)
 /**
 **	Define an AI player.
 **
-**	@param list	List of the AI Player.
+**  @param l  Lua state.
 */
 local int CclDefineAiPlayer(lua_State* l)
 {

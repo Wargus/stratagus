@@ -1001,11 +1001,11 @@ global void InitSpells(void)
 }
 
 /**
-**		Get spell-type struct pointer by string identifier.
+**  Get spell-type struct pointer by string identifier.
 **
-**		@param IdentName		Spell identifier.
+**  @param ident  Spell identifier.
 **
-**		@return				spell-type struct pointer.
+**  @return       spell-type struct pointer.
 */
 global SpellType* SpellTypeByIdent(const char* ident)
 {

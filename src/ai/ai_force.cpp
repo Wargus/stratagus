@@ -134,7 +134,7 @@ global int AiFindUnitTypeEquiv(const UnitType* unittype, int* result)
 **  UnitType are returned in the prefered order ( ie palladin >> knight... )
 **
 **  @param unittype     The unittype to find equivalence for
-**  @param usabelTypes  int array which will hold the result. (Size UnitTypeMax+1)
+**  @param usableTypes  int array which will hold the result. (Size UnitTypeMax+1)
 **
 **  @return             the number of unittype found
 */

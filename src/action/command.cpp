@@ -157,9 +157,9 @@ global void CommandStopUnit(Unit* unit)
 /**
 **  Order an already formed Order structure
 **
-**  @param unit   pointer to unit
-**  @param order  pointer to valid order
-**  @param flush  if true, flush command queue.
+**  @param unit      pointer to unit
+**  @param cpyorder  pointer to valid order
+**  @param flush     if true, flush command queue.
 */
 global void CommandAnyOrder(Unit* unit, Order* cpyorder, int flush)
 {
@@ -707,7 +707,6 @@ global void CommandBuildBuilding(Unit* unit, int x, int y,
 **  Cancel the building construction, or kill an unit.
 **
 **  @param unit    pointer to unit.
-**  @param worker  pointer to unit.
 */
 global void CommandDismiss(Unit* unit)
 {
@@ -1248,9 +1247,9 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 /**
 **  Auto spell cast.
 **
-**  @param unit   pointer to unit.
-**  @param spell  Spell type pointer.
-**  @param on     1 for auto cast on, 0 for off.
+**  @param unit     pointer to unit.
+**  @param spellid  Spell id.
+**  @param on       1 for auto cast on, 0 for off.
 */
 global void CommandAutoSpellCast(Unit* unit, int spellid, int on)
 {

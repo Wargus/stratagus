@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_unittype.c - The unit-type ccl functions. */
+/**@name script_unittype.c - The unit-type ccl functions. */
 //
 //      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -70,9 +70,9 @@ global int NumberBoolFlag;                  /// Number of defined flags.
 /**
 **  Get the resource ID from a SCM object.
 **
-**  @param value  SCM thingie
+**  @param l  Lua state.
 **
-**  @return       the resource id
+**  @return   the resource id
 */
 global unsigned CclGetResourceByName(lua_State* l)
 {
@@ -92,9 +92,7 @@ global unsigned CclGetResourceByName(lua_State* l)
 /**
 **  Parse unit-type.
 **
-**  @note Should write a general parser for this.
-**
-**  @param list  List describing the unit-type.
+**  @param l  Lua state.
 */
 local int CclDefineUnitType(lua_State* l)
 {
@@ -805,9 +803,9 @@ local int CclDefineUnitType(lua_State* l)
 }
 
 /**
-**		Parse unit-stats.
+**  Parse unit-stats.
 **
-**		@param list		List describing the unit-stats.
+**  @param l  Lua state.
 */
 local int CclDefineUnitStats(lua_State* l)
 {
@@ -897,7 +895,9 @@ local int CclDefineUnitStats(lua_State* l)
 // ----------------------------------------------------------------------------
 
 /**
-**		Access unit-type object
+**  Access unit-type object
+**
+**  @param l  Lua state.
 */
 global UnitType* CclGetUnitType(lua_State* l)
 {
@@ -920,11 +920,11 @@ global UnitType* CclGetUnitType(lua_State* l)
 }
 
 /**
-**		Get unit-type structure.
+**  Get unit-type structure.
 **
-**		@param ident		Identifier for unit-type.
+**  @param l  Lua state.
 **
-**		@return				Unit-type structure.
+**  @return   Unit-type structure.
 */
 local int CclUnitType(lua_State* l)
 {
@@ -946,9 +946,11 @@ local int CclUnitType(lua_State* l)
 }
 
 /**
-**		Get all unit-type structures.
+**  Get all unit-type structures.
 **
-**		@return				An array of all unit-type structures.
+**  @param l  Lua state.
+**
+**  @return   An array of all unit-type structures.
 */
 local int CclUnitTypeArray(lua_State* l)
 {
@@ -971,11 +973,11 @@ local int CclUnitTypeArray(lua_State* l)
 }
 
 /**
-**		Get the ident of the unit-type structure.
+**  Get the ident of the unit-type structure.
 **
-**		@param ptr		Unit-type object.
+**  @param l  Lua state.
 **
-**		@return				The identifier of the unit-type.
+**  @return   The identifier of the unit-type.
 */
 local int CclGetUnitTypeIdent(lua_State* l)
 {
@@ -991,11 +993,11 @@ local int CclGetUnitTypeIdent(lua_State* l)
 }
 
 /**
-**		Get the name of the unit-type structure.
+**  Get the name of the unit-type structure.
 **
-**		@param ptr		Unit-type object.
+**  @param l  Lua state.
 **
-**		@return				The name of the unit-type.
+**  @return   The name of the unit-type.
 */
 local int CclGetUnitTypeName(lua_State* l)
 {
@@ -1011,12 +1013,11 @@ local int CclGetUnitTypeName(lua_State* l)
 }
 
 /**
-**		Set the name of the unit-type structure.
+**  Set the name of the unit-type structure.
 **
-**		@param ptr		Unit-type object.
-**		@param name		The name to set.
+**  @param l  Lua state.
 **
-**		@return				The name of the unit-type.
+**  @return   The name of the unit-type.
 */
 local int CclSetUnitTypeName(lua_State* l)
 {
@@ -1037,9 +1038,9 @@ local int CclSetUnitTypeName(lua_State* l)
 }
 
 /**
-**		Define unit type mapping from original number to internal symbol
+**  Define unit type mapping from original number to internal symbol
 **
-**		@param list		List of all names.
+**  @param l  Lua state.
 */
 local int CclDefineUnitTypeWcNames(lua_State* l)
 {
@@ -1075,9 +1076,9 @@ local int CclDefineUnitTypeWcNames(lua_State* l)
 // ----------------------------------------------------------------------------
 
 /**
-**		Define an unit-type animations set.
+**  Define an unit-type animations set.
 **
-**		@param list		Animations list.
+**  @param l  Lua state.
 */
 local int CclDefineAnimations(lua_State* l)
 {
@@ -1192,11 +1193,10 @@ local int CclDefineAnimations(lua_State* l)
 	return 0;
 }
 
-/*
-**		Define boolean flag.
+/**
+**  Define boolean flag.
 **
-**		@param list : list of flags' name.
-**      @return 0.
+**  @param l  Lua state.
 */
 local int CclDefineBoolFlags(lua_State* l)
 {
@@ -1241,7 +1241,7 @@ local int CclDefineBoolFlags(lua_State* l)
 // ----------------------------------------------------------------------------
 
 /**
-**		Register CCL features for unit-type.
+**  Register CCL features for unit-type.
 */
 global void UnitTypeCclRegister(void)
 {

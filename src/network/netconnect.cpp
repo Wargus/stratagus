@@ -93,10 +93,6 @@ local unsigned long NetworkServerIP;		/// Network Client: IP of server to join
 /// For now just specify with the -P port command line arg...
 local int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 
-
-/**@name api */
-//@{
-
 //----------------------------------------------------------------------------
 //		Functions
 //----------------------------------------------------------------------------

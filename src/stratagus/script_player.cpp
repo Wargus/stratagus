@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_player.c - The player ccl functions. */
+/**@name script_player.c - The player ccl functions. */
 //
 //      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -56,9 +56,9 @@
 /**
 **  Get a player pointer
 **
-**  @param value  Player slot number.
+**  @param l  Lua state.
 **
-**  @return       The player pointer
+**  @return   The player pointer
 */
 local Player* CclGetPlayer(lua_State* l)
 {
@@ -68,7 +68,7 @@ local Player* CclGetPlayer(lua_State* l)
 /**
 **  Parse the player configuration.
 **
-**  @param list  Tagged list of all informations.
+**  @param l  Lua state.
 */
 local int CclPlayer(lua_State* l)
 {
@@ -347,11 +347,8 @@ local int CclPlayer(lua_State* l)
 /**
 **  Change unit owner
 **
-**  @param pos1       top left tile
-**  @param pos2       bottom right tile
-**  @param oldplayer  old player number
-**  @param newplayer  new player number
-**/
+**  @param l  Lua state.
+*/
 local int CclChangeUnitsOwner(lua_State* l)
 {
 	Unit* table[UnitMax];
@@ -402,7 +399,7 @@ local int CclChangeUnitsOwner(lua_State* l)
 /**
 **  Get ThisPlayer.
 **
-**  @return  This player number.
+**  @param l  Lua state.
 */
 local int CclGetThisPlayer(lua_State* l)
 {
@@ -416,7 +413,7 @@ local int CclGetThisPlayer(lua_State* l)
 /**
 **  Set ThisPlayer.
 **
-**  @param plynr  This player number.
+**  @param l  Lua state.
 */
 local int CclSetThisPlayer(lua_State* l)
 {
@@ -435,7 +432,7 @@ local int CclSetThisPlayer(lua_State* l)
 /**
 **  Set MaxSelectable
 **
-**  @param Max number of selectable units.
+**  @param l  Lua state.
 */
 local int CclSetMaxSelectable(lua_State* l)
 {
@@ -451,7 +448,7 @@ local int CclSetMaxSelectable(lua_State* l)
 /**
 **  Set player unit limit.
 **
-**  @param limit  Unit limit.
+**  @param l  Lua state.
 */
 local int CclSetAllPlayersUnitLimit(lua_State* l)
 {
@@ -471,7 +468,7 @@ local int CclSetAllPlayersUnitLimit(lua_State* l)
 /**
 **  Set player unit limit.
 **
-**  @param limit  Unit limit.
+**  @param l  Lua state.
 */
 local int CclSetAllPlayersBuildingLimit(lua_State* l)
 {
@@ -491,7 +488,7 @@ local int CclSetAllPlayersBuildingLimit(lua_State* l)
 /**
 **  Set player unit limit.
 **
-**  @param limit  Unit limit.
+**  @param l  Lua state.
 */
 local int CclSetAllPlayersTotalUnitLimit(lua_State* l)
 {
@@ -511,13 +508,9 @@ local int CclSetAllPlayersTotalUnitLimit(lua_State* l)
 /**
 **  Change the diplomacy from player to another player.
 **
-**  @param player    Player to change diplomacy.
-**  @param opponent  Player number to change.
-**  @param state     To which state this should be changed.
+**  @param l  Lua state.
 **
 **  @return          FIXME: should return old state.
-**
-**  @todo FIXME: should return old state.
 */
 local int CclSetDiplomacy(lua_State* l)
 {
@@ -548,8 +541,7 @@ local int CclSetDiplomacy(lua_State* l)
 /**
 **  Change the diplomacy from ThisPlayer to another player.
 **
-**  @param state   To which state this should be changed.
-**  @param player  Player number to change.
+**  @param l  Lua state.
 */
 local int CclDiplomacy(lua_State* l)
 {
@@ -561,13 +553,9 @@ local int CclDiplomacy(lua_State* l)
 /**
 **  Change the shared vision from player to another player.
 **
-**  @param player    Player to change shared vision.
-**  @param opponent  Player number to change.
-**  @param state     To which state this should be changed.
+**  @param l  Lua state.
 **
-**  @return          FIXME: should return old state.
-**
-**  @todo FIXME: should return old state.
+**  @return   FIXME: should return old state.
 */
 local int CclSetSharedVision(lua_State* l)
 {
@@ -591,8 +579,7 @@ local int CclSetSharedVision(lua_State* l)
 /**
 **  Change the shared vision from ThisPlayer to another player.
 **
-**  @param state   To which state this should be changed.
-**  @param player  Player number to change.
+**  @param l  Lua state.
 */
 local int CclSharedVision(lua_State* l)
 {
@@ -604,7 +591,7 @@ local int CclSharedVision(lua_State* l)
 /**
 **  Define race names
 **
-**  @param list  List of all races.
+**  @param l  Lua state.
 */
 local int CclDefineRaceNames(lua_State* l)
 {
@@ -665,6 +652,8 @@ local int CclDefineRaceNames(lua_State* l)
 
 /**
 **  Make new player colors
+**
+**  @param l  Lua state.
 */
 local int CclNewPlayerColors(lua_State* l)
 {
@@ -680,6 +669,8 @@ local int CclNewPlayerColors(lua_State* l)
 
 /**
 **  Get player data.
+**
+**  @param l  Lua state.
 */
 local int CclGetPlayerData(lua_State* l)
 {
@@ -793,6 +784,8 @@ local int CclGetPlayerData(lua_State* l)
 
 /**
 **  Set player data.
+**
+**  @param l  Lua state.
 */
 local int CclSetPlayerData(lua_State* l)
 {

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_map.c - The map ccl functions. */
+/**@name script_map.c - The map ccl functions. */
 //
 //      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -53,7 +53,7 @@
 /**
 **  Parse a stratagus map.
 **
-**  @param list  list of tuples keyword data
+**  @param l  Lua state.
 */
 local int CclStratagusMap(lua_State* l)
 {
@@ -254,6 +254,8 @@ local int CclStratagusMap(lua_State* l)
 
 /**
 **  Reveal the complete map.
+**
+**  @param l  Lua state.
 */
 local int CclRevealMap(lua_State* l)
 {
@@ -272,8 +274,7 @@ local int CclRevealMap(lua_State* l)
 /**
 **  Center the map.
 **
-**  @param x  X tile location.
-**  @param y  Y tile location.
+**  @param l  Lua state.
 */
 local int CclCenterMap(lua_State* l)
 {
@@ -289,11 +290,7 @@ local int CclCenterMap(lua_State* l)
 /**
 **  Show Map Location
 **
-**  @param x       X tile location.
-**  @param y       Y tile location.
-**  @param radius  radius of view.
-**  @param cycle   cycles show vision for.
-**  @param unit    name of unit to use for showing map
+**  @param l  Lua state.
 */
 local int CclShowMapLocation(lua_State* l)
 {
@@ -321,9 +318,9 @@ local int CclShowMapLocation(lua_State* l)
 /**
 **  Set the default map.
 **
-**  @param map  Path to the default map.
+**  @param l  Lua state.
 **
-**  @return     The old default map.
+**  @return   The old default map.
 */
 local int CclSetDefaultMap(lua_State* l)
 {
@@ -343,7 +340,7 @@ local int CclSetDefaultMap(lua_State* l)
 /**
 **  Set fog of war on/off.
 **
-**  @param flag  True = turning fog of war on, false = off.
+**  @param l  Lua state.
 **
 **  @return      The old state of fog of war.
 */
@@ -367,9 +364,9 @@ local int CclSetFogOfWar(lua_State* l)
 /**
 **  Enable display of terrain in minimap.
 **
-**  @param flag  true = show minimap with terrain, false = show no terrain.
+**  @param l  Lua state.
 **
-**  @return      The old state of the minimap with terrain.
+**  @return   The old state of the minimap with terrain.
 */
 local int CclSetMinimapTerrain(lua_State* l)
 {
@@ -386,7 +383,9 @@ local int CclSetMinimapTerrain(lua_State* l)
 }
 
 /**
-**  Gray style fog of war brightness.
+**  Fog of war opacity.
+**
+**  @param l  Lua state.
 */
 local int CclSetFogOfWarOpacity(lua_State* l)
 {
@@ -416,9 +415,9 @@ local int CclSetFogOfWarOpacity(lua_State* l)
 /**
 **  Set forest regeneration speed.
 **
-**  @param speed  New regeneration speed (0 disabled)
+**  @param l  Lua state.
 **
-**  @return       Old speed
+**  @return   Old speed
 */
 local int CclSetForestRegeneration(lua_State* l)
 {

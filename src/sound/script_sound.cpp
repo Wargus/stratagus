@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_sound.c	-	The sound ccl functions. */
+/**@name script_sound.c - The sound ccl functions. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
+//      (c) Copyright 1999-2004 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -50,19 +50,19 @@
 #include "cdaudio.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Glue between c and scheme. Ask the sound system to associate a
-**		sound id to a sound name.
+**  Glue between c and scheme. Ask the sound system to associate a
+**  sound id to a sound name.
 **
-**		@param name		name
+**  @param l  Lua state.
 */
 local int CclSoundForName(lua_State* l)
 {
@@ -80,10 +80,11 @@ local int CclSoundForName(lua_State* l)
 }
 
 /**
-**		Get a Game Sound Id from either a siod sound id or a sound name
+**  Get a Game Sound Id from either a lua sound id or a sound name
 **
-**		@param sound		Lisp cell, SoundID or string or symbol.
-**		@return				The C sound id.
+**  @param l  Lua state.
+**
+**  @return   The C sound id.
 */
 local SoundId CclGetSoundId(lua_State* l)
 {
@@ -103,16 +104,15 @@ local SoundId CclGetSoundId(lua_State* l)
 }
 
 /**
-**		Create a sound.
+**  Create a sound.
 **
-**		Glue between c and scheme. This function asks the sound system to
-**		register a sound under a given name, wiht an associated list of files
-**		(the list can be replaced by only one file).
+**  Glue between c and scheme. This function asks the sound system to
+**  register a sound under a given name, wiht an associated list of files
+**  (the list can be replaced by only one file).
 **
-**		@param name		the name of the sound
-**		@param file		a list of sound file names (or a file name)
+**  @param l  Lua state.
 **
-**		@return				the sound id of the created sound
+**  @return   the sound id of the created sound
 */
 local int CclMakeSound(lua_State* l)
 {
@@ -163,14 +163,12 @@ local int CclMakeSound(lua_State* l)
 }
 
 /**
-**		Glue between c and scheme. This function asks the sound system to
-**		build a special sound group.
+**  Glue between c and scheme. This function asks the sound system to
+**  build a special sound group.
 **
-**		@param name		the name of the sound
-**		@param first		first group played (sound-id or string)
-**		@param second		second group played (sound-id or string)
+**  @param l  Lua state.
 **
-**		@return				The sound id of the created sound
+**  @return   The sound id of the created sound
 */
 local int CclMakeSoundGroup(lua_State* l)
 {
@@ -198,13 +196,12 @@ local int CclMakeSoundGroup(lua_State* l)
 }
 
 /**
-**		Glue between c and scheme. Ask to the sound system to remap a sound id
-**		to a given name.
+**  Glue between c and scheme. Ask to the sound system to remap a sound id
+**  to a given name.
 **
-**		@param name		the new name for the sound
-**		@param sound		the sound object
+**  @param l  Lua state.
 **
-**		@return				the sound object
+**  @return   the sound object
 */
 local int CclMapSound(lua_State* l)
 {
@@ -220,11 +217,9 @@ local int CclMapSound(lua_State* l)
 }
 
 /**
-**		Ask the sound system to play the specified sound.
+**  Ask the sound system to play the specified sound.
 **
-**		@param sound		either the sound name or the sound id
-**
-**		@return				SCM_UNSPECIFIED
+**  @param l  Lua state.
 */
 local int CclPlaySound(lua_State* l)
 {
@@ -240,8 +235,10 @@ local int CclPlaySound(lua_State* l)
 }
 
 /**
-**		Glue between c and scheme. Ask the sound system to dump on the
-**		standard output the mapping between sound names and sound id.
+**  Glue between c and scheme. Ask the sound system to dump on the
+**  standard output the mapping between sound names and sound id.
+**
+**  @param l  Lua state.
 */
 local int CclDisplaySounds(lua_State* l)
 {
@@ -254,8 +251,10 @@ local int CclDisplaySounds(lua_State* l)
 }
 
 /**
-**		Glue between c and scheme. Allows to specify some global game sounds
-**		in a ccl file.
+**  Glue between c and scheme. Allows to specify some global game sounds
+**  in a ccl file.
+**
+**  @param l  Lua state.
 */
 local int CclDefineGameSounds(lua_State* l)
 {
@@ -343,9 +342,9 @@ local int CclDefineGameSounds(lua_State* l)
 }
 
 /**
-**		Global volume support
+**  Global volume support
 **
-**		@param volume		new global sound volume
+**  @param l  Lua state.
 */
 local int CclSetSoundVolume(lua_State* l)
 {
@@ -359,9 +358,9 @@ local int CclSetSoundVolume(lua_State* l)
 }
 
 /**
-**		Music volume support
+**  Music volume support
 **
-**		@param volume		new global music volume
+**  @param l  Lua state.
 */
 local int CclSetMusicVolume(lua_State* l)
 {
@@ -375,9 +374,9 @@ local int CclSetMusicVolume(lua_State* l)
 }
 
 /**
-**		Set cd mode
+**  Set cd mode
 **
-**		@param mode		cd mode
+**  @param l  Lua state.
 */
 local int CclSetCdMode(lua_State* l)
 {
@@ -410,7 +409,9 @@ local int CclSetCdMode(lua_State* l)
 }
 
 /**
-**		Define play sections
+**  Define play sections
+**
+**  @param l  Lua state.
 */
 local int CclDefinePlaySections(lua_State* l)
 {
@@ -537,7 +538,9 @@ local int CclDefinePlaySections(lua_State* l)
 }
 
 /**
-**		Turn Off Sound (client side)
+**  Turn Off Sound (client side)
+**
+**  @param l  Lua state.
 */
 local int CclSoundOff(lua_State* l)
 {
@@ -550,10 +553,11 @@ local int CclSoundOff(lua_State* l)
 }
 
 /**
-**		Turn On Sound (client side)
+**  Turn On Sound (client side)
 **
-**		@return true if and only if the sound is REALLY turned on
-**				(uses SoundFildes)
+**  @param l  Lua state.
+**
+**  @return   true if and only if the sound is REALLY turned on
 */
 local int CclSoundOn(lua_State* l)
 {
@@ -571,7 +575,9 @@ local int CclSoundOn(lua_State* l)
 }
 
 /**
-**		Turn Off Music (client side)
+**  Turn Off Music (client side)
+**
+**  @param l  Lua state.
 */
 local int CclMusicOff(lua_State* l)
 {
@@ -585,10 +591,11 @@ local int CclMusicOff(lua_State* l)
 }
 
 /**
-**		Turn On Music (client side)
+**  Turn On Music (client side)
 **
-**		@return true if and only if the sound is REALLY turned on
-**				(uses SoundFildes)
+**  @param l  Lua state.
+**
+**  @return   true if and only if the sound is REALLY turned on
 */
 local int CclMusicOn(lua_State* l)
 {
@@ -601,9 +608,9 @@ local int CclMusicOn(lua_State* l)
 }
 
 /**
-**		Set the cut off distance.
+**  Set the cut off distance.
 **
-**		@param distance new cut off distance for sounds
+**  @param l  Lua state.
 */
 local int CclSetGlobalSoundRange(lua_State* l)
 {
@@ -623,7 +630,9 @@ local int CclSetGlobalSoundRange(lua_State* l)
 }
 
 /**
-**		Ask clone to use a sound thread
+**  Use a sound thread
+**
+**  @param l  Lua state.
 */
 local int CclSoundThread(lua_State* l)
 {
@@ -638,10 +647,9 @@ local int CclSoundThread(lua_State* l)
 }
 
 /**
-**		Set the range of a given sound.
+**  Set the range of a given sound.
 **
-**		@param sound		the sound id or name of the sound
-**		@param range		the new range for this sound
+**  @param l  Lua state.
 */
 local int CclSetSoundRange(lua_State* l) {
 	unsigned char theRange;
@@ -668,9 +676,9 @@ local int CclSetSoundRange(lua_State* l) {
 }
 
 /**
-**		Play a music file.
+**  Play a music file.
 **
-**		@param name		Name of the music file to play.
+**  @param l  Lua state.
 */
 local int CclPlayMusic(lua_State* l)
 {
@@ -684,9 +692,9 @@ local int CclPlayMusic(lua_State* l)
 }
 
 /**
-**		Play a sound file.
+**  Play a sound file.
 **
-**		@param name		Name of the sound file to play.
+**  @param l  Lua state.
 */
 local int CclPlayFile(lua_State* l)
 {
@@ -700,7 +708,9 @@ local int CclPlayFile(lua_State* l)
 }
 
 /**
-**		Stop playing music.
+**  Stop playing music.
+**
+**  @param l  Lua state.
 */
 local int CclStopMusic(lua_State* l)
 {
@@ -714,7 +724,7 @@ local int CclStopMusic(lua_State* l)
 }
 
 /**
-**		Register CCL features for sound.
+**  Register CCL features for sound.
 */
 global void SoundCclRegister(void)
 {
@@ -749,9 +759,9 @@ global void SoundCclRegister(void)
 #include "script.h"
 
 /**
-**		Global volume support
+**  Global volume support
 **
-**		@param volume		new global sound volume
+**  @param l  Lua state.
 */
 local int CclSetSoundVolume(lua_State* l)
 {
@@ -763,9 +773,9 @@ local int CclSetSoundVolume(lua_State* l)
 }
 
 /**
-**		Music volume support
+**  Music volume support
 **
-**		@param volume		new global music volume
+**  @param l  Lua state.
 */
 local int CclSetMusicVolume(lua_State* l)
 {
@@ -777,9 +787,9 @@ local int CclSetMusicVolume(lua_State* l)
 }
 
 /**
-**		Set cd mode
+**  Set cd mode
 **
-**		@param mode		cd mode
+**  @param l  Lua state.
 */
 local int CclSetCdMode(lua_State* l)
 {
@@ -791,7 +801,9 @@ local int CclSetCdMode(lua_State* l)
 }
 
 /**
-**		Turn Off Sound (client side)
+**  Turn Off Sound (client side)
+**
+**  @param l  Lua state.
 */
 local int CclSoundOff(lua_State* l)
 {
@@ -799,10 +811,11 @@ local int CclSoundOff(lua_State* l)
 }
 
 /**
-**		Turn On Sound (client side)
+**  Turn On Sound (client side)
 **
-**		@return true if and only if the sound is REALLY turned on
-**				(uses SoundFildes)
+**  @param l  Lua state.
+**
+**  @return   true if and only if the sound is REALLY turned on
 */
 local int CclSoundOn(lua_State* l)
 {
@@ -811,7 +824,9 @@ local int CclSoundOn(lua_State* l)
 }
 
 /**
-**		Turn Off Music (client side)
+**  Turn Off Music (client side)
+**
+**  @param l  Lua state.
 */
 local int CclMusicOff(lua_State* l)
 {
@@ -819,10 +834,11 @@ local int CclMusicOff(lua_State* l)
 }
 
 /**
-**		Turn On Music (client side)
+**  Turn On Music (client side)
 **
-**		@return true if and only if the sound is REALLY turned on
-**				(uses SoundFildes)
+**  @param l  Lua state.
+**
+**  @return   true if and only if the sound is REALLY turned on
 */
 local int CclMusicOn(lua_State* l)
 {
@@ -830,9 +846,9 @@ local int CclMusicOn(lua_State* l)
 }
 
 /**
-**		Set the cut off distance.
+**  Set the cut off distance.
 **
-**		@param distance new cut off distance for sounds
+**  @param l  Lua state.
 */
 local int CclSetGlobalSoundRange(lua_State* l)
 {
@@ -844,10 +860,9 @@ local int CclSetGlobalSoundRange(lua_State* l)
 }
 
 /**
-**		Set the range of a given sound.
+**  Set the range of a given sound.
 **
-**		@param sound		the sound id or name of the sound
-**		@param range		the new range for this sound
+**  @param l  Lua state.
 */
 local int CclSetSoundRange(lua_State* l)
 {
@@ -859,7 +874,9 @@ local int CclSetSoundRange(lua_State* l)
 }
 
 /**
-**		Ask clone to use a sound thread
+**  Use a sound thread
+**
+**  @param l  Lua state.
 */
 local int CclSoundThread(lua_State* l)
 {
@@ -867,8 +884,10 @@ local int CclSoundThread(lua_State* l)
 }
 
 /**
-**		Glue between c and scheme. Ask the sound system to dump on the
-**		standard output the mapping between sound names and sound id.
+**  Glue between c and scheme. Ask the sound system to dump on the
+**  standard output the mapping between sound names and sound id.
+**
+**  @param l  Lua state.
 */
 local int CclDisplaySounds(lua_State* l)
 {
@@ -876,8 +895,10 @@ local int CclDisplaySounds(lua_State* l)
 }
 
 /**
-**		Glue between c and scheme. Ask the sound system to associate a sound
-**		id to a sound name.
+**  Glue between c and scheme. Ask the sound system to associate a sound
+**  id to a sound name.
+**
+**  @param l  Lua state.
 */
 local int CclSoundForName(lua_State* l)
 {
@@ -885,8 +906,10 @@ local int CclSoundForName(lua_State* l)
 }
 
 /**
-**		Glue between c and scheme. Allows to specify some global game sounds
-**		in a ccl file.
+**  Glue between c and scheme. Allows to specify some global game sounds
+**  in a ccl file.
+**
+**  @param l  Lua state.
 */
 local int CclDefineGameSounds(lua_State* l)
 {
@@ -894,13 +917,12 @@ local int CclDefineGameSounds(lua_State* l)
 }
 
 /**
-**		Glue between c and scheme. Ask to the sound system to remap a sound id
-**		to a given name.
+**  Glue between c and scheme. Ask to the sound system to remap a sound id
+**  to a given name.
 **
-**		@param name		the new name for the sound
-**		@param sound		the sound object
+**  @param l  Lua state.
 **
-**		@return				the sound object
+**  @return   the sound object
 */
 local int CclMapSound(lua_State* l)
 {
@@ -912,9 +934,9 @@ local int CclMapSound(lua_State* l)
 }
 
 /**
-**		Play a music file.
+**  Play a music file.
 **
-**		@param name		Name of the music file to play.
+**  @param l  Lua state.
 */
 local int CclPlayMusic(lua_State* l)
 {
@@ -922,9 +944,9 @@ local int CclPlayMusic(lua_State* l)
 }
 
 /**
-**		Play a sound file.
+**  Play a sound file.
 **
-**		@param name		Name of the sound file to play.
+**  @param l  Lua state.
 */
 local int CclPlayFile(lua_State* l)
 {
@@ -932,24 +954,24 @@ local int CclPlayFile(lua_State* l)
 }
 
 /**
-**		Register CCL features for sound. Dummy version.
+**  Register CCL features for sound. Dummy version.
 */
 global void SoundCclRegister(void)
 {
-	lua_register(Lua, "SetSoundVolume!", CclSetSoundVolume);
-	lua_register(Lua, "SetMusicVolume!", CclSetMusicVolume);
-	lua_register(Lua, "SetCdMode!", CclSetCdMode);
+	lua_register(Lua, "SetSoundVolume", CclSetSoundVolume);
+	lua_register(Lua, "SetMusicVolume", CclSetMusicVolume);
+	lua_register(Lua, "SetCdMode", CclSetCdMode);
 	lua_register(Lua, "SoundOff", CclSoundOff);
 	lua_register(Lua, "SoundOn", CclSoundOn);
 	lua_register(Lua, "MusicOff", CclMusicOff);
 	lua_register(Lua, "MusicOn", CclMusicOn);
 	lua_register(Lua, "SoundThread", CclSoundThread);
-	lua_register(Lua, "SetGlobalSoundRange!", CclSetGlobalSoundRange);
+	lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);
 	lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
 	lua_register(Lua, "DisplaySounds", CclDisplaySounds);
 	lua_register(Lua, "MapSound", CclMapSound);
 	lua_register(Lua, "SoundForName", CclSoundForName);
-	lua_register(Lua, "SetSoundRange!", CclSetSoundRange);
+	lua_register(Lua, "SetSoundRange", CclSetSoundRange);
 
 	lua_register(Lua, "PlayMusic", CclPlayMusic);
 	lua_register(Lua, "PlayFile", CclPlayFile);

@@ -1058,7 +1058,7 @@ global int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 }
 
 /**
-**		Initialize the selection module.
+**  Initialize the selection module.
 */
 global void InitSelections(void)
 {
@@ -1099,7 +1099,7 @@ global void SaveSelections(CLFile* file)
 }
 
 /**
-**		Clean up the selection module.
+**  Clean up the selection module.
 */
 global void CleanSelections(void)
 {
@@ -1121,10 +1121,9 @@ global void CleanSelections(void)
 // ----------------------------------------------------------------------------
 
 /**
-**		Set the current group id. (Needed for load/save)
+**  Set the current group id. (Needed for load/save)
 **
-**		@param id		New group identifier
-**		@return				old value
+**  @param l  Lua state.
 */
 local int CclSetGroupId(lua_State* l)
 {
@@ -1141,10 +1140,9 @@ local int CclSetGroupId(lua_State* l)
 }
 
 /**
-**		Define the current selection.
+**  Define the current selection.
 **
-**		@param num		Number of units in selection
-**		@param units		Units in selection
+**  @param l  Lua state.
 */
 local int CclSelection(lua_State* l)
 {
@@ -1172,7 +1170,7 @@ local int CclSelection(lua_State* l)
 }
 
 /**
-**		Register CCL features for selections.
+**  Register CCL features for selections.
 */
 global void SelectionCclRegister(void)
 {

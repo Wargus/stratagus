@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl.c - The craft configuration language. */
+/**@name script.c - The configuration language. */
 //
 //      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -220,6 +220,8 @@ global int LuaLoadFile(const char* file)
 
 /**
 **  FIXME: docu
+**
+**  @param l  Lua state.
 */
 local int CclLoad(lua_State* l)
 {
@@ -238,7 +240,7 @@ local int CclLoad(lua_State* l)
 /**
 **  Load the SaveGame Header
 **
-**  @param l  Lua variable stack
+**  @param l  Lua state.
 */
 local int CclSaveGame(lua_State* l)
 {
@@ -277,6 +279,9 @@ local int CclSaveGame(lua_State* l)
 
 /**
 **  FIXME: docu
+**
+**  @param l     Lua state.
+**  @param narg  Argument number.
 */
 global const char* LuaToString(lua_State* l, int narg)
 {
@@ -286,6 +291,9 @@ global const char* LuaToString(lua_State* l, int narg)
 
 /**
 **  FIXME: docu
+**
+**  @param l     Lua state.
+**  @param narg  Argument number.
 */
 global lua_Number LuaToNumber(lua_State* l, int narg)
 {
@@ -295,6 +303,9 @@ global lua_Number LuaToNumber(lua_State* l, int narg)
 
 /**
 **  FIXME: docu
+**
+**  @param l     Lua state.
+**  @param narg  Argument number.
 */
 global int LuaToBoolean(lua_State* l, int narg)
 {
@@ -325,7 +336,9 @@ global void CclGarbageCollect(int fast)
 /**
 **  Return the stratagus library path.
 **
-**  @return  Current libray path.
+**  @param l  Lua state.
+**
+**  @return   Current libray path.
 */
 local int CclStratagusLibraryPath(lua_State* l)
 {
@@ -336,7 +349,9 @@ local int CclStratagusLibraryPath(lua_State* l)
 /**
 **  Return the stratagus game-cycle
 **
-**  @return  Current game cycle.
+**  @param l  Lua state.
+**
+**  @return   Current game cycle.
 */
 local int CclGameCycle(lua_State* l)
 {
@@ -347,9 +362,9 @@ local int CclGameCycle(lua_State* l)
 /**
 **  Return of game name.
 **
-**  @param gamename  SCM name. (nil reports only)
+**  @param l  Lua state.
 **
-**  @return          Old game name.
+**  @return   Old game name.
 */
 local int CclSetGameName(lua_State* l)
 {
@@ -380,6 +395,8 @@ local int CclSetGameName(lua_State* l)
 
 /**
 **  Set the stratagus game-cycle
+**
+**  @param l  Lua state.
 */
 local int CclSetGameCycle(lua_State* l)
 {
@@ -392,6 +409,8 @@ local int CclSetGameCycle(lua_State* l)
 
 /**
 **  Set the game paused or unpaused
+**
+**  @param l  Lua state.
 */
 local int CclSetGamePaused(lua_State* l)
 {
@@ -408,6 +427,8 @@ local int CclSetGamePaused(lua_State* l)
 
 /**
 **  Set the video sync speed
+**
+**  @param l  Lua state.
 */
 local int CclSetVideoSyncSpeed(lua_State* l)
 {
@@ -420,6 +441,8 @@ local int CclSetVideoSyncSpeed(lua_State* l)
 
 /**
 **  Set the local player name
+**
+**  @param l  Lua state.
 */
 local int CclSetLocalPlayerName(lua_State* l)
 {
@@ -438,7 +461,8 @@ local int CclSetLocalPlayerName(lua_State* l)
 /**
 **  Affect UseHPForXp.
 **
-**  @param l lua_state with boolean value to affect to UseHPForXp.
+**  @param l  Lua state.
+**
 **	@return 0.
 */
 local int ScriptSetUseHPForXp(lua_State* l)
@@ -452,7 +476,9 @@ local int ScriptSetUseHPForXp(lua_State* l)
 }
 
 /**
-**		Removes Randomization of Player position in Multiplayer mode
+**  Removes Randomization of Player position in Multiplayer mode
+**
+**  @param l  Lua state.
 */
 local int CclNoRandomPlacementMultiplayer(lua_State* l)
 {
@@ -468,7 +494,9 @@ local int CclNoRandomPlacementMultiplayer(lua_State* l)
 /**
 **  Set God mode.
 **
-**  @return  The old mode.
+**  @param l  Lua state.
+**
+**  @return   The old mode.
 */
 local int CclSetGodMode(lua_State* l)
 {
@@ -483,7 +511,7 @@ local int CclSetGodMode(lua_State* l)
 /**
 **  Enable/disable Showing the tips at the start of a level.
 **
-**  @param flag  True = turn on, false = off.
+**  @param l  Lua state.
 **
 **  @return      The old state of tips displayed.
 */
@@ -504,7 +532,7 @@ local int CclSetShowTips(lua_State* l)
 /**
 **  Set the current tip number.
 **
-**  @param tip  Tip number.
+**  @param l  Lua state.
 **
 **  @return     The old tip number.
 */
@@ -528,7 +556,7 @@ local int CclSetCurrentTip(lua_State* l)
 /**
 **  Add a new tip to the list of tips.
 **
-**  @param tip  A new tip to be displayed before level.
+**  @param l  Lua state.
 **
 **  @todo  FIXME: Memory for tips is never freed.
 **         FIXME: Make Tips dynamic.
@@ -559,8 +587,7 @@ local int CclAddTip(lua_State* l)
 /**
 **  Set resource harvesting speed.
 **
-**  @param resource  Name of resource.
-**  @param speed     Speed factor of harvesting resource.
+**  @param l  Lua state.
 */
 local int CclSetSpeedResourcesHarvest(lua_State* l)
 {
@@ -585,8 +612,7 @@ local int CclSetSpeedResourcesHarvest(lua_State* l)
 /**
 **  Set resource returning speed.
 **
-**  @param resource  Name of resource.
-**  @param speed     Speed factor of returning resource.
+**  @param l  Lua state.
 */
 local int CclSetSpeedResourcesReturn(lua_State* l)
 {
@@ -610,6 +636,8 @@ local int CclSetSpeedResourcesReturn(lua_State* l)
 
 /**
 **  For debug increase building speed.
+**
+**  @param l  Lua state.
 */
 local int CclSetSpeedBuild(lua_State* l)
 {
@@ -624,6 +652,8 @@ local int CclSetSpeedBuild(lua_State* l)
 
 /**
 **  For debug increase training speed.
+**
+**  @param l  Lua state.
 */
 local int CclSetSpeedTrain(lua_State* l)
 {
@@ -638,6 +668,8 @@ local int CclSetSpeedTrain(lua_State* l)
 
 /**
 **  For debug increase upgrading speed.
+**
+**  @param l  Lua state.
 */
 local int CclSetSpeedUpgrade(lua_State* l)
 {
@@ -652,6 +684,8 @@ local int CclSetSpeedUpgrade(lua_State* l)
 
 /**
 **  For debug increase researching speed.
+**
+**  @param l  Lua state.
 */
 local int CclSetSpeedResearch(lua_State* l)
 {
@@ -666,6 +700,8 @@ local int CclSetSpeedResearch(lua_State* l)
 
 /**
 **  For debug increase all speeds.
+**
+**  @param l  Lua state.
 */
 local int CclSetSpeeds(lua_State* l)
 {
@@ -688,6 +724,8 @@ local int CclSetSpeeds(lua_State* l)
 
 /**
 **  Define default resources for a new player.
+**
+**  @param l  Lua state.
 */
 local int CclDefineDefaultResources(lua_State* l)
 {
@@ -703,6 +741,8 @@ local int CclDefineDefaultResources(lua_State* l)
 
 /**
 **  Define default resources for a new player with low resources.
+**
+**  @param l  Lua state.
 */
 local int CclDefineDefaultResourcesLow(lua_State* l)
 {
@@ -718,6 +758,8 @@ local int CclDefineDefaultResourcesLow(lua_State* l)
 
 /**
 **  Define default resources for a new player with mid resources.
+**
+**  @param l  Lua state.
 */
 local int CclDefineDefaultResourcesMedium(lua_State* l)
 {
@@ -748,6 +790,8 @@ local int CclDefineDefaultResourcesHigh(lua_State* l)
 
 /**
 **  Define default incomes for a new player.
+**
+**  @param l  Lua state.
 */
 local int CclDefineDefaultIncomes(lua_State* l)
 {
@@ -763,6 +807,8 @@ local int CclDefineDefaultIncomes(lua_State* l)
 
 /**
 **  Define default action for the resources.
+**
+**  @param l  Lua state.
 */
 local int CclDefineDefaultActions(lua_State* l)
 {
@@ -782,6 +828,8 @@ local int CclDefineDefaultActions(lua_State* l)
 
 /**
 **  Define default names for the resources.
+**
+**  @param l  Lua state.
 */
 local int CclDefineDefaultResourceNames(lua_State* l)
 {
@@ -801,6 +849,8 @@ local int CclDefineDefaultResourceNames(lua_State* l)
 
 /**
 **  Define default names for the resources.
+**
+**  @param l  Lua state.
 */
 local int CclDefineDefaultResourceAmounts(lua_State* l)
 {
@@ -831,6 +881,8 @@ local int CclDefineDefaultResourceAmounts(lua_State* l)
 
 /**
 **  Debug unit slots.
+**
+**  @param l  Lua state.
 */
 local int CclUnits(lua_State* l)
 {
@@ -879,6 +931,8 @@ local int CclUnits(lua_State* l)
 
 /**
 **  Compiled with sound.
+**
+**  @param l  Lua state.
 */
 local int CclGetCompileFeature(lua_State* l)
 {
@@ -902,6 +956,8 @@ local int CclGetCompileFeature(lua_State* l)
 
 /**
 **  Get Stratagus home path.
+**
+**  @param l  Lua state.
 */
 local int CclGetStratagusHomePath(lua_State* l)
 {
@@ -922,6 +978,8 @@ local int CclGetStratagusHomePath(lua_State* l)
 
 /**
 **  Get Stratagus library path.
+**
+**  @param l  Lua state.
 */
 local int CclGetStratagusLibraryPath(lua_State* l)
 {
@@ -931,6 +989,8 @@ local int CclGetStratagusLibraryPath(lua_State* l)
 
 /**
 **  Get a value from the Stratagus syncronized random number generator.
+**
+**  @param l  Lua state.
 */
 local int CclSyncRand(lua_State* l)
 {
@@ -949,9 +1009,7 @@ local int CclSyncRand(lua_State* l)
 /**
 **  Load a pud. (Try in library path first)
 **
-**  @param file  filename of pud.
-**
-**  @return      FIXME: Nothing.
+**  @param l  Lua state.
 */
 local int CclLoadPud(lua_State* l)
 {
@@ -975,9 +1033,7 @@ local int CclLoadPud(lua_State* l)
 /**
 **  Load a map. (Try in library path first)
 **
-**  @param file  filename of map.
-**
-**  @return      FIXME: Nothing.
+**  @param l  Lua state.
 */
 local int CclLoadMap(lua_State* l)
 {

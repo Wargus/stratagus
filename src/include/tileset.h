@@ -218,7 +218,7 @@
 **
 **      Hash table of item numbers to unit names.
 **
-**  @struct _tileset_ tileset.h
+**  @struct _tile_info_ tileset.h
 **
 **  \#include "tileset.h"
 **
@@ -276,7 +276,7 @@ typedef struct _tile_info_ {
 typedef struct _solid_terrain_info_ {
 	char* TerrainName;  ///< Name of the terrain
 	int NumSolidTiles;  ///< How many solid tile variants
-	/// @todo When drawing with the editor add some kind fo probabilities for every tile.
+	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 	unsigned short* SolidTiles; ///< Solid tile IDs
 } SolidTerrainInfo;
 
@@ -297,9 +297,9 @@ typedef struct _tileset_ {
 	TileInfo* Tiles; ///< Tile descriptions
 
 
-	/// @todo currently hardcoded
+	// TODO: currently hardcoded
 	unsigned char* TileTypeTable;   ///< For fast lookup of tile type
-	/// @todo currently unsupported
+	// TODO: currently unsupported
 	unsigned short* AnimationTable; ///< Tile animation sequences
 
 	int NumTerrainTypes;                 ///< Number of different terrain types

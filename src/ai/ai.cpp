@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name new_ai.c	-	The new computer player AI main file. */
+/**@name ai.c - The computer player AI main file. */
 //
 //      (c) Copyright 2000-2004 by Lutz Sammer and Ludovic Pollet
 //
@@ -1593,7 +1593,6 @@ local void HelpWithTransporter(Unit* unit, Unit* transporter,
 **  Called if an unit can't move. Try to move unit in the way
 **
 **  @param unit  Pointer to unit what builds the building.
-**  @param what  Pointer to unit-type.
 */
 global void AiCanNotMove(Unit* unit)
 {

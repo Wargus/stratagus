@@ -1326,7 +1326,7 @@ global void CleanCclCredits()
 /**
 **  Parse the credits configuration.
 **
-**  @param list  Scheme list containing the credits.
+**  @param l  Lua state.
 **
 **  @todo  'comment and 'title are only parsed, but not used.
 */

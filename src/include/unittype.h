@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unittype.h	-	The unit-types headerfile. */
+/**@name unittype.h - The unit-types headerfile. */
 //
 //      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -481,7 +481,7 @@
 **
 ** \#include "unittype.h"
 **
-**  typedef struct _unit_type_ UnitType;
+**  typedef struct _resource_info_ ResourceInfo;
 **
 **    This struct contains information about how a unit will harvest a resource.
 **
@@ -703,7 +703,7 @@ struct _unit_type_ {
 		UnitTypeNaval,              ///< Unit lives on water
 	} UnitType;                     ///< Land / fly / naval
 	int DecayRate;                  ///< Decay rate in 1/6 seconds
-	/// @todo not used
+	// TODO: not used
 	int AnnoyComputerFactor;        ///< How much this annoys the computer
 	int MouseAction;                ///< Right click action
 #define MouseActionNone      0      ///< Nothing
@@ -753,7 +753,7 @@ struct _unit_type_ {
 	SDL_Color NeutralMinimapColorRGB;   ///< Minimap Color for Neutral Units.
 
 	UnitSound Sound;                ///< Sounds for events
-	/// @todo temporary solution
+	// TODO: temporary solution
 	WeaponSound Weapon;             ///< Currently sound for weapon
 
 	int Supply;                     ///< Food supply

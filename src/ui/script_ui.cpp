@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_ui.c - The ui ccl functions. */
+/**@name script_ui.c - The ui ccl functions. */
 //
 //      (c) Copyright 1999-2004 by Lutz Sammer, Jimmy Salmon, Martin Renold
 //
@@ -49,7 +49,7 @@
 #include "etlib/hash.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 
@@ -64,16 +64,16 @@ typedef struct _info_text_ {
 } InfoText;
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 
 /**
 **  Enable/disable the global color cycling.
 **
-**  @param flag  True = turn on, false = off.
+**  @param l  Lua state.
 **
-**  @return      The old state of color cylce all.
+**  @return   The old state of color cylce all.
 */
 local int CclSetColorCycleAll(lua_State* l)
 {
@@ -96,9 +96,9 @@ local int CclSetColorCycleAll(lua_State* l)
 /**
 **  Set speed of middle-mouse scroll
 **
-**  @param speed  number of screen pixels per mouse pixel
+**  @param l  Lua state.
 **
-**  @return       The old value.
+**  @return   The old value.
 */
 local int CclSetMouseScrollSpeedDefault(lua_State* l)
 {
@@ -117,9 +117,9 @@ local int CclSetMouseScrollSpeedDefault(lua_State* l)
 /**
 **  Set speed of ctrl-middle-mouse scroll
 **
-**  @param speed  number of screen pixels per mouse pixel
+**  @param l  Lua state.
 **
-**  @return       The old value.
+**  @return   The old value.
 */
 local int CclSetMouseScrollSpeedControl(lua_State* l)
 {
@@ -138,9 +138,9 @@ local int CclSetMouseScrollSpeedControl(lua_State* l)
 /**
 **  Set which missile is used for right click
 **
-**  @param missile  missile name to use
+**  @param l  Lua state.
 **
-**  @return         old value
+**  @return   old value
 */
 local int CclSetClickMissile(lua_State* l)
 {
@@ -167,10 +167,11 @@ local int CclSetClickMissile(lua_State* l)
 }
 
 /**
-**		Set which missile shows Damage
+**  Set which missile shows Damage
 **
-**		@param missile		missile name to use
-**		@return				old value
+**  @param l  Lua state.
+**
+**  @return   old value
 */
 local int CclSetDamageMissile(lua_State* l)
 {
@@ -197,10 +198,9 @@ local int CclSetDamageMissile(lua_State* l)
 }
 
 /**
-**		Set the video resolution.
+**  Set the video resolution.
 **
-**		@param width		Resolution width.
-**		@param height		Resolution height.
+**  @param l  Lua state.
 */
 local int CclSetVideoResolution(lua_State* l)
 {
@@ -218,11 +218,11 @@ local int CclSetVideoResolution(lua_State* l)
 }
 
 /**
-**		Set the video fullscreen mode.
+**  Set the video fullscreen mode.
 **
-**		@param fullscreen		True for fullscreen, false for window.
+**  @param l  Lua state.
 **
-**		@return						Old fullscreen mode
+**  @return   Old fullscreen mode
 */
 local int CclSetVideoFullScreen(lua_State* l)
 {
@@ -246,9 +246,9 @@ local int CclSetVideoFullScreen(lua_State* l)
 /**
 **  Default title screens.
 **
-**  @param list  FIXME: docu
+**  @param l  Lua state.
 **
-**  @return      None
+**  @return   None
 */
 local int CclSetTitleScreens(lua_State* l)
 {
@@ -359,11 +359,11 @@ local int CclSetTitleScreens(lua_State* l)
 }
 
 /**
-**		Default menu background.
+**  Default menu background.
 **
-**		@param background		background. (nil reports only)
+**  @param l  Lua state.
 **
-**		@return				Old menu background.
+**  @return   Old menu background.
 */
 local int CclSetMenuBackground(lua_State* l)
 {
@@ -388,11 +388,11 @@ local int CclSetMenuBackground(lua_State* l)
 }
 
 /**
-**		Default menu music.
+**  Default menu music.
 **
-**		@param music		menu music. (nil reports only)
+**  @param l  Lua state.
 **
-**		@return				Old menu music.
+**  @return   Old menu music.
 */
 local int CclSetMenuMusic(lua_State* l)
 {
@@ -417,11 +417,9 @@ local int CclSetMenuMusic(lua_State* l)
 }
 
 /**
-**		Display a picture.
+**  Display a picture.
 **
-**		@param file		filename of picture.
-**
-**		@return				Nothing.
+**  @param l  Lua state.
 */
 local int CclDisplayPicture(lua_State* l)
 {
@@ -440,11 +438,9 @@ local int CclDisplayPicture(lua_State* l)
 }
 
 /**
-**		Process a menu.
+**  Process a menu.
 **
-**		@param id		of menu.
-**
-**		@return				Nothing.
+**  @param l  Lua state.
 */
 local int CclProcessMenu(lua_State* l)
 {
@@ -463,9 +459,9 @@ local int CclProcessMenu(lua_State* l)
 }
 
 /**
-**		Define a cursor.
+**  Define a cursor.
 **
-**		FIXME: need some general data structure to make this parsing easier.
+**  @param l  Lua state.
 */
 local int CclDefineCursor(lua_State* l)
 {
@@ -579,9 +575,9 @@ local int CclDefineCursor(lua_State* l)
 }
 
 /**
-**		Set the current game cursor.
+**  Set the current game cursor.
 **
-**		@param ident		Cursor identifier.
+**  @param l  Lua state.
 */
 local int CclSetGameCursor(lua_State* l)
 {
@@ -593,11 +589,10 @@ local int CclSetGameCursor(lua_State* l)
 }
 
 /**
-**		Define a menu item
+**  Define a menu item
 **
-**		FIXME: need some general data structure to make this parsing easier.
-**
-**		@param value		Button type.
+**  @param l      Lua state.
+**  @param value  Button type.
 */
 local MenuButtonId scm2buttonid(lua_State* l, const char* value)
 {
@@ -671,7 +666,10 @@ local MenuButtonId scm2buttonid(lua_State* l, const char* value)
 }
 
 /**
-**		Parse info panel text
+**  Parse info panel text
+**
+**  @param l     Lua state.
+**  @param text  FIXME: docu.
 */
 local void CclParseInfoText(lua_State* l, InfoText* text)
 {
@@ -717,7 +715,10 @@ local void CclParseInfoText(lua_State* l, InfoText* text)
 }
 
 /**
-**		Parse icon
+**  Parse icon
+**
+**  @param l     Lua state.
+**  @param icon  FIXME: docu.
 */
 local void CclParseIcon(lua_State* l, Button* icon)
 {
@@ -765,7 +766,10 @@ local void CclParseIcon(lua_State* l, Button* icon)
 }
 
 /**
-**		Parse info panel selected section
+**  Parse info panel selected section
+**
+**  @param l   Lua state.
+**  @param ui  FIXME: docu.
 */
 local void CclParseSelected(lua_State* l, UI* ui)
 {
@@ -868,7 +872,10 @@ local void CclParseSelected(lua_State* l, UI* ui)
 }
 
 /**
-**		Parse info panel training section
+**  Parse info panel training section
+**
+**  @param l   Lua state.
+**  @param ui  FIXME: docu.
 */
 local void CclParseTraining(lua_State* l, UI* ui)
 {
@@ -964,7 +971,10 @@ local void CclParseTraining(lua_State* l, UI* ui)
 }
 
 /**
-**		Parse info panel upgrading section
+**  Parse info panel upgrading section
+**
+**  @param l   Lua state.
+**  @param ui  FIXME: docu.
 */
 local void CclParseUpgrading(lua_State* l, UI* ui)
 {
@@ -1002,7 +1012,10 @@ local void CclParseUpgrading(lua_State* l, UI* ui)
 }
 
 /**
-**		Parse info panel researching section
+**  Parse info panel researching section
+**
+**  @param l   Lua state.
+**  @param ui  FIXME: docu.
 */
 local void CclParseResearching(lua_State* l, UI* ui)
 {
@@ -1040,7 +1053,10 @@ local void CclParseResearching(lua_State* l, UI* ui)
 }
 
 /**
-**		Parse info panel transporting section
+**  Parse info panel transporting section
+**
+**  @param l   Lua state.
+**  @param ui  FIXME: docu.
 */
 local void CclParseTransporting(lua_State* l, UI* ui)
 {
@@ -1089,7 +1105,10 @@ local void CclParseTransporting(lua_State* l, UI* ui)
 }
 
 /**
-**		Parse button panel icons section
+**  Parse button panel icons section
+**
+**  @param l   Lua state.
+**  @param ui  FIXME: docu.
 */
 local void CclParseButtonIcons(lua_State* l, UI* ui)
 {
@@ -1105,10 +1124,9 @@ local void CclParseButtonIcons(lua_State* l, UI* ui)
 }
 
 /**
-**		Define the look+feel of the user interface.
+**  Define the look+feel of the user interface.
 **
-**		FIXME: need some general data structure to make this parsing easier.
-**		FIXME: use the new tagged config format.
+**  @param l  Lua state.
 */
 local int CclDefineUI(lua_State* l)
 {
@@ -2015,9 +2033,9 @@ local int CclDefineUI(lua_State* l)
 }
 
 /**
-**		Define the viewports.
+**  Define the viewports.
 **
-**		@param list		List of the viewports.
+**  @param l  Lua state.
 */
 local int CclDefineViewports(lua_State* l)
 {
@@ -2056,10 +2074,11 @@ local int CclDefineViewports(lua_State* l)
 }
 
 /**
-**		Enable/disable scrolling with the mouse.
+**  Enable/disable scrolling with the mouse.
 **
-**		@param flag		True = turn on, false = off.
-**		@return				The old state of scrolling.
+**  @param l  Lua state.
+**
+**  @return   The old state of scrolling.
 */
 local int CclSetMouseScroll(lua_State* l)
 {
@@ -2076,10 +2095,11 @@ local int CclSetMouseScroll(lua_State* l)
 }
 
 /**
-**		Set speed of mouse scrolling
+**  Set speed of mouse scrolling
 **
-**		@param num		Mouse scroll speed in frames.
-**		@return				old scroll speed.
+**  @param l  Lua state.
+**
+**  @return   old scroll speed.
 */
 local int CclSetMouseScrollSpeed(lua_State* l)
 {
@@ -2102,10 +2122,11 @@ local int CclSetMouseScrollSpeed(lua_State* l)
 }
 
 /**
-**		Enable/disable grabbing the mouse.
+**  Enable/disable grabbing the mouse.
 **
-**		@param flag		True = grab on, false = grab off.
-**		@return				FIXME: not supported: The old state of grabbing.
+**  @param l  Lua state.
+**
+**  @return   FIXME: not supported: The old state of grabbing.
 */
 local int CclSetGrabMouse(lua_State* l)
 {
@@ -2122,10 +2143,11 @@ local int CclSetGrabMouse(lua_State* l)
 }
 
 /**
-**		Enable/disable leaving the window stops scrolling.
+**  Enable/disable leaving the window stops scrolling.
 **
-**		@param flag		True = stop on, false = stop off.
-**		@return				The old state of stopping.
+**  @param l  Lua state.
+**
+**  @return   The old state of stopping.
 */
 local int CclSetLeaveStops(lua_State* l)
 {
@@ -2142,10 +2164,11 @@ local int CclSetLeaveStops(lua_State* l)
 }
 
 /**
-**		Enable/disable scrolling with the keyboard.
+**  Enable/disable scrolling with the keyboard.
 **
-**		@param flag		True = turn on, false = off.
-**		@return				The old state of scrolling.
+**  @param l  Lua state.
+**
+**  @return   The old state of scrolling.
 */
 local int CclSetKeyScroll(lua_State* l)
 {
@@ -2162,10 +2185,11 @@ local int CclSetKeyScroll(lua_State* l)
 }
 
 /**
-**		Set speed of keyboard scrolling
+**  Set speed of keyboard scrolling
 **
-**		@param num		Keyboard scroll speed in frames.
-**		@return				old scroll speed.
+**  @param l  Lua state.
+**
+**  @return   old scroll speed.
 */
 local int CclSetKeyScrollSpeed(lua_State* l)
 {
@@ -2188,10 +2212,11 @@ local int CclSetKeyScrollSpeed(lua_State* l)
 }
 
 /**
-**		Enable/disable display of command keys in panels.
+**  Enable/disable display of command keys in panels.
 **
-**		@param flag		True = turn on, false = off.
-**		@return				The old state of scrolling.
+**  @param l  Lua state.
+**
+**  @return   The old state of scrolling.
 */
 local int CclSetShowCommandKey(lua_State* l)
 {
@@ -2209,7 +2234,9 @@ local int CclSetShowCommandKey(lua_State* l)
 }
 
 /**
-**		Fighter right button attacks as default.
+**  Fighter right button attacks as default.
+**
+**  @param l  Lua state.
 */
 local int CclRightButtonAttacks(lua_State* l)
 {
@@ -2222,7 +2249,9 @@ local int CclRightButtonAttacks(lua_State* l)
 }
 
 /**
-**		Fighter right button moves as default.
+**  Fighter right button moves as default.
+**
+**  @param l  Lua state.
 */
 local int CclRightButtonMoves(lua_State* l)
 {
@@ -2235,10 +2264,11 @@ local int CclRightButtonMoves(lua_State* l)
 }
 
 /**
-**		Enable/disable the fancy buildings.
+**  Enable/disable the fancy buildings.
 **
-**		@param flag		True = turn on, false = off.
-**		@return				The old state of fancy buildings flag.
+**  @param l  Lua state.
+**
+**  @return   The old state of fancy buildings flag.
 */
 local int CclSetFancyBuildings(lua_State* l)
 {
@@ -2255,11 +2285,9 @@ local int CclSetFancyBuildings(lua_State* l)
 }
 
 /**
-**		Define a menu
+**  Define a menu
 **
-**		FIXME: need some general data structure to make this parsing easier.
-**
-**		@param list		List describing the menu.
+**  @param l  Lua state.
 */
 local int CclDefineMenu(lua_State* l)
 {
@@ -2425,6 +2453,9 @@ local int CclDefineMenu(lua_State* l)
 	return 0;
 }
 
+/**
+**  FIXME: docu
+*/
 local int scm2hotkey(lua_State* l, const char* value)
 {
 	int len;
@@ -2453,6 +2484,9 @@ local int scm2hotkey(lua_State* l, const char* value)
 	return key;
 }
 
+/**
+**  FIXME: docu
+*/
 local int scm2style(lua_State* l, const char* value)
 {
 	int id;
@@ -3371,9 +3405,9 @@ local int CclDefineMenuItem(lua_State* l)
 }
 
 /**
-**		Define menu graphics
+**  Define menu graphics
 **
-**		@param list		List describing the menu.
+**  @param l  Lua state.
 */
 local int CclDefineMenuGraphics(lua_State* l)
 {
@@ -3434,11 +3468,9 @@ local int CclDefineMenuGraphics(lua_State* l)
 }
 
 /**
-**		Define a button.
+**  Define a button.
 **
-**		FIXME: need some general data structure to make this parsing easier.
-**
-**		@param list		List describing the button.
+**  @param l  Lua state.
 */
 local int CclDefineButton(lua_State* l)
 {
@@ -3625,7 +3657,7 @@ local int CclDefineButton(lua_State* l)
 }
 
 /**
-**		Run the set-selection-changed-hook.
+**  Run the set-selection-changed-hook.
 */
 global void SelectionChanged(void)
 {
@@ -3634,7 +3666,7 @@ global void SelectionChanged(void)
 }
 
 /**
-**	  The selected unit has been altered.
+**  The selected unit has been altered.
 */
 global void SelectedUnitChanged(void)
 {
@@ -3642,10 +3674,9 @@ global void SelectedUnitChanged(void)
 }
 
 /**
-**		The next 6 functions set color cycling index
+**  The next 6 functions set color cycling index
 **
-**		@param index		index
-**
+**  @param l  Lua state.
 */
 local int CclSetColorWaterCycleStart(lua_State* l)
 {
@@ -3660,6 +3691,8 @@ local int CclSetColorWaterCycleStart(lua_State* l)
 
 /**
 **  FIXME: docu
+**
+**  @param l  Lua state.
 */
 local int CclSetColorWaterCycleEnd(lua_State* l)
 {
@@ -3674,6 +3707,8 @@ local int CclSetColorWaterCycleEnd(lua_State* l)
 
 /**
 **  FIXME: docu
+**
+**  @param l  Lua state.
 */
 local int CclSetColorIconCycleStart(lua_State* l)
 {
@@ -3688,6 +3723,8 @@ local int CclSetColorIconCycleStart(lua_State* l)
 
 /**
 **  FIXME: docu
+**
+**  @param l  Lua state.
 */
 local int CclSetColorIconCycleEnd(lua_State* l)
 {
@@ -3702,6 +3739,8 @@ local int CclSetColorIconCycleEnd(lua_State* l)
 
 /**
 **  FIXME: docu
+**
+**  @param l  Lua state.
 */
 local int CclSetColorBuildingCycleStart(lua_State* l)
 {
@@ -3716,6 +3755,8 @@ local int CclSetColorBuildingCycleStart(lua_State* l)
 
 /**
 **  FIXME: docu
+**
+**  @param l  Lua state.
 */
 local int CclSetColorBuildingCycleEnd(lua_State* l)
 {
@@ -3729,10 +3770,10 @@ local int CclSetColorBuildingCycleEnd(lua_State* l)
 }
 
 /**
-**		Set double-click delay.
+**  Set double-click delay.
 **
-**		@param delay		Delay in ms
-**		@return				Old delay
+**  @param l  Lua state.
+**  @return   Old delay
 */
 local int CclSetDoubleClickDelay(lua_State* l)
 {
@@ -3749,10 +3790,11 @@ local int CclSetDoubleClickDelay(lua_State* l)
 }
 
 /**
-**		Set hold-click delay.
+**  Set hold-click delay.
 **
-**		@param delay		Delay in ms
-**		@return				Old delay
+**  @param l  Lua state.
+**
+**  @return   Old delay
 */
 local int CclSetHoldClickDelay(lua_State* l)
 {
@@ -3769,10 +3811,11 @@ local int CclSetHoldClickDelay(lua_State* l)
 }
 
 /**
-**		Set selection style.
+**  Set selection style.
 **
-**		@param style		New style
-**		@return				Old style
+**  @param l  Lua state.
+**
+**  @return   Old style
 */
 local int CclSetSelectionStyle(lua_State* l)
 {
@@ -3805,11 +3848,11 @@ local int CclSetSelectionStyle(lua_State* l)
 }
 
 /**
-**		Set display of sight range.
+**  Set display of sight range.
 **
-**		@param flag		True = turning display of sight on, false = off.
+**  @param l  Lua state.
 **
-**		@return				The old state of display of sight.
+**  @return   The old state of display of sight.
 */
 local int CclSetShowSightRange(lua_State* l)
 {
@@ -3854,11 +3897,11 @@ local int CclSetShowSightRange(lua_State* l)
 }
 
 /**
-**		Set display of reaction range.
+**  Set display of reaction range.
 **
-**		@param flag		True = turning display of reaction on, false = off.
+**  @param l  Lua state.
 **
-**		@return				The old state of display of reaction.
+**  @return   The old state of display of reaction.
 */
 local int CclSetShowReactionRange(lua_State* l)
 {
@@ -3896,11 +3939,11 @@ local int CclSetShowReactionRange(lua_State* l)
 }
 
 /**
-**		Set display of attack range.
+**  Set display of attack range.
 **
-**		@param flag		True = turning display of attack on, false = off.
+**  @param l  Lua state.
 **
-**		@return				The old state of display of attack.
+**  @return   The old state of display of attack.
 */
 local int CclSetShowAttackRange(lua_State* l)
 {
@@ -3917,11 +3960,11 @@ local int CclSetShowAttackRange(lua_State* l)
 }
 
 /**
-**		Set display of orders.
+**  Set display of orders.
 **
-**		@param flag		True = turning display of orders on, false = off.
+**  @param l  Lua state.
 **
-**		@return				The old state of display of orders.
+**  @return   The old state of display of orders.
 */
 local int CclSetShowOrders(lua_State* l)
 {
@@ -3945,9 +3988,9 @@ local int CclSetShowOrders(lua_State* l)
 }
 
 /**
-**		Add a new message.
+**  Add a new message.
 **
-**		@param message		Message to display.
+**  @param l  Lua state.
 */
 local int CclAddMessage(lua_State* l)
 {
@@ -3963,7 +4006,9 @@ local int CclAddMessage(lua_State* l)
 }
 
 /**
-**		Reset the keystroke help array
+**  Reset the keystroke help array
+**
+**  @param l  Lua state.
 */
 local int CclResetKeystrokeHelp(lua_State* l)
 {
@@ -3988,6 +4033,8 @@ local int CclResetKeystrokeHelp(lua_State* l)
 
 /**
 **  FIXME: docu
+**
+**  @param l  Lua state.
 */
 local int CclSetGroupKeys(lua_State* l)
 {
@@ -3999,9 +4046,9 @@ local int CclSetGroupKeys(lua_State* l)
 }
 
 /**
-**		Add a keystroke help
+**  Add a keystroke help
 **
-**		@param list		pair describing the keystroke.
+**  @param l  Lua state.
 */
 local int CclAddKeystrokeHelp(lua_State* l)
 {
@@ -4035,7 +4082,7 @@ local int CclAddKeystrokeHelp(lua_State* l)
 }
 
 /**
-**		Register CCL features for UI.
+**  Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
 {

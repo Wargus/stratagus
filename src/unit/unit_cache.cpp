@@ -5,16 +5,16 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unitcache.c	-	The unit cache. */
+/**@name unit_cache.c - The unit cache. */
 //
-//	Cache to find units faster from position.
-//	Sort of trivial implementation, since most queries are on a single tile.
-//	Unit is just inserted in a double linked list for every tile it's on.
+//      Cache to find units faster from position.
+//      Sort of trivial implementation, since most queries are on a single tile.
+//      Unit is just inserted in a double linked list for every tile it's on.
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer(older implementations) and Crestez Leonard
+//      (c) Copyright 1998-2004 by Lutz Sammer(older implementations) and Crestez Leonard
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
