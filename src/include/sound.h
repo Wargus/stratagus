@@ -62,9 +62,7 @@ typedef struct _game_sound_ {
     SoundConfig BuildingConstruction;	/// building under construction
 
 //FIXME: (Fabrice) I don't think it's the correct place to put this
-    SoundConfig HumanWorkComplete;	/// building ready
-    SoundConfig PeasantWorkComplete;	/// building ready
-    SoundConfig OrcWorkComplete;	/// building ready
+    SoundConfig WorkComplete[MAX_RACES];/// building ready
 
     SoundConfig Repair;			/// repair sound
 
