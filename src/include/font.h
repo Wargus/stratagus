@@ -145,6 +145,8 @@ extern void GetDefaultTextColors(char** normalp, char** reversep);
 extern int VideoTextLength(unsigned font, const unsigned char* text);
 	/// Returns the height of the font
 extern int VideoTextHeight(unsigned font);
+	///  Return the 'line' line of the string 's'.
+extern char* GetLineFont(int line, char* s, int maxlen, int font);
 	/// Draw text unclipped
 extern int VideoDrawText(int x, int y, unsigned font,
 	const unsigned char* text);

@@ -164,6 +164,9 @@ and how to use it.
 	<dt>SubString(StringDesc, NumberDesc begin[, NumberDesc end])</dt>
 	<dd>Return the substring which begin at the 'begin' character ([0-lenght(s)])
 		and end at the 'end' character of the given string. default value for 'end' is the end of the initial string.</dd>
+	<dt>Line(NumberDesc line, StringDesc[, NumberDesc maxlen[, Font] ])</dt>
+	<dd>Return the line (which is a subtring) of a multi-line string, maxlen is the size maximum of the string.
+		If Font is specified, maxlen used VideoTextLenght, else it uses number of characters.</dd>
   </dl></dd>
   <dt><b>UnitDesc</b></dt>
   <dd>Represent a unit. It could be :
