@@ -153,8 +153,9 @@ distclean:	clean
 	for i in $(MODULES_ALL); do \
 	[ $(OBJDIR) == "." ] || $(RM) -rf $$i/$(OBJDIR); \
 	$(RM) $$i/.#* $$i/*~; done
-	$(RM) stratagus$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt
-	$(RM) -r srcdoc/*
+	$(RM) stratagus$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt \
+	srcdoc/* .depend Rules.make config.log config.status configure \
+	autom4te.cache/
 	@echo
 
 lockver:
