@@ -609,7 +609,7 @@ struct _unit_ {
 #define UnitNumber(unit)	((unit)->Slot)
 
 /**
-**	How many units could be selected
+*	How many units could be selected
 */
 #define MaxSelectable	9
 
@@ -670,6 +670,7 @@ extern void InitUnitsMemory(void);
 //extern void FreeUnitMemory(Unit* unit);
     /// Release an unit
 extern void ReleaseUnit(Unit* unit);
+extern void InitUnit (Unit * , UnitType * , Player * );
     ///	Create a new unit
 extern Unit* MakeUnit(UnitType* type,Player* player);
     /// Place an unit on map
