@@ -85,7 +85,7 @@ global unsigned PfCounterNotReachable;
 ----------------------------------------------------------------------------*/
 
 /**
-**	Create empty movement matrix.
+**	Initialize a matrix
 **
 **	@NOTE	Double border for ships/flyers.
 **
@@ -95,9 +95,8 @@ global unsigned PfCounterNotReachable;
 **		98	    98
 **		98 98 98 98 98
 */
-global unsigned char* CreateMatrix(void)
+local void InitMatrix(unsigned char* matrix)
 {
-    unsigned char* matrix;
     unsigned i;
     unsigned w;
     unsigned h;
@@ -105,8 +104,6 @@ global unsigned char* CreateMatrix(void)
 
     w=TheMap.Width+2;
     h=TheMap.Height;
-    matrix=Matrix;
-    //matrix=malloc(w*(h+2));
 
     i=w+w+1;
     memset(matrix,98,i);		// +1 for ships!
@@ -118,6 +115,26 @@ global unsigned char* CreateMatrix(void)
 	matrix[i-1]=98;
     }
     memset(matrix+i,98,w+1);		// +1 for ships!
+}
+
+/**
+**	Create empty movement matrix.
+*/
+global unsigned char* CreateMatrix(void)
+{
+    InitMatrix(Matrix);
+    return Matrix;
+}
+
+/**
+**	Allocate a new matrix and initialize
+*/
+global unsigned char* MakeMatrix(void)
+{
+    unsigned char* matrix;
+
+    matrix=malloc((TheMap.Width+2)*(TheMap.Height+3));
+    InitMatrix(matrix);
 
     return matrix;
 }
