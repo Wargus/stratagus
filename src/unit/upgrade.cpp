@@ -10,7 +10,7 @@
 //
 /**@name upgrade.c	-	The upgrade/allow functions. */
 //
-//	(c) Copyright 1999-2002 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -44,17 +44,16 @@
 #include "player.h"
 #include "depend.h"
 #include "interface.h"
-
 #include "map.h"
 
 #include "myendian.h"
 
 #include "etlib/hash.h"
 
-local int AddUpgradeModifierBase(int,int,int,int,int,int,int,int,int,int*,
-	const char*,const char*,const char*,UnitType*);
-local int AddUpgradeModifier(int,int,int,int,int,int,int,int,int*,
-	const char*,const char*,const char*);
+local int AddUpgradeModifierBase(int, int, int, int, int, int, int, int, int,
+    int*, const char*, const char*, const char*, UnitType*);
+local int AddUpgradeModifier(int, int, int, int, int, int, int, int,
+    int*, const char*, const char*, const char*);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -69,20 +68,16 @@ global Upgrade Upgrades[UpgradeMax];	/// The main user useable upgrades
 local int NumUpgrades;			/// Number of upgrades used
 
     /// How many upgrades modifiers supported
-#define UPGRADE_MODIFIERS_MAX	(UpgradeMax*4)
+#define UPGRADE_MODIFIERS_MAX	(UpgradeMax * 4)
     /// Upgrades modifiers
 local UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
     /// Number of upgrades modifiers used
 local int NumUpgradeModifiers;
 
 #ifdef DOXYGEN				// no real code, only for document
-
 local Upgrade* UpgradeHash[61];		/// lookup table for upgrade names
-
 #else
-
-local hashtable(Upgrade*,61) UpgradeHash;/// lookup table for upgrade names
-
+local hashtable(Upgrade*, 61) UpgradeHash;/// lookup table for upgrade names
 #endif
 
 /**
@@ -121,7 +116,7 @@ local Upgrade* AddUpgrade(const char* ident, const char* icon,
     }
     //  Fill upgrade structure
 
-    if ((tmp = (Upgrade **) hash_find(UpgradeHash, (char *)ident)) && *tmp) {
+    if ((tmp = (Upgrade **)hash_find(UpgradeHash, (char*)ident)) && *tmp) {
 	DebugLevel0Fn("Already defined upgrade `%s'\n" _C_ ident);
 	upgrade = *tmp;
 	free(upgrade->Icon.Name);
@@ -129,15 +124,15 @@ local Upgrade* AddUpgrade(const char* ident, const char* icon,
 	upgrade = Upgrades + NumUpgrades++;
 	upgrade->OType = UpgradeType;
 	upgrade->Ident = strdup(ident);
-	*(Upgrade **) hash_add(UpgradeHash, upgrade->Ident) = upgrade;
+	*(Upgrade **)hash_add(UpgradeHash, upgrade->Ident) = upgrade;
     }
 
     if (icon) {
 	upgrade->Icon.Name = strdup(icon);
     } else {				// automatic generated icon-name
 	upgrade->Icon.Name = malloc(strlen(ident) + 5 - 8 + 1);
-	strcpy(upgrade->Icon.Name,"icon-");
-	strcpy(upgrade->Icon.Name + 5,ident + 8);
+	strcpy(upgrade->Icon.Name, "icon-");
+	strcpy(upgrade->Icon.Name + 5, ident + 8);
     }
 
     for (i = 0; i < MaxCosts; ++i) {
@@ -157,7 +152,7 @@ global Upgrade* UpgradeByIdent(const char* ident)
 {
     Upgrade** upgrade;
 
-    if( (upgrade=(Upgrade**)hash_find(UpgradeHash,(char*)ident)) ) {
+    if ((upgrade = (Upgrade**)hash_find(UpgradeHash, (char*)ident))) {
 	return *upgrade;
     }
 
@@ -188,8 +183,8 @@ global void InitUpgrades(void)
     //
     //	Resolve the icons.
     //
-    for( i=0; i<NumUpgrades; ++i ) {
-	Upgrades[i].Icon.Icon=IconByIdent(Upgrades[i].Icon.Name);
+    for (i = 0; i < NumUpgrades; ++i) {
+	Upgrades[i].Icon.Icon = IconByIdent(Upgrades[i].Icon.Name);
     }
 }
 
@@ -240,7 +235,7 @@ global void CleanUpgrades(void)
 **	@note	Only included for compatibility, for new levels use
 **		CCL (define-allow)
 */
-global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
+global void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 {
     // units allow bits -> wc2num -> internal names.
     static char unit_for_bit[64] = {
@@ -356,26 +351,26 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
     //
     //	Allow units
     //
-    for( player=Players; player<Players+16; ++player ) {
-	for( i=0; i<4; ++i ) {		// 4 bytes endian save
+    for (player = Players; player < Players + 16; ++player) {
+	for (i = 0; i < 4; ++i) {		// 4 bytes endian save
 	    int v;
 
-	    v=(*alow++)&0xFF;
-	    for( b=0; b<8; ++b ) {
-		if( unit_for_bit[i*16+0+b*2]>=0 ) {
-		    if( v&(1<<b) ) {
+	    v = (*alow++) & 0xFF;
+	    for (b = 0; b < 8; ++b) {
+		if (unit_for_bit[i * 16 + 0 + b * 2] >= 0) {
+		    if (v & (1 << b)) {
 			AllowUnitId(player,
-			    UnitTypeByWcNum(unit_for_bit[i*16+0+b*2])->Type,
+			    UnitTypeByWcNum(unit_for_bit[i * 16 + 0 + b * 2])->Type,
 				'A');
 			AllowUnitId(player,
-			    UnitTypeByWcNum(unit_for_bit[i*16+1+b*2])->Type,
+			    UnitTypeByWcNum(unit_for_bit[i * 16 + 1 + b * 2])->Type,
 				'A');
 		    } else {
 			AllowUnitId(player,
-			    UnitTypeByWcNum(unit_for_bit[i*16+0+b*2])->Type,
+			    UnitTypeByWcNum(unit_for_bit[i * 16 + 0 + b * 2])->Type,
 				'F');
 			AllowUnitId(player,
-			    UnitTypeByWcNum(unit_for_bit[i*16+1+b*2])->Type,
+			    UnitTypeByWcNum(unit_for_bit[i * 16 + 1 + b * 2])->Type,
 				'F');
 		    }
 		}
@@ -386,19 +381,19 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
     //
     //	Spells start with
     //
-    for( player=Players; player<Players+16; ++player ) {
-	for( i=0; i<4; ++i ) {
+    for (player = Players; player < Players + 16; ++player) {
+	for (i = 0; i < 4; ++i) {
 	    int v;
 
-	    v=*alow++;
-	    for( b=0; b<8; ++b ) {
-		if( spell_for_bit[i*8+b]>=0 ) {
-		    if( v&(1<<b) ) {
+	    v = *alow++;
+	    for (b = 0; b < 8; ++b) {
+		if (spell_for_bit[i * 8 + b] >= 0) {
+		    if (v & (1 << b)) {
 			AllowUpgradeId(player,
-			    UpgradeByWcNum(spell_for_bit[i*8+b])-Upgrades,'R');
+			    UpgradeByWcNum(spell_for_bit[i * 8 + b]) - Upgrades, 'R');
 		    } else {
 			AllowUpgradeId(player,
-			    UpgradeByWcNum(spell_for_bit[i*8+b])-Upgrades,'F');
+			    UpgradeByWcNum(spell_for_bit[i * 8 + b]) - Upgrades, 'F');
 		    }
 		}
 	    }
@@ -408,17 +403,17 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
     //
     //	Spells allowed
     //
-    for( player=Players; player<Players+16; ++player ) {
-	for( i=0; i<4; ++i ) {
+    for (player = Players; player < Players + 16; ++player) {
+	for (i = 0; i < 4; ++i) {
 	    int v;
 
-	    v=*alow++;
-	    for( b=0; b<8; ++b ) {
-		if( v&(1<<b) ) {
+	    v = *alow++;
+	    for (b = 0; b < 8; ++b) {
+		if (v & (1 << b)) {
 		    // FIXME: combine with 'R'esearched and 'F'orbidden
-		    if( spell_for_bit[i*8+b]>=0 ) {
+		    if (spell_for_bit[i * 8 + b] >= 0) {
 			AllowUpgradeId(player,
-			    UpgradeByWcNum(spell_for_bit[i*8+b])-Upgrades,'A');
+			    UpgradeByWcNum(spell_for_bit[i * 8 + b]) - Upgrades, 'A');
 		    }
 		}
 	    }
@@ -429,17 +424,17 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
     //	Spells researching
     //		FIXME: not useful.
     //
-    for( player=Players; player<Players+16; ++player ) {
-	for( i=0; i<4; ++i ) {
+    for (player = Players; player < Players + 16; ++player) {
+	for (i = 0; i < 4; ++i) {
 	    int v;
 
-	    v=*alow++;
-	    for( b=0; b<8; ++b ) {
-		if( v&(1<<b) ) {
+	    v = *alow++;
+	    for (b = 0; b < 8; ++b) {
+		if (v & (1 << b)) {
 		    // FIXME: combine with 'R'esearched and 'F'orbidden
-		    if( spell_for_bit[i*8+b]>=0 ) {
+		    if (spell_for_bit[i * 8 + b] >= 0) {
 			AllowUpgradeId(player,
-			    UpgradeByWcNum(spell_for_bit[i*8+b])-Upgrades,'U');
+			    UpgradeByWcNum(spell_for_bit[i * 8 + b]) - Upgrades, 'U');
 		    }
 		}
 	    }
@@ -449,20 +444,20 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
     //
     //	Upgrades allowed
     //
-    for( player=Players; player<Players+16; ++player ) {
-	for( i=0; i<4; ++i ) {
+    for (player = Players; player < Players + 16; ++player) {
+	for (i = 0; i < 4; ++i) {
 	    int v;
 
-	    v=*alow++;
-	    for( b=0; b<8; ++b ) {
-		if( v&(1<<b) ) {
-		    if( upgrade_for_bit[i*16+b*2+0]>=0 ) {
+	    v = *alow++;
+	    for (b = 0; b < 8; ++b) {
+		if (v & (1 << b)) {
+		    if (upgrade_for_bit[i * 16 + b * 2 + 0] >= 0) {
 			AllowUpgradeId(player,
-			    UpgradeByWcNum(upgrade_for_bit[i*16+b*2+0])-Upgrades
-			    ,'A');
+			    UpgradeByWcNum(upgrade_for_bit[i * 16 + b * 2 + 0]) - Upgrades,
+			    'A');
 			AllowUpgradeId(player,
-			    UpgradeByWcNum(upgrade_for_bit[i*16+b*2+1])-Upgrades
-			    ,'A');
+			    UpgradeByWcNum(upgrade_for_bit[i * 16 + b * 2 + 1])-Upgrades,
+			    'A');
 		    }
 		}
 	    }
@@ -472,20 +467,20 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
     //
     //	Upgrades acquired
     //
-    for( player=Players; player<Players+16; ++player ) {
-	for( i=0; i<4; ++i ) {
+    for (player = Players; player < Players + 16; ++player) {
+	for (i = 0; i < 4; ++i) {
 	    int v;
 
-	    v=*alow++;
-	    for( b=0; b<8; ++b ) {
-		if( v&(1<<b) ) {
-		    if( upgrade_for_bit[i*16+b*2+0]>=0 ) {
+	    v = *alow++;
+	    for (b = 0; b < 8; ++b) {
+		if (v & (1 << b)) {
+		    if (upgrade_for_bit[i * 16 + b * 2 + 0] >= 0) {
 			AllowUpgradeId(player,
-			    UpgradeByWcNum(upgrade_for_bit[i*16+b*2+0])-Upgrades
-			    ,'U');
+			    UpgradeByWcNum(upgrade_for_bit[i * 16 + b * 2 + 0]) - Upgrades,
+			    'U');
 			AllowUpgradeId(player,
-			    UpgradeByWcNum(upgrade_for_bit[i*16+b*2+1])-Upgrades
-			    ,'U');
+			    UpgradeByWcNum(upgrade_for_bit[i * 16 + b * 2 + 1]) - Upgrades,
+			    'U');
 		    }
 		}
 	    }
@@ -499,7 +494,7 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 **	@param ugrd	Pointer to ugrd area.
 **	@param length	length of ugrd area.
 */
-global void ParsePudUGRD(const char* ugrd,int length __attribute__((unused)))
+global void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 {
     int i;
     int time;
@@ -512,27 +507,26 @@ global void ParsePudUGRD(const char* ugrd,int length __attribute__((unused)))
     int costs[MaxCosts];
 
     DebugLevel3Fn(" Length %d\n" _C_ length);
-    DebugCheck( length!=780 );
+    DebugCheck(length != 780);
 
-    for( i=0; i<52; ++i ) {
-	time=((unsigned char*)ugrd)[i];
-	gold=AccessLE16(	ugrd+52+(i)*2);
-	lumber=AccessLE16(	ugrd+52+(i+52)*2);
-	oil=AccessLE16(		ugrd+52+(i+52+52)*2);
-	icon=AccessLE16(	ugrd+52+(i+52+52+52)*2);
-	group=AccessLE16(	ugrd+52+(i+52+52+52+52)*2);
-	flags=AccessLE16(	ugrd+52+(i+52+52+52+52+52)*2);
-	DebugLevel3Fn(" (%d)%s %d,%d,%d,%d (%d)%s %d %08X\n"
-		_C_ i _C_ UpgradeWcNames[i]
-		_C_ time _C_ gold _C_ lumber _C_ oil
-		_C_ icon _C_ IconWcNames[icon] _C_ group _C_ flags);
+    for (i = 0; i < 52; ++i) {
+	time = ((unsigned char*)ugrd)[i];
+	gold = AccessLE16(	ugrd + 52 + (i) * 2);
+	lumber = AccessLE16(	ugrd + 52 + (i + 52) * 2);
+	oil = AccessLE16(	ugrd + 52 + (i + 52 + 52) * 2);
+	icon = AccessLE16(	ugrd + 52 + (i + 52 + 52 + 52) * 2);
+	group = AccessLE16(	ugrd + 52 + (i + 52 + 52 + 52 + 52) * 2);
+	flags = AccessLE16(	ugrd + 52 + (i + 52 + 52 + 52 + 52 + 52) * 2);
+	DebugLevel3Fn(" (%d)%s %d,%d,%d,%d (%d)%s %d %08X\n" _C_
+	    i _C_ UpgradeWcNames[i] _C_ time _C_ gold _C_ lumber _C_ oil _C_
+	    icon _C_ IconWcNames[icon] _C_ group _C_ flags);
 
-	memset(costs,0,sizeof(costs));
-	costs[TimeCost]=time;
-	costs[GoldCost]=gold;
-	costs[WoodCost]=lumber;
-	costs[OilCost]=oil;
-	AddUpgrade(UpgradeWcNames[i],IconWcNames[icon],costs);
+	memset(costs, 0, sizeof(costs));
+	costs[TimeCost] = time;
+	costs[GoldCost] = gold;
+	costs[WoodCost] = lumber;
+	costs[OilCost] = oil;
+	AddUpgrade(UpgradeWcNames[i], IconWcNames[icon], costs);
 
 	// group+flags are to mystic to be implemented
     }
@@ -549,156 +543,156 @@ global void SaveUpgrades(CLFile* file)
     int j;
     int p;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: upgrades $Id$\n\n");
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: upgrades $Id$\n\n");
 
     /* remove?
     //
     //	Save all upgrades
     //
-    for( i=0; i<NumUpgrades; ++i ) {
-	CLprintf(file,"(define-upgrade '%s 'icon '%s\n"
-		,Upgrades[i].Ident,Upgrades[i].Icon.Name);
-	CLprintf(file,"  'costs #(");
-	for( j=0; j<MaxCosts; ++j ) {
-	    CLprintf(file," %5d",Upgrades[i].Costs[j]);
+    for (i = 0; i < NumUpgrades; ++i) {
+	CLprintf(file, "(define-upgrade '%s 'icon '%s\n",
+	    Upgrades[i].Ident, Upgrades[i].Icon.Name);
+	CLprintf(file, "  'costs #(");
+	for (j = 0; j < MaxCosts; ++j) {
+	    CLprintf(file, " %5d", Upgrades[i].Costs[j]);
 	}
-	CLprintf(file,"))\n");
+	CLprintf(file, "))\n");
     }
-    CLprintf(file,"\n");
+    CLprintf(file, "\n");
     */
 
     //
     //	Save all upgrades
     //
-    for( i=0; i<NumUpgrades; ++i ) {
-	CLprintf(file,"(define-upgrade '%s 'icon '%s\n"
-		,Upgrades[i].Ident,Upgrades[i].Icon.Name);
-	CLprintf(file,"  'costs #(");
-	for( j=0; j<MaxCosts; ++j ) {
-	    CLprintf(file," %5d",Upgrades[i].Costs[j]);
+    for (i = 0; i < NumUpgrades; ++i) {
+	CLprintf(file, "(define-upgrade '%s 'icon '%s\n",
+	    Upgrades[i].Ident, Upgrades[i].Icon.Name);
+	CLprintf(file, "  'costs #(");
+	for (j = 0; j < MaxCosts; ++j) {
+	    CLprintf(file, " %5d",Upgrades[i].Costs[j]);
 	}
 
-	CLprintf(file,"))\n");
+	CLprintf(file, "))\n");
     }
-    CLprintf(file,"\n");
+    CLprintf(file, "\n");
 
     //
     //	Save all upgrade modifiers.
     //
-    for( i=0; i<NumUpgradeModifiers; ++i ) {
-	CLprintf(file,"(define-modifier '%s",
-		Upgrades[UpgradeModifiers[i]->UpgradeId].Ident);
+    for (i = 0; i < NumUpgradeModifiers; ++i) {
+	CLprintf(file, "(define-modifier '%s",
+	    Upgrades[UpgradeModifiers[i]->UpgradeId].Ident);
 
-	if( UpgradeModifiers[i]->Modifier.AttackRange ) {
-	    CLprintf(file,"\n  '(attack-range %d)"
-		    ,UpgradeModifiers[i]->Modifier.AttackRange );
+	if (UpgradeModifiers[i]->Modifier.AttackRange) {
+	    CLprintf(file, "\n  '(attack-range %d)",
+		UpgradeModifiers[i]->Modifier.AttackRange);
 	}
-	if( UpgradeModifiers[i]->Modifier.SightRange ) {
-	    CLprintf(file,"\n  '(sight-range %d)"
-		    ,UpgradeModifiers[i]->Modifier.SightRange );
+	if (UpgradeModifiers[i]->Modifier.SightRange) {
+	    CLprintf(file, "\n  '(sight-range %d)",
+		UpgradeModifiers[i]->Modifier.SightRange);
 	}
-	if( UpgradeModifiers[i]->Modifier.BasicDamage ) {
-	    CLprintf(file,"\n  '(basic-damage %d)"
-		    ,UpgradeModifiers[i]->Modifier.BasicDamage );
+	if (UpgradeModifiers[i]->Modifier.BasicDamage) {
+	    CLprintf(file, "\n  '(basic-damage %d)",
+		UpgradeModifiers[i]->Modifier.BasicDamage);
 	}
-	if( UpgradeModifiers[i]->Modifier.PiercingDamage ) {
-	    CLprintf(file,"\n  '(piercing-damage %d)"
-		    ,UpgradeModifiers[i]->Modifier.PiercingDamage );
+	if (UpgradeModifiers[i]->Modifier.PiercingDamage) {
+	    CLprintf(file, "\n  '(piercing-damage %d)",
+		UpgradeModifiers[i]->Modifier.PiercingDamage);
 	}
-	if( UpgradeModifiers[i]->Modifier.Armor ) {
-	    CLprintf(file,"\n  '(armor %d)"
-		    ,UpgradeModifiers[i]->Modifier.Armor );
+	if (UpgradeModifiers[i]->Modifier.Armor) {
+	    CLprintf(file, "\n  '(armor %d)",
+		UpgradeModifiers[i]->Modifier.Armor);
 	}
-	if( UpgradeModifiers[i]->Modifier.Speed ) {
-	    CLprintf(file,"\n  '(speed %d)"
-		    ,UpgradeModifiers[i]->Modifier.Speed );
+	if (UpgradeModifiers[i]->Modifier.Speed) {
+	    CLprintf(file, "\n  '(speed %d)",
+		UpgradeModifiers[i]->Modifier.Speed);
 	}
-	if( UpgradeModifiers[i]->Modifier.HitPoints ) {
-	    CLprintf(file,"\n  '(hit-points %d)"
-		    ,UpgradeModifiers[i]->Modifier.HitPoints );
+	if (UpgradeModifiers[i]->Modifier.HitPoints) {
+	    CLprintf(file, "\n  '(hit-points %d)",
+		UpgradeModifiers[i]->Modifier.HitPoints);
 	}
-	if( UpgradeModifiers[i]->Modifier.RegenerationRate ) {
-	    CLprintf(file,"\n  '(regeneration-rate %d)"
-		    ,UpgradeModifiers[i]->Modifier.RegenerationRate );
+	if (UpgradeModifiers[i]->Modifier.RegenerationRate) {
+	    CLprintf(file, "\n  '(regeneration-rate %d)",
+		UpgradeModifiers[i]->Modifier.RegenerationRate);
 	}
 
-	for( j=0; j<MaxCosts; ++j ) {
-	    if( UpgradeModifiers[i]->Modifier.Costs[j] ) {
-		CLprintf(file,"\n  '(%s-cost %d)"
-		    ,DefaultResourceNames[j],UpgradeModifiers[i]->Modifier.Costs[j]);
+	for (j = 0; j < MaxCosts; ++j) {
+	    if (UpgradeModifiers[i]->Modifier.Costs[j]) {
+		CLprintf(file, "\n  '(%s-cost %d)",
+		    DefaultResourceNames[j],UpgradeModifiers[i]->Modifier.Costs[j]);
 	    }
 	}
 
-	for( j=0; j<UnitTypeMax; ++j ) {	// allow/forbid units
-	    if( UpgradeModifiers[i]->ChangeUnits[j]!='?' ) {
-		CLprintf(file,"\n  '(allow %s %d)",
-			UnitTypes[j]->Ident,
-			UpgradeModifiers[i]->ChangeUnits[j]);
+	for (j = 0; j < UnitTypeMax; ++j) {	// allow/forbid units
+	    if (UpgradeModifiers[i]->ChangeUnits[j] != '?') {
+		CLprintf(file, "\n  '(allow %s %d)",
+		    UnitTypes[j]->Ident,
+		    UpgradeModifiers[i]->ChangeUnits[j]);
 	    }
 	}
 
-	for( j=0; j<UpgradeMax; ++j ) {		// allow/forbid upgrades
-	    if( UpgradeModifiers[i]->ChangeUpgrades[j]!='?' ) {
-		CLprintf(file,"\n  '(allow %s %c)",Upgrades[j].Ident,
-			UpgradeModifiers[i]->ChangeUpgrades[j]);
+	for (j = 0; j < UpgradeMax; ++j) {		// allow/forbid upgrades
+	    if (UpgradeModifiers[i]->ChangeUpgrades[j] != '?') {
+		CLprintf(file, "\n  '(allow %s %c)",Upgrades[j].Ident,
+		    UpgradeModifiers[i]->ChangeUpgrades[j]);
 	    }
 	}
 
-	for( j=0; j<UnitTypeMax; ++j ) {	// apply to units
-	    if( UpgradeModifiers[i]->ApplyTo[j]!='?' ) {
-		CLprintf(file,"\n  '(apply-to %s)",UnitTypes[j]->Ident);
+	for (j = 0; j < UnitTypeMax; ++j) {	// apply to units
+	    if (UpgradeModifiers[i]->ApplyTo[j] != '?') {
+		CLprintf(file, "\n  '(apply-to %s)", UnitTypes[j]->Ident);
 	    }
 	}
 
-	if( UpgradeModifiers[i]->ConvertTo ) {
-	    CLprintf(file,"\n  '(convert-to %s)",
-		    ((UnitType*)UpgradeModifiers[i]->ConvertTo)->Ident);
+	if (UpgradeModifiers[i]->ConvertTo) {
+	    CLprintf(file, "\n  '(convert-to %s)",
+		((UnitType*)UpgradeModifiers[i]->ConvertTo)->Ident);
 	}
 
-	CLprintf(file,")\n\n");
+	CLprintf(file, ")\n\n");
     }
 
     //
     //	Save the allow
     //
-    for( i=0; i<NumUnitTypes; ++i ) {
-	CLprintf(file,"(define-allow '%s\t",UnitTypes[i]->Ident);
-	if( strlen(UnitTypes[i]->Ident)<9 ) {
-	    CLprintf(file,"\t\t\t\"");
-	} else if( strlen(UnitTypes[i]->Ident)<17 ) {
-	    CLprintf(file,"\t\t\"");
-	} else if( strlen(UnitTypes[i]->Ident)<25 ) {
-	    CLprintf(file,"\t\"");
+    for (i = 0; i < NumUnitTypes; ++i) {
+	CLprintf(file, "(define-allow '%s\t", UnitTypes[i]->Ident);
+	if (strlen(UnitTypes[i]->Ident) < 9) {
+	    CLprintf(file, "\t\t\t\"");
+	} else if (strlen(UnitTypes[i]->Ident) < 17) {
+	    CLprintf(file, "\t\t\"");
+	} else if (strlen(UnitTypes[i]->Ident) < 25) {
+	    CLprintf(file, "\t\"");
 	} else {
-	    CLprintf(file,"\"");
+	    CLprintf(file, "\"");
 	}
-	for( p=0; p<PlayerMax; ++p ) {
-	    CLprintf(file,"%c",Players[p].Allow.Units[i]);
+	for (p = 0; p < PlayerMax; ++p) {
+	    CLprintf(file, "%c", Players[p].Allow.Units[i]);
 	}
-	CLprintf(file,"\")\n");
+	CLprintf(file, "\")\n");
     }
-    CLprintf(file,"\n");
+    CLprintf(file, "\n");
 
     //
     //	Save the upgrades
     //
-    for( i=0; i<NumUpgrades; ++i ) {
-	CLprintf(file,"(define-allow '%s\t",Upgrades[i].Ident);
-	if( strlen(Upgrades[i].Ident)<9 ) {
-	    CLprintf(file,"\t\t\t\"");
-	} else if( strlen(Upgrades[i].Ident)<17 ) {
-	    CLprintf(file,"\t\t\"");
-	} else if( strlen(Upgrades[i].Ident)<25 ) {
-	    CLprintf(file,"\t\"");
+    for (i = 0; i < NumUpgrades; ++i) {
+	CLprintf(file, "(define-allow '%s\t", Upgrades[i].Ident);
+	if (strlen(Upgrades[i].Ident) < 9) {
+	    CLprintf(file, "\t\t\t\"");
+	} else if (strlen(Upgrades[i].Ident) < 17) {
+	    CLprintf(file, "\t\t\"");
+	} else if (strlen(Upgrades[i].Ident) < 25) {
+	    CLprintf(file, "\t\"");
 	} else {
-	    CLprintf(file,"\"");
+	    CLprintf(file, "\"");
 	}
-	for( p=0; p<PlayerMax; ++p ) {
-	    CLprintf(file,"%c",Players[p].Allow.Upgrades[i]);
+	for (p = 0; p < PlayerMax; ++p) {
+	    CLprintf(file, "%c", Players[p].Allow.Upgrades[i]);
 	}
-	CLprintf(file,"\"");
-	CLprintf(file,")\n");
+	CLprintf(file, "\"");
+	CLprintf(file, ")\n");
     }
 }
 
@@ -733,98 +727,98 @@ local SCM CclDefineModifier(SCM list)
     char apply_to[UnitTypeMax];
     UnitType* convert_to;
 
-    attack_range=0;
-    sight_range=0;
-    basic_damage=0;
-    piercing_damage=0;
-    armor=0;
-    speed=0;
-    hit_points=0;
-    regeneration_rate=0;
-    memset(costs,0,sizeof(costs));
-    memset(units,'?',sizeof(units));
-    memset(upgrades,'?',sizeof(upgrades));
-    memset(apply_to,'?',sizeof(apply_to));
-    convert_to=NULL;
+    attack_range = 0;
+    sight_range = 0;
+    basic_damage = 0;
+    piercing_damage = 0;
+    armor = 0;
+    speed = 0;
+    hit_points = 0;
+    regeneration_rate = 0;
+    memset(costs, 0, sizeof(costs));
+    memset(units, '?', sizeof(units));
+    memset(upgrades, '?', sizeof(upgrades));
+    memset(apply_to, '?', sizeof(apply_to));
+    convert_to = NULL;
 
-    value=gh_car(list);
-    list=gh_cdr(list);
+    value = gh_car(list);
+    list = gh_cdr(list);
 
-    str=gh_scm2newstr(value,NULL);
-    uid=UpgradeIdByIdent(str);
+    str = gh_scm2newstr(value, NULL);
+    uid = UpgradeIdByIdent(str);
     free(str);
 
-    while( !gh_null_p(list) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
-	if( !gh_list_p(value) ) {
-	    errl("wrong tag",value);
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (!gh_list_p(value)) {
+	    errl("wrong tag", value);
 	    return SCM_UNSPECIFIED;
 	}
-	temp=gh_car(value);
-	if( gh_eq_p(temp,gh_symbol2scm("attack-range")) ) {
-	    attack_range=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("sight-range")) ) {
-	    sight_range=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("basic-damage")) ) {
-	    basic_damage=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("piercing-damage")) ) {
-	    piercing_damage=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("armor")) ) {
-	    armor=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("speed")) ) {
-	    speed=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("hit-points")) ) {
-	    hit_points=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("regeneration-rate")) ) {
-	    regeneration_rate=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("time-cost")) ) {
-	    costs[0]=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("gold-cost")) ) {
-	    costs[1]=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("wood-cost")) ) {
-	    costs[2]=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("oil-cost")) ) {
-	    costs[3]=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("ore-cost")) ) {
-	    costs[4]=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("stone-cost")) ) {
-	    costs[5]=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("coal-cost")) ) {
-	    costs[6]=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("allow")) ) {
-	    value=gh_cdr(value);
-	    str=gh_scm2newstr(gh_car(value),NULL);
-	    value=gh_cdr(value);
+	temp = gh_car(value);
+	if (gh_eq_p(temp, gh_symbol2scm("attack-range"))) {
+	    attack_range = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("sight-range"))) {
+	    sight_range = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("basic-damage"))) {
+	    basic_damage = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("piercing-damage"))) {
+	    piercing_damage = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("armor"))) {
+	    armor = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("speed"))) {
+	    speed = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("hit-points"))) {
+	    hit_points = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("regeneration-rate"))) {
+	    regeneration_rate = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("time-cost"))) {
+	    costs[0] = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("gold-cost"))) {
+	    costs[1] = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("wood-cost"))) {
+	    costs[2] = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("oil-cost"))) {
+	    costs[3] = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("ore-cost"))) {
+	    costs[4] = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("stone-cost"))) {
+	    costs[5] = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("coal-cost"))) {
+	    costs[6] = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("allow"))) {
+	    value = gh_cdr(value);
+	    str = gh_scm2newstr(gh_car(value), NULL);
+	    value = gh_cdr(value);
 	    DebugLevel3Fn("%s\n" _C_ str);
-	    if( !strncmp(str,"upgrade-",8) ) {
-		upgrades[UpgradeIdByIdent(str)]=gh_scm2int(gh_car(value));
-	    } else if( !strncmp(str,"unit-",5) ) {
-		units[UnitTypeIdByIdent(str)]=gh_scm2int(gh_car(value));
+	    if (!strncmp(str, "upgrade-", 8)) {
+		upgrades[UpgradeIdByIdent(str)] = gh_scm2int(gh_car(value));
+	    } else if (!strncmp(str, "unit-", 5)) {
+		units[UnitTypeIdByIdent(str)] = gh_scm2int(gh_car(value));
 	    } else {
 		free(str);
-		errl("upgrade or unit expected",NIL);
+		errl("upgrade or unit expected", NIL);
 	    }
 	    free(str);
-	} else if( gh_eq_p(temp,gh_symbol2scm("apply-to")) ) {
-	    value=gh_cdr(value);
-	    str=gh_scm2newstr(gh_car(value),NULL);
-	    apply_to[UnitTypeIdByIdent(str)]='X';
+	} else if (gh_eq_p(temp, gh_symbol2scm("apply-to"))) {
+	    value = gh_cdr(value);
+	    str = gh_scm2newstr(gh_car(value), NULL);
+	    apply_to[UnitTypeIdByIdent(str)] = 'X';
 	    free(str);
-	} else if( gh_eq_p(temp,gh_symbol2scm("convert-to")) ) {
-	    value=gh_cdr(value);
-	    str=gh_scm2newstr(gh_car(value),NULL);
-	    convert_to=UnitTypeByIdent(str);
+	} else if (gh_eq_p(temp, gh_symbol2scm("convert-to"))) {
+	    value = gh_cdr(value);
+	    str = gh_scm2newstr(gh_car(value), NULL);
+	    convert_to = UnitTypeByIdent(str);
 	    free(str);
 	} else {
-	    errl("wrong tag",temp);
+	    errl("wrong tag", temp);
 	    return SCM_UNSPECIFIED;
 	}
     }
 
-    AddUpgradeModifierBase(uid,attack_range,sight_range,
-	    basic_damage,piercing_damage,armor,speed,hit_points,regeneration_rate,costs,
-	    units,upgrades,apply_to,convert_to);
+    AddUpgradeModifierBase(uid, attack_range, sight_range, basic_damage,
+	piercing_damage, armor, speed, hit_points, regeneration_rate, costs,
+	units,upgrades, apply_to,convert_to);
 
     return SCM_UNSPECIFIED;
 }
@@ -846,49 +840,49 @@ local SCM CclDefineUpgrade(SCM list)
 
     //	Identifier
 
-    ident=gh_scm2newstr(gh_car(list),NULL);
-    list=gh_cdr(list);
+    ident = gh_scm2newstr(gh_car(list), NULL);
+    list = gh_cdr(list);
 
-    icon=NULL;
-    memset(costs,0,sizeof(costs));
+    icon = NULL;
+    memset(costs, 0, sizeof(costs));
 
-    while( !gh_null_p(list) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
-	if( gh_eq_p(value,gh_symbol2scm("icon")) ) {
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("icon"))) {
 	    //	Icon
 
-	    if( icon ) {
+	    if (icon) {
 		free(icon);
 	    }
-	    icon=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("costs")) ) {
+	    icon = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("costs"))) {
 	    //	Costs
 
-	    value=gh_car(list);
-	    list=gh_cdr(list);
-	    n=gh_vector_length(value);
-	    if( n<4 || n>MaxCosts ) {
-		fprintf(stderr,"%s: Wrong vector length\n",ident);
-		if( n>MaxCosts ) {
-		    n=MaxCosts;
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    n = gh_vector_length(value);
+	    if (n < 4 || n > MaxCosts) {
+		fprintf(stderr, "%s: Wrong vector length\n", ident);
+		if (n > MaxCosts) {
+		    n = MaxCosts;
 		}
 	    }
-	    for( j=0; j<n; ++j ) {
-		costs[j]=gh_scm2int(gh_vector_ref(value,gh_int2scm(j)));
+	    for (j = 0; j < n; ++j) {
+		costs[j] = gh_scm2int(gh_vector_ref(value, gh_int2scm(j)));
 	    }
-	    while( j<MaxCosts ) {
-		costs[j++]=0;
+	    while (j < MaxCosts) {
+		costs[j++] = 0;
 	    }
 	} else {
-	    str=gh_scm2newstr(value,NULL);
-	    fprintf(stderr,"%s: Wrong tag `%s'\n",ident,str);
+	    str = gh_scm2newstr(value, NULL);
+	    fprintf(stderr, "%s: Wrong tag `%s'\n", ident, str);
 	    free(str);
 	}
     }
 
-    AddUpgrade(ident,icon,costs);
+    AddUpgrade(ident, icon, costs);
     free(ident);
     free(icon);
 
@@ -906,22 +900,22 @@ local SCM CclDefineAllow(SCM list)
     int i;
     int n;
 
-    while( !gh_null_p(list) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
-	str=gh_scm2newstr(value,NULL);
-	value=gh_car(list);
-	list=gh_cdr(list);
-	ids=gh_scm2newstr(value,NULL);
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	str = gh_scm2newstr(value, NULL);
+	value = gh_car(list);
+	list = gh_cdr(list);
+	ids = gh_scm2newstr(value, NULL);
 
-	n=strlen(ids);
-	if( n>16 ) {
-	    fprintf(stderr,"%s: Allow string too long %d\n",str,n);
-	    n=16;
+	n = strlen(ids);
+	if (n > 16) {
+	    fprintf(stderr, "%s: Allow string too long %d\n", str, n);
+	    n = 16;
 	}
 
-	for( i=0; i<n; ++i ) {
-	    AllowByIdent(&Players[i],str,ids[i]);
+	for (i = 0; i < n; ++i) {
+	    AllowByIdent(&Players[i], str, ids[i]);
 	}
 
 	free(str);
@@ -941,8 +935,8 @@ local SCM CclDefineUpgradeWcNames(SCM list)
     int i;
     char** cp;
 
-    if( (cp=UpgradeWcNames) ) {		// Free all old names
-	while( *cp ) {
+    if ((cp = UpgradeWcNames)) {		// Free all old names
+	while (*cp) {
 	    free(*cp++);
 	}
 	free(UpgradeWcNames);
@@ -951,13 +945,13 @@ local SCM CclDefineUpgradeWcNames(SCM list)
     //
     //	Get new table.
     //
-    i=gh_length(list);
-    UpgradeWcNames=cp=malloc((i+1)*sizeof(char*));
-    while( i-- ) {
-	*cp++=gh_scm2newstr(gh_car(list),NULL);
-	list=gh_cdr(list);
+    i = gh_length(list);
+    UpgradeWcNames = cp = malloc((i + 1) * sizeof(char*));
+    while (i--) {
+	*cp++ = gh_scm2newstr(gh_car(list), NULL);
+	list = gh_cdr(list);
     }
-    *cp=NULL;
+    *cp = NULL;
 
     return SCM_UNSPECIFIED;
 }
@@ -967,42 +961,12 @@ local SCM CclDefineUpgradeWcNames(SCM list)
 */
 global void UpgradesCclRegister(void)
 {
-    gh_new_procedureN("define-modifier",CclDefineModifier);
-    gh_new_procedureN("define-upgrade",CclDefineUpgrade);
-    gh_new_procedureN("define-allow",CclDefineAllow);
+    gh_new_procedureN("define-modifier", CclDefineModifier);
+    gh_new_procedureN("define-upgrade", CclDefineUpgrade);
+    gh_new_procedureN("define-allow", CclDefineAllow);
 
-    gh_new_procedureN("define-upgrade-wc-names",CclDefineUpgradeWcNames);
+    gh_new_procedureN("define-upgrade-wc-names", CclDefineUpgradeWcNames);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1031,18 +995,18 @@ global void UpgradesCclRegister(void)
 **	@param convert_to	Converts units to this unit-type.
 **
 **	@return			upgrade modifier id or -1 for error
-**			( actually this id is useless, just error checking )
+**			(actually this id is useless, just error checking)
 */
-local int AddUpgradeModifierBase(int uid,int attack_range,int sight_range,
-    int basic_damage,int piercing_damage,int armor,int speed,
-    int hit_points,int regeneration_rate, int* costs,const char* af_units,
-    const char* af_upgrades,const char* apply_to,UnitType* convert_to)
+local int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
+    int basic_damage, int piercing_damage, int armor, int speed,
+    int hit_points, int regeneration_rate, int* costs,const char* af_units,
+    const char* af_upgrades, const char* apply_to, UnitType* convert_to)
 {
     int i;
-    UpgradeModifier *um;
+    UpgradeModifier* um;
 
-    um=(UpgradeModifier*)malloc(sizeof(UpgradeModifier));
-    if( !um ) {
+    um = (UpgradeModifier*)malloc(sizeof(UpgradeModifier));
+    if (!um) {
 	return -1;
     }
 
@@ -1058,49 +1022,41 @@ local int AddUpgradeModifierBase(int uid,int attack_range,int sight_range,
     um->Modifier.HitPoints	= hit_points;
     um->Modifier.RegenerationRate = regeneration_rate;
 
-    for( i=0; i<MaxCosts; ++i ) {
+    for (i = 0; i < MaxCosts; ++i) {
 	um->Modifier.Costs[i]	= costs[i];
     }
 
-    memcpy(um->ChangeUnits,af_units,sizeof(um->ChangeUnits));
-    memcpy(um->ChangeUpgrades,af_upgrades,sizeof(um->ChangeUpgrades));
-    memcpy(um->ApplyTo,apply_to,sizeof(um->ApplyTo));
+    memcpy(um->ChangeUnits, af_units, sizeof(um->ChangeUnits));
+    memcpy(um->ChangeUpgrades, af_upgrades, sizeof(um->ChangeUpgrades));
+    memcpy(um->ApplyTo, apply_to, sizeof(um->ApplyTo));
 
-    um->ConvertTo=convert_to;
+    um->ConvertTo = convert_to;
 
     UpgradeModifiers[NumUpgradeModifiers] = um;
 
     return NumUpgradeModifiers++;
 }
 
-
-// returns upgrade modifier id or -1 for error ( actually this id is useless, just error checking )
-local int AddUpgradeModifier( int uid,
-    int attack_range,
-    int sight_range,
-    int basic_damage,
-    int piercing_damage,
-    int armor,
-    int speed,
-    int hit_points,
-
-    int* costs,
-
+/**
+**	returns upgrade modifier id or -1 for error (actually this id is
+**	useless, just error checking)
+*/
+local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
+    int basic_damage, int piercing_damage, int armor, int speed,
+    int hit_points, int* costs,
     // following are comma separated list of required string id's
-
     const char* af_units,    // "A:unit-mage,F:unit-grunt" -- allow mages, forbid grunts
     const char* af_upgrades, // "F:upgrade-Shield1,R:upgrade-ShieldTotal" -- :)
     const char* apply_to	    // "unit-peon,unit-peasant"
-
     )
 {
-    char *s1;
-    char *s2;
+    char* s1;
+    char* s2;
     int i;
-    UpgradeModifier *um;
+    UpgradeModifier* um;
 
-    um=(UpgradeModifier*)malloc(sizeof(UpgradeModifier));
-    if( !um ) {
+    um = (UpgradeModifier*)malloc(sizeof(UpgradeModifier));
+    if (!um) {
 	return -1;
     }
 
@@ -1115,29 +1071,29 @@ local int AddUpgradeModifier( int uid,
     um->Modifier.Speed		= speed;
     um->Modifier.HitPoints	= hit_points;
 
-    for( i=0; i<MaxCosts; ++i ) {
-	um->Modifier.Costs[i]	= costs[i];
+    for (i = 0; i < MaxCosts; ++i) {
+	um->Modifier.Costs[i] = costs[i];
     }
 
     // FIXME: all the thing below is sensitive to the format of the string!
     // FIXME: it will be good if things are checked for errors better!
     // FIXME: perhaps the function `strtok()' should be replaced with local one?
 
-    memset( um->ChangeUnits,    '?', sizeof(um->ChangeUnits)   );
-    memset( um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
-    memset( um->ApplyTo,        '?', sizeof(um->ApplyTo)       );
+    memset(um->ChangeUnits,    '?', sizeof(um->ChangeUnits));
+    memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
+    memset(um->ApplyTo,        '?', sizeof(um->ApplyTo));
 
     //
     // get allow/forbid's for units
     //
-    s1 = strdup( af_units );
+    s1 = strdup(af_units);
     DebugCheck(!s1);
-    for( s2 = strtok( s1, "," ); s2; s2=strtok( NULL, "," ) ) {
+    for (s2 = strtok(s1, ","); s2; s2 = strtok(NULL, ",")) {
 	int id;
-	DebugCheck(! (s2[0] == 'A' || s2[0] == 'F' ));
-	DebugCheck(! (s2[1] == ':' ));
-	id = UnitTypeIdByIdent( s2+2 );
-	if ( id == -1 ) {
+	DebugCheck(!(s2[0] == 'A' || s2[0] == 'F'));
+	DebugCheck(!(s2[1] == ':'));
+	id = UnitTypeIdByIdent(s2 + 2);
+	if (id == -1) {
 	    continue;		// should we cancel all and return error?!
 	}
 	um->ChangeUnits[id] = s2[0];
@@ -1147,14 +1103,14 @@ local int AddUpgradeModifier( int uid,
     //
     // get allow/forbid's for upgrades
     //
-    s1 = strdup( af_upgrades );
+    s1 = strdup(af_upgrades);
     DebugCheck(!s1);
-    for( s2 = strtok( s1, "," ); s2; s2=strtok( NULL, "," ) ) {
+    for (s2 = strtok(s1, ","); s2; s2 = strtok(NULL, ",")) {
 	int id;
-	DebugCheck(!( s2[0] == 'A' || s2[0] == 'F' || s2[0] == 'R' ));
-	DebugCheck(!( s2[1] == ':' ));
-	id = UpgradeIdByIdent( s2+2 );
-	if ( id == -1 ) {
+	DebugCheck(!(s2[0] == 'A' || s2[0] == 'F' || s2[0] == 'R'));
+	DebugCheck(!(s2[1] == ':'));
+	id = UpgradeIdByIdent(s2 + 2);
+	if (id == -1) {
 	    continue;		// should we cancel all and return error?!
 	}
 	um->ChangeUpgrades[id] = s2[0];
@@ -1164,14 +1120,14 @@ local int AddUpgradeModifier( int uid,
     //
     // get units that are affected by this upgrade
     //
-    s1 = strdup( apply_to );
+    s1 = strdup(apply_to);
     DebugCheck(!s1);
-    for( s2 = strtok( s1, "," ); s2; s2=strtok( NULL, "," ) ) {
+    for (s2 = strtok(s1, ","); s2; s2 = strtok(NULL, ",")) {
 	int id;
 
 	DebugLevel3Fn(" %s\n" _C_ s2);
-	id = UnitTypeIdByIdent( s2 );
-	if ( id == -1 ) {
+	id = UnitTypeIdByIdent(s2);
+	if (id == -1) {
 	    break;		// cade: should we cancel all and return error?!
 	}
 	um->ApplyTo[id] = 'X';	// something other than '?'
@@ -1181,40 +1137,34 @@ local int AddUpgradeModifier( int uid,
     UpgradeModifiers[NumUpgradeModifiers] = um;
     NumUpgradeModifiers++;
 
-    return NumUpgradeModifiers-1;
+    return NumUpgradeModifiers - 1;
 }
 
-// this function is used for define `simple' upgrades
-// with only one modifier
-global void AddSimpleUpgrade( const char* ident,
-    const char* icon,
+/**
+**	this function is used for define `simple' upgrades
+**	with only one modifier
+*/
+global void AddSimpleUpgrade(const char* ident, const char* icon,
     // upgrade costs
     int* costs,
     // upgrade modifiers
-    int attack_range,
-    int sight_range,
-    int basic_damage,
-    int piercing_damage,
-    int armor,
-    int speed,
-    int hit_points,
-
+    int attack_range, int sight_range, int basic_damage, int piercing_damage,
+    int armor, int speed, int hit_points,
     int* mcosts,
-
     const char* apply_to		// "unit-peon,unit-peasant"
     )
 {
     Upgrade* up;
 
-    up = AddUpgrade(ident,icon,costs);
-    if ( !up )  {
+    up = AddUpgrade(ident, icon, costs);
+    if (!up)  {
 	return;
     }
-    AddUpgradeModifier(up-Upgrades,attack_range,sight_range,basic_damage,
-	    piercing_damage,armor,speed,hit_points,
-	    mcosts,
-	    "","", // no allow/forbid maps
-	    apply_to);
+    AddUpgradeModifier(up-Upgrades, attack_range, sight_range, basic_damage,
+	piercing_damage, armor, speed, hit_points,
+	mcosts,
+	"", "", // no allow/forbid maps
+	apply_to);
 }
 
 /*----------------------------------------------------------------------------
@@ -1234,7 +1184,7 @@ global int UnitTypeIdByIdent(const char* ident)
 {
     UnitType* type;
 
-    if( (type=UnitTypeByIdent(ident)) ) {
+    if ((type = UnitTypeByIdent(ident))) {
 	return type->Type;
     }
     DebugLevel0Fn(" fix this %s\n" _C_ ident);
@@ -1251,8 +1201,8 @@ global int UpgradeIdByIdent(const char* ident)
 {
     Upgrade* upgrade;
 
-    upgrade=UpgradeByIdent(ident);
-    if( upgrade ) {
+    upgrade = UpgradeByIdent(ident);
+    if (upgrade) {
 	return upgrade-Upgrades;
     }
     DebugLevel0Fn(" fix this %s\n" _C_ ident);
@@ -1274,7 +1224,7 @@ global int UpgradeIdByIdent(const char* ident)
 **	@param id	Upgrade id number.
 **	@param amount	Value to add to timer. -1 to cancel upgrade
 */
-global void UpgradeIncTime(Player * player, int id, int amount)
+global void UpgradeIncTime(Player* player, int id, int amount)
 {
     player->UpgradeTimers.Upgrades[id] += amount;
     if (player->UpgradeTimers.Upgrades[id] >= Upgrades[id].Costs[TimeCost]) {
@@ -1290,40 +1240,40 @@ global void UpgradeIncTime(Player * player, int id, int amount)
 **	@param src	From this unit-type.
 **	@param dst	To this unit-type.
 */
-local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
+local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 {
     Unit* unit;
     int i;
     int j;
 
-    for( i=0; i<player->TotalNumUnits; ++i ) {
-	unit=player->Units[i];
+    for (i = 0; i < player->TotalNumUnits; ++i) {
+	unit = player->Units[i];
 	//
 	//	Convert already existing units to this type.
 	//
-	if( unit->Type==src ) {
-	    unit->HP+=dst->Stats[player->Player].HitPoints
-		    -unit->Stats->HitPoints;
+	if (unit->Type == src) {
+	    unit->HP += dst->Stats[player->Player].HitPoints -
+		unit->Stats->HitPoints;
 	    // don't have such unit now
 	    player->UnitTypesCount[src->Type]--;
 	    // UnMark the Unit sight for conversion if on map
 	    if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
-		src->TileWidth != dst->TileWidth ||
-		src->TileHeight != dst->TileHeight) && !unit->Removed) {
+		    src->TileWidth != dst->TileWidth ||
+		    src->TileHeight != dst->TileHeight) && !unit->Removed) {
 		MapUnmarkUnitSight(unit);
 	    }
-	    unit->Type=dst;
-	    unit->Stats=&dst->Stats[player->Player];
+	    unit->Type = dst;
+	    unit->Stats = &dst->Stats[player->Player];
 	    // and we have new one...
 	    player->UnitTypesCount[dst->Type]++;
-	    UpdateForNewUnit(unit,1);
-	    if( dst->CanCastSpell ) {
-		unit->Mana=MAGIC_FOR_NEW_UNITS;
+	    UpdateForNewUnit(unit, 1);
+	    if (dst->CanCastSpell) {
+		unit->Mana = MAGIC_FOR_NEW_UNITS;
 	    }
 	    if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
-		src->TileWidth != dst->TileWidth ||
-		src->TileHeight != dst->TileHeight) && !unit->Removed) {
-		unit->CurrentSightRange=dst->Stats[player->Player].SightRange;
+		    src->TileWidth != dst->TileWidth ||
+		    src->TileHeight != dst->TileHeight) && !unit->Removed) {
+		unit->CurrentSightRange = dst->Stats[player->Player].SightRange;
 		MapMarkUnitSight(unit);
 	    }
 	    
@@ -1333,20 +1283,20 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 	//	FIXME: what about buildings?
 	//
 	} else {
-	    if( unit->Orders[0].Action==UnitActionTrain ) {
-		for( j=0; j<unit->Data.Train.Count; ++j ) {
-		     if( unit->Data.Train.What[j]==src ) {
-			unit->Data.Train.What[j]=dst;
-			if( IsOnlySelected(unit) ) {
-			    MustRedraw|=RedrawInfoPanel;
+	    if (unit->Orders[0].Action == UnitActionTrain) {
+		for (j = 0; j < unit->Data.Train.Count; ++j) {
+		     if (unit->Data.Train.What[j] == src) {
+			unit->Data.Train.What[j] = dst;
+			if (IsOnlySelected(unit)) {
+			    MustRedraw |= RedrawInfoPanel;
 			}
 		     }
 		}
 	    }
-	    for( j=1; j<unit->OrderCount; ++j ) {
-		if( unit->Orders[j].Action==UnitActionTrain
-			&& unit->Orders[j].Type==src ) {
-		    unit->Orders[j].Type=dst;
+	    for (j = 1; j < unit->OrderCount; ++j) {
+		if (unit->Orders[j].Action == UnitActionTrain &&
+			unit->Orders[j].Type == src) {
+		    unit->Orders[j].Type = dst;
 		}
 	    }
 	}
@@ -1362,14 +1312,14 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 **	@param player	Player that get all the upgrades.
 **	@param um	Upgrade modifier that do the effects
 */
-local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
+local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 {
     int z;
     int j;
     int pn;
 
     pn = player->Player;		// player number
-    for (z = 0; z < UpgradeMax; z++) {
+    for (z = 0; z < UpgradeMax; ++z) {
 	// allow/forbid upgrades for player.  only if upgrade is not acquired
 
 	// FIXME: check if modify is allowed
@@ -1388,7 +1338,7 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 	}
     }
 
-    for (z = 0; z < UnitTypeMax; z++) {
+    for (z = 0; z < UnitTypeMax; ++z) {
 	// allow/forbid unit types for player
 
 	// FIXME: check if modify is allowed
@@ -1415,21 +1365,21 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 		int numunits;
 		Unit* sightupgrade[UnitMax];
 		
-		numunits = FindUnitsByType(UnitTypes[z],sightupgrade);
+		numunits = FindUnitsByType(UnitTypes[z], sightupgrade);
 		numunits--; // Change to 0 Start not 1 start
 		while (numunits >= 0) {
 		    if (sightupgrade[numunits]->Player->Player == player->Player &&
-		    	!sightupgrade[numunits]->Removed) {
+		    	    !sightupgrade[numunits]->Removed) {
 			MapUnmarkUnitSight(sightupgrade[numunits]);
-			sightupgrade[numunits]->CurrentSightRange=UnitTypes[z]->Stats[pn].SightRange;
+			sightupgrade[numunits]->CurrentSightRange =
+			    UnitTypes[z]->Stats[pn].SightRange;
 			MapMarkUnitSight(sightupgrade[numunits]);
 		    }                                   
-		    numunits--;
+		    --numunits;
 		}
 	    }
 	    UnitTypes[z]->Stats[pn].BasicDamage += um->Modifier.BasicDamage;
-	    UnitTypes[z]->Stats[pn].PiercingDamage
-		    += um->Modifier.PiercingDamage;
+	    UnitTypes[z]->Stats[pn].PiercingDamage += um->Modifier.PiercingDamage;
 	    UnitTypes[z]->Stats[pn].Armor += um->Modifier.Armor;
 	    UnitTypes[z]->Stats[pn].Speed += um->Modifier.Speed;
 	    UnitTypes[z]->Stats[pn].HitPoints += um->Modifier.HitPoints;
@@ -1442,9 +1392,9 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 
 	    UnitTypes[z]->Stats[pn].Level++;
 
-	    if( um->ConvertTo ) {
+	    if (um->ConvertTo) {
 		((UnitType*)um->ConvertTo)->Stats[pn].Level++;
-		ConvertUnitTypeTo(player,UnitTypes[z],um->ConvertTo);
+		ConvertUnitTypeTo(player,UnitTypes[z], um->ConvertTo);
 	    }
 	}
     }
@@ -1457,41 +1407,43 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 **	@param player	Player researching the upgrade.
 **	@param upgrade	Upgrade ready researched.
 */
-global void UpgradeAcquire( Player* player, const Upgrade* upgrade )
+global void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 {
     int z;
     int id;
 
-    id=upgrade-Upgrades;
+    id = upgrade-Upgrades;
     player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
-    AllowUpgradeId( player, id, 'R' );		// research done
+    AllowUpgradeId(player, id, 'R');		// research done
 
-    for ( z = 0; z < NumUpgradeModifiers; z++ ) {
-	if ( UpgradeModifiers[z]->UpgradeId == id ) {
-	    ApplyUpgradeModifier( player, UpgradeModifiers[z] );
+    for (z = 0; z < NumUpgradeModifiers; ++z) {
+	if (UpgradeModifiers[z]->UpgradeId == id) {
+	    ApplyUpgradeModifier(player, UpgradeModifiers[z]);
 	}
     }
 
     //
     //	Upgrades could change the buttons displayed.
     //
-    if( player==ThisPlayer ) {
+    if (player == ThisPlayer) {
 	SelectedUnitChanged();
-	MustRedraw|=RedrawInfoPanel;
+	MustRedraw |= RedrawInfoPanel;
     }
 }
 
-// for now it will be empty?
-// perhaps acquired upgrade can be lost if ( for example ) a building is lost
-// ( lumber mill? stronghold? )
-// this function will apply all modifiers in reverse way
-global void UpgradeLost( Player* player, int id )
+/**
+**	for now it will be empty?
+**	perhaps acquired upgrade can be lost if (for example) a building is lost
+**	(lumber mill? stronghold?)
+**	this function will apply all modifiers in reverse way
+*/
+global void UpgradeLost(Player* player, int id)
 {
-  return; //FIXME: remove this if implemented below
+    return; //FIXME: remove this if implemented below
 
-  player->UpgradeTimers.Upgrades[id] = 0;
-  AllowUpgradeId( player, id, 'A' ); // research is lost i.e. available
-  // FIXME: here we should reverse apply upgrade...
+    player->UpgradeTimers.Upgrades[id] = 0;
+    AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
+    // FIXME: here we should reverse apply upgrade...
 }
 
 /*----------------------------------------------------------------------------
@@ -1509,7 +1461,7 @@ global void UpgradeLost( Player* player, int id )
 */
 global void AllowUnitId(Player* player, int id, char af)
 {
-    DebugCheck(!(af == 'A' || af == 'F' || af == 'R' ));
+    DebugCheck(!(af == 'A' || af == 'F' || af == 'R'));
     player->Allow.Units[id] = af;
 }
 
@@ -1532,7 +1484,7 @@ global void AllowUpgradeId(Player* player, int id, char af)
 global char UnitIdAllowed(const Player* player, int id)
 {
     // JOHNS: Don't be kind, the people should code correct!
-    DebugCheck( id < 0 || id >= UpgradeMax );
+    DebugCheck(id < 0 || id >= UpgradeMax);
     if (id < 0 || id >= UpgradeMax) {
 	return 'F';
     }
@@ -1542,10 +1494,10 @@ global char UnitIdAllowed(const Player* player, int id)
 /**
 **	FIXME: docu
 */
-global char UpgradeIdAllowed(const Player* player,  int id )
+global char UpgradeIdAllowed(const Player* player, int id)
 {
     // JOHNS: Don't be kind, the people should code correct!
-    DebugCheck( id < 0 || id >= UpgradeMax );
+    DebugCheck(id < 0 || id >= UpgradeMax);
 
     return player->Allow.Upgrades[id];
 }
@@ -1555,7 +1507,7 @@ global char UpgradeIdAllowed(const Player* player,  int id )
 /**
 **	FIXME: docu
 */
-global void UpgradeIncTime2(Player * player, char *ident, int amount)	// by ident string
+global void UpgradeIncTime2(Player* player, char* ident, int amount)	// by ident string
 {
     UpgradeIncTime(player, UpgradeIdByIdent(ident), amount);
 }
@@ -1563,7 +1515,7 @@ global void UpgradeIncTime2(Player * player, char *ident, int amount)	// by iden
 /**
 **	FIXME: docu
 */
-global void UpgradeLost2(Player * player, char *ident)	// by ident string
+global void UpgradeLost2(Player* player, char* ident)	// by ident string
 {
     UpgradeLost(player, UpgradeIdByIdent(ident));
 }
@@ -1571,7 +1523,7 @@ global void UpgradeLost2(Player * player, char *ident)	// by ident string
 /**
 **	FIXME: docu
 */
-global void AllowUnitByIdent(Player * player, const char *ident, char af)
+global void AllowUnitByIdent(Player* player, const char* ident, char af)
 {
     AllowUnitId(player, UnitTypeIdByIdent(ident), af);
 }
@@ -1579,7 +1531,7 @@ global void AllowUnitByIdent(Player * player, const char *ident, char af)
 /**
 **	FIXME: docu
 */
-global void AllowUpgradeByIdent(Player * player, const char *ident, char af)
+global void AllowUpgradeByIdent(Player* player, const char* ident, char af)
 {
     AllowUpgradeId(player, UpgradeIdByIdent(ident), af);
 }
@@ -1587,12 +1539,12 @@ global void AllowUpgradeByIdent(Player * player, const char *ident, char af)
 /**
 **	FIXME: docu
 */
-global void AllowByIdent(Player* player,  const char* ident, char af )
+global void AllowByIdent(Player* player,  const char* ident, char af)
 {
-    if( !strncmp(ident,"unit-",5) ) {
-	AllowUnitByIdent(player,ident,af);
-    } else if( !strncmp(ident,"upgrade-",8) ) {
-	AllowUpgradeByIdent(player,ident,af);
+    if (!strncmp(ident, "unit-", 5)) {
+	AllowUnitByIdent(player, ident, af);
+    } else if (!strncmp(ident, "upgrade-", 8)) {
+	AllowUpgradeByIdent(player, ident, af);
     } else {
 	DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
     }
@@ -1609,7 +1561,7 @@ global void AllowByIdent(Player* player,  const char* ident, char af )
 **
 **	@see Allow
 */
-global char UnitIdentAllowed(const Player * player, const char *ident)
+global char UnitIdentAllowed(const Player* player, const char* ident)
 {
     return UnitIdAllowed(player, UnitTypeIdByIdent(ident));
 }
@@ -1646,7 +1598,7 @@ global char UpgradeIdentAllowed(const Player* player, const char* ident)
 **	@param player	Player pointer.
 **	@param ident	Upgrade ident.
 */
-global int UpgradeIdentAvailable(const Player* player,const char* ident)
+global int UpgradeIdentAvailable(const Player* player, const char* ident)
 {
     int allow;
 
@@ -1654,15 +1606,15 @@ global int UpgradeIdentAvailable(const Player* player,const char* ident)
     //
     //	Check dependencies
     //
-    if( !CheckDependByIdent(player,ident) ) {
+    if (!CheckDependByIdent(player, ident)) {
 	return 0;
     }
 #endif
     //
     //	Allowed by level
     //
-    allow=UpgradeIdentAllowed(player,ident);
-    return allow=='R' || allow=='X';
+    allow = UpgradeIdentAllowed(player, ident);
+    return allow == 'R' || allow == 'X';
 }
 
 //@}
