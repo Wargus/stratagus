@@ -361,6 +361,126 @@ global void (*VideoDrawTransHLineClip)(SysColors color,int x,int y
 	,unsigned width,int alpha);
 
     /**
+    **	Draw line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+global void (*VideoDrawLine)(SysColors color,int sx,int sy,int dx,int dy);
+
+    /**
+    **	Draw 25% translucent line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+global void (*VideoDraw25TransLine)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw 50% translucent line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+global void (*VideoDraw50TransLine)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw 75% translucent line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+global void (*VideoDraw75TransLine)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw translucent line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    **	@param alpha	alpha value of pixel.
+    */
+global void (*VideoDrawTransLine)(SysColors color,int sx,int sy,int dx,int dy
+	,int alpha);
+
+    /**
+    **	Draw line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+global void (*VideoDrawLineClip)(SysColors color,int sx,int sy,int dx,int dy);
+
+    /**
+    **	Draw 25% translucent line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+global void (*VideoDraw25TransLineClip)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw 50% translucent line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+global void (*VideoDraw50TransLineClip)(SysColors color,int sx,int sy,
+	int dx,int dy);
+
+    /**
+    **	Draw 75% translucent line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+global void (*VideoDraw75TransLineClip)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw translucent line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    **	@param alpha	alpha value of pixel.
+    */
+global void (*VideoDrawTransLineClip)(SysColors color,int sx,int sy
+	,int dx,int dy,int alpha);
+
+    /**
     **	Draw rectangle.
     **
     **	@param color	Color index.
@@ -1477,7 +1597,7 @@ local void DrawVLineClip16(SysColors color,int x,int y,unsigned height)
 	}
 	height=ClipY2-y;
     }
-    if( height>640 ) 
+    if( height>640 )
 	abort();
 
     w=VideoWidth;
@@ -1524,7 +1644,7 @@ local void DrawVLineClip24(SysColors color,int x,int y,unsigned height)
 	}
 	height=ClipY2-y;
     }
-    if( height>640 ) 
+    if( height>640 )
 	abort();
 
     w=VideoWidth;
@@ -1585,7 +1705,622 @@ local void DrawVLineClip32(SysColors color,int x,int y,unsigned height)
 //	General Line
 // ===========================================================================
 
-// FIXME: not written?
+/**
+**	Draw line unclipped into 8bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x1	Source x coordinate on the screen
+**	@param y1	Source y coordinate on the screen
+**	@param x2	Destination x coordinate on the screen
+**	@param y2	Destination y coordinate on the screen
+*/
+global void DrawLine8(SysColors color,int x1,int y1,int x2,int y2)
+{
+    int d;
+    int dx;
+    int dy;
+    int xstep;
+    VMemType8* p;
+    int w;
+    unsigned f;
+
+    if( x1==x2 ) {
+	if( y1<y2 ) {
+	    DrawVLine8(color,x1,y1,y2-y1);
+	} else {
+	    DrawVLine8(color,x2,y2,y1-y2);
+	}
+	return;
+    }
+    if( y1==y2 ) {
+	if( x1<x2 ) {
+	    DrawHLine8(color,x1,y1,x2-x1);
+	} else {
+	    DrawHLine8(color,x2,y2,x1-x2);
+	}
+	return;
+    }
+
+    // initialize
+
+    w=VideoWidth;
+    f=Pixels8[color];
+
+    if( y1>y2 ) {		// exchange coordinates
+	x1^=x2; x2^=x1; x1^=x2;
+	y1^=y2; y2^=y1; y1^=y2;
+    }
+    dy=y2-y1;
+    xstep=1;
+    dx=x2-x1;
+    if( dx<0 ) {
+	dx=-dx;
+	xstep=-1;
+    }
+
+    p=VideoMemory8+w*y1+x1;
+    *p=f;
+
+    if( dx<dy ) {		// step in vertical direction
+	d=dy-1;
+	dx+=dx;
+	dy+=dy;
+	while( y1!=y2 ) {
+	    y1++;
+	    p+=w;
+	    d-=dx;
+	    if( d<0 ) {
+		d+=dy;
+		p+=xstep;
+	    }
+	    *p=f;
+	}
+	return;
+    }
+
+    if( dx>dy ) {		// step in horizontal direction
+	d=dx-1;
+	dx+=dx;
+	dy+=dy;
+
+	while( x1!=x2 ) {
+	    x1+=xstep;
+	    p+=xstep;
+	    d-=dy;
+	    if( d<0 ) {
+		d+=dx;
+		p+=w;
+	    }
+	    *p=f;
+	}
+	return;
+    }
+
+    while( y1!=y2) {			// diagonal line
+	x1+=xstep;
+	p+=xstep;
+	y1++;
+	p+=w;
+	*p=f;
+    }
+}
+
+/**
+**	Draw line unclipped into 16bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x1	Source x coordinate on the screen
+**	@param y1	Source y coordinate on the screen
+**	@param x2	Destination x coordinate on the screen
+**	@param y2	Destination y coordinate on the screen
+*/
+global void DrawLine16(SysColors color,int x1,int y1,int x2,int y2)
+{
+    int d;
+    int dx;
+    int dy;
+    int xstep;
+    VMemType16* p;
+    int w;
+    unsigned f;
+
+    if( x1==x2 ) {
+	if( y1<y2 ) {
+	    DrawVLine16(color,x1,y1,y2-y1);
+	} else {
+	    DrawVLine16(color,x2,y2,y1-y2);
+	}
+	return;
+    }
+    if( y1==y2 ) {
+	if( x1<x2 ) {
+	    DrawHLine16(color,x1,y1,x2-x1);
+	} else {
+	    DrawHLine16(color,x2,y2,x1-x2);
+	}
+	return;
+    }
+
+    // initialize
+
+    w=VideoWidth;
+    f=Pixels16[color];
+
+    if( y1>y2 ) {		// exchange coordinates
+	x1^=x2; x2^=x1; x1^=x2;
+	y1^=y2; y2^=y1; y1^=y2;
+    }
+    dy=y2-y1;
+    xstep=1;
+    dx=x2-x1;
+    if( dx<0 ) {
+	dx=-dx;
+	xstep=-1;
+    }
+
+    p=VideoMemory16+w*y1+x1;
+    *p=f;
+
+    if( dx<dy ) {		// step in vertical direction
+	d=dy-1;
+	dx+=dx;
+	dy+=dy;
+	while( y1!=y2 ) {
+	    y1++;
+	    p+=w;
+	    d-=dx;
+	    if( d<0 ) {
+		d+=dy;
+		p+=xstep;
+	    }
+	    *p=f;
+	}
+	return;
+    }
+
+    if( dx>dy ) {		// step in horizontal direction
+	d=dx-1;
+	dx+=dx;
+	dy+=dy;
+
+	while( x1!=x2 ) {
+	    x1+=xstep;
+	    p+=xstep;
+	    d-=dy;
+	    if( d<0 ) {
+		d+=dx;
+		p+=w;
+	    }
+	    *p=f;
+	}
+	return;
+    }
+
+    while( y1!=y2) {			// diagonal line
+	x1+=xstep;
+	p+=xstep;
+	y1++;
+	p+=w;
+	*p=f;
+    }
+}
+
+/**
+**	Draw line unclipped into 24bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x1	Source x coordinate on the screen
+**	@param y1	Source y coordinate on the screen
+**	@param x2	Destination x coordinate on the screen
+**	@param y2	Destination y coordinate on the screen
+*/
+global void DrawLine24(SysColors color,int x1,int y1,int x2,int y2)
+{
+    int d;
+    int dx;
+    int dy;
+    int xstep;
+    VMemType24* p;
+    int w;
+    VMemType24 f;
+
+    if( x1==x2 ) {
+	if( y1<y2 ) {
+	    DrawVLine24(color,x1,y1,y2-y1);
+	} else {
+	    DrawVLine24(color,x2,y2,y1-y2);
+	}
+	return;
+    }
+    if( y1==y2 ) {
+	if( x1<x2 ) {
+	    DrawHLine24(color,x1,y1,x2-x1);
+	} else {
+	    DrawHLine24(color,x2,y2,x1-x2);
+	}
+	return;
+    }
+
+    // initialize
+
+    w=VideoWidth;
+    f=Pixels24[color];
+
+    if( y1>y2 ) {		// exchange coordinates
+	x1^=x2; x2^=x1; x1^=x2;
+	y1^=y2; y2^=y1; y1^=y2;
+    }
+    dy=y2-y1;
+    xstep=1;
+    dx=x2-x1;
+    if( dx<0 ) {
+	dx=-dx;
+	xstep=-1;
+    }
+
+    p=VideoMemory24+w*y1+x1;
+    *p=f;
+
+    if( dx<dy ) {		// step in vertical direction
+	d=dy-1;
+	dx+=dx;
+	dy+=dy;
+	while( y1!=y2 ) {
+	    y1++;
+	    p+=w;
+	    d-=dx;
+	    if( d<0 ) {
+		d+=dy;
+		p+=xstep;
+	    }
+	    *p=f;
+	}
+	return;
+    }
+
+    if( dx>dy ) {		// step in horizontal direction
+	d=dx-1;
+	dx+=dx;
+	dy+=dy;
+
+	while( x1!=x2 ) {
+	    x1+=xstep;
+	    p+=xstep;
+	    d-=dy;
+	    if( d<0 ) {
+		d+=dx;
+		p+=w;
+	    }
+	    *p=f;
+	}
+	return;
+    }
+
+    while( y1!=y2) {			// diagonal line
+	x1+=xstep;
+	p+=xstep;
+	y1++;
+	p+=w;
+	*p=f;
+    }
+}
+
+/**
+**	Draw line unclipped into 32bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x1	Source x coordinate on the screen
+**	@param y1	Source y coordinate on the screen
+**	@param x2	Destination x coordinate on the screen
+**	@param y2	Destination y coordinate on the screen
+*/
+global void DrawLine32(SysColors color,int x1,int y1,int x2,int y2)
+{
+    int d;
+    int dx;
+    int dy;
+    int xstep;
+    VMemType32* p;
+    int w;
+    unsigned f;
+
+    if( x1==x2 ) {
+	if( y1<y2 ) {
+	    DrawVLine32(color,x1,y1,y2-y1);
+	} else {
+	    DrawVLine32(color,x2,y2,y1-y2);
+	}
+	return;
+    }
+    if( y1==y2 ) {
+	if( x1<x2 ) {
+	    DrawHLine32(color,x1,y1,x2-x1);
+	} else {
+	    DrawHLine32(color,x2,y2,x1-x2);
+	}
+	return;
+    }
+
+    // initialize
+
+    w=VideoWidth;
+    f=Pixels32[color];
+
+    if( y1>y2 ) {		// exchange coordinates
+	x1^=x2; x2^=x1; x1^=x2;
+	y1^=y2; y2^=y1; y1^=y2;
+    }
+    dy=y2-y1;
+    xstep=1;
+    dx=x2-x1;
+    if( dx<0 ) {
+	dx=-dx;
+	xstep=-1;
+    }
+
+    p=VideoMemory32+w*y1+x1;
+    *p=f;
+
+    if( dx<dy ) {		// step in vertical direction
+	d=dy-1;
+	dx+=dx;
+	dy+=dy;
+	while( y1!=y2 ) {
+	    y1++;
+	    p+=w;
+	    d-=dx;
+	    if( d<0 ) {
+		d+=dy;
+		p+=xstep;
+	    }
+	    *p=f;
+	}
+	return;
+    }
+
+    if( dx>dy ) {		// step in horizontal direction
+	d=dx-1;
+	dx+=dx;
+	dy+=dy;
+
+	while( x1!=x2 ) {
+	    x1+=xstep;
+	    p+=xstep;
+	    d-=dy;
+	    if( d<0 ) {
+		d+=dx;
+		p+=w;
+	    }
+	    *p=f;
+	}
+	return;
+    }
+
+    while( y1!=y2) {			// diagonal line
+	x1+=xstep;
+	p+=xstep;
+	y1++;
+	p+=w;
+	*p=f;
+    }
+}
+
+/**
+**	Liang/Barksy clipping algorithm.
+**
+**	FIXME: could remove floating point, but on my cpu floating point
+**	FIXME: is faster than integer.
+*/
+local int ClipTest(double p,double q,double *u1,double *u2)
+{
+    double r;
+
+    r = q/p;
+    if (p < 0) {
+	if (r > *u2) {
+	    return 0;
+	}
+	if (r > *u1) {
+	    *u1 = r;
+	}
+	return 1;
+    }
+    if (p > 0) {
+	if (r < *u1) {
+	    return 0;
+	}
+	if (r < *u2) {
+	    *u2 = r;
+	}
+	return 1;
+    }
+    if (q < 0) {
+	return 0;
+    }
+    return 1;
+}
+
+/**
+**	Liang/Barksy clipping algorithm.
+*/
+local void LineClip(int x1,int y1,int x2,int y2)
+{
+    double u1;
+    double u2;
+    int dx;
+    int dy;
+
+    u1 = 0.0;
+    u2 = 1.0;
+    dx = x2-x1;
+    if (ClipTest(-dx,x1-ClipX1, &u1, &u2)
+	    && ClipTest(dx,ClipX2-x1, &u1, &u2)) {
+	dy = y2-y1;
+	if (ClipTest(-dy, y1-ClipY1, &u1, &u2)
+		&& ClipTest(dy,ClipY2-y1, &u1, &u2)) {
+	    if (u1 > 0) {
+		x1 = (x1 + u1*dx) + 0.5;
+		y1 = (y1 + u1*dy) + 0.5;
+	    }
+	    if (u2 < 1) {
+		x2 = (x1 + u2*dx) + 0.5;
+		y2 = (y1 + u2*dy) + 0.5;
+	    }
+	}
+    }
+}
+
+/**
+**	Draw line clipped into 8bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x1	Source x coordinate on the screen
+**	@param y1	Source y coordinate on the screen
+**	@param x2	Destination x coordinate on the screen
+**	@param y2	Destination y coordinate on the screen
+*/
+global void DrawLineClip8(SysColors color,int x1,int y1,int x2,int y2)
+{
+    double u1;
+    double u2;
+    int dx;
+    int dy;
+
+    u1 = 0.0;
+    u2 = 1.0;
+    dx = x2-x1;
+    if (ClipTest(-dx,x1-ClipX1, &u1, &u2)
+	    && ClipTest(dx,ClipX2-x1, &u1, &u2)) {
+	dy = y2-y1;
+	if (ClipTest(-dy, y1-ClipY1, &u1, &u2)
+		&& ClipTest(dy,ClipY2-y1, &u1, &u2)) {
+	    if (u1 > 0) {
+		x1 = (x1 + u1*dx) + 0.5;
+		y1 = (y1 + u1*dy) + 0.5;
+	    }
+	    if (u2 < 1) {
+		x2 = (x1 + u2*dx) + 0.5;
+		y2 = (y1 + u2*dy) + 0.5;
+	    }
+
+	    DrawLine8(color,x1,y1,x2,y2);
+	}
+    }
+}
+
+/**
+**	Draw line clipped into 16bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x1	Source x coordinate on the screen
+**	@param y1	Source y coordinate on the screen
+**	@param x2	Destination x coordinate on the screen
+**	@param y2	Destination y coordinate on the screen
+*/
+global void DrawLineClip16(SysColors color,int x1,int y1,int x2,int y2)
+{
+    double u1;
+    double u2;
+    int dx;
+    int dy;
+
+    u1 = 0.0;
+    u2 = 1.0;
+    dx = x2-x1;
+    if (ClipTest(-dx,x1-ClipX1, &u1, &u2)
+	    && ClipTest(dx,ClipX2-x1, &u1, &u2)) {
+	dy = y2-y1;
+	if (ClipTest(-dy, y1-ClipY1, &u1, &u2)
+		&& ClipTest(dy,ClipY2-y1, &u1, &u2)) {
+	    if (u1 > 0) {
+		x1 = (x1 + u1*dx) + 0.5;
+		y1 = (y1 + u1*dy) + 0.5;
+	    }
+	    if (u2 < 1) {
+		x2 = (x1 + u2*dx) + 0.5;
+		y2 = (y1 + u2*dy) + 0.5;
+	    }
+
+	    DrawLine16(color,x1,y1,x2,y2);
+	}
+    }
+}
+
+/**
+**	Draw line clipped into 24bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x1	Source x coordinate on the screen
+**	@param y1	Source y coordinate on the screen
+**	@param x2	Destination x coordinate on the screen
+**	@param y2	Destination y coordinate on the screen
+*/
+global void DrawLineClip24(SysColors color,int x1,int y1,int x2,int y2)
+{
+    double u1;
+    double u2;
+    int dx;
+    int dy;
+
+    u1 = 0.0;
+    u2 = 1.0;
+    dx = x2-x1;
+    if (ClipTest(-dx,x1-ClipX1, &u1, &u2)
+	    && ClipTest(dx,ClipX2-x1, &u1, &u2)) {
+	dy = y2-y1;
+	if (ClipTest(-dy, y1-ClipY1, &u1, &u2)
+		&& ClipTest(dy,ClipY2-y1, &u1, &u2)) {
+	    if (u1 > 0) {
+		x1 = (x1 + u1*dx) + 0.5;
+		y1 = (y1 + u1*dy) + 0.5;
+	    }
+	    if (u2 < 1) {
+		x2 = (x1 + u2*dx) + 0.5;
+		y2 = (y1 + u2*dy) + 0.5;
+	    }
+
+	    DrawLine24(color,x1,y1,x2,y2);
+	}
+    }
+}
+
+/**
+**	Draw line clipped into 32bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x1	Source x coordinate on the screen
+**	@param y1	Source y coordinate on the screen
+**	@param x2	Destination x coordinate on the screen
+**	@param y2	Destination y coordinate on the screen
+*/
+global void DrawLineClip32(SysColors color,int x1,int y1,int x2,int y2)
+{
+    double u1;
+    double u2;
+    int dx;
+    int dy;
+
+    u1 = 0.0;
+    u2 = 1.0;
+    dx = x2-x1;
+    if (ClipTest(-dx,x1-ClipX1, &u1, &u2)
+	    && ClipTest(dx,ClipX2-x1, &u1, &u2)) {
+	dy = y2-y1;
+	if (ClipTest(-dy, y1-ClipY1, &u1, &u2)
+		&& ClipTest(dy,ClipY2-y1, &u1, &u2)) {
+	    if (u1 > 0) {
+		x1 = (x1 + u1*dx) + 0.5;
+		y1 = (y1 + u1*dy) + 0.5;
+	    }
+	    if (u2 < 1) {
+		x2 = (x1 + u2*dx) + 0.5;
+		y2 = (y1 + u2*dy) + 0.5;
+	    }
+
+	    DrawLine32(color,x1,y1,x2,y2);
+	}
+    }
+}
 
 // ===========================================================================
 //	Rectangle
@@ -2302,6 +3037,8 @@ global void InitLineDraw(void)
 	    VideoDrawHLineClip=DrawHLineClip8;
 	    VideoDrawVLine=DrawVLine8;
 	    VideoDrawVLineClip=DrawVLineClip8;
+	    VideoDrawLine=DrawLine8;
+	    VideoDrawLineClip=DrawLineClip8;
 	    VideoDrawRectangle=DrawRectangle8;
 	    VideoDrawRectangleClip=DrawRectangleClip8;
 	    break;
@@ -2321,6 +3058,8 @@ global void InitLineDraw(void)
 	    VideoDrawTransHLineClip=DrawTransHLineClip15;
 	    VideoDrawVLine=DrawVLine16;
 	    VideoDrawVLineClip=DrawVLineClip16;
+	    VideoDrawLine=DrawLine16;
+	    VideoDrawLineClip=DrawLineClip16;
 	    VideoDrawRectangle=DrawRectangle16;
 	    VideoDrawRectangleClip=DrawRectangleClip16;
 	    break;
@@ -2340,6 +3079,8 @@ global void InitLineDraw(void)
 	    VideoDrawTransHLineClip=DrawTransHLineClip16;
 	    VideoDrawVLine=DrawVLine16;
 	    VideoDrawVLineClip=DrawVLineClip16;
+	    VideoDrawLine=DrawLine16;
+	    VideoDrawLineClip=DrawLineClip16;
 	    VideoDrawRectangle=DrawRectangle16;
 	    VideoDrawRectangleClip=DrawRectangleClip16;
 	    break;
@@ -2351,6 +3092,8 @@ global void InitLineDraw(void)
 	    VideoDrawHLineClip=DrawHLineClip24;
 	    VideoDrawVLine=DrawVLine24;
 	    VideoDrawVLineClip=DrawVLineClip24;
+	    VideoDrawLine=DrawLine24;
+	    VideoDrawLineClip=DrawLineClip24;
 	    VideoDrawRectangle=DrawRectangle24;
 	    VideoDrawRectangleClip=DrawRectangleClip24;
 	    break;
@@ -2362,6 +3105,8 @@ global void InitLineDraw(void)
 	    VideoDrawHLineClip=DrawHLineClip32;
 	    VideoDrawVLine=DrawVLine32;
 	    VideoDrawVLineClip=DrawVLineClip32;
+	    VideoDrawLine=DrawLine32;
+	    VideoDrawLineClip=DrawLineClip32;
 	    VideoDrawRectangle=DrawRectangle32;
 	    VideoDrawRectangleClip=DrawRectangleClip32;
 	    break;
