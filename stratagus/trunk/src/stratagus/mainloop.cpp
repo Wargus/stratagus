@@ -788,6 +788,7 @@ global void GameMainLoop(void)
 
     FlagRevealMap=0;
     GamePaused=0;
+    GodMode=0;
 }
 
 //@}

@@ -209,6 +209,8 @@ extern char GameObserve;
 extern char OrdersDuringPause;
     /// Flag telling not to advance to the next game cycle
 extern char SkipGameCycle;
+    /// Invincibility cheat
+extern int GodMode;
 
     /// pressed mouse buttons (normal,double,dragged,long)
 extern enum _mouse_buttons_ MouseButtons;
