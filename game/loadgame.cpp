@@ -128,10 +128,14 @@ global void InitModules(void)
     InitMissiles();
     InitConstructions();
     // InitDecorations();
-    InitUnitTypes();
+
+    // LUDO : 0 = don't reset player stats ( units level , upgrades, ... ) !
+    InitUnitTypes(0);
+
     InitUnits();
     InitSelections();
     InitGroups();
+    InitSpells();
     InitUpgrades();
     InitDependencies();
 
