@@ -479,6 +479,7 @@ global void ShowIntro(const Intro *intro)
     SetVideoSync();
 
     CallbackMusicOn();
+    StopMusic();
     // FIXME: should this be GameMusic?
     PlayMusic(MenuMusic);
 }
