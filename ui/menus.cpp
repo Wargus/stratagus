@@ -1750,6 +1750,8 @@ global void SoundOptions(void)
 #endif
     if (SoundFildes != -1)
 	SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_CHECKED;
+    else
+	SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_UNCHECKED;
     SoundOptionsMenuItems[2].d.hslider.percent = (GlobalVolume * 100) / 255;
 
     if (PlayingMusic == 1 && SoundFildes != -1)
@@ -1782,6 +1784,7 @@ local void SetMasterPower(Menuitem *mi)
         SoundFildes=-1;
     } else {
 	InitSound();
+	SoundOff=0;
     }
 #endif 				
     EndMenu();
