@@ -719,6 +719,10 @@ static void CclParseIcon(lua_State* l, Button* icon)
 			icon->Height = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "style")) {
+			lua_rawgeti(l, -1, j + 1);
+			icon->Style = FindButtonStyle(LuaToString(l, -1));
+			lua_pop(l, 1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1526,9 +1530,20 @@ static int CclDefineUI(lua_State* l)
 					}
 					CclParseButtonIcons(l, ui);
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "command-key-font")) {
+				} else if (!strcmp(value, "auto-cast-border-color")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					ui->CommandKeyFont = FontByIdent(LuaToString(l, -1));
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument");
+					}
+					lua_rawgeti(l, -1, 1);
+					ui->ButtonAutoCastBorderColorRGB.r = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_rawgeti(l, -1, 2);
+					ui->ButtonAutoCastBorderColorRGB.g = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_rawgeti(l, -1, 3);
+					ui->ButtonAutoCastBorderColorRGB.b = LuaToNumber(l, -1);
+					lua_pop(l, 1);
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
