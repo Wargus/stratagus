@@ -1394,6 +1394,7 @@ void CleanMissileTypes(void)
 		free(mtype->ImpactName);
 		free(mtype->SmokeName);
 		FreeGraphic(mtype->G);
+		free(mtype);
 	}
 	free(MissileTypes);
 	MissileTypes = NULL;
