@@ -10,7 +10,7 @@
 //
 /**@name network.c	-	The network. */
 //
-//	(c) Copyright 2000 by Lutz Sammer
+//	(c) Copyright 2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -28,6 +28,10 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+
+#ifdef __MINGW32__
+extern unsigned int sleep(unsigned int seconds);
+#endif
 
 #include "etlib/dllist.h"
 #include "net_lowlevel.h"
