@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_sound.h - The Ccl sound header file. */
+/**@name script_sound.h - The Ccl sound header file. */
 //
 //      (c) Copyright 1999-2004 by Lutz Sammer and Fabrice Rossi
 //

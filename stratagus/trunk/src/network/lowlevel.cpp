@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name lowlevel.c	-	The network lowlevel. */
+/**@name lowlevel.c - The network lowlevel. */
 //
-//	(c) Copyright 2000-2002 by Lutz Sammer
+//      (c) Copyright 2000-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 //----------------------------------------------------------------------------
-//		Includes
+//  Includes
 //----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -50,13 +50,13 @@
 #include "network.h"
 
 //----------------------------------------------------------------------------
-//		Declarations
+//  Declarations
 //----------------------------------------------------------------------------
 
 #define MAX_LOC_IP 10
 
 //----------------------------------------------------------------------------
-//		Variables
+//  Variables
 //----------------------------------------------------------------------------
 
 global int NetLastSocket;				/// Last socket
@@ -66,11 +66,8 @@ global int NetLastPort;						/// Last port number (net format)
 global unsigned long NetLocalAddrs[MAX_LOC_IP]; /// Local IP-Addrs of this host (net format)
 
 //----------------------------------------------------------------------------
-//		Low level functions
+//  Low level functions
 //----------------------------------------------------------------------------
-
-/**@name lowlevel */
-//@{
 
 #ifdef USE_WINSOCK		// {
 

@@ -265,8 +265,7 @@ local void (*HandleActionTable[256])(Unit*) = {
 /**
 **  Increment a unit's health
 **
-**  @param unit    the unit to operate on
-**  @param amount  the amount of time to make up for.(in cycles)
+**  @param unit  the unit to operate on
 */
 local void HandleRegenerations(Unit* unit)
 {

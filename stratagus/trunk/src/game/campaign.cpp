@@ -174,8 +174,8 @@ global void PlayCampaign(const char* name)
 /**
 **  Parse campaign show-picture.
 **
+**  @param l        Lua state.
 **  @param chapter  Chapter.
-**  @param list     List describing show-picture.
 */
 local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 {
@@ -315,7 +315,7 @@ local void FreeChapters(CampaignChapter** chapters)
 /**
 **  Define a campaign.
 **
-**  @param list  List describing the campaign.
+**  @param l  Lua state.
 **
 **  @note FIXME: play-video, defeat, draw are missing.
 */
@@ -432,7 +432,7 @@ local int CclDefineCampaign(lua_State* l)
 /**
 **  Set the current campaign chapter
 **
-**  @param num  Number of current chapter in current campaign.
+**  @param l  Lua state.
 */
 local int CclSetCurrentChapter(lua_State* l)
 {
@@ -465,7 +465,7 @@ local int CclSetCurrentChapter(lua_State* l)
 /**
 **  Set the briefing.
 **
-**  @param list  List describing the briefing.
+**  @param l  Lua state.
 */
 local int CclBriefing(lua_State* l)
 {
@@ -531,7 +531,7 @@ local int CclBriefing(lua_State* l)
 }
 
 /**
-** Register CCL features for campaigns.
+**  Register CCL features for campaigns.
 */
 global void CampaignCclRegister(void)
 {

@@ -288,9 +288,6 @@ local int NetworkSendResend;				/// Packets send to resend
 
 local int PlayerQuit[PlayerMax];		/// Player quit
 
-/**@name api */
-//@{
-
 //----------------------------------------------------------------------------
 //		Mid-Level api functions
 //----------------------------------------------------------------------------
@@ -679,7 +676,7 @@ global void NetworkSendSelection(Unit** units, int count)
 **  Process Received Unit Selection
 **
 **  @param packet  Network Packet to Process
-**
+**  @param player  Player number
 */
 local void NetworkProcessSelection(NetworkPacket* packet, int player)
 {
@@ -712,9 +709,9 @@ local void NetworkProcessSelection(NetworkPacket* packet, int player)
 }
 
 /**
-**		Remove a player from the game.
+**  Remove a player from the game.
 **
-**		@param player		Player number
+**  @param player  Player number
 */
 local void NetworkRemovePlayer(int player)
 {
