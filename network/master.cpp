@@ -90,14 +90,14 @@ global int MetaInit(void)
     reply = NULL;
     sockfd = NetworkFildes;
     for (i = 1234; i < 1244; ++i) {
-	sockfd=NetOpenTCP(i);	//FIXME: need to make a dynamic port allocation there...if (!sockfd) {...}
+	sockfd = NetOpenTCP(i);	//FIXME: need to make a dynamic port allocation there...if (!sockfd) {...}
 	if (sockfd != -1) {
 	    break;
 	}
     }
     
     // FIXME: Configurable Meta Server
-    TCPConnectStatus = NetConnectTCP(sockfd,NetResolveHost(MASTER_HOST),MASTER_PORT);
+    TCPConnectStatus = NetConnectTCP(sockfd, NetResolveHost(MASTER_HOST), MASTER_PORT);
 
     if (TCPConnectStatus == -1) {
 	//TODO: Notify player that connection was aborted...
@@ -140,7 +140,7 @@ global int MetaClose(void)
 **
 **	@return 1 OK, 0 Error.
 */
-global int MetaServerOK(char **reply)
+global int MetaServerOK(char** reply)
 {
     return !strcmp("OK\r\n",*reply) || !strcmp("OK\n",*reply);
 }
@@ -163,7 +163,7 @@ global int SendMetaCommand(char* command, char* format, ...)
     char* s;
     va_list ap;
 
-    size = strlen(GameName)+strlen(LocalPlayerName)+strlen(command)+100;
+    size = strlen(GameName) + strlen(LocalPlayerName) + strlen(command) + 100;
     ret = -1;
     if ((p = malloc(size)) == NULL) {
 	return -1;
@@ -175,7 +175,7 @@ global int SendMetaCommand(char* command, char* format, ...)
     // Message Structure
     // <Stratagus> if for Magnant Compatibility, it may be removed
     // Player Name, Game Name, VERSION, Command, **Paramaters**
-    sprintf(s,"<Stratagus>\n%s\n%s\n%s\n%s\n", LocalPlayerName, GameName, VERSION, command);
+    sprintf(s, "<Stratagus>\n%s\n%s\n%s\n%s\n", LocalPlayerName, GameName, VERSION, command);
 
     // Commands
     // Login - password
@@ -210,8 +210,8 @@ global int SendMetaCommand(char* command, char* format, ...)
     }
     // Allocate the correct size
     if ((s = realloc(s, size + strlen(s))) == NULL ) {
-	    free(p);
-	    return -1;
+	free(p);
+	return -1;
     }
     strcat(s, p);
     size = strlen(s);
@@ -227,7 +227,7 @@ global int SendMetaCommand(char* command, char* format, ...)
 **	@param	reply	Text of the reply
 **	@return	error or number of bytes
 */
-global int RecvMetaReply(char **reply)
+global int RecvMetaReply(char** reply)
 {
     int n;
     int size;
@@ -238,7 +238,8 @@ global int RecvMetaReply(char **reply)
 	return -1;
     }
    
-    size=1;
+    size = 1;
+    p = NULL;
     while ((n = NetRecvTCP(sockfd, &buf, 1024))) {
 	size += n;
 	if ((p = realloc(p, size)) == NULL) {
