@@ -275,7 +275,7 @@ IfDebug(
 global unsigned long MyHost;		/// My host number.
 global int MyPort;			/// My port number.
 );
-local int NetworkDelay;			/// Delay counter for recover.
+local unsigned long NetworkDelay;	/// Delay counter for recover.
 local int NetworkSyncSeeds[256];	/// Network sync seeds.
 local int NetworkSyncHashs[256];	/// Network sync hashs.
 local NetworkCommandQueue NetworkIn[256][PlayerMax]; /// Per-player network packet input queue
