@@ -69,29 +69,30 @@ typedef enum {
 local SDL_Surface* PixelSurface;
 
 // FIXME: comments
-global void VideoDrawPixel(SDL_Color color, int x, int y);
-global void VideoDrawTransPixel(SDL_Color color, int x, int y, unsigned char alpha);
-global void VideoDrawPixelClip(SDL_Color color, int x, int y);
-global void VideoDrawVLine(SDL_Color color, int x, int y, int width);
-global void VideoDrawVLineClip(SDL_Color color, int x, int y, int width);
-global void VideoDrawTransVLine(SDL_Color color, int x, int y,
+global void (*VideoDrawPixel)(Uint32 color, int x, int y);
+global void (*VideoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
+global void VideoDrawPixelClip(Uint32 color, int x, int y);
+global void VideoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha);
+global void VideoDrawVLine(Uint32 color, int x, int y, int width);
+global void VideoDrawVLineClip(Uint32 color, int x, int y, int width);
+global void VideoDrawTransVLine(Uint32 color, int x, int y,
     int height, unsigned char alpha);
-global void VideoDrawHLine(SDL_Color color, int x, int y, int width);
-global void VideoDrawHLineClip(SDL_Color color, int x, int y, int width);
-global void VideoDrawTransHLine(SDL_Color color, int x, int y,
+global void VideoDrawHLine(Uint32 color, int x, int y, int width);
+global void VideoDrawHLineClip(Uint32 color, int x, int y, int width);
+global void VideoDrawTransHLine(Uint32 color, int x, int y,
     int width, unsigned char alpha);
-global void VideoDrawLine(SDL_Color color, int sx, int sy, int dx, int dy);
-global void VideoDrawTransLine(SDL_Color color, int sx, int sy,
+global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy);
+global void VideoDrawTransLine(Uint32 color, int sx, int sy,
     int dx, int dy, unsigned char alpha);
-global void VideoDrawRectangle(SDL_Color color, int x, int y,
+global void VideoDrawRectangle(Uint32 color, int x, int y,
     int w, int h);
-global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
+global void VideoDrawRectangleClip(Uint32 color, int x, int y,
     int w, int h);
-global void VideoDrawTransRectangle(SDL_Color color, int x, int y,
+global void VideoDrawTransRectangle(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha);
-global void VideoFillRectangle(SDL_Color color, int x, int y,
+global void VideoFillRectangle(Uint32 color, int x, int y,
     int w, int h);
-global void VideoFillTransRectangle(SDL_Color color, int x, int y,
+global void VideoFillTransRectangle(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha);
 #else
 /**
@@ -451,48 +452,55 @@ global void (*VideoFillTransRectangle)(VMemType color, int x, int y,
 #ifdef USE_SDL_SURFACE
     // FIXME: BIG todo
     // FIXME: optimize all these
-global void InitLineDraw()
+global void VideoDrawPixel16(Uint32 color, int x, int y)
 {
-    SDL_Surface* s;
-
-    s = SDL_CreateRGBSurface(SDL_SWSURFACE, 1, 1, 32, 
-	RMASK, GMASK, BMASK, AMASK);
-    PixelSurface = SDL_DisplayFormatAlpha(s);
-    SDL_FreeSurface(s);
+    VideoLockScreen();
+    ((Uint16*)TheScreen->pixels)[x + y * VideoWidth] = color;
+    VideoUnlockScreen();
 }
 
-global void VideoDrawPixel(SDL_Color color, int x, int y)
+global void VideoDrawPixel32(Uint32 color, int x, int y)
 {
-    SDL_Rect drect;
-
-    drect.x = x;
-    drect.y = y;
-
-    SDL_FillRect(PixelSurface, NULL, SDL_MapRGB(PixelSurface->format, 
-	color.r, color.g, color.b));
-    SDL_BlitSurface(PixelSurface, NULL, TheScreen, &drect);
+    VideoLockScreen();
+    ((Uint32*)TheScreen->pixels)[x + y * VideoWidth] = color;
+    VideoUnlockScreen();
 }
 
-global void VideoDrawTransPixel(SDL_Color color, int x, int y, unsigned char alpha)
+global void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
-    SDL_Rect drect;
+    // FIXME: todo
+/*
+    Uint16* p;
 
-    drect.x = x;
-    drect.y = y;
-
-    SDL_FillRect(PixelSurface, NULL, SDL_MapRGBA(PixelSurface->format, 
-	color.r, color.g, color.b, alpha));
-    SDL_BlitSurface(PixelSurface, NULL, TheScreen, &drect);
+    VideoLockScreen();
+    p = &((Uint16*)TheScreen->pixels)[x + y * VideoWidth];
+    *p = ((((*p & 0xF800) >> 11) * (255 - alpha) + ((color & 0xF800) >> 11) * alpha) << 3) |
+	((((*p & 0x7E0) >> 5) * (255 - alpha) + ((color & 0x7E0) >> 5) * alpha) >> 3) |
+	(((*p &0x1F) * (255 - alpha) + (color & 0x1F) * alpha) >> 8);
+    VideoUnlockScreen();
+*/
 }
 
-global void VideoDrawPixelClip(SDL_Color color, int x, int y)
+global void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
+{
+    // FIXME: todo
+}
+
+global void VideoDrawPixelClip(Uint32 color, int x, int y)
 {
     if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipX2) {
 	VideoDrawPixel(color, x, y);
     }
 }
 
-global void VideoDrawVLine(SDL_Color color, int x, int y, int height)
+global void VideoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
+{
+    if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipX2) {
+	VideoDrawTransPixel(color, x, y, alpha);
+    }
+}
+
+global void VideoDrawVLine(Uint32 color, int x, int y, int height)
 {
     int i;
 
@@ -501,7 +509,7 @@ global void VideoDrawVLine(SDL_Color color, int x, int y, int height)
     }
 }
 
-global void VideoDrawTransVLine(SDL_Color color, int x, int y,
+global void VideoDrawTransVLine(Uint32 color, int x, int y,
     int height, unsigned char alpha)
 {
     int i;
@@ -511,14 +519,14 @@ global void VideoDrawTransVLine(SDL_Color color, int x, int y,
     }
 }
 
-global void VideoDrawVLineClip(SDL_Color color, int x, int y, int height)
+global void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
 {
     int w = 1;
     CLIP_RECTANGLE(x, y, w, height);
     VideoDrawVLine(color, x, y, height);
 }
 
-global void VideoDrawHLine(SDL_Color color, int x, int y, int width)
+global void VideoDrawHLine(Uint32 color, int x, int y, int width)
 {
     int i;
 
@@ -527,14 +535,14 @@ global void VideoDrawHLine(SDL_Color color, int x, int y, int width)
     }
 }
 
-global void VideoDrawHLineClip(SDL_Color color, int x, int y, int width)
+global void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
 {
     int h = 1;
     CLIP_RECTANGLE(x, y, width, h);
     VideoDrawHLine(color, x, y, width);
 }
 
-global void VideoDrawTransHLine(SDL_Color color, int x, int y,
+global void VideoDrawTransHLine(Uint32 color, int x, int y,
     int width, unsigned char alpha)
 {
     int i;
@@ -544,7 +552,7 @@ global void VideoDrawTransHLine(SDL_Color color, int x, int y,
     }
 }
 
-global void VideoDrawLine(SDL_Color color, int sx, int sy, int dx, int dy)
+global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 {
     int x;
     int y;
@@ -645,7 +653,7 @@ global void VideoDrawLine(SDL_Color color, int sx, int sy, int dx, int dy)
     }
 }
 
-global void VideoDrawLineClip(SDL_Color color, int sx, int sy, int dx, int dy)
+global void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 {
     SDL_Rect oldrect;
     SDL_Rect newrect;
@@ -661,14 +669,14 @@ global void VideoDrawLineClip(SDL_Color color, int sx, int sy, int dx, int dy)
     SDL_SetClipRect(TheScreen, &oldrect);
 }
 
-global void VideoDrawTransLine(SDL_Color color, int sx, int sy,
+global void VideoDrawTransLine(Uint32 color, int sx, int sy,
     int dx, int dy, unsigned char alpha)
 {
     // FIXME: trans
     VideoDrawLine(color, sx, sy, dx, dy);
 }
 
-global void VideoDrawRectangle(SDL_Color color, int x, int y,
+global void VideoDrawRectangle(Uint32 color, int x, int y,
     int w, int h)
 {
     VideoDrawHLine(color, x, y, w);
@@ -678,7 +686,7 @@ global void VideoDrawRectangle(SDL_Color color, int x, int y,
     VideoDrawVLine(color, x + w - 1, y + 1, h - 2);
 }
 
-global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
+global void VideoDrawRectangleClip(Uint32 color, int x, int y,
     int w, int h)
 {
     SDL_Rect oldrect;
@@ -695,7 +703,7 @@ global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
     SDL_SetClipRect(TheScreen, &oldrect);
 }
 
-global void VideoDrawTransRectangle(SDL_Color color, int x, int y,
+global void VideoDrawTransRectangle(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     VideoDrawTransHLine(color, x, y, w, alpha);
@@ -705,21 +713,20 @@ global void VideoDrawTransRectangle(SDL_Color color, int x, int y,
     VideoDrawTransVLine(color, x + w - 1, y + 1, h - 2, alpha);
 }
 
-global void VideoFillRectangle(SDL_Color color, int x, int y,
+global void VideoFillRectangle(Uint32 color, int x, int y,
     int w, int h)
 {
     SDL_Rect drect;
-    Uint32 c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
 
     drect.x = x;
     drect.y = y;
     drect.w = w;
     drect.h = h;
 
-    SDL_FillRect(TheScreen, &drect, c);
+    SDL_FillRect(TheScreen, &drect, color);
 }
 
-global void VideoFillRectangleClip(SDL_Color color, int x, int y,
+global void VideoFillRectangleClip(Uint32 color, int x, int y,
     int w, int h)
 {
     SDL_Rect oldrect;
@@ -736,19 +743,16 @@ global void VideoFillRectangleClip(SDL_Color color, int x, int y,
     SDL_SetClipRect(TheScreen, &oldrect);
 }
 
-global void VideoFillTransRectangle(SDL_Color color, int x, int y,
+global void VideoFillTransRectangle(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     SDL_Rect drect;
     SDL_Surface* s;
-    Uint32 c;
 
     s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h,
 	32, RMASK, GMASK, BMASK, AMASK);
 
-    c = SDL_MapRGBA(s->format, color.r, color.g, color.b, alpha);
-
-    SDL_FillRect(s, NULL, c);
+    SDL_FillRect(s, NULL, color);
 
     drect.x = x;
     drect.y = y;
@@ -757,7 +761,7 @@ global void VideoFillTransRectangle(SDL_Color color, int x, int y,
     SDL_FreeSurface(s);
 }
 
-global void VideoFillTransRectangleClip(SDL_Color color, int x, int y,
+global void VideoFillTransRectangleClip(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     SDL_Rect oldrect;
@@ -774,7 +778,7 @@ global void VideoFillTransRectangleClip(SDL_Color color, int x, int y,
     SDL_SetClipRect(TheScreen, &oldrect);
 }
 
-global void VideoDrawCircle(SDL_Color color, int x, int y, int r)
+global void VideoDrawCircle(Uint32 color, int x, int y, int r)
 {
     int p;
     int px;
@@ -803,7 +807,7 @@ global void VideoDrawCircle(SDL_Color color, int x, int y, int r)
     }
 }
 
-global void VideoDrawTransCircle(SDL_Color color, int x, int y, 
+global void VideoDrawTransCircle(Uint32 color, int x, int y, 
     int r, unsigned char alpha)
 {
     int p;
@@ -833,7 +837,7 @@ global void VideoDrawTransCircle(SDL_Color color, int x, int y,
     }
 }
 
-global void VideoDrawCircleClip(SDL_Color color, int x, int y, int r)
+global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 {
     SDL_Rect oldrect;
     SDL_Rect newrect;
@@ -849,7 +853,7 @@ global void VideoDrawCircleClip(SDL_Color color, int x, int y, int r)
     SDL_SetClipRect(TheScreen, &oldrect);
 }
 
-global void VideoDrawTransCircleClip(SDL_Color color, int x, int y,
+global void VideoDrawTransCircleClip(Uint32 color, int x, int y,
     int r, unsigned char alpha)
 {
     SDL_Rect oldrect;
@@ -866,7 +870,7 @@ global void VideoDrawTransCircleClip(SDL_Color color, int x, int y,
     SDL_SetClipRect(TheScreen, &oldrect);
 }
 
-global void VideoFillCircle(SDL_Color color, int x, int y, int r)
+global void VideoFillCircle(Uint32 color, int x, int y, int r)
 {
     int p;
     int px;
@@ -902,7 +906,7 @@ global void VideoFillCircle(SDL_Color color, int x, int y, int r)
     }
 }
 
-global void VideoFillTransCircle(SDL_Color color, int x, int y, 
+global void VideoFillTransCircle(Uint32 color, int x, int y, 
     int r, unsigned char alpha)
 {
     int p;
@@ -939,7 +943,7 @@ global void VideoFillTransCircle(SDL_Color color, int x, int y,
     }
 }
 
-global void VideoFillCircleClip(SDL_Color color, int x, int y, int r)
+global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 {
     SDL_Rect oldrect;
     SDL_Rect newrect;
@@ -955,7 +959,7 @@ global void VideoFillCircleClip(SDL_Color color, int x, int y, int r)
     SDL_SetClipRect(TheScreen, &oldrect);
 }
 
-global void VideoFillTransCircleClip(SDL_Color color, int x, int y,
+global void VideoFillTransCircleClip(Uint32 color, int x, int y,
     int r, unsigned char alpha)
 {
     SDL_Rect oldrect;
@@ -970,6 +974,27 @@ global void VideoFillTransCircleClip(SDL_Color color, int x, int y,
     SDL_SetClipRect(TheScreen, &newrect);
     VideoFillTransCircle(color, x, y, r, alpha);
     SDL_SetClipRect(TheScreen, &oldrect);
+}
+
+global void InitLineDraw()
+{
+/*
+    SDL_Surface* s;
+
+    s = SDL_CreateRGBSurface(SDL_SWSURFACE, 1, 1, 32, 
+	RMASK, GMASK, BMASK, AMASK);
+    PixelSurface = SDL_DisplayFormatAlpha(s);
+    SDL_FreeSurface(s);
+*/
+    switch (VideoDepth) {
+	case 16:
+	    VideoDrawPixel = VideoDrawPixel16;
+	    VideoDrawTransPixel = VideoDrawTransPixel16;
+	    break;
+	case 32:
+	    VideoDrawPixel = VideoDrawPixel32;
+	    VideoDrawTransPixel = VideoDrawTransPixel32;
+    }
 }
 
 global void DebugTestDisplayLines(void)

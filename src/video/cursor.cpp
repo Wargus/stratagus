@@ -817,7 +817,7 @@ local void DrawBuildingCursor(void)
     int mx;
     int my;
 #ifdef USE_SDL_SURFACE
-    SDL_Color color;
+    Uint32 color;
 #else
     int x1;
     int y1;

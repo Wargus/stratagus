@@ -93,7 +93,7 @@ global int ShowManaBackgroundLong;
 **	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
-global void (*DrawSelection)(SDL_Color color, int x1, int y1,
+global void (*DrawSelection)(Uint32 color, int x1, int y1,
     int x2, int y2) = DrawSelectionNone;
 #else
 global void (*DrawSelection)(VMemType color, int x1, int y1,
@@ -119,11 +119,11 @@ global const Viewport* CurrentViewport;	/// FIXME: quick hack for split screen
 **	@return		Color for selection, or NULL if not selected.
 */
 #ifdef USE_SDL_SURFACE
-local SDL_Color* SelectionColor(const Unit* unit)
+local Uint32* SelectionColor(const Unit* unit)
 {
-    SDL_Color *color;
+    Uint32 *color;
 
-    color = malloc(sizeof(SDL_Color));
+    color = malloc(sizeof(Uint32));
 
     // FIXME: make these colors customizable via CVS
 
@@ -197,7 +197,7 @@ local VMemType* SelectionColor(const Unit* unit)
 global void DrawUnitSelection(const Unit* unit)
 {
 #ifdef USE_SDL_SURFACE
-    SDL_Color* color;
+    Uint32* color;
 #else
     VMemType* color;
 #endif
@@ -228,7 +228,7 @@ global void DrawUnitSelection(const Unit* unit)
 **	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
-global void DrawSelectionNone(SDL_Color color, int x1, int y1,
+global void DrawSelectionNone(Uint32 color, int x1, int y1,
     int x2, int y2)
 {
 }
@@ -247,7 +247,7 @@ global void DrawSelectionNone(VMemType color, int x1, int y1,
 **	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
-global void DrawSelectionCircle(SDL_Color color, int x1, int x2,
+global void DrawSelectionCircle(Uint32 color, int x1, int x2,
     int y1, int y2)
 #else
 global void DrawSelectionCircle(VMemType color, int x1, int x2,
@@ -268,7 +268,7 @@ global void DrawSelectionCircle(VMemType color, int x1, int x2,
 **	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
-global void DrawSelectionCircleWithTrans(SDL_Color color, int x1, int y1,
+global void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
     int x2, int y2)
 #else
 global void DrawSelectionCircleWithTrans(VMemType color, int x1, int y1,
@@ -294,7 +294,7 @@ global void DrawSelectionCircleWithTrans(VMemType color, int x1, int y1,
 **	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
-global void DrawSelectionRectangle(SDL_Color color, int x1, int y1,
+global void DrawSelectionRectangle(Uint32 color, int x1, int y1,
     int x2, int y2)
 #else
 global void DrawSelectionRectangle(VMemType color, int x1, int y1,
@@ -312,7 +312,7 @@ global void DrawSelectionRectangle(VMemType color, int x1, int y1,
 **	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
-global void DrawSelectionRectangleWithTrans(SDL_Color color, int x1, int y1,
+global void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
     int x2, int y2)
 #else
 global void DrawSelectionRectangleWithTrans(VMemType color, int x1, int y1,
@@ -337,7 +337,7 @@ global void DrawSelectionRectangleWithTrans(VMemType color, int x1, int y1,
 **	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
-global void DrawSelectionCorners(SDL_Color color, int x1, int y1,
+global void DrawSelectionCorners(Uint32 color, int x1, int y1,
     int x2, int y2)
 #else
 global void DrawSelectionCorners(VMemType color, int x1, int y1,
@@ -1139,7 +1139,7 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 {
     int f;
 #ifdef USE_SDL_SURFACE
-    SDL_Color color;
+    Uint32 color;
 #else
     VMemType color;
 #endif
@@ -1748,8 +1748,8 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
     int x2;
     int y2;
 #ifdef USE_SDL_SURFACE
-    SDL_Color color;
-    SDL_Color e_color;
+    Uint32 color;
+    Uint32 e_color;
 #else
     VMemType color;
     VMemType e_color;

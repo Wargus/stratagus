@@ -344,7 +344,7 @@ struct _player_ {
 
 // Display video
 #ifdef USE_SDL_SURFACE
-    SDL_Color	Color;			/// color of units on minimap
+    Uint32	Color;			/// color of units on minimap
 #else
     VMemType	Color;			/// color of units on minimap
 #endif
@@ -458,7 +458,7 @@ extern Player Players[PlayerMax];	/// All players
 extern Player* ThisPlayer;		/// Player on local computer
 extern int NoRescueCheck;		/// Disable rescue check
 #ifdef USE_SDL_SURFACE
-extern SDL_Color PlayerColors[PlayerMax];
+extern Uint32 PlayerColors[PlayerMax];
 #else
 extern VMemType PlayerColors[PlayerMax];	/// Player colors
 #endif
