@@ -5,6 +5,9 @@ dnl AC_CANONICAL_TARGET
 
 CPPFLAGS="$CPPFLAGS -I/usr/local/include"
 
+AC_CHECK_HEADERS(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
+AC_CHECK_HEADERS(png.h,, AC_MSG_ERROR(could not find png.h))
+
 EXE=
 OUTFILE="\$(TOPDIR)/freecraft\$(EXE)"
 OE=o
@@ -25,15 +28,24 @@ elif test "`uname -a | grep -is beos`"; then
 else
     ARCH=linux
 fi
+
+AC_ARG_ENABLE(win32,
+    [  --enable-win32	  Force win32 (default: no)])
+if test "$enable_win32" = "yes"; then
+    WIN32=1
+    EXE=.exe
+    OUTFILE="\$(TOPDIR)/freecraft\$(EXE)"
+    ARCH=win32
+    OBJDIR=winobj
+    PLATFORM="-DUSE_WIN32"
+    PATH="/usr/local/cross/bin:$PATH"
+fi
 AC_SUBST(EXE)
 AC_SUBST(OUTFILE)
 AC_SUBST(ARCH)
 AC_SUBST(OE)
 AC_SUBST(OBJDIR)
 AC_SUBST(PLATFORM)
-
-AC_CHECK_HEADERS(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
-AC_CHECK_HEADERS(png.h,, AC_MSG_ERROR(could not find png.h))
 
 AC_ARG_ENABLE(static,
     [  --enable-static	  Compile a static binary (default: no)])
@@ -91,10 +103,10 @@ else
 	VIDEO_LIBS="`sdl-config --static-libs`"
     fi
     if test "$WIN32" = "1"; then
-	if test "`uname -a | grep -is mingw`"; then
-	    VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32 -lmingwex -lgmon"
-	else
+	if test "`uname -a | grep -is cygwin`"; then
 	    VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32"
+	else
+	    VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32 -lmingwex -lgmon"
 	fi
     fi
 fi

@@ -136,6 +136,7 @@ strip:
 	@if [ -f freecraft.exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip freecraft.exe; fi
 
 src/$(OBJDIR)/freecraftrc.$(OE): src/freecraft.rc
+	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
 	windres --include-dir contrib -o src/$(OBJDIR)/freecraftrc.$(OE) src/freecraft.rc
 
 echo::
@@ -376,7 +377,6 @@ release:
 #	WIN32 Crosscompiler Build
 ##############################################################################
 
-#-lws2_32 -Wl,--stack,63550000  -Wl,--stack,16777216
 WIN32=	\
     VIDEOLIB='-L$(CROSSDIR)/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32' \
     RULESFILE=$(WINRULESFILE)
