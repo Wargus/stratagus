@@ -3503,6 +3503,8 @@ global void SaveUnits(FILE* file)
 	    HitPointRegeneration ? "t" : "f");
     fprintf(file,"(set-fancy-buildings! #%s)\n",
 	    FancyBuildings ? "t" : "f");
+    fprintf(file,"(set-training-queue! #%s)\n",
+	    EnableTrainingQueue ? "t" : "f");
 
     for( table=Units; table<&Units[NumUnits]; ++table ) {
 	SaveUnit(*table,file);
