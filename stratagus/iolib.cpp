@@ -40,6 +40,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#else
+#define R_OK	1	// FIXME: correct?
 #endif
 
 #include "freecraft.h"
@@ -473,6 +475,9 @@ local int flqcmp(const void *v1, const void *v2)
 */
 global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *),FileList **flp)
 {
+#ifdef _MSC_VER
+    // FIXME: help write this function
+#else
     DIR *dirp;
     struct dirent *dp;
     struct stat st;
@@ -542,6 +547,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     }
     *flp = fl;
     return n;
+#endif
 }
 
 //@}
