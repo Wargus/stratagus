@@ -2363,9 +2363,11 @@ local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 SaveDir="save";
 mkdir(SaveDir);
 #else
-char *path;
+//char *path;
 
-strcpy(path, "test");
+// HEY ! path is unitialized => pointing to random location!!!!!
+////// strcpy(path, "test");
+
 //strcat(buffer,"/");
 //strcat(buffer,FREECRAFT_HOME_PATH);
 //mkdir(buffer,0777);
