@@ -75,7 +75,7 @@ global int HandleActionDie(Unit* unit)
 	}
 	unit->NextCount=0;
 	unit->SubAction=0;
-	UnitNewHeading(unit);
+	UnitUpdateHeading(unit);
 	DebugCheck( !unit->Type->Animations || !unit->Type->Animations->Die );
 	UnitShowAnimation(unit,unit->Type->Animations->Die);
 

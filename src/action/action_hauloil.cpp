@@ -89,10 +89,10 @@ local int MoveToOilWell(Unit* unit)
     unit->X=well->X;
     unit->Y=well->Y;
 
-    if( HAUL_FOR_OIL<UNIT_MAX_WAIT ) {
+    if( HAUL_FOR_OIL<MAX_UNIT_WAIT ) {
 	unit->Wait=HAUL_FOR_OIL;
     } else {
-	unit->Wait=UNIT_MAX_WAIT;
+	unit->Wait=MAX_UNIT_WAIT;
     }
     unit->Value=HAUL_FOR_OIL-unit->Wait;
 
@@ -173,11 +173,19 @@ local int HaulInOilWell(Unit* unit)
 	//
 	if( !(depot=FindOilDeposit(unit->Player,unit->X,unit->Y)) ) {
 	    if( well ) {
+#ifdef NEW_HEADING
+		DropOutOnSide(unit,LookingW
+			,well->Type->TileWidth,well->Type->TileHeight);
+#else
 		DropOutOnSide(unit,HeadingW
-			,well->Type->TileWidth
-			,well->Type->TileHeight);
+			,well->Type->TileWidth,well->Type->TileHeight);
+#endif
 	    } else {
+#ifdef NEW_HEADING
+		DropOutOnSide(unit,LookingW,1,1);
+#else
 		DropOutOnSide(unit,HeadingW,1,1);
+#endif
 	    }
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
@@ -218,10 +226,10 @@ local int HaulInOilWell(Unit* unit)
     //
     //	Continue waiting
     //
-    if( unit->Value<UNIT_MAX_WAIT ) {
+    if( unit->Value<MAX_UNIT_WAIT ) {
 	unit->Wait=unit->Value;
     } else {
-	unit->Wait=UNIT_MAX_WAIT;
+	unit->Wait=MAX_UNIT_WAIT;
     }
     unit->Value-=unit->Wait;
     return 0;
@@ -279,10 +287,10 @@ local int MoveToOilDepot(Unit* unit)
 		,unit->Type->Ident);
     }
 
-    if( WAIT_FOR_OIL<UNIT_MAX_WAIT ) {
+    if( WAIT_FOR_OIL<MAX_UNIT_WAIT ) {
 	unit->Wait=WAIT_FOR_OIL;
     } else {
-	unit->Wait=UNIT_MAX_WAIT;
+	unit->Wait=MAX_UNIT_WAIT;
     }
     unit->Value=WAIT_FOR_OIL-unit->Wait;
     return 1;
@@ -302,9 +310,15 @@ local int WaitForOilDeliver(Unit* unit)
     if( !unit->Value ) {
 	// FIXME: return to last position!
 	if( !(platform=FindOilPlatform(unit->Player,unit->X,unit->Y)) ) {
+#ifdef NEW_HEADING
+	    DropOutOnSide(unit,LookingW
+		    ,UnitTypes[UnitGreatHall].TileWidth
+		    ,UnitTypes[UnitGreatHall].TileHeight);
+#else
 	    DropOutOnSide(unit,HeadingW
 		    ,UnitTypes[UnitGreatHall].TileWidth
 		    ,UnitTypes[UnitGreatHall].TileHeight);
+#endif
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
 	} else {
@@ -335,10 +349,10 @@ local int WaitForOilDeliver(Unit* unit)
 	unit->SubAction=0;
 	return 1;
     } else {
-	if( unit->Value<UNIT_MAX_WAIT ) {
+	if( unit->Value<MAX_UNIT_WAIT ) {
 	    unit->Wait=unit->Value;
 	} else {
-	    unit->Wait=UNIT_MAX_WAIT;
+	    unit->Wait=MAX_UNIT_WAIT;
 	}
 	unit->Value-=unit->Wait;
     }

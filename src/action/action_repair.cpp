@@ -197,7 +197,7 @@ global int HandleActionRepair(Unit* unit)
 			<=REPAIR_RANGE ) {
 		    unit->State=0;
 		    if( !unit->Type->Tower ) {
-			UnitNewHeadingFromXY(unit
+			UnitHeadingFromDeltaXY(unit
 			    ,goal->X-unit->X,goal->Y-unit->Y);
 		    }
 		    unit->SubAction=1;

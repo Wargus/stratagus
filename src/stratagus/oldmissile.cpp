@@ -99,6 +99,8 @@
 
 /**
 **	W*rCr*ft number to internal missile-type name.
+**
+**	Should be made configurable.
 */
 local const char* MissileTypeWcNames[] = {
     "missile-lightning",
@@ -545,11 +547,13 @@ global void FireMissile(Unit* unit)
 #endif
 	if( goal->Removed ) {
 	    DebugLevel3("Missile-none hits removed unit!\n");
+	    --goal->Refs;
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 	    DebugLevel3("Missile-none hits dead unit!\n");
+	    --goal->Refs;
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
@@ -564,14 +568,21 @@ global void FireMissile(Unit* unit)
     x=unit->X*TileSizeX+TileSizeX/2;
     y=unit->Y*TileSizeY+TileSizeY/2;
     if( (goal=unit->Command.Data.Move.Goal) ) {
-	// Fire to nearest point of unit!
-	if( goal->Type ) {
-	    NearestOfUnit(goal,unit->X,unit->Y,&dx,&dy);
-	} else {
-	    // FIXME: unit killed?
-	    dx=goal->X;
-	    dy=goal->Y;
+#ifdef NEW_UNIT
+	// Check if goal is correct unit.
+	if( goal->Destroyed ) {
+	    DebugLevel0(__FUNCTION__": destroyed unit\n");
+	    if( !--goal->Refs ) {
+		ReleaseUnit(goal);
+	    }
+	    // FIXME: should I clear this here?
+	    unit->Command.Data.Move.Goal=NULL;
+	    return;
 	}
+#endif
+	DebugCheck( !goal->Type );	// Target invalid?
+	// Fire to nearest point of unit!
+	NearestOfUnit(goal,unit->X,unit->Y,&dx,&dy);
 	DebugLevel3("Fire to unit at %d,%d\n",dx,dy);
 	dx=dx*TileSizeX+TileSizeX/2;
 	dy=dy*TileSizeY+TileSizeY/2;
@@ -586,6 +597,9 @@ global void FireMissile(Unit* unit)
     //	Damage of missile
     //
     missile->SourceUnit=unit;
+#ifdef NEW_UNIT
+    // unit->Refs++; Reference currently not used.
+#endif
     missile->SourceType=unit->Type;
     missile->SourceStats=unit->Stats;
     missile->SourcePlayer=unit->Player;
@@ -634,40 +648,58 @@ global void DrawMissiles(void)
 
 /**
 **	Change missile heading from x,y.
+**
+**	@param missile	Missile pointer.
+**	@param dx	Delta in x.
+**	@param dy	Delta in y.
 */
-local void MissileNewHeadingFromXY(int missile,int x,int y)
+local void MissileNewHeadingFromXY(Missile* missile,int dx,int dy)
 {
+#ifdef NEW_HEADING
+    int heading;
+    int frame;
+
+    heading=DirectionToHeading(dx,dy);
+    // FIXME: depends on the missile directions wc 8, sc 32
+    if( heading<=LookingS ) {	// north->east->south
+	frame=heading/32;
+    } else {
+	frame=128+256/32-heading/32;
+    }
+    missile->Frame=frame;
+#else
     int heading;
     int frame;
 
     // Set new heading:
-    if( x==0 ) {
-	if( y<0 ) {
+    if( dx==0 ) {
+	if( dy<0 ) {
 	    heading=HeadingN;
 	} else {
 	    heading=HeadingS;
 	}
 	frame=heading;
-    } else if( x>0 ) {
-	if( y<0 ) {
+    } else if( dx>0 ) {
+	if( dy<0 ) {
 	    heading=HeadingNE;
-	} else if( y==0 ) {
+	} else if( dy==0 ) {
 	    heading=HeadingE;
 	} else {
 	    heading=HeadingSE;
 	}
 	frame=heading;
     } else {
-	if( y<0 ) {
+	if( dy<0 ) {
 	    heading=HeadingNW;
-	} else if( y==0 ) {
+	} else if( dy==0 ) {
 	    heading=HeadingW;
 	} else {
 	    heading=HeadingSW;
 	}
 	frame=128+1+HeadingNW-heading;
     }
-    Missiles[missile].Frame=frame;
+    missile->Frame=frame;
+#endif
 }
 
 #define MISSILE_STEPS	16		// How much did a missile move??
@@ -699,7 +731,7 @@ local int PointToPointMissile(int missile)
 	}
 
 	// FIXME: could be better written
-	MissileNewHeadingFromXY(missile,dx*xstep,dy*ystep);
+	MissileNewHeadingFromXY(&Missiles[missile],dx*xstep,dy*ystep);
 
 	if( dy==0 ) {		// horizontal line
 	    if( dx==0 ) {
@@ -1086,15 +1118,16 @@ global void MissileActions(void)
 /**
 **	Calculate distance from view-point to missle.
 */
-global int ViewPointDistanceToMissile(Missile* dest)
+global int ViewPointDistanceToMissile(const Missile* dest)
 {
     int x;
     int y;
 
-    //FIXME: is it the correct formula?
     x=dest->X/TileSizeX;
-    y=dest->Y/TileSizeY;
-    DebugLevel3("Missile %p at %d %d\n",dest,x,y);
+    y=dest->Y/TileSizeY;		// pixel -> tile
+
+    DebugLevel3(__FUNCTION__": Missile %p at %d %d\n",dest,x,y);
+
     return ViewPointDistance(x,y);
 }
 

@@ -74,10 +74,10 @@ local int MoveToGoldMine(Unit* unit)
     unit->X=destu->X;
     unit->Y=destu->Y;
 
-    if( MINE_FOR_GOLD<UNIT_MAX_WAIT ) {
+    if( MINE_FOR_GOLD<MAX_UNIT_WAIT ) {
 	unit->Wait=MINE_FOR_GOLD;
     } else {
-	unit->Wait=UNIT_MAX_WAIT;
+	unit->Wait=MAX_UNIT_WAIT;
     }
     unit->Value=MINE_FOR_GOLD-unit->Wait;
 
@@ -136,9 +136,13 @@ local int MineInGoldmine(Unit* unit)
 	// FIXME: I use goldmine after destory!!!
 
 	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
+#ifdef NEW_HEADING
+	    DropOutOnSide(unit,LookingW
+		    ,mine->Type->TileWidth,mine->Type->TileHeight);
+#else
 	    DropOutOnSide(unit,HeadingW
-		    ,mine->Type->TileWidth
-		    ,mine->Type->TileHeight);
+		    ,mine->Type->TileWidth,mine->Type->TileHeight);
+#endif
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
 	    DebugLevel3("Mine without goldmine\n");
@@ -186,10 +190,10 @@ local int MineInGoldmine(Unit* unit)
     //
     //	Continue waiting
     //
-    if( unit->Value<UNIT_MAX_WAIT ) {
+    if( unit->Value<MAX_UNIT_WAIT ) {
 	unit->Wait=unit->Value;
     } else {
-	unit->Wait=UNIT_MAX_WAIT;
+	unit->Wait=MAX_UNIT_WAIT;
     }
     unit->Value-=unit->Wait;
     return 0;
@@ -291,10 +295,10 @@ global void HandleActionMineGold(Unit* unit)
 		    ,unit->Type->Name);
 	    }
 
-	    if( WAIT_FOR_GOLD<UNIT_MAX_WAIT ) {
+	    if( WAIT_FOR_GOLD<MAX_UNIT_WAIT ) {
 		unit->Wait=WAIT_FOR_GOLD;
 	    } else {
-		unit->Wait=UNIT_MAX_WAIT;
+		unit->Wait=MAX_UNIT_WAIT;
 	    }
 	    unit->Value=WAIT_FOR_GOLD-unit->Wait;
 	    unit->SubAction=128;
@@ -309,9 +313,15 @@ global void HandleActionMineGold(Unit* unit)
 		// FIXME: return to last position!
 		// FIXME: Ari says, don't automatic search a new mine.
 		if( !(destu=FindGoldMine(unit,unit->X,unit->Y)) ) {
+#ifdef NEW_HEADING
+		    DropOutOnSide(unit,LookingW
+			    ,UnitTypes[UnitGreatHall].TileWidth
+			    ,UnitTypes[UnitGreatHall].TileHeight);
+#else
 		    DropOutOnSide(unit,HeadingW
 			    ,UnitTypes[UnitGreatHall].TileWidth
 			    ,UnitTypes[UnitGreatHall].TileHeight);
+#endif
 		    unit->Command.Action=UnitActionStill;
 		    unit->SubAction=0;
 		} else {
@@ -341,10 +351,10 @@ global void HandleActionMineGold(Unit* unit)
 		unit->Wait=1;
 		unit->SubAction=0;
 	    } else {
-		if( unit->Value<UNIT_MAX_WAIT ) {
+		if( unit->Value<MAX_UNIT_WAIT ) {
 		    unit->Wait=unit->Value;
 		} else {
-		    unit->Wait=UNIT_MAX_WAIT;
+		    unit->Wait=MAX_UNIT_WAIT;
 		}
 		unit->Value-=unit->Wait;
 	    }

@@ -166,7 +166,7 @@ global void HandleActionBuild(Unit* unit)
     unit->X=x;
     unit->Y=y;
     unit->Command.Action=UnitActionStill;
-    // unit->Wait=UNIT_MAX_WAIT;
+    // unit->Wait=MAX_UNIT_WAIT;
 
     if( UnitVisible(build) ) {
         MustRedraw|=RedrawMaps;
@@ -196,7 +196,11 @@ global void HandleActionBuilded(Unit* unit)
 	peon->Wait=1;
 	peon->Command.Action=UnitActionStill;
 	unit->Command.Data.Builded.Worker=NULL;
+#ifdef NEW_HEADING
+	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
+#else
 	DropOutOnSide(peon,HeadingW,type->TileWidth,type->TileHeight);
+#endif
 	// Cancel building
 	DestroyUnit(unit);
 	return;
@@ -233,7 +237,11 @@ global void HandleActionBuilded(Unit* unit)
 	peon->Command.Action=UnitActionStill;
 	peon->Reset=1;
 	peon->Wait=1;
+#ifdef NEW_HEADING
+	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
+#else
 	DropOutOnSide(peon,HeadingW,type->TileWidth,type->TileHeight);
+#endif
 
 	//
 	//	Building oil-platform, must update oil.
