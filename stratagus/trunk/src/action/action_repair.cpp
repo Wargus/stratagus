@@ -128,7 +128,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	} else {
 		// hp is the current damage taken by the unit.
 		hp = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
-			(goal->Type->Stats->Costs[TimeCost] * 600) - goal->HP;
+			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - goal->HP;
 		//
 		// Calculate the length of the attack (repair) anim.
 		//
@@ -145,7 +145,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 		goal->Data.Builded.Progress += 100 * animlength * SpeedBuild;
 		// Keep the same level of damage while increasing HP.
 		goal->HP = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
-			(goal->Type->Stats->Costs[TimeCost] * 600) - hp;
+			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - hp;
 		if (goal->HP > goal->Stats->HitPoints) {
 			goal->HP = goal->Stats->HitPoints;
 		}
@@ -225,7 +225,7 @@ global void HandleActionRepair(Unit* unit)
 				// Have reached target? FIXME: could use return value
 				//
 				if (goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange &&
-						goal->HP < goal->Type->Stats->HitPoints) {
+						goal->HP < goal->Type->Stats[goal->Player->Player].HitPoints) {
 					unit->State = 0;
 					unit->SubAction = 2;
 					unit->Reset = 1;

@@ -221,7 +221,7 @@ global void ActionStillGeneric(Unit* unit, int ground)
 				unit->Reset = 0;
 				unit->State = 0;
 				unit->SubAction = 1; // Mark attacking.
-				if (type->Stats->Speed) {
+				if (type->Stats[unit->Player->Player].Speed) {
 					UnitHeadingFromDeltaXY(unit,
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);

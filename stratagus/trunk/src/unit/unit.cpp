@@ -2857,7 +2857,7 @@ global void LetUnitDie(Unit* unit)
 				!unit->Type->Animations->Die);
 			UnitShowAnimation(unit, unit->Type->Animations->Die);
 			DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
-			unit->CurrentSightRange = type->Stats->SightRange;
+			unit->CurrentSightRange = type->Stats[unit->Player->Player].SightRange;
 			MapMarkUnitSight(unit);
 		} else {
 			// no corpse available
@@ -2890,7 +2890,7 @@ global void LetUnitDie(Unit* unit)
 	unit->Orders[0].Action = UnitActionDie;
 
 	if (unit->Type->CorpseType) {
-		unit->CurrentSightRange = unit->Type->CorpseType->Stats->SightRange;
+		unit->CurrentSightRange = unit->Type->CorpseType->Stats[unit->Player->Player].SightRange;
 	} else {
 		unit->CurrentSightRange = 0;
 	}
