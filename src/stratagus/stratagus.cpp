@@ -488,7 +488,6 @@ local void WaitCallbackKey4(unsigned dummy1 __attribute__((unused)),
     unsigned dummy2 __attribute__((unused)))
 {
     DebugLevel3Fn("Repeated %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_ dummy2);
-    WaitNoEvent = 0;
 }
 
 /**
