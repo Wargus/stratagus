@@ -37,11 +37,8 @@
 ==  Config definitions
 ============================================================================*/
 
-// Unit On Map cache
-// #define UNIT_ON_MAP
-
 // New unit cache
-#define NEW_UNIT_CACHE
+//#define NEW_UNIT_CACHE
 
 // New Lua scripting.
 //#define META_LUA
