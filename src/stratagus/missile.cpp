@@ -594,6 +594,16 @@ global void FireMissile(Unit* unit)
 	// FIXME: goal is already dead, but missile could hit others?
     }
 
+    if( goal && RevealAttacker ) {	// attacking units are seen
+#ifdef NEW_FOW
+	MapMarkSight(goal->Player,unit->X,unit->Y,1);
+#else
+	if( goal->Player==ThisPlayer ) {
+	    MapMarkSight(unit->X,unit->Y,1);
+	}
+#endif
+    }
+
     //
     //	None missile hits immediately!
     //
