@@ -340,7 +340,7 @@ global void DoRightButton(int x,int y)
 #endif
 
 	    // empty space
-	    if( RightButtonAttacks ) {
+	    if( RightButtonAttacks || (KeyModifiers&ModifierControl) ) {
 		SendCommandAttack(unit,x,y,NoUnitP,flush);
 	    } else {
 		// Note: move is correct here, right default is move
