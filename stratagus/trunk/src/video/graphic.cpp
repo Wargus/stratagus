@@ -41,6 +41,7 @@
 #include "stratagus.h"
 #include "video.h"
 #include "iolib.h"
+#include "iocompat.h"
 #include "intern_video.h"
 
 /*----------------------------------------------------------------------------
@@ -132,8 +133,13 @@ global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y)
 {
+	int oldx;
+	int oldy;
+
+	oldx = x;
+	oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSub(graphic, gx, gy, w, h, x, y);
+	VideoDrawSub(graphic, gx + x - oldx, gy + oldy - y, w, h, x, y);
 }
 
 /**
@@ -183,8 +189,13 @@ global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
 global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char fade)
 {
+	int oldx;
+	int oldy;
+
+	oldx = x;
+	oldy = y;
 	CLIP_RECTANGLE(gx, gy, w, h);
-	VideoDrawSubFaded(graphic, gx, gy, w, h, x, y, fade);
+	VideoDrawSubFaded(graphic, gx + x - oldx, gy + y - oldy, w, h, x, y, fade);
 }
 
 /**
