@@ -103,8 +103,8 @@ global void HandleActionFollow(Unit* unit)
 	if ((goal->X == unit->Orders[0].X && goal->Y == unit->Orders[0].Y)) {
 	    unit->Reset = 1;
 	    unit->Wait = 10;
-	    if ((unit->Orders[0].RangeX > 1) || (unit->Orders[0].RangeY > 1)) {
-	        unit->Orders[0].RangeX = unit->Orders[0].RangeY = 1;
+	    if (unit->Orders[0].Range > 1) {
+	        unit->Orders[0].Range = 1;
 		unit->SubAction = 0;
 	    }
 	    return;
@@ -124,10 +124,9 @@ global void HandleActionFollow(Unit* unit)
 	    //
 	    //	Some tries to reach the goal
 	    //
-	    if (unit->Orders[0].RangeX <= TheMap.Width ||
-		    unit->Orders[0].RangeX <= TheMap.Height) {
-		unit->Orders[0].RangeX++;
-		unit->Orders[0].RangeY++;
+	    if (unit->Orders[0].Range <= TheMap.Width ||
+		    unit->Orders[0].Range <= TheMap.Height) {
+		unit->Orders[0].Range++;
 		break;
             }
 	    // FALL THROUGH

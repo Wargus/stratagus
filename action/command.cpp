@@ -265,13 +265,13 @@ global void CommandFollow(Unit* unit, Unit* dest, int flush)
 	    order->X = dest->X + dest->Type->TileWidth / 2;
 	    order->Y = dest->Y + dest->Type->TileHeight / 2;
 	    order->Goal = NoUnitP;
-	    order->RangeX = order->RangeY = 0;
+	    order->Range = 0;
 	} else {
 	    order->X = order->Y = -1;
 	    order->Goal = dest;
 	    RefsDebugCheck(!dest->Refs);
 	    dest->Refs++;
-	    order->RangeX = order->RangeY = 1;
+	    order->Range = 1;
 	}
 	order->Type = NULL;
 	order->Arg1 = NULL;
@@ -314,7 +314,7 @@ global void CommandMove(Unit* unit, int x, int y, int flush)
 	order->Goal = NoUnitP;
 	order->X = x;
 	order->Y = y;
-	order->RangeX = order->RangeY = 0;
+	order->Range = 0;
 	order->Type = NULL;
 	order->Arg1 = NULL;
 #ifdef HIERARCHIC_PATHFINDER
@@ -368,19 +368,21 @@ global void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 		order->X = dest->X + dest->Type->TileWidth / 2;
 		order->Y = dest->Y + dest->Type->TileHeight / 2;
 		order->Goal = NoUnitP;
-		order->RangeX = order->RangeY = 0;
+		order->Range = 0;
+		order->Width = order->Height = 0;
 	    } else {
 		order->X = order->Y = -1;
+		order->Width = order->Height = 0;
 		order->Goal = dest;
 		RefsDebugCheck(!dest->Refs);
 		dest->Refs++;
-		order->RangeX = order->RangeY = unit->Type->RepairRange;
+		order->Range = unit->Type->RepairRange;
 	    }
 	} else {
 	    order->X = x;
 	    order->Y = y;
 	    order->Goal = NoUnitP;
-	    order->RangeX = order->RangeY = unit->Type->RepairRange;
+	    order->Range = 0;
 	}
 	order->Type = NULL;
 	order->Arg1 = NULL;
@@ -431,27 +433,27 @@ global void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 		order->X = attack->X + attack->Type->TileWidth / 2;
 		order->Y = attack->Y + attack->Type->TileHeight / 2;
 		order->Goal = NoUnitP;
-		order->RangeX = order->RangeY = 0;
+		order->Range = 0;
 	    } else {
 		// Removed, Dying handled by action routine.
 		order->X = order->Y = -1;
 		order->Goal = attack;
 		RefsDebugCheck(!attack->Refs);
 		attack->Refs++;
-		order->RangeX = order->RangeY = unit->Stats->AttackRange;
+		order->Range = unit->Stats->AttackRange;
 		order->MinRange = unit->Type->MinAttackRange;
 	    }
 	} else if (WallOnMap(x,y)) {
 	    // FIXME: look into action_attack.c about this ugly problem
 	    order->X = x;
 	    order->Y = y;
-	    order->RangeX = order->RangeY = unit->Stats->AttackRange;
+	    order->Range = unit->Stats->AttackRange;
 	    order->MinRange = unit->Type->MinAttackRange;
 	    order->Goal = NoUnitP;
 	} else {
 	    order->X = x;
 	    order->Y = y;
-	    order->RangeX = order->RangeY = 0;
+	    order->Range = 0;
 	    order->Goal = NoUnitP;
 	}
 	order->Type = NULL;
@@ -495,7 +497,7 @@ global void CommandAttackGround(Unit* unit, int x, int y, int flush)
 	order->Action = UnitActionAttackGround;
 	order->X = x;
 	order->Y = y;
-	order->RangeX = order->RangeY = unit->Stats->AttackRange;
+	order->Range = unit->Stats->AttackRange;
 	order->MinRange = unit->Type->MinAttackRange;
 	order->Goal = NoUnitP;
 	order->Type = NULL;
@@ -543,7 +545,7 @@ global void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 	order->Goal = NoUnitP;
 	order->X = x;
 	order->Y = y;
-	order->RangeX = order->RangeY = 0;
+	order->Range = 0;
 	order->Type = NULL;
 	DebugCheck(unit->X & ~0xFFFF || unit->Y & ~0xFFFF);
 	// BUG-ALERT: encode source into arg1 as two 16 bit values!
@@ -589,7 +591,7 @@ global void CommandBoard(Unit* unit, Unit* dest, int flush)
 	order->Goal = dest;
 	RefsDebugCheck(!dest->Refs);
 	dest->Refs++;
-	order->RangeX = order->RangeY = 1;
+	order->Range = 1;
 	order->Type = NULL;
 	order->Arg1 = NULL;
     }
@@ -631,7 +633,7 @@ global void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 	    RefsDebugCheck(!what->Refs);
 	    what->Refs++;
 	}
-	order->RangeX = order->RangeY = 0;
+	order->Range = 0;
 	order->Type = NULL;
 	order->Arg1 = NULL;
     }
@@ -666,16 +668,15 @@ global void CommandBuildBuilding(Unit* unit, int x, int y,
 
 	order->Action = UnitActionBuild;
 	order->Goal = NoUnitP;
-	order->IsRect = 1;
 	order->X = x;
 	order->Y = y;
+	order->Width = what->TileWidth;
+	order->Height = what->TileHeight;
 	if (what->BuilderOutside) {
-	    order->RangeX = unit->Type->RepairRange;
-	    order->RangeY = unit->Type->RepairRange;
+	    order->Range = unit->Type->RepairRange;
 	} else {
 	    // If building inside, but be next to stop
-	    order->RangeX = 1;
-	    order->RangeY = 1;
+	    order->Range = 1;
 	}
 	order->Type = what;
 	order->Arg1 = NULL;
@@ -750,7 +751,7 @@ global void CommandResourceLoc(Unit* unit, int x, int y, int flush)
 	order->X = nx;
 	order->Y = ny;
 
-	order->RangeX = order->RangeY = 1;
+	order->Range = 1;
 	order->Goal = NoUnitP;
 	order->Type = NULL;
 	order->Arg1 = NULL;
@@ -795,7 +796,7 @@ global void CommandResource(Unit* unit, Unit* dest, int flush)
 	order->Goal = dest;
 	RefsDebugCheck(!dest->Refs);
 	dest->Refs++;
-	order->RangeX = order->RangeY = 1;
+	order->Range = 1;
 	order->Type = NULL;
 	order->Arg1 = NULL;
     }
@@ -842,7 +843,7 @@ global void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 	    RefsDebugCheck(!goal->Refs);
 	    goal->Refs++;
 	}
-	order->RangeX = order->RangeY = 1;
+	order->Range = 1;
 	order->Type = NULL;
 	order->Arg1 = NULL;
     }
@@ -1203,23 +1204,23 @@ global void CommandDemolish(Unit* unit, int x, int y, Unit* dest, int flush)
 		order->X = dest->X + dest->Type->TileWidth / 2;
 		order->Y = dest->Y + dest->Type->TileHeight / 2;
 		order->Goal = NoUnitP;
-		order->RangeX = order->RangeY = 0;
+		order->Range = 0;
 	    } else {
 		order->X = order->Y = -1;
 		order->Goal = dest;
 		RefsDebugCheck(!dest->Refs);
 		dest->Refs++;
-		order->RangeX = order->RangeY = 1;
+		order->Range = 1;
 	    }
 	} else if (WallOnMap(x,y) || ForestOnMap(x,y) || RockOnMap(x,y)) {
 	    order->X = x;
 	    order->Y = y;
-	    order->RangeX = order->RangeY = 1;
+	    order->Range = 1;
 	    order->Goal = NoUnitP;
 	} else {
 	    order->X = x;
 	    order->Y = y;
-	    order->RangeX = order->RangeY = 0;
+	    order->Range = 0;
 	    order->Goal = NoUnitP;
 	}
 	order->Type = NULL;
@@ -1274,7 +1275,7 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 	}
 
 	order->Action = UnitActionSpellCast;
-	order->RangeX = order->RangeY = spell->Range;
+	order->Range = spell->Range;
 	if (dest) {
 	    //
 	    //	Destination could be killed.
@@ -1283,11 +1284,11 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 	    //
 	    if (dest->Destroyed) {
 		// FIXME: where check if spell needs an unit as destination?
-		order->X = dest->X + dest->Type->TileWidth / 2 - order->RangeX;
-		order->Y = dest->Y + dest->Type->TileHeight / 2 - order->RangeY;
+		order->X = dest->X + dest->Type->TileWidth / 2 - order->Range;
+		order->Y = dest->Y + dest->Type->TileHeight / 2 - order->Range;
 		order->Goal = NoUnitP;
-		order->RangeX <<= 1;
-		order->RangeY <<= 1;
+		order->Range <<= 1;
+		order->Range <<= 1;
 	    } else {
 		order->X = order->Y = -1;
 		order->Goal = dest;
@@ -1295,11 +1296,10 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 		dest->Refs++;
 	    }
 	} else {
-	    order->X = x-order->RangeX;
-	    order->Y = y-order->RangeY;
+	    order->X = x-order->Range;
+	    order->Y = y-order->Range;
 	    order->Goal = NoUnitP;
-	    order->RangeX <<= 1;
-	    order->RangeY <<= 1;
+	    order->Range <<= 1;
 	}
 	order->Type = NULL;
 	order->Arg1 = spell;

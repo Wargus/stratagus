@@ -68,8 +68,7 @@ local int MoveToTransporter(Unit* unit)
     i = DoActionMove(unit);
     // We have to reset a lot, or else they will circle each other and stuff.
     if (x != unit->X || y != unit->Y) {
-	unit->Orders[0].RangeX = 1;
-	unit->Orders[0].RangeY = 1;
+	unit->Orders[0].Range = 1;
         NewResetPath(unit);
     }
     // New code has this as default.
@@ -132,8 +131,7 @@ local int WaitForTransporter(Unit* unit)
     //  it's there. This is why we reset the search. The transporter
     //  should be a lot closer now, so it's not as bad as it seems.
     unit->SubAction = 0;
-    unit->Orders[0].RangeX = 1;
-    unit->Orders[0].RangeY = 1;
+    unit->Orders[0].Range = 1;
     //Uhh wait a bit.
     unit->Wait = 10;
 
@@ -258,10 +256,9 @@ global void HandleActionBoard(Unit* unit)
                             //
                             // Try with a bigger range.
                             //
-                            if (unit->Orders[0].RangeX <= TheMap.Width ||
-				    unit->Orders[0].RangeX <= TheMap.Height) {
-		                unit->Orders[0].RangeX++;
-		                unit->Orders[0].RangeY++;
+                            if (unit->Orders[0].Range <= TheMap.Width ||
+				    unit->Orders[0].Range <= TheMap.Height) {
+		                unit->Orders[0].Range++;
                                 unit->SubAction--;
                             }
 			}

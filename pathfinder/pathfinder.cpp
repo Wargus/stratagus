@@ -474,24 +474,16 @@ global int NewPath(Unit* unit)
 	gh=unit->Orders[0].Goal->Type->TileHeight-1;
 	gx=unit->Orders[0].Goal->X;
 	gy=unit->Orders[0].Goal->Y;
-	maxrange=unit->Orders[0].RangeX;
+	maxrange=unit->Orders[0].Range;
 	minrange=unit->Orders[0].MinRange;
-	DebugCheck( unit->Orders[0].RangeX != unit->Orders[0].RangeY );
     } else {
 	// Take care of non square goals :)
 	// If goal is non square, range states a non-existant goal rather
 	// than a tile.
-	if( unit->Orders[0].IsRect ) {
-	    gw = unit->Orders[0].RangeX;
-	    gh = unit->Orders[0].RangeY;
-	    maxrange=0;
-	    minrange=0;
-	} else {
-	    gw=0;
-	    gh=0;
-	    maxrange=unit->Orders[0].RangeX;
-	    minrange=unit->Orders[0].MinRange;
-	}
+	gw = unit->Orders[0].Width;
+	gh = unit->Orders[0].Height;
+	maxrange=unit->Orders[0].Range;
+	minrange=unit->Orders[0].MinRange;
 	gx=unit->Orders[0].X;
 	gy=unit->Orders[0].Y;
     }

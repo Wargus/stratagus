@@ -102,14 +102,6 @@ global void HandleActionBuild(Unit* unit)
 
     type = unit->Orders[0].Type;
 
-    // Create the building to find a valid path to any part of it.
-    // Only create if we didn't already.
-    if (unit->Orders[0].Goal == NoUnitP) {
-	unit->Orders[0].Goal = MakeUnit(type, NULL);
-	unit->Orders[0].Goal->X = unit->Orders[0].X;
-	unit->Orders[0].Goal->Y = unit->Orders[0].Y;
-    }
-
     switch (DoActionMove(unit)) {	// reached end-point?
 	case PF_UNREACHABLE:
 	    //
@@ -129,10 +121,6 @@ global void HandleActionBuild(Unit* unit)
 	    }
 
 	    unit->Orders[0].Action = UnitActionStill;
-	    // Release Temporary Building
-            UnitClearOrders(unit->Orders[0].Goal);
-            ReleaseUnit(unit->Orders[0].Goal);
-	    unit->Orders[0].Goal = NULL;
 	    unit->SubAction = 0;
 	    if (unit->Selected) {	// update display for new action
 		SelectedUnitChanged();
@@ -171,10 +159,6 @@ global void HandleActionBuild(Unit* unit)
 	}
 
 	unit->Orders[0].Action = UnitActionStill;
-	// Release Temporary Building
-        UnitClearOrders(unit->Orders[0].Goal);
-        ReleaseUnit(unit->Orders[0].Goal);
-	unit->Orders[0].Goal = NULL;
 	unit->SubAction = 0;
 	if (unit->Selected) {	// update display for new action
 	    SelectedUnitChanged();
@@ -204,10 +188,6 @@ global void HandleActionBuild(Unit* unit)
 	}
 
 	unit->Orders[0].Action = UnitActionStill;
-	// Release Temporary Building
-        UnitClearOrders(unit->Orders[0].Goal);
-        ReleaseUnit(unit->Orders[0].Goal);
-	unit->Orders[0].Goal = NULL;
 	unit->SubAction = 0;
 	if (unit->Selected) {	// update display for new action
 	    SelectedUnitChanged();
@@ -226,10 +206,6 @@ global void HandleActionBuild(Unit* unit)
 	}
 
 	unit->Orders[0].Action = UnitActionStill;
-	// Release Temporary Building
-        UnitClearOrders(unit->Orders[0].Goal);
-        ReleaseUnit(unit->Orders[0].Goal);
-	unit->Orders[0].Goal = NULL;
 	unit->SubAction = 0;
 	if (unit->Selected) {	// update display for new action
 	    SelectedUnitChanged();
@@ -238,10 +214,7 @@ global void HandleActionBuild(Unit* unit)
     }
     PlayerSubUnitType(unit->Player, type);
 
-    
-    build = unit->Orders[0].Goal;
-    unit->Orders[0].Goal = NoUnitP;
-    AssignUnitToPlayer(build, unit->Player);
+    build=MakeUnit(type,unit->Player);
     build->Constructed = 1;
     build->CurrentSightRange = 0;
     PlaceUnit(build, x, y);
@@ -300,7 +273,7 @@ global void HandleActionBuild(Unit* unit)
 	unit->Orders[0].Action = UnitActionRepair;
 	unit->Orders[0].Goal = build;
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
-	unit->Orders[0].RangeX = unit->Orders[0].RangeY = unit->Type->RepairRange;
+	unit->Orders[0].Range = unit->Type->RepairRange;
 	unit->SubAction = 0;
 	unit->Wait = 1;
 	RefsDebugCheck(!build->Refs);
