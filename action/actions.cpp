@@ -555,7 +555,7 @@ void UnitActions(void)
 		fprintf(logf, "%d %s S%d/%d-%d P%d Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit->Type ? unit->Type->Ident : "unit-killed",
 			unit->State, unit->SubAction,
-			unit->Orders[0].Action,
+			unit->Orders ? unit->Orders[0].Action : -1,
 			unit->Player ? unit->Player->Player : -1, unit->Refs,SyncRandSeed,
 			unit->X, unit->Y, unit->IX, unit->IY);
 
@@ -569,7 +569,7 @@ void UnitActions(void)
 		// Calculate some hash.
 		//
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
-		SyncHash ^= unit->Orders[0].Action << 18;
+		SyncHash ^= unit->Orders ? unit->Orders[0].Action << 18 : 0;
 		SyncHash ^= unit->State << 12;
 		SyncHash ^= unit->SubAction << 6;
 		SyncHash ^= unit->Refs << 3;

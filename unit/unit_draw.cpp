@@ -1083,7 +1083,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	if (unit->Orders[0].Action == UnitActionTrain) {
 		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
 		unit->Variable[TRAINING_INDEX].Max =
-			unit->Data.Train.What[0]->Stats[unit->Player->Player].Costs[TimeCost];
+			unit->Orders[0].Type->Stats[unit->Player->Player].Costs[TimeCost];
 	}
 
 	// UpgradeTo

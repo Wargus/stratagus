@@ -67,6 +67,7 @@
 #include "commands.h"
 #include "cdaudio.h"
 #include "pathfinder.h"
+#include "editor.h"
 
 #ifdef USE_SDLCD
 #include "SDL.h"
@@ -336,7 +337,7 @@ void DrawMapArea(void)
 */
 void UpdateDisplay(void)
 {
-	if (EnableRedraw != RedrawMenu) {
+	if (GameRunning || EditorRunning == EditorEditing) {
 		int i;
 
 		DrawMapArea();

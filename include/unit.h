@@ -331,18 +331,23 @@
 **  Unit::OrderCount
 **
 **  The number of the orders unit to process. An unit has atleast
-**  one order. Unit::OrderCount should be a number between 1 and
-**  ::MAX_ORDERS. The orders are in Unit::Orders[].
+**  one order. Unit::OrderCount should be a number at least 1.
+**  The orders are in Unit::Orders[].
 **
 **  Unit::OrderFlush
 **
 **  A flag, which tells the unit to stop with the current order
 **  and immediately start with the next order.
 **
+**  Unit::TotalOrders
+**
+**  The number of Orders allocated for this unit to use.
+**  Default is 4, but is dynamically updated if more orders are
+**  given.
+**
 **  Unit::Orders
 **
 **  Contains all orders of the unit. Slot 0 is always used.
-**  Up to ::MAX_ORDERS can be stored.
 **
 **  Unit::SavedOrder
 **
@@ -596,10 +601,10 @@ struct _unit_ {
 	unsigned Rs : 8;
 	unsigned char CurrentResource;
 
-#define MAX_ORDERS 16           ///< How many outstanding orders?
 	char OrderCount;            ///< how many orders in queue
 	char OrderFlush;            ///< cancel current order, take next
-	Order Orders[MAX_ORDERS];   ///< orders to process
+	int  TotalOrders;           ///< Total Number of orders available
+	Order* Orders;              ///< orders to process
 	Order SavedOrder;           ///< order to continue after current
 	Order NewOrder;             ///< order for new trained units
 	char* AutoCastSpell;        ///< spells to auto cast
@@ -632,10 +637,6 @@ struct _unit_ {
 	} UpgradeTo; ///< Upgrade to action
 	struct _order_train_ {
 		int Ticks;                      ///< Ticks to complete
-		int Count;                      ///< Units in training queue
-		// TODO: vladi: later we should train more units or automatic
-#define MAX_UNIT_TRAIN 6 ///< max number of units in queue
-		UnitType* What[MAX_UNIT_TRAIN]; ///< Unit trained
 	} Train; ///< Train units action
 	} Data; ///< Storage room for different commands
 
@@ -728,6 +729,9 @@ extern int    NumTeamSelected[PlayerMax];  ///< Number of Units a team member ha
 
 extern Unit* ReleasedHead;                 ///< Head of the released unit list.
 extern Unit* ReleasedTail;                 ///< Tail of the released unit list.
+
+extern Order* ReleasedOrderHead;           ///< Head of the released orders list.
+extern Order* ReleasedOrderTail;           ///< Tail of the released unit list.
 
 /*----------------------------------------------------------------------------
 -- Functions

@@ -77,10 +77,10 @@ static int IconWidth;                       /// Icon width in panels
 static int IconHeight;                      /// Icon height in panels
 
 
-char EditorRunning;    /// True editor is running
 char EditorMapLoaded;  /// Map loaded in editor
 
-EditorStateType EditorState;  /// Current editor state.
+EditorStateType EditorState;                /// Current editor state.
+EditorRunningType EditorRunning;  /// Running State of editor.
 
 static char TileToolRandom;      /// Tile tool draws random
 static char TileToolDecoration;  /// Tile tool draws with decorations
@@ -201,7 +201,6 @@ void EditTile(int x, int y, int tile)
 
 	UpdateMinimapSeenXY(x, y);
 	UpdateMinimapXY(x, y);
-	MustRedraw |= RedrawMinimap;
 
 	EditorTileChanged(x, y);
 }
@@ -1168,7 +1167,6 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 			if (TheMap.Info->PlayerType[CursorPlayer] != PlayerNobody) {
 				SelectedPlayer = CursorPlayer;
 				ThisPlayer = Players + SelectedPlayer;
-				MustRedraw |= RedrawMinimap;
 			}
 			return;
 		}
@@ -2025,7 +2023,7 @@ void EditorMainLoop(void)
 
 	while (1) {
 		EditorMapLoaded = 0;
-		EditorRunning = 1;
+		EditorRunning = EditorEditing;
 
 		CreateEditor();
 

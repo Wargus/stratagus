@@ -1837,7 +1837,6 @@ static void SetFogOfWar(Menuitem *mi __attribute__((unused)))
 		UpdateFogOfWarChange();
 		CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow on", -1);
 	}
-	MustRedraw &= ~RedrawMinimap;
 }
 
 /**
@@ -4718,7 +4717,7 @@ static void StartEditor(void)
 {
 	SetupEditor();
 
-	EditorRunning = 1;
+	EditorRunning = EditorStarted;
 	EndMenu();
 }
 
@@ -4763,7 +4762,7 @@ void SetupEditor(void)
 static void EditorSelectCancel(void)
 {
 	QuitToMenu = 1;
-	EditorRunning = 0;
+	EditorRunning = EditorNotRunning;
 	EndMenu();
 }
 
@@ -5349,7 +5348,7 @@ void EditorLoadMenu(void)
 	}
 
 	EditorMapLoaded = 1;
-	EditorRunning = 0;
+	EditorRunning = EditorNotRunning;
 	EndMenu();
 }
 
@@ -6193,7 +6192,7 @@ static void EditorSaveConfirmCancel(void)
 static void EditorQuitToMenu(void)
 {
 	QuitToMenu = 1;
-	EditorRunning = 0;
+	EditorRunning = EditorNotRunning;
 	EndMenu();
 }
 
