@@ -462,8 +462,8 @@ local void SpellFlameShieldController(Missile * missile)
     //vladi: still no have clear idea what is this about :)
     CheckMissileToBeDrawn(missile);
 
-    // FIXME: vladi: uhm... perhaps is a bit powerfull?
-    if (missile->TTL % 10 == 0) {
+    // Only hit 1 out of 8 frames
+    if (missile->TTL & 7) {
 	return;
     }
     n = SelectUnits(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
@@ -471,7 +471,7 @@ local void SpellFlameShieldController(Missile * missile)
 	if (table[i] == missile->TargetUnit) {	// cannot hit target unit
 	    continue;
 	}
-	if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP) {
+	if (table[i]->HP) {
 	    HitUnit(missile->SourceUnit, table[i], 1);
 	}
     }
