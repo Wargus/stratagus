@@ -316,8 +316,12 @@ global void InitUnit(Unit* unit, UnitType* type)
 
 	unit->Seen.Frame = UnitNotSeen;				// Unit isn't yet seen
 
-	unit->Frame = unit->Type->Animations->Still[0].Frame +
-		(type->Building ? 0 : type->NumDirections / 2 + 1 - 1);
+	// On Load, Some units don't have Still animation, eg Deadbody
+	if (unit->Type->Animations->Still) {
+		unit->Frame = unit->Type->Animations->Still[0].Frame +
+			(type->Building ? 0 : type->NumDirections / 2 + 1 - 1);
+	}
+
 	if (!type->Building && type->Sprite &&
 			VideoGraphicFrames(type->Sprite) > 5) {
 		unit->Direction = (MyRand() >> 8) & 0xFF;		// random heading
