@@ -550,17 +550,6 @@ extern void MapSetWall(unsigned x, unsigned y, int humanwall);
 #define IsMapFieldVisible(player,x,y) \
 	(IsTileVisible((player),(x),(y))>1)
 
-#ifdef UNITS_ON_MAP
-	/// Is there a building on this field
-#define BuildingOnMapField(mf) ((mf)->Building != 0xffff)
-	/// Is there a land unit on this field
-#define LandUnitOnMapField(mf) ((mf)->LandUnit != 0xffff)
-	/// Is there a sea unit on this field
-#define SeaUnitOnMapField(mf)  ((mf)->SeaUnit != 0xffff)
-	/// Is there an air unit on this field
-#define AirUnitOnMapField(mf)  ((mf)->AirUnit != 0xffff)
-#endif // UNITS_ON_MAP
-
 //@}
 
 #endif // !__MAP_H__

@@ -61,7 +61,7 @@
 // Use this to see FOW visibility for every tile
 #define noDEBUG_FOG_OF_WAR
 
-#define noTIMEIT						/// defined time function
+#define noTIMEIT  /// defined time function
 #endif
 
 	/// True if this is the fog color
@@ -69,49 +69,15 @@
 	/// Solid fog color number in global palette
 #define COLOR_FOG (0)
 
-/**
-**		Do unroll 8x
-**
-**		@param x		Index passed to UNROLL2 incremented by 2.
-*/
-#define UNROLL8(x)		\
-	UNROLL2((x) + 0);		\
-	UNROLL2((x) + 2);		\
-	UNROLL2((x) + 4);		\
-	UNROLL2((x) + 6)
-
-/**
-**		Do unroll 16x
-**
-**		@param x		Index passed to UNROLL8 incremented by 8.
-*/
-#define UNROLL16(x)		\
-	UNROLL8((x) + 0);		\
-	UNROLL8((x) + 8)
-
-/**
-**		Do unroll 32x
-**
-**		@param x		Index passed to UNROLL8 incremented by 8.
-*/
-#define UNROLL32(x)		\
-	UNROLL8((x) + 0);		\
-	UNROLL8((x) + 8);		\
-	UNROLL8((x) + 16);		\
-	UNROLL8((x) + 24)
-
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global int OriginalFogOfWar;				/// Use original style fog of war
-global int FogOfWarOpacity;					/// Fog of war Opacity.
-
-#define MapFieldCompletelyVisible   0x0001  /// Field completely visible
-#define MapFieldPartiallyVisible	0x0002  /// Field partially visible
+global int OriginalFogOfWar;                /// Use original style fog of war
+global int FogOfWarOpacity;                 /// Fog of war Opacity.
 
 /**
-**		Mapping for fog of war tiles.
+**  Mapping for fog of war tiles.
 */
 local const int FogTable[16] = {
 	 0,11,10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
@@ -125,33 +91,33 @@ local unsigned char* VisibleTable;
 local SDL_Surface* OnlyFogSurface;
 
 /**
-**		Draw unexplored area function pointer. (display and video mode independ)
+**  Draw unexplored area function pointer. (display and video mode independ)
 */
 local void (*VideoDrawUnexplored)(const int, int, int);
 
 /**
-**		Draw fog of war function pointer. (display and video mode independ)
+**  Draw fog of war function pointer. (display and video mode independ)
 */
 local void (*VideoDrawFog)(const int, int, int);
 
 /**
-**		Draw only fog of war function pointer. (display and video mode independ)
+**  Draw only fog of war function pointer. (display and video mode independ)
 */
 local void (*VideoDrawOnlyFog)(int, int);
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Find the Number of Units that can see this square using a long
-**		lookup. So when a 225 Viewed square can be calculated properly.
+**  Find the Number of Units that can see this square using a long
+**  lookup. So when a 225 Viewed square can be calculated properly.
 **
-**		@param player		Player to mark sight.
-**		@param tx		X center position.
-**		@param ty		Y center position.
+**  @param player  Player to mark sight.
+**  @param tx      X center position.
+**  @param ty      Y center position.
 **
-**		@return				Number of units that can see this square.
+**  @return        Number of units that can see this square.
 */
 local int LookupSight(const Player* player, int tx, int ty)
 {
@@ -183,14 +149,14 @@ local int LookupSight(const Player* player, int tx, int ty)
 }
 
 /**
-**		Find out if a field is seen (By player, or by shared vision)
-**		This function will return > 1 with no fog of war.
+**  Find out if a field is seen (By player, or by shared vision)
+**  This function will return > 1 with no fog of war.
 **
-**		@param player		Player to check for.
-**		@param x		X tile to check.
-**		@param y		Y tile to check.
+**  @param player  Player to check for.
+**  @param x       X tile to check.
+**  @param y       Y tile to check.
 **
-**		@return				0 unexplored, 1 explored, > 1 visible.
+**  @return        0 unexplored, 1 explored, > 1 visible.
 */
 global unsigned char IsTileVisible(const Player* player, int x, int y)
 {
@@ -243,25 +209,25 @@ global int MapFogFilterFlags(Player* player, int x, int y, int mask)
 	int fogmask;
 	Unit* table[UnitMax];
 	
-			// Calculate Mask for tile with fog
-			nunits = UnitCacheOnTile(x, y, table);
-			fogmask = -1;
-			unitcount = 0;
-			while (unitcount < nunits) {
-				if (!UnitVisibleAsGoal(table[unitcount], player)) {
-					fogmask &= ~table[unitcount]->Type->FieldFlags;
-				}
-				++unitcount;
-			}
+	// Calculate Mask for tile with fog
+	nunits = UnitCacheOnTile(x, y, table);
+	fogmask = -1;
+	unitcount = 0;
+	while (unitcount < nunits) {
+		if (!UnitVisibleAsGoal(table[unitcount], player)) {
+			fogmask &= ~table[unitcount]->Type->FieldFlags;
+		}
+		++unitcount;
+	}
 	return mask & fogmask;
 }
 
 /**
-**		Mark a tile's sight. (Explore and make visible.)
+**  Mark a tile's sight. (Explore and make visible.)
 **
-**		@param player		Player to mark sight.
-**		@param x		X tile to mark.
-**		@param y		Y tile to mark.
+**  @param player  Player to mark sight.
+**  @param x       X tile to mark.
+**  @param y       Y tile to mark.
 */
 global void MapMarkTileSight(const Player* player, int x, int y)
 {
@@ -269,10 +235,10 @@ global void MapMarkTileSight(const Player* player, int x, int y)
 
 	v = TheMap.Fields[x + y * TheMap.Width].Visible[player->Player];
 	switch (v) {
-		case 0:		// Unexplored
-		case 1:		// Unseen
-			//  When there is NoFogOfWar only unexplored tiles are marked.
-			if ((!TheMap.NoFogOfWar) || (v == 0)) {
+		case 0:  // Unexplored
+		case 1:  // Unseen
+			// When there is NoFogOfWar only unexplored tiles are marked.
+			if ((!TheMap.NoFogOfWar) || v == 0) {
 				UnitsOnTileMarkSeen(player, x, y, 0);
 			}
 			v = 2;
@@ -281,10 +247,10 @@ global void MapMarkTileSight(const Player* player, int x, int y)
 				MapMarkSeenTile(x, y);
 			}
 			return;
-		case 255:		// Overflow
+		case 255:  // Overflow
 			DebugLevel0Fn("Visible overflow (Player): %d\n" _C_ player->Player);
 			break;
-		default:		// seen -> seen
+		default:  // seen -> seen
 			++v;
 			break;
 	}
@@ -292,11 +258,11 @@ global void MapMarkTileSight(const Player* player, int x, int y)
 }
 
 /**
-**		Unmark a tile's sight. (Explore and make visible.)
+**  Unmark a tile's sight. (Explore and make visible.)
 **
-**		@param player		Player to mark sight.
-**		@param x		X tile to mark.
-**		@param y		Y tile to mark.
+**  @param player  Player to mark sight.
+**  @param x       X tile to mark.
+**  @param y       Y tile to mark.
 */
 global void MapUnmarkTileSight(const Player* player, int x, int y)
 {
@@ -310,13 +276,13 @@ global void MapUnmarkTileSight(const Player* player, int x, int y)
 			v = LookupSight(player, x, y);
 			DebugCheck(v < 254);
 			break;
-		case 0:		// Unexplored
+		case 0:  // Unexplored
 		case 1:
 			// We are at minimum, don't do anything shouldn't happen.
 			DebugCheck(1);
 			break;
 		case 2:
-			//  When there is NoFogOfWar units never get unmarked.
+			// When there is NoFogOfWar units never get unmarked.
 			if (!TheMap.NoFogOfWar) {
 				UnitsOnTileUnmarkSeen(player, x, y, 0);
 			}
@@ -324,7 +290,7 @@ global void MapUnmarkTileSight(const Player* player, int x, int y)
 			if (IsTileVisible(ThisPlayer, x, y) > 1) {
 				MapMarkSeenTile(x, y);
 			}
-		default:		// seen -> seen
+		default:  // seen -> seen
 			v--;
 			break;
 	}
@@ -334,9 +300,9 @@ global void MapUnmarkTileSight(const Player* player, int x, int y)
 /**
 **	Mark a tile for cloak detection.
 **
-**	@param player	Player to mark sight.
-**	@param x	X tile to mark.
-**	@param y	Y tile to mark.
+**	@param player  Player to mark sight.
+**	@param x       X tile to mark.
+**	@param y       Y tile to mark.
 */
 global void MapMarkTileDetectCloak(const Player* player, int x, int y)
 {
@@ -354,9 +320,9 @@ global void MapMarkTileDetectCloak(const Player* player, int x, int y)
 /**
 **	Unmark a tile for cloak detection.
 **
-**	@param player	Player to mark sight.
-**	@param x	X tile to mark.
-**	@param y	Y tile to mark.
+**	@param player  Player to mark sight.
+**	@param x       X tile to mark.
+**	@param y       Y tile to mark.
 */
 global void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
 {
@@ -372,15 +338,15 @@ global void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
 }
 
 /**
-**		Mark the sight of unit. (Explore and make visible.)
+**  Mark the sight of unit. (Explore and make visible.)
 **
-**		@param player		player to mark the sight for (not unit owner)
-**		@param x		x location to mark
-**		@param y		y location to mark
-**		@param w		width to mark, in square
-**		@param h		height to mark, in square
-**		@param range		Radius to mark.
-**		@param marker		Function to mark or unmark sight
+**  @param player  player to mark the sight for (not unit owner)
+**  @param x       x location to mark
+**  @param y       y location to mark
+**  @param w       width to mark, in square
+**  @param h       height to mark, in square
+**  @param range   Radius to mark.
+**  @param marker  Function to mark or unmark sight
 */
 global void MapSight(const Player* player, int x, int y, int w, int h, int range,
 	void (*marker)(const Player*, int, int))
@@ -394,7 +360,7 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
 	int p;
 
 	// Mark as seen
-	if (!range) {						// zero sight range is zero sight range
+	if (!range) {
 		DebugLevel0Fn("Zero sight range\n");
 		return;
 	}
@@ -444,7 +410,7 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
 		cx[3] = x + w - 1;
 		cy[3] = y + VisionTable[0][steps] + h - 1;
 		// loop for steps
-		++steps;		// Increment past info pointer
+		++steps;  // Increment past info pointer
 		while (VisionTable[1][steps] != 0 || VisionTable[2][steps] != 0) {
 			// Loop through for repeat cycle
 			cycle = 0;
@@ -476,7 +442,7 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
 }
 
 /**
-**		Update fog of war.
+**  Update fog of war.
 */
 global void UpdateFogOfWarChange(void)
 {
@@ -486,7 +452,7 @@ global void UpdateFogOfWarChange(void)
 
 	DebugLevel0Fn("\n");
 	//
-	//		Mark all explored fields as visible again.
+	//  Mark all explored fields as visible again.
 	//
 	if (TheMap.NoFogOfWar) {
 		w = TheMap.Width;
@@ -499,7 +465,7 @@ global void UpdateFogOfWarChange(void)
 		}
 	}
 	//
-	//	Global seen recount.
+	//  Global seen recount.
 	//
 	for (x = 0; x < NumUnits; ++x) {
 		UnitCountSeen(Units[x]);
@@ -508,7 +474,7 @@ global void UpdateFogOfWarChange(void)
 }
 
 /*----------------------------------------------------------------------------
---		Draw fog solid
+--  Draw fog solid
 ----------------------------------------------------------------------------*/
 
 #ifndef USE_OPENGL
@@ -724,16 +690,16 @@ global void VideoDrawOnlyFogOpenGL(int x, int y)
 #endif
 
 /*----------------------------------------------------------------------------
---		Old version correct working but not 100% original
+--  Old version correct working but not 100% original
 ----------------------------------------------------------------------------*/
 
 /**
-**		Draw fog of war tile.
+**  Draw fog of war tile.
 **
-**		@param sx		Offset into fields to current tile.
-**		@param sy		Start of the current row.
-**		@param dx		X position into video memory.
-**		@param dy		Y position into video memory.
+**  @param sx  Offset into fields to current tile.
+**  @param sy  Start of the current row.
+**  @param dx  X position into video memory.
+**  @param dy  Y position into video memory.
 */
 local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 {
@@ -754,7 +720,7 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	y = sy / TheMap.Width;
 
 	//
-	//		Which Tile to draw for fog
+	//  Which Tile to draw for fog
 	//
 	// Investigate tiles around current tile
 	// 1 2 3
@@ -839,23 +805,12 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
 		if (tile && tile != tile2) {
 			VideoDrawFog(tile, dx, dy);
-//			TheMap.Fields[sx].VisibleLastFrame |= MapFieldPartiallyVisible;
-//		} else {
-//			TheMap.Fields[sx].VisibleLastFrame |= MapFieldCompletelyVisible;
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy);
 	}
 	if (tile2) {
 		VideoDrawUnexplored(tile2, dx, dy);
-/*
-		if (tile2 == tile) {				// no same fog over unexplored
-//			if (tile != 0xf) {
-//				TheMap.Fields[sx].VisibleLastFrame |= MapFieldPartiallyVisible;
-//			}
-			tile = 0;
-		}
-*/
 	}
 
 #undef IsMapFieldExploredTable
@@ -863,11 +818,11 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 }
 
 /**
-**		Draw the map fog of war.
+**  Draw the map fog of war.
 **
-**		@param vp		Viewport pointer.
-**		@param x		Map viewpoint x position.
-**		@param y		Map viewpoint y position.
+**  @param vp  Viewport pointer.
+**  @param x   Map viewpoint x position.
+**  @param y   Map viewpoint y position.
 */
 global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 {
@@ -889,7 +844,8 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 	static long mv = 9999999;
 #endif
 
-	redraw_row = vp->MustRedrawRow;				// flags must redraw or not
+	// flags must redraw or not
+	redraw_row = vp->MustRedrawRow;
 	redraw_tile = vp->MustRedrawTile;
 
 	p = ThisPlayer->Player;
@@ -922,7 +878,8 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 	ey = vp->EndY;
 
 	while (dy < ey) {
-		if (*redraw_row) {				// row must be redrawn
+		// row must be redrawn
+		if (*redraw_row) {
 #if NEW_MAPDRAW > 1
 			(*redraw_row)--;
 #else
@@ -955,11 +912,11 @@ extern int VideoDrawText(int x, int y, unsigned font, const unsigned char* text)
 						int y = (dy - vp->Y) / TileSizeY + vp->MapY;
 
 #if 1
-						//  Fog of War Vision
-						//  Really long and ugly, shared and own vision:
-						//  sprintf(seen,"%d(%d)",TheMap.Fields[y * TheMap.Width + x].Visible[ThisPlayer->Player],IsMapFieldVisible(ThisPlayer,x, y));
-						//  Shorter version, but no shared vision:
-						sprintf(seen,"%d",TheMap.Fields[y * TheMap.Width + x].Visible[ThisPlayer->Player]);
+						// Fog of War Vision
+						// Really long and ugly, shared and own vision:
+						// sprintf(seen,"%d(%d)",TheMap.Fields[y * TheMap.Width + x].Visible[ThisPlayer->Player],IsMapFieldVisible(ThisPlayer,x, y));
+						// Shorter version, but no shared vision:
+						sprintf(seen, "%d", TheMap.Fields[y * TheMap.Width + x].Visible[ThisPlayer->Player]);
 //						if (TheMap.Fields[y * TheMap.Width + x].Visible[0]) {
 							VideoDrawText(dx, dy, GameFont,seen);
 //						}
@@ -1000,8 +957,8 @@ extern int VideoDrawText(int x, int y, unsigned font, const unsigned char* text)
 }
 
 /**
-**		Initialise the fog of war.
-**		Build tables, setup functions.
+**  Initialise the fog of war.
+**  Build tables, setup functions.
 */
 global void InitMapFogOfWar(void)
 {
@@ -1041,7 +998,7 @@ global void InitMapFogOfWar(void)
 }
 
 /**
-**		Cleanup the fog of war.
+**  Cleanup the fog of war.
 */
 global void CleanMapFogOfWar(void)
 {
@@ -1058,7 +1015,7 @@ global void CleanMapFogOfWar(void)
 }
 
 /**
-**		Initialize Vision and Goal Tables.
+**  Initialize Vision and Goal Tables.
 */
 global void InitVisionTable(void)
 {
@@ -1204,7 +1161,7 @@ global void InitVisionTable(void)
 }
 
 /**
-**		Clean Up Generated Vision and Goal Tables.
+**  Clean Up Generated Vision and Goal Tables.
 */
 global void FreeVisionTable(void)
 {
