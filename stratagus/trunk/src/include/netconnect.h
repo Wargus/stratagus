@@ -43,7 +43,7 @@
     /// Network protocol minor version (maximal 99)
 #define NetworkProtocolMinorVersion	4
     /// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel	4
+#define NetworkProtocolPatchLevel	5
     /// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion*10000+NetworkProtocolMinorVersion*100 \
@@ -87,6 +87,7 @@ typedef struct _setup_state_ {
     unsigned char	UnsOpt;			/// Unit # option
     unsigned char	FwsOpt;			/// Fog of war option
     unsigned char	TssOpt;			/// Tileset select option
+    unsigned char	GaTOpt;			/// Game type option
     unsigned char	CompOpt[PlayerMax];	/// Free slot option selection
     unsigned char	Ready[PlayerMax];	/// Client ready state
     unsigned char	Race[PlayerMax];	/// Client race selection

@@ -67,6 +67,7 @@ struct _settings_ {
     unsigned	NumUnits;		/// Preset # of units
     unsigned	Opponents;		/// Preset # of ai-opponents
     unsigned	Terrain;		/// Terrain type (summer,winter,...)
+    unsigned	GameType;		/// Game type (melee, free for all,...)
 };
 
 #define SettingsPresetMapDefault	(~0ul)	/// Special: Use pud/cm supplied
@@ -84,6 +85,25 @@ struct _settings_ {
 */
 #define SettingsNumUnitsMapDefault	SettingsPresetMapDefault
 #define SettingsNumUnits1		0
+
+/*
+**	GameType settings
+*/
+enum {
+    SettingsGameTypeMapDefault=SettingsPresetMapDefault,
+    SettingsGameTypeMelee=0,
+    SettingsGameTypeFreeForAll,
+    SettingsGameTypeOneOnOne,
+    SettingsGameTypeCaptureTheFlag,
+    SettingsGameTypeGreed,
+    SettingsGameTypeSlaughter,
+    SettingsGameTypeSuddenDeath,
+    SettingsGameTypeTeamMelee,
+    SettingsGameTypeTeamCaptureTheFlag,
+    SettingsGameTypeTopVsBottom,
+    SettingsGameTypeLeftVsRight,
+} GameTypes;
+
 
 // ----------------------------------------------------------------------------
 

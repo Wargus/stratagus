@@ -56,6 +56,7 @@
 #include "settings.h"
 #include "campaign.h"
 #include "trigger.h"
+#include "commands.h"
 
 #include "ccl.h"
 
@@ -151,6 +152,20 @@ local void LoadMap(const char* filename,WorldMap* map)
 --	Game creation
 ----------------------------------------------------------------------------*/
 
+local void GameTypeFreeForAll(void)
+{
+    int i;
+    int j;
+
+    for (i=0; i<15; i++) {
+	for (j=0; j<15; j++) {
+	    if (i != j) {
+		SendCommandDiplomacy(i,DiplomacyEnemy,j);
+	    }
+	}
+    }
+}
+
 /**
 **	CreateGame.
 **
@@ -226,6 +241,35 @@ global void CreateGame(char* filename, WorldMap* map)
 			break;
 		}
 	    }
+	}
+    }
+
+    // FIXME: implement more game types
+    if (GameSettings.GameType != SettingsGameTypeMapDefault) {
+	switch (GameSettings.GameType) {
+	    case SettingsGameTypeMelee:
+		break;
+	    case SettingsGameTypeFreeForAll:
+		GameTypeFreeForAll();
+		break;
+	    case SettingsGameTypeOneOnOne:
+		break;
+	    case SettingsGameTypeCaptureTheFlag:
+		break;
+	    case SettingsGameTypeGreed:
+		break;
+	    case SettingsGameTypeSlaughter:
+		break;
+	    case SettingsGameTypeSuddenDeath:
+		break;
+	    case SettingsGameTypeTeamMelee:
+		break;
+	    case SettingsGameTypeTeamCaptureTheFlag:
+		break;
+	    case SettingsGameTypeTopVsBottom:
+		break;
+	    case SettingsGameTypeLeftVsRight:
+		break;
 	}
     }
 
@@ -395,6 +439,7 @@ global void InitSettings(void)
     GameSettings.NumUnits = SettingsNumUnitsMapDefault;
     GameSettings.Opponents = SettingsPresetMapDefault;
     GameSettings.Terrain = SettingsPresetMapDefault;
+    GameSettings.GameType = SettingsPresetMapDefault;
 }
 
 //@}
