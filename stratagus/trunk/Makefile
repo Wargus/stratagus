@@ -171,7 +171,7 @@ tags:
 
 depend:
 	@echo -n >.depend
-	@for i in $(SRC) ; do\
+	@for i in $(SRC) ; do
 	echo -n `dirname $$i`/$(OBJDIR)/ >> .depend;\
 	$(CC) -MM $(IFLAGS) $(DFLAGS) $(CFLAGS) $$i >>.depend ; done
 
@@ -279,12 +279,11 @@ dist: distlist
 	chown -R johns:freecraft $(distdir)
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir).tar.gz $(distdir)
-	tar cjhf $(distdir).tar.bz2 $(distdir)
 	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir).zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
-	du -h $(distdir).tar.gz $(distdir).tar.bz2 $(distdir).zip
+	du -h $(distdir).tar.gz $(distdir).zip
 
 small-dist: distlist
 	echo $(MISC) >>$(DISTLIST)
@@ -297,12 +296,11 @@ small-dist: distlist
 	chown -R johns:freecraft $(distdir)
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-small.tar.gz $(distdir)
-	tar cjhf $(distdir)-small.tar.bz2 $(distdir)
 	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir)-small.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
-	du -h $(distdir)-small.tar.gz $(distdir)-small.tar.bz2 $(distdir)-small.zip
+	du -h $(distdir)-small.tar.gz $(distdir)-small.zip
 
 bin-dist: all
 	$(RM) $(DISTLIST)
@@ -323,7 +321,6 @@ bin-dist: all
 	strip -s -R .comment $(distdir)/freecraft$(EXE)
 	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
 	tar czhf freecraft-$(mydate)-bin.tar.gz $(distdir)
-	tar cjhf freecraft-$(mydate)-bin.tar.bz2 $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 
@@ -383,7 +380,6 @@ linux-complete:
 	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
 	-tar czhf freecraft-$(MYDATE)-complete-linux.tar.gz freecraft-complete
-	-tar cjhf freecraft-$(MYDATE)-complete-linux.tar.bz2 freecraft-complete
 	rm -rf freecraft-complete
 
 win32-complete:
