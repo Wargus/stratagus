@@ -55,44 +55,46 @@
 #include "ui.h"
 
 #ifndef MAX_PATH_LENGTH
-#define MAX_PATH_LENGTH				9		/// Maximal path part returned.
+#define MAX_PATH_LENGTH  9 /// Maximal path part returned.
 #endif
 
-#define USE_BEST						/// Goto best point, don't stop.
+#define USE_BEST  /// Goto best point, don't stop.
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**		The matrix is used to generated the paths.
+**  The matrix is used to generated the paths.
 **
-**				0:		Nothing must check if usable.
-**				1-8:		Field on the path 1->2->3->4->5...
-**				88:		Marks the possible goal fields.
-**				98:		Marks map border, for faster limits checks.
+**  0:      Nothing must check if usable.
+**  1-8:    Field on the path 1->2->3->4->5...
+**  88:     Marks the possible goal fields.
+**  98:     Marks map border, for faster limits checks.
 */
-unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];		/// Path matrix
-// static unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
+unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];  /// Path matrix
+#ifndef MAP_REGIONS
+static unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
+#endif
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		PATH-FINDER LOW-LEVEL
+--  PATH-FINDER LOW-LEVEL
 ----------------------------------------------------------------------------*/
 
 /**
-**		Initialize a matrix
+**  Initialize a matrix
 **
-**		@note		Double border for ships/flyers.
+**  @note  Double border for ships/flyers.
 **
-**				98 98 98 98 98
-**				98 98 98 98 98
-**				98			98
-**				98			98
-**				98 98 98 98 98
+**    98 98 98 98 98
+**    98 98 98 98 98
+**    98          98
+**    98          98
+**    98 98 98 98 98
 */
 static void InitMatrix(unsigned char* matrix)
 {
@@ -105,26 +107,26 @@ static void InitMatrix(unsigned char* matrix)
 	h = TheMap.Height;
 
 	i = w + w + 1;
-	memset(matrix, 98, i);				// +1 for ships!
-	memset(matrix + i, 0, w * h);			 // initialize matrix
+	memset(matrix, 98, i);          // +1 for ships!
+	memset(matrix + i, 0, w * h);   // initialize matrix
 
-	for (e = i + w * h; i < e;) {			  // mark left and right border
+	for (e = i + w * h; i < e;) {   // mark left and right border
 		matrix[i] = 98;
 		i += w;
 		matrix[i - 1] = 98;
 	}
-	memset(matrix + i, 98, w + 1);			// +1 for ships!
+	memset(matrix + i, 98, w + 1);  // +1 for ships!
 }
 
-#if 0
+#ifndef MAP_REGIONS
 static void InitLocalMatrix(void)
 {
-	memset(LocalMatrix, 0, TheMap.Width * TheMap.Height * sizeof(int));				// initialize matrix
+	memset(LocalMatrix, 0, TheMap.Width * TheMap.Height * sizeof(int)); // initialize matrix
 }
 #endif
 
 /**
-**		Create empty movement matrix.
+**  Create empty movement matrix.
 */
 unsigned char* CreateMatrix(void)
 {
@@ -133,7 +135,7 @@ unsigned char* CreateMatrix(void)
 }
 
 /**
-**		Allocate a new matrix and initialize
+**  Allocate a new matrix and initialize
 */
 unsigned char* MakeMatrix(void)
 {
@@ -145,18 +147,18 @@ unsigned char* MakeMatrix(void)
 	return matrix;
 }
 
-#if 0
+#ifndef MAP_REGIONS
 /**
-**		Mark place in matrix.
+**  Mark place in matrix.
 **
-**		@param gx		X position of target area
-**		@param gy		Y position of target area
-**		@param gw		Width of target area
-**		@param gh		Height of target area
-**		@param range		Range to search at
-**		@param matrix		Target area marked in matrix
+**  @param gx       X position of target area
+**  @param gy       Y position of target area
+**  @param gw       Width of target area
+**  @param gh       Height of target area
+**  @param range    Range to search at
+**  @param matrix   Target area marked in matrix
 **
-**		@returns		depth, -1 unreachable
+**  @returns        depth, -1 unreachable
 */
 static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigned int* matrix)
 {
@@ -176,9 +178,9 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 	// Mark top, bottom, left, right
 
 	// Mark Top and Bottom of Goal
-	for (x = gx;x <= gx + gw;++x) {
+	for (x = gx; x <= gx + gw; ++x) {
 		if (x >= 0 && x < TheMap.Width) {
-			if ( gy-range >= 0 && matrix[(gy - range) * TheMap.Width + x]) {
+			if ( gy - range >= 0 && matrix[(gy - range) * TheMap.Width + x]) {
 				return 1;
 			}
 			if (gy + range + gh < TheMap.Height && matrix[(gy + range + gh) * TheMap.Width + x]) {
@@ -187,7 +189,7 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 		}
 	}
 
-	for (y = gy;y <= gy + gh;++y) {
+	for (y = gy; y <= gy + gh; ++y) {
 		if (y >= 0 && y < TheMap.Height) {
 			if (gx - range >= 0 && matrix[y * TheMap.Width + gx - range]) {
 				return 1;
@@ -269,15 +271,15 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 }
 #endif
 
-#if 0
+#ifndef MAP_REGIONS
 /**
-**		Flood fill an area for a matrix.
+**  Flood fill an area for a matrix.
 **
-**		This use the flood-fill algorithms.
-**		@todo can be done faster, if starting from both sides.
+**  This use the flood-fill algorithms.
+**  @todo can be done faster, if starting from both sides.
 **
-**		@param unit		Path for this unit.
-**		@param matrix		Matrix for calculation.
+**  @param unit     Path for this unit.
+**  @param matrix   Matrix for calculation.
 **
 */
 static void FillMatrix(Unit* unit, unsigned int* matrix)
@@ -313,19 +315,19 @@ static void FillMatrix(Unit* unit, unsigned int* matrix)
 	points[0].Y = y = unit->Y;
 	points[0].depth = 1;
 	rp = 0;
-	matrix[x + y * TheMap.Width] = depth = 1;				// mark start point
-	ep = wp = 1;										// start with one point
+	matrix[x + y * TheMap.Width] = depth = 1;   // mark start point
+	ep = wp = 1;                                // start with one point
 	n = 2;
 
 	//
-	//		Pop a point from stack, push all neightbors which could be entered.
+	//  Pop a point from stack, push all neightbors which could be entered.
 	//
 	for (;;) {
 		while (rp != ep) {
 			rx = points[rp].X;
 			ry = points[rp].Y;
 			depth = points[rp].depth;
-			for (j = 0; j < 8; ++j) {				// mark all neighbors
+			for (j = 0; j < 8; ++j) {       // mark all neighbors
 				x = rx + Heading2X[j];
 				y = ry + Heading2Y[j];
 				if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
@@ -336,29 +338,29 @@ static void FillMatrix(Unit* unit, unsigned int* matrix)
 				if (*m) {
 					continue;
 				}
-				if (CanMoveToMask(x, y, mask)) {		// reachable
+				if (CanMoveToMask(x, y, mask)) {    // reachable
 					*m = depth + 1;
-					points[wp].X = x;				// push the point
+					points[wp].X = x;   // push the point
 					points[wp].Y = y;
 					points[wp].depth = depth + 1;
-					if (++wp >= size) {				// round about
+					if (++wp >= size) {             // round about
 						wp = 0;
 					}
-				} else {						// unreachable
+				} else {                             // unreachable
 					*m = 0;
 				}
 			}
 
 			// Loop for
-			if (++rp >= size) {						// round about
+			if (++rp >= size) { // round about
 				rp = 0;
 			}
 		}
 
 		//
-		//		Continue with next frame.
+		//  Continue with next frame.
 		//
-		if (rp == wp) {						// unreachable, no more points available
+		if (rp == wp) {  // unreachable, no more points available
 			break;
 		}
 		ep = wp;
@@ -370,22 +372,22 @@ static void FillMatrix(Unit* unit, unsigned int* matrix)
 #endif
 
 /*----------------------------------------------------------------------------
---		PATH-FINDER USE
+--  PATH-FINDER USE
 ----------------------------------------------------------------------------*/
 
 #ifndef MAP_REGIONS
 /**
-**		Can the unit 'src' reach the place x,y.
+**  Can the unit 'src' reach the place x,y.
 **
-**		@param src		Unit for the path.
-**		@param x		Map X tile position.
-**		@param y		Map Y tile position.
-**		@param w		Width of Goal
-**		@param h		Height of Goal
-**		@param minrange min range to the tile
-**		@param range		Range to the tile.
+**  @param src          Unit for the path.
+**  @param x            Map X tile position.
+**  @param y            Map Y tile position.
+**  @param w            Width of Goal
+**  @param h            Height of Goal
+**  @param minrange     min range to the tile
+**  @param range        Range to the tile.
 **
-**		@return				Distance to place.
+**  @return         Distance to place.
 */
 int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __attribute__((unused)), int range)
 {
@@ -407,7 +409,7 @@ int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __attribu
 	//
 	//  Find a path to the place.
 	//
-	if ((depth=CheckPlaceInMatrix(x, y, w, h, range, LocalMatrix)) < 0) {
+	if ((depth = CheckPlaceInMatrix(x, y, w, h, range, LocalMatrix)) < 0) {
 		DebugPrint("Can't move to destination, not route to goal\n");
 		return 0;
 	}
@@ -418,20 +420,20 @@ int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __attribu
 #endif
 
 /**
-**		Can the unit 'src' reach the unit 'dst'.
+**  Can the unit 'src' reach the unit 'dst'.
 **
-**		@param src		Unit for the path.
-**		@param dst		Unit to be reached.
-**		@param range		Range to unit.
+**  @param src      Unit for the path.
+**  @param dst      Unit to be reached.
+**  @param range    Range to unit.
 **
-**		@return				Distance to place.
+**  @return  Distance to place.
 */
 int UnitReachable(Unit* src, Unit* dst, int range)
 {
 	int depth;
 
 	//
-	//		Find a path to the goal.
+	//  Find a path to the goal.
 	//
 	depth=PlaceReachable(src, dst->X, dst->Y, dst->Type->TileWidth, dst->Type->TileHeight, 0, range);
 	if (depth <= 0) {
@@ -442,21 +444,21 @@ int UnitReachable(Unit* src, Unit* dst, int range)
 }
 
 /*----------------------------------------------------------------------------
---		REAL PATH-FINDER
+--  REAL PATH-FINDER
 ----------------------------------------------------------------------------*/
 
 /**
-**		Find new path.
+**  Find new path.
 **
-**		The destination could be an unit or a field.
-**		Range gives how far we must reach the goal.
+**  The destination could be an unit or a field.
+**  Range gives how far we must reach the goal.
 **
-**		@note		The destination could become negative coordinates!
+**  @note  The destination could become negative coordinates!
 **
-**		@param unit		Path for this unit.
+**  @param unit  Path for this unit.
 **
-**	  @return				>0 remaining path length, 0 wait for path, -1
-**						reached goal, -2 can't reach the goal.
+**  @return         >0 remaining path length, 0 wait for path, -1
+**                  reached goal, -2 can't reach the goal.
 */
 int NewPath(Unit* unit)
 {
