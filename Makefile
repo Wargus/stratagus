@@ -102,7 +102,7 @@ clean::
 
 clobber:	clean
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i clobber ; done
-	$(RM) freecraft$(EXE) gmon.sum
+	$(RM) freecraft$(EXE) gmon.sum *~
 	$(RM) -r srcdoc/*
 	@$(MAKE) -C tools clobber
 
