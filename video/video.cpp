@@ -129,28 +129,18 @@
 #ifdef USE_X11
 #define UseX11		1
 #define UseSdl		0
-#define UseSVGALib	0
 #define UseWin32	0
 #endif
 
 #ifdef USE_SDL
 #define UseX11		0
 #define UseSdl		1
-#define UseSVGALib	0
-#define UseWin32	0
-#endif
-
-#ifdef USE_SVGALIB
-#define UseX11		0
-#define UseSdl		0
-#define UseSVGALib	1
 #define UseWin32	0
 #endif
 
 #ifdef noUSE_WIN32
 #define UseX11		0
 #define UseSdl		0
-#define UseSVGALib	0
 #define UseWin32	1
 #endif
 
@@ -1343,11 +1333,6 @@ global unsigned long GetTicks(void)
 
     return X11GetTicks();
 #endif
-#if UseSVGALib
-    extern unsigned long SVGAGetTicks(void);
-
-    return SVGAGetTicks();
-#endif
 }
 
 /**
@@ -1360,8 +1345,6 @@ global void InitVideo(void)
 	InitVideoSdl();
     } else if (UseX11) {
 	InitVideoX11();
-    } else if (UseSVGALib) {
-	InitVideoSVGA();
     } else if (UseWin32) {
 	InitVideoWin32();
     } else {
@@ -1376,14 +1359,10 @@ global void InitVideo(void)
 	#if UseX11
 	    InitVideoX11();
 	#else
-	    #if UseSVGALib
-		InitVideoSVGA();
+	    #if UseWin32
+		InitVideoWin32();
 	    #else
-		#if UseWin32
-		    InitVideoWin32();
-		#else
-		    abort();
-		#endif
+		abort();
 	    #endif
 	#endif
     #endif
