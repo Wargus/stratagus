@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ui.c		-	The user interface globals. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer and Andreas Arens
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer and Andreas Arens
+//
+//	$Id$
 
 //@{
 
@@ -397,8 +396,8 @@ global void InitUserInterface(void)
     //
     //	Calculations
     //
-    MapWidth=(TheUI.MapWidth-TheUI.MapX)/TileSizeX;
-    MapHeight=(TheUI.MapHeight-TheUI.MapY)/TileSizeY;
+    MapWidth=(TheUI.MapEndX-TheUI.MapX+TileSizeX)/TileSizeX;
+    MapHeight=(TheUI.MapEndY-TheUI.MapY+TileSizeY)/TileSizeY;
 }
 
 //@}

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ui.h		-	The user interface header file. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __UI_H__
 #define __UI_H__
@@ -111,7 +110,7 @@ typedef struct _ui_ {
 	int	IconH;			/// icon H position
 	int	TextX;			/// text X position
 	int	TextY;			/// text Y position
-    } 		Resources[MaxCosts];
+    }		Resources[MaxCosts];
 
     struct {
 	char*	File;			/// Filename
@@ -165,10 +164,10 @@ typedef struct _ui_ {
     // The map
     int		MapX;			/// big map screen X position
     int		MapY;			/// big map screen Y position
-	/// map width for current mode (MapX+14*32 for 640x480)          
-    unsigned	MapWidth;
-	/// map height for current mode (MapY+14*32 for 640x480)
-    unsigned	MapHeight;
+	/// map width for current mode (MapX+14*32-1 for 640x480)
+    unsigned	MapEndX;
+	/// map height for current mode (MapY+14*32-1 for 640x480)
+    unsigned	MapEndY;
 
     // The menu button
     struct {
@@ -199,7 +198,7 @@ typedef struct _ui_ {
     /// used for displaying unit training queues
     Button	Buttons2[6];
 
-// FIXME: could use different sounds/speach for the errors 
+// FIXME: could use different sounds/speach for the errors
 // Is in gamesounds?
 //    SoundConfig	PlacementError;		/// played on placements errors
 //    SoundConfig	PlacementSuccess;	/// played on placements success

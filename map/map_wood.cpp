@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name map_wood.c	-	The map wood handling. */
-/*
-**	(c) Copyright 1999,2000 by Vladi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Vladi Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -46,7 +45,7 @@ global int WoodTable[16];
 /**
 **	Check if the tile type is wood.
 **
-** 	Used by @see MapFixWood and @see PreprocessMap
+**	Used by @see MapFixWood and @see PreprocessMap
 */
 global int MapWoodChk(int x,int y)
 {
@@ -128,7 +127,8 @@ global void MapRemoveWood(unsigned x,unsigned y)
 #else
     if( mf->Flags&MapFieldVisible ) {
 #endif
-	MustRedraw|=RedrawMaps;
+        MarkDrawPosMap(x,y);
+	MustRedraw|=RedrawMinimap;
 	MapMarkSeenTile(x,y);
     }
 }
@@ -160,7 +160,7 @@ global void RegenerateForest(void)
 		    if( x && !(mf->Flags&(MapFieldWall|MapFieldUnpassable
 				    |MapFieldLandUnit|MapFieldBuilding)) ) {
 			tmp=mf-TheMap.Width;
-			if( tmp->Tile==TheMap.Tileset->RemovedTree 
+			if( tmp->Tile==TheMap.Tileset->RemovedTree
 				&& tmp->Value>=ForestRegeneration
 				&& !(tmp->Flags&(MapFieldWall|MapFieldUnpassable
 				    |MapFieldLandUnit|MapFieldBuilding)) ) {

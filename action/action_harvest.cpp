@@ -137,11 +137,11 @@ local int ChopWood(Unit* unit)
 	//
 #if 0
 	// FIXME: johns+cade: this didn't work with the current code
-	if( unit->NextCommand[0].Action==UnitActionHarvest 
+	if( unit->NextCommand[0].Action==UnitActionHarvest
 		 || unit->NextCommand[0].Action==UnitActionMineGold ) {
 	    unit->SubAction=0;
 	    return 0;
-	} 
+	}
 #endif
 
 	//
@@ -184,9 +184,7 @@ local int ChopWood(Unit* unit)
 	    //
 	    //	Update the display.
 	    //
-	    if( UnitVisible(unit) ) {
-		MustRedraw|=RedrawMap;
-	    }
+            CheckUnitToBeDrawn(unit);
 	    if( IsSelected(unit) ) {
 		UpdateButtonPanel();
 		MustRedraw|=RedrawButtonPanel;
@@ -333,7 +331,7 @@ local int ReturnWithWood(Unit* unit)
 	unit->Wait=MAX_UNIT_WAIT;
     }
     unit->Value=WAIT_FOR_WOOD-unit->Wait;
-    
+
     return 1;
 }
 
@@ -367,9 +365,7 @@ local int WaitInWoodDeposit(Unit* unit)
 	unit->Command.Data.Move.DX=unit->Command.Data.Move.SX;
 	unit->Command.Data.Move.DY=unit->Command.Data.Move.SY;
 
-	if( UnitVisible(unit) ) {
-	    MustRedraw|=RedrawMap;
-	}
+        CheckUnitToBeDrawn(unit);
 	unit->Wait=1;
 	unit->WoodToHarvest=CHOP_FOR_WOOD;
 	return 1;

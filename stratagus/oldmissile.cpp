@@ -185,7 +185,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "fireball.png",
     32,32,
     { "fireball hit" },
-    MissileClassPointToPoint,	
+    MissileClassPointToPoint,
     1,
     },
 { MissileTypeType,
@@ -193,7 +193,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "flame shield.png",
     32,32,
     { NULL },
-    MissileClassFlameShield,	
+    MissileClassFlameShield,
     1,
     },
 { MissileTypeType,
@@ -210,7 +210,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "death and decay.png",
     32,32,
     { NULL },
-    MissileClassDeathDecay,	
+    MissileClassDeathDecay,
     1,
     },
 { MissileTypeType,
@@ -218,7 +218,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "big cannon.png",
     16,16,
     { "explosion" },
-    MissileClassPointToPoint,	
+    MissileClassPointToPoint,
     1,
     "missile-cannon-tower-explosion",	NULL,
     },
@@ -227,7 +227,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "exorcism.png",
     48,48,
     { NULL },
-    MissileClassPointToPoint,	
+    MissileClassPointToPoint,
     1,
     },
 { MissileTypeType,
@@ -235,7 +235,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "heal effect.png",
     48,48,
     { NULL },
-    MissileClassStayWithDelay,	
+    MissileClassStayWithDelay,
     1,
     },
 { MissileTypeType,
@@ -251,7 +251,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "rune.png",
     16,16,
     { NULL },
-    MissileClassStayWithDelay,	
+    MissileClassStayWithDelay,
     5,
     },
 { MissileTypeType,
@@ -259,7 +259,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "tornado.png",
     56,56,
     { NULL },
-    MissileClassWhirlwind,	
+    MissileClassWhirlwind,
     1,
     },
 { MissileTypeType,
@@ -276,7 +276,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "ballista bolt.png",
     64,64,
     { "explosion" },
-    MissileClassPointToPoint,	
+    MissileClassPointToPoint,
     1,
     "missile-impact",	NULL,
     },
@@ -285,7 +285,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "arrow.png",
     40,40,
     { "bow-hit" },
-    MissileClassPointToPoint,	
+    MissileClassPointToPoint,
     1,
     },
 { MissileTypeType,
@@ -293,7 +293,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "axe.png",
     32,32,
     { "bow-hit" },
-    MissileClassPointToPoint,	
+    MissileClassPointToPoint,
     1,
     },
 { MissileTypeType,
@@ -301,7 +301,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "submarine missile.png",
     40,40,
     { "explosion" },
-    MissileClassPointToPoint,	
+    MissileClassPointToPoint,
     1,
     "missile-impact",	NULL,
     },
@@ -310,7 +310,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "turtle missile.png",
     40,40,
     { "explosion" },
-    MissileClassPointToPoint,	
+    MissileClassPointToPoint,
     1,
     "missile-impact",	NULL,
     },
@@ -319,7 +319,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "small fire.png",
     32,48,
     { NULL },
-    MissileClassFire,	
+    MissileClassFire,
     8,
     },
 { MissileTypeType,
@@ -327,15 +327,15 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "big fire.png",
     48,48,
     { NULL },
-    MissileClassFire,	
-    8, 
+    MissileClassFire,
+    8,
     },
 { MissileTypeType,
     "missile-impact",
     "ballista-catapult impact.png",
     48,48,
     { NULL },
-    MissileClassStayWithDelay,	
+    MissileClassStayWithDelay,
     1,
     },
 { MissileTypeType,
@@ -343,7 +343,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "normal spell.png",
     32,32,
     { NULL },
-    MissileClassStayWithDelay,	
+    MissileClassStayWithDelay,
     1,
     },
 { MissileTypeType,
@@ -351,7 +351,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "explosion.png",
     64,64,
     { NULL },
-    MissileClassStayWithDelay,	
+    MissileClassStayWithDelay,
     1,
     },
 { MissileTypeType,
@@ -368,7 +368,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "cannon explosion.png",
     32,32,
     { NULL },
-    MissileClassStayWithDelay,	
+    MissileClassStayWithDelay,
     1,
     },
 { MissileTypeType,
@@ -376,7 +376,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "cannon-tower explosion.png",
     32,32,
     { NULL },
-    MissileClassStayWithDelay,	
+    MissileClassStayWithDelay,
     1,
     },
 { MissileTypeType,
@@ -384,7 +384,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "daemon fire.png",
     32,32,
     { NULL },
-    MissileClassPointToPoint,	
+    MissileClassPointToPoint,
     1,
     },
 { MissileTypeType,
@@ -400,7 +400,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     NULL,
     32,32,
     { NULL },
-    MissileClassNone,		
+    MissileClassNone,
     1,
     },
 { MissileTypeType,
@@ -424,7 +424,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     NULL,
     32,32,
     { NULL },
-    MissileClassCustom,		
+    MissileClassCustom,
     1,
     },
 { MissileTypeType,
@@ -432,7 +432,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     NULL,
     32,32,
     { NULL },
-    MissileClassNone,		
+    MissileClassNone,
     1,
     },
 };
@@ -514,7 +514,7 @@ global MissileType* MissileTypeByIdent(const char* ident)
 
     type=(MissileType**)hash_find(MissileHash,(char*)ident);
 
-    if( type ) { 
+    if( type ) {
 	return *type;
     }
 
@@ -604,14 +604,14 @@ local int CalculateDamageStats( const UnitStats* attacker_stats,
     int damage;
     int basic_damage = attacker_stats->BasicDamage;
     int piercing_damage = attacker_stats->PiercingDamage;
-    
+
     if (bloodlust)
       {
       basic_damage *= 2;
       piercing_damage *= 2;
       printf("bloodlust\n");
       }
-    
+
     damage=-goal_stats->Armor;
     damage+= basic_damage;
     if( damage<0 ) {
@@ -806,15 +806,30 @@ global void FireMissile(Unit* unit)
     //	Damage of missile
     //
     missile->SourceUnit=unit;
-    unit->Refs++; 
+    unit->Refs++;
 }
 
 /**
-**	Check missile visibility.
+**      Get area of tiles covered by missile
 **
-**	@param missile	Missile pointer to check if visible.
+**      @param missile  Missile to be checked and set.
+**      @return         sx,sy,ex,ey defining area in Map
+*/
+local void GetMissileMapArea( const Missile* missile,
+                              int *sx, int *sy, int *ex, int *ey )
+{
+    *sx=missile->X/TileSizeX;
+    *sy=missile->Y/TileSizeY;
+    *ex=(missile->X+missile->Type->Width)/TileSizeX;
+    *ey=(missile->Y+missile->Type->Height)/TileSizeY;
+}
+
+/**
+**      Check missile visibility.
 **
-**	@return		Returns true if visibile, false otherwise.
+**      @param missile  Missile pointer to check if visible.
+**
+**      @return         Returns true if visibile, false otherwise.
 */
 local int MissileVisible(const Missile* missile)
 {
@@ -822,19 +837,28 @@ local int MissileVisible(const Missile* missile)
     int tileMaxX;
     int tileMinY;
     int tileMaxY;
-
-    tileMinX=missile->X/TileSizeX;
-    tileMinY=missile->Y/TileSizeY;
-    tileMaxX=(missile->X+missile->Type->Width)/TileSizeX;
-    tileMaxY=(missile->Y+missile->Type->Height)/TileSizeY;
-    if ( (tileMinX>(MapX+MapWidth)) || (tileMaxX<MapX)
-	    || (tileMinY>MapY+MapHeight) || (tileMaxY<MapY)) {
-	return 0;
+    GetMissileMapArea(missile,&tileMinX,&tileMinY,&tileMaxX,&tileMaxY);
+    if ( !AreaVisibleInMap(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
+        return 0;
     }
     DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
 		tileMinX,tileMaxX,tileMinY,tileMaxY,
 		MapX,MapX+MapWidth,MapY,MapY+MapHeight);
     return 1;
+}
+
+/**
+**      Check and sets if missile must be drawn on screen-map
+**
+**      @param missile  Missile to be checked.
+**      @return         True if map marked to be drawn, false otherwise.
+*/
+local int CheckMissileToBeDrawn(const Missile* missile)
+{
+    int sx,sy,ex,ey;
+
+    GetMissileMapArea( missile, &sx, &sy, &ex, &ey );
+    return MarkDrawAreaMap( sx, sy, ex, ey );
 }
 
 /**
@@ -1099,7 +1123,7 @@ global void MissileHit(const Missile* missile)
     }
     if ( BlizzardMissileHit && goal == missile->SourceUnit )
       return; // blizzard cannot hit owner unit
-    BlizzardMissileHit = 0;  
+    BlizzardMissileHit = 0;
     if ( missile->Damage )
       HitUnit(goal,missile->Damage); // direct damage, spells mostly
     else
@@ -1123,11 +1147,11 @@ global void MissileActions(void)
 	if( missile->Wait-- ) {
 	    continue;
 	}
-	
+
 	if ( missile->TTL != -1 ) {
 	  missile->TTL--; // overall time to live if specified
 	}
-	
+
 	if ( missile->Controller ) {
 	  missile->Controller( missile );
 	}
@@ -1141,12 +1165,8 @@ global void MissileActions(void)
 	  missile->Wait=missile->Type->Speed;
 	  continue; // custom missiles are handled by Controller() only
 	}
-	
-	if (MissileVisible(missile)) {
-	    // check before movement
-	    MustRedraw|=RedrawMap;
-	    // FIXME: must mark the exact tile, for more optimazation
-	}
+
+	CheckMissileToBeDrawn(missile); //StephanR FIXME:needed here?
 
 	switch( missile->Type->Class ) {
 	    //
@@ -1254,9 +1274,9 @@ global void MissileActions(void)
 		    }
 		}
 		break;
-	    
-	    case MissileClassDeathDecay:	
-	    	//NOTE: vladi: this is exact copy of MissileClassStayWithDelay
+
+	    case MissileClassDeathDecay:
+		//NOTE: vladi: this is exact copy of MissileClassStayWithDelay
 		// but with check for blizzard-type hit (friendly fire:))
 		missile->Wait=missile->Type->Speed;
 		if( ++missile->Frame
@@ -1266,7 +1286,7 @@ global void MissileActions(void)
 		    missile->Type=MissileFree;
 		}
 		break;
-	    
+
 	    case MissileClassWhirlwind:
 		missile->Wait=missile->Type->Speed;
 		missile->Frame++;
@@ -1356,10 +1376,9 @@ global void MissileActions(void)
 
 	}
 
-	if (missile->Type!=MissileFree && MissileVisible(missile)) {
+	if (missile->Type!=MissileFree) {
 	    // check after movement
-	    MustRedraw|=RedrawMap;
-	    // FIXME: must mark the exact tile, for more optimazation
+	    CheckMissileToBeDrawn(missile);
 	}
     }
 }

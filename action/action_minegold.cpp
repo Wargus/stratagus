@@ -51,7 +51,7 @@ local int MoveToGoldMine(Unit* unit)
     if( HandleActionMove(unit)>=0 ) {	// reached end-point?
 	return 0;
     }
-    
+
     // FIXME: HandleActionMove return this: reached nearly, use it!
 
     unit->Command.Action=UnitActionMineGold;
@@ -194,9 +194,7 @@ local int MineInGoldmine(Unit* unit)
 		,unit->X,unit->Y
 		,unit->Type->Type,unit->Type->Name);
 	}
-	if( UnitVisible(unit) ) {
-	    MustRedraw|=RedrawMap;
-	}
+        CheckUnitToBeDrawn(unit);
 	if( IsSelected(unit) ) {
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel;
@@ -233,7 +231,7 @@ local int MoveToGoldDeposit(Unit* unit)
     if( HandleActionMove(unit)>=0 ) {	// reached end-point?
 	return 0;
     }
-    
+
     // FIXME: HandleActionMove return this: reached nearly, use it!
 
     unit->Command.Action=UnitActionMineGold;
@@ -281,7 +279,7 @@ local int MoveToGoldDeposit(Unit* unit)
     if( unit->Player==ThisPlayer ) {
 	MustRedraw|=RedrawResources;
     }
-    
+
     if( unit->Type==UnitTypeOrcWorkerWithGold ) {
 	unit->Type=UnitTypeOrcWorker;
     } else if( unit->Type==UnitTypeHumanWorkerWithGold ) {
@@ -344,9 +342,7 @@ local int StoreGoldInDeposit(Unit* unit)
 	    unit->Command.Action=UnitActionMineGold;
 	}
 
-	if( UnitVisible(unit) ) {
-	    MustRedraw|=RedrawMap;
-	}
+        CheckUnitToBeDrawn(unit);
 	unit->Wait=1;
 	unit->SubAction=0;
 	return 1;

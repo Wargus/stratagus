@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name mouse.c	-	The mouse handling. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -229,7 +228,7 @@ global void DoRightButton(int x,int y)
             dest=TargetOnMapTile(unit,x,y);
             if( dest ) {
                 dest->Blink=3;
-                if( dest->Player==ThisPlayer || 
+                if( dest->Player==ThisPlayer ||
 		        dest->Player->Player==PlayerNumNeutral) {
 		    // FIXME: lokh: maybe we should add the ally players here
 		    // FIXME: don't work must check repairable first
@@ -400,14 +399,14 @@ local void HandleMouseOn(int x,int y)
     //
     //	Map
     //
-    if( x>=TheUI.MapX && x<TheUI.MapWidth
-	    && y>=TheUI.MapY && y<TheUI.MapHeight ) {
+    if( x>=TheUI.MapX && x<=TheUI.MapEndX
+	    && y>=TheUI.MapY && y<=TheUI.MapEndY ) {
 	CursorOn=CursorOnMap;
     } else {
 	CursorOn=-1;
     }
 
-    // 
+    //
     //	Scrolling Region Handling
     //	FIXME: perhaps I should change the complete scroll handling.
     //  FIXME: show scrolling cursor only, if scrolling is possible
@@ -541,7 +540,7 @@ global void UIHandleMouseMove(int x,int y)
       {
       UnitUnderCursor = NULL;
       }
-    
+
     //
     //	Selecting target.
     //
@@ -581,7 +580,7 @@ global void UIHandleMouseMove(int x,int y)
 	    }
 	    GameCursor=&Cursors[CursorTypeGlass];
 	}
-	
+
 #ifdef FLAG_DEBUG	// ARI: Disabled by introducing flag debug!
 	IfDebug( DrawMouseCoordsOnMap(x,y); );
 #endif
@@ -795,21 +794,21 @@ local void SendSpellCast(int x,int y)
     int i;
     Unit* unit;
     Unit* dest;
-    
+
     dest=UnitOnMapTile(x,y);
     DebugLevel3Fn("SpellCast on: %p (%d,%d)\n", dest, x, y);
     /*	NOTE: Vladi:
         This is a high-level function, it sends target spot and unit
-	(if exists). All checks are performed at spell cast handle 
+	(if exists). All checks are performed at spell cast handle
 	function which will cancel function if cannot be executed
     */
     for( i=0; i<NumSelected; i++ ) {
         unit=Selected[i];
-	if( !unit->Type->CanCastSpell ) 
+	if( !unit->Type->CanCastSpell )
 	  continue; // this unit cannot cast spell
-	if( dest && unit == dest ) 
+	if( dest && unit == dest )
 	  continue; // no unit can cast spell on himself
-	// CursorValue here holds the spell type id  
+	// CursorValue here holds the spell type id
 	SendCommandSpellCast(unit,x,y,dest,CursorValue,!(KeyModifiers&ModifierShift));
     }
 }
@@ -852,7 +851,7 @@ local void SendCommand(int x,int y)
 	case B_Demolish:
 	    SendDemolish(x,y);
 	    break;
-        case B_SpellCast:    
+        case B_SpellCast:
 	    SendSpellCast(x,y);
 	    break;
 	default:
@@ -947,7 +946,7 @@ global void UIHandleButtonDown(int b)
 			,CursorX,CursorY,CursorBuilding-UnitTypes);
 		// FIXME: error messages
 
- 		if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)
+		if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)
 			// FIXME: vladi: should check all building footprint
 			// but not just MAPEXPLORED(x,y)
 			&& IsMapFieldExplored(x,y) ) {
@@ -987,7 +986,7 @@ global void UIHandleButtonDown(int b)
               unit->Blink=3;
 	    } else { // if not not click on building -- green cross
 	      MakeMissile(MissileTypeGreenCross
-	 	    ,MapX*TileSizeX+CursorX-TheUI.MapX
+		    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
 	    }
 	    DoRightButton(Screen2MapX(CursorX),Screen2MapY(CursorY));
@@ -1151,7 +1150,7 @@ global void UIHandleButtonUp(int b)
 		} else if( Selected[0]->Burning ) {
 		    // FIXME: use GameSounds.Burning
 		    PlayGameSound(SoundIdForName("burning"),MaxSampleVolume);
-		} else if( Selected[0]->Player==ThisPlayer 
+		} else if( Selected[0]->Player==ThisPlayer
 			|| Selected[0]->Player->Race==PlayerRaceNeutral ) {
 		    PlayUnitSound(Selected[0],VoiceSelected);
 		} else {

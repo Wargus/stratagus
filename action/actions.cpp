@@ -67,9 +67,8 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
     unit->IY+=animation[state].Pixel;
     unit->Wait=animation[state].Sleep;
 
-    if( (animation[state].Frame || animation[state].Pixel)
-	    && UnitVisible(unit) ) {
-	MustRedraw|=RedrawMap;
+    if( (animation[state].Frame || animation[state].Pixel) ) {
+        CheckUnitToBeDrawn(unit);
     }
 
     flags=animation[state].Flags;
