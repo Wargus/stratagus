@@ -608,6 +608,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	int g;
 	int b;
 	int v;
+	char *vp;
 
 	r=(palette[i].r)&0xFF;
 	g=(palette[i].g)&0xFF;
@@ -641,9 +642,10 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	    break;
 	case 24:
 	    v=SDL_MapRGB(Screen->format,r,g,b);
-	    ((VMemType24*)pixels)[i].c=v>>16;
-	    ((VMemType24*)pixels)[i].b=v>> 8;
-	    ((VMemType24*)pixels)[i].a=v>> 0;
+	    vp = (char *)(&v);
+	    ((VMemType24*)pixels)[i].a=vp[0];	// endian safe ?
+	    ((VMemType24*)pixels)[i].b=vp[1];
+	    ((VMemType24*)pixels)[i].c=vp[2];
 	    break;
 	case 32:
 	    ((VMemType32*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);

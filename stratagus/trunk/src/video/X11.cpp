@@ -856,6 +856,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	int g;
 	int b;
 	int v;
+	char *vp;
 
 	r=(palette[i].r)&0xFF;
 	g=(palette[i].g)&0xFF;
@@ -897,7 +898,15 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	    ((VMemType16*)pixels)[i]=color.pixel;
 	    break;
 	case 24:
-	    ((VMemType24*)pixels)[i]=color.pixel;
+	    // Disliked by gcc 2.95.2, maybe due to size mismatch
+	    // ((VMemType24*)pixels)[i]=color.pixel;
+	    // ARI: Let's hope XAllocColor did correct RGB/BGR DAC mapping into color.pixel
+	    // The following brute force hack then should be endian safe, well maybe except for vaxen..
+	    // Now just tell users to stay away from strict-aliasing..
+	    vp = (char *)(&color.pixel);
+	    ((VMemType24*)pixels)[i].a=vp[0];
+	    ((VMemType24*)pixels)[i].b=vp[1];
+	    ((VMemType24*)pixels)[i].c=vp[2];
 	    break;
 	case 32:
 	    ((VMemType32*)pixels)[i]=color.pixel;
