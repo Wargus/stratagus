@@ -451,8 +451,8 @@ local unsigned char *mgptsoptions[] = {
 **	Help-items for the Net Multiplayer Setup and Client Menus
 */
 local Menuitem NetMultiButtonStorage[] = {
-    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, 0, NULL, NULL, NULL, {{NULL,0}} },
 };
 local void InitNetMultiButtonStorage() {
     MenuitemPulldown i0 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, -1, 0, 0, 0};
@@ -3021,7 +3021,7 @@ local void JoinNetGameMenu(void)
     Menu *menu;
 
 #ifdef USE_SDL_SURFACE
-    MenusSetBackground();
+    VideoUnlockScreen();
     Invalidate();
 #else
     VideoLockScreen();
@@ -7178,6 +7178,7 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     char* reply;
     Menu* menu;
     char* port;
+
 
     
     SendMetaCommand("NumberOfGames", "");

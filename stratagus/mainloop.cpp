@@ -274,30 +274,33 @@ local void DrawMenuButtonArea(void)
 	    TheUI.MenuPanelX, TheUI.MenuPanelY);
     }
     if (NetworkFildes == (Socket)-1) {
+		//FIX ME: Transparent flag, 3rd param, has been hardcoded.
 	if (TheUI.MenuButton.X != -1) {
 	    DrawMenuButton(TheUI.MenuButton.Button,
 		(ButtonAreaUnderCursor == ButtonAreaMenu
 		    && ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
-		(GameMenuButtonClicked ? MenuButtonClicked : 0),
+		(GameMenuButtonClicked ? MenuButtonClicked : 0), 0, 
 		TheUI.MenuButton.Width, TheUI.MenuButton.Height,
 		TheUI.MenuButton.X, TheUI.MenuButton.Y,
 		GameFont, TheUI.MenuButton.Text, NULL, NULL);
 	}
     } else {
 	if (TheUI.NetworkMenuButton.X != -1) {
+		//FIX ME: Transparent flag, 3rd param, has been hardcoded.
 	    DrawMenuButton(TheUI.NetworkMenuButton.Button,
 		(ButtonAreaUnderCursor == ButtonAreaMenu
 		    && ButtonUnderCursor == ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
-		(GameMenuButtonClicked ? MenuButtonClicked : 0),
+		(GameMenuButtonClicked ? MenuButtonClicked : 0),/*Transparent*/ 0,
 		TheUI.NetworkMenuButton.Width, TheUI.NetworkMenuButton.Height,
 		TheUI.NetworkMenuButton.X, TheUI.NetworkMenuButton.Y,
 		GameFont, TheUI.NetworkMenuButton.Text, NULL, NULL);
 	}
 	if (TheUI.NetworkDiplomacyButton.X != -1) {
+		//FIX ME: Transparent flag, 3rd param, has been hardcoded.
 	    DrawMenuButton(TheUI.NetworkDiplomacyButton.Button,
 		(ButtonAreaUnderCursor == ButtonAreaMenu
 		    && ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
-		(GameDiplomacyButtonClicked ? MenuButtonClicked : 0),
+		(GameDiplomacyButtonClicked ? MenuButtonClicked : 0),/*Transparent*/ 0,
 		TheUI.NetworkDiplomacyButton.Width, TheUI.NetworkDiplomacyButton.Height,
 		TheUI.NetworkDiplomacyButton.X, TheUI.NetworkDiplomacyButton.Y,
 		GameFont, TheUI.NetworkDiplomacyButton.Text, NULL, NULL);
@@ -417,6 +420,9 @@ local void DrawMapViewport(Viewport* vp)
 	//
 	nunits = FindAndSortUnits(vp, table);
 	nmissiles = FindAndSortMissiles(vp, missiletable);
+/*	if (Units[170]) {
+	    DebugLevel0Fn("Unit 170: %s ref %d\n" _C_ Units[170]->Type->Name _C_ Units[170]->Refs);
+	}*/
 
 	i = 0;
 	j = 0;
@@ -519,7 +525,7 @@ global void DrawMapArea(void)
     //
     for (vp = TheUI.Viewports; vp < evp; ++vp) {
 #ifdef USE_SDL_SURFACE
-	Uint32 color;
+	SDL_Color color;
 #else
 	VMemType color;
 #endif
@@ -832,8 +838,6 @@ global void GameMainLoop(void)
 		    CclGarbageCollect(1);
 		    break;
 		case 1:
-		    HandleCloak();
-		    break;
 		case 2:
 		    break;
 		case 3:				// minimap update

@@ -207,7 +207,7 @@ local void IntroCallbackExit(void)
 */
 local void DrawContinueButton(void)
 {
-    DrawMenuButton(MBUTTON_GM_HALF, ContinueButtonFlags,
+    DrawMenuButton(MBUTTON_GM_HALF, ContinueButtonFlags,0,
 	106, 27,
 	ContinueButtonX, ContinueButtonY,
 	LargeFont, "~!Continue", NULL, NULL);
