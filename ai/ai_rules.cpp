@@ -706,6 +706,12 @@ global int AiEvaluateForceCost(int force, int total)
 	cost = (cost * (100 + (forcesize - 5) * 10)) / 100;
     }
 
+    // Be much more aggressive whith biggest forces
+    if (forcesize > 50) {
+	cost = (cost * (100 + (forcesize - 50) * 10)) / 100;
+    }
+
+
     return cost;
 }
 
@@ -1123,6 +1129,9 @@ global void AiPeriodicAttack(void)
 	    AiEraseForce(AiScript->ownForce);
 	} else {
 	    DebugLevel3Fn("Attacking crisis ! reseting.\n");
+	    AiEraseForce(1);
+	    // FIXME : should update with lower values
+	    AiUpdateForce(1, AiScript->ownForce);
 	    AiEraseForce(AiScript->ownForce);
 	}
     }
