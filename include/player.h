@@ -67,8 +67,7 @@
 **		We support currently #PlayerNeutral,
 **		#PlayerNobody, #PlayerComputer, #PlayerPerson,
 **		#PlayerRescuePassive and #PlayerRescueActive.
-**		@see #PlayerTypes
-**
+**		@see #PlayerTypes.
 **
 **	Player::RaceName
 **
@@ -79,9 +78,10 @@
 **
 **	Player::Race
 **
-**		Race number of the player (See #PlayerRaces). This field is
-**		setup from the level (PUD). This number is mapped with
-**		#RaceWcNames to the symbolic name Player::RaceName.
+**		Race number of the player. This field is setup from the level
+**		(PUD). This number is mapped with #RaceWcNames to the symbolic
+**		name Player::RaceName.
+**		@see #PlayerRaces.
 **
 **	Player::AiNum
 **
@@ -93,17 +93,16 @@
 **
 **		Team of player. Selected during network game setup. All players
 **		of the same team are allied and enemy to all other teams.
-**
 **		@note It is planned to show the team on the map.
 **
 **	Player::Enemy
 **
 **		A bit field which contains the enemies of this player.
 **		If Player::Enemy & (1<<Player::Player) != 0 its an enemy.
-**		Setup during startup using the Player:Team, can later be
+**		Setup during startup using the Player::Team, can later be
 **		changed with diplomacy. Player::Enemy and Player::Allied
-**		are combined. @note You can be allied to a player,
-**		which sees you as enemy.
+**		are combined, if none bit is set, the player is neutral.
+**		@note You can be allied to a player, which sees you as enemy.
 **
 **	Player::Allied
 **
@@ -111,8 +110,8 @@
 **		If Player::Allied & (1<<Player::Player) != 0 its an allied.
 **		Setup during startup using the Player:Team, can later be
 **		changed with diplomacy. Player::Enemy and Player::Allied
-**		are combined. @note You can be allied to a player,
-**		which sees you as enemy.
+**		are combined, if none bit is set, the player is neutral.
+**		@note You can be allied to a player, which sees you as enemy.
 **
 **	Player::X Player::Y
 **
@@ -126,22 +125,29 @@
 **
 **		How many resources the player owns. Needed for building
 **		units and structures.
+**		@see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
 **
 **	Player::Incomes[::MaxCosts]
 **
 **		Income of the resources, when they are delivered at a store.
+**		@see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
 **
 **	Player::UnitTypesCount[::UnitTypeMax]
 **
 **		Total count for each different unit type. Used by the AI and
-**		for dependencies checks.
+**		for dependencies checks. The addition of all counts should
+**		be Player::TotalNumUnits.
 **		@note Should not use the maximum number of unit-types here,
 **		only the real number of unit-types used.
 **
 **	Player::AiEnabled
 **
-**		If the player is played by the computer and this flag is true,
-**		than the player is handled by the AI on this local computer.
+**		If the player is controlled by the computer and this flag is
+**		true, than the player is handled by the AI on this local
+**		computer.
+**
+**		@note Currently the AI is calculated parallel on all computers
+**		in a network play. It is planned to change this.
 **
 **	Player::Ai
 **
@@ -154,7 +160,8 @@
 **
 **	Player::TotalNumUnits
 **
-**		Total number of units in the Player::Units table.
+**		Total number of units (incl. buildings) in the Player::Units
+**		table.
 **
 **	Player::NumFoodUnits
 **
@@ -162,8 +169,8 @@
 **		A player can only build up to Player::Food units and not more
 **		than Player::FoodUnitLimit units.
 **
-**		@note that Player::NumFoodUnits > Player::Food, when farms are
-**		destroyed upon Player::NumFoodUnits==Player::Food.
+**		@note that Player::NumFoodUnits > Player::Food, when enough
+**		farms are destroyed.
 **
 **	Player::NumBuildings
 **
@@ -173,26 +180,31 @@
 **
 **		Number of food available/produced. Player can't train more
 **		Player::NumFoodUnits than this.
+**		@note that all limits are always checked.
 **
 **	Player::FoodUnitLimit
 **
 **		Number of food units allowed. Player can't train more
 **		Player::NumFoodUnits than this.
+**		@note that all limits are always checked.
 **
 **	Player::BuildingLimit
 **
 **		Number of buildings allowed.  Player can't build more
 **		Player::NumBuildings than this.
+**		@note that all limits are always checked.
 **
 **	Player::TotalUnitLimit
 **
 **		Number of total units allowed. Player can't have more
 **		Player::NumFoodUnits+Player::NumBuildings=Player::TotalNumUnits
 **		this.
+**		@note that all limits are always checked.
 **
 **	Player::LastRepairResource
 **
-**		Last resource used for repair cycles. @see RepairUnit.
+**		Last resource used for repair cycles. Was introduced to
+**		reduce the repair speed.  @see RepairUnit.
 **
 **	Player::Score
 **
@@ -207,8 +219,11 @@
 **	Player::UnitColors
 **
 **		Unit colors of this player. Contains the hardware dependent
-**		pixel values for the player colors (palette index 208-211).
+**		pixel values for the player colors (palette index #208-#211).
 **		Setup from the global palette.
+**		@note Index #208-#211 are various SHADES of the team color
+**		(#208 is brightest shade, #211 is darkest shade) .... these
+**		numbers are NOT red=#208, blue=#209, etc
 **
 **	Player::Allow
 **
@@ -219,10 +234,14 @@
 **		@li	`R' -- acquired, perhaps other values
 **		@li	`Q' -- acquired but forbidden (does it make sense?:))
 **		@li	`E' -- enabled, allowed by level but currently forbidden
+**		@see _allow_
 **
 **	Player::UpgradeTimers
 **
 **		Timer for the upgrades. One timer for all possible upgrades.
+**		Initial 0 counted up by the upgrade action, until it reaches
+**		the upgrade time.
+**		@see _upgrade_timers_
 **		@note it is planned to combine research for faster upgrades.
 */
 
@@ -332,27 +351,38 @@ enum PlayerRaces {
 **
 **	#PlayerNeutral
 **
-**		FIXME: please write documentation.
+**		This player is controlled by the computer doing nothing.
 **
 **	#PlayerNobody
 **
-**		FIXME: please write documentation.
+**		This player is unused. Nobody controlls this player.
 **
 **	#PlayerComputer
 **
-**		FIXME: please write documentation.
+**		This player is controlled by the computer. Player::AiNum
+**		selects the AI strategy.
 **
 **	#PlayerPerson
 **
-**		FIXME: please write documentation.
+**		This player is contolled by a person. This can be the player
+**		sitting on the local computer or player playing over the
+**		network.
 **
 **	#PlayerRescuePassive
 **
-**		FIXME: please write documentation.
+**		This player does nothing, the game pieces just sit in the game
+**		(being passive)... when a person player moves next to a
+**		PassiveRescue unit/building, then it is "rescued" and becomes
+**		part of that persons team. If the city center is rescued, than
+**		all units of this player are rescued.
 **
 **	#PlayerRescueActive
 **
-**		FIXME: please write documentation.
+**		This player is controlled by the computer. Player::AiNum
+**		selects the AI strategy. Unit it is rescued it plays like
+**		an ally. The first person which reaches units of this player,
+**		can rescue them. If the city center is rescued, than all units
+**		of this player are rescued.
 */
 enum PlayerTypes {
     PlayerNeutral	=2,		/// neutral
@@ -370,7 +400,7 @@ enum PlayerTypes {
 */
 enum PlayerAis {
     PlayerAiLand	=0x00,		/// attack at land
-    PlayerAiPassive	=0x01,		/// passive ai does nothing
+    PlayerAiPassive	=0x01,		/// passive does nothing
     PlayerAiSea		=0x19,		/// attack at sea
     PlayerAiAir		=0x1A,		/// attack at air
     PlayerAiUniversal	=0xFF,		/// attack best possible

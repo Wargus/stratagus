@@ -227,17 +227,17 @@ typedef struct _upgrade_modifier_ {
 } UpgradeModifier;
 
 /**
-**	Allow what a player can do. Every player has an own Allow struct.
+**	Allow what a player can do. Every #Player has an own allow struct.
 **
 **	This could allow/disallow units, actions or upgrades.
 **
 **	Values are:
-**		`A' -- allowed,
-**		`F' -- forbidden,
-**		`R' -- acquired, perhaps other values
-**		`Q' -- acquired but forbidden (does it make sense?:))
-**		`E' -- enabled, allowed by level but currently forbidden
-***		`X' -- fixed, acquired can't be disabled
+**		@li `A' -- allowed,
+**		@li `F' -- forbidden,
+**		@li `R' -- acquired, perhaps other values
+**		@li `Q' -- acquired but forbidden (does it make sense?:))
+**		@li `E' -- enabled, allowed by level but currently forbidden
+***		@li `X' -- fixed, acquired can't be disabled
 */
 typedef struct _allow_ {
     char	Units[UnitTypeMax];	/// units allowed/disallowed
