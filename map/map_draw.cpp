@@ -158,7 +158,7 @@ local unsigned int PixelsHigh[256];
 **	Flags must redraw map row.
 **	MustRedrawRow[y]!=0 This line of tiles must be redrawn.
 **
-**	@see MAXMAP_W 
+**	@see MAXMAP_W
 */
 global char MustRedrawRow[MAXMAP_W];
 
@@ -1438,21 +1438,23 @@ global void MapColorCycle(void)
 }
 
 /**
-**	Mark position inside screenmap be drawn for next display update.
+**	Mark position inside viewport be drawn for next display update.
 **
 **	@param x	X map tile position of point in Map to be marked.
 **	@param y	Y map tile position of point in Map to be marked.
 **
 **	@return		True if inside and marked, false otherwise.
+**
+**	@note latimerius: MarkDrawPosMap() in split screen environment
+**	schedules RedrawMap if (x,y) is visible inside *any* of the existing
+**	viewports.  Is this OK, johns?  Do you think it would pay having
+**	RedrawViewport0, RedrawViewport1 etc. variables and redraw just
+**	vp's that actually need redrawing?  We should evaluate this.
+**	JOHNS: A complete viewport redraw is still too much work. The final
+**	version should only redraw the needed tiles.
 */
 global int MarkDrawPosMap(int x, int y)
 {
-    /* NOTE: latimerius: MarkDrawPosMap() in split screen environment
-     * schedules RedrawMap if (x,y) is visible inside *any* of the existing
-     * viewports.  Is this OK, johns?  Do you think it would pay having
-     * RedrawViewport0, RedrawViewport1 etc. variables and redraw just
-     * vp's that actually need redrawing?  We should evaluate this.
-     */
     if (GetViewport(x, y) != -1) {
 	MustRedraw |= RedrawMap;
 	return 1;
@@ -1460,6 +1462,16 @@ global int MarkDrawPosMap(int x, int y)
     return 0;
 }
 
+/**
+**	Denote wether area in map is overlapping with the viewport.
+**
+**	@param sx	X map tile position of area in map to be checked.
+**	@param sy	Y map tile position of area in map to be checked.
+**	@param ex	X map tile position of area in map to be checked.
+**	@param ey	Y map tile position of area in map to be checked.
+**
+**	@return		True if overlapping, false otherwise.
+*/
 global int MapAreaVisibleInViewport(int v, int sx, int sy, int ex, int ey)
 {
     const Viewport* view;
@@ -1470,24 +1482,46 @@ global int MapAreaVisibleInViewport(int v, int sx, int sy, int ex, int ey)
 	&& ey < view->MapY + view->MapHeight;
 }
 
-local inline int PointInViewport(int v, int x, int y)
+/**
+**	Check if a point is visible (inside) a viewport.
+**
+**	@param v	Viewport.
+**	@param x	X map tile position of point in map to be checked.
+**	@param y	Y map tile position of point in map to be checked.
+**
+**	@return		True if point is in the visible map, false otherwise
+*/
+local inline int PointInViewport(const Viewport* vp, int x, int y)
 {
-    const Viewport* view;
-
-    view = &TheUI.VP[v];
-    return view->MapX <= x && x < view->MapX + view->MapWidth
-	&& view->MapY <= y && y < view->MapY + view->MapHeight;
-}
-
-global int AnyMapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
-{
-    // FIXME: Can be faster written
-    return PointInViewport (v,sx,sy) || PointInViewport (v,sx,ey)
-	    || PointInViewport (v,ex,sy) || PointInViewport (v,ex,ey);
+    return vp->MapX <= x && x < vp->MapX + vp->MapWidth
+	&& vp->MapY <= y && y < vp->MapY + vp->MapHeight;
 }
 
 /**
-**	Mark overlapping area with screenmap be drawn for next display update.
+**	Check if any part of an area is visible in a viewport.
+**
+**	@param sx	X map tile position of area in map to be checked.
+**	@param sy	Y map tile position of area in map to be checked.
+**	@param ex	X map tile position of area in map to be checked.
+**	@param ey	Y map tile position of area in map to be checked.
+**
+**	@return		True if any part of area is visible, false otherwise
+**
+**	@todo	Didn't works if all points lay outside and the area covers
+**		the complete viewport.
+*/
+global int AnyMapAreaVisibleInViewport(int v, int sx, int sy, int ex, int ey)
+{
+    const Viewport* vp;
+
+    // FIXME: Can be faster written
+    vp = &TheUI.VP[v];
+    return PointInViewport(vp, sx, sy) || PointInViewport(vp, sx, ey)
+	|| PointInViewport(vp, ex, sy) || PointInViewport(vp, ex, ey);
+}
+
+/**
+**	Mark overlapping area with viewport be drawn for next display update.
 **
 **	@param sx	X map tile position of area in Map to be marked.
 **	@param sy	Y map tile position of area in Map to be marked.
@@ -1500,7 +1534,7 @@ global int AnyMapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
 */
 global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 {
-    if (MapTileGetViewport (sx,sy) != -1 || MapTileGetViewport (ex,ey) != -1) {
+    if (MapTileGetViewport(sx, sy) != -1 || MapTileGetViewport(ex, ey) != -1) {
 	MustRedraw |= RedrawMap;
 	return 1;
     }
@@ -1532,7 +1566,6 @@ global void MarkDrawEntireMap(void)
     MustRedraw|=RedrawMap;
 }
 
-
 /**
 **	Draw the map backgrounds.
 **
@@ -1562,8 +1595,7 @@ global void MarkDrawEntireMap(void)
 ** (in pixels)
 ** </PRE>
 */
-
-global void DrawMapBackgroundInViewport (int v, int x, int y)
+global void DrawMapBackgroundInViewport(int v, int x, int y)
 {
     int sx;
     int sy;
@@ -1603,13 +1635,13 @@ global void DrawMapBackgroundInViewport (int v, int x, int y)
 		    MapDrawTile(TheMap.Fields[sx].SeenTile,dx,dy);
 
 		// StephanR: debug-mode denote tiles that are redrawn
-		#if NEW_MAPDRAW > 1
+#if NEW_MAPDRAW > 1
 		  VideoDrawRectangle( redraw_tile[-1] > 1
 				      ? ColorWhite
 				      : ColorRed,
 				      dx, dy, 32, 32 );
-		#endif
-		}
+#endif
+	    }
 		++sx;
 		dx+=TileSizeX;
 	    }
@@ -1661,45 +1693,47 @@ global void DrawMapBackgroundInViewport (int v, int x, int y)
 **
 **      @param dummy_data  should be NULL; needed to make callback possible
 */
-local void mapdeco_draw( void *dummy_data )
+local void mapdeco_draw(void *dummy_data)
 {
-  MapField *src;
-  int x, y, w, h, nextline;
+    MapField *src;
+    int x;
+    int y;
+    int w;
+    int h;
+    int nextline;
 
-  extern int ClipX1;
-  extern int ClipY1;
-  extern int ClipX2;
-  extern int ClipY2;
+    extern int ClipX1;
+    extern int ClipY1;
+    extern int ClipX2;
+    extern int ClipY2;
 
 //  VideoDrawRectangle( ColorWhite, ClipX1, ClipY1,
 //                      ClipX2-ClipX1+1, ClipY2-ClipY1+1 );
-  w = (ClipX2 - ClipX1) / TileSizeX + 1;
-  h = (ClipY2 - ClipY1) / TileSizeY + 1;
-  x = (ClipX1 - TheUI.MapX) / TileSizeX;
-  y = (ClipY1 - TheUI.MapY) / TileSizeY;
-  src = TheMap.Fields + MapX + x + (MapY + y) * TheMap.Width;
-  x = TheUI.MapX + x * TileSizeX;
-  y = TheUI.MapY + y * TileSizeY;
-  nextline=TheMap.Width-w;
-  do
-  {
-    int w2=w;
-    do
-    {
-      MapDrawTile(src->SeenTile,x,y);
-      x+=TileSizeX;
-      src++;
+    w = (ClipX2 - ClipX1) / TileSizeX + 1;
+    h = (ClipY2 - ClipY1) / TileSizeY + 1;
+    x = (ClipX1 - TheUI.MapX) / TileSizeX;
+    y = (ClipY1 - TheUI.MapY) / TileSizeY;
+    src = TheMap.Fields + MapX + x + (MapY + y) * TheMap.Width;
+    x = TheUI.MapX + x * TileSizeX;
+    y = TheUI.MapY + y * TileSizeY;
+    nextline = TheMap.Width - w;
+    do {
+	int w2 = w;
+
+	do {
+	    MapDrawTile(src->SeenTile, x, y);
+	    x += TileSizeX;
+	    src++;
+	}
+	while (--w2);
+	y += TileSizeY;
+	src += nextline;
     }
-    while ( --w2 );
-    y+=TileSizeY;
-    src+=nextline;
-  }
-  while ( --h );
+    while (--h);
 }
 #endif
 
 /**
-:w
 **	Initialise the fog of war.
 **	Build tables, setup functions.
 **
