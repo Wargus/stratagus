@@ -32,41 +32,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef _MSC_VER
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
-#include <limits.h>
-
-#else // _MSC_VER
-
-#ifdef _WIN32_WCE
-#define R_OK	1	// FIXME: correct?
-#else
-#define R_OK	4
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <errno.h>
-#include <io.h>
-#define PATH_MAX _MAX_PATH
-#define S_ISDIR(x) ((x) & _S_IFDIR)
-#define S_ISREG(x) ((x) & _S_IFREG)
-#endif
-
-#endif
+#include "iocompat.h"
 
 #include "freecraft.h"
-#include "iolib.h"
 #include "campaign.h"			// for CurrentMapPath
 
-#ifndef O_BINARY
-#define O_BINARY	0
-#endif
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --	Defines
