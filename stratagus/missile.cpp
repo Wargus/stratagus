@@ -114,7 +114,7 @@ global int NoWarningMissileType;		/// quiet ident lookup.
 local Missile* GlobalMissiles[MAX_MISSILES];	/// all global missiles on map
 local int NumGlobalMissiles;			/// currently used missiles
 
-local Missile* LocalMissiles[MAX_MISSILES*8];	/// all local missiles on map
+local Missile* LocalMissiles[MAX_MISSILES * 8];	/// all local missiles on map
 local int NumLocalMissiles;			/// currently used missiles
 
 #ifdef DOXYGEN                          // no real code, only for document
@@ -222,7 +222,7 @@ global MissileType* NewMissileTypeSlot(char* ident)
     //	Rehash.
     //
     for (i = 0; i < NumMissileTypes; ++i) {
-	*(MissileType**)hash_add(MissileTypeHash,MissileTypes[i].Ident) = &MissileTypes[i];
+	*(MissileType**)hash_add(MissileTypeHash, MissileTypes[i].Ident) = &MissileTypes[i];
     }
 
     mtype->CanHitOwner = 0;		// defaults
@@ -326,7 +326,7 @@ local Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
 **
 **	@return		created missile.
 */
-global Missile* MakeMissile(MissileType* mtype,int sx,int sy,int dx,int dy)
+global Missile* MakeMissile(MissileType* mtype, int sx, int sy, int dx, int dy)
 {
     Missile* missile;
 
@@ -801,7 +801,7 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 
     nextdir = 256 / missile->Type->NumDirections;
     dir = ((DirectionToHeading(dx, dy) + nextdir / 2) & 0xFF) / nextdir;
-    if (dir <= LookingS / nextdir ) {	// north->east->south
+    if (dir <= LookingS / nextdir) {	// north->east->south
 	missile->SpriteFrame += dir;
     } else {
 	missile->SpriteFrame += 256 / nextdir - dir;
@@ -1033,7 +1033,7 @@ local int ParabolicMissile(Missile* missile)
     //	Move missile
     //
     if (missile->Dy == 0) {		// horizontal line
-	for (i = 0; i<missile->Type->Speed; ++i) {
+	for (i = 0; i < missile->Type->Speed; ++i) {
 	    if (missile->X == missile->DX) {
 		return 1;
 	    }
@@ -1172,7 +1172,7 @@ global void MissileHit(Missile* missile)
     x /= TileSizeX;
     y /= TileSizeY;
 
-    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height ) {
+    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 	// FIXME: this should handled by caller?
 	DebugLevel0Fn("Missile gone outside of map!\n");
 	return;				// outside the map.
@@ -1217,7 +1217,7 @@ global void MissileHit(Missile* missile)
 	    // We are attacking the nearest field of the unit
 	    if (x < goal->X || y < goal->Y ||
 		    x >= goal->X + goal->Type->TileWidth ||
-		    y >= goal->Y + goal->Type->TileHeight ) {
+		    y >= goal->Y + goal->Type->TileHeight) {
 		MissileHitsGoal(missile, goal, 2);
 	    } else {
 		MissileHitsGoal(missile, goal, 1);
@@ -1458,8 +1458,8 @@ global void SaveMissileTypes(CLFile* file)
     char** sp;
     int i;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: missile-types $Id$\n\n");
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: missile-types $Id$\n\n");
 
     //
     //	Original number to internal missile-type name.
@@ -1483,7 +1483,7 @@ global void SaveMissileTypes(CLFile* file)
 	}
 	CLprintf(file, " 'size '(%d %d)", mtype->Width, mtype->Height);
 	if (mtype->Sprite) {
-	    CLprintf(file," 'frames %d", mtype->SpriteFrames);
+	    CLprintf(file, " 'frames %d", mtype->SpriteFrames);
 	}
 	CLprintf(file, "\n  'num-directions %d", mtype->NumDirections);
 	CLprintf(file, "\n ");
@@ -1524,8 +1524,8 @@ local void SaveMissile(const Missile* missile,CLFile* file)
     CLprintf(file, "(missile 'type '%s",missile->Type->Ident);
     CLprintf(file, " 'pos '(%d %d) 'goal '(%d %d)",
 	missile->X, missile->Y, missile->DX, missile->DY);
-    CLprintf(file," '%s", missile->Local ? "local" : "global");
-    CLprintf(file,"\n  'frame %d 'state %d 'wait %d 'delay %d\n ",
+    CLprintf(file, " '%s", missile->Local ? "local" : "global");
+    CLprintf(file, "\n  'frame %d 'state %d 'wait %d 'delay %d\n ",
 	missile->SpriteFrame, missile->State, missile->Wait, missile->Delay);
     if (missile->SourceUnit) {
 	CLprintf(file, " 'source '%s", s1 = UnitReference(missile->SourceUnit));
@@ -1553,8 +1553,8 @@ global void SaveMissiles(CLFile* file)
 {
     Missile* const* missiles;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: missiles $Id$\n\n");
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: missiles $Id$\n\n");
 
     for (missiles = GlobalMissiles; *missiles; ++missiles) {
 	SaveMissile(*missiles, file);
@@ -1780,6 +1780,11 @@ void MissileActionPointToPoint3Bounces(Missile* missile)
     }
 }
 
+/**
+**	FIXME: docu
+**
+**	@param missile	pointer to missile
+*/
 void MissileActionCycleOnce(Missile* missile)
 {
     int neg;
@@ -1815,7 +1820,7 @@ void MissileActionCycleOnce(Missile* missile)
 
 /*
 **      Missile flies from x,y to x1,y1 than shows hit animation.
-**	
+**
 **	@param missile	pointer to missile
 */
 void MissileActionPointToPointWithHit(Missile* missile)
@@ -1865,6 +1870,11 @@ void MissileActionFire(Missile* missile)
     }
 }
 
+/**
+**	FIXME: docu
+**
+**	@param missile	pointer to missile
+*/
 void MissileActionHit(Missile* missile)
 {
     if (PointToPointMissile(missile)) {
@@ -1874,7 +1884,7 @@ void MissileActionHit(Missile* missile)
 }
 
 /*
-**     Missile flies from x,y to x1,y1 using a parabolic path
+**	Missile flies from x,y to x1,y1 using a parabolic path
 **	
 **	@param missile	pointer to missile
 */
@@ -1951,7 +1961,7 @@ global void SpellDeathCoilController(Missile *missile)
 	    && missile->TargetUnit->HP)  {
 	if (missile->TargetUnit->HP <= 50) {// 50 should be parametrable
 	    source->Player->Score += missile->TargetUnit->Type->Points;
-	    if( missile->TargetUnit->Type->Building) {
+	    if (missile->TargetUnit->Type->Building) {
 		source->Player->TotalRazings++;
 	    } else {
 		source->Player->TotalKills++;
@@ -2003,9 +2013,9 @@ global void SpellDeathCoilController(Missile *missile)
 		if (IsEnemy(source->Player, table[i]) && table[i]->Type->Organic != 0) {
 		    // disperse damage between them
 		    //NOTE: 1 is the minimal damage
-		    if (table[i]->HP <= 50 / ec ) {
+		    if (table[i]->HP <= 50 / ec) {
 			source->Player->Score += table[i]->Type->Points;
-			if( table[i]->Type->Building ) {
+			if (table[i]->Type->Building) {
 			    source->Player->TotalRazings++;
 			} else {
 			    source->Player->TotalKills++;
@@ -2189,13 +2199,13 @@ global void SpellWhirlwindController(Missile *missile)
 	n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
 	DebugLevel3Fn("Damage on %d,%d-%d,%d = %d\n" _C_ x-1 _C_ y-1 _C_ x+1 _C_ y+1 _C_ n);
 	for (i = 0; i < n; ++i) {
-	    if( (table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
+	    if ((table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
 		HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE2); // should be in missile
 	    }
 	}
     }
-    DebugLevel3Fn( "Whirlwind: %d, %d, TTL: %d\n" _C_
-	    missile->X _C_ missile->Y _C_ missile->TTL );
+    DebugLevel3Fn("Whirlwind: %d, %d, TTL: %d\n" _C_
+	missile->X _C_ missile->Y _C_ missile->TTL);
 
     //
     //	Changes direction every 3 seconds (approx.)
@@ -2212,8 +2222,8 @@ global void SpellWhirlwindController(Missile *missile)
 	missile->DX = nx * TileSizeX + TileSizeX / 2;
 	missile->DY = ny * TileSizeY + TileSizeY / 2;
 	missile->State=0;
-	DebugLevel3Fn( "Whirlwind new direction: %d, %d, TTL: %d\n" _C_
-		missile->X _C_ missile->Y _C_ missile->TTL );
+	DebugLevel3Fn("Whirlwind new direction: %d, %d, TTL: %d\n" _C_
+	    missile->X _C_ missile->Y _C_ missile->TTL);
     }
 }
 
