@@ -189,8 +189,11 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #endif
 #endif
 
-#ifdef __MINGW32__
+#ifdef USE_SDL
 #include "SDL.h"
+#endif
+
+#ifdef __MINGW32__
 extern int opterr;
 extern int optind;
 extern int optopt;
@@ -1379,11 +1382,7 @@ map is relative to FreeCraftLibPath=datapath, use ./map for relative to cwd\n\
 **	@param	argc	Number of arguments.
 **	@param	argv	Vector of arguments.
 */
-#if defined(__MINGW32__) || defined(__CYGWIN__) || defined(__APPLE__) || (defined(_MSC_VER) && !defined(_WIN32_WCE))
-global int mymain(int argc,char** argv)
-#else
 global int main(int argc,char** argv)
-#endif
 {
 #ifdef USE_BEOS
     //
