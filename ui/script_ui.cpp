@@ -600,103 +600,114 @@ local int CclProcessMenu(lua_State* l)
 local int CclDefineCursor(lua_State* l)
 {
 	const char* value;
-	char* s1;
-	char* s2;
+	const char* name;
+	const char* race;
+	const char* file;
+	int hotx;
+	int hoty;
+	int w;
+	int h;
+	int rate;
 	int i;
 	CursorType* ct;
-	int args;
-	int j;
 
-	j = 0;
-	s1 = strdup(LuaToString(l, j + 1));
-	++j;
-	s2 = strdup(LuaToString(l, j + 1));
-	++j;
-	if (!strcmp(s2, "any")) {
-		free(s2);
-		s2 = NULL;
+	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	}
+	name = race = file = NULL;
+	hotx = hoty = w = h = 0;
+	rate = 200;
+	lua_pushnil(l);
+	while (lua_next(l, 1)) {
+		value = LuaToString(l, -2);
+		if (!strcmp(value, "Name")) {
+			name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Race")) {
+			race = LuaToString(l, -1);
+		} else if (!strcmp(value, "File")) {
+			file = LuaToString(l, -1);
+		} else if (!strcmp(value, "HotSpot")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			hotx = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			hoty = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "Size")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			w = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			h = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "Rate")) {
+			rate = LuaToNumber(l, -1);
+		} else {
+			lua_pushfstring(l, "Unsupported tag: %s", value);
+			lua_error(l);
+		}
+		lua_pop(l, 1);
+	}
+
+	DebugCheck(!name || !file || !w || !h);
+
+	if (!strcmp(race, "any")) {
+		race = NULL;
 	}
 
 	//
-	//		Look if this kind of cursor already exists.
+	//  Look if this kind of cursor already exists.
 	//
 	ct = NULL;
 	i = 0;
 	if (Cursors) {
 		for (; Cursors[i].OType; ++i) {
 			//
-			//		Race not same, not found.
+			//  Race not same, not found.
 			//
-			if (Cursors[i].Race && s2) {
-				if (strcmp(Cursors[i].Race, s2)) {
+			if (Cursors[i].Race && race) {
+				if (strcmp(Cursors[i].Race, race)) {
 					continue;
 				}
-			} else if (Cursors[i].Race != s2) {
+			} else if (Cursors[i].Race != race) {
 				continue;
 			}
-			if (!strcmp(Cursors[i].Ident, s1)) {
+			if (!strcmp(Cursors[i].Ident, name)) {
 				ct = &Cursors[i];
 				break;
 			}
 		}
 	}
 	//
-	//		Not found, make a new slot.
+	//  Not found, make a new slot.
 	//
-	if (ct) {
-		free(s1);
-		free(s2);
-	} else {
+	if (!ct) {
 		ct = calloc(i + 2, sizeof(CursorType));
 		memcpy(ct, Cursors, sizeof(CursorType) * i);
 		free(Cursors);
 		Cursors = ct;
 		ct = &Cursors[i];
 		ct->OType = CursorTypeType;
-		ct->Ident = s1;
-		ct->Race = s2;
-		ct->FrameRate = 200;
+		ct->Ident = strdup(name);
+		ct->Race = race ? strdup(race) : NULL;
 	}
 
-	//
-	//		Parse the arguments, already the new tagged format.
-	//
-	args = lua_gettop(l);
-	for (; j < args; ++j) {
-		value = LuaToString(l, j + 1);
-		++j;
-		if (!strcmp(value, "image")) {
-			free(ct->File);
-			ct->File = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "hot-spot")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
-			}
-			lua_rawgeti(l, j + 1, 1);
-			ct->HotX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			ct->HotY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "size")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
-			}
-			lua_rawgeti(l, j + 1, 1);
-			ct->Width = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			ct->Height = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "rate")) {
-			ct->FrameRate = LuaToNumber(l, j + 1);
-		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
-		}
-	}
+	free(ct->File);
+	ct->File = strdup(file);
+	ct->HotX = hotx;
+	ct->HotY = hoty;
+	ct->Width = w;
+	ct->Height = h;
+	ct->FrameRate = rate;
 
 	return 0;
 }
