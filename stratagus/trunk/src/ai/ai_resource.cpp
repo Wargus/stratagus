@@ -124,7 +124,7 @@ local int AiCheckCosts(const int *costs)
 **	@todo	The number of food currently trained can be stored global
 **		for faster use.
 */
-local int AiCheckFood(const PlayerAi * pai, const UnitType * type)
+local int AiCheckSupply(const PlayerAi * pai, const UnitType * type)
 {
     int remaining;
     const AiBuildQueue *queue;
@@ -144,7 +144,7 @@ local int AiCheckFood(const PlayerAi * pai, const UnitType * type)
     //
     //  We are already out of food.
     //
-    remaining += pai->Player->Food - pai->Player->NumFoodUnits - type->Demand;
+    remaining += pai->Player->Supply - pai->Player->Demand - type->Demand;
     DebugLevel3Fn("-Demand %d\n" _C_ remaining);
     if (remaining < 0) {
 	DebugLevel3Fn(" player %d needs more food\n" _C_ pai->Player->Player);
@@ -308,7 +308,7 @@ local int AiBuildBuilding(const UnitType * type, UnitType * building)
 /**
 **	Build new units to reduce the food shortage.
 */
-local void AiRequestFarms(void)
+local void AiRequestSupply(void)
 {
     int i;
     int n;
@@ -730,12 +730,12 @@ local void AiCheckingWork(void)
 	AiPlayer->Player->Resources[1] _C_
 	AiPlayer->Player->Resources[2] _C_ AiPlayer->Player->Resources[3]);
 
-    // Food has the highest priority
-    if (AiPlayer->NeedFood) {
+    // Suppy has the highest priority
+    if (AiPlayer->NeedSupply) {
 	DebugLevel3Fn("player %d needs food.\n" _C_ AiPlayer->Player->Player);
 	if (!(AiPlayer->UnitTypeBuilded && AiPlayer->UnitTypeBuilded->Type->Supply)) {
-	    AiPlayer->NeedFood = 0;
-	    AiRequestFarms();
+	    AiPlayer->NeedSupply = 0;
+	    AiRequestSupply();
 	}
     }
     //
@@ -751,25 +751,21 @@ local void AiCheckingWork(void)
 	    //          Buildings can be destructed.
 
 	    //
-	    //  Check limits, AI should be broken if reached.
-	    //
-	    if (!PlayerCheckLimits(AiPlayer->Player, type)) {
-		DebugLevel2Fn("Unit limits reached\n");
-		continue;
-	    }
-	    //
 	    //  Check if we have enough food.
 	    //
 	    if (!type->Building) {
 		// Count future
-		if (!AiCheckFood(AiPlayer, type)) {
-		    AiPlayer->NeedFood = 1;
-		    AiRequestFarms();
+		if (!AiCheckSupply(AiPlayer, type)) {
+		    AiPlayer->NeedSupply = 1;
+		    AiRequestSupply();
 		}
-		// Current limit
-		if (!PlayerCheckFood(AiPlayer->Player, type)) {
-		    continue;
-		}
+	    }
+	    //
+	    //  Check limits, AI should be broken if reached.
+	    //
+	    if (PlayerCheckLimits(AiPlayer->Player, type) < 0) {
+		DebugLevel2Fn("Unit limits reached, or Need Supply\n");
+		continue;
 	    }
 	    //
 	    //  Check if resources available.
@@ -1391,9 +1387,9 @@ global void AiResourceManager(void)
     //
     //  Look if we can build a farm in advance.
     //
-    if (!AiPlayer->NeedFood && AiPlayer->Player->NumFoodUnits == AiPlayer->Player->Food) {
+    if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply == AiPlayer->Player->Demand) {
 	DebugLevel3Fn("Farm in advance request\n");
-	AiRequestFarms();
+	AiRequestSupply();
     }
     //
     //  Collect resources.

@@ -310,9 +310,10 @@ global void SavePlayers(CLFile* file)
 
 	// Ai done by load ais.
 
-	CLprintf (file, "  'food %d", Players[i].Food);
-	CLprintf(file, " 'food-unit-limit %d", Players[i].FoodUnitLimit);
+	CLprintf(file, " 'supply %d", Players[i].Supply);
+	CLprintf(file, " 'demand %d", Players[i].Demand);
 	CLprintf(file, " 'building-limit %d", Players[i].BuildingLimit);
+	CLprintf(file, " 'unit-limit %d", Players[i].UnitLimit);
 	CLprintf(file, " 'total-unit-limit %d", Players[i].TotalUnitLimit);
 
 	CLprintf(file, "\n  'score %d", Players[i].Score);
@@ -511,8 +512,8 @@ global void CreatePlayer(int type)
     */
     memset(&(player->UnitTypesCount), 0, sizeof(player->UnitTypesCount));
 
-    player->Food = 0;
-    player->NumFoodUnits = 0;
+    player->Supply = 0;
+    player->Demand = 0;
     player->NumBuildings = 0;
     player->TotalNumUnits = 0;
     player->Score = 0;
@@ -595,53 +596,40 @@ global void PlayerSetResource(Player* player, int resource, int value)
 **	@param player	Pointer to player.
 **	@param type	Type of unit.
 **
-**	@return		True if enought, false otherwise.
+**	@return		True if enough, negative on problem.
 **
 **	@note	The return values of the PlayerCheck functions are inconsistent.
 */
 global int PlayerCheckLimits(const Player* player, const UnitType* type)
 {
-    // FIXME: currently all units costs 1 unit slot.
     //
     //	Check game limits.
     //
     if (NumUnits < UnitMax) {
-	if ((type->Building ?  player->NumBuildings < player->BuildingLimit :
-		player->NumFoodUnits + type->Demand <= player->FoodUnitLimit) &&
-		player->TotalNumUnits < player->TotalUnitLimit) {
-	    return 1;
+	if (type->Building && player->NumBuildings >= player->BuildingLimit) {
+	    NotifyPlayer(player, NotifyYellow, 0, 0, "Building Limit Reached");
+	    return -1;
 	}
-    }
-
-    NotifyPlayer(player, NotifyYellow, 0, 0, "Cannot create more units.");
-    if (player->Ai) {
-	// AiNoMoreUnits(player, type);
-    }
-    return 0;
-}
-
-/**
-**	Check if enough food for new unit is available.
-**
-**	@param player	Pointer to player.
-**	@param type	Type of unit.
-**	@return		True if enought, false otherwise.
-**
-**	@note	The return values of the PlayerCheck functions are inconsistent.
-*/
-global int PlayerCheckFood(const Player* player, const UnitType* type)
-{
-    // FIXME: currently all units costs 1 food
-
-    if (player->Food < player->NumFoodUnits + type->Demand) {
-	NotifyPlayer(player, NotifyYellow, 0, 0, "Not enough food...build more farms.");
+	if (!type->Building && (player->TotalNumUnits - player->NumBuildings) >= player->UnitLimit) {
+	    NotifyPlayer(player, NotifyYellow, 0, 0, "Unit Limit Reached");
+	    return -2;
+	}
+	if (player->Demand + type->Demand > player->Supply && type->Demand) {
+	    NotifyPlayer(player, NotifyYellow, 0, 0, "Not enough food...build more farms.");
+	    return -3;
+	}
+	if (player->TotalNumUnits >= player->TotalUnitLimit) {
+	    NotifyPlayer(player, NotifyYellow, 0, 0, "Unit Limit Reached");
+	    return -4;
+	}
+	return 1;
+    } else {
+	NotifyPlayer(player, NotifyYellow, 0, 0, "Cannot create more units.");
 	if (player->Ai) {
-	    // FIXME: message to AI, called too much
-	    DebugLevel3("Ai: Not enough food...build more farms.\n");
+	    // AiNoMoreUnits(player, type);
 	}
-	return 0;
+	return -5;
     }
-    return 1;
 }
 
 /**
