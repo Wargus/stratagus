@@ -466,6 +466,9 @@ global void HandleActionResource(Unit* unit,const Resource* resource)
 	//	Move to the resource
 	//
 	case 0:
+	    NewResetPath(unit);
+	    unit->SubAction=1;
+	    // FALL THROUGH
 	case 1:
 	case 2:
 	case 3:
@@ -539,6 +542,7 @@ global void HandleActionResource(Unit* unit,const Resource* resource)
 	    break;
     }
 }
+
 /*----------------------------------------------------------------------------
 --	High level
 ----------------------------------------------------------------------------*/
