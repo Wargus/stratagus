@@ -124,7 +124,7 @@ global void DoRightButton(int sx, int sy)
 	// Unit selected isn't owned by the player.
 	// You can't select your own units + foreign unit(s).
 	//
-	if (Selected[0]->Player != ThisPlayer) {
+	if (!CanSelectMultipleUnits(Selected[0]->Player)) {
 		return;
 	}
 
@@ -139,7 +139,7 @@ global void DoRightButton(int sx, int sy)
 	dest = UnitUnderCursor;
 
 	// don't allow stopping enemy transporters!
-	if (dest && dest->Type->Transporter && dest->Player == ThisPlayer) {
+	if (dest && dest->Type->Transporter && PlayersTeamed(ThisPlayer->Player, dest->Player->Player)) {
 		// n0b0dy: So we are clicking on a transporter. We have to:
 		// 1) Flush the transporters orders.
 		// 2) Tell the transporter to follow the units. We have to queue all
@@ -768,8 +768,7 @@ global void UIHandleMouseMove(int x, int y)
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
 			GameCursor = TheUI.YellowHair.Cursor;
 			if (UnitUnderCursor) {
-				// FIXME: should use IsEnemy here? yes (:
-				if (UnitUnderCursor->Player == ThisPlayer) {
+				if (IsAllied(ThisPlayer, UnitUnderCursor)) {
 					GameCursor = TheUI.GreenHair.Cursor;
 				} else if (UnitUnderCursor->Player->Player != PlayerNumNeutral) {
 					GameCursor = TheUI.RedHair.Cursor;
@@ -877,7 +876,8 @@ local int SendMove(int sx, int sy)
 	//  Move to a transporter.
 	if ((transporter = UnitUnderCursor) &&
 			(transporter->Type->Transporter) &&
-			(transporter->Player == ThisPlayer)){
+			((transporter->Player == ThisPlayer) ||
+			PlayersTeamed(ThisPlayer->Player,transporter->Player->Player))) {
 		SendCommandStopUnit(transporter);
 		ret = 1;
 	} else {
@@ -1709,6 +1709,7 @@ global void UIHandleButtonUp(unsigned button)
 		int num;
 		Unit* unit;
 
+		unit = NULL;
 		//
 		//		Little threshold
 		//
@@ -1761,7 +1762,6 @@ global void UIHandleButtonUp(unsigned button)
 			//
 			// Select single unit
 			//
-			unit = NULL;
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
 			if (IsMapFieldVisible(ThisPlayer,
@@ -1790,9 +1790,11 @@ global void UIHandleButtonUp(unsigned button)
 					// Don't allow to select own and enemy units.
 					// Don't allow mixing buildings
 				} else if (KeyModifiers & ModifierShift &&
-						unit->Player == ThisPlayer && !unit->Type->Building &&
+						(unit->Player == ThisPlayer || PlayersTeamed(ThisPlayer->Player, unit->Player->Player)) &&
+						!unit->Type->Building &&
 						(NumSelected != 1 || !Selected[0]->Type->Building) &&
-						(NumSelected != 1 || Selected[0]->Player == ThisPlayer)) {
+						(NumSelected != 1 || Selected[0]->Player == ThisPlayer ||
+						PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player))) {
 					num = ToggleSelectUnit(unit);
 					if (!num) {
 						SelectionChanged();
@@ -1824,7 +1826,7 @@ global void UIHandleButtonUp(unsigned button)
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(SoundIdForName("burning"), MaxSampleVolume);
-				} else if (Selected[0]->Player == ThisPlayer ||
+				} else if (Selected[0]->Player == ThisPlayer || PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player) ||
 						Selected[0]->Player->Race == PlayerRaceNeutral) {
 					PlayUnitSound(Selected[0], VoiceSelected);
 				} else {
@@ -1832,9 +1834,15 @@ global void UIHandleButtonUp(unsigned button)
 				}
 				if (Selected[0]->Player == ThisPlayer) {
 					char buf[64];
-					sprintf(buf, "You have ~<%d~> %s(s)",
-						Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type],
-						Selected[0]->Type->Name);
+					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type] > 1) {
+						sprintf(buf, "You have ~<%d~> %ss", 
+							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type],
+							Selected[0]->Type->Name);
+					} else {
+						sprintf(buf, "You have ~<%d~> %s(s)",
+							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type],
+							Selected[0]->Type->Name);
+					}
 					SetStatusLine(buf);
 				}
 			}

@@ -379,6 +379,7 @@ global void DrawButtonPanel(void)
 {
 	int i;
 	int v;
+	Player* player;
 	const UnitStats* stats;
 	const ButtonAction* buttons;
 	char buf[8];
@@ -395,6 +396,8 @@ global void DrawButtonPanel(void)
 	if (!(buttons = CurrentButtons)) {		// no buttons
 		return;
 	}
+
+	player = Selected[0]->Player;
 
 	for (i = 0; i < TheUI.NumButtonButtons; ++i) {
 		if (buttons[i].Pos != -1) {
@@ -499,7 +502,7 @@ global void DrawButtonPanel(void)
 				}
 			}
 
-			DrawUnitIcon(ThisPlayer, buttons[i].Icon.Icon,
+			DrawUnitIcon(player, buttons[i].Icon.Icon,
 				v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y);
 
 			//
@@ -515,7 +518,7 @@ global void DrawButtonPanel(void)
 					case ButtonTrain:
 					case ButtonUpgradeTo:
 						// FIXME: store pointer in button table!
-						stats = &UnitTypes[v]->Stats[ThisPlayer->Player];
+						stats = &UnitTypes[v]->Stats[player->Player];
 						DebugLevel3("Upgrade to %s %d %d %d %d %d\n" _C_
 							UnitTypes[v].Ident _C_ UnitTypes[v].Demand _C_
 							UnitTypes[v]._Costs[GoldCost] _C_
@@ -663,6 +666,7 @@ global void UpdateButtonPanel(void)
 {
 	Unit* unit;
 	char unit_ident[128];
+	Player* player;
 	ButtonAction* buttonaction;
 	int z;
 	int allow;
@@ -696,9 +700,11 @@ global void UpdateButtonPanel(void)
 	}
 
 	unit = Selected[0];
+	player = unit->Player;
 	DebugCheck(unit == NoUnitP);
 
-	if (unit->Player != ThisPlayer) {		// foreign unit
+	if (unit->Player != ThisPlayer &&
+		!PlayersTeamed(ThisPlayer->Player, player->Player)) {		// foreign unit
 		return;
 	}
 
@@ -787,15 +793,15 @@ global void UpdateButtonPanel(void)
 				case ButtonUpgradeTo:
 				case ButtonResearch:
 				case ButtonBuild:
-					allow = CheckDependByIdent(ThisPlayer, buttonaction->ValueStr);
+					allow = CheckDependByIdent(player, buttonaction->ValueStr);
 					if (allow && !strncmp(buttonaction->ValueStr, "upgrade-", 8)) {
-						allow = UpgradeIdentAllowed(ThisPlayer,
+						allow = UpgradeIdentAllowed(player,
 							buttonaction->ValueStr) == 'A';
 					}
 					break;
 				case ButtonSpellCast:
-					allow = CheckDependByIdent(ThisPlayer,buttonaction->ValueStr) &&
-						UpgradeIdentAllowed(ThisPlayer, buttonaction->ValueStr) == 'R';
+					allow = CheckDependByIdent(player,buttonaction->ValueStr) &&
+						UpgradeIdentAllowed(player, buttonaction->ValueStr) == 'R';
 					break;
 				case ButtonUnload:
 					allow = (Selected[0]->Type->Transporter && Selected[0]->InsideCount);
@@ -978,7 +984,7 @@ global void DoButtonButtonClicked(int button)
 		case ButtonBuild:
 			// FIXME: store pointer in button table!
 			type = UnitTypes[CurrentButtons[button].Value];
-			if (!PlayerCheckUnitType(ThisPlayer, type)) {
+			if (!PlayerCheckUnitType(Selected[0]->Player, type)) {
 				SetStatusLine("Select Location");
 				ClearCosts();
 				CursorBuilding = type;
@@ -1001,9 +1007,9 @@ global void DoButtonButtonClicked(int button)
 						!EnableTrainingQueue)) {
 				NotifyPlayer(Selected[0]->Player, NotifyYellow, Selected[0]->X,
 					Selected[0]->Y, "Unit training queue is full");
-			} else if (PlayerCheckLimits(ThisPlayer, type) >= 0 &&
-					!PlayerCheckUnitType(ThisPlayer, type)) {
-				//PlayerSubUnitType(ThisPlayer,type);
+			} else if (PlayerCheckLimits(Selected[0]->Player, type) >= 0 &&
+					!PlayerCheckUnitType(Selected[0]->Player, type)) {
+				//PlayerSubUnitType(player,type);
 				SendCommandTrainUnit(Selected[0], type,
 					!(KeyModifiers & ModifierShift));
 				ClearStatusLine();
@@ -1014,10 +1020,10 @@ global void DoButtonButtonClicked(int button)
 		case ButtonUpgradeTo:
 			// FIXME: store pointer in button table!
 			type = UnitTypes[CurrentButtons[button].Value];
-			if (!PlayerCheckUnitType(ThisPlayer, type)) {
+			if (!PlayerCheckUnitType(Selected[0]->Player, type)) {
 				DebugLevel3("Upgrade to %s %d %d\n" _C_ type->Ident _C_
 					type->_Costs[GoldCost] _C_ type->_Costs[WoodCost]);
-				//PlayerSubUnitType(ThisPlayer,type);
+				//PlayerSubUnitType(player,type);
 				SendCommandUpgradeTo(Selected[0],type,
 					!(KeyModifiers & ModifierShift));
 				ClearStatusLine();
@@ -1026,8 +1032,8 @@ global void DoButtonButtonClicked(int button)
 			break;
 		case ButtonResearch:
 			i = CurrentButtons[button].Value;
-			if (!PlayerCheckCosts(ThisPlayer, Upgrades[i]. Costs)) {
-				//PlayerSubCosts(ThisPlayer,Upgrades[i].Costs);
+			if (!PlayerCheckCosts(Selected[0]->Player, Upgrades[i]. Costs)) {
+				//PlayerSubCosts(player,Upgrades[i].Costs);
 				SendCommandResearch(Selected[0],&Upgrades[i],
 					!(KeyModifiers & ModifierShift));
 				ClearStatusLine();

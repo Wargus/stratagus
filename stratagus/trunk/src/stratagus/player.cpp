@@ -1001,7 +1001,8 @@ global void NotifyPlayer(const Player* player,
 	char temp[128];
 	va_list va;
 
-	if (player != ThisPlayer) {				// Currently only notfiy me
+	// Notify me, and my TEAM members
+	if (player != ThisPlayer && !PlayersTeamed(ThisPlayer->Player, player->Player)) {
 		return;
 	}
 
@@ -1012,7 +1013,12 @@ global void NotifyPlayer(const Player* player,
 	//
 	//		FIXME: show minimap animation for the event.
 	//
-	SetMessageEvent(x, y, "%s", temp);
+	if (player == ThisPlayer) {
+		SetMessageEvent(x, y, "%s", temp);
+	} else {
+		SetMessageEvent(x, y, "(%s): %s", player->Name, temp);
+	}
+	
 }
 
 //@}
