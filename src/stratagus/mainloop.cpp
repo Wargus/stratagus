@@ -912,7 +912,7 @@ global void GameMainLoop(void)
 	}
 	if (MustRedraw /* && !VideoInterrupts */ &&
 		(FastForwardCycle <= GameCycle || GameCycle <= 10 ||
-		    !(GameCycle & 0x3f))) {
+		    GameCycle % 64 == 0)) {
 	    if (Callbacks == &MenuCallbacks) {
 		MustRedraw |= RedrawMenu;
 	    }
@@ -945,7 +945,7 @@ global void GameMainLoop(void)
 	if (FastForwardCycle == GameCycle) {
 	    VideoSyncSpeed = RealVideoSyncSpeed;
 	}
-	if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
+	if (FastForwardCycle <= GameCycle || GameCycle % 64 == 0) {
 	    WaitEventsOneFrame(Callbacks);
 	}
 	if (!NetworkInSync) {
