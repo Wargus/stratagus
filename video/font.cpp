@@ -570,10 +570,16 @@ local void FontMeasureWidths(ColorFont* fp)
     const unsigned char* lp;
     const unsigned char* gp;
 
+    for (y = 1; y < 207; y++){
+      fp->CharWidth[y] = 0;
+    }
+
     for (y = 1; y < 207; y++) {
 	sp = fp->Graphic->Frames + y * fp->Height * fp->Graphic->Width - 1;
 	gp = sp + fp->Graphic->Width * fp->Height;
-	fp->CharWidth[y] = 0;
+	//	fp->CharWidth[y] = 0;
+	if(gp >= (unsigned char* )(fp->Graphic->Frames+fp->Graphic->Width*fp->Graphic->Height))
+	  break; //Bail out cause there are no letters left
 	while (sp < gp) {
 	    lp = sp + fp->Graphic->Width - 1;
 	    for (;sp < lp; --lp) {
