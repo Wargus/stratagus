@@ -398,7 +398,7 @@ local SCM CclDefineMap(SCM width,SCM height)
     InitUnitCache();
     // FIXME: this should be CreateMap or InitMap?
 
-    MapX=MapY=0;
+    // MapX=MapY=0;
 
     return SCM_UNSPECIFIED;
 }
