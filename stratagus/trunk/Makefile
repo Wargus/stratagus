@@ -55,7 +55,7 @@ OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ))),$(notdir $(OBJ)))
 SRC_ALL = $(SRC)
 OBJ_ALL = $(OBJ)
 
-METASERVER_SRC :=
+METASERVER_SRC := src/network/lowlevel.c
 include src/metaserver/Module.make
 METASERVER_OBJ := $(patsubst %.c, %.o, $(METASERVER_SRC))
 METASERVER_OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(METASERVER_OBJ))),$(notdir $(METASERVER_OBJ)))
