@@ -2339,7 +2339,7 @@ global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
 ----------------------------------------------------------------------------*/
 
 /**
-**	Destroy a unit.
+**	Destroy an unit.
 **
 **	@param unit	Unit to be destroyed.
 */
@@ -2408,8 +2408,13 @@ global void DestroyUnit(Unit* unit)
 	    unit->State=unit->Type->CorpseScript;
 	    unit->Type=type;
 
+#ifdef NEW_VIDEO
+	    unit->IX=(type->Width-VideoGraphicWidth(type->Sprite))/2;
+	    unit->IY=(type->Height-VideoGraphicHeight(type->Sprite))/2;
+#else
 	    unit->IX=(type->Width-type->RleSprite->Width)/2;
 	    unit->IY=(type->Height-type->RleSprite->Height)/2;
+#endif
 
 	    unit->SubAction=0;
 	    unit->Removed=0;
@@ -2442,12 +2447,12 @@ global void DestroyUnit(Unit* unit)
     UnitLost(unit);
 
     // FIXME: ugly trick unit-peon-with-gold ... has no die sequence.
-    if( type==UnitTypeByIdent("unit-peon-with-gold")
-	    || type==UnitTypeByIdent("unit-peon-with-wood") ) {
-	unit->Type=UnitTypeByIdent("unit-peon");
-    } else if( type==UnitTypeByIdent("unit-peasant-with-gold")
-	    || type==UnitTypeByIdent("unit-peasant-with-wood") ) {
-	unit->Type=UnitTypeByIdent("unit-peasant");
+    if( type==UnitTypeHumanWorkerWithGold
+	    || type==UnitTypeHumanWorkerWithWood ) {
+	unit->Type=UnitTypeHumanWorker;
+    } else if( type==UnitTypeOrcWorkerWithGold
+	    || type==UnitTypeOrcWorkerWithWood ) {
+	unit->Type=UnitTypeOrcWorker;
     }
 
     //
