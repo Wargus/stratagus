@@ -1,0 +1,365 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2003 by Lutz Sammer
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; version 2 dated June, 1991.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Stratagus Configuration Language Description: Icon</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <meta name="Author" content="johns98@gmx.net">
+    <meta name="Keyword" content="ccl,tileset">
+    <meta name="Description" content="">
+</head>
+<body>
+    <h1>Stratagus Configuration Language Description: Research</h1>
+<hr><pre width=80>
+         _________ __                 __                               
+        /   _____//  |_____________ _/  |______     ____  __ __  ______
+        \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+       /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+               \/                  \/          \//_____/            \/ 
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   Stratagus - A free fantasy real time strategy game engine
+</pre>
+<p><b>(C) Copyright 2002-2003 by The Stratagus Project. Distributed under the
+<a href="../gpl.html">"GNU General Public License"</a></b>
+<hr>
+<a href="../stratagus.html">Stratagus</a> 
+<a href="../readme.html">Readme</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="ccl.html">CCL</a> 
+<a href="pud.html">PREV</a> 
+<a href="sound.html">NEXT</a> 
+<a href="ccl-index.html">Index</a> 
+<hr>
+<a href="#check-dependency">check-dependency</a>
+<a href="#define-allow">define-allow</a>
+<a href="#define-dependency">define-dependency</a>
+<a href="#define-modifier">define-modifier</a>
+<a href="#define-upgrade">define-upgrade</a>
+<a href="pud.html#define-upgrade-wc-names">define-upgrade-wc-names</a>
+<a href="#get-dependency">get-dependency</a>
+<hr>
+<h2>Intro - Introduction to research functions and variables</h2>
+
+Everything around researching and upgrades.
+<h2>Functions</h2>
+
+<a name="check-dependency"></a>
+<h3>(check-dependency)</h3>
+
+NOT WRITTEN YET.
+
+
+<dl>
+<dt>.</dt>
+<dd>.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    (check-dependency)
+</pre>
+<h4>Used</h4>
+
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
+
+
+<a name="define-unit-allow"></a>
+<h3>(define-unit-allow name N N N N N N N N N N N N N N N N)</h3>
+
+Define how many units of each type a players can have during
+a level.
+
+<dl>
+<dt>name</dt>
+<dd>Name of an unit-type to be defined.
+</dd>
+<dt>N</dt>
+<dd>
+  The initial quantity of units per type at level start.
+  Each player has his quatinty, the first is for player 0 and the last
+  is for player 15.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    ;; Allow the catapult for the 2nd player.
+    (define-unit-allow 'unit-catapult  0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+</pre>
+
+
+<a name="define-allow"></a>
+<h3>(define-allow name str16)</h3>
+
+Define what upgrades are enabled for each player during
+a level.
+
+<dl>
+<dt>name</dt>
+<dd>Name of an upgrade to be defined.
+</dd>
+<dt>str16</dt>
+<dd>
+  The initial allow state for the upgrade at level start:
+  <ul>
+  <li>A - Allowed
+  <li>E - Enabled, allowed by level but currently forbidden
+  <li>F - Forbidden
+  <li>R - Researched or acquired
+  <li>Q - Acquired but currently forbidden (does it make sense?:)
+  </ul>
+  Each player has his own character, the first is for player 0 and the last
+  is for player 15.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    ;; Allow the metal upgrade for all 16 players.
+    (define-allow 'upgrade-metal  "AAAAAAAAAAAAAAAA")
+    ;;                             ^- player 0    ^- player 15
+</pre>
+
+<h4>Used</h4>
+
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
+
+<a name="define-dependency"></a>
+<h3>(define-dependency unit-type/upgrade ...)</h3>
+
+Define the dependencies for an unit-type or an upgrade. The dependency
+must be full filled before an unit or research can be used.
+<p>
+<code>(define-dependency unit-type/upgrade '( required-part )
+     ['or '( optional-or-part ) ...] )
+</code>
+
+<dl>
+<dt>required-part</dt>
+<dd><code>unit/upgrade [count]</code><p>
+   A list of unit-types or upgrades required.
+   <dl>
+   <dt>unit/upgrade</dt>
+   <dd>Unit-type name or upgrade name required.
+   </dd>
+   <dt>count</dt>
+   <dd>Optional count, how many units of the unit-type are required.
+   </dl>
+</dd>
+<dt>'or optional-or-part</dt>
+<dd><code>unit/upgrade [count]</code><p>
+    Optional list of or parts. One or list must be complete full filled.<p>
+   <dl>
+   <dt>unit/upgrade</dt>
+   <dd>Unit-type name or upgrade name required.
+   </dd>
+   <dt>count</dt>
+   <dd>Optional count, how many units of the unit-type are required.
+   </dl>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    ;; The second sword upgrade is only possible, if the first sword upgrade is
+    ;; researched.
+    (define-dependency 'upgrade-sword2 '(upgrade-sword1))
+    ;; The ranger upgrade is only available if a keep or castle is available.
+    (define-dependency 'upgrade-ranger '(unit-keep) 'or '(unit-castle))
+</pre>
+
+<h4>Used</h4>
+
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
+
+<a name="define-modifier"></a>
+<h3>(define-modifier upgrade-name '(effect1 effect1-arg) ...)</h3>
+
+Define the effects (modifier) of an upgrade. An upgrade can have multiple 
+modifiers. It can activate, enable or disable other upgrades and allows
+complex reactions.
+
+
+<dl>
+<dt>upgrade-name</dt>
+<dd>Name of the upgrade, which has this effects. All effects change
+all old units and any new unit of a player.
+</dd>
+<dt>'(effectN effectN-arg)</dt>
+<dd>A list of effects of the upgrade. Here are all possible effects:
+  <dl>
+  <dt>'(attack-range N)</dt>
+  <dd>Change the attack range of all units of the unit-types given with
+  '(apply-to ...). Note it can be increased with positive numbers and decreased
+  with negative numbers.
+  </dd>
+  <dt>'(sight-range N)</dt>
+  <dd>Change the sight range of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>'(basic-damage N)</dt>
+  <dd>Change the basic damage of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>'(piercing-damage N)</dt>
+  <dd>Change the piercing damage of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>'(armor N)</dt>
+  <dd>Change the armor of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>'(speed N)</dt>
+  <dd>Change the speed of all units of the unit-types given with
+  '(apply-to ...). <b>Attention</b>: This changes only the displayed value
+  and not the real unit-speed!
+  </dd>
+  <dt>'(hit-points N)</dt>
+  <dd>Change the hit points of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>'(regeneration-rate N)</dt>
+  <dd>amount of HP a unit gains per seconds</dt>
+  <dt>'(cost (resource N))</dt>
+  <dd>Change the costs for the resource type of all unit-types
+  or upgrade-ids given with '(apply-to ...).
+  </dd>
+  <dt>'(allow-unit unit-type-id N)</dt>
+  <dd>
+      Change the state of an upgrade. N is the maximum quantity
+      of this unit per player.
+  </dd>
+  <dt>'(allow upgrade-id N)</dt>
+  <dd>Change the state of an upgrade. N can be
+      <ul>
+      <li>A - Allowed
+      <li>E - Enabled, allowed by level but currently forbidden
+      <li>F - Forbidden
+      <li>R - Researched or acquired
+      <li>Q - Acquired but currently forbidden (does it make sense?:)
+      </ul>
+      FIXME: The correct possible changed must be described.
+  </dd>
+  <dt>'(apply-to unit-type-id) or '(apply-to upgrade-id)</dt>
+  <dd>The modifiers are applied to this unit-type or upgrade.
+  </dd>
+  <dt>'(convert-to unit-type-id)</dt>
+  <dd>All units of the unit-types given with '(apply-to ...) are converted
+  into this unit-type.
+  </dd>
+  </dl>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    ;; This is the default effect of the first sword upgrade. The piercing damage
+    ;; of the listed units is increased.
+    (define-modifier 'upgrade-sword1
+      '(piercing-damage 2)
+      '(apply-to unit-footman) '(apply-to unit-knight) '(apply-to unit-paladin)
+      '(apply-to unit-dwarves) '(apply-to unit-d_____) '(apply-to unit-l_____)
+      '(apply-to unit-u____-l___________) '(apply-to unit-t_______))
+</pre>
+
+<h4>Used</h4>
+
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
+
+<a name="define-upgrade"></a>
+<h3>(define-upgrade name 'icon icon-id 'costs #( costs ... ))</h3>
+
+Define an upgrade, how it is shown and how much it costs.
+
+
+<dl>
+<dt>name</dt>
+<dd>Name of the upgrade, used in buttons (define-button) and 
+<a href="#define-modifier">(define-modifier)</a>.
+</dd>
+<dt>'icon icon-id</dt>
+<dd>Name of the upgrade icon, shown in buttons or during the research of the
+upgrade.  The icon is defined with 
+<a href="icon.html#define-icon">(define-icon)</a> or
+<a href="icon.html#define-icon-alias">(define-icon-alias)</a>
+<dt>'costs #( time resource1 resource2 resource3 resource4 resource5 resource6)</dt>
+<dd>This are the costs for the upgrade. The costs (resource1-resource6) could
+be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    ;; This is the default definition of the first sword upgrade. The icon
+    ;; "icon-sword2" is shown in buttons and during the upgrade. The upgrade costs
+    ;; 200 frame cycles to research and 800 gold from the store.
+    (define-upgrade 'upgrade-sword1 'icon 'icon-sword2
+      'costs #(   200   800     0     0     0     0     0))
+</pre>
+
+<h4>Used</h4>
+
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
+
+<a name="get-dependency"></a>
+<h3>(get-dependency)</h3>
+
+NOT WRITTEN YET.
+
+
+<dl>
+<dt>.</dt>
+<dd>.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    (get-dependency)
+</pre>
+<h4>Used</h4>
+
+<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
+<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
+<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
+
+<hr>
+Last changed: $Id$<br>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2003 by<a href="http://stratagus.org">
+The Stratagus Project</a></address></body></html>

@@ -1,0 +1,268 @@
+
+AC_INIT(configure.in)
+AC_PREREQ([2.50])
+
+CPPFLAGS="$CPPFLAGS -I/usr/local/include -L/usr/local/lib"
+
+AC_CHECK_HEADERS(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
+AC_CHECK_HEADERS(png.h,, AC_MSG_ERROR(could not find png.h))
+
+EXE=
+OUTFILE="\$(TOPDIR)/stratagus\$(EXE)"
+OE=o
+OBJDIR=obj
+if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
+    WIN32=1
+    EXE=.exe
+    OUTFILE="\$(TOPDIR)/stratagus\$(EXE)"
+    ARCH=win32
+    OBJDIR=winobj
+    PLATFORM="-DUSE_WIN32"
+elif test "`uname -a | grep -is bsd`"; then
+    ARCH=bsd
+    PLATFORM="-DBSD"
+elif test "`uname -a | grep -is beos`"; then
+    ARCH=beos
+    PLATFORM="-DUSE_BEOS"
+else
+    ARCH=linux
+fi
+
+dnl --- CHECK FOR WITH SOUND ---
+AC_ARG_ENABLE(sound,
+    [  --enable-sound	  [Use sound (default: yes)]], SOUND="$with_sound")
+SOUND_CFLAGS=
+if test "$SOUND" != "no"; then
+    SOUND_CFLAGS="-DWITH_SOUND"
+fi
+AC_SUBST(SOUND_CFLAGS)
+dnl ----------------------------
+
+AC_ARG_ENABLE(win32,
+    [  --enable-win32	  Force win32, useful for cross-compiling (default: no)])
+if test "$enable_win32" = "yes"; then
+    WIN32=1
+    EXE=.exe
+    OUTFILE="\$(TOPDIR)/stratagus\$(EXE)"
+    ARCH=win32
+    OBJDIR=winobj
+    PLATFORM="-DUSE_WIN32"
+    PATH="/usr/local/cross/bin:$PATH"
+fi
+AC_SUBST(EXE)
+AC_SUBST(OUTFILE)
+AC_SUBST(ARCH)
+AC_SUBST(OE)
+AC_SUBST(OBJDIR)
+AC_SUBST(PLATFORM)
+
+AC_ARG_ENABLE(static,
+    [  --enable-static	  Compile a static binary (default: no)])
+if test "$enable_static" != "yes"; then
+    STATIC_LDFLAGS=
+else
+    STATIC_LDFLAGS="-static"
+fi
+AC_SUBST(STATIC_LDFLAGS)
+
+AC_ARG_ENABLE(profile,
+    [  --enable-profile	  Enable profiling support, implies --enable-debug (default: no)])
+if test "$enable_profile" != "yes"; then
+    PROFILE_CFLAGS=""
+else
+    PROFILE_CFLAGS="-pg"
+fi
+AC_SUBST(PROFILE_CFLAGS)
+
+AC_ARG_ENABLE(debug,
+    [  --enable-debug	  [Enable debug, implies --disable-optimization (default: no)]])
+if test "$enable_debug" != "yes" -a "$enable_profile" != "yes"; then
+    DEBUG_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
+else
+    DEBUG_CFLAGS="-g -O1 -fsigned-char -Wsign-compare"
+	if test "$enable_debug" == "yes"; then
+		DEBUG_CFLAGS="$DEBUG_CFLAGS -Werror -Wall -DDEBUG"
+	fi
+fi
+AC_SUBST(DEBUG_CFLAGS)
+
+dnl AC_ARG_ENABLE(optimization,
+dnl    [  --enable-optimization	  [Enable detection of optimization flags (default: no)]])
+dnl FIXME: todo
+
+AC_CHECK_PROGS(SDLCONFIG, sdl-config)
+VIDEO_CFLAGS="-DUSE_SDL -DUSE_SDLA `sdl-config --cflags`"
+if test "$enable_static" != "yes"; then
+    VIDEO_LIBS="`$SDLCONFIG --libs`"
+else
+    VIDEO_LIBS="`$SDLCONFIG --static-libs`"
+fi
+if test "$WIN32" = "1"; then
+    if test "`uname -a | grep -is cygwin`"; then
+	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32"
+    else
+	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32 -lmingwex -lgmon"
+    fi
+fi
+AC_SUBST(VIDEO_CFLAGS)
+AC_SUBST(VIDEO_LIBS)
+AC_SUBST(THREAD_LIBS)
+
+dnl --- OPENGL support ---------
+AC_ARG_WITH(opengl,
+    [  --with-opengl		  [Use opengl (default: no)]],, with_opengl="no")
+if test "$with_opengl" != "no"; then
+	VIDEO_CFLAGS="$VIDEO_CFLAGS -DUSE_OPENGL"
+	if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
+		VIDEO_LIBS="$VIDEO_LIBS -lopengl32"
+	else
+		AC_PATH_X
+		AC_PATH_XTRA
+		if test x$have_x = xyes; then
+			VIDEO_CFLAGS="$VIDEO_CFLAGS $X_CFLAGS"
+			VIDEO_LIBS="$VIDEO_LIBS $X_LIBS -lGL"
+		else
+			VIDEO_LIBS="$VIDEO_LIBS -lGL"
+		fi
+	fi
+fi
+AC_SUBST(VIDEO_CFLAGS)
+AC_SUBST(VIDEO_LIBS)
+dnl ----------------------------
+
+dnl --- CHECK FOR BZIP2 --------
+AC_ARG_WITH(bzip2,
+    [  --with-bzip2		  [Use bzip2 (default: yes)]],, with_bzip2="yes")
+if test "$with_bzip2" != "no"; then
+    AC_CHECK_LIB(bz2, main, 
+        [BZ2_CFLAGS="-DUSE_BZ2LIB"
+         BZ2_LIBS="-lbz2"],
+        [BZ2_CFLAGS=""
+         BZ2_LIBS=""])
+else
+    BZ2_CFLAGS=""
+    BZ2_LIBS=""
+fi
+AC_SUBST(BZ2_CFLAGS)
+AC_SUBST(BZ2_LIBS)
+dnl ----------------------------
+
+dnl --- CHECK FOR OGG VORBIS ---
+AC_ARG_WITH(ogg, 
+    [  --with-ogg		  [Use ogg (default: autodetect)]], OGG="$with_ogg")
+OGG_CFLAGS=
+OGG_LIBS=
+if test "$OGG" != "no"; then
+    OGG="yes"
+    AC_CHECK_HEADERS(ogg/ogg.h,, OGG=no)
+    AC_CHECK_HEADERS(vorbis/vorbisfile.h,, OGG=no)
+    if test "$OGG" != "no"; then
+	OGG_CFLAGS="-DUSE_OGG"
+	OGG_LIBS="-lvorbisfile -lvorbis -logg"
+    fi
+fi
+AC_SUBST(OGG_CFLAGS)
+AC_SUBST(OGG_LIBS)
+dnl ----------------------------
+
+dnl --- CHECK FOR MAD LIB ------
+AC_ARG_WITH(mad,
+    [  --with-mad		  [Use mad mp3 (default: no)]], MAD="$with_mad")
+MAD_CFLAGS=
+MAD_LIBS=
+if test "$MAD" != "yes"; then
+    MAD_CFLAGS=""
+    MAD_LIBS=""
+else
+    MAD_CFLAGS="-DUSE_MAD"
+    MAD_LIBS="-lmad"
+fi
+AC_SUBST(MAD_CFLAGS)
+AC_SUBST(MAD_LIBS)
+dnl ----------------------------
+
+dnl --- CHECK FOR FLAC LIB -----
+AC_ARG_WITH(flac,
+    [  --with-flac		  [Use FLAC (default: no)]], FLAC="$with_flac")
+if test "$FLAC" != "yes"; then
+    FLAC_CFLAGS=
+    FLAC_LIBS=
+else
+    FLAC_CFLAGS="-DUSE_FLAC"
+    FLAC_LIBS="-lFLAC"
+fi
+AC_SUBST(FLAC_CFLAGS)
+AC_SUBST(FLAC_LIBS)
+dnl ----------------------------
+
+dnl --- CHECK FOR CDAUDIO ------
+AC_ARG_WITH(cdaudio,
+    [  --with-cdaudio=libcda,sdlcd,cdda,no
+			  [Enable CD Audio support (default: no)]], CDAUDIO="$with_cdaudio")
+if test "$CDAUDIO" = "sdl"; then
+    CDAUDIO_CFLAGS="`sdl-config --cflags`"
+    CDAUDIO_LIBS=""
+elif test "$CDAUDIO" = "cdda"; then
+    CDAUDIO_CFLAGS="-DUSE_CDDA"
+    CDAUDIO_LIBS=""
+elif test "$CDAUDIO" = "libcda"; then
+    CDAUDIO_CFLAGS="-DUSE_LIBCDA"
+    CDAUDIO_LIBS=""
+else
+    CDAUDIO_CFLAGS=""
+    CDAUDIO_LIBS=""
+fi
+AC_SUBST(CDAUDIO_CFLAGS)
+AC_SUBST(CDAUDIO_LIBS)
+dnl ----------------------------
+
+dnl ---- CHECK FOR LUA ---------
+AC_ARG_WITH(lua, 
+    [	--with-lua=prefix	  [Prefix where Lua is installed]], LUAPFX="$with_lua")
+if test x$LUAPFX != x ; then
+    LUA_CFLAGS="-I$LUAPFX/include"
+    LUA_LIBS="-L$LUAPFX/lib"
+fi
+
+AC_CHECK_PROGS(LUACONFIG, [lua-config lua-config50 luaconfig5.0], "")
+if test x$LUACONFIG != x; then
+    LUA_CFLAGS="$LUA_CFLAGS `[$LUACONFIG --include]`"
+    LUA_LIBS="$LUA_LIBS `[$LUACONFIG --libs]`"
+else
+    LUA_CFLAGS="$CFLAGS"
+    LUA_LIBS="$LIBS"
+    if test x$WIN32 = x ; then
+	LUA_LIBS="$LUA_LIBS -ldl"
+    fi
+    AC_CHECK_LIB(lua, lua_getfenv, LUA_LIBS="$LUA_LIBS -llua",
+    AC_CHECK_LIB(lua50, lua_setfenv, LUA_LIBS="$LUA_LIBS -llua50",
+    AC_CHECK_LIB(lua5.0, lua_setfenv, LUA_LIBS="$LUA_LIBS -llua5.0",
+    [AC_MSG_ERROR(Lua5 is required)], -lm), -lm), -lm)
+    AC_CHECK_LIB(lualib, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib",
+    AC_CHECK_LIB(lualib50, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib50",
+    AC_CHECK_LIB(lualib5.0, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib5.0",
+    [AC_MSG_ERROR(Lualib5 is required)], $LUA_LIBS -lm), $LUA_LIBS -lm),$LUA_LIBS -lm)
+fi
+
+LUA_LIBS="$LUA_LIBS -lm"
+AC_SUBST(LUA_CFLAGS)
+AC_SUBST(LUA_LIBS)
+	
+dnl ---- end of lua check ------
+
+if test "$prefix" = "NONE"; then
+    PREFIX=/usr/local
+else
+    PREFIX="$prefix"
+fi
+AC_SUBST(PREFIX)
+
+if test "$WIN32" = "1"; then
+    touch Rules.make
+    AC_CONFIG_FILES(Rules.make.WIN32:Rules.make.in)
+else
+    AC_CONFIG_FILES(Rules.make)
+fi
+AC_OUTPUT
+
+# EOF #
