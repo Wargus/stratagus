@@ -2042,7 +2042,7 @@ BuildRestriction* OnTopDetails(const Unit* unit, const UnitType* parent)
 **  @param x     Map X position.
 **  @param y     Map Y position.
 **
-**  @return      OnTop, parent unit, builder on true, NULL false.
+**  @return      OnTop, parent unit, builder on true or 1 if unit==NULL, NULL false.
 */
 Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 {
@@ -2204,14 +2204,22 @@ Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 			}
 			if (b == NULL) {
 				// We passed a full ruleset return
-				return ontoptarget ? ontoptarget : (Unit*)unit;
+				if (unit == NULL) {
+					return ontoptarget ? ontoptarget : (Unit*)1;
+				} else {
+					return ontoptarget ? ontoptarget : (Unit*)unit;
+				}
 			}
 			++w;
 		}
 		return NULL;
 	}
 
-	return (Unit*)unit;
+	if (unit == NULL) {
+		return (Unit*)1;
+	} else {
+		return (Unit*)unit;
+	}
 }
 
 /**
