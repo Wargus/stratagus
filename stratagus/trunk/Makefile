@@ -184,6 +184,8 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
+PUDS	= contrib/puds/single/*.pud.gz contrib/puds/multi/*.pud.gz
+
 CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/constructions.ccl data/ccl/human/constructions.ccl \
 	  data/ccl/orc/constructions.ccl \
@@ -226,6 +228,7 @@ dist::
 	@set -e; for i in $(MODULES); do $(MAKE) -C $$i RULESFILE=$(RULESFILE) distlist ; done
 	echo >>$(DISTLIST)
 	echo $(PICS) >>$(DISTLIST)
+	echo $(PUDS) >>$(DISTLIST)
 	echo $(MISC) >>$(DISTLIST)
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
@@ -267,6 +270,7 @@ small-dist::
 bin-dist:: all
 	$(RM) $(DISTLIST)
 	echo $(PICS) >>$(DISTLIST)
+	echo $(PUDS) >>$(DISTLIST)
 	echo $(CONTRIB) >>$(DISTLIST)
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
@@ -291,6 +295,7 @@ bin-dist:: all
 win32-bin-dist2:: win32
 	@$(RM) $(DISTLIST)
 	@echo $(PICS) >>$(DISTLIST)
+	@echo $(PUDS) >>$(DISTLIST)
 	@echo $(CONTRIB) >>$(DISTLIST)
 	@echo $(CCLS) >>$(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
