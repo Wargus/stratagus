@@ -118,6 +118,8 @@ local void EnterNameCancel(void);
 local void EnterServerIPAction(Menuitem *mi, int key);
 local void EnterServerIPCancel(void);
 
+local void EnterSaveGameAction(Menuitem *mi, int key);
+
 local void JoinNetGameMenu(void);
 local void CreateNetGameMenu(void);
 
@@ -1234,13 +1236,29 @@ local Menuitem SaveGameMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Save Game", MI_TFLAGS_CENTERED} } },
+/*
     { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL,
 	{ input:{ "test123", 384-16-16, 16, MI_TFLAGS_CENTERED, NULL, 7, 33} } },
+    ARI->NEHAL: Was WRONG: you can't write to static strings (those go into the rdonly code segment!).
+    You need to initialize before usage. (see GameSaveMenu...).
+    You used flag (copy bug from above) where button is required for box size.
+    Action function is required to enable/disable Save(and maybe Delete) button and to
+    define 'Enter' action... See EnterIP for sample..
+    NOTE: Input type Item was not designed to overlay listbox!! This will need adjustments
+    to basic menu code.. I'll check when done with NET...
+*/
+    { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL,
+	{ input:{ NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0} } },
+
+/* ARI->NEHAL: THIS IS WRONG: "ScenSelect" stands for ScenarioSelection, that is what the
+   functions do. You need to provide your own Init, Exit, LBAction, LBRetrieve,
+   VSAction, and OK functions to fill the listbox with data!!!! */
     { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit,
 	{ listbox:{ NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 7, 0,
 		    (void *)ScenSelectLBRetrieve, ScenSelectOk} } },
     { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL,
 	{ vslider:{ 0, 18, 7*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk} } },
+
     { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Save", 106, 27, MBUTTON_GM_HALF, EndMenu, 's'} } },
     { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL,
@@ -2099,8 +2117,30 @@ local void GameMenuReturn(void)
     GamePaused = 0;
 }
 
+/**
+**	FIXME: docu.
+*/
+local void EnterSaveGameAction(Menuitem *mi, int key)
+{
+    if (mi->d.input.nch == 0) {
+	mi[3].flags = MenuButtonDisabled;	/* mi[i]: Save button! */
+    } else {
+	mi[3].flags &= ~MenuButtonDisabled;
+	if (key == 10 || key == 13) {
+	    EndMenu();
+	}
+    }
+}
+
 local void GameMenuSave(void)
 {
+    char savegame_buffer[32];
+
+    strcpy(savegame_buffer, "~!_");
+    SaveGameMenuItems[1].d.input.buffer = savegame_buffer;
+    SaveGameMenuItems[1].d.input.nch = 0; /* strlen(savegame_buffer) - 3; */
+    SaveGameMenuItems[1].d.input.maxch = 24;
+    SaveGameMenuItems[4].flags = MenuButtonDisabled;	/* Save button! */
     ProcessMenu(MENU_SAVE_GAME, 1);
 }
 
