@@ -272,6 +272,9 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
     for( i=0; i<110; ++i ) {		// Flag if unit is magic
 	unittype=UnitTypeByWcNum(i);
 	v=Fetch8(udta);
+	if( v==1 ) {
+	    v=255;			// Compatibility hack 1 = FULL
+	}
 	unittype->Magic=v;
     }
     for( i=0; i<110; ++i ) {		// Build time * 6 = one second FRAMES
