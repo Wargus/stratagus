@@ -95,8 +95,8 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 	case PF_REACHED:
 	    break;
 	default:
-	    if( !(goal->Destroyed || goal->Removed || !goal->HP
-		    || goal->Orders[0].Action==UnitActionDie) ) {
+	    if( !unit->Reset || !(goal->Destroyed || goal->Removed
+		    || !goal->HP || goal->Orders[0].Action==UnitActionDie) ) {
 		return 0;
 	    }
 	    break;
@@ -346,8 +346,8 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	case PF_REACHED:
 	    break;
 	default:
-	    if( !(goal->Destroyed || goal->Removed || !goal->HP
-		    || goal->Orders[0].Action==UnitActionDie) ) {
+	    if( !unit->Reset || !(goal->Destroyed || goal->Removed
+		    || !goal->HP || goal->Orders[0].Action==UnitActionDie) ) {
 		return 0;
 	    }
 	    break;
