@@ -424,11 +424,18 @@ global int LoadReplay(char* name)
 */
 global void EndReplayLog(void)
 {
-    ReplayLog=NIL;
     if( LogFile ) {
 	fclose(LogFile);
 	LogFile=NULL;
     }
+}
+
+/**
+**	Clean replay log
+*/
+global void CleanReplayLog(void)
+{
+    ReplayLog=NIL;
     // FIXME: LoadGame disables the log since replays aren't saved in the
     // FIXME: saved games yet.  Always enable the log again for now even
     // FIXME: though it ignores the -l command line option.
