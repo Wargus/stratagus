@@ -76,10 +76,12 @@ global int NumUnitTypes;			/// number of unit-types made
 **
 **	FIXME: find a way to make it configurable!
 */
+#if 0
 global UnitType*UnitTypeOrcTanker;		/// Orc tanker unit type pointer
 global UnitType*UnitTypeHumanTanker;		/// Human tanker unit type pointer
 global UnitType*UnitTypeOrcTankerFull;		/// Orc tanker full unit type pointer
 global UnitType*UnitTypeHumanTankerFull;	/// Human tanker full unit type pointer
+#endif
 global UnitType*UnitTypeHumanWorker;		/// Human worker
 global UnitType*UnitTypeOrcWorker;		/// Orc worker
 global UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
@@ -1089,6 +1091,7 @@ global UnitType* UnitTypeByIdent(const char* ident)
     IfDebug(
 	if( !NoWarningUnitType ) {
 	    DebugLevel0Fn("Name `%s' not found\n" _C_ ident);
+	    DebugCheck(1);
 	}
     );
 
@@ -1218,10 +1221,6 @@ global void InitUnitTypes(int reset_player_stats)
     //
     //	Setup hardcoded unit types. FIXME: should be moved to some configs.
     //
-    UnitTypeHumanTanker=UnitTypeByIdent("unit-human-oil-tanker");
-    UnitTypeOrcTanker=UnitTypeByIdent("unit-orc-oil-tanker");
-    UnitTypeHumanTankerFull=UnitTypeByIdent("unit-human-oil-tanker-full");
-    UnitTypeOrcTankerFull=UnitTypeByIdent("unit-orc-oil-tanker-full");
     UnitTypeHumanWorker=UnitTypeByIdent("unit-peasant");
     UnitTypeOrcWorker=UnitTypeByIdent("unit-peon");
     UnitTypeHumanWorkerWithGold=UnitTypeByIdent("unit-peasant-with-gold");
@@ -1447,10 +1446,6 @@ global void CleanUnitTypes(void)
     //
     //	Clean hardcoded unit types.
     //
-    UnitTypeHumanTanker=NULL;
-    UnitTypeOrcTanker=NULL;
-    UnitTypeHumanTankerFull=NULL;
-    UnitTypeOrcTankerFull=NULL;
     UnitTypeHumanWorker=NULL;
     UnitTypeOrcWorker=NULL;
     UnitTypeHumanWorkerWithGold=NULL;

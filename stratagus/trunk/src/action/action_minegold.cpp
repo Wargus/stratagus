@@ -47,6 +47,7 @@
 #include "interface.h"
 #include "pathfinder.h"
 
+#if 0
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -568,5 +569,7 @@ global void HandleActionMineGold(Unit* unit)
 	    break;
     }
 }
+
+#endif
 
 //@}

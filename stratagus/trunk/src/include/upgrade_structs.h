@@ -51,7 +51,7 @@
 /**
 **	Indices into costs/resource/income array. (A litte future here :)
 */
-enum _costs_ {
+typedef enum _costs_ {
     TimeCost,				/// time in game cycles
 
 // standard

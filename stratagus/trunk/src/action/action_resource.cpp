@@ -139,7 +139,7 @@ local int MoveToResource(Unit* unit)
     DebugLevel3Fn("+%d\n" _C_ goal->Data.Resource.Active);
 
     if( !goal->Frame ) {		// show resource working
-	goal->Frame=2;
+	goal->Frame=1;
 	CheckUnitToBeDrawn(goal);
     }
     UnitMarkSeen(goal);

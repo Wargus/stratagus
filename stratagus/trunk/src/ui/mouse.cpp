@@ -274,26 +274,28 @@ global void DoRightButton(int sx,int sy)
 	//	Tanker
 	//
 	if( action==MouseActionHaulOil ) {
-	    if( type==UnitTypeOrcTankerFull || type==UnitTypeHumanTankerFull ) {
-		if( UnitUnderCursor && (dest=UnitOnMapTile(x,y))
-			&& dest->Player==unit->Player ) {
-		    dest->Blink=4;
-		    if( dest->Type->CanStore[OilCost] ) {
-			DebugLevel3("OIL-DEPOSIT\n");
-			SendCommandReturnGoods(unit,dest,flush);
-			continue;
-		    }
-		}
-	    } else {
-		if( UnitUnderCursor && (dest=PlatformOnMap(x,y))
-			&& dest->Player==unit->Player ) {
-		    dest->Blink=4;
-		    DebugLevel3("PLATFORM\n");
-		    SendCommandResource(unit,dest,flush);
-		    continue;
-		}
+	    //  Return to deposit
+	    if( (unit->Type->Harvester) &&
+		    (unit->Value) &&
+		    (UnitUnderCursor) &&
+		    (dest=ResourceDepositOnMap(x,y,unit->Type->ResourceHarvested)) &&
+		    (dest->Player==unit->Player)) {
+		dest->Blink=4;
+		DebugLevel3Fn("Return to deposit.\n");
+		SendCommandReturnGoods(unit,dest,flush);
+		continue;
+	    } 
+	    //  Go and harvest
+	    if( (unit->Type->Harvester) &&
+		    (unit->Value<unit->Type->ResourceCapacity) &&
+		    (UnitUnderCursor) &&
+		    (dest=ResourceOnMap(x,y,unit->Type->ResourceHarvested)) &&
+		    (dest->Player==unit->Player)) {
+		dest->Blink=4;
+		SendCommandResource(unit,dest,flush);
+		continue;
 	    }
-
+	    //  Follow another unit
 	    if( UnitUnderCursor && (dest=UnitOnScreenMapPosition(sx,sy)) ) {
 		if( (dest->Player==unit->Player || IsAllied(unit->Player,dest))
 			&& dest!=unit ) {
@@ -302,13 +304,7 @@ global void DoRightButton(int sx,int sy)
 		    continue;
 		}
 	    }
-
-#ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand ) {
-		x&=~1;
-		y&=~1;			// Ships could only even fields
-	    }
-#endif
+	    //  Move 
 	    SendCommandMove(unit,x,y,flush);
 	    continue;
 	}
@@ -413,7 +409,7 @@ global void DoRightButton(int sx,int sy)
 #endif
 
         if (type->Building) {
-	    if( UnitUnderCursor && (dest=PlatformOnMap(x,y)) ) {
+	    if( UnitUnderCursor && (dest=ResourceOnMap(x,y,OilCost)) ) {
                 dest->Blink=4;
 	        DebugLevel3("RALY POINT TO PLATFORM\n");
                 SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
@@ -1044,13 +1040,13 @@ local void SendHarvest(int x,int y)
     Unit* dest;
 
     for( i=0; i<NumSelected; ++i ) {
-	if( UnitUnderCursor && (dest=PlatformOnMap(x,y)) ) {
+	if( UnitUnderCursor && (dest=ResourceOnMap(x,y,OilCost)) ) {
 	    dest->Blink=4;
 	    DebugLevel3("PLATFORM\n");
 	    SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
 	}
-	if( UnitUnderCursor && (dest=GoldMineOnMap(x,y)) ) {
+	if( UnitUnderCursor && (dest=ResourceOnMap(x,y,GoldCost)) ) {
 	    dest->Blink=4;
 	    DebugLevel3("GOLD-MINE\n");
 	    SendCommandMineGold(Selected[i],dest,!(KeyModifiers&ModifierShift));
