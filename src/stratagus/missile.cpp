@@ -188,16 +188,7 @@ global MissileType* MissileTypeByIdent(const char* ident)
 	MissileType* const* mtype;
 
 	mtype = (MissileType**)hash_find(MissileTypeHash, (char*)ident);
-	if (mtype) {
-		return *mtype;
-	}
-
-#ifdef DEBUG
-	if (!NoWarningMissileType) {
-		DebugLevel0Fn("Missile %s not found\n" _C_ ident);
-	}
-#endif
-	return NULL;
+	return mtype ? *mtype : 0;
 }
 
 /**

@@ -1166,6 +1166,7 @@ local void InitScript(void)
 	
 	/* Add all our namesspaces and stuff.*/
 	ScriptSpellInit();
+	ScriptMissileTypesInit();
 	lua_settable(Lua, LUA_GLOBALSINDEX);
 }
 

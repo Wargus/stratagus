@@ -267,6 +267,9 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 */
 global void FlipGraphic(Graphic* graphic)
 {
+#ifdef USE_OPENGL
+	return;
+#else
 	int i;
 	int j;
 	SDL_Surface* s;
@@ -287,6 +290,7 @@ global void FlipGraphic(Graphic* graphic)
 		}
 	}
 	SDL_UnlockSurface(s);
+#endif
 }
 
 /**
@@ -374,8 +378,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 			}
 		}
 		SDL_UnlockSurface(graphic->Surface);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-			GL_UNSIGNED_BYTE, tex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG
 		i = glGetError();
 		if (i) {
@@ -464,8 +467,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 		}
 	}
 	SDL_UnlockSurface(graphic->Surface);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG
 	i = glGetError();
 	if (i) {
