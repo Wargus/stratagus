@@ -689,8 +689,9 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     }
     CLprintf(file, "\n  'size '(%d %d)\n", type->Width, type->Height);
     if (type->ShadowFile) {
-	CLprintf(file, "  'shadow '(file \"%s\" width %d height %d)\n",
-	    type->ShadowFile, type->ShadowWidth, type->ShadowHeight);
+	CLprintf(file, "  'shadow '(file \"%s\" size (%d %d) offset (%d %d))\n",
+	    type->ShadowFile, type->ShadowWidth, type->ShadowHeight,
+	    type->ShadowOffsetX, type->ShadowOffsetY);
     }
 
     //
@@ -1511,18 +1512,18 @@ global void CleanUnitTypes(void)
 	for (res = 0; res < MaxCosts; ++res) {
 	    if (type->ResInfo[res]) {
 		if (type->ResInfo[res]->SpriteWhenLoaded) {
-		    free (type->ResInfo[res]->SpriteWhenLoaded);
+		    free(type->ResInfo[res]->SpriteWhenLoaded);
 		}
 		if (type->ResInfo[res]->SpriteWhenEmpty) {
-		    free (type->ResInfo[res]->SpriteWhenEmpty);
+		    free(type->ResInfo[res]->SpriteWhenEmpty);
 		}
 		if (type->ResInfo[res]->FileWhenEmpty) {
-		    free (type->ResInfo[res]->FileWhenEmpty);
+		    free(type->ResInfo[res]->FileWhenEmpty);
 		}
 		if (type->ResInfo[res]->FileWhenLoaded) {
-		    free (type->ResInfo[res]->FileWhenLoaded);
+		    free(type->ResInfo[res]->FileWhenLoaded);
 		}
-		free (type->ResInfo[res]);
+		free(type->ResInfo[res]);
 	    }
 	}
 

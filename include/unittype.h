@@ -671,7 +671,8 @@ struct _unit_type_ {
     int		DrawLevel;		/// Level to Draw Unittype at
     int		ShadowWidth;		/// Shadow sprite width
     int		ShadowHeight;		/// Shadow sprite height
-    int		ShadowOffset;		/// Shadow vertical offset
+    int		ShadowOffsetX;		/// Shadow horizontal offset
+    int		ShadowOffsetY;		/// Shadow vertical offset
 
     Animations*	Animations;		/// Animation scripts
 
