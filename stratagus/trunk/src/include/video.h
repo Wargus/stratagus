@@ -380,9 +380,9 @@ typedef struct _event_callback_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-EventCallback* Callbacks;		/// Current callbacks
-EventCallback GameCallbacks;		/// Game callbacks
-EventCallback MenuCallbacks;		/// Menu callbacks
+extern EventCallback* Callbacks;	/// Current callbacks
+extern EventCallback GameCallbacks;	/// Game callbacks
+extern EventCallback MenuCallbacks;	/// Menu callbacks
 
 extern PaletteLink* PaletteList;	/// List of all used palettes loaded
 extern int ColorCycleAll;		/// Flag color cycle palettes
