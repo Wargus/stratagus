@@ -1447,7 +1447,6 @@ global void MapColorCycle(void)
 */
 global int MarkDrawPosMap( int x, int y )
 {
-#ifdef SPLIT_SCREEN_SUPPORT
     /* NOTE: latimerius: MarkDrawPosMap() in split screen environment
      * schedules RedrawMap if (x,y) is visible inside *any* of the existing
      * viewports.  Is this OK, johns?  Do you think it would pay having
@@ -1458,20 +1457,8 @@ global int MarkDrawPosMap( int x, int y )
 	MustRedraw|=RedrawMap;
 	return 1;
     }
-#else /* SPLIT_SCREEN_SUPPORT */
-    if ( (x-=MapX)>=0 && (y-=MapY)>=0 && x<MapWidth && y<MapHeight ) {
-#ifdef NEW_MAPDRAW
-      MustRedrawRow[y]=MustRedrawTile[y*MapWidth+x]=NEW_MAPDRAW;
-#endif
-      MustRedraw|=RedrawMap;
-      return 1;
-    }
-#endif /* SPLIT_SCREEN_SUPPORT */
     return 0;
 }
-
-
-#ifdef SPLIT_SCREEN_SUPPORT
 
 global int MapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
 {
@@ -1494,54 +1481,6 @@ global int AnyMapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
 	    || PointInViewport (v,ex,sy) || PointInViewport (v,ex,ey);
 }
 
-#else /* SPLIT_SCREEN_SUPPORT */
-
-/**
-**	Denote wether area in screenmap is overlapping
-**
-**	@param sx	X map tile position of area in Map to be checked.
-**	@param sy	Y map tile position of area in Map to be checked.
-**	@param ex	X map tile position of area in Map to be checked.
-**	@param ey	Y map tile position of area in Map to be checked.
-**
-**	@return		True if overlapping, false otherwise.
-*/
-global int MapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
-{
-    return sx>=MapX && sy>=MapY && ex<MapX+MapWidth && ey<MapY+MapHeight;
-}
-
-/**
-**	Check if a point is visible
-**
-**	@param x	X map tile position of point in Map to be checked.
-**	@param y	Y map tile position of point in Map to be checked.
-**
-**	@return		True if point is in the visible map, false otherwise
-*/
-local inline int PointOnScreen(int x, int y)
-{
-    return MapX <= x && x < MapX+MapWidth && MapY <= y && y < MapY+MapHeight;
-}
-
-/**
-**	Check if any part of an area is visible
-**
-**	@param sx	X map tile position of area in Map to be checked.
-**	@param sy	Y map tile position of area in Map to be checked.
-**	@param ex	X map tile position of area in Map to be checked.
-**	@param ey	Y map tile position of area in Map to be checked.
-**
-**	@return		True if any part of area is visible, false otherwise
-*/
-global int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
-{
-    // FIXME: Can be faster written
-    return PointOnScreen(sx,sy) || PointOnScreen(sx,ey)
-	    || PointOnScreen(ex,sy) || PointOnScreen(ex,ey);
-}
-#endif /* SPLIT_SCREEN_SUPPORT */
-
 /**
 **	Mark overlapping area with screenmap be drawn for next display update.
 **
@@ -1556,49 +1495,10 @@ global int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
 */
 global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 {
-#ifdef SPLIT_SCREEN_SUPPORT
     if (MapTileGetViewport (sx,sy) != -1 || MapTileGetViewport (ex,ey) != -1) {
 	MustRedraw |= RedrawMap;
 	return 1;
     }
-#else /* SPLIT_SCREEN_SUPPORT */
-    if ((ex -= MapX) >= 0 && (ey -= MapY) >= 0 && ((sx -= MapX) < MapWidth
-	    || sx < 0) && ((sy -= MapY) < MapHeight || sy < 0)) {
-#ifdef NEW_MAPDRAW
-	char *row, *tile;
-
-	// Get area in screenmap
-	if (sx < 0) {
-	    sx = 0;
-	}
-	if (ex >= MapWidth) {
-	    ex = MapWidth - 1;
-	}
-	if (sy < 0) {
-	    sy = 0;
-	}
-	if (ey >= MapHeight) {
-	    ey = MapHeight - 1;
-	}
-	// Denote area in screenmap
-	row = MustRedrawRow + sy;
-	tile = MustRedrawTile + sy * MapWidth + sx;
-	ex -= sx;			//now: ex=width+1
-	ey -= sy;			//     ey=height+1
-	do {
-	    row[ey] = NEW_MAPDRAW;
-	    sx = ex;
-	    do {
-		tile[sx] = NEW_MAPDRAW;
-	    } while (--sx >= 0);
-	    tile += MapWidth;
-	} while (--ey >= 0);
-#endif
-
-	MustRedraw |= RedrawMap;
-	return 1;
-    }
-#endif /* SPLIT_SCREEN_SUPPORT */
     return 0;
 }
 
@@ -1656,8 +1556,6 @@ global void MarkDrawEntireMap(void)
 ** (in pixels)
 ** </PRE>
 */
-
-#ifdef SPLIT_SCREEN_SUPPORT
 
 global void DrawMapBackgroundInViewport (int v, int x, int y)
 {
@@ -1750,102 +1648,6 @@ global void DrawMapBackgroundInViewport (int v, int x, int y)
     DebugLevel1("%ld %ld %3ld\n" _C_ (long)sx _C_ mv _C_ (sx*100)/mv);
 #endif
 }
-
-#else /* SPLIT_SCREEN_SUPPORT */
-
-global void DrawMapBackground(int x,int y)
-{
-    int sx;
-    int sy;
-    int dx;
-    int ex;
-    int dy;
-    int ey;
-    const char* redraw_row;
-    const char* redraw_tile;
-#ifdef TIMEIT
-    u_int64_t sv=rdtsc();
-    u_int64_t ev;
-    static long mv=9999999;
-#endif
-#ifdef USE_SMART_TILECACHE
-    memset(TileCached,0,sizeof(TileCached));
-#endif
-
-    redraw_row=MustRedrawRow;		// flags must redraw or not
-    redraw_tile=MustRedrawTile;
-
-    ex=TheUI.MapEndX;
-    sy=y*TheMap.Width;
-    dy=TheUI.MapY;
-    ey=TheUI.MapEndY;
-
-    while( dy<ey ) {
-	if( *redraw_row++ ) {		// row must be redrawn
-	    sx=x+sy;
-	    dx=TheUI.MapX;
-	    while( dx<ex ) {
-		//
-		//	draw only tiles which must be drawn
-		//
-		if( *redraw_tile++ ) {
-		    // FIXME: unexplored fields could be drawn faster
-		    MapDrawTile(TheMap.Fields[sx].SeenTile,dx,dy);
-
-		// StephanR: debug-mode denote tiles that are redrawn
-		#if NEW_MAPDRAW > 1
-		  VideoDrawRectangle( redraw_tile[-1] > 1
-				      ? ColorWhite
-				      : ColorRed,
-				      dx, dy, 32, 32 );
-		#endif
-		}
-		++sx;
-		dx+=TileSizeX;
-	    }
-	} else {
-	    redraw_tile+=MapWidth;
-	}
-	sy+=TheMap.Width;
-	dy+=TileSizeY;
-    }
-
-#if defined(HIERARCHIC_PATHFINDER) && defined(GRID)
-    {
-    int xmax = x + (TheUI.MapEndX-TheUI.MapX)/TileSizeX;
-    int xmin = x;
-    int ymax = y + (TheUI.MapEndY-TheUI.MapY)/TileSizeY;
-    int ymin = y;
-    int AreaWidth = AreaGetWidth ();
-    int AreaHeight = AreaGetHeight ();
-    for ( ; x <= xmax; x++)  {
-	if (x%AreaWidth == 0) {
-	    int	xx = TheUI.MapX + TileSizeX * (x - xmin) - 1;
-	    VideoDrawLineClip (ColorRed, xx, TheUI.MapY, xx, TheUI.MapEndY);
-	}
-    }
-    for ( ; y <= ymax; y++)  {
-	if (y%AreaHeight == 0) {
-	    int	yy = TheUI.MapY + TileSizeY * (y - ymin) - 1;
-	    VideoDrawLineClip (ColorRed, TheUI.MapX, yy, TheUI.MapEndX, yy);
-	}
-    }
-
-    }
-#endif
-
-#ifdef TIMEIT
-    ev=rdtsc();
-    sx=(ev-sv);
-    if( sx<mv ) {
-	mv=sx;
-    }
-
-    DebugLevel1("%ld %ld %3ld\n" _C_ (long)sx _C_ mv _C_ (sx*100)/mv);
-#endif
-}
-
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 #ifdef NEW_DECODRAW
 /**

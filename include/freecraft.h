@@ -43,8 +43,6 @@
 #define noUSE_SVGALIB			/// Remove no for svgalib support
 #define noUSE_WINCE			/// Remove no for win-ce video support
 
-#define SPLIT_SCREEN_SUPPORT		/// Support Viewports (must be on!)
-
     /**
     **	Define this to support load of compressed (gzip) pud files
     **	and other data files. (If defined you need libz)

@@ -50,9 +50,7 @@
 #include "sound_server.h"
 #include "missile.h"
 #include "map.h"
-#ifdef SPLIT_SCREEN_SUPPORT
 #include "ui.h"
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 #include "sound.h"
 
