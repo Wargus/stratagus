@@ -466,8 +466,20 @@ global Unit* ResourceDepositOnMap(int tx,int ty,int resource)
 **/
 local int InDistanceCompare(const void* v1, const void* v2)
 {
-    return MapDistanceBetweenUnits(*(Unit**)v1,localunit) <
-	MapDistanceBetweenUnits(*(Unit**)v2,localunit);
+    int unit1dist;
+    int unit2dist;
+
+    unit1dist = MapDistanceBetweenUnits(*(Unit**)v1, localunit);
+    unit2dist = MapDistanceBetweenUnits(*(Unit**)v2, localunit);
+
+    if (unit1dist < unit2dist) {
+	return -1;
+    } else if (unit1dist > unit2dist) {
+	return 1;
+    } else {
+	return (*(Unit**)v1)->Slot - (*(Unit**)v2)->Slot;
+    }
+    
 }
 			
 /*----------------------------------------------------------------------------
