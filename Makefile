@@ -173,7 +173,7 @@ depend:
 	@echo -n >.depend
 	@echo
 	@for i in $(SRC) ; do\
-	echo -e "\rMaking dependancies for $$i";\
+	echo -e "\rMaking dependencies for $$i";\
 	echo -n `dirname $$i`/$(OBJDIR)/ >> .depend;\
 	$(CC) -MM $(IFLAGS) $(DFLAGS) $(CFLAGS) $$i >>.depend ; done
 	@echo
