@@ -47,77 +47,130 @@
 local int MoveToGoldMine(Unit* unit)
 {
     Unit* destu;
+    int i;
 
-    if( HandleActionMove(unit)>=0 ) {	// reached end-point?
+    if( (i=HandleActionMove(unit))>=0 ) {	// reached end-point?
 	return 0;
     }
 
-    // FIXME: HandleActionMove return this: reached nearly, use it!
-
 #ifdef NEW_ORDERS
-    unit->Orders[0].Action=UnitActionMineGold;
-
     destu=unit->Orders[0].Goal;
-    if( destu && (destu->Destroyed || !destu->HP) ) {
-	DebugLevel1Fn("WAIT after goldmine destroyed %d\n",unit->Wait);
+
+    DebugCheck( !destu );
+    DebugCheck( unit->Wait!=1 );
+
+    //
+    //	Target is dead, stop mining.
+    //
+    if( destu->Destroyed ) {
+	DebugLevel0Fn("Destroyed unit\n");
 	RefsDebugCheck( !destu->Refs );
 	if( !--destu->Refs ) {
 	    ReleaseUnit(destu);
 	}
 	unit->Orders[0].Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    } else if( destu->Removed || !destu->HP
+	    || destu->Orders[0].Action==UnitActionDie ) {
+	RefsDebugCheck( !destu->Refs );
+	--destu->Refs;
+	RefsDebugCheck( !destu->Refs );
+	unit->Orders[0].Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
     }
-    if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
-	DebugLevel3Fn("GOLD-MINE NOT REACHED %d,%d\n",dx,dy);
+
+    unit->Orders[0].Action=UnitActionMineGold;
+
+    //
+    //	Check if mine could be reached.
+    /
+    if( i==PF_UNREACHABLE ) {
+	// FIXME: could try another mine, or retry later.
+	DebugLevel3Fn("GOLD-MINE NOT REACHED %Zd=%d,%d ? %d\n"
+	      ,UnitNumber(destu),x,y,MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
     }
 
-    //
-    // Activate gold-mine
-    //
-    // FIXME: hmmm... we're in trouble here.
-    // we should check if there's still some gold left in the mine instead.
     RefsDebugCheck( !destu->Refs );
     --destu->Refs;
     RefsDebugCheck( !destu->Refs );
     unit->Orders[0].Goal=NoUnitP;
 
+    //
+    // Activate gold-mine
+    //
+    // FIXME: hmmm... we're in trouble here.
+    // we should check if there's still some gold left in the mine instead.
+
     destu->Data.Resource.Active++;
 #else
-    unit->Command.Action=UnitActionMineGold;
-
     destu=unit->Command.Data.Move.Goal;
-    if( destu && (destu->Destroyed || !destu->HP) ) {
-	DebugLevel1Fn("WAIT after goldmine destroyed %d\n",unit->Wait);
+
+    DebugCheck( !destu );
+    DebugCheck( unit->Wait!=1 );
+
+    //
+    //	Target is dead, stop mining.
+    //
+    if( destu->Destroyed ) {
+	DebugLevel0Fn("Destroyed unit\n");
 	RefsDebugCheck( !destu->Refs );
 	if( !--destu->Refs ) {
 	    ReleaseUnit(destu);
 	}
 	unit->Command.Data.Move.Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    } else if( destu->Removed || !destu->HP
+	    || destu->Command.Action==UnitActionDie ) {
+	RefsDebugCheck( !destu->Refs );
+	--destu->Refs;
+	RefsDebugCheck( !destu->Refs );
+	unit->Command.Data.Move.Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
 	unit->Command.Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
     }
-    if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
-	DebugLevel3Fn("GOLD-MINE NOT REACHED %d,%d\n",dx,dy);
+
+    unit->Command.Action=UnitActionMineGold;
+
+    //
+    //	Check if mine could be reached.
+    //
+    if( i==PF_UNREACHABLE ) {
+	// FIXME: could try another mine, or retry later.
+	DebugLevel3Fn("GOLD-MINE NOT REACHED %Zd=%d,%d ? %d\n"
+	      ,UnitNumber(destu),destu->X,destu->Y
+	      ,MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
     }
+
+    RefsDebugCheck( !destu->Refs );
+    --destu->Refs;
+    RefsDebugCheck( !destu->Refs );
+    unit->Command.Data.Move.Goal=NoUnitP;
 
     //
     // Activate gold-mine
     //
     // FIXME: hmmm... we're in trouble here.
     // we should check if there's still some gold left in the mine instead.
-    RefsDebugCheck( !destu->Refs );
-    --destu->Refs;
-    RefsDebugCheck( !destu->Refs );
-    unit->Command.Data.Move.Goal=NoUnitP;
 
     destu->Command.Data.GoldMine.Active++;
 #endif
-    destu->Frame=1;			// FIXME: should be configurable
+    if( !destu->Frame ) {
+	destu->Frame=1;			// FIXME: should be configurable
+	CheckUnitToBeDrawn(destu);
+    }
 
     RemoveUnit(unit);
     unit->X=destu->X;
@@ -165,10 +218,12 @@ local int MineInGoldmine(Unit* unit)
 #ifdef NEW_ORDERS
 	if( !--mine->Data.Resource.Active ) {
 	    mine->Frame=0;
+	    CheckUnitToBeDrawn(mine);
 	}
 #else
 	if( !--mine->Command.Data.GoldMine.Active ) {
 	    mine->Frame=0;
+	    CheckUnitToBeDrawn(mine);
 	}
 #endif
 	if( IsSelected(mine) ) {
@@ -190,6 +245,9 @@ local int MineInGoldmine(Unit* unit)
 	}
 	// FIXME: I use goldmine after destory!!!
 
+	//
+	//	Find gold depot
+	//
 #ifdef NEW_ORDERS
 	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
 	    DropOutOnSide(unit,LookingW
@@ -203,18 +261,11 @@ local int MineInGoldmine(Unit* unit)
 		    ,mine->Type->TileWidth,mine->Type->TileHeight);
 	    ResetPath(unit->Orders[0]);
 	    unit->Orders[0].Goal=destu;
+	    RefsDebugCheck( !destu->Refs );
 	    ++destu->Refs;
 	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-#if 1
-	    // FIXME: old pathfinder didn't found the path to the nearest
-	    // FIXME: point of the unit
-	    NearestOfUnit(destu,unit->X,unit->Y
-		,&unit->Orders[0].X
-		,&unit->Orders[0].Y);
-#else
-	    unit->Orders[0].X=destu->X;
-	    unit->Orders[0].Y=destu->Y;
-#endif
+	    unit->Orders[0].X=-1;
+	    unit->Orders[0].Y=-1;
 	    unit->Orders[0].Action=UnitActionMineGold;
 	    DebugLevel3Fn("Mine with deposit %d,%d\n",destu->X,destu->Y);
 	}
@@ -231,31 +282,26 @@ local int MineInGoldmine(Unit* unit)
 		    ,mine->Type->TileWidth,mine->Type->TileHeight);
 	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=destu;
+	    RefsDebugCheck( !destu->Refs );
 	    ++destu->Refs;
 	    unit->Command.Data.Move.Range=1;
-#if 1
-	    // FIXME: old pathfinder didn't found the path to the nearest
-	    // FIXME: point of the unit
-	    NearestOfUnit(destu,unit->X,unit->Y
-		,&unit->Command.Data.Move.DX
-		,&unit->Command.Data.Move.DY);
-#else
-	    unit->Command.Data.Move.DX=destu->X;
-	    unit->Command.Data.Move.DY=destu->Y;
-#endif
+	    unit->Command.Data.Move.DX=-1;
+	    unit->Command.Data.Move.DY=-1;
 	    unit->Command.Action=UnitActionMineGold;
 	    DebugLevel3Fn("Mine with deposit %d,%d\n",destu->X,destu->Y);
 	}
 #endif
 
+	//
+	//	Change unit outfit. (Unit type is used for this.)
+	//
 	if( unit->Type==UnitTypeOrcWorker ) {
 	    unit->Type=UnitTypeOrcWorkerWithGold;
 	} else if( unit->Type==UnitTypeHumanWorker ) {
 	    unit->Type=UnitTypeHumanWorkerWithGold;
 	} else {
 	    DebugLevel0Fn("Wrong unit (%d,%d) for mining gold %d (%s)\n"
-		,unit->X,unit->Y
-		,unit->Type->Type,unit->Type->Name);
+		,unit->X,unit->Y,unit->Type->Type,unit->Type->Name);
 	}
         CheckUnitToBeDrawn(unit);
 	if( IsSelected(unit) ) {
@@ -287,61 +333,114 @@ local int MineInGoldmine(Unit* unit)
 */
 local int MoveToGoldDeposit(Unit* unit)
 {
-    int x;
-    int y;
+    int i;
     Unit* destu;
 
-    if( HandleActionMove(unit)>=0 ) {	// reached end-point?
+    if( (i=HandleActionMove(unit))>=0 ) {	// reached end-point?
 	return 0;
     }
 
-    // FIXME: HandleActionMove return this: reached nearly, use it!
-
 #ifdef NEW_ORDERS
-    unit->Orders[0].Action=UnitActionMineGold;
-
     destu=unit->Orders[0].Goal;
-    if( destu && (destu->Destroyed || !destu->HP) ) {
+
+    DebugCheck( !destu );
+    DebugCheck( unit->Wait!=1 );
+
+    //
+    //	Target is dead, stop mining.
+    //
+    if( destu->Destroyed ) {
+	DebugLevel0Fn("Destroyed unit\n");
 	RefsDebugCheck( !destu->Refs );
 	if( !--destu->Refs ) {
 	    ReleaseUnit(destu);
 	}
+	unit->Orders[0].Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    } else if( destu->Removed || !destu->HP
+	    || destu->Orders[0].Action==UnitActionDie ) {
+	RefsDebugCheck( !destu->Refs );
+	--destu->Refs;
+	RefsDebugCheck( !destu->Refs );
+	unit->Orders[0].Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
     }
 
-    x=unit->Orders[0].X;
-    y=unit->Orders[0].Y;
-#else
-    unit->Command.Action=UnitActionMineGold;
+    unit->Orders[0].Action=UnitActionMineGold;
 
-    destu=unit->Command.Data.Move.Goal;
-    if( destu && (destu->Destroyed || !destu->HP) ) {
-	RefsDebugCheck( !destu->Refs );
-	if( !--destu->Refs ) {
-	    ReleaseUnit(destu);
-	}
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
-
-    x=unit->Command.Data.Move.DX;
-    y=unit->Command.Data.Move.DY;
-#endif
-    DebugCheck( destu!=GoldDepositOnMap(x,y) );
-
-    if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
-	DebugLevel3Fn("GOLD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
-	    ,UnitNumber(destu),x,y
-	    ,MapDistanceToUnit(unit->X,unit->Y,destu));
+    //
+    //	Check if depot could be reached.
+    /
+    if( i==PF_UNREACHABLE ) {
+	// FIXME: could try another mine, or retry later.
+	DebugLevel3Fn("GOLD-DEPOT NOT REACHED %Zd=%d,%d ? %d\n"
+	      ,UnitNumber(destu),x,y,MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
     }
 
     RefsDebugCheck( !destu->Refs );
     --destu->Refs;
     RefsDebugCheck( !destu->Refs );
+    unit->Orders[0].Goal=NoUnitP;
+
+#else
+
+    destu=unit->Command.Data.Move.Goal;
+
+    DebugCheck( !destu );
+    DebugCheck( unit->Wait!=1 );
+
+    //
+    //	Target is dead, stop mining.
+    //
+    if( destu->Destroyed ) {
+	DebugLevel0Fn("Destroyed unit\n");
+	RefsDebugCheck( !destu->Refs );
+	if( !--destu->Refs ) {
+	    ReleaseUnit(destu);
+	}
+	unit->Command.Data.Move.Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    } else if( destu->Removed || !destu->HP
+	    || destu->Command.Action==UnitActionDie ) {
+	RefsDebugCheck( !destu->Refs );
+	--destu->Refs;
+	RefsDebugCheck( !destu->Refs );
+	unit->Command.Data.Move.Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+
+    unit->Command.Action=UnitActionMineGold;
+
+    //
+    //	Check if mine could be reached.
+    //
+    if( i==PF_UNREACHABLE ) {
+	// FIXME: could try another mine, or retry later.
+	DebugLevel3Fn("GOLD-MINE NOT REACHED %Zd=%d,%d ? %d\n"
+	      ,UnitNumber(destu),destu->X,destu->Y
+	      ,MapDistanceToUnit(unit->X,unit->Y,destu));
+	return -1;
+    }
+
+    RefsDebugCheck( !destu->Refs );
+    --destu->Refs;
+    RefsDebugCheck( !destu->Refs );
+    unit->Command.Data.Move.Goal=NoUnitP;
+
+#endif
 
     RemoveUnit(unit);
     unit->X=destu->X;
@@ -361,8 +460,7 @@ local int MoveToGoldDeposit(Unit* unit)
 	unit->Type=UnitTypeHumanWorker;
     } else {
 	DebugLevel0Fn("Wrong unit (%d,%d) for returning gold %d (%s)\n"
-	    ,unit->X,unit->Y
-	    ,unit->Type->Type,unit->Type->Name);
+	    ,unit->X,unit->Y,unit->Type->Type,unit->Type->Name);
     }
 
     if( WAIT_FOR_GOLD<MAX_UNIT_WAIT ) {
@@ -376,6 +474,7 @@ local int MoveToGoldDeposit(Unit* unit)
 }
 
 /**
+**	Store the gold in the gold depot.
 **
 **	@param unit	Pointer to worker unit.
 **
@@ -389,7 +488,8 @@ local int StoreGoldInDeposit(Unit* unit)
     DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
 #ifdef NEW_ORDERS
-	depot=unit->Orders[0].Goal;
+	depot=GoldDepositOnMap(unit->X,unit->Y);
+	DebugCheck( !depot );
 	// Could be destroyed, but than we couldn't be in?
 
 	// FIXME: return to last position!
@@ -404,20 +504,15 @@ local int StoreGoldInDeposit(Unit* unit)
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 	    ResetPath(unit->Command);
 	    unit->Orders[0].Goal=destu;
+	    RefsDebugCheck( !destu->Refs );
 	    ++destu->Refs;
 	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-#if 1
-	    // FIXME: old pathfinder didn't found the path to the nearest
-	    // FIXME: point of the unit
-	    NearestOfUnit(destu,unit->X,unit->Y
-		,&unit->Orders[0].X,&unit->Orders[0].Y);
-#else
-	    unit->Orders[0].X=destu->X;
-	    unit->Orders[0].Y=destu->Y;
-#endif
+	    unit->Orders[0].X=-1;
+	    unit->Orders[0].Y=-1;
 	    unit->Orders[0].Action=UnitActionMineGold;
 #else
-	depot=unit->Command.Data.Move.Goal;
+	depot=GoldDepositOnMap(unit->X,unit->Y);
+	DebugCheck( !depot );
 	// Could be destroyed, but than we couldn't be in?
 
 	// FIXME: return to last position!
@@ -432,17 +527,11 @@ local int StoreGoldInDeposit(Unit* unit)
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=destu;
+	    RefsDebugCheck( !destu->Refs );
 	    ++destu->Refs;
 	    unit->Command.Data.Move.Range=1;
-#if 1
-	    // FIXME: old pathfinder didn't found the path to the nearest
-	    // FIXME: point of the unit
-	    NearestOfUnit(destu,unit->X,unit->Y
-		,&unit->Command.Data.Move.DX,&unit->Command.Data.Move.DY);
-#else
-	    unit->Command.Data.Move.DX=destu->X;
-	    unit->Command.Data.Move.DY=destu->Y;
-#endif
+	    unit->Command.Data.Move.DX=-1;
+	    unit->Command.Data.Move.DY=-1;
 	    unit->Command.Action=UnitActionMineGold;
 #endif
 	}
@@ -493,16 +582,17 @@ global void HandleActionMineGold(Unit* unit)
 			    --unit->Orders[0].Goal->Refs;
 			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 			    unit->Orders[0].Goal=NoUnitP;
+			}
 #else
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
-			    RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
+			    RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
 			    --unit->Command.Data.Move.Goal->Refs;
-			    RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
+			    RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
 			    unit->Command.Data.Move.Goal=NoUnitP;
-#endif
 			}
+#endif
 		    }
 		} else {
 		    unit->SubAction=64;
@@ -525,10 +615,11 @@ global void HandleActionMineGold(Unit* unit)
 	case 65:
 	case 66:
 	case 67:
-	case 68:				// 4 tries to reach depot
+	case 68:
+	case 69:				// 4 tries to reach depot
 	    if( (ret=MoveToGoldDeposit(unit)) ) {
 		if( ret==-1 ) {
-		    if( ++unit->SubAction==69 ) {
+		    if( ++unit->SubAction==70 ) {
 #ifdef NEW_ORDERS
 			unit->Orders[0].Action=UnitActionStill;
 			unit->SubAction=0;
@@ -542,9 +633,9 @@ global void HandleActionMineGold(Unit* unit)
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
-			    RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
+			    RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
 			    --unit->Command.Data.Move.Goal->Refs;
-			    RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
+			    RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
 			    unit->Command.Data.Move.Goal=NoUnitP;
 			}
 #endif

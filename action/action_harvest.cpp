@@ -49,99 +49,98 @@
 */
 local int MoveToWood(Unit* unit)
 {
+    int i;
     int x;
     int y;
-    int dx;
-    int dy;
 
-    if( HandleActionMove(unit)>=0 ) {	// reached end-point?
+    if( (i=HandleActionMove(unit))>=0 ) {	// reached end-point?
 	return 0;
     }
 
 #ifdef NEW_ORDERS
-    // FIXME: JOHNS: rewrite this complete sh*t (I have written it :)
-
-    //
-    //	reached nearly? and is there wood?
-    //		FIXME: use return value of pathfinder.
-    //
-    if( unit->Orders[0].RangeX ) {
-	++unit->Orders[0].X;
-	++unit->Orders[0].Y;
-    }
-    x=unit->Orders[0].X;
-    y=unit->Orders[0].Y;
-#else
-    //
-    //	reached nearly? and is there wood?
-    //		FIXME: use return value of pathfinder.
-    //
-    if( unit->Command.Data.Move.Range ) {
-	// FIXME: not correct on map border :(
-	++unit->Command.Data.Move.DX;
-	++unit->Command.Data.Move.DY;
-    }
-    x=unit->Command.Data.Move.DX;
-    y=unit->Command.Data.Move.DY;
-#endif
-
-    dx=x-unit->X;
-    dy=y-unit->Y;
-    DebugLevel3Fn("Why %d,%d = %d\n",dx,dy,ForestOnMap(x,y));
-    if( dx<-1 || dx>1 || dy<-1 || dy>1 || !ForestOnMap(x,y) ) {
-#ifdef NEW_ORDERS
+    if( i==PF_UNREACHABLE ) {
+newtry:
 	if( FindWoodInSight(unit,&unit->Orders[0].X,&unit->Orders[0].Y) ) {
 
 	    // Move to new wood position
 	    ResetPath(unit->Orders[0]);
 	    unit->Orders[0].Goal=NoUnitP;
-	    unit->Orders[0].RangeX=2;
-	    unit->Orders[0].RangeY=2;
+	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=2;
 	    unit->Orders[0].Action=UnitActionHarvest;
-	    if( unit->Orders[0].X ) {
-		unit->Orders[0].X--;
-	    }
-	    if( unit->Orders[0].Y ) {
-		unit->Orders[0].Y--;
-	    }
+	    unit->Orders[0].X--;
+	    unit->Orders[0].Y--;
 	}
 	return 0;
     }
-    unit->Orders[0].Action=UnitActionHarvest;
+    x=unit->Orders[0].X+1;
+    y=unit->Orders[0].Y+1;
 #else
+    if( i==PF_UNREACHABLE ) {
+newtry:
 	if( FindWoodInSight(unit
-		,&unit->Command.Data.Move.DX
-		,&unit->Command.Data.Move.DY) ) {
+		,&unit->Command.Data.Move.DX,&unit->Command.Data.Move.DY) ) {
 
 	    // Move to new wood position
 	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=NoUnitP;
 	    unit->Command.Data.Move.Range=2;
 	    unit->Command.Action=UnitActionHarvest;
-	    if( unit->Command.Data.Move.DX ) {
-		unit->Command.Data.Move.DX--;
-	    }
-	    if( unit->Command.Data.Move.DY ) {
-		unit->Command.Data.Move.DY--;
-	    }
+	    unit->Command.Data.Move.DX--;
+	    unit->Command.Data.Move.DY--;
 	}
 	return 0;
     }
-    unit->Command.Action=UnitActionHarvest;
+    x=unit->Command.Data.Move.DX+1;
+    y=unit->Command.Data.Move.DY+1;
 #endif
 
-    // turn to wood
-    UnitHeadingFromDeltaXY(unit,dx,dy);
+    if( !CheckedForestOnMap(x,y) ) {
+	//
+	//	Check surrounding for forest
+	//
+	x=unit->X;
+	y=unit->Y;
+	if( CheckedForestOnMap(x-1,y-1) ) {
+	    --x;
+	    --y;
+	} else if( CheckedForestOnMap(x-1,y+0) ) {
+	    --x;
+	} else if( CheckedForestOnMap(x-1,y+1) ) {
+	    --x;
+	    ++y;
+	} else if( CheckedForestOnMap(x+0,y-1) ) {
+	    --y;
+	} else if( CheckedForestOnMap(x+0,y+1) ) {
+	    ++y;
+	} else if( CheckedForestOnMap(x+1,y-1) ) {
+	    ++x;
+	    --y;
+	} else if( CheckedForestOnMap(x+1,y+0) ) {
+	    ++x;
+	} else if( CheckedForestOnMap(x+1,y+1) ) {
+	    ++x;
+	    ++y;
+	} else {
+	    goto newtry;
+	}
+    }
+
     // FIXME: don't chop the same wood!
+
 #ifdef NEW_ORDERS
+    unit->Orders[0].X=x;
+    unit->Orders[0].Y=y;
+    unit->Orders[0].Action=UnitActionHarvest;
+    // turn to wood
+    UnitHeadingFromDeltaXY(unit,x-unit->X,y-unit->Y);
     unit->Value=unit->Data.Harvest.WoodToHarvest;
 #else
-    // FIXME: looks wired wrong
-    if( unit->WoodToHarvest != CHOP_FOR_WOOD ) {
-	unit->Value=unit->WoodToHarvest;
-    } else {
-	unit->Value=CHOP_FOR_WOOD;
-    }
+    unit->Command.Data.Move.DX=x;
+    unit->Command.Data.Move.DY=y;
+    unit->Command.Action=UnitActionHarvest;
+    // turn to wood
+    UnitHeadingFromDeltaXY(unit,x-unit->X,y-unit->Y);
+    unit->Value=unit->WoodToHarvest;
 #endif
 
     DebugCheck( unit->Wait!=1 );
@@ -152,10 +151,9 @@ local int MoveToWood(Unit* unit)
 /**
 **	Chop the wood.
 **
-**	@param unit	Unit pointer chopping wood.
+**	@param unit	Pointer to worker unit.
 **
-**
-**	Return TRUE if ready, otherwise FALSE.
+**	@return		TRUE if ready, otherwise FALSE.
 */
 local int ChopWood(Unit* unit)
 {
@@ -190,17 +188,14 @@ local int ChopWood(Unit* unit)
 	//
 	//	Wood gone while chopping?
 	//
-	if( !ForestOnMap(unit->Orders[0].X
-		,unit->Orders[0].Y) ) {
-	    if( FindWoodInSight(unit
-		    ,&unit->Orders[0].X
-		    ,&unit->Orders[0].Y) ) {
+	if( !ForestOnMap(unit->Orders[0].X,unit->Orders[0].Y) ) {
+	    if( FindWoodInSight(unit,&unit->Orders[0].X,&unit->Orders[0].Y) ) {
 		ResetPath(unit->Orders[0]);
 		unit->Orders[0].Goal=NoUnitP;
-		unit->Orders[0].RangeX=0;
-		unit->Orders[0].RangeY=0;
-		// FIXME: shouldn't it be range=1 ??
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=2;
 		DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
+		unit->Orders[0].X--;
+		unit->Orders[0].Y--;
 		unit->SubAction=0;
 	    } else {
 		unit->Orders[0].Action=UnitActionStill;
@@ -220,8 +215,9 @@ local int ChopWood(Unit* unit)
 		    ,&unit->Command.Data.Move.DY) ) {
 		ResetPath(unit->Command);
 		unit->Command.Data.Move.Goal=NoUnitP;
-		unit->Command.Data.Move.Range=0;
-		// FIXME: shouldn't it be range=1 ??
+		unit->Command.Data.Move.Range=2;
+		unit->Command.Data.Move.DX--;
+		unit->Command.Data.Move.DY--;
 		DebugCheck( unit->Command.Action!=UnitActionHarvest );
 		unit->SubAction=0;
 	    } else {
@@ -278,27 +274,17 @@ local int ChopWood(Unit* unit)
 		unit->SubAction=0;
 	    } else {
 		ResetPath(unit->Orders[0]);
-		unit->Orders[0].RangeX=1;
-		unit->Orders[0].RangeY=1;
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
 		unit->Orders[0].Goal=destu;
+		RefsDebugCheck( !destu->Refs );
 		destu->Refs++;
-#if 1
-		// Fast movement need this??
-		NearestOfUnit(destu,unit->X,unit->Y
-			,&unit->Orders[0].X
-			,&unit->Orders[0].Y);
-#else
-		unit->Orders[0].X=destu->X;
-		unit->Orders[0].Y=destu->Y;
-#endif
+		unit->Orders[0].X=-1;
+		unit->Orders[0].Y=-1;
 		DebugLevel3Fn("Return to %Zd=%d,%d\n"
-			    ,UnitNumber(destu)
-			    ,unit->Orders[0].Data.Move.DX
-			    ,unit->Orders[0].Data.Move.DY);
+			,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
 		DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
 		return 1;
 	    }
-
 #else
 	    MapRemoveWood(unit->Command.Data.Move.DX
 		,unit->Command.Data.Move.DY);
@@ -315,24 +301,17 @@ local int ChopWood(Unit* unit)
 		ResetPath(unit->Command);
 		unit->Command.Data.Move.Range=1;
 		unit->Command.Data.Move.Goal=destu;
+		RefsDebugCheck( !destu->Refs );
 		destu->Refs++;
-#if 1
-		// Fast movement need this??
-		NearestOfUnit(destu,unit->X,unit->Y
-			,&unit->Command.Data.Move.DX
-			,&unit->Command.Data.Move.DY);
-#else
-		unit->Command.Data.Move.DX=destu->X;
-		unit->Command.Data.Move.DY=destu->Y;
-#endif
+		unit->Command.Data.Move.DX=-1;
+		unit->Command.Data.Move.DY=-1;
 		DebugLevel3Fn("Return to %Zd=%d,%d\n"
-			    ,UnitNumber(destu)
-			    ,unit->Command.Data.Move.DX
-			    ,unit->Command.Data.Move.DY);
+			,UnitNumber(destu)
+			,unit->Command.Data.Move.DX
+			,unit->Command.Data.Move.DY);
 		DebugCheck( unit->Command.Action!=UnitActionHarvest );
 		return 1;
 	    }
-
 #endif
 	}
     }
@@ -341,109 +320,120 @@ local int ChopWood(Unit* unit)
 
 /**
 **	Return with the wood.
-**	Return TRUE if reached, otherwise FALSE.
+**
+**	@param unit	unit pointer.
+**
+**	@return		TRUE if reached, otherwise FALSE.
 */
 local int ReturnWithWood(Unit* unit)
 {
-    int x;
-    int y;
     Unit* destu;
+    int i;
 
-    if( HandleActionMove(unit)>=0 ) {	// reached end-point?
+    if( (i=HandleActionMove(unit))>=0 ) {	// reached end-point?
 	return 0;
     }
 
     DebugCheck( unit->Wait!=1 );
 
 #ifdef NEW_ORDERS
+
     destu=unit->Orders[0].Goal;
 
-    //
-    //	Target is dead, stop harvest
-    //
-    if( destu ) {
-	if( destu->Destroyed ) {
-	    DebugLevel0Fn("Destroyed unit\n");
-	    RefsDebugCheck( !destu->Refs );
-	    if( !--destu->Refs ) {
-		ReleaseUnit(destu);
-	    }
-	    unit->Orders[0].Goal=NoUnitP;
-	    // FIXME: perhaps I should choose an alternative
-	    unit->Orders[0].Action=UnitActionStill;
-	    return 0;
-	} else if( destu->Removed || !destu->HP
-		|| destu->Orders[0].Action==UnitActionDie ) {
-	    RefsDebugCheck( !destu->Refs );
-	    --destu->Refs;
-	    RefsDebugCheck( !destu->Refs );
-	    unit->Orders[0].Goal=NoUnitP;
-	    // FIXME: perhaps I should choose an alternative
-	    unit->Orders[0].Action=UnitActionStill;
-	    return 0;
-	}
-	unit->Orders[0].Goal=NoUnitP;
-#else
-    destu=unit->Command.Data.Move.Goal;
+    DebugCheck( !destu );
 
     //
     //	Target is dead, stop harvest
     //
-    if( destu ) {
-	if( destu->Destroyed ) {
-	    DebugLevel0Fn("Destroyed unit\n");
-	    RefsDebugCheck( !destu->Refs );
-	    if( !--destu->Refs ) {
-		ReleaseUnit(destu);
-	    }
-	    unit->Command.Data.Move.Goal=NoUnitP;
-	    // FIXME: perhaps I should choose an alternative
-	    unit->Command.Action=UnitActionStill;
-	    return 0;
-	} else if( destu->Removed || !destu->HP
-		    || destu->Command.Action==UnitActionDie ) {
-	    RefsDebugCheck( !destu->Refs );
-	    --destu->Refs;
-	    RefsDebugCheck( !destu->Refs );
-	    unit->Command.Data.Move.Goal=NoUnitP;
-	    // FIXME: perhaps I should choose an alternative
-	    unit->Command.Action=UnitActionStill;
-	    return 0;
+    if( destu->Destroyed ) {
+	DebugLevel0Fn("Destroyed unit\n");
+	RefsDebugCheck( !destu->Refs );
+	if( !--destu->Refs ) {
+	    ReleaseUnit(destu);
 	}
-	unit->Command.Data.Move.Goal=NoUnitP;
-#endif
+	unit->Orders[0].Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    } else if( destu->Removed || !destu->HP
+	    || destu->Orders[0].Action==UnitActionDie ) {
 	RefsDebugCheck( !destu->Refs );
 	--destu->Refs;
 	RefsDebugCheck( !destu->Refs );
+	unit->Orders[0].Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
     }
+    unit->Orders[0].Goal=NoUnitP;
 
-#ifdef NEW_ORDERS
-    x=unit->Orders[0].X;
-    y=unit->Orders[0].Y;
-#else
-    x=unit->Command.Data.Move.DX;
-    y=unit->Command.Data.Move.DY;
-#endif
-    destu=WoodDepositOnMap(x,y);
+    RefsDebugCheck( !destu->Refs );
+    --destu->Refs;
+    RefsDebugCheck( !destu->Refs );
 
-    // FIXME: could use the return value of the pathfinder
-    if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
-      DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
+    if( i==PF_UNREACHABLE ) {
+	// FIXME: could try another depot, or retry later.
+	DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
 		  ,UnitNumber(destu),x,y
 		  ,MapDistanceToUnit(unit->X,unit->Y,destu));
-#ifdef NEW_ORDERS
 	unit->Orders[0].Action=UnitActionStill;
-#else
-	unit->Command.Action=UnitActionStill;
-#endif
 	unit->SubAction=0;
 	return 0;
     }
 
-#ifdef NEW_ORDERS
     unit->Orders[0].Action=UnitActionHarvest;
+
 #else
+
+    destu=unit->Command.Data.Move.Goal;
+
+    DebugCheck( !destu );
+
+    //
+    //	Target is dead, stop harvest
+    //
+    if( destu->Destroyed ) {
+	DebugLevel0Fn("Destroyed unit\n");
+	RefsDebugCheck( !destu->Refs );
+	if( !--destu->Refs ) {
+	    ReleaseUnit(destu);
+	}
+	unit->Command.Data.Move.Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    } else if( destu->Removed || !destu->HP
+		|| destu->Command.Action==UnitActionDie ) {
+	RefsDebugCheck( !destu->Refs );
+	--destu->Refs;
+	RefsDebugCheck( !destu->Refs );
+	unit->Command.Data.Move.Goal=NoUnitP;
+	// FIXME: perhaps we should choose an alternative
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+    unit->Command.Data.Move.Goal=NoUnitP;
+
+    RefsDebugCheck( !destu->Refs );
+    --destu->Refs;
+    RefsDebugCheck( !destu->Refs );
+
+    if( i==PF_UNREACHABLE ) {
+	// FIXME: could try another depot, or retry later.
+	DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
+		  ,UnitNumber(destu),destu->X,destu->Y
+		  ,MapDistanceToUnit(unit->X,unit->Y,destu));
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+
     unit->Command.Action=UnitActionHarvest;
+
 #endif
 
     RemoveUnit(unit);
@@ -463,8 +453,7 @@ local int ReturnWithWood(Unit* unit)
     } else if( unit->Type==UnitTypeHumanWorkerWithWood ) {
 	unit->Type=UnitTypeHumanWorker;
     } else {
-	DebugLevel0Fn("Wrong unit for returning wood %d\n"
-	    ,unit->Type->Type);
+	DebugLevel0Fn("Wrong unit for returning wood %d\n",unit->Type->Type);
     }
 
     if( WAIT_FOR_WOOD<MAX_UNIT_WAIT ) {
@@ -477,8 +466,10 @@ local int ReturnWithWood(Unit* unit)
     return 1;
 }
 
-/*
+/**
 **	Wait in wood deposit.
+**
+**	@param unit	Pointer to worker unit.
 */
 local int WaitInWoodDeposit(Unit* unit)
 {
@@ -502,7 +493,7 @@ local int WaitInWoodDeposit(Unit* unit)
 	unit->Orders[0].Action=UnitActionHarvest;
 	ResetPath(unit->Orders[0]);
 	unit->Orders[0].Goal=NoUnitP;
-	unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
 	// FIXME: works this? where store I the return point?
 
         CheckUnitToBeDrawn(unit);
@@ -521,7 +512,7 @@ local int WaitInWoodDeposit(Unit* unit)
 	unit->Command.Action=UnitActionHarvest;
 	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=NoUnitP;
-	unit->Command.Data.Move.Range=0;
+	unit->Command.Data.Move.Range=1;
 	unit->Command.Data.Move.DX=unit->Command.Data.Move.SX;
 	unit->Command.Data.Move.DY=unit->Command.Data.Move.SY;
 
@@ -542,13 +533,17 @@ local int WaitInWoodDeposit(Unit* unit)
     return 0;
 }
 
-/*
+/**
 **	Unit Harvest:
 **		Move into forest.
 **		Chop the tree.
 **		Return to wood store.
 **		Deliver wood.
 **		Restart from beginning.
+**
+**	FIXME: we should write a generic resource function
+**
+**	@param unit	Pointer to worker unit.
 */
 global void HandleActionHarvest(Unit* unit)
 {
