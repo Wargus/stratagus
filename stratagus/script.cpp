@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "iolib.h" 
+#include "iolib.h"
 
 #ifdef USE_CCL
 
@@ -48,7 +48,7 @@
 #include "ccl_sound.h"
 #include "ccl.h"
 #include "font.h"
-#include "pathfinder.h" 
+#include "pathfinder.h"
 
 #include <guile/gh.h>			// I use guile for a quick hack
 
@@ -81,7 +81,7 @@ extern void sgtk_init_gtk_gdk_glue();
 #include "ccl_sound.h"
 #include "ui.h"
 #include "font.h"
-#include "pathfinder.h" 
+#include "pathfinder.h"
 #include "ai.h"
 
 #endif // USE_CCL2
@@ -185,6 +185,30 @@ local SCM CclShowHealthDot(void)
 }
 
 /**
+**	Enable display health as horizontal bar.
+*/
+local SCM CclShowHealthHorizontal(void)
+{
+    ShowHealthBar=1;
+    ShowHealthDot=0;
+    ShowHealthHorizontal=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display health as vertical bar.
+*/
+local SCM CclShowHealthVertical(void)
+{
+    ShowHealthBar=1;
+    ShowHealthDot=0;
+    ShowHealthHorizontal=0;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Enable display mana as mana-bar.
 */
 local SCM CclShowManaBar(void)
@@ -212,6 +236,30 @@ local SCM CclShowManaDot(void)
 local SCM CclShowFull(void)
 {
     ShowNoFull=0;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display mana as horizontal bar.
+*/
+local SCM CclShowManaHorizontal(void)
+{
+    ShowManaBar=1;
+    ShowManaDot=0;
+    ShowManaHorizontal=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable display mana as vertical bar.
+*/
+local SCM CclShowManaVertical(void)
+{
+    ShowManaBar=1;
+    ShowManaDot=0;
+    ShowManaHorizontal=0;
 
     return SCM_UNSPECIFIED;
 }
@@ -769,7 +817,7 @@ local void gh_main_prog(int argc,char* argv[])
     gh_new_procedureN("missile-type",CclMissileType);
 
     MapCclRegister();
-    PathfinderCclRegister(); 
+    PathfinderCclRegister();
     UnitButtonCclRegister();
     UnitTypeCclRegister();
     SoundCclRegister();
@@ -854,6 +902,13 @@ global void CclInit(void)
 
     init_subr_0("show-health-bar",CclShowHealthBar);
     init_subr_0("show-health-dot",CclShowHealthDot);
+// adicionado por protoman
+    init_subr_0("show-health-vertical",CclShowHealthVertical);
+    init_subr_0("show-health-horizontal",CclShowHealthHorizontal);
+    init_subr_0("show-mana-vertical",CclShowManaVertical);
+    init_subr_0("show-mana-horizontal",CclShowManaHorizontal);
+// fim
+
     init_subr_0("show-mana-bar",CclShowManaBar);
     init_subr_0("show-mana-dot",CclShowManaDot);
     init_subr_0("show-full",CclShowFull);
@@ -879,7 +934,7 @@ global void CclInit(void)
     init_lsubr("missile-type",CclMissileType);
 
     MapCclRegister();
-    PathfinderCclRegister(); 
+    PathfinderCclRegister();
     UnitButtonCclRegister();
     UnitTypeCclRegister();
     UpgradesCclRegister();
