@@ -1,9 +1,8 @@
-#include <string.h>
 #include <stdlib.h>
 #include "etlib/generic.h"
-//#include "etlib/xmalloc.h"
+#include "etlib/xmalloc.h"
 #include "etlib/hash.h"
-#include "stdlib.h"
+
 /*
     Mixture of hash table and binary tree.
 
@@ -121,7 +120,6 @@ _hash_get(u8 *id, void *tab, int size, int usize)
 	ss = i < 0 ? &s->left : &s->right;
     }
 
-//    *ss = s = xmalloc(sizeof(*s) + usize + strlen(id));
     *ss = s = malloc(sizeof(*s) + usize + strlen(id));
 
     s->left = 0;
@@ -131,6 +129,52 @@ _hash_get(u8 *id, void *tab, int size, int usize)
     strcpy(s->misc + usize + 1, id);
 
     return s->misc;
+}
+
+/*
+    Delete a symbol.
+*/
+
+void
+_hash_del(u8 *id, void *tab, int size, int usize)
+{
+    struct symbol *s, **ss;
+    u32 h;
+    int i;
+
+    h = hash(id);
+    ss = &((struct symbol **)tab)[h % size];
+
+    while ( (s = *ss) )
+    {
+	i = (u8)h - s->misc[usize];
+	if (i == 0)
+	{
+	    i = strcmp(id, s->misc + usize + 1);
+	    if (i == 0)
+	    {
+		/* found, now remove it */
+		if (s->left == 0)
+		    *ss = s->right;
+		else if (s->right == 0)
+		    *ss = s->left;
+		else
+		{
+		    struct symbol *t, **tt;
+
+		    for (tt = &s->right; (t = *tt)->left; tt = &t->left)
+			;
+		    *tt = t->right;
+		    t->left = s->left;
+		    t->right = s->right;
+		    *ss = t;
+		}
+		free(s);
+		return;
+	    }
+	}
+	ss = i < 0 ? &s->left : &s->right;
+    }
 }
 
 
@@ -146,6 +190,11 @@ _stat(int depth, struct symbol *s, struct hash_st *st)
 	st->middepth += depth;
 	depth++;
 	_stat(depth, s->left, st);
+    #if 0
+	printf("<%s>\t", s->misc+5);
+	if (s->left) printf("<%s>\t", s->left->misc+5); else printf(".\t");
+	if (s->right) printf("<%s>\n", s->right->misc+5); else printf(".\n");
+    #endif
 	s = s->right;
     }
 }
@@ -184,17 +233,29 @@ _hash_stat(void *tab, int size, struct hash_st *st)
     100003
 */
 
-hashtable(int, 97) pseudoop;
+//hashtable(int, 97) pseudoop;
+hashtable(int, 1) pseudoop;
 
 main()
 {
     struct hash_st st;
     u8 buf[256];
 
+#if 1
+    hash_add(pseudoop, "0");
+    hash_add(pseudoop, "5");
+    hash_add(pseudoop, "1");
+    hash_add(pseudoop, "6");
+
+    hash_stat(pseudoop, &st);	printf("-----------\n");
+    hash_del(pseudoop, "5");
+
+#else
     while (gets(buf))
 	if (buf[0])
-	    hash_get(pseudoop, buf);
-    hash_stat(testtable, &st);
+	    hash_add(pseudoop, buf);
+#endif
+    hash_stat(pseudoop, &st);
     printf("nelem   : %d\n", st.nelem);
     printf("hashsize: %d\n", st.hashsize);
     printf("maxdepth: %d\n", st.maxdepth);
