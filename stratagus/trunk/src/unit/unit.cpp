@@ -1028,9 +1028,9 @@ global void RescueUnits(void)
 		// FIXME: could be done faster?
 #endif
 		n=SelectUnits(
-			unit->X-1,unit->Y-1,
-			unit->X+unit->Type->TileWidth+1,
-			unit->Y+unit->Type->TileHeight+1,near);
+			unit->X-2,unit->Y-2,
+			unit->X+unit->Type->TileWidth+2,
+			unit->Y+unit->Type->TileHeight+2,near);
 		//
 		//	Look if human near the unit.
 		//
