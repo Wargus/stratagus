@@ -40,6 +40,7 @@
 #include "interface.h"
 #include "map.h"
 #include "ui.h"
+#include "menus.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -170,14 +171,16 @@ global void LoadUserInterface(void)
 	if( TheUI.Filler[i].File ) {
 	    TheUI.Filler[i].Graphic=LoadGraphic(TheUI.Filler[i].File);
 #ifdef USE_OPENGL
-	    MakeTexture(TheUI.Filler[i].Graphic,TheUI.Filler[i].Graphic->Width,TheUI.Filler[i].Graphic->Height);
+	    MakeTexture(TheUI.Filler[i].Graphic,TheUI.Filler[i].Graphic->Width,
+		    TheUI.Filler[i].Graphic->Height);
 #endif
 	}
     }
     if( TheUI.Resource.File ) {
 	TheUI.Resource.Graphic=LoadGraphic(TheUI.Resource.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.Resource.Graphic,TheUI.Resource.Graphic->Width,TheUI.Resource.Graphic->Height);
+	MakeTexture(TheUI.Resource.Graphic,TheUI.Resource.Graphic->Width,
+		TheUI.Resource.Graphic->Height);
 #endif
     }
 
@@ -187,7 +190,9 @@ global void LoadUserInterface(void)
 	    TheUI.Resources[i].Icon.Graphic
 		    =LoadGraphic(TheUI.Resources[i].Icon.File);
 #ifdef USE_OPENGL
-	    MakeTexture(TheUI.Resources[i].Icon.Graphic,TheUI.Resources[i].Icon.Graphic->Width,TheUI.Resources[i].Icon.Graphic->Height);
+	    MakeTexture(TheUI.Resources[i].Icon.Graphic,
+		    TheUI.Resources[i].Icon.Graphic->Width,
+		    TheUI.Resources[i].Icon.Graphic->Height);
 #endif
 	}
     }
@@ -196,45 +201,57 @@ global void LoadUserInterface(void)
     if( TheUI.Resources[FoodCost].Icon.File ) {
 	TheUI.Resources[FoodCost].Icon.Graphic=LoadGraphic(TheUI.Resources[FoodCost].Icon.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.Resources[FoodCost].Icon.Graphic,TheUI.Resources[FoodCost].Icon.Graphic->Width,TheUI.Resources[FoodCost].Icon.Graphic->Height);
+	MakeTexture(TheUI.Resources[FoodCost].Icon.Graphic,
+		TheUI.Resources[FoodCost].Icon.Graphic->Width,
+		TheUI.Resources[FoodCost].Icon.Graphic->Height);
 #endif
     }
     // FIXME: reuse same graphics?
     if( TheUI.Resources[ScoreCost].Icon.File ) {
 	TheUI.Resources[ScoreCost].Icon.Graphic=LoadGraphic(TheUI.Resources[ScoreCost].Icon.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.Resources[ScoreCost].Icon.Graphic,TheUI.Resources[ScoreCost].Icon.Graphic->Width,TheUI.Resources[ScoreCost].Icon.Graphic->Height);
+	MakeTexture(TheUI.Resources[ScoreCost].Icon.Graphic,
+		TheUI.Resources[ScoreCost].Icon.Graphic->Width,
+		TheUI.Resources[ScoreCost].Icon.Graphic->Height);
 #endif
     }
 
     if( TheUI.InfoPanel.File ) {
 	TheUI.InfoPanel.Graphic=LoadGraphic(TheUI.InfoPanel.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.InfoPanel.Graphic,TheUI.InfoPanel.Graphic->Width,TheUI.InfoPanel.Graphic->Height);
+	MakeTexture(TheUI.InfoPanel.Graphic,
+		TheUI.InfoPanel.Graphic->Width,
+		TheUI.InfoPanel.Graphic->Height);
 #endif
     }
     if( TheUI.ButtonPanel.File ) {
 	TheUI.ButtonPanel.Graphic=LoadGraphic(TheUI.ButtonPanel.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.ButtonPanel.Graphic,TheUI.ButtonPanel.Graphic->Width,TheUI.ButtonPanel.Graphic->Height);
+	MakeTexture(TheUI.ButtonPanel.Graphic,
+		TheUI.ButtonPanel.Graphic->Width,
+		TheUI.ButtonPanel.Graphic->Height);
 #endif
     }
-    if( TheUI.MenuButton.File ) {
-	TheUI.MenuButton.Graphic=LoadGraphic(TheUI.MenuButton.File);
+    if( TheUI.MenuButtonGraphic.File ) {
+	TheUI.MenuButtonGraphic.Graphic=LoadGraphic(TheUI.MenuButtonGraphic.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.MenuButton.Graphic,TheUI.MenuButton.Graphic->Width,TheUI.MenuButton.Graphic->Height);
+	MakeTexture(TheUI.MenuButtonGraphic.Graphic,
+		TheUI.MenuButtonGraphic.Graphic->Width,
+		TheUI.MenuButtonGraphic.Graphic->Height);
 #endif
     }
     if( TheUI.Minimap.File ) {
 	TheUI.Minimap.Graphic=LoadGraphic(TheUI.Minimap.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.Minimap.Graphic,TheUI.Minimap.Graphic->Width,TheUI.Minimap.Graphic->Height);
+	MakeTexture(TheUI.Minimap.Graphic,TheUI.Minimap.Graphic->Width,
+		TheUI.Minimap.Graphic->Height);
 #endif
     }
     if( TheUI.StatusLine.File ) {
 	TheUI.StatusLine.Graphic=LoadGraphic(TheUI.StatusLine.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.StatusLine.Graphic,TheUI.StatusLine.Graphic->Width,TheUI.StatusLine.Graphic->Height);
+	MakeTexture(TheUI.StatusLine.Graphic,TheUI.StatusLine.Graphic->Width,
+		TheUI.StatusLine.Graphic->Height);
 #endif
     }
 
@@ -338,7 +355,8 @@ local void SaveUi(FILE* file,const UI* ui)
 
     fprintf(file,"  ; Menu button background\n");
     fprintf(file,"  (list \"%s\" %d %d)\n",
-	    ui->MenuButton.File,ui->MenuButtonX,ui->MenuButtonY);
+	    ui->MenuButtonGraphic.File,ui->MenuButtonGraphicX,
+	    ui->MenuButtonGraphicY);
 
     fprintf(file,"  ; Minimap background\n");
     fprintf(file,"  (list \"%s\" %d %d)\n",
@@ -348,21 +366,62 @@ local void SaveUi(FILE* file,const UI* ui)
     fprintf(file,"  (list \"%s\" %d %d)\n",
 	    ui->StatusLine.File,ui->StatusLineX,ui->StatusLineY);
 
-    fprintf(file,"  ; Buttons\n");
-    for( i=0; i<MaxButtons; ++i ) {
-	fprintf(file,"  (list %3d %3d %4d %3d)\n",
-		ui->Buttons[i].X,ui->Buttons[i].Y,
-		ui->Buttons[i].Width,ui->Buttons[i].Height);
-    }
+    fprintf(file,"\n  'menu-button '(");
+    fprintf(file,"\n    pos (%d %d)",
+	    ui->MenuButton.X,ui->MenuButton.Y);
+    fprintf(file,"\n    size (%d %d)",
+	    ui->MenuButton.Width,ui->MenuButton.Height);
+    fprintf(file,"\n    caption \"%s\"",
+	    ui->MenuButton.Text);
+    fprintf(file,"\n    style %s",
+	    MenuButtonStyle(ui->MenuButton.Button));
+    fprintf(file,")");
 
-    fprintf(file,"  ; Buttons II\n");
-    for( i=0; i<6; ++i ) {
-	fprintf(file,"  (list %3d %3d %4d %3d)\n",
-		ui->Buttons2[i].X,ui->Buttons2[i].Y,
-		ui->Buttons2[i].Width,ui->Buttons2[i].Height);
-    }
+    fprintf(file,"\n  'network-menu-button '(");
+    fprintf(file,"\n    pos (%d %d)",
+	    ui->NetworkMenuButton.X,ui->NetworkMenuButton.Y);
+    fprintf(file,"\n    size (%d %d)",
+	    ui->NetworkMenuButton.Width,ui->NetworkMenuButton.Height);
+    fprintf(file,"\n    caption \"%s\"",
+	    ui->NetworkMenuButton.Text);
+    fprintf(file,"\n    style %s",
+	    MenuButtonStyle(ui->NetworkMenuButton.Button));
+    fprintf(file,")");
 
-    fprintf(file,"\n  'cursors '(");
+    fprintf(file,"\n  'network-diplomacy-button '(");
+    fprintf(file,"\n    pos (%d %d)",
+	    ui->NetworkDiplomacyButton.X,ui->NetworkDiplomacyButton.Y);
+    fprintf(file,"\n    size (%d %d)",
+	    ui->NetworkDiplomacyButton.Width,ui->NetworkDiplomacyButton.Height);
+    fprintf(file,"\n    caption \"%s\"",
+	    ui->NetworkDiplomacyButton.Text);
+    fprintf(file,"\n    style %s",
+	    MenuButtonStyle(ui->NetworkDiplomacyButton.Button));
+    fprintf(file,")");
+
+    fprintf(file,"\n\n  'info-buttons '(");
+    for( i=0; i<ui->NumInfoButtons; ++i ) {
+	fprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
+		ui->InfoButtons[i].X,ui->InfoButtons[i].Y,
+		ui->InfoButtons[i].Width,ui->InfoButtons[i].Height);
+    }
+    fprintf(file,")");
+    fprintf(file,"\n  'training-buttons '(");
+    for( i=0; i<ui->NumTrainingButtons; ++i ) {
+	fprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
+		ui->TrainingButtons[i].X,ui->TrainingButtons[i].Y,
+		ui->TrainingButtons[i].Width,ui->TrainingButtons[i].Height);
+    }
+    fprintf(file,")");
+    fprintf(file,"\n  'button-buttons '(");
+    for( i=0; i<ui->NumButtonButtons; ++i ) {
+	fprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
+		ui->ButtonButtons[i].X,ui->ButtonButtons[i].Y,
+		ui->ButtonButtons[i].Width,ui->ButtonButtons[i].Height);
+    }
+    fprintf(file,")");
+
+    fprintf(file,"\n\n  'cursors '(");
     fprintf(file,"\n    point %s", ui->Point.Name);
     fprintf(file,"\n    glass %s", ui->Glass.Name);
     fprintf(file,"\n    cross %s", ui->Cross.Name);
@@ -476,7 +535,7 @@ global void CleanUserInterface(void)
 
     VideoSaveFree(TheUI.InfoPanel.Graphic);
     VideoSaveFree(TheUI.ButtonPanel.Graphic);
-    VideoSaveFree(TheUI.MenuButton.Graphic);
+    VideoSaveFree(TheUI.MenuButtonGraphic.Graphic);
     VideoSaveFree(TheUI.Minimap.Graphic);
     VideoSaveFree(TheUI.StatusLine.Graphic);
 
