@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit.c		-	The units. */
+/**@name unit.c - The units. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -739,11 +739,11 @@ global void RemoveUnit(Unit* unit, Unit* host)
 }
 
 /**
-**		Update informations for lost units.
+**  Update information for lost units.
 **
-**		@param unit		Pointer to unit.
+**  @param unit  Pointer to unit.
 **
-**		@note Also called by ChangeUnitOwner
+**  @note Also called by ChangeUnitOwner
 */
 global void UnitLost(Unit* unit)
 {
@@ -755,10 +755,10 @@ global void UnitLost(Unit* unit)
 	DebugCheck(!unit);
 
 	player = unit->Player;
-	DebugCheck(!player);				// Next code didn't support no player!
+	DebugCheck(!player);  // Next code didn't support no player!
 
 	//
-	//		Call back to AI, for killed or lost units.
+	//  Call back to AI, for killed or lost units.
 	//
 	if (player && player->AiEnabled) {
 		AiUnitKilled(unit);
@@ -772,7 +772,7 @@ global void UnitLost(Unit* unit)
 	}
 
 	//
-	//		Remove the unit from the player's units table.
+	//  Remove the unit from the player's units table.
 	//
 	type = unit->Type;
 	if (player && !type->Vanishes) {
@@ -796,21 +796,21 @@ global void UnitLost(Unit* unit)
 
 
 	//
-	//		Handle unit demand. (Currently only food supported.)
+	//  Handle unit demand. (Currently only food supported.)
 	//
 	if (type->Demand) {
 		player->Demand -= type->Demand;
 		if (player == ThisPlayer) {
-			MustRedraw |= RedrawResources;		// update food
+			MustRedraw |= RedrawResources;  // update food
 			// FIXME: MustRedraw |= RedrawFood;
 		}
 	}
 
 	//
-	//		Update informations.
+	//  Update information.
 	//
 	if (unit->Orders[0].Action != UnitActionBuilded) {
-		if (type->Supply) {						// supply
+		if (type->Supply) {
 			player->Supply -= type->Supply;
 			if (player == ThisPlayer) {
 				MustRedraw |= RedrawResources;
@@ -819,12 +819,12 @@ global void UnitLost(Unit* unit)
 		}
 
 		//
-		//		Handle income improvements, look if a player looses a building
-		//		which have given him a better income, find the next lesser
-		//		income.
+		//  Handle income improvements, look if a player loses a building
+		//  which have given him a better income, find the next best
+		//  income.
 		//
 		for (i = 1; i < MaxCosts; ++i) {
-			if (type->ImproveIncomes[i] == player->Incomes[i]) {
+			if (player->Incomes[i] && type->ImproveIncomes[i] == player->Incomes[i]) {
 				int m;
 				int j;
 
@@ -834,7 +834,7 @@ global void UnitLost(Unit* unit)
 						m = player->Units[j]->Type->ImproveIncomes[i];
 					}
 				}
-				player->Incomes[WoodCost] = m;
+				player->Incomes[i] = m;
 				if (player == ThisPlayer) {
 					MustRedraw |= RedrawInfoPanel;
 				}
@@ -843,7 +843,7 @@ global void UnitLost(Unit* unit)
 	}
 
 	//
-	//		Handle research cancels.
+	//  Handle research cancels.
 	//
 	if (unit->Orders[0].Action == UnitActionResearch) {
 		unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade - Upgrades] = 0;
@@ -851,9 +851,9 @@ global void UnitLost(Unit* unit)
 
 	DebugLevel0Fn("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));
 
-	//		Destroy resource-platform, must re-make resource patch.
+	// Destroy resource-platform, must re-make resource patch.
 	if (type->MustBuildOnTop && unit->Value > 0) {
-		temp = MakeUnitAndPlace(unit->X, unit->Y, type->MustBuildOnTop, &Players[15]);
+		temp = MakeUnitAndPlace(unit->X, unit->Y, type->MustBuildOnTop, &Players[PlayerMax - 1]);
 		temp->Value = unit->Value;
 	}
 	DebugCheck(player->NumBuildings > UnitMax);
@@ -862,14 +862,16 @@ global void UnitLost(Unit* unit)
 }
 
 /**
-**		FIXME: Docu
+**  FIXME: Docu
+**
+**  @param unit  FIXME: docu
 */
 global void UnitClearOrders(Unit *unit)
 {
 	int i;
 
 	//
-	//		Release all references of the unit.
+	//  Release all references of the unit.
 	//
 	for (i = unit->OrderCount; i-- > 0;) {
 		if (unit->Orders[i].Goal) {
@@ -2424,10 +2426,10 @@ global Unit* FindResource(const Unit* unit, int x, int y, int range, int resourc
 				//		Look if there is a mine
 				//
 				if ((mine = ResourceOnMap(x, y, resource)) &&
-						(mine->Type->CanHarvest) &&
-						((mine->Player->Player == PlayerMax - 1)||
-						(mine->Player == unit->Player)||
-						(IsAllied(unit->Player, mine)))) {
+						mine->Type->CanHarvest &&
+						(mine->Player->Player == PlayerMax - 1 ||
+							mine->Player == unit->Player ||
+							IsAllied(unit->Player, mine))) {
 					if (destu) {
 						n = max(abs(destx - x), abs(desty - y));
 						if (n < bestd) {
@@ -2904,7 +2906,11 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	unsigned long lastattack;
 
 	if (!damage) {						// Can now happen by splash damage
-		DebugLevel0Fn("Warning no damage, try to fix by caller?\n");
+#ifdef DEBUG
+		if (!GodMode) {
+			DebugLevel0Fn("Warning no damage, try to fix by caller?\n");
+		}
+#endif
 		return;
 	}
 
