@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name game.c		-	The game set-up and creation. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer, Andreas Arens
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer, Andreas Arens
+//
+//	$Id$
 
 //@{
 
@@ -70,7 +69,7 @@ global int lcm_prevent_recurse = 0;	/// prevent recursion through LoadGameMap
 */
 local void LoadCloneMap(const char* filename,WorldMap* map)
 {
-    DebugLevel3(__FUNCTION__" %p \n",map);
+    DebugLevel3Fn("%p \n",map);
 
 #if defined(USE_CCL) || defined(USE_CCL2)
     if (lcm_prevent_recurse) {

@@ -9,11 +9,12 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ai.c           -       The computer player AI main file. */
-/*
-**      (c) Copyright 1998-2000 by Lutz Sammer
-**
-**      $Id$
-*/
+//
+//      (c) Copyright 1998-2001 by Lutz Sammer
+//
+//      $Id$
+
+//@{
 
 #ifndef NEW_AI	// {
 
@@ -433,19 +434,19 @@ local int AiNeedResources(const UnitType* type)
         {
         if(err&(1<<GoldCost))
            {
-           DebugLevel3(__FUNCTION__": %Zd Need gold\n"
+           DebugLevel3Fn("%Zd Need gold\n"
 		    ,AiPlayer->Player-Players);
            AiPlayer->NeedGold=1;
 	   }
         if(err&(1<<WoodCost))
            {
-           DebugLevel3(__FUNCTION__": %Zd Need wood\n"
+           DebugLevel3Fn("%Zd Need wood\n"
 		    ,AiPlayer->Player-Players);
 	   AiPlayer->NeedWood=1;
 	   }
         if(err&(1<<OilCost))
            {
-           DebugLevel3(__FUNCTION__": %Zd Need oil\n"
+           DebugLevel3Fn("%Zd Need oil\n"
 		    ,AiPlayer->Player-Players);
 	   AiPlayer->NeedOil=1;
 	   }
@@ -589,11 +590,11 @@ global int AiNearHall(Unit* hall,Unit* worker,UnitType* type,int* dx,int *dy)
     int end, state, best_x, best_y, d, cost;
     Unit* goldmines[MAX_UNITS];
 
-    DebugLevel3(__FUNCTION__": hall %d %d,%d\n",UnitNumber(hall),
+    DebugLevel3Fn("hall %d %d,%d\n",UnitNumber(hall),
                     hall->X,hall->Y);
 
     if( !hall ) {			// No hall take units place.
-	DebugLevel3(__FUNCTION__": Called without hall\n");
+	DebugLevel3Fn("Called without hall\n");
 	*dx=worker->X;
 	*dy=worker->Y;
 	return 99998;
@@ -686,7 +687,7 @@ local int AiBuildHall(int type)
     int num_goldmine, g, best_w, best_g, best_x, best_y, cost;
     int x, y, d, num_worker, w;
 
-    DebugLevel3(__FUNCTION__":\n");
+    DebugLevel3Fn("\n");
 
     //  Find all available peon/peasants.
     num_worker=AiFindFreeWorkers(workers);
@@ -756,7 +757,7 @@ local int AiBuildBuilding(int type)
     {
     Unit* workers[MAX_UNITS];
     int num_worker,cost,best_w,best_x,best_y,x,y,d,w;
-    DebugLevel3(__FUNCTION__": (%d)\n",type);
+    DebugLevel3Fn("(%d)\n",type);
 
     //  Find all available peon/peasants.
     num_worker=AiFindFreeWorkers(workers);
@@ -791,7 +792,7 @@ local int AiBuildBuilding(int type)
         }
     if(cost!=99999)
         {
-	DebugLevel3(__FUNCTION__": at %d,%d\n",best_x,best_y);
+	DebugLevel3Fn("at %d,%d\n",best_x,best_y);
 	CommandBuildBuilding(workers[best_w],best_x,best_y,&UnitTypes[type],1);
 	AiMarkBuildUnitType(type);
 	return 0;
@@ -815,7 +816,7 @@ local int AiTrainCreature(int type)
     Unit* units[MAX_UNITS];
     int nunits;
     Player* player;
-    DebugLevel3(__FUNCTION__":\n");
+    DebugLevel3Fn("\n");
     if(type == AiChooseRace(UnitTypeHumanWorker->Type))
         {nunits = AiFindHalls(units);}
     else
@@ -852,12 +853,12 @@ local int AiTrainCreature(int type)
 local void AiMineGold(Unit* unit)
     {
     Unit* dest;
-    DebugLevel3(__FUNCTION__": %d\n",UnitNumber(unit));
+    DebugLevel3Fn("%d\n",UnitNumber(unit));
     dest=FindGoldMine(unit,unit->X,unit->Y);
     if(!dest)
         {
 	// FIXME: now not really, no goldmine.
-	DebugLevel0(__FUNCTION__": goldmine not reachable\n");
+	DebugLevel0Fn("goldmine not reachable\n");
 	//AiPlayer->NoGold=1;
 	return;
         }
@@ -871,7 +872,7 @@ local int AiHarvest(Unit* unit)
     {
     int x,y,addx,addy,i,n,r,wx,wy,bestx,besty,cost;
     Unit* dest;
-    DebugLevel3(__FUNCTION__": %d\n",UnitNumber(unit));
+    DebugLevel3Fn("%d\n",UnitNumber(unit));
     x=unit->X;
     y=unit->Y;
     addx=unit->Type->TileWidth;
@@ -958,13 +959,13 @@ local int AiHarvest(Unit* unit)
 	    }
 	if(cost!=99999)
             {
-	    DebugLevel3(__FUNCTION__": wood on %d,%d\n",x,y);
+	    DebugLevel3Fn("wood on %d,%d\n",x,y);
 	    CommandHarvest(unit,bestx,besty,1);
 	    return 1;
 	    }
 	++addy;
         }
-    DebugLevel0(__FUNCTION__": no wood on map\n");
+    DebugLevel0Fn("no wood on map\n");
     AiPlayer->NoWood=1;
     return 0;
     }
@@ -979,7 +980,7 @@ local void AiAssignWorker(void)
     int num_worker, num_gold, num_wood, num_repair, num_still;
     int action, type, w;
 
-    DebugLevel3(__FUNCTION__":\n");
+    DebugLevel3Fn("\n");
 
     //  Count workers
     num_worker=AiFindFreeWorkers(workers);
@@ -1295,7 +1296,7 @@ local int AiNeedBuilding(int type)
 */
 local int AiCommandBuild(int type,int number,int action)
     {
-    DebugLevel3(__FUNCTION__": %d, %d, %d\n",type,number,action);
+    DebugLevel3Fn("%d, %d, %d\n",type,number,action);
     if(number == 0) return 1;
     type = AiChooseRace(type);
     if(AiBuildingUnitType(type)) {return 0;} //already training
@@ -1378,7 +1379,7 @@ local void AiNextGoal(void)
         else
             {
 	    if( goal->Unit==-1 ) {
-		DebugLevel0(__FUNCTION__": Oops\n");
+		DebugLevel0Fn("Oops\n");
 		continue;
 	    }
             if(AiCommandBuild(goal->Unit,goal->Number,goal->Action))
@@ -1496,7 +1497,7 @@ global void AiEachFrame(Player* player)
     }
 
     AiPlayer=player->Ai;
-    DebugLevel3(__FUNCTION__": Player %d\n",player->Player);
+    DebugLevel3Fn("Player %d\n",player->Player);
     command = AiPlayer->Commands[AiPlayer->CmdIndex];
     if(AiPlayer->GoalHead->Next == 0)
         {
@@ -1521,7 +1522,7 @@ global void AiEachFrame(Player* player)
 */
 global void AiEachSecond(Player* player)
     {
-    DebugLevel3(__FUNCTION__": Player %d\n",player->Player);
+    DebugLevel3Fn("Player %d\n",player->Player);
     if( AiSleep ) {			// wait some time. FIXME: see above
 	return;
     }
@@ -1535,7 +1536,7 @@ global void AiEachSecond(Player* player)
 	  ForceAtHome[AiPlayer->CurrentHome].Archer))
     if(AiCommandAttack(UnitFootman,
 	ForceAttacking[AiPlayer->CurrentAttack].Footman,
-	  ForceAtHome[AiPlayer->CurrentHome].Footman)) 
+	  ForceAtHome[AiPlayer->CurrentHome].Footman))
 	    AiPlayer->CurrentAttack = 0;
     }
 
@@ -1551,7 +1552,7 @@ global void AiInit(Player* player)
     PlayerAi* aip;
     Unit* units[MAX_UNITS];
 
-    DebugLevel2(__FUNCTION__": Player %d\n",player->Player);
+    DebugLevel2Fn("Player %d\n",player->Player);
     player->Ai=aip=&Ais[player->Player];
     aip->Player=player;
 
@@ -1591,4 +1592,6 @@ global void AiInit(Player* player)
     }
 
 
-#endif 	// } NEW_AI
+#endif	// } NEW_AI
+
+//@}

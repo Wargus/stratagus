@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name console.c	-	The console overlay. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -38,7 +37,7 @@
 */
 global void DrawConsole(void)
 {
-    DebugLevel3(__FUNCTION__"\n");
+    DebugLevel3Fn("\n");
 }
 
 //@}

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name font.c		-	The color fonts. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -416,7 +415,7 @@ global int DrawText(int x,int y,unsigned font,const unsigned char* text)
 	if( *text=='~' ) {
 	    switch( *++text ) {
 		case '\0':		// wrong formated string.
-		    DebugLevel0(__FUNCTION__": oops, format your ~\n");
+		    DebugLevel0Fn("oops, format your ~\n");
 		    return widths;
 		case '~':
 		    break;
@@ -449,7 +448,7 @@ global int DrawText(int x,int y,unsigned font,const unsigned char* text)
 		    continue;
 
 		default:
-		    DebugLevel0(__FUNCTION__": oops, format your ~\n");
+		    DebugLevel0Fn("oops, format your ~\n");
 		    continue;
 	    }
 	}
@@ -468,7 +467,7 @@ global int DrawText(int x,int y,unsigned font,const unsigned char* text)
 
 /**
 **	Draw reverse text with font at x,y unclipped.
-**	
+**
 **	@see DrawText for full description.
 **
 **	@param x	X screen position
@@ -616,7 +615,7 @@ global void LoadFonts(void)
 	    break;
 
 	default:
-	    DebugLevel0(__FUNCTION__": unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("unsupported %d bpp\n",VideoDepth);
 	    abort();
     }
 }

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name pud.c		-	The pud. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -208,7 +207,7 @@ local void ConvertREGM(const unsigned short* regm,int width,int height
 	    if( v==MapActionIsland ) {	// island no transporter
 		// FIXME: don't know what todo here
 		//map->Fields[i].Flags|=MapFieldWall;
-		DebugLevel0(__FUNCTION__": %d,%d %d\n",w,h,v);
+		DebugLevel0Fn("%d,%d %d\n",w,h,v);
 		continue;
 	    }
 	    v&=~0xFF;			// low byte is region
@@ -1155,7 +1154,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			}
 			v = 1;
 			goto pawn;
-		    } 
+		    }
 	    } else {
 		    if (GameSettings.NumUnits == SettingsNumUnitsMapDefault ||
 			t == WC_UnitGoldMine || t == WC_UnitOilPatch) {

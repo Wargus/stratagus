@@ -10,7 +10,7 @@
 //
 /**@name linedraw.c	-	The general linedraw functions. */
 //
-//	(c) Copyright 2000 by Lutz Sammer
+//	(c) Copyright 2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -3112,7 +3112,7 @@ global void InitLineDraw(void)
 	    break;
 
 	default:
-	    DebugLevel0(__FUNCTION__": unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("unsupported %d bpp\n",VideoDepth);
 	    abort();
     }
 }

@@ -341,7 +341,7 @@ global unsigned UnitFieldFlags(const Unit* unit)
 	case UnitTypeNaval:		// on water
 	    return MapFieldSeaUnit;
 	default:
-	    DebugLevel1(__FUNCTION__": Were moves this unit?\n");
+	    DebugLevel1Fn("Were moves this unit?\n");
 	    return 0;
     }
 }
@@ -383,7 +383,7 @@ global int TypeMovementMask(const UnitType* type)
 		| MapFieldLandAllowed	// can't move on this
 		| MapFieldUnpassable;
 	default:
-	    DebugLevel1(__FUNCTION__": Were moves this unit?\n");
+	    DebugLevel1Fn("Were moves this unit?\n");
 	    return 0;
     }
 }

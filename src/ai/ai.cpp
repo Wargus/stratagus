@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name new_ai.c	-	The new computer player AI main file. */
-/*
-**      (c) Copyright 2000 by Lutz Sammer
-**
-**      $Id$
-*/
+//
+//      (c) Copyright 2000,2001 by Lutz Sammer
+//
+//      $Id$
 
 #ifdef NEW_AI	// {
 
@@ -67,7 +66,7 @@ global void AiInit(Player* player)
 */
 global void AiHelpMe(Unit* unit)
 {
-    DebugLevel0(__FUNCTION__": %d %d",unit->X,unit->Y);
+    DebugLevel0Fn("%d %d",unit->X,unit->Y);
 }
 
 /**

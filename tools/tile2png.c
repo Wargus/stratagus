@@ -10,7 +10,7 @@
 //
 //	tile2png.c	-	Convert tileset files to png files.
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -52,7 +52,7 @@ int Map2Tile[0x9E0];
 int Img2Tile[0x9E0];
 int NumTiles;
 
-/*
+/**
 **	Count used mega tiles for map.
 */
 void CountUsedTiles(const unsigned char* map,const unsigned char* mega)
@@ -62,7 +62,7 @@ void CountUsedTiles(const unsigned char* map,const unsigned char* mega)
     int used;
     const char* tp;
 
-    DebugLevel1("%s:\n",__FUNCTION__);
+    DebugLevel1Fn("\n");
     memset(Map2Tile,0,sizeof(Map2Tile));
 
     //
@@ -125,7 +125,7 @@ void DecodeMiniTile(unsigned char* image,int ix,int iy,int iadd
     int x;
     int y;
 
-    DebugLevel2("%s: index %d\n",__FUNCTION__,index);
+    DebugLevel2Fn("index %d\n",index);
     for( y=0; y<8; ++y ) {
 	for( x=0; x<8; ++x ) {
 	    image[(y+iy*8)*iadd+ix*8+x]=mini[index+
@@ -433,7 +433,7 @@ int ConvertFile(const char* filemini,const char* filemega,const char* filemap)
 
     cp=strrchr(filemap,'.');
     memcpy(cp,".png",4);
-    
+
     SavePNG(filemap,image,w,h);
 
     free(image);

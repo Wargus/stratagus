@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ccl_pathfinder.c	-	pathfinder ccl functions. */
-/*
-**	(c) Copyright 2000 by Lutz Sammer and Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 2000,2001 by Lutz Sammer and Fabrice Rossi
+//
+//	$Id$
 
 //@{
 

@@ -8,13 +8,12 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name sound_server.c		-	The sound server 
+/**@name sound_server.c		-	The sound server
 **                                      (hardware layer and so on) */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer and Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer and Fabrice Rossi
+//
+//	$Id$
 
 //@{
 
@@ -289,7 +288,7 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
     int length;
     int v;
     int local_volume;
-    
+
     local_volume=((int)volume+1)*2*GlobalVolume/MaxVolume;
     length=sample->Length-index;
     DebugLevel3("Length %d\n",length);
@@ -367,7 +366,7 @@ typedef struct _sound_channel_ {
 **	All possible sound channels.
 */
 global SoundChannel Channels[MaxChannels];
-global int NextFreeChannel; 
+global int NextFreeChannel;
 
 /*
 ** Selection handling
@@ -493,7 +492,7 @@ local unsigned char VolumeForDistance(unsigned short d,unsigned char range) {
     int d_tmp;
     int range_tmp;
     //FIXME: THIS IS SLOW!!!!!!!
-    if (d <= ViewPointOffset || range==INFINITE_SOUND_RANGE) 
+    if (d <= ViewPointOffset || range==INFINITE_SOUND_RANGE)
 	return MaxVolume;
     else {
 	if (range) {
@@ -543,7 +542,7 @@ local Sample* SimpleChooseSample(ServerSoundId sound) {
 
 /*
 ** Choose a sample from a SoundRequest. Take into account selection and sound
-** groups. 
+** groups.
 */
 local Sample* ChooseSample(SoundRequest* sr)
 {
@@ -554,7 +553,7 @@ local Sample* ChooseSample(SoundRequest* sr)
 	TheSound=(ServerSoundId)(sr->Sound);
 	if (TheSound->Number==TWO_GROUPS) {
 	    // handle a special sound (selection)
-	    if (SelectionHandler.Source.Base==sr->Source.Base 
+	    if (SelectionHandler.Source.Base==sr->Source.Base
 		&& SelectionHandler.Source.Id==sr->Source.Id) {
 		if (SelectionHandler.Sound==TheSound->Sound.TwoGroups->First) {
 		    DebugLevel3("First group\n");
@@ -604,7 +603,7 @@ local Sample* ChooseSample(SoundRequest* sr)
 /*
 ** Free a channel and unregister its source
 */
-local void FreeOneChannel(int channel) 
+local void FreeOneChannel(int channel)
 {
     Channels[channel].Command=ChannelFree;
     Channels[channel].Point=NextFreeChannel;
@@ -619,7 +618,7 @@ local void FreeOneChannel(int channel)
 ** Put a sound request in the next free channel. While doing this, the
 ** function computes the volume of the source and chooses a sample.
 */
-local int FillOneChannel(SoundRequest* sr) 
+local int FillOneChannel(SoundRequest* sr)
 {
     int next_free;
     int old_free;
@@ -629,8 +628,8 @@ local int FillOneChannel(SoundRequest* sr)
 	next_free=Channels[NextFreeChannel].Point;
 	Channels[NextFreeChannel].Source=sr->Source;
 	Channels[NextFreeChannel].Point=0;
-	Channels[NextFreeChannel].Volume=ComputeVolume(sr); 
-	Channels[NextFreeChannel].Command=ChannelPlay; 
+	Channels[NextFreeChannel].Volume=ComputeVolume(sr);
+	Channels[NextFreeChannel].Command=ChannelPlay;
 	Channels[NextFreeChannel].Sample=ChooseSample(sr);
 	NextFreeChannel=next_free;
     } else {
@@ -688,7 +687,7 @@ local int MixChannelsToStereo32(int* buffer,int size)
     int channel;
     int i;
     int new_free_channels;
-    
+
     new_free_channels=0;
     for( channel=0; channel<MaxChannels; ++channel ) {
 	if( Channels[channel].Command==ChannelPlay && Channels[channel].Sample) {
@@ -704,7 +703,7 @@ local int MixChannelsToStereo32(int* buffer,int size)
 			    Channels[channel].Source.Base);
 		FreeOneChannel(channel);
 		new_free_channels++;
-	    } 
+	    }
 	}
     }
     return new_free_channels;
@@ -819,7 +818,7 @@ global SoundId RegisterTwoGroups(SoundId first,SoundId second) {
     id->Sound.TwoGroups->First=first;
     id->Sound.TwoGroups->Second=second;
     id->Range=MAX_SOUND_RANGE;
-    return (SoundId)id;    
+    return (SoundId)id;
 }
 
 /*
@@ -847,15 +846,15 @@ global void WriteSound(void)
 #endif
     int free_channels,dummy1,dummy2;
 
-    DebugLevel3(__FUNCTION__"\n");
+    DebugLevel3Fn("\n");
 
     if( 0 ) {
 	audio_buf_info info;
-	
+
 	ioctl(SoundFildes,SNDCTL_DSP_GETOSPACE,&info);
 	DebugLevel0("Free bytes %d\n",info.bytes);
     }
-    
+
     free_channels=HowManyFree();
     FillChannels(free_channels,&dummy1,&dummy2);
 
@@ -896,7 +895,7 @@ local void FillAudio(void* udata,Uint8* stream,int len)
     int mixer_buffer[len];
     int dummy1,dummy2;
 
-    DebugLevel3(__FUNCTION__"%d\n",len);
+    DebugLevel3Fn("%d\n",len);
 
     FillChannels(HowManyFree(),&dummy1,&dummy2);
 
@@ -929,7 +928,7 @@ global void WriteSoundThreaded(void)
     int discarded_request;
     int started_request;
 
-    DebugLevel3(__FUNCTION__"\n");
+    DebugLevel3Fn("\n");
 
     free_channels=MaxChannels;
     how_many_playing=0;
@@ -938,7 +937,7 @@ global void WriteSoundThreaded(void)
     for(;;) {
       if( 0 ) {
 	audio_buf_info info;
-	
+
 	ioctl(SoundFildes,SNDCTL_DSP_GETOSPACE,&info);
 	DebugLevel0("Free bytes %d\n",info.bytes);
       }
@@ -946,9 +945,9 @@ global void WriteSoundThreaded(void)
       how_many_playing+=started_request;
       new_free_channels=0;
       if ( how_many_playing ) {
-	
+
 	memset(mixer_buffer,0,sizeof(mixer_buffer));
-	
+
 	new_free_channels=MixChannelsToStereo32(mixer_buffer,sizeof(mixer_buffer)/sizeof(int));
 
 #if SoundSampleSize==8
@@ -957,7 +956,7 @@ global void WriteSoundThreaded(void)
 #if SoundSampleSize==16
 	ClipMixToStereo16(mixer_buffer,sizeof(mixer_buffer)/sizeof(int),buffer);
 #endif
-	
+
 	while( write(SoundFildes,buffer,sizeof(buffer))==-1 ) {
 	    switch( errno ) {
 	    case EAGAIN:
@@ -1014,7 +1013,7 @@ global int InitSound(void)
     }
 #else
     //
-    //	Open dsp device, 8bit samples, stereo. 
+    //	Open dsp device, 8bit samples, stereo.
     //
     //SoundFildes=open(SoundDeviceName,O_WRONLY|O_NDELAY);
     SoundFildes=open(SoundDeviceName,O_WRONLY);
