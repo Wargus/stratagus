@@ -316,7 +316,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 		    //
 		    //	Check if goal reached.
 		    //
-		    if( matrix[w+1+x+y*w]==88 ) {
+		    if( matrix[x+y*w]==88 ) {
 			DebugLevel3("Goal reached %d ",depth);
 			return depth;
 		    }
@@ -411,7 +411,7 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
     unsigned char* matrix;
     int depth;
 
-    DebugLevel3Fn("%Zd(%d,%d,%s)->%Zd(%d,%d,%s) "
+    DebugLevel2Fn("%Zd(%d,%d,%s)->%Zd(%d,%d,%s) "
 	,UnitNumber(src),src->X,src->Y,src->Type->Ident
 	,UnitNumber(dst),dst->X,dst->Y,dst->Type->Ident);
 
@@ -425,10 +425,10 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
     //	Find a path to the goal.
     //
     if( (depth=MarkPathInMatrix(src,matrix))<0 ) {
-	DebugLevel3("NO WAY\n");
+	DebugLevel2("NO WAY\n");
 	return 0;
     }
-    DebugLevel3("OK\n");
+    DebugLevel2("OK\n");
 
     return depth;
 }
@@ -625,10 +625,10 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
     for( x=gx<0 ? 0 : gx; x<xd; ++x ) {
 	for( y=gy<0 ? 0 : gy; y<yd; ++y ) {
 	    if( CanMoveToMask(x,y,mask) ) {	// reachable
-		matrix[w+1+x+y*w]=88;
+		matrix[x+y*w]=88;
 		IfDebug( i=0; )
 	    } else {
-		matrix[w+1+x+y*w]=99;
+		matrix[x+y*w]=99;
 	    }
 	}
     }
