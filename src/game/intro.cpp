@@ -1210,10 +1210,12 @@ void ShowStats(void)
 	if (GameResult == GameVictory) {
 		if (TheUI.VictoryBackgroundG) {
 			LoadGraphic(TheUI.VictoryBackgroundG);
+			background = TheUI.VictoryBackgroundG;
 		}
 	} else {
 		if (TheUI.DefeatBackgroundG) {
 			LoadGraphic(TheUI.DefeatBackgroundG);
+			background = TheUI.DefeatBackgroundG;
 		}
 	}
 	ResizeGraphic(background, VideoWidth, VideoHeight);
@@ -1247,8 +1249,6 @@ void ShowStats(void)
 		WaitEventsOneFrame(&callbacks);
 		++frame;
 	}
-
-	FreeGraphic(background);
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
