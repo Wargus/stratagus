@@ -109,10 +109,13 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
     int n;
     Unit* table[UnitMax];
 
-    xmin = x - action->Data.Demolish.Range;
-    ymin = y - action->Data.Demolish.Range;
-    xmax = x + action->Data.Demolish.Range;
-    ymax = y + action->Data.Demolish.Range;
+    //
+    //	Allow error margnins. (Lame, I know)
+    //
+    xmin = x - action->Data.Demolish.Range - 2;
+    ymin = y - action->Data.Demolish.Range - 2;
+    xmax = x + action->Data.Demolish.Range + 2;
+    ymax = y + action->Data.Demolish.Range + 2;
     if (xmin < 0) {
 	xmin = 0;
     }
@@ -130,9 +133,9 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
     //	 Effect of the explosion on units. Don't bother if damage is 0
     //
     if (action->Data.Demolish.Damage) {
-	n = SelectUnits(xmin, ymin, xmax+1, ymax+1, table);
+	n = SelectUnits(xmin, ymin, xmax, ymax, table);
 	for (i = 0; i < n; ++i) {
-	    DebugLevel0("Hit an unit at %d %d?\n" _C_ table[i]->X _C_ table[i]->Y);
+	    DebugLevel3("Hit an unit at %d %d?\n" _C_ table[i]->X _C_ table[i]->Y);
 	    if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP &&
 		    MapDistanceToUnit(x, y, table[i]) <= action->Data.Demolish.Range) {
 		// Don't hit flying units!
@@ -1136,6 +1139,14 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
     } else {
 	x += spell->Range;	// Why ??
 	y += spell->Range;	// Why ??
+    }
+    //
+    //	For TargetSelf, you target.... YOURSELF
+    //
+    if (spell->Target==TargetSelf) {
+	x=caster->X;
+	y=caster->Y;
+	target=caster;
     }
     DebugLevel3Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->IdentName _C_
 	unit->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);

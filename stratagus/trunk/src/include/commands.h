@@ -116,8 +116,6 @@ extern void SendCommandCancelUpgradeTo(Unit* unit);
 extern void SendCommandResearch(Unit* unit,Upgrade* what,int flush);
     /// Send cancel research command
 extern void SendCommandCancelResearch(Unit* unit);
-    /// Send demolish command
-extern void SendCommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Send spell cast command
 extern void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 	,int flush);

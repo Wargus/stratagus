@@ -56,6 +56,7 @@
 #include "sound.h"
 #include "ui.h"
 #include "network.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -110,6 +111,7 @@ global void DoRightButton(int sx, int sy)
     int acknowledged;
     int flush;
     int res;
+    int spellnum;
 
     //
     // No unit selected
@@ -259,13 +261,17 @@ global void DoRightButton(int sx, int sy)
 	//
 	//	Fighters
 	//
-	if (action == MouseActionDemolish || action == MouseActionAttack) {
+	if (action == MouseActionSpellCast || action == MouseActionAttack) {
 	    if (dest) {
 		if (IsEnemy(unit->Player, dest)) {
 		    dest->Blink = 4;
-		    if (action == MouseActionDemolish) {
+		    if (action == MouseActionSpellCast) {
 			// This is for demolition squads and such
-			SendCommandDemolish(unit, x, y, dest, flush);
+			DebugCheck(!unit->Type->CanCastSpell);
+			for (spellnum=0; !unit->Type->CanCastSpell[spellnum] &&
+				spellnum < SpellTypeCount ; spellnum++) ;
+			DebugCheck(spellnum == SpellTypeCount);
+			SendCommandSpellCast(unit, x, y, dest, spellnum, flush);
 		    } else {
 			SendCommandAttack(unit, x, y, dest, flush);
 		    }
@@ -946,39 +952,6 @@ local void SendPatrol(int sx, int sy)
 }
 
 /**
-**	Let a unit explode at selected point
-**
-**	@param sx	X screen map position
-**	@param sy	Y screen map position
-*/
-local void SendDemolish(int sx, int sy)
-{
-    int i;
-    Unit* unit;
-    Unit* dest;
-    int x;
-    int y;
-
-    x = sx / TileSizeX;
-    y = sy / TileSizeY;
-    for (i = 0; i < NumSelected; ++i) {
-	unit = Selected[i];
-	if (unit->Type->Volatile) {
-	    // FIXME: choose correct unit no flying ...
-	    if ((dest = UnitUnderCursor) && CanTarget(unit->Type, dest->Type)) {
-		dest->Blink = 4;
-	    } else {
-		dest = NoUnitP;
-	    }
-	    SendCommandDemolish(unit, sx / TileSizeX, sy / TileSizeY, dest,
-		!(KeyModifiers & ModifierShift));
-	} else {
-	    DebugLevel0Fn("can't demolish %p\n" _C_ unit);
-	}
-    }
-}
-
-/**
 **	Let units harvest wood/mine gold/haul oil
 **
 **	@param sx	X screen map position
@@ -1118,9 +1091,6 @@ local void SendCommand(int sx, int sy)
 	    break;
 	case ButtonUnload:
 	    SendUnload(sx, sy);
-	    break;
-	case ButtonDemolish:
-	    SendDemolish(sx, sy);
 	    break;
 	case ButtonSpellCast:
 	    SendSpellCast(sx, sy);

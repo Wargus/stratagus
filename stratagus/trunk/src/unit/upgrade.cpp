@@ -1265,7 +1265,7 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 	    unit->Type = dst;
 	    unit->Stats = &dst->Stats[player->Player];
 	    // and we have new one...
-	    player->UnitTypesCount[dst->Type]++;
+	    
 	    UpdateForNewUnit(unit, 1);
 	    if (dst->CanCastSpell) {
 		unit->Mana = MAGIC_FOR_NEW_UNITS;

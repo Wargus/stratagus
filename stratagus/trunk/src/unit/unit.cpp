@@ -3424,10 +3424,6 @@ local void SaveOrder(const Order* order, CLFile* file)
 	    CLprintf(file, "action-return-goods");
 	    break;
 
-	case UnitActionDemolish:
-	    CLprintf(file, "action-demolish");
-	    break;
-
 	default:
 	    DebugLevel0Fn("Unknown action in order\n");
     }

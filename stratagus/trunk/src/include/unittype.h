@@ -257,17 +257,6 @@
 **
 **		How many points you get for unit. Used in the final score table.
 **
-**	UnitType::DemolishRange
-**
-**		If non-zero This is the range for units that can demolish.
-**		The demolished area is a square, sorry.
-**
-**	UnitType::DemolishDamage
-**
-**		Damage dealt to unit affected by demolition. This can be 0,
-**		in this case only terrain will be affected. Units have to be in
-**		DemolishRange to be affected.
-**
 **	UnitType::CanTarget
 **
 **		Which units can it attack
@@ -712,8 +701,6 @@ struct _unit_type_ {
     int		_BasicDamage;		/// Basic damage dealt
     int		_PiercingDamage;	/// Piercing damage dealt
     int		_RegenerationRate;	/// HP regeneration HP per sec
-    int 	DemolishRange;		/// Unit will Demolish around when dead.
-    int 	DemolishDamage;		/// Damage dealt to unit affected by demolition.
     int 	RepairRange;		/// Units repair range.
     char 	*CanCastSpell;		/// Unit is able to use spells.
     // FIXME: n0body: AutoBuildRate not implemented.
@@ -735,7 +722,7 @@ struct _unit_type_ {
 #define MouseActionAttack	1		/// Attack
 #define MouseActionMove		2		/// Move
 #define MouseActionHarvest	3		/// Harvest resources
-#define MouseActionDemolish	5		/// Demolish
+#define MouseActionSpellCast	5		/// Cast the first spell known
 #define MouseActionSail		6		/// Sail
     int		Points;			/// How many points you get for unit
     int		CanTarget;		/// Which units can it attack

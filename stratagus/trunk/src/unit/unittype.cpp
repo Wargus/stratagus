@@ -507,13 +507,6 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	if (BIT(31, v))	DebugLevel0("Unused bit 31 used in %d\n" _C_ i);
 #endif
 #undef BIT
-	//
-	//	Unit type checks.
-	//
-	if (unittype->CanCastSpell && !unittype->_MaxMana) {
-	    DebugLevel0Fn("%s: Need max mana value\n" _C_ unittype->Ident);
-	    unittype->_MaxMana = 255;
-	}
     }
 
     // FIXME: peon applies also to peon-with-gold and peon-with-wood
@@ -851,8 +844,8 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	case MouseActionHarvest:
 	    CLprintf(file, "'right-harvest");
 	    break;
-	case MouseActionDemolish:
-	    CLprintf(file, "'right-demolish");
+	case MouseActionSpellCast:
+	    CLprintf(file, "'right-spell-cast");
 	    break;
 	case MouseActionSail:
 	    CLprintf(file, "'right-sail");
@@ -871,12 +864,6 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     }
     if (type->RepairRange) {
 	CLprintf(file, "  'repair-range %d\n", type->RepairRange);
-    }
-    if (type->DemolishRange) {
-	CLprintf(file, "  'demolish-range %d\n", type->DemolishRange);
-    }
-    if (type->DemolishRange) {
-	CLprintf(file, "  'demolish-damage %d\n", type->DemolishDamage);
     }
     if (type->CanTarget) {
 	CLprintf(file, "  ");
@@ -1242,6 +1229,8 @@ global UnitType* NewUnitTypeSlot(char* ident)
     }
     memset(type, 0, sizeof(UnitType));
     type->Type = NumUnitTypes;
+    DebugLevel3Fn("Making a new unit, called %s, branded %d\n"
+	    _C_ ident _C_ type->Type);
     type->Ident = ident;
     UnitTypes[NumUnitTypes++] = type;
     //

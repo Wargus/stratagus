@@ -47,16 +47,15 @@
 
     /// Button Commands that need target selection
 enum _button_cmd_ {
-    ButtonMove,                        /// order move
-    ButtonAttack,                      /// order attack
-    ButtonRepair,                      /// order repair
-    ButtonHarvest,                     /// order harvest
-    ButtonBuild,                       /// order build
-    ButtonPatrol,                      /// order patrol
-    ButtonAttackGround,                /// order attack ground
-    ButtonSpellCast,                   /// order cast spell
-    ButtonUnload,                      /// order unload unit
-    ButtonDemolish,                    /// order demolish/explode
+    ButtonMove,                         /// order move
+    ButtonAttack,                       /// order attack
+    ButtonRepair,                       /// order repair
+    ButtonHarvest,                      /// order harvest
+    ButtonBuild,                        /// order build
+    ButtonPatrol,                       /// order patrol
+    ButtonAttackGround,                 /// order attack ground
+    ButtonSpellCast,			/// order cast spell
+    ButtonUnload,			/// order unload unit
     ButtonStop,				/// order stop
     ButtonButton,			/// choose other button set
     ButtonTrain,			/// order train

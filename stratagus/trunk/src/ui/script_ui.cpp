@@ -2785,8 +2785,6 @@ local SCM CclDefineButton(SCM list)
 		ba.Action = ButtonAttackGround;
 	    } else if (gh_eq_p(value, gh_symbol2scm("return-goods"))) {
 		ba.Action = ButtonReturn;
-	    } else if (gh_eq_p(value, gh_symbol2scm("demolish"))) {
-		ba.Action = ButtonDemolish;
 	    } else if (gh_eq_p(value, gh_symbol2scm("cast-spell"))) {
 		ba.Action = ButtonSpellCast;
 	    } else if (gh_eq_p(value, gh_symbol2scm("research"))) {

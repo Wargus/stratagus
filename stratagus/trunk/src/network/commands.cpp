@@ -577,8 +577,6 @@ local void DoNextReplay(void)
 	SendCommandResearch(UnitSlots[unit],UpgradeByIdent(val), flags);
     } else if (!strcmp(name, "cancel-research")) {
 	SendCommandCancelResearch(UnitSlots[unit]);
-    } else if (!strcmp(name, "demolish")) {
-	SendCommandDemolish(UnitSlots[unit], posx, posy, dunit, flags);
     } else if (!strcmp(name, "spell-cast")) {
 	SendCommandSpellCast(UnitSlots[unit], posx, posy, dunit, num, flags);
     } else if (!strcmp(name, "auto-spell-cast")) {
@@ -1056,25 +1054,6 @@ global void SendCommandCancelResearch(Unit* unit)
 }
 
 /**
-**	Send command: Unit demolish at position.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position where to demolish.
-**	@param y	Y map tile position where to demolish.
-**	@param attack	or !=NoUnitP unit to be demolished.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandDemolish(Unit* unit, int x, int y, Unit* attack, int flush)
-{
-    if (NetworkFildes == (Socket)-1) {
-	CommandLog("demolish", unit, flush, x, y, attack, NULL, -1);
-	CommandDemolish(unit, x, y, attack, flush);
-    } else {
-	NetworkSendCommand(MessageCommandDemolish, unit, x, y, attack, NULL, flush);
-    }
-}
-
-/**
 **	Send command: Unit spell cast on position/unit.
 **
 **	@param unit	pointer to unit.
@@ -1364,15 +1343,6 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 	    CommandLog("cancel-research", unit, FlushCommands, -1, -1, NoUnitP,
 		NULL, -1);
 	    CommandCancelResearch(unit);
-	    break;
-	case MessageCommandDemolish:
-	    dest = NoUnitP;
-	    if (dstnr != (unsigned short)0xFFFF) {
-		dest = UnitSlots[dstnr];
-		DebugCheck(!dest || !dest->Type);
-	    }
-	    CommandLog("demolish", unit, status, x, y, dest, NULL, -1);
-	    CommandDemolish(unit, x, y, dest, status);
 	    break;
 	default:
 	    id = (msgnr&0x7f) - MessageCommandSpellCast;
