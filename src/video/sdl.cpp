@@ -88,8 +88,10 @@
 
 SDL_Surface* TheScreen;				/// Internal screen
 
+#ifndef USE_OPENGL
 static SDL_Rect Rects[100];
 static int NumRects;
+#endif
 
 static int FrameTicks;						/// Frame length in ms
 static int FrameRemainder;				/// Frame remainder 0.1 ms
