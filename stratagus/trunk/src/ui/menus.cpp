@@ -51,6 +51,7 @@ local void ScenSelectLBInit(Menuitem *mi);
 local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
 local void ScenSelectLBAction(Menuitem *mi, int i);
 local void ScenSelectTPAction(Menuitem *mi, int i);
+local void ScenSelectVSAction(Menuitem *mi, int i);
 local void ScenSelectFolder(void);
 local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
@@ -88,7 +89,7 @@ local int MenuButtonCurSel = -1;
 */
 local Menuitem GameMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Game Menu", MI_FLAGS_CENTERED} } },
+	{ text:{ "Game Menu", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 16, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11} } },
     { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
@@ -110,9 +111,9 @@ local Menuitem GameMenuItems[] = {
 */
 local Menuitem VictoryMenuItems[] = {
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Congratulations!", MI_FLAGS_CENTERED} } },
+	{ text:{ "Congratulations!", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
-	{ text:{ "You are victorious!", MI_FLAGS_CENTERED} } },
+	{ text:{ "You are victorious!", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!Victory", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'} } },
     { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL,
@@ -124,9 +125,9 @@ local Menuitem VictoryMenuItems[] = {
 */
 local Menuitem LostMenuItems[] = {
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "You failed to", MI_FLAGS_CENTERED} } },
+	{ text:{ "You failed to", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
-	{ text:{ "achieve victory!", MI_FLAGS_CENTERED} } },
+	{ text:{ "achieve victory!", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'} } },
 };
@@ -152,11 +153,13 @@ local char ScenSelectDisplayPath[1024];
 
 local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_TEXT, 176, 8, 0, LargeFont, ScenSelectInit, NULL,
-	{ text:{ "Select scenario", MI_FLAGS_CENTERED} } },
+	{ text:{ "Select scenario", MI_TFLAGS_CENTERED} } },
 
     { MI_TYPE_LISTBOX, 24, 140, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit,
 	{ listbox:{ NULL, 288, 6*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 6, 0,
 		    (void *)ScenSelectLBRetrieve} } },
+    { MI_TYPE_VSLIDER, 312, 140, 0, 0, NULL, NULL,
+	{ vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0} } },
 
     { MI_TYPE_BUTTON, 48, 318, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "OK", 106, 27, MBUTTON_GM_HALF, ScenSelectOk, 0} } },
@@ -164,11 +167,11 @@ local Menuitem ScenSelectMenuItems[] = {
 	{ button:{ "Cancel", 106, 27, MBUTTON_GM_HALF, ScenSelectCancel, 0} } },
 
     { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL,
-	{ text:{ "Type:", MI_FLAGS_RALIGN} } },
+	{ text:{ "Type:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL,
 	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPAction, 2, 1, 1, 0} } },
     { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL,
-	{ text:{ "Map size:", MI_FLAGS_RALIGN} } },
+	{ text:{ "Map size:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 80, MenuButtonDisabled, GameFont, NULL, NULL,
 	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, NULL, 5, 0, 0, 0} } },
     { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL,
@@ -212,7 +215,7 @@ global Menu Menus[] = {
 	(480-352)/2,
 	352, 352,
 	ImagePanel5,
-	3, 9,
+	4, 10,
 	ScenSelectMenuItems
     },
 };
@@ -403,12 +406,65 @@ local void DrawListbox(Menuitem *mi, unsigned mx, unsigned my)
 
     if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangleClip(ColorGray,x-2,y-2,w+2,h+2);
+	    VideoDrawRectangleClip(ColorGray,x-2,y-2,w+1,h+2);
 	} else {
-	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w+2,h+2);
+	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w+1,h+2);
 	}
     }
     SetDefaultTextColors(nc,rc);
+}
+
+/**
+**	Draw vslider 'button' on menu mx, my
+**
+**	@param mi	menuitem pointer
+**	@param mx	menu X display position (offset)
+**	@param my	menu Y display position (offset)
+*/
+local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
+{
+    int i, p;
+    unsigned flags = mi->flags;
+    unsigned w, h, x, y;
+    w = mi->d.vslider.xsize;
+    h = mi->d.vslider.ysize;
+    x = mx+mi->xofs;
+    y = my+mi->yofs;
+
+    if (flags&MenuButtonDisabled) {
+	PushClipping();
+	SetClipping(0,0,VideoWidth,y + h - 20);
+	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
+	PopClipping();
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW - 1, x, y - 2);
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
+    } else {
+	PushClipping();
+	SetClipping(0,0,VideoWidth,y + h - 20);
+	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
+	PopClipping();
+	if (mi->d.vslider.cflags&MI_CFLAGS_UP) {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW + 1, x, y - 2);
+	} else {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW, x, y - 2);
+	}
+	if (mi->d.vslider.cflags&MI_CFLAGS_DOWN) {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + 1, x, y + h - 20);
+	} else {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW, x, y + h - 20);
+	}
+	p = (mi->d.vslider.percent * (h - 54)) / 100;
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 1, y + 18 + p);
+    }
+
+    if (flags&MenuButtonSelected) {
+	if (flags&MenuButtonDisabled) {
+	    VideoDrawRectangleClip(ColorGray,x,y-2,w,h+2);
+	} else {
+	    VideoDrawRectangleClip(ColorYellow,x,y-2,w,h+2);
+	}
+    }
+
 }
 
 
@@ -435,10 +491,10 @@ global void DrawMenu(int MenuId)
     for (i = 0; i < n; i++) {
 	switch (mi->mitype) {
 	    case MI_TYPE_TEXT:
-		if (mi->d.text.tflags&MI_FLAGS_CENTERED)
+		if (mi->d.text.tflags&MI_TFLAGS_CENTERED)
 		    DrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
-		else if (mi->d.text.tflags&MI_FLAGS_RALIGN) {
+		else if (mi->d.text.tflags&MI_TFLAGS_RALIGN) {
 		    l = TextLength(mi->font,mi->d.text.text);
 		    DrawText(menu->x+mi->xofs-l,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
@@ -447,16 +503,19 @@ global void DrawMenu(int MenuId)
 			    mi->font,mi->d.text.text);
 		break;
 	    case MI_TYPE_BUTTON:
-		    DrawMenuButton(mi->d.button.button,mi->flags,
-			    mi->d.button.xsize,mi->d.button.ysize,
-			    menu->x+mi->xofs,menu->y+mi->yofs,
-			    mi->font,mi->d.button.text);
+		DrawMenuButton(mi->d.button.button,mi->flags,
+			mi->d.button.xsize,mi->d.button.ysize,
+			menu->x+mi->xofs,menu->y+mi->yofs,
+			mi->font,mi->d.button.text);
 		break;
 	    case MI_TYPE_PULLDOWN:
-		    DrawPulldown(mi,menu->x,menu->y);
+		DrawPulldown(mi,menu->x,menu->y);
 		break;
 	    case MI_TYPE_LISTBOX:
-		    DrawListbox(mi,menu->x,menu->y);
+		DrawListbox(mi,menu->x,menu->y);
+		break;
+	    case MI_TYPE_VSLIDER:
+		DrawVSlider(mi,menu->x,menu->y);
 		break;
 	    default:
 		break;
@@ -496,8 +555,8 @@ local void ScenSelectInit(Menuitem *mi __attribute__((unused)) )
 {
     strcpy(ScenSelectPath, FreeCraftLibPath);
     ScenSelectDisplayPath[0] = 0;
-    ScenSelectMenuItems[8].flags = MenuButtonDisabled;
-    ScenSelectMenuItems[8].d.button.text = NULL;
+    ScenSelectMenuItems[9].flags = MenuButtonDisabled;
+    ScenSelectMenuItems[9].d.button.text = NULL;
 }
 
 local void ScenSelectLBAction(Menuitem *mi, int i)
@@ -507,9 +566,12 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
-	    ScenSelectMenuItems[2].d.button.text = "OK";
+	    ScenSelectMenuItems[3].d.button.text = "OK";
 	} else {
-	    ScenSelectMenuItems[2].d.button.text = "Open";
+	    ScenSelectMenuItems[3].d.button.text = "Open";
+	}
+	if (mi->d.listbox.noptions > 5) {
+	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
     }
 }
@@ -520,6 +582,7 @@ local void ScenSelectLBExit(Menuitem *mi)
 	free(mi->d.listbox.options);
 	mi->d.listbox.options = NULL;
 	mi->d.listbox.noptions = 0;
+	mi[1].flags |= MenuButtonDisabled;
     }
 }
 
@@ -528,18 +591,21 @@ local void ScenSelectLBInit(Menuitem *mi)
     char *suf;
 
     ScenSelectLBExit(mi);
-    if (ScenSelectMenuItems[5].d.pulldown.curopt == 0)
+    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0)
 	suf = ".cm";
     else
 	suf = ".pud";
     mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, suf, (FileList **)&(mi->d.listbox.options));
     // FIXME: Fill xdata here
     if (mi->d.listbox.noptions == 0) {
-	ScenSelectMenuItems[2].d.button.text = "OK";
-	ScenSelectMenuItems[2].flags |= MenuButtonDisabled;
+	ScenSelectMenuItems[3].d.button.text = "OK";
+	ScenSelectMenuItems[3].flags |= MenuButtonDisabled;
     } else {
 	ScenSelectLBAction(mi, 0);
-	ScenSelectMenuItems[2].flags &= ~MenuButtonDisabled;
+	ScenSelectMenuItems[3].flags &= ~MenuButtonDisabled;
+	if (mi->d.listbox.noptions > 5) {
+	    mi[1].flags &= ~MenuButtonDisabled;
+	}
     }
 }
 
@@ -568,7 +634,81 @@ local void ScenSelectTPAction(Menuitem *mi, int i __attribute__((unused)) )
     mi->d.listbox.cursel = -1;
     mi->d.listbox.startline = 0;
     mi->d.listbox.curopt = 0;
+    mi[1].d.vslider.percent = 0;
     MustRedraw |= RedrawMenu;
+}
+
+local void ScenSelectVSAction(Menuitem *mi, int i)
+{
+    int op, d1, d2;
+
+    mi--;
+    switch (i) {
+	case 0:		// click - down
+	case 2:		// key - down
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
+		    mi->d.listbox.curopt++;
+		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+			mi->d.listbox.curopt--;
+			mi->d.listbox.startline++;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    mi->d.listbox.curopt--;
+		    if (mi->d.listbox.curopt < 0) {
+			mi->d.listbox.curopt++;
+			mi->d.listbox.startline--;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    }
+	    ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    if (i == 2) {
+		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
+	    }
+	    break;
+	case 1:		// mouse - move
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
+			op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
+				 (mi->d.listbox.noptions - 1);
+			d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
+			d2 = op - mi[1].d.vslider.curper;
+			if (d2 < d1) {
+			    mi->d.listbox.curopt++;
+			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+				mi->d.listbox.curopt--;
+				mi->d.listbox.startline++;
+			    }
+			}
+		    }
+		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+			op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
+				 (mi->d.listbox.noptions - 1);
+			d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
+			d2 = mi[1].d.vslider.curper - op;
+			if (d2 < d1) {
+			    mi->d.listbox.curopt--;
+			    if (mi->d.listbox.curopt < 0) {
+				mi->d.listbox.curopt++;
+				mi->d.listbox.startline--;
+			    }
+			}
+		    }
+		}
+		ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		mi[1].d.vslider.percent = mi[1].d.vslider.curper;
+		MustRedraw |= RedrawMenu;
+	    }
+	    break;
+	default:
+	    break;
+    }
 }
 
 local void ScenSelectFolder(void)
@@ -582,8 +722,8 @@ local void ScenSelectFolder(void)
 	    *cp = 0;
 	} else {
 	    ScenSelectDisplayPath[0] = 0;
-	    ScenSelectMenuItems[8].flags |= MenuButtonDisabled;
-	    ScenSelectMenuItems[8].d.button.text = NULL;
+	    ScenSelectMenuItems[9].flags |= MenuButtonDisabled;
+	    ScenSelectMenuItems[9].d.button.text = NULL;
 	}
 	cp = strrchr(ScenSelectPath, '/');
 	if (cp) {
@@ -592,6 +732,7 @@ local void ScenSelectFolder(void)
 	    mi->d.listbox.cursel = -1;
 	    mi->d.listbox.startline = 0;
 	    mi->d.listbox.curopt = 0;
+	    mi[1].d.vslider.percent = 0;
 	    MustRedraw |= RedrawMenu;
 	}
     }
@@ -612,9 +753,9 @@ local void ScenSelectOk(void)
 		strcat(ScenSelectPath, "/");
 	    }
 	    strcat(ScenSelectPath, fl[i].name);
-	    if (ScenSelectMenuItems[8].flags&MenuButtonDisabled) {
-		ScenSelectMenuItems[8].flags &= ~MenuButtonDisabled;
-		ScenSelectMenuItems[8].d.button.text = ScenSelectDisplayPath;
+	    if (ScenSelectMenuItems[9].flags&MenuButtonDisabled) {
+		ScenSelectMenuItems[9].flags &= ~MenuButtonDisabled;
+		ScenSelectMenuItems[9].d.button.text = ScenSelectDisplayPath;
 	    } else {
 		strcat(ScenSelectDisplayPath, "/");
 	    }
@@ -623,6 +764,7 @@ local void ScenSelectOk(void)
 	    mi->d.listbox.cursel = -1;
 	    mi->d.listbox.startline = 0;
 	    mi->d.listbox.curopt = 0;
+	    mi[1].d.vslider.percent = 0;
 	    MustRedraw |= RedrawMenu;
 	} else {
 	    if (ScenSelectPath[0]) {
@@ -736,10 +878,21 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 				    break;
 				}
 			    }
-			    MustRedraw |= RedrawMenu;
 			    if (mi->d.listbox.action) {
 				(*mi->d.listbox.action)(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 			    }
+			    MustRedraw |= RedrawMenu;
+			    break;
+			case MI_TYPE_VSLIDER:
+			    if (key == KeyCodeDown) {
+				mi->d.vslider.cflags |= MI_CFLAGS_DOWN;
+			    } else {
+				mi->d.vslider.cflags |= MI_CFLAGS_UP;
+			    }
+			    if (mi->d.vslider.action) {
+				(*mi->d.vslider.action)(mi, 2);		// 0 indicates key down
+			    }
+			    MustRedraw |= RedrawMenu;
 			    break;
 			default:
 			    break;
@@ -755,9 +908,10 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 		    switch (mi->mitype) {
 			case MI_TYPE_TEXT:
 			    break;
-			case MI_TYPE_LISTBOX:
-			case MI_TYPE_PULLDOWN:
 			case MI_TYPE_BUTTON:
+			case MI_TYPE_PULLDOWN:
+			case MI_TYPE_LISTBOX:
+			case MI_TYPE_VSLIDER:
 			    if (mi->flags & MenuButtonDisabled) {
 				break;
 			    }
@@ -861,6 +1015,41 @@ global void MenuHandleMouseMove(int x,int y)
 			mi->d.listbox.cursel = j;	// just store for click
 		    }
 		    break;
+		case MI_TYPE_VSLIDER:
+		    xs = menu->x + mi->xofs;
+		    ys = menu->y + mi->yofs;
+		    if (x < xs || x > xs + mi->d.vslider.xsize || y < ys || y > ys + mi->d.vslider.ysize) {
+			if (!(mi->flags&MenuButtonClicked)) {
+			    if (mi->flags&MenuButtonActive) {
+				RedrawFlag = 1;
+				mi->flags &= ~MenuButtonActive;
+			    }
+			}
+			mi->d.vslider.cursel = 0;
+			continue;
+		    }
+		    j = y - ys;
+		    if (j < 20) {
+			mi->d.vslider.cursel |= MI_CFLAGS_UP;
+		    } else if (j > mi->d.vslider.ysize - 20) {
+			mi->d.vslider.cursel |= MI_CFLAGS_DOWN;
+		    } else {
+			mi->d.vslider.cursel &= ~(MI_CFLAGS_UP|MI_CFLAGS_DOWN);
+			h = (mi->d.vslider.percent * (mi->d.vslider.ysize - 54)) / 100 + 18;
+			mi->d.vslider.curper = ((j - 20) * 100) / (mi->d.vslider.ysize - 54);
+			if (mi->d.vslider.curper > 100) {
+			    mi->d.vslider.curper = 100;
+			}
+			if (j > h && j < h + 18) {
+			    mi->d.vslider.cursel |= MI_CFLAGS_KNOB;
+			} else {
+			    mi->d.vslider.cursel |= MI_CFLAGS_CONT;
+			}
+		    }
+		    if (mi->d.vslider.action) {
+			(*mi->d.vslider.action)(mi, 1);		// 1 indicates move
+		    }
+		    break;
 		default:
 		    break;
 	    }
@@ -868,6 +1057,7 @@ global void MenuHandleMouseMove(int x,int y)
 		case MI_TYPE_BUTTON:
 		case MI_TYPE_PULLDOWN:
 		case MI_TYPE_LISTBOX:
+		case MI_TYPE_VSLIDER:
 		    if (!(mi->flags&MenuButtonActive)) {
 			RedrawFlag = 1;
 			mi->flags |= MenuButtonActive;
@@ -902,6 +1092,7 @@ global void MenuHandleButtonDown(int b)
 		    case MI_TYPE_BUTTON:
 		    case MI_TYPE_PULLDOWN:
 		    case MI_TYPE_LISTBOX:
+		    case MI_TYPE_VSLIDER:
 			if (MenuButtonCurSel != -1) {
 			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
 			}
@@ -913,6 +1104,12 @@ global void MenuHandleButtonDown(int b)
 		}
 	    }
 	    switch (mi->mitype) {
+		case MI_TYPE_VSLIDER:
+		    mi->d.vslider.cflags = mi->d.vslider.cursel;
+		    if (mi->d.vslider.action) {
+			(*mi->d.vslider.action)(mi, 0);		// 0 indicates down
+		    }
+		    break;
 		case MI_TYPE_PULLDOWN:
 		    mi->d.pulldown.cursel = mi->d.pulldown.curopt;
 		    break;
@@ -983,6 +1180,13 @@ global void MenuHandleButtonUp(int b)
 			// MAYBE ADD HERE
 		    }
 		    break;
+		case MI_TYPE_VSLIDER:
+		    if (mi->flags&MenuButtonClicked) {
+			RedrawFlag = 1;
+			mi->flags &= ~MenuButtonClicked;
+			mi->d.vslider.cflags = 0;
+		    }
+		    break;
 		default:
 		    break;
 	    }
@@ -1020,6 +1224,7 @@ global void ProcessMenu(int MenuId, int Loop)
 	    case MI_TYPE_BUTTON:
 	    case MI_TYPE_PULLDOWN:
 	    case MI_TYPE_LISTBOX:
+	    case MI_TYPE_VSLIDER:
 		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
 		// FIXME: Maybe activate if mouse-pointer is over it right now?
 		if (i == menu->defsel) {
@@ -1039,6 +1244,11 @@ global void ProcessMenu(int MenuId, int Loop)
 		mi->d.listbox.startline = 0;
 		if (mi->d.listbox.defopt != -1)
 		    mi->d.listbox.curopt = mi->d.listbox.defopt;
+		break;
+	    case MI_TYPE_VSLIDER:
+		mi->d.vslider.cflags = 0;
+		if (mi->d.vslider.defper != -1)
+		    mi->d.vslider.percent = mi->d.vslider.defper;
 		break;
 	    default:
 		break;
