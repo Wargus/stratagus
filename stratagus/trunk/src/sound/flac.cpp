@@ -392,7 +392,7 @@ global Sample* LoadFlac(const char* name, int flags)
 
 	DebugCheck(FLAC__stream_decoder_get_state(stream) != 
 	    FLAC__STREAM_DECODER_SEARCH_FOR_METADATA);
-        if (FLAC__stream_decoder_process_until_end_of_stream(stream))
+	FLAC__stream_decoder_process_until_end_of_stream(stream);
 	DebugCheck(FLAC__stream_decoder_get_state(stream) != 
 	    FLAC__STREAM_DECODER_END_OF_STREAM);
 
