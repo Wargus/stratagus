@@ -1450,10 +1450,7 @@ global void SoundOptions(void)
 
 local void GlobalOptions(void)
 {
-    if (InterfaceState == IfaceStateMenu)
-	ProcessMenu("menu-global-options", 0);
-    else
-	ProcessMenu("menu-global-options", 1);
+    ProcessMenu("menu-global-options", 1);
 }
 
 local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
@@ -1517,6 +1514,7 @@ local void SetRes640(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    EndMenu();
     GlobalOptions();
 }
 
@@ -1540,6 +1538,7 @@ local void SetRes800(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    EndMenu();
     GlobalOptions();
 }
 
@@ -1563,6 +1562,7 @@ local void SetRes1024(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    EndMenu();
     GlobalOptions();
 }
 
@@ -1586,6 +1586,7 @@ local void SetRes1280(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    EndMenu();
     GlobalOptions();
 }
 
@@ -1609,24 +1610,28 @@ local void SetRes1600(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    EndMenu();
     GlobalOptions();
 }
 
 local void SetFullscreen(Menuitem *mi __attribute__((unused)))
 {
     ToggleFullScreen();
+    EndMenu();
     GlobalOptions();
 }
 
 local void SetShadowFogAlpha(Menuitem *mi __attribute__((unused)))
 {
     OriginalFogOfWar=1;
+    EndMenu();
     GlobalOptions();
 }
 
 local void SetShadowFogGray(Menuitem *mi __attribute__((unused)))
 {
     OriginalFogOfWar=0;
+    EndMenu();
     GlobalOptions();
 }
 
