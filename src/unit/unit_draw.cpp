@@ -1025,7 +1025,9 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    //
 	    } else if( unit->Orders[0].Action==UnitActionHarvest
 		    && unit->SubAction==64 ) {
-		DrawManaBar(x,y,type,CHOP_FOR_WOOD,CHOP_FOR_WOOD-unit->Value);
+		DrawManaBar(x,y,type,CHOP_FOR_WOOD,
+			unit->Value>CHOP_FOR_WOOD?
+			    0:CHOP_FOR_WOOD-unit->Value);
 
 	    //
 	    //	Building research new technologie.
@@ -1099,7 +1101,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    } else if( unit->Orders[0].Action==UnitActionHarvest
 		    && unit->SubAction==64 ) {
 		DrawManaSprite(x,y,type,CHOP_FOR_WOOD,
-			CHOP_FOR_WOOD-unit->Value);
+			unit->Value>CHOP_FOR_WOOD?
+			    0:CHOP_FOR_WOOD-unit->Value);
 
 	    //
 	    //	Building research new technologie.
