@@ -48,7 +48,7 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
     int flags;
 
     if( !(state=unit->State) ) {
-	UnitNewHeading(unit);		// FIXME: remove this!!
+	UnitUpdateHeading(unit);		// FIXME: remove this!!
     }
 
     DebugLevel3(__FUNCTION__": State %2d ",state);
@@ -90,26 +90,25 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 */
 local void HandleUnitAction(Unit* unit)
 {
-    int reset;
-
     //
     //	If current action is breakable proceed with next one.
     //
-    if( (reset=unit->Reset) ) {
+    if( unit->Reset ) {
 	unit->Reset=0;
 
 	//
-	//	New command and forced or old ready
+	//	New command and forced or old ready (= still)
+	//	FIXME: how should we deal with saved commands?
 	//
 	if( unit->NextCount
 		&& (unit->Command.Action == UnitActionStill || unit->NextFlush)
 		&& !unit->Removed ) {
 	    int z;
 
-	    unit->NextFlush = 0;
 	    //	Structure assign
 	    unit->Command=unit->NextCommand[0];
-	    //Next line shouldn't affect human players, but needed for AI player
+	    // Next line shouldn't affect human players,
+	    //	but needed for AI player
 	    unit->NextCommand[0].Action = UnitActionStill;
 	    // cade: shift queue
 	    unit->NextCount--;
@@ -117,6 +116,7 @@ local void HandleUnitAction(Unit* unit)
 		unit->NextCommand[z] = unit->NextCommand[z+1];
 	    }
 
+	    unit->NextFlush = 0;
 	    unit->SubAction=0;
 	    unit->State=0;
 

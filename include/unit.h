@@ -91,6 +91,16 @@ struct _command_ {
     UnitAction	Action : 8;		/// global action
     union {
 	// FIXME: will be changed with new pathfinder
+	/*
+	** FIXME: rewrite this complete
+	struct {
+	    unsigned	RangeX;		/// Range to goal in X
+	    unsigned	RangeY;		/// Range to goal in Y
+	    Unit*	Goal;		/// Goal unit
+	    unsigned	DX;
+	    unsigned	DY;		/// Destination
+	} Move;				/// move:
+	*/
 	struct {
 	    unsigned	Fast : 1;	/// Can fast move
 	    unsigned	Range : 31;	/// Range to goal
@@ -159,6 +169,36 @@ typedef enum _unit_voice_group_ {
 } UnitVoiceGroup;
 
 /**
+**	Unit/Missile headings.
+**		N
+**	NW		NE
+**	W		 E
+**	SW		SE
+**		S
+*/
+#ifdef NEW_HEADING
+enum _directions_ {
+    LookingN	=0*32,			/// Unit looking north
+    LookingNE	=1*32,			/// Unit looking north east
+    LookingE	=2*32,			/// Unit looking east
+    LookingSE	=3*32,			/// Unit looking south east
+    LookingS	=4*32,			/// Unit looking south
+    LookingSW	=5*32,			/// Unit looking south west
+    LookingW	=6*32,			/// Unit looking west
+    LookingNW	=7*32,			/// Unit looking north west
+};
+#else
+#define HeadingN		0	/// Unit heading north
+#define HeadingNE		1	/// Unit heading north east
+#define HeadingE		2	/// Unit heading east
+#define HeadingSE		3	/// Unit heading south east
+#define HeadingS		4	/// Unit heading south
+#define HeadingSW		5	/// Unit heading south west
+#define HeadingW		6	/// Unit heading west
+#define HeadingNW		7	/// Unit heading north west
+#endif
+
+/**
 **	The big unit structure.
 */
 struct _unit_ {
@@ -186,7 +226,11 @@ struct _unit_ {
     unsigned	Frame : 8;		/// Image frame: high bit used for flip
     unsigned   	SeenFrame : 8;		/// last seen frame/stage of buildings
 
+#ifdef NEW_HEADING
+    unsigned	Direction : 8;		/// angle (0-255) unit looking
+#else
     unsigned	Heading : 8;		/// direction of unit looking
+#endif
 
     unsigned	Attacked : 1;		/// unit is attacked
     // FIXME: next not used!
@@ -209,9 +253,9 @@ struct _unit_ {
 
     unsigned	SubAction : 8;		/// sub-action of unit
     unsigned	Wait : 8;		/// action counter
-#define UNIT_MAX_WAIT	255		/// biggest number in action counter
+#define MAX_UNIT_WAIT	255		/// biggest number in action counter
     unsigned	State : 8; 		/// action state
-#define UNIT_MAX_STATE	255		/// biggest state for action
+#define MAX_UNIT_STATE	255		/// biggest state for action
     unsigned	Reset : 1;		/// can process new command
     unsigned	Blink : 3;		/// Let selection rectangle blink
     unsigned	Moving : 1;		/// The unit is moving
@@ -226,6 +270,8 @@ struct _unit_ {
     // FIXME: use the new next pointer
     Unit*	OnBoard[MAX_UNITS_ONBOARD];	/// Units in transporter
 
+#if 0
+    // FIXME: not used
     union _command_data_ {
 	struct _command_move_ {
 #define MAX_PATH_LENGTH	15		/// max length of precalculated path
@@ -234,6 +280,7 @@ struct _unit_ {
 	    unsigned char Path[MAX_PATH_LENGTH];
 	}	Move;			/// for command move
     }		Data;			/// Storage room for different commands
+#endif
 
 #define MAX_COMMANDS 16			/// max number of outstanding commands
 //	NEW-ACTIONS:
@@ -244,21 +291,6 @@ struct _unit_ {
     int		NextFlush;	/// true: cancel command and proceed to next one
     Command	PendCommand;		/// pending commands
 };
-
-//		N
-//	NW		NE
-//	W		 E
-//	SW		SE
-//		S
-// FIXME: this heading should be changed see tasks.txt
-#define HeadingN		0	/// Unit heading north
-#define HeadingNE		1	/// Unit heading north east
-#define HeadingE		2	/// Unit heading east
-#define HeadingSE		3	/// Unit heading south east
-#define HeadingS		4	/// Unit heading south
-#define HeadingSW		5	/// Unit heading south west
-#define HeadingW		6	/// Unit heading west
-#define HeadingNW		7	/// Unit heading north west
 
 #define NoUnitP		(Unit*)0	/// return value: for no unit found
 #define InfiniteDistance INT_MAX	/// the distance is unreachable
@@ -367,9 +399,14 @@ extern void RescueUnits(void);
     /// Change owner of unit.
 extern void ChangeUnitOwner(Unit* unit,Player* old,Player* new);
 
-extern void UnitNewHeading(Unit* unit);
-extern void UnitNewHeadingFromXY(Unit* unit,int x,int y);
-extern int HeadingFromXY2XY(int x,int y,int dx,int dy);
+    /// Convert direction (dx,dy) to heading (0-255)
+extern int DirectionToHeading(int,int);
+    /// Update frame from heading
+extern void UnitUpdateHeading(Unit* unit);
+    /// Heading and frame from delta direction x,y
+extern void UnitHeadingFromDeltaXY(Unit* unit,int x,int y);
+
+//extern int HeadingFromXY2XY(int x,int y,int dx,int dy);
 
 extern void DropOutOnSide(Unit* unit,int heading,int addx,int addy);
 extern void DropOutNearest(Unit* unit,int x,int y,int addx,int addy);

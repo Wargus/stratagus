@@ -218,7 +218,7 @@ global void HandleActionStill(Unit* unit)
 		unit->SubAction=1;
 		// Turn to target
 		if( !type->Tower ) {
-		    UnitNewHeadingFromXY(unit,goal->X-unit->X,goal->Y-unit->Y);
+		    UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
 		    AnimateActionAttack(unit);
 		}
 	    }
@@ -241,15 +241,23 @@ global void HandleActionStill(Unit* unit)
     if( type->LandUnit ) {
 	switch( (MyRand()>>8)&0x0FF ) {
 	    case 0:			// Turn clockwise
+#ifdef NEW_HEADING
+		unit->Direction+=32;
+#else
 		unit->Heading=(unit->Heading+1)&7;
-		UnitNewHeading(unit);
+#endif
+		UnitUpdateHeading(unit);
 		if( UnitVisible(unit) ) {
 		    MustRedraw|=RedrawMap;
 		}
 		break;
 	    case 1:			// Turn counter clockwise
+#ifdef NEW_HEADING
+		unit->Direction-=32;
+#else
 		unit->Heading=(unit->Heading-1)&7;
-		UnitNewHeading(unit);
+#endif
+		UnitUpdateHeading(unit);
 		if( UnitVisible(unit) ) {
 		    MustRedraw|=RedrawMap;
 		}

@@ -178,12 +178,20 @@ global void HandleActionStandGround(Unit* unit)
 	    // FIXME: johns, looks wired what I have written here
 	    // FIXME: Why have I written such a chaos? (johns)
 	    if( !unit->SubAction || unit->Command.Data.Move.Goal!=goal ) {
+#ifdef NEW_UNIT
+		if( unit->Command.Data.Move.Goal ) {
+		    unit->Command.Data.Move.Goal--;
+		}
 		unit->Command.Data.Move.Goal=goal;
+		goal->Refs++;
+#else
+		unit->Command.Data.Move.Goal=goal;
+#endif
 		unit->State=0;
 		unit->SubAction=1;
 		// Turn to target
 		if( !type->Tower ) {
-		    UnitNewHeadingFromXY(unit,goal->X-unit->X,goal->Y-unit->Y);
+		    UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
 		    AnimateActionAttack(unit);
 		}
 	    }
@@ -201,15 +209,23 @@ global void HandleActionStandGround(Unit* unit)
     if( type->LandUnit ) {
 	switch( (MyRand()>>8)&0x0FF ) {
 	    case 0:			// Turn clockwise
+#ifdef NEW_HEADING
+		unit->Direction+=32;
+#else
 		unit->Heading=(unit->Heading+1)&7;
-		UnitNewHeading(unit);
+#endif
+		UnitUpdateHeading(unit);
 		if( UnitVisible(unit) ) {
 		    MustRedraw|=RedrawMap;
 		}
 		break;
 	    case 1:			// Turn counter clockwise
+#ifdef NEW_HEADING
+		unit->Direction-=32;
+#else
 		unit->Heading=(unit->Heading-1)&7;
-		UnitNewHeading(unit);
+#endif
+		UnitUpdateHeading(unit);
 		if( UnitVisible(unit) ) {
 		    MustRedraw|=RedrawMap;
 		}
