@@ -457,10 +457,6 @@ global void CreateGame(char* filename, WorldMap* map)
 		AllocatedGraphicMemory _C_
 		AllocatedGraphicMemory / 1024 _C_
 		AllocatedGraphicMemory / 1024 / 1024);
-	DebugLevel0("Compressed graphics uses %d bytes (%d KB, %d MB)\n" _C_
-		CompressedGraphicMemory _C_
-		CompressedGraphicMemory / 1024 _C_
-		CompressedGraphicMemory / 1024 / 1024);
 
 	CreateMinimap();   // create minimap for pud
 	InitMap();         // setup draw functions

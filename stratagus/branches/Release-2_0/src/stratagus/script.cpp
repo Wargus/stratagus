@@ -921,6 +921,20 @@ local int CclGetStratagusLibraryPath(lua_State* l)
 	return 1;
 }
 
+/**
+**  Get a value from the Stratagus syncronized random number generator.
+*/
+local int CclSyncRand(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	}
+
+	lua_pushnumber(l, SyncRand() % (int)LuaToNumber(l, -1));
+	return 1;
+}
+
 /*............................................................................
 ..  Tables
 ............................................................................*/
@@ -1159,7 +1173,7 @@ global void ScriptProxyTypeInitBlock(ScriptProxyType* type)
 }
 
 /**
-** 	Get a value from the Stratagus syncronized random number generator.
+**  Get a value from the Stratagus syncronized random number generator.
 */
 local int ScriptSyncRand(lua_State* l)
 {
@@ -1373,6 +1387,8 @@ global void InitCcl(void)
 	lua_register(Lua, "GetStratagusHomePath", CclGetStratagusHomePath);
 	lua_register(Lua, "GetStratagusLibraryPath",
 		CclGetStratagusLibraryPath);
+
+	lua_register(Lua, "SyncRand", CclSyncRand);
 }
 
 /**

@@ -208,18 +208,10 @@ global void LoadUserInterface(void)
 	for (i = 0; i < TheUI.NumFillers; ++i) {
 		if (TheUI.Filler[i].File) {
 			TheUI.Filler[i].Graphic = LoadGraphic(TheUI.Filler[i].File);
-#ifdef USE_OPENGL
-			MakeTexture(TheUI.Filler[i].Graphic, TheUI.Filler[i].Graphic->Width,
-				TheUI.Filler[i].Graphic->Height);
-#endif
 		}
 	}
 	if (TheUI.Resource.File && *TheUI.Resource.File) {
 		TheUI.Resource.Graphic = LoadGraphic(TheUI.Resource.File);
-#ifdef USE_OPENGL
-		MakeTexture(TheUI.Resource.Graphic, TheUI.Resource.Graphic->Width,
-			TheUI.Resource.Graphic->Height);
-#endif
 	}
 
 	for (i = 0; i < MaxCosts; ++i) {
@@ -227,76 +219,36 @@ global void LoadUserInterface(void)
 		if (TheUI.Resources[i].Icon.File) {
 			TheUI.Resources[i].Icon.Graphic =
 				LoadGraphic(TheUI.Resources[i].Icon.File);
-#ifdef USE_OPENGL
-			MakeTexture(TheUI.Resources[i].Icon.Graphic,
-				TheUI.Resources[i].Icon.Graphic->Width,
-				TheUI.Resources[i].Icon.Graphic->Height);
-#endif
 		}
 	}
 
 	// FIXME: reuse same graphics?
 	if (TheUI.Resources[FoodCost].Icon.File) {
 		TheUI.Resources[FoodCost].Icon.Graphic = LoadGraphic(TheUI.Resources[FoodCost].Icon.File);
-#ifdef USE_OPENGL
-		MakeTexture(TheUI.Resources[FoodCost].Icon.Graphic,
-			TheUI.Resources[FoodCost].Icon.Graphic->Width,
-			TheUI.Resources[FoodCost].Icon.Graphic->Height);
-#endif
 	}
 	// FIXME: reuse same graphics?
 	if (TheUI.Resources[ScoreCost].Icon.File) {
 		TheUI.Resources[ScoreCost].Icon.Graphic = LoadGraphic(TheUI.Resources[ScoreCost].Icon.File);
-#ifdef USE_OPENGL
-		MakeTexture(TheUI.Resources[ScoreCost].Icon.Graphic,
-			TheUI.Resources[ScoreCost].Icon.Graphic->Width,
-			TheUI.Resources[ScoreCost].Icon.Graphic->Height);
-#endif
 	}
 
 	if (TheUI.InfoPanel.File) {
 		TheUI.InfoPanel.Graphic = LoadGraphic(TheUI.InfoPanel.File);
-#ifdef USE_OPENGL
-		MakeTexture(TheUI.InfoPanel.Graphic,
-			TheUI.InfoPanel.Graphic->Width,
-			TheUI.InfoPanel.Graphic->Height);
-#endif
 	}
 	if (TheUI.ButtonPanel.File) {
 		TheUI.ButtonPanel.Graphic = LoadGraphic(TheUI.ButtonPanel.File);
-#ifdef USE_OPENGL
-		MakeTexture(TheUI.ButtonPanel.Graphic,
-			TheUI.ButtonPanel.Graphic->Width,
-			TheUI.ButtonPanel.Graphic->Height);
-#endif
 	}
 	if (TheUI.MenuPanel.File) {
 		TheUI.MenuPanel.Graphic = LoadGraphic(TheUI.MenuPanel.File);
-#ifdef USE_OPENGL
-		MakeTexture(TheUI.MenuPanel.Graphic,
-			TheUI.MenuPanel.Graphic->Width,
-			TheUI.MenuPanel.Graphic->Height);
-#endif
 	}
 	if (TheUI.MinimapPanel.File) {
 		TheUI.MinimapPanel.Graphic = LoadGraphic(TheUI.MinimapPanel.File);
-#ifdef USE_OPENGL
-		MakeTexture(TheUI.MinimapPanel.Graphic,
-			TheUI.MinimapPanel.Graphic->Width,
-			TheUI.MinimapPanel.Graphic->Height);
-#endif
 	}
 	if (TheUI.StatusLine.File) {
 		TheUI.StatusLine.Graphic = LoadGraphic(TheUI.StatusLine.File);
-#ifdef USE_OPENGL
-		MakeTexture(TheUI.StatusLine.Graphic,
-			TheUI.StatusLine.Graphic->Width,
-			TheUI.StatusLine.Graphic->Height);
-#endif
 	}
 
 	//
-	//		Resolve cursors
+	//  Resolve cursors
 	//
 	TheUI.Point.Cursor = CursorTypeByIdent(TheUI.Point.Name);
 	TheUI.Glass.Cursor = CursorTypeByIdent(TheUI.Glass.Name);
@@ -319,11 +271,6 @@ global void LoadUserInterface(void)
 	while (menupanel) {
 		if (menupanel->Panel.File) {
 			menupanel->Panel.Graphic = LoadGraphic(menupanel->Panel.File);
-#ifdef USE_OPENGL
-			MakeTexture(menupanel->Panel.Graphic,
-				menupanel->Panel.Graphic->Width,
-				menupanel->Panel.Graphic->Height);
-#endif
 		}
 		menupanel = menupanel->Next;
 	}

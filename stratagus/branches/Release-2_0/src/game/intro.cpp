@@ -421,9 +421,6 @@ global void ShowIntro(const Intro* intro)
 
 	background = LoadGraphic(intro->Background);
 	ResizeGraphic(background, VideoWidth, VideoHeight);
-#ifdef USE_OPENGL
-	MakeTexture(background, background->Width, background->Height);
-#endif
 
 	LibraryFileName(intro->TextFile, buf);
 	if (!(file = CLopen(buf, CL_OPEN_READ))) {
@@ -610,9 +607,6 @@ global void ShowCredits(Credits* credits)
 	if (credits->Background) {
 		background = LoadGraphic(credits->Background);
 		ResizeGraphic(background, VideoWidth, VideoHeight);
-#ifdef USE_OPENGL
-		MakeTexture(background, background->Width, background->Height);
-#endif
 	}
 
 	// play different music?
@@ -763,9 +757,6 @@ global void ShowPicture(CampaignChapter* chapter)
 
 	background = LoadGraphic(chapter->Data.Picture.Image);
 	ResizeGraphic(background, VideoWidth, VideoHeight);
-#ifdef USE_OPENGL
-	MakeTexture(background, background->Width, background->Height);
-#endif
 	IntroNoEvent = 1;
 
 	text = chapter->Data.Picture.Text;

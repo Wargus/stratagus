@@ -317,27 +317,6 @@ global void FlipGraphic(Graphic* graphic)
 }
 
 /**
-**  Make a new graphic object.
-**
-**  @param depth   Pixel depth of the object (8,16,32)
-**  @param width   Pixel width.
-**  @param height  Pixel height.
-*/
-global Graphic* NewGraphic(unsigned depth, int width, int height)
-{
-	void* data;
-	int size;
-
-	size = width * height * (depth + 7) / 8;
-	data = malloc(size);
-#ifdef DEBUG
-	AllocatedGraphicMemory += size;
-#endif
-
-	return MakeGraphic(depth, width, height, data, size);
-}
-
-/**
 **  Make an OpenGL texture or textures out of a graphic object.
 **
 **  @param graphic  The graphic object.
@@ -492,8 +471,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 	SDL_UnlockSurface(graphic->Surface);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG
-	i = glGetError();
-	if (i) {
+	if ((i = glGetError())) {
 		DebugLevel0Fn("glTexImage2D(%x)\n" _C_ i);
 	}
 #endif
@@ -511,7 +489,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 **  @todo FIXME: Higher quality resizing.
 **        FIXME: Works only with 8bit indexed graphic objects.
 */
-global void ResizeGraphic(Graphic *g, int w, int h)
+global void ResizeGraphic(Graphic* g, int w, int h)
 {
 	int i;
 	int j;
@@ -552,7 +530,14 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 
 	g->Width = w;
 	g->Height = h;
+	free(g->Data);
 	g->Data = data;
+
+#ifdef USE_OPENGL
+	glDeleteTextures(g->NumTextureNames, g->TextureNames);
+	free(g->TextureNames);
+	MakeTexture(g, g->Width, g->Height);
+#endif
 }
 
 /**
@@ -564,19 +549,7 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 */
 global Graphic* LoadGraphic(const char* name)
 {
-	Graphic* graphic;
-	char buf[PATH_MAX];
-
-	// TODO: More formats?
-	if (!(graphic = LoadGraphicPNG(LibraryFileName(name, buf)))) {
-		fprintf(stderr, "Can't load the graphic `%s'\n", name);
-		ExitFatal(-1);
-	}
-
-	graphic->NumFrames = 1;
-	VideoPaletteListAdd(graphic->Surface);
-
-	return graphic;
+	return LoadSprite(name, 0, 0);
 }
 
 /**
