@@ -35,6 +35,7 @@
 #include "freecraft.h"
 #include "ccl.h"
 #include "tileset.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -73,6 +74,127 @@ local SCM CclDefineTilesetWcNames(SCM list)
     *cp=NULL;
 
     return SCM_UNSPECIFIED;
+}
+
+/**
+**	Extend tables of the tileset.
+**
+**	@param tileset	Tileset to be extended.
+**	@param tiles	Number of tiles.
+*/
+local void ExtendTilesetTables(Tileset * tileset, int tiles)
+{
+    tileset->Table = realloc(tileset->Table, tiles * sizeof(*tileset->Table));
+    if (!tileset->Table) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+    tileset->FlagsTable =
+	realloc(tileset->FlagsTable, tiles * sizeof(*tileset->FlagsTable));
+    if (!tileset->FlagsTable) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+    tileset->BasicNameTable = realloc(tileset->BasicNameTable,
+	tiles * sizeof(*tileset->BasicNameTable));
+    if (!tileset->BasicNameTable) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+    tileset->MixedNameTable = realloc(tileset->MixedNameTable,
+	tiles * sizeof(*tileset->MixedNameTable));
+    if (!tileset->MixedNameTable) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+}
+
+/**
+**	Parse the name field in tileset definition.
+**
+**	@param tileset	Tileset currently parsed.
+**	@param list	List with name.
+*/
+local int TilesetParseName(Tileset* tileset, SCM list)
+{
+    char *ident;
+    int i;
+
+    ident = gh_scm2newstr(gh_car(list), NULL);
+    for (i = 0; i < tileset->NumNames; ++i) {
+	if (!strcmp(ident, tileset->TileNames[i])) {
+	    free(ident);
+	    return i;
+	}
+    }
+    tileset->TileNames = realloc(tileset->TileNames,
+	++tileset->NumNames * sizeof(*tileset->TileNames));
+    tileset->TileNames[i] = ident;
+
+    return i;
+}
+
+/**
+**	Parse the flag section of a tile definition.
+**
+**	@param list	list of flags.
+**	@param back	pointer for the flags (return).
+**
+**	@return		remaining list
+*/
+local SCM ParseTilesetTileFlags(SCM list, int* back)
+{
+    int flags;
+
+    //
+    //  Parse the list: flags of the slot
+    //
+    flags = 0;
+    while (!gh_null_p(list)) {
+	SCM value;
+
+	value = gh_car(list);
+
+	if (!gh_symbol_p(value)) {
+	    break;
+	}
+	list = gh_cdr(list);
+
+	//
+	//      Flags are only needed for the editor
+	//
+	if (gh_eq_p(value, gh_symbol2scm("water"))) {
+	    flags |= MapFieldWaterAllowed;
+	} else if (gh_eq_p(value, gh_symbol2scm("land"))) {
+	    flags |= MapFieldLandAllowed;
+	} else if (gh_eq_p(value, gh_symbol2scm("coast"))) {
+	    flags |= MapFieldCoastAllowed;
+	} else if (gh_eq_p(value, gh_symbol2scm("no-building"))) {
+	    flags |= MapFieldNoBuilding;
+	} else if (gh_eq_p(value, gh_symbol2scm("unpassable"))) {
+	    flags |= MapFieldUnpassable;
+	} else if (gh_eq_p(value, gh_symbol2scm("wall"))) {
+	    flags |= MapFieldWall;
+	} else if (gh_eq_p(value, gh_symbol2scm("rock"))) {
+	    flags |= MapFieldRocks;
+	} else if (gh_eq_p(value, gh_symbol2scm("forest"))) {
+	    flags |= MapFieldForest;
+	} else if (gh_eq_p(value, gh_symbol2scm("land-unit"))) {
+	    flags |= MapFieldLandUnit;
+	} else if (gh_eq_p(value, gh_symbol2scm("air-unit"))) {
+	    flags |= MapFieldAirUnit;
+	} else if (gh_eq_p(value, gh_symbol2scm("sea-unit"))) {
+	    flags |= MapFieldSeaUnit;
+	} else if (gh_eq_p(value, gh_symbol2scm("building"))) {
+	    flags |= MapFieldBuilding;
+	} else if (gh_eq_p(value, gh_symbol2scm("human"))) {
+	    flags |= MapFieldHuman;
+	} else {
+	    errl("solid: unsupported tag", value);
+	}
+    }
+    *back = flags;
+    return list;
 }
 
 /**
@@ -176,51 +298,34 @@ local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
     SCM value;
     SCM data;
     int i;
+    int f;
     int l;
+    int basic_name;
 
-    tileset->Table=realloc(tileset->Table,(index+16)*sizeof(*tileset->Table));
-    if( !tileset->Table ) {
-	fprintf(stderr,"out of memory.\n");
-	ExitFatal(-1);
-    }
+    ExtendTilesetTables(tileset,index+16);
 
-    value=gh_car(list);			// name
+    basic_name=TilesetParseName(tileset,list);	// base name
     list=gh_cdr(list);
 
-    //
-    //	Parse the list:	flags of the slot
-    //
-    while( !gh_null_p(list) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
-
-	if( !gh_symbol_p(value) ) {
-	    break;
-	}
-
-	//
-	//	Flags are only needed for the editor
-	//
-	if( gh_eq_p(value,gh_symbol2scm("water")) ) {
-	} else if( gh_eq_p(value,gh_symbol2scm("no-building")) ) {
-	} else if( gh_eq_p(value,gh_symbol2scm("forest")) ) {
-	} else if( gh_eq_p(value,gh_symbol2scm("rock")) ) {
-	} else if( gh_eq_p(value,gh_symbol2scm("wall")) ) {
-	} else {
-	    errl("solid: unsupported tag",value);
-	}
-    }
+    list=ParseTilesetTileFlags(list,&f);
 
     //
     //	Vector: the tiles.
     //
+    value = gh_car(list);
     l=gh_vector_length(value);
     for( i=0; i<l; ++i ) {
 	data=gh_vector_ref(value,gh_int2scm(i));
 	tileset->Table[index+i]=gh_scm2int(data);
+	tileset->FlagsTable[index+i]=f;
+	tileset->BasicNameTable[index+i]=basic_name;
     }
     while( i<16 ) {
-	tileset->Table[index+i++]=0;
+	tileset->Table[index+i]=0;
+	tileset->FlagsTable[index+i]=0;
+	tileset->BasicNameTable[index+i]=0;
+	tileset->MixedNameTable[index+i]=0;
+	++i;
     }
 
     return index+16;
@@ -239,42 +344,18 @@ local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
     SCM data;
     int i;
     int l;
+    int f;
+    int basic_name;
+    int mixed_name;
 
-    tileset->Table=realloc(tileset->Table,(index+256)*sizeof(*tileset->Table));
-    if( !tileset->Table ) {
-	fprintf(stderr,"out of memory.\n");
-	ExitFatal(-1);
-    }
+    ExtendTilesetTables(tileset,index+256);
 
-    value=gh_car(list);			// base name
+    basic_name=TilesetParseName(tileset,list);	// base name
     list=gh_cdr(list);
-    value=gh_car(list);			// mixed name
+    mixed_name=TilesetParseName(tileset,list);	// mixed name
     list=gh_cdr(list);
 
-    //
-    //	Parse the list:	flags of the slot
-    //
-    while( !gh_null_p(list) ) {
-	value=gh_car(list);
-
-	if( !gh_symbol_p(value) ) {
-	    break;
-	}
-	list=gh_cdr(list);
-
-	//
-	//	Flags are only needed for the editor
-	//
-	if( gh_eq_p(value,gh_symbol2scm("water")) ) {
-	} else if( gh_eq_p(value,gh_symbol2scm("no-building")) ) {
-	} else if( gh_eq_p(value,gh_symbol2scm("forest")) ) {
-	} else if( gh_eq_p(value,gh_symbol2scm("rock")) ) {
-	} else if( gh_eq_p(value,gh_symbol2scm("wall")) ) {
-	} else if( gh_eq_p(value,gh_symbol2scm("coast")) ) {
-	} else {
-	    errl("solid: unsupported tag",value);
-	}
-    }
+    list=ParseTilesetTileFlags(list,&f);
 
     //
     //	Parse the list:	slots FIXME: no error checking number of slots
@@ -291,9 +372,16 @@ local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
 	for( i=0; i<l; ++i ) {
 	    data=gh_vector_ref(value,gh_int2scm(i));
 	    tileset->Table[index+i]=gh_scm2int(data);
+	    tileset->FlagsTable[index+i]=f;
+	    tileset->BasicNameTable[index+i]=basic_name;
+	    tileset->MixedNameTable[index+i]=mixed_name;
 	}
-	while( i<16 ) {
-	    tileset->Table[index+i++]=0;
+	while( i<16 ) {			// Fill missing slots
+	    tileset->Table[index+i]=0;
+	    tileset->FlagsTable[index+i]=0;
+	    tileset->BasicNameTable[index+i]=0;
+	    tileset->MixedNameTable[index+i]=0;
+	    ++i;
 	}
 	index+=16;
     }
@@ -314,9 +402,25 @@ local void DefineTilesetParseSlot(Tileset* tileset,SCM list)
     int index;
 
     index=0;
-    tileset->Table=malloc(16*sizeof(*tileset->Table));
-    if( !tileset->Table ) {
-	fprintf(stderr,"out of memory.\n");
+    tileset->Table = malloc(16 * sizeof(*tileset->Table));
+    if (!tileset->Table) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+    tileset->FlagsTable =
+	malloc(16 * sizeof(*tileset->FlagsTable));
+    if (!tileset->FlagsTable) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+    tileset->BasicNameTable = malloc(16 * sizeof(*tileset->BasicNameTable));
+    if (!tileset->BasicNameTable) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+    tileset->MixedNameTable = malloc(16 * sizeof(*tileset->MixedNameTable));
+    if (!tileset->MixedNameTable) {
+	fprintf(stderr, "out of memory.\n");
 	ExitFatal(-1);
     }
 
