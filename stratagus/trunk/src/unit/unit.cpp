@@ -487,7 +487,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	//
 	//	Update fog of war, if unit belongs to player on this computer
 	//
-	if( unit->Next && !unit->Next->Data.Builded.Cancel && unit->Removed ) {
+	if( unit->Next && unit->Removed ) {
 	    MapUnmarkSight(unit->Player,unit->Next->X+unit->Next->Type->TileWidth/2
 				,unit->Next->Y+unit->Next->Type->TileHeight/2
 				,unit->CurrentSightRange);
@@ -577,19 +577,14 @@ global void RemoveUnit(Unit* unit, Unit* host)
     unsigned flags;
 
 #ifdef NEW_FOW
-    if ( !(host &&
-	unit->X+unit->Type->TileWidth/2 == host->X+host->Type->TileWidth/2 &&
-	unit->Y+unit->Type->TileHeight/2 == host->Y+host->Type->TileWidth/2 &&
-	unit->CurrentSightRange == unit->CurrentSightRange) ) {
-	    MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+    MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
 				,unit->Y+unit->Type->TileHeight/2
 				,unit->CurrentSightRange);
-	    if( host ) {
-		unit->CurrentSightRange=host->CurrentSightRange;
-		MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2,
-				host->Y+host->Type->TileWidth/2,
-				unit->CurrentSightRange);
-	    }
+    if( host ) {
+	unit->CurrentSightRange=host->CurrentSightRange;
+	MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2,
+			host->Y+host->Type->TileWidth/2,
+			unit->CurrentSightRange);
     }
 #endif
 
