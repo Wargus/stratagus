@@ -1004,7 +1004,9 @@ global void ShowLoadProgress(const char* fmt, ...)
     va_end(va);
 
     if (VideoDepth && IsFontLoaded(GameFont)) {
-#ifndef USE_SDL_SURFACE
+#ifdef USE_SDL_SURFACE
+	SDL_Color color = { 0, 0, 0, 0 };
+#else
 	VideoLockScreen();
 #endif
 	for (s = temp; *s; ++s) {	// Remove non printable chars
@@ -1013,8 +1015,6 @@ global void ShowLoadProgress(const char* fmt, ...)
 	    }
 	}
 #ifdef USE_SDL_SURFACE
-	SDL_Color color = { 0, 0, 0, 0 };
-
 	VideoFillRectangle(color, 5, VideoHeight - 18, VideoWidth - 10, 18);
 #else
 	VideoFillRectangle(ColorBlack, 5, VideoHeight - 18, VideoWidth - 10, 18);

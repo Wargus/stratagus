@@ -10,7 +10,7 @@
 //
 /**@name linedraw.c	-	The general linedraw functions. */
 //
-//	(c) Copyright 2000-2003 by Lutz Sammer, Stephan Rasenberg, 
+//	(c) Copyright 2000-2003 by Lutz Sammer, Stephan Rasenberg,
 //	Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -464,7 +464,7 @@ global void VideoDrawPixel(SDL_Color color, int x, int y)
     ofs = TheScreen->pitch * y + x * bpp;
 
     SDL_LockSurface(TheScreen);
-    memcpy(TheScreen->pixels + ofs, &c, bpp);
+    memcpy((char*)TheScreen->pixels + ofs, &c, bpp);
     SDL_UnlockSurface(TheScreen);
 }
 
@@ -481,7 +481,7 @@ global void VideoDrawTransPixel(SDL_Color color, int x, int y, unsigned char alp
     ofs = TheScreen->pitch * y + x * bpp;
 
     SDL_LockSurface(TheScreen);
-    memcpy(TheScreen->pixels + ofs, &c, bpp);
+    memcpy((char*)TheScreen->pixels + ofs, &c, bpp);
     SDL_UnlockSurface(TheScreen);
 }
 
@@ -762,7 +762,7 @@ global void VideoFillTransRectangle(SDL_Color color, int x, int y,
     SDL_Surface* s;
     Uint32 c;
 
-    s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 
+    s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h,
 	32, RMASK, GMASK, BMASK, AMASK);
 
     c = SDL_MapRGBA(s->format, color.r, color.g, color.b, alpha);
@@ -1437,7 +1437,7 @@ local void DrawNoTransPixel8(VMemType color, int x, int y,
 **      @param alpha    alpha value of pixel.
 **
 ** For 15bit |-RRRRRGGGGGBBBBB|, we need for each 5bit offically:
-**   (5bit - 5bit) * 8bit alpha = 14bit signed int 
+**   (5bit - 5bit) * 8bit alpha = 14bit signed int
 **
 ** But Lutz has a smarter way, all in one unsigned 32bit:
 **    color = |------GGGGG-----RRRRR------BBBBB|
@@ -1471,8 +1471,8 @@ local void DrawTransPixel15(VMemType color, int x, int y,
 **      @param alpha    alpha value of pixel.
 **
 ** For 16bit |RRRRRGGGGGGBBBBB|, we need offically:
-**   (5bit - 5bit) * 8bit alpha = 14bit signed int 
-**   (6bit - 6bit) * 8bit alpha = 15bit signed int 
+**   (5bit - 5bit) * 8bit alpha = 14bit signed int
+**   (6bit - 6bit) * 8bit alpha = 15bit signed int
 **
 ** But Lutz has a smarter way, all in one unsigned 32bit:
 **    color = |-----GGGGGG-----RRRRR------BBBBB|
@@ -1521,7 +1521,7 @@ local void DrawTransPixel24(VMemType color, int x, int y,
 **      @param alpha    alpha value of pixel.
 **
 ** For 32bit |AAAAAAAARRRRRRRRGGGGGGGGBBBBBBBB|, we need offically:
-**   (8bit - 8bit) * 8bit alpha = 17bit signed int 
+**   (8bit - 8bit) * 8bit alpha = 17bit signed int
 **
 ** a smarter way, all in two unsigned 32bit:
 **  color(1)    = |--------RRRRRRRR--------BBBBBBBB|
@@ -2018,16 +2018,16 @@ local void Draw25TransHLine32(VMemType color, int x, int y, int width)
     sp1 = (sp1 & 0x00FF00FF) * 3;
 
     while (p < e) {
-        unsigned long dp1;
+	unsigned long dp1;
 	unsigned long dp2;
 
-        dp1 = *p;
-        dp2 = (dp1 & 0xFF00FF00) >> 8;
-        dp1 &= 0x00FF00FF;
+	dp1 = *p;
+	dp2 = (dp1 & 0xFF00FF00) >> 8;
+	dp1 &= 0x00FF00FF;
 
-        dp1 = ((dp1 + sp1) >> 2) & 0x00FF00FF;
-        dp2 = ((dp2 + sp2) >> 2) & 0x00FF00FF;
-        *p++ = (dp1 | (dp2 << 8));
+	dp1 = ((dp1 + sp1) >> 2) & 0x00FF00FF;
+	dp2 = ((dp2 + sp2) >> 2) & 0x00FF00FF;
+	*p++ = (dp1 | (dp2 << 8));
     }
 }
 
@@ -2183,15 +2183,15 @@ local void Draw50TransHLine32(VMemType color, int x, int y, int width)
     sp1 &= 0x00FF00FF;
 
     while (p < e) {
-        unsigned long dp1, dp2;
+	unsigned long dp1, dp2;
 
-        dp1 = *p;
-        dp2 = (dp1 & 0xFF00FF00) >> 8;
-        dp1 &= 0x00FF00FF;
+	dp1 = *p;
+	dp2 = (dp1 & 0xFF00FF00) >> 8;
+	dp1 &= 0x00FF00FF;
 
-        dp1 = ((dp1 + sp1) >> 1) & 0x00FF00FF;
-        dp2 = ((dp2 + sp2) >> 1) & 0x00FF00FF;
-        *p++ = (dp1 | (dp2 << 8));
+	dp1 = ((dp1 + sp1) >> 1) & 0x00FF00FF;
+	dp2 = ((dp2 + sp2) >> 1) & 0x00FF00FF;
+	*p++ = (dp1 | (dp2 << 8));
     }
 }
 
@@ -2244,8 +2244,8 @@ local void Draw75TransHLine8(VMemType color, int x, int y, int width)
     c = color.D8;
 
     while (p < e) {
-      *p = lookup25trans8[(*p << 8) | c];
-      ++p;
+	*p = lookup25trans8[(*p << 8) | c];
+	++p;
     }
 }
 
@@ -2349,16 +2349,16 @@ local void Draw75TransHLine32(VMemType color, int x, int y, int width)
     sp1 &= 0x00FF00FF;
 
     while (p < e) {
-        unsigned long dp1;
+	unsigned long dp1;
 	unsigned long dp2;
 
-        dp1 = *p;
-        dp2 = (dp1 & 0xFF00FF00) >> 8;
-        dp1 &= 0x00FF00FF;
+	dp1 = *p;
+	dp2 = (dp1 & 0xFF00FF00) >> 8;
+	dp1 &= 0x00FF00FF;
 
-        dp1 = (((dp1 << 1) + dp1 + sp1) >> 2) & 0x00FF00FF;
-        dp2 = (((dp2 << 1) + dp2 + sp2) >> 2) & 0x00FF00FF;
-        *p++ = (dp1 | (dp2 << 8));
+	dp1 = (((dp1 << 1) + dp1 + sp1) >> 2) & 0x00FF00FF;
+	dp2 = (((dp2 << 1) + dp2 + sp2) >> 2) & 0x00FF00FF;
+	*p++ = (dp1 | (dp2 << 8));
     }
 }
 
@@ -2557,17 +2557,17 @@ local void DrawTransHLine24(VMemType color, int x, int y, int width,
 
 	c = *p;
 
-        i = c.a;
-        i = (((i - spR) * alpha) >> 8) + spR;
-        c.a = i & 0xFF;
+	i = c.a;
+	i = (((i - spR) * alpha) >> 8) + spR;
+	c.a = i & 0xFF;
 
-        i = c.b;
-        i = (((i - spG) * alpha) >> 8) + spG;
-        c.b = i & 0xFF;
+	i = c.b;
+	i = (((i - spG) * alpha) >> 8) + spG;
+	c.b = i & 0xFF;
 
-        i = c.c;
-        i = (((i - spB) * alpha) >> 8) + spB;
-        c.c = i & 0xFF;
+	i = c.c;
+	i = (((i - spB) * alpha) >> 8) + spB;
+	c.c = i & 0xFF;
 
 	*p++ = c;
     }
@@ -2606,9 +2606,9 @@ local void DrawTransHLine32(VMemType color, int x, int y, int width,
 	dp2 = (dp1 & 0xFF00FF00) >> 8;
 	dp1 &= 0x00FF00FF;
 
-        //FIXME: alpha==256 unreached
-        dp1 = ((((dp1 - sp1) * alpha) >> 7) + sp1) & 0x00FF00FF;
-        dp2 = ((((dp2 - sp2) * alpha) >> 7) + sp2) & 0x00FF00FF;
+	//FIXME: alpha==256 unreached
+	dp1 = ((((dp1 - sp1) * alpha) >> 7) + sp1) & 0x00FF00FF;
+	dp2 = ((((dp2 - sp2) * alpha) >> 7) + sp2) & 0x00FF00FF;
 
 	*p++ = (dp1 | (dp2 << 8));
     }
@@ -2889,8 +2889,8 @@ local void Draw25TransVLine8(VMemType color, int x, int y, int height)
     p = VideoMemory8 + x + y * w;
     c = color.D8 << 8;
     while (height--) {
-        *p = lookup25trans8[c | *p];
-        p += w;
+	*p = lookup25trans8[c | *p];
+	p += w;
     }
 }
 
@@ -2919,9 +2919,9 @@ local void Draw25TransVLine15(VMemType color, int x, int y, int height)
 
 	dp = *p;
 	dp = ((dp << 16) | dp) & 0x03E07C1F;
-        dp = ((dp + sp) >> 2) & 0x03E07C1F;
+	dp = ((dp + sp) >> 2) & 0x03E07C1F;
 	*p = (dp >> 16) | dp;
-        p += w;
+	p += w;
     }
 }
 
@@ -2950,9 +2950,9 @@ local void Draw25TransVLine16(VMemType color, int x, int y, int height)
 
 	dp = *p;
 	dp = ((dp << 16) | dp) & 0x07E0F81F;
-        dp = ((dp + sp) >> 2) & 0x07E0F81F;
+	dp = ((dp + sp) >> 2) & 0x07E0F81F;
 	*p = (dp >> 16) | dp;
-        p += w;
+	p += w;
     }
 }
 
@@ -2995,14 +2995,14 @@ local void Draw25TransVLine32(VMemType color, int x, int y, int height)
 	unsigned long dp1, dp2;
 
 	dp1 = *p;
-        dp2 = (dp1 & 0xFF00FF00) >> 8;
-        dp1 &= 0x00FF00FF;
+	dp2 = (dp1 & 0xFF00FF00) >> 8;
+	dp1 &= 0x00FF00FF;
 
-        dp1 = ((dp1 + sp1) >> 2) & 0x00FF00FF;
-        dp2 = ((dp2 + sp2) >> 2) & 0x00FF00FF;
-        *p = (dp1 | (dp2 << 8));
+	dp1 = ((dp1 + sp1) >> 2) & 0x00FF00FF;
+	dp2 = ((dp2 + sp2) >> 2) & 0x00FF00FF;
+	*p = (dp1 | (dp2 << 8));
 
-        p += w;
+	p += w;
     }
 }
 
@@ -3052,8 +3052,8 @@ local void Draw50TransVLine8(VMemType color, int x, int y, int height)
     p = VideoMemory8 + x + y * w;
     c = color.D8 << 8;
     while (height--) {
-        *p = lookup50trans8[c | *p];
-        p += w;
+	*p = lookup50trans8[c | *p];
+	p += w;
     }
 }
 
@@ -3081,9 +3081,9 @@ local void Draw50TransVLine15(VMemType color, int x, int y, int height)
 
 	dp = *p;
 	dp = ((dp << 16) | dp) & 0x03E07C1F;
-        dp = ((dp + sp) >> 1) & 0x03E07C1F;
+	dp = ((dp + sp) >> 1) & 0x03E07C1F;
 	*p = (dp >> 16) | dp;
-        p += w;
+	p += w;
     }
 }
 
@@ -3112,9 +3112,9 @@ local void Draw50TransVLine16(VMemType color, int x, int y, int height)
 
 	dp = *p;
 	dp = ((dp << 16) | dp) & 0x07E0F81F;
-        dp = ((dp + sp) >> 1) & 0x07E0F81F;
+	dp = ((dp + sp) >> 1) & 0x07E0F81F;
 	*p = (dp >> 16) | dp;
-        p += w;
+	p += w;
     }
 }
 
@@ -3158,14 +3158,14 @@ local void Draw50TransVLine32(VMemType color, int x, int y, int height)
 	unsigned long dp2;
 
 	dp1 = *p;
-        dp2 = (dp1 & 0xFF00FF00) >> 8;
-        dp1 &= 0x00FF00FF;
+	dp2 = (dp1 & 0xFF00FF00) >> 8;
+	dp1 &= 0x00FF00FF;
 
-        dp1 = ((dp1 + sp1) >> 1) & 0x00FF00FF;
-        dp2 = ((dp2 + sp2) >> 1) & 0x00FF00FF;
-        *p = (dp1 | (dp2 << 8));
+	dp1 = ((dp1 + sp1) >> 1) & 0x00FF00FF;
+	dp2 = ((dp2 + sp2) >> 1) & 0x00FF00FF;
+	*p = (dp1 | (dp2 << 8));
 
-        p += w;
+	p += w;
     }
 }
 
@@ -3217,8 +3217,8 @@ local void Draw75TransVLine8(VMemType color, int x, int y, int height)
     p = VideoMemory8 + x + y * w;
     c = color.D8;
     while (height--) {
-        *p = lookup25trans8[(*p << 8) | c];
-        p += w;
+	*p = lookup25trans8[(*p << 8) | c];
+	p += w;
     }
 }
 
@@ -3247,9 +3247,9 @@ local void Draw75TransVLine15(VMemType color, int x, int y, int height)
 
 	dp = *p;
 	dp = ((dp << 16) | dp) & 0x03E07C1F;
-        dp = (((dp << 1) + dp + sp) >> 2) & 0x03E07C1F;
+	dp = (((dp << 1) + dp + sp) >> 2) & 0x03E07C1F;
 	*p = (dp >> 16) | dp;
-        p += w;
+	p += w;
     }
 }
 
@@ -3278,9 +3278,9 @@ local void Draw75TransVLine16(VMemType color, int x, int y, int height)
 
 	dp = *p;
 	dp = ((dp << 16) | dp) & 0x07E0F81F;
-        dp = (((dp << 1) + dp + sp) >> 2) & 0x07E0F81F;
+	dp = (((dp << 1) + dp + sp) >> 2) & 0x07E0F81F;
 	*p = (dp >> 16) | dp;
-        p += w;
+	p += w;
     }
 }
 
@@ -3324,14 +3324,14 @@ local void Draw75TransVLine32(VMemType color, int x, int y, int height)
 	unsigned long dp2;
 
 	dp1 = *p;
-        dp2 = (dp1 & 0xFF00FF00) >> 8;
-        dp1 &= 0x00FF00FF;
+	dp2 = (dp1 & 0xFF00FF00) >> 8;
+	dp1 &= 0x00FF00FF;
 
-        dp1 = (((dp1 << 1) + dp1 + sp1) >> 2) & 0x00FF00FF;
-        dp2 = (((dp2 << 1) + dp2 + sp2) >> 2) & 0x00FF00FF;
-        *p = (dp1 | (dp2 << 8));
+	dp1 = (((dp1 << 1) + dp1 + sp1) >> 2) & 0x00FF00FF;
+	dp2 = (((dp2 << 1) + dp2 + sp2) >> 2) & 0x00FF00FF;
+	*p = (dp1 | (dp2 << 8));
 
-        p += w;
+	p += w;
     }
 }
 
@@ -3462,7 +3462,7 @@ local void DrawTransVLine15(VMemType color, int x, int y, int height,
 	dp = ((dp << 16) | dp) & 0x03E07C1F;
 	dp = ((((dp - sp) * alpha) >> 5) + sp) & 0x03E07C1F; //FIXME: alpha==256 unreached
 	*p = (dp >> 16) | dp;
-        p += w;
+	p += w;
     }
 }
 
@@ -3496,7 +3496,7 @@ local void DrawTransVLine16(VMemType color, int x, int y, int height,
 	dp = ((dp << 16) | dp) & 0x07E0F81F;
 	dp = ((((dp - sp) * alpha) >> 5) + sp) & 0x07E0F81F; //FIXME: alpha==256 unreached
 	*p = (dp >> 16) | dp;
-        p += w;
+	p += w;
     }
 }
 
@@ -3544,15 +3544,15 @@ local void DrawTransVLine32(VMemType color, int x, int y, int height,
 	unsigned long dp2;
 
 	dp1 = *p;
-        dp2 = (dp1 & 0xFF00FF00) >> 8;
-        dp1 &= 0x00FF00FF;
+	dp2 = (dp1 & 0xFF00FF00) >> 8;
+	dp1 &= 0x00FF00FF;
 
-        //FIXME: alpha==256 unreached
-        dp1 = ((((dp1-sp1) * alpha) >> 8) + sp1) & 0x00FF00FF;
-        dp2 = ((((dp2-sp2) * alpha) >> 8) + sp2) & 0x00FF00FF;
-        *p = (dp1 | (dp2 << 8));
+	//FIXME: alpha==256 unreached
+	dp1 = ((((dp1-sp1) * alpha) >> 8) + sp1) & 0x00FF00FF;
+	dp2 = ((((dp2-sp2) * alpha) >> 8) + sp2) & 0x00FF00FF;
+	*p = (dp1 | (dp2 << 8));
 
-        p += w;
+	p += w;
     }
 }
 
@@ -4225,7 +4225,7 @@ global void VideoDrawLineClip(VMemType color, int x1, int y1, int x2, int y2)
 //FIXME: As the clipped coordinates are rounded to integers, the line's
 //       direction vector might be slightly off. Somehow, the sub-pixel
 //       position(s) on the clipped retangle should be denoted to the line
-//       drawing routine.. 
+//       drawing routine..
     DebugCheck(x1 < ClipX1 || x2 < ClipX1 || x1 > ClipX2 || x2 > ClipX2 ||
 	y1 < ClipY1 || y2 < ClipY1 || y1 > ClipY2 || y2 > ClipY2);
     VideoDrawLine(color, x1, y1, x2, y2);
@@ -7291,64 +7291,64 @@ global void InitLineDraw(void)
 #else
     switch (VideoBpp) {
 	case 8:
-            if (lookup25trans8 && lookup50trans8) {
-	      VideoDrawPixel            = DrawPixel8;
-	      VideoDraw25TransPixel     = Draw25TransPixel8;
-	      VideoDraw50TransPixel     = Draw50TransPixel8;
-	      VideoDraw75TransPixel     = Draw75TransPixel8;
-	      VideoDrawTransPixel       = DrawTransPixel8;
-	      VideoDrawPixelClip        = DrawPixelClip8;
-	      VideoDrawHLine            = DrawHLine8;
-	      VideoDraw25TransHLine     = Draw25TransHLine8;
-	      VideoDraw50TransHLine     = Draw50TransHLine8;
-	      VideoDraw75TransHLine     = Draw75TransHLine8;
-	      VideoDrawTransHLine       = DrawTransHLine8;
-	      VideoDrawVLine            = DrawVLine8;
-	      VideoDraw25TransVLine     = Draw25TransVLine8;
-	      VideoDraw50TransVLine     = Draw50TransVLine8;
-	      VideoDraw75TransVLine     = Draw75TransVLine8;
-	      VideoDrawTransVLine       = DrawTransVLine8;
-	      VideoDrawLine             = DrawLine8;
-	      VideoDrawRectangle        = DrawRectangle8;
-	      VideoDraw25TransRectangle = Draw25TransRectangle8;
-	      VideoDraw50TransRectangle = Draw50TransRectangle8;
-	      VideoDraw75TransRectangle = Draw75TransRectangle8;
-	      VideoDrawTransRectangle   = DrawTransRectangle8;
-	      VideoFillRectangle        = DrawFillRectangle8;
-	      VideoFill25TransRectangle = DrawFill25TransRectangle8;
-	      VideoFill50TransRectangle = DrawFill50TransRectangle8;
-	      VideoFill75TransRectangle = DrawFill75TransRectangle8;
-	      VideoFillTransRectangle   = DrawFillTransRectangle8;
-            } else {
-              printf("(transparency support disabled)\n");
-	      VideoDrawPixel            =
-	      VideoDraw25TransPixel     =
-	      VideoDraw50TransPixel     =
-	      VideoDraw75TransPixel     = DrawPixel8;
-	      VideoDrawTransPixel       = DrawNoTransPixel8;
-	      VideoDrawPixelClip        = DrawPixelClip8;
-	      VideoDrawHLine            =
-	      VideoDraw25TransHLine     =
-	      VideoDraw50TransHLine     =
-	      VideoDraw75TransHLine     = DrawHLine8;
-	      VideoDrawTransHLine       = DrawNoTransHLine8;
-	      VideoDrawVLine            =
-	      VideoDraw25TransVLine     =
-	      VideoDraw50TransVLine     =
-	      VideoDraw75TransVLine     = DrawVLine8;
-	      VideoDrawTransVLine       = DrawNoTransVLine8;
-	      VideoDrawLine             = DrawLine8;
-	      VideoDrawRectangle        =
-	      VideoDraw25TransRectangle =
-	      VideoDraw50TransRectangle =
-	      VideoDraw75TransRectangle = DrawRectangle8;
-	      VideoDrawTransRectangle   = DrawNoTransRectangle8;
-	      VideoFillRectangle        =
-	      VideoFill25TransRectangle =
-	      VideoFill50TransRectangle =
-	      VideoFill75TransRectangle = DrawFillRectangle8;
-	      VideoFillTransRectangle   = DrawFillNoTransRectangle8;
-            }
+	    if (lookup25trans8 && lookup50trans8) {
+		VideoDrawPixel            = DrawPixel8;
+		VideoDraw25TransPixel     = Draw25TransPixel8;
+		VideoDraw50TransPixel     = Draw50TransPixel8;
+		VideoDraw75TransPixel     = Draw75TransPixel8;
+		VideoDrawTransPixel       = DrawTransPixel8;
+		VideoDrawPixelClip        = DrawPixelClip8;
+		VideoDrawHLine            = DrawHLine8;
+		VideoDraw25TransHLine     = Draw25TransHLine8;
+		VideoDraw50TransHLine     = Draw50TransHLine8;
+		VideoDraw75TransHLine     = Draw75TransHLine8;
+		VideoDrawTransHLine       = DrawTransHLine8;
+		VideoDrawVLine            = DrawVLine8;
+		VideoDraw25TransVLine     = Draw25TransVLine8;
+		VideoDraw50TransVLine     = Draw50TransVLine8;
+		VideoDraw75TransVLine     = Draw75TransVLine8;
+		VideoDrawTransVLine       = DrawTransVLine8;
+		VideoDrawLine             = DrawLine8;
+		VideoDrawRectangle        = DrawRectangle8;
+		VideoDraw25TransRectangle = Draw25TransRectangle8;
+		VideoDraw50TransRectangle = Draw50TransRectangle8;
+		VideoDraw75TransRectangle = Draw75TransRectangle8;
+		VideoDrawTransRectangle   = DrawTransRectangle8;
+		VideoFillRectangle        = DrawFillRectangle8;
+		VideoFill25TransRectangle = DrawFill25TransRectangle8;
+		VideoFill50TransRectangle = DrawFill50TransRectangle8;
+		VideoFill75TransRectangle = DrawFill75TransRectangle8;
+		VideoFillTransRectangle   = DrawFillTransRectangle8;
+	    } else {
+		printf("(transparency support disabled)\n");
+		VideoDrawPixel            =
+		VideoDraw25TransPixel     =
+		VideoDraw50TransPixel     =
+		VideoDraw75TransPixel     = DrawPixel8;
+		VideoDrawTransPixel       = DrawNoTransPixel8;
+		VideoDrawPixelClip        = DrawPixelClip8;
+		VideoDrawHLine            =
+		VideoDraw25TransHLine     =
+		VideoDraw50TransHLine     =
+		VideoDraw75TransHLine     = DrawHLine8;
+		VideoDrawTransHLine       = DrawNoTransHLine8;
+		VideoDrawVLine            =
+		VideoDraw25TransVLine     =
+		VideoDraw50TransVLine     =
+		VideoDraw75TransVLine     = DrawVLine8;
+		VideoDrawTransVLine       = DrawNoTransVLine8;
+		VideoDrawLine             = DrawLine8;
+		VideoDrawRectangle        =
+		VideoDraw25TransRectangle =
+		VideoDraw50TransRectangle =
+		VideoDraw75TransRectangle = DrawRectangle8;
+		VideoDrawTransRectangle   = DrawNoTransRectangle8;
+		VideoFillRectangle        =
+		VideoFill25TransRectangle =
+		VideoFill50TransRectangle =
+		VideoFill75TransRectangle = DrawFillRectangle8;
+		VideoFillTransRectangle   = DrawFillNoTransRectangle8;
+	    }
 	    break;
 
 	case 15:
