@@ -1530,7 +1530,7 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 **
 **	@param unit	Pointer to the unit.
 */
-local void ShowOrder(const Unit* unit)
+global void ShowOrder(const Unit* unit)
 {
     int x1;
     int y1;

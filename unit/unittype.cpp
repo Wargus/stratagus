@@ -887,7 +887,10 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 	CLprintf(file,"  'coward\n");
     }
     if( type->Harvester ) {
-	CLprintf(file,"  'harvester 'resource-harvested '%s",DefaultResourceNames[type->ResourceHarvested]);
+	CLprintf(file,"  'harvester 'resource-harvested '%s\n",DefaultResourceNames[type->ResourceHarvested]);
+    }
+    if( type->HarvestFromOutside ) {
+	CLprintf(file,"  'harvest-from-outside\n");
     }
     if ( type->WaitAtResource ) {
 	CLprintf(file,"  'wait-at-resource %d\n",type->WaitAtResource);
@@ -908,7 +911,10 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 	CLprintf(file,"  'gives-resource '%s\n",DefaultResourceNames[type->GivesResource]);
     }
     if( type->MaxWorkers ) {
-	CLprintf(file,"  'max-workers '%d\n",type->MaxWorkers);
+	CLprintf(file,"  'max-workers %d\n",type->MaxWorkers);
+    }
+    if( type->ResourceStep ){
+	CLprintf(file,"  'resource-step %d\n",type->ResourceStep);
     }
    
     // Save store info.

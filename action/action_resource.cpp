@@ -129,6 +129,15 @@ local int StartGathering(Unit* unit)
 
     // FIXME: 0 can happen, if to near placed by map designer.
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)>1 );
+
+    //
+    //	Update the heading of a harvesting unit to looks straight at the resource.
+    //
+    if (goal) {
+	UnitHeadingFromDeltaXY(unit,
+		2*(goal->X-unit->X)+goal->Type->TileWidth,
+		2*(goal->Y-unit->Y)+goal->Type->TileHeight);
+    }
     
     //
     //	If resource is still under construction, wait!
@@ -147,11 +156,6 @@ local int StartGathering(Unit* unit)
 	return 0;
     }
 
-    RefsDebugCheck( !goal->Refs );
-    --goal->Refs;
-    RefsDebugCheck( !goal->Refs );
-    unit->Orders[0].Goal=NoUnitP;
-
     //	Activate the resource
     goal->Data.Resource.Active++;
 
@@ -159,19 +163,47 @@ local int StartGathering(Unit* unit)
     //
     //	Place unit inside the resource
     //
-    RemoveUnit(unit,goal);
-    unit->X=goal->X;
-    unit->Y=goal->Y;
+    if (!unit->Type->HarvestFromOutside) {
+
+	RefsDebugCheck( !goal->Refs );
+	--goal->Refs;
+	RefsDebugCheck( !goal->Refs );
+	unit->Orders[0].Goal=NoUnitP;
+
+	RemoveUnit(unit,goal);
+	unit->X=goal->X;
+	unit->Y=goal->Y;
+    }
 
     if (unit->Type->WaitAtResource) {
-	unit->Wait=unit->Type->WaitAtResource;
+	unit->Data.ResWorker.TimeToHarvest=unit->Type->WaitAtResource;
     } else {
-	unit->Wait=1;
+	unit->Data.ResWorker.TimeToHarvest=1;
     }
 
     unit->Reset=1;
 
     return 1;
+}
+
+
+local void AnimateActionHarvest(Unit* unit)
+{
+    int flags;
+    if( unit->Type->Animations ) {
+	//FIXME: Animation->Harvest
+	DebugCheck( !unit->Type->Animations->Attack );
+	flags=UnitShowAnimation(unit,unit->Type->Animations->Attack);
+#ifdef WITH_SOUND
+	if( (flags&AnimationSound) ) {
+	    if( GameSounds.Repair.Sound==(void*)-1 ) {
+		PlayUnitSound(unit,VoiceAttacking);
+	    } else {
+		PlayUnitSound(unit,VoiceRepair);
+	    }
+	}
+#endif
+    }
 }
 
 /**
@@ -187,42 +219,87 @@ local int GatherResource(Unit* unit)
     Unit* depot;
     Unit* uins;
     int i;
+    int addload;
 
-    source=unit->Container;
+    if (unit->Type->HarvestFromOutside) {
+	AnimateActionHarvest(unit);
+    } else {
+	unit->Wait=1;
+    }
+
+    //  This means we have to return.
+    if (unit->Data.ResWorker.TimeToHarvest==-1) {
+	DebugCheck(!unit->Type->HarvestFromOutside);
+	return unit->Reset;
+    }
+    
+    if (--unit->Data.ResWorker.TimeToHarvest) {
+	DebugLevel3Fn("need to wait %d more cycles.\n" _C_ unit->Data.ResWorker.TimeToHarvest);
+	return 0;
+    }
+    
+    unit->Data.ResWorker.TimeToHarvest=unit->Type->WaitAtResource;
+    
+    if ( unit->Type->HarvestFromOutside ) {
+	source=unit->Orders[0].Goal;
+    } else {
+	source=unit->Container;
+    }
 
     DebugCheck( !source );
     DebugCheck( source->Value>655350 );
 
-    //	Update the resource quantity. FIXME: depleted resources.
-    if (source->Value<unit->Type->ResourceCapacity) {
-	// Uhh-oh, depleted.
-	unit->Value=source->Value;
-	source->Value=0;
-    } else {
-	// Remove resources.
-	unit->Value=unit->Type->ResourceCapacity;
-	source->Value-=unit->Type->ResourceCapacity;
-    }
-   
-    UnitMarkSeen(source);
-    if( IsOnlySelected(source) ) {
-	MustRedraw|=RedrawInfoPanel;
+    //
+    //	Target is dead, stop getting resources.
+    //
+    if( !(source->Destroyed || source->Removed || !source->HP ||
+	    source->Orders[0].Action==UnitActionDie)) {
+	//
+	//  Calculate how much we can load.
+	//  
+	if (unit->Type->ResourceStep) {
+	    addload = unit->Type->ResourceStep;
+	} else {
+	    addload = unit->Type->ResourceCapacity;
+	}
+	//  Don't load more that there is.
+	if (addload > source->Value) {
+	    addload = source->Value;
+	}
+	//  Make sure we don't bite more than we can chew.
+	if (unit->Value + addload > unit->Type->ResourceCapacity) {
+	    addload = unit->Type->ResourceCapacity - unit->Value;
+	}
+
+	DebugLevel3Fn("Harvested another %d resources.\n" _C_ addload);
+	
+	unit->Value += addload;
+	source->Value -= addload;
+       
+	UnitMarkSeen(source);
+	if( IsOnlySelected(source) ) {
+	    MustRedraw|=RedrawInfoPanel;
+	}
+	//	Change unit to full state.
+	if( unit->Type->TransformWhenLoaded&&unit->Value ) {
+	    unit->Player->UnitTypesCount[unit->Type->Type]--;
+	    unit->Type=unit->Type->TransformWhenLoaded;
+	    unit->Player->UnitTypesCount[unit->Type->Type]++;
+	}
     }
     
-    //	Change unit to full state.
-    if( unit->Type->TransformWhenLoaded&&unit->Value ) {
-	unit->Player->UnitTypesCount[unit->Type->Type]--;
-	unit->Type=unit->Type->TransformWhenLoaded;
-    	unit->Player->UnitTypesCount[unit->Type->Type]++;
-    }
-
     //
     //	End of resource: destroy the resource.
+    //	FIXME: implement depleted resources.
     //
-    if( source->Value==0 ) {
-	DebugLevel0Fn("%lu: Resource is destroyed\n" _C_ GameCycle);
+    if( source->Destroyed || source->Removed || !source->HP ||
+	    source->Orders[0].Action==UnitActionDie || source->Value==0) {
+	DebugLevel0Fn("Resource is destroyed\n");
 	uins=source->UnitInside;
-	// Improved version of DropOutAll
+	//
+	// Improved version of DropOutAll that makes workers go to the depot.
+	// FIXME: empty harvesters whould find another resource.
+	// 
         for( i=source->InsideCount; i; --i,uins=uins->NextContained ) {
 	    if (uins->Value && (depot=FindDeposit(uins->Player,uins->X,uins->Y,source->Type->GivesResource))) {
 		DropOutNearest(uins,depot->X+depot->Type->TileWidth/2
@@ -248,19 +325,26 @@ local int GatherResource(Unit* unit)
 	    uins->SubAction=0;
 	}
 
-	LetUnitDie(source);
+	//  Don't destroy the resource twice.
+    	if( !(source->Destroyed || source->Removed || !source->HP ||
+	    source->Orders[0].Action==UnitActionDie)){
+	    LetUnitDie(source);
+	}
 	// FIXME: make the workers inside look for a new resource.
 	source=NULL;
     }
 
-    /*CheckUnitToBeDrawn(unit);
-    if( IsOnlySelected(unit) ) {
-	SelectedUnitChanged();
-	// FIXME: redundant?
-	MustRedraw|=RedrawButtonPanel;
-    }*/
-    
-    return 1;
+    //  Only return home if we are full.
+    if (unit->Value < unit->Type->ResourceCapacity || !source) {
+	return 0;
+    } else {
+	if (unit->Type->HarvestFromOutside) {
+	    unit->Data.ResWorker.TimeToHarvest=-1;
+	    return 0;
+	} else {
+	    return 1;
+	}
+    }
 }
 
 /**
@@ -275,12 +359,16 @@ local int StopGathering(Unit* unit)
     Unit* depot;
     Unit* source;
 
-    if ((source=unit->Container)) {
-	//  Deactivate the resource. Wicked.
-	source->Data.Resource.Active--;
-	DebugCheck(source->Data.Resource.Active<0);
+    
+    if ( unit->Type->HarvestFromOutside ) {
+	source=unit->Orders[0].Goal;
+    } else {
+	source=unit->Container;
     }
      
+    source->Data.Resource.Active--;
+    DebugCheck(source->Data.Resource.Active<0);
+
     //	Store resource position.
     //	FIXME: is this the best way?
     unit->Orders[0].Arg1=(void*)((unit->X<<16)|unit->Y);
@@ -288,7 +376,8 @@ local int StopGathering(Unit* unit)
     // Find and send to resource deposit.
     if( (!(depot=FindDeposit(unit->Player,unit->X,unit->Y,unit->Type->ResourceHarvested)))
 	    || (!unit->Value)) {
-	if (source) {
+	if (!unit->Type->HarvestFromOutside) {
+	    DebugCheck(!unit->Container);
 	    DropOutOnSide(unit,LookingW,source->Type->TileWidth,source->Type->TileHeight);
 	}
 	DebugLevel0Fn("Can't find a resource deposit.\n");
@@ -296,7 +385,8 @@ local int StopGathering(Unit* unit)
 	unit->SubAction=0;
 	// should return 0, done below!
     } else {
-	if (source) {
+	if (!unit->Type->HarvestFromOutside) {
+	    DebugCheck(!unit->Container);
 	    DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
 		    ,depot->Y+depot->Type->TileHeight/2
 		    ,source->Type->TileWidth,source->Type->TileHeight);
@@ -464,7 +554,6 @@ local int WaitInDepot(Unit* unit)
 	++goal->Refs;
 	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
 	unit->Orders[0].X=unit->Orders[0].Y=-1;
-	NewResetPath(unit);
     }
 
     CheckUnitToBeDrawn(unit);
@@ -479,8 +568,11 @@ local int WaitInDepot(Unit* unit)
 */
 void ResourceGiveUp(Unit* unit)
 {
+    DebugLevel0Fn("Unit %d gave up on resource gathering.\n" _C_ unit->Slot);
     unit->Orders[0].Action=UnitActionStill;
     unit->Wait=1;
+    unit->Reset=1;
+    unit->Orders[0].X=unit->Orders[0].Y=-1;
     unit->SubAction=0;
     if( unit->Orders[0].Goal ) {
 	RefsDebugCheck( !unit->Orders[0].Goal->Refs );
@@ -507,7 +599,8 @@ global void HandleActionResource(Unit* unit)
     //	Let's start mining.
     if ( unit->SubAction==SUB_START_RESOURCE ) {
 	NewResetPath(unit);
-	unit->SubAction=1;
+	DebugLevel3Fn("Started mining. reset path.\n");
+	unit->SubAction=SUB_MOVE_TO_RESOURCE;
     }
    
     //  Move to the resource location.
@@ -531,8 +624,8 @@ global void HandleActionResource(Unit* unit)
 
     //  Resource seems to be unreachable
     if (unit->SubAction==SUB_UNREACHABLE_RESOURCE) {
-	return;
 	ResourceGiveUp(unit);
+	return;
     }
 
     //  Start gathering the resource
@@ -547,6 +640,8 @@ global void HandleActionResource(Unit* unit)
     if (unit->SubAction==SUB_GATHER_RESOURCE) {
 	if( GatherResource(unit) ) {
 	    unit->SubAction=SUB_STOP_GATHERING;
+	} else {
+	    return;
 	}
     }
     

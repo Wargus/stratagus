@@ -694,7 +694,7 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int range, 
 
     // let's clean up the matrix now
     AStarCleanUp(num_in_close);
-    DebugLevel1Fn("Tiles Visited: %d\n" _C_ (TheMap.Height*TheMap.Width)-counter);
+    DebugLevel3Fn("Tiles Visited: %d\n" _C_ (TheMap.Height*TheMap.Width)-counter);
     return path_length;
 }
 

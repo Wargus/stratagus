@@ -292,7 +292,14 @@ local void HandleUnitAction(Unit* unit)
 	    //	Release pending references.
 	    //
 	    if( unit->Orders[0].Goal ) {
-		// Still shouldn't have a reference
+		//  If mining decrease the active count on the resource.
+		if ( unit->Orders[0].Action==UnitActionResource &&
+			unit->SubAction==60) {
+		    //  FIXME: SUB_GATHER_RESOURCE ?
+		    unit->Orders[0].Goal->Data.Resource.Active--;
+		    DebugCheck(unit->Orders[0].Goal->Data.Resource.Active<0);
+		}
+		//  Still shouldn't have a reference
 		DebugCheck( unit->Orders[0].Action==UnitActionStill );
 		RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 		if( !--unit->Orders[0].Goal->Refs ) {
