@@ -69,8 +69,6 @@
 **
 **	MissleType::Frames
 **
-**	@note	This isn't implemented yet.
-**
 **		Number of frames in the graphic image.
 **
 **	MissileType::FiredSound
@@ -146,7 +144,77 @@
 **
 **	The missile structure members:
 **
+**	Missile::X Missile::Y
+**
+**		Missile current map position in pixels. To convert a map tile
+**		position to pixel position use: (mapx*::TileSizeX+::TileSizeX/2)
+**		and (mapy*::TileSizeY+::TileSizeY/2) 
+**
+**	Missile::DX Missile::DY
+**
+**		Missile destination on the map in pixels. If
+**		Missile::X==MissileDX and Missile::Y==Missile::DY the missile
+**		stays at its position.
+**
+**	Missile::Type
+**
+**		::MissileType pointer of the missile, contains the shared
+**		informations of all missiles of the same type.
+**
+**	Missile::Frame
+**
+**		Current animation frame of the missile. Animation scripts
+**		aren't currently supported for missiles, everything is
+**		handled by the MissileType::Class. If wanted we can add
+**		animation scripts support to the engine.
+**
+**	Missile::State
+**
+**		Current state of the missile.
+**
+**	Missile::Wait
+**
+**		Wait this number of frames until the next state or animation
+**		of this missile is handled.
+**
+**	Missile::Delay
+**
+**		Number of frames the missile isn't shown on the map.
+**
+**	Missile::SourceUnit
+**
+**		The owner of the missile. Normally the unit which has fired
+**		this missile. Some missiles didn't hurt the owner.
+**
+**	Missile::TargetUnit
+**
+**		The target of the missile. Normally the unit which should be
+**		hit by the missile.
+**
+**	Missile::Damage
+**
+**		Damage done by missile. 
+**
+**	Missile::TTL
+**
 **	FIXME: not written documentation
+**
+**	Missile::Controller
+**
+**	FIXME: not written documentation
+**
+**	Missile::D
+**
+**	FIXME: not written documentation
+**
+**	Missile::Dx Missile::Dy
+**
+**	FIXME: not written documentation
+**
+**	Missile::Xstep Missile::Ystep
+**
+**	FIXME: not written documentation
+**
 */
 
 /*----------------------------------------------------------------------------
@@ -183,6 +251,7 @@ struct _missile_type_ {
 
     unsigned	Width;			/// missile width in pixels
     unsigned	Height;			/// missile height in pixels
+    unsigned	Frames;			/// number of frames in graphic
 
 	// FIXME: FireSound defined but not used!
     SoundConfig FiredSound;		/// fired sound
@@ -253,6 +322,7 @@ extern MissileType* MissileTypes;		/// all missile-types
 extern MissileType* MissileTypeSmallFire;	/// Small fire missile-type
 extern MissileType* MissileTypeBigFire;		/// Big fire missile-type
 extern MissileType* MissileTypeGreenCross;	/// Green cross missile-type
+extern MissileType* MissileTypeExplosion; 	/// Explosion missile-type
 
 extern const char* MissileClassNames[];		/// Missile class names
 
