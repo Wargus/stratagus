@@ -274,7 +274,7 @@ global unsigned long NetworkStatus[PlayerMax];	/// Network status
 global unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 global int NetworkTimeout = 45;		/// Number of seconds until player times out
 
-local char NetMsgBuf[128][PlayerMax];	/// Chat message buffers
+local char NetMsgBuf[PlayerMax][128];	/// Chat message buffers
 local int NetMsgBufLen[PlayerMax];	/// Stored chat message length
 IfDebug(
 global unsigned long MyHost;		/// My host number.
