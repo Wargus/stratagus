@@ -253,8 +253,8 @@ if test "x$LUACONFIG" != "x"; then
     LUA_CFLAGS="$LUA_CFLAGS `[$LUACONFIG --include]`"
     LUA_LIBS="$LUA_LIBS `[$LUACONFIG --libs]`"
 else
-    LUA_CFLAGS="$CFLAGS"
-    LUA_LIBS="$LIBS"
+    LUA_CFLAGS=""
+    LUA_LIBS=""
     if test "$ARCH" = "linux"; then
 	LUA_LIBS="$LUA_LIBS -ldl"
     fi
