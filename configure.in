@@ -87,7 +87,7 @@ dnl AC_ARG_ENABLE(optimization,
 dnl    [  --enable-optimization	  [Enable detection of optimization flags (default: no)]])
 dnl FIXME: todo
 
-AC_CHECK_HEADERS(SDL/SDL.h,, AC_MSG_ERROR(could not find SDL/SDL.h))
+AC_CHECK_PROGS(sdl-config)
 VIDEO_CFLAGS="-DUSE_SDL -DUSE_SDLA `sdl-config --cflags`"
 if test "$enable_static" != "yes"; then
     VIDEO_LIBS="`sdl-config --libs`"
@@ -240,10 +240,10 @@ dnl Debian, and possibly other systems, include this script...
 	    AC_CHECK_LIB(lualib, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib",
 	    AC_CHECK_LIB(lualib50, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib50",
 	    AC_CHECK_LIB(lualib5.0, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib5.0",
-	    [AC_MSG_ERROR(Lualib5 is required)], $LUA_LIBS -lm -ldl), $LUA_LIBS -lm -ldl),$LUA_LIBS -lm -ldl)
+	    [AC_MSG_ERROR(Lualib5 is required)], $LUA_LIBS -lm), $LUA_LIBS -lm),$LUA_LIBS -lm)
 	fi
 fi
-LUA_LIBS="$LUA_LIBS -lm -ldl"
+LUA_LIBS="$LUA_LIBS -lm"
 AC_SUBST(LUA_CFLAGS)
 AC_SUBST(LUA_LIBS)
 	
