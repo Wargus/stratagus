@@ -1789,6 +1789,7 @@ found:
     unit->Wait=1;		// should be correct unit has still action
 
     // FIXME: Should I use PlaceUnit here?
+    // latimerius: I think so
     UnitCacheInsert(unit);
     // FIXME: This only works with 1x1 big units
     DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
@@ -3580,6 +3581,11 @@ local void SaveOrder(const Order* order,FILE* file)
     fprintf(file," flags %d",order->Flags);
     fprintf(file," range (%d %d)",order->RangeX,order->RangeY);
     if( order->Goal ) {
+	if (order->Goal->Destroyed) {
+	    /* this unit is destroyed so it's not in the global unit
+	     * array - this means it won't be saved!!! */
+	    printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+	}
 	fprintf(file," goal %s",ref=UnitReference(order->Goal));
 	free(ref);
     }
@@ -3639,15 +3645,20 @@ global void SaveUnit(const Unit* unit,FILE* file)
     }
 
     fprintf(file,"'tile '(%d %d) ",unit->X,unit->Y);
+#if 0
+    /* latimerius: why is this so complex? */
     for( i=0; i<PlayerMax; ++i ) {
 	if( &unit->Type->Stats[i]==unit->Stats ) {
 	    fprintf(file,"'stats %d\n  ",i);
 	    break;
 	}
     }
+    /* latimerius: what's the point of storing a pointer value anyway? */
     if( i==PlayerMax ) {
 	fprintf(file,"'stats 'S%08X\n  ",(int)unit->Stats);
     }
+#endif
+    fprintf (file, "'stats %d\n  " ,unit->Player->Player);
     fprintf(file,"'pixel '(%d %d) ",unit->IX,unit->IY);
     fprintf(file,"'%sframe %d ",
 	    unit->Frame&128 ? "flipped-" : "" ,unit->Frame&127);
@@ -3820,7 +3831,6 @@ global void SaveUnits(FILE* file)
     fprintf(file,"(set-training-queue! #%s)\n",
 	    EnableTrainingQueue ? "t" : "f");
 
-    fprintf (file, "(num-units! %d)\n", NumUnits);
     fprintf (file, "; Unit slot usage bitmap\n");
     fprintf (file, "(slot-usage '(");
 
