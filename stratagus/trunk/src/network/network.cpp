@@ -898,13 +898,17 @@ global void NetworkEvent(void)
 		NetworkLastFrame[player] = FrameCounter;
 
 		// Place in network in
-		switch (packet->Header.Type[i]) {
+		switch (packet->Header.Type[i] & 0x7F) {
 			case MessageExtendedCommand:
 				// FIXME: ensure the sender is part of the command
 				allowed = 1;
 				break;
 			case MessageSync:
 				// Sync does not matter
+				allowed = 1;
+				break;
+			case MessageQuit:
+				// FIXME: ensure it's from the right player
 				allowed = 1;
 				break;
 			default:
