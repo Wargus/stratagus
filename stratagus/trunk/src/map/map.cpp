@@ -187,50 +187,29 @@ global void RevealMap(void)
 */
 global void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 {
-	int map_width;
-	int map_height;
+	DebugCheck(!vp);
 
-	vp->OffsetX = offsetx;
-	vp->OffsetY = offsety;
-
-	map_width = vp->MapWidth;
+	x = x * TileSizeX + offsetx;
+	y = y * TileSizeY + offsety;
 	if (x < 0) {
-		vp->MapX = 0;
-		vp->OffsetX = 0;
-	} else if (x >= TheMap.Width - map_width + 1) {
-		vp->MapX = TheMap.Width - vp->MapWidth + 1;
-		vp->OffsetX = 0;
-	} else {
-		vp->MapX = x;
-		if (vp->OffsetX < 0) {
-			if (vp->MapX != 0) {
-				vp->MapX--;
-				vp->OffsetX += TileSizeX;
-			} else {
-				vp->OffsetX = 0;
-			}
-		}
+		x = 0;
 	}
-	DebugCheck(vp->OffsetX < 0 || vp->OffsetX >= TileSizeX);
-	map_height = vp->MapHeight;
 	if (y < 0) {
-		vp->MapY = 0;
-		vp->OffsetY = 0;
-	} else if (y >= TheMap.Height - map_height + 1) {
-		vp->MapY = TheMap.Height - vp->MapHeight + 1;
-		vp->OffsetY = 0;
-	} else {
-		vp->MapY = y;
-		if (vp->OffsetY < 0) {
-			if (vp->MapY != 0) {
-				vp->MapY--;
-				vp->OffsetY += TileSizeY;
-			} else {
-				vp->OffsetY = 0;
-			}
-		}
+		y = 0;
 	}
-	DebugCheck(vp->OffsetY < 0 || vp->OffsetY >= TileSizeY);
+	if (x > TheMap.Width * TileSizeX - (vp->EndX - vp->X) - 1) {
+		x = TheMap.Width * TileSizeX - (vp->EndX - vp->X) - 1;
+	}
+	if (y > TheMap.Height * TileSizeY - (vp->EndY - vp->Y) - 1) {
+		y = TheMap.Height * TileSizeY - (vp->EndY - vp->Y) - 1;
+	}
+	vp->MapX = x / TileSizeX;
+	vp->MapY = y / TileSizeY;
+	vp->OffsetX = x % TileSizeX;
+	vp->OffsetY = y % TileSizeY;
+	vp->MapWidth = ((vp->EndX - vp->X) + vp->OffsetX - 1) / TileSizeX + 1;
+	vp->MapHeight = ((vp->EndY - vp->Y) + vp->OffsetY - 1) / TileSizeY + 1;
+
 	MarkDrawEntireMap();
 	MustRedraw |= RedrawMinimap | RedrawMinimapCursor;
 }

@@ -97,94 +97,6 @@ global EventCallback MenuCallbacks;		/// Menu callbacks
 //----------------------------------------------------------------------------
 
 /**
-**  Move map view point up (north).
-**
-**  @param step  How many pixels.
-*/
-local void MoveMapViewPointUp(int step)
-{
-	Viewport* vp;
-
-	vp = TheUI.SelectedViewport;
-	vp->OffsetY -= step;
-	while (vp->OffsetY < 0) {
-		vp->OffsetY += TileSizeY;
-		--vp->MapY;
-	}
-
-	if (vp->MapY < 0) {
-		vp->MapY = 0;
-		vp->OffsetY = 0;
-	}
-}
-
-/**
-**  Move map view point left (west).
-**
-**  @param step  How many pixels.
-*/
-local void MoveMapViewPointLeft(int step)
-{
-	Viewport* vp;
-
-	vp = TheUI.SelectedViewport;
-	vp->OffsetX -= step;
-	while (vp->OffsetX < 0) {
-		vp->OffsetX += TileSizeX;
-		--vp->MapX;
-	}
-
-	if (vp->MapX < 0) {
-		vp->MapX = 0;
-		vp->OffsetX = 0;
-	}
-}
-
-/**
-**  Move map view point down (south).
-**
-**  @param step  How many pixels.
-*/
-local void MoveMapViewPointDown(int step)
-{
-	Viewport* vp;
-
-	vp = TheUI.SelectedViewport;
-	vp->OffsetY += step;
-	while (vp->OffsetY >= TileSizeY) {
-		vp->OffsetY -= TileSizeY;
-		++vp->MapY;
-	}
-	// If bottom is > Last map top, make it equal
-	if (vp->MapY + vp->MapHeight - 1 >= TheMap.Height) {
-		vp->MapY = TheMap.Height - vp->MapHeight + 1;
-		vp->OffsetY = 0;
-	}
-}
-
-/**
-**  Move map view point right (east).
-**
-**  @param step  How many pixels.
-*/
-local void MoveMapViewPointRight(int step)
-{
-	Viewport* vp;
-
-	vp = TheUI.SelectedViewport;
-	vp->OffsetX += step;
-	while (vp->OffsetX >= TileSizeX) {
-		vp->OffsetX -= TileSizeX;
-		++vp->MapX;
-	}
-	// If right is > Last map top, make it equal
-	if (vp->MapX + vp->MapWidth - 1> TheMap.Width) {
-		vp->MapX = TheMap.Width - vp->MapWidth + 1;
-		vp->OffsetX = 0;
-	}
-}
-
-/**
 **  Handle scrolling area.
 **
 **  @param state  Scroll direction/state.
@@ -198,8 +110,8 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 	Viewport* vp;
 	int stepx;
 	int stepy;
-	static int remx = 0;
-	static int remy = 0;
+	static int remx = 0; // FIXME: docu
+	static int remy = 0; // FIXME: docu
 
 	if (state == ScrollNone) {
 		return;
@@ -208,9 +120,9 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 	vp = TheUI.SelectedViewport;
 
 	if (fast) {
-		stepx = TheUI.SelectedViewport->MapWidth / 2 * TileSizeX * FRAMES_PER_SECOND;
-		stepy = TheUI.SelectedViewport->MapHeight / 2 * TileSizeY * FRAMES_PER_SECOND;
-	} else {				// dynamic: let these variables increase upto fast..
+		stepx = vp->MapWidth / 2 * TileSizeX * FRAMES_PER_SECOND;
+		stepy = vp->MapHeight / 2 * TileSizeY * FRAMES_PER_SECOND;
+	} else {// dynamic: let these variables increase upto fast..
 		// FIXME: pixels per second should be configurable
 		stepx = TileSizeX * FRAMES_PER_SECOND;
 		stepy = TileSizeY * FRAMES_PER_SECOND;
@@ -223,6 +135,8 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 			++stepx;
 			remx -= 100;
 		}
+	} else {
+		stepx = 0;
 	}
 	if (state & (ScrollUp | ScrollDown)) {
 		stepy = stepy * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
@@ -232,20 +146,18 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 			++stepy;
 			remy -= 100;
 		}
+	} else {
+		stepy = 0;
 	}
 
 	if (state & ScrollUp) {
-		MoveMapViewPointUp(stepy);
+		stepy = -stepy;
 	}
 	if (state & ScrollLeft) {
-		MoveMapViewPointLeft(stepx);
+		stepx = -stepx;
 	}
-	if (state & ScrollDown) {
-		MoveMapViewPointDown(stepy);
-	}
-	if (state & ScrollRight) {
-		MoveMapViewPointRight(stepx);
-	}
+	ViewportSetViewpoint(vp, vp->MapX, vp->MapY,
+		vp->OffsetX + stepx, vp->OffsetY + stepy);
 
 	// This recalulates some values
 	HandleMouseMove(CursorX, CursorY);
@@ -288,7 +200,6 @@ local void DrawMapViewport(Viewport* vp)
 #if 0
 		MapUpdateFogOfWar(vp->MapX, vp->MapY);
 #endif
-#else
 		int u;
 
 		// FIXME: Johns: this didn't work correct with viewports!
@@ -318,7 +229,7 @@ local void DrawMapViewport(Viewport* vp)
 		DrawMapBackgroundInViewport(vp, vp->MapX, vp->MapY);
 
 		//
-		//		We find and sort units after draw level.
+		// We find and sort units after draw level.
 		//
 		nunits = FindAndSortUnits(vp, table);
 		nmissiles = FindAndSortMissiles(vp, missiletable);
@@ -429,7 +340,7 @@ global void DrawMapArea(void)
 	}
 
 	//
-	//		Separate the viewports and mark the active viewport.
+	// Separate the viewports and mark the active viewport.
 	//
 	for (vp = TheUI.Viewports; vp < evp; ++vp) {
 		Uint32 color;
@@ -459,9 +370,9 @@ global void DrawMapArea(void)
 */
 global void UpdateDisplay(void)
 {
-	MustRedraw &= EnableRedraw;				// Don't redraw disabled parts
+	MustRedraw &= EnableRedraw; // Don't redraw disabled parts
 
-	HideAnyCursor();						// remove cursor (when available)
+	HideAnyCursor(); // remove cursor (when available)
 
 	if (MustRedraw & RedrawMap) {
 		DrawMapArea();
@@ -557,7 +468,7 @@ global void UpdateDisplay(void)
 	DrawAnyCursor();
 
 	//
-	//		Update changes to display.
+	// Update changes to display.
 	//
 	if (MustRedraw & RedrawAll) {
 		// refresh entire screen, so no further invalidate needed
@@ -656,8 +567,8 @@ global void UpdateDisplay(void)
 }
 
 /**
-**		Enable everything to be drawn for next display update.
-**		Used at start of mainloop (and possible refresh as user option)
+**  Enable everything to be drawn for next display update.
+**  Used at start of mainloop (and possible refresh as user option)
 */
 local void EnableDrawRefresh(void)
 {
@@ -666,18 +577,18 @@ local void EnableDrawRefresh(void)
 }
 
 /**
-**		Game main loop.
+**  Game main loop.
 **
-**		Unit actions.
-**		Missile actions.
-**		Players (AI).
-**		Cyclic events (color cycle,...)
-**		Display update.
-**		Input/Network/Sound.
+**  Unit actions.
+**  Missile actions.
+**  Players (AI).
+**  Cyclic events (color cycle,...)
+**  Display update.
+**  Input/Network/Sound.
 */
 global void GameMainLoop(void)
 {
-#ifdef DEBUG		// removes the setjmp warnings
+#ifdef DEBUG  // removes the setjmp warnings
 	static int showtip;
 #else
 	int showtip;
@@ -704,7 +615,7 @@ global void GameMainLoop(void)
 
 	showtip = 0;
 	RealVideoSyncSpeed = VideoSyncSpeed;
-	if (!IsNetworkGame()) {				// Don't show them for net play
+	if (!IsNetworkGame()) {  // Don't show them for net play
 		showtip = ShowTips;
 	}
 
@@ -723,34 +634,33 @@ global void GameMainLoop(void)
 		}
 #endif
 		//
-		//		Game logic part
+		// Game logic part
 		//
 		if (!GamePaused && NetworkInSync && !SkipGameCycle) {
 			SinglePlayerReplayEachCycle();
 			++GameCycle;
 			MultiPlayerReplayEachCycle();
-			NetworkCommands();				// Get network commands
+			NetworkCommands(); // Get network commands
 #ifdef MAP_REGIONS
 			MapSplitterEachCycle();
 #endif // MAP_REGIONS
-			UnitActions();				// handle units
-			MissileActions();				// handle missiles
-			PlayersEachCycle();				// handle players
-			UpdateTimer();				// update game timer
+			UnitActions();      // handle units
+			MissileActions();   // handle missiles
+			PlayersEachCycle(); // handle players
+			UpdateTimer();      // update game timer
 
 			//
-			//		Work todo each second.
-			//				Split into different frames, to reduce cpu time.
-			//				Increment mana of magic units.
-			//				Update mini-map.
-			//				Update map fog of war.
-			//				Call AI.
-			//				Check game goals.
-			//				Check rescue of units.
+			// Work todo each second.
+			// Split into different frames, to reduce cpu time.
+			// Increment mana of magic units.
+			// Update mini-map.
+			// Update map fog of war.
+			// Call AI.
+			// Check game goals.
+			// Check rescue of units.
 			//
 			switch (GameCycle % CYCLES_PER_SECOND) {
-				case 0:
-					// At cycle 0, start all ai players...
+				case 0:	// At cycle 0, start all ai players...
 					if (GameCycle == 0) {
 						for (player = 0; player < NumPlayers; ++player) {
 							PlayersEachSecond(player);
@@ -761,16 +671,16 @@ global void GameMainLoop(void)
 					break;
 				case 2:
 					break;
-				case 3:								// minimap update
+				case 3:	// minimap update
 					UpdateMinimap();
 					MustRedraw |= RedrawMinimap;
 					break;
 				case 4:
 					break;
-				case 5:								// forest grow
+				case 5:	// forest grow
 					RegenerateForest();
 					break;
-				case 6:								// overtaking units
+				case 6:	// overtaking units
 					RescueUnits();
 					break;
 				default:
@@ -784,13 +694,13 @@ global void GameMainLoop(void)
 
 			//
 			// Work todo each realtime second.
-			//				Check cd-rom (every 2nd second)
+			// Check cd-rom (every 2nd second)
 			// FIXME: Not called while pause or in the user interface.
 			//
 			switch (GameCycle % ((CYCLES_PER_SECOND * VideoSyncSpeed / 100) + 1)) {
 				case 0:								// Check cd-rom
 #if defined(USE_SDLCD)
-					if (!(GameCycle % 4)) {		// every 2nd second
+					if (!(GameCycle % 4)) {	// every 2nd second
 						SDL_CreateThread(CDRomCheck, NULL);
 					}
 #elif defined(USE_LIBCDA) || defined(USE_CDDA)
@@ -805,13 +715,13 @@ global void GameMainLoop(void)
 			}
 		}
 
-		TriggersEachCycle();				// handle triggers
-		UpdateMessages();				// update messages
+		TriggersEachCycle();  // handle triggers
+		UpdateMessages();     // update messages
 
-		PlayListAdvance();				// Check for next song
+		PlayListAdvance();    // Check for next song
 
 		//
-		//		Map scrolling
+		// Map scrolling
 		//
 		DoScrollArea(MouseScrollState | KeyScrollState, KeyModifiers & ModifierControl);
 
@@ -844,8 +754,8 @@ global void GameMainLoop(void)
 			}
 
 			//FIXME: this might be better placed somewhere at front of the
-			//			 program, as we now still have a game on the background and
-			//			 need to go through hte game-menu or supply a pud-file
+			// program, as we now still have a game on the background and
+			// need to go through hte game-menu or supply a pud-file
 			UpdateDisplay();
 
 			//
@@ -866,7 +776,7 @@ global void GameMainLoop(void)
 			WaitEventsOneFrame(Callbacks);
 		}
 		if (!NetworkInSync) {
-			NetworkRecover();				// recover network
+			NetworkRecover(); // recover network
 		}
 
 		if (showtip) {
@@ -883,7 +793,7 @@ global void GameMainLoop(void)
 	}
 
 	//
-	//		Game over
+	// Game over
 	//
 	if (FastForwardCycle > GameCycle) {
 		VideoSyncSpeed = RealVideoSyncSpeed;
