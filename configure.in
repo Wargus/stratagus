@@ -105,6 +105,31 @@ AC_SUBST(VIDEO_CFLAGS)
 AC_SUBST(VIDEO_LIBS)
 AC_SUBST(THREAD_LIBS)
 
+dnl --- OPENGL support ---------
+AC_ARG_WITH(opengl,
+    [  --with-opengl		  [Use opengl (default: no)]],, with_opengl="no")
+if test "$with_opengl" != "no"; then
+	VIDEO_CFLAGS="$VIDEO_CFLAGS -DOPENGL"
+	case "$target" in
+		*-*-cygwin* | *-*-mingw32*)
+			VIDEO_LIBS="$VIDEO_LIBS -lopengl32"
+			;;
+		*)
+			AC_PATH_X
+			AC_PATH_XTRA
+			if test x$have_x = xyes; then
+				VIDEO_CFLAGS="$VIDEO_CFLAGS $X_CFLAGS"
+				VIDEO_LIBS="$VIDEO_LIBS $X_LIBS -lGL"
+			else
+				VIDEO_LIBS="$VIDEO_LIBS -lGL"
+			fi
+			;;
+	esac
+fi
+AC_SUBST(VIDEO_CFLAGS)
+AC_SUBST(VIDEO_LIBS)
+dnl ----------------------------
+
 dnl --- CHECK FOR BZIP2 --------
 AC_ARG_WITH(bzip2,
     [  --with-bzip2		  [Use bzip2 (default: yes)]],, with_bzip2="yes")
