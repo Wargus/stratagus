@@ -191,7 +191,8 @@ local SCM CclMakeSound(SCM name, SCM file)
 */
 local SCM CclMakeSoundGroup(SCM name, SCM first, SCM second)
 {
-    char *c_name;
+    SoundId id;
+    char* c_name;
 
     if (!gh_string_p(name) && !gh_symbol_p(name)) {
 	fprintf(stderr, "string or symbol expected\n");
@@ -199,10 +200,10 @@ local SCM CclMakeSoundGroup(SCM name, SCM first, SCM second)
     }
     c_name = gh_scm2newstr(name, NULL);
 
-    return sound_id_ccl(MakeSoundGroup(c_name, CclGetSoundId(first),
-	    CclGetSoundId(second)));
-    free(c_name);
+    id = MakeSoundGroup(c_name, CclGetSoundId(first), CclGetSoundId(second));
     // JOHNS: not anymore: c_name consumed by MakeSoundGroup!
+    free(c_name);
+    return sound_id_ccl(id);
 }
 
 /**
