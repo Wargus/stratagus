@@ -399,6 +399,16 @@ local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 /**
 **	Callback for input.
 */
+local void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
+	unsigned dummy2 __attribute__((unused)))
+{
+    DebugLevel3Fn("Repeated %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_ dummy2);
+    WaitNoEvent=0;
+}
+
+/**
+**	Callback for input.
+*/
 local void WaitCallbackMouse(int dummy_x __attribute__((unused)),
 	int dummy_y __attribute__((unused)))
 {
@@ -718,6 +728,7 @@ local void WaitForInput(int timeout)
     callbacks.MouseExit=WaitCallbackExit;
     callbacks.KeyPressed=WaitCallbackKey2;
     callbacks.KeyReleased=WaitCallbackKey2;
+    callbacks.KeyRepeated=WaitCallbackKey3;
 
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;

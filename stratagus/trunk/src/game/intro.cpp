@@ -146,6 +146,14 @@ local void IntroCallbackKey2(unsigned key, unsigned keychar)
 /**
 **	Callback for input.
 */
+local void IntroCallbackKey3(unsigned key __attribute__((unused)),
+			     unsigned keychar __attribute__((unused)))
+{
+}
+
+/**
+**	Callback for input.
+*/
 local void IntroCallbackMouse(int x, int y)
 {
     CursorX=x;
@@ -358,6 +366,7 @@ global void ShowIntro(const Intro *intro)
     callbacks.MouseExit=IntroCallbackExit;
     callbacks.KeyPressed=IntroCallbackKey1;
     callbacks.KeyReleased=IntroCallbackKey2;
+    callbacks.KeyRepeated=IntroCallbackKey3;
 
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
@@ -516,6 +525,7 @@ global void ShowCredits(Credits *credits)
     callbacks.MouseExit=IntroCallbackExit;
     callbacks.KeyPressed=IntroCallbackKey1;
     callbacks.KeyReleased=IntroCallbackKey2;
+    callbacks.KeyRepeated=IntroCallbackKey3;
 
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
@@ -651,6 +661,7 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     callbacks.MouseExit=IntroCallbackExit;
     callbacks.KeyPressed=IntroCallbackKey1;
     callbacks.KeyReleased=IntroCallbackKey2;
+    callbacks.KeyRepeated=IntroCallbackKey3;
 
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
@@ -1122,6 +1133,7 @@ global void ShowStats(void)
     callbacks.MouseExit=IntroCallbackExit;
     callbacks.KeyPressed=IntroCallbackKey1;
     callbacks.KeyReleased=IntroCallbackKey2;
+    callbacks.KeyRepeated=IntroCallbackKey3;
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
 
