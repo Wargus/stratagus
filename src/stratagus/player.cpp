@@ -10,7 +10,7 @@
 //
 /**@name player.c	-	The players. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -195,6 +195,10 @@ global void SavePlayers(FILE* file)
 	fprintf(file,"\" 'allied \"");
 	for( j=0; j<PlayerMax; ++j ) {
 	    fputc((Players[i].Allied&(1<<j)) ? 'X' : '_',file);
+	}
+	fprintf(file,"\" 'shared-vision \"");
+	for( j=0; j<PlayerMax; ++j ) {
+	    fputc((Players[i].SharedVision&(1<<j)) ? 'X' : '_',file);
 	}
 	fprintf(file,"\"\n  'start '(%d %d)\n",Players[i].StartX,
 		Players[i].StartY);

@@ -10,7 +10,7 @@
 //
 /**@name ccl_player.c	-	The player ccl functions. */
 //
-//	(c) Copyright 2001,2002 by Lutz Sammer
+//	(c) Copyright 2001-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -170,6 +170,16 @@ local SCM CclPlayer(SCM list)
 		    player->Allied&=~(1<<i);
 		} else {
 		    player->Allied|=(1<<i);
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("shared-vision")) ) {
+	    str=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	    for( i=0; i<PlayerMax && *str; ++i,++str ) {
+		if( *str=='-' || *str=='_' || *str==' ' ) {
+		    player->SharedVision&=~(1<<i);
+		} else {
+		    player->SharedVision|=(1<<i);
 		}
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("start")) ) {
