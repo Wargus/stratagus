@@ -151,12 +151,15 @@ local void VideoDrawChar(const Graphic* sprite,
 {
 	SDL_Color* c;
 	int i;
+	int fy;
 
 	glDisable(GL_TEXTURE_2D);
 
 	if (y + h >= VideoHeight) {
 		h = VideoHeight - y - 1;
 	}
+	fy = gy / Fonts[CurrentFont].Height * Fonts[CurrentFont].Height;
+	fy = fy + Fonts[CurrentFont].Height - (gy - fy) - h;
 	for (i = 0; i < NumFontColors; ++i) {
 		c = FontColor->Color + i;
 		glColor3ub(c->r, c->g, c->b);
@@ -164,7 +167,7 @@ local void VideoDrawChar(const Graphic* sprite,
 		glBitmap(FontBitmapWidths[CurrentFont] * 8, h,
 			0.0f, 0.0f, 0.0f, 0.0f,
 			FontBitmaps[CurrentFont][i] +
-				(gy + Fonts[CurrentFont].Height - h) * FontBitmapWidths[CurrentFont]);
+				fy * FontBitmapWidths[CurrentFont]);
 	}
 
 	glEnable(GL_TEXTURE_2D);
