@@ -216,6 +216,9 @@ local SCM CclPlayer(SCM list)
 	    player->AiEnabled=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("ai-disabled")) ) {
 	    player->AiEnabled=0;
+	} else if( gh_eq_p(value,gh_symbol2scm("food")) ) {
+	    player->Food=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("food-unit-limit")) ) {
 	    player->FoodUnitLimit=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);

@@ -231,7 +231,8 @@ global void SavePlayers(FILE* file)
 
 	// Ai done by load ais.
 
-	fprintf(file,"  'food-unit-limit %d",Players[i].FoodUnitLimit);
+	fprintf (file, "  'food %d", Players[i].Food);
+	fprintf(file," 'food-unit-limit %d",Players[i].FoodUnitLimit);
 	fprintf(file," 'building-limit %d",Players[i].BuildingLimit);
 	fprintf(file," 'total-unit-limit %d",Players[i].TotalUnitLimit);
 
