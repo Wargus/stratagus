@@ -271,7 +271,7 @@ global void Invalidate(void)
 **
 **	@param code	SDL keysym structure pointer.
 **
-**	@returns	ASCII code or internal keycode.
+**	@return		ASCII code or internal keycode.
 */
 local int Sdl2InternalKeycode(const SDL_keysym* code)
 {
@@ -635,7 +635,7 @@ global void WaitEventsAndKeepSync(void)
 **
 **	@param palette	Hardware independend palette.
 **
-**	@returns	A hardware dependend pixel table.
+**	@return		A hardware dependend pixel table.
 */
 global VMemType* VideoCreateNewPalette(const Palette *palette)
 {

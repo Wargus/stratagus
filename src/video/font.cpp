@@ -361,7 +361,7 @@ global void GetDefaultTextColors(int *normalp,int *reversep)
 **	@param font	Font number.
 **	@param text	Text to calculate the length of.
 **
-**	@returns	The length in pixels of the text.
+**	@return		The length in pixels of the text.
 */
 global int TextLength(unsigned font,const unsigned char* text)
 {
@@ -399,7 +399,7 @@ global int TextLength(unsigned font,const unsigned char* text)
 **	@param font	Font number
 **	@param text	Text to be displayed.
 **
-**	@returns	The lenght of the printed text.
+**	@return		The lenght of the printed text.
 */
 global int DrawText(int x,int y,unsigned font,const unsigned char* text)
 {
@@ -475,7 +475,7 @@ global int DrawText(int x,int y,unsigned font,const unsigned char* text)
 **	@param font	Font number
 **	@param text	Text to be displayed.
 **
-**	@returns	The lenght of the printed text.
+**	@return		The lenght of the printed text.
 */
 global int DrawReverseText(int x,int y,unsigned font,const unsigned char* text)
 {
@@ -498,7 +498,7 @@ global int DrawReverseText(int x,int y,unsigned font,const unsigned char* text)
 **	@param font	Font number
 **	@param text	Text to be displayed.
 **
-**	@returns	The lenght of the printed text.
+**	@return		The lenght of the printed text.
 */
 global int DrawTextCentered(int x,int y,unsigned font,const unsigned char* text)
 {
@@ -518,7 +518,7 @@ global int DrawTextCentered(int x,int y,unsigned font,const unsigned char* text)
 **	@param font	Font number
 **	@param number	Number to be displayed.
 **
-**	@returns	The lenght of the printed text.
+**	@return		The lenght of the printed text.
 */
 global int DrawNumber(int x,int y,unsigned font,int number)
 {
@@ -536,7 +536,7 @@ global int DrawNumber(int x,int y,unsigned font,int number)
 **	@param font	Font number
 **	@param number	Number to be displayed.
 **
-**	@returns	The lenght of the printed text.
+**	@return		The lenght of the printed text.
 */
 global int DrawReverseNumber(int x,int y,unsigned font,int number)
 {
