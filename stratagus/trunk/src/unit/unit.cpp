@@ -2879,15 +2879,19 @@ global void LetUnitDie(Unit* unit)
 				!unit->Type->Animations->Die);
 			UnitShowAnimation(unit, unit->Type->Animations->Die);
 			DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
+			unit->CurrentSightRange = type->Stats->SightRange;
+			MapMarkUnitSight(unit);
+		} else {
+			// no corpse available
+			MapMarkUnitSight(unit);
+			MapUnmarkUnitSight(unit);
+			unit->CurrentSightRange = 0;
 		}
-		// no corpse available
-		// FIXME: (mr-russ) Hack to make sure we see our own building destroyed
-		MapMarkUnitSight(unit);
-		MapUnmarkUnitSight(unit);
 		return;
 	}
 
-	if (unit->Type->Transporter) { // Transporters loose their units
+	// Transporters lose their units
+	if (unit->Type->Transporter) {
 		DestroyAllInside(unit);
 	}
 
