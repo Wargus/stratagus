@@ -9,7 +9,7 @@
 ##			  T H E	  W A R	  B E G I N S
 ##	   FreeCraft - A free fantasy real time strategy game engine
 ##
-##	setup		-	Configure Rules.make (GNU MAKE rules).
+##	configure	-	Configure Rules.make (GNU MAKE rules).
 ##
 ##	(c) Copyright 2000-2002 by Dan Hensley, Nehal Mistry.
 ##	Additional sections (c) Copyright 2002 Patrick McFarland
@@ -23,7 +23,7 @@
 ##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##	GNU General Public License for more details.
 ##
-##	$Id:
+##	$Id$
 ##
 ##-----------------------------------------------------------------------------
 ##	HERE ARE SOME USER-CONFIGURABLE VARIABLES
@@ -141,10 +141,11 @@ DEBUG_CFLAGS="-g -O1 -fsigned-char -W -Wall \$(IFLAGS) \$(DFLAGS)"
 #-- Production (default)
 NORMAL_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS)"
 
-# Note, -fconserve-space is really not recommended for gcc 3.x. Rtfm on gcc, in the -fconserve-space
-# section.
+# Note, -fconserve-space is really not recommended for gcc 3.x. Rtfm on gcc,
+# in the -fconserve-space section.
 
-# Additionally selected ops. Email unknown@panax.com before ever changing these.
+# Additionally selected ops. Email unknown@panax.com before ever changing
+# these.
 
 SUPEROPT="-O3 -pipe -fsigned-char -fomit-frame-pointer -foptimize-sibling-calls -ffast-math -fstrength-reduce -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -frerun-cse-after-loop -frerun-loop-opt -fgcse -fgcse-lm -fgcse-sm -fdelete-null-pointer-checks -fexpensive-optimizations -fschedule-insns2 -funroll-loops -frename-registers -fno-cprop-registers \$(IFLAGS) \$(DFLAGS) -Wno-comment"
 
@@ -666,7 +667,7 @@ case $ANSWER in
 
 	LIBCHECK="-lvorbisfile -lvorbis -logg"; check_for_libs
 	if [ "$?" = 0 ] ; then
-	echo "	Found Vorbis..."
+	echo "	Vorbis Found..."
 	echo -n "Would you like Vorbis OGG support? (n) "
 	read $N ANSWER
 	echo
@@ -892,14 +893,18 @@ if [ "$DEBUG" != 1 ] ; then
 fi
 
 
-CCVERS=`$CC --version`
+CCVERS=`$CC -dumpversion`
+# CCVERS=`echo $CCVERS | sed -e 's/gcc-3.2//'`
+# CCVERS=`echo $CCVERS | sed -e 's/something that removes (foo)//g'`
 CCMAJOR=`echo $CCVERS | cut -d. -f 1`
 CCMINOR=`echo $CCVERS | cut -d. -f 2`
+CCREALLYMINOR=`echo $CCVERS | cut -d. -f 3`
+
 if [ $CCMAJOR -gt 3 -o $CCMAJOR -eq 3 -a $CCMINOR -ge 2 ] ; then
 if [ "$DEBUG" != 1 ] ; then
     echo
     echo
-    echo Compiler is $CC $CCMAJOR.$CCMINOR
+    echo Compiler is $CC $CCMAJOR.$CCMINOR.$CCREALLYMINOR
     echo
     echo "This autoconfiguring program allows you to tell GCC to use different"
     echo "optimizations, based on how stable you want Freecraft. The higher the"
@@ -1037,7 +1042,7 @@ if [ $CCMAJOR -ne 3 -o $CCMAJOR -eq 3 -a $CCMINOR -ne 2 ] ; then
     if [ "$DEBUG" != 1 ] ; then
 	echo
 	echo
-	echo Compiler is $CC $CCMAJOR.$CCMINOR
+	echo Compiler is $CC $CCMAJOR.$CCMINOR.$CCREALLYMINOR
 	echo
 	echo "Optimization Menu Disabled: Not running GCC 3.2.x"
  	echo "Using Normal Optimization"
