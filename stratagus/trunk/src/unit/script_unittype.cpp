@@ -713,17 +713,16 @@ local int CclDefineUnitType(lua_State* l)
     char* str;
     int i;
     int redefine;
-    int args;
-    int j;
     int subargs;
     int k;
 
-    args = lua_gettop(l);
-    j = 0;
+    if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
 
     //	Slot identifier
-    str = strdup(LuaToString(l, j + 1));
-    ++j;
+    str = strdup(LuaToString(l, 1));
 
 #ifdef DEBUG
     i = NoWarningUnitType;
@@ -755,27 +754,27 @@ local int CclDefineUnitType(lua_State* l)
     //
     //	Parse the list:	(still everything could be changed!)
     //
-    for (; j < args; ++j) {
-	value = LuaToString(l, j + 1);
-	++j;
-	if (!strcmp(value, "name")) {
+    lua_pushnil(l);
+    while (lua_next(l, 2)) {
+	value = LuaToString(l, -2);
+	if (!strcmp(value, "Name")) {
 	    if (redefine) {
 		free(type->Name);
 	    }
-	    type->Name = strdup(LuaToString(l, j + 1));
-	} else if (!strcmp(value, "use")) {
+	    type->Name = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Use")) {
 	    if (redefine) {
 		free(type->SameSprite);
 	    }
-	    type->SameSprite = strdup(LuaToString(l, j + 1));
-	} else if (!strcmp(value, "files")) {
-	    if (!lua_istable(l, j + 1)) {
+	    type->SameSprite = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Files")) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++k;
@@ -798,18 +797,18 @@ local int CclDefineUnitType(lua_State* l)
 		if (redefine) {
 		    free(type->File[i]);
 		}
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		type->File[i] = strdup(LuaToString(l, -1));
 		lua_pop(l, 1);
 	    }
-	} else if (!strcmp(value, "shadow")) {
-	    if (!lua_istable(l, j + 1)) {
+	} else if (!strcmp(value, "Shadow")) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++k;
@@ -818,11 +817,11 @@ local int CclDefineUnitType(lua_State* l)
 		    if (redefine) {
 			free(type->ShadowFile);
 		    }
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    type->ShadowFile = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "size")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    if (!lua_istable(l, -1)) {
 			lua_pushstring(l, "incorrect argument");
 			lua_error(l);
@@ -836,7 +835,7 @@ local int CclDefineUnitType(lua_State* l)
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "height")) {
 		} else if (!strcmp(value, "offset")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    if (!lua_istable(l, -1)) {
 			lua_pushstring(l, "incorrect argument");
 			lua_error(l);
@@ -853,336 +852,332 @@ local int CclDefineUnitType(lua_State* l)
 		    lua_error(l);
 		}
 	    }
-	} else if (!strcmp(value, "size")) {
-	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+	} else if (!strcmp(value, "Size")) {
+	    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    lua_rawgeti(l, j + 1, 1);
+	    lua_rawgeti(l, -1, 1);
 	    type->Width = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	    lua_rawgeti(l, j + 1, 2);
+	    lua_rawgeti(l, -1, 2);
 	    type->Height = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	} else if (!strcmp(value, "animations")) {
-	    type->Animations = AnimationsByIdent(LuaToString(l, j + 1));
-	} else if (!strcmp(value, "icon")) {
+	} else if (!strcmp(value, "Animations")) {
+	    type->Animations = AnimationsByIdent(LuaToString(l, -1));
+	} else if (!strcmp(value, "Icon")) {
 	    if (redefine) {
 		free(type->Icon.Name);
 	    }
-	    type->Icon.Name = strdup(LuaToString(l, j + 1));
+	    type->Icon.Name = strdup(LuaToString(l, -1));
 	    type->Icon.Icon = NULL;
-	} else if (!strcmp(value, "costs")) {
-	    if (!lua_istable(l, j + 1)) {
+	} else if (!strcmp(value, "Costs")) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
 		int res;
 
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		res = CclGetResourceByName(l);
 		lua_pop(l, 1);
 		++k;
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		type->_Costs[res] = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	    }
-	} else if (!strcmp(value, "improve-production")) {
-	    if (!lua_istable(l, j + 1)) {
+	} else if (!strcmp(value, "ImproveProduction")) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
 		int res;
 
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		res = CclGetResourceByName(l);
 		lua_pop(l, 1);
 		++k;
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		type->ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	    }
-	} else if (!strcmp(value, "construction")) {
+	} else if (!strcmp(value, "Construction")) {
 	    // FIXME: What if constructions aren't yet loaded?
-	    type->Construction = ConstructionByIdent(LuaToString(l, j + 1));
-	} else if (!strcmp(value, "speed")) {
-	    type->_Speed = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "draw-level")) {
-	    type->DrawLevel = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "max-on-board")) {
-	    type->MaxOnBoard = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "hit-points")) {
-	    type->_HitPoints = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "regeneration-rate")) {
-	    type->_RegenerationRate = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "burn-percent")) {
-	    type->BurnPercent = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "burn-damage-rate")) {
-	    type->BurnDamageRate = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "max-mana")) {
-	    type->_MaxMana = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "tile-size")) {
-	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+	    type->Construction = ConstructionByIdent(LuaToString(l, -1));
+	} else if (!strcmp(value, "Speed")) {
+	    type->_Speed = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "DrawLevel")) {
+	    type->DrawLevel = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "MaxOnBoard")) {
+	    type->MaxOnBoard = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "HitPoints")) {
+	    type->_HitPoints = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "RegenerationRate")) {
+	    type->_RegenerationRate = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "BurnPercent")) {
+	    type->BurnPercent = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "BurnDamageRate")) {
+	    type->BurnDamageRate = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "MaxMana")) {
+	    type->_MaxMana = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "TileSize")) {
+	    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    lua_rawgeti(l, j + 1, 1);
+	    lua_rawgeti(l, -1, 1);
 	    type->TileWidth = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	    lua_rawgeti(l, j + 1, 2);
+	    lua_rawgeti(l, -1, 2);
 	    type->TileHeight = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	} else if (!strcmp(value, "must-build-on-top")) {
-	    value = LuaToString(l, j + 1);
+	} else if (!strcmp(value, "MustBuildOnTop")) {
+	    value = LuaToString(l, -1);
 	    auxtype = UnitTypeByIdent(value);
 	    if (!auxtype) {
 		DebugLevel0("Build on top of undefined unit \"%s\".\n" _C_ str);
 		DebugCheck(1);
 	    }
 	    type->MustBuildOnTop = auxtype;
-	} else if (!strcmp(value, "not-selectable")) {
-	    type->Selectable = 0;
-	    --j;
-	} else if (!strcmp(value, "neutral-minimap-color")) {
-	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 3) {
+	} else if (!strcmp(value, "Selectable")) {
+	    type->Selectable = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "NeutralMinimapColor")) {
+	    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
 #ifdef USE_SDL_SURFACE
-	    lua_rawgeti(l, j + 1, 1);
+	    lua_rawgeti(l, -1, 1);
 	    type->NeutralMinimapColorRGB.r = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	    lua_rawgeti(l, j + 1, 2);
+	    lua_rawgeti(l, -1, 2);
 	    type->NeutralMinimapColorRGB.g = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	    lua_rawgeti(l, j + 1, 3);
+	    lua_rawgeti(l, -1, 3);
 	    type->NeutralMinimapColorRGB.b = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 #else
-	    lua_rawgeti(l, j + 1, 1);
+	    lua_rawgeti(l, -1, 1);
 	    type->NeutralMinimapColorRGB.D24.a = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	    lua_rawgeti(l, j + 1, 2);
+	    lua_rawgeti(l, -1, 2);
 	    type->NeutralMinimapColorRGB.D24.b = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	    lua_rawgeti(l, j + 1, 3);
+	    lua_rawgeti(l, -1, 3);
 	    type->NeutralMinimapColorRGB.D24.c = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 #endif
-	} else if (!strcmp(value, "box-size")) {
-	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+	} else if (!strcmp(value, "BoxSize")) {
+	    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    lua_rawgeti(l, j + 1, 1);
+	    lua_rawgeti(l, -1, 1);
 	    type->BoxWidth = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	    lua_rawgeti(l, j + 1, 2);
+	    lua_rawgeti(l, -1, 2);
 	    type->BoxHeight = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	} else if (!strcmp(value, "num-directions")) {
-	    type->NumDirections = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "revealer")) {
-	    type->Revealer = 1;
-	    --j;
-	} else if (!strcmp(value, "sight-range")) {
-	    type->_SightRange = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "computer-reaction-range")) {
-	    type->ReactRangeComputer = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "person-reaction-range")) {
-	    type->ReactRangePerson = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "armor")) {
-	    type->_Armor = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "basic-damage")) {
-	    type->_BasicDamage = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "piercing-damage")) {
-	    type->_PiercingDamage = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "missile")) {
-	    type->Missile.Name = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "NumDirections")) {
+	    type->NumDirections = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Revealer")) {
+	    type->Revealer = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "SightRange")) {
+	    type->_SightRange = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "ComputerReactionRange")) {
+	    type->ReactRangeComputer = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "PersonReactionRange")) {
+	    type->ReactRangePerson = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Armor")) {
+	    type->_Armor = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "BasicDamage")) {
+	    type->_BasicDamage = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "PiercingDamage")) {
+	    type->_PiercingDamage = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Missile")) {
+	    type->Missile.Name = strdup(LuaToString(l, -1));
 	    type->Missile.Missile = NULL;
-	} else if (!strcmp(value, "min-attack-range")) {
-	    type->MinAttackRange = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "max-attack-range")) {
-	    type->_AttackRange = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "priority")) {
-	    type->Priority = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "annoy-computer-factor")) {
-	    type->AnnoyComputerFactor = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "decay-rate")) {
-	    type->DecayRate = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "points")) {
-	    type->Points = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "demand")) {
-	    type->Demand = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "supply")) {
-	    type->Supply = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "corpse")) {
-	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+	} else if (!strcmp(value, "MinAttackRange")) {
+	    type->MinAttackRange = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "MaxAttackRange")) {
+	    type->_AttackRange = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Priority")) {
+	    type->Priority = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "AnnoyComputerFactor")) {
+	    type->AnnoyComputerFactor = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "DecayRate")) {
+	    type->DecayRate = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Points")) {
+	    type->Points = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Demand")) {
+	    type->Demand = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Supply")) {
+	    type->Supply = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Corpse")) {
+	    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
 	    if (redefine) {
 		free(type->CorpseName);
 	    }
-	    lua_rawgeti(l, j + 1, 1);
+	    lua_rawgeti(l, -1, 1);
 	    type->CorpseName = strdup(LuaToString(l, -1));
 	    lua_pop(l, 1);
 	    type->CorpseType = NULL;
-	    lua_rawgeti(l, j + 1, 2);
+	    lua_rawgeti(l, -1, 2);
 	    type->CorpseScript = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
-	} else if (!strcmp(value, "explode-when-killed")) {
+	} else if (!strcmp(value, "ExplodeWhenKilled")) {
 	    type->ExplodeWhenKilled = 1;
-	    type->Explosion.Name = strdup(LuaToString(l, j + 1));
+	    type->Explosion.Name = strdup(LuaToString(l, -1));
 	    type->Explosion.Missile = NULL;
-	} else if (!strcmp(value, "type-land")) {
-	    type->UnitType = UnitTypeLand;
-	    --j;
-	} else if (!strcmp(value, "type-fly")) {
-	    type->UnitType = UnitTypeFly;
-	    --j;
-	} else if (!strcmp(value, "type-naval")) {
-	    type->UnitType = UnitTypeNaval;
-	    --j;
+	} else if (!strcmp(value, "Type")) {
+	    value = LuaToString(l, -1);
+	    if (!strcmp(value, "land")) {
+		type->UnitType = UnitTypeLand;
+	    } else if (!strcmp(value, "fly")) {
+		type->UnitType = UnitTypeFly;
+	    } else if (!strcmp(value, "naval")) {
+		type->UnitType = UnitTypeNaval;
+	    } else {
+		lua_pushfstring(l, "Unsupported Type: %s", value);
+		lua_error(l);
+	    }
 
-	} else if (!strcmp(value, "right-none")) {
-	    type->MouseAction = MouseActionNone;
-	    --j;
-	} else if (!strcmp(value, "right-attack")) {
-	    type->MouseAction = MouseActionAttack;
-	    --j;
-	} else if (!strcmp(value, "right-move")) {
-	    type->MouseAction = MouseActionMove;
-	    --j;
-	} else if (!strcmp(value, "right-harvest")) {
-	    type->MouseAction = MouseActionHarvest;
-	    --j;
-	} else if (!strcmp(value, "right-spell-cast")) {
-	    type->MouseAction = MouseActionSpellCast;
-	    --j;
-	} else if (!strcmp(value, "right-sail")) {
-	    type->MouseAction = MouseActionSail;
-	    --j;
+	} else if (!strcmp(value, "RightMouseAction")) {
+	    value = LuaToString(l, -1);
+	    if (!strcmp(value, "none")) {
+		type->MouseAction = MouseActionNone;
+	    } else if (!strcmp(value, "attack")) {
+		type->MouseAction = MouseActionAttack;
+	    } else if (!strcmp(value, "move")) {
+		type->MouseAction = MouseActionMove;
+	    } else if (!strcmp(value, "harvest")) {
+		type->MouseAction = MouseActionHarvest;
+	    } else if (!strcmp(value, "spell-cast")) {
+		type->MouseAction = MouseActionSpellCast;
+	    } else if (!strcmp(value, "sail")) {
+		type->MouseAction = MouseActionSail;
+	    } else {
+		lua_pushfstring(l, "Unsupported RightMouseAction: %s", value);
+		lua_error(l);
+	    }
 
-	} else if (!strcmp(value, "can-ground-attack")) {
-	    type->GroundAttack = 1;
-	    --j;
-	} else if (!strcmp(value, "can-attack")) {
-	    type->CanAttack = 1;
-	    --j;
-	} else if (!strcmp(value, "repair-range")) {
-	    type->RepairRange = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "repair-hp")) {
-	    type->RepairHP = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "repair-costs")) {
-	    if (!lua_istable(l, j + 1)) {
+	} else if (!strcmp(value, "CanGroundAttack")) {
+	    type->GroundAttack = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "CanAttack")) {
+	    type->CanAttack = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "RepairRange")) {
+	    type->RepairRange = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "RepairHp")) {
+	    type->RepairHP = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "RepairCosts")) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
 		int res;
 
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		res = CclGetResourceByName(l);
 		lua_pop(l, 1);
 		++k;
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		type->RepairCosts[res] = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	    }
-	} else if (!strcmp(value, "can-target-land")) {
-	    type->CanTarget |= CanTargetLand;
-	    --j;
-	} else if (!strcmp(value, "can-target-sea")) {
-	    type->CanTarget |= CanTargetSea;
-	    --j;
-	} else if (!strcmp(value, "can-target-air")) {
-	    type->CanTarget |= CanTargetAir;
-	    --j;
+	} else if (!strcmp(value, "CanTargetLand")) {
+	    if (LuaToBoolean(l, -1)) {
+		type->CanTarget |= CanTargetLand;
+	    } else {
+		type->CanTarget &= ~CanTargetLand;
+	    }
+	} else if (!strcmp(value, "CanTargetSea")) {
+	    if (LuaToBoolean(l, -1)) {
+		type->CanTarget |= CanTargetSea;
+	    } else {
+		type->CanTarget &= ~CanTargetSea;
+	    }
+	} else if (!strcmp(value, "CanTargetAir")) {
+	    if (LuaToBoolean(l, -1)) {
+		type->CanTarget |= CanTargetAir;
+	    } else {
+		type->CanTarget &= ~CanTargetAir;
+	    }
 
-	} else if (!strcmp(value, "building")) {
-	    type->Building = 1;
-	    --j;
-	} else if (!strcmp(value, "visible-under-fog")) {
-	    type->VisibleUnderFog = 1;
-	    --j;
-	} else if (!strcmp(value, "builder-outside")) {
-	    type->BuilderOutside = 1;
-	    --j;
-	} else if (!strcmp(value, "builder-lost")) {
-	    type->BuilderLost = 1;
-	    --j;
-	} else if (!strcmp(value, "auto-build-rate")) {
-	    type->AutoBuildRate = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "shore-building")) {
-	    type->ShoreBuilding = 1;
-	    --j;
-	} else if (!strcmp(value, "land-unit")) {
-	    type->LandUnit = 1;
-	    --j;
-	} else if (!strcmp(value, "air-unit")) {
-	    type->AirUnit = 1;
-	    --j;
-	} else if (!strcmp(value, "sea-unit")) {
-	    type->SeaUnit = 1;
-	    --j;
-	} else if (!strcmp(value, "random-movement-probability")) {
-	    type->RandomMovementProbability = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "clicks-to-explode")) {
-	    type->ClicksToExplode = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "permanent-cloak")) {
-	    type->PermanentCloak = 1;
-	    --j;
-	} else if (!strcmp(value, "detect-cloak")) {
-	    type->DetectCloak = 1;
-	    --j;
-	} else if (!strcmp(value, "transporter")) {
-	    type->Transporter = 1;
-	    --j;
-	} else if (!strcmp(value, "coward")) {
-	    type->Coward = 1;
-	    --j;
-	} else if (!strcmp(value, "can-gather-resource")) {
+	} else if (!strcmp(value, "Building")) {
+	    type->Building = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "VisibleUnderFog")) {
+	    type->VisibleUnderFog = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "BuilderOutside")) {
+	    type->BuilderOutside = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "BuilderLost")) {
+	    type->BuilderLost = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "AutoBuildRate")) {
+	    type->AutoBuildRate = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "ShoreBuilding")) {
+	    type->ShoreBuilding = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "LandUnit")) {
+	    type->LandUnit = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "AirUnit")) {
+	    type->AirUnit = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "SeaUnit")) {
+	    type->SeaUnit = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "RandomMovementProbability")) {
+	    type->RandomMovementProbability = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "ClicksToExplode")) {
+	    type->ClicksToExplode = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "PermanentCloak")) {
+	    type->PermanentCloak = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "DetectCloak")) {
+	    type->DetectCloak = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "Transporter")) {
+	    type->Transporter = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "Coward")) {
+	    type->Coward = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "CanGatherResource")) {
 	    res = (ResourceInfo*)malloc(sizeof(ResourceInfo));
 	    memset(res, 0, sizeof(ResourceInfo));
-	    if (!lua_istable(l, j + 1)) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++k;
 		if (!strcmp(value, "resource-id")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    res->ResourceId = CclGetResourceByName(l);
 		    lua_pop(l, 1);
 		    type->ResInfo[res->ResourceId] = res;
 		} else if (!strcmp(value, "resource-step")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    res->ResourceStep = LuaToNumber(l, -1);
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "final-resource")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    res->FinalResource = CclGetResourceByName(l);
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "wait-at-resource")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    res->WaitAtResource = LuaToNumber(l, -1);
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "wait-at-depot")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    res->WaitAtDepot = LuaToNumber(l, -1);
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "resource-capacity")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    res->ResourceCapacity = LuaToNumber(l, -1);
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "terrain-harvester")) {
@@ -1195,11 +1190,11 @@ local int CclDefineUnitType(lua_State* l)
 		    res->HarvestFromOutside = 1;
 		    --k;
 		} else if (!strcmp(value, "file-when-empty")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    res->FileWhenEmpty = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "file-when-loaded")) {
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    res->FileWhenLoaded = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else {
@@ -1214,28 +1209,27 @@ local int CclDefineUnitType(lua_State* l)
 		res->FinalResource = res->ResourceId;
 	    }
 	    DebugCheck(!res->ResourceId);
-	} else if (!strcmp(value, "gives-resource")) {
-	    lua_pushvalue(l, j + 1);
+	} else if (!strcmp(value, "GivesResource")) {
+	    lua_pushvalue(l, -1);
 	    type->GivesResource = CclGetResourceByName(l);
 	    lua_pop(l, 1);
-	} else if (!strcmp(value, "can-harvest")) {
-	    type->CanHarvest = 1;
-	    --j;
-	} else if (!strcmp(value, "can-store")) {
-	    if (!lua_istable(l, j + 1)) {
+	} else if (!strcmp(value, "CanHarvest")) {
+	    type->CanHarvest = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "CanStore")) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		type->CanStore[CclGetResourceByName(l)] = 1;
+		lua_pop(l, 1);
 	    }
-	} else if (!strcmp(value, "vanishes")) {
-	    type->Vanishes = 1;
-	    --j;
-	} else if (!strcmp(value, "can-cast-spell")) {
-	    if (!lua_istable(l, j + 1)) {
+	} else if (!strcmp(value, "Vanishes")) {
+	    type->Vanishes = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "CanCastSpell")) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
@@ -1247,7 +1241,7 @@ local int CclDefineUnitType(lua_State* l)
 		type->CanCastSpell = malloc(SpellTypeCount);
 		memset(type->CanCastSpell, 0, SpellTypeCount);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    if (subargs == 0) {
 		free(type->CanCastSpell);
 		type->CanCastSpell = NULL;
@@ -1256,7 +1250,7 @@ local int CclDefineUnitType(lua_State* l)
 	    for (k = 0; k < subargs; ++k) {
 		int id;
 
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		value = LuaToString(l, -1);
 		id = CclGetSpellByIdent(l);
 		lua_pop(l, 1);
@@ -1267,24 +1261,24 @@ local int CclDefineUnitType(lua_State* l)
 		}
 		type->CanCastSpell[id] = 1;
 	    }
-	} else if (!strcmp(value, "can-target-flag")) {
+	} else if (!strcmp(value, "CanTargetFlag")) {
 	    //
 	    //    Warning: can-target-flag should only be used AFTER all bool flags
 	    //    have been defined.
 	    //
-	    if (!lua_istable(l, j + 1)) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++k;
 		for (i = 0; i < NumberBoolFlag; ++i) {
 		    if (!strcmp(value, BoolFlagName[i])) {
-			lua_rawgeti(l, j + 1, k + 1);
+			lua_rawgeti(l, -1, k + 1);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 		        type->CanTargetFlag[i] = Ccl2Condition(l, value);
@@ -1298,20 +1292,18 @@ local int CclDefineUnitType(lua_State* l)
 		lua_pushfstring(l, "Unsupported flag tag for can-target-flag: %s", value);
 		lua_error(l);
 	    }
-	} else if (!strcmp(value, "selectable-by-rectangle")) {
-	    type->SelectableByRectangle = 1;
-	    --j;
-	} else if (!strcmp(value, "teleporter")) {
-	    type->Teleporter = 1;
-	    --j;
-	} else if (!strcmp(value, "sounds")) {
-	    if (!lua_istable(l, j + 1)) {
+	} else if (!strcmp(value, "SelectableByRectangle")) {
+	    type->SelectableByRectangle = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "Teleporter")) {
+	    type->Teleporter = LuaToBoolean(l, -1);
+	} else if (!strcmp(value, "Sounds")) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++k;
@@ -1320,35 +1312,35 @@ local int CclDefineUnitType(lua_State* l)
 		    if (redefine) {
 			free(type->Sound.Selected.Name);
 		    }
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    type->Sound.Selected.Name = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "acknowledge")) {
 		    if (redefine) {
 			free(type->Sound.Acknowledgement.Name);
 		    }
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    type->Sound.Acknowledgement.Name = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "ready")) {
 		    if (redefine) {
 			free(type->Sound.Ready.Name);
 		    }
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    type->Sound.Ready.Name = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "repair")) {
 		    if (redefine) {
 			free(type->Sound.Repair.Name);
 		    }
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    type->Sound.Repair.Name = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "harvest")) {
 		    int res;
 		    const char* name;
 
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    name = LuaToString(l, -1 );
 		    lua_pop(l, 1);
 		    ++k;
@@ -1364,28 +1356,28 @@ local int CclDefineUnitType(lua_State* l)
 		    if (redefine) {
 			free(type->Sound.Harvest[res].Name);
 		    }
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    type->Sound.Harvest[res].Name = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "help")) {
 		    if (redefine) {
 			free(type->Sound.Help.Name);
 		    }
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    type->Sound.Help.Name = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "dead")) {
 		    if (redefine) {
 			free(type->Sound.Dead.Name);
 		    }
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    type->Sound.Dead.Name = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else if (!strcmp(value, "attack")) {
 		    if (redefine) {
 			free(type->Weapon.Attack.Name);
 		    }
-		    lua_rawgeti(l, j + 1, k + 1);
+		    lua_rawgeti(l, -1, k + 1);
 		    type->Weapon.Attack.Name = strdup(LuaToString(l, -1));
 		    lua_pop(l, 1);
 		} else {
@@ -1396,20 +1388,18 @@ local int CclDefineUnitType(lua_State* l)
 	} else {
 	    for (i = 0; i < NumberBoolFlag; ++i) { // User defined bool flags
 		if (!strcmp(value, BoolFlagName[i])) {
-		    type->BoolFlag[i] = 1;
-		    --j;
+		    type->BoolFlag[i] = LuaToBoolean(l, -1);
 		    break;
 		}
 	    }
-	    if (i != NumberBoolFlag) {
-		continue;
+	    if (i == NumberBoolFlag) {
+		printf("\n%s\n",type->Name);
+		lua_pushfstring(l, "Unsupported tag: %s", value);
+		lua_error(l);
+		DebugCheck(1);
 	    }
-	    // This leaves a half initialized unit-type
-	    printf("\n%s\n",type->Name);
-	    lua_pushfstring(l, "Unsupported tag: %s", value);
-	    lua_error(l);
-	    DebugCheck(1);
 	}
+	lua_pop(l, 1);
     }
 
     // FIXME: try to simplify/combine the flags instead
