@@ -939,116 +939,18 @@ local void ShowOrder(const Unit* unit)
     //DrawPath(unit);
 }
 
-/*
-**	Units on map:
-**
-**	1) Must draw underground/underwater units. (FUTURE extension)
-**	2) Must draw buildings and corpse.
-**	3) Must draw land/sea units.
-**	4) Must draw decoration units. (FUTURE extension)
-**	5) Must draw low air units.
-**	6) Must draw middle air units. (FUTURE extension)
-**	7) Must draw hight air units. (FUTURE extension)
-*/
-
 /**
-**	Draw building on map.
+**	Draw additional informations of an unit.
 **
-**	@param unit	Pointer to the building
+**	@param unit	Unit pointer of drawn unit.
+**	@param type	Unit-type pointer.
+**	@param X	X screen pixel position of unit.
+**	@param y	Y screen pixel position of unit.
 */
-local void DrawBuilding(Unit* unit)
+local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 {
-    int x;
-    int y;
-    const UnitType* type;
-    int frame;
-    int visible;
-
-    visible=UnitVisibleOnMap(unit);
-    // FIXME: is this the correct place? No, but now correct working.
-    if( visible ) {
-	frame = unit->SeenFrame = unit->Frame;
-    } else {
-	frame = unit->SeenFrame;
-	DebugCheck( frame==-1 || frame==0xFF );
-    }
-
-    type=unit->Type;
-    GraphicPlayerPixels(unit->Player,type->Sprite);
-    x=Map2ScreenX(unit->X)+unit->IX;
-    y=Map2ScreenY(unit->Y)+unit->IY;
-
-#if 0
-#else
-    // FIXME: Johns: don't remember why I have draw this after the unit type.
-    DrawSelection(unit,type,x,y);
-#endif
-
-    //
-    //	Buildings under construction/upgrade/ready.
-    //
-    if( unit->Orders[0].Action==UnitActionBuilded ) {
-	if( unit->Constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
-	    DrawConstruction(type->OverlapFrame
-		,frame&127
-		,x+(type->TileWidth*TileSizeX)/2
-		,y+(type->TileHeight*TileSizeY)/2);
-	} else {
-	    DrawUnitType(type,frame,x,y);
-	}
-    //
-    //	Draw the future unit type, if upgrading to it.
-    //
-    } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
-	DrawUnitType(unit->Orders[0].Type,(frame&128)+1,x,y);
-    } else {
-	DrawUnitType(type,frame,x,y);
-    }
-
-#if 0
-    // FIXME: johns: ugly check here, should be removed!
-    if( unit->Orders[0].Action!=UnitActionDie ) {
-	DrawDecoration(unit,type,x,y);
-	DrawSelection(unit,type,x,y);
-    }
-#else
-    // FIXME: johns: ugly check here, should be removed!
-    if( visible && unit->Orders[0].Action!=UnitActionDie ) {
-	DrawDecoration(unit,type,x,y);
-    }
-#endif
-}
-
-/**
-**	Draw unit on map.
-**
-**	@param unit	Pointer to the unit.
-*/
-local void DrawUnit(const Unit* unit)
-{
-    int x;
-    int y;
-    int r;
-    const UnitType* type;
     const UnitStats* stats;
-
-    if ( unit->Revealer ) {		// Revealers are not drawn
-	DebugLevel3Fn("Drawing revealer %d\n",UnitNumber(unit));
-	return;
-    }
-
-    x=Map2ScreenX(unit->X)+unit->IX;
-    y=Map2ScreenY(unit->Y)+unit->IY;
-
-    type=unit->Type;
-    if( type->UnitType==UnitTypeFly ) {
-	DrawShadow(unit,type,x,y);
-    }
-
-    DrawSelection(unit,type,x,y);
-
-    GraphicPlayerPixels(unit->Player,unit->Type->Sprite);
-    DrawUnitType(type,unit->Frame,x,y);
+    int r;
 
     stats=unit->Stats;
 
@@ -1097,6 +999,106 @@ local void DrawUnit(const Unit* unit)
     if( unit->Orders[0].Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
     }
+}
+
+/*
+**	Units on map:
+**
+**	1) Must draw underground/underwater units. (FUTURE extension)
+**	2) Must draw buildings and corpse.
+**	3) Must draw land/sea units.
+**	4) Must draw decoration units. (FUTURE extension)
+**	5) Must draw low air units.
+**	6) Must draw middle air units. (FUTURE extension)
+**	7) Must draw hight air units. (FUTURE extension)
+*/
+
+/**
+**	Draw building on map.
+**
+**	@param unit	Pointer to the building
+*/
+local void DrawBuilding(Unit* unit)
+{
+    int x;
+    int y;
+    const UnitType* type;
+    int frame;
+    int visible;
+
+    visible=UnitVisibleOnMap(unit);
+    // FIXME: is this the correct place? No, but now correct working.
+    if( visible ) {
+	frame = unit->SeenFrame = unit->Frame;
+    } else {
+	frame = unit->SeenFrame;
+	DebugCheck( frame==-1 || frame==0xFF );
+    }
+
+    type=unit->Type;
+    GraphicPlayerPixels(unit->Player,type->Sprite);
+    x=Map2ScreenX(unit->X)+unit->IX;
+    y=Map2ScreenY(unit->Y)+unit->IY;
+
+    DrawSelection(unit,type,x,y);
+
+    //
+    //	Buildings under construction/upgrade/ready.
+    //
+    if( unit->Orders[0].Action==UnitActionBuilded ) {
+	if( unit->Constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
+	    DrawConstruction(type->OverlapFrame
+		,frame&127
+		,x+(type->TileWidth*TileSizeX)/2
+		,y+(type->TileHeight*TileSizeY)/2);
+	} else {
+	    DrawUnitType(type,frame,x,y);
+	}
+    //
+    //	Draw the future unit type, if upgrading to it.
+    //
+    } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
+	DrawUnitType(unit->Orders[0].Type,(frame&128)+1,x,y);
+    } else {
+	DrawUnitType(type,frame,x,y);
+    }
+
+    // FIXME: johns: ugly check here, should be removed!
+    if( visible ) {
+	DrawInformations(unit,type,x,y);
+    }
+}
+
+/**
+**	Draw unit on map.
+**
+**	@param unit	Pointer to the unit.
+*/
+local void DrawUnit(const Unit* unit)
+{
+    int x;
+    int y;
+    const UnitType* type;
+
+    if ( unit->Revealer ) {		// Revealers are not drawn
+	DebugLevel3Fn("Drawing revealer %d\n",UnitNumber(unit));
+	return;
+    }
+
+    x=Map2ScreenX(unit->X)+unit->IX;
+    y=Map2ScreenY(unit->Y)+unit->IY;
+
+    type=unit->Type;
+    if( type->UnitType==UnitTypeFly ) {
+	DrawShadow(unit,type,x,y);
+    }
+
+    DrawSelection(unit,type,x,y);
+
+    GraphicPlayerPixels(unit->Player,type->Sprite);
+    DrawUnitType(type,unit->Frame,x,y);
+
+    DrawInformations(unit,type,x,y);
 }
 
 /**
