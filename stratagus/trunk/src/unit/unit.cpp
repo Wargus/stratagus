@@ -1524,7 +1524,8 @@ global void DoRunestones(void)
 	    }
 
 	    // Restore HP in everything but buildings (even in other player's units)
-	    if (!units[j]->Type->Building && units[j]->HP != units[j]->Stats->HitPoints) {
+	    if (!units[j]->Type->Building && units[j]->Type->Organic && 
+			units[j]->HP != units[j]->Stats->HitPoints ) {
 		tmp = units[j]->Stats->HitPoints - units[j]->HP;
 		if (tmp > 2) {
 		    tmp = 2;
