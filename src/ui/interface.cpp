@@ -292,11 +292,13 @@ local void UiToggleMusic(void)
 */
 global void UiTogglePause(void)
 {
-	GamePaused ^= 1;
-	if (GamePaused) {
-		SetStatusLine("Game Paused");
-	} else {
-		SetStatusLine("Game Resumed");
+	if (NetworkFildes == (Socket)-1) {
+		GamePaused ^= 1;
+		if (GamePaused) {
+			SetStatusLine("Game Paused");
+		} else {
+			SetStatusLine("Game Resumed");
+		}
 	}
 }
 
