@@ -2110,8 +2110,8 @@ local void DiplomacyOk(void)
 		}
 	    }
 	    // Menu says to be neutral
-	    if (menu->Items[4*j+5].d.gem.state == MI_GSTATE_UNCHECKED &&
-		menu->Items[4*j+6].d.gem.state == MI_GSTATE_UNCHECKED) {
+	    if (menu->Items[4 * j + 5].d.gem.state == MI_GSTATE_UNCHECKED &&
+		menu->Items[4 * j + 6].d.gem.state == MI_GSTATE_UNCHECKED) {
 		// Are they neutral?
 		if (!(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
 		    !(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
@@ -2120,8 +2120,8 @@ local void DiplomacyOk(void)
 		}
 	    }
 	    // Menu says to be crazy
-	    if (menu->Items[4*j+5].d.gem.state == MI_GSTATE_CHECKED &&
-		menu->Items[4*j+6].d.gem.state == MI_GSTATE_CHECKED) {
+	    if (menu->Items[4 * j + 5].d.gem.state == MI_GSTATE_CHECKED &&
+		menu->Items[4 * j + 6].d.gem.state == MI_GSTATE_CHECKED) {
 		// Are they crazy?
 		if (!(ThisPlayer->Allied&(1<<Players[i].Player) &&
 		    ThisPlayer->Enemy&(1<<Players[i].Player))) {
@@ -2130,7 +2130,7 @@ local void DiplomacyOk(void)
 		}
 	    }
 	    // Shared vision
-	    if (menu->Items[4*j+7].d.gem.state == MI_GSTATE_CHECKED) {
+	    if (menu->Items[4 * j + 7].d.gem.state == MI_GSTATE_CHECKED) {
 		if (!(ThisPlayer->SharedVision&(1<<Players[i].Player))) {
 		    SendCommandSharedVision(ThisPlayer->Player,1,
 			Players[i].Player);
@@ -2481,54 +2481,54 @@ local void TipsInit(Menuitem *mi __attribute__((unused)))
 
     menu = CurrentMenu;
 
-    if( ShowTips ) {
-	menu->Items[1].d.gem.state=MI_GSTATE_CHECKED;
+    if(ShowTips) {
+	menu->Items[1].d.gem.state = MI_GSTATE_CHECKED;
     } else {
-	menu->Items[1].d.gem.state=MI_GSTATE_UNCHECKED;
+	menu->Items[1].d.gem.state = MI_GSTATE_UNCHECKED;
     }
 
     TipsFreeTips();
 
-    w=menu->Width-2*menu->Items[5].xofs;
-    font=menu->Items[5].font;
-    i=0;
-    line=5;
+    w = menu->Width-2 * menu->Items[5].xofs;
+    font = menu->Items[5].font;
+    i = 0;
+    line = 5;
 
-    p=Tips[CurrentTip];
-    if( !p ) {
+    p = Tips[CurrentTip];
+    if(!p) {
 	return;
     }
 
-    l=0;
-    s=str=strdup(p);
+    l = 0;
+    s = str = strdup(p);
 
-    while( line<13 ) {
+    while (line<13) {
 	char* s1;
 	char* space;
 
-	space=NULL;
-	for( ;; ) {
-	    if( VideoTextLength(font,s)<w ) {
+	space = NULL;
+	for(;;) {
+	    if(VideoTextLength(font, s) < w) {
 		break;
 	    }
-	    s1=strrchr(s,' ');
-	    if( !s1 ) {
+	    s1 = strrchr(s,' ');
+	    if(!s1) {
 		fprintf(stderr, "line too long: \"%s\"\n", s);
 		break;
 	    }
-	    if( space ) {
+	    if(space) {
 		*space=' ';
 	    }
-	    space=s1;
-	    *space='\0';
+	    space = s1;
+	    *space = '\0';
 	}
-	menu->Items[line++].d.text.text=strdup(s);
-	l+=strlen(s);
-	if( !p[l] ) {
+	menu->Items[line++].d.text.text = strdup(s);
+	l += strlen(s);
+	if(!p[l]) {
 	    break;
 	}
 	++l;
-	s=str+l;
+	s = str+l;
     }
 
     free(str);
@@ -2553,7 +2553,7 @@ local void TipsCyclePreviousTip(void)
     if (CurrentTip != 0) {
 	--CurrentTip;
     } else {
-	while (Tips[CurrentTip+1] != NULL) {
+	while (Tips[CurrentTip + 1] != NULL) {
 	    ++CurrentTip;
 	}
     }
@@ -2639,43 +2639,44 @@ local void ObjectivesInit(Menuitem *mi __attribute__((unused)))
     Menu *menu;
 
     menu = FindMenu("menu-objectives");
-    w=menu->Width-2*menu->Items[1].xofs;
-    font=menu->Items[1].font;
-    i=0;
-    line=1;
+    w = menu->Width-2 * menu->Items[1].xofs;
+    font = menu->Items[1].font;
+    i = 0;
+    line = 1;
 
-    for( p=GameIntro.Objectives[i]; p; p=GameIntro.Objectives[++i] ) {
-	l=0;
-	s=str=strdup(p);
+    for(p = GameIntro.Objectives[i]; p; p = GameIntro.Objectives[++i]) {
+	l = 0;
+	s = str = strdup(p);
 
-	for( ;; ) {
+	for(;;) {
 	    char* s1;
 	    char* space;
 
-	    space=NULL;
-	    for( ;; ) {
-		if( VideoTextLength(font,s)<w ) {
+	    space = NULL;
+	    for(;;) {
+		if(VideoTextLength(font, s) < w) {
 		    break;
 		}
-		s1=strrchr(s,' ');
-		if( !s1 ) {
+		s1=strrchr(s, ' ');
+		if(!s1) {
 		    fprintf(stderr, "line too long: \"%s\"\n", s);
 		    break;
 		}
-		if( space )
+		if( space ) {
 		    *space=' ';
-		space=s1;
-		*space='\0';
+		}
+		space = s1;
+		*space = '\0';
 	    }
-	    menu->Items[line++].d.text.text=strdup(s);
-	    l+=strlen(s);
-	    if( !p[l] ) {
+	    menu->Items[line++].d.text.text = strdup(s);
+	    l += strlen(s);
+	    if(!p[l]) {
 		break;
 	    }
 	    ++l;
-	    s=str+l;
+	    s = str + l;
 
-	    if( line==menu->NumItems-1 ) {
+	    if(line==menu->NumItems-1) {
 		break;
 	    }
 	}
@@ -2692,10 +2693,10 @@ local void ObjectivesExit(Menuitem *mi)
     Menu *menu;
 
     menu = mi->menu;
-    for( i=1;i<menu->NumItems-1;i++ ) {
+    for(i = 1; i < menu->NumItems - 1;i++) {
 	if( menu->Items[i].d.text.text ) {
 	    free(menu->Items[i].d.text.text);
-	    menu->Items[i].d.text.text=NULL;
+	    menu->Items[i].d.text.text = NULL;
 	}
     }
 }
@@ -3332,7 +3333,7 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
 
-    DebugCheck(i<0);
+    DebugCheck( i < 0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	free(mi->menu->Items[3].d.button.text);
@@ -3551,20 +3552,20 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
 		    if (info->Description) {
-			VideoDrawText(mi->menu->X+8,mi->menu->Y+254,LargeFont,info->Description);
+			VideoDrawText(mi->menu->X + 8, mi->menu->Y + 254, LargeFont, info->Description);
 		    }
 		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		    VideoDrawText(mi->menu->X+8,mi->menu->Y+254+20,LargeFont,buffer);
+		    VideoDrawText(mi->menu->X + 8,mi->menu->Y + 254 + 20, LargeFont, buffer);
 		    for (n = j = 0; j < PlayerMax; j++) {
 			if (info->PlayerType[j] == PlayerPerson) {
 			    n++;
 			}
 		    }
 		    if (n == 1) {
-			VideoDrawText(mi->menu->X+8,mi->menu->Y+254+40,LargeFont,"1 player");
+			VideoDrawText(mi->menu->X + 8, mi->menu->Y + 254 + 40, LargeFont, "1 player");
 		    } else {
 			sprintf(buffer, "%d players", n);
-			VideoDrawText(mi->menu->X+8,mi->menu->Y+254+40,LargeFont,buffer);
+			VideoDrawText(mi->menu->X + 8, mi->menu->Y + 254 + 40, LargeFont, buffer);
 		    }
 		}
 	    }
@@ -3607,7 +3608,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
 		    mi->d.listbox.curopt++;
 		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 			mi->d.listbox.curopt--;
@@ -3615,8 +3616,8 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 		    }
 		    MustRedraw |= RedrawMenu;
 		}
-	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+	    } else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 		    mi->d.listbox.curopt--;
 		    if (mi->d.listbox.curopt < 0) {
 			mi->d.listbox.curopt++;
@@ -3631,9 +3632,9 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 	    }
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		    if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
 				 (mi->d.listbox.noptions - 1);
@@ -3646,12 +3647,12 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 				mi->d.listbox.curopt--;
 				mi->d.listbox.startline++;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+			    if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 == mi->d.listbox.noptions)
 				break;
 			}
 		    }
 		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
 				     (mi->d.listbox.noptions - 1);
@@ -3664,7 +3665,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 				mi->d.listbox.curopt++;
 				mi->d.listbox.startline--;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+			    if (mi->d.listbox.curopt + mi->d.listbox.startline == 0)
 				break;
 			}
 		    }
@@ -3672,7 +3673,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 
 		DebugCheck(mi->d.listbox.startline < 0);
 		DebugCheck(mi->d.listbox.noptions > 0 &&
-		    mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+		    mi->d.listbox.startline + mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
 		ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		MustRedraw |= RedrawMenu;
@@ -3697,12 +3698,12 @@ local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 	    if (mi->d.vslider.cflags&MI_CFLAGS_DOWN && j < nKeyStrokeHelps - 11) {
 		    j++;
 		    MustRedraw |= RedrawMenu;
-	    } else if (mi->d.vslider.cflags&MI_CFLAGS_UP && j > 0) {
+	    } else if (mi->d.vslider.cflags  & MI_CFLAGS_UP && j > 0) {
 		    j--;
 		    MustRedraw |= RedrawMenu;
 	    }
 	    if (i == 2) {
-		mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
+		mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 	    }
 	    mi->d.vslider.percent = j * 100 / (nKeyStrokeHelps - 11);
 	    break;
@@ -3729,9 +3730,9 @@ local void KeystrokeHelpDrawFunc(Menuitem *mi)
     j = ((mi[-2].d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
     for (i = 0; i < 11; i++) {
 	VideoDrawText(mi->menu->X+mi->xofs,mi->menu->Y+mi->yofs+(i*20),
-			    mi->font,KeyStrokeHelps[j*2]);
-	VideoDrawText(mi->menu->X+mi->xofs+80,mi->menu->Y+mi->yofs+(i*20),
-			    mi->font,KeyStrokeHelps[j*2+1]);
+			    mi->font,KeyStrokeHelps[j * 2]);
+	VideoDrawText(mi->menu->X + mi->xofs + 80,mi->menu->Y + mi->yofs+(i * 20),
+			    mi->font,KeyStrokeHelps[j * 2 + 1]);
 	j++;
     }
 }
@@ -3746,12 +3747,12 @@ local void GameSpeedHSAction(Menuitem *mi, int i)
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
 		DebugLevel0Fn("Increasing game speed by 10%s\n" _C_ "%");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
+	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing game speed by 10%s\n" _C_ "%");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
@@ -3764,7 +3765,7 @@ local void GameSpeedHSAction(Menuitem *mi, int i)
 	    SetVideoSync();
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
@@ -3791,19 +3792,19 @@ local void MouseScrollHSAction(Menuitem *mi, int i)
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
 		DebugLevel0Fn("Increasing mouse speed\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
+	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing mouse speed\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
 	    }
 	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
+		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
 	    }
 	    TheUI.MouseScroll = 1;
 	    SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
@@ -3811,7 +3812,7 @@ local void MouseScrollHSAction(Menuitem *mi, int i)
 		TheUI.MouseScroll = 0;
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
@@ -3840,19 +3841,19 @@ local void KeyboardScrollHSAction(Menuitem *mi, int i)
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
+	    if (mi[1].d.hslider.cflags  &MI_CFLAGS_RIGHT) {
 		DebugLevel0Fn("Increasing keyboard speed\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
+	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing keyboard speed\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
 	    }
 	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
+		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
 	    }
 	    TheUI.KeyScroll = 1;
 	    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
@@ -3860,7 +3861,7 @@ local void KeyboardScrollHSAction(Menuitem *mi, int i)
 		TheUI.KeyScroll = 0;
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
@@ -3889,24 +3890,24 @@ local void MasterVolumeHSAction(Menuitem *mi, int i)
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
 		DebugLevel0Fn("Increasing master volume\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
+	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing master volume\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
 	    }
 	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
+		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
 	    }
 	    SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
@@ -3932,24 +3933,24 @@ local void MusicVolumeHSAction(Menuitem *mi, int i)
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
 		DebugLevel0Fn("Increasing music volume\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
+	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing music volume\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
 	    }
 	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
+		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
 	    }
 	    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
@@ -3976,24 +3977,24 @@ local void CdVolumeHSAction(Menuitem *mi, int i)
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
 		DebugLevel0Fn("Increasing cd volume\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
+	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing cd volume\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
 	    }
 	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
+		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
 	    }
 	    SetCDVolume((mi[1].d.hslider.percent * 255) / 100);
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
@@ -4070,7 +4071,7 @@ local void ScenSelectOk(void)
 	if (fl[i].type == 0) {
 	    strcat(ScenSelectPath, "/");
 	    strcat(ScenSelectPath, fl[i].name);
-	    if (menu->Items[9].flags&MenuButtonDisabled) {
+	    if (menu->Items[9].flags & MenuButtonDisabled) {
 		menu->Items[9].flags &= ~MenuButtonDisabled;
 		menu->Items[9].d.button.text = ScenSelectDisplayPath;
 	    } else {
@@ -4247,13 +4248,13 @@ local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
     SetDefaultTextColors(rc, rc);
     l = VideoTextLength(GameFont, "Scenario:");
     VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360, GameFont, "Scenario:");
-    VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360+24 , GameFont, ScenSelectFileName);
+    VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360 + 24 , GameFont, ScenSelectFileName);
     if (MenuMapInfo) {
 	if (MenuMapInfo->Description) {
 	    VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 360, GameFont, MenuMapInfo->Description);
 	}
 	sprintf(buffer, " (%d x %d)", MenuMapInfo->MapWidth, MenuMapInfo->MapHeight);
-	VideoDrawText(TheUI.Offset640X + 16+l+8+VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 360+24, GameFont, buffer);
+	VideoDrawText(TheUI.Offset640X + 16 + l + 8 + VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 360 + 24, GameFont, buffer);
     }
 #if 0
     for (n = j = 0; j < PlayerMax; j++) {
@@ -4262,10 +4263,10 @@ local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 	}
     }
     if (n == 1) {
-	VideoDrawText(menu->X+8,menu->Y+254+40,LargeFont,"1 player");
+	VideoDrawText(menu->X+8,menu->Y + 254 + 40,LargeFont,"1 player");
     } else {
 	sprintf(buffer, "%d players", n);
-	VideoDrawText(menu->X+8,menu->Y+254+40,LargeFont,buffer);
+	VideoDrawText(menu->X+8,menu->Y + 254 + 40,LargeFont,buffer);
     }
 #endif
     SetDefaultTextColors(nc, rc);
@@ -4356,7 +4357,7 @@ local void GameTSSAction(Menuitem *mi, int i)
 local void GameGATAction(Menuitem *mi, int i)
 {
     if (!mi || mi->d.pulldown.curopt == i) {
-	GameSettings.GameType = i ? SettingsGameTypeMelee + i-1 : SettingsGameTypeMapDefault;
+	GameSettings.GameType = i ? SettingsGameTypeMelee + i - 1 : SettingsGameTypeMapDefault;
 	ServerSetupState.GaTOpt = i;
 	if (mi) {
 	    NetworkServerResyncClients();
