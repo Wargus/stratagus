@@ -342,35 +342,36 @@ global void UpdateDisplay(void)
 		DrawMapArea();
 		DrawMessages();
 
-		for (i = 0; i < TheUI.NumFillers; ++i) {
-			VideoDrawSubClip(TheUI.Filler[i].Graphic, 0, 0,
-				TheUI.Filler[i].Graphic->Width,
-				TheUI.Filler[i].Graphic->Height,
-				TheUI.FillerX[i], TheUI.FillerY[i]);
+		if (!BigMapMode) {
+			for (i = 0; i < TheUI.NumFillers; ++i) {
+				VideoDrawSubClip(TheUI.Filler[i].Graphic, 0, 0,
+					TheUI.Filler[i].Graphic->Width,
+					TheUI.Filler[i].Graphic->Height,
+					TheUI.FillerX[i], TheUI.FillerY[i]);
+			}
+			DrawMenuButtonArea();
+
+			if (TheUI.MinimapPanel.Graphic) {
+				VideoDrawSubClip(TheUI.MinimapPanel.Graphic, 0, 0,
+					TheUI.MinimapPanel.Graphic->Width,
+					TheUI.MinimapPanel.Graphic->Height,
+					TheUI.MinimapPanelX, TheUI.MinimapPanelY);
+			} else {
+				VideoDrawRectangle(TheUI.CompletedBarColor,
+					TheUI.MinimapPosX - 1, TheUI.MinimapPosY - 1,
+					TheUI.MinimapW + 2, TheUI.MinimapH + 2);
+			}
+
+			DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
+			DrawMinimapCursor(TheUI.SelectedViewport->MapX,
+				TheUI.SelectedViewport->MapY);
+
+			DrawInfoPanel();
+			DrawButtonPanel();
+			DrawResources();
+			DrawStatusLine();
 		}
-		DrawMenuButtonArea();
 
-		if (TheUI.MinimapPanel.Graphic) {
-			VideoDrawSubClip(TheUI.MinimapPanel.Graphic, 0, 0,
-				TheUI.MinimapPanel.Graphic->Width,
-				TheUI.MinimapPanel.Graphic->Height,
-				TheUI.MinimapPanelX, TheUI.MinimapPanelY);
-		} else {
-			VideoDrawRectangle(TheUI.CompletedBarColor,
-				TheUI.MinimapPosX - 1, TheUI.MinimapPosY - 1,
-				TheUI.MinimapW + 2, TheUI.MinimapH + 2);
-		}
-
-		// FIXME: redraw only 1* per second!
-		// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
-		DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
-		DrawMinimapCursor(TheUI.SelectedViewport->MapX,
-			TheUI.SelectedViewport->MapY);
-
-		DrawInfoPanel();
-		DrawButtonPanel();
-		DrawResources();
-		DrawStatusLine();
 		DrawCosts();
 		DrawTimer();
 	}

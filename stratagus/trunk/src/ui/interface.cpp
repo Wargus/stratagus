@@ -464,7 +464,6 @@ local void UiToggleBigMap(void)
 		EnableRedraw = RedrawMap | RedrawCursor | RedrawMessage | RedrawMenu |
 			RedrawTimer | RedrawAll;
 		SetStatusLine("Big map enabled");
-		VideoClearScreen();
 	} else {
 		TheUI.MapArea.X = mapx;
 		TheUI.MapArea.Y = mapy;
@@ -475,7 +474,6 @@ local void UiToggleBigMap(void)
 
 		EnableRedraw = RedrawEverything;
 		SetStatusLine("Returning to old map");
-		VideoClearScreen();
 	}
 }
 
