@@ -1659,7 +1659,7 @@ void MissileActionPointToPointBounce(Missile* missile)
     DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
     if (PointToPointMissile(missile)) {
-	if (missile->State < 2 * missile->Type->NumBounces - 1) {
+	if (missile->State < 2 * missile->Type->NumBounces - 1 && missile->TotalStep) {
 	    int xstep;
 	    int ystep;
 
