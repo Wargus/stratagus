@@ -698,7 +698,7 @@ local int MissileDrawLevelCompare(const void *v1, const void *v2)
 **
 **	@param vp	Viewport pointer.
 */
-global int DrawMissiles(const Viewport* vp, Missile **table)
+global int FindAndSortMissiles(const Viewport* vp, Missile **table)
 {
     Missile* missile;
     Missile* const* missiles;
