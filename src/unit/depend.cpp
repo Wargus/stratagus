@@ -215,7 +215,7 @@ global void AddDependency(const char* target,const char* required,int count
     } else if ( !strncmp( target, "upgrade-", 8 ) ) {
 	// target string refers to upgrade-XXX
 	rule.Type = DependRuleUpgrade;
-	rule.Kind.Upgrade = UpgradeIdByIdent( target );
+	rule.Kind.Upgrade = UpgradeByIdent( target );
     } else {
 	DebugLevel0Fn("dependency target `%s' should be unit-type or upgrade\n"
 		,target);
@@ -272,10 +272,10 @@ global void AddDependency(const char* target,const char* required,int count
     } else if ( !strncmp( required, "upgrade-", 8 ) ) {
 	// required string refers to upgrade-XXX
 	temp->Type = DependRuleUpgrade;
-	temp->Kind.Upgrade = UpgradeIdByIdent( required );
+	temp->Kind.Upgrade = UpgradeByIdent( required );
     } else {
-	DebugLevel0Fn("
-		dependency required `%s' should be unit-type or upgrade\n"
+	DebugLevel0Fn(
+		"dependency required `%s' should be unit-type or upgrade\n"
 		,required);
 	free(temp);
 	return;
@@ -317,8 +317,8 @@ global int CheckDependByIdent(const Player* player,const char* target)
 	rule.Type = DependRuleUnitType;
     } else if ( !strncmp( target, "upgrade-", 8 ) ) {
 	// target string refers to upgrade-XXX
-	rule.Kind.Upgrade = UpgradeIdByIdent( target );
-	if( UpgradeIdAllowed( player, rule.Kind.Upgrade ) != 'A' ) {
+	rule.Kind.Upgrade = UpgradeByIdent( target );
+	if( UpgradeIdAllowed( player, rule.Kind.Upgrade-Upgrades ) != 'A' ) {
 	    return 0;
 	}
 	rule.Type = DependRuleUpgrade;
@@ -360,7 +360,7 @@ global int CheckDependByIdent(const Player* player,const char* target)
 		}
 		break;
 	    case DependRuleUpgrade:
-		i=UpgradeIdAllowed( player, temp->Kind.Upgrade ) != 'R';
+		i=UpgradeIdAllowed( player, temp->Kind.Upgrade-Upgrades) != 'R';
 		if ( temp->Count ? i : !i ) {
 		    goto try_or;
 		}
@@ -435,7 +435,7 @@ global void SaveDependencies(FILE* file)
 		    fprintf(file,"%s",node->Kind.UnitType->Ident);
 		    break;
 		case DependRuleUpgrade:
-		    fprintf(file,"%s",Upgrades[node->Kind.Upgrade].Ident);
+		    fprintf(file,"%s",node->Kind.Upgrade->Ident);
 		    break;
 	    }
 	    // All or cases
@@ -447,12 +447,10 @@ global void SaveDependencies(FILE* file)
 		while( temp ) {
 		    switch( temp->Type ) {
 		    case DependRuleUnitType:
-			fprintf(file,"%s"
-				,temp->Kind.UnitType->Ident);
+			fprintf(file,"%s",temp->Kind.UnitType->Ident);
 			break;
 		    case DependRuleUpgrade:
-			fprintf(file,"%s"
-				,Upgrades[temp->Kind.Upgrade].Ident);
+			fprintf(file,"%s",temp->Kind.Upgrade->Ident);
 			break;
 		    }
 		    temp=temp->Rule;
