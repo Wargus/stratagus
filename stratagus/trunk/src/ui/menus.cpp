@@ -2205,6 +2205,9 @@ local void GetInfoFromSelectPath(void)
     } else if (strcasestr(ScenSelectFileName, ".scm")) {
 	ScenSelectPudInfo = GetScmInfo(ScenSelectPath);
 	strcpy(ScenSelectFullPath, ScenSelectPath);
+    } else if (strcasestr(ScenSelectFileName, ".chk")) {
+	ScenSelectPudInfo = GetChkInfo(ScenSelectPath);
+	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else {
 	// FIXME: GetCmInfo();
     }
@@ -2752,11 +2755,12 @@ local void ScenSelectLBExit(Menuitem *mi)
 local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
-    char *suf;
+    char *suf[2];
     char *cp;
     char *lcp;
     char *np;
     int p;
+    int i;
     int sz;
     static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
     Menu *menu;
@@ -2767,13 +2771,16 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     menu = FindMenu("menu-select-scenario");
 
     if (menu->items[6].d.pulldown.curopt == 0) {
-	suf = ".cm";
+	suf[0] = ".cm";
+	suf[1] = NULL;
 	p = 0;
     } else if (menu->items[6].d.pulldown.curopt == 1) {
-	suf = ".pud";
+	suf[0] = ".pud";
+	suf[1] = NULL;
 	p = 1;
     } else {
-	suf = ".scm";
+	suf[0] = ".scm";
+	suf[1] = ".chk";
 	p = 2;
     }
     np = strrchr(pathbuf, '/');
@@ -2782,8 +2789,6 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     } else {
 	np = pathbuf;
     }
-    cp = np;
-    cp--;
     fl->type = -1;
 #ifdef USE_ZZIPLIB
     if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
@@ -2794,12 +2799,21 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 	}
     }
 #endif
+    i = 0;
     do {
-	lcp = cp++;
-	cp = strcasestr(cp, suf);
-    } while (cp != NULL);
+	cp = np;
+	--cp;
+	do {
+	    lcp = cp++;
+	    cp = strcasestr(cp, suf[i]);
+	} while (cp != NULL);
+	if (lcp >= np) {
+	    break;
+	}
+	++i;
+    } while (i < sizeof(suf)/sizeof(*suf));
     if (lcp >= np) {
-	cp = lcp + strlen(suf);
+	cp = lcp + strlen(suf[i]);
 #ifdef USE_ZLIB
 	if (strcmp(cp, ".gz") == 0) {
 	    *cp = 0;
@@ -2835,6 +2849,20 @@ usezzf:
 		    info = GetScmInfo(pathbuf);
 		    if (info) {
 			DebugLevel3Fn("GetScmInfo(%s) : %p\n" _C_ pathbuf _C_ info);
+			sz = szl[menu->items[8].d.pulldown.curopt];
+			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
+			    fl->type = 1;
+			    fl->name = strdup(np);
+			    fl->xdata = info;
+			    return 1;
+			} else {
+			    FreeMapInfo(info);
+			}
+		    }
+		} else if (strcasestr(pathbuf, ".chk")) {
+		    info = GetChkInfo(pathbuf);
+		    if (info) {
+			DebugLevel3Fn("GetChkInfo(%s) : %p\n" _C_ pathbuf _C_ info);
 			sz = szl[menu->items[8].d.pulldown.curopt];
 			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
 			    fl->type = 1;
@@ -4359,6 +4387,8 @@ global int NetClientSelectScenario(void)
 	ScenSelectPudInfo = GetPudInfo(ScenSelectFullPath);
     } else if (strcasestr(ScenSelectFileName, ".scm")) {
 	ScenSelectPudInfo = GetScmInfo(ScenSelectFullPath);
+    } else if (strcasestr(ScenSelectFileName, ".chk")) {
+	ScenSelectPudInfo = GetChkInfo(ScenSelectFullPath);
     } else {
 	// FIXME: GetCmInfo();
     }
@@ -4704,11 +4734,11 @@ local void EditorMainLoadLBExit(Menuitem *mi)
 local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
-    char *suf;
+    char *suf[3];
     char *np;
     char *cp;
     char *lcp;
-    char *lcp2;
+    int i;
 #ifdef USE_ZZIPLIB
     int sz;
     ZZIP_FILE *zzf;
@@ -4720,8 +4750,6 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
     } else {
 	np = pathbuf;
     }
-    cp = np;
-    cp--;
     fl->type = -1;
 #ifdef USE_ZZIPLIB
     if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
@@ -4732,24 +4760,25 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 	}
     }
 #endif
-    suf = ".pud";
+    suf[0] = ".pud";
+    suf[1] = ".scm";
+    suf[2] = ".chk";
+    i = 0;
     do {
-	lcp = cp++;
-	cp = strcasestr(cp, ".pud");
-    } while (cp != NULL);
-    cp = np;
-    cp--;
-    do {
-	lcp2 = cp++;
-	cp = strcasestr(cp, ".scm");
-    } while (cp != NULL);
-    if (lcp2 > lcp) {
-	lcp = lcp2;
-	suf = ".scm";
-    }
+	cp = np;
+	--cp;
+	do {
+	    lcp = cp++;
+	    cp = strcasestr(cp, suf[i]);
+	} while (cp != NULL);
+	if (lcp >= np) {
+	    break;
+	}
+	++i;
+    } while (i < sizeof(suf)/sizeof(*suf));
 
     if (lcp >= np) {
-	cp = lcp + strlen(suf);
+	cp = lcp + strlen(suf[i]);
 #ifdef USE_ZLIB
 	if (strcmp(cp, ".gz") == 0) {
 	    *cp = 0;
@@ -4774,6 +4803,14 @@ usezzf:
 		}
 	    } else if (strcasestr(pathbuf, ".scm")) {
 		info = GetScmInfo(pathbuf);
+		if (info) {
+		    fl->type = 1;
+		    fl->name = strdup(np);
+		    fl->xdata = info;
+		    return 1;
+		}
+	    } else if (strcasestr(pathbuf, ".chk")) {
+		info = GetChkInfo(pathbuf);
 		if (info) {
 		    fl->type = 1;
 		    fl->name = strdup(np);
