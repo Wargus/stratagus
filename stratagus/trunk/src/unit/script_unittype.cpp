@@ -126,6 +126,7 @@ local SCM CclDefineUnitType(SCM list)
 	redefine = 0;
 	//Set some default values
 	type->_RegenerationRate = 0;
+	type->Selectable = 1;
     }
     type->NumDirections = 8;
 
@@ -279,6 +280,14 @@ local SCM CclDefineUnitType(SCM list)
 	    type->MustBuildOnTop = auxtype;
 	    free(str);
 	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("not-selectable"))) {
+	    type->Selectable = 0;
+	} else if (gh_eq_p(value, gh_symbol2scm("neutral-minimap-color"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    type->NeutralMinimapColorRGB.D24.a = gh_scm2int(gh_car(sublist));
+	    type->NeutralMinimapColorRGB.D24.b = gh_scm2int(gh_car(gh_cdr(sublist)));
+	    type->NeutralMinimapColorRGB.D24.c = gh_scm2int(gh_car(gh_cdr(gh_cdr(sublist))));
 	} else if (gh_eq_p(value, gh_symbol2scm("box-size"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);

@@ -761,6 +761,15 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     }
     CLprintf(file, "  'tile-size '(%d %d)", type->TileWidth, type->TileHeight);
     CLprintf(file, "  'box-size '(%d %d)\n", type->BoxWidth, type->BoxHeight);
+    
+    if(!type->Selectable) {
+	CLprintf(file, "  'not-selectable\n");
+    }
+
+    CLprintf(file, "  'neutral-minimap-color '(%d %d %d)\n",
+	type->NeutralMinimapColorRGB.D24.a,type->NeutralMinimapColorRGB.D24.b,
+	type->NeutralMinimapColorRGB.D24.c);
+
     CLprintf(file, "  'sight-range %d", type->_SightRange);
     if (all || type->ReactRangeComputer) {
 	CLprintf(file, "  'computer-reaction-range %d", type->ReactRangeComputer);
