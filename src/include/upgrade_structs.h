@@ -138,7 +138,6 @@ typedef struct _unit_stats_ {
 **  The main useable upgrades.
 */
 typedef struct _upgrade_ {
-	const void* OType;                      ///< object type (future extensions)
 	char*       Ident;                      ///< identifier
 	int         Costs[MaxCosts];            ///< costs for the upgrade
 		// TODO: not used by buttons
@@ -185,8 +184,7 @@ typedef struct _upgrade_modifier_ {
 	char ChangeUpgrades[UpgradeMax];    ///< allow/forbid upgrades
 	char ApplyTo[UnitTypeMax];          ///< which unit types are affected
 
-	// TODO: void* cshould be UnitType*
-	void* ConvertTo;                    ///< convert to this unit-type.
+	struct _unit_type_* ConvertTo;      ///< convert to this unit-type.
 
 } UpgradeModifier;
 
@@ -226,7 +224,6 @@ typedef struct _upgrade_timers_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern const char UpgradeType[];            ///< upgrade type
 extern Upgrade Upgrades[UpgradeMax];        ///< the main user usable upgrades
 
 //@}
