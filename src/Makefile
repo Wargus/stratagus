@@ -31,7 +31,7 @@ include $(TOPDIR)/Rules.make
 OBJS=
 
 MODULES= clone map unit action ai ui sound video network pathfinder siod \
-	 game beos missile
+	 game beos missile libmodplug
 
 all::
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i all ; done
