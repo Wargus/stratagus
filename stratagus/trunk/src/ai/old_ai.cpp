@@ -851,8 +851,7 @@ local int AiHarvest(Unit * unit)
 	wy = unit->Y;
     }
     cost = 99999;
-    IfDebug(bestx = besty = 0;
-	    );				// keep the compiler happy
+    IfDebug(bestx = besty = 0; );	// keep the compiler happy
 
     // FIXME: if we reach the map borders we can go fast up, left, ...
     --x;
@@ -861,7 +860,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
-		if (n < cost) {
+		if (n < cost && PlaceReachable(unit, x, y, 1)) {
 		    cost = n;
 		    bestx = x;
 		    besty = y;
@@ -873,7 +872,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
-		if (n < cost) {
+		if (n < cost && PlaceReachable(unit, x, y, 1)) {
 		    cost = n;
 		    bestx = x;
 		    besty = y;
@@ -885,7 +884,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
-		if (n < cost) {
+		if (n < cost && PlaceReachable(unit, x, y, 1)) {
 		    cost = n;
 		    bestx = x;
 		    besty = y;
@@ -897,7 +896,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
-		if (n < cost) {
+		if (n < cost && PlaceReachable(unit, x, y, 1)) {
 		    cost = n;
 		    bestx = x;
 		    besty = y;
