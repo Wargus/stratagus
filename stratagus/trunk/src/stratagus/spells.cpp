@@ -8,7 +8,7 @@
 //			  T H E	  W A R	  B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name action_spellcast.c	-	The spell cast action. */
+/**@name spells.c	-	The spell cast action. */
 //
 //	(c) Copyright 1998-2001 by Vladi Belperchinov-Shabanski
 //
