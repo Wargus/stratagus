@@ -113,6 +113,8 @@ extern void ActionStillGeneric(Unit* unit,int ground);
 extern void HandleActionStill(Unit* unit);
     /// Handle command stand ground
 extern void HandleActionStandGround(Unit* unit);
+    /// Handle command follow
+extern void HandleActionFollow(Unit* unit);
     /// Generic move action
 extern int DoActionMove(Unit* unit);
     /// Handle command move
