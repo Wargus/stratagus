@@ -118,7 +118,13 @@ void PlayListAdvance(void)
 	if (proceed) {
 		lua_pushstring(Lua, "MusicStopped");
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
-		LuaCall(0, 1);
+		if (!lua_isfunction(Lua, -1)) {
+			fprintf(stderr, "No MusicStopped function in Lua\n");
+			MusicOff = 1;
+			StopMusic();
+		} else {
+			LuaCall(0, 1);
+		}
 	}
 }
 
