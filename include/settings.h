@@ -60,6 +60,8 @@ typedef struct _settings_ Settings;
 **
 */
 struct _settings_ {
+    int		NetGameType;		/// Multiplayer or single player
+
 //  Individual presets:
 //  For single-player game only Presets[0] will be used..
     struct {
@@ -79,6 +81,12 @@ struct _settings_ {
 };
 
 #define SettingsPresetMapDefault	-1	/// Special: Use pud/cm supplied
+
+/**
+**	Single or multiplayer settings
+*/
+#define SettingsSinglePlayerGame	1
+#define SettingsMultiPlayerGame		2
 
 /*
 **	Resource-Preset factor
