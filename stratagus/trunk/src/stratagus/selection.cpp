@@ -67,7 +67,7 @@ global void UnSelectAll(void)
 {
     Unit* unit;
 
-    while( !++GroupId ) {
+    while( !++GroupId ) {		// Advance group id, but keep non zero
     }
 
     while( NumSelected ) {
@@ -176,7 +176,7 @@ global void UnSelectUnit(Unit* unit)
     }
 
     if( NumSelected>1 ) {		// Assign new group to remaining units
-	while( !++GroupId ) {
+	while( !++GroupId ) {		// Advance group id, but keep non zero
 	}
 	for( i=0; i<NumSelected; ++i ) {
 	    Selected[i]->LastGroup=GroupId;
@@ -225,7 +225,7 @@ global int SelectUnitsByType(Unit* base)
     const UnitType* type;
     int r;
     int i;
-    Viewport *v = &TheUI.VP[TheUI.ActiveViewport];
+    const Viewport* v;
 
     type=base->Type;
 
@@ -235,7 +235,8 @@ global int SelectUnitsByType(Unit* base)
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
     /* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
      * took parameters of the selection rectangle as arguments */
-    r = SelectUnits (v->MapX-1, v->MapY-1, v->MapX + v->MapWidth+1,
+    v = &TheUI.VP[TheUI.ActiveViewport];
+    r = SelectUnits(v->MapX-1, v->MapY-1, v->MapX + v->MapWidth+1,
 		v->MapY + v->MapHeight+1, table);
 
     // if unit is a cadaver or hidden (not on map)
@@ -310,7 +311,7 @@ global int ToggleUnitsByType(Unit* base)
     const UnitType* type;
     int r;
     int i;
-    Viewport *v = &TheUI.VP[TheUI.ActiveViewport];
+    const Viewport* v;
 
     type = base->Type;
 
@@ -320,6 +321,7 @@ global int ToggleUnitsByType(Unit* base)
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
     /* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
      * took parameters of the selection rectangle as arguments */
+    v = &TheUI.VP[TheUI.ActiveViewport];
     r = SelectUnits(v->MapX-1, v->MapY-1, v->MapX + v->MapWidth + 1,
 		v->MapY + v->MapHeight + 1, table);
 
@@ -945,7 +947,9 @@ global void SaveSelections(FILE* file)
 */
 global void CleanSelections(void)
 {
+    GroupId=0;
     NumSelected=0;
+    DebugCheck( NoUnitP );		// Code fails if none zero
     memset(Selected,0,sizeof(Selected));
 }
 
