@@ -591,6 +591,8 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	pixels=malloc(256*sizeof(VMemType16));
 	break;
     case 24:
+	//pixels=malloc(256*sizeof(VMemType24));
+	//break;
     case 32:
 	pixels=malloc(256*sizeof(VMemType32));
 	break;
@@ -639,6 +641,11 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	    ((VMemType16*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);
 	    break;
 	case 24:
+	    v=SDL_MapRGB(Screen->format,r,g,b);
+	    ((VMemType24*)pixels)[i].a=v>>16;
+	    ((VMemType24*)pixels)[i].b=v>> 8;
+	    ((VMemType24*)pixels)[i].c=v>> 0;
+	    //break;
 	case 32:
 	    ((VMemType32*)pixels)[i]=SDL_MapRGB(Screen->format,r,g,b);
 	    break;
