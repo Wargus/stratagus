@@ -97,15 +97,11 @@
 <A HREF="#set-show-sight-range!">set-show-sight-range!</A>
 <A HREF="#set-show-tips!">set-show-tips!</A>
 <A HREF="#set-speed-build!">set-speed-build!</A>
-<A HREF="#set-speed-chop!">set-speed-chop!</A>
-<A HREF="#set-speed-gold!">set-speed-gold!</A>
-<A HREF="#set-speed-haul!">set-speed-haul!</A>
-<A HREF="#set-speed-mine!">set-speed-mine!</A>
-<A HREF="#set-speed-oil!">set-speed-oil!</A>
 <A HREF="#set-speed-research!">set-speed-research!</A>
+<A HREF="#set-speed-resources-harvest!">set-speed-resources-harvest!</A>
+<A HREF="#set-speed-resources-return!">set-speed-resources-return!</A>
 <A HREF="#set-speed-train!">set-speed-train!</A>
 <A HREF="#set-speed-upgrade!">set-speed-upgrade!</A>
-<A HREF="#set-speed-wood!">set-speed-wood!</A>
 <A HREF="#set-speeds!">set-speeds!</A>
 <A HREF="#set-title-screen!">set-title-screen!</A>
 <A HREF="#set-training-queue!">set-training-queue!</A>
@@ -1704,151 +1700,6 @@ Set build speed.
 
 <A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
 
-<A NAME="set-speed-chop!"></A>
-<H3>set-speed-chop!</H3>
-
-<H4>Description</H4>
-
-Set chop speed.
-
-<H4>Syntax</H4>
-
-<CODE>(set-speed-chop! speed)</CODE>
-
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-speed-chop! 10)
-</PRE>
-
-<P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
-<A NAME="set-speed-gold!"></A>
-<H3>set-speed-gold!</H3>
-
-<H4>Description</H4>
-
-Set gold speed.
-
-<H4>Syntax</H4>
-
-<CODE>(set-speed-gold! speed)</CODE>
-
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-speed-gold! 10)
-</PRE>
-
-<P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
-<A NAME="set-speed-haul!"></A>
-<H3>set-speed-haul!</H3>
-
-<H4>Description</H4>
-
-Set haul speed.
-
-<H4>Syntax</H4>
-
-<CODE>(set-speed-haul! speed)</CODE>
-
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-speed-haul! 10)
-</PRE>
-
-<P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
-<A NAME="set-speed-mine!"></A>
-<H3>set-speed-mine!</H3>
-
-<H4>Description</H4>
-
-Set mine speed.
-
-<H4>Syntax</H4>
-
-<CODE>(set-speed-mine! speed)</CODE>
-
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-speed-mine! 10)
-</PRE>
-
-<P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
-<A NAME="set-speed-oil!"></A>
-<H3>set-speed-oil!</H3>
-
-<H4>Description</H4>
-
-Set oil speed.
-
-<H4>Syntax</H4>
-
-<CODE>(set-speed-oil! speed)</CODE>
-
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-speed-oil! 10)
-</PRE>
-
-<P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
 <A NAME="set-speed-research!"></A>
 <H3>set-speed-research!</H3>
 
@@ -1873,6 +1724,70 @@ Set research speed.
 </PRE>
 
 <P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="set-speed-resources-harvest!"></A>
+<H3>set-speed-resources-harvest!</H3>
+
+<H4>Description</H4>
+
+Set the harvesting speed of a resource.
+
+<H4>Syntax</H4>
+
+<CODE>(set-speed-resources-harvest! resource speed)</CODE>
+
+<DL>
+<DT>resource</DT>
+<DD>Name of the resource.
+</DD>
+<DT>speed</DT>
+<DD>Speed factor to increase harvesting time.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-speed-resources-harvest! 'gold 10)
+</PRE>
+
+<P>Speeds up gold mining time by a factor of 10.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="set-speed-resources-return!"></A>
+<H3>set-speed-resources-return!</H3>
+
+<H4>Description</H4>
+
+Set the returning speed of a resource.
+
+<H4>Syntax</H4>
+
+<CODE>(set-speed-resources-return! resource speed)</CODE>
+
+<DL>
+<DT>resource</DT>
+<DD>Name of the resource.
+</DD>
+<DT>speed</DT>
+<DD>Speed factor to increase returning time.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-speed-resources-return! 'gold 10)
+</PRE>
+
+<P>Speeds up the time spent returning gold by a factor of 10.
 
 <H4>Used</H4>
 
@@ -1928,35 +1843,6 @@ Set upgrade speed.
 
 <PRE>
     (set-speed-upgrade! 10)
-</PRE>
-
-<P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
-<A NAME="set-speed-wood!"></A>
-<H3>set-speed-wood!</H3>
-
-<H4>Description</H4>
-
-Set wood speed.
-
-<H4>Syntax</H4>
-
-<CODE>(set-speed-wood! speed)</CODE>
-
-<DL>
-<DT>speed</DT>
-<DD>.
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (set-speed-wood! 10)
 </PRE>
 
 <P>.
