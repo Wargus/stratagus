@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file.
 ##
-##	(c) Copyright 1998-2002 by Lutz Sammer
+##	(c) Copyright 1998-2003 by Lutz Sammer and Nehal Mistry
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
@@ -91,7 +91,6 @@ help:
 	@-echo "make tags			create ctags"
 	@-echo "make depend			create dependencies"
 	@-echo "make dist			create distribution"
-	@-echo "make small-dist			create small distribution"
 	@-echo "make buildit			create data files from original data"
 	@-echo "make buildclean			cleanup build data files"
 	@-echo "make win32new			(CROSS-COMPILER ONLY) start new win32"
@@ -283,7 +282,7 @@ dist: distlist
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-src.tar.gz $(distdir)
-	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
+	echo "(c) 2003 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir)-src.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -299,7 +298,7 @@ small-dist: distlist
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-small.tar.gz $(distdir)
-	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
+	echo "(c) 2003 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir)-small.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -346,7 +345,7 @@ win32-bin-dist2: win32
 	@chmod -R a+rX $(distdir)
 	@strip -s -R .comment $(distdir)/freecraft$(EXE)
 	@strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	@echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
+	@echo "(c) 2003 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
 	@$(RM) -r $(distdir)
@@ -358,44 +357,6 @@ win32-bin-dist: win32
 
 #----------------------------------------------------------------------------
 
-MYDATE	= $(shell date +%y%m%d)
-PCRAFT= freecraft-$(MYDATE).tar.bz2
-LCRAFT= freecraft-$(MYDATE)-bin.tar.bz2
-WCRAFT= freecraft-$(MYDATE)-win32bin.zip
-FCMP=	../fcmp-*.tar.gz
-
-linux-complete:
-	mkdir freecraft-complete
-	tar xjf $(PCRAFT)
-	tar xjf $(LCRAFT)
-	cp -a freecraft-$(MYDATE)/* freecraft-complete
-	mv freecraft-complete/data freecraft-complete/data.wc2
-	tar xzCf freecraft-complete $(FCMP)
-	rm -rf freecraft-$(MYDATE)
-	chmod 777 freecraft-complete
-	chmod -R a+rX freecraft-complete
-	-tar czhf freecraft-$(MYDATE)-complete-linux.tar.gz freecraft-complete
-	rm -rf freecraft-complete
-
-win32-complete:
-	mkdir freecraft-complete
-	tar xjf $(PCRAFT)
-	unzip -oq $(WCRAFT)
-	cp -a freecraft-$(MYDATE)/* freecraft-complete
-	mv freecraft-complete/data freecraft-complete/data.wc2
-	tar xzCf freecraft-complete $(FCMP)
-	rm -rf freecraft-$(MYDATE)
-	chmod 777 freecraft-complete
-	chmod -R a+rX freecraft-complete
-	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
-	zip -zq9r freecraft-$(MYDATE)-complete-win32.zip freecraft-complete
-	cat tools/SFXWiz32-gcc.exe freecraft-$(MYDATE)-complete-win32.zip \
-		> freecraft-$(MYDATE)-complete-win32.exe
-	rm -rf freecraft-complete
-
-complete:	linux-complete win32-complete
-
-#----------------------------------------------------------------------------
 difffile=	freecraft-`date +%y%m%d`.diff
 diff:
 	@$(RM) $(difffile)
