@@ -402,7 +402,7 @@ global int CanCastSpell( Unit* unit, int SpellId )
 }
 */
 
-/*
+/**
 **      Spell cast!
 **
 **      @param SpellId  Spell id (index in the spell type table).
