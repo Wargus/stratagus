@@ -59,9 +59,8 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
     DebugLevel3("Flags %2d Pixel %2d Frame %2d Wait %3d "
 	    ,animation[state].Flags,animation[state].Pixel
 	    ,animation[state].Frame,animation[state].Sleep);
-    DebugLevel3("Heading %d +%d,%d\n",unit->Heading,unit->IX,unit->IY);
+    DebugLevel3("Heading %d +%d,%d\n",unit->Direction,unit->IX,unit->IY);
 
-    //unit->Frame= (unit->Frame&128) + (unit->Frame%5);
     unit->Frame+=animation[state].Frame;
     unit->IX+=animation[state].Pixel;
     unit->IY+=animation[state].Pixel;
