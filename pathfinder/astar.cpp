@@ -350,11 +350,21 @@ global int AStarFindPath(Unit* unit, int x1, int y1, int x2, int y2, char* path)
     gx=(x1+x2)/2;
     gy=(y1+y2)/2;
 
+    if( y1 < 0 ) {
+	y1 = 0;
+    }
+    if( y2 >= TheMap.Height ) {
+	y2 = TheMap.Height-1;
+    }
+    if( x1 < 0 ) {
+	x1 = 0;
+    }
+    if( x2 >= TheMap.Width ) {
+	x2 = TheMap.Width-1;
+    }
+
     // Mark Goal Border in Matrix
     for( ey=y1;ey<=y2;ey++ ){
-	if( ey<0 || ey>=TheMap.Height ) {
-	    break;
-	}
 	if( CostMoveTo(unit,x1,ey,mask,AStarFixedUnitCrossingCost)>=0 ) {
 	    eo=ey*TheMap.Width+x1;
 	    AStarMatrix[eo].InGoal=1;
@@ -374,9 +384,6 @@ global int AStarFindPath(Unit* unit, int x1, int y1, int x2, int y2, char* path)
     }
     
     for( ex=x1;ex<=x2;ex++ ){
-	if( ex<0 || ex>=TheMap.Width ) {
-	    break;
-	}
 	if( CostMoveTo(unit,ex,y1,mask,AStarFixedUnitCrossingCost)>=0 ) {
 	    eo=y1*TheMap.Width+ex;
 	    AStarMatrix[eo].InGoal=1;

@@ -1061,9 +1061,11 @@ global int HandleCheats(const char* Input)
     } else if (!strcmp(Input, "ai me") ) {
 	if( ThisPlayer->AiEnabled ) {
 	    ThisPlayer->AiEnabled = 0;
+	    ThisPlayer->Type = PlayerPerson;
 	    SetMessage("AI is off, Normal Player");
 	} else {
 	    ThisPlayer->AiEnabled = 1;
+	    ThisPlayer->Type = PlayerComputer;
 	    if( !ThisPlayer->Ai ) {
 	    	AiInit( ThisPlayer );
 	    }
