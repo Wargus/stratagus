@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	sound.ccl	-	Define the used sounds.
+--	sound.lua	-	Define the used sounds.
 --
 --	(c) Copyright 1999-2004 by Fabrice Rossi, Lutz Sammer and Crestez Leonard
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: sound.lua,v 1.2 2004/02/10 01:55:23 n0body Exp $
+--	$Id$
 
 ------------------------------------------------------------------------------
 --	Music part
