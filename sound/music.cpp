@@ -65,6 +65,7 @@
 global Sample* MusicSample;		/// Music samples
 #endif
 
+				/// FIXME: remove :wc2
 global char *CDMode = ":off";	/// cd play mode, ":off" ":random" ":all" or ":wc2"
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global int CDTrack = 0;			/// Current cd track
@@ -288,6 +289,7 @@ global int PlayCDRom(const char* name)
 /**
 **	Play music from cdrom.
 **
+**	FIXME: remove :wc2
 **	:all :random :off :wc2
 **
 **	@param name	Name starting with ":".
@@ -353,6 +355,7 @@ global int PlayCDRom(const char* name)
 		CDMode = ":stopped";
 	    return 1;
 	}
+	// FIXME: remove :wc2
 	if (!strcmp(name, ":wc2")) {
 	    CDMode = ":wc2";
 	    if (GuiGameStarted == 0)
