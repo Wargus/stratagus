@@ -284,7 +284,8 @@ local void MoveToTarget(Unit* unit)
 		// FIXME: only if heading changes
 		CheckUnitToBeDrawn(unit);
 	    }
-	    unit->SubAction=ATTACK_TARGET;
+	    unit->SubAction&=WEAK_TARGET;
+	    unit->SubAction|=MOVE_TO_TARGET;
 	    return;
 	} else if( err<0 ) {
 	    unit->State=unit->SubAction=0;
@@ -435,7 +436,8 @@ local void AttackTarget(Unit* unit)
 	    NewResetPath(unit);
 	    unit->Frame=0;
 	    unit->State=0;
-	    unit->SubAction=MOVE_TO_TARGET;
+	    unit->SubAction&=WEAK_TARGET;
+	    unit->SubAction|=MOVE_TO_TARGET;
 	}
 
 	//
