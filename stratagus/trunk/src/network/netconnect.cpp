@@ -1357,6 +1357,8 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				/// Use information supplied by the client:
 				ServerSetupState.Ready[h] = msg->u.State.Ready[h];
 				ServerSetupState.Race[h] = msg->u.State.Race[h];
+				DebugLevel3Fn("Server: ICMState: Client[%d]: Ready: %d Race: %d\n",
+						 h, ServerSetupState.Ready[h], ServerSetupState.Race[h]);
 				/// Add additional info usage here!
 				/* Fall through */
 			    case ccs_async:
