@@ -820,6 +820,7 @@ local int CclDefineModifier(lua_State* l)
 			convert_to = UnitTypeByIdent(value);
 		} else {
 			lua_pushfstring(l, "wrong tag: %s", temp);
+			lua_error(l);
 			return 0;
 		}
 	}

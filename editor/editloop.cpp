@@ -73,6 +73,10 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 --  Variables
 ----------------------------------------------------------------------------*/
 
+global int IconWidth;                       /// Icon width in panels
+global int IconHeight;                      /// Icon height in panels
+
+
 global char EditorRunning;    /// True editor is running
 global char EditorMapLoaded;  /// Map loaded in editor
 
@@ -345,12 +349,38 @@ local int CalculateUnitIcons(void)
 		x += IconHeight + 2;
 	}
 	x = TheUI.ButtonPanelX + 10;
-	while (x < TheUI.ButtonPanelX + 146) {
+	while (x < TheUI.ButtonPanelX + TheUI.ButtonPanel.Graphic->Width) {
 		count += i;
 		x += IconWidth + 8;
 	}
 	return count;
 }
+
+/**
+**	Calculate the max height and the max widht of icons,
+**	and assign them to IconHeight and IconWidth
+*/
+local void CalculateMaxIconSize()
+{
+	int i;
+	const UnitType* type;
+	const Icon* icon;
+
+	IconWidth = 0;
+	IconHeight = 0;
+	for (i = 0; i < MaxUnitIndex; ++i) {
+		type = UnitTypeByIdent(EditorUnitTypes[i]);
+		DebugCheck(!type || !type->Icon.Icon);
+		icon = type->Icon.Icon;
+		if (IconWidth < icon->Width) {
+			IconWidth = icon->Width;
+		}
+		if (IconHeight < icon->Height) {
+			IconHeight = icon->Height;
+		}
+	}
+}
+
 
 /**
 **  Recalculate the shown units.
@@ -620,15 +650,14 @@ local void DrawUnitIcons(void)
 	//  Draw the unit icons.
 	//
 	y = TheUI.ButtonPanelY + 24;
-
 	i = UnitIndex;
-	while (y < TheUI.ButtonPanelY +
-			640/3 - IconHeight) {
+	while (y < TheUI.ButtonPanelY + TheUI.ButtonPanel.Graphic->Height
+			- IconHeight) {
 		if (i >= MaxShownUnits) {
 			break;
 		}
 		x = TheUI.ButtonPanelX + 10;
-		while (x < TheUI.ButtonPanelX + 146) {
+		while (x + IconWidth < TheUI.ButtonPanelX + TheUI.ButtonPanel.Graphic->Width) {
 			if (i >= MaxShownUnits) {
 				break;
 			}
@@ -1930,7 +1959,7 @@ local void CreateEditor(void)
 		}
 		MaxUnitIndex = n - 1;
 	}
-
+	CalculateMaxIconSize();
 	ShowUnitsToSelect = 1; // Show all units as default
 	ShowBuildingsToSelect = 1;
 #if 0

@@ -176,8 +176,8 @@ typedef struct _icon_ {
 	IconFile* File;   /// File containing the data
 	unsigned  Index;  /// Index into file
 
-	unsigned Width;   /// Icon width
-	unsigned Height;  /// Icon height
+	int Width;   /// Icon width
+	int Height;  /// Icon height
 
 // --- FILLED UP ---
 	Graphic* Sprite;  /// Graphic data loaded
