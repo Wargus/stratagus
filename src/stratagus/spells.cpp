@@ -341,15 +341,15 @@ local void SpellWhirlwindController(Missile *missile)
     //
     if (!(missile->TTL % (CYCLES_PER_SECOND/10))) {
 	n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
-	DebugLevel3Fn("Damage on %d,%d-%d,%d = %d\n",x-1,y-1,x+1,y+1,n);
+	DebugLevel3Fn("Damage on %d,%d-%d,%d = %d\n" _C_ x-1 _C_ y-1 _C_ x+1 _C_ y+1 _C_ n);
 	for (i = 0; i < n; ++i) {
 	    if( (table[i]->X!=x || table[i]->Y!=y) && table[i]->HP) {
 		HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE2);
 	    }
 	}
     }
-    DebugLevel3Fn( "Whirlwind: %d, %d, TTL: %d\n",
-	    missile->X, missile->Y, missile->TTL );
+    DebugLevel3Fn( "Whirlwind: %d, %d, TTL: %d\n" _C_
+	    missile->X _C_ missile->Y _C_ missile->TTL );
 
     //
     //	Changes direction every 3 seconds (approx.)
@@ -365,8 +365,8 @@ local void SpellWhirlwindController(Missile *missile)
 	missile->DX = nx * TileSizeX + TileSizeX / 2;
 	missile->DY = ny * TileSizeY + TileSizeY / 2;
 	missile->State=0;
-	DebugLevel3Fn( "Whirlwind new direction: %d, %d, TTL: %d\n",
-		missile->X, missile->Y, missile->TTL );
+	DebugLevel3Fn( "Whirlwind new direction: %d, %d, TTL: %d\n" _C_
+		missile->X _C_ missile->Y _C_ missile->TTL );
     }
 }
 
@@ -484,7 +484,7 @@ global void InitSpells(void)
 #endif
 
 	if (SpellTypeTable[z].Casted.Sound == NULL) {
-	    DebugLevel0Fn("cannot get SoundId for `%s'\n",
+	    DebugLevel0Fn("cannot get SoundId for `%s'\n" _C_
 			  SpellTypeTable[z].Casted.Name);
 	}
 
@@ -737,8 +737,8 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	y += spell->Range;
     }
 
-    DebugLevel3Fn("Spell cast: (%s), %s -> %s (%d,%d)\n", spell->Ident,
-		  unit->Type->Name, target ? target->Type->Name : "none", x,
+    DebugLevel3Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident _C_
+		  unit->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_
 		  y);
 
     // the unit can collect mana during the move to target, so check is here...

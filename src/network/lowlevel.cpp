@@ -238,7 +238,7 @@ global int NetSocketAddr(const int sock)
 	wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
                       sizeof(localAddr), &bytesReturned, NULL, NULL);
 	if (wsError == SOCKET_ERROR) {
-	    DebugLevel0Fn("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %ld\n", GetLastError());
+	    DebugLevel0Fn("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %ld\n" _C_ GetLastError());
 	}
 
 	// parse interface information
@@ -358,7 +358,7 @@ global int NetOpenUDP(int port)
 
     // open the socket
     sockfd=socket(AF_INET, SOCK_DGRAM, 0);
-    DebugLevel3Fn(" socket %d\n",sockfd);
+    DebugLevel3Fn(" socket %d\n" _C_ sockfd);
     if( sockfd==INVALID_SOCKET ) {
 	return -1;
     }
@@ -464,8 +464,8 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
 
     NetLastHost=sock_addr.sin_addr.s_addr;
     NetLastPort=sock_addr.sin_port;
-    DebugLevel3Fn(" %d.%d.%d.%d:%d\n",
-	    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+    DebugLevel3Fn(" %d.%d.%d.%d:%d\n" _C_
+	    NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
 
     return l;
 }

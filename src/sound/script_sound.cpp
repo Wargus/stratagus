@@ -134,13 +134,13 @@ local SCM CclMakeSound(SCM name,SCM file) {
 	c_name=gh_scm2newstr(name,NULL);
 	c_file=gh_scm2newstr(file,NULL);
 	id=MakeSound(c_name,&c_file,1);
-	DebugLevel3("Making sound `%s' from `%s' with id %p\n",c_name,c_file,id);
+	DebugLevel3("Making sound `%s' from `%s' with id %p\n" _C_ c_name _C_ c_file _C_ id);
 	// the sound name (c_name) must be kept but the file name can be freed
 	free(c_file);
     } else if (gh_list_p(file)) {
 	// several files
 	c_name=gh_scm2newstr(name,NULL);
-	DebugLevel3("Making sound `%s'\n",c_name);
+	DebugLevel3("Making sound `%s'\n" _C_ c_name);
 	nb=gh_length(file);
 	c_files=(char **)malloc(sizeof(char*)*nb);
 	for(i=0;i<nb;i++) {
@@ -150,7 +150,7 @@ local SCM CclMakeSound(SCM name,SCM file) {
 		return SCM_UNSPECIFIED;
 	    }
 	    c_files[i]=gh_scm2newstr(a_file,NULL);
-	    DebugLevel3("\tComponent %d: `%s'\n",i,c_files[i]);
+	    DebugLevel3("\tComponent %d: `%s'\n" _C_ i _C_ c_files[i]);
 	    file=gh_cdr(file);
 	}
 	//FIXME: check size before casting
@@ -425,7 +425,7 @@ local SCM CclSetSoundRange(SCM sound,SCM range) {
     } else {
 	TheRange=(unsigned char)tmp;
     }
-    DebugLevel3("Range: %u (%d)\n",TheRange,tmp);
+    DebugLevel3("Range: %u (%d)\n" _C_ TheRange _C_ tmp);
     id=CclGetSoundId(sound);
     SetSoundRange(id,TheRange);
     return sound;

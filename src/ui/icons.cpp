@@ -118,7 +118,7 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
     str=strdcat(ident,tileset);
     ptr=(void**)hash_find(IconHash,str);
     if( ptr && *ptr ) {
-	DebugLevel0Fn("FIXME: Icon already defined `%s,%s'\n",ident,tileset);
+	DebugLevel0Fn("FIXME: Icon already defined `%s,%s'\n" _C_ ident _C_ tileset);
 	// This is more a config error
 	free(str);
 	return;
@@ -151,7 +151,7 @@ global void InitIcons(void)
 {
     unsigned i;
 
-    DebugLevel0Fn("Init icons %s\n",TheMap.TerrainName);
+    DebugLevel0Fn("Init icons %s\n" _C_ TheMap.TerrainName);
 
     //
     //	Add icons of the current tileset, with shortcut to hash.
@@ -302,7 +302,7 @@ global Icon* IconByIdent(const char* ident)
 	return *icon;
     }
 
-    DebugLevel0Fn("Icon %s not found\n",ident);
+    DebugLevel0Fn("Icon %s not found\n" _C_ ident);
     return NoIcon;
 }
 
@@ -445,7 +445,7 @@ local SCM CclDefineIcon(SCM list)
 	fprintf(stderr,"too much arguments\n");
     }
 
-    DebugLevel3Fn("icon %s/%s %d of %s\n",ident,tileset,n,str);
+    DebugLevel3Fn("icon %s/%s %d of %s\n" _C_ ident _C_ tileset _C_ n _C_ str);
     AddIcon(ident,tileset,n,str);
     free(ident);
     free(tileset);

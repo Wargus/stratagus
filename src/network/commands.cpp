@@ -648,7 +648,7 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
     int id;
     int status;
 
-    DebugLevel3Fn(" %d cycle %lu\n", msgnr, GameCycle);
+    DebugLevel3Fn(" %d cycle %lu\n" _C_ msgnr _C_ GameCycle);
 
     unit=UnitSlots[unum];
     DebugCheck( !unit );
@@ -656,7 +656,7 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
     //	Check if unit is already killed?
     //
     if( unit->Destroyed ) {
-	DebugLevel0Fn(" destroyed unit skipping %d\n",UnitNumber(unit));
+	DebugLevel0Fn(" destroyed unit skipping %d\n" _C_ UnitNumber(unit));
 	return;
     }
 
@@ -856,7 +856,7 @@ global void ParseExtendedCommand(unsigned char type,int status,
 	unsigned char arg1, unsigned short arg2, unsigned short arg3,
 	unsigned short arg4)
 {
-    DebugLevel3Fn(" %d cycle %lu\n", type, GameCycle);
+    DebugLevel3Fn(" %d cycle %lu\n" _C_ type _C_ GameCycle);
 
     // Note: destroyed units are handled by the action routines.
 
@@ -883,8 +883,8 @@ global void ParseExtendedCommand(unsigned char type,int status,
 	    CommandDiplomacy(arg2,arg3,arg4);
 	    break;
 	default:
-	    DebugLevel0Fn("Unknown message %u/%s %u %u %u %u\n",
-		type,status ? "flush" : "-", arg1,arg2,arg3,arg4);
+	    DebugLevel0Fn("Unknown message %u/%s %u %u %u %u\n" _C_
+		type _C_ status ? "flush" : "-" _C_ arg1 _C_ arg2 _C_ arg3 _C_ arg4);
 	    break;
     }
 }

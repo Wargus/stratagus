@@ -108,7 +108,7 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
     if( map->Terrain<TilesetMax ) {
 	// FIXME: should use terrain name!!
 	ctab=Tilesets[map->Terrain]->Table;
-	DebugLevel0Fn("FIXME: %s <-> %s\n",Tilesets[map->Terrain]->Class,
+	DebugLevel0Fn("FIXME: %s <-> %s\n" _C_ Tilesets[map->Terrain]->Class _C_
 		map->TerrainName);
     } else {
 	DebugLevel1("Unknown terrain!\n");
@@ -169,13 +169,13 @@ local void ConvertSQM(const unsigned short* sqm,int width,int height
 	    }
 	    if( v&MapMoveWallO ) {
 		if( !map->Fields[i].Flags&MapFieldWall ) {
-		    DebugLevel0("Should already be wall %d\n",i);
+		    DebugLevel0("Should already be wall %d\n" _C_ i);
 		    map->Fields[i].Flags|=MapFieldWall;
 		}
 	    }
 	    if( v&MapMoveHuman ) {
 		if( !map->Fields[i].Flags&MapFieldWall ) {
-		    DebugLevel0("Should already be wall %d\n",i);
+		    DebugLevel0("Should already be wall %d\n" _C_ i);
 		    map->Fields[i].Flags|=MapFieldWall;
 		}
 		map->Fields[i].Flags|=MapFieldHuman;
@@ -202,7 +202,7 @@ local void ConvertSQM(const unsigned short* sqm,int width,int height
 		map->Fields[i].Flags|=MapFieldBuilding;
 	    }
 	    if( v&0x20 ) {
-		DebugLevel0("SQM: contains unknown action %#04X\n",v);
+		DebugLevel0("SQM: contains unknown action %#04X\n" _C_ v);
 	    }
 	}
     }
@@ -243,7 +243,7 @@ local void ConvertREGM(const unsigned short* regm,int width,int height
 	    if( v==MapActionIsland ) {	// island no transporter
 		// FIXME: don't know what todo here
 		//map->Fields[i].Flags|=MapFieldWall;
-		DebugLevel0Fn("%d,%d %d\n",w,h,v);
+		DebugLevel0Fn("%d,%d %d\n" _C_ w _C_ h _C_ v);
 		continue;
 	    }
 	    v&=~0xFF;			// low byte is region
@@ -254,7 +254,7 @@ local void ConvertREGM(const unsigned short* regm,int width,int height
 		continue;
 	    }
 	    DebugLevel0("REGM: contains unknown action %#04X at %d,%d\n"
-		,v,w,h);
+		_C_ v _C_ w _C_ h);
 	}
     }
 }
@@ -368,7 +368,7 @@ global MapInfo* GetPudInfo(const char* pud)
     //	Parse all sections.
     //
     while( PudReadHeader(input,header,&length) ) {
-	DebugLevel3("\tSection: %4.4s\n",header);
+	DebugLevel3("\tSection: %4.4s\n" _C_ header);
 
 	info->MapUID += ChksumArea(header, 4);
 
@@ -380,7 +380,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		int v;
 
 		v=PudReadWord(input);
-		DebugLevel3("\tVER: %d.%d\n",(v&0xF0)>>4,v&0xF);
+		DebugLevel3("\tVER: %d.%d\n" _C_ (v&0xF0)>>4 _C_ v&0xF);
 		buf[0] = v & 0xFF;
 		info->MapUID += ChksumArea(buf, 1);
 		continue;
@@ -552,7 +552,7 @@ global MapInfo* GetPudInfo(const char* pud)
 			case PlayerRaceNeutral:
 			    break;
 			default:
-			    DebugLevel1("Unknown race %d\n",v);
+			    DebugLevel1("Unknown race %d\n" _C_ v);
 			    v=PlayerRaceNeutral;
 			    break;
 		    }
@@ -750,7 +750,7 @@ global MapInfo* GetPudInfo(const char* pud)
 	    continue;
 	}
 
-	DebugLevel2("Unsupported Section: %4.4s\n",header);
+	DebugLevel2("Unsupported Section: %4.4s\n" _C_ header);
 
 	CLseek(input,length,SEEK_CUR);
     }
@@ -809,7 +809,7 @@ global void LoadPud(const char* pud,WorldMap* map)
     //	Parse all sections.
     //
     while( PudReadHeader(input,header,&length) ) {
-	DebugLevel3("\tSection: %4.4s\n",header);
+	DebugLevel3("\tSection: %4.4s\n" _C_ header);
 
 	//
 	//	PUD version
@@ -819,7 +819,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		int v;
 
 		v=PudReadWord(input);
-		DebugLevel1("\tVER: %d.%d\n",(v&0xF0)>>4,v&0xF);
+		DebugLevel1("\tVER: %d.%d\n" _C_ (v&0xF0)>>4 _C_ v&0xF);
 		continue;
 	    }
 	    DebugLevel1("Wrong version length\n");
@@ -833,7 +833,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		perror("CLread()");
 		ExitFatal(-1);
 	    }
-	    DebugLevel1("\tDESC: %s\n",buf);
+	    DebugLevel1("\tDESC: %s\n" _C_ buf);
 	    strncpy(map->Description,buf,sizeof(map->Description));
 	    map->Description[sizeof(map->Description)-1]='\0';
 	    continue;
@@ -912,7 +912,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    width=PudReadWord(input);
 	    height=PudReadWord(input);
 
-	    DebugLevel2("\tMap %d x %d\n",width,height);
+	    DebugLevel2("\tMap %d x %d\n" _C_ width _C_ height);
 
 	    if( !map->Fields ) {
 		map->Width=width;
@@ -1024,7 +1024,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			case PlayerRaceNeutral:
 			    break;
 			default:
-			    DebugLevel1("Unknown race %d\n",v);
+			    DebugLevel1("Unknown race %d\n" _C_ v);
 			    v=PlayerRaceNeutral;
 			    break;
 		    }
@@ -1129,7 +1129,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    unsigned short* mtxm;
 
 	    if( length!=width*height*2 ) {
-		DebugLevel1("wrong length of MTXM section %ld\n",length);
+		DebugLevel1("wrong length of MTXM section %ld\n" _C_ length);
 		ExitFatal(-1);
 	    }
 	    if( !(mtxm=malloc(length)) ) {
@@ -1154,7 +1154,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    unsigned short* sqm;
 
 	    if( length!=width*height*sizeof(short) ) {
-		DebugLevel1("wrong length of SQM  section %ld\n",length);
+		DebugLevel1("wrong length of SQM  section %ld\n" _C_ length);
 		ExitFatal(-1);
 	    }
 	    if( !(sqm=malloc(length)) ) {
@@ -1179,7 +1179,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    unsigned short* regm;
 
 	    if( length!=width*height*sizeof(short) ) {
-		DebugLevel1("wrong length of REGM section %ld\n",length);
+		DebugLevel1("wrong length of REGM section %ld\n" _C_ length);
 		ExitFatal(-1);
 	    }
 	    if( !(regm=malloc(length)) ) {
@@ -1272,7 +1272,7 @@ pawn:
 	    continue;
 	}
 
-	DebugLevel2("Unsupported Section: %4.4s\n",header);
+	DebugLevel2("Unsupported Section: %4.4s\n" _C_ header);
 
 	CLseek(input,length,SEEK_CUR);
     }
@@ -1280,7 +1280,7 @@ pawn:
     CLclose(input);
 
     DebugLevel3("Memory for pud %d\n"
-	    ,width*height*sizeof(*map->Fields)
+	    _C_ width*height*sizeof(*map->Fields)
 // FIXME: remove this
 	    +width*height*sizeof(short)
 	    +width*height*sizeof(short) );

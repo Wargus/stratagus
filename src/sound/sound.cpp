@@ -125,9 +125,9 @@ local void InsertSoundRequest(const Unit* unit,unsigned id,unsigned char power,
 	    SoundRequests[NextSoundRequestIn].Selection=(selection)?1:0;
 	    SoundRequests[NextSoundRequestIn].IsVolume=(volume)?1:0;
 	    SoundRequests[NextSoundRequestIn].Stereo=stereo;
-	    DebugLevel3("Source[%p,%s]: registering request %p at slot %d=%d\n",
-			unit,unit ? unit->Type->Ident : ""
-			,sound,NextSoundRequestIn,power);
+	    DebugLevel3("Source[%p,%s]: registering request %p at slot %d=%d\n" _C_
+			unit _C_ unit ? unit->Type->Ident : ""
+			_C_ sound _C_ NextSoundRequestIn _C_ power);
 #ifdef USE_THREAD
 	    // increment semaphore
 	    if (SoundThreadRunning) {
@@ -242,7 +242,7 @@ global void PlayMissileSound(const Missile* missile,SoundId sound)
     if (stereo < -1.0) stereo=-1.0;
     else if (stereo > 1.0) stereo=1.0;
 
-    DebugLevel3("Playing %p\n",sound);
+    DebugLevel3("Playing %p\n" _C_ sound);
     InsertSoundRequest(NULL,
 		       0,
 		       ViewPointDistanceToMissile(missile),
@@ -258,7 +258,7 @@ global void PlayMissileSound(const Missile* missile,SoundId sound)
 */
 global void PlayGameSound(SoundId sound,unsigned char volume)
 {
-    DebugLevel3("Playing %p at volume %u\n",sound,volume);
+    DebugLevel3("Playing %p at volume %u\n" _C_ sound _C_ volume);
     InsertSoundRequest(NULL,
 		       0,
 		       volume,

@@ -240,7 +240,7 @@ local SCM CclIfUnit(SCM player,SCM operation,SCM quantity,SCM unit)
 	}
     } else {
 	for( ; plynr<pn; ++plynr ) {
-	    DebugLevel3Fn("Player%d, %d == %s\n",plynr,q,unittype->Ident);
+	    DebugLevel3Fn("Player%d, %d == %s\n" _C_ plynr _C_ q _C_ unittype->Ident);
 	    if( Compare(Players[plynr].UnitTypesCount[unittype->Type],q) ) {
 		return SCM_BOOL_T;
 	    }
@@ -282,7 +282,7 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
     //	Get all unit types 'near'.
     //
     n=FindUnitsByType(ut2,table);
-    DebugLevel3Fn("%s: %d\n",ut2->Ident,n);
+    DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
     for( i=0; i<n; ++i ) {
 	Unit* unit;
 	Unit* around[UnitMax];
@@ -309,7 +309,7 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 		unit->X+unit->Type->TileWidth+2,
 		unit->Y+unit->Type->TileHeight+2,around);
 	}
-	DebugLevel3Fn("Units around %d: %d\n",UnitNumber(unit),an);
+	DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
 	//
 	//	Count the requested units
 	//
@@ -370,7 +370,7 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
     //	Get all unit types 'near'.
     //
     n=FindUnitsByType(ut2,table);
-    DebugLevel3Fn("%s: %d\n",ut2->Ident,n);
+    DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
     for( i=0; i<n; ++i ) {
 	Unit* unit;
 	Unit* around[UnitMax];
@@ -397,7 +397,7 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 		unit->X+unit->Type->TileWidth+2,
 		unit->Y+unit->Type->TileHeight+2,around);
 	}
-	DebugLevel3Fn("Units around %d: %d\n",UnitNumber(unit),an);
+	DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
 	//
 	//	Count the requested units
 	//
@@ -471,7 +471,7 @@ local SCM CclIfOpponents(SCM player,SCM operation,SCM quantity)
 		++n;
 	    }
 	}
-	DebugLevel3Fn("Opponents of %d = %d\n",plynr,n);
+	DebugLevel3Fn("Opponents of %d = %d\n" _C_ plynr _C_ n);
 	if( Compare(n,q) ) {
 	    return SCM_BOOL_T;
 	}

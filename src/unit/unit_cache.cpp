@@ -807,7 +807,7 @@ global void UnitCacheInsert(Unit* unit)
     mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
     unit->Next=mf->Here.Units;
     mf->Here.Units=unit;
-    DebugLevel3Fn("%p %p\n",unit,unit->Next);
+    DebugLevel3Fn("%p %p\n" _C_ unit _C_ unit->Next);
 }
 
 /**

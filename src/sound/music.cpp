@@ -135,7 +135,7 @@ local int LoadMod(const char* name)
     ModPlug_SetSettings(&settings);
 
     buffer=malloc(8192);
-    DebugLevel2Fn("Loading `%s'\n",name);
+    DebugLevel2Fn("Loading `%s'\n" _C_ name);
 
     if( !(f=CLopen(name)) ) {
 	printf("Can't open file `%s'\n",name);
@@ -149,7 +149,7 @@ local int LoadMod(const char* name)
     }
     size+=i;
     buffer=realloc(buffer,size);
-    DebugLevel3Fn("%d\n",size);
+    DebugLevel3Fn("%d\n" _C_ size);
 
     StopMusic();			// stop music before new music
 

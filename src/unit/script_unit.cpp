@@ -406,7 +406,7 @@ local SCM CclUnit(SCM list)
     list=gh_cdr(list);
 
     slot=strtol(str+1,NULL,16);
-    DebugLevel0Fn ("parsing unit #%d\n", slot);
+    DebugLevel0Fn ("parsing unit #%d\n" _C_ slot);
     free(str);
     unit=NULL;
     type=NULL;
@@ -666,7 +666,7 @@ local SCM CclUnit(SCM list)
     if (unit->Moving)
 	NewResetPath(unit);
     DebugLevel0Fn("FIXME: not written\n");
-    DebugLevel0Fn ("unit #%d parsed\n", slot);
+    DebugLevel0Fn ("unit #%d parsed\n" _C_ slot);
 
     return SCM_UNSPECIFIED;
 }

@@ -331,7 +331,7 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	left=1.0-stereo;
 	right=1.0;
     }
-    DebugLevel3("Length %d\n",length);
+    DebugLevel3("Length %d\n" _C_ length);
 
     // FIXME: support other formats, stereo or 32 bit ...
 
@@ -356,7 +356,7 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	}
 	ri=(wi*sample->Frequency)/SoundFrequency;
 	ri/=2;				// adjust for mono
-	DebugLevel3("Mixed %d bytes to %d\n",ri,wi);
+	DebugLevel3("Mixed %d bytes to %d\n" _C_ ri _C_ wi);
     } else {
 	short* rp;
 
@@ -510,9 +510,9 @@ local void RegisterSource(SoundRequest* sr,int channel)
 
     i=channel;
     p=sr;
-    DebugLevel3Fn("FIXME: must write %p -> %d\n",sr,channel);
+    DebugLevel3Fn("FIXME: must write %p -> %d\n" _C_ sr _C_ channel);
 #endif
-    DebugLevel3("Registering %p (channel %d)\n",sr->Source.Base,channel);
+    DebugLevel3("Registering %p (channel %d)\n" _C_ sr->Source.Base _C_ channel);
 }
 
 /*
@@ -530,9 +530,9 @@ local void UnRegisterSource(int channel) {
     int i;
 
     i=channel;
-    DebugLevel3Fn("FIXME: must write %d\n", channel);
+    DebugLevel3Fn("FIXME: must write %d\n" _C_ channel);
 #endif
-    DebugLevel3("Removing %p (channel %d)\n",Channels[channel].Source.Base,
+    DebugLevel3("Removing %p (channel %d)\n" _C_ Channels[channel].Source.Base _C_
 		channel);
 }
 
@@ -556,7 +556,7 @@ local unsigned char VolumeForDistance(unsigned short d,unsigned char range) {
 	    d-=ViewPointOffset;
 	    d_tmp=d*MAX_SOUND_RANGE;
 	    range_tmp=DistanceSilent*range;
-	    DebugLevel3("Distance: %d, Range: %d\n",d_tmp,range_tmp);
+	    DebugLevel3("Distance: %d, Range: %d\n" _C_ d_tmp _C_ range_tmp);
 	    if (d_tmp > range_tmp )
 		return 0;
 	    else
@@ -712,22 +712,22 @@ local void FillChannels(int free_channels,int* discarded,int* started)
     *started=0;
     while(free_channels && sr->Used) {
 	if(KeepRequest(sr)) {
-	    DebugLevel3("Source [%p]: start playing request %p at slot %d\n",
-			sr->Source.Base,sr->Sound,NextSoundRequestOut);
+	    DebugLevel3("Source [%p]: start playing request %p at slot %d\n" _C_
+			sr->Source.Base _C_ sr->Sound _C_ NextSoundRequestOut);
 	    channel=FillOneChannel(sr);
 	    if (sr->Source.Base) {
 		//Register only sound with a valid origin
 		RegisterSource(sr,channel);
 	    }
 	    free_channels--;
-	    DebugLevel3("Free channels: %d\n",free_channels);
+	    DebugLevel3("Free channels: %d\n" _C_ free_channels);
 	    sr->Used=0;
 	    NextSoundRequestOut++;
 	    (*started)++;
 	} else {
 	  // Discarding request (for whatever reason)
-	  DebugLevel3("Discarding resquest %p from %p at slot %d\n",
-		      sr->Sound,sr->Source.Base,NextSoundRequestOut);
+	  DebugLevel3("Discarding resquest %p from %p at slot %d\n" _C_
+		      sr->Sound _C_ sr->Source.Base _C_ NextSoundRequestOut);
 	  sr->Used=0;
 	  NextSoundRequestOut++;
 	  (*discarded)++;
@@ -766,7 +766,7 @@ local int MixChannelsToStereo32(int* buffer,int size)
 	    if( Channels[channel].Point>=Channels[channel].Sample->Length ) {
 		// free channel as soon as possible (before playing)
 		// useful in multithreading
-		DebugLevel3("End playing request from %p\n",
+		DebugLevel3("End playing request from %p\n" _C_
 			    Channels[channel].Source.Base);
 		FreeOneChannel(channel);
 		new_free_channels++;
@@ -891,7 +891,7 @@ global SoundId RegisterSound(char *files[], unsigned number)
     if (number > 1) {			// load a sound group
 	id->Sound.OneGroup = malloc(sizeof(Sample *) * number);
 	for (i = 0; i < number; i++) {
-	    DebugLevel3("Registering `%s'\n", files[i]);
+	    DebugLevel3("Registering `%s'\n" _C_ files[i]);
 	    id->Sound.OneGroup[i] = LoadSample(files[i]);
 	    if (!id->Sound.OneGroup[i]) {
 		free(id->Sound.OneGroup);
@@ -901,7 +901,7 @@ global SoundId RegisterSound(char *files[], unsigned number)
 	}
 	id->Number = number;
     } else {				// load an unique sound
-	DebugLevel3("Registering `%s'\n", files[0]);
+	DebugLevel3("Registering `%s'\n" _C_ files[0]);
 	id->Sound.OneSound = LoadSample(files[0]);
 	if (!id->Sound.OneSound) {
 	    free(id);
@@ -943,7 +943,7 @@ global SoundId RegisterTwoGroups(SoundId first, SoundId second)
 global void SetSoundRange(SoundId sound,unsigned char range) {
     if (sound!=NO_SOUND) {
 	((ServerSoundId)sound)->Range=range;
-	DebugLevel3("Setting sound <%p> to range %u\n",sound,range);
+	DebugLevel3("Setting sound <%p> to range %u\n" _C_ sound _C_ range);
     }
 }
 
@@ -1047,7 +1047,7 @@ global void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
 #if SoundSampleSize==16
     len>>=1;
 #endif
-    DebugLevel3Fn("%d\n",len);
+    DebugLevel3Fn("%d\n" _C_ len);
 
     MixIntoBuffer(stream,len);
 }
@@ -1192,9 +1192,9 @@ global int InitSoundServer(void)
     int MapHeight = (TheUI.MapArea.EndY-TheUI.MapArea.Y +TileSizeY) / TileSizeY;
     //FIXME: Valid only in shared memory context!
     DistanceSilent=3*max(MapWidth,MapHeight);
-    DebugLevel2("Distance Silent: %d\n",DistanceSilent);
+    DebugLevel2("Distance Silent: %d\n" _C_ DistanceSilent);
     ViewPointOffset=max(MapWidth/2,MapHeight/2);
-    DebugLevel2("ViewPointOffset: %d\n",ViewPointOffset);
+    DebugLevel2("ViewPointOffset: %d\n" _C_ ViewPointOffset);
 #else /* SPLIT_SCREEN_SUPPORT */
     //FIXME: Valid only in shared memory context!
     DistanceSilent=3*max(MapWidth,MapHeight);

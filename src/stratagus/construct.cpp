@@ -234,7 +234,7 @@ global Construction* ConstructionByIdent(const char* ident)
 	    return &Constructions[i];
 	}
     }
-    DebugLevel0Fn("Construction `%s' not found.\n",ident);
+    DebugLevel0Fn("Construction `%s' not found.\n" _C_ ident);
     return NULL;
 }
 

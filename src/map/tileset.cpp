@@ -129,7 +129,7 @@ global void LoadTileset(void)
     }
 
     DebugLevel2Fn(" %d Tiles in file %s, %d per row\n"
-	    ,TheMap.TileCount,TheMap.Tileset->File,tiles_per_row);
+	    _C_ TheMap.TileCount _C_ TheMap.Tileset->File _C_ tiles_per_row);
 
     if( n>MaxTilesInTileset ) {
 	fprintf(stderr,"Too many tiles in tileset. Increase MaxTilesInTileset and recompile.\n");
