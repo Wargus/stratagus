@@ -166,6 +166,13 @@ local void MovieCallbackKey(unsigned dummy __attribute__((unused)))
 /**
 **	Callback for input.
 */
+local void MovieCallbackKey1(unsigned dummy __attribute__((unused)))
+{
+}
+
+/**
+**	Callback for input.
+*/
 local void MovieCallbackKey2(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
@@ -176,6 +183,14 @@ local void MovieCallbackKey2(unsigned dummy1 __attribute__((unused)),
 **	Callback for input.
 */
 local void MovieCallbackKey3(unsigned dummy1 __attribute__((unused)),
+	unsigned dummy2 __attribute__((unused)))
+{
+}
+
+/**
+**	Callback for input.
+*/
+local void MovieCallbackKey4(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
     MovieKeyPressed = 0;
@@ -251,12 +266,12 @@ global int PlayMovie(const char* name, int flags)
 #endif
 
     callbacks.ButtonPressed = MovieCallbackKey;
-    callbacks.ButtonReleased = MovieCallbackKey;
+    callbacks.ButtonReleased = MovieCallbackKey1;
     callbacks.MouseMoved = MovieCallbackMouse;
     callbacks.MouseExit = MovieCallbackExit;
     callbacks.KeyPressed = MovieCallbackKey2;
-    callbacks.KeyReleased = MovieCallbackKey2;
-    callbacks.KeyRepeated = MovieCallbackKey3;
+    callbacks.KeyReleased = MovieCallbackKey3;
+    callbacks.KeyRepeated = MovieCallbackKey4;
     callbacks.NetworkEvent = NetworkEvent;
     callbacks.SoundReady = WriteSound;
 
