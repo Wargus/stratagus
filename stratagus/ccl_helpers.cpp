@@ -196,7 +196,7 @@ local void IOStructArray(SCM from, void *binaryform, void *para)
 	    IOStruct(gh_car(from), binaryform, para);
 
 	    from = gh_cdr(from);
-	    binaryform += def->size;
+	    (char*)binaryform += def->size;
 	}
     } else {
 	CLprintf(IOOutFile, " (\n");
@@ -205,7 +205,7 @@ local void IOStructArray(SCM from, void *binaryform, void *para)
 	    IOPrintTabs();
 	    IOStruct(from, binaryform, para);
 	    CLprintf(IOOutFile, "\n");
-	    binaryform += def->size;
+	    (char*)binaryform += def->size;
 	}
 	--IOTabLevel;
 	IOPrintTabs();

@@ -1098,7 +1098,7 @@ local SCM CclAiWait( SCM value )
 **	Give the number of the script specific force.
 **
 */
-local SCM CclAiOwnForce()
+local SCM CclAiOwnForce(void)
 {
     return gh_int2scm( AiScript->ownForce );
 }
@@ -1529,7 +1529,7 @@ local SCM CclAiEvaluateForceCost( SCM s_force )
 }
 
 // Just hang...
-local SCM CclAiIdle()
+local SCM CclAiIdle(void)
 {
     return SCM_BOOL_T;
 }
@@ -1721,13 +1721,13 @@ local SCM CclAiSetHotSpotRay( SCM value )
     return SCM_BOOL_F;
 }
 
-local SCM CclAiComputeGauges()
+local SCM CclAiComputeGauges(void)
 {
     AiComputeCurrentScriptGauges();
     return SCM_BOOL_F;
 }
 
-local SCM CclAiDebugGauges()
+local SCM CclAiDebugGauges(void)
 {
     AiDebugGauges();
     return SCM_BOOL_F;
