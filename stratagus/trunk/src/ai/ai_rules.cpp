@@ -117,17 +117,6 @@
 **		+3		allied
 **		+4		enemy
 **		+5		own
-**	TODO : the remainder is not usefull and should be removed
-**	 UnitTypesBase:
-**	 	Count by unittype ...
-**			On the hotspot:	
-**		+0		allied 
-**		+1		enemy
-**		+2		own 
-**	   		On the map:
-**		+0		allied
-**		+1		enemy
-**		+2		own
 */
 
 /*----------------------------------------------------------------------------
@@ -608,6 +597,7 @@ global int AiEvaluateForceCost(int force, int total)
     int cost, own;
     
     int forcesize;
+    int missing;
     
     AiUnitType *unittype;
     UnitType * usedtype;
@@ -621,8 +611,16 @@ global int AiEvaluateForceCost(int force, int total)
     }
 
     // We have everything ready
-    if (!AiForceSubstractWant(force, count)) {
+    missing = AiForceSubstractWant(force, count);
+
+    if (!total && !missing) {
 	DebugLevel3Fn("Force ready, no cost\n");
+	return 0;
+    }
+
+    // Check that missing+nb of units < max nb of units
+    if (missing + AiPlayer->Player->TotalNumUnits >= AiPlayer->Player->TotalUnitLimit) {
+    	DebugLevel2Fn("Unit limit reached\n");
 	return 0;
     }
 
