@@ -2824,7 +2824,7 @@ local void LoadVSAction(Menuitem *mi, int i)
 		    MustRedraw |= RedrawMenu;
 		}
 	    }
-	    SaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    LoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
 		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
@@ -2872,14 +2872,13 @@ local void LoadVSAction(Menuitem *mi, int i)
 		DebugCheck(mi->d.listbox.startline < 0);
 		DebugCheck(mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
-		SaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		LoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
 	default:
 	    break;
     }
-    TypedFileName = 0;
 }
 
 // FIXME: modify function
