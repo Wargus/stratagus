@@ -745,14 +745,20 @@ global void InitCcl(void)
 global void LoadCcl(void)
 {
     char* file;
+    char* s;
     char buf[1024];
+    extern LISP fast_load(LISP lfname,LISP noeval);
 
     //
     //	Load and evaluate configuration file
     //
     CclInConfigFile=1;
     file=LibraryFileName(CclStartFile,buf);
-    vload(file,0,1);
+    if( (s=strrchr(file,'.')) && s[1]=='C' ) {
+	fast_load(gh_str02scm(file),NIL);
+    } else {
+	vload(file,0,1);
+    }
     CclInConfigFile=0;
     user_gc(SCM_BOOL_F);		// Cleanup memory after load
 }
