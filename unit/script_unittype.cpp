@@ -982,7 +982,11 @@ static int CclGetUnitTypeIdent(lua_State* l)
 	}
 
 	type = CclGetUnitType(l);
+	if (type) {
 	lua_pushstring(l, type->Ident);
+	} else {
+	lua_pushstring(l, "unit not defined");
+	}
 	return 1;
 }
 
