@@ -49,6 +49,7 @@
 #include "pud.h"
 #include "iolib.h"
 #include "iocompat.h"
+#include "commands.h"
 
 #include "ccl.h"
 
@@ -1654,12 +1655,6 @@ local void EditorCallbackMouse(int x, int y)
 	    }
 	    by += TileSizeY+2;
 	}
-
-	if (TheUI.InfoPanelX <= x && x <= TheUI.ButtonPanelX + 144 + TileSizeX
-		&& TheUI.InfoPanelY <= y && y <= TheUI.ButtonPanelY + 100) {
-	    ClearStatusLine();
-	    return;
-	}
     }
 
     //
@@ -1703,6 +1698,7 @@ local void EditorCallbackMouse(int x, int y)
 	DebugLevel3("On button %d\n" _C_ i);
 	ButtonUnderCursor = i;
 	CursorOn = CursorOnButton;
+	ClearStatusLine();
 	return;
     }
 
@@ -1975,6 +1971,10 @@ global int EditorSavePud(const char *file)
 global void EditorMainLoop(void)
 {
     EventCallback callbacks;
+    int OldCommandLogDisabled;
+
+    OldCommandLogDisabled = CommandLogDisabled;
+    CommandLogDisabled = 1;
 
     do {
 	EditorMapLoaded = 0;
@@ -2044,6 +2044,8 @@ global void EditorMainLoop(void)
 	VideoUnlockScreen();
 	Invalidate();
     } while (EditorMapLoaded);
+
+    CommandLogDisabled = OldCommandLogDisabled;
 }
 
 //@}
