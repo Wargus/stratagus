@@ -66,6 +66,8 @@
 #include "commands.h"
 #include "actions.h"
 #include "cdaudio.h"
+#include "net_lowlevel.h"
+#include "master.h"
 
 #ifdef USE_SDLA
 #include "SDL.h"
@@ -374,6 +376,9 @@ local void ReplayGameOk(void);
 local void ReplayGameCancel(void);
 local int ReplayGameRDFilter(char *pathbuf, FileList *fl);
 
+// Metaserver
+local void MultiGameMasterReport(void);
+local void EnterMasterAction(Menuitem *mi, int key);
 
 local void GameMenuReturn(void);
 local void NetErrorMenu(char *error);
@@ -757,6 +762,10 @@ global void InitMenuFuncHash(void) {
     HASHADD(ReplayGameDisableFog,"replay-game-disable-fog");
     HASHADD(ReplayGameOk,"replay-game-ok");
     HASHADD(ReplayGameCancel,"replay-game-cancel");
+
+// Metaserver
+    HASHADD(EnterMasterAction,"enter-master-action");
+    HASHADD(MultiGameMasterReport,"menu-multi-master-gem");
 }
 
 /*----------------------------------------------------------------------------
@@ -2740,6 +2749,10 @@ local void MultiScenSelectMenu(void)
     ScenSelectMenu();
     MultiGamePlayerSelectorsUpdate(1);
 
+    if (PublicMasterAnnounce) {
+	MasterSendAnnounce();
+    }
+
     menu->Items[6].flags = MI_DISABLED;
 }
 
@@ -3122,9 +3135,21 @@ local void TerminateNetConnect(void)
 */
 local void CreateNetGameMenu(void)
 {
+    Menu *menu;
+
+    menu = FindMenu("menu-multi-setup");
+    menu->Items[61].d.input.buffer = MasterTempString;
+    sprintf(MasterTempString, "%s:%d", master_host, master_port);
+    strcat(MasterTempString, "~!_");
+    menu->Items[61].d.input.nch = strlen(MasterTempString) - 3;
+    menu->Items[61].d.input.maxch = 49;
+    PublicMasterAnnounce = 0;
+    menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
+
     DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu("menu-multi-setup", 1);
+    PublicMasterAnnounce = 2;
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -7087,6 +7112,62 @@ global void InitMenuFunctions(void)
 	fclose(fd);
     }
 #endif
+}
+
+local void MultiGameMasterReport(void)
+{
+    Menu *menu;
+    char *port;
+
+    menu = FindMenu("menu-multi-setup");
+    if (menu->Items[61].d.input.nch == 0) {
+	PublicMasterAnnounce = 0;
+	menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
+	return;
+    }
+
+    MasterTempString[menu->Items[61].d.input.nch] = 0;
+    port = strchr(MasterTempString, ':');
+    if (port) {
+	*port=0;
+	port++;
+	if (master_host) {
+	    free(master_host);
+	}
+	master_host = malloc(strlen(MasterTempString));
+	strcpy(master_host, MasterTempString);
+	master_port = atoi(port);
+	port--;
+	*port=':';
+    } else {
+	if (master_host) {
+	    free(master_host);
+	}
+	master_host = malloc(strlen(MasterTempString));
+	strcpy(master_host, MasterTempString);
+	master_port = MASTER_PORT;
+    }
+
+    if (PublicMasterAnnounce) {
+	PublicMasterAnnounce = 0;
+	menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
+	// change behaviour here?
+	MasterSendAnnounce();
+    } else {
+	PublicMasterAnnounce = 1;
+	menu->Items[60].d.gem.state = MI_GSTATE_CHECKED;
+	MasterSendAnnounce();
+    }
+}
+
+
+local void EnterMasterAction(Menuitem *mi, int key)
+{
+    Menu *menu;
+
+    menu = FindMenu("menu-multi-setup");
+    PublicMasterAnnounce = 0;
+    menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
 }
 
 //@}
