@@ -1548,8 +1548,7 @@ static int CclDefineUI(lua_State* l)
 		} else if (!strcmp(value, "piemenu")) {
 			k = 0;
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -1591,8 +1590,7 @@ static int CclDefineUI(lua_State* l)
 					}
 					lua_pop(l, 1);
 				} else {
-					lua_pushfstring(l, "Unsupported tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 			lua_pop(l, 1);
