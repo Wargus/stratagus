@@ -195,6 +195,9 @@ struct _unit_type_ {
 
 // --- FILLED UP ---
 
+    unsigned	Supply;			/// Food supply
+    unsigned	Demand;			/// Food demand
+
 	// FIXME: This stats should? be moved into the player struct
     UnitStats Stats[PlayerMax];		/// Unit status for each player
 
