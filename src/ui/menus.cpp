@@ -66,12 +66,16 @@ local void EndMenu(void);
 
 local void GameMenuSave(void);
 local void GameMenuLoad(void);
-local void GameMenuEndDefeat(void);
 local void GameMenuEnd(void);
 local void GameMenuExit(void);
 local void GameMenuReturn(void);
 local void GameShowCredits(void);
 local void GameMenuObjectives(void);
+local void GameMenuEndScenario(void);
+
+local void EndScenarioRestart(void);
+local void EndScenarioSurrender(void);
+local void EndScenarioQuitMenu(void);
 
 local void PrgStartInit(Menuitem *mi);		// master init
 local void StartMenusSetBackground(Menuitem *mi);
@@ -215,10 +219,10 @@ local Menuitem GameMenuItems[] = {
 	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF5} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF1} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, MenuButtonSelected, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, GameMenuObjectives, 'o'} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEndDefeat, 'e'} } },
+	{ button:{ "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEndScenario, 'e'} } },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, GameMenuReturn, '\033'} } },
 #else
@@ -290,6 +294,26 @@ local Menuitem ObjectivesMenuItems[] = {
     { 0 }
 #endif
 };
+
+local Menuitem EndScenarioMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "End Scenario", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Restart Scenario", 224, 27, MBUTTON_GM_FULL, EndScenarioRestart, 'r'} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Surrender", 224, 27, MBUTTON_GM_FULL, EndScenarioSurrender, 's'} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*2, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Quit to Menu", 224, 27, MBUTTON_GM_FULL, EndScenarioQuitMenu, 'q'} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*3, 0, LargeFont, NULL, NULL,
+	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!Previous", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
+#else
+    { 0 }
+#endif
+};
+
 
 /**
 **	Items for the SelectScen Menu
@@ -888,8 +912,18 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	2, 11,
+	10, 11,
 	ObjectivesMenuItems,
+	NULL,
+    },
+    {
+	// End Scenario Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	5, 6,
+	EndScenarioMenuItems,
 	NULL,
     },
 };
@@ -1431,12 +1465,46 @@ local void GameShowCredits(void)
 }
 
 /**
-**	End the running game from menu.
+**	Show the End Scenario menu
 */
-local void GameMenuEndDefeat(void)
+local void GameMenuEndScenario(void)
 {
+    ProcessMenu(MENU_END_SCENARIO, 1);
+    if( !GameRunning )
+	EndMenu();
+}
+
+/**
+**	Restart the scenario
+*/
+local void EndScenarioRestart(void)
+{
+    RestartScenario=1;
+    InterfaceState=IfaceStateNormal;
+    GameRunning=0;
+    EndMenu();
+}
+
+/**
+**	End the game in defeat
+*/
+local void EndScenarioSurrender(void)
+{
+    InterfaceState=IfaceStateNormal;
     GameResult=GameDefeat;
     GameRunning=0;
+    EndMenu();
+}
+
+/**
+**	End the game and return to the menu
+*/
+local void EndScenarioQuitMenu(void)
+{
+    QuitToMenu=1;
+    InterfaceState=IfaceStateNormal;
+    GameRunning=0;
+    EndMenu();
 }
 
 /**
@@ -1538,7 +1606,6 @@ local void GameMenuObjectives(void)
     SetMenuObjectives();
     ProcessMenu(MENU_OBJECTIVES, 1);
     FreeMenuObjectives();
-
 }
 
 local void ScenSelectMenu(void)
@@ -2199,23 +2266,28 @@ local void GameCancel(void)
 local void CustomGameStart(void)
 {
     int i;
+    char *p;
 
     FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");
+	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
+	p=strchr(ScenSelectPath,'/')+1;
+	strcpy(CurrentMapPath, p);
     }
-    strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
+    else {
+	strcpy(CurrentMapPath, ScenSelectFileName);
+	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
+    }
 
-    // FIXME: this shouldn't be done here and the default objective should
-    //        be configurable
     for( i=0;i<MAX_OBJECTIVES;i++) {
 	if( GameIntro.Objectives[i] ) {
 	    free(GameIntro.Objectives[i]);
 	    GameIntro.Objectives[i]=NULL;
 	}
     }
-    GameIntro.Objectives[0]=strdup("-Destroy your enemies");
+    GameIntro.Objectives[0]=strdup(DefaultObjective);
 
     // FIXME: Johns is this here needed? Can the map loaded in create game?
     // ARI: Yes - This switches the menu gfx.. from def. Orc to Human, etc
