@@ -495,7 +495,7 @@ global void InitSpells(void)
 
 	if( SpellTypeTable[z].Missile.Name ) {
 	    SpellTypeTable[z].Missile.Missile =
-		    MissileTypeByIdent(SpellTypeTable[z].Missile.Name );
+		    MissileTypeByIdent(SpellTypeTable[z].Missile.Name);
 	}
     }
     SpellTypeCount = z;
@@ -909,62 +909,6 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    mis->Controller = SpellFlameShieldController;
 	    RefsDebugCheck(!target->Refs || target->Destroyed);
 	    target->Refs++;
-
-/*
-	    x+=target->IX;
-	    y+=target->IY;
-
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    mis=MakeMissile(spell->Missile.Missile,
-		    x*TileSizeX+TileSizeX/2-TileSizeX*0/3,
-		    y*TileSizeY+TileSizeY/2-TileSizeY*3/3,
-		    x*TileSizeX+TileSizeX/2+TileSizeX*3/3,
-		    y*TileSizeY+TileSizeY/2-TileSizeY*1/3);
-	    mis->TTL = spell->TTL;
-	    mis->TargetUnit = target;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-
-	    mis=MakeMissile(spell->Missile.Missile,
-		    x*TileSizeX+TileSizeX/2+TileSizeX*3/3,
-		    y*TileSizeY+TileSizeY/2-TileSizeY*1/3,
-		    x*TileSizeX+TileSizeX/2+TileSizeX*2/3,
-		    y*TileSizeY+TileSizeY/2+TileSizeY*2/3);
-	    mis->TTL = spell->TTL;
-	    mis->TargetUnit = target;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-
-	    mis=MakeMissile(spell->Missile.Missile,
-		    x*TileSizeX+TileSizeX/2+TileSizeX*2/3,
-		    y*TileSizeY+TileSizeY/2+TileSizeY*2/3,
-		    x*TileSizeX+TileSizeX/2-TileSizeX*2/3,
-		    y*TileSizeY+TileSizeY/2+TileSizeY*2/3);
-	    mis->TTL = spell->TTL;
-	    mis->TargetUnit = target;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-
-	    mis=MakeMissile(spell->Missile.Missile,
-		    x*TileSizeX+TileSizeX/2-TileSizeX*2/3,
-		    y*TileSizeY+TileSizeY/2+TileSizeY*2/3,
-		    x*TileSizeX+TileSizeX/2-TileSizeX*3/3,
-		    y*TileSizeY+TileSizeY/2-TileSizeY*1/3);
-	    mis->TTL = spell->TTL;
-	    mis->TargetUnit = target;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-
-	    mis=MakeMissile(spell->Missile.Missile,
-		    x*TileSizeX+TileSizeX/2-TileSizeX*3/3,
-		    y*TileSizeY+TileSizeY/2-TileSizeY*1/3,
-		    x*TileSizeX+TileSizeX/2-TileSizeX*0/3,
-		    y*TileSizeY+TileSizeY/2-TileSizeY*3/3);
-	    mis->TTL = spell->TTL;
-	    mis->TargetUnit = target;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-*/
 	}
 	break;
 
