@@ -2760,7 +2760,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     char *lcp;
     char *np;
     int p;
-    int i;
+    unsigned u;
     int sz;
     static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
     Menu *menu;
@@ -2799,21 +2799,21 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 	}
     }
 #endif
-    i = 0;
+    u = 0;
     do {
 	cp = np;
 	--cp;
 	do {
 	    lcp = cp++;
-	    cp = strcasestr(cp, suf[i]);
+	    cp = strcasestr(cp, suf[u]);
 	} while (cp != NULL);
 	if (lcp >= np) {
 	    break;
 	}
-	++i;
-    } while (i < sizeof(suf)/sizeof(*suf));
+	++u;
+    } while (u < sizeof(suf)/sizeof(*suf));
     if (lcp >= np) {
-	cp = lcp + strlen(suf[i]);
+	cp = lcp + strlen(suf[u]);
 #ifdef USE_ZLIB
 	if (strcmp(cp, ".gz") == 0) {
 	    *cp = 0;
@@ -4738,7 +4738,7 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
     char *np;
     char *cp;
     char *lcp;
-    int i;
+    unsigned u;
 #ifdef USE_ZZIPLIB
     int sz;
     ZZIP_FILE *zzf;
@@ -4763,22 +4763,22 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
     suf[0] = ".pud";
     suf[1] = ".scm";
     suf[2] = ".chk";
-    i = 0;
+    u = 0;
     do {
 	cp = np;
 	--cp;
 	do {
 	    lcp = cp++;
-	    cp = strcasestr(cp, suf[i]);
+	    cp = strcasestr(cp, suf[u]);
 	} while (cp != NULL);
 	if (lcp >= np) {
 	    break;
 	}
-	++i;
-    } while (i < sizeof(suf)/sizeof(*suf));
+	++u;
+    } while (u < sizeof(suf)/sizeof(*suf));
 
     if (lcp >= np) {
-	cp = lcp + strlen(suf[i]);
+	cp = lcp + strlen(suf[u]);
 #ifdef USE_ZLIB
 	if (strcmp(cp, ".gz") == 0) {
 	    *cp = 0;
