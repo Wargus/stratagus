@@ -1181,7 +1181,11 @@ local void DoSelectionButtons(unsigned num,unsigned button __attribute__((unused
 	}
 #endif /* SPLIT_SCREEN_SUPPORT */
     } else if( KeyModifiers&ModifierAlt ) {
-	SelectGroupFromUnit(unit);
+	if( KeyModifiers&ModifierShift ) {
+	    AddGroupFromUnitToSelection(unit);
+	} else {
+	    SelectGroupFromUnit(unit);
+	}
     } else if( KeyModifiers&ModifierShift ) {
 	ToggleSelectUnit(unit);
     } else {
@@ -1675,7 +1679,11 @@ global void UIHandleButtonUp(unsigned button)
 			num=SelectUnitsByType(unit);
 		    }
 		} else if( (KeyModifiers&ModifierAlt) && unit->LastGroup ) {
-		    num=SelectGroupFromUnit(unit);
+		    if( KeyModifiers&ModifierShift ) {
+			num=AddGroupFromUnitToSelection(unit);
+		    } else {
+			num=SelectGroupFromUnit(unit);
+		    }
 
 		    // Don't allow to select own and enemy units.
 		    // Don't allow mixing buildings
