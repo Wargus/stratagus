@@ -443,13 +443,13 @@ global void SaveDecorations(FILE* file)
 */
 global void CleanDecorations(void)
 {
-    free(HealthSprite.File);
+    //free(HealthSprite.File);	// latimerius: hack?
     VideoSaveFree(HealthSprite.Sprite);
-    HealthSprite.File=NULL;
+    //HealthSprite.File=NULL;	// latimerius: hack?
     HealthSprite.Sprite=NULL;
-    free(ManaSprite.File);
+    //free(ManaSprite.File);	// latimerius: hack?
     VideoSaveFree(ManaSprite.Sprite);
-    ManaSprite.File=NULL;
+    //ManaSprite.File=NULL;	// latimerius: hack?
     ManaSprite.Sprite=NULL;
     //free(ShadowSprite.File);
     VideoSaveFree(ShadowSprite.Sprite);
