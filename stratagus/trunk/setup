@@ -469,7 +469,7 @@ echo "" >> $RULESFILE
 if test "$WIN32" = "1" ; then
 	echo "VIDEO		= -DUSE_WIN32 \$(SDL)" >> $RULESFILE
 	if test "`gcc -v 2>&1 | grep -is mingw32` x" = " x" ; then
-	  echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
+	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32" >> $RULESFILE
 	else
 	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32" >> $RULESFILE
 	fi
