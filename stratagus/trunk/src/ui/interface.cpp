@@ -736,6 +736,7 @@ local int CommandKey(int key)
 	case 'M':			// ALT+M, F10 Game menu
 	    if( KeyModifiers&ModifierControl ) {
 		UiToggleMusic();
+		SavePreferences();
 		break;
 	    }
 	    if( !(KeyModifiers&ModifierAlt) ) {
@@ -802,6 +803,7 @@ local int CommandKey(int key)
 
 	case 's'&0x1F:			// Ctrl + S - Turn sound on / off
 	    UiToggleSound();
+	    SavePreferences();
 	    break;
 
 	case 's':			// ALT s F11 save game menu
