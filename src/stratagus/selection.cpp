@@ -1010,17 +1010,6 @@ global void CleanSelections(void)
 **		@param id		New group identifier
 **		@return				old value
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSetGroupId(SCM id)
-{
-	SCM old;
-
-	old = gh_int2scm(GroupId);
-	GroupId = gh_scm2int(id);
-
-	return old;
-}
-#elif defined(USE_LUA)
 local int CclSetGroupId(lua_State* l)
 {
 	int old;
@@ -1035,7 +1024,6 @@ local int CclSetGroupId(lua_State* l)
 	lua_pushnumber(l, old);
 	return 1;
 }
-#endif
 
 /**
 **		Define the current selection.
@@ -1043,26 +1031,6 @@ local int CclSetGroupId(lua_State* l)
 **		@param num		Number of units in selection
 **		@param units		Units in selection
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSelection(SCM num, SCM units)
-{
-	int i;
-
-	InitSelections();
-	NumSelected = gh_scm2int(num);
-	i = 0;
-	while (!gh_null_p(units)) {
-		char* str;
-
-		str = gh_scm2newstr(gh_car(units), NULL);
-		Selected[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
-		free(str);
-		units = gh_cdr(units);
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclSelection(lua_State* l)
 {
 	int i;
@@ -1088,20 +1056,14 @@ local int CclSelection(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Register CCL features for selections.
 */
 global void SelectionCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedure1_0("set-group-id!", CclSetGroupId);
-	gh_new_procedure2_0("selection", CclSelection);
-#elif defined(USE_LUA)
 	lua_register(Lua, "SetGroupId", CclSetGroupId);
 	lua_register(Lua, "Selection", CclSelection);
-#endif
 }
 
 //@}

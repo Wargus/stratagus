@@ -153,11 +153,7 @@ global void PlayCampaign(const char* name)
 	if (!CurrentCampaign->Chapters) {
 		char buf[1024];
 		filename = LibraryFileName(CurrentCampaign->File, buf);
-#if defined(USE_GUILE) || defined(USE_SIOD)
-		vload(filename, 0, 1);
-#elif defined(USE_LUA)
 		LuaLoadFile(filename);
-#endif
 	}
 
 	GameIntro.Objectives[0] = strdup(DefaultObjective);
@@ -181,83 +177,6 @@ global void PlayCampaign(const char* name)
 **  @param chapter  Chapter.
 **  @param list     List describing show-picture.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local void ParseShowPicture(CampaignChapter* chapter, SCM list)
-{
-	SCM value;
-	SCM sublist;
-
-	chapter->Type = ChapterShowPicture;
-
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-
-		if (gh_eq_p(value, gh_symbol2scm("image"))) {
-			chapter->Data.Picture.Image = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("fade-in"))) {
-			chapter->Data.Picture.FadeIn = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("fade-out"))) {
-			chapter->Data.Picture.FadeOut = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("display-time"))) {
-			chapter->Data.Picture.DisplayTime = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
-			ChapterPictureText** text;
-
-			sublist = gh_car(list);
-			list = gh_cdr(list);
-
-			text = &chapter->Data.Picture.Text;
-			while (*text) {
-				text = &((*text)->Next);
-			}
-			*text = calloc(sizeof(ChapterPictureText), 1);
-
-			while (!gh_null_p(sublist)) {
-				value = gh_car(sublist);
-				sublist = gh_cdr(sublist);
-
-				if (gh_eq_p(value, gh_symbol2scm("font"))) {
-					(*text)->Font = CclFontByIdentifier(gh_car(sublist));
-					sublist = gh_cdr(sublist);
-				} else if (gh_eq_p(value, gh_symbol2scm("x"))) {
-					(*text)->X = gh_scm2int(gh_car(sublist));
-					sublist = gh_cdr(sublist);
-				} else if (gh_eq_p(value, gh_symbol2scm("y"))) {
-					(*text)->Y = gh_scm2int(gh_car(sublist));
-					sublist = gh_cdr(sublist);
-				} else if (gh_eq_p(value, gh_symbol2scm("width"))) {
-					(*text)->Width = gh_scm2int(gh_car(sublist));
-					sublist = gh_cdr(sublist);
-				} else if (gh_eq_p(value, gh_symbol2scm("height"))) {
-					(*text)->Height = gh_scm2int(gh_car(sublist));
-					sublist = gh_cdr(sublist);
-				} else if (gh_eq_p(value, gh_symbol2scm("align"))) {
-					char* str;
-					str = gh_scm2newstr(gh_car(sublist), 0);
-					if (!strcmp(str, "left")) {
-						(*text)->Align = PictureTextAlignLeft;
-					} else if (!strcmp(str, "center")) {
-						(*text)->Align = PictureTextAlignCenter;
-					} else {
-						errl("Invalid chapter picture text align value",
-							gh_car(sublist));
-					}
-					free(str);
-					sublist = gh_cdr(sublist);
-				} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
-					(*text)->Text = gh_scm2newstr(gh_car(sublist), 0);
-					sublist = gh_cdr(sublist);
-				}
-			}
-		}
-	}
-}
-#elif defined(USE_LUA)
 local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 {
 	const char* value;
@@ -360,7 +279,6 @@ local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 		}
 	}
 }
-#endif
 
 /**
 **  Free campaign chapters.
@@ -404,114 +322,6 @@ local void FreeChapters(CampaignChapter** chapters)
 **
 **  @note FIXME: play-video, defeat, draw are missing.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineCampaign(SCM list)
-{
-	char* ident;
-	SCM value;
-	SCM sublist;
-	Campaign* campaign;
-	CampaignChapter* chapter;
-	CampaignChapter** tail;
-	int i;
-
-	//
-	//		Campaign name
-	//
-	ident = gh_scm2newstr(gh_car(list), NULL);
-	list = gh_cdr(list);
-	campaign = NULL;
-
-	if (Campaigns) {
-		for (i = 0; i < NumCampaigns; ++i) {
-			if (!strcmp(Campaigns[i].Ident, ident)) {
-				if (!strcmp(ident, "current") && Campaigns[i].Chapters) {
-					FreeChapters(&Campaigns[i].Chapters);
-				} else if (Campaigns[i].Chapters) {
-					// Redefining campaigns causes problems if a campaign is
-					// playing.
-					return SCM_UNSPECIFIED;
-				}
-				campaign = Campaigns + i;
-				free(campaign->Ident);
-				free(campaign->Name);
-				free(campaign->File);
-				break;
-			}
-		}
-		if (i == NumCampaigns) {
-			Campaigns = realloc(Campaigns, sizeof(Campaign) * (NumCampaigns + 1));
-			campaign = Campaigns + NumCampaigns;
-			++NumCampaigns;
-		}
-	} else {
-		campaign = Campaigns = malloc(sizeof(Campaign));
-		++NumCampaigns;
-	}
-
-	memset(campaign, 0, sizeof(Campaign));
-	campaign->Ident = ident;
-	campaign->Players = 1;
-	tail = &campaign->Chapters;
-
-	//
-	//  Parse the list: (still everything could be changed!)
-	//
-	while (!gh_null_p(list)) {
-
-		value = gh_car(list);
-		list = gh_cdr(list);
-
-		if (gh_eq_p(value, gh_symbol2scm("name"))) {
-			campaign->Name = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("file"))) {
-			campaign->File = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("players"))) {
-			campaign->Players = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("campaign"))) {
-			sublist = gh_car(list);
-			list = gh_cdr(list);
-			//
-			// Parse the list
-			//
-			while (!gh_null_p(sublist)) {
-
-				value = gh_car(sublist);
-				sublist = gh_cdr(sublist);
-
-				chapter = calloc(sizeof(CampaignChapter), 1);
-				chapter->Next = *tail;
-				*tail = chapter;
-				tail = &chapter->Next;
-
-				if (gh_eq_p(value, gh_symbol2scm("show-picture"))) {
-					ParseShowPicture(chapter, gh_car(sublist));
-					sublist = gh_cdr(sublist);
-				} else if (gh_eq_p(value, gh_symbol2scm("play-movie"))) {
-					DebugLevel0Fn("FIXME: not supported\n");
-				} else if (gh_eq_p(value, gh_symbol2scm("play-level"))) {
-					value = gh_car(sublist);
-					sublist = gh_cdr(sublist);
-
-					chapter->Type = ChapterPlayLevel;
-					chapter->Data.Level.Name = gh_scm2newstr(value, NULL);
-				} else {
-					// FIXME: this leaves a half initialized campaign
-					errl("Unsupported tag", value);
-				}
-			}
-		} else {
-			// FIXME: this leaves a half initialized campaign
-			errl("Unsupported tag", value);
-		}
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineCampaign(lua_State* l)
 {
 	char* ident;
@@ -624,38 +434,12 @@ local int CclDefineCampaign(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **  Set the current campaign chapter
 **
 **  @param num  Number of current chapter in current campaign.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSetCurrentChapter(SCM num)
-{
-	int i;
-
-	for (i = 0; i < NumCampaigns; ++i) {
-		if (!strcmp(Campaigns[i].Ident, "current")) {
-			CurrentCampaign = Campaigns + i;
-			break;
-		}
-	}
-	if (!CurrentCampaign) {
-		return SCM_UNSPECIFIED;
-	}
-
-	i = gh_scm2int(num);
-	CurrentChapter = CurrentCampaign->Chapters;
-	while (i && CurrentChapter) {
-		--i;
-		CurrentChapter = CurrentChapter->Next;
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclSetCurrentChapter(lua_State* l)
 {
 	int i;
@@ -684,83 +468,12 @@ local int CclSetCurrentChapter(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **  Set the briefing.
 **
 **  @param list  List describing the briefing.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclBriefing(SCM list)
-{
-	SCM value;
-	int voice;
-	int objective;
-
-	voice = objective = 0;
-	//
-	// Parse the list: (still everything could be changed!)
-	//
-	while (!gh_null_p(list)) {
-
-		value = gh_car(list);
-		list = gh_cdr(list);
-
-		if (gh_eq_p(value, gh_symbol2scm("type"))) {
-			if (!gh_eq_p(gh_car(list), gh_symbol2scm("wc2")) &&
-					!gh_eq_p(gh_car(list), gh_symbol2scm("sc")) ) {
-				// FIXME: this leaves a half initialized briefing
-				errl("Unsupported briefing type", value);
-			}
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("title"))) {
-			if (GameIntro.Title) {
-				free(GameIntro.Title);
-			}
-			GameIntro.Title = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("background"))) {
-			if (GameIntro.Background) {
-				free(GameIntro.Background);
-			}
-			GameIntro.Background = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
-			if (GameIntro.TextFile) {
-				free(GameIntro.TextFile);
-			}
-			GameIntro.TextFile = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("voice"))) {
-			if (voice == MAX_BRIEFING_VOICES) {
-				errl("too many voices", value);
-			}
-			if (GameIntro.VoiceFile[voice]) {
-				free(GameIntro.VoiceFile[voice]);
-			}
-			GameIntro.VoiceFile[voice] = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-			++voice;
-		} else if (gh_eq_p(value, gh_symbol2scm("objective"))) {
-			if (objective == MAX_OBJECTIVES) {
-			   errl("too many objectives", value);
-			}
-			if (GameIntro.Objectives[objective]) {
-				free(GameIntro.Objectives[objective]);
-			}
-			GameIntro.Objectives[objective] = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-			++objective;
-		} else {
-			// FIXME: this leaves a half initialized briefing
-			errl("Unsupported tag", value);
-		}
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclBriefing(lua_State* l)
 {
 	const char* value;
@@ -827,22 +540,15 @@ local int CclBriefing(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 ** Register CCL features for campaigns.
 */
 global void CampaignCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedureN("define-campaign", CclDefineCampaign);
-	gh_new_procedure1_0("set-current-chapter!", CclSetCurrentChapter);
-	gh_new_procedureN("briefing", CclBriefing);
-#elif defined(USE_LUA)
 	lua_register(Lua, "DefineCampaign", CclDefineCampaign);
 	lua_register(Lua, "SetCurrentChapter", CclSetCurrentChapter);
 	lua_register(Lua, "Briefing", CclBriefing);
-#endif
 }
 
 /**

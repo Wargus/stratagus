@@ -18,8 +18,8 @@ MAKE=make
 # Prefix for 'make install'
 PREFIX=@PREFIX@
 
-# Use SIOD support
-CCL		= -DUSE_SIOD
+# Use LUA support
+CCL		= -DUSE_LUA
 CCLLIB		= -lm
 
 # Video support

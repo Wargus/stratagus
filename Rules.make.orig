@@ -130,10 +130,10 @@ XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib
 XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include 
 
 #------------------------------------------------------------------------------
-#	Support for SIOD (scheme interpreter)
+#	Support for LUA
 #	C C L	-	Craft Configuration Language
 
-CCL	= -DUSE_SIOD
+CCL	= -DUSE_LUA
 CCLLIB	= -lm
 
 #------------------------------------------------------------------------------

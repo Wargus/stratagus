@@ -1839,9 +1839,6 @@ local void CreateEditor(void)
 	int i;
 	int n;
 	char* file;
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	char* s;
-#endif
 	char buf[PATH_MAX];
 	CLFile* clf;
 	int scm;
@@ -1855,15 +1852,7 @@ local void CreateEditor(void)
 	if ((clf = CLopen(file, CL_OPEN_READ))) {
 		CLclose(clf);
 		ShowLoadProgress("Script %s", file);
-#if defined(USE_GUILE) || defined(USE_SIOD)
-		if ((s = strrchr(file, '.')) && s[1] == 'C') {
-			fast_load(gh_str02scm(file), NIL);
-		} else {
-			vload(file, 0, 1);
-		}
-#elif defined(USE_LUA)
 		LuaLoadFile(file);
-#endif
 		CclGarbageCollect(0); // Cleanup memory after load
 	}
 

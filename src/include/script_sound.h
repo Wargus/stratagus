@@ -45,13 +45,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
-extern int ccl_sound_p(SCM sound);  /// is it a ccl sound?
-
-extern SoundId ccl_sound_id(SCM sound);  /// scheme -> sound id
-#elif defined(USE_LUA)
-#endif
-
 extern void SoundCclRegister(void);  /// register ccl features
 
 #else  // }{ defined(WITH_SOUND)

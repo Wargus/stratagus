@@ -707,136 +707,6 @@ global void SaveUpgrades(CLFile* file)
 **
 **		@param list		List of modifiers.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineModifier(SCM list)
-{
-	SCM temp;
-	SCM value;
-	int uid;
-	char* str;
-	int attack_range;
-	int sight_range;
-	int basic_damage;
-	int piercing_damage;
-	int armor;
-	int speed;
-	int regeneration_rate;
-	int hit_points;
-	int costs[MaxCosts];
-	int units[UnitTypeMax];
-	char upgrades[UpgradeMax];
-	char apply_to[UnitTypeMax];
-	UnitType* convert_to;
-
-	attack_range = 0;
-	sight_range = 0;
-	basic_damage = 0;
-	piercing_damage = 0;
-	armor = 0;
-	speed = 0;
-	hit_points = 0;
-	regeneration_rate = 0;
-	memset(costs, 0, sizeof(costs));
-	memset(units, 0, sizeof(units));
-	memset(upgrades, '?', sizeof(upgrades));
-	memset(apply_to, '?', sizeof(apply_to));
-	convert_to = NULL;
-
-	value = gh_car(list);
-	list = gh_cdr(list);
-
-	str = gh_scm2newstr(value, NULL);
-	uid = UpgradeIdByIdent(str);
-	free(str);
-
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-		if (!gh_list_p(value)) {
-			errl("wrong tag", value);
-			return SCM_UNSPECIFIED;
-		}
-		temp = gh_car(value);
-		if (gh_eq_p(temp, gh_symbol2scm("attack-range"))) {
-			attack_range = gh_scm2int(gh_cadr(value));
-		} else if (gh_eq_p(temp, gh_symbol2scm("sight-range"))) {
-			sight_range = gh_scm2int(gh_cadr(value));
-		} else if (gh_eq_p(temp, gh_symbol2scm("basic-damage"))) {
-			basic_damage = gh_scm2int(gh_cadr(value));
-		} else if (gh_eq_p(temp, gh_symbol2scm("piercing-damage"))) {
-			piercing_damage = gh_scm2int(gh_cadr(value));
-		} else if (gh_eq_p(temp, gh_symbol2scm("armor"))) {
-			armor = gh_scm2int(gh_cadr(value));
-		} else if (gh_eq_p(temp, gh_symbol2scm("speed"))) {
-			speed = gh_scm2int(gh_cadr(value));
-		} else if (gh_eq_p(temp, gh_symbol2scm("hit-points"))) {
-			hit_points = gh_scm2int(gh_cadr(value));
-		} else if (gh_eq_p(temp, gh_symbol2scm("regeneration-rate"))) {
-			regeneration_rate = gh_scm2int(gh_cadr(value));
-		} else if (gh_eq_p(temp, gh_symbol2scm("cost"))) {
-			int i;
-			char* name;
-
-			value = gh_car(gh_cdr(value));
-			name = gh_scm2newstr(gh_car(value), NULL);
-			for (i = 0; i < MaxCosts; ++i) {
-				if (!strcmp(name, DefaultResourceNames[i])) {
-					break;
-				}
-			}
-			if (i == MaxCosts) {
-				errl("Resource not found", gh_car(value));
-			}
-			free(name);
-			value = gh_cdr(value);
-			costs[i] = gh_scm2int(gh_car(value));
-		} else if (gh_eq_p(temp, gh_symbol2scm("allow-unit"))) {
-			value = gh_cdr(value);
-			str = gh_scm2newstr(gh_car(value), NULL);
-			value = gh_cdr(value);
-			DebugLevel3Fn("%s\n" _C_ str);
-			if (!strncmp(str, "unit-", 5)) {
-				units[UnitTypeIdByIdent(str)] = gh_scm2int(gh_car(value));
-			} else {
-				free(str);
-				errl("unit expected", NIL);
-			}
-			free(str);
-		} else if (gh_eq_p(temp, gh_symbol2scm("allow"))) {
-			value = gh_cdr(value);
-			str = gh_scm2newstr(gh_car(value), NULL);
-			value = gh_cdr(value);
-			DebugLevel3Fn("%s\n" _C_ str);
-			if (!strncmp(str, "upgrade-", 8)) {
-				upgrades[UpgradeIdByIdent(str)] = gh_scm2int(gh_car(value));
-			} else {
-				free(str);
-				errl("upgrade expected", NIL);
-			}
-			free(str);
-		} else if (gh_eq_p(temp, gh_symbol2scm("apply-to"))) {
-			value = gh_cdr(value);
-			str = gh_scm2newstr(gh_car(value), NULL);
-			apply_to[UnitTypeIdByIdent(str)] = 'X';
-			free(str);
-		} else if (gh_eq_p(temp, gh_symbol2scm("convert-to"))) {
-			value = gh_cdr(value);
-			str = gh_scm2newstr(gh_car(value), NULL);
-			convert_to = UnitTypeByIdent(str);
-			free(str);
-		} else {
-			errl("wrong tag", temp);
-			return SCM_UNSPECIFIED;
-		}
-	}
-
-	AddUpgradeModifierBase(uid, attack_range, sight_range, basic_damage,
-		piercing_damage, armor, speed, hit_points, regeneration_rate, costs,
-		units, upgrades, apply_to,convert_to);
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineModifier(lua_State* l)
 {
 	const char* temp;
@@ -989,75 +859,12 @@ local int CclDefineModifier(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Define a new upgrade.
 **
 **		@param list		List defining the upgrade.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineUpgrade(SCM list)
-{
-	SCM value;
-	char* str;
-	char* icon;
-	char* ident;
-	int costs[MaxCosts];
-	int n;
-	int j;
-
-	//		Identifier
-
-	ident = gh_scm2newstr(gh_car(list), NULL);
-	list = gh_cdr(list);
-
-	icon = NULL;
-	memset(costs, 0, sizeof(costs));
-
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-		if (gh_eq_p(value, gh_symbol2scm("icon"))) {
-			//		Icon
-
-			if (icon) {
-				free(icon);
-			}
-			icon = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("costs"))) {
-			//		Costs
-
-			value = gh_car(list);
-			list = gh_cdr(list);
-			n = gh_vector_length(value);
-			if (n > MaxCosts) {
-				fprintf(stderr, "%s: Wrong vector length\n", ident);
-				if (n > MaxCosts) {
-					n = MaxCosts;
-				}
-			}
-			for (j = 0; j < n; ++j) {
-				costs[j] = gh_scm2int(gh_vector_ref(value, gh_int2scm(j)));
-			}
-			while (j < MaxCosts) {
-				costs[j++] = 0;
-			}
-		} else {
-			str = gh_scm2newstr(value, NULL);
-			fprintf(stderr, "%s: Wrong tag `%s'\n", ident, str);
-			free(str);
-		}
-	}
-
-	AddUpgrade(ident, icon, costs);
-	free(ident);
-	free(icon);
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineUpgrade(lua_State* l)
 {
 	const char* value;
@@ -1115,43 +922,10 @@ local int CclDefineUpgrade(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Define which units are allowed and how much.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineUnitAllow(SCM list)
-{
-	SCM value;
-	char* ident;
-	int i;
-
-	if (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-		ident = gh_scm2newstr(value, NULL);
-
-		if (strncmp(ident, "unit-", 5)) {
-			DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
-			free(ident);
-			return SCM_UNSPECIFIED;
-		}
-
-		i = 0;
-		while (!gh_null_p(list) && i < 16) {
-			value = gh_car(list);
-			list = gh_cdr(list);
-			AllowUnitByIdent(&Players[i], ident, gh_scm2int(value));
-			++i;
-		}
-
-		free(ident);
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineUnitAllow(lua_State* l)
 {
 	const char* ident;
@@ -1177,57 +951,10 @@ local int CclDefineUnitAllow(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Define which units/upgrades are allowed.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineAllow(SCM list)
-{
-	SCM value;
-	char* ident;
-	char* ids;
-	int i;
-	int n;
-
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-		ident = gh_scm2newstr(value, NULL);
-		value = gh_car(list);
-		list = gh_cdr(list);
-		ids = gh_scm2newstr(value, NULL);
-
-		n = strlen(ids);
-		if (n > 16) {
-			fprintf(stderr, "%s: Allow string too long %d\n", ident, n);
-			n = 16;
-		}
-
-		if (!strncmp(ident, "unit-", 5)) {
-			for (i = 0; i < n; ++i) {
-				if (ids[i] == 'A') {
-					AllowUnitByIdent(&Players[i], ident, UnitMax);
-				} else if (ids[i] == 'F') {
-					AllowUnitByIdent(&Players[i], ident, 0);
-				}
-			}
-		} else if (!strncmp(ident, "upgrade-", 8)) {
-			for (i = 0; i < n; ++i) {
-				AllowUpgradeByIdent(&Players[i], ident, ids[i]);
-			}
-		} else {
-			DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
-		}
-
-		free(ident);
-		free(ids);
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineAllow(lua_State* l)
 {
 	const char* ident;
@@ -1268,40 +995,12 @@ local int CclDefineAllow(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Define upgrade mapping from original number to internal symbol
 **
 **		@param list		List of all names.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineUpgradeWcNames(SCM list)
-{
-	int i;
-	char** cp;
-
-	if ((cp = UpgradeWcNames)) {				// Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(UpgradeWcNames);
-	}
-
-	//
-	//		Get new table.
-	//
-	i = gh_length(list);
-	UpgradeWcNames = cp = malloc((i + 1) * sizeof(char*));
-	while (i--) {
-		*cp++ = gh_scm2newstr(gh_car(list), NULL);
-		list = gh_cdr(list);
-	}
-	*cp = NULL;
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineUpgradeWcNames(lua_State* l)
 {
 	int i;
@@ -1332,34 +1031,23 @@ local int CclDefineUpgradeWcNames(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Register CCL features for upgrades.
 */
 global void UpgradesCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedureN("define-modifier", CclDefineModifier);
-	gh_new_procedureN("define-upgrade", CclDefineUpgrade);
-	gh_new_procedureN("define-allow", CclDefineAllow);
-	gh_new_procedureN("define-unit-allow", CclDefineUnitAllow);
-
-	gh_new_procedureN("define-upgrade-wc-names", CclDefineUpgradeWcNames);
-#elif defined(USE_LUA)
 	lua_register(Lua, "DefineModifier", CclDefineModifier);
 	lua_register(Lua, "DefineUpgrade", CclDefineUpgrade);
 	lua_register(Lua, "DefineAllow", CclDefineAllow);
 	lua_register(Lua, "DefineUnitAllow", CclDefineUnitAllow);
 
 	lua_register(Lua, "DefineUpgradeWcNames", CclDefineUpgradeWcNames);
-#endif
 }
 
 
 
 
-// FIXME: Johns stops here
 
 /*----------------------------------------------------------------------------
 --		Init/Done/Add functions

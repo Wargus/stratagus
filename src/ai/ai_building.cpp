@@ -290,7 +290,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 **
 **  @return        True if place found, false if not found.
 **
-**  @todo          FIXME: This is slow really slow, using 
+**  @todo          FIXME: This is slow really slow, using
 **                 two flood fills, is not a perfect solution.
 */
 local int AiFindHallPlace(const Unit * worker, const UnitType * type, int *dx, int *dy)
