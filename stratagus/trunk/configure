@@ -892,7 +892,6 @@ if [ "$DEBUG" != 1 ] ; then
 fi
 
 
-CFLAGS="$CFLAGS $NORMAL_CFLAGS"
 if [ "x`gcc -v 2>&1 | grep -is 3\.2`" != x ] ; then
 if [ "$DEBUG" != 1 ] ; then
     echo
@@ -923,6 +922,7 @@ if [ "$DEBUG" != 1 ] ; then
 	*)
 	    echo
 	    echo "Using Normal Optimization."
+	    CFLAGS="$CFLAGS $NORMAL_CFLAGS"
 	    ;;
     esac
     echo
