@@ -378,6 +378,9 @@ global void DrawButtonPanel(void)
     const ButtonAction* buttons;
     char buf[8];
 
+    //
+    //	Draw background
+    //
     VideoDrawSub(TheUI.ButtonPanel.Graphic,0,0
 	    ,TheUI.ButtonPanel.Graphic->Width,TheUI.ButtonPanel.Graphic->Height
 	    ,TheUI.ButtonPanelX,TheUI.ButtonPanelY);
@@ -386,6 +389,7 @@ global void DrawButtonPanel(void)
 	return;
     }
 
+    // FIXME: this is unneeded DrawUnitIcon does it self
     PlayerPixels(ThisPlayer);		// could only select own units.
 
     for( i=0; i<9; ++i ) {
@@ -405,18 +409,19 @@ global void DrawButtonPanel(void)
 	    //
 	    //	FIXME: Must also show, if all units have the same action!!!
 	    //	FIXME: very useful for contolling stand and stop.
+	    //	FIXME: Should show the rally action of buildings.
 	    //
 	    if( NumSelected==1 ) {
 		switch( buttons[i].Action ) {
 		    case ButtonStop:
 			if( Selected[0]->Orders[0].Action==UnitActionStill ) {
-			    v=IconSelected;
+			    v|=IconSelected;
 			}
 			break;
 		    case ButtonStandGround:
 			if( Selected[0]->Orders[0].Action
 				==UnitActionStandGround ) {
-			    v=IconSelected;
+			    v|=IconSelected;
 			}
 			break;
 		    case ButtonMove:
@@ -425,7 +430,7 @@ global void DrawButtonPanel(void)
 				    ==UnitActionBuild
 				|| Selected[0]->Orders[0].Action
 				    ==UnitActionFollow ) {
-			    v=IconSelected;
+			    v|=IconSelected;
 			}
 			break;
 		    case ButtonHarvest:
@@ -433,29 +438,29 @@ global void DrawButtonPanel(void)
 			if( Selected[0]->Orders[0].Action==UnitActionMineGold
 				|| Selected[0]->Orders[0].Action
 				    ==UnitActionHarvest ) {
-			    v=IconSelected;
+			    v|=IconSelected;
 			}
 			break;
 		    case ButtonAttack:
 			if( Selected[0]->Orders[0].Action==UnitActionAttack ) {
-			    v=IconSelected;
+			    v|=IconSelected;
 			}
 			break;
 		    case ButtonDemolish:
 			if( Selected[0]->Orders[0].Action
 				==UnitActionDemolish ) {
-			    v=IconSelected;
+			    v|=IconSelected;
 			}
 			break;
 		    case ButtonAttackGround:
 			if( Selected[0]->Orders[0].Action
 				==UnitActionAttackGround ) {
-			    v=IconSelected;
+			    v|=IconSelected;
 			}
 			break;
 		    case ButtonRepair:
 			if( Selected[0]->Orders[0].Action==UnitActionRepair ) {
-			    v=IconSelected;
+			    v|=IconSelected;
 			}
 			break;
 
