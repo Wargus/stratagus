@@ -163,7 +163,7 @@ global void UpdateStats(int reset)
     //
     for (j = 0; j<NumUnitTypes; ++j) {
 	type = UnitTypes[j];
-        if (reset){
+	if (reset) {
 	    // LUDO : FIXME : reset loading of player stats !
 	    for (player = 0; player < PlayerMax; ++player) {
 		stats = &type->Stats[player];
@@ -492,7 +492,7 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	unittype->CanStore[OilCost] = BIT(24, v);
 //	unittype->Volatile = BIT(25, v);
 //	unittype->Organic = BIT(27, v);
-	
+
 	if (BIT(11, v) || BIT(21, v)) {
 	    unittype->GivesResource = OilCost;
 	}
@@ -722,7 +722,7 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     if (flag) {
 	CLprintf(file, ")\n");
     }
-    
+
     for (i = flag = 0; i < MaxCosts; ++i) {
 	if (type->ImproveIncomes[i] > DefaultIncomes[i]) {
 	    if (!flag) {
@@ -776,7 +776,7 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     }
     CLprintf(file, "  'tile-size '(%d %d)", type->TileWidth, type->TileHeight);
     CLprintf(file, "  'box-size '(%d %d)\n", type->BoxWidth, type->BoxHeight);
-    
+
     if(!type->Selectable) {
 	CLprintf(file, "  'not-selectable\n");
     }
@@ -913,10 +913,10 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     }
     CLprintf(file, "'can-target-flag '(");
     for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
-        if (type->CanTargetFlag[i] != CONDITION_TRUE) {
-            CLprintf(file, "%s %s ", BoolFlagName[i],
-                type->CanTargetFlag[i] == CONDITION_ONLY ? "only" : "false");
-        }
+	if (type->CanTargetFlag[i] != CONDITION_TRUE) {
+	    CLprintf(file, "%s %s ", BoolFlagName[i],
+		type->CanTargetFlag[i] == CONDITION_ONLY ? "only" : "false");
+	}
     }
     CLprintf(file, ") ");
 
@@ -974,7 +974,7 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     if (type->Coward) {
 	CLprintf(file, "  'coward\n");
     }
-    
+
     if (type->Harvester) {
 	for (i = 0; i < MaxCosts; ++i) {
 	    if (type->ResInfo[i]) {
@@ -1030,7 +1030,7 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	CLprintf(file, "  'max-workers %d\n",
 	    type->MaxWorkers);
     }
-   
+
     // Save store info.
     for (flag = i = 0; i < MaxCosts; ++i)
 	if (type->CanStore[i]) {
@@ -1043,7 +1043,7 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	}
     if (flag)
 	CLprintf(file, ")");
-   
+
     if (type->CanCastSpell) {
 	CLprintf(file, "  'can-cast-spell '( ");
 	for (i = 0; i < SpellTypeCount; ++i) {
@@ -1070,9 +1070,9 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	CLprintf(file, "  'teleporter\n");
     }
     for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
-        if (type->BoolFlag[i]) {
-            CLprintf(file, "  '%s\n", BoolFlagName[i]);
-        }
+	if (type->BoolFlag[i]) {
+	    CLprintf(file, "  '%s\n", BoolFlagName[i]);
+	}
     }
 
 
@@ -1123,7 +1123,7 @@ local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
     CLFile* file)
 {
     int j;
-    
+
     DebugCheck(plynr >= PlayerMax);
     CLprintf(file, "(define-unit-stats '%s %d\n  ", ident, plynr);
     CLprintf(file, "'level %d ", stats->Level);
@@ -1160,17 +1160,17 @@ global void SaveFlags(CLFile* file)
     int i;
 
     if (NumberBoolFlag != 0) {
-        CLprintf(file, "(define-bool-flags");
-        for (i = 0; i < NumberBoolFlag; i++) {
-            CLprintf(file, " '%s", BoolFlagName[i]);
-        }
-        CLprintf(file, ")\n");
+	CLprintf(file, "(define-bool-flags");
+	for (i = 0; i < NumberBoolFlag; i++) {
+	    CLprintf(file, " '%s", BoolFlagName[i]);
+	}
+	CLprintf(file, ")\n");
     }
 }
 
 /**
 ** 	Save the names of all unit types, before actually defining anything about them.
-**	
+**
 **	@param file	Output file.
 */
 global void SaveUnitTypeDefs(CLFile* file)
@@ -1543,13 +1543,6 @@ global void CleanUnitTypes(void)
 	free(type->BoolFlag);
 	free(type->CanTargetFlag);
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	if ((SCM)type->Property != SCM_UNSPECIFIED) {
-	    CclGcUnprotect((SCM*)&type->Property);
-	}
-#elif defined(USE_LUA)
-#endif
-
     	if (type->SameSprite) {
 	    free(type->SameSprite);
 	}
@@ -1643,7 +1636,7 @@ global void CleanUnitTypes(void)
     NumUnitTypes = 0;
 
     for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
-        free(BoolFlagName[i]);
+	free(BoolFlagName[i]);
     }
     free(BoolFlagName);
     BoolFlagName = NULL;
