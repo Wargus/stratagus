@@ -1631,9 +1631,6 @@ global void RescueUnits(void)
 				}
 				DebugLevel3("Checking %d(%s)" _C_ UnitNumber(unit) _C_
 					unit->Type->Ident);
-#ifdef UNIT_ON_MAP
-				// FIXME: could be done faster?
-#endif
 				// FIXME: I hope SelectUnits checks bounds?
 				// FIXME: Yes, but caller should check.
 				// NOTE: +1 right,bottom isn't inclusive :(

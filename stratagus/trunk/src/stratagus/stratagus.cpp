@@ -787,9 +787,6 @@ local void PrintHeader(void)
 #ifdef UNIT_ON_MAP
 	"UNIT-ON-MAP "
 #endif
-#ifdef UNITS_ON_MAP
-	"UNITS-ON-MAP "
-#endif
 #ifdef NEW_MAPDRAW
 	"NEW-MAPDRAW "
 #endif

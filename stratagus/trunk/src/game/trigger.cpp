@@ -336,9 +336,6 @@ local int CclIfUnitAt(lua_State* l)
 	//
 	// Get all unit types in location.
 	//
-#ifdef UNIT_ON_MAP
-	// FIXME: could be done faster?
-#endif
 	// FIXME: I hope SelectUnits checks bounds?
 	// FIXME: Yes, but caller should check.
 	// NOTE: +1 right,bottom isn't inclusive :(
@@ -423,9 +420,6 @@ local int CclIfNearUnit(lua_State* l)
 
 		unit = table[i];
 
-#ifdef UNIT_ON_MAP
-		// FIXME: could be done faster?
-#endif
 		// FIXME: I hope SelectUnits checks bounds?
 		// FIXME: Yes, but caller should check.
 		// NOTE: +1 right,bottom isn't inclusive :(
@@ -526,9 +520,6 @@ local int CclIfRescuedNearUnit(lua_State* l)
 
 		unit = table[i];
 
-#ifdef UNIT_ON_MAP
-		// FIXME: could be done faster?
-#endif
 		// FIXME: I hope SelectUnits checks bounds?
 		// FIXME: Yes, but caller should check.
 		// NOTE: +1 right,bottom isn't inclusive :(

@@ -204,20 +204,6 @@
 --  Map - field
 ----------------------------------------------------------------------------*/
 
-#ifdef UNIT_ON_MAP
-/**
-**  All units on a map field, if more than one.
-**  FIXME: unused
-*/
-typedef struct _unit_array_ {
-	Unit* Building;  /// Building or corpse
-	Unit* SeaUnit;   /// Sea unit
-	Unit* LandUnit;  /// Land unit
-	Unit* AirUnit;   /// Air unit
-} UnitArray;
-
-#endif
-
 	/// Describes a field of the map
 typedef struct _map_field_ {
 	unsigned short Tile;      /// graphic tile number
@@ -229,16 +215,7 @@ typedef struct _map_field_ {
 	unsigned char Visible[PlayerMax];  /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax];  /// Visiblity for cloaking.
 #ifdef UNIT_ON_MAP
-	union {
-		Unit*      Units;  /// An unit on the map field
-		UnitArray* Array;  /// More units on the map field
-	} Here;                /// What is on the field
-#endif
-#ifdef UNITS_ON_MAP
-	UnitRef Building;  /// Building or corpse
-	UnitRef AirUnit;   /// Air unit
-	UnitRef LandUnit;  /// Land unit
-	UnitRef SeaUnit;   /// Sea unit
+	Unit*      UnitCache;  /// An unit on the map field
 #endif
 #ifdef HIERARCHIC_PATHFINDER
 	unsigned short RegId;  /// Region to which the field belongs
