@@ -363,8 +363,6 @@ global void AssignUnitToPlayer (Unit *unit, Player *player)
     unit->Player=player;
     unit->Stats=&type->Stats[unit->Player->Player];
     unit->Colors=player->UnitColors;
-
-    unit->HP=unit->Stats->HitPoints;
 }
 
 /**
@@ -384,6 +382,12 @@ global Unit* MakeUnit(UnitType* type, Player* player)
     unit = AllocUnit();
     InitUnit(unit, type);
     AssignUnitToPlayer(unit, player);
+
+    /* now we can finish the player-specific initialization of our unit */
+    /* NOTE: this used to be a part of AssignUnitToPlayer() but had to be
+     * moved out since it clobbered HP read from a saved file during game
+     * load. */
+    unit->HP = unit->Stats->HitPoints;
 
     return unit;
 }
