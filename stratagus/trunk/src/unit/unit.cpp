@@ -740,21 +740,20 @@ global int UnitVisible(const Unit* unit)
 	}
     );
 
-    if ( unit->Invisible && unit->Player != ThisPlayer )
-      {
-      //FIXME: vladi: should handle teams and shared vision
-      return 0;
-      }
+    if ( unit->Invisible && unit->Player != ThisPlayer ) {
+	//FIXME: vladi: should handle teams and shared vision
+	return 0;
+    }
 
     //
     //	Check if visible on screen
     //
     x = unit->X;
     y = unit->Y;
-    w = unit->Type->TileWidth  - 1; // x+width is outside building rect
-    h = unit->Type->TileHeight - 1;
-    if( (x+w) < MapX || x > (MapX+MapWidth) ||
-	    (y+h) < MapY || y > (MapY+MapHeight) ) {
+    w = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
+    if( (x+w-1) < MapX || x > (MapX+MapWidth) ||
+	(y+h-1) < MapY || y > (MapY+MapHeight) ) {
 	return 0;
     }
 
@@ -762,12 +761,16 @@ global int UnitVisible(const Unit* unit)
     //	Check explored or if visible under fog of war.
     //	FIXME: isn't it enough to see a field of the building?
     //
-    if( !(TheMap.Fields[y*TheMap.Width+x].Flags&MapFieldExplored)
-	    || (!unit->Type->Building
-		&& !(TheMap.Fields[y*TheMap.Width+x].Flags&MapFieldVisible)) ) {
-	return 0;
+    for( ; (int)w>=0; --w ) {
+	for( ; (int)h>=0; --h) {
+	    if( IsMapFieldExplored(x+w,y+h) &&
+		(unit->Type->Building || IsMapFieldVisible(x+w,y+h)) ) {
+		return 1;
+	    }
+	}
     }
-    return 1;
+
+    return 0;
 #endif
 }
 
