@@ -415,6 +415,12 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 		}
 	    }
 	}
+	// Check if we counted the unit near itself
+	if( unittype==ANY_UNIT
+		|| (unittype==ALL_FOODUNITS && ut2->Building)
+		|| (unittype==ALL_BUILDINGS && ut2->Building) ) {
+	    --s;
+	}
 	if( compare(s,q) ) {
 	    return SCM_BOOL_T;
 	}
@@ -504,6 +510,12 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 		    }
 		}
 	    }
+	}
+	// Check if we counted the unit near itself
+	if( unittype==ANY_UNIT
+		|| (unittype==ALL_FOODUNITS && ut2->Building)
+		|| (unittype==ALL_BUILDINGS && ut2->Building) ) {
+	    --s;
 	}
 	if( compare(s,q) ) {
 	    return SCM_BOOL_T;
