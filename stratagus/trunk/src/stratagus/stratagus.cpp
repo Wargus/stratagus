@@ -971,8 +971,17 @@ global int main(int argc, char** argv)
 	CclStartFile = "scripts/stratagus.lua";
 	EditorStartFile = "scripts/editor.lua";
 
+	//  Default play name to username on unix systems.
 	memset(LocalPlayerName, 0, 16);
+#ifdef USE_WIN32
 	strcpy(LocalPlayerName, "Anonymous");
+#else
+	if (getenv("USERNAME")) {
+		strncpy(LocalPlayerName, getenv("USERNAME"), 14);
+	} else {
+		strcpy(LocalPlayerName, "Anonymous");
+	}
+#endif
 
 	// FIXME: Parse options before or after scripts?
 
