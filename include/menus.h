@@ -172,6 +172,7 @@ typedef struct _menuitem_gem_ {
     void (*action)(struct _menuitem_ *);
 } MenuitemGem;
 
+struct _menus_;
 typedef struct _menuitem_ {
     int mitype;					/// FIXME: write docu
     int xofs;
@@ -180,6 +181,7 @@ typedef struct _menuitem_ {
     int font;
     void (*initfunc)(struct _menuitem_ *);	/// constructor
     void (*exitfunc)(struct _menuitem_ *);	/// destructor
+    struct _menus_ *menu;			/// backpointer for speedups
     union {
 	MenuitemText text;
 	MenuitemButton button;
