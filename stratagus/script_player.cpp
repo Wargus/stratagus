@@ -391,6 +391,64 @@ local SCM CclNewPlayerColors(void)
 // ----------------------------------------------------------------------------
 
 /**
+**	Get a player pointer
+**
+**	@param value	Player slot number.
+**
+**	@return		The player pointer
+*/
+local Player* CclGetPlayer(SCM value)
+{
+    return &Players[gh_scm2int(value)];
+}
+
+/**
+**	Get player resources.
+**
+**	@param ptr	Player
+**	@return		Player resource vector
+*/
+local SCM CclGetPlayerResources(SCM ptr)
+{
+    int i;
+    Player* player;
+    SCM vec;
+
+    player=CclGetPlayer(ptr);
+    vec=cons_array(gh_int2scm(MaxCosts),NIL);
+    for( i=0; i<MaxCosts; ++i ) {
+	aset1(vec,gh_int2scm(i),gh_int2scm(player->Resources[i]));
+    }
+    return vec;
+}
+
+/**
+**	Set player resources.
+**
+**	@param ptr	Player
+**	@param vec	Resources vector
+**	@return		Old resource vector
+*/
+local SCM CclSetPlayerResources(SCM ptr,SCM vec)
+{
+    int i;
+    Player* player;
+    SCM old;
+
+    player=CclGetPlayer(ptr);
+    old=cons_array(gh_int2scm(MaxCosts),NIL);
+    for( i=0; i<MaxCosts; ++i ) {
+	aset1(old,gh_int2scm(i),gh_int2scm(player->Resources[i]));
+    }
+    for( i=0; i<MaxCosts; ++i ) {
+	player->Resources[i]=gh_scm2int(gh_vector_ref(vec,gh_int2scm(i)));
+    }
+    return old;
+}
+
+// ----------------------------------------------------------------------------
+
+/**
 **	Register CCL features for players.
 */
 global void PlayerCclRegister(void)
@@ -411,6 +469,10 @@ global void PlayerCclRegister(void)
     gh_new_procedureN("define-race-wc-names",CclDefineRaceWcNames);
 
     gh_new_procedure0_0("new-colors",CclNewPlayerColors);
+
+    // player member access functions
+    gh_new_procedure1_0("get-player-resources",CclGetPlayerResources);
+    gh_new_procedure2_0("set-player-resources!",CclSetPlayerResources);
 }
 
 //@}
