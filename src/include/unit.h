@@ -826,6 +826,8 @@ extern int CanBuildOn(int x,int y,int mask);
     /// FIXME: more docu
 extern int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y);
 
+    /// Find resource
+extern Unit* FindResource(const Player* player,int x,int y,int resource);
     /// Find nearest deposit
 extern Unit* FindDeposit(const Player*,int x,int y,int resource);
     /// Find the next idle worker
@@ -833,10 +835,6 @@ extern Unit* FindIdleWorker(const Player* player,const Unit* last);
 
     /// Find the nearest piece of wood in sight range
 extern int FindWoodInSight(const Unit* unit,int* x,int* y);
-    /// Find gold mine
-extern Unit* FindGoldMine(const Unit* unit,int x,int y);
-    /// Find resource
-extern Unit* FindResource(const Player* player,int x,int y,int resource);
 
     /// FIXME: more docu
 extern Unit* UnitOnScreen(Unit* unit,int x,int y);
@@ -983,10 +981,8 @@ extern Unit* TransporterOnScreenMapPosition (int , int );
 extern Unit* UnitTypeOnMap(int tx,int ty,UnitType* type);
     /// Return gold mine, if on map tile
 extern Unit* GoldMineOnMap(int tx,int ty);
-    /// Return oil patch, if on map tile
-extern Unit* OilPatchOnMap(int tx,int ty);
-    /// Return oil platform, if on map tile
-extern Unit* PlatformOnMap(int tx,int ty);
+    /// Return resource, if on map tile
+extern Unit* ResourceOnMap(int tx,int ty,int resource);
     /// Return resource deposit, if on map tile
 extern Unit* ResourceDepositOnMap(int tx,int ty,int resource);
 

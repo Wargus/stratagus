@@ -792,7 +792,7 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 }
 
 /**
-**	Send unit haul oil.
+**	Send unit to harvest resources
 **
 **	@param unit	pointer to unit.
 **	@param dest	destination unit.
@@ -808,9 +808,7 @@ global void CommandResource(Unit* unit,Unit* dest,int flush)
     if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie
 	     && !dest->Destroyed ) {
 	// FIXME: more races, could happen with many orders in queue.
-	if( !unit->Type->Building
-		&& unit->Type!=UnitTypeHumanTanker
-		&& unit->Type!=UnitTypeOrcTanker ) {
+	if( !unit->Type->Building && !unit->Type->Harvester ) {
 	    ClearSavedAction(unit);
 	    return;
 	}
@@ -854,12 +852,9 @@ global void CommandReturnGoods(Unit* unit,Unit* goal,int flush)
     if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	// FIXME: more races, could happen with many orders in queue.
 	if( !unit->Type->Building
-		&& unit->Type!=UnitTypeHumanWorkerWithGold
+		&& !unit->Type->Harvester
 		&& unit->Type!=UnitTypeHumanWorkerWithWood
-		&& unit->Type!=UnitTypeOrcWorkerWithGold
-		&& unit->Type!=UnitTypeOrcWorkerWithWood
-		&& unit->Type!=UnitTypeHumanTankerFull
-		&& unit->Type!=UnitTypeOrcTankerFull ) {
+		&& unit->Type!=UnitTypeOrcWorkerWithWood) {
 	    ClearSavedAction(unit);
 	    return;
 	}

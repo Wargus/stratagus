@@ -1196,8 +1196,8 @@ local int AiHaulOil(Unit * unit)
 		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 	return 0;
     }
-    DebugCheck(unit->Type!=UnitTypeHumanTanker
-	    && unit->Type!=UnitTypeOrcTanker);
+
+    DebugCheck( !unit->Type->Harvester );
 
     CommandResource(unit, dest,FlushCommands);
 
