@@ -1405,6 +1405,18 @@ global void MapColorCycle(void)
 */
 global int MarkDrawPosMap( int x, int y )
 {
+#ifdef SPLIT_SCREEN_SUPPORT
+    /* NOTE: latimerius: MarkDrawPosMap() in split screen environment
+     * schedules RedrawMap if (x,y) is visible inside *any* of the existing
+     * viewports.  Is this OK, johns?  Do you think it would pay having
+     * RedrawViewport0, RedrawViewport1 etc. variables and redraw just
+     * vp's that actually need redrawing?  We should evaluate this.
+     */
+    if (GetViewport (x, y) != -1) {
+	MustRedraw|=RedrawMap;
+	return 1;
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     if ( (x-=MapX)>=0 && (y-=MapY)>=0 && x<MapWidth && y<MapHeight ) {
 #ifdef NEW_MAPDRAW
       MustRedrawRow[y]=MustRedrawTile[y*MapWidth+x]=NEW_MAPDRAW;
@@ -1412,8 +1424,35 @@ global int MarkDrawPosMap( int x, int y )
       MustRedraw|=RedrawMap;
       return 1;
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
     return 0;
 }
+
+
+#ifdef SPLIT_SCREEN_SUPPORT
+
+global int MapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
+{
+    Viewport *view = &TheUI.VP[v];
+    return sx>=view->MapX && sy>=view->MapY &&
+		ex<view->MapX+view->MapWidth && ey<view->MapY+view->MapHeight;
+}
+
+local inline int PointInViewport (int v, int x, int y)
+{
+    Viewport *view = &TheUI.VP[v];
+    return view->MapX <= x && x < view->MapX+view->MapWidth &&
+		view->MapY <= y && y < view->MapY+view->MapHeight;
+}
+
+global int AnyMapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
+{
+    // FIXME: Can be faster written
+    return PointInViewport (v,sx,sy) || PointInViewport (v,sx,ey)
+	    || PointInViewport (v,ex,sy) || PointInViewport (v,ex,ey);
+}
+
+#else /* SPLIT_SCREEN_SUPPORT */
 
 /**
 **	Denote wether area in screenmap is overlapping
@@ -1459,30 +1498,6 @@ global int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
     return PointOnScreen(sx,sy) || PointOnScreen(sx,ey)
 	    || PointOnScreen(ex,sy) || PointOnScreen(ex,ey);
 }
-
-#ifdef SPLIT_SCREEN_SUPPORT
-
-global int MapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
-{
-    Viewport *view = &TheUI.VP[v];
-    return sx>=view->MapX && sy>=view->MapY &&
-		ex<view->MapX+view->MapWidth && ey<view->MapY+view->MapHeight;
-}
-
-local inline int PointInViewport (int v, int x, int y)
-{
-    Viewport *view = &TheUI.VP[v];
-    return view->MapX <= x && x < view->MapX+view->MapWidth &&
-		view->MapY <= y && y < view->MapY+view->MapHeight;
-}
-
-global int AnyMapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
-{
-    // FIXME: Can be faster written
-    return PointInViewport (v,sx,sy) || PointInViewport (v,sx,ey)
-	    || PointInViewport (v,ex,sy) || PointInViewport (v,ex,ey);
-}
-
 #endif /* SPLIT_SCREEN_SUPPORT */
 
 /**
@@ -1499,6 +1514,12 @@ global int AnyMapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
 */
 global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 {
+#ifdef SPLIT_SCREEN_SUPPORT
+    if (MapTileGetViewport (sx,sy) != -1 || MapTileGetViewport (ex,ey) != -1) {
+	MustRedraw |= RedrawMap;
+	return 1;
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     if ((ex -= MapX) >= 0 && (ey -= MapY) >= 0 && ((sx -= MapX) < MapWidth
 	    || sx < 0) && ((sy -= MapY) < MapHeight || sy < 0)) {
 #ifdef NEW_MAPDRAW
@@ -1535,6 +1556,7 @@ global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 	MustRedraw |= RedrawMap;
 	return 1;
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
     return 0;
 }
 
@@ -1687,7 +1709,7 @@ global void DrawMapBackgroundInViewport (int v, int x, int y)
 #endif
 }
 
-#endif /* SPLIT_SCREEN_SUPPORT */
+#else /* SPLIT_SCREEN_SUPPORT */
 
 global void DrawMapBackground(int x,int y)
 {
@@ -1780,6 +1802,8 @@ global void DrawMapBackground(int x,int y)
     DebugLevel1("%ld %ld %3ld\n",(long)sx,mv,(sx*100)/mv);
 #endif
 }
+
+#endif /* SPLIT_SCREEN_SUPPORT */
 
 #ifdef NEW_DECODRAW
 /**

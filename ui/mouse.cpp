@@ -723,12 +723,14 @@ global void UIHandleMouseMove(int x,int y)
     //	Restrict mouse to minimap when dragging
     if( OldCursorOn==CursorOnMinimap && CursorOn!=CursorOnMinimap &&
 	(MouseButtons&LeftButton) ) {
-	RestrictCursorToMinimap();
 #ifdef SPLIT_SCREEN_SUPPORT
+	Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
+	RestrictCursorToMinimap();
 	MapViewportSetViewpoint (TheUI.ActiveViewport
-		,ScreenMinimap2MapX(CursorX)-MapWidth/2
-		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
+		,ScreenMinimap2MapX (CursorX) - vp->MapWidth/2
+		,ScreenMinimap2MapY (CursorY) - vp->MapHeight/2);
 #else /* SPLIT_SCREEN_SUPPORT */
+	RestrictCursorToMinimap();
 	MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
 		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
 #endif /* SPLIT_SCREEN_SUPPORT */
@@ -745,13 +747,9 @@ global void UIHandleMouseMove(int x,int y)
     //cade: this is forbidden for unexplored and not visible space
     // FIXME: This must done new, moving units, scrolling...
     if( CursorOn==CursorOnMap ) {
-	// FIXME: wrong for SPLIT_SCREEN_SUPPORT!
-	if( IsMapFieldVisible(Screen2MapX(x),Screen2MapY(y)) ) {
-	    DebugLevel3Fn("%d,%d\n"
-		    ,x-TheUI.MapX+MapX*TileSizeX
-		    ,y-TheUI.MapY+MapY*TileSizeY);
-	    // Map coordinate in pixels
 #ifdef SPLIT_SCREEN_SUPPORT
+	if (IsMapFieldVisible (Viewport2MapX (TheUI.ActiveViewport, x),
+			Viewport2MapY(TheUI.ActiveViewport, y)) ) {
 {
 	    int v = TheUI.ActiveViewport;
 	    UnitUnderCursor = UnitOnScreen (NULL
@@ -759,6 +757,11 @@ global void UIHandleMouseMove(int x,int y)
 		,y-TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY);
 }
 #else /* SPLIT_SCREEN_SUPPORT */
+	if( IsMapFieldVisible(Screen2MapX(x),Screen2MapY(y)) ) {
+	    // Map coordinate in pixels
+	    DebugLevel3Fn("%d,%d\n"
+		    ,x-TheUI.MapX+MapX*TileSizeX
+		    ,y-TheUI.MapY+MapY*TileSizeY);
 	    UnitUnderCursor=UnitOnScreen(NULL,x-TheUI.MapX+MapX*TileSizeX
 		    ,y-TheUI.MapY+MapY*TileSizeY);
 #endif /* SPLIT_SCREEN_SUPPORT */
@@ -797,9 +800,10 @@ global void UIHandleMouseMove(int x,int y)
 		//	Minimap move viewpoint
 		//
 #ifdef SPLIT_SCREEN_SUPPORT
+		Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
 		MapViewportSetViewpoint (TheUI.ActiveViewport
-			,ScreenMinimap2MapX(CursorX)-MapWidth/2
-			,ScreenMinimap2MapY(CursorY)-MapHeight/2);
+			,ScreenMinimap2MapX (CursorX) - vp->MapWidth/2
+			,ScreenMinimap2MapY (CursorY) - vp->MapHeight/2);
 #else /* SPLIT_SCREEN_SUPPORT */
 		MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
 			,ScreenMinimap2MapY(CursorY)-MapHeight/2);
@@ -837,9 +841,10 @@ global void UIHandleMouseMove(int x,int y)
 	//
 
 #ifdef SPLIT_SCREEN_SUPPORT
+	Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
 	MapViewportSetViewpoint (TheUI.LastClickedVP
-		,ScreenMinimap2MapX(CursorX)-MapWidth/2
-		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
+		,ScreenMinimap2MapX(CursorX) - vp->MapWidth/2
+		,ScreenMinimap2MapY(CursorY) - vp->MapHeight/2);
 #else /* SPLIT_SCREEN_SUPPORT */
 	MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
 		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
@@ -1362,6 +1367,8 @@ global void UIHandleButtonDown(unsigned button)
 	TheUI.LastClickedVP = GetViewport (CursorX, CursorY);
 	DebugLevel0Fn ("last clicked viewport changed to %d.\n",
 		TheUI.LastClickedVP);
+	MustRedraw = RedrawMinimapCursor | RedrawMap;
+	/* to redraw the cursor immediately (and avoid up to 1 sec delay */
 #endif /* SPLIT_SCREEN_SUPPORT */
 	if( CursorBuilding ) {
 	    // Possible Selected[0] was removed from map

@@ -392,6 +392,19 @@ local void DrawVisibleRectangleCursor(int x,int y,int x1,int y1)
     //	Clip to map window.
     // FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
     //
+#ifdef SPLIT_SCREEN_SUPPORT
+    int v = TheUI.ActiveViewport;
+    if( x1<TheUI.VP[v].X ) {
+	x1=TheUI.VP[v].X;
+    } else if( x1>TheUI.VP[v].EndX ) {
+	x1=TheUI.VP[v].EndX;
+    }
+    if( y1<TheUI.VP[v].Y ) {
+	y1=TheUI.VP[v].Y;
+    } else if( y1>TheUI.VP[v].EndY ) {
+	y1=TheUI.VP[v].EndY;
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     if( x1<TheUI.MapX ) {
 	x1=TheUI.MapX;
     } else if( x1>TheUI.MapEndX ) {
@@ -402,6 +415,7 @@ local void DrawVisibleRectangleCursor(int x,int y,int x1,int y1)
     } else if( y1>TheUI.MapEndY ) {
 	y1=TheUI.MapEndY;
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
 
     if( x>x1 ) {
 	x=x1;
@@ -682,10 +696,10 @@ local void DrawBuildingCursor(void)
 
     // Align to grid
 #ifdef SPLIT_SCREEN_SUPPORT
-    Viewport *v = &TheUI.VP[TheUI.ActiveViewport];
+    Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
 
-    x=CursorX-(CursorX - v->X)%TileSizeX;
-    y=CursorY-(CursorY - v->Y)%TileSizeY;
+    x=CursorX-(CursorX - vp->X)%TileSizeX;
+    y=CursorY-(CursorY - vp->Y)%TileSizeY;
     BuildingCursorSX = mx = Viewport2MapX (TheUI.ActiveViewport, x);
     BuildingCursorSY = my = Viewport2MapY (TheUI.ActiveViewport, y);
 
@@ -693,7 +707,7 @@ local void DrawBuildingCursor(void)
     //	Draw building
     //
     PushClipping ();
-    SetClipping (v->X, v->Y, v->EndX, v->EndY);
+    SetClipping (vp->X, vp->Y, vp->EndX, vp->EndY);
 #else /* SPLIT_SCREEN_SUPPORT */
     x=CursorX-(CursorX-TheUI.MapX)%TileSizeX;
     y=CursorY-(CursorY-TheUI.MapY)%TileSizeY;
@@ -754,13 +768,13 @@ local void DrawBuildingCursor(void)
     h=CursorBuilding->TileHeight;
     BuildingCursorEY=my+h-1;
 #ifdef SPLIT_SCREEN_SUPPORT
-    if (my+h > v->MapY + v->MapHeight) {		// reduce to view limits
-	h = v->MapY + v->MapHeight - my;
+    if (my+h > vp->MapY + vp->MapHeight) {	// reduce to view limits
+	h = vp->MapY + vp->MapHeight - my;
     }
     w0 = CursorBuilding->TileWidth;	// reduce to view limits
     BuildingCursorEX=mx+w0-1;
-    if (mx+w0 > v->MapX + v->MapWidth) {
-	w0 = v->MapX + v->MapWidth - mx;
+    if (mx+w0 > vp->MapX + vp->MapWidth) {
+	w0 = vp->MapX + vp->MapWidth - mx;
     }
 #else /* SPLIT_SCREEN_SUPPORT */
     if( my+h>MapY+MapHeight ) {		// reduce to view limits
@@ -775,6 +789,9 @@ local void DrawBuildingCursor(void)
     while( h-- ) {
 	w=w0;
 	while( w-- ) {
+#ifdef SPLIT_SCREEN_SUPPORT
+	    int basex, basey;
+#endif /* SPLIT_SCREEN_SUPPORT */
 	    // FIXME: The field is covered by fog of war!
 	    if( f && CanBuildOn(mx+w,my+h,mask &
 		    ((Selected[0]->X==mx+w && Selected[0]->Y==my+h)
@@ -785,11 +802,29 @@ local void DrawBuildingCursor(void)
 		color=ColorRed;
 	    }
 	    // FIXME: I could do this faster+better
+#ifdef SPLIT_SCREEN_SUPPORT
+	    /* latimerius: I'm not sure what you have in mind but I can
+	     * at least move invariants out of the loops. */
+	    basex = x + w*TileSizeX;
+	    basey = y + h*TileSizeY;
+	    for( y1=0; y1<TileSizeY; ++y1 ) {
+		int j = basey+y1;
+		for( x1=y1&1; x1<TileSizeX; x1+=2 ) {
+		    int i = basex+x1;
+		    if (i > vp->EndX)
+			break;
+		    VideoDrawPixel (color, i, j);
+		}
+		if (j > vp->EndY)
+		    break;
+	    }
+#else /* SPLIT_SCREEN_SUPPORT */
 	    for( y1=0; y1<TileSizeY; ++y1 ) {
 		for( x1=y1&1; x1<TileSizeX; x1+=2 ) {
 		    VideoDrawPixel(color,x+w*TileSizeX+x1,y+h*TileSizeY+y1);
 		}
 	    }
+#endif /* SPLIT_SCREEN_SUPPORT */
 	}
     }
 }

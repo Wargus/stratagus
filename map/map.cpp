@@ -50,10 +50,12 @@
 
 global WorldMap TheMap;			/// The current map
 
+#ifndef SPLIT_SCREEN_SUPPORT
 global unsigned MapX;			/// Map tile X start on display
 global unsigned MapY;			/// Map tile Y start on display
 global unsigned MapWidth;		/// Map width in tiles on display
 global unsigned MapHeight;		/// Map height in tiles on display
+#endif /* SPLIT_SCREEN_SUPPORT */
 
 global int FlagRevealMap;		/// Flag must reveal the map
 
@@ -162,7 +164,7 @@ global void RevealMap(void)
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
 */
-global void MapViewportSetViewpoint (int v, int x,int y)
+global void MapViewportSetViewpoint (int v, int x, int y)
 {
     unsigned MapX = TheUI.VP[v].MapX;
     unsigned MapY = TheUI.VP[v].MapY;
@@ -205,7 +207,7 @@ global void MapCenterViewport (int v, int x,int y)
     MapViewportSetViewpoint(v, x-(MapWidth/2), y-(MapHeight/2));
 }
 
-#endif /* SPLIT_SCREEN_SUPPORT */
+#else /* SPLIT_SCREEN_SUPPORT */
 
 /**
 **	Change viewpoint of map to x,y
@@ -247,6 +249,8 @@ global void MapCenter(int x,int y)
 {
     MapSetViewpoint(x-(MapWidth/2),y-(MapHeight/2));
 }
+
+#endif /* SPLIT_SCREEN_SUPPORT */
 
 /*----------------------------------------------------------------------------
 --	Map queries
@@ -587,6 +591,30 @@ global void PreprocessMap(void)
     }
 }
 
+#ifdef SPLIT_SCREEN_SUPPORT
+
+global int Viewport2MapX (int v, int x)
+{
+    return (((x)-TheUI.VP[v].X)/TileSizeX+TheUI.VP[v].MapX);
+}
+
+global int Viewport2MapY (int v, int y)
+{
+    return (((y)-TheUI.VP[v].Y)/TileSizeY+TheUI.VP[v].MapY);
+}
+
+global int Map2ViewportX (int v, int x)
+{
+    return (TheUI.VP[v].X+((x)-TheUI.VP[v].MapX)*TileSizeX);
+}
+
+global int Map2ViewportY (int v, int y)
+{
+    return (TheUI.VP[v].Y+((y)-TheUI.VP[v].MapY)*TileSizeY);
+}
+
+#else /* SPLIT_SCREEN_SUPPORT */
+
 /**
 **	Convert a screen coordinate to map tile.
 **
@@ -634,47 +662,6 @@ global int Map2ScreenY(int y)
 {
     return (TheUI.MapY+((y)-MapY)*TileSizeY);
 }
-
-#ifdef SPLIT_SCREEN_SUPPORT
-
-/**
-**	FIXME: docu
-*/
-global int Viewport2MapX (int v, int x)
-{
-    int r;
-
-    r=((x)-TheUI.VP[v].X)/TileSizeX+TheUI.VP[v].MapX;
-    return r<TheMap.Width ? r : TheMap.Width-1;
-}
-
-/**
-**	FIXME: docu
-*/
-global int Viewport2MapY (int v, int y)
-{
-    int r;
-
-    r=((y)-TheUI.VP[v].Y)/TileSizeY+TheUI.VP[v].MapY;
-    return r<TheMap.Height ? r : TheMap.Height-1;
-}
-
-/**
-**	FIXME: docu
-*/
-global int Map2ViewportX (int v, int x)
-{
-    return TheUI.VP[v].X+((x)-TheUI.VP[v].MapX)*TileSizeX;
-}
-
-/**
-**	FIXME: docu
-*/
-global int Map2ViewportY (int v, int y)
-{
-    return TheUI.VP[v].Y+((y)-TheUI.VP[v].MapY)*TileSizeY;
-}
-
 #endif /* SPLIT_SCREEN_SUPPORT */
 
 /**

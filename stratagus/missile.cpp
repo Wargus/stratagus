@@ -693,30 +693,6 @@ local void GetMissileMapArea( const Missile* missile,
     *ey=(missile->Y+missile->Type->Height)/TileSizeY;
 }
 
-/**
-**      Check missile visibility.
-**
-**      @param missile  Missile pointer to check if visible.
-**
-**      @return         Returns true if visible, false otherwise.
-*/
-local int MissileVisible(const Missile* missile)
-{
-    int tileMinX;
-    int tileMaxX;
-    int tileMinY;
-    int tileMaxY;
-
-    GetMissileMapArea(missile,&tileMinX,&tileMinY,&tileMaxX,&tileMaxY);
-    if ( !AnyMapAreaVisibleOnScreen(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
-	return 0;
-    }
-    DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
-		tileMinX,tileMaxX,tileMinY,tileMaxY,
-		MapX,MapX+MapWidth,MapY,MapY+MapHeight);
-    return 1;
-}
-
 #ifdef SPLIT_SCREEN_SUPPORT
 /**
 **      Check missile visibility in a given viewport.
@@ -735,6 +711,30 @@ local int MissileVisibleInViewport (int v, const Missile* missile)
 
     GetMissileMapArea(missile,&tileMinX,&tileMinY,&tileMaxX,&tileMaxY);
     if (!AnyMapAreaVisibleInViewport (v,tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
+	return 0;
+    }
+    DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
+		tileMinX,tileMaxX,tileMinY,tileMaxY,
+		MapX,MapX+MapWidth,MapY,MapY+MapHeight);
+    return 1;
+}
+#else /* SPLIT_SCREEN_SUPPORT */
+/**
+**      Check missile visibility.
+**
+**      @param missile  Missile pointer to check if visible.
+**
+**      @return         Returns true if visible, false otherwise.
+*/
+local int MissileVisible(const Missile* missile)
+{
+    int tileMinX;
+    int tileMaxX;
+    int tileMinY;
+    int tileMaxY;
+
+    GetMissileMapArea(missile,&tileMinX,&tileMinY,&tileMaxX,&tileMaxY);
+    if ( !AnyMapAreaVisibleOnScreen(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
 	return 0;
     }
     DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
