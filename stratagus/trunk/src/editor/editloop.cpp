@@ -97,7 +97,7 @@ enum _mode_buttons_ {
     TileButton,				/// Tile mode button
 };
 
-local char** EditorUnitTypes;		/// Sorted editor unit-type table
+global char** EditorUnitTypes;		/// Sorted editor unit-type table
 
 local int UnitIndex;			/// Unit icon draw index
 local int CursorUnitIndex;		/// Unit icon under cursor
@@ -400,13 +400,21 @@ local void DrawUnitIcons(void)
     }
 
     x = TheUI.InfoPanelX + 4;
-    y += 18 + 4;
+    y += 18 * 1 + 4;
+    if( SelectedPlayer != -1 ) {
+	sprintf(buf,"Player %d: %s",SelectedPlayer,
+		Players[SelectedPlayer].RaceName);
+	VideoDrawText(x, y, GameFont, buf);
+    }
+
+    x = TheUI.InfoPanelX + 4;
+    y += 18;
 
     j = 0;
-    for (i = 0; UnitTypeWcNames[i]; ++i) {
+    for (i = 0; EditorUnitTypes[i]; ++i) {
 	const UnitType *type;
 
-	if ((type = UnitTypeByIdent(UnitTypeWcNames[i]))) {
+	if ((type = UnitTypeByIdent(EditorUnitTypes[i]))) {
 	    if (type->Building) {
 		++j;
 	    }
@@ -417,10 +425,10 @@ local void DrawUnitIcons(void)
     y += 16;
 
     j = 0;
-    for (i = 0; UnitTypeWcNames[i]; ++i) {
+    for (i = 0; EditorUnitTypes[i]; ++i) {
 	const UnitType *type;
 
-	if ((type = UnitTypeByIdent(UnitTypeWcNames[i]))) {
+	if ((type = UnitTypeByIdent(EditorUnitTypes[i]))) {
 	    if (!type->Building && type->UnitType == UnitTypeLand) {
 		++j;
 	    }
@@ -431,10 +439,10 @@ local void DrawUnitIcons(void)
     y += 16;
 
     j = 0;
-    for (i = 0; UnitTypeWcNames[i]; ++i) {
+    for (i = 0; EditorUnitTypes[i]; ++i) {
 	const UnitType *type;
 
-	if ((type = UnitTypeByIdent(UnitTypeWcNames[i]))) {
+	if ((type = UnitTypeByIdent(EditorUnitTypes[i]))) {
 	    if (!type->Building && type->UnitType == UnitTypeFly) {
 		++j;
 	    }
@@ -445,10 +453,10 @@ local void DrawUnitIcons(void)
     y += 16;
 
     j = 0;
-    for (i = 0; UnitTypeWcNames[i]; ++i) {
+    for (i = 0; EditorUnitTypes[i]; ++i) {
 	const UnitType *type;
 
-	if ((type = UnitTypeByIdent(UnitTypeWcNames[i]))) {
+	if ((type = UnitTypeByIdent(EditorUnitTypes[i]))) {
 	    if (!type->Building && type->UnitType == UnitTypeNaval) {
 		++j;
 	    }
@@ -948,7 +956,7 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	}
 	if( CursorUnitIndex!=-1 ) {
 	    SelectedUnitIndex = CursorUnitIndex;
-	    CursorBuilding = UnitTypeByWcNum(SelectedUnitIndex);
+	    CursorBuilding = UnitTypeByIdent(EditorUnitTypes[CursorUnitIndex]);
 	    ThisPlayer = Players + SelectedPlayer;
 	    return;
 	}
@@ -1244,7 +1252,10 @@ local void EditorCallbackMouse(int x, int y)
 		}
 		if (bx < x && x < bx + ICON_WIDTH
 			&& by < y && y < by + ICON_HEIGHT) {
-		    SetStatusLine(UnitTypeByIdent(EditorUnitTypes[i])->Name);
+		    sprintf(buf,"%s \"%s\"",
+			    UnitTypeByIdent(EditorUnitTypes[i])->Ident,
+			    UnitTypeByIdent(EditorUnitTypes[i])->Name);
+		    SetStatusLine(buf);
 		    CursorUnitIndex = i;
 		    //ButtonUnderCursor = i + 100;
 		    //CursorOn = CursorOnButton;
@@ -1446,17 +1457,25 @@ local void CreateEditor(void)
 	    DebugLevel0Fn("Player nobody has a start position\n");
 	}
     }
-    //
-    //  Build editor unit-type tables.
-    //
-    i = 0;
-    while (UnitTypeWcNames[i]) {
-	++i;
+
+    if( !EditorUnitTypes ) {
+	//
+	//  Build editor unit-type tables.
+	//
+	i = 0;
+	while (UnitTypeWcNames[i]) {
+	    ++i;
+	}
+	n = i + 1;
+	EditorUnitTypes = malloc(sizeof(char*) * n);
+	for (i = 0; i < n; ++i) {
+	    EditorUnitTypes[i] = UnitTypeWcNames[i];
+	}
     }
-    n = i + 1;
-    EditorUnitTypes = malloc(sizeof(char*) * n);
-    for (i = 0; i < n; ++i) {
-	EditorUnitTypes[i] = UnitTypeWcNames[i];
+
+    if( 1 ) {
+	ProcessMenu("menu-editor-tips", 1);
+	InterfaceState = IfaceStateNormal;
     }
 }
 
