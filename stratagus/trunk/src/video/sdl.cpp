@@ -858,7 +858,7 @@ global void ToggleGrabMouse(void)
 */
 global void ToggleFullScreen(void)
 {
-#ifndef USE_WIN32
+#ifdef USE_WIN32
     long framesize;
     void *pixels;
     SDL_Color *palette;
@@ -926,6 +926,8 @@ global void ToggleFullScreen(void)
     SDL_UnlockSurface(Screen);
 
     SDL_SetClipRect(Screen, &clip);
+
+    Invalidate();			// Update display
 
     return;
 #else
