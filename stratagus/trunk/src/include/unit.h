@@ -64,7 +64,7 @@
 **
 **		A pointer into Player::Units[], where the unit pointer is
 **		stored. Player::Units[] is a table of all units currently
-**		belonging to a player. 	This pointer is only needed to speed
+**		belonging to a player.	This pointer is only needed to speed
 **		up, the remove of the unit pointer from Player::Units[].
 **
 **	Unit::Next
@@ -425,13 +425,12 @@ struct _unit_ {
     unsigned	Attacked : 4;		/// unit is attacked
 
     unsigned	Burning : 1;		/// unit is burning
-    // FIXME: next not used!
-    //unsigned	Visible : 1;		/// unit is visible (submarine)
+    unsigned	Visible : 1;		/// unit is visible (submarine)
     unsigned	Destroyed : 1;		/// unit is destroyed pending reference
     unsigned	Removed : 1;		/// unit is removed (not on map)
     unsigned	Selected : 1;		/// unit is selected
     unsigned	Constructed : 1;	/// unit is in construction
-    unsigned 	Active : 1;		/// unit is active for AI
+    unsigned	Active : 1;		/// unit is active for AI
 
     unsigned	Mana : 8;		/// mana points
     unsigned	HP;			/// hit points
@@ -599,13 +598,16 @@ extern void ReleaseUnit(Unit* unit);
 extern Unit* MakeUnit(UnitType* type,Player* player);
     ///	Create a new unit and place on map
 extern Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player);
-
+    /// FIXME: more docu
+extern void RemoveUnit(Unit* unit);
     /// FIXME: more docu
 extern void UnitLost(const Unit* unit);
     /// FIXME: more docu
 extern void UpdateForNewUnit(const Unit* unit,int upgrade);
     /// FIXME: more docu
 extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
+    /// Mark submarine as seen.
+extern void MarkSubmarineSeen(int x,int y,int range);
     /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if unit is known on the map
@@ -617,8 +619,6 @@ extern int CheckUnitToBeDrawn(const Unit* unit);
     /// FIXME: more docu
 extern void GetUnitMapArea( const Unit* unit,
                             int *sx, int *sy, int *ex, int *ey );
-    /// FIXME: more docu
-extern void RemoveUnit(Unit* unit);
     /// Increment mana of all magic units each second
 extern void UnitIncrementMana(void);
     /// Increment health of all regenerating units each second
