@@ -483,7 +483,7 @@ local SCM CclDefineUnitType(SCM list)
 		} else if (gh_eq_p(value, gh_symbol2scm("harvest-from-outside"))) {
 		    res->HarvestFromOutside = 1;
 		} else if (gh_eq_p(value, gh_symbol2scm("file-when-empty"))) {
-		    res->FileWhenLoaded = gh_scm2newstr(gh_car(sublist),0);
+		    res->FileWhenEmpty = gh_scm2newstr(gh_car(sublist),0);
 		    sublist = gh_cdr(sublist);
 		} else if (gh_eq_p(value, gh_symbol2scm("file-when-loaded"))) {
 		    res->FileWhenLoaded = gh_scm2newstr(gh_car(sublist),0);
