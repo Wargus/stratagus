@@ -213,9 +213,10 @@ CONTRIB	= contrib/cross.png contrib/red_cross.png \
 	  contrib/health2.png contrib/mana2.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
 	  contrib/music/toccata.mod.gz \
+	  contrib/FreeCraft-beos.proj \
 	  contrib/msvc.zip contrib/macosx.tgz contrib/stdint.h
 
-MISC    = Makefile Common.mk Rules.make.orig FreeCraft-beos.proj setup \
+MISC    = Makefile Common.mk Rules.make.orig setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
 	  .indent.pro make/common.scc make/rules.scc make/makefile.scc \
 	  make/README tools/udta.c tools/ugrd.c $(CONTRIB) \
@@ -409,7 +410,7 @@ WIN32=	\
     EXE='.exe' \
     XLDFLAGS='' \
     XIFLAGS='' \
-    VIDEO='-DUSE_WIN32 $(SDL)'  \
+    VIDEO='-DUSE_WIN32 -DFLAC_IDIOTIC2 $(SDL)'  \
     VIDEOLIB='-L$(CROSSDIR)/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32' \
     RULESFILE=$(WINRULESFILE)
 
