@@ -116,6 +116,12 @@
 **		@note It is planned to support more than one weapons.
 **		And the sound of the missile should be used as fire sound.
 **
+**	UnitType::Explosion
+**
+**		Configuration and run time variable of the missile explosion.
+**		This is the explosion that happens if unit is set to
+**		ExplodeWhenKilled
+**
 **	UnitType::CorpseName
 **
 **		Corpse unit-type name, should only be used during setup.
@@ -685,6 +691,7 @@ struct _unit_type_ {
 
     IconConfig	Icon;			/// Icon to display for this unit
     MissileConfig Missile;		/// Missile weapon
+    MissileConfig Explosion;		/// Missile for unit explosion
 
     char*	CorpseName;		/// Corpse type name
     UnitType*	CorpseType;		/// Corpse unit-type

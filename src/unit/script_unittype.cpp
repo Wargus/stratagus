@@ -350,8 +350,9 @@ local SCM CclDefineUnitType(SCM list)
 	    type->CorpseScript=gh_scm2int(gh_cadr(sublist));
 	} else if( gh_eq_p(value,gh_symbol2scm("explode-when-killed")) ) {
 	    type->ExplodeWhenKilled=1;
+	    type->Explosion.Name=gh_scm2newstr(gh_car(list),NULL);
+	    type->Explosion.Missile=NULL;
 	    list=gh_cdr(list);
-
 	} else if( gh_eq_p(value,gh_symbol2scm("type-land")) ) {
 	    type->UnitType=UnitTypeLand;
 	} else if( gh_eq_p(value,gh_symbol2scm("type-fly")) ) {

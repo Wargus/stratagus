@@ -1029,12 +1029,13 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a name="set-reveal-attacker!"></a>
 <h3>(set-reveal-attacker! reveal)</h3>
 
-.
-
+Sets where unit will respond the the attacking unit or not.  If set to true,
+they will respond whether they can see the unit or not.  If set to false,
+they will only response if the attacker is within their reaction range.
 
 <dl>
 <dt>reveal</dt>
-<dd>.
+<dd>#f or #t
 </dd>
 </dl>
 
