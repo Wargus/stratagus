@@ -217,7 +217,7 @@ global void AddDependency(const char* target,const char* required,int count
 	DebugLevel0(__FUNCTION__": wrong dependency target %s\n",target);
 	return;
     }
-    hash=(int)rule.Kind.UnitType%(sizeof(DependHash)/sizeof(*DependHash));
+    hash=rule.Kind.UnitType->Type%(sizeof(DependHash)/sizeof(*DependHash));
     DebugLevel3("Hash %d\n",hash);
 
     //
@@ -328,7 +328,7 @@ global int CheckDependByIdent(const Player* player,const char* target)
     //
     //	Find rule
     //
-    i=(int)rule.Kind.UnitType%(sizeof(DependHash)/sizeof(*DependHash));
+    i=rule.Kind.UnitType->Type%(sizeof(DependHash)/sizeof(*DependHash));
 
     if( (node=DependHash[i]) ) {	// find correct entry
 	while( node->Type!=rule.Type
