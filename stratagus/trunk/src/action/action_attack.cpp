@@ -78,9 +78,6 @@ void AnimateActionAttack(Unit* unit)
 	//  So direct fire missile.
 	//  FIXME : wait a little.
 	if (!unit->Type->NewAnimations || !unit->Type->NewAnimations->Attack) {
-		if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
-			PlayUnitSound(unit, VoiceAttacking);
-		}
 		FireMissile(unit);
 		unit->Invisible = 0; // unit is invisible until attacks
 		return;

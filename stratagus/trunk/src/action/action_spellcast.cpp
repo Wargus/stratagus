@@ -76,10 +76,6 @@ void AnimateActionSpellCast(Unit* unit)
 
 		flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
 
-		if ((flags & AnimationSound)) {
-			PlayUnitSound(unit, VoiceAttacking); // FIXME: spell sound?
-		}
-
 		if (flags & AnimationMissile) { // FIXME: should cast spell ?
 			FireMissile(unit);          // we should not get here ??
 		}
