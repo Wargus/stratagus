@@ -31,18 +31,45 @@
 
 #include "freecraft.h"
 
-#if defined(WITH_SOUND) // {
+#if defined(USE_CDDA) // {
 
 #include "sound_server.h"
 #include <stdlib.h>
+#include <stdio.h>
 
-/*----------------------------------------------------------------------------
---	Declaration
-----------------------------------------------------------------------------*/
+global struct cdrom_read_audio data;
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+local int CDRead(Sample *sample, void *buf, int len)
+{
+    int pos;
+    
+    pos = (int)sample->User;
+
+    data.addr.lba = CDtocentry[CDTrack].cdte_addr;
+    data.addr_format = CDROM_LBA;
+    data.nframes = 50;
+    data.buf = sample->User;
+    ioctl(CDDrive, CDROMREADAUDIO, &data);
+
+    memcpy(buf, data.buf + pos, data.nframes * 2352);
+    sample->User = (void*)(pos + len * 2352);
+
+    return len;
+}
+
+local void CDFree(Sample *sample)
+{
+    free(sample);
+}
+
+local const SampleType CDStreamSampleType = {
+    CDRead,
+    CDFree,
+};
 
 /**
 **	Load CD.
@@ -56,10 +83,25 @@
 global Sample* LoadCD(const char* name, int flags)
 {
     Sample* sample = NULL;
-    
+    int i;
+
+    sample = malloc(sizeof(*sample));
+    sample->Channels = 2;
+    sample->SampleSize = 16;
+    sample->Frequency = 44100;
+    sample->Length = 0;
+    sample->Type = &CDStreamSampleType;
+    sample->User = malloc(50 * 2352);
+
+    data.addr.lba = CDtocentry[flags].cdte_addr.lba;
+    data.addr_format = CDROM_LBA;
+    data.nframes = 50;
+    data.buf = sample->User;
+    ioctl(CDDrive, CDROMREADAUDIO, &data);
+
     return sample;
 }
 
-#endif	// } WITH_SOUND
+#endif	// } USE_CDDA
 
 //@}
