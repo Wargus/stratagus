@@ -3372,11 +3372,16 @@ int ViewPointDistanceToUnit(const Unit* dest)
 **
 **  @param source    Unit type pointer of the attacker.
 **  @param dest      Unit type pointer of the target.
+**
+**  @return 0 if attacker can't target the unit, else a positive number.
 */
 int CanTarget(const UnitType* source, const UnitType* dest)
 {
 	int i;
 
+	if (source == dest) { // cannot attack itself.
+		return 0;
+	}
 	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
 		if (source->CanTargetFlag[i] != CONDITION_TRUE) {
 			if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
@@ -3412,6 +3417,9 @@ int CanTransport(const Unit* transporter, const Unit* unit)
 	int i;
 
 	if (!transporter->Type->CanTransport) {
+		return 0;
+	}
+	if (transporter == unit) { // Cannot transporter itself.
 		return 0;
 	}
 	if (transporter->BoardCount >= transporter->Type->MaxOnBoard) { // full
