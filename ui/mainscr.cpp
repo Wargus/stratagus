@@ -953,19 +953,67 @@ local char StatusLine[STATUS_LINE_LEN];			/// status line/hints
 */
 global void DrawStatusLine(void)
 {
+#ifdef NEW_UI
+    int i, x;
+    char * startpos;
+    char * endpos;
+    char * endline;
+    char * s;
+#endif
     if (TheUI.StatusLine.Graphic) {
 	VideoDrawSub(TheUI.StatusLine.Graphic
 	    ,0,0
 	    ,TheUI.StatusLine.Graphic->Width,TheUI.StatusLine.Graphic->Height
 	    ,TheUI.StatusLineX,TheUI.StatusLineY);
     }
+#ifdef NEW_UI
+    // maxy: split "$1", "$2", ... from the string and draw resource icon instead
+    //       beware: stringhandling in C :-/
+#endif
     if( StatusLine[0] ) {
 	PushClipping();
 	SetClipping(TheUI.StatusLineTextX,TheUI.StatusLineTextY
 		,TheUI.StatusLineX+TheUI.StatusLine.Graphic->Width-1
 		,TheUI.StatusLineY+TheUI.StatusLine.Graphic->Height-1);
+#ifndef NEW_UI
 	VideoDrawTextClip(TheUI.StatusLineTextX,TheUI.StatusLineTextY
 		,TheUI.StatusLineFont,StatusLine);
+#else
+    
+	// need one more to easily read one char too far
+	s = calloc(1, strlen(StatusLine)+2);
+	strcpy(s, StatusLine);
+	startpos = s;
+	endline = s + strlen(s);
+	x = TheUI.StatusLineTextX;
+	do {
+	    endpos = strchr(startpos, '$');
+	    if( !endpos ) {
+		endpos = endline;
+	    } else {
+		// replace the $
+		*endpos = '\0';
+	    }
+	    x += VideoDrawTextClip(x, TheUI.StatusLineTextY
+				   ,TheUI.StatusLineFont,startpos);
+	    if( endpos[1]>='0' && endpos[1]<='9' ) {
+		i = endpos[1]-'0';
+		if( TheUI.Resources[i].Icon.Graphic ) {
+		    VideoDrawSub(TheUI.Resources[i].Icon.Graphic
+				 ,0,TheUI.Resources[i].IconRow*TheUI.Resources[i].IconH
+				 ,TheUI.Resources[i].IconW,TheUI.Resources[i].IconH
+				 ,x,TheUI.StatusLineY+1);
+		    // FIXME: hardcoded useable icon width
+		    x += 15;
+		}
+	    } else if( endpos[1] == '$' ) {
+		// escaped "$$"
+		endpos--;
+	    }
+	    // skip the "$1" characters
+	    startpos = endpos + 2;
+	} while( startpos < endline );
+#endif
 	PopClipping();
     }
 }
@@ -994,6 +1042,7 @@ global void ClearStatusLine(void)
     }
 }
 
+#ifndef NEW_UI
 /*----------------------------------------------------------------------------
 --	COSTS
 ----------------------------------------------------------------------------*/
@@ -1100,6 +1149,7 @@ global void ClearCosts(void)
     memset(costs,0,sizeof(costs));
     SetCosts(0,0,costs);
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --	INFO PANEL

@@ -51,6 +51,9 @@
 #include "sound.h"
 #include "map.h"
 #include "pathfinder.h"
+#ifdef NEW_UI
+#include "interface.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --	Defines
@@ -161,7 +164,13 @@ local Unit* CheckForDeadGoal(Unit* unit)
 		unit->SavedOrder.Goal=NoUnitP;
 
 		if( unit->Selected && unit->Player==ThisPlayer ) {
+#ifndef NEW_UI
 		    MustRedraw|=RedrawButtonPanel;
+#else
+		    // FIXME: not really used because actions
+		    // cannot yet be shown with NEW_UI
+		    SelectedUnitChanged();
+#endif
 		}
 		goal=unit->Orders[0].Goal;
 	    }
@@ -371,7 +380,11 @@ local void MoveToTarget(Unit* unit)
 	    unit->SavedOrder.Goal=NoUnitP;
 
 	    if( unit->Selected && unit->Player==ThisPlayer ) {
+#ifndef NEW_UI
 		MustRedraw|=RedrawButtonPanel;
+#else
+		SelectedUnitChanged();
+#endif
 	    }
 	    return;
 	}
@@ -445,7 +458,11 @@ local void AttackTarget(Unit* unit)
 		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
 
 		    if( unit->Selected && unit->Player==ThisPlayer ) {
+#ifndef NEW_UI
 			MustRedraw|=RedrawButtonPanel;
+#else
+			SelectedUnitChanged();
+#endif
 		    }
 		}
 		return;

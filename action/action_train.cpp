@@ -199,8 +199,13 @@ global void HandleActionTrain(Unit* unit)
 	}
 
 	if( IsOnlySelected(unit) ) {
+#ifndef NEW_UI
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawPanels;
+#else
+	    SelectedUnitChanged();
+	    MustRedraw|=RedrawInfoPanel;
+#endif
 	}
 
 	return;

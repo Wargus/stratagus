@@ -40,54 +40,65 @@
 #include "player.h"
 #include "unit.h"
 #include "icons.h"
+#ifdef NEW_UI
+#include "ccl.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --	Definitons
 ----------------------------------------------------------------------------*/
 
-    /// Button Commands
+    /// Button Commands that need target selection
 enum _button_cmd_ {
-    ButtonMove,				/// order move
+    ButtonMove,                        /// order move
+    ButtonAttack,                      /// order attack
+    ButtonRepair,                      /// order repair
+    ButtonHarvest,                     /// order harvest
+    ButtonBuild,                       /// order build
+    ButtonPatrol,                      /// order patrol
+    ButtonAttackGround,                /// order attack ground
+    ButtonSpellCast,                   /// order cast spell
+    ButtonUnload,                      /// order unload unit
+    ButtonDemolish,                    /// order demolish/explode
+#ifndef NEW_UI
     ButtonStop,				/// order stop
-    ButtonAttack,			/// order attack
-    ButtonRepair,			/// order repair
-    ButtonHarvest,			/// order harvest
     ButtonButton,			/// choose other button set
-    ButtonBuild,			/// order build
     ButtonTrain,			/// order train
-    ButtonPatrol,			/// order patrol
     ButtonStandGround,			/// order stand ground
-    ButtonAttackGround,			/// order attack ground
     ButtonReturn,			/// order return goods
-    ButtonDemolish,			/// order demolish/explode
-    ButtonSpellCast,			/// order cast spell
     ButtonResearch,			/// order reseach
     ButtonUpgradeTo,			/// order upgrade
-    ButtonUnload,			/// order unload unit
     ButtonCancel,			/// cancel
     ButtonCancelUpgrade,		/// cancel upgrade
     ButtonCancelTrain,			/// cancel training
     ButtonCancelBuild,			/// cancel building
+#endif
 };
 
     /// typedef for action of button
 typedef struct _button_action_ ButtonAction;
+#ifndef NEW_UI
 typedef int (*ButtonCheckFunc)(const Unit*,const ButtonAction*);
+#endif
 
     /// Action of button
 struct _button_action_ {
+#ifndef NEW_UI
     int		Pos;			/// button position in the grid
     int		Level;			/// requires button level
-    IconConfig	Icon;			/// icon to display
     enum _button_cmd_ Action;		/// command on button press
     int		Value;			/// extra value for command
     char*	ValueStr;		/// keep original value string
 	/// Check if this button is allowed
     ButtonCheckFunc	Allowed;
     char*	AllowStr;		/// argument for allowed
+    char*	UnitMask;		/// for which units is it available
+#else
+    SCM 	Action;			/// script on button press
+#endif
+    IconConfig	Icon;			/// icon to display
     int		Key;			/// alternative on keyboard
     char*	Hint;			/// tip text
-    char*	UnitMask;		/// for which units is it available
 };
 
     /// Button area under cursor
@@ -297,11 +308,18 @@ extern void DrawConsole(void);
 extern void InitButtons(void);
     /// Free memory for buttons
 extern void CleanButtons(void);
+#ifndef NEW_UI
     /// Make a new button
 extern int AddButton(int pos,int level,const char* IconIdent,
 	enum _button_cmd_ action,const char* value,
 	const ButtonCheckFunc func,const void* arg,
 	int key,const char* hint,const char* umask);
+#else
+    /// Add a new button to the command panel
+extern void AddButton(int pos, char *icon_ident, SCM action, int key, char *hint);
+    /// Remove a single button from the panel
+global void RemoveButton(int pos);
+#endif
 
     /// Save all buttons
 extern void SaveButtons(FILE* file);
@@ -388,11 +406,13 @@ extern void ClearStatusLine(void);
     /// Draw status line
 extern void DrawStatusLine(void);
     /// Draw costs in status line
+#ifndef NEW_UI
 extern void DrawCosts(void);
     /// Set costs to be displayed in status line
 extern void SetCosts(int,int,const int* costs);
     /// Clear the costs displayed in status line (undisplay!)
 extern void ClearCosts(void);
+#endif
 
     /// Draw the unit info panel
 extern void DrawInfoPanel(void);
@@ -405,13 +425,18 @@ extern void DrawButtonPanel(void);
     /// Update the content of the unit button panel
 extern void UpdateButtonPanel(void);
     /// Handle button click in button panel area
+#ifndef NEW_UI
 extern void DoButtonButtonClicked(int button);
+#else
+extern void DoButtonButtonClicked(int pos);
+#endif
     /// Lookup key for bottom panel buttons
 extern int DoButtonPanelKey(int key);
 
     /// Handle the mouse in scroll area
 extern int HandleMouseScrollArea(int,int);
 
+#ifndef NEW_UI
 //
 //	in button_checks.c
 //
@@ -433,7 +458,6 @@ extern int ButtonCheckNoNetwork(const Unit*,const ButtonAction*);
 extern int ButtonCheckNoWork(const Unit*,const ButtonAction*);
     /// Check if unit isn't researching or upgrading
 extern int ButtonCheckNoResearch(const Unit*,const ButtonAction*);
-
     /// Check if all requirements for an attack to are meet
 extern int ButtonCheckAttack(const Unit*,const ButtonAction*);
     /// Check if all requirements for an upgrade to are meet
@@ -442,6 +466,21 @@ extern int ButtonCheckUpgradeTo(const Unit*,const ButtonAction*);
 extern int ButtonCheckResearch(const Unit*,const ButtonAction*);
     /// Check if all requirements for a single research are meet
 extern int ButtonCheckSingleResearch(const Unit*,const ButtonAction*);
+#endif
+
+//
+//	in ccl_ui.c
+//
+    /// Called whenever the units selection is altered
+extern void SelectionChanged(void);
+    /// Called whenever the selected unit was updated
+extern void SelectedUnitChanged(void);
+#ifdef NEW_UI
+    /// Enter target selection mode
+extern void ChooseTargetBegin(int action);
+    /// Clean up when leaving target selection mode
+extern void ChooseTargetFinish(void);
+#endif
 
 //@}
 

@@ -288,8 +288,8 @@ local void LeaveTransporter(Unit* unit)
 	}
     }
     if( IsOnlySelected(unit) ) {
-	UpdateButtonPanel();
-	MustRedraw|=RedrawPanels;
+	SelectedUnitChanged();
+	MustRedraw|=RedrawInfoPanel;
     }
     
     // We still have some units to unload, find a piece of free coast.

@@ -552,6 +552,7 @@ global void SaveUpgrades(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: upgrades $Id$\n\n");
 
+    /* remove?
     //
     //	Save all upgrades
     //
@@ -562,10 +563,12 @@ global void SaveUpgrades(FILE* file)
 	for( j=0; j<MaxCosts; ++j ) {
 	    fprintf(file," %5d",Upgrades[i].Costs[j]);
 	}
-
 	fprintf(file,"))\n");
     }
     fprintf(file,"\n");
+    */
+
+    // FIXME: can at least partially be removed
 
     //
     //	Save all upgrade modifiers.
@@ -1463,7 +1466,7 @@ global void UpgradeAcquire( Player* player, const Upgrade* upgrade )
     //	Upgrades could change the buttons displayed.
     //
     if( player==ThisPlayer ) {
-	UpdateButtonPanel();
+	SelectedUnitChanged();
 	MustRedraw|=RedrawInfoPanel;
     }
 }

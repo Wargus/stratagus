@@ -245,11 +245,11 @@ global void LoadUserInterface(void)
 		TheUI.MenuButtonGraphic.Graphic->Height);
 #endif
     }
-    if( TheUI.Minimap.File ) {
-	TheUI.Minimap.Graphic=LoadGraphic(TheUI.Minimap.File);
+    if( TheUI.MinimapPanel.File ) {
+	TheUI.MinimapPanel.Graphic=LoadGraphic(TheUI.MinimapPanel.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.Minimap.Graphic,TheUI.Minimap.Graphic->Width,
-		TheUI.Minimap.Graphic->Height);
+	MakeTexture(TheUI.MinimapPanel.Graphic,TheUI.MinimapPanel.Graphic->Width,
+		TheUI.MinimapPanel.Graphic->Height);
 #endif
     }
     if( TheUI.StatusLine.File ) {
@@ -295,187 +295,6 @@ global void LoadUserInterface(void)
 }
 
 /**
-**	Save the UI structure.
-**
-**	@param file	Save file handle
-**	@param ui	User interface to save
-*/
-local void SaveUi(FILE* file,const UI* ui)
-{
-    int i;
-    MenuPanel* menupanel;
-
-    fprintf(file,"(define-ui '%s %d %d\t; Selector",
-	    ui->Name,ui->Width,ui->Height);
-
-    fprintf(file,"\n  'normal-font-color '%s"
-                 "\n  'reverse-font-color '%s",
-	    ui->NormalFontColor, ui->ReverseFontColor);
-    fprintf(file,"\n");
-
-    fprintf(file,"\n  'filler (list");
-    fprintf(file,"\n    'file \"%s\"",ui->Filler[0].File);
-    fprintf(file,"\n    'pos '(%3d %3d)",ui->FillerX[0],ui->FillerY[0]);
-    fprintf(file,")\n");
-
-    fprintf(file,"\n  ; Resource line");
-    fprintf(file,"\n  (list \"%s\" %d %d)",
-	    ui->Resource.File,ui->ResourceX,ui->ResourceY);
-
-    fprintf(file,"\n  'resources (list");
-    for( i=1; i<MaxCosts+2; ++i ) {
-	if( !ui->Resources[i].Icon.File ) {
-	    continue;
-	}
-	fprintf(file,"\n    '%s",
-		i<MaxCosts ? DefaultResourceNames[i] :
-		    i==FoodCost ? "food" : "score");
-	fprintf(file," (list 'file \"%s\" 'row %d\n"
-	             "      'pos '(%d %d) 'size '(%d %d) 'text-pos '(%d %d))",
-		ui->Resources[i].Icon.File,ui->Resources[i].IconRow,
-		ui->Resources[i].IconX,ui->Resources[i].IconY,
-		ui->Resources[i].IconW,ui->Resources[i].IconH,
-		ui->Resources[i].TextX,ui->Resources[i].TextY);
-    }
-    fprintf(file,")\n");
-
-    fprintf(file,"  ; Info panel\n");
-    fprintf(file,"  (list \"%s\" %d %d %d %d)\n",
-	    ui->InfoPanel.File,
-	    ui->InfoPanelX,ui->InfoPanelY,
-	    ui->InfoPanelW,ui->InfoPanelH);
-
-    fprintf(file,"\n  'completed-bar '(");
-    fprintf(file,"\n    color %d",ui->CompleteBarColor);
-    fprintf(file,"\n    pos (%3d %3d)",ui->CompleteBarX,ui->CompleteBarY);
-    fprintf(file,"\n    size (%d %d)",ui->CompleteBarW,ui->CompleteBarH);
-    fprintf(file,"\n    text \"%s\"",ui->CompleteBarText);
-    fprintf(file,"\n    font %s",FontNames[ui->CompleteBarFont]);
-    fprintf(file,"\n    text-pos (%3d %3d)",
-	    ui->CompleteTextX,ui->CompleteTextY);
-    fprintf(file,")\n\n");
-
-    fprintf(file,"  ; Button panel\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    ui->ButtonPanel.File,ui->ButtonPanelX,ui->ButtonPanelY);
-
-    fprintf(file,"\n  'map-area (list");
-    fprintf(file,"\n    'pos '(%3d %3d)",
-	    ui->MapArea.X, ui->MapArea.Y);
-    fprintf(file,"\n    'size '(%d %d)",
-	    ui->MapArea.EndX-ui->MapArea.X+1,
-	    ui->MapArea.EndY-ui->MapArea.Y+1);
-    fprintf(file,")\n\n");
-
-    fprintf(file,"  ; Menu button background\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    ui->MenuButtonGraphic.File,ui->MenuButtonGraphicX,
-	    ui->MenuButtonGraphicY);
-
-    fprintf(file,"  ; Minimap background\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    ui->Minimap.File,ui->MinimapX,ui->MinimapY);
-
-    fprintf(file,"\n  'status-line '(");
-    fprintf(file,"\n    file \"%s\"",ui->StatusLine.File);
-    fprintf(file,"\n    pos (%d %d)",ui->StatusLineX,ui->StatusLineY);
-    fprintf(file,"\n    text-pos (%d %d)",
-	    ui->StatusLineTextX,ui->StatusLineTextY);
-    fprintf(file,"\n    font %s",FontNames[ui->StatusLineFont]);
-    fprintf(file,")\n");
-
-    fprintf(file,"\n  'menu-button '(");
-    fprintf(file,"\n    pos (%d %d)",
-	    ui->MenuButton.X,ui->MenuButton.Y);
-    fprintf(file,"\n    size (%d %d)",
-	    ui->MenuButton.Width,ui->MenuButton.Height);
-    fprintf(file,"\n    caption \"%s\"",
-	    ui->MenuButton.Text);
-    fprintf(file,"\n    style %s",
-	    MenuButtonStyle(ui->MenuButton.Button));
-    fprintf(file,")");
-
-    fprintf(file,"\n  'network-menu-button '(");
-    fprintf(file,"\n    pos (%d %d)",
-	    ui->NetworkMenuButton.X,ui->NetworkMenuButton.Y);
-    fprintf(file,"\n    size (%d %d)",
-	    ui->NetworkMenuButton.Width,ui->NetworkMenuButton.Height);
-    fprintf(file,"\n    caption \"%s\"",
-	    ui->NetworkMenuButton.Text);
-    fprintf(file,"\n    style %s",
-	    MenuButtonStyle(ui->NetworkMenuButton.Button));
-    fprintf(file,")");
-
-    fprintf(file,"\n  'network-diplomacy-button '(");
-    fprintf(file,"\n    pos (%d %d)",
-	    ui->NetworkDiplomacyButton.X,ui->NetworkDiplomacyButton.Y);
-    fprintf(file,"\n    size (%d %d)",
-	    ui->NetworkDiplomacyButton.Width,ui->NetworkDiplomacyButton.Height);
-    fprintf(file,"\n    caption \"%s\"",
-	    ui->NetworkDiplomacyButton.Text);
-    fprintf(file,"\n    style %s",
-	    MenuButtonStyle(ui->NetworkDiplomacyButton.Button));
-    fprintf(file,")");
-
-    fprintf(file,"\n\n  'info-buttons '(");
-    for( i=0; i<ui->NumInfoButtons; ++i ) {
-	fprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
-		ui->InfoButtons[i].X,ui->InfoButtons[i].Y,
-		ui->InfoButtons[i].Width,ui->InfoButtons[i].Height);
-    }
-    fprintf(file,")");
-    fprintf(file,"\n  'training-buttons '(");
-    for( i=0; i<ui->NumTrainingButtons; ++i ) {
-	fprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
-		ui->TrainingButtons[i].X,ui->TrainingButtons[i].Y,
-		ui->TrainingButtons[i].Width,ui->TrainingButtons[i].Height);
-    }
-    fprintf(file,")");
-    fprintf(file,"\n  'button-buttons '(");
-    for( i=0; i<ui->NumButtonButtons; ++i ) {
-	fprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
-		ui->ButtonButtons[i].X,ui->ButtonButtons[i].Y,
-		ui->ButtonButtons[i].Width,ui->ButtonButtons[i].Height);
-    }
-    fprintf(file,")");
-
-    fprintf(file,"\n\n  'cursors '(");
-    fprintf(file,"\n    point %s", ui->Point.Name);
-    fprintf(file,"\n    glass %s", ui->Glass.Name);
-    fprintf(file,"\n    cross %s", ui->Cross.Name);
-    fprintf(file,"\n    yellow %s", ui->YellowHair.Name);
-    fprintf(file,"\n    green %s", ui->GreenHair.Name);
-    fprintf(file,"\n    red %s", ui->RedHair.Name);
-    fprintf(file,"\n    scroll %s", ui->Scroll.Name);
-
-    fprintf(file,"\n    arrow-e %s", ui->ArrowE.Name);
-    fprintf(file,"\n    arrow-ne %s", ui->ArrowNE.Name);
-    fprintf(file,"\n    arrow-n %s", ui->ArrowN.Name);
-    fprintf(file,"\n    arrow-nw %s", ui->ArrowNW.Name);
-    fprintf(file,"\n    arrow-w %s", ui->ArrowW.Name);
-    fprintf(file,"\n    arrow-sw %s", ui->ArrowSW.Name);
-    fprintf(file,"\n    arrow-s %s", ui->ArrowS.Name);
-    fprintf(file,"\n    arrow-se %s", ui->ArrowSE.Name);
-    fprintf(file,")\n");
-
-    fprintf(file,"\n  'menu-panels '(");
-    menupanel=ui->MenuPanels;
-    while( menupanel ) {
-	fprintf(file,"\n    %s \"%s\"",
-		menupanel->Ident,menupanel->Panel.File);
-	menupanel=menupanel->Next;
-    }
-    fprintf(file,")\n");
-
-    fprintf(file,"\n  'victory-background \"%s\"",
-	    ui->VictoryBackground.File);
-    fprintf(file,"\n  'defeat-background \"%s\"",
-	    ui->DefeatBackground.File);
-
-    fprintf(file," )\n\n");
-}
-
-/**
 **	Save the viewports.
 **
 **	@param file	Save file handle
@@ -501,36 +320,8 @@ local void SaveViewports(FILE* file,const UI* ui)
 */
 global void SaveUserInterface(FILE* file)
 {
-    int i;
-
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: ui $Id$\n\n");
-
-    // Contrast, Brightness, Saturation
-    fprintf(file,"(set-contrast! %d)\n",TheUI.Contrast);
-    fprintf(file,"(set-brightness! %d)\n",TheUI.Brightness);
-    fprintf(file,"(set-saturation! %d)\n\n",TheUI.Saturation);
-    // Scrolling
-    fprintf(file,"(set-mouse-scroll! %s)\n",TheUI.MouseScroll ? "#t" : "#f");
-    fprintf(file,"(set-mouse-scroll-speed! %d)\n",SpeedMouseScroll);
-    fprintf(file,"(set-key-scroll! %s)\n",TheUI.KeyScroll ? "#t" : "#f");
-    fprintf(file,"(set-key-scroll-speed! %d)\n",SpeedKeyScroll);
-    fprintf(file,"(set-reverse-map-move! %s)\n\n",
-	    TheUI.ReverseMouseMove ? "#t" : "#f");
-
-    fprintf(file,"(set-mouse-adjust! %d)\n",TheUI.MouseAdjust);
-    fprintf(file,"(set-mouse-scale! %d)\n\n",TheUI.MouseScale);
-
-    fprintf(file,"(set-original-resources! %s)\n\n",
-	    TheUI.OriginalResources ? "#t" : "#f");
-
-    // Save the UIs for all resolutions
-    for( i=0; UI_Table[i]; ++i ) {
-	SaveUi(file,UI_Table[i]);
-    }
-
-    // FIXME: maxy: strange things could happen to the saved viewports
-    // when loading them on a different resolution
 
     SaveViewports(file,&TheUI);
 }
@@ -577,7 +368,7 @@ global void CleanUI(UI* ui)
     free(ui->MenuButtonGraphic.File);
 
     // Minimap
-    free(ui->Minimap.File);
+    free(ui->MinimapPanel.File);
 
     // Status Line
     free(ui->StatusLine.File);
@@ -647,7 +438,7 @@ global void CleanUserInterface(void)
     VideoSaveFree(TheUI.InfoPanel.Graphic);
     VideoSaveFree(TheUI.ButtonPanel.Graphic);
     VideoSaveFree(TheUI.MenuButtonGraphic.Graphic);
-    VideoSaveFree(TheUI.Minimap.Graphic);
+    VideoSaveFree(TheUI.MinimapPanel.Graphic);
     VideoSaveFree(TheUI.StatusLine.Graphic);
 
     menupanel=TheUI.MenuPanels;

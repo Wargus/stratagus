@@ -146,12 +146,13 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	MapMarkNewSight(unit->Player,x,y,unit->CurrentSightRange,xd,yd);
 	//  Remove unit from the current selection
 	if( unit->Selected && !IsMapFieldVisible(ThisPlayer,unit->X,unit->Y)) {
+#ifndef NEW_UI
 	    if( NumSelected==1 ) {          //  Remove building cursor
 		CancelBuildingMode();
 	    }
+#endif
 	    UnSelectUnit(unit);
-	    MustRedraw|=RedrawPanels;
-	    UpdateButtonPanel();
+	    SelectionChanged();
 	}
 
 	//  Remark sight for units inside too.
@@ -308,7 +309,7 @@ global void HandleActionMove(Unit* unit)
 	    }
 	    unit->Orders[0].Action=UnitActionStill;
 	    if( unit->Selected ) {	// update display for new action
-		UpdateButtonPanel();
+		SelectedUnitChanged();
 	    }
 	    return;
 

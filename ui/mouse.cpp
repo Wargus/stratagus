@@ -78,6 +78,7 @@ global enum _cursor_on_ CursorOn=CursorOnUnknown;	/// Cursor on field
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#ifndef NEW_UI
 /**
 **	Cancel building cursor mode.
 */
@@ -90,6 +91,7 @@ global void CancelBuildingMode(void)
     CurrentButtonLevel = 0;		// reset unit buttons to normal
     UpdateButtonPanel();
 }
+#endif
 
 /**
 **	Called when right button is pressed
@@ -549,8 +551,8 @@ local void HandleMouseOn(int x,int y)
     //
     //	Minimap
     //
-    if( x>=TheUI.MinimapX+24 && x<TheUI.MinimapX+24+MINIMAP_W
-	    && y>=TheUI.MinimapY+2 && y<TheUI.MinimapY+2+MINIMAP_H ) {
+    if( x>=TheUI.MinimapPosX && x<TheUI.MinimapPosX+MINIMAP_W
+	    && y>=TheUI.MinimapPosY && y<TheUI.MinimapPosY+MINIMAP_H ) {
 	CursorOn=CursorOnMinimap;
 	return;
     }
@@ -644,18 +646,18 @@ global void RestrictCursorToViewport(void)
 */
 global void RestrictCursorToMinimap(void)
 {
-    if (CursorX < TheUI.MinimapX + 24) {
-	CursorStartX = TheUI.MinimapX + 24;
-    } else if (CursorX >= TheUI.MinimapX + 24 + MINIMAP_W) {
-	CursorStartX = TheUI.MinimapX + 24 + MINIMAP_W - 1;
+    if (CursorX < TheUI.MinimapPosX) {
+	CursorStartX = TheUI.MinimapPosX;
+    } else if (CursorX >= TheUI.MinimapPosX + MINIMAP_W) {
+	CursorStartX = TheUI.MinimapPosX + MINIMAP_W - 1;
     } else {
 	CursorStartX = CursorX;
     }
 
-    if (CursorY < TheUI.MinimapY + 2) {
-	CursorStartY = TheUI.MinimapY + 2;
-    } else if (CursorY >= TheUI.MinimapY + 2 + MINIMAP_H) {
-	CursorStartY = TheUI.MinimapY + 2 + MINIMAP_H - 1;
+    if (CursorY < TheUI.MinimapPosY) {
+	CursorStartY = TheUI.MinimapPosY;
+    } else if (CursorY >= TheUI.MinimapPosY + MINIMAP_H) {
+	CursorStartY = TheUI.MinimapPosY + MINIMAP_H - 1;
     } else {
 	CursorStartY = CursorY;
     }
@@ -1118,9 +1120,15 @@ local void SendSpellCast(int sx, int sy)
 	if( dest && unit==dest ) {
 	    continue;			// no unit can cast spell on himself
 	}
+#ifndef NEW_UI
 	// CursorValue here holds the spell type id
 	SendCommandSpellCast(unit,x,y,dest,CursorValue,
 		!(KeyModifiers&ModifierShift));
+#else
+	// CursorSpell here holds the spell type id
+	SendCommandSpellCast(unit,x,y,dest,CursorSpell,
+		!(KeyModifiers&ModifierShift));
+#endif
     }
 }
 
@@ -1140,8 +1148,10 @@ local void SendCommand(int sx, int sy)
 
     x=sx/TileSizeX;
     y=sy/TileSizeY;
+#ifndef NEW_UI
     CurrentButtonLevel=0; // reset unit buttons to normal
     UpdateButtonPanel();
+#endif
     switch( CursorAction ) {
 	case ButtonMove:
 	    SendMove(x,y);
@@ -1221,10 +1231,12 @@ local void DoSelectionButtons(int num,unsigned button __attribute__((unused)))
     }
 
     ClearStatusLine();
+#ifndef NEW_UI
     ClearCosts();
     CurrentButtonLevel = 0;		// reset unit buttons to normal
-    UpdateButtonPanel();
-    MustRedraw|=RedrawPanels;
+#endif
+    SelectionChanged();
+    MustRedraw|=RedrawInfoPanel;
 }
 
 //.............................................................................
@@ -1243,10 +1255,58 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
     const Viewport* vp;
 
     vp = TheUI.MouseViewport;
+
+#ifdef NEW_UI
+    // to redraw the cursor immediately (and avoid up to 1 sec delay
+    if( CursorBuilding ) {
+	// Possible Selected[0] was removed from map
+	// need to make sure there is an unit to build
+	if( Selected[0] && (MouseButtons&LeftButton) ) {// enter select mode
+	    int x;
+	    int y;
+	    int i;
+	    int j;
+	    int explored;
+	    
+	    x=Viewport2MapX(TheUI.MouseViewport,CursorX);
+	    y=Viewport2MapY(TheUI.MouseViewport,CursorY);
+	    // FIXME: error messages
+	    
+	    explored=1;
+	    for( j=0; explored && j<Selected[0]->Type->TileHeight; ++j ) {
+		for( i=0; i<Selected[0]->Type->TileWidth; ++i ) {
+		    if( !IsMapFieldExplored(ThisPlayer,x+i,y+j) ) {
+			explored=0;
+			break;
+		    }
+		}
+	    }
+	    if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)
+		&& (explored || ReplayRevealMap) ) {
+		PlayGameSound(GameSounds.PlacementSuccess.Sound
+			      ,MaxSampleVolume);
+		SendCommandBuildBuilding(Selected[0],x,y,CursorBuilding
+					 ,!(KeyModifiers&ModifierShift));
+		if( KeyModifiers&ModifierAlt ) {
+		    return;
+		}
+	    } else {
+		PlayGameSound(GameSounds.PlacementError.Sound
+			      ,MaxSampleVolume);
+	    }
+	}
+	ChooseTargetFinish();
+	// FIXME: maxy: this does not allow clicking on
+	// the minimap while choosing locations
+	return;
+    }
+#endif
+    
     //
     //	Clicking on the map.
     //
     if( CursorOn==CursorOnMap ) {
+#ifndef NEW_UI
 	ClearStatusLine();
 	ClearCosts();
 	CursorState=CursorStatePoint;
@@ -1254,7 +1314,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	CurrentButtonLevel = 0;
 	UpdateButtonPanel();
 	MustRedraw|=RedrawButtonPanel|RedrawCursor;
-
+#endif
 
 	sx = CursorX - vp->X + TileSizeX * vp->MapX;
 	sy = CursorY - vp->Y + TileSizeY * vp->MapY;
@@ -1266,6 +1326,9 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 		    ,vp->MapY*TileSizeY+CursorY - vp->Y);
 	    SendCommand(sx, sy);
 	}
+#ifdef NEW_UI
+	ChooseTargetFinish();
+#endif
 	return;
     }
 
@@ -1281,6 +1344,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	if( MouseButtons&LeftButton ) {
 	    sx=mx*TileSizeX;
 	    sy=my*TileSizeY;
+#ifndef NEW_UI
 	    ClearStatusLine();
 	    ClearCosts();
 	    CursorState=CursorStatePoint;
@@ -1288,9 +1352,13 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	    CurrentButtonLevel = 0; // reset unit buttons to normal
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel|RedrawCursor;
+#endif
 	    MakeLocalMissile(MissileTypeGreenCross
 		    ,sx+TileSizeX/2,sy+TileSizeY/2,0,0);
 	    SendCommand(sx,sy);
+#ifdef NEW_UI
+	    ChooseTargetFinish();
+#endif
 	} else {
 	    ViewportCenterViewpoint(TheUI.SelectedViewport, mx, my);
 	}
@@ -1300,11 +1368,15 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
     if( CursorOn==CursorOnButton ) {
 	// FIXME: other buttons?
 	if( ButtonAreaUnderCursor==ButtonAreaButton ) {
+#ifdef NEW_UI
+	    ChooseTargetFinish();
+#endif
 	    DoButtonButtonClicked(ButtonUnderCursor);
 	    return;
 	}
     }
 
+#ifndef NEW_UI
     ClearStatusLine();
     ClearCosts();
     CursorState=CursorStatePoint;
@@ -1312,6 +1384,9 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
     CurrentButtonLevel = 0; // reset unit buttons to normal
     UpdateButtonPanel();
     MustRedraw|=RedrawButtonPanel|RedrawCursor;
+#else
+    ChooseTargetFinish();
+#endif
 }
 
 /**
@@ -1383,6 +1458,7 @@ global void UIHandleButtonDown(unsigned button)
 		    TheUI.SelectedViewport - TheUI.Viewports);
 	}
 
+#ifndef NEW_UI
 	// to redraw the cursor immediately (and avoid up to 1 sec delay
 	if( CursorBuilding ) {
 	    // Possible Selected[0] was removed from map
@@ -1425,6 +1501,7 @@ global void UIHandleButtonDown(unsigned button)
 	    }
 	    return;
 	}
+#endif
 
 	if( MouseButtons&LeftButton ) { // enter select mode
 	    CursorStartX=CursorX;
@@ -1569,7 +1646,13 @@ global void UIHandleButtonDown(unsigned button)
 	    //
 	    } else if( ButtonAreaUnderCursor==ButtonAreaButton ) {
 		if( !GameObserve && !GamePaused ) {
+#ifndef NEW_UI
 		    DoButtonButtonClicked(ButtonUnderCursor);
+#else
+		    if( ButtonUnderCursor >= 0 && ButtonUnderCursor < 9 ) {
+			DoButtonButtonClicked(ButtonUnderCursor);
+		    }
+#endif
 		}
 	    }
 	} else if( (MouseButtons&MiddleButton) ) {
@@ -1753,9 +1836,11 @@ global void UIHandleButtonUp(unsigned button)
 
 	if( num ) {
 	    ClearStatusLine();
+#ifndef NEW_UI
 	    ClearCosts();
 	    CurrentButtonLevel = 0; // reset unit buttons to normal
-	    UpdateButtonPanel();
+#endif
+	    SelectionChanged();
 
 	    //
 	    //	Play selecting sound.

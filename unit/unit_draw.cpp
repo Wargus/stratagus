@@ -644,69 +644,6 @@ global void LoadDecorations(void)
 }
 
 /**
-**	Save decorations.
-*/
-global void SaveDecorations(FILE* file)
-{
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: decorations $Id$\n\n");
-
-    fprintf(file,"(mana-sprite \"%s\"  %d %d  %d %d)\n",
-	ManaSprite.File,ManaSprite.HotX,ManaSprite.HotY,
-	ManaSprite.Width,ManaSprite.Height);
-    fprintf(file,"(health-sprite \"%s\"  %d %d  %d %d)\n",
-	HealthSprite.File,HealthSprite.HotX,HealthSprite.HotY,
-	HealthSprite.Width,HealthSprite.Height);
-    fprintf(file,"(shadow-sprite \"%s\"  %d %d  %d %d)\n",
-	ShadowSprite.File,ShadowSprite.HotX,ShadowSprite.HotY,
-	ShadowSprite.Width,ShadowSprite.Height);
-    fprintf(file,"(spell-sprite \"%s\"  %d %d  %d %d)\n",
-	SpellSprite.File,SpellSprite.HotX,SpellSprite.HotY,
-	SpellSprite.Width,SpellSprite.Height);
-
-    // This belongs to the config and not save file
-    if( ShowHealthBar ) {
-	fprintf(file,";(show-health-bar)\n");
-    }
-    if( ShowHealthDot ) {
-	fprintf(file,";(show-health-dot)\n");
-    }
-    if( ShowHealthHorizontal ) {
-	fprintf(file,";(show-health-horizontal)\n");
-    } else {
-	fprintf(file,";(show-health-vertical)\n");
-    }
-    if( ShowHealthBackgroundLong ) {
-	fprintf(file,";(show-health-blackground-long)\n");
-    }
-    if( ShowManaBar ) {
-	fprintf(file,";(show-mana-bar)\n");
-    }
-    if( ShowManaDot ) {
-	fprintf(file,";(show-mana-dot)\n");
-    }
-    if( ShowManaHorizontal ) {
-	fprintf(file,";(show-mana-horizontal)\n");
-    } else {
-	fprintf(file,";(show-mana-vertical)\n");
-    }
-    if( ShowManaBackgroundLong ) {
-	fprintf(file,";(show-mana-blackground-long)\n");
-    }
-    if( ShowEnergySelectedOnly ) {
-	fprintf(file,";(show-energy-selected-only)\n");
-    }
-    if( ShowNoFull ) {
-	fprintf(file,";(show-no-full)\n");
-    } else {
-	fprintf(file,";(show-full)\n");
-    }
-    if( DecorationOnTop ) {
-	fprintf(file,";(decoration-on-top)\n");
-    }
-}
-
-/**
 **	Clean decorations.
 */
 global void CleanDecorations(void)

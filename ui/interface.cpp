@@ -119,7 +119,9 @@ local void UiBeginInput(void)
     KeyState=KeyStateInput;
     Input[0]='\0';
     InputIndex=0;
+#ifndef NEW_UI
     ClearCosts();
+#endif
     ShowInput();
 }
 
@@ -135,7 +137,7 @@ local void UiBeginInput(void)
 local void UiUnselectAll(void)
 {
     UnSelectAll();
-    UpdateButtonPanel();
+    SelectionChanged();
 }
 
 /**
@@ -195,8 +197,8 @@ local void UiSelectGroup(unsigned group)
     }
 
     SelectGroup(group);
-    UpdateButtonPanel();
-    MustRedraw|=RedrawMap|RedrawPanels;
+    SelectionChanged();
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
 }
 
 /**
@@ -231,8 +233,8 @@ local void UiAddGroupToSelection(unsigned group)
 	}
     }
 
-    UpdateButtonPanel();
-    MustRedraw|=RedrawMap|RedrawPanels;
+    SelectionChanged();
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
 }
 
 /**
@@ -622,10 +624,15 @@ local void UiFindIdleWorker(void)
 	LastIdleWorker=unit;
 	SelectSingleUnit(unit);
 	ClearStatusLine();
+#ifndef NEW_UI
 	ClearCosts();
 	CurrentButtonLevel=0;
-	UpdateButtonPanel();
+#else
+	// stupid trick, just in case SelectionChanged() should be slow it
+	// will probably feel faster if you hear the sound at once :)
+#endif
 	PlayUnitSound(Selected[0],VoiceSelected);
+	SelectionChanged();
 	ViewportCenterViewpoint(TheUI.SelectedViewport,unit->X,unit->Y);
     }
 }
@@ -1251,9 +1258,12 @@ global int HandleKeyModifiersDown(unsigned key, unsigned keychar
 	    return 1;
 	case KeyCodeAlt:
 	    KeyModifiers |= ModifierAlt;
+	    // maxy: disabled
+#ifndef NEW_UI
 	    if (InterfaceState == IfaceStateNormal) {
-		UpdateButtonPanel();	//VLADI: to allow alt-buttons
+		SelectedUnitChanged();	//VLADI: to allow alt-buttons
 	    }
+#endif
 	    return 1;
 	case KeyCodeSuper:
 	    KeyModifiers |= ModifierSuper;
@@ -1291,9 +1301,12 @@ global int HandleKeyModifiersUp(unsigned key,
 	    return 1;
 	case KeyCodeAlt:
 	    KeyModifiers&=~ModifierAlt;
+	    // maxy: disabled
+#ifndef NEW_UI
 	    if (InterfaceState == IfaceStateNormal) {
-		UpdateButtonPanel(); //VLADI: to allow alt-buttons
+		SelectedUnitChanged(); //VLADI: to allow alt-buttons
 	    }
+#endif
 	    return 1;
 	case KeyCodeSuper:
 	    KeyModifiers&=~ModifierSuper;

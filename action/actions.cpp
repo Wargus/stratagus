@@ -320,7 +320,7 @@ local void HandleUnitAction(Unit* unit)
 	    unit->Wait=1;
 
 	    if( IsOnlySelected(unit) ) {// update display for new action
-		UpdateButtonPanel();
+		SelectedUnitChanged();
 		MustRedraw|=RedrawInfoPanel;
 	    }
 	}

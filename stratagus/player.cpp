@@ -191,6 +191,7 @@ global void SavePlayers(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: players $Id$\n\n");
 
+#ifndef NEW_UI
     //
     //	Dump table wc2 race numbers -> internal symbol.
     //
@@ -208,6 +209,7 @@ global void SavePlayers(FILE* file)
 	}
 	fprintf(file,")\n\n");
     }
+#endif
 
     //
     //	Dump all players

@@ -56,23 +56,26 @@
 --      Defines
 ----------------------------------------------------------------------------*/
 
+#ifndef NEW_UI
     /// How many different buttons are allowed
 #define MAX_BUTTONS	2048
+#endif
 
 /*----------------------------------------------------------------------------
 --      Variables
 ----------------------------------------------------------------------------*/
 
-    /// for unit buttons sub-menus etc.
-global int CurrentButtonLevel;
-
     /// Display the command key in the buttons.
 global char ShowCommandKey;
 
+#ifndef NEW_UI
+    /// for unit buttons sub-menus etc.
+global int CurrentButtonLevel;
     /// All buttons for units
 local ButtonAction *UnitButtonTable[MAX_BUTTONS];
     /// buttons in UnitButtonTable
 local int NumUnitButtons;
+#endif
 
 /*----------------------------------------------------------------------------
 --      Functions
@@ -83,6 +86,7 @@ local int NumUnitButtons;
 */
 global void InitButtons(void)
 {
+#ifndef NEW_UI
     int z;
 
     //
@@ -92,6 +96,10 @@ global void InitButtons(void)
 	UnitButtonTable[z]->Icon.Icon
 		= IconByIdent(UnitButtonTable[z]->Icon.Name);
     }
+#else
+    // FIXME: proabably not necessary
+    //CleanButtons();
+#endif
 }
 
 /**
@@ -99,148 +107,11 @@ global void InitButtons(void)
 */
 global void SaveButtons(FILE* file)
 {
-    int i;
-    int n;
-    char* cp;
-
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: buttons $Id$\n\n");
 
-    for( i=0; i<NumUnitButtons; ++i ) {
-	fprintf(file,"(define-button 'pos %d 'level %d 'icon '%s\n",
-		UnitButtonTable[i]->Pos,
-		UnitButtonTable[i]->Level,
-		IdentOfIcon(UnitButtonTable[i]->Icon.Icon));
-	fprintf(file,"  'action ");
-	switch( UnitButtonTable[i]->Action ) {
-	    case ButtonMove:
-		fprintf(file,"'move"); break;
-	    case ButtonStop:
-		fprintf(file,"'stop"); break;
-	    case ButtonAttack:
-		fprintf(file,"'attack"); break;
-	    case ButtonRepair:
-		fprintf(file,"'repair"); break;
-	    case ButtonHarvest:
-		fprintf(file,"'harvest"); break;
-	    case ButtonButton:
-		fprintf(file,"'button"); break;
-	    case ButtonBuild:
-		fprintf(file,"'build"); break;
-	    case ButtonTrain:
-		fprintf(file,"'train-unit"); break;
-	    case ButtonPatrol:
-		fprintf(file,"'patrol"); break;
-	    case ButtonStandGround:
-		fprintf(file,"'stand-ground"); break;
-	    case ButtonAttackGround:
-		fprintf(file,"'attack-ground"); break;
-	    case ButtonReturn:
-		fprintf(file,"'return-goods"); break;
-	    case ButtonDemolish:
-		fprintf(file,"'demolish"); break;
-	    case ButtonSpellCast:
-		fprintf(file,"'cast-spell"); break;
-	    case ButtonResearch:
-		fprintf(file,"'research"); break;
-	    case ButtonUpgradeTo:
-		fprintf(file,"'upgrade-to"); break;
-	    case ButtonUnload:
-		fprintf(file,"'unload"); break;
-	    case ButtonCancel:
-		fprintf(file,"'cancel"); break;
-	    case ButtonCancelUpgrade:
-		fprintf(file,"'cancel-upgrade"); break;
-	    case ButtonCancelTrain:
-		fprintf(file,"'cancel-train-unit"); break;
-	    case ButtonCancelBuild:
-		fprintf(file,"'cancel-build"); break;
-	}
-	if( UnitButtonTable[i]->ValueStr ) {
-	    if( isdigit(UnitButtonTable[i]->ValueStr[0]) ) {
-		fprintf(file," 'value %s\n",UnitButtonTable[i]->ValueStr);
-	    } else {
-		fprintf(file," 'value '%s\n",UnitButtonTable[i]->ValueStr);
-	    }
-	} else {
-	    fprintf(file,"\n");
-	}
-	if( UnitButtonTable[i]->Allowed ) {
-	    fprintf(file,"  'allowed ");
-	    if( UnitButtonTable[i]->Allowed == ButtonCheckTrue ) {
-		fprintf(file,"'check-true");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckFalse ) {
-		fprintf(file,"'check-false");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUpgrade ) {
-		fprintf(file,"'check-upgrade");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUnitsOr ) {
-		fprintf(file,"'check-units-or");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUnitsAnd ) {
-		fprintf(file,"'check-units-and");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNetwork ) {
-		fprintf(file,"'check-network");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoNetwork ) {
-		fprintf(file,"'check-no-network");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoWork ) {
-		fprintf(file,"'check-no-work");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoResearch ) {
-		fprintf(file,"'check-no-research");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckAttack ) {
-		fprintf(file,"'check-attack");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUpgradeTo ) {
-		fprintf(file,"'check-upgrade-to");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckResearch ) {
-		fprintf(file,"'check-research");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckSingleResearch ) {
-		fprintf(file,"'check-single-research");
-	    } else {
-		DebugLevel0Fn("Unsupported check function %p\n" _C_
-			UnitButtonTable[i]->Allowed);
-		fprintf(file,"%p",UnitButtonTable[i]->Allowed);
-	    }
-	    if( UnitButtonTable[i]->AllowStr ) {
-		fprintf(file," 'allow-arg '(");
-		cp=alloca(strlen(UnitButtonTable[i]->AllowStr));
-		strcpy(cp,UnitButtonTable[i]->AllowStr);
-		cp=strtok(cp,",");
-		while( cp ) {
-		    fprintf(file,"%s",cp);
-		    cp=strtok(NULL,",");
-		    if( cp ) {
-			fprintf(file," ");
-		    }
-		}
-		fprintf(file,")");
-	    }
-	    fprintf(file,"\n");
-	}
-	fprintf(file,"  'key \"");
-	switch( UnitButtonTable[i]->Key ) {
-	    case '\033':
-		fprintf(file,"\\%03o",UnitButtonTable[i]->Key);
-		break;
-	    default:
-		fprintf(file,"%c",UnitButtonTable[i]->Key);
-		break;
-	}
-	fprintf(file,"\" 'hint \"%s\"\n",UnitButtonTable[i]->Hint);
-	n=fprintf(file,"  'for-unit '(");
-	cp=alloca(strlen(UnitButtonTable[i]->UnitMask));
-	strcpy(cp,UnitButtonTable[i]->UnitMask);
-	cp=strtok(cp,",");
-	while( cp ) {
-	    if( n+strlen(cp)>78 ) {
-		n=fprintf(file,"\n    ");
-	    }
-	    n+=fprintf(file,"%s",cp);
-	    cp=strtok(NULL,",");
-	    if( cp ) {
-		n+=fprintf(file," ");
-	    }
-	}
-	fprintf(file,"))\n\n");
-    }
-
+    // Hmm, is this needed? maybe it is set in a tutorial level which
+    // might be saved?
     fprintf(file,"(set-show-command-key! %s)\n\n",
 	    ShowCommandKey ? "#t" : "#f");
 }
@@ -263,17 +134,41 @@ global void SaveButtons(FILE* file)
 --      Buttons structures
 ----------------------------------------------------------------------------*/
 
+#ifndef NEW_UI
 global ButtonAction* CurrentButtons;	/// Pointer to current buttons
 local ButtonAction  _current_buttons[9];	/// FIXME: this is just for test
+#else
+global ButtonAction CurrentButtons[9];	/// Pointer to current buttons
+#endif
+
+#ifdef NEW_UI
+local void CleanButton(ButtonAction * ba)
+{
+    if( !ba->Icon.Name ) {
+	return;
+    }
+    free(ba->Icon.Name);
+    CclGcUnprotect(ba->Action);
+    memset(ba, 0, sizeof(*ba));
+    MustRedraw|=RedrawButtonPanel;
+}
+#endif
 
 /// FIXME: docu
+#ifndef NEW_UI
 int AddButton(int pos, int level, const char *icon_ident,
 	enum _button_cmd_ action, const char *value, const ButtonCheckFunc func,
 	const void *allow, int key, const char *hint, const char *umask)
+#else
+global void AddButton(int pos, char *icon_ident, SCM action, int key, char *hint)
+#endif
 {
+#ifndef NEW_UI
     char buf[2048];
+#endif
     ButtonAction *ba;
 
+#ifndef NEW_UI
     ba = (ButtonAction *) malloc(sizeof(ButtonAction));
     DebugCheck(!ba);			//FIXME: perhaps should return error?
 
@@ -316,7 +211,6 @@ int AddButton(int pos, int level, const char *icon_ident,
     } else {
 	ba->AllowStr = NULL;
     }
-
     ba->Key = key;
     ba->Hint = strdup(hint);
     //FIXME: here should be added costs to the hint
@@ -328,17 +222,57 @@ int AddButton(int pos, int level, const char *icon_ident,
     }
     ba->UnitMask = strdup(buf);
     UnitButtonTable[NumUnitButtons++] = ba;
-
     // FIXME: check if already initited
     //DebugCheck(ba->Icon.Icon == NoIcon);// just checks, that's why at the end
     return 1;
+#else
+    if( pos<1 || pos>9 ) {
+	DebugLevel0Fn("Bad button positon %d (Icon.Name=%s)\n" _C_ pos _C_ icon_ident);
+	// FIXME: better way to kill the program?
+	DebugCheck(1);
+    }
+    ba = CurrentButtons + (pos-1);
+    CleanButton(ba);
+
+    // maxy: the caller does not free this pointer
+    ba->Icon.Name = icon_ident;
+    ba->Icon.Icon = IconByIdent(ba->Icon.Name);
+    if( ba->Icon.Icon == NoIcon ) {
+	ba->Icon.Icon = IconByIdent(ba->Icon.Name);
+	DebugLevel0Fn("Icon not found: Icon.Name = %s\n" _C_ ba->Icon.Name);
+	// FIXME: better way to kill the program? or draw a
+	// Unknown-Icon and add a hint so the user can test the rest of the ccl?
+	DebugCheck(1);
+    }
+
+    // maxy: the caller protected this from the GC
+    ba->Action = action;
+
+    // maxy: the caller does not free this pointer
+    ba->Hint = hint;
+    MustRedraw|=RedrawButtonPanel;
+    ba->Key = key;
+#endif
 }
+
+#ifdef NEW_UI
+global void RemoveButton(int pos)
+{
+    if( pos<1 || pos>9 ) {
+	DebugLevel0Fn("Bad button positon %d\n" _C_ pos);
+	// FIXME: better way to kill the program?
+	DebugCheck(1);
+    }
+    CleanButton(CurrentButtons + (pos-1));
+}
+#endif
 
 /**
 **	Cleanup buttons.
 */
 global void CleanButtons(void)
 {
+#ifndef NEW_UI
     int z;
 
     //
@@ -367,6 +301,13 @@ global void CleanButtons(void)
 
     CurrentButtonLevel = 0;
     CurrentButtons = NULL;
+#else
+    int i;
+    DebugLevel0Fn("CleanButtons()\n");
+    for (i=0; i<9; i++) {
+	CleanButton(CurrentButtons + i);
+    }
+#endif
 }
 
 /**
@@ -376,9 +317,15 @@ global void DrawButtonPanel(void)
 {
     int i;
     int v;
+#ifndef NEW_UI
     const UnitStats* stats;
     const ButtonAction* buttons;
     char buf[8];
+#else
+    //const UnitStats* stats;
+    const ButtonAction* ba;
+    //char buf[8];
+#endif
 
     //
     //	Draw background
@@ -389,17 +336,28 @@ global void DrawButtonPanel(void)
 	    ,TheUI.ButtonPanelX,TheUI.ButtonPanelY);
     }
 
+#ifndef NEW_UI
     if( !(buttons=CurrentButtons) ) {	// no buttons
 	return;
     }
+#endif
 
     // FIXME: this is unneeded DrawUnitIcon does it self
     PlayerPixels(ThisPlayer);		// could only select own units.
 
+#ifndef NEW_UI
     for( i=0; i<TheUI.NumButtonButtons; ++i ) {
 	if( buttons[i].Pos!=-1 ) {
 	    int j;
 	    int action;
+#else
+    //for( i=0; i<TheUI.NumButtonButtons; ++i ) {
+    for( i=0; i<9; ++i ) {
+	ba = CurrentButtons + i;
+	if( ba->Icon.Icon != NoIcon ) {
+	    //int j;
+	    //int action;
+#endif
 
 	    // cursor is on that button
 	    if( ButtonAreaUnderCursor==ButtonAreaButton
@@ -418,6 +376,12 @@ global void DrawButtonPanel(void)
 	    //	FIXME: Should show the rally action of buildings.
 	    //
 
+	    // NEW_UI:
+	    /*  FIXME: maxy: had to disable this feature :(
+		should be re-enabled from ccl as a boolean button option,
+		together with something like (selected-action-is 'patrol) */
+
+#ifndef NEW_UI
 	    action=UnitActionNone;
 	    switch( buttons[i].Action ) {
 		case ButtonStop:
@@ -500,15 +464,22 @@ global void DrawButtonPanel(void)
 			break;
 		}
 	    }
+#endif
 
+#ifndef NEW_UI
 	    DrawUnitIcon(ThisPlayer,buttons[i].Icon.Icon
 		    ,v,TheUI.ButtonButtons[i].X,TheUI.ButtonButtons[i].Y);
+#else
+	    DrawUnitIcon(ThisPlayer,ba->Icon.Icon
+		    ,v,TheUI.ButtonButtons[i].X,TheUI.ButtonButtons[i].Y);
+#endif
 
 	    //
 	    //	Update status line for this button
 	    //
 	    if( ButtonAreaUnderCursor==ButtonAreaButton
 		    && ButtonUnderCursor==i && KeyState!=KeyStateInput ) {
+#ifndef NEW_UI
 		SetStatusLine(buttons[i].Hint);
 		// FIXME: Draw costs
 		v=buttons[i].Value;
@@ -541,6 +512,9 @@ global void DrawButtonPanel(void)
 			ClearCosts();
 			break;
 		}
+#else
+		SetStatusLine(ba->Hint);
+#endif
 	    }
 
 	    //
@@ -548,15 +522,26 @@ global void DrawButtonPanel(void)
 	    //
 	    if( ShowCommandKey ) {
 		Button* b;
+#ifdef NEW_UI
+		char buf[4];
+#endif
 
 		b=&TheUI.ButtonButtons[i];
+#ifndef NEW_UI
 		if( CurrentButtons[i].Key==27 ) {
+#else
+		if( ba->Key==27 ) {
+#endif
 		    strcpy(buf,"ESC");
 		    VideoDrawText(b->X+4+b->Width-VideoTextLength(GameFont,buf),
 			b->Y+5+b->Height-VideoTextHeight(GameFont),GameFont,buf);
 		} else {
 		    // FIXME: real DrawChar would be useful
+#ifndef NEW_UI
 		    buf[0]=toupper(CurrentButtons[i].Key);
+#else
+		    buf[0]=toupper(ba->Key);
+#endif
 		    buf[1]='\0';
 		    VideoDrawText(b->X+4+b->Width-VideoTextLength(GameFont,buf),
 			b->Y+5+b->Height-VideoTextHeight(GameFont),GameFont,buf);
@@ -570,6 +555,7 @@ global void DrawButtonPanel(void)
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#ifndef NEW_UI
 /**
 **	Update bottom panel for multiple units.
 */
@@ -860,13 +846,11 @@ global void DoButtonButtonClicked(int button)
 {
     int i;
     UnitType* type;
-
     DebugLevel3Fn("Button clicked %d\n" _C_ button);
 
     if( !CurrentButtons ) {		// no buttons
 	return;
     }
-
     //
     //	Button not available.
     //
@@ -879,6 +863,7 @@ global void DoButtonButtonClicked(int button)
     //
     //	Handle action on button.
     //
+
     DebugLevel3Fn("Button clicked %d=%d\n" _C_ button _C_
 	    CurrentButtons[button].Action);
     switch( CurrentButtons[button].Action ) {
@@ -905,7 +890,6 @@ global void DoButtonButtonClicked(int button)
 		    && (KeyModifiers&ModifierControl) ) {
 		int autocast;
 		SpellType *spell;
-
 		spell=SpellTypeById(CurrentButtons[button].Value);
 		if( !CanAutoCastSpell(spell) ) {
 		    PlayGameSound(GameSounds.PlacementError.Sound
@@ -1065,6 +1049,38 @@ global void DoButtonButtonClicked(int button)
 	    break;
     }
 }
+#endif
+
+#ifdef NEW_UI
+global void DoButtonButtonClicked(int pos)
+{
+    ButtonAction * ba;
+    ba = CurrentButtons + pos;
+    //
+    //	Handle action on button.
+    //
+    //FIXME DebugLevel3Fn("Button clicked (button hint: %s).", ba->Hint);
+
+    if( !gh_null_p(ba->Action) ) {
+	PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
+	
+	/*
+	  if( [ccl debugging] ) {         // display executed command
+	  gh_display(...);
+	  gh_newline();
+	  }
+	*/
+	gh_apply(ba->Action,NIL);
+    } else {
+	if( ba->Hint ) {
+	    DebugLevel0Fn("Missing button action (button hint: %s)." _C_ ba->Hint);
+	} else {
+	    // FIXME: remove this after testing
+	    DebugLevel0Fn("You are clicking on empty space, aren't you ;)");
+	}
+    }
+}
+#endif
 
 /**
 **	Lookup key for bottom panel buttons.
@@ -1077,6 +1093,7 @@ global int DoButtonPanelKey(int key)
 {
     int i;
 
+#ifndef NEW_UI
     if( CurrentButtons ) {		// buttons
 
 	// cade: this is required for action queues SHIFT+M should be `m'
@@ -1091,7 +1108,22 @@ global int DoButtonPanelKey(int key)
 	    }
 	}
     }
+#else
+    ButtonAction * ba;
 
+    // cade: this is required for action queues SHIFT+M should be `m'
+    if ( key >= 'A' && key <= 'Z' ) {
+	key = tolower(key);
+    }
+
+    for( i=0; i<9; i++ ) {
+	ba = CurrentButtons + i;
+	if( key==CurrentButtons[i].Key ) {
+	    DoButtonButtonClicked(i);
+	    return 1;
+	}
+    }
+#endif
     return 0;
 }
 
