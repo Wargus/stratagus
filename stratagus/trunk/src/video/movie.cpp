@@ -114,8 +114,7 @@ global int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
     unsigned char *frame;
     int length;
     int i;
-    int width;
-    int height;
+    YUV_BUFFER_CONFIG yuv;
 
     length = AviReadNextVideoFrame(avi, &frame);
     if (length < 0) {			// EOF
@@ -128,22 +127,18 @@ global int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
 	}
 
 	SDL_LockYUVOverlay(overlay);
-	width = avi->Width;
-	height = avi->Height;
-	for (i = 0; i < height; ++i) {	// copy Y
+	GetYUVConfig(pbi, &yuv);
+	for (i = 0; i < yuv.YHeight; ++i) {	// copy Y
 	    memcpy(overlay->pixels[0] + i * overlay->pitches[0],
-		pbi->LastFrameRecon + pbi->ReconYDataOffset + (height - i -
-		    1) * pbi->Configuration.YStride, width);
+		yuv.YBuffer + (yuv.YHeight - i - 1) * yuv.YStride, yuv.YWidth);
 	}
-	height >>= 1;
-	width >>= 1;
-	for (i = 0; i < height; ++i) {	// copy UV
+	for (i = 0; i < yuv.UVHeight; ++i) {	// copy UV
 	    memcpy(overlay->pixels[1] + i * overlay->pitches[1],
-		pbi->LastFrameRecon + pbi->ReconVDataOffset + (height - i -
-		    1) * pbi->Configuration.UVStride, width);
+		yuv.VBuffer + (yuv.UVHeight - i - 1) * yuv.UVStride,
+		yuv.UVWidth);
 	    memcpy(overlay->pixels[2] + i * overlay->pitches[2],
-		pbi->LastFrameRecon + pbi->ReconUDataOffset + (height - i -
-		    1) * pbi->Configuration.UVStride, width);
+		yuv.UBuffer + (yuv.UVHeight - i - 1) * yuv.UVStride,
+		yuv.UVWidth);
 	}
 	SDL_UnlockYUVOverlay(overlay);
     }
