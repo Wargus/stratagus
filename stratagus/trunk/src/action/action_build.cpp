@@ -291,6 +291,7 @@ global void HandleActionBuilded(Unit* unit)
 {
     Unit* worker;
     UnitType* type;
+    int n;
 
     type=unit->Type;
 
@@ -325,6 +326,12 @@ global void HandleActionBuilded(Unit* unit)
 	unit->HP++;
 	unit->Data.Builded.Sum++;
     }
+
+    n=(unit->Stats->Costs[TimeCost]*CYCLES_PER_SECOND/6)/(SpeedBuild*5);
+    if( unit->Data.Builded.Add!=unit->Stats->HitPoints/(n?n:1) ) {
+	unit->Data.Builded.Add=unit->Stats->HitPoints/(n?n:1);
+    }
+
     unit->HP+=unit->Data.Builded.Add;
     unit->Data.Builded.Sum+=unit->Data.Builded.Add;
 
