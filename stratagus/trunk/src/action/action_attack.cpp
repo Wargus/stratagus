@@ -128,6 +128,7 @@ local Unit* CheckForDeadGoal(Unit* unit)
 	    //
 	    unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 	    unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
+	    unit->Orders[0].MinRange = 0;
 	    unit->Orders[0].RangeX = unit->Orders[0].RangeY = 0;
 
 	    DebugLevel0Fn("destroyed unit %d\n" _C_ UnitNumber(goal));
@@ -144,6 +145,7 @@ local Unit* CheckForDeadGoal(Unit* unit)
 	    //
 	    unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 	    unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
+	    unit->Orders[0].MinRange = 0;
 	    unit->Orders[0].RangeX = unit->Orders[0].RangeY = 0;
 
 	    RefsDebugCheck(!goal->Refs);
@@ -210,6 +212,7 @@ local int CheckForTargetInRange(Unit* unit)
 	    RefsDebugCheck(goal->Destroyed || !goal->Refs);
 	    goal->Refs++;
 	    unit->Orders[0].Goal = goal;
+	    unit->Orders[0].MinRange = unit->Type->MinAttackRange;
 	    unit->Orders[0].RangeX = unit->Orders[0].RangeY =
 		unit->Stats->AttackRange;
 	    unit->Orders[0].X = unit->Orders[0].Y = -1;
@@ -238,6 +241,7 @@ local int CheckForTargetInRange(Unit* unit)
 			UnitNumber(goal));
 		    unit->SavedOrder.X = goal->X + goal->Type->TileWidth / 2;
 		    unit->SavedOrder.Y = goal->Y + goal->Type->TileHeight / 2;
+		    unit->SavedOrder.MinRange = 0;
 		    unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
 		    unit->SavedOrder.Goal = NoUnitP;
 		}
@@ -457,6 +461,7 @@ local void AttackTarget(Unit* unit)
 			UnitNumber(temp));
 		    unit->SavedOrder.X = temp->X + temp->Type->TileWidth / 2;
 		    unit->SavedOrder.Y = temp->Y + temp->Type->TileHeight / 2;
+		    unit->SavedOrder.MinRange = 0;
 		    unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
 		    unit->SavedOrder.Goal = NoUnitP;
 		}
@@ -468,6 +473,7 @@ local void AttackTarget(Unit* unit)
 		UnitNumber(unit) _C_ UnitNumber(goal));
 	    unit->Orders[0].Goal = goal;
 	    unit->Orders[0].X = unit->Orders[0].Y = -1;
+	    unit->Orders[0].MinRange = unit->Type->MinAttackRange;
 	    unit->Orders[0].RangeX = unit->Orders[0].RangeY =
 		unit->Stats->AttackRange;
 	    NewResetPath(unit);
@@ -494,12 +500,15 @@ local void AttackTarget(Unit* unit)
 			    UnitNumber(goal));
 			unit->SavedOrder.X = goal->X + goal->Type->TileWidth / 2;
 			unit->SavedOrder.Y = goal->Y + goal->Type->TileHeight / 2;
+			unit->SavedOrder.MinRange = 0;
 			unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
 			unit->SavedOrder.Goal = NoUnitP;
 		    }
 		}
 		unit->Orders[0].Goal = goal = temp;
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
+		unit->Orders[0].MinRange = unit->Type->MinAttackRange;
+		unit->SubAction = MOVE_TO_TARGET;
 		NewResetPath(unit);
 	    }
 	}
@@ -516,6 +525,7 @@ local void AttackTarget(Unit* unit)
 			UnitNumber(temp));
 		    unit->SavedOrder.X = temp->X + temp->Type->TileWidth / 2;
 		    unit->SavedOrder.Y = temp->Y + temp->Type->TileHeight / 2;
+		    unit->SavedOrder.MinRange = 0;
 		    unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
 		    unit->SavedOrder.Goal = NoUnitP;
 		}
@@ -525,6 +535,9 @@ local void AttackTarget(Unit* unit)
 	    unit->State = 0;
 	    unit->SubAction &= WEAK_TARGET;
 	    unit->SubAction |= MOVE_TO_TARGET;
+	}
+	if (MapDistanceBetweenUnits(unit, goal) < unit->Type->MinAttackRange) {
+	    unit->SubAction = MOVE_TO_TARGET;
 	}
 
 	//
