@@ -1090,9 +1090,19 @@ local int InputKey(int key)
     char ChatMessage[sizeof(Input)+40];
     int i;
     char *namestart;
+    char *p;
+    char *q;
 
     switch (key) {
 	case '\r':
+	    // Replace ~~ with ~
+	    for (p = q = Input; *p; ) {
+		if (*p == '~') {
+		    ++p;
+		}
+		*q++ = *p++;
+	    }
+	    *q = '\0';
 	    if (Input[0] == '(') {
 		if (!GameObserve && !GamePaused) {
 		    CommandLog("input", NoUnitP,FlushCommands,-1,-1,NoUnitP,Input,-1);
@@ -1117,7 +1127,19 @@ local int InputKey(int key)
 		FastForwardCycle = atoi(&Input[4]);
 	    }
 	    
-	    if (strlen(Input)) {
+	    if (Input[0]) {
+		// Replace ~ with ~~
+		for (p = Input; *p; ++p) {
+		    if (*p == '~') {
+			q = p + strlen(p);
+			q[1] = '\0';
+			while (q > p) {
+			    *q = *(q - 1);
+			    --q;
+			}
+			++p;
+		    }
+		}
 		sprintf(ChatMessage, "~%s~<%s>~> %s", PlayerColorNames[ThisPlayer->Player],
 			ThisPlayer->Name, Input);
 		// FIXME: only to selected players ...
@@ -1131,6 +1153,9 @@ local int InputKey(int key)
 	case '\b':
 	    DebugLevel3("Key <-\n");
 	    if (InputIndex) {
+		if (Input[InputIndex - 1] == '~') {
+		    Input[--InputIndex] = '\0';
+		}
 		Input[--InputIndex] = '\0';
 		ShowInput();
 	    }
@@ -1162,10 +1187,15 @@ local int InputKey(int key)
 	    return 1;
 	default:
 	    if (key >= ' ' && key <= 256) {
-		if (InputIndex < (int)sizeof(Input) - 1) {
+		if ((key == '~' && InputIndex < (int)sizeof(Input) - 2)
+			|| InputIndex < (int)sizeof(Input) - 1) {
 		    DebugLevel3("Key %c\n" _C_ key);
 		    Input[InputIndex++] = key;
 		    Input[InputIndex] = '\0';
+		    if (key == '~') {
+			Input[InputIndex++] = key;
+			Input[InputIndex] = '\0';
+		    }
 		    ShowInput();
 		}
 		return 1;
