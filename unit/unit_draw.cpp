@@ -582,24 +582,28 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	}
     }
 
+    x+=(type->TileWidth*TileSizeX-type->BoxWidth)/2;
+    y+=(type->TileHeight*TileSizeY-type->BoxHeight)/2;
     //
     // Draw spells decoration
     //
-    if ( unit->Bloodlust > 0 ) {
+    if ( unit->Bloodlust ) {
 	VideoDrawClip( SpellSprites, 0, x, y );
     }
-    if ( unit->Haste > 0 ) { // same slot as slow
+    if ( unit->Haste ) {	// same slot as slow
 	VideoDrawClip( SpellSprites, 1, x+16, y );
     }
-    if ( unit->Slow > 0 ) { // same slot as haste
+    if ( unit->Slow ) {		// same slot as haste
 	VideoDrawClip( SpellSprites, 2, x+16, y );
     }
-    if ( unit->Invisible > 0 ) {
+    if ( unit->Invisible ) {
 	VideoDrawClip( SpellSprites, 3, x+16+16, y );
     }
-    if ( unit->UnholyArmor > 0 ) {
+    if ( unit->UnholyArmor ) {
 	VideoDrawClip( SpellSprites, 4, x+16+16+16, y );
     }
+    x-=(type->TileWidth*TileSizeX-type->BoxWidth)/2;
+    y-=(type->TileHeight*TileSizeY-type->BoxHeight)/2;
 
     //
     //	Draw group number

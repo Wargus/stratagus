@@ -970,6 +970,7 @@ global void UnitIncrementMana(void)
 {
     Unit** table;
     Unit* unit;
+    int flag;
 
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
@@ -1002,24 +1003,44 @@ global void UnitIncrementMana(void)
 	    continue;
 	}
 
+	// some frames delayed done my color cycling
+	flag=1;
 	//
-	// decrease spells effects time
+	// decrease spells effects time, if end redraw unit.
 	//
-	if ( unit->Bloodlust > 0 ) {
+	if ( unit->Bloodlust ) {
 	    unit->Bloodlust--;
+	    if( !flag && !unit->Bloodlust ) {
+                flag=CheckUnitToBeDrawn(unit);
+	    }
 	}
-	if ( unit->Haste > 0 ) {
+	if ( unit->Haste ) {
 	    unit->Haste--;
+	    if( !flag && !unit->Haste ) {
+                flag=CheckUnitToBeDrawn(unit);
+	    }
 	}
-	if ( unit->Slow > 0 ) {
+	if ( unit->Slow ) {
 	    unit->Slow--;
+	    if( !flag && !unit->Slow ) {
+                flag=CheckUnitToBeDrawn(unit);
+	    }
 	}
-	if ( unit->Invisible > 0 ) {
+	if ( unit->Invisible ) {
 	    unit->Invisible--;
+	    if( !flag && !unit->Invisible ) {
+                flag=CheckUnitToBeDrawn(unit);
+	    }
 	}
-	if ( unit->UnholyArmor > 0 ) {
+	if ( unit->UnholyArmor ) {
 	    unit->UnholyArmor--;
+	    if( !flag && !unit->UnholyArmor ) {
+                flag=CheckUnitToBeDrawn(unit);
+	    }
 	}
+	DebugLevel3Fn("%d:%d,%d,%d,%d,%d\n",UnitNumber(unit),
+		unit->Bloodlust,unit->Haste,unit->Slow,unit->Invisible,
+		unit->UnholyArmor);
     }
 }
 
