@@ -56,7 +56,7 @@
 <A HREF="#define-map">define-map</A>
 <A HREF="#define-missile-type">define-missile-type</A>
 <A HREF="#define-missiletype-wc-names">define-missiletype-wc-names</A>
-<A HREF="#define-race-wc-names">define-race-wc-names</A>
+<A HREF="#define-race-names">define-race-names</A>
 <A HREF="#define-ranks">define-ranks</A>
 <A HREF="#diplomacy">diplomacy</A>
 <A HREF="#freecraft-map">freecraft-map</A>
@@ -565,30 +565,62 @@ percent complete use the frame 1 of the main building graphic.
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
 
-<A NAME="define-race-wc-names"></A>
-<H3>define-race-wc-names</H3>
+<A NAME="define-race-names"></A>
+<H3>define-race-names</H3>
 
 <H4>Description</H4>
 
-.
+Define the race names.
 
 <H4>Syntax</H4>
 
-<CODE>(define-race-wc-names)</CODE>
+<CODE><PRE>
+(define-race-names
+  'race '(
+    race race-number
+    name race-name
+    display race-display-name
+    [visible])
+  ['race '(...)] ...)
+</PRE></CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>race-number</DT>
+<DD>Internal race number.  Used to map pud race numbers.
+</DD>
+<DT>race-name</DT>
+<DD>Internal race name used by other ccl functions.
+</DD>
+<DT>race-display-name</DT>
+<DD>Name of the race that gets displayed to the user.
+</DD>
+<DT>visible</DT>
+<DD>If specified the race will be visible in the race menus.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (define-race-wc-names)
+    (define-race-names
+      'race '(
+        race 0
+        name "alliance"
+        display "Alliance"
+        visible)
+      'race '(
+        race 1
+        name "mythical"
+        display "Mythical"
+        visible)
+      'race '(
+        race 2
+        name "neutral"
+        display "Neutral"))
 </PRE>
 
-<P>.
+<P>Defines the alliance, mythical, and neutral races.  The neutral race is
+not visible in the race menus.
 
 <H4>Used</H4>
 
