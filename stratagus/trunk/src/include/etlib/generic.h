@@ -41,7 +41,7 @@ static inline max(int a,int b) { return a>b ? a : b; }
 #define bound(a,b,c) ({ typeof(a) _a = a; typeof(b) _b = b; typeof(c) _c = c; \
 			_b < _a ? _a : _b > _c ? _c : _b; })
 #else
-#warning "// FIXME: bound not written!"
+//#warning "// FIXME: bound not written!"
 #endif
 
 typedef unsigned char u8;
