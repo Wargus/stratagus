@@ -268,7 +268,7 @@ global void IOLinkedList(SCM scmfrom, void *binaryform, void *para)
 	++IOTabLevel;
 	while (*((void **) current)) {
 	    IOPrintTabs();
-	    IOStructPtr(gh_car(scmfrom), current, itemDef);
+	    IOStructPtr(SCM_UNSPECIFIED, current, itemDef);
 	    CLprintf(IOOutFile, "\n");
 
 	    // Get the next...
@@ -367,8 +367,47 @@ global void IOString(SCM scmfrom, void *binaryform, void *para)
     }
     if (IOLoadingMode) {
 	(*((char **) binaryform)) = gh_scm2newstr(scmfrom, 0);
-    } else {				// FIXME : (pludov) better string support
-	CLprintf(IOOutFile, " \"%s\"", (*((char **) binaryform)));
+    } else {
+	char* str, *escape;
+	char buffer[1024];
+	int i;
+	
+	str = (*((char **) binaryform));
+	
+	// Escape '"' & '\n'
+	CLprintf(IOOutFile," \"");
+	do {
+	    escape = str;
+	    while (*escape && (*escape != '\n' && *escape != '"')) {
+		escape++;
+	    }
+
+	    if (!*escape) {
+		CLprintf(IOOutFile, "%s", str);
+		break;
+	    }
+	    
+	    while (str < escape) {
+		i = 0;
+		while (str < escape && i < 1023) {
+		    buffer[i] = *str;
+		    str++;
+		    i++;
+		}
+		buffer[i] = 0;
+		CLprintf(IOOutFile, "%s", buffer);
+	    }
+	    switch (*escape) {
+		case '\n':
+		    CLprintf(IOOutFile, "\\n");
+		    break;
+		case '"':
+		    CLprintf(IOOutFile, "\\\"");
+		    break;
+	    }
+	    str = escape + 1;
+	}while(1);
+	CLprintf(IOOutFile,"\"");
     }
 }
 
@@ -571,7 +610,7 @@ global void IOIntArrayPtr(SCM scmfrom, void *binaryform, void *para)
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the array ( int * )
-**	@param	para		Size of array to allocate/save 
+**	@param	para		Size of array to load/save 
 */
 global void IOIntArray(SCM scmfrom, void *binaryform, void *para)
 {
@@ -714,5 +753,16 @@ global void IOPlayerPtr(SCM scmfrom, void *binaryform, void *para)
 	CLprintf(IOOutFile, " %d", playerid);
     }
 }
+
+#if defined(USE_GUILE)
+global char* CclRepresentation(SCM value)
+{
+    SCM eval,string;
+    eval = gh_list(gh_symbol2scm("as-string"),gh_list(gh_symbol2scm("quote"),value,SCM_UNDEFINED),SCM_UNDEFINED);
+    string = gh_eval(eval, NIL);
+    return gh_scm2newstr(string, 0);
+}
+#endif
+
 #elif defined(USE_LUA)
 #endif
