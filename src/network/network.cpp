@@ -647,8 +647,8 @@ global void NetworkSendSelection(Unit** units, int count)
 		DebugCheck(i > MaxNetworkCommands);
 		header->Type[i] = MessageSelection;
 		selection = (NetworkSelection*)&packet.Command[i];
-		for (ref = 0; ref < 4 && unitcount < count; ++ref) {
-			selection->Unit[ref] = htons(UnitNumber(units[unitcount++]));
+		for (ref = 0; ref < 4 && unitcount < count; ++ref, ++unitcount) {
+			selection->Unit[ref] = htons(UnitNumber(units[unitcount]));
 		}
 	}
 	DebugLevel3("\n");
