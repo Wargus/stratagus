@@ -1742,12 +1742,17 @@ local void DrawBuilding(Unit* unit)
     // FIXME: is this the correct place? No, but now correct working.
     if( visible ) {
 	frame = unit->SeenFrame = unit->Frame;
+	type = unit->SeenType = unit->Type;
+	unit->SeenState = unit->Orders[0].Action==UnitActionBuilded |
+			(unit->Orders[0].Action==UnitActionUpgradeTo << 1);
+	unit->SeenConstructed = unit->Constructed;
+	
     } else {
 	frame = unit->SeenFrame;
+	type = unit->SeenType;
 	DebugCheck( frame==UnitNotSeen );
     }
-
-    type=unit->Type;
+    
     x=Map2ViewportX(CurrentViewport,unit->X)+unit->IX;
     y=Map2ViewportY(CurrentViewport,unit->Y)+unit->IY;
 
@@ -1761,8 +1766,8 @@ local void DrawBuilding(Unit* unit)
     //
     //	Buildings under construction/upgrade/ready.
     //
-    if( unit->Orders[0].Action==UnitActionBuilded ) {
-	if( unit->Constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
+    if( unit->SeenState == 1 ) {
+	if( unit->SeenConstructed || VideoGraphicFrames(type->Sprite)<=1 ) {
 	    GraphicUnitPixels(unit,type->Construction->Sprite);
 	    DrawConstruction(type->Construction
 		,frame&127
@@ -1778,7 +1783,7 @@ local void DrawBuilding(Unit* unit)
     //
     //	Draw the future unit type, if upgrading to it.
     //
-    } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
+    } else if( unit->SeenState == 2 ) {
 	// FIXME: this frame is hardcoded!!!
 	GraphicUnitPixels(unit,unit->Orders[0].Type->Sprite);
 	DrawUnitType(unit->Orders[0].Type,frame<0?-1:1,x,y);
