@@ -379,7 +379,8 @@ local void DrawMapViewport(int v)
 	//	An unit is tracked, center viewport on this unit.
 	//
 	if (TheUI.VP[v].Unit) {
-	    if (TheUI.VP[v].Unit->Destroyed) {
+	    if (TheUI.VP[v].Unit->Destroyed || 
+		TheUI.VP[v].Unit->Orders[0].Action == UnitActionDie) {
 		TheUI.VP[v].Unit = NoUnitP;
 	    } else {
 		MapCenterViewport(v, TheUI.VP[v].Unit->X, TheUI.VP[v].Unit->Y);
