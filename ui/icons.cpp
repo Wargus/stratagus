@@ -409,7 +409,7 @@ global void InitIcons(void)
     //	Different names for the same thing
     //
     for( i=0; i<sizeof(DefaultIconAliases)/sizeof(*DefaultIconAliases); ++i ) {
-	IconId id;
+	Icon* id;
 
 	id=IconByIdent(DefaultIconAliases[i][1]);
 	DebugCheck( id==NoIcon );
@@ -421,7 +421,7 @@ global void InitIcons(void)
     //	Different names for the same thing
     //
     for( i=0; i<IconAliasesCount; ++i ) {
-	IconId id;
+	Icon* id;
 
 	id=IconByIdent(IconAliases[i*2+1]);
 	DebugCheck( id==NoIcon );
@@ -484,11 +484,11 @@ global void CleanIcons(void)
 **
 **	@return		Icon pointer or NoIcon == NULL if not found.
 */
-global IconId IconByIdent(const char* ident)
+global Icon* IconByIdent(const char* ident)
 {
-    const IconId* icon;
+    Icon* const* icon;
 
-    icon=(const IconId*)hash_find(IconHash,(char*)ident);
+    icon=hash_find(IconHash,(char*)ident);
 
     if( icon ) {
 	return *icon;
@@ -505,7 +505,7 @@ global IconId IconByIdent(const char* ident)
 **
 **	@return		The identifier for the icon
 */
-global const char* IdentOfIcon(IconId icon)
+global const char* IdentOfIcon(const Icon* icon)
 {
     DebugCheck( !icon );
 
@@ -520,7 +520,7 @@ global const char* IdentOfIcon(IconId icon)
 **	@param x	X display position
 **	@param y	Y display position
 */
-global void DrawUnitIcon(const Player* player,IconId icon,unsigned flags
+global void DrawUnitIcon(const Player* player,Icon* icon,unsigned flags
 	,unsigned x,unsigned y)
 {
     int color;
