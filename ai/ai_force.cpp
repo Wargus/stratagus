@@ -652,7 +652,7 @@ global int AiCreateSpecificForce(int *power, int *unittypes, int unittypescount)
 		    continue;
 		}
 
-		unittypeforce = AiUnittypeForce(ut) / 8;
+		unittypeforce = AiUnittypeForce(ut);
 		unittypeforce = (unittypeforce ? unittypeforce : 1);
 
 		// Try to respond to the most important power ...
