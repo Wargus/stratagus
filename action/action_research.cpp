@@ -79,9 +79,6 @@ global void HandleActionResearch(Unit* unit)
 			unit->Reset = unit->Wait = 1;
 			unit->Orders[0].Action = UnitActionStill;
 			unit->SubAction = 0;
-			if (IsOnlySelected(unit)) {
-				MustRedraw |= RedrawInfoPanel;
-			}
 			return;
 		}
 #endif
@@ -107,14 +104,8 @@ global void HandleActionResearch(Unit* unit)
 
 		// Upgrade can change all
 		SelectedUnitChanged();
-		MustRedraw |= RedrawInfoPanel;
 
 		return;
-	}
-
-	if (IsOnlySelected(unit)) {
-		// refresh info panel (to show progress, I think)
-		MustRedraw |= RedrawInfoPanel;
 	}
 
 	unit->Reset = 1;

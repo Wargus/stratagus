@@ -147,9 +147,6 @@ local Unit* CheckForDeadGoal(Unit* unit)
 				unit->SavedOrder.Action = UnitActionStill;
 				unit->SavedOrder.Goal = NoUnitP;
 
-				if (unit->Selected && unit->Player == ThisPlayer) {
-					MustRedraw |= RedrawButtonPanel;
-				}
 				goal = unit->Orders[0].Goal;
 			}
 			NewResetPath(unit);
@@ -286,8 +283,6 @@ local void MoveToTarget(Unit* unit)
 					UnitHeadingFromDeltaXY(unit,
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
-					// FIXME: only if heading changes
-					CheckUnitToBeDrawn(unit);
 				}
 				unit->SubAction++;
 				return;
@@ -304,8 +299,6 @@ local void MoveToTarget(Unit* unit)
 				if (unit->Stats->Speed) {
 					UnitHeadingFromDeltaXY(unit, unit->Orders[0].X - unit->X,
 						unit->Orders[0].Y - unit->Y);
-					// FIXME: only if heading changes
-					CheckUnitToBeDrawn(unit);
 				}
 				unit->SubAction &= WEAK_TARGET;
 				unit->SubAction |= ATTACK_TARGET;
@@ -351,9 +344,6 @@ local void MoveToTarget(Unit* unit)
 		unit->SavedOrder.Action = UnitActionStill;
 		unit->SavedOrder.Goal = NoUnitP;
 
-		if (unit->Selected && unit->Player == ThisPlayer) {
-			MustRedraw |= RedrawButtonPanel;
-		}
 		return;
 	}
 	DebugCheck(unit->Type->Vanishes || unit->Destroyed || unit->Removed);
@@ -423,10 +413,6 @@ local void AttackTarget(Unit* unit)
 
 					// This isn't supported
 					DebugCheck(unit->SavedOrder.Goal != NoUnitP);
-
-					if (unit->Selected && unit->Player == ThisPlayer) {
-						MustRedraw |= RedrawButtonPanel;
-					}
 				}
 				return;
 			}
@@ -522,8 +508,6 @@ local void AttackTarget(Unit* unit)
 			UnitHeadingFromDeltaXY(unit,
 				goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 				goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
-			// FIXME: only if heading changes
-			CheckUnitToBeDrawn(unit);
 		}
 	}
 }

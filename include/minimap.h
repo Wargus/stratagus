@@ -74,8 +74,6 @@ extern void CreateMinimap(void);
 extern void DestroyMinimap(void);
 	/// Draw minimap with viewpoint
 extern void DrawMinimap(int vx, int vy);
-	/// Hide minimap cursor
-extern void HideMinimapCursor(void);
 	/// Draw minimap viewpoint cursor
 extern void DrawMinimapCursor(int vx, int vy);
 

@@ -582,10 +582,6 @@ global void PlayerSetAiNum(Player* player, int ai)
 global void PlayerSetResource(Player* player, int resource, int value)
 {
 	player->Resources[resource] = value;
-
-	if (player == ThisPlayer) {
-		MustRedraw |= RedrawResources;
-	}
 }
 
 /**
@@ -693,9 +689,6 @@ global void PlayerAddCosts(Player* player, const int* costs)
 	for (i = 1; i < MaxCosts; ++i) {
 		player->Resources[i] += costs[i];
 	}
-	if (player == ThisPlayer) {
-		MustRedraw |= RedrawResources;
-	}
 }
 
 /**
@@ -725,9 +718,6 @@ global void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
 		DebugLevel3("%d %d\n" _C_ i _C_ costs[i] * factor / 100);
 		player->Resources[i] += costs[i] * factor / 100;
 	}
-	if (player == ThisPlayer) {
-		MustRedraw |= RedrawResources;
-	}
 }
 
 /**
@@ -742,9 +732,6 @@ global void PlayerSubCosts(Player* player, const int* costs)
 
 	for (i = 1; i < MaxCosts; ++i) {
 		player->Resources[i] -= costs[i];
-	}
-	if (player == ThisPlayer) {
-		MustRedraw |= RedrawResources;
 	}
 }
 
@@ -772,9 +759,6 @@ global void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
 
 	for (i = 1; i < MaxCosts; ++i) {
 		player->Resources[i] -= costs[i] * 100 / factor;
-	}
-	if (player == ThisPlayer) {
-		MustRedraw |= RedrawResources;
 	}
 }
 

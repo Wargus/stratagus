@@ -1163,8 +1163,6 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 				MapMarkUnitSight(unit);
 			}
 			player->UnitTypesCount[dst->Slot]++;
-
-			CheckUnitToBeDrawn(unit);
 		//
 		//  Convert trained units to this type.
 		//  FIXME: what about buildings?
@@ -1172,12 +1170,9 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 		} else {
 			if (unit->Orders[0].Action == UnitActionTrain) {
 				for (j = 0; j < unit->Data.Train.Count; ++j) {
-					 if (unit->Data.Train.What[j] == src) {
+					if (unit->Data.Train.What[j] == src) {
 						unit->Data.Train.What[j] = dst;
-						if (IsOnlySelected(unit)) {
-							MustRedraw |= RedrawInfoPanel;
-						}
-					 }
+					}
 				}
 			}
 			for (j = 1; j < unit->OrderCount; ++j) {
@@ -1308,7 +1303,6 @@ global void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 	//
 	if (player == ThisPlayer) {
 		SelectedUnitChanged();
-		MustRedraw |= RedrawInfoPanel;
 	}
 }
 

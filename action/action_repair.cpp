@@ -150,13 +150,6 @@ local void RepairUnit(Unit* unit, Unit* goal)
 			goal->HP = goal->Stats->HitPoints;
 		}
 	}
-
-	if (CheckUnitToBeDrawn(goal)) {
-		MustRedraw |= RedrawMinimap;
-	}
-	if (IsOnlySelected(goal)) {				// Update panel if unit is selected
-		MustRedraw |= RedrawInfoPanel;
-	}
 }
 
 /**
@@ -232,8 +225,6 @@ global void HandleActionRepair(Unit* unit)
 					UnitHeadingFromDeltaXY(unit,
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
-					// FIXME: only if heading changes
-					CheckUnitToBeDrawn(unit);
 				} else if (err < 0) {
 					if (goal) {				// release reference
 						RefsDecrease(goal);

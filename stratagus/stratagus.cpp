@@ -504,16 +504,23 @@ local void WaitCallbackExit(void)
 }
 
 /**
-**  Wait for any input.
-**
-**  @param timeout  Time in seconds to wait.
+**  Show the title screens
 */
-local void WaitForInput(int timeout)
+local void ShowTitleScreens(void)
 {
 	EventCallback callbacks;
+	int timeout;
+	int i;
+	int j;
+	int x;
+	int y;
+
+
+	if (!TitleScreens) {
+		return;
+	}
 
 	SetVideoSync();
-
 	callbacks.ButtonPressed = WaitCallbackKey;
 	callbacks.ButtonReleased = WaitCallbackKey1;
 	callbacks.MouseMoved = WaitCallbackMouse;
@@ -523,15 +530,43 @@ local void WaitForInput(int timeout)
 	callbacks.KeyRepeated = WaitCallbackKey4;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	WaitNoEvent = 1;
-	timeout *= CYCLES_PER_SECOND;
-	while (timeout-- && WaitNoEvent) {
-		WaitEventsOneFrame(&callbacks);
-	}
+	for (i = 0; TitleScreens[i]; ++i) {
+		WaitNoEvent = 1;
+		timeout = TitleScreens[i]->Timeout * CYCLES_PER_SECOND;
 
-	VideoClearScreen();
-	Invalidate();
-	RealizeVideoMemory();
+		if (TitleScreens[i]->Music) {
+			if (!strcmp(TitleScreens[i]->Music, "none") ||
+					!PlayMusic(TitleScreens[i]->Music)) {
+				StopMusic();
+			}
+		}
+		if (PlayMovie(TitleScreens[i]->File,
+				PlayMovieZoomScreen | PlayMovieKeepAspect)) {
+			TitleScreenLabel** labels;
+
+			while (timeout-- && WaitNoEvent) {
+				DisplayPicture(TitleScreens[i]->File);
+				labels = TitleScreens[i]->Labels;
+				if (labels && labels[0] && IsFontLoaded(labels[0]->Font)) {
+					for (j = 0; labels[j]; ++j) {
+						x = labels[j]->Xofs * VideoWidth / 640;
+						y = labels[j]->Yofs * VideoWidth / 640;
+						if (labels[j]->Flags & TitleFlagCenter) {
+							x -= VideoTextLength(labels[j]->Font, labels[j]->Text) / 2;
+						}
+						VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
+					}
+				}
+				Invalidate();
+				RealizeVideoMemory();
+				WaitEventsOneFrame(&callbacks);
+			}
+		}
+
+		VideoClearScreen();
+		Invalidate();
+		RealizeVideoMemory();
+	}
 }
 
 /**
@@ -735,11 +770,6 @@ local void PrintHeader(void)
 local int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
-	int i;
-	int j;
-	int x;
-	int y;
-
 	PrintHeader();
 	printf(
 	"\n\nStratagus may be copied only under the terms of the GNU General Public License\
@@ -767,42 +797,13 @@ Use it at your own risk.\n\n");
 #endif
 
 	//
-	//  Show title screen.
+	//  Show title screens.
 	//
 	SetDefaultTextColors(FontYellow, FontWhite);
 	LoadFonts();
 	SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
 	VideoClearScreen();
-	if (TitleScreens) {
-		for (i = 0; TitleScreens[i]; ++i) {
-			if (TitleScreens[i]->Music) {
-				if (!strcmp(TitleScreens[i]->Music, "none") ||
-						!PlayMusic(TitleScreens[i]->Music)) {
-					StopMusic();
-				}
-			}
-			if (PlayMovie(TitleScreens[i]->File,
-					PlayMovieZoomScreen | PlayMovieKeepAspect)) {
-				TitleScreenLabel** labels;
-
-				DisplayPicture(TitleScreens[i]->File);
-				labels = TitleScreens[i]->Labels;
-				if (labels && labels[0] && IsFontLoaded(labels[0]->Font)) {
-					for (j = 0; labels[j]; ++j) {
-						x = labels[j]->Xofs * VideoWidth / 640;
-						y = labels[j]->Yofs * VideoWidth / 640;
-						if (labels[j]->Flags & TitleFlagCenter) {
-							x -= VideoTextLength(labels[j]->Font, labels[j]->Text) / 2;
-						}
-						VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
-					}
-				}
-				Invalidate();
-				RealizeVideoMemory();
-				WaitForInput(TitleScreens[i]->Timeout);
-			}
-		}
-	}
+	ShowTitleScreens();
 
 	InitUnitsMemory();  // Units memory management
 	PreMenuSetup();     // Load everything needed for menus

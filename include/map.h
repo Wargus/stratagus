@@ -341,16 +341,10 @@ extern void DrawMapBackgroundInViewport(const Viewport*, int x, int y);
 	/// Build tables for map
 extern void InitMap(void);
 
-	/// Mark position inside screenmap be drawn for next display update
-extern int MarkDrawPosMap(int x, int y );
 	/// Denote wether area in map is overlapping with viewport on screen
 extern int MapAreaVisibleInViewport(const Viewport*, int , int , int , int);
 	/// Check if any part of an area is visible in viewport
 extern int AnyMapAreaVisibleInViewport(const Viewport*, int , int , int , int);
-	/// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
-extern  int MarkDrawAreaMap(int sx, int sy, int ex, int ey);
-	/// Set all entries in MustRedrawRow and MustRedrawTile
-extern  void MarkDrawEntireMap(void);
 
 //
 // in map_fog.c

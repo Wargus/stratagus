@@ -251,6 +251,7 @@ local void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 	while (s1) {
 		char* x1;
 		char* x2;
+
 		if ((s1 = strpbrk(s1, "\n\r"))) {
 			if ((s1[0] == '\n' && s1[1] == '\r') ||
 					(s1[0] == '\r' && s1[1] == '\n')) {
@@ -398,7 +399,6 @@ global void ShowIntro(const Intro* intro)
 	UseContinueButton = 1;
 	InitContinueButton(455 * VideoWidth / 640, 440 * VideoHeight / 480);
 	GameCursor = TheUI.Point.Cursor;
-	DestroyCursorBackground();
 
 	VideoClearScreen();
 
@@ -477,7 +477,6 @@ global void ShowIntro(const Intro* intro)
 			}
 		}
 
-		HideAnyCursor();
 		//
 		// Draw background
 		//
@@ -518,15 +517,7 @@ global void ShowIntro(const Intro* intro)
 		DrawContinueButton();
 		DrawAnyCursor();
 
-		if (!line && !c) {
-			Invalidate();
-		} else {
-			InvalidateAreaAndCheckCursor(70 * VideoWidth / 640, 80 * VideoHeight / 480,
-				70 * VideoWidth / 640 + 320 + 1, 170 * VideoHeight / 480 + 1);
-			InvalidateAreaAndCheckCursor(ContinueButtonX, ContinueButtonY,
-				106, 27);
-			InvalidateCursorAreas();
-		}
+		Invalidate();
 		RealizeVideoMemory();
 
 		if (!IntroNoEvent) {
@@ -610,7 +601,6 @@ global void ShowCredits(Credits* credits)
 	UseContinueButton = 1;
 	InitContinueButton(TheUI.Offset640X + 455, TheUI.Offset480Y + 440);
 	GameCursor = TheUI.Point.Cursor;
-	DestroyCursorBackground();
 
 	x = TheUI.Offset640X;
 	y = TheUI.Offset480Y;
@@ -618,9 +608,6 @@ global void ShowCredits(Credits* credits)
 	line = 0;
 	scrolling = 1;
 	while (1) {
-
-		HideAnyCursor();
-
 		//
 		// Draw background
 		//
@@ -669,7 +656,6 @@ global void ShowCredits(Credits* credits)
 	}
 
 	VideoClearScreen();
-	DestroyCursorBackground();
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
@@ -868,26 +854,8 @@ local int GameStatsDrawFunc(int frame)
 	int description_offset;
 	int percent;
 	int max;
-	int draw_all;
-
-#ifdef USE_OPENGL
-	draw_all = 1;
-#else
-	draw_all = 0;
-#endif
-
-#ifndef USE_OPENGL
-	// If a button was pressed draw everything
-	if (IntroButtonPressed) {
-		draw_all = 1;
-	}
-#endif
 
 	done = 0;
-
-	if (!draw_all && (frame % stats_pause) != 0) {
-		return done;
-	}
 
 	percent = 100;
 	x = TheUI.Offset640X;
@@ -915,12 +883,12 @@ local int GameStatsDrawFunc(int frame)
 	}
 	line_spacing = (432 - bottom_offset - description_offset) / c;
 
-	if (!draw_all || (dodraw <= 10 && (frame % stats_pause) == 0)) {
+	if (dodraw <= 10 && (frame % stats_pause) == 0) {
 		PlayGameSound(SoundIdForName("statsthump"), MaxSampleVolume);
 	}
 
 
-	if (dodraw==1 || (draw_all && dodraw >= 1)) {
+	if (dodraw >= 1) {
 		char* outcome;
 
 		VideoDrawTextCentered(x + 106, y + top_offset, LargeFont, "Outcome");
@@ -933,7 +901,7 @@ local int GameStatsDrawFunc(int frame)
 			outcome);
 	}
 
-	if (dodraw == 2 || (draw_all && dodraw >= 2)) {
+	if (dodraw >= 2) {
 		char* rank;
 		char** ranks;
 		int* scores;
@@ -963,13 +931,13 @@ local int GameStatsDrawFunc(int frame)
 		VideoDrawTextCentered(x + 324, y + top_offset + 21, SmallTitleFont, rank);
 	}
 
-	if (dodraw == 3 || (draw_all && dodraw >= 3)) {
+	if (dodraw >= 3) {
 		VideoDrawTextCentered(x + 540, y + top_offset, LargeFont, "Score");
 		sprintf(buf, "%u", ThisPlayer->Score);
 		VideoDrawTextCentered(x + 540, y + top_offset + 21, SmallTitleFont, buf);
 	}
 
-	if (dodraw == 4 || (draw_all && dodraw >= 4)) {
+	if (dodraw >= 4) {
 		max = Players[0].TotalUnits;
 		for (i = 1; i < PlayerMax - 1; ++i) {
 			p = &Players[i];
@@ -1014,7 +982,7 @@ local int GameStatsDrawFunc(int frame)
 		}
 	}
 
-	if (dodraw == 5 || (draw_all && dodraw >= 5)) {
+	if (dodraw >= 5) {
 		max = Players[0].TotalBuildings;
 		for (i = 1; i < PlayerMax - 1; ++i) {
 			p = &Players[i];
@@ -1047,7 +1015,7 @@ local int GameStatsDrawFunc(int frame)
 		}
 	}
 
-	if (dodraw == 6 || (draw_all && dodraw >= 6)) {
+	if (dodraw >= 6) {
 		max = Players[0].TotalResources[GoldCost];
 		for (i = 1; i < PlayerMax - 1; ++i) {
 			p = &Players[i];
@@ -1080,7 +1048,7 @@ local int GameStatsDrawFunc(int frame)
 		}
 	}
 
-	if (dodraw == 7 || (draw_all && dodraw >= 7)) {
+	if (dodraw >= 7) {
 		max = Players[0].TotalResources[WoodCost];
 		for (i = 1; i < PlayerMax - 1; ++i) {
 			p = &Players[i];
@@ -1113,7 +1081,7 @@ local int GameStatsDrawFunc(int frame)
 		}
 	}
 
-	if (dodraw == 8 || (draw_all && dodraw >= 8)) {
+	if (dodraw >= 8) {
 		max = Players[0].TotalResources[OilCost];
 		for (i = 1; i < PlayerMax - 1; ++i) {
 			p = &Players[i];
@@ -1146,7 +1114,7 @@ local int GameStatsDrawFunc(int frame)
 		}
 	}
 
-	if (dodraw == 9 || (draw_all && dodraw >= 9)) {
+	if (dodraw >= 9) {
 		max = Players[0].TotalKills;
 		for (i = 1; i < PlayerMax - 1; ++i) {
 			p = &Players[i];
@@ -1179,7 +1147,7 @@ local int GameStatsDrawFunc(int frame)
 		}
 	}
 
-	if (dodraw == 10 || (draw_all && dodraw >= 10)) {
+	if (dodraw >= 10) {
 		max = Players[0].TotalRazings;
 		for (i = 1; i < PlayerMax - 1; ++i) {
 			p = &Players[i];
@@ -1257,23 +1225,12 @@ global void ShowStats(void)
 	UseContinueButton = 1;
 	InitContinueButton(TheUI.Offset640X + 455, TheUI.Offset480Y + 440);
 	GameCursor = TheUI.Point.Cursor;
-	DestroyCursorBackground();
 
 	frame = 1;
 	done = 0;
 	IntroNoEvent = 1;
 	IntroButtonPressed = 0;
-#ifndef USE_OPENGL
-	if (background) {
-		VideoDrawSubClip(background, 0, 0,
-			background->Width, background->Height,
-			(VideoWidth - background->Width) / 2,
-			(VideoHeight - background->Height) / 2);
-	}
-#endif
 	while (1) {
-		HideAnyCursor();
-#ifdef USE_OPENGL
 		if (background) {
 			VideoDrawSubClip(background, 0, 0,
 				background->Width, background->Height,
@@ -1281,11 +1238,6 @@ global void ShowStats(void)
 				(VideoHeight - background->Height) / 2);
 		}
 		GameStatsDrawFunc(frame);
-#else
-		if (!done) {
-			done = GameStatsDrawFunc(frame);
-		}
-#endif
 		DrawContinueButton();
 		DrawAnyCursor();
 

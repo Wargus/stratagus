@@ -170,33 +170,6 @@ global void MapDrawTile(int tile, int x, int y)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Mark position inside viewport be drawn for next display update.
-**
-**  @param x  X map tile position of point in Map to be marked.
-**  @param y  Y map tile position of point in Map to be marked.
-**
-**  @return   True if inside and marked, false otherwise.
-**
-**  @note latimerius: MarkDrawPosMap() in split screen environment
-**        schedules RedrawMap if (x,y) is visible inside *any* of the existing
-**        viewports.  Is this OK, johns?  Do you think it would pay having
-**        RedrawViewport0, RedrawViewport1 etc. variables and redraw just
-**        vp's that actually need redrawing?  We should evaluate this.
-**        JOHNS: A complete viewport redraw is still too much work. The final
-**        version should only redraw the needed tiles.
-*/
-global int MarkDrawPosMap(int x, int y)
-{
-	Viewport* vp;
-
-	if ((vp = MapTileGetViewport(x, y))) {
-		MustRedraw |= RedrawMap;
-		return 1;
-	}
-	return 0;
-}
-
-/**
 **  Denote wether area in map is overlapping with the viewport.
 **
 **  @param vp  Viewport pointer.
@@ -249,37 +222,6 @@ global int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 	// FIXME: Can be written faster
 	return PointInViewport(vp, sx, sy) || PointInViewport(vp, sx, ey) ||
 		PointInViewport(vp, ex, sy) || PointInViewport(vp, ex, ey);
-}
-
-/**
-**  Mark overlapping area with viewport be drawn for next display update.
-**
-**  @param sx  X map tile position of area in Map to be marked.
-**  @param sy  Y map tile position of area in Map to be marked.
-**  @param ex  X map tile position of area in Map to be marked.
-**  @param ey  Y map tile position of area in Map to be marked.
-**
-**  @return    True if overlapping and marked, false otherwise.
-**
-**  @see MustRedrawRow @see MustRedrawTile.
-*/
-global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
-{
-	if (MapTileGetViewport(sx, sy) || MapTileGetViewport(ex, ey) ||
-			MapTileGetViewport(sx, ey) || MapTileGetViewport(ex, sy)) {
-		MustRedraw |= RedrawMap;
-		return 1;
-	}
-	return 0;
-}
-
-/**
-**  Enable entire map be drawn for next display update.
-*/
-global void MarkDrawEntireMap(void)
-{
-	DebugLevel3Fn("\n");
-	MustRedraw |= RedrawMap;
 }
 
 /**

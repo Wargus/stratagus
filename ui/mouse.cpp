@@ -85,7 +85,6 @@ global enum _cursor_on_ CursorOn=CursorOnUnknown;		/// Cursor on field
 global void CancelBuildingMode(void)
 {
 	CursorBuilding = NULL;
-	MustRedraw |= RedrawCursor;
 	ClearStatusLine();
 	ClearCosts();
 	CurrentButtonLevel = 0;				// reset unit buttons to normal
@@ -396,7 +395,6 @@ local void HandleMouseOn(int x, int y)
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderMenu;
 				CursorOn = CursorOnButton;
-				MustRedraw |= RedrawMenuButton;
 				return;
 			}
 		}
@@ -409,7 +407,6 @@ local void HandleMouseOn(int x, int y)
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkMenu;
 				CursorOn = CursorOnButton;
-				MustRedraw |= RedrawMenuButton;
 				return;
 			}
 		}
@@ -421,7 +418,6 @@ local void HandleMouseOn(int x, int y)
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkDiplomacy;
 				CursorOn = CursorOnButton;
-				MustRedraw |= RedrawMenuButton;
 				return;
 			}
 		}
@@ -435,7 +431,6 @@ local void HandleMouseOn(int x, int y)
 			if (CurrentButtons && CurrentButtons[i].Pos != -1) {
 				ButtonUnderCursor = i;
 				CursorOn = CursorOnButton;
-				MustRedraw |= RedrawButtonPanel;
 				return;
 			}
 		}
@@ -450,7 +445,6 @@ local void HandleMouseOn(int x, int y)
 				ButtonAreaUnderCursor = ButtonAreaTransporting;
 				ButtonUnderCursor = i;
 				CursorOn = CursorOnButton;
-				MustRedraw |= RedrawInfoPanel;
 				return;
 			}
 		}
@@ -466,7 +460,6 @@ local void HandleMouseOn(int x, int y)
 					ButtonAreaUnderCursor = ButtonAreaTraining;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
-					MustRedraw |= RedrawInfoPanel;
 					return;
 				}
 			} else {
@@ -479,7 +472,6 @@ local void HandleMouseOn(int x, int y)
 						ButtonAreaUnderCursor = ButtonAreaTraining;
 						ButtonUnderCursor = i;
 						CursorOn = CursorOnButton;
-						MustRedraw |= RedrawInfoPanel;
 						return;
 					}
 				}
@@ -492,7 +484,6 @@ local void HandleMouseOn(int x, int y)
 				ButtonAreaUnderCursor = ButtonAreaUpgrading;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
-				MustRedraw |= RedrawInfoPanel;
 				return;
 			}
 		} else if (Selected[0]->Orders[0].Action == UnitActionResearch && !BigMapMode) {
@@ -503,7 +494,6 @@ local void HandleMouseOn(int x, int y)
 				ButtonAreaUnderCursor = ButtonAreaResearching;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
-				MustRedraw |= RedrawInfoPanel;
 				return;
 			}
 		}
@@ -517,7 +507,6 @@ local void HandleMouseOn(int x, int y)
 			ButtonAreaUnderCursor = ButtonAreaSelected;
 			ButtonUnderCursor = 0;
 			CursorOn = CursorOnButton;
-			MustRedraw |= RedrawInfoPanel;
 			return;
 		}
 	} else {
@@ -526,31 +515,19 @@ local void HandleMouseOn(int x, int y)
 				TheUI.NumSelectedButtons - 1 : NumSelected - 1;
 			for (; i >= 0; --i) {
 				if (x >= TheUI.SelectedButtons[i].X &&
-					x < TheUI.SelectedButtons[i].X + TheUI.SelectedButtons[i].Width + 7 &&
-					y >= TheUI.SelectedButtons[i].Y &&
-					y < TheUI.SelectedButtons[i].Y + TheUI.SelectedButtons[i].Height + 7) {
-				ButtonAreaUnderCursor = ButtonAreaSelected;
-				ButtonUnderCursor = i;
-				CursorOn = CursorOnButton;
-				MustRedraw |= RedrawInfoPanel;
-				return;
+						x < TheUI.SelectedButtons[i].X + TheUI.SelectedButtons[i].Width + 7 &&
+						y >= TheUI.SelectedButtons[i].Y &&
+						y < TheUI.SelectedButtons[i].Y + TheUI.SelectedButtons[i].Height + 7) {
+					ButtonAreaUnderCursor = ButtonAreaSelected;
+					ButtonUnderCursor = i;
+					CursorOn = CursorOnButton;
+					return;
 				}
 			}
 		}
 	}
 
 	if (ButtonUnderCursor != -1) {		// remove old display
-		if (ButtonAreaUnderCursor == ButtonAreaMenu) {
-			MustRedraw |= RedrawMenuButton;
-		} else if (ButtonAreaUnderCursor == ButtonAreaSelected ||
-				ButtonAreaUnderCursor == ButtonAreaTraining ||
-				ButtonAreaUnderCursor == ButtonAreaUpgrading ||
-				ButtonAreaUnderCursor == ButtonAreaResearching ||
-				ButtonAreaUnderCursor == ButtonAreaTransporting) {
-			MustRedraw |= RedrawInfoPanel;
-		} else {
-			MustRedraw |= RedrawButtonPanel;
-		}
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = -1;
 	}
@@ -810,9 +787,6 @@ global void UIHandleMouseMove(int x, int y)
 		//
 		if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration &&
 				(UnitVisible(UnitUnderCursor, ThisPlayer) || ReplayRevealMap)) {
-			if (NumSelected == 0) {
-				MustRedraw |= RedrawInfoPanel;
-			}
 			GameCursor = TheUI.Glass.Cursor;
 		}
 
@@ -1267,7 +1241,6 @@ local void DoSelectionButtons(int num,unsigned button __attribute__((unused)))
 	ClearCosts();
 	CurrentButtonLevel = 0;				// reset unit buttons to normal
 	SelectionChanged();
-	MustRedraw |= RedrawInfoPanel;
 }
 
 //.............................................................................
@@ -1298,7 +1271,6 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 		GameCursor = TheUI.Point.Cursor;
 		CurrentButtonLevel = 0;
 		UpdateButtonPanel();
-		MustRedraw |= RedrawButtonPanel | RedrawCursor;
 
 		sx = CursorX - vp->X + TileSizeX * vp->MapX + vp->OffsetX;
 		sy = CursorY - vp->Y + TileSizeY * vp->MapY + vp->OffsetY;
@@ -1333,7 +1305,6 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 			GameCursor = TheUI.Point.Cursor;
 			CurrentButtonLevel = 0; // reset unit buttons to normal
 			UpdateButtonPanel();
-			MustRedraw |= RedrawButtonPanel | RedrawCursor;
 			if (ClickMissile) {
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 					sx + TileSizeX / 2, sy + TileSizeY / 2, 0, 0);
@@ -1359,7 +1330,6 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	GameCursor = TheUI.Point.Cursor;
 	CurrentButtonLevel = 0; // reset unit buttons to normal
 	UpdateButtonPanel();
-	MustRedraw |= RedrawButtonPanel | RedrawCursor;
 }
 
 /**
@@ -1426,7 +1396,6 @@ global void UIHandleButtonDown(unsigned button)
 		if ((MouseButtons & LeftButton) &&
 				TheUI.SelectedViewport != TheUI.MouseViewport) {
 			TheUI.SelectedViewport = TheUI.MouseViewport;
-			MustRedraw = RedrawMinimapCursor | RedrawMap;
 			DebugLevel0Fn("selected viewport changed to %d.\n" _C_
 				TheUI.SelectedViewport - TheUI.Viewports);
 		}
@@ -1484,7 +1453,6 @@ global void UIHandleButtonDown(unsigned button)
 				TileSizeY * TheUI.MouseViewport->MapY;
 			GameCursor = TheUI.Cross.Cursor;
 			CursorState = CursorStateRectangle;
-			MustRedraw |= RedrawCursor;
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
@@ -1492,7 +1460,6 @@ global void UIHandleButtonDown(unsigned button)
 			SubScrollY = 0;
 			GameCursor = TheUI.Scroll.Cursor;
 			DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
-			MustRedraw |= RedrawCursor;
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
 				Unit* unit;
@@ -1559,12 +1526,10 @@ global void UIHandleButtonDown(unsigned button)
 						!GameMenuButtonClicked) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					GameMenuButtonClicked = 1;
-					MustRedraw |= RedrawMenuButton;
 				} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy &&
 						!GameDiplomacyButtonClicked) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					GameDiplomacyButtonClicked = 1;
-					MustRedraw |= RedrawMenuButton;
 				}
 			//
 			//		clicked on selected button
@@ -1684,7 +1649,6 @@ global void UIHandleButtonUp(unsigned button)
 	//
 	if ((1 << button) == LeftButton && GameMenuButtonClicked) {
 		GameMenuButtonClicked = 0;
-		MustRedraw |= RedrawMenuButton;
 		if (ButtonAreaUnderCursor == ButtonAreaMenu &&
 			(ButtonUnderCursor == ButtonUnderMenu ||
 				ButtonUnderCursor == ButtonUnderNetworkMenu)) {
@@ -1703,7 +1667,6 @@ global void UIHandleButtonUp(unsigned button)
 	//
 	if ((1 << button) == LeftButton && GameDiplomacyButtonClicked) {
 		GameDiplomacyButtonClicked = 0;
-		MustRedraw |= RedrawMenuButton;
 		if (ButtonAreaUnderCursor == ButtonAreaMenu &&
 				ButtonUnderCursor == ButtonUnderNetworkDiplomacy) {
 			// FIXME: Not if, in input mode.
@@ -1867,7 +1830,6 @@ global void UIHandleButtonUp(unsigned button)
 		CursorStartY = 0;
 		GameCursor = TheUI.Point.Cursor;
 		CursorState = CursorStatePoint;
-		MustRedraw |= RedrawCursor | RedrawMap | RedrawPanels;
 	}
 }
 

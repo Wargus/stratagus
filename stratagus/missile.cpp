@@ -623,23 +623,6 @@ local int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
 }
 
 /**
-**  Check and sets if missile must be drawn on screen-map
-**
-**  @param missile  Missile to be checked.
-**  @return         True if map marked to be drawn, false otherwise.
-*/
-global int CheckMissileToBeDrawn(const Missile* missile)
-{
-	int sx;
-	int sy;
-	int ex;
-	int ey;
-
-	GetMissileMapArea(missile, &sx, &sy, &ex, &ey);
-	return MarkDrawAreaMap(sx, sy, ex, ey);
-}
-
-/**
 **  Draw missile.
 **
 **  @param mtype  Missile type
@@ -1218,9 +1201,6 @@ local void MissilesActionLoop(Missile** missiles)
 			++missiles;
 			continue;
 		}
-
-		// Mark missile area on screen to be drawn, if missile moves or disappears.
-		CheckMissileToBeDrawn(missile);
 
 		MissileClassFunctions[missile->Type->Class](missile);
 

@@ -248,12 +248,10 @@ global void ActionStillGeneric(Unit* unit, int ground)
 			case 0: // Turn clockwise
 				unit->Direction += NextDirection;
 				UnitUpdateHeading(unit);
-				CheckUnitToBeDrawn(unit);
 				break;
 			case 1: // Turn counter clockwise
 				unit->Direction -= NextDirection;
 				UnitUpdateHeading(unit);
-				CheckUnitToBeDrawn(unit);
 				break;
 			default: // does nothing
 				break;

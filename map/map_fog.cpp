@@ -448,7 +448,6 @@ global void UpdateFogOfWarChange(void)
 	for (x = 0; x < NumUnits; ++x) {
 		UnitCountSeen(Units[x]);
 	}
-	MarkDrawEntireMap();
 }
 
 /*----------------------------------------------------------------------------
