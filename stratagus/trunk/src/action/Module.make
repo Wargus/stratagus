@@ -33,7 +33,3 @@ MSRC =	 action_attack.c action_board.c action_build.c action_demolish.c \
 SRC+=	$(addprefix $(MODULE)/,$(MSRC))
 HDRS+=
 
-$(MODULE)/$(OBJDIR)/%.o: $(MODULE)/%.c
-	@if [ ! -d $(shell dirname $@) ]; then mkdir $(shell dirname $@); fi
-	$(CC) -c $(CFLAGS) $< -o $@;
-
