@@ -1756,7 +1756,9 @@ local void DrawUnit(const Unit* unit)
 
     type=unit->Type;
     if( type->UnitType==UnitTypeFly || type->ShadowSprite ) {
-	DrawShadow(unit,x,y);
+	if( unit->Orders[0].Action!=UnitActionDie ) {
+	    DrawShadow(unit,x,y);
+	}
     }
 
     //
