@@ -293,7 +293,7 @@ global void MapMarkNewSight(int tx,int ty,int range
 global void MapUpdateFogOfWar(int x,int y)
 {
     Unit* unit;
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     char *redraw_row;
     char *redraw_tile;
     int n;

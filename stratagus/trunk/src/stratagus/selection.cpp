@@ -213,7 +213,7 @@ global int ToggleSelectUnit(Unit* unit)
 global int SelectUnitsByType(Unit* base)
 {
     Unit* unit;
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     const UnitType* type;
     int r;
     int i;
@@ -374,7 +374,7 @@ local int SelectOrganicUnitsInTable(Unit** table,int num_units)
  */
 global int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int toggle_num;
     int n,i;
 
@@ -425,7 +425,7 @@ global int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h)
 global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
 {
     Unit* unit;
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     UnitType* type;
     int r;
     int n;

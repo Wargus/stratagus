@@ -53,7 +53,7 @@
 */
 global void HandleActionDemolish(Unit* unit)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int i;
     int n;
     int x, y, ix, iy;
