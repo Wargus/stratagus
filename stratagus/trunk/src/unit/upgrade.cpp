@@ -224,12 +224,12 @@ global void CleanUpgrades(void)
 global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 {
     // units allow bits -> wc2num -> internal names.
-    static char unit_for_bit[] = {
+    static char unit_for_bit[64] = {
 	 0,  1,	// unit-footman			unit-grunt
 	 2,  3,	// unit-peasant			unit-peon
 	 4,  5,	// unit-ballista		unit-catapult
 	 6,  7,	// unit-knight			unit-ogre
-	 7,  9,	// unit-archer			unit-axethrower
+	 8,  9,	// unit-archer			unit-axethrower
 	10, 11,	// unit-mage			unit-death-knight
 	26, 27,	// unit-human-oil-tanker	unit-orc-oil-tanker
 	30, 31,	// unit-elven-destroyer		unit-troll-destroyer
@@ -240,64 +240,27 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	42, 43,	// unit-gryphon-rider		unit-dragon
 	-1, -1,	// NULL				NULL
 	14, 15,	// unit-dwarves			unit-goblin-sappers
-	 0,  0,	// unit-gryphon-aviary		unit-dragon-roost
-	 0,  0,	// unit-farm			unit-pig-farm
-	 0,  0,	// unit-human-barracks		unit-orc-barracks
-	 0,  0,	// unit-gryphon-aviary		unit-dragon-roost
-	 0,  0,	// unit-elven-lumber-mill	unit-troll-lumber-mill
-	 0,  0,	// unit-stables			unit-ogre-mound
-	 0,  0,	// unit-mage-tower		unit-temple-of-the-damned
-	 0,  0,	// unit-human-foundry		unit-orc-foundry
-	 0,  0,	// unit-human-refinery		unit-orc-refinery
-	 0,  0,	// unit-gnomish-inventor	unit-goblin-alchemist
-	 0,  0,	// unit-church			unit-altar-of-storms
-	 0,  0,	// unit-human-watch-tower	unit-orc-watch-tower
-	 0,  0,	// unit-town-hall		unit-great-hall
-	 0,  0,	// unit-keep			unit-stronghold
-	 0,  0,	// unit-castle			unit-fortress
-	 0,  0,	// unit-human-blacksmith	unit-orc-blacksmith
-	 0,  0,	// unit-human-shipyard		unit-orc-shipyard
-	 0,  0,	// unit-human-wall		unit-orc-wall
-    };
-    // FIXME: must loaded from config files
-    // units allow bits -> internal names.
-    static char* units[] = {
-	"unit-footman",		"unit-grunt",
-	"unit-peasant",		"unit-peon",
-	"unit-ballista",	"unit-catapult",
-	"unit-knight",		"unit-ogre",
-	"unit-archer",		"unit-axethrower",
-	"unit-mage",		"unit-death-knight",
-	"unit-human-oil-tanker","unit-orc-oil-tanker",
-	"unit-elven-destroyer",	"unit-troll-destroyer",
-	"unit-human-transport",	"unit-orc-transport",
-	"unit-battleship",	"unit-ogre-juggernaught",
-	"unit-gnomish-submarine","unit-giant-turtle",
-	"unit-gnomish-flying-machine", "unit-goblin-zeppelin",
-	"unit-gryphon-rider",	"unit-dragon",
-	NULL,			NULL,
-	"unit-dwarves",		"unit-goblin-sappers",
-	"unit-gryphon-aviary",	"unit-dragon-roost",
-	"unit-farm",		"unit-pig-farm",
-	"unit-human-barracks",	"unit-orc-barracks",
-	"unit-gryphon-aviary",	"unit-dragon-roost",
-	"unit-elven-lumber-mill","unit-troll-lumber-mill",
-	"unit-stables",		"unit-ogre-mound",
-	"unit-mage-tower",	"unit-temple-of-the-damned",
-	"unit-human-foundry",	"unit-orc-foundry",
-	"unit-human-refinery",	"unit-orc-refinery",
-	"unit-gnomish-inventor","unit-goblin-alchemist",
-	"unit-church",		"unit-altar-of-storms",
-	"unit-human-watch-tower","unit-orc-watch-tower",
-	"unit-town-hall",	"unit-great-hall",
-	"unit-keep",		"unit-stronghold",
-	"unit-castle",		"unit-fortress",
-	"unit-human-blacksmith","unit-orc-blacksmith",
-	"unit-human-shipyard",	"unit-orc-shipyard",
-	"unit-human-wall",	"unit-orc-wall",
+	70, 71,	// unit-gryphon-aviary		unit-dragon-roost
+	58, 59,	// unit-farm			unit-pig-farm
+	60, 61,	// unit-human-barracks		unit-orc-barracks
+	76, 77,	// unit-elven-lumber-mill	unit-troll-lumber-mill
+	66, 67,	// unit-stables			unit-ogre-mound
+	80, 81,	// unit-mage-tower		unit-temple-of-the-damned
+	78, 79,	// unit-human-foundry		unit-orc-foundry
+	84, 85,	// unit-human-refinery		unit-orc-refinery
+	68, 69,	// unit-gnomish-inventor	unit-goblin-alchemist
+	62, 63,	// unit-church			unit-altar-of-storms
+	64, 65,	// unit-human-watch-tower	unit-orc-watch-tower
+	74, 75,	// unit-town-hall		unit-great-hall
+	88, 89,	// unit-keep			unit-stronghold
+	90, 91,	// unit-castle			unit-fortress
+	82, 83,	// unit-human-blacksmith	unit-orc-blacksmith
+	72, 73,	// unit-human-shipyard		unit-orc-shipyard
+	103,104,// unit-human-wall		unit-orc-wall
     };
     // spell allow bits -> internal names.
-    static char* spells[] = {
+    // FIXME: spells allow bits -> wc2num -> internal names.
+    static char* spells[32] = {
 	"upgrade-holy-vision",
 	"upgrade-healing",
 	NULL,
@@ -332,7 +295,8 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	NULL,
     };
     // upgrades allow bits -> internal names.
-    static char* upgrades[] = {
+    // FIXME: upgrades allow bits -> wc2num -> internal names.
+    static char* upgrades[64] = {
 	"upgrade-arrow1",		"upgrade-throwing-axe1",
 	"upgrade-arrow2",		"upgrade-throwing-axe2",
 	"upgrade-sword1",		"upgrade-battle-axe1",
@@ -372,37 +336,30 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 
     DebugLevel0Fn(" Length %d FIXME: constant must be moved to ccl\n",length);
 
-    InitUpgrades();
-
     //
     //	Allow units
     //
     for( player=Players; player<Players+16; ++player ) {
-	for( i=0; i<4; ++i ) {
+	for( i=0; i<4; ++i ) {		// 4 bytes endian save
 	    int v;
 
-	    v=*alow++;
-	    DebugLevel3Fn(" %x\n",v);
+	    v=(*alow++)&0xFF;
 	    for( b=0; b<8; ++b ) {
 		if( unit_for_bit[i*16+0+b*2]>0 ) {
-		    DebugCheck( UnitTypeByIdent(units[i*16+0+b*2])->Type
-			    != unit_for_bit[i*16+0+b*2] );
-		}
-		if( v&(1<<b) ) {
-		    if( units[i*16+0+b*2] ) {
-			DebugLevel3Fn(" %s +\n",
-				units[i*16+0+b*2]);
-
-			AllowUnitByIdent(player,units[i*16+0+b*2],'A');
-			AllowUnitByIdent(player,units[i*16+1+b*2],'A');
-		    }
-		} else {
-		    if( units[i*16+0+b*2] ) {
-			DebugLevel3Fn(" %s -\n",
-				units[i*16+0+b*2]);
-
-			AllowUnitByIdent(player,units[i*16+0+b*2],'F');
-			AllowUnitByIdent(player,units[i*16+1+b*2],'F');
+		    if( v&(1<<b) ) {
+			AllowUnitId(player,
+			    UnitTypeByWcNum(unit_for_bit[i*16+0+b*2])->Type,
+				'A');
+			AllowUnitId(player,
+			    UnitTypeByWcNum(unit_for_bit[i*16+1+b*2])->Type,
+				'A');
+		    } else {
+			AllowUnitId(player,
+			    UnitTypeByWcNum(unit_for_bit[i*16+0+b*2])->Type,
+				'F');
+			AllowUnitId(player,
+			    UnitTypeByWcNum(unit_for_bit[i*16+1+b*2])->Type,
+				'F');
 		    }
 		}
 	    }
@@ -421,14 +378,14 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
-			DebugLevel0Fn(" %d %s +R\n",
+			DebugLevel3Fn(" %d %s +R\n",
 				player->Player,spells[i*8+b]);
 
 			AllowUpgradeByIdent(player,spells[i*8+b],'R');
 		    }
 		} else {
 		    if( spells[i*8+b] ) {
-			DebugLevel0Fn(" %d %s -F\n",
+			DebugLevel3Fn(" %d %s -F\n",
 				player->Player,spells[i*8+b]);
 
 			AllowUpgradeByIdent(player,spells[i*8+b],'F');
@@ -450,7 +407,7 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
-			DebugLevel0Fn(" %d %s +A\n",
+			DebugLevel3Fn(" %d %s +A\n",
 				player->Player,spells[i*8+b]);
 
 			AllowUpgradeByIdent(player,spells[i*8+b],'A');
@@ -472,7 +429,7 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
-			DebugLevel0Fn(" %d %s +U\n",
+			DebugLevel3Fn(" %d %s +U\n",
 				player->Player,spells[i*8+b]);
 
 			AllowUpgradeByIdent(player,spells[i*8+b],'U');
@@ -494,7 +451,7 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( upgrades[i*16+b*2+0] ) {
-			DebugLevel0Fn(" %d %s +A\n",
+			DebugLevel3Fn(" %d %s +A\n",
 				player->Player,upgrades[i*16+b*2]);
 
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'A');
@@ -517,7 +474,7 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( upgrades[i*16+b*2+0] ) {
-			DebugLevel0Fn(" %d %s +U\n",
+			DebugLevel3Fn(" %d %s +U\n",
 				player->Player,upgrades[i*16+b*2]);
 
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'U');
@@ -527,7 +484,6 @@ global void ParsePudALOW(const char* alow,int length __attribute__((unused)))
 	    }
 	}
     }
-
 }
 
 /**
