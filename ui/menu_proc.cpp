@@ -1991,18 +1991,18 @@ local void PopMenu(void)
     Menuitem* mi;
     int i;
 
-    for (i = 0; i < CurrentMenu->nitems; ++i) {
-	mi = CurrentMenu->items + i;
-	if (mi->exitfunc) {
-	    (*mi->exitfunc)(mi);		// action/destructor
+    if (Menus && Menus->Menu == CurrentMenu) {
+	for (i = 0; i < CurrentMenu->nitems; ++i) {
+	    mi = CurrentMenu->items + i;
+	    if (mi->exitfunc) {
+		(*mi->exitfunc)(mi);		// action/destructor
+	    }
 	}
-    }
 
-    MenuButtonUnderCursor = -1;
-    MenuButtonCurSel = -1;
-    CurrentMenu = NULL;
+	MenuButtonUnderCursor = -1;
+	MenuButtonCurSel = -1;
+	CurrentMenu = NULL;
 
-    if (Menus) {
 	MenuButtonCurSel = Menus->CurSel;
 	menu = Menus;
 	Menus = Menus->Next;
@@ -2010,6 +2010,8 @@ local void PopMenu(void)
 	if (Menus) {
 	    CurrentMenu = Menus->Menu;
 	}
+    } else {
+	CurrentMenu = NULL;
     }
 }
 

@@ -1621,7 +1621,7 @@ local void SoundOptionsExit(Menuitem *mi __attribute__((unused)))
 */
 local void GlobalOptionsMenu(void)
 {
-    ProcessMenu("menu-global-options", 0);
+    ProcessMenu("menu-global-options", 1);
 }
 
 /**
