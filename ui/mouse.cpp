@@ -1315,7 +1315,7 @@ global void UIHandleButtonDown(unsigned button)
     //	Selecting target. (Move,Attack,Patrol,... commands);
     //
     if( CursorState==CursorStateSelect ) {
-	if( !GameObserve ) {
+	if( !GameObserve && !GamePaused ) {
 	    UISelectStateButtonDown(button);
 	}
 	return;
@@ -1385,7 +1385,7 @@ global void UIHandleButtonDown(unsigned button)
 	    DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
 	    MustRedraw|=RedrawCursor;
 	} else if( MouseButtons&RightButton ) {
-	    if( !GameObserve ) {
+	    if( !GameObserve && !GamePaused ) {
 		Unit* unit;
 		// FIXME: Rethink the complete chaos of coordinates here
 		// FIXME: Johns: Perhaps we should use a pixel map coordinates
@@ -1423,7 +1423,7 @@ global void UIHandleButtonDown(unsigned button)
 	    ViewportCenterViewpoint(TheUI.SelectedViewport,
 		ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY));
 	} else if( MouseButtons&RightButton ) {
-	    if( !GameObserve ) {
+	    if( !GameObserve && !GamePaused ) {
 		MakeLocalMissile(MissileTypeGreenCross
 			,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 			,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
@@ -1440,7 +1440,7 @@ global void UIHandleButtonDown(unsigned button)
 	//	clicked on info panel - selection shown
 	//
 	if( NumSelected>1 && ButtonUnderCursor && ButtonUnderCursor<10 ) {
-	    if( !GameObserve ) {
+	    if( !GameObserve && !GamePaused ) {
 		DoSelectionButtons(ButtonUnderCursor-1,button);
 	    }
 	} else if( (MouseButtons&LeftButton) ) {
@@ -1464,7 +1464,7 @@ global void UIHandleButtonDown(unsigned button)
 	    //
 	    } else if( ButtonUnderCursor>3 && ButtonUnderCursor<10 ) {
 		if( NumSelected==1 && Selected[0]->Type->Transporter ) {
-		    if( !GameObserve ) {
+		    if( !GameObserve && !GamePaused ) {
 			if( Selected[0]->OnBoard[ButtonUnderCursor-4] ) {
 			    // FIXME: should check if valid here.
 			    SendCommandUnload(Selected[0]
@@ -1476,7 +1476,7 @@ global void UIHandleButtonDown(unsigned button)
 		}
 		else if( NumSelected==1 && Selected[0]->Type->Building &&
 		         Selected[0]->Orders[0].Action==UnitActionTrain) {
-		    if( !GameObserve ) {
+		    if( !GameObserve && !GamePaused ) {
 			int slotid = ButtonUnderCursor-4;
 			if ( Selected[0]->Data.Train.Count == 1 ) {
 			    // FIXME: ignore clicks that did not hit
@@ -1499,7 +1499,7 @@ global void UIHandleButtonDown(unsigned button)
 	    //	clicked on button panel
 	    //
 	    } else if( ButtonUnderCursor>9 ) {
-		if( !GameObserve ) {
+		if( !GameObserve && !GamePaused ) {
 		    DoButtonButtonClicked(ButtonUnderCursor-10);
 		}
 	    }
