@@ -1,4 +1,82 @@
 #!/bin/bash
+##   ___________		     _________		      _____  __
+##   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+##    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+##    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+##    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+##	  \/		    \/	   \/	     \/		   \/
+##  ______________________                           ______________________
+##			  T H E   W A R   B E G I N S
+##	   FreeCraft - A free fantasy real time strategy game engine
+##
+##	setup		-	Configure Rules.make (GNU MAKE rules).
+##
+##	(c) Copyright 2000-2002 by Dan Hensley, Nehal Mistry.
+##
+##	FreeCraft is free software; you can redistribute it and/or modify
+##	it under the terms of the GNU General Public License as published
+##	by the Free Software Foundation; only version 2 of the License.
+##
+##	FreeCraft is distributed in the hope that it will be useful,
+##	but WITHOUT ANY WARRANTY; without even the implied warranty of
+##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##	GNU General Public License for more details.
+##
+##	$Id$
+##
+##-----------------------------------------------------------------------------
+##	HERE ARE SOME USER-CONFIGURABLE VARIABLES
+
+EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DNEW_NETMENUS"
+
+## These could be used for experimental versions
+## ---------------------------------------------
+## SLOW_INPUT		If you have problems that events aren't fetched.
+## BPP8_*               Only for X11 8bpp common palette:
+##   BPP8_NORMAL          disables default, like other Xbpp (delivers errors)
+##   BPP8_WINSAFE         Uses a windows safe palette instead.
+##   BPP8_IRGB            Uses a palette based on 4x4x4 RGB in 4 intensities
+## There are some still not well tested code parts or branches.
+## UNIT_ON_MAP		Fast lookup of units
+## UNITS_ON_MAP		Faster lookup of units
+## NEW_AI		New better improved AI code
+## USE_TILECACHE	Faster tile drawing, costs memory.
+## USE_SMART_TILECACHE	Faster tile drawing, slow with hardware video memory.
+## USE_HP_FOR_XP	Use hit-points for XP calculations.
+## NEW_NETMENUS		Include new menu driven network set-up.
+## USE_LIBMODPLUG	Use modplug audio player support.
+## USE_FLAC		Use flac audio player support (asked by setup).
+## USE_OGG		Use ogg audio player support (asked by setup).
+## USE_MAD		Use mad mp3 audio player support (asked by setup).
+## These aren't working yet:
+## NEW_MAPDRAW		Stephans new map draw code (value>1 shows update)
+## USE_FFMPEG		Use ffmpeg video player support.
+## NEW_FOW		New fog of war code, should work correct
+## NEW_SHIPS		New correct ship movement.
+## HIERARCHIC_PATHFINDER	Use hierarchic pathfinder
+## USE_LUA		Lua scripting support
+
+##-----------------------------------------------------------------------------
+
+# if your system/distribution lacks libpng, you may install the source
+# in the freecraft directory and name that directory here!
+# Default (tested) version is 1.0.12, anything above should also be ok.
+# Adjust as required - ignored if the directory does not exist.
+LOCAL_PNG="libpng-1.0.12"
+
+# Please note that on most systems libpng also requires libz, so
+# you might additionally need to install the following:
+
+# if your system/distribution lacks libz, you may install the source
+# in the freecraft directory and name that directory here!
+# Default (tested) version is 1.1.4, anything above should also be ok.
+# Adjust as required - ONLY USED IF SYSTEM HAS NO ZLIB INSTALLED BY DEFAULT!
+LOCAL_ZLIB="zlib-1.1.4"
+
+BEOS_CONFIGFILE=/boot/home/config/settings/FreeCraft/FreeCraft.cfg
+
+##-----------------------------------------------------------------------------
+## Everything below this line should only be changed by FreeCraft developers.
 
 if [ "`echo $* | grep \"\-\-win32\"`" = "" ]; then
   RULESFILE=Rules.make
@@ -8,8 +86,6 @@ else
   DEPEND=win32new
   CROSS=" win32"
 fi
-
-BEOS_CONFIGFILE=/boot/home/config/settings/FreeCraft/FreeCraft.cfg
 
 cat << .. > $RULESFILE
 ##   ___________		     _________		      _____  __
@@ -23,54 +99,6 @@ cat << .. > $RULESFILE
 ##	   FreeCraft - A free fantasy real time strategy game engine
 ##
 ..
-##	setup		-	Configure Rules.make (GNU MAKE rules).
-##
-##	(c) Copyright 2000-2002 by Dan Hensley
-##
-##	FreeCraft is free software; you can redistribute it and/or modify
-##	it under the terms of the GNU General Public License as published
-##	by the Free Software Foundation; either version 2 of the License,
-##	or (at your option) any later version.
-##
-##	FreeCraft is distributed in the hope that it will be useful,
-##	but WITHOUT ANY WARRANTY; without even the implied warranty of
-##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##	GNU General Public License for more details.
-##
-##	$Id$
-##
-
-#------------------------------------------------------------------------------
-# HERE ARE SOME USER-CONFIGURABLE VARIABLES
-
-EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
-
-## These could be used for experimental versions
-## ---------------------------------------------
-## SLOW_INPUT		If you have problems that events aren't fetched.
-## BPP8_*               Only for X11 8bpp common palette:
-##   BPP8_NORMAL          disables default, like other Xbpp (delivers errors)
-##   BPP8_WINSAFE         Uses a windows safe palette instead.
-##   BPP8_IRGB            Uses a palette based on 4x4x4 RGB in 4 intensities
-## There are some still not well tested code parts or branches.
-## UNIT_ON_MAP:		Fast lookup of units
-## UNITS_ON_MAP:	Faster lookup of units
-## NEW_AI:		New better improved AI code
-## USE_TILECACHE:	Faster tile drawing, costs memory.
-## USE_SMART_TILECACHE:	Faster tile drawing, slow with hardware video memory.
-## USE_HP_FOR_XP	Use hit-points for XP calculations.
-## NEW_NETMENUS:	Include new menu driven network set-up.
-## USE_LIBMODPLUG:	Use modplug audio player support.
-## These aren't working yet:
-## NEW_MAPDRAW:		Stephans new map draw code (value>1 shows update)
-## USE_FFMPEG		Use ffmpeg video player support.
-## USE_FLAC:		Use flac audio player support.
-## USE_OGG:		Use ogg audio player support.
-## USE_MAD:		Use mad mp3 audio player support.
-## NEW_FOW:		New fog of war code, should work correct
-## NEW_SHIPS:		New correct ship movement.
-## HIERARCHIC_PATHFINDER:	Use hierarchic pathfinder
-## USE_LUA:		Lua scripting support
 
 # Compile commands
 CC=gcc
@@ -87,22 +115,6 @@ if [ "`uname -a | grep -is bsd` x" != " x" ] ; then
 else
   DL=-ldl
 fi
-
-# if your system/distribution lacks libpng, you may install the source
-# in the freecraft directory and name that directory here!
-# Default (tested) version is 1.0.5, anything above should also be ok.
-# Adjust as required - ignored if the directory does not exist.
-LOCAL_PNG="libpng-1.0.5"
-
-# Please note that on most systems libpng also requires libz, so
-# you might additionally need to install the following:
-
-# if your system/distribution lacks libz, you may install the source
-# in the freecraft directory and name that directory here!
-# Default (tested) version is 1.1.3, anything above should also be ok.
-# Adjust as required - ONLY USED IF SYSTEM HAS NO ZLIB INSTALLED BY DEFAULT!
-LOCAL_ZLIB="zlib-1.1.3"
-
 
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
@@ -218,7 +230,7 @@ done
 
 cat $RULESFILE
 echo >> $RULESFILE
-echo; echo
+echo
 
 #------------------------------------------------------------------------------
 # Determine if this is for UNIX, BEOS, or WIN32
@@ -415,7 +427,6 @@ fi
 if test "$WIN32" = 0 ; then
   echo
   echo "VIDEO DRIVER OPTIONS"
-  echo
   echo "  X-X11 Support (default)"
 
   if test "$HAVESDL" = 1 ; then
