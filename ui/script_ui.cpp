@@ -5856,6 +5856,9 @@ local int CclDefineMenuItem(lua_State* l)
 			    s1 = strdup(lua_tostring(l, -1));
 			    item->d.text.text = s1;
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.text.text = NULL;
 			}
 			lua_pop(l, 1);
@@ -5875,6 +5878,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_error(l);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.text.action = NULL;
 			}
 			lua_pop(l, 1);
@@ -5950,6 +5956,9 @@ local int CclDefineMenuItem(lua_State* l)
 			    s1 = strdup(lua_tostring(l, -1));
 			    item->d.button.text = s1;
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.button.text = NULL;
 			}
 			lua_pop(l, 1);
@@ -5979,6 +5988,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_error(l);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.button.handler = NULL;
 			}
 			lua_pop(l, 1);
@@ -6079,6 +6091,10 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_pop(l, 1);
 				item->d.pulldown.options[subk] = s1;
 			    }
+			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			}
 			lua_pop(l, 1);
 		    } else if (!strcmp(value, "func")) {
@@ -6097,6 +6113,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_error(l);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.pulldown.action = NULL;
 			}
 			lua_pop(l, 1);
@@ -6216,6 +6235,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_error(l);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.listbox.action = NULL;
 			}
 			lua_pop(l, 1);
@@ -6235,6 +6257,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_error(l);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.listbox.handler = NULL;
 			}
 			lua_pop(l, 1);
@@ -6254,6 +6279,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_error(l);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.listbox.retrieveopt = NULL;
 			}
 			lua_pop(l, 1);
@@ -6411,6 +6439,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_pushfstring(l, "Can't find function: %s", value);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.vslider.action = NULL;
 			}
 			lua_pop(l, 1);
@@ -6430,6 +6461,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_error(l);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.vslider.handler = NULL;
 			}
 			lua_pop(l, 1);
@@ -6535,6 +6569,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_pushfstring(l, "Can't find function: %s", value);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.input.action = NULL;
 			}
 			lua_pop(l, 1);
@@ -6648,6 +6685,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_pushfstring(l, "Can't find function: %s", value);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.gem.action = NULL;
 			}
 			lua_pop(l, 1);
@@ -6783,6 +6823,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_error(l);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.hslider.action = NULL;
 			}
 			lua_pop(l, 1);
@@ -6802,6 +6845,9 @@ local int CclDefineMenuItem(lua_State* l)
 				lua_error(l);
 			    }
 			} else {
+			    lua_pushnumber(l, 0);
+			    lua_rawseti(l, j + 1, k + 1);
+			    subargs = luaL_getn(l, j + 1);
 			    item->d.hslider.handler = NULL;
 			}
 			lua_pop(l, 1);
