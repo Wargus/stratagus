@@ -717,13 +717,12 @@ global void ShowCredits(Credits* credits)
 
 #ifdef USE_SDL_SURFACE
 	VideoClearScreen();
-	DestroyCursorBackground();
 #else
 	VideoLockScreen();
 	VideoClearScreen();
 	VideoUnlockScreen();
-	DestroyCursorBackground();
 #endif
+	DestroyCursorBackground();
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
@@ -824,20 +823,16 @@ global void ShowPicture(CampaignChapter* chapter)
 	while (IntroNoEvent && i < max) {
 #ifdef USE_SDL_SURFACE
 		VideoClearScreen();
-		VideoDrawSubClipFaded(background, 0, 0,
-			background->Width, background->Height,
-			(VideoWidth - background->Width) / 2,
-			(VideoHeight - background->Height) / 2,
-			255 * i / max);
-		PictureDrawText(chapter, lines);
 #else
 		VideoLockScreen();
+#endif
 		VideoDrawSubClipFaded(background, 0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2,
 			255 * i / max);
 		PictureDrawText(chapter, lines);
+#ifndef USE_SDL_SURFACE
 		VideoUnlockScreen();
 #endif
 
@@ -855,19 +850,15 @@ global void ShowPicture(CampaignChapter* chapter)
 	j = 0;
 	max = chapter->Data.Picture.DisplayTime;
 	while (IntroNoEvent && j < max) {
-#ifdef USE_SDL_SURFACE
-		VideoDrawSubClip(background, 0, 0,
-			background->Width, background->Height,
-			(VideoWidth - background->Width) / 2,
-			(VideoHeight - background->Height) / 2);
-		PictureDrawText(chapter, lines);
-#else
+#ifndef USE_SDL_SURFACE
 		VideoLockScreen();
+#endif
 		VideoDrawSubClip(background, 0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2);
 		PictureDrawText(chapter, lines);
+#ifndef USE_SDL_SURFACE
 		VideoUnlockScreen();
 #endif
 
@@ -885,20 +876,16 @@ global void ShowPicture(CampaignChapter* chapter)
 	while (i >= 0) {
 #ifdef USE_SDL_SURFACE
 		VideoClearScreen();
-		VideoDrawSubClipFaded(background, 0, 0,
-			background->Width, background->Height,
-			(VideoWidth - background->Width) / 2,
-			(VideoHeight - background->Height) / 2,
-			255 * i / max);
-		PictureDrawText(chapter, lines);
 #else
 		VideoLockScreen();
+#endif
 		VideoDrawSubClipFaded(background, 0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2,
 			255 * i / max);
 		PictureDrawText(chapter, lines);
+#ifndef USE_SDL_SURFACE
 		VideoUnlockScreen();
 #endif
 
