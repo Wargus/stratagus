@@ -1634,33 +1634,34 @@ local void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
     menu = CurrentMenu;
 
     menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[3].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[5].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[7].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[9].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[15].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
 
     if (VideoWidth == 640) {
 	menu->items[2].d.gem.state = MI_GSTATE_CHECKED;
     } else if (VideoWidth == 800) {
-	menu->items[4].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[3].d.gem.state = MI_GSTATE_CHECKED;
     } else if (VideoWidth == 1024) {
-	menu->items[6].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[4].d.gem.state = MI_GSTATE_CHECKED;
     } else if (VideoWidth == 1280) {
-	menu->items[8].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[5].d.gem.state = MI_GSTATE_CHECKED;
     } else if (VideoWidth == 1600) {
-	menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[6].d.gem.state = MI_GSTATE_CHECKED;
     }
 
     if (VideoFullScreen) {
-	menu->items[12].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[7].d.gem.state = MI_GSTATE_CHECKED;
     }
 
     if (OriginalFogOfWar) {
-	menu->items[15].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[9].d.gem.state = MI_GSTATE_CHECKED;
     } else {
-	menu->items[17].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
     }
 }
 
@@ -1685,16 +1686,16 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 	case 2:
 	    res = 640;
 	    break;
-	case 4:
+	case 3:
 	    res = 800;
 	    break;
-	case 6:
+	case 4:
 	    res = 1024;
 	    break;
-	case 8:
+	case 5:
 	    res = 1280;
 	    break;
-	case 10:
+	case 6:
 	    res = 1600;
 	    break;
     }
