@@ -86,6 +86,10 @@ global void UnSelectAll(void)
 */
 local void HandleCritterClick(Unit* unit)
 {
+    if( GameObserve ) {
+	return;
+    }
+
     if( NumSelected==1 && Selected[0]==unit ) {
 	unit->Value++;
     } else {
