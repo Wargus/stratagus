@@ -110,6 +110,7 @@ local void CustomGameOPSAction(Menuitem *mi, int i);
 local void MultiClientReady(void);
 local void MultiClientNotReady(void);
 local void MultiClientGemAction(Menuitem *mi);
+local void MultiClientCancel(void);
 
 local void MultiGameCancel(void);
 local void MultiGameSetupInit(Menuitem *mi);	// master init
@@ -510,7 +511,7 @@ local Menuitem NetMultiClientMenuItems[] = {
 	{ button:{ "~!Not Ready", 224, 27, MBUTTON_GM_FULL, MultiClientNotReady, 'n'} } },
 
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, GameCancel, 'c'} } },	/// FIXME: Cancelfunc
+	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, MultiClientCancel, 'c'} } },
 
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
 	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
@@ -703,7 +704,7 @@ global Menu Menus[] = {
 	ImageNone,
 	4, 30,
 	NetMultiClientMenuItems,		// FIXME: unfinished
-	NULL,
+	TerminateNetConnect,
     },
     {
 	// Connecting Menu
@@ -2033,6 +2034,11 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     SetDefaultTextColors(nc, rc);
 }
 
+local void MultiClientCancel(void)
+{
+    NetworkDetachFromServer();
+    // GameCancel();
+}
 
 local void MultiGameClientInit(Menuitem *mi __attribute__((unused)))
 {
