@@ -199,7 +199,7 @@ local int ChopWood(Unit* unit)
 	    //	Update the display.
 	    //
             CheckUnitToBeDrawn(unit);
-	    if( IsSelected(unit) ) {
+	    if( unit->Selected ) {
 		UpdateButtonPanel();
 	    }
 

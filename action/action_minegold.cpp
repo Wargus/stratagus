@@ -161,39 +161,37 @@ local int MineInGoldmine(Unit* unit)
 	    mine->Frame=0;
 	    CheckUnitToBeDrawn(mine);
 	}
-	if( IsSelected(mine) ) {
+	if( IsOnlySelected(mine) ) {
 	    MustRedraw|=RedrawInfoPanel;
 	}
 
 	//
 	//	End of gold: destroy gold-mine.
 	//
-	if( mine->Value<=DEFAULT_INCOMES[GoldCost] ) {
-	    // FIXME: better way to fix bug
-	    unit->Removed=0;
+	if( mine->Value<DEFAULT_INCOMES[GoldCost] ) {
+	    DebugLevel0Fn("Mine destroyed %d,%d\n",mine->X,mine->Y);
 	    DropOutAll(mine);
-	    unit->Removed=1;
 	    DestroyUnit(mine);
-	    if( mine->Value<DEFAULT_INCOMES[GoldCost] ) {
-		// FIXME: should return 0 here?
-		DebugLevel0Fn("Too less gold\n");
-	    }
+	    mine=NULL;
 	}
-	// FIXME: I use goldmine after destory!!!
 
 	//
 	//	Find gold depot
 	//
 	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
-	    DropOutOnSide(unit,LookingW
-		    ,mine->Type->TileWidth,mine->Type->TileHeight);
+	    if( mine ) {
+		DropOutOnSide(unit,LookingW
+			,mine->Type->TileWidth,mine->Type->TileHeight);
+	    }
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
 	    DebugLevel2Fn("Mine without deposit\n");
 	} else {
-	    DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
-		    ,destu->Y+destu->Type->TileHeight/2
-		    ,mine->Type->TileWidth,mine->Type->TileHeight);
+	    if( mine ) {
+		DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
+			,destu->Y+destu->Type->TileHeight/2
+			,mine->Type->TileWidth,mine->Type->TileHeight);
+	    }
 	    unit->Orders[0].Goal=destu;
 	    NewResetPath(unit);
 	    RefsDebugCheck( destu->Destroyed || !destu->Refs );
@@ -201,6 +199,7 @@ local int MineInGoldmine(Unit* unit)
 	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
 	    unit->Orders[0].X=unit->Orders[0].Y=-1;
 	    unit->Orders[0].Action=UnitActionMineGold;
+	    unit->SubAction=64;
 	    DebugLevel3Fn("Mine with deposit %d,%d\n",destu->X,destu->Y);
 	}
 
@@ -217,7 +216,7 @@ local int MineInGoldmine(Unit* unit)
 		,unit->X,unit->Y,unit->Type->Type,unit->Type->Name);
 	}
         CheckUnitToBeDrawn(unit);
-	if( IsSelected(unit) ) {
+	if( unit->Selected ) {
 	    UpdateButtonPanel();
 	}
 	unit->Wait=1;
