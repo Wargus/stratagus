@@ -44,6 +44,7 @@
 #include "unittype.h"
 #include "player.h"
 #include "missile.h"
+#include "ccl.h"
 
 #include "etlib/hash.h"
 
@@ -359,6 +360,26 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
     DebugLevel0("\tUDTA used %d bytes\n",udta-start);
 
     UpdateStats();
+}
+
+/**
+**	Get the animations structure by ident.
+**
+**	@param ident	Identifier for the animation.
+**	@return		Pointer to the animation structure.
+**
+**	@todo	Remove the use of scheme symbols to store, use own hash.
+*/
+global Animations* AnimationsByIdent(const char* ident)
+{
+    SCM sym;
+
+    sym=gh_symbol2scm((char*)ident);
+    if( symbol_boundp(sym,NIL)==SCM_BOOL_T ) {
+	return (Animations*)gh_scm2int(symbol_value(sym,NIL));
+    }
+    DebugLevel0Fn("Warning animation `%s' not found\n" _C_ ident);
+    return NULL;
 }
 
 /**
@@ -1407,7 +1428,7 @@ global void CleanUnitTypes(void)
     UnitType* type;
     void** ptr;
 
-    DebugLevel0Fn("FIXME: animations, icon, sounds not freed.\n");
+    DebugLevel0Fn("FIXME: icon, sounds not freed.\n");
 
     //
     //	Mapping the original unit-type numbers in puds to our internal strings
@@ -1421,7 +1442,7 @@ global void CleanUnitTypes(void)
 	UnitTypeWcNames=NULL;
     }
 
-#if 0
+#if 1
     //	FIXME: scheme contains references on this structure.
     //	Clean all animations.
 
@@ -1491,12 +1512,11 @@ global void CleanUnitTypes(void)
 	    if( type->Missile.Name ) {
 		free(type->Missile.Name);
 	    }
+#endif
 	    if( type->CorpseName ) {
 		free(type->CorpseName);
 	    }
-#endif
 
-#if 0
 	    //
 	    //	FIXME: Sounds can't be freed, they still stuck in sound hash.
 	    //
@@ -1518,7 +1538,6 @@ global void CleanUnitTypes(void)
 	    if( type->Weapon.Attack.Name ) {
 		free(type->Weapon.Attack.Name);
 	    }
-#endif
 
 	    if( !type->SameSprite ) {	// our own graphics
 		VideoSaveFree(type->Sprite);
