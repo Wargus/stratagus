@@ -270,6 +270,7 @@ local void DrawPulldown(Menuitem *mi, int mx, int my)
     char *text;
     unsigned flags;
     MenuButtonId rb;
+    MenuButtonId db;
     int w;
     int h;
     int x;
@@ -281,71 +282,202 @@ local void DrawPulldown(Menuitem *mi, int mx, int my)
     w = mi->d.pulldown.xsize;
     flags = mi->flags;
     rb = mi->d.pulldown.button;
-    oh = h = mi->d.pulldown.ysize - 2;
 
     GetDefaultTextColors(&nc, &rc);
-    if (flags&MenuButtonClicked) {
-	// Make the menu inside of the screen (TOP)
-	if (y + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->y) {
-	    y = 2 + CurrentMenu->y;
-	} else {
-	    y -= mi->d.pulldown.curopt * h;
-	    // Make the menu inside the bottom of the screen
-	    // FIXME: can't assume bottom is always 480
-	    if (y + h*mi->d.pulldown.noptions >= 480 + CurrentMenu->y) {
-		y -= y + h*mi->d.pulldown.noptions - (480 + CurrentMenu->y);
-	    }
-	}
-	i = mi->d.pulldown.noptions;
-	h *= i;
-	while (i--) {
-	    PushClipping();
-	    SetClipping(0,0,x+w,VideoHeight-1);
-	    VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1 + oh*i);
-	    PopClipping();
-	    text = mi->d.pulldown.options[i];
-	    if (text) {
-		if (i == mi->d.pulldown.cursel)
-		    SetDefaultTextColors(rc,rc);
-		else
-		    SetDefaultTextColors(nc,rc);
-		VideoDrawText(x+2,y+2 + oh*i ,mi->font,text);
-	    }
-	}
-	w += 2;
-    } else {
+    if (rb == MBUTTON_SC_PULLDOWN) {
 	h = mi->d.pulldown.ysize;
-	y = my+mi->yofs;
-	if (flags&MenuButtonDisabled) {
-	    rb--;
-	    SetDefaultTextColors(FontGrey,FontGrey);
+	if (flags&MenuButtonClicked) {
+	    int usetop;
+	    int option;
+	    int max;
+
+	    // Check if the pulldown goes below the bottom
+	    if (mi->yofs + (h+1)*mi->d.pulldown.noptions >= mi->menu->ysize) {
+		y -= h*mi->d.pulldown.noptions;
+		usetop = 0;
+	    } else {
+		usetop = 1;
+	    }
+
+	    // Draw top
+	    if (usetop) {
+		rb = MBUTTON_SC_PULLDOWN_TOP_SELECTED;
+	    } else {
+		rb = MBUTTON_SC_PULLDOWN_TOP;
+	    }
+	    VideoDraw(MenuButtonGfx.Sprite, rb-1, x, y);
+	    for (i = x+16; i < x+w-1-16; i += 16) {
+		VideoDraw(MenuButtonGfx.Sprite, rb, i, y);
+	    }
+	    VideoDraw(MenuButtonGfx.Sprite, rb+1, x+w-1-16, y);
+	    option = 0;
+	    if (usetop) {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_PULLDOWN_DOWN_ARROW, x+w-1-16-3, y+4);
+		text = mi->d.pulldown.options[mi->d.pulldown.curopt];
+		if (text) {
+		    VideoDrawText(x+4,y+2,mi->font,text);
+		}
+	    } else {
+		if (option == mi->d.pulldown.cursel) {
+		    SetDefaultTextColors(rc,rc);
+		} else {
+		    SetDefaultTextColors(nc,rc);
+		}
+		text = mi->d.pulldown.options[option];
+		if (text) {
+		    VideoDrawText(x+4, y+2, mi->font, text);
+		}
+		option = 1;
+	    }
+
+	    // Middle
+	    y += mi->d.pulldown.ysize;
+	    rb = MBUTTON_SC_PULLDOWN_MIDDLE;
+	    if (usetop) {
+		max = mi->d.pulldown.noptions-1;
+	    } else {
+		max = mi->d.pulldown.noptions;
+	    }
+	    for ( ; option < max; ++option) {
+		VideoDraw(MenuButtonGfx.Sprite, rb-1, x, y);
+		for (i = x+16; i < x+w-1-16; i += 16) {
+		    VideoDraw(MenuButtonGfx.Sprite, rb, i, y);
+		}
+		VideoDraw(MenuButtonGfx.Sprite, rb+1, x+w-1-16, y);
+		if (option == mi->d.pulldown.cursel) {
+		    SetDefaultTextColors(rc,rc);
+		} else {
+		    SetDefaultTextColors(nc,rc);
+		}
+		text = mi->d.pulldown.options[option];
+		if (text) {
+		    VideoDrawText(x+4, y+2, mi->font, text);
+		}
+		y += mi->d.pulldown.ysize;
+	    }
+
+	    // Bottom
+	    SetDefaultTextColors(nc,rc);
+	    if (usetop) {
+		rb = MBUTTON_SC_PULLDOWN_BOTTOM;
+	    } else {
+		rb = MBUTTON_SC_PULLDOWN_BOTTOM_SELECTED;
+	    }
+	    VideoDraw(MenuButtonGfx.Sprite, rb-1, x, y);
+	    for (i = x+16; i < x+w-1-16; i += 16) {
+		VideoDraw(MenuButtonGfx.Sprite, rb, i, y);
+	    }
+	    VideoDraw(MenuButtonGfx.Sprite, rb+1, x+w-1-16, y);
+	    if (usetop) {
+		if (option == mi->d.pulldown.cursel) {
+		    SetDefaultTextColors(rc,rc);
+		} else {
+		    SetDefaultTextColors(nc,rc);
+		}
+		text = mi->d.pulldown.options[option];
+		if (text) {
+		    VideoDrawText(x+4,y+2,mi->font,text);
+		}
+		option = 0;
+	    } else {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_PULLDOWN_DOWN_ARROW, x+w-1-16-3, y+4);
+		text = mi->d.pulldown.options[mi->d.pulldown.curopt];
+		if (text) {
+		    VideoDrawText(x+4, y+2, mi->font, text);
+		}
+		option = 1;
+	    }
 	} else {
-	    if (flags&MenuButtonActive) {
-		SetDefaultTextColors(rc,rc);
+	    h = mi->d.pulldown.ysize;
+	    y = my+mi->yofs;
+	    db = MBUTTON_SC_PULLDOWN_DOWN_ARROW;
+	    if (flags&MenuButtonDisabled) {
+		rb = MBUTTON_SC_PULLDOWN_DISABLED;
+		SetDefaultTextColors(FontGrey,FontGrey);
+	    } else {
+		if (flags&MenuButtonActive) {
+		    SetDefaultTextColors(rc,rc);
+		    ++db;
+		}
+	    }
+	    VideoDraw(MenuButtonGfx.Sprite, rb-1, x, y);
+	    for (i = x+16; i < x+w-1-16; i += 16) {
+		VideoDraw(MenuButtonGfx.Sprite, rb, i, y);
+	    }
+	    VideoDraw(MenuButtonGfx.Sprite, rb+1, x+w-1-16, y);
+	    if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+		VideoDraw(MenuButtonGfx.Sprite, db, x+w-1-16-3, y+4);
+	    }
+	    text = mi->d.pulldown.options[mi->d.pulldown.curopt];
+	    if (text) {
+		VideoDrawText(x+4,y+2,mi->font,text);
 	    }
 	}
+    } else {
+	oh = h = mi->d.pulldown.ysize - 2;
+	if (flags&MenuButtonClicked) {
+	    // Make the menu inside of the screen (TOP)
+	    if (y + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->y) {
+		y = 2 + CurrentMenu->y;
+	    } else {
+		y -= mi->d.pulldown.curopt * h;
+		// Make the menu inside the bottom of the screen
+		// FIXME: can't assume bottom is always 480
+		if (y + h*mi->d.pulldown.noptions >= 480 + CurrentMenu->y) {
+		    y -= y + h*mi->d.pulldown.noptions - (480 + CurrentMenu->y);
+		}
+	    }
+	    i = mi->d.pulldown.noptions;
+	    h *= i;
+	    while (i--) {
+		PushClipping();
+		SetClipping(0,0,x+w,VideoHeight-1);
+		VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1 + oh*i);
+		PopClipping();
+		text = mi->d.pulldown.options[i];
+		if (text) {
+		    if (i == mi->d.pulldown.cursel)
+			SetDefaultTextColors(rc,rc);
+		    else
+			SetDefaultTextColors(nc,rc);
+		    VideoDrawText(x+2,y+2 + oh*i ,mi->font,text);
+		}
+	    }
+	    w += 2;
+	} else {
+	    h = mi->d.pulldown.ysize;
+	    y = my+mi->yofs;
+	    if (flags&MenuButtonDisabled) {
+		rb--;
+		SetDefaultTextColors(FontGrey,FontGrey);
+	    } else {
+		if (flags&MenuButtonActive) {
+		    SetDefaultTextColors(rc,rc);
+		}
+	    }
 
-	PushClipping();
-	if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
-	    SetClipping(0,0,x+w-20,VideoHeight-1);
-	} else {
-	    SetClipping(0,0,x+w-1,VideoHeight-1);
+	    PushClipping();
+	    if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+		SetClipping(0,0,x+w-20,VideoHeight-1);
+	    } else {
+		SetClipping(0,0,x+w-1,VideoHeight-1);
+	    }
+	    VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1);
+	    PopClipping();
+	    if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN, x-1 + w-20, y-2);
+	    }
+	    text = mi->d.pulldown.options[mi->d.pulldown.curopt];
+	    if (text) {
+		VideoDrawText(x+2,y+2,mi->font,text);
+	    }
 	}
-	VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1);
-	PopClipping();
-	if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
-	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN, x-1 + w-20, y-2);
-	}
-	text = mi->d.pulldown.options[mi->d.pulldown.curopt];
-	if (text) {
-	    VideoDrawText(x+2,y+2,mi->font,text);
-	}
-    }
-    if (flags&MenuButtonSelected) {
-	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangleClip(ColorGray,x-2,y-2,w,h);
-	} else {
-	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w,h);
+	if (flags&MenuButtonSelected) {
+	    if (flags&MenuButtonDisabled) {
+		VideoDrawRectangleClip(ColorGray,x-2,y-2,w,h);
+	    } else {
+		VideoDrawRectangleClip(ColorYellow,x-2,y-2,w,h);
+	    }
 	}
     }
     SetDefaultTextColors(nc,rc);
@@ -1158,26 +1290,56 @@ local void MenuHandleMouseMove(int x,int y)
 	    if (mi->mitype == MI_TYPE_PULLDOWN && (mi->flags&MenuButtonClicked)) {
 		xs = menu->x + mi->xofs;
 		ys = menu->y + mi->yofs;
-		h = mi->d.pulldown.ysize - 2;
-		if (ys + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->y) {
-		    ys = 2 + CurrentMenu->y;
-		} else {
-		    ys -= mi->d.pulldown.curopt * h;
-		    if (ys + h*mi->d.pulldown.noptions >= 480 + CurrentMenu->y) {
-			ys -= ys + h*mi->d.pulldown.noptions - (480 + CurrentMenu->y);
+		if (mi->d.pulldown.button == MBUTTON_SC_PULLDOWN) {
+		    int usetop;
+
+		    h = mi->d.pulldown.ysize;
+		    if (mi->yofs + (h+1)*mi->d.pulldown.noptions >= mi->menu->ysize) {
+			ys -= h*mi->d.pulldown.noptions;
+			usetop = 0;
+		    } else {
+			usetop = 1;
 		    }
-		}
-		if (!(x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + h*mi->d.pulldown.noptions)) {
-		    j = (y - ys) / h;
-		    if (j >= 0 && j < mi->d.pulldown.noptions && j != mi->d.pulldown.cursel) {
-			mi->d.pulldown.cursel = j;
-			redraw_flag = 1;
-			if (mi->d.pulldown.action) {
-			    (*mi->d.pulldown.action)(mi, mi->d.pulldown.cursel);
+		    if (!(x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + (h+1)*mi->d.pulldown.noptions)) {
+			j = (y - ys) / h;
+			if (usetop) {
+			    --j;
+			} else {
+			    if (j == mi->d.pulldown.noptions) {
+				j = -1;
+			    }
+			}
+			if (j >= -1 && j < mi->d.pulldown.noptions && j != mi->d.pulldown.cursel) {
+			    mi->d.pulldown.cursel = j;
+			    redraw_flag = 1;
+			    if (mi->d.pulldown.action) {
+				(*mi->d.pulldown.action)(mi, mi->d.pulldown.cursel);
+			    }
 			}
 		    }
+		    MenuButtonUnderCursor = i;
+		} else {
+		    h = mi->d.pulldown.ysize - 2;
+		    if (ys + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->y) {
+			ys = 2 + CurrentMenu->y;
+		    } else {
+			ys -= mi->d.pulldown.curopt * h;
+			if (ys + h*mi->d.pulldown.noptions >= 480 + CurrentMenu->y) {
+			    ys -= ys + h*mi->d.pulldown.noptions - (480 + CurrentMenu->y);
+			}
+		    }
+		    if (!(x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + h*mi->d.pulldown.noptions)) {
+			j = (y - ys) / h;
+			if (j >= 0 && j < mi->d.pulldown.noptions && j != mi->d.pulldown.cursel) {
+			    mi->d.pulldown.cursel = j;
+			    redraw_flag = 1;
+			    if (mi->d.pulldown.action) {
+				(*mi->d.pulldown.action)(mi, mi->d.pulldown.cursel);
+			    }
+			}
+		    }
+		    MenuButtonUnderCursor = i;
 		}
-		MenuButtonUnderCursor = i;
 		break;
 	    }
 	}
