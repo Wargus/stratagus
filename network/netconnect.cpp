@@ -1382,10 +1382,13 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 		case ccs_connected:
 		    switch(msg->SubType) {
+			int pathlen;
 
 			case ICMMap:		// Server has sent us new map info
-			    memcpy(ScenSelectFullPath, msg->u.MapPath, 256);
-			    ScenSelectFullPath[255] = 0;
+			    sprintf(ScenSelectFullPath, "%s/", FreeCraftLibPath);
+			    pathlen = strlen(ScenSelectFullPath);
+			    memcpy(ScenSelectFullPath+pathlen, msg->u.MapPath, 256);
+			    ScenSelectFullPath[pathlen+255] = 0;
 			    if (NetClientSelectScenario()) {
 				NetLocalState = ccs_badmap;
 				break;
@@ -1710,6 +1713,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		// look up the host
 		for (h = 0; h < PlayerMax-1; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort && Hosts[h].PlyNr) {
+			int pathlen;
 			ServerSetupState.LastFrame[h] = FrameCounter;
 			NetConnectForceDisplayUpdate();
 
@@ -1723,8 +1727,8 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				// this code path happens until client acknoledges the map
 				message.Type = MessageInitReply;
 				message.SubType = ICMMap;			// Send Map info to the client
-				// FIXME: Transmit (and receive!) relative to FreeCraftLibPath
-				memcpy(message.u.MapPath, ScenSelectFullPath, 256);
+				pathlen = strlen(FreeCraftLibPath) + 1;
+				memcpy(message.u.MapPath, ScenSelectFullPath+pathlen, 256);
 				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
 				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 				DebugLevel0Fn("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_
