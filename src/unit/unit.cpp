@@ -3440,21 +3440,21 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
     y2=dst->Y;
 
     if( x1+src->Type->TileWidth<=x2 ) {
-	dx=x2-x1-src->Type->TileWidth;
+	dx=x2-x1-src->Type->TileWidth+1;
 	if( dx<0 ) {
 	    dx=0;
 	}
     } else {
-	dx=x1-x2-dst->Type->TileWidth;
+	dx=x1-x2-dst->Type->TileWidth+1;
 	if( dx<0 ) {
 	    dx=0;
 	}
     }
 
     if( y1+src->Type->TileHeight<=y2 ) {
-	dy=y2-y1-src->Type->TileHeight;
+	dy=y2-y1-src->Type->TileHeight+1;
     } else {
-	dy=y1-y2-dst->Type->TileHeight;
+	dy=y1-y2-dst->Type->TileHeight+1;
 	if( dy<0 ) {
 	    dy=0;
 	}

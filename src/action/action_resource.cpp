@@ -191,8 +191,8 @@ local int StartGathering(Unit* unit)
     }
 
     // FIXME: 0 can happen, if to near placed by map designer.
-    DebugLevel3Fn("%d\n" _C_ MapDistanceToUnit(unit->X,unit->Y,goal) );
-    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)>1 );
+    DebugLevel3Fn("%d\n" _C_ MapDistanceBetweenUnits(unit,goal) );
+    DebugCheck( MapDistanceBetweenUnits(unit,goal)>1 );
 
     //
     //	Update the heading of a harvesting unit to looks straight at the resource.

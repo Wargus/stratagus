@@ -114,7 +114,7 @@ local int WaitForTransporter(Unit* unit)
 	return 0;
     }
 
-    if( MapDistanceToUnit(unit->X,unit->Y,trans)==1 ) {
+    if( MapDistanceBetweenUnits(unit,trans)==1 ) {
 	DebugLevel3Fn("Enter transporter\n");
 	return 1;
     }
