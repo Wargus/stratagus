@@ -184,7 +184,9 @@ global void HandleActionDemolish(Unit* unit)
 		    }
 		}
 	    }
+#ifdef HIERARCHIC_PATHFINDER
 	    PfHierMapChangedCallback (xmin, ymin, xmax, ymax);
+#endif
 	    break;
     }
 }
