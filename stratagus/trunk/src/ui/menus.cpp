@@ -2868,10 +2868,14 @@ local void CampaignGameMenu(void)
 */
 local void StartCampaignFromMenu(int number)
 {
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
 #if 0
     // JOHNS: this is currently not needed:
@@ -2886,11 +2890,15 @@ local void StartCampaignFromMenu(int number)
     PlayCampaign(Campaigns[number].Ident);
     GuiGameStarted = 1;
 
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoClearScreen();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
     // FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
     EndMenu();
@@ -3004,10 +3012,14 @@ local void JoinNetGameMenu(void)
     char *port;
     Menu *menu;
 
+#ifdef USE_SDL_SURFACE
+    VideoUnlockScreen();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
     //
     //  Prepare enter ip/hostname menu
@@ -3075,10 +3087,14 @@ local void JoinNetGameMenu(void)
     ProcessMenu("menu-net-connecting", 1);
 
     if (GuiGameStarted) {
+#ifdef USE_SDL_SURFACE
+	MenusSetBackground();
+#else
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
 	Invalidate();
+#endif
 	EndMenu();
     }
 }
@@ -3202,10 +3218,14 @@ local void CreateInternetGameMenu(void)
 */
 local void MultiGameStart(void)
 {
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
     if (MetaServerInUse) {
 	SendMetaCommand("StartGame","");
@@ -3227,10 +3247,14 @@ local void MultiPlayerGameMenu(void)
     char NameBuf[32];
     Menu *menu;
 
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
     menu = FindMenu("menu-enter-name");
     menu->Items[1].d.input.buffer = NameBuf;
@@ -4871,11 +4895,14 @@ global void NetClientUpdateState(void)
 */
 local void StartEditor(void)
 {
-
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
     SetupEditor();
 
@@ -4938,10 +4965,14 @@ local void EditorNewMap(void)
     char height[10];
     char description[36];
 
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
     EditorCancelled = 0;
 
@@ -6473,11 +6504,16 @@ local void ReplayGameMenu(void)
 #endif
     *ScenSelectDisplayPath = '\0';
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+    MenusSetBackground();
+#else
     VideoLockScreen();
     VideoClearScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
     GuiGameStarted = 0;
     ProcessMenu("menu-replay-game", 1);
@@ -7028,10 +7064,14 @@ global void InitMenuFunctions(void)
 local void MultiGameMasterReport(void)
 {
 //	EndMenu();
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
     ProcessMenu("metaserver-list", 1);
     if (GuiGameStarted) {
@@ -7046,10 +7086,14 @@ local void MultiGameMasterReport(void)
 local void ShowMetaServerList(void)
 {
     EndMenu();
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     Invalidate();
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
+#endif
 
     DestroyCursorBackground();
     GuiGameStarted = 0;
@@ -7165,10 +7209,14 @@ local void MultiMetaServerGameSetupExit(Menuitem *mi)
 {
 	//TODO: how to free stuff?
     //EndMenu();	
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
     //EndMenu();
 }
 
@@ -7184,10 +7232,14 @@ local void SelectGameServer(Menuitem *mi)
 
     j = mi - mi->menu->Items;
     mi->menu->Items[j].d.gem.state = MI_GSTATE_UNCHECKED;
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
     EndMenu();
 
     strcpy(server_host_buffer, mi->menu->Items[j - 4].d.text.text);
@@ -7224,10 +7276,14 @@ local void SelectGameServer(Menuitem *mi)
     ProcessMenu("menu-net-connecting", 1);
 
     if (GuiGameStarted) {
+#ifdef USE_SDL_SURFACE
+	MenusSetBackground();
+#else
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
 	Invalidate();
+#endif
 	EndMenu();
     }
 
@@ -7277,13 +7333,17 @@ local void ChangeGameServer(void)
 
 local int MetaServerConnectError(void)
 {
+#ifdef USE_SDL_SURFACE
+    NetErrorMenu("Cannot Connect to Meta-Server");
+    MenusSetBackground();
+#else
     Invalidate();
     NetErrorMenu("Cannot Connect to Meta-Server");
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
+#endif
     return 0;
-
 }
 /**
 **  Close MetaServer connection
