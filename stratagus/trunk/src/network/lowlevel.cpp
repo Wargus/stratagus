@@ -161,7 +161,7 @@ global void NetExit(void)
 **
 **	@param sockfd	Socket fildes
 */
-global void NetCloseUDP(int sockfd)
+global void NetCloseUDP(Socket sockfd)
 {
     closesocket(sockfd);
 }
@@ -171,7 +171,7 @@ global void NetCloseUDP(int sockfd)
 **
 **	@param sockfd	Socket fildes
 */
-global void NetCloseTCP(int sockfd)
+global void NetCloseTCP(Socket sockfd)
 {
     closesocket(sockfd);
 }
@@ -200,7 +200,7 @@ global void NetExit(void)
 **
 **	@param sockfd	Socket fildes
 */
-global void NetCloseUDP(int sockfd)
+global void NetCloseUDP(Socket sockfd)
 {
     close(sockfd);
 }
@@ -210,7 +210,7 @@ global void NetCloseUDP(int sockfd)
 **
 **	@param sockfd	Socket fildes
 */
-global void NetCloseTCP(int sockfd)
+global void NetCloseTCP(Socket sockfd)
 {
     close(sockfd);
 }
@@ -225,7 +225,7 @@ global void NetCloseTCP(int sockfd)
 **	@return		0 for success, -1 for error
 */
 #ifdef USE_WINSOCK
-global int NetSetNonBlocking(int sockfd)
+global int NetSetNonBlocking(Socket sockfd)
 {
     unsigned long opt;
 
@@ -233,7 +233,7 @@ global int NetSetNonBlocking(int sockfd)
     return ioctlsocket(sockfd,FIONBIO,&opt);
 }
 #else
-global int NetSetNonBlocking(int sockfd)
+global int NetSetNonBlocking(Socket sockfd)
 {
     int flags;
 
@@ -282,7 +282,7 @@ global unsigned long NetResolveHost(const char* host)
 //	I also found a way for winsock1.1 (= win95), but
 //	that one was too complex to start with.. -> trouble
 //	Lookout for INTRFC.EXE on the MS web site...
-global int NetSocketAddr(const int sock)
+global int NetSocketAddr(const Socket sock)
 {
     INTERFACE_INFO localAddr[MAX_LOC_IP];  // Assume there will be no more than MAX_LOC_IP interfaces 
     DWORD bytesReturned;
@@ -292,7 +292,7 @@ global int NetSocketAddr(const int sock)
     int numLocalAddr; 
 	
     nif = 0;
-    if (sock != -1) {
+    if (sock != (Socket)-1) {
 	wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
                       sizeof(localAddr), &bytesReturned, NULL, NULL);
 	if (wsError == SOCKET_ERROR) {
@@ -323,7 +323,7 @@ global int NetSocketAddr(const int sock)
 // ARI: I knew how to write this for a unix environment,
 //	but am quite certain that porting this can cause you
 //	trouble..
-global int NetSocketAddr(const int sock)
+global int NetSocketAddr(const Socket sock)
 {
     char buf[4096], *cp, *cplim;
     struct ifconf ifc;
@@ -332,7 +332,7 @@ global int NetSocketAddr(const int sock)
     int i, nif;
 
     nif = 0;
-    if (sock != -1) {
+    if (sock != (Socket)-1) {
 	ifc.ifc_len = sizeof(buf);
 	ifc.ifc_buf = buf;
 	if (ioctl(sock, SIOCGIFCONF, (char *)&ifc) < 0) {
@@ -400,7 +400,7 @@ global int NetSocketAddr(const int sock)
 }
 #else // } !unix
 // Beos?? Mac??
-global int NetSocketAddr(const int sock)
+global int NetSocketAddr(const Socket sock)
 {
     NetLocalAddrs[0] = htonl(0x7f000001);
     return 1;
@@ -415,9 +415,9 @@ global int NetSocketAddr(const int sock)
 **
 **	@return		If success the socket fildes, -1 otherwise.
 */
-global int NetOpenUDP(int port)
+global Socket NetOpenUDP(int port)
 {
-    int sockfd;
+    Socket sockfd;
 
     // open the socket
     sockfd=socket(AF_INET, SOCK_DGRAM, 0);
@@ -453,14 +453,14 @@ global int NetOpenUDP(int port)
 **
 **	@return		If success the socket fildes, -1 otherwise
 */
-global int NetOpenTCP(int port)
+global Socket NetOpenTCP(int port)
 {
-    int sockfd;
+    Socket sockfd;
 
     sockfd=socket(AF_INET, SOCK_STREAM, 0);
     DebugLevel3Fn(" socket %d\n" _C_ sockfd);
     if( sockfd==INVALID_SOCKET ) {
-	return -1;
+	return (Socket)-1;
     }
     // bind local port
     if( port ) {
@@ -478,7 +478,7 @@ global int NetOpenTCP(int port)
 	if( bind(sockfd,(struct sockaddr*)&sock_addr,sizeof(sock_addr))<0 ) {
 	    fprintf(stderr,"Couldn't bind to local port\n");
 	    NetCloseTCP(sockfd);
-	    return -1;
+	    return (Socket)-1;
 	}
 	DebugLevel3Fn(" bind ok\n");
 	NetLastHost=sock_addr.sin_addr.s_addr;
@@ -497,7 +497,7 @@ global int NetOpenTCP(int port)
 **
 **	@return		0 if success, -1 if failure
 */
-global int NetConnectTCP(int sockfd,unsigned long addr,int port)
+global int NetConnectTCP(Socket sockfd,unsigned long addr,int port)
 {
     struct sockaddr_in sa;
 #ifndef __BEOS__
@@ -535,7 +535,7 @@ global int NetConnectTCP(int sockfd,unsigned long addr,int port)
 **
 **	@return		1 if data is available, 0 if not, -1 if failure.
 */
-global int NetSocketReady(int sockfd,int timeout)
+global int NetSocketReady(Socket sockfd,int timeout)
 {
     int retval;
     struct timeval tv;
@@ -591,7 +591,7 @@ global int NetSocketReady(int sockfd,int timeout)
 **
 **	@return		Number of bytes placed in buffer, or -1 if failure.
 */
-global int NetRecvUDP(int sockfd,void* buf,int len)
+global int NetRecvUDP(Socket sockfd,void* buf,int len)
 {
     int n;
     int l;
@@ -624,7 +624,7 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
 **
 **	@return		Number of bytes placed in buffer or -1 if failure.
 */
-global int NetRecvTCP(int sockfd,void* buf,int len)
+global int NetRecvTCP(Socket sockfd,void* buf,int len)
 {
     NetLastSocket=sockfd;
     return recv(sockfd,buf,len,0);
@@ -641,7 +641,7 @@ global int NetRecvTCP(int sockfd,void* buf,int len)
 **
 **	@return		Number of bytes sent.
 */
-global int NetSendUDP(int sockfd,unsigned long host,int port
+global int NetSendUDP(Socket sockfd,unsigned long host,int port
 	,const void* buf,int len)
 {
     int n;
@@ -666,7 +666,7 @@ global int NetSendUDP(int sockfd,unsigned long host,int port
 **
 **	@return		Number of bytes sent.
 */
-global int NetSendTCP(int sockfd,const void* buf,int len)
+global int NetSendTCP(Socket sockfd,const void* buf,int len)
 {
     return send(sockfd,buf,len,0);
 }
@@ -678,7 +678,7 @@ global int NetSendTCP(int sockfd,const void* buf,int len)
 **
 **	@return		0 for success, -1 for error
 */
-global int NetListenTCP(int sockfd)
+global int NetListenTCP(Socket sockfd)
 {
     return listen(sockfd,PlayerMax);
 }
@@ -690,7 +690,7 @@ global int NetListenTCP(int sockfd)
 **
 **	@return		If success the new socket fildes, -1 otherwise.
 */
-global int NetAcceptTCP(int sockfd)
+global Socket NetAcceptTCP(Socket sockfd)
 {
     struct sockaddr_in sa;
     int len;
