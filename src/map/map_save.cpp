@@ -73,8 +73,9 @@ global void SaveMap(FILE* file)
 
     fprintf(file,"  'the-map '(\n");
 
+    // FIXME: Why terrain? TheMap->Tileset->Class should be correct
     fprintf(file,"  terrain (%s \"%s\")\n"
-	    ,TheMap.TerrainName,Tilesets[TheMap.Terrain].Name);
+	    ,TheMap.TerrainName,Tilesets[TheMap.Terrain]->Class);
 
     fprintf(file,"  size (%d %d)\n",TheMap.Width,TheMap.Height);
     fprintf(file,"  %s\n",TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
