@@ -1132,7 +1132,7 @@ local void NetworkServerSetup(void)
     // FIXME: randomize the slots :)
 
     //
-    //	Send all clients host/ports to all clients.
+    //	Send all clients host:ports to all clients.
     //
 
     // Prepare message:
@@ -1149,7 +1149,7 @@ local void NetworkServerSetup(void)
     ThisPlayer=&Players[num[i]];
 
     //
-    //	Send all clients host/ports to all clients.
+    //	Send all clients host:ports to all clients.
     //
     for( j=HostsCount; j; ) {
 	DebugLevel1Fn(" ready, assigning\n");
@@ -1232,7 +1232,8 @@ local void NetworkClientSetup(void)
 	fprintf(stderr,"Can't resolve host %s\n",NetworkArg);
 	exit(-1);
     }
-    DebugLevel0Fn(": Server %ld:%d\n",host,ntohs(port));
+    DebugLevel0Fn(" Server host:port %ld.%ld.%ld.%ld:%d\n"
+	,host & 0xff, (host >> 8) & 0xff, (host >> 16) & 0xff, (host >> 24) & 0xff ,ntohs(port));
 
     //
     //	Connecting to server
@@ -1360,6 +1361,8 @@ global void InitNetwork(void)
 	if( NetworkArg ) {
 	    i=strtol(NetworkArg,&cp,0);
 	    if( cp!=NetworkArg && (*cp==':' || *cp=='\0') ) {
+		if(*cp==':')
+		    cp++;
 		NetworkArg=cp;
 		port=i;
 	    }
@@ -1382,8 +1385,8 @@ global void InitNetwork(void)
 	    DebugLevel0Fn(" %s\n",buf);
 	    MyHost=NetResolveHost(buf);
 	    MyPort=NetLastPort;
-	    DebugLevel0Fn(" My host/port %ld:%d\n"
-		    ,MyHost,ntohs(MyPort));
+	    DebugLevel0Fn(" My host:port %ld.%ld.%ld.%ld:%d\n"
+	    ,MyHost & 0xff, (MyHost >> 8) & 0xff, (MyHost >> 16) & 0xff, (MyHost >> 24) & 0xff ,ntohs(MyPort));
 	});
 
 	//
