@@ -4,12 +4,13 @@
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
-//  ______________________			     ______________________
-//			  T H E	  W A R	  B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//  ______________________                           ______________________
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sweepline.c    -       Invalidate rectangles from given marked areas *///
-//	(c) Copyright 2002-2003 by Lutz Sammer and Stephan Rasenberg
+/**@name sweepline.c - Invalidate rectangles from given marked areas *///
+//
+//      (c) Copyright 2002-2004 by Lutz Sammer and Stephan Rasenberg
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -45,7 +46,7 @@
 #include "sweepline.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
@@ -113,13 +114,13 @@ typedef struct SRectangle {
 
 
 /*----------------------------------------------------------------------------
---		Externals
+--  Externals
 ----------------------------------------------------------------------------*/
 
 
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /**

@@ -1499,25 +1499,25 @@ global void MapDrawTile(int tile, int x, int y)
 	g = TheMap.TileGraphic;
 	sx = x;
 	ex = sx + TileSizeX;
-	ey = VideoHeight - y;
-	sy = ey - TileSizeY;
+	sy = y;
+	ey = sy + TileSizeY;
 
 	t = tile % (g->Width / TileSizeX);
-	stx=(GLfloat)t * TileSizeX / g->Width * g->TextureWidth;
-	etx=(GLfloat)(t * TileSizeX + TileSizeX) / g->Width * g->TextureWidth;
+	stx = (GLfloat)t * TileSizeX / g->Width * g->TextureWidth;
+	etx = (GLfloat)(t * TileSizeX + TileSizeX) / g->Width * g->TextureWidth;
 	t = tile / (g->Width / TileSizeX);
-	sty=(GLfloat)t * TileSizeY / g->Height * g->TextureHeight;
-	ety=(GLfloat)(t * TileSizeY + TileSizeY) / g->Height * g->TextureHeight;
+	sty = (GLfloat)t * TileSizeY / g->Height * g->TextureHeight;
+	ety = (GLfloat)(t * TileSizeY + TileSizeY) / g->Height * g->TextureHeight;
 
 	glBindTexture(GL_TEXTURE_2D, g->TextureNames[0]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(stx, 1.0f - ety);
+	glTexCoord2f(stx, sty);
 	glVertex2i(sx, sy);
-	glTexCoord2f(stx, 1.0f - sty);
+	glTexCoord2f(stx, ety);
 	glVertex2i(sx, ey);
-	glTexCoord2f(etx, 1.0f - sty);
+	glTexCoord2f(etx, ety);
 	glVertex2i(ex, ey);
-	glTexCoord2f(etx, 1.0f - ety);
+	glTexCoord2f(etx, sty);
 	glVertex2i(ex, sy);
 	glEnd();
 }

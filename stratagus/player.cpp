@@ -157,7 +157,7 @@ global void InitPlayers(void)
 			Players[p].Type = PlayerNobody;
 		}
 		for (x = 0; x < 4; ++x) {
-			PlayerColors[p][x] = SDL_MapRGB(TheScreen->format, PlayerColorsRGB[p][x].r,
+			PlayerColors[p][x] = VideoMapRGB(TheScreen->format, PlayerColorsRGB[p][x].r,
 				PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
 		}
 	}
