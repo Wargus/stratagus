@@ -90,7 +90,6 @@ local int CclPlayer(lua_State* l)
 		NumPlayers = i + 1;
 	}
 	player->Player = i;
-	player->Color = PlayerColors[i][0];
 	if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
 		DebugLevel0("Not enough memory to create player %d.\n" _C_ i);
 		return 0;
@@ -321,6 +320,25 @@ local int CclPlayer(lua_State* l)
 			}
 		} else if (!strcmp(value, "total-units")) {
 			player->TotalUnits = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "color")) {
+			int r;
+			int g;
+			int b;
+
+			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 3) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			lua_rawgeti(l, j + 1, 1);
+			r = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, j + 1, 2);
+			g = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, j + 1, 3);
+			b = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			player->Color = SDL_MapRGB(TheScreen->format, r, g, b);
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {
 				lua_pushstring(l, "incorrect argument");
