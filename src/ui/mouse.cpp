@@ -1196,7 +1196,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	sx = CursorX - v->X + TileSizeX * v->MapX;
 	sy = CursorY - v->Y + TileSizeY * v->MapY;
 	if( MouseButtons&LeftButton ) {
-	    MakeLocalMissile(MissileTypeGreenCross
+	    MakeLocalMissile(MissileTypeRedCross
 		    ,v->MapX*TileSizeX+CursorX - v->X
 		    ,v->MapY*TileSizeY+CursorY - v->Y
 		    ,v->MapX*TileSizeX+CursorX - v->X
@@ -1205,7 +1205,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	sx = CursorX - TheUI.MapX + TileSizeX*MapX;
 	sy = CursorY - TheUI.MapY + TileSizeY*MapY;
 	if( MouseButtons&LeftButton ) {
-	    MakeLocalMissile(MissileTypeGreenCross
+	    MakeLocalMissile(MissileTypeRedCross
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX

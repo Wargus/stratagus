@@ -408,14 +408,6 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
 	
-	// FIXME: Wrong possition for missile
-        if ( ThisPlayer==unit->Player && order->Goal == NoUnitP ) {
-	    MakeLocalMissile(MissileTypeRedCross
-		,x*TileSizeX+TileSizeX/2
-		,y*TileSizeY+TileSizeY/2
-		,x*TileSizeX+TileSizeX/2
-		,y*TileSizeY+TileSizeY/2);
-	}
     }
     ClearSavedAction(unit);
 }
