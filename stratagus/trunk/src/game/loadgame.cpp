@@ -113,8 +113,8 @@ global void CleanModules(void)
     //
     //	Free our protected objects, AI scripts, unit-type properties.
     //
-    var=gh_symbol2scm("*ccl-protect*");
-    setvar(var,NIL,NIL);
+    var = gh_symbol2scm("*ccl-protect*");
+    setvar(var, NIL, NIL);
 }
 
 /**
@@ -165,7 +165,7 @@ global void InitModules(void)
 */
 global void LoadModules(void)
 {
-    char *s;
+    char* s;
 
     LoadIcons();
     LoadCursors(ThisPlayer->RaceName);
@@ -193,13 +193,13 @@ global void LoadModules(void)
 #endif
 
     LoadRGB(GlobalPalette,
-	    s=strdcat3(StratagusLibPath,"/graphics/",
+	    s = strdcat3(StratagusLibPath, "/graphics/",
 		TheMap.Tileset->PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
     CreateMinimap();
 
-    SetDefaultTextColors(TheUI.NormalFontColor,TheUI.ReverseFontColor);
+    SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
 
     // LoadButtons();
 }
@@ -218,24 +218,24 @@ global void LoadGame(char* filename)
 
     CleanModules();
 
-    old_siod_verbose_level=siod_verbose_level;
-    siod_verbose_level=4;
+    old_siod_verbose_level = siod_verbose_level;
+    siod_verbose_level = 4;
     user_gc(SCM_BOOL_F);
-    siod_verbose_level=old_siod_verbose_level;
+    siod_verbose_level = old_siod_verbose_level;
     InitVisionTable();
     gh_load(filename);
     user_gc(SCM_BOOL_F);
 
-    game_cycle=GameCycle;
+    game_cycle = GameCycle;
     // FIXME: log should be loaded from the save game
     CommandLogDisabled = 1;
 
     InitModules();
     LoadModules();
 
-    GameCycle=game_cycle;
+    GameCycle = game_cycle;
     SelectionChanged();
-    MustRedraw=RedrawEverything;
+    MustRedraw = RedrawEverything;
 }
 
 /**
