@@ -302,11 +302,6 @@
 **
 **		Death explosion animated
 **
-**	UnitType::Critter
-**
-**		Unit is marked as critter. The effect of this is that when
-**		idle the unit will move around randomly.
-**
 **	UnitType::RandomMovementProbability
 **
 **		When the unit is idle this is the probability that it will
@@ -759,7 +754,6 @@ struct _unit_type_ {
     unsigned AirUnit : 1;		/// Air animated
     unsigned SeaUnit : 1;		/// Sea animated
     unsigned ExplodeWhenKilled : 1;	/// Death explosion animated
-    unsigned Critter : 1;		/// Unit is controlled by nobody
     unsigned int RandomMovementProbability;/// Probability to move randomly.
     unsigned int ClicksToExplode;	/// Number of consecutive clicks until unit suicides.
     unsigned Sniper : 1;		/// The unit can only hit organic units.
@@ -845,7 +839,6 @@ extern int NumUnitTypes;			/// Number of unit-types made
 // FIXME: this hardcoded unit-types must be removed!!
 extern UnitType*UnitTypeHumanWall;		/// Human wall
 extern UnitType*UnitTypeOrcWall;		/// Orc wall
-extern UnitType*UnitTypeCritter;		/// Critter unit-type pointer
 
 extern char** UnitTypeWcNames;			/// Mapping wc-number 2 symbol
 

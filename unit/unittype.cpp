@@ -79,7 +79,6 @@ global int NumUnitTypes;			/// number of unit-types made
 */
 global UnitType*UnitTypeHumanWall;		/// Human wall
 global UnitType*UnitTypeOrcWall;		/// Orc wall
-global UnitType*UnitTypeCritter;		/// Critter unit type pointer
 
 /**
 **	Mapping of W*rCr*ft number to our internal unit-type symbol.
@@ -442,7 +441,9 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->AirUnit=BIT(1,v);
 	unittype->ExplodeWhenKilled=BIT(2,v);
 	unittype->SeaUnit=BIT(3,v);
-	unittype->Critter=BIT(4,v);
+	//  BIT(4,v) This makes the unit a critter, true for demons, skeletons and sheep.
+	//  There were some uses for this in code, like removing a health bar and the like,
+	//  but I (n0body) don't think they were usefull. Thus BIT(4,v) is from now on ignored.
 	unittype->Building=BIT(5,v);
 	unittype->PermanentCloak=BIT(6,v);
 	unittype->DetectCloak=BIT(7,v);
@@ -909,9 +910,6 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 	CLprintf(file,"  'sea-unit\n");
     }
 
-    if( type->Critter ) {
-	CLprintf(file,"  'critter\n");
-    }
     if( type->RandomMovementProbability ) {
 	CLprintf(file,"  'random-movement-probability %d\n",type->RandomMovementProbability);
     }
@@ -1288,7 +1286,6 @@ global void InitUnitTypes(int reset_player_stats)
     //
     UnitTypeHumanWall=UnitTypeByIdent("unit-human-wall");
     UnitTypeOrcWall=UnitTypeByIdent("unit-orc-wall");
-    UnitTypeCritter=UnitTypeByIdent("unit-critter");
 }
 
 /**
@@ -1551,7 +1548,6 @@ global void CleanUnitTypes(void)
     //
     UnitTypeHumanWall=NULL;
     UnitTypeOrcWall=NULL;
-    UnitTypeCritter=NULL;
 }
 
 //@}
