@@ -119,8 +119,8 @@ local void ScenSelectLBAction(Menuitem *mi, int i);
 local void ScenSelectTPMSAction(Menuitem *mi, int i);
 local void ScenSelectVSAction(Menuitem *mi, int i);
 local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i);
-local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i);
-local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i);
+local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i);
+local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i);
 local void ScenSelectFolder(void);
 local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
@@ -786,10 +786,42 @@ local Menuitem SoundOptionsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Sound Options", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 64, 36*1, 0, LargeFont, NULL, NULL,
+	{ text:{ "Master Volume", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL,
+        { hslider:{ 0, 11*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_TEXT, 44, 36*2 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 218, 36*2 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 64, 36*3, 0, LargeFont, NULL, NULL,
+	{ text:{ "Music Volume", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL,
+        { hslider:{ 0, 11*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_TEXT, 44, 36*4 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 64, 36*5, 0, LargeFont, NULL, NULL,
+	{ text:{ "CD Volume", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
+        { hslider:{ 0, 11*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 15, 36*7, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
-    { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
-	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 36*7, 0, LargeFont, NULL, NULL,
+	{ text:{ "Sound Enabled", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 15, 36*7, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+    { MI_TYPE_TEXT, 144, 36*7, 0, LargeFont, NULL, NULL,
+	{ text:{ "Music Enabled", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 15, 36*7, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+    { MI_TYPE_TEXT, 144, 36*7, 0, LargeFont, NULL, NULL,
+	{ text:{ "CD Audio Enaled", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
 #else
@@ -827,7 +859,7 @@ local Menuitem SpeedSettingsMenuItems[] = {
     { MI_TYPE_TEXT, 70, 36*3, 0, LargeFont, NULL, NULL,
 	{ text:{ "Mouse Scroll", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL,
-        { hslider:{ 0, 11*18, 18, ScenSelectHSMouseSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+        { hslider:{ 0, 11*18, 18, ScenSelectHSMouseScrollAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 42, 36*4 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "off", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL,
@@ -835,7 +867,7 @@ local Menuitem SpeedSettingsMenuItems[] = {
     { MI_TYPE_TEXT, 82, 36*5, 0, LargeFont, NULL, NULL,
 	{ text:{ "Keyboard Scroll", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
-        { hslider:{ 0, 11*18, 18, ScenSelectHSKeyboardSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+        { hslider:{ 0, 11*18, 18, ScenSelectHSKeyboardScrollAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 42, 36*6 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "off", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL,
@@ -1052,11 +1084,11 @@ global Menu Menus[] = {
     },
     {
     	// Sound Options Menu
-	176+(14*TileSizeX-256)/2,
-	16+(14*TileSizeY-288)/2,
-	256, 288,
-	ImagePanel1,
-	2, 4,
+	176+(14*TileSizeX-352)/2,
+	16+(14*TileSizeY-352)/2,
+	352, 352,
+	ImagePanel5,
+	20, 20,
 	SoundOptionsMenuItems,
 	NULL,
     },
@@ -2520,7 +2552,7 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i)
+local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i)
 {
     mi--;
     
@@ -2570,7 +2602,7 @@ local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i)
+local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i)
 {
     mi--;
     
