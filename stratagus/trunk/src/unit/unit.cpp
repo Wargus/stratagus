@@ -311,11 +311,6 @@ global void InitUnit(Unit* unit, UnitType* type)
 			(type->Building ? 0 : type->NumDirections / 2 + 1 - 1);
 	}
 
-	if (UnitTypeVar.NumberVariable) {
-		unit->Variable = malloc(UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
-		memcpy(unit->Variable, unit->Type->Variable, UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
-	}
-
 	if (!type->Building && type->Sprite &&
 			VideoGraphicFrames(type->Sprite) > 5) {
 		unit->Direction = (MyRand() >> 8) & 0xFF;		// random heading
@@ -3052,7 +3047,7 @@ global int CanTarget(const UnitType* source, const UnitType* dest)
 {
 	int i;
 
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
+	for (i = 0; i < NumberBoolFlag; ++i) {
 		if (source->CanTargetFlag[i] != CONDITION_TRUE) {
 			if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
 				return 0;
@@ -3323,12 +3318,6 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"flame-shield\", %d, ", unit->FlameShield);
 	CLprintf(file, "\"unholy-armor\", %d,\n  ", unit->UnholyArmor);
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-		CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
-			UnitTypeVar.VariableName[i], unit->Variable[i].Value, unit->Variable[i].Max,
-			unit->Variable[i].Increase, unit->Variable[i].Enable ? "true" : "false");
-	}
-
 	CLprintf(file, "\"group-id\", %d,\n  ", unit->GroupId);
 	CLprintf(file, "\"last-group\", %d,\n  ", unit->LastGroup);
 
@@ -3589,7 +3578,6 @@ global void CleanUnits(void)
 	//
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		free((*table)->AutoCastSpell);
-		free((*table)->Variable);
 		free(*table);
 		*table = NULL;
 	}
@@ -3601,6 +3589,7 @@ global void CleanUnits(void)
 		ReleasedHead = unit->Next;
 		free(unit);
 	}
+
 	InitUnitsMemory();
 
 	XpDamage = 0;
