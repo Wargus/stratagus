@@ -322,7 +322,7 @@ local int CclPlayer(lua_State* l)
 			lua_rawgeti(l, j + 1, 3);
 			b = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			player->Color = SDL_MapRGB(TheScreen->format, r, g, b);
+			player->Color = VideoMapRGB(TheScreen->format, r, g, b);
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

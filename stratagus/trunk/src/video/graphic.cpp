@@ -202,10 +202,6 @@ global void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 */
 global void VideoFree(Graphic* graphic)
 {
-#ifdef DEBUG
-	AllocatedGraphicMemory -= sizeof(Graphic);
-#endif
-
 #ifdef USE_OPENGL
 	if (graphic->NumTextureNames) {
 		glDeleteTextures(graphic->NumTextureNames, graphic->TextureNames);
@@ -214,20 +210,12 @@ global void VideoFree(Graphic* graphic)
 #endif
 
 	if (graphic->Surface) {
-#ifdef DEBUG
-		AllocatedGraphicMemory -=
-			graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
-#endif
 		if (graphic->Surface->format->BytesPerPixel == 1) {
 			VideoPaletteListRemove(graphic->Surface);
 		}
 		SDL_FreeSurface(graphic->Surface);
 	}
 	if (graphic->SurfaceFlip) {
-#ifdef DEBUG
-		AllocatedGraphicMemory -=
-			graphic->Width * graphic->Height * graphic->SurfaceFlip->format->BytesPerPixel;
-#endif
 		if (graphic->SurfaceFlip->format->BytesPerPixel == 1) {
 			VideoPaletteListRemove(graphic->SurfaceFlip);
 		}
@@ -260,9 +248,6 @@ global Graphic* MakeGraphic(SDL_Surface* surface)
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-#ifdef DEBUG
-	AllocatedGraphicMemory += sizeof(Graphic);
-#endif
 
 	graphic->Surface = surface;
 	graphic->Width = surface->w;
@@ -288,11 +273,9 @@ global void FlipGraphic(Graphic* graphic)
 
 	s = graphic->SurfaceFlip = SDL_ConvertSurface(graphic->Surface,
 		graphic->Surface->format, SDL_SWSURFACE);
-	VideoPaletteListAdd(graphic->SurfaceFlip);
-#ifdef DEBUG
-	AllocatedGraphicMemory +=
-		graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
-#endif
+	if (graphic->SurfaceFlip->format->BytesPerPixel == 1) {
+		VideoPaletteListAdd(graphic->SurfaceFlip);
+	}
 
 	SDL_LockSurface(graphic->Surface);
 	SDL_LockSurface(s);
@@ -500,9 +483,6 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 	SDL_LockSurface(g->Surface);
 
 	data = (unsigned char*)malloc(w * h);
-#ifdef DEBUG
-	AllocatedGraphicMemory += w * h;
-#endif
 	x = 0;
 
 	for (i = 0; i < h; ++i) {
@@ -519,7 +499,9 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 	SDL_FreeSurface(g->Surface);
 
 	g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
-	VideoPaletteListAdd(g->Surface);
+	if (g->Surface->format->BytesPerPixel == 1) {
+		VideoPaletteListAdd(g->Surface);
+	}
 	SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
 	SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, 255);
 
@@ -531,25 +513,6 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 	free(g->TextureNames);
 	MakeTexture(g, g->Width, g->Height);
 #endif
-}
-
-/**
-**  Load graphic from file.
-**
-**  @param name  File name.
-**
-**  @return      Graphic object.
-*/
-global Graphic* LoadGraphic(const char* name)
-{
-	return LoadSprite(name, 0, 0);
-}
-
-/**
-**  Init graphic
-*/
-global void InitGraphic(void)
-{
 }
 
 //@}

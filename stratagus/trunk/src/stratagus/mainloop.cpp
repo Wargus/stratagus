@@ -929,7 +929,7 @@ global void GameMainLoop(void)
 		if (FastForwardCycle >= GameCycle) {
 			MustRedraw = RedrawEverything;
 		}
-		if (MustRedraw /* && !VideoInterrupts */ &&
+		if (MustRedraw &&
 				(FastForwardCycle <= GameCycle || GameCycle <= 10 ||
 					!(GameCycle & 0x3f))) {
 			if (Callbacks == &MenuCallbacks) {
@@ -955,8 +955,6 @@ global void GameMainLoop(void)
 			MustRedraw = 0;
 #endif
 		}
-
-		CheckVideoInterrupts();				// look if already an interrupt
 
 		if (FastForwardCycle == GameCycle) {
 			VideoSyncSpeed = RealVideoSyncSpeed;

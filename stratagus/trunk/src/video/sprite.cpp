@@ -373,25 +373,6 @@ global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, in
 }
 #endif
 
-local void FreeSprite(Graphic* graphic)
-{
-	int i;
-
-#ifdef DEBUG_TODO
-	AllocatedGraphicMemory -= graphic->Size;
-	AllocatedGraphicMemory -= sizeof(Graphic);
-#endif
-#ifdef USE_OPENGL
-	if (graphic->NumTextureNames) {
-		glDeleteTextures(graphic->NumTextureNames, graphic->TextureNames);
-		free(graphic->TextureNames);
-	}
-#endif
-	for (i = 0; i < graphic->NumFrames; ++i) {
-		SDL_FreeSurface(&graphic->Surface[i]);
-	}
-}
-
 /*----------------------------------------------------------------------------
 --  Global functions
 ----------------------------------------------------------------------------*/
@@ -470,13 +451,6 @@ global void MakeShadowSprite(Graphic* graphic)
 		SDL_SetPalette(graphic->SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
 		SDL_SetAlpha(graphic->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 	}
-}
-
-/**
-**  Init sprite
-*/
-global void InitSprite(void)
-{
 }
 
 //@}
