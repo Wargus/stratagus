@@ -515,7 +515,9 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    if( strcmp(TitleMusic,MenuMusic) ) {
 		PlayMusic(MenuMusic);
 	    }
+	    EnableRedraw=RedrawMenu;
 	    ProcessMenu(MENU_PRG_START, 1);
+	    EnableRedraw=RedrawEverything;
 	    if( NetworkFildes!=-1 && NetPlayers<2 ) {
 		ExitNetwork1();
 	    }

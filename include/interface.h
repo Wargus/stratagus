@@ -293,6 +293,9 @@ extern void InputMouseExit(const EventCallback*,unsigned);
     /// Called to look for mouse timeout's
 extern void InputMouseTimeout(const EventCallback*,unsigned);
 
+    /// Toggle pause mode
+extern void UiTogglePause(void);
+
 //
 //	Chaos pur.
 //

@@ -512,6 +512,29 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
     }
 }
 
+#ifdef USE_WIN32
+/**
+**	Check if the user alt-tabbed away from the game and redraw
+**	everyhing when the user comes back.
+*/
+local void CheckScreenVisible()
+{
+    static int IsVisible=1;
+    Uint8 state;
+
+    state=SDL_GetAppState();
+    if( IsVisible && !(state&SDL_APPACTIVE) ) {
+	IsVisible=0;
+	UiTogglePause();
+    }
+    else if( !IsVisible && (state&SDL_APPACTIVE) ) {
+	IsVisible=1;
+	UiTogglePause();
+	MustRedraw=RedrawEverything&~RedrawMinimap;
+    }
+}
+#endif
+
 /**
 **	Wait for interactive input event for one frame.
 **
@@ -671,6 +694,10 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     if( !SkipGameCycle-- ) {
 	SkipGameCycle=SkipFrames;
     }
+
+#ifdef USE_WIN32
+    CheckScreenVisible();
+#endif
 }
 
 /**
