@@ -1145,9 +1145,9 @@ local int TriggerExecuteAction(int script)
 */
 local void TriggerRemoveTrigger(int trig)
 {
-	lua_pushnil(Lua);
+	lua_pushnumber(Lua, -1);
 	lua_rawseti(Lua, -2, trig);
-	lua_pushnil(Lua);
+	lua_pushnumber(Lua, -1);
 	lua_rawseti(Lua, -2, trig + 1);
 }
 
@@ -1187,7 +1187,7 @@ global void TriggersEachCycle(void)
 	// Skip to the next trigger
 	while (Trigger < triggers) {
 		lua_rawgeti(Lua, -1, Trigger + 1);
-		if (!lua_isnil(Lua, -1)) {
+		if (!lua_isnumber(Lua, -1)) {
 			break;
 		}
 		lua_pop(Lua, 1);
