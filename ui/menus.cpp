@@ -3193,7 +3193,9 @@ local void MultiGameStart(void)
     VideoUnlockScreen();
     Invalidate();
 
-    SendMetaCommand("StartGame","");
+    if (MetaServerInUse) {
+	SendMetaCommand("StartGame","");
+    }
 
     GameSettings.Presets[0].Race = SettingsPresetMapDefault;
 
@@ -7292,38 +7294,61 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     int k;
     int numparams;
     int nummenus;
+    char* parameter;
     char* reply;
-	
-    SendMetaCommand("GameList", "");
+    Menu *menu;
+
+    SendMetaCommand("NumberOfGames","");
+    menu = FindMenu("menu-metaserver-list");
+
     reply = NULL;
     //receive
     //check okay
-    
+    if (1 || RecvMetaReply(&reply) == -1) {
+	//TODO: Notify player that connection was aborted...
+	nummenus = 1;
+
+	
+    } else {
+	GetMetaParameter(reply, 1, &parameter);
+	nummenus = atoi(parameter);
+    }
     // Meta server only sends matching version
     // Only Displays games from Matching version
-	nummenus = 5;
-	i = 1;
-	k = 0;
-	numparams = 4; //TODO: To be changed if more params are sent
+
 	
-	//Retrieve list of online game from the meta server
-	for (j = 4; j <= nummenus * (numparams + 1); j += numparams + 1) { // loop over the number of items in the menu
-	    //TODO: hard coded.
-	    // Check if connection to meta server is there.
-	    SendMetaCommand("NextGameInList", ""); 
-	    i = RecvMetaReply(&reply);
-	    if (i == 0) {
-		// fill the menus with the right info.
-		mi->menu->Items[j].d.text.text = "Nick"; 
-		mi->menu->Items[j + 1].d.text.text = "IP";
-		mi->menu->Items[j + 2].d.text.text = "OS";
-		mi->menu->Items[j + 3].d.text.text = "Engine Version";
-	    }
-	    ++k;
+    i = 1;
+    k = 0;
+    numparams = 4; //TODO: To be changed if more params are sent
+
+    //Retrieve list of online game from the meta server
+    for (j = 4; j <= nummenus * (numparams + 1); j += numparams + 1) { // loop over the number of items in the menu
+	//TODO: hard coded.
+	// Check if connection to meta server is there.
+
+	SendMetaCommand("GameNumber","%d\n",k + 1); 
+	i=RecvMetaReply(&reply);
+		
+
+	if (i == 0) {
+	    // fill the menus with the right info.
+
+	    menu->Items[j].d.text.text = "Nick"; 
+	    menu->Items[j + 1].d.text.text = "IP";
+	    menu->Items[j + 2].d.text.text = "OS";
+	    menu->Items[j + 3].d.text.text = "Engine Version";
+	} else {
+	    GetMetaParameter(reply, 0, &parameter);  ////TODO: use this function.
+	    menu->Items[j].d.text.text = parameter;
+	    GetMetaParameter(reply, 1, &parameter);
+	    menu->Items[j + 1].d.text.text = parameter;
+	    GetMetaParameter(reply, 2, &parameter);
+	    menu->Items[j + 2].d.text.text = parameter;
+	    GetMetaParameter(reply, 3, &parameter);
+	    menu->Items[j + 3].d.text.text = parameter;
 	}
-	//	mi->menu->Items[4].d.text.text=TheMessage->Nickname; 
-	//	mi->menu->Items[9].d.text.text=TheMessage->Nickname; 
-	//	mi->menu->Items[14].d.text.text=TheMessage->Nickname; 
+	++k;
+    }
 }
 
 /**
@@ -7404,19 +7429,19 @@ local void SelectGameServer(Menuitem *mi)
 /**
 **	Action to add a game server on the meta-server.
 */
-local void AddGameServer()
+local void AddGameServer(void)
 {
     //send message to meta server. meta server will detect IP address.
     //Meta-server will return "BUSY" if the list of online games is busy.
 
-    SendMetaCommand("AddGame","%s\n%s\n%s\n%s\n","Name","Map","Players","Free");
+    SendMetaCommand("AddGame","%s\n%s\n%s\n%s\n%s\n%s\n","IP","Port","Name","Map","Players","Free");
 
     // FIXME: Get Reply from Queue
 
 }
 
 
-local int MetaServerConnectError()
+local int MetaServerConnectError(void)
 {
     Invalidate();
     NetErrorMenu("Cannot Connect to Meta-Server");
