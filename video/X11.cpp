@@ -63,7 +63,6 @@
 #include "interface.h"
 #include "network.h"
 #include "ui.h"
-#include "new_video.h"
 
 local Display* TheDisplay;		/// My X11 display
 local int TheScreen;			/// My X11 screen
