@@ -2151,11 +2151,11 @@ global void PreferencesMenu(void)
 }
 
 /**
-**		Preferences menu init callback
+**  Preferences menu init callback
 */
-local void PreferencesInit(Menuitem *mi __attribute__((unused)))
+local void PreferencesInit(Menuitem* mi __attribute__((unused)))
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = CurrentMenu;
 	if (!TheMap.NoFogOfWar) {
@@ -2179,16 +2179,16 @@ local void PreferencesInit(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**		Preferences menu init callback
+**  Preferences menu init callback
 */
-local void PreferencesExit(Menuitem *mi __attribute__((unused)))
+local void PreferencesExit(Menuitem* mi __attribute__((unused)))
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
 }
 
 /**
-**		Show the game options.
+**  Show the game options.
 */
 local void GameOptionsMenu(void)
 {
@@ -2196,7 +2196,7 @@ local void GameOptionsMenu(void)
 }
 
 /**
-**		Show the game credits.
+**  Show the game credits.
 */
 local void GameShowCredits(void)
 {
@@ -2204,7 +2204,7 @@ local void GameShowCredits(void)
 }
 
 /**
-**		Show the Restart Confirm menu
+**  Show the Restart Confirm menu
 */
 global void RestartConfirmMenu(void)
 {
@@ -2212,7 +2212,7 @@ global void RestartConfirmMenu(void)
 }
 
 /**
-**		Show the Surrender Confirm menu
+**  Show the Surrender Confirm menu
 */
 local void SurrenderConfirmMenu(void)
 {
@@ -2220,7 +2220,7 @@ local void SurrenderConfirmMenu(void)
 }
 
 /**
-**		Show the Quit To Menu Confirm menu
+**  Show the Quit To Menu Confirm menu
 */
 global void QuitToMenuConfirmMenu(void)
 {
@@ -2228,7 +2228,7 @@ global void QuitToMenuConfirmMenu(void)
 }
 
 /**
-**		Show the Exit Confirm menu
+**  Show the Exit Confirm menu
 */
 global void ExitConfirmMenu(void)
 {
@@ -2236,15 +2236,24 @@ global void ExitConfirmMenu(void)
 }
 
 /**
-**		Show the End Scenario menu
+**  Show the End Scenario menu
 */
 local void EndScenarioMenu(void)
 {
+	Menu* menu;
+
+	menu = FindMenu("menu-end-scenario");
+	if (NetworkFildes == (Socket)-1) {
+		menu->Items[1].flags = MI_ENABLED;
+	} else {
+		menu->Items[1].flags = MI_DISABLED;
+	}
+
 	ProcessMenu("menu-end-scenario", 0);
 }
 
 /**
-**		Restart the scenario
+**  Restart the scenario
 */
 local void EndScenarioRestart(void)
 {
@@ -2254,7 +2263,7 @@ local void EndScenarioRestart(void)
 }
 
 /**
-**		End the game in defeat
+**  End the game in defeat
 */
 local void EndScenarioSurrender(void)
 {
@@ -2264,7 +2273,7 @@ local void EndScenarioSurrender(void)
 }
 
 /**
-**		End the game and return to the menu
+**  End the game and return to the menu
 */
 local void EndScenarioQuitMenu(void)
 {
@@ -2274,7 +2283,7 @@ local void EndScenarioQuitMenu(void)
 }
 
 /**
-**		End the running game from menu.
+**  End the running game from menu.
 */
 local void GameMenuEnd(void)
 {
@@ -2285,11 +2294,11 @@ local void GameMenuEnd(void)
 }
 
 /**
-**		Victory menu init callback
+**  Victory menu init callback
 */
-local void VictoryInit(Menuitem *mi __attribute__((unused)))
+local void VictoryInit(Menuitem* mi __attribute__((unused)))
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = CurrentMenu;
 	if (CommandLogDisabled) {
@@ -2298,11 +2307,11 @@ local void VictoryInit(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**		Defeated menu init callback
+**  Defeated menu init callback
 */
-local void DefeatedInit(Menuitem *mi __attribute__((unused)))
+local void DefeatedInit(Menuitem* mi __attribute__((unused)))
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = CurrentMenu;
 	if (CommandLogDisabled) {
@@ -2311,7 +2320,7 @@ local void DefeatedInit(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**		Save replay of completed game.
+**  Save replay of completed game.
 */
 local void SaveReplay(void)
 {
@@ -2319,12 +2328,12 @@ local void SaveReplay(void)
 }
 
 /**
-**		Save replay menu init callback
+**  Save replay menu init callback
 */
-local void SaveReplayInit(Menuitem *mi __attribute__((unused)))
+local void SaveReplayInit(Menuitem* mi __attribute__((unused)))
 {
-	Menu *menu;
-	char *buf;
+	Menu* menu;
+	char* buf;
 
 	menu = CurrentMenu;
 
@@ -2336,18 +2345,18 @@ local void SaveReplayInit(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**		Save replay menu exit callback
+**  Save replay menu exit callback
 */
-local void SaveReplayExit(Menuitem *mi)
+local void SaveReplayExit(Menuitem* mi)
 {
 	free(mi->menu->Items[1].d.input.buffer);
 	mi->menu->Items[1].d.input.buffer = NULL;
 }
 
 /**
-**		Input field action of save replay menu.
+**  Input field action of save replay menu.
 */
-local void SaveReplayEnterAction(Menuitem *mi, int key)
+local void SaveReplayEnterAction(Menuitem* mi, int key)
 {
 	if (mi->d.input.nch == 0) {
 		mi[1].flags = MenuButtonDisabled;
