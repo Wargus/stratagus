@@ -2465,7 +2465,7 @@ global void HitUnit(const Unit* attacker,Unit* target,int damage)
 	    }
 	}
 	if( target->Player->AiEnabled ) {
-	    AiHelpMe(target);
+	    AiHelpMe(attacker,target);
 	}
     }
     target->Attacked=7;
