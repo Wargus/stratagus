@@ -112,15 +112,10 @@
 Everything around the game.
 <h2>Functions</h2>
 <a name="add-keystroke-help"></a>
-<h3>add-keystroke-help</h3>
-
-<h4>Description</h4>
+<h3>(add-keystroke-help)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(add-keystroke-help)</code>
 
 <dl>
 <dt></dt>
@@ -141,15 +136,10 @@ Everything around the game.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="add-message"></a>
-<h3>add-message</h3>
-
-<h4>Description</h4>
+<h3>(add-message message)</h3>
 
 Add a message to be displayed.
 
-<h4>Syntax</h4>
-
-<code>(add-message message)</code>
 
 <dl>
 <dt>message</dt>
@@ -168,15 +158,10 @@ Add a message to be displayed.
 <h4>Not Used</h4>
 
 <a name="add-objective"></a>
-<h3>add-objective</h3>
-
-<h4>Description</h4>
+<h3>(add-objective objective position)</h3>
 
 Add an objective to the scenario objectives text list.
 
-<h4>Syntax</h4>
-
-<code>(add-objective objective position)</code>
 
 <dl>
 <dt>objective</dt>
@@ -199,15 +184,10 @@ list and adds the objective "-Destroy all enemies" to the first position.
 <h4>Not Used</h4>
 
 <a name="add-tip"></a>
-<h3>add-tip</h3>
-
-<h4>Description</h4>
+<h3>(add-tip tip)</h3>
 
 Adds a tip.  Tips are shown at the start of a level.
 
-<h4>Syntax</h4>
-
-<code>(add-tip tip)</code>
 
 <dl>
 <dt>tip</dt>
@@ -228,15 +208,10 @@ Adds a tip.  Tips are shown at the start of a level.
 <a href="../../data/ccl/tips.ccl"> $LIBARYPATH/ccl/tips.ccl </a>
 
 <a name="briefing"></a>
-<h3>briefing</h3>
-
-<h4>Description</h4>
+<h3>(briefing)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(briefing)</code>
 
 <dl>
 <dt></dt>
@@ -257,15 +232,10 @@ Adds a tip.  Tips are shown at the start of a level.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="center-map"></a>
-<h3>center-map</h3>
-
-<h4>Description</h4>
+<h3>(center-map x y)</h3>
 
 Center the current viewport at a certain location.
 
-<h4>Syntax</h4>
-
-<code>(center-map x y)</code>
 
 <dl>
 <dt>x</dt>
@@ -287,16 +257,10 @@ Center the current viewport at a certain location.
 <h4>Not Used</h4>
 
 <a name="change-units-owner"></a>
-
-<h3>change-units-owner</h3>
-
-<h4>Description</h4>
+<h3>(change-units-owner '(x1 y1) '(x2 y2) oldplayer newplayer)</h3>
 
 Changes the owner of a group of units from 1 player to another.
 
-<h4>Syntax</h4>
-
-<code>(change-units-owner '(x1 y1) '(x2 y2) oldplayer newplayer)</code>
 
 <dl>
 <dt>'(x1 y1)</dt>
@@ -325,16 +289,11 @@ that are located in the area (0,0)-(10,10).
 <h4>Not Used</h4>
 
 <a name="create-unit"></a>
-<h3>create-unit</h3>
-
-<h4>Description</h4>
+<h3>(create-unit type player x y)</h3>
 
 Create a unit at a location.  If the location is occupied the unit will be
 placed in the closest available spot.
 
-<h4>Syntax</h4>
-
-<code>(create-unit type player x y)</code>
 
 <dl>
 <dt>type</dt>
@@ -362,15 +321,10 @@ placed in the closest available spot.
 <h4>Not Used</h4>
 
 <a name="credits"></a>
-<h3>credits</h3>
-
-<h4>Description</h4>
+<h3>(credits)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(credits)</code>
 
 <dl>
 <dt></dt>
@@ -391,15 +345,10 @@ placed in the closest available spot.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-campaign"></a>
-<h3>define-campaign</h3>
-
-<h4>Description</h4>
+<h3>(define-campaign)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(define-campaign)</code>
 
 <dl>
 <dt></dt>
@@ -420,9 +369,7 @@ placed in the closest available spot.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-construction"></a>
-<h3>define-construction</h3>
-
-<h4>Description</h4>
+<h3><pre</h3>
 
 Defines a construction.<br>
 <br>
@@ -432,9 +379,6 @@ different tilesets.  Note that shadows are optional.<br>
 The construction frames should be ordered by increasing percentages and the
 first frame should be 0.
 
-<h4>Syntax</h4>
-
-<code><pre>
 (define-construction ident
   'file '(
     tileset tileset
@@ -507,15 +451,10 @@ percent complete use the frame 1 of the main building graphic.
 <a href="../../data/ccl/orc/constructions.ccl"> $LIBARYPATH/ccl/orc/constructions.ccl </a>
 
 <a name="define-construction-wc-names"></a>
-<h3>define-construction-wc-names</h3>
-
-<h4>Description</h4>
+<h3>(define-construction-wc-names)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(define-construction-wc-names)</code>
 
 <dl>
 <dt></dt>
@@ -536,15 +475,10 @@ percent complete use the frame 1 of the main building graphic.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-editor-unittypes"></a>
-<h3>define-editor-unittypes</h3>
-
-<h4>Description</h4>
+<h3>(define-editor-unittypes)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(define-editor-unittypes)</code>
 
 <dl>
 <dt></dt>
@@ -565,15 +499,10 @@ percent complete use the frame 1 of the main building graphic.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-map"></a>
-<h3>define-map</h3>
-
-<h4>Description</h4>
+<h3>(define-map)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(define-map)</code>
 
 <dl>
 <dt></dt>
@@ -594,15 +523,10 @@ percent complete use the frame 1 of the main building graphic.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-missile-type"></a>
-<h3>define-missile-type</h3>
-
-<h4>Description</h4>
+<h3>(define-missile-type)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(define-missile-type)</code>
 
 <dl>
 <dt></dt>
@@ -623,15 +547,10 @@ percent complete use the frame 1 of the main building graphic.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-missiletype-wc-names"></a>
-<h3>define-missiletype-wc-names</h3>
-
-<h4>Description</h4>
+<h3>(define-missiletype-wc-names)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(define-missiletype-wc-names)</code>
 
 <dl>
 <dt></dt>
@@ -652,15 +571,10 @@ percent complete use the frame 1 of the main building graphic.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-race-names"></a>
-<h3>define-race-names</h3>
-
-<h4>Description</h4>
+<h3><pre</h3>
 
 Define the race names.
 
-<h4>Syntax</h4>
-
-<code><pre>
 (define-race-names
   'race '(
     race race-number
@@ -713,15 +627,10 @@ not visible in the race menus.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-ranks"></a>
-<h3>define-ranks</h3>
-
-<h4>Description</h4>
+<h3>(define-ranks race '(score rank [score rank] ...))</h3>
 
 Define ranks for a race.
 
-<h4>Syntax</h4>
-
-<code>(define-ranks race '(score rank [score rank] ...))</code>
 
 <dl>
 <dt>race</dt>
@@ -753,15 +662,10 @@ rank is displayed.  Scores are expected to be sorted in increasing order.
 <a href="../../data/ccl/ranks.ccl"> $LIBARYPATH/ccl/ranks.ccl </a>
 
 <a name="diplomacy"></a>
-<h3>diplomacy</h3>
-
-<h4>Description</h4>
+<h3>(diplomacy)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(diplomacy)</code>
 
 <dl>
 <dt></dt>
@@ -782,15 +686,10 @@ rank is displayed.  Scores are expected to be sorted in increasing order.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="stratagus-map"></a>
-<h3>stratagus-map</h3>
-
-<h4>Description</h4>
+<h3>(stratagus-map)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(stratagus-map)</code>
 
 <dl>
 <dt></dt>
@@ -811,15 +710,10 @@ rank is displayed.  Scores are expected to be sorted in increasing order.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="game-cycle"></a>
-<h3>game-cycle</h3>
-
-<h4>Description</h4>
+<h3>(game-cycle)</h3>
 
 Returns the current game cycle.
 
-<h4>Syntax</h4>
-
-<code>(game-cycle)</code>
 
 <dl>
 <dt></dt>
@@ -838,15 +732,10 @@ Returns the current game cycle.
 <h4>Not Used</h4>
 
 <a name="get-stratagus-home-path"></a>
-<h3>get-stratagus-home-path</h3>
-
-<h4>Description</h4>
+<h3>(get-stratagus-home-path)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(get-stratagus-home-path)</code>
 
 <dl>
 <dt></dt>
@@ -867,15 +756,10 @@ Returns the current game cycle.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="get-stratagus-library-path"></a>
-<h3>get-stratagus-library-path</h3>
-
-<h4>Description</h4>
+<h3>(get-stratagus-library-path)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(get-stratagus-library-path)</code>
 
 <dl>
 <dt></dt>
@@ -896,15 +780,10 @@ Returns the current game cycle.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="get-player-resource"></a>
-<h3>get-player-resource</h3>
-
-<h4>Description</h4>
+<h3>(get-player-resource player resource)</h3>
 
 Get the amount of a resource for a certain player.
 
-<h4>Syntax</h4>
-
-<code>(get-player-resource player resource)</code>
 
 <dl>
 <dt>player</dt>
@@ -926,15 +805,10 @@ Get the amount of a resource for a certain player.
 <h4>Not Used</h4>
 
 <a name="get-this-player"></a>
-<h3>get-this-player</h3>
-
-<h4>Description</h4>
+<h3>(get-this-player)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(get-this-player)</code>
 
 <dl>
 <dt></dt>
@@ -955,15 +829,10 @@ Get the amount of a resource for a certain player.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="get-unit-unholy-armor"></a>
-<h3>get-unit-unholy-armor</h3>
-
-<h4>Description</h4>
+<h3>(get-unit-unholy-armor)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(get-unit-unholy-armor)</code>
 
 <dl>
 <dt></dt>
@@ -984,15 +853,10 @@ Get the amount of a resource for a certain player.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="group"></a>
-<h3>group</h3>
-
-<h4>Description</h4>
+<h3>(group)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(group)</code>
 
 <dl>
 <dt></dt>
@@ -1013,15 +877,10 @@ Get the amount of a resource for a certain player.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="kill-unit"></a>
-<h3>kill-unit</h3>
-
-<h4>Description</h4>
+<h3>(kill-unit unit player)</h3>
 
 Kill a unit.
 
-<h4>Syntax</h4>
-
-<code>(kill-unit unit player)</code>
 
 <dl>
 <dt>unit</dt>
@@ -1052,15 +911,10 @@ Kill a unit.
 <h4>Not Used</h4>
 
 <a name="kill-unit-at"></a>
-<h3>kill-unit-at</h3>
-
-<h4>Description</h4>
+<h3>(kill-unit-at unit player quantity location1 location2)</h3>
 
 Kills units at a specific location.
 
-<h4>Syntax</h4>
-
-<code>(kill-unit-at unit player quantity location1 location2)</code>
 
 <dl>
 <dt>unit</dt>
@@ -1103,15 +957,10 @@ Kills units at a specific location.
 <h4>Not Used</h4>
 
 <a name="library-path"></a>
-<h3>library-path</h3>
-
-<h4>Description</h4>
+<h3>(library-path)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(library-path)</code>
 
 <dl>
 <dt></dt>
@@ -1132,15 +981,10 @@ Kills units at a specific location.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="load-map"></a>
-<h3>load-map</h3>
-
-<h4>Description</h4>
+<h3>(load-map map)</h3>
 
 Load a map using any of the supported formats.
 
-<h4>Syntax</h4>
-
-<code>(load-map map)</code>
 
 <dl>
 <dt>map</dt>
@@ -1159,15 +1003,10 @@ Load a map using any of the supported formats.
 <h4>Not Used</h4>
 
 <a name="load-pud"></a>
-<h3>load-pud</h3>
-
-<h4>Description</h4>
+<h3>(load-pud map)</h3>
 
 Load a map using the pud format.
 
-<h4>Syntax</h4>
-
-<code>(load-pud map)</code>
 
 <dl>
 <dt>map</dt>
@@ -1186,15 +1025,10 @@ Load a map using the pud format.
 <h4>Not Used</h4>
 
 <a name="log"></a>
-<h3>log</h3>
-
-<h4>Description</h4>
+<h3>(log)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(log)</code>
 
 <dl>
 <dt></dt>
@@ -1215,15 +1049,10 @@ Load a map using the pud format.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="make-unit"></a>
-<h3>make-unit</h3>
-
-<h4>Description</h4>
+<h3>(make-unit)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(make-unit)</code>
 
 <dl>
 <dt></dt>
@@ -1244,15 +1073,10 @@ Load a map using the pud format.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="missile"></a>
-<h3>missile</h3>
-
-<h4>Description</h4>
+<h3>(missile)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(missile)</code>
 
 <dl>
 <dt></dt>
@@ -1273,15 +1097,10 @@ Load a map using the pud format.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="new-colors"></a>
-<h3>new-colors</h3>
-
-<h4>Description</h4>
+<h3>(new-colors)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(new-colors)</code>
 
 <dl>
 <dt></dt>
@@ -1302,15 +1121,10 @@ Load a map using the pud format.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="pf-show-groupids!"></a>
-<h3>pf-show-groupids!</h3>
-
-<h4>Description</h4>
+<h3>(pf-show-groupids!)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(pf-show-groupids!)</code>
 
 <dl>
 <dt></dt>
@@ -1331,15 +1145,10 @@ Load a map using the pud format.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="pf-show-regids!"></a>
-<h3>pf-show-regids!</h3>
-
-<h4>Description</h4>
+<h3>(pf-show-regids!)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(pf-show-regids!)</code>
 
 <dl>
 <dt></dt>
@@ -1360,15 +1169,10 @@ Load a map using the pud format.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="place-unit"></a>
-<h3>place-unit</h3>
-
-<h4>Description</h4>
+<h3>(place-unit)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(place-unit)</code>
 
 <dl>
 <dt></dt>
@@ -1389,15 +1193,10 @@ Load a map using the pud format.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="player"></a>
-<h3>player</h3>
-
-<h4>Description</h4>
+<h3>(player)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(player)</code>
 
 <dl>
 <dt></dt>
@@ -1418,15 +1217,10 @@ Load a map using the pud format.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="remove-objective"></a>
-<h3>remove-objective</h3>
-
-<h4>Description</h4>
+<h3>(remove-objective position)</h3>
 
 Remove an objective from the scenario objectives text list.
 
-<h4>Syntax</h4>
-
-<code>(remove-objective position)</code>
 
 <dl>
 <dt>position</dt>
@@ -1444,15 +1238,10 @@ Remove an objective from the scenario objectives text list.
 <h4>Not Used</h4>
 
 <a name="replay-log"></a>
-<h3>replay-log</h3>
-
-<h4>Description</h4>
+<h3>(replay-log)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(replay-log)</code>
 
 <dl>
 <dt></dt>
@@ -1473,15 +1262,10 @@ Remove an objective from the scenario objectives text list.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="reset-keystroke-help"></a>
-<h3>reset-keystroke-help</h3>
-
-<h4>Description</h4>
+<h3>(reset-keystroke-help)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(reset-keystroke-help)</code>
 
 <dl>
 <dt></dt>
@@ -1502,15 +1286,10 @@ Remove an objective from the scenario objectives text list.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="selection"></a>
-<h3>selection</h3>
-
-<h4>Description</h4>
+<h3>(selection)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(selection)</code>
 
 <dl>
 <dt></dt>
@@ -1531,15 +1310,10 @@ Remove an objective from the scenario objectives text list.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="set-default-map!"></a>
-<h3>set-default-map!</h3>
-
-<h4>Description</h4>
+<h3>(set-default-map! path)</h3>
 
 Set the default map path.
 
-<h4>Syntax</h4>
-
-<code>(set-default-map! path)</code>
 
 <dl>
 <dt>path</dt>
@@ -1558,15 +1332,10 @@ Set the default map path.
 <h4>Not Used</h4>
 
 <a name="set-diplomacy!"></a>
-<h3>set-diplomacy!</h3>
-
-<h4>Description</h4>
+<h3>(set-diplomacy! player state enemy)</h3>
 
 Alters the diplomacy setting between two players. eg Enemy,Allied
 
-<h4>Syntax</h4>
-
-<code>(set-diplomacy! player state enemy)</code>
 
 <dl>
 <dt>player</dt>
@@ -1596,15 +1365,10 @@ Alters the diplomacy setting between two players. eg Enemy,Allied
 <h4>Not Used</h4>
 
 <a name="set-game-cycle!"></a>
-<h3>set-game-cycle!</h3>
-
-<h4>Description</h4>
+<h3>(set-game-cycle! cycle)</h3>
 
 Set the current game cycle number.
 
-<h4>Syntax</h4>
-
-<code>(set-game-cycle! cycle)</code>
 
 <dl>
 <dt>cycle</dt>
@@ -1623,15 +1387,10 @@ Set the current game cycle number.
 <h4>Not Used</h4>
 
 <a name="set-game-paused!"></a>
-<h3>set-game-cycle!</h3>
-
-<h4>Description</h4>
+<h3>(set-game-paused! paused)</h3>
 
 Pause or unpause the game.
 
-<h4>Syntax</h4>
-
-<code>(set-game-paused! paused)</code>
 
 <dl>
 <dt>paused</dt>
@@ -1650,15 +1409,10 @@ Pause or unpause the game.
 <h4>Not Used</h4>
 
 <a name="set-group-id!"></a>
-<h3>set-group-id!</h3>
-
-<h4>Description</h4>
+<h3>(set-group-id!)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-group-id!)</code>
 
 <dl>
 <dt></dt>
@@ -1679,15 +1433,10 @@ Pause or unpause the game.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="set-objectives!"></a>
-<h3>set-objectives!</h3>
-
-<h4>Description</h4>
+<h3>(set-objectives! objective [objective ...])</h3>
 
 Set the mission objectives.  This will overwrite any previous objectives.
 
-<h4>Syntax</h4>
-
-<code>(set-objectives! objective [objective ...])</code>
 
 <dl>
 <dt>objective</dt>
@@ -1706,15 +1455,10 @@ Set the mission objectives.  This will overwrite any previous objectives.
 <h4>Not Used</h4>
 
 <a name="set-player-resource!"></a>
-<h3>set-player-resource!</h3>
-
-<h4>Description</h4>
+<h3>(set-player-resource! player resource amount [[resource amount] ...])</h3>
 
 Set the amount of resources for a certain player.
 
-<h4>Syntax</h4>
-
-<code>(set-player-resource! player resource amount [[resource amount] ...])</code>
 
 <dl>
 <dt>player</dt>
@@ -1740,15 +1484,10 @@ Set the amount of resources for a certain player.
 <h4>Not Used</h4>
 
 <a name="set-shared-vision!"></a>
-<h3>set-shared-vision!</h3>
-
-<h4>Description</h4>
+<h3>(set-shared-vision! player state opponent)</h3>
 
 Sets shared vision.
 
-<h4>Syntax</h4>
-
-<code>(set-shared-vision! player state opponent)</code>
 
 <dl>
 <dt>player</dt>
@@ -1773,15 +1512,10 @@ Sets shared vision.
 <h4>Not Used</h4>
 
 <a name="set-this-player!"></a>
-<h3>set-this-player!</h3>
-
-<h4>Description</h4>
+<h3>(set-this-player!)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-this-player!)</code>
 
 <dl>
 <dt></dt>
@@ -1802,15 +1536,10 @@ Sets shared vision.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="set-unit-unholy-armor!"></a>
-<h3>set-unit-unholy-armor!</h3>
-
-<h4>Description</h4>
+<h3>(set-unit-unholy-armor!)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-unit-unholy-armor!)</code>
 
 <dl>
 <dt></dt>
@@ -1831,15 +1560,10 @@ Sets shared vision.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="shared-vision"></a>
-<h3>shared-vision</h3>
-
-<h4>Description</h4>
+<h3>(shared-vision state opponent)</h3>
 
 Sets shared vision for the player at the computer.
 
-<h4>Syntax</h4>
-
-<code>(shared-vision state opponent)</code>
 
 <dl>
 <dt>state</dt>
@@ -1861,15 +1585,10 @@ Sets shared vision for the player at the computer.
 <h4>Not Used</h4>
 
 <a name="show-map-location"></a>
-<h3>show-map-location</h3>
-
-<h4>Description</h4>
+<h3>(show-map-location x y radius cycles)</h3>
 
 Show an area on the map for the given player.
 
-<h4>Syntax</h4>
-
-<code>(show-map-location x y radius cycles)</code>
 
 <dl>
 <dt></dt>
@@ -1888,15 +1607,10 @@ Show an area on the map for the given player.
 <h4>Not Used</h4>
 
 <a name="slot-usage"></a>
-<h3>slot-usage</h3>
-
-<h4>Description</h4>
+<h3>(slot-usage)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(slot-usage)</code>
 
 <dl>
 <dt></dt>
@@ -1917,15 +1631,10 @@ Show an area on the map for the given player.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="unit"></a>
-<h3>unit</h3>
-
-<h4>Description</h4>
+<h3>(unit)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(unit)</code>
 
 <dl>
 <dt></dt>
@@ -1946,15 +1655,10 @@ Show an area on the map for the given player.
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="units"></a>
-<h3>units</h3>
-
-<h4>Description</h4>
+<h3>(units)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(units)</code>
 
 <dl>
 <dt></dt>

@@ -79,15 +79,10 @@ Everything around the control of the Stratagus AI.
 
 <h2>Functions</h2>
 <a name="define-ai"></a>
-<h3>define-ai</h3>
-
-<h4>Description</h4>
+<h3>(define-ai name race class script)</h3>
 
 This defines how a special AI works. Each level can use his own AI definition.
 
-<h4>Syntax</h4>
-
-<code>(define-ai name race class script)</code>
 
 <dl>
 <dt>name</dt>
@@ -127,17 +122,12 @@ time the next statement is executed. No statement should use more than 3 ms.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="define-ai-helper"></a>
-<h3>define-ai-helper</h3>
-
-<h4>Description</h4>
+<h3>(define-ai-helper (list))</h3>
 
 The AI is complete configurable, nothing is hardcoded. The AI knows nothing
 about any units without this table. This table defines F.E. what unit can build
 and what they can build and many other things that the AI must know.
 
-<h4>Syntax</h4>
-
-<code>(define-ai-helper (list))</code>
 
 <dl>
 <dt>list</dt>
@@ -274,15 +264,10 @@ A minimal AI helper definition:
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="define-ai-player"></a>
-<h3>define-ai-player</h3>
-
-<h4>Description</h4>
+<h3>(define-ai-player (list ...))</h3>
 
 Define an AI player. (NOT SUPPORTED)
 
-<h4>Syntax</h4>
-
-<code>(define-ai-player (list ...))</code>
 
 <dl>
 <dt></dt>
@@ -302,15 +287,10 @@ FIXME:
 <h4>Not Used</h4>
 
 <a name="define-ai-wc-names"></a>
-<h3>define-ai-wc-names</h3>
-
-<h4>Description</h4>
+<h3>(define-ai-wc-names (list ...))</h3>
 
 Define AI mapping from original number to internal symbol.
 
-<h4>Syntax</h4>
-
-<code>(define-ai-wc-names (list ...))</code>
 
 <dl>
 <dt></dt>
@@ -330,17 +310,12 @@ FIXME:
 <h4>Not Used</h4>
 
 <a name="ai:attack-with-force"></a>
-<h3>ai:attack-with-force</h3>
-
-<h4>Description</h4>
+<h3>(ai:attack-with-force force)</h3>
 
 Attack the opponent with a force. The place is choosen by the AI. If there
 are flyers, ships and land units in the force they could attack different
 goals.
 
-<h4>Syntax</h4>
-
-<code>(ai:attack-with-force force)</code>
 
 <dl>
 <dt>force</dt>
@@ -368,15 +343,10 @@ footman is ready trained. Now attack the opponent with force 0.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:check-force"></a>
-<h3>ai:check-force</h3>
-
-<h4>Description</h4>
+<h3>(ai:check-force force)</h3>
 
 Check if a force is ready.
 
-<h4>Syntax</h4>
-
-<code>(ai:check-force force)</code>
 
 <dl>
 <dt>force</dt>
@@ -398,15 +368,10 @@ supported.
 <h4>Not Used</h4>
 
 <a name="ai:debug"></a>
-<h3>ai:debug</h3>
-
-<h4>Description</h4>
+<h3>(ai:debug flag)</h3>
 
 Enable or disable the debug output of the AI script execution.
 
-<h4>Syntax</h4>
-
-<code>(ai:debug flag)</code>
 
 <dl>
 <dt>flag</dt>
@@ -427,15 +392,10 @@ Enable or disable the debug output of the AI script execution.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:dump"></a>
-<h3>ai:dump</h3>
-
-<h4>Description</h4>
+<h3>(ai:dump)</h3>
 
 Dump some AI debug information.
 
-<h4>Syntax</h4>
-
-<code>(ai:dump)</code>
 
 <h4>Example</h4>
 
@@ -448,9 +408,7 @@ Dump some AI debug information.
 <h4>Not Used</h4>
 
 <a name="ai:force"></a>
-<h3>ai:force</h3>
-
-<h4>Description</h4>
+<h3>(ai:force force unit-type-1 count-1 ... unit-type-N count-N)</h3>
 
 Define a force, what and how many units should belong to a force. Up to 10
 forces are currently supported.
@@ -463,9 +421,6 @@ assigned to the force.
 <br>
 Note: The low-level didn't support the reduce of a force.
 
-<h4>Syntax</h4>
-
-<code>(ai:force force unit-type-1 count-1 ... unit-type-N count-N)</code>
 
 <dl>
 <dt>force</dt>
@@ -502,15 +457,10 @@ force 1 is filled with 3 footmans and 2 bowmans.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:force-role"></a>
-<h3>ai:force-role</h3>
-
-<h4>Description</h4>
+<h3>(ai:force-role force role)</h3>
 
 Define the role of a force.
 
-<h4>Syntax</h4>
-
-<code>(ai:force-role force role)</code>
 
 <dl>
 <dt>force</dt>
@@ -535,15 +485,10 @@ supported.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:get-race"></a>
-<h3>ai:get-race</h3>
-
-<h4>Description</h4>
+<h3>(ai:get-race)</h3>
 
 Get the race of the current AI player.
 
-<h4>Syntax</h4>
-
-<code>(ai:get-race)</code>
 
 <h4>Example</h4>
 
@@ -558,15 +503,10 @@ Get the race of the current AI player.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:get-sleep-cycles"></a>
-<h3>ai:get-sleep-cycles</h3>
-
-<h4>Description</h4>
+<h3>(ai:get-sleep-cycles)</h3>
 
 Get the number of cycles to sleep.
 
-<h4>Syntax</h4>
-
-<code>(ai:get-sleep-cycles)</code>
 
 <h4>Example</h4>
 
@@ -579,9 +519,7 @@ Get the number of cycles to sleep.
 <h4>Not Used</h4>
 
 <a name="ai:need"></a>
-<h3>ai:need</h3>
-
-<h4>Description</h4>
+<h3>(ai:need unit-type)</h3>
 
 Tells the AI that it should have an unit of this unit-type. The AI builds or
 trains units in this order of the ai:set/ai:need commands. If the unit or an
@@ -590,9 +528,6 @@ automatic rebuild. If the units are requested in wrong order, the AI could
 hang up. Resources are collected automatic and farms are automatic build, but
 additional could be requested.
 
-<h4>Syntax</h4>
-
-<code>(ai:need unit-type)</code>
 
 <dl>
 <dt>unit-type</dt>
@@ -614,15 +549,10 @@ additional could be requested.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:player"></a>
-<h3>ai:player</h3>
-
-<h4>Description</h4>
+<h3>(ai:player)</h3>
 
 Return the player of the running AI.
 
-<h4>Syntax</h4>
-
-<code>(ai:player)</code>
 
 <h4>Example</h4>
 
@@ -635,18 +565,13 @@ Return the player of the running AI.
 <h4>Not Used</h4>
 
 <a name="ai:research"></a>
-<h3>ai:research</h3>
-
-<h4>Description</h4>
+<h3>(ai:research upgrade)</h3>
 
 Let the AI research an upgrade, upgrades are reseached in command order.
 And automatic researched if lost. Building orders have a higher priority.
 The script writer is responsible for the correct order. If wrong the
 AI could hang up.
 
-<h4>Syntax</h4>
-
-<code>(ai:research upgrade)</code>
 
 <dl>
 <dt>upgrade</dt>
@@ -667,16 +592,11 @@ AI could hang up.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:restart"></a>
-<h3>ai:restart</h3>
-
-<h4>Description</h4>
+<h3>(ai:restart)</h3>
 
 Restart with the main AI script. Could be used as longjmp for the AI
 scripts.
 
-<h4>Syntax</h4>
-
-<code>(ai:restart)</code>
 
 <h4>Example</h4>
 
@@ -693,16 +613,11 @@ scripts.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:script"></a>
-<h3>ai:script</h3>
-
-<h4>Description</h4>
+<h3>(ai:script script)</h3>
 
 Execute a new script, can be used for loops, subroutines. But this must be
 handled by the user.
 
-<h4>Syntax</h4>
-
-<code>(ai:script script)</code>
 
 <dl>
 <dt>script</dt>
@@ -727,9 +642,7 @@ than attack with the force 1. This is done endless.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:set"></a>
-<h3>ai:set</h3>
-
-<h4>Description</h4>
+<h3>(ai:set unit-type count)</h3>
 
 This ai:need with a number. Tells the AI that it should have a specified number
 of an unit of this unit-type. The AI builds or trains units in this order of
@@ -740,9 +653,6 @@ collected automatic and farms are automatic build, but additional could be
 requested. In the opposite to ai:need, which always inserts a request, ai:set
 modifies the last request to the new number.
 
-<h4>Syntax</h4>
-
-<code>(ai:set unit-type count)</code>
 
 <dl>
 <dt>unit-type</dt>
@@ -766,15 +676,10 @@ modifies the last request to the new number.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:set-collect!"></a>
-<h3>ai:set-collect!</h3>
-
-<h4>Description</h4>
+<h3>(ai:set-collect! #(time gold wood oil ore stone coal))</h3>
 
 Set AI player resource collect percent.
 
-<h4>Syntax</h4>
-
-<code>(ai:set-collect! #(time gold wood oil ore stone coal))</code>
 
 <dl>
 <dt>time</dt>
@@ -811,15 +716,10 @@ Set AI player resource collect percent.
 <h4>Not Used</h4>
 
 <a name="ai:set-reserve!"></a>
-<h3>ai:set-reserve!</h3>
-
-<h4>Description</h4>
+<h3>(ai:set-reserve! #( time gold wood oil ore stone coal))</h3>
 
 Set AI player resource reserve.
 
-<h4>Syntax</h4>
-
-<code>(ai:set-reserve! #( time gold wood oil ore stone coal))</code>
 
 <dl>
 <dt>time</dt>
@@ -856,15 +756,10 @@ Set AI player resource reserve.
 <h4>Not Used</h4>
 
 <a name="ai:sleep"></a>
-<h3>ai:sleep</h3>
-
-<h4>Description</h4>
+<h3>(ai:sleep frames)</h3>
 
 Wait some frames, to let the opponent (you) recover.
 
-<h4>Syntax</h4>
-
-<code>(ai:sleep frames)</code>
 
 <dl>
 <dt>frames</dt>
@@ -885,17 +780,12 @@ Wait some frames, to let the opponent (you) recover.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:upgrade-to"></a>
-<h3>ai:upgrade-to</h3>
-
-<h4>Description</h4>
+<h3>(ai:upgrade-to unit-type)</h3>
 
 Upgrade units to an improved type. You must give for each unit you want to
 upgrade an upgrade command. The computer automatic searches which unit it
 upgrades.
 
-<h4>Syntax</h4>
-
-<code>(ai:upgrade-to unit-type)</code>
 
 <dl>
 <dt>unit-type</dt>
@@ -916,16 +806,11 @@ upgrades.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:wait"></a>
-<h3>ai:wait</h3>
-
-<h4>Description</h4>
+<h3>(ai:wait type)</h3>
 
 Waits until the *first* request of this unit-type is completed.
 Don't forget to request an unit-type, before you wait on it.
 
-<h4>Syntax</h4>
-
-<code>(ai:wait type)</code>
 
 <dl>
 <dt>type</dt>
@@ -947,16 +832,11 @@ Don't forget to request an unit-type, before you wait on it.
 <a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="ai:wait-force"></a>
-<h3>ai:wait-force</h3>
-
-<h4>Description</h4>
+<h3>(ai:wait-force force)</h3>
 
 Wait until a force is complete, the forces are build in force number order.
 First 0, than 1, last 9.
 
-<h4>Syntax</h4>
-
-<code>(ai:wait-force force)</code>
 
 <dl>
 <dt>force</dt>

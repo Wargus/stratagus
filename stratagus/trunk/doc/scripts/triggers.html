@@ -75,15 +75,10 @@ Everything around triggers.
 <h2>Functions</h2>
 
 <a name="action-defeat"></a>
-<h3>action-defeat</h3>
-
-<h4>Description</h4>
+<h3>(action-defeat)</h3>
 
 The condition player is set to defeat.
 
-<h4>Syntax</h4>
-
-<code>(action-defeat)</code>
 
 <h4>Example</h4>
 
@@ -102,15 +97,10 @@ The condition player is set to defeat.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="action-draw"></a>
-<h3>action-draw</h3>
-
-<h4>Description</h4>
+<h3>(action-draw)</h3>
 
 The condition player is set to draw. (NOT SUPPORTED)
 
-<h4>Syntax</h4>
-
-<code>(action-draw)</code>
 
 <h4>Example</h4>
 
@@ -123,15 +113,10 @@ The condition player is set to draw. (NOT SUPPORTED)
 <h4>Not Used</h4>
 
 <a name="action-set-switch"></a>
-<h3>action-set-switch</h3>
-
-<h4>Description</h4>
+<h3>(action-set-switch number set)</h3>
 
 Set a switch.
 
-<h4>Syntax</h4>
-
-<code>(action-set-switch number set)</code>
 
 <dl>
 <dt>number</dt>
@@ -153,15 +138,10 @@ Set a switch.
 <h4>Not Used</h4>
 
 <a name="action-set-timer"></a>
-<h3>action-set-timer</h3>
-
-<h4>Description</h4>
+<h3>(action-set-timer cycles increasing)</h3>
 
 Set the timer.
 
-<h4>Syntax</h4>
-
-<code>(action-set-timer cycles increasing)</code>
 
 <dl>
 <dt>cycles</dt>
@@ -183,15 +163,10 @@ Set the timer.
 <h4>Not Used</h4>
 
 <a name="action-start-timer"></a>
-<h3>action-start-timer</h3>
-
-<h4>Description</h4>
+<h3>(action-start-timer)</h3>
 
 Start the timer.
 
-<h4>Syntax</h4>
-
-<code>(action-start-timer)</code>
 
 <h4>Example</h4>
 
@@ -204,15 +179,10 @@ Start the timer.
 <h4>Not Used</h4>
 
 <a name="action-stop-timer"></a>
-<h3>action-stop-timer</h3>
-
-<h4>Description</h4>
+<h3>(action-stop-timer)</h3>
 
 Stop the timer.
 
-<h4>Syntax</h4>
-
-<code>(action-stop-timer)</code>
 
 <h4>Example</h4>
 
@@ -225,15 +195,10 @@ Stop the timer.
 <h4>Not Used</h4>
 
 <a name="action-victory"></a>
-<h3>action-victory</h3>
-
-<h4>Description</h4>
+<h3>(action-victory)</h3>
 
 The condition player is set to victory.
 
-<h4>Syntax</h4>
-
-<code>(action-victory)</code>
 
 <h4>Example</h4>
 
@@ -253,15 +218,10 @@ opponents he won.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="action-wait"></a>
-<h3>action-wait</h3>
-
-<h4>Description</h4>
+<h3>(action-wait ms)</h3>
 
 Causes the trigger to wait a minimum number of milliseconds.
 
-<h4>Syntax</h4>
-
-<code>(action-wait ms)</code>
 
 <dl>
 <dt>ms</dt>
@@ -289,15 +249,10 @@ opponents the message "Hello" appears then two seconds later the message
 <h4>Not Used</h4>
 
 <a name="add-trigger"></a>
-<h3>add-trigger</h3>
-
-<h4>Description</h4>
+<h3>(add-trigger condition action)</h3>
 
 Creates a new trigger.
 
-<h4>Syntax</h4>
-
-<code>(add-trigger condition action)</code>
 
 <dl>
 <dt>condition</dt>
@@ -337,15 +292,10 @@ opponents he won.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="if-elapsed"></a>
-<h3>if-elapsed</h3>
-
-<h4>Description</h4>
+<h3>(if-elapsed op quantity)</h3>
 
 Game run for duration.  If the game run for the duration game cycles the action is executed.
 
-<h4>Syntax</h4>
-
-<code>(if-elapsed op quantity)</code>
 
 <dl>
 <dt>op</dt>
@@ -373,16 +323,11 @@ Game run for duration.  If the game run for the duration game cycles the action 
 <h4>Not Used</h4>
 
 <a name="if-kills"></a>
-<h3>if-kills</h3>
-
-<h4>Description</h4>
+<h3>(if-kills player op quantity)</h3>
 
 Player has quantity of kills. Which quantity must be killed by the
 player for the action.
 
-<h4>Syntax</h4>
-
-<code>(if-kills player op quantity)</code>
 
 <dl>
 <dt>player</dt>
@@ -417,17 +362,12 @@ player for the action.
 <h4>Not Used</h4>
 
 <a name="if-near-unit"></a>
-<h3>if-near-unit</h3>
-
-<h4>Description</h4>
+<h3>(if-near-unit player op quantity unit unit)</h3>
 
 Player has the quantity of unit-type near to unit-type. Which unit 
 and how many units must the player have near to an other unit for 
 the action.
 
-<h4>Syntax</h4>
-
-<code>(if-near-unit player op quantity unit unit)</code>
 
 <dl>
 <dt>player</dt>
@@ -470,15 +410,10 @@ the action.
 <h4>Not Used</h4>
 
 <a name="if-opponents"></a>
-<h3>if-opponents</h3>
-
-<h4>Description</h4>
+<h3>(if-opponents player op quantity)</h3>
 
 Player has the quantity of opponents.
 
-<h4>Syntax</h4>
-
-<code>(if-opponents player op quantity)</code>
 
 <dl>
 <dt>player</dt>
@@ -515,17 +450,12 @@ Player has the quantity of opponents.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="if-rescued-near-unit"></a>
-<h3>if-rescued-near-unit</h3>
-
-<h4>Description</h4>
+<h3>(if-rescued-near-unit player op quantity unit unit)</h3>
 
 Player has the quantity of rescued unit-type near to unit-type. Which 
 rescued unit and how many units must the player have near to a unit 
 for the action.
 
-<h4>Syntax</h4>
-
-<code>(if-rescued-near-unit player op quantity unit unit)</code>
 
 <dl>
 <dt>player</dt>
@@ -568,17 +498,12 @@ for the action.
 <h4>Not Used</h4>
 
 <a name="if-resource"></a>
-<h3>if-resource</h3>
-
-<h4>Description</h4>
+<h3>(if-resource player op quantity resource)</h3>
 
 Player has the quantity of resources. This condition is used to 
 specify how many or how little resources (gold, oil, lumber) a 
 player must have for the action.
 
-<h4>Syntax</h4>
-
-<code>(if-resource player op quantity resource)</code>
 
 <dl>
 <dt>player</dt>
@@ -619,16 +544,11 @@ Name of the resource or:
 <h4>Not Used</h4>
 
 <a name="if-score"></a>
-<h3>if-score</h3>
-
-<h4>Description</h4>
+<h3>(if-score player op quantity)</h3>
 
 Player has the quantity of score. If the player reaches the 
 quantity of score the action is executed.
 
-<h4>Syntax</h4>
-
-<code>(if-score player op quantity)</code>
 
 <dl>
 <dt>player</dt>
@@ -664,15 +584,10 @@ quantity of score the action is executed.
 <h4>Not Used</h4>
 
 <a name="if-switch"></a>
-<h3>if-switch</h3>
-
-<h4>Description</h4>
+<h3>(if-switch number set)</h3>
 
 Checks the value of a switch.
 
-<h4>Syntax</h4>
-
-<code>(if-switch number set)</code>
 
 <dl>
 <dt>number</dt>
@@ -694,15 +609,10 @@ Checks the value of a switch.
 <h4>Not Used</h4>
 
 <a name="if-timer"></a>
-<h3>if-timer</h3>
-
-<h4>Description</h4>
+<h3>(if-timer op cycles)</h3>
 
 Timer reaches quantity. If the timer reaches quantity the action is executed.
 
-<h4>Syntax</h4>
-
-<code>(if-timer op cycles)</code>
 
 <dl>
 <dt>op</dt>
@@ -730,16 +640,11 @@ Timer reaches quantity. If the timer reaches quantity the action is executed.
 <h4>Not Used</h4>
 
 <a name="if-unit"></a>
-<h3>if-unit</h3>
-
-<h4>Description</h4>
+<h3>(if-unit player op quantity unit)</h3>
 
 Player has the quantity of unit-type. Which unit and how many 
 units must control the player for the action.
 
-<h4>Syntax</h4>
-
-<code>(if-unit player op quantity unit)</code>
 
 <dl>
 <dt>player</dt>
@@ -784,15 +689,10 @@ units must control the player for the action.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="if-unit-at"></a>
-<h3>if-unit-at</h3>
-
-<h4>Description</h4>
+<h3>(if-unit-at player op quantity unit location1 location2)</h3>
 
 Player has the quantity of unit-type at a location.
 
-<h4>Syntax</h4>
-
-<code>(if-unit-at player op quantity unit location1 location2)</code>
 
 <dl>
 <dt>player</dt>
@@ -846,15 +746,10 @@ Player has the quantity of unit-type at a location.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-trigger-number!"></a>
-<h3>set-trigger-number!</h3>
-
-<h4>Description</h4>
+<h3>(set-trigger-number! number)</h3>
 
 Set the current trigger number.
 
-<h4>Syntax</h4>
-
-<code>(set-trigger-number! number)</code>
 
 <dl>
 <dt>number</dt>

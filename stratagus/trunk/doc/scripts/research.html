@@ -61,15 +61,10 @@ Everything around researching and upgrades.
 <h2>Functions</h2>
 
 <a name="check-dependency"></a>
-<h3>check-dependency</h3>
-
-<h4>Description</h4>
+<h3>(check-dependency)</h3>
 
 NOT WRITTEN YET.
 
-<h4>Syntax</h4>
-
-<code>(check-dependency)</code>
 
 <dl>
 <dt>.</dt>
@@ -92,16 +87,11 @@ NOT WRITTEN YET.
 <a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
 <a name="define-allow"></a>
-<h3>define-allow</h3>
-
-<h4>Description</h4>
+<h3>(define-allow name str16)</h3>
 
 Define what unit-types and upgrades are enabled for each player during
 a level.
 
-<h4>Syntax</h4>
-
-<code>(define-allow name str16)</code>
 
 <dl>
 <dt>name</dt>
@@ -137,18 +127,11 @@ a level.
 <a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
 <a name="define-dependency"></a>
-<h3>define-dependency</h3>
-
-<h4>Description</h4>
+<h3>(define-dependency unit-type/upgrade ...)</h3>
 
 Define the dependencies for an unit-type or an upgrade. The dependency
 must be full filled before an unit or research can be used.
-
-<h4>Syntax</h4>
-
-<code>(define-dependency unit-type/upgrade '( unit-type/upgrade count ... )
-    ['or '( unit-type/upgrade count ... ) ...] )
-</code><p>
+<p>
 <code>(define-dependency unit-type/upgrade '( required-part )
      ['or '( optional-or-part ) ...] )
 </code>
@@ -200,17 +183,12 @@ must be full filled before an unit or research can be used.
 <a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
 <a name="define-modifier"></a>
-<h3>define-modifier</h3>
-
-<h4>Description</h4>
+<h3>(define-modifier name '(effect1 effect1-arg) ...)</h3>
 
 Define the effects (modifier) of an upgrade. An upgrade can have multiple 
 modifiers. It can activate, enable or disable other upgrades and allows
 complex reactions.
 
-<h4>Syntax</h4>
-
-<code>(define-modifier name '(effect1 effect1-arg) ...)</code>
 
 <dl>
 <dt>name</dt>
@@ -322,15 +300,10 @@ of the listed units is increased.
 <a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
 <a name="define-upgrade"></a>
-<h3>define-upgrade</h3>
-
-<h4>Description</h4>
+<h3>(define-upgrade name 'icon icon-id 'costs #( costs ... ))</h3>
 
 Define an upgrade, how it is shown and how much it costs.
 
-<h4>Syntax</h4>
-
-<code>(define-upgrade name 'icon icon-id 'costs #( costs ... ))</code>
 
 <dl>
 <dt>name</dt>
@@ -366,15 +339,10 @@ be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
 <a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
 <a name="define-upgrade-wc-names"></a>
-<h3>define-upgrade-wc-names</h3>
-
-<h4>Description</h4>
+<h3>(define-upgrade-wc-names sword1 sword2 ...)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(define-upgrade-wc-names sword1 sword2 ...)</code>
 
 <dl>
 <dt>.</dt>
@@ -397,15 +365,10 @@ be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
 <a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
 <a name="get-dependency"></a>
-<h3>get-dependency</h3>
-
-<h4>Description</h4>
+<h3>(get-dependency)</h3>
 
 NOT WRITTEN YET.
 
-<h4>Syntax</h4>
-
-<code>(get-dependency)</code>
 
 <dl>
 <dt>.</dt>

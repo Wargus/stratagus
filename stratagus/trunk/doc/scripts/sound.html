@@ -74,15 +74,10 @@
 Everything around sound.
 <h2>Functions</h2>
 <a name="define-game-sounds"></a>
-<h3>define-game-sounds</h3>
-
-<h4>Description</h4>
+<h3>(define-game-sounds name sound [[name sound] ...])</h3>
 
 Specify some global sounds.
 
-<h4>Syntax</h4>
-
-<code>(define-game-sounds name sound [[name sound] ...])</code>
 
 <dl>
 <dt>name</dt>
@@ -112,16 +107,11 @@ Specify some global sounds.
 <a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <a name="display-sounds"></a>
-<h3>display-sounds</h3>
-
-<h4>Description</h4>
+<h3>(display-sounds)</h3>
 
 Ask the sound system to dump on the standard output the mapping 
 between sound names and sound id.
 
-<h4>Syntax</h4>
-
-<code>(display-sounds)</code>
 
 <h4>Example</h4>
 
@@ -134,16 +124,11 @@ between sound names and sound id.
 <h4>Not Used</h4>
 
 <a name="make-sound"></a>
-<h3>make-sound</h3>
-
-<h4>Description</h4>
+<h3>(make-sound name file)</h3>
 
 Asks the sound system to register a sound under a given name, with an 
 associated list of files (the list can be replaced by only one file).
 
-<h4>Syntax</h4>
-
-<code>(make-sound name file)</code>
 
 <dl>
 <dt>name</dt>
@@ -172,15 +157,10 @@ associated list of files (the list can be replaced by only one file).
 <a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <a name="make-sound-group"></a>
-<h3>make-sound-group</h3>
-
-<h4>Description</h4>
+<h3>(make-sound-group name group group)</h3>
 
 Asks the sound system to build a special sound group.
 
-<h4>Syntax</h4>
-
-<code>(make-sound-group name group group)</code>
 
 <dl>
 <dt>name</dt>
@@ -205,15 +185,10 @@ Asks the sound system to build a special sound group.
 <a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <a name="map-sound"></a>
-<h3>map-sound</h3>
-
-<h4>Description</h4>
+<h3>(map-sound name sound)</h3>
 
 Ask the sound system to remap a sound id to a given name.
 
-<h4>Syntax</h4>
-
-<code>(map-sound name sound)</code>
 
 <dl>
 <dt>name</dt>
@@ -237,15 +212,10 @@ Ask the sound system to remap a sound id to a given name.
 <a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <a name="play-file"></a>
-<h3>play-file</h3>
-
-<h4>Description</h4>
+<h3>(play-file name)</h3>
 
 Play a sound file.
 
-<h4>Syntax</h4>
-
-<code>(play-file name)</code>
 
 <dl>
 <dt>name</dt>
@@ -266,15 +236,10 @@ Play a sound file.
 <a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <a name="play-music"></a>
-<h3>play-music</h3>
-
-<h4>Description</h4>
+<h3>(play-music name)</h3>
 
 Name of the music file to play.
 
-<h4>Syntax</h4>
-
-<code>(play-music name)</code>
 
 <dl>
 <dt>name</dt>
@@ -295,15 +260,10 @@ Name of the music file to play.
 <a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <a name="play-sound"></a>
-<h3>play-sound</h3>
-
-<h4>Description</h4>
+<h3>(play-sound name)</h3>
 
 Ask the sound system to play the specified sound.
 
-<h4>Syntax</h4>
-
-<code>(play-sound name)</code>
 
 <dl>
 <dt>name</dt>
@@ -324,15 +284,10 @@ Ask the sound system to play the specified sound.
 <a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <a name="set-cd-mode!"></a>
-<h3>set-cd-mode!</h3>
-
-<h4>Description</h4>
+<h3>(set-cd-mode! mode)</h3>
 
 Set the cd mode.
 
-<h4>Syntax</h4>
-
-<code>(set-cd-mode! mode)</code>
 
 <dl>
 <dt>mode</dt>
@@ -353,15 +308,10 @@ Set the cd mode.
 <a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
 
 <a name="set-global-sound-range!"></a>
-<h3>set-global-sound-range!</h3>
-
-<h4>Description</h4>
+<h3>(set-global-sound-range! distance)</h3>
 
 Set the cut off distance.
 
-<h4>Syntax</h4>
-
-<code>(set-global-sound-range! distance)</code>
 
 <dl>
 <dt>distance</dt>
@@ -380,15 +330,10 @@ Set the cut off distance.
 <h4>Not Used</h4>
 
 <a name="set-menu-music!"></a>
-<h3>set-menu-music!</h3>
-
-<h4>Description</h4>
+<h3>(set-menu-music! song)</h3>
 
 Set the default menu music.
 
-<h4>Syntax</h4>
-
-<code>(set-menu-music! song)</code>
 
 <dl>
 <dt>song</dt>
@@ -409,15 +354,10 @@ Set the default menu music.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-music-volume!"></a>
-<h3>set-music-volume!</h3>
-
-<h4>Description</h4>
+<h3>(set-music-volume! volume)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-music-volume! volume)</code>
 
 <dl>
 <dt>volume</dt>
@@ -438,15 +378,10 @@ Set the default menu music.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-sound-range!"></a>
-<h3>set-sound-range!</h3>
-
-<h4>Description</h4>
+<h3>(set-sound-range! name distance)</h3>
 
 Set the range of a given sound.
 
-<h4>Syntax</h4>
-
-<code>(set-sound-range! name distance)</code>
 
 <dl>
 <dt>name</dt>
@@ -468,15 +403,10 @@ Set the range of a given sound.
 <h4>Not Used</h4>
 
 <a name="set-sound-volume!"></a>
-<h3>set-sound-volume!</h3>
-
-<h4>Description</h4>
+<h3>(set-sound-volume! volume)</h3>
 
 Global volume support.
 
-<h4>Syntax</h4>
-
-<code>(set-sound-volume! volume)</code>
 
 <dl>
 <dt>volume</dt>
@@ -497,15 +427,10 @@ Global volume support.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-title-music!"></a>
-<h3>set-title-music!</h3>
-
-<h4>Description</h4>
+<h3>(set-title-music! song)</h3>
 
 Change the default title music.
 
-<h4>Syntax</h4>
-
-<code>(set-title-music! song)</code>
 
 <dl>
 <dt>song</dt>
@@ -526,15 +451,10 @@ Change the default title music.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="sound-for-name"></a>
-<h3>sound-for-name</h3>
-
-<h4>Description</h4>
+<h3>(sound-for-name name)</h3>
 
 Ask the sound system to associate a sound id to a sound name.
 
-<h4>Syntax</h4>
-
-<code>(sound-for-name name)</code>
 
 <dl>
 <dt>name</dt>
@@ -553,15 +473,10 @@ Ask the sound system to associate a sound id to a sound name.
 <h4>Not Used</h4>
 
 <a name="sound-off"></a>
-<h3>sound-off</h3>
-
-<h4>Description</h4>
+<h3>(sound-off)</h3>
 
 Turn off sound.
 
-<h4>Syntax</h4>
-
-<code>(sound-off)</code>
 
 <h4>Example</h4>
 
@@ -574,15 +489,10 @@ Turn off sound.
 <h4>Not Used</h4>
 
 <a name="sound-on"></a>
-<h3>sound-on</h3>
-
-<h4>Description</h4>
+<h3>(sound-on)</h3>
 
 Turn on sound.
 
-<h4>Syntax</h4>
-
-<code>(sound-on)</code>
 
 <h4>Example</h4>
 
@@ -595,15 +505,10 @@ Turn on sound.
 <h4>Not Used</h4>
 
 <a name="sound-thread"></a>
-<h3>sound-thread</h3>
-
-<h4>Description</h4>
+<h3>(sound-thread)</h3>
 
 Ask clone to use a sound thread.
 
-<h4>Syntax</h4>
-
-<code>(sound-thread)</code>
 
 <h4>Example</h4>
 
@@ -616,15 +521,10 @@ Ask clone to use a sound thread.
 <h4>Not Used</h4>
 
 <a name="stop-music"></a>
-<h3>stop-music</h3>
-
-<h4>Description</h4>
+<h3>(stop-music)</h3>
 
 Stop playing music.
 
-<h4>Syntax</h4>
-
-<code>(stop-music)</code>
 
 <h4>Example</h4>
 
@@ -637,15 +537,10 @@ Stop playing music.
 <h4>Not Used</h4>
 
 <a name="with-sound"></a>
-<h3>with-sound</h3>
-
-<h4>Description</h4>
+<h3>(with-sound)</h3>
 
 Returns true if compiled with sound, false otherwise.
 
-<h4>Syntax</h4>
-
-<code>(with-sound)</code>
 
 <h4>Example</h4>
 
