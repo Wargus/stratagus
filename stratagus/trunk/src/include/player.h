@@ -229,9 +229,10 @@
 **
 **		Total number of buildings made.
 **
-**	Player::TotalResources
+**	Player::TotalResources[::MaxCosts]
 **
 **		Total number of resources collected.
+**		@see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
 **
 **	Player::TotalRazings
 **
