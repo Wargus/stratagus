@@ -1189,7 +1189,7 @@ global void DrawInfoPanel(void)
 
 	DrawInfoPanelBackground(0);
 	if (UnitUnderCursor && UnitVisible(UnitUnderCursor, ThisPlayer)  &&
-		(UnitUnderCursor->Type->Selectable || !GameRunning)) {
+		(!UnitUnderCursor->Type->Decoration || !GameRunning)) {
 			// FIXME: not correct for enemies units
 			DrawUnitInfo(UnitUnderCursor);
 	} else {

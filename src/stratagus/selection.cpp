@@ -126,14 +126,14 @@ global void ChangeSelectedUnits(Unit** units,int count)
 	DebugCheck(count > MaxSelectable);
 
 	if (count == 1 && units[0]->Type->ClicksToExplode &&
-		units[0]->Type->Selectable) {
+		!units[0]->Type->Decoration) {
 		HandleSuicideClick(units[0]);
 	}
 
 	UnSelectAll();
 	NetworkSendSelection(units, count);
 	for (n = i = 0; i < count; ++i) {
-		if (!units[i]->Removed && !units[i]->TeamSelected && units[i]->Type->Selectable) {
+		if (!units[i]->Removed && !units[i]->TeamSelected && !units[i]->Type->Decoration) {
 			Selected[n++] = unit = units[i];
 			unit->Selected = 1;
 			if (count > 1) {
@@ -171,7 +171,7 @@ global void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, in
 			// FALL THROUGH
 		case 2:
 			for (i = 0; i < count; ++i) {
-				if (!units[i]->Removed && units[i]->Type->Selectable) {
+				if (!units[i]->Removed && !units[i]->Type->Decoration) {
 					TeamSelected[player->Player][TeamNumSelected[player->Player]++] = units[i];
 					units[i]->TeamSelected |= 1 << player->Player;
 				}
@@ -223,7 +223,7 @@ global int SelectUnit(Unit* unit)
 		return 0;
 	}
 
-	if (!unit->Type->Selectable && GameRunning) {
+	if (unit->Type->Decoration && GameRunning) {
 		return 0;
 	}
 
@@ -360,7 +360,7 @@ global int SelectUnitsByType(Unit* base)
 		HandleSuicideClick(base);
 	}
 
-	if (!base->Type->Selectable && GameRunning) {
+	if (base->Type->Decoration && GameRunning) {
 		return 0;
 	}
 	if (base->TeamSelected) { // Somebody else onteam has this unit
