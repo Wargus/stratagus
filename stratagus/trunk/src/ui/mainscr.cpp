@@ -234,7 +234,7 @@ global void DrawUnitInfo(const Unit* unit)
     }
     // Not our building and not under construction
     if( unit->Player!=ThisPlayer
-	    && unit->Orders[0].Action==UnitActionBuilded ) {
+	    || unit->Orders[0].Action!=UnitActionBuilded ) {
 	if( type->GivesOil || type->OilPatch ) {
 	    DrawText(x+47,y+8+78,GameFont,"Oil Left:");
 	    DrawNumber(x+108,y+8+78,GameFont,unit->Value);
