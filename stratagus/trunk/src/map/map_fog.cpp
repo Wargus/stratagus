@@ -118,39 +118,6 @@ local const int FogTable[16] = {
      0,11,10, 2,  13, 6, 0, 3,  12, 0, 4, 1,  8, 9, 7, 0,
 };
 
-/*
-global const unsigned char VisionTable[][3] = {
-      {2,0,0}, {1,1,1},
-      {3,0,0}, {1,1,1}, {1,1,0}, {1,0,1},
-      {4,0,0}, {1,1,1}, {1,1,0}, {1,1,1}, {1,0,1},
-      {5,0,0}, {1,1,1}, {2,1,0}, {1,0,1}, {1,1,0}, {2,0,1},
-      {6,0,0}, {1,1,1}, {2,1,0}, {2,1,1}, {2,0,1},
-      {7,0,0}, {1,1,1}, {2,1,0}, {3,1,1}, {2,0,1},
-      {8,0,0}, {1,1,1}, {2,1,0}, {1,1,1}, {1,1,0}, {1,0,1}, {1,1,0}, {1,0,1},{1,1,1},{2,0,1},
-      {9,0,0}, {1,1,1}, {3,1,0}, {1,0,1}, {1,1,0}, {2,1,1}, {1,0,1}, {1,1,0}, {3,0,1},
-      {10,0,0}, {1,1,1}, {3,1,0}, {1,1,1}, {1,1,0}, {1,0,1}, {1,1,0}, {1,0,1},{1,1,0}, {1,0,1},{1,1,1},{3,0,1},
-      {11,0,0}, {1,1,1}, {3,1,0},{1,1,1},{1,1,0},{3,1,1},{1,0,1},{1,1,1},{3,0,1},
-      {12,0,0}
-    };
-local const int VisionLookup[6] = { 0,0,2,6,11,17 };
-
-global const unsigned char VisionTable[][3] = {
-	{1,0,0}, {1,1,0},
-	{2,0,0}, {2,1,0}, {1,0,1},
-	{3,0,0}, {3,1,0}, {2,0,1},
-	{4,0,0}, {4,1,0}, {3,0,1},
-	{5,0,0}, {5,1,0}, {4,0,1},
-	{6,0,0}, {6,1,0}, {5,0,1},
-	{7,0,0}, {7,1,0}, {6,0,1},
-	{8,0,0}, {8,1,0}, {7,0,1},
-	{9,0,0}, {9,1,0}, {8,0,1},
-	{10,0,0}, {10,1,0}, {9,0,1},
-	{11,0,0}, {11,1,0}, {10,0,1},
-	{12,0,0}
-	};
-
-local const int VisionLookup[14] = { 0,0,3,6,9,12,15,18,21,24,27,30,33,36 };
-*/
 global unsigned char *VisionTable[3];
 global int *VisionLookup;
 /**
@@ -2697,13 +2664,18 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 */
 global void InitMapFogOfWar(void)
 {
-    int maxsize;
     int *visionlist;
+    int maxsize;
     int sizex;
     int sizey;
     int maxsearchsize;
     int i;
     int VisionTablePosition;
+    int marker;
+    int direction;
+    int right;
+    int up;
+    int repeat;
 
 #ifdef USE_OPENGL
     VideoDrawFog=VideoDrawFogAlphaOpenGL;
@@ -2980,27 +2952,97 @@ build_table:
 	}
     }
 #endif
+    // Initialize Visiontable to large size, can't be more entries than tiles.
+    VisionTable[0]=malloc(MaxMapWidth*MaxMapWidth*sizeof(int));
+    VisionTable[1]=malloc(MaxMapWidth*MaxMapWidth*sizeof(int));
+    VisionTable[2]=malloc(MaxMapWidth*MaxMapWidth*sizeof(int));
 
-	visionlist=malloc(MaxMapWidth*MaxMapWidth*sizeof(int));
-	//*2 as diagonal distance is longer
+    VisionLookup=malloc((MaxMapWidth+2)*sizeof(int));
+#ifndef SQUAREVISION
+    visionlist=malloc(MaxMapWidth*MaxMapWidth*sizeof(int));
+    //*2 as diagonal distance is longer
 
-	maxsize = MaxMapWidth;
+    maxsize = MaxMapWidth;
+    maxsearchsize = MaxMapWidth;
     // Fill in table of map size
     for(sizex=0; sizex < maxsize; sizex++) {
 	for(sizey=0; sizey < maxsize; sizey++) {
 	    visionlist[sizey*maxsize+sizex]=isqrt(sizex*sizex+sizey*sizey);
 	}
     }
+
+    VisionLookup[0]=0;
+    i=1;
+    VisionTablePosition=0;
+    while( i < maxsearchsize ) {
+	// Set Lookup Table
+	VisionLookup[i]=VisionTablePosition;
+	// Put in Null Marker
+	VisionTable[0][VisionTablePosition]=i;
+	VisionTable[1][VisionTablePosition]=0;
+	VisionTable[2][VisionTablePosition]=0;
+	VisionTablePosition++;
+
+
+       // find i in left column
+	marker = maxsize*i;
+	direction = 0;
+	right=0;
+	up=0;
+
+	// If not on top row, continue
+	do {
+	    repeat=0;
+	    do {
+		// search for repeating
+		// Test Right
+		if( (repeat == 0 || direction==1) && visionlist[marker+1] == i ) {
+		    right=1;
+		    up=0;
+		    repeat++;
+		    direction=1;
+		    marker++;
+		} else if ( (repeat == 0 || direction==2) && visionlist[marker-maxsize] == i ) {
+		    up=1;
+		    right=0;
+		    repeat++;
+		    direction=2;
+		    marker=marker-maxsize;
+		} else if ( (repeat == 0 || direction==3) && visionlist[marker+1-maxsize] == i
+			&&  visionlist[marker-maxsize] != i && visionlist[marker+1] != i) {
+		    up=1;
+		    right=1;
+		    repeat++;
+		    direction=3;
+		    marker=marker+1-maxsize;
+		} else {
+		    direction=0;
+		    break;
+		}
+
+	       // search rigth
+               // search up - store as down.
+               // search diagonal
+	    }  while ( direction && marker > (maxsize*2));
+	    if( right || up ) {
+		VisionTable[0][VisionTablePosition]=repeat;
+		VisionTable[1][VisionTablePosition]=right;
+		VisionTable[2][VisionTablePosition]=up;
+		VisionTablePosition++;
+	    }
+       } while( marker > (maxsize*2) );
+       i++;
+    }
+
+
+
+
+
+    free(visionlist);
+#else
     // Find maximum distance in corner of map.
-    maxsearchsize=isqrt(maxsize/2);
-    // 1 for 0 and one for end redundant point
-    VisionLookup=malloc((maxsearchsize+2)*sizeof(int));
-
-    // Initialize Visiontable to large size, can't be more entries than tiles.
-    VisionTable[0]=malloc(maxsize*maxsize*sizeof(int));
-    VisionTable[1]=malloc(maxsize*maxsize*sizeof(int));
-    VisionTable[2]=malloc(maxsize*maxsize*sizeof(int));
-
+    maxsize = MaxMapWidth;
+    maxsearchsize=isqrt(MaxMapWidth/2);
     // Mark 1, It's a special case
     // Only Horizontal is marked
     VisionTable[0][0]=1;
@@ -3034,7 +3076,12 @@ build_table:
 	VisionTable[2][VisionTablePosition]=1;
 	i++;
     }
-    free(visionlist);
+
+    // Update Size of VisionTable to what was used.
+    realloc(VisionTable[0],(VisionTablePosition+2)*sizeof(int));
+    realloc(VisionTable[1],(VisionTablePosition+2)*sizeof(int));
+    realloc(VisionTable[2],(VisionTablePosition+2)*sizeof(int));
+#endif
 }
 
 /**
