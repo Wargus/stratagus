@@ -3280,7 +3280,7 @@ local void MultiPlayerInternetGame(void)
 	MetaServerInUse = 0;
 	MetaServerConnectError();
 	return;
-	}
+    }
     MetaServerInUse = 1;
     ProcessMenu("menu-internet-create-join-menu", 1);
     if (GuiGameStarted) {
