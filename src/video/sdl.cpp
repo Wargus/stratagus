@@ -100,7 +100,7 @@ global void SetVideoSync(void)
     if( SDL_SetTimer(
 		(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed,
 		VideoSyncHandler) ) {
-	fprintf(stderr,"Can't set timer or you use SDL 1.1.X\n");
+	fprintf(stderr, "Can't set timer or you use SDL 1.1.X\n");
     }
 
     // DebugLevel1("Timer installed\n");
@@ -343,11 +343,16 @@ local void SdlHandleKey(const SDL_keysym* code)
 	    icode = KeyCodeSuper;
 	    break;
 	default:
-	    // Note to X11-users: SDL (up to including 1.0.2) is buggy here.
-	    // Shifted keys are not converted correctly, due to a too small
-	    // keybuf in src/video/x11/SDL_x11events.c. Patch yourself, or
-	    // wait for a fixed SDL lib. SVGAlib and win32 seems to be ok!
+	    // Note to X11-users: SDL (versions before 1.0.3) is buggy here.
+	    // Shifted keys may fail to be converted correctly.
+	    // Use SDL 1.0.3 or higher, which works ok.
 	    if (1) {
+		if (icode >= '0' && icode <= '9') {
+		    if( code->mod&(KMOD_LCTRL|KMOD_RCTRL|KMOD_LALT|KMOD_RALT|KMOD_LMETA|KMOD_RMETA) ) {
+			// Do not translate these to support grouping!
+			break;
+		    }
+		}
 		if ( (code->unicode & 0xFF80) == 0 ) {
 		    icode = code->unicode & 0x7F;
 		} else {
@@ -356,7 +361,7 @@ local void SdlHandleKey(const SDL_keysym* code)
 		    icode = code->unicode & 0xFF;
 		}
 	    } else if( code->mod&(KMOD_LSHIFT|KMOD_RSHIFT) ) {
-		// FIXME: only letters handled here - implement shift keymap (punktuation!)
+		// FIXME: only letters handled here - implement shift keymap (punctuation!)
 		if(icode <= 'z' && icode >= 'a') {
 		    icode -= 32;
 		}
