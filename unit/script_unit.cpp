@@ -44,6 +44,8 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+local int NumOfUnitsToLoad;
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -307,6 +309,45 @@ local void CclParseBuilded(Unit* unit __attribute__((unused)),
 }
 
 /**
+**	Parse stored data for train order
+**
+**	@param unit	Unit pointer which should be filled with the data.
+**	@param list	All options of the trained order
+*/
+local void CclParseTrain (Unit *unit, SCM list)
+{
+    SCM value, sublist;
+    int i;
+
+    while ( !gh_null_p (list) ) {
+	value = gh_car (list);
+	list = gh_cdr (list);
+	if (gh_eq_p (value, gh_symbol2scm ("ticks")) ) {
+	    value = gh_car (list);
+	    list = gh_cdr (list);
+	    unit->Data.Train.Ticks = gh_scm2int (value);
+	} else if (gh_eq_p (value, gh_symbol2scm ("count")) ) {
+	    value = gh_car (list);
+	    list = gh_cdr (list);
+	    unit->Data.Train.Count = gh_scm2int (value);
+	} else if (gh_eq_p (value, gh_symbol2scm ("queue")) ) {
+	    sublist=gh_car (list);
+	    list=gh_cdr (list);
+	    for (i=0; i<MAX_UNIT_TRAIN; ++i) {
+		value = gh_vector_ref (sublist, gh_int2scm(i));
+		if ( gh_eq_p (value, gh_symbol2scm ("unit-none")) ) {
+		    unit->Data.Train.What[i] = NULL;
+		} else {
+		    char *ident = gh_scm2newstr (value, NULL);
+		    unit->Data.Train.What[i] = UnitTypeByIdent (ident);
+		    free (ident);
+		}
+	    }
+	}
+    }
+}
+
+/**
 **	Parse unit
 **
 **	@param list	List describing unit
@@ -331,6 +372,7 @@ local SCM CclUnit(SCM list)
     unit=NULL;
     type=NULL;
     player=NULL;
+    DebugLevel0Fn ("parsing unit #%d\n", slot);
 
     //
     //	Parse the list:	(still everything could be changed!)
@@ -352,7 +394,9 @@ local SCM CclUnit(SCM list)
 	    list=gh_cdr(list);
 
 	    DebugCheck( !type );
-	    unit=MakeUnit(type,player);
+	    //unit=MakeUnit(type,player);
+	    unit = UnitSlots[slot];
+	    InitUnit (unit, type, player);
 	    unit->Active=0;
 	    unit->Removed=0;
 	    unit->Reset=0;
@@ -537,9 +581,9 @@ local SCM CclUnit(SCM list)
 	    list=gh_cdr(list);
 	    DebugLevel0Fn("FIXME: upgrade-to\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("data-train")) ) {
-	    value=gh_car(list);
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME: train\n");
+	    CclParseTrain (unit, sublist);
 	} else if( gh_eq_p(value,gh_symbol2scm("data-move")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
@@ -640,6 +684,69 @@ local SCM CclSetUnitUnholyArmor(SCM ptr,SCM value)
     return value;
 }
 
+local SCM CclSetNumUnitsToLoad (SCM num)
+{
+    NumOfUnitsToLoad = gh_scm2int(num);
+    DebugLevel0Fn ("Will load %d units.\n", NumOfUnitsToLoad);
+    return SCM_UNSPECIFIED;
+}
+
+local SCM CclSlotUsage (SCM list)
+{
+#if 0
+    /* the old way */
+    int len = gh_vector_length (vector);
+    unsigned char SlotUsage[len];
+    int i;
+    Unit *UnitMemory;
+
+    for (i=0; i<len; i++) {
+	SlotUsage[i] = (unsigned char )
+		gh_scm2int (gh_vector_ref (vector, gh_int2scm (i)));
+    }
+#else
+    int len = MAX_UNIT_SLOTS/8 + 1;
+    unsigned char SlotUsage[len];
+    int i, prev;
+    Unit *UnitMemory;
+    SCM value;
+
+    DebugLevel0Fn ("entered\n");
+    memset (SlotUsage, 0, len);
+    prev = -1;
+    while ( !gh_null_p (list) ) {
+	value = gh_car (list);
+	list = gh_cdr (list);
+	if (gh_eq_p (value, gh_symbol2scm ("-"))) {
+	    int range_end;
+	    value = gh_car (list);
+	    list = gh_cdr (list);
+	    range_end = gh_scm2int (value);
+	    for (i=prev; i<=range_end; i++)
+		SlotUsage[i/8] |= 1 << (i%8);
+	    prev = -1;
+	} else {
+	    if (prev >= 0)
+		SlotUsage[prev/8] |= 1 << (prev%8);
+	    prev = gh_scm2int (value);
+	}
+    }
+#endif
+
+    UnitMemory = (Unit * )calloc (NumOfUnitsToLoad, sizeof (Unit));
+    /* now walk through the bitfield and create the needed unit slots */
+    for (i=0; i<len*8; i++) {
+	if ( SlotUsage[i/8] & (1 << i%8) ) {
+	    Unit *new_unit = UnitMemory++;
+	    UnitSlotFree = (void *)UnitSlots[i];
+	    UnitSlots[i] = new_unit;
+	    new_unit->Slot = i;
+	}
+    }
+    DebugLevel0Fn ("leaved\n");
+    return SCM_UNSPECIFIED;
+}
+
 // FIXME: write the missing access functions
 
 /**
@@ -661,6 +768,9 @@ global void UnitCclRegister(void)
     // unit member access functions
     gh_new_procedure1_0("get-unit-unholy-armor",CclGetUnitUnholyArmor);
     gh_new_procedure2_0("set-unit-unholy-armor!",CclSetUnitUnholyArmor);
+
+    gh_new_procedure1_0 ("num-units!", CclSetNumUnitsToLoad);
+    gh_new_procedure1_0 ("slot-usage", CclSlotUsage);
 }
 
 //@}
