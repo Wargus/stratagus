@@ -278,12 +278,12 @@ dist: distlist
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chown -R johns:freecraft $(distdir)
 	chmod -R a+rX $(distdir)
-	tar czhf $(distdir).tar.gz $(distdir)
+	tar czhf $(distdir)-src.tar.gz $(distdir)
 	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
-	zip -zq9r $(distdir).zip $(distdir)
+	zip -zq9r $(distdir)-src.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
-	du -h $(distdir).tar.gz $(distdir).zip
+	du -h $(distdir)-src.tar.gz $(distdir)-src.zip
 
 small-dist: distlist
 	echo $(MISC) >>$(DISTLIST)
@@ -320,7 +320,7 @@ bin-dist: all
 	chmod -R a+rX $(distdir)
 	strip -s -R .comment $(distdir)/freecraft$(EXE)
 	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	tar czhf freecraft-$(mydate)-bin.tar.gz $(distdir)
+	tar czhf freecraft-$(mydate)-linux.tar.gz $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 
@@ -355,10 +355,6 @@ win32-bin-dist2: win32
 win32-bin-dist: win32
 	@export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
 	$(MAKE) RULESFILE=$(WINRULESFILE) $(WIN32) win32-bin-dist2
-
-win32-exe-dist:	win32-bin-dist
-	cat tools/SFXWiz32-gcc.exe freecraft-$(mydate)-win32bin.zip \
-		> freecraft-$(mydate)-win32bin.exe
 
 #----------------------------------------------------------------------------
 
@@ -428,7 +424,6 @@ release:
 	$(MAKE) bin-dist
 	$(MAKE) win32new
 	$(MAKE) win32-bin-dist
-	$(MAKE) win32-exe-dist
 	$(MAKE) win32distclean
 	$(MAKE) dist
 
