@@ -3165,9 +3165,9 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 }
 
 /**
-** Scenario select listbox init callback
+**  Scenario select listbox init callback
 */
-static void ScenSelectLBInit(Menuitem *mi)
+static void ScenSelectLBInit(Menuitem* mi)
 {
 	int i;
 
@@ -3178,7 +3178,7 @@ static void ScenSelectLBInit(Menuitem *mi)
 		mi->menu->Items[8].flags &= ~MenuButtonDisabled;
 	}
 	i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
-													 (FileList **)&(mi->d.listbox.options));
+		(FileList**)&(mi->d.listbox.options));
 	if (i == 0) {
 		free(mi->menu->Items[3].d.button.text);
 		mi->menu->Items[3].d.button.text = strdup("OK");
@@ -3188,6 +3188,8 @@ static void ScenSelectLBInit(Menuitem *mi)
 		mi->menu->Items[3].flags &= ~MenuButtonDisabled;
 		if (i > mi->d.listbox.nlines) {
 			mi[1].flags &= ~MenuButtonDisabled;
+		} else {
+			mi[1].flags |= MenuButtonDisabled;
 		}
 	}
 }
