@@ -15,6 +15,8 @@
 **      $Id$
 */
 
+#ifndef NEW_AI	// {
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1360,9 +1362,9 @@ global void AiTrainingComplete(Unit* unit,Unit* what)
 /**
 **      This is called for each player, each frame.
 **
-**      @param player   The player number.
+**      @param player   The player structure pointer.
 */
-global void AiEachFrame(int player)
+global void AiEachFrame(Player* player)
     {
     AiCommand command;
 
@@ -1372,8 +1374,8 @@ global void AiEachFrame(int player)
 	return;
     }
 
-    AiPlayer=&Ais[player];
-    DebugLevel3(__FUNCTION__": Player %d\n",player);
+    AiPlayer=player->Ai;
+    DebugLevel3(__FUNCTION__": Player %d\n",player->Player);
     command = AiPlayer->Commands[AiPlayer->CmdIndex];
     if(AiPlayer->GoalHead->Next == 0)
         {
@@ -1394,15 +1396,15 @@ global void AiEachFrame(int player)
 /**
 **      This called for each player, each second.
 **
-**      @param player   The player number.
+**      @param player   The player structure pointer.
 */
-global void AiEachSecond(int player)
+global void AiEachSecond(Player* player)
     {
-    DebugLevel3(__FUNCTION__": Player %d\n",player);
+    DebugLevel3(__FUNCTION__": Player %d\n",player->Player);
     if( AiSleep ) {			// wait some time. FIXME: see above
 	return;
     }
-    AiPlayer=&Ais[player];  //  Prepare ai.
+    AiPlayer=player->Ai;	//  Prepare ai.
     AiAssignWorker();
     if(AiCommandAttack(UnitBallista,
 	ForceAttacking[AiPlayer->CurrentAttack].Ballista,
@@ -1419,18 +1421,19 @@ global void AiEachSecond(int player)
 /**
 **      Setup all at start.
 **
-**      @param player   The player number.
+**      @param player   The player structure pointer.
 */
-global void AiInit(int player)
+global void AiInit(Player* player)
     {
     int i;
     int j;
     PlayerAi* aip;
     Unit* units[MAX_UNITS];
 
-    DebugLevel2(__FUNCTION__": Player %d\n",player);
-    aip=&Ais[player];
-    aip->Player=&Players[player];
+    DebugLevel2(__FUNCTION__": Player %d\n",player->Player);
+    player->Ai=aip=&Ais[player->Player];
+    aip->Player=player;
+
     for(i=0; i<UnitTypeMax/(sizeof(int)*8); ++i) {aip->Build[i]=0;}
     aip->GoalHead=(AiGoal*)&aip->GoalNil1;
     aip->GoalNil1=(AiGoal*)0;
@@ -1453,9 +1456,9 @@ global void AiInit(int player)
     //
     for( i=0; i<UnitTypeInternalMax; ++i ) {
 	for( j=0; j<MaxCosts; ++j ) {
-	    UnitTypes[i].Stats[player].Costs[j]*=
+	    UnitTypes[i].Stats[player->Player].Costs[j]*=
 		    j==TimeCost ? AiTimeFactor : AiCostFactor;
-	    UnitTypes[i].Stats[player].Costs[j]/=100;
+	    UnitTypes[i].Stats[player->Player].Costs[j]/=100;
 	}
     }
 
@@ -1467,3 +1470,4 @@ global void AiInit(int player)
     }
 
 
+#endif 	// } NEW_AI

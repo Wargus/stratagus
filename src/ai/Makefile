@@ -21,6 +21,8 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = ai
 
-OBJS	= ai.$(OE)
+HDRS	= ai_local.h
+
+OBJS	= ai.$(OE) new_ai.$(OE) ccl_ai.$(OE) 
 
 include $(TOPDIR)/Common.mk

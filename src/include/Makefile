@@ -36,18 +36,4 @@ HDRS	= actions.h ai.h ccl.h clone.h construct.h cursor.h font.h icons.h \
 all:
 	echo done.
 
-doc:	$(HDRS:.h=.doc)
-
-distlist::
-	#echo src/include/Makefile >>$(DISTLIST)
-	@for i in $(HDRS) ; do echo src/include/$$i >>$(DISTLIST) ; done
-
-ci::
-	@ci -l Makefile
-	@for i in $(HDRS) ; do ci -l $$i ; done
-
-lockver::
-	@for i in $(HDRS) ; do $(LOCKVER) $$i ; done
-	@$(LOCKVER) Makefile
-
 include $(TOPDIR)/Common.mk
