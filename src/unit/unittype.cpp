@@ -88,6 +88,7 @@ global UnitType*UnitTypeOrcFarm;	/// Orc farm
 global UnitType*UnitTypeHumanWall;	/// Human wall
 global UnitType*UnitTypeOrcWall;	/// Orc wall
 global UnitType*UnitTypeCritter;	/// Critter unit type pointer
+global UnitType*UnitTypeBerserker;	/// Berserker for berserker regeneration
 
 /**
 **	Mapping of W*rCr*ft number to our internal unit-type symbols.
@@ -974,6 +975,7 @@ global void InitUnitTypes(void)
     UnitTypeHumanWall=UnitTypeByIdent("unit-human-wall");
     UnitTypeOrcWall=UnitTypeByIdent("unit-orc-wall");
     UnitTypeCritter=UnitTypeByIdent("unit-critter");
+    UnitTypeBerserker=UnitTypeByIdent("unit-berserker");
 
     //
     //	Setup some hard coded values. FIXME: should be moved to some configs.
@@ -1197,6 +1199,7 @@ global void CleanUnitTypes(void)
     UnitTypeHumanWall=NULL;
     UnitTypeOrcWall=NULL;
     UnitTypeCritter=NULL;
+    UnitTypeBerserker=NULL;
 }
 
 //@}
