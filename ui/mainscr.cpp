@@ -46,6 +46,7 @@
 
 // FIXME: should become global configurable
 #define OriginalTraining	0	/// 1 for the original training display
+#define OriginalBuilding	0	/// 1 for the original building display
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -210,6 +211,11 @@ global void DrawUnitInfo(const Unit* unit)
 	//	Building under constuction.
 	//
 	if( unit->Orders[0].Action==UnitActionBuilded ) {
+	    if( !OriginalBuilding ) {
+		DrawUnitIcon(unit->Data.Builded.Worker
+			,unit->Data.Builded.Worker->Type->Icon.Icon
+			,0,x+107,y+8+70);
+	    }
 	    // FIXME: not correct must use build time!!
 	    DrawCompleted(stats->HitPoints,unit->HP);
 	    return;
