@@ -84,7 +84,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 		} else {
 		    --MapY;
 		}
-		MustRedraw|=RedrawMaps|RedrawCursor|RedrawMinimapCursor;
+		MustRedraw|=RedrawMaps|RedrawCursors;
 	    }
 	    break;
 
@@ -99,7 +99,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 		} else {
 		    ++MapY;
 		}
-		MustRedraw|=RedrawMaps|RedrawCursor|RedrawMinimapCursor;
+		MustRedraw|=RedrawMaps|RedrawCursors;
 	    }
 	    break;
 	case ScrollLeft:
@@ -113,7 +113,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 		} else {
 		    --MapX;
 		}
-		MustRedraw|=RedrawMaps|RedrawCursor|RedrawMinimapCursor;
+		MustRedraw|=RedrawMaps|RedrawCursors;
 	    }
 	    break;
 
@@ -128,7 +128,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 		} else {
 		    --MapX;
 		}
-		MustRedraw|=RedrawMaps|RedrawCursor|RedrawMinimapCursor;
+		MustRedraw|=RedrawMaps|RedrawCursors;
 	    }
 	    if( MapY ) {
 		if( FastScroll ) {
@@ -140,7 +140,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 		} else {
 		    --MapY;
 		}
-		MustRedraw|=RedrawMaps|RedrawCursor|RedrawMinimapCursor;
+		MustRedraw|=RedrawMaps|RedrawCursors;
 	    }
 	    break;
 	case ScrollLeftDown:
@@ -154,7 +154,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 		} else {
 		    --MapX;
 		}
-		MustRedraw|=RedrawMaps|RedrawCursor|RedrawMinimapCursor;
+		MustRedraw|=RedrawMaps|RedrawCursors;
 	    }
 	    if( MapY<TheMap.Height-MapHeight ) {
 		if( FastScroll ) {
@@ -166,7 +166,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 		} else {
 		    ++MapY;
 		}
-		MustRedraw|=RedrawMaps|RedrawCursor|RedrawMinimapCursor;
+		MustRedraw|=RedrawMaps|RedrawCursors;
 	    }
 	    break;
 	case ScrollRight:
@@ -206,7 +206,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 		} else {
 		    --MapY;
 		}
-		MustRedraw|=RedrawMaps|RedrawCursor|RedrawMinimapCursor;
+		MustRedraw|=RedrawMaps|RedrawCursors;
 	    }
 	    break;
 	case ScrollRightDown:
@@ -232,7 +232,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 		} else {
 		    ++MapY;
 		}
-		MustRedraw|=RedrawMaps|RedrawCursor|RedrawMinimapCursor;
+		MustRedraw|=RedrawMaps|RedrawCursors;
 	    }
 	    break;
 	default:
@@ -431,6 +431,9 @@ global void UpdateDisplay(void)
 	}
 	/* if (MustRedraw) */ {
 	// FIXME: JOHNS: That didn't work: if (MustRedraw&RedrawCursor) 
+	    DebugLevel3Fn("%d,%d,%d,%d\n",CursorX-GameCursor->HotX,CursorY-GameCursor->HotY
+		,VideoGraphicWidth(GameCursor->Sprite)
+		,VideoGraphicHeight(GameCursor->Sprite));
 	    InvalidateArea(CursorX-GameCursor->HotX,CursorY-GameCursor->HotY
 		,VideoGraphicWidth(GameCursor->Sprite)
 		,VideoGraphicHeight(GameCursor->Sprite));
