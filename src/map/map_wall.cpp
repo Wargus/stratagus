@@ -143,7 +143,7 @@ global void MapFixSeenWallTile(int x, int y)
 
     if( t==TileTypeHumanWall ) {
 	tile = WallHumanTable[tile];
-	if( mf->Value<=UnitTypeByIdent("unit-human-wall")->_HitPoints/2 ) {
+	if( mf->Value<=UnitTypeHumanWall->_HitPoints/2 ) {
 	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
 		++tile;
 	    }
@@ -153,7 +153,7 @@ global void MapFixSeenWallTile(int x, int y)
 	}
     } else {
 	tile = WallOrcTable[tile];
-	if( mf->Value<=UnitTypeByIdent("unit-orc-wall")->_HitPoints/2 ) {
+	if( mf->Value<=UnitTypeOrcWall->_HitPoints/2 ) {
 	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
 		++tile;
 	    }
@@ -239,7 +239,7 @@ global void MapFixWallTile(int x, int y)
 
     if( t&MapFieldHuman ) {
 	tile = WallHumanTable[tile];
-	if( mf->Value<=UnitTypeByIdent("unit-human-wall")->_HitPoints/2 ) {
+	if( mf->Value<=UnitTypeHumanWall->_HitPoints/2 ) {
 	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
 		++tile;
 	    }
@@ -249,7 +249,7 @@ global void MapFixWallTile(int x, int y)
 	}
     } else {
 	tile = WallOrcTable[tile];
-	if( mf->Value<=UnitTypeByIdent("unit-orc-wall")->_HitPoints/2 ) {
+	if( mf->Value<=UnitTypeOrcWall->_HitPoints/2 ) {
 	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
 		++tile;
 	    }
@@ -343,11 +343,11 @@ global void MapSetWall(unsigned x,unsigned y,int humanwall)
     if( humanwall ) {
 	mf->Tile=TheMap.Tileset->Table[WallHumanTable[0]];
 	mf->Flags|=MapFieldWall|MapFieldUnpassable|MapFieldHuman;
-	mf->Value=UnitTypeByIdent("unit-human-wall")->_HitPoints;
+	mf->Value=UnitTypeHumanWall->_HitPoints;
     } else {
 	mf->Tile=TheMap.Tileset->Table[WallOrcTable[0]];
 	mf->Flags|=MapFieldWall|MapFieldUnpassable;
-	mf->Value=UnitTypeByIdent("unit-orc-wall")->_HitPoints;
+	mf->Value=UnitTypeOrcWall->_HitPoints;
     }
 
     UpdateMinimapXY(x,y);
