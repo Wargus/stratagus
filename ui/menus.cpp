@@ -876,7 +876,6 @@ local Menuitem SoundOptionsMenuItems[] = {
 
     { MI_TYPE_TEXT, 16, 36*5, 0, GameFont, NULL, NULL,
 	{ text:{ "CD Volume", MI_TFLAGS_LALIGN} } },
-#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
         { hslider:{ 0, 11*18, 18, ScenSelectHSCdVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL,
@@ -895,29 +894,6 @@ local Menuitem SoundOptionsMenuItems[] = {
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_ROUND, SetCdModeRandom} } },
     { MI_TYPE_TEXT, 180, 36*6.5 + 2, 0, GameFont, NULL, NULL,
 	{ text:{ "Random Tracks", MI_TFLAGS_LALIGN} } },
-
-#else
-    { MI_TYPE_HSLIDER, 32, 36*5.5, -1, 0, NULL, NULL,
-        { hslider:{ 0, 11*18, 18, ScenSelectHSCdVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 44, 36*6 + 6, -1, SmallFont, NULL, NULL,
-	{ text:{ "min", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 218, 36*6 + 6, -1, SmallFont, NULL, NULL,
-	{ text:{ "max", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 240, 36*5.5, -1, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdPower} } },
-    { MI_TYPE_TEXT, 266, 36*5.5 + 2, -1, GameFont, NULL, NULL,
-	{ text:{ "Enabled", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_GEM, 32, 36*6.5, -1, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_ROUND, SetCdModeAll} } },
-    { MI_TYPE_TEXT, 58, 36*6.5 + 2, -1, GameFont, NULL, NULL,
-	{ text:{ "All Tracks", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_GEM, 154, 36*6.5, -1, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_ROUND, SetCdModeRandom} } },
-    { MI_TYPE_TEXT, 180, 36*6.5 + 2, -1, GameFont, NULL, NULL,
-	{ text:{ "Random Tracks", MI_TFLAGS_LALIGN} } },
-
-#endif
-
     { MI_TYPE_BUTTON, 176 - (106 / 2), 352 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
 #else
@@ -1901,16 +1877,15 @@ local void GameMenuLoad(void)
 global void SoundOptions(void)
 {
 #ifdef WITH_SOUND
-#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     int i = 17;
-#endif
+
     SoundOptionsMenuItems[2].flags = 0;				// master volume slider
     SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_CHECKED;	// master power
     SoundOptionsMenuItems[8].flags = 0;				// music volume slider
     SoundOptionsMenuItems[11].flags = 0;			// music power
     SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_CHECKED;
     SoundOptionsMenuItems[14].flags = 0;			// cd volume slider
-    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;	// cd power
+    SoundOptionsMenuItems[17].d.gem.state = MI_GSTATE_CHECKED;	// cd power
     SoundOptionsMenuItems[19].flags = 0;			// all tracks button
     SoundOptionsMenuItems[19].d.gem.state = MI_GSTATE_UNCHECKED;
     SoundOptionsMenuItems[21].flags = 0;			// random tracks button
@@ -1933,7 +1908,7 @@ global void SoundOptions(void)
     
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
+	SoundOptionsMenuItems[17].d.gem.state = MI_GSTATE_UNCHECKED;
 	SoundOptionsMenuItems[14].flags = -1;
 	SoundOptionsMenuItems[19].flags = -1;
 	
@@ -1951,6 +1926,12 @@ global void SoundOptions(void)
 	}
 	SoundOptionsMenuItems[11].flags = -1;
     }
+#else
+    SoundOptionsMenuItems[14].flags = -1;			// cd volume slider
+    SoundOptionsMenuItems[17].flags = -1;			// cd power
+    SoundOptionsMenuItems[17].d.gem.state = MI_GSTATE_UNCHECKED;
+    SoundOptionsMenuItems[19].flags = -1;			// all tracks button
+    SoundOptionsMenuItems[21].flags = -1;			// random tracks button
 #endif
     ProcessMenu(MENU_SOUND_OPTIONS, 1);
 #endif // with sound
