@@ -137,9 +137,9 @@ local SCM CclStratagusMap(SCM list)
 		    // FIXME: this should be CreateMap or InitMap?
 
 		} else if (gh_eq_p(value, gh_symbol2scm("fog-of-war"))) {
-		    TheMap.NoFogOfWar=0;
+		    TheMap.NoFogOfWar = 0;
 		} else if (gh_eq_p(value, gh_symbol2scm("no-fog-of-war"))) {
-		    TheMap.NoFogOfWar=1;
+		    TheMap.NoFogOfWar = 1;
 		} else if (gh_eq_p(value, gh_symbol2scm("map-fields"))) {
 		    int i;
 
@@ -482,7 +482,7 @@ local SCM CclSetForestRegeneration(SCM speed)
 **
 **	@param percent	    Max percent needed to burn buildings
 **	@param rate	    HP per cycle to damage buildings
-**	@param wait	    Number of cycles to wail
+**	@param wait	    Number of cycles to wait
 */
 local SCM CclSetBurnBuildings(SCM percent, SCM rate, SCM wait)
 {
@@ -490,9 +490,9 @@ local SCM CclSetBurnBuildings(SCM percent, SCM rate, SCM wait)
     int r;
     int w;
 
-    p=gh_scm2int(percent);
-    r=gh_scm2int(rate);
-    w=gh_scm2int(wait);
+    p = gh_scm2int(percent);
+    r = gh_scm2int(rate);
+    w = gh_scm2int(wait);
     if (p < 0 || p > 100) {
 	PrintFunction();
 	fprintf(stdout, "Burn percent should be 0-100\n");
@@ -506,11 +506,11 @@ local SCM CclSetBurnBuildings(SCM percent, SCM rate, SCM wait)
     if (w <= 0) {
 	PrintFunction();
 	fprintf(stderr, "Wait Cycles must be greater than 0\n");
-	w=CYCLES_PER_SECOND;
+	w = CYCLES_PER_SECOND;
     }
-    BurnBuildingPercent=p;
-    BurnBuildingDamageRate=r;
-    BurnBuildingWait=w;
+    BurnBuildingPercent = p;
+    BurnBuildingDamageRate = r;
+    BurnBuildingWait = w;
 
     return SCM_UNSPECIFIED;
 }
