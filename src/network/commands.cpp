@@ -564,6 +564,8 @@ local void DoNextReplay(void)
 	SendCommandDemolish(UnitSlots[unit],posx,posy,dunit,flags);
     } else if( !strcmp(name,"spell-cast") ) {
 	SendCommandSpellCast(UnitSlots[unit],posx,posy,dunit,num,flags);
+    } else if( !strcmp(name,"auto-spell-cast") ) {
+	SendCommandAutoSpellCast(UnitSlots[unit],num,flags);
     } else if( !strcmp(name,"diplomacy") ) {
 	int state;
 	if( !strcmp(val,"neutral") ) {
