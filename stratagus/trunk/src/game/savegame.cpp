@@ -37,6 +37,7 @@
 
 #include "icons.h"
 #include "ui.h"
+#include "construct.h"
 #include "unittype.h"
 #include "unit.h"
 #include "upgrade.h"
@@ -86,6 +87,7 @@ global void SaveGame(const char* filename)
     SaveIcons(file);
     SaveCursors(file);
     // SaveUI(file);
+    SaveConstructions(file);
     SaveUnitTypes(file);
     SaveUpgrades(file);
     SaveDependencies(file);
