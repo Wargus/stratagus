@@ -398,9 +398,7 @@ local SCM CclDefineMap(SCM width,SCM height)
     InitUnitCache();
     // FIXME: this should be CreateMap or InitMap?
 
-#ifndef SPLIT_SCREEN_SUPPORT
     MapX=MapY=0;
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     return SCM_UNSPECIFIED;
 }
