@@ -232,10 +232,7 @@ global void DrawMinimap(int vx __attribute__((unused)),
     int w;
     int h;
     int h0;
-#ifdef NEW_FOW
-    int p;
-    MapField* mf;
-#else
+#ifndef NEW_FOW
     int flags;
 #endif
 
@@ -257,16 +254,12 @@ global void DrawMinimap(int vx __attribute__((unused)),
     //
     //	Draw the terrain
     //
-#ifdef NEW_FOW
-    p=ThisPlayer->Player;
-#endif
     if( MinimapWithTerrain ) {
 	for( my=0; my<MINIMAP_H; ++my ) {
 	    for( mx=0; mx<MINIMAP_W; ++mx ) {
 #ifdef NEW_FOW
-		mf=TheMap.Fields+Minimap2MapX[mx]+Minimap2MapY[my];
-		if( mf->Visible[p]
-			&& ( (mf->Visible[p]>1) || ((mx&1)==(my&1)) ) ) {
+		if( IsMapFieldVisible(Minimap2MapX[mx],(Minimap2MapY[my]/TheMap.Width))
+			 ) {
 		    VideoDrawPixel(((unsigned char*)MinimapGraphic->Frames)
 			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
@@ -306,13 +299,8 @@ global void DrawMinimap(int vx __attribute__((unused)),
 
 
 #ifdef NEW_FOW
-	mf=TheMap.Fields+unit->X+unit->Y*TheMap.Width;
-	// Draw only units on explored fields
-	if( !mf->Visible[p] ) {
-	    continue;
-	}
-	// Draw only units on visible fields
-	if( !(mf->Visible[p]>1) ) {
+	// Draw only units on explored and visible fields
+	if( !IsMapFieldVisible(unit->X,unit->Y) ) {
 	    continue;
 	}
 #else
