@@ -132,7 +132,7 @@ local void AddIcon(const char *ident, const char *tileset,
     } else {
 	icon = malloc(sizeof(Icon));
 	icon->Ident = strdup(ident);
-	icon->Tileset = strdup(tileset);
+	icon->Tileset = tileset ? strdup(tileset) : NULL;
 	icon->File = iconfile;
 	icon->Index = index;
 
