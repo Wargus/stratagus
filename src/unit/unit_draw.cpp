@@ -1589,14 +1589,13 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 		VideoFill75TransCircleClip(ColorGreen
 			,x+type->TileWidth*TileSizeX/2
 			,y+type->TileHeight*TileSizeY/2
-			,min(stats->SightRange*TileSizeX
-			    ,stats->SightRange*TileSizeY));
+			,min((stats->SightRange+(type->TileWidth-1)/2)*TileSizeX
+			    ,(stats->SightRange+(type->TileHeight-1)/2)*TileSizeY));
 	    } else {
-		VideoDrawRectangleClip(ColorGreen
-		    ,x+type->TileWidth*TileSizeX/2-stats->SightRange*TileSizeX
-		    ,y+type->TileHeight*TileSizeY/2-stats->SightRange*TileSizeY
-		    ,stats->SightRange*TileSizeX*2
-		    ,stats->SightRange*TileSizeY*2);
+		VideoDrawCircleClip(ColorGreen
+		    ,x+type->TileWidth*TileSizeX/2
+		    ,y+type->TileHeight*TileSizeY/2
+		    ,(stats->SightRange+(type->TileWidth-1)/2)*TileSizeX*2);
 	    }
 	}
 	if( type->CanAttack || type->Tower ) {
@@ -1605,19 +1604,17 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 			? type->ReactRangePerson
 			: type->ReactRangeComputer;
 		if( r ) {
-		    VideoDrawRectangleClip(ColorBlue
-			,x+type->TileWidth*TileSizeX/2-r*TileSizeX
-			,y+TileSizeY/2-r*TileSizeY
-			,r*TileSizeX*2
-			,r*TileSizeY*2);
+		    VideoDrawCircleClip(ColorBlue
+			,x+type->TileWidth*TileSizeX/2
+			,y+type->TileHeight*TileSizeY/2
+			,r*TileSizeX);
 		}
 	    }
 	    if( ShowAttackRange && stats->AttackRange ) {
-		VideoDrawRectangleClip(ColorRed
-		    ,x+type->TileWidth*TileSizeX/2-stats->AttackRange*TileSizeX
-		    ,y+type->TileHeight*TileSizeY/2-stats->AttackRange*TileSizeY
-		    ,stats->AttackRange*TileSizeX*2
-		    ,stats->AttackRange*TileSizeY*2);
+		VideoDrawCircleClip(ColorRed
+		    ,x+type->TileWidth*TileSizeX/2
+		    ,y+type->TileHeight*TileSizeY/2
+		    ,stats->AttackRange*TileSizeX);
 	    }
 	}
     }
@@ -1897,7 +1894,7 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 	drawlevel2 = c2->Type->DrawLevel;
     }
     if( drawlevel1 == drawlevel2 ) {
-        return c1->Y*MaxMapWidth+c1->X < c2->Y*MaxMapWidth+c2->X ? -1 : 1;
+	return c1->Y*MaxMapWidth+c1->X < c2->Y*MaxMapWidth+c2->X ? -1 : 1;
     } else {
 	return drawlevel1 <= drawlevel2 ? -1 : 1;
     }

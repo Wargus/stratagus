@@ -979,16 +979,20 @@ global int UnitCacheOnTile(int x,int y,Unit** table)
 */
 global Unit* UnitCacheOnXY(int x,int y,unsigned type)
 {
-    Unit* unit;
+    Unit* table[UnitMax];
+    int n;
 
-    unit=TheMap.Fields[y*TheMap.Width+x].Here.Units;
-    while( unit ) {
-	if( (unsigned)unit->Type->UnitType==type ) {
+    n = UnitCacheOnTile(x,y,table);
+    while( n-- ) {
+	if( (unsigned)table[n]->Type->UnitType==type ) {
 	    break;
 	}
-	unit=unit->Next;
     }
-    return unit;
+    if( n > -1 ) {
+	return table[n];
+    } else {
+	return NoUnitP;
+    }
 }
 
 /**

@@ -1301,10 +1301,7 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 	    if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
 		src->TileWidth != dst->TileWidth ||
 		src->TileHeight != dst->TileHeight) && !unit->Removed) {
-		MapUnmarkSight(player,
-			unit->X+unit->Type->TileWidth/2,
-			unit->Y+unit->Type->TileHeight/2,
-			unit->CurrentSightRange);
+		MapUnmarkUnitSight(unit);
 	    }
 	    unit->Type=dst;
 	    unit->Stats=&dst->Stats[player->Player];
@@ -1318,10 +1315,7 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 		src->TileWidth != dst->TileWidth ||
 		src->TileHeight != dst->TileHeight) && !unit->Removed) {
 		unit->CurrentSightRange=dst->Stats[player->Player].SightRange;
-		MapMarkSight(player,
-			unit->X+unit->Type->TileWidth/2,
-			unit->Y+unit->Type->TileHeight/2,
-			unit->CurrentSightRange);
+		MapMarkUnitSight(unit);
 	    }
 	    
 	    CheckUnitToBeDrawn(unit);
@@ -1417,16 +1411,9 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 		while (numunits >= 0) {
 		    if (sightupgrade[numunits]->Player->Player == player->Player &&
 		    	!sightupgrade[numunits]->Removed) {
-			/// Marking First is faster
-			MapMarkSight(player,
-					sightupgrade[numunits]->X+UnitTypes[z]->TileWidth/2,
-					sightupgrade[numunits]->Y+UnitTypes[z]->TileHeight/2,
-					UnitTypes[z]->Stats[pn].SightRange);
-			MapUnmarkSight(player,
-					sightupgrade[numunits]->X+UnitTypes[z]->TileWidth/2,
-					sightupgrade[numunits]->Y+UnitTypes[z]->TileHeight/2,
-					sightupgrade[numunits]->CurrentSightRange);
+			MapUnmarkUnitSight(sightupgrade[numunits]);
 			sightupgrade[numunits]->CurrentSightRange=UnitTypes[z]->Stats[pn].SightRange;
+			MapMarkUnitSight(sightupgrade[numunits]);
 		    }                                   
 		    numunits--;
 		}

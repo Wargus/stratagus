@@ -78,7 +78,7 @@ global void HandleActionDie(Unit* unit)
 	}
 
 	//Fixes sight from death
-	MapUnmarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
+	MapUnmarkUnitSight(unit);
 	//unit->CurrentSightRange=unit->Type->Stats->SightRange;
 
 	unit->State=unit->Type->CorpseScript;

@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -340,6 +340,11 @@ extern void (*VideoDrawTile)(const unsigned char*,int,int);
     /// Draws tiles display and video mode independ
 extern void (*MapDrawTile)(int,int,int);
 
+    /// Vision Table to see where to locate goals and vision
+extern unsigned char *VisionTable[3];
+    /// Companion table for fast lookups
+extern int *VisionLookup;
+
 #ifdef NEW_DECODRAW
     /// FIXME: docu
 extern void InitMapDecoration(void);
@@ -396,12 +401,10 @@ extern  void MarkDrawEntireMap(void);
 //
 //	in map_fog.c
 //
-    /// Mark the sight in range
-extern void MapMarkSight(const Player*,int,int,int);
-    /// Mark the new sight in range
-extern void MapMarkNewSight(const Player*,int,int,int,int,int);
-    /// Unmark the sight in range
-extern void MapUnmarkSight(const Player*,int,int,int);
+extern void MapUnmarkTileSight(const Player* player,int x,int y,unsigned char *v);
+extern void MapMarkTileSight(const Player* player,int x,int y,unsigned char *v);
+    /// Mark sight changes
+extern void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*,int,int,unsigned char*));
     /// Find if a tile is visible (With shared vision)
 extern int IsTileVisible(const Player* player, int x, int y);
     /// Mark tiles with fog of war to be redrawn
@@ -543,7 +546,16 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #define CanMoveToMask(x,y,mask) \
 	!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
 
-
+#define MapMarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapMarkTileSight)
+#define MapUnmarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapUnmarkTileSight)
+#define MapMarkUnitSight(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
+	(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapMarkTileSight)
+#define MapUnmarkUnitSight(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
+	(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight)
+#define MapMarkUnitOnBoardSight(unit,host) MapSight((unit)->Player,(host)->X,(host)->Y, \
+	(host)->Type->TileWidth,(host)->Type->TileHeight,(unit)->CurrentSightRange,MapMarkTileSight)
+#define MapUnmarkUnitOnBoardSight(unit,host) MapSight((unit)->Player,(host)->X,(host)->Y, \
+	(host)->Type->TileWidth,(host)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight)
     /// Check if a field for the user is explored
 #define IsMapFieldExplored(player,x,y) \
     (IsTileVisible((player),(x),(y)))

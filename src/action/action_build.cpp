@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -102,6 +102,14 @@ global void HandleActionBuild(Unit* unit)
 
     type=unit->Orders[0].Type;
 
+    // Create the building to find a valid path to any part of it.
+    // Only create if we didn't already.
+    if ( unit->Orders[0].Goal == NoUnitP ) {
+	unit->Orders[0].Goal=MakeUnit(type,NULL);
+	unit->Orders[0].Goal->X=unit->Orders[0].X;
+	unit->Orders[0].Goal->Y=unit->Orders[0].Y;
+    }
+
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
 	    //
@@ -121,6 +129,9 @@ global void HandleActionBuild(Unit* unit)
 	    }
 
 	    unit->Orders[0].Action=UnitActionStill;
+	    // Release Temporary Building
+            UnitClearOrders(unit->Orders[0].Goal);
+            ReleaseUnit(unit->Orders[0].Goal);
 	    unit->SubAction=0;
 	    if( unit->Selected ) {	// update display for new action
 		SelectedUnitChanged();
@@ -135,15 +146,8 @@ global void HandleActionBuild(Unit* unit)
 	    return;
     }
 
-    //
-    //	Building place must be reached!
-    //
     x=unit->Orders[0].X;
     y=unit->Orders[0].Y;
-    if( type->ShoreBuilding ) {		// correct coordinates.
-	++x;
-	++y;
-    }
 
     //
     //	Check if the building could be build there.
@@ -166,6 +170,9 @@ global void HandleActionBuild(Unit* unit)
 	}
 
 	unit->Orders[0].Action=UnitActionStill;
+	// Release Temporary Building
+        UnitClearOrders(unit->Orders[0].Goal);
+        ReleaseUnit(unit->Orders[0].Goal);
 	unit->SubAction=0;
 	if( unit->Selected ) {	// update display for new action
 	    SelectedUnitChanged();
@@ -195,6 +202,9 @@ global void HandleActionBuild(Unit* unit)
 	}
 
 	unit->Orders[0].Action=UnitActionStill;
+	// Release Temporary Building
+        UnitClearOrders(unit->Orders[0].Goal);
+        ReleaseUnit(unit->Orders[0].Goal);
 	unit->SubAction=0;
 	if( unit->Selected ) {	// update display for new action
 	    SelectedUnitChanged();
@@ -213,6 +223,9 @@ global void HandleActionBuild(Unit* unit)
 	}
 
 	unit->Orders[0].Action=UnitActionStill;
+	// Release Temporary Building
+        UnitClearOrders(unit->Orders[0].Goal);
+        ReleaseUnit(unit->Orders[0].Goal);
 	unit->SubAction=0;
 	if( unit->Selected ) {	// update display for new action
 	    SelectedUnitChanged();
@@ -221,12 +234,16 @@ global void HandleActionBuild(Unit* unit)
     }
     PlayerSubUnitType(unit->Player,type);
 
-    build=MakeUnit(type,unit->Player);
+    
+    build=unit->Orders[0].Goal;
+    unit->Orders[0].Goal = NoUnitP;
+    AssignUnitToPlayer(build,unit->Player);
     build->Constructed=1;
     build->CurrentSightRange=0;
     PlaceUnit(build,x,y);
-    build->CurrentSightRange=build->Type->TileWidth < build->Type->TileHeight
-				? build->Type->TileHeight : build->Type->TileWidth;
+    if( !type->BuilderOutside ) {
+	build->CurrentSightRange=1;
+    }
 
     //	Building on top of something, must remove what is beneath it
     if( type->MustBuildOnTop ) {
@@ -285,7 +302,7 @@ global void HandleActionBuild(Unit* unit)
 	build->Refs++;
 	UnitMarkSeen(unit);
 	//  Mark the new building seen.
-	MapMarkSight(build->Player,x+build->Type->TileWidth/2,y+build->Type->TileHeight/2,build->CurrentSightRange);
+	MapMarkUnitSight(build);
     }
     UpdateConstructionFrame(build);
     UnitMarkSeen(build);
@@ -422,9 +439,7 @@ global void HandleActionBuilded(Unit* unit)
 	    SelectedUnitChanged();
 	}
 	unit->CurrentSightRange=unit->Stats->SightRange;
-	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2,
-			    unit->Y+unit->Type->TileWidth/2,
-			    unit->CurrentSightRange);
+	MapMarkUnitSight(unit);
         CheckUnitToBeDrawn(unit);
 	return;
     }

@@ -413,6 +413,8 @@ global void AssignUnitToPlayer(Unit *unit, Player *player)
     unit->Player=player;
     unit->Stats=&type->Stats[unit->Player->Player];
     unit->Colors=&player->UnitColors;
+    unit->HP = unit->Stats->HitPoints;
+
 }
 
 /**
@@ -427,17 +429,15 @@ global Unit* MakeUnit(UnitType* type, Player* player)
 {
     Unit* unit;
 
-    DebugCheck(!player);		// Current code didn't support no player
+    //DebugCheck(!player);		// Current code didn't support no player
 
     unit = AllocUnit();
     InitUnit(unit, type);
-    AssignUnitToPlayer(unit, player);
 
-    /* now we can finish the player-specific initialization of our unit */
-    /* NOTE: this used to be a part of AssignUnitToPlayer() but had to be
-     * moved out since it clobbered HP read from a saved file during game
-     * load. */
-    unit->HP = unit->Stats->HitPoints;
+    // Only Assign if a Player was specified
+    if ( player ) {
+	AssignUnitToPlayer(unit, player);
+    }
 
     return unit;
 }
@@ -504,15 +504,13 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	//	Update fog of war, if unit belongs to player on this computer
 	//
 	if( unit->Container && unit->Removed ) {
-	    MapUnmarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
-		    ,unit->Container->Y+unit->Container->Type->TileHeight/2
-		    ,unit->CurrentSightRange);
+	    MapUnmarkUnitOnBoardSight(unit,unit->Container);
 	}
 	if (unit->Container) {
 	    RemoveUnitFromContainer(unit);
 	}
 	unit->CurrentSightRange=unit->Stats->SightRange;
-	MapMarkSight(unit->Player,x,y,unit->CurrentSightRange);
+	MapMarkUnitSight(unit);
 
 	if( type->CanSeeSubmarine ) {
 	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
@@ -629,19 +627,13 @@ global void RemoveUnit(Unit* unit, Unit* host)
     unsigned flags;
 
     if( unit->Removed && unit->Container ) {
-	MapUnmarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
-		,unit->Container->Y+unit->Container->Type->TileHeight/2
-		,unit->CurrentSightRange);
+	MapUnmarkUnitOnBoardSight(unit,unit->Container);
     } else {
-	MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-		,unit->Y+unit->Type->TileHeight/2
-		,unit->CurrentSightRange);
+	MapUnmarkUnitSight(unit);
     }
     if( host ) {
 	unit->CurrentSightRange=host->CurrentSightRange;
-	MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2,
-		host->Y+host->Type->TileWidth/2,
-		unit->CurrentSightRange);
+	MapMarkUnitOnBoardSight(unit,host);
 	AddUnitInContainer(unit,host);
     }
 
@@ -1728,22 +1720,14 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
     }
     *unit->PlayerSlot=unit;
 
-    unit->Player=newplayer;
-
     if ( unit->Removed && unit->Container ) {
-	MapUnmarkSight(oldplayer,unit->Container->X+unit->Container->Type->TileWidth/2
-		,unit->Container->Y+unit->Container->Type->TileHeight/2
-		,unit->CurrentSightRange);
-	MapMarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
-		,unit->Container->Y+unit->Container->Type->TileHeight/2
-		,unit->CurrentSightRange);
+	MapUnmarkUnitOnBoardSight(unit,unit->Next);
+	unit->Player=newplayer;
+	MapMarkUnitOnBoardSight(unit,unit->Next);
     } else {
-	MapUnmarkSight(oldplayer,unit->X+unit->Type->TileWidth/2
-		,unit->Y+unit->Type->TileHeight/2
-		,unit->CurrentSightRange);
-	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-		,unit->Y+unit->Type->TileHeight/2
-		,unit->CurrentSightRange);
+	MapUnmarkUnitSight(unit);
+	unit->Player=newplayer;
+	MapMarkUnitSight(unit);
     }
 
     unit->Stats=&unit->Type->Stats[newplayer->Player];
@@ -2369,7 +2353,7 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
     //	Remove unit that is building!
     //
     IfDebug( j=0; );
-    if( unit&&!type->BuilderOutside ) {
+    if( unit ) {
 	// FIXME: This only works with 1x1 big units
 	DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
 	j=unit->Type->FieldFlags;
@@ -2463,7 +2447,7 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 	    }
 	}
     }
-    if( unit&&!type->BuilderOutside ) {
+    if( unit ) {
 	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
     }
 
@@ -2794,7 +2778,7 @@ global Unit* FindIdleWorker(const Player* player,const Unit* last)
 
     for( i=0; i<nunits; i++ ) {
 	unit=units[i];
-	if( unit->Type->Harvester && !unit->Removed ) {
+	if( unit->Type->Coward && !unit->Removed ) {
 	    if( unit->Orders[0].Action==UnitActionStill ) {
 		if( SelectNextUnit && !IsOnlySelected(unit) ) {
 		    return unit;
@@ -2993,18 +2977,18 @@ global void LetUnitDie(Unit* unit)
 	    unit->Visible = 0xffff;
 	    DeadBuildingCacheInsert(unit);	//Insert into corpse list
 	    // FIXME: (mr-russ) Hack to make sure we see our own building destroyed
-	    MapMarkSight(unit->Player,unit->X,unit->Y,1);
+	    MapMarkUnitSight(unit);
 	    UnitMarkSeen(unit);
-	    MapUnmarkSight(unit->Player,unit->X,unit->Y,1);
+	    MapUnmarkUnitSight(unit);
 	    UnitMarkSeen(unit);
 	    return;
 	}
 
 	// no corpse available
 	// FIXME: (mr-russ) Hack to make sure we see our own building destroyed
-	MapMarkSight(unit->Player,unit->X,unit->Y,1);
+	MapMarkUnitSight(unit);
 	UnitMarkSeen(unit);
-	MapUnmarkSight(unit->Player,unit->X,unit->Y,1);
+	MapUnmarkUnitSight(unit);
 	ReleaseUnit(unit);
 	return;
     }
@@ -3038,7 +3022,7 @@ global void LetUnitDie(Unit* unit)
     } else {
 	unit->CurrentSightRange=0;
     }
-    MapMarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
+    MapMarkUnitSight(unit);
 }
 
 /**
@@ -3050,6 +3034,8 @@ global void DestroyAllInside(Unit* source)
     int i;
 
     // FIXME: n0b0dy: No corpses, is that correct behaviour?
+    // No Corpses, we are inside something, and we can't be seen
+    // FIXME: mr-russ: support for units inside units/buildings?
     unit=source->UnitInside;
     for( i=source->InsideCount; i; --i,unit=unit->NextContained ) {
 	RemoveUnit(unit,NULL);
@@ -3278,7 +3264,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
  */
 global int MapDistance(int x1,int y1,int x2,int y2)
 {
-    return max(abs(x1-x2),abs(y1-y2));
+    return isqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
 }
 
 /**
@@ -3318,7 +3304,7 @@ global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
     DebugLevel3("\tDistance %d,%d -> %d,%d = %d\n"
 	    _C_ x1 _C_ y1 _C_ x2 _C_ y2 _C_ (dy<dx) ? dx : dy );
 
-    return (dy<dx) ? dx : dy;
+    return isqrt(dy*dy+dx*dx);
 }
 
 /**
@@ -3378,7 +3364,7 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 	}
     }
 
-    return (dy<dx) ? dx : dy;
+    return isqrt(dy*dy+dx*dx);
 }
 
 /**
@@ -3704,10 +3690,14 @@ global void SaveUnit(const Unit* unit,CLFile* file)
 	CLprintf(file," 'rescued-from %d",unit->RescuedFrom->Player);
     }
     // n0b0dy: How is this usefull?
+    // mr-russ: You can't always load units in order, it saved the information
+    // so you can load a unit who's Container hasn't been loaded yet.
+    // SEE unit loading code.
     if( unit->Container && unit->Removed ) {
-	CLprintf(file," 'host-tile '(%d %d) ",
-		unit->Container->X+unit->Container->Type->TileWidth/2,
-		unit->Container->Y+unit->Container->Type->TileHeight/2);
+	CLprintf(file," 'host-info '(%d %d %d %d) ",
+	    unit->Next->X,unit->Next->Y,
+	    unit->Next->Type->TileWidth,
+	    unit->Next->Type->TileHeight);
     }
     CLprintf(file," 'visible \"");
     for( i=0; i<PlayerMax; ++i ) {

@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -153,66 +153,123 @@ global unsigned char* MakeMatrix(void)
 /**
 **	Mark place in matrix.
 **
-**	@param x1	X1 position of target area
-**	@param y1	Y1 position of target area
-**	@param x2	X2 position of target area, range is [x1,x2]
-**	@param y2	Y2 position of target area, range is [y1,y2]
+**	@param gx	X position of target area
+**	@param gy	Y position of target area
+**	@param gw	Width of target area
+**	@param gh	Height of target area
+**	@param rnage	Range to search at
 **	@param matrix	Target area marked in matrix
 **
 **	@returns	depth, -1 unreachable
 */
-local int CheckPlaceInMatrix(int x1,int y1,int x2,int y2,unsigned int* matrix)
+local int CheckPlaceInMatrix(int gx,int gy,int gw,int gh,int range,unsigned int* matrix)
 {
+    int cx[4]; 
+    int cy[4];
+    int steps;
+    int cycle;
     int x;
     int y;
+    int quad;
+    int filler;
 
-    for( y=y1; y<=y2; y++) {
-	if( matrix[y*TheMap.Width+x1] ) {
-	    return matrix[y*TheMap.Width+x1];
-	}
-	if( matrix[y*TheMap.Width+x2] ) {
-	    return matrix[y*TheMap.Width+x2];
+    if( range == 0 && gw == 0 && gh == 0 ) {
+	return matrix[gx+gy*TheMap.Width];
+    }
+
+    // Mark top, bottom, left, right
+
+    // Mark Top and Bottom of Goal
+    for(x=gx;x<=gx+gw;x++) {
+	if( x >= 0 && x < TheMap.Width) {
+	    if( gy-range >= 0 && matrix[(gy-range)*TheMap.Width+x] ) {
+		return 1;
+	    }
+	    if( gy+range+gh < TheMap.Height && matrix[(gy+range+gh)*TheMap.Width+x] ) {
+		return 1;
+	    }
 	}
     }
-    for( x=x1; x<=x2; ++x ) {
-	if( matrix[y1*TheMap.Width+x] ) {
-	    return matrix[y1*TheMap.Width+x];
-	}
-	if( matrix[y2*TheMap.Width+x] ) {
-	    return matrix[y2*TheMap.Width+x];
+
+    for(y=gy;y<=gy+gh;y++) {
+	if( y >= 0 && y < TheMap.Height) {
+	    if( gx-range >=0 && matrix[y*TheMap.Width+gx-range] ) {
+		return 1;
+	    }
+	    if( gx+gw+range < TheMap.Width && matrix[y*TheMap.Width+gx+gw+range] ) {
+		return 1;
+	    }
 	}
     }
-    return -1;
-}
 
-/**
-**	Make goal in matrix.
-**	'range' is how near we must reach.
-**
-**	       rrrr
-**	       rggr
-**	       rggr
-**	       rrrr
-**
-**	@param unit	Goal to reach.
-**	@param range	How near we must come.
-**	@param matrix	Target goal and area around is marked in matrix
-*/
-local int CheckGoalInMatrix(const Unit* unit,int range,unsigned int* matrix)
-{
-    int x;
-    int y;
-    int w;
-    int h;
-    UnitType* type;
+    // Mark Goal Border in Matrix
 
-    x=unit->X-range;
-    y=unit->Y-range;
-    type=unit->Type;
-    w=type->TileWidth+range*2;
-    h=type->TileHeight+range*2;
-
-    return CheckPlaceInMatrix(x,y,w,h,matrix);
+    // Mark Edges of goal
+   
+    steps=0;
+    // Find place to start. (for marking curves)
+    while(VisionTable[0][steps] != range && VisionTable[1][steps] == 0 && VisionTable[2][steps] == 0) {
+	steps++;
+    }
+    // 0 - Top right Quadrant
+    cx[0] = gx+gw;
+    cy[0] = gy-VisionTable[0][steps];
+    // 1 - Top left Quadrant
+    cx[1] = gx;
+    cy[1] = gy-VisionTable[0][steps];
+    // 2 - Bottom Left Quadrant
+    cx[2] = gx;
+    cy[2] = gy+VisionTable[0][steps]+gh;
+    // 3 - Bottom Right Quadrant
+    cx[3] = gx+gw;
+    cy[3] = gy+VisionTable[0][steps]+gh;
+    
+    steps++;  // Move past blank marker
+    while(VisionTable[1][steps] != 0 || VisionTable[2][steps] != 0 ) {
+	// Loop through for repeat cycle
+	cycle=0;
+	while( cycle++ < VisionTable[0][steps] ) {
+	    // If we travelled on an angle, mark down as well.
+	    if( VisionTable[1][steps] == VisionTable[2][steps] ) {
+		// do down
+		quad = 0;
+		while( quad < 4 ) {
+		    if( quad < 2 ) {
+			filler=1;
+		    } else {
+			filler=-1;
+		    }
+		    if( cx[quad] >= 0 && cx[quad] < TheMap.Width && cy[quad]+filler >= 0 && 
+			cy[quad]+filler < TheMap.Height && matrix[(cy[quad]+filler)*TheMap.Width+cx[quad]] ) {
+			return 1;
+		    }
+		    quad++;
+		}
+	    }
+		
+	    cx[0]+=VisionTable[1][steps];
+	    cy[0]+=VisionTable[2][steps];
+	    cx[1]-=VisionTable[1][steps];
+	    cy[1]+=VisionTable[2][steps];
+	    cx[2]-=VisionTable[1][steps];
+	    cy[2]-=VisionTable[2][steps];
+	    cx[3]+=VisionTable[1][steps];
+	    cy[3]-=VisionTable[2][steps];
+	    
+	    // Mark Actually Goal curve change
+	    quad = 0;
+	    while( quad < 4 ) {
+		if( cx[quad] >= 0 && cx[quad] < TheMap.Width && cy[quad] >= 0 &&
+		    cy[quad] < TheMap.Height &&
+		    matrix[cy[quad]*TheMap.Width+cx[quad]] ) {
+		    return 1;
+		}
+		quad++;
+	    }
+	}
+	steps++;
+    }
+    return 0;
 }
 
 /**
@@ -323,66 +380,24 @@ local void FillMatrix(Unit* unit,unsigned int* matrix)
 **	@param src	Unit for the path.
 **	@param x	Map X tile position.
 **	@param y	Map Y tile position.
+**	@param w	Width of Goal
+**	@param h	Height of Goal
 **	@param range	Range to the tile.
 **
 **	@return		Distance to place.
 */
-global int PlaceReachable(Unit* src,int x,int y,int range)
+global int PlaceReachable(Unit* src,int x,int y,int w,int h,int range)
 {
     int depth;
-    int x1;
-    int x2;
-    int y1;
-    int y2;
-    int reachable;
     static unsigned long LastGameCycle;
     static unsigned mask;
 
     DebugLevel3Fn("%p -> %d,%d\n" _C_ src _C_ x _C_ y);
 
     //
-    //	Find a path to the place.
-    //
-    x1 = x;
-    if( x1 < 0 ) {
-	x1 = 0;
-    }
-    x2 = x + range;
-    if( x2 > TheMap.Width ) {
-	x2 = TheMap.Width;
-    }
-    y1 = y;
-    if( y1 < 0 ) {
-	y1 = 0;
-    }
-    y2 = y+range;
-    if( y2 > TheMap.Height ) {
-    	y2 = TheMap.Height;
-    }
-    // Find a reachable target, otherwise, don't search
-    reachable=0;
-    for( x=x1;x<=x2;x++ ) {
-	if( CheckedCanMoveToMask(x,y1,UnitMovementMask(src)) ||
-	    CheckedCanMoveToMask(x,y2,UnitMovementMask(src)) ) {
-	    reachable=1;
-	}
-    }
-    for( y=y1;y<y2;y++ ) {
-	if( CheckedCanMoveToMask(x1,y,UnitMovementMask(src)) ||
-	    CheckedCanMoveToMask(x2,y,UnitMovementMask(src)) ) {
-	    reachable=1;
-	}
-    }
-
-    if( !reachable ) {
-	DebugLevel3("Can't move to destination, goal unreachable\n");
-	return 0;
-    }
-
-    //
     //  Setup movement.
     //
-    if( src->Type->MovementMask != mask || LastGameCycle != GameCycle 
+    if( src->Type->MovementMask != mask || LastGameCycle != GameCycle
 	|| LocalMatrix[src->X+src->Y*TheMap.Width] == 0 ) {
 	InitLocalMatrix();
 	FillMatrix(src,LocalMatrix);
@@ -393,13 +408,13 @@ global int PlaceReachable(Unit* src,int x,int y,int range)
     //
     //  Find a path to the place.
     //
-    if( (depth=CheckPlaceInMatrix(x1,y1,x2,y2,LocalMatrix)) < 0 ) {
-	DebugLevel3("Can't move to destination, not route to goal\n");
+    if( (depth=CheckPlaceInMatrix(x,y,w,h,range,LocalMatrix)) < 0 ) {
+	DebugLevel1("Can't move to destination, not route to goal\n");
 	return 0;
     }
 
     return depth;
-								
+
 }
 
 /**
@@ -411,10 +426,9 @@ global int PlaceReachable(Unit* src,int x,int y,int range)
 **
 **	@return		Distance to place.
 */
-global int UnitReachable(Unit* src,const Unit* dst,int range)
+global int UnitReachable(Unit* src,Unit* dst,int range)
 {
     int depth;
-    int realrange;
 
     DebugLevel3Fn("%d(%d,%d,%s)->%d(%d,%d,%s)+%d "
 	_C_ UnitNumber(src) _C_ src->X _C_ src->Y _C_ src->Type->Ident
@@ -423,8 +437,7 @@ global int UnitReachable(Unit* src,const Unit* dst,int range)
     //
     //	Find a path to the goal.
     //
-    realrange = range + range + max(dst->Type->TileHeight,dst->Type->TileWidth);
-    depth=PlaceReachable(src,dst->X-range,dst->Y-range,realrange);
+    depth=PlaceReachable(src,dst->X,dst->Y,dst->Type->TileWidth,dst->Type->TileHeight,range);
     if( depth <= 0 ) {
 	DebugLevel3("NO WAY\n");
 	return 0;
@@ -887,6 +900,7 @@ local int ComplexNewPath(Unit* unit,int x1,int y1,int x2,int y2,char* path)
 */
 global int NewPath(Unit* unit)
 {
+#if 0
     int x;
     int y;
     const Unit* goal;
@@ -897,10 +911,17 @@ global int NewPath(Unit* unit)
     int y2;
     int rx;
     int ry;
-    int i;
     int reachable;
+#endif
+    int i;
+    int gw;
+    int gh;
+    int gx;
+    int gy;
+    int range;
     char* path;
 
+#if 0
     x=unit->X;
     y=unit->Y;
     goal=unit->Orders[0].Goal;
@@ -910,11 +931,6 @@ global int NewPath(Unit* unit)
     ry=unit->Orders[0].RangeY;
     unit->Data.Move.Length=0;
 
-#if 0
-    DebugLevel1Fn("%d: -> %s %p | %dx%d-%dx%d\n"
-	_C_ UnitNumber(unit) _C_ unit->Data.Move.Fast ? "F" : "C"
-	_C_ goal _C_ x1 _C_ y1 _C_ x2 _C_ y2);
-#endif
     //
     //	Check if goal is already reached.
     //
@@ -1003,14 +1019,41 @@ global int NewPath(Unit* unit)
     //
     //	Fall back to slow complex method.
     //
+#endif
+    if( unit->Orders[0].Goal ) {
+	gw=unit->Orders[0].Goal->Type->TileWidth-1;
+	gh=unit->Orders[0].Goal->Type->TileHeight-1;
+	gx=unit->Orders[0].Goal->X;
+	gy=unit->Orders[0].Goal->Y;
+	range=unit->Orders[0].RangeX;
+	DebugCheck( unit->Orders[0].RangeX != unit->Orders[0].RangeY );
+    } else {
+	// Take care of non square goals :)
+	// If goal is non square, range states a non-existant goal rather
+	// than a tile.
+	if( unit->Orders[0].IsRect ) {
+	    gw = unit->Orders[0].RangeX;
+	    gh = unit->Orders[0].RangeY;
+	    range=0;
+	} else {
+	    gw=0;
+	    gh=0;
+	    range=unit->Orders[0].RangeX;
+	}
+	gx=unit->Orders[0].X;
+	gy=unit->Orders[0].Y;
+    }
     path = unit->Data.Move.Path;
+    i=0;
     if( AStarOn ) {
-	i=AStarFindPath(unit,x1,y1,x2,y2,path);
+	i=AStarFindPath(unit,gx,gy,gw,gh,range,path);
 	if( i == PF_FAILED ) {
 	    i = PF_UNREACHABLE;
 	}
+#if 0	
     } else {
 	i=ComplexNewPath(unit,x1,y1,x2,y2,path);
+#endif
     }
 
     // Update path if it was requested. Otherwise we may only want

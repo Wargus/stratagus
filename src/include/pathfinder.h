@@ -100,9 +100,9 @@ extern unsigned char* MakeMatrix(void);
     /// Get next element of the way to goal.
 extern int NewPath(Unit* unit);
     /// Return distance to place.
-extern int PlaceReachable(Unit* unit,int x,int y,int range);
+extern int PlaceReachable(Unit* src,int x,int y,int w, int h, int range);
     /// Return distance to unit.
-extern int UnitReachable(Unit* unit,const Unit* dest,int range);
+extern int UnitReachable(Unit* unit,Unit* dst,int range);
 
 //
 //	in astar.c
@@ -117,7 +117,7 @@ extern void InitAStar(void);
 extern void FreeAStar(void);
 
     /// Find and a* path for a unit
-extern int AStarFindPath(Unit* unit, int x1, int y1, int x2, int y2, char* path);
+extern int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int range, char* path);
 //
 //	in ccl_pathfinder.c
 //
