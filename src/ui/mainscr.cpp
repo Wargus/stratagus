@@ -181,6 +181,7 @@ global void DrawUnitInfo(const Unit* unit)
     const UnitType* type;
     const UnitStats* stats;
     int i;
+    int vpos;
     int x;
     int y;
     Unit* uins;
@@ -243,24 +244,14 @@ global void DrawUnitInfo(const Unit* unit)
     }
 
     //
-    //	Show for all players.
+    //	Show How much a resource has left for owner and neutral.
     //
-    if( type->GivesResource==GoldCost ) {
-	VideoDrawText(x+37,y+8+78,GameFont,"Gold Left:");
-	if ( !unit->Value ) {
-	    VideoDrawText(x+108,y+8+78,GameFont,"(none)");
-	} else {
-	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
-	}
-	return;
-    }
-    // Not our building and not under construction
-    if( unit->Player!=ThisPlayer
-	    || unit->Orders[0].Action!=UnitActionBuilded ) {
-	if( type->GivesResource==OilCost ) {
-	    VideoDrawText(x+47,y+8+78,GameFont,"Oil Left:");
+    if( unit->Player==ThisPlayer || unit->Player->Player==PlayerNumNeutral ) {
+	if( type->GivesResource ) {
+	    sprintf(buf,"%s Left:",DefaultResourceNames[type->GivesResource]);
+	    VideoDrawText(x+108-VideoTextLength(GameFont,buf),y+8+78,GameFont,buf);
 	    if ( !unit->Value ) {
-		VideoDrawText(x+108,y+8+78,GameFont,"(depleted)");
+		VideoDrawText(x+108,y+8+78,GameFont,"(none)");
 	    } else {
 		VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
 	    }
@@ -369,73 +360,32 @@ global void DrawUnitInfo(const Unit* unit)
 	}
     }
 
-    if( type->CanStore[GoldCost] ) {
-	VideoDrawText(x+20,y+8+61,GameFont,"Production");
-	VideoDrawText(x+43,y+8+77,GameFont,"Gold:");
-	VideoDrawNumber(x+78,y+8+77,GameFont,DefaultIncomes[GoldCost]);
-	// Keep/Stronghold, Castle/Fortress
-	if( unit->Player->Incomes[GoldCost] != DefaultIncomes[GoldCost] ) {
+    vpos=77; // Start of resource drawing
+    for(i=1; i < MaxCosts; ++i) {
+	if( type->CanStore[i] ) {
+	    if( vpos==77 ) {
+		VideoDrawText(x+20,y+8+61,GameFont,"Production");
+	    }
+	    sprintf(buf,"%s:",DefaultResourceNames[i]);
+	    VideoDrawText(x+78-VideoTextLength(GameFont,buf),y+8+vpos,GameFont,buf);
+	    VideoDrawNumber(x+78,y+8+vpos,GameFont,DefaultIncomes[i]);
+	    // Incomes have been upgraded
+	    if( unit->Player->Incomes[i] != DefaultIncomes[i] ) {
 		sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[GoldCost]-DefaultIncomes[GoldCost]);
-		VideoDrawText(x+96,y+8+77,GameFont,buf);
+		    unit->Player->Incomes[i]-DefaultIncomes[i]);
+		VideoDrawText(x+96,y+8+vpos,GameFont,buf);
+	    }
+	    sprintf(buf, "(%+.1f)", unit->Player->Revenue[i] / 1000.0);
+            VideoDrawText(x+120,y+8+vpos,GameFont,buf);
+	    vpos+=16;
 	}
-	sprintf(buf, "(%+.1f)", unit->Player->Revenue[GoldCost] / 1000.0);
-        VideoDrawText(x+120,y+8+77,GameFont,buf);
-
-	VideoDrawText(x+22,y+8+93,GameFont,"Lumber:");
-	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[WoodCost]);
-	// Lumber mill
-	if( unit->Player->Incomes[WoodCost]!=DefaultIncomes[WoodCost] ) {
-	    sprintf(buf, "~<+%i~>",
-		unit->Player->Incomes[WoodCost]-DefaultIncomes[WoodCost]);
-	    VideoDrawText(x+96,y+8+93,GameFont,buf);
-	}
-	sprintf(buf, "(%+.1f)", unit->Player->Revenue[WoodCost] / 1000.0);
-        VideoDrawText(x+120,y+8+93,GameFont,buf);
-
-	VideoDrawText(x+54,y+8+109,GameFont,"Oil:");
-	VideoDrawNumber(x+78,y+8+109,GameFont,DefaultIncomes[OilCost]);
-	if( unit->Player->Incomes[OilCost]!=DefaultIncomes[OilCost] ) {
-	    sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[OilCost]-DefaultIncomes[OilCost]);
-	    VideoDrawText(x+96,y+8+109,GameFont,buf);
-	}
-	sprintf(buf, "(%+.1f)", unit->Player->Revenue[OilCost] / 1000.0);
-        VideoDrawText(x+120,y+8+109,GameFont,buf);
+    }
+    if( vpos != 77 ) {
+	// We displayed at least one resource
 	return;
-
-   } else if (type->CanStore[WoodCost] ) {
-	VideoDrawText(x+20,y+8+78,GameFont,"Production");
-	VideoDrawText(x+22,y+8+93,GameFont,"Lumber:");
-	// I'm assuming that it will be short enough to fit in the space
-	// I'm also assuming that it won't be 100 - x
-	// and since the default is used for comparison we might as well
-	// use that in the printing too.
-	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[WoodCost]);
-
-	if( unit->Player->Incomes[WoodCost] != DefaultIncomes[WoodCost] ) {
-	    sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[WoodCost]-DefaultIncomes[WoodCost]);
-	    VideoDrawText(x+96,y+8+93,GameFont,buf);
-	}
-	sprintf(buf, "(%+.1f)", unit->Player->Revenue[WoodCost] / 1000.0);
-        VideoDrawText(x+120,y+8+93,GameFont,buf);
-	return;
-
-    } else if( type->CanStore[OilCost] ) {
-	VideoDrawText(x+20,y+8+78,GameFont,"Production");
-	VideoDrawText(x+54,y+8+93,GameFont,"Oil:");
-	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[OilCost]);
-	if( unit->Player->Incomes[OilCost]!=DefaultIncomes[OilCost] ) {
-	    sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[OilCost]-DefaultIncomes[OilCost]);
-	    VideoDrawText(x+96,y+8+93,GameFont,buf);
-	}
-	sprintf(buf, "(%+.1f)", unit->Player->Revenue[OilCost] / 1000.0);
-        VideoDrawText(x+120,y+8+93,GameFont,buf);
-	return;
-
-    } else if( type->Transporter && unit->InsideCount ) {
+    }
+    
+    if( type->Transporter && unit->InsideCount ) {
 	uins=unit->UnitInside;
 	for( i=0; i<unit->InsideCount; ++i,uins=uins->NextContained ) {
 	    DrawUnitIcon(unit->Player
