@@ -270,6 +270,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 
     unit->Wait=1;
     unit->Reset=1;
+    unit->Removed=1;
 
     unit->Rs=MyRand()%100; // used for random fancy buildings and other things
 
@@ -373,6 +374,7 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
     }
 #endif
 
+    unit->Removed=0;
     UnitCacheInsert(unit);
 
     return unit;
@@ -1330,9 +1332,10 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     int i;
     int mask;
 
+    DebugCheck( !unit->Removed );
+
     x=unit->X;
     y=unit->Y;
-    DebugLevel3("\tAdd: %d %d,%d\n",heading,addx,addy);
     mask=UnitMovementMask(unit);
 
     if( heading<LookingNE || heading>LookingNW) {
@@ -1409,6 +1412,7 @@ found:
     unit->Y=y;
     UnitCacheInsert(unit);
     // FIXME: This only works with 1x1 big units
+    DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
     TheMap.Fields[x+y*TheMap.Width].Flags|=UnitFieldFlags(unit);
 
     //unit->Orders[0].Action=UnitActionStill;
@@ -1459,6 +1463,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
     int mask;
 
     DebugLevel3Fn("%Zd\n",UnitNumber(unit));
+    DebugCheck( !unit->Removed );
 
     x=unit->X;
     y=unit->Y;
@@ -1563,12 +1568,10 @@ global void DropOutAll(const Unit* source)
 
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
-	if( !unit->Removed ) {		// unusable unit
-	    continue;
-	}
-	if( unit->X==source->X && unit->Y==source->Y ) {
+	if( unit->Removed && unit->X==source->X && unit->Y==source->Y ) {
 	    DropOutOnSide(unit,LookingW
 		    ,source->Type->TileWidth,source->Type->TileHeight);
+	    DebugCheck( unit->Orders[0].Goal );
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->Wait=unit->Reset=1;
 	    unit->SubAction=0;

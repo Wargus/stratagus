@@ -172,6 +172,7 @@ local int MineInGoldmine(Unit* unit)
 	    // FIXME: better way to fix bug
 	    unit->Removed=0;
 	    DropOutAll(mine);
+	    unit->Removed=1;
 	    DestroyUnit(mine);
 	    if( mine->Value<DEFAULT_INCOMES[GoldCost] ) {
 		// FIXME: should return 0 here?
