@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -53,15 +53,15 @@
 ----------------------------------------------------------------------------*/
 
 
-char* ClickMissile;
-char* DamageMissile;
+char* ClickMissile;              ///< FIXME:docu
+char* DamageMissile;             ///< FIXME:docu
 
 typedef struct _info_text_ {
-	char* Text;
-	int Font;
-	int X;
-	int Y;
-} InfoText;
+	char* Text;                  ///< FIXME:docu
+	int Font;                    ///< FIXME:docu
+	int X;                       ///< FIXME:docu
+	int Y;                       ///< FIXME:docu
+} InfoText;                      ///< FIXME:docu
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -1116,7 +1116,7 @@ static int CclDefineUI(lua_State* l)
 	j = 0;
 	args = lua_gettop(l);
 
-	//		Get identifier
+	// Get identifier
 	str = strdup(LuaToString(l, j + 1));
 	++j;
 	x = LuaToNumber(l, j + 1);
@@ -1153,7 +1153,7 @@ static int CclDefineUI(lua_State* l)
 	ui->Height = y;
 
 	//
-	//		Some value defaults
+	// Some value defaults
 	//
 
 	// This save the setup values FIXME: They are set by CCL.
@@ -1193,7 +1193,7 @@ static int CclDefineUI(lua_State* l)
 		ui->Resources[i].TextX = -1;
 	}
 	//
-	//		Parse the arguments, already the new tagged format.
+	// Parse the arguments, already the new tagged format.
 	//  maxy: this could be much simpler
 	//
 
@@ -2041,7 +2041,7 @@ static int CclDefineUI(lua_State* l)
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "victory-background")) {
-			//		Backgrounds
+			// Backgrounds
 			ui->VictoryBackground.File = strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "defeat-background")) {
 			ui->DefeatBackground.File = strdup(LuaToString(l, j + 1));
@@ -2325,7 +2325,7 @@ static int CclDefineMenu(lua_State* l)
 	TheUI.Offset480Y = (VideoHeight - 480) / 2;
 
 	//
-	//		Parse the arguments, already the new tagged format.
+	// Parse the arguments, already the new tagged format.
 	//
 	memset(&item, 0, sizeof(Menu));
 
@@ -2546,7 +2546,7 @@ static int CclDefineMenuItem(lua_State* l)
 	item = (Menuitem*)calloc(1, sizeof(Menuitem));
 
 	//
-	//		Parse the arguments, already the new tagged format.
+	// Parse the arguments, already the new tagged format.
 	//
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
@@ -3507,7 +3507,7 @@ static int CclDefineButton(lua_State* l)
 
 	memset(&ba, 0, sizeof(ba));
 	//
-	//		Parse the arguments
+	// Parse the arguments
 	//
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
@@ -4146,7 +4146,7 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "DefineMenuGraphics", CclDefineMenuGraphics);
 
 	//
-	//		Color cycling
+	// Color cycling
 	//
 	lua_register(Lua, "SetColorWaterCycleStart", CclSetColorWaterCycleStart);
 	lua_register(Lua, "SetColorWaterCycleEnd", CclSetColorWaterCycleEnd);
@@ -4156,13 +4156,13 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "SetColorBuildingCycleEnd", CclSetColorBuildingCycleEnd);
 
 	//
-	//		Correct named functions
+	// Correct named functions
 	//
 	lua_register(Lua, "SetDoubleClickDelay", CclSetDoubleClickDelay);
 	lua_register(Lua, "SetHoldClickDelay", CclSetHoldClickDelay);
 
 	//
-	//		Look and feel of units
+	// Look and feel of units
 	//
 	lua_register(Lua, "SetSelectionStyle", CclSetSelectionStyle);
 	lua_register(Lua, "SetShowSightRange", CclSetShowSightRange);
@@ -4171,7 +4171,7 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "SetShowOrders", CclSetShowOrders);
 
 	//
-	//		Keystroke helps
+	// Keystroke helps
 	//
 	lua_register(Lua, "ResetKeystrokeHelp", CclResetKeystrokeHelp);
 	lua_register(Lua, "AddKeystrokeHelp", CclAddKeystrokeHelp);

@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -73,21 +73,21 @@
 #endif
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**		Menu button graphics
+** Menu button graphics
 */
 MenuGraphics MenuButtonGfx;
 
 /**
-**		The currently processed menu
+** The currently processed menu
 */
 Menu* CurrentMenu;
 
 /**
-**		The background picture used by menus
+** The background picture used by menus
 */
 static Graphic* Menusbgnd;
 
@@ -95,11 +95,11 @@ static int MenuButtonUnderCursor = -1;
 static int MenuButtonCurSel = -1;
 
 /*----------------------------------------------------------------------------
---		Menu operation functions
+-- Menu operation functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	  Convert menu button style to a string for saving.
+**   Convert menu button style to a string for saving.
 */
 char* MenuButtonStyle(int style)
 {
@@ -144,11 +144,11 @@ char* MenuButtonStyle(int style)
 }
 
 /**
-**		Find a menu by ident.
+** Find a menu by ident.
 **
-**		@param menu_id		Unique identifier for the menu.
+** @param menu_id Unique identifier for the menu.
 **
-**		@return				Pointer to the menu, NULL if menu is not found.
+** @return Pointer to the menu, NULL if menu is not found.
 */
 Menu* FindMenu(const char* menu_id)
 {
@@ -162,19 +162,19 @@ Menu* FindMenu(const char* menu_id)
 }
 
 /**
-**		Draw menu button 'button' on x,y
+** Draw menu button 'button' on x,y
 **
-**		@param button		Button identifier
-**		@param flags		State of Button (clicked, mouse over...)
-**		@param transparent		State of button transparency: 0=No, 1=Yes
-**		@param w		Button width (for border)
-**		@param h		Button height (for border)
-**		@param x		X display position
-**		@param y		Y display position
-**		@param font		font number for text
-**		@param text		text to print on button
-**		@param normalcolor
-**		@param reversecolor
+** @param button         Button identifier
+** @param flags          State of Button (clicked, mouse over...)
+** @param transparent    State of button transparency: 0=No, 1=Yes
+** @param w              Button width (for border)
+** @param h              Button height (for border)
+** @param x              X display position
+** @param y              Y display position
+** @param font           font number for text
+** @param text           text to print on button
+** @param normalcolor    FIXME : docu
+** @param reversecolor   FIXME : docu
 */
 void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent, int w, int h,
 	int x, int y, const int font, const unsigned char* text,
@@ -281,11 +281,11 @@ void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent, int w,
 }
 
 /**
-**		Draw pulldown 'button' on menu mx, my
+** Draw pulldown 'button' on menu mx, my
 **
-**		@param mi		menuitem pointer
-**		@param mx		menu X display position (offset)
-**		@param my		menu Y display position (offset)
+** @param mi    menuitem pointer
+** @param mx    menu X display position (offset)
+** @param my    menu Y display position (offset)
 */
 static void DrawPulldown(Menuitem* mi, int mx, int my)
 {
@@ -532,11 +532,11 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 }
 
 /**
-**		Draw listbox 'button' on menu mx, my
+** Draw listbox 'button' on menu mx, my
 **
-**		@param mi		menuitem pointer
-**		@param mx		menu X display position (offset)
-**		@param my		menu Y display position (offset)
+** @param mi    menuitem pointer
+** @param mx    menu X display position (offset)
+** @param my    menu Y display position (offset)
 */
 static void DrawListbox(Menuitem* mi, int mx, int my)
 {
@@ -612,11 +612,11 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 }
 
 /**
-**		Draw vslider 'button' on menu mx, my
+** Draw vslider 'button' on menu mx, my
 **
-**		@param mi		menuitem pointer
-**		@param mx		menu X display position (offset)
-**		@param my		menu Y display position (offset)
+** @param mi    menuitem pointer
+** @param mx    menu X display position (offset)
+** @param my    menu Y display position (offset)
 */
 static void DrawVSlider(Menuitem* mi, int mx, int my)
 {
@@ -715,11 +715,11 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 }
 
 /**
-**		Draw hslider 'button' on menu mx, my
+** Draw hslider 'button' on menu mx, my
 **
-**		@param mi		menuitem pointer
-**		@param mx		menu X display position (offset)
-**		@param my		menu Y display position (offset)
+** @param mi    menuitem pointer
+** @param mx    menu X display position (offset)
+** @param my    menu Y display position (offset)
 */
 static void DrawHSlider(Menuitem* mi, int mx, int my)
 {
@@ -818,11 +818,11 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 }
 
 /**
-**		Draw gem 'button' on menu mx, my
+** Draw gem 'button' on menu mx, my
 **
-**		@param mi		menuitem pointer
-**		@param mx		menu X display position (offset)
-**		@param my		menu Y display position (offset)
+** @param mi    menuitem pointer
+** @param mx    menu X display position (offset)
+** @param my    menu Y display position (offset)
 */
 static void DrawGem(Menuitem* mi, int mx, int my)
 {
@@ -876,11 +876,11 @@ static void DrawGem(Menuitem* mi, int mx, int my)
 }
 
 /**
-**		Draw input 'button' on menu mx, my
+** Draw input 'button' on menu mx, my
 **
-**		@param mi		menuitem pointer
-**		@param mx		menu X display position (offset)
-**		@param my		menu Y display position (offset)
+** @param mi    menuitem pointer
+** @param mx    menu X display position (offset)
+** @param my    menu Y display position (offset)
 */
 static void DrawInput(Menuitem* mi, int mx, int my)
 {
@@ -961,7 +961,7 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 /**
 **  Draw a menu.
 **
-**  @param menu  The menu number to display (NULL allowed)
+**  @param menu    The menu number to display (NULL allowed)
 */
 void DrawMenu(Menu* menu)
 {
@@ -1075,7 +1075,7 @@ void DrawMenu(Menu* menu)
 				break;
 			case MI_TYPE_PULLDOWN:
 				if (mi->flags & MenuButtonClicked) {
-					mip = mi;		// Delay, due to possible overlaying!
+					mip = mi; // Delay, due to possible overlaying!
 				} else {
 					DrawPulldown(mi, menu->X, menu->Y);
 				}
@@ -1111,7 +1111,7 @@ void DrawMenu(Menu* menu)
 }
 
 /**
-**		Paste text from the clipboard
+** Paste text from the clipboard
 */
 static void PasteFromClipboard(Menuitem* mi)
 {
@@ -1203,13 +1203,13 @@ static void PasteFromClipboard(Menuitem* mi)
 }
 
 /**
-**		Handle keys in menu mode.
+** Handle keys in menu mode.
 **
-**		@param key		Key scancode.
-**		@param keychar		ASCII character code of key.
+** @param key        Key scancode.
+** @param keychar    ASCII character code of key.
 **
-**		@todo FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
-**	  to implement button animation (depress before action)
+** @todo FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
+**   to implement button animation (depress before action)
 */
 static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 {
@@ -1247,8 +1247,8 @@ inkey:
 					break;
 				case 9:
 					goto normkey;
-				case '~':				// ~ are quotes
-					return;				// Just ignore them
+				case '~': // ~ are quotes
+					return; // Just ignore them
 				case KeyCodeDelete:
 					mi->d.input.nch = 0;
 					strcpy(mi->d.input.buffer, "~!_");
@@ -1301,7 +1301,7 @@ normkey:
 		}
 	}
 	switch (key) {
-		case 10: case 13:						// RETURN
+		case 10: case 13: // RETURN
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
 				switch (mi->mitype) {
@@ -1423,7 +1423,7 @@ normkey:
 				}
 			}
 			break;
-		case 9:								// TAB						// FIXME: Add Shift-TAB
+		case 9: // TAB // FIXME: Add Shift-TAB
 			if (KeyModifiers & ModifierAlt) {
 				break;
 			}
@@ -1486,10 +1486,10 @@ normkey:
 }
 
 /**
-**		Handle keys in menu mode.
+** Handle keys in menu mode.
 **
-**		@param key		Key scancode.
-**		@param keychar		ASCII character code of key.
+** @param key        Key scancode.
+** @param keychar    ASCII character code of key.
 */
 static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 {
@@ -1497,10 +1497,10 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 }
 
 /**
-**		Handle keys repeated in menu mode.
+** Handle keys repeated in menu mode.
 **
-**		@param key		Key scancode.
-**		@param keychar		ASCII character code of key.
+** @param key        Key scancode.
+** @param keychar    ASCII character code of key.
 */
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
@@ -1516,10 +1516,10 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 }
 
 /**
-**		Handle movement of the cursor.
+** Handle movement of the cursor.
 **
-**		@param x		Screen X position.
-**		@param y		Screen Y position.
+** @param x    Screen X position.
+** @param y    Screen Y position.
 */
 static void MenuHandleMouseMove(int x, int y)
 {
@@ -1536,7 +1536,7 @@ static void MenuHandleMouseMove(int x, int y)
 	int oy;
 
 	ox = CursorX;
-	oy = CursorY;						// Old position for rel movement.
+	oy = CursorY; // Old position for rel movement.
 	HandleCursorMove(&x, &y);
 
 	if (CurrentMenu == NULL) {
@@ -1703,7 +1703,7 @@ static void MenuHandleMouseMove(int x, int y)
 						}
 						j = (y - ys) / 18;
 						if (j != mi->d.listbox.cursel) {
-							mi->d.listbox.cursel = j;		// just store for click
+							mi->d.listbox.cursel = j; // just store for click
 						}
 						if (mi->flags & MenuButtonClicked && mi->flags & MenuButtonActive) {
 							if (mi->d.listbox.cursel != mi->d.listbox.curopt) {
@@ -1771,7 +1771,7 @@ static void MenuHandleMouseMove(int x, int y)
 							}
 						}
 						if (mi->d.vslider.action) {
-							(*mi->d.vslider.action)(mi, 1);				// 1 indicates move
+							(*mi->d.vslider.action)(mi, 1); // 1 indicates move
 						}
 						break;
 					}
@@ -1895,9 +1895,9 @@ static void MenuHandleMouseMove(int x, int y)
 }
 
 /**
-**		Called if mouse button pressed down.
+** Called if mouse button pressed down.
 **
-**		@param b		button code
+** @param b    button code
 */
 static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 {
@@ -1941,7 +1941,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 				case MI_TYPE_VSLIDER:
 					mi->d.vslider.cflags = mi->d.vslider.cursel;
 					if (mi->d.vslider.action) {
-						(*mi->d.vslider.action)(mi, 0);				// 0 indicates down
+						(*mi->d.vslider.action)(mi, 0); // 0 indicates down
 					}
 					break;
 				case MI_TYPE_HSLIDER:
@@ -2109,9 +2109,9 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 }
 
 /**
-**		Called if mouse button released.
+** Called if mouse button released.
 **
-**		@param b		button code
+** @param b    button code
 */
 static void MenuHandleButtonUp(unsigned b)
 {
@@ -2241,10 +2241,10 @@ typedef struct _menu_stack_ {
 	struct _menu_stack_* Next;
 } MenuStack;
 
-MenuStack* Menus;
+MenuStack* Menus;             ///< FIXME : docu
 
 /**
-**		Push the current menu onto the stack.
+** Push the current menu onto the stack.
 */
 static void PushMenu(void)
 {
@@ -2258,7 +2258,7 @@ static void PushMenu(void)
 }
 
 /**
-**		Pop the stack and set the current menu
+** Pop the stack and set the current menu
 */
 static void PopMenu(void)
 {
@@ -2270,7 +2270,7 @@ static void PopMenu(void)
 		for (i = 0; i < CurrentMenu->NumItems; ++i) {
 			mi = CurrentMenu->Items + i;
 			if (mi->exitfunc) {
-				(*mi->exitfunc)(mi);				// action/destructor
+				(*mi->exitfunc)(mi); // action/destructor
 			}
 		}
 
@@ -2308,12 +2308,12 @@ void EndMenu(void)
 }
 
 /**
-**		Process a menu.
+** Process a menu.
 **
-**		@param menu_id		The menu number to process
-**		@param loop		Indicates to setup handlers and really 'Process'
+** @param menu_id The menu number to process
+** @param loop Indicates to setup handlers and really 'Process'
 **
-**		@todo FIXME: This function is called from the event handler!!
+** @todo FIXME: This function is called from the event handler!!
 */
 void ProcessMenu(const char* menu_id, int loop)
 {
@@ -2407,7 +2407,7 @@ void ProcessMenu(const char* menu_id, int loop)
 
 	if (loop) {
 		SetVideoSync();
-		MenuHandleMouseMove(CursorX,CursorY);		// This activates buttons as appropriate!
+		MenuHandleMouseMove(CursorX,CursorY); // This activates buttons as appropriate!
 	}
 
 	if (loop) {
@@ -2443,7 +2443,7 @@ void ProcessMenu(const char* menu_id, int loop)
 		for (i = 0; i < menu->NumItems; ++i) {
 			mi = menu->Items + i;
 			if (mi->exitfunc) {
-				(*mi->exitfunc)(mi);				// action/destructor
+				(*mi->exitfunc)(mi); // action/destructor
 			}
 		}
 		CurrentMenu = CurrentMenuSave;
@@ -2461,7 +2461,7 @@ void ProcessMenu(const char* menu_id, int loop)
 /**
 **  Init Menus for a specific race
 **
-**  @param race  The Race to set-up for
+**  @param race    The Race to set-up for
 */
 void InitMenus(int race)
 {
@@ -2474,7 +2474,7 @@ void InitMenus(int race)
 	InitMenuData();
 
 #ifndef USE_OPENGL
-	if (race == last_race) {		// same race? already loaded!
+	if (race == last_race) { // same race? already loaded!
 		return;
 	}
 #endif
@@ -2504,7 +2504,7 @@ void InitMenus(int race)
 }
 
 /**
-**		Exit Menus code (freeing data)
+** Exit Menus code (freeing data)
 */
 void ExitMenus(void)
 {
@@ -2513,3 +2513,5 @@ void ExitMenus(void)
 		Menusbgnd = NULL;
 	}
 }
+
+//@}

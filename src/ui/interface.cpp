@@ -67,20 +67,20 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static int SavedMapPositionX[4];     /// Saved map position X
-static int SavedMapPositionY[4];     /// Saved map position Y
-static char Input[80];               /// line input for messages/long commands
-static int InputIndex;               /// current index into input
-static char InputStatusLine[99];     /// Last input status line
-char* UiGroupKeys = "0123456789`"; /// Up to 11 keys, last unselect. Default for qwerty
-char GameRunning;            /// Current running state
-char GamePaused;             /// Current pause state
-char GameObserve;            /// Observe mode
-char SkipGameCycle;          /// Skip the next game cycle
-char BigMapMode;             /// Show only the map
-enum _iface_state_ InterfaceState; /// Current interface state
-int GodMode;                 /// Invincibility cheat
-enum _key_state_ KeyState;   /// current key state
+static int SavedMapPositionX[4];     ///< Saved map position X
+static int SavedMapPositionY[4];     ///< Saved map position Y
+static char Input[80];               ///< line input for messages/long commands
+static int InputIndex;               ///< current index into input
+static char InputStatusLine[99];     ///< Last input status line
+char* UiGroupKeys = "0123456789`";   ///< Up to 11 keys, last unselect. Default for qwerty
+char GameRunning;                    ///< Current running state
+char GamePaused;                     ///< Current pause state
+char GameObserve;                    ///< Observe mode
+char SkipGameCycle;                  ///< Skip the next game cycle
+char BigMapMode;                     ///< Show only the map
+enum _iface_state_ InterfaceState;   ///< Current interface state
+int GodMode;                         ///< Invincibility cheat
+enum _key_state_ KeyState;           ///< current key state
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -662,8 +662,8 @@ static int CommandKey(int key)
 			break;
 
 		case 'p' & 0x1F:
-		case 'p':						// If pause-key didn't work
-		case 'P':						// CTRL-P, ALT-P Toggle pause
+		case 'p': // If pause-key didn't work
+		case 'P': // CTRL-P, ALT-P Toggle pause
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
@@ -677,7 +677,7 @@ static int CommandKey(int key)
 
 		case KeyCodeF2:
 		case KeyCodeF3:
-		case KeyCodeF4:						// Set/Goto place
+		case KeyCodeF4: // Set/Goto place
 			if (KeyModifiers & ModifierShift) {
 				UiSaveMapPosition(key - KeyCodeF1);
 			} else {
@@ -686,7 +686,7 @@ static int CommandKey(int key)
 			break;
 
 		case 'm':
-		case 'M':						// ALT+M, F10 Game menu
+		case 'M': // ALT+M, F10 Game menu
 			if (KeyModifiers & ModifierControl) {
 				UiToggleMusic();
 				SavePreferences();
@@ -696,49 +696,49 @@ static int CommandKey(int key)
 				break;
 			}
 
-		case KeyCodeF5:						// Options menu
+		case KeyCodeF5: // Options menu
 			if (KeyState != KeyStateInput) {
 				UiEnterOptionsMenu();
 			}
 			break;
 
-		case KeyCodeF7:						// Sound Options menu
+		case KeyCodeF7: // Sound Options menu
 			if (KeyState != KeyStateInput) {
 				UiEnterSoundOptionsMenu();
 			}
 			break;
 
-		case KeyCodeF8:						// Speed Options menu
+		case KeyCodeF8: // Speed Options menu
 			if (KeyState != KeyStateInput) {
 				UiEnterSpeedOptionsMenu();
 			}
 			break;
 
-		case KeyCodeF9:						// Preferences menu
+		case KeyCodeF9: // Preferences menu
 			if (KeyState != KeyStateInput) {
 				UiEnterPreferencesOptionsMenu();
 			}
 			break;
 
-		case KeyCodeF10:				// Game Options menu
+		case KeyCodeF10: // Game Options menu
 			if (KeyState != KeyStateInput) {
 				UiEnterMenu();
 			}
 			break;
 
-		case '+':						// + Faster
+		case '+': // + Faster
 		case '=': // plus is shift-equals.
 		case KeyCodeKPPlus:
 			UiIncreaseGameSpeed();
 			break;
 
-		case '-':						// - Slower
+		case '-': // - Slower
 		case KeyCodeKPMinus:
 			UiDecreaseGameSpeed();
 			break;
 
 		case 'l' & 0x1F:
-		case 'l':						// ALT l F12 load game menu
+		case 'l': // ALT l F12 load game menu
 		case 'L':
 #ifdef DEBUG
 			if (KeyModifiers & ModifierControl) {// Ctrl + L - load - all debug
@@ -754,12 +754,12 @@ static int CommandKey(int key)
 			UiEnterLoadGameMenu();
 			break;
 
-		case 's' & 0x1F:						// Ctrl + S - Turn sound on / off
+		case 's' & 0x1F: // Ctrl + S - Turn sound on / off
 			UiToggleSound();
 			SavePreferences();
 			break;
 
-		case 's':						// ALT s F11 save game menu
+		case 's': // ALT s F11 save game menu
 		case 'S':
 			if (KeyModifiers & ModifierControl) {
 				UiToggleSound();
@@ -775,7 +775,7 @@ static int CommandKey(int key)
 
 		case 't' & 0x1F:
 		case 't':
-		case 'T':						// ALT-T, CTRL-T Track unit
+		case 'T': // ALT-T, CTRL-T Track unit
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
@@ -784,21 +784,21 @@ static int CommandKey(int key)
 
 		case 'b' & 0x1F:
 		case 'b':
-		case 'B':						// ALT+B, CTRL+B Toggle big map
+		case 'B': // ALT+B, CTRL+B Toggle big map
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			UiToggleBigMap();
 			break;
 
-		case 'c':						// CTRL+C,ALT+C, C center on units
+		case 'c': // CTRL+C,ALT+C, C center on units
 		case 'C':
 			UiCenterOnSelected();
 			break;
 
 		case 'f' & 0x1F:
 		case 'f':
-		case 'F':						// ALT+F, CTRL+F toggle fullscreen
+		case 'F': // ALT+F, CTRL+F toggle fullscreen
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
@@ -808,7 +808,7 @@ static int CommandKey(int key)
 
 		case 'g' & 0x1F:
 		case 'g':
-		case 'G':						// ALT+G, CTRL+G grab mouse pointer
+		case 'G': // ALT+G, CTRL+G grab mouse pointer
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
@@ -817,20 +817,20 @@ static int CommandKey(int key)
 
 		case 'h' & 0x1F:
 		case 'h':
-		case 'H':						// ALT+H, CTRL+H Help menu
+		case 'H': // ALT+H, CTRL+H Help menu
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			UiEnterHelpMenu();
 			break;
 
-		case ' ':						// center on last action
+		case ' ': // center on last action
 			CenterOnMessage();
 			break;
 
-		case '\t':						// TAB toggles minimap.
-										// FIXME: more...
-										// FIXME: shift+TAB
+		case '\t': // TAB toggles minimap.
+					// FIXME: more...
+					// FIXME: shift+TAB
 			if (KeyModifiers & ModifierAlt) {
 				break;
 			}
@@ -839,7 +839,7 @@ static int CommandKey(int key)
 
 		case 'x' & 0x1F:
 		case 'x':
-		case 'X':						// ALT+X, CTRL+X: Exit game
+		case 'X': // ALT+X, CTRL+X: Exit game
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
@@ -848,7 +848,7 @@ static int CommandKey(int key)
 
 		case 'q' & 0x1F:
 		case 'q':
-		case 'Q':						// ALT+Q, CTRL+Q: Quit level
+		case 'Q': // ALT+Q, CTRL+Q: Quit level
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
@@ -857,7 +857,7 @@ static int CommandKey(int key)
 
 		case 'r' & 0x1F:
 		case 'r':
-		case 'R':						// ALT+R, CTRL+R: Restart scenario
+		case 'R': // ALT+R, CTRL+R: Restart scenario
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
@@ -870,11 +870,11 @@ static int CommandKey(int key)
 				break;
 			}
 			// FALL THROUGH
-		case '.':						// ., ALT+I, CTRL+I: Find idle worker
+		case '.': // ., ALT+I, CTRL+I: Find idle worker
 			UiFindIdleWorker();
 			break;
 
-		case 'v':						// ALT+v CTRL+V: Viewport
+		case 'v': // ALT+v CTRL+V: Viewport
 			if (KeyModifiers & ModifierControl) {
 				CycleViewportMode(-1);
 			} else {
@@ -1118,7 +1118,7 @@ int HandleKeyModifiersDown(unsigned key, unsigned keychar
 			KeyModifiers |= ModifierAlt;
 			// maxy: disabled
 			if (InterfaceState == IfaceStateNormal) {
-				SelectedUnitChanged();		// VLADI: to allow alt-buttons
+				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
 			return 1;
 		case KeyCodeSuper:
@@ -1354,8 +1354,8 @@ void HandleButtonDown(unsigned button)
 /**
 **  Called if mouse button released.
 **
-**  FIXME: the mouse handling should be complete rewritten
-**  FIXME: this is needed for double click, long click,...
+**  @todo FIXME: the mouse handling should be complete rewritten
+**  @todo FIXME: this is needed for double click, long click,...
 **
 **  @param button  Mouse button number (0 left, 1 middle, 2 right)
 */
@@ -1368,19 +1368,19 @@ void HandleButtonUp(unsigned button)
 --  Lowlevel input functions
 ----------------------------------------------------------------------------*/
 
-int DoubleClickDelay = 300;      /// Time to detect double clicks.
-int HoldClickDelay = 1000;       /// Time to detect hold clicks.
+int DoubleClickDelay = 300;             ///< Time to detect double clicks.
+int HoldClickDelay = 1000;              ///< Time to detect hold clicks.
 
 static enum {
-	InitialMouseState,                  /// start state
-	ClickedMouseState,                  /// button is clicked
-} MouseState;                           /// Current state of mouse
+	InitialMouseState,                  ///< start state
+	ClickedMouseState,                  ///< button is clicked
+} MouseState;                           ///< Current state of mouse
 
-static int MouseX;                       /// Last mouse X position
-static int MouseY;                       /// Last mouse Y position
-static unsigned LastMouseButton;         /// last mouse button handled
-static unsigned StartMouseTicks;         /// Ticks of first click
-static unsigned LastMouseTicks;          /// Ticks of last mouse event
+static int MouseX;                       ///< Last mouse X position
+static int MouseY;                       ///< Last mouse Y position
+static unsigned LastMouseButton;         ///< last mouse button handled
+static unsigned StartMouseTicks;         ///< Ticks of first click
+static unsigned LastMouseTicks;          ///< Ticks of last mouse event
 
 /**
 **  Called if any mouse button is pressed down
@@ -1515,12 +1515,12 @@ void InputMouseTimeout(const EventCallback* callbacks, unsigned ticks)
 }
 
 
-static int HoldKeyDelay = 250;               /// Time to detect hold key
-static int HoldKeyAdditionalDelay = 50;      /// Time to detect additional hold key
+static int HoldKeyDelay = 250;               ///< Time to detect hold key
+static int HoldKeyAdditionalDelay = 50;      ///< Time to detect additional hold key
 
-static unsigned LastIKey;                    /// last key handled
-static unsigned LastIKeyChar;                /// last keychar handled
-static unsigned LastKeyTicks;                /// Ticks of last key
+static unsigned LastIKey;                    ///< last key handled
+static unsigned LastIKeyChar;                ///< last keychar handled
+static unsigned LastKeyTicks;                ///< Ticks of last key
 
 /**
 **  Handle keyboard key press.

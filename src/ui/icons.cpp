@@ -56,17 +56,17 @@
 */
 char** IconWcNames;
 
-static Icon** Icons;                         /// Table of all icons.
-static int NumIcons;                         /// Number of icons in Icons.
+static Icon** Icons;                         ///< Table of all icons.
+static int NumIcons;                         ///< Number of icons in Icons.
 
-static char** IconAliases;                   /// Table of all aliases for icons.
-static int NumIconAliases;                   /// Number of icons aliases in Aliases.
+static char** IconAliases;                   ///< Table of all aliases for icons.
+static int NumIconAliases;                   ///< Number of icons aliases in Aliases.
 
-#ifdef DOXYGEN                              // no real code, only for document
+#ifdef DOXYGEN // no real code, only for document
 
-static IconFile* IconFileHash[61];           /// lookup table for icon file names
+static IconFile* IconFileHash[61];           ///< lookup table for icon file names
 
-static Icon* IconHash[61];                   /// lookup table for icon names
+static Icon* IconHash[61];                   ///< lookup table for icon names
 
 #else
 
