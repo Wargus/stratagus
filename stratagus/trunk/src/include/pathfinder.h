@@ -32,6 +32,10 @@
 
 /**
 **	Result codes of the pathfinder.
+**
+**	@todo
+**		Another idea is	SINT_MAX as reached, SINT_MIN as unreachable
+**		stop others how far to goal.
 */
 enum _move_return_ {
     PF_UNREACHABLE=-2,			/// Unreachable stop
@@ -43,30 +47,21 @@ enum _move_return_ {
 /**
 **	To remove pathfinder internals. Called if path destination changed.
 */
-#ifdef NEW_ORDERS
-#define ResetPath(command) // Hope I didn't need this?
-
 #define NewResetPath(unit) \
     do { unit->Data.Move.Fast=1; unit->Data.Move.Length=0; }while( 0 )
-
-#else
-
-#define ResetPath(command) ((command).Data.Move.Fast=1)
-
-#endif
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+2)];  /// Path matrix
-
-extern int AStarOn; /// are we using a* or the old path finder
-extern int AStarFixedUnitCrossingCost; /// cost associated to move on a tile
-                                       /// occupied by a fixed unit
-extern int AStarMovingUnitCrossingCost; /// cost associated to move on a tile
-                                        /// occupied by a moving unit
-
+    /// Path matrix
+extern unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+2)];
+    /// are we using A* or the old path finder
+extern int AStarOn;
+    /// cost associated to move on a tile occupied by a fixed unit
+extern int AStarFixedUnitCrossingCost;
+    /// cost associated to move on a tile occupied by a moving unit
+extern int AStarMovingUnitCrossingCost;
 
 /*----------------------------------------------------------------------------
 --	Functions
