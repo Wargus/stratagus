@@ -283,7 +283,7 @@ local void UiToggleSound(void)
 /**
 **	Toggle pause on / off.
 */
-local void UiTogglePause(void)
+global void UiTogglePause(void)
 {
     GamePaused^=1;
     if(GamePaused) {
