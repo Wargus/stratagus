@@ -10,3 +10,5 @@ srcdoc
 .gdbinit
 obj
 freeceaft.vpj
+stderr.txt
+stdout.txt
