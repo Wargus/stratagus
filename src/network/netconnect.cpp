@@ -173,7 +173,7 @@ local const char *icmsgsubtypenames[] = {
 **	@param msg	The message to send
 **	@param msecs	microseconds to delay
 */
-local void NetworkSendRateLimitedClientMessage(InitMessage * msg, long msecs)
+local void NetworkSendRateLimitedClientMessage(InitMessage * msg, unsigned long msecs)
 {
     unsigned long now;
     int n;
@@ -400,7 +400,8 @@ global void NetworkServerStartGame(void)
 		if (Hosts[j].PlyNr) {
 		    DebugLevel0Fn("Compact: Hosts %d -> Hosts %d\n" _C_ j _C_ i);
 		    Hosts[i] = Hosts[j];
-		    Hosts[j].PlyNr = Hosts[j].Host = Hosts[j].Port = 0;
+		    Hosts[j].PlyNr = 0;
+		    Hosts[j].Host = Hosts[j].Port = 0;
 		    n = LocalSetupState.CompOpt[i];
 		    LocalSetupState.CompOpt[i] = LocalSetupState.CompOpt[j];
 		    LocalSetupState.CompOpt[j] = n;
