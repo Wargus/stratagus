@@ -169,6 +169,7 @@ extern void StopMusic(void);
 
 #define SoundOff	1		/// Dummy macro for without sound
 #define PlayingMusic	1		/// Dummy macro for without sound
+#define CurrentMusicFile ""		/// Dummy macro for without sound
 
 #define PlayUnitSound(u,g)		/// Dummy macro for without sound
 #define PlayMissileSound(s,v)		/// Dummy macro for without sound
