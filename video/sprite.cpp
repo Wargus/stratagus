@@ -1650,6 +1650,13 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
     DebugCheck( width>graphic->Width || height>graphic->Height );
     depth=8;
 
+    if(((graphic->Width/width)*width!=graphic->Width)
+       || ((graphic->Height/height)*height!=graphic->Height) ){
+      fprintf(stderr,"Invalid graphic (width, height) %s\n",name);
+      fprintf(stderr,"Expected: (%d,%d)  Found: (%d,%d)",
+	      width,height,graphic->Width,graphic->Height);
+    }
+       
     // Check if width and height fits.
     DebugCheck( ((graphic->Width/width)*width!=graphic->Width)
 	    || ((graphic->Height/height)*height!=graphic->Height) );
