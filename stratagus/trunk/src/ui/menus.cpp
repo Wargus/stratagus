@@ -1777,6 +1777,9 @@ local void SetMasterPower(Menuitem *mi)
 	SoundFildes=-1;
     } else {
 	InitSound();
+	MapUnitSounds();
+	InitSoundServer();
+	SoundOff=0;
     }
 #else 
     if (SoundFildes != -1) {
@@ -1784,6 +1787,8 @@ local void SetMasterPower(Menuitem *mi)
         SoundFildes=-1;
     } else {
 	InitSound();
+	MapUnitSounds();
+	InitSoundServer();
 	SoundOff=0;
     }
 #endif 				
