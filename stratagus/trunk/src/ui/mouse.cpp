@@ -205,8 +205,8 @@ global void DoRightButton(int sx, int sy)
 			SendCommandReturnGoods(unit, dest, flush);
 			continue;
 		    } 
-		    //  Go and harvest from an building
-		    if ((res=dest->Type->GivesResource) &&
+		    //  Go and harvest from a building
+		    if ((res = dest->Type->GivesResource) &&
 			    (unit->Type->ResInfo[res]) &&
 			    (unit->Value < unit->Type->ResInfo[res]->ResourceCapacity) &&
 			    (dest->Type->CanHarvest) &&
