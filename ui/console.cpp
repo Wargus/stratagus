@@ -40,7 +40,7 @@
 */
 global void DrawConsole(void)
 {
-    DebugLevel0(__FUNCTION__"\n");
+    DebugLevel3(__FUNCTION__"\n");
 }
 
 #endif
