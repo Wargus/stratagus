@@ -212,6 +212,10 @@ typedef struct _ui_ {
     int		CompleteBarColor;	/// color for complete bar
     int		CompleteBarX;		/// complete bar X position
     int		CompleteBarY;		/// complete bar Y position
+    int		CompleteBarW;		/// complete bar width
+    int		CompleteBarH;		/// complete bar height
+    char*	CompleteBarText;	/// complete bar text
+    unsigned	CompleteBarFont;	/// complete bar font
     int		CompleteTextX;		/// complete text X position
     int		CompleteTextY;		/// complete text Y position
 

@@ -10,7 +10,7 @@
 //
 /**@name font.h		-	The font headerfile. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -128,6 +128,12 @@ enum _game_font_ {
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
+/**
+**	Font names
+**	FIXME: should use the names of the real fonts.
+*/
+extern char *FontNames[];
 
 /*----------------------------------------------------------------------------
 --	Functions
