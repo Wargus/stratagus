@@ -103,7 +103,7 @@ local char** ShownUnitTypes;		/// Shown editor unit-type table
 local int MaxShownUnits;		/// Max unit icon draw index
 local char ShowUnitsToSelect;		/// Show units in unit list
 local char ShowBuildingsToSelect;	/// Show buildings in unit list
-local char ShowHeroesToSelect;		/// Show heroes in unit list
+//local char ShowHeroesToSelect;		/// Show heroes in unit list
 local char ShowAirToSelect;		/// Show air units in unit list
 local char ShowLandToSelect;		/// Show land units in unit list
 local char ShowWaterToSelect;		/// Show water units in unit list
@@ -376,9 +376,9 @@ local void RecalculateShownUnits(void)
 	if (!type->Building && !ShowUnitsToSelect) {
 	    continue;
 	}
-	if (type->Hero && !ShowHeroesToSelect) {
-	    continue;
-	}
+//	if (type->Hero && !ShowHeroesToSelect) {
+//	    continue;
+//	}
 	if (type->UnitType == UnitTypeLand && !ShowLandToSelect) {
 	    continue;
 	}
@@ -567,9 +567,9 @@ local void DrawUnitIcons(void)
     VideoDraw(MenuButtonGfx.Sprite,
 	MBUTTON_GEM_SQUARE + (ShowBuildingsToSelect ? 2 : 0), x + 28 * 1,
 	y + 16);
-    VideoDrawText(x + 28 * 2, y, GameFont, "He");
-    VideoDraw(MenuButtonGfx.Sprite,
-	MBUTTON_GEM_SQUARE + (ShowHeroesToSelect ? 2 : 0), x + 28 * 2, y + 16);
+//    VideoDrawText(x + 28 * 2, y, GameFont, "He");
+//    VideoDraw(MenuButtonGfx.Sprite,
+//	MBUTTON_GEM_SQUARE + (ShowHeroesToSelect ? 2 : 0), x + 28 * 2, y + 16);
     VideoDrawText(x + 28 * 3, y, GameFont, "La");
     VideoDraw(MenuButtonGfx.Sprite,
 	MBUTTON_GEM_SQUARE + (ShowLandToSelect ? 2 : 0), x + 28 * 3, y + 16);
@@ -1162,14 +1162,14 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	    RecalculateShownUnits();
 	    return;
 	}
-	if (TheUI.InfoPanelX + 10 + 28 * 2 < CursorX &&
-		CursorX < TheUI.InfoPanelX + 10 + 28 * 3 &&
-		TheUI.InfoPanelY + 140 < CursorY &&
-		CursorY < TheUI.InfoPanelY + 140 + 28) {
-	    ShowHeroesToSelect ^= 1;
-	    RecalculateShownUnits();
-	    return;
-	}
+//	if (TheUI.InfoPanelX + 10 + 28 * 2 < CursorX &&
+//		CursorX < TheUI.InfoPanelX + 10 + 28 * 3 &&
+//		TheUI.InfoPanelY + 140 < CursorY &&
+//		CursorY < TheUI.InfoPanelY + 140 + 28) {
+//	    ShowHeroesToSelect ^= 1;
+//	    RecalculateShownUnits();
+//	    return;
+//	}
 	if (TheUI.InfoPanelX + 10 + 28 * 3 < CursorX &&
 		CursorX < TheUI.InfoPanelX + 10 + 28 * 4 &&
 		TheUI.InfoPanelY + 140 < CursorY &&
@@ -1924,7 +1924,7 @@ local void CreateEditor(void)
 
     ShowUnitsToSelect = 1;		// Show all units as default
     ShowBuildingsToSelect = 1;
-    ShowHeroesToSelect = 1;
+//    ShowHeroesToSelect = 1;
     ShowAirToSelect = 1;
     ShowLandToSelect = 1;
     ShowWaterToSelect = 1;

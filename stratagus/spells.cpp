@@ -209,6 +209,64 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
     return 0;
 }
 
+/**
+**	Cast Area Adjust Vitals on all valid units in range.
+**
+**	@param caster	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+global int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
+    const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
+{
+    Unit* units[UnitMax];
+    int nunits;
+    int j;
+    int hp;
+    int mana;
+
+    DebugCheck(!caster);
+    DebugCheck(!spell);
+    DebugCheck(!action);
+    // Get all the units around the unit
+    nunits = SelectUnits(x - spell->Range,
+	y - spell->Range,
+	x + spell->Range + caster->Type->Width,
+	y + spell->Range + caster->Type->Height,
+	units);
+    hp = action->Data.AreaAdjustVitals.HP;
+    mana = action->Data.AreaAdjustVitals.Mana;
+    caster->Mana -= spell->ManaCost;
+    for (j = 0; j < nunits; ++j) {
+        target = units[j];
+//	if (!PassCondition(caster, spell, target, x, y) {
+	if (!CanCastSpell(caster, spell, target, x, y)) {
+	    continue;
+	}
+        if (hp < 0) {
+	    HitUnit(caster, target, hp);
+        } else {
+	    target->HP += hp;
+	    if (target->HP > target->Stats->HitPoints) {
+	        target->HP = target->Stats->HitPoints;
+	    }
+        }
+        target->Mana += mana;
+        if (target->Mana < 0) {
+	    target->Mana = 0;
+        }
+        if (target->Mana > target->Type->_MaxMana) {
+	    target->Mana = target->Type->_MaxMana;
+        }
+    }
+    return 0;
+}
+
+
 //	AreaBombardment
 //   NOTE: vladi: blizzard differs than original in this way:
 //   original: launches 50 shards at 5 random spots x 10 for 25 mana.
@@ -697,6 +755,7 @@ local Target* NewTargetPosition(int x, int y)
 local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* target,
     int x, int y, const ConditionInfo* condition)
 {
+    int i;
     //
     //	Check caster mana. FIXME: move somewhere else?
     //
@@ -717,16 +776,16 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
     //	Now check conditions regarding the target unit.
     //
     if (target) {
-	if (condition->Undead != CONDITION_TRUE) {
-	    if ((condition->Undead == CONDITION_ONLY) ^ (target->Type->IsUndead)) {
-		return 0;
-	    }
-	}
-	if (condition->Organic != CONDITION_TRUE) {
-	    if ((condition->Organic == CONDITION_ONLY) ^ (target->Type->Organic)) {
-		return 0;
-	    }
-	}
+//	if (condition->Undead != CONDITION_TRUE) {
+//	    if ((condition->Undead == CONDITION_ONLY) ^ (target->Type->IsUndead)) {
+//		return 0;
+//	    }
+//	}
+//	if (condition->Organic != CONDITION_TRUE) {
+//	    if ((condition->Organic == CONDITION_ONLY) ^ (target->Type->Organic)) {
+//		return 0;
+//	    }
+//	}
 	if (condition->Volatile != CONDITION_TRUE) {
 	    if ((condition->Volatile == CONDITION_ONLY) ^ (target->Type->Volatile)) {
 		return 0;
@@ -737,15 +796,22 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 		return 0;
 	    }
 	}
-	if (condition->Hero != CONDITION_TRUE) {
-	    if ((condition->Hero == CONDITION_ONLY) ^ (target->Type->Hero)) {
-		return 0;
-	    }
-	}
+//	if (condition->Hero != CONDITION_TRUE) {
+//	    if ((condition->Hero == CONDITION_ONLY) ^ (target->Type->Hero)) {
+//		return 0;
+//	    }
+//	}
 	if (condition->Coward != CONDITION_TRUE) {
 	    if ((condition->Coward == CONDITION_ONLY) ^ (target->Type->Coward)) {
 		return 0;
 	    }
+	}
+        for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
+            if (condition->BoolFlag[i] != CONDITION_TRUE) {
+                if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
+                    return 0;
+                }
+            }
 	}
 	if (condition->Alliance != CONDITION_TRUE) {
 	    if ((condition->Alliance == CONDITION_ONLY) ^ 
@@ -1184,6 +1250,7 @@ void CleanSpells(void)
 	free(spell->Name);
 	free(spell->Action);
 	if (spell->Condition) {
+	    free(spell->Condition->BoolFlag);
 	    free(spell->Condition);
 	}
 	//
@@ -1191,12 +1258,14 @@ void CleanSpells(void)
 	//
 	if (spell->AutoCast) {
 	    if (spell->AutoCast->Condition) {
+	        free(spell->AutoCast->Condition->BoolFlag);
 		free(spell->AutoCast->Condition);
 	    }
 	    free(spell->AutoCast);
 	}
 	if (spell->AICast) {
 	    if (spell->AICast->Condition) {
+	        free(spell->AICast->Condition->BoolFlag);
 		free(spell->AICast->Condition);
 	    }
 	    free(spell->AICast);
