@@ -72,7 +72,6 @@ local int WavReadStream(Sample *sample, void *buf, int len)
     int brratio;
     int samplesize;	// number of bytes per sample
     int divide;
-    int i;
 
     data = (WavData*) sample->User;
 
