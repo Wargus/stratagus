@@ -461,12 +461,6 @@ extern char* TitleMusic;		/// File for title music
 extern char* MenuMusic;			/// File for menu music
 extern char* FreeCraftLibPath;		/// Location of freecraft data
 
-extern int SpeedMine;			/// Speed factor for mine gold
-extern int SpeedGold;			/// Speed factor for getting gold
-extern int SpeedChop;			/// Speed factor for chop
-extern int SpeedWood;			/// Speed factor for getting wood
-extern int SpeedHaul;			/// Speed factor for haul oil
-extern int SpeedOil;			/// Speed factor for getting oil
 extern int SpeedBuild;			/// Speed factor for building
 extern int SpeedTrain;			/// Speed factor for training
 extern int SpeedUpgrade;		/// Speed factor for upgrading
@@ -532,17 +526,17 @@ extern long isqrt(long num);
     // FIXME: more config stuff which needs a better place
 
     /// How long stay in a gold-mine
-#define MINE_FOR_GOLD	(UnitTypeGoldMine->_Costs[TimeCost]/SpeedMine)
+#define MINE_FOR_GOLD	(UnitTypeGoldMine->_Costs[TimeCost]/SpeedResourcesHarvest[GoldCost])
     /// How long stay in a gold-deposit
-#define WAIT_FOR_GOLD	(UnitTypeGoldMine->_Costs[TimeCost]/SpeedGold)
+#define WAIT_FOR_GOLD	(UnitTypeGoldMine->_Costs[TimeCost]/SpeedResourcesReturn[GoldCost])
     /// How much I must chop for 1 wood
-#define CHOP_FOR_WOOD	(52/SpeedChop)
+#define CHOP_FOR_WOOD	(52/SpeedResourcesHarvest[WoodCost])
     /// How long stay in a wood-deposit
-#define WAIT_FOR_WOOD	(100/SpeedWood)
+#define WAIT_FOR_WOOD	(100/SpeedResourcesReturn[WoodCost])
     /// How long stay in a oil-well
-#define HAUL_FOR_OIL	(100/SpeedHaul)
+#define HAUL_FOR_OIL	(100/SpeedResourcesHarvest[OilCost])
     /// How long stay in a oil-deposit
-#define WAIT_FOR_OIL	(100/SpeedOil)
+#define WAIT_FOR_OIL	(100/SpeedResourcesReturn[OilCost])
 
     /// How many resource get the player back if canceling building
 #define CancelBuildingCostsFactor	75

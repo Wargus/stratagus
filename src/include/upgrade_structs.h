@@ -10,7 +10,8 @@
 //
 /**@name upgrade_structs.h	-	The upgrade/allow headerfile. */
 //
-//	(c) Copyright 1999-2002 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski and
+//	                           Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -60,6 +61,16 @@ enum _costs_ {
 
     MaxCosts				/// how many different costs
 };
+
+/**
+**	Speed factor for harvesting resources
+*/
+extern int SpeedResourcesHarvest[MaxCosts];
+
+/**
+**	Speed factor for returning resources
+*/
+extern int SpeedResourcesReturn[MaxCosts];
 
 /**
 **	Default resources for a new player.
