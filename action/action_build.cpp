@@ -93,13 +93,12 @@ static void MoveToLocation(Unit* unit)
 	// First entry
 	if (!unit->SubAction) {
 		unit->SubAction = 1;
-		unit->Data.Build.Wait = 0;
 		NewResetPath(unit);
 	}
 
-	if (unit->Data.Build.Wait) {
+	if (unit->Wait) {
 		// FIXME: show still animation while we wait?
-		unit->Data.Build.Wait--;
+		unit->Wait--;
 		return;
 	}
 
@@ -111,7 +110,7 @@ static void MoveToLocation(Unit* unit)
 			if (unit->SubAction++ < 10) {
 				// To keep the load low, retry each 1/4 second.
 				// NOTE: we can already inform the AI about this problem?
-				unit->Data.Build.Wait = CYCLES_PER_SECOND / 4 + unit->SubAction;
+				unit->Wait = CYCLES_PER_SECOND / 4 + unit->SubAction;
 				return;
 			}
 
@@ -148,9 +147,9 @@ static Unit* CheckCanBuild(Unit* unit)
 	UnitType* type;
 	Unit* ontop;
 
-	if (unit->Data.Build.Wait) {
+	if (unit->Wait) {
 		// FIXME: show still animation while we wait?
-		unit->Data.Build.Wait--;
+		unit->Wait--;
 		return NULL;
 	}
 
@@ -169,7 +168,7 @@ static Unit* CheckCanBuild(Unit* unit)
 		if (unit->SubAction++ < 30) {
 			// To keep the load low, retry each 10 cycles
 			// NOTE: we can already inform the AI about this problem?
-			unit->Data.Build.Wait = 10;
+			unit->Wait = 10;
 			return NULL;
 		}
 

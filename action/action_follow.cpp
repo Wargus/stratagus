@@ -62,11 +62,6 @@ void HandleActionFollow(Unit* unit)
 {
 	Unit* goal;
 
-	if (unit->Data.Follow.Wait) {
-		unit->Data.Follow.Wait--;
-		return;
-	}
-
 	//
 	// Reached target
 	//
@@ -102,7 +97,7 @@ void HandleActionFollow(Unit* unit)
 #else
 		// FIXME: Unit doesn't animate.
 		if ((goal->X == unit->Orders[0].X && goal->Y == unit->Orders[0].Y)) {
-			unit->Data.Follow.Wait = 10;
+			unit->Wait = 10;
 			if (unit->Orders[0].Range > 1) {
 				unit->Orders[0].Range = 1;
 				unit->SubAction = 0;
@@ -115,7 +110,6 @@ void HandleActionFollow(Unit* unit)
 
 	if (!unit->SubAction) { // first entry
 		unit->SubAction = 1;
-		unit->Data.Follow.Wait = 0;
 		NewResetPath(unit);
 		Assert(unit->State == 0);
 	}

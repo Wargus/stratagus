@@ -87,8 +87,8 @@ static int WaitForTransporter(Unit* unit)
 {
 	Unit* trans;
 
-	if (unit->Data.Board.Wait) {
-		unit->Data.Board.Wait--;
+	if (unit->Wait) {
+		unit->Wait--;
 		return 0;
 	}
 
@@ -96,7 +96,7 @@ static int WaitForTransporter(Unit* unit)
 
 	if (!trans || !CanTransport(trans, unit)) {
 		// FIXME: destination destroyed??
-		unit->Data.Board.Wait = 6;
+		unit->Wait = 6;
 		return 0;
 	}
 
@@ -104,7 +104,7 @@ static int WaitForTransporter(Unit* unit)
 		DebugPrint("Transporter Gone\n");
 		RefsDecrease(trans);
 		unit->Orders[0].Goal = NoUnitP;
-		unit->Data.Board.Wait = 6;
+		unit->Wait = 6;
 		return 0;
 	}
 
@@ -122,11 +122,10 @@ static int WaitForTransporter(Unit* unit)
 	// is not there. The unit searches with a big range, so it thinks
 	// it's there. This is why we reset the search. The transporter
 	// should be a lot closer now, so it's not as bad as it seems.
-	NewResetPath(unit);
-	unit->SubAction = 1;
+	unit->SubAction = 0;
 	unit->Orders[0].Range = 1;
 	// Uhh wait a bit.
-	unit->Data.Board.Wait = 10;
+	unit->Wait = 10;
 
 	return 0;
 }
@@ -189,12 +188,6 @@ void HandleActionBoard(Unit* unit)
 	int i;
 	Unit* goal;
 
-	if (!unit->SubAction) {
-		unit->Data.Board.Wait = 0;
-		NewResetPath(unit);
-		unit->SubAction = 1;
-	}
-
 	switch (unit->SubAction) {
 		//
 		// Wait for transporter
@@ -215,6 +208,14 @@ void HandleActionBoard(Unit* unit)
 		//
 		// Move to transporter
 		//
+		case 0:
+			if (unit->Wait) {
+				unit->Wait--;
+				return;
+			}
+			NewResetPath(unit);
+			unit->SubAction = 1;
+			// FALL THROUGH
 		default:
 			if (unit->SubAction <= 200) {
 				// FIXME: if near transporter wait for enter
