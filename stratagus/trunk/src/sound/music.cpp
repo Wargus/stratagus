@@ -242,6 +242,11 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 */
 global int PlayCDRom(int name)
 {
+    if (name == CDModeOff) {
+	CDMode = CDModeOff;
+	return 1;
+    }
+
     // Old mode off, starting cdrom play.
     if (CDMode == CDModeOff) {
         if (SDL_Init(SDL_INIT_CDROM) < 0) {
@@ -297,6 +302,11 @@ global int PlayCDRom(int name)
 {
     int i;
     int data_cd;
+
+    if (name == CDModeOff) {
+	CDMode = CDModeOff;
+	return 1;
+    }
 
     if (CDMode == CDModeOff) {
         if (cd_init()) {
@@ -372,6 +382,11 @@ global int PlayCDRom(int name)
 {
     int i;
     Sample *sample;
+
+    if (name == CDModeOff) {
+	CDMode = CDModeOff;
+	return 1;
+    }
 
     if (CDMode == CDModeOff) {
 	CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
