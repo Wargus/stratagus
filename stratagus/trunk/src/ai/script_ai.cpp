@@ -1067,7 +1067,7 @@ static int CclAiDump(lua_State* l)
 	// Building queue
 	//
 	printf("Building queue:\n");
-	for (queue = AiPlayer->UnitTypeBuilded; queue; queue = queue->Next) {
+	for (queue = AiPlayer->UnitTypeBuilt; queue; queue = queue->Next) {
 		printf("%s(%d/%d) ", queue->Type->Ident, queue->Made, queue->Want);
 	}
 	printf("\n");
@@ -1522,7 +1522,7 @@ static int CclDefineAiPlayer(lua_State* l)
 				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
-			queue = &ai->UnitTypeBuilded;
+			queue = &ai->UnitTypeBuilt;
 			for (k = 0; k < subargs; ++k) {
 				const char* ident;
 				int made;

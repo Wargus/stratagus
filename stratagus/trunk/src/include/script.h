@@ -128,7 +128,7 @@ typedef enum {
 	UnitRefItSelf = 0,      ///< unit.
 	UnitRefInside,          ///< unit->Inside.
 	UnitRefContainer,       ///< Unit->Container.
-	UnitRefWorker,          ///< unit->Data.Builded.Worker
+	UnitRefWorker,          ///< unit->Data.Built.Worker
 	UnitRefGoal,            ///< unit->Goal
 } EnumUnit;
 

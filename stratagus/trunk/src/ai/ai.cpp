@@ -222,7 +222,7 @@ static void AiCheckUnits(void)
 	//
 	//  Count the already made build requests.
 	//
-	for (queue = AiPlayer->UnitTypeBuilded; queue; queue = queue->Next) {
+	for (queue = AiPlayer->UnitTypeBuilt; queue; queue = queue->Next) {
 		counter[queue->Type->Slot] += queue->Want;
 	}
 
@@ -776,7 +776,7 @@ static void SaveAiPlayer(CLFile* file, int plynr, PlayerAi* ai)
 	//  Building queue
 	//
 	CLprintf(file, "  \"building\", {");
-	for (queue = ai->UnitTypeBuilded; queue; queue = queue->Next) {
+	for (queue = ai->UnitTypeBuilt; queue; queue = queue->Next) {
 		CLprintf(file, "\"%s\", %d, %d, ", queue->Type->Ident, queue->Made, queue->Want);
 	}
 	CLprintf(file, "},\n");
@@ -960,9 +960,9 @@ void CleanAi(void)
 			//
 			free(pai->ResearchRequests);
 			//
-			//  Free UnitTypeBuilded
+			//  Free UnitTypeBuilt
 			//
-			for (queue = pai->UnitTypeBuilded; queue; queue = temp) {
+			for (queue = pai->UnitTypeBuilt; queue; queue = temp) {
 				temp = queue->Next;
 				free(queue);
 			}
@@ -1061,7 +1061,7 @@ void CleanAi(void)
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-static int AiRemoveFromBuilded2(PlayerAi* pai, const UnitType* type)
+static int AiRemoveFromBuilt2(PlayerAi* pai, const UnitType* type)
 {
 	AiBuildQueue** queue;
 	AiBuildQueue* next;
@@ -1069,7 +1069,7 @@ static int AiRemoveFromBuilded2(PlayerAi* pai, const UnitType* type)
 	//
 	//  Search the unit-type order.
 	//
-	for (queue = &pai->UnitTypeBuilded; (next = *queue); queue = &next->Next) {
+	for (queue = &pai->UnitTypeBuilt; (next = *queue); queue = &next->Next) {
 		Assert(next->Want);
 		if (type == next->Type && next->Made) {
 			--next->Made;
@@ -1089,13 +1089,13 @@ static int AiRemoveFromBuilded2(PlayerAi* pai, const UnitType* type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiRemoveFromBuilded(PlayerAi* pai, const UnitType* type)
+static void AiRemoveFromBuilt(PlayerAi* pai, const UnitType* type)
 {
 	int i;
 	int equivalents[UnitTypeMax + 1];
 	int equivalentsCount;
 
-	if (AiRemoveFromBuilded2(pai, type)) {
+	if (AiRemoveFromBuilt2(pai, type)) {
 		return;
 	}
 
@@ -1104,7 +1104,7 @@ static void AiRemoveFromBuilded(PlayerAi* pai, const UnitType* type)
 	//
 	equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
 	for (i = 0; i < equivalentsCount; ++i) {
-		if (AiRemoveFromBuilded2(pai, UnitTypes[equivalents[i]])) {
+		if (AiRemoveFromBuilt2(pai, UnitTypes[equivalents[i]])) {
 			return;
 		}
 	}
@@ -1125,13 +1125,13 @@ static void AiRemoveFromBuilded(PlayerAi* pai, const UnitType* type)
 **  @param type  Unit-type which is now available.
 **  @return      True if the unit-type could be reduced.
 */
-static int AiReduceMadeInBuilded2(const PlayerAi* pai, const UnitType* type)
+static int AiReduceMadeInBuilt2(const PlayerAi* pai, const UnitType* type)
 {
 	AiBuildQueue* queue;
 	//
 	//  Search the unit-type order.
 	//
-	for (queue = pai->UnitTypeBuilded; queue; queue = queue->Next) {
+	for (queue = pai->UnitTypeBuilt; queue; queue = queue->Next) {
 		if (type == queue->Type && queue->Made) {
 			queue->Made--;
 			return 1;
@@ -1146,13 +1146,13 @@ static int AiReduceMadeInBuilded2(const PlayerAi* pai, const UnitType* type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiReduceMadeInBuilded(const PlayerAi* pai, const UnitType* type)
+static void AiReduceMadeInBuilt(const PlayerAi* pai, const UnitType* type)
 {
 	int i;
 	int equivs[UnitTypeMax + 1];
 	int equivnb;
 
-	if (AiReduceMadeInBuilded2(pai, type)) {
+	if (AiReduceMadeInBuilt2(pai, type)) {
 		return;
 	}
 	//
@@ -1161,7 +1161,7 @@ static void AiReduceMadeInBuilded(const PlayerAi* pai, const UnitType* type)
 	equivnb = AiFindUnitTypeEquiv(type, equivs);
 
 	for (i = 0; i < AiHelpers.Equiv[type->Slot]->Count; ++i) {
-		if (AiReduceMadeInBuilded2(pai, UnitTypes[equivs[i]])) {
+		if (AiReduceMadeInBuilt2(pai, UnitTypes[equivs[i]])) {
 			return;
 		}
 	}
@@ -1255,16 +1255,16 @@ void AiUnitKilled(Unit* unit)
 		case UnitActionAttack:
 		case UnitActionMove:
 			break;
-		case UnitActionBuilded:
+		case UnitActionBuilt:
 			DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
 				unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident);
-			AiReduceMadeInBuilded(unit->Player->Ai, unit->Type);
+			AiReduceMadeInBuilt(unit->Player->Ai, unit->Type);
 			break;
 		case UnitActionBuild:
 			DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
 				unit->Player->Player _C_ UnitNumber(unit) _C_
 				unit->Type->Ident _C_ unit->Orders[0].Type->Ident);
-			AiReduceMadeInBuilded(unit->Player->Ai, unit->Orders[0].Type);
+			AiReduceMadeInBuilt(unit->Player->Ai, unit->Orders[0].Type);
 			break;
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
@@ -1293,7 +1293,7 @@ void AiWorkComplete(Unit* unit, Unit* what)
 
 	Assert(what->Player->Type != PlayerPerson);
 
-	AiRemoveFromBuilded(what->Player->Ai, what->Type);
+	AiRemoveFromBuilt(what->Player->Ai, what->Type);
 }
 
 /**
@@ -1310,7 +1310,7 @@ void AiCanNotBuild(Unit* unit, const UnitType* what)
 
 	Assert(unit->Player->Type != PlayerPerson);
 
-	AiReduceMadeInBuilded(unit->Player->Ai, what);
+	AiReduceMadeInBuilt(unit->Player->Ai, what);
 }
 
 /**
@@ -1323,7 +1323,7 @@ void AiCanNotReach(Unit* unit, const UnitType* what)
 {
 	Assert(unit->Player->Type != PlayerPerson);
 
-	AiReduceMadeInBuilded(unit->Player->Ai, what);
+	AiReduceMadeInBuilt(unit->Player->Ai, what);
 }
 
 /**
@@ -1751,7 +1751,7 @@ void AiTrainingComplete(Unit* unit, Unit* what)
 
 	Assert(unit->Player->Type != PlayerPerson);
 
-	AiRemoveFromBuilded(unit->Player->Ai, what->Type);
+	AiRemoveFromBuilt(unit->Player->Ai, what->Type);
 
 	AiPlayer = unit->Player->Ai;
 	AiCleanForces();

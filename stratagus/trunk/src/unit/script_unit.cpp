@@ -201,8 +201,8 @@ void CclParseOrder(lua_State* l, Order* order)
 			order->Action = UnitActionUpgradeTo;
 		} else if (!strcmp(value, "action-research")) {
 			order->Action = UnitActionResearch;
-		} else if (!strcmp(value, "action-builded")) {
-			order->Action = UnitActionBuilded;
+		} else if (!strcmp(value, "action-built")) {
+			order->Action = UnitActionBuilt;
 		} else if (!strcmp(value, "action-board")) {
 			order->Action = UnitActionBoard;
 		} else if (!strcmp(value, "action-unload")) {
@@ -336,12 +336,12 @@ static void CclParseOrders(lua_State* l, Unit* unit)
 }
 
 /**
-**  Parse builded
+**  Parse built
 **
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-static void CclParseBuilded(lua_State* l, Unit* unit)
+static void CclParseBuilt(lua_State* l, Unit* unit)
 {
 	const char* value;
 	int args;
@@ -364,14 +364,14 @@ static void CclParseBuilded(lua_State* l, Unit* unit)
 			lua_pop(l, 1);
 			slot = strtol(value + 1, NULL, 16);
 			Assert(UnitSlots[slot]);
-			unit->Data.Builded.Worker = UnitSlots[slot];
+			unit->Data.Built.Worker = UnitSlots[slot];
 			//++UnitSlots[slot]->Refs;
 		} else if (!strcmp(value, "progress")) {
 			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Builded.Progress = LuaToNumber(l, -1);
+			unit->Data.Built.Progress = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "cancel")) {
-			unit->Data.Builded.Cancel = 1;
+			unit->Data.Built.Cancel = 1;
 			--j;
 		} else if (!strcmp(value, "frame")) {
 			int frame;
@@ -384,7 +384,7 @@ static void CclParseBuilded(lua_State* l, Unit* unit)
 			while (frame--) {
 				cframe = cframe->Next;
 			}
-			unit->Data.Builded.Frame = cframe;
+			unit->Data.Built.Frame = cframe;
 		}
 	}
 }
@@ -835,7 +835,7 @@ static int CclUnit(lua_State* l)
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
 			AssignUnitToPlayer (unit, player);
-			if (unit->Orders[0].Action == UnitActionBuilded) {
+			if (unit->Orders[0].Action == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;
@@ -848,9 +848,9 @@ static int CclUnit(lua_State* l)
 			lua_pushvalue(l, j + 1);
 			CclParseOrder(l, &unit->NewOrder);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-builded")) {
+		} else if (!strcmp(value, "data-built")) {
 			lua_pushvalue(l, j + 1);
-			CclParseBuilded(l, unit);
+			CclParseBuilt(l, unit);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "data-res-worker")) {
 			lua_pushvalue(l, j + 1);

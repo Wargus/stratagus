@@ -90,7 +90,7 @@ static void RepairUnit(Unit* unit, Unit* goal)
 
 	player = unit->Player;
 
-	if (goal->Orders[0].Action != UnitActionBuilded) {
+	if (goal->Orders[0].Action != UnitActionBuilt) {
 		//
 		// Calculate the repair costs.
 		//
@@ -129,7 +129,7 @@ static void RepairUnit(Unit* unit, Unit* goal)
 		}
 	} else {
 		// hp is the current damage taken by the unit.
-		hp = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
+		hp = (goal->Data.Built.Progress * goal->Stats->HitPoints) /
 			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - goal->HP;
 		//
 		// Calculate the length of the attack (repair) anim.
@@ -141,11 +141,11 @@ static void RepairUnit(Unit* unit, Unit* goal)
 
 		// FIXME: implement this below:
 #if 0
-		unit->Data.Builded.Worker->Type->BuilderSpeedFactor;
+		unit->Data.Built.Worker->Type->BuilderSpeedFactor;
 #endif
-		goal->Data.Builded.Progress += 100 * animlength * SpeedBuild;
+		goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
 		// Keep the same level of damage while increasing HP.
-		goal->HP = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
+		goal->HP = (goal->Data.Built.Progress * goal->Stats->HitPoints) /
 			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - hp;
 		if (goal->HP > goal->Stats->HitPoints) {
 			goal->HP = goal->Stats->HitPoints;
