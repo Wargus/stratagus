@@ -179,8 +179,8 @@ typedef struct _sound_request {
     unsigned Selection : 1;		/// is it a selection sound?
     unsigned IsVolume : 1;		/// how to interpret power (as a
                                         ///volume or as a distance?)
-    float Stereo;			/// stereo location of sound (
-                                        ///-1.0 left, 0.0 center, 1.0 right)
+    char Stereo;			/// stereo location of sound (
+                                        ///-128 left, 0 center, 127 right)
 } SoundRequest;
 
 #define MAX_SOUND_REQUESTS 32		/// maximal number of sound requests
