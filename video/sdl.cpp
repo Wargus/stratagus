@@ -83,7 +83,7 @@ global void SetVideoSync(void)
     if( SDL_SetTimer(
 		(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed,
 		VideoSyncHandler) ) {
-	fprintf(stderr,"Can't set timer\n");
+	fprintf(stderr,"Can't set timer or you use SDL 1.1.X\n");
     }
 
     // DebugLevel1("Timer installed\n");
@@ -201,13 +201,23 @@ global void InvalidateArea(int x,int y,int w,int h)
 	w+=x;
 	x=0;
     }
+    if( x+w>=VideoWidth ) {
+	w=VideoWidth-x;
+    }
+    if( w<=0 ) {
+	return;
+    }
     if( y<0 ) {
 	h+=y;
 	y=0;
     }
-    if( !w<=0 && !h<=0 ) {
-	SDL_UpdateRect(Screen,x,y,w,h);
+    if( y+h>=VideoHeight ) {
+	h=VideoHeight-y;
     }
+    if( h<=0 ) {
+	return;
+    }
+    SDL_UpdateRect(Screen,x,y,w,h);
 }
 
 /**
