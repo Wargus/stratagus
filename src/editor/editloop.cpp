@@ -1126,12 +1126,12 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	if (CursorUnitIndex != -1) {
 	    SelectedUnitIndex = CursorUnitIndex;
 	    CursorBuilding = UnitTypeByIdent(ShownUnitTypes[CursorUnitIndex]);
-	    ThisPlayer = Players + SelectedPlayer;
 	    return;
 	}
 	// Cursor on player icons
 	if (CursorPlayer != -1) {
 	    SelectedPlayer = CursorPlayer;
+	    ThisPlayer = Players + SelectedPlayer;
 	    return;
 	}
 	// Cursor on unit selection icons
