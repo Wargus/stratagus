@@ -30,6 +30,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "freecraft.h"
 
@@ -695,6 +696,8 @@ inkey:
 		    break;
 		case 9:
 		    goto normkey;
+		case '~':		// ~ are quotes
+		    return;		// Just ignore them
 		case 'x':
 		case 'X':
 		    if( (KeyModifiers&ModifierAlt) ) {
@@ -940,8 +943,12 @@ local void MenuHandleMouseMove(int x,int y)
     int h, w, i, j, n, xs, ys;
     Menuitem *mi;
     Menu *menu;
-    int RedrawFlag = 0;
+    int ox;
+    int oy;
+    int redraw_flag;
 
+    ox = CursorX;
+    oy = CursorY;			// Old position for rel movement.
     HandleCursorMove(&x,&y);
 
     if (CurrentMenu == NULL) {
@@ -955,8 +962,9 @@ local void MenuHandleMouseMove(int x,int y)
 
     n = menu->nitems;
     MenuButtonUnderCursor = -1;
+    redraw_flag = 0;
 
-    /* check active (popped-up) pulldown first, as it may overlay other menus! */
+    // check active (popped-up) pulldown first, as it may overlay other menus!
     mi = menu->items;
     for (i = 0; i < n; ++i) {
 	if (!(mi->flags&MenuButtonDisabled)) {
@@ -973,7 +981,7 @@ local void MenuHandleMouseMove(int x,int y)
 		    j = (y - ys) / h;
 		    if (j >= 0 && j < mi->d.pulldown.noptions && j != mi->d.pulldown.cursel) {
 			mi->d.pulldown.cursel = j;
-			RedrawFlag = 1;
+			redraw_flag = 1;
 			if (mi->d.pulldown.action) {
 			    (*mi->d.pulldown.action)(mi, mi->d.pulldown.cursel);
 			}
@@ -996,7 +1004,7 @@ local void MenuHandleMouseMove(int x,int y)
 			if (x < xs || x > xs + mi->d.gem.xsize || y < ys || y > ys + mi->d.gem.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
-				    RedrawFlag = 1;
+				    redraw_flag = 1;
 				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
@@ -1009,7 +1017,7 @@ local void MenuHandleMouseMove(int x,int y)
 			if (x < xs || x > xs + mi->d.button.xsize || y < ys || y > ys + mi->d.button.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
-				    RedrawFlag = 1;
+				    redraw_flag = 1;
 				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
@@ -1019,10 +1027,11 @@ local void MenuHandleMouseMove(int x,int y)
 		    case MI_TYPE_INPUT:
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
-			if (x<xs || x>xs + mi->d.input.xsize || y<ys || y>ys + mi->d.input.ysize) {
+			if (x<xs || x>xs + mi->d.input.xsize
+				|| y<ys || y>ys + mi->d.input.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
-				    RedrawFlag = 1;
+				    redraw_flag = 1;
 				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
@@ -1039,7 +1048,7 @@ local void MenuHandleMouseMove(int x,int y)
 			if (x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + mi->d.pulldown.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
-				    RedrawFlag = 1;
+				    redraw_flag = 1;
 				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
@@ -1052,7 +1061,7 @@ local void MenuHandleMouseMove(int x,int y)
 			if (x < xs || x > xs + mi->d.listbox.xsize || y < ys || y > ys + mi->d.listbox.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
-				    RedrawFlag = 1;
+				    redraw_flag = 1;
 				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
@@ -1066,7 +1075,7 @@ local void MenuHandleMouseMove(int x,int y)
 			    if (mi->d.listbox.cursel != mi->d.listbox.curopt) {
 				mi->d.listbox.dohandler = 0;
 				mi->d.listbox.curopt = mi->d.listbox.cursel;
-				RedrawFlag = 1;
+				redraw_flag = 1;
 			    }
 			}
 			break;
@@ -1076,7 +1085,7 @@ local void MenuHandleMouseMove(int x,int y)
 			if (x < xs || x > xs + mi->d.vslider.xsize || y < ys || y > ys + mi->d.vslider.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
-				    RedrawFlag = 1;
+				    redraw_flag = 1;
 				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
@@ -1121,7 +1130,7 @@ local void MenuHandleMouseMove(int x,int y)
 			if (x < xs || x > xs + mi->d.hslider.xsize || y < ys || y > ys + mi->d.hslider.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
-				    RedrawFlag = 1;
+				    redraw_flag = 1;
 				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
@@ -1171,19 +1180,40 @@ local void MenuHandleMouseMove(int x,int y)
 		    case MI_TYPE_LISTBOX:
 		    case MI_TYPE_VSLIDER:
 		    case MI_TYPE_HSLIDER:
-		    case MI_TYPE_INPUT:
 			if (!(mi->flags&MenuButtonActive)) {
-			    RedrawFlag = 1;
+			    redraw_flag = 1;
 			    mi->flags |= MenuButtonActive;
 			}
 			MenuButtonUnderCursor = i;
 		    default:
 			break;
+		    case MI_TYPE_INPUT:
+			if (!(mi->flags&MenuButtonActive)) {
+			    redraw_flag = 1;
+			    mi->flags |= MenuButtonActive;
+			}
+			if (MouseButtons & LeftButton
+				&& mi->flags & MenuButtonSelected) {
+			    if (mi->d.input.buffer && *mi->d.input.buffer) {
+				char* s;
+
+				j = strtol(mi->d.input.buffer, &s, 0);
+				if (!*s || s[0]=='~' ) {
+				    mi->d.input.nch =
+					sprintf(mi->d.input.buffer, "%d~!_",
+						j + x - ox
+						+ (y - oy)*1000);
+				    redraw_flag = 1;
+				}
+			    }
+			}
+			MenuButtonUnderCursor = i;
+			break;
 		}
 	    }
 	}
     }
-    if (RedrawFlag) {
+    if (redraw_flag) {
 	MustRedraw |= RedrawMenu;
     }
 }
@@ -1281,7 +1311,7 @@ local void MenuHandleButtonUp(unsigned b)
     int i, n;
     Menuitem *mi;
     Menu *menu;
-    int RedrawFlag = 0;
+    int redraw_flag = 0;
 
     if (CurrentMenu == NULL) {
 	return;
@@ -1299,7 +1329,7 @@ local void MenuHandleButtonUp(unsigned b)
 	    switch (mi->mitype) {
 		case MI_TYPE_GEM:
 		    if (mi->flags&MenuButtonClicked) {
-			RedrawFlag = 1;
+			redraw_flag = 1;
 			mi->flags &= ~MenuButtonClicked;
 			if (MenuButtonUnderCursor == i) {
 			    MenuButtonUnderCursor = -1;
@@ -1316,7 +1346,7 @@ local void MenuHandleButtonUp(unsigned b)
 		    break;
 		case MI_TYPE_BUTTON:
 		    if (mi->flags&MenuButtonClicked) {
-			RedrawFlag = 1;
+			redraw_flag = 1;
 			mi->flags &= ~MenuButtonClicked;
 			if (MenuButtonUnderCursor == i) {
 			    MenuButtonUnderCursor = -1;
@@ -1328,7 +1358,7 @@ local void MenuHandleButtonUp(unsigned b)
 		    break;
 		case MI_TYPE_PULLDOWN:
 		    if (mi->flags&MenuButtonClicked) {
-			RedrawFlag = 1;
+			redraw_flag = 1;
 			mi->flags &= ~MenuButtonClicked;
 			if (MenuButtonUnderCursor == i) {
 			    MenuButtonUnderCursor = -1;
@@ -1346,7 +1376,7 @@ local void MenuHandleButtonUp(unsigned b)
 		    break;
 		case MI_TYPE_LISTBOX:
 		    if (mi->flags&MenuButtonClicked) {
-			RedrawFlag = 1;
+			redraw_flag = 1;
 			mi->flags &= ~MenuButtonClicked;
 			if (MenuButtonUnderCursor == i) {
 			    MenuButtonUnderCursor = -1;
@@ -1358,21 +1388,21 @@ local void MenuHandleButtonUp(unsigned b)
 		    break;
 		case MI_TYPE_INPUT:
 		    if (mi->flags&MenuButtonClicked) {
-			RedrawFlag = 1;
+			redraw_flag = 1;
 			mi->flags &= ~MenuButtonClicked;
 			// MAYBE ADD HERE
 		    }
 		    break;
 		case MI_TYPE_VSLIDER:
 		    if (mi->flags&MenuButtonClicked) {
-			RedrawFlag = 1;
+			redraw_flag = 1;
 			mi->flags &= ~MenuButtonClicked;
 			mi->d.vslider.cflags = 0;
 		    }
 		    break;
 		case MI_TYPE_HSLIDER:
 		    if (mi->flags&MenuButtonClicked) {
-			RedrawFlag = 1;
+			redraw_flag = 1;
 			mi->flags &= ~MenuButtonClicked;
 			mi->d.hslider.cflags = 0;
 		    }
@@ -1382,7 +1412,7 @@ local void MenuHandleButtonUp(unsigned b)
 	    }
 	}
     }
-    if (RedrawFlag) {
+    if (redraw_flag) {
 	MustRedraw |= RedrawMenu;
 
 	MenuHandleMouseMove(CursorX,CursorY);
