@@ -742,7 +742,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    GameResult=GameDefeat;
+	    QuitToMenu=1;
 	    GameRunning=0;
 	    break;
 
