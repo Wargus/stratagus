@@ -378,6 +378,11 @@ global void UnitActions(void)
 	    list=list->Next;
 	} }
 #endif
+	if( unit->Destroyed ) {		// Ignore destroyed units
+	    DebugLevel0Fn("Destroyed unit %d in table, should be ok\n" _C_
+		    UnitNumber(unit));
+	    continue;
+	}
 
 	if( --unit->Wait ) {		// Wait until counter reached
 	    continue;
