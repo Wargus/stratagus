@@ -528,11 +528,29 @@ global int AiFindGaugeId(SCM symbol)
 	    return gauge;
 	}
     }
-    DebugLevel3Fn("didn't found %s\n" _C_ tmp);
+    DebugLevel3Fn("didn't find %s\n" _C_ tmp);
     free(tmp);
     return -1;
 }
 #elif defined(USE_LUA)
+global int AiFindGaugeId(lua_State* l)
+{
+    int gauge;
+    char buffer[256];
+    const char *tmp;
+
+    tmp = LuaToString(l, -1);
+
+    for (gauge = 0; gauge < GAUGE_NB; ++gauge) {
+	AiGetGaugeName(gauge, buffer, 256);
+
+	if (!strcmp(tmp, buffer)) {
+	    return gauge;
+	}
+    }
+    DebugLevel3Fn("didn't find %s\n" _C_ tmp);
+    return -1;
+}
 #endif
 
 local int AiFindUnusedScript(void)
@@ -561,7 +579,9 @@ local int AiFindUnusedScript(void)
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local int AiEvaluateScript(SCM script)
 {
-    SCM get_need_lambda, rslt, willeval;
+    SCM get_need_lambda;
+    SCM rslt;
+    SCM willeval;
 
     get_need_lambda = gh_cadr(gh_car(script));
     willeval =

@@ -509,6 +509,7 @@ extern int AiGetGaugeValue(int gauge);
 #if defined(USE_GUILE) || defined(USE_SIOD)
 extern int AiFindGaugeId(SCM id);
 #elif defined(USE_LUA)
+extern int AiFindGaugeId(lua_State* l);
 #endif
     /// return the force of the unittype.
 extern int AiUnittypeForce(UnitType * unitType);
