@@ -302,7 +302,9 @@ int PlayMovie(const char* name)
 		theora_clear(&data->tstate);
 	}
 
+	ogg_sync_clear(&data->sync);
 	free(data);
+	CLclose(f);
 
 	return 0;
 }
