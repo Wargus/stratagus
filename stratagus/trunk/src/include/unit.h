@@ -766,6 +766,10 @@ extern void FreeUnitMemory(Unit* unit);
 extern void RefsIncrease(Unit* unit);
 	/// Decrease an unit's reference count
 extern void RefsDecrease(Unit* unit);
+	///  Mark the field with the FieldFlags.
+void MarkUnitFieldFlags(const Unit* unit);
+	///  Unmark the field with the FieldFlags.
+void UnmarkUnitFieldFlags(const Unit* unit);
 	/// Release an unit
 extern void ReleaseUnit(Unit* unit);
 	/// Initialize unit structure with default values

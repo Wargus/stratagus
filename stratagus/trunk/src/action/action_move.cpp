@@ -87,7 +87,10 @@ static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 		// FIXME: So units flying up and down are not affected.
 		unit->IX = unit->IY = 0;
 
-		switch (d = NextPathElement(unit, &xd, &yd)) {
+		UnmarkUnitFieldFlags(unit);
+		d = NextPathElement(unit, &xd, &yd);
+		MarkUnitFieldFlags(unit);
+		switch (d) {
 			case PF_UNREACHABLE: // Can't reach, stop
 				if (unit->Player->AiEnabled) {
 					AiCanNotMove(unit);

@@ -443,9 +443,9 @@ extern int RockOnMap(int x, int y);
 	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern int CheckedCanMoveToMask(int x, int y, int mask);
 	/// Returns true, if the unit-type can enter the field
-extern int UnitTypeCanMoveTo(int x, int y, const struct _unit_type_* type);
+extern int UnitTypeCanBeAt(const struct _unit_type_* type, int x, int y);
 	/// Returns true, if the unit can enter the field
-extern int UnitCanMoveTo(int x, int y, const struct _unit_* unit);
+extern int UnitCanBeAt(const struct _unit_* unit, int x, int y);
 
 	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);
