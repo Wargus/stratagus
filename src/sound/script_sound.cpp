@@ -80,6 +80,8 @@ local SCM sound_id_ccl(SoundId id)
 /**
 **	Glue between c and scheme. Ask the sound system to associate a
 **	sound id to a sound name.
+**
+**	@param name	name
 */
 local SCM CclSoundForName(SCM name)
 {
@@ -109,13 +111,15 @@ local SoundId CclGetSoundId(SCM sound)
     }
 }
 
-/** Glue between c and scheme. This function asks the sound system to register
-    a sound under a given name, wiht an associated list of files (the list can
-    be replaced by only one file).
-    @param name the name of the sound
-    @param file a list of sound file names (or a file name)
-    @return the sound id of the created sound
-
+/**
+**	Glue between c and scheme. This function asks the sound system to
+**	register a sound under a given name, with an associated list of
+**	files (the list can be replaced by only one file).
+**
+**	@param name	the name of the sound
+**	@param file	a list of sound file names (or a file name)
+**
+**	@return		the sound id of the created sound
 */
 local SCM CclMakeSound(SCM name,SCM file) {
     SoundId id;
@@ -190,11 +194,14 @@ local SCM CclMakeSoundGroup(SCM name,SCM first,SCM second)
     // c_name consumed by MakeSoundGroup!
 }
 
-/** Glue between c and scheme. Ask to the sound system to remap a sound id to
-    a given name.
-    @param name the new name for the sound
-    @param sound the sound object
-    @return the sound object
+/**
+**	Glue between c and scheme. Ask the sound system to remap a sound
+**	id to a given name.
+**
+**	@param name	the new name for the sound
+**	@param sound	the sound object
+**
+**	@return		the sound object
 */
 local SCM CclMapSound(SCM name,SCM sound) {
     char* sound_name;
@@ -204,9 +211,12 @@ local SCM CclMapSound(SCM name,SCM sound) {
     return sound;
 }
 
-/** Ask to the sound system to play the specified sound.
-    @param sound either the sound name or the sound id
-    @return SCM_UNSPECIFIED
+/**
+**	Ask the sound system to play the specified sound.
+**
+**	@param sound	either the sound name or the sound id
+**
+**	@return		SCM_UNSPECIFIED
 */
 local SCM CclPlaySound(SCM sound) {
     SoundId id;
@@ -241,8 +251,8 @@ global SoundId ccl_sound_id(SCM sound)
 }
 
 /**
-**	Glue between c and scheme. Ask the sound system to dump on the standard
-**	output the mapping between sound names and sound id.
+**	Glue between c and scheme. Ask the sound system to dump on the
+**	standard output the mapping between sound names and sound id.
 */
 local SCM CclDisplaySounds(void) {
     DisplaySoundHashTable();
@@ -343,6 +353,11 @@ local SCM CclSetMusicVolume(SCM volume)
     return volume;
 }
 
+/**
+**	Set cd mode
+**
+**	@param mode	cd mode
+*/
 local SCM CclSetCdMode(SCM mode)
 {
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
@@ -389,8 +404,9 @@ local SCM CclSetGlobalSoundRange(SCM distance) {
     int d;
     //FIXME check for errors
     d=gh_scm2int(distance);
-    if (d>0)
+    if (d>0) {
 	DistanceSilent=d;
+    }
     return distance;
 }
 
@@ -409,7 +425,7 @@ local SCM CclSoundThread(void)
 **	Set the range of a given sound.
 **
 **	@param sound	the sound id or name of the sound
-**	@param		range the new range for this sound
+**	@param range	the new range for this sound
 */
 local SCM CclSetSoundRange(SCM sound,SCM range) {
     //FIXME check for errors
@@ -509,7 +525,7 @@ global void SoundCclRegister(void)
 /**
 **	Global volume support
 **
-**	@param volume new global sound volume
+**	@param volume	new global sound volume
 */
 local SCM CclSetSoundVolume(SCM volume)
 {
@@ -526,6 +542,11 @@ local SCM CclSetMusicVolume(SCM volume)
     return volume;
 }
 
+/**
+**	Set cd mode
+**
+**	@param mode	cd mode
+*/
 local SCM CclSetCdMode(SCM mode)
 {
     return mode;
@@ -563,8 +584,8 @@ local SCM CclSetGlobalSoundRange(SCM distance)
 /**
 **	Set the range of a given sound.
 **
-**	@param sound the sound id or name of the sound
-*	@range the new range for this sound
+**	@param sound	the sound id or name of the sound
+**	@param range	the new range for this sound
 */
 local SCM CclSetSoundRange(SCM sound,SCM range __attribute__((unused)))
 {
@@ -613,7 +634,7 @@ local SCM CclDefineGameSounds(SCM list __attribute__((unused)))
 **	@param name	the new name for the sound
 **	@param sound	the sound object
 **
-**	@return the sound object
+**	@return		the sound object
 */
 local SCM CclMapSound(SCM name __attribute__((unused)),SCM sound)
 {
