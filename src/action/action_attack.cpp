@@ -154,14 +154,12 @@ local Unit* CheckForDeadGoal(Unit* unit)
 	    if( unit->SavedOrder.Action!=UnitActionStill ) {
 		unit->Orders[0]=unit->SavedOrder;
 		unit->SavedOrder.Action=UnitActionStill;
-
-		// This is not supported
-		DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+		unit->SavedOrder.Goal=NoUnitP;
 
 		if( unit->Selected && unit->Player==ThisPlayer ) {
 		    MustRedraw|=RedrawButtonPanel;
 		}
-		
+		goal=unit->Orders[0].Goal;
 	    }
 	    NewResetPath(unit);
 	}
@@ -354,7 +352,8 @@ local void MoveToTarget(Unit* unit)
 
 	    // Must finish, if saved command finishes
 	    unit->SavedOrder.Action=UnitActionStill;
-	    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+	    unit->SavedOrder.Goal=NoUnitP;
+
 	    if( unit->Selected && unit->Player==ThisPlayer ) {
 		MustRedraw|=RedrawButtonPanel;
 	    }

@@ -151,28 +151,14 @@ global void HandleActionFollow(Unit* unit)
 		    || goal->Orders[0].Action==UnitActionStill) ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
-		Order order;
-
 		DebugLevel2Fn("Follow attack %d\n",UnitNumber(goal));
-		order=unit->Orders[0];
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		// Save current command to come back.
-		unit->SavedOrder=order;
-		if( unit->SavedOrder.Goal ) {
-		    RefsDebugCheck(!order.Goal->Refs || order.Goal->Destroyed);
-		    order.Goal->Refs++;
-		}
+		unit->SavedOrder=unit->Orders[0];
 		unit->Orders[0].Action=UnitActionStill;
+		unit->Orders[0].Goal=NoUnitP;
 		unit->SubAction=0;
 		unit->Wait=1;
-		if( unit->Orders[0].Goal ) {
-		    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
-		    if( !--unit->Orders[0].Goal->Refs ) {
-			DebugCheck( !unit->Orders[0].Goal->Destroyed );
-			ReleaseUnit(unit->Orders[0].Goal);
-		    }
-		    unit->Orders[0].Goal=NoUnitP;
-		}
 	    }
 	}
     }
