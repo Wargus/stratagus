@@ -1095,6 +1095,8 @@ global void WaitEventsAndKeepSync(void)
     callbacks.ButtonPressed=(void*)HandleButtonDown;
     callbacks.ButtonReleased=(void*)HandleButtonUp;
     callbacks.MouseMoved=(void*)HandleMouseMove;
+    callbacks.MouseExit=(void*)HandleMouseExit; // @note never called!
+
     callbacks.KeyPressed=HandleKeyDown;
     callbacks.KeyReleased=HandleKeyUp;
 

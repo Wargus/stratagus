@@ -809,7 +809,7 @@ local void X11DoEvent(const EventCallback* callbacks)
 
 	case FocusOut:
 	    DebugLevel3("\tfocus out\n");
-	    CursorOn=-1;
+	    InputMouseExit(callbacks, X11GetTicks());
 	    break;
 
 	case ClientMessage:
@@ -1072,6 +1072,8 @@ global void WaitEventsAndKeepSync(void)
     callbacks.ButtonPressed=HandleButtonDown;
     callbacks.ButtonReleased=HandleButtonUp;
     callbacks.MouseMoved=HandleMouseMove;
+    callbacks.MouseExit=HandleMouseExit;
+
     callbacks.KeyPressed=HandleKeyDown;
     callbacks.KeyReleased=HandleKeyUp;
 
