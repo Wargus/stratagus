@@ -1904,12 +1904,20 @@ global void SoundOptions(void)
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     int i = 17;
 #endif
+    SoundOptionsMenuItems[2].flags = 0;				// master volume slider
+    SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_CHECKED;	// master power
+    SoundOptionsMenuItems[8].flags = 0;				// music volume slider
+    SoundOptionsMenuItems[11].flags = 0;			// music power
+    SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_CHECKED;
+    SoundOptionsMenuItems[14].flags = 0;			// cd volume slider
+    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;	// cd power
+    SoundOptionsMenuItems[19].flags = 0;			// all tracks button
+    SoundOptionsMenuItems[19].d.gem.state = MI_GSTATE_UNCHECKED;
+    SoundOptionsMenuItems[21].flags = 0;			// random tracks button
+    SoundOptionsMenuItems[21].d.gem.state = MI_GSTATE_UNCHECKED;
+
     // Set master volume checkbox and slider
-    if (SoundFildes != -1) {
-	SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_CHECKED;
-	SoundOptionsMenuItems[2].flags = 0;
-	SoundOptionsMenuItems[11].flags = 0;
-    } else {
+    if (SoundFildes == -1) {
 	SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_UNCHECKED;
 	SoundOptionsMenuItems[2].flags = -1;
 	SoundOptionsMenuItems[11].flags = -1;
@@ -1917,10 +1925,7 @@ global void SoundOptions(void)
     SoundOptionsMenuItems[2].d.hslider.percent = (GlobalVolume * 100) / 255;
 
     // Set music volume checkbox and slider
-    if (PlayingMusic == 1 && SoundFildes != -1) {
-        SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_CHECKED;
-	SoundOptionsMenuItems[8].flags = 0;
-    } else {
+    if (PlayingMusic != 1 || SoundFildes == -1) {
 	SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_UNCHECKED;
 	SoundOptionsMenuItems[8].flags = -1;
     }
@@ -1931,26 +1936,20 @@ global void SoundOptions(void)
 	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
 	SoundOptionsMenuItems[14].flags = -1;
 	SoundOptionsMenuItems[19].flags = -1;
-	SoundOptionsMenuItems[19].d.gem.state = MI_GSTATE_UNCHECKED;
+	
 	SoundOptionsMenuItems[21].flags = -1;
-	SoundOptionsMenuItems[21].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
-	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;
-	SoundOptionsMenuItems[14].flags = 0;
-	SoundOptionsMenuItems[19].flags = 0;
-	SoundOptionsMenuItems[21].flags = 0;
 #ifdef USE_LIBCDA
 	cd_get_volume(&i, &i);
 	SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
 #endif
 	if (!strcmp(":all", CDMode)) {
 	    SoundOptionsMenuItems[19].d.gem.state = MI_GSTATE_CHECKED;
-	    SoundOptionsMenuItems[21].d.gem.state = MI_GSTATE_UNCHECKED;
 	}
 	if (!strcmp(":random", CDMode)) {
-	    SoundOptionsMenuItems[19].d.gem.state = MI_GSTATE_UNCHECKED;
 	    SoundOptionsMenuItems[21].d.gem.state = MI_GSTATE_CHECKED;
 	}
+	SoundOptionsMenuItems[11].flags = -1;
     }
 #endif
     ProcessMenu(MENU_SOUND_OPTIONS, 1);
