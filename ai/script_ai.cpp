@@ -2417,4 +2417,5 @@ global void AiCclRegister( void )
     gh_new_procedureN( "define-ai-player", CclDefineAiPlayer );
 }
 
+
 //@}
