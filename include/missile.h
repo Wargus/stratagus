@@ -400,7 +400,7 @@ struct _missile_type_ {
 
     char*	Ident;			/// missile name
     char*	File;			/// missile sprite file
-	int		Transparency;	/// Missile transparency possible value is 50 (later 25 and 75)
+    int		Transparency;		/// Missile transparency possible value is 50 (later 25 and 75)
     int		Width;			/// missile width in pixels
     int		Height;			/// missile height in pixels
     int		DrawLevel;		/// Level to draw missile at
