@@ -10,7 +10,7 @@
 //
 /**@name map_radar.c - The map radar handling. */
 //
-//      (c) Copyright 1999-2004 by Russell Smith.
+//      (c) Copyright 2004 by Russell Smith.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -91,16 +91,14 @@ unsigned char IsTileRadarVisible(const Player* pradar, const Player* punit, int 
 {
 	int i;
 	unsigned char radarvision;
-	unsigned char jammingvision;
 	unsigned char* radar;
 	unsigned char* jamming;
 
 	radar = TheMap.Fields[y * TheMap.Info.MapWidth + x].Radar;
 	jamming = TheMap.Fields[y * TheMap.Info.MapWidth + x].RadarJammer;
 	radarvision = radar[pradar->Player];
-	jammingvision = jamming[punit->Player];
 
-	if (jammingvision) {
+	if (jamming[punit->Player]) {
 		return 0;
 	}
 	if (!pradar->SharedVision) {
@@ -124,13 +122,12 @@ unsigned char IsTileRadarVisible(const Player* pradar, const Player* punit, int 
 	return radarvision;
 }
 
-/*
+/**
 **  Mark Radar Vision for a tile
 **
 **  @param player  The player you are marking for
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
-**
 */
 void MapMarkTileRadar(const Player* player, int x, int y)
 {
@@ -139,24 +136,17 @@ void MapMarkTileRadar(const Player* player, int x, int y)
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
 	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Player];
-	switch (v) {
-		case 255:  // Overflow
-			DebugPrint("Radar overflow (Player): %d\n" _C_ player->Player);
-			break;
-		default:
-			++v;
-			break;
-	}
+	Assert (v != 255);
+	++v;
 	TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Player] = v;
 }
 
-/*
+/**
 **  Unmark Radar Vision for a tile
 **
 **  @param player  The player you are marking for
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
-**
 */
 void MapUnmarkTileRadar(const Player* player, int x, int y)
 {
@@ -166,24 +156,18 @@ void MapUnmarkTileRadar(const Player* player, int x, int y)
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
 	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Player];
 	// Reduce radar coverage if it exists.
-	if (v == 255) {
-		// FIXME: (mr-russ) Add radar counter for unit
-		DebugPrint("Radar overflowed\n");
-		Assert(1);
-	}
 	if (v) {
 		--v;
+		TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Player] = v;
 	}
-	TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Player] = v;
 }
 
-/*
+/**
 **  Mark Radar Jamming Vision for a tile
 **
 **  @param player  The player you are marking for
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
-**
 */
 void MapMarkTileRadarJammer(const Player* player, int x, int y)
 {
@@ -192,24 +176,17 @@ void MapMarkTileRadarJammer(const Player* player, int x, int y)
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
 	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Player];
-	switch (v) {
-		case 255:  // Overflow
-			DebugPrint("Radar Jamming overflow (Player): %d\n" _C_ player->Player);
-			break;
-		default:
-			++v;
-			break;
-	}
+	Assert(v != 255);
+	++v;
 	TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Player] = v;
 }
 
-/*
+/**
 **  Unmark Radar Vision for a tile
 **
 **  @param player  The player you are marking for
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
-**
 */
 void MapUnmarkTileRadarJammer(const Player* player, int x, int y)
 {
@@ -221,6 +198,6 @@ void MapUnmarkTileRadarJammer(const Player* player, int x, int y)
 	// Reduce radar coverage if it exists.
 	if (v) {
 		--v;
+		TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Player] = v;
 	}
-	TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Player] = v;
 }
