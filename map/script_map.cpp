@@ -115,7 +115,11 @@ local SCM CclFreeCraftMap(SCM list)
 		    free(TheMap.Fields);
 		    TheMap.Fields=calloc(TheMap.Width*TheMap.Height,
 			    sizeof(*TheMap.Fields));
+#ifdef NEW_FOW2
+		    TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
+#endif
 		    InitUnitCache();
+		    // FIXME: this should be CreateMap or InitMap?
 
 		} else if( gh_eq_p(value,gh_symbol2scm("fog-of-war")) ) {
 
@@ -151,12 +155,22 @@ local SCM CclFreeCraftMap(SCM list)
 				TheMap.Fields[i].Value=
 					gh_scm2int(gh_car(field));
 
+#ifdef NEW_FOW
 			    } else if( gh_eq_p(gh_car(field),
 					gh_symbol2scm("visible")) ) {
+				DebugLevel0Fn("FIXME:\n");
+#else
+			    } else if( gh_eq_p(gh_car(field),
+					gh_symbol2scm("visible")) ) {
+#ifdef NEW_FOW2
+				TheMap.Visible[0][i/32] |= 1<<(i%32);
+#else
 				TheMap.Fields[i].Flags|=MapFieldVisible;
+#endif
 			    } else if( gh_eq_p(gh_car(field),
 					gh_symbol2scm("explored")) ) {
 				TheMap.Fields[i].Flags|=MapFieldExplored;
+#endif
 
 			    } else if( gh_eq_p(gh_car(field),
 					gh_symbol2scm("human")) ) {

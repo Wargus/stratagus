@@ -119,9 +119,13 @@ global void MapFixSeenWoodTile(int x, int y)
 
     // FIXME: can this only happen if seen?
 #ifdef NEW_FOW
-    if (mf->Visible & (1 << ThisPlayer->Player)) {
+    if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+    if ( IsMapFieldVisible(x,y) ) {
 #else
     if (mf->Flags & MapFieldVisible) {
+#endif
 #endif
 	UpdateMinimapSeenXY(x, y);
 	MarkDrawPosMap(x, y);
@@ -190,9 +194,13 @@ global void MapFixWoodTile(int x, int y)
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
 #ifdef NEW_FOW
-	if (mf->Visible & (1 << ThisPlayer->Player)) {
+	if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+	if ( IsMapFieldVisible(x,y) ) {
 #else
 	if (mf->Flags & MapFieldVisible) {
+#endif
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
@@ -236,9 +244,13 @@ global void MapRemoveWood(unsigned x, unsigned y)
     MapFixWoodNeighbors(x, y);
 
 #ifdef NEW_FOW
-    if (mf->Visible & (1 << ThisPlayer->Player)) {
+    if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+    if ( IsMapFieldVisible(x,y) ) {
 #else
     if (mf->Flags & MapFieldVisible) {
+#endif
 #endif
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
@@ -292,10 +304,18 @@ global void RegenerateForest(void)
 			    mf->Value = 0;
 			    mf->Flags |= MapFieldForest | MapFieldUnpassable;
 #ifdef NEW_FOW
-			    if (mf->Visible & (1 << ThisPlayer->Player)) {
+			    if (mf->Visible[ThisPlayer->Player]>1) {
 				MapMarkSeenTile(x, y);
 			    }
-			    if (tmp->Visible & (1 << ThisPlayer->Player)) {
+			    if (tmp->Visible[ThisPlayer->Player]>1) {
+				MapMarkSeenTile(x, y-1);
+			    }
+#else
+#ifdef NEW_FOW2
+			    if ( IsMapFieldVisible(x,y) ) {
+				MapMarkSeenTile(x, y);
+			    }
+			    if ( IsMapFieldVisible(x,y-1) ) {
 				MapMarkSeenTile(x, y-1);
 			    }
 #else
@@ -305,6 +325,7 @@ global void RegenerateForest(void)
 			    if (tmp->Flags & MapFieldVisible) {
 				MapMarkSeenTile(x , y-1);
 			    }
+#endif
 #endif
 			}
 		    }

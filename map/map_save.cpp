@@ -90,12 +90,22 @@ global void SaveMap(FILE* file)
 	    if( mf->Value ) {
 		fprintf(file," %d",mf->Value);
 	    }
+#ifdef NEW_FOW
+	    DebugLevel0Fn("FIXME:\n");
+#else
+#ifdef NEW_FOW2
+	    if( IsMapFieldVisible(h,w) ) {
+		fprintf(file," visible");
+	    }
+#else
 	    if( mf->Flags&MapFieldVisible ) {
 		fprintf(file," visible");
 	    }
+#endif
 	    if( mf->Flags&MapFieldExplored ) {
 		fprintf(file," explored");
 	    }
+#endif
 	    if( mf->Flags&MapFieldHuman ) {
 		fprintf(file," human");
 	    }
