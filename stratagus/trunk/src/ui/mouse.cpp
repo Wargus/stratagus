@@ -370,14 +370,35 @@ void DoRightButton(int sx, int sy)
 **
 **  @param x       X coordinate.
 **  @param y       Y coordinate.
-**  @param button  Button to check
+**  @param button  Button to check.
 **
-**  @return        True if mouse is on the button, False otherwise
+**  @return        True if mouse is on the button, False otherwise.
 */
 static inline int OnButton(int x, int y, Button* button)
 {
 	return x >= button->X && x < button->X + button->Style->Width &&
 		y >= button->Y && y < button->Y + button->Style->Height;
+}
+
+/**
+**  Check if the mouse is on a graphic
+**
+**  @param x   X coordinate.
+**  @param y   Y coordinate.
+**  @param g   Graphic.
+**  @param gx  Graphic X coordinate.
+**  @param gy  Graphic Y coordinate.
+**
+**  @return    True if mouse is on the graphic, False otherwise.
+*/
+static inline int OnGraphic(int x, int y, Graphic* g, int gx, int gy)
+{
+	x -= gx;
+	y -= gy;
+	if (x >= 0 && x < g->Width && y >= 0 && y < g->Height) {
+		return !GraphicTransparentPixel(g, x, y);
+	}
+	return 0;
 }
 
 /**
@@ -389,6 +410,7 @@ static inline int OnButton(int x, int y, Button* button)
 static void HandleMouseOn(int x, int y)
 {
 	int i;
+	int on_ui;
 
 	MouseScrollState = ScrollNone;
 
@@ -520,10 +542,19 @@ static void HandleMouseOn(int x, int y)
 	}
 
 	//
-	//  Map
-	//  NOTE: Later this is not always true, with shaped maps view.
+	//  On UI graphic
 	//
-	if (x >= TheUI.MapArea.X && x <= TheUI.MapArea.EndX &&
+	on_ui = 0;
+	for (i = 0; i < TheUI.NumFillers; ++i) {
+		if (OnGraphic(x, y, TheUI.Filler[i], TheUI.FillerX[i], TheUI.FillerY[i])) {
+			on_ui = 1;
+		}
+	}
+
+	//
+	//  Map
+	//
+	if (!on_ui && x >= TheUI.MapArea.X && x <= TheUI.MapArea.EndX &&
 			y >= TheUI.MapArea.Y && y <= TheUI.MapArea.EndY) {
 		Viewport* vp;
 

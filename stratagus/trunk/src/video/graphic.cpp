@@ -642,4 +642,41 @@ void ResizeGraphic(Graphic* g, int w, int h)
 #endif
 }
 
+/**
+**  Check if a pixel is transparent
+**
+**  @param g  Graphic to check
+**  @param x  X coordinate
+**  @param y  Y coordinate
+**
+**  @return   True if the pixel is transparent, False otherwise
+*/
+int GraphicTransparentPixel(Graphic* g, int x, int y)
+{
+	unsigned char* p;
+	int bpp;
+	int ret;
+
+	bpp = g->Surface->format->BytesPerPixel;
+	if ((bpp == 1 && !(g->Surface->flags & SDL_SRCCOLORKEY)) || bpp == 3) {
+		return 0;
+	}
+
+	ret = 0;
+	SDL_LockSurface(g->Surface);
+	p = (unsigned char*)g->Surface->pixels + y * g->Surface->pitch + x * bpp;
+	if (bpp == 1) {
+		if (*p == g->Surface->format->colorkey) {
+			ret = 1;
+		}
+	} else {
+		if (p[g->Surface->format->Ashift >> 3] == 255) {
+			ret = 1;
+		}
+	}
+	SDL_UnlockSurface(g->Surface);
+
+	return ret;
+}
+
 //@}
