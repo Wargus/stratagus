@@ -539,7 +539,7 @@ global void UpdateDisplay(void)
 		DrawMapArea();
 
 		//
-		// Force Redraw Items that are ontop of map, they don't have a panel
+		// Force Redraw Items that are on top of map, they don't have a panel
 		//
 		if (!TheUI.MinimapPanel.Graphic) {
 			MustRedraw |= RedrawMinimapBorder;
@@ -554,10 +554,9 @@ global void UpdateDisplay(void)
 		if (!TheUI.Resource.Graphic) {
 			MustRedraw |= RedrawResources;
 		}
-		MustRedraw |= RedrawStatusLine;
-		/*if (!TheUI.StatusLine.Graphic) {
+		if (!TheUI.StatusLine.Graphic) {
 			MustRedraw |= RedrawStatusLine;
-		}*/
+		}
 	}
 
 	if (MustRedraw & (RedrawMessage | RedrawMap)) {
