@@ -1547,10 +1547,10 @@ global void MarkDrawEntireMap(void)
 #ifdef NEW_MAPDRAW
     int i;
 
-    for( i=0; i<MapHeight; ++i ) {
+    for( i=0; i<TheMap.Height; ++i ) {
 	MustRedrawRow[i]=1;
     }
-    for( i=0; i<MapHeight*MapWidth; ++i ) {
+    for( i=0; i<TheMap.Height*TheMap.Width; ++i ) {
 	MustRedrawTile[i]=1;
     }
 #endif
