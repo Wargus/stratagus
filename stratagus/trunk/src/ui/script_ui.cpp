@@ -2818,6 +2818,22 @@ static int CclDefineMenu(lua_State* l)
 		} else if (!strcmp(value, "nitems")) {
 			item.nitems = LuaToNumber(l, j + 1);
 */
+		} else if (!strcmp(value, "init")) {
+			value = LuaToString(l, j + 1);
+			func = (void**)hash_find(MenuFuncHash, value);
+			if (func != NULL) {
+				item.InitFunc = (void*)*func;
+			} else {
+				LuaError(l, "Can't find function: %s" _C_ value);
+			}
+		} else if (!strcmp(value, "exit")) {
+			value = LuaToString(l, j + 1);
+			func = (void**)hash_find(MenuFuncHash, value);
+			if (func != NULL) {
+				item.ExitFunc = (void*)*func;
+			} else {
+				LuaError(l, "Can't find function: %s" _C_ value);
+			}
 		} else if (!strcmp(value, "netaction")) {
 			value = LuaToString(l, j + 1);
 			func = (void**)hash_find(MenuFuncHash, value);
@@ -3828,7 +3844,6 @@ static int CclDefineMenuItem(lua_State* l)
 	Menuitem *item;
 	Menu** tmp;
 	Menu* menu;
-	void** func;
 	int args;
 	int subargs;
 	int j;
@@ -3880,36 +3895,6 @@ static int CclDefineMenuItem(lua_State* l)
 			}
 		} else if (!strcmp(value, "font")) {
 			item->Font = FontByIdent(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "init")) {
-			if (!lua_isstring(l, j + 1) && !lua_isnil(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			if (lua_isstring(l, j + 1)) {
-				value = lua_tostring(l, j + 1);
-				func = (void**)hash_find(MenuFuncHash, value);
-				if (func != NULL) {
-					item->InitFunc = (void*)*func;
-				} else {
-					LuaError(l, "Can't find function: %s" _C_ value);
-				}
-			} else {
-				item->InitFunc = NULL;
-			}
-		} else if (!strcmp(value, "exit")) {
-			if (!lua_isstring(l, j + 1) && !lua_isnil(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			if (lua_isstring(l, j + 1)) {
-				value = lua_tostring(l, j + 1);
-				func = (void**)hash_find(MenuFuncHash, value);
-				if (func != NULL) {
-					item->ExitFunc = (void*)*func;
-				} else {
-					LuaError(l, "Can't find function: %s" _C_ value);
-				}
-			} else {
-				item->ExitFunc = NULL;
-			}
 /* Menu types */
 		} else if (!item->MiType) {
 			if (!strcmp(value, "text")) {

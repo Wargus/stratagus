@@ -225,8 +225,6 @@ typedef struct _menuitem_ {
 	int YOfs;
 	unsigned Flags;
 	int Font;
-	void (*InitFunc)(struct _menuitem_*);  /// constructor
-	void (*ExitFunc)(struct _menuitem_*);  /// destructor
 	struct _menu_* Menu;  /// backpointer for speedups
 	union {
 		MenuitemText Text;
@@ -293,6 +291,8 @@ typedef struct _menu_ {
 	int       DefSel;     /// initial selected item number (or -1)
 	int       NumItems;   /// number of items to follow
 	Menuitem* Items;      /// buttons, etc
+	void (*InitFunc)(struct _menu_*);  /// constructor
+	void (*ExitFunc)(struct _menu_*);  /// destructor
 	void (*NetAction)(void);   /// network action callback
 } Menu;
 
