@@ -1383,7 +1383,7 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	    break;
 	default:
 	    id = (msgnr&0x7f) - MessageCommandSpellCast;
-	    if( y!=-1 ) {
+	    if( y!=(unsigned short)0xFFFF ) {
 		dest=NoUnitP;
 		if( dstnr!=(unsigned short)0xFFFF ) {
 		    dest=UnitSlots[dstnr];
