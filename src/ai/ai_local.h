@@ -324,6 +324,8 @@ extern int AiFindBuildingPlace(const Unit*, const UnitType * , int *, int *);
 //
     /// Assign a new unit to a force
 extern void AiAssignToForce(Unit* unit);
+    /// Assign a free units to a force
+extern void AiAssignFreeUnitsToForce(void);
     /// Attack with force at position
 extern void AiAttackWithForceAt(int force,int x,int y);
     /// Attack with force

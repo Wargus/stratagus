@@ -551,6 +551,8 @@ local SCM CclAiForce(SCM list)
 	}
     }
 
+    AiAssignFreeUnitsToForce();
+
     return SCM_BOOL_F;
 }
 
@@ -671,6 +673,16 @@ local SCM CclAiUpgradeTo(SCM value)
     return SCM_BOOL_F;
 }
 
+/**
+**	Simple restart the ai.
+*/
+local SCM CclAiRestart(void)
+{
+    AiPlayer->Script=AiPlayer->AiType->Script;
+
+    return SCM_BOOL_T;
+}
+
 #else
 
 /**
@@ -713,6 +725,7 @@ global void AiCclRegister(void)
     gh_new_procedure1_0("ai:sleep",CclAiSleep);
     gh_new_procedure1_0("ai:research",CclAiResearch);
     gh_new_procedure1_0("ai:upgrade-to",CclAiUpgradeTo);
+    gh_new_procedure0_0("ai:restart",CclAiRestart);
 #endif
 
 }
