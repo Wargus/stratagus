@@ -53,7 +53,6 @@
 ----------------------------------------------------------------------------*/
 
 global unsigned SyncHash;			/// Hash calculated to find sync failures
-#define DEBUG_ACTIONS
 
 /*----------------------------------------------------------------------------
 --  Functions
