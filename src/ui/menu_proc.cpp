@@ -1370,7 +1370,7 @@ normkey:
 								mi[1].d.vslider.percent = (mi->d.listbox.curopt * 100) / (mi->d.listbox.noptions - mi->d.listbox.nlines);
 							}
 							if (mi[1].d.vslider.action) {
-								(*mi->d.vslider.action)(mi);
+								(*mi[1].d.vslider.action)(mi);
 							}
 							break;
 						case MI_TYPE_VSLIDER:
