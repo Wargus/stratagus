@@ -294,7 +294,7 @@ global void CreatePlayer(int type)
     //	Take first slot for person on this computer,
     //	fill other with computer players.
     //
-    if( type==PlayerPerson && !NetPlayers && !NetworkArg ) {
+    if( type==PlayerPerson && !NetPlayers ) {
 	if( !ThisPlayer ) {
 	    ThisPlayer=player;
 	} else {

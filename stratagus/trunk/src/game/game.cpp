@@ -181,32 +181,6 @@ global void CreateGame(char* filename, WorldMap* map)
 	if (s) {
 	    free(s);
 	}
-	
-#if 0	/* WILL NOW BE DONE BY MENU CODE.. */
-	//
-	//	Network by command line
-	//
-	if( NetworkFildes!=-1 ) {
-	    if( NetPlayers>1 || NetworkArg ) {
-		//
-		//	Server
-		//
-		if (NetPlayers > 1) {
-		    NetworkServerSetup(map);
-		    DebugLevel0Fn("Server setup ready\n");
-		//
-		// Client
-		//
-		} else if (NetworkArg) {
-		    NetworkClientSetup(map);
-		    DebugLevel0Fn("Client setup ready\n");
-		}
-	    } else {
-		ExitNetwork1();
-	    }
-	}
-#endif
-
     }
 
     GameCycle=0;
