@@ -700,7 +700,7 @@ global void GameMainLoop(void)
 	    switch( GameCycle% ((CYCLES_PER_SECOND*VideoSyncSpeed/100)+1) ) {
 		case 0:				// Check cd-rom
 #if defined(USE_SDLCD)
-		    if ( !(GameCycle%2) )	// every 2nd second
+		    if ( !(GameCycle%4) )	// every 2nd second
 			SDL_CreateThread(CDRomCheck, NULL);
 #elif defined(USE_LIBCDA) || defined(USE_CDDA)
 		    CDRomCheck(NULL);
