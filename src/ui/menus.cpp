@@ -7239,35 +7239,31 @@ global void InitMenuData(void)
 */
 global void InitMenuFunctions(void)
 {
-    Menu *menu;
+    // FIXME: This must be removed!
+    // FIXME: Use wartool and fix the ccls instead!
+    if (!strcmp(GameName, "wc2")) {
+	Menu *menu;
 
-    //
-    //	Autodetect the swamp tileset
-    //
-    strcpy(MenuMapFullPath, StratagusLibPath);
-    if (MenuMapFullPath[0]) {
-	strcat(MenuMapFullPath, "/graphics/tilesets/");
-    }
-    strcat(MenuMapFullPath, "swamp");
-    //
-    //	FIXME: Johns: this didn't work if the files are in ZIP archive.
-    //
-    if (access(MenuMapFullPath, F_OK) != 0) {
-	// ARI FIXME: Hack to disable Expansion Gfx..
-	// also shows how to add new tilesets....
-	// - FIXME2:
-	// With new dynamic tileset configuration this
-	// should read what siod-config gave us and
-	// build the menu from that..
-	menu = FindMenu("menu-custom-game");
-	menu->Items[14].d.pulldown.noptions = 4;
-	menu = FindMenu("menu-multi-setup");
-	menu->Items[29].d.pulldown.noptions = 4;
+	//
+	//  FIXME: Hack to disable Expansion Gfx..
+	//
+	strcpy(MenuMapFullPath, StratagusLibPath);
+	if (MenuMapFullPath[0]) {
+	    strcat(MenuMapFullPath, "/graphics/tilesets/");
+	}
+	strcat(MenuMapFullPath, "swamp");
+	if (access(MenuMapFullPath, F_OK) != 0) {
+	    menu = FindMenu("menu-custom-game");
+	    menu->Items[14].d.pulldown.noptions = 4;
+	    menu = FindMenu("menu-multi-setup");
+	    menu->Items[29].d.pulldown.noptions = 4;
+	}
     }
 
 #ifdef SAVE_MENU_CCL
     {
-	FILE *fd=fopen("menus.ccl","wb");
+	FILE* fd;
+	fd = fopen("menus.ccl", "wb");
 	SaveMenus(fd);
 	fclose(fd);
     }
