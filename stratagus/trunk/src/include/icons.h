@@ -200,8 +200,6 @@ extern char** IconWcNames;		/// pud original -> internal
 extern int IconWidth;			/// icon width in panels
 	/** FIXME: Not needed */
 extern int IconHeight;	    		/// icon height in panels
-	/** FIXME: Not needed */
-extern int IconsPerRow;			/// icons per row
 
 /*----------------------------------------------------------------------------
 --	Functions
