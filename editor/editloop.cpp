@@ -1691,6 +1691,7 @@ local void EditorCallbackMouse(int x, int y)
 	    TheUI.InfoPanelY + 4 < CursorY &&
 	    CursorY < TheUI.InfoPanelY + 4 + IconHeight + 7) {
 	// FIXME: what is this button?
+	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = SelectButton;
 	CursorOn = CursorOnButton;
 	SetStatusLine("Select mode");
@@ -1700,6 +1701,7 @@ local void EditorCallbackMouse(int x, int y)
 	    CursorX < TheUI.InfoPanelX + 4 + UNIT_ICON_X + IconWidth + 7 &&
 	    TheUI.InfoPanelY + 4 + UNIT_ICON_Y < CursorY &&
 	    CursorY < TheUI.InfoPanelY + 4 + UNIT_ICON_Y + IconHeight + 7) {
+	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = UnitButton;
 	CursorOn = CursorOnButton;
 	SetStatusLine("Unit mode");
@@ -1709,6 +1711,7 @@ local void EditorCallbackMouse(int x, int y)
 	    CursorX < TheUI.InfoPanelX + 4 + TILE_ICON_X + TileSizeX + 7 &&
 	    TheUI.InfoPanelY + 4 + TILE_ICON_Y < CursorY &&
 	    CursorY < TheUI.InfoPanelY + 4 + TILE_ICON_Y + TileSizeY + 7) {
+	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = TileButton;
 	CursorOn = CursorOnButton;
 	SetStatusLine("Tile mode");
