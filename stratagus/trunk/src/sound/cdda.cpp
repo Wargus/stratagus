@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name cdda.c			-	cdda support */
+/**@name cdda.c - cdda support */
 //
-//	(c) Copyright 2002-2003 by Nehal Mistry
+// (c) Copyright 2002-2003 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id: wav.c,v 1.7 2002/07/20 00:09:05 johns Exp $
+// $Id: wav.c,v 1.7 2002/07/20 00:09:05 johns Exp $
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
@@ -46,31 +46,31 @@
 #include "cdaudio.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+-- Declarations
 ----------------------------------------------------------------------------*/
 
 typedef struct _cdda_data {
-	int PosInCd;						// Offset on CD to read from
-	struct cdrom_read_audio Readdata;		// Structure for IOCTL
-	char* PointerInBuffer;				// Position in buffer
-	char* Buffer;						// Buffer start
+	int PosInCd;                      ///< Offset on CD to read from
+	struct cdrom_read_audio Readdata; ///< Structure for IOCTL
+	char* PointerInBuffer;            ///< Position in buffer
+	char* Buffer;                     ///< Buffer start
 } CddaData;
 
 #define FRAME_SIZE 2352
 #define CDDA_BUFFER_SIZE (12 * FRAME_SIZE)
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Type member function to read from the cd
+** Type member function to read from the cd
 **
-**		@param sample			Sample reading from
-**		@param buf			Buffer to write data to
-**		@param len			Length of the buffer
+** @param sample   Sample reading from
+** @param buf      Buffer to write data to
+** @param len      Length of the buffer
 **
-**		@return					Number of bytes read
+** @return Number of bytes read
 */
 static int CDRead(Sample* sample, void* buf, int len)
 {
@@ -112,9 +112,9 @@ static int CDRead(Sample* sample, void* buf, int len)
 }
 
 /**
-**		Type member function to free CDDA sample
+** Type member function to free CDDA sample
 **
-**		@param sample			Sample to free
+** @param sample Sample to free
 */
 static void CDFree(Sample* sample)
 {
@@ -122,7 +122,7 @@ static void CDFree(Sample* sample)
 }
 
 /**
-**		CDDA object type structure.
+** CDDA object type structure.
 */
 static const SampleType CDStreamSampleType = {
 	CDRead,
@@ -130,12 +130,12 @@ static const SampleType CDStreamSampleType = {
 };
 
 /**
-**		Load CD.
+** Load CD.
 **
-**		@param name		Unused.
-**		@param flags		Unused.
+** @param name   Unused.
+** @param flags  Unused.
 **
-**		@return				Returns the loaded sample.
+** @return Returns the loaded sample.
 **
 */
 Sample* LoadCD(const char* name __attribute__((unused)),
@@ -160,6 +160,6 @@ Sample* LoadCD(const char* name __attribute__((unused)),
 	return sample;
 }
 
-#endif		// } USE_CDDA
+#endif // } USE_CDDA
 
 //@}

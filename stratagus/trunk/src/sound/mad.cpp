@@ -5,7 +5,7 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
+//   T H E   W A R   B E G I N S
 //      Stratagus - A free fantasy real time strategy game engine
 //
 /**@name mad.c - mp3 support with libmad */
@@ -37,7 +37,7 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#ifdef USE_MAD		// {
+#ifdef USE_MAD // {
 
 #include <stdlib.h>
 #include <string.h>
@@ -57,14 +57,14 @@
 **  Private mp3 data structure to handle mp3 streaming.
 */
 typedef struct _mp3_data_ {
-	struct mad_decoder MadDecoder;           /// Mad decoder handle
-	CLFile* MadFile;                         /// File handle
-	unsigned char Buffer[MAD_INBUF_SIZE];    /// Input buffer
-	int BufferLen;                           /// Length of filled buffer
+	struct mad_decoder MadDecoder;           ///< Mad decoder handle
+	CLFile* MadFile;                         ///< File handle
+	unsigned char Buffer[MAD_INBUF_SIZE];    ///< Input buffer
+	int BufferLen;                           ///< Length of filled buffer
 } MadData;
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -206,7 +206,7 @@ static int MadRead(Sample *sample, unsigned char* buf, int len)
 		Assert(0);
 	}
 	mad_synth_frame (synth, frame);
-	
+
 	decoder->output_func(decoder->cb_data, &frame->header, &synth->pcm);
 
 
@@ -335,7 +335,7 @@ static void Mp3FreeStream(Sample* sample)
 	mad_frame_finish(&data->MadDecoder.sync->frame);
 	mad_stream_finish(&data->MadDecoder.sync->stream);
 
-//	free(data->MadDecoder.sync);
+// free(data->MadDecoder.sync);
 	mad_decoder_finish(&data->MadDecoder);
 
 	CLclose(data->MadFile);
@@ -478,6 +478,6 @@ Sample* LoadMp3(const char* name, int flags)
 	return sample;
 }
 
-#endif		// USE_MAD
+#endif // USE_MAD
 
 //@}
