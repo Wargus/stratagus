@@ -169,7 +169,8 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 
 CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
 	  contrib/health2.png contrib/mana2.png \
-	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png
+	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
+	  contrib/music/toccata.mod.gz
 
 MISC    = Makefile Common.mk Rules.make.orig FreeCraft-beos.proj setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
