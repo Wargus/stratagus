@@ -40,10 +40,18 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "util.h"
 #include "video.h"
 #include "upgrade_structs.h"
 #include "cursor.h"
 #include "interface.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+struct _unit_;
+struct _CL_File_;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -165,7 +173,7 @@ struct _viewport_ {
 	int MapWidth;               ///< Width in map tiles
 	int MapHeight;              ///< Height in map tiles
 
-	Unit* Unit;                 ///< Bound to this unit
+	struct _unit_* Unit;        ///< Bound to this unit
 };
 
 /**
@@ -400,7 +408,7 @@ extern UI TheUI;                        ///< The user interface
 extern UI** UI_Table;                   ///< All available user interfaces
 
 	/// Hash table of all the button styles
-typedef hashtable(ButtonStyle*,128) _ButtonStyleHash;
+typedef hashtable(ButtonStyle*, 128) _ButtonStyleHash;
 extern _ButtonStyleHash ButtonStyleHash;
 
 	/// Hash table of all the checkbox styles
@@ -427,7 +435,7 @@ extern void InitUserInterface(const char* race_name);
 	/// Load ui graphics
 extern void LoadUserInterface(void);
 	/// Save the ui state
-extern void SaveUserInterface(CLFile* file);
+extern void SaveUserInterface(struct _CL_File_* file);
 	/// Clean up a ui
 extern void CleanUI(UI* ui);
 	/// Clean up the ui module

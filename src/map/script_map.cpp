@@ -45,6 +45,8 @@
 #include "actions.h"
 #include "campaign.h"
 #include "ui.h"
+#include "player.h"
+#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
