@@ -136,8 +136,17 @@ global void HandleActionBuild(Unit* unit)
     //	Check if enough resources for the building.
     //
     if( PlayerCheckUnitType(unit->Player,type) ) {
-	if( unit->Player!=ThisPlayer ) {
+	// FIXME: use general notify/messages
+        if( unit->Player==ThisPlayer ) {
+	    SetMessage("Not enough resources to build %s.", type->Name);
+	} else {
 	    AiCanNotBuild(unit,type);
+	}
+
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	if( unit->Selected ) {	// update display for new action
+	    UpdateButtonPanel();
 	}
 	return;
     }
