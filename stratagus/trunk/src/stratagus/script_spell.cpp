@@ -170,6 +170,14 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_rawgeti(l, -1, j + 1);
 				CclSpellMissileLocation(l, &spellaction->Data.SpawnMissile.EndPoint);
 				lua_pop(l, 1);
+			} else if (!strcmp(value, "missile")) {
+				lua_rawgeti(l, -1, j + 1);
+				value = LuaToString(l, -1);
+				spellaction->Data.SpawnMissile.Missile = MissileTypeByIdent(value);
+				if (spellaction->Data.SpawnMissile.Missile == NULL) {
+					DebugLevel0Fn("in spawn-missile : missile %s does not exist\n" _C_ value);
+				}
+				lua_pop(l, 1);
 			} else {
 				lua_pushfstring(l, "Unsupported spawn-missile tag: %s", value);
 				lua_error(l);
@@ -221,6 +229,14 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			} else if (!strcmp(value, "start-offset-y")) {
 				lua_rawgeti(l, -1, j + 1);
 				spellaction->Data.AreaBombardment.StartOffsetY = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			} else if (!strcmp(value, "missile")) {
+				lua_rawgeti(l, -1, j + 1);
+				value = LuaToString(l, -1);
+				spellaction->Data.AreaBombardment.Missile = MissileTypeByIdent(value);
+				if (spellaction->Data.AreaBombardment.Missile == NULL) {
+					DebugLevel0Fn("in area-bombardement : missile %s does not exist\n" _C_ value);
+				}
 				lua_pop(l, 1);
 			} else {
 				lua_pushfstring(l, "Unsupported area-bombardment tag: %s", value);
@@ -700,13 +716,6 @@ local int CclDefineSpell(lua_State* l)
 			if (!spell->SoundWhenCast.Sound) {
 				free(spell->SoundWhenCast.Name);
 				spell->SoundWhenCast.Name = 0;
-			}
-		} else if (!strcmp(value, "missile-when-cast")) {
-			value = LuaToString(l, j + 1);
-			spell->Missile = MissileTypeByIdent(value);
-			if (spell->Missile == NULL) {
-				DebugLevel0Fn("in spell-type '%s' : missile %s does not exist\n" _C_
-					spell->Name _C_ value);
 			}
 		} else if (!strcmp(value, "depend-upgrade")) {
 			value = LuaToString(l, j + 1);

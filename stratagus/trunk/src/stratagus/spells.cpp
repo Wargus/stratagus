@@ -297,6 +297,7 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	int dx;
 	int dy;
 	int i;
+	MissileType *missile;
 
 	DebugCheck(!caster);
 	DebugCheck(!spell);
@@ -310,6 +311,8 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	damage = action->Data.AreaBombardment.Damage;
 	offsetx = action->Data.AreaBombardment.StartOffsetX;
 	offsety = action->Data.AreaBombardment.StartOffsetY;
+	missile = action->Data.AreaBombardment.Missile;
+	DebugCheck(!missile);
 	while (fields--) {
 			// FIXME: radius configurable...
 		do {
@@ -318,7 +321,7 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 			dy = y + SyncRand() % 5 - 2;
 		} while (dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height);
 		for (i = 0; i < shards; ++i) {
-			mis = MakeMissile(spell->Missile,
+			mis = MakeMissile(missile,
 				dx * TileSizeX + TileSizeX / 2 + offsetx,
 				dy * TileSizeY + TileSizeY / 2 + offsety,
 				dx * TileSizeX + TileSizeX / 2,
@@ -399,7 +402,7 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 	DebugCheck(!caster);
 	DebugCheck(!spell);
 	DebugCheck(!action);
-	DebugCheck(!spell->Missile);
+	DebugCheck(!action->Data.SpawnMissile.Missile);
 
 	missile = NULL;
 
@@ -408,11 +411,13 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 	EvaluateMissileLocation(&action->Data.SpawnMissile.EndPoint,
 		caster, target, x, y, &dx, &dy);
 
-	missile = MakeMissile(spell->Missile, sx, sy, dx, dy);
+	missile = MakeMissile(action->Data.SpawnMissile.Missile, sx, sy, dx, dy);
 	missile->TTL = action->Data.SpawnMissile.TTL;
 	missile->Delay = action->Data.SpawnMissile.Delay;
 	missile->Damage = action->Data.SpawnMissile.Damage;
-	missile->SourceUnit = caster;
+	if (missile->Damage != 0) {
+		missile->SourceUnit = caster;
+	}
 	if ((missile->TargetUnit = target)) {
 		RefsIncrease(target);
 	}
@@ -455,9 +460,6 @@ global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 		target->UnholyArmor = action->Data.AdjustBuffs.InvincibilityTicks;
 	}
 	CheckUnitToBeDrawn(target);
-	MakeMissile(spell->Missile,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
 	return 0;
 }
 
@@ -546,9 +548,6 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 
 	DebugLevel3Fn("Unit now has %d hp and %d mana.\n" _C_
 		target->HP _C_ target->Mana);
-	MakeMissile(spell->Missile,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
 	return 0;
 }
 
@@ -619,11 +618,6 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 		UnitLost(target);
 		UnitClearOrders(target);
 		ReleaseUnit(target);
-		if (spell->Missile) {
-			MakeMissile(spell->Missile,
-				x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-				x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-		}
 		return 1;
 	} else {
 		PlaceUnit(target, target->X, target->Y);
@@ -714,9 +708,6 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 
 		caster->Mana -= spell->ManaCost;
 
-		MakeMissile(spell->Missile,
-			x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-			x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
 		return 1;
 	}
 
