@@ -156,7 +156,7 @@ void UpdateStats(int reset)
 	//
 	//  Update players stats
 	//
-	for (j = 0; j<NumUnitTypes; ++j) {
+	for (j = 0; j < NumUnitTypes; ++j) {
 		type = UnitTypes[j];
 		if (reset) {
 			// LUDO : FIXME : reset loading of player stats !
@@ -168,6 +168,7 @@ void UpdateStats(int reset)
 				stats->BasicDamage = type->_BasicDamage;
 				stats->PiercingDamage = type->_PiercingDamage;
 				stats->HitPoints = type->_HitPoints;
+				stats->Mana = type->Variable[MANA_INDEX].Max;
 				for (i = 0; i < MaxCosts; ++i) {
 					stats->Costs[i] = type->_Costs[i];
 				}
@@ -182,6 +183,21 @@ void UpdateStats(int reset)
 				} else {
 					stats->Level = 1;
 				}
+				stats->Variables[MANA_INDEX].Max = stats->Mana;
+				stats->Variables[LEVEL_INDEX].Value = stats->Level;
+				stats->Variables[LEVEL_INDEX].Max = stats->Level;
+				stats->Variables[ATTACKRANGE_INDEX].Value = stats->AttackRange;
+				stats->Variables[ATTACKRANGE_INDEX].Max = stats->AttackRange;
+				stats->Variables[SIGHTRANGE_INDEX].Value = stats->SightRange;
+				stats->Variables[SIGHTRANGE_INDEX].Max = stats->SightRange;
+				stats->Variables[ARMOR_INDEX].Value = stats->Armor;
+				stats->Variables[ARMOR_INDEX].Max = stats->Armor;
+				stats->Variables[BASICDAMAGE_INDEX].Value = stats->BasicDamage;
+				stats->Variables[BASICDAMAGE_INDEX].Max = stats->BasicDamage;
+				stats->Variables[PIERCINGDAMAGE_INDEX].Value = stats->PiercingDamage;
+				stats->Variables[PIERCINGDAMAGE_INDEX].Max = stats->PiercingDamage;
+				stats->Variables[HP_INDEX].Max = stats->HitPoints;
+				stats->Variables[HP_INDEX].Increase = stats->RegenerationRate;
 			}
 		}
 
@@ -297,21 +313,11 @@ static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 
 	Assert(plynr < PlayerMax);
 	CLprintf(file, "DefineUnitStats(\"%s\", %d,\n  ", ident, plynr);
-	CLprintf(file, "\"level\", %d, ", stats->Level);
-	CLprintf(file, "\"attack-range\", %d, ", stats->AttackRange);
-	CLprintf(file, "\"sight-range\", %d,\n  ", stats->SightRange);
-	CLprintf(file, "\"armor\", %d, ", stats->Armor);
-	CLprintf(file, "\"basic-damage\", %d, ", stats->BasicDamage);
-	CLprintf(file, "\"piercing-damage\", %d, ", stats->PiercingDamage);
-	CLprintf(file, "\"hit-points\", %d,\n  ", stats->HitPoints);
-	CLprintf(file, "\"regeneration-rate\", %d,\n  ", stats->RegenerationRate);
-
-	for (j = NVARALREADYDEFINED; j < UnitTypeVar.NumberVariable; ++j) {
+	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) {
 		CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d},\n  ",
 			UnitTypeVar.VariableName[j], stats->Variables[j].Value,
 			stats->Variables[j].Max, stats->Variables[j].Increase);
 	}
-
 	CLprintf(file, "\"costs\", {");
 	for (j = 0; j < MaxCosts; ++j) {
 		if (j) {

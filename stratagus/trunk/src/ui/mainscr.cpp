@@ -154,10 +154,8 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 	y += unit->Type->Icon.Icon->Sprite->Height;
 	VideoFillRectangleClip(ColorBlack, x, y + 3,
 		unit->Type->Icon.Icon->Sprite->Width, 4);
-	if (unit->HP) {
-		// s0m3body: mana bar should represent proportional value of Mana
-		// with respect to MaxMana (unit->Type->_MaxMana) for the unit
-		f = (100 * unit->Mana) / unit->Type->_MaxMana;
+	if (unit->HP && unit->Stats->Mana) {
+		f = (100 * unit->Mana) / unit->Stats->Mana;
 		f = (f * (unit->Type->Icon.Icon->Sprite->Width)) / 100;
 		VideoFillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
@@ -694,7 +692,7 @@ static void DrawUnitInfo(const Unit* unit)
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 					TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y, NULL);
 				UiDrawLifeBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
-				if (uins->Type->CanCastSpell && unit->Type->_MaxMana) {
+				if (uins->Type->CanCastSpell && unit->Stats->Mana) {
 					UiDrawManaBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
 				}
 				if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) {
@@ -1288,7 +1286,7 @@ void DrawInfoPanel(void)
 					Selected[0]->Orders[0].Action == UnitActionUpgradeTo ||
 					Selected[0]->Orders[0].Action == UnitActionTrain) {
 					i = 3;
-				} else if (Selected[0]->Type->_MaxMana) {
+				} else if (Selected[0]->Stats->Mana) {
 					i = 2;
 				} else {
 					i = 1;

@@ -348,7 +348,6 @@ void InitUnit(Unit* unit, UnitType* type)
 	}
 
 	if (type->CanCastSpell) {
-		unit->Mana = (type->_MaxMana * MAGIC_FOR_NEW_UNITS) / 100;
 		unit->AutoCastSpell = malloc(SpellTypeCount);
 		if (unit->Type->AutoCastActive) {
 			memcpy(unit->AutoCastSpell, unit->Type->AutoCastActive, SpellTypeCount);
@@ -438,12 +437,15 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 	unit->Player = player;
 	unit->Stats = &type->Stats[unit->Player->Player];
 	unit->Colors = &player->UnitColors;
-	unit->HP = unit->Stats->HitPoints;
-	if (UnitTypeVar.NumberVariable) {
-		Assert(unit->Variable);
-		Assert(unit->Stats->Variables);
-		memcpy(unit->Variable, unit->Stats->Variables,
-			UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
+	if (!SaveGameLoading) {
+		unit->HP = unit->Stats->HitPoints;
+		unit->Mana = (unit->Stats->Mana * MAGIC_FOR_NEW_UNITS) / 100;
+		if (UnitTypeVar.NumberVariable) {
+			Assert(unit->Variable);
+			Assert(unit->Stats->Variables);
+			memcpy(unit->Variable, unit->Stats->Variables,
+				UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
+		}
 	}
 }
 

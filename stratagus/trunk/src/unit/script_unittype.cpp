@@ -443,7 +443,7 @@ static int CclDefineUnitType(lua_State* l)
 		} else if (!strcmp(value, "BurnDamageRate")) {
 			type->BurnDamageRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxMana")) {
-			type->_MaxMana = LuaToNumber(l, -1);
+			type->Variable[MANA_INDEX].Max = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TileSize")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -1072,23 +1072,7 @@ static int CclDefineUnitStats(lua_State* l)
 		value = LuaToString(l, j + 1);
 		++j;
 
-		if (!strcmp(value, "level")) {
-			stats->Level = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "attack-range")) {
-			stats->AttackRange = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "sight-range")) {
-			stats->SightRange = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "armor")) {
-			stats->Armor = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "basic-damage")) {
-			stats->BasicDamage = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "piercing-damage")) {
-			stats->PiercingDamage = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "hit-points")) {
-			stats->HitPoints = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "regeneration-rate")) {
-			stats->RegenerationRate = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "costs")) {
+		if (!strcmp(value, "costs")) {
 			int subargs;
 			int k;
 
@@ -1136,6 +1120,16 @@ static int CclDefineUnitStats(lua_State* l)
 		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+
+	stats->Mana = stats->Variables[MANA_INDEX].Max;
+	stats->Level = stats->Variables[LEVEL_INDEX].Value;
+	stats->AttackRange = stats->Variables[ATTACKRANGE_INDEX].Value;
+	stats->SightRange = stats->Variables[SIGHTRANGE_INDEX].Value;
+	stats->Armor = stats->Variables[ARMOR_INDEX].Value;
+	stats->BasicDamage = stats->Variables[BASICDAMAGE_INDEX].Value;
+	stats->PiercingDamage = stats->Variables[PIERCINGDAMAGE_INDEX].Value;
+	stats->HitPoints = stats->Variables[HP_INDEX].Max;
+	stats->RegenerationRate = stats->Variables[HP_INDEX].Increase;
 
 	return 0;
 }
@@ -1768,7 +1762,7 @@ void UpdateUnitVariables(const Unit* unit)
 
 	// Mana.
 	unit->Variable[MANA_INDEX].Value = unit->Mana;
-	unit->Variable[MANA_INDEX].Max = unit->Type->_MaxMana;
+	unit->Variable[MANA_INDEX].Max = unit->Stats->Mana;
 
 	// Transport
 	unit->Variable[TRANSPORT_INDEX].Value = unit->BoardCount;
