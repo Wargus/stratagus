@@ -117,7 +117,7 @@ static enum mad_flow MAD_write(void* user,
 	int i;
 	int j;
 	int n;
-	short *buf;
+	short* buf;
 	int s;
 	int comp;
 

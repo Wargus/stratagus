@@ -16,7 +16,7 @@ extern "C" {
 #define LIBCDA_VERSION_STR  "0.5"
 
 
-extern const char *cd_error;
+extern const char* cd_error;
 
 
 int cd_init(void);

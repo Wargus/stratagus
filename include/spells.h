@@ -196,7 +196,7 @@ typedef struct ConditionInfo {
 	char Opponent;          ///< Target is opponent. (neutral is neither allied, nor opponent)
 	char Building;          ///< Target is a building.
 	char TargetSelf;        ///< Target is the same as the caster.
-	char *BoolFlag;         ///< User defined boolean flag.
+	char* BoolFlag;         ///< User defined boolean flag.
 #if 0
 		// TODO: NOT IMPLEMENTED:
 	char UnitBuffed;        ///< Target is buffed(haste/slow/bloodlust). Dispel magic?

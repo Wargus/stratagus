@@ -1576,7 +1576,7 @@ static int CclDefineUI(lua_State* l)
 						ui->PieY[pie]= (coeffY[pie] * radius) >> 8;
 					}
 				} else if (!strcmp(value, "mouse-button")) {
-					const char *button;
+					const char* button;
 
 					lua_rawgeti(l, j + 1, k + 1);
 					button = LuaToString(l, -1);

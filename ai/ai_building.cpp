@@ -66,7 +66,7 @@
 **
 **  @note          Can be faster written.
 */
-static int AiCheckSurrounding(const Unit * worker, const UnitType * type, int x, int y, int flag)
+static int AiCheckSurrounding(const Unit* worker, const UnitType* type, int x, int y, int flag)
 {
 	static int dirs[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
 	int surrounding[1024]; // Max criconference for building
@@ -148,8 +148,8 @@ static int AiCheckSurrounding(const Unit * worker, const UnitType * type, int x,
 **
 **  @return        True if place found, false if no found.
 */
-static int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
-	int ox, int oy, int *dx, int *dy, int flag)
+static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
+	int ox, int oy, int* dx, int* dy, int flag)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -168,8 +168,8 @@ static int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	int ep;
 	int i;
 	int w;
-	unsigned char *m;
-	unsigned char *matrix;
+	unsigned char* m;
+	unsigned char* matrix;
 
 	points = malloc(TheMap.Width * TheMap.Height);
 	size = TheMap.Width * TheMap.Height / sizeof (*points);
@@ -289,14 +289,14 @@ static int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 **  @todo          FIXME: This is slow really slow, using
 **                 two flood fills, is not a perfect solution.
 */
-static int AiFindHallPlace(const Unit * worker, const UnitType * type, int *dx, int *dy)
+static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, int* dy)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
 	struct {
 		unsigned short X;
 		unsigned short Y;
-	}	 *points;
+	} *points;
 	int size;
 	int x;
 	int y;
@@ -308,10 +308,10 @@ static int AiFindHallPlace(const Unit * worker, const UnitType * type, int *dx, 
 	int ep;
 	int i;
 	int w;
-	unsigned char *m;
-	unsigned char *morg;
-	unsigned char *matrix;
-	Unit *mine;
+	unsigned char* m;
+	unsigned char* morg;
+	unsigned char* matrix;
+	Unit* mine;
 	int destx;
 	int desty;
 
@@ -456,15 +456,15 @@ static int AiFindHallPlace(const Unit * worker, const UnitType * type, int *dx, 
 **  @todo          FIXME: This is slow really slow, using two flood
 **                 fills, is not a perfect solution.
 */
-static int AiFindLumberMillPlace(const Unit * worker, const UnitType * type, int *dx,
-	int *dy)
+static int AiFindLumberMillPlace(const Unit* worker, const UnitType* type, int* dx,
+	int* dy)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
 	struct {
 		unsigned short X;
 		unsigned short Y;
-	}	 *points;
+	} *points;
 	int size;
 	int x;
 	int y;
@@ -476,9 +476,9 @@ static int AiFindLumberMillPlace(const Unit * worker, const UnitType * type, int
 	int ep;
 	int i;
 	int w;
-	unsigned char *m;
-	unsigned char *morg;
-	unsigned char *matrix;
+	unsigned char* m;
+	unsigned char* morg;
+	unsigned char* matrix;
 
 	x = worker->X;
 	y = worker->Y;

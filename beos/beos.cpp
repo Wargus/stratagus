@@ -36,7 +36,7 @@ extern "C" {
 **
 **  @param argc  Number of command line argurments
 */
-void beos_init(int argc, char **argv)
+void beos_init(int argc, char** argv)
 { 
 	BPath path( argv[0] );
 	path.GetParent( &path );

@@ -112,19 +112,19 @@ enum {
 ----------------------------------------------------------------------------*/
 
 	///  Library file open
-extern CLFile *CLopen(const char *fn, long flags);
+extern CLFile* CLopen(const char* fn, long flags);
 	///  Library file close
-extern int CLclose(CLFile *file);
+extern int CLclose(CLFile* file);
 	///  Library file flush
-extern void CLflush(CLFile *file);
+extern void CLflush(CLFile* file);
 	///  Library file read
-extern int CLread(CLFile *file, void *buf, size_t len);
+extern int CLread(CLFile* file, void* buf, size_t len);
 	///  Library file seek
-extern int CLseek(CLFile *file, long offset, int whence);
+extern int CLseek(CLFile* file, long offset, int whence);
 	///  Library file tell
-extern long CLtell(CLFile *file);
+extern long CLtell(CLFile* file);
 	///  Library file write
-extern int CLprintf(CLFile *file, char *format, ...);
+extern int CLprintf(CLFile* file, char* format, ...);
 
 
 #endif // USE_ZLIB || USE_BZ2LIB

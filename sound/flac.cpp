@@ -55,8 +55,8 @@
 **  Private flac data structure to handle flac streaming.
 */
 typedef struct _flac_data_ {
-	FLAC__StreamDecoder *FlacStream;	/// Decoder stream
-	CLFile *FlacFile;			/// File handle
+	FLAC__StreamDecoder* FlacStream;  /// Decoder stream
+	CLFile* FlacFile;                 /// File handle
 } FlacData;
 
 /*----------------------------------------------------------------------------
@@ -70,8 +70,8 @@ typedef struct _flac_data_ {
 **  @param status  Error state.
 **  @param user    User data.
 */
-static void FLAC_error_callback(const FLAC__StreamDecoder *stream,
-	FLAC__StreamDecoderErrorStatus status, void *user)
+static void FLAC_error_callback(const FLAC__StreamDecoder* stream,
+	FLAC__StreamDecoderErrorStatus status, void* user)
 {
 	DebugPrint(" %s\n" _C_ FLAC__StreamDecoderErrorStatusString[status]);
 }
@@ -87,11 +87,11 @@ static void FLAC_error_callback(const FLAC__StreamDecoder *stream,
 **  @return        Error status.
 */
 static FLAC__StreamDecoderReadStatus FLAC_read_callback(
-	const FLAC__StreamDecoder *stream, FLAC__byte buffer[],
-	unsigned int *bytes, void *user)
+	const FLAC__StreamDecoder* stream, FLAC__byte buffer[],
+	unsigned int* bytes, void* user)
 {
-	Sample *sample;
-	FlacData *data;
+	Sample* sample;
+	FlacData* data;
 	unsigned int i;
 
 	sample = user;
@@ -113,10 +113,10 @@ static FLAC__StreamDecoderReadStatus FLAC_read_callback(
 **  @param metadata  metadata block
 **  @param user      User data.
 */
-static void FLAC_metadata_callback(const FLAC__StreamDecoder *stream,
-	const FLAC__StreamMetadata *metadata, void *user)
+static void FLAC_metadata_callback(const FLAC__StreamDecoder* stream,
+	const FLAC__StreamMetadata* metadata, void* user)
 {
-	Sample *sample;
+	Sample* sample;
 
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
 		sample = user;
@@ -143,14 +143,14 @@ static void FLAC_metadata_callback(const FLAC__StreamDecoder *stream,
 **  @return        Error status.
 */
 static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
-	const FLAC__StreamDecoder *stream, const FLAC__Frame *frame,
-	const FLAC__int32* const buffer[], void *user)
+	const FLAC__StreamDecoder *stream, const FLAC__Frame* frame,
+	const FLAC__int32* const buffer[], void* user)
 {
-	Sample *sample;
-	FlacData *data;
+	Sample* sample;
+	FlacData* data;
 	unsigned int i;
 	int j;
-	char *buf;
+	char* buf;
 	int ssize;
 
 	sample = user;
@@ -195,9 +195,9 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 **
 **  @return        Number of bytes read
 */
-static int FlacStreamRead(Sample *sample, void *buf, int len)
+static int FlacStreamRead(Sample* sample, void* buf, int len)
 {
-	FlacData *data;
+	FlacData* data;
 
 	data = sample->User;
 
@@ -228,9 +228,9 @@ static int FlacStreamRead(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void FlacStreamFree(Sample *sample)
+static void FlacStreamFree(Sample* sample)
 {
-	FlacData *data;
+	FlacData* data;
 
 	data = sample->User;
 
@@ -259,7 +259,7 @@ static const SampleType FlacStreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-static int FlacRead(Sample *sample, void *buf, int len)
+static int FlacRead(Sample* sample, void* buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -279,7 +279,7 @@ static int FlacRead(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void FlacFree(Sample *sample)
+static void FlacFree(Sample* sample)
 {
 	free(sample->User);
 	free(sample->Buffer);
@@ -302,13 +302,13 @@ static const SampleType FlacSampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-Sample* LoadFlac(const char *name, int flags)
+Sample* LoadFlac(const char* name, int flags)
 {
-	Sample *sample;
-	FlacData *data;
-	CLFile *f;
+	Sample* sample;
+	FlacData* data;
+	CLFile* f;
 	unsigned int magic[1];
-	FLAC__StreamDecoder *stream;
+	FLAC__StreamDecoder* stream;
 
 
 	if (!(f = CLopen(name, CL_OPEN_READ))) {
