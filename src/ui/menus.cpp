@@ -38,6 +38,7 @@
 #include "map.h"
 #include "pud.h"
 #include "iolib.h"
+#include "network.h"
 #include "settings.h"
 
 /*----------------------------------------------------------------------------
@@ -59,6 +60,9 @@ local void NameLineDrawFunc(Menuitem *mi);
 local void EnterNameAction(Menuitem *mi, int key);
 local void EnterNameCancel(void);
 
+local void JoinNetGameMenu(void);
+local void CreateNetGameMenu(void);
+
 local void SinglePlayerGameMenu(void);
 local void MultiPlayerGameMenu(void);
 local void ScenSelectMenu(void);
@@ -74,16 +78,22 @@ local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
 local void ScenSelectCancel(void);
 
-local void CustomGameSetupInit(Menuitem *mi);	// master init
+local void GameSetupInit(Menuitem *mi);	// master init
+local void GameDrawFunc(Menuitem *mi);
+
+local void GameRCSAction(Menuitem *mi, int i);
+local void GameRESAction(Menuitem *mi, int i);
+local void GameUNSAction(Menuitem *mi, int i);
+local void GameTSSAction(Menuitem *mi, int i);
+
 local void CustomGameCancel(void);
 local void CustomGameStart(void);
-local void CustomGameDrawFunc(Menuitem *mi);
-
-local void CustomGameRCSAction(Menuitem *mi, int i);
-local void CustomGameRESAction(Menuitem *mi, int i);
-local void CustomGameUNSAction(Menuitem *mi, int i);
 local void CustomGameOPSAction(Menuitem *mi, int i);
-local void CustomGameTSSAction(Menuitem *mi, int i);
+
+local void MultiGameSetupInit(Menuitem *mi);	// master init
+local void MultiGameDrawFunc(Menuitem *mi);
+local void MultiGameFWSAction(Menuitem *mi, int i);
+local void NetMultiPlayerDrawFunc(Menuitem *mi);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -229,22 +239,31 @@ local Menuitem PrgStartMenuItems[] = {
 /**
 **	Items for the Custom Game Setup Menu
 */
-local unsigned char *cgrcsoptions[] = {
+local unsigned char *rcsoptions[] = {
     "Human",
     "Orc",
     "Map Default",
 };
 
-local unsigned char *cgresoptions[] = {
+local unsigned char *resoptions[] = {
     "Map Default",
     "Low",
     "Medium",
     "High",
 };
 
-local unsigned char *cgunsoptions[] = {
+local unsigned char *unsoptions[] = {
     "Map Default",
     "One Peasant Only",
+};
+
+local unsigned char *tssoptions[] = {
+    "Map Default",
+    "Forest",
+    "Winter",
+    "Wasteland",
+    "Orc Swamp",	// hmm. need flag if XPN-GFX is present! - tmp-hack in InitMenus()..
+			// Some time later _all_ tilesets should be a dynamic (ccl-defineable) resource..
 };
 
 local unsigned char *cgopsoptions[] = {
@@ -258,18 +277,20 @@ local unsigned char *cgopsoptions[] = {
     "7 Opponents",
 };
 
-local unsigned char *cgtssoptions[] = {
-    "Map Default",
-    "Forest",
-    "Winter",
-    "Wasteland",
-    "Orc Swamp",	// hmm. need flag if XPN-GFX is present! - tmp-hack in InitMenus()..
-			// Some time later _all_ tilesets should be a dynamic (ccl-defineable) resource..
+local unsigned char *mgfwsoptions[] = {
+    "On",
+    "Off",
+};
+
+local unsigned char *mgptsoptions[] = {
+    "Available",
+    "Computer",
+    "Closed",
 };
 
 local Menuitem CustomGameMenuItems[] = {
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, CustomGameSetupInit, NULL,
-	{ drawfunc:{ CustomGameDrawFunc } } },
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, GameSetupInit, NULL,
+	{ drawfunc:{ GameDrawFunc } } },
     { MI_TYPE_TEXT, 640/2+12, 192, 0, LargeFont, NULL, NULL,
 	{ text:{ "~<Single Player Game Setup~>", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
@@ -281,15 +302,15 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgrcsoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameRCSAction, 3, 2, 2, 0} } },
+	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0} } },
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgresoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameRESAction, 4, 0, 0, 0} } },
+	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0} } },
     { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Units:~>", 0} } },
     { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgunsoptions, 190, 20, MBUTTON_PULLDOWN, CustomGameUNSAction, 2, 0, 0, 0} } },
+	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0} } },
     { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Opponents:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
@@ -297,7 +318,7 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Map Tileset:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgtssoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameTSSAction, 5, 0, 0, 0} } },
+	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0} } },
 };
 
 /**
@@ -313,6 +334,81 @@ local Menuitem EnterNameMenuItems[] = {
     { MI_TYPE_BUTTON, 154, 80, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Cancel", 106, 27, MBUTTON_GM_HALF, EnterNameCancel, 'c'} } },
 };
+
+/**
+**	Items for the Net Create Join Menu
+*/
+local Menuitem NetCreateJoinMenuItems[] = {
+    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, StartMenusSetBackground, NULL,
+	{ button:{ "~!Join Game", 224, 27, MBUTTON_GM_FULL, JoinNetGameMenu, 'j'} } },
+    { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Create Game", 224, 27, MBUTTON_GM_FULL, CreateNetGameMenu, 'c'} } },
+    { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
+};
+
+
+/**
+**	Items for the Net Multiplayer Setup Menu
+*/
+local Menuitem NetMultiButtonStorage[] = {
+    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL,
+	{ drawfunc:{ NetMultiPlayerDrawFunc } } },
+};
+
+local Menuitem NetMultiSetupMenuItems[] = {
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameSetupInit, NULL,
+	{ drawfunc:{ MultiGameDrawFunc } } },
+    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL,
+	{ text:{ "~<Multi Player Setup~>", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
+	{ button:{ "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, ScenSelectMenu, 'e'} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, CustomGameCancel, 'c'} } },
+
+    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+
+    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Your Race:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
+	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0} } },
+    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Resources:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
+	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Units:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
+	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Fog of War:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Map Tileset:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
+	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0} } },
+};
+
 
 /**
 **	Menus
@@ -380,6 +476,24 @@ global Menu Menus[] = {
 	ImagePanel4,
 	2, 4,
 	EnterNameMenuItems
+    },
+    {
+	/// Net Create Join Menu
+	0,
+	0,
+	640, 480,
+	ImageNone,
+	2, 3,
+	NetCreateJoinMenuItems
+    },
+    {
+	/// Multi Player Setup Menu
+	0,
+	0,
+	640, 480,
+	ImageNone,
+	3, 23,
+	NetMultiSetupMenuItems
     },
 };
 
@@ -841,6 +955,26 @@ local void EnterNameAction(Menuitem *mi, int key)
     }
 }
 
+local void JoinNetGameMenu(void)
+{
+    DestroyCursorBackground();
+    CustomGameStarted = 0;
+    ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
+    if (CustomGameStarted) {
+	GameMenuReturn();
+    }
+}
+
+local void CreateNetGameMenu(void)
+{
+    DestroyCursorBackground();
+    CustomGameStarted = 0;
+    ProcessMenu(MENU_NET_MULTI_SETUP, 1);
+    if (CustomGameStarted) {
+	GameMenuReturn();
+    }
+}
+
 local void MultiPlayerGameMenu(void)
 {
     char NameBuf[32];
@@ -859,7 +993,9 @@ local void MultiPlayerGameMenu(void)
     }
     
     NameBuf[EnterNameMenuItems[1].d.input.nch] = 0;	// Now finally here is the name
+    strcpy(NetworkName, NameBuf);
     // Here we really go...
+    ProcessMenu(MENU_NET_CREATE_JOIN, 1);
 }
 
 
@@ -1228,7 +1364,7 @@ local void CustomGameStart(void)
     EndMenu();
 }
 
-local void CustomGameSetupInit(Menuitem *mi __attribute__((unused)))
+local void GameSetupInit(Menuitem *mi __attribute__((unused)))
 {
     strcpy(ScenSelectPath, FreeCraftLibPath);
 #if 0	// FIXME: as soon as .cm is supported..
@@ -1251,7 +1387,7 @@ local void CustomGameSetupInit(Menuitem *mi __attribute__((unused)))
     strcpy(ScenSelectPath, FreeCraftLibPath);
 }
 
-local void CustomGameDrawFunc(Menuitem *mi)
+local void GameDrawFunc(Menuitem *mi)
 {
     int nc, rc;
     char buffer[32];
@@ -1284,14 +1420,14 @@ local void CustomGameDrawFunc(Menuitem *mi)
     SetDefaultTextColors(nc, rc);
 }
 
-local void CustomGameRCSAction (Menuitem *mi __attribute__((unused)), int i)
+local void GameRCSAction (Menuitem *mi __attribute__((unused)), int i)
 {
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
 
     GameSettings.Presets[0].Race = v[i];
 }
 
-local void CustomGameRESAction (Menuitem *mi __attribute__((unused)), int i)
+local void GameRESAction (Menuitem *mi __attribute__((unused)), int i)
 {
     int v[] = { SettingsResourcesMapDefault, SettingsResourcesLow,
 		SettingsResourcesMedium, SettingsResourcesHigh };
@@ -1299,9 +1435,16 @@ local void CustomGameRESAction (Menuitem *mi __attribute__((unused)), int i)
     GameSettings.Resources = v[i];
 }
 
-local void CustomGameUNSAction (Menuitem *mi __attribute__((unused)), int i)
+local void GameUNSAction (Menuitem *mi __attribute__((unused)), int i)
 {
     GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
+}
+
+local void GameTSSAction (Menuitem *mi __attribute__((unused)), int i)
+{
+    int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
+
+    GameSettings.Terrain = v[i];
 }
 
 local void CustomGameOPSAction (Menuitem *mi __attribute__((unused)), int i)
@@ -1309,11 +1452,37 @@ local void CustomGameOPSAction (Menuitem *mi __attribute__((unused)), int i)
     GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
 
-local void CustomGameTSSAction (Menuitem *mi __attribute__((unused)), int i)
+local void MultiGameFWSAction (Menuitem *mi __attribute__((unused)), int i)
 {
-    int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
+    FlagRevealMap = i;
+}
 
-    GameSettings.Terrain = v[i];
+local void MultiGameDrawFunc(Menuitem *mi)
+{
+    GameDrawFunc(mi);
+}
+
+local void MultiGameSetupInit(Menuitem *mi)
+{
+    int i;
+
+    GameSetupInit(mi);
+    NetMultiSetupMenuItems[5] = NetMultiButtonStorage[1];
+    NetMultiSetupMenuItems[5].yofs = 32;
+    for (i = 1; i < 8; i++) {
+	NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[0];
+	NetMultiSetupMenuItems[5 + i].yofs = 32 + i * 22;
+    }
+}
+
+local void NetMultiPlayerDrawFunc(Menuitem *mi)
+{
+    int nc, rc;
+
+    GetDefaultTextColors(&nc, &rc);
+    SetDefaultTextColors(rc, rc);
+    DrawText(mi->xofs, mi->yofs, GameFont, NetworkName);
+    SetDefaultTextColors(nc, rc);
 }
 
 /*----------------------------------------------------------------------------
@@ -1549,54 +1718,66 @@ global void MenuHandleMouseMove(int x,int y)
 
     n = menu->nitems;
     MenuButtonUnderCursor = -1;
+
+    /* check active (popped-up) pulldown first, as it may overlay other menus! */
+    mi = menu->items;
     for (i = 0; i < n; ++i) {
-	mi = menu->items + i;
 	if (!(mi->flags&MenuButtonDisabled)) {
-	    switch (mi->mitype) {
-		case MI_TYPE_BUTTON:
-		    xs = menu->x + mi->xofs;
-		    ys = menu->y + mi->yofs;
-		    if (x < xs || x > xs + mi->d.button.xsize || y < ys || y > ys + mi->d.button.ysize) {
-			if (!(mi->flags&MenuButtonClicked)) {
-			    if (mi->flags&MenuButtonActive) {
-				RedrawFlag = 1;
-				mi->flags &= ~MenuButtonActive;
-			    }
+	    if (mi->mitype == MI_TYPE_PULLDOWN && (mi->flags&MenuButtonClicked)) {
+		xs = menu->x + mi->xofs;
+		ys = menu->y + mi->yofs;
+		h = mi->d.pulldown.ysize - 2;
+		ys -= mi->d.pulldown.curopt * h;
+		if (!(x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + h*mi->d.pulldown.noptions)) {
+		    j = (y - ys) / h;
+		    if (j != mi->d.pulldown.cursel) {
+			mi->d.pulldown.cursel = j;
+			RedrawFlag = 1;
+			if (mi->d.pulldown.action) {
+			    (*mi->d.pulldown.action)(mi, mi->d.pulldown.cursel);
 			}
-			continue;
 		    }
-		    break;
-		case MI_TYPE_INPUT:
-		    xs = menu->x + mi->xofs;
-		    ys = menu->y + mi->yofs;
-		    if (x<xs || x>xs + mi->d.input.xsize || y<ys || y>ys + mi->d.input.ysize) {
-			if (!(mi->flags&MenuButtonClicked)) {
-			    if (mi->flags&MenuButtonActive) {
-				RedrawFlag = 1;
-				mi->flags &= ~MenuButtonActive;
-			    }
-			}
-			continue;
-		    }
-		    break;
-		case MI_TYPE_PULLDOWN:
-		    xs = menu->x + mi->xofs;
-		    if (mi->flags&MenuButtonClicked) {
+		}
+		MenuButtonUnderCursor = i;
+		break;
+	    }
+	}
+	mi++;
+    }
+    if (MenuButtonUnderCursor == -1) {
+	for (i = 0; i < n; ++i) {
+	    mi = menu->items + i;
+	    if (!(mi->flags&MenuButtonDisabled)) {
+		switch (mi->mitype) {
+		    case MI_TYPE_BUTTON:
+			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
-			h = mi->d.pulldown.ysize - 2;
-			ys -= mi->d.pulldown.curopt * h;
-			if (x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + h*mi->d.pulldown.noptions) {
+			if (x < xs || x > xs + mi->d.button.xsize || y < ys || y > ys + mi->d.button.ysize) {
+			    if (!(mi->flags&MenuButtonClicked)) {
+				if (mi->flags&MenuButtonActive) {
+				    RedrawFlag = 1;
+				    mi->flags &= ~MenuButtonActive;
+				}
+			    }
 			    continue;
 			}
-			j = (y - ys) / h;
-			if (j != mi->d.pulldown.cursel) {
-			    mi->d.pulldown.cursel = j;
-			    RedrawFlag = 1;
-			    if (mi->d.pulldown.action) {
-				(*mi->d.pulldown.action)(mi, mi->d.pulldown.cursel);
+			break;
+		    case MI_TYPE_INPUT:
+			xs = menu->x + mi->xofs;
+			ys = menu->y + mi->yofs;
+			if (x<xs || x>xs + mi->d.input.xsize || y<ys || y>ys + mi->d.input.ysize) {
+			    if (!(mi->flags&MenuButtonClicked)) {
+				if (mi->flags&MenuButtonActive) {
+				    RedrawFlag = 1;
+				    mi->flags &= ~MenuButtonActive;
+				}
 			    }
+			    continue;
 			}
-		    } else {
+			break;
+		    case MI_TYPE_PULLDOWN:
+			// Clicked-state already checked above - there can only be one!
+			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
 			if (x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + mi->d.pulldown.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
@@ -1607,77 +1788,77 @@ global void MenuHandleMouseMove(int x,int y)
 			    }
 			    continue;
 			}
-		    }
-		    break;
-		case MI_TYPE_LISTBOX:
-		    xs = menu->x + mi->xofs;
-		    ys = menu->y + mi->yofs;
-		    if (x < xs || x > xs + mi->d.listbox.xsize || y < ys || y > ys + mi->d.listbox.ysize) {
-			if (!(mi->flags&MenuButtonClicked)) {
-			    if (mi->flags&MenuButtonActive) {
-				RedrawFlag = 1;
-				mi->flags &= ~MenuButtonActive;
+			break;
+		    case MI_TYPE_LISTBOX:
+			xs = menu->x + mi->xofs;
+			ys = menu->y + mi->yofs;
+			if (x < xs || x > xs + mi->d.listbox.xsize || y < ys || y > ys + mi->d.listbox.ysize) {
+			    if (!(mi->flags&MenuButtonClicked)) {
+				if (mi->flags&MenuButtonActive) {
+				    RedrawFlag = 1;
+				    mi->flags &= ~MenuButtonActive;
+				}
 			    }
+			    continue;
 			}
-			continue;
-		    }
-		    j = (y - ys) / 18;
-		    if (j != mi->d.listbox.cursel) {
-			mi->d.listbox.cursel = j;	// just store for click
-		    }
-		    break;
-		case MI_TYPE_VSLIDER:
-		    xs = menu->x + mi->xofs;
-		    ys = menu->y + mi->yofs;
-		    if (x < xs || x > xs + mi->d.vslider.xsize || y < ys || y > ys + mi->d.vslider.ysize) {
-			if (!(mi->flags&MenuButtonClicked)) {
-			    if (mi->flags&MenuButtonActive) {
-				RedrawFlag = 1;
-				mi->flags &= ~MenuButtonActive;
+			j = (y - ys) / 18;
+			if (j != mi->d.listbox.cursel) {
+			    mi->d.listbox.cursel = j;	// just store for click
+			}
+			break;
+		    case MI_TYPE_VSLIDER:
+			xs = menu->x + mi->xofs;
+			ys = menu->y + mi->yofs;
+			if (x < xs || x > xs + mi->d.vslider.xsize || y < ys || y > ys + mi->d.vslider.ysize) {
+			    if (!(mi->flags&MenuButtonClicked)) {
+				if (mi->flags&MenuButtonActive) {
+				    RedrawFlag = 1;
+				    mi->flags &= ~MenuButtonActive;
+				}
 			    }
+			    mi->d.vslider.cursel = 0;
+			    continue;
 			}
-			mi->d.vslider.cursel = 0;
-			continue;
-		    }
-		    j = y - ys;
-		    if (j < 20) {
-			mi->d.vslider.cursel |= MI_CFLAGS_UP;
-		    } else if (j > mi->d.vslider.ysize - 20) {
-			mi->d.vslider.cursel |= MI_CFLAGS_DOWN;
-		    } else {
-			mi->d.vslider.cursel &= ~(MI_CFLAGS_UP|MI_CFLAGS_DOWN);
-			h = (mi->d.vslider.percent * (mi->d.vslider.ysize - 54)) / 100 + 18;
-			mi->d.vslider.curper = ((j - 20) * 100) / (mi->d.vslider.ysize - 54);
-			if (mi->d.vslider.curper > 100) {
-			    mi->d.vslider.curper = 100;
-			}
-			if (j > h && j < h + 18) {
-			    mi->d.vslider.cursel |= MI_CFLAGS_KNOB;
+			j = y - ys;
+			if (j < 20) {
+			    mi->d.vslider.cursel |= MI_CFLAGS_UP;
+			} else if (j > mi->d.vslider.ysize - 20) {
+			    mi->d.vslider.cursel |= MI_CFLAGS_DOWN;
 			} else {
-			    mi->d.vslider.cursel |= MI_CFLAGS_CONT;
+			    mi->d.vslider.cursel &= ~(MI_CFLAGS_UP|MI_CFLAGS_DOWN);
+			    h = (mi->d.vslider.percent * (mi->d.vslider.ysize - 54)) / 100 + 18;
+			    mi->d.vslider.curper = ((j - 20) * 100) / (mi->d.vslider.ysize - 54);
+			    if (mi->d.vslider.curper > 100) {
+				mi->d.vslider.curper = 100;
+			    }
+			    if (j > h && j < h + 18) {
+				mi->d.vslider.cursel |= MI_CFLAGS_KNOB;
+			    } else {
+				mi->d.vslider.cursel |= MI_CFLAGS_CONT;
+			    }
 			}
-		    }
-		    if (mi->d.vslider.action) {
-			(*mi->d.vslider.action)(mi, 1);		// 1 indicates move
-		    }
-		    break;
-		default:
-		    break;
-	    }
-	    switch (mi->mitype) {
-		case MI_TYPE_BUTTON:
-		case MI_TYPE_PULLDOWN:
-		case MI_TYPE_LISTBOX:
-		case MI_TYPE_VSLIDER:
-		case MI_TYPE_INPUT:
-		    if (!(mi->flags&MenuButtonActive)) {
-			RedrawFlag = 1;
-			mi->flags |= MenuButtonActive;
-		    }
-		    DebugLevel3("On menu item %d\n", i);
-		    MenuButtonUnderCursor = i;
-		default:
-		    break;
+			if (mi->d.vslider.action) {
+			    (*mi->d.vslider.action)(mi, 1);		// 1 indicates move
+			}
+			break;
+		    default:
+			break;
+		}
+		switch (mi->mitype) {
+		    case MI_TYPE_BUTTON:
+		    case MI_TYPE_PULLDOWN:
+		    case MI_TYPE_LISTBOX:
+		    case MI_TYPE_VSLIDER:
+		    case MI_TYPE_INPUT:
+			if (!(mi->flags&MenuButtonActive)) {
+			    RedrawFlag = 1;
+			    mi->flags |= MenuButtonActive;
+			}
+			DebugLevel3("On menu item %d\n", i);
+			MenuButtonUnderCursor = i;
+		    default:
+			break;
+		}
 	    }
 	}
     }
@@ -1807,6 +1988,8 @@ global void MenuHandleButtonUp(int b)
     }
     if (RedrawFlag) {
 	MustRedraw |= RedrawMenu;
+
+	MenuHandleMouseMove(CursorX,CursorY);
     }
 }
 
@@ -1818,8 +2001,7 @@ local void EndMenu(void)
 {
     CursorOn = CursorOnUnknown;
     CurrentMenu = -1;
-    MustRedraw |= RedrawMenu;
-    /// FIXME: restore mouse pointer to sane state (call fake mouse move?)
+    MustRedraw |= RedrawMenu|RedrawCursor;
 }
 
 
@@ -1861,7 +2043,6 @@ global void ProcessMenu(int MenuId, int Loop)
 	    case MI_TYPE_VSLIDER:
 	    case MI_TYPE_INPUT:
 		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
-		// FIXME: Maybe activate if mouse-pointer is over it right now?
 		if (i == menu->defsel) {
 		    mi->flags |= MenuButtonSelected;
 		    MenuButtonCurSel = i;
@@ -1896,6 +2077,8 @@ global void ProcessMenu(int MenuId, int Loop)
     if (Loop) {
 	SetVideoSync();
 	MustRedraw = 0;
+	MenuHandleMouseMove(CursorX,CursorY);	// This activates buttons as appropriate!
+	MustRedraw |= RedrawCursor;
     }
     DrawMenu(CurrentMenu);
 
