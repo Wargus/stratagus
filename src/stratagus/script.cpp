@@ -64,27 +64,17 @@ global int CclInConfigFile;		/// True while config file parsing
 ----------------------------------------------------------------------------*/
 
 /**
-**	Free pointer, if it lays in the heap.
+**	Protect SCM object against garbage collector.
 **
-**	@param ptr	Pointer into heap.
+**	@param obj	Scheme object
 */
-global void CclFree(void* ptr __attribute__((unused)))
+global void CclGcProtect(SCM obj)
 {
-#if 0
-#ifndef __MINGW32__
-    extern unsigned long end;
+    SCM var;
 
-    // FIXME: is the save on all architectures?
-    if( ptr<(void*)&end ) {
-	return;
-    }
-    free(ptr);
-#endif
-#endif
+    var=gh_symbol2scm("*ccl-protect*");
+    setvar(var,cons(symbol_value(var,NIL),obj),NIL);
 }
-
-// FIXME: memory loose, if you define the same thing again.
-// FIXME: use CclFree.
 
 /*............................................................................
 ..	Config
@@ -528,7 +518,7 @@ global void InitCcl(void)
 #else
     sprintf(buf,"-l%s",FreeCraftLibPath);
 #endif
-    sargv[4] = strdup(buf);
+    sargv[4] = strdup(buf);		// never freed
     siod_init(5,sargv);
 
     init_subr_0("library-path",CclFreeCraftLibraryPath);
@@ -660,6 +650,8 @@ global void InitCcl(void)
     gh_define("freecraft-feature-have-expansion",SCM_BOOL_T);
 #endif
 
+    gh_define("*ccl-protect*",NIL);
+
     print_welcome();
 }
 
@@ -678,7 +670,7 @@ global void LoadCcl(void)
     file=LibraryFileName(CclStartFile,buf);
     vload(file,0,1);
     CclInConfigFile=0;
-    // FIXME: user_gc(SCM_BOOL_F);
+    user_gc(SCM_BOOL_F);		// Cleanup memory after load
 }
 
 //@}

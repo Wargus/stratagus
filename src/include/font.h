@@ -10,12 +10,11 @@
 //
 /**@name font.h		-	The font headerfile. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -149,6 +148,8 @@ extern int VideoDrawReverseNumber(int x,int y,unsigned font,int number);
 extern void LoadFonts(void);
     /// Register ccl features
 extern void FontsCclRegister(void);
+    /// Cleanup the font module
+extern void CleanFonts(void);
 
 //@}
 

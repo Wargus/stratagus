@@ -10,12 +10,11 @@
 //
 /**@name font.c		-	The color fonts. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -625,7 +624,7 @@ local SCM CclDefineFont(SCM type,SCM file,SCM width,SCM height)
 	return SCM_UNSPECIFIED;
     }
 
-    CclFree(Fonts[i].File);
+    free(Fonts[i].File);
     Fonts[i].File=gh_scm2newstr(file,NULL);
     Fonts[i].Width=gh_scm2int(width);
     Fonts[i].Height=gh_scm2int(height);
@@ -675,6 +674,22 @@ global void FontsCclRegister(void)
     //gh_new_procedure4_0("draw-reverse-text-centered",CclDrawReverseTextCentered);
     //gh_new_procedure4_0("draw-number",CclDrawNumber);
     //gh_new_procedure4_0("draw-reverse-number",CclDrawReverseNumber);
+}
+
+/**
+**	Cleanup the font module.
+*/
+global void CleanFonts(void)
+{
+    unsigned i;
+
+    for( i=0; i<sizeof(Fonts)/sizeof(*Fonts); ++i ) {
+	free(Fonts[i].File);
+	VideoFree(Fonts[i].Graphic);
+	Fonts[i].File=NULL;
+	Fonts[i].Graphic=NULL;
+    }
+
 }
 
 //@}

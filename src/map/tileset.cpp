@@ -540,10 +540,10 @@ global void CleanTilesets(void)
     //
     //	Should this be done by the map?
     //
-    VideoFree(TheMap.TileData);
-    IfDebug( TheMap.TileData=NULL; );
+    VideoSaveFree(TheMap.TileData);
+    TheMap.TileData=NULL;
     free(TheMap.Tiles);
-    IfDebug( TheMap.Tiles=NULL; );
+    TheMap.Tiles=NULL;
 
     //
     //	Mapping the original tileset numbers in puds to our internal strings

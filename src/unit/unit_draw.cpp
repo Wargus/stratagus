@@ -365,7 +365,7 @@ global Graphic* SpellSprites;
 */
 global SCM CclManaSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 {
-    CclFree(ManaSprite.File);
+    free(ManaSprite.File);
     ManaSprite.File=gh_scm2newstr(file,NULL);
     ManaSprite.HotX=gh_scm2int(x);
     ManaSprite.HotY=gh_scm2int(y);
@@ -386,7 +386,7 @@ global SCM CclManaSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 */
 global SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 {
-    CclFree(HealthSprite.File);
+    free(HealthSprite.File);
     HealthSprite.File=gh_scm2newstr(file,NULL);
     HealthSprite.HotX=gh_scm2int(x);
     HealthSprite.HotY=gh_scm2int(y);

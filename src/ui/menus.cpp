@@ -189,7 +189,7 @@ local int OffsetY = 0;
 /**
 **	The background picture used by start menues
 */
-local Graphic* Menusbgnd = NULL;
+local Graphic* Menusbgnd;
 
 /**
 **	Items for the Game Menu
@@ -3109,6 +3109,11 @@ global void ProcessMenu(int MenuId, int Loop)
 	CurrentMenu = CurrentMenuSave;
 	MenuButtonUnderCursor = MenuButtonUnderCursorSave;
 	MenuButtonCurSel = MenuButtonCurSelSave;
+    }
+    // FIXME: Johns good point?
+    if (Menusbgnd) {
+	VideoFree(Menusbgnd);
+	Menusbgnd = 0;
     }
 }
 

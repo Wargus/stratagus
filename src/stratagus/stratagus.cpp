@@ -413,6 +413,8 @@ local void PreMenuSetup(void)
     VideoCreatePalette(GlobalPalette);
     LoadFonts();
 
+    InitCursors();
+
     // All pre-start menues are orcish - may need to be switched later..
     SetDefaultTextColors(FontYellow,FontWhite);
     InitMenus(PlayerRaceOrc);
@@ -472,6 +474,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	GameMainLoop();
 
 	CleanModules();
+	CleanFonts();
 
 	LoadCcl();			// Reload the main config file
 
@@ -616,7 +619,7 @@ Use it at your own risk.\n\n");
 /**
 **	Exit clone.
 **
-**	Called from 'Q'.
+**	Called from ALT-'X' key or exit game menus.
 */
 global volatile void Exit(int err)
 {
@@ -627,6 +630,7 @@ global volatile void Exit(int err)
 	extern unsigned PfCounterNotReachable;
     );
 
+    StopMusic();
     QuitSound();
     NetworkQuit();
 
@@ -642,6 +646,8 @@ global volatile void Exit(int err)
     );
 #ifdef DEBUG
     CclUnits();
+    CleanModules();
+    CleanFonts();
 #endif
     fprintf(stderr,"Thanks for playing FreeCraft.\n");
     exit(err);

@@ -61,6 +61,8 @@
 */
 global void CleanModules(void)
 {
+    SCM var;
+
     CleanIcons();
     CleanCursors();
     CleanUserInterface();
@@ -78,6 +80,12 @@ global void CleanModules(void)
     CleanMissiles();
     CleanTilesets();
     CleanMap();
+
+    //
+    //	Free our protected objects, AI scripts, unit-type properties.
+    //
+    var=gh_symbol2scm("*ccl-protect*");
+    setvar(var,NIL,NIL);
 }
 
 /**
