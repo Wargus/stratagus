@@ -130,7 +130,9 @@ typedef LISP (*SUBR_FUNC)(void);
 #define TKBUFFERN 5120
 
 #ifndef WIN32
+#ifndef __stdcall
 #define __stdcall
+#endif
 #endif
 
 
