@@ -4302,7 +4302,6 @@ local void StartEditor(void)
     GetInfoFromSelectPath();
 
     ProcessMenu("menu-editor-select", 1);
-
 }
 
 local void EditorNewMap(void)
@@ -4314,6 +4313,7 @@ local void EditorNewMap(void)
     // FIXME: currently just loads default.pud
     strcpy(CurrentMapPath, "default.pud");
 
+    // FIXME: Use EditorRunning and main-loop.
     EditorMainLoop();
     EndMenu();
 }
@@ -4347,6 +4347,7 @@ local void EditorLoadMap(void)
 	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
     }
 
+    // FIXME: Use EditorRunning and main-loop.
     EditorMainLoop();
     EndMenu();
 }

@@ -73,6 +73,7 @@ global void CleanModules(void)
 
     CleanIcons();
     CleanCursors();
+    // CleanMenus();
     CleanUserInterface();
     CleanCampaign();
     CleanTriggers();
@@ -116,6 +117,7 @@ global void InitModules(void)
     InitIcons();
     InitVideoCursors();
     InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
+    // InitMenus();
     InitPlayers();
     InitMissileTypes();
     InitMissiles();

@@ -259,12 +259,19 @@ extern char **KeyStrokeHelps;		/// Keystroke help pairs
 
 #define MENUS_MAXMENU 128		/// FIXME: wrong place, docu
 #define MENUS_MAXFUNC 128		/// FIXME: wrong place, docu
+
+#ifdef DOXYGEN                          // no real code, only for document
+
+#else
+
     /// FIXME: docu
 typedef hashtable(Menu*,MENUS_MAXMENU) _MenuHash;
 extern _MenuHash MenuHash;
     /// FIXME: docu
 typedef hashtable(void*,MENUS_MAXFUNC) _MenuFuncHash;
 extern _MenuFuncHash MenuFuncHash;
+
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
