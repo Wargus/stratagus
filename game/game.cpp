@@ -113,6 +113,7 @@ local void LoadStratagusMap(const char* filename,
 		fprintf(stderr, "%s: invalid Stratagus map\n", filename);
 		ExitFatal(-1);
 	}
+	TheMap.Info->Filename = strdup(filename);
 }
 
 /**
@@ -154,6 +155,7 @@ local void LoadMap(const char* filename, WorldMap* map)
 	// ARI: This bombs out, if no pud, so will be safe.
 	if (strcasestr(filename, ".pud")) {
 		LoadPud(filename, map);
+		map->Info->Filename = strdup(filename);
 	}
 }
 

@@ -218,6 +218,7 @@ global void LoadGame(char* filename)
 	CleanModules();
 	// log will be enabled if found in the save game
 	CommandLogDisabled = 1;
+	SaveGameLoading = 1;
 
 	LoadCcl();
 
@@ -241,6 +242,7 @@ global void LoadGame(char* filename)
 	GameCycle = game_cycle;
 	SelectionChanged();
 	MustRedraw = RedrawEverything;
+	SaveGameLoading = 0;
 }
 
 /**
