@@ -1194,11 +1194,42 @@ local void VideoFreePallette(void* pixels)
 #endif
 
 /**
-**	Allocate a new hardware dependend palette palette.
+**	Maps RGB to a hardware dependent pixel.
 **
-**	@param palette	Hardware independend palette.
+**	@param r	Red color.
+**	@param g	Green color.
+**	@param b	Blue color.
 **
-**	@return		A hardware dependend pixel table.
+**	@return		A hardware dependent pixel.
+*/
+global unsigned long VideoMapRGB(int r, int g, int b)
+{
+    XColor color;
+    XWindowAttributes xwa;
+
+    DebugCheck( !TheDisplay || !TheMainWindow );
+
+    XGetWindowAttributes(TheDisplay,TheMainWindow,&xwa);
+
+    color.red=r<<8;
+    color.green=g<<8;
+    color.blue=b<<8;
+    color.flags=DoRed|DoGreen|DoBlue;
+    if( !XAllocColor(TheDisplay,xwa.colormap,&color) ) {
+	fprintf(stderr,"Cannot allocate color\n");
+	// FIXME: Must find the nearest matching color
+	//ExitFatal(-1);
+    }
+
+    return color.pixel;
+}
+
+/**
+**	Allocate a new hardware dependent palette palette.
+**
+**	@param palette	Hardware independent palette.
+**
+**	@return		A hardware dependent pixel table.
 **
 **	@todo FIXME: VideoFreePallette should be used to free unused colors
 */
