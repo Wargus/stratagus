@@ -69,7 +69,8 @@
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckTrue(const Unit* unit __attribute__((unused)),const ButtonAction* button __attribute__((unused)))
+global int ButtonCheckTrue(const Unit* unit __attribute__((unused)),
+    const ButtonAction* button __attribute__((unused)))
 {
     return 1;
 }
@@ -82,7 +83,8 @@ global int ButtonCheckTrue(const Unit* unit __attribute__((unused)),const Button
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckFalse(const Unit* unit __attribute__((unused)),const ButtonAction* button __attribute__((unused)))
+global int ButtonCheckFalse(const Unit* unit __attribute__((unused)),
+    const ButtonAction* button __attribute__((unused)))
 {
     return 0;
 }
@@ -94,9 +96,9 @@ global int ButtonCheckFalse(const Unit* unit __attribute__((unused)),const Butto
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckUpgrade(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckUpgrade(const Unit* unit, const ButtonAction* button)
 {
-    return UpgradeIdentAllowed(unit->Player,button->AllowStr)=='R';
+    return UpgradeIdentAllowed(unit->Player, button->AllowStr) == 'R';
 }
 
 /**
@@ -106,17 +108,17 @@ global int ButtonCheckUpgrade(const Unit* unit,const ButtonAction* button)
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckUnitsOr(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckUnitsOr(const Unit* unit, const ButtonAction* button)
 {
     char* buf;
     const char* s;
     Player* player;
 
-    player=unit->Player;
-    buf=alloca(strlen(button->AllowStr)+1);
-    strcpy(buf,button->AllowStr);
-    for( s=strtok(buf,","); s; s=strtok(NULL,",") ) {
-	if( HaveUnitTypeByIdent(player,s) ) {
+    player = unit->Player;
+    buf = alloca(strlen(button->AllowStr) + 1);
+    strcpy(buf, button->AllowStr);
+    for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+	if (HaveUnitTypeByIdent(player, s)) {
 	    return 1;
 	}
     }
@@ -130,17 +132,17 @@ global int ButtonCheckUnitsOr(const Unit* unit,const ButtonAction* button)
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckUnitsAnd(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 {
     char* buf;
     const char* s;
     Player* player;
 
-    player=unit->Player;
-    buf=alloca(strlen(button->AllowStr)+1);
-    strcpy(buf,button->AllowStr);
-    for( s=strtok(buf,","); s; s=strtok(NULL,",") ) {
-	if( !HaveUnitTypeByIdent(player,s) ) {
+    player = unit->Player;
+    buf = alloca(strlen(button->AllowStr) + 1);
+    strcpy(buf, button->AllowStr);
+    for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+	if (!HaveUnitTypeByIdent(player, s)) {
 	    return 0;
 	}
     }
@@ -157,9 +159,10 @@ global int ButtonCheckUnitsAnd(const Unit* unit,const ButtonAction* button)
 **
 **	NOTE: this check could also be moved into intialisation.
 */
-global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),const ButtonAction* button __attribute__((unused)))
+global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
+    const ButtonAction* button __attribute__((unused)))
 {
-    return NetworkFildes!=-1;
+    return NetworkFildes != -1;
 }
 
 /**
@@ -171,9 +174,10 @@ global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),const But
 **
 **	NOTE: this check could also be moved into intialisation.
 */
-global int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),const ButtonAction* button __attribute__((unused)))
+global int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
+    const ButtonAction* button __attribute__((unused)))
 {
-    return NetworkFildes==-1;
+    return NetworkFildes == -1;
 }
 
 /**
@@ -184,12 +188,13 @@ global int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),const B
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckNoWork(const Unit* unit,const ButtonAction* button __attribute__((unused)))
+global int ButtonCheckNoWork(const Unit* unit,
+    const ButtonAction* button __attribute__((unused)))
 {
-    return unit->Type->Building
-	    && unit->Orders[0].Action != UnitActionTrain
-	    && unit->Orders[0].Action != UnitActionUpgradeTo
-	    && unit->Orders[0].Action != UnitActionResearch;
+    return unit->Type->Building &&
+	unit->Orders[0].Action != UnitActionTrain &&
+	unit->Orders[0].Action != UnitActionUpgradeTo &&
+	unit->Orders[0].Action != UnitActionResearch;
 }
 
 /**
@@ -199,11 +204,12 @@ global int ButtonCheckNoWork(const Unit* unit,const ButtonAction* button __attri
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckNoResearch(const Unit* unit,const ButtonAction* button __attribute__((unused)))
+global int ButtonCheckNoResearch(const Unit* unit,
+    const ButtonAction* button __attribute__((unused)))
 {
-    return unit->Type->Building
-	    && unit->Orders[0].Action != UnitActionUpgradeTo
-	    && unit->Orders[0].Action != UnitActionResearch;
+    return unit->Type->Building &&
+	unit->Orders[0].Action != UnitActionUpgradeTo &&
+	unit->Orders[0].Action != UnitActionResearch;
 }
 
 /**
@@ -214,12 +220,12 @@ global int ButtonCheckNoResearch(const Unit* unit,const ButtonAction* button __a
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckUpgradeTo(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckUpgradeTo(const Unit* unit, const ButtonAction* button)
 {
-    if ( unit->Orders[0].Action != UnitActionStill ) {
+    if (unit->Orders[0].Action != UnitActionStill) {
 	return 0;
     }
-    return CheckDependByIdent(unit->Player,button->ValueStr);
+    return CheckDependByIdent(unit->Player, button->ValueStr);
 }
 
 /**
@@ -229,7 +235,8 @@ global int ButtonCheckUpgradeTo(const Unit* unit,const ButtonAction* button)
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckAttack(const Unit* unit,const ButtonAction* button __attribute__((unused)))
+global int ButtonCheckAttack(const Unit* unit,
+    const ButtonAction* button __attribute__((unused)))
 {
     return unit->Type->CanAttack;
 }
@@ -241,18 +248,18 @@ global int ButtonCheckAttack(const Unit* unit,const ButtonAction* button __attri
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckResearch(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckResearch(const Unit* unit, const ButtonAction* button)
 {
-    if ( !ButtonCheckNoWork( unit, button ) ) {	// don't show any if working
+    if (!ButtonCheckNoWork(unit, button)) {	// don't show any if working
 	return 0;
     }
 
     // check if allowed
-    if ( !CheckDependByIdent( unit->Player, button->ValueStr ) ) {
+    if (!CheckDependByIdent(unit->Player, button->ValueStr)) {
 	return 0;
     }
-    if ( !strncmp( button->ValueStr,"upgrade-", 8 ) &&
-		UpgradeIdentAllowed( unit->Player,button->ValueStr )!='A' ) {
+    if (!strncmp(button->ValueStr, "upgrade-", 8) &&
+	    UpgradeIdentAllowed(unit->Player, button->ValueStr) != 'A') {
 	return 0;
     }
     return 1;
@@ -267,11 +274,11 @@ global int ButtonCheckResearch(const Unit* unit,const ButtonAction* button)
 **	@return		True if enabled.
 */
 global int ButtonCheckSingleResearch(const Unit* unit,
-	const ButtonAction* button)
+    const ButtonAction* button)
 {
-    if( ButtonCheckResearch(unit,button) ) {
-	if( !unit->Player->UpgradeTimers.Upgrades[
-		UpgradeIdByIdent(button->ValueStr) ] ) {
+    if (ButtonCheckResearch(unit, button)) {
+	if (!unit->Player->UpgradeTimers.Upgrades[
+		UpgradeIdByIdent(button->ValueStr)]) {
 	    return 1;
 	}
     }
