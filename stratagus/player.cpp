@@ -827,7 +827,10 @@ global void PlayerPixels(const Player* player)
 global void SetPlayersPalette(void)
 {
     int i;
+    int o;
 
+    //o=rand()&0x7;			// FIXME: random colors didn't work
+    o=0;
     switch( VideoBpp ) {
     case 8:
 	// New player colors setup
@@ -837,25 +840,26 @@ global void SetPlayersPalette(void)
 	}
 
 	for( i=0; i<7; ++i ) {
-	    Players[i].UnitColors.Depth8.Pixels[0]=Pixels8[i*4+208];
-	    Players[i].UnitColors.Depth8.Pixels[1]=Pixels8[i*4+209];
-	    Players[i].UnitColors.Depth8.Pixels[2]=Pixels8[i*4+210];
-	    Players[i].UnitColors.Depth8.Pixels[3]=Pixels8[i*4+211];
+	    Players[o].UnitColors.Depth8.Pixels[0]=Pixels8[i*4+208];
+	    Players[o].UnitColors.Depth8.Pixels[1]=Pixels8[i*4+209];
+	    Players[o].UnitColors.Depth8.Pixels[2]=Pixels8[i*4+210];
+	    Players[o].UnitColors.Depth8.Pixels[3]=Pixels8[i*4+211];
 
-	    Players[i+8].UnitColors.Depth8.Pixels[0]=Pixels8[i*4+208];
-	    Players[i+8].UnitColors.Depth8.Pixels[1]=Pixels8[i*4+209];
-	    Players[i+8].UnitColors.Depth8.Pixels[2]=Pixels8[i*4+210];
-	    Players[i+8].UnitColors.Depth8.Pixels[3]=Pixels8[i*4+211];
+	    Players[o+8].UnitColors.Depth8.Pixels[0]=Pixels8[i*4+208];
+	    Players[o+8].UnitColors.Depth8.Pixels[1]=Pixels8[i*4+209];
+	    Players[o+8].UnitColors.Depth8.Pixels[2]=Pixels8[i*4+210];
+	    Players[o+8].UnitColors.Depth8.Pixels[3]=Pixels8[i*4+211];
+	    o=(o+1)&0x7;
 	}
 
-	Players[i].UnitColors.Depth8.Pixels[0]=Pixels8[12];
-	Players[i].UnitColors.Depth8.Pixels[1]=Pixels8[13];
-	Players[i].UnitColors.Depth8.Pixels[2]=Pixels8[14];
-	Players[i].UnitColors.Depth8.Pixels[3]=Pixels8[15];
-	Players[i+8].UnitColors.Depth8.Pixels[0]=Pixels8[12];
-	Players[i+8].UnitColors.Depth8.Pixels[1]=Pixels8[13];
-	Players[i+8].UnitColors.Depth8.Pixels[2]=Pixels8[14];
-	Players[i+8].UnitColors.Depth8.Pixels[3]=Pixels8[15];
+	Players[o].UnitColors.Depth8.Pixels[0]=Pixels8[12];
+	Players[o].UnitColors.Depth8.Pixels[1]=Pixels8[13];
+	Players[o].UnitColors.Depth8.Pixels[2]=Pixels8[14];
+	Players[o].UnitColors.Depth8.Pixels[3]=Pixels8[15];
+	Players[o+8].UnitColors.Depth8.Pixels[0]=Pixels8[12];
+	Players[o+8].UnitColors.Depth8.Pixels[1]=Pixels8[13];
+	Players[o+8].UnitColors.Depth8.Pixels[2]=Pixels8[14];
+	Players[o+8].UnitColors.Depth8.Pixels[3]=Pixels8[15];
 
 	break;
 
@@ -868,25 +872,26 @@ global void SetPlayersPalette(void)
 	}
 
 	for( i=0; i<7; ++i ) {
-	    Players[i].UnitColors.Depth16.Pixels[0]=Pixels16[i*4+208];
-	    Players[i].UnitColors.Depth16.Pixels[1]=Pixels16[i*4+209];
-	    Players[i].UnitColors.Depth16.Pixels[2]=Pixels16[i*4+210];
-	    Players[i].UnitColors.Depth16.Pixels[3]=Pixels16[i*4+211];
+	    Players[o].UnitColors.Depth16.Pixels[0]=Pixels16[i*4+208];
+	    Players[o].UnitColors.Depth16.Pixels[1]=Pixels16[i*4+209];
+	    Players[o].UnitColors.Depth16.Pixels[2]=Pixels16[i*4+210];
+	    Players[o].UnitColors.Depth16.Pixels[3]=Pixels16[i*4+211];
 
-	    Players[i+8].UnitColors.Depth16.Pixels[0]=Pixels16[i*4+208];
-	    Players[i+8].UnitColors.Depth16.Pixels[1]=Pixels16[i*4+209];
-	    Players[i+8].UnitColors.Depth16.Pixels[2]=Pixels16[i*4+210];
-	    Players[i+8].UnitColors.Depth16.Pixels[3]=Pixels16[i*4+211];
+	    Players[o+8].UnitColors.Depth16.Pixels[0]=Pixels16[i*4+208];
+	    Players[o+8].UnitColors.Depth16.Pixels[1]=Pixels16[i*4+209];
+	    Players[o+8].UnitColors.Depth16.Pixels[2]=Pixels16[i*4+210];
+	    Players[o+8].UnitColors.Depth16.Pixels[3]=Pixels16[i*4+211];
+	    o=(o+1)&0x7;
 	}
 
-	Players[i].UnitColors.Depth16.Pixels[0]=Pixels16[12];
-	Players[i].UnitColors.Depth16.Pixels[1]=Pixels16[13];
-	Players[i].UnitColors.Depth16.Pixels[2]=Pixels16[14];
-	Players[i].UnitColors.Depth16.Pixels[3]=Pixels16[15];
-	Players[i+8].UnitColors.Depth16.Pixels[0]=Pixels16[12];
-	Players[i+8].UnitColors.Depth16.Pixels[1]=Pixels16[13];
-	Players[i+8].UnitColors.Depth16.Pixels[2]=Pixels16[14];
-	Players[i+8].UnitColors.Depth16.Pixels[3]=Pixels16[15];
+	Players[o].UnitColors.Depth16.Pixels[0]=Pixels16[12];
+	Players[o].UnitColors.Depth16.Pixels[1]=Pixels16[13];
+	Players[o].UnitColors.Depth16.Pixels[2]=Pixels16[14];
+	Players[o].UnitColors.Depth16.Pixels[3]=Pixels16[15];
+	Players[o+8].UnitColors.Depth16.Pixels[0]=Pixels16[12];
+	Players[o+8].UnitColors.Depth16.Pixels[1]=Pixels16[13];
+	Players[o+8].UnitColors.Depth16.Pixels[2]=Pixels16[14];
+	Players[o+8].UnitColors.Depth16.Pixels[3]=Pixels16[15];
 
 	break;
     case 24:
@@ -897,25 +902,26 @@ global void SetPlayersPalette(void)
 	}
 
 	for( i=0; i<7; ++i ) {
-	    Players[i].UnitColors.Depth24.Pixels[0]=Pixels24[i*4+208];
-	    Players[i].UnitColors.Depth24.Pixels[1]=Pixels24[i*4+209];
-	    Players[i].UnitColors.Depth24.Pixels[2]=Pixels24[i*4+210];
-	    Players[i].UnitColors.Depth24.Pixels[3]=Pixels24[i*4+211];
+	    Players[o].UnitColors.Depth24.Pixels[0]=Pixels24[i*4+208];
+	    Players[o].UnitColors.Depth24.Pixels[1]=Pixels24[i*4+209];
+	    Players[o].UnitColors.Depth24.Pixels[2]=Pixels24[i*4+210];
+	    Players[o].UnitColors.Depth24.Pixels[3]=Pixels24[i*4+211];
 
-	    Players[i+8].UnitColors.Depth24.Pixels[0]=Pixels24[i*4+208];
-	    Players[i+8].UnitColors.Depth24.Pixels[1]=Pixels24[i*4+209];
-	    Players[i+8].UnitColors.Depth24.Pixels[2]=Pixels24[i*4+210];
-	    Players[i+8].UnitColors.Depth24.Pixels[3]=Pixels24[i*4+211];
+	    Players[o+8].UnitColors.Depth24.Pixels[0]=Pixels24[i*4+208];
+	    Players[o+8].UnitColors.Depth24.Pixels[1]=Pixels24[i*4+209];
+	    Players[o+8].UnitColors.Depth24.Pixels[2]=Pixels24[i*4+210];
+	    Players[o+8].UnitColors.Depth24.Pixels[3]=Pixels24[i*4+211];
+	    o=(o+1)&0x7;
 	}
 
-	Players[i].UnitColors.Depth24.Pixels[0]=Pixels24[12];
-	Players[i].UnitColors.Depth24.Pixels[1]=Pixels24[13];
-	Players[i].UnitColors.Depth24.Pixels[2]=Pixels24[14];
-	Players[i].UnitColors.Depth24.Pixels[3]=Pixels24[15];
-	Players[i+8].UnitColors.Depth24.Pixels[0]=Pixels24[12];
-	Players[i+8].UnitColors.Depth24.Pixels[1]=Pixels24[13];
-	Players[i+8].UnitColors.Depth24.Pixels[2]=Pixels24[14];
-	Players[i+8].UnitColors.Depth24.Pixels[3]=Pixels24[15];
+	Players[o].UnitColors.Depth24.Pixels[0]=Pixels24[12];
+	Players[o].UnitColors.Depth24.Pixels[1]=Pixels24[13];
+	Players[o].UnitColors.Depth24.Pixels[2]=Pixels24[14];
+	Players[o].UnitColors.Depth24.Pixels[3]=Pixels24[15];
+	Players[o+8].UnitColors.Depth24.Pixels[0]=Pixels24[12];
+	Players[o+8].UnitColors.Depth24.Pixels[1]=Pixels24[13];
+	Players[o+8].UnitColors.Depth24.Pixels[2]=Pixels24[14];
+	Players[o+8].UnitColors.Depth24.Pixels[3]=Pixels24[15];
 
 	break;
     case 32:
@@ -926,25 +932,26 @@ global void SetPlayersPalette(void)
 	}
 
 	for( i=0; i<7; ++i ) {
-	    Players[i].UnitColors.Depth32.Pixels[0]=Pixels32[i*4+208];
-	    Players[i].UnitColors.Depth32.Pixels[1]=Pixels32[i*4+209];
-	    Players[i].UnitColors.Depth32.Pixels[2]=Pixels32[i*4+210];
-	    Players[i].UnitColors.Depth32.Pixels[3]=Pixels32[i*4+211];
+	    Players[o].UnitColors.Depth32.Pixels[0]=Pixels32[i*4+208];
+	    Players[o].UnitColors.Depth32.Pixels[1]=Pixels32[i*4+209];
+	    Players[o].UnitColors.Depth32.Pixels[2]=Pixels32[i*4+210];
+	    Players[o].UnitColors.Depth32.Pixels[3]=Pixels32[i*4+211];
 
-	    Players[i+8].UnitColors.Depth32.Pixels[0]=Pixels32[i*4+208];
-	    Players[i+8].UnitColors.Depth32.Pixels[1]=Pixels32[i*4+209];
-	    Players[i+8].UnitColors.Depth32.Pixels[2]=Pixels32[i*4+210];
-	    Players[i+8].UnitColors.Depth32.Pixels[3]=Pixels32[i*4+211];
+	    Players[o+8].UnitColors.Depth32.Pixels[0]=Pixels32[i*4+208];
+	    Players[o+8].UnitColors.Depth32.Pixels[1]=Pixels32[i*4+209];
+	    Players[o+8].UnitColors.Depth32.Pixels[2]=Pixels32[i*4+210];
+	    Players[o+8].UnitColors.Depth32.Pixels[3]=Pixels32[i*4+211];
+	    o=(o+1)&0x7;
 	}
 
-	Players[i].UnitColors.Depth32.Pixels[0]=Pixels32[12];
-	Players[i].UnitColors.Depth32.Pixels[1]=Pixels32[13];
-	Players[i].UnitColors.Depth32.Pixels[2]=Pixels32[14];
-	Players[i].UnitColors.Depth32.Pixels[3]=Pixels32[15];
-	Players[i+8].UnitColors.Depth32.Pixels[0]=Pixels32[12];
-	Players[i+8].UnitColors.Depth32.Pixels[1]=Pixels32[13];
-	Players[i+8].UnitColors.Depth32.Pixels[2]=Pixels32[14];
-	Players[i+8].UnitColors.Depth32.Pixels[3]=Pixels32[15];
+	Players[o].UnitColors.Depth32.Pixels[0]=Pixels32[12];
+	Players[o].UnitColors.Depth32.Pixels[1]=Pixels32[13];
+	Players[o].UnitColors.Depth32.Pixels[2]=Pixels32[14];
+	Players[o].UnitColors.Depth32.Pixels[3]=Pixels32[15];
+	Players[o+8].UnitColors.Depth32.Pixels[0]=Pixels32[12];
+	Players[o+8].UnitColors.Depth32.Pixels[1]=Pixels32[13];
+	Players[o+8].UnitColors.Depth32.Pixels[2]=Pixels32[14];
+	Players[o+8].UnitColors.Depth32.Pixels[3]=Pixels32[15];
 
 	break;
     }
