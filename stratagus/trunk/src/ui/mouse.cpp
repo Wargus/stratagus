@@ -521,7 +521,7 @@ global void UIHandleMouseMove(int x,int y)
     //cade: this is forbidden for unexplored and not visible space
     // FIXME: This must done new, moving units, scrolling...
     if( CursorOn==CursorOnMap ) {
-	if( MAPVISIBLE(Screen2MapX(x),Screen2MapY(y)) ) {
+	if( IsMapFieldVisible(Screen2MapX(x),Screen2MapY(y)) ) {
 	    DebugLevel3(__FUNCTION__": %d,%d\n"
 		    ,x-TheUI.MapX+MapX*TileSizeX
 		    ,y-TheUI.MapY+MapY*TileSizeY);
@@ -530,7 +530,7 @@ global void UIHandleMouseMove(int x,int y)
 		    ,y-TheUI.MapY+MapY*TileSizeY);
 	}
     } else if( CursorOn==CursorOnMinimap ) {
-	if( MAPVISIBLE(Minimap2MapX(x),Minimap2MapY(y)) ) {
+	if( IsMapFieldVisible(Minimap2MapX(x),Minimap2MapY(y)) ) {
 	    UnitUnderCursor=UnitOnMapTile(Minimap2MapX(x),Minimap2MapY(y));
 	}
     }
@@ -897,7 +897,7 @@ global void UIHandleButtonDown(int b)
  		if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)
 			// FIXME: vladi: should check all building footprint
 			// but not just MAPEXPLORED(x,y)
-			&& MAPEXPLORED(x,y) ) {
+			&& IsMapFieldExplored(x,y) ) {
 		    PlayGameSound(GameSounds.PlacementSuccess.Sound
 			    ,MaxSampleVolume);
 		    SendCommandBuildBuilding(Selected[0],x,y,CursorBuilding
@@ -1057,7 +1057,7 @@ global void UIHandleButtonUp(int b)
 	    }
             //cade: cannot select unit on invisible space
 	    // FIXME: johns: only complete invisibile units
-            if( MAPVISIBLE(Screen2MapX(CursorX),Screen2MapY(CursorY)) ) {
+            if( IsMapFieldVisible(Screen2MapX(CursorX),Screen2MapY(CursorY)) ) {
 		unit=UnitOnScreen(unit
 		    ,CursorX-TheUI.MapX+MapX*TileSizeX
 		    ,CursorY-TheUI.MapY+MapY*TileSizeY);

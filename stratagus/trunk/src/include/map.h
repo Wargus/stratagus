@@ -72,8 +72,10 @@ typedef struct _map_field_ {
 #endif
 } MapField;
 
+#ifndef NEW_FOW
 #define MapFieldVisible		0x0001	/// Field visible
 #define MapFieldExplored	0x0002	/// Field explored
+#endif
 
 #define MapFieldArray		0x0004	/// More than one unit on the field
 
@@ -254,18 +256,17 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 --	Defines
 ----------------------------------------------------------------------------*/
 
+    /// Can an unit with 'mask' can enter the field.
 #define CanMoveToMask(x,y,mask) \
 	!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
 
-#define    MAPFIELD(xx,yy) TheMap.Fields[(xx)+(yy)*TheMap.Width]
-#define     MAPMOVE(xx,yy) TheMap.MovementMap[(xx)+(yy)*TheMap.Width]
-#define       INMAP(xx,yy) ((xx)>=0&&(yy)>=0&&(xx)<TheMap.Width&&(yy)<TheMap.Height)
-#define  MAPVISIBLE(xx,yy) (INMAP(xx,yy) ? !!(TheMap.Fields[(yy)*TheMap.Width+(xx)].Flags&MapFieldVisible ) : 1)
-#define MAPEXPLORED(xx,yy) (INMAP(xx,yy) ? !!(TheMap.Fields[(yy)*TheMap.Width+(xx)].Flags&MapFieldExplored) : 1)
+    /// Check if a field for the user is explored
+#define IsMapFieldExplored(x,y) \
+    (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldExplored)
 
-#define MAPTILE(xx,yy) (MAPFIELD(xx,yy).Tile)
-#define MAPSEENTILE(xx,yy) (MAPFIELD(xx,yy).SeenTile)
-#define TILETYPE(tile) (TheMap.Tileset->TileTypeTable[tile])
+    /// Check if a field for the user is visibile
+#define IsMapFieldVisible(x,y) \
+    (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldVisible)
 
 #define UNEXPLORED_TILE 0
 
