@@ -34,14 +34,10 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-#include "iolib.h"
-
-/*----------------------------------------------------------------------------
---  Declaration
-----------------------------------------------------------------------------*/
+struct _CL_File_;
 
 /**
 **  Possible outcomes of the game.
@@ -96,12 +92,12 @@ typedef struct _chapter_picture_text_ {
 **  Campaign chapter structure.
 */
 struct _campaign_chapter_ {
-	CampaignChapter* Next;  ///< Next campaign chapter
-	ChapterTypes     Type;  ///< Type of the chapter (level,...)
+	CampaignChapter* Next;   ///< Next campaign chapter
+	ChapterTypes     Type;   ///< Type of the chapter (level,...)
 	union {
 		struct {
-			char* Name;  ///< Chapter name
-		} Level;         ///< Data for a level
+			char* Name;      ///< Chapter name
+		} Level;             ///< Data for a level
 		struct {
 			char* Image;               ///< File name of image
 			int   FadeIn;              ///< Number of cycles to fade in
@@ -156,7 +152,7 @@ extern void PlayCampaign(const char* name);
 extern char* NextChapter(void);
 
 extern void CampaignCclRegister(void);   /// Register ccl features
-extern void SaveCampaign(CLFile* file);  /// Save the campaign module
+extern void SaveCampaign(struct _CL_File_* file); /// Save the campaign module
 extern void CleanCampaign(void);         /// Cleanup the campaign module
 
 //@}

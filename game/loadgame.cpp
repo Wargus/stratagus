@@ -56,10 +56,12 @@
 #include "actions.h"
 #include "minimap.h"
 #include "commands.h"
+#include "sound.h"
 #include "sound_server.h"
 #include "font.h"
 #include "menus.h"
 #include "pathfinder.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

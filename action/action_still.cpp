@@ -45,6 +45,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "pathfinder.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 -- Functions

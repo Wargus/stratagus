@@ -34,12 +34,16 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-#include "player.h"
-#include "unit.h"
 #include "icons.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+struct _unit_;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -71,7 +75,7 @@ enum _button_cmd_ {
 
 	/// typedef for action of button
 typedef struct _button_action_ ButtonAction;
-typedef int (*ButtonCheckFunc)(const Unit*, const ButtonAction*);
+typedef int (*ButtonCheckFunc)(const struct _unit_*, const ButtonAction*);
 
 	/// Action of button
 struct _button_action_ {
@@ -251,7 +255,7 @@ extern enum _scroll_state_ MouseScrollState;
 	/// current key state
 extern enum _key_state_ KeyState;
 	/// pointer to unit under the cursor
-extern Unit* UnitUnderCursor;
+extern struct _unit_* UnitUnderCursor;
 	/// button area under the cursor
 extern int ButtonAreaUnderCursor;
 	/// button number under the cursor
@@ -289,9 +293,8 @@ extern void InitButtons(void);
 extern void CleanButtons(void);
 	/// Make a new button
 extern int AddButton(int pos, int level, const char* IconIdent,
-		enum _button_cmd_ action, const char* value,
-		const ButtonCheckFunc func, const void* arg,
-		int key, const char* hint, const char* umask);
+	enum _button_cmd_ action, const char* value, const ButtonCheckFunc func,
+	const void* arg, int key, const char* hint, const char* umask);
 
 //
 // in mouse.c
@@ -308,42 +311,47 @@ extern void HandleMouseMove(int x, int y);
 extern void HandleMouseExit(void);
 
 	/// Update KeyModifiers if a key is pressed
-extern int HandleKeyModifiersDown(unsigned keycode,unsigned keychar);
+extern int HandleKeyModifiersDown(unsigned keycode, unsigned keychar);
 	/// Update KeyModifiers if a key is released
-extern int HandleKeyModifiersUp(unsigned keycode,unsigned keychar);
+extern int HandleKeyModifiersUp(unsigned keycode, unsigned keychar);
 
 	/// Called if a key is pressed
-extern void HandleKeyDown(unsigned keycode,unsigned keychar);
+extern void HandleKeyDown(unsigned keycode, unsigned keychar);
 	/// Called when a key is released
-extern void HandleKeyUp(unsigned keycode,unsigned keychar);
+extern void HandleKeyUp(unsigned keycode, unsigned keychar);
 	/// Called when a key is repeated
-extern void HandleKeyRepeat(unsigned keycode,unsigned keychar);
+extern void HandleKeyRepeat(unsigned keycode, unsigned keychar);
 
 //
 // in interface.c (for link between video and mouse.c)
 //
 	/// Called if any mouse button is pressed down
-extern void InputMouseButtonPress(const EventCallback*, unsigned, unsigned);
+extern void InputMouseButtonPress(const EventCallback* callbacks,
+	unsigned ticks, unsigned button);
 	/// Called if any mouse button is released up
-extern void InputMouseButtonRelease(const EventCallback*, unsigned, unsigned);
+extern void InputMouseButtonRelease(const EventCallback* callbacks,
+	unsigned ticks, unsigned button);
 	/// Called if the mouse is moved
-extern void InputMouseMove(const EventCallback*, unsigned, int, int);
+extern void InputMouseMove(const EventCallback* callbacks, unsigned ticks,
+	int x, int y);
 	/// Called if the mouse exits the game window (when supported by videomode)
-extern void InputMouseExit(const EventCallback*, unsigned);
+extern void InputMouseExit(const EventCallback* callbacks, unsigned ticks);
 	/// Called to look for mouse timeouts
-extern void InputMouseTimeout(const EventCallback*, unsigned);
+extern void InputMouseTimeout(const EventCallback* callbacks, unsigned ticks);
 
 	/// Called if any key button is pressed down
-extern void InputKeyButtonPress(const EventCallback*, unsigned, unsigned, unsigned);
+extern void InputKeyButtonPress(const EventCallback* callbacks,
+	unsigned ticks, unsigned ikey, unsigned ikeychar);
 	/// Called if any key button is released up
-extern void InputKeyButtonRelease(const EventCallback*, unsigned, unsigned, unsigned);
+extern void InputKeyButtonRelease(const EventCallback* callbacks,
+	unsigned ticks, unsigned ikey, unsigned ikeychar);
 	/// Called to look for key timeouts
-extern void InputKeyTimeout(const EventCallback*, unsigned);
+extern void InputKeyTimeout(const EventCallback* callbacks, unsigned ticks);
 
 	/// Toggle pause mode
 extern void UiTogglePause(void);
 	/// Handle cheats
-extern int HandleCheats(const char*);
+extern int HandleCheats(const char* input);
 
 //
 // Chaos pur.
@@ -379,7 +387,7 @@ extern void DrawStatusLine(void);
 	/// Draw costs in status line
 extern void DrawCosts(void);
 	/// Set costs to be displayed in status line
-extern void SetCosts(int, int, const int* costs);
+extern void SetCosts(int mana, int food, const int* costs);
 	/// Clear the costs displayed in status line (undisplay!)
 extern void ClearCosts(void);
 
@@ -392,7 +400,7 @@ extern void UpdateTimer(void);
 	/// Draw the unit button panel
 extern void DrawButtonPanel(void);
 	/// Update the status line with hints from the button
-extern void UpdateStatusLineForButton(const ButtonAction*);
+extern void UpdateStatusLineForButton(const ButtonAction* button);
 	/// Draw the Pie Menu
 extern void DrawPieMenu(void);
 	/// Update the content of the unit button panel
@@ -403,37 +411,50 @@ extern void DoButtonButtonClicked(int button);
 extern int DoButtonPanelKey(int key);
 
 	/// Handle the mouse in scroll area
-extern int HandleMouseScrollArea(int, int);
+extern int HandleMouseScrollArea(int x, int y);
 
 //
 // in button_checks.c
 //
 	/// Check is always true
-extern int ButtonCheckTrue(const Unit*, const ButtonAction*);
+extern int ButtonCheckTrue(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check is always false
-extern int ButtonCheckFalse(const Unit*, const ButtonAction*);
+extern int ButtonCheckFalse(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if allowed upgrade is ready
-extern int ButtonCheckUpgrade(const Unit*, const ButtonAction*);
+extern int ButtonCheckUpgrade(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if allowed units exists
-extern int ButtonCheckUnitsOr(const Unit*, const ButtonAction*);
+extern int ButtonCheckUnitsOr(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if allowed units exists
-extern int ButtonCheckUnitsAnd(const Unit*, const ButtonAction*);
+extern int ButtonCheckUnitsAnd(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if have network play
-extern int ButtonCheckNetwork(const Unit*, const ButtonAction*);
+extern int ButtonCheckNetwork(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if don't have network play
-extern int ButtonCheckNoNetwork(const Unit*, const ButtonAction*);
+extern int ButtonCheckNoNetwork(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if unit isn't working (train,upgrade,research)
-extern int ButtonCheckNoWork(const Unit*, const ButtonAction*);
+extern int ButtonCheckNoWork(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if unit isn't researching or upgrading
-extern int ButtonCheckNoResearch(const Unit*, const ButtonAction*);
+extern int ButtonCheckNoResearch(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if all requirements for an attack to are meet
-extern int ButtonCheckAttack(const Unit*, const ButtonAction*);
+extern int ButtonCheckAttack(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if all requirements for an upgrade to are meet
-extern int ButtonCheckUpgradeTo(const Unit*, const ButtonAction*);
+extern int ButtonCheckUpgradeTo(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if all requirements for a research are meet
-extern int ButtonCheckResearch(const Unit*, const ButtonAction*);
+extern int ButtonCheckResearch(const struct _unit_* unit,
+	const ButtonAction* button);
 	/// Check if all requirements for a single research are meet
-extern int ButtonCheckSingleResearch(const Unit*, const ButtonAction*);
+extern int ButtonCheckSingleResearch(const struct _unit_* unit,
+	const ButtonAction* button);
 
 //
 // in ccl_ui.c

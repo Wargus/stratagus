@@ -54,8 +54,6 @@
 #include "iocompat.h"
 #endif
 
-#include "sound_server.h"
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -87,7 +85,7 @@ extern struct cdrom_tocentry CDtocentry[64];  ///< TOC track header struct
 
 #ifdef USE_CDDA
 	/// Load a cd track
-extern Sample* LoadCD(const char* name,int flags);
+extern Sample* LoadCD(const char* name, int flags);
 #endif
 
 	/// Play CDMode 'name'
@@ -107,7 +105,7 @@ extern void PauseCD(void);
 	/// Close CD
 extern void QuitCD(void);
 	/// Check the cdrom status
-extern int CDRomCheck(void *);
+extern int CDRomCheck(void*);
 
 #else
 
