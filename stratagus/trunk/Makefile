@@ -35,9 +35,9 @@ OBJDIR ?= .
 
 CROSSDIR = /usr/local/cross
 
-INCLUDE_DIRS = src/include src/movie/vp31/include etlib
+INCLUDE_DIRS = src/include src/movie/vp31/include
 
-MODULES = src/action src/ai src/beos src/stratagus src/editor src/stratagus src/game src/libmodplug src/map \
+MODULES = src/action src/ai src/beos src/stratagus src/editor src/game src/libmodplug src/map \
           src/missile src/movie src/movie/vp31 src/network src/pathfinder src/sound src/ui src/unit \
           src/video etlib
 
@@ -204,26 +204,17 @@ tools/aledoc$(EXE): tools/aledoc.c
 #	Distributions
 ##############################################################################
 
-DOCS    = README doc/index.html doc/install.html \
-	  doc/media.html doc/datadir.html doc/README-SDL.txt\
-	  doc/faq.html doc/ChangeLog.html doc/todo.html \
-	  doc/development.html doc/gpl.html \
-	  doc/ccl/ai.html doc/ccl/ccl.html doc/ccl/config.html \
-	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
-	  doc/ccl/research.html doc/graphics/* \
-	  doc/trigger.txt doc/vp32_opensource_license_9-6-01.txt \
-	  doc/ccl/ccl-index.html doc/ccl/game.html \
-	  doc/ccl/sound.html doc/ccl/triggers.html \
-	  doc/ccl/ui.html
+DOCS    = README doc/*.html doc/*.txt doc/ccl/*.html doc/ccl/*.py \
+	  doc/graphics/*.html doc/graphics/*.gimp doc/graphics/*.png
 
 PICS    = contrib/stratagus.ico
 
 CONTRIB	= contrib/macosx.tgz
 
-MISC    += Makefile Rules.make.orig setup \
+MISC    += Makefile Rules.make.orig \
 	  contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
-	  .indent.pro Rules.make.in configure.in configure \
-	  src/stratagus.rc data/default.cm
+	  Rules.make.in configure.in configure \
+	  src/stratagus.rc
 
 mydate	= $(shell date +%y%m%d)
 distdir	= stratagus-$(mydate)
@@ -238,7 +229,6 @@ dist: distlist
 	echo >>$(DISTLIST)
 	echo $(PICS) >>$(DISTLIST)
 	echo $(MISC) >>$(DISTLIST)
-	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
 	echo $(CONTRIB) >>$(DISTLIST)
 	rm -rf $(distdir)
@@ -247,7 +237,7 @@ dist: distlist
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-src.tar.gz $(distdir)
-	echo "(c) 2003 by the Stratagus Project http://Stratagus.Org" | \
+	echo "(c) 2004 The Stratagus Project" | \
 	zip -zq9r $(distdir)-src.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -255,7 +245,6 @@ dist: distlist
 
 bin-dist: all
 	$(RM) $(DISTLIST)
-	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
 	echo stratagus$(EXE) >>$(DISTLIST)
 	rm -rf $(distdir)
@@ -272,7 +261,6 @@ bin-dist: all
 
 win32-bin-dist2: win32
 	@$(RM) $(DISTLIST)
-	@echo $(CCLS) >>$(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
 	@echo stratagus$(EXE) >>$(DISTLIST)
 	@rm -rf $(distdir)
@@ -300,7 +288,6 @@ diff:
 	$(MAKE) -C src RULESFILE=$(RULESFILE) distlist
 	$(MAKE) -C tools RULESFILE=$(RULESFILE) distlist
 	echo $(MISC) >>$(DISTLIST)
-	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
 	rcsdiff -u `cat $(DISTLIST)` > $(difffile)
 
