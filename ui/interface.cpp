@@ -996,6 +996,10 @@ global int HandleCheats(const char* input)
 #endif
 	lua_pushstring(Lua, "HandleCheats");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	if (!lua_isfunction(Lua, -1)) {
+		DebugLevel0Fn("No HandleCheats function in lua.\n");
+		return 0;
+	}
 	lua_pushstring(Lua, input);
 	LuaCall(1, 0);
 	ret = lua_gettop(Lua);
