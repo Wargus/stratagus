@@ -153,7 +153,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 	goal->Frame=resource->Frame;
 	CheckUnitToBeDrawn(goal);
     }
-
+    UnitMarkSeen(goal);
     //
     //	Place unit inside the resource
     //
@@ -239,6 +239,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    source->Frame=0;
 	    CheckUnitToBeDrawn(source);
 	}
+	UnitMarkSeen(source);
 	if( IsOnlySelected(source) ) {
 	    MustRedraw|=RedrawInfoPanel;
 	}

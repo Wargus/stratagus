@@ -310,6 +310,7 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 				    if( i >= (*corpses)->X && y >= (*corpses)->Y
 					&& i < (*corpses)->X+w && y < (*corpses)->Y+h ) {
 					    (*corpses)->Visible &= ~(1 << player->Player);
+					    UnitMarkSeen(*corpses);
 				    }
 				}
 				remove = corpses;
@@ -322,6 +323,7 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 #endif
 			if( IsTileVisible(ThisPlayer,i,y) > 1) {
 			    MapMarkSeenTile(i,y);
+			    UnitsMarkSeen(i,y);
 			}
                         
 			break;
@@ -404,6 +406,7 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 		    	// Check visible Tile, then deduct...
 			if( IsTileVisible(ThisPlayer,i,y) > 1) {
 			    MapMarkSeenTile(i,y);
+			    UnitsMarkSeen(i,y);
 			}
 		    default:		// seen -> seen
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=v-1;
@@ -427,8 +430,9 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 global void MapMarkNewSight(const Player* player,int tx,int ty,int range
 	,int dx __attribute__((unused)),int dy __attribute__((unused)))
 {
-    MapUnmarkSight(player,tx-dx,ty-dy,range);
+    /// It's faster to mark then unmark.
     MapMarkSight(player,tx,ty,range);
+    MapUnmarkSight(player,tx-dx,ty-dy,range);
 }
 
 #else

@@ -1755,27 +1755,6 @@ local void DrawBuilding(Unit* unit)
 #else
     visible=UnitVisibleOnMap(unit);
 #endif
-    // FIXME: is this the correct place? No, but now correct working.
-    if( visible ) {
-	y=unit->SeenIY=unit->IY;
-	x=unit->SeenIX=unit->IX;
-	frame = unit->SeenFrame = unit->Frame;
-	type = unit->SeenType = unit->Type;
-	state = unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
-			((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
-	constructed = unit->SeenConstructed = unit->Constructed;
-	
-    } else {
-	y=unit->SeenIY;
-	x=unit->SeenIX;
-	frame = unit->SeenFrame;
-	type = unit->SeenType;
-	constructed = unit->SeenConstructed;
-	state = unit->SeenState;
-	if( !ReplayRevealMap ) {
-	    DebugCheck( frame==UnitNotSeen );
-	}
-    }
     
     if( ReplayRevealMap ) {
 	type = unit->Type;
@@ -1785,8 +1764,17 @@ local void DrawBuilding(Unit* unit)
 	state = (unit->Orders[0].Action==UnitActionBuilded) |
 			((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
 	constructed = unit->Constructed;
+    } else {
+	y=unit->SeenIY;
+	x=unit->SeenIX;
+	frame = unit->SeenFrame;
+	type = unit->SeenType;
+	constructed = unit->SeenConstructed;
+	state = unit->SeenState;
     }
-    
+
+    DebugCheck( frame==UnitNotSeen );
+
     x+=Map2ViewportX(CurrentViewport,unit->X);
     y+=Map2ViewportY(CurrentViewport,unit->Y);
 
@@ -1924,7 +1912,7 @@ global void DrawUnits(const void* v)
     //
     corpses = &DestroyedBuildings;
     while( *corpses ) {
-	if( UnitVisibleInViewport(vp,*corpses) && (*corpses)->Visible&(1 << ThisPlayer->Player) ) {
+	if( UnitVisibleInViewport(vp,*corpses) ) {
 	    DrawBuilding(*corpses);
 	}
 	corpses=&(*corpses)->Next;
