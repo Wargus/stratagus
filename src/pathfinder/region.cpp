@@ -135,8 +135,8 @@ void RegionDeleteNeighbor (Region *reg, Region *neigh)
 			break;
 	}
 	if (i == reg->NumNeighbors) {
-		DebugLevel0Fn ("region %d is not a neighbor of %d.\n",
-					reg->RegId, neigh->RegId);
+		DebugLevel0Fn ("region %d is not a neighbor of %d.\n" _C_
+					reg->RegId _C_ neigh->RegId);
 		return;
 	}
 	for ( ; i+1 < reg->NumNeighbors; i++) {

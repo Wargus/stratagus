@@ -2565,7 +2565,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
     int bestd;
     Unit* destu;
 
-    DebugLevel3Fn("%d %d,%d\n",UnitNumber(unit),unit->X,unit->Y);
+    DebugLevel3Fn("%d %d,%d\n" _C_ UnitNumber(unit) _C_ unit->X _C_ unit->Y);
 
     x=unit->X;
     y=unit->Y;
@@ -2578,7 +2578,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
     //
     if( (destu=FindWoodDeposit(unit->Player,x,y)) ) {
 	NearestOfUnit(destu,x,y,&wx,&wy);
-	DebugLevel3("To %d,%d\n",wx,wy);
+	DebugLevel3("To %d,%d\n" _C_ wx _C_ wy);
     } else {
 	wx=unit->X;
 	wy=unit->Y;
@@ -2592,7 +2592,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
 	for( i=addy; i--; y++ ) {
 	    if( CheckedForestOnMap(x,y) ) {
 		n=max(abs(wx-x),abs(wy-y));
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if( n<bestd ) {
 		    bestd=n;
 		    bestx=x;
@@ -2604,7 +2604,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
 	for( i=addx; i--; x++ ) {
 	    if( CheckedForestOnMap(x,y) ) {
 		n=max(abs(wx-x),abs(wy-y));
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if( n<bestd ) {
 		    bestd=n;
 		    bestx=x;
@@ -2616,7 +2616,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
 	for( i=addy; i--; y-- ) {
 	    if( CheckedForestOnMap(x,y) ) {
 		n=max(abs(wx-x),abs(wy-y));
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if( n<bestd ) {
 		    bestd=n;
 		    bestx=x;
@@ -2628,7 +2628,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
 	for( i=addx; i--; x-- ) {
 	    if( CheckedForestOnMap(x,y) ) {
 		n=max(abs(wx-x),abs(wy-y));
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if( n<bestd ) {
 		    bestd=n;
 		    bestx=x;
@@ -2637,7 +2637,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
 	    }
 	}
 	if( bestd!=99999 ) {
-	    DebugLevel3Fn("wood on %d,%d\n",x,y);
+	    DebugLevel3Fn("wood on %d,%d\n" _C_ x _C_ y);
 	    *px=bestx;
 	    *py=besty;
 	    return 1;

@@ -699,7 +699,7 @@ global void NetworkEvent(void)
 	    // Both directions are same fast/slow
 	    ncq = (NetworkCommandQueue *)(CommandsOut->last);
 	    while (ncq->List->prev) {
-		DebugLevel3Fn("resend %d? %d\n", ncq->Time, n);
+		DebugLevel3Fn("resend %d? %d\n" _C_ ncq->Time _C_ n);
 		if (ncq->Time == n) {
 		    NetworkSendPacket(ncq);
 		    break;

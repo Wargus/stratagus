@@ -445,7 +445,7 @@ global void NetworkServerStartGame(void)
 #if 0
 	    // ARI: is this code path really executed? (initially h >= NetPlayers..)
 	    Hosts[i].PlyNr = num[0];
-	    DebugLevel0Fn("Hosts[%d].PlyNr = %i\n", i, num[0]);
+	    DebugLevel0Fn("Hosts[%d].PlyNr = %i\n" _C_ i _C_ num[0]);
 #endif
 	}
     }

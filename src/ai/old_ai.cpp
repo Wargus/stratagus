@@ -370,15 +370,15 @@ local int AiNeedResources(const UnitType * type)
     player = AiPlayer->Player;
     if ((err = PlayerCheckUnitType(player, type))) {
 	if (err & (1 << GoldCost)) {
-	    DebugLevel3Fn("%d Need gold\n", AiPlayer->Player - Players);
+	    DebugLevel3Fn("%d Need gold\n" _C_ AiPlayer->Player - Players);
 	    AiPlayer->NeedGold = 1;
 	}
 	if (err & (1 << WoodCost)) {
-	    DebugLevel3Fn("%d Need wood\n", AiPlayer->Player - Players);
+	    DebugLevel3Fn("%d Need wood\n" _C_ AiPlayer->Player - Players);
 	    AiPlayer->NeedWood = 1;
 	}
 	if (err & (1 << OilCost)) {
-	    DebugLevel3Fn("%d Need oil\n", AiPlayer->Player - Players);
+	    DebugLevel3Fn("%d Need oil\n" _C_ AiPlayer->Player - Players);
 	    AiPlayer->NeedOil = 1;
 	}
 	// FIXME: more resources!!!
@@ -425,20 +425,20 @@ local int AiNearGoldmine(const Unit * goldmine, const Unit * worker,
     y = goldmine->Y;
     addx = goldmine->Type->TileWidth;
     addy = goldmine->Type->TileHeight;
-    DebugLevel3("%d,%d\n", type->TileWidth, type->TileHeight);
+    DebugLevel3("%d,%d\n" _C_ type->TileWidth _C_ type->TileHeight);
     x -= type->TileWidth;	// this should correct it
     y -= type->TileHeight - 1;
     addx += type->TileWidth - 1;
     addy += type->TileHeight - 1;
-    DebugLevel3("XXXXX: %d,%d\n", addx, addy);
+    DebugLevel3("XXXXX: %d,%d\n" _C_ addx _C_ addy);
     cost = 99999;
     IfDebug( best_x = best_y = 0; );	// remove compiler warning
     for (;;) {				// test rectangles around the mine
 	for (i = addy; i--; y++) {
-	    DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	    DebugLevel3("\t\tTest %3d,%3d\n" _C_ x _C_ y);
 	    if (CanBuildUnitType(worker, type, x, y)) {
 		d = MapDistanceToType(wx, wy, type, x, y);
-		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n" _C_ wx _C_ wy _C_ x _C_ y _C_ d);
 		if (d < cost) {
 		    cost = d;
 		    best_x = x;
@@ -448,10 +448,10 @@ local int AiNearGoldmine(const Unit * goldmine, const Unit * worker,
 	}
 	++addx;
 	for (i = addx; i--; x++) {
-	    DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	    DebugLevel3("\t\tTest %3d,%3d\n" _C_ x _C_ y);
 	    if (CanBuildUnitType(worker, type, x, y)) {
 		d = MapDistanceToType(wx, wy, type, x, y);
-		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n" _C_ wx _C_ wy _C_ x _C_ y _C_ d);
 		if (d < cost) {
 		    cost = d;
 		    best_x = x;
@@ -461,10 +461,10 @@ local int AiNearGoldmine(const Unit * goldmine, const Unit * worker,
 	}
 	++addy;
 	for (i = addy; i--; y--) {
-	    DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	    DebugLevel3("\t\tTest %3d,%3d\n" _C_ x _C_ y);
 	    if (CanBuildUnitType(worker, type, x, y)) {
 		d = MapDistanceToType(wx, wy, type, x, y);
-		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n" _C_ wx _C_ wy _C_ x _C_ y _C_ d);
 		if (d < cost) {
 		    cost = d;
 		    best_x = x;
@@ -474,10 +474,10 @@ local int AiNearGoldmine(const Unit * goldmine, const Unit * worker,
 	}
 	++addx;
 	for (i = addx; i--; x--) {
-	    DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	    DebugLevel3("\t\tTest %3d,%3d\n" _C_ x _C_ y);
 	    if (CanBuildUnitType(worker, type, x, y)) {
 		d = MapDistanceToType(wx, wy, type, x, y);
-		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n" _C_ wx _C_ wy _C_ x _C_ y _C_ d);
 		if (d < cost) {
 		    cost = d;
 		    best_x = x;
@@ -486,7 +486,7 @@ local int AiNearGoldmine(const Unit * goldmine, const Unit * worker,
 	    }
 	}
 	if (cost != 99999) {
-	    DebugLevel3("\tBuild at %d,%d\n", best_x, best_y);
+	    DebugLevel3("\tBuild at %d,%d\n" _C_ best_x _C_ best_y);
 	    *dx = best_x;
 	    *dy = best_y;
 	    return 0;
@@ -510,7 +510,7 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
     int end, state, best_x, best_y, d, cost;
     Unit *goldmines[UnitMax];
 
-    DebugLevel3Fn("hall %d %d,%d\n", UnitNumber(hall), hall->X, hall->Y);
+    DebugLevel3Fn("hall %d %d,%d\n" _C_ UnitNumber(hall) _C_ hall->X _C_ hall->Y);
 
     if (!hall) {			// No hall take units place.
 	DebugLevel3Fn("Called without hall\n");
@@ -520,7 +520,7 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
     }
 
     num_goldmine = FindUnitsByType(UnitTypeGoldMine, goldmines);
-    DebugLevel3("\tGoldmines %d\n", num_goldmine);
+    DebugLevel3("\tGoldmines %d\n" _C_ num_goldmine);
     wx = worker->X;
     wy = worker->Y;
     x = hall->X;
@@ -530,7 +530,7 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
     cost = 99999;
     IfDebug(best_x = best_y = 0;
 	    );				// remove compiler warning
-    DebugLevel3("%d,%d\n", type->TileWidth, type->TileHeight);
+    DebugLevel3("%d,%d\n" _C_ type->TileWidth _C_ type->TileHeight);
     /// leave two fields free!
 #define SPACE 2		/// Space around buildings
     x -= type->TileWidth + SPACE;	// this should correct it
@@ -565,7 +565,7 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
 		state = 0;
 		end = y + addy++;
 		if (cost != 99999) {
-		    DebugLevel3("\tBuild at %d,%d\n", best_x, best_y);
+		    DebugLevel3("\tBuild at %d,%d\n" _C_ best_x _C_ best_y);
 		    *dx = best_x;
 		    *dy = best_y;
 		    return cost;
@@ -575,10 +575,10 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
 	}
 	// FIXME: this check outside the map could be speeded up.
 	if (y < 0 || x < 0 || y >= TheMap.Height || x >= TheMap.Width) {
-	    DebugLevel3("\t\tSkip %3d,%3d\n", x, y);
+	    DebugLevel3("\t\tSkip %3d,%3d\n" _C_ x _C_ y);
 	    continue;
 	}
-	DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	DebugLevel3("\t\tTest %3d,%3d\n" _C_ x _C_ y);
 	if (CanBuildUnitType(worker, type, x, y)) {
 	    if (x == hall->X || y == hall->Y || x == hall->X + 1
 		|| y == hall->Y + 1 || x == hall->X + 2 || y == hall->Y + 2
@@ -598,7 +598,7 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
 		continue;
 	    }				//too near goldmine
 	    d = MapDistanceToType(wx, wy, type, x, y);
-	    DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+	    DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n" _C_ wx _C_ wy _C_ x _C_ y _C_ d);
 	    if (d < cost) {
 		cost = d;
 		best_x = x;
@@ -637,14 +637,14 @@ local int AiBuildHall(int type)
 
     //  Find all available peon/peasants.
     num_worker = AiFindFreeWorkers(workers);
-    DebugLevel3("\tWorkers %d\n", num_worker);
+    DebugLevel3("\tWorkers %d\n" _C_ num_worker);
     if (!num_worker) {
 	return -1;
     }					// QUESTION: only not working ??
 
     //  Find all goldmines.
     num_goldmine = FindUnitsByType(UnitTypeGoldMine, goldmines);
-    DebugLevel3("\tGoldmines %d\n", num_goldmine);
+    DebugLevel3("\tGoldmines %d\n" _C_ num_goldmine);
     if (!num_goldmine) {
 	return -1;
     }
@@ -662,8 +662,8 @@ local int AiBuildHall(int type)
 	y = workers[w]->Y;
 	for (g = 0; g < num_goldmine; ++g) {
 	    d = MapDistanceToUnit(x, y, goldmines[g]);
-	    DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", x, y,
-			goldmines[g]->X, goldmines[g]->Y, d);
+	    DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n" _C_ x _C_ y _C_
+			goldmines[g]->X _C_ goldmines[g]->Y _C_ d);
 	    if (d < cost && UnitReachable(workers[w], goldmines[g], 1)) {
 		best_w = w;
 		best_g = g;
@@ -672,11 +672,11 @@ local int AiBuildHall(int type)
 	}
     }
     // Did use the first if no could be moved.
-    DebugLevel3("\tWorker %d %d,%d -> Goldmine %d %d,%d\n",
+    DebugLevel3("\tWorker %d %d,%d -> Goldmine %d %d,%d\n" _C_
 		UnitNumber(workers[best_w])
-		, workers[best_w]->X, workers[best_w]->Y,
+		_C_ workers[best_w]->X _C_ workers[best_w]->Y _C_
 		UnitNumber(goldmines[best_g])
-		, goldmines[best_g]->X, goldmines[best_g]->Y);
+		_C_ goldmines[best_g]->X _C_ goldmines[best_g]->Y);
 
     //  Find the nearest buildable place near the gold-mine.
     if (AiNearGoldmine(goldmines[best_g]
@@ -708,11 +708,11 @@ local int AiBuildBuilding(int type)
     Unit *workers[UnitMax];
     int num_worker, cost, best_w, best_x, best_y, x, y, d, w;
 
-    DebugLevel3Fn("(%d)\n", type);
+    DebugLevel3Fn("(%d)\n" _C_ type);
 
     //  Find all available peon/peasants.
     num_worker = AiFindFreeWorkers(workers);
-    DebugLevel3("\tWorkers %d\n", num_worker);
+    DebugLevel3("\tWorkers %d\n" _C_ num_worker);
     if (!num_worker) {
 	return -1;
     }
@@ -742,7 +742,7 @@ local int AiBuildBuilding(int type)
 	}
     }
     if (cost != 99999) {
-	DebugLevel3Fn("at %d,%d\n", best_x, best_y);
+	DebugLevel3Fn("at %d,%d\n" _C_ best_x _C_ best_y);
 	CommandBuildBuilding(workers[best_w], best_x, best_y, UnitTypeByWcNum(type),
 			     1);
 	AiMarkBuildUnitType(UnitTypeByWcNum(type));
@@ -807,7 +807,7 @@ local void AiMineGold(Unit * unit)
 {
     Unit *dest;
 
-    DebugLevel3Fn("%d\n", UnitNumber(unit));
+    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     dest = FindGoldMine(unit, unit->X, unit->Y);
     if (!dest) {
 	// FIXME: now not really, no goldmine.
@@ -826,7 +826,7 @@ local int AiHarvest(Unit * unit)
     int x, y, addx, addy, i, n, r, wx, wy, bestx, besty, cost;
     Unit *dest;
 
-    DebugLevel3Fn("%d\n", UnitNumber(unit));
+    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     x = unit->X;
     y = unit->Y;
     addx = unit->Type->TileWidth;
@@ -838,7 +838,7 @@ local int AiHarvest(Unit * unit)
     //  This is correct, but can this be written faster???
     if ((dest = FindWoodDeposit(unit->Player, x, y))) {
 	NearestOfUnit(dest, x, y, &wx, &wy);
-	DebugLevel3("To %d,%d\n", wx, wy);
+	DebugLevel3("To %d,%d\n" _C_ wx _C_ wy);
     } else {
 	wx = unit->X;
 	wy = unit->Y;
@@ -854,7 +854,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		AiPlayer->NoWood = 0;
 		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < cost && PlaceReachable(unit, x, y, 1)) {
 		    cost = n;
 		    bestx = x;
@@ -867,7 +867,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		AiPlayer->NoWood = 0;
 		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < cost && PlaceReachable(unit, x, y, 1)) {
 		    cost = n;
 		    bestx = x;
@@ -880,7 +880,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		AiPlayer->NoWood = 0;
 		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < cost && PlaceReachable(unit, x, y, 1)) {
 		    cost = n;
 		    bestx = x;
@@ -893,7 +893,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		AiPlayer->NoWood = 0;
 		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < cost && PlaceReachable(unit, x, y, 1)) {
 		    cost = n;
 		    bestx = x;
@@ -902,7 +902,7 @@ local int AiHarvest(Unit * unit)
 	    }
 	}
 	if (cost != 99999) {
-	    DebugLevel3Fn("wood on %d,%d\n", x, y);
+	    DebugLevel3Fn("wood on %d,%d\n" _C_ x _C_ y);
 	    CommandHarvest(unit, bestx, besty,FlushCommands);
 	    return 1;
 	}
@@ -926,7 +926,7 @@ local void AiAssignWorker(void)
 
     //  Count workers
     num_worker = AiFindFreeWorkers(workers);
-    DebugLevel3Fn("Player %d: %d\n", AiPlayer->Player - Players, num_worker);
+    DebugLevel3Fn("Player %d: %d\n" _C_ AiPlayer->Player - Players _C_ num_worker);
     if (num_worker) {
 	num_still = num_gold = num_wood = num_repair = 0;
 	for (w = 0; w < num_worker; ++w) {
@@ -945,17 +945,17 @@ local void AiAssignWorker(void)
 		++num_repair;
 		break;
 	    default:
-		DebugLevel0("%d\n", action);
+		DebugLevel0("%d\n" _C_ action);
 		break;
 	    }
 	}
 
-	DebugLevel3("Ai: Player %d: ", AiPlayer->Player - Players);
-	DebugLevel3("Workers %d, Gold %d, Wood %d, Repair %d, Still %d.\n",
-		    num_worker, num_gold, num_wood, num_repair, num_still);
+	DebugLevel3("Ai: Player %d: " _C_ AiPlayer->Player - Players);
+	DebugLevel3("Workers %d, Gold %d, Wood %d, Repair %d, Still %d.\n" _C_
+		    num_worker _C_ num_gold _C_ num_wood _C_ num_repair _C_ num_still);
 
 	if (AiPlayer->NeedGold && AiPlayer->NeedWood) {
-	    DebugLevel3("Ai: Player %d need gold and wood\n",
+	    DebugLevel3("Ai: Player %d need gold and wood\n" _C_
 			AiPlayer->Player - Players);
 	    //      Assign half to wood and gold.
 	    if (num_still) {		// assign the non-working
@@ -986,7 +986,7 @@ local void AiAssignWorker(void)
 	}
 
 	if (AiPlayer->NeedGold) {
-	    DebugLevel3("Ai: Player %d need gold\n",
+	    DebugLevel3("Ai: Player %d need gold\n" _C_
 			AiPlayer->Player - Players);
 	    //      Assign all to mine gold.
 	    for (w = 0; w < num_worker; ++w) {
@@ -1009,7 +1009,7 @@ local void AiAssignWorker(void)
 	}
 
 	if (AiPlayer->NeedWood) {
-	    DebugLevel3("Ai: Player %d need wood\n",
+	    DebugLevel3("Ai: Player %d need wood\n" _C_
 			AiPlayer->Player - Players);
 	    //      Assign all to harvest wood.
 	    for (w = 0; w < num_worker; ++w) {
@@ -1064,7 +1064,7 @@ local void AiAssignWorker(void)
     num_worker = FindPlayerUnitsByType(AiPlayer->Player,
 	    UnitTypeByWcNum(AiChooseRace(UnitPeasantWithGold)),
 	    workers);
-    DebugLevel3("Gold %d\n", num_worker);
+    DebugLevel3("Gold %d\n" _C_ num_worker);
     if (num_worker) {			// assign the non working
 	if (AiPlayer->MainHall) {
 	    for (w = 0; w < num_worker; ++w) {
@@ -1078,7 +1078,7 @@ local void AiAssignWorker(void)
     num_worker = FindPlayerUnitsByType(AiPlayer->Player,
 	    UnitTypeByWcNum(AiChooseRace(UnitPeasantWithWood)),
 	    workers);
-    DebugLevel3("Wood %d\n", num_worker);
+    DebugLevel3("Wood %d\n" _C_ num_worker);
     if (num_worker) {			// assign the non working
 	if (AiPlayer->MainHall) {
 	    for (w = 0; w < num_worker; ++w) {
@@ -1253,8 +1253,8 @@ local int AiNeedBuilding(int type)
 */
 local int AiCommandBuild(int type, int number, int action)
 {
-    DebugLevel3Fn("%s(%d), %d, %d\n",
-	    UnitTypeByWcNum(type)->Ident, type, number, action);
+    DebugLevel3Fn("%s(%d), %d, %d\n" _C_
+	    UnitTypeByWcNum(type)->Ident _C_ type _C_ number _C_ action);
 
     if (number == 0)
 	return 1;
@@ -1388,10 +1388,10 @@ local void AiNextGoal(void)
 */
 global void AiHelpMe(const Unit* attacker,Unit * defender)
 {
-    DebugLevel0("HELP %s(%d,%d) attacked by %s(%d,%d)",
-	    defender->Type->Ident,defender->X, defender->Y,
-	    attacker ? attacker->Type->Ident : "killed",
-	    attacker ? attacker->X : 0, attacker ? attacker->Y : 0);
+    DebugLevel0("HELP %s(%d,%d) attacked by %s(%d,%d)" _C_
+	    defender->Type->Ident _C_ defender->X _C_ defender->Y _C_
+	    attacker ? attacker->Type->Ident : "killed" _C_
+	    attacker ? attacker->X : 0 _C_ attacker ? attacker->Y : 0);
 }
 
 /**
@@ -1432,8 +1432,8 @@ global void AiNeedMoreFarms(Unit* unit,const UnitType* what)
 */
 global void AiWorkComplete(Unit * unit, Unit * what)
 {
-    DebugLevel3("Ai: Player %d: %d Work %d complete\n",
-		unit->Player - Players, UnitNumber(unit), UnitNumber(what));
+    DebugLevel3("Ai: Player %d: %d Work %d complete\n" _C_
+		unit->Player - Players _C_ UnitNumber(unit) _C_ UnitNumber(what));
     // FIXME: correct position
     if (unit->Player->Type == PlayerPerson) {
 	return;
@@ -1457,8 +1457,8 @@ global void AiCanNotBuild(Unit * unit, const UnitType * what)
 {
     int i;
 
-    DebugLevel1("Ai: Player %d: %d Can't build %d at %d,%d\n",
-		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
+    DebugLevel1("Ai: Player %d: %d Can't build %d at %d,%d\n" _C_
+		unit->Player - Players _C_ UnitNumber(unit) _C_ what->Type _C_ unit->X _C_
 		unit->Y);
     // FIXME: correct position
     if (unit->Player->Type == PlayerPerson) {
@@ -1488,8 +1488,8 @@ global void AiCanNotReach(Unit * unit, const UnitType * what)
 {
     int i;
 
-    DebugLevel3("Ai: Player %d: %d Can't reach %d at %d,%d\n",
-		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
+    DebugLevel3("Ai: Player %d: %d Can't reach %d at %d,%d\n" _C_
+		unit->Player - Players _C_ UnitNumber(unit) _C_ what->Type _C_ unit->X _C_
 		unit->Y);
     // FIXME: correct position
     if (unit->Player->Type == PlayerPerson) {
@@ -1520,8 +1520,8 @@ global void AiCanNotReach(Unit * unit, const UnitType * what)
 */
 global void AiTrainingComplete(Unit * unit, Unit * what)
 {
-    DebugLevel3("Ai: Player %d: %d Training %d complete\n",
-		unit->Player - Players, UnitNumber(unit), UnitNumber(what));
+    DebugLevel3("Ai: Player %d: %d Training %d complete\n" _C_
+		unit->Player - Players _C_ UnitNumber(unit) _C_ UnitNumber(what));
     // FIXME: correct position
     if (unit->Player->Type == PlayerPerson) {
 	return;
@@ -1580,7 +1580,7 @@ global void AiEachCycle(Player * player)
     }
 
     AiPlayer = player->Ai;
-    DebugLevel3Fn("Player %d\n", player->Player);
+    DebugLevel3Fn("Player %d\n" _C_ player->Player);
     command = AiPlayer->Commands[AiPlayer->CmdIndex];
     if (AiPlayer->GoalHead->Next == 0) {
 	if (command.Number == 0 && command.Command == 0) {

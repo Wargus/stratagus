@@ -1293,7 +1293,7 @@ global void InitVideo(void)
 #endif
 
 #ifndef SPLIT_SCREEN_SUPPORT
-    DebugLevel3Fn("%d %d\n",MapWidth,MapHeight);
+    DebugLevel3Fn("%d %d\n" _C_ MapWidth _C_ MapHeight);
 #endif
 }
 

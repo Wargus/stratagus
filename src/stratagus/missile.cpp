@@ -737,9 +737,9 @@ local int MissileVisible(const Missile* missile)
     if ( !AnyMapAreaVisibleOnScreen(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
 	return 0;
     }
-    DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
-		tileMinX,tileMaxX,tileMinY,tileMaxY,
-		MapX,MapX+MapWidth,MapY,MapY+MapHeight);
+    DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n" _C_
+		tileMinX _C_ tileMaxX _C_ tileMinY _C_ tileMaxY _C_
+		MapX _C_ MapX+MapWidth _C_ MapY _C_ MapY+MapHeight);
     return 1;
 }
 #endif /* SPLIT_SCREEN_SUPPORT */
