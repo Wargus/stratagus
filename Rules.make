@@ -178,8 +178,8 @@ DEBUG=	-DDEBUG -DREFS_DEBUG # -DFLAG_DEBUG
 ## There are some still not well tested code parts or branches.
 ## UNITS_ON_MAP:	Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code
-## This aren't working:
 ## NEW_NAMES:		New unit names without copyleft problems
+## This aren't working:
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_AI:		New better improved AI code
 ## NEW_SHIPS:		New correct ship movement.
