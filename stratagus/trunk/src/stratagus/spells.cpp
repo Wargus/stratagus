@@ -793,7 +793,7 @@ static Target* NewTargetPosition(int x, int y)
 // Main local functions
 // ****************************************************************************
 
-/*
+/**
 **  Check the condition.
 **
 **  @param caster      Pointer to caster unit.

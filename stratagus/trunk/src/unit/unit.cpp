@@ -2044,7 +2044,7 @@ void DropOutAll(const Unit* source)
   --  Building units
   ----------------------------------------------------------------------------*/
 
-/*
+/**
 **  Find the building restriction that gives me this unit built on top
 **  Allows you to define how the restriction is effecting the build
 **
