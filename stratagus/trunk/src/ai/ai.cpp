@@ -30,6 +30,7 @@
 
 #ifdef NEW_AI	// {
 
+
 //@{
 
 #define noTIMEIT			/// Enable CPU use debugging
@@ -135,6 +136,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
