@@ -45,7 +45,7 @@
 #include "libcda.h"
 #endif
 
-#ifdef USE_SDLCD
+#if defined(USE_SDLCD) || defined(USE_SDL)
 #include <SDL.h>
 #endif
 
