@@ -443,9 +443,9 @@ local void DoNextReplay(void)
     int flags;
     int posx;
     int posy;
-    int dest;
     const char* val;
     int num;
+    Unit* dunit;
 
     list=gh_car(ReplayLog);
 
@@ -462,7 +462,7 @@ local void DoNextReplay(void)
     flags=0;
     posx=-1;
     posy=-1;
-    dest=-1;
+    dunit=NoUnitP;
     val=NULL;
     num=-1;
     while( !gh_null_p(list) ) {
@@ -492,7 +492,7 @@ local void DoNextReplay(void)
 	    posy=gh_scm2int(gh_car(sublist));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("dest")) ) {
-	    dest=gh_scm2int(gh_car(list));
+	    dunit=UnitSlots[gh_scm2int(gh_car(list))];
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("value")) ) {
 	    val=get_c_string(gh_car(list));
@@ -508,33 +508,33 @@ local void DoNextReplay(void)
     } else if( !strcmp(name,"stand-ground") ) {
 	SendCommandStandGround(UnitSlots[unit],flags);
     } else if( !strcmp(name,"follow") ) {
-	SendCommandFollow(UnitSlots[unit],UnitSlots[dest],flags);
+	SendCommandFollow(UnitSlots[unit],dunit,flags);
     } else if( !strcmp(name,"move") ) {
 	SendCommandMove(UnitSlots[unit],posx,posy,flags);
     } else if( !strcmp(name,"repair") ) {
-	SendCommandRepair(UnitSlots[unit],posx,posy,UnitSlots[dest],flags);
+	SendCommandRepair(UnitSlots[unit],posx,posy,dunit,flags);
     } else if( !strcmp(name,"attack") ) {
-	SendCommandAttack(UnitSlots[unit],posx,posy,UnitSlots[dest],flags);
+	SendCommandAttack(UnitSlots[unit],posx,posy,dunit,flags);
     } else if( !strcmp(name,"attack-ground") ) {
 	SendCommandAttackGround(UnitSlots[unit],posx,posy,flags);
     } else if( !strcmp(name,"patrol") ) {
 	SendCommandPatrol(UnitSlots[unit],posx,posy,flags);
     } else if( !strcmp(name,"board") ) {
-	SendCommandBoard(UnitSlots[unit],posx,posy,UnitSlots[dest],flags);
+	SendCommandBoard(UnitSlots[unit],posx,posy,dunit,flags);
     } else if( !strcmp(name,"unload") ) {
-	SendCommandUnload(UnitSlots[unit],posx,posy,dest!=-1?UnitSlots[dest]:NoUnitP,flags);
+	SendCommandUnload(UnitSlots[unit],posx,posy,dunit,flags);
     } else if( !strcmp(name,"build") ) {
 	SendCommandBuildBuilding(UnitSlots[unit],posx,posy,UnitTypeByIdent(val),flags);
     } else if( !strcmp(name,"cancel-build") ) {
-	SendCommandCancelBuilding(UnitSlots[unit],UnitSlots[dest]);
+	SendCommandCancelBuilding(UnitSlots[unit],dunit);
     } else if( !strcmp(name,"harvest") ) {
 	SendCommandHarvest(UnitSlots[unit],posx,posy,flags);
     } else if( !strcmp(name,"mine") ) {
-	SendCommandMineGold(UnitSlots[unit],UnitSlots[dest],flags);
+	SendCommandMineGold(UnitSlots[unit],dunit,flags);
     } else if( !strcmp(name,"haul") ) {
-	SendCommandHaulOil(UnitSlots[unit],UnitSlots[dest],flags);
+	SendCommandHaulOil(UnitSlots[unit],dunit,flags);
     } else if( !strcmp(name,"return") ) {
-	SendCommandReturnGoods(UnitSlots[unit],UnitSlots[dest],flags);
+	SendCommandReturnGoods(UnitSlots[unit],dunit,flags);
     } else if( !strcmp(name,"train") ) {
 	SendCommandTrainUnit(UnitSlots[unit],UnitTypeByIdent(val),flags);
     } else if( !strcmp(name,"cancel-train") ) {
@@ -548,9 +548,9 @@ local void DoNextReplay(void)
     } else if( !strcmp(name,"cancel-research") ) {
 	SendCommandCancelResearch(UnitSlots[unit]);
     } else if( !strcmp(name,"demolish") ) {
-	SendCommandDemolish(UnitSlots[unit],posx,posy,UnitSlots[dest],flags);
+	SendCommandDemolish(UnitSlots[unit],posx,posy,dunit,flags);
     } else if( !strcmp(name,"spell-cast") ) {
-	SendCommandSpellCast(UnitSlots[unit],posx,posy,UnitSlots[dest],num,flags);
+	SendCommandSpellCast(UnitSlots[unit],posx,posy,dunit,num,flags);
     } else if( !strcmp(name,"diplomacy") ) {
 	int state;
 	if( !strcmp(val,"neutral") ) {
@@ -1217,7 +1217,7 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 		dest=UnitSlots[dstnr];
 		DebugCheck( !dest || !dest->Type );
 	    }
-	    CommandLog("repair",unit,status,x,y,NoUnitP,NULL,-1);
+	    CommandLog("repair",unit,status,x,y,dest,NULL,-1);
 	    CommandRepair(unit,x,y,dest,status);
 	    break;
 	case MessageCommandAttack:
