@@ -3,7 +3,24 @@ AC_INIT(configure.in)
 AC_PREREQ([2.50])
 dnl AC_CANONICAL_TARGET
 
-echo `uname -a`
+if test "`uname -a` | grep -is cygwin" -o "`uname -a` | grep -is mingw"; then
+    EXE=.exe
+    OUTFILE="\$(TOPDIR)/freecraft\$(EXE)"
+    ARCH=win32
+    OE=o
+    OBJDIR=winobj
+else
+    EXE=
+    OUTFILE="\$(TOPDIR)/freecraft\$(EXE)"
+    ARCH=linux
+    OE=o
+    OBJDIR=obj
+fi
+AC_SUBST(EXE)
+AC_SUBST(OUTFILE)
+AC_SUBST(ARCH)
+AC_SUBST(OE)
+AC_SUBST(OBJDIR)
 
 AC_CHECK_HEADERS(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
 AC_CHECK_HEADERS(png.h,, AC_MSG_ERROR(could not find png.h))
