@@ -965,6 +965,7 @@ local int CclUnit(lua_State* l)
 	if (unit->UnitSlot && (unit->Destroyed || unit->Orders->Action == UnitActionDie)) {
 		UnitCacheRemove(unit);
 		UnitCacheInsert(unit);
+		UnitCountSeen(unit);
 	}
 
 	// Units Dieing may have sight
