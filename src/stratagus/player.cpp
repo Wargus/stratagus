@@ -33,6 +33,7 @@
 #include "player.h"
 #include "unit.h"
 #include "ai.h"
+#include "network.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -104,7 +105,7 @@ global void CreatePlayer(char* name,int type)
     if( type==PlayerHuman ) {
 	if( !ThisPlayer ) {
 	    ThisPlayer=player;
-	} else if( !NetPlayers ) {
+	} else if( !NetPlayers && !NetworkArg ) {
 	    // FIXME: only for single players
 	    type=PlayerComputer;
 	}
