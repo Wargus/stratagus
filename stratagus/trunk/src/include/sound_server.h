@@ -213,8 +213,9 @@ extern void QuitSound(void);
 #define SoundThreadRunning	0	/// Dummy macro for without sound
 
 #define InitSound()	0		/// Dummy macro for without sound
-#define WriteSound()			/// Dummy macro for without sound
+#define WriteSound	NULL		/// Dummy macro for without sound
 #define QuitSound()			/// Dummy macro for without sound
+
 
 #endif	// { WITH_SOUND
 
