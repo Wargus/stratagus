@@ -66,7 +66,7 @@ global Sample* MusicSample;		/// Music samples
 
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global char *CDMode = ":off";	/// cd play mode, ":off" ":random" or ":all"
-global int CDTrack = 1;			/// Current cd track
+global int CDTrack = 0;			/// Current cd track
 #endif
 
 #if defined(USE_SDLCD)
@@ -76,6 +76,10 @@ global int NumCDTracks;			/// Number of tracks on the cd
 #elif defined(USE_CDDA)
 // FIXME: fill up
 global int NumCDTracks;
+global int CDDrive;
+global struct cdrom_tochdr CDchdr;
+global struct cdrom_tocentry CDtocentry[64];
+global struct cdrom_read_audio CDdata;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -375,19 +379,22 @@ local int PlayCDRom(const char* name)
 */
 local int PlayCDRom(const char* name)
 {
-    cdrom_drive *CddaDrive = NULL;
-    void *buf;
-//    cdrom_paranoia *Cdda;
+    int i;
+    Sample *sample;
 
     if (!strcmp(CDMode, ":off")) {
 	if (!strncmp(name, ":", 1)) {
-	    CddaDrive = cdda_find_a_cdrom(0, NULL);
-	    cdda_open(CddaDrive);
-//	    Cdda = paranoia_init(CddaDrive);
+	    CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
+	    ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
 
-	    NumCDTracks = cdda_tracks(CddaDrive);
+	    for (i = CDchdr.cdth_trk0; i < CDchdr.cdth_trk1; ++i){
+		CDtocentry[i].cdte_format = CDROM_LBA;
+		CDtocentry[i].cdte_track = i + 1;
+		ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);
+	    }
+	    NumCDTracks = i + 1;
 
-	    if (NumCDTracks == -1) {
+	    if (NumCDTracks == 0) {
 		CDMode = ":off";
 		return 1;
 	    }
@@ -405,19 +412,8 @@ local int PlayCDRom(const char* name)
 	    
 	    do {
 		if (CDTrack > NumCDTracks)
-		    CDTrack = 1;
-	    } while (cdda_track_audiop(CddaDrive, ++CDTrack) == 0);
-	    
-	    // temporary
-	    fprintf(stderr, "AAAAAAAAAAa %d\n",CDTrack);
-	    CDTrack = 3;
-	    
-	    buf = malloc(512*100);
-	    cdda_read(CddaDrive, buf, cdda_track_firstsector(CddaDrive, CDTrack), 100);
-
-	    free(buf);
-
-	    return 1;
+		    CDTrack = 0;
+	    } while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
 	}
 	// if mode is play random tracks
 	if (!strcmp(name, ":random")) {
@@ -425,15 +421,13 @@ local int PlayCDRom(const char* name)
 
 	    do {
 		CDTrack = MyRand() % NumCDTracks;
-	    } while (cdda_track_audiop(CddaDrive, ++CDTrack) == 0);
-
-	    buf = malloc(512*100);
-	    cdda_read(CddaDrive, buf, cdda_track_firstsector(CddaDrive, CDTrack), 100);
-
-	    free(buf);
-
-	    return 1;
+	    } while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
 	}
+
+	sample = LoadCD(NULL, CDTrack);
+	StopMusic();
+	MusicSample = sample;
+	PlayingMusic = 1;
 	return 1;
     }
     // FIXME: no cdrom, must stop it now!
