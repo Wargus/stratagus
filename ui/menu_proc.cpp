@@ -835,6 +835,9 @@ normkey:
 	    }
 	    break;
 	case 9:				// TAB			// FIXME: Add Shift-TAB
+	    if (KeyModifiers&ModifierAlt) {
+		break;
+	    }
 	    if (MenuButtonCurSel != -1 && !(menu->items[MenuButtonCurSel].flags&MenuButtonClicked)) {
 		n = menu->nitems;
 		for (i = 0; i < n; ++i) {
