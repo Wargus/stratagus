@@ -1227,16 +1227,20 @@ global void QuitCD(void)
 #ifdef USE_SDLCD
     if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped"))
 	SDL_CDStop(CDRom);
+	CDMode = ":stopped";
     if (strcmp(CDMode,":off"))
         SDL_CDClose(CDRom);
+	CDMode = ":off"
 #endif
 
 #ifdef USE_LIBCDA
     if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped"))
         cd_stop();
+	CDMode = ":stopped";
     if (strcmp(CDMode,":off")) {
         cd_close();
         cd_exit();
+	CDMode = ":off"
     }
 #endif
 }
