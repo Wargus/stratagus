@@ -27,7 +27,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -163,11 +163,7 @@ local int OldCursorRectangleX;				/// saved cursor position on screen X
 local int OldCursorRectangleY;				/// saved cursor position on screen Y
 local int OldCursorRectangleW;				/// saved cursor width in pixel
 local int OldCursorRectangleH;				/// saved cursor height in pixel
-#ifdef USE_SDL_SURFACE
 local void* OldCursorRectangle;				/// background saved behind rectangle
-#else
-local void* OldCursorRectangle;				/// background saved behind rectangle
-#endif
 
 		// Area which is already hidden, but needed for invalidate
 		// (HiddenCursorRectangleW != 0 denotes it's defined)
@@ -252,13 +248,8 @@ global void LoadCursors(const char* race)
 			buf = alloca(strlen(file) + 9 + 1);
 			file = strcat(strcpy(buf,"graphics/"), file);
 			ShowLoadProgress("Cursor %s", file);
-#ifdef USE_SDL_SURFACE
 			Cursors[i].Sprite = LoadSprite(file,
 				Cursors[i].Width, Cursors[i].Height);
-#else
-			Cursors[i].Sprite = LoadSprite(file,
-				Cursors[i].Width, Cursors[i].Height);
-#endif
 		}
 	}
 }
@@ -280,11 +271,7 @@ global CursorType* CursorTypeByIdent(const char* ident)
 		if (strcmp(cursortype->Ident, ident)) {
 			continue;
 		}
-#ifdef USE_SDL_SURFACE
 		if (!cursortype->Race || cursortype->Sprite) {
-#else
-		if (!cursortype->Race || cursortype->Sprite) {
-#endif
 			return cursortype;
 		}
 	}
@@ -794,13 +781,8 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
 	//
 	spritex = (x -= type->HotX);
 	spritey = (y -= type->HotY);
-#ifdef USE_SDL_SURFACE
 	w = VideoGraphicWidth(type->Sprite);
 	h = VideoGraphicHeight(type->Sprite);
-#else
-	w = VideoGraphicWidth(type->Sprite);
-	h = VideoGraphicHeight(type->Sprite);
-#endif
 
 	//Reserve enough memory for background of sprite (also for future calls)
 #ifdef USE_SDL_SURFACE
@@ -826,11 +808,7 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
 		OldCursorW = w, OldCursorH = h);
 
 	//Draw sprite (using its own clipping)  FIXME: prevent clipping twice
-#ifdef USE_SDL_SURFACE
 	VideoDrawClip(type->Sprite, frame, spritex, spritey);
-#else
-	VideoDrawClip(type->Sprite, frame, spritex, spritey);
-#endif
 	OldCursorInvalidate = 1;
 }
 
@@ -1064,11 +1042,7 @@ global void CursorAnimate(unsigned ticks)
 		last = ticks + GameCursor->FrameRate;
 		GameCursor->SpriteFrame++;
 		if ((GameCursor->SpriteFrame & 127) >=
-#ifdef USE_SDL_SURFACE
 				VideoGraphicFrames(GameCursor->Sprite)) {
-#else
-				VideoGraphicFrames(GameCursor->Sprite)) {
-#endif
 			GameCursor->SpriteFrame = 0;
 		}
 		MustRedraw |= RedrawCursor;
