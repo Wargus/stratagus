@@ -200,7 +200,7 @@ local SCM CclDefineUnitType(SCM list)
 			}
 		    }
 		    if (i == NumTilesets) {
-		       // FIXME: this leaves half initialized unit-type
+		       // This leaves half initialized unit-type
 		       errl("Unsupported tileset tag", value);
 		    }
 		}
@@ -532,9 +532,6 @@ local SCM CclDefineUnitType(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("gives-resource"))) {
 	    type->GivesResource = CclGetResourceByName(gh_car(list));
 	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("max-workers"))) {
-	    type->MaxWorkers = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("can-harvest"))) {
 	    type->CanHarvest = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("can-store"))) {
@@ -690,7 +687,7 @@ local SCM CclDefineUnitType(SCM list)
 	    if (i != NumberBoolFlag) {
 		continue;
 	    }
-	    // FIXME: this leaves a half initialized unit-type
+	    // This leaves a half initialized unit-type
 	    printf("\n%s\n",type->Name);
 	    errl("Unsupported tag", value);
 	    DebugCheck(1);
@@ -793,7 +790,7 @@ local int CclDefineUnitType(lua_State* l)
 			}
 		    }
 		    if (i == NumTilesets) {
-		       // FIXME: this leaves half initialized unit-type
+		       // This leaves half initialized unit-type
 		       lua_pushfstring(l, "Unsupported tileset tag", value);
 		       lua_error(l);
 		    }
@@ -1221,8 +1218,6 @@ local int CclDefineUnitType(lua_State* l)
 	    lua_pushvalue(l, j + 1);
 	    type->GivesResource = CclGetResourceByName(l);
 	    lua_pop(l, 1);
-	} else if (!strcmp(value, "max-workers")) {
-	    type->MaxWorkers = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "can-harvest")) {
 	    type->CanHarvest = 1;
 	    --j;
@@ -1409,7 +1404,7 @@ local int CclDefineUnitType(lua_State* l)
 	    if (i != NumberBoolFlag) {
 		continue;
 	    }
-	    // FIXME: this leaves a half initialized unit-type
+	    // This leaves a half initialized unit-type
 	    printf("\n%s\n",type->Name);
 	    lua_pushfstring(l, "Unsupported tag: %s", value);
 	    lua_error(l);
@@ -1504,13 +1499,13 @@ local SCM CclDefineUnitStats(SCM list)
 		    }
 		}
 		if (i == MaxCosts) {
-		   // FIXME: this leaves half initialized stats
+		   // This leaves half initialized stats
 		   errl("Unsupported tag", value);
 		}
 		sublist = gh_cdr(sublist);
 	    }
 	} else {
-	   // FIXME: this leaves a half initialized unit
+	   // This leaves a half initialized unit
 	   errl("Unsupported tag", value);
 	}
     }
@@ -1591,13 +1586,13 @@ local int CclDefineUnitStats(lua_State* l)
 		    }
 		}
 		if (i == MaxCosts) {
-		   // FIXME: this leaves half initialized stats
+		   // This leaves half initialized stats
 		   lua_pushfstring(l, "Unsupported tag: %s", value);
 		   lua_error(l);
 		}
 	    }
 	} else {
-	   // FIXME: this leaves a half initialized unit
+	   // This leaves a half initialized unit
 	   lua_pushfstring(l, "Unsupported tag: %s", value);
 	   lua_error(l);
 	}

@@ -792,15 +792,6 @@ global void InitUnitCache(void)
 #include "map.h"
 
 //*****************************************************************************
-//	Store direct on map.
-//****************************************************************************/
-
-// FIXME: Currently are units only stored at its insertion point on the map
-// FIXME: For many functions it would be better if the units are strored in
-// FIXME: all field that they occupy. This means a 2x2 big building is stored
-// FIXME: in 4 fields.
-
-//*****************************************************************************
 //	Convert calls to internal
 //****************************************************************************/
 
