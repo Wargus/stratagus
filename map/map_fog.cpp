@@ -1058,6 +1058,19 @@ global void VideoDraw32Unexplored32Solid(const GraphicData* data,int x,int y)
     }
 }
 
+/**
+**	Fast draw solid unexplored tile.
+**
+**	@param data	pointer to tile graphic data
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+#ifdef USE_OPENGL
+global void VideoDrawUnexploredSolidOpenGL(const GraphicData* data,int x,int y)
+{
+}
+#endif
+
 /*----------------------------------------------------------------------------
 --	Draw real fog :-)
 ----------------------------------------------------------------------------*/
@@ -1521,6 +1534,33 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
     }
 }
 
+// Routines for OpenGL .. -------------------------------------------
+
+/**
+**	Fast draw alpha fog of war 32x32 tile for 32 bpp video modes.
+**
+**	@param data	pointer to tile graphic data.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+global void VideoDrawFogAlphaOpenGL(const GraphicData* data,int x,int y)
+{
+}
+
+/**
+**	Fast draw 100% fog of war 32x32 tile for 32 bpp video modes.
+**
+**	100% fog of war -- i.e. raster	10101.
+**					01010 etc...
+**
+**	@param data	pointer to tile graphic data.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+global void VideoDrawOnlyFogAlphaOpenGL(const GraphicData* data __attribute__((unused)),int x,int y)
+{
+}
+
 /*----------------------------------------------------------------------------
 --	Old version correct working but not 100% original
 ----------------------------------------------------------------------------*/
@@ -1809,6 +1849,11 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 */
 global void InitMapFogOfWar(void)
 {
+#ifdef USE_OPENGL
+    VideoDrawFog=VideoDrawFogAlphaOpenGL;
+    VideoDrawOnlyFog=VideoDrawOnlyFogAlphaOpenGL;
+    VideoDrawUnexplored=VideoDrawUnexploredSolidOpenGL;
+#else
     if( !OriginalFogOfWar ) {
 	int i;
 	int n;
@@ -2005,6 +2050,7 @@ build_table:
 		break;
 	}
     }
+#endif
 }
 
 /**
