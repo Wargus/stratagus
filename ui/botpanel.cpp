@@ -686,16 +686,27 @@ global void UpdateButtonPanel(void)
     }
 
     for( z = 0; z < NumUnitButtons; z++ ) {
+	int pos; //keep position, midified if alt-buttons required
 	//FIXME: we have to check and if these unit buttons are available
 	//       i.e. if button action is ButtonTrain for example check if
 	//        required unit is not restricted etc...
 
 	buttonaction=UnitButtonTable[z];
-
+	pos = buttonaction->Pos;
+	
 	// Same level
 	if ( buttonaction->Level != CurrentButtonLevel ) {
 	    continue;
 	}
+	
+	if ( pos > 9 ) // VLADI: this allows alt-buttons
+	  {
+	  if ( KeyModifiers & ModifierAlt )
+	    pos -= 9; // buttons with pos >9 are shown on if ALT is pressed
+	  else
+	    continue;  
+	  }
+	
 	// any unit or unit in list
 	if ( buttonaction->UnitMask[0] != '*'
 		&& !strstr( buttonaction->UnitMask, unit_ident ) ) {
@@ -780,7 +791,7 @@ global void UpdateButtonPanel(void)
 	}
 
 	if (allow) {		// is button allowed after all?
-	    _current_buttons[buttonaction->Pos-1] = (*buttonaction);
+	    _current_buttons[pos-1] = (*buttonaction);
 	}
     }
 

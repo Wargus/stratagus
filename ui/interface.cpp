@@ -1001,6 +1001,7 @@ global int HandleKeyModifiersDown(unsigned key,
 	    return 1;
 	case KeyCodeAlt:
 	    KeyModifiers|=ModifierAlt;
+	    UpdateButtonPanel(); //VLADI: to allow alt-buttons
 	    return 1;
 	case KeyCodeSuper:
 	    KeyModifiers|=ModifierSuper;
@@ -1034,6 +1035,7 @@ global int HandleKeyModifiersUp(unsigned key,
 	    return 1;
 	case KeyCodeAlt:
 	    KeyModifiers&=~ModifierAlt;
+	    UpdateButtonPanel(); //VLADI: to allow alt-buttons
 	    return 1;
 	case KeyCodeSuper:
 	    KeyModifiers&=~ModifierSuper;
