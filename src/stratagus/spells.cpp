@@ -1189,9 +1189,6 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
     if (target) {
 	x = target->X;
 	y = target->Y;
-    } else {
-	x += spell->Range;	// Why ??
-	y += spell->Range;	// Why ??
     }
     //
     //	For TargetSelf, you target.... YOURSELF

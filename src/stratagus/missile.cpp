@@ -1673,7 +1673,7 @@ void MissileActionPointToPointBounce(Missile* missile)
 	    missile->SourceY = missile->Y;
 	    PointToPointMissile(missile);
 	    //missile->State++;
-	    DebugLevel0("HIT %d!\n" _C_ missile->State);
+	    DebugLevel3("HIT %d!\n" _C_ missile->State);
 	    MissileHit(missile);
 	    // FIXME: hits to left and right
 	    // FIXME: reduce damage effects on later impacts
