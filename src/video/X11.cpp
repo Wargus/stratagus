@@ -231,7 +231,9 @@ foundvisual:
     // attached to it.  The POSIX spec says that a segment marked as deleted
     // can no longer have addition processes attach to it, but Linux will let
     // them anyway.
+#if defined(linux)
     shmctl(shminfo.shmid,IPC_RMID,0);
+#endif /* linux */
 
     TheMainDrawable=attributes.background_pixmap=
 	    XShmCreatePixmap(TheDisplay,DefaultRootWindow(TheDisplay)

@@ -75,6 +75,12 @@ local void gzseek(CLFile* file,unsigned offset,int whence)
 
 #ifdef USE_BZ2LIB
 
+#if defined(__FreeBSD__)
+#define bzread BZ2_bzread
+#define bzopen BZ2_bzopen
+#define bzclose BZ2_bzclose
+#endif /* __FreeBSD__ */
+
 /**
 **	Seek on compressed input. (I hope newer libs support it directly)
 **
