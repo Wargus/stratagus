@@ -19,6 +19,8 @@
 // FIXME: should split the next into small modules!
 // FIXME: I (Johns) leave this for other people (this means you!)
 
+#define __COMPRESS_SYNC
+
 //----------------------------------------------------------------------------
 //	Includes
 //----------------------------------------------------------------------------
@@ -165,12 +167,18 @@ local int NetworkSendResend;		/// Packets send to resend
 /**
 **	Send message to all clients.
 **
-**	FIXME: should support multicast and proxy clients/server.
+**	@param buf	Buffer of outgoing message.
+**	@param len	Buffer length.
+**
+**	@todo FIXME: should support multicast and proxy clients/server.
 */
-global void NetworkBroadcast(void *buf, int len)
+global void NetworkBroadcast(const void *buf, int len)
 {
     int i;
 #if 0
+    //
+    //	Can be enabled to simulate network delays.
+    //
 #define DELAY 5
     static char delay_buf[DELAY][1024];
     static int delay_len[DELAY];
@@ -200,9 +208,11 @@ global void NetworkBroadcast(void *buf, int len)
 }
 
 /**
-**	Network send packet.
+**	Network send packet. Build it from queue and broadcast.
+**
+**	@param ncq	Outgoing network queue start.
 */
-local void NetworkSendPacket(NetworkCommandQueue *ncq)
+local void NetworkSendPacket(const NetworkCommandQueue *ncq)
 {
     NetworkPacket packet;
     int i;
@@ -741,6 +751,9 @@ global void InitNetwork2(void)
 **	@param dest	optional destination unit.
 **	@param type	optional unit-type argument.
 **	@param status	Append command or flush old commands.
+**
+**	@warning
+**		Destination and unit-type shares the same network slot.
 */
 global void NetworkSendCommand(int command, const Unit *unit, int x, int y,
 	const Unit *dest, const UnitType *type, int status)
@@ -762,7 +775,7 @@ global void NetworkSendCommand(int command, const Unit *unit, int x, int y,
     ncq->Data.Unit = htons(unit->Slot);
     ncq->Data.X = htons(x);
     ncq->Data.Y = htons(y);
-    DebugCheck( dest && type );
+    DebugCheck( dest && type );		// Both together isn't allowed
     if (dest) {
 	ncq->Data.Dest = htons(dest->Slot);
     } else if (type) {
@@ -833,12 +846,13 @@ global void NetworkEvent(void)
 	DebugLevel0Fn("Not a host in play\n");
 	return;
     }
+    player=NetPlyNr[i];
 
     //
     //	Parse the packet commands.
     //
     for (i = 0; i < NetworkDups; ++i) {
-	NetworkCommand *nc;
+	const NetworkCommand *nc;
 
 	nc = &packet->Commands[i];
 
@@ -851,7 +865,7 @@ global void NetworkEvent(void)
 	}
 
 	if (nc->Type == MessageResend) {
-	    NetworkCommandQueue *ncq;
+	    const NetworkCommandQueue *ncq;
 
 	    // Destination frame (time to execute).
 	    n = ((FrameCounter + 128) & ~0xFF) | nc->Frame;
@@ -859,6 +873,9 @@ global void NetworkEvent(void)
 		DebugLevel3Fn("+128 needed!\n");
 		n -= 0x100;
 	    }
+
+	    // FIXME: not neccessary to send this packet multiple!!!!
+	    //	other side send re-send until its gets an answer.
 
 	    DebugLevel2Fn("Resend for %d got\n",n);
 	    //
@@ -897,22 +914,15 @@ global void NetworkEvent(void)
 	    continue;
 	}
 
-	// need player number. This could also be calculated from the
-	//	sender ip, port.
-	// FIXME: see above now known!
-	if (nc->Type == MessageChat || nc->Type == MessageChatTerm) {
-	    player = ((NetworkChat *)nc)->Player;
-	} else if (nc->Type == MessageSync) {
-	    player = ntohs(nc->X);
-	} else {
-	    player = UnitSlots[ntohs(nc->Unit)]->Player->Player;
-	}
-
 	// Destination frame (time to execute).
 	n = ((FrameCounter + 128) & ~0xFF) | nc->Frame;
 	if (n > FrameCounter + 128) {
 	    DebugLevel3Fn("+128 needed!\n");
 	    n -= 0x100;
+	}
+
+	if (nc->Type == MessageSync) {
+	    // FIXME: must support compressed sync slots.
 	}
 
 	if( NetworkIn[nc->Frame][player].Time != n ) {
@@ -1000,7 +1010,7 @@ global void NetworkChatMessage(const char *msg)
 local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 {
     int ply;
-    NetworkChat *ncm;
+    const NetworkChat *ncm;
 
     switch (ncq->Data.Type) {
 	case MessageSync:
@@ -1021,11 +1031,9 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 	    }
 	    break;
 	default:
-	    ParseCommand(ncq->Data.Type,
-			ntohs(ncq->Data.Unit),
-			ntohs(ncq->Data.X),
-			ntohs(ncq->Data.Y),
-			ntohs(ncq->Data.Dest));
+	    ParseCommand(ncq->Data.Type,ntohs(ncq->Data.Unit),
+		    ntohs(ncq->Data.X),ntohs(ncq->Data.Y),
+		    ntohs(ncq->Data.Dest));
 	    break;
     }
 }
@@ -1042,7 +1050,7 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 local void NetworkResendCommands(void)
 {
     NetworkPacket packet;
-    NetworkCommandQueue *ncq;
+    const NetworkCommandQueue *ncq;
     int i;
 
     IfDebug( ++NetworkSendResend );
@@ -1086,7 +1094,7 @@ local void NetworkSendCommands(void)
     if (dl_empty(CommandsIn)) {
 	ncq = malloc(sizeof(NetworkCommandQueue));
 	ncq->Data.Type = MessageSync;
-	ncq->Data.X = htons(ThisPlayer->Player);
+	// FIXME: can compress sync-messages.
     } else {
 	DebugLevel3Fn("command in remove\n");
 	ncq = (NetworkCommandQueue *)CommandsIn->first;
@@ -1170,7 +1178,7 @@ local void NetworkExecCommands(void)
 */
 local void NetworkSyncCommands(void)
 {
-    NetworkCommandQueue *ncq;
+    const NetworkCommandQueue *ncq;
     int i;
     int n;
 
