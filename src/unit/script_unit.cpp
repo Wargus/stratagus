@@ -568,10 +568,10 @@ local SCM CclUnit(SCM list)
 	    }
 #endif
 #ifdef NEW_FOW
-	} else if( gh_eq_p(value,gh_symbol2scm("currentsightrange")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("current-sight-range")) ) {
 	    unit->CurrentSightRange=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("hosttile")) ) {          
+	} else if( gh_eq_p(value,gh_symbol2scm("host-tile")) ) {          
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    MapMarkSight(player,gh_scm2int(gh_car(value)),
@@ -632,9 +632,9 @@ local SCM CclUnit(SCM list)
 	    free(str);
 	} else if( gh_eq_p(value,gh_symbol2scm("constructed")) ) {
 	    unit->Constructed=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("seenconstructed")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("seen-constructed")) ) {
 	    unit->SeenConstructed=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("seenstate")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("seen-state")) ) {
 	    unit->SeenState=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("active")) ) {
