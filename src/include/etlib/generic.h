@@ -1,7 +1,6 @@
 #ifndef ETLIB_GENERIC_H
 #define ETLIB_GENERIC_H
 
-#define $ (void *)
 #define NELEM(x) ((int)(sizeof(x)/sizeof(*(x))))
 #define NORETURN(x) void x __attribute__((__noreturn__))
 #define DEFINE(x) typeof(x) x
@@ -21,28 +20,28 @@
 #endif
 
 #ifndef min
-#ifdef _MSC_VER
+#ifdef __GNUC__
+#define min(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a < _b ? _a : _b; })
+#else
 #define min min
 static inline min(int a,int b) { return a<b ? a : b; }
-#else
-#define min(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a < _b ? _a : _b; })
 #endif
 #endif
 
 #ifndef max
-#ifdef _MSC_VER
+#ifdef __GNUC__
+#define max(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a > _b ? _a : _b; })
+#else
 #define max max
 static inline max(int a,int b) { return a>b ? a : b; }
-#else
-#define max(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a > _b ? _a : _b; })
 #endif
 #endif
 
-#ifdef _MSC_VER
-// FIXME: not written!
-#else
+#ifdef __GNUC__
 #define bound(a,b,c) ({ typeof(a) _a = a; typeof(b) _b = b; typeof(c) _c = c; \
 			_b < _a ? _a : _b > _c ? _c : _b; })
+#else
+#warning "// FIXME: bound not written!"
 #endif
 
 typedef unsigned char u8;
