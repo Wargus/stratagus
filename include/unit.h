@@ -649,6 +649,9 @@ struct _unit_ {
 		int Cancel;                 ///< Cancel construction
 		struct _construction_frame_* Frame; ///< Construction frame
 	} Built; ///< ActionBuilt,...
+	struct _order_build_ {
+		int Cycles;                 ///< Cycles unit has been building for
+	} Build; ///< ActionBuild
 	struct _order_resource_ {
 		int Active; ///< how many units are harvesting from the resource.
 	} Resource; ///< Resource still

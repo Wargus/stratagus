@@ -10,8 +10,8 @@
 //
 /**@name action_build.c - The build building action. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon
-//          Russell Smith
+//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, and
+//                                 Russell Smith
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -320,6 +320,7 @@ static void StartBuilding(Unit* unit, Unit* ontop)
 		// FIXME: Should have a BuildRange?
 		unit->Orders[0].Range = unit->Type->RepairRange;
 		unit->SubAction = 40;
+		unit->Data.Build.Cycles = 0;
 		unit->Wait = 1;
 		RefsIncrease(build);
 		// Mark the new building seen.
@@ -361,7 +362,9 @@ static void BuildBuilding(Unit* unit)
 	Animation* anim;
 
 	AnimateActionBuild(unit);
-	if (unit->Type->NewAnimations || unit->Reset) {
+	unit->Data.Build.Cycles++;
+	if ((!unit->Type->NewAnimations && unit->Reset) ||
+			(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
 		goal = unit->Orders[0].Goal;
 
 		// hp is the current damage taken by the unit.
@@ -376,7 +379,8 @@ static void BuildBuilding(Unit* unit)
 				animlength += anim->Sleep;
 			}
 		} else {
-			animlength = 1;
+			animlength = unit->Data.Build.Cycles;
+			unit->Data.Build.Cycles = 0;
 		}
 
 		// FIXME: implement this below:
