@@ -516,10 +516,10 @@ static void FormatNumber(int number, char* buf)
 /**
 **  Return the first occurance of c in [s- s + maxlen]
 **
-**  @param s     original string.
-**  @param c     charrater to find.
-**  @param len   size limit of the search. (0 means unlimited).
-**  @param font  if specified use VideoTextLenght instead of strlen.
+**  @param s       original string.
+**  @param c       charrater to find.
+**  @param maxlen  size limit of the search. (0 means unlimited).
+**  @param font    if specified use VideoTextLenght instead of strlen.
 **
 **  @return computed value.
 */
