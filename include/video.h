@@ -1368,6 +1368,9 @@ extern void VideoLockScreen(void);
     ///	Unlock the screen for display
 extern void VideoUnlockScreen(void);
 
+    ///	Clear video screen
+extern void VideoClearScreen(void);
+
     /// Returns the ticks in ms since start
 extern unsigned long GetTicks(void);
 
