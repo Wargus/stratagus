@@ -81,10 +81,10 @@ local const SampleType CDStreamSampleType = {
 **	@return		Returns the loaded sample.
 **
 */
-global Sample* LoadCD(const char* name, int flags)
+global Sample* LoadCD(const char* name __attribute__((unused)),
+	int flags __attribute__((unused)))
 {
-    Sample* sample = NULL;
-    int i;
+    Sample* sample;
 
     sample = malloc(sizeof(*sample));
     sample->Channels = 2;
