@@ -1463,7 +1463,7 @@ global Tileset Tilesets[TilesetMax] = {
     ,TileTableWinter
     ,TileTypeTableWinter
     ,101, 126
-    ,136, 136+24
+    ,137, 137+24
     ,16,52,88
     ,34,70,88
 },
