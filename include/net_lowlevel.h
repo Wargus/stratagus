@@ -38,14 +38,19 @@
 #endif
 #include <windows.h>
 #ifdef NEW_NETMENUS
-#include <ws2tcpip.h>
+//#include <ws2tcpip.h>
+#define SIO_GET_INTERFACE_LIST 0x4004747F
+#define IFF_UP	1
+#define IFF_LOOPBACK 4
+#include <winsock.h>
+#include <winsock2.h>
 // MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
 typedef struct _OLD_INTERFACE_INFO
 {
-  u_long      iiFlags;      /* Interface flags */ 
-  sockaddr   iiAddress;      /* Interface address */ 
-  sockaddr   iiBroadcastAddress;    /* Broadcast address */ 
-  sockaddr   iiNetmask;      /* Network mask */ 
+  unsigned long iiFlags;      /* Interface flags */ 
+  SOCKADDR   iiAddress;      /* Interface address */ 
+  SOCKADDR   iiBroadcastAddress;    /* Broadcast address */ 
+  SOCKADDR   iiNetmask;      /* Network mask */ 
 } OLD_INTERFACE_INFO;
 #define INTERFACE_INFO OLD_INTERFACE_INFO
 #endif
