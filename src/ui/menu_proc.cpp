@@ -40,7 +40,7 @@
 
 #include "stratagus.h"
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #undef NOUSER
 #endif
 #include "video.h"

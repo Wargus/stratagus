@@ -36,9 +36,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#if !defined(_MSC_VER) || !defined(_WIN32_WCE)
 #include <time.h>
-#endif
 
 #include "stratagus.h"
 

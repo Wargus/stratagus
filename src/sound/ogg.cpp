@@ -44,9 +44,7 @@
 #ifdef BSD
 #include <inttypes.h>
 #else
-#if defined(_MSC_VER) && !defined(_WIN32_WCE)
 #include <windows.h>
-#endif
 #include <stdint.h>
 #endif // BSD
 

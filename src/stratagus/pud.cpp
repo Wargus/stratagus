@@ -43,7 +43,7 @@
 #ifdef BSD
 #include <inttypes.h>
 #else
-#if defined(_MSC_VER) && !defined(_WIN32_WCE)
+#ifdef _MSC_VER
 #define DrawIcon WinDrawIcon
 #define EndMenu WinEndMenu
 #include <winsock2.h>
