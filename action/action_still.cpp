@@ -187,7 +187,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 		// Normal units react in reaction range.
 		// Removed units can only attack in AttackRange, from bunker
 		//
-		if (unit->Stats->Speed && !unit->Removed && !ground) {
+		if (!type->Building && !unit->Removed && !ground) {
 			if ((goal = AttackUnitsInReactRange(unit))) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
@@ -218,7 +218,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 				unit->Reset = 0;
 				unit->State = 0;
 				unit->SubAction = 1; // Mark attacking.
-				if (type->Stats[unit->Player->Player].Speed) {
+				if (!type->Building) {
 					UnitHeadingFromDeltaXY(unit,
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);

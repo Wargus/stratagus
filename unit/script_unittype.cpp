@@ -420,8 +420,6 @@ static int CclDefineUnitType(lua_State* l)
 		} else if (!strcmp(value, "Construction")) {
 			// FIXME: What if constructions aren't yet loaded?
 			type->Construction = ConstructionByIdent(LuaToString(l, -1));
-		} else if (!strcmp(value, "Speed")) {
-			type->_Speed = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DrawLevel")) {
 			type->DrawLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxOnBoard")) {
@@ -1049,8 +1047,6 @@ static int CclDefineUnitStats(lua_State* l)
 
 		if (!strcmp(value, "level")) {
 			stats->Level = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "speed")) {
-			stats->Speed = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "attack-range")) {
 			stats->AttackRange = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "sight-range")) {
@@ -1788,10 +1784,6 @@ void UpdateUnitVariables(const Unit* unit)
 	unit->Variable[ARMOR_INDEX].Value = unit->Type->_Armor;
 	unit->Variable[ARMOR_INDEX].Max = unit->Stats->Armor;
 
-	// Speed
-	unit->Variable[SPEED_INDEX].Value = unit->Type->_Speed;
-	unit->Variable[SPEED_INDEX].Max = unit->Stats->Speed;
-
 	// SightRange
 	unit->Variable[SIGHTRANGE_INDEX].Value = unit->Type->_SightRange;
 	unit->Variable[SIGHTRANGE_INDEX].Max = unit->Stats->SightRange;
@@ -1848,7 +1840,7 @@ void InitDefinedVariables()
 {
 	const char* var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
 		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
-		"Xp", "Level", "Kill", "Supply", "Demand", "Armor", "Speed", "SightRange",
+		"Xp", "Level", "Kill", "Supply", "Demand", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "Damage", "ExtraDamage",
 		"PosX", "PosY", "Slot"
 		}; // names of the variable.
