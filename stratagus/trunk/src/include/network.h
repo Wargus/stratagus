@@ -31,7 +31,7 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#define NetworkMaxLag	60		/// Debuging network lag (# frames)
+#define NetworkMaxLag	250		/// Debuging network lag (# frames)
 
 #define NetworkPort	6660		/// Default port for communication
 #define NetworkDups	4		/// Repeat old commands
