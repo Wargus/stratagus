@@ -935,6 +935,23 @@ void CleanUnitTypes(void)
 		free(type->CanTargetFlag);
 		free(type->CanTransport);
 
+		// Free Building Restrictions if there are any
+		if (type->BuildingRules) {
+			int x;
+			BuildRestriction* b;
+			BuildRestriction* f;
+				x = 0;
+			while(type->BuildingRules[x] != NULL) {
+				b = type->BuildingRules[x];
+				while (b != NULL) {
+					f = b;
+					b = b->Next;
+					free(f);
+				}
+				++x;
+			}
+			free(type->BuildingRules);
+		}
 		if (type->SameSprite) {
 			free(type->SameSprite);
 		}

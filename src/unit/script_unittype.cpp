@@ -589,6 +589,24 @@ static int CclDefineUnitType(lua_State* l)
 				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
+			// Free any old restrictions if they are redefined
+			if (type->BuildingRules) {
+				int x;
+				BuildRestriction* b;
+				BuildRestriction* f;
+
+				x = 0;
+				while(type->BuildingRules[x] != NULL) {
+					b = type->BuildingRules[x];
+					while (b != NULL) {
+						f = b;
+						b = b->Next;
+						free(f);
+					}
+					++x;
+				}
+				free(type->BuildingRules);
+			}
 			type->BuildingRules = malloc((subargs + 1) * sizeof(BuildRestriction*));
 			type->BuildingRules[subargs] = NULL;
 			for (k = 0; k < subargs; ++k) {
