@@ -285,11 +285,7 @@ global Decoration HealthSprite;
 global Decoration ShadowSprite
 #ifndef laterUSE_CCL
 // FIXME: Must make this configurable through CCL.
-#ifdef NEW_NAMES
      = { "graphics/missiles/unit shadow.png",	0,42, 32,32, 0 };
-#else
-     = { "graphic/unit shadow.png",	0,42, 32,32, 0 };
-#endif
 #endif
     ;
 
@@ -352,12 +348,8 @@ global void LoadDecorations(void)
     ShadowSprite.Sprite=LoadSprite(ShadowSprite.File
 		,ShadowSprite.Width,ShadowSprite.Height);
     // FIXME: make this configurable
-#ifdef NEW_NAMES
     SpellSprites=LoadSprite("graphics/ui/bloodlust,haste,slow,invisible,shield.png"
 	,16,16);
-#else
-    SpellSprites=LoadSprite("graphic/bloodlust,haste,slow,invis.,shield.png",16,16);
-#endif
 }
 
 /**

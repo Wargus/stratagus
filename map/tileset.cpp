@@ -1360,13 +1360,8 @@ global Tileset Tilesets[TilesetMax]
 {
     "tileset-summer"
     ,"summer"
-#ifdef NEW_NAMES
-    ,"graphic/tilesets/summer/terrain/summer.png"
-    ,"graphic/tilesets/summer/summer.rgb"
-#else
-    ,"graphic/tileset/summer.png"
-    ,"summer.rgb"
-#endif
+    ,"graphics/tilesets/summer/terrain/summer.png"
+    ,"graphics/tilesets/summer/summer.rgb"
     ,TileTableSummer
     ,NULL
     ,NULL
@@ -1381,13 +1376,8 @@ global Tileset Tilesets[TilesetMax]
 {
     "tileset-winter"
     ,"winter"
-#ifdef NEW_NAMES
-    ,"graphic/tilesets/summer/terrain/winter.png"
-    ,"graphic/tilesets/summer/winter.rgb"
-#else
-    ,"graphic/tileset/winter.png"
-    ,"winter.rgb"
-#endif
+    ,"graphics/tilesets/summer/terrain/winter.png"
+    ,"graphics/tilesets/summer/winter.rgb"
     ,TileTableWinter
     ,NULL
     ,NULL
@@ -1402,13 +1392,8 @@ global Tileset Tilesets[TilesetMax]
 {
     "tileset-wasteland"
     ,"wasteland"
-#ifdef NEW_NAMES
-    ,"graphic/tilesets/summer/terrain/wasteland.png"
-    ,"graphic/tilesets/summer/wasteland.rgb"
-#else
-    ,"graphic/tileset/wasteland.png"
-    ,"wasteland.rgb"
-#endif
+    ,"graphics/tilesets/summer/terrain/wasteland.png"
+    ,"graphics/tilesets/summer/wasteland.rgb"
     ,TileTableWasteland
     ,NULL
     ,NULL
@@ -1423,13 +1408,8 @@ global Tileset Tilesets[TilesetMax]
 {
     "tileset-swamp"
     ,"swamp"
-#ifdef NEW_NAMES
-    ,"graphic/tilesets/summer/terrain/swamp.png"
-    ,"graphic/tilesets/summer/swamp.rgb"
-#else
-    ,"graphic/tileset/swamp.png"
-    ,"swamp.rgb"
-#endif
+    ,"graphics/tilesets/summer/terrain/swamp.png"
+    ,"graphics/tilesets/summer/swamp.rgb"
     ,TileTableSwamp
     ,NULL
     ,NULL
