@@ -563,7 +563,8 @@ global void EffectDrawCircle(int* ptr,int depth,int x,int y,int r)
 **	@param frame		Current frame.
 **	@param callbacks	Call backs that handle events.
 */
-local void VideoEffect0(int frame, const EventCallback* callbacks)
+local void VideoEffect0(int frame,
+	const EventCallback* callbacks __attribute((unused)))
 {
     static int* buf1;
     static int* buf2;
@@ -832,6 +833,7 @@ local void WaitForInput(int timeout)
 {
     EventCallback callbacks;
 #ifdef linux
+    char* s;
     char ddate[72+1];
     FILE* ddfile;
 #endif
@@ -865,6 +867,9 @@ local void WaitForInput(int timeout)
     ddfile=popen("`which ddate`","r");
     fgets(ddate,72,ddfile);
     pclose(ddfile);
+    if( (s=strrchr(ddate,'\n')) ) {
+	*s='\0';
+    }
     VideoDrawTextCentered(VideoWidth/2,20,LargeFont,ddate);
 #endif
     VideoUnlockScreen();
