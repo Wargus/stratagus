@@ -10,7 +10,7 @@
 //
 /**@name ccl_unittype.c	-	The unit-type ccl functions. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer
+//	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -108,17 +108,18 @@ local SCM CclDefineUnitType(SCM list)
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
 	    while( !gh_null_p(sublist) ) {
+		char* str;
 
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
 
 		// FIXME: use a general get tileset function here!
+		str=gh_scm2newstr(value,NULL);
 		i=0;
-		if( !gh_eq_p(value,gh_symbol2scm("default")) ) {
+		if( strcmp(str,"default") ) {
 		    for( ; i<TilesetMax; ++i ) {
-			if( gh_eq_p(value,gh_symbol2scm(Tilesets[i]->Ident)) ||
-				gh_eq_p(value,
-				    gh_symbol2scm(Tilesets[i]->Class)) ) {
+			if( !strcmp(str,Tilesets[i]->Ident) ||
+				!strcmp(str,Tilesets[i]->Class) ) {
 			    break;
 			}
 		    }
@@ -127,6 +128,7 @@ local SCM CclDefineUnitType(SCM list)
 		       errl("Unsupported tileset tag",value);
 		    }
 		}
+		free(str);
 		type->File[i]=gh_scm2newstr(gh_car(sublist),NULL);
 		sublist=gh_cdr(sublist);
 	    }
