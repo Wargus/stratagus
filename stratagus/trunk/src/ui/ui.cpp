@@ -588,8 +588,8 @@ local void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 		vp->EndY = ClipY;
 	}
 
-	DebugCheck(vp->EndX > TheUI.MapArea.EndX);
-	DebugCheck(vp->EndY > TheUI.MapArea.EndY);
+	Assert(vp->EndX <= TheUI.MapArea.EndX);
+	Assert(vp->EndY <= TheUI.MapArea.EndY);
 }
 
 /**

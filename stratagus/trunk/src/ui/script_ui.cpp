@@ -520,7 +520,7 @@ local int CclDefineCursor(lua_State* l)
 		lua_pop(l, 1);
 	}
 
-	DebugCheck(!name || !file || !w || !h);
+	Assert(name && file && w && h);
 
 	if (!strcmp(race, "any")) {
 		race = NULL;

@@ -680,7 +680,7 @@ local void DrawManaSprite(int x, int y, const UnitType* type, int full, int read
 	n = VideoGraphicFrames(ManaSprite.Sprite) - 1;
 	n -= (n * ready) / full;
 
-	DebugCheck(n < 0 || n >= VideoGraphicFrames(ManaSprite.Sprite));
+	Assert(n >= 0 && n < VideoGraphicFrames(ManaSprite.Sprite));
 	if (ManaSprite.HotX < 0) {
 		x += ManaSprite.HotX +
 			(type->TileWidth * TileSizeX + type->BoxWidth + 1) / 2;
@@ -880,7 +880,7 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 				DebugLevel3("%d - %d\n" _C_ f _C_ n);
 			}
 #endif
-			DebugCheck(n < 0);
+			Assert(n >= 0);
 			if (HealthSprite.HotX < 0) {
 				x1 = x + HealthSprite.HotX +
 					(type->TileWidth * TileSizeX + type->BoxWidth + 1) / 2;
@@ -1118,10 +1118,10 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 	int x, int y)
 {
 	if (!type) {
-		DebugCheck(!unit);
+		Assert(unit);
 		type = unit->Type;
 	}
-	DebugCheck(unit && type && unit->Type != type);
+	Assert(!unit || !type || unit->Type == type);
 
 	//
 	//  A building can be under construction and is drawn with construction
@@ -1831,8 +1831,8 @@ global void DrawUnit(const Unit* unit)
 		return;
 	}
 
-	//  Those should have been filtered. Check doesn't make sense with ReplayRevealMap
-	DebugCheck((!ReplayRevealMap) && (!unit->Type->VisibleUnderFog) && (!UnitVisible(unit, ThisPlayer)));
+	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
+	Assert(ReplayRevealMap || unit->Type->VisibleUnderFog || UnitVisible(unit, ThisPlayer));
 
 	if (ReplayRevealMap || UnitVisible(unit, ThisPlayer)) {
 		type = unit->Type;
