@@ -198,40 +198,14 @@
 
 #else	// }{ !__GNUC__
 
-    // FIXME: need useful code for this debug functions!
-
-    /**
-    **	Print debug information of level 0.
-    */
-static inline void DebugLevel0(const char* fmt,...) {};
-    /**
-    **	Print debug information of level 1
-    */
-static inline void DebugLevel1(const char* fmt,...) {};
-    /**
-    **	Print debug information of level 2
-    */
-static inline void DebugLevel2(const char* fmt,...) {};
-    /**
-    **	Print debug information of level 3
-    */
-static inline void DebugLevel3(const char* fmt,...) {};
-    /**
-    **	Print debug information of level 0 with function name.
-    */
-static inline void DebugLevel0Fn(const char* fmt,...) {};
-    /**
-    **	Print debug information of level 1 with function name.
-    */
-static inline void DebugLevel1Fn(const char* fmt,...) {};
-    /**
-    **	Print debug information of level 2 with function name.
-    */
-static inline void DebugLevel2Fn(const char* fmt,...) {};
-    /**
-    **	Print debug information of level 3 with function name.
-    */
-static inline void DebugLevel3Fn(const char* fmt,...) {};
+#define DebugLevel0(args) do { fprintf(stdout,args); } while(0)
+#define DebugLevel1(args) do { fprintf(stdout,args); } while(0)
+#define DebugLevel2(args) do { fprintf(stdout,args); } while(0)
+#define DebugLevel3(args) /* TURNED OFF: do { fprintf(stdout,args); } while(0) */
+#define DebugLevel0Fn(args) do { fprintf(stdout,__FUNCTION__ ": " args); } while(0)
+#define DebugLevel1Fn(args) do { fprintf(stdout,__FUNCTION__ ": " args); } while(0)
+#define DebugLevel2Fn(args) do { fprintf(stdout,__FUNCTION__ ": " args); } while(0)
+#define DebugLevel3Fn(args) /* TURNED OFF: do { fprintf(stdout,__FUNCTION__); fprintf(stdout,args); } while(0) */
 
 #endif	// } !__GNUC__
 
@@ -253,14 +227,17 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 
 #else	// }{ __GNUC__
 
-static inline void DebugLevel0(const char* fmt,...) {};
-static inline void DebugLevel1(const char* fmt,...) {};
-static inline void DebugLevel2(const char* fmt,...) {};
-static inline void DebugLevel3(const char* fmt,...) {};
-static inline void DebugLevel0Fn(const char* fmt,...) {};
-static inline void DebugLevel1Fn(const char* fmt,...) {};
-static inline void DebugLevel2Fn(const char* fmt,...) {};
-static inline void DebugLevel3Fn(const char* fmt,...) {};
+#undef _C_
+#define _C_
+
+#define DebugLevel0(fmt)	/* disabled */
+#define DebugLevel1(fmt)	/* disabled */
+#define DebugLevel2(fmt)	/* disabled */
+#define DebugLevel3(fmt)	/* disabled */
+#define DebugLevel0Fn(fmt)	/* disabled */
+#define DebugLevel1Fn(fmt)	/* disabled */
+#define DebugLevel2Fn(fmt)	/* disabled */
+#define DebugLevel3Fn(fmt)	/* disabled */
 
 #endif	// } !__GNUC__
 
