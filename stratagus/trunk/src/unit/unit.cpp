@@ -314,9 +314,8 @@ void InitUnit(Unit* unit, UnitType* type)
 	//  Initialise unit structure (must be zero filled!)
 	//
 	unit->Type = type;
-	unit->CacheLinks = (UnitListItem*)malloc(type->TileWidth * type->TileHeight * sizeof(UnitListItem));
+	unit->CacheLinks = calloc(type->TileWidth * type->TileHeight, sizeof(UnitListItem));
 	for (i = 0; i < type->TileWidth * type->TileHeight; ++i) {
-		unit->CacheLinks[i].Prev = unit->CacheLinks[i].Next = 0;
 		unit->CacheLinks[i].Unit = unit;
 	}
 
@@ -330,7 +329,8 @@ void InitUnit(Unit* unit, UnitType* type)
 
 	if (UnitTypeVar.NumberVariable) {
 		unit->Variable = malloc(UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
-		memcpy(unit->Variable, unit->Type->Variable, UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
+		memcpy(unit->Variable, unit->Type->Variable,
+			UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
 	}
 
 	if (!type->Building && type->Sprite &&
