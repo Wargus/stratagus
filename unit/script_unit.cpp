@@ -678,7 +678,7 @@ local int CclUnit(lua_State* l)
 			DebugCheck(!type);
 			unit = UnitSlots[slot];
 			InitUnit(unit, type);
-			unit->SeenType = seentype;
+			unit->Seen.Type = seentype;
 			unit->Active = 0;
 			unit->Removed = 0;
 			unit->Reset = 0;				// JOHNS ????
@@ -740,21 +740,21 @@ local int CclUnit(lua_State* l)
 				lua_error(l);
 			}
 			lua_rawgeti(l, j + 1, 1);
-			unit->SeenIX = LuaToNumber(l, -1);
+			unit->Seen.IX = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			unit->SeenIY = LuaToNumber(l, -1);
+			unit->Seen.IY = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "frame")) {
 			unit->Frame = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "flipped-frame")) {
 			unit->Frame = -LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "seen")) {
-			unit->SeenFrame = LuaToNumber(l, j + 1);
+			unit->Seen.Frame = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "flipped-seen")) {
-			unit->SeenFrame = -LuaToNumber(l, j + 1);
+			unit->Seen.Frame = -LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "not-seen")) {
-			unit->SeenFrame = UnitNotSeen;
+			unit->Seen.Frame = UnitNotSeen;
 			--j;
 		} else if (!strcmp(value, "direction")) {
 			unit->Direction = LuaToNumber(l, j + 1);
@@ -767,9 +767,6 @@ local int CclUnit(lua_State* l)
 		} else if (!strcmp(value, "destroyed")) {
 			unit->Destroyed = 1;
 			--j;
-		} else if (!strcmp(value, "seen-destroyed")) {
-			unit->SeenDestroyed = 1;
-			--j;
 		} else if (!strcmp(value, "removed")) {
 			unit->Removed = 1;
 			--j;
@@ -778,23 +775,34 @@ local int CclUnit(lua_State* l)
 			--j;
 		} else if (!strcmp(value, "rescued-from")) {
 			unit->RescuedFrom = &Players[(int)LuaToNumber(l, j + 1)];
-		} else if (!strcmp(value, "visible")) {
+		} else if (!strcmp(value, "seen-by-player")) {
 			s = LuaToString(l, j + 1);
+			unit->Seen.ByPlayer = 0;
 			for (i = 0; i < PlayerMax && *s; ++i, ++s) {
 				if (*s == '-' || *s == '_' || *s == ' ') {
-					unit->Visible &= ~(1 << i);
+					unit->Seen.ByPlayer &= ~(1 << i);
 				} else {
-					unit->Visible |= (1 << i);
+					unit->Seen.ByPlayer |= (1 << i);
+				}
+			}
+		} else if (!strcmp(value, "seen-destroyed")) {
+			s = LuaToString(l, j + 1);
+			unit->Seen.Destroyed = 0;
+			for (i = 0; i < PlayerMax && *s; ++i, ++s) {
+				if (*s == '-' || *s == '_' || *s == ' ') {
+					unit->Seen.Destroyed &= ~(1 << i);
+				} else {
+					unit->Seen.Destroyed |= (1 << i);
 				}
 			}
 		} else if (!strcmp(value, "constructed")) {
 			unit->Constructed = 1;
 			--j;
 		} else if (!strcmp(value, "seen-constructed")) {
-			unit->SeenConstructed = 1;
+			unit->Seen.Constructed = 1;
 			--j;
 		} else if (!strcmp(value, "seen-state")) {
-			unit->SeenState = LuaToNumber(l, j + 1);
+			unit->Seen.State = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "active")) {
 			unit->Active = 1;
 			--j;
@@ -887,19 +895,6 @@ local int CclUnit(lua_State* l)
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Type]--;
 			}
-			// FIXME: (mr-russ) Does not load CorpseList Properly
-			if (unit->Type->Building &&
-					(unit->Orders[0].Action == UnitActionDie || unit->Destroyed)) {
-				DeadBuildingCacheInsert(unit);
-			} else if (unit->Orders[0].Action == UnitActionDie) {
-				CorpseCacheInsert(unit);
-			}
-#if 0
-			if (unit->Orders[0].Action == UnitActionDie &&
-					unit->Type->CorpseScript) {
-				MapMarkUnitSight(unit);
-			}
-#endif
 		} else if (!strcmp(value, "saved-order")) {
 			lua_pushvalue(l, j + 1);
 			CclParseOrder(l, &unit->SavedOrder);

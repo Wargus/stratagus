@@ -143,12 +143,28 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 
 		UnitCacheRemove(unit);
 
-		MapUnmarkUnitSight(unit);
-		// ummark sight for units inside too.
-		uninside = unit->UnitInside;
-		for (i = unit->InsideCount; i; uninside = uninside->NextContained, --i) {
-			MapUnmarkUnitOnBoardSight(uninside, unit);
-		}
+		//
+		//	Trick for fog of war speed. first mark the new location then unmark the first.
+		//
+			x = unit->X += xd;
+			y = unit->Y += yd;
+			// Mark sight.
+			MapMarkUnitSight(unit);
+			uninside = unit->UnitInside;
+			for (i = unit->InsideCount; i; uninside = uninside->NextContained, --i) {
+				MapMarkUnitOnBoardSight(uninside, unit);
+			}
+			x = unit->X -= xd;
+			y = unit->Y -= yd;
+			// Unmark sight.
+			MapUnmarkUnitSight(unit);
+			uninside = unit->UnitInside;
+			for (i = unit->InsideCount; i; uninside = uninside->NextContained, --i) {
+				MapUnmarkUnitOnBoardSight(uninside, unit);
+			}
+		//
+		//	End fog of war trick
+		//
 
 		x = unit->X += xd;
 		y = unit->Y += yd;
@@ -158,7 +174,6 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 
 		MustRedraw |= RedrawMinimap;
 
-		MapMarkUnitSight(unit);
 		// Remove unit from the current selection
 		if (unit->Selected && !IsMapFieldVisible(ThisPlayer, unit->X, unit->Y)) {
 			if (NumSelected == 1) { //  Remove building cursor
@@ -168,21 +183,12 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 			SelectionChanged();
 		}
 
-		// Remark sight for units inside too.
-		uninside = unit->UnitInside;
-		for (i = unit->InsideCount; i; uninside = uninside->NextContained, --i) {
-			MapMarkUnitOnBoardSight(uninside, unit);
-		}
-
-		// Reveal cloaked units.
-		if (unit->Type->DetectCloak) {
-			MapDetectCloakedUnits(unit);
-		}
-
 		unit->IX = -xd * TileSizeX;
 		unit->IY = -yd * TileSizeY;
 		unit->Frame = 0;
 		UnitHeadingFromDeltaXY(unit, xd, yd);
+		//  Recalculate the seen count.
+		UnitCountSeen(unit);
 	} else {
 		xd = Heading2X[unit->Direction / NextDirection];
 		yd = Heading2Y[unit->Direction / NextDirection];

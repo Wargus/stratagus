@@ -231,7 +231,7 @@ global void HandleActionSpellCast(Unit* unit)
 				flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
 				if (flags & AnimationMissile) {
 					// FIXME: what todo, if unit/goal is removed?
-					if (unit->Orders[0].Goal && GoalGone(unit,unit->Orders->Goal)) {
+					if (unit->Orders[0].Goal && !UnitVisibleAsGoal(unit->Orders->Goal, unit->Player)) {
 						unit->Value = 0;
 					} else {
 						spell = unit->Orders[0].Arg1;
@@ -244,7 +244,7 @@ global void HandleActionSpellCast(Unit* unit)
 				}
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
-				if (unit->Orders[0].Goal && GoalGone(unit, unit->Orders->Goal)) {
+				if (unit->Orders[0].Goal && !UnitVisibleAsGoal(unit->Orders->Goal, unit->Player)) {
 					unit->Value = 0;
 				} else {
 					spell = unit->Orders[0].Arg1;

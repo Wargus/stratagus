@@ -72,16 +72,12 @@ global void HandleActionDie(Unit* unit)
 		DebugLevel3("Die complete %d\n" _C_ UnitNumber(unit));
 
 		if (!unit->Type->CorpseType) {
-			UnitMarkSeen(unit);
 			ReleaseUnit(unit);
 			return;
 		}
 
 		// Fixes sight from death
 		MapUnmarkUnitSight(unit);
-#if 0
-		unit->CurrentSightRange = unit->Type->Stats->SightRange;
-#endif
 
 		unit->State = unit->Type->CorpseScript;
 		unit->Type = unit->Type->CorpseType;
@@ -104,7 +100,6 @@ global void HandleActionDie(Unit* unit)
 		ChangeUnitOwner(unit, &Players[PlayerNumNeutral]);
 #endif
 	}
-	UnitMarkSeen(unit);
 }
 
 //@}
