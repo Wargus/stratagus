@@ -591,9 +591,6 @@ global void InitCcl(void)
     //
     //	Make some sombols for the compile options/features.
     //
-#ifdef USE_SDL
-    gh_define("freecraft-feature-use-sdl",SCM_BOOL_T);
-#endif
 #ifdef USE_THREAD
     gh_define("freecraft-feature-thread",SCM_BOOL_T);
 #endif
@@ -617,6 +614,9 @@ global void InitCcl(void)
 #endif
 #ifdef USE_SDLA
     gh_define("freecraft-feature-sdl-audio",SCM_BOOL_T);
+#endif
+#ifdef USE_SDLCD
+    gh_define("freecraft-feature-sdl-cd",SCM_BOOL_T);
 #endif
 #ifdef USE_X11
     gh_define("freecraft-feature-x11",SCM_BOOL_T);
@@ -653,6 +653,18 @@ global void InitCcl(void)
 #endif
 #ifdef HAVE_EXPANSION
     gh_define("freecraft-feature-have-expansion",SCM_BOOL_T);
+#endif
+#ifdef USE_FLAC
+    gh_define("freecraft-feature-flac",SCM_BOOL_T);
+#endif
+#ifdef USE_OGG
+    gh_define("freecraft-feature-ogg",SCM_BOOL_T);
+#endif
+#ifdef USE_MAD
+    gh_define("freecraft-feature-mp3",SCM_BOOL_T);
+#endif
+#ifdef USE_LIBCDA
+    gh_define("freecraft-feature-libcda",SCM_BOOL_T);
 #endif
 
     gh_define("*ccl-protect*",NIL);
