@@ -251,7 +251,7 @@ extern Sample* MusicSample;  ///< Music samples
 
 extern Sample* LoadFlac(const char* name, int flags);   ///< Load a flac file
 extern Sample* LoadWav(const char* name, int flags);    ///< Load a wav file
-extern Sample* LoadOgg(const char* name, int flags);    ///< Load an ogg file
+extern Sample* LoadVorbis(const char* name, int flags); ///< Load a vorbis file
 extern Sample* LoadMp3(const char* name, int flags);    ///< Load a mp3 file
 extern Sample* LoadMikMod(const char* name, int flags); ///< Load a module file
 

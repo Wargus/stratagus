@@ -521,6 +521,7 @@ static void ShowTitleScreens(void)
 				StopMusic();
 			}
 		}
+
 		if (PlayMovie(TitleScreens[i]->File,
 				PlayMovieZoomScreen | PlayMovieKeepAspect)) {
 			TitleScreenLabel** labels;
@@ -849,8 +850,6 @@ void Exit(int err)
 	lua_close(Lua);
 #endif
 
-	CleanMovie();
-
 	fprintf(stdout, "Thanks for playing Stratagus.\n");
 	exit(err);
 }
@@ -931,8 +930,8 @@ int main(int argc, char** argv)
 #ifdef USE_FLAC
 		"FLAC "
 #endif
-#ifdef USE_OGG
-		"OGG "
+#ifdef USE_VORBIS
+		"VORBIS "
 #endif
 #ifdef USE_MAD
 		"MP3 "
