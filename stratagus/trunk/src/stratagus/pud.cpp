@@ -583,7 +583,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		    buf[0] = v & 0xFF;
 		    buf[1] = (v >> 8) & 0xFF;
 		    info->MapUID += ChksumArea(buf, 2);
-		    info->PlayerGold[i]=v;
+		    info->PlayerResources[i][GoldCost]=v;
 		}
 		continue;
 	    } else {
@@ -604,7 +604,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		    buf[0] = v & 0xFF;
 		    buf[1] = (v >> 8) & 0xFF;
 		    info->MapUID += ChksumArea(buf, 2);
-		    info->PlayerWood[i]=v;
+		    info->PlayerResources[i][WoodCost]=v;
 		}
 		continue;
 	    } else {
@@ -625,7 +625,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		    buf[0] = v & 0xFF;
 		    buf[1] = (v >> 8) & 0xFF;
 		    info->MapUID += ChksumArea(buf, 2);
-		    info->PlayerOil[i]=v;
+		    info->PlayerResources[i][OilCost]=v;
 		}
 		continue;
 	    } else {
@@ -1629,22 +1629,22 @@ global int SavePud(const char* pud,const WorldMap* map)
 
     PudWriteHeader(f,"SGLD",32);
     for( i=0; i<16; ++i ) {
-	buf[i*2+0]=map->Info->PlayerGold[i] >> 0;
-	buf[i*2+1]=map->Info->PlayerGold[i] >> 8;
+	buf[i*2+0]=map->Info->PlayerResources[i][GoldCost] >> 0;
+	buf[i*2+1]=map->Info->PlayerResources[i][GoldCost] >> 8;
     }
     gzwrite(f,buf,32);
 
     PudWriteHeader(f,"SLBR",32);
     for( i=0; i<16; ++i ) {
-	buf[i*2+0]=map->Info->PlayerWood[i] >> 0;
-	buf[i*2+1]=map->Info->PlayerWood[i] >> 8;
+	buf[i*2+0]=map->Info->PlayerResources[i][WoodCost] >> 0;
+	buf[i*2+1]=map->Info->PlayerResources[i][WoodCost] >> 8;
     }
     gzwrite(f,buf,32);
 
     PudWriteHeader(f,"SOIL",32);
     for( i=0; i<16; ++i ) {
-	buf[i*2+0]=map->Info->PlayerOil[i] >> 0;
-	buf[i*2+1]=map->Info->PlayerOil[i] >> 8;
+	buf[i*2+0]=map->Info->PlayerResources[i][OilCost] >> 0;
+	buf[i*2+1]=map->Info->PlayerResources[i][OilCost] >> 8;
     }
     gzwrite(f,buf,32);
 
