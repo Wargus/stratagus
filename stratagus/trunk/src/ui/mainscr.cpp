@@ -415,7 +415,7 @@ global void DrawUnitInfo(const Unit* unit)
 		}
 		uins = unit->UnitInside;
 		for (i = j = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
-			if (uins->Boarded) {
+			if (uins->Boarded && j < TheUI.NumTransportingButtons) {
 				DrawUnitIcon(unit->Player,uins->Type->Icon.Icon,
 					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
