@@ -155,6 +155,9 @@ global void LoadModules(void)
     LoadDecorations();
     LoadUnitTypes();
 
+    LoadUnitSounds();
+    MapUnitSounds();
+
     LoadTileset();
     CreateMinimap();
 
