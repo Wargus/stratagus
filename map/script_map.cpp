@@ -10,7 +10,7 @@
 //
 /**@name ccl_map.c	-	The map ccl functions. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer
+//	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -38,6 +38,7 @@
 #include "minimap.h"
 #include "actions.h"
 #include "campaign.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -253,6 +254,18 @@ local SCM CclRevealMap(void)
     }
     FlagRevealMap=1;
 
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Center the map.
+**
+**	@param x	X tile location.
+**	@param y	Y tile location.
+*/
+local SCM CclCenterMap(SCM x,SCM y)
+{
+    ViewportCenterViewpoint(TheUI.SelectedViewport,gh_scm2int(x),gh_scm2int(y));
     return SCM_UNSPECIFIED;
 }
 
@@ -496,6 +509,7 @@ global void MapCclRegister(void)
 {
     gh_new_procedureN("freecraft-map",CclFreeCraftMap);
     gh_new_procedure0_0("reveal-map",CclRevealMap);
+    gh_new_procedure2_0("center-map",CclCenterMap);
 
     gh_new_procedure1_0("set-default-map!",CclSetDefaultMap);
     gh_new_procedure1_0("set-fog-of-war!",CclSetFogOfWar);
