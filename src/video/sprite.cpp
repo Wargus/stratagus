@@ -452,21 +452,36 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 **  Make shadow sprite
 **
 **  @param graphic  pointer to object
+**
+**  @todo FIXME: 32bpp
 */
-global void MakeShadowSprite(Graphic* graphic)
+global void MakeShadowSprite(Graphic* g)
 {
 	SDL_Color colors[256];
+#ifdef USE_OPENGL
+	int w;
+	int h;
+#endif
 
 	// Set all colors in the palette to black and use 50% alpha
 	memset(colors, 0, sizeof(colors));
 
-	SDL_SetPalette(graphic->Surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
-	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+	SDL_SetAlpha(g->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 
-	if (graphic->SurfaceFlip) {
-		SDL_SetPalette(graphic->SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
-		SDL_SetAlpha(graphic->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	if (g->SurfaceFlip) {
+		SDL_SetPalette(g->SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+		SDL_SetAlpha(g->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 	}
+#ifdef USE_OPENGL
+	w = g->Width;
+	h = g->Height;
+	g->Width = g->GraphicWidth;
+	g->Height = g->GraphicHeight;
+	MakeTexture(g, w, h);
+	g->Width = w;
+	g->Height = h;
+#endif
 }
 
 //@}

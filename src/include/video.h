@@ -254,7 +254,7 @@ extern void RealizeVideoMemory(void);
 extern Graphic* LoadSprite(const char* file, int w, int h);
 
 	/// Make shadow sprite
-extern void MakeShadowSprite(Graphic* graphic);
+extern void MakeShadowSprite(Graphic* g);
 
 	/// Draw a graphic clipped and with alpha.
 extern void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
