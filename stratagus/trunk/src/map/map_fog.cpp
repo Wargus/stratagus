@@ -1066,7 +1066,9 @@ global void VideoDraw32Unexplored32Solid(const GraphicData* data,int x,int y)
 **	@param y	Y position into video memory
 */
 #ifdef USE_OPENGL
-global void VideoDrawUnexploredSolidOpenGL(const GraphicData* data,int x,int y)
+global void VideoDrawUnexploredSolidOpenGL(
+    const GraphicData* data __attribute__((unused)),
+    int x __attribute__((unused)),int y __attribute__((unused)))
 {
 }
 #endif
@@ -1543,9 +1545,13 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
-global void VideoDrawFogAlphaOpenGL(const GraphicData* data,int x,int y)
+#ifdef USE_OPENGL
+global void VideoDrawFogAlphaOpenGL(
+    const GraphicData* data __attribute__((unused)),
+    int x __attribute__((unused)),int y __attribute__((unused)))
 {
 }
+#endif
 
 /**
 **	Fast draw 100% fog of war 32x32 tile for 32 bpp video modes.
@@ -1557,9 +1563,13 @@ global void VideoDrawFogAlphaOpenGL(const GraphicData* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
-global void VideoDrawOnlyFogAlphaOpenGL(const GraphicData* data __attribute__((unused)),int x,int y)
+#ifdef USE_OPENGL
+global void VideoDrawOnlyFogAlphaOpenGL(
+    const GraphicData* data __attribute__((unused)),
+    int x __attribute__((unused)),int y __attribute__((unused)))
 {
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --	Old version correct working but not 100% original

@@ -311,6 +311,8 @@ struct _graphic_ {
 	// cache line 2
     //void*		Offsets;	/// Offsets into frames
 #ifdef USE_OPENGL
+    int			GraphicWidth;	/// Original graphic width
+    int			GraphicHeight;	/// Original graphic height
     GLfloat		TextureWidth;	/// Width of the texture
     GLfloat		TextureHeight;	/// Height of the texture
     int			NumTextureNames; /// Number of textures
@@ -1177,6 +1179,8 @@ extern Graphic* LoadGraphicPNG(const char* name);
 #ifdef USE_OPENGL
     /// Make an OpenGL texture
 extern void MakeTexture(Graphic* graphic,int width,int height);
+    /// Make an OpenGL texture of the player color pixels only.
+extern void MakePlayerColorTexture(Graphic** g,Graphic* graphic,int frame,unsigned char *map,int maplen);
 #endif
 
     ///	Save a screenshot to a PNG file

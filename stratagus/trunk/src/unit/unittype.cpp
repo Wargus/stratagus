@@ -1252,6 +1252,9 @@ global void CleanUnitTypes(void)
 {
     UnitType* type;
     void** ptr;
+#ifdef USE_OPENGL
+    int i;
+#endif
 
     DebugLevel0Fn("FIXME: icon, sounds not freed.\n");
 
@@ -1359,6 +1362,11 @@ global void CleanUnitTypes(void)
 	    if( !type->SameSprite ) {	// our own graphics
 		VideoSaveFree(type->Sprite);
 	    }
+#ifdef USE_OPENGL
+	    for( i=0; i<PlayerMax; ++i ) {
+		VideoSaveFree(type->PlayerColorSprite[i]);
+	    }
+#endif
 	}
 	free(UnitTypes);
 	UnitTypes=NULL;
