@@ -120,7 +120,7 @@ global void InitModules(void)
     InitSyncRand();
     InitIcons();
     InitVideoCursors();
-    InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
+    InitUserInterface(ThisPlayer->RaceName);
     // InitMenus();
     InitPlayers();
     InitMissileTypes();
