@@ -567,8 +567,11 @@ global void MakeTexture(Graphic* graphic,int width,int height)
 
 /**
 **	Make an OpenGL texture of the player color pixels only.
+**
+**	FIXME: Docu
 */
-global void MakePlayerColorTexture(Graphic** g,Graphic* graphic,int frame,unsigned char *map,int maplen)
+global void MakePlayerColorTexture(Graphic** g,Graphic* graphic,int frame,
+	unsigned char *map,int maplen)
 {
     int i;
     int j;
@@ -656,6 +659,9 @@ global void MakePlayerColorTexture(Graphic** g,Graphic* graphic,int frame,unsign
 **	@param g	Graphic object.
 **	@param w	New width of graphic.
 **	@param h	New height of graphic.
+**
+**	@todo	FIXME: Higher quality resizing.
+**		FIXME: Works only with 8bit indexed graphic objects.
 */
 global void ResizeGraphic(Graphic *g,int w,int h)
 {
@@ -664,11 +670,14 @@ global void ResizeGraphic(Graphic *g,int w,int h)
     unsigned char *data;
     int x;
 
+    DebugCheck( g->Type!=&GraphicImage8Type );
+
     if( g->Width==w && g->Height==h ) {
 	return;
     }
 
     data = (unsigned char*)malloc(w*h);
+    IfDebug( AllocatedGraphicMemory+=w*h );
     x=0;
 
     for( i=0; i<h; ++i ) {
@@ -680,6 +689,7 @@ global void ResizeGraphic(Graphic *g,int w,int h)
     }
 
     free(g->Frames);
+    IfDebug( AllocatedGraphicMemory-=g->Width*g->Height );
     g->Frames = data;
     g->Width = w;
     g->Height = h;
