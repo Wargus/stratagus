@@ -1142,73 +1142,81 @@ local int CclDefineUnitType(lua_State* l)
 	    type->Transporter = LuaToBoolean(l, -1);
 	} else if (!strcmp(value, "Coward")) {
 	    type->Coward = LuaToBoolean(l, -1);
-	} else if (!strcmp(value, "CanGatherResource")) {
-	    res = (ResourceInfo*)malloc(sizeof(ResourceInfo));
-	    memset(res, 0, sizeof(ResourceInfo));
-	    if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    subargs = luaL_getn(l, -1);
-	    for (k = 0; k < subargs; ++k) {
-		lua_rawgeti(l, -1, k + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++k;
-		if (!strcmp(value, "resource-id")) {
-		    lua_rawgeti(l, -1, k + 1);
-		    res->ResourceId = CclGetResourceByName(l);
-		    lua_pop(l, 1);
-		    type->ResInfo[res->ResourceId] = res;
-		} else if (!strcmp(value, "resource-step")) {
-		    lua_rawgeti(l, -1, k + 1);
-		    res->ResourceStep = LuaToNumber(l, -1);
-		    lua_pop(l, 1);
-		} else if (!strcmp(value, "final-resource")) {
-		    lua_rawgeti(l, -1, k + 1);
-		    res->FinalResource = CclGetResourceByName(l);
-		    lua_pop(l, 1);
-		} else if (!strcmp(value, "wait-at-resource")) {
-		    lua_rawgeti(l, -1, k + 1);
-		    res->WaitAtResource = LuaToNumber(l, -1);
-		    lua_pop(l, 1);
-		} else if (!strcmp(value, "wait-at-depot")) {
-		    lua_rawgeti(l, -1, k + 1);
-		    res->WaitAtDepot = LuaToNumber(l, -1);
-		    lua_pop(l, 1);
-		} else if (!strcmp(value, "resource-capacity")) {
-		    lua_rawgeti(l, -1, k + 1);
-		    res->ResourceCapacity = LuaToNumber(l, -1);
-		    lua_pop(l, 1);
-		} else if (!strcmp(value, "terrain-harvester")) {
-		    res->TerrainHarvester = 1;
-		    --k;
-		} else if (!strcmp(value, "lose-resources")) {
-		    res->LoseResources = 1;
-		    --k;
-		} else if (!strcmp(value, "harvest-from-outside")) {
-		    res->HarvestFromOutside = 1;
-		    --k;
-		} else if (!strcmp(value, "file-when-empty")) {
-		    lua_rawgeti(l, -1, k + 1);
-		    res->FileWhenEmpty = strdup(LuaToString(l, -1));
-		    lua_pop(l, 1);
-		} else if (!strcmp(value, "file-when-loaded")) {
-		    lua_rawgeti(l, -1, k + 1);
-		    res->FileWhenLoaded = strdup(LuaToString(l, -1));
-		    lua_pop(l, 1);
-		} else {
-		   printf("\n%s\n",type->Name);
-		   lua_pushfstring(l, "Unsupported tag: %s", value);
-		   lua_error(l);
-		   DebugCheck(1);
+	} else if (!strcmp(value, "CanGatherResources")) {
+	    int args;
+	    int j;
+
+	    args = luaL_getn(l, -1);
+	    for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		res = (ResourceInfo*)malloc(sizeof(ResourceInfo));
+		memset(res, 0, sizeof(ResourceInfo));
+		if (!lua_istable(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
 		}
+		subargs = luaL_getn(l, -1);
+		for (k = 0; k < subargs; ++k) {
+		    lua_rawgeti(l, -1, k + 1);
+		    value = LuaToString(l, -1);
+		    lua_pop(l, 1);
+		    ++k;
+		    if (!strcmp(value, "resource-id")) {
+			lua_rawgeti(l, -1, k + 1);
+			res->ResourceId = CclGetResourceByName(l);
+			lua_pop(l, 1);
+			type->ResInfo[res->ResourceId] = res;
+		    } else if (!strcmp(value, "resource-step")) {
+			lua_rawgeti(l, -1, k + 1);
+			res->ResourceStep = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "final-resource")) {
+			lua_rawgeti(l, -1, k + 1);
+			res->FinalResource = CclGetResourceByName(l);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "wait-at-resource")) {
+			lua_rawgeti(l, -1, k + 1);
+			res->WaitAtResource = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "wait-at-depot")) {
+			lua_rawgeti(l, -1, k + 1);
+			res->WaitAtDepot = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "resource-capacity")) {
+			lua_rawgeti(l, -1, k + 1);
+			res->ResourceCapacity = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "terrain-harvester")) {
+			res->TerrainHarvester = 1;
+			--k;
+		    } else if (!strcmp(value, "lose-resources")) {
+			res->LoseResources = 1;
+			--k;
+		    } else if (!strcmp(value, "harvest-from-outside")) {
+			res->HarvestFromOutside = 1;
+			--k;
+		    } else if (!strcmp(value, "file-when-empty")) {
+			lua_rawgeti(l, -1, k + 1);
+			res->FileWhenEmpty = strdup(LuaToString(l, -1));
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "file-when-loaded")) {
+			lua_rawgeti(l, -1, k + 1);
+			res->FileWhenLoaded = strdup(LuaToString(l, -1));
+			lua_pop(l, 1);
+		    } else {
+		       printf("\n%s\n",type->Name);
+		       lua_pushfstring(l, "Unsupported tag: %s", value);
+		       lua_error(l);
+		       DebugCheck(1);
+		    }
+		}
+		if (!res->FinalResource) {
+		    res->FinalResource = res->ResourceId;
+		}
+		DebugCheck(!res->ResourceId);
+		lua_pop(l, 1);
 	    }
 	    type->Harvester = 1;
-	    if (!res->FinalResource) {
-		res->FinalResource = res->ResourceId;
-	    }
-	    DebugCheck(!res->ResourceId);
 	} else if (!strcmp(value, "GivesResource")) {
 	    lua_pushvalue(l, -1);
 	    type->GivesResource = CclGetResourceByName(l);
