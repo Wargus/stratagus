@@ -467,7 +467,9 @@ local int PlayCDRom(const char* name)
 */
 global void PlaySectionMusic(PlaySectionType section)
 {
+#ifdef USE_LIBCDA
     int track;
+#endif
     int newtrack;
     int i;
     int j;
@@ -480,8 +482,9 @@ global void PlaySectionMusic(PlaySectionType section)
 
     newtrack = 0;
     j = 0;
+#ifdef USE_LIBCDA
     track = cd_current_track();
-
+#endif
     if (section == PlaySectionStats) {
 	if (GameResult == GameVictory) {
 	    section = PlaySectionStatsVictory;
@@ -497,6 +500,7 @@ global void PlaySectionMusic(PlaySectionType section)
 	}
     }
 
+#ifdef USE_LIBCDA
     if (CDMode == CDModeDefined) {
 	if ( (1 << track) & PlaySections[i].CDTracks ) {
 	    newtrack = 0;
@@ -511,7 +515,6 @@ global void PlaySectionMusic(PlaySectionType section)
 	    } else if (PlaySections[i].CDOrder == PlaySectionOrderRandom) {
     		do {
 		    newtrack = MyRand() % NumCDTracks;
-		    printf("%d\n", newtrack);
 		} while ( !((1 << newtrack) & PlaySections[i].CDTracks) || 
 		    (cd_is_audio(newtrack) < 1) );
 	    }
@@ -520,6 +523,9 @@ global void PlaySectionMusic(PlaySectionType section)
 	    cd_play(newtrack);
 	}
     } else if (PlaySections[i].Files && (CDMode == CDModeOff || CDMode == CDModeStopped)) {
+#else
+    if (PlaySections[i].Files && (CDMode == CDModeOff || CDMode == CDModeStopped)) {
+#endif
 	found = 0;
 	numfiles = 0;
 	for (j = 0; PlaySections[i].Files[j] && !found; ++j) {
