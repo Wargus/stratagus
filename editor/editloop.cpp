@@ -1217,6 +1217,11 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	    InterfaceState = IfaceStateNormal;
 	    break;
 
+	case KeyCodeF12:
+	    EditorLoadMenu();
+	    InterfaceState = IfaceStateNormal;
+	    break;
+
 	case 'v':		// 'v' Viewport
 	    if (KeyModifiers & ModifierControl) {
 		CycleViewportMode(-1);
