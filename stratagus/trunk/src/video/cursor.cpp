@@ -382,26 +382,32 @@ global void SaveCursorRectangle32(void *buffer,int x,int y,int w,int h)
 **	Draw rectangle cursor when visible, defined by
 **      OldCursorRectangleW (!=0),..
 **      Pre: for this to work OldCursorRectangleW should be 0 upfront
+**
+**	@param x	Screen x start position of rectangle
+**	@param y	Screen y start position of rectangle
+**	@param x1	Screen x end position of rectangle
+**	@param y1	Screen y end position of rectangle
 */
 local void DrawVisibleRectangleCursor(int x,int y,int x1,int y1)
 {
     int w;
     int h;
+    const Viewport* vp;
 
     //
     //	Clip to map window.
-    // FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
+    //	FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
     //
-    int v = TheUI.ActiveViewport;
-    if( x1<TheUI.VP[v].X ) {
-	x1=TheUI.VP[v].X;
-    } else if( x1>TheUI.VP[v].EndX ) {
-	x1=TheUI.VP[v].EndX;
+    vp = &TheUI.VP[TheUI.ActiveViewport];
+    if( x1<vp->X ) {
+	x1=vp->X;
+    } else if( x1>vp->EndX ) {
+	x1=vp->EndX;
     }
-    if( y1<TheUI.VP[v].Y ) {
-	y1=TheUI.VP[v].Y;
-    } else if( y1>TheUI.VP[v].EndY ) {
-	y1=TheUI.VP[v].EndY;
+    if( y1<vp->Y ) {
+	y1=vp->Y;
+    } else if( y1>vp->EndY ) {
+	y1=vp->EndY;
     }
 
     if( x>x1 ) {
@@ -683,7 +689,7 @@ local void DrawBuildingCursor(void)
     int w0;
     int h;
     int mask;
-    Viewport *vp;
+    const Viewport* vp;
 
     // Align to grid
     vp = &TheUI.VP[TheUI.ActiveViewport];
