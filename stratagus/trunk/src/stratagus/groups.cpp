@@ -34,16 +34,8 @@
 #include <string.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
-#include "unittype.h"
-#include "player.h"
 #include "unit.h"
-#include "interface.h"
-#include "tileset.h"
-#include "map.h"
-
+#include "ccl.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -90,7 +82,7 @@ global void SaveGroups(FILE* file)
     fprintf(file,";;; MODULE: groups $Id$\n\n");
 
     for( g=0; g<NUM_GROUPS; g++ ) {
-	fprintf(file,";;(group %d %d '(",g,Groups[g].NumUnits);
+	fprintf(file,"(group %d %d '(",g,Groups[g].NumUnits);
 	for( i=0; i<Groups[g].NumUnits; ++i ) {
 	    ref=UnitReference(Groups[g].Units[i]);
 	    fprintf(file,"%s ",ref);
@@ -220,6 +212,43 @@ global void RemoveUnitFromGroup(Unit *unit)
     }
 
     unit->GroupId=-1;
+}
+
+// ----------------------------------------------------------------------------
+
+/**
+**	Define the group.
+**
+**	@param group	Group number
+**	@param num	Number of units in group
+**	@param units	Units in group
+*/
+local SCM CclGroup(SCM group,SCM num,SCM units)
+{
+#if 0
+    int i;
+
+    NumSelected=gh_scm2int(num);
+    i=0;
+    while( !gh_null_p(units) ) {
+	char* str;
+
+	str=gh_scm2newstr(gh_car(units),NULL);
+	Selected[i++]=(Unit*)strtol(str+1,NULL,16);
+	free(str);
+	units=gh_cdr(units);
+    }
+#endif
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Register CCL features for groups.
+*/
+global void GroupCclRegister(void)
+{
+    gh_new_procedure3_0("group",CclGroup);
 }
 
 //@}
