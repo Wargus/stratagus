@@ -40,7 +40,9 @@
 #include "missile.h"
 #include "ui.h"
 
-#define FC_MAX_PATH	9		/// Maximal path part returned.
+#ifndef MAX_PATH_LENGTH 
+#define MAX_PATH_LENGTH		9	/// Maximal path part returned.
+#endif
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -179,77 +181,6 @@ local void MarkGoalInMatrix(const Unit* unit,int range,unsigned char* matrix)
     h=type->TileHeight+range*2;
 
     MarkPlaceInMatrix(x,y,w,h,matrix);
-}
-
-/**
-**	Trace path in the matrix back to origin.
-**
-**	FIXME: didn't need to check the goal field again!
-**	FIXME: only the last 8 points are returned!
-**
-**	@param matrix	Matrix
-**	@param add	Step value.
-**	@param x	X start point of trace back.
-**	@param y	Y start point of trace back.
-**	@param n	Mark start value (1..8)
-**	@param path	OUT: here are the path points stored.
-*/
-local void PathTraceBack(const unsigned char* matrix,int add,int x,int y,int n
-	,int* path)
-{
-    int w;
-    int w2;
-    const unsigned char* m;
-
-    DebugLevel3Fn("%d\n",n);
-
-    w=TheMap.Width+2;
-    w2=w+w;
-
-    path[n*2+0]=x;
-    path[n*2+1]=y;
-
-    m=matrix+w2+2+y*w;
-
-    for( ;; ) {
-	DebugLevel3("%d,%d(%d)\n",x,y,n);
-	n=((n-1)&0x7)+1;
-
-	x+=add;					// +1, 0
-	if( m[x]!=n ) {			// test all neighbors
-	  x-=2*add;				// -1, 0
-	  if( m[x]!=n ) {
-	    x+=add;
-	    y+=add;				//  0,+1
-	    m+=w*add;
-	    if( m[x]!=n ) {
-	      y-=2*add;				//  0,-1
-	      m-=w2*add;
-	      if( m[x]!=n ) {
-		x+=add;				// +1,-1
-		if( m[x]!=n ) {
-		  x-=2*add;			// -1,-1
-		  if( m[x]!=n ) {
-		    y+=2*add;			// -1,+1
-		    m+=w2*add;
-		    if( m[x]!=n ) {
-		      x+=2*add;			// +1,+1
-			if( m[x]!=n ) {
-			    DebugLevel3("Start reached\n");
-			    return;
-			}
-		    }
-		  }
-		}
-	      }
-	    }
-	  }
-	}
-	// found: continue
-	--n;
-	path[n*2+0]=x;
-	path[n*2+1]=y;
-    }
 }
 
 /**
@@ -540,6 +471,83 @@ local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
 }
 
 /**
+**	Trace path in the matrix back to origin.
+**
+**	@param matrix	Matrix (not real start!)
+**	@param add	Step value.
+**	@param x	X start point of trace back.
+**	@param y	Y start point of trace back.
+**	@param depth	Depth of path and marks start value (1..8)
+**	@param path	OUT: here are the path directions stored.
+*/
+local void PathTraceBack(const unsigned char* matrix,int add,int x,int y
+	,int depth,unsigned char* path)
+{
+    int w;
+    int w2;
+    const unsigned char* m;
+    int d;
+    int n;
+
+    w=TheMap.Width+2;
+    m=matrix+x+y*w;			// End of path in matrix.
+    w*=add;
+    w2=w+w;
+
+    //
+    //	Find the way back, nodes are numbered ascending.
+    //
+    for( ;; ) {
+	--depth;
+	n=(depth&0x7)+1;
+
+	//
+	//	Directions stored in path:
+	//		7 0 1
+	//		6 . 2
+	//		5 4 3
+	//
+	d=6;
+	m+=add;				// +1, 0
+	if( *m!=n ) {			// test all neighbors
+	  d=2;
+	  m-=add<<1;			// -1, 0
+	  if( *m!=n ) {
+	    d=0;
+	    m+=add+w;			//  0,+1
+	    if( *m!=n ) {
+	      d=4;
+	      m-=w2;			//  0,-1
+	      if( *m!=n ) {
+		d=5;
+		m+=add;			// +1,-1
+		if( *m!=n ) {
+		  d=3;
+		  m-=add<<1;		// -1,-1
+		  if( *m!=n ) {
+		    d=1;
+		    m+=w2;		// -1,+1
+		    if( *m!=n ) {
+		      d=7;
+		      m+=add<<1;	// +1,+1
+		      if( *m!=n ) {
+			  return;
+		      }
+		    }
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+	// found: continue
+	if( depth<MAX_PATH_LENGTH ) {
+	    path[depth]=d;
+	}
+    }
+}
+
+/**
 **	Complex search new path.
 **
 **	@param unit	Path for this unit.
@@ -548,20 +556,17 @@ local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
 **	@param ox	Offset in X.
 **	@param oy	Offset in Y.
 **
-**	@param xdp	OUT: Pointer for x direction.
-**	@param xdp	OUT: Pointer for y direction.
+**	@param path	OUT: part of the path.
 **
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
-local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
-	,int *xdp,int* ydp)
+local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 {
-    static int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
-    static int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
     unsigned char* matrix;
-    unsigned char points[TheMap.Width*TheMap.Height];
-    int path[FC_MAX_PATH*2];
+    unsigned short points[TheMap.Width*TheMap.Height];
     const Unit* goal;
     int bestx;
     int besty;
@@ -596,17 +601,15 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
     points[0]=x=unit->X;
     points[1]=y=unit->Y;
     rp=0;
-    matrix[x+y*w]=n=1;				// mark start point
-    depth=1;
-    ep=2;
-    wp=2;					// start with one point
+    matrix[x+y*w]=depth=1;			// mark start point
+    ep=wp=n=2;					// start with one point
 
     bestx=x;
     besty=y;
     xd=abs(gx+ox/2-x);
     yd=abs(gy+oy/2-y);
     bestd=xd>yd ? xd : yd;
-    bestn=1;					// needed if goal not reachable
+    bestn=0;					// needed if goal not reachable
 
     //
     //	Mark goal
@@ -632,8 +635,16 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
 	    }
 	}
     }
+
     // No point of the target area could be entered
-    IfDebug( if( i ) { PfCounterNotReachable++;  } );
+    IfDebug(
+	if( i ) {
+	    PfCounterNotReachable++;
+	    MakeMissile(MissileTypeGreenCross,
+		unit->X*TileSizeX+TileSizeX/2,
+		unit->Y*TileSizeY+TileSizeY/2,0,0);
+	}
+    );
 
 #ifdef NEW_SHIPS
     if( unit->Type->UnitType==UnitTypeLand ) {
@@ -645,6 +656,12 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
     add=1;
 #endif
 
+    gx+=ox/2;
+    gy+=oy/2;
+
+    //
+    //	Push and pop points until reached.
+    //
     for( ;; ) {
 	while( rp!=ep ) {
 	    for( j=0; j<8; ++j ) {		// mark all neighbors
@@ -655,15 +672,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
 		    //	Check if goal reached.
 		    //
 		    if( i==88 ) {
-			PathTraceBack(matrix-w-w-2,add,x,y,n,path);
-			xd=path[2]-unit->X;
-			yd=path[3]-unit->Y;
-
-			DebugCheck( xd>2 || xd<-2 );
-			DebugCheck( yd>2 || yd<-2 );
-
-			*xdp=xd;
-			*ydp=yd;
+			PathTraceBack(matrix,add,x,y,depth,path);
 			IfDebug(
 			    PfCounterOk++;
 			    PfCounterDepth+=depth;
@@ -704,41 +713,39 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
 		    }
 		}
 
-		DebugLevel3("OK: %d,%d\n",x,y);
 		//
 		//	Reachable: push point on stack.
 		//
-		matrix[x+y*w]=n+1;
+		matrix[x+y*w]=n;
 		points[wp]=x;
 		points[wp+1]=y;
 		wp+=2;
-		if( wp>=sizeof(points) ) {	// round about
+		if( wp>=sizeof(points)/sizeof(*points) ) {	// round about
 		    wp=0;
 		}
 
 		//
 		//	Save nearest point to target.
 		//
-		xd=abs(gx+ox/2-x);
-		yd=abs(gy+oy/2-y);
-		DebugLevel3("Best: %d,%d-%d - %d,%d\n"
-		    ,bestx,besty,bestd,xd,yd);
+		xd=abs(gx-x);
+		yd=abs(gy-y);
+		DebugLevel3("Best: %d,%d-%d - %d,%d\n",bestx,besty,bestd,xd,yd);
 		if( xd>yd && xd<bestd ) {
 		    bestd=xd;
 		    bestx=x;
 		    besty=y;
-		    bestn=n;
+		    bestn=depth;
 		}
-		if( yd>xd && yd<bestd ) {
+		if( yd>=xd && yd<bestd ) {
 		    bestd=yd;
 		    bestx=x;
 		    besty=y;
-		    bestn=n;
+		    bestn=depth;
 		}
 	    }
 
 	    rp+=2;
-	    if( rp>=sizeof(points) ) {	// round about
+	    if( rp>=sizeof(points)/sizeof(*points) ) {	// round about
 		rp=0;
 	    }
 	}
@@ -755,31 +762,20 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
 #if 0
 	//	FIXME: if we ignore distant units we run left-right
 	//	Ignore any units more than 5 fields from start.
-	if( n>6 ) {
+	if( depth>6 ) {
 	    mask&=~(MapMoveLandUnit|MapMoveAirUnit|MapMoveSeaUnit);
 	}
 #endif
 
-	n=(n+1)&7;
 	++depth;
+	n=(depth&0x07)+1;
     }
 
     //
     //	We now move to the best reachable point.
     //
-    DebugLevel3("Unreachable Best %d=%d,%d\n",bestn,bestx,besty);
-
-    PathTraceBack(matrix-w-w-2,add,bestx,besty,bestn,path);
-    xd=path[2]-unit->X;
-    yd=path[3]-unit->Y;
-
-    DebugCheck( xd>2 || xd<-2 );
-    DebugCheck( yd>2 || yd<-2 );
-
-    DebugLevel3("Move: %d,%d\n",*xdp,*ydp);
-
-    *xdp=xd;
-    *ydp=yd;
+    DebugLevel3Fn("Unreachable Best %d,%d -> %d=%d,%d\n",
+	  unit->X,unit->Y,bestn,bestx,besty);
 
     IfDebug(
 	PfCounterFail++;
@@ -787,7 +783,8 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
 	PfCounterDepth/=2;
     );
 
-    if( xd || yd ) {			// can move
+    if( bestn ) {		// can move
+	PathTraceBack(matrix,add,bestx,besty,bestn,path);
 	return INT_MAX;
     }
 
@@ -820,6 +817,14 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     int rx;
     int ry;
     int i;
+    unsigned char path[MAX_PATH_LENGTH];
+
+    //
+    //	Convert heading into direction.
+    //				  //  N NE  E SE  S SW  W NW
+    local const int Heading2X[8] = {  0,+1,+1,+1, 0,-1,-1,-1 };
+    local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
+
 
     x=unit->X;
     y=unit->Y;
@@ -881,6 +886,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 	}
     } else {				// goal map field
 	// FIXME: still some wired code, if moving to point this must +1
+	// FIXME: should be +2? for ships/flyers?
 	++rx;
 	++ry;
 	if( x>=gx && x<gx+rx && y>=gy && y<gy+ry ) {
@@ -908,9 +914,9 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     //	If possible, try fast.
     //
 #ifdef NEW_ORDERS
-    if( unit->Data.Move.Fast ) {
+    if( 0 && unit->Data.Move.Fast ) {
 #else
-    if( unit->Command.Data.Move.Fast ) {
+    if( 0 && unit->Command.Data.Move.Fast ) {
 #endif
 	if( (i=FastNewPath(unit,gx,gy,rx,ry,xdp,ydp))>=-1 ) {
 	    // Fast works
@@ -928,7 +934,24 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     //
     //	Fall back to slow complex method.
     //
-    return ComplexNewPath(unit,gx,gy,rx,ry,xdp,ydp);
+    i=ComplexNewPath(unit,gx,gy,rx,ry,path);
+
+    if( i>=0 ) {
+#ifdef NEW_SHIPS
+	if( unit->Type->UnitType==UnitTypeLand ) {
+	    *xdp=Heading2X[*path];
+	    *ydp=Heading2Y[*path];
+	} else {
+	    *xdp=Heading2X[*path]*2;
+	    *ydp=Heading2Y[*path]*2;
+	}
+#else
+	*xdp=Heading2X[*path];
+	*ydp=Heading2Y[*path];
+#endif
+    }
+
+    return i;
 }
 
 //@}
