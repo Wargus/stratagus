@@ -725,6 +725,12 @@ global void UpdateButtonPanel(void)
 		}
 		break;
 	    case ButtonTrain:
+		// Check if building queue is enabled
+		if( !EnableTrainingQueue
+			&& unit->Orders[0].Action==UnitActionTrain ) {
+		    break;
+		}
+		// FALL THROUGH
 	    case ButtonUpgradeTo:
 	    case ButtonResearch:
 	    case ButtonBuild:
@@ -910,8 +916,10 @@ global void DoButtonButtonClicked(int button)
 	    // FIXME: Johns: I want to place commands in queue, even if not
 	    // FIXME:	enough resources are available.
 	    // FIXME: training queue full check is not correct for network.
+	    // FIXME: this can be correct written, with a little more code.
 	    if( Selected[0]->Orders[0].Action==UnitActionTrain
-		    && Selected[0]->Data.Train.Count==MAX_UNIT_TRAIN ) {
+		    && (Selected[0]->Data.Train.Count==MAX_UNIT_TRAIN
+			|| !EnableTrainingQueue) ) {
 		SetMessage( "Unit training queue is full" );
 	    } else if( PlayerCheckFood(ThisPlayer,type)
 			&& !PlayerCheckUnitType(ThisPlayer,type) ) {

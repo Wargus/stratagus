@@ -881,7 +881,7 @@ global void CommandTrainUnit(Unit* unit,UnitType* type,
 	//
 	//	Training slots are all already full. (NETWORK!)
 	//
-	if( unit->Data.Train.Count>=MAX_UNIT_TRAIN ) {
+	if( !EnableTrainingQueue || unit->Data.Train.Count>=MAX_UNIT_TRAIN ) {
 	    DebugLevel0Fn("Unit queue full!\n");
 	    return;
 	}

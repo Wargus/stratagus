@@ -57,8 +57,6 @@ extern UnitType* CclGetUnitType(SCM ptr);
 **	@param flag	Flag enabling or disabling it.
 **
 **	@return		The old state of the hit-point regeneration.
-**
-**	@todo move to unit ccl part.
 */
 local SCM CclSetHitPointRegeneration(SCM flag)
 {
@@ -66,6 +64,23 @@ local SCM CclSetHitPointRegeneration(SCM flag)
 
     old=HitPointRegeneration;
     HitPointRegeneration=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
+**	Set training queue
+**
+**	@param flag	Flag enabling or disabling it.
+**
+**	@return		The old state of the training queue
+*/
+local SCM CclSetTrainingQueue(SCM flag)
+{
+    int old;
+
+    old=EnableTrainingQueue;
+    EnableTrainingQueue=gh_scm2bool(flag);
 
     return gh_bool2scm(old);
 }
@@ -371,6 +386,8 @@ global void UnitCclRegister(void)
 {
     gh_new_procedure1_0("set-hitpoint-regeneration!",
 	    CclSetHitPointRegeneration);
+    gh_new_procedure1_0("set-training-queue!",CclSetTrainingQueue);
+
     gh_new_procedureN("unit",CclUnit);
 
     gh_new_procedure2_0("make-unit",CclMakeUnit);
