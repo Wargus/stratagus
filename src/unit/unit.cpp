@@ -1355,8 +1355,8 @@ global int CheckUnitToBeDrawn(const Unit* unit)
 
 	// FIXME: Inaccurate dimension to take unit's extras into account..
 	//        Should be solved by adding each unit extra as separate decoration
-	x = Map2ScreenX(unit->X) + unit->IX - 10;
-	y = Map2ScreenY(unit->Y) + unit->IY - 10;
+	x = Map2ViewportX(TheUI.SelectedViewport, unit->X) + unit->IX - 10;
+	y = Map2ViewportY(TheUI.SelectedViewport, unit->Y) + unit->IY - 10;
 	w = unit->Type->Width + 20;
 	h = unit->Type->Height + 20;
 

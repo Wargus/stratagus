@@ -125,8 +125,8 @@ extern void DecorationInit(void);
 extern Deco *DecorationAdd( void *data,
 				   void (*drawclip)(void *data),
 				   DecorationLevel l, 
-				   unsigned x, unsigned y,
-				   unsigned w, unsigned h );
+				   int x, int y,
+				   int w, int h );
 extern void DecorationRemove( Deco *d );
 extern void DecorationRemoveLevels( DecorationLevel min, DecorationLevel max );
 
