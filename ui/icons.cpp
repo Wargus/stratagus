@@ -172,7 +172,7 @@ global void InitIcons(void)
     }
 
     //
-    //  Alliases: different names for the same thing
+    //  Aliases: different names for the same thing
     //
     for (i = 0; i < NumIconAliases; ++i) {
 	Icon* id;
@@ -532,6 +532,104 @@ local SCM CclDefineIcon(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineIcon(lua_State* l)
+{
+    const char* value;
+    const char* ident;
+    const char* tileset;
+    const char* filename;
+    int width;
+    int height;
+    int index;
+    int args;
+    int j;
+
+    args = lua_gettop(l);
+    j = 0;
+#ifdef DEBUG
+    index = width = height = 0;
+#endif
+    filename = NULL;
+    tileset = NULL;
+
+    //  Identifier
+
+    if (!lua_isstring(l, j + 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ident = lua_tostring(l, j + 1);
+    ++j;
+
+    //
+    //  Parse the arguments, tagged format.
+    //
+    for (; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+
+	if (!strcmp(value, "tileset")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    tileset = lua_tostring(l, j + 1);
+	} else if (!strcmp(value, "size")) {
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    width = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    height = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "normal")) {
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    index = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    filename = lua_tostring(l, -1);
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+
+    DebugCheck(!filename || !width || !height);
+
+    AddIcon(ident, tileset, index, width, height, filename);
+
+    return 0;
+}
+#endif
 
 /**
 **	@brief Parse icon alias definition.
@@ -542,6 +640,7 @@ local SCM CclDefineIcon(SCM list)
 **	@param alias	Icon alias name.
 **	@param icon	Original icon.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineIconAlias(SCM alias, SCM icon)
 {
     IconAliases = realloc(IconAliases, sizeof(char*) * 2 * (NumIconAliases + 1));
@@ -552,6 +651,19 @@ local SCM CclDefineIconAlias(SCM alias, SCM icon)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineIconAlias(lua_State* l)
+{
+    if (lua_gettop(l) != 2 || !lua_isstring(l, 1) || !lua_isstring(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    IconAliases = realloc(IconAliases, sizeof(char*) * 2 * (NumIconAliases + 1));
+    IconAliases[NumIconAliases * 2 + 0] = strdup(lua_tostring(l, 1));
+    IconAliases[NumIconAliases * 2 + 1] = strdup(lua_tostring(l, 2));
+    ++NumIconAliases;
+
+    return 0;
+}
 #endif
 
 /**
@@ -637,6 +749,16 @@ local SCM CclSetIconSize(SCM width, SCM height)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclSetIconSize(lua_State* l)
+{
+    if (lua_gettop(l) != 2 || !lua_isnumber(l, 1) || !lua_isnumber(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    IconWidth = lua_tonumber(l, 1);
+    IconHeight = lua_tonumber(l, 2);
+    return 0;
+}
 #endif
 
 /**
@@ -656,13 +778,13 @@ global void IconCclRegister(void)
     // FIXME: can be removed:
     gh_new_procedure2_0("set-icon-size!", CclSetIconSize);
 #elif defined(USE_LUA)
-//    lua_register(Lua, "DefineIcon", CclDefineIcon);
-//    lua_register(Lua, "DefineIconAlias", CclDefineIconAlias);
+    lua_register(Lua, "DefineIcon", CclDefineIcon);
+    lua_register(Lua, "DefineIconAlias", CclDefineIconAlias);
 
     lua_register(Lua, "DefineIconWcNames", CclDefineIconWcNames);
 
     // FIXME: can be removed:
-//    lua_register(Lua, "SetIconSize", CclSetIconSize);
+    lua_register(Lua, "SetIconSize", CclSetIconSize);
 #endif
 }
 
