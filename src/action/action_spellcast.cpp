@@ -74,7 +74,7 @@ global int AnimateActionSpellCast(Unit* unit)
 **
 **	@param unit	Unit, for that the spell cast is handled.
 */
-local void MoveToTarget(Unit* unit)
+local void SpellMoveToTarget(Unit* unit)
 {
 	Unit* goal;
 	int err;
@@ -128,7 +128,7 @@ global void HandleActionSpellCast(Unit* unit)
     switch( unit->SubAction ) {
 	
 	case 0: // Move to the target.
-	    MoveToTarget(unit);
+	    SpellMoveToTarget(unit);
 	    break;
 
 	case 1: // Cast spell on the target.
