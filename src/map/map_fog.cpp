@@ -404,11 +404,7 @@ global void MapUpdateVisible(void)
 	    //  This is not a big deal as far as only mines are
 	    //  concerned, but for more units (like parasited ones
 	    //  in *craft), maybe we should create a dedicated queue...
-#ifdef NEW_ORDERS
 	    if( unit->Orders[0].Action==UnitActionMineGold ) {
-#else
-	    if( unit->Command.Action==UnitActionMineGold ) {
-#endif
 	        mine=GoldMineOnMap(unit->X,unit->Y);
 		if( mine ) {  // Somtimes, the peon is at home :).
 #ifdef NEW_FOW

@@ -850,18 +850,11 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 
     x=unit->X;
     y=unit->Y;
-#ifdef NEW_ORDERS
     goal=unit->Orders[0].Goal;
     gx=unit->Orders[0].X;
     gy=unit->Orders[0].Y;
     rx=unit->Orders[0].RangeX;
     ry=unit->Orders[0].RangeY;
-#else
-    goal=unit->Command.Data.Move.Goal;
-    gx=unit->Command.Data.Move.DX;
-    gy=unit->Command.Data.Move.DY;
-    rx=ry=unit->Command.Data.Move.Range;
-#endif
 
     DebugLevel3Fn("%Zd: -> %s %p | %dx%d+%d+%d\n"
 	,UnitNumber(unit),unit->Command.Data.Move.Fast ? "F" : "C"
@@ -873,17 +866,10 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     //	A new path should always have the fast flag set.
     //
     if( unit->Goal!=goal || unit->GoalX!=gx || unit->GoalY!=gy ) {
-#ifdef NEW_ORDERS
 	if( !unit->Data.Move.Fast ) {
 	    DebugLevel0Fn("ResetPath missing\n");
 	    abort();
 	}
-#else
-	if( !unit->Command.Data.Move.Fast ) {
-	    DebugLevel0Fn("ResetPath missing\n");
-	    abort();
-	}
-#endif
 	unit->Goal=goal;
 	unit->GoalX=gx;
 	unit->GoalY=gy;
@@ -924,33 +910,21 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 		*xdp=*ydp=0;
 		return PF_UNREACHABLE;
 	    }
-#ifdef NEW_ORDERS
 	    unit->Data.Move.Fast=1;	// this could be handled fast
-#else
-	    unit->Command.Data.Move.Fast=1;	// this could be handled fast
-#endif
 	}
     }
 
     //
     //	If possible, try fast.
     //
-#ifdef NEW_ORDERS
-    if( 0 && unit->Data.Move.Fast ) {
-#else
-    if( 0 && unit->Command.Data.Move.Fast ) {
-#endif
+    if( unit->Data.Move.Fast ) {
 	if( (i=FastNewPath(unit,gx,gy,rx,ry,xdp,ydp))>=-1 ) {
 	    // Fast works
 	    DebugCheck( *xdp==0 && *ydp==0 );
 	    return i;
 	}
 	DebugLevel3Fn("Fallback to slow method\n");
-#ifdef NEW_ORDERS
 	unit->Data.Move.Fast=0;
-#else
-	unit->Command.Data.Move.Fast=0;
-#endif
     }
 
     //

@@ -737,15 +737,9 @@ global int SpellCast( const SpellType* spell, Unit* unit, Unit* target,
 
 	   for( i=0; i<NumUnits; ++i ) {
 	       // FIXME: this tries to draw all corps, ohje
-#ifdef NEW_ORDERS
 	       if( (Units[i]->Type->Vanishes
-		    || Units[i]->Orders[0].Action==UnitActionDie)
-		      && Units[i]->X == x && Units[i]->Y == y ) {
-#else
-	       if( (Units[i]->Type->Vanishes
-		    || Units[i]->Command.Action==UnitActionDie)
-		      && Units[i]->X == x && Units[i]->Y == y ) {
-#endif
+			|| Units[i]->Orders[0].Action==UnitActionDie)
+			      && Units[i]->X == x && Units[i]->Y == y ) {
 		   //FIXME: URGENT: remove corpse
 		   //RemoveUnit( Units[i] );
 		   //UnitLost( Units[i] );
