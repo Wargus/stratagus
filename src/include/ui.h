@@ -69,35 +69,54 @@ struct _button_ {
 
 #ifdef SPLIT_SCREEN_SUPPORT
 
-#define MAX_NUM_VIEWPORTS 4
+#define MAX_NUM_VIEWPORTS 4		/// Number of supported viewports
 
-typedef struct _viewport_ Viewport;
+typedef struct _viewport_ Viewport;	/// Viewport typedef
 
+/**
+**	A map viewport.
+**
+**	A part of the map displayed on sceen.
+**
+**	Viewport::X Viewport::Y
+**	Viewport::EndX Viewport::EndY
+**
+**		upper left corner of this viewport is located at pixel
+**		coordinates (X, Y) with respect to upper left corner of
+**		freecraft's window, similarly lower right corner of this
+**		viewport is (EndX, EndY) pixels away from the UL corner of
+**		freecraft's window.
+**
+**	Viewport::MapX Viewport::MapY
+**	Viewport::MapWidth Viewport::MapHeight
+**
+**		Tile coordinates of UL corner of this viewport with respect to
+**		UL corner of the whole map.
+**
+**	@todo mixing unsigned and int is dangerous!!!
+*/
 struct _viewport_ {
-    /* upper left corner of this viewport is located at pixel coordinates
-     * (X, Y) with respect to upper left corner of freecraft's window,
-     * similarly lower right corner of this viewport is (EndX, EndY)
-     * pixels away from the UL corner of freecraft's window. */
-    int X;
-    int Y;
-    unsigned EndX;
-    unsigned EndY;
+    int X;			/// Screen pixel left corner x coordinate
+    int Y;			/// Screen pixel upper corner y coordinate
+    unsigned EndX;		/// Screen pixel right x coordinate
+    unsigned EndY;		/// Screen pixel bottom y coordinate
 
-    /* tile coordinates of UL corner of this viewport with respect to UL
-     * corner of the whole map. */
-    unsigned MapX;
-    unsigned MapY;
-    unsigned MapWidth;
-    unsigned MapHeight;
+    unsigned MapX;		/// Map tile left corner x coordinate
+    unsigned MapY;		/// Map tile upper corner y coordinate
+    unsigned MapWidth;		/// Width in map tiles
+    unsigned MapHeight;		/// Height in map tiles
 };
 
+/**
+**	Enumeration of the different predefined viewport configurations.
+*/
 typedef enum {
-    VIEWPORT_SINGLE,
-    VIEWPORT_SPLIT_HORIZ,
-    VIEWPORT_SPLIT_HORIZ3,
-    VIEWPORT_SPLIT_VERT,
-    VIEWPORT_QUAD,
-    NUM_VIEWPORT_MODES
+    VIEWPORT_SINGLE,		/// Old single viewport
+    VIEWPORT_SPLIT_HORIZ,	/// Two viewports split horizontal
+    VIEWPORT_SPLIT_HORIZ3,	/// Three viewports split horiontal
+    VIEWPORT_SPLIT_VERT,	/// Two viewports split vertical
+    VIEWPORT_QUAD,		/// Four viewports split symmetric
+    NUM_VIEWPORT_MODES		/// Number of different viewports.
 } ViewportMode;
 
 #endif /* SPLIT_SCREEN_SUPPORT */
@@ -147,7 +166,7 @@ typedef struct _ui_ {
 	int	IconH;			/// icon H position
 	int	TextX;			/// text X position
 	int	TextY;			/// text Y position
-    }		Resources[MaxCosts];
+    }		Resources[MaxCosts];	/// Icon+Text of all resources
 
     GraphicConfig FoodIcon;		/// units icon image
     int		FoodIconRow;		/// units icon image row (frame)
@@ -187,12 +206,12 @@ typedef struct _ui_ {
     int		ButtonPanelY;		/// Button panel screen Y position
 
 #ifdef SPLIT_SCREEN_SUPPORT
-    ViewportMode	ViewportMode;
-    int 	ActiveViewport;		/// contains (or last contained) pointer
+    ViewportMode	ViewportMode;	/// Current viewport mode
+    int		ActiveViewport;		/// Contains (or last contained) pointer
 					/// (index into VP[])
-    int		LastClickedVP;
+    int		LastClickedVP;		/// FIXME: Docu
     int		NumViewports;		/// viewports currently used
-    Viewport	VP[MAX_NUM_VIEWPORTS];
+    Viewport	VP[MAX_NUM_VIEWPORTS];	/// FIXME: Docu
     /* Map* attributes of Viewport are unused here */
     Viewport	MapArea;		/// geometry of the whole map area
 #else /* SPLIT_SCREEN_SUPPORT */
@@ -220,9 +239,9 @@ typedef struct _ui_ {
     int		StatusLineX;		/// status line screeen X position
     int		StatusLineY;		/// status line screeen Y position
 
-    /// all buttons (1 Menu, 9 Group, 9 Command)
+	/// all buttons (1 Menu, 9 Group, 9 Command)
     Button	Buttons[MaxButtons];
-    /// used for displaying unit training queues
+	/// used for displaying unit training queues
     Button	Buttons2[6];
 
     //
@@ -291,10 +310,14 @@ extern void UIHandleButtonUp(unsigned button);
 
 #ifdef SPLIT_SCREEN_SUPPORT
 
-extern int GetViewport (int , int );
-extern int MapTileGetViewport (int , int );
-extern void CycleViewportMode (int );
-extern void SetViewportMode (void);
+    /// FIXME: Short one line docu
+extern int GetViewport(int, int);
+    /// FIXME: Short one line docu
+extern int MapTileGetViewport(int, int);
+    /// FIXME: Short one line docu
+extern void CycleViewportMode(int);
+    /// FIXME: Short one line docu
+extern void SetViewportMode(void);
 
 #endif /* SPLIT_SCREEN_SUPPORT */
 
