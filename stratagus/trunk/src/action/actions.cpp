@@ -135,6 +135,8 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 
 			case NewAnimationRotate:
 				break;
+			case NewAnimationRandomRotate:
+				break;
 
 			case NewAnimationMove:
 				Assert(!move);
