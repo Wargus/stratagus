@@ -60,11 +60,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-/**
-**  Unit-type type definition
-*/
-const char UnitTypeType[] = "unit-type";
-
 #ifdef DEBUG
 int NoWarningUnitType;  ///< quiet ident lookup
 #endif
