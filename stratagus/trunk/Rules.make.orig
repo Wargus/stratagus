@@ -189,14 +189,13 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## There are some still not well tested code parts or branches.
 ## UNIT_ON_MAP:		Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code
-## NEW_NAMES:		New unit names without copyleft problems
 ## NEW_AI:		New better improved AI code
 ## This aren't working:
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
 ## NEW_NETMENUS:	Include new network menues.
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -DNEW_NAMES # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS -DNEW_NETMENUS
+	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS -DNEW_NETMENUS
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
