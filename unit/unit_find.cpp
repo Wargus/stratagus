@@ -69,8 +69,6 @@
 /*----------------------------------------------------------------------------
 --	Local Data
 ----------------------------------------------------------------------------*/
-//FIXME: mr-russ  Really bad hack to improve UnitsInDistance calculation
-local Unit* localunit;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -456,33 +454,6 @@ global Unit* ResourceDepositOnMap(int tx, int ty, int resource)
     return NoUnitP;
 }
 
-/**
-**	Compare distance from me to a unit
-**
-**	@param v1	item to compare
-**	@param v2	item to compare with
-**
-**	@return		which unit should be sorted first
-**
-**/
-local int InDistanceCompare(const void* v1, const void* v2)
-{
-    int unit1dist;
-    int unit2dist;
-
-    unit1dist = MapDistanceBetweenUnits(*(Unit**)v1, localunit);
-    unit2dist = MapDistanceBetweenUnits(*(Unit**)v2, localunit);
-
-    if (unit1dist < unit2dist) {
-	return -1;
-    } else if (unit1dist > unit2dist) {
-	return 1;
-    } else {
-	return (*(Unit**)v1)->Slot - (*(Unit**)v2)->Slot;
-    }
-    
-}
-			
 /*----------------------------------------------------------------------------
 --	Finding units for attack
 ----------------------------------------------------------------------------*/
@@ -562,9 +533,6 @@ local Unit* FindRangeAttack(Unit* u, int range)
     }
 
     enemy_count = 0;
-    // FIXME: (mr-russ) Breaks all good coding rules...
-    localunit = u;
-    qsort((void*)table, n, sizeof(Unit*), InDistanceCompare);
     // FILL good/bad...
     for (i = 0; i < n; ++i) {
 	dest = table[i];
@@ -657,7 +625,7 @@ local Unit* FindRangeAttack(Unit* u, int range)
 	    }
      	    d = MapDistanceBetweenUnits(u, dest);
 
-	    if (d <= range && UnitReachable(u, dest, attackrange)) {
+	    if (d <= attackrange || (d <= range && UnitReachable(u, dest, attackrange))) {
 		++enemy_count;
 	    } else {
 	    	table[i] = 0;
@@ -784,7 +752,6 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
     int attackrange;
     int cost;
     int best_cost;
-    int tried_units;
     const Player* player;
     Unit* best_unit;
 
@@ -807,7 +774,6 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 
     best_unit = NoUnitP;
     best_cost = INT_MAX;
-    tried_units = 0;
 
     player = unit->Player;
     attackrange = unit->Stats->AttackRange;
@@ -816,9 +782,6 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
     //	Find the best unit to attack
     //
 
-    // FIXME: (mr-russ) Breaks all good coding rules...
-    localunit = unit;
-    qsort((void*)table, n, sizeof(Unit*), InDistanceCompare);
     for (i = 0; i < n; ++i) {
 	dest = table[i];
 	//
@@ -879,15 +842,8 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 	//
 	//	Take this target?
 	//
-	// If we failed 5 closest units, we probably can't get anything
-	if (tried_units >= 5 && best_cost == INT_MAX) {
-	    best_unit = NULL;
-	    break;
-	}
-	if (cost < best_cost && d > attackrange &&
-		!UnitReachable(unit, dest, attackrange)) {
-	    ++tried_units;
-	} else {
+	if (cost < best_cost && (d < attackrange ||
+		UnitReachable(unit, dest, attackrange))) {
 	    best_unit = dest;
 	    best_cost = cost;
 	}

@@ -3172,7 +3172,7 @@ global int MapDistanceToUnit(int x,int y,const Unit* dest)
  **
  **	@return		The distance between in tiles.
  */
-global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
+global int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
 {
     int dx;
     int dy;
@@ -3539,9 +3539,9 @@ global void SaveUnit(const Unit* unit,CLFile* file)
     // SEE unit loading code.
     if( unit->Container && unit->Removed ) {
 	CLprintf(file," 'host-info '(%d %d %d %d) ",
-	    unit->Next->X,unit->Next->Y,
-	    unit->Next->Type->TileWidth,
-	    unit->Next->Type->TileHeight);
+	    unit->Container->X,unit->Container->Y,
+	    unit->Container->Type->TileWidth,
+	    unit->Container->Type->TileHeight);
     }
     CLprintf(file," 'visible \"");
     for( i=0; i<PlayerMax; ++i ) {
