@@ -35,15 +35,13 @@
 #include <string.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
 #include "interface.h"
-#include "tileset.h"
 #include "map.h"
+
+#include "ccl.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -557,6 +555,13 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 */
 global void InitSelections(void)
 {
+    int i;
+
+    if( (i=NumSelected) ) {		// Cleanup after load
+	while( i-- ) {
+	    Selected[i]=UnitSlots[(int)Selected[i]];
+	}
+    }
 }
 
 /**
@@ -572,8 +577,8 @@ global void SaveSelections(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: selection $Id$\n\n");
 
-    fprintf(file,";;(group-id %d)\n",GroupId);
-    fprintf(file,";;(selection %d '(",NumSelected);
+    fprintf(file,"(set-group-id! %d)\n",GroupId);
+    fprintf(file,"(selection %d '(",NumSelected);
     for( i=0; i<NumSelected; ++i ) {
 	ref=UnitReference(Selected[i]);
 	fprintf(file,"%s ",ref);
@@ -589,6 +594,57 @@ global void CleanSelections(void)
 {
     NumSelected=0;
     memset(Selected,0,sizeof(Selected));
+}
+
+// ----------------------------------------------------------------------------
+
+/**
+**	Set the current group id. (Needed for load/save)
+**
+**	@param id	New group identifier
+**	@return		old value
+*/
+local SCM CclSetGroupId(SCM id)
+{
+    SCM old;
+
+    old=gh_int2scm(GroupId);
+    GroupId=gh_scm2int(id);
+
+    return old;
+}
+
+/**
+**	Define the current selection.
+**
+**	@param num	Number of units in selection
+**	@param units	Units in selection
+*/
+local SCM CclSelection(SCM num,SCM units)
+{
+    int i;
+
+    NumSelected=gh_scm2int(num);
+    i=0;
+    while( !gh_null_p(units) ) {
+	char* str;
+
+	str=gh_scm2newstr(gh_car(units),NULL);
+	Selected[i++]=(Unit*)strtol(str+1,NULL,16);
+	free(str);
+	units=gh_cdr(units);
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Register CCL features for selections.
+*/
+global void SelectionCclRegister(void)
+{
+    gh_new_procedure1_0("set-group-id!",CclSetGroupId);
+    gh_new_procedure2_0("selection",CclSelection);
 }
 
 //@}
