@@ -134,12 +134,13 @@ global void LoadConstructions(void)
 }
 
 /**
-**		Save state of constructions to file.
+**  Save state of constructions to file.
 **
-**		@param file		Output file.
+**  @param file  Output file.
 */
 global void SaveConstructions(CLFile* file)
 {
+#if 0
 	int j;
 	int i;
 	char** cp;
@@ -152,7 +153,7 @@ global void SaveConstructions(CLFile* file)
 	// FIXME: needed?
 
 	//
-	//		Dump table wc2 construction numbers -> internal symbol.
+	//  Dump table wc2 construction numbers -> internal symbol.
 	//
 	if ((cp = ConstructionWcNames)) {
 		CLprintf(file, "(define-construction-wc-names");
@@ -168,7 +169,7 @@ global void SaveConstructions(CLFile* file)
 	}
 
 	//
-	//		Dump table of all constructions
+	//  Dump table of all constructions
 	//
 	if ((cop = Constructions)) {
 		while (*cop) {
@@ -215,6 +216,7 @@ global void SaveConstructions(CLFile* file)
 			++cop;
 		}
 	}
+#endif
 }
 
 /**

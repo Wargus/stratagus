@@ -629,31 +629,32 @@ local void SaveUi(CLFile* file, const UI* ui)
 }
 
 /**
-**		Save the viewports.
+**  Save the viewports.
 **
-**		@param file		Save file handle
-**		@param ui		User interface to save
+**  @param file  Save file handle
+**  @param ui    User interface to save
 */
-local void SaveViewports(CLFile* file,const UI* ui)
+local void SaveViewports(CLFile* file, const UI* ui)
 {
 	int i;
 	const Viewport* vp;
 
-	CLprintf(file, "(define-viewports 'mode %d", ui->ViewportMode);
+	CLprintf(file, "DefineViewports(\"mode\", %d", ui->ViewportMode);
 	for (i = 0; i < ui->NumViewports; ++i) {
 		vp = &ui->Viewports[i];
-		CLprintf(file, "\n  'viewport '(%d %d)", vp->MapX, vp->MapY);
+		CLprintf(file, ",\n  \"viewport\", {%d, %d}", vp->MapX, vp->MapY);
 	}
 	CLprintf(file, ")\n\n");
 }
 
 /**
-**		Save the user interface module.
+**  Save the user interface module.
 **
-**		@param file		Save file handle
+**  @param file  Save file handle
 */
 global void SaveUserInterface(CLFile* file)
 {
+#if 0
 	int i;
 
 	CLprintf(file, "\n;;; -----------------------------------------\n");
@@ -675,6 +676,7 @@ global void SaveUserInterface(CLFile* file)
 	for (i = 0; UI_Table[i]; ++i) {
 		SaveUi(file, UI_Table[i]);
 	}
+#endif
 
 	SaveViewports(file, &TheUI);
 }

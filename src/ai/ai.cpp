@@ -678,13 +678,14 @@ local void SaveAiPlayers(CLFile* file)
 */
 global void SaveAi(CLFile* file)
 {
-	CLprintf(file, "\n;;; -----------------------------------------\n");
+	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file,
-		";;; MODULE: AI $Id$\n\n");
-
+		"--- MODULE: AI $Id$\n\n");
+#if 0
 	SaveAiTypesWcName(file);
 	SaveAiHelper(file);
 	SaveAiTypes(file);
+#endif
 	SaveAiPlayers(file);
 
 	DebugLevel0Fn("FIXME: Saving AI isn't supported\n");
@@ -959,7 +960,7 @@ local int AiRemoveFromBuilded2(PlayerAi* pai, const UnitType* type)
 local void AiRemoveFromBuilded(PlayerAi* pai, const UnitType* type)
 {
 	int i;
-	int equivalents[UnitTypeMax+1];
+	int equivalents[UnitTypeMax + 1];
 	int equivalentsCount;
 
 	if (AiRemoveFromBuilded2(pai, type)) {

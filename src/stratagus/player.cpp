@@ -391,9 +391,7 @@ global void SavePlayers(CLFile* file)
 			}
 			CLprintf(file, "%d,", Players[i].UpgradeTimers.Upgrades[j]);
 		}
-		CLprintf(file, "},");
-
-		CLprintf(file, ")\n\n");
+		CLprintf(file, "})\n\n");
 	}
 
 	DebugLevel0Fn("FIXME: must save unit-stats?\n");

@@ -78,9 +78,9 @@ global void InitGroups(void)
 }
 
 /**
-**		Save groups.
+**  Save groups.
 **
-**		@param file		Output file.
+**  @param file  Output file.
 */
 global void SaveGroups(CLFile* file)
 {
@@ -88,17 +88,17 @@ global void SaveGroups(CLFile* file)
 	int g;
 	char* ref;
 
-	CLprintf(file, "\n;;; -----------------------------------------\n");
-	CLprintf(file, ";;; MODULE: groups $Id$\n\n");
+	CLprintf(file, "\n--- -----------------------------------------\n");
+	CLprintf(file, "--- MODULE: groups $Id$\n\n");
 
 	for (g = 0; g < NUM_GROUPS; ++g) {
-		CLprintf(file, "(group %d %d '(", g, Groups[g].NumUnits);
+		CLprintf(file, "Group(%d, %d, {", g, Groups[g].NumUnits);
 		for (i = 0; i < Groups[g].NumUnits; ++i) {
 			ref = UnitReference(Groups[g].Units[i]);
-			CLprintf(file, "%s ", ref);
+			CLprintf(file, "\"%s\", ", ref);
 			free(ref);
 		}
-		CLprintf(file, "))\n");
+		CLprintf(file, "})\n");
 	}
 }
 

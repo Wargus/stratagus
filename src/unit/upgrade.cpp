@@ -116,7 +116,7 @@ local Upgrade* AddUpgrade(const char* ident, const char* icon,
 	}
 	//  Fill upgrade structure
 
-	if ((tmp = (Upgrade **)hash_find(UpgradeHash, (char*)ident)) && *tmp) {
+	if ((tmp = (Upgrade**)hash_find(UpgradeHash, (char*)ident)) && *tmp) {
 		DebugLevel0Fn("Already defined upgrade `%s'\n" _C_ ident);
 		upgrade = *tmp;
 		free(upgrade->Icon.Name);
@@ -124,7 +124,7 @@ local Upgrade* AddUpgrade(const char* ident, const char* icon,
 		upgrade = Upgrades + NumUpgrades++;
 		upgrade->OType = UpgradeType;
 		upgrade->Ident = strdup(ident);
-		*(Upgrade **)hash_add(UpgradeHash, upgrade->Ident) = upgrade;
+		*(Upgrade**)hash_add(UpgradeHash, upgrade->Ident) = upgrade;
 	}
 
 	if (icon) {
@@ -533,34 +533,19 @@ global void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 }
 
 /**
-**		save state of the dependencies to file.
+**  Save state of the dependencies to file.
 **
-**		@param file		Output file.
+**  @param file  Output file.
 */
 global void SaveUpgrades(CLFile* file)
 {
 	int i;
-	int j;
 	int p;
+#if 0
+	int j;
 
 	CLprintf(file, "\n;;; -----------------------------------------\n");
 	CLprintf(file, ";;; MODULE: upgrades $Id$\n\n");
-
-	/* remove?
-	//
-	//		Save all upgrades
-	//
-	for (i = 0; i < NumUpgrades; ++i) {
-		CLprintf(file, "(define-upgrade '%s 'icon '%s\n",
-			Upgrades[i].Ident, Upgrades[i].Icon.Name);
-		CLprintf(file, "  'costs #(");
-		for (j = 0; j < MaxCosts; ++j) {
-			CLprintf(file, " %5d", Upgrades[i].Costs[j]);
-		}
-		CLprintf(file, "))\n");
-	}
-	CLprintf(file, "\n");
-	*/
 
 	//
 	//		Save all upgrades
@@ -652,47 +637,31 @@ global void SaveUpgrades(CLFile* file)
 
 		CLprintf(file, ")\n\n");
 	}
-
+#endif
 	//
-	//		Save the allow
+	//  Save the allow
 	//
 	for (i = 0; i < NumUnitTypes; ++i) {
-		CLprintf(file, "(define-unit-allow '%s\t", UnitTypes[i]->Ident);
-		if (strlen(UnitTypes[i]->Ident) < 9) {
-			CLprintf(file, "\t\t\t");
-		} else if (strlen(UnitTypes[i]->Ident) < 17) {
-			CLprintf(file, "\t\t");
-		} else if (strlen(UnitTypes[i]->Ident) < 25) {
-			CLprintf(file, "\t");
-		} else {
-			CLprintf(file, "");
-		}
+		CLprintf(file, "DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident);
 		for (p = 0; p < PlayerMax; ++p) {
-			CLprintf(file, "%d ", Players[p].Allow.Units[i]);
+			if (p) {
+				CLprintf(file, ", ");
+			}
+			CLprintf(file, "%d", Players[p].Allow.Units[i]);
 		}
 		CLprintf(file, ")\n");
 	}
 	CLprintf(file, "\n");
 
 	//
-	//		Save the upgrades
+	//  Save the upgrades
 	//
 	for (i = 0; i < NumUpgrades; ++i) {
-		CLprintf(file, "(define-allow '%s\t", Upgrades[i].Ident);
-		if (strlen(Upgrades[i].Ident) < 9) {
-			CLprintf(file, "\t\t\t\"");
-		} else if (strlen(Upgrades[i].Ident) < 17) {
-			CLprintf(file, "\t\t\"");
-		} else if (strlen(Upgrades[i].Ident) < 25) {
-			CLprintf(file, "\t\"");
-		} else {
-			CLprintf(file, "\"");
-		}
+		CLprintf(file, "DefineAllow(\"%s\", \"", Upgrades[i].Ident);
 		for (p = 0; p < PlayerMax; ++p) {
 			CLprintf(file, "%c", Players[p].Allow.Upgrades[i]);
 		}
-		CLprintf(file, "\"");
-		CLprintf(file, ")\n");
+		CLprintf(file, "\")\n");
 	}
 }
 

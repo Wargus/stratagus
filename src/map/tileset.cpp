@@ -741,6 +741,7 @@ local void SaveTileset(CLFile* file, const Tileset* tileset)
 */
 global void SaveTilesets(CLFile* file)
 {
+#if 0
 	int i;
 	char** sp;
 
@@ -763,6 +764,7 @@ global void SaveTilesets(CLFile* file)
 	for (i = 0; i < NumTilesets; ++i) {
 		SaveTileset(file, Tilesets[i]);
 	}
+#endif
 }
 
 /**

@@ -927,6 +927,7 @@ void SaveSpellAutoCast(CLFile* file, AutoCastInfo* autocast)
 */
 global void SaveSpells(CLFile* file)
 {
+#if 0
 	SpellType* spell;
 	SpellActionType* act;
 
@@ -973,12 +974,12 @@ global void SaveSpells(CLFile* file)
 		//  Save the action(effect of the spell)
 		//
 		CLprintf(file, "	'action '(\n");
-		act=spell->Action;
+		act = spell->Action;
 		while (act) {
 			CLprintf(file,"		");
 			SaveSpellAction(file, act);
 			CLprintf(file,"\n");
-			act=act->Next;
+			act = act->Next;
 		}
 		CLprintf(file, ")\n");
 		//
@@ -1007,6 +1008,7 @@ global void SaveSpells(CLFile* file)
 		}
 		CLprintf(file, ")\n");
 	}
+#endif
 }
 
 //@}

@@ -1109,51 +1109,47 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 }
 
 /**
-**		Save state of an unit-stats to file.
+**  Save state of an unit-stats to file.
 **
-**		@param stats		Unit-stats to save.
-**		@param ident		Unit-type ident.
-**		@param plynr		Player number.
-**		@param file		Output file.
+**  @param stats  Unit-stats to save.
+**  @param ident  Unit-type ident.
+**  @param plynr  Player number.
+**  @param file   Output file.
 */
-local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
+local void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 	CLFile* file)
 {
 	int j;
 
 	DebugCheck(plynr >= PlayerMax);
-	CLprintf(file, "(define-unit-stats '%s %d\n  ", ident, plynr);
-	CLprintf(file, "'level %d ", stats->Level);
-	CLprintf(file, "'speed %d ", stats->Speed);
-	CLprintf(file, "'attack-range %d ", stats->AttackRange);
-	CLprintf(file, "'sight-range %d\n  ", stats->SightRange);
-	CLprintf(file, "'armor %d ", stats->Armor);
-	CLprintf(file, "'basic-damage %d ", stats->BasicDamage);
-	CLprintf(file, "'piercing-damage %d ", stats->PiercingDamage);
-	CLprintf(file, "'hit-points %d\n  ", stats->HitPoints);
-	CLprintf(file, "  'regeneration-rate %d\n", stats->RegenerationRate);
-	CLprintf(file, "'costs '(");
+	CLprintf(file, "DefineUnitStats(\"%s\", %d,\n  ", ident, plynr);
+	CLprintf(file, "\"level\", %d, ", stats->Level);
+	CLprintf(file, "\"speed\", %d, ", stats->Speed);
+	CLprintf(file, "\"attack-range\", %d, ", stats->AttackRange);
+	CLprintf(file, "\"sight-range\", %d,\n  ", stats->SightRange);
+	CLprintf(file, "\"armor\", %d, ", stats->Armor);
+	CLprintf(file, "\"basic-damage\", %d, ", stats->BasicDamage);
+	CLprintf(file, "\"piercing-damage\", %d, ", stats->PiercingDamage);
+	CLprintf(file, "\"hit-points\", %d,\n  ", stats->HitPoints);
+	CLprintf(file, "\"regeneration-rate\", %d,\n  ", stats->RegenerationRate);
+	CLprintf(file, "\"costs\", {");
 	for (j = 0; j < MaxCosts; ++j) {
 		if (j) {
-//			if (j == MaxCosts / 2) {
-//				fputs("\n	", file);
-//			} else {
-				CLprintf(file, " ");
-//			}
+			CLprintf(file, " ");
 		}
-		CLprintf(file, "%s %d", DefaultResourceNames[j], stats->Costs[j]);
+		CLprintf(file, "\"%s\", %d,", DefaultResourceNames[j], stats->Costs[j]);
 	}
-
-	CLprintf(file, ") )\n");
+	CLprintf(file, "})\n");
 }
 
- /**
-**		Save declaration of user defined flags.
+/**
+**  Save declaration of user defined flags.
 **
-**		@param file		Output file.
+**  @param file  Output file.
 */
 global void SaveFlags(CLFile* file)
 {
+#if 0
 	int i;
 
 	if (NumberBoolFlag != 0) {
@@ -1163,15 +1159,17 @@ global void SaveFlags(CLFile* file)
 		}
 		CLprintf(file, ")\n");
 	}
+#endif
 }
 
 /**
-** 		Save the names of all unit types, before actually defining anything about them.
+**  Save the names of all unit types, before actually defining anything about them.
 **
-**		@param file		Output file.
+**  @param file  Output file.
 */
 global void SaveUnitTypeDefs(CLFile* file)
 {
+#if 0
 	int i;
 
 	CLprintf(file, "\n;;; Declare all unit types in advance.\n");
@@ -1180,23 +1178,24 @@ global void SaveUnitTypeDefs(CLFile* file)
 		CLprintf(file, "(define-unit-type '%s)\n", UnitTypes[i]->Ident);
 	}
 	CLprintf(file, "\n");
+#endif
 }
 
 /**
-**		Save state of the unit-type table to file.
+**  Save state of the unit-type table to file.
 **
-**		@param file		Output file.
+**  @param file  Output file.
 */
 global void SaveUnitTypes(CLFile* file)
 {
 	int i;
 	int j;
-	char** sp;
+//	char** sp;
 
-	CLprintf(file, "\n;;; -----------------------------------------\n");
-	CLprintf(file, ";;; MODULE: unittypes $Id$\n\n");
-
-	//		Original number to internal unit-type name.
+	CLprintf(file, "\n--- -----------------------------------------\n");
+	CLprintf(file, "--- MODULE: unittypes $Id$\n\n");
+#if 0
+	// Original number to internal unit-type name.
 
 	i = CLprintf(file, "(define-unittype-wc-names");
 	for (sp = UnitTypeWcNames; *sp; ++sp) {
@@ -1207,20 +1206,20 @@ global void SaveUnitTypes(CLFile* file)
 	}
 	CLprintf(file, ")\n");
 
-	//		Save all animations.
+	// Save all animations.
 
 	for (i = 0; i < NumUnitTypes; ++i) {
 		SaveAnimations(UnitTypes[i], file);
 	}
 
-	//		Save all types
+	// Save all types
 
 	for (i = 0; i < NumUnitTypes; ++i) {
 		CLprintf(file, "\n");
 		SaveUnitType(file, UnitTypes[i], 0);
 	}
-
-	//		Save all stats
+#endif
+	// Save all stats
 
 	for (i = 0; i < NumUnitTypes; ++i) {
 		CLprintf(file, "\n");
