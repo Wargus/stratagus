@@ -128,7 +128,7 @@ strip:
 
 src/$(OBJDIR)/stratagusrc.$(OE): src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
-	windres --include-dir contrib -o src/$(OBJDIR)/stratagusrc.$(OE) src/stratagus.rc
+	cd src; windres -o $(OBJDIR)/stratagusrc.$(OE) stratagus.rc; cd ..
 
 echo::
 	@-echo CFLAGS: $(CFLAGS)
