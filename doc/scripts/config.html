@@ -119,6 +119,8 @@
 <a href="#show-mana-vertical">show-mana-vertical</a>
 <a href="#show-no-full">show-no-full</a>
 <a href="#spell-sprite">spell-sprite</a>
+<a href="#set-group-keys">set-group-keys</a>
+
 <hr>
 <h2>Intro - Introduction to config functions and variables</h2>
 
@@ -1529,6 +1531,28 @@ Define spell-sprite.
 <h4>Used</h4>
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+
+<a name="set-group-keys"></a>
+<h3>(set-group-keys "0123456789~")</h3>
+
+Define the key to use for group on non-us keyborads. It should be placed in
+preferences1.ccl, with the key to use for group 0, 1, 2, ... 9, and the key
+to unselect all groups ( on the left of the 1 key )
+
+<dl>
+<dt>keys</dt>
+<dd>the keys to substitute to the 0 1 2 3 4... keys
+</dl>
+
+<h4>Example</h4>
+For french azerty, use :
+<pre>
+	(set-group-keys "à&é\"'(-è_ç²")
+</pre>
+
+<h4>Used</h4>
+
+<a href="../../data/ccl/stratagus.ccl"> ~/.stratagus/preferences1.ccl </a>
 
 <hr>
 Last changed: $Id$<br>
