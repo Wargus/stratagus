@@ -1161,7 +1161,7 @@ local void LoadGameInit(Menuitem *mi)
 /**
 **	Load game exit callback
 */
-local void LoadGameExit(Menuitem *mi)
+local void LoadGameExit(Menuitem *mi __attribute__ ((unused)))
 {
     if( GameLoaded ) {
 	GameMenuReturn();
@@ -1962,7 +1962,7 @@ global void DiplomacyMenu(void)
 /**
 **	Diplomacy init callback
 */
-local void DiplomacyInit(Menuitem *mi)
+local void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
 {
     Menu *menu;
     int i;
@@ -2014,7 +2014,7 @@ local void DiplomacyInit(Menuitem *mi)
 /**
 **	Diplomacy exit callback
 */
-local void DiplomacyExit(Menuitem *mi)
+local void DiplomacyExit(Menuitem *mi __attribute__ ((unused)))
 {
     Menu* menu;
     int i;
