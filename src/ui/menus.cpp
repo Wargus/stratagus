@@ -88,22 +88,22 @@ static void EditorEndMenu(void);
 ----------------------------------------------------------------------------*/
 
 // Game menu
-static void GameMenuInit(Menuitem *mi);
+static void GameMenuInit(Menuitem* mi);
 static void GameOptionsMenu(void);
 static void HelpMenu(void);
 static void ObjectivesMenu(void);
 static void EndScenarioMenu(void);
 
 // Objectives
-static void ObjectivesInit(Menuitem *mi);
-static void ObjectivesExit(Menuitem *mi);
+static void ObjectivesInit(Menuitem* mi);
+static void ObjectivesExit(Menuitem* mi);
 
 // Victory, lost
 static void GameMenuEnd(void);
-static void VictoryInit(Menuitem *mi);
-static void DefeatedInit(Menuitem *mi);
+static void VictoryInit(Menuitem* mi);
+static void DefeatedInit(Menuitem* mi);
 static void SaveReplay(void);
-static void SaveReplayEnterAction(Menuitem *mi, int key);
+static void SaveReplayEnterAction(Menuitem* mi, int key);
 static void SaveReplayOk(void);
 
 // Scenario select
@@ -135,34 +135,34 @@ static void GameMenuExit(void);
 static void SurrenderConfirmMenu(void);
 
 // Global Options
-static void GlobalOptionsInit(Menuitem *mi);
-static void GlobalOptionsExit(Menuitem *mi);
-static void GlobalOptionsResolutionCheckbox(Menuitem *mi);
-static void GlobalOptionsFullscreenCheckbox(Menuitem *mi);
+static void GlobalOptionsInit(Menuitem* mi);
+static void GlobalOptionsExit(Menuitem* mi);
+static void GlobalOptionsResolutionCheckbox(Menuitem* mi);
+static void GlobalOptionsFullscreenCheckbox(Menuitem* mi);
 
 // Tips
-static void TipsInit(Menuitem *mi);
-static void TipsExit(Menuitem *mi);
-static void TipsShowTipsCheckbox(Menuitem *mi);
-static void TipsShowTipsText(Menuitem *mi);
+static void TipsInit(Menuitem* mi);
+static void TipsExit(Menuitem* mi);
+static void TipsShowTipsCheckbox(Menuitem* mi);
+static void TipsShowTipsText(Menuitem* mi);
 static void TipsNextTip(void);
 static void TipsPreviousTip(void);
 
 // Custom game setup
-static void GameSetupInit(Menuitem *mi);
+static void GameSetupInit(Menuitem* mi);
 static void ScenSelectMenu(void);
 static void CustomGameStart(void);
 static void GameCancel(void);
-static void GameDrawFunc(Menuitem *mi);
-static void GameRCSAction(Menuitem *mi, int i);
-static void GameRESAction(Menuitem *mi, int i);
-static void GameUNSAction(Menuitem *mi, int i);
-static void GameTSSAction(Menuitem *mi, int i);
-static void GameGATAction(Menuitem *mi, int i);
-static void CustomGameOPSAction(Menuitem *mi, int i);
+static void GameDrawFunc(Menuitem* mi);
+static void GameRCSAction(Menuitem* mi, int i);
+static void GameRESAction(Menuitem* mi, int i);
+static void GameUNSAction(Menuitem* mi, int i);
+static void GameTSSAction(Menuitem* mi, int i);
+static void GameGATAction(Menuitem* mi, int i);
+static void CustomGameOPSAction(Menuitem* mi, int i);
 
 // Enter name
-static void EnterNameAction(Menuitem *mi, int key);
+static void EnterNameAction(Menuitem* mi, int key);
 static void EnterNameCancel(void);
 
 // Net create join
@@ -175,33 +175,33 @@ static void MultiPlayerLANGame(void);
 static void MultiPlayerInternetGame(void);
 
 // Net multi setup
-static void MultiGameSetupInit(Menuitem *mi);
-static void MultiGameSetupExit(Menuitem *mi);
-static void MultiGameDrawFunc(Menuitem *mi);
+static void MultiGameSetupInit(Menuitem* mi);
+static void MultiGameSetupExit(Menuitem* mi);
+static void MultiGameDrawFunc(Menuitem* mi);
 static void MultiScenSelectMenu(void);
 static void MultiGameStart(void);
 static void MultiGameCancel(void);
-static void MultiGameFWSAction(Menuitem *mi, int i);
+static void MultiGameFWSAction(Menuitem* mi, int i);
 
 // Enter server ip
-static void EnterServerIPAction(Menuitem *mi, int key);
+static void EnterServerIPAction(Menuitem* mi, int key);
 static void EnterServerIPCancel(void);
 
 // Net multi client
 static void TerminateNetConnect(void);
-static void MultiGameClientInit(Menuitem *mi);
-static void MultiGameClientExit(Menuitem *mi);
-static void MultiGameClientDrawFunc(Menuitem *mi);
+static void MultiGameClientInit(Menuitem* mi);
+static void MultiGameClientExit(Menuitem* mi);
+static void MultiGameClientDrawFunc(Menuitem* mi);
 static void MultiClientReady(void);
 static void MultiClientNotReady(void);
 static void MultiClientCancel(void);
-static void MultiClientRCSAction(Menuitem *mi, int i);
-static void MultiClientCheckboxAction(Menuitem *mi);
+static void MultiClientRCSAction(Menuitem* mi, int i);
+static void MultiClientCheckboxAction(Menuitem* mi);
 static void MultiClientUpdate(int initial);
 
 // Net connecting
-static void NetConnectingInit(Menuitem *mi);
-static void NetConnectingExit(Menuitem *mi);
+static void NetConnectingInit(Menuitem* mi);
+static void NetConnectingExit(Menuitem* mi);
 static void NetConnectingCancel(void);
 
 // Campaign select
@@ -217,36 +217,36 @@ static void EndScenarioSurrender(void);
 static void EndScenarioQuitMenu(void);
 
 // Sound options
-static void SoundOptionsInit(Menuitem *mi);
-static void SoundOptionsExit(Menuitem *mi);
-static void MasterVolumeHSAction(Menuitem *mi);
-static void SetMasterPower(Menuitem *mi);
-static void MusicVolumeHSAction(Menuitem *mi);
-static void SetMusicPower(Menuitem *mi);
-static void CdVolumeHSAction(Menuitem *mi);
-static void SetCdPower(Menuitem *mi);
-static void SetCdModeDefined(Menuitem *mi);
-static void SetCdModeRandom(Menuitem *mi);
+static void SoundOptionsInit(Menuitem* mi);
+static void SoundOptionsExit(Menuitem* mi);
+static void MasterVolumeHSAction(Menuitem* mi);
+static void SetMasterPower(Menuitem* mi);
+static void MusicVolumeHSAction(Menuitem* mi);
+static void SetMusicPower(Menuitem* mi);
+static void CdVolumeHSAction(Menuitem* mi);
+static void SetCdPower(Menuitem* mi);
+static void SetCdModeDefined(Menuitem* mi);
+static void SetCdModeRandom(Menuitem* mi);
 
 // Preferences
-static void PreferencesInit(Menuitem *mi);
-static void PreferencesExit(Menuitem *mi);
-static void SetFogOfWar(Menuitem *mi);
-static void SetCommandKey(Menuitem *mi);
+static void PreferencesInit(Menuitem* mi);
+static void PreferencesExit(Menuitem* mi);
+static void SetFogOfWar(Menuitem* mi);
+static void SetCommandKey(Menuitem* mi);
 
 // Speed options
-static void SpeedOptionsInit(Menuitem *mi);
-static void SpeedOptionsExit(Menuitem *mi);
-static void GameSpeedHSAction(Menuitem *mi);
-static void MouseScrollHSAction(Menuitem *mi);
-static void KeyboardScrollHSAction(Menuitem *mi);
+static void SpeedOptionsInit(Menuitem* mi);
+static void SpeedOptionsExit(Menuitem* mi);
+static void GameSpeedHSAction(Menuitem* mi);
+static void MouseScrollHSAction(Menuitem* mi);
+static void KeyboardScrollHSAction(Menuitem* mi);
 
 // Game options
 
 // Diplomacy options
-static void DiplomacyInit(Menuitem *mi);
-static void DiplomacyExit(Menuitem *mi);
-static void DiplomacyWait(Menuitem *mi);
+static void DiplomacyInit(Menuitem* mi);
+static void DiplomacyExit(Menuitem* mi);
+static void DiplomacyWait(Menuitem* mi);
 static void DiplomacyOk(void);
 
 // Help
@@ -258,44 +258,44 @@ static void KeystrokeHelpVSAction(Menuitem* mi);
 static void KeystrokeHelpDrawFunc(Menuitem* mi);
 
 // Save
-static void SaveGameInit(Menuitem *mi);
-static void SaveGameExit(Menuitem *mi);
-static void SaveGameLBInit(Menuitem *mi);
-static void SaveGameLBExit(Menuitem *mi);
-static void SaveGameEnterAction(Menuitem *mi, int key);
-static void SaveGameLBAction(Menuitem *mi, int i);
-static unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i);
-static void SaveGameVSAction(Menuitem *mi);
+static void SaveGameInit(Menuitem* mi);
+static void SaveGameExit(Menuitem* mi);
+static void SaveGameLBInit(Menuitem* mi);
+static void SaveGameLBExit(Menuitem* mi);
+static void SaveGameEnterAction(Menuitem* mi, int key);
+static void SaveGameLBAction(Menuitem* mi, int i);
+static unsigned char *SaveGameLBRetrieve(Menuitem* mi, int i);
+static void SaveGameVSAction(Menuitem* mi);
 static void SaveGameOk(void);
 static void DeleteConfirmMenu(void);
 static int SaveGameRDFilter(char *pathbuf, FileList *fl);
 static void CreateSaveDir(void);
 
 // Load
-static void LoadGameInit(Menuitem *mi);
-static void LoadGameExit(Menuitem *mi);
-static void LoadGameLBInit(Menuitem *mi);
-static void LoadGameLBExit(Menuitem *mi);
-static void LoadGameLBAction(Menuitem *mi, int i);
-static unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i);
-static void LoadGameVSAction(Menuitem *mi);
+static void LoadGameInit(Menuitem* mi);
+static void LoadGameExit(Menuitem* mi);
+static void LoadGameLBInit(Menuitem* mi);
+static void LoadGameLBExit(Menuitem* mi);
+static void LoadGameLBAction(Menuitem* mi, int i);
+static unsigned char *LoadGameLBRetrieve(Menuitem* mi, int i);
+static void LoadGameVSAction(Menuitem* mi);
 static void LoadGameOk(void);
 
 // Confirm save
-static void SaveConfirmInit(Menuitem *mi);
-static void SaveConfirmExit(Menuitem *mi);
+static void SaveConfirmInit(Menuitem* mi);
+static void SaveConfirmExit(Menuitem* mi);
 static void SaveConfirmOk(void);
 static void SaveConfirmCancel(void);
 
 // Confirm delete
-static void DeleteConfirmInit(Menuitem *mi);
-static void DeleteConfirmExit(Menuitem *mi);
+static void DeleteConfirmInit(Menuitem* mi);
+static void DeleteConfirmExit(Menuitem* mi);
 static void DeleteConfirmOk(void);
 static void DeleteConfirmCancel(void);
 
 // Save replay
-static void SaveReplayInit(Menuitem *mi);
-static void SaveReplayExit(Menuitem *mi);
+static void SaveReplayInit(Menuitem* mi);
+static void SaveReplayExit(Menuitem* mi);
 
 // Editor select
 static void EditorNewMap(void);
@@ -303,19 +303,19 @@ static void EditorMainLoadMap(void);
 static void EditorSelectCancel(void);
 
 // Editor new
-static void EditorNewDrawFunc(Menuitem *mi);
-static void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key);
-static void EditorNewMapSizeEnterAction(Menuitem *mi, int key);
+static void EditorNewDrawFunc(Menuitem* mi);
+static void EditorNewMapDescriptionEnterAction(Menuitem* mi, int key);
+static void EditorNewMapSizeEnterAction(Menuitem* mi, int key);
 static void EditorNewOk(void);
 static void EditorNewCancel(void);
 
 // Editor main load map
-static void EditorMainLoadInit(Menuitem *mi);
-static void EditorMainLoadLBInit(Menuitem *mi);
-static void EditorMainLoadLBExit(Menuitem *mi);
-static void EditorMainLoadLBAction(Menuitem *mi, int i);
-static unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i);
-static void EditorMainLoadVSAction(Menuitem *mi);
+static void EditorMainLoadInit(Menuitem* mi);
+static void EditorMainLoadLBInit(Menuitem* mi);
+static void EditorMainLoadLBExit(Menuitem* mi);
+static void EditorMainLoadLBAction(Menuitem* mi, int i);
+static unsigned char *EditorMainLoadLBRetrieve(Menuitem* mi, int i);
+static void EditorMainLoadVSAction(Menuitem* mi);
 static void EditorMainLoadOk(void);
 static void EditorMainLoadCancel(void);
 static void EditorMainLoadFolder(void);
@@ -331,60 +331,60 @@ static void EditorPlayerPropertiesMenu(void);
 static void EditorQuitToMenu(void);
 
 // Editor map properties
-static void EditorMapPropertiesEnterAction(Menuitem *mi, int key);
+static void EditorMapPropertiesEnterAction(Menuitem* mi, int key);
 static void EditorMapPropertiesOk(void);
 
 // Editor player properties
-static void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
-static void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
+static void EditorPlayerPropertiesDrawFunc(Menuitem* mi);
+static void EditorPlayerPropertiesEnterAction(Menuitem* mi, int key);
 
 // Editor edit resource
-static void EditorEditResourceEnterAction(Menuitem *mi,int key);
+static void EditorEditResourceEnterAction(Menuitem* mi,int key);
 static void EditorEditResourceOk(void);
 static void EditorEditResourceCancel(void);
 
 // Editor edit ai properties
-static void EditorEditAiPropertiesCheckbox(Menuitem *mi);
+static void EditorEditAiPropertiesCheckbox(Menuitem* mi);
 static void EditorEditAiPropertiesOk(void);
 static void EditorEditAiPropertiesCancel(void);
 
 // Editor save
-static void EditorSaveLBInit(Menuitem *mi);
-static void EditorSaveLBExit(Menuitem *mi);
+static void EditorSaveLBInit(Menuitem* mi);
+static void EditorSaveLBExit(Menuitem* mi);
 static void EditorSaveFolder(void);
-static void EditorSaveLBAction(Menuitem *mi, int i);
-static unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i);
-static void EditorSaveVSAction(Menuitem *mi);
-static void EditorSaveEnterAction(Menuitem *mi, int key);
+static void EditorSaveLBAction(Menuitem* mi, int i);
+static unsigned char *EditorSaveLBRetrieve(Menuitem* mi, int i);
+static void EditorSaveVSAction(Menuitem* mi);
+static void EditorSaveEnterAction(Menuitem* mi, int key);
 static void EditorSaveOk(void);
 static void EditorSaveCancel(void);
 static int EditorSaveRDFilter(char *pathbuf, FileList *fl);
 
 // Editor save confirm
-static void EditorSaveConfirmInit(Menuitem *mi);
+static void EditorSaveConfirmInit(Menuitem* mi);
 static void EditorSaveConfirmOk(void);
 static void EditorSaveConfirmCancel(void);
 
 // Replay game
-static void ReplayGameInit(Menuitem *mi);
-static void ReplayGameLBInit(Menuitem *mi);
-static void ReplayGameLBExit(Menuitem *mi);
-static void ReplayGameLBAction(Menuitem *mi, int i);
-static unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i);
-static void ReplayGameVSAction(Menuitem *mi);
+static void ReplayGameInit(Menuitem* mi);
+static void ReplayGameLBInit(Menuitem* mi);
+static void ReplayGameLBExit(Menuitem* mi);
+static void ReplayGameLBAction(Menuitem* mi, int i);
+static unsigned char *ReplayGameLBRetrieve(Menuitem* mi, int i);
+static void ReplayGameVSAction(Menuitem* mi);
 static void ReplayGameFolder(void);
-static void ReplayGameDisableFog(Menuitem *mi);
+static void ReplayGameDisableFog(Menuitem* mi);
 static void ReplayGameOk(void);
 static void ReplayGameCancel(void);
 static int ReplayGameRDFilter(char *pathbuf, FileList *fl);
 
 // Metaserver
 //static void MultiGameMasterReport(void);
-//static void EnterMasterAction(Menuitem *mi, int key);
+//static void EnterMasterAction(Menuitem* mi, int key);
 static void ShowMetaServerList(void); // Addition for Magnant
-static void MultiMetaServerGameSetupInit(Menuitem *mi); // init callback
-static void MultiMetaServerGameSetupExit(Menuitem *mi); // exit callback
-static void SelectGameServer(Menuitem *mi); // Game Server selection so that client joins the game
+static void MultiMetaServerGameSetupInit(Menuitem* mi); // init callback
+static void MultiMetaServerGameSetupExit(Menuitem* mi); // exit callback
+static void SelectGameServer(Menuitem* mi); // Game Server selection so that client joins the game
 static void AddGameServer(void); //Add Game Server on Meta server
 static void ChangeGameServer(void); //Change Game Parameters on Meta server
 static int MetaServerConnectError(void); // Display error message
@@ -393,8 +393,8 @@ static void MultiMetaServerClose(void); //Close Master Server connection
 static void GameMenuReturn(void);
 static void NetErrorMenu(char *error);
 static void NetworkGamePrepareGameSettings(void);
-static void MultiGamePTSAction(Menuitem *mi, int o);
-static void NetMultiPlayerDrawFunc(Menuitem *mi);
+static void MultiGamePTSAction(Menuitem* mi, int o);
+static void NetMultiPlayerDrawFunc(Menuitem* mi);
 static void MultiGamePlayerSelectorsUpdate(int initial);
 
 
@@ -452,8 +452,8 @@ static Menuitem NetMultiButtonStorage[] = {
 static void InitNetMultiButtonStorage(void) {
 	MenuitemPulldown i0 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, -1, 0, 0, 0};
 	MenuitemDrawfunc i1 = { NetMultiPlayerDrawFunc };
-	NetMultiButtonStorage[0].d.pulldown = i0;
-	NetMultiButtonStorage[1].d.drawfunc = i1;
+	NetMultiButtonStorage[0].D.Pulldown = i0;
+	NetMultiButtonStorage[1].D.DrawFunc = i1;
 }
 
 /*----------------------------------------------------------------------------
@@ -811,12 +811,12 @@ static void NameLineDrawFunc(Menuitem* mi __attribute__ ((unused)))
 **
 ** @param mi The menu.
 */
-static void PrgStartInit(Menuitem *mi)
+static void PrgStartInit(Menuitem* mi)
 {
 	if (NetworkNumInterfaces == 0) {
-		mi[2].flags = MenuButtonDisabled;
+		mi[2].Flags = MenuButtonDisabled;
 	} else {
-		mi[2].flags = 0;
+		mi[2].Flags = 0;
 	}
 }
 
@@ -836,48 +836,48 @@ static void GameMenuReturn(void)
 /**
 ** Init callback for save game menu
 */
-static void SaveGameInit(Menuitem *mi __attribute__ ((unused)))
+static void SaveGameInit(Menuitem* mi __attribute__ ((unused)))
 {
-	Menu *menu;
+	Menu* menu;
 	char *buf;
 
 	menu = CurrentMenu;
 
 	buf = malloc(64);
 	strcpy(buf, "~!_");
-	menu->Items[1].d.input.buffer = buf;
-	menu->Items[1].d.input.nch = 0;
-	menu->Items[1].d.input.maxch = 60;
+	menu->Items[1].D.Input.buffer = buf;
+	menu->Items[1].D.Input.nch = 0;
+	menu->Items[1].D.Input.maxch = 60;
 
-	menu->Items[4].flags = MenuButtonDisabled;
-	menu->Items[5].flags = MenuButtonDisabled;
+	menu->Items[4].Flags = MenuButtonDisabled;
+	menu->Items[5].Flags = MenuButtonDisabled;
 	CreateSaveDir();
 }
 
 /**
 ** Exit callback for save game menu
 */
-static void SaveGameExit(Menuitem *mi)
+static void SaveGameExit(Menuitem* mi)
 {
-	free(mi->menu->Items[1].d.input.buffer);
-	mi->menu->Items[1].d.input.buffer = NULL;
+	free(mi->Menu->Items[1].D.Input.buffer);
+	mi->Menu->Items[1].D.Input.buffer = NULL;
 }
 
 /**
 ** Save game input box callback
 */
-static void SaveGameEnterAction(Menuitem *mi, int key)
+static void SaveGameEnterAction(Menuitem* mi, int key)
 {
-	if (mi->d.input.nch == 0) {
-		mi[3].flags = MenuButtonDisabled; /* mi[i]: Save button! */
+	if (mi->D.Input.nch == 0) {
+		mi[3].Flags = MenuButtonDisabled; /* mi[i]: Save button! */
 	} else {
-		mi[3].flags &= ~MenuButtonDisabled;
+		mi[3].Flags &= ~MenuButtonDisabled;
 		if (key == 10 || key == 13) {
 			SaveGameOk();
 			return;
 		}
 	}
-	mi->menu->Items[5].flags = MenuButtonDisabled;
+	mi->Menu->Items[5].Flags = MenuButtonDisabled;
 }
 
 /**
@@ -886,11 +886,11 @@ static void SaveGameEnterAction(Menuitem *mi, int key)
 static void SaveGameOk(void)
 {
 	char *name;
-	Menu *menu;
+	Menu* menu;
 	size_t nameLength;
 
 	menu = CurrentMenu;
-	name = menu->Items[1].d.input.buffer;
+	name = menu->Items[1].D.Input.buffer;
 
 	nameLength = strlen(name) - 3;
 	if (nameLength != 0) {
@@ -961,50 +961,50 @@ void SaveGameMenu(void)
 /**
 ** Exit callback for listbox in save game menu
 */
-static void SaveGameLBExit(Menuitem *mi)
+static void SaveGameLBExit(Menuitem* mi)
 {
 	FileList *fl;
 
-	if (mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		free(fl);
-		mi->d.listbox.options = NULL;
-		mi->d.listbox.noptions = 0;
-		mi[1].flags |= MenuButtonDisabled;
+		mi->D.Listbox.options = NULL;
+		mi->D.Listbox.noptions = 0;
+		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
 /**
 ** Init callback for listbox in save game menu
 */
-static void SaveGameLBInit(Menuitem *mi)
+static void SaveGameLBInit(Menuitem* mi)
 {
 	int i;
 
 	SaveGameLBExit(mi);
 
-	i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir,
-			NULL, (FileList **) & (mi->d.listbox.options));
+	i = mi->D.Listbox.noptions = ReadDataDirectory(SaveDir,
+			NULL, (FileList **) & (mi->D.Listbox.options));
 	if (i != 0) {
-		if (i > mi->d.listbox.nlines) {
-			mi->menu->Items[3].flags = MI_ENABLED;
+		if (i > mi->D.Listbox.nlines) {
+			mi->Menu->Items[3].Flags = MI_ENABLED;
 		} else {
-			mi->menu->Items[3].flags = MI_DISABLED;
+			mi->Menu->Items[3].Flags = MI_DISABLED;
 		}
 	}
-	mi->d.listbox.curopt = -1;
+	mi->D.Listbox.curopt = -1;
 }
 
 /**
 **  Save game listbox retrieve callback
 */
-static unsigned char* SaveGameLBRetrieve(Menuitem *mi, int i)
+static unsigned char* SaveGameLBRetrieve(Menuitem* mi, int i)
 {
 	FileList* fl;
 	static char buffer[1024];
 
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type) {
 			strcpy(buffer, "   ");
 		} else {
@@ -1019,21 +1019,21 @@ static unsigned char* SaveGameLBRetrieve(Menuitem *mi, int i)
 /**
 ** Save game listbox action callback
 */
-static void SaveGameLBAction(Menuitem *mi, int i)
+static void SaveGameLBAction(Menuitem* mi, int i)
 {
 	FileList *fl;
 
 	Assert(i >= 0);
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type) {
-			sprintf(mi->menu->Items[1].d.input.buffer, "%s~!_", fl[i].name);
-			mi->menu->Items[1].d.input.nch = strlen(mi->menu->Items[1].d.input.buffer) - 3;
-			mi->menu->Items[4].flags = MI_ENABLED;
-			mi->menu->Items[5].flags = MI_ENABLED;
+			sprintf(mi->Menu->Items[1].D.Input.buffer, "%s~!_", fl[i].name);
+			mi->Menu->Items[1].D.Input.nch = strlen(mi->Menu->Items[1].D.Input.buffer) - 3;
+			mi->Menu->Items[4].Flags = MI_ENABLED;
+			mi->Menu->Items[5].Flags = MI_ENABLED;
 		} else {
-			mi->menu->Items[4].flags = MenuButtonDisabled;
-			mi->menu->Items[5].flags = MenuButtonDisabled;
+			mi->Menu->Items[4].Flags = MenuButtonDisabled;
+			mi->Menu->Items[5].Flags = MenuButtonDisabled;
 		}
 	}
 }
@@ -1098,66 +1098,66 @@ static int SaveGameRDFilter(char *pathbuf, FileList *fl)
 /**
 ** Load game init callback
 */
-static void LoadGameInit(Menuitem *mi)
+static void LoadGameInit(Menuitem* mi)
 {
-	mi->menu->Items[3].flags = MI_DISABLED;
+	mi->Menu->Items[3].Flags = MI_DISABLED;
 	CreateSaveDir();
 }
 
 /**
 ** Load game exit callback
 */
-static void LoadGameExit(Menuitem *mi __attribute__ ((unused)))
+static void LoadGameExit(Menuitem* mi __attribute__ ((unused)))
 {
 }
 
 /**
 ** Exit callback for listbox in load game menu
 */
-static void LoadGameLBExit(Menuitem *mi)
+static void LoadGameLBExit(Menuitem* mi)
 {
 	FileList *fl;
 
-	if (mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		free(fl);
-		mi->d.listbox.options = NULL;
-		mi->d.listbox.noptions = 0;
-		mi[1].flags |= MenuButtonDisabled;
+		mi->D.Listbox.options = NULL;
+		mi->D.Listbox.noptions = 0;
+		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
 /**
 ** Init callback for listbox in load game menu
 */
-static void LoadGameLBInit(Menuitem *mi)
+static void LoadGameLBInit(Menuitem* mi)
 {
 	int i;
 
 	LoadGameLBExit(mi);
 
-	i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, SaveGameRDFilter,
-													 (FileList **)&(mi->d.listbox.options));
+	i = mi->D.Listbox.noptions = ReadDataDirectory(SaveDir, SaveGameRDFilter,
+													 (FileList **)&(mi->D.Listbox.options));
 	if (i != 0) {
-		if (i > mi->d.listbox.nlines) {
-			mi->menu->Items[2].flags = MenuButtonSelected;
+		if (i > mi->D.Listbox.nlines) {
+			mi->Menu->Items[2].Flags = MenuButtonSelected;
 		} else {
-			mi->menu->Items[2].flags = MenuButtonDisabled;
+			mi->Menu->Items[2].Flags = MenuButtonDisabled;
 		}
 	}
-	mi->d.listbox.curopt = -1;
+	mi->D.Listbox.curopt = -1;
 }
 
 /**
 **  Load game listbox retrieve callback
 */
-static unsigned char* LoadGameLBRetrieve(Menuitem *mi, int i)
+static unsigned char* LoadGameLBRetrieve(Menuitem* mi, int i)
 {
 	FileList* fl;
 	static char buffer[1024];
 
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type) {
 			strcpy(buffer, "   ");
 		} else {
@@ -1172,20 +1172,20 @@ static unsigned char* LoadGameLBRetrieve(Menuitem *mi, int i)
 /**
 ** Load game listbox action callback
 */
-static void LoadGameLBAction(Menuitem *mi, int i)
+static void LoadGameLBAction(Menuitem* mi, int i)
 {
 	FileList *fl;
 
 	Assert(i >= 0);
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type) {
-			mi->menu->Items[3].flags = MI_ENABLED;
+			mi->Menu->Items[3].Flags = MI_ENABLED;
 		} else {
-			mi->menu->Items[3].flags = MI_DISABLED;
+			mi->Menu->Items[3].Flags = MI_DISABLED;
 		}
 	} else {
-		mi->menu->Items[3].flags = MI_DISABLED;
+		mi->Menu->Items[3].Flags = MI_DISABLED;
 	}
 }
 
@@ -1202,15 +1202,15 @@ static void LoadGameVSAction(Menuitem* mi)
 static void LoadGameOk(void)
 {
 	FileList *fl;
-	Menuitem *mi;
-	Menu *menu;
+	Menuitem* mi;
+	Menu* menu;
 	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt;
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	i = mi->D.Listbox.curopt;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		sprintf(TempPathBuf, "%s/%s", SaveDir, fl[i].name);
 		SaveGameLoading = 1;
 		LoadGame(TempPathBuf);
@@ -1224,29 +1224,29 @@ static void LoadGameOk(void)
 /**
 ** Save confirm init callback
 */
-static void SaveConfirmInit(Menuitem *mi)
+static void SaveConfirmInit(Menuitem* mi)
 {
 	static char name[PATH_MAX]; // FIXME: much memory wasted
 	int fileLength;
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-save-game");
-	fileLength = strlen(menu->Items[1].d.input.buffer) - 3;
+	fileLength = strlen(menu->Items[1].D.Input.buffer) - 3;
 
 	strcpy(name, "the file: ");
-	strncat(name, menu->Items[1].d.input.buffer, fileLength);
+	strncat(name, menu->Items[1].D.Input.buffer, fileLength);
 	if (strstr(name, ".sav") == NULL) {
 		strcat(name, ".sav");
 	}
-	mi->menu->Items[2].d.text.text = name;
+	mi->Menu->Items[2].D.Text.text = name;
 }
 
 /**
 ** Save confirm exit callback
 */
-static void SaveConfirmExit(Menuitem *mi)
+static void SaveConfirmExit(Menuitem* mi)
 {
-	mi->menu->Items[2].d.text.text = NULL;
+	mi->Menu->Items[2].D.Text.text = NULL;
 }
 
 /**
@@ -1255,14 +1255,14 @@ static void SaveConfirmExit(Menuitem *mi)
 static void SaveConfirmOk(void)
 {
 	int fileLength;
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-save-game");
-	fileLength = strlen(menu->Items[1].d.input.buffer) - 3;
+	fileLength = strlen(menu->Items[1].D.Input.buffer) - 3;
 
 	strcpy(TempPathBuf, SaveDir);
 	strcat(TempPathBuf, "/");
-	strncat(TempPathBuf, menu->Items[1].d.input.buffer, fileLength);
+	strncat(TempPathBuf, menu->Items[1].D.Input.buffer, fileLength);
 	if (strstr(TempPathBuf, ".sav") == NULL) {
 		strcat(TempPathBuf, ".sav");
 	}
@@ -1290,24 +1290,24 @@ static void DeleteConfirmMenu(void)
 /**
 ** Init callback for delete confirm menu
 */
-static void DeleteConfirmInit(Menuitem *mi)
+static void DeleteConfirmInit(Menuitem* mi)
 {
-	Menu *menu;
+	Menu* menu;
 	static char name[PATH_MAX]; // FIXME: much memory wasted
 
 	menu = FindMenu("menu-save-game");
 	strcpy(name, "the file: ");
-	strcat(name, menu->Items[1].d.input.buffer);
+	strcat(name, menu->Items[1].D.Input.buffer);
 	name[strlen(name) - 3] = '\0';
-	mi->menu->Items[2].d.text.text = name;
+	mi->Menu->Items[2].D.Text.text = name;
 }
 
 /**
 ** Exit callback for delete confirm menu
 */
-static void DeleteConfirmExit(Menuitem *mi)
+static void DeleteConfirmExit(Menuitem* mi)
 {
-	mi->menu->Items[2].d.text.text = NULL;
+	mi->Menu->Items[2].D.Text.text = NULL;
 }
 
 /**
@@ -1315,20 +1315,20 @@ static void DeleteConfirmExit(Menuitem *mi)
 */
 static void DeleteConfirmOk(void)
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-save-game");
 	strcpy(TempPathBuf, SaveDir);
 	strcat(TempPathBuf, "/");
-	strcat(TempPathBuf, menu->Items[1].d.input.buffer);
+	strcat(TempPathBuf, menu->Items[1].D.Input.buffer);
 	TempPathBuf[strlen(TempPathBuf) - 3] = '\0';
 	unlink(TempPathBuf);
 	EndMenu();
 
 	// Update list of files and clear input
 	SaveGameLBInit(&CurrentMenu->Items[2]);
-	strcpy(CurrentMenu->Items[1].d.input.buffer, "~!_");
-	CurrentMenu->Items[1].d.input.nch = 0;
+	strcpy(CurrentMenu->Items[1].D.Input.buffer, "~!_");
+	CurrentMenu->Items[1].D.Input.nch = 0;
 }
 
 /**
@@ -1350,20 +1350,20 @@ void LoadGameMenu(void)
 /**
 ** Init callback for game menu
 */
-static void GameMenuInit(Menuitem *mi __attribute__((unused)))
+static void GameMenuInit(Menuitem* mi __attribute__((unused)))
 {
 	// Disable save menu in multiplayer and replays
 	if (IsNetworkGame() || ReplayGameType != ReplayNone) {
-		mi->menu->Items[1].flags |= MenuButtonDisabled;
+		mi->Menu->Items[1].Flags |= MenuButtonDisabled;
 	} else {
-		mi->menu->Items[1].flags &= ~MenuButtonDisabled;
+		mi->Menu->Items[1].Flags &= ~MenuButtonDisabled;
 	}
 
 	// Disable load menu in multiplayer
 	if (IsNetworkGame()) {
-		mi->menu->Items[2].flags |= MenuButtonDisabled;
+		mi->Menu->Items[2].Flags |= MenuButtonDisabled;
 	} else {
-		mi->menu->Items[2].flags &= ~MenuButtonDisabled;
+		mi->Menu->Items[2].Flags &= ~MenuButtonDisabled;
 	}
 }
 
@@ -1378,78 +1378,78 @@ void SoundOptionsMenu(void)
 /**
 ** Init callback for sound options menu
 */
-static void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
+static void SoundOptionsInit(Menuitem* mi __attribute__((unused)))
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-sound-options");
 
 	// master volume slider
 	if (SoundFildes == -1) {
-		menu->Items[2].flags = MenuButtonDisabled;
+		menu->Items[2].Flags = MenuButtonDisabled;
 	} else {
-		menu->Items[2].flags = 0;
-		menu->Items[2].d.hslider.percent = (GlobalVolume * 100) / 255;
+		menu->Items[2].Flags = 0;
+		menu->Items[2].D.HSlider.percent = (GlobalVolume * 100) / 255;
 	}
 
 	// master power
 	if (SoundFildes == -1) {
-		menu->Items[5].d.checkbox.state = MI_CSTATE_UNCHECKED;
+		menu->Items[5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	} else {
-		menu->Items[5].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[5].D.Checkbox.State = MI_CSTATE_CHECKED;
 	}
 
 	// music volume slider
 	if (PlayingMusic != 1 || SoundFildes == -1) {
-		menu->Items[7].flags = MenuButtonDisabled;
+		menu->Items[7].Flags = MenuButtonDisabled;
 	} else {
-		menu->Items[7].flags = 0;
-		menu->Items[7].d.hslider.percent = (MusicVolume * 100) / 255;
+		menu->Items[7].Flags = 0;
+		menu->Items[7].D.HSlider.percent = (MusicVolume * 100) / 255;
 	}
 
 	// music power
 	if (SoundFildes == -1) {
-		menu->Items[10].flags = MenuButtonDisabled;
+		menu->Items[10].Flags = MenuButtonDisabled;
 	} else {
-		menu->Items[10].flags = 0;
+		menu->Items[10].Flags = 0;
 	}
 #ifdef USE_CDAUDIO
 	if (CDMode != CDModeStopped && CDMode != CDModeOff) {
-		menu->Items[7].flags = MenuButtonDisabled;
-		menu->Items[10].flags = MenuButtonDisabled;
+		menu->Items[7].Flags = MenuButtonDisabled;
+		menu->Items[10].Flags = MenuButtonDisabled;
 	}
 #endif
 	if (PlayingMusic != 1 || SoundFildes == -1) {
-		menu->Items[10].d.checkbox.state = MI_CSTATE_UNCHECKED;
+		menu->Items[10].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	} else {
-		menu->Items[10].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[10].D.Checkbox.State = MI_CSTATE_CHECKED;
 	}
 
-	menu->Items[12].flags = MenuButtonDisabled; // cd volume slider
-	menu->Items[15].flags = MenuButtonDisabled; // cd power
-	menu->Items[15].d.checkbox.state = MI_CSTATE_UNCHECKED;
-	menu->Items[16].flags = MenuButtonDisabled; // all tracks button
-	menu->Items[17].flags = MenuButtonDisabled; // random tracks button
+	menu->Items[12].Flags = MenuButtonDisabled; // cd volume slider
+	menu->Items[15].Flags = MenuButtonDisabled; // cd power
+	menu->Items[15].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+	menu->Items[16].Flags = MenuButtonDisabled; // all tracks button
+	menu->Items[17].Flags = MenuButtonDisabled; // random tracks button
 #ifdef USE_CDAUDIO
-	menu->Items[15].flags = 0; // cd power
+	menu->Items[15].Flags = 0; // cd power
 	if (CDMode != CDModeStopped && CDMode != CDModeOff) {
 #if (!defined(USE_WIN32) && defined(USE_LIBCDA)) || defined(USE_CDDA)
 		int i = 0;
 		i = GetCDVolume();
 
-		menu->Items[12].flags = 0;
-		menu->Items[12].d.hslider.percent = (i * 100) / 255;
+		menu->Items[12].Flags = 0;
+		menu->Items[12].D.HSlider.percent = (i * 100) / 255;
 #endif
-		menu->Items[15].d.checkbox.state = MI_CSTATE_CHECKED;
-		menu->Items[16].flags = 0;
-		menu->Items[17].flags = 0;
+		menu->Items[15].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[16].Flags = 0;
+		menu->Items[17].Flags = 0;
 
 		if (CDMode == CDModeDefined) {
-			menu->Items[16].d.checkbox.state = MI_CSTATE_CHECKED;
-			menu->Items[17].d.checkbox.state = MI_CSTATE_UNCHECKED;
+			menu->Items[16].D.Checkbox.State = MI_CSTATE_CHECKED;
+			menu->Items[17].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 		} else if (CDMode == CDModeRandom) {
-			menu->Items[16].d.checkbox.state = MI_CSTATE_UNCHECKED;
-			menu->Items[17].d.checkbox.state = MI_CSTATE_CHECKED;
+			menu->Items[16].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+			menu->Items[17].D.Checkbox.State = MI_CSTATE_CHECKED;
 		}
 	}
 #endif // cd
@@ -1458,7 +1458,7 @@ static void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 /**
 ** Exit callback for sound options menu
 */
-static void SoundOptionsExit(Menuitem *mi __attribute__((unused)))
+static void SoundOptionsExit(Menuitem* mi __attribute__((unused)))
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -1475,40 +1475,40 @@ static void GlobalOptionsMenu(void)
 /**
 ** Init callback for global options menu
 */
-static void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
+static void GlobalOptionsInit(Menuitem* mi __attribute__((unused)))
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = CurrentMenu;
 
-	menu->Items[2].d.checkbox.state = MI_CSTATE_UNCHECKED;
-	menu->Items[3].d.checkbox.state = MI_CSTATE_UNCHECKED;
-	menu->Items[4].d.checkbox.state = MI_CSTATE_UNCHECKED;
-	menu->Items[5].d.checkbox.state = MI_CSTATE_UNCHECKED;
-	menu->Items[6].d.checkbox.state = MI_CSTATE_UNCHECKED;
-	menu->Items[7].d.checkbox.state = MI_CSTATE_UNCHECKED;
+	menu->Items[2].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+	menu->Items[3].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+	menu->Items[4].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+	menu->Items[5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+	menu->Items[6].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+	menu->Items[7].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 
 	if (VideoWidth == 640) {
-		menu->Items[2].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[2].D.Checkbox.State = MI_CSTATE_CHECKED;
 	} else if (VideoWidth == 800) {
-		menu->Items[3].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[3].D.Checkbox.State = MI_CSTATE_CHECKED;
 	} else if (VideoWidth == 1024) {
-		menu->Items[4].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[4].D.Checkbox.State = MI_CSTATE_CHECKED;
 	} else if (VideoWidth == 1280) {
-		menu->Items[5].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[5].D.Checkbox.State = MI_CSTATE_CHECKED;
 	} else if (VideoWidth == 1600) {
-		menu->Items[6].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[6].D.Checkbox.State = MI_CSTATE_CHECKED;
 	}
 
 	if (VideoFullScreen) {
-		menu->Items[7].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[7].D.Checkbox.State = MI_CSTATE_CHECKED;
 	}
 }
 
 /**
 ** Exit callback for global options menu
 */
-static void GlobalOptionsExit(Menuitem *mi __attribute__((unused)))
+static void GlobalOptionsExit(Menuitem* mi __attribute__((unused)))
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -1517,12 +1517,12 @@ static void GlobalOptionsExit(Menuitem *mi __attribute__((unused)))
 /**
 ** Global options resolution gem callback
 */
-static void GlobalOptionsResolutionCheckbox(Menuitem *mi)
+static void GlobalOptionsResolutionCheckbox(Menuitem* mi)
 {
 	int res;
 
 	res = VideoWidth;
-	switch (mi - mi->menu->Items) {
+	switch (mi - mi->Menu->Items) {
 		case 2:
 			res = 640;
 			break;
@@ -1541,7 +1541,7 @@ static void GlobalOptionsResolutionCheckbox(Menuitem *mi)
 	}
 
 	if (VideoWidth != res) {
-		Menu *menu;
+		Menu* menu;
 		int i;
 
 		VideoWidth = res;
@@ -1557,8 +1557,8 @@ static void GlobalOptionsResolutionCheckbox(Menuitem *mi)
 		GameCursor = TheUI.Point.Cursor;
 		menu = FindMenu("menu-program-start");
 		for (i = 0; i < menu->NumItems; ++i) {
-			if (menu->Items[i].initfunc) {
-				(*menu->Items[i].initfunc)(menu->Items + i);
+			if (menu->Items[i].InitFunc) {
+				(*menu->Items[i].InitFunc)(menu->Items + i);
 			}
 		}
 		DrawMenu(menu);
@@ -1570,7 +1570,7 @@ static void GlobalOptionsResolutionCheckbox(Menuitem *mi)
 /**
 ** Global options fullscreen gem callback
 */
-static void GlobalOptionsFullscreenCheckbox(Menuitem *mi __attribute__((unused)))
+static void GlobalOptionsFullscreenCheckbox(Menuitem* mi __attribute__((unused)))
 {
 	ToggleFullScreen();
 	GlobalOptionsInit(NULL);
@@ -1579,7 +1579,7 @@ static void GlobalOptionsFullscreenCheckbox(Menuitem *mi __attribute__((unused))
 /**
 ** Master volume gem callback
 */
-static void SetMasterPower(Menuitem *mi __attribute__((unused)))
+static void SetMasterPower(Menuitem* mi __attribute__((unused)))
 {
 	if (SoundFildes != -1) {
 		QuitSound();
@@ -1604,7 +1604,7 @@ static void SetMasterPower(Menuitem *mi __attribute__((unused)))
 /**
 ** Music volume gem callback
 */
-static void SetMusicPower(Menuitem *mi __attribute__((unused)))
+static void SetMusicPower(Menuitem* mi __attribute__((unused)))
 {
 	if (PlayingMusic) {
 		MusicOff = 1;
@@ -1624,7 +1624,7 @@ static void SetMusicPower(Menuitem *mi __attribute__((unused)))
 /**
 ** CD volume gem callback
 */
-static void SetCdPower(Menuitem *mi __attribute__((unused)))
+static void SetCdPower(Menuitem* mi __attribute__((unused)))
 {
 #ifdef USE_CDAUDIO
 	// Start Playing CD
@@ -1644,7 +1644,7 @@ static void SetCdPower(Menuitem *mi __attribute__((unused)))
 **
 ** @param mi Menu item (not used).
 */
-static void SetFogOfWar(Menuitem *mi __attribute__((unused)))
+static void SetFogOfWar(Menuitem* mi __attribute__((unused)))
 {
 	if (!TheMap.NoFogOfWar) {
 		TheMap.NoFogOfWar = 1;
@@ -1663,7 +1663,7 @@ static void SetFogOfWar(Menuitem *mi __attribute__((unused)))
 **
 ** @param mi Menu item (not used).
 */
-static void SetCommandKey(Menuitem *mi __attribute__((unused)))
+static void SetCommandKey(Menuitem* mi __attribute__((unused)))
 {
 	ShowCommandKey ^= 1;
 }
@@ -1671,7 +1671,7 @@ static void SetCommandKey(Menuitem *mi __attribute__((unused)))
 /**
 ** CD play all tracks gem callback
 */
-static void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
+static void SetCdModeDefined(Menuitem* mi __attribute__((unused)))
 {
 #ifdef USE_CDAUDIO
 	CDMode = CDModeDefined;
@@ -1682,7 +1682,7 @@ static void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
 /**
 ** CD play random tracks gem callback
 */
-static void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
+static void SetCdModeRandom(Menuitem* mi __attribute__((unused)))
 {
 #ifdef USE_CDAUDIO
 	CDMode = CDModeRandom;
@@ -1701,36 +1701,36 @@ void SpeedOptionsMenu(void)
 /**
 ** Init callback for speed settings menu
 */
-void SpeedOptionsInit(Menuitem *mi __attribute__((unused)))
+void SpeedOptionsInit(Menuitem* mi __attribute__((unused)))
 {
-	Menu *menu;
+	Menu* menu;
 	int i;
 
 	i = 2;
 	menu = CurrentMenu;
 
-	menu->Items[i].d.hslider.percent = ((VideoSyncSpeed - MIN_GAME_SPEED) * 100) / (MAX_GAME_SPEED - MIN_GAME_SPEED);
-	if (menu->Items[i].d.hslider.percent < 0) {
-		menu->Items[i].d.hslider.percent = 0;
+	menu->Items[i].D.HSlider.percent = ((VideoSyncSpeed - MIN_GAME_SPEED) * 100) / (MAX_GAME_SPEED - MIN_GAME_SPEED);
+	if (menu->Items[i].D.HSlider.percent < 0) {
+		menu->Items[i].D.HSlider.percent = 0;
 	}
-	if (menu->Items[i].d.hslider.percent > 100) {
-		menu->Items[i].d.hslider.percent = 100;
+	if (menu->Items[i].D.HSlider.percent > 100) {
+		menu->Items[i].D.HSlider.percent = 100;
 	}
 
-	menu->Items[i + 4].d.hslider.percent = 100 - (SpeedMouseScroll - 1) * 100 / 10;
+	menu->Items[i + 4].D.HSlider.percent = 100 - (SpeedMouseScroll - 1) * 100 / 10;
 	if (TheUI.MouseScroll == 0) {
-		menu->Items[i + 4].d.hslider.percent = 0;
+		menu->Items[i + 4].D.HSlider.percent = 0;
 	}
-	menu->Items[i + 8].d.hslider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 10;
+	menu->Items[i + 8].D.HSlider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 10;
 	if (TheUI.KeyScroll == 0) {
-		menu->Items[i + 8].d.hslider.percent = 0;
+		menu->Items[i + 8].D.HSlider.percent = 0;
 	}
 }
 
 /**
 ** Exit callback for speed settings menu
 */
-void SpeedOptionsExit(Menuitem *mi __attribute__((unused)))
+void SpeedOptionsExit(Menuitem* mi __attribute__((unused)))
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -1747,9 +1747,9 @@ void DiplomacyMenu(void)
 /**
 ** Diplomacy init callback
 */
-static void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
+static void DiplomacyInit(Menuitem* mi __attribute__ ((unused)))
 {
-	Menu *menu;
+	Menu* menu;
 	int i;
 	int j;
 
@@ -1758,48 +1758,48 @@ static void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
 
 	for (i=0; i<=PlayerMax-2; ++i) {
 		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
-			menu->Items[4*j+4].d.text.text = Players[i].Name;
+			menu->Items[4*j+4].D.Text.text = Players[i].Name;
 			if (ThisPlayer->Allied&(1<<Players[i].Player)) {
-				menu->Items[4 * j + 5].d.checkbox.state = MI_CSTATE_CHECKED;
+				menu->Items[4 * j + 5].D.Checkbox.State = MI_CSTATE_CHECKED;
 			} else {
-				menu->Items[4 * j + 5].d.checkbox.state = MI_CSTATE_UNCHECKED;
+				menu->Items[4 * j + 5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 			}
 			if (ThisPlayer->Enemy&(1<<Players[i].Player)) {
-				menu->Items[4 * j + 6].d.checkbox.state = MI_CSTATE_CHECKED;
+				menu->Items[4 * j + 6].D.Checkbox.State = MI_CSTATE_CHECKED;
 			} else {
-				menu->Items[4 * j + 6].d.checkbox.state = MI_CSTATE_UNCHECKED;
+				menu->Items[4 * j + 6].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 			}
 			if (ThisPlayer->SharedVision&(1<<Players[i].Player)) {
-				menu->Items[4 * j + 7].d.checkbox.state = MI_CSTATE_CHECKED;
+				menu->Items[4 * j + 7].D.Checkbox.State = MI_CSTATE_CHECKED;
 			} else {
-				menu->Items[4 * j + 7].d.checkbox.state = MI_CSTATE_UNCHECKED;
+				menu->Items[4 * j + 7].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 			}
 
 			if (ReplayGameType != ReplayNone || ThisPlayer->Team == Players[i].Team) {
-				menu->Items[4 * j + 5].d.checkbox.state |= MI_CSTATE_PASSIVE;
-				menu->Items[4 * j + 6].d.checkbox.state |= MI_CSTATE_PASSIVE;
-				menu->Items[4 * j + 7].d.checkbox.state |= MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 5].D.Checkbox.State |= MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 6].D.Checkbox.State |= MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 7].D.Checkbox.State |= MI_CSTATE_PASSIVE;
 			} else {
-				menu->Items[4 * j + 5].d.checkbox.state &= ~MI_CSTATE_PASSIVE;
-				menu->Items[4 * j + 6].d.checkbox.state &= ~MI_CSTATE_PASSIVE;
-				menu->Items[4 * j + 7].d.checkbox.state &= ~MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 5].D.Checkbox.State &= ~MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 6].D.Checkbox.State &= ~MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 7].D.Checkbox.State &= ~MI_CSTATE_PASSIVE;
 			}
 
 			++j;
 		}
 	}
 	for (; j<=PlayerMax - 3; ++j ) {
-		menu->Items[4 * j + 4].d.text.text = NULL;
-		menu->Items[4 * j + 5].d.checkbox.state = MI_CSTATE_INVISIBLE;
-		menu->Items[4 * j + 6].d.checkbox.state = MI_CSTATE_INVISIBLE;
-		menu->Items[4 * j + 7].d.checkbox.state = MI_CSTATE_INVISIBLE;
+		menu->Items[4 * j + 4].D.Text.text = NULL;
+		menu->Items[4 * j + 5].D.Checkbox.State = MI_CSTATE_INVISIBLE;
+		menu->Items[4 * j + 6].D.Checkbox.State = MI_CSTATE_INVISIBLE;
+		menu->Items[4 * j + 7].D.Checkbox.State = MI_CSTATE_INVISIBLE;
 	}
 }
 
 /**
 ** Diplomacy exit callback
 */
-static void DiplomacyExit(Menuitem *mi __attribute__ ((unused)))
+static void DiplomacyExit(Menuitem* mi __attribute__ ((unused)))
 {
 	Menu* menu;
 	int i;
@@ -1807,28 +1807,28 @@ static void DiplomacyExit(Menuitem *mi __attribute__ ((unused)))
 	menu = CurrentMenu;
 
 	for (i=0; i<=PlayerMax - 3; ++i) {
-		menu->Items[4 * i + 4].d.text.text = NULL;
+		menu->Items[4 * i + 4].D.Text.text = NULL;
 	}
 }
 
 /**
 ** Diplomacy gem callback
 */
-static void DiplomacyWait(Menuitem *mi)
+static void DiplomacyWait(Menuitem* mi)
 {
 	int player;
 	int item;
 
-	item = mi - mi->menu->Items;
+	item = mi - mi->Menu->Items;
 	player = (item - 4) / 4;
 
 	// Don't allow allies and enemies at the same time
 	if (item == 4 * player + 5) {
-		mi->menu->Items[4 * player + 5].d.checkbox.state |= MI_CSTATE_CHECKED;
-		mi->menu->Items[4 * player + 6].d.checkbox.state &= ~MI_CSTATE_CHECKED;
+		mi->Menu->Items[4 * player + 5].D.Checkbox.State |= MI_CSTATE_CHECKED;
+		mi->Menu->Items[4 * player + 6].D.Checkbox.State &= ~MI_CSTATE_CHECKED;
 	} else if (item == 4 * player + 6) {
-		mi->menu->Items[4 * player + 5].d.checkbox.state &= ~MI_CSTATE_CHECKED;
-		mi->menu->Items[4 * player + 6].d.checkbox.state |= MI_CSTATE_CHECKED;
+		mi->Menu->Items[4 * player + 5].D.Checkbox.State &= ~MI_CSTATE_CHECKED;
+		mi->Menu->Items[4 * player + 6].D.Checkbox.State |= MI_CSTATE_CHECKED;
 	}
 
 	// Don't set diplomacy until clicking ok
@@ -1839,7 +1839,7 @@ static void DiplomacyWait(Menuitem *mi)
 */
 static void DiplomacyOk(void)
 {
-	Menu *menu;
+	Menu* menu;
 	int i;
 	int j;
 
@@ -1849,49 +1849,49 @@ static void DiplomacyOk(void)
 	for (i=0; i<=PlayerMax - 2; ++i) {
 		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
 			// Menu says to ally
-			if (menu->Items[4 * j + 5].d.checkbox.state == MI_CSTATE_CHECKED &&
-				menu->Items[4 * j + 6].d.checkbox.state == MI_CSTATE_UNCHECKED) {
+			if (menu->Items[4 * j + 5].D.Checkbox.State == MI_CSTATE_CHECKED &&
+				menu->Items[4 * j + 6].D.Checkbox.State == MI_CSTATE_UNCHECKED) {
 				// Are they allied?
-				if (!(ThisPlayer->Allied&(1<<Players[i].Player) &&
-					!(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
-					SendCommandDiplomacy(ThisPlayer->Player,DiplomacyAllied,
+				if (!(ThisPlayer->Allied & (1 << Players[i].Player) &&
+						!(ThisPlayer->Enemy & (1 << Players[i].Player)))) {
+					SendCommandDiplomacy(ThisPlayer->Player, DiplomacyAllied,
 						Players[i].Player);
 				}
 			}
 			// Menu says to be enemies
-			if (menu->Items[4 * j + 5].d.checkbox.state == MI_CSTATE_UNCHECKED &&
-				menu->Items[4 * j + 6].d.checkbox.state == MI_CSTATE_CHECKED) {
+			if (menu->Items[4 * j + 5].D.Checkbox.State == MI_CSTATE_UNCHECKED &&
+				menu->Items[4 * j + 6].D.Checkbox.State == MI_CSTATE_CHECKED) {
 				// Are they enemies?
-				if( !(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
-					ThisPlayer->Enemy&(1<<Players[i].Player))) {
-					SendCommandDiplomacy(ThisPlayer->Player,DiplomacyEnemy,
+				if (!(!(ThisPlayer->Allied & (1 << Players[i].Player)) &&
+						ThisPlayer->Enemy & (1 << Players[i].Player))) {
+					SendCommandDiplomacy(ThisPlayer->Player, DiplomacyEnemy,
 						Players[i].Player);
 				}
 			}
 			// Menu says to be neutral
-			if (menu->Items[4 * j + 5].d.checkbox.state == MI_CSTATE_UNCHECKED &&
-				menu->Items[4 * j + 6].d.checkbox.state == MI_CSTATE_UNCHECKED) {
+			if (menu->Items[4 * j + 5].D.Checkbox.State == MI_CSTATE_UNCHECKED &&
+				menu->Items[4 * j + 6].D.Checkbox.State == MI_CSTATE_UNCHECKED) {
 				// Are they neutral?
-				if (!(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
-					!(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
-					SendCommandDiplomacy(ThisPlayer->Player,DiplomacyNeutral,
+				if (!(!(ThisPlayer->Allied & (1 << Players[i].Player)) &&
+						!(ThisPlayer->Enemy & (1 << Players[i].Player)))) {
+					SendCommandDiplomacy(ThisPlayer->Player, DiplomacyNeutral,
 						Players[i].Player);
 				}
 			}
 			// Menu says to be crazy
-			if (menu->Items[4 * j + 5].d.checkbox.state == MI_CSTATE_CHECKED &&
-				menu->Items[4 * j + 6].d.checkbox.state == MI_CSTATE_CHECKED) {
+			if (menu->Items[4 * j + 5].D.Checkbox.State == MI_CSTATE_CHECKED &&
+				menu->Items[4 * j + 6].D.Checkbox.State == MI_CSTATE_CHECKED) {
 				// Are they crazy?
-				if (!(ThisPlayer->Allied&(1<<Players[i].Player) &&
-					ThisPlayer->Enemy&(1<<Players[i].Player))) {
-					SendCommandDiplomacy(ThisPlayer->Player,DiplomacyCrazy,
+				if (!(ThisPlayer->Allied & (1 << Players[i].Player) &&
+						ThisPlayer->Enemy & (1 << Players[i].Player))) {
+					SendCommandDiplomacy(ThisPlayer->Player, DiplomacyCrazy,
 						Players[i].Player);
 				}
 			}
 			// Shared vision
-			if (menu->Items[4 * j + 7].d.checkbox.state == MI_CSTATE_CHECKED) {
-				if (!(ThisPlayer->SharedVision&(1<<Players[i].Player))) {
-					SendCommandSharedVision(ThisPlayer->Player,1,
+			if (menu->Items[4 * j + 7].D.Checkbox.State == MI_CSTATE_CHECKED) {
+				if (!(ThisPlayer->SharedVision & (1 << Players[i].Player))) {
+					SendCommandSharedVision(ThisPlayer->Player, 1,
 						Players[i].Player);
 				}
 			}
@@ -1926,22 +1926,22 @@ static void PreferencesInit(Menuitem* mi __attribute__((unused)))
 
 	menu = CurrentMenu;
 	if (!TheMap.NoFogOfWar) {
-		menu->Items[1].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[1].D.Checkbox.State = MI_CSTATE_CHECKED;
 	} else {
-		menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
+		menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	}
 
 	// Not available in net games or replays
 	if (!IsNetworkGame() && ReplayGameType == ReplayNone) {
-		menu->Items[1].flags = MI_ENABLED;
+		menu->Items[1].Flags = MI_ENABLED;
 	} else {
-		menu->Items[1].flags = MI_DISABLED;
+		menu->Items[1].Flags = MI_DISABLED;
 	}
 
 	if (ShowCommandKey) {
-		menu->Items[2].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[2].D.Checkbox.State = MI_CSTATE_CHECKED;
 	} else {
-		menu->Items[2].d.checkbox.state = MI_CSTATE_UNCHECKED;
+		menu->Items[2].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	}
 }
 
@@ -2011,9 +2011,9 @@ static void EndScenarioMenu(void)
 
 	menu = FindMenu("menu-end-scenario");
 	if (!IsNetworkGame()) {
-		menu->Items[1].flags = MI_ENABLED;
+		menu->Items[1].Flags = MI_ENABLED;
 	} else {
-		menu->Items[1].flags = MI_DISABLED;
+		menu->Items[1].Flags = MI_DISABLED;
 	}
 
 	ProcessMenu("menu-end-scenario", 0);
@@ -2069,7 +2069,7 @@ static void VictoryInit(Menuitem* mi __attribute__((unused)))
 
 	menu = CurrentMenu;
 	if (CommandLogDisabled) {
-		menu->Items[3].flags = MI_DISABLED;
+		menu->Items[3].Flags = MI_DISABLED;
 	}
 }
 
@@ -2082,7 +2082,7 @@ static void DefeatedInit(Menuitem* mi __attribute__((unused)))
 
 	menu = CurrentMenu;
 	if (CommandLogDisabled) {
-		menu->Items[3].flags = MI_DISABLED;
+		menu->Items[3].Flags = MI_DISABLED;
 	}
 }
 
@@ -2106,9 +2106,9 @@ static void SaveReplayInit(Menuitem* mi __attribute__((unused)))
 
 	buf = malloc(32);
 	strcpy(buf, "~!_");
-	menu->Items[1].d.input.buffer = buf;
-	menu->Items[1].d.input.nch = 0;
-	menu->Items[1].d.input.maxch = 28;
+	menu->Items[1].D.Input.buffer = buf;
+	menu->Items[1].D.Input.nch = 0;
+	menu->Items[1].D.Input.maxch = 28;
 }
 
 /**
@@ -2116,8 +2116,8 @@ static void SaveReplayInit(Menuitem* mi __attribute__((unused)))
 */
 static void SaveReplayExit(Menuitem* mi)
 {
-	free(mi->menu->Items[1].d.input.buffer);
-	mi->menu->Items[1].d.input.buffer = NULL;
+	free(mi->Menu->Items[1].D.Input.buffer);
+	mi->Menu->Items[1].D.Input.buffer = NULL;
 }
 
 /**
@@ -2125,10 +2125,10 @@ static void SaveReplayExit(Menuitem* mi)
 */
 static void SaveReplayEnterAction(Menuitem* mi, int key)
 {
-	if (mi->d.input.nch == 0) {
-		mi[1].flags = MenuButtonDisabled;
+	if (mi->D.Input.nch == 0) {
+		mi[1].Flags = MenuButtonDisabled;
 	} else {
-		mi[1].flags &= ~MenuButtonDisabled;
+		mi[1].Flags &= ~MenuButtonDisabled;
 		if (key == 10 || key == 13) {
 			SaveReplayOk();
 		}
@@ -2141,18 +2141,18 @@ static void SaveReplayEnterAction(Menuitem* mi, int key)
 static void SaveReplayOk(void)
 {
 	FILE *fd;
-	Menu *menu;
+	Menu* menu;
 	char *buf;
 	struct stat s;
 	char *ptr;
 
 	menu = FindMenu("menu-save-replay");
 
-	if (strchr(menu->Items[1].d.input.buffer, '/')) {
+	if (strchr(menu->Items[1].D.Input.buffer, '/')) {
 		ErrorMenu("Name cannot contain '/'");
 		return;
 	}
-	if (strchr(menu->Items[1].d.input.buffer, '\\')) {
+	if (strchr(menu->Items[1].D.Input.buffer, '\\')) {
 		ErrorMenu("Name cannot contain '\\'");
 		return;
 	}
@@ -2172,9 +2172,9 @@ static void SaveReplayOk(void)
 	fread(buf, s.st_size, 1, fd);
 	fclose(fd);
 
-	strncpy(ptr, menu->Items[1].d.input.buffer, menu->Items[1].d.input.nch);
-	ptr[menu->Items[1].d.input.nch] = '\0';
-	if (!strcasestr(menu->Items[1].d.input.buffer, ".log\0")) {
+	strncpy(ptr, menu->Items[1].D.Input.buffer, menu->Items[1].D.Input.nch);
+	ptr[menu->Items[1].D.Input.nch] = '\0';
+	if (!strcasestr(menu->Items[1].D.Input.buffer, ".log\0")) {
 		strcat(ptr, ".log");
 	}
 
@@ -2221,13 +2221,13 @@ static void TipsMenu(void)
 static void TipsFreeTips(void)
 {
 	int i;
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-tips");
 	for (i = 4; i < 12; i++) {
-		if (menu->Items[i].d.text.text) {
-			free(menu->Items[i].d.text.text);
-			menu->Items[i].d.text.text = NULL;
+		if (menu->Items[i].D.Text.text) {
+			free(menu->Items[i].D.Text.text);
+			menu->Items[i].D.Text.text = NULL;
 		}
 	}
 }
@@ -2235,7 +2235,7 @@ static void TipsFreeTips(void)
 /**
 ** Initialize the tips menu
 */
-static void TipsInit(Menuitem *mi __attribute__((unused)))
+static void TipsInit(Menuitem* mi __attribute__((unused)))
 {
 	int i;
 	int line;
@@ -2245,20 +2245,20 @@ static void TipsInit(Menuitem *mi __attribute__((unused)))
 	int w;
 	int font;
 	int l;
-	Menu *menu;
+	Menu* menu;
 
 	menu = CurrentMenu;
 
 	if(ShowTips) {
-		menu->Items[1].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[1].D.Checkbox.State = MI_CSTATE_CHECKED;
 	} else {
-		menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
+		menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	}
 
 	TipsFreeTips();
 
-	w = menu->Width-2 * menu->Items[5].xofs;
-	font = menu->Items[5].font;
+	w = menu->Width-2 * menu->Items[5].XOfs;
+	font = menu->Items[5].Font;
 	i = 0;
 	line = 5;
 
@@ -2290,7 +2290,7 @@ static void TipsInit(Menuitem *mi __attribute__((unused)))
 			space = s1;
 			*space = '\0';
 		}
-		menu->Items[line++].d.text.text = strdup(s);
+		menu->Items[line++].D.Text.text = strdup(s);
 		l += strlen(s);
 		if(!p[l]) {
 			break;
@@ -2330,7 +2330,7 @@ static void TipsCyclePreviousTip(void)
 /**
 ** Tips menu exit callback
 */
-static void TipsExit(Menuitem *mi __attribute__((unused)))
+static void TipsExit(Menuitem* mi __attribute__((unused)))
 {
 	TipsCycleNextTip();
 	TipsFreeTips();
@@ -2340,9 +2340,9 @@ static void TipsExit(Menuitem *mi __attribute__((unused)))
 /**
 ** Show tips at startup gem callback
 */
-static void TipsShowTipsCheckbox(Menuitem *mi)
+static void TipsShowTipsCheckbox(Menuitem* mi)
 {
-	if (mi->menu->Items[1].d.checkbox.state == MI_CSTATE_CHECKED) {
+	if (mi->Menu->Items[1].D.Checkbox.State == MI_CSTATE_CHECKED) {
 		ShowTips = 1;
 	} else {
 		ShowTips = 0;
@@ -2352,14 +2352,14 @@ static void TipsShowTipsCheckbox(Menuitem *mi)
 /**
 ** Show tips at startup text callback
 */
-static void TipsShowTipsText(Menuitem *mi)
+static void TipsShowTipsText(Menuitem* mi)
 {
-	if (mi->menu->Items[1].d.checkbox.state == MI_CSTATE_UNCHECKED) {
+	if (mi->Menu->Items[1].D.Checkbox.State == MI_CSTATE_UNCHECKED) {
 		ShowTips = 1;
-		mi->menu->Items[1].d.checkbox.state = MI_CSTATE_CHECKED;
+		mi->Menu->Items[1].D.Checkbox.State = MI_CSTATE_CHECKED;
 	} else {
 		ShowTips = 0;
-		mi->menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
+		mi->Menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	}
 }
 
@@ -2393,7 +2393,7 @@ static void GameMenuExit(void)
 /**
 ** Initialize the game objectives menu
 */
-static void ObjectivesInit(Menuitem *mi __attribute__((unused)))
+static void ObjectivesInit(Menuitem* mi __attribute__((unused)))
 {
 	int i;
 	int line;
@@ -2403,11 +2403,11 @@ static void ObjectivesInit(Menuitem *mi __attribute__((unused)))
 	int w;
 	int font;
 	int l;
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-objectives");
-	w = menu->Width-2 * menu->Items[1].xofs;
-	font = menu->Items[1].font;
+	w = menu->Width-2 * menu->Items[1].XOfs;
+	font = menu->Items[1].Font;
 	i = 0;
 	line = 1;
 
@@ -2435,7 +2435,7 @@ static void ObjectivesInit(Menuitem *mi __attribute__((unused)))
 				space = s1;
 				*space = '\0';
 			}
-			menu->Items[line++].d.text.text = strdup(s);
+			menu->Items[line++].D.Text.text = strdup(s);
 			l += strlen(s);
 			if(!p[l]) {
 				break;
@@ -2454,16 +2454,16 @@ static void ObjectivesInit(Menuitem *mi __attribute__((unused)))
 /**
 ** Free the game objectives menu memory
 */
-static void ObjectivesExit(Menuitem *mi)
+static void ObjectivesExit(Menuitem* mi)
 {
 	int i;
-	Menu *menu;
+	Menu* menu;
 
-	menu = mi->menu;
+	menu = mi->Menu;
 	for(i = 1; i < menu->NumItems - 1;i++) {
-		if( menu->Items[i].d.text.text ) {
-			free(menu->Items[i].d.text.text);
-			menu->Items[i].d.text.text = NULL;
+		if( menu->Items[i].D.Text.text ) {
+			free(menu->Items[i].D.Text.text);
+			menu->Items[i].D.Text.text = NULL;
 		}
 	}
 }
@@ -2507,7 +2507,7 @@ static void GetInfoFromSelectPath(void)
 */
 static void ScenSelectMenu(void)
 {
-	Menu *menu;
+	Menu* menu;
 	int n;
 	int j;
 	int t;
@@ -2519,8 +2519,8 @@ static void ScenSelectMenu(void)
 	menu = FindMenu("menu-custom-game");
 	// FIXME: This check is only needed until GetCmInfo works
 	if (!MenuMapInfo) {
-		menu->Items[12].d.pulldown.noptions = PlayerMax-1;
-		menu->Items[12].d.pulldown.curopt = 0;
+		menu->Items[12].D.Pulldown.noptions = PlayerMax-1;
+		menu->Items[12].D.Pulldown.curopt = 0;
 	} else {
 		for (n = j = 0; j < PlayerMax; ++j) {
 			t = MenuMapInfo->PlayerType[j];
@@ -2528,9 +2528,9 @@ static void ScenSelectMenu(void)
 				n++;
 			}
 		}
-		menu->Items[12].d.pulldown.noptions = n;
-		if (menu->Items[12].d.pulldown.curopt >= n) {
-			menu->Items[12].d.pulldown.curopt = 0;
+		menu->Items[12].D.Pulldown.noptions = n;
+		if (menu->Items[12].D.Pulldown.curopt >= n) {
+			menu->Items[12].D.Pulldown.curopt = 0;
 		}
 	}
 }
@@ -2540,18 +2540,18 @@ static void ScenSelectMenu(void)
 */
 static void MultiScenSelectMenu(void)
 {
-	Menu *menu;
+	Menu* menu;
 	unsigned flags;
 
 	// FIXME: remove when cm works with multiplayer
 	menu = FindMenu("menu-select-scenario");
-	flags = menu->Items[6].flags;
-	menu->Items[6].flags = MenuButtonDisabled;
+	flags = menu->Items[6].Flags;
+	menu->Items[6].Flags = MenuButtonDisabled;
 
 	ScenSelectMenu();
 	MultiGamePlayerSelectorsUpdate(1);
 
-	menu->Items[6].flags = MI_DISABLED;
+	menu->Items[6].Flags = MI_DISABLED;
 }
 
 /**
@@ -2592,16 +2592,16 @@ static void CampaignGameMenu(void)
 	for (i = 0; i < NumCampaigns && i < 4; ++i) {
 		char* s;
 
-		menu->Items[i].d.button.text = Campaigns[i].Name;
-		menu->Items[i].flags &= ~MenuButtonDisabled;
+		menu->Items[i].D.Button.Text = Campaigns[i].Name;
+		menu->Items[i].Flags &= ~MenuButtonDisabled;
 
 		if ((s = strchr(Campaigns[i].Name, '!'))) {
-			menu->Items[i].d.button.hotkey = tolower(s[1]);
+			menu->Items[i].D.Button.HotKey = tolower(s[1]);
 		}
 	}
 	for (; i < 4; ++i) {
-		menu->Items[i].d.button.text = "Not available";
-		menu->Items[i].flags |= MenuButtonDisabled;
+		menu->Items[i].D.Button.Text = "Not available";
+		menu->Items[i].Flags |= MenuButtonDisabled;
 	}
 
 	GuiGameStarted = 0;
@@ -2611,7 +2611,7 @@ static void CampaignGameMenu(void)
 	}
 
 	for (i = 0; i < 4; ++i) {
-		menu->Items[i].d.button.text = NULL;
+		menu->Items[i].D.Button.Text = NULL;
 	}
 }
 
@@ -2692,22 +2692,22 @@ static void SelectCampaignMenu(void)
 */
 static void EnterNameCancel(void)
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = CurrentMenu;
-	menu->Items[1].d.input.nch = 0;
+	menu->Items[1].D.Input.nch = 0;
 	EndMenu();
 }
 
 /**
 ** Input field action of player name menu.
 */
-static void EnterNameAction(Menuitem *mi, int key)
+static void EnterNameAction(Menuitem* mi, int key)
 {
-	if (mi->d.input.nch == 0) {
-		mi[1].flags = MenuButtonDisabled;
+	if (mi->D.Input.nch == 0) {
+		mi[1].Flags = MenuButtonDisabled;
 	} else {
-		mi[1].flags &= ~MenuButtonDisabled;
+		mi[1].Flags &= ~MenuButtonDisabled;
 		if (key == 10 || key == 13) {
 			EndMenu();
 		}
@@ -2719,19 +2719,19 @@ static void EnterNameAction(Menuitem *mi, int key)
 */
 static void EnterServerIPCancel(void)
 {
-	CurrentMenu->Items[1].d.input.nch = 0;
+	CurrentMenu->Items[1].D.Input.nch = 0;
 	EndMenu();
 }
 
 /**
 ** Input field action of server ip/name.
 */
-static void EnterServerIPAction(Menuitem *mi, int key)
+static void EnterServerIPAction(Menuitem* mi, int key)
 {
-	if (mi->d.input.nch == 0) {
-		mi[1].flags = MenuButtonDisabled;
+	if (mi->D.Input.nch == 0) {
+		mi[1].Flags = MenuButtonDisabled;
 	} else {
-		mi[1].flags &= ~MenuButtonDisabled;
+		mi[1].Flags &= ~MenuButtonDisabled;
 		if (key == 10 || key == 13) {
 			EndMenu();
 		}
@@ -2745,7 +2745,7 @@ static void JoinNetGameMenu(void)
 {
 	char server_host_buffer[64];
 	char *port;
-	Menu *menu;
+	Menu* menu;
 
 	//
 	//  Prepare enter ip/hostname menu
@@ -2765,18 +2765,18 @@ static void JoinNetGameMenu(void)
 	}
 	menu = FindMenu("menu-enter-server");
 	strcat(server_host_buffer, "~!_");
-	menu->Items[1].d.input.buffer = server_host_buffer;
-	menu->Items[1].d.input.nch = strlen(server_host_buffer) - 3;
-	menu->Items[1].d.input.maxch = 60;
-	if (menu->Items[1].d.input.nch) {
-		menu->Items[2].flags &= ~MenuButtonDisabled;
+	menu->Items[1].D.Input.buffer = server_host_buffer;
+	menu->Items[1].D.Input.nch = strlen(server_host_buffer) - 3;
+	menu->Items[1].D.Input.maxch = 60;
+	if (menu->Items[1].D.Input.nch) {
+		menu->Items[2].Flags &= ~MenuButtonDisabled;
 	} else {
-		menu->Items[2].flags |= MenuButtonDisabled;
+		menu->Items[2].Flags |= MenuButtonDisabled;
 	}
 
 	ProcessMenu("menu-enter-server", 1);
 
-	if (menu->Items[1].d.input.nch == 0) {
+	if (menu->Items[1].D.Input.nch == 0) {
 		return;
 	}
 
@@ -2786,7 +2786,7 @@ static void JoinNetGameMenu(void)
 	}
 
 	// Now finally here is the address
-	server_host_buffer[menu->Items[1].d.input.nch] = 0;
+	server_host_buffer[menu->Items[1].D.Input.nch] = 0;
 	if (NetworkSetupServerAddress(server_host_buffer)) {
 		NetErrorMenu("Unable to lookup host.");
 		return;
@@ -2813,19 +2813,19 @@ static void JoinNetGameMenu(void)
 /**
 ** Network connect menu init.
 */
-static void NetConnectingInit(Menuitem *mi)
+static void NetConnectingInit(Menuitem* mi)
 {
-	mi->menu->Items[1].d.text.text = NetServerText;
-	mi->menu->Items[2].d.text.text = NetTriesText;
+	mi->Menu->Items[1].D.Text.text = NetServerText;
+	mi->Menu->Items[2].D.Text.text = NetTriesText;
 }
 
 /**
 ** Network connect menu exit.
 */
-static void NetConnectingExit(Menuitem *mi)
+static void NetConnectingExit(Menuitem* mi)
 {
-	mi->menu->Items[1].d.text.text = NULL;
-	mi->menu->Items[2].d.text.text = NULL;
+	mi->Menu->Items[1].D.Text.text = NULL;
+	mi->Menu->Items[2].D.Text.text = NULL;
 }
 
 /**
@@ -2944,20 +2944,20 @@ static void MultiPlayerGameMenu(void)
 	Menu* menu;
 
 	menu = FindMenu("menu-enter-name");
-	menu->Items[1].d.input.buffer = NameBuf;
+	menu->Items[1].D.Input.buffer = NameBuf;
 	strcpy(NameBuf, LocalPlayerName);
 	strcat(NameBuf, "~!_");
-	menu->Items[1].d.input.nch = strlen(NameBuf) - 3;
-	menu->Items[1].d.input.maxch = 15;
-	menu->Items[2].flags &= ~MenuButtonDisabled;
+	menu->Items[1].D.Input.nch = strlen(NameBuf) - 3;
+	menu->Items[1].D.Input.maxch = 15;
+	menu->Items[2].Flags &= ~MenuButtonDisabled;
 
 	ProcessMenu("menu-enter-name", 1);
 
-	if (menu->Items[1].d.input.nch == 0) {
+	if (menu->Items[1].D.Input.nch == 0) {
 		return;
 	}
 
-	NameBuf[menu->Items[1].d.input.nch] = 0; // Now finally here is the name
+	NameBuf[menu->Items[1].D.Input.nch] = 0; // Now finally here is the name
 	memset(LocalPlayerName, 0, 16);
 	strcpy(LocalPlayerName, NameBuf);
 
@@ -3025,30 +3025,30 @@ static void FreeMapInfos(FileList *fl, int n)
 /**
 ** Initialize the scenario selector menu.
 */
-static void ScenSelectInit(Menuitem *mi)
+static void ScenSelectInit(Menuitem* mi)
 {
 	Assert(*ScenSelectPath);
-	mi->menu->Items[9].flags =
+	mi->Menu->Items[9].Flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-	mi->menu->Items[9].d.button.text = ScenSelectDisplayPath;
+	mi->Menu->Items[9].D.Button.Text = ScenSelectDisplayPath;
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 /**
 **  Scenario select listbox action callback
 */
-static void ScenSelectLBAction(Menuitem *mi, int i)
+static void ScenSelectLBAction(Menuitem* mi, int i)
 {
 	FileList* fl;
 
 	Assert(i >= 0);
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
-		free(mi->menu->Items[3].d.button.text);
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
+		free(mi->Menu->Items[3].D.Button.Text);
 		if (fl[i].type) {
-			mi->menu->Items[3].d.button.text = strdup("OK");
+			mi->Menu->Items[3].D.Button.Text = strdup("OK");
 		} else {
-			mi->menu->Items[3].d.button.text = strdup("Open");
+			mi->Menu->Items[3].D.Button.Text = strdup("Open");
 		}
 	}
 }
@@ -3056,17 +3056,17 @@ static void ScenSelectLBAction(Menuitem *mi, int i)
 /**
 ** Scenario select listbox exit callback
 */
-static void ScenSelectLBExit(Menuitem *mi)
+static void ScenSelectLBExit(Menuitem* mi)
 {
 	FileList *fl;
 
-	if (mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
-		FreeMapInfos(fl, mi->d.listbox.noptions);
+	if (mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
+		FreeMapInfos(fl, mi->D.Listbox.noptions);
 		free(fl);
-		mi->d.listbox.options = NULL;
-		mi->d.listbox.noptions = 0;
-		mi[1].flags |= MenuButtonDisabled;
+		mi->D.Listbox.options = NULL;
+		mi->D.Listbox.noptions = 0;
+		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
@@ -3084,11 +3084,11 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 	unsigned u;
 	int sz;
 	static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-select-scenario");
 
-	curopt = menu->Items[6].d.pulldown.curopt;
+	curopt = menu->Items[6].D.Pulldown.curopt;
 	if (curopt == 0) {
 		suf[0] = ".cm";
 		suf[1] = NULL;
@@ -3148,7 +3148,7 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 			} else if (curopt == 1) {
 				info = GetPudInfo(pathbuf);
 				if (info) {
-					sz = szl[menu->Items[8].d.pulldown.curopt];
+					sz = szl[menu->Items[8].D.Pulldown.curopt];
 					if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
 						fl->type = 1;
 						fl->name = strdup(np);
@@ -3172,24 +3172,24 @@ static void ScenSelectLBInit(Menuitem* mi)
 	int i;
 
 	ScenSelectLBExit(mi);
-	if (mi->menu->Items[6].d.pulldown.curopt == 0) {
-		mi->menu->Items[8].flags |= MenuButtonDisabled;
+	if (mi->Menu->Items[6].D.Pulldown.curopt == 0) {
+		mi->Menu->Items[8].Flags |= MenuButtonDisabled;
 	} else {
-		mi->menu->Items[8].flags &= ~MenuButtonDisabled;
+		mi->Menu->Items[8].Flags &= ~MenuButtonDisabled;
 	}
-	i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
-		(FileList**)&(mi->d.listbox.options));
+	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
+		(FileList**)&(mi->D.Listbox.options));
 	if (i == 0) {
-		free(mi->menu->Items[3].d.button.text);
-		mi->menu->Items[3].d.button.text = strdup("OK");
-		mi->menu->Items[3].flags |= MenuButtonDisabled;
+		free(mi->Menu->Items[3].D.Button.Text);
+		mi->Menu->Items[3].D.Button.Text = strdup("OK");
+		mi->Menu->Items[3].Flags |= MenuButtonDisabled;
 	} else {
 		ScenSelectLBAction(mi, 0);
-		mi->menu->Items[3].flags &= ~MenuButtonDisabled;
-		if (i > mi->d.listbox.nlines) {
-			mi[1].flags &= ~MenuButtonDisabled;
+		mi->Menu->Items[3].Flags &= ~MenuButtonDisabled;
+		if (i > mi->D.Listbox.nlines) {
+			mi[1].Flags &= ~MenuButtonDisabled;
 		} else {
-			mi[1].flags |= MenuButtonDisabled;
+			mi[1].Flags |= MenuButtonDisabled;
 		}
 	}
 }
@@ -3205,26 +3205,26 @@ static unsigned char* ScenSelectLBRetrieve(Menuitem* mi, int i)
 	int j;
 	int n;
 
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type) {
-			if (i == mi->d.listbox.curopt) {
+			if (i == mi->D.Listbox.curopt) {
 				if ((info = fl[i].xdata)) {
 					if (info->Description) {
-						VideoDrawText(mi->menu->X + 8, mi->menu->Y + 254, LargeFont, info->Description);
+						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254, LargeFont, info->Description);
 					}
 					sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-					VideoDrawText(mi->menu->X + 8,mi->menu->Y + 254 + 20, LargeFont, buffer);
+					VideoDrawText(mi->Menu->X + 8,mi->Menu->Y + 254 + 20, LargeFont, buffer);
 					for (n = j = 0; j < PlayerMax; j++) {
 						if (info->PlayerType[j] == PlayerPerson) {
 							n++;
 						}
 					}
 					if (n == 1) {
-						VideoDrawText(mi->menu->X + 8, mi->menu->Y + 254 + 40, LargeFont, "1 player");
+						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 40, LargeFont, "1 player");
 					} else {
 						sprintf(buffer, "%d players", n);
-						VideoDrawText(mi->menu->X + 8, mi->menu->Y + 254 + 40, LargeFont, buffer);
+						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 40, LargeFont, buffer);
 					}
 				}
 			}
@@ -3241,15 +3241,15 @@ static unsigned char* ScenSelectLBRetrieve(Menuitem* mi, int i)
 /**
 **  Scenario select map type action callback
 */
-static void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
+static void ScenSelectTPMSAction(Menuitem* mi, int i __attribute__((unused)))
 {
-	mi = mi->menu->Items + 1;
+	mi = mi->Menu->Items + 1;
 	ScenSelectLBInit(mi);
-	mi->d.listbox.cursel = -1;
-	mi->d.listbox.startline = 0;
-	mi->d.listbox.curopt = 0;
-	mi[1].d.vslider.percent = 0;
-	mi[1].d.hslider.percent = 0;
+	mi->D.Listbox.cursel = -1;
+	mi->D.Listbox.startline = 0;
+	mi->D.Listbox.curopt = 0;
+	mi[1].D.VSlider.percent = 0;
+	mi[1].D.HSlider.percent = 0;
 }
 
 /**
@@ -3266,13 +3266,13 @@ static void KeystrokeHelpVSAction(Menuitem* mi)
 {
 	int j;
 
-	j = ((mi->d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
-	if ((mi->d.vslider.cflags & MI_CFLAGS_DOWN) && j < nKeyStrokeHelps - 11) {
+	j = ((mi->D.VSlider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
+	if ((mi->D.VSlider.cflags & MI_CFLAGS_DOWN) && j < nKeyStrokeHelps - 11) {
 		++j;
-	} else if ((mi->d.vslider.cflags & MI_CFLAGS_UP) && j > 0) {
+	} else if ((mi->D.VSlider.cflags & MI_CFLAGS_UP) && j > 0) {
 		--j;
 	}
-	mi->d.vslider.percent = j * 100 / (nKeyStrokeHelps - 11);
+	mi->D.VSlider.percent = j * 100 / (nKeyStrokeHelps - 11);
 }
 
 /**
@@ -3283,12 +3283,12 @@ static void KeystrokeHelpDrawFunc(Menuitem* mi)
 	int i;
 	int j;
 
-	j = ((mi[-2].d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
+	j = ((mi[-2].D.VSlider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
 	for (i = 0; i < 11; ++i) {
-		VideoDrawText(mi->menu->X + mi->xofs, mi->menu->Y + mi->yofs + (i * 20),
-			mi->font,KeyStrokeHelps[j * 2]);
-		VideoDrawText(mi->menu->X + mi->xofs + 80, mi->menu->Y + mi->yofs + (i * 20),
-			mi->font,KeyStrokeHelps[j * 2 + 1]);
+		VideoDrawText(mi->Menu->X + mi->XOfs, mi->Menu->Y + mi->YOfs + (i * 20),
+			mi->Font, KeyStrokeHelps[j * 2]);
+		VideoDrawText(mi->Menu->X + mi->XOfs + 80, mi->Menu->Y + mi->YOfs + (i * 20),
+			mi->Font, KeyStrokeHelps[j * 2 + 1]);
 		++j;
 	}
 }
@@ -3296,20 +3296,20 @@ static void KeystrokeHelpDrawFunc(Menuitem* mi)
 /**
 ** Game speed horizontal slider action callback
 */
-static void GameSpeedHSAction(Menuitem *mi)
+static void GameSpeedHSAction(Menuitem* mi)
 {
-	VideoSyncSpeed = (mi->d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
+	VideoSyncSpeed = (mi->D.HSlider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
 	SetVideoSync();
 }
 
 /**
 ** Mouse scroll horizontal slider action callback
 */
-static void MouseScrollHSAction(Menuitem *mi)
+static void MouseScrollHSAction(Menuitem* mi)
 {
 	TheUI.MouseScroll = 1;
-	SpeedMouseScroll = 10 - (mi->d.hslider.percent * 9) / 100;
-	if (mi->d.hslider.percent == 0) {
+	SpeedMouseScroll = 10 - (mi->D.HSlider.percent * 9) / 100;
+	if (mi->D.HSlider.percent == 0) {
 		TheUI.MouseScroll = 0;
 	}
 }
@@ -3317,11 +3317,11 @@ static void MouseScrollHSAction(Menuitem *mi)
 /**
 ** Keyboard scroll horizontal slider action callback
 */
-static void KeyboardScrollHSAction(Menuitem *mi)
+static void KeyboardScrollHSAction(Menuitem* mi)
 {
 	TheUI.KeyScroll = 1;
-	SpeedKeyScroll = 10 - (mi->d.hslider.percent * 9) / 100;
-	if (mi->d.hslider.percent == 0) {
+	SpeedKeyScroll = 10 - (mi->D.HSlider.percent * 9) / 100;
+	if (mi->D.HSlider.percent == 0) {
 		TheUI.KeyScroll = 0;
 	}
 }
@@ -3329,32 +3329,32 @@ static void KeyboardScrollHSAction(Menuitem *mi)
 /**
 ** Master volume horizontal slider action callback
 */
-static void MasterVolumeHSAction(Menuitem *mi)
+static void MasterVolumeHSAction(Menuitem* mi)
 {
-	SetGlobalVolume((mi->d.hslider.percent * 255) / 100);
+	SetGlobalVolume((mi->D.HSlider.percent * 255) / 100);
 }
 
 /**
 ** Music volume horizontal slider action callback
 */
-static void MusicVolumeHSAction(Menuitem *mi)
+static void MusicVolumeHSAction(Menuitem* mi)
 {
-	SetMusicVolume((mi->d.hslider.percent * 255) / 100);
+	SetMusicVolume((mi->D.HSlider.percent * 255) / 100);
 }
 
 #ifdef USE_CDAUDIO
 /**
 ** CD volume horizontal slider action callback
 */
-static void CdVolumeHSAction(Menuitem *mi)
+static void CdVolumeHSAction(Menuitem* mi)
 {
-	SetCDVolume((mi->d.hslider.percent * 255) / 100);
+	SetCDVolume((mi->D.HSlider.percent * 255) / 100);
 }
 #else
 /**
 ** CD volume horizontal slider action callback
 */
-static void CdVolumeHSAction(Menuitem *mi __attribute__((unused)))
+static void CdVolumeHSAction(Menuitem* mi __attribute__((unused)))
 {
 }
 #endif
@@ -3365,8 +3365,8 @@ static void CdVolumeHSAction(Menuitem *mi __attribute__((unused)))
 static void ScenSelectFolder(void)
 {
 	char *cp;
-	Menu *menu;
-	Menuitem *mi;
+	Menu* menu;
+	Menuitem* mi;
 
 	menu = CurrentMenu;
 	mi = menu->Items + 1;
@@ -3376,18 +3376,18 @@ static void ScenSelectFolder(void)
 			*cp = 0;
 		} else {
 			ScenSelectDisplayPath[0] = 0;
-			menu->Items[9].flags |= MenuButtonDisabled;
-			menu->Items[9].d.button.text = NULL;
+			menu->Items[9].Flags |= MenuButtonDisabled;
+			menu->Items[9].D.Button.Text = NULL;
 		}
 		cp = strrchr(ScenSelectPath, '/');
 		if (cp) {
 			*cp = 0;
 			ScenSelectLBInit(mi);
-			mi->d.listbox.cursel = -1;
-			mi->d.listbox.startline = 0;
-			mi->d.listbox.curopt = 0;
-			mi[1].d.vslider.percent = 0;
-			mi[1].d.hslider.percent = 0;
+			mi->D.Listbox.cursel = -1;
+			mi->D.Listbox.startline = 0;
+			mi->D.Listbox.curopt = 0;
+			mi[1].D.VSlider.percent = 0;
+			mi[1].D.HSlider.percent = 0;
 		}
 	}
 }
@@ -3398,35 +3398,35 @@ static void ScenSelectFolder(void)
 static void ScenSelectOk(void)
 {
 	FileList *fl;
-	Menu *menu;
-	Menuitem *mi;
+	Menu* menu;
+	Menuitem* mi;
 	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt;
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	i = mi->D.Listbox.curopt;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type == 0) {
 			strcat(ScenSelectPath, "/");
 			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[9].flags & MenuButtonDisabled) {
-				menu->Items[9].flags &= ~MenuButtonDisabled;
-				menu->Items[9].d.button.text = ScenSelectDisplayPath;
+			if (menu->Items[9].Flags & MenuButtonDisabled) {
+				menu->Items[9].Flags &= ~MenuButtonDisabled;
+				menu->Items[9].D.Button.Text = ScenSelectDisplayPath;
 			} else {
 				strcat(ScenSelectDisplayPath, "/");
 			}
 			strcat(ScenSelectDisplayPath, fl[i].name);
 			ScenSelectLBInit(mi);
-			mi->d.listbox.cursel = -1;
-			mi->d.listbox.startline = 0;
-			mi->d.listbox.curopt = 0;
-			mi[1].d.vslider.percent = 0;
-			mi[1].d.hslider.percent = 0;
+			mi->D.Listbox.cursel = -1;
+			mi->D.Listbox.startline = 0;
+			mi->D.Listbox.curopt = 0;
+			mi[1].D.VSlider.percent = 0;
+			mi[1].D.HSlider.percent = 0;
 		} else {
 			strcpy(ScenSelectFileName, fl[i].name); // Final map name
 			EndMenu();
-			menu->Items[9].d.button.text = NULL;
+			menu->Items[9].D.Button.Text = NULL;
 		}
 	}
 }
@@ -3462,7 +3462,7 @@ static void ScenSelectCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 */
-	CurrentMenu->Items[9].d.button.text = NULL;
+	CurrentMenu->Items[9].D.Button.Text = NULL;
 
 	EndMenu();
 }
@@ -3513,9 +3513,9 @@ static void CustomGameStart(void)
 /**
 ** Single player custom game menu entered.
 */
-static void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
+static void GameSetupInit(Menuitem* mi __attribute__ ((unused)))
 {
-	Menu *menu;
+	Menu* menu;
 	int n;
 	int j;
 	int t;
@@ -3551,8 +3551,8 @@ static void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 	menu = FindMenu("menu-custom-game");
 	// FIXME: This check is only needed until GetCmInfo works
 	if (!MenuMapInfo) {
-		menu->Items[12].d.pulldown.noptions = PlayerMax-1;
-		menu->Items[12].d.pulldown.curopt = 0;
+		menu->Items[12].D.Pulldown.noptions = PlayerMax-1;
+		menu->Items[12].D.Pulldown.curopt = 0;
 	} else {
 		for (n = j = 0; j < PlayerMax; ++j) {
 			t = MenuMapInfo->PlayerType[j];
@@ -3560,9 +3560,9 @@ static void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 				n++;
 			}
 		}
-		menu->Items[12].d.pulldown.noptions = n;
-		if (menu->Items[12].d.pulldown.curopt >= n) {
-			menu->Items[12].d.pulldown.curopt = 0;
+		menu->Items[12].D.Pulldown.noptions = n;
+		if (menu->Items[12].D.Pulldown.curopt >= n) {
+			menu->Items[12].D.Pulldown.curopt = 0;
 		}
 	}
 }
@@ -3570,7 +3570,7 @@ static void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 /**
 ** FIXME: docu
 */
-static void GameDrawFunc(Menuitem *mi __attribute__((unused)))
+static void GameDrawFunc(Menuitem* mi __attribute__((unused)))
 {
 	char* nc;
 	char* rc;
@@ -3610,12 +3610,12 @@ static void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 **
 ** @note FIXME: Todo support more and other races.
 */
-static void GameRCSAction(Menuitem *mi, int i)
+static void GameRCSAction(Menuitem* mi, int i)
 {
 	int n;
 	int x;
 
-	if (mi->d.pulldown.curopt == i) {
+	if (mi->D.Pulldown.curopt == i) {
 		for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
 			if (PlayerRaces.Visible[n]) {
 				if (x == i) {
@@ -3629,7 +3629,7 @@ static void GameRCSAction(Menuitem *mi, int i)
 		} else {
 			GameSettings.Presets[0].Race = SettingsPresetMapDefault;
 		}
-		ServerSetupState.Race[0] = mi->d.pulldown.noptions - 1 - i;
+		ServerSetupState.Race[0] = mi->D.Pulldown.noptions - 1 - i;
 		NetworkServerResyncClients();
 	}
 }
@@ -3637,12 +3637,12 @@ static void GameRCSAction(Menuitem *mi, int i)
 /**
 ** Game resources action callback
 */
-static void GameRESAction(Menuitem *mi, int i)
+static void GameRESAction(Menuitem* mi, int i)
 {
 	int v[] = { SettingsResourcesMapDefault, SettingsResourcesLow,
 				SettingsResourcesMedium, SettingsResourcesHigh };
 
-	if (!mi || mi->d.pulldown.curopt == i) {
+	if (!mi || mi->D.Pulldown.curopt == i) {
 		GameSettings.Resources = v[i];
 		ServerSetupState.ResOpt = i;
 		if (mi) {
@@ -3654,9 +3654,9 @@ static void GameRESAction(Menuitem *mi, int i)
 /**
 ** Game units action callback
 */
-static void GameUNSAction(Menuitem *mi, int i)
+static void GameUNSAction(Menuitem* mi, int i)
 {
-	if (!mi || mi->d.pulldown.curopt == i) {
+	if (!mi || mi->D.Pulldown.curopt == i) {
 		GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
 		ServerSetupState.UnsOpt = i;
 		if (mi) {
@@ -3668,9 +3668,9 @@ static void GameUNSAction(Menuitem *mi, int i)
 /**
 ** Game tilesets action callback
 */
-static void GameTSSAction(Menuitem *mi, int i)
+static void GameTSSAction(Menuitem* mi, int i)
 {
-	if (!mi || mi->d.pulldown.curopt == i) {
+	if (!mi || mi->D.Pulldown.curopt == i) {
 		// Subtract 1 for default option.
 		GameSettings.Terrain = i - 1;
 		ServerSetupState.TssOpt = i;
@@ -3683,9 +3683,9 @@ static void GameTSSAction(Menuitem *mi, int i)
 /**
 ** Called if the pulldown menu of the game type is changed.
 */
-static void GameGATAction(Menuitem *mi, int i)
+static void GameGATAction(Menuitem* mi, int i)
 {
-	if (!mi || mi->d.pulldown.curopt == i) {
+	if (!mi || mi->D.Pulldown.curopt == i) {
 		GameSettings.GameType = i ? SettingsGameTypeMelee + i - 1 : SettingsGameTypeMapDefault;
 		ServerSetupState.GaTOpt = i;
 		if (mi) {
@@ -3697,7 +3697,7 @@ static void GameGATAction(Menuitem *mi, int i)
 /**
 ** Game opponents action callback
 */
-static void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
+static void CustomGameOPSAction(Menuitem* mi __attribute__((unused)), int i)
 {
 	GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
@@ -3705,9 +3705,9 @@ static void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 /**
 ** Menu setup fog-of-war pulldown action.
 */
-static void MultiGameFWSAction(Menuitem *mi, int i)
+static void MultiGameFWSAction(Menuitem* mi, int i)
 {
-	if (!mi || mi->d.pulldown.curopt == i) {
+	if (!mi || mi->D.Pulldown.curopt == i) {
 		DebugPrint("Update fow %d\n" _C_ i);
 		switch (i) {
 			case 0:
@@ -3745,9 +3745,9 @@ static void MultiGameFWSAction(Menuitem *mi, int i)
 /**
 ** Multiplayer menu player server states.
 */
-static void MultiGamePTSAction(Menuitem *mi, int o)
+static void MultiGamePTSAction(Menuitem* mi, int o)
 {
-	Menu *menu;
+	Menu* menu;
 	int i;
 
 	menu = FindMenu("menu-multi-setup");
@@ -3757,8 +3757,8 @@ static void MultiGamePTSAction(Menuitem *mi, int o)
 	// Assert(i >= 0 && i <= PlayerMax - 1);
 
 	if (i > 0 && i < PlayerMax-1) {
-		if (mi->d.pulldown.curopt == o) {
-			if (mi->d.pulldown.noptions == 2) { // computer slot
+		if (mi->D.Pulldown.curopt == o) {
+			if (mi->D.Pulldown.noptions == 2) { // computer slot
 				ServerSetupState.CompOpt[i] = o + 1;
 			} else {
 				ServerSetupState.CompOpt[i] = o;
@@ -3773,7 +3773,7 @@ static void MultiGamePTSAction(Menuitem *mi, int o)
 /**
 ** Multiplayer server draw func
 */
-static void MultiGameDrawFunc(Menuitem *mi)
+static void MultiGameDrawFunc(Menuitem* mi)
 {
 	GameDrawFunc(mi);
 }
@@ -3781,7 +3781,7 @@ static void MultiGameDrawFunc(Menuitem *mi)
 /**
 ** Multiplayer client draw func
 */
-static void MultiGameClientDrawFunc(Menuitem *mi)
+static void MultiGameClientDrawFunc(Menuitem* mi)
 {
 	// FIXME: do something better
 	GameDrawFunc(mi);
@@ -3884,7 +3884,7 @@ static void NetworkGamePrepareGameSettings(void)
 */
 static void MultiGamePlayerSelectorsUpdate(int initial)
 {
-	Menu *menu;
+	Menu* menu;
 	int i;
 	int h;
 	int c;
@@ -3916,11 +3916,11 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			if (i < h) {
 				ServerSetupState.CompOpt[i] = 0;
 			}
-			menu->Items[SERVER_PLAYER_READY - 1 + i].flags = 0;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state = MI_CSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = 0;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
 
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].flags = 0;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.checkbox.state = MI_CSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = 0;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
 
 			// FIXME: don't forget to throw out additional players
 			//   without available slots here!
@@ -3929,40 +3929,40 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 		if (Hosts[i].PlyNr) {
 			menu->Items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
 
-			menu->Items[SERVER_PLAYER_READY - 1 + i].flags = 0;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state = MI_CSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = 0;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
 			++plyrs;
 			if (ServerSetupState.Ready[i]) {
-				menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state |= MI_CSTATE_CHECKED;
+				menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State |= MI_CSTATE_CHECKED;
 				++ready;
 			}
 
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].flags = 0;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.checkbox.state = MI_CSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = 0;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
 		} else {
 			// don't allow network and button events to intercept server player's action on pulldown buttons!
-			if (!(menu->Items[SERVER_PLAYER_STATE + i].flags & MenuButtonClicked)) {
+			if (!(menu->Items[SERVER_PLAYER_STATE + i].Flags & MenuButtonClicked)) {
 				if (initial == 1 ||
-					(initial == 2 && menu->Items[SERVER_PLAYER_STATE + i].mitype != MI_TYPE_PULLDOWN)) {
+					(initial == 2 && menu->Items[SERVER_PLAYER_STATE + i].MiType != MI_TYPE_PULLDOWN)) {
 					menu->Items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[0];
-					menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.state = 0;
-					menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
+					menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.state = 0;
+					menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = ServerSetupState.CompOpt[i];
 				}
 			}
 			if (i < h && ServerSetupState.CompOpt[i] != 0) {
 				avail--;
 			}
 
-			menu->Items[SERVER_PLAYER_READY - 1 + i].flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state = MI_CSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MenuButtonDisabled;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_INVISIBLE;
 
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.checkbox.state = MI_CSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MenuButtonDisabled;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.State = MI_CSTATE_INVISIBLE;
 		}
 
-		menu->Items[SERVER_PLAYER_STATE + i].yofs = 32 + (i & 7) * 22;
+		menu->Items[SERVER_PLAYER_STATE + i].YOfs = 32 + (i & 7) * 22;
 		if (i > 7) {
-			menu->Items[SERVER_PLAYER_STATE + i].xofs = 320 + 40;
+			menu->Items[SERVER_PLAYER_STATE + i].XOfs = 320 + 40;
 		}
 
 
@@ -3970,26 +3970,26 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			// Allow to switch off (close) preset ai-computer slots
 			// FIXME: evaluate game type...
 			if (initial == 1 && i < h + c) {
-				menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.state = 0;
-				menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.noptions = 2;
-				menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.options = mgptsoptions + 1;
-				menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.curopt = 0;
+				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.state = 0;
+				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.noptions = 2;
+				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.options = mgptsoptions + 1;
+				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = 0;
 				ServerSetupState.CompOpt[i] = 1;
-				menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.curopt = ServerSetupState.CompOpt[i] - 1;
+				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = ServerSetupState.CompOpt[i] - 1;
 			}
 
-			menu->Items[SERVER_PLAYER_READY - 1 + i].flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state = MI_CSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MenuButtonDisabled;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_INVISIBLE;
 
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.checkbox.state = MI_CSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MenuButtonDisabled;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.State = MI_CSTATE_INVISIBLE;
 		}
 
 		if (i >= h + c) {
-			menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.state = MI_PSTATE_PASSIVE;
-			menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.defopt = 2;
-			menu->Items[SERVER_PLAYER_STATE + i].d.pulldown.curopt = 2;
-			menu->Items[SERVER_PLAYER_STATE + i].flags = MenuButtonDisabled;
+			menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.state = MI_PSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.defopt = 2;
+			menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = 2;
+			menu->Items[SERVER_PLAYER_STATE + i].Flags = MenuButtonDisabled;
 		}
 	}
 
@@ -4003,19 +4003,19 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 	// Disable the select scenario after players have joined.
 	if (plyrs) {
 		// disable Select Scenario button
-		menu->Items[2].flags = MenuButtonDisabled;
+		menu->Items[2].Flags = MenuButtonDisabled;
 	} else {
 		// enable Select Scenario button
-		menu->Items[2].flags = 0;
+		menu->Items[2].Flags = 0;
 	}
 	if (ready == avail) {
-		if (menu->Items[3].flags == MenuButtonDisabled) {
+		if (menu->Items[3].Flags == MenuButtonDisabled) {
 			// enable start game button
-			menu->Items[3].flags = 0;
+			menu->Items[3].Flags = 0;
 		}
 	} else {
 		// disable start game button
-		menu->Items[3].flags = MenuButtonDisabled;
+		menu->Items[3].Flags = MenuButtonDisabled;
 	}
 
 	if (MetaServerInUse) {
@@ -4028,7 +4028,7 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 */
 static void MultiClientUpdate(int initial)
 {
-	Menu *menu;
+	Menu* menu;
 	int i;
 	int h;
 	int c;
@@ -4050,7 +4050,7 @@ static void MultiClientUpdate(int initial)
 	//
 	if (initial) {
 		menu->Items[CLIENT_PLAYER_STATE] = NetMultiButtonStorage[1];
-		menu->Items[CLIENT_PLAYER_STATE].yofs = 32;
+		menu->Items[CLIENT_PLAYER_STATE].YOfs = 32;
 		memset(&ServerSetupState, 0, sizeof(ServerSetup));
 		memset(&LocalSetupState, 0, sizeof(ServerSetup));
 	}
@@ -4061,51 +4061,51 @@ static void MultiClientUpdate(int initial)
 		if (Hosts[i].PlyNr || i == NetLocalHostsSlot) {
 			menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[1];
 			if (i == NetLocalHostsSlot) {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state = 0;
+				menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State = 0;
 			} else {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state =
+				menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State =
 					MI_CSTATE_PASSIVE;
 			}
 		} else {
 			menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[0];
-			menu->Items[CLIENT_PLAYER_STATE + i].d.pulldown.state =
+			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.state =
 				MI_PSTATE_PASSIVE;
-			menu->Items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt =
+			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt =
 				ServerSetupState.CompOpt[i];
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state =
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State =
 				MI_CSTATE_INVISIBLE;
 		}
-		menu->Items[CLIENT_PLAYER_STATE + i].yofs = 32 + (i & 7) * 22;
+		menu->Items[CLIENT_PLAYER_STATE + i].YOfs = 32 + (i & 7) * 22;
 		if (i > 7) {
-			menu->Items[CLIENT_PLAYER_STATE + i].xofs = 320 + 40;
+			menu->Items[CLIENT_PLAYER_STATE + i].XOfs = 320 + 40;
 		}
-		menu->Items[CLIENT_PLAYER_READY - 1 + i].flags = 0;
+		menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = 0;
 
 		if (ServerSetupState.Ready[i]) {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state |=
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State |=
 				MI_CSTATE_CHECKED;
 		} else {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state &=
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State &=
 				~MI_CSTATE_CHECKED;
 		}
 
 #if 0
 		if (i != NetLocalHostsSlot) {
 		//if (i >= h) {
-			menu->Items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt =
+			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt =
 				ServerSetupState.CompOpt[i];
 		}
 #endif
 
 		// Unused slots are always disabled.
 		if (i >= h + c) {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].flags =
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags =
 				MenuButtonDisabled;
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state =
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State =
 				MI_CSTATE_INVISIBLE;
-			menu->Items[CLIENT_PLAYER_STATE + i].d.pulldown.defopt =
-				menu->Items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt = 2;
-			menu->Items[CLIENT_PLAYER_STATE + i].flags = MenuButtonDisabled;
+			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.defopt =
+				menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt = 2;
+			menu->Items[CLIENT_PLAYER_STATE + i].Flags = MenuButtonDisabled;
 		}
 	}
 }
@@ -4113,7 +4113,7 @@ static void MultiClientUpdate(int initial)
 /**
 ** Multiplayer server menu init callback
 */
-static void MultiGameSetupInit(Menuitem *mi)
+static void MultiGameSetupInit(Menuitem* mi)
 {
 	int i;
 	int h;
@@ -4125,9 +4125,9 @@ static void MultiGameSetupInit(Menuitem *mi)
 
 	GameSetupInit(mi);
 	NetworkInitServerConnect();
-	mi->menu->Items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
-	mi->menu->Items[SERVER_PLAYER_STATE].yofs = 32;
-	MultiGameFWSAction(NULL, mi->menu->Items[27].d.pulldown.defopt);
+	mi->Menu->Items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
+	mi->Menu->Items[SERVER_PLAYER_STATE].YOfs = 32;
+	MultiGameFWSAction(NULL, mi->Menu->Items[27].D.Pulldown.defopt);
 
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
 	// Calculate available slots from pudinfo
@@ -4150,14 +4150,14 @@ static void MultiGameSetupInit(Menuitem *mi)
 /**
 ** Multiplayer server menu exit callback
 */
-static void MultiGameSetupExit(Menuitem *mi)
+static void MultiGameSetupExit(Menuitem* mi)
 {
 	int i;
 
-	// ugly hack to prevent NetMultiButtonStorage[0].d.pulldown.options
+	// ugly hack to prevent NetMultiButtonStorage[0].D.Pulldown.options
 	// from being freed
 	for (i=0; i<PlayerMax-1; ++i) {
-		mi->menu->Items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
+		mi->Menu->Items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
 	}
 }
 
@@ -4179,9 +4179,9 @@ static void MultiGameCancel(void)
 /**
 ** Draw the multi player setup menu.
 */
-static void NetMultiPlayerDrawFunc(Menuitem *mi)
+static void NetMultiPlayerDrawFunc(Menuitem* mi)
 {
-	Menu *menu;
+	Menu* menu;
 	int i;
 	char* nc;
 	char* rc;
@@ -4190,27 +4190,27 @@ static void NetMultiPlayerDrawFunc(Menuitem *mi)
 	i = mi - menu->Items - SERVER_PLAYER_STATE;
 	if (i >= 0 && i < PlayerMax - 1) { // Ugly test to detect server
 		if (i > 0) {
-			menu->Items[SERVER_PLAYER_READY - 1 + i].flags &=
+			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags &=
 				~MenuButtonDisabled;
 			// Note: re-disabled in MultiGamePlayerSelectorsUpdate()
 			// for kicked out clients!!
 			if (ServerSetupState.Ready[i]) {
 				menu->Items[SERVER_PLAYER_READY - 1 + i]
-						.d.checkbox.state = MI_CSTATE_PASSIVE|MI_CSTATE_CHECKED;
+						.D.Checkbox.State = MI_CSTATE_PASSIVE|MI_CSTATE_CHECKED;
 			} else {
 				menu->Items[SERVER_PLAYER_READY - 1 + i]
-						.d.checkbox.state = MI_CSTATE_PASSIVE;
+						.D.Checkbox.State = MI_CSTATE_PASSIVE;
 			}
 			if (ServerSetupState.LastFrame[i] + 30 > FrameCounter) {
-				menu->Items[SERVER_PLAYER_LAG - 1 + i].flags &=
+				menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags &=
 					~MenuButtonDisabled;
 				menu->Items[SERVER_PLAYER_LAG - 1 + i]
-						.d.checkbox.state = MI_CSTATE_PASSIVE|MI_CSTATE_CHECKED;
+						.D.Checkbox.State = MI_CSTATE_PASSIVE|MI_CSTATE_CHECKED;
 			} else {
-				menu->Items[SERVER_PLAYER_LAG - 1 + i].flags |=
+				menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags |=
 					MenuButtonDisabled;
 				menu->Items[SERVER_PLAYER_LAG - 1 + i]
-						.d.checkbox.state = MI_CSTATE_PASSIVE;
+						.D.Checkbox.State = MI_CSTATE_PASSIVE;
 			}
 
 		}
@@ -4218,21 +4218,21 @@ static void NetMultiPlayerDrawFunc(Menuitem *mi)
 		menu = FindMenu("menu-net-multi-client");
 		i = mi - menu->Items - CLIENT_PLAYER_STATE;
 		if (i > 0) {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].flags &=
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags &=
 				~MenuButtonDisabled;
 			if (i == NetLocalHostsSlot) {
 				menu->Items[CLIENT_PLAYER_READY - 1 + i].
-						d.checkbox.state &= ~MI_CSTATE_PASSIVE;
+						D.Checkbox.State &= ~MI_CSTATE_PASSIVE;
 			} else {
 				menu->Items[CLIENT_PLAYER_READY - 1 + i].
-						d.checkbox.state |= MI_CSTATE_PASSIVE;
+						D.Checkbox.State |= MI_CSTATE_PASSIVE;
 			}
 		}
 	}
 
 	GetDefaultTextColors(&nc, &rc);
 	SetDefaultTextColors(rc, rc);
-	VideoDrawText(TheUI.Offset640X + mi->xofs, TheUI.Offset480Y + mi->yofs, GameFont, Hosts[i].PlyName);
+	VideoDrawText(TheUI.Offset640X + mi->XOfs, TheUI.Offset480Y + mi->YOfs, GameFont, Hosts[i].PlyName);
 
 	SetDefaultTextColors(nc, rc);
 }
@@ -4249,53 +4249,53 @@ static void MultiClientCancel(void)
 /**
 ** Multiplayer client menu init callback
 */
-static void MultiGameClientInit(Menuitem *mi)
+static void MultiGameClientInit(Menuitem* mi)
 {
 	// GameSetupInit(mi);
 	MultiClientUpdate(1);
 	if (LocalSetupState.Ready[NetLocalHostsSlot]) {
-		mi->menu->Items[2].flags = MenuButtonDisabled;
-		mi->menu->Items[3].flags = 0;
-		mi->menu->Items[CLIENT_RACE].flags = MenuButtonDisabled;
+		mi->Menu->Items[2].Flags = MenuButtonDisabled;
+		mi->Menu->Items[3].Flags = 0;
+		mi->Menu->Items[CLIENT_RACE].Flags = MenuButtonDisabled;
 	} else {
-		mi->menu->Items[3].flags = MenuButtonDisabled;
-		mi->menu->Items[2].flags = 0;
-		mi->menu->Items[CLIENT_RACE].flags = 0;
+		mi->Menu->Items[3].Flags = MenuButtonDisabled;
+		mi->Menu->Items[2].Flags = 0;
+		mi->Menu->Items[CLIENT_RACE].Flags = 0;
 	}
 }
 
 /**
 ** Multiplayer client menu exit callback
 */
-static void MultiGameClientExit(Menuitem *mi)
+static void MultiGameClientExit(Menuitem* mi)
 {
 	int i;
 
-	// ugly hack to prevent NetMultiButtonStorage[0].d.pulldown.options
+	// ugly hack to prevent NetMultiButtonStorage[0].D.Pulldown.options
 	// from being freed
 	for (i = 0; i < PlayerMax-1; ++i) {
-		mi->menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[1];
+		mi->Menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[1];
 	}
 }
 
 /**
 ** Multiplayer client gem action. Toggles ready flag.
 */
-static void MultiClientCheckboxAction(Menuitem *mi)
+static void MultiClientCheckboxAction(Menuitem* mi)
 {
 	int i;
 
-	i = mi - mi->menu->Items - CLIENT_PLAYER_READY + 1;
+	i = mi - mi->Menu->Items - CLIENT_PLAYER_READY + 1;
 	if (i == NetLocalHostsSlot) {
 		LocalSetupState.Ready[i] = !LocalSetupState.Ready[i];
 		if (LocalSetupState.Ready[i]) {
-			mi->menu->Items[2].flags = MenuButtonDisabled;
-			mi->menu->Items[3].flags = 0;
-			mi->menu->Items[CLIENT_RACE].flags = MenuButtonDisabled;
+			mi->Menu->Items[2].Flags = MenuButtonDisabled;
+			mi->Menu->Items[3].Flags = 0;
+			mi->Menu->Items[CLIENT_RACE].Flags = MenuButtonDisabled;
 		} else {
-			mi->menu->Items[3].flags = MenuButtonDisabled;
-			mi->menu->Items[2].flags = 0;
-			mi->menu->Items[CLIENT_RACE].flags = 0;
+			mi->Menu->Items[3].Flags = MenuButtonDisabled;
+			mi->Menu->Items[2].Flags = 0;
+			mi->Menu->Items[CLIENT_RACE].Flags = 0;
 		}
 		MultiClientUpdate(0);
 	}
@@ -4304,10 +4304,10 @@ static void MultiClientCheckboxAction(Menuitem *mi)
 /**
 ** Multiplayer client races action callback
 */
-static void MultiClientRCSAction(Menuitem *mi, int i)
+static void MultiClientRCSAction(Menuitem* mi, int i)
 {
-	if (mi->d.pulldown.curopt == i) {
-		LocalSetupState.Race[NetLocalHostsSlot] = mi->d.pulldown.noptions - 1 - i;
+	if (mi->D.Pulldown.curopt == i) {
+		LocalSetupState.Race[NetLocalHostsSlot] = mi->D.Pulldown.noptions - 1 - i;
 		MultiClientUpdate(0);
 	}
 }
@@ -4317,12 +4317,12 @@ static void MultiClientRCSAction(Menuitem *mi, int i)
 */
 static void MultiClientReady(void)
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-net-multi-client");
-	menu->Items[2].flags = MenuButtonDisabled;
-	menu->Items[3].flags = 0;
-	menu->Items[CLIENT_RACE].flags = MenuButtonDisabled;
+	menu->Items[2].Flags = MenuButtonDisabled;
+	menu->Items[3].Flags = 0;
+	menu->Items[CLIENT_RACE].Flags = MenuButtonDisabled;
 	LocalSetupState.Ready[NetLocalHostsSlot] = 1;
 	MultiClientUpdate(0);
 }
@@ -4332,12 +4332,12 @@ static void MultiClientReady(void)
 */
 static void MultiClientNotReady(void)
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-net-multi-client");
-	menu->Items[3].flags = MenuButtonDisabled;
-	menu->Items[2].flags = 0;
-	menu->Items[CLIENT_RACE].flags = 0;
+	menu->Items[3].Flags = MenuButtonDisabled;
+	menu->Items[2].Flags = 0;
+	menu->Items[CLIENT_RACE].Flags = 0;
 	LocalSetupState.Ready[NetLocalHostsSlot] = 0;
 	MultiClientUpdate(0);
 }
@@ -4402,28 +4402,28 @@ void NetConnectForceDisplayUpdate(void)
 */
 void NetClientUpdateState(void)
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-net-multi-client");
 
 	GameRESAction(NULL, ServerSetupState.ResOpt);
-	menu->Items[CLIENT_RESOURCE].d.pulldown.curopt =
+	menu->Items[CLIENT_RESOURCE].D.Pulldown.curopt =
 		ServerSetupState.ResOpt;
 
 	GameUNSAction(NULL, ServerSetupState.UnsOpt);
-	menu->Items[CLIENT_UNITS].d.pulldown.curopt =
+	menu->Items[CLIENT_UNITS].D.Pulldown.curopt =
 		ServerSetupState.UnsOpt;
 
 	MultiGameFWSAction(NULL, ServerSetupState.FwsOpt);
-	menu->Items[CLIENT_FOG_OF_WAR].d.pulldown.curopt =
+	menu->Items[CLIENT_FOG_OF_WAR].D.Pulldown.curopt =
 		ServerSetupState.FwsOpt;
 
 	GameTSSAction(NULL, ServerSetupState.TssOpt);
-	menu->Items[CLIENT_TILESET].d.pulldown.curopt =
+	menu->Items[CLIENT_TILESET].D.Pulldown.curopt =
 		ServerSetupState.TssOpt;
 
 	GameGATAction(NULL, ServerSetupState.GaTOpt);
-	menu->Items[CLIENT_GAMETYPE].d.pulldown.curopt =
+	menu->Items[CLIENT_GAMETYPE].D.Pulldown.curopt =
 		ServerSetupState.GaTOpt;
 
 	MultiClientUpdate(0);
@@ -4491,7 +4491,7 @@ static void EditorSelectCancel(void)
 */
 static void EditorNewMap(void)
 {
-	Menu *menu;
+	Menu* menu;
 	char width[10];
 	char height[10];
 	char description[36];
@@ -4499,19 +4499,19 @@ static void EditorNewMap(void)
 	EditorCancelled = 0;
 
 	menu = FindMenu("menu-editor-new");
-	menu->Items[2].d.input.buffer = description;
+	menu->Items[2].D.Input.buffer = description;
 	strcpy(description, "~!_");
-	menu->Items[2].d.input.nch = strlen(description) - 3;
-	menu->Items[2].d.input.maxch = 31;
-	menu->Items[4].d.input.buffer = width;
+	menu->Items[2].D.Input.nch = strlen(description) - 3;
+	menu->Items[2].D.Input.maxch = 31;
+	menu->Items[4].D.Input.buffer = width;
 	strcpy(width, "128~!_");
-	menu->Items[4].d.input.nch = strlen(width) - 3;
-	menu->Items[4].d.input.maxch = 4;
-	menu->Items[5].d.input.buffer = height;
+	menu->Items[4].D.Input.nch = strlen(width) - 3;
+	menu->Items[4].D.Input.maxch = 4;
+	menu->Items[5].D.Input.buffer = height;
 	strcpy(height, "128~!_");
-	menu->Items[5].d.input.nch = strlen(width) - 3;
-	menu->Items[5].d.input.maxch = 4;
-	menu->Items[7].d.pulldown.noptions = NumTilesets;
+	menu->Items[5].D.Input.nch = strlen(width) - 3;
+	menu->Items[5].D.Input.maxch = 4;
+	menu->Items[7].D.Pulldown.noptions = NumTilesets;
 	ProcessMenu("menu-editor-new", 1);
 
 	if (EditorCancelled) {
@@ -4521,7 +4521,7 @@ static void EditorNewMap(void)
 	TheMap.Info = calloc(1, sizeof(MapInfo));
 	description[strlen(description) - 3] = '\0';
 	TheMap.Info->Description = strdup(description);
-	TheMap.Info->MapTerrain = menu->Items[7].d.pulldown.curopt;
+	TheMap.Info->MapTerrain = menu->Items[7].D.Pulldown.curopt;
 	TheMap.Info->MapWidth = atoi(width);
 	TheMap.Info->MapHeight = atoi(height);
 
@@ -4536,7 +4536,7 @@ static void EditorNewMap(void)
 /**
 ** Editor new map draw func
 */
-static void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
+static void EditorNewDrawFunc(Menuitem* mi __attribute__((unused)))
 {
 }
 
@@ -4544,7 +4544,7 @@ static void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
 ** Editor new map, map description input box callback
 */
 static void EditorNewMapDescriptionEnterAction(
-		Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
+		Menuitem* mi __attribute__((unused)), int key __attribute__((unused)))
 {
 }
 
@@ -4554,9 +4554,9 @@ static void EditorNewMapDescriptionEnterAction(
 static void EditorNewMapSizeEnterAction(Menuitem * mi,
 		int key __attribute__((unused)))
 {
-	if (mi->d.input.nch > 0
-			&& !isdigit(mi->d.input.buffer[mi->d.input.nch - 1])) {
-		strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
+	if (mi->D.Input.nch > 0
+			&& !isdigit(mi->D.Input.buffer[mi->D.Input.nch - 1])) {
+		strcpy(mi->D.Input.buffer + (--mi->D.Input.nch), "~!_");
 	}
 }
 
@@ -4565,42 +4565,42 @@ static void EditorNewMapSizeEnterAction(Menuitem * mi,
 */
 static void EditorNewOk(void)
 {
-	Menu *menu;
+	Menu* menu;
 	unsigned value1;
 	unsigned value2;
 
 	menu = CurrentMenu;
-	value1 = atoi(menu->Items[4].d.input.buffer);
-	value2 = atoi(menu->Items[5].d.input.buffer);
+	value1 = atoi(menu->Items[4].D.Input.buffer);
+	value2 = atoi(menu->Items[5].D.Input.buffer);
 
 	if (value1 < 32 || value2 < 32) {
 		if (value1 < 32) {
-			sprintf(menu->Items[4].d.input.buffer, "32~!_");
-			menu->Items[4].d.input.nch = strlen(menu->Items[4].d.text.text) - 3;
+			sprintf(menu->Items[4].D.Input.buffer, "32~!_");
+			menu->Items[4].D.Input.nch = strlen(menu->Items[4].D.Text.text) - 3;
 		}
 		if (value2 < 32) {
-			sprintf(menu->Items[5].d.input.buffer, "32~!_");
-			menu->Items[5].d.input.nch = strlen(menu->Items[5].d.text.text) - 3;
+			sprintf(menu->Items[5].D.Input.buffer, "32~!_");
+			menu->Items[5].D.Input.nch = strlen(menu->Items[5].D.Text.text) - 3;
 		}
 		ErrorMenu("Size smaller than 32");
 	} else if (value1 > 1024 || value2 > 1024) {
 		if (value1 == 0) {
-			sprintf(menu->Items[4].d.input.buffer, "1024~!_");
-			menu->Items[4].d.input.nch = strlen(menu->Items[4].d.text.text) - 3;
+			sprintf(menu->Items[4].D.Input.buffer, "1024~!_");
+			menu->Items[4].D.Input.nch = strlen(menu->Items[4].D.Text.text) - 3;
 		}
 		if (value2 == 0) {
-			sprintf(menu->Items[5].d.input.buffer, "1024~!_");
-			menu->Items[5].d.input.nch = strlen(menu->Items[5].d.text.text) - 3;
+			sprintf(menu->Items[5].D.Input.buffer, "1024~!_");
+			menu->Items[5].D.Input.nch = strlen(menu->Items[5].D.Text.text) - 3;
 		}
 		ErrorMenu("Size larger than 1024");
 	} else if (value1 / 32 * 32 != value1 || value2/32*32 != value2) {
 		if (value1 / 32 * 32 != value1) {
-			sprintf(menu->Items[4].d.input.buffer, "%d~!_", (value1 + 16) / 32 * 32);
-			menu->Items[4].d.input.nch = strlen(menu->Items[4].d.text.text) - 3;
+			sprintf(menu->Items[4].D.Input.buffer, "%d~!_", (value1 + 16) / 32 * 32);
+			menu->Items[4].D.Input.nch = strlen(menu->Items[4].D.Text.text) - 3;
 		}
 		if (value2 / 32 * 32 != value2) {
-			sprintf(menu->Items[5].d.input.buffer, "%d~!_", (value2 + 16) / 32 * 32);
-			menu->Items[5].d.input.nch = strlen(menu->Items[5].d.text.text) - 3;
+			sprintf(menu->Items[5].D.Input.buffer, "%d~!_", (value2 + 16) / 32 * 32);
+			menu->Items[5].D.Input.nch = strlen(menu->Items[5].D.Text.text) - 3;
 		}
 		ErrorMenu("Size must be a multiple of 32");
 	}
@@ -4654,35 +4654,35 @@ static void EditorMainLoadMap(void)
 /**
 ** Editor main load init callback
 */
-static void EditorMainLoadInit(Menuitem *mi)
+static void EditorMainLoadInit(Menuitem* mi)
 {
 	Assert(*ScenSelectPath);
-	mi->menu->Items[5].flags =
+	mi->Menu->Items[5].Flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-	mi->menu->Items[5].d.button.text = ScenSelectDisplayPath;
+	mi->Menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 /**
 ** Editor main load listbox init callback
 */
-static void EditorMainLoadLBInit(Menuitem *mi)
+static void EditorMainLoadLBInit(Menuitem* mi)
 {
 	int i;
 
 	EditorMainLoadLBExit(mi);
-	i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorMainLoadRDFilter,
-		(FileList **) & (mi->d.listbox.options));
+	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorMainLoadRDFilter,
+		(FileList **) & (mi->D.Listbox.options));
 
 	if (i == 0) {
-		free(mi->menu->Items[3].d.button.text);
-		mi->menu->Items[3].d.button.text = strdup("OK");
-		mi->menu->Items[3].flags |= MenuButtonDisabled;
+		free(mi->Menu->Items[3].D.Button.Text);
+		mi->Menu->Items[3].D.Button.Text = strdup("OK");
+		mi->Menu->Items[3].Flags |= MenuButtonDisabled;
 	} else {
 		EditorMainLoadLBAction(mi, 0);
-		mi->menu->Items[3].flags &= ~MenuButtonDisabled;
-		if (i > mi->d.listbox.nlines) {
-			mi[1].flags &= ~MenuButtonDisabled;
+		mi->Menu->Items[3].Flags &= ~MenuButtonDisabled;
+		if (i > mi->D.Listbox.nlines) {
+			mi[1].Flags &= ~MenuButtonDisabled;
 		}
 	}
 }
@@ -4690,17 +4690,17 @@ static void EditorMainLoadLBInit(Menuitem *mi)
 /**
 ** Editor main load listbox exit callback
 */
-static void EditorMainLoadLBExit(Menuitem *mi)
+static void EditorMainLoadLBExit(Menuitem* mi)
 {
 	FileList *fl;
 
-	if (mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
-		FreeMapInfos(fl, mi->d.listbox.noptions);
+	if (mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
+		FreeMapInfos(fl, mi->D.Listbox.noptions);
 		free(fl);
-		mi->d.listbox.options = NULL;
-		mi->d.listbox.noptions = 0;
-		mi[1].flags |= MenuButtonDisabled;
+		mi->D.Listbox.options = NULL;
+		mi->D.Listbox.noptions = 0;
+		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
@@ -4777,8 +4777,8 @@ static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 */
 static void EditorMainLoadFolder(void)
 {
-	Menu *menu;
-	Menuitem *mi;
+	Menu* menu;
+	Menuitem* mi;
 	char *cp;
 
 	menu = CurrentMenu;
@@ -4790,18 +4790,18 @@ static void EditorMainLoadFolder(void)
 			*cp = 0;
 		} else {
 			ScenSelectDisplayPath[0] = 0;
-			menu->Items[5].flags |= MenuButtonDisabled;
-			menu->Items[5].d.button.text = NULL;
+			menu->Items[5].Flags |= MenuButtonDisabled;
+			menu->Items[5].D.Button.Text = NULL;
 		}
 		cp = strrchr(ScenSelectPath, '/');
 		if (cp) {
 			*cp = 0;
 			EditorMainLoadLBInit(mi);
-			mi->d.listbox.cursel = -1;
-			mi->d.listbox.startline = 0;
-			mi->d.listbox.curopt = 0;
-			mi[1].d.vslider.percent = 0;
-			mi[1].d.hslider.percent = 0;
+			mi->D.Listbox.cursel = -1;
+			mi->D.Listbox.startline = 0;
+			mi->D.Listbox.curopt = 0;
+			mi[1].D.VSlider.percent = 0;
+			mi[1].D.HSlider.percent = 0;
 		}
 	}
 }
@@ -4811,36 +4811,36 @@ static void EditorMainLoadFolder(void)
 */
 static void EditorMainLoadOk(void)
 {
-	Menu *menu;
-	Menuitem *mi;
+	Menu* menu;
+	Menuitem* mi;
 	FileList *fl;
 	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt;
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	i = mi->D.Listbox.curopt;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type == 0) {
 			strcat(ScenSelectPath, "/");
 			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[5].flags & MenuButtonDisabled) {
-				menu->Items[5].flags &= ~MenuButtonDisabled;
-				menu->Items[5].d.button.text = ScenSelectDisplayPath;
+			if (menu->Items[5].Flags & MenuButtonDisabled) {
+				menu->Items[5].Flags &= ~MenuButtonDisabled;
+				menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
 			} else {
 				strcat(ScenSelectDisplayPath, "/");
 			}
 			strcat(ScenSelectDisplayPath, fl[i].name);
 			EditorMainLoadLBInit(mi);
-			mi->d.listbox.cursel = -1;
-			mi->d.listbox.startline = 0;
-			mi->d.listbox.curopt = 0;
-			mi[1].d.vslider.percent = 0;
-			mi[1].d.hslider.percent = 0;
+			mi->D.Listbox.cursel = -1;
+			mi->D.Listbox.startline = 0;
+			mi->D.Listbox.curopt = 0;
+			mi[1].D.VSlider.percent = 0;
+			mi[1].D.HSlider.percent = 0;
 		} else {
 			strcpy(ScenSelectFileName, fl[i].name); // Final map name
 			EndMenu();
-			menu->Items[5].d.button.text = NULL;
+			menu->Items[5].D.Button.Text = NULL;
 		}
 	}
 }
@@ -4876,7 +4876,7 @@ static void EditorMainLoadCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
-	CurrentMenu->Items[5].d.button.text = NULL;
+	CurrentMenu->Items[5].D.Button.Text = NULL;
 
 	EndMenu();
 }
@@ -4884,7 +4884,7 @@ static void EditorMainLoadCancel(void)
 /**
 ** Editor main load listbox retrieve callback
 */
-static unsigned char* EditorMainLoadLBRetrieve(Menuitem *mi, int i)
+static unsigned char* EditorMainLoadLBRetrieve(Menuitem* mi, int i)
 {
 	FileList* fl;
 	MapInfo* info;
@@ -4892,26 +4892,26 @@ static unsigned char* EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 	int j;
 	int n;
 
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type) {
-			if (i == mi->d.listbox.curopt) {
+			if (i == mi->D.Listbox.curopt) {
 				if ((info = fl[i].xdata)) {
 					if (info->Description) {
-						VideoDrawText(mi->menu->X + 8, mi->menu->Y + 234, LargeFont, info->Description);
+						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 234, LargeFont, info->Description);
 					}
 					sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-					VideoDrawText(mi->menu->X + 8, mi->menu->Y + 234 + 20, LargeFont, buffer);
+					VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 234 + 20, LargeFont, buffer);
 					for (n = j = 0; j < PlayerMax; j++) {
 						if (info->PlayerType[j] == PlayerPerson) {
 							n++;
 						}
 					}
 					if (n == 1) {
-						VideoDrawText(mi->menu->X + 8, mi->menu->Y + 234 + 40, LargeFont, "1 player");
+						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 234 + 40, LargeFont, "1 player");
 					} else {
 						sprintf(buffer, "%d players", n);
-						VideoDrawText(mi->menu->X + 8, mi->menu->Y + 234 + 40, LargeFont, buffer);
+						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 234 + 40, LargeFont, buffer);
 					}
 				}
 			}
@@ -4928,18 +4928,18 @@ static unsigned char* EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 /**
 **  Editor main load listbox action callback
 */
-static void EditorMainLoadLBAction(Menuitem *mi, int i)
+static void EditorMainLoadLBAction(Menuitem* mi, int i)
 {
 	FileList *fl;
 
 	Assert(i >= 0);
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
-		free(mi->menu->Items[3].d.button.text);
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
+		free(mi->Menu->Items[3].D.Button.Text);
 		if (fl[i].type) {
-			mi->menu->Items[3].d.button.text = strdup("OK");
+			mi->Menu->Items[3].D.Button.Text = strdup("OK");
 		} else {
-			mi->menu->Items[3].d.button.text = strdup("Open");
+			mi->Menu->Items[3].D.Button.Text = strdup("Open");
 		}
 	}
 }
@@ -4947,7 +4947,7 @@ static void EditorMainLoadLBAction(Menuitem *mi, int i)
 /**
 ** Editor main load vertical slider action callback
 */
-static void EditorMainLoadVSAction(Menuitem *mi)
+static void EditorMainLoadVSAction(Menuitem* mi)
 {
 }
 
@@ -4990,36 +4990,36 @@ void EditorLoadMenu(void)
 */
 static void EditorLoadOk(void)
 {
-	Menu *menu;
-	Menuitem *mi;
+	Menu* menu;
+	Menuitem* mi;
 	FileList *fl;
 	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt;
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	i = mi->D.Listbox.curopt;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type == 0) {
 			strcat(ScenSelectPath, "/");
 			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[5].flags & MenuButtonDisabled) {
-				menu->Items[5].flags &= ~MenuButtonDisabled;
-				menu->Items[5].d.button.text = ScenSelectDisplayPath;
+			if (menu->Items[5].Flags & MenuButtonDisabled) {
+				menu->Items[5].Flags &= ~MenuButtonDisabled;
+				menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
 			} else {
 				strcat(ScenSelectDisplayPath, "/");
 			}
 			strcat(ScenSelectDisplayPath, fl[i].name);
 			EditorMainLoadLBInit(mi);
-			mi->d.listbox.cursel = -1;
-			mi->d.listbox.startline = 0;
-			mi->d.listbox.curopt = 0;
-			mi[1].d.vslider.percent = 0;
-			mi[1].d.hslider.percent = 0;
+			mi->D.Listbox.cursel = -1;
+			mi->D.Listbox.startline = 0;
+			mi->D.Listbox.curopt = 0;
+			mi[1].D.VSlider.percent = 0;
+			mi[1].D.HSlider.percent = 0;
 		} else {
 			strcpy(ScenSelectFileName, fl[i].name); // Final map name
 			EndMenu();
-			menu->Items[5].d.button.text = NULL;
+			menu->Items[5].D.Button.Text = NULL;
 		}
 	}
 }
@@ -5055,7 +5055,7 @@ static void EditorLoadCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
-	CurrentMenu->Items[5].d.button.text = NULL;
+	CurrentMenu->Items[5].D.Button.Text = NULL;
 
 	EditorEndMenu();
 }
@@ -5065,37 +5065,37 @@ static void EditorLoadCancel(void)
 */
 static void EditorMapPropertiesMenu(void)
 {
-	Menu *menu;
+	Menu* menu;
 	char description[36];
 	char size[30];
 
 	menu = FindMenu("menu-editor-map-properties");
 
-	menu->Items[2].d.input.buffer = description;
+	menu->Items[2].D.Input.buffer = description;
 	strcpy(description, TheMap.Info->Description);
 	strcat(description, "~!_");
-	menu->Items[2].d.input.nch = strlen(description) - 3;
-	menu->Items[2].d.input.maxch = 31;
+	menu->Items[2].D.Input.nch = strlen(description) - 3;
+	menu->Items[2].D.Input.maxch = 31;
 
 	sprintf(size, "%d x %d", TheMap.Width, TheMap.Height);
-	menu->Items[4].d.text.text = size;
+	menu->Items[4].D.Text.text = size;
 
-	menu->Items[6].d.pulldown.defopt = TheMap.Terrain;
+	menu->Items[6].D.Pulldown.defopt = TheMap.Terrain;
 
 	// FIXME: Set the correct pud version
-	menu->Items[8].d.pulldown.defopt = 1;
-	menu->Items[8].flags = -1;
+	menu->Items[8].D.Pulldown.defopt = 1;
+	menu->Items[8].Flags = -1;
 
 	ProcessMenu("menu-editor-map-properties", 1);
 
-	menu->Items[4].d.text.text = NULL;
+	menu->Items[4].D.Text.text = NULL;
 }
 
 /**
 ** Editor map properties input box callback
 */
 static void EditorMapPropertiesEnterAction(
-		Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
+		Menuitem* mi __attribute__((unused)), int key __attribute__((unused)))
 {
 }
 
@@ -5104,21 +5104,21 @@ static void EditorMapPropertiesEnterAction(
 */
 static void EditorMapPropertiesOk(void)
 {
-	Menu *menu;
+	Menu* menu;
 	char *description;
 	int old;
 
 	menu = CurrentMenu;
 
-	description = menu->Items[2].d.input.buffer;
+	description = menu->Items[2].D.Input.buffer;
 	description[strlen(description)-3] = '\0';
 	free(TheMap.Info->Description);
 	TheMap.Info->Description = strdup(description);
 
 	// Change the terrain
 	old = TheMap.Info->MapTerrain;
-	if (old != menu->Items[6].d.pulldown.curopt) {
-		TheMap.Info->MapTerrain = menu->Items[6].d.pulldown.curopt;
+	if (old != menu->Items[6].D.Pulldown.curopt) {
+		TheMap.Info->MapTerrain = menu->Items[6].D.Pulldown.curopt;
 		free(TheMap.Info->MapTerrainName);
 		TheMap.Info->MapTerrainName = strdup(TilesetWcNames[TheMap.Info->MapTerrain]);
 		TheMap.Terrain = TheMap.Info->MapTerrain;
@@ -5144,18 +5144,18 @@ static void EditorMapPropertiesOk(void)
 /**
 ** Editor player properties draw func
 */
-static void EditorPlayerPropertiesDrawFunc(Menuitem *mi __attribute__((unused)))
+static void EditorPlayerPropertiesDrawFunc(Menuitem* mi __attribute__((unused)))
 {
 }
 
 /**
 ** Editor player properties input box callback
 */
-static void EditorPlayerPropertiesEnterAction(Menuitem *mi,
+static void EditorPlayerPropertiesEnterAction(Menuitem* mi,
 		int key __attribute__((unused)))
 {
-	if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch - 1])) {
-		strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
+	if (mi->D.Input.nch > 0 && !isdigit(mi->D.Input.buffer[mi->D.Input.nch - 1])) {
+		strcpy(mi->D.Input.buffer + (--mi->D.Input.nch), "~!_");
 	}
 }
 
@@ -5226,7 +5226,7 @@ static int PlayerAiMenuToFc(int num)
 */
 static void EditorPlayerPropertiesMenu(void)
 {
-	Menu *menu;
+	Menu* menu;
 	char gold[PlayerMax][15];
 	char lumber[PlayerMax][15];
 	char oil[PlayerMax][15];
@@ -5242,29 +5242,29 @@ static void EditorPlayerPropertiesMenu(void)
 #define OIL_POSITION 106
 
 	for (i = 0; i < PlayerMax; ++i) {
-		menu->Items[RACE_POSITION + i].d.pulldown.defopt = TheMap.Info->PlayerSide[i];
-		menu->Items[TYPE_POSITION + i].d.pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info->PlayerType[i]];
-		menu->Items[AI_POSITION + i].d.pulldown.defopt = PlayerAiFcToMenu(TheMap.Info->PlayerAi[i]);
+		menu->Items[RACE_POSITION + i].D.Pulldown.defopt = TheMap.Info->PlayerSide[i];
+		menu->Items[TYPE_POSITION + i].D.Pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info->PlayerType[i]];
+		menu->Items[AI_POSITION + i].D.Pulldown.defopt = PlayerAiFcToMenu(TheMap.Info->PlayerAi[i]);
 		sprintf(gold[i], "%d~!_", TheMap.Info->PlayerResources[i][GoldCost]);
 		sprintf(lumber[i], "%d~!_", TheMap.Info->PlayerResources[i][WoodCost]);
 		sprintf(oil[i], "%d~!_", TheMap.Info->PlayerResources[i][OilCost]);
-		menu->Items[GOLD_POSITION + i].d.input.buffer = gold[i];
-		menu->Items[GOLD_POSITION + i].d.input.nch = strlen(gold[i]) - 3;
-		menu->Items[GOLD_POSITION + i].d.input.maxch = 7;
-		menu->Items[LUMBER_POSITION + i].d.input.buffer = lumber[i];
-		menu->Items[LUMBER_POSITION + i].d.input.nch = strlen(lumber[i]) - 3;
-		menu->Items[LUMBER_POSITION + i].d.input.maxch = 7;
-		menu->Items[OIL_POSITION + i].d.input.buffer = oil[i];
-		menu->Items[OIL_POSITION + i].d.input.nch = strlen(oil[i]) - 3;
-		menu->Items[OIL_POSITION + i].d.input.maxch = 7;
+		menu->Items[GOLD_POSITION + i].D.Input.buffer = gold[i];
+		menu->Items[GOLD_POSITION + i].D.Input.nch = strlen(gold[i]) - 3;
+		menu->Items[GOLD_POSITION + i].D.Input.maxch = 7;
+		menu->Items[LUMBER_POSITION + i].D.Input.buffer = lumber[i];
+		menu->Items[LUMBER_POSITION + i].D.Input.nch = strlen(lumber[i]) - 3;
+		menu->Items[LUMBER_POSITION + i].D.Input.maxch = 7;
+		menu->Items[OIL_POSITION + i].D.Input.buffer = oil[i];
+		menu->Items[OIL_POSITION + i].D.Input.nch = strlen(oil[i]) - 3;
+		menu->Items[OIL_POSITION + i].D.Input.maxch = 7;
 	}
 
 	ProcessMenu("menu-editor-player-properties", 1);
 
 	for (i = 0; i < PlayerMax; ++i) {
-		TheMap.Info->PlayerSide[i] = menu->Items[RACE_POSITION + i].d.pulldown.curopt;
-		TheMap.Info->PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].d.pulldown.curopt];
-		TheMap.Info->PlayerAi[i] = PlayerAiMenuToFc(menu->Items[AI_POSITION + i].d.pulldown.curopt);
+		TheMap.Info->PlayerSide[i] = menu->Items[RACE_POSITION + i].D.Pulldown.curopt;
+		TheMap.Info->PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].D.Pulldown.curopt];
+		TheMap.Info->PlayerAi[i] = PlayerAiMenuToFc(menu->Items[AI_POSITION + i].D.Pulldown.curopt);
 		TheMap.Info->PlayerResources[i][GoldCost] = atoi(gold[i]);
 		TheMap.Info->PlayerResources[i][WoodCost] = atoi(lumber[i]);
 		TheMap.Info->PlayerResources[i][OilCost] = atoi(oil[i]);
@@ -5276,29 +5276,29 @@ static void EditorPlayerPropertiesMenu(void)
 */
 void EditorEditResource(void)
 {
-	Menu *menu;
+	Menu* menu;
 	char buf[13];
 	char buf2[32];
 
 	menu = FindMenu("menu-editor-edit-resource");
 
 	sprintf(buf2,"Amount of %s:",DefaultResourceNames[UnitUnderCursor->Type->GivesResource]);
-	menu->Items[0].d.text.text = buf2;
+	menu->Items[0].D.Text.text = buf2;
 	sprintf(buf, "%d~!_", UnitUnderCursor->Value);
-	menu->Items[1].d.input.buffer = buf;
-	menu->Items[1].d.input.nch = strlen(buf) - 3;
-	menu->Items[1].d.input.maxch = 6;
+	menu->Items[1].D.Input.buffer = buf;
+	menu->Items[1].D.Input.nch = strlen(buf) - 3;
+	menu->Items[1].D.Input.maxch = 6;
 	ProcessMenu("menu-editor-edit-resource", 1);
-	menu->Items[0].d.text.text = NULL;
+	menu->Items[0].D.Text.text = NULL;
 }
 
 /**
 ** Key pressed in menu-editor-edit-resource
 */
-static void EditorEditResourceEnterAction(Menuitem *mi,int key)
+static void EditorEditResourceEnterAction(Menuitem* mi,int key)
 {
-	if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch - 1])) {
-		strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
+	if (mi->D.Input.nch > 0 && !isdigit(mi->D.Input.buffer[mi->D.Input.nch - 1])) {
+		strcpy(mi->D.Input.buffer + (--mi->D.Input.nch), "~!_");
 	} else if (key==10 || key==13) {
 		EditorEditResourceOk();
 	}
@@ -5309,33 +5309,33 @@ static void EditorEditResourceEnterAction(Menuitem *mi,int key)
 */
 static void EditorEditResourceOk(void)
 {
-	Menu *menu;
+	Menu* menu;
 	unsigned value;
 
 	menu = CurrentMenu;
-	value = atoi(menu->Items[1].d.input.buffer);
+	value = atoi(menu->Items[1].D.Input.buffer);
 	if (value < 2500) {
-		strcpy(menu->Items[1].d.text.text, "2500~!_");
-		menu->Items[1].d.input.nch = strlen(menu->Items[1].d.text.text) - 3;
+		strcpy(menu->Items[1].D.Text.text, "2500~!_");
+		menu->Items[1].D.Input.nch = strlen(menu->Items[1].D.Text.text) - 3;
 		menu = FindMenu("menu-editor-error");
-		menu->Items[1].d.text.text = "Must be greater than 2500";
+		menu->Items[1].D.Text.text = "Must be greater than 2500";
 		ProcessMenu("menu-editor-error", 1);
-		menu->Items[1].d.text.text = NULL;
+		menu->Items[1].D.Text.text = NULL;
 	} else if (value > 655000) {
-		strcpy(menu->Items[1].d.text.text, "655000~!_");
-		menu->Items[1].d.input.nch = strlen(menu->Items[1].d.text.text) - 3;
+		strcpy(menu->Items[1].D.Text.text, "655000~!_");
+		menu->Items[1].D.Input.nch = strlen(menu->Items[1].D.Text.text) - 3;
 		menu = FindMenu("menu-editor-error");
-		menu->Items[1].d.text.text = "Must be smaller than 655000";
+		menu->Items[1].D.Text.text = "Must be smaller than 655000";
 		ProcessMenu("menu-editor-error", 1);
-		menu->Items[1].d.text.text = NULL;
+		menu->Items[1].D.Text.text = NULL;
 	} else if (value / 2500 * 2500 != value) {
 		value = (value + 1250)/ 2500 * 2500;
-		sprintf(menu->Items[1].d.text.text, "%d~!_", value);
-		menu->Items[1].d.input.nch = strlen(menu->Items[1].d.text.text) - 3;
+		sprintf(menu->Items[1].D.Text.text, "%d~!_", value);
+		menu->Items[1].D.Input.nch = strlen(menu->Items[1].D.Text.text) - 3;
 		menu = FindMenu("menu-editor-error");
-		menu->Items[1].d.text.text = "Must be a multiple of 2500";
+		menu->Items[1].D.Text.text = "Must be a multiple of 2500";
 		ProcessMenu("menu-editor-error", 1);
-		menu->Items[1].d.text.text = NULL;
+		menu->Items[1].D.Text.text = NULL;
 	} else {
 		UnitUnderCursor->Value = value;
 		GameMenuReturn();
@@ -5355,15 +5355,15 @@ static void EditorEditResourceCancel(void)
 */
 void EditorEditAiProperties(void)
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-editor-edit-ai-properties");
 	if (UnitUnderCursor->Active) {
-		menu->Items[1].d.checkbox.state = MI_CSTATE_CHECKED;
-		menu->Items[3].d.checkbox.state = MI_CSTATE_UNCHECKED;
+		menu->Items[1].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[3].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	} else {
-		menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
-		menu->Items[3].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+		menu->Items[3].D.Checkbox.State = MI_CSTATE_CHECKED;
 	}
 
 	ProcessMenu("menu-editor-edit-ai-properties", 1);
@@ -5372,14 +5372,14 @@ void EditorEditAiProperties(void)
 /**
 ** Active or Passive gem clicked in menu-editor-edit-ai-properties
 */
-static void EditorEditAiPropertiesCheckbox(Menuitem *mi)
+static void EditorEditAiPropertiesCheckbox(Menuitem* mi)
 {
-	if (&mi->menu->Items[1] == mi) {
-		mi->d.checkbox.state = MI_CSTATE_CHECKED;
-		mi->menu->Items[3].d.checkbox.state = MI_CSTATE_UNCHECKED;
+	if (&mi->Menu->Items[1] == mi) {
+		mi->D.Checkbox.State = MI_CSTATE_CHECKED;
+		mi->Menu->Items[3].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	} else {
-		mi->d.checkbox.state = MI_CSTATE_CHECKED;
-		mi->menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
+		mi->D.Checkbox.State = MI_CSTATE_CHECKED;
+		mi->Menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	}
 }
 
@@ -5388,10 +5388,10 @@ static void EditorEditAiPropertiesCheckbox(Menuitem *mi)
 */
 static void EditorEditAiPropertiesOk(void)
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = CurrentMenu;
-	if (menu->Items[1].d.checkbox.state == MI_CSTATE_CHECKED) {
+	if (menu->Items[1].D.Checkbox.State == MI_CSTATE_CHECKED) {
 		UnitUnderCursor->Active = 1;
 	} else {
 		UnitUnderCursor->Active = 0;
@@ -5414,7 +5414,7 @@ static void EditorEditAiPropertiesCancel(void)
 */
 int EditorSaveMenu(void)
 {
-	Menu *menu;
+	Menu* menu;
 	char path[PATH_MAX];
 	char *s;
 	char *p;
@@ -5425,13 +5425,13 @@ int EditorSaveMenu(void)
 
 	EditorCancelled = 0;
 
-	menu->Items[3].d.input.buffer = path;
-	menu->Items[3].d.input.maxch = PATH_MAX - 4;
+	menu->Items[3].D.Input.buffer = path;
+	menu->Items[3].D.Input.maxch = PATH_MAX - 4;
 
 	Assert(*ScenSelectPath);
-	menu->Items[6].flags =
+	menu->Items[6].Flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-	menu->Items[6].d.button.text = ScenSelectDisplayPath;
+	menu->Items[6].D.Button.Text = ScenSelectDisplayPath;
 
 	ProcessMenu("menu-editor-save", 1);
 
@@ -5453,25 +5453,25 @@ int EditorSaveMenu(void)
 /**
 ** Editor save listbox init callback
 */
-static void EditorSaveLBInit(Menuitem *mi)
+static void EditorSaveLBInit(Menuitem* mi)
 {
 	int i;
 
 	EditorSaveLBExit(mi);
-	i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorSaveRDFilter,
-		(FileList **) & (mi->d.listbox.options));
+	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorSaveRDFilter,
+		(FileList **) & (mi->D.Listbox.options));
 
 	if (i == 0) {
-		free(mi->menu->Items[4].d.button.text);
-		mi->menu->Items[4].d.button.text = strdup("Save");
-		mi->menu->Items[4].flags |= MenuButtonDisabled;
+		free(mi->Menu->Items[4].D.Button.Text);
+		mi->Menu->Items[4].D.Button.Text = strdup("Save");
+		mi->Menu->Items[4].Flags |= MenuButtonDisabled;
 	} else {
 		EditorSaveLBAction(mi, 0);
-		sprintf(mi->menu->Items[3].d.input.buffer, "%s~!_", ScenSelectFileName);
-		mi->menu->Items[3].d.input.nch = strlen(mi->menu->Items[3].d.input.buffer) - 3;
-		mi->menu->Items[4].flags &= ~MenuButtonDisabled;
-		if (i > mi->d.listbox.nlines) {
-			mi[1].flags &= ~MenuButtonDisabled;
+		sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", ScenSelectFileName);
+		mi->Menu->Items[3].D.Input.nch = strlen(mi->Menu->Items[3].D.Input.buffer) - 3;
+		mi->Menu->Items[4].Flags &= ~MenuButtonDisabled;
+		if (i > mi->D.Listbox.nlines) {
+			mi[1].Flags &= ~MenuButtonDisabled;
 		}
 	}
 }
@@ -5479,16 +5479,16 @@ static void EditorSaveLBInit(Menuitem *mi)
 /**
 ** Editor save listbox exit callback
 */
-static void EditorSaveLBExit(Menuitem *mi)
+static void EditorSaveLBExit(Menuitem* mi)
 {
 	FileList *fl;
 
-	if (mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		free(fl);
-		mi->d.listbox.options = NULL;
-		mi->d.listbox.noptions = 0;
-		mi[1].flags |= MenuButtonDisabled;
+		mi->D.Listbox.options = NULL;
+		mi->D.Listbox.noptions = 0;
+		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
@@ -5544,8 +5544,8 @@ static int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 */
 static void EditorSaveFolder(void)
 {
-	Menu *menu;
-	Menuitem *mi;
+	Menu* menu;
+	Menuitem* mi;
 	char *cp;
 
 	menu = CurrentMenu;
@@ -5557,17 +5557,17 @@ static void EditorSaveFolder(void)
 			*cp = 0;
 		} else {
 			ScenSelectDisplayPath[0] = 0;
-			menu->Items[6].flags |= MenuButtonDisabled;
-			menu->Items[6].d.button.text = NULL;
+			menu->Items[6].Flags |= MenuButtonDisabled;
+			menu->Items[6].D.Button.Text = NULL;
 		}
 		cp = strrchr(ScenSelectPath, '/');
 		if (cp) {
 			*cp = 0;
 			EditorSaveLBInit(mi);
-			mi->d.listbox.cursel = -1;
-			mi->d.listbox.startline = 0;
-			mi->d.listbox.curopt = 0;
-			mi[1].d.vslider.percent = 0;
+			mi->D.Listbox.cursel = -1;
+			mi->D.Listbox.startline = 0;
+			mi->D.Listbox.curopt = 0;
+			mi[1].D.VSlider.percent = 0;
 		}
 	}
 }
@@ -5577,33 +5577,33 @@ static void EditorSaveFolder(void)
 */
 static void EditorSaveOk(void)
 {
-	Menu *menu;
-	Menuitem *mi;
+	Menu* menu;
+	Menuitem* mi;
 	FileList *fl;
 	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt;
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
-		if (mi->menu->Items[3].d.input.nch == 0 && fl[i].type == 0) {
+	i = mi->D.Listbox.curopt;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
+		if (mi->Menu->Items[3].D.Input.nch == 0 && fl[i].type == 0) {
 			strcat(ScenSelectPath, "/");
 			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[6].flags & MenuButtonDisabled) {
-				menu->Items[6].flags &= ~MenuButtonDisabled;
-				menu->Items[6].d.button.text = ScenSelectDisplayPath;
+			if (menu->Items[6].Flags & MenuButtonDisabled) {
+				menu->Items[6].Flags &= ~MenuButtonDisabled;
+				menu->Items[6].D.Button.Text = ScenSelectDisplayPath;
 			} else {
 				strcat(ScenSelectDisplayPath, "/");
 			}
 			strcat(ScenSelectDisplayPath, fl[i].name);
 			EditorSaveLBInit(mi);
-			mi->d.listbox.cursel = -1;
-			mi->d.listbox.startline = 0;
-			mi->d.listbox.curopt = 0;
-			mi[1].d.vslider.percent = 0;
+			mi->D.Listbox.cursel = -1;
+			mi->D.Listbox.startline = 0;
+			mi->D.Listbox.curopt = 0;
+			mi[1].D.VSlider.percent = 0;
 		} else {
-			strcpy(ScenSelectFileName, menu->Items[3].d.input.buffer); // Final map name
+			strcpy(ScenSelectFileName, menu->Items[3].D.Input.buffer); // Final map name
 			ScenSelectFileName[strlen(ScenSelectFileName) - 3] = '\0';
 			if (!strcasestr(ScenSelectFileName, ".pud\0")) {
 				strcat(ScenSelectFileName, ".pud");
@@ -5617,7 +5617,7 @@ static void EditorSaveOk(void)
 				}
 			}
 			EditorEndMenu();
-			menu->Items[6].d.button.text = NULL;
+			menu->Items[6].D.Button.Text = NULL;
 		}
 	}
 }
@@ -5627,25 +5627,25 @@ static void EditorSaveOk(void)
 */
 static void EditorSaveCancel(void)
 {
-	Menu *menu;
+	Menu* menu;
 
 	EditorCancelled = 1;
 	EditorEndMenu();
 
 	menu = FindMenu("menu-editor-save");
-	menu->Items[6].d.button.text = NULL;
+	menu->Items[6].D.Button.Text = NULL;
 }
 
 /**
 **  Editor save listbox retrieve callback
 */
-static unsigned char* EditorSaveLBRetrieve(Menuitem *mi, int i)
+static unsigned char* EditorSaveLBRetrieve(Menuitem* mi, int i)
 {
 	FileList* fl;
 	static char buffer[1024];
 
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type) {
 			strcpy(buffer, "   ");
 		} else {
@@ -5665,19 +5665,19 @@ static void EditorSaveLBAction(Menuitem* mi, int i)
 	FileList* fl;
 
 	Assert(i >= 0);
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
-		free(mi->menu->Items[4].d.button.text);
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
+		free(mi->Menu->Items[4].D.Button.Text);
 		if (fl[i].type) {
-			sprintf(mi->menu->Items[3].d.input.buffer, "%s~!_", fl[i].name);
-			mi->menu->Items[3].d.input.nch = strlen(mi->menu->Items[3].d.input.buffer) - 3;
-			mi->menu->Items[4].d.button.text = strdup("Save");
+			sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", fl[i].name);
+			mi->Menu->Items[3].D.Input.nch = strlen(mi->Menu->Items[3].D.Input.buffer) - 3;
+			mi->Menu->Items[4].D.Button.Text = strdup("Save");
 		} else {
-			strcpy(mi->menu->Items[3].d.input.buffer, "~!_");
-			mi->menu->Items[3].d.input.nch = strlen(mi->menu->Items[3].d.input.buffer) - 3;
-			mi->menu->Items[4].d.button.text = strdup("Open");
+			strcpy(mi->Menu->Items[3].D.Input.buffer, "~!_");
+			mi->Menu->Items[3].D.Input.nch = strlen(mi->Menu->Items[3].D.Input.buffer) - 3;
+			mi->Menu->Items[4].D.Button.Text = strdup("Open");
 		}
-		mi->menu->Items[4].flags &= ~MenuButtonDisabled;
+		mi->Menu->Items[4].Flags &= ~MenuButtonDisabled;
 	}
 }
 
@@ -5691,16 +5691,16 @@ static void EditorSaveVSAction(Menuitem* mi)
 /**
 ** Editor save input callback
 */
-static void EditorSaveEnterAction(Menuitem *mi, int key)
+static void EditorSaveEnterAction(Menuitem* mi, int key)
 {
-	if (mi->d.input.nch == 0) {
-		mi->menu->Items[4].flags = MenuButtonDisabled;
+	if (mi->D.Input.nch == 0) {
+		mi->Menu->Items[4].Flags = MenuButtonDisabled;
 	} else {
-		if (mi->d.input.nch == 1 && key != '\b' && key != '\177') {
-			free(mi->menu->Items[4].d.button.text);
-			mi->menu->Items[4].d.button.text = strdup("Save");
+		if (mi->D.Input.nch == 1 && key != '\b' && key != '\177') {
+			free(mi->Menu->Items[4].D.Button.Text);
+			mi->Menu->Items[4].D.Button.Text = strdup("Save");
 		}
-		mi->menu->Items[4].flags &= ~MenuButtonDisabled;
+		mi->Menu->Items[4].Flags &= ~MenuButtonDisabled;
 		if (key == 10 || key == 13) {
 			EditorSaveOk();
 		}
@@ -5710,9 +5710,9 @@ static void EditorSaveEnterAction(Menuitem *mi, int key)
 /**
 ** Editor save confirm init callback
 */
-static void EditorSaveConfirmInit(Menuitem *mi)
+static void EditorSaveConfirmInit(Menuitem* mi)
 {
-	mi->menu->Items[2].d.text.text = ScenSelectFileName;
+	mi->Menu->Items[2].D.Text.text = ScenSelectFileName;
 }
 
 /**
@@ -5720,7 +5720,7 @@ static void EditorSaveConfirmInit(Menuitem *mi)
 */
 static void EditorSaveConfirmOk(void)
 {
-	CurrentMenu->Items[2].d.text.text = NULL;
+	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorEndMenu();
 }
 
@@ -5729,7 +5729,7 @@ static void EditorSaveConfirmOk(void)
 */
 static void EditorSaveConfirmCancel(void)
 {
-	CurrentMenu->Items[2].d.text.text = NULL;
+	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorCancelled = 1;
 	EditorEndMenu();
 }
@@ -5794,38 +5794,38 @@ static void ReplayGameMenu(void)
 /**
 ** Replay game menu init callback
 */
-static void ReplayGameInit(Menuitem *mi)
+static void ReplayGameInit(Menuitem* mi)
 {
 	Assert(*ScenSelectPath);
-	mi->menu->Items[5].flags =
+	mi->Menu->Items[5].Flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-	mi->menu->Items[5].d.button.text = ScenSelectDisplayPath;
-	mi->menu->Items[6].d.checkbox.state = MI_CSTATE_UNCHECKED;
+	mi->Menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
+	mi->Menu->Items[6].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 /**
 ** Replay game listbox init callback
 */
-static void ReplayGameLBInit(Menuitem *mi)
+static void ReplayGameLBInit(Menuitem* mi)
 {
 	int i;
 
 	ReplayGameLBExit(mi);
-	i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ReplayGameRDFilter,
-		(FileList **) & (mi->d.listbox.options));
+	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, ReplayGameRDFilter,
+		(FileList **) & (mi->D.Listbox.options));
 
 	if (i == 0) {
-		free(mi->menu->Items[3].d.button.text);
-		mi->menu->Items[3].d.button.text = strdup("OK");
-		mi->menu->Items[3].flags |= MenuButtonDisabled;
+		free(mi->Menu->Items[3].D.Button.Text);
+		mi->Menu->Items[3].D.Button.Text = strdup("OK");
+		mi->Menu->Items[3].Flags |= MenuButtonDisabled;
 	} else {
 		ReplayGameLBAction(mi, 0);
-		mi->menu->Items[3].flags &= ~MenuButtonDisabled;
-		if (i > mi->d.listbox.nlines) {
-			mi[1].flags &= ~MenuButtonDisabled;
+		mi->Menu->Items[3].Flags &= ~MenuButtonDisabled;
+		if (i > mi->D.Listbox.nlines) {
+			mi[1].Flags &= ~MenuButtonDisabled;
 		} else {
-			mi[1].flags |= MenuButtonDisabled;
+			mi[1].Flags |= MenuButtonDisabled;
 		}
 	}
 }
@@ -5833,16 +5833,16 @@ static void ReplayGameLBInit(Menuitem *mi)
 /**
 ** Replay game listbox exit callback
 */
-static void ReplayGameLBExit(Menuitem *mi)
+static void ReplayGameLBExit(Menuitem* mi)
 {
 	FileList *fl;
 
-	if (mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		free(fl);
-		mi->d.listbox.options = NULL;
-		mi->d.listbox.noptions = 0;
-		mi[1].flags |= MenuButtonDisabled;
+		mi->D.Listbox.options = NULL;
+		mi->D.Listbox.noptions = 0;
+		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
@@ -5896,18 +5896,18 @@ static int ReplayGameRDFilter(char *pathbuf, FileList *fl)
 /**
 ** Replay game listbox action
 */
-static void ReplayGameLBAction(Menuitem *mi, int i)
+static void ReplayGameLBAction(Menuitem* mi, int i)
 {
 	FileList *fl;
 
 	Assert(i >= 0);
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
-		free(mi->menu->Items[3].d.button.text);
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
+		free(mi->Menu->Items[3].D.Button.Text);
 		if (fl[i].type) {
-			mi->menu->Items[3].d.button.text = strdup("OK");
+			mi->Menu->Items[3].D.Button.Text = strdup("OK");
 		} else {
-			mi->menu->Items[3].d.button.text = strdup("Open");
+			mi->Menu->Items[3].D.Button.Text = strdup("Open");
 		}
 	}
 }
@@ -5915,13 +5915,13 @@ static void ReplayGameLBAction(Menuitem *mi, int i)
 /**
 **  Replay game listbox retrieve
 */
-static unsigned char* ReplayGameLBRetrieve(Menuitem *mi, int i)
+static unsigned char* ReplayGameLBRetrieve(Menuitem* mi, int i)
 {
 	FileList* fl;
 	static char buffer[1024];
 
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type) {
 			strcpy(buffer, "   ");
 		} else {
@@ -5945,8 +5945,8 @@ static void ReplayGameVSAction(Menuitem* mi)
 */
 static void ReplayGameFolder(void)
 {
-	Menu *menu;
-	Menuitem *mi;
+	Menu* menu;
+	Menuitem* mi;
 	char *cp;
 
 	menu = CurrentMenu;
@@ -5958,18 +5958,18 @@ static void ReplayGameFolder(void)
 			*cp = 0;
 		} else {
 			ScenSelectDisplayPath[0] = 0;
-			menu->Items[5].flags |= MenuButtonDisabled;
-			menu->Items[5].d.button.text = NULL;
+			menu->Items[5].Flags |= MenuButtonDisabled;
+			menu->Items[5].D.Button.Text = NULL;
 		}
 		cp = strrchr(ScenSelectPath, '/');
 		if (cp) {
 			*cp = 0;
 			ReplayGameLBInit(mi);
-			mi->d.listbox.cursel = -1;
-			mi->d.listbox.startline = 0;
-			mi->d.listbox.curopt = 0;
-			mi[1].d.vslider.percent = 0;
-			mi[1].d.hslider.percent = 0;
+			mi->D.Listbox.cursel = -1;
+			mi->D.Listbox.startline = 0;
+			mi->D.Listbox.curopt = 0;
+			mi[1].D.VSlider.percent = 0;
+			mi[1].D.HSlider.percent = 0;
 		}
 	}
 }
@@ -5977,7 +5977,7 @@ static void ReplayGameFolder(void)
 /**
 ** Replay game disable fog gem callback
 */
-static void ReplayGameDisableFog(Menuitem *mi __attribute__((unused)))
+static void ReplayGameDisableFog(Menuitem* mi __attribute__((unused)))
 {
 }
 
@@ -5986,32 +5986,32 @@ static void ReplayGameDisableFog(Menuitem *mi __attribute__((unused)))
 */
 static void ReplayGameOk(void)
 {
-	Menu *menu;
-	Menuitem *mi;
+	Menu* menu;
+	Menuitem* mi;
 	FileList *fl;
 	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt;
-	if (i < mi->d.listbox.noptions) {
-		fl = mi->d.listbox.options;
+	i = mi->D.Listbox.curopt;
+	if (i < mi->D.Listbox.noptions) {
+		fl = mi->D.Listbox.options;
 		if (fl[i].type == 0) {
 			strcat(ScenSelectPath, "/");
 			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[5].flags & MenuButtonDisabled) {
-				menu->Items[5].flags &= ~MenuButtonDisabled;
-				menu->Items[5].d.button.text = ScenSelectDisplayPath;
+			if (menu->Items[5].Flags & MenuButtonDisabled) {
+				menu->Items[5].Flags &= ~MenuButtonDisabled;
+				menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
 			} else {
 				strcat(ScenSelectDisplayPath, "/");
 			}
 			strcat(ScenSelectDisplayPath, fl[i].name);
 			ReplayGameLBInit(mi);
-			mi->d.listbox.cursel = -1;
-			mi->d.listbox.startline = 0;
-			mi->d.listbox.curopt = 0;
-			mi[1].d.vslider.percent = 0;
-			mi[1].d.hslider.percent = 0;
+			mi->D.Listbox.cursel = -1;
+			mi->D.Listbox.startline = 0;
+			mi->D.Listbox.curopt = 0;
+			mi[1].D.VSlider.percent = 0;
+			mi[1].D.HSlider.percent = 0;
 		} else {
 			strcpy(ScenSelectFileName, fl[i].name); // Final map name
 
@@ -6034,9 +6034,9 @@ static void ReplayGameOk(void)
 
 			GuiGameStarted = 1;
 			EndMenu();
-			menu->Items[5].d.button.text = NULL;
+			menu->Items[5].D.Button.Text = NULL;
 
-			if (menu->Items[6].d.checkbox.state == MI_CSTATE_CHECKED) {
+			if (menu->Items[6].D.Checkbox.State == MI_CSTATE_CHECKED) {
 				ReplayRevealMap = 1;
 			} else {
 				ReplayRevealMap = 0;
@@ -6074,7 +6074,7 @@ static void ReplayGameCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
-	CurrentMenu->Items[5].d.button.text = NULL;
+	CurrentMenu->Items[5].D.Button.Text = NULL;
 
 	EndMenu();
 }
@@ -6086,12 +6086,12 @@ static void ReplayGameCancel(void)
 */
 static void NetErrorMenu(char *error)
 {
-	Menu *menu;
+	Menu* menu;
 
 	menu = FindMenu("menu-net-error");
-	menu->Items[1].d.text.text = error;
+	menu->Items[1].D.Text.text = error;
 	ProcessMenu("menu-net-error", 1);
-	menu->Items[1].d.text.text = NULL;
+	menu->Items[1].D.Text.text = NULL;
 }
 
 /**
@@ -6101,7 +6101,7 @@ static void NetErrorMenu(char *error)
 */
 void ErrorMenu(char *error)
 {
-	Menu *menu;
+	Menu* menu;
 	int oldx;
 	int oldy;
 
@@ -6110,9 +6110,9 @@ void ErrorMenu(char *error)
 	oldy = menu->Y;
 	menu->X = (VideoWidth - menu->Width) / 2;
 	menu->Y = (VideoHeight - menu->Height) / 2;
-	menu->Items[1].d.text.text = error;
+	menu->Items[1].D.Text.text = error;
 	ProcessMenu("menu-net-error", 1);
-	menu->Items[1].d.text.text = NULL;
+	menu->Items[1].D.Text.text = NULL;
 	menu->X = oldx;
 	menu->Y = oldy;
 }
@@ -6136,18 +6136,18 @@ static void InitPlayerRaces(Menuitem* mi)
 	}
 	++n;
 	// Reallocate pulldown options.
-	if (mi->d.pulldown.options) {
-		free(mi->d.pulldown.options);
+	if (mi->D.Pulldown.options) {
+		free(mi->D.Pulldown.options);
 	}
-	mi->d.pulldown.options = (unsigned char**)malloc(n * sizeof(unsigned char*));
+	mi->D.Pulldown.options = (unsigned char**)malloc(n * sizeof(unsigned char*));
 	for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
 		if (PlayerRaces.Visible[i]) {
-			mi->d.pulldown.options[n++] = strdup(PlayerRaces.Display[i]);
+			mi->D.Pulldown.options[n++] = strdup(PlayerRaces.Display[i]);
 		}
 	}
-	mi->d.pulldown.options[n++] = strdup("Map Default");
-	mi->d.pulldown.noptions = n;
-	mi->d.pulldown.defopt = n - 1;
+	mi->D.Pulldown.options[n++] = strdup("Map Default");
+	mi->D.Pulldown.noptions = n;
+	mi->D.Pulldown.defopt = n - 1;
 }
 
 /**
@@ -6159,20 +6159,20 @@ static void InitTilesets(Menuitem* mi, int mapdefault)
 	int n;
 
 	// Reallocate pulldown options.
-	if (mi->d.pulldown.options) {
-		free(mi->d.pulldown.options);
+	if (mi->D.Pulldown.options) {
+		free(mi->D.Pulldown.options);
 	}
 	n = NumTilesets + (mapdefault ? 1 : 0);
-	mi->d.pulldown.options = (unsigned char**)malloc(n * sizeof(unsigned char*));
+	mi->D.Pulldown.options = (unsigned char**)malloc(n * sizeof(unsigned char*));
 	n = 0;
 	if (mapdefault) {
-		mi->d.pulldown.options[n++] = strdup("Map Default");
+		mi->D.Pulldown.options[n++] = strdup("Map Default");
 	}
 	for (i = 0; i < NumTilesets; ++i) {
-		mi->d.pulldown.options[n++] = strdup(Tilesets[i]->Name);
+		mi->D.Pulldown.options[n++] = strdup(Tilesets[i]->Name);
 	}
-	mi->d.pulldown.noptions = n;
-	mi->d.pulldown.defopt = 0;
+	mi->D.Pulldown.noptions = n;
+	mi->D.Pulldown.defopt = 0;
 }
 
 /**
@@ -6180,7 +6180,7 @@ static void InitTilesets(Menuitem* mi, int mapdefault)
 */
 void InitMenuData(void)
 {
-	Menu *menu;
+	Menu* menu;
 
 	InitNetMultiButtonStorage();
 
@@ -6288,26 +6288,26 @@ static void MultiMetaServerGameSetupInit(Menuitem* mi)
 		i = RecvMetaReply(&reply);
 		if (i == 0) {
 			// fill the menus with the right info.
-			menu->Items[j].d.text.text = NULL;
-			menu->Items[j + 1].d.text.text = NULL;
-			menu->Items[j + 2].d.text.text = NULL;
-			menu->Items[j + 3].d.text.text = NULL;
-			menu->Items[j + 4].d.text.text = NULL;
-			menu->Items[j + 5].d.checkbox.state = MI_CSTATE_INVISIBLE;
+			menu->Items[j].D.Text.text = NULL;
+			menu->Items[j + 1].D.Text.text = NULL;
+			menu->Items[j + 2].D.Text.text = NULL;
+			menu->Items[j + 3].D.Text.text = NULL;
+			menu->Items[j + 4].D.Text.text = NULL;
+			menu->Items[j + 5].D.Checkbox.State = MI_CSTATE_INVISIBLE;
 		} else {
 			GetMetaParameter(reply, 0, &parameter);       // Player Name
-			menu->Items[j].d.text.text = parameter;
+			menu->Items[j].D.Text.text = parameter;
 			GetMetaParameter(reply, 3, &parameter);       // IP
 			GetMetaParameter(reply, 4, &port);            // port
 			sprintf(parameter, "%s:%s", parameter, port); // IP:Port
-			menu->Items[j + 1].d.text.text = parameter;
+			menu->Items[j + 1].D.Text.text = parameter;
 			GetMetaParameter(reply, 6, &parameter);
-			menu->Items[j + 2].d.text.text = parameter;
+			menu->Items[j + 2].D.Text.text = parameter;
 			GetMetaParameter(reply, 7, &parameter);
-			menu->Items[j + 3].d.text.text = parameter;
+			menu->Items[j + 3].D.Text.text = parameter;
 			GetMetaParameter(reply, 8, &parameter);
-			menu->Items[j + 4].d.text.text = parameter;
-			menu->Items[j + 5].d.checkbox.state = MI_CSTATE_UNCHECKED;
+			menu->Items[j + 4].D.Text.text = parameter;
+			menu->Items[j + 5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 		}
 		++k;
 	}
@@ -6317,19 +6317,19 @@ static void MultiMetaServerGameSetupInit(Menuitem* mi)
 	// 5 is the hardcoded value
 	for (; j <= numparams * 5; j += numparams + 1) {
 		// fill the menus with the right info.
-		menu->Items[j].d.text.text = NULL;
-		menu->Items[j + 1].d.text.text = NULL;
-		menu->Items[j + 2].d.text.text = NULL;
-		menu->Items[j + 3].d.text.text = NULL;
-		menu->Items[j + 4].d.text.text = NULL;
-		menu->Items[j + 5].d.checkbox.state = MI_CSTATE_INVISIBLE;
+		menu->Items[j].D.Text.text = NULL;
+		menu->Items[j + 1].D.Text.text = NULL;
+		menu->Items[j + 2].D.Text.text = NULL;
+		menu->Items[j + 3].D.Text.text = NULL;
+		menu->Items[j + 4].D.Text.text = NULL;
+		menu->Items[j + 5].D.Checkbox.State = MI_CSTATE_INVISIBLE;
 	}
 }
 
 /**
 **  Multiplayer server menu exit callback
 */
-static void MultiMetaServerGameSetupExit(Menuitem *mi)
+static void MultiMetaServerGameSetupExit(Menuitem* mi)
 {
 	// TODO: how to free stuff?
 // EndMenu();
@@ -6339,17 +6339,17 @@ static void MultiMetaServerGameSetupExit(Menuitem *mi)
 /**
 **  Action taken when a player select an online game
 */
-static void SelectGameServer(Menuitem *mi)
+static void SelectGameServer(Menuitem* mi)
 {
 	char server_host_buffer[64];
 	char *port;
 	int j;
 
-	j = mi - mi->menu->Items;
-	mi->menu->Items[j].d.checkbox.state = MI_CSTATE_UNCHECKED;
+	j = mi - mi->Menu->Items;
+	mi->Menu->Items[j].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	EndMenu();
 
-	strcpy(server_host_buffer, mi->menu->Items[j - 4].d.text.text);
+	strcpy(server_host_buffer, mi->Menu->Items[j - 4].D.Text.text);
 
 	// Launch join directly
 	if ((port = strchr(server_host_buffer, ':')) != NULL) {
@@ -6358,7 +6358,7 @@ static void SelectGameServer(Menuitem *mi)
 	}
 
 	// Now finally here is the address
-// server_host_buffer[menu->Items[1].d.input.nch] = 0;
+// server_host_buffer[menu->Items[1].D.Input.nch] = 0;
 	if (NetworkSetupServerAddress(server_host_buffer)) {
 		NetErrorMenu("Unable to lookup host.");
 		ProcessMenu("metaserver-list", 1);
