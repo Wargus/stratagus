@@ -1389,7 +1389,7 @@ local void AiNextGoal(void)
 global void AiHelpMe(const Unit* attacker,Unit * defender)
 {
     DebugLevel0("HELP %s(%d,%d) attacked by %s(%d,%d)",
-	    defender->Type->Ident,defender->X, defender->Y
+	    defender->Type->Ident,defender->X, defender->Y,
 	    attacker ? attacker->Type->Ident : "killed",
 	    attacker ? attacker->X : 0, attacker ? attacker->Y : 0);
 }
