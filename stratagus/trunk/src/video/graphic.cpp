@@ -311,9 +311,11 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 	unsigned char* tex;
 	const unsigned char* sp;
 	int fl;
+	Uint32 ckey;
 
 	n = (graphic->Width / width) * (graphic->Height / height);
 	fl = graphic->Width / width;
+	ckey = graphic->Surface->format->colorkey;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	graphic->NumTextureNames = n;
@@ -328,6 +330,8 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 	graphic->TextureWidth = (float)width / w;
 	graphic->TextureHeight = (float)height / h;
 	tex = (unsigned char*)malloc(w * h * 4);
+
+	// FIXME: only works for 8bit images
 	for (x = 0; x < n; ++x) {
 		glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[x]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -337,13 +341,13 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 		SDL_LockSurface(graphic->Surface);
 		for (i = 0; i < height; ++i) {
 			sp = (const unsigned char*)graphic->Surface->pixels + (x % fl) * width +
-				((x / fl) * height + i) * graphic->Width;
+				((x / fl) * height + i) * graphic->Surface->pitch;
 			for (j = 0; j < width; ++j) {
 				int c;
 				SDL_Color p;
 
 				c = i * w * 4 + j * 4;
-				if (*sp == 255) {
+				if (*sp == ckey) {
 					tex[c + 3] = 0;
 				} else {
 					p = graphic->Surface->format->palette->colors[*sp];
