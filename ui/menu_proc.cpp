@@ -771,7 +771,7 @@ local void DrawGem(Menuitem *mi, int mx, int my)
     GetDefaultTextColors(&nc, &rc);
     if (mi->d.gem.text) {
 	// FIXME: find correct x, y for other gem types , add options for other fonts
-	VideoDrawText(x+24, y+3, GameFont, mi->d.gem.text);
+	VideoDrawText(x+24, y+4, GameFont, mi->d.gem.text);
 	if (mi->flags&MenuButtonActive) {
 	    SetDefaultTextColors(rc,rc);
 	    VideoDrawRectangleClip(ColorGray,mx+mi->xofs-4,my+mi->yofs-4,
