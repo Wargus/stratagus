@@ -633,15 +633,15 @@ global int PlayerCheckLimits(const Player* player, const UnitType* type)
 	    return -2;
 	}
 	if (player->Demand + type->Demand > player->Supply && type->Demand) {
-	    NotifyPlayer(player, NotifyYellow, 0, 0, "Not enough food...build more farms.");
+	    NotifyPlayer(player, NotifyYellow, 0, 0, "Insufficient Supply, increase Supply.");
 	    return -3;
 	}
 	if (player->TotalNumUnits >= player->TotalUnitLimit) {
-	    NotifyPlayer(player, NotifyYellow, 0, 0, "Unit Limit Reached");
+	    NotifyPlayer(player, NotifyYellow, 0, 0, "Total Unit Limit Reached");
 	    return -4;
 	}
 	if (player->UnitTypesCount[type->Type] >=  player->Allow.Units[type->Type]) {
-	    NotifyPlayer(player, NotifyYellow, 0, 0, "Limit Reached for this unit type");
+	    NotifyPlayer(player, NotifyYellow, 0, 0, "Limit of %d Reached for this unit type", player->Allow.Units[type->Type]);
 	    return -6;
 	}
 	return 1;

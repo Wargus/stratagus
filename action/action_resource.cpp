@@ -206,7 +206,7 @@ local int StartGathering(Unit* unit)
     //
     //	If resource is still under construction, wait!
     //
-    if ((goal->Type->MaxWorkers && goal->Data.Resource.Active >= goal->Type->MaxWorkers) ||
+    if ((goal->Type->MaxOnBoard && goal->Data.Resource.Active >= goal->Type->MaxOnBoard) ||
 	    goal->Orders[0].Action == UnitActionBuilded) {
 	DebugLevel3Fn("Waiting at the resource with %d people inside.\n" _C_
 	    goal->Data.Resource.Active);

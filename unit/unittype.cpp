@@ -1027,10 +1027,6 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	CLprintf(file, "  'gives-resource '%s\n",
 	    DefaultResourceNames[type->GivesResource]);
     }
-    if (type->MaxWorkers) {
-	CLprintf(file, "  'max-workers %d\n",
-	    type->MaxWorkers);
-    }
 
     // Save store info.
     for (flag = i = 0; i < MaxCosts; ++i)

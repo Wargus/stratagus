@@ -325,11 +325,7 @@
 **
 **	UnitType::MaxOnBoard
 **
-**		Maximum units on board (for transporters)
-**
-**	UnitType::MaxWorkers
-**
-**		This limit the number of workers on a resource.
+**		Maximum units on board (for transporters), and resources
 **
 **	UnitType::GivesResource
 **
@@ -740,7 +736,6 @@ struct _unit_type_ {
 
     int		CanStore[MaxCosts];	/// Resources that we can store here.
     int		GivesResource;		/// The resource this unit gives.
-    int		MaxWorkers;		/// Maximum number of workers.
     ResourceInfo* ResInfo[MaxCosts];	/// Resource information.
     UnitType* 	MustBuildOnTop;		/// Must be built on top of something.
 #ifdef USE_SDL_SURFACE

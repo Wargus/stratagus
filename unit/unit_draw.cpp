@@ -1726,9 +1726,6 @@ local void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y
 		unit->Type->TileHeight * TileSizeY / 2;
 	}
 	if (order->Action == UnitActionBuild) {
-	    // FIXME: mr-russ, can this be removed? since the build order now has a goal?
-	    // When building a building point to the center of the would-be building.
-	    // The -1 is because of what we have above.
 	    *x += (order->Type->TileWidth - 1) * TileSizeX / 2;
 	    *y += (order->Type->TileHeight - 1) * TileSizeY / 2;
 	}

@@ -695,8 +695,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
 	UnitUnderCursor = NULL;
     }
 
-    // FIXME: unit is tracked?
-
     type = unit->Type;
 
     //
@@ -984,7 +982,7 @@ global int UnitVisibleOnMap(const Unit* unit)
     int w0;
     int h;
 
-    DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
+    DebugCheck(!unit->Type);
 
     //
     //	Unit invisible (by spell), removed or submarine.
@@ -1001,7 +999,6 @@ global int UnitVisibleOnMap(const Unit* unit)
 
     //
     //	Check if visible, not under fog of war.
-    //		FIXME: need only check the boundary, not the complete rectangle.
     //
     for (; h-- > 0;) {
 	for (w = w0; w-- > 0;) {
@@ -1039,7 +1036,6 @@ global int BuildingVisibleOnMap(const Unit* unit)
 
     //
     //	Check if visible, not under fog of war.
-    //		FIXME: need only check the boundary, not the complete rectangle.
     //
     for (; h-- > 0;) {
 	for (w = w0; w-- > 0;) {
@@ -1153,7 +1149,7 @@ global int UnitKnownOnMap(const Unit* unit)
     int w0;
     int h;
 
-    DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
+    DebugCheck(!unit->Type);
 
     if (unit->Player != ThisPlayer) {
 	//FIXME: vladi: should handle teams and shared vision
@@ -1209,7 +1205,7 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
     int w0;
     int h;
 
-    DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
+    DebugCheck(!unit->Type);
 
     if (!ThisPlayer) {
 	//FIXME: ARI: Added here for early game setup state by
@@ -1447,8 +1443,6 @@ global int UnitGetNextPathSegment(const Unit* unit, int* dx, int* dy)
 **	@param unit		Unit which should be consigned.
 **	@param newplayer	New owning player.
 **
-**	@todo	FIXME: I think here are some failures, if building is build
-**		what is with the unit inside? or a main hall with workers
 **		inside?
 */
 global void ChangeUnitOwner(Unit* unit, Player* newplayer)
@@ -1475,23 +1469,6 @@ global void ChangeUnitOwner(Unit* unit, Player* newplayer)
     //	Must change food/gold and other.
     //
     UnitLost(unit);
-
-    //  Adjust Orders to remove Attack Order
-    //  Mainly to protect peasants who are building.
-    //  FIXME: What's the point in this code? It just causes a crash when
-    //  FIXME: an unit is moving (the unit stops when between map cells.)
-
-    /*for (i = 0; i < MAX_ORDERS; ++i) {
-	if (unit->Orders[i].Action == UnitActionAttack ||
-		unit->Orders[i].Action == UnitActionAttackGround) {
-	    // Now see if it's an enemy..
-	    // FIXME:Just Stops attacking at the moment
-	    printf("Stopped attack for a/an %s,\n", unit->Type->Name);
-	    unit->Orders[i].Action = UnitActionStill;
-	    unit->SubAction = unit->State = 0;
-	    break;
-	}
-    }*/
 
     //
     //	Now the new side!
@@ -1770,10 +1747,6 @@ global void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
     int i;
     int mask;
 
-    //FIXME: vladi: this debug check fails when used for teleporting...
-    //DebugCheck(!unit->Removed);
-
-    // FIXME: better and quicker solution, to find the building.
     if (unit->Container) {
 	x = unit->Container->X;
 	y = unit->Container->Y;
@@ -1864,7 +1837,6 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     DebugCheck(!unit->Removed);
 
-    // FIXME: better and quicker solution, to find the building.
     x = y = -1;
     if (unit->Container) {
 	x = unit->Container->X;
@@ -1982,12 +1954,8 @@ global int CanBuildHere(const UnitType* type, int x, int y)
     Unit* table[UnitMax];
     int n;
     int i;
-    Unit* unit;
-    int dx;
-    int dy;
     int w;
     int h;
-    int resource;
     int found;
 
     //
@@ -2042,27 +2010,12 @@ global int CanBuildHere(const UnitType* type, int x, int y)
     }
 
     //	resource deposit can't be build too near to resource
-    // FIXME: use unit-cache here.
-    for (i = 0; i < NumUnits; ++i) {
-	unit = Units[i];
-	for (resource = 1; resource < MaxCosts; ++resource) {
-	    if ((type->CanStore[resource] && unit->Type->GivesResource == resource) ||
-		    (unit->Type->CanStore[resource] && type->GivesResource == resource)) {
-		if (unit->X < x) {
-		    dx = x - unit->X - unit->Type->TileWidth;
-		} else {
-		    dx = unit->X - x - type->TileWidth;
-		}
-		if (unit->Y < y) {
-		    dy = y - unit->Y - unit->Type->TileHeight;
-		} else {
-		    dy = unit->Y - y - type->TileHeight;
-		}
-		DebugLevel3("Distance %d,%d\n" _C_ dx _C_ dy);
-		if (dx < RESOURCE_DISTANCE && dy < RESOURCE_DISTANCE) {
-		    return 0;
-		}
-	    }
+    // FIXME: (mr-russ) check bound for Select
+    n = UnitCacheSelect(x - RESOURCE_DISTANCE, y - RESOURCE_DISTANCE,
+	x + type->TileWidth + RESOURCE_DISTANCE, y + type->TileHeight + RESOURCE_DISTANCE, table);
+    for (i = 0; i < n; ++i) {
+	if (type->CanStore[table[i]->Type->GivesResource]) {
+	    return 0;
 	}
     }
 
@@ -2884,10 +2837,7 @@ global void LetUnitDie(Unit* unit)
 	return;
     }
 
-    // FIXME: units in transporters should die without corpes...
     if (unit->Type->Transporter) { // Transporters loose their units
-	//FIXME: vladi: it could be usefull if transport is near land
-	//       to unload instead of destroying all units in it... ?
 	DestroyAllInside(unit);
     }
 
@@ -2924,9 +2874,7 @@ global void DestroyAllInside(Unit* source)
     Unit* unit;
     int i;
 
-    // FIXME: n0b0dy: No corpses, is that correct behaviour?
     // No Corpses, we are inside something, and we can't be seen
-    // FIXME: mr-russ: support for units inside units/buildings?
     unit = source->UnitInside;
     for (i = source->InsideCount; i; --i, unit = unit->NextContained) {
 	RemoveUnit(unit, NULL);

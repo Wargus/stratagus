@@ -71,7 +71,11 @@ local void DoActionRepairGeneric(Unit* unit, const Animation* repair)
 }
 
 /**
-**	Repair an unit.
+**	Repair a unit.
+**
+**	@param	unit	unit repairing
+**	@param	goal	unit being repaired
+**
 */
 local void RepairUnit(Unit* unit, Unit* goal)
 {
@@ -82,14 +86,9 @@ local void RepairUnit(Unit* unit, Unit* goal)
     int hp;
     char buf[100];
 
-    //
-    //  Calculate the repair points
-    //          original per 100 hit points only 25 gold 25 wood
-    //
-
     player = unit->Player;
 
-    if (goal->Orders[0].Action != UnitActionBuilded || (!goal->Type->BuilderOutside)) {
+    if (goal->Orders[0].Action != UnitActionBuilded) {
 	//
 	//  Calculate the repair costs.
 	//
@@ -121,12 +120,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	//  Subtract the resources
 	//
 	PlayerSubCosts(player, goal->Type->RepairCosts);
-    }
-
-    //
-    //  Repair the unit
-    //
-    if (goal->Type->BuilderOutside && (goal->Orders->Action == UnitActionBuilded)) {
+    } else {
 	//  hp is the current damage taken by the unit.
 	hp = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
 	    (goal->Type->Stats->Costs[TimeCost] * 600) - goal->HP;
@@ -145,12 +139,6 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	//  Keep the same level of damage while increasing HP.
 	goal->HP = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
 	    (goal->Type->Stats->Costs[TimeCost] * 600) - hp;
-	if (goal->HP > goal->Stats->HitPoints) {
-	    goal->HP = goal->Stats->HitPoints;
-	}
-	//  HandleActionBuilded will deal with most stuff.
-    } else {
-	goal->HP += goal->Type->RepairHP;
 	if (goal->HP > goal->Stats->HitPoints) {
 	    goal->HP = goal->Stats->HitPoints;
 	}
@@ -211,7 +199,6 @@ global void HandleActionRepair(Unit* unit)
 		//	Target is dead, choose new one.
 		//
 		// Check if goal is correct unit.
-		// FIXME: should I do a function for this?
 		if (goal) {
 		    if (GoalGone(unit, goal)) {
 			DebugLevel0Fn("repair target gone. Booohooo\n");
