@@ -10,7 +10,8 @@
 //
 /**@name depend.c	-	The units/upgrade dependencies */
 //
-//	(c) Copyright 2000-2003 by Vladi Belperchinov-Shabanski and Lutz Sammer
+//	(c) Copyright 2000-2003 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//	                           and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -154,15 +155,15 @@ global void AddDependency(const char* target, const char* required, int count,
     } else {
     	// move rule to temp->rule
 	temp->Rule = node->Rule;		// insert rule
-	
+
 	// also Link temp to old "or" list
 	if (node->Rule) {
 	    temp->Next = node->Rule->Next;
 	}
-	
+
 	node->Rule = temp;
     }
-    
+
 #ifdef neverDEBUG
     printf("New rules are :");
     node = node->Rule;
@@ -174,7 +175,7 @@ global void AddDependency(const char* target, const char* required, int count,
 	}
 	node = node->Next;
 	printf("\n or ... ");
-    }	    
+    }
     printf("\n");
 #endif
 }
@@ -200,7 +201,7 @@ global int CheckDependByIdent(const Player* player, const char* target)
     if (!strncmp(target, "unit-", 5)) {
 	// target string refers to unit-XXX
 	rule.Kind.UnitType = UnitTypeByIdent(target);
-	if (UnitIdAllowed(player, rule.Kind.UnitType->Type) == 0) {  
+	if (UnitIdAllowed(player, rule.Kind.UnitType->Type) == 0) {
 	    return 0;
 	}
 	rule.Type = DependRuleUnitType;
@@ -435,6 +436,68 @@ local SCM CclDefineDependency(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineDependency(lua_State* l)
+{
+    const char* target;
+    const char* required;
+    int count;
+    const char* value;
+    int or_flag;
+    int args;
+    int j;
+    int subargs;
+    int k;
+
+    args = lua_gettop(l);
+    j = 0;
+
+    target = LuaToString(l, j + 1);
+    ++j;
+
+    //
+    //	All or rules.
+    //
+    or_flag = 0;
+    for (; j < args; ++j) {
+	if (!lua_istable(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	subargs = luaL_getn(l, j + 1);
+
+	for (k = 0; k < subargs; ++k) {
+	    lua_rawgeti(l, j + 1, k + 1);
+	    required = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    count = 1;
+	    if (k + 1 < subargs) {
+		lua_rawgeti(l, j + 1, k + 2);
+		if (lua_isnumber(l, -1)) {
+		    count = LuaToNumber(l, -1);
+		    ++k;
+		}
+		lua_pop(l, 1);
+	    }
+
+	    AddDependency(target, required, count, or_flag);
+	    or_flag = 0;
+	}
+	if (j + 1 < args) {
+	    ++j;
+	    value = LuaToString(l, j + 1);
+	    if (strcmp(value, "or")) {
+		lua_pushfstring(l, "not or symbol: %s", value);
+		lua_error(l);
+		return 0;
+	    }
+	    or_flag = 1;
+	}
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Get the dependency.
@@ -443,12 +506,21 @@ local SCM CclDefineDependency(SCM list)
 **
 **	@param target	Unit type or upgrade.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclGetDependency(SCM target __attribute__((unused)))
 {
     DebugLevel0Fn("FIXME: write this %p\n" _C_ target);
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclGetDependency(lua_State* l __attribute__((unused)))
+{
+    DebugLevel0Fn("FIXME: write this %p\n" _C_ l);
+
+    return 0;
+}
+#endif
 
 /**
 **	Check the dependency.
@@ -457,6 +529,7 @@ local SCM CclGetDependency(SCM target __attribute__((unused)))
 **
 **	@param target	Unit type or upgrade.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclCheckDependency(SCM target __attribute__((unused)))
 {
     DebugLevel0Fn("FIXME: write this %p\n" _C_ target);
@@ -464,6 +537,12 @@ local SCM CclCheckDependency(SCM target __attribute__((unused)))
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclCheckDependency(lua_State* l __attribute__((unused)))
+{
+    DebugLevel0Fn("FIXME: write this %p\n" _C_ l);
+
+    return 0;
+}
 #endif
 
 /**
@@ -475,6 +554,10 @@ global void DependenciesCclRegister(void)
     gh_new_procedureN("define-dependency", CclDefineDependency);
     gh_new_procedure1_0("get-dependency", CclGetDependency);
     gh_new_procedure1_0("check-dependency", CclCheckDependency);
+#elif defined(USE_LUA)
+    lua_register(Lua, "DefineDependency", CclDefineDependency);
+    lua_register(Lua, "GetDependency", CclGetDependency);
+    lua_register(Lua, "CheckDependency", CclCheckDependency);
 #endif
 }
 
