@@ -17,9 +17,9 @@
 ----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ----    02111-1307, USA.
 -->
-    <title>Stratagus Configuration Language Description: Tileset</title>
+    <title>Stratagus Configuration Language Description: Magic</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
-    <meta name="Author" content="johns98@gmx.net">
+    <meta name="Author" content="cleonard@go.ro">
     <meta name="Keyword" content="ccl,magic,spells">
     <meta name="Description" content="">
 </head>
@@ -241,8 +241,115 @@ You can still use position spells on units, it will target the unit's position.
 If the unit dies however the caster will stop. (Some spells get casted until
 there is no more mana left).
 </dd>
+<dt>conditions</dt>
+<dd>This is the condition for being able to cast the spell. Think of it as a 
+function that takes an unit as a parameter and return either yes or no depending
+on the unit properties. Here is how a condition looks like:
+<pre>'condition '(
+  building false
+  max-slow-ticks 10)</pre>
+Here are the supported parameters:<p>
+<dl>
+    <dt>building</dt>
+    <dd>This is one of the bool parameters (can't think of a better name). It is
+    followed by true, false or only. Imagine this as a question, is the target a
+    building? The answer is yes/no. A "true" parameter makes it always pass(and
+    it's the default.), "false" parameter passes when the answer is NO, and "only"
+    passes only when the answer is yes.<br>
+    It doesn't really makes sense to ever say true, since you might just as well
+    ommit it. "building false" means the spell won't work on buildings. "building 
+    only" will make a spell that works only on buildings (can't think of any though).
+    This syntax is used for more that "building"
+    </dd>
+    <dt>coward</dt>
+    <dd>This is a bool parameter too, just like building. I specifies the behaviour
+    for cowards, unit's that don't attack by themselves. For example you should not
+    cast an offensive buff (like bloodlust) on non-combat units.
+    </dd>
+    <dt>alliance</dt>
+    <dd>This is a bool parameter too, just like building. I specifies the behaviour
+    for allied units. Your own units are considered allied too. For instance you
+    should only cast healing on your own units. 
+    </dd>
+    <dt>self</dt>
+    <dd>This is a bool parameter too, just like building. I it a bit more special,
+    since it specifies the behaviour for casting on yourself. <b>A LOT</b> of
+    spells specify "self false", to disallow casting on yourself.
+    </dd>
+    <dt>bool-flags</dt>
+    <dd>There is no parameter called bool-flags. You can however use flags defined
+    by <a href="unittype.html#define-bool-flags">define-bool-flags</a> just like a
+    bool parameter. For instance "organic only" will make a spell work only on
+    units marked with the organic flag.
+    </dd>
+    <dt>min-hp-percent</dt>
+    <dd>Minimum hp percent of the target. If not specified the minimum is around -10
+    You can use this to avoid casting damage spells on enemies that are dying anyway.
+    </dd>
+    <dt>max-hp-percent</dt>
+    <dd>Maximum hp percent of the target. If not specified the maximum is around 1000.
+    For instance you can use this to avoid healing units that are not injured.
+    </dd>
+    <dt>min-mana-percent</dt>
+    <dd>Minimum mana percent of the target. If not specified the minimum is around -10
+    You can use this to avoid spells like mana drain on units that are empty. 
+    </dd>
+    <dt>max-mana-percent</dt>
+    <dd>Maximum mana percent of the target. If not specified the maximum is around 1000
+    For instance you can use this to avoid restoring mana to units that are full.
+    </dd>
+    <dt>max-slow-ticks</dt>
+    <dd>Followed by a number, to avoid casting slow on an unit that is already slowed down.
+    </dd>
+    <dt>max-haste-ticks</dt>
+    <dd>Followed by a number, to avoid casting haste on an unit that is already hasted.
+    </dd>
+    <dt>max-bloodlust-ticks</dt>
+    <dd>Followed by a number, to avoid casting bloodlust on an unit that already has it.
+    </dd>
+    <dt>max-invisibility-ticks</dt>
+    <dd>Followed by a number, to avoid casting invisibility on an unit that already has it.
+    </dd>
+    <dt>max-invincibility-ticks</dt>
+    <dd>Followed by a number, to avoid casting invincibility on an unit that already has it.
+    </dd>
+</dl>
+</dd><p>
+<dt>autocast</dt>
+<dd>Autocast works very closely with conditions. Here is the syntax:
+<pre>'autocast (range x condition(whatever) )</pre>
+It functions by selecting every unit in range and trying to check of they fit the
+condition. If they do, the spell is casted. Of course, this is a very primitive
+mechanism, but it works for simple spells like heal. As you might have noticed, some
+of the finer restrictions in conditions are designed for autocast (like not casting
+buffs on cowards). Autocasting position target spells is not supported, sorry.
+Here is a formal list of parameters:
+<dl>
+    <dt>range</dt>
+    <dd>The range in which autocast runs. I think it's square?
+    </dd>
+    <dt>combat</dt>
+    <dd>This is a bool parameter, like in condition. It's autocast-specific and NOT
+    part of conditions due to technical considerations. Combat is not unit-specific,
+    it only depends on caster location. combat mode is when there are non-coward
+    enemy units in range. most offensive spells obviousely only should be used in
+    combat. (can you say offensive buffs?)
+    </dd>
+    <dt>condition</dt>
+    <dd>This is followed by a list exactly like in 'condition. As it was said
+    before, this is evaluated for each and every unit in range, and if a unit
+    passes, the spell gets casted.
+    </dd>
+</dl>
+</dd>
+<dt>ai-cast</dt>
+<dd>This is identical to autocast in syntax. It's used by the AI (computer controller
+player) rather then by a human players units. In general this should be a little better
+than autocast (and make human players think some more). There no reason to repeat the
+syntax of autocast here.
+</dd><p>
 <dt>action</dt>
-<dd>The effect of the spells. This comes in the following form:
+<dd>The effect of the spells. You can add multiple actions, here is the syntax:
 <pre>'action '((operation-name-1 parameters ... )
           (operation-name-2 parameters ... )
              ...

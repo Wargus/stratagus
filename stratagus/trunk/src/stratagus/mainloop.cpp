@@ -381,8 +381,8 @@ local void DrawMapViewport(Viewport* vp)
     // Every to-be-drawn item added to this mechanism, can be handed by this
     // call.
     if (InterfaceState == IfaceStateNormal) {
-//	DecorationRefreshDisplay();
-	DecorationUpdateDisplay();
+	DecorationRefreshDisplay();
+//	DecorationUpdateDisplay();
     }
 
 #else
