@@ -352,7 +352,7 @@ global void DrawUnitIcon(const Player* player,Icon* icon,unsigned flags
     VideoDrawVLine(color,x+3,y+3,ICON_HEIGHT+3);
     VideoDrawVLine(color,x+4,y+3,ICON_HEIGHT+3);
 
-    if( (flags&IconClicked) ) {
+    if( flags&IconClicked ) {
 	++x; ++y;
     }
 
