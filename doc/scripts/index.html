@@ -50,7 +50,8 @@
 <a href="game.html">Game</a>
 <a href="icon.html">Icon</a>
 <a href="magic.html">Magic</a>
-<a href="pud.html">PUD</a>
+<a href="mappresentation.html">Map Presentation</a>
+<a href="mapsetup.html">Map Setup</a>
 <a href="research.html">Research</a>
 <a href="savegame.html">SaveGame</a>
 <a href="sound.html">Sound</a>
@@ -133,6 +134,8 @@
 <dd></dd>
 <dt><a href="research.html#CheckDependency">CheckDependency</a></dt>
 <dd></dd>
+<dt><a href="mappresentation.html#CreateMap">CreateMap</a></dt>
+<dd></dd>
 <dt><a href="game.html#CreateUnit">CreateUnit</a></dt>
 <dd></dd>
 <dt><a href="game.html#Credits">Credits</a></dt>
@@ -144,8 +147,6 @@
 <dt><a href="ai.html#DefineAiHelper">DefineAiHelper</a></dt>
 <dd></dd>
 <dt><a href="ai.html#DefineAiPlayer">DefineAiPlayer</a></dt>
-<dd></dd>
-<dt><a href="pud.html#DefineAiWcNames">DefineAiWcNames</a></dt>
 <dd></dd>
 <dt><a href="research.html#DefineAllow">DefineAllow</a></dt>
 <dd></dd>
@@ -162,8 +163,6 @@
 <dt><a href="game.html#DefineCampaign">DefineCampaign</a></dt>
 <dd></dd>
 <dt><a href="game.html#DefineConstruction">DefineConstruction</a></dt>
-<dd></dd>
-<dt><a href="pud.html#DefineConstructionWcNames">DefineConstructionWcNames</a></dt>
 <dd></dd>
 <dt><a href="ui.html#DefineCursor">DefineCursor</a></dt>
 <dd></dd>
@@ -199,7 +198,9 @@
 <dd></dd>
 <dt><a href="icon.html#DefineIconAlias">DefineIconAlias</a></dt>
 <dd></dd>
-<dt><a href="pud.html#DefineIconWcNames">DefineIconWcNames</a></dt>
+<dt><a href="mappresentation.html#DefineMapOption">DefineMapOption</a></dt>
+<dd></dd>
+<dt><a href="mappresentation.html#DefineMapSetup">DefineMapSetup</a></dt>
 <dd></dd>
 <dt><a href="ui.html#DefineMenu">DefineMenu</a></dt>
 <dd></dd>
@@ -208,8 +209,6 @@
 <dt><a href="ui.html#DefineMenuItem">DefineMenuItem</a></dt>
 <dd></dd>
 <dt><a href="magic.html#DefineMissileType">DefineMissileType</a></dt>
-<dd></dd>
-<dt><a href="pud.html#DefineMissileTypeWcNames">DefineMissileTypeWcNames</a></dt>
 <dd></dd>
 <dt><a href="research.html#DefineModifier">DefineModifier</a></dt>
 <dd></dd>
@@ -221,9 +220,9 @@
 <dd></dd>
 <dt><a href="config.html#DefineSprites">DefineSprites</a></dt>
 <dd></dd>
-<dt><a href="tileset.html#DefineTileset">DefineTileset</a></dt>
+<dt><a href="tileset.html#DefineTileModel">DefineTileModel</a></dt>
 <dd></dd>
-<dt><a href="pud.html#DefineTilesetWcNames">DefineTilesetWcNames</a></dt>
+<dt><a href="tileset.html#DefineTileset">DefineTileset</a></dt>
 <dd></dd>
 <dt><a href="ui.html#DefineUI">DefineUI</a></dt>
 <dd></dd>
@@ -233,11 +232,7 @@
 <dd></dd>
 <dt><a href="unittype.html#DefineUnitType">DefineUnitType</a></dt>
 <dd></dd>
-<dt><a href="pud.html#DefineUnitTypeWcNames">DefineUnitTypeWcNames</a></dt>
-<dd></dd>
 <dt><a href="research.html#DefineUpgrade">DefineUpgrade</a></dt>
-<dd></dd>
-<dt><a href="pud.html#DefineUpgradeWcNames">DefineUpgradeWcNames</a></dt>
 <dd></dd>
 <dt><a href="unittype.html#DefineVariables">DefineVariables</a></dt>
 <dd></dd>
@@ -252,6 +247,8 @@
 <dt><a href="game.html#GameCycle">GameCycle</a></dt>
 <dd></dd>
 <dt><a href="research.html#GetDependency">GetDependency</a></dt>
+<dd></dd>
+<dt><a href="mappresentation.html#GetMapOption">GetMapOption</a></dt>
 <dd></dd>
 <dt><a href="game.html#GetPlayerData">GetPlayerData</a></dt>
 <dd></dd>
@@ -341,7 +338,11 @@
 <dd></dd>
 <dt><a href="savegame.html#SaveGame">SaveGame</a></dt>
 <dd></dd>
+<dt><a href="mapsetup.html#SelectTileset">SelectTileset</a></dt>
+<dd></dd>
 <dt><a href="game.html#Selection">Selection</a></dt>
+<dd></dd>
+<dt><a href="mapsetup.html#SetAiType">SetAiType</a></dt>
 <dd></dd>
 <dt><a href="config.html#SetAllPlayersBuildingLimit">SetAllPlayersBuildingLimit</a></dt>
 <dd></dd>
@@ -411,6 +412,8 @@
 <dd></dd>
 <dt><a href="config.html#SetGroupKeys">SetGroupKeys</a></dt>
 <dd></dd>
+<dt><a href="mapsetup.html#SetHeightMap">SetHeightMap</a></dt>
+<dd></dd>
 <dt><a href="config.html#SetHoldClickDelay">SetHoldClickDelay</a></dt>
 <dd></dd>
 <dt><a href="config.html#SetKeyScroll">SetKeyScroll</a></dt>
@@ -420,6 +423,8 @@
 <dt><a href="config.html#SetLeaveStops">SetLeaveStops</a></dt>
 <dd></dd>
 <dt><a href="game.html#SetLocalPlayerName">SetLocalPlayerName</a></dt>
+<dd></dd>
+<dt><a href="mappresentation.html#SetMapMiniImage">SetMapMiniImage</a></dt>
 <dd></dd>
 <dt><a href="config.html#SetMaxSelectable">SetMaxSelectable</a></dt>
 <dd></dd>
@@ -477,7 +482,13 @@
 <dd></dd>
 <dt><a href="config.html#SetSpeeds">SetSpeeds</a></dt>
 <dd></dd>
+<dt><a href="mapsetup.html#SetStartView">SetStartView</a></dt>
+<dd></dd>
 <dt><a href="game.html#SetThisPlayer">SetThisPlayer</a></dt>
+<dd></dd>
+<dt><a href="mapsetup.html#SetTile">SetTile</a></dt>
+<dd></dd>
+<dt><a href="mapsetup.html#SetTileMap">SetTileMap</a></dt>
 <dd></dd>
 <dt><a href="config.html#SetTitleScreens">SetTitleScreens</a></dt>
 <dd></dd>
