@@ -54,7 +54,7 @@ struct symbol
 
 
 static inline u32
-hash(u8 *str)
+hash(const u8 *str)
 {
     u32 h = 0;
 
@@ -69,15 +69,15 @@ hash(u8 *str)
     Find a symbol. Return 0 if not found.
 */
 
-void *
-_hash_find(u8 *id, void *tab, int size, int usize)
+const void *
+_hash_find(const u8 *id, const void *tab, int size, int usize)
 {
-    struct symbol *s;
+    const struct symbol *s;
     u32 h;
     int i;
 
     h = hash(id);
-    s = ((struct symbol **)tab)[h % size];
+    s = ((const struct symbol **)tab)[h % size];
 
     while (s)
     {
@@ -100,7 +100,7 @@ _hash_find(u8 *id, void *tab, int size, int usize)
 */
 
 void *
-_hash_get(u8 *id, void *tab, int size, int usize)
+_hash_get(const u8 *id, void *tab, int size, int usize)
 {
     struct symbol *s, **ss;
     u32 h;
@@ -137,7 +137,7 @@ _hash_get(u8 *id, void *tab, int size, int usize)
 */
 
 void
-_hash_del(u8 *id, void *tab, int size, int usize)
+_hash_del(const u8 *id, void *tab, int size, int usize)
 {
     struct symbol *s, **ss;
     u32 h;
