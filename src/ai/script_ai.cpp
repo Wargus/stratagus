@@ -1002,11 +1002,11 @@ local int CclDefineAi(lua_State* l)
 #ifdef DEBUG
     const AiType* ait;
 #endif
-    int args;
-    int j;
 
-    args = lua_gettop(l);
-    j = 0;
+    if (lua_gettop(l) != 4 || !lua_isfunction(l, 4)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
 
     aitype = malloc(sizeof(AiType));
     aitype->Next = AiTypes;
@@ -1015,8 +1015,7 @@ local int CclDefineAi(lua_State* l)
     //
     //  AI Name
     //
-    aitype->Name = strdup(LuaToString(l, j + 1));
-    ++j;
+    aitype->Name = strdup(LuaToString(l, 1));
     DebugLevel3Fn("%s\n" _C_ aitype->Name);
 
 #ifdef DEBUG
@@ -1031,8 +1030,7 @@ local int CclDefineAi(lua_State* l)
     //
     //  AI Race
     //
-    value = LuaToString(l, j + 1);
-    ++j;
+    value = LuaToString(l, 2);
     DebugLevel3Fn("%s\n" _C_ value);
     if (*value != '*') {
 	aitype->Race = strdup(value);
@@ -1043,14 +1041,31 @@ local int CclDefineAi(lua_State* l)
     //
     //  AI Class
     //
-    aitype->Class = strdup(LuaToString(l, j + 1));
-    ++j;
+    aitype->Class = strdup(LuaToString(l, 3));
     DebugLevel3Fn("%s\n" _C_ aitype->Class);
 
     //
     //  AI Script
     //
-//    aitype->Script = value;
+    lua_pushstring(l, "_ai_scripts_");
+    lua_gettable(l, LUA_GLOBALSINDEX);
+    if (lua_isnil(l, -1)) {
+	lua_pop(l, 1);
+	lua_pushstring(l, "_ai_scripts_");
+	lua_newtable(l);
+	lua_settable(l, LUA_GLOBALSINDEX);
+	lua_pushstring(l, "_ai_scripts_");
+	lua_gettable(l, LUA_GLOBALSINDEX);
+    }
+    aitype->Script = malloc(strlen(aitype->Name) +
+	(aitype->Race ? strlen(aitype->Race) : 0) +
+	strlen(aitype->Class) + 1);
+    sprintf(aitype->Script, "%s%s%s", aitype->Name,
+	(aitype->Race ? aitype->Race : ""), aitype->Class);
+    lua_pushstring(l, aitype->Script);
+    lua_pushvalue(l, 4);
+    lua_rawset(l, 5);
+    lua_pop(l, 1);
 
     return 0;
 }
@@ -3032,7 +3047,7 @@ local int CclAiSetReserve(lua_State* l)
     lua_newtable(l);
     for (i = 0; i < MaxCosts; ++i) {
 	lua_pushnumber(l, AiPlayer->Reserve[i]);
-	lua_rawseti(l, -1, i + 1);
+	lua_rawseti(l, -2, i + 1);
     }
     for (i = 0; i < MaxCosts; ++i) {
 	lua_rawgeti(l, 1, i + 1);
@@ -3520,8 +3535,8 @@ global void AiCclRegister(void)
 //    lua_register(Lua, "AiRestart", CclAiRestart);
 
     lua_register(Lua, "AiPlayer", CclAiPlayer);
-    lua_register(Lua, "AiSetReserve!", CclAiSetReserve);
-    lua_register(Lua, "AiSetCollect!", CclAiSetCollect);
+    lua_register(Lua, "AiSetReserve", CclAiSetReserve);
+    lua_register(Lua, "AiSetCollect", CclAiSetCollect);
     lua_register(Lua, "AiSetAutoAttack", CclAiSetAutoAttack);
 
     lua_register(Lua, "AiDump", CclAiDump);
