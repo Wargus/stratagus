@@ -352,7 +352,6 @@ global void ShowIntro(const Intro *intro)
 
 	WaitEventsOneFrame(&callbacks);
 	WaitEventsOneFrame(&callbacks);
-	WaitEventsOneFrame(&callbacks);
 	++line;
     }
 
