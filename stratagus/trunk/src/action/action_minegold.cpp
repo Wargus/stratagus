@@ -10,7 +10,7 @@
 //
 /**@name action_minegold.c -	The mine gold action. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//	(c) Copyright 1998-2003 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -58,14 +58,17 @@ local int MoveToGoldMine(Unit* unit)
     Unit* destu;
     int i;
 
-    if( (i=DoActionMove(unit))>=0 ) {	// reached end-point?
+    destu=unit->Orders[0].Goal;
+    DebugCheck( !destu );
+
+    i=DoActionMove(unit);
+    if( i==0 ) {
 	return 0;
     }
-
-    destu=unit->Orders[0].Goal;
-
-    DebugCheck( !destu );
-    DebugCheck( unit->Wait!=1 );
+    if( i>0 && !(destu->Destroyed || destu->Removed || !destu->HP
+	    || destu->Orders[0].Action==UnitActionDie) ) {
+	return 0;
+    }
 
     //
     //	Target is dead, stop mining.
@@ -111,6 +114,7 @@ local int MoveToGoldMine(Unit* unit)
 	return 0;
     }
 
+    DebugCheck( unit->Wait!=1 );
     DebugCheck( unit->Orders[0].Action!=UnitActionMineGold );
 
     //
@@ -348,14 +352,17 @@ local int MoveToGoldDeposit(Unit* unit)
     int i;
     Unit* destu;
 
-    if( (i=DoActionMove(unit))>=0 ) {	// reached end-point?
+    destu=unit->Orders[0].Goal;
+    DebugCheck( !destu );
+
+    i=DoActionMove(unit);
+    if( i==0 ) {
 	return 0;
     }
-
-    destu=unit->Orders[0].Goal;
-
-    DebugCheck( !destu );
-    DebugCheck( unit->Wait!=1 );
+    if( i>0 && !(destu->Destroyed || destu->Removed || !destu->HP
+	    || destu->Orders[0].Action==UnitActionDie) ) {
+	return 0;
+    }
 
     //
     //	Target is dead, stop mining.
@@ -383,6 +390,7 @@ local int MoveToGoldDeposit(Unit* unit)
 	return 0;
     }
 
+    DebugCheck( unit->Wait!=1 );
     DebugCheck( unit->Orders[0].Action!=UnitActionMineGold );
 
     //
