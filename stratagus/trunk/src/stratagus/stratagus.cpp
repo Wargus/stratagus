@@ -564,7 +564,7 @@ global void EffectDrawCircle(int* ptr,int depth,int x,int y,int r)
 **	@param callbacks	Call backs that handle events.
 */
 local void VideoEffect0(int frame,
-	const EventCallback* callbacks __attribute((unused)))
+	const EventCallback* callbacks __attribute__((unused)))
 {
     static int* buf1;
     static int* buf2;
