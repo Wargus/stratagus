@@ -1720,7 +1720,13 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
     Player* oldplayer;
 
     oldplayer=unit->Player;
-
+   
+    // This shouldn't happen
+    if (oldplayer==newplayer) {
+        DebugLevel0Fn("Change the unit owner to the same player???\n");
+        return;
+    }
+  
     // For st*rcr*ft (dark archons),
     if( unit->Type->Transporter ) {
         for( i=0; i<MAX_UNITS_ONBOARD; i++) {
@@ -1729,24 +1735,41 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
 	    }
 	}
     }
+    // FIXME: should use a better methode, linking all units in a building
+    // FIXME: f.e. with the next pointer. How???
+    //
+    // Rescue all units in buildings
+    //
+    printf("Rescue of a %s at 0x%X\n",unit->Type->Name,(unsigned)unit);
+    for( i=0; i<NumUnits; i++ ) {
+	if( Units[i]->Removed && Units[i]->Next==unit ) {
+            printf("Chain rescue of a %s\n at 0x%X",Units[i]->Type->Name,(unsigned)Units[i]);
+            ChangeUnitOwner(Units[i],newplayer);
+	}
+    }
 
     //
     //	Must change food/gold and other.
     //
     UnitLost(unit);
 
-    //Adjust Orders to remove Attack Order
-    //Mainly to protect peasants who are building.
-    for( i=0; i < MAX_ORDERS; i++) {
+    //  Adjust Orders to remove Attack Order
+    //  Mainly to protect peasants who are building.
+    //  FIXME: What's the point in this code? It just causes a crash when
+    //  FIXME: an unit is moving (the unit stops when between map cells.)
+    
+    /*for( i=0; i < MAX_ORDERS; i++) {
         if (unit->Orders[i].Action==UnitActionAttack ||
             unit->Orders[i].Action==UnitActionAttackGround) {
-            //Now see if it's an enemy..
-            //FIXME:Just Stops attacking at the moment
+               //Now see if it's an enemy..
+               //FIXME:Just Stops attacking at the moment
+               printf("Stopped attack for a/an %s,\n",unit->Type->Name);
                unit->Orders[i].Action=UnitActionStill;
                unit->SubAction=unit->State=0;
                break;
         }
-    }
+    }*/
+    
     //
     //	Now the new side!
     //
@@ -1765,12 +1788,22 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
     *unit->PlayerSlot=unit;
 
     unit->Player=newplayer;
-    MapUnmarkSight(oldplayer,unit->X+unit->Type->TileWidth/2
-	,unit->Y+unit->Type->TileHeight/2
-	,unit->CurrentSightRange);
-    MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-	,unit->Y+unit->Type->TileHeight/2
-	,unit->CurrentSightRange);
+    
+    if ( unit->Removed&&unit->Next ) {
+        MapUnmarkSight(oldplayer,unit->Next->X+unit->Next->Type->TileWidth/2
+            ,unit->Next->Y+unit->Next->Type->TileHeight/2
+	    ,unit->CurrentSightRange);
+        MapMarkSight(unit->Player,unit->Next->X+unit->Next->Type->TileWidth/2
+	    ,unit->Next->Y+unit->Next->Type->TileHeight/2
+            ,unit->CurrentSightRange);
+    } else {
+        MapUnmarkSight(oldplayer,unit->X+unit->Type->TileWidth/2
+            ,unit->Y+unit->Type->TileHeight/2
+	    ,unit->CurrentSightRange);
+        MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+	    ,unit->Y+unit->Type->TileHeight/2
+            ,unit->CurrentSightRange);
+    }
 
     unit->Stats=&unit->Type->Stats[newplayer->Player];
     //
@@ -1810,9 +1843,14 @@ local void ChangePlayerOwner(Player* oldplayer,Player* newplayer)
     memcpy(table,oldplayer->Units,n*sizeof(Unit*));
     for( i=0; i<n; i++ ) {
 	unit=table[i];
+        // Don't save the unit again(can happen when inside a town hall)
+        if (unit->Player==newplayer) {
+            continue;
+        }
 	ChangeUnitOwner(unit,newplayer);
 	unit->Blink=5;
 	unit->Rescued=1;
+	unit->RescuedFrom=oldplayer;
     }
 }
 
@@ -1851,6 +1889,11 @@ global void RescueUnits(void)
 	    memcpy(table,p->Units,l*sizeof(Unit*));
 	    for( j=0; j<l; j++ ) {
 		unit=table[j];
+                // Do not rescue removed units. Units inside something are
+                // rescued by ChangeUnitOwner
+                if (unit->Removed) {
+                    continue;
+                }
 		DebugLevel3("Checking %d(%s)" _C_ UnitNumber(unit) _C_
 			unit->Type->Ident);
 #ifdef UNIT_ON_MAP
@@ -1881,18 +1924,20 @@ global void RescueUnits(void)
 #endif
 		    if( around[i]->Type->CanAttack &&
 			    IsAllied(unit->Player,around[i]) ) {
-			ChangeUnitOwner(unit,around[i]->Player);
-			unit->Blink=5;
-			unit->Rescued=1;
-			PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound
-				,MaxSampleVolume);
-			//
+        		//
 			//	City center converts complete race
 			//	NOTE: I use a trick here, centers could
 			//		store gold.
 			if( unit->Type->StoresGold ) {
-			    ChangePlayerOwner(p,unit->Player);
+			    ChangePlayerOwner(p,around[i]->Player);
+                            break;
 			}
+                        unit->RescuedFrom=unit->Player;
+			ChangeUnitOwner(unit,around[i]->Player);
+			unit->Blink=5;
+		        unit->Rescued=1;
+			PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound
+				,MaxSampleVolume);
 			break;
 		    }
 		}
@@ -4215,6 +4260,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     }
     if( unit->Rescued ) {
 	fprintf(file," 'rescued");
+	fprintf(file," 'rescued-from %d",unit->RescuedFrom->Player);
     }
     if( unit->Next && unit->Removed ) {
 	fprintf(file," 'host-tile '(%d %d) ",

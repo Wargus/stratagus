@@ -143,13 +143,27 @@ global void HandleActionTrain(Unit* unit)
 	//	FIXME: we must check if the units supports the new order.
 	//
 	if( (unit->NewOrder.Action==UnitActionHaulOil
-		    && !nunit->Type->Tanker)
-		|| (unit->NewOrder.Action==UnitActionAttack
-		    && !nunit->Type->CanAttack)
-		|| (unit->NewOrder.Action==UnitActionBoard
-		    && nunit->Type->UnitType!=UnitTypeLand) ) {
+	        && !nunit->Type->Tanker)
+    	    || (unit->NewOrder.Action==UnitActionAttack
+	        && !nunit->Type->CanAttack)
+            || ((unit->NewOrder.Action==UnitActionMineGold
+                || unit->NewOrder.Action==UnitActionHarvest)
+		&& nunit->Type!=UnitTypeOrcWorker 
+		&& nunit->Type!=UnitTypeHumanWorker )
+	    || (unit->NewOrder.Action==UnitActionBoard
+	        && nunit->Type->UnitType!=UnitTypeLand) ) {
 	    DebugLevel0Fn("Wrong order for unit\n");
-	    nunit->Orders[0].Action=UnitActionStill;
+            
+	    //nunit->Orders[0].Action=UnitActionStandStill;
+            
+            // Tell the unit to move instead of trying to harvest
+	    nunit->Orders[0]=unit->NewOrder;
+	    nunit->Orders[0].Action=UnitActionMove;
+	    if( nunit->Orders[0].Goal ) {
+		RefsDebugCheck( !nunit->Orders[0].Goal->Refs );
+		nunit->Orders[0].Goal->Refs++;
+	    }
+            
 	} else {
 	    if( unit->NewOrder.Goal ) {
 		if( unit->NewOrder.Goal->Destroyed ) {

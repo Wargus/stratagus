@@ -957,8 +957,8 @@ global void DrawStatusLine(void)
     if( StatusLine[0] ) {
 	PushClipping();
 	SetClipping(TheUI.StatusLineTextX,TheUI.StatusLineTextY
-		,TheUI.StatusLineX+TheUI.StatusLine.Graphic->Width
-		,TheUI.StatusLineY+TheUI.StatusLine.Graphic->Height);
+		,TheUI.StatusLineX+TheUI.StatusLine.Graphic->Width-1
+		,TheUI.StatusLineY+TheUI.StatusLine.Graphic->Height-1);
 	VideoDrawTextClip(TheUI.StatusLineTextX,TheUI.StatusLineTextY
 		,TheUI.StatusLineFont,StatusLine);
 	PopClipping();

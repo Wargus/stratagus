@@ -513,6 +513,7 @@ struct _unit_ {
     unsigned	SeenDestroyed : 1;	/// Unit seen destroyed or not
     unsigned	Active : 1;		/// Unit is active for AI
     unsigned	Rescued : 1;		/// Unit is rescued
+    Player*     RescuedFrom;            /// The original owner of a rescued unit.
 
 #define MaxMana	255			/// maximal mana for units
     unsigned	Mana : 8;		/// mana points
@@ -520,7 +521,7 @@ struct _unit_ {
     int		XP;			/// experience points
     int		Kills;			/// how many unit has this unit killed
 
-    unsigned long	TTL;		/// time to life
+    unsigned long	TTL;		/// time to live
     int		Bloodlust;		/// ticks bloodlust
     int		Haste;			/// ticks haste (disables slow)
     int		Slow;			/// ticks slow (disables haste)

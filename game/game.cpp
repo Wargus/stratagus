@@ -525,7 +525,13 @@ global void CreateGame(char* filename, WorldMap* map)
     //	FIXME: This loops fixes the colors of the units.
     //
     for( i=0; i<NumUnits; ++i ) {
-	Units[i]->Colors=Units[i]->Player->UnitColors;
+        //  I don't really think that there can be any rescued
+        //  units at this point.
+        if (Units[i]->Rescued) { 
+            Units[i]->Colors=Units[i]->RescuedFrom->UnitColors;
+        } else {
+            Units[i]->Colors=Units[i]->Player->UnitColors;
+        }
     }
 
     GameResult=GameNoResult;
