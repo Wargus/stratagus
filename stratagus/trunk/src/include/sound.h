@@ -77,11 +77,10 @@ typedef struct _game_sound_ {
     */
 extern int SoundOff;
 
-/*----------------------------------------------------------------------------
---	Functions
-----------------------------------------------------------------------------*/
-
 extern GameSound GameSounds;		/// Game sound configuration
+
+extern int PlayingMusic;		/// flag true if playing music
+extern int CallbackMusic;		/// flag true callback ccl if stops
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -116,10 +115,20 @@ extern void SetMusicVolume(int volume);
 */
 extern void InitSoundClient(void);
 
+    /// Play a sample file
+extern void PlayFile(const char* name);
+#define PlayFile PlayMusic
     /// Play a music file
 extern void PlayMusic(const char* name);
     /// Stop music playing
 extern void StopMusic(void);
+
+    /// Turn music stopped callback on
+#define CallbackMusicOn() \
+	CallbackMusic=1;
+    /// Turn music stopped callback off
+#define CallbackMusicOff() \
+	CallbackMusic=0;
 
 #else	// }{ WITH_SOUND
 
@@ -128,6 +137,7 @@ extern void StopMusic(void);
 ----------------------------------------------------------------------------*/
 
 #define SoundOff	1		/// Dummy macro for without sound
+#define PlayingMusic	1		/// Dummy macro for without sound
 
 #define PlayUnitSound(u,g)		/// Dummy macro for without sound
 #define PlayMissileSound(s,v)		/// Dummy macro for without sound
@@ -136,8 +146,11 @@ extern void StopMusic(void);
 #define SetMusicVolume(v)		/// Dummy macro for without sound
 #define InitSoundClient()		/// Dummy macro for without sound
 
+#define PlayFile(v)			/// Dummy macro for without sound
 #define PlayMusic(v)			/// Dummy macro for without sound
-#define StopMusic(v)			/// Dummy macro for without sound
+#define StopMusic()			/// Dummy macro for without sound
+#define CallbackMusicOn()		/// Dummy macro for without sound
+#define CallbackMusicOff()		/// Dummy macro for without sound
 
 #endif	// } WITH_SOUND
 
