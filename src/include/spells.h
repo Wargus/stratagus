@@ -287,7 +287,7 @@ typedef struct _spell_type_ {
 
 	// Spell Specifications
 	TargetType Target;          ///< Targetting information. See TargetType.
-	SpellActionType *Action;    ///< More arguments for spell (damage, delay, additional sounds...).
+	SpellActionType* Action;    ///< More arguments for spell (damage, delay, additional sounds...).
 
 	int Range;                  ///< Max range of the target.
 #define INFINITE_RANGE 0xFFFFFFF
@@ -312,9 +312,9 @@ typedef struct _spell_type_ {
 /**
 **  Define the names and effects of all available spells.
 */
-extern SpellType **SpellTypeTable;
+extern SpellType** SpellTypeTable;
 
-/// How many spell-types are available
+	/// How many spell-types are available
 extern int SpellTypeCount;
 
 
@@ -322,44 +322,36 @@ extern int SpellTypeCount;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/// register fonction.
+	/// register fonction.
 extern void SpellCclRegister(void);
 
-/// init spell tables
+	/// init spell tables
 extern void InitSpells(void);
 
-/// done spell tables
+	/// done spell tables
 extern void CleanSpells(void);
 
-/// return 1 if spell is availible, 0 if not (must upgrade)
+	/// return 1 if spell is availible, 0 if not (must upgrade)
 extern int SpellIsAvailable(const struct _player_* player, int SpellId);
 
-/// returns != 0 if spell can be casted (enough mana, valid target)
-extern int CanCastSpell(const struct _unit_* caster, const SpellType*,
+	/// returns != 0 if spell can be casted (enough mana, valid target)
+extern int CanCastSpell(const struct _unit_* caster, const SpellType* spell,
 	const struct _unit_* target, int x, int y);
 
-/// cast spell on target unit or place at x,y
-extern int SpellCast(struct _unit_* caster, const SpellType*,
+	/// cast spell on target unit or place at x,y
+extern int SpellCast(struct _unit_* caster, const SpellType* spell,
 	struct _unit_* target, int x, int y);
 
-/// auto cast the spell if possible
+	/// auto cast the spell if possible
 extern int AutoCastSpell(struct _unit_* caster, const SpellType* spell);
 
-/// returns != 0 if spell can be auto cast
+	/// returns != 0 if spell can be auto cast
 extern int CanAutoCastSpell(const SpellType* spell);
 
-/// return spell id by ident string
-extern int SpellIdByIdent(const char* Ident);
-
-/// return spell type by ident string
+	/// return spell type by ident string
 extern SpellType* SpellTypeByIdent(const char* Ident);
 
-/// return spell type by spell id
-extern SpellType* SpellTypeById(int Id);
-
-extern unsigned CclGetSpellByIdent(struct lua_State* l);
-
-/// return 0, 1, 2 for true, only, false.
+	/// return 0, 1, 2 for true, only, false.
 extern char Ccl2Condition(struct lua_State* l, const char* value);
 
 /*

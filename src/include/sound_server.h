@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-// T H E   W A R   B E G I N S
-// Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name sound_server.h - The sound server header file. */
 //
-// (c) Copyright 1998-2004 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 1998-2004 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 #ifndef __SOUND_SERVER_H__
 #define __SOUND_SERVER_H__
@@ -62,21 +62,21 @@ typedef struct _sample_ Sample;
 **         which supports streaming, decompressing on demand, caching.
 */
 typedef struct _sample_type_ {
-		/**
-		**  Read next samples from object.
-		**
-		**  @param o     pointer to object.
-		**  @param buf   buffer to fill.
-		**  @param len   length of buffer.
-		**
-		**  @return      Number of bytes filled.
-		*/
+	/**
+	**  Read next samples from object.
+	**
+	**  @param o    pointer to object.
+	**  @param buf  buffer to fill.
+	**  @param len  length of buffer.
+	**
+	**  @return     Number of bytes filled.
+	*/
 	int (*Read)(Sample* o, void* buf, int len);
-		/**
-		** Free the sample object.
-		**
-		**  @param o     pointer to object.
-		*/
+	/**
+	** Free the sample object.
+	**
+	**  @param o  pointer to object.
+	*/
 	void (*Free) (Sample* o);
 } SampleType;
 
@@ -144,7 +144,7 @@ typedef struct _sound_ {
 	union {
 		Sample* OneSound;       ///< if it's only a simple sound
 		Sample** OneGroup;      ///< when it's a simple group
-		TwoGroups*  TwoGroups;  ///< when it's a double group
+		TwoGroups* TwoGroups;   ///< when it's a double group
 	} Sound;
 } Sound;
 
