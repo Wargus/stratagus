@@ -58,6 +58,8 @@
 **	@return		Returns the loaded sample.
 **
 **	@note	A second wav loader is in libmodplug!
+**
+**	@todo	Add ADPCM loading support!
 */
 global Sample* LoadWav(const char* name)
 {
@@ -214,8 +216,7 @@ global Sample* LoadWav(const char* name)
 
     CLclose(f);
 
-    IfDebug(AllocatedSoundMemory += sample->Length;
-	);
+    IfDebug( AllocatedSoundMemory += sample->Length; );
 
     return sample;
 }
