@@ -65,9 +65,9 @@ global void HandleActionReturnGoods(Unit* unit)
 	RefsDebugCheck( !destu->Refs );
 	++destu->Refs;
 	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	unit->Orders[0].X=-1;
-	unit->Orders[0].Y=-1;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
 	unit->Orders[0].Action=UnitActionMineGold;
+	NewResetPath(unit);
 #else
 	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
 	    // No deposit -> can't return
@@ -101,11 +101,11 @@ global void HandleActionReturnGoods(Unit* unit)
 	RefsDebugCheck( !destu->Refs );
 	++destu->Refs;
 	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	unit->Orders[0].X=-1;
-	unit->Orders[0].Y=-1;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
 	DebugLevel3("Return to %Zd=%d,%d\n"
 	    ,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHarvest;
+	NewResetPath(unit);
 #else
 	if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
 	    // No deposit -> can't return
@@ -142,11 +142,11 @@ global void HandleActionReturnGoods(Unit* unit)
 	RefsDebugCheck( !destu->Refs );
 	++destu->Refs;
 	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	unit->Orders[0].X=-1;
-	unit->Orders[0].Y=-1;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
 	DebugLevel3("Return to %Zd=%d,%d\n"
 	    ,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHaulOil;
+	NewResetPath(unit);
 #else
 	if( !(destu=FindOilDeposit(unit->Player,unit->X,unit->Y)) ) {
 	    // No deposit -> can't return
