@@ -3564,23 +3564,16 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 **	@todo
 **		FIXME: is it the correct place to put this function in?
 */
-global int ViewPointDistance(int x,int y)
+global int ViewPointDistance(int x, int y)
 {
-    int x_v;
-    int y_v;
+    const Viewport* v;
 
     // first compute the view point coordinate
-#ifdef SPLIT_SCREEN_SUPPORT
-    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
-    x_v = v->MapX + v->MapWidth/2;
-    y_v = v->MapY + v->MapHeight/2;
-#else /* SPLIT_SCREEN_SUPPORT */
-    x_v=MapX+MapWidth/2;
-    y_v=MapY+MapHeight/2;
-#endif /* SPLIT_SCREEN_SUPPORT */
+    v = &TheUI.VP[TheUI.LastClickedVP];
 
     // then use MapDistance
-    return MapDistance(x_v,y_v,x,y);
+    return MapDistance(v->MapX + v->MapWidth / 2, v->MapY + v->MapHeight / 2,
+	x, y);
 }
 
 /**
@@ -3593,21 +3586,13 @@ global int ViewPointDistance(int x,int y)
 */
 global int ViewPointDistanceToUnit(const Unit* dest)
 {
-    int x_v;
-    int y_v;
+    const Viewport* v;
 
     // first compute the view point coordinate
-#ifdef SPLIT_SCREEN_SUPPORT
-    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
-    x_v = v->MapX + v->MapWidth/2;
-    y_v = v->MapY + v->MapHeight/2;
-#else /* SPLIT_SCREEN_SUPPORT */
-    x_v=MapX+MapWidth/2;
-    y_v=MapY+MapHeight/2;
-#endif /* SPLIT_SCREEN_SUPPORT */
-
+    v = &TheUI.VP[TheUI.LastClickedVP];
     // then use MapDistanceToUnit
-    return MapDistanceToUnit(x_v,y_v,dest);
+    return MapDistanceToUnit(v->MapX + v->MapWidth / 2,
+	    v->MapY + v->MapHeight / 2, dest);
 }
 
 /**
