@@ -270,20 +270,12 @@ typedef struct _decoration_ {
 /**
 **	Sprite to display the mana.
 */
-global Decoration ManaSprite
-#ifndef USE_CCL
-    = { "mana.png",		-7,-7, 7,7 }
-#endif
-    ;
+global Decoration ManaSprite;
 
 /**
 **	Sprite to display the health.
 */
-global Decoration HealthSprite
-#ifndef USE_CCL
-    = { "health.png",		0,-7, 7,7 }
-#endif
-    ;
+global Decoration HealthSprite;
 
 /**
 **	Sprite to display the shadow of flying units.

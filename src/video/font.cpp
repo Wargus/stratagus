@@ -45,30 +45,16 @@
 **
 **	Define the font files, sizes.
 */
-local ColorFont Fonts[MaxFonts]
-#ifndef USE_CCL
-#ifdef NEW_NAMES
-    ={ { "graphics/ui/fonts/small.png",			 7, 6 },
-    { "graphics/ui/fonts/game.png",			13,14 },
-    { "graphics/ui/fonts/large.png",			17,17 },
-    { "graphics/ui/fonts/small episode titles.png",	32,35 },
-    { "graphics/ui/fonts/large episode titles.png",	52,50 }, }
-#else
-    ={ { "graphic/game font.png",			 7, 6 },
-    { "graphic/small font.png",				13,14 },
-    { "graphic/large font.png",				17,17 },
-    { "graphic/small font episode titles.png",		32,35 },
-    { "graphic/large font episode titles.png",		52,50 }, }
-#endif
-#endif
-    ;
+local ColorFont Fonts[MaxFonts];
 
 /**
 **	Font color table.
 **
 **	FIXME: only yellow, grey and white are correct.
 */
-global unsigned char FontColors[16][8] = {
+global unsigned char FontColors[16][8]
+#ifndef USE_CCL
+= {
     // 0 black
     {   0, 228, 228, 228, 228, 239,   0 },
     // 1 red
@@ -102,6 +88,9 @@ global unsigned char FontColors[16][8] = {
     // f light grey
     {   0, 111, 110, 109, 104, 239,   0 },
 };
+#else
+    ;
+#endif
 
     /// Current color
 local const unsigned char* TextColor;
