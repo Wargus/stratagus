@@ -279,6 +279,9 @@ extern char* strdcat(const char* l, const char* r);
      /// strdup + strcat + strcat
 extern char* strdcat3(const char* l, const char *m, const char* r);
  
+    /// Build libary path name
+extern char* LibraryFileName(const char* file,char* buffer);
+
 /*============================================================================
 ==	Misc
 ============================================================================*/

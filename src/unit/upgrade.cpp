@@ -398,6 +398,7 @@ global void InitUpgrades(void)
 {
     int z;
 
+    DebugLevel3(__FUNCTION__": ---------------------------------------\n");
     if( !UpgradesCount ) {
 	InitIcons();			// wired, but I need them here
 
@@ -941,11 +942,38 @@ local SCM CclDefineUpgrade(SCM list)
 }
 
 /**
-**	Define the allow.
+**	Define which units/upgrades are allowed.
 */
 local SCM CclDefineAllow(SCM list)
 {
-    DebugLevel0(__FUNCTION__": not written\n");
+    SCM value;
+    char* str;
+    char* ids;
+    int i; 
+    int n;
+
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	str=gh_scm2newstr(value,NULL);
+	value=gh_car(list);
+	list=gh_cdr(list);
+	ids=gh_scm2newstr(value,NULL);
+
+	DebugLevel3(__FUNCTION__"\tName: %s - %s\n",str,ids);
+
+	n=strlen(ids);
+	if( n>16 ) {
+	    n=16;
+	}
+
+	for( i=0; i<n; ++i ) {
+	    AllowByIdent(&Players[i],str,ids[i]);
+	}
+
+	free(str);
+	free(ids);
+    }
 
     return SCM_UNSPECIFIED;
 }
@@ -1382,6 +1410,17 @@ void AllowActionByIdent( Player* player,  const char* sid, char af )
      { AllowActionId( player,  ActionIdByIdent(sid), af ); };
 void AllowUpgradeByIdent( Player* player,  const char* sid, char af )
      { AllowUpgradeId( player,  UpgradeIdByIdent(sid), af ); };
+
+void AllowByIdent(Player* player,  const char* sid, char af )
+{
+    if( !strncmp(sid,"unit-",5) ) {
+	AllowUnitByIdent(player,sid,af);
+    } else if( !strncmp(sid,"upgrade-",8) ) {
+	AllowUpgradeByIdent(player,sid,af);
+    } else {
+	DebugLevel0(__FUNCTION__": wrong sid %s\n",sid);
+    }
+}
 
 char UnitIdentAllowed(const Player* player,const char* sid )
      { return UnitIdAllowed( player,  UnitTypeIdByIdent(sid) ); };
