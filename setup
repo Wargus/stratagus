@@ -446,16 +446,16 @@ fi
 if test "$WIN32" = 0 ; then
   echo
   echo "VIDEO DRIVER OPTIONS"
-  echo "  X-X11 Support"
+  echo "  X - X11 Support"
 
   if test "$HAVESDL" = 1 ; then
-    echo "  S-SDL Support"
+    echo "  S - SDL Support"
   fi
   if test "$HAVESVGA" = 1 ; then
-    echo "  V-SVGALIB Support"
+    echo "  V - SVGALIB Support"
   fi
   if (test "$HAVESVGA" = 1 && test "$HAVESDL" = 1) ; then
-    echo "  B-SDL/SVGALIB Support"
+    echo "  B - SDL/SVGALIB Support"
   fi
   echo
   echo -n "Please enter selection: (s) "
@@ -686,36 +686,36 @@ case $ANSWER in
 	fi
 	echo
 
-	echo -n "Would you like to use [n]one or [i]nternal "
+	echo "CD AUDIO OPTIONS"
+	echo "  I - Internal/libcda driver (recommended)"
 	if test "$HAVESDL" = "1" ; then
-	echo -n "or [S]DL "
+	echo "  S - SDL driver (known to have problems with some drives)"
 	fi
-	echo -n "CD Audio support? (n) "
+	echo "  C - CDDA driver"
+	echo "  N - None"
+	echo
+	echo -n "Please enter selection: (n) "
 	read $N CDMode
 	echo
 	case $CDMode in
 	    [sS])
 		echo "-> Compiling with SDL cdrom support"
-		USE_SDLCD=1
-		USE_LIBCDA=0
 		echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
 		if [ "$USESDL" != "1" ]; then
 		    echo "SDLCD	= $SDLCD \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 		    echo "CLONELIBS	= \$(shell $SDL_CONFIG --libs)" >> $RULESFILE
 		fi
-		echo >> $RULESFILE
 		;;
 	    [iI])
 		echo "-> Compiling with internal (libcda) cdrom support"
-		USE_SDLCD=0
-		USE_LIBCDA=1
 		echo "LIBCDA          = -DUSE_LIBCDA" >> $RULESFILE
-		echo >> $RULESFILE
+		;;
+	    [cC])
+		echo "-> Compiling with CDDA cdrom support"
+		echo "CDDA	= -DUSE_CDDA" >> $RULESFILE
 		;;
 	    *)
 		echo "-> No cdrom support"
-		USE_SDLCD=0
-		USE_LIBCDA=0
 		;;
 	esac
 	
