@@ -199,6 +199,10 @@ int PlayMovie(const char* name)
 	}
 
 	data = malloc(sizeof(OggData));
+	if (!data) {
+		fprintf(stderr, "Out of memory\n");
+		return -1;
+	}
 
 	if (OggInit(f, data) || !data->video) {
 		free(data);
@@ -224,6 +228,7 @@ int PlayMovie(const char* name)
 		data->tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
 	if (yuv_overlay == NULL) {
+		free(data);
 		return -1;
 	}
 
@@ -233,6 +238,7 @@ int PlayMovie(const char* name)
 				sample->SampleSize != 16) {
 			DebugPrint("Not supported music format\n");
 			SoundFree(sample);
+			free(data);
 			return 0;
 		}
 		MusicSample = sample;
@@ -293,7 +299,10 @@ int PlayMovie(const char* name)
 		ogg_stream_clear(&data->vstream);
 		theora_comment_clear(&data->tcomment);
 		theora_info_clear(&data->tinfo);
+		theora_clear(&data->tstate);
 	}
+
+	free(data);
 
 	return 0;
 }
