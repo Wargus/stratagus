@@ -70,13 +70,13 @@ CTAGSFLAGS=-i defptvS -a -f
 # Locks versions with a symbolic name
 LOCKVER=	rcs -q -n$(NAME)
 
-$(OBJDIR)%.$(OE): %.c
+$(OBJDIR)/%.$(OE): %.c
 	$(CC) -c $(CFLAGS) $< -o $@
-	@$(AR) cru $(TOPDIR)/src/$(OBJDIR)libclone.a $@
+	@$(AR) cru $(TOPDIR)/src/$(OBJDIR)/libclone.a $@
 
-$(OBJDIR)%.$(OE): %.cpp
+$(OBJDIR)/%.$(OE): %.cpp
 	$(CC) -c $(CFLAGS) $< -o $@
-	@$(AR) cru $(TOPDIR)/src/$(OBJDIR)libclone.a $@
+	@$(AR) cru $(TOPDIR)/src/$(OBJDIR)/libclone.a $@
 
 # Source code documentation
 DOXYGEN=	doxygen
