@@ -55,6 +55,7 @@
 #include <string.h>
 #include <errno.h>
 #include <io.h>
+#include <fcntl.h>
 #define PATH_MAX _MAX_PATH
 #define S_ISDIR(x) ((x) & _S_IFDIR)
 #define S_ISREG(x) ((x) & _S_IFREG)
