@@ -149,6 +149,14 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	y+=unit->Type->TileHeight/2;
 #ifdef NEW_FOW
 	MapMarkNewSight(unit->Player,x,y,unit->Stats->SightRange,xd,yd);
+	if ( unit->Type->Transporter ) {
+	    for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
+		if( unit->OnBoard[i] != NoUnitP ) {
+		    MapMarkNewSight(unit->OnBoard[i]->Player,x,y,
+				    unit->OnBoard[i]->CurrentSightRange,xd,yd);
+		}
+	    }
+	}
 #else
 	if( unit->Player==ThisPlayer ) {
 	    MapMarkNewSight(x,y,unit->Stats->SightRange,xd,yd);

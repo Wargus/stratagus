@@ -124,12 +124,7 @@ local int MoveToGoldMine(Unit* unit)
 	CheckUnitToBeDrawn(destu);
     }
 
-    RemoveUnit(unit);
-#ifdef NEW_FOW
-    MapMarkSight(unit->Player,destu->X+destu->Type->TileWidth/2,
-    				destu->Y+destu->Type->TileHeight/2,
-        			destu->Stats->SightRange);
-#endif
+    RemoveUnit(unit,destu);
 
 #if 0
     // This breaks the drop out code
@@ -139,19 +134,19 @@ local int MoveToGoldMine(Unit* unit)
     // Place unit where pathfinder is more likely to work
     if (unit->X < destu->X) {
 	PlaceUnit(unit,destu->X,unit->Y);
- 	RemoveUnit(unit);		// Unit removal necessary to free map tiles
+	RemoveUnit(unit,destu);		// Unit removal necessary to free map tiles
     }
     if (unit->X > destu->X+destu->Type->TileWidth-1) {
 	PlaceUnit(unit,destu->X+destu->Type->TileWidth-1,unit->Y);
-	RemoveUnit(unit);
+	RemoveUnit(unit,destu);
     }
     if (unit->Y < destu->Y) {
 	PlaceUnit(unit,unit->X,destu->Y);
-	RemoveUnit(unit);
+	RemoveUnit(unit,destu);
     }
     if (unit->Y > destu->Y+destu->Type->TileHeight-1) {
 	PlaceUnit(unit,unit->X,destu->Y+destu->Type->TileHeight-1);
-	RemoveUnit(unit);
+	RemoveUnit(unit,destu);
     }
 #else
     unit->X=destu->X;
@@ -377,7 +372,7 @@ local int MoveToGoldDeposit(Unit* unit)
     RefsDebugCheck( !destu->Refs );
     unit->Orders[0].Goal=NoUnitP;
 
-    RemoveUnit(unit);
+    RemoveUnit(unit,destu);
     unit->X=destu->X;
     unit->Y=destu->Y;
 

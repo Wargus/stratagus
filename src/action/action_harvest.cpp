@@ -336,7 +336,7 @@ local int ReturnWithWood(Unit* unit)
 	return 0;
     }
 
-    RemoveUnit(unit);
+    RemoveUnit(unit,NULL);
 #if 0
     // FIXME: this breaks the drop out code.
     // FIXME: this is a hack, but solves the problem, a better solution is
@@ -345,19 +345,19 @@ local int ReturnWithWood(Unit* unit)
     // Place unit where pathfinder is more likely to work
     if (unit->X < destu->X) {
 	PlaceUnit(unit,destu->X,unit->Y);
- 	RemoveUnit(unit);		// Unit removal necessary to free map tiles
+ 	RemoveUnit(unit,NULL);		// Unit removal necessary to free map tiles
     }
     if (unit->X > destu->X+destu->Type->TileWidth-1) {
 	PlaceUnit(unit,destu->X+destu->Type->TileWidth-1,unit->Y);
-	RemoveUnit(unit);
+	RemoveUnit(unit,NULL);
     }
     if (unit->Y < destu->Y) {
 	PlaceUnit(unit,unit->X,destu->Y);
-	RemoveUnit(unit);
+	RemoveUnit(unit,NULL);
     }
     if (unit->Y > destu->Y+destu->Type->TileHeight-1) {
 	PlaceUnit(unit,unit->X,destu->Y+destu->Type->TileHeight-1);
-	RemoveUnit(unit);
+	RemoveUnit(unit,NULL);
     }
 #else
     unit->X=destu->X;

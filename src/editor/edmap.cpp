@@ -699,7 +699,7 @@ local void EditorDestroyAllUnits(void)
 
     while( NumUnits != 0 ) {
 	unit=Units[0];
-	RemoveUnit( unit ); 
+	RemoveUnit( unit,NULL ); 
 	UnitLost( unit ); 
 	UnitClearOrders( unit );
 	ReleaseUnit( unit ); 

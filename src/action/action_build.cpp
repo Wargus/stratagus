@@ -189,6 +189,10 @@ global void HandleActionBuild(Unit* unit)
 
     build=MakeUnit(type,unit->Player);
     build->Constructed=1;
+#ifdef NEW_FOW
+    build->CurrentSightRange=build->Type->TileWidth < build->Type->TileHeight
+				? build->Type->TileHeight : build->Type->TileWidth;
+#endif
     PlaceUnit(build,x,y);
 /* Done by PlaceUnit now
 #ifdef HIERARCHIC_PATHFINDER
@@ -240,13 +244,7 @@ global void HandleActionBuild(Unit* unit)
 #endif
     unit->Value=build->Value;		// worker holding value while building
 
-#ifdef NEW_FOW
-	MapMarkSight(build->Player,build->X+build->Type->TileWidth/2
-				     ,build->Y+build->Type->TileHeight/2
-			,build->Type->TileWidth > build->Type->TileHeight ?
-			    build->Type->TileWidth : build->Type->TileHeight);
-#endif
-    RemoveUnit(unit);		// automaticly: CheckUnitToBeDrawn(unit)
+    RemoveUnit(unit,build);		// automaticly: CheckUnitToBeDrawn(unit)
     // FIXME: Johns: should connect it to the building with ->Next?
     unit->X=x;
     unit->Y=y;
@@ -286,16 +284,6 @@ global void HandleActionBuilded(Unit* unit)
 	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,
 		CancelBuildingCostsFactor);
 	// Cancel building
-#ifdef NEW_FOW
-	MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-				     ,unit->Y+unit->Type->TileHeight/2
-			,unit->Type->TileWidth > unit->Type->TileHeight ?
-			    unit->Type->TileWidth : unit->Type->TileHeight);
-	//Hack since RemoveUnit will UnmarkUnitSite, so We'll temp mark it.
-	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-				     ,unit->Y+unit->Type->TileHeight/2
-			,unit->Stats->SightRange);
-#endif
 	LetUnitDie(unit);
 	return;
     }
@@ -331,15 +319,6 @@ global void HandleActionBuilded(Unit* unit)
 	worker->SubAction=0;
 	worker->Reset=worker->Wait=1;
 	DropOutOnSide(worker,LookingW,type->TileWidth,type->TileHeight);
-#ifdef NEW_FOW
-	MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-				     ,unit->Y+unit->Type->TileHeight/2
-			,unit->Type->TileWidth > unit->Type->TileHeight ?
-			    unit->Type->TileWidth : unit->Type->TileHeight);
-	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-				     ,unit->Y+unit->Type->TileHeight/2
-				     ,unit->Stats->SightRange);
-#endif
 	//
 	//	Building oil-platform, must update oil.
 	//
@@ -372,7 +351,7 @@ global void HandleActionBuilded(Unit* unit)
 	if ( unit->Type == UnitTypeOrcWall
 		    || unit->Type == UnitTypeHumanWall ) {
 	    MapSetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
-            RemoveUnit(unit);
+            RemoveUnit(unit,NULL);
 	    UnitLost(unit);
 	    UnitClearOrders(unit);
 	    ReleaseUnit(unit);
@@ -387,6 +366,12 @@ global void HandleActionBuilded(Unit* unit)
 	} else if( unit->Player==ThisPlayer ) {
 	    UpdateButtonPanel();
 	}
+#ifdef NEW_FOW
+	unit->CurrentSightRange=unit->Type->Stats->SightRange;
+	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2,
+			    unit->Y+unit->Type->TileWidth/2,
+			    unit->CurrentSightRange);
+#endif
         CheckUnitToBeDrawn(unit);
 	return;
     }

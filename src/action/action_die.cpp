@@ -70,6 +70,7 @@ global void HandleActionDie(Unit* unit)
 
 	unit->State=unit->Type->CorpseScript;
 	unit->Type=unit->Type->CorpseType;
+
 	CommandStopUnit(unit);		// This clears all order queues
 	IfDebug(
 	    if( unit->Orders[0].Action!=UnitActionDie ) {
