@@ -737,7 +737,7 @@ struct _unit_type_ {
 	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
 
 	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
-	unsigned Selectable : 1;            /// Unit Is Selectable at all.
+	unsigned Decoration : 1;            /// Unit Is a decoration.
 	unsigned Teleporter : 1;            /// Can teleport other units.
 
 	int CanStore[MaxCosts];             /// Resources that we can store here.

@@ -778,8 +778,8 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	CLprintf(file, "  'tile-size '(%d %d)", type->TileWidth, type->TileHeight);
 	CLprintf(file, "  'box-size '(%d %d)\n", type->BoxWidth, type->BoxHeight);
 
-	if(!type->Selectable) {
-		CLprintf(file, "  'not-selectable\n");
+	if(!type->Decoration) {
+		CLprintf(file, "  'decoration\n");
 	}
 
 	CLprintf(file, "  'neutral-minimap-color '(%d %d %d)\n",
