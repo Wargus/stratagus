@@ -60,15 +60,15 @@
     recommended that you use 16 bit, 22050 kHz, mono format. To save more 
     space, it is recommended that you gzip the file too.<p>
 
-    All the sound entry data is in data/ccl/sound.ccl, 
-    Here is an example ccl entry for: data/sounds/human/buildings/farm.wav.gz<p>
+    All the sound entry data is in data/scripts/sound.lua, 
+    Here is an example lua entry for: data/sounds/human/buildings/farm.wav.gz<p>
 
-    <pre>(make-sound "farm-selected" "human/buildings/farm.wav")</pre><p>
+    <pre>MakeSound("farm-selected", "human/buildings/farm.wav")</pre><p>
 
-    Note how the '.gz' suffix isn't needed in the ccl entry, 
+    Note how the '.gz' suffix isn't needed in the lua entry, 
     the Stratagus engine detects this automatically.<p>
 
-    You may look through the ccl file for more examples.<p>
+    You may look through the script files for existing media for more examples.<p>
 
 <hr>
 (C) Copyright 1998-2004 by The <a href="http://stratagus.sf.net">Stratagus</a> Project 
