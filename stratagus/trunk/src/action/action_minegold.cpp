@@ -96,7 +96,7 @@ local int MoveToGoldMine(Unit* unit)
 
     //
     //	Check if mine could be reached.
-    /
+    //
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another mine, or retry later.
 	DebugLevel3Fn("GOLD-MINE NOT REACHED %Zd=%d,%d ? %d\n"
@@ -398,8 +398,16 @@ local int MoveToGoldDeposit(Unit* unit)
     unit->Orders[0].Action=UnitActionMineGold;
 
     //
+    //	If depot is still under construction, wait!
+    //
+    if( destu->Orders[0].Action==UnitActionBuilded ) {
+        DebugLevel2Fn("Invalid depot\n");
+	return 0;
+    }
+
+    //
     //	Check if depot could be reached.
-    /
+    //
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another mine, or retry later.
 	DebugLevel3Fn("GOLD-DEPOT NOT REACHED %Zd=%d,%d ? %d\n"
@@ -455,11 +463,19 @@ local int MoveToGoldDeposit(Unit* unit)
     unit->Command.Action=UnitActionMineGold;
 
     //
-    //	Check if mine could be reached.
+    //	If depot is still under construction, wait!
+    //
+    if( destu->Command.Action==UnitActionBuilded ) {
+        DebugLevel2Fn("Invalid depot\n");
+	return 0;
+    }
+
+    //
+    //	Check if depot could be reached.
     //
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another mine, or retry later.
-	DebugLevel3Fn("GOLD-MINE NOT REACHED %Zd=%d,%d ? %d\n"
+	DebugLevel3Fn("GOLD-DEPOT NOT REACHED %Zd=%d,%d ? %d\n"
 	      ,UnitNumber(destu),destu->X,destu->Y
 	      ,MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;

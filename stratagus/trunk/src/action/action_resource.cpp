@@ -78,7 +78,11 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 
     switch( HandleActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
+#ifdef NEW_ORDERS
+	    unit->Orders[0].Action=resource->Action;
+#else
 	    unit->Command.Action=resource->Action;
+#endif
 	    return -1;
 	case PF_REACHED:
 	    break;
@@ -402,7 +406,11 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 
     switch( HandleActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
+#ifdef NEW_ORDERS
+	    unit->Orders[0].Action=resource->Action;
+#else
 	    unit->Command.Action=resource->Action;
+#endif
 	    return -1;
 	case PF_REACHED:
 	    break;

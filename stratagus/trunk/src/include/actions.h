@@ -89,7 +89,8 @@ extern void CommandCancelResearch(Unit* unit);
     /// Prepare command demolish
 extern void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Prepare command spellcast
-extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid, int flush);
+extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
+	,int spellid, int flush);
 
 /*----------------------------------------------------------------------------
 --	Actions:	in action_<name>.c

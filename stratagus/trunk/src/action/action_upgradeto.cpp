@@ -10,7 +10,7 @@
 //
 /**name action_upgradeto.c -	The unit upgrading to new action. */
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -49,12 +49,21 @@ global void HandleActionUpgradeTo(Unit* unit)
     DebugLevel3Fn(" %Zd\n",UnitNumber(unit));
 
     player=unit->Player;
+#ifdef NEW_ORDERS
+    type=unit->Data.UpgradeTo.What;
+    stats=&type->Stats[player->Player];
+
+    // FIXME: Should count down here
+    unit->Data.UpgradeTo.Ticks+=SpeedUpgrade;
+    if( unit->Data.UpgradeTo.Ticks>=stats->Costs[TimeCost] ) {
+#else
     type=unit->Command.Data.UpgradeTo.What;
     stats=&type->Stats[player->Player];
 
     // FIXME: Should count down here
     unit->Command.Data.UpgradeTo.Ticks+=SpeedUpgrade;
     if( unit->Command.Data.UpgradeTo.Ticks>=stats->Costs[TimeCost] ) {
+#endif
 
 	unit->HP+=stats->HitPoints-unit->Type->Stats[player->Player].HitPoints;
 	// don't have such unit now
@@ -74,7 +83,11 @@ global void HandleActionUpgradeTo(Unit* unit)
 	}
 	unit->Reset=1;
 	unit->Wait=1;
+#ifdef NEW_ORDERS
+	unit->Orders[0].Action=UnitActionStill;
+#else
 	unit->Command.Action=UnitActionStill;
+#endif
 
 	//
 	//	Update possible changed buttons.

@@ -1433,7 +1433,7 @@ global void DropOutAll(const Unit* source)
 **	@param y	Map Y position.
 **	@return		True if could build here, otherwise false.
 */
-global int CanBuildHere(UnitType* type,unsigned x,unsigned y)
+global int CanBuildHere(const UnitType* type,unsigned x,unsigned y)
 {
     Unit* table[MAX_UNITS];
     int n;
@@ -1566,7 +1566,7 @@ global int CanBuildOn(int x,int y,int mask)
 /**
 **	Can build unit-type on this point.
 */
-global int CanBuildUnitType(Unit* unit,UnitType* type,int x,int y)
+global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 {
     int w;
     int h;
