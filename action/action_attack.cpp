@@ -337,8 +337,8 @@ local void MoveToTarget(Unit* unit)
 	} else if( err<0 ) {
 	    unit->State=unit->SubAction=0;
 	    // Return to old task?
-	    if( err==-2 ) {
-		DebugLevel0Fn("Target not reachable\n");
+	    if( err==PF_UNREACHABLE ) {
+		DebugLevel0Fn("Target not reachable, unit: %d\n" _C_ UnitNumber(unit));
 	    }
 	    if( unit->Orders[0].Goal ) {
 		RefsDebugCheck( !unit->Orders[0].Goal->Refs );

@@ -452,6 +452,7 @@ local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
     add=1;
 #endif
 
+
     // FIXME: johns: has anybody an idea how to write this faster?
     xd-=x;
     if( xd<0 ) xd=-add; else if( xd>0 ) xd=add;
@@ -809,7 +810,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 	//	FIXME: if we ignore distant units we run left-right
 	//	Ignore any units more than 5 fields from start.
 	if( depth>6 ) {
-	    mask&=~(MapMoveLandUnit|MapMoveAirUnit|MapMoveSeaUnit);
+	    mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
 	}
 #endif
 
@@ -875,6 +876,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     int rx;
     int ry;
     int i;
+    int p;
     unsigned char path[MAX_PATH_LENGTH];
 
     //
@@ -891,6 +893,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     gy=unit->Orders[0].Y;
     rx=unit->Orders[0].RangeX;
     ry=unit->Orders[0].RangeY;
+    unit->Data.Move.Length=0;
 
     DebugLevel3Fn("%d: -> %s %p | %dx%d+%d+%d\n"
 	_C_ UnitNumber(unit) _C_ unit->Data.Move.Fast ? "F" : "C"
@@ -965,9 +968,20 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 #else
 	*xdp=Heading2X[*path];
 	*ydp=Heading2Y[*path];
+	// Build Path to follow later
+	// -1 to include 0, -1 for 1 point will have been executed
+	if( i >= MAX_PATH_LENGTH ) {
+	    p=MAX_PATH_LENGTH;
+	    unit->Data.Move.Length=MAX_PATH_LENGTH-1;
+	} else {
+	    p=i;
+	    unit->Data.Move.Length=p-1;
+	}
+	for(; p > 0; p--) {
+	    unit->Data.Move.Path[p-1]=path[unit->Data.Move.Length-p+1];
+	}
 #endif
     }
-
     return i;
 }
 
