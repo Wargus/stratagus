@@ -10,7 +10,7 @@
 //
 /**@name ui.c - The user interface globals. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Andreas Arens, and
+//      (c) Copyright 1999-2005 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -268,7 +268,7 @@ static void CleanConditionPanel(ConditionPanel* condition)
 /**
 **  Clean Condition Panel.
 **
-**  @param condition condition panel to free.
+**  @param content  content panel to free.
 */
 static void CleanContent(ContentType* content)
 {
@@ -289,7 +289,7 @@ static void CleanContent(ContentType* content)
 /**
 **  Clean Panel.
 **
-**  @param panel panel to free.
+**  @param panel  panel to free.
 */
 void CleanPanel(InfoPanel* panel)
 {
