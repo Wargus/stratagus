@@ -3004,7 +3004,7 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 {
     int j = 3;
     int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
-    int increments = 100 / (nitems - 3 - 9);
+    int increments = 100 / (nitems - j - 9);
 
     mi--;
     switch (i) {
@@ -3043,7 +3043,7 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 		}
 		mi[1].d.vslider.percent = mi[1].d.vslider.curper / increments * increments;
 		for (j=3; j < nitems; ++j) {
-		    KeystrokeHelpMenuItems[j].yofs = ( mi[1].d.vslider.percent * (nitems - 9) / 200 * (-20) ) + 40 + (j-3)*20;
+		    KeystrokeHelpMenuItems[j].yofs = ( mi[1].d.vslider.percent * (nitems - 9 - 3) / 100 * (-20) ) + 40 + (j-3)*20;
 		    if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
 			KeystrokeHelpMenuItems[j].xofs = 400;
 		    else
