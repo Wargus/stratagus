@@ -10,7 +10,7 @@
 //
 /**@name unit.h		-	The unit headerfile. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -349,6 +349,7 @@
 #include "unittype.h"
 #include "upgrade_structs.h"
 #include "upgrade.h"
+#include "construct.h"
 
 #ifdef NEW_DECODRAW
 #include "deco.h"
@@ -572,6 +573,7 @@ struct _unit_ {
 	int	Val;			/// Counter (fixed point trick)
 	int	Sub;			/// - to counter
 	int	Cancel;			/// Cancel construction
+	ConstructionFrame* Frame;	/// Construction frame
     }		Builded;		/// ActionBuilded,...
     struct _order_resource_ {
 	int	Active;			/// how much units are in the resource

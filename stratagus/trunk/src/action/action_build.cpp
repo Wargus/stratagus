@@ -10,7 +10,7 @@
 //
 /**@name action_build.c -	The build building action. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer
+//	(c) Copyright 1998,2000-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -46,6 +46,33 @@
 /*----------------------------------------------------------------------------
 --      Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	Update construction frame
+**
+**	@param unit	Unit
+*/
+local void UpdateConstructionFrame(Unit* unit)
+{
+    ConstructionFrame* cframe;
+    ConstructionFrame* tmp;
+    int percent;
+
+    percent=unit->Data.Builded.Sum*100/unit->Stats->HitPoints;
+    cframe=tmp=unit->Type->Construction->Frames;
+    while( tmp ) {
+	if( percent<tmp->Percent ) {
+	    break;
+	}
+	cframe=tmp;
+	tmp=tmp->Next;
+    }
+    if( cframe!=unit->Data.Builded.Frame ) {
+	unit->Data.Builded.Frame=cframe;
+	CheckUnitToBeDrawn(unit);
+	UnitMarkSeen(unit);
+    }
+}
 
 /**
 **	Unit builds a building.
@@ -227,6 +254,7 @@ global void HandleActionBuild(Unit* unit)
 	_C_ build->Data.Builded.Sum _C_ build->Data.Builded.Add
 	_C_ build->Data.Builded.Val _C_ build->Data.Builded.Sub);
     build->Wait=CYCLES_PER_SECOND/6;
+    UpdateConstructionFrame(build);
 
 #if 0
     //
@@ -263,8 +291,6 @@ global void HandleActionBuilded(Unit* unit)
 {
     Unit* worker;
     UnitType* type;
-    int i;
-    int n;
 
     type=unit->Type;
 
@@ -376,25 +402,7 @@ global void HandleActionBuilded(Unit* unit)
 	return;
     }
 
-    //
-    //	Update building states
-    //
-    n=unit->Type->Construction->Sprite->NumFrames+2;
-    for( i=(n+1)/2; i>=1; --i ) {
-	if( unit->Data.Builded.Sum*n/i >= unit->Stats->HitPoints ) {
-	    if( unit->Frame!=i && unit->Constructed ) {
-		CheckUnitToBeDrawn(unit);
-	    }
-	    if( i==(n+1)/2 ) {
-		unit->Constructed=0;
-		unit->Frame=1;
-	    } else {
-		unit->Frame=i;
-	    }
-	    UnitMarkSeen(unit);
-	    break;
-	}
-    }
+    UpdateConstructionFrame(unit);
 
     unit->Wait=5;
     if( IsOnlySelected(unit) ) {

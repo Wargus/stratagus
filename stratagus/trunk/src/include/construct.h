@@ -112,6 +112,17 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
+    /// Construction frame
+typedef struct _construction_frame_ {
+    int		Percent;		/// Percent complete
+    enum {
+	ConstructionFileConstruction,
+	ConstructionFileMain,
+    } File;				/// Graphic to use
+    int		Frame;			/// Frame number
+    struct _construction_frame_*    Next; /// Next pointer
+} ConstructionFrame;
+
     /// Construction shown during construction of a building
 typedef struct _construction_ {
     const void* OType;			/// Object type (future extensions)
@@ -122,6 +133,7 @@ typedef struct _construction_ {
 	int	Width;			/// sprite width
 	int	Height;			/// sprite height
     } File[TilesetMax], ShadowFile[TilesetMax];
+    ConstructionFrame*	Frames;		/// construction frames
 
 // --- FILLED UP ---
 
@@ -155,8 +167,6 @@ extern void LoadConstructions(void);
 extern void SaveConstructions(FILE* file);
     ///	Clean up the constructions module
 extern void CleanConstructions(void);
-    ///	Draw a construction
-extern void DrawConstruction(const Construction*,int image,int x,int y);
     /// Get construction by wc number
 extern Construction* ConstructionByWcNum(int num);
     /// Get construction by identifier
