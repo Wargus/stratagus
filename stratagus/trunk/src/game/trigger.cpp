@@ -735,11 +735,9 @@ global void TriggersEachCycle(void)
 {
     SCM pair;
     SCM trig;
-    static SCM trigger_start=NIL;
 
     if( !Trigger ) {
 	Trigger=symbol_value(gh_symbol2scm("*triggers*"),NIL);
-	trigger_start=Trigger;
     }
 
     if( !gh_null_p(trig=Trigger) ) {		// Next trigger
