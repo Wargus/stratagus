@@ -1094,7 +1094,7 @@ global void DrawInfoPanel(void)
 		    if( Selected[i]->Name ) {
 			char buf[128];
 
-			sprintf(buf,"%s %s\n",Selected[i]->Type->Name,
+			sprintf(buf,"%s %s",Selected[i]->Type->Name,
 			    Selected[i]->Name);
 			SetStatusLine(buf);
 		    } else {
@@ -1126,7 +1126,7 @@ global void DrawInfoPanel(void)
 		if( Selected[0]->Name ) {
 		    char buf[128];
 
-		    sprintf(buf,"%s %s\n",Selected[0]->Type->Name,
+		    sprintf(buf,"%s %s",Selected[0]->Type->Name,
 			Selected[0]->Name);
 		    SetStatusLine(buf);
 		} else {
