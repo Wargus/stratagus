@@ -231,6 +231,8 @@ local void MultiClientUpdate(int initial);
 local void NetConnectingCancel(void);
 local void TerminateNetConnect(void);
 
+local void StartEditor(void);
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -549,13 +551,14 @@ local void InitScenSelectMenuItems() {
 */
 local Menuitem PrgStartMenuItems[] = {
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 5, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 7, 0, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitPrgStartMenuItems() {
     MenuitemDrawfunc i0 = { NameLineDrawFunc };
@@ -564,8 +567,9 @@ local void InitPrgStartMenuItems() {
     MenuitemButton   i3 = { "~!Campaign Game", 224, 27, MBUTTON_GM_FULL, CampaignGameMenu, 'c'};
     MenuitemButton   i4 = { "~!Load Game", 224, 27, MBUTTON_GM_FULL, GameMenuLoad, 'l'};
     MenuitemButton   i5 = { "~!Options", 224, 27, MBUTTON_GM_FULL, GameGlobalOptionsMenu, 'o'};
-    MenuitemButton   i6 = { "S~!how Credits", 224, 27, MBUTTON_GM_FULL, GameShowCredits, 'h'};
-    MenuitemButton   i7 = { "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'};
+    MenuitemButton   i6 = { "~!Editor", 224, 27, MBUTTON_GM_FULL, StartEditor, 'e'};
+    MenuitemButton   i7 = { "S~!how Credits", 224, 27, MBUTTON_GM_FULL, GameShowCredits, 'h'};
+    MenuitemButton   i8 = { "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'};
     PrgStartMenuItems[0].d.drawfunc = i0;
     PrgStartMenuItems[1].d.button   = i1;
     PrgStartMenuItems[2].d.button   = i2;
@@ -574,6 +578,7 @@ local void InitPrgStartMenuItems() {
     PrgStartMenuItems[5].d.button   = i5;
     PrgStartMenuItems[6].d.button   = i6;
     PrgStartMenuItems[7].d.button   = i7;
+    PrgStartMenuItems[8].d.button   = i8;
 }
 
 /**
@@ -1639,7 +1644,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	1, 8,
+	1, 9,
 	PrgStartMenuItems,
 	NULL,
     },
@@ -5630,6 +5635,13 @@ global void NetClientUpdateState(void)
     DebugLevel1Fn("MultiClientMenuRedraw\n");
 
     MustRedraw |= RedrawMenu;
+}
+
+/**
+**	Start editor.
+*/
+local void StartEditor(void)
+{
 }
 
 /*----------------------------------------------------------------------------
