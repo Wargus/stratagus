@@ -76,13 +76,13 @@ Please follow the following instruction to get a working program.
 <UL>
 	<LI>Unpack the archive clone-'data'.tar.gz to any directory.
 	    (stored <B>with</B> path)
-	<LI>Change to the toplevel directory.
+	<LI>Change to the toplevel directory (cd clone-'date').
 	<LI>Read <A HREF="install.html">doc/install.html</A>.
 	<LI>Install the required libraries (development version!).
 	<LI>You own the original:
 	<UL>
-	<LI>Search the files maindat.war, sfxdat.sud and rezdat.war from the
-	    original game.
+	<LI>Search the files maindat.war, sfxdat.sud,strdat.war  and rezdat.war
+	    from the original game.
 	    <B>This version supports the original or expansion CD!</B>
 	    If you have only the original CD, it should also works, ignore the
 	    warnings.
@@ -106,11 +106,11 @@ Please follow the following instruction to get a working program.
 	    <LI>You have the option of running "make" from the script,
 		bypassing the next step.
 	    </UL>
-  	<LI>Type "make". (Should compile without errors :-)
   	<LI>If you have the original type "make buildit" or
 	    ". tools/build.sh", to extract and convert the needed graphics,
 	    sounds and puds. (You need to run this only once!)
  	<LI>Now it's time for a coffee break.
+  	<LI>Type "make". (Should compile without errors :-)
 	<LI>Optional:
 	    <UL>
 	    <LI>Edit "data/ccl/clone.ccl" to configure FreeCraft with
@@ -125,11 +125,9 @@ Please follow the following instruction to get a working program.
 	    if it is already known, if not please mail it to
 	    <A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>.
 	<LI>ADVANCED: Type "make help" for more compile options.
-	<LI>If you have compiled with guile-gtk you can get a file requester
-	to choose the maps, with "./clone contrib/req.cm".
 	<P>
 	<LI>If you get everytime killed by the computer, let him sleep with		the command line option "-s n" (sleep n frames) or set the build
-	costs and build times of the computer  with -f 110 and -t 110 higher.
+	costs and build times of the computer with -f 110 and -t 110 higher.
 </UL>
 
     <H2>SVGALib support = console</H2>
