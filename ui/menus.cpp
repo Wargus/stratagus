@@ -2498,6 +2498,7 @@ local void SetFogOfWar(Menuitem *mi __attribute__((unused)))
         UpdateFogOfWarChange();
         MapUpdateVisible();
     }
+    MustRedraw &= ~RedrawMinimap;
 }
 
 local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
