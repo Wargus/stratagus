@@ -37,9 +37,43 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
-#include "siod.h"
+#ifdef USE_GUILE
+#  include <guile/gh.h>
+#  define get_c_string(lisp)     CclConvertToString(lisp)
+#  define try_get_c_string(lisp) CclConvertToString(lisp)
+#  define symbol_value(x, env)   scm_variable_ref(scm_lookup(x))
+#  define NIL                    SCM_EOL
+#  define cons(a, b)             gh_cons(a, b)
+#  define symbol_boundp(x, env)  (!SCM_UNBNDP(x))
+#  define fast_load(s_filename, bogus)  scm_primitive_load(s_filename)
+#  define cons_array              gh_make_vector
+#  define gh_eval(expr, env)      scm_primitive_eval(expr)
+#  define setvar(sym, value, env) scm_define(sym,value)
+#  define vload(buf,cflag,rflag)  gh_load(buf)
+#  define errl(message, value)    { fputs(message, stdout); gh_display(value); putchar('\n'); }
+#  define lprin1f(var, file)
+#  define gh_new_procedureN(name, proc) gh_new_procedure(name, proc, 0, 0, 1)
+#  define aset1(array, pos, value)      gh_vector_set_x(array, pos, value)
+#  define repl_c_string(msg, a, b, c  ) gh_eval_str(msg)
+#  define print_welcome()         
+#  define user_gc(a)              scm_gc()
+#  define gh_scm2newstr(scm, lenp) \
+  (gh_symbol_p(scm) ? gh_symbol2newstr(scm, lenp) : gh_scm2newstr(scm,lenp))
+#  define gh_scm2int(val) \
+  (gh_inexact_p(val) ? (int)gh_scm2double(val) : gh_scm2int(val))
+#  define gh_scm2long(val) \
+  (gh_inexact_p(val) ? (long)gh_scm2double(val) : gh_scm2long(val))
 
+extern int siod_verbose_level;
+struct gen_printio* f;
+typedef scm_t_bits ccl_smob_type_t;
+
+#else
+#  include <string.h>
+#  include "siod.h"
+#  include "siodp.h"
+
+extern LISP fast_load(LISP lfname,LISP noeval);
 /*----------------------------------------------------------------------------
 --	Macros
 ----------------------------------------------------------------------------*/
@@ -62,8 +96,12 @@
 #define gh_cddr(lisp)		cddr(lisp)
 #define gh_length(lisp)		nlength(lisp)
 
+#define gh_set_car_x(pair, val) setcar(pair, val)
+#define gh_set_cdr_x(pair, val) setcdr(pair, val)
+
 #define gh_exact_p(lisp)	TYPEP(lisp,tc_flonum)
 #define gh_scm2int(lisp)	(long)FLONM(lisp)
+#define gh_scm2long(lisp)	(long)FLONM(lisp)
 #define gh_int2scm(num)		flocons(num)
 
 #define gh_string_p(lisp)	TYPEP(lisp,tc_string)
@@ -87,7 +125,7 @@
 #define gh_display(lisp)	lprin1f(lisp,stdout)
 #define gh_newline()		fprintf(stdout,"\n")
 
-#define gh_eval_file(str)	vload(str,0,0)
+#define gh_load(str)	        vload(str,0,0)
 
 #define gh_apply(proc,args)	lapply(proc,args)
 #define gh_eval(proc,env)	leval(proc,env)
@@ -103,7 +141,12 @@
 #define SCM_BOOL_T	sym_t
 #define SCM_BOOL_F	NIL
 
+#define gh_vector_set_x(array, pos, value) aset1(array, pos, value) 
+
 extern LISP sym_t;
+typedef long ccl_smob_type_t;
+
+#endif // !USE_GUILE
 
 //extern SCM CclEachSecond;		/// Scheme function called each second
 
@@ -117,6 +160,12 @@ extern int CclInConfigFile;		/// True while config file parsing
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+extern char*           CclConvertToString(SCM scm);
+extern ccl_smob_type_t CclMakeSmobType(const char* name);
+extern SCM             CclMakeSmobObj(ccl_smob_type_t tag, void* ptr);
+extern void*           CclGetSmobData(SCM smob);
+extern ccl_smob_type_t CclGetSmobType(SCM smob);
 
 extern void CclGcProtect(SCM obj);	/// Protect scm object for GC
 extern void CclGcUnprotect(SCM obj);	/// Unprotect scm object for GC

@@ -34,6 +34,7 @@
 //	Includes
 //----------------------------------------------------------------------------
 
+#include <string.h>
 #include <stdio.h>
 #if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
 #include <stdlib.h>

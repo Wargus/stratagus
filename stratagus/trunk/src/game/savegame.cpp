@@ -34,6 +34,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <string.h>
 #include <stdio.h>
 #if !defined(_MSC_VER) || !defined(_WIN32_WCE)
 #include <time.h>
@@ -112,7 +113,7 @@ global void SaveGame(const char* filename)
     { SCM var;
 	fprintf(file,";;;  'media\t'");
 	var=gh_symbol2scm("media-version");
-	if( !gh_null_p(symbol_boundp(var, NIL)) ) {
+	if (symbol_boundp(var, NIL)) {
 	    var=symbol_value(var,NIL);
 	    lprin1f(var,file);
 	} else {

@@ -89,7 +89,7 @@ local SCM CclAStar(SCM list)
 		AStarFixedUnitCrossingCost=i;
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("moving-unit-cost")) ) {
-	    i=gh_scm2int(list);
+	    i=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	    if( i<=0) {
 		PrintFunction();

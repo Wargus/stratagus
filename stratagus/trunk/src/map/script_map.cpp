@@ -34,6 +34,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -94,7 +95,7 @@ local SCM CclStratagusMap(SCM list)
 
 	    str=gh_scm2newstr(data,NULL);
 	    strncpy(TheMap.Description,str,sizeof(TheMap.Description));
-	    TheMap.Info->Description=strdup(str);
+	    TheMap.Info->Description = strdup(str);
 	    free(str);
 	} else if( gh_eq_p(value,gh_symbol2scm("the-map")) ) {
 	    data=gh_car(list);

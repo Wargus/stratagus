@@ -34,6 +34,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -871,7 +872,7 @@ local SCM CclAiSetReserve(SCM vec)
     int i;
     SCM old;
 
-    old=cons_array(gh_int2scm(MaxCosts),NIL);
+    old = cons_array(gh_int2scm(MaxCosts), 0);
     for( i=0; i<MaxCosts; ++i ) {
 	aset1(old,gh_int2scm(i),gh_int2scm(AiPlayer->Reserve[i]));
     }
@@ -892,7 +893,7 @@ local SCM CclAiSetCollect(SCM vec)
     int i;
     SCM old;
 
-    old=cons_array(gh_int2scm(MaxCosts),NIL);
+    old = cons_array(gh_int2scm(MaxCosts), 0);
     for( i=0; i<MaxCosts; ++i ) {
 	aset1(old,gh_int2scm(i),gh_int2scm(AiPlayer->Collect[i]));
     }

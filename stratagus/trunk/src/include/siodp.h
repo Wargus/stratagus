@@ -11,6 +11,7 @@ However, some of these should be moved to siod.h
 
 */
 
+#include <setjmp.h>
 
 extern char *tkbuffer;
 extern LISP heap,heap_end,heap_org;
