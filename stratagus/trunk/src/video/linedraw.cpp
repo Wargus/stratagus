@@ -657,7 +657,7 @@ global void VideoFillTransRectangle(Uint32 color, int x, int y,
 		24, RMASK, GMASK, BMASK, 0);
 
 	SDL_GetRGB(color, TheScreen->format, &r, &g, &b);
-	color = SDL_MapRGB(s->format, r, g, b);
+	color = VideoMapRGB(s->format, r, g, b);
 
 	SDL_FillRect(s, NULL, color);
 
