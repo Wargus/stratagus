@@ -10,7 +10,7 @@
 //
 /**@name upgrade.c - The upgrade/allow functions. */
 //
-//      (c) Copyright 1999-2004 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1073,9 +1073,6 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 					}
 				}
 			}
-			UnitTypes[z]->Stats[pn].BasicDamage += um->Modifier.Variables[BASICDAMAGE_INDEX].Value;
-			UnitTypes[z]->Stats[pn].PiercingDamage += um->Modifier.Variables[PIERCINGDAMAGE_INDEX].Value;
-			UnitTypes[z]->Stats[pn].Armor += um->Modifier.Variables[ARMOR_INDEX].Value;
 			UnitTypes[z]->Stats[pn].HitPoints += um->Modifier.Variables[HP_INDEX].Max;
 			UnitTypes[z]->Stats[pn].RegenerationRate += um->Modifier.Variables[HP_INDEX].Increase;
 			UnitTypes[z]->Stats[pn].Mana += um->Modifier.Variables[MANA_INDEX].Max;
@@ -1129,11 +1126,9 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 					}
 				}
 			}
-			UnitTypes[z]->Stats[pn].Level++;
 			UnitTypes[z]->Stats[pn].Variables[LEVEL_INDEX].Value++;
 			UnitTypes[z]->Stats[pn].Variables[LEVEL_INDEX].Max++;
 			if (um->ConvertTo) {
-				um->ConvertTo->Stats[pn].Level++;
 				um->ConvertTo->Stats[pn].Variables[LEVEL_INDEX].Value++;
 				um->ConvertTo->Stats[pn].Variables[LEVEL_INDEX].Max++;
 				ConvertUnitTypeTo(player,UnitTypes[z], um->ConvertTo);

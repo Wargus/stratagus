@@ -10,7 +10,7 @@
 //
 /**@name upgrade_structs.h - The upgrade/allow headerfile. */
 //
-//      (c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski and
+//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and
 // Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -127,14 +127,10 @@ typedef struct _unit_stats_ {
 	struct _variable_type_* Variables;  ///< userdefined variable.
 	int AttackRange;                ///< how far can the unit attack
 	int SightRange;                 ///< how far can the unit see
-	int Armor;                      ///< armor strength
-	int BasicDamage;                ///< weapon basic damage
-	int PiercingDamage;             ///< weapon piercing damage
 	int HitPoints;                  ///< hit points
 	int RegenerationRate;           ///< HP regeration rate in HP
 	int Mana;                       ///< Mana points.
 	int Costs[MaxCosts];            ///< current costs of the unit
-	int Level;                      ///< unit level (upgrades)
 } UnitStats;
 
 /**

@@ -1117,12 +1117,8 @@ static int CclDefineUnitStats(lua_State* l)
 	}
 
 	stats->Mana = stats->Variables[MANA_INDEX].Max;
-	stats->Level = stats->Variables[LEVEL_INDEX].Value;
 	stats->AttackRange = stats->Variables[ATTACKRANGE_INDEX].Max;
 	stats->SightRange = stats->Variables[SIGHTRANGE_INDEX].Value;
-	stats->Armor = stats->Variables[ARMOR_INDEX].Value;
-	stats->BasicDamage = stats->Variables[BASICDAMAGE_INDEX].Value;
-	stats->PiercingDamage = stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 	stats->HitPoints = stats->Variables[HP_INDEX].Max;
 	stats->RegenerationRate = stats->Variables[HP_INDEX].Increase;
 
@@ -1947,11 +1943,13 @@ void UpdateUnitVariables(const Unit* unit)
 {
 	int i;
 	const UnitType* type; // unit->Type.
-	int piercing;         // unit->type->Variable[PIERCINGDAMAGE_INDEX].Value.
-	int basic;            // unit->type->Variable[BASICDAMAGE_INDEX].Value.
 
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
+		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
+			|| i == LEVEL_INDEX) {
+			continue;
+		}
 		unit->Variable[i].Value = 0;
 		unit->Variable[i].Max = 0;
 		unit->Variable[i].Enable = 1;
@@ -2014,11 +2012,6 @@ void UpdateUnitVariables(const Unit* unit)
 		unit->Variable[CARRYRESOURCE_INDEX].Max = unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity;
 	}
 
-
-	// level
-	unit->Variable[LEVEL_INDEX].Value = unit->Stats->Level;
-	unit->Variable[LEVEL_INDEX].Max = unit->Stats->Level;
-
 	// XP
 	unit->Variable[XP_INDEX].Value = unit->XP;
 	unit->Variable[XP_INDEX].Max = unit->XP;
@@ -2040,10 +2033,6 @@ void UpdateUnitVariables(const Unit* unit)
 	unit->Variable[DEMAND_INDEX].Max = unit->Player->Demand;
 	unit->Variable[DEMAND_INDEX].Enable = unit->Type->Demand > 0;
 
-	// Armor
-	unit->Variable[ARMOR_INDEX].Value = type->Variable[ARMOR_INDEX].Value;
-	unit->Variable[ARMOR_INDEX].Max = unit->Stats->Armor;
-
 	// SightRange
 	unit->Variable[SIGHTRANGE_INDEX].Value = type->Variable[SIGHTRANGE_INDEX].Value;
 	unit->Variable[SIGHTRANGE_INDEX].Max = unit->Stats->SightRange;
@@ -2051,44 +2040,6 @@ void UpdateUnitVariables(const Unit* unit)
 	// AttackRange
 	unit->Variable[ATTACKRANGE_INDEX].Value = type->Variable[ATTACKRANGE_INDEX].Max;
 	unit->Variable[ATTACKRANGE_INDEX].Max = unit->Stats->AttackRange;
-
-	// PiercingDamage
-	piercing = type->Variable[PIERCINGDAMAGE_INDEX].Value;
-	unit->Variable[PIERCINGDAMAGE_INDEX].Value = piercing;
-	unit->Variable[PIERCINGDAMAGE_INDEX].Max = unit->Stats->PiercingDamage;
-
-	// BasicDamage
-	basic = type->Variable[BASICDAMAGE_INDEX].Value;
-	unit->Variable[BASICDAMAGE_INDEX].Value = basic;
-	unit->Variable[BASICDAMAGE_INDEX].Max = unit->Stats->BasicDamage;
-
-	// Damage and extradamage
-	if (unit->Stats->PiercingDamage != piercing) {
-		if (piercing < 30 && basic < 30) {
-			unit->Variable[DAMAGE_INDEX].Value = (piercing + 1) / 2;
-		} else {
-			unit->Variable[DAMAGE_INDEX].Value = (piercing + basic - 30) / 2;
-		}
-		unit->Variable[EXTRADAMAGE_INDEX].Value = unit->Stats->BasicDamage - basic +
-							(int)isqrt(unit->XP / 100) * XpDamage;
-		unit->Variable[EXTRADAMAGE_INDEX].Max = unit->Variable[EXTRADAMAGE_INDEX].Value;
-	} else if (piercing || basic < 30) {
-		unit->Variable[DAMAGE_INDEX].Value = (piercing + 1) / 2;
-	} else {
-		unit->Variable[DAMAGE_INDEX].Value = (basic - 30) / 2;
-	}
-	unit->Variable[DAMAGE_INDEX].Max = basic + piercing;
-
-	if (unit->Bloodlust) { // bloodlust do extra damage.
-		unit->Variable[PIERCINGDAMAGE_INDEX].Value <<= 1;
-		unit->Variable[PIERCINGDAMAGE_INDEX].Max <<= 1;
-		unit->Variable[BASICDAMAGE_INDEX].Value <<= 1;
-		unit->Variable[BASICDAMAGE_INDEX].Max <<= 1;
-		unit->Variable[DAMAGE_INDEX].Value <<= 1;
-		unit->Variable[DAMAGE_INDEX].Max <<= 1;
-		unit->Variable[EXTRADAMAGE_INDEX].Value <<= 1;
-		unit->Variable[EXTRADAMAGE_INDEX].Max <<= 1;
-	}
 
 	// Position
 	unit->Variable[POSX_INDEX].Value = unit->X;
@@ -2158,8 +2109,8 @@ void InitDefinedVariables()
 	const char* var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
 		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
 		"Xp", "Level", "Kill", "Supply", "Demand", "Armor", "SightRange",
-		"AttackRange", "PiercingDamage", "BasicDamage", "Damage", "ExtraDamage",
-		"PosX", "PosY", "RadarRange", "RadarJammerRange", "AutoRepairRange", "Slot"
+		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
+		"RadarJammerRange", "AutoRepairRange", "Slot"
 		}; // names of the variable.
 	const char* boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
