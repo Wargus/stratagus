@@ -173,10 +173,14 @@
 **		Contains the tile numbers of a growing tree from small to big.
 **		@note Not yet used.
 **
-**	Tilset::WoodTable[16]
+**	Tilset::WoodTable[20]
 **
 **		Table for wood removable. This table contains the tile which
 **		is placed after a tree removement, depending on the surrounding.
+**
+**	Tileset::MixedLookupTable[MaxTilesInTileset]
+**		Table for finding what part of the tile contains wood/rock,
+**		and which part is grass or bare ground.
 **
 **	Tileset::ExtraRocks[6]
 **
@@ -282,8 +286,9 @@ typedef struct _tileset_ {
     unsigned	BotOneTree;		/// Tile for one tree bottom
     int		RemovedTree;		/// Tile placed where trees are gone
     unsigned	GrowingTree[2];		/// Growing tree tiles
-    int		WoodTable[16];		/// Table for tree removable
-
+    int		WoodTable[20];		/// Table for tree removable
+    int		MixedLookupTable[MaxTilesInTileset];
+					/// Lookup for what part of tile used
     unsigned	ExtraRocks[6];		/// Extra rock tiles for removing
     unsigned	TopOneRock;		/// Tile for one rock top
     unsigned	MidOneRock;		/// Tile for one rock middle

@@ -543,10 +543,6 @@ global void PreprocessMap(void)
     // it is required for fixing the wood that all tiles are marked as seen!
 	for (ix = 0; ix < TheMap.Width; ix++) {
 	    for (iy = 0; iy < TheMap.Height; iy++) {
-		MapFixWoodTile(ix, iy);
-		MapFixSeenWoodTile(ix, iy);
-		MapFixRockTile(ix, iy);
-		MapFixSeenRockTile(ix, iy);
 		MapFixWallTile(ix, iy);
 		MapFixSeenWallTile(ix, iy);
 	    }

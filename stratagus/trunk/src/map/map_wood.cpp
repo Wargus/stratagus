@@ -77,37 +77,60 @@ global int MapIsSeenTileWood(int x, int y)
 global void MapFixSeenWoodTile(int x, int y)
 {
     int tile;
+    int ttup;
+    int ttdown;
+    int ttleft;
+    int ttright;
     MapField *mf;
+    
 
     //  Outside of map or no wood.
     if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 	return;
     }
+
     if (!MapIsSeenTileWood(x,y)) {
 	return;
     }
-
     //
-    //  Calculate the correct tile. Depends on the surrounding.
+    //  Find out what each tile has with respect to wood, or grass.
     //
     tile = 0;
-    if ((y - 1) < 0 || MapIsSeenTileWood(x,y-1)) {
-	tile |= 1 << 0;
-    }
-    if ((x + 1) >= TheMap.Width || MapIsSeenTileWood(x+1,y)) {
-	tile |= 1 << 1;
-    }
-    if ((y + 1) >= TheMap.Height || MapIsSeenTileWood(x,y+1)) {
-	tile |= 1 << 2;
-    }
-    if ((x - 1) < 0 || MapIsSeenTileWood(x-1,y)) {
-	tile |= 1 << 3;
-    }
-    if( tile==15 ) {
-	return;
-    }
-    tile = TheMap.Tileset->WoodTable[tile];
+    ttup = TheMap.Tileset->MixedLookupTable[
+	TheMap.Fields[x + (y - 1) * TheMap.Width].SeenTile];
+    ttright = TheMap.Tileset->MixedLookupTable[
+	TheMap.Fields[x + 1 + y  * TheMap.Width].SeenTile];
+    ttdown = TheMap.Tileset->MixedLookupTable[
+	TheMap.Fields[x + (y + 1) * TheMap.Width].SeenTile];
+    ttleft = TheMap.Tileset->MixedLookupTable[
+	TheMap.Fields[x -1 + y * TheMap.Width].SeenTile];
 
+    //
+    //  Check each of the corners to ensure it has both connecting
+    //  ?**?
+    //  *mm*
+    //  *mm*
+    //  ?**?
+    //  *
+    //   *  type asterixs must match for wood to be present
+    
+    tile += ((ttup & 0x01) && (ttleft & 0x04)) * 8;
+    tile += ((ttup & 0x02) && (ttright & 0x08)) * 4;
+    tile += ((ttright & 0x01) && (ttdown & 0x04)) * 2;
+    tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
+
+    
+    tile = TheMap.Tileset->WoodTable[tile];
+    //If tile is -1, then we should check if we are to draw just one tree
+    //Check for tile about, or below or both...
+    if (tile == -1) {
+	tile = 16;
+	tile += ((ttup & 0x01) || (ttup & 0x02)) * 1;
+	tile += ((ttdown & 0x04) || (ttdown & 0x08)) * 2;
+	tile = TheMap.Tileset->WoodTable[tile];
+    }
+
+    //Update seen tile.
     mf = TheMap.Fields + x + y * TheMap.Width;
     if (tile == -1) {			// No valid wood remove it.
 	mf->SeenTile = TheMap.Tileset->RemovedTree;
@@ -153,7 +176,12 @@ global void MapFixSeenWoodNeighbors(int x, int y)
 global void MapFixWoodTile(int x, int y)
 {
     int tile;
+    int ttup;
+    int ttdown;
+    int ttleft;
+    int ttright;
     MapField *mf;
+    
 
     //  Outside of map or no wood.
     if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
@@ -164,26 +192,42 @@ global void MapFixWoodTile(int x, int y)
 	return;
     }
     //
-    //  Calculate the correct tile. Depends on the surrounding.
+    //  Find out what each tile has with respect to wood, or grass.
     //
     tile = 0;
-    if ((y - 1) < 0 || (TheMap.Fields[x + (y - 1) * TheMap.Width].
-	    Flags & MapFieldForest)) {
-	tile |= 1 << 0;
-    }
-    if ((x + 1) >= TheMap.Width || (TheMap.Fields[x + 1 + y * TheMap.Width].
-	    Flags & MapFieldForest)) {
-	tile |= 1 << 1;
-    }
-    if ((y + 1) >= TheMap.Height || (TheMap.Fields[x + (y + 1) * TheMap.Width].
-	    Flags & MapFieldForest)) {
-	tile |= 1 << 2;
-    }
-    if ((x - 1) < 0 || (TheMap.Fields[x - 1 + y * TheMap.Width].
-	    Flags & MapFieldForest)) {
-	tile |= 1 << 3;
-    }
+    ttup = TheMap.Tileset->MixedLookupTable[
+	TheMap.Fields[x + (y - 1) * TheMap.Width].Tile];
+    ttright = TheMap.Tileset->MixedLookupTable[
+	TheMap.Fields[x + 1 + y  * TheMap.Width].Tile];
+    ttdown = TheMap.Tileset->MixedLookupTable[
+	TheMap.Fields[x + (y + 1) * TheMap.Width].Tile];
+    ttleft = TheMap.Tileset->MixedLookupTable[
+	TheMap.Fields[x -1 + y * TheMap.Width].Tile];
+
+    //
+    //  Check each of the corners to ensure it has both connecting
+    //  ?**?
+    //  *mm*
+    //  *mm*
+    //  ?**?
+    //  *
+    //   *  type asterixs must match for wood to be present
+    
+    tile += ((ttup & 0x01) && (ttleft & 0x04)) * 8;
+    tile += ((ttup & 0x02) && (ttright & 0x08)) * 4;
+    tile += ((ttright & 0x01) && (ttdown & 0x04)) * 2;
+    tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
+
+    
     tile = TheMap.Tileset->WoodTable[tile];
+    //If tile is -1, then we should check if we are to draw just one tree
+    //Check for tile about, or below or both...
+    if (tile == -1) {
+	tile = 16;
+	tile += ((ttup & 0x01) || (ttup & 0x02)) * 1;
+	tile += ((ttdown & 0x04) || (ttdown & 0x08)) * 2;
+	tile = TheMap.Tileset->WoodTable[tile];
+    }
 
     if (tile == -1) {			// No valid wood remove it.
 	MapRemoveWood(x, y);
