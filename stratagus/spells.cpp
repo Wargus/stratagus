@@ -76,7 +76,7 @@ global SpellType SpellTypeTable[] = {
 { 0, "spell-healing",          4,   6,  -1, SpellActionHealing      , { "healing" }        },
 { 0, "spell-exorcism",        10,   4,  -1, SpellActionExorcism     , { "exorcism" }       },
 //      ---human mages---                                                ---human mages---
-{ 0, "spell-fireball",         8, 100,1000, SpellActionFireball     , { "fireball" }       },
+{ 0, "spell-fireball",         8, 100,1000, SpellActionFireball     , { "fireball throw" }       },
 { 0, "spell-slow",            10,  50,1000, SpellActionSlow         , { "slow" }           },
 { 0, "spell-flame-shield",     6,  80, 600, SpellActionFlameShield  , { "flame shield" }   },
 { 0, "spell-invisibility",     6, 200,2000, SpellActionInvisibility , { "invisibility" }   },
@@ -449,7 +449,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 
   #define PLAY_FIREWORKS(s) \
 	{ \
-	PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
+	PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	MakeMissile( s, x*TileSizeX+TileSizeX/2,   \
 	                y*TileSizeX+TileSizeX/2,   \
 	                x*TileSizeX+TileSizeX/2,   \
@@ -530,7 +530,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 
 	   unit->Mana -= spell->ManaCost;
 
-  	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
+  	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-fireball"),
 	                sx, sy, dx, dy );
 
@@ -620,7 +620,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
            sx = dx - 1 - SyncRand() % 4;
 	   sy = dy - 1 - SyncRand() % 4;
 
-	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
+	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent( "missile-blizzard" ),
 		              sx*TileSizeX+TileSizeX/2,
 	                      sy*TileSizeX+TileSizeX/2,
@@ -665,7 +665,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   //FIXME: vladi: runes should be set on empty tile (ground or water)
 	   Missile* mis;
 	   unit->Mana -= spell->ManaCost;
-	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
+	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent( "missile-custom" ),
 		              x*TileSizeX+TileSizeX/2,
 	                      y*TileSizeX+TileSizeX/2,
@@ -694,7 +694,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 
 	   unit->Mana -= spell->ManaCost;
 
-  	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
+  	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-death-coil"),
 	                sx*TileSizeX+TileSizeX/2,
 	                sy*TileSizeX+TileSizeX/2,
@@ -759,7 +759,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   Missile* mis;
 	   unit->Mana -= spell->ManaCost;
 
-  	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
+  	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-whirlwind"),
 	                x*TileSizeX+TileSizeX/2,
 	                y*TileSizeX+TileSizeX/2,
@@ -801,7 +801,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	     }
 	   while(  dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height );
 
-	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
+	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent( "missile-death-and-decay" ),
 		              dx*TileSizeX+TileSizeX/2,
 	                      dy*TileSizeX+TileSizeX/2,
