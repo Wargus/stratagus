@@ -381,13 +381,11 @@ global void InitUserInterface(void)
 {
     int i;
     int best;
-    // FIXME: this should be configurable
-    static const char* names[]={ "human","orc","alliance","mythical" };
 
     // select the correct slot
     best=0;
     for( i=0; UI_Table[i]; ++i ) {
-	if( !strcmp(names[(ThisPlayer->Race+RaceAdd*2)&3],UI_Table[i]->Name) ) {
+	if( !strcmp(ThisPlayer->RaceName,UI_Table[i]->Name) ) {
 	    // perfect
 	    if( VideoWidth==UI_Table[i]->Width
 		    && VideoHeight==UI_Table[i]->Height  ) {
@@ -409,6 +407,20 @@ global void InitUserInterface(void)
 
     // FIXME: overwrites already set slots?
     TheUI=*UI_Table[best];
+
+    //
+    //	Calculations
+    //
+    MapWidth=(TheUI.MapEndX-TheUI.MapX+TileSizeX)/TileSizeX;
+    MapHeight=(TheUI.MapEndY-TheUI.MapY+TileSizeY)/TileSizeY;
+}
+
+/**
+**	Load the user interface graphics.
+*/
+global void LoadUserInterface(void)
+{
+    int i;
 
     //
     //	Load graphics
@@ -454,7 +466,7 @@ global void InitUserInterface(void)
     }
 
     //
-    //	Cursors.
+    //	Resolve cursors
     //
     TheUI.Point.Cursor=CursorTypeByIdent(TheUI.Point.Name);
     TheUI.Glass.Cursor=CursorTypeByIdent(TheUI.Glass.Name);
@@ -472,12 +484,37 @@ global void InitUserInterface(void)
     TheUI.ArrowSW.Cursor=CursorTypeByIdent(TheUI.ArrowSW.Name);
     TheUI.ArrowS.Cursor=CursorTypeByIdent(TheUI.ArrowS.Name);
     TheUI.ArrowSE.Cursor=CursorTypeByIdent(TheUI.ArrowSE.Name);
+}
+
+/**
+**	Clean up the user interface module.
+*/
+global void CleanUserInterface(void)
+{
+    int i;
 
     //
-    //	Calculations
+    //	Free the graphics. FIXME: if shared this crashs.
     //
-    MapWidth=(TheUI.MapEndX-TheUI.MapX+TileSizeX)/TileSizeX;
-    MapHeight=(TheUI.MapEndY-TheUI.MapY+TileSizeY)/TileSizeY;
+    VideoSaveFree(TheUI.Filler1.Graphic);
+    VideoSaveFree(TheUI.Resource.Graphic);
+
+    for( i=0; i<MaxCosts; ++i ) {
+	VideoSaveFree(TheUI.Resources[i].Icon.Graphic);
+    }
+
+    VideoSaveFree(TheUI.FoodIcon.Graphic);
+    VideoSaveFree(TheUI.ScoreIcon.Graphic);
+    VideoSaveFree(TheUI.InfoPanel.Graphic);
+    VideoSaveFree(TheUI.ButtonPanel.Graphic);
+    VideoSaveFree(TheUI.MenuButton.Graphic);
+    VideoSaveFree(TheUI.Minimap.Graphic);
+    VideoSaveFree(TheUI.StatusLine.Graphic);
+
+    memset(&TheUI,0,sizeof(TheUI));
+
+
+    DebugLevel0Fn("FIXME: not complete written\n");
 }
 
 //@}
