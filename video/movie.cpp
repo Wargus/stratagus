@@ -240,7 +240,7 @@ global int PlayMovie(const char *name, int flags)
 
     StartDecoder(&pbi, avi->Width, avi->Height);
 
-#ifdef USE_OGG
+#if defined(WITH_SOUND) && defined(USE_OGG)
     if( avi->AudioStream != -1 ) {	// Only if audio available
 	PlayAviOgg(avi);
     }
