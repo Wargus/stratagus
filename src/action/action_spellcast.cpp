@@ -10,7 +10,7 @@
 //
 /**@name action_spellcast.c	-	The spell cast action. */
 //
-//	(c) Copyright 2000-2002 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 2000-2003 by Vladi Belperchinov-Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@
 **
 **	@param unit	Unit, for that spell cast/attack animation is played.
 */
-global void AnimateActionSpellCast(Unit * unit)
+global void AnimateActionSpellCast(Unit* unit)
 {
     int flags;
 
@@ -100,7 +100,7 @@ local void SpellMoveToTarget(Unit* unit)
 
     // Unit can't move
     err = 1;
-    if( unit->Type->Animations && unit->Type->Animations->Move ) {
+    if (unit->Type->Animations && unit->Type->Animations->Move) {
 	err = DoActionMove(unit);
 	if (!unit->Reset) {
 	    return;
@@ -111,45 +111,45 @@ local void SpellMoveToTarget(Unit* unit)
     // FIXME: use return codes from pathfinder
     goal = unit->Orders[0].Goal;
 
-    if (goal && MapDistanceBetweenUnits(unit, goal)
-	    <= unit->Orders[0].RangeX) {
+    if (goal && MapDistanceBetweenUnits(unit, goal) <=
+	    unit->Orders[0].RangeX) {
 
 	// there is goal and it is in range
 	unit->State = 0;
-	if( !unit->Type->Building ) {
+	if (!unit->Type->Building) {
 	    // FIXME: buildings could have directions
 	    UnitHeadingFromDeltaXY(unit,
-		goal->X+(goal->Type->TileWidth-1)/2-unit->X,
-		goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);
+		goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
+		goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 	}
 	unit->SubAction++;		// cast the spell
 	return;
     } else if (!goal && MapDistanceToUnit(unit->Orders[0].X,
-	    unit->Orders[0].Y,unit) <= unit->Orders[0].RangeX) {
+	    unit->Orders[0].Y, unit) <= unit->Orders[0].RangeX) {
 	// there is no goal and target spot is in range
 	unit->State = 0;
-	if( !unit->Type->Building ) {
+	if (!unit->Type->Building) {
 	    // FIXME: buildings could have directions
 	    UnitHeadingFromDeltaXY(unit,
-		unit->Orders[0].X
-			+((SpellType*)unit->Orders[0].Arg1)->Range-unit->X,
-		unit->Orders[0].Y
-			+((SpellType*)unit->Orders[0].Arg1)->Range-unit->Y);
+		unit->Orders[0].X +
+		    ((SpellType*)unit->Orders[0].Arg1)->Range - unit->X,
+		unit->Orders[0].Y +
+		    ((SpellType*)unit->Orders[0].Arg1)->Range - unit->Y);
 	}
 	unit->SubAction++;		// cast the spell
 	return;
     } else if (err) {
 	// goal/spot out of range -- move to target
-	unit->Orders[0].Action=UnitActionStill;
-	unit->State=unit->SubAction=0;
+	unit->Orders[0].Action = UnitActionStill;
+	unit->State = unit->SubAction = 0;
 
-	if( unit->Orders[0].Goal ) {	// Release references
+	if (unit->Orders[0].Goal) {	// Release references
 	    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
 	    if (!--unit->Orders[0].Goal->Refs) {
 		RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
 		ReleaseUnit(unit->Orders[0].Goal);
 	    }
-	    unit->Orders[0].Goal=NoUnitP;
+	    unit->Orders[0].Goal = NoUnitP;
 	}
     }
     DebugCheck(unit->Type->Vanishes || unit->Destroyed);
@@ -160,116 +160,115 @@ local void SpellMoveToTarget(Unit* unit)
 **
 **	@param unit	Unit, for that the spell cast is handled.
 */
-global void HandleActionSpellCast(Unit * unit)
+global void HandleActionSpellCast(Unit* unit)
 {
     int flags;
-    const SpellType *spell;
+    const SpellType* spell;
 
     DebugLevel3Fn("%d %d,%d+%d+%d\n" _C_
 	UnitNumber(unit) _C_ unit->Orders[0].X _C_ unit->Orders[0].Y _C_
 	unit->Orders[0].RangeX _C_ unit->Orders[0].RangeY);
 
     switch (unit->SubAction) {
-
-    case 0:				// first entry.
-	//
-	//	Check if we can cast the spell.
-	//
-	spell = unit->Orders[0].Arg1;
-	if( !CanCastSpell(unit,spell,unit->Orders[0].Goal,
-		unit->Orders[0].X,unit->Orders[0].Y) ) {
-
+	case 0:				// first entry.
 	    //
-	    //	Notify player about this problem
+	    //	Check if we can cast the spell.
 	    //
-	    if (unit->Mana < spell->ManaCost) {
-		NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
+	    spell = unit->Orders[0].Arg1;
+	    if (!CanCastSpell(unit,spell, unit->Orders[0].Goal,
+		    unit->Orders[0].X, unit->Orders[0].Y)) {
+
+		//
+		//	Notify player about this problem
+		//
+		if (unit->Mana < spell->ManaCost) {
+		    NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
 			"%s: not enough mana for spell: %s",
 			unit->Type->Name, spell->Name);
-	    } else {
-		NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
+		} else {
+		    NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
 			"%s: can't cast spell: %s",
 			unit->Type->Name, spell->Name);
-	    }
-
-	    if( unit->Player->Ai ) {
-		DebugLevel0Fn("FIXME: need we an AI callback?\n");
-	    }
-	    unit->Orders[0].Action = UnitActionStill;
-	    unit->SubAction = 0;
-	    unit->Wait = 1;
-	    if (unit->Orders[0].Goal) {
-		RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-		if (!--unit->Orders[0].Goal->Refs) {
-		    RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
-		    ReleaseUnit(unit->Orders[0].Goal);
 		}
-		unit->Orders[0].Goal=NoUnitP;
+
+		if (unit->Player->Ai) {
+		    DebugLevel0Fn("FIXME: need we an AI callback?\n");
+		}
+		unit->Orders[0].Action = UnitActionStill;
+		unit->SubAction = 0;
+		unit->Wait = 1;
+		if (unit->Orders[0].Goal) {
+		    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
+		    if (!--unit->Orders[0].Goal->Refs) {
+			RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
+			ReleaseUnit(unit->Orders[0].Goal);
+		    }
+		    unit->Orders[0].Goal = NoUnitP;
+		}
+		return;
 	    }
-	    return;
-	}
-	// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
-	NewResetPath(unit);
-	unit->Value=0;		// repeat spell on next pass? (defaults to `no')
-	unit->SubAction=1;
-	// FALL THROUGH
-    case 1:				// Move to the target.
-	// FIXME: crashes with huge ranges.
-	if( (spell = unit->Orders[0].Arg1)->Range != INFINITE_RANGE ) {
-	    SpellMoveToTarget(unit);
-	    break;
-	} else {
-	    unit->SubAction=2;
-	}
-	// FALL THROUGH
-    case 2:				// Cast spell on the target.
-	// FIXME: should use AnimateActionSpellCast here
-	if (unit->Type->Animations && unit->Type->Animations->Attack ) {
-	    flags=UnitShowAnimation(unit, unit->Type->Animations->Attack);
-	    if( flags&AnimationMissile ) {
+	    // FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
+	    NewResetPath(unit);
+	    unit->Value = 0;		// repeat spell on next pass? (defaults to `no')
+	    unit->SubAction = 1;
+	    // FALL THROUGH
+	case 1:				// Move to the target.
+	    // FIXME: crashes with huge ranges.
+	    if ((spell = unit->Orders[0].Arg1)->Range != INFINITE_RANGE) {
+		SpellMoveToTarget(unit);
+		break;
+	    } else {
+		unit->SubAction = 2;
+	    }
+	    // FALL THROUGH
+	case 2:				// Cast spell on the target.
+	    // FIXME: should use AnimateActionSpellCast here
+	    if (unit->Type->Animations && unit->Type->Animations->Attack) {
+		flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
+		if (flags & AnimationMissile) {
+		    // FIXME: what todo, if unit/goal is removed?
+		    if (unit->Orders[0].Goal &&
+			    unit->Orders[0].Goal->Orders[0].Action == UnitActionDie) {
+			unit->Value = 0;
+		    } else {
+			spell = unit->Orders[0].Arg1;
+			unit->Value = SpellCast(unit, spell, unit->Orders[0].Goal,
+			    unit->Orders[0].X, unit->Orders[0].Y);
+		    }
+		}
+		if (!(flags & AnimationReset)) {	// end of animation
+		    return;
+		}
+	    } else {
 		// FIXME: what todo, if unit/goal is removed?
-		if (unit->Orders[0].Goal
-			&& unit->Orders[0].Goal->Orders[0].Action==UnitActionDie) {
+		if (unit->Orders[0].Goal &&
+			unit->Orders[0].Goal->Orders[0].Action == UnitActionDie) {
 		    unit->Value = 0;
 		} else {
 		    spell = unit->Orders[0].Arg1;
-		    unit->Value = SpellCast(unit,spell,unit->Orders[0].Goal,
-			    unit->Orders[0].X,unit->Orders[0].Y);
-		}
-	    }
-	    if ( !(flags&AnimationReset) ) {	// end of animation
-		return;
-	    }
-	} else {
-	    // FIXME: what todo, if unit/goal is removed?
-	    if (unit->Orders[0].Goal
-		    && unit->Orders[0].Goal->Orders[0].Action==UnitActionDie) {
-		unit->Value = 0;
-	    } else {
-		spell = unit->Orders[0].Arg1;
-		unit->Value = SpellCast(unit,spell,unit->Orders[0].Goal,
+		    unit->Value = SpellCast(unit, spell, unit->Orders[0].Goal,
 			unit->Orders[0].X,unit->Orders[0].Y);
-	    }
-	}
-	if (!unit->Value) {
-	    unit->Orders[0].Action = UnitActionStill;
-	    unit->SubAction = 0;
-	    unit->Wait = 1;
-	    if (unit->Orders[0].Goal) {
-		RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-		if (!--unit->Orders[0].Goal->Refs) {
-		    if (unit->Orders[0].Goal->Destroyed) {
-			ReleaseUnit(unit->Orders[0].Goal);
-		    }
 		}
-		unit->Orders[0].Goal=NoUnitP;
 	    }
-	}
-	break;
+	    if (!unit->Value) {
+		unit->Orders[0].Action = UnitActionStill;
+		unit->SubAction = 0;
+		unit->Wait = 1;
+		if (unit->Orders[0].Goal) {
+		    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
+		    if (!--unit->Orders[0].Goal->Refs) {
+			if (unit->Orders[0].Goal->Destroyed) {
+			    ReleaseUnit(unit->Orders[0].Goal);
+			}
+		    }
+		    unit->Orders[0].Goal = NoUnitP;
+		}
+	    }
+	    break;
 
-    default:
-	unit->SubAction = 0;		// Reset path, than move to target
-	break;
+	default:
+	    unit->SubAction = 0;		// Reset path, than move to target
+	    break;
     }
 }
 
