@@ -179,18 +179,16 @@ local void ExtractMap(FILE *mpqfd,unsigned char** entry,int* size)
     *size=0;
     max=0;
     maxi=0;
-    // Assumes the largest file is the .chk map
+
     for( i=0; i<MpqFileCount; ++i ) {
-	if( MpqBlockTable[i*4+2]>max ) {
-	    maxi=i;
-	    max=MpqBlockTable[i*4+2];
+	if( !strcmp("staredit\\scenario.chk",MpqFilenameTable+i*PATH_MAX) ) {
+	    *size=MpqBlockTable[i*4+2];
+	    *entry=malloc(*size+1);
+	    MpqExtractTo(*entry,i,mpqfd);
+	    return;
 	}
     }
-    if( max!=0 ) {
-	*size=MpqBlockTable[maxi*4+2];
-	*entry=malloc(*size+1);
-	MpqExtractTo(*entry,maxi,mpqfd);
-    }
+    fprintf(stderr,"Could not find staredit\\scenario.chk");
 }
 
 /**
