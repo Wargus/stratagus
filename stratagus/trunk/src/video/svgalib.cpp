@@ -64,10 +64,9 @@ global void* VideoMemory;
 */
 global int VideoDepth;
 
-global VMemType8 Pixels8[256];
-global VMemType16 Pixels16[256];
-global VMemType32 Pixels32[256];
-
+global VMemType8 * Pixels8;		/// 8 bpp palette FIXME: remove pointer
+global VMemType16 * Pixels16;		/// 16 bpp palette
+global VMemType32 * Pixels32;		/// 32 bpp palette
 global Palette GlobalPalette[256];
 
 local int old_button;
@@ -951,27 +950,55 @@ global void WaitEventsAndKeepSync(void)
 }
 
 /**
-**	Create palette.
+**	Create a new hardware dependend palette palette.
+**
+**	@param palette	Hardware independend palette.
+**
+**	@returns	A hardware dependend pixel table.
 */
-global void VideoCreatePalette(const Palette* palette)
+global GraphicData * VideoCreateNewPalette(const Palette *palette)
 {
     int i;
+    void* pixels;
 
-    if( !VideoDepth ) {
-	return;
+/*
+    if( !Screen ) {			// no init
+      return NULL;
+    }
+*/
+
+    switch( VideoDepth ) {
+    case 8:
+	pixels=malloc(256*sizeof(VMemType8));
+	break;
+    case 15:
+    case 16:
+	pixels=malloc(256*sizeof(VMemType16));
+	break;
+    case 24:
+    case 32:
+	pixels=malloc(256*sizeof(VMemType32));
+	break;
+    default:
+	DebugLevel0(__FUNCTION__": Unknown depth\n");
+	return NULL;
     }
 
+    //
+    //	Convert each palette entry into hardware format.
+    //
     for( i=0; i<256; ++i ) {
 	int r;
 	int g;
 	int b;
 	int v;
 
-	r=palette[i].r;
-	g=palette[i].g;
-	b=palette[i].b;
+	r=(palette[i].r>>2)&0x3F;
+	g=(palette[i].g>>2)&0x3F;
+	b=(palette[i].b>>2)&0x3F;
 	v=r+g+b;
 
+	// Apply global saturation,contrast and brightness
 	r= ((((r*3-v)*TheUI.Saturation + v*100)
 	    *TheUI.Contrast)
 	    +TheUI.Brightness*6400*3)/30000;
@@ -987,28 +1014,30 @@ global void VideoCreatePalette(const Palette* palette)
 	g= g<0 ? 0 : g>63 ? 63 : g;
 	b= b<0 ? 0 : b>63 ? 63 : b;
 
+	// -> Video
 	switch( VideoDepth ) {
-	    case 15:
-		Pixels16[i] = ((r >> 1) << 10)
-			+ ((g >>1) << 5)
-			+ (b >> 1);
-		break;
-	    case 16:
-		Pixels16[i] = ((r >> 1) << 11)
-			+ (g << 5)
-			+ (b >> 1);
-		break;
-	    case  8:
-	    case 24:
-	    case 32:
-		// FIXME: write this please
-	    default:
-		DebugLevel0(__FUNCTION__": Depth not written\n");
+	case 15:
+	    ((VMemType16*)pixels)[i] = ((r >> 1) << 10)
+		    + ((g >>1) << 5)
+		    + (b >> 1);
+	    break;
+	case 16:
+	    ((VMemType16*)pixels)[i] = ((r >> 1) << 11)
+		    + (g << 5)
+		    + (b >> 1);
+	    break;
+	case 8:
+	case 24:
+	case 32:
+	    // FIXME: write this please
+	default:
+	    DebugLevel0(__FUNCTION__": Depth not written\n");
 	}
     }
 
-    SetPlayersPalette();
+    return pixels;
 }
+
 
 /**
 **	Color cycle.
