@@ -10,7 +10,7 @@
 //
 /**@name action_unload.c - The unload action. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -390,13 +390,16 @@ void HandleActionUnload(Unit* unit)
 	int x;
 	int y;
 
+	if (!CanMove(unit)) {
+		unit->SubAction = 2;
+	}
 	switch (unit->SubAction) {
 		//
 		// Move the transporter
 		//
 		case 0:
 			if (!unit->Orders[0].Goal) {
-				if (!ClosestFreeDropZone(unit,unit->Orders[0].X,unit->Orders[0].Y,
+				if (!ClosestFreeDropZone(unit, unit->Orders[0].X, unit->Orders[0].Y,
 						&x, &y)) {
 					// Sorry... I give up.
 					unit->Orders[0].Action = UnitActionStill;
@@ -431,7 +434,7 @@ void HandleActionUnload(Unit* unit)
 		case 2:
 			// FIXME: show still animations ?
 			LeaveTransporter(unit);
-			if (unit->Orders[0].Action != UnitActionStill) {
+			if (CanMove(unit) && unit->Orders[0].Action != UnitActionStill) {
 				HandleActionUnload(unit);
 			}
 			break;
