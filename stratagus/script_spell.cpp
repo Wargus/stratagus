@@ -621,57 +621,67 @@ local void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 */
 local int CclDefineSpell(lua_State* l)
 {
-	char* identname;
+	const char* identname;
 	SpellType* spell;
 	const char* value;
 	SpellActionType* act;
 	int args;
-	int j;
+	int i;
 
 	args = lua_gettop(l);
-	j = 0;
-	identname = strdup(LuaToString(l, j + 1));
-	++j;
+	identname = LuaToString(l, 1);
 	spell = SpellTypeByIdent(identname);
 	if (spell != NULL) {
 		DebugLevel0Fn("Redefining spell-type `%s'\n" _C_ identname);
-		free(identname);
 	} else {
 		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
-		spell = SpellTypeTable[SpellTypeCount++] = malloc(sizeof(SpellType));
+		spell = SpellTypeTable[SpellTypeCount] = malloc(sizeof(SpellType));
 		memset(spell, 0, sizeof(SpellType));
-		spell->Slot = SpellTypeCount - 1;
-		spell->Ident = identname;
+		spell->Slot = SpellTypeCount;
+		spell->Ident = strdup(identname);
 		spell->DependencyId = -1;
+		for (i = 0; i < NumUnitTypes; i++) { // adjust array for caster already defined
+			if (UnitTypes[i]->CanCastSpell) {
+				UnitTypes[i]->CanCastSpell = realloc(UnitTypes[i]->CanCastSpell,
+					SpellTypeCount * sizeof((*UnitTypes)->CanCastSpell));
+				UnitTypes[i]->CanCastSpell[SpellTypeCount] = 0;
+			}
+			if (UnitTypes[i]->AutoCastActive) {
+				UnitTypes[i]->AutoCastActive = realloc(UnitTypes[i]->AutoCastActive,
+					SpellTypeCount * sizeof((*UnitTypes)->AutoCastActive));
+				UnitTypes[i]->AutoCastActive[SpellTypeCount] = 0;
+			}
+		}
+		SpellTypeCount++;
 	}
-	for (; j < args; ++j) {
-		value = LuaToString(l, j + 1);
-		++j;
+	for (i = 1; i < args; ++i) {
+		value = LuaToString(l, i + 1);
+		++i;
 		if (!strcmp(value, "showname")) {
 			if (spell->Name) {
 					free(spell->Name);
 			}
-			spell->Name = strdup(LuaToString(l, j + 1));
+			spell->Name = strdup(LuaToString(l, i + 1));
 		} else if (!strcmp(value, "manacost")) {
-			spell->ManaCost = LuaToNumber(l, j + 1);
+			spell->ManaCost = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "range")) {
-			if (!lua_isstring(l, j + 1) && !lua_isnumber(l, j + 1)) {
+			if (!lua_isstring(l, i + 1) && !lua_isnumber(l, i + 1)) {
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
-			if (lua_isstring(l, j + 1) && !strcmp(lua_tostring(l, j + 1), "infinite")) {
+			if (lua_isstring(l, i + 1) && !strcmp(lua_tostring(l, i + 1), "infinite")) {
 				spell->Range = INFINITE_RANGE;
-			} else if (lua_isnumber(l, j + 1)) {
-				spell->Range = lua_tonumber(l, j + 1);
+			} else if (lua_isnumber(l, i + 1)) {
+				spell->Range = lua_tonumber(l, i + 1);
 			} else {
 				lua_pushstring(l, "Invalid range");
 				lua_error(l);
 			}
 		} else if (!strcmp(value, "repeat-cast")) {
 			spell->RepeatCast = 1;
-			--j;
+			--i;
 		} else if (!strcmp(value, "target")) {
-			value = LuaToString(l, j + 1);
+			value = LuaToString(l, i + 1);
 			if (!strcmp(value, "self")) {
 				spell->Target = TargetSelf;
 			} else if (!strcmp(value, "unit")) {
@@ -689,13 +699,13 @@ local int CclDefineSpell(lua_State* l)
 			spell->Action = (SpellActionType*)malloc(sizeof(SpellActionType));
 			act = spell->Action;
 			memset(act, 0, sizeof(SpellActionType));
-			if (!lua_istable(l, j + 1)) {
+			if (!lua_istable(l, i + 1)) {
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = luaL_getn(l, i + 1);
 			k = 0;
-			lua_rawgeti(l, j + 1, k + 1);
+			lua_rawgeti(l, i + 1, k + 1);
 			CclSpellAction(l, act);
 			lua_pop(l, 1);
 			++k;
@@ -703,7 +713,7 @@ local int CclDefineSpell(lua_State* l)
 				act->Next = (SpellActionType*)malloc(sizeof(SpellActionType));
 				act = act->Next;
 				memset(act, 0, sizeof(SpellActionType));
-				lua_rawgeti(l, j + 1, k + 1);
+				lua_rawgeti(l, i + 1, k + 1);
 				CclSpellAction(l, act);
 				lua_pop(l, 1);
 			}
@@ -711,7 +721,7 @@ local int CclDefineSpell(lua_State* l)
 			if (!spell->Condition) {
 				spell->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
 			}
-			lua_pushvalue(l, j + 1);
+			lua_pushvalue(l, i + 1);
 			CclSpellCondition(l, spell->Condition);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "autocast")) {
@@ -719,7 +729,7 @@ local int CclDefineSpell(lua_State* l)
 				spell->AutoCast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
 				memset(spell->AutoCast, 0, sizeof(AutoCastInfo));
 			}
-			lua_pushvalue(l, j + 1);
+			lua_pushvalue(l, i + 1);
 			CclSpellAutocast(l, spell->AutoCast);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "ai-cast")) {
@@ -727,7 +737,7 @@ local int CclDefineSpell(lua_State* l)
 				spell->AICast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
 				memset(spell->AICast, 0, sizeof(AutoCastInfo));
 			}
-			lua_pushvalue(l, j + 1);
+			lua_pushvalue(l, i + 1);
 			CclSpellAutocast(l, spell->AICast);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "sound-when-cast")) {
@@ -735,7 +745,7 @@ local int CclDefineSpell(lua_State* l)
 			if (spell->SoundWhenCast.Name) {
 				free(spell->SoundWhenCast.Name);
 			}
-			spell->SoundWhenCast.Name = strdup(LuaToString(l, j + 1));
+			spell->SoundWhenCast.Name = strdup(LuaToString(l, i + 1));
 			spell->SoundWhenCast.Sound = SoundIdForName(spell->SoundWhenCast.Name);
 			//  Check for sound.
 			if (!spell->SoundWhenCast.Sound) {
@@ -743,7 +753,7 @@ local int CclDefineSpell(lua_State* l)
 				spell->SoundWhenCast.Name = 0;
 			}
 		} else if (!strcmp(value, "depend-upgrade")) {
-			value = LuaToString(l, j + 1);
+			value = LuaToString(l, i + 1);
 			spell->DependencyId = UpgradeIdByIdent(value);
 			if (spell->DependencyId == -1) {
 				lua_pushfstring(l, "Bad upgrade name: %s", value);
