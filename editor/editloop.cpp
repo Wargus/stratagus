@@ -92,6 +92,8 @@ local char TileToolDecoration;		/// Tile tool draws with decorations
 local int TileCursorSize;		/// Tile cursor size 1x1 2x2 ... 4x4
 local int TileCursor;			/// Tile type number
 
+local int MirrorEdit;                   /// Mirror editing enabled
+
 enum _mode_buttons_ {
     SelectButton=201,			/// Select mode button
     UnitButton,				/// Unit mode button
@@ -206,14 +208,17 @@ global void EditTile(int x, int y, int tile)
 }
 
 /**
-**	Edit tiles.
+**	Edit tiles (internal, used by EditTiles()).
 **
 **	@param x	X map tile coordinate.
 **	@param y	Y map tile coordinate.
 **	@param tile	Tile type to edit.
 **	@param size	Size of rectangle
+**
+**      This function does not support mirror editing!
+**
 */
-global void EditTiles(int x, int y, int tile, int size)
+global void EditTilesInternal(int x, int y, int tile, int size)
 {
     int ex;
     int ey;
@@ -236,6 +241,54 @@ global void EditTiles(int x, int y, int tile, int size)
 }
 
 /**
+**	Edit tiles
+**
+**	@param x	X map tile coordinate.
+**	@param y	Y map tile coordinate.
+**	@param tile	Tile type to edit.
+**	@param size	Size of rectangle
+**
+*/
+global void EditTiles(int x, int y, int tile, int size)
+{
+    int mx = TheMap.Width;
+    int my = TheMap.Height;
+    
+    EditTilesInternal( x, y, tile, size );
+    
+    if ( !MirrorEdit ) return;
+    
+    EditTilesInternal( mx - x - size, y, tile, size );
+    EditTilesInternal( x, my - y - size, tile, size );
+    EditTilesInternal( mx - x - size, my - y - size, tile, size );
+}
+
+/**
+**	Edit unit (internal, used by EditUnit()).
+**
+**	@param x	X map tile coordinate.
+**	@param y	Y map tile coordinate.
+**	@param type	Unit type to edit.
+**	@param player	Player owning the unit.
+**
+**	@todo	FIXME: Check if the player has already a start-point.
+**      This function does not support mirror editing!
+**
+*/
+local void EditUnitInternal(int x, int y, UnitType* type, Player* player)
+{
+    Unit *unit;
+    //FXIME: vladi: should check place when mirror editing is enabled...?
+    unit = MakeUnitAndPlace(x, y, type, player);
+    if (type->OilPatch || type->GivesOil) {
+	unit->Value = 50000;
+    }
+    if (unit->Type->GoldMine) {
+	unit->Value = 100000;
+    }
+}
+
+/**
 **	Edit unit.
 **
 **	@param x	X map tile coordinate.
@@ -247,15 +300,16 @@ global void EditTiles(int x, int y, int tile, int size)
 */
 local void EditUnit(int x, int y, UnitType* type, Player* player)
 {
-    Unit *unit;
-
-    unit = MakeUnitAndPlace(x, y, type, player);
-    if (type->OilPatch || type->GivesOil) {
-	unit->Value = 50000;
-    }
-    if (unit->Type->GoldMine) {
-	unit->Value = 100000;
-    }
+    int mx = TheMap.Width;
+    int my = TheMap.Height;
+    
+    EditUnitInternal( x, y, type, player );
+    
+    if ( !MirrorEdit ) return;
+    
+    EditUnitInternal( mx - x - 1, y, type, player );
+    EditUnitInternal( x, my - y - 1, type, player );
+    EditUnitInternal( mx - x - 1, my - y - 1, type, player );
 }
 
 /**
@@ -1220,6 +1274,16 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
             {
                 DebugLevel3Fn("Randomizing map...\n");
   	        EditorCreateRandomMap();
+	    }
+	    break;
+
+	case 'm':
+	case 'M':			// CTRL+M Mirror edit
+	    if( KeyModifiers & ModifierControl ) 
+            {
+  	        MirrorEdit = !MirrorEdit;
+                SetStatusLine( MirrorEdit ? "Miror editing enabled" 
+                                          : "Miror editing disabled" );
 	    }
 	    break;
 
