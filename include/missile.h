@@ -224,6 +224,14 @@
 **
 **	FIXME: not written documentation
 **
+**	Missile::Local
+**
+**		This is a local missile, which can be different on all
+**		computer in play. Used for user interface.
+**
+**	Missile::MissileSlot
+**
+**		Pointer to the slot of this missile. Used for faster freeing.
 */
 
 /*----------------------------------------------------------------------------
@@ -280,9 +288,6 @@ struct _missile_type_ {
     Graphic*	Sprite;			/// missile sprite image
 };
 
-    /// mark a free missile slot
-#define MissileFree			(MissileType*)0
-
 /*----------------------------------------------------------------------------
 --	Missile
 ----------------------------------------------------------------------------*/
@@ -318,6 +323,9 @@ struct _missile_ {
     int		Dy;			/// delta y
     int		Xstep;			/// X step
     int		Ystep;			/// Y step
+
+    unsigned	Local : 1;		/// missile is a local missile
+    Missile**	MissileSlot;		/// pointer to missile slot
 };
 
 /*----------------------------------------------------------------------------
@@ -353,6 +361,8 @@ extern MissileType* NewMissileTypeSlot(char*);
 extern MissileType* MissileTypeByIdent(const char*);
     /// create a missile
 extern Missile* MakeMissile(MissileType*,int,int,int,int);
+    /// create a local missile
+extern Missile* MakeLocalMissile(MissileType*,int,int,int,int);
     /// fire a missile
 extern void FireMissile(Unit*);
     /// draw all missiles
