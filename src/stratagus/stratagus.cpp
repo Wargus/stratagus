@@ -468,6 +468,73 @@ local void VideoEffect0(int frame)
 #endif
 
 /**
+**	Draw video effect circle.
+**
+**	@param ptr	Memory pointer
+**	@param depth	depth
+**	@param x	Center x coordinate on the image
+**	@param y	Center y coordinate on the image
+**	@param r	radius of circle
+**
+**	@note if you like optimize play here.
+*/
+global void EffectDrawCircle(int* ptr,int depth,int x,int y,int r)
+{
+    int cx;
+    int cy;
+    int df;
+    int d_e;
+    int d_se;
+
+    cx=0;
+    cy=r;
+    df=1-r;
+    d_e=3;
+    d_se=-2*r+5;
+
+#define EffectDrawPixel(depth,x,y) \
+    do {								\
+	if( 0<(x) && (x)<VideoWidth-1 && 0<(y) && (y)<VideoHeight-1 ) {	\
+	    ptr[(x)+(y)*VideoWidth]+=depth;				\
+	}								\
+    } while( 0 )
+
+    do {
+	if( !cx ) {
+	    EffectDrawPixel(depth,x,y+cy);
+	    EffectDrawPixel(depth,x,y-cy);
+	    EffectDrawPixel(depth,x+cy,y);
+	    EffectDrawPixel(depth,x-cy,y);
+	} else if ( cx==cy ) {
+	    EffectDrawPixel(depth,x+cx,y+cy);
+	    EffectDrawPixel(depth,x-cx,y+cy);
+	    EffectDrawPixel(depth,x+cx,y-cy);
+	    EffectDrawPixel(depth,x-cx,y-cy);
+	} else if ( cx<cy ) {
+	    EffectDrawPixel(depth,x+cx,y+cy);
+	    EffectDrawPixel(depth,x+cx,y-cy);
+	    EffectDrawPixel(depth,x+cy,y+cx);
+	    EffectDrawPixel(depth,x+cy,y-cx);
+	    EffectDrawPixel(depth,x-cx,y+cy);
+	    EffectDrawPixel(depth,x-cx,y-cy);
+	    EffectDrawPixel(depth,x-cy,y+cx);
+	    EffectDrawPixel(depth,x-cy,y-cx);
+	}
+	if( df<0 ) {
+	    df+=d_e;
+	    d_se+=2;
+	} else {
+	    df+=d_se;
+	    d_se+=4;
+	    cy--;
+	}
+	d_e+=2;
+	cx++;
+
+    } while( cx <= cy );
+}
+
+/**
 **	Test some video effects.
 **
 **	@param frame	Current frame.
@@ -476,7 +543,6 @@ local void VideoEffect0(int frame)
 {
     static int* buf1;
     static int* buf2;
-    //static Graphic* logo;
     static void* vmem;
     int* tmp;
     int x;
@@ -489,9 +555,7 @@ local void VideoEffect0(int frame)
 	free(buf1);
 	free(buf2);
 	free(vmem);
-	buf1=buf2=NULL;
-	//VideoFree(logo);
-	//logo=NULL;
+	vmem=buf1=buf2=NULL;
 	return;
     }
 
@@ -519,9 +583,6 @@ local void VideoEffect0(int frame)
 	    }
 	}
     }
-    //if( !logo ) {
-//	logo=LoadGraphic(TitleScreen);
-    //}
 
     //
     //	Generate waves
@@ -534,27 +595,32 @@ local void VideoEffect0(int frame)
 		buf1[y*VideoWidth+x+1]+
 		buf1[y*VideoWidth-VideoWidth+x]+
 		buf1[y*VideoWidth+VideoWidth+x])>>1) - buf2[y*VideoWidth+x];
-	    buf2[y*VideoWidth+x] = i - (i >> 5);
-	    if( 0 ) {
-		i=rand();
-		if( !(i&15) ) {
-		    buf2[y*VideoWidth+x] += (i>>4)&1;
-		}
-	    }
+	    buf2[y*VideoWidth+x] = i - (i >> 6);
 	}
     }
 
+    //
+    //	Add mouse
+    //
     if( WaitMouseY && WaitMouseX
 	    && WaitMouseX!=VideoWidth-1 && WaitMouseY!=VideoHeight-1 ) {
-	buf2[WaitMouseY*VideoWidth+WaitMouseX]-=100;
+	EffectDrawCircle(buf2,10,WaitMouseX,WaitMouseY,10);
+	//buf2[WaitMouseY*VideoWidth+WaitMouseX]-=100;
+    }
+    //
+    //	Random drops
+    //
+    if( 0 ) {
+	EffectDrawCircle(buf2,20,rand()%(VideoWidth-1),rand()%(VideoHeight-1),
+	    rand()%7);
     }
 
     //
     //	Draw it
     //
     VideoLockScreen();
-    for( y=0; y<VideoHeight; ++y ) {
-	for( x=0; x<VideoWidth; ++x ) {
+    for( y=1; y<VideoHeight-1; ++y ) {
+	for( x=1; x<VideoWidth-1; ++x ) {
 	    int xo;
 	    int yo;
 	    int xt;
@@ -578,14 +644,28 @@ local void VideoEffect0(int frame)
 		yt=VideoHeight-1;
 	    }
 
-	    //pixel=((unsigned char*)logo->Frames)[xt+yt*logo->Width];
-	    //pixel=((VMemType16*)logo->Pixels)[pixel];
-
 	    switch( VideoDepth ) {
 		case 15:
+		    pixel=((unsigned short*)vmem)[xt+yt*VideoWidth];
+		    if( 1 ) {		// Shading
+			int r,g,b;
+
+			r=(pixel>>0)&0x1F;
+			g=(pixel>>5)&0x1F;
+			b=(pixel>>10)&0x1F;
+			r+=xo;
+			g+=xo;
+			b+=xo;
+			r= r<0 ? 0 : r>0x1F ? 0x1F : r;
+			g= g<0 ? 0 : g>0x1F ? 0x1F : g;
+			b= b<0 ? 0 : b>0x1F ? 0x1F : b;
+			pixel=r|(g<<5)|(b<<10);
+		    }
+		    VideoMemory16[x+VideoWidth*y]=pixel;
+		    break;
 		case 16:
 		    pixel=((unsigned short*)vmem)[xt+yt*VideoWidth];
-		    if( 1 ) {
+		    if( 1 ) {		// Shading
 			int r,g,b;
 
 			r=(pixel>>0)&0x1F;
@@ -599,7 +679,6 @@ local void VideoEffect0(int frame)
 			b= b<0 ? 0 : b>0x1F ? 0x1F : b;
 			pixel=r|(g<<5)|(b<<11);
 		    }
-
 		    VideoMemory16[x+VideoWidth*y]=pixel;
 		    break;
 	    }
