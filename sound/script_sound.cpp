@@ -275,7 +275,7 @@ local SCM CclDefineGameSounds(SCM list) {
 	} else if ( gh_eq_p(name,gh_symbol2scm("orc-rescue")) ) {
 	    GameSounds.OrcRescue.Sound=CCL_SOUND_ID(data);
 	} else {
-   	    fprintf(stderr,"Incorrect symbol\n");
+   	    fprintf(stderr,"Incorrect symbol %s\n",gh_scm2newstr(name,NULL));
 	    return list;
 	}
     }
@@ -592,8 +592,12 @@ local SCM CclDefineGameSounds(SCM list) {
 	    GameSounds.PlacementSuccess.Sound=CCL_SOUND_ID(data);
 	    DebugLevel3("SoundPlacementSuccess %p\n",
 		    GameSounds.PlacementSuccess.Sound);
+	} else if ( gh_eq_p(name,gh_symbol2scm("human-rescue")) ) {
+	    GameSounds.HumanRescue.Sound=CCL_SOUND_ID(data);
+	} else if ( gh_eq_p(name,gh_symbol2scm("orc-rescue")) ) {
+	    GameSounds.OrcRescue.Sound=CCL_SOUND_ID(data);
 	} else {
-   	    fprintf(stderr,"Incorrect symbol\n");
+   	    fprintf(stderr,"Incorrect symbol %s\n",gh_scm2newstr(name,NULL));
 	    return list;
 	}
     }
