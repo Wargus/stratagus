@@ -406,150 +406,11 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 --	Finding units for attack
 ----------------------------------------------------------------------------*/
 
-#if 0
-
-// Not used
-
-/**
-**	Enemy in range.
-**
-**	@param unit	Find in distance for this unit.
-**	@param range	Distance range to look.
-**
-**	@return		Unit to be attacked.
-*/
-global Unit* EnemyInRange(const Unit* unit,unsigned range)
-{
-    const Unit* dest;
-    Unit* table[MAX_UNITS];
-    unsigned x;
-    unsigned y;
-    unsigned n;
-    unsigned i;
-    const Player* player;
-
-    x=unit->X;
-    y=unit->Y;
-    n=SelectUnits(x-range,y-range,x+range+1,y+range+1,table);
-
-    player=unit->Player;
-    for( i=0; i<n; ++i ) {
-	dest=table[i];
-	// unusable unit
-	if( dest->Removed || dest->Command.Action==UnitActionDie ) {
-	    continue;
-	}
-
-	if( !IsEnemy(player,dest) ) {	// a friend or neutral
-	    continue;
-	}
-	if( MapDistanceToUnit(x,y,dest)>range ) {
-	    DebugLevel0Fn("Select units wrong?\n");
-	    continue;
-	}
-	return (Unit*)dest;
-    }
-
-    return NoUnitP;
-}
-
-#endif
-
-#if 0
-
-// Old version
-
 /**
 **	Attack units in distance.
 **
 **		If the unit can attack must be handled by caller.
-**
-**	@param unit	Find in distance for this unit.
-**	@param range	Distance range to look.
-**
-**	@return		Unit to be attacked.
-*/
-global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
-{
-    const Unit* dest;
-    const UnitType* type;
-    const UnitType* dtype;
-    Unit* table[MAX_UNITS];
-    unsigned x;
-    unsigned y;
-    unsigned n;
-    unsigned i;
-    const Player* player;
-    const Unit* best_unit;
-    int best_priority;
-    int best_hp;
-
-    x=unit->X;
-    y=unit->Y;
-    n=SelectUnits(x-range,y-range,x+range+1,y+range+1,table);
-
-    best_unit=NoUnitP;
-    best_priority=0;
-    best_hp=99999;
-
-    player=unit->Player;
-    type=unit->Type;
-    for( i=0; i<n; ++i ) {
-	dest=table[i];
-	DebugCheck( dest->Destroyed );
-	// unusable unit
-	if( dest->Removed || dest->Command.Action==UnitActionDie ) {
-	    continue;
-	}
-
-	dtype=dest->Type;
-	if( !IsEnemy(player,dest) ) {		// a friend
-	    continue;
-	}
-	IfDebug( 
-	    if( !dest->HP ) {
-		DebugLevel0Fn("HP==0\n");
-		continue;
-	    }
-
-	    if( MapDistanceToUnit(x,y,dest)>range ) {
-		DebugLevel0("Internal error: %d - %d `%s'\n"
-			,MapDistanceToUnit(x,y,dest)
-			,range
-			,dest->Type->Name);
-		continue;
-	    }
-	);
-
-	// Check if I can attack this unit.
-	DebugLevel3("Can attack unit %p <- %p\n",dest,unit);
-	if( CanTarget(type,dtype) ) {
-	    DebugLevel3("Can target unit %p <- %p\n",dest,unit);
-	    if( best_priority<dtype->Priority ) {
-		best_priority=dtype->Priority;
-		best_hp=dest->HP;
-		best_unit=dest;
-		DebugLevel3("Higher priority\n");
-	    } else if( best_priority==dtype->Priority ) {
-		if( best_hp>dest->HP ) {
-		    best_hp=dest->HP;
-		    best_unit=dest;
-		    DebugLevel3("Less hit-points\n");
-		}
-	    }
-	}
-    }
-
-    // FIXME: No idea how to make this correct, without cast!!
-    return (Unit*)best_unit;
-}
-
-#endif
-
-/**
-**	Attack units in distance.
-**
-**		If the unit can attack must be handled by caller.
+**		Choose the best target, that can be attacked.
 **
 **	@param unit	Find in distance for this unit.
 **	@param range	Distance range to look.
@@ -674,7 +535,7 @@ global Unit* AttackUnitsInRange(const Unit* unit)
     //	Only units which can attack.
     //
     IfDebug(
-	
+
 	if( !unit->Type->CanAttack && !unit->Type->Tower ) {
 	    DebugLevel0("Should be handled by caller?\n");
 	    abort();
