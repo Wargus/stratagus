@@ -47,42 +47,48 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Enable the reverse map move.
+**	Enable/disable the reverse map move.
+**
+**	@param flag	True = turn on, false = off.
+**	@return		The old state of scrolling.
 */
-local SCM CclReverseMouseMove(void)
+local SCM CclSetReverseMapMove(SCM flag)
 {
-    TheUI.ReverseMouseMove=1;
+    int old;
 
-    return SCM_UNSPECIFIED;
-}
+    old=TheUI.ReverseMouseMove;
+    TheUI.ReverseMouseMove=gh_scm2bool(flag);
 
-/**
-**	Disable the reverse map move.
-*/
-local SCM CclNoReverseMouseMove(void)
-{
-    TheUI.ReverseMouseMove=0;
-
-    return SCM_UNSPECIFIED;
+    return gh_bool2scm(old);
 }
 
 /**
 **	Defines the SVGALIB mouse speed adjust (must be > 0)
+**
+**	@param adjust	mouse adjust for SVGALIB
+**	@return		old value
 */
-local SCM CclMouseAdjust(SCM adjust)
+local SCM CclSetMouseAdjust(SCM adjust)
 {
     SCM old;
+    int i;
 
     old=gh_int2scm(TheUI.MouseAdjust);
-    TheUI.MouseAdjust=gh_scm2int(adjust);
+    i=gh_scm2int(adjust);
+    if( i>0 ) {
+	TheUI.MouseAdjust=i;
+    }
 
     return old;
 }
 
 /**
 **	Defines the SVGALIB mouse scale
+**
+**	@param scale	mouse scale for SVGALIB
+**	@return		old value
 */
-local SCM CclMouseScale(SCM scale)
+local SCM CclSetMouseScale(SCM scale)
 {
     SCM old;
 
@@ -94,8 +100,11 @@ local SCM CclMouseScale(SCM scale)
 
 /**
 **	Game contrast.
+**
+**	@param contrast	New contrast 0 - 400.
+**	@return		Old contrast.
 */
-local SCM CclContrast(SCM contrast)
+local SCM CclSetContrast(SCM contrast)
 {
     int i;
     SCM old;
@@ -115,8 +124,11 @@ local SCM CclContrast(SCM contrast)
 
 /**
 **	Game brightness.
+**
+**	@param contrast	New brightness -100 - 100.
+**	@return		Old brightness.
 */
-local SCM CclBrightness(SCM brightness)
+local SCM CclSetBrightness(SCM brightness)
 {
     int i;
     SCM old;
@@ -136,8 +148,11 @@ local SCM CclBrightness(SCM brightness)
 
 /**
 **	Game saturation.
+**
+**	@param contrast	New saturation -100 - 200.
+**	@return		Old saturation.
 */
-local SCM CclSaturation(SCM saturation)
+local SCM CclSetSaturation(SCM saturation)
 {
     int i;
     SCM old;
@@ -195,12 +210,19 @@ local SCM CclProcessMenu(SCM id)
 }
 
 /**
-**	Disable resource extension, use original resource display.
+**	Enable/disable resource extension, use original resource display.
+**
+**	@param flag	True = turn on, false = off.
+**	@return		The old state of scrolling.
 */
-local SCM CclOriginalResources(void)
+local SCM CclSetOriginalResources(SCM flag)
 {
-    TheUI.OriginalResources=1;
-    return SCM_UNSPECIFIED;
+    int old;
+
+    old=TheUI.OriginalResources;
+    TheUI.OriginalResources=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
 }
 
 /**
@@ -373,11 +395,14 @@ local SCM CclDefineUI(SCM list)
     //	Some value defaults
     //
 #if 1
+    // This save the setup values
+
     ui->Contrast=TheUI.Contrast;
     ui->Brightness=TheUI.Brightness;
     ui->Saturation=TheUI.Saturation;
 
     ui->MouseScroll=TheUI.MouseScroll;
+    ui->KeyScroll=TheUI.KeyScroll;
     ui->ReverseMouseMove=TheUI.ReverseMouseMove;
 
     ui->WarpX=TheUI.WarpX;
@@ -393,6 +418,7 @@ local SCM CclDefineUI(SCM list)
     ui->Saturation=100;
 
     ui->MouseScroll=1;
+    ui->KeyScroll=1;
     ui->ReverseMouseMove=0;
 
     ui->WarpX=-1;
@@ -1027,44 +1053,94 @@ local SCM CclDefineUI(SCM list)
 }
 
 /**
-**	Set Speed of Mouse Scrolling
+**	Enable/disable scrolling with the mouse.
+**
+**	@param flag	True = turn on, false = off.
+**	@return		The old state of scrolling.
 */
-local SCM CclMouseScrollSpeed(SCM num)
+local SCM CclSetMouseScroll(SCM flag)
+{
+    int old;
+
+    old=TheUI.MouseScroll;
+    TheUI.MouseScroll=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
+**	Set speed of mouse scrolling
+**
+**	@param num	Mouse scroll speed in frames.
+**	@return		old scroll speed.
+*/
+local SCM CclSetMouseScrollSpeed(SCM num)
 {
     int speed;
+    int old;
 
+    old=SpeedMouseScroll;
     speed=gh_scm2int(num);
     if (speed < 1 || speed > FRAMES_PER_SECOND) {
 	SpeedMouseScroll=MOUSE_SCROLL_SPEED;
     } else {
 	SpeedMouseScroll=speed;
     }
-    return num;
+    return gh_int2scm(old);
 }
+
 /**
- **	Set Speed of Key Scrolling
- */
-local SCM CclKeyScrollSpeed(SCM num)
+**	Enable/disable scrolling with the keyboard.
+**
+**	@param flag	True = turn on, false = off.
+**	@return		The old state of scrolling.
+*/
+local SCM CclSetKeyScroll(SCM flag)
+{
+    int old;
+
+    old=TheUI.KeyScroll;
+    TheUI.KeyScroll=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
+**	Set speed of keyboard scrolling
+**
+**	@param num	Keyboard scroll speed in frames.
+**	@return		old scroll speed.
+*/
+local SCM CclSetKeyScrollSpeed(SCM num)
 {
     int speed;
+    int old;
 
+    old=SpeedKeyScroll;
     speed=gh_scm2int(num);
     if (speed < 1 || speed > FRAMES_PER_SECOND) {
 	SpeedKeyScroll=KEY_SCROLL_SPEED;
     } else {
 	SpeedKeyScroll=speed;
     }
-    return num;
+    return gh_int2scm(old);
 }
 
 /**
-**	Enable display of command keys in panels.
+**	Enable/disable display of command keys in panels.
+**
+**	@param flag	True = turn on, false = off.
+**	@return		The old state of scrolling.
 */
-local SCM CclShowCommandKey(void)
+local SCM CclSetShowCommandKey(SCM flag)
 {
-    ShowCommandKey=1;
+    int old;
 
-    return SCM_UNSPECIFIED;
+    old=ShowCommandKey;
+    ShowCommandKey=gh_scm2bool(flag);
+    UpdateButtonPanel();
+
+    return gh_bool2scm(old);
 }
 
 /**
@@ -1326,28 +1402,30 @@ local SCM CclSetHoldClickDelay(SCM delay)
 */
 global void UserInterfaceCclRegister(void)
 {
-    gh_new_procedure0_0("reverse-map-move",CclReverseMouseMove);
-    gh_new_procedure0_0("no-reverse-map-move",CclNoReverseMouseMove);
-    gh_new_procedure1_0("mouse-adjust",CclMouseAdjust);
-    gh_new_procedure1_0("mouse-scale",CclMouseScale);
+    gh_new_procedure1_0("set-reverse-map-move!",CclSetReverseMapMove);
 
-    gh_new_procedure1_0("contrast",CclContrast);
-    gh_new_procedure1_0("brightness",CclBrightness);
-    gh_new_procedure1_0("saturation",CclSaturation);
+    gh_new_procedure1_0("set-mouse-adjust!",CclSetMouseAdjust);
+    gh_new_procedure1_0("set-mouse-scale!",CclSetMouseScale);
+
+    gh_new_procedure1_0("set-contrast!",CclSetContrast);
+    gh_new_procedure1_0("set-brightness!",CclSetBrightness);
+    gh_new_procedure1_0("set-saturation!",CclSetSaturation);
 
     gh_new_procedure1_0("display-picture",CclDisplayPicture);
     gh_new_procedure1_0("process-menu",CclProcessMenu);
 
-    gh_new_procedure0_0("original-resources",CclOriginalResources);
+    gh_new_procedure1_0("set-original-resources!",CclSetOriginalResources);
 
     gh_new_procedureN("define-cursor",CclDefineCursor);
     gh_new_procedure1_0("game-cursor",CclGameCursor);
     gh_new_procedureN("define-ui",CclDefineUI);
 
-    gh_new_procedure1_0("key-scroll-speed", CclKeyScrollSpeed);
-    gh_new_procedure1_0("mouse-scroll-speed", CclMouseScrollSpeed);
+    gh_new_procedure1_0("set-key-scroll!", CclSetKeyScroll);
+    gh_new_procedure1_0("set-key-scroll-speed!", CclSetKeyScrollSpeed);
+    gh_new_procedure1_0("set-mouse-scroll!", CclSetMouseScroll);
+    gh_new_procedure1_0("set-mouse-scroll-speed!", CclSetMouseScrollSpeed);
 
-    gh_new_procedure0_0("show-command-key",CclShowCommandKey);
+    gh_new_procedure1_0("set-show-command-key!",CclSetShowCommandKey);
     gh_new_procedure0_0("right-button-attacks",CclRightButtonAttacks);
     gh_new_procedure0_0("right-button-moves",CclRightButtonMoves);
     gh_new_procedure0_0("fancy-buildings",CclFancyBuildings);
