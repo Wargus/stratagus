@@ -621,6 +621,97 @@ global void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3
 }
 
 /**
+**  Sends My Selections to Teamates
+**
+**  @param units  Units to send
+**  @param count  Number of units to send
+**
+*/
+global void NetworkSendSelection(Unit** units, int count)
+{
+	static NetworkPacket packet;
+	NetworkSelectionHeader* header;
+	NetworkSelection* selection;
+	int unitcount;
+	int ref;
+	int i;
+
+	//
+	//  Build packet of Up to MaxNetworkCommands messages.
+	//  FIXME: handle multiple packets (units > MaxNetworkCommands * 4
+	//
+	header = (NetworkSelectionHeader*)&(packet.Header);
+	header->NumberSent = count;
+	header->Add = 0;
+	header->Remove = 0;
+	unitcount = 0;
+	DebugLevel3("Time: %lu " _C_ ncq[0].Time);
+	for (i = 0; i <= (count / 4); ++i) {
+		DebugCheck(i > MaxNetworkCommands);
+		header->Type[i] = MessageSelection;
+		selection = (NetworkSelection*)&packet.Command[i];
+		for (ref = 0; ref < 4 && unitcount < count; ++ref) {
+			selection->Unit[ref] = htons(UnitNumber(units[unitcount++]));
+		}
+	}
+	DebugLevel3("\n");
+
+	unitcount = i;
+
+	for (; i < MaxNetworkCommands; ++i) {
+		packet.Header.Type[i] = MessageNone;
+	}
+
+	//
+	// Send the Constructed packet to team members
+	//
+	for (i = 0; i < HostsCount; ++i) {
+		if (Players[Hosts[i].PlyNr].Team == ThisPlayer->Team) { 
+			ref = NetSendUDP(NetworkFildes, Hosts[i].Host, Hosts[i].Port,
+				&packet, sizeof(NetworkPacketHeader) + sizeof(NetworkSelection) * unitcount);
+			DebugLevel3Fn("Sending %d to %d.%d.%d.%d:%d\n" _C_
+				ref _C_ NIPQUAD(ntohl(Hosts[i].Host)) _C_ ntohs(Hosts[i].Port));
+		}
+	}
+
+}
+/**
+**  Process Received Unit Selection
+**
+**  @param packet  Network Packet to Process
+**
+*/
+local void NetworkProcessSelection(NetworkPacket* packet, int player)
+{
+	int i;
+	int j;
+	Unit* units[UnitMax];
+	NetworkSelectionHeader* header;
+	NetworkSelection* selection;
+	int adjust;
+	int count;
+	int unitcount;
+
+	header = (NetworkSelectionHeader*)&(packet->Header);
+	// 
+	// Create Unit Array
+	//
+	count = header->NumberSent;
+	adjust = (header->Add << 1) | header->Remove;
+	unitcount = 0;
+
+	for (i = 0; header->Type[i] == MessageSelection; ++i) {
+		selection = (NetworkSelection*)&(packet->Command[i]);
+		for (j = 0; j < 4 && unitcount < count; ++j) {
+			units[unitcount++] = Units[ntohs(selection->Unit[j])];
+		}
+	}
+	DebugCheck(count != unitcount);
+
+	ChangeTeamSelectedUnits(&Players[player], units, adjust, count);
+}
+
+/**
 **		Remove a player from the game.
 **
 **		@param player		Player number
@@ -719,6 +810,12 @@ global void NetworkEvent(void)
 		return;
 	}
 	player = Hosts[i].PlyNr;
+
+	// In a normal packet there is a least sync, selection may not have that
+	if (packet->Header.Type[0] == MessageSelection || commands == 0) {
+		NetworkProcessSelection(packet, player);
+		return;
+	}
 
 	//
 	//		Parse the packet commands.

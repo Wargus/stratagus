@@ -66,6 +66,7 @@ enum _message_type_ {
 	MessageInitConfig,             /// Setup message configure clients
 
 	MessageSync,                   /// Heart beat
+	MessageSelection,              /// Update a Selection from Team Player
 	MessageQuit,                   /// Quit game
 	MessageQuitAck,                /// Quit reply - UNUSED YET - Protocol Version 2 - Reserved for menus
 	MessageResend,                 /// Resend message
@@ -146,6 +147,23 @@ typedef struct _network_chat_ {
 } NetworkChat;
 
 /**
+**  Network Selection Info
+*/
+typedef struct _network_selection_header_ {
+	unsigned NumberSent : 6;  /// New Number Selected
+	unsigned Add : 1;          /// Adding to Selection
+	unsigned Remove : 1;       /// Removing from Selection
+	unsigned char Type[MaxNetworkCommands];  /// Command
+} NetworkSelectionHeader;
+	
+/**
+**  Network Selection Update
+*/
+typedef struct _network_selection_ {
+	UnitRef Unit[4];  /// Selection Units
+} NetworkSelection;
+
+/**
 **  Network packet header.
 **
 **  Header for the packet.
@@ -197,6 +215,8 @@ extern void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 	/// Send extended network command.
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 	int arg4, int status);
+	/// Send Selections to Team
+extern void NetworkSendSelection(Unit** units, int count);
 	/// Register ccl functions related to network
 extern void NetworkCclRegister(void);
 //@}

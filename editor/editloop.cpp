@@ -623,7 +623,7 @@ local void DrawUnitIcons(void)
 
 	i = UnitIndex;
 	while (y < TheUI.ButtonPanelY +
-			TheUI.ButtonPanel.Graphic->Height - IconHeight) {
+			640/3 - IconHeight) {
 		if (i >= MaxShownUnits) {
 			break;
 		}
