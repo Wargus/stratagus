@@ -226,6 +226,36 @@ global unsigned char IsTileVisible(const Player* player, int x, int y)
 }
 
 /**
+**  Find out what the tile flags are a tile is covered by fog
+**
+**  @param player  player who is doing operation
+**  @param x       X map location
+**  @param y       Y map location
+**  @param mask    input mask to filter
+**
+**  @return        Filtered mask after taking fog into account
+*/
+global int MapFogFilterFlags(Player* player, int x, int y, int mask)
+{
+	int nunits;
+	int unitcount;
+	int fogmask;
+	Unit* table[UnitMax];
+	
+			// Calculate Mask for tile with fog
+			nunits = UnitCacheOnTile(x, y, table);
+			fogmask = -1;
+			unitcount = 0;
+			while (unitcount < nunits) {
+				if (!UnitVisibleAsGoal(table[unitcount], player)) {
+					fogmask &= ~table[unitcount]->Type->FieldFlags;
+				}
+				++unitcount;
+			}
+	return mask & fogmask;
+}
+
+/**
 **		Mark a tile's sight. (Explore and make visible.)
 **
 **		@param player		Player to mark sight.
