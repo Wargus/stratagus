@@ -52,9 +52,10 @@
 */
 global char** IconWcNames;
 
-global int IconWidth;			/// icon width in panels
-global int IconHeight;	    		/// icon height in panels
-global int IconsPerRow;			/// icons per row
+// FIXME: Can be removed:
+global int IconWidth;			/// Icon width in panels
+global int IconHeight;			/// Icon height in panels
+global int IconsPerRow;			/// Icons per row
 
 local Icon** Icons;			/// Table of all icons.
 local int NumIcons;			/// Number of icons in Icons.
@@ -84,14 +85,16 @@ local hashtable(Icon*,61) IconHash;	/// lookup table for icon names
 **	@brief Add an icon definition.
 **
 **	@bug Redefining an icon isn't supported.
-**	@note 5 icons pro row are hardcoded.
 **
 **	@param ident	Icon identifier.
-**	@param tileset	Tileset identifier.
+**	@param tileset	Optional tileset identifier.
+**	@param width	Icon width.
+**	@param height	Icon height.
 **	@param index	Index into file.
 **	@param file	Graphic file containing the icons.
 */
-local void AddIcon(char* ident,char* tileset,int index,char* file)
+local void AddIcon(const char *ident, const char *tileset,
+    int index, int width, int height, const char *file)
 {
     void** ptr;
     char* str;
@@ -99,50 +102,53 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
     Icon* icon;
 
     //
-    //	Look up file
+    //  Look up graphic file
     //
-    ptr=(void**)hash_find(IconFileHash,file);
-    if( ptr && *ptr ) {
-	iconfile=*ptr;
+    ptr = (void **)hash_find(IconFileHash, file);
+    if (ptr && *ptr) {
+	iconfile = *ptr;
     } else {				// new file
-	iconfile=malloc(sizeof(IconFile));
-	iconfile->FileName=strdup(file);
-	iconfile->Width=IconWidth;
-	iconfile->Height=IconHeight;
-
-	iconfile->Icons=0;
-
-	iconfile->Graphic=NULL;
-	*(IconFile**)hash_add(IconFileHash,iconfile->FileName)=iconfile;
+	iconfile = malloc(sizeof(IconFile));
+	iconfile->FileName = strdup(file);
+	iconfile->Graphic = NULL;
+	*(IconFile **) hash_add(IconFileHash, iconfile->FileName) = iconfile;
     }
 
     //
-    //	Look up icon
+    //  Look up icon
     //
-    str=strdcat(ident,tileset);
-    ptr=(void**)hash_find(IconHash,str);
-    if( ptr && *ptr ) {
-	DebugLevel0Fn("FIXME: Icon already defined `%s,%s'\n" _C_ ident _C_ tileset);
+    if (tileset) {
+	str = strdcat(ident, tileset);
+    } else {
+	str = strdup(ident);
+    }
+    ptr = (void **)hash_find(IconHash, str);
+    if (ptr && *ptr) {
+	DebugLevel0Fn("FIXME: Icon already defined `%s,%s'\n" _C_
+	    ident _C_ tileset);
 	// This is more a config error
 	free(str);
 	return;
     } else {
-	icon=malloc(sizeof(Icon));
-	icon->Ident=strdup(ident);
-	icon->Tileset=strdup(tileset);
-	icon->File=iconfile;
-	icon->Index=index;
-	icon->X=(index%IconsPerRow)*iconfile->Width;
-	icon->Y=(index/IconsPerRow)*iconfile->Height;
-	icon->Width=iconfile->Width;
-	icon->Height=iconfile->Height;
+	icon = malloc(sizeof(Icon));
+	icon->Ident = strdup(ident);
+	icon->Tileset = strdup(tileset);
+	icon->File = iconfile;
+	icon->Index = index;
 
-	icon->Graphic=NULL;
-	*(Icon**)hash_add(IconHash,str)=icon;
+	icon->Width = width;
+	icon->Height = height;
+
+	icon->X = 0;
+	icon->Y = 0;
+
+	icon->Graphic = NULL;
+
+	*(Icon **) hash_add(IconHash, str) = icon;
 	free(str);
     }
-    Icons=realloc(Icons,sizeof(Icon*)*(NumIcons+1));
-    Icons[NumIcons++]=icon;
+    Icons = realloc(Icons, sizeof(Icon *) * (NumIcons + 1));
+    Icons[NumIcons++] = icon;
 }
 
 /**
@@ -154,27 +160,26 @@ global void InitIcons(void)
 {
     unsigned i;
 
-    DebugLevel0Fn("Init icons %s\n" _C_ TheMap.TerrainName);
-
     //
-    //	Add icons of the current tileset, with shortcut to hash.
+    //  Add icons of the current tileset, with shortcut to hash.
     //
-    for( i=0; i<NumIcons; ++i ) {
-	if( !strcmp(Icons[i]->Tileset,TheMap.TerrainName) ) {
-	    *(Icon**)hash_add(IconHash,Icons[i]->Ident)=Icons[i];
+    for (i = 0; i < NumIcons; ++i) {
+	if (Icons[i]->Tileset
+		&& !strcmp(Icons[i]->Tileset, TheMap.TerrainName)) {
+	    *(Icon **) hash_add(IconHash, Icons[i]->Ident) = Icons[i];
 	}
     }
 
     //
-    //	Different names for the same thing
+    //  Alliases: different names for the same thing
     //
-    for( i=0; i<NumIconAliases; ++i ) {
+    for (i = 0; i < NumIconAliases; ++i) {
 	Icon* id;
 
-	id=IconByIdent(IconAliases[i*2+1]);
-	DebugCheck( id==NoIcon );
+	id = IconByIdent(IconAliases[i * 2 + 1]);
+	DebugCheck(id == NoIcon);
 
-	*(Icon**)hash_add(IconHash,IconAliases[i*2+0])=id;
+	*(Icon **) hash_add(IconHash, IconAliases[i * 2 + 0]) = id;
     }
 }
 
@@ -187,21 +192,33 @@ global void LoadIcons(void)
     unsigned i;
 
     //
-    //	Load all icon files.
+    //  Load all icon files.
     //
-    for( i=0; i<NumIcons; ++i ) {
-	if( !strcmp(Icons[i]->Tileset,TheMap.TerrainName) ) {
-	    if( !Icons[i]->File->Graphic ) {
+    for (i = 0; i < NumIcons; ++i) {
+	Icon* icon;
+
+	icon=Icons[i];
+	// If tileset only fitting tileset.
+	if (!icon->Tileset
+		|| !strcmp(icon->Tileset, TheMap.TerrainName)) {
+	    int icons_per_row;
+
+	    // File already loaded?
+	    if (!icon->File->Graphic) {
 		char* buf;
 		char* file;
 
-		file=Icons[i]->File->FileName;
-		buf=alloca(strlen(file)+9+1);
-		file=strcat(strcpy(buf,"graphics/"),file);
-		ShowLoadProgress("\tIcons %s\n",file);
-		Icons[i]->File->Graphic=LoadGraphic(file);
+		file = icon->File->FileName;
+		buf = alloca(strlen(file) + 9 + 1);
+		file = strcat(strcpy(buf, "graphics/"), file);
+		ShowLoadProgress("\tIcons %s\n", file);
+		icon->File->Graphic = LoadGraphic(file);
 	    }
-	    Icons[i]->Graphic=Icons[i]->File->Graphic;
+	    icon->Graphic = icon->File->Graphic;
+
+	    icons_per_row = icon->Graphic->Width / icon->Width;
+	    icon->X = (icon->Index % icons_per_row) * icon->Width;
+	    icon->Y = (icon->Index / icons_per_row) * icon->Height;
 	}
     }
 }
@@ -216,56 +233,57 @@ global void CleanIcons(void)
     int n;
     int i;
 
-    table=alloca(NumIcons);
     //
-    //	Mapping the original icon numbers in puds to our internal strings
+    //  Mapping the original icon numbers in puds to our internal strings
     //
-    if( (ptr=(void**)IconWcNames) ) {	// Free all old names
-	while( *ptr ) {
+    if ((ptr = (void **)IconWcNames)) {	// Free all old names
+	while (*ptr) {
 	    free(*ptr++);
 	}
 	free(IconWcNames);
-
-	IconWcNames=NULL;
+	IconWcNames = NULL;
     }
 
     //
-    //	Icons
+    //  Icons
     //
-    if( Icons ) {
-	n=0;
-	for( i=0; i<NumIcons; ++i ) {
+    if (Icons) {
+	table = alloca(NumIcons);
+	n = 0;
+	for (i = 0; i < NumIcons; ++i) {
 	    char* str;
 
 	    //
-	    //	Remove long hash and short hash
+	    //  Remove long hash and short hash
 	    //
-	    str=strdcat(Icons[i]->Ident,Icons[i]->Tileset);
-	    hash_del(IconHash,str);
-	    free(str);
-	    hash_del(IconHash,Icons[i]->Ident);
+	    if (Icons[i]->Tileset) {
+		str = strdcat(Icons[i]->Ident, Icons[i]->Tileset);
+		hash_del(IconHash, str);
+		free(str);
+		free(Icons[i]->Tileset);
+	    }
+	    hash_del(IconHash, Icons[i]->Ident);
 
 	    free(Icons[i]->Ident);
-	    free(Icons[i]->Tileset);
 
-	    ptr=(void**)hash_find(IconFileHash,Icons[i]->File->FileName);
-	    if( ptr && *ptr ) {
-		table[n++]=*ptr;
-		*ptr=NULL;
+	    ptr = (void **)hash_find(IconFileHash, Icons[i]->File->FileName);
+	    if (ptr && *ptr) {
+		table[n++] = *ptr;
+		*ptr = NULL;
 	    }
 
 	    free(Icons[i]);
 	}
 
 	free(Icons);
-	Icons=NULL;
-	NumIcons=0;
+	Icons = NULL;
+	NumIcons = 0;
 
 	//
-	//	Handle the icon files.
+	//      Handle the icon files.
 	//
-	for( i=0; i<n; ++i ) {
-	    hash_del(IconFileHash,table[i]->FileName);
+	for (i = 0; i < n; ++i) {
+	    hash_del(IconFileHash, table[i]->FileName);
 	    free(table[i]->FileName);
 	    VideoSaveFree(table[i]->Graphic);
 	    free(table[i]);
@@ -273,18 +291,18 @@ global void CleanIcons(void)
     }
 
     //
-    //	Icons aliases
+    //  Icons aliases
     //
-    if( IconAliases ) {
-	for( i=0; i<NumIconAliases; ++i ) {
-	    hash_del(IconHash,IconAliases[i*2+0]);
-	    free(IconAliases[i*2+0]);
-	    free(IconAliases[i*2+1]);
+    if (IconAliases) {
+	for (i = 0; i < NumIconAliases; ++i) {
+	    hash_del(IconHash, IconAliases[i * 2 + 0]);
+	    free(IconAliases[i * 2 + 0]);
+	    free(IconAliases[i * 2 + 1]);
 	}
 
 	free(IconAliases);
-	IconAliases=NULL;
-	NumIconAliases=0;
+	IconAliases = NULL;
+	NumIconAliases = 0;
     }
 }
 
@@ -295,13 +313,13 @@ global void CleanIcons(void)
 **
 **	@return		Icon pointer or NoIcon == NULL if not found.
 */
-global Icon* IconByIdent(const char* ident)
+global Icon* IconByIdent(const char *ident)
 {
     Icon* const* icon;
 
-    icon=hash_find(IconHash,(char*)ident);
+    icon = hash_find(IconHash, ident);
 
-    if( icon ) {
+    if (icon) {
 	return *icon;
     }
 
@@ -331,10 +349,11 @@ global const char* IdentOfIcon(const Icon* icon)
 **	@param x	X display pixel position
 **	@param y	Y display pixel position
 */
-global void DrawIcon(const Player* player,Icon* icon,int x,int y)
+global void DrawIcon(const Player* player, Icon* icon, int x, int y)
 {
-    GraphicPlayerPixels(player,icon->Graphic);
-    VideoDrawSub(icon->Graphic,icon->X,icon->Y,icon->Width,icon->Height,x,y);
+    GraphicPlayerPixels(player, icon->Graphic);
+    VideoDrawSub(icon->Graphic, icon->X, icon->Y, icon->Width, icon->Height,
+	x, y);
 }
 
 /**
@@ -346,39 +365,51 @@ global void DrawIcon(const Player* player,Icon* icon,int x,int y)
 **	@param x	X display pixel position
 **	@param y	Y display pixel position
 */
-global void DrawUnitIcon(const Player* player,Icon* icon,unsigned flags
-	,int x,int y)
+global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
+    int x, int y)
 {
     int color;
+    int width;
+    int height;
 
-    DebugCheck( !icon );
+    DebugCheck(!icon);
 
-    color= (flags&IconActive) ? ColorGray : ColorBlack;
+    //
+    //	Black border around icon with gray border if active.
+    //
+    color = (flags & IconActive) ? ColorGray : ColorBlack;
 
-    VideoDrawRectangleClip(color,x,y,IconWidth+7,IconHeight+7);
-    VideoDrawRectangleClip(ColorBlack,x+1,y+1,IconWidth+5,IconHeight+5);
+    width = icon->Width;
+    height = icon->Height;
+    VideoDrawRectangleClip(color, x, y, width + 7, height + 7);
+    VideoDrawRectangleClip(ColorBlack, x + 1, y + 1,
+	width + 5, height + 5);
 
-    VideoDrawVLine(ColorGray,x+IconWidth+4,y+5,IconHeight-1);	// _|
-    VideoDrawVLine(ColorGray,x+IconWidth+5,y+5,IconHeight-1);
-    VideoDrawHLine(ColorGray,x+5,y+IconHeight+4,IconWidth+1);
-    VideoDrawHLine(ColorGray,x+5,y+IconHeight+5,IconWidth+1);
+    // _|	Shadow
+    VideoDrawVLine(ColorGray, x + width + 4, y + 5, height - 1);
+    VideoDrawVLine(ColorGray, x + width + 5, y + 5, height - 1);
+    VideoDrawHLine(ColorGray, x + 5, y + height + 4, width + 1);
+    VideoDrawHLine(ColorGray, x + 5, y + height + 5, width + 1);
 
-    color= (flags&IconClicked) ? ColorGray : ColorWhite;	// |~
-    VideoDrawHLine(color,x+5,y+3,IconWidth+1);
-    VideoDrawHLine(color,x+5,y+4,IconWidth+1);
-    VideoDrawVLine(color,x+3,y+3,IconHeight+3);
-    VideoDrawVLine(color,x+4,y+3,IconHeight+3);
+    // |~	Light
+    color = (flags & IconClicked) ? ColorGray : ColorWhite;
+    VideoDrawHLine(color, x + 5, y + 3, width + 1);
+    VideoDrawHLine(color, x + 5, y + 4, width + 1);
+    VideoDrawVLine(color, x + 3, y + 3, height + 3);
+    VideoDrawVLine(color, x + 4, y + 3, height + 3);
 
-    if( flags&IconClicked ) {
-	++x; ++y;
+    if (flags & IconClicked) {
+	x += 5;
+	y += 5;
+    } else {
+	x += 4;
+	y += 4;
     }
 
-    x+=4;
-    y+=4;
-    DrawIcon(player,icon,x,y);
+    DrawIcon(player, icon, x, y);
 
-    if( flags&IconSelected ) {
-	VideoDrawRectangleClip(ColorGreen,x,y,IconWidth,IconHeight);
+    if (flags & IconSelected) {
+	VideoDrawRectangleClip(ColorGreen, x, y, width, height);
     }
 }
 
@@ -389,31 +420,102 @@ global void DrawUnitIcon(const Player* player,Icon* icon,unsigned flags
 */
 global void SaveIcons(FILE* file)
 {
-    char** cp;
+    char* const* cp;
     int i;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: icons $Id$\n\n");
+    fprintf(file, "\n;;; -----------------------------------------\n");
+    fprintf(file, ";;; MODULE: icons $Id$\n\n");
 
-    if( (cp=IconWcNames) ) {
-	fprintf(file,"(define-icon-wc-names");
+    //
+    //  Mapping the original icon numbers in puds to our internal strings
+    //
+    if ((cp = IconWcNames)) {
+	fprintf(file, "(define-icon-wc-names");
 
-	i=90;
-	while( *cp ) {
-	    if( i+strlen(*cp)>79 ) {
-		i=fprintf(file,"\n ");
+	i = 90;
+	while (*cp) {
+	    if (i + strlen(*cp) > 79) {
+		i = fprintf(file, "\n ");
 	    }
-	    i+=fprintf(file," '%s",*cp++);
+	    i += fprintf(file, " '%s", *cp++);
 	}
-	fprintf(file,")\n\n");
+	fprintf(file, ")\n\n");
     }
 
-    for( i=0; i<NumIcons; ++i ) {
-	fprintf(file,"(define-icon '%s '%s\n",
-		Icons[i]->Ident,Icons[i]->Tileset);
-	fprintf(file,"  'normal %d \"%s\")\n",
-		Icons[i]->Index,Icons[i]->File->FileName);
+    //
+    //  Icons
+    //
+    for (i = 0; i < NumIcons; ++i) {
+	fprintf(file, "(define-icon '%s 'tileset '%s\n", Icons[i]->Ident,
+	    Icons[i]->Tileset);
+	fprintf(file, "  'size '(%d %d) 'normal '(%d \"%s\"))\n",
+	    Icons[i]->Width, Icons[i]->Height,
+	    Icons[i]->Index, Icons[i]->File->FileName);
     }
+    fprintf(file, "\n");
+
+    //
+    //  Icons aliases
+    //
+    for (i = 0; i < NumIconAliases; ++i) {
+	fprintf(file, "(define-icon-alias '%s '%s)\n",
+	    IconAliases[i * 2 + 0], IconAliases[i * 2 + 1]);
+    }
+}
+
+/**
+**	@brief Parse icon definition.
+**
+**	@param list	Icon definition list.
+*/
+local SCM CclDefineOldIcon(SCM list)
+{
+    SCM value;
+    char* ident;
+    char* tileset;
+    char* str;
+    int n;
+
+    IfDebug( n = 0; );
+
+    //  Identifier
+
+    ident = gh_scm2newstr(gh_car(list), NULL);
+    list = gh_cdr(list);
+
+    //  Tileset
+
+    tileset = gh_scm2newstr(gh_car(list), NULL);
+    list = gh_cdr(list);
+
+    //  Type
+
+    value = gh_car(list);
+    list = gh_cdr(list);
+    if (gh_eq_p(value, gh_symbol2scm("normal"))) {
+	//      Normal icon - index, file
+	n = gh_scm2int(gh_car(list));
+	list = gh_cdr(list);
+	str = gh_scm2newstr(gh_car(list), NULL);
+	list = gh_cdr(list);
+
+    } else {
+	str = gh_scm2newstr(value, NULL);
+	fprintf(stderr, "%s: Wrong tag `%s'\n", ident, str);
+    }
+
+    if (!gh_null_p(list)) {
+	fprintf(stderr, "too much arguments\n");
+    }
+
+    DebugLevel3Fn("icon %s/%s %d of %s\n" _C_ ident _C_ tileset _C_ n _C_ str);
+
+    AddIcon(ident, tileset, n, IconWidth, IconHeight, str);
+    free(ident);
+    free(tileset);
+    free(str);
+
+    return SCM_UNSPECIFIED;
 }
 
 /**
@@ -426,46 +528,49 @@ local SCM CclDefineIcon(SCM list)
     SCM value;
     char* ident;
     char* tileset;
-    char* str;
-    int n;
+    char* filename;
+    int width;
+    int height;
+    int index;
 
-    IfDebug( n=0; );
+    IfDebug(index = width = height = 0;);
+    filename = NULL;
+    tileset = NULL;
 
-    //	Identifier
+    //  Identifier
 
-    ident=gh_scm2newstr(gh_car(list),NULL);
-    list=gh_cdr(list);
+    ident = gh_scm2newstr(gh_car(list), NULL);
+    list = gh_cdr(list);
 
-    //	Tileset
+    //
+    //  Parse the arguments, tagged format.
+    //
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
 
-    tileset=gh_scm2newstr(gh_car(list),NULL);
-    list=gh_cdr(list);
-
-    //	Type
-
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("normal")) ) {
-	//	Normal icon - index, file
-	n=gh_scm2int(gh_car(list));
-	list=gh_cdr(list);
-	str=gh_scm2newstr(gh_car(list),NULL);
-	list=gh_cdr(list);
-
-    } else {
-	str=gh_scm2newstr(value,NULL);
-	fprintf(stderr,"%s: Wrong tag `%s'\n",ident,str);
+	if (gh_eq_p(value, gh_symbol2scm("tileset"))) {
+	    tileset = gh_scm2newstr(gh_car(list), NULL);
+	} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+	    value = gh_car(list);
+	    width = gh_scm2int(gh_car(value));
+	    height = gh_scm2int(gh_cadr(value));
+	} else if (gh_eq_p(value, gh_symbol2scm("normal"))) {
+	    value = gh_car(list);
+	    index = gh_scm2int(gh_car(value));
+	    filename = gh_scm2newstr(gh_cadr(value), NULL);
+	} else {
+	    errl("Unsupported tag", value);
+	}
+	list = gh_cdr(list);
     }
 
-    if( !gh_null_p(list) ) {
-	fprintf(stderr,"too much arguments\n");
-    }
+    DebugCheck( !filename || !width || !height);
 
-    DebugLevel3Fn("icon %s/%s %d of %s\n" _C_ ident _C_ tileset _C_ n _C_ str);
-    AddIcon(ident,tileset,n,str);
+    AddIcon(ident, tileset, index, width, height, filename);
     free(ident);
     free(tileset);
-    free(str);
+    free(filename);
 
     return SCM_UNSPECIFIED;
 }
@@ -522,6 +627,7 @@ local SCM CclDefineIconWcNames(SCM list)
 
 /**
 **	Set icon size
+** FIXME: can be removed:
 **
 **	@param width	Width of icon.
 **	@param height	Height of icon.
@@ -535,6 +641,7 @@ local SCM CclSetIconSize(SCM width,SCM height)
 
 /**
 **	Set icons per row
+** FIXME: can be removed:
 **
 **	@param icons	Icons per row.
 */
@@ -552,11 +659,13 @@ local SCM CclSetIconsPerRow(SCM icons)
 */
 global void IconCclRegister(void)
 {
+    gh_new_procedureN("define-old-icon",CclDefineOldIcon);
     gh_new_procedureN("define-icon",CclDefineIcon);
     gh_new_procedure2_0("define-icon-alias",CclDefineIconAlias);
 
     gh_new_procedureN("define-icon-wc-names",CclDefineIconWcNames);
 
+    // FIXME: can be removed:
     gh_new_procedure2_0("set-icon-size!",CclSetIconSize);
     gh_new_procedure1_0("set-icons-per-row!",CclSetIconsPerRow);
 }
