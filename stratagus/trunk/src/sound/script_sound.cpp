@@ -399,12 +399,13 @@ local SCM CclSetCdMode(SCM mode)
 
 local SCM CclDefinePlaySections(SCM list)
 {
-    SCM value, sublist, temp;
+    SCM value, sublist, sublist2, temp;
     enum _race_ { racealliance, racemythical } race = -1;
     enum _type_ { typegame, typebriefing, typestats, typemainmenu } type = -1;
     enum _order_ { orderall, orderrandom } order = -1;
     long tracks = 0;
     int i;
+    char *filename;
 
     while ( !gh_null_p(list) ) {
 	value = gh_car(list);
@@ -456,10 +457,26 @@ local SCM CclDefinePlaySections(SCM list)
 		}
 	    }
 	}
+	if (gh_eq_p(value, gh_symbol2scm("no-cd"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while ( !gh_null_p(sublist) ) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("files"))) {
+		    sublist2 = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while ( !gh_null_p(sublist2) ) {
+			value = gh_car(sublist2);
+			sublist2 = gh_cdr(sublist2);
+			filename = gh_scm2newstr(value, NULL);
+			printf("file %s\n", filename);
+			free(filename);
+		    }
+		}
+	    }
+	}
     }
-    printf("race %d\n", race);
-    printf("type %d\n", type);
-    exit(0);
 }
 
 /**
