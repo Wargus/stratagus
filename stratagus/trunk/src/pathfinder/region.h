@@ -23,7 +23,8 @@ struct _region_neighbor_ {
 **  A region of the map
 */
 struct _region_ {
-    unsigned short RegId;
+    unsigned short RegId;			/* this Region's id number */
+    unsigned short GroupId;		/* id of the RegGroup to which Region belongs */
 	unsigned short Passability;		/* MapField::Flags of the region's fields */
     /*
      * Tile map coordinates of one of the region's tiles. It doesn't really
