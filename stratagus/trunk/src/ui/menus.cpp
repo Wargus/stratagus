@@ -3992,11 +3992,7 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
     //  No old path, setup the default.
     //
     if (!*CurrentMapPath || *CurrentMapPath == '.' || *CurrentMapPath == '/') {
-#if 0					// FIXME: as soon as .cm is supported..
-	strcpy(CurrentMapPath, "puds/default.cm");
-#endif
-	strcpy(CurrentMapPath, "puds/default.pud");
-
+	strcpy(CurrentMapPath, DefaultMap);
     }
 
     DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
@@ -4896,7 +4892,7 @@ local void StartEditor(void)
     //  Create a default path + map.
     //
     if (!*CurrentMapPath || *CurrentMapPath == '.' || *CurrentMapPath == '/') {
-	strcpy(CurrentMapPath, "puds/default.pud");
+	strcpy(CurrentMapPath, DefaultMap);
     }
 
     //
