@@ -1378,8 +1378,8 @@ local SCM CclSetFancyBuildings(SCM flag)
 local SCM CclDefineMenu(SCM list)
 {
     SCM value;
-    Menu *menu = NULL, item;
-    char *name;
+    Menu *menu, item;
+    char *name = NULL;
     char *s1;
     void **func;
 
@@ -1458,8 +1458,7 @@ local SCM CclDefineMenu(SCM list)
     }
 
     if (name) {
-	menu = (Menu*)malloc(sizeof(Menu));
-	memset(menu,0,sizeof(Menu));
+	menu = (Menu*)calloc(1,sizeof(Menu));
 	memcpy(menu, &item, sizeof(Menu));
 	menu->nitems = 0; // reset to zero
 	//printf("Me:%s\n", name);
@@ -1561,8 +1560,8 @@ local SCM CclDefineMenuItem(SCM list)
 
     DebugLevel3Fn("Define menu-item\n");
 
-    item = (Menuitem*)malloc(sizeof(Menuitem));
-    memset(item,0,sizeof(Menuitem));
+    name = NULL;
+    item = (Menuitem*)calloc(1,sizeof(Menuitem));
 
     //
     //	Parse the arguments, already the new tagged format.
