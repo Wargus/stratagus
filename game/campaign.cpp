@@ -51,8 +51,8 @@ global char DefaultObjective[] = "-Destroy your enemies";
 
 global int GameResult;			/// Outcome of the game
 global char CurrentMapPath[1024];	/// Path of the current map
-global int RestartScenario=0;		/// Restart the scenario
-global int QuitToMenu=0;		/// Quit to menu
+global int RestartScenario;		/// Restart the scenario
+global int QuitToMenu;			/// Quit to menu
 global Campaign* Campaigns;		/// Campaigns
 global int NumCampaigns;		/// Number of campaigns
 

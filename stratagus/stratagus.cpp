@@ -868,12 +868,13 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    EnableRedraw=RedrawMenu;
 	    ProcessMenu(MENU_PRG_START, 1);
 	    EnableRedraw=RedrawEverything;
-	    if( NetworkFildes!=-1 && NetPlayers<2 ) {
-		ExitNetwork1();
-	    }
 	    DebugLevel0Fn("Menu start: NetPlayers %d\n", NetPlayers);
 	    filename = CurrentMapPath;
 	}
+	if( NetworkFildes!=-1 && NetPlayers<2 ) {
+	    ExitNetwork1();
+	}
+
 	//
 	//	Create the game.
 	//
