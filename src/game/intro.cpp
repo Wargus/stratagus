@@ -262,6 +262,7 @@ global void ShowIntro(const Intro *intro)
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+    VideoCreatePalette(GlobalPalette);
 
     OldVideoSyncSpeed=VideoSyncSpeed;
     VideoSyncSpeed=100;
