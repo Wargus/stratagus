@@ -3149,9 +3149,8 @@ local void MultiPlayerGameMenu(void)
 
 	GuiGameStarted = 0;
 	// Here we really go...
-	// ProcessMenu("menu-create-join-menu", 1);
-
-	ProcessMenu("menu-multi-net-type-menu", 1);
+	ProcessMenu("menu-create-join-menu", 1);
+	// ProcessMenu("menu-multi-net-type-menu", 1);
 
 
 	DebugPrint("GuiGameStarted: %d\n" _C_ GuiGameStarted);
