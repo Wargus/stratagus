@@ -195,7 +195,8 @@ global void UpdateMinimapTerrain(void)
 
 	    ((Uint8*)MinimapTerrainSurface->pixels)[mx + my * TheUI.MinimapW] =
 		((Uint8*)TheMap.TileGraphic->Surface->pixels)
-		    [xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) * TheMap.TileGraphic->Surface->w];
+		    [xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) 
+		    * TheMap.TileGraphic->Surface->w];
 	}
     }
     SDL_UnlockSurface(MinimapTerrainSurface);
@@ -229,6 +230,7 @@ global void UpdateMinimapXY(int tx, int ty)
     //
     //	Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
     //
+    SDL_LockSurface(TheMap.TileGraphic->Surface);
     SDL_LockSurface(MinimapTerrainSurface);
 
     ty *= TheMap.Width;
@@ -258,13 +260,15 @@ global void UpdateMinimapXY(int tx, int ty)
 	    yofs = TileSizeY * (tile / tilepitch);
 
 	    // FIXME: does this work?
-	    ((unsigned char*)MinimapTerrainSurface->pixels)[mx + my * TheUI.MinimapW] =
-		((unsigned char*)TheMap.TileGraphic->Surface->pixels)[xofs + 7 + 
-		(mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) * TileSizeX];
+	    ((Uint8*)MinimapTerrainSurface->pixels)[mx + my * TheUI.MinimapW] =
+		((Uint8*)TheMap.TileGraphic->Surface->pixels)
+		    [xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) 
+		    * TheMap.TileGraphic->Surface->w];
 //	    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW] =
 //		TheMap.Tiles[tile][7 + (mx % scalex) * 8 + (6 + (my % scaley) * 8) * TileSizeX];
 	}
     }
+    SDL_UnlockSurface(TheMap.TileGraphic->Surface);
     SDL_UnlockSurface(MinimapTerrainSurface);
 }
 
@@ -305,11 +309,11 @@ global void UpdateMinimap(void)
 		((Uint8*)MinimapSurface->pixels)[mx + my * TheUI.MinimapW] = 
 		    ((Uint8*)MinimapTerrainSurface->pixels)[mx + my * TheUI.MinimapW];
 	    } else if (visiontype > 0) {
-		((Uint8*)MinimapSurface->pixels)[mx + my * TheUI.MinimapW] = 0; // FIXME: black
+		((Uint8*)MinimapSurface->pixels)[mx + my * TheUI.MinimapW] = 
+		    SDL_MapRGB(MinimapSurface->format, 0, 0, 0);
 	    }
 	}
     }
-
     SDL_UnlockSurface(MinimapTerrainSurface);
 
     //
@@ -405,7 +409,6 @@ global void UpdateMinimap(void)
 		    SDL_MapRGB(MinimapSurface->format, color.r, color.g, color.b);
 	    }
 	}
-
     }
     SDL_UnlockSurface(MinimapSurface);
 }
