@@ -58,10 +58,21 @@ local SCM CclPlayer(SCM list)
 {
     SCM value;
     SCM data;
+    SCM sublist;
     Player* player;
-    //char* str;
+    int i;
+    char* str;
 
-    player=&Players[gh_scm2int(gh_car(list))];
+    i=gh_scm2int(gh_car(list));
+    player=&Players[i];
+    if( NumPlayers<=i ) {
+	NumPlayers=i+1;
+    }
+    if( !(player->Units=(Unit**)calloc(UnitMax,sizeof(Unit*))) ) {
+	DebugLevel0("Not enough memory to create player %d.\n",i);
+
+	return SCM_UNSPECIFIED;
+    }
     list=gh_cdr(list);
 
     //
@@ -76,51 +87,141 @@ local SCM CclPlayer(SCM list)
 	    player->Name=gh_scm2newstr(data=gh_car(list),NULL);
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("type")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    value=gh_car(list);
 	    list=gh_cdr(list);
+	    if( gh_eq_p(value,gh_symbol2scm("neutral")) ) {
+		player->Type=PlayerNeutral;
+	    } else if( gh_eq_p(value,gh_symbol2scm("nobody")) ) {
+		player->Type=PlayerNobody;
+	    } else if( gh_eq_p(value,gh_symbol2scm("computer")) ) {
+		player->Type=PlayerComputer;
+	    } else if( gh_eq_p(value,gh_symbol2scm("human")) ) {
+		player->Type=PlayerHuman;
+	    } else if( gh_eq_p(value,gh_symbol2scm("rescue-passive")) ) {
+		player->Type=PlayerRescuePassive;
+	    } else if( gh_eq_p(value,gh_symbol2scm("rescue-active")) ) {
+		player->Type=PlayerRescueActive;
+	    } else {
+	       // FIXME: this leaves a half initialized player
+	       errl("Unsupported tag",value);
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("race")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    player->RaceName=str=gh_scm2newstr(gh_car(list),NULL);
+	    if( !strcmp(str,"human") ) {
+		player->Race=PlayerRaceHuman;
+	    } else if( !strcmp(str,"orc") ) {
+		player->Race=PlayerRaceOrc;
+	    } else if( !strcmp(str,"neutral") ) {
+		player->Race=PlayerRaceNeutral;
+	    } else {
+	       // FIXME: this leaves a half initialized player
+	       errl("Unsupported tag",gh_car(list));
+	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("ai")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    player->AiNum=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("team")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    player->Team=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("enemy")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    str=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
+	    for( i=0; i<PlayerMax && *str; ++i,++str ) {
+		if( *str=='-' || *str=='_' || *str==' ' ) {
+		    player->Enemy&=~(1<<i);
+		} else {
+		    player->Enemy|=(1<<i);
+		}
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("allied")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    str=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
+	    for( i=0; i<PlayerMax && *str; ++i,++str ) {
+		if( *str=='-' || *str=='_' || *str==' ' ) {
+		    player->Allied&=~(1<<i);
+		} else {
+		    player->Allied|=(1<<i);
+		}
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("start")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    value=gh_car(list);
 	    list=gh_cdr(list);
+	    player->X=gh_scm2int(gh_car(value));
+	    player->Y=gh_scm2int(gh_cadr(value));
 	} else if( gh_eq_p(value,gh_symbol2scm("resources")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+
+		for( i=0; i<MaxCosts; ++i ) {
+		    if( gh_eq_p(value,gh_symbol2scm(DEFAULT_NAMES[i])) ) {
+			player->Resources[i]=gh_scm2int(gh_car(sublist));
+			break;
+		    }
+		}
+		if( i==MaxCosts ) {
+		   // FIXME: this leaves a half initialized player
+		   errl("Unsupported tag",value);
+		}
+		sublist=gh_cdr(sublist);
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("incomes")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+
+		for( i=0; i<MaxCosts; ++i ) {
+		    if( gh_eq_p(value,gh_symbol2scm(DEFAULT_NAMES[i])) ) {
+			player->Incomes[i]=gh_scm2int(gh_car(sublist));
+			break;
+		    }
+		}
+		if( i==MaxCosts ) {
+		   // FIXME: this leaves a half initialized player
+		   errl("Unsupported tag",value);
+		}
+		sublist=gh_cdr(sublist);
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("ai-enabled")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    player->AiEnabled=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("ai-disabled")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    player->AiEnabled=0;
 	} else if( gh_eq_p(value,gh_symbol2scm("food-unit-limit")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    player->FoodUnitLimit=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("building-limit")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    player->BuildingLimit=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("total-unit-limit")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    player->TotalUnitLimit=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("score")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    player->Score=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("timers")) ) {
-	    DebugLevel0Fn("FIXME:\n");
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
+	    i=gh_length(sublist);
+	    if( i!=UpgradeMax ) {
+		fprintf(stderr,"Wrong upgrade timer length %d\n",i);
+	    }
+
+	    i=0;
+	    while( !gh_null_p(sublist) ) {
+		if( i<UpgradeMax ) {
+		    player->UpgradeTimers.Upgrades[i]=
+			    gh_scm2int(gh_car(sublist));
+		}
+		sublist=gh_cdr(sublist);
+		++i;
+	    }
 	} else {
 	   // FIXME: this leaves a half initialized player
 	   errl("Unsupported tag",value);
