@@ -100,14 +100,14 @@ global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
     srect.w = sprite->Width;
     srect.h = sprite->Height;
 
+    oldx = x;
+    oldy = y;
+    CLIP_RECTANGLE(x, y, srect.w, srect.h);
+    srect.x += x - oldx;
+    srect.y += y - oldy;
+
     drect.x = x;
     drect.y = y;
-
-    oldx = drect.x;
-    oldy = drect.y;
-    CLIP_RECTANGLE(x, y, srect.w, srect.h);
-    drect.x += x - oldx;
-    drect.y += y - oldy;
 
     SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
 }
