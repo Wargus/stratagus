@@ -48,6 +48,7 @@
 #include "font.h"
 #include "tileset.h"
 #include "map.h"
+#include "minimap.h"
 #include "interface.h"
 #include "menus.h"
 #include "cursor.h"
@@ -5565,6 +5566,8 @@ local void EditorMapPropertiesOk(void)
     char *description;
     // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
     int v[] = { TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
+    int old;
+    char *s;
 
     menu = CurrentMenu;
 
@@ -5573,8 +5576,27 @@ local void EditorMapPropertiesOk(void)
     free(TheMap.Info->Description);
     TheMap.Info->Description = strdup(description);
 
-    // FIXME: Need to actually change the terrain
-    TheMap.Info->MapTerrain = v[menu->items[6].d.pulldown.curopt];
+    // Change the terrain
+    old=TheMap.Info->MapTerrain;
+    if (old != v[menu->items[6].d.pulldown.curopt]) {
+	TheMap.Info->MapTerrain = v[menu->items[6].d.pulldown.curopt];
+	free(TheMap.Info->MapTerrainName);
+	TheMap.Info->MapTerrainName=strdup(TilesetWcNames[TheMap.Info->MapTerrain]);
+	TheMap.Terrain = TheMap.Info->MapTerrain;
+	free(TheMap.TerrainName);
+	TheMap.TerrainName = strdup(TilesetWcNames[TheMap.Info->MapTerrain]);
+	TheMap.Tileset = Tilesets[TheMap.Info->MapTerrain];
+
+	LoadTileset();
+	ChangeTilesetPud(old,&TheMap);
+	LoadRGB(GlobalPalette,
+		s=strdcat3(FreeCraftLibPath,"/graphics/",
+		    TheMap.Tileset->PaletteFile));
+	free(s);
+	VideoCreatePalette(GlobalPalette);
+	PreprocessMap();
+	UpdateMinimap();
+    }
 
     // FIXME: Save the pud version somewhere
 

@@ -105,6 +105,8 @@ extern void LoadChk(const char* chk,WorldMap* map);
 
     /// Save a pud file
 extern int SavePud(const char* pud,const WorldMap* map);
+    /// Change a pud's tileset
+extern void ChangeTilesetPud(int old,WorldMap* map);
 
     /// Clean the pud module
 extern void CleanPud(void);

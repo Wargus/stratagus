@@ -1345,23 +1345,19 @@ local void PudWriteHeader(gzFile f,char* type,int length)
 }
 
 /**
-**	Save the MTXM section
+**	Convert the map to MTXM format and save in a buffer.
 **
-**	@param f	File handle
-**	@param map	Map to save.
+**	@param mtxm	Buffer to save MTXM data
+**	@param map	Map to convert
+**	@param tileset	Tileset used to convert
 */
-local void PudWriteMTXM(gzFile f,const WorldMap* map)
+local void PudConvertMTXM(unsigned char* mtxm,const WorldMap* map,
+	    Tileset* tileset)
 {
     int i;
     int n;
-    unsigned char* mtxm;
-    Tileset* tileset;
 
-    tileset=map->Tileset;
     n=map->Width*map->Height;
-    PudWriteHeader(f,"MTXM",n*2);
-    mtxm=alloca(n*2);
-
     for( i=0; i<n; ++i ) {
 	int tile;
 	int j;
@@ -1376,8 +1372,44 @@ local void PudWriteMTXM(gzFile f,const WorldMap* map)
 	mtxm[i*2+0]=j >> 0;
 	mtxm[i*2+1]=j >> 8;
     }
+}
+
+/**
+**	Save the MTXM section
+**
+**	@param f	File handle
+**	@param map	Map to save.
+*/
+local void PudWriteMTXM(gzFile f,const WorldMap* map)
+{
+    int n;
+    unsigned char* mtxm;
+    Tileset* tileset;
+
+    tileset=map->Tileset;
+    n=map->Width*map->Height;
+    PudWriteHeader(f,"MTXM",n*2);
+    mtxm=alloca(n*2);
+
+    PudConvertMTXM(mtxm,map,tileset);
 
     gzwrite(f,mtxm,n*2);
+}
+
+/**
+**	Change a pud's tileset
+**
+**	@param old	    Number of old tileset
+**	@param map	    Map to change
+*/
+global void ChangeTilesetPud(int old,WorldMap* map)
+{
+    unsigned char* mtxm;
+
+    MapOffsetX=MapOffsetY=0;
+    mtxm=alloca(map->Width*map->Height*2);
+    PudConvertMTXM(mtxm,map,Tilesets[old]);
+    ConvertMTXM((const unsigned short*)mtxm,map->Width,map->Height,map);
 }
 
 /**
