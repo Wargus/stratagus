@@ -1288,7 +1288,7 @@ global ButtonAction AllButtons[] = {
 {   7, 2, { "icon-altar-of-storms" },
     B_Build,		0, "unit-altar-of-storms",
     NULL,		NULL,
-    'a', "BUILD ~!ALTAR OF STORMS",
+    'l', "BUILD ~!ALTAR OF STORMS",
     WORKERS_O 
 },
 {   8, 2, { "icon-dragon-roost" },
