@@ -365,10 +365,13 @@ local SCM CclDefineUnitType(SCM list)
     CclFree(type->Missile.Name);
     type->Missile.Name=str;
 
-    // Flags
+    CclFree(type->CorpseName);
+    type->CorpseName=NULL;
+    type->CorpseType=NULL;
+    type->CorpseScript=0;		// corpse must be better configured
 
-    type->Corpse=0;			// reset all
-    type->UnitType=0;
+    // Flags
+    type->UnitType=0;			// reset all
     type->MouseAction=0;
     type->CanTarget=0;
     type->LandUnit=0;
@@ -410,18 +413,22 @@ local SCM CclDefineUnitType(SCM list)
 
 	// FIXME: slow! any better idea?
 	if( gh_eq_p(value,gh_symbol2scm("corpse-none")) ) {
-	    type->Corpse=CorpseNone;
+	    type->CorpseName=NULL;
 	} else if( gh_eq_p(value,gh_symbol2scm("corpse-human")) ) {
-	    type->Corpse=CorpseHuman;
+	    type->CorpseName="unit-dead-body";
+	    type->CorpseScript=0;
 	} else if( gh_eq_p(value,gh_symbol2scm("corpse-orc")) ) {
-	    type->Corpse=CorpseOrc;
+	    type->CorpseName="unit-dead-body";
+	    type->CorpseScript=0;
 	} else if( gh_eq_p(value,gh_symbol2scm("corpse-ship")) ) {
-	    type->Corpse=CorpseShip;
+	    type->CorpseName="unit-dead-body";
+	    type->CorpseScript=0;
 	} else if( gh_eq_p(value,gh_symbol2scm("corpse-land-site")) ) {
-	    type->Corpse=CorpseLandSite;
+	    type->CorpseName="unit-destroyed-1x1-place";
+	    type->CorpseScript=0;
 	} else if( gh_eq_p(value,gh_symbol2scm("corpse-water-site")) ) {
-	    type->Corpse=CorpseWaterSite;
-
+	    type->CorpseName="unit-destroyed-1x1-place";
+	    type->CorpseScript=0;
 	} else if( gh_eq_p(value,gh_symbol2scm("type-land")) ) {
 	    type->UnitType=UnitTypeLand;
 	} else if( gh_eq_p(value,gh_symbol2scm("type-fly")) ) {

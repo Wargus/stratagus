@@ -694,7 +694,7 @@ global void DrawInfoPanel(void)
 		    && (Selected[0]->Command.Action==UnitActionBuilded
 		    || Selected[0]->Command.Action==UnitActionResearch
 		    || Selected[0]->Command.Action==UnitActionUpgradeTo
-		    || Selected[0]->Command.Action==UnitActionUpgrade
+		    /* || Selected[0]->Command.Action==UnitActionUpgrade */
 		    || Selected[0]->Command.Action==UnitActionTrain) ) {
 		i=3;
 	    } else if( Selected[0]->Type->Magic ) {

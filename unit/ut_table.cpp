@@ -695,30 +695,23 @@ local Animation DaemonDie[] = {
     { 3, 0, 1,  0}
 };
 
-///	Corpse:		Orcish
-local Animation CorpseOrcishDie[] = {
+///	Dead body (contains orcis, human and ships corpse
+local Animation DeadBodyDie[] = {
+    //	Corpse:		Orcish
     {0, 0,200, 5}, {0, 0,200,  5}, {0, 0,200, 5}, {0, 0,200, 5},
-    {0, 0,200, 5}, {3, 0,  1,-25}
-};
-
-///	Corpse:		Human
-local Animation CorpseHumanDie[] = {
+    {0, 0,200, 5}, {3, 0,  1,-25},
+    //	Corpse:		Human
     {0, 0,200, 0}, {0, 0,200, 10}, {0, 0,200, 5}, {0, 0,200, 5},
-    {0, 0,200, 5}, {3, 0,  1,-25}
-};
-
-///	Corpse:		Ships
-local Animation CorpseShipsDie[] = {
+    {0, 0,200, 5}, {3, 0,  1,-25},
+    //	Corpse:		Ships
     {0, 0,100,30}, {0, 0,100, 0}, {3, 0,  1,  0}
 };
 
 ///	Destroyed site:
-local Animation DestroyedSiteDie[] = {
-    {0, 0,200,0}, {0, 0,200,1}, {3, 0,  1,0}
-};
-
-///	Destroyed water site:
-local Animation DestroyedWaterSiteDie[] = {
+local Animation DestroyedPlaceDie[] = {
+    //	Destroyed land site:
+    {0, 0,200,0}, {0, 0,200,1}, {3, 0,  1,0},
+    //	Destroyed water site:
     {0, 0,200,2}, {0, 0,200,1}, {3, 0,  1,0}
 };
 
@@ -977,22 +970,6 @@ local Animations BuildingAnimations[] = {
     NULL	}
 };
 
-local Animations GuardTowerAnimations[] = {
-{   DefaultStill,
-    NULL,
-    GuardTowerAttack,
-    NULL,
-    NULL	}
-};
-
-local Animations CannonTowerAnimations[] = {
-{   DefaultStill,
-    NULL,
-    CannonTowerAttack,
-    NULL,
-    NULL	}
-};
-
 #define FarmAnimations			BuildingAnimations
 #define PigFarmAnimations		BuildingAnimations
 #define BarracksHumanAnimations		BuildingAnimations
@@ -1031,21 +1008,52 @@ local Animations CannonTowerAnimations[] = {
 #define OilPatchAnimations		BuildingAnimations
 #define StartLocationHumanAnimations	BuildingAnimations
 #define StartLocationOrcAnimations	BuildingAnimations
+
 #define GuardTowerHumanAnimations	GuardTowerAnimations
 #define GuardTowerOrcAnimations		GuardTowerAnimations
+local Animations GuardTowerAnimations[] = {
+{   DefaultStill,
+    NULL,
+    GuardTowerAttack,
+    NULL,
+    NULL	}
+};
+
 #define CannonTowerHumanAnimations	CannonTowerAnimations
 #define CannonTowerOrcAnimations	CannonTowerAnimations
+local Animations CannonTowerAnimations[] = {
+{   DefaultStill,
+    NULL,
+    CannonTowerAttack,
+    NULL,
+    NULL	}
+};
+
 #define CircleofPowerAnimations		BuildingAnimations
 #define DarkPortalAnimations		BuildingAnimations
 #define RunestoneAnimations		BuildingAnimations
 #define WallHumanAnimations		BuildingAnimations
 #define WallOrcAnimations		BuildingAnimations
 
-#define DeadBodyAnimations		BuildingAnimations
-#define Destroyed1x1PlaceAnimations	BuildingAnimations
-#define Destroyed2x2PlaceAnimations	BuildingAnimations
-#define Destroyed3x3PlaceAnimations	BuildingAnimations
-#define Destroyed4x4PlaceAnimations	BuildingAnimations
+local Animations DeadBodyAnimations[] = {
+{   NULL,
+    NULL,
+    NULL,
+    DeadBodyDie,
+    NULL	}
+};
+
+#define Destroyed1x1PlaceAnimations	DestroyedPlaceAnimations
+#define Destroyed2x2PlaceAnimations	DestroyedPlaceAnimations
+#define Destroyed3x3PlaceAnimations	DestroyedPlaceAnimations
+#define Destroyed4x4PlaceAnimations	DestroyedPlaceAnimations
+local Animations DestroyedPlaceAnimations[] = {
+{   NULL,
+    NULL,
+    NULL,
+    DestroyedPlaceDie,
+    NULL	}
+};
 
 #define PeasantWithGoldAnimations	PeasantAnimations
 #define PeonWithGoldAnimations		PeonAnimations
@@ -1053,6 +1061,25 @@ local Animations CannonTowerAnimations[] = {
 #define PeonWithWoodAnimations		PeonAnimations
 #define TankerHumanFullAnimations	TankerHumanAnimations	
 #define TankerOrcFullAnimations		TankerOrcAnimations
+
+/*----------------------------------------------------------------------------
+--	Corpse
+----------------------------------------------------------------------------*/
+
+#define CorpseNone		NULL, NULL, 0
+#define CorpseOrc		"unit-dead-body", NULL, 0
+#define CorpseHuman		"unit-dead-body", NULL, 6
+#define CorpseShip		"unit-dead-body", NULL, 12
+
+#define CorpseLandSite1x1	"unit-destroyed-1x1-place", NULL, 0
+#define CorpseLandSite2x2	"unit-destroyed-2x2-place", NULL, 0
+#define CorpseLandSite3x3	"unit-destroyed-3x3-place", NULL, 0
+#define CorpseLandSite4x4	"unit-destroyed-4x4-place", NULL, 0
+
+#define CorpseWaterSite1x1	"unit-destroyed-1x1-place", NULL, 3
+#define CorpseWaterSite2x2	"unit-destroyed-2x2-place", NULL, 3
+#define CorpseWaterSite3x3	"unit-destroyed-3x3-place", NULL, 3
+#define CorpseWaterSite4x4	"unit-destroyed-4x4-place", NULL, 3
 
 /*----------------------------------------------------------------------------
 --	Unit types table
@@ -2332,7 +2359,7 @@ global UnitType UnitTypes[] = {
     ,  0,  0			// graphic size
    ,NothingAnimations	// animations
    ,{ "icon-cancel" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,    99,      0,     0,      0,     0, {    0,     0,      0,     0 }
@@ -2850,7 +2877,7 @@ global UnitType UnitTypes[] = {
     ,  0,  0			// graphic size
    ,Nothing3Animations	// animations
    ,{ "icon-cancel" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,    99,      0,     0,      0,     0, {    0,     0,      0,     0 }
@@ -3072,7 +3099,7 @@ global UnitType UnitTypes[] = {
     ,  0,  0			// graphic size
    ,Nothing4Animations	// animations
    ,{ "icon-cancel" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,    99,      0,     0,      0,     0, {    0,     0,      0,     0 }
@@ -3220,8 +3247,8 @@ global UnitType UnitTypes[] = {
     , 64, 64			// graphic size
    ,FarmAnimations	// animations
    ,{ "icon-farm" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    400,     0, {  100,   500,    250,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3257,8 +3284,8 @@ global UnitType UnitTypes[] = {
     , 64, 64			// graphic size
    ,PigFarmAnimations	// animations
    ,{ "icon-pig-farm" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    400,     0, {  100,   500,    250,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3294,8 +3321,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,BarracksHumanAnimations	// animations
    ,{ "icon-human-barracks" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    800,     0, {  200,   700,    450,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3331,8 +3358,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,BarracksOrcAnimations	// animations
    ,{ "icon-orc-barracks" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    800,     0, {  200,   700,    450,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3368,8 +3395,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,ChurchAnimations	// animations
    ,{ "icon-church" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    700,     0, {  175,   900,    500,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3405,8 +3432,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,AltarOfStormsAnimations	// animations
    ,{ "icon-altar-of-storms" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    700,     0, {  175,   900,    500,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3443,7 +3470,7 @@ global UnitType UnitTypes[] = {
    ,ScoutTowerHumanAnimations	// animations
    ,{ "icon-human-watch-tower" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     9,    100,     0, {   60,   550,    200,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3480,7 +3507,7 @@ global UnitType UnitTypes[] = {
    ,ScoutTowerOrcAnimations	// animations
    ,{ "icon-orc-watch-tower" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     9,    100,     0, {   60,   550,    200,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3516,8 +3543,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,StablesAnimations	// animations
    ,{ "icon-stables" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    500,     0, {  150,  1000,    300,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3553,8 +3580,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,OgreMoundAnimations	// animations
    ,{ "icon-ogre-mound" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    500,     0, {  150,  1000,    300,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3590,8 +3617,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,GnomishInventorAnimations	// animations
    ,{ "icon-gnomish-inventor" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    500,     0, {  150,  1000,    400,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3627,8 +3654,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,GoblinAlchemistAnimations	// animations
    ,{ "icon-goblin-alchemist" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    500,     0, {  150,  1000,    400,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3664,8 +3691,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,GryphonAviaryAnimations	// animations
    ,{ "icon-gryphon-aviary" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    500,     0, {  150,  1000,    400,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3701,8 +3728,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,DragonRoostAnimations	// animations
    ,{ "icon-dragon-roost" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    500,     0, {  150,  1000,    400,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3738,8 +3765,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,ShipyardHumanAnimations	// animations
    ,{ "icon-human-shipyard" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseWaterSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseWaterSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      7,     3,   1100,     0, {  200,   800,    450,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3775,8 +3802,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,ShipyardOrcAnimations	// animations
    ,{ "icon-orc-shipyard" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseWaterSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseWaterSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      8,     3,   1100,     0, {  200,   800,    450,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3812,8 +3839,8 @@ global UnitType UnitTypes[] = {
     ,128,128			// graphic size
    ,TownHallAnimations	// animations
    ,{ "icon-town-hall" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite4x4
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     4,   1200,     0, {  255,  1200,    800,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3849,8 +3876,8 @@ global UnitType UnitTypes[] = {
     ,128,128			// graphic size
    ,GreatHallAnimations	// animations
    ,{ "icon-great-hall" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite4x4
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     4,   1200,     0, {  255,  1200,    800,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3886,8 +3913,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,ElvenLumberMillAnimations	// animations
    ,{ "icon-elven-lumber-mill" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    600,     0, {  150,   600,    450,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3923,8 +3950,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,TrollLumberMillAnimations	// animations
    ,{ "icon-troll-lumber-mill" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    600,     0, {  150,   600,    450,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3960,8 +3987,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,FoundryHumanAnimations	// animations
    ,{ "icon-human-foundry" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseWaterSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseWaterSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,     13,     3,    750,     0, {  175,   700,    400,   400 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -3997,8 +4024,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,FoundryOrcAnimations	// animations
    ,{ "icon-orc-foundry" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseWaterSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseWaterSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,     14,     3,    750,     0, {  175,   700,    400,   400 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4034,8 +4061,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,MageTowerAnimations	// animations
    ,{ "icon-mage-tower" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    500,     0, {  125,  1000,    200,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4071,8 +4098,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,TempleOfTheDamnedAnimations	// animations
    ,{ "icon-temple-of-the-damned" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    500,     0, {  125,  1000,    200,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4108,8 +4135,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,BlacksmithHumanAnimations	// animations
    ,{ "icon-human-blacksmith" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    775,     0, {  200,   800,    450,   100 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4145,8 +4172,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,BlacksmithOrcAnimations	// animations
    ,{ "icon-orc-blacksmith" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,    775,     0, {  200,   800,    450,   100 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4182,8 +4209,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,RefineryHumanAnimations	// animations
    ,{ "icon-human-refinery" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseWaterSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseWaterSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,     11,     3,    600,     0, {  225,   800,    350,   200 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4219,8 +4246,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,RefineryOrcAnimations	// animations
    ,{ "icon-orc-refinery" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseWaterSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseWaterSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,     12,     3,    600,     0, {  225,   800,    350,   200 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4256,8 +4283,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,OilPlatformHumanAnimations	// animations
    ,{ "icon-human-oil-platform" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseWaterSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseWaterSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      9,     3,    650,     0, {  200,   700,    450,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4293,8 +4320,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,OilPlatformOrcAnimations	// animations
    ,{ "icon-orc-oil-platform" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseWaterSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseWaterSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,     10,     3,    650,     0, {  200,   700,    450,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4330,8 +4357,8 @@ global UnitType UnitTypes[] = {
     ,128,128			// graphic size
    ,KeepAnimations	// animations
    ,{ "icon-keep" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite4x4
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     6,   1400,     0, {  200,  2000,   1000,   200 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4367,8 +4394,8 @@ global UnitType UnitTypes[] = {
     ,128,128			// graphic size
    ,StrongholdAnimations	// animations
    ,{ "icon-stronghold" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite4x4
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     6,   1400,     0, {  200,  2000,   1000,   200 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4404,8 +4431,8 @@ global UnitType UnitTypes[] = {
     ,128,128			// graphic size
    ,CastleAnimations	// animations
    ,{ "icon-castle" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite4x4
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     9,   1600,     0, {  200,  2500,   1200,   500 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4441,8 +4468,8 @@ global UnitType UnitTypes[] = {
     ,128,128			// graphic size
    ,FortressAnimations	// animations
    ,{ "icon-fortress" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite4x4
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     9,   1600,     0, {  200,  2500,   1200,   500 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4478,8 +4505,8 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,GoldMineAnimations	// animations
    ,{ "icon-gold-mine" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite3x3
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     3,  25500,     0, {  150,     0,      0,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4515,7 +4542,7 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,OilPatchAnimations	// animations
    ,{ "icon-oil-patch" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     0,      0,     0, {    0,     0,      0,     0 }
@@ -4552,7 +4579,7 @@ global UnitType UnitTypes[] = {
     , 32, 32			// graphic size
    ,StartLocationHumanAnimations	// animations
    ,{ "icon-cancel" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     0,      0,     0, {    0,     0,      0,     0 }
@@ -4589,7 +4616,7 @@ global UnitType UnitTypes[] = {
     , 32, 32			// graphic size
    ,StartLocationOrcAnimations	// animations
    ,{ "icon-cancel" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     0,      0,     0, {    0,     0,      0,     0 }
@@ -4627,7 +4654,7 @@ global UnitType UnitTypes[] = {
    ,GuardTowerHumanAnimations	// animations
    ,{ "icon-human-guard-tower" }
    ,{ "missile-arrow" }		// Missile
-   ,CorpseLandSite
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     9,    130,     0, {  140,   500,    150,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4664,7 +4691,7 @@ global UnitType UnitTypes[] = {
    ,GuardTowerOrcAnimations	// animations
    ,{ "icon-orc-guard-tower" }
    ,{ "missile-arrow" }		// Missile
-   ,CorpseLandSite
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     9,    130,     0, {  140,   500,    150,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4701,7 +4728,7 @@ global UnitType UnitTypes[] = {
    ,CannonTowerHumanAnimations	// animations
    ,{ "icon-human-cannon-tower" }
    ,{ "missile-small-cannon" }		// Missile
-   ,CorpseLandSite
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     9,    160,     0, {  190,  1000,    300,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4738,7 +4765,7 @@ global UnitType UnitTypes[] = {
    ,CannonTowerOrcAnimations	// animations
    ,{ "icon-orc-cannon-tower" }
    ,{ "missile-small-cannon" }		// Missile
-   ,CorpseLandSite
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     9,    160,     0, {  190,  1000,    300,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4774,8 +4801,8 @@ global UnitType UnitTypes[] = {
     , 64, 64			// graphic size
    ,CircleofPowerAnimations	// animations
    ,{ "icon-circle-of-power" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     0,      0,     0, {    0,     0,      0,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4811,8 +4838,8 @@ global UnitType UnitTypes[] = {
     ,128,128			// graphic size
    ,DarkPortalAnimations	// animations
    ,{ "icon-dark-portal" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite4x4
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     0,   5000,     0, {    0,     0,      0,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4848,8 +4875,8 @@ global UnitType UnitTypes[] = {
     , 64, 64			// graphic size
    ,RunestoneAnimations	// animations
    ,{ "icon-runestone" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite2x2
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      6,     4,   5000,     0, {  175,   900,    500,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4885,8 +4912,8 @@ global UnitType UnitTypes[] = {
     , 32, 32			// graphic size
    ,WallHumanAnimations	// animations
    ,{ "icon-human-wall" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite1x1
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,     15,     1,     40,     0, {   30,    20,     10,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4922,8 +4949,8 @@ global UnitType UnitTypes[] = {
     , 32, 32			// graphic size
    ,WallOrcAnimations	// animations
    ,{ "icon-orc-wall" }
-   ,{ "missile-lightning" }		// Missile
-   ,CorpseLandSite
+   ,{ "missile-none" }		// Missile
+   ,CorpseLandSite1x1
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,     15,     1,     40,     0, {   30,    20,     10,     0 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
@@ -4959,7 +4986,7 @@ global UnitType UnitTypes[] = {
     , 72, 72			// graphic size
    ,DeadBodyAnimations	// animations
    ,{ "icon-peasant" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     1,    255,     0, {    0,     0,      0,     0 }
@@ -4996,7 +5023,7 @@ global UnitType UnitTypes[] = {
     , 32, 32			// graphic size
    ,Destroyed1x1PlaceAnimations	// animations
    ,{ "icon-peasant" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     2,    255,     0, {    0,     0,      0,     0 }
@@ -5033,7 +5060,7 @@ global UnitType UnitTypes[] = {
     , 64, 64			// graphic size
    ,Destroyed2x2PlaceAnimations	// animations
    ,{ "icon-peasant" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     2,    255,     0, {    0,     0,      0,     0 }
@@ -5070,7 +5097,7 @@ global UnitType UnitTypes[] = {
     , 96, 96			// graphic size
    ,Destroyed3x3PlaceAnimations	// animations
    ,{ "icon-peasant" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     3,    255,     0, {    0,     0,      0,     0 }
@@ -5107,7 +5134,7 @@ global UnitType UnitTypes[] = {
     ,128,128			// graphic size
    ,Destroyed4x4PlaceAnimations	// animations
    ,{ "icon-peasant" }
-   ,{ "missile-lightning" }		// Missile
+   ,{ "missile-none" }		// Missile
    ,CorpseNone
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
 	,     0,      0,     3,    255,     0, {    0,     0,      0,     0 }
