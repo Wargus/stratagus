@@ -54,6 +54,7 @@
 <a href="#DefineMenu">DefineMenu</a>
 <a href="#DefineMenuGraphics">DefineMenuGraphics</a>
 <a href="#DefineMenuItem">DefineMenuItem</a>
+<a href="#DefinePanel">DefinePanel</a>
 <a href="#DefineUI">DefineUI</a>
 <a href="#DefineViewports">DefineViewports</a>
 <a href="#DisplayPicture">DisplayPicture</a>
@@ -880,6 +881,134 @@ Example:
                    "menu", "menu-game")
 </pre>
 
+<a name="DefinePanel"></a>
+<h3>DefinePanel({flag = value}, ...)</h3>
+
+Define panel content when an unit is selected.
+
+<dl>
+  <dt>Ident = "name"</dt>
+  <dd>identifier of the panel.</dd>
+  <dt>Pos = {x, y}<dt>
+  <dd>position of the panel. The other coordonate are relative to this point.</dd>
+  <dt>DefaultFont = "font-name"<dt>
+  <dd>Default font used in content if not redefined.</dd>
+  <dt>Condition = {flag = value}</dt>
+  <dd>condition to show the panel.
+  <dl>
+    <dt>ShowOnlySelected = Boolean</dt>
+    <dd>if true, show only if unit is selected (not just pointed).</dd>
+    <dt>HideNeutral = Boolean</dt>
+    <dd>if true, hide for neutral units.</dd>
+    <dt>HideAllied = Boolean</dt>
+    <dd>if true, hide for allied units.</dd>
+    <dt>ShowOpponent = Boolean</dt>
+    <dd>if true, show for opponent units.</dd>
+    <dt>Variable = "only", "false", "true"<dt>
+    <dd>For variables defined by DefineVariables(), show info if unit correpond with the criteria<dd>
+    <dt>Flag = "only", "false", "true"<dt>
+    <dd>For flags defined by DefineBoolFlags(), show info if unit correpond with the criteria<dd>
+  </dl> </dd>
+  <dt>Content = {flag = value}</dt>
+  <dd>The info to show, and the method associated.
+  <dl>
+    <dt>Pos = {x, y}</dt>
+    <dd>Coordinate to show element. (relatif to Panel' coordinates)</dd>
+    <dt>Condition = {flag = value}</dt>
+    <dd>Extra condition for content itself. Identic as Panel's condition</dd>
+    <dt>More = {"method-name", ExtraData}</dt>
+    <dd>Tell the method to show informations.
+    <dl>
+      <dt>"Text", "texttodisplay" or {flag = value}</dt>
+      <dd>Show simple text "texttodisplay" and after one optional variable.
+      <dl>
+        <dt>Text = "texttodisplay"</dt>
+        <dd>text to display</dd>
+        <dt>Font = "font-name"</dt>
+        <dd>font to use.</dd>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Component = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>component of value to show. Diff represent Max - value and Percent represent 100 * Value / Max.</dd>
+        <dt>ShowName = boolean</dt>
+        <dd>if true show the name of the unit and no variable information.</dd>
+        <dt>Stat = boolean</dt>
+        <dd>if true and value != max, then show value + diff else show value.</dd>
+      </dl></dd>
+
+      <dt>"FormatedText", {flag = value, ...}</dt>
+      <dd>Show text with a given format.
+      <dl>
+        <dt>Format = "texttodisplay"</dt>
+        <dd>format of the text. Must have 1 %d (for number)or %s (for string). Use ~< ~> for reverse mode.</dd>
+        <dt>Font = "font-name"</dt>
+        <dd>font to use.</dd>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Component = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>component of value to show. Diff represent Max - value and Percent represent 100 * Value / Max.</dd>
+        <dt>Centered = boolean</dt>
+        <dd>if true then text is centered on the position.</dd>
+      </dl></dd>
+
+      <dt>"FormatedText2", {flag = value, ...}</dt>
+      <dd>Similar of FormatedText but with 2 variables.
+      <dl>
+        <dt>Format = "texttodisplay"</dt>
+        <dd>format of the text. Must have 2 %d (for number)or %s (for string). Use ~< ~> for reverse mode.</dd>
+        <dt>Font = "font-name"</dt>
+        <dd>font to use.</dd>
+        <dt>Variable1 = "variable-name"</dt>
+        <dd>1st Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Variable2 = "variable-name"</dt>
+        <dd>2nd Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show(Assume var1 == var2). See DefineVariable() for more details.</dd>
+        <dt>Component1 = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>component of the 1st value to show. Diff represent Max - value and Percent represent 100 * Value / Max.</dd>
+        <dt>Component2 = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>component of 2nd value to show. Diff represent Max - value and Percent represent 100 * Value / Max.</dd>
+        <dt>Component = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>Assume that component1 == component2.</dd>
+        <dt>Centered = boolean</dt>
+        <dd>if true then text is centered on the position.</dd>
+      </dl></dd>
+
+      <dt>"Icon", {flag = value, ...}</dt>
+      <dd>Draw the icon of a specified unit.
+      <dl>
+        <dt>Unit = "ItSelf" or "Inside" or "Container" or "Worker" or "Goal"</dt>
+        <dd>which unit to draw : itself or first unit inside or its container
+            or the unit which is building it or the goal objective.</dd>
+      </dl></dd>
+
+      <dt>"LifeBar", {flag = value, ...}</dt>
+      <dd>Draw a bar which represent the variable. Change color depend of the percent.
+      <dl>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Height = value</dt>
+        <dd>Height of the bar.</dd>
+        <dt>Width = value</dt>
+        <dd>width of the bar.</dd>
+      </dl></dd>
+      <dt>"CompleteBar", {flag = value, ...}</dt>
+      <dd>Draw a bar which represent the variable.
+      <dl>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Height = value</dt>
+        <dd>Height of the bar.</dd>
+        <dt>Width = value</dt>
+        <dd>width of the bar.</dd>
+        <dt>Border = boolean</dt>
+        <dd>if true then add border for the bar.</dd>
+      </dl></dd>
+    </dl></dd>
+  </dd></dl>
+</dl>
+
+
 <a name="DefineUI"></a>
 <h3>DefineUI("race-name", screen-width, screen-height, tag1, value1, tag2, value2, ...)</h3>
 
@@ -950,6 +1079,8 @@ FIXME
     <dd>FIXME</dd>
   </dl>
   </dd>
+  <dt>"panels", "panel-ident" or {"panel-ident1", ...}</dt>
+  <dd>Panel ident to show when unit is selected. (see DefinePanels() for more details)</dd>
   <dt>"selected", {tag, value}</dt>
   <dd>FIXME
   <dl>
@@ -965,8 +1096,6 @@ FIXME
     <dt>"multiple", {tag, value}</dt>
     <dd>FIXME
     <dl>
-      <dt>"text", {tag, value}</dt>
-      <dd>FIXME</dd>
       <dt>"icons", {{tag, value}, ...}</dt>
       <dd>FIXME, see above (icon)</dd>
       <dt>"max-text", {tag, value}</dt>
@@ -982,8 +1111,6 @@ FIXME
     <dt>"single", {tag, value}</dt>
     <dd>FIXME
     <dl>
-      <dt>"text", {tag, value}</dt>
-      <dd>FIXME</dd>
       <dt>"icon", {tag, value}</dt>
       <dd>FIXME</dd>
     </dl>
@@ -1004,8 +1131,6 @@ FIXME
   <dt>"upgrading", {tag, value}</dt>
   <dd>FIXME
   <dl>
-    <dt>"text", {tag, value}</dt>
-    <dd>FIXME</dd>
     <dt>"icon", {tag, value}</dt>
     <dd>FIXME</dd>
   </dl>
@@ -1014,8 +1139,6 @@ FIXME
   <dt>"researching", {tag, value}</dt>
   <dd>FIXME
   <dl>
-    <dt>"text", {tag, value}</dt>
-    <dd>FIXME</dd>
     <dt>"icon", {tag, value}</dt>
     <dd>FIXME</dd>
   </dl>
@@ -1024,8 +1147,6 @@ FIXME
   <dt>"transporting", {tag, value}</dt>
   <dd>FIXME
   <dl>
-    <dt>"text", {tag, value}</dt>
-    <dd>FIXME</dd>
     <dt>"icons", {{tag, value}, ...}</dt>
     <dd>FIXME, see above (icon)</dd>
   </dl>
@@ -1036,12 +1157,6 @@ FIXME
   <dl>
     <dt>"color", {r, g, b}</dt>
     <dd>FIXME</dd>
-    <dt>"pos", {x, y}</dt>
-    <dd>FIXME</dd>
-    <dt>"size", {width, height}</dt>
-    <dd>FIXME</dd>
-    <dt>"text", {tag, value}</dt>
-    <dd>FIXME(text, font, x, y)</dd>
     <dt>"has-shadow"</dt>
     <dd>FIXME</dd>
   </dl>
