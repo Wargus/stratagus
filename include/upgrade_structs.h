@@ -132,6 +132,7 @@ typedef struct _unit_stats_ {
 	int PiercingDamage;             ///< weapon piercing damage
 	int HitPoints;                  ///< hit points
 	int RegenerationRate;           ///< HP regeration rate in HP
+	int Mana;                       ///< Mana points.
 	int Costs[MaxCosts];            ///< current costs of the unit
 	int Level;                      ///< unit level (upgrades)
 } UnitStats;
@@ -157,15 +158,7 @@ typedef struct _upgrade_ {
 */
 typedef struct _modifiers_ {
 	struct _variable_type_* Variables;  ///< userdefined variable modifier.
-	int AttackRange;                ///< attack range modifier
-	int SightRange;                 ///< sight range modifier
-	int BasicDamage;                ///< basic damage modifier
-	int PiercingDamage;             ///< piercing damage modifier
-	int Armor;                      ///< armor modifier
-	int HitPoints;                  ///< hit points modifier
-	int RegenerationRate;           ///< HP regeneration rate modifier
-
-	int Costs[MaxCosts];            ///< costs modifier
+	int Costs[MaxCosts];                ///< costs modifier
 } Modifiers;
 
 /**

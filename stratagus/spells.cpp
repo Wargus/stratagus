@@ -268,8 +268,8 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 		if (target->Mana < 0) {
 			target->Mana = 0;
 		}
-		if (target->Mana > target->Type->_MaxMana) {
-			target->Mana = target->Type->_MaxMana;
+		if (target->Mana > target->Stats->Mana) {
+			target->Mana = target->Stats->Mana;
 		}
 	}
 	return 0;
@@ -543,7 +543,7 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 		diffHP = target->HP;
 	}
 	if (mana > 0) {
-		diffMana = target->Type->_MaxMana - target->Mana;
+		diffMana = target->Stats->Mana - target->Mana;
 	} else {
 		diffMana = target->Mana;
 	}
@@ -580,8 +580,8 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	if (target->Mana < 0) {
 		target->Mana = 0;
 	}
-	if (target->Mana > target->Type->_MaxMana) {
-		target->Mana = target->Type->_MaxMana;
+	if (target->Mana > target->Stats->Mana) {
+		target->Mana = target->Stats->Mana;
 	}
 
 	return 0;
@@ -873,10 +873,10 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 		return 0;
 	}
 	if (target->Type->CanCastSpell) {
-		if (condition->MinManaPercent * target->Type->_MaxMana / 100 > target->Mana) {
+		if (condition->MinManaPercent * target->Stats->Mana / 100 > target->Mana) {
 			return 0;
 		}
-		if (condition->MaxManaPercent * target->Type->_MaxMana / 100 < target->Mana) {
+		if (condition->MaxManaPercent * target->Stats->Mana / 100 < target->Mana) {
 			return 0;
 		}
 	}
