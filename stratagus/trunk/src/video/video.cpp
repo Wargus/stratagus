@@ -1193,6 +1193,14 @@ global void VideoUnlockScreen(void)
 }
 
 /**
+**	Clear the video screen.
+*/
+global void VideoClearScreen(void)
+{
+    VideoFillRectangle(ColorBlack,0,0,VideoWidth,VideoHeight);
+}
+
+/**
 **	Return ticks in ms since start.
 */
 global unsigned long GetTicks(void)
