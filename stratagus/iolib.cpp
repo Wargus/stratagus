@@ -47,6 +47,11 @@
 #include "freecraft.h"
 #include "iolib.h"
 
+#ifdef USE_ZZIPLIB
+#include <zziplib.h>
+#include <zzipformat.h>
+#endif
+
 #ifndef O_BINARY
 #define O_BINARY	0
 #endif
@@ -260,7 +265,7 @@ global int CLclose(CLFile *file)
 }
 
 /**
-**	CLclose		Library file read
+**	CLread		Library file read
 **
 **	@param file	CLFile pointer.
 **	@param buf	Pointer to read the data to.
@@ -476,14 +481,25 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 {
 #ifdef _MSC_VER
     // FIXME: help write this function
+    // find_first()/find_next() are your friends - well whoever cares..
+#else
+#ifdef USE_ZZIPLIB
+    ZZIP_DIR *dirp = NULL;
+    ZZIP_DIRENT *dp;
+    // ATTENTION: valid until end of file!
+    #define readdir zzip_readdir
+    #define closedir zzip_closedir
+    int entvalid;
+    char zzbasepath[PATH_MAX];
 #else
     DIR *dirp;
     struct dirent *dp;
+#endif
     struct stat st;
     FileList *nfl, *fl = NULL;
-    int n = 0;
+    int n = 0, isdir = 0; // silence gcc..
     char *cp, *np;
-    char buffer[1024];
+    char buffer[PATH_MAX];
 
     strcpy(buffer, dirname);
     cp = strrchr(buffer, '/');
@@ -491,7 +507,39 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 	strcat(buffer, "/");
     }
     np = strrchr(buffer, '/') + 1;
+
+#ifdef USE_ZZIPLIB
+    strcpy (zzbasepath, dirname);
+    /* per each slash in filename, check if it there is a zzip around */
+    while ((cp = strrchr(zzbasepath, '/'))) 
+    {
+	int fd;
+	zzip_error_t e;
+
+	*cp = '\0'; /* cut at path separator == possible zipfile basename */
+	fd = __zzip_open_zip(zzbasepath, O_RDONLY|O_BINARY);
+	if (fd == -1) {
+	    continue;
+	}
+	/* found zip-file, now open it */
+	dirp = zzip_dir_fdopen(fd, &e);
+	if (e) {
+	    errno = zzip_errno(e);
+	    close(fd);
+	    dirp = NULL;
+	    break;
+	}
+    }
+    if (!dirp) {
+	dirp = zzip_opendir(dirname);
+	zzbasepath[0] = 0;
+    }
+#else
     dirp = opendir(dirname);
+#endif
+    if (!dirp) {
+	DebugLevel0Fn("Dir `%s' not found\n", dirname);
+    }
     if (dirp) {
 	while ((dp = readdir(dirp)) != NULL) {
 	    if (strcmp(dp->d_name, ".") == 0)
@@ -500,8 +548,67 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		continue;
 
 	    strcpy(np, dp->d_name);
+#ifdef USE_ZZIPLIB
+	    entvalid = 0;
+	    if (zzip_dir_real(dirp)) {
+		if (stat(buffer, &st) == 0) {
+		    isdir = S_ISDIR(st.st_mode);
+		    if (isdir || S_ISREG(st.st_mode)) {
+			entvalid = 1;
+			if (!isdir) {	// Find out if we have a zip here ..
+			    cp = strrchr(buffer, '.');
+			    if (cp) {
+				*cp = 0;
+				isdir = __zzip_open_zip(buffer, O_RDONLY|O_BINARY);
+				if (isdir != -1) {
+				    close(isdir);
+				    isdir = 1;
+				} else {
+				    isdir = 0;
+				    *cp = '.';
+				}
+			    }
+			}
+		    }
+		}
+	    } else {
+		entvalid = 0;
+		if (zzbasepath[0]) {
+		    cp = (char *)dirname + strlen(zzbasepath) + 1;
+		    cp = strchr(cp, '/') + 1;
+		    DebugLevel3Fn("dirprefix `%s', `%s'\n", cp, np);
+		    isdir = strlen(cp);
+		    if (strlen(dp->d_name) >= isdir && memcmp(dp->d_name, cp, isdir) == 0 &&
+				dp->d_name[isdir] == '/' &&
+				dp->d_name[isdir + 1]) {
+			entvalid = 1;
+			strcpy(np, dp->d_name + isdir + 1);
+		    }
+		} else {
+		    entvalid = 1;
+		}
+		if (entvalid) {
+		    cp = strrchr(np, '/');
+		    if (cp && cp[1]) {
+			entvalid = 0;
+		    } else {
+			entvalid = 1;
+			isdir = ( cp && dp->d_compr == ZZIP_IS_STORED &&
+			      dp->st_size == 0 );
+			      // FIXME: also check for crc == 0... how ?
+			if (isdir) {
+			    *cp = 0;
+			}
+		    }
+		}
+	    }
+	    {
+		if (entvalid) {
+#else //    }}
 	    if (stat(buffer, &st) == 0) {
-		if (S_ISREG(st.st_mode) || S_ISDIR(st.st_mode)) {
+		isdir = S_ISDIR(st.st_mode);
+		if (isdir || S_ISREG(st.st_mode)) {
+#endif
 		    if (n) {
 			nfl = realloc(fl, sizeof(FileList) * (n + 1));
 			if (nfl) {
@@ -512,7 +619,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 			fl = nfl = malloc(sizeof(FileList));
 		    }
 		    if (nfl) {
-			if (S_ISDIR(st.st_mode)) {
+			if (isdir) {
 			    nfl->name = strdup(np);
 			    nfl->type = 0;
 			    nfl->xdata = NULL;
