@@ -2887,7 +2887,9 @@ static void SinglePlayerGameMenu(void)
 */
 static void CampaignGameMenu(void)
 {
+#ifdef DEBUG
 	int i;
+#endif
 	Menu* menu;
 
 	menu = FindMenu("menu-campaign-select");
