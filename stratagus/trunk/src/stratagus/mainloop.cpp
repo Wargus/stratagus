@@ -650,9 +650,7 @@ global void GameMainLoop(void)
 
     MultiPlayerReplayEachCycle();
 
-#ifdef WITH_SOUND
     PlaySectionMusic(PlaySectionGame);
-#endif
 
     while( GameRunning ) {
 #if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
@@ -853,9 +851,7 @@ global void GameMainLoop(void)
     }
 
     if( GameResult==GameVictory || GameResult==GameDefeat ) {
-#ifdef WITH_SOUND
 	PlaySectionMusic(PlaySectionStats);
-#endif
 	ShowStats();
     }
 

@@ -193,6 +193,7 @@ extern void StopMusic(void);
 #define StopMusic()			/// Dummy macro for without sound
 #define CallbackMusicOn()		/// Dummy macro for without sound
 #define CallbackMusicOff()		/// Dummy macro for without sound
+#define PlaySectionMusic(v)		/// Dummy macro for without sound
 
 #endif	// } WITH_SOUND
 
