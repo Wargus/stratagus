@@ -63,7 +63,7 @@
 <A HREF="#game-cycle">game-cycle</A>
 <A HREF="#get-freecraft-home-path">get-freecraft-home-path</A>
 <A HREF="#get-freecraft-library-path">get-freecraft-library-path</A>
-<A HREF="#get-player-resources">get-player-resources</A>
+<A HREF="#get-player-resource">get-player-resource</A>
 <A HREF="#get-this-player">get-this-player</A>
 <A HREF="#get-unit-unholy-armor">get-unit-unholy-armor</A>
 <A HREF="#group">group</A>
@@ -86,7 +86,7 @@
 <A HREF="#set-diplomacy!">set-diplomacy!</A>
 <A HREF="#set-game-cycle!">set-game-cycle!</A>
 <A HREF="#set-group-id!">set-group-id!</A>
-<A HREF="#set-player-resources!">set-player-resources!</A>
+<A HREF="#set-player-resource!">set-player-resource!</A>
 <A HREF="#set-shared-vision!">set-shared-vision!</A>
 <A HREF="#set-this-player!">set-this-player!</A>
 <A HREF="#set-unit-unholy-armor!">set-unit-unholy-armor!</A>
@@ -809,34 +809,35 @@ Returns the current game cycle.
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
 
-<A NAME="get-player-resources"></A>
-<H3>get-player-resources</H3>
+<A NAME="get-player-resource"></A>
+<H3>get-player-resource</H3>
 
 <H4>Description</H4>
 
-.
+Get the amount of a resource for a certain player.
 
 <H4>Syntax</H4>
 
-<CODE>(get-player-resources)</CODE>
+<CODE>(get-player-resource player resource)</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>player</DT>
+<DD>Player number.
+</DD>
+<DT>resource</DT>
+<DD>Name of the resource.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (get-player-resources)
+    (get-player-resource 0 'gold)
 </PRE>
 
-<P>.
+<P>Gets the amount of gold that player 0 has.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="get-this-player"></A>
 <H3>get-this-player</H3>
@@ -1463,34 +1464,39 @@ Set the current game cycle number.
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
 
-<A NAME="set-player-resources!"></A>
-<H3>set-player-resources!</H3>
+<A NAME="set-player-resource!"></A>
+<H3>set-player-resource!</H3>
 
 <H4>Description</H4>
 
-.
+Set the amount of resources for a certain player.
 
 <H4>Syntax</H4>
 
-<CODE>(set-player-resources!)</CODE>
+<CODE>(set-player-resource! player resource amount [[resource amount] ...])</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>player</DT>
+<DD>Player number.
+</DD>
+<DT>resource</DT>
+<DD>Name of the resource.
+</DD>
+<DT>amount</DT>
+<DD>Number to set the resource to.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (set-player-resources!)
+    (set-player-resource! 0 'gold 2000)
+    (set-player-resource! 1 'gold (+ 500 (get-player-resource 1 'gold)))
 </PRE>
 
-<P>.
+<P>Sets player 0's gold to 2000.  Adds 500 gold to player 1.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="set-shared-vision!"></A>
 <H3>set-shared-vision!</H3>
