@@ -274,7 +274,7 @@ local int Sdl2InternalKeycode(const SDL_keysym * code, int *keychar)
     *keychar = 0;
     switch ((icode = code->sym)) {
 	case SDLK_ESCAPE:
-	    *keychar = icode = '\e';
+	    *keychar = icode = '\033';
 	    break;
 	case SDLK_RETURN:
 	    *keychar = icode = '\r';
@@ -561,7 +561,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     SDL_Event event[1];
     Uint32 ticks;
 
-#ifndef USE_SDLA
+#if defined(WITH_SOUND) && !defined(USE_SDLA)
     // FIXME: ugly hack, move into sound part!!!
     if( SoundFildes==-1 ) {
 	SoundOff=1;
@@ -579,10 +579,10 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 
     ticks=SDL_GetTicks();
     if( ticks>NextFrameTicks ) {	// We are too slow :(
-	IfDebug(
+//	IfDebug(
 	    // FIXME: need locking!
 	    //VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
-	);
+//	);
 	++SlowFrameCounter;
     }
 
