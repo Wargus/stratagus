@@ -86,7 +86,7 @@ extern void PlayUnitSound(Unit* unit,UnitVoiceGroup unit_voice_group);
     @param missile the missile (origin of the sound)
     @param sound the sound to play
 */
-extern void PlayMissileSound(Missile* missile,SoundId sound);
+extern void PlayMissileSound(const Missile* missile,SoundId sound);
 
 /** Ask to the sound server to play a sound: low level call.
     @param sound the sound to play.

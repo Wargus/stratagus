@@ -143,201 +143,268 @@ global char MissileTypeType[] = "missile-type";
 /**
 **	Define missile types.
 */
-global MissileType MissileTypes[] = {
+global MissileType MissileTypes[MissileTypeMax] = {
 { MissileTypeType,
     "missile-lightning",
     "lightning.png",
     32,32,
     { NULL },
-    MissileClassPointToPointWithHit,	},
+    MissileClassPointToPointWithHit,
+    1,
+    },
 { MissileTypeType,
     "missile-griffon-hammer",
     "gryphon hammer.png",
     32,32,
     { "fireball hit" },
-    MissileClassPointToPoint3Bounces,	},
+    MissileClassPointToPoint3Bounces,
+    1,
+    "missile-explosion",	NULL,
+    },
 { MissileTypeType,
     "missile-dragon-breath",
     "dragon breath.png",
     32,32,
     { "fireball hit" },
-    MissileClassPointToPoint3Bounces,	},
+    MissileClassPointToPoint3Bounces,
+    1,
+    "missile-explosion",	NULL,
+    },
 { MissileTypeType,
     "missile-fireball",
     "fireball.png",
     32,32,
     { "fireball hit" },
-    MissileClassFireball,		},
+    MissileClassFireball,	
+    1,
+    },
 { MissileTypeType,
     "missile-flame-shield",
     "flame shield.png",
     32,32,
     { NULL },
-    MissileClassFlameShield,		},
+    MissileClassFlameShield,	
+    1,
+    },
 { MissileTypeType,
     "missile-blizzard",
     "blizzard.png",
     32,32,
     { NULL },
-    MissileClassBlizzard,		},
+    MissileClassBlizzard,	
+    1,
+    },
 { MissileTypeType,
     "missile-death-and-decay",
     "death and decay.png",
     32,32,
     { NULL },
-    MissileClassDeathDecay,		},
+    MissileClassDeathDecay,	
+    1,
+    },
 { MissileTypeType,
     "missile-big-cannon",
     "big cannon.png",
     16,16,
     { "explosion" },
-    MissileClassPointToPoint,		},
+    MissileClassPointToPoint,	
+    1,
+    "missile-cannon-tower-explosion",	NULL,
+    },
 { MissileTypeType,
     "missile-exorcism",
     "exorcism.png",
     32,32,
     { NULL },
-    MissileClassPointToPoint,		},
+    MissileClassPointToPoint,	
+    1,
+    },
 { MissileTypeType,
     "missile-heal-effect",
     "heal effect.png",
     32,32,
     { NULL },
-    MissileClassPointToPoint,		},
+    MissileClassPointToPoint,	
+    1,
+    },
 { MissileTypeType,
     "missile-touch-of-death",
     "touch of death.png",
     32,32,
     { NULL },
-    MissileClassPointToPointWithHit,	},
+    MissileClassPointToPointWithHit,
+    1,
+    },
 { MissileTypeType,
     "missile-rune",
     "rune.png",
     32,32,
     { NULL },
-    MissileClassStayWithDelay,		},
+    MissileClassStayWithDelay,	
+    1,
+    },
 { MissileTypeType,
     "missile-whirlwind",
     "tornado.png",
     56,56,
     { NULL },
-    MissileClassWhirlwind,		},
+    MissileClassWhirlwind,	
+    1,
+    },
 { MissileTypeType,
     "missile-catapult-rock",
     "catapult rock.png",
     32,32,
     { "explosion" },
-    MissileClassPointToPointWithDelay,	},
+    MissileClassPointToPointWithDelay,
+    1,
+    "missile-impact",	NULL,
+    },
 { MissileTypeType,
     "missile-ballista-bolt",
     "ballista bolt.png",
     64,64,
     { "explosion" },
-    MissileClassPointToPoint,		},
+    MissileClassPointToPoint,	
+    1,
+    "missile-impact",	NULL,
+    },
 { MissileTypeType,
     "missile-arrow",
     "arrow.png",
     40,40,
     { "bow-hit" },
-    MissileClassPointToPoint,		},
+    MissileClassPointToPoint,	
+    1,
+    },
 { MissileTypeType,
     "missile-axe",
     "axe.png",
     32,32,
     { "bow-hit" },
-    MissileClassPointToPoint,		},
+    MissileClassPointToPoint,	
+    1,
+    },
 { MissileTypeType,
     "missile-submarine-missile",
     "submarine missile.png",
     40,40,
     { "explosion" },
-    MissileClassPointToPoint,		},
+    MissileClassPointToPoint,	
+    1,
+    "missile-impact",	NULL,
+    },
 { MissileTypeType,
     "missile-turtle-missile",
     "turtle missile.png",
     40,40,
     { "explosion" },
-    MissileClassPointToPoint,		},
+    MissileClassPointToPoint,	
+    1,
+    "missile-impact",	NULL,
+    },
 { MissileTypeType,
     "missile-small-fire",
     "small fire.png",
     32,48,
     { NULL },
-    MissileClassStayWithDelay,		},
+    MissileClassStayWithDelay,	
+    1,
+    },
 { MissileTypeType,
     "missile-big-fire",
     "big fire.png",
     48,48,
     { NULL },
-    MissileClassStayWithDelay,		},
+    MissileClassStayWithDelay,	
+    1,
+    },
 { MissileTypeType,
     "missile-impact",
     "ballista-catapult impact.png",
     48,48,
     { NULL },
-    MissileClassStayWithDelay,		},
+    MissileClassStayWithDelay,	
+    1,
+    },
 { MissileTypeType,
     "missile-normal-spell",
     "normal spell.png",
     32,32,
     { NULL },
-    MissileClassStayWithDelay,		},
+    MissileClassStayWithDelay,	
+    1,
+    },
 { MissileTypeType,
     "missile-explosion",
     "explosion.png",
     64,64,
     { NULL },
-    MissileClassStayWithDelay,		},
+    MissileClassStayWithDelay,	
+    1,
+    },
 { MissileTypeType,
     "missile-small-cannon",
     "cannon.png",
     32,32,
     { "explosion" },
-    MissileClassPointToPointWithDelay,	},
+    MissileClassPointToPointWithDelay,
+    1,
+    "missile-cannon-explosion",	NULL,
+    },
 { MissileTypeType,
     "missile-cannon-explosion",
     "cannon explosion.png",
     32,32,
     { NULL },
-    MissileClassStayWithDelay,		},
+    MissileClassStayWithDelay,	
+    1,
+    },
 { MissileTypeType,
     "missile-cannon-tower-explosion",
     "cannon-tower explosion.png",
     32,32,
     { NULL },
-    MissileClassStayWithDelay,		},
+    MissileClassStayWithDelay,	
+    1,
+    },
 { MissileTypeType,
     "missile-daemon-fire",
     "daemon fire.png",
     32,32,
     { NULL },
-    MissileClassPointToPoint,		},
+    MissileClassPointToPoint,	
+    1,
+    },
 { MissileTypeType,
     "missile-green-cross",
     "green cross.png",
     32,32,
     { NULL },
-    MissileClassCycleOnce,			FRAMES_PER_SECOND/30	},
+    MissileClassCycleOnce,
+    FRAMES_PER_SECOND/30
+    },
 { MissileTypeType,
     "missile-none",
     NULL,
     32,32,
     { NULL },
-    MissileClassNone,			},
+    MissileClassNone,		
+    1,
+    },
 };
 
 #define MAX_MISSILES	1800		/// maximum number of missiles
 
 local int NumMissiles;			/// currently used missiles
-
 local Missile Missiles[MAX_MISSILES];	/// all missiles on map
 
     /// lookup table for missile names
 local hashtable(MissileType*,61) MissileHash;
 
-/*============================================================================
-==	MISSILE FUNCTIONS
-============================================================================*/
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Load the graphics for the missiles.
@@ -357,7 +424,6 @@ global void LoadMissileSprites(void)
 	    MissileTypes[i].RleSprite=LoadRleSprite(
 		    file,MissileTypes[i].Width,MissileTypes[i].Height);
 	}
-	MissileTypes[i].Type=i;
     }
 
     //
@@ -366,6 +432,16 @@ global void LoadMissileSprites(void)
     for( i=0; i<sizeof(MissileTypes)/sizeof(*MissileTypes); ++i ) {
 	*(MissileType**)hash_add(MissileHash,MissileTypes[i].Ident)
 		=&MissileTypes[i];
+    }
+
+    //
+    //	Resolve impact missiles.
+    //
+    for( i=0; i<sizeof(MissileTypes)/sizeof(*MissileTypes); ++i ) {
+	if( MissileTypes[i].ImpactName ) {
+	    MissileTypes[i].ImpactMissile
+		    =MissileTypeByIdent(MissileTypes[i].ImpactName);
+	}
     }
 }
 
@@ -393,32 +469,26 @@ global MissileType* MissileTypeByIdent(const char* ident)
 /**
 **	Create a new missile at (x,y).
 **
-**	@param missle_type	Type of missile.
-**	@param sx		Missile x start point in pixel.
-**	@param sy		Missile y start point in pixel.
-**	@param dx		Missile x destination point in pixel.
-**	@param dy		Missile y destination point in pixel.
+**	@param type	Type pointer of missile.
+**	@param sx	Missile x start point in pixel.
+**	@param sy	Missile y start point in pixel.
+**	@param dx	Missile x destination point in pixel.
+**	@param dy	Missile y destination point in pixel.
 **
 **	@returns	created missile.
 */
-global Missile* MakeMissile(int missile_type,int sx,int sy,int dx,int dy)
+global Missile* MakeMissile(MissileType* type,int sx,int sy,int dx,int dy)
 {
-    int missile;
+    Missile* missile;
 
-    DebugLevel3(__FUNCTION__": type %d(%s) at %d,%d to %d,%d\n"
-	    ,missile_type,MissileTypes[missile_type].Name
-	    ,sx,sy,dx,dy);
-
-    if( missile_type>sizeof(MissileTypes)/sizeof(*MissileTypes) ) {
-	DebugLevel0(__FUNCTION__": INTERNAL: Illegal type\n");
-	return NULL;
-    }
+    DebugLevel3(__FUNCTION__": type %Zd(%s) at %d,%d to %d,%d\n"
+	    ,type-MissileTypes,type->Name,sx,sy,dx,dy);
 
     //
     //	Find free slot, FIXME: see MakeUnit for better code
     //
-    for( missile=0; missile<NumMissiles; ++missile ) {
-	if( Missiles[missile].Type==MissileFree ) {
+    for( missile=Missiles; missile<Missiles+NumMissiles; ++missile ) {
+	if( missile->Type==MissileFree ) {
 	    goto found;
 	}
     }
@@ -430,24 +500,24 @@ global Missile* MakeMissile(int missile_type,int sx,int sy,int dx,int dy)
 	return NULL;
     }
 
-    missile=NumMissiles++;
+    missile=Missiles+NumMissiles++;
 
 found:
-    Missiles[missile].X=sx;
-    Missiles[missile].Y=sy;
-    Missiles[missile].DX=dx;
-    Missiles[missile].DY=dy;
-    Missiles[missile].Type=&MissileTypes[missile_type];
-    Missiles[missile].Frame=0;
-    Missiles[missile].State=0;
-    Missiles[missile].Wait=1;
+    missile->X=sx;
+    missile->Y=sy;
+    missile->DX=dx;
+    missile->DY=dy;
+    missile->Type=type;
+    missile->Frame=0;
+    missile->State=0;
+    missile->Wait=1;
 
-    Missiles[missile].SourceUnit=NULL;
-    Missiles[missile].SourceType=NULL;
-    Missiles[missile].SourceStats=NULL;
-    Missiles[missile].SourcePlayer=NULL;
+    missile->SourceUnit=NULL;
+    missile->SourceType=NULL;
+    missile->SourceStats=NULL;
+    missile->SourcePlayer=NULL;
 
-    return &Missiles[missile];
+    return missile;
 }
 
 /**
@@ -458,6 +528,10 @@ found:
 **	damage =----------------------------------
 **				    2
 **	damage is multiplied by random 1 or 2.
+**
+**	NOTE: different targets (big are hit by some missiles better)
+**	NOTE: hiden targets are hit worser.
+**	NOTE: targets higher are hit worser.
 **
 **	@param attack_stats	Attacker attributes.
 **	@param goal_stats	Goal attributes.
@@ -511,7 +585,7 @@ global void FireMissile(Unit* unit)
     DebugLevel3(__FUNCTION__":\n");
 
     if( ((MissileType*)unit->Type->Missile.Missile)->Class==MissileClassNone ) {
-	// FIXME: must hit now!!!
+	// Hit immediately
 	if( !(goal=unit->Command.Data.Move.Goal) ) {
 	    dx=unit->Command.Data.Move.DX;
 	    dy=unit->Command.Data.Move.DY;
@@ -547,13 +621,17 @@ global void FireMissile(Unit* unit)
 #endif
 	if( goal->Removed ) {
 	    DebugLevel3("Missile-none hits removed unit!\n");
+#ifdef NEW_UNIT
 	    --goal->Refs;
+#endif
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 	    DebugLevel3("Missile-none hits dead unit!\n");
+#ifdef NEW_UNIT
 	    --goal->Refs;
+#endif
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
@@ -591,8 +669,7 @@ global void FireMissile(Unit* unit)
 	dy=unit->Command.Data.Move.DY*TileSizeY+TileSizeY/2;
     }
 
-    missile=MakeMissile((MissileType*)unit->Type->Missile.Missile-MissileTypes
-	    ,x,y,dx,dy);
+    missile=MakeMissile(unit->Type->Missile.Missile,x,y,dx,dy);
     //
     //	Damage of missile
     //
@@ -606,19 +683,47 @@ global void FireMissile(Unit* unit)
 }
 
 /**
+**	Check missile visibility.
+**
+**	@param missile	Missile pointer to check if visible.
+**
+**	@return		Returns true if visibile, false otherwise.
+*/
+local int MissileVisible(const Missile* missile)
+{
+    int tileMinX;
+    int tileMaxX;
+    int tileMinY;
+    int tileMaxY;
+
+    tileMinX=(missile->X-missile->Type->Width/2)/TileSizeX;
+    tileMinY=(missile->Y-missile->Type->Height/2)/TileSizeY;
+    tileMaxX=(missile->X+missile->Type->Width/2)/TileSizeX;
+    tileMaxY=(missile->Y+missile->Type->Height/2)/TileSizeY;
+    if ( (tileMinX>(MapX+MapWidth)) || (tileMaxX<MapX)
+	    || (tileMinY>MapY+MapHeight) || (tileMaxY<MapY)) {
+	return 0;
+    }
+    DebugLevel3("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
+		tileMinX,tileMaxX,tileMinY,tileMaxY,
+		MapX,MapX+MapWidth,MapY,MapY+MapHeight);
+    return 1;
+}
+
+/**
 **	Draw missile.
 */
-global void DrawMissile(MissileType* missile_type,int frame,int x,int y)
+global void DrawMissile(const MissileType* type,int frame,int x,int y)
 {
     // FIXME: remove this here, move to higher functions
-    x-=missile_type->Width/2;
-    y-=missile_type->Height/2;
+    x-=type->Width/2;
+    y-=type->Height/2;
 
     // FIXME: This is a hack for mirrored sprites
     if( frame&128 ) {
-	DrawRleSpriteClippedX(missile_type->RleSprite,frame&127,x,y);
+	DrawRleSpriteClippedX(type->RleSprite,frame&127,x,y);
     } else {
-	DrawRleSpriteClipped(missile_type->RleSprite,frame,x,y);
+	DrawRleSpriteClipped(type->RleSprite,frame,x,y);
     }
 }
 
@@ -627,22 +732,23 @@ global void DrawMissile(MissileType* missile_type,int frame,int x,int y)
 */
 global void DrawMissiles(void)
 {
-    int missile;
+    Missile* missile;
+    Missile* missiles_end;
     int x;
     int y;
 
-    for( missile=0; missile<NumMissiles; ++missile ) {
-	if( Missiles[missile].Type==MissileFree ) {
+    missiles_end=Missiles+NumMissiles;
+    for( missile=Missiles; missile<missiles_end; ++missile ) {
+	// FIXME: make table of used slots!
+	if( missile->Type==MissileFree ) {
 	    continue;
 	}
-	// FIXME: is this correct???
-	x=Missiles[missile].X-MapX*TileSizeX+TheUI.MapX;
-	y=Missiles[missile].Y-MapY*TileSizeY+TheUI.MapY;
-	if( x<TheUI.MapX || x>=TheUI.MapWidth
-		|| y<TheUI.MapY || y>=TheUI.MapHeight ) {
-	    continue;
+	// Draw only visibile missiles
+	if (MissileVisible(missile)) {
+	    x=missile->X-MapX*TileSizeX+TheUI.MapX;
+	    y=missile->Y-MapY*TileSizeY+TheUI.MapY;
+	    DrawMissile(missile->Type,missile->Frame,x,y);
 	}
-	DrawMissile(Missiles[missile].Type,Missiles[missile].Frame,x,y);
     }
 }
 
@@ -707,7 +813,7 @@ local void MissileNewHeadingFromXY(Missile* missile,int dx,int dy)
 /**
 **	Handle point to point missile.
 */
-local int PointToPointMissile(int missile)
+local int PointToPointMissile(Missile* missile)
 {
     int dx;
     int dy;
@@ -715,15 +821,15 @@ local int PointToPointMissile(int missile)
     int ystep;
     int i;
 
-    if( !(Missiles[missile].State&1) ) {
+    if( !(missile->State&1) ) {
 	// initialize
-	dy=Missiles[missile].DY-Missiles[missile].Y;
+	dy=missile->DY-missile->Y;
 	ystep=1;
 	if( dy<0 ) {
 	    dy=-dy;
 	    ystep=-1;
 	}
-	dx=Missiles[missile].DX-Missiles[missile].X;
+	dx=missile->DX-missile->X;
 	xstep=1;
 	if( dx<0 ) {
 	    dx=-dx;
@@ -731,7 +837,7 @@ local int PointToPointMissile(int missile)
 	}
 
 	// FIXME: could be better written
-	MissileNewHeadingFromXY(&Missiles[missile],dx*xstep,dy*ystep);
+	MissileNewHeadingFromXY(missile,dx*xstep,dy*ystep);
 
 	if( dy==0 ) {		// horizontal line
 	    if( dx==0 ) {
@@ -739,64 +845,64 @@ local int PointToPointMissile(int missile)
 	    }
 	} else if( dx==0 ) {	// vertical line
 	} else if( dx<dy ) {	// step in vertical direction
-	    Missiles[missile].D=dy-1;
+	    missile->D=dy-1;
 	    dx+=dx;
 	    dy+=dy;
         } else if( dx>dy ) {	// step in horizontal direction
-	    Missiles[missile].D=dx-1;
+	    missile->D=dx-1;
 	    dx+=dx;
 	    dy+=dy;
 	}
 
-	Missiles[missile].Dx=dx;
-	Missiles[missile].Dy=dy;
-	Missiles[missile].Xstep=xstep;
-	Missiles[missile].Ystep=ystep;
-	++Missiles[missile].State;
+	missile->Dx=dx;
+	missile->Dy=dy;
+	missile->Xstep=xstep;
+	missile->Ystep=ystep;
+	++missile->State;
 	DebugLevel3("Init: %d,%d, %d,%d, =%d\n"
-		,dx,dy,xstep,ystep,Missiles[missile].D);
+		,dx,dy,xstep,ystep,missile->D);
 	return 0;
     } else {
-	dx=Missiles[missile].Dx;
-	dy=Missiles[missile].Dy;
-	xstep=Missiles[missile].Xstep;
-	ystep=Missiles[missile].Ystep;
+	// on the way
+	dx=missile->Dx;
+	dy=missile->Dy;
+	xstep=missile->Xstep;
+	ystep=missile->Ystep;
     }
-
 
     //
     //	Move missile
     //
     if( dy==0 ) {		// horizontal line
 	for( i=0; i<MISSILE_STEPS; ++i ) {
-	    if( Missiles[missile].X==Missiles[missile].DX ) {
+	    if( missile->X==missile->DX ) {
 		return 1;
 	    }
-	    Missiles[missile].X+=xstep;
+	    missile->X+=xstep;
 	}
 	return 0;
     }
 
     if( dx==0 ) {		// vertical line
 	for( i=0; i<MISSILE_STEPS; ++i ) {
-	    if( Missiles[missile].Y==Missiles[missile].DY ) {
+	    if( missile->Y==missile->DY ) {
 		return 1;
 	    }
-	    Missiles[missile].Y+=ystep;
+	    missile->Y+=ystep;
 	}
 	return 0;
     }
 
     if( dx<dy ) {		// step in vertical direction
 	for( i=0; i<MISSILE_STEPS; ++i ) {
-	    if( Missiles[missile].Y==Missiles[missile].DY ) {
+	    if( missile->Y==missile->DY ) {
 		return 1;
 	    }
-	    Missiles[missile].Y+=ystep;
-	    Missiles[missile].D-=dx;
-	    if( Missiles[missile].D<0 ) {
-		Missiles[missile].D+=dy;
-		Missiles[missile].X+=xstep;
+	    missile->Y+=ystep;
+	    missile->D-=dx;
+	    if( missile->D<0 ) {
+		missile->D+=dy;
+		missile->X+=xstep;
 	    }
 	}
 	return 0;
@@ -804,25 +910,25 @@ local int PointToPointMissile(int missile)
 
     if( dx>dy ) {		// step in horizontal direction
 	for( i=0; i<MISSILE_STEPS; ++i ) {
-	    if( Missiles[missile].X==Missiles[missile].DX ) {
+	    if( missile->X==missile->DX ) {
 		return 1;
 	    }
-	    Missiles[missile].X+=xstep;
-	    Missiles[missile].D-=dy;
-	    if( Missiles[missile].D<0 ) {
-		Missiles[missile].D+=dx;
-		Missiles[missile].Y+=ystep;
+	    missile->X+=xstep;
+	    missile->D-=dy;
+	    if( missile->D<0 ) {
+		missile->D+=dx;
+		missile->Y+=ystep;
 	    }
 	}
 	return 0;
     }
 				// diagonal line
     for( i=0; i<MISSILE_STEPS; ++i ) {
-	if( Missiles[missile].Y==Missiles[missile].DY ) {
+	if( missile->Y==missile->DY ) {
 	    return 1;
 	}
-	Missiles[missile].X+=xstep;
-	Missiles[missile].Y+=ystep;
+	missile->X+=xstep;
+	missile->Y+=ystep;
     }
     return 0;
 }
@@ -830,285 +936,195 @@ local int PointToPointMissile(int missile)
 /**
 **	Work for missile hit.
 */
-global void MissileHit(int missile)
+global void MissileHit(const Missile* missile)
 {
     Unit* goal;
 
     // FIXME: should I move the PlayMissileSound to here?
-    // FIXME: And should the the connected missile be defined in the missile
-    // FIXME: structure
 
-    switch( Missiles[missile].Type->Type ) {
-	case MissileArrow:
-	case MissileAxe:
-	    PlayMissileSound(Missiles+missile,
-			     Missiles[missile].Type->ImpactSound.Sound);
-	    break;
-	case MissileBallistaBolt:
-	case MissileBigCannon:
-	    PlayMissileSound(Missiles+missile,
-			     Missiles[missile].Type->ImpactSound.Sound);
-	    MakeMissile(MissileImpact
-		,Missiles[missile].X
-		,Missiles[missile].Y
-		,0,0);
-	    break;
-
-	case MissileSubmarineMissile:
-	case MissileTurtleMissile:
-	    PlayMissileSound(Missiles+missile,
-			     Missiles[missile].Type->ImpactSound.Sound);
-	    MakeMissile(MissileImpact
-		,Missiles[missile].X
-		,Missiles[missile].Y
-		,0,0);
-	    break;
-
-	case MissileGreenCross:
-	    break;
+    if( missile->Type->ImpactSound.Sound ) {
+	PlayMissileSound(missile,missile->Type->ImpactSound.Sound);
     }
-
-    if( !Missiles[missile].SourceType ) {
+    if( missile->Type->ImpactMissile ) {
+	MakeMissile(missile->Type->ImpactMissile,missile->X,missile->Y,0,0);
+    }
+    if( !missile->SourceType ) {	// no target
 	return;
     }
 
     // FIXME: must choose better goal!
     // FIXME: what can the missile hit?
-    goal=UnitOnMapTile(Missiles[missile].X/TileSizeX
-		,Missiles[missile].Y/TileSizeY);
+    // FIXME: "missile-catapult-rock", "missile-ballista-bolt", have are effect
+    goal=UnitOnMapTile(missile->X/TileSizeX,missile->Y/TileSizeY);
     if( !goal || !goal->HP ) {
 	int dx;
 	int dy;
 
-	dx=Missiles[missile].X/TileSizeX;
-	dy=Missiles[missile].Y/TileSizeY;
+	dx=missile->X/TileSizeX;
+	dy=missile->Y/TileSizeY;
 	if( WallOnMap(dx,dy) ) {
 	    DebugLevel3("Missile on wall?\n");
 	    // FIXME: don't use UnitTypeByIdent here, this is slow!
-	    HitWall(dx,dy,CalculateDamageStats(Missiles[missile].SourceStats,
-		    UnitTypeByIdent("unit-human-wall")->Stats));
+	    if( HumanWallOnMap(dx,dy) ) {
+		HitWall(dx,dy,CalculateDamageStats(missile->SourceStats,
+			UnitTypeByIdent("unit-human-wall")->Stats));
+	    } else {
+		HitWall(dx,dy,CalculateDamageStats(missile->SourceStats,
+			UnitTypeByIdent("unit-orc-wall")->Stats));
+	    }
 	    return;
 	}
+	DebugLevel0(__FUNCTION__": Oops nothing to hit?");
 	return;
     }
 
-    HitUnit(goal,CalculateDamage(Missiles[missile].SourceStats,goal));
-}
-
-/**
- ** Check missile visibility.
- */
-//FIXME: is this correct?
-//FIXME: should be exported?
-local int MissileVisible(int missile)
-{
-    int tileMinX,tileMaxX;
-    int tileMinY,tileMaxY;
-
-    tileMinX=Missiles[missile].X/TileSizeX;
-    tileMinY=Missiles[missile].Y/TileSizeY;
-    tileMaxX=(Missiles[missile].X+Missiles[missile].Type->Width)/TileSizeX;
-    tileMaxY=(Missiles[missile].Y+Missiles[missile].Type->Height)/TileSizeY;
-    if ( (tileMinX>(MapX+MapWidth)) || (tileMaxX<MapX)
-	 || (tileMinY>MapY+MapHeight) || (tileMaxY<MapY)) {
-	return 0;
-    }
-    DebugLevel3("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
-		tileMinX,tileMaxX,tileMinY,tileMaxY,
-		MapX,MapX+MapWidth,MapY,MapY+MapHeight);
-    return 1;
+    HitUnit(goal,CalculateDamage(missile->SourceStats,goal));
 }
 
 /**
 **	Handle all missile actions.
 */
-//FIXME: (Fabrice) I don't know if my update for missile visibility is fully
-//correct.
 global void MissileActions(void)
 {
-    int missile;
+    Missile* missile;
+    Missile* missiles_end;
 
-    for( missile=0; missile<NumMissiles; ++missile ) {
-	if( Missiles[missile].Type==MissileFree ) {
+    missiles_end=Missiles+NumMissiles;
+    for( missile=Missiles; missile<missiles_end; ++missile ) {
+	if( missile->Type==MissileFree ) {
 	    continue;
 	}
-	if( Missiles[missile].Wait-- ) {
+	if( missile->Wait-- ) {
 	    continue;
 	}
 	if (MissileVisible(missile)) {
 	    // check before movement
 	    MustRedraw|=RedrawMap;
+	    // FIXME: must mark the exact tile, for more optimazation
 	}
-	switch( Missiles[missile].Type->Class ) {
 
+	switch( missile->Type->Class ) {
+	    //
+	    //	Missile flies from x,y to x1,y1
+	    //
 	    case MissileClassPointToPoint:
-		Missiles[missile].Wait=1;
+		missile->Wait=missile->Type->Speed;
 		if( PointToPointMissile(missile) ) {
 		    MissileHit(missile);
-		    Missiles[missile].Type=MissileFree;
+		    missile->Type=MissileFree;
 		} else {
 		    //
 		    //	Animate missile, cycle through frames
 		    //
-		    Missiles[missile].Frame+=5;
-		    if( (Missiles[missile].Frame&127)
-			    >=Missiles[missile].Type->RleSprite->NumFrames ) {
-			Missiles[missile].Frame=
-			    // (Missiles[missile].Frame&128)|
-				(Missiles[missile].Frame
-				    -Missiles[missile].Type->RleSprite
-					->NumFrames);
+		    missile->Frame+=5;		// FIXME: frames pro row
+		    if( (missile->Frame&127)
+			    >=missile->Type->RleSprite->NumFrames ) {
+			missile->Frame-=missile->Type->RleSprite->NumFrames;
 		    }
 		    DebugLevel3("Frame %d of %d\n"
-			,Missiles[missile].Frame
-			,Missiles[missile].Type->RleSprite->NumFrames);
-
+			,missile->Frame
+			,missile->Type->RleSprite->NumFrames);
 		}
 		break;
 
 	    case MissileClassPointToPointWithDelay:
-		Missiles[missile].Wait=1;
+		missile->Wait=missile->Type->Speed;
 		if( PointToPointMissile(missile) ) {
-		    switch( Missiles[missile].State++ ) {
-			case 1:
-			    // FIXME: bounces up.
-			    PlayMissileSound(Missiles+missile,
-				     Missiles[missile].Type->ImpactSound.Sound);
-			    // FIXME: make this configurable!!
-			    switch( Missiles[missile].Type->Type ) {
-				case MissileSmallCannon:
-				    MakeMissile(MissileCannonExplosion
-					,Missiles[missile].X
-					,Missiles[missile].Y
-					,0,0);
-				    break;
-				case MissileBigCannon:
-				    MakeMissile(MissileCannonTowerExplosion
-					,Missiles[missile].X
-					,Missiles[missile].Y
-					,0,0);
-				    break;
-				case MissileCatapultRock:
-				case MissileBallistaBolt:
-				    MakeMissile(MissileImpact
-					,Missiles[missile].X
-					,Missiles[missile].Y
-					,0,0);
-				    break;
-			    }
-			    break;
-			default:
-			    MissileHit(missile);
-			    Missiles[missile].Type=MissileFree;
-			    break;
-		    }
+		    MissileHit(missile);
+		    missile->Type=MissileFree;
 		} else {
 		    //
 		    //	Animate missile, depends on the way.
-		    //
+		    //		FIXME: becomes bigger than smaller.
 		    // FIXME: how?
 		}
 		break;
 
 	    case MissileClassPointToPoint3Bounces:
-		Missiles[missile].Wait=1;
+		missile->Wait=missile->Type->Speed;
 		if( PointToPointMissile(missile) ) {
 		    //
 		    //	3 Bounces.
 		    //
-		    switch( Missiles[missile].State ) {
+		    switch( missile->State ) {
 			case 1:
 			case 3:
 			case 5:
-			    Missiles[missile].State+=2;
-			    Missiles[missile].DX+=
-				Missiles[missile].Xstep*TileSizeX*2;
-			    Missiles[missile].DY+=
-				Missiles[missile].Ystep*TileSizeY*2;
-			    PlayMissileSound(Missiles+missile,
-				    Missiles[missile].Type->ImpactSound.Sound);
-			    MakeMissile(MissileExplosion
-				,Missiles[missile].X
-				,Missiles[missile].Y
-				,0,0);
+			    missile->State+=2;
+			    missile->DX+=missile->Xstep*TileSizeX*2;
+			    missile->DY+=missile->Ystep*TileSizeY*2;
 			    MissileHit(missile);
 			    // FIXME: hits to left and right
-			    // FIXME: reduce damage
+			    // FIXME: reduce damage effect
 			    break;
 			default:
-			    Missiles[missile].Type=MissileFree;
+			    missile->Type=MissileFree;
 			    break;
 		    }
 		} else {
 		    //
 		    //	Animate missile, cycle through frames
 		    //
-		    Missiles[missile].Frame+=5;
-		    if( (Missiles[missile].Frame&127)
-			    >=Missiles[missile].Type->RleSprite->NumFrames ) {
-			Missiles[missile].Frame=
-			    // (Missiles[missile].Frame&128)|
-				(Missiles[missile].Frame
-				    -Missiles[missile].Type->RleSprite
-					->NumFrames);
+		    missile->Frame+=5;		// FIXME: frames pro row
+		    if( (missile->Frame&127)
+			    >=missile->Type->RleSprite->NumFrames ) {
+			missile->Frame-=missile->Type->RleSprite->NumFrames;
 		    }
 		    DebugLevel3("Frame %d of %d\n"
-			,Missiles[missile].Frame
-			,Missiles[missile].Type->RleSprite->NumFrames);
+			,missile->Frame
+			,missile->Type->RleSprite->NumFrames);
 
 		}
 		break;
 
 	    case MissileClassPointToPointWithHit:
-		Missiles[missile].Wait=1;
+		missile->Wait=missile->Type->Speed;
 		if( PointToPointMissile(missile) ) {
 		    //
 		    //	Animate hit
 		    //
-		    Missiles[missile].Frame+=5;
-		    if( (Missiles[missile].Frame&127)
-			    >=Missiles[missile].Type->RleSprite->NumFrames ) {
+		    missile->Frame+=5;	// FIXME: frames pro row
+		    if( (missile->Frame&127)
+			    >=missile->Type->RleSprite->NumFrames ) {
 			MissileHit(missile);
-			Missiles[missile].Type=MissileFree;
+			missile->Type=MissileFree;
 		    }
 		}
 		break;
 
 	    case MissileClassStayWithDelay:
-		Missiles[missile].Wait=1;
-		if( ++Missiles[missile].Frame
-			==Missiles[missile].Type->RleSprite
-			    ->NumFrames ) {
+		missile->Wait=missile->Type->Speed;
+		if( ++missile->Frame==missile->Type->RleSprite->NumFrames ) {
 		    MissileHit(missile);
-		    Missiles[missile].Type=MissileFree;
+		    missile->Type=MissileFree;
 		}
 		break;
 
 	    case MissileClassCycleOnce:
-		Missiles[missile].Wait=Missiles[missile].Type->Speed;
-		switch( Missiles[missile].State ) {
+		missile->Wait=missile->Type->Speed;
+		switch( missile->State ) {
 		    case 0:
 		    case 2:
-			++Missiles[missile].State;
+			++missile->State;
 			break;
 		    case 1:
-			if( ++Missiles[missile].Frame
-				==Missiles[missile].Type->RleSprite
-				    ->NumFrames ) {
-			    --Missiles[missile].Frame;
-			    ++Missiles[missile].State;
+			if( ++missile->Frame
+				==missile->Type->RleSprite->NumFrames ) {
+			    --missile->Frame;
+			    ++missile->State;
 			}
 			break;
 		    case 3:
-			if( !Missiles[missile].Frame-- ) {
+			if( !missile->Frame-- ) {
 			    MissileHit(missile);
-			    Missiles[missile].Type=MissileFree;
+			    missile->Type=MissileFree;
 			}
 			break;
 		}
 		break;
 	}
-	if (Missiles[missile].Type!=MissileFree && MissileVisible(missile)) {
+
+	if (missile->Type!=MissileFree && MissileVisible(missile)) {
 	    // check after movement
 	    MustRedraw|=RedrawMap;
 	}
@@ -1117,16 +1133,18 @@ global void MissileActions(void)
 
 /**
 **	Calculate distance from view-point to missle.
+**
+**	@param missile	Missile pointer for distance.
 */
-global int ViewPointDistanceToMissile(const Missile* dest)
+global int ViewPointDistanceToMissile(const Missile* missile)
 {
     int x;
     int y;
 
-    x=dest->X/TileSizeX;
-    y=dest->Y/TileSizeY;		// pixel -> tile
+    x=missile->X/TileSizeX;
+    y=missile->Y/TileSizeY;		// pixel -> tile
 
-    DebugLevel3(__FUNCTION__": Missile %p at %d %d\n",dest,x,y);
+    DebugLevel3(__FUNCTION__": Missile %p at %d %d\n",missile,x,y);
 
     return ViewPointDistance(x,y);
 }

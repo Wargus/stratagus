@@ -195,7 +195,7 @@ global void PlayUnitSound(Unit* unit,UnitVoiceGroup unit_voice_group)
 /**
 **	FIXME: docu
 */
-global void PlayMissileSound(Missile* missile,SoundId sound) {
+global void PlayMissileSound(const Missile* missile,SoundId sound) {
     DebugLevel3("Playing %p at volume %u\n",sound,volume);
     InsertSoundRequest(NULL,
 		       0,
