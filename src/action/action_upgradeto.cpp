@@ -96,7 +96,7 @@ global void HandleActionUpgradeTo(Unit* unit)
 
 		// Update Possible sight range change
 		MapUnmarkUnitSight(unit);
-		unit->CurrentSightRange = unit->Stats[player->Player].SightRange;
+		unit->CurrentSightRange = unit->Stats->SightRange;
 		MapMarkUnitSight(unit);
 
 		//
