@@ -39,6 +39,10 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+IfDebug(
+extern int NoWarningMissileType;		/// quiet ident lookup.
+);
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -119,8 +123,11 @@ local SCM CclDefineMissileType(SCM list)
 
     str=gh_scm2newstr(gh_car(list),NULL);
     list=gh_cdr(list);
+    IfDebug( i=NoWarningMissileType; NoWarningMissileType=1; );
     type=MissileTypeByIdent(str);
+    IfDebug( NoWarningMissileType=i; );
     if( type ) {
+	DebugLevel0Fn("Redefining missile-type `%s'\n",str);
 	CclFree(str);
     } else {
 	type=NewMissileTypeSlot(str);
