@@ -2633,6 +2633,10 @@ global void LetUnitDie(Unit* unit)
 		|| type->StoresGold || type->StoresWood
 		|| type->GivesOil || type->StoresOil
 		|| unit->Orders[0].Action==UnitActionBuilded ) {
+	    if( type->GivesOil && unit->Orders[0].Action==UnitActionBuilded ) {
+		// Restore value for oil-patch
+		unit->Value=unit->Data.Builded.Worker->Value;
+	    }
 	    DestroyAllInside(unit);
 	}
 
