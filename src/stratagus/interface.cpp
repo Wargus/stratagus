@@ -261,6 +261,11 @@ local int InputKey(int key)
 #endif
                 // Handle cheats
 		// FIXME: disable cheats
+                if (strcmp(Input, "there is no aliens level") == 0)
+                  {
+		  // FIXME: no function yet.
+                  SetMessage( "cheat enabled" );
+                  } else
                 if (strcmp(Input, "hatchet") == 0)
                   {
                   SpeedChop = 52/2;
