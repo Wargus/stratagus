@@ -672,20 +672,20 @@ global void SoundCclRegister(void)
 
     gh_new_procedureN("define-play-sections",CclDefinePlaySections);
 
-    init_subr_0("sound-off",CclSoundOff);
-    init_subr_0("sound-on",CclSoundOn);
-    init_subr_0("music-off",CclMusicOff);
-    init_subr_0("music-on",CclMusicOn);
-    init_subr_0("sound-thread",CclSoundThread);
-    init_subr_1("set-global-sound-range!",CclSetGlobalSoundRange);
-    init_lsubr("define-game-sounds",CclDefineGameSounds);
-    init_subr_0("display-sounds",CclDisplaySounds);
-    init_subr_2("map-sound",CclMapSound);
-    init_subr_1("sound-for-name",CclSoundForName);
-    init_subr_2("set-sound-range!",CclSetSoundRange);
-    init_subr_2("make-sound",CclMakeSound);
-    init_subr_3("make-sound-group",CclMakeSoundGroup);
-    init_subr_1("play-sound",CclPlaySound);
+    gh_new_procedure0_0("sound-off",CclSoundOff);
+    gh_new_procedure0_0("sound-on",CclSoundOn);
+    gh_new_procedure0_0("music-off",CclMusicOff);
+    gh_new_procedure0_0("music-on",CclMusicOn);
+    gh_new_procedure0_0("sound-thread",CclSoundThread);
+    gh_new_procedure1_0("set-global-sound-range!",CclSetGlobalSoundRange);
+    gh_new_procedureN("define-game-sounds",CclDefineGameSounds);
+    gh_new_procedure0_0("display-sounds",CclDisplaySounds);
+    gh_new_procedure2_0("map-sound",CclMapSound);
+    gh_new_procedure1_0("sound-for-name",CclSoundForName);
+    gh_new_procedure2_0("set-sound-range!",CclSetSoundRange);
+    gh_new_procedure2_0("make-sound",CclMakeSound);
+    gh_new_procedure3_0("make-sound-group",CclMakeSoundGroup);
+    gh_new_procedure1_0("play-sound",CclPlaySound);
 
     gh_new_procedure1_0("play-music",CclPlayMusic);
     gh_new_procedure1_0("play-file",CclPlayFile);
