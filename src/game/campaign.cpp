@@ -130,10 +130,10 @@ global char* NextChapter(void)
 **	Play the campaign.
 **
 **	@param name	Name of the campaign.
+**	@note		::CurrentMapPath contains the filename of first level.
 */
 global void PlayCampaign(const char* name)
 {
-    char* s;
     char* filename;
     int i;
 
@@ -161,6 +161,11 @@ global void PlayCampaign(const char* name)
     SkipCurrentChapter=1;
     GameResult=GameNoResult;
 
+    strcpy(CurrentMapPath, filename);
+
+#if 0
+    // NOW DONE in create game?
+
     // FIXME: Johns is this here needed? Can the map loaded in create game?
     // ARI: Yes - This switches the menu gfx.. from def. Orc to Human, etc
     InitUnitTypes();
@@ -186,6 +191,7 @@ global void PlayCampaign(const char* name)
     if (s) {
 	free(s);
     }
+#endif
 }
 
 /**
