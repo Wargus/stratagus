@@ -728,9 +728,6 @@ local void UpdateButtonPanelMultipleUnits(void)
     }
 
     i=PlayerRacesIndex(ThisPlayer->Race);
-    if( i==-1 ) {
-	i=PlayerRaces.Race[PlayerRaces.Count-1];
-    }
     sprintf(unit_ident,",%s-group,",PlayerRaces.Name[i]);
 
     for( z = 0; z < NumUnitButtons; z++ ) {
