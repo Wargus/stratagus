@@ -67,8 +67,17 @@ extern int PlaceReachable(Unit* unit,int x,int y);
     ///
 extern int UnitReachable(Unit* unit,Unit* dest);
 
+//
+//	in astar.c
+//
     /// Returns the next element of the path
 extern int NextPathElement(Unit*,int* xdp,int* ydp);
+
+    /// Init the a* data structures
+extern void InitAStar(void);
+
+    /// free the a* data structures
+extern void FreeAStar(void);
 
 //
 //	in ccl_pathfinder.c

@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define DEBUG
+
 #include "freecraft.h"
 
 #if defined(USE_CCL) || defined(USE_CCL2)	// {
@@ -50,6 +52,11 @@
 local SCM CclAStar(void)
 {
     AStarOn=1;
+    if(!CclInConfigFile) {
+	// allocation is done directly in this alternate case
+	InitAStar();
+    }
+    DebugLevel0("A* is ON :-)\n");
 
     return SCM_UNSPECIFIED;
 }
@@ -60,6 +67,10 @@ local SCM CclAStar(void)
 local SCM CclNoAStar(void)
 {
     AStarOn=0;
+    if(!CclInConfigFile) {
+	FreeAStar();
+    }
+    DebugLevel0("A* is OFF :-(\n");
 
     return SCM_UNSPECIFIED;
 }
@@ -74,7 +85,7 @@ local SCM CclAStarSetFixedUCC(SCM cost)
     i=gh_scm2int(cost);
     if( i<=0) {
 	fprintf(stderr,__FUNCTION__": Fixed unit crossing cost must be strictly positive\n");
-	i=MaxMapWidth*MaxMapHeight;
+	i=TheMap.Width*TheMap.Height;
     }
     AStarFixedUnitCrossingCost=i;
 

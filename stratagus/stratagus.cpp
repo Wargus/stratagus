@@ -70,6 +70,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "sound_server.h"
 #include "sound.h"
 #include "network.h"
+#include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -411,6 +412,10 @@ global int main1(int argc __attribute__ ((unused)),
 	}
     }
 #endif
+    //FIXME: must be done after map is loaded
+    if(AStarOn) {
+	InitAStar();
+    }
 
     SetStatusLine(NameLine);
     SetMessage("Do it! Do it now!");
