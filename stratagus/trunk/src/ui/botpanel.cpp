@@ -824,7 +824,7 @@ void DoButtonButtonClicked(int button)
 
 		case ButtonCancelBuild:
 			// FIXME: johns is this not sure, only building should have this?
-			Assert(Selected[0]->Orders[0].Action == UnitActionBuild);
+			Assert(Selected[0]->Orders[0].Action == UnitActionBuilded);
 			if (NumSelected == 1) {
 				SendCommandDismiss(Selected[0]);
 			}
