@@ -709,6 +709,9 @@ local unsigned X112InternalKeycode(const KeySym code)
 	case XK_KP_Subtract:
 	    icode=KeyCodeKPMinus;
 	    break;
+	case XK_Print:
+	    icode=KeyCodePrint;
+	    break;
 
 	case XK_dead_circumflex:
 	    icode='^';

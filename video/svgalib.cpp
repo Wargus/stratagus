@@ -726,6 +726,8 @@ local void KeyboardEvent(int scancode, int press)
 	    case SCANCODE_KEYPADMINUS:
 		icode = KeyCodeKPMinus;
 		break;
+	    case SCANCODE_PRINTSCREEN:
+		icode = KeyCodePrint;
 
 		// KeyCodePause
 
