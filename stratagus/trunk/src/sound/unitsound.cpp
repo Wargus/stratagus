@@ -316,7 +316,7 @@ void MapUnitSounds(void)
 	int j;
 
 	if (SoundFildes != -1) {
-		SetSoundRange(SoundIdForName("tree chopping"), 32);
+		SetSoundRange(SoundIdForName("tree-chopping"), 32);
 
 		//
 		// Parse all units sounds.
