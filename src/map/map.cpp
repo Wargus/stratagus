@@ -72,7 +72,7 @@ global void MapMarkSeenTile(int x, int y)
 {
     int tile;
     int seentile;
-    MapField *mf;
+    MapField* mf;
 
     mf = TheMap.Fields + x + y * TheMap.Width;
     //
@@ -92,11 +92,11 @@ global void MapMarkSeenTile(int x, int y)
     //
     //  Handle wood changes. FIXME: check if for growing wood correct?
     //
-    if (seentile != TheMap.Tileset->RemovedTree
-	    && tile == TheMap.Tileset->RemovedTree) {
+    if (seentile != TheMap.Tileset->RemovedTree &&
+	    tile == TheMap.Tileset->RemovedTree) {
 	MapFixSeenWoodNeighbors(x, y);
-    } else if (seentile == TheMap.Tileset->RemovedTree
-	    && tile != TheMap.Tileset->RemovedTree) {
+    } else if (seentile == TheMap.Tileset->RemovedTree &&
+	    tile != TheMap.Tileset->RemovedTree) {
 	MapFixSeenWoodTile(x, y);
     } else if (ForestOnMap(x, y)) {
 	MapFixSeenWoodTile(x, y);
@@ -105,11 +105,11 @@ global void MapMarkSeenTile(int x, int y)
 	//
 	//  Handle rock changes.
 	//
-    } else if (seentile != TheMap.Tileset->RemovedRock
-	    && tile == TheMap.Tileset->RemovedRock) {
+    } else if (seentile != TheMap.Tileset->RemovedRock &&
+	    tile == TheMap.Tileset->RemovedRock) {
 	MapFixSeenRockNeighbors(x, y);
-    } else if (seentile == TheMap.Tileset->RemovedRock
-	    && tile != TheMap.Tileset->RemovedRock) {
+    } else if (seentile == TheMap.Tileset->RemovedRock &&
+	    tile != TheMap.Tileset->RemovedRock) {
 	MapFixSeenRockTile(x, y);
     } else if (RockOnMap(x, y)) {
 	MapFixSeenRockTile(x, y);
@@ -118,10 +118,10 @@ global void MapMarkSeenTile(int x, int y)
 	//
 	//  Handle Walls changes.
 	//
-    } else if (TheMap.Tileset->TileTypeTable[tile] == TileTypeHumanWall
-	    || TheMap.Tileset->TileTypeTable[tile] == TileTypeOrcWall
-	    || TheMap.Tileset->TileTypeTable[seentile] == TileTypeHumanWall
-	    || TheMap.Tileset->TileTypeTable[seentile] == TileTypeOrcWall) {
+    } else if (TheMap.Tileset->TileTypeTable[tile] == TileTypeHumanWall ||
+	    TheMap.Tileset->TileTypeTable[tile] == TileTypeOrcWall ||
+	    TheMap.Tileset->TileTypeTable[seentile] == TileTypeHumanWall ||
+	    TheMap.Tileset->TileTypeTable[seentile] == TileTypeOrcWall) {
 	MapFixSeenWallTile(x, y);
 	MapFixSeenWallNeighbors(x, y);
     }
@@ -140,7 +140,7 @@ global void RevealMap(void)
 	    int i;
 	    for (i = 0; i < PlayerMax; ++i) {
 		if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
-		    TheMap.Fields[ix+iy*TheMap.Width].Visible[i]=1;
+		    TheMap.Fields[ix+iy*TheMap.Width].Visible[i] = 1;
 		}
 	    }
 	    MapMarkSeenTile(ix, iy);
@@ -211,11 +211,11 @@ global void ViewportCenterViewpoint(Viewport* vp, int x, int y)
 **
 **	@return		True if empty, false otherwise.
 */
-global int IsMapFieldEmpty(int tx,int ty)
+global int IsMapFieldEmpty(int tx, int ty)
 {
-    return !(TheMap.Fields[tx+ty*TheMap.Width].Flags
-	    &(MapFieldUnpassable|MapFieldWall|MapFieldRocks|MapFieldForest
-	    |MapFieldBuilding));
+    return !(TheMap.Fields[tx + ty * TheMap.Width].Flags &
+	(MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest |
+	    MapFieldBuilding));
 }
 
 /**
@@ -226,9 +226,9 @@ global int IsMapFieldEmpty(int tx,int ty)
 **
 **	@return		True if water, false otherwise.
 */
-global int WaterOnMap(int tx,int ty)
+global int WaterOnMap(int tx, int ty)
 {
-    return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldWaterAllowed;
+    return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldWaterAllowed;
 }
 
 /**
@@ -238,9 +238,9 @@ global int WaterOnMap(int tx,int ty)
 **	@param ty	Y map tile position.
 **	@return		True if coast, false otherwise.
 */
-global int CoastOnMap(int tx,int ty)
+global int CoastOnMap(int tx, int ty)
 {
-    return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldCoastAllowed;
+    return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldCoastAllowed;
 }
 
 /**
@@ -250,9 +250,9 @@ global int CoastOnMap(int tx,int ty)
 **	@param ty	Y map tile position.
 **	@return		True if wall, false otherwise.
 */
-global int WallOnMap(int tx,int ty)
+global int WallOnMap(int tx, int ty)
 {
-    return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldWall;
+    return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldWall;
 }
 
 /**
@@ -262,10 +262,10 @@ global int WallOnMap(int tx,int ty)
 **	@param ty	Y map tile position.
 **	@return		True if human wall, false otherwise.
 */
-global int HumanWallOnMap(int tx,int ty)
+global int HumanWallOnMap(int tx, int ty)
 {
-    return (TheMap.Fields[tx+ty*TheMap.Width].Flags
-	    &(MapFieldWall|MapFieldHuman))==(MapFieldWall|MapFieldHuman);
+    return (TheMap.Fields[tx + ty * TheMap.Width].Flags &
+	(MapFieldWall | MapFieldHuman)) == (MapFieldWall | MapFieldHuman);
 }
 
 /**
@@ -275,10 +275,10 @@ global int HumanWallOnMap(int tx,int ty)
 **	@param ty	Y map tile position.
 **	@return		True if orcish wall, false otherwise.
 */
-global int OrcWallOnMap(int tx,int ty)
+global int OrcWallOnMap(int tx, int ty)
 {
-    return (TheMap.Fields[tx+ty*TheMap.Width].Flags
-	    &(MapFieldWall|MapFieldHuman))==MapFieldWall;
+    return (TheMap.Fields[tx + ty * TheMap.Width].Flags &
+	(MapFieldWall | MapFieldHuman)) == MapFieldWall;
 }
 
 /**
@@ -289,12 +289,12 @@ global int OrcWallOnMap(int tx,int ty)
 **
 **	@return		True if forest, false otherwise.
 */
-global int CheckedForestOnMap(int tx,int ty)
+global int CheckedForestOnMap(int tx, int ty)
 {
-    if( tx<0 || ty<0 || tx>=TheMap.Width || ty>=TheMap.Height ) {
+    if (tx < 0 || ty < 0 || tx >= TheMap.Width || ty >= TheMap.Height) {
 	return 0;
     }
-    return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldForest;
+    return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldForest;
 }
 
 /**
@@ -305,18 +305,18 @@ global int CheckedForestOnMap(int tx,int ty)
 **
 **	@return		True if forest, false otherwise.
 */
-global int ForestOnMap(int tx,int ty)
+global int ForestOnMap(int tx, int ty)
 {
 #ifdef DEBUG
-    if( tx<0 || ty<0 || tx>=TheMap.Width || ty>=TheMap.Height ) {
+    if (tx < 0 || ty < 0 || tx >= TheMap.Width || ty >= TheMap.Height) {
 	// FIXME: must cleanup calling function !
-	fprintf(stderr,"Used x %d, y %d\n",tx,ty);
+	fprintf(stderr, "Used x %d, y %d\n", tx, ty);
 	abort();
 	return 0;
     }
 #endif
 
-    return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldForest;
+    return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldForest;
 }
 
 /**
@@ -327,18 +327,18 @@ global int ForestOnMap(int tx,int ty)
 **
 **	@return		True if rock, false otherwise.
 */
-global int RockOnMap(int tx,int ty)
+global int RockOnMap(int tx, int ty)
 {
-    IfDebug(
-	if( tx<0 || ty<0 || tx>=TheMap.Width || ty>=TheMap.Height ) {
-	    // FIXME: must cleanup calling function !
-	    fprintf(stderr,"Used x %d, y %d\n",tx,ty);
-	    abort();
-	    return 0;
-	}
-    );
+#ifdef DEBUG
+    if (tx < 0 || ty < 0 || tx >= TheMap.Width || ty >= TheMap.Height) {
+	// FIXME: must cleanup calling function !
+	fprintf(stderr, "Used x %d, y %d\n", tx, ty);
+	abort();
+	return 0;
+    }
+#endif
 
-    return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldRocks;
+    return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldRocks;
 }
 
 #ifdef HIERARCHIC_PATHFINDER
@@ -379,13 +379,13 @@ global inline int MapFieldPassable(int tx, int ty, int mask)
 **
 **	@return		True if could be entered, false otherwise.
 */
-global int CheckedCanMoveToMask(int x,int y,int mask)
+global int CheckedCanMoveToMask(int x, int y, int mask)
 {
-    if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 	return 0;
     }
 
-    return !(TheMap.Fields[x+y*TheMap.Width].Flags&mask);
+    return !(TheMap.Fields[x + y * TheMap.Width].Flags & mask);
 }
 
 #ifndef CanMoveToMask
@@ -398,18 +398,18 @@ global int CheckedCanMoveToMask(int x,int y,int mask)
 **
 **	@return		True if could be entered, false otherwise.
 */
-global int CanMoveToMask(int x,int y,int mask)
+global int CanMoveToMask(int x, int y, int mask)
 {
-    IfDebug(
-	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    // FIXME: must cleanup calling function !
-	    fprintf(stderr,"Used x %d, y %d, mask %x\n",x,y,mask);
-	    abort();
-	    return 0;
-	}
-    );
+#ifdef DEBUG
+    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	// FIXME: must cleanup calling function !
+	fprintf(stderr, "Used x %d, y %d, mask %x\n", x, y, mask);
+	abort();
+	return 0;
+    }
+#endif
 
-    return !(TheMap.Fields[x+y*TheMap.Width].Flags&mask);
+    return !(TheMap.Fields[x + y * TheMap.Width].Flags & mask);
 }
 #endif
 
@@ -422,9 +422,9 @@ global int CanMoveToMask(int x,int y,int mask)
 **
 **	@return		True if could be entered, false otherwise.
 */
-global int UnitTypeCanMoveTo(int x,int y,const UnitType* type)
+global int UnitTypeCanMoveTo(int x, int y, const UnitType* type)
 {
-    return CanMoveToMask(x,y,TypeMovementMask(type));
+    return CanMoveToMask(x, y, TypeMovementMask(type));
 }
 
 /**
@@ -436,9 +436,9 @@ global int UnitTypeCanMoveTo(int x,int y,const UnitType* type)
 **
 **	@return		True if could be entered, false otherwise.
 */
-global int UnitCanMoveTo(int x,int y,const Unit* unit)
+global int UnitCanMoveTo(int x, int y, const Unit* unit)
 {
-    return CanMoveToMask(x,y,TypeMovementMask(unit->Type));
+    return CanMoveToMask(x, y, TypeMovementMask(unit->Type));
 }
 
 #if 0
@@ -454,7 +454,7 @@ global int UnitCanMoveTo(int x,int y,const Unit* unit)
 global unsigned UnitFieldFlags(const Unit* unit)
 {
     // FIXME: Should be moved into unittype structure, and allow more types.
-    switch( unit->Type->UnitType ) {
+    switch (unit->Type->UnitType) {
 	case UnitTypeLand:		// on land
 	    return MapFieldLandUnit;
 	case UnitTypeFly:		// in air
@@ -478,31 +478,31 @@ global unsigned UnitFieldFlags(const Unit* unit)
 global int TypeMovementMask(const UnitType* type)
 {
     // FIXME: Should be moved into unittype structure, and allow more types.
-    switch( type->UnitType ) {
+    switch (type->UnitType) {
 	case UnitTypeLand:		// on land
-	    return MapFieldLandUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldWall
-		| MapFieldRocks
-		| MapFieldForest	// wall,rock,forest not 100% clear?
-		| MapFieldCoastAllowed
-		| MapFieldWaterAllowed	// can't move on this
-		| MapFieldUnpassable;
+	    return MapFieldLandUnit |
+		MapFieldBuilding |	// already occuppied
+		MapFieldWall |
+		MapFieldRocks |
+		MapFieldForest |	// wall,rock,forest not 100% clear?
+		MapFieldCoastAllowed |
+		MapFieldWaterAllowed |	// can't move on this
+		MapFieldUnpassable;
 	case UnitTypeFly:		// in air
 	    return MapFieldAirUnit;	// already occuppied
 	case UnitTypeNaval:		// on water
 	    if( type->Transporter ) {
-		return MapFieldLandUnit
-		    | MapFieldSeaUnit
-		    | MapFieldBuilding	// already occuppied
-		    | MapFieldLandAllowed;	// can't move on this
+		return MapFieldLandUnit |
+		    MapFieldSeaUnit |
+		    MapFieldBuilding |	// already occuppied
+		    MapFieldLandAllowed;	// can't move on this
 		    //| MapFieldUnpassable;	// FIXME: bug?
 	    }
-	    return MapFieldSeaUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldCoastAllowed
-		| MapFieldLandAllowed	// can't move on this
-		| MapFieldUnpassable;
+	    return MapFieldSeaUnit |
+		MapFieldBuilding |	// already occuppied
+		MapFieldCoastAllowed |
+		MapFieldLandAllowed |	// can't move on this
+		MapFieldUnpassable;
 	default:
 	    DebugLevel1Fn("Were moves this unit?\n");
 	    return 0;
@@ -532,20 +532,20 @@ global void PreprocessMap(void)
     int iy;
     MapField* mf;
 
-    for (ix = 0; ix < TheMap.Width; ix++) {
-	for (iy = 0; iy < TheMap.Height; iy++) {
+    for (ix = 0; ix < TheMap.Width; ++ix) {
+	for (iy = 0; iy < TheMap.Height; ++iy) {
 	    mf = TheMap.Fields + ix + iy * TheMap.Width;
 	    mf->SeenTile = mf->Tile;
 	}
     }
 
     // it is required for fixing the wood that all tiles are marked as seen!
-	for (ix = 0; ix < TheMap.Width; ix++) {
-	    for (iy = 0; iy < TheMap.Height; iy++) {
-		MapFixWallTile(ix, iy);
-		MapFixSeenWallTile(ix, iy);
-	    }
+    for (ix = 0; ix < TheMap.Width; ++ix) {
+	for (iy = 0; iy < TheMap.Height; ++iy) {
+	    MapFixWallTile(ix, iy);
+	    MapFixSeenWallTile(ix, iy);
 	}
+    }
 }
 
 /**
