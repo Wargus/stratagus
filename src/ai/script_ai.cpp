@@ -865,7 +865,7 @@ local SCM CclDefineAiAction(SCM type, SCM definition)
     AiScriptAction* aiScriptAction;
 
     aiScriptAction = AiScriptActions + AiScriptActionNum;
-    AiScriptActionNum++;
+    ++AiScriptActionNum;
 
     memset(aiScriptAction, 0, sizeof(AiScriptAction));
 
@@ -875,9 +875,10 @@ local SCM CclDefineAiAction(SCM type, SCM definition)
     while (!gh_null_p(type)) {
 	if (gh_eq_p(gh_car(type), gh_symbol2scm("defense"))) {
 	    aiScriptAction->Defensive = 1;
-	}
-	if (gh_eq_p(gh_car(type), gh_symbol2scm("attack"))) {
+	} else if (gh_eq_p(gh_car(type), gh_symbol2scm("attack"))) {
 	    aiScriptAction->Offensive = 1;
+	} else {
+	    errl("Unsupported ai action type", gh_car(type));
 	}
 	type = gh_cdr(type);
     }
@@ -885,6 +886,42 @@ local SCM CclDefineAiAction(SCM type, SCM definition)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineAiAction(lua_State* l)
+{
+    AiScriptAction* aiScriptAction;
+    const char* value;
+    int args;
+    int j;
+
+    if (lua_gettop(l) != 2 || !lua_istable(l, 1) || !lua_istable(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    aiScriptAction = AiScriptActions + AiScriptActionNum;
+    ++AiScriptActionNum;
+
+    memset(aiScriptAction, 0, sizeof(AiScriptAction));
+
+//    aiScriptAction->Action = definition;
+//    CclGcProtect(&aiScriptAction->Action);
+
+    args = luaL_getn(l, 1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, 1, j + 1);
+	value = LuaToString(l, -1);
+	lua_pop(l, 1);
+	if (!strcmp(value, "defense")) {
+	    aiScriptAction->Defensive = 1;
+	} else if (!strcmp(value, "attack")) {
+	    aiScriptAction->Offensive = 1;
+	} else {
+	    lua_pushfstring(l, "Unsupported ai action type: %s", value);
+	    lua_error(l);
+	}
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -1827,7 +1864,7 @@ local int CclAiForceActive(lua_State* l)
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAiForce(SCM list)
 {
-    AiUnitType* *prev;
+    AiUnitType** prev;
     AiUnitType* aiut;
     UnitType* type;
     int count;
@@ -1891,7 +1928,7 @@ local SCM CclAiForce(SCM list)
 #elif defined(USE_LUA)
 local int CclAiForce(lua_State* l)
 {
-    AiUnitType* *prev;
+    AiUnitType** prev;
     AiUnitType* aiut;
     UnitType* type;
     int count;
@@ -2231,8 +2268,8 @@ local int CclAiCanReachHotSpot(lua_State* l)
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    if ((AiScript->HotSpot_X == -1) || (AiScript->HotSpot_Y == -1) ||
-	    (AiScript->HotSpot_Ray <= 0)) {
+    if ((AiScript->HotSpotX == -1) || (AiScript->HotSpotY == -1) ||
+	    (AiScript->HotSpotRay <= 0)) {
 	lua_pushboolean(l, 1);
 	return 1;
     }
@@ -2277,7 +2314,7 @@ local int CclAiCanReachHotSpot(lua_State* l)
 	    case UnitTypeFly:
 	    	break;
 	    case UnitTypeNaval:
-		if (!PlaceReachable(aiunit->Unit, AiScript->HotSpot_X, AiScript->HotSpot_Y,
+		if (!PlaceReachable(aiunit->Unit, AiScript->HotSpotX, AiScript->HotSpotY,
 			1, 1, 0, aiunit->Unit->Type->_AttackRange)) {
 		    lua_pushboolean(l, 0);
 		    return 1;
@@ -2289,8 +2326,8 @@ local int CclAiCanReachHotSpot(lua_State* l)
 		ZoneSetAddUnitZones(&sources,aiunit->Unit);
 
 		ZoneSetClear(&targets);
-		ZoneSetAddGoalZones(&targets, aiunit->Unit, AiScript->HotSpot_X - 4, AiScript->HotSpot_Y - 4,
-		    9, 9, 0, 0);
+		ZoneSetAddGoalZones(&targets, aiunit->Unit, AiScript->HotSpotX - 4,
+		    AiScript->HotSpotY - 4, 9, 9, 0, 0);
 
 		if (!ZoneSetHasIntersect(&targets, &sources) &&
 			(!ZoneSetHasIntersect(&targets, &transportable) ||
@@ -2468,7 +2505,7 @@ local SCM CclAiHotSpotAttackWithForce(SCM value)
 	errl("Force out of range", value);
     }
 
-    AiAttackWithForceAt(force, AiScript->HotSpot_X, AiScript->HotSpot_Y);
+    AiAttackWithForceAt(force, AiScript->HotSpotX, AiScript->HotSpotY);
 
     return SCM_BOOL_F;
 }
@@ -2487,7 +2524,7 @@ local int CclAiHotSpotAttackWithForce(lua_State* l)
 	lua_error(l);
     }
 
-    AiAttackWithForceAt(force, AiScript->HotSpot_X, AiScript->HotSpot_Y);
+    AiAttackWithForceAt(force, AiScript->HotSpotX, AiScript->HotSpotY);
 
     lua_pushboolean(l, 0);
     return 1;
@@ -2508,7 +2545,7 @@ local SCM CclAiGroupForce(SCM value)
 	errl("Force out of range", value);
     }
 
-    AiGroupForceNear(force, AiScript->HotSpot_X, AiScript->HotSpot_Y);
+    AiGroupForceNear(force, AiScript->HotSpotX, AiScript->HotSpotY);
 
     return SCM_BOOL_F;
 }
@@ -2527,7 +2564,7 @@ local int CclAiGroupForce(lua_State* l)
 	lua_error(l);
     }
 
-    AiGroupForceNear(force, AiScript->HotSpot_X, AiScript->HotSpot_Y);
+    AiGroupForceNear(force, AiScript->HotSpotX, AiScript->HotSpotY);
 
     lua_pushboolean(l, 0);
     return 1;
@@ -2905,9 +2942,9 @@ global void AiRunScript(int script, SCM list, int hotSpotX, int hotSpotY, int ho
     CclGcProtectedAssign(&AiPlayer->Scripts[script].Script, list);
     AiPlayer->Scripts[script].SleepCycles = 0;
     snprintf(AiPlayer->Scripts[script].ident, 10, "AiRunScript");
-    AiPlayer->Scripts[script].HotSpot_X = hotSpotX;
-    AiPlayer->Scripts[script].HotSpot_Y = hotSpotY;
-    AiPlayer->Scripts[script].HotSpot_Ray = hotSpotRay;
+    AiPlayer->Scripts[script].HotSpotX = hotSpotX;
+    AiPlayer->Scripts[script].HotSpotY = hotSpotY;
+    AiPlayer->Scripts[script].HotSpotRay = hotSpotRay;
     // FIXME : Compute gauges here ?
 }
 #elif defined(USE_LUA)
@@ -3429,7 +3466,7 @@ global void AiCclRegister(void)
     lua_register(Lua, "DefineAiHelper", CclDefineAiHelper);
     lua_register(Lua, "DefineAi", CclDefineAi);
 
-//    lua_register(Lua, "DefineAiAction", CclDefineAiAction);
+    lua_register(Lua, "DefineAiAction", CclDefineAiAction);
 
     lua_register(Lua, "AiGetRace", CclAiGetRace);
     lua_register(Lua, "AiGetSleepCycles", CclAiGetSleepCycles);
