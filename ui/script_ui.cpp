@@ -3591,12 +3591,12 @@ local SCM CclSetShowOrders(SCM flag)
 **
 **	@param message	Message to display.
 */
-global SCM CclSetMessage(SCM message)
+local SCM CclAddMessage(SCM message)
 {
     const char *str;
 
     str = get_c_string(message);
-    SetMessage(str);
+    SetMessage("%s", str);
 
     return SCM_UNSPECIFIED;
 }
@@ -3671,7 +3671,7 @@ local SCM CclAddKeystrokeHelp(SCM list)
 global void UserInterfaceCclRegister(void)
 {
 
-    gh_new_procedure1_0("add-message", CclSetMessage);
+    gh_new_procedure1_0("add-message", CclAddMessage);
 
     gh_new_procedure1_0("set-color-cycle-all!",CclSetColorCycleAll);
     gh_new_procedure1_0("set-reverse-map-move!",CclSetReverseMapMove);
