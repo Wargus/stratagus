@@ -261,8 +261,10 @@ global void SaveMenus(FILE* file);
 
 #ifdef SAVE_MENU_CCL
 typedef char char30[30];
-extern hashtable(char30,MENUS_MAXFUNC) MenuFuncHash2;
+global hashtable(char30,MENUS_MAXFUNC) MenuFuncHash2;
 #endif
+global _MenuHash MenuHash;
+global _MenuFuncHash MenuFuncHash;
 
     /// Name, Version, Copyright FIXME: move to headerfile
 extern char NameLine[];

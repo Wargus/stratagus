@@ -257,9 +257,11 @@ extern MapInfo *ScenSelectPudInfo;	/// MapInfo of currently selected map
 #define MENUS_MAXMENU 128		/// FIXME: wrong place, docu
 #define MENUS_MAXFUNC 128		/// FIXME: wrong place, docu
     /// FIXME: docu
-extern hashtable(Menu*,MENUS_MAXMENU) MenuHash;
+typedef hashtable(Menu*,MENUS_MAXMENU) _MenuHash;
+extern _MenuHash MenuHash;
     /// FIXME: docu
-extern hashtable(void*,MENUS_MAXFUNC) MenuFuncHash;
+typedef hashtable(void*,MENUS_MAXFUNC) _MenuFuncHash;
+extern _MenuFuncHash MenuFuncHash;
 
 /*----------------------------------------------------------------------------
 --	Functions
