@@ -44,6 +44,10 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
+#ifdef NEW_ORDERS
+#define Command Orders[0]
+#endif
+
 // FIXME: should become global configurable
 #define OriginalTraining	0	/// 1 for the original training display
 
@@ -203,8 +207,84 @@ global void DrawUnitInfo(const Unit* unit)
     }
 
     //
-    //	Show progress for buildings only if they are selected.
+    //	Show progress for buildings only, if they are selected.
     //
+#ifdef NEW_ORDERS
+    if( type->Building && NumSelected==1 && Selected[0]==unit ) {
+	//
+	//	Building under constuction.
+	//
+	if( unit->Orders[0].Action==UnitActionBuilded ) {
+	    // FIXME: not correct must use build time!!
+	    DrawCompleted(stats->HitPoints,unit->HP);
+	    return;
+	}
+
+	//
+	//	Building training units.
+	//
+	if( unit->Orders[0].Action==UnitActionTrain ) {
+	    if( OriginalTraining || unit->Data.Train.Count==1 ) {
+		DrawText(x+37,y+8+78,GameFont,"Training:");
+		DrawUnitIcon(unit->Player
+			,unit->Data.Train.What[0]->Icon.Icon
+			,0,x+107,y+8+70);
+
+		DrawCompleted(
+			unit->Data.Train.What[0]
+			    ->Stats[ThisPlayer->Player].Costs[TimeCost]
+			,unit->Data.Train.Ticks);
+	    } else {
+		DrawTextCentered(x+114,y+8+29,GameFont,"Training...");
+
+		for( i = 0; i < unit->Data.Train.Count; i++ ) {
+		    DrawUnitIcon(unit->Player
+			    ,unit->Data.Train.What[i]->Icon.Icon
+			    ,(ButtonUnderCursor==i+4)
+				? (IconActive|(MouseButtons&LeftButton)) : 0
+			    ,TheUI.Buttons2[i].X,TheUI.Buttons2[i].Y);
+		}
+
+		DrawCompleted(
+			unit->Data.Train.What[0]
+			    ->Stats[ThisPlayer->Player].Costs[TimeCost]
+			,unit->Data.Train.Ticks);
+	    }
+	    return;
+	}
+
+	//
+	//	Building upgrading to better type.
+	//
+	if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
+	    DrawText(x+29,y+8+78,GameFont,"Upgrading:");
+	    DrawUnitIcon(unit->Player
+		    ,unit->Data.UpgradeTo.What->Icon.Icon
+		    ,0,x+107,y+8+70);
+
+	    DrawCompleted(
+		    unit->Data.UpgradeTo.What
+			->Stats[ThisPlayer->Player].Costs[TimeCost]
+		    ,unit->Data.UpgradeTo.Ticks);
+	    return;
+	}
+
+	//
+	//	Building research new technologie.
+	//
+	if( unit->Orders[0].Action==UnitActionResearch ) {
+	    DrawText(16,y+8+78,GameFont,"Researching:");
+	    DrawUnitIcon(unit->Player
+		    ,unit->Data.Research.Upgrade->Icon
+		    ,0,x+107,y+8+70);
+
+	    DrawCompleted(
+		    unit->Data.Research.Upgrade->Costs[TimeCost]
+		    ,unit->Data.Research.Ticks);
+	    return;
+	}
+    }
+#else
     if( type->Building && NumSelected==1 && Selected[0]==unit ) {
 	if( unit->Command.Action==UnitActionBuilded ) {
 	    // FIXME: not correct must use build time!!
@@ -264,6 +344,7 @@ global void DrawUnitInfo(const Unit* unit)
 	    return;
 	}
     }
+#endif
 
     if( type->StoresWood ) {
 	DrawText(x+20,y+8+78,GameFont,"Production");
@@ -883,11 +964,19 @@ global void DrawInfoPanel(void)
 	} else {
 	    // FIXME: not correct for enemies units
 	    if( Selected[0]->Type->Building
+#ifdef NEW_ORDERS
+		    && (Selected[0]->Orders[0].Action==UnitActionBuilded
+			|| Selected[0]->Orders[0].Action==UnitActionResearch
+			|| Selected[0]->Orders[0].Action==UnitActionUpgradeTo
+		    /* || Selected[0]->Orders[0].Action==UnitActionUpgrade */
+			|| Selected[0]->Orders[0].Action==UnitActionTrain) ) {
+#else
 		    && (Selected[0]->Command.Action==UnitActionBuilded
-		    || Selected[0]->Command.Action==UnitActionResearch
-		    || Selected[0]->Command.Action==UnitActionUpgradeTo
+			|| Selected[0]->Command.Action==UnitActionResearch
+			|| Selected[0]->Command.Action==UnitActionUpgradeTo
 		    /* || Selected[0]->Command.Action==UnitActionUpgrade */
-		    || Selected[0]->Command.Action==UnitActionTrain) ) {
+			|| Selected[0]->Command.Action==UnitActionTrain) ) {
+#endif
 		i=3;
 	    } else if( Selected[0]->Type->Magic ) {
 		i=2;
