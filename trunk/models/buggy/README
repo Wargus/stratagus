@@ -1,0 +1,35 @@
+buggy.blend : Blender model by Frank Loeffler (c) 2004
+compose     : Bash script to compose the many output images into two
+              images. It needs 'convert', contained in the
+              imagemagic tools, and 'mmv', a small script to rename
+              multiple files.
+              In order to use this you have to save the images which
+              should go into the shadow file as 'shadow????.png' where
+              ???? are the numbers of the images and the images that
+              should go into the unit file as 'normal????.png'.
+              The model is ready for the shadow images. To obtain the
+              unit images, remove the plane on which the model is sitting
+              and change the output filename to 'normal' before rendering.
+
+The model and the script are distributed unter the GPL (look below).
+
+It is a model used for creating a unit of the game 'Battle of Survival'.
+http://bos.seul.org/
+It is not needed for playing, it was/is just used for development purposes.
+
+-----------------------------------------------------------------------------
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+

@@ -1,0 +1,48 @@
+#!/bin/bash
+# script by Frank Loeffler (c) 2004
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+function create
+{
+  for i in `seq 1 8 17`; do
+    ji=1
+    for j in `seq -f "%03g" $i $[$i+7]`; do
+      n[$ji]=$j
+      let ji=ji+1
+    done
+    convert +append $10${n[1]}.png $10${n[2]}.png $10${n[3]}.png $10${n[4]}.png\
+                    $10${n[5]}.png $10${n[6]}.png $10${n[7]}.png $10${n[8]}.png\
+                    tmp$i.png
+  done
+  mmv "tmp?.png" "tmp0#1.png"
+  mmv "tmp??.png" "tmp0#1#2.png"
+  convert -append tmp???.png $2
+  rm tmp???.png
+}
+
+export BLENDER_SCRIPT_FILE_TO_RENDER="camera.blend"
+blender -P blender.py
+
+for i in `seq -w 1 24`; do
+  convert -crop 32x64 normal00$i.png cropped.png
+  mv cropped.png.0 cropped00$i.png
+  rm cropped.png.1
+done
+
+create cropped unit_camera.png
+create normal  unit_camera_n.png
+create shadow  unit_camera_s.png
+
