@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	credits.ccl	-	The credits of the engine.
+--	credits.lua	-	The credits of the engine.
 --
 --	(c) Copyright 2002-2004 by Jimmy Salmon and Crestez Leonard
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: credits.lua,v 1.3 2004/10/16 20:27:40 feb Exp $
+--	$Id$
 
 Credits(
 	"background", "screens/general.png",

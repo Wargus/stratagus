@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	upgrade.ccl	-	Define the dependencies and upgrades.
+--	upgrade.lua	-	Define the dependencies and upgrades.
 --
 --	(c) Copyright 2001 - 2004 by Lutz Sammer and Crestez Leonard
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: upgrade.lua,v 1.2 2004/02/10 01:55:23 n0body Exp $
+--	$Id$
 
 --   Stuff for the different races
 Load("scripts/elites/upgrade.lua")
