@@ -538,7 +538,10 @@ global void ShowIntro(const Intro *intro)
     CallbackMusicOn();
     StopMusic();
     // FIXME: should this be GameMusic?
-    PlayMusic(MenuMusic);
+    if (CDMode == "off")
+    {
+	PlayMusic(MenuMusic);
+    }
 }
 
 /**

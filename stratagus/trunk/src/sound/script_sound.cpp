@@ -379,7 +379,7 @@ local SCM CclSetCdMode(SCM mode)
     char *str;
 
     if ( !gh_null_p(mode) ) {
-        PlayMusic(str = gh_scm2newstr(mode,NULL));
+        PlayCDRom(str = gh_scm2newstr(mode,NULL));
         free(str);
     }
 #endif

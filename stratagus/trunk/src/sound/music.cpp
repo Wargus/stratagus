@@ -64,8 +64,8 @@
 global Sample* MusicSample;		/// Music samples
 #endif
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global char *CDMode = ":off";	/// cd play mode, ":off" ":random" or ":all"
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global int CDTrack = 0;			/// Current cd track
 #endif
 
@@ -74,7 +74,6 @@ global SDL_CD *CDRom;			/// SDL cdrom device
 #elif defined(USE_LIBCDA)
 global int NumCDTracks;			/// Number of tracks on the cd
 #elif defined(USE_CDDA)
-// FIXME: fill up
 global int NumCDTracks;
 global int CDDrive;
 global struct cdrom_tochdr CDchdr;
@@ -240,7 +239,7 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 **
 **	@return		True if name is handled by the cdrom module.
 */
-local int PlayCDRom(const char* name)
+global int PlayCDRom(const char* name)
 {
     // Old mode off, starting cdrom play.
     if (!strcmp(CDMode, ":off")) {
@@ -294,7 +293,7 @@ local int PlayCDRom(const char* name)
 **
 **	@return		True if name is handled by the cdrom module.
 */
-local int PlayCDRom(const char* name)
+global int PlayCDRom(const char* name)
 {
     int i;
     int data_cd;
@@ -441,6 +440,7 @@ global void PlayMusic(const char* name)
     Sample* sample;
 #endif
 
+/*
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     if (PlayCDRom(name)) {
 	return;
@@ -449,6 +449,7 @@ global void PlayMusic(const char* name)
 	return;
     }
 #endif
+*/
 
     if (MusicOff) {
 	return;

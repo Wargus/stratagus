@@ -123,6 +123,8 @@ extern void PlayMusic(const char* name);
     /// Stop music playing
 extern void StopMusic(void);
 
+extern int PlayCDRom(const char* name);
+
     /// Turn music stopped callback on
 #define CallbackMusicOn() \
 	CallbackMusic=1;
