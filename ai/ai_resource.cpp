@@ -1060,6 +1060,7 @@ local void AiCollectResources(void)
     Unit** units;
     Unit* unit;
     int p[MaxCosts] = { 0, 50, 50, 0 };
+    int pt = 100;
 
     //
     //	Collect statistics about the current assignment
@@ -1067,13 +1068,12 @@ local void AiCollectResources(void)
     for( i=0; i<MaxCosts; i++ ) {
 	rn[i]=0;
 	an[i]=0;
+	if( (AiPlayer->NeededMask&(1<<i)) ) {	// Double percent if needed
+	    pt+=p[i];
+	    p[i]<<=1;
+	}
     }
     total=un=0;
-#if 0
-    if( (AiPlayer->NeededMask&(1<<i)) ) {	// Double percent if needed
-	p[i]*=2;
-    }
-#endif
 
     n=AiPlayer->Player->TotalNumUnits;
     units=AiPlayer->Player->Units;
@@ -1163,8 +1163,8 @@ local void AiCollectResources(void)
 	unit=unassigned[i];
 
 	for( o=c=0; c<MaxCosts; ++c ) {
-	    DebugLevel3Fn("%d, %d, %d\n",(an[c]+rn[c])*p[c],p[c],total*100);
-	    if( (an[c]+rn[c])*100<total*p[c] ) {
+	    DebugLevel3Fn("%d, %d, %d\n",(an[c]+rn[c])*p[c],p[c],total*pt);
+	    if( (an[c]+rn[c])*pt<total*p[c] ) {
 		o=c;
 		break;
 	    }
