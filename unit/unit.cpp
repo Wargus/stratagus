@@ -1325,7 +1325,7 @@ global void RescueUnits(void)
     Player* p;
     Unit* unit;
     Unit* table[UnitMax];
-    Unit* near[UnitMax];
+    Unit* around[UnitMax];
     int n;
     int i;
     int j;
@@ -1362,19 +1362,19 @@ global void RescueUnits(void)
 		    n=SelectUnits(
 			unit->X-1,unit->Y-1,
 			unit->X+unit->Type->TileWidth+1,
-			unit->Y+unit->Type->TileHeight+1,near);
+			unit->Y+unit->Type->TileHeight+1,around);
 		} else {
 		    n=SelectUnits(
 			unit->X-2,unit->Y-2,
 			unit->X+unit->Type->TileWidth+2,
-			unit->Y+unit->Type->TileHeight+2,near);
+			unit->Y+unit->Type->TileHeight+2,around);
 		}
 		//
 		//	Look if human near the unit.
 		//
 		for( i=0; i<n; ++i ) {
-		    if( near[i]->Player->Type==PlayerHuman ) {
-			ChangeUnitOwner(unit,unit->Player,near[i]->Player);
+		    if( around[i]->Player->Type==PlayerHuman ) {
+			ChangeUnitOwner(unit,unit->Player,around[i]->Player);
 			// FIXME: more races?
 			if( unit->Player->Race==PlayerRaceHuman ) {
 			    PlayGameSound(GameSounds.HumanRescue.Sound
