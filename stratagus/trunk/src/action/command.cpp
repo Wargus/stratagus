@@ -537,7 +537,7 @@ global void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 		order->Y = y;
 		order->Range = 0;
 		order->Type = NULL;
-		Assert(!(unit->X & ~0xFFFF) || !(unit->Y & ~0xFFFF));
+		Assert(!(unit->X & ~0xFFFF) && !(unit->Y & ~0xFFFF));
 		// FIXME: BUG-ALERT: encode source into arg1 as two 16 bit values!
 		order->Arg1 = (void*)((unit->X << 16) | unit->Y);
 	}
