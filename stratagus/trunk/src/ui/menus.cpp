@@ -1979,7 +1979,7 @@ global void DiplomacyMenu(void)
 /**
 **	Diplomacy gem callback
 */
-local void DiplomacyWait(Menuitem *mi __attribute__((unused)))
+local void DiplomacyWait(Menuitem *mi)
 {
     int player;
     int item;
