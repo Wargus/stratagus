@@ -673,7 +673,9 @@ global void NetworkEvent(void)
 	if (nc->Type == MessageQuit) {
 	    DebugLevel0("Got quit from network.\n");
 	    // FIXME: should only remove the player who have send the quit
-	    GameResult=GameVictory;
+	    if (GameResult == GameNoResult) {
+		GameResult=GameVictory;
+	    }
 	    GameRunning=0;
 	    continue;
 	}
