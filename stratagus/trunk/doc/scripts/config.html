@@ -47,6 +47,7 @@
 <hr>
 <a href="#AStar">AStar</a>
 <a href="#DecorationOnTop">DecorationOnTop</a>
+<a href="#DefineDecorations">DefineDecorations</a>
 <a href="#DefineDefaultActions">DefineDefaultActions</a>
 <a href="#DefineDefaultIncomes">DefineDefaultIncomes</a>
 <a href="#DefineDefaultResourceAmounts">DefineDefaultResourceAmounts</a>
@@ -56,9 +57,10 @@
 <a href="#DefineDefaultResourcesLow">DefineDefaultResourcesLow</a>
 <a href="#DefineDefaultResourcesMedium">DefineDefaultResourcesMedium</a>
 <a href="#DefineSprites">DefinesSprites</a>
+<a href="#GetVideoFullScreen">GetVideoFullScreen</a>
+<a href="#GetVideoResolution">GetVideoResolution</a>
 <a href="#HealthSprite">HealthSprite</a>
 <a href="#ManaSprite">ManaSprite</a>
-<a href="#DefineDecorations">DefineDecorations</a>
 <a href="#RevealMap">RevealMap</a>
 <a href="#RightButtonAttacks">RightButtonAttacks</a>
 <a href="#RightButtonMoves">RightButtonMoves</a>
@@ -375,6 +377,40 @@ from full (left) to empty (right of th image).
 -- ManaSprite("graphics/ui/mana2.png", 0, -1, 31, 4)
 DefineSprites({Name = "sprite-health", File = "graphics/ui/health2.png", Offset = {0, -4}, Size = {31, 4}},
     {Name = "sprite-mana", File = "graphics/ui/mana2.png", Offset = {0, -1}, Size = {31, 4}})
+</pre>
+
+<a name="GetVideoFullScreen"></a>
+<h3>GetVideoFullScreen()</h3>
+
+Check if the game is in full screen or windowed mode.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>True if full screen, false if in windowed mode</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Get Fullscreen
+    fullscreen = GetVideoFullScreen()
+</pre>
+
+<a name="GetVideoResolution"></a>
+<h3>GetVideoResolution()</h3>
+
+Get the video resolution.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Width and Height of current resolution</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Get the video resolution
+    w,h = GetVideoResolution()
 </pre>
 
 <a name="HealthSprite"></a>
