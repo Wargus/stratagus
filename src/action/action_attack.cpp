@@ -129,19 +129,23 @@ local void MoveToTarget(Unit* unit)
 	unit->Command.Data.Move.DY-=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.Range*=2;
 	wall=unit->Command.Action;
+#ifdef DEBUG
 	// This fixes the bug: if wall is gone, debug code fails.
 	unit->Goal=unit->Command.Data.Move.Goal;
 	unit->GoalX=unit->Command.Data.Move.DX;
 	unit->GoalY=unit->Command.Data.Move.DY;
+#endif
 	err=HandleActionMove(unit);
 	unit->Command.Data.Move.Range/=2;
 	unit->Command.Data.Move.DX+=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.DY+=unit->Command.Data.Move.Range;
 	unit->Command.Action=wall;
+#ifdef DEBUG
 	// This fixes the bug: if wall is gone, debug code fails.
 	unit->Goal=unit->Command.Data.Move.Goal;
 	unit->GoalX=unit->Command.Data.Move.DX;
 	unit->GoalY=unit->Command.Data.Move.DY;
+#endif
     } else {
 	err=HandleActionMove(unit);
     }
