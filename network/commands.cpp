@@ -65,6 +65,7 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
 	unsigned x,unsigned y,const Unit* dest,const char* value,int num)
 {
     static FILE* logf;
+    extern unsigned SyncRandSeed;
 
     if( !CommandLogEnabled ) {
 	return;
@@ -120,7 +121,9 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     if( num!=-1 ) {
 	fprintf(logf," %d",num);
     }
-    fprintf(logf,")\n");
+    fprintf(logf,") ;%d %d",unit->Refs,SyncRandSeed);
+
+    fprintf(logf,"\n");
     fflush(logf);
 }
 
@@ -141,10 +144,10 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
 global void SendCommandStopUnit(Unit* unit)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("stop",unit,1,-1,-1,NoUnitP,NULL,-1);
+	CommandLog("stop",unit,FlushCommands,-1,-1,NoUnitP,NULL,-1);
 	CommandStopUnit(unit);
     } else {
-	NetworkSendCommand(MessageCommandStop,unit,0,0,NoUnitP,0,1);
+	NetworkSendCommand(MessageCommandStop,unit,0,0,NoUnitP,0,FlushCommands);
     }
 }
 
@@ -338,10 +341,11 @@ global void SendCommandCancelBuilding(Unit* unit,Unit* worker)
 {
     // FIXME: currently unit and worker are same?
     if( NetworkFildes==-1 ) {
-	CommandLog("cancel-build",unit,1,-1,-1,worker,NULL,-1);
+	CommandLog("cancel-build",unit,FlushCommands,-1,-1,worker,NULL,-1);
 	CommandCancelBuilding(unit,worker);
     } else {
-	NetworkSendCommand(MessageCommandCancelBuild,unit,0,0,worker,0,1);
+	NetworkSendCommand(MessageCommandCancelBuild,unit,0,0,worker,0
+		,FlushCommands);
     }
 }
 
@@ -439,10 +443,11 @@ global void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush)
 global void SendCommandCancelTraining(Unit* unit,int slot)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("cancel-train",unit,1,-1,-1,NoUnitP,NULL,slot);
+	CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,NULL,slot);
 	CommandCancelTraining(unit,slot);
     } else {
-	NetworkSendCommand(MessageCommandCancelTrain,unit,slot,0,NoUnitP,0,1);
+	NetworkSendCommand(MessageCommandCancelTrain,unit,slot,0,NoUnitP,NULL
+		,FlushCommands);
     }
 }
 
@@ -471,11 +476,12 @@ global void SendCommandUpgradeTo(Unit* unit,UnitType* what,int flush)
 global void SendCommandCancelUpgradeTo(Unit* unit)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("cancel-upgrade-to",unit,1,-1,-1,NoUnitP,NULL,-1);
+	CommandLog("cancel-upgrade-to",unit,FlushCommands
+		,-1,-1,NoUnitP,NULL,-1);
 	CommandCancelUpgradeTo(unit);
     } else {
 	NetworkSendCommand(MessageCommandCancelUpgrade,unit
-		,0,0,NoUnitP,NULL,1);
+		,0,0,NoUnitP,NULL,FlushCommands);
     }
 }
 
@@ -493,7 +499,7 @@ global void SendCommandResearch(Unit* unit,Upgrade* what,int flush)
 	CommandResearch(unit,what,flush);
     } else {
 	NetworkSendCommand(MessageCommandResearch,unit
-		,0,0,NoUnitP,(void*)(what-Upgrades),flush);
+		,what-Upgrades,0,NoUnitP,NULL,flush);
     }
 }
 
@@ -505,11 +511,11 @@ global void SendCommandResearch(Unit* unit,Upgrade* what,int flush)
 global void SendCommandCancelResearch(Unit* unit)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("cancel-research",unit,1,-1,-1,NoUnitP,NULL,-1);
+	CommandLog("cancel-research",unit,FlushCommands,-1,-1,NoUnitP,NULL,-1);
 	CommandCancelResearch(unit);
     } else {
 	NetworkSendCommand(MessageCommandCancelResearch,unit
-		,0,0,NoUnitP,0,1);
+		,0,0,NoUnitP,NULL,FlushCommands);
     }
 }
 
@@ -528,7 +534,7 @@ global void SendCommandDemolish(Unit* unit,int x,int y,Unit* attack,int flush)
 	CommandLog("demolish",unit,flush,x,y,attack,NULL,-1);
 	CommandDemolish(unit,x,y,attack,flush);
     } else {
-	NetworkSendCommand(MessageCommandDemolish,unit,x,y,attack,0,flush);
+	NetworkSendCommand(MessageCommandDemolish,unit,x,y,attack,NULL,flush);
     }
 }
 
@@ -550,7 +556,7 @@ global void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 	CommandSpellCast(unit,x,y,dest,spellid,flush);
     } else {
 	NetworkSendCommand(MessageCommandSpellCast+spellid
-		,unit,x,y,dest,0,flush);
+		,unit,x,y,dest,NULL,flush);
     }
 }
 
@@ -601,7 +607,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    return;
 
 	case MessageCommandStop:
-	    CommandLog("stop",unit,1,-1,-1,NoUnitP,NULL,-1);
+	    CommandLog("stop",unit,FlushCommands,-1,-1,NoUnitP,NULL,-1);
 	    CommandStopUnit(unit);
 	    break;
 	case MessageCommandStand:
@@ -667,7 +673,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 		dest=UnitSlots[dstnr];
 		DebugCheck( !dest );
 	    }
-	    CommandLog("cancel-build",unit,1,-1,-1,dest,NULL,-1);
+	    CommandLog("cancel-build",unit,FlushCommands,-1,-1,dest,NULL,-1);
 	    CommandCancelBuilding(unit,dest);
 	    break;
 	case MessageCommandHarvest:
@@ -702,8 +708,8 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    CommandTrainUnit(unit,UnitTypes+dstnr,status);
 	    break;
 	case MessageCommandCancelTrain:
-	    CommandLog("cancel-train",unit,1,-1,-1,NoUnitP,NULL,dstnr);
-	    CommandCancelTraining(unit,dstnr);
+	    CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,NULL,x);
+	    CommandCancelTraining(unit,x);
 	    break;
 	case MessageCommandUpgrade:
 	    CommandLog("upgrade-to",unit,status,-1,-1,NULL
@@ -711,16 +717,18 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    CommandUpgradeTo(unit,UnitTypes+dstnr,status);
 	    break;
 	case MessageCommandCancelUpgrade:
-	    CommandLog("cancel-upgrade-to",unit,1,-1,-1,NoUnitP,NULL,-1);
+	    CommandLog("cancel-upgrade-to",unit,FlushCommands,-1,-1,NoUnitP
+		    ,NULL,-1);
 	    CommandCancelUpgradeTo(unit);
 	    break;
 	case MessageCommandResearch:
 	    CommandLog("research",unit,status,-1,-1,NULL
-		    ,Upgrades[dstnr].Ident,-1);
+		    ,Upgrades[x].Ident,-1);
 	    CommandResearch(unit,Upgrades+x,status);
 	    break;
 	case MessageCommandCancelResearch:
-	    CommandLog("cancel-research",unit,1,-1,-1,NoUnitP,NULL,-1);
+	    CommandLog("cancel-research",unit,FlushCommands,-1,-1,NoUnitP
+		    ,NULL,-1);
 	    CommandCancelResearch(unit);
 	    break;
 	case MessageCommandDemolish:
