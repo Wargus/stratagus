@@ -91,7 +91,7 @@ local int MoveToGoldMine(Unit* unit)
     //
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another mine, or retry later.
-	DebugLevel3Fn("GOLD-MINE NOT REACHED %Zd=%d,%d ? %d\n"
+	DebugLevel3Fn("GOLD-MINE NOT REACHED %d=%d,%d ? %d\n"
 	      ,UnitNumber(destu),x,y,MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
     }
@@ -147,7 +147,7 @@ local int MineInGoldmine(Unit* unit)
 	//
 	mine=GoldMineOnMap(unit->X,unit->Y);
 	IfDebug(
-	    DebugLevel3Fn("Found %d,%d=%Zd\n",unit->X,unit->Y,UnitNumber(mine));
+	    DebugLevel3Fn("Found %d,%d=%d\n",unit->X,unit->Y,UnitNumber(mine));
 	    if( !mine ) {
 		DebugLevel0Fn("No unit? (%d,%d)\n",unit->X,unit->Y);
 		abort();
@@ -298,7 +298,7 @@ local int MoveToGoldDeposit(Unit* unit)
     //
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another depot, or retry later.
-	DebugLevel3Fn("GOLD-DEPOT NOT REACHED %Zd=%d,%d ? %d\n"
+	DebugLevel3Fn("GOLD-DEPOT NOT REACHED %d=%d,%d ? %d\n"
 	      ,UnitNumber(destu),x,y,MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
     }

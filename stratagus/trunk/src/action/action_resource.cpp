@@ -185,7 +185,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	source=resource->ResourceOnMap(unit->X,unit->Y);
 	IfDebug(
-	    DebugLevel2Fn("Found %d,%d=%Zd\n",unit->X,unit->Y
+	    DebugLevel2Fn("Found %d,%d=%d\n",unit->X,unit->Y
 		,UnitNumber(source));
 	    if( !source ) {
 		DebugLevel0Fn("No unit? (%d,%d)\n",unit->X,unit->Y);
@@ -452,7 +452,7 @@ global void HandleActionResource(Unit* unit,const Resource* resource)
 {
     int ret;
 
-    DebugLevel3Fn("%s(%Zd) SubAction %d\n"
+    DebugLevel3Fn("%s(%d) SubAction %d\n"
 	,unit->Type->Ident,UnitNumber(unit),unit->SubAction);
 
     switch( unit->SubAction ) {

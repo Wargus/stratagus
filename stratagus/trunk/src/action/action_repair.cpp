@@ -152,7 +152,7 @@ global void HandleActionRepair(Unit* unit)
     Unit* goal;
     int err;
 
-    DebugLevel3("Repair %Zd\n",UnitNumber(unit));
+    DebugLevel3("Repair %d\n",UnitNumber(unit));
 
     switch( unit->SubAction ) {
 	case 0:
