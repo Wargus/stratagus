@@ -30,6 +30,7 @@ RULESFILE ?= Rules.make
 WINRULESFILE = Rules.make.WIN32
 
 include $(TOPDIR)/$(RULESFILE)
+OBJDIR ?= .
 
 CROSSDIR=/usr/local/cross-tools
 
@@ -86,7 +87,7 @@ doc++::
 	@$(DOCPP) -v -H -A -a -b -c -j -d srcdoc `find . -name "*.doc" -print`
 
 src::
-	@$(MAKE) -C src RULESFILE=$(RULESFILE) all
+	@$(MAKE) -C src RULESFILE=$(RULESFILE) OBJDIR=$(OBJDIR) all
 
 etlib/$(OBJDIR)/hash.$(OE): etlib/hash.c
 	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
