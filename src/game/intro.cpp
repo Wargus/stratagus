@@ -39,40 +39,17 @@
 #include "network.h"
 #include "sound_server.h"
 #include "sound.h"
+#include "settings.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-#define MAX_OBJECTIVES 9
-
-typedef struct _intro_ {
-    char*	Title;				/// Intro title
-    char*	Background;			/// Background picture
-    char*	TextFile;			/// Intro text file
-    char*	VoiceFile1;			/// Intro voice file
-    char*	VoiceFile2;			/// Intro voice file
-    char*	Objectives[MAX_OBJECTIVES];	/// Objectives
-} Intro;					/// Intro definition
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local Intro MyIntro[1] = {
-{
-    "I. Welcome to FreeCraft",
-    "campaigns/human/interface/introscreen1.png",
-    "campaigns/human/level01h.txt.gz",
-    "campaigns/human/level01h-intro1.wav.gz",
-    "campaigns/human/level01h-intro2.wav.gz",
-    {
-	"- This is a dummy intro",
-	"- Kill all enemies",
-	"- Be the lonly surivor",
-    },
-}
-};
+global Intro	GameIntro;		/// Game intro
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -182,7 +159,7 @@ local void ScrollText(int x,int y,int i,const char* text)
 **
 **	First version - only testing.
 */
-global void ShowIntro(void)
+global void ShowIntro(const Intro *intro)
 {
     EventCallback callbacks;
     Graphic* background;
@@ -192,12 +169,9 @@ global void ShowIntro(void)
     int l;
     int x;
     int y;
-    const Intro* intro;
     CLFile* file;
     char buf[1024];
     int stage;
-
-    intro=MyIntro;
 
     VideoLockScreen();
     VideoFillRectangle(ColorBlack,0,0,VideoWidth,VideoHeight);

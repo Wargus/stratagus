@@ -52,6 +52,7 @@
 #include "pathfinder.h"
 #include "ai.h"
 #include "campaign.h"
+#include "trigger.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -574,6 +575,7 @@ global void InitCcl(void)
     UserInterfaceCclRegister();
     AiCclRegister();
     CampaignCclRegister();
+    TriggerCclRegister();
 
     init_subr_1("load-pud",CclLoadPud);
     init_subr_2("define-map",CclDefineMap);

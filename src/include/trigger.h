@@ -40,11 +40,11 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void CheckTriggers(void);	/// test all triggers
+extern void TriggersEachFrame(void);	/// test triggers
 
 extern void TriggerCclRegister(void);	/// Register ccl features
-extern void SaveTrigger(FILE*);		/// Save the trigger module
-extern void CleanTrigger(void);		/// Cleanup the trigger module
+extern void SaveTriggers(FILE*);	/// Save the trigger module
+extern void CleanTriggers(void);	/// Cleanup the trigger module
 
 //@}
 

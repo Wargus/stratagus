@@ -37,6 +37,7 @@
 #include "unittype.h"
 #include "map.h"
 #include "campaign.h"
+#include "settings.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -247,11 +248,93 @@ local SCM CclDefineCampaign(SCM list)
 }
 
 /**
+**	Set the briefing.
+**
+**	@param list	List describing the briefing.
+*/
+local SCM CclBriefing(SCM list)
+{
+    SCM value;
+    int voice;
+    int objective;
+
+    voice=objective=0;
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("type")) ) {
+	    if( !gh_eq_p(gh_car(list),gh_symbol2scm("wc2")) ) {
+	       // FIXME: this leaves a half initialized briefing
+	       errl("Unsupported briefing type",value);
+	    }
+	    list=gh_cdr(list);
+	} else if ( gh_eq_p(value,gh_symbol2scm("title")) ) {
+	    if( GameIntro.Title ) {
+		free(GameIntro.Title);
+	    }
+	    GameIntro.Title=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	} else if ( gh_eq_p(value,gh_symbol2scm("background")) ) {
+	    if( GameIntro.Background ) {
+		free(GameIntro.Background);
+	    }
+	    GameIntro.Background=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	} else if ( gh_eq_p(value,gh_symbol2scm("text")) ) {
+	    if( GameIntro.TextFile ) {
+		free(GameIntro.TextFile);
+	    }
+	    GameIntro.TextFile=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	} else if ( gh_eq_p(value,gh_symbol2scm("voice")) ) {
+	    switch( voice ) {
+		case 0:
+		    if( GameIntro.VoiceFile1 ) {
+			free(GameIntro.VoiceFile1);
+		    }
+		    GameIntro.VoiceFile1=gh_scm2newstr(gh_car(list),NULL);
+		    break;
+		case 1:
+		    if( GameIntro.VoiceFile2 ) {
+			free(GameIntro.VoiceFile2);
+		    }
+		    GameIntro.VoiceFile2=gh_scm2newstr(gh_car(list),NULL);
+		    break;
+		default:
+		   errl("Only two voice",value);
+	    }
+	    list=gh_cdr(list);
+	} else if ( gh_eq_p(value,gh_symbol2scm("objective")) ) {
+	    if( objective==MAX_OBJECTIVES ) {
+		   errl("Only too much objectives",value);
+	    }
+	    if( GameIntro.Objectives[objective] ) {
+		free(GameIntro.Objectives[objective]);
+	    }
+	    GameIntro.Objectives[objective]=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	    ++objective;
+	} else {
+	   // FIXME: this leaves a half initialized briefing
+	   errl("Unsupported tag",value);
+	}
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for campaigns.
 */
 global void CampaignCclRegister(void)
 {
     gh_new_procedureN("define-campaign",CclDefineCampaign);
+    gh_new_procedureN("briefing",CclBriefing);
 }
 
 /**
@@ -269,8 +352,32 @@ global void SaveCampaign(FILE* file)
 */
 global void CleanCampaign(void)
 {
+    int i;
+
     // FIXME: Can't clean campaign needed for continue.
     DebugLevel0Fn("FIXME: Cleaning campaign not written\n");
+
+    if( GameIntro.Title ) {
+	free(GameIntro.Title);
+    }
+    if( GameIntro.Background ) {
+	free(GameIntro.Background);
+    }
+    if( GameIntro.TextFile ) {
+	free(GameIntro.TextFile);
+    }
+    if( GameIntro.VoiceFile2 ) {
+	free(GameIntro.VoiceFile1);
+    }
+    if( GameIntro.VoiceFile2 ) {
+	free(GameIntro.VoiceFile2);
+    }
+    for( i=0; i<MAX_OBJECTIVES; ++i ) {
+	if( GameIntro.Objectives[i] ) {
+	    free(GameIntro.Objectives[i]);
+	}
+    }
+    memset(&GameIntro,0,sizeof(GameIntro));
 }
 
 //@}
