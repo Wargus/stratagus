@@ -426,7 +426,7 @@ win32_2:
 
 win32:
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
-	$(MAKE) win32_2
+	$(MAKE) $(WIN32) win32_2
 
 win32distclean:
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
