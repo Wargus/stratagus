@@ -47,6 +47,117 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**	Reappear unit on map.
+**
+**	@param unit	Unit to drop out.
+**	@param heading	Direction in which the unit should appear.
+**	@param addx	Tile size in x.
+**	@param addy	Tile size in y.
+**
+**	@return		True if unit can be unloaded.
+*/
+global int UnloadUnit(Unit* unit,int addx,int addy)
+{
+    int x;
+    int y;
+    int i;
+    int mask;
+    int n;
+
+    DebugCheck( !unit->Removed );
+
+    x=unit->X;
+    y=unit->Y;
+    mask=UnitMovementMask(unit);
+
+    --x;
+    // FIXME: don't search outside of the map
+    for( n=0; n<2; ++n ) {
+	for( i=addy; i--; y++ ) {
+#ifdef NEW_SHIPS
+	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
+		continue;
+	    }
+#endif
+	    if( CheckedCanMoveToMask(x,y,mask) ) {
+		goto found;
+	    }
+	}
+	++addx;
+	for( i=addx; i--; x++ ) {
+#ifdef NEW_SHIPS
+	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
+		continue;
+	    }
+#endif
+	    if( CheckedCanMoveToMask(x,y,mask) ) {
+		goto found;
+	    }
+	}
+	++addy;
+	for( i=addy; i--; y-- ) {
+#ifdef NEW_SHIPS
+	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
+		continue;
+	    }
+#endif
+	    if( CheckedCanMoveToMask(x,y,mask) ) {
+		goto found;
+	    }
+	}
+	++addx;
+	for( i=addx; i--; x-- ) {
+#ifdef NEW_SHIPS
+	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
+		continue;
+	    }
+#endif
+	    if( CheckedCanMoveToMask(x,y,mask) ) {
+		goto found;
+	    }
+	}
+	++addy;
+    }
+    return 0;
+
+found:
+    unit->X=x;
+    unit->Y=y;
+
+    unit->Wait=1;		// should be correct unit has still action
+
+    // FIXME: Should I use PlaceUnit here?
+    UnitCacheInsert(unit);
+    // FIXME: This only works with 1x1 big units
+    DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
+    TheMap.Fields[x+y*TheMap.Width].Flags|=UnitFieldFlags(unit);
+
+    unit->Removed=0;
+
+#ifdef NEW_FOW
+    //
+    //	Update fog of war.
+    //
+    MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
+#else
+    //
+    //	Update fog of war, if unit belongs to player on this computer
+    //
+    if( unit->Player==ThisPlayer ) {
+	MapMarkSight(x,y,unit->Stats->SightRange);
+    }
+#endif
+    if( unit->Type->CanSeeSubmarine ) {
+	MarkSubmarineSeen(unit->Player,unit->X,unit->Y,unit->Stats->SightRange);
+    }
+
+    MustRedraw|=RedrawMinimap;
+    CheckUnitToBeDrawn(unit);
+
+    return 1;
+}
+
+/**
 **	Move to coast.
 **
 **	@param unit	Pointer to unit.
@@ -106,10 +217,11 @@ local void LeaveTransporter(Unit* unit)
 	    if( goal==unit->OnBoard[i] ) {
 		goal->X=unit->X;
 		goal->Y=unit->Y;
-		DropOutOnSide(goal,LookingW
-			,unit->Type->TileWidth,unit->Type->TileHeight);
-		unit->OnBoard[i]=NoUnitP;
-		unit->Value--;
+		if( UnloadUnit(goal,
+			unit->Type->TileWidth,unit->Type->TileHeight) ) {
+		    unit->OnBoard[i]=NoUnitP;
+		    unit->Value--;
+		}
 		break;
 	    }
 	}
@@ -118,10 +230,11 @@ local void LeaveTransporter(Unit* unit)
 	    if( (goal=unit->OnBoard[i]) ) {
 		goal->X=unit->X;
 		goal->Y=unit->Y;
-		DropOutOnSide(goal,LookingW
-			,unit->Type->TileWidth,unit->Type->TileHeight);
-		unit->OnBoard[i]=NoUnitP;
-		unit->Value--;
+		if( UnloadUnit(goal,
+			unit->Type->TileWidth,unit->Type->TileHeight) ) {
+		    unit->OnBoard[i]=NoUnitP;
+		    unit->Value--;
+		}
 	    }
 	}
     }
