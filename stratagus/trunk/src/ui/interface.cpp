@@ -1093,13 +1093,13 @@ local int InputKey(int key)
 		    CclCommand(Input);
 		}
 	    } else if (NetworkFildes==-1) {
-		if (!GameObserve) {
+//		if (!GameObserve) {
 		    int ret;
 		    ret = HandleCheats(Input);
 		    if (ret) {
 			CommandLog("input", NoUnitP,FlushCommands,-1,-1,NoUnitP,Input,-1);
 		    }
-		}
+//		}
 	    }
 	    // FIXME: only to selected players ...
 	    sprintf(ChatMessage, "<%s> %s", ThisPlayer->Name, Input);
@@ -1437,6 +1437,8 @@ local enum {
     ClickedMouseState,			/// button is clicked
 }	MouseState;			/// Current state of mouse
 
+local int MouseX;			/// Last mouse X position
+local int MouseY;			/// Last mouse Y position
 local unsigned LastMouseButton;		/// last mouse button handled
 local unsigned StartMouseTicks;		/// Ticks of first click
 local unsigned LastMouseTicks;		/// Ticks of last mouse event
@@ -1528,8 +1530,13 @@ global void InputMouseButtonRelease(const EventCallback* callbacks,
 global void InputMouseMove(const EventCallback* callbacks,
 	unsigned ticks,int x,int y)
 {
-    MouseState=InitialMouseState;
-    LastMouseTicks=ticks;
+    // Don't reset the mouse state unless we really moved
+    if( MouseX!=x || MouseY!=y ) {
+	MouseState=InitialMouseState;
+	LastMouseTicks=ticks;
+	MouseX=x;
+	MouseY=y;
+    }
     callbacks->MouseMoved(x,y);
 }
 
