@@ -128,13 +128,13 @@ global void PlayListAdvance(void)
 }
 
 /**
-**		Mix music to stereo 32 bit.
+**  Mix music to stereo 32 bit.
 **
-**		@param buffer		Buffer for mixed samples.
-**		@param size		Number of samples that fits into buffer.
+**  @param buffer  Buffer for mixed samples.
+**  @param size    Number of samples that fits into buffer.
 **
-**		@todo this functions can be called from inside the SDL audio callback,
-**				which is bad, the buffer should be precalculated.
+**  @todo this functions can be called from inside the SDL audio callback,
+**  which is bad, the buffer should be precalculated.
 */
 local void MixMusicToStereo32(int* buffer, int size)
 {
@@ -142,13 +142,23 @@ local void MixMusicToStereo32(int* buffer, int size)
 	int n;
 	int len;
 	short* buf;
+	char* tmp;
+	int div;
 
 	if (PlayingMusic) {
 		Assert(MusicSample && MusicSample->Type);
 
 		len = size * sizeof(*buf);
+		tmp = alloca(len);
 		buf = alloca(len);
-		n = MusicSample->Type->Read(MusicSample, buf, len);
+
+		div = 176400 / (MusicSample->Frequency * (MusicSample->SampleSize / 8)
+				* MusicSample->Channels);
+
+		size = MusicSample->Type->Read(MusicSample, tmp, len / div);
+
+		n = ConvertToStereo32((char*)(tmp), (char*)buf, MusicSample->Frequency,
+			MusicSample->SampleSize / 8, MusicSample->Channels, len / div);
 
 		for (i = 0; i < n / (int)sizeof(*buf); ++i) {
 			// Add to our samples
@@ -176,22 +186,21 @@ local void MixMusicToStereo32(int* buffer, int size)
 ----------------------------------------------------------------------------*/
 
 /**
-**		Mix sample to buffer.
+**  Mix sample to buffer.
 **
-**		The input samples are adjusted by the local volume and resampled
-**		to the output frequence.
+**  The input samples are adjusted by the local volume and resampled
+**  to the output frequence.
 **
-**		@param sample		Input sample
-**		@param index		Position into input sample
-**		@param volume		Volume of the input sample
-**		@param stereo		Stereo (left/right) position of sample
-**		@param buffer		Output buffer
-**		@param size		Size of the output buffer to be filled
+**  @param sample  Input sample
+**  @param index   Position into input sample
+**  @param volume  Volume of the input sample
+**  @param stereo  Stereo (left/right) position of sample
+**  @param buffer  Output buffer
+**  @param size    Size of output buffer (in samples per channel)
 **
-**		@return			the number of bytes used to fill buffer
+**  @return        The number of bytes used to fill buffer
 **
-**		@todo			Can mix faster if signed 8 bit buffers are used.
-**		@todo			Can combine stereo and volume for faster operation.
+**  @todo          Can mix faster if signed 8 bit buffers are used.
 */
 local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	char stereo, int* buffer, int size)
@@ -200,6 +209,11 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	unsigned char left;
 	unsigned char right;
 	int i;
+	int buf[SOUND_BUFFER_SIZE/2];
+	int div;
+
+	div = 176400 / (sample->Frequency * (sample->SampleSize / 8)
+			* sample->Channels);
 
 	local_volume = (int)volume * GlobalVolume / MaxVolume;
 	if (local_volume < 32) {
@@ -217,31 +231,38 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 
 	Assert(!(index & 1));
 
-	if (size >= sample->Len / 2 - index) {
-		size = sample->Len / 2 - index;
+	memset(buffer, 0, size * 4);
+
+	if (size >= (sample->Len - index) * div / 2) {
+		size = (sample->Len - index) * div / 2;
 	}
 
+	size = ConvertToStereo32((char*)(sample->Buffer + index), (char*)buf, sample->Frequency,
+			sample->SampleSize / 8, sample->Channels,
+			size * 2 / div);
+
+	size /= 2;
 	for (i = 0; i < size; i += 2) {
 		// FIXME: why taking out '/ 2' leads to distortion
-		buffer[i] += ((short*)(sample->Buffer))[index + i] * local_volume * left / 128 / MaxVolume / 2;
-		buffer[i + 1] += ((short*)(sample->Buffer))[index + i + 1] * local_volume * right / 128 / MaxVolume / 2;
+		buffer[i] += ((short*)(buf))[i] * local_volume * left / 128 / MaxVolume / 2;
+		buffer[i + 1] += ((short*)(buf))[i + 1] * local_volume * right / 128 / MaxVolume / 2;
 	}
 
-	return size;
+	return 2 * size / div;
 }
 
 /**
-**		Convert RAW sound data to 44100 hz, Stereo, 16 bits per channel
+**  Convert RAW sound data to 44100 hz, Stereo, 16 bits per channel
 **
-**		// FIXME
-**		@param src				Source buffer
-**		@param dest				Destination buffer
-**		@param frequency		Frequency of source
-**		@param chansize				Bitrate in bytes per channel of source
-**		@param channels				Number of channels of source
-**		@param bytes				Number of compressed bytes to read
+**  // FIXME
+**  @param src        Source buffer
+**  @param dest       Destination buffer
+**  @param frequency  Frequency of source
+**  @param chansize   Bitrate in bytes per channel of source
+**  @param channels   Number of channels of source
+**  @param bytes      Number of compressed bytes to read
 **
-**		@return				Number of bytes written in 'dest'
+**  @return           Number of bytes written in 'dest'
 */
 global int ConvertToStereo32(const char* src, char* dest, int frequency,
 	int chansize, int channels, int bytes)
@@ -581,9 +602,9 @@ local int MixChannelsToStereo32(int* buffer,int size)
 				Channels[channel].Point, Channels[channel].Volume,
 				Channels[channel].Stereo, buffer, size);
 			Channels[channel].Point += i;
+			Assert(Channels[channel].Point <= Channels[channel].Sample->Len);
 
-//			if (Channels[channel].Point >= Channels[channel].Sample->Length){
-			if (Channels[channel].Point >= Channels[channel].Sample->Len / 2) {
+			if (Channels[channel].Point == Channels[channel].Sample->Len) {
 				// free channel as soon as possible (before playing)
 				// useful in multithreading
 				FreeOneChannel(channel);
