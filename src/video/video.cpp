@@ -331,9 +331,10 @@ global void SetClipping(int left, int top, int right, int bottom)
 	left = 0;
     } else if (left >= VideoWidth) {
 	left = VideoWidth - 1;
+    }
     if (top < 0) {
 	top = 0;
-    else if (top >= VideoHeight) {
+    } else if (top >= VideoHeight) {
 	top = VideoHeight - 1;
     }
     if (right < 0) {
