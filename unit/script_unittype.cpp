@@ -933,6 +933,37 @@ local SCM CclSetUnitTypeProperty(SCM ptr,SCM property)
 }
 
 /**
+**	Define tileset mapping from original number to internal symbol
+**
+**	@param list	List of all names.
+*/
+local SCM CclDefineUnitTypeWcNames(SCM list)
+{
+    int i;
+    char** cp;
+
+    if( (cp=UnitTypeWcNames) ) {		// Free all old names
+	while( *cp ) {
+	    free(*cp++);
+	}
+	free(UnitTypeWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i=gh_length(list);
+    UnitTypeWcNames=cp=malloc((i+1)*sizeof(char*));
+    while( i-- ) {
+	*cp++=gh_scm2newstr(gh_car(list),NULL);
+	list=gh_cdr(list);
+    }
+    *cp=NULL;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for unit-type.
 */
 global void UnitTypeCclRegister(void)
@@ -956,6 +987,8 @@ global void UnitTypeCclRegister(void)
 
     gh_new_procedure1_0("get-unit-type-property",CclGetUnitTypeProperty);
     gh_new_procedure2_0("set-unit-type-property!",CclSetUnitTypeProperty);
+
+    gh_new_procedureN("define-unittype-wc-names",CclDefineUnitTypeWcNames);
 
     gh_new_procedureN("anim-type",CclAnimType);
 

@@ -10,10 +10,9 @@
 //
 /**@name unittype.h	-	The unit types headerfile. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
-//
 
 #ifndef __UNITTYPE_H__
 #define __UNITTYPE_H__
@@ -226,6 +225,8 @@ extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
 extern UnitType*UnitTypeHumanFarm;	/// Human farm
 extern UnitType*UnitTypeOrcFarm;	/// Orc farm
 extern UnitType*UnitTypeCritter;	/// Critter unit type pointer
+
+extern char** UnitTypeWcNames;		/// Mapping wc-number 2 symbol
 
 /*----------------------------------------------------------------------------
 --	Functions

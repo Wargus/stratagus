@@ -63,17 +63,11 @@ global UnitType*UnitTypeHumanFarm;	/// Human farm.
 global UnitType*UnitTypeOrcFarm;	/// Orc farm.
 global UnitType*UnitTypeCritter;	/// Critter unit type pointer
 
+#if !defined(USE_CCL)
 /**
-**	Lookup table for unit-type names
+**	Default without CCL support.
 */
-local hashtable(UnitType*,61) UnitTypeHash;
-
-/**
-**	W*rCr*ft number to internal unit-type name.
-**
-**	FIXME: must loaded from ccl!!!!
-*/
-local const char* UnitTypeWcNames[] = {
+local char* DefaultUnitTypeWcNames[] = {
     "unit-footman",
     "unit-grunt",
     "unit-peasant",
@@ -190,7 +184,24 @@ local const char* UnitTypeWcNames[] = {
     "unit-peon-with-wood",
     "unit-human-oil-tanker-full",
     "unit-orc-oil-tanker-full",
+    NULL
 };
+#endif
+
+/**
+**	Mapping of W*rCr*ft number to our internal unit-type symbols.
+**	The numbers are used in puds.
+*/
+global char** UnitTypeWcNames
+#if !defined(USE_CCL)
+    =DefaultUnitTypeWcNames
+#endif
+    ;
+
+/**
+**	Lookup table for unit-type names
+*/
+local hashtable(UnitType*,61) UnitTypeHash;
 
 #ifdef DEBUG	// {
 
@@ -658,10 +669,8 @@ global void ParsePudUDTA(const char* udta,int length)
     for( i=0; i<110; ++i ) {		// Missile Weapon
 	unittype=UnitTypeByWcNum(i);
 	v=Fetch8(udta);
-	//unittype->MissileWeapon=v;
-	unittype->Missile.Name=MissileTypes[v].Ident;
-	if( unittype->Missile.Missile ) abort();
-	// FIXME: convert wc weapon number to internal name
+	unittype->Missile.Name=MissileTypeWcNames[v];
+	DebugCheck( unittype->Missile.Missile );
     }
     for( i=0; i<110; ++i ) {		// Unit type
 	unittype=UnitTypeByWcNum(i);

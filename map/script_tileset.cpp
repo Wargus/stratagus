@@ -10,7 +10,7 @@
 //
 /**@name ccl_tileset.c	-	The tileset ccl functions. */
 //
-//	(c) Copyright 2000 by Lutz Sammer
+//	(c) Copyright 2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -84,13 +84,13 @@ local SCM CclTileset(SCM slot,SCM name,SCM file,SCM table)
 /**
 **	Define tileset mapping from original number to internal symbol
 **
+**	@param list	List of all names.
 */
 local SCM CclDefineTilesetWcNames(SCM list)
 {
     int i;
     char** cp;
 
-    i=gh_length(list);
     if( (cp=TilesetWcNames) ) {		// Free all old names
 	while( *cp ) {
 	    free(*cp++);
@@ -101,6 +101,7 @@ local SCM CclDefineTilesetWcNames(SCM list)
     //
     //	Get new table.
     //
+    i=gh_length(list);
     TilesetWcNames=cp=malloc((i+1)*sizeof(char*));
     while( i-- ) {
 	*cp++=gh_scm2newstr(gh_car(list),NULL);

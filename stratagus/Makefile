@@ -25,6 +25,6 @@ OBJS	= clone.$(OE) unit.$(OE) unit_draw.$(OE) unitcache.$(OE) \
 	  unit_find.$(OE) missile.$(OE) construct.$(OE)\
 	  player.$(OE) pud.$(OE) ccl.$(OE) interface.$(OE) iolib.$(OE) \
 	  mainloop.$(OE) goal.$(OE) selection.$(OE) groups.$(OE) \
-	  spells.$(OE)
+	  spells.$(OE) ccl_missile.$(OE)
 
 include $(TOPDIR)/Common.mk
