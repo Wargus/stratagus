@@ -83,7 +83,15 @@ global void SetVideoSync(void)
 	return;
     }
 
-    // FIXME: didn't work with SDL/SVGAlib
+    // FIXME: doesn't work with SDL/SVGAlib
+#ifdef __linux__
+    {
+	// ARI: kick svgalib's butt - WE handled SIGALRM, no bombing any more!
+	extern void SDL_TimerInit();
+	SDL_TimerInit();
+    }
+#endif
+
     if( SDL_SetTimer(
 		(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed,
 		VideoSyncHandler) ) {
@@ -108,7 +116,7 @@ global void InitVideoSdl(void)
 
     if ( SDL_Init(
 #ifdef USE_SDLA
-	    // FIXME: didn't work with SDL SVGAlib
+	    // FIXME: doesn't work with SDL SVGAlib
 	    SDL_INIT_AUDIO |
 #endif
 #ifdef DEBUG
@@ -157,7 +165,7 @@ global void InitVideoSdl(void)
     //
     //	I need the used bits per pixel.
     //	You see it's better making all self, than using wired libaries :)
-    //  And with the win32 version this also didn't works
+    //  And with the win32 version this also doesn't work
     //
     if( !VideoDepth ) {
 	int i;
@@ -189,7 +197,7 @@ global void InitVideoSdl(void)
 
     // Make default character translation easier
     SDL_EnableUNICODE(1);
-    // Enable keyborad repeat (with autodetection of SDL version :)
+    // Enable keyboard repeat (with autodetection of SDL version :)
 #ifdef SDL_DEFAULT_REPEAT_DELAY
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
 #endif
@@ -310,7 +318,7 @@ local void SdlHandleKey(const SDL_keysym* code)
 	    break;
 
         // We need these because if you only hit a modifier key,
-        // the *ots from SDL didn't report correct modifiers
+        // the *ots from SDL don't report correct modifiers
 	case SDLK_LSHIFT:
 	case SDLK_RSHIFT:
 	    icode = KeyCodeShift;
@@ -367,7 +375,7 @@ local void SdlHandleKeyUp(const SDL_keysym* code)
 
     switch( (icode=code->sym) ) {
         // We need these because if you only hit a modifier key,
-        // the *ots from SDL didn't report correct modifiers
+        // the *ots from SDL don't report correct modifiers
 	case SDLK_LSHIFT:
 	case SDLK_RSHIFT:
 	    icode = KeyCodeShift;
