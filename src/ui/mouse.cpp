@@ -1055,7 +1055,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	mx=Screen2MapX(CursorX);
 	my=Screen2MapY(CursorY);
 	if( MouseButtons&LeftButton ) {
-	    MakeMissile(MissileTypeGreenCross
+	    MakeLocalMissile(MissileTypeGreenCross
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
@@ -1079,7 +1079,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	    CurrentButtonLevel = 0; // reset unit buttons to normal
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel|RedrawCursor;
-	    MakeMissile(MissileTypeGreenCross
+	    MakeLocalMissile(MissileTypeGreenCross
 		    ,mx*TileSizeX+TileSizeX/2,my*TileSizeY+TileSizeY/2,0,0);
 	    SendCommand(mx,my);
 	} else {
@@ -1183,7 +1183,7 @@ global void UIHandleButtonDown(unsigned button)
             if ( unit ) { // if right click on building -- blink
               unit->Blink=3;
 	    } else { // if not not click on building -- green cross
-	      MakeMissile(MissileTypeGreenCross
+	      MakeLocalMissile(MissileTypeGreenCross
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
 	    }
@@ -1197,7 +1197,7 @@ global void UIHandleButtonDown(unsigned button)
 	    MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
 		    ,ScreenMinimap2MapY(CursorY)-MapHeight/2);
 	} else if( MouseButtons&RightButton ) {
-	    MakeMissile(MissileTypeGreenCross
+	    MakeLocalMissile(MissileTypeGreenCross
 		    ,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 		    ,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
 	    // DoRightButton() takes screen map coordinates

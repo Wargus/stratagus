@@ -146,9 +146,9 @@ global void ReleaseUnit(Unit* unit)
 	//
 	DebugCheck( *unit->UnitSlot!=unit );
 	temp=Units[--NumUnits];
-	Units[NumUnits]=NULL;
 	temp->UnitSlot=unit->UnitSlot;
 	*unit->UnitSlot=temp;
+	Units[NumUnits]=NULL;
 	//
 	//	Are more references remaining?
 	//
@@ -572,9 +572,9 @@ global void UnitLost(Unit* unit)
     if( player ) {
 	DebugCheck( *unit->PlayerSlot!=unit );
 	temp=player->Units[--player->TotalNumUnits];
-	player->Units[player->TotalNumUnits]=NULL;
 	temp->PlayerSlot=unit->PlayerSlot;
 	*unit->PlayerSlot=temp;
+	player->Units[player->TotalNumUnits]=NULL;
     }
 
     //
@@ -1275,9 +1275,9 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     //	Remove from old player table
 
     temp=oldplayer->Units[--oldplayer->TotalNumUnits];
-    oldplayer->Units[oldplayer->TotalNumUnits]=NULL;
     temp->PlayerSlot=unit->PlayerSlot;
     *unit->PlayerSlot=temp;
+    oldplayer->Units[oldplayer->TotalNumUnits]=NULL;
 #endif
 
     //
