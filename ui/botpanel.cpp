@@ -476,7 +476,7 @@ global void DrawButtonPanel(void)
 	    //
 	    //	Update status line for this button
 	    //
-	    if( ButtonUnderCursor==i+10 ) {
+	    if( ButtonUnderCursor==i+10 && KeyState!=KeyStateInput ) {
 		SetStatusLine(buttons[i].Hint);
 		// FIXME: Draw costs
 		v=buttons[i].Value;
