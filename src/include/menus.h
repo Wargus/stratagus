@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name menus.h	-	The menu headerfile. */
-/*
-**	(c) Copyright 1999,2000 by Andreas Arens
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Andreas Arens
+//
+//	$Id$
 
 #ifndef __MENUS_H__
 #define __MENUS_H__
@@ -21,7 +20,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Menubuttons
+--	Defines/Declarations
 ----------------------------------------------------------------------------*/
 
 #define MenuButtonActive	1	/// cursor on button
@@ -29,8 +28,9 @@
 #define MenuButtonSelected	4	/// selected button
 #define MenuButtonDisabled	8	/// button cannot be depressed
 
-#define MENUBUTTONHEIGHT 144
-#define MENUBUTTONWIDTH 300
+#define MENUBUTTONHEIGHT 144		/// Height of button in the graphic
+#define MENUBUTTONWIDTH 300		/// Width of button in the graphic
+
 /**
 **	Menu button referencing
 **	Each button is 300 x 144  =>	53 buttons
@@ -40,7 +40,7 @@ typedef unsigned MenuButtonId;
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
-#define MBUTTON_MAIN		 4
+#define MBUTTON_MAIN		 4	/// FIXME: write docu
 #define MBUTTON_GM_HALF		10
 #define MBUTTON_132		13
 #define MBUTTON_GM_FULL		16
@@ -63,13 +63,13 @@ typedef unsigned MenuButtonId;
 **	Menuitem definition.
 */
 typedef struct _menuitem_ {
-    int mitype;
+    int mitype;					/// FIXME: write docu
     unsigned xofs;
     unsigned yofs;
     unsigned flags;
     int font;
-    void (*initfunc)(struct _menuitem_ *);	// constructor
-    void (*exitfunc)(struct _menuitem_ *);	// destructor
+    void (*initfunc)(struct _menuitem_ *);	/// constructor
+    void (*exitfunc)(struct _menuitem_ *);	/// destructor
     union {
 	struct {
 	    unsigned char *text;
@@ -137,7 +137,7 @@ typedef struct _menuitem_ {
     } d;
 } Menuitem;
 
-#define MI_TYPE_TEXT 1
+#define MI_TYPE_TEXT 1			/// FIXME: write docu
 #define MI_TYPE_BUTTON 2
 #define MI_TYPE_PULLDOWN 3
 #define MI_TYPE_LISTBOX 4
@@ -172,7 +172,7 @@ typedef struct _menus_ {
 } Menu;
 
 
-#define MENU_GAME 0
+#define MENU_GAME 0			/// FIXME: write docu
 #define MENU_VICTORY 1
 #define MENU_LOST 2
 #define MENU_SCEN_SELECT 3
@@ -189,7 +189,7 @@ typedef struct _menus_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern  int CurrentMenu;
+extern  int CurrentMenu;		/// Current handled menu
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -212,8 +212,6 @@ extern void MenuHandleMouseMove(int x,int y);
 extern void MenuHandleButtonDown(int b);
     /// Called if any mouse button is released up
 extern void MenuHandleButtonUp(int b);
-    /// Called if the mouse is moved
-
 
 //@}
 
