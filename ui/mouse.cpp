@@ -1173,12 +1173,8 @@ global void UIHandleButtonUp(int b)
 	    //		Other clicks.
 	    //
 	    if( NumSelected==1 ) {
-#ifdef NEW_ORDERS
 		if( Selected[0]->Orders[0].Action==UnitActionBuilded ) {
-#else
-		if( Selected[0]->Command.Action==UnitActionBuilded ) {
-#endif
-		//if( Selected[0]->Constructed )
+		// FIXME: if( Selected[0]->Constructed )
 		    PlayUnitSound(Selected[0],VoiceBuilding);
 		} else if( Selected[0]->Burning ) {
 		    // FIXME: use GameSounds.Burning
