@@ -603,17 +603,13 @@ global void UnitLost(const Unit* unit)
     }
 
     //
-    //	Destroy oil-platform, must update oil.
+    //	Destroy oil-platform, must re-make oil patch.
     //
-    if( type->GivesOil ) {
-	temp=OilPatchOnMap(unit->X,unit->Y);
-	if( temp ) {
-	    // JOHNS: copy remaining oil value
-	    temp->Value=unit->Value;
-	    temp->Removed=0;
-	} else {
-	    DebugLevel0(__FUNCTION__": Update no oil-patch %s\n",type->Ident);
-	}
+    if( type->GivesOil && unit->Value > 0 ) {
+	// NOTE: I wasn't sure the best UnitType/Player
+	// NOTE: This should really NOT be hardcoded?!
+	temp=MakeUnitAndPlace(unit->X,unit->Y,UnitTypeByWcNum(93),&Players[15]);
+	temp->Value=unit->Value;
     }
 
     player->UnitTypesCount[type->Type]--;
@@ -2350,10 +2346,9 @@ global void DestroyUnit(Unit* unit)
     unit->HP=0;
     unit->Moving=0;
 
-    type=unit->Type;
-    PlayUnitSound(unit,VoiceDying);
-
     MustRedraw|=RedrawResources; // for food usage indicator
+
+    type=unit->Type;
 
     //
     //	Oil patch or removed units,  just remove.
@@ -2364,6 +2359,8 @@ global void DestroyUnit(Unit* unit)
 	ReleaseUnit(unit);
 	return;
     }
+
+    PlayUnitSound(unit,VoiceDying);
 
     //
     //	Catapults,... explodes.
