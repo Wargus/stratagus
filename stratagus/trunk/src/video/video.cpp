@@ -530,9 +530,9 @@ global void LoadRGB(Palette *pal, const char *name)
 
     p=buffer;
     for( i=0;i<256;i++ ) {
-	pal[i].r=(*p++)<<2;
-	pal[i].g=(*p++)<<2;
-	pal[i].b=(*p++)<<2;
+	pal[i].r=(*p++);
+	pal[i].g=(*p++);
+	pal[i].b=(*p++);
     }
 
     CLclose(fp);
