@@ -547,12 +547,10 @@ global void UpdateDisplay(void)
 	int i;
 
 	for( i=0; i<TheUI.NumFillers; ++i ) {
-	    if (TheUI.Filler[i].Graphic) {
-		VideoDrawSub(TheUI.Filler[i].Graphic,0,0
+	    VideoDrawSub(TheUI.Filler[i].Graphic,0,0
 		    ,TheUI.Filler[i].Graphic->Width
 		    ,TheUI.Filler[i].Graphic->Height
 		    ,TheUI.FillerX[i],TheUI.FillerY[i]);
-	    }
 	}
     }
 
