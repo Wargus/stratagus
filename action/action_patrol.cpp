@@ -88,7 +88,7 @@ global void HandleActionPatrol(Unit* unit)
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
 		DebugLevel0("Patrol attack %Zd\n",UnitNumber(goal));
-		CommandAttack(unit,goal->X,goal->Y,NULL,1);
+		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		// Save current command to come back.
 #ifdef NEW_ORDERS
 		unit->SavedOrder=unit->Orders[0];
