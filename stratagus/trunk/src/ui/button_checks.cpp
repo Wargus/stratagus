@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name button_checks.c	-	The button checks. */
+/**@name button_checks.c - The button checks. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//      (c) Copyright 1999-2004 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -45,28 +45,17 @@
 #include "network.h"
 
 /*----------------------------------------------------------------------------
---	  Defines
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---	  Declaration
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---	  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---	  Function
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		ButtonCheck for button enabled, always true.
-**		This needed to overwrite the internal tests.
+**  ButtonCheck for button enabled, always true.
+**  This needed to overwrite the internal tests.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckTrue(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
@@ -75,12 +64,13 @@ global int ButtonCheckTrue(const Unit* unit __attribute__((unused)),
 }
 
 /**
-**		Check for button enabled, always false.
-**		This needed to overwrite the internal tests.
+**  Check for button enabled, always false.
+**  This needed to overwrite the internal tests.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckFalse(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
@@ -89,11 +79,12 @@ global int ButtonCheckFalse(const Unit* unit __attribute__((unused)),
 }
 
 /**
-**		Check for button enabled, if upgrade is ready.
+**  Check for button enabled, if upgrade is ready.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckUpgrade(const Unit* unit, const ButtonAction* button)
 {
@@ -101,11 +92,12 @@ global int ButtonCheckUpgrade(const Unit* unit, const ButtonAction* button)
 }
 
 /**
-**		Check for button enabled, if any unit is available.
+**  Check for button enabled, if any unit is available.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckUnitsOr(const Unit* unit, const ButtonAction* button)
 {
@@ -125,11 +117,12 @@ global int ButtonCheckUnitsOr(const Unit* unit, const ButtonAction* button)
 }
 
 /**
-**		Check for button enabled, if all units are available.
+**  Check for button enabled, if all units are available.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 {
@@ -149,14 +142,14 @@ global int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 }
 
 /**
-**		Check if network play is enabled.
-**		Needed for walls, which could only be build in network play.
+**  Check if network play is enabled.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
 **
-**		NOTE: this check could also be moved into intialisation.
+**  @return        True if enabled.
+**
+**  NOTE: this check could also be moved into intialisation.
 */
 global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
@@ -165,13 +158,14 @@ global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
 }
 
 /**
-**		Check if network play is disabled.
+**  Check if network play is disabled.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if disabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
 **
-**		NOTE: this check could also be moved into intialisation.
+**  @return        True if disabled.
+**
+**  NOTE: this check could also be moved into intialisation.
 */
 global int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
@@ -180,12 +174,13 @@ global int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
 }
 
 /**
-**		Check for button enabled, if the unit isn't working.
-**				Working is training, upgrading, researching.
+**  Check for button enabled, if the unit isn't working.
+**  Working is training, upgrading, researching.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckNoWork(const Unit* unit,
 	const ButtonAction* button __attribute__((unused)))
@@ -197,11 +192,12 @@ global int ButtonCheckNoWork(const Unit* unit,
 }
 
 /**
-**		Check for button enabled, if the unit isn't researching.
+**  Check for button enabled, if the unit isn't researching.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckNoResearch(const Unit* unit,
 	const ButtonAction* button __attribute__((unused)))
@@ -212,12 +208,13 @@ global int ButtonCheckNoResearch(const Unit* unit,
 }
 
 /**
-**		Check for button enabled, if all requirements for an upgrade to unit
-**		are meet.
+**  Check for button enabled, if all requirements for an upgrade to unit
+**  are met.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckUpgradeTo(const Unit* unit, const ButtonAction* button)
 {
@@ -228,11 +225,12 @@ global int ButtonCheckUpgradeTo(const Unit* unit, const ButtonAction* button)
 }
 
 /**
-**		Check if all requirements for an attack are meet.
+**  Check if all requirements for an attack are met.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckAttack(const Unit* unit,
 	const ButtonAction* button __attribute__((unused)))
@@ -241,15 +239,17 @@ global int ButtonCheckAttack(const Unit* unit,
 }
 
 /**
-**		Check if all requirements for upgrade research are meet.
+**  Check if all requirements for upgrade research are met.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckResearch(const Unit* unit, const ButtonAction* button)
 {
-	if (!ButtonCheckNoWork(unit, button)) {		// don't show any if working
+	// don't show any if working
+	if (!ButtonCheckNoWork(unit, button)) {
 		return 0;
 	}
 
@@ -265,12 +265,13 @@ global int ButtonCheckResearch(const Unit* unit, const ButtonAction* button)
 }
 
 /**
-**		Check if all requirements for upgrade research are meet only one
-**		running research allowed.
+**  Check if all requirements for upgrade research are met only one
+**  running research allowed.
 **
-**		@param unit		Pointer to unit for button.
-**		@param button		Pointer to button to check/enable.
-**		@return				True if enabled.
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
 */
 global int ButtonCheckSingleResearch(const Unit* unit,
 	const ButtonAction* button)
