@@ -373,20 +373,22 @@ global void InitUnit(Unit* unit, UnitType* type)
 */
 global void AssignUnitToPlayer(Unit *unit, Player *player)
 {
-    UnitType *type;
+    UnitType* type;
  
-    type = unit->Type;
+    type=unit->Type;
 
     //
     //	Build player unit table    
     //
-    if (player && !type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
+    if( player && !type->Vanishes && unit->Orders[0].Action!=UnitActionDie ) {
 	unit->PlayerSlot=player->Units+player->TotalNumUnits++;
 	if( type->_HitPoints!=0 ) {
 	    if( type->Building ) {
-		player->TotalBuildings++;
-	    }
-	    else {
+		// FIXME: support more races
+		if( type!=UnitTypeOrcWall && type!=UnitTypeHumanWall ) {
+		    player->TotalBuildings++;
+		}
+	    } else {
 		player->TotalUnits++;
 	    }
 	}
@@ -402,7 +404,10 @@ global void AssignUnitToPlayer(Unit *unit, Player *player)
 	}
     }
     if( type->Building ) {
-	player->NumBuildings++;
+	// FIXME: support more races
+	if( type!=UnitTypeOrcWall && type!=UnitTypeHumanWall ) {
+	    player->NumBuildings++;
+	}
     }
 
     unit->Player=player;
@@ -794,7 +799,10 @@ global void UnitLost(Unit* unit)
 	player->Units[player->TotalNumUnits]=NULL;
 
 	if( unit->Type->Building ) {
-	    player->NumBuildings--;
+	    // FIXME: support more races
+	    if( type!=UnitTypeOrcWall && type!=UnitTypeHumanWall ) {
+		player->NumBuildings--;
+	    }
 	}
 
 	if( unit->Orders[0].Action!=UnitActionBuilded ) {
