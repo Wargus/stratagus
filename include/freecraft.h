@@ -439,9 +439,6 @@ extern int SpeedTrain;			/// speed factor for training
 extern int SpeedUpgrade;		/// speed factor for upgrading
 extern int SpeedResearch;		/// speed factor for researching
 
-extern int SpeedKeyScroll;		/// Keyboard Scrolling Speed, in Frames
-extern int SpeedMouseScroll;		/// Mouse Scrolling Speed, in Frames
-
 extern void LoadGame(char*);		/// Load saved game back
 extern void SaveGame(const char*);	/// Save game for later load
 
