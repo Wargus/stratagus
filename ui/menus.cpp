@@ -3324,6 +3324,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     }
 #endif
     u = 0;
+    lcp = 0;
     while (suf[u]) {
 	cp = np;
 	--cp;
