@@ -521,25 +521,27 @@ char* LibraryFileName(const char* file, char* buffer)
 	//
 	//  In user home directory
 	//
-	sprintf(buffer, "%s/%s", GameName, file);
-	if (!access(buffer,R_OK)) {
-		return buffer;
-	}
+	if (GameName) {
+		sprintf(buffer, "%s/%s", GameName, file);
+		if (!access(buffer,R_OK)) {
+			return buffer;
+		}
 #ifdef USE_ZLIB  // gzip or bzip2 in user home directory
-	sprintf(buffer, "%s/%s.gz", GameName, file);
-	if (!access(buffer, R_OK)) {
-		return buffer;
-	}
+		sprintf(buffer, "%s/%s.gz", GameName, file);
+		if (!access(buffer, R_OK)) {
+			return buffer;
+		}
 #endif
 #ifdef USE_BZ2LIB
-	sprintf(buffer, "%s/%s.bz2", GameName, file);
-	if (!access(buffer, R_OK)) {
-		return buffer;
+		sprintf(buffer, "%s/%s.bz2", GameName, file);
+		if (!access(buffer, R_OK)) {
+			return buffer;
+		}
+#endif
 	}
 #endif
-#endif
 
-	if ((s = getenv("HOME"))) {
+	if ((s = getenv("HOME")) && GameName) {
 		//
 		//  In user home directory
 		//
