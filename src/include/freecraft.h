@@ -247,7 +247,7 @@
 #define DEFAULT_VIDEO_HEIGHT	480	/// Default video height
 
 // This is for 1600x1200
-#define MAXMAP_W	50		/// maximum map width in tiles
+#define MAXMAP_W	50		/// maximum map width in tiles on screen
 #define MAXMAP_H	40		/// maximum map height in tiles
 
 #define MINIMAP_W	128		/// minimap width in pixels

@@ -92,7 +92,7 @@ newtry:
 
     if( !CheckedForestOnMap(x,y) ) {
 	//
-	//	Check surrounding for forest
+	//	Fast check surrounding for forest
 	//
 	x=unit->X;
 	y=unit->Y;
@@ -125,6 +125,7 @@ newtry:
 
     unit->Orders[0].X=x;
     unit->Orders[0].Y=y;
+    unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
     DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
     // turn to wood
     UnitHeadingFromDeltaXY(unit,x-unit->X,y-unit->Y);
