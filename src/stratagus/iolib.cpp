@@ -40,6 +40,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#ifdef __CYGWIN__
+#include <limits.h>
+#endif
 #else
 #define R_OK	1	// FIXME: correct?
 #endif
