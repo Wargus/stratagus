@@ -501,7 +501,8 @@ void cd_get_volume(int *c0, int *c1)
 }
 
 
-void cd_set_volume(int c0, int c1)
+void cd_set_volume(int c0 __attribute__((unused)),
+	int c1 __attribute__((unused)))
 {
 }
 
