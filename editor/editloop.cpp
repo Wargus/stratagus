@@ -93,7 +93,8 @@ local char TileToolDecoration;		/// Tile tool draws with decorations
 local int TileCursorSize;		/// Tile cursor size 1x1 2x2 ... 4x4
 local int TileCursor;			/// Tile type number
 
-local int MirrorEdit;                   /// Mirror editing enabled
+local int MirrorEdit = 0;                   /// Mirror editing enabled
+local int UnitPlacedThisPress = 0;	///Only allow one unit per press
 
 enum _mode_buttons_ {
     SelectButton=201,			/// Select mode button
@@ -955,6 +956,9 @@ local void EditorCallbackButtonUp(unsigned button)
 	    ProcessMenu("menu-editor",1);
 	}
     }
+    if((1<<button) == LeftButton) {
+	UnitPlacedThisPress = 0;
+    }
 }
 
 /**
@@ -1168,19 +1172,22 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		Viewport2MapY(TheUI.MouseViewport, CursorY), TileCursor,
 		TileCursorSize);
 	}
-	if (EditorState == EditorEditUnit && CursorBuilding) {
-	    if (CanBuildUnitType(NULL, CursorBuilding,
-		    Viewport2MapX(TheUI.MouseViewport, CursorX),
-		    Viewport2MapY(TheUI.MouseViewport, CursorY))) {
-		PlayGameSound(GameSounds.PlacementSuccess.Sound,
-		    MaxSampleVolume);
-		EditUnit(Viewport2MapX(TheUI.MouseViewport,CursorX),
-		    Viewport2MapY(TheUI.MouseViewport, CursorY),
-		    CursorBuilding, Players + SelectedPlayer);
-	    } else {
-		SetStatusLine("Unit can't be placed here.");
-		PlayGameSound(GameSounds.PlacementError.Sound,
-		    MaxSampleVolume);
+	if(!UnitPlacedThisPress) {
+	    if (EditorState == EditorEditUnit && CursorBuilding) {
+		if (CanBuildUnitType(NULL, CursorBuilding,
+			Viewport2MapX(TheUI.MouseViewport, CursorX),
+			Viewport2MapY(TheUI.MouseViewport, CursorY))) {
+		    PlayGameSound(GameSounds.PlacementSuccess.Sound,
+			MaxSampleVolume);
+		    EditUnit(Viewport2MapX(TheUI.MouseViewport,CursorX),
+			Viewport2MapY(TheUI.MouseViewport, CursorY),
+			CursorBuilding, Players + SelectedPlayer);
+		    UnitPlacedThisPress = 1;
+		} else {
+		    SetStatusLine("Unit can't be placed here.");
+		    PlayGameSound(GameSounds.PlacementError.Sound,
+			MaxSampleVolume);
+		}
 	    }
 	}
     }
