@@ -120,7 +120,7 @@ local int MoveToResource(Unit* unit)
 		}
 	} else {
 		goal = unit->Orders[0].Goal;
-		DebugCheck(!goal);
+		Assert(goal);
 		switch (DoActionMove(unit)) { // reached end-point?
 			case PF_UNREACHABLE:
 				return -1;
@@ -150,8 +150,8 @@ local int StartGathering(Unit* unit)
 	ResourceInfo* resinfo;
 
 	resinfo = unit->Type->ResInfo[unit->CurrentResource];
-	DebugCheck(unit->IX);
-	DebugCheck(unit->IY);
+	Assert(!unit->IX);
+	Assert(!unit->IY);
 	if (resinfo->TerrainHarvester) {
 		// This shouldn't happend?
 #if 0
@@ -195,7 +195,7 @@ local int StartGathering(Unit* unit)
 
 	// FIXME: 0 can happen, if to near placed by map designer.
 	DebugLevel3Fn("%d\n" _C_ MapDistanceBetweenUnits(unit, goal));
-	DebugCheck(MapDistanceBetweenUnits(unit, goal) > 1);
+	Assert(MapDistanceBetweenUnits(unit, goal) <= 1);
 
 	//
 	// Update the heading of a harvesting unit to looks straight at the resource.
@@ -256,7 +256,7 @@ local void AnimateActionHarvest(Unit* unit)
 	int flags;
 
 	if (unit->Type->Animations) {
-		DebugCheck(!unit->Type->Animations->Harvest[unit->CurrentResource]);
+		Assert(unit->Type->Animations->Harvest[unit->CurrentResource]);
 		flags = UnitShowAnimation(unit,
 			unit->Type->Animations->Harvest[unit->CurrentResource]);
 		if ((flags & AnimationSound) && (UnitVisible(unit, ThisPlayer) || ReplayRevealMap)) {
@@ -279,7 +279,7 @@ local void LoseResource(Unit* unit, const Unit* source)
 	resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
 	if (unit->Container) {
-		DebugCheck(resinfo->HarvestFromOutside);
+		Assert(!resinfo->HarvestFromOutside);
 	}
 
 	//
@@ -310,7 +310,7 @@ local void LoseResource(Unit* unit, const Unit* source)
 	// Dump the unit outside and look for something to do.
 	//
 	if (unit->Container) {
-		DebugCheck(resinfo->HarvestFromOutside);
+		Assert(!resinfo->HarvestFromOutside);
 		DropOutOnSide(unit, LookingW, source->Type->TileWidth,
 			source->Type->TileHeight);
 	}
@@ -358,7 +358,7 @@ local int GatherResource(Unit* unit)
 	}
 
 	if (unit->Data.ResWorker.DoneHarvesting) {
-		DebugCheck(!(resinfo->HarvestFromOutside || resinfo->TerrainHarvester));
+		Assert(resinfo->HarvestFromOutside || resinfo->TerrainHarvester);
 		return unit->Reset;
 	}
 
@@ -408,8 +408,8 @@ local int GatherResource(Unit* unit)
 				source = unit->Container;
 			}
 
-			DebugCheck(!source);
-			DebugCheck(source->Value > 655350);
+			Assert(source);
+			Assert(source->Value <= 655350);
 
 			//
 			// Target is not dead, getting resources.
@@ -501,7 +501,7 @@ local int StopGathering(Unit* unit)
 			source = unit->Container;
 		}
 		source->Data.Resource.Active--;
-		DebugCheck(source->Data.Resource.Active < 0);
+		Assert(source->Data.Resource.Active >= 0);
 	}
 
 
@@ -518,7 +518,7 @@ local int StopGathering(Unit* unit)
 	if (!(depot = FindDeposit(unit, unit->X, unit->Y, 1000, unit->CurrentResource)) ||
 			!unit->Value) {
 		if (!(resinfo->HarvestFromOutside || resinfo->TerrainHarvester)) {
-			DebugCheck(!unit->Container);
+			Assert(unit->Container);
 			DropOutOnSide(unit, LookingW, source->Type->TileWidth,
 				source->Type->TileHeight);
 		}
@@ -529,7 +529,7 @@ local int StopGathering(Unit* unit)
 		// should return 0, done below!
 	} else {
 		if (!(resinfo->HarvestFromOutside || resinfo->TerrainHarvester)) {
-			DebugCheck(!unit->Container);
+			Assert(unit->Container);
 			DropOutNearest(unit, depot->X + depot->Type->TileWidth / 2,
 				depot->Y + depot->Type->TileHeight / 2,
 				source->Type->TileWidth, source->Type->TileHeight);
@@ -565,7 +565,7 @@ local int MoveToDepot(Unit* unit)
 	resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
 	goal = unit->Orders[0].Goal;
-	DebugCheck(!goal);
+	Assert(goal);
 
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
@@ -592,7 +592,7 @@ local int MoveToDepot(Unit* unit)
 		return 0;
 	}
 
-	DebugCheck(unit->Wait != 1);
+	Assert(unit->Wait == 1);
 
 	//
 	// If resource depot is still under construction, wait!
@@ -648,7 +648,7 @@ local int WaitInDepot(Unit* unit)
 	resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
 	depot = ResourceDepositOnMap(unit->X, unit->Y, resinfo->ResourceId);
-	DebugCheck(!depot);
+	Assert(depot);
 	// Could be destroyed, but then we couldn't be in?
 
 	if (unit->Orders[0].Arg1 == (void*)-1) {

@@ -92,7 +92,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 		//
 		// Calculate the repair costs.
 		//
-		DebugCheck(!goal->Stats->HitPoints);
+		Assert(goal->Stats->HitPoints);
 
 		//
 		// Check if enough resources are available
@@ -160,7 +160,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 local int AnimateActionRepair(Unit* unit)
 {
 	if (unit->Type->Animations) {
-		DebugCheck(!unit->Type->Animations->Repair);
+		Assert(unit->Type->Animations->Repair);
 		DoActionRepairGeneric(unit, unit->Type->Animations->Repair);
 	}
 
@@ -239,7 +239,7 @@ global void HandleActionRepair(Unit* unit)
 				}
 
 				// FIXME: Should be it already?
-				DebugCheck(unit->Orders[0].Action != UnitActionRepair);
+				Assert(unit->Orders[0].Action == UnitActionRepair);
 			}
 			break;
 

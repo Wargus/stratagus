@@ -314,7 +314,7 @@ local void AiRequestSupply(void)
 	AiBuildQueue* queue;
 	int counter[UnitTypeMax];
 
-	DebugCheck(!AiHelpers.UnitLimit);
+	Assert(AiHelpers.UnitLimit);
 
 	//
 	// Count the already made build requests.
@@ -820,7 +820,7 @@ local int AiAssignHarvester(Unit* unit, int resource)
 	}
 
 	resinfo = unit->Type->ResInfo[resource];
-	DebugCheck(!resinfo);
+	Assert(resinfo);
 	if (resinfo->TerrainHarvester) {
 		//
 		// Code for terrain harvesters. Search for piece of terrain to mine.
@@ -854,7 +854,7 @@ local int AiAssignHarvester(Unit* unit, int resource)
 					exploremask |= MapFieldSeaUnit;
 					break;
 				default:
-					DebugCheck(1);
+					Assert(0);
 				}
 			}
 		}

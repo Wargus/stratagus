@@ -236,10 +236,10 @@ global void RegionDebugWater(void)
 			for (x = 0; x < TheMap.Width; x++) {
 			reg = RegionMapping(x,y);
 			if (!TileMappable(x,y)) {
-				DebugCheck(reg != NoRegion);
+				Assert(reg == NoRegion);
 			} else {
-				DebugCheck(reg == NoRegion);
-					DebugCheck(TileIsWater(x,y) != Regions[reg].IsWater);
+				Assert(reg != NoRegion);
+				Assert(TileIsWater(x,y) == Regions[reg].IsWater);
 			}
 		}
 	}

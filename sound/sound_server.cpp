@@ -148,7 +148,7 @@ local void MixMusicToStereo32(int* buffer, int size)
 	short* buf;
 
 	if (PlayingMusic) {
-		DebugCheck(!MusicSample && !MusicSample->Type);
+		Assert(MusicSample && MusicSample->Type);
 
 		len = size * sizeof(*buf);
 		buf = alloca(len);
@@ -221,7 +221,7 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 
 	DebugLevel3("Length %d\n" _C_ length);
 
-	DebugCheck(index & 1);
+	Assert(!(index & 1));
 
 	if (size >= sample->Len / 2 - index) {
 		size = sample->Len / 2 - index;

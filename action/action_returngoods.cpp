@@ -67,7 +67,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	//
 	// Select target to return goods.
 	//
-	DebugCheck(!type->Harvester );
+	Assert(type->Harvester );
 	if ((!unit->CurrentResource) && (!unit->Value)) {
 		DebugLevel0("Unit can't return resources, it doesn't carry any.\n");
 	}

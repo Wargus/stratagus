@@ -185,7 +185,7 @@ global void RevealMap(void)
 */
 global void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 {
-	DebugCheck(!vp);
+	Assert(vp);
 
 	x = x * TileSizeX + offsetx;
 	y = y * TileSizeY + offsety;

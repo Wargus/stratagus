@@ -72,7 +72,7 @@ local int MoveToTransporter(Unit* unit)
 		NewResetPath(unit);
 	}
 	// New code has this as default.
-	DebugCheck(unit->Orders[0].Action != UnitActionBoard);
+	Assert(unit->Orders[0].Action == UnitActionBoard);
 	return i;
 }
 

@@ -103,7 +103,7 @@ local unsigned QuadFromTile(int x, int y)
 			break;
 		}
 	}
-	DebugCheck(i == TheMap.Tileset->NumTiles);
+	Assert(i != TheMap.Tileset->NumTiles);
 
 	base = TheMap.Tileset->Tiles[i].BaseTerrain;
 	mix = TheMap.Tileset->Tiles[i].MixTerrain;
@@ -147,7 +147,7 @@ local unsigned QuadFromTile(int x, int y)
 			return (mix << 24) | (base << 16) | (base << 8) | base;
 	}
 
-	DebugCheck(1);
+	Assert(0);
 
 	return base | (base << 8) | (base << 16) | (base << 24);
 }
@@ -282,7 +282,7 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 					i += 256;
 				}
 			}
-			DebugCheck(i >= TheMap.Tileset->NumTiles);
+			Assert(i < TheMap.Tileset->NumTiles);
 			return i;
 		}
 	} else {
@@ -422,8 +422,8 @@ global void ChangeTile(int x, int y, int tile)
 {
 	MapField *mf;
 
-	DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
-	DebugCheck(tile < 0 || tile >= TheMap.Tileset->NumTiles);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
+	Assert(tile >= 0 && tile < TheMap.Tileset->NumTiles);
 
 	mf = &TheMap.Fields[y * TheMap.Width + x];
 	mf->Tile = mf->SeenTile = TheMap.Tileset->Table[tile];
@@ -446,7 +446,7 @@ local void EditorChangeTile(int x, int y, int tile, int d)
 {
 	MapField* mf;
 
-	DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
 
 	ChangeTile(x, y, tile);
 

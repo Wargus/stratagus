@@ -571,7 +571,7 @@ global void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 	ncq->Data.Unit = htons(unit->Slot);
 	ncq->Data.X = htons(x);
 	ncq->Data.Y = htons(y);
-	DebugCheck( dest && type );				// Both together isn't allowed
+	Assert (!dest || !type);				// Both together isn't allowed
 	if (dest) {
 		ncq->Data.Dest = htons(dest->Slot);
 	} else if (type) {
@@ -644,7 +644,7 @@ global void NetworkSendSelection(Unit** units, int count)
 	unitcount = 0;
 	DebugLevel3("Time: %lu " _C_ ncq[0].Time);
 	for (i = 0; i <= (count / 4); ++i) {
-		DebugCheck(i > MaxNetworkCommands);
+		Assert(i <= MaxNetworkCommands);
 		header->Type[i] = MessageSelection;
 		selection = (NetworkSelection*)&packet.Command[i];
 		for (ref = 0; ref < 4 && unitcount < count; ++ref, ++unitcount) {
@@ -703,7 +703,7 @@ local void NetworkProcessSelection(NetworkPacket* packet, int player)
 			units[unitcount++] = Units[ntohs(selection->Unit[j])];
 		}
 	}
-	DebugCheck(count != unitcount);
+	Assert(count == unitcount);
 
 	ChangeTeamSelectedUnits(&Players[player], units, adjust, count);
 }
@@ -1072,7 +1072,7 @@ local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
 			break;
 		case MessageNone:
 			// Nothing to Do, This Message Should Never be Executed
-			DebugCheck(1);
+			Assert(0);
 			break;
 		default:
 			ParseCommand(ncq->Type, ntohs(ncq->Data.Unit),
@@ -1206,7 +1206,7 @@ local void NetworkExecCommands(void)
 				if (ncq->Time != GameCycle) {
 					DebugLevel1Fn("cycle %lu idx %lu time %lu\n" _C_
 						GameCycle _C_ GameCycle & 0xFF _C_ ncq->Time);
-					DebugCheck(ncq->Time != GameCycle);
+					Assert(ncq->Time == GameCycle);
 				}
 #endif
 				ParseNetworkCommand(ncq);

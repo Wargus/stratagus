@@ -128,7 +128,7 @@ static void FLAC_metadata_callback(const FLAC__StreamDecoder *stream,
 		sample->SampleSize = metadata->data.stream_info.bits_per_sample;
 
 		if (!sample->Buffer) {
-			DebugCheck(!metadata->data.stream_info.total_samples);
+			Assert(metadata->data.stream_info.total_samples);
 			sample->Buffer = malloc(metadata->data.stream_info.total_samples * 4);
 		}
 
@@ -166,8 +166,8 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	sample = user;
 	data = sample->User;
 
-	DebugCheck(!sample->Buffer);
-	DebugCheck(frame->header.bits_per_sample != sample->SampleSize);
+	Assert(sample->Buffer);
+	Assert(frame->header.bits_per_sample == sample->SampleSize);
 
 	ssize = (frame->header.bits_per_sample / 8);
 	buf = malloc(frame->header.blocksize * sample->Channels * ssize);
@@ -367,10 +367,10 @@ global Sample* LoadFlac(const char *name, int flags)
 		sample->Buffer = NULL;
 		sample->Type = &FlacSampleType;
 
-		DebugCheck(FLAC__stream_decoder_get_state(stream) !=
+		Assert(FLAC__stream_decoder_get_state(stream) ==
 			FLAC__STREAM_DECODER_SEARCH_FOR_METADATA);
 		FLAC__stream_decoder_process_until_end_of_stream(stream);
-		DebugCheck(FLAC__stream_decoder_get_state(stream) !=
+		Assert(FLAC__stream_decoder_get_state(stream) ==
 			FLAC__STREAM_DECODER_END_OF_STREAM);
 
 		FLAC__stream_decoder_finish(stream);

@@ -159,7 +159,7 @@ local int OggStreamRead(Sample* sample, void* buf, int len)
 		i = ov_read(&data->VorbisFile, sndbuf, n, 0, 2, 1,
 			&bitstream);
 #endif
-		DebugCheck(i < 0);
+		Assert(i >= 0);
 
 		if (!i) {
 			// EOF
@@ -334,7 +334,7 @@ global Sample* LoadOgg(const char* name,int flags)
 			i = ov_read(&data->VorbisFile, sndbuf, n, 0, 2, 1,
 				&bitstream);
 #endif
-			DebugCheck(i < 0);
+			Assert(i >= 0);
 
 			if (!i) {
 				// EOF
@@ -347,7 +347,7 @@ global Sample* LoadOgg(const char* name,int flags)
 			sample->Len += i;
 		}
 
-		DebugCheck(sample->Len != total);
+		Assert(sample->Len == total);
 	}
 
 	return sample;

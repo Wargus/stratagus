@@ -80,8 +80,8 @@ global void HandleActionDie(Unit* unit)
 
 		unit->State = unit->Type->CorpseScript;
 
-		DebugCheck(unit->Type->TileWidth != unit->Type->CorpseType->TileWidth ||
-				unit->Type->TileHeight != unit->Type->CorpseType->TileHeight);
+		Assert(unit->Type->TileWidth == unit->Type->CorpseType->TileWidth &&
+				unit->Type->TileHeight == unit->Type->CorpseType->TileHeight);
 
 		// Update sight for new corpse
 		// We have to unmark BEFORE changing the type.

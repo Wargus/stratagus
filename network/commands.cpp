@@ -518,7 +518,7 @@ local int CclLog(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 
-	DebugCheck(!CurrentReplay);
+	Assert(CurrentReplay);
 
 	log = calloc(1, sizeof(LogEntry));
 	log->UnitNumber = -1;
@@ -582,7 +582,7 @@ local int CclReplayLog(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 
-	DebugCheck(CurrentReplay != NULL);
+	Assert(CurrentReplay == NULL);
 
 	replay = calloc(1, sizeof(FullReplay));
 
@@ -790,7 +790,7 @@ local void DoNextReplay(void)
 	int num;
 	Unit* dunit;
 
-	DebugCheck(ReplayStep == 0);
+	Assert(ReplayStep != 0);
 
 	NextLogCycle = ReplayStep->GameCycle;
 
@@ -807,7 +807,7 @@ local void DoNextReplay(void)
 	val = ReplayStep->Value;
 	num = ReplayStep->Num;
 
-	DebugCheck(unit != -1 && strcmp(ReplayStep->UnitIdent, UnitSlots[unit]->Type->Ident));
+	Assert(unit == -1 || !strcmp(ReplayStep->UnitIdent, UnitSlots[unit]->Type->Ident));
 
 	if (SyncRandSeed != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG
@@ -817,7 +817,7 @@ local void DoNextReplay(void)
 		} else {
 			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync (%lu) !", GameCycle);
 			DebugLevel0("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
-			DebugCheck(1);
+			Assert(0);
 			// ReplayStep = 0;
 			// NextLogCycle = ~0UL;
 			// return;
@@ -1493,7 +1493,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 	DebugLevel3Fn(" %d cycle %lu\n" _C_ msgnr _C_ GameCycle);
 
 	unit = UnitSlots[unum];
-	DebugCheck(!unit);
+	Assert(unit);
 	//
 	//		Check if unit is already killed?
 	//
@@ -1502,7 +1502,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 		return;
 	}
 
-	DebugCheck(!unit->Type);
+	Assert(unit->Type);
 
 	status = (msgnr & 0x80) >> 7;
 
@@ -1528,7 +1528,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
-				DebugCheck(!dest || !dest->Type);
+				Assert(dest && dest->Type);
 			}
 			CommandLog("follow", unit, status, -1, -1, dest, NULL, -1);
 			CommandFollow(unit, dest, status);
@@ -1541,7 +1541,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
-				DebugCheck(!dest || !dest->Type);
+				Assert(dest && dest->Type);
 			}
 			CommandLog("repair", unit, status, x, y, dest, NULL, -1);
 			CommandRepair(unit, x, y, dest, status);
@@ -1550,7 +1550,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
-				DebugCheck(!dest || !dest->Type);
+				Assert(dest && dest->Type);
 			}
 			CommandLog("attack", unit, status, x, y, dest, NULL, -1);
 			CommandAttack(unit, x, y, dest, status);
@@ -1567,7 +1567,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
-				DebugCheck(!dest || !dest->Type);
+				Assert(dest && dest->Type);
 			}
 			CommandLog("board", unit, status, x, y, dest, NULL, -1);
 			CommandBoard(unit, dest, status);
@@ -1576,7 +1576,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
-				DebugCheck(!dest || !dest->Type);
+				Assert(dest && dest->Type);
 			}
 			CommandLog("unload", unit, status, x, y, dest, NULL, -1);
 			CommandUnload(unit, x, y, dest, status);
@@ -1598,7 +1598,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
-				DebugCheck(!dest || !dest->Type);
+				Assert(dest && dest->Type);
 			}
 			CommandLog("resource", unit, status, -1, -1, dest, NULL, -1);
 			CommandResource(unit, dest, status);
@@ -1607,7 +1607,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
-				DebugCheck(!dest || !dest->Type);
+				Assert(dest && dest->Type);
 			}
 			CommandLog("return", unit, status, -1, -1, dest, NULL, -1);
 			CommandReturnGoods(unit, dest, status);
@@ -1655,7 +1655,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 				dest = NoUnitP;
 				if (dstnr != (unsigned short)0xFFFF) {
 					dest = UnitSlots[dstnr];
-					DebugCheck(!dest || !dest->Type);
+					Assert(dest && dest->Type);
 				}
 				CommandLog("spell-cast", unit, status, x, y, dest, NULL, id);
 				CommandSpellCast(unit, x, y, dest, SpellTypeTable[id], status);
