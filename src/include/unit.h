@@ -200,17 +200,17 @@
 **
 **		If Burning is non-zero, the unit is burning.
 **
-**	Unit::Visible
-**
-**		Used for submarines. It is a bit field for all players. If
-**		Unit::Visible&(1<<player-nr) is non-zero, the unit could be
-**		seen on the map.
-**
 **	Unit::VisCount[PlayerMax]
 **
 **		Used to keep track of visible units on the map, it counts the
 **		Number of seen tiles for each player. This is only modified
 **		in UnitsMarkSeen and UnitsUnmarkSeen, from fow.
+**
+**	Unit::SeenByPlayer
+**
+**		This is a bitmask of 1 and 0 values. SeenByPlayer & (1<<p) is 0
+**		If p never saw the unit and 1 if it did. This is important for
+**		keeping track of dead units under fog.
 **
 **	Unit::Destroyed
 **
@@ -545,7 +545,7 @@ struct _unit_ {
     unsigned	Selected : 1;		/// unit is selected
 
     unsigned char VisCount[PlayerMax];  /// Unit visibility counts.
-    unsigned	Visible : 16;		/// Unit is visible (submarine)
+    unsigned 	SeenByPlayer : 16;	/// Unit seen mask. (as in explored.)
     unsigned	Constructed : 1;	/// Unit is in construction
     unsigned	Active : 1;		/// Unit is active for AI
     Player*     RescuedFrom;            /// The original owner of a rescued unit.
@@ -705,7 +705,6 @@ extern Unit** UnitSlotFree;		/// First free unit slot
 
 extern Unit* Units[MAX_UNIT_SLOTS];	/// Units used
 extern int NumUnits;			/// Number of units used
-extern Unit* DestroyedBuildings;	/// List of DestroyedBuildings
 extern Unit* CorpseList;		/// List of Corpses On Map
 
 //	in unit_draw.c (FIXME: could be moved into the user interface?)
@@ -780,19 +779,17 @@ extern void UpdateForNewUnit(const Unit* unit, int upgrade);
 extern void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy);
     /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
-    /// Returns true, if building is known on the map
-extern int BuildingVisibleOnMap(const Unit* unit);
+    /// Returns true, if unit is visible for drawing on the map
+extern int UnitDrawableOnMap(const Unit* unit);
 
-    /// Fill in values, considering the unit was just recently seen.
-extern void UnitFillSeenValues(Unit* unit);
+    /// To be called when an unit goes under fog.
+extern void UnitGoesUnderFog(Unit* unit, int p);
     /// Marks unit seen. (increases visibility count)
-extern void UnitsMarkSeen(const Player* player, int x, int y);
+extern void UnitsMarkSeen(const Player* player, int x, int y, int cloak);
     /// Unmarks unit seen. (decreases visibility count)
-extern void UnitsUnmarkSeen(const Player* player, int x, int y);
+extern void UnitsUnmarkSeen(const Player* player, int x, int y, int cloak);
     /// Calculated an unit's seen information itself
 extern void UnitCountSeen(Unit* unit);
-    /// Returns true, if unit is known on the map
-extern int UnitKnownOnMap(const Unit* unit);
 
     /// To be called when the look of the unit changes.
 extern int CheckUnitToBeDrawn(Unit* unit);
@@ -912,14 +909,8 @@ extern void DeadCacheRemove(Unit* unit, Unit** List);
 #define CorpseCacheInsert(unit) \
 	(DeadCacheInsert((unit),&CorpseList))
 
-#define DeadBuildingCacheInsert(unit) \
-	(DeadCacheInsert((unit),&DestroyedBuildings))
-
 #define CorpseCacheRemove(unit) \
 	(DeadCacheRemove((unit),&CorpseList))
-
-#define DeadBuildingCacheRemove(unit) \
-	(DeadCacheRemove((unit),&DestroyedBuildings))
 
 //	in unit_draw.c
 //--------------------
