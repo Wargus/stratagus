@@ -78,6 +78,7 @@ local SCM CclPlayer(SCM list)
 	NumPlayers=i+1;
     }
     player->Player = i;
+    player->Color=PlayerColors[i];
     if( !(player->Units=(Unit**)calloc(UnitMax,sizeof(Unit*))) ) {
 	DebugLevel0("Not enough memory to create player %d.\n" _C_ i);
 

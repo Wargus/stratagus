@@ -451,6 +451,7 @@ extern int NumPlayers;			/// How many player slots used
 extern Player Players[PlayerMax];	/// All players
 extern Player* ThisPlayer;		/// Player on local computer
 extern int NoRescueCheck;		/// Disable rescue check
+extern int PlayerColors[PlayerMax];	/// Player colors
 
 extern char** RaceWcNames;		/// pud original -> internal
 
