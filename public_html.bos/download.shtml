@@ -36,7 +36,7 @@ to download the stratagus engine too.
 
 <h2>Development version</h2>
 The game is still in development. You can get the latest version with <a href="http://subversion.tigris.org/">subversion</a>:
- <pre>svn svn://bos.seul.org/svn/bos/data.bos/trunk data.bos</pre>
+ <pre>svn co svn://bos.seul.org/svn/bos/data.bos/trunk data.bos</pre>
 <p>
 To start the game run :<br>
  <pre>./stratagus -d path/to/data.bos</pre>
