@@ -10,7 +10,7 @@
 //
 /**@name freecraft.h	-	The main header file. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -300,9 +300,9 @@
     /// FreeCraft major version
 #define FreeCraftMajorVersion	1
     /// FreeCraft minor version (maximal 99)
-#define FreeCraftMinorVersion	17
+#define FreeCraftMinorVersion	18
     /// FreeCraft patch level (maximal 99)
-#define FreeCraftPatchLevel	99
+#define FreeCraftPatchLevel	0
     /// FreeCraft version (1,2,3) -> 10203
 #define FreeCraftVersion \
 	(FreeCraftMajorVersion*10000+FreeCraftMinorVersion*100 \
