@@ -40,7 +40,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Select units in range.
+**	Select units in rectangle range.
 **
 **	@param x1	Left column of selection rectangle
 **	@param y1	Top row of selection rectangle
@@ -53,6 +53,20 @@
 global int SelectUnits(int x1,int y1,int x2,int y2,Unit** table)
 {
     return UnitCacheSelect(x1,y1,x2,y2,table);
+}
+
+/**
+**	Select units on tile.
+**
+**	@param x	Map X tile position
+**	@param y	Map Y tile position
+**	@param table	All units in the selection rectangle
+**
+**	@return		Returns the number of units found
+*/
+global int SelectUnitsOnTile(int x,int y,Unit** table)
+{
+    return UnitCacheOnTile(x,y,table);
 }
 
 /**
@@ -134,7 +148,7 @@ global Unit* UnitOnMapTile(unsigned tx,unsigned ty)
     int n;
     int i;
 
-    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
         // Note: this is less restrictive than UnitActionDie...
         // Is it normal?
@@ -161,7 +175,7 @@ global Unit* RepairableOnMapTile(unsigned tx,unsigned ty)
     int n;
     int i;
 
-    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
 	if( UnitUnusable(table[i]) ) {
 	    continue;
@@ -193,8 +207,7 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
     int n;
     int i;
 
-    n=SelectUnits(tx,ty,tx+1,ty+1,table);
-
+    n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
 	unit=table[i];
 	// unusable unit ?
@@ -259,7 +272,7 @@ global Unit* GoldMineOnMap(int tx,int ty)
     int i;
     int n;
 
-    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
 	if( UnitUnusable(table[i]) ) {
 	    continue;
@@ -285,8 +298,7 @@ global Unit* GoldDepositOnMap(int tx,int ty)
     int i;
     int n;
 
-    // FIXME: perhaps I should write a select on tile function?
-    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
 	if( UnitUnusable(table[i]) ) {
 	    continue;
@@ -312,7 +324,7 @@ global Unit* OilPatchOnMap(int tx,int ty)
     int i;
     int n;
 
-    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
 	if( table[i]->Type->OilPatch ) {
 	    return table[i];
@@ -335,7 +347,7 @@ global Unit* PlatformOnMap(int tx,int ty)
     int i;
     int n;
 
-    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
 	if( UnitUnusable(table[i]) ) {
 	    continue;
@@ -361,7 +373,7 @@ global Unit* OilDepositOnMap(int tx,int ty)
     int i;
     int n;
 
-    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
 	if( UnitUnusable(table[i]) ) {
 	    continue;
@@ -387,7 +399,7 @@ global Unit* WoodDepositOnMap(int tx,int ty)
     int i;
     int n;
 
-    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
 	if( UnitUnusable(table[i]) ) {
 	    continue;

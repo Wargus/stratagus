@@ -8,27 +8,33 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name unitcache.c	-	The unit cache.
-**
-**		Cache to find units faster from position.
-**		I use a radix-quad-tree for lookups.
-**		Other possible data-structures:
-**			Binary Space Partitioning (BSP) tree.
-**			Real quad tree.
-**			Priority search tree.
-*/
-/*	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+/**@name unitcache.c	-	The unit cache. */
+//
+//	Cache to find units faster from position.
+//	I use a radix-quad-tree for lookups.
+//	Other possible data-structures:
+//		Binary Space Partitioning (BSP) tree.
+//		Real quad tree.
+//		Priority search tree.
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "freecraft.h"
+
+#ifndef UNIT_ON_MAP	// {
+
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"
@@ -42,7 +48,9 @@
 //	Quadtrees
 //****************************************************************************/
 
+#ifdef DEBUG
 #define STATISTIC			/// include statistic code
+#endif
 
 //
 //	Types
@@ -594,10 +602,12 @@ local void QuadTreePrintStatistic(QuadTree* tree)
 //	Convert calls to internal
 //****************************************************************************/
 
-local QuadTree* PositionCache;
+local QuadTree* PositionCache;		/// My quad tree for lookup
 
 /**
 **	Insert new unit into cache.
+**
+**	@param unit	Unit pointer to place in cache.
 */
 global void UnitCacheInsert(Unit* unit)
 {
@@ -607,6 +617,8 @@ global void UnitCacheInsert(Unit* unit)
 
 /**
 **	Remove unit from cache.
+**
+**	@param unit	Unit pointer to remove from cache.
 */
 global void UnitCacheRemove(Unit* unit)
 {
@@ -615,7 +627,9 @@ global void UnitCacheRemove(Unit* unit)
 }
 
 /**
-**	Change unit in cache.
+**	Change unit position in cache.
+**
+**	@param unit	Unit pointer to change in cache.
 */
 global void UnitCacheChange(Unit* unit)
 {
@@ -624,10 +638,15 @@ global void UnitCacheChange(Unit* unit)
 }
 
 /**
-**	Select units in range.
+**	Select units in rectangle range.
 **
-**	table:	contains all units in given range.
-**	RETURNS:number of units in table.
+**	@param x1	Left column of selection rectangle
+**	@param y1	Top row of selection rectangle
+**	@param x2	Right column of selection rectangle
+**	@param y2	Bottom row of selection rectangle
+**	@param table	All units in the selection rectangle
+**
+**	@return		Returns the number of units found
 */
 global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 {
@@ -641,6 +660,16 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
     //
     i=x1-4; if( i<0 ) i=0;		// Only for current unit-cache !!
     j=y1-4; if( j<0 ) j=0;
+
+    //
+    //	Reduce to map limits. FIXME: should the caller check?
+    //
+    if( x2>TheMap.Width ) {
+	x2=TheMap.Width;
+    }
+    if( y2>TheMap.Height ) {
+	y2=TheMap.Height;
+    }
 
     n=QuadTreeSelect(PositionCache,i,j,x2,y2,table);
 
@@ -660,11 +689,30 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 }
 
 /**
-**	Select unit on X,Y.
+**	Select units on map tile.
+**
+**	@param x	Map X tile position
+**	@param y	Map Y tile position
+**	@param table	All units in the selection rectangle
+**
+**	@return		Returns the number of units found
+*/
+global int UnitCacheOnTile(int x,int y,Unit** table)
+{
+    return UnitCacheSelect(x,y,x+1,y+1,table);
+}
+
+/**
+**	Select unit on X,Y of type naval,fly,land.
+**
+**	@param x	Map X tile position.
+**	@param y	Map Y tile position.
+**	@param type	UnitType::UnitType, naval,fly,land.
+**
+**	@returns	Unit, if an unit of correct type is on the field.
 */
 global Unit* UnitCacheOnXY(int x,int y,int type)
 {
-
     QuadTreeLeaf* leaf;
 
     leaf=QuadTreeSearch(PositionCache,x,y);
@@ -714,5 +762,182 @@ global void InitUnitCache(void)
     DebugLevel0("UnitCache: %d Levels\n",l);
     PositionCache=NewQuadTree(l);
 }
+
+#else	// }{ !UNIT_ON_MAP
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
+#include "unit.h"
+#include "map.h"
+
+//*****************************************************************************
+//	Store direct on map.
+//****************************************************************************/
+
+//*****************************************************************************
+//	Convert calls to internal
+//****************************************************************************/
+
+/**
+**	Insert new unit into cache.
+**
+**	@param unit	Unit pointer to place in cache.
+*/
+global void UnitCacheInsert(Unit* unit)
+{
+    MapField* mf;
+
+    mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
+    unit->Next=mf->Here.Units;
+    mf->Here.Units=unit;
+    DebugLevel3Fn("%p %p\n",unit,unit->Next);
+}
+
+/**
+**	Remove unit from cache.
+**
+**	@param unit	Unit pointer to remove from cache.
+*/
+global void UnitCacheRemove(Unit* unit)
+{
+    Unit** prev;
+
+    prev=&TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
+    DebugCheck( !*prev );
+    for( ;; ) {				// find the unit
+	if( *prev==unit ) {
+	    *prev=unit->Next;
+	    return;
+	}
+	prev=&(*prev)->Next;
+	DebugCheck( !*prev );
+    }
+}
+
+/**
+**	Change unit in cache.
+**
+**	@param unit	Unit pointer to change in cache.
+*/
+global void UnitCacheChange(Unit* unit)
+{
+    UnitCacheRemove(unit);		// must remove first
+    UnitCacheInsert(unit);
+}
+
+/**
+**	Select units in rectangle range.
+**
+**	@param x1	Left column of selection rectangle
+**	@param y1	Top row of selection rectangle
+**	@param x2	Right column of selection rectangle
+**	@param y2	Bottom row of selection rectangle
+**	@param table	All units in the selection rectangle
+**
+**	@return		Returns the number of units found
+*/
+global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
+{
+    int x;
+    int y;
+    int n;
+    int i;
+    Unit* unit;
+    MapField* mf;
+
+    //
+    //	Units are inserted by origin position
+    //
+    x=x1-4; if( x<0 ) x=0;		// Only for current unit-cache !!
+    y=y1-4; if( y<0 ) y=0;
+
+    //
+    //	Reduce to map limits. FIXME: should the caller check?
+    //
+    if( x2>TheMap.Width ) {
+	x2=TheMap.Width;
+    }
+    if( y2>TheMap.Height ) {
+	y2=TheMap.Height;
+    }
+
+    for( n=0; y<y2; ++y ) {
+	mf=TheMap.Fields+y*TheMap.Width+x;
+	for( i=x; i<x2; ++i ) {
+	    
+	    for( unit=mf->Here.Units; unit; unit=unit->Next ) {
+		DebugLevel3Fn("%p\n",unit);
+		//
+		//	Remove units, outside range.
+		//
+		if( unit->X+unit->Type->TileWidth<=x1
+			|| unit->X>x2
+			|| unit->Y+unit->Type->TileHeight<=y1
+			|| unit->Y>y2 ) {
+		    continue;
+		}
+		table[n++]=unit;
+	    }
+	    ++mf;
+	}
+    }
+
+    return n;
+}
+
+/**
+**	Select units on map tile.
+**
+**	@param x	Map X tile position
+**	@param y	Map Y tile position
+**	@param table	All units in the selection rectangle
+**
+**	@return		Returns the number of units found
+*/
+global int UnitCacheOnTile(int x,int y,Unit** table)
+{
+    return UnitCacheSelect(x,y,x+1,y+1,table);
+}
+
+/**
+**	Select unit on X,Y of type naval,fly,land.
+**
+**	@param x	Map X tile position.
+**	@param y	Map Y tile position.
+**	@param type	UnitType::UnitType, naval,fly,land.
+**
+**	@returns	Unit, if an unit of correct type is on the field.
+*/
+global Unit* UnitCacheOnXY(int x,int y,int type)
+{
+    Unit* unit;
+
+    unit=TheMap.Fields[y*TheMap.Width+x].Here.Units;
+    while( unit ) {
+	if( unit->Type->UnitType==type ) {
+	    break;
+	}
+	unit=unit->Next;
+    }
+    return unit;
+}
+
+/**
+**	Print unit-cache statistic.
+*/
+global void UnitCacheStatistic(void)
+{
+}
+
+/**
+**	Initialize unit-cache.
+*/
+global void InitUnitCache(void)
+{
+}
+
+#endif	// } UNIT_ON_MAP
 
 //@}
