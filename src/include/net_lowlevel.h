@@ -78,14 +78,14 @@ typedef struct _OLD_INTERFACE_INFO
 #else	// UNIX
 #    include <sys/time.h>
 #    include <unistd.h>
-#  ifndef __BEOS__
-#    include <arpa/inet.h>
-#  endif
 #  include <netinet/in.h>
 #  include <netdb.h>
 #  include <sys/socket.h>
 #  include <sys/ioctl.h>
 #  include <net/if.h>
+#  ifndef __BEOS__
+#    include <arpa/inet.h>
+#  endif
 #  define INVALID_SOCKET -1
 #endif	// !WIN32
 #endif // !USE_SDL_NET
