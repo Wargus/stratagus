@@ -176,38 +176,15 @@ DefineMenuItem("pos", { 162, 80}, "font", "large",
 -- menu-objectives
 --
 DefineMenu("name", "menu-objectives", "geometry", {272, 96, 256, 288}, 
-  "init", "objectives-init",
   "panel", "panel1", "default", 10)
 DefineMenuItem("pos", { 128, 11}, "font", "large", 
   "text", {"caption", "Objectives", "align", "center"},
   "menu", "menu-objectives")
-DefineMenuItem("pos", { 14, 38 + (21 * 0)}, "font", "large",
-  "text", {"caption", nil},
+for i = 0, 8 do
+ DefineMenuItem("pos", { 14, 38 + (21 * i)}, "font", "large",
+  "text", {"caption", Line(1 + i, GameInfo("Objectives"), 228, "large")},
   "menu", "menu-objectives")
-DefineMenuItem("pos", { 14, 38 + (21 * 1)}, "font", "large",
-  "text", {"caption", nil},
-  "menu", "menu-objectives")
-DefineMenuItem("pos", { 14, 38 + (21 * 2)}, "font", "large",
-  "text", {"caption", nil},
-  "menu", "menu-objectives")
-DefineMenuItem("pos", { 14, 38 + (21 * 3)}, "font", "large",
-  "text", {"caption", nil},
-  "menu", "menu-objectives")
-DefineMenuItem("pos", { 14, 38 + (21 * 4)}, "font", "large",
-  "text", {"caption", nil},
-  "menu", "menu-objectives")
-DefineMenuItem("pos", { 14, 38 + (21 * 5)}, "font", "large",
-  "text", {"caption", nil},
-  "menu", "menu-objectives")
-DefineMenuItem("pos", { 14, 38 + (21 * 6)}, "font", "large",
-  "text", {"caption", nil},
-  "menu", "menu-objectives")
-DefineMenuItem("pos", { 14, 38 + (21 * 7)}, "font", "large",
-  "text", {"caption", nil},
-  "menu", "menu-objectives")
-DefineMenuItem("pos", { 14, 38 + (21 * 8)}, "font", "large",
-  "text", {"caption", nil},
-  "menu", "menu-objectives")
+end
 DefineMenuItem("pos", { 16, 288 - 40}, "font", "large",
   "button", {
     "caption", "~!OK",
@@ -794,7 +771,7 @@ DefineMenuItem("pos", { 128 - (224 / 2), 245}, "font", "large",
 -- menu-tips
 --
 DefineMenu("name", "menu-tips", "geometry", {256, 112, 288, 256},
-  "init", "tips-init", "exit", "tips-exit",
+  "exit", "tips-exit",
   "panel", "panel2", "default", 4)
 DefineMenuItem("pos", { 144, 11}, "font", "large", 
   "text", {"caption", "Stratagus Tips", "align", "center"},
@@ -820,30 +797,11 @@ DefineMenuItem("pos", { 168, 256 - 40}, "font", "large",
     "func", "end-menu",
     "style", "gm-half"},
   "menu", "menu-tips")
-DefineMenuItem("pos", { 14, 35 + (16 * 0)}, "font", "game",
-  "text", {"caption", nil, "align", "left"},
+for i = 0,7 do
+ DefineMenuItem("pos", { 14, 35 + (16 * i)}, "font", "game",
+  "text", {"caption", Line(1 + i, GameInfo("Tips"), 260, "game"), "align", "left"},
   "menu", "menu-tips")
-DefineMenuItem("pos", { 14, 35 + (16 * 1)}, "font", "game",
-  "text", {"caption", nil, "align", "left"},
-  "menu", "menu-tips")
-DefineMenuItem("pos", { 14, 35 + (16 * 2)}, "font", "game",
-  "text", {"caption", nil, "align", "left"},
-  "menu", "menu-tips")
-DefineMenuItem("pos", { 14, 35 + (16 * 3)}, "font", "game",
-  "text", {"caption", nil, "align", "left"},
-  "menu", "menu-tips")
-DefineMenuItem("pos", { 14, 35 + (16 * 4)}, "font", "game",
-  "text", {"caption", nil, "align", "left"},
-  "menu", "menu-tips")
-DefineMenuItem("pos", { 14, 35 + (16 * 5)}, "font", "game",
-  "text", {"caption", nil, "align", "left"},
-  "menu", "menu-tips")
-DefineMenuItem("pos", { 14, 35 + (16 * 6)}, "font", "game",
-  "text", {"caption", nil, "align", "left"},
-  "menu", "menu-tips")
-DefineMenuItem("pos", { 14, 35 + (16 * 7)}, "font", "game",
-  "text", {"caption", nil, "align", "left"},
-  "menu", "menu-tips")
+end
 
 
 --
