@@ -817,12 +817,13 @@ global void GameMainLoop(void)
 		case 0:				
 		    // At cycle 0 , start all ai players...
 		    if (GameCycle == 0){
-		    	for (player = 0; player<NumPlayers; ++player){
+		    	for (player = 0; player < NumPlayers; ++player){
 			    PlayersEachSecond(player);
 			}
 		    }
 		    // Clear scheme heap each second
-		    user_gc(SCM_BOOL_F);
+		    // FIXME: this is too slow to call during the game
+		    //user_gc(SCM_BOOL_F);
 		    break;		    
 		case 1:
 		    HandleCloak();
@@ -832,7 +833,9 @@ global void GameMainLoop(void)
 		case 3:				// minimap update
 		    UpdateMinimap();
 		    MustRedraw |= RedrawMinimap;
-		    break;		
+		    break;
+		case 4:
+		    break;
 		case 5:				// forest grow
 		    RegenerateForest();
 		    break;
@@ -841,7 +844,7 @@ global void GameMainLoop(void)
 		    break;
 		default:
 		    // FIXME : assume that NumPlayers < (CYCLES_PER_SECOND -7) 
-		    player = ( GameCycle % CYCLES_PER_SECOND ) - 7;
+		    player = (GameCycle % CYCLES_PER_SECOND) - 7;
 		    if (player < NumPlayers){
 		    	PlayersEachSecond(player);
 		    }		    		    
