@@ -264,9 +264,11 @@ global int PlayMovie(const char* name, int flags)
 
 	StartDecoder(&pbi, avi->Width, avi->Height);
 
+#ifdef USE_OGG
 	if (avi->AudioStream != -1) {  // Only if audio available
 		PlayAviOgg(avi);
 	}
+#endif
 
 	callbacks.ButtonPressed = MovieCallbackKey;
 	callbacks.ButtonReleased = MovieCallbackKey1;

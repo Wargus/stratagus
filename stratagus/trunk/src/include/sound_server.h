@@ -10,7 +10,7 @@
 //
 /**@name sound_server.h	-	The sound server header file. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2004 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -92,13 +92,9 @@ struct _sample_ {
 	unsigned int Frequency;       ///< frequency in hz
 	unsigned short BitsPerSample; ///< bits in a sample 8/16/32
 
-	unsigned char *Buffer;                 ///< sample buffer
+	unsigned char *Buffer;        ///< sample buffer
 	int Pos;                      ///< buffer position
 	int Len;                      ///< length of filled buffer
-
-
-	int Length;
-	char Data[1];
 };
 
 	/// Free a sample object.

@@ -10,7 +10,7 @@
 //
 /**@name wav.c			-	wav support */
 //
-//	(c) Copyright 2003 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
+//	(c) Copyright 2003-2004 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -34,10 +34,10 @@
 --		Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
 #include "stratagus.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "myendian.h"
@@ -47,84 +47,91 @@
 #include "wav.h"
 
 /*----------------------------------------------------------------------------
---		Declaration
+--  Declaration
 ----------------------------------------------------------------------------*/
 
 /**
-**	  Private wav data structure to handle wav streaming.
+**  Private wav data structure to handle wav streaming.
 */
 typedef struct _wav_data_ {
-	char* PointerInBuffer;		/// Pointer into buffer
 	CLFile* WavFile;				/// Vorbis file handle
 } WavData;
 
-#define WAV_BUFFER_SIZE  (12 * 1024)			/// Buffer size to fill
-
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
-local int WavReadStream(Sample* sample, void* buf, int len)
+local int WavStreamRead(Sample* sample, void* buf, int len)
 {
 	WavData* data;
-	char sndbuf[WAV_BUFFER_SIZE];
-	int unc;				// number of uncompressed bytes to read
-	int comp;				// number of compressed bytes actually read
-	int freqratio;
-	int chanratio;
-	int brratio;
-	int samplesize;		// number of bytes per sample
+	WavChunk chunk;
+	char sndbuf[SOUND_BUFFER_SIZE];
+	int comp;		// number of compressed bytes actually read
 	int divide;
 	int i;
+	int n;
 
-	data = (WavData*)sample->User;
+	data = sample->User;
 
-	if (data->PointerInBuffer - sample->Data + len > sample->Length) {
-		// need to read new data
-		sample->Length -= data->PointerInBuffer - sample->Data;
-		memcpy(sample->Data, data->PointerInBuffer, sample->Length);
-		data->PointerInBuffer = sample->Data;
+	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
+		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
+		sample->Pos = 0;
+	}
 
-		unc = WAV_BUFFER_SIZE - sample->Length;
+	divide = 176400 / (sample->Frequency * (sample->SampleSize/8) * sample->Channels);
 
-		freqratio = (44100 / sample->Frequency);
-		samplesize = sample->SampleSize / 8;
-		brratio = 4 / (samplesize * sample->Channels);
-		chanratio = 2 / sample->Channels;
-		divide = freqratio * brratio / chanratio;
+	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
+		// read more data
+		comp = CLread(data->WavFile, &chunk, sizeof(chunk));
 
-		comp = CLread(data->WavFile, sndbuf, unc/divide);
+		if (!comp) {
+			// EOF
+			break;
+		}
+
+		chunk.Magic = ConvertLE32(chunk.Magic);
+		chunk.Length = ConvertLE32(chunk.Length);
+		if (chunk.Magic != DATA) {
+			CLseek(data->WavFile, chunk.Length, SEEK_CUR);
+			continue;
+		}
+		n = chunk.Length;
+
+		comp = CLread(data->WavFile, sndbuf, n);
+
+		if (!comp) {
+			break;
+		}
 
 		if (sample->BitsPerSample == 16) {
-			for (i = 0; i < (unc / divide) >> 1; ++i) {
+			for (i = 0; i < n >> 1; ++i) {
 				((unsigned short*)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
 			}
 		}
 
-		sample->Length += ConvertToStereo32(sndbuf,
-			&data->PointerInBuffer[sample->Length],
+		i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos,
 			sample->Frequency, sample->SampleSize / 8,
 			sample->Channels, comp);
 
-		if (sample->Length < len) {
-			len = sample->Length;
-		}
+		sample->Len += i;
 	}
 
-	memcpy(buf, data->PointerInBuffer, len);
-	data->PointerInBuffer += len;
+        if (sample->Len < len) {
+                len = sample->Len;
+        }
+
+	memcpy(buf, sample->Buffer + sample->Pos, len);
+	sample->Pos += len;
+	sample->Len -= len;
+
 	return len;
 }
 
-local void WavFreeStream(Sample* sample)
+local void WavStreamFree(Sample* sample)
 {
 	WavData* data;
 
-#ifdef DEBUG
-	AllocatedSoundMemory -= sizeof(*sample) + WAV_BUFFER_SIZE;
-#endif
-
-	data = (WavData*)sample->User;
+	data = sample->User;
 
 	CLclose(data->WavFile);
 	free(data);
@@ -132,33 +139,60 @@ local void WavFreeStream(Sample* sample)
 }
 
 /**
-**	  wav object type structure.
+**  wav stream type structure.
 */
 local const SampleType WavStreamSampleType = {
-	WavReadStream,
-	WavFreeStream,
+	WavStreamRead,
+	WavStreamFree,
 };
 
-/**
-**		Load wav.
-**
-**		@param name		File name.
-**		@param flags		Load flags.
-**
-**		@return				Returns the loaded sample.
-**
-**		@note		A second wav loader is in libmodplug!
-**
-**		@todo		Add ADPCM loading support!
-*/
-global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
+local int WavRead(Sample* sample, void* buf, int len)
 {
+        if (len > sample->Len) {
+                len = sample->Len;
+        }
+
+        memcpy(buf, sample->Buffer + sample->Pos, len);
+        sample->Pos += len;
+        sample->Len -= len;
+
+        return len;
+}
+
+local void WavFree(Sample* sample)
+{
+        free(sample->User);
+        free(sample->Buffer);
+        free(sample);
+}
+
+/**
+**	  wav stream type structure.
+*/
+local const SampleType WavSampleType = {
+	WavRead,
+	WavFree,
+};
+
+
+/**
+**  Load wav.
+**
+**  @param name   File name.
+**  @param flags  Load flags.
+**
+**  @return       Returns the loaded sample.
+**
+**  @todo         Add ADPCM loading support!
+*/
+global Sample* LoadWav(const char* name, int flags)
+{
+	Sample* sample;
+	WavData* data;
 	CLFile* f;
 	WavChunk chunk;
 	WavFMT wavfmt;
 	unsigned int t;
-	int i;
-	Sample* sample;
 
 	if (!(f = CLopen(name,CL_OPEN_READ))) {
 		printf("Can't open file `%s'\n", name);
@@ -260,78 +294,74 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 	DebugCheck(wavfmt.Frequency != 44100 && wavfmt.Frequency != 22050 &&
 		wavfmt.Frequency != 11025);
 
+	data = malloc(sizeof(WavData));
+	data->WavFile = f;
+
 	//
 	//  Read sample
 	//
-	sample = malloc(sizeof(*sample) + WAV_BUFFER_SIZE * wavfmt.Channels * wavfmt.SampleSize);
+	sample = malloc(sizeof(Sample));
 	sample->Channels = wavfmt.Channels;
 	sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
 	sample->Frequency = wavfmt.Frequency;
 	sample->BitsPerSample = wavfmt.BitsPerSample;
-	sample->Length = 0;
-
+	sample->Len = 0;
+	sample->Pos = 0;
+	sample->User = data;
 
 	if (flags & PlayAudioStream) {
-		WavData* data;
-		data = malloc(sizeof(WavData));
-
-		data->WavFile = f;
-		data->PointerInBuffer = sample->Data;
-
+		sample->Buffer = malloc(SOUND_BUFFER_SIZE);
 		sample->Type = &WavStreamSampleType;
-		sample->User = data;
-
-		CLread(f, &chunk, sizeof(chunk));
-
-		DebugLevel0Fn(" %d\n" _C_ sizeof(*sample) + WAV_BUFFER_SIZE);
-#ifdef DEBUG
-		AllocatedSoundMemory += sizeof(*sample) + WAV_BUFFER_SIZE;
-#endif
 	} else {
-		for (;;) {
-			if ((i = CLread(f, &chunk, sizeof(chunk))) != sizeof(chunk)) {
-				// FIXME: have 1 byte remaining, wrong wav or wrong code?
-				// if (i) { printf("Rest: %d\n", i); }
+		int comp;		// number of compressed bytes actually read
+		int divide;
+		int i;
+		int n;
+		char sndbuf[SOUND_BUFFER_SIZE];
+
+		sample->Type = &WavSampleType;
+
+		divide = 176400 / (sample->Frequency * (sample->SampleSize/8) * sample->Channels);
+
+		sample->Buffer = NULL;
+		while (1) {
+			// read more data
+			comp = CLread(f, &chunk, sizeof(chunk));
+
+			if (!comp) {
+				// EOF
 				break;
 			}
+
 			chunk.Magic = ConvertLE32(chunk.Magic);
 			chunk.Length = ConvertLE32(chunk.Length);
-
-			DebugLevel3("Magic: $%x\n" _C_ chunk.Magic);
-			DebugLevel3("Length: %d\n" _C_ chunk.Length);
 			if (chunk.Magic != DATA) {
 				CLseek(f, chunk.Length, SEEK_CUR);
 				continue;
 			}
+			n = chunk.Length;
 
-			i = chunk.Length;
-			sample = realloc(sample, sizeof(*sample) + sample->Length + i);
-			if (!sample) {
-				printf("Out of memory!\n");
-				CLclose(f);
-				ExitFatal(-1);
+			sample->Buffer = realloc(sample->Buffer, sample->Len + n * divide);
+			DebugCheck(!sample->Buffer);
+
+			comp = CLread(data->WavFile, sndbuf, n);
+
+			if (!comp) {
+				break;
 			}
 
-			if (CLread(f, sample->Data + sample->Length, i) != i) {
-				printf("Unexpected end of file!\n");
-				CLclose(f);
-				free(sample);
-				ExitFatal(-1);
+			if (sample->BitsPerSample == 16) {
+				for (i = 0; i < n >> 1; ++i) {
+					((unsigned short*)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
+				}
 			}
-			sample->Length += i;
+
+			i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos,
+				sample->Frequency, sample->SampleSize / 8,
+				sample->Channels, comp);
+
+			sample->Len += i;
 		}
-
-		CLclose(f);
-
-		if (wavfmt.BitsPerSample == 16) {
-			for (i = 0; i < sample->Length >> 1; ++i) {
-				((unsigned short*)sample->Data)[i] = ConvertLE16(((unsigned short*)sample->Data)[i]);
-			}
-		}
-
-#ifdef DEBUG
-		AllocatedSoundMemory += sample->Length;
-#endif
 	}
 
 	return sample;

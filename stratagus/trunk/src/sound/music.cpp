@@ -10,7 +10,7 @@
 //
 /**@name music.c		-	Background music support */
 //
-//	(c) Copyright 2002-2003 by Lutz Sammer
+//	(c) Copyright 2002-2004 by Lutz Sammer, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -63,9 +63,7 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
 global Sample* MusicSample;			 /// Music samples
-#endif
 
 global char* CurrentMusicFile;
 
@@ -86,7 +84,6 @@ global void StopMusic(void)
 {
 	if (PlayingMusic) {
 		PlayingMusic = 0;				// Callback!
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
 		if (MusicSample) {
 #ifdef USE_SDL
 			SDL_LockAudio();
@@ -98,7 +95,6 @@ global void StopMusic(void)
 #endif
 			return;
 		}
-#endif
 	}
 }
 

@@ -55,7 +55,7 @@
 **  Private flac data structure to handle flac streaming.
 */
 typedef struct _flac_data_ {
-	FLAC__StreamDecoder *Stream;		/// Decoder stream
+	FLAC__StreamDecoder *FlacStream;	/// Decoder stream
 	CLFile *FlacFile;			/// File handle
 } FlacData;
 
@@ -129,8 +129,7 @@ static void FLAC_metadata_callback(const FLAC__StreamDecoder *stream,
 
 		if (!sample->Buffer) {
 			DebugCheck(!metadata->data.stream_info.total_samples);
-			sample->Buffer = malloc(metadata->data.stream_info.total_samples *
-				sample->Channels * sample->SampleSize / 8);
+			sample->Buffer = malloc(metadata->data.stream_info.total_samples * 4);
 		}
 
 		DebugLevel3Fn("Stream %d Channels, %d frequency, %d bits\n" _C_
@@ -217,9 +216,9 @@ static int FlacStreamRead(Sample *sample, void *buf, int len)
 	}
 
 	while (sample->Len < SOUND_BUFFER_SIZE / 4 &&
-			FLAC__stream_decoder_get_state(data->Stream) != FLAC__STREAM_DECODER_END_OF_STREAM) {
+			FLAC__stream_decoder_get_state(data->FlacStream) != FLAC__STREAM_DECODER_END_OF_STREAM) {
 		// need to read new data
-		FLAC__stream_decoder_process_single(data->Stream);
+		FLAC__stream_decoder_process_single(data->FlacStream);
 	}
 
 	if (sample->Len < len) {
@@ -245,8 +244,8 @@ local void FlacStreamFree(Sample *sample)
 	data = sample->User;
 
 	CLclose(data->FlacFile);
-	FLAC__stream_decoder_finish(data->Stream);
-	FLAC__stream_decoder_delete(data->Stream);
+	FLAC__stream_decoder_finish(data->FlacStream);
+	FLAC__stream_decoder_delete(data->FlacStream);
 	free(data);
 	free(sample->Buffer);
 	free(sample);
@@ -271,17 +270,13 @@ local const SampleType FlacStreamSampleType = {
 */
 local int FlacRead(Sample *sample, void *buf, int len)
 {
-	FlacData *data;
-
-	data = sample->User;
-
 	if (len > sample->Len) {
 		len = sample->Len;
 	}
 
 	memcpy(buf, sample->Buffer + sample->Pos, len);
 	sample->Pos += len;
-	sample->Len += len;
+	sample->Len -= len;
 
 	return len;
 }
@@ -348,7 +343,7 @@ global Sample* LoadFlac(const char *name, int flags)
 
 	data = malloc(sizeof(FlacData));
 	data->FlacFile = f;
-	data->Stream = stream;
+	data->FlacStream = stream;
 
 	sample = malloc(sizeof(Sample));
 	sample->Len = 0;
