@@ -1873,17 +1873,10 @@ static void CreateEditor(void)
 		}
 	}
 
-	//MAPTODO
 	if (!EditorUnitTypes) {
-		//
-		// Build editor unit-type tables.
-		//
-		
-		EditorUnitTypes = malloc(sizeof(char*) * NumUnits);
-		for (i = 0; i < NumUnits + 1; ++i) {
-			//EditorUnitTypes[i] = UnitTypeWcNames[i];
-		}
-		MaxUnitIndex = NumUnits;
+		// Build empty editor unit-type tables.
+		EditorUnitTypes = malloc(sizeof(char*) * 2);
+		MaxUnitIndex = 0;
 	}
 
 	CalculateMaxIconSize();
