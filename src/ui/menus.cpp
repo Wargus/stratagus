@@ -243,15 +243,15 @@ local Menu *FindMenu(const char *menu_id);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-    /// Name, Version, Copyright
+    /// Name, Version, Copyright FIXME: move to headerfile
 extern char NameLine[];
 
 local EventCallback callbacks;
 
 // FIXME: Johns: this must be all be configured from ccl some time.
 
-    /// private struct which specifies the buttons gfx
-local struct {
+    /// JOHNS: I need it too, !private struct which specifies the buttons gfx
+global struct {
 	/// resource filename one for each race
     const char*	File[PlayerMaxRaces];
 	/// Width of button
