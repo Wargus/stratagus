@@ -2369,6 +2369,10 @@ local MenuButtonId scm2buttonid(SCM value)
         id=MBUTTON_VTHIN;
     } else if ( gh_eq_p(value, gh_symbol2scm("folder")) ) {
         id=MBUTTON_FOLDER;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-gem-round")) ) {
+        id=MBUTTON_SC_GEM_ROUND;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-gem-square")) ) {
+        id=MBUTTON_SC_GEM_SQUARE;
     } else if ( gh_eq_p(value, gh_symbol2scm("sc-button-left")) ) {
         id=MBUTTON_SC_BUTTON_LEFT;
     } else if ( gh_eq_p(value, gh_symbol2scm("sc-button")) ) {
