@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit.h		-	The unit headerfile. */
+/**@name unit.h - The unit headerfile. */
 //
 //      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -386,10 +386,6 @@
 
 #include "SDL.h"
 
-#ifdef NEW_DECODRAW
-#include "deco.h"
-#endif
-
 /*----------------------------------------------------------------------------
 -- Declarations
 ----------------------------------------------------------------------------*/
@@ -645,10 +641,6 @@ struct _unit_ {
 	} Data; ///< Storage room for different commands
 
 	Unit* Goal; ///< Generic goal pointer
-
-#ifdef NEW_DECODRAW
-	Deco* Decoration; ///< Decoration when visible on screen
-#endif
 };
 
 #define NoUnitP (Unit*)0         ///< return value: for no unit found

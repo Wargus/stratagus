@@ -174,18 +174,6 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 */
 local void DrawMapViewport(Viewport* vp)
 {
-#ifdef NEW_DECODRAW
-	// Experimental new drawing mechanism, which can keep track of what is
-	// overlapping and draw only that what has changed..
-	// Every to-be-drawn item added to this mechanism, can be handed by this
-	// call.
-	if (InterfaceState == IfaceStateNormal) {
-		CurrentViewport=TheUI.SelectedViewport;
-//		DecorationRefreshDisplay();
-		DecorationUpdateDisplay();
-	}
-
-#else
 	Unit* table[UnitMax];
 	Missile* missiletable[MAX_MISSILES * 9];
 	int nunits;
@@ -314,7 +302,6 @@ local void DrawMapViewport(Viewport* vp)
 	if (TheUI.ResourceX == -1 || TheUI.ResourceY == -1) {
 		MustRedraw |= RedrawResources;
 	}
-#endif
 }
 
 /**

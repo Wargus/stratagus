@@ -61,13 +61,6 @@
 #define noTIMEIT  /// defined time function
 #endif
 
-#ifdef NEW_DECODRAW
-/**
-**  Decoration as registered for decoration mechanism to draw map tiles
-*/
-global Deco* MapDecoration = NULL;
-#endif
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -158,37 +151,6 @@ global void VideoDrawTile(const int tile, int x, int y)
 	glTexCoord2f(etx, sty);
 	glVertex2i(ex, sy);
 	glEnd();
-}
-#endif
-
-#ifdef NEW_DECODRAW
-/**
-**  Draw TileSizeX x TileSizeY clipped for XX bpp video modes.
-**  (needed for decoration mechanism, which wants to draw tile partly)
-**  FIXME: this separate function is only needed for compatibility with
-**         variable VideoDrawTile, can be replaced by MapDrawXXTileClip
-**
-**  @param data  pointer to tile graphic data
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
-*/
-local void VideoDrawXXTileClip(const unsigned char* data, int x, int y)
-{
-	VideoDrawRawClip((VMemType*)TheMap.TileData->Pixels,
-		data, x, y, TileSizeX, TileSizeY);
-}
-
-/**
-**  Draw TileSizeX x TileSizeY clipped for XX bpp video modes.
-**  (needed for decoration mechanism, which wants to draw tile partly)
-**
-**  @param tile  Tile number to draw.
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
-*/
-local void MapDrawXXTileClip(int tile, int x, int y)
-{
-	VideoDrawXXTileClip(TheMap.Tiles[tile], x, y);
 }
 #endif
 
@@ -338,9 +300,6 @@ global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 */
 global void MarkDrawEntireMap(void)
 {
-#ifdef NEW_DECODRAW
-	Unit** unit;
-#endif
 	DebugLevel3Fn("\n");
 #ifdef NEW_MAPDRAW
 	int i;
@@ -354,16 +313,6 @@ global void MarkDrawEntireMap(void)
 				TheUI.Viewports[i].MustRedrawTile[x + y * TheUI.Viewports[i].MapWidth] = 1;
 			}
 		}
-	}
-#endif
-
-#ifdef NEW_DECODRAW
-	//
-	//  FIXME: This is soo slow.
-	//
-	DecorationMark(MapDecoration);
-	for (unit = Units; unit < Units + NumUnits; ++unit) {
-		CheckUnitToBeDrawn(*unit);
 	}
 #endif
 
@@ -487,85 +436,12 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 #endif
 }
 
-#ifdef NEW_DECODRAW
-/**
-**  Decoration redraw function that will redraw map for set clip rectangle
-**
-**  @param dummy_data  should be NULL; needed to make callback possible
-*/
-local void mapdeco_draw(void* dummy_data)
-{
-	MapField* src;
-	int x;
-	int y;
-	int w;
-	int h;
-	int w2;
-	int x2;
-	int nextline;
-
-	extern int ClipX1;
-	extern int ClipY1;
-	extern int ClipX2;
-	extern int ClipY2;
-
-/*	VideoFillRectangle((VMemType)(VMemType32)(rand()),
-				ClipX1, ClipY1, ClipX2 - ClipX1 + 1, ClipY2 - ClipY1 + 1);
-	return;*/
-	w = (ClipX2 - ClipX1) / TileSizeX + 1;
-	h = (ClipY2 - ClipY1) / TileSizeY + 1;
-	x = (ClipX1 - TheUI.SelectedViewport->X) / TileSizeX;
-	y = (ClipY1 - TheUI.SelectedViewport->Y) / TileSizeY;
-	DebugLevel3Fn("%d %d %d %d\n" _C_ x _C_ y _C_ w _C_ h);
-	src = TheMap.Fields + TheUI.SelectedViewport->MapX + x + (TheUI.SelectedViewport->MapY + y) * TheMap.Width;
-	x = TheUI.SelectedViewport->X + x * TileSizeX;
-	y = TheUI.SelectedViewport->Y + y * TileSizeY;
-	/*x = x * TileSizeX;
-	y = y * TileSizeY;*/
-	DebugLevel3Fn("%d %d %d %d->%d %d\n" _C_ ClipX1 _C_ ClipY1 _C_ ClipX2 _C_ ClipY2 _C_ x _C_ y);
-	nextline = TheMap.Width - w - 1;
-	do {
-		x2 = x;
-		w2 = w;
-		do {
-			MapDrawTile(src->SeenTile, x2, y);
-			x2 += TileSizeX;
-			++src;
-		}
-		while (--w2);
-		y += TileSizeY;
-		src += nextline;
-	}
-	while (--h);
-}
-#endif
-
 /**
 **  Initialize the fog of war.
 **  Build tables, setup functions.
 */
 global void InitMap(void)
 {
-#ifdef NEW_DECODRAW
-	// StephanR: Using the decoration mechanism we need to support drawing tiles
-	// clipped, as by only updating a small part of the tile, we don't have to
-	// redraw items overlapping the remaining part of the tile.. it might need
-	// some performance increase though, but at least the video dependent depth is
-	// not done here..
-	MapDrawTile = MapDrawXXTileClip;
-	VideoDrawTile = VideoDrawXXTileClip;
-	DebugLevel0Fn("Adding a big deco %d,%d - %d %d\n" _C_
-		TheUI.SelectedViewport->X _C_ TheUI.SelectedViewport->Y _C_
-		(TheUI.SelectedViewport->EndY - 1)* TileSizeX _C_
-		(TheUI.SelectedViewport->EndX - 1) * TileSizeY);
-	MapDecoration = DecorationAdd(NULL /* no data to pass to */,
-		mapdeco_draw, 0, TheUI.SelectedViewport->X, TheUI.SelectedViewport->Y,
-		(TheUI.SelectedViewport->EndY - 1) * TileSizeX,
-		(TheUI.SelectedViewport->EndX - 1) * TileSizeY);
-//		TheUI.SelectedViewport->EndX - TheUI.SelectedViewport->X + 1,
-//		TheUI.SelectedViewport->EndY - TheUI.SelectedViewport->Y + 1);
-	DebugCheck(!MapDecoration);
-#endif // NEW_DECODRAW
 }
 
 //@}

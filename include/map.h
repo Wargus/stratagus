@@ -308,13 +308,6 @@ extern unsigned char *VisionTable[3];
 	/// Companion table for fast lookups
 extern int *VisionLookup;
 
-#ifdef NEW_DECODRAW
-	/// @todo docu
-extern void InitMapDecoration(void);
-	/// Decoration for the map.
-extern Deco* MapDecoration;
-#endif
-
 	/// Contrast of fog of war
 extern int FogOfWarOpacity;
 	/// Forest regeneration

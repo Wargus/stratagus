@@ -521,11 +521,6 @@ global void InitVideo(void)
 #endif
 
 	InitLineDraw();
-
-#ifdef NEW_DECODRAW
-	// Use the decoration mechanism to only redraw what is needed on screen update
-	DecorationInit();
-#endif
 }
 
 //@}
