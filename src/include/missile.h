@@ -381,6 +381,8 @@ extern Missile* MakeMissile(MissileType*,int,int,int,int);
 extern Missile* MakeLocalMissile(MissileType*,int,int,int,int);
     /// fire a missile
 extern void FireMissile(Unit*);
+    /// check if missile should be drawn
+extern int CheckMissileToBeDrawn(const Missile* missile);
     /// draw all missiles
 extern void DrawMissiles(void);
     /// handle all missiles

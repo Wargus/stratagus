@@ -440,7 +440,7 @@ local void SpellFlameShieldController(Missile *missile)
   
   int mx = ux * TileSizeX + ix + uw / 2 + dx - 32;
   int my = uy * TileSizeY + iy + uh / 2 + dy - 32 - 16;
-  
+
   missile->X = mx;
   missile->Y = my;
 
@@ -448,6 +448,9 @@ local void SpellFlameShieldController(Missile *missile)
     {
     missile->TargetUnit->FlameShield = 0;
     }
+  
+  //vladi: still no have clear idea what is this about :)
+  CheckMissileToBeDrawn( missile );
   
   // FIXME: vladi: uhm... perhaps is a bit powerfull?
   if ( missile->TTL % 10 == 0 ) return;
