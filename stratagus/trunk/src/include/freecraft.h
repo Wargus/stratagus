@@ -123,11 +123,6 @@
 #define inline __inline			/// Fix m$ brain damage
 #define alloca _alloca			/// I hope this works with all VC..
 
-#ifndef __FUNCTION__
-    // I don't know, but eVC didn't has it, even it is documented
-#define __FUNCTION__ __FILE__  /* ":" __LINE__ */
-#endif
-
 #ifndef _WIN32_WCE
 #pragma warning(disable:4018)		// Signed/unsigned mismatch
 #pragma warning(disable:4244)		// Conversion from double to uchar
@@ -136,6 +131,14 @@
 #endif
 
 #endif	// } m$
+
+#ifndef __FUNCTION__
+#define __FUNCTION__ __FILE__  /* ":" __LINE__ */
+#define PrintFunction() do { fprintf(stdout,"%s:%d: ",__FILE__,__LINE__); } while(0)
+#else
+#define PrintFunction() do { fprintf(stdout,__FUNCTION__": "); } while(0)
+#endif
+
 
 /*============================================================================
 ==	Debug definitions
@@ -191,19 +194,19 @@
     **	Print debug information of level 0 with function name.
     */
 #define DebugLevel0Fn(args) \
-	do { fprintf(stdout,__FUNCTION__": " args); } while(0)
+	do { PrintFunction(); fprintf(stdout,args); } while(0)
 
     /**
     **	Print debug information of level 1 with function name.
     */
 #define DebugLevel1Fn(args) \
-	do { fprintf(stdout,__FUNCTION__": " args); } while(0)
+	do { PrintFunction(); fprintf(stdout,args); } while(0)
 
     /**
     **	Print debug information of level 2 with function name.
     */
 #define DebugLevel2Fn(args) \
-	do { fprintf(stdout,__FUNCTION__": " args); } while(0)
+	do { PrintFunction(); fprintf(stdout,args); } while(0)
 
     /**
     **	Print debug information of level 3 with function name.
