@@ -389,6 +389,48 @@ Than process the following steps:<P>
 <LI>or upload it to <A HREF="http://sourceforge.net/tracker/?func=add&group_id=1965&atid=301965">patch tracker on sourceforge</A>
 </UL>
 
+<H2>Building FcGP</H2>
+
+You always need the newst tarball from FcGP, because not all files are already
+imported into CVS.<P>
+<UL>
+<LI>Download the fcgp tarball from <A HREF="http://FreeCraft.Net/snapshots/">snapshots</A>.
+<LI>Get module from CVS. See above for instructions.
+<LI>Unpack fcgp tarball. <I>tar vxzf fcgp-010801.tar.gz</I>
+<LI>Move data directory into FcGP-CVS directory. <I>mv fcgp-010801 fcgp</I>
+<LI>Enter CVS directory. <I>cd fcgp</I>
+<LI>Update data tree. <I>make</I>
+<LI>Test it. <I>../freecraft/freecraft</I>
+</UL>
+
+<H2>Building FcSP</H2>
+
+You need FcGP, without this FcSP can't be used. Follow the above instructions.
+<P>
+<UL>
+<LI>Get module from CVS. See above for instructions.
+<LI>Link data directory from FcSP to FcGP. <I>ln -s fcgp/data fcsp/data</I>
+<LI>>Enter CVS directory. <I>cd fcgp</I>
+<LI>Build data tree. <I>make</I>
+<LI>Test it. <I>../freecraft/freecraft</I>
+</UL>
+
+<H2>Building CraftED from CVS</H2>
+
+Crafted uses autoconf and configure. To build from CVS use.<P>
+
+./autogen.sh<BR>
+make<BR>
+./src/crafted<P>
+
+<H2>Building CraftED from tarball</H2>
+
+Crafted uses autoconf and configure. To build from tarball distribution use.<P>
+
+./configure<BR>
+make<BR>
+./src/crafted<P>
+
 <HR>
 All trademarks and copyrights on this page are owned by their respective owners.
 <ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
