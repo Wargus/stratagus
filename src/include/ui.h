@@ -334,9 +334,6 @@ typedef struct _ui_ {
 	Button NetworkDiplomacyButton;      ///< network diplomacy button
 
 	// The minimap
-	GraphicConfig MinimapPanel;         ///< minimap panel background
-	int           MinimapPanelX;        ///< minimap panel screen X position
-	int           MinimapPanelY;        ///< minimap panel screen Y position
 	int           MinimapW;             ///< minimap screen Width
 	int           MinimapH;             ///< minimap screen Height
 	int           MinimapPosX;          ///< minimap screen X position
