@@ -225,11 +225,6 @@ void MapUnitSounds(void)
 						SoundIdForName(type->Sound.Harvest[j].Name);
 				}
 			}
-			// FIXME: will be modified, attack sound be moved to missile/weapon
-			if (type->Weapon.Attack.Name) {
-				type->Weapon.Attack.Sound =
-					SoundIdForName(type->Weapon.Attack.Name);
-			}
 			if (type->Sound.Help.Name) {
 				type->Sound.Help.Sound =
 					SoundIdForName(type->Sound.Help.Name);

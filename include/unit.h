@@ -608,8 +608,6 @@ struct _unit_ {
 	unsigned SubAction : 8; /// sub-action of unit
 	unsigned Wait;          /// action counter
 	unsigned State : 8;     /// action state
-#define MAX_UNIT_STATE 255  /// biggest state for action
-	unsigned Reset : 1;     /// can process new command
 	unsigned Blink : 3;     /// Let selection rectangle blink
 	unsigned Moving : 1;    /// The unit is moving
 	unsigned ReCast : 1;    /// Recast again next cycle

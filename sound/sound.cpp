@@ -152,8 +152,6 @@ static SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 			return unit->Type->Sound.Ready.Sound;
 		case VoiceSelected:
 			return unit->Type->Sound.Selected.Sound;
-		case VoiceAttacking:
-			return unit->Type->Weapon.Attack.Sound;
 		case VoiceHelpMe:
 			return unit->Type->Sound.Help.Sound;
 		case VoiceDying:

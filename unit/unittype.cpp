@@ -269,26 +269,6 @@ void UpdateStats(int reset)
 **
 **  @todo Remove the use of scheme symbols to store, use own hash.
 */
-Animations* AnimationsByIdent(const char* ident)
-{
-	Animations** tmp;
-
-	tmp = (Animations**)hash_find(AnimationsHash, ident);
-	if (tmp) {
-		return *tmp;
-	}
-	DebugPrint("Warning animation `%s' not found\n" _C_ ident);
-	return NULL;
-}
-
-/**
-**  Get the animations structure by ident.
-**
-**  @param ident  Identifier for the animation.
-**  @return  Pointer to the animation structure.
-**
-**  @todo Remove the use of scheme symbols to store, use own hash.
-*/
 NewAnimations* NewAnimationsByIdent(const char* ident)
 {
 	NewAnimations** tmp;
@@ -647,7 +627,6 @@ void CleanUnitTypes(void)
 	int i;
 	int j;
 	int res;
-	Animations* anims;
 
 	DebugPrint("FIXME: icon, sounds not freed.\n");
 
@@ -668,37 +647,7 @@ void CleanUnitTypes(void)
 
 	for (i = 0; i < NumUnitTypes; ++i) {
 		type = UnitTypes[i];
-
-		if (!(anims = type->Animations)) { // Must be handled?
-			continue;
-		}
-		for (j = i; j < NumUnitTypes; ++j) { // Remove all uses.
-			if (anims == UnitTypes[j]->Animations) {
-				UnitTypes[j]->Animations = NULL;
-			}
-		}
-		type->Animations = NULL;
-		if (anims->Still) {
-			free(anims->Still);
-		}
-		if (anims->Move) {
-			free(anims->Move);
-		}
-		if (anims->Attack) {
-			free(anims->Attack);
-		}
-		if (anims->Die) {
-			free(anims->Die);
-		}
-		if (anims->Repair) {
-			free(anims->Repair);
-		}
-		for (j = 0; j < MaxCosts; ++j) {
-			if (anims->Harvest[j]) {
-				free(anims->Harvest[j]);
-			}
-		}
-		free(anims);
+		// FIXME: clean animations
 	}
 
 	// Clean all unit-types
@@ -811,9 +760,6 @@ void CleanUnitTypes(void)
 		}
 		if (type->Sound.Dead.Name) {
 			free(type->Sound.Dead.Name);
-		}
-		if (type->Weapon.Attack.Name) {
-			free(type->Weapon.Attack.Name);
 		}
 
 		FreeGraphic(type->Sprite);

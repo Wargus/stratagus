@@ -529,34 +529,6 @@ struct lua_State;
 struct _graphic_;
 struct _construction_;
 
-/**
-**  Defines the animation for different actions.
-*/
-typedef struct _animation_ {
-	unsigned char Flags;            /// Flags for actions
-	signed char   Pixel;            /// Change the position in pixels
-	unsigned char Sleep;            /// Wait for next animation
-	int           Frame;            /// Sprite-frame to display
-} Animation;
-
-#define AnimationRestart  1         /// Restart animation
-#define AnimationReset    2         /// Animation could here be aborted
-#define AnimationSound    4         /// Play sound
-#define AnimationMissile  8         /// Fire projectil
-#define AnimationEnd      0x80      /// Animation end in memory
-
-/**
-**  Define all animations scripts of an unittype.
-*/
-typedef struct _animations_ {
-	Animation*  Still;              /// Standing still
-	Animation*  Move;               /// Unit moving
-	Animation*  Attack;             /// Unit attacking/working
-	Animation*  Repair;             /// Unit repairing
-	Animation*  Harvest[MaxCosts];  /// Unit harvesting
-	Animation*  Die;                /// Unit dying
-} Animations;
-
 typedef enum _new_animation_type_ {
 	NewAnimationFrame,
 	NewAnimationExactFrame,
@@ -647,10 +619,6 @@ typedef struct _new_animations_ {
 } NewAnimations;
 
 #define ANIMATIONS_MAXANIM 1024
-
-	/// Hash table of all the animations
-typedef hashtable(Animations*, ANIMATIONS_MAXANIM) _AnimationsHash;
-extern _AnimationsHash AnimationsHash;
 
 	/// Hash table of all the newanimations
 typedef hashtable(NewAnimations*, ANIMATIONS_MAXANIM) _NewAnimationsHash;
@@ -901,7 +869,6 @@ struct _unit_type_ {
 	int ShadowOffsetX;              /// Shadow horizontal offset
 	int ShadowOffsetY;              /// Shadow vertical offset
 
-	Animations* Animations;         /// Animation scripts
 	NewAnimations* NewAnimations;   /// NewAnimation scripts
 
 	IconConfig Icon;                /// Icon to display for this unit
@@ -1001,8 +968,6 @@ struct _unit_type_ {
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	UnitSound Sound;                /// Sounds for events
-	// TODO: temporary solution
-	WeaponSound Weapon;             /// Currently sound for weapon
 
 	int Supply;                     /// Food supply
 	int Demand;                     /// Food demand
@@ -1066,7 +1031,6 @@ extern UnitType* UnitTypeByWcNum(unsigned);     /// Get unit-type by wc number
 extern int GetVariableIndex(const char *VarName); /// Get index of the variable
 
 	/// Get the animations structure by ident
-extern Animations* AnimationsByIdent(const char* ident);
 extern NewAnimations* NewAnimationsByIdent(const char* ident);
 
 extern void SaveUnitTypes(struct _CL_File_* file);  /// Save the unit-type table
