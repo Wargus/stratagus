@@ -235,8 +235,8 @@ struct _unit_ {
     UnitStats*	Stats;			/// current unit stats
  
 //	DISPLAY:
-    char	IX;
-    char	IY;			/// image displacement to map position
+    char	IX;			/// X image displacement to map position
+    char	IY;			/// Y image displacement to map position
     unsigned	Frame : 8;		/// Image frame: high bit used for flip
     unsigned   	SeenFrame : 8;		/// last seen frame/stage of buildings
 
