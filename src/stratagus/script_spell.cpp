@@ -526,7 +526,7 @@ local SCM CclDefineSpell(SCM list)
 	    sublist=gh_car(list);
 	    CclSpellAction(gh_car(sublist), act);
 	    sublist=gh_cdr(sublist);
-	    while (!gh_null_p(gh_car(sublist))) {
+	    while (!gh_null_p(sublist)) {
 		act->Next = (SpellActionType*)malloc(sizeof(SpellActionType));
 		act=act->Next;
 		memset(act, 0, sizeof(SpellActionType));

@@ -51,7 +51,8 @@
 #  define setvar(sym, value, env) scm_define(sym,value)
 #  define vload(buf,cflag,rflag)  gh_load(buf)
 #  define errl(message, value)    { fputs(message, stdout); gh_display(value); putchar('\n'); }
-#  define lprin1f(var, file)
+// FIXME : support for guile lprin1CL needed
+#  define lprin1CL(var, file)
 #  define gh_new_procedureN(name, proc) gh_new_procedure(name, proc, 0, 0, 1)
 #  define aset1(array, pos, value)      gh_vector_set_x(array, pos, value)
 #  define repl_c_string(msg, a, b, c  ) gh_eval_str(msg)
