@@ -168,7 +168,7 @@ CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
 MISC    = Makefile Common.mk Rules.make.orig FreeCraft-beos.proj setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
 	  .indent.pro make/common.scc make/rules.scc make/makefile.scc \
-	  make/README tools/udta.c tools/ugrd.c contrib/req.cm $(CONTRIB) \
+	  make/README tools/udta.c tools/ugrd.c $(CONTRIB) \
 	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h
 
 mydate	= $(shell date +%y%m%d)
