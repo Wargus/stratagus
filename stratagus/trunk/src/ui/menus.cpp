@@ -2181,6 +2181,15 @@ local void GameMenuEnd(void)
 
 local void KeystrokeHelpMenu(void)
 {
+    int j;
+    int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
+
+    for (j=3; j < nitems ;++j) {
+	if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
+	    KeystrokeHelpMenuItems[j].xofs = 400;
+	else
+	    KeystrokeHelpMenuItems[j].xofs = 16;
+    }
     ProcessMenu(MENU_KEYSTROKE_HELP, 1);
 }
 
@@ -2995,17 +3004,28 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
     int j = 3;
     int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
 
+
     mi--;
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN && KeystrokeHelpMenuItems[nitems-1].yofs > 40*5) {
-		    for (j=3; j < nitems ;++j)
-			KeystrokeHelpMenuItems[j].yofs -= 10;
+		    for (j=3; j < nitems ;++j) {
+			KeystrokeHelpMenuItems[j].yofs -= 20;
+			if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
+			    KeystrokeHelpMenuItems[j].xofs = 400;
+			else
+			    KeystrokeHelpMenuItems[j].xofs = 16;
+		    }
 		    MustRedraw |= RedrawMenu;
 	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP && KeystrokeHelpMenuItems[3].yofs < 40) {
-		    for (j=3; j < nitems ;++j)
-			KeystrokeHelpMenuItems[j].yofs += 10;
+		    for (j=3; j < nitems ;++j) {
+		    KeystrokeHelpMenuItems[j].yofs += 20;
+		    if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
+			KeystrokeHelpMenuItems[j].xofs = 400;
+		    else
+			KeystrokeHelpMenuItems[j].xofs = 16;
+		    }
 		    MustRedraw |= RedrawMenu;
 	    }
 	    ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
