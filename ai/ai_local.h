@@ -157,9 +157,13 @@ typedef struct _player_ai_ {
 
     // resource manager
 
+	/// number of elements in UnitTypeRequests
+    int			RequestsCount;
 	/// unit-types to build/train requested and priority list
     AiUnitTypeTable*	UnitTypeRequests;
 
+	/// number of elements in UnitTypeBuilded
+    int			BuildedCount;
     struct {
 	int		Want;		/// requested number
 	int		Made;		/// builded number
@@ -214,6 +218,15 @@ extern PlayerAi* AiPlayer;		/// Current AI player
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+//
+//	Resource manager
+//
+    /// Add unit-type request to resource manager
+extern void AiAddUnitTypeRequest(UnitType* type,int count);
+    /// Periodic called resource manager handler
+extern void AiResourceManager(void);
+
 
 //@}
 
