@@ -65,6 +65,7 @@
 <a href="#set-click-missile!">set-click-missile!</a>
 <a href="#set-color-cycle-all!">set-color-cycle-all!</a>
 <a href="#set-contrast!">set-contrast!</a>
+<a href="#set-damage-missile!">set-damage-missile!</a>
 <a href="#set-double-click-delay!">set-double-click-delay!</a>
 <a href="#set-editor-select-icon!">set-editor-select-icon!</a>
 <a href="#set-editor-units-icon!">set-editor-units-icon!</a>
@@ -503,6 +504,26 @@ settings.
 <pre>
     ;; This is the default contrast. A little more than the original.
     (set-contrast! 110)
+</pre>
+
+<h4>Used</h4>
+
+<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+
+<a name="set-damage-missile!"></a>
+<h3>(set-damage-missile! missile)</h3>
+
+Sets the missile to use for displaying the damage done to units
+
+<dl>
+<dt>missile</dt>
+<dd>missile name to use to display the damage</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+   (set-damage-missile! 'missile-hit)
 </pre>
 
 <h4>Used</h4>
