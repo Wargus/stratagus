@@ -78,6 +78,7 @@ global char SkipGameCycle;	/// Skip the next game cycle
 global char BigMapMode;		/// Show only the map
 global enum _iface_state_ InterfaceState; /// Current interface state
 global int GodMode;		/// Invincibility cheat
+global enum _key_state_ KeyState; /// current key state
 
 /*----------------------------------------------------------------------------
 --	Functions
