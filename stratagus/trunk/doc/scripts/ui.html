@@ -64,29 +64,70 @@ Everything around the UI.
 
 <H4>Description</H4>
 
-.
+Define a button.
 
 <H4>Syntax</H4>
 
-<CODE>(define-button)</CODE>
+<CODE>(define-button 'pos pos 'level level 'icon icon<BR>
+&nbsp;&nbsp;'action action ['value value]<BR>
+&nbsp;&nbsp;['allowed allowed 'allow-arg allowarg]<BR>
+&nbsp;&nbsp;'key key 'hint hint<BR>
+&nbsp;&nbsp;'for-unit '(forunit))</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>pos</DT>
+<DD>Position number.
+</DD>
+<DT>level</DT>
+<DD>Level number.
+</DD>
+<DT>icon</DT>
+<DD>Name of the icon to display.
+</DD>
+<DT>action</DT>
+<DD>Action to perform when the button is clicked.  Can be any of the following:
+move, stop, attack, repair, harvest, button, build, train-unit, patrol,
+stand-ground, attack-ground, return-goods, demolish, cast-spell, research,
+upgrade-to, unload, cancel, cancel-upgrade, cancel-train-unit, cancel-build.
+</DD>
+<DT>value</DT>
+<DD>Optional value associated with the action.
+</DD>
+<DT>allowed</DT>
+<DD>Optional check to see if a button is allowed.  Can be any of the following:
+check-true, check-false, check-upgrade, check-units-or, check-units-and,
+check-network, check-no-work, check-no-research, check-attack,
+check-upgrade-to, check-research, check-single-research.
+</DD>
+<DT>allowarg</DT>
+<DD>Optional argument used by the allowed function.
+</DD>
+<DT>key</DT>
+<DD>Shortcut key for the button.
+</DD>
+<DT>hint</DT>
+<DD>Hint to be displayed for the button.
+</DD>
+<DT>forunit</DT>
+<DD>List of units the button applies to.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (define-button)
+    (define-button 'pos 1 'level 0 'icon 'icon-move-peasant
+      'action 'move
+      'key "m" 'hint "~MOVE"
+      'for-unit '(unit-footman unit-knight))
 </PRE>
 
-<P>.
+<P>Defines the move button for the footman and knight.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/human/buttons.ccl"> $LIBARYPATH/ccl/human/buttons.ccl </A> ,
+<A HREF="../../data/ccl/orc/buttons.ccl"> $LIBARYPATH/ccl/orc/buttons.ccl </A>
 
 <A NAME="define-cursor"></A>
 <H3>define-cursor</H3>
