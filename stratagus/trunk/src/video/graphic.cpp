@@ -335,7 +335,10 @@ local void FreeGraphic8(Graphic* graphic)
 **	@param depth	Pixel depth of the object (8,16,32)
 **	@param width	Pixel width.
 **	@param height	Pixel height.
-**	@param data	Object data.
+**	@param data	Object data (malloced by caller, freed from object).
+**	@param size	Size in bytes of the object data.
+**
+**	@return		New graphic object (malloced).
 */
 global Graphic* MakeGraphic(
 	unsigned depth,unsigned width,unsigned height,void* data,unsigned size)

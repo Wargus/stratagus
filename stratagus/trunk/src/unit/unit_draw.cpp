@@ -87,7 +87,7 @@ global int ShowManaBackgroundLong;
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-global void (*DrawSelection)(const Unit*,const UnitType*,int,int)
+global void (*DrawSelection)(const Unit* unit,const UnitType* type,int x,int y)
 	=DrawSelectionNone;
 
 /*----------------------------------------------------------------------------
@@ -499,7 +499,7 @@ local void DrawManaBar(int x,int y,const UnitType* type,int full,int ready)
 	}
         w=(f*type->BoxHeight)/100-1;
         if (  w > 0 ) // Prevents -1 turning into unsigned int
- 	    VideoFillRectangleClip(ColorBlue
+	    VideoFillRectangleClip(ColorBlue
 		,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
 		,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
 			+type->BoxHeight+6
@@ -564,7 +564,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		if( ShowHealthBackgroundLong ) {
 #if defined(DEBUG)
 		    // Johns: I want to see fast moving.
-		    //VideoFillRectangleClip(unit->Data.Move.Fast 
+		    //VideoFillRectangleClip(unit->Data.Move.Fast
 		    VideoFillRectangleClip(unit->Active
 			    ? ColorBlack : ColorWhite
 #else
@@ -578,7 +578,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		} else {
 #if defined(DEBUG)
 		    // Johns: I want to see fast moving.
-		    VideoFillRectangleClip(unit->Data.Move.Fast 
+		    VideoFillRectangleClip(unit->Data.Move.Fast
 			    ? ColorBlack : ColorWhite
 #else
 		    VideoFillRectangleClip(ColorBlack
@@ -1158,7 +1158,7 @@ local void ShowOrder(const Unit* unit)
 **
 **	@param unit	Unit pointer of drawn unit.
 **	@param type	Unit-type pointer.
-**	@param X	X screen pixel position of unit.
+**	@param x	X screen pixel position of unit.
 **	@param y	Y screen pixel position of unit.
 */
 local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
@@ -1236,6 +1236,7 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 **	FIXME: use function pointer here.
 **
 **	@param unit	Pointer to unit.
+**	@param sprite	Change the palette entries 208-210 in this sprite.
 */
 local void GraphicUnitPixels(const Unit* unit,const Graphic* sprite)
 {
