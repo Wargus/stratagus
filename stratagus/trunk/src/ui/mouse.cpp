@@ -272,7 +272,8 @@ global void DoRightButton(int sx,int sy)
 
 	    // cade: this is default repair action
 	    dest=RepairableOnScreenMapPosition(sx, sy);
-	    if( dest && dest->Type && dest->Player==ThisPlayer ) {
+	    if( dest && dest->Type && (dest->Player==ThisPlayer
+		    || IsAllied(ThisPlayer,dest)) ) {
 		SendCommandRepair(unit,x,y,dest,flush);
 		continue;
 	    }
@@ -795,7 +796,8 @@ local void SendRepair(int sx,int sy)
     int y;
 
     dest=RepairableOnScreenMapPosition(sx,sy);
-    if( !dest || !dest->Type || dest->Player!=ThisPlayer ) {
+    if( !(dest && dest->Type && (dest->Player==ThisPlayer
+	    || IsAllied(ThisPlayer,dest))) ) {
 	// FIXME: Should move test in repairable
 	dest=NoUnitP;
     }
