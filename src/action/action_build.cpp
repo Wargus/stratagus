@@ -387,8 +387,10 @@ global void HandleActionBuilded(Unit* unit)
 	NotifyPlayer(unit->Player, NotifyGreen, unit->X, unit->Y,
 	    "New %s done", type->Name);
 	if (unit->Player == ThisPlayer) {
-	    if (worker) {
-	    	PlayUnitSound(worker, VoiceWorkCompleted);
+	    if (unit->Type->Sound.Ready.Sound) {
+		PlayUnitSound(unit, VoiceReady);
+	    } else if (worker) {
+		PlayUnitSound(worker, VoiceWorkCompleted);
 	    } else {
 		PlayUnitSound(unit, VoiceBuilding);
 	    }
