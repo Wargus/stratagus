@@ -1778,6 +1778,7 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 */
 local void SetCdPower(Menuitem *mi __attribute__((unused)))
 {
+#ifdef WITH_SOUND
 #ifdef USE_SDLCD
     // Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
@@ -1811,6 +1812,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 	StopMusic();
 	CDMode = ":stopped";
     }
+#endif
 #endif
     SoundOptionsInit(NULL);
 }
@@ -1853,7 +1855,7 @@ local void SetCommandKey(Menuitem *mi __attribute__((unused)))
 */
 local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 {
-#if defined(USE_LIBCDA) || defined(USE_SDLCD)
+#if defined(WITH_SOUND) && (defined(USE_LIBCDA) || defined(USE_SDLCD))
     CDMode = ":all";
 #endif
     SoundOptionsInit(NULL);
@@ -1864,7 +1866,7 @@ local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 */
 local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 {
-#if defined(USE_LIBCDA) || defined(USE_SDLCD)
+#if defined(WITH_SOUND) && (defined(USE_LIBCDA) || defined(USE_SDLCD))
     CDMode = ":random";
 #endif
     SoundOptionsInit(NULL);
@@ -3762,7 +3764,7 @@ local void MusicVolumeHSAction(Menuitem *mi, int i)
     }
 }
 
-#if defined(USE_LIBCDA) || defined(USE_CDDA)
+#if defined(WITH_SOUND) && (defined(USE_LIBCDA) || defined(USE_CDDA))
 /**
 **	CD volume horizontal slider action callback
 */
