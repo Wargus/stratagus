@@ -483,6 +483,8 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
     int widths;
     const ColorFont* fp;
     const VMemType* rev;
+    char* color;
+    const char* p;
     void (*DrawChar)(const Graphic*,int,int,int,int,int,int);
 
 #ifdef USE_OPENGL
@@ -505,13 +507,6 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 		    return widths;
 		case '~':
 		    break;
-		case '0': case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7': case '8': case '9':
-		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-		    fprintf(stderr,"Not supported: ~%c\n",*text);
-		    ExitFatal(1);
-		    break;
 		case '!':
 		    rev=FontPixels;
 		    FontPixels=ReverseTextColor;
@@ -528,7 +523,21 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 		    continue;
 
 		default:
-		    DebugLevel0Fn("oops, format your ~\n");
+		    p=text;
+		    while( *p && *p!='~' ) {
+			++p;
+		    }
+		    if( !*p ) {
+			DebugLevel0Fn("oops, format your ~\n");
+			return widths;
+		    }
+		    color=malloc(p-text+1);
+		    memcpy(color,text,p-text);
+		    color[p-text]='\0';
+		    text=p;
+		    LastTextColor=FontPixels;
+		    FontPixels=GetFontColorMapping(color);
+		    free(color);
 		    continue;
 	    }
 	}
