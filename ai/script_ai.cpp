@@ -155,6 +155,8 @@ local SCM CclDefineAiHelper(SCM list)
 	    what=6;
 	} else if( gh_eq_p(value,gh_symbol2scm("unit-equiv")) ) {
 	    what=7;
+	} else if( gh_eq_p(value,gh_symbol2scm("repair")) ) {
+	    what=8;
 	} else {
 	    fprintf(stderr,"unknown tag\n");
 	    continue;
@@ -233,49 +235,49 @@ local SCM CclDefineAiHelper(SCM list)
 		case 0:			// build
 		    AiHelperSetupTable(
 			    &AiHelpers.BuildCount,&AiHelpers.Build,type->Type);
-		    AiHelperInsert(
-			    AiHelpers.Build+type->Type,base);
+		    AiHelperInsert(AiHelpers.Build+type->Type,base);
 		    break;
 		case 1:			// train
 		    AiHelperSetupTable(
 			    &AiHelpers.TrainCount,&AiHelpers.Train,type->Type);
-		    AiHelperInsert(
-			    AiHelpers.Train+type->Type,base);
+		    AiHelperInsert(AiHelpers.Train+type->Type,base);
 		    break;
 		case 2:			// upgrade
 		    AiHelperSetupTable(
 			    &AiHelpers.UpgradeCount,&AiHelpers.Upgrade,
 			    type->Type);
-		    AiHelperInsert(
-			    AiHelpers.Upgrade+type->Type,base);
+		    AiHelperInsert(AiHelpers.Upgrade+type->Type,base);
 		    break;
 		case 3:			// research
 		    AiHelperSetupTable(
 			    &AiHelpers.ResearchCount,&AiHelpers.Research,
 			    upgrade-Upgrades);
-		    AiHelperInsert(
-			    AiHelpers.Research+(upgrade-Upgrades),base);
+		    AiHelperInsert(AiHelpers.Research+(upgrade-Upgrades),base);
 		    break;
 		case 4:			// collect
 		    AiHelperSetupTable(
 			    &AiHelpers.CollectCount,&AiHelpers.Collect,cost);
-		    AiHelperInsert( AiHelpers.Collect+cost,base);
+		    AiHelperInsert(AiHelpers.Collect+cost,base);
 		    break;
 		case 5:			// with-goods
 		    AiHelperSetupTable(
 			&AiHelpers.WithGoodsCount,&AiHelpers.WithGoods,cost);
-		    AiHelperInsert( AiHelpers.WithGoods+cost,base);
+		    AiHelperInsert(AiHelpers.WithGoods+cost,base);
 		    break;
 		case 6:			// unit-limit
 		    AiHelperSetupTable(
 			&AiHelpers.UnitLimitCount,&AiHelpers.UnitLimit,cost);
-		    AiHelperInsert( AiHelpers.UnitLimit+cost,base);
+		    AiHelperInsert(AiHelpers.UnitLimit+cost,base);
 		    break;
 		case 7:			// equivalence
 		    AiHelperSetupTable(
 			    &AiHelpers.EquivCount,&AiHelpers.Equiv,base->Type);
-		    AiHelperInsert(
-			    AiHelpers.Equiv+base->Type,type);
+		    AiHelperInsert(AiHelpers.Equiv+base->Type,type);
+		    break;
+		case 8:			// repair
+		    AiHelperSetupTable(
+			&AiHelpers.RepairCount,&AiHelpers.Repair,type->Type);
+		    AiHelperInsert(AiHelpers.Repair+type->Type,base);
 		    break;
 	    }
 	}

@@ -311,9 +311,9 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
     }
 
     // FIXME: Should do this if all units can't build better!
-    //return AiFindBuildingPlace2(worker,type,dx,dy,0);
+    return AiFindBuildingPlace2(worker,type,dx,dy,0);
 
-    return 0;
+    // return 0;
 }
 
 //@}
