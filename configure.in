@@ -213,11 +213,7 @@ AC_ARG_WITH(cdaudio,
 			  [Enable CD Audio support (default: platform-dependant)]], CDAUDIO="$with_cdaudio")
 if test "$CDAUDIO" = "sdl"; then
     CDAUDIO_CFLAGS="`sdl-config --cflags`"
-    if test "$enable_static" != "yes"; then
-	CDAUDIO_LIBS="`sdl-config --libs`"
-    else 
-	CDAUDIO_LIBS="`sdl-config --static-libs`"
-    fi
+    CDAUDIO_LIBS=""
 elif test "$CDAUDIO" = "no" -o "$PLATFORM" = "-DBSD"; then
     CDAUDIO_CFLAGS=""
     CDAUDIO_LIBS=""
