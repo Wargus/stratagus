@@ -70,20 +70,20 @@ static void AllowUpgradeId(Player* player, int id, char af);
 */
 const char UpgradeType[] = "upgrade";
 
-Upgrade Upgrades[UpgradeMax];        /// The main user useable upgrades
-static int NumUpgrades;                      /// Number of upgrades used
+Upgrade Upgrades[UpgradeMax];                ///< The main user useable upgrades
+static int NumUpgrades;                      ///< Number of upgrades used
 
 	/// How many upgrades modifiers supported
-#define UPGRADE_MODIFIERS_MAX		(UpgradeMax * 4)
+#define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
 	/// Upgrades modifiers
 static UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 	/// Number of upgrades modifiers used
 static int NumUpgradeModifiers;
 
 #ifdef DOXYGEN  // no real code, only for documentation
-static Upgrade* UpgradeHash[61];             /// lookup table for upgrade names
+static Upgrade* UpgradeHash[61];             ///< lookup table for upgrade names
 #else
-static hashtable(Upgrade*, 61) UpgradeHash;  /// lookup table for upgrade names
+static hashtable(Upgrade*, 61) UpgradeHash;  ///< lookup table for upgrade names
 #endif
 
 /**
@@ -233,120 +233,120 @@ void CleanUpgrades(void)
 }
 
 /**
-**		Parse ALOW area from puds.
+** Parse ALOW area from puds.
 **
-**		@param alow		Pointer to alow area.
-**		@param length		length of alow area.
+** @param alow      Pointer to alow area.
+** @param length    length of alow area.
 **
-**		@note		Only included for compatibility, for new levels use
-**				CCL (define-allow)
+** @note Only included for compatibility, for new levels use
+** CCL (define-allow)
 */
 void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 {
 	// units allow bits -> wc2num -> internal names.
 	static char unit_for_bit[64] = {
-		 0,  1,		// unit-footman						unit-grunt
-		 2,  3,		// unit-peasant						unit-peon
-		 4,  5,		// unit-ballista				unit-catapult
-		 6,  7,		// unit-knight						unit-ogre
-		 8,  9,		// unit-archer						unit-axethrower
-		10, 11,		// unit-mage						unit-death-knight
-		26, 27,		// unit-human-oil-tanker		unit-orc-oil-tanker
-		30, 31,		// unit-elven-destroyer				unit-troll-destroyer
-		28, 29,		// unit-human-transport				unit-orc-transport
-		32, 33,		// unit-battleship				unit-ogre-juggernaught
-		38, 39,		// unit-gnomish-submarine		unit-giant-turtle
-		40, 41,		// unit-gnomish-flying-machine		unit-goblin-zeppelin
-		42, 43,		// unit-gryphon-rider				unit-dragon
-		-1, -1,		// unused
-		14, 15,		// unit-dwarves						unit-goblin-sappers
-		70, 71,		// unit-gryphon-aviary				unit-dragon-roost
-		58, 59,		// unit-farm						unit-pig-farm
-		60, 61,		// unit-human-barracks				unit-orc-barracks
-		76, 77,		// unit-elven-lumber-mill		unit-troll-lumber-mill
-		66, 67,		// unit-stables						unit-ogre-mound
-		80, 81,		// unit-mage-tower				unit-temple-of-the-damned
-		78, 79,		// unit-human-foundry				unit-orc-foundry
-		84, 85,		// unit-human-refinery				unit-orc-refinery
-		68, 69,		// unit-gnomish-inventor		unit-goblin-alchemist
-		62, 63,		// unit-church						unit-altar-of-storms
-		64, 65,		// unit-human-watch-tower		unit-orc-watch-tower
-		74, 75,		// unit-town-hall				unit-great-hall
-		88, 89,		// unit-keep						unit-stronghold
-		90, 91,		// unit-castle						unit-fortress
-		82, 83,		// unit-human-blacksmith		unit-orc-blacksmith
-		72, 73,		// unit-human-shipyard				unit-orc-shipyard
-		103,104,// unit-human-wall				unit-orc-wall
+		 0,  1, // unit-footman                  unit-grunt
+		 2,  3, // unit-peasant                  unit-peon
+		 4,  5, // unit-ballista                 unit-catapult
+		 6,  7, // unit-knight                   unit-ogre
+		 8,  9, // unit-archer                   unit-axethrower
+		10, 11, // unit-mage                     unit-death-knight
+		26, 27, // unit-human-oil-tanker         unit-orc-oil-tanker
+		30, 31, // unit-elven-destroyer          unit-troll-destroyer
+		28, 29, // unit-human-transport          unit-orc-transport
+		32, 33, // unit-battleship               unit-ogre-juggernaught
+		38, 39, // unit-gnomish-submarine        unit-giant-turtle
+		40, 41, // unit-gnomish-flying-machine   unit-goblin-zeppelin
+		42, 43, // unit-gryphon-rider            unit-dragon
+		-1, -1, // unused
+		14, 15, // unit-dwarves                  unit-goblin-sappers
+		70, 71, // unit-gryphon-aviary           unit-dragon-roost
+		58, 59, // unit-farm                     unit-pig-farm
+		60, 61, // unit-human-barracks           unit-orc-barracks
+		76, 77, // unit-elven-lumber-mill        unit-troll-lumber-mill
+		66, 67, // unit-stables                  unit-ogre-mound
+		80, 81, // unit-mage-tower               unit-temple-of-the-damned
+		78, 79, // unit-human-foundry            unit-orc-foundry
+		84, 85, // unit-human-refinery           unit-orc-refinery
+		68, 69, // unit-gnomish-inventor         unit-goblin-alchemist
+		62, 63, // unit-church                   unit-altar-of-storms
+		64, 65, // unit-human-watch-tower        unit-orc-watch-tower
+		74, 75, // unit-town-hall                unit-great-hall
+		88, 89, // unit-keep                     unit-stronghold
+		90, 91, // unit-castle                   unit-fortress
+		82, 83, // unit-human-blacksmith         unit-orc-blacksmith
+		72, 73, // unit-human-shipyard           unit-orc-shipyard
+		103,104,// unit-human-wall               unit-orc-wall
 	};
 	// spells allow bits -> wc2num -> internal names.
 	static char spell_for_bit[32] = {
-		34,		// upgrade-holy-vision
-		35,		// upgrade-healing
-		-1,		// not used
-		36,		// upgrade-exorcism
-		37,		// upgrade-flame-shield
-		38,		// upgrade-fireball
-		39,		// upgrade-slow
-		40,		// upgrade-invisibility
-		41,		// upgrade-polymorph
-		42,		// upgrade-blizzard
-		43,		// upgrade-eye-of-kilrogg
-		44,		// upgrade-bloodlust
-		-1,		// not used
-		45,		// upgrade-raise-dead
-		46,		// upgrade-death-coil
-		47,		// upgrade-whirlwind
-		48,		// upgrade-haste
-		49,		// upgrade-unholy-armor
-		50,		// upgrade-runes
-		51,		// upgrade-death-and-decay
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
-		-1,		// not used
+		34, // upgrade-holy-vision
+		35, // upgrade-healing
+		-1, // not used
+		36, // upgrade-exorcism
+		37, // upgrade-flame-shield
+		38, // upgrade-fireball
+		39, // upgrade-slow
+		40, // upgrade-invisibility
+		41, // upgrade-polymorph
+		42, // upgrade-blizzard
+		43, // upgrade-eye-of-kilrogg
+		44, // upgrade-bloodlust
+		-1, // not used
+		45, // upgrade-raise-dead
+		46, // upgrade-death-coil
+		47, // upgrade-whirlwind
+		48, // upgrade-haste
+		49, // upgrade-unholy-armor
+		50, // upgrade-runes
+		51, // upgrade-death-and-decay
+		-1, // not used
+		-1, // not used
+		-1, // not used
+		-1, // not used
+		-1, // not used
+		-1, // not used
+		-1, // not used
+		-1, // not used
+		-1, // not used
+		-1, // not used
+		-1, // not used
+		-1, // not used
 	};
 	// upgrades allow bits -> wc2num -> internal names.
 	static char upgrade_for_bit[64] = {
-		 4, 6,		// upgrade-arrow1				upgrade-throwing-axe1
-		 5, 7,		// upgrade-arrow2				upgrade-throwing-axe2
-		 0, 2,		// upgrade-sword1				upgrade-battle-axe1
-		 1, 3,		// upgrade-sword2				upgrade-battle-axe2
-		 8,10,		// upgrade-human-shield1		upgrade-orc-shield1
-		 9,11,		// upgrade-human-shield2		upgrade-orc-shield2
-		12,14,		// upgrade-human-ship-cannon1		upgrade-orc-ship-cannon1
-		13,15,		// upgrade-human-ship-cannon2		upgrade-orc-ship-cannon2
-		16,18,		// upgrade-human-ship-armor1		upgrade-orc-ship-armor1
-		17,19,		// upgrade-human-ship-armor2		upgrade-orc-ship-armor2
-		-1,-1,		// unused
-		-1,-1,		// unused
-		20,22,		// upgrade-catapult1				upgrade-ballista1
-		21,23,		// upgrade-catapult2				upgrade-ballista2
-		-1,-1,		// unused
-		-1,-1,		// unused
-		24,28,		// upgrade-ranger				upgrade-berserker
-		25,29,		// upgrade-longbow				upgrade-light-axes
-		26,30,		// upgrade-ranger-scouting		upgrade-berserker-scouting
-		27,31,		// upgrade-ranger-marksmanship		upgrade-berserker-regeneration
-		33,32,		// upgrade-paladin				upgrade-ogre-mage
-		-1,-1,		// unused
-		-1,-1,		// unused
-		-1,-1,		// unused
-		-1,-1,		// unused
-		-1,-1,		// unused
-		-1,-1,		// unused
-		-1,-1,		// unused
-		-1,-1,		// unused
-		-1,-1,		// unused
-		-1,-1,		// unused
-		-1,-1,		// unused
+		 4, 6, // upgrade-arrow1                    upgrade-throwing-axe1
+		 5, 7, // upgrade-arrow2                    upgrade-throwing-axe2
+		 0, 2, // upgrade-sword1                    upgrade-battle-axe1
+		 1, 3, // upgrade-sword2                    upgrade-battle-axe2
+		 8,10, // upgrade-human-shield1             upgrade-orc-shield1
+		 9,11, // upgrade-human-shield2             upgrade-orc-shield2
+		12,14, // upgrade-human-ship-cannon1        upgrade-orc-ship-cannon1
+		13,15, // upgrade-human-ship-cannon2        upgrade-orc-ship-cannon2
+		16,18, // upgrade-human-ship-armor1         upgrade-orc-ship-armor1
+		17,19, // upgrade-human-ship-armor2         upgrade-orc-ship-armor2
+		-1,-1, // unused
+		-1,-1, // unused
+		20,22, // upgrade-catapult1                 upgrade-ballista1
+		21,23, // upgrade-catapult2                 upgrade-ballista2
+		-1,-1, // unused
+		-1,-1, // unused
+		24,28, // upgrade-ranger                    upgrade-berserker
+		25,29, // upgrade-longbow                   upgrade-light-axes
+		26,30, // upgrade-ranger-scouting           upgrade-berserker-scouting
+		27,31, // upgrade-ranger-marksmanship       upgrade-berserker-regeneration
+		33,32, // upgrade-paladin                   upgrade-ogre-mage
+		-1,-1, // unused
+		-1,-1, // unused
+		-1,-1, // unused
+		-1,-1, // unused
+		-1,-1, // unused
+		-1,-1, // unused
+		-1,-1, // unused
+		-1,-1, // unused
+		-1,-1, // unused
+		-1,-1, // unused
+		-1,-1, // unused
 	};
 	int i;
 	int b;
@@ -355,10 +355,10 @@ void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 	DebugPrint(" Length %d FIXME: constant must be moved to ccl\n" _C_ length);
 
 	//
-	//		Allow units
+	// Allow units
 	//
 	for (player = Players; player < Players + 16; ++player) {
-		for (i = 0; i < 4; ++i) {				// 4 bytes endian save
+		for (i = 0; i < 4; ++i) { // 4 bytes endian save
 			int v;
 
 			v = (*alow++) & 0xFF;
@@ -385,7 +385,7 @@ void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 	}
 
 	//
-	//		Spells start with
+	// Spells start with
 	//
 	for (player = Players; player < Players + 16; ++player) {
 		for (i = 0; i < 4; ++i) {
@@ -407,7 +407,7 @@ void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 	}
 
 	//
-	//		Spells allowed
+	// Spells allowed
 	//
 	for (player = Players; player < Players + 16; ++player) {
 		for (i = 0; i < 4; ++i) {
@@ -427,8 +427,8 @@ void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 	}
 
 	//
-	//		Spells researching
-	//				FIXME: not useful.
+	// Spells researching
+	// FIXME: not useful.
 	//
 	for (player = Players; player < Players + 16; ++player) {
 		for (i = 0; i < 4; ++i) {
@@ -448,7 +448,7 @@ void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 	}
 
 	//
-	//		Upgrades allowed
+	// Upgrades allowed
 	//
 	for (player = Players; player < Players + 16; ++player) {
 		for (i = 0; i < 4; ++i) {
@@ -471,7 +471,7 @@ void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 	}
 
 	//
-	//		Upgrades acquired
+	// Upgrades acquired
 	//
 	for (player = Players; player < Players + 16; ++player) {
 		for (i = 0; i < 4; ++i) {
@@ -495,10 +495,10 @@ void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 }
 
 /**
-**		Parse UGRD area from puds.
+** Parse UGRD area from puds.
 **
-**		@param ugrd		Pointer to ugrd area.
-**		@param length		length of ugrd area.
+** @param ugrd      Pointer to ugrd area.
+** @param length    length of ugrd area.
 */
 void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 {
@@ -516,12 +516,12 @@ void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 
 	for (i = 0; i < 52; ++i) {
 		time = ((unsigned char*)ugrd)[i];
-		gold = AccessLE16(		ugrd + 52 + (i) * 2);
-		lumber = AccessLE16(		ugrd + 52 + (i + 52) * 2);
-		oil = AccessLE16(		ugrd + 52 + (i + 52 + 52) * 2);
-		icon = AccessLE16(		ugrd + 52 + (i + 52 + 52 + 52) * 2);
-		group = AccessLE16(		ugrd + 52 + (i + 52 + 52 + 52 + 52) * 2);
-		flags = AccessLE16(		ugrd + 52 + (i + 52 + 52 + 52 + 52 + 52) * 2);
+		gold = AccessLE16(ugrd + 52 + (i) * 2);
+		lumber = AccessLE16(ugrd + 52 + (i + 52) * 2);
+		oil = AccessLE16(ugrd + 52 + (i + 52 + 52) * 2);
+		icon = AccessLE16(ugrd + 52 + (i + 52 + 52 + 52) * 2);
+		group = AccessLE16(ugrd + 52 + (i + 52 + 52 + 52 + 52) * 2);
+		flags = AccessLE16(ugrd + 52 + (i + 52 + 52 + 52 + 52 + 52) * 2);
 
 		memset(costs, 0, sizeof(costs));
 		costs[TimeCost] = time;
@@ -983,8 +983,8 @@ static int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 
 #if 0
 /**
-**		returns upgrade modifier id or -1 for error (actually this id is
-**		useless, just error checking)
+** returns upgrade modifier id or -1 for error (actually this id is
+** useless, just error checking)
 */
 static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 	int basic_damage, int piercing_damage, int armor, int speed,
@@ -992,7 +992,7 @@ static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 	const int units[UnitTypeMax],
 	// following are comma separated list of required string id's
 	const char* af_upgrades,
-	const char* apply_to			// "unit-peon,unit-peasant"
+	const char* apply_to // "unit-peon,unit-peasant"
 	)
 {
 	char* s1;
@@ -1026,7 +1026,7 @@ static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 
 	memcpy(um->ChangeUnits, units, sizeof(um->ChangeUnits));
 	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
-	memset(um->ApplyTo,		'?', sizeof(um->ApplyTo));
+	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
 
 	//
 	// get allow/forbid's for upgrades
@@ -1039,7 +1039,7 @@ static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 		Assert(s2[1] == ':');
 		id = UpgradeIdByIdent(s2 + 2);
 		if (id == -1) {
-			continue;				// should we cancel all and return error?!
+			continue; // should we cancel all and return error?!
 		}
 		um->ChangeUpgrades[id] = s2[0];
 	}
@@ -1055,9 +1055,9 @@ static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 
 		id = UnitTypeIdByIdent(s2);
 		if (id == -1) {
-			break;				// cade: should we cancel all and return error?!
+			break; // cade: should we cancel all and return error?!
 		}
-		um->ApplyTo[id] = 'X';		// something other than '?'
+		um->ApplyTo[id] = 'X'; // something other than '?'
 	}
 	free(s1);
 
@@ -1069,7 +1069,7 @@ static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 #endif
 
 /*----------------------------------------------------------------------------
---		General/Map functions
+-- General/Map functions
 ----------------------------------------------------------------------------*/
 
 // AllowStruct and UpgradeTimers will be static in the player so will be
@@ -1111,7 +1111,7 @@ int UpgradeIdByIdent(const char* ident)
 }
 
 /*----------------------------------------------------------------------------
---		Upgrades
+-- Upgrades
 ----------------------------------------------------------------------------*/
 
 /**

@@ -66,19 +66,19 @@
 const char UnitTypeType[] = "unit-type";
 
 #ifdef DEBUG
-int NoWarningUnitType;  /// quiet ident lookup
+int NoWarningUnitType;  ///< quiet ident lookup
 #endif
 
-UnitType* UnitTypes[UnitTypeMax];  /// unit-types definition
-int NumUnitTypes;  /// number of unit-types made
+UnitType* UnitTypes[UnitTypeMax];   ///< unit-types definition
+int NumUnitTypes;                   ///< number of unit-types made
 
-/*
+/**
 **  Next unit type are used hardcoded in the source.
 **
 **  @todo find a way to make it configurable!
 */
-UnitType* UnitTypeHumanWall; /// Human wall
-UnitType* UnitTypeOrcWall;   /// Orc wall
+UnitType* UnitTypeHumanWall;       ///< Human wall
+UnitType* UnitTypeOrcWall;         ///< Orc wall
 
 /**
 **  Mapping of W*rCr*ft number to our internal unit-type symbol.
@@ -308,9 +308,9 @@ void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 		unittype->_HitPoints = v;
 	}
 	for (i = 0; i < 110; ++i) { // Flag if unit is magic
-//		unittype = UnitTypeByWcNum(i);
-//		v = Fetch8(udta);
-//		unittype->Magic = v;
+// unittype = UnitTypeByWcNum(i);
+// v = Fetch8(udta);
+// unittype->Magic = v;
 		++udta;
 	}
 	for (i = 0; i < 110; ++i) { // Build time * 6 = one second FRAMES
@@ -485,16 +485,16 @@ void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 		unittype->CanStore[GoldCost] = BIT(12, v);
 		unittype->Vanishes = BIT(13, v);
 		unittype->GroundAttack = BIT(14, v);
-//		No idea on what do about commented stuff.
-//		unittype->IsUndead = BIT(15, v);
+// No idea on what do about commented stuff.
+// unittype->IsUndead = BIT(15, v);
 		unittype->ShoreBuilding = BIT(16, v);
-//		unittype->CanCastSpell = BIT(17,v);
+// unittype->CanCastSpell = BIT(17,v);
 		unittype->CanStore[WoodCost] = BIT(18, v);
 		unittype->CanAttack = BIT(19, v);
-//		unittype->Hero = BIT(23, v);
+// unittype->Hero = BIT(23, v);
 		unittype->CanStore[OilCost] = BIT(24, v);
-//		unittype->Volatile = BIT(25, v);
-//		unittype->Organic = BIT(27, v);
+// unittype->Volatile = BIT(25, v);
+// unittype->Organic = BIT(27, v);
 
 		if (BIT(11, v) || BIT(21, v)) {
 			unittype->GivesResource = OilCost;
@@ -583,7 +583,7 @@ void SaveUnitTypes(CLFile* file)
 {
 	int i;
 	int j;
-//	char** sp;
+// char** sp;
 
 	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file, "--- MODULE: unittypes $Id$\n\n");
