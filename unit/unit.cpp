@@ -56,6 +56,7 @@ local Unit** ReleasedTail;		/// List tail of released units.
 
 global Unit* Units[MAX_UNIT_SLOTS];	/// Array of used slots
 global int NumUnits;			/// Number of slots used
+global int HitPointRegeneration;	/// Enable hit point regeneration for all units
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -1140,6 +1141,16 @@ global void UnitIncrementHealth(void)
 
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
+	if (HitPointRegeneration &&  unit->HP<unit->Stats->HitPoints)
+	{
+		++unit->HP;
+
+		// some frames delayed done my color cycling
+	    if( 0 )
+			CheckUnitToBeDrawn(unit);
+	    if( unit->Selected )
+			MustRedraw|=RedrawInfoPanel;
+	}
 	if( unit->Type==berserker
 		&& unit->HP<unit->Stats->HitPoints
 		&& UpgradeIdAllowed(unit->Player,regeneration)=='R' ) {
