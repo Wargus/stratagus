@@ -557,21 +557,21 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #ifdef NEW_FOW
 
     /// Check if a field for the user is explored
-#define IsMapFieldExplored(x,y) \
-    (IsTileVisible(ThisPlayer,x,y))
+#define IsMapFieldExplored(player,x,y) \
+    (IsTileVisible(player,x,y))
 
     /// Check if a field for the user is visibile
-#define IsMapFieldVisible(x,y) \
-    (IsTileVisible(ThisPlayer,x,y)>1)
+#define IsMapFieldVisible(player,x,y) \
+    (IsTileVisible(player,x,y)>1)
 
 #else
 
     /// Check if a field for the user is explored
-#define IsMapFieldExplored(x,y) \
+#define IsMapFieldExplored(player,x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldExplored)
 
     /// Check if a field for the user is visibile
-#define IsMapFieldVisible(x,y) \
+#define IsMapFieldVisible(player,x,y) \
     (TheMap.Visible[0][((y)*TheMap.Width+(x))/32] \
 	&(1<<(((y)*TheMap.Width+(x))%32)))
 

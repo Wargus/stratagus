@@ -168,7 +168,7 @@ global void MapFixSeenRockTile(int x, int y)
     }
 
     // FIXME: can this only happen if seen?
-    if ( IsMapFieldVisible(x,y) ) {
+    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
 	UpdateMinimapSeenXY(x, y);
 	MarkDrawPosMap(x, y);
 	MustRedraw |= RedrawMinimap;
@@ -307,7 +307,7 @@ global void MapFixRockTile(int x, int y)
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
 
-	if ( IsMapFieldVisible(x,y) ) {
+	if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
 	    MarkDrawPosMap(x, y);
@@ -335,7 +335,7 @@ global void MapRemoveRock(unsigned x, unsigned y)
     UpdateMinimapXY(x, y);
     MapFixRockNeighbors(x, y);
 
-    if ( IsMapFieldVisible(x,y) ) {
+    if ( IsMapFieldVisible(ThisPlayer,x,y) ) {
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
 	MarkDrawPosMap(x, y);

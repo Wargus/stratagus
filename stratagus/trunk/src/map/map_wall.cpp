@@ -158,7 +158,7 @@ global void MapFixSeenWallTile(int x, int y)
 	mf->SeenTile = tile;
 
 	// FIXME: can this only happen if seen?
-	if (IsMapFieldVisible(x, y)) {
+	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	    UpdateMinimapSeenXY(x, y);
 	    MarkDrawPosMap(x, y);
 	    MustRedraw |= RedrawMinimap;
@@ -258,7 +258,7 @@ global void MapFixWallTile(int x, int y)
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
 
-	if (IsMapFieldVisible(x, y)) {
+	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
 	    MarkDrawPosMap(x, y);
@@ -299,7 +299,7 @@ global void MapRemoveWall(unsigned x, unsigned y)
     MapFixWallTile(x, y);
     MapFixWallNeighbors(x, y);
 
-    if (IsMapFieldVisible(x,y)) {
+    if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
         MarkDrawPosMap(x, y);
@@ -339,7 +339,7 @@ global void MapSetWall(unsigned x, unsigned y, int humanwall)
     MapFixWallTile(x, y);
     MapFixWallNeighbors(x, y);
 
-    if (IsMapFieldVisible(x, y)) {
+    if (IsMapFieldVisible(ThisPlayer, x, y)) {
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
         MarkDrawPosMap(x, y);
