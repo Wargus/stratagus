@@ -468,22 +468,48 @@ global void VideoDrawPixel32(Uint32 color, int x, int y)
 
 global void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
-    // FIXME: todo
-/*
     Uint16* p;
+    unsigned long dp;
+
+    alpha = (255 - alpha) >> 3;
 
     VideoLockScreen();
+
     p = &((Uint16*)TheScreen->pixels)[x + y * VideoWidth];
-    *p = ((((*p & 0xF800) >> 11) * (255 - alpha) + ((color & 0xF800) >> 11) * alpha) << 3) |
-	((((*p & 0x7E0) >> 5) * (255 - alpha) + ((color & 0x7E0) >> 5) * alpha) >> 3) |
-	(((*p &0x1F) * (255 - alpha) + (color & 0x1F) * alpha) >> 8);
+    color = (((color << 16) | color) & 0x07E0F81F);
+    dp = *p;
+    dp = ((dp << 16) | dp) & 0x07E0F81F;
+    dp = ((((dp - color) * alpha) >> 5) + color) & 0x07E0F81F;
+    *p = (dp >> 16) | dp;
+
     VideoUnlockScreen();
-*/
 }
 
 global void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
 {
-    // FIXME: todo
+    unsigned long sp2;
+    unsigned long dp1;
+    unsigned long dp2;
+    Uint32* p;
+
+    alpha = 255 - alpha;
+
+    VideoLockScreen();
+
+    p = &((Uint32*)TheScreen->pixels)[x + y * VideoWidth];
+
+    sp2 = (color & 0xFF00FF00) >> 8;
+    color &= 0x00FF00FF;
+
+    dp1 = *p;
+    dp2 = (dp1 & 0xFF00FF00) >> 8;
+    dp1 &= 0x00FF00FF;
+
+    dp1 = ((((dp1-color) * alpha) >> 8) + color) & 0x00FF00FF;
+    dp2 = ((((dp2-sp2) * alpha) >> 8) + sp2) & 0x00FF00FF;
+    *p = (dp1 | (dp2 << 8));
+
+    VideoUnlockScreen();
 }
 
 global void VideoDrawPixelClip(Uint32 color, int x, int y)
