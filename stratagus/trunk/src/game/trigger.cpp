@@ -196,16 +196,16 @@ local SCM CclIfUnit(SCM player,SCM operation,SCM quantity,SCM unit)
     int pn;
     const UnitType* unittype;
     const char* op;
-    CompareFunction Compare;
+    CompareFunction compare;
 
     plynr=TriggerGetPlayer(player);
     op=get_c_string(operation);
     q=gh_scm2int(quantity);
     unittype=TriggerGetUnitType(unit);
 
-    Compare=GetCompareFunction(op);
-    if( !Compare ) {
-	errl("Illegal comparison operation in if-unit", operation);
+    compare=GetCompareFunction(op);
+    if( !compare ) {
+	errl("Illegal comparison operation in if-unit",operation);
     }
 
     if( plynr==-1 ) {
@@ -220,36 +220,112 @@ local SCM CclIfUnit(SCM player,SCM operation,SCM quantity,SCM unit)
 	    int j;
 
 	    for( j=0; j<NumUnitTypes; ++j ) {
-		if( Compare(Players[plynr].UnitTypesCount[j],q) ) {
+		if( compare(Players[plynr].UnitTypesCount[j],q) ) {
 		    return SCM_BOOL_T;
 		}
 	    }
 	}
     } else if( unittype==ALL_UNITS ) {
 	for( ; plynr<pn; ++plynr ) {
-	    if( Compare(Players[plynr].TotalNumUnits,q) ) {
+	    if( compare(Players[plynr].TotalNumUnits,q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
     } else if( unittype==ALL_FOODUNITS ) {
 	for( ; plynr<pn; ++plynr ) {
-	    if( Compare(Players[plynr].NumFoodUnits,q) ) {
+	    if( compare(Players[plynr].NumFoodUnits,q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
     } else if( unittype==ALL_BUILDINGS ) {
 	for( ; plynr<pn; ++plynr ) {
-	    if( Compare(Players[plynr].NumBuildings,q) ) {
+	    if( compare(Players[plynr].NumBuildings,q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
     } else {
 	for( ; plynr<pn; ++plynr ) {
 	    DebugLevel3Fn("Player%d, %d == %s\n" _C_ plynr _C_ q _C_ unittype->Ident);
-	    if( Compare(Players[plynr].UnitTypesCount[unittype->Type],q) ) {
+	    if( compare(Players[plynr].UnitTypesCount[unittype->Type],q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
+    }
+
+    return SCM_BOOL_F;
+}
+
+/**
+**	Player has the quantity of unit-type at a location.
+**
+**	(if-unit-at <player> <op> <quantity> <unit> <location> <location>)
+*/
+local SCM CclIfUnitAt(SCM list)
+{
+    int plynr;
+    int q;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    const UnitType* unittype;
+    CompareFunction compare;
+    Unit* table[UnitMax];
+    Unit* unit;
+    int an;
+    int j;
+    int s;
+
+    plynr=TriggerGetPlayer(gh_car(list));
+    list=gh_cdr(list);
+    compare=GetCompareFunction(get_c_string(gh_car(list)));
+    if( !compare ) {
+	errl("Illegal comparison operator in if-unit-at",gh_car(list));
+    }
+    list=gh_cdr(list);
+    q=gh_scm2int(gh_car(list));
+    list=gh_cdr(list);
+    unittype=TriggerGetUnitType(gh_car(list));
+    list=gh_cdr(list);
+    x1=gh_scm2int(gh_car(gh_car(list)));
+    y1=gh_scm2int(gh_car(gh_cdr(gh_car(list))));
+    list=gh_cdr(list);
+    x2=gh_scm2int(gh_car(gh_car(list)));
+    y2=gh_scm2int(gh_car(gh_cdr(gh_car(list))));
+    list=gh_cdr(list);
+
+    //
+    //	Get all unit types in location.
+    //
+#ifdef UNIT_ON_MAP
+    // FIXME: could be done faster?
+#endif
+    // FIXME: I hope SelectUnits checks bounds?
+    // FIXME: Yes, but caller should check.
+    // NOTE: +1 right,bottom isn't inclusive :(
+    an=SelectUnits(x1,y1,x2+1,y2+1,table);
+    //
+    //	Count the requested units
+    //
+    for( j=s=0; j<an; ++j ) {
+	unit=table[j];
+	//
+	//	Check unit type
+	//
+	if( (unittype==ANY_UNIT && unittype==ALL_UNITS)
+		|| (unittype==ALL_FOODUNITS && !unit->Type->Building)
+		|| (unittype==ALL_BUILDINGS && unit->Type->Building)
+		|| (unittype==unit->Type) ) {
+	    //
+	    //	Check the player
+	    //
+	    if( plynr==-1 || plynr==unit->Player->Player ) {
+		++s;
+	    }
+	}
+    }
+    if( compare(s,q) ) {
+	return SCM_BOOL_T;
     }
 
     return SCM_BOOL_F;
@@ -269,7 +345,7 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
     const UnitType* ut2;
     const char* op;
     Unit* table[UnitMax];
-    CompareFunction Compare;
+    CompareFunction compare;
 
     plynr=TriggerGetPlayer(player);
     op=get_c_string(operation);
@@ -277,9 +353,9 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
     unittype=TriggerGetUnitType(unit);
     ut2=CclGetUnitType(nearunit);
 
-    Compare=GetCompareFunction(op);
-    if( !Compare ) {
-	errl("Illegal comparison operation in if-near-unit", operation);
+    compare=GetCompareFunction(op);
+    if( !compare ) {
+	errl("Illegal comparison operation in if-near-unit",operation);
     }
 
     //
@@ -334,7 +410,7 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 		}
 	    }
 	}
-	if( Compare(s,q) ) {
+	if( compare(s,q) ) {
 	    return SCM_BOOL_T;
 	}
     }
@@ -356,7 +432,7 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
     const UnitType* ut2;
     const char* op;
     Unit* table[UnitMax];
-    CompareFunction Compare;
+    CompareFunction compare;
 
     plynr=TriggerGetPlayer(player);
     op=get_c_string(operation);
@@ -364,9 +440,9 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
     unittype=TriggerGetUnitType(unit);
     ut2=CclGetUnitType(nearunit);
 
-    Compare=GetCompareFunction(op);
-    if( !Compare ) {
-	errl("Illegal comparison operation in if-rescued-near-unit", operation);
+    compare=GetCompareFunction(op);
+    if( !compare ) {
+	errl("Illegal comparison operation in if-rescued-near-unit",operation);
     }
 
     //
@@ -423,7 +499,7 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 		}
 	    }
 	}
-	if( Compare(s,q) ) {
+	if( compare(s,q) ) {
 	    return SCM_BOOL_T;
 	}
     }
@@ -441,15 +517,15 @@ local SCM CclIfOpponents(SCM player,SCM operation,SCM quantity)
     int pn;
     int n;
     const char* op;
-    CompareFunction Compare;
+    CompareFunction compare;
 
     plynr=TriggerGetPlayer(player);
     op=get_c_string(operation);
     q=gh_scm2int(quantity);
 
-    Compare=GetCompareFunction(op);
-    if( !Compare ) {
-	errl("Illegal comparison operation in if-opponents", operation);
+    compare=GetCompareFunction(op);
+    if( !compare ) {
+	errl("Illegal comparison operation in if-opponents",operation);
     }
 
     if( plynr==-1 ) {
@@ -474,7 +550,7 @@ local SCM CclIfOpponents(SCM player,SCM operation,SCM quantity)
 	    }
 	}
 	DebugLevel3Fn("Opponents of %d = %d\n" _C_ plynr _C_ n);
-	if( Compare(n,q) ) {
+	if( compare(n,q) ) {
 	    return SCM_BOOL_T;
 	}
     }
@@ -492,7 +568,7 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
     int pn;
     const char* res;
     const char* op;
-    CompareFunction Compare;
+    CompareFunction compare;
     int i;
 
     plynr=TriggerGetPlayer(player);
@@ -500,9 +576,9 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
     q=gh_scm2int(quantity);
     res=get_c_string(resource);
 
-    Compare=GetCompareFunction(op);
-    if( !Compare ) {
-	errl("Illegal comparison operation in if-resource", operation);
+    compare=GetCompareFunction(op);
+    if( !compare ) {
+	errl("Illegal comparison operation in if-resource",operation);
     }
 
     if( plynr==-1 ) {
@@ -515,7 +591,7 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
     for( i=0; i<MaxCosts; ++i ) {
 	if( !strcmp(res, DefaultResourceNames[i]) ) {
 	    for( ; plynr<pn; ++plynr ) {
-		if( Compare(Players[plynr].Resources[i],q) ) {
+		if( compare(Players[plynr].Resources[i],q) ) {
 		    return SCM_BOOL_T;
 		}
 	    }
@@ -532,7 +608,7 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
 		sum+=Players[plynr].Resources[j];
 	    }
 	}
-	if( Compare(sum,q) ) {
+	if( compare(sum,q) ) {
 	    return SCM_BOOL_T;
 	}
     } else if( !strcmp(res, "any") ) {
@@ -540,7 +616,7 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
 
 	for( ; plynr<pn; ++plynr ) {
 	    for( j=1; j<MaxCosts; ++j ) {
-		if( Compare(Players[plynr].Resources[j],q) ) {
+		if( compare(Players[plynr].Resources[j],q) ) {
 		    return SCM_BOOL_T;
 		}
 	    }
@@ -560,15 +636,15 @@ local SCM CclIfKills(SCM player,SCM operation,SCM quantity)
     int pn;
     int n;
     const char* op;
-    CompareFunction Compare;
+    CompareFunction compare;
 
     plynr=TriggerGetPlayer(player);
     op=get_c_string(operation);
     q=gh_scm2int(quantity);
 
-    Compare=GetCompareFunction(op);
-    if( !Compare ) {
-	errl("Illegal comparison operation in if-kills", operation);
+    compare=GetCompareFunction(op);
+    if( !compare ) {
+	errl("Illegal comparison operation in if-kills",operation);
     }
 
     if( plynr==-1 ) {
@@ -579,7 +655,7 @@ local SCM CclIfKills(SCM player,SCM operation,SCM quantity)
     }
 
     for( n=0; plynr<pn; ++plynr ) {
-	if( Compare(Players[plynr].TotalKills,q) ) {
+	if( compare(Players[plynr].TotalKills,q) ) {
 	    return SCM_BOOL_T;
 	}
     }
@@ -597,15 +673,15 @@ local SCM CclIfScore(SCM player,SCM operation,SCM quantity)
     int pn;
     int n;
     const char* op;
-    CompareFunction Compare;
+    CompareFunction compare;
 
     plynr=TriggerGetPlayer(player);
     op=get_c_string(operation);
     q=gh_scm2int(quantity);
 
-    Compare=GetCompareFunction(op);
-    if( !Compare ) {
-	errl("Illegal comparison operation in if-score", operation);
+    compare=GetCompareFunction(op);
+    if( !compare ) {
+	errl("Illegal comparison operation in if-score",operation);
     }
 
     if( plynr==-1 ) {
@@ -616,7 +692,7 @@ local SCM CclIfScore(SCM player,SCM operation,SCM quantity)
     }
 
     for( n=0; plynr<pn; ++plynr ) {
-	if( Compare(Players[plynr].Score,q) ) {
+	if( compare(Players[plynr].Score,q) ) {
 	    return SCM_BOOL_T;
 	}
     }
@@ -631,17 +707,17 @@ local SCM CclIfElapsed(SCM operation,SCM quantity)
 {
     int q;
     const char* op;
-    CompareFunction Compare;
+    CompareFunction compare;
 
     op=get_c_string(operation);
     q=gh_scm2int(quantity);
 
-    Compare=GetCompareFunction(op);
-    if( !Compare ) {
-	errl("Illegal comparison operation in if-elapsed", operation);
+    compare=GetCompareFunction(op);
+    if( !compare ) {
+	errl("Illegal comparison operation in if-elapsed",operation);
     }
 
-    if( Compare(GameCycle,q) ) {
+    if( compare(GameCycle,q) ) {
 	return SCM_BOOL_T;
     }
 
@@ -655,7 +731,7 @@ local SCM CclIfTimer(SCM operation,SCM quantity)
 {
     int q;
     const char* op;
-    CompareFunction Compare;
+    CompareFunction compare;
 
     if( !GameTimer.Init ) {
 	return SCM_BOOL_F;
@@ -664,12 +740,12 @@ local SCM CclIfTimer(SCM operation,SCM quantity)
     op=get_c_string(operation);
     q=gh_scm2int(quantity);
 
-    Compare=GetCompareFunction(op);
-    if( !Compare ) {
-	errl("Illegal comparison operation in if-timer", operation);
+    compare=GetCompareFunction(op);
+    if( !compare ) {
+	errl("Illegal comparison operation in if-timer",operation);
     }
 
-    if( Compare(GameTimer.Cycles,q) ) {
+    if( compare(GameTimer.Cycles,q) ) {
 	return SCM_BOOL_T;
     }
 
@@ -920,6 +996,7 @@ global void TriggerCclRegister(void)
     gh_new_procedure1_0("set-trigger-number!",CclSetTriggerNumber);
     // Conditions
     gh_new_procedure4_0("if-unit",CclIfUnit);
+    gh_new_procedureN("if-unit-at",CclIfUnitAt);
     gh_new_procedure5_0("if-near-unit",CclIfNearUnit);
     gh_new_procedure5_0("if-rescued-near-unit",CclIfRescuedNearUnit);
     gh_new_procedure3_0("if-opponents",CclIfOpponents);
