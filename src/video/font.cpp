@@ -134,7 +134,11 @@ static void VideoDrawChar(const Graphic* g,
 #endif
 
 /**
-**  FIXME: docu
+**  Find the relevant font color for a color string eg. "blue"
+**
+**  @param color  The text color to find "blue"
+**
+**  @return       Pointer to the information about this color.
 */
 static FontColorMapping* GetFontColorMapping(char* color)
 {

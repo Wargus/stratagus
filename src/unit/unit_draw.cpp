@@ -217,7 +217,7 @@ void DrawUnitSelection(const Unit* unit)
 /**
 **  Don't show selected units.
 **
-**  @param color  FIXME: docu
+**  @param color  Color to draw, nothing in this case.
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
@@ -229,7 +229,7 @@ void DrawSelectionNone(Uint32 color, int x1, int y1,
 /**
 **  Show selected units with circle.
 **
-**  @param color  FIXME: docu
+**  @param color  Color to draw circle
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
@@ -243,7 +243,7 @@ void DrawSelectionCircle(Uint32 color, int x1, int y1,
 /**
 **  Show selected units with circle.
 **
-**  @param color  FIXME: docu
+**  @param color  Color to draw and fill circle.
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
@@ -259,7 +259,7 @@ void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 /**
 **  Draw selected rectangle around the unit.
 **
-**  @param color  FIXME: docu
+**  @param color  Color to draw rectangle.
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
@@ -272,7 +272,7 @@ void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 /**
 **  Draw selected rectangle around the unit.
 **
-**  @param color  FIXME: docu
+**  @param color  Color to draw and fill rectangle.
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
@@ -287,7 +287,7 @@ void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 /**
 **  Draw selected corners around the unit.
 **
-**  @param color  FIXME: docu
+**  @param color  Color to draw corners.
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
@@ -1924,7 +1924,12 @@ void DrawUnit(const Unit* unit)
 }
 
 /**
-**  FIXME: docu
+**  Compare what order 2 units should be drawn on the map
+**
+**  @param v1  First Unit to compare (**Unit)
+**  @param v2  Second Unit to compare (**Unit)
+**
+**  @return -1 for v1 < v2, 1 for v2 < v1
 */
 static int DrawLevelCompare(const void* v1, const void* v2) {
 
@@ -1962,9 +1967,8 @@ static int DrawLevelCompare(const void* v1, const void* v2) {
 **  Find all units to draw in viewport.
 **
 **  @param vp     Viewport to be drawn.
-**  @param table  FIXME: docu
+**  @param table  Table of units to return in sorted order 
 **
-**  @todo FIXME: Must use the redraw tile flags in this function
 */
 int FindAndSortUnits(const Viewport* vp, Unit** table)
 {
