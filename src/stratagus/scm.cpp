@@ -41,6 +41,7 @@
 #include "iocompat.h"
 #include "myendian.h"
 #include "pud.h"
+#include "editor.h"
 
 
 /*----------------------------------------------------------------------------
@@ -1076,33 +1077,36 @@ pawn:
 		    }
 		}
 
-		for( i=0; i<12; ++i ) {
-		    if( Players[i].Type==PlayerPerson || Players[i].Type==PlayerComputer ) {
-			if( Players[i].TotalUnits == 0 ) {
-			    // If the player has no units use 4 peasants and a town hall as default
-			    int j;
-			    int t1;
-			    Unit* unit;
-			    UnitType* type;
-			    if( Players[i].Race==0 ) {
-				t1=SC_ZergDrone;
-				type=UnitTypeByWcNum(SC_ZergHatchery);
-			    } else if( Players[i].Race==1 ) {
-				t1=SC_TerranSCV;
-				type=UnitTypeByWcNum(SC_TerranCommandCenter);
-			    } else {
-				t1=SC_ProtossProbe;
-				type=UnitTypeByWcNum(SC_ProtossNexus);
-			    }
-			    unit=MakeUnitAndPlace(Players[i].StartX,Players[i].StartY,
-				type,&Players[i]);
-			    UpdateForNewUnit(unit,0);
-			    for( j=0; j<4; ++j ) {
-				unit=MakeUnit(UnitTypeByWcNum(t1),&Players[i]);
-				unit->X=Players[i].StartX;
-				unit->Y=Players[i].StartY;
-				DropOutOnSide(unit,LookingS,type->TileWidth,type->TileHeight);
+		if( !EditorRunning ) {
+		    // If the player has no units use 4 peasants and a town
+		    // hall as default
+		    for( i=0; i<12; ++i ) {
+			if( Players[i].Type==PlayerPerson || Players[i].Type==PlayerComputer ) {
+			    if( Players[i].TotalUnits == 0 ) {
+				int j;
+				int t1;
+				Unit* unit;
+				UnitType* type;
+				if( Players[i].Race==0 ) {
+				    t1=SC_ZergDrone;
+				    type=UnitTypeByWcNum(SC_ZergHatchery);
+				} else if( Players[i].Race==1 ) {
+				    t1=SC_TerranSCV;
+				    type=UnitTypeByWcNum(SC_TerranCommandCenter);
+				} else {
+				    t1=SC_ProtossProbe;
+				    type=UnitTypeByWcNum(SC_ProtossNexus);
+				}
+				unit=MakeUnitAndPlace(Players[i].StartX,Players[i].StartY,
+				    type,&Players[i]);
 				UpdateForNewUnit(unit,0);
+				for( j=0; j<4; ++j ) {
+				    unit=MakeUnit(UnitTypeByWcNum(t1),&Players[i]);
+				    unit->X=Players[i].StartX;
+				    unit->Y=Players[i].StartY;
+				    DropOutOnSide(unit,LookingS,type->TileWidth,type->TileHeight);
+				    UpdateForNewUnit(unit,0);
+				}
 			    }
 			}
 		    }
