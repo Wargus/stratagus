@@ -540,11 +540,9 @@ struct _unit_ {
     } Train;				/// Train units action
     }		Data;			/// Storage room for different commands
 
-#ifdef DEBUG
     const Unit*	Goal;			/// Goal for pathfinder
     int		GoalX;			/// Destination X of pathfinder
     int		GoalY;			/// Destination Y of pathfinder
-#endif
 
 #ifdef HIERARCHIC_PATHFINDER
 
