@@ -159,7 +159,8 @@ global void CreateGame(char* filename, WorldMap* map)
     NetworkSetupArgs();
 
     //
-    // Don't leak when called multiple times - FIXME: not the ideal place for this..
+    // Don't leak when called multiple times 
+    //	- FIXME: not the ideal place for this..
     //
     FreeMapInfo(map->Info);
     map->Info = NULL;
@@ -214,6 +215,8 @@ global void CreateGame(char* filename, WorldMap* map)
 	    }
 	}
     }
+
+    ShowIntro();
 
     if( FlagRevealMap ) {
 	RevealMap();
