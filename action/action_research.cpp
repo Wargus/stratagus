@@ -63,8 +63,8 @@ global void HandleActionResearch(Unit* unit)
 {
     const Upgrade* upgrade;
 
-    if( !unit->SubAction ) {		// first entry
-	upgrade=unit->Data.Research.Upgrade=unit->Orders[0].Arg1;
+    if (!unit->SubAction) {		// first entry
+	upgrade = unit->Data.Research.Upgrade = unit->Orders[0].Arg1;
 #if 0
 	// FIXME: I want to support both, but with network we need this check
 	//	  but if want combined upgrades this is worse
@@ -72,53 +72,53 @@ global void HandleActionResearch(Unit* unit)
 	//
 	//	Check if an other building has already started?
 	//
-	if( unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] ) {
+	if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]) {
 	    DebugLevel0Fn("Two researches running\n");
-	    PlayerAddCosts(unit->Player,upgrade->Costs);
+	    PlayerAddCosts(unit->Player, upgrade->Costs);
 
-	    unit->Reset=unit->Wait=1;
-	    unit->Orders[0].Action=UnitActionStill;
-	    unit->SubAction=0;
-	    if( IsOnlySelected(unit) ) {
-		MustRedraw|=RedrawInfoPanel;
+	    unit->Reset = unit->Wait = 1;
+	    unit->Orders[0].Action = UnitActionStill;
+	    unit->SubAction = 0;
+	    if (IsOnlySelected(unit)) {
+		MustRedraw |= RedrawInfoPanel;
 	    }
 	    return;
 	}
 #endif
-	unit->SubAction=1;
+	unit->SubAction = 1;
     } else {
-	upgrade=unit->Data.Research.Upgrade;
+	upgrade = unit->Data.Research.Upgrade;
     }
 
-    unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]+=SpeedResearch;
-    if( unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]
-		>=upgrade->Costs[TimeCost] ) {
+    unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] += SpeedResearch;
+    if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] >=
+	    upgrade->Costs[TimeCost]) {
 
-	NotifyPlayer(unit->Player,NotifyGreen,unit->X,unit->Y,
-		"%s: complete",unit->Type->Name);
-	if( unit->Player->Ai ) {
-	    AiResearchComplete(unit,upgrade);
+	NotifyPlayer(unit->Player, NotifyGreen, unit->X, unit->Y,
+	    "%s: complete", unit->Type->Name);
+	if (unit->Player->Ai) {
+	    AiResearchComplete(unit, upgrade);
 	}
-        UpgradeAcquire(unit->Player,upgrade);
+        UpgradeAcquire(unit->Player, upgrade);
 
-	unit->Reset=unit->Wait=1;
-	unit->Orders[0].Action=UnitActionStill;
-	unit->SubAction=0;
+	unit->Reset = unit->Wait = 1;
+	unit->Orders[0].Action = UnitActionStill;
+	unit->SubAction = 0;
 
 	// Upgrade can change all
 	SelectedUnitChanged();
-	MustRedraw|=RedrawInfoPanel;
+	MustRedraw |= RedrawInfoPanel;
 
 	return;
     }
 
-    if( IsOnlySelected(unit) ) {
+    if (IsOnlySelected(unit)) {
 	// refresh info panel (to show progress, I think)
-	MustRedraw|=RedrawInfoPanel;
+	MustRedraw |= RedrawInfoPanel;
     }
 
-    unit->Reset=1;
-    unit->Wait=CYCLES_PER_SECOND/6;
+    unit->Reset = 1;
+    unit->Wait = CYCLES_PER_SECOND / 6;
 
     // FIXME: should be animations here?
 }
