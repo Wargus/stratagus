@@ -97,7 +97,7 @@ local void DrawSelectionRectangleWithTrans(const Unit* unit,const UnitType* type
 **	@param y	Screen Y position of the unit.
 */
 local void (*DrawSelection)(const Unit*,const UnitType*,int,int)
-	=DrawSelectionRectangleWithTrans;
+	=DrawSelectionCircle;
 
 /*----------------------------------------------------------------------------
 --	Functions
