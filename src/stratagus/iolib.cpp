@@ -156,20 +156,17 @@ global CLFile *CLopen(const char *fn)
     input.cl_type = CLF_TYPE_INVALID;
     if (!(input.cl_plain = fopen(fn, "rb"))) {		// try plain first
 #ifdef USE_ZLIB
-	sprintf(buf, "%s.gz", fn);
-	if ( (input.cl_gz = gzopen(buf, "rb")) ) {
+	if ((input.cl_gz = gzopen(strcat(strcpy(buf,fn),".gz"), "rb"))) {
 	    input.cl_type = CLF_TYPE_GZIP;
 	} else
 #endif
 #ifdef USE_BZ2LIB
-	sprintf(buf, "%s.bz2", fn);
-	if ((input.cl_bz = bzopen(buf, "rb"))) {
+	if ((input.cl_bz = bzopen(strcat(strcpy(buf,fn),".bz2"), "rb"))) {
 	    input.cl_type = CLF_TYPE_BZIP2;
 	} else
 #endif
 #ifdef USE_ZZIPLIB
-	strcpy(buf,fn);
-	if ((input.cl_zz = zzip_open(buf,O_RDONLY|O_BINARY) )) {
+	if ((input.cl_zz = zzip_open(strcpy(buf,fn),O_RDONLY|O_BINARY) )) {
 	    input.cl_type = CLF_TYPE_ZZIP;
 	} else
 #endif
