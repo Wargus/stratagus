@@ -1511,7 +1511,7 @@ local unsigned char *keystrokehintstexts[] = {
     "- toggle full screen",
     "- toggle grab mouse",
     "- mute sound",
-    "- mute music (NOT SUPPORTED)",
+    "- mute music",
     "- increase game speed",
     "- decrease game speed",
     "- pause game",
