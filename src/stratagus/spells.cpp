@@ -87,6 +87,82 @@ global int SpellTypeCount;
 // ****************************************************************************
 
 /**
+** 	Cast demolish
+**	@param caster	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
+	const SpellActionType* action,Unit* target __attribute__((unused)), int x, int y)
+{
+    int xmin;
+    int ymin;
+    int xmax;
+    int ymax;
+    int i;
+    int ix;
+    int iy;
+    int n;
+    Unit* table[UnitMax];
+
+    xmin = x - action->Data.Demolish.Range;
+    ymin = y - action->Data.Demolish.Range;
+    xmax = x + action->Data.Demolish.Range;
+    ymax = y + action->Data.Demolish.Range;
+    if (xmin < 0) {
+	xmin = 0;
+    }
+    if (xmax > TheMap.Width - 1) {
+	xmax = TheMap.Width - 1;
+    }
+    if (ymin < 0) {
+	ymin = 0;
+    }
+    if (ymax > TheMap.Height - 1) {
+	ymax = TheMap.Height - 1;
+    }
+
+    //
+    //	 Effect of the explosion on units. Don't bother if damage is 0
+    //
+    if (action->Data.Demolish.Damage) {
+	n = SelectUnits(xmin, ymin, xmax+1, ymax+1, table);
+	for (i = 0; i < n; ++i) {
+	    DebugLevel0("Hit an unit at %d %d?\n" _C_ table[i]->X _C_ table[i]->Y);
+	    if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP &&
+		    MapDistanceToUnit(x, y, table[i]) <= action->Data.Demolish.Range) {
+		// Don't hit flying units!
+		HitUnit(caster, table[i], action->Data.Demolish.Damage);
+	    }
+	}
+    }
+
+    //
+    //	Terrain effect of the explosion
+    //
+    for (ix = xmin; ix <= xmax; ++ix) {
+	for (iy = ymin; iy <= ymax; ++iy) {
+	    n = TheMap.Fields[ix + iy * TheMap.Width].Flags;
+	    if (MapDistance(ix, iy, x, y ) > action->Data.Demolish.Range) {
+		// Not in circle range
+		continue;
+	    } else if (n & MapFieldWall) {
+		MapRemoveWall(ix, iy);
+	    } else if (n & MapFieldRocks) {
+		MapRemoveRock(ix, iy);
+	    } else if (n & MapFieldForest) {
+		MapRemoveWood(ix, iy);
+	    }
+	}
+    }
+    return 0;
+}
+
+/**
 **	Cast circle of power.
 **
 **	@param caster	Unit that casts the spell
@@ -1073,6 +1149,7 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	}
 	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 	while (act) {
+	    DebugCheck(!act->CastFunction);
 	    act->CastFunction(caster, spell, act, target, x, y);
 	    act=act->Next;
 	}

@@ -493,7 +493,7 @@ local SCM CclDefinePlaySections(SCM list)
 
 		    value = gh_car(sublist);
 		    sublist = gh_cdr(sublist);
-		    for (i = 0; i < gh_vector_length(value); ++i) {
+		    for (i = 0; i < (signed)gh_vector_length(value); ++i) {
 			temp=gh_vector_ref(value, gh_int2scm(i));
 			p->CDTracks |= (1 << gh_scm2int(temp));
 		    }

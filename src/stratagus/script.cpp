@@ -1181,6 +1181,7 @@ global void SaveCcl(CLFile* file)
 {
 #ifdef USE_GUILE
 #else
+#if 0
     SCM list;
     extern SCM oblistvar;
 
@@ -1193,7 +1194,6 @@ global void SaveCcl(CLFile* file)
 	sym = gh_car(list);
 	if (symbol_boundp(sym, NIL)) {
 	    SCM value;
-
 	    CLprintf(file, ";;(define %s\n", get_c_string(sym));
 	    value = symbol_value(sym, NIL);
 	    CLprintf(file, ";;");
@@ -1205,6 +1205,7 @@ global void SaveCcl(CLFile* file)
 #endif
 	}
     }
+#endif
 #endif
 }
 

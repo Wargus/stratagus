@@ -63,8 +63,8 @@
 #define HEALTH_FACTOR		0x00000001
 #define DISTANCE_FACTOR		0x00100000
 #define INRANGE_FACTOR		0x00010000
-#define INRANGE_BONUS		0x00100000
-#define CANATTACK_BONUS		0x01000000
+#define INRANGE_BONUS		0x01000000
+#define CANATTACK_BONUS		0x00100000
 
 /*----------------------------------------------------------------------------
 --	Local Data

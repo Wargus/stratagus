@@ -5,8 +5,8 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name ai_local.h	-	The local AI header file. */
 //
@@ -54,27 +54,30 @@ typedef struct _ai_type_ AiType;
 /**
 **	Ai Type structure.
 */
-struct _ai_type_ {
-    AiType*		Next;			/// Next ai type
+struct _ai_type_
+{
+    AiType *Next;		/// Next ai type
 
-    char*		Name;			/// Name of this ai
-    char*		Race;			/// for this race
-    char*		Class;			/// class of this ai
+    char *Name;			/// Name of this ai
+    char *Race;			/// for this race
+    char *Class;		/// class of this ai
 
-    // nice flags
-    //unsigned char	AllExplored : 1;	/// Ai sees unexplored area
-    //unsigned char	AllVisibile : 1;	/// Ai sees invisibile area
+   // nice flags
+   //unsigned char     AllExplored : 1;        /// Ai sees unexplored area
+   //unsigned char     AllVisibile : 1;        /// Ai sees invisibile area
 
-    SCM			Script;			/// Main script (gc-protected!)
+    SCM Script;			/// Main script (gc-protected!)
 };
 
 /**
 **	AI unit-type table with counter in front.
 */
-typedef struct _ai_unittype_table_ {
-    int		Count;			/// elements in table
-    UnitType*	Table[1];		/// the table
-} AiUnitTypeTable;
+typedef struct _ai_unittype_table_
+{
+    int Count;			/// elements in table
+    UnitType *Table[1];		/// the table
+}
+AiUnitTypeTable;
 
 /**
 **	Ai unit-type typedef.
@@ -84,10 +87,11 @@ typedef struct _ai_unit_type_ AiUnitType;
 /**
 **	Ai unit-type in a force.
 */
-struct _ai_unit_type_ {
-    AiUnitType*	Next;			/// next unit-type
-    int		Want;			/// number of this unit-type wanted
-    UnitType*	Type;			/// unit-type self
+struct _ai_unit_type_
+{
+    AiUnitType *Next;		/// next unit-type
+    int Want;			/// number of this unit-type wanted
+    UnitType *Type;		/// unit-type self
 };
 
 /**
@@ -98,17 +102,41 @@ typedef struct _ai_unit_ AiUnit;
 /**
 **	Ai unit in a force.
 */
-struct _ai_unit_ {
-    AiUnit*	Next;			/// next unit
-    Unit*	Unit;			/// unit self
+struct _ai_unit_
+{
+    AiUnit *Next;		/// next unit
+    Unit *Unit;			/// unit self
 };
 
 /**
 **	Roles for forces
 */
-enum _ai_force_role_ {
-    AiForceRoleAttack,			/// Force should attack
-    AiForceRoleDefend,			/// Force should defend
+enum _ai_force_role_
+{
+    AiForceRoleAttack,		/// Force should attack
+    AiForceRoleDefend,		/// Force should defend
+};
+
+
+/**
+**	Ways to populate a force 
+*/
+enum _ai_force_populate_mode_
+{
+    AiForceDontPopulate,	/// Force won't receive any unit
+    AiForcePopulateFromScratch,	/// Force unit's will be builded
+    AiForcePopulateFromAttack,	/// Force will receive units from idle attack force only - nothing builded
+    AiForcePopulateAny		/// Force will receive units from any idle force - nothing builded
+};
+
+/**
+**	How to react when an unit is attacked in a force
+*/
+enum _ai_force_help_mode_
+{
+    AiForceDontHelp,		/// Don't react to attack on this force
+    AiForceHelpForce,		/// Send idle units to defend
+    AiForceHelpFull		/// Create a defend force, send it, ...
 };
 
 /**
@@ -121,22 +149,25 @@ typedef struct _ai_force_ AiForce;
 **
 **	A force is a group of units belonging together.
 */
-struct _ai_force_ {
-    char		Completed;	/// Flag saying force is complete build
-    char		Defending;	/// Flag saying force is defending
-    char		Attacking;	/// Flag saying force is attacking
+struct _ai_force_
+{
+    char Completed;		/// Flag saying force is complete build
+    char Attacking;		/// Is this force attacking ( aka not idle )
+    char Role;			/// Role of the force
+    char PopulateMode;		/// Which forces can be used to fill this force ?
+    char UnitsReusable;		/// Indicate moving units of this force into others is allowed.    
+    char HelpMode;		/// How to react to treat in this force ?
 
-    char		Role;		/// Role of the force
+    AiUnitType *UnitTypes;	/// Count and types of unit-type
+    AiUnit *Units;		/// Units in the force
 
-    AiUnitType*		UnitTypes;	/// Count and types of unit-type
-    AiUnit*		Units;		/// Units in the force
-	//
-	// If attacking
-	//
-    int			State;		/// Attack state
-    int			GoalX;		/// Attack point X tile map position
-    int			GoalY;		/// Attack point Y tile map position
-    int			MustTransport;	/// Flag must use transporter
+   //
+   // If attacking
+   //
+    int State;			/// Attack state
+    int GoalX;			/// Attack point X tile map position
+    int GoalY;			/// Attack point Y tile map position
+    int MustTransport;		/// Flag must use transporter
 };
 
 /**
@@ -149,63 +180,148 @@ typedef struct _ai_build_queue_ AiBuildQueue;
 **
 **	List of orders for the resource manager to handle
 */
-struct _ai_build_queue_ {
-	AiBuildQueue*	Next;		/// next request
-	int		Want;		/// requested number
-	int		Made;		/// builded number
-	UnitType*	Type;		/// unit-type
+struct _ai_build_queue_
+{
+    AiBuildQueue *Next;		/// next request
+    int Want;			/// requested number
+    int Made;			/// builded number
+    UnitType *Type;		/// unit-type
+};
+
+
+typedef struct _ai_running_script_ AiRunningScript;
+
+/**
+**	AI running script ( with state, ... )
+*/
+struct _ai_running_script_
+{
+    SCM Script;			/// Script executed
+    unsigned long SleepCycles;	/// Cycles to sleep
+    char ident[10];		/// Debugging !
+    int HotSpot_X;		/// Hot spot ( for defense, attack, ... )
+    int HotSpot_Y;
+    int HotSpot_Ray;
+
+    int ownForce;		/// A force ID ( the n° of the script... )
+
+   // Total number of ressource gauges
+#define RESSOURCE_COUNT 3
+   // Total number of forces gauges
+#define FORCE_COUNT	11
+
+#define GAUGE_NB (3+(RESSOURCE_COUNT*2)+(FORCE_COUNT*6))
+    int *gauges;		/// Gauges values ( initially 0 )               
+};
+
+/**
+**	Ai script action 
+**
+**	Describe each different attack/defend scheme.
+**
+**	Linked list.
+*/
+typedef struct _ai_script_action_ AiScriptAction;
+
+struct _ai_script_action_
+{
+    SCM Action;			/// Scheme description, in the form : 
+   /// '((name evaluate-lambda run-script) ... )
+
+    int Defensive;		/// Is this action usable for defense
+    int Offensive;		/// Is this action usable for attack
+
+   /// TODO : hotspot_kind : set if the hotspot should contain path from base      
+};
+
+/**
+**	Ai action evaluation 
+**
+**	Each AiPlayer periodically evaluation an attack action.
+**
+**	If it is ready, the attack is fired. Else, it is keept for a while.
+**	From time to time, the best unfired try is fired.
+**	
+*/
+typedef struct _ai_action_evaluation_ AiActionEvaluation;
+
+struct _ai_action_evaluation_
+{
+    AiScriptAction *aiScriptAction;
+
+    int hotSpotX;
+    int hotSpotY;
+
+   // Value of the hotspot ( total points to get... )
+    int hotSpotValue;
+
+   // Evaluation of the script ( ressources needed... )
+    int value;
+
+    AiActionEvaluation *Next;
 };
 
 /**
 **	AI variables.
 */
-typedef struct _player_ai_ {
-    Player*     Player;                 /// Engine player structure
+typedef struct _player_ai_
+{
+    Player *Player;		/// Engine player structure
 
-    AiType*	AiType;			/// AI type of this player AI
+    AiType *AiType;		/// AI type of this player AI
 
-    // controller
-    SCM		Script;			/// Script executed
-    int		ScriptDebug;		/// Flag script debuging on/off
-    unsigned long	SleepCycles;	/// Cycles to sleep
+   // controller
+#define AI_MAX_RUNNING_SCRIPTS	5	/// ( generic, attack, defend, ... )
+#define AI_MAIN_SCRIPT 0
+    AiRunningScript Scripts[AI_MAX_RUNNING_SCRIPTS];
 
-    // forces
-#define AI_MAX_FORCES	10		/// How many forces are supported
-#define AI_MAX_ATTACKING_FORCES	30	/// Attacking forces
-    AiForce	Force[AI_MAX_ATTACKING_FORCES];	/// Forces controlled by AI
+   // Ai "memory"
+#define AI_MEMORY_SIZE	30	/// Max number of keept evaluation ( => 30 sec )
+    AiActionEvaluation *FirstEvaluation;
+    AiActionEvaluation *LastEvaluation;
+    int EvaluationCount;
 
-    // resource manager
+    int ScriptDebug;		/// Flag script debuging on/off
 
-    int		Reserve[MaxCosts];	/// Resources to keep in reserve
-    int		Used[MaxCosts];		/// Used resources
-    int		Needed[MaxCosts];	/// Needed resources
-    int		Collect[MaxCosts];	/// Collect % of resources
-    int		NeededMask;		/// Mask for needed resources
+    int AutoAttack;		/// Are attack started automatically ?
 
-    int		NeedFood;		/// Flag need food
+   // forces
+#define AI_MAX_FORCES	10	/// How many forces are supported
+#define AI_GENERIC_FORCES 	(AI_MAX_FORCES-AI_MAX_RUNNING_SCRIPTS)	/// How many forces are useable in the main script
+    AiForce Force[AI_MAX_FORCES];	/// Forces controlled by AI
 
-	/// number of elements in UnitTypeRequests
-    int			UnitTypeRequestsCount;
-	/// unit-types to build/train requested and priority list
-    AiUnitTypeTable*	UnitTypeRequests;
-	/// number of elements in UpgradeRequests
-    int			UpgradeToRequestsCount;
-	/// Upgrade to unit-type requested and priority list
-    UnitType**		UpgradeToRequests;
-	/// number of elements in ResearchRequests
-    int			ResearchRequestsCount;
-	/// Upgrades requested and priority list
-    Upgrade**		ResearchRequests;
+   // resource manager
+    int Reserve[MaxCosts];	/// Resources to keep in reserve
+    int Used[MaxCosts];		/// Used resources
+    int Needed[MaxCosts];	/// Needed resources
+    int Collect[MaxCosts];	/// Collect % of resources
+    int NeededMask;		/// Mask for needed resources
 
-	/// What the resource manager should build
-    AiBuildQueue*	UnitTypeBuilded;
+    int NeedFood;		/// Flag need food
 
-	/// Last building checked for repair in this turn
-    int			LastRepairBuilding;
-	/// Number of workers that unsuccessfully tried to repair a building
-    unsigned		TriedRepairWorkers[UnitMax];
+   /// number of elements in UnitTypeRequests
+    int UnitTypeRequestsCount;
+   /// unit-types to build/train requested and priority list
+    AiUnitTypeTable *UnitTypeRequests;
+   /// number of elements in UpgradeRequests
+    int UpgradeToRequestsCount;
+   /// Upgrade to unit-type requested and priority list
+    UnitType **UpgradeToRequests;
+   /// number of elements in ResearchRequests
+    int ResearchRequestsCount;
+   /// Upgrades requested and priority list
+    Upgrade **ResearchRequests;
 
-} PlayerAi;
+   /// What the resource manager should build
+    AiBuildQueue *UnitTypeBuilded;
+
+   /// Last building checked for repair in this turn
+    int LastRepairBuilding;
+   /// Number of workers that unsuccessfully tried to repair a building
+    unsigned TriedRepairWorkers[UnitMax];
+
+}
+PlayerAi;
 
 /**
 **	AI Helper.
@@ -214,113 +330,177 @@ typedef struct _player_ai_ {
 **	building or upgrade or spell, it could lookup in this tables to find
 **	where it could be trained, builded or researched.
 */
-typedef struct _ai_helper_ {
+typedef struct _ai_helper_
+{
     /**
     **	The index is the unit that should be trained, giving a table of all
     **	units/buildings which could train this unit.
     */
-    int			TrainCount;
-    AiUnitTypeTable**	Train;
+    int TrainCount;
+    AiUnitTypeTable **Train;
     /**
     **	The index is the unit that should be build, giving a table of all
     **	units/buildings which could build this unit.
     */
-    int			BuildCount;
-    AiUnitTypeTable**	Build;
+    int BuildCount;
+    AiUnitTypeTable **Build;
     /**
     **	The index is the upgrade that should be made, giving a table of all
     **	units/buildings which could do the upgrade.
     */
-    int			UpgradeCount;
-    AiUnitTypeTable**	Upgrade;
+    int UpgradeCount;
+    AiUnitTypeTable **Upgrade;
     /**
     **	The index is the research that should be made, giving a table of all
     **	units/buildings which could research this upgrade.
     */
-    int			ResearchCount;
-    AiUnitTypeTable**	Research;
+    int ResearchCount;
+    AiUnitTypeTable **Research;
     /**
     **	The index is the unit that should be repaired, giving a table of all
     **	units/buildings which could repair this unit.
     */
-    int			RepairCount;
-    AiUnitTypeTable**	Repair;
+    int RepairCount;
+    AiUnitTypeTable **Repair;
     /**
     **	The index is the unit-limit that should be solved, giving a table of all
     **	units/buildings which could reduce this unit-limit.
     */
-    int			UnitLimitCount;
-    AiUnitTypeTable**	UnitLimit;
+    int UnitLimitCount;
+    AiUnitTypeTable **UnitLimit;
     /**
     **	The index is the unit that should be made, giving a table of all
     **	units/buildings which are equivalent.
     */
-    int			EquivCount;
-    AiUnitTypeTable**	Equiv;
-} AiHelper;
+    int EquivCount;
+    AiUnitTypeTable **Equiv;
+}
+AiHelper;
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern AiType* AiTypes;			/// List of all AI types
-extern AiHelper AiHelpers;		/// AI helper variables
+extern AiType *AiTypes;		/// List of all AI types
+extern AiHelper AiHelpers;	/// AI helper variables
 
-extern PlayerAi* AiPlayer;		/// Current AI player
-extern char** AiTypeWcNames;		/// pud num to internal string mapping
+#define MaxAiScriptActions	64	/// How many AiScriptActions are supported
+extern int AiScriptActionNum;	/// Current number of AiScriptAction
+extern AiScriptAction AiScriptActions[MaxAiScriptActions];	/// All availables AI script actions   
+
+extern PlayerAi *AiPlayer;	/// Current AI player
+extern AiRunningScript *AiScript;
+extern char **AiTypeWcNames;	/// pud num to internal string mapping
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
 //
-//	Resource manager
+//      Resource manager
 //
     /// Add unit-type request to resource manager
-extern void AiAddUnitTypeRequest(UnitType* type,int count);
+extern void AiAddUnitTypeRequest( UnitType * type, int count );
     /// Add upgrade-to request to resource manager
-extern void AiAddUpgradeToRequest(UnitType* type);
+extern void AiAddUpgradeToRequest( UnitType * type );
     /// Add research request to resource manager
-extern void AiAddResearchRequest(Upgrade* upgrade);
+extern void AiAddResearchRequest( Upgrade * upgrade );
     /// Periodic called resource manager handler
-extern void AiResourceManager(void);
+extern void AiResourceManager( void );
+    /// Count the number of builder unit available for the given unittype
+extern int AiCountUnitBuilders( UnitType * type );
 
 //
-//	Buildings
+//      Buildings
 //
     /// Find nice building place
-extern int AiFindBuildingPlace(const Unit*, const UnitType * , int *, int *);
+extern int AiFindBuildingPlace( const Unit *, const UnitType *, int *, int * );
 
 //
-//	Forces
+//      Forces
 //
     /// Cleanup units in force
-extern void AiCleanForces(void);
+extern void AiCleanForces( void );
+    /// Cleanup units in the given force
+extern void AiCleanForce( int force );
+    /// Remove everything in the given force
+extern void AiEraseForce( int force );
     /// Assign a new unit to a force
-extern void AiAssignToForce(Unit* unit);
+extern void AiAssignToForce( Unit * unit );
     /// Assign a free units to a force
-extern void AiAssignFreeUnitsToForce(void);
+extern void AiAssignFreeUnitsToForce( void );
+    /// Complete a force with units form another
+extern void AiForceTransfert( int src, int dst );
+    /// Group a force on the nearest unit to target
+extern void AiGroupForceNear( int force, int targetx, int targety );
     /// Attack with force at position
-extern void AiAttackWithForceAt(int force,int x,int y);
+extern void AiAttackWithForceAt( int force, int x, int y );
     /// Attack with force
-extern void AiAttackWithForce(int force);
+extern void AiAttackWithForce( int force );
+    /// Send force home
+extern void AiSendForceHome( int force );
+    /// Evaluate the cost to build a force (time to build + ressources)
+extern int AiEvaluateForceCost( int force, int total );
+    /// Complete a force from existing units.
+extern void AiForceComplete( int force );
+    /// Enrole one or more units of a type in a force
+extern int AiEnroleSpecificUnitType( int force, UnitType * ut, int count );
+    /// Create a force from existing units, ready to respond to the powers
+extern int AiCreateSpecificForce( int *power, int *unittypes, int unittypescount );
+    /// Force's unit is attacked.
+extern void AiForceHelpMe( int force, const Unit * attacker, Unit * defender );
     /// Periodic called force manager handler
-extern void AiForceManager(void);
-
+extern void AiForceManager( void );
+    /// Calculate the number of unit produced for each wanted unittype   
+extern void AiForceCountUnits( int force, int *unittypeCount );
+    /// Substract the number of unit wanted for each unittype
+extern int AiForceSubstractWant( int force, int *unittypeCount );
 //
-//	Plans
+//      Plans
 //
     /// Find a wall to attack
-extern int AiFindWall(AiForce* force);
+extern int AiFindWall( AiForce * force );
     /// Plan the an attack
-extern int AiPlanAttack(AiForce* force);
+extern int AiPlanAttack( AiForce * force );
 
 //
-//	Magic
+//      Scripts
+//
+	/// Run a script ( for the current AiPlayer )
+extern void AiRunScript( int script, SCM list, int hotSpotX, int hotSpotY, int hotSpotRay );
+	/// Find a script for defense.
+extern void AiFindDefendScript( int attackX, int attackY );
+	/// Check if attack is possible
+extern void AiPeriodicAttack();
+//
+//      Gauges
+//
+    /// Compute gauges for the current RunningScript
+extern void AiComputeCurrentScriptGauges();
+    /// Output gauges values
+extern void AiDebugGauges();
+    /// Give the value of a specific gauge, for the current RunningScript
+extern int AiGetGaugeValue( int gauge );
+    /// Find a gauge given its identifier. 
+extern int AiFindGaugeId( SCM id );
+    /// return the force of the unittype.
+extern int AiUnittypeForce( UnitType * unitType );
+
+//
+//      Magic
 //
     /// Check for magic
-extern void AiCheckMagic(void);
+extern void AiCheckMagic( void );
+
+
+//
+//      Ccl helpers
+//
+
+    /// Save/Load a PlayerAi structure ( see ccl_helpers.h for details )
+extern void IOPlayerAiFullPtr( SCM form, void *binaryform, void *para );
+
 
 //@}
 
-#endif	// !__AI_LOCAL_H__
+#endif				// !__AI_LOCAL_H__
