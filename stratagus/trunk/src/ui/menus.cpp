@@ -5751,7 +5751,7 @@ local void EditorLoadMap(void)
     EndMenu();
 }
 
-local void EditorLoadInit(Menuitem *mi)
+local void EditorLoadInit(Menuitem *mi __attribute__((unused)))
 {
     DebugCheck(!*ScenSelectPath);
     EditorLoadMapMenuItems[5].flags =
@@ -5800,6 +5800,7 @@ local int EditorLoadRDFilter(char *pathbuf, FileList *fl)
     char *suf;
     char *np, *cp, *lcp;
 #ifdef USE_ZZIPLIB
+    int sz;
     ZZIP_FILE *zzf;
 #endif
 
