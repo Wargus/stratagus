@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+    <TITLE>FreeCraft Configuration Language Description: Tileset</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,tileset">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Tileset</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+<A HREF="../clone.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<HR>
+<H2>Intro - Introduction to tileset functions and variables</H2>
+
+Everything around the C Tileset structure.
+<H2>Functions</H2>
+<A NAME="define-tileset-wc-names"></A>
+<H3>define-tileset-wc-names</H3>
+
+<H4>Description</H4>
+
+    Define the mapping of the tileset numbers in puds, to the tileset names.
+
+<H4>Syntax</H4>
+
+<CODE>(define-tileset-wc-names tileset0 tileset1 tileset2 tileset3)</CODE>
+
+<DL>
+<DT>tileset0</DT>
+<DD>Name of the tileset assigned to index 0.
+</DD>
+<DT>tileset1</DT>
+<DD>Name of the tileset assigned to index 1.
+</DD>
+<DT>tileset2</DT>
+<DD>Name of the tileset assigned to index 2.
+</DD>
+<DT>tileset3</DT>
+<DD>Name of the tileset assigned to index 3.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-tileset-wc-names 
+      "tileset-summer" "tileset-winter" "tileset-wasteland" "tileset-swamp" )
+</PRE>
+
+<P>This is the default tileset mapping.
+
+<A NAME="define-tileset"></A>
+<H3>define-tileset</H3>
+
+<H4>Description</H4>
+
+    Define the unit types in game it is based on the UDTA.<P>
+
+    This could also be defined in own levels. <P>
+
+<H4>Syntax</H4>
+
+<CODE>(define-tileset)</CODE>
+
+<DL>
+<DT></DT>
+<DD>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-tileset
+</PRE>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2000 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
