@@ -57,11 +57,34 @@ global void HandleActionDemolish(Unit* unit)
 	//	Move near to target.
 	//
 	case 0:
-	    // FIXME: RESET FIRST!!
+	    // FIXME: reset first!! why? (johns)
 	    err=HandleActionMove(unit); 
 	    if( unit->Reset ) {
 		goal=unit->Command.Data.Move.Goal;
-
+#ifdef NEW_UNIT
+		//
+		//	Target is dead, stop demolish
+		//
+		if( goal ) {
+		    if( goal->Destroyed ) {
+			DebugLevel0(__FUNCTION__": destroyed unit\n");
+			if( !--goal->Refs ) {
+			    ReleaseUnit(goal);
+			}
+			unit->Command.Data.Move.Goal=goal=NoUnitP;
+			// FIXME: perhaps I should choose an alternative
+			unit->Command.Action=UnitActionStill;
+			return;
+		    } else if( goal->Removed || !goal->HP
+				|| goal->Command.Action==UnitActionDie ) {
+			--goal->Refs;
+			unit->Command.Data.Move.Goal=goal=NoUnitP;
+			// FIXME: perhaps I should choose an alternative
+			unit->Command.Action=UnitActionStill;
+			return;
+		    }
+		}
+#else
 		//
 		//	Target is dead, stop demolish
 		//
@@ -72,6 +95,7 @@ global void HandleActionDemolish(Unit* unit)
 		    unit->Command.Action=UnitActionStill;
 		    return;
 		}
+#endif
 
 		//
 		//	Have reached target?
@@ -97,16 +121,30 @@ global void HandleActionDemolish(Unit* unit)
 	//	Demolish the target.
 	//
 	case 1:
+#ifdef NEW_UNIT
+	    goal=unit->Command.Data.Move.Goal;
+	    if( goal ) {
+		--goal->Refs;
+	    }
+#endif
+
             x=unit->X;
             y=unit->Y;
             DestroyUnit(unit);
 	    // FIXME: Must play explosion sound
+
+	    //
+	    //	 Effect of the explosion on units.
+	    //
             n=SelectUnits(x-2,y-2, x+2, y+2,table);
 	    // FIXME: Don't hit flying units!
             for( i=0; i<n; ++i ) {
                 HitUnit(table[i],DEMOLISH_DAMAGE);
             }
 
+	    //
+	    //	Terrain effect of the explosion
+	    //
             for( ix=x-2; ix<=x+2; ix++ ) {
 		for( iy=y-2; iy<=y+2; iy++ ) {
 		    n=TheMap.Fields[ix+iy*TheMap.Width].Flags;
