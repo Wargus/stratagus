@@ -4006,7 +4006,11 @@ global void SaveUnit(const Unit* unit,FILE* file)
 		fprintf(file,"fast ");
 	    }
 	    if( unit->Data.Move.Length ) {
-		fprintf(file,"with-path ");
+		fprintf(file,"path #(");
+		for( i=0; i<unit->Data.Move.Length; ++i ) {
+		    fprintf(file,"%d ", unit->Data.Move.Path[i]);
+		}
+		fprintf(file,")");
 	    }
 	    fprintf(file,")");
 	    break;
