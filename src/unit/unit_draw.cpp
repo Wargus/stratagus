@@ -510,7 +510,6 @@ local void DrawBuilding(Unit* unit)
     int y;
     UnitType* type;
     int frame;
-    int n_frame;
 
     // FIXME: This should I rewrite, without checks here!!
 
@@ -518,10 +517,21 @@ local void DrawBuilding(Unit* unit)
     x = unit->X;
     y = unit->Y;
 
+#ifdef NEW_FOW
+    if ( !TheMap.NoFogOfWar && !IsMapFieldVisible( x, y ) ) {
+	frame = unit->SeenFrame;
+	if (frame == 255) {
+	    return;
+	}
+    } else {
+	// FIXME: is this the correct place?
+	frame = unit->SeenFrame = unit->Frame;
+    }
+#else
     // FIXME: johns: this isn't 100% correct, building which are partly
     // FIXME: johns: under the fog are shown partly.
 
-    // FIXME: There is already a check in the main loop UnitVisibile!
+    // FIXME: There is already a check in the main loop UnitVisible!
     if ( !IsMapFieldExplored( x, y ) ) {
 	return;
     }
@@ -534,11 +544,15 @@ local void DrawBuilding(Unit* unit)
     } else {
 	frame = unit->SeenFrame = unit->Frame;
     }
+#endif
 
+#if 0
+    // Moved to init, FIXME: cade look if correct
     n_frame = 0;
     if ((frame & 128) == 0 && unit->Rs > 50) {
 	n_frame = 128; // fancy buildings
     }
+#endif
 
     RLEPlayerPixels(unit->Player,unit->Type->RleSprite);
     x=Map2ScreenX(unit->X)+unit->IX;
@@ -550,30 +564,19 @@ local void DrawBuilding(Unit* unit)
     if( unit->Command.Action==UnitActionBuilded ) {
 	if( unit->Constructed || type->RleSprite->NumFrames<=1 ) {
 	    DrawConstruction(type->OverlapFrame
-		,frame
+		,frame&127
 		,x+(type->TileWidth*TileSizeX)/2
 		,y+(type->TileHeight*TileSizeY)/2);
 	} else {
-#if 0
-	    DebugLevel0("Remove this %d\n",n_frame);
-	    if ( strcmp(type->Ident,"dark-portal") == 0
-		||  strcmp(type->Ident,"runestone") == 0 )
-	    //FIXME: dark-portal and runestone haven't reqiured frames, so we draw construction instead
-	    DrawConstruction(type->OverlapFrame
-		,frame
-		,x+(type->TileWidth*TileSizeX)/2
-		,y+(type->TileHeight*TileSizeY)/2);
-	    else
-#endif
-	    DrawUnitType(type,frame+n_frame,x,y);
+	    DrawUnitType(type,frame,x,y);
 	}
     } else if( unit->Command.Action==UnitActionUpgradeTo ) {
-	DrawUnitType(unit->Command.Data.UpgradeTo.What,1+n_frame,x,y);
+	DrawUnitType(unit->Command.Data.UpgradeTo.What,(frame&128)+1,x,y);
     } else {
-	DrawUnitType(type,frame+n_frame,x,y);
+	DrawUnitType(type,frame,x,y);
     }
 
-    // FIXME: johns: ugly check here should be removed! vanish could be used?
+    // FIXME: johns: ugly check here should be removed!
     if( unit->Command.Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
 	DrawSelectionRectangle(unit,type,x,y);

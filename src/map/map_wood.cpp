@@ -26,6 +26,7 @@
 #include "freecraft.h"
 #include "map.h"
 #include "minimap.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -127,9 +128,13 @@ global void MapRemoveWood(unsigned x,unsigned y)
     mf->Value=0;
 
     UpdateMinimapXY(x,y);
-    MustRedraw|=RedrawMaps;
 
+#ifdef NEW_FOW
+    if( mf->Visible&(1<<ThisPlayer->Player) ) {
+#else
     if( mf->Flags&MapFieldVisible ) {
+#endif
+	MustRedraw|=RedrawMaps;
 	MapMarkSeenTile(x,y);
     }
 }
@@ -174,12 +179,21 @@ global void RegenerateForest(void)
 			    mf->Tile=123;
 			    mf->Value=0;
 			    mf->Flags|=MapFieldForest|MapFieldUnpassable;
+#ifdef NEW_FOW
+			    if( mf->Visible&(1<<ThisPlayer->Player) ) {
+				MapMarkSeenTile(x,y);
+			    }
+			    if( tmp->Visible&(1<<ThisPlayer->Player) ) {
+				MapMarkSeenTile(x-1,y);
+			    }
+#else
 			    if( mf->Flags&MapFieldVisible ) {
 				MapMarkSeenTile(x,y);
 			    }
 			    if( tmp->Flags&MapFieldVisible ) {
 				MapMarkSeenTile(x-1,y);
 			    }
+#endif
 
 			}
 		    }
