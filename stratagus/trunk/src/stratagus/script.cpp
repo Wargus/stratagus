@@ -950,6 +950,127 @@ global int CclCommand(const char* command)
 
 #ifdef META_LUA
 
+/**
+**  Generic Get Function for a script proxy. Delegate the call to the object's
+**  own Get function.
+**
+**	@param l            The lua state.
+*/
+local int ScriptGet(lua_State* l)
+{
+	ScriptProxy* sp;
+	const char* key;
+
+	sp = (ScriptProxy*)lua_touserdata(l, -2);
+	key = LuaToString(l, -1);
+	DebugCheck((!sp) || (!key) || (!sp->Object) || (!sp->GetFunction));
+	DebugLevel3Fn("%p->(%s)\n" _C_ sp _C_ key);
+
+	return sp->GetFunction(sp->Object, key, l);
+}
+
+/**
+**  Generic Set Function for a script proxy. Delegate the call to the object's
+**  own Set function.
+**
+**	@param l            The lua state.
+*/
+local int ScriptSet(lua_State* l)
+{
+	ScriptProxy* sp;
+	const char* key;
+
+	sp = (ScriptProxy*)lua_touserdata(l, -3);
+	key = LuaToString(l, -2);
+	DebugCheck((!sp) || (!key) || (!sp->Object) || (!sp->SetFunction));
+	DebugLevel3Fn("%p->(%s)\n" _C_ sp _C_ key);
+
+	return sp->SetFunction(sp->Object, key, l);
+}
+
+/**
+**  Garbage collector function for normal userdata. This is only used inside
+**	scripting, getting called when lua decides to collect the proxy for a C
+**  structure.
+**
+**  @param l            The lua state.
+**
+**	@see ScriptCreateUserdata for garbage details.
+*/
+local int ScriptCollectUserdata(lua_State* l)
+{
+	ScriptProxy* sp;
+	char key[20];
+
+	sp = (ScriptProxy*)lua_touserdata(l, -1);
+	DebugLevel3Fn("Collecting ScriptProxy at %p for obj at %p.\n" _C_ sp _C_ sp->Object);
+
+	// Remove the key from the table.
+	lua_pushstring(l, "StratagusReferences");
+	lua_gettable(l, LUA_REGISTRYINDEX);
+	sprintf(key, "%p%p%p", sp->Object, sp->GetFunction, sp->SetFunction);
+	lua_pushstring(l, key);
+	lua_pushnil(l);
+	lua_settable(l, -3);
+	lua_remove(l, -1);
+	return 0;
+}
+
+/**
+**  Create a lua proxy for a C structure. This will not always create new
+**  userdata, but use an old one for the same structure. The userdata is pushed on
+**  the lua stack anyway.
+**
+**  @param l            The lua state
+**  @param Object       The Object to create userdata for.
+**  @param GetFunction  The function called to "Get" a value from the structure.
+**	@param SetFunction  The function called to "Set" a value from the structure.
+**
+**	@notes The Object is sent to the get/set functions, otherwise it is not touched.
+**	@notes Internals.  All lua proxies are kept inside a weak table inside the registry.
+**  That table is indexed by the pointer to the object, get and set funcs. When This
+**	function is called it searches for an already existant userdata, and returns it if found.
+**	Otherwise it create a new userdata, and sets it's metatable. A garbage collection
+**  proc is called to remove it from the table.
+*/
+global void ScriptDoCreateUserdata(lua_State* l, void* Object,
+		ScriptGetSetFunction* GetFunction, ScriptGetSetFunction* SetFunction)
+{
+	char key[40];
+	ScriptProxy* sp;
+
+	// FIXME: FASTER?
+	sprintf(key, "%p%p%p", Object, GetFunction, SetFunction);
+
+	lua_pushstring(l, "StratagusReferences");
+	lua_gettable(l, LUA_REGISTRYINDEX);
+	lua_pushstring(l, key);
+	lua_gettable(l, -2);
+
+	if (lua_isnil(l, -1)) {
+		lua_remove(l, -1);
+		// Create userdata.
+		sp = (ScriptProxy*)lua_newuserdata(l, sizeof(ScriptProxy));
+		sp->Object = Object;
+		sp->GetFunction = GetFunction;
+		sp->SetFunction = SetFunction;
+		// Get the standard metatable
+		lua_pushstring(l, "StratagusStandardMetatable");
+		lua_gettable(l, LUA_REGISTRYINDEX);
+		lua_setmetatable(l, -2);
+		// Add it to the reference table
+		lua_pushstring(l, key);
+		lua_pushvalue(l, -2);
+		lua_settable(l, -4);
+		// Remove StratagusReferences reference
+		lua_remove(l, -2);
+		DebugLevel3Fn("Creating ScriptProxy at %p for obj at %p.\n" _C_ lua_touserdata(l, -1) _C_ Object);
+	} else {
+		lua_remove(l, -2);
+		DebugLevel3Fn("Reusing ScriptProxy at %p for obj at %p.\n" _C_ lua_touserdata(l, -1) _C_ Object);
+	}
+}
+
 global int ScriptSetValueBlock(lua_State* l)
 {
 	lua_pushstring(l, "Structure is read-only, sorry.\n");
@@ -1008,7 +1129,7 @@ local void InitScript(void)
 {
 	lua_pushstring(Lua, "Stratagus");
 
-	/* Generate a weak table in the registry */
+	// Generate a weak table in the registry
 	lua_pushstring(Lua, "StratagusReferences");
 	lua_newtable(Lua);
 	lua_newtable(Lua);
@@ -1017,8 +1138,22 @@ local void InitScript(void)
 	lua_settable(Lua, -3);
 	lua_setmetatable(Lua, -2);
 	lua_settable(Lua, LUA_REGISTRYINDEX);
+
+	// Generate a standard metatable
+	lua_pushstring(Lua, "StratagusStandardMetatable");
+	lua_newtable(Lua);
+	lua_pushstring(Lua, "__index");
+	lua_pushcfunction(Lua, ScriptGet);
+	lua_settable(Lua, -3);
+	lua_pushstring(Lua, "__newindex");
+	lua_pushcfunction(Lua, ScriptSet);
+	lua_settable(Lua, -3);
+	lua_pushstring(Lua, "__gc");
+	lua_pushcfunction(Lua, ScriptCollectUserdata);
+	lua_settable(Lua, -3);
+	lua_settable(Lua, LUA_REGISTRYINDEX);
 	
-	/* This is the main table, and the metatable for Stratagus. */
+	// This is the main table, and the metatable for Stratagus.
 	lua_newtable(Lua);
 	lua_newtable(Lua);
 	lua_pushstring(Lua, "__index");

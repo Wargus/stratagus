@@ -1279,6 +1279,7 @@ void CleanSpells(void)
 		if (spell->SoundWhenCast.Name) {
 			free(spell->SoundWhenCast.Name);
 		}
+		free(spell);
 		// FIXME: missile free somewhere else, right?
 	}
 	free(SpellTypeTable);

@@ -396,8 +396,6 @@ enum _missile_class_ {
 
 	/// Base structure of missile-types
 struct _missile_type_ {
-	const void* OType;  /// object type (future extensions)
-
 	char* Ident;          /// missile name
 	char* File;           /// missile sprite file
 	int   Transparency;   /// Missile transparency possible value is 50 (later 25 and 75)
@@ -483,10 +481,10 @@ typedef struct _burning_building_frame_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
+extern MissileType** MissileTypes;  /// All missile-types
+extern int NumMissileTypes;        /// Number of missile-types
+
 extern char** MissileTypeWcNames;  /// Mapping wc-number 2 symbol
-
-extern MissileType* MissileTypes;  /// All missile-types
-
 extern const char* MissileClassNames[];  /// Missile class names
 
 extern BurningBuildingFrame* BurningBuildingFrames;  /// Burning building frames
@@ -559,6 +557,11 @@ FuncController MissileActionLandMine;
 FuncController MissileActionWhirlwind;
 FuncController MissileActionFlameShield;
 FuncController MissileActionDeathCoil;
+
+#ifdef META_LUA
+	/// Initialize Spell scripting.
+extern void ScriptSpellInit(void);
+#endif
 
 //@}
 
