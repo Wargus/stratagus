@@ -1634,13 +1634,13 @@ static int CclDefineNewAnimations(lua_State* l)
 			anims->EndBuild = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "StartHarvest_", 12)) {
 			res = ResourceIndex(l, value + 12);
-			anims->StartHarvest[0] = ParseAnimation(l, -1);
+			anims->StartHarvest[res] = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Harvest_", 8)) {
 			res = ResourceIndex(l, value + 8);
 			anims->Harvest[res] = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "EndHarvest_", 11)) {
 			res = ResourceIndex(l, value + 11);
-			anims->EndHarvest[0] = ParseAnimation(l, -1);
+			anims->EndHarvest[res] = ParseAnimation(l, -1);
 		} else {
 			LuaError(l, "Unsupported animation: %s" _C_ value);
 		}
