@@ -359,8 +359,10 @@ local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
     int f;
     int basic_name;
     int mixed_name;
+    int new_index;
 
-    ExtendTilesetTables(tileset,index+256);
+    new_index=index+256;
+    ExtendTilesetTables(tileset,new_index);
 
     basic_name=TilesetParseName(tileset,list);	// base name
     list=gh_cdr(list);
@@ -398,7 +400,15 @@ local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
 	index+=16;
     }
 
-    return index;
+    while( index<new_index ) {
+	tileset->Table[index]=0;
+	tileset->FlagsTable[index]=0;
+	tileset->BasicNameTable[index]=0;
+	tileset->MixedNameTable[index]=0;
+	++index;
+    }
+
+    return new_index;
 }
 
 /**
