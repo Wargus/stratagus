@@ -721,7 +721,11 @@ local void DrawBuildingCursor(void)
     SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapEndX,TheUI.MapEndY);
 #endif /* SPLIT_SCREEN_SUPPORT */
     GraphicPlayerPixels(ThisPlayer,CursorBuilding->Sprite);
-    DrawUnitType(CursorBuilding,0,x,y);
+    if( VideoGraphicFrames(CursorBuilding->Sprite)>5 ) {
+	DrawUnitType(CursorBuilding,4,x,y);
+    } else {
+	DrawUnitType(CursorBuilding,0,x,y);
+    }
     PopClipping();
 
     //
