@@ -292,7 +292,7 @@ global void PlaySectionMusic(PlaySectionType section)
 	}
     } else if (PlaySections[i].Files && (CDMode == CDModeOff || CDMode == CDModeStopped)) {
 #else
-    if (PlaySections[i].Files && (CDMode == CDModeOff || CDMode == CDModeStopped)) {
+    if (PlaySections[i].Files) {
 #endif
 	found = 0;
 	numfiles = 0;
