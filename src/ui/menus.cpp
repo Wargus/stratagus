@@ -1416,9 +1416,11 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
     } else {
 	menu->items[11].flags = 0;
     }
+#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
 	menu->items[11].flags = -1;
     }
+#endif
     if (PlayingMusic != 1 || SoundFildes == -1) {
 	menu->items[11].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
