@@ -164,7 +164,7 @@ local void FLAC_metadata_callback(
 **	@return		Error status.
 */
 local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
-    FLAC__StreamDecoder * decoder __attribute__((unused)),
+    FLAC__StreamDecoder * stream __attribute__((unused)),
     const FLAC__Frame * frame, const FLAC__int32 * const buffer[], void *user)
 {
     Sample *sample;
