@@ -780,7 +780,7 @@ global void UnitLost(Unit* unit)
 
 	// Destroy resource-platform, must re-make resource patch.
 	if (type->MustBuildOnTop && unit->Value > 0) {
-		temp = MakeUnitAndPlace(unit->X, unit->Y, type->MustBuildOnTop, &Players[PlayerMax - 1]);
+		temp = MakeUnitAndPlace(unit->X, unit->Y, type->MustBuildOnTop, &Players[PlayerNumNeutral]);
 		temp->Value = unit->Value;
 	}
 	DebugCheck(player->NumBuildings > UnitMax);
