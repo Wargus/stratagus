@@ -1301,8 +1301,8 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 	DebugCheck(unit && type && unit->Type != type);
 
 	//
-	//		A building can be under construction and is drawn with construction
-	//		frames.
+	//  A building can be under construction and is drawn with construction
+	//  frames.
 	//
 	if (type->Building) {
 		// Draw normal shadow
@@ -1314,9 +1314,21 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 				type->TileHeight * TileSizeY) / 2;
 			x += type->ShadowOffsetX;
 			y += type->ShadowOffsetY;
-			if (frame < 0) {
-				VideoDrawShadowClipX(type->ShadowSprite, -frame, x, y);
+			if (type->Flip) {
+				if (frame < 0) {
+					VideoDrawShadowClipX(type->ShadowSprite, -frame, x, y);
+				} else {
+					VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
+				}
 			} else {
+				int row;
+
+				row = type->NumDirections / 2 + 1;
+				if (frame < 0) {
+					frame = (-frame / row) * type->NumDirections + type->NumDirections - -frame % row;
+				} else {
+					frame = (frame / row) * type->NumDirections + frame % row;
+				}
 				VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
 			}
 		}
@@ -1336,9 +1348,21 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 		x += type->ShadowOffsetX;
 		y += type->ShadowOffsetY;
 
-		if (frame < 0) {
-			VideoDrawShadowClipX(type->ShadowSprite, -frame, x, y);
+		if (type->Flip) {
+			if (frame < 0) {
+				VideoDrawShadowClipX(type->ShadowSprite, -frame, x, y);
+			} else {
+				VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
+			}
 		} else {
+			int row;
+
+			row = type->NumDirections / 2 + 1;
+			if (frame < 0) {
+				frame = (-frame / row) * type->NumDirections + type->NumDirections - -frame % row;
+			} else {
+				frame = (frame / row) * type->NumDirections + frame % row;
+			}
 			VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
 		}
 		return;
@@ -1831,7 +1855,13 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 {
 	if (!type->PlayerColorSprite[player] ||
 			!type->PlayerColorSprite[player]->TextureNames[
-				frame < 0 ? -frame : frame]) {
+				type->Flip ?
+					(frame < 0 ? -frame : frame) :
+					(frame < 0 ?
+						(-frame / (type->NumDirections / 2 + 1)) * type->NumDirections +
+							type->NumDirections - -frame % (type->NumDirections / 2 + 1) :
+						(frame / (type->NumDirections / 2 + 1)) * type->NumDirections +
+							frame % (type->NumDirections / 2 + 1))]) {
 		unsigned char mapping[4 * 2];
 		int i;
 
@@ -1855,11 +1885,22 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 	x -= (type->Width - type->TileWidth * TileSizeX) / 2;
 	y -= (type->Height - type->TileHeight * TileSizeY) / 2;
 
-	// FIXME: This is a hack for mirrored sprites
-	if (frame < 0) {
-		VideoDrawClipX(type->PlayerColorSprite[player], -frame, x, y);
+	if (type->Flip) {
+		if (frame < 0) {
+			VideoDrawClipX(type->PlayerColorSprite[player], -frame, x, y);
+		} else {
+			VideoDrawClip(type->PlayerColorSprite[player], frame, x, y);
+		}
 	} else {
-		VideoDrawClip(type->PlayerColorSprite[player],frame, x, y);
+		int row;
+
+		row = type->NumDirections / 2 + 1;
+		if (frame < 0) {
+			frame = (-frame / row) * type->NumDirections + type->NumDirections - -frame % row;
+		} else {
+			frame = (frame / row) * type->NumDirections + frame % row;
+		}
+		VideoDrawClip(type->PlayerColorSprite[player], frame, x, y);
 	}
 }
 #endif
@@ -1883,12 +1924,25 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 			y -= (unit->Type->Construction->Height - unit->Type->TileHeight * TileSizeY )/ 2;
 //			x += type->ShadowOffsetX;
 //			y += type->ShadowOffsetY;
-			if (frame < 0) {
-				VideoDrawShadowClipX(unit->Type->Construction->ShadowSprite,
-					-frame, x, y);
+			if (unit->Type->Flip) {
+				if (frame < 0) {
+					VideoDrawShadowClipX(unit->Type->Construction->ShadowSprite,
+						-frame, x, y);
+				} else {
+					VideoDrawShadowClip(unit->Type->Construction->ShadowSprite,
+						frame, x, y);
+				}
 			} else {
-				VideoDrawShadowClip(unit->Type->Construction->ShadowSprite,
-					frame, x, y);
+				int row;
+
+				row = unit->Type->NumDirections / 2 + 1;
+				if (frame < 0) {
+					frame = (-frame / row) * unit->Type->NumDirections + unit->Type->NumDirections - -frame % row;
+				} else {
+					frame = (frame / row) * unit->Type->NumDirections + frame % row;
+				}
+				VideoDrawShadowClip(unit->Type->Construction->ShadowSprite, frame,
+					x, y);
 			}
 		}
 	} else {
@@ -1897,9 +1951,21 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 			y -= (unit->Type->ShadowHeight - unit->Type->TileHeight * TileSizeY) / 2;
 			x += unit->Type->ShadowOffsetX;
 			y += unit->Type->ShadowOffsetY;
-			if (frame < 0) {
-				VideoDrawShadowClipX(unit->Type->ShadowSprite, -frame, x, y);
+			if (unit->Type->Flip) {
+				if (frame < 0) {
+					VideoDrawShadowClipX(unit->Type->ShadowSprite, -frame, x, y);
+				} else {
+					VideoDrawShadowClip(unit->Type->ShadowSprite, frame, x, y);
+				}
 			} else {
+				int row;
+
+				row = unit->Type->NumDirections / 2 + 1;
+				if (frame < 0) {
+					frame = (-frame / row) * unit->Type->NumDirections + unit->Type->NumDirections - -frame % row;
+				} else {
+					frame = (frame / row) * unit->Type->NumDirections + frame % row;
+				}
 				VideoDrawShadowClip(unit->Type->ShadowSprite, frame, x, y);
 			}
 		}

@@ -411,8 +411,9 @@ struct _missile_type_ {
 	SoundConfig FiredSound;   /// fired sound
 	SoundConfig ImpactSound;  /// impact sound for this missile-type
 
-	unsigned CanHitOwner:1;   /// missile can hit the owner
-	unsigned FriendlyFire:1;  /// missile can't hit own units
+	unsigned Flip : 1;        /// flip image when facing left
+	unsigned CanHitOwner : 1; /// missile can hit the owner
+	unsigned FriendlyFire : 1;/// missile can't hit own units
 
 	MissileClass Class;       /// missile class
 	int          NumBounces;  /// number of bounces

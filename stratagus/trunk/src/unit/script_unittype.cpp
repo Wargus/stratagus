@@ -142,6 +142,7 @@ local int CclDefineUnitType(lua_State* l)
 	memset(type->CanTargetFlag, 0, NumberBoolFlag * sizeof (*type->CanTargetFlag));
 
 	type->NumDirections = 8;
+	type->Flip = 1;
 
 	//
 	//		Parse the list:		(still everything could be changed!)
@@ -255,6 +256,8 @@ local int CclDefineUnitType(lua_State* l)
 			lua_rawgeti(l, -1, 2);
 			type->Height = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "Flip")) {
+			type->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Animations")) {
 			type->Animations = AnimationsByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
