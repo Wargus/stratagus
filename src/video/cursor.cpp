@@ -300,10 +300,14 @@ global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h)
 {
     // FIXME: todo
     int i;
+    int bpp;
 
+    return;
+
+    bpp = TheScreen->format->BytesPerPixel;
     SDL_LockSurface(TheScreen);
     for (i = 0; i < h; ++i) {
-	memcpy(&((char*)TheScreen->pixels)[x + (y + i) * VideoWidth], buffer, w);
+	memcpy(&((char*)TheScreen->pixels)[x * bpp + (y + i) * TheScreen->pitch], buffer, w * bpp);
     }
     SDL_UnlockSurface(TheScreen);
 }
@@ -311,10 +315,14 @@ global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h)
 global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h)
 {
     int i;
+    int bpp;
 
+    return;
+
+    bpp = TheScreen->format->BytesPerPixel;
     SDL_LockSurface(TheScreen);
     for (i = 0; i < h; ++i) {
-	memcpy(buffer, &((char*)TheScreen->pixels)[x + (y + i) * VideoWidth], w);
+	memcpy(buffer, &((char*)TheScreen->pixels)[x * bpp + (y + i) * TheScreen->pitch], w * bpp);
     }
     SDL_UnlockSurface(TheScreen);
     // FIXME: todo
@@ -525,23 +533,18 @@ local void LoadCursorBackground(int x, int y, int w, int h)
     drect.y = y;
 
     SDL_BlitSurface(OldCursorImage, &srect, TheScreen, &drect);
-    InvalidateArea(x, y, w, h);
 }
 
 local void SaveCursorBackground(int x, int y, int w, int h)
 {
     SDL_Rect srect;
-    SDL_Rect drect;
 
     srect.x = x;
     srect.y = y;
     srect.w = w;
     srect.h = h;
 
-    drect.x = 0;
-    drect.y = 0;
-
-    SDL_BlitSurface(TheScreen, &srect, OldCursorImage, &drect);
+    SDL_BlitSurface(TheScreen, &srect, OldCursorImage, NULL);
 }
 #else
 /**
@@ -769,7 +772,7 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
 #ifdef USE_SDL_SURFACE
     size = w * h;
     if (OldCursorSize < size) {
-	OldCursorImage = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32, RMASK, GMASK, BMASK, AMASK);
+	OldCursorImage = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32, BMASK, GMASK, RMASK, AMASK);
 	OldCursorSize = size;
     }
 #else
