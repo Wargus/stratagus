@@ -246,6 +246,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	    s=strdcat3(FreeCraftLibPath,"/",TheMap.Tileset->PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
+    InitIcons();
     LoadIcons();
 
     // FIXME: Race only known in single player game:
@@ -373,7 +374,6 @@ global void CreateGame(char* filename, WorldMap* map)
     }
 
 }
-
 
 /**
 **	Init Game Setting to default values
