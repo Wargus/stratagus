@@ -961,13 +961,16 @@ void DrawBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 */
 void PrintValue(int x, int y, const Unit* unit, const DecoVarType* Deco)
 {
+	int font;  // font to display the value.
+
+	font = Deco->Data.Text.Font;
 	if (Deco->IsCenteredInX) {
 		x -= 2; // VideoTextLength(GameFont, buf) / 2, with buf = str(Value)
 	}
 	if (Deco->IsCenteredInY) {
-		y -= VideoTextHeight(GameFont) / 2;
+		y -= VideoTextHeight(font) / 2;
 	}
-	VideoDrawNumberClip(x, y, GameFont, unit->Variable[Deco->Index].Value);
+	VideoDrawNumberClip(x, y, font, unit->Variable[Deco->Index].Value);
 }
 
 /**
