@@ -589,10 +589,6 @@ global void VideoFreeSharedPalette(VMemType* pixels)
 global void DisplayPicture(const char* name)
 {
     Graphic* picture;
-#ifdef USE_SDL_SURFACE
-    SDL_Rect srect;
-    SDL_Rect drect;
-#endif
 
     picture = LoadGraphic(name);
     ResizeGraphic(picture, VideoWidth, VideoHeight);
@@ -601,15 +597,7 @@ global void DisplayPicture(const char* name)
 #endif
 
 #ifdef USE_SDL_SURFACE
-    srect.x = 0;
-    srect.y = 0;
-    srect.w = picture->Width;
-    srect.h = picture->Height;
-
-    drect.x = 0;
-    drect.y = 0;
-
-    SDL_BlitSurface(picture->Surface, &srect, TheScreen, &drect);
+    SDL_BlitSurface(picture->Surface, NULL, TheScreen, NULL);
 #else
     VideoLockScreen();
     VideoDrawSubClip(picture, 0, 0, picture->Width, picture->Height,
