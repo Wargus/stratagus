@@ -57,14 +57,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-#ifdef DEBUG
-
-// Use this to see FOW visibility for every tile
-#define noDEBUG_FOG_OF_WAR
-
-#define noTIMEIT  /// defined time function
-#endif
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -83,22 +75,9 @@ global int* VisionLookup;
 
 local unsigned char* VisibleTable;
 
+#ifndef USE_OPENGL
 local SDL_Surface* OnlyFogSurface;
-
-/**
-**  Draw unexplored area function pointer. (display and video mode independ)
-*/
-local void (*VideoDrawUnexplored)(const int, int, int);
-
-/**
-**  Draw fog of war function pointer. (display and video mode independ)
-*/
-local void (*VideoDrawFog)(const int, int, int);
-
-/**
-**  Draw only fog of war function pointer. (display and video mode independ)
-*/
-local void (*VideoDrawOnlyFog)(int, int);
+#endif
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -122,7 +101,7 @@ local int LookupSight(const Player* player, int tx, int ty)
 	int mapdistance;
 	Unit* unit;
 
-	visiblecount=0;
+	visiblecount = 0;
 	for (i = 0; i < player->TotalNumUnits; ++i) {
 		unit = player->Units[i];
 		range = unit->CurrentSightRange;
@@ -237,7 +216,7 @@ global void MapMarkTileSight(const Player* player, int x, int y)
 		case 0:  // Unexplored
 		case 1:  // Unseen
 			// When there is NoFogOfWar only unexplored tiles are marked.
-			if ((!TheMap.NoFogOfWar) || v == 0) {
+			if (!TheMap.NoFogOfWar || v == 0) {
 				UnitsOnTileMarkSeen(player, x, y, 0);
 			}
 			v = 2;
@@ -484,7 +463,7 @@ global void UpdateFogOfWarChange(void)
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawFogSDL(const int tile, int x, int y)
+global void VideoDrawFog(const int tile, int x, int y)
 {
 	int tilepitch;
 	int oldx;
@@ -520,7 +499,7 @@ global void VideoDrawFogSDL(const int tile, int x, int y)
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawUnexploredSDL(const int tile, int x, int y)
+global void VideoDrawUnexplored(const int tile, int x, int y)
 {
 	int tilepitch;
 	int oldx;
@@ -552,7 +531,7 @@ global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawOnlyFogSDL(int x, int y)
+global void VideoDrawOnlyFog(int x, int y)
 {
 	int oldx;
 	int oldy;
@@ -585,7 +564,7 @@ global void VideoDrawOnlyFogSDL(int x, int y)
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawFogOpenGL(
+global void VideoDrawFog(
 	const int tile __attribute__((unused)),
 	int x __attribute__((unused)), int y __attribute__((unused)))
 {
@@ -644,7 +623,7 @@ global void VideoDrawFogOpenGL(
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawUnexploredOpenGL(const int tile, int x, int y)
+global void VideoDrawUnexplored(const int tile, int x, int y)
 {
 	int tilepitch;
 	Graphic* graphic;
@@ -694,27 +673,10 @@ global void VideoDrawUnexploredOpenGL(const int tile, int x, int y)
 **  @param x  X position into video memory
 **  @param y  Y position into video memory
 */
-global void VideoDrawOnlyFogOpenGL(int x, int y)
+global void VideoDrawOnlyFog(int x, int y)
 {
-	GLint sx;
-	GLint ex;
-	GLint sy;
-	GLint ey;
-
-	sx = x;
-	ex = sx + TileSizeX;
-	sy = y;
-	ey = sy + TileSizeY;
-
-	glDisable(GL_TEXTURE_2D);
-	glColor4ub(0, 0, 0, FogOfWarOpacity);
-	glBegin(GL_QUADS);
-	glVertex2i(sx, sy);
-	glVertex2i(sx, ey);
-	glVertex2i(ex, ey);
-	glVertex2i(ex, sy);
-	glEnd();
-	glEnable(GL_TEXTURE_2D);
+	VideoFillRectangle(VideoMapRGBA(0, 0, 0, 0, FogOfWarOpacity), x, y,
+		TileSizeX, TileSizeY);
 }
 #endif
 
@@ -941,11 +903,7 @@ global void InitMapFogOfWar(void)
 {
 	VisibleTable = malloc(TheMap.Width * TheMap.Height * sizeof(*VisibleTable));
 
-#ifdef USE_OPENGL
-	VideoDrawUnexplored = VideoDrawUnexploredOpenGL;
-	VideoDrawFog = VideoDrawFogOpenGL;
-	VideoDrawOnlyFog = VideoDrawOnlyFogOpenGL;
-#else
+#ifndef USE_OPENGL
 	//
 	//	Generate Only Fog surface.
 	//
@@ -968,9 +926,6 @@ global void InitMapFogOfWar(void)
 		SDL_SetAlpha(OnlyFogSurface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 		SDL_FreeSurface(s);
 	}
-	VideoDrawUnexplored = VideoDrawUnexploredSDL;
-	VideoDrawFog = VideoDrawFogSDL;
-	VideoDrawOnlyFog = VideoDrawOnlyFogSDL;
 #endif
 }
 
@@ -983,7 +938,7 @@ global void CleanMapFogOfWar(void)
 		free(VisibleTable);
 		VisibleTable = NULL;
 	}
-#ifndef OPENGL
+#ifndef USE_OPENGL
 	if (OnlyFogSurface) {
 		SDL_FreeSurface(OnlyFogSurface);
 		OnlyFogSurface = NULL;
