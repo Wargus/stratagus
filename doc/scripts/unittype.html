@@ -49,7 +49,7 @@
 <hr>
 <a href="#DefineAnimations">DefineAnimations</a>
 <a href="#DefineBoolFlags">DefineBoolFlags</a>
-<!-- <a href="#define-unit-stats">define-unit-stats</a> -->
+<a href="#DefineUnitStats">DefineUnitStats</a> -->
 <a href="#DefineUnitType">DefineUnitType</a>
 <a href="pud.html#DefineUnitTypeWcNames">DefineUnittypeWcNames</a>
 <a href="#GetUnitTypeIdent">GetUnitTypeIdent</a>
@@ -132,8 +132,8 @@ or spell condition definition.)
 </pre>
 
 <!--
-<a name="define-unit-stats"></a>
-<h3>(define-unit-stats ident player 'tag1 value1 'tag2 value2 ...)</h3>
+<a name="DefineUnitStats"></a>
+<h3>(DefineUnitStats ident player 'tag1 value1 'tag2 value2 ...)</h3>
 
 Define unit stats. This is mostly only used in savegames, but included
 here for completeness. In the game every unit of the same type of one
@@ -188,12 +188,11 @@ A special 'resource' is time, the time to train the unit in cycles.
 <h4>Example</h4>
 
 <pre>
-    (define-unit-stats 'unit-archer 14
+    (DefineUnitStats 'unit-archer 14
       'level 1 'speed 10 'attack-range 4 'sight-range 5
       'armor 0 'basic-damage 3 'piercing-damage 6 'hit-points 40
       'costs '(time 70 gold 500 wood 50 oil 0 ore 0 stone 0 coal 0) )
 </pre>
-<h4>Not Used</h4>
 -->
 <a name="DefineUnitType"></a>
 <h3>DefineUnitType( "ident", { tag1 = value1, tag2  = value2, ...})</h3>
@@ -284,7 +283,7 @@ files are not declared here. Please see the documentation on <a href="sound.html
 </dd>
 <!--
 <dt>The following stats are also included in a unit stats struct and are upgradeable, see
-<a href="#define-unit-stats">define-unit-stats</a>
+<a href="#DefineUnitStats">DefineUnitStats</a>
 </dt>
 -->
 <dt>Speed = number</dt>
@@ -636,7 +635,6 @@ Get the ident of the unit-type structure.
 <pre>
     GetUnitTypeIdent(unit-type)
 </pre>
-<h4>Not Used</h4>
 
 <a name="GetUnitTypeName"></a>
 <h3>GetUnitTypeName(unit-type)</h3>
@@ -655,7 +653,6 @@ Get the name of the unit-type structure.
 <pre>
     GetUnitTypeName(unit-type)
 </pre>
-<h4>Not Used</h4>
 
 <a name="SetUnitTypeName"></a>
 <h3>SetUnitTypeName(unit-type, name)</h3>
@@ -677,7 +674,6 @@ Set the name of the unit-type structure.
 <pre>
     SetUnitTypeName(unit-type, name)
 </pre>
-<h4>Not Used</h4>
 
 <a name="UnitType"></a>
 <h3>UnitType(ident)</h3>

@@ -49,49 +49,28 @@
 <a href="ccl-index.html">Index</a> 
 <hr>
 <a href="#DefineAi">DefineAi</a>
-<a href="#DefineAiAction">DefineAiAction</a>
 <a href="#DefineAiHelper">DefineAiHelper</a>
 <a href="#DefineAiPlayer">DefineAiPlayer</a>
 <a href="pud.html#DefineAiWcNames">DefineAiWcNames</a>
-<a href="#AiAdhocForce">AiAdhocForce</a>
 <a href="#AiCheckForce">AiCheckForce</a>
-<a href="#AiClearForce">AiClearForce</a>
 <a href="#AiComputeGauges">AiComputeGauges</a>
 <a href="#AiDebug">AiDebug</a>
-<a href="#AiDebugGuages">AiDebugGuages</a>
 <a href="#AiDebugPlayer">AiDebugPlayer</a>
 <a href="#AiDump">AiDump</a>
-<a href="#AiEvaluateForceCost">AiEvaluateForceCost</a>
 <a href="#AiForce">AiForce</a>
-<a href="#AiForceActive">AiForceActive</a>
-<a href="#AiForceComplete">AiForceComplete</a>
-<a href="#AiForceEmpty">AiForceEmpty</a>
-<a href="#AiForceGoHome">AiForceGoHome</a>
-<a href="#AiForceList">AiForceList</a>
 <a href="#AiForceRole">AiForceRole</a>
-<a href="#AiForceTransfer">AiForceTransfer</a>
-<a href="#AiGetForce">AiGetForce</a>
-<a href="#AiGetGauge">AiGetGauge</a>
 <a href="#AiGetRace">AiGetRace</a>
-<a href="#ai:get-sleep-cycles">ai:get-sleep-cycles</a>
-<a href="#ai:get-unittype-force">ai:get-unittype-force</a>
-<a href="#ai:hotspot-attack-with-force">ai:hotspot-attack-with-force</a>
-<a href="#ai:idle">ai:idle</a>
-<a href="#ai:need">ai:need</a>
-<a href="#ai:own-force">ai:own-force</a>
-<a href="#ai:player">ai:player</a>
-<a href="#ai:research">ai:research</a>
-<a href="#ai:restart">ai:restart</a>
-<a href="#ai:script">ai:script</a>
-<a href="#ai:set">ai:set</a>
-<a href="#ai:set-auto-attack">ai:set-auto-attack</a>
-<a href="#ai:set-collect!">ai:set-collect!</a>
-<a href="#ai:set-reserve!">ai:set-reserve!</a>
-<a href="#ai:sleep">ai:sleep</a>
-<a href="#ai:timed-wait-force">ai:timed-wait-force</a>
-<a href="#ai:upgrade-to">ai:upgrade-to</a>
-<a href="#ai:wait">ai:wait</a>
-<a href="#ai:wait-force">ai:wait-force</a>
+<a href="#AiGetSleepCycles">AiGetSleepCycles</a>
+<a href="#AiNeed">AiNeed</a>
+<a href="#AiPlayer">AiPlayer</a>
+<a href="#AiResearch">AiResearch</a>
+<a href="#AiSet">AiSet</a>
+<a href="#AiSetCollect">AiSetCollect</a>
+<a href="#AiSetReserve">AiSetReserve</a>
+<a href="#AiSleep">AiSleep</a>
+<a href="#AiUpgradeTo">AiUpgradeTo</a>
+<a href="#AiWait">AiWait</a>
+<a href="#AiWaitForce">AiWaitForce</a>
 
 <hr>
 <h2>Intro - Introduction to AI functions and variables</h2>
@@ -105,16 +84,12 @@ There are two kinds of scripts :
 <ul>
   <li>The main script. It starts buildings, upgrades, ...</li>
   <li>The action/reaction scripts. They are started by the AI engine, under certain condition.<br>
-  They can use the gauge mecanism to decide which types and how many units to send, ... See <a href="#AiGetGauge">AiGetGauge</a> for details.
   </li>
 </ul>
 Scripts can arrange and control units using forces : <br>
 A script can ask for some type of unit in a force (using <a href="#AiForce">AiForce</a>), 
-and then wait for them to be ready (using <a href="#ai:wait-force">ai:wait-force</a>).<br>
-Then it can send them to attack ( <a href="#ai:hotspot-attack-with-force">ai:hotspot-attack-with-force</a> ) 
-or back home ( <a href="#AiForceGoHome">AiForceGoHome</a> ).
+and then wait for them to be ready (using <a href="#AiWaitForce">AiWaitForce</a>).<br>
 <br>
-Each action/reaction script has a specific force which keeps all its units. ( see <a href="#ai:own-force">ai:own-force</a> )<br>
 <br>
 The force 0 is a special case : it holds all the unassigned units, and is used to fill other forces. 
 ( when needed, units are transfered from force 0 to others ). Attacker units in force 0 won't be used for attacks<br>
@@ -160,101 +135,8 @@ time the next statement is executed. No statement should use more than 3 ms.
 <pre>
     ;; Defines the passive computer AI, which does nothing.
 (DefineAi "passive-ai" "*" "passive"
-  '((ai:sleep	10000)
-  (ai:restart) ))
+  '((AiSleep	10000)
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="DefineAiAction"></a>
-<h3>(DefineAiAction '(flags...) '( (name create-force-lambda drive-action-script) ... ))</h3>
-
-This defines an action which can be used for attacking of defending.
-
-
-<dl>
-<dt>flags</dt>
-<dd>Can be defense, attack or both. The action will be used for attacking or defending, depending on the flags set.<br>
-A defense script will be thrown when a computer controlled unit 
-which is not attacking ( i.e. units in force 0 ) is attacked. 
-In that case, the hotspot (see <a href="#get-gauge">get-gauge</a>)
-will be set to the position of the attacker<br>
-Attack scripts are evaluated from time to time using random enemy unit as target (hotspot). 
-When an evaluation looks good, the corresponding script is started. 
-( An evaluation "looks good" if units are ready to be sent and the value of the attacked area is interesting. ) 
-</dd>
-<dt>name</dt>
-<dd>Unique name of this AI action.
-</dd>
-<dt>create-force-lambda</dt>
-<dd>Name of a scheme lambda which will be used to create the force. 
-It will receive one parameter : the second parameter of DefineAiAction. The hotspot (see <A HREF='#get-gauge-value'>get-gauge-value</A> )  will be set on the area the AI needs to defend or attack.
-It must returns a int value indicating wether the action can be started : 
-<ul>
-<li>-1 if the action should not occur at all,
-<li>0 if the action is ready to start,
-<li>&gt;0 if the force may be ready in the future. ( see <A HREF='#evaluate-force-cost'>evaluate-force-cost</A> ).
-</ul>
-</dd>
-<dt>drive-action-script</dt>
-<dd>Name of a scheme script which be used to "drive" the attack ( or defense). The script must have the same form as those defined by <A href="#DefineAi">DefineAi</A>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; This simple scheme lambda ask for 10 grunt and 20 troll...
-    ;; the script parameter could be used to tune those values.
-(define create-force-lambda 
-  (lambda (script)
-    (begin
-        ;; Clear the action's force
-      (AiClearForce (ai:own-force))	
-        ;; update the force to ask for units
-      (AiForceList (cons (ai:own-force) '(unit-grunt 10 unit-troll 20)))
-        ;; take units from force 0...
-      (AiForceComplete (ai:own-force))
-        ;; return an evaluation of what is missing ( will return -1 if can't build required units )
-      (AiEvaluateForceCost (ai:own-force)) )))
-
-    ;; this script just send the force to attack at the current hotspot.
-(define simple-attack-script
-  '(
-        ;; send whole force to attack
-     (ai:hotspot-attack-with-force (ai:own-force))
-        ;; wait until force is totally idle...
-     (if (AiForceActive (ai:own-force))
-        (ai:idle))
-	;; Send force to home and release it ( so that units can be reused )
-     (begin
-        ;; Send units home,
-        ;; and forget about them.
-        (AiForceGoHome (ai:own-force))
-        (AiClearForce (ai:own-force))) ))
-
-    ;; describe a new action which will be available to the AI.
-(DefineAiAction '(attack)
-  '(
-      (
-          ;; name
-	dummy-attack
-	  ;; create-force lambda
-	create-force-lambda
-	  ;; script to use
-	simple-attack-script
-      )
-        ;; You could add some internal stuffs there, and use it in create-force-lambda.
-      ;; ...
-))
-
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="DefineAiHelper"></a>
 <h3>(DefineAiHelper (list))</h3>
@@ -371,10 +253,6 @@ A minimal AI helper definition:
 <p>To fix the food shortage the AI must build farms.
 <p>For the AI is a keep equivalent to a town hall.
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
 <a name="DefineAiPlayer"></a>
 <h3>(DefineAiPlayer (list ...))</h3>
 
@@ -395,48 +273,6 @@ FIXME:
     (DefineAiPlayer (list ...))
 </pre>
 
-<h4>Not Used</h4>
-
-<a name="AiAdhocForce"></a>
-<h3>(AiAdhocForce requirements unittypes)</h3>
-
-Create a force to respond to the given requirements. 
-The force updated is (<a href="#ai:own-force">ai:own-force</a>).<br>
-Force is populated with available units.<br>
-If such a force cannot be created, return False. True otherwise.
-
-<dl>
-<dt>requirements</dt>
-<dd>A list of land/sea/air power that the force must have.
-</dd>
-<dt>unittypes</dt>
-<dd>A list of unittypes which can be used to create the force.
-The force will be created using a subset (or all) of those unittypes.<br>
-If a unittype is given twice ( or more... ), it will increase 
-its representation in the resulting force. 
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-      ;; Create a force composed of grunt and trolls to respond to enemy forces on the hotspot    
-    (if 
-      (AiAdhocForce 
-        (list 
-	  (AiGetGauge 'enemy-hotspot-ground-force)
-          (AiGetGauge 'enemy-hotspot-sea-force)
-          (AiGetGauge 'enemy-hotspot-air-force))
-	(unittype-grunt unittype-troll))
-        ;; Force OK ?
-      (ai:hotspot-attack-with-force (ai:own-force))
-        ;; Not ok ? arg.
-      (writes nil "Can't defend with grunts and trolls!"))
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
 <a name="AiCheckForce"></a>
 <h3>(AiCheckForce force)</h3>
 
@@ -456,26 +292,8 @@ supported.
     ;; Force 0 is build with one footman. When the force is ready, sleep for
     ;; 500 frames.
     (AiForce 0 'unit-footman 1)
-    (if (AiCheckForce 0) (ai:sleep 500))
+    (if (AiCheckForce 0) (AiSleep 500))
 </pre>
-
-<h4>Not Used</h4>
-
-<a name="AiClearForce"></a>
-<h3>(AiClearForce force)</h3>
-
-Reset a force. ( set all needs to 0, unassign all units. ) 
-
-<dl>
-<dt>force</dt>
-<dd>Number of the force to clear. 0 - 9 is currently
-supported.
-</dd>
-</dl>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="AiDebug"></a>
 <h3>(AiDebug flag)</h3>
@@ -496,26 +314,6 @@ Enable or disable the debug output of the AI script execution.
     (AiDebug #t)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="AiDebugGuages"></a>
-<h3>(AiDebugGuages)</h3>
-
-Dump all the gauges on the stdout.
-
-<h4>Example</h4>
-
-<pre>
-    ;; Prints all the gauges on stdout...
-    (AiDebugGuages)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
 <a name="AiDebugPlayer"></a>
 <h3>(AiDebugPlayer 1 2 3 ...)</h3>
 
@@ -529,10 +327,6 @@ Parameters are player number, or 'self, for thisplayer.<br>
     (AiDebugPlayer 'self)
 </pre>
 
-<h4>Used</h4>
-
-During the game...
-
 <a name="AiDump"></a>
 <h3>(AiDump)</h3>
 
@@ -545,34 +339,6 @@ Dump some AI debug information.
     ;; Prints out some debug information.
     (AiDump)
 </pre>
-
-<h4>Not Used</h4>
-
-<a name="AiEvaluateForceCost"></a>
-<h3>(AiEvaluateForceCost force)</h3>
-
-Evaluate ressource and time needed to complete a force.
-The returned value is compatible with the one returned by an action lambda 
-( see <a href="#DefineAiAction">DefineAiAction</a> ) :
-<ul>
-  <li>-1 : the force can't be completed</li>
-  <li>0 : the force is ready</li>
-  <li>&gt;0 : the force can be completed ( the higher the harder/longer )</li>
-</ul>
-
-<dl>
-<dt>force</dt>
-<dd>The force to evaluate.
-</dd>
-</dl>
-
-<h4>See also</h4>
-
-<a href="#DefineAiAction">DefineAiAction</a>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <a name="AiForce"></a>
 <h3>(AiForce force unit-type-1 count-1 ... unit-type-N count-N)</h3>
@@ -618,119 +384,6 @@ each unit-type one after the other?</i>
     (AiForce 1 'unit-footman 3 'unit-bowman 2)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="AiForceActive"></a>
-<h3>(AiForceActive force)</h3>
-
-Return #t if the force is active, #f otherwise. A force is active while at least one units is not standing.
-
-<i>
-An empty force is not active.
-</i>
-
-<dl>
-<dt>force</dt>
-<dd>Number of the force to check. 0 - 9 is currently supported.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; Wait until the force has completed attack.
-    (if (AiForceActive (ai:own-force))
-    	(ai:idle))
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="AiForceComplete"></a>
-<h3>(AiForceComplete force)</h3>
-
-Complete a force using units from reserve.<br>
-If the force created is an attack force, only units from attack reserve will used ( force 1 ). 
-For defense force, all reserve forces will be used ( force 0 and 1 )  
-
-<dl>
-<dt>force</dt>
-<dd>Force to complete. 0 - 9 is currently supported.
-</dd>
-</dl>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="AiForceEmpty"></a>
-<h3>(AiForceEmpty force)</h3>
-
-Return #t if the force is empty ( no unit ), #f otherwise.
-
-<dl>
-<dt>force</dt>
-<dd>Number of the force to check. 0 - 9 is currently supported.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; Wait until the force is completely destroyed. ( possibly hand forever... )
-    (if (not (AiForceEmpty (ai:own-force)))
-    	(ai:idle))
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="AiForceGoHome"></a>
-<h3>(AiForceGoHome force)</h3>
-
-Send all units of the force to home. 
-
-<i>
-Home means in fact the player start position. This should be improved.
-</i>
-
-<dl>
-<dt>force</dt>
-<dd>Number of the force to send back home. 0 - 9 is currently supported.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; Wait until the force has finished attacking.
-    (if (AiForceActive (ai:own-force))
-    	(ai:idle))
-    ;; Send units to home...
-    (AiForceGoHome (ai:own-force))
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="AiForceList"></a>
-<h3>(AiForceList '(force unittype count unittype count ... ))</h3>
-
-Same as <a href="#AiForce">AiForce</a>, but all arguments are stored in a list. 
-
-<h4>See also</h4>
-
-<a href="#AiForce">AiForce</a>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
 <a name="AiForceRole"></a>
 <h3>(AiForceRole force role)</h3>
 
@@ -754,136 +407,6 @@ supported.
     (AiForceRole 0 'attack)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="AiForceTransfer"></a>
-<h3>(AiForceTransfer source destination)</h3>
-
-Move units from the source force to fill the destination force.
-No move will be done if the destination force is already full.
-
-<dl>
-<dt>source</dt>
-<dd>Number of the source force. 0 - 9 is currently supported.
-</dd>
-<dt>destination</dt>
-<dd>Number of the destination force. 0 - 9 is currently supported.
-</dd>
-</dl>
-
-<h4>Not Used</h4>
-
-<a name="AiGetForce"></a>
-<h3>(AiGetForce force)</h3>
-
-Returns the force requirements as a list of unittype and count.
-
-<dl>
-<dt>force</dt>
-<dd>Number of the force. 0 - 9 is currently supported.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; Make a carbon copy of force 0 into force 1...
-    (AiForceList (cons 1 (AiGetForce 0)))
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="AiGetGauge"></a>
-<h3>(AiGetGauge gauge)</h3>
-
-Returns the value of a given gauge.<br>
-Each gauge is identified by a name. Available gauges are :
-<ul>
-<li>Scores<ul>		    
-		<li>allied-score enemy-score self-score
-</li>		
-</ul></li><li>ressources<ul>
-		<li>gold-hotspot gold-map wood-hotspot wood-map oil-hotspot oil-map
-</li>		
-</ul></li><li>fire power over sea<ul>				
-		<li>allied-hotspot-sea-fire enemy-hotspot-sea-fire self-hotspot-sea-fire
-</li>		
-		<li>allied-map-sea-fire enemy-map-sea-fire self-map-sea-fire
-</li>		
-</ul></li><li>fire power on ground<ul>		
-		<li>allied-hotspot-ground-fire enemy-hotspot-ground-fire self-hotspot-ground-fire
-</li>		
-		<li>allied-map-ground-fire enemy-map-ground-fire self-map-ground-fire
-</li>				
-</ul></li><li>fire power on air<ul>		
-		<li>allied-hotspot-air-fire enemy-hotspot-air-fire self-hotspot-air-fire
-</li>		
-		<li>allied-map-air-fire enemy-map-air-fire self-map-air-fire
-</li>		
-</ul></li><li>detectors<ul>
-		<li>allied-hotspot-detectors enemy-hotspot-detectors  self-hotspot-detectors
-</li>		
-		<li>allied-map-detectors enemy-map-detectors self-map-detectors
-</li>		
-</ul></li><li>fire power from sea<ul>		
-		<li>allied-hotspot-sea-force enemy-hotspot-sea-force self-hotspot-sea-force
-</li>		
-		<li>allied-map-sea-force enemy-map-sea-force self-map-sea-force
-</li>		
-</ul></li><li>fire power from ground<ul>		
-		<li>allied-hotspot-ground-force enemy-hotspot-ground-force self-hotspot-ground-force
-</li>		
-		<li>allied-map-ground-force enemy-map-ground-force self-map-ground-force
-</li>		
-</ul></li><li>fire power from air<ul>
-		<li>allied-hotspot-air-force enemy-hotspot-air-force self-hotspot-air-force
-</li>		
-		<li>allied-map-air-force enemy-map-air-force self-map-air-force
-</li>
-</ul></li><li>points value of units on the sea<ul>		
-		<li>allied-hotspot-sea-value enemy-hotspot-sea-value self-hotspot-sea-value
-</li>		
-		<li>allied-map-sea-value enemy-map-sea-value self-map-sea-value
-</li>		
-</ul></li><li>points value of units on ground<ul>
-		<li>allied-hotspot-ground-value enemy-hotspot-ground-value self-hotspot-ground-value
-</li>		
-		<li>allied-map-ground-value enemy-map-ground-value self-map-ground-value
-</li>		
-</ul></li><li>points value of units on the sky<ul>		
-		<li>allied-hotspot-air-value enemy-hotspot-air-value self-hotspot-air-value 
-</li>		
-		<li>allied-map-air-value enemy-map-air-value self-map-air-value 
-</li>
-</ul></li><li>invisibles units<ul>
-		<li>allied-hotspot-invisibles enemy-hotspot-invisibles self-hotspot-invisibles
-</li>		
-		<li>allied-map-invisibles enemy-map-invisibles self-map-invisibles
-</li>
-</ul></ul><br>
-
-<i>Gauges about ressources are not correctly computed.</i>
-
-<i>To get the individual value of an unit type in the fire power gauges, use <a href="#ai:get-unittype-force">ai:get-unittype-force</a></i>  
-
-<dl>
-<dt>gauge</dt>
-<dd>Identifier of the gauge.
-</dd>
-</dl>
-
-<h4>See also</h4>
-
-<a href="#ai:get-unittype-force">ai:get-unittype-force</a>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
 <a name="AiGetRace"></a>
 <h3>(AiGetRace)</h3>
 
@@ -897,12 +420,8 @@ Get the race of the current AI player.
     (AiGetRace)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:get-sleep-cycles"></a>
-<h3>(ai:get-sleep-cycles)</h3>
+<a name="AiGetSleepCycles"></a>
+<h3>(AiGetSleepCycles)</h3>
 
 Get the number of cycles to sleep.
 
@@ -911,98 +430,13 @@ Get the number of cycles to sleep.
 
 <pre>
     ;; Returns the number of cycles to sleep.
-    (ai:get-sleep-cycles)
+    (AiGetSleepCycles)
 </pre>
 
-<h4>Not Used</h4>
-
-<a name="ai:get-unittype-force"></a>
-<h3>(ai:get-unittype-force unittype)</h3>
-
-Return the contribution of a given unittype in gauge computation.
-
-<h4>Example</h4>
-
-The following code create and send some grunt to attack on the hotspot.
-<pre>
-    ;; Calculate the number of grunt to sent ....
-    (let      
-      (( grunt-nb 
-	(quotient 
-	  (get-gauge 'enemy-hotspot-ground-force)
-	  (get-unittype-force 'unittype-grunt))))
-	;; create a force with the accurate number of grunt  
-      (AiForce (ai:own-force) unittype-grunt grunt-nb)
-      (ai:wait-force (ai:own-force))
-      (ai:hotspot-attack-with-force (ai:own-force)))	
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<h4>See also</h4>
-
-<a href="#AiGetGauge">AiGetGauge</a>
-
-<a name="ai:hotspot-attack-with-force"></a>
-<h3>(ai:attack-with-force force)</h3>
-
-Attack the opponent with a force. The attack place is taken from the hotspot position.
-
-<dl>
-<dt>force</dt>
-<dd>Number of the force to which the units should belong. 0 - 9 is currently
-supported.22
-</dd>
-</dl>
-
-<i>The force isn't moved as unit, faster units attacks first, than later the
-slower units will attack.</i>
-
-<h4>Example</h4>
-
-<pre>
-    ;; Force 0 is built with one footman. The script continues processing, if the
-    ;; footman is ready trained. Now attack the opponent with force 0.
-    (AiForce 0 'unit-footman 1)
-    (ai:wait-force 0)
-    (ai:hotspot-attack-with-force 0)
-</pre>
-
-<h4>See also</h4>
-
-<a href="#ai:attack-with-force">ai:attack-with-force</a>
-
-<a href="#AiForceGoHome">AiForceGoHome</a>
-
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:idle"></a>
-<h3>(ai:idle)</h3>
-
-Just return #f, to suspend AI script execution.
-
-<h4>Example</h4>
-
-<pre>
-    ;; Wait while the force is active
-  (if (AiForceActive (ai:own-force))
-  	(ai:idle))
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:need"></a>
-<h3>(ai:need unit-type)</h3>
+<h3>(AiNeed unit-type)</h3>
 
 Tells the AI that it should have an unit of this unit-type. The AI builds or
-trains units in this order of the ai:set/ai:need commands. If the unit or an
+trains units in this order of the AiSet/AiNeed commands. If the unit or an
 equivalent unit already exists, the AI does nothing. If the unit is lost, it is
 automatic rebuild. If the units are requested in wrong order, the AI could 
 hang up. Resources are collected automatic and farms are automatic build, but
@@ -1019,32 +453,12 @@ additional could be requested.
 
 <pre>
     ;; The great hall must be build before a barrack.
-  (ai:need (unit-type 'unit-great-hall))
-  (ai:need (unit-type 'unit-barrack))
+  (AiNeed (unit-type 'unit-great-hall))
+  (AiNeed (unit-type 'unit-barrack))
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:own-force"></a>
-<h3>(ai:own-force)</h3>
-
-Return the number of the force which is dedicated to the currently executing AI script.
-
-<h4>Example</h4>
-
-<pre>
-    ;; Require a grunt in the script's force
-  (AiForce (ai:own-force) 'unittype-grunt 1 )
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:player"></a>
-<h3>(ai:player)</h3>
+<a name="AiPlayer"></a>
+<h3>(AiPlayer)</h3>
 
 Return the player of the running AI.
 
@@ -1053,13 +467,11 @@ Return the player of the running AI.
 
 <pre>
     ;; Returns the player of the running AI.
-    (ai:player)
+    (AiPlayer)
 </pre>
 
-<h4>Not Used</h4>
-
-<a name="ai:research"></a>
-<h3>(ai:research upgrade)</h3>
+<a name="AiResearch"></a>
+<h3>(AiResearch upgrade)</h3>
 
 Let the AI research an upgrade, upgrades are reseached in command order.
 And automatic researched if lost. Building orders have a higher priority.
@@ -1077,71 +489,19 @@ AI could hang up.
 
 <pre>
     ;; Research a better armor for land units.
-    (ai:research 'upgrade-shield1)
+    (AiResearch 'upgrade-shield1)
 </pre>
 
-<h4>Used</h4>
+<a name="AiSet"></a>
+<h3>(AiSet unit-type count)</h3>
 
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:restart"></a>
-<h3>(ai:restart)</h3>
-
-Restart with the main AI script. Could be used as longjmp for the AI
-scripts.
-
-
-<h4>Example</h4>
-
-<pre>
-    ;; A endless script doing nothing.
-(DefineAi "passive" "*" "passive"
-  '( (ai:sleep   10000)
-     (ai:restart) ))
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:script"></a>
-<h3>(ai:script script)</h3>
-
-Execute a new script, can be used for loops, subroutines. But this must be
-handled by the user.
-
-
-<dl>
-<dt>script</dt>
-<dd>A list of AI commands. Executed one after the other.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; An example with a for ever loop. Wait for force 1 ready (all units trained),
-    ;; than attack with the force 1. This is done endless.
-(define attack-endloop
-  '((ai:with-force 1)
-    (ai:attack-with-force 1)
-    (ai:script attack-endloop) ))
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:set"></a>
-<h3>(ai:set unit-type count)</h3>
-
-This ai:need with a number. Tells the AI that it should have a specified number
+This AiNeed with a number. Tells the AI that it should have a specified number
 of an unit of this unit-type. The AI builds or trains units in this order of
-the ai:set/ai:need commands. If the unit or an equivalent unit already exists,
+the AiSet/AiNeed commands. If the unit or an equivalent unit already exists,
 the AI does nothing. If the units are lost, they are automatic rebuild. If the
 units are requested in wrong order, the AI could hang up. Resources are
 collected automatic and farms are automatic build, but additional could be
-requested. In the opposite to ai:need, which always inserts a request, ai:set
+requested. In the opposite to AiNeed, which always inserts a request, AiSet
 modifies the last request to the new number.
 
 
@@ -1158,50 +518,11 @@ modifies the last request to the new number.
 
 <pre>
     ;; Request two peons.
-    (ai:set 'unit-peon 2)
+    (AiSet 'unit-peon 2)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:set-auto-attack"></a>
-<h3>(ai:set-auto-attack flag)</h3>
-
-Enable or disable the automatic start of attack scripts.<br>
-This is usefull to prevent AI from trying to attack when it can only
-produce simple units...
-
-<dl>
-<dt>flag</dt>
-<dd>#t will active automatic attack, #f disable it...
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; To make an air AI attack only when it can send flyers...
-    (ai:set-auto-attack #f)
-    
-    ;; ... let's develop
-    
-    ;; Create the attack reserve
-    (AiForce 1 'unit-dragon 2)
-    
-    ;; Wait until it's ready
-    (ai:wait-force 1)
-    
-    ;; Then start auto-attack.    
-    (ai:set-auto-attack #t)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:set-collect!"></a>
-<h3>(ai:set-collect! #(time gold wood oil ore stone coal))</h3>
+<a name="AiSetCollect"></a>
+<h3>(AiSetCollect #(time gold wood oil ore stone coal))</h3>
 
 Set AI player resource collect percent.
 
@@ -1234,13 +555,11 @@ Set AI player resource collect percent.
 
 <pre>
     ;; Set the collect percent to 50% gold and 50% wood.
-    (ai:set-collect! #(0  50 50 0  0 0 0))
+    (AiSetCollect #(0  50 50 0  0 0 0))
 </pre>
 
-<h4>Not Used</h4>
-
-<a name="ai:set-reserve!"></a>
-<h3>(ai:set-reserve! #( time gold wood oil ore stone coal))</h3>
+<a name="AiSetReserve"></a>
+<h3>(AiSetReserve #( time gold wood oil ore stone coal))</h3>
 
 Set AI player resource reserve.
 
@@ -1273,13 +592,11 @@ Set AI player resource reserve.
 
 <pre>
     ;; Set all of the reserves to 0.
-    (ai:set-reserve! #( 0  0 0 0  0 0 0))
+    (AiSetReserve #( 0  0 0 0  0 0 0))
 </pre>
 
-<h4>Not Used</h4>
-
-<a name="ai:sleep"></a>
-<h3>(ai:sleep frames)</h3>
+<a name="AiSleep"></a>
+<h3>(AiSleep frames)</h3>
 
 Wait some frames, to let the opponent (you) recover.
 
@@ -1294,48 +611,11 @@ Wait some frames, to let the opponent (you) recover.
 
 <pre>
     ;; Wait 500 frames ~16s.
-    (ai:sleep 500)
+    (AiSleep 500)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:timed-wait-force"></a>
-<h3>(ai:timed-wait-force force frame)</h3>
-
-Wait until a force is complete or a timer expires. ( as <a href="#ai:wait-force">ai:wait-force</a> does )
-
-<dl>
-<dt>force</dt>
-<dd>Number of the force to which the units should belong. 0 - 9 is currently
-supported.
-</dd>
-<dt>frame</dt>
-<dd>Maximum number of frame to wait for the force
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; Force 0 is build with one footman. The script continues processing, if the
-    ;; footman is ready trained.
-    
-    ;; If the footman is not ready in the next 1000 frames, the ai is restarted 
-    (AiForce 0 'unit-footman 1)
-    (ai:timed-wait-force 0 1000)
-    (if (not (AiCheckForce 0))
-    	;; Force not ready => restart !
-	(ai:restart))
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:upgrade-to"></a>
-<h3>(ai:upgrade-to unit-type)</h3>
+<a name="AiUpgradeTo"></a>
+<h3>(AiUpgradeTo unit-type)</h3>
 
 Upgrade units to an improved type. You must give for each unit you want to
 upgrade an upgrade command. The computer automatic searches which unit it
@@ -1352,15 +632,11 @@ upgrades.
 
 <pre>
     ;; Upgrade a town-hall to keep.
-    (ai:upgrade-to 'unit-keep)
+    (AiUpgradeTo 'unit-keep)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:wait"></a>
-<h3>(ai:wait type)</h3>
+<a name="AiWait"></a>
+<h3>(AiWait type)</h3>
 
 Waits until the *first* request of this unit-type is completed.
 Don't forget to request an unit-type, before you wait on it.
@@ -1376,16 +652,12 @@ Don't forget to request an unit-type, before you wait on it.
 
 <pre>
     ;; Proceed only if a peasant is ready.
-    (ai:need 'unit-peasant)
-    (ai:wait 'unit-peasant)
+    (AiNeed 'unit-peasant)
+    (AiWait 'unit-peasant)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
-
-<a name="ai:wait-force"></a>
-<h3>(ai:wait-force force)</h3>
+<a name="AiWaitForce"></a>
+<h3>(AiWaitForce force)</h3>
 
 Wait until a force is complete, the forces are build in force number order.
 First 0, than 1, last 9.
@@ -1404,12 +676,8 @@ supported.
     ;; Force 0 is build with one footman. The script continues processing, if the
     ;; footman is ready trained.
     (AiForce 0 'unit-footman 1)
-    (ai:wait-force 0)
+    (AiWaitForce 0)
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </a>
 
 <h2>Notes</h2>
 
@@ -1423,20 +691,20 @@ If you want to write this you know who to contact.
 </pre><p style="margin-left:1cm;">
 This is the AI "wc2-example" usable for human race and land-attack.
 </p><pre>
-  '( (ai:need (unit-type 'unit-great-hall))
+  '( (AiNeed (unit-type 'unit-great-hall))
 </pre><p style="margin-left:1cm;">
 The first need unit is the great-hall.
 </p><pre>
-     (ai:need 'unit-peon)
+     (AiNeed 'unit-peon)
 </pre><p style="margin-left:1cm;">
 The next unit should be the peon.
 </p><pre>
-     (ai:wait 'unit-great-hall)
+     (AiWait 'unit-great-hall)
 </pre><p style="margin-left:1cm;">
 Now wait until the great hall is available. Could hang if no great hall can be
 build.
 </p><pre>
-     (ai:wait 'unit-peon) ))
+     (AiWait 'unit-peon) ))
 </pre><p style="margin-left:1cm;">
 Now wait unit we have a worker to build the next things.
 </p>

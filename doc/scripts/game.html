@@ -68,7 +68,6 @@
 <a href="#GameCycle">GameCycle</a>
 <a href="#GetStratagusHomePath">GetStratagusHomePath</a>
 <a href="#GetStratagusLibraryPath">GetStratagusLibraryPath</a>
-<a href="#Getplayerresource">GetPlayerResource</a>
 <a href="#GetThisPlayer">GetThisPlayer</a>
 <a href="#GetUnitMana">GetUnitMana</a>
 <a href="#GetUnitUnholyArmor">GetUnitUnholyArmor</a>
@@ -93,7 +92,6 @@
 <a href="#SetGamePaused">SetGamePaused</a>
 <a href="#SetGroupId">SetGroupId</a>
 <a href="#SetObjectives">SetObjectives</a>
-<a href="#SetPlayerResource">SetPlayerResource</a>
 <a href="#SetSharedVision">SetSharedVision</a>
 <a href="#SetThisPlayer">SetThisPlayer</a>
 <a href="#SetUnitMana">SetUnitMana</a>
@@ -609,29 +607,6 @@ Returns the current game cycle.
     GetStratagusLibraryPath()
 </pre>
 
-<a name="GetPlayerResource"></a>
-<h3>GetPlayerResource(player resource)</h3>
-
-Get the amount of a resource for a certain player.
-
-<dl>
-<dt>player</dt>
-<dd>Player number.
-</dd>
-<dt>resource</dt>
-<dd>Name of the resource.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    -- Gets the amount of gold that player 0 has.
-    GetPlayerResource(0, "gold")
-</pre>
-
-<h4>Not Used</h4>
-
 <a name="GetThisPlayer"></a>
 <h3>GetThisPlayer()</h3>
 
@@ -702,7 +677,6 @@ Get a unit's mana.
 <pre>
     Group()
 </pre>
-<h4>Used</h4>
 
 <a name="KillUnit"></a>
 <h3>KillUnit(unit player)</h3>
@@ -1081,8 +1055,6 @@ Pause or unpause the game.
     SetGamePaused(#t)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="SetGroupId"></a>
 <h3>SetGroupId()</h3>
 
@@ -1117,32 +1089,6 @@ Set the mission objectives.  This will overwrite any previous objectives.
 <pre>
     -- Sets the mission objectives.
     SetObjectives("Build 4 farms", "Mine 500 gold")
-</pre>
-
-<a name="SetPlayerResource"></a>
-<h3>SetPlayerResource(player resource amount [[resource amount] ...])</h3>
-
-Set the amount of resources for a certain player.
-
-
-<dl>
-<dt>player</dt>
-<dd>Player number.
-</dd>
-<dt>resource</dt>
-<dd>Name of the resource.
-</dd>
-<dt>amount</dt>
-<dd>Number to set the resource to.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    -- Sets player 0's gold to 2000.  Adds 500 gold to player 1.
-    SetPlayerResource(0, "gold", 2000)
-    SetPlayerResource(1, "gold", 500 + GetPlayerResource(1,"gold"))
 </pre>
 
 <a name="SetSharedVision"></a>

@@ -67,7 +67,6 @@
 <a href="#IfTimer">IfTimer</a>
 <a href="#IfUnit">IfUnit</a>
 <a href="#IfUnitAt">IfUnitAt</a>
-<a href="#SetTriggerNumber">SetTriggerNumber</a>
 <hr>
 <h2>Intro - Introduction to trigger functions and variables</h2>
 
@@ -91,10 +90,6 @@ The condition player is set to defeat.
         (ActionDefeat)))
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="ActionDraw"></a>
 <h3>(ActionDraw)</h3>
 
@@ -106,7 +101,6 @@ The condition player is set to draw. (NOT SUPPORTED)
 <pre>
     (ActionDraw)
 </pre>
-<h4>Not Used</h4>
 
 <a name="ActionSetSwitch"></a>
 <h3>(ActionSetSwitch number set)</h3>
@@ -130,8 +124,6 @@ Set a switch.
     (ActionSetSwitch 1 #t)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="ActionSetTimer"></a>
 <h3>(ActionSetTimer cycles increasing)</h3>
 
@@ -154,8 +146,6 @@ Set the timer.
     (ActionSetTimer 9000 0)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="ActionStartTimer"></a>
 <h3>(ActionStartTimer)</h3>
 
@@ -169,8 +159,6 @@ Start the timer.
     (ActionStartTimer)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="ActionStopTimer"></a>
 <h3>(ActionStopTimer)</h3>
 
@@ -183,8 +171,6 @@ Stop the timer.
     ;; Stops the timer.
     (ActionStopTimer)
 </pre>
-
-<h4>Not Used</h4>
 
 <a name="ActionVictory"></a>
 <h3>(ActionVictory)</h3>
@@ -203,10 +189,6 @@ The condition player is set to victory.
       '(
         (ActionVictory)))
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="ActionWait"></a>
 <h3>(ActionWait ms)</h3>
@@ -235,8 +217,6 @@ Causes the trigger to wait a minimum number of milliseconds.
         (add-message "World")
         #f))
 </pre>
-
-<h4>Not Used</h4>
 
 <a name="AddTrigger"></a>
 <h3>(AddTrigger condition action)</h3>
@@ -276,10 +256,6 @@ returns true and is removed if the action returns false.
         (ActionVictory)))
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="IfElapsed"></a>
 <h3>(IfElapsed op quantity)</h3>
 
@@ -307,8 +283,6 @@ Game run for duration.  If the game run for the duration game cycles the action 
     ;; If the game has run for 300 cycles.
     (IfElapsed '&gt;= 300)
 </pre>
-
-<h4>Not Used</h4>
 
 <a name="IfKills"></a>
 <h3>(IfKills player op quantity)</h3>
@@ -344,7 +318,6 @@ player for the action.
 <pre>
     (IfKills 'this '&gt;= 30)
 </pre>
-<h4>Not Used</h4>
 
 <a name="IfNearUnit"></a>
 <h3>(IfNearUnit player op quantity unit unit)</h3>
@@ -391,8 +364,6 @@ the action.
     (IfNearUnit 'this '== 6 'unit-archer 'unit-circle-of-power)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="IfOpponents"></a>
 <h3>(IfOpponents player op quantity)</h3>
 
@@ -426,9 +397,6 @@ Player has the quantity of opponents.
 <pre>
     (IfOpponents 'this '== 0)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="IfRescuedNearUnit"></a>
 <h3>(IfRescuedNearUnit player op quantity unit unit)</h3>
@@ -475,8 +443,6 @@ for the action.
     (IfRescuedNearUnit 'this '== 1 'unit-archer 'unit-circle-of-power)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="IfResource"></a>
 <h3>(IfResource player op quantity resource)</h3>
 
@@ -520,8 +486,6 @@ Name of the resource or:
     (IfResource 'this '&gt;= 5000 'gold)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="IfScore"></a>
 <h3>(IfScore player op quantity)</h3>
 
@@ -559,8 +523,6 @@ quantity of score the action is executed.
     (IfScore 'this '&gt;= 1000)
 </pre>
 
-<h4>Not Used</h4>
-
 <a name="IfSwitch"></a>
 <h3>(IfSwitch number set)</h3>
 
@@ -582,8 +544,6 @@ Checks the value of a switch.
     ;; Checks if switch 1 is on.
     (IfSwitch 1 #t)
 </pre>
-
-<h4>Not Used</h4>
 
 <a name="IfTimer"></a>
 <h3>(IfTimer op cycles)</h3>
@@ -612,8 +572,6 @@ Timer reaches quantity. If the timer reaches quantity the action is executed.
     ;; If the timer is at 0 cycles.
     (IfTimer '== 0)
 </pre>
-
-<h4>Not Used</h4>
 
 <a name="IfUnit"></a>
 <h3>(IfUnit player op quantity unit)</h3>
@@ -658,10 +616,6 @@ units must control the player for the action.
     ;; If the player on the console has at least 8 archers.
     (IfUnit 'this '&gt;= 8 'unit-archer)
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="IfUnitAt"></a>
 <h3>(IfUnitAt player op quantity unit location1 location2)</h3>
@@ -714,30 +668,6 @@ Player has the quantity of unit-type at a location.
     ;; (10 10) to (12 14).
     (IfUnitAt 'this '&gt;= 8 'unit-archer '(10 10) '(12 14))
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="SetTriggerNumber"></a>
-<h3>(SetTriggerNumber number)</h3>
-
-Set the current trigger number.
-
-
-<dl>
-<dt>number</dt>
-<dd>Trigger number (0 offset, -1 for no current trigger)</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; Set the current trigger to the first trigger.
-    (SetTriggerNumber 0)
-</pre>
-
-<h4>Not Used</h4>
 
 <hr>
 Last changed: $Id$<br>
