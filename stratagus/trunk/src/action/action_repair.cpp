@@ -246,8 +246,9 @@ global void HandleActionRepair(Unit* unit)
 			// FIXME: should I clear this here?
 			unit->Orders[0].Goal=goal=NULL;
 			NewResetPath(unit);
-		    } else if( !goal->HP ||
-				goal->Orders[0].Action==UnitActionDie ) {
+		    } else if( !goal->HP
+				|| goal->Orders[0].Action==UnitActionDie
+				|| goal->HP > goal->Stats->HitPoints ) {
 			unit->Orders[0].X=goal->X;
 			unit->Orders[0].Y=goal->Y;
 			RefsDebugCheck( !goal->Refs );
