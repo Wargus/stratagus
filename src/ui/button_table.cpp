@@ -214,7 +214,7 @@ local int bc_CheckUpgrade(const Unit* unit,const ButtonAction* button)
 	return 0;
     }
 
-    //DebugLevel0("%s\n",button->ValueStr);
+    DebugLevel3("%s\n",button->ValueStr);
     // check if allowed
     if ( !CheckDependByIdent( ThisPlayer, button->ValueStr ) ) {
 	return 0;
