@@ -790,7 +790,15 @@ global void UnitLost(Unit* unit)
 	temp=MakeUnitAndPlace(unit->X,unit->Y,UnitTypeOilPatch,&Players[15]);
 	temp->Value=unit->Value;
     }
+    DebugCheck( player->NumFoodUnits > UnitMax);
+    DebugCheck( player->NumBuildings > UnitMax);
+    DebugCheck( player->TotalNumUnits > UnitMax);
+    DebugCheck( player->UnitTypesCount[type->Type] > UnitMax);
+}
 
+global void UnitClearOrders(Unit *unit)
+{
+    int i;
     //
     //	Release all references of the unit.
     //
@@ -823,12 +831,8 @@ global void UnitLost(Unit* unit)
     }
     unit->Orders[0].Action=UnitActionStill;
     unit->SubAction=unit->State=0;
-
-    DebugCheck( player->NumFoodUnits > UnitMax);
-    DebugCheck( player->NumBuildings > UnitMax);
-    DebugCheck( player->TotalNumUnits > UnitMax);
-    DebugCheck( player->UnitTypesCount[type->Type] > UnitMax);
 }
+
 
 /**
 **	Update for new unit. Food and income ...
@@ -1523,6 +1527,18 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     //
     UnitLost(unit);
 
+    //Adjust Orders to remove Attack Order
+    //Mainly to protect peasants who are building.
+    for( i=0; i < MAX_ORDERS; i++) {
+        if (unit->Orders[i].Action==UnitActionAttack ||
+            unit->Orders[i].Action==UnitActionAttackGround) {
+            //Now see if it's an enemy..
+            //FIXME:Just Stops attacking at the moment
+               unit->Orders[i].Action=UnitActionStill;
+               unit->SubAction=unit->State=0;
+               break;
+        }
+    }
     //
     //	Now the new side!
     //
@@ -3002,6 +3018,7 @@ global void LetUnitDie(Unit* unit)
     if( type->OilPatch || unit->Removed ) {
 	RemoveUnit(unit);
 	UnitLost(unit);
+	UnitClearOrders(unit);
 	ReleaseUnit(unit);
 	return;
     }
@@ -3019,6 +3036,7 @@ global void LetUnitDie(Unit* unit)
 	    ,0,0);
 	RemoveUnit(unit);
 	UnitLost(unit);
+	UnitClearOrders(unit);
 	ReleaseUnit(unit);
 	return;
     }
@@ -3054,6 +3072,7 @@ global void LetUnitDie(Unit* unit)
 
 	RemoveUnit(unit);
 	UnitLost(unit);
+	UnitClearOrders(unit);
 
 	// FIXME: buildings should get a die sequence
 
@@ -3091,6 +3110,7 @@ global void LetUnitDie(Unit* unit)
 
     RemoveUnit(unit);
     UnitLost(unit);
+    UnitClearOrders(unit);
 
     // FIXME: ugly trick unit-peon-with-gold ... has no die sequence.
     if( type==UnitTypeHumanWorkerWithGold
@@ -3133,6 +3153,7 @@ global void DestroyAllInside(Unit* source)
 	        // LetUnitDie(unit);
 		RemoveUnit(unit);
 		UnitLost(unit);
+    		UnitClearOrders(unit);
 		ReleaseUnit(unit);
 	    }
 	}

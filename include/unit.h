@@ -714,6 +714,8 @@ extern Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player);
 extern void RemoveUnit(Unit* unit);
     /// Handle the loose of an unit (food,...)
 extern void UnitLost(Unit* unit);
+    /// Remove the Orders of a Unit
+extern void UnitClearOrders(Unit *unit);
     /// FIXME: more docu
 extern void UpdateForNewUnit(const Unit* unit,int upgrade);
     /// FIXME: more docu
