@@ -135,8 +135,7 @@ global void RevealMap(void)
 #ifdef NEW_FOW
 	    int i;
 	    for (i = 0; i < PlayerMax; ++i) {
-		if (Players[i].Type != PlayerNobody
-			&& !TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
+		if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
 		    TheMap.Fields[ix+iy*TheMap.Width].Visible[i]=1;
 		}
 	    }
