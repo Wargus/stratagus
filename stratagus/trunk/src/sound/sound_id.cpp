@@ -62,7 +62,7 @@ local int SoundIdHash[61];
 /**
 **	hash table used to store the mapping between sound name and sound id
 */
-local hashtable(int,61) SoundIdHash;
+local hashtable(int, 61) SoundIdHash;
 
 #endif
 
@@ -97,9 +97,9 @@ global void DisplaySoundHashTable(void)
 **	@param name	Name of the sound (now freed by caller!).
 **	@param id	Sound identifier.
 */
-global void MapSound(const char* name,const SoundId id)
+global void MapSound(const char* name, const SoundId id)
 {
-    *((SoundId*)hash_add(SoundIdHash,(char*)name))=id;
+    *((SoundId*)hash_add(SoundIdHash, (char*)name)) = id;
 }
 
 /**
@@ -113,9 +113,9 @@ global SoundId SoundIdForName(const char* name)
 {
     const SoundId* result;
 
-    DebugCheck( !name );
+    DebugCheck(!name);
 
-    if( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
+    if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
 	return *result;
     }
     DebugLevel0("Can't find sound `%s' in sound table\n" _C_ name);
@@ -134,22 +134,22 @@ global SoundId SoundIdForName(const char* name)
 **
 **	@return the sound id of the created group
 */
-global SoundId MakeSound(const char* name,char* file[],int nb)
+global SoundId MakeSound(const char* name, char* file[], int nb)
 {
     SoundId id;
     const SoundId* result;
 
-    DebugCheck( nb>255 );
+    DebugCheck(nb > 255);
 
-    if ( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
+    if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
 	DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
 	return *result;
     }
 
     // ask the server to register the sound
-    id=RegisterSound(file,nb);
+    id = RegisterSound(file, nb);
     // save the mapping from name to id in the hash table.
-    MapSound(name,id);
+    MapSound(name, id);
     return id;
 }
 
@@ -166,18 +166,18 @@ global SoundId MakeSound(const char* name,char* file[],int nb)
 **
 **	@return		Registered sound identifier.
 */
-global SoundId MakeSoundGroup(const char* name,SoundId first,SoundId second)
+global SoundId MakeSoundGroup(const char* name, SoundId first, SoundId second)
 {
     SoundId sound;
     const SoundId* result;
 
-    if ( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
+    if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
 	DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
 	return *result;
     }
 
-    sound=RegisterTwoGroups(first,second);
-    MapSound(name,sound);
+    sound=RegisterTwoGroups(first, second);
+    MapSound(name, sound);
 
     return sound;
 }
