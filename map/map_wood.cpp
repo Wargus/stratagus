@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+// T H E   W A R   B E G I N S
+// Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_wood.c	-	The map wood handling. */
+/**@name map_wood.c - The map wood handling. */
 //
-//	(c) Copyright 1999-2002 by Vladi Shabanski and Lutz Sammer
+// (c) Copyright 1999-2002 by Vladi Shabanski and Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,18 +26,18 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*
-**		Note:
-**				This functions are doubled. One for the real map tile and one
-**				for the tile that the player sees.
+** Note:
+** This functions are doubled. One for the real map tile and one
+** for the tile that the player sees.
 */
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -52,20 +52,20 @@
 #endif
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
-int ForestRegeneration;				/// Forest regeneration
+int ForestRegeneration; /// Forest regeneration
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Check if the seen tile-type is wood.
+** Check if the seen tile-type is wood.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x  Map X tile-position.
+** @param y  Map Y tile-position.
 */
 int MapIsSeenTileWood(int x, int y)
 {
@@ -74,10 +74,10 @@ int MapIsSeenTileWood(int x, int y)
 }
 
 /**
-**		Correct the seen wood field, depending on the surrounding.
+** Correct the seen wood field, depending on the surrounding.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x  Map X tile-position.
+** @param y  Map Y tile-position.
 */
 void MapFixSeenWoodTile(int x, int y)
 {
@@ -163,11 +163,11 @@ void MapFixSeenWoodTile(int x, int y)
 
 	//Update seen tile.
 	mf = TheMap.Fields + x + y * TheMap.Width;
-	if (tile == -1) {						// No valid wood remove it.
+	if (tile == -1) { // No valid wood remove it.
 		mf->SeenTile = TheMap.Tileset->RemovedTree;
 		MapFixSeenWoodNeighbors(x, y);
 	} else if (TheMap.Tileset->MixedLookupTable[mf->SeenTile] ==
-				TheMap.Tileset->MixedLookupTable[tile]) {	  //Same Type
+				TheMap.Tileset->MixedLookupTable[tile]) { //Same Type
 		return;
 	} else {
 		mf->SeenTile = tile;
@@ -181,46 +181,46 @@ void MapFixSeenWoodTile(int x, int y)
 }
 
 /**
-**		Correct the surrounding seen wood fields.
+** Correct the surrounding seen wood fields.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x  Map X tile-position.
+** @param y  Map Y tile-position.
 */
 void MapFixSeenWoodNeighbors(int x, int y)
 {
-	MapFixSeenWoodTile(x + 1, y);				// side neighbors
+	MapFixSeenWoodTile(x + 1, y); // side neighbors
 	MapFixSeenWoodTile(x - 1, y);
 	MapFixSeenWoodTile(x, y + 1);
 	MapFixSeenWoodTile(x, y - 1);
-	MapFixSeenWoodTile(x + 1, y - 1);				// side neighbors
+	MapFixSeenWoodTile(x + 1, y - 1); // side neighbors
 	MapFixSeenWoodTile(x - 1, y - 1);
 	MapFixSeenWoodTile(x - 1, y + 1);
 	MapFixSeenWoodTile(x + 1, y + 1);
 }
 
 /**
-**		Correct the surrounding real wood fields.
+** Correct the surrounding real wood fields.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x  Map X tile-position.
+** @param y  Map Y tile-position.
 */
 static void MapFixWoodNeighbors(int x, int y)
 {
-	MapFixWoodTile(x + 1, y);				// side neighbors
+	MapFixWoodTile(x + 1, y); // side neighbors
 	MapFixWoodTile(x - 1, y);
 	MapFixWoodTile(x, y + 1);
 	MapFixWoodTile(x, y - 1);
-	MapFixWoodTile(x + 1, y - 1);				// side neighbors
+	MapFixWoodTile(x + 1, y - 1); // side neighbors
 	MapFixWoodTile(x - 1, y - 1);
 	MapFixWoodTile(x - 1, y + 1);
 	MapFixWoodTile(x + 1, y + 1);
 }
 
 /**
-**		Correct the real wood field, depending on the surrounding.
+** Correct the real wood field, depending on the surrounding.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x  Map X tile-position.
+** @param y  Map Y tile-position.
 */
 void MapFixWoodTile(int x, int y)
 {
@@ -302,7 +302,7 @@ void MapFixWoodTile(int x, int y)
 		tile = TheMap.Tileset->WoodTable[tile];
 	}
 
-	if (tile == -1) {						// No valid wood remove it.
+	if (tile == -1) { // No valid wood remove it.
 		MapRemoveWood(x, y);
 	} else if (TheMap.Tileset->MixedLookupTable[mf->Tile] !=
 			TheMap.Tileset->MixedLookupTable[tile]) {
@@ -319,10 +319,10 @@ void MapFixWoodTile(int x, int y)
 }
 
 /**
-**		Remove wood from the map.
+** Remove wood from the map.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x  Map X tile-position.
+** @param y  Map Y tile-position.
 */
 void MapRemoveWood(unsigned x, unsigned y)
 {
@@ -349,7 +349,7 @@ void MapRemoveWood(unsigned x, unsigned y)
 }
 
 /**
-**		Regenerate forest.
+** Regenerate forest.
 */
 void RegenerateForest(void)
 {

@@ -60,25 +60,25 @@ static unsigned char* MinimapTerrainSurface;
 static int MinimapTextureWidth;
 static int MinimapTextureHeight;
 #else
-static SDL_Surface* MinimapSurface;		/// generated minimap
-static SDL_Surface* MinimapTerrainSurface;		/// generated minimap terrain
+static SDL_Surface* MinimapSurface;        /// generated minimap
+static SDL_Surface* MinimapTerrainSurface; /// generated minimap terrain
 #endif
-static int* Minimap2MapX;				/// fast conversion table
-static int* Minimap2MapY;				/// fast conversion table
-static int Map2MinimapX[MaxMapWidth];		/// fast conversion table
-static int Map2MinimapY[MaxMapHeight];		/// fast conversion table
+static int* Minimap2MapX;                  /// fast conversion table
+static int* Minimap2MapY;                  /// fast conversion table
+static int Map2MinimapX[MaxMapWidth];      /// fast conversion table
+static int Map2MinimapY[MaxMapHeight];     /// fast conversion table
 
-//		MinimapScale:
-//		32x32 64x64 96x96 128x128 256x256 512x512 ...
-//		  *4	*2	*4/3   *1			 *1/2	*1/4
-static int MinimapScaleX;				/// Minimap scale to fit into window
-static int MinimapScaleY;				/// Minimap scale to fit into window
-int MinimapX;						/// Minimap drawing position x offset
-int MinimapY;						/// Minimap drawing position y offset
+// MinimapScale:
+// 32x32 64x64 96x96 128x128 256x256 512x512 ...
+// *4 *2 *4/3   *1 *1/2 *1/4
+static int MinimapScaleX;                  /// Minimap scale to fit into window
+static int MinimapScaleY;                  /// Minimap scale to fit into window
+int MinimapX;                              /// Minimap drawing position x offset
+int MinimapY;                              /// Minimap drawing position y offset
 
-int MinimapWithTerrain = 1;		/// display minimap with terrain
-int MinimapFriendly = 1;				/// switch colors of friendly units
-int MinimapShowSelected = 1;		/// highlight selected units
+int MinimapWithTerrain = 1;                /// display minimap with terrain
+int MinimapFriendly = 1;                   /// switch colors of friendly units
+int MinimapShowSelected = 1;               /// highlight selected units
 
 /**
 **  Create a mini-map from the tiles of the map.
@@ -93,7 +93,7 @@ void CreateMinimap(void)
 	SDL_PixelFormat* f;
 #endif
 
-	if (TheMap.Width > TheMap.Height) {		// Scale to biggest value.
+	if (TheMap.Width > TheMap.Height) { // Scale to biggest value.
 		n = TheMap.Width;
 	} else {
 		n = TheMap.Height;
@@ -112,7 +112,7 @@ void CreateMinimap(void)
 		MinimapX _C_ MinimapY);
 
 	//
-	//		Calculate minimap fast lookup tables.
+	// Calculate minimap fast lookup tables.
 	//
 	// FIXME: this needs to be recalculated during map load - the map size
 	// might have changed!
@@ -156,7 +156,7 @@ void CreateMinimap(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	memset(MinimapSurface, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth,
-		MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
+		MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 		MinimapSurface);
 #endif
 
@@ -303,7 +303,7 @@ void UpdateMinimapTerrain(void)
 				c = *(Uint32*)&((Uint8*)TheMap.TileGraphic->Surface->pixels)[
 					(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
 					TheMap.TileGraphic->Surface->pitch];
-				c = VideoMapRGB(0, 
+				c = VideoMapRGB(0,
 					((c & f->Rmask) >> f->Rshift),
 					((c & f->Gmask) >> f->Gshift),
 					((c & f->Bmask) >> f->Bshift));
@@ -419,7 +419,7 @@ void UpdateMinimapXY(int tx, int ty)
 				c = *(Uint32*)&((Uint8*)TheMap.TileGraphic->Surface->pixels)[
 					(xofs + 7 + (mx % scalex) * 8) * 4 + (yofs + 6 + (my % scaley) * 8) *
 					TheMap.TileGraphic->Surface->pitch];
-				c = VideoMapRGB(0, 
+				c = VideoMapRGB(0,
 					((c & f->Rmask) >> f->Rshift),
 					((c & f->Gmask) >> f->Gshift),
 					((c & f->Bmask) >> f->Bshift));
@@ -436,7 +436,7 @@ void UpdateMinimapXY(int tx, int ty)
 }
 
 /**
-**  Draw an unit on the minimap. 
+**  Draw an unit on the minimap.
 */
 static void DrawUnitOnMinimap(Unit* unit, int red_phase)
 {
@@ -484,11 +484,11 @@ static void DrawUnitOnMinimap(Unit* unit, int red_phase)
 	mx = 1 + MinimapX + Map2MinimapX[unit->X];
 	my = 1 + MinimapY + Map2MinimapY[unit->Y];
 	w = Map2MinimapX[type->TileWidth];
-	if (mx + w >= TheUI.MinimapW) {				// clip right side
+	if (mx + w >= TheUI.MinimapW) { // clip right side
 		w = TheUI.MinimapW - mx;
 	}
 	h0 = Map2MinimapY[type->TileHeight];
-	if (my + h0 >= TheUI.MinimapH) {		// clip bottom side
+	if (my + h0 >= TheUI.MinimapH) { // clip bottom side
 		h0 = TheUI.MinimapH - my;
 	}
 #ifndef USE_OPENGL
@@ -540,7 +540,7 @@ void UpdateMinimap(void)
 	bpp = MinimapSurface->format->BytesPerPixel;
 #endif
 	//
-	//		Draw the terrain
+	// Draw the terrain
 	//
 	for (my = 0; my < TheUI.MinimapH; ++my) {
 		for (mx = 0; mx < TheUI.MinimapW; ++mx) {
@@ -584,8 +584,8 @@ void UpdateMinimap(void)
 #endif
 
 	//
-	//		Draw units on map
-	//		FIXME: We should rewrite this completely
+	// Draw units on map
+	// FIXME: We should rewrite this completely
 	//
 	n = UnitCacheSelect(0, 0, TheMap.Height, TheMap.Width, table);
 	while (n--) {
