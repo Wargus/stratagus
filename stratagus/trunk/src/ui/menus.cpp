@@ -173,9 +173,11 @@ local void EnterNameCancel(void);
 // Net create join
 local void JoinNetGameMenu(void);
 local void CreateNetGameMenu(void);
+local void CreateInternetGameMenu(void);
 
 // Multi net type
 local void MultiPlayerLANGame(void);
+local void MultiPlayerInternetGame(void);
 
 // Net multi setup
 local void MultiGameSetupInit(Menuitem *mi);
@@ -384,7 +386,14 @@ local int ReplayGameRDFilter(char *pathbuf, FileList *fl);
 // Metaserver
 local void MultiGameMasterReport(void);
 local void EnterMasterAction(Menuitem *mi, int key);
+local void ShowMetaServerList(void); // Addition for Magnant
+local void MultiMetaServerGameSetupInit(Menuitem *mi); // init callback
+local void MultiMetaServerGameSetupExit(Menuitem *mi); // exit callback
+local void SelectGameServer(Menuitem *mi); // Game Server selection so that client joins the game
+local void AddGameServer(void); //Add Game Server on Meta server
+local int MetaServerConnectError(void); // Display error message
 
+//others
 local void GameMenuReturn(void);
 local void NetErrorMenu(char *error);
 local void NetworkGamePrepareGameSettings(void);
@@ -552,9 +561,11 @@ global void InitMenuFuncHash(void) {
 // Net create join
     HASHADD(JoinNetGameMenu,"net-join-game");
     HASHADD(CreateNetGameMenu,"net-create-game");
+    HASHADD(CreateInternetGameMenu,"net-internet-create-game");
 
 // Multi net type
     HASHADD(MultiPlayerLANGame,"net-lan-game");
+    HASHADD(MultiPlayerInternetGame,"net-internet-game");
 
 // Net multi setup
     HASHADD(MultiGameSetupInit,"multi-game-setup-init");
@@ -769,6 +780,10 @@ global void InitMenuFuncHash(void) {
     HASHADD(ReplayGameCancel,"replay-game-cancel");
 
 // Metaserver
+    HASHADD(ShowMetaServerList,"menu-metaserver-list");
+    HASHADD(MultiMetaServerGameSetupInit,"menu-metaserver-init");
+    HASHADD(MultiMetaServerGameSetupExit,"menu-metaserver-exit");
+    HASHADD(SelectGameServer,"select-game-server");
 }
 
 /*----------------------------------------------------------------------------
@@ -3144,16 +3159,28 @@ local void TerminateNetConnect(void)
 */
 local void CreateNetGameMenu(void)
 {
-    Menu *menu;
-
-    menu = FindMenu("menu-multi-setup");
-
     DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu("menu-multi-setup", 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
+}
+
+/**
+**	Start process network game setup menu (server).
+**	Internet game, register with meta server
+*/
+local void CreateInternetGameMenu(void)
+{
+    DestroyCursorBackground();
+    GuiGameStarted = 0;
+    AddGameServer();
+    ProcessMenu("menu-multi-setup", 1);
+    if (GuiGameStarted) {
+	GameMenuReturn();
+    }
+
 }
 
 /**
@@ -3165,6 +3192,8 @@ local void MultiGameStart(void)
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+
+    SendMetaCommand("StartGame","");
 
     GameSettings.Presets[0].Race = SettingsPresetMapDefault;
 
@@ -3215,7 +3244,9 @@ local void MultiPlayerGameMenu(void)
     GuiGameStarted = 0;
     // Here we really go...
     // ProcessMenu("menu-create-join-menu", 1);
+
     ProcessMenu("menu-multi-net-type-menu", 1);
+	  
 
     DebugLevel0Fn("GuiGameStarted: %d\n" _C_ GuiGameStarted);
     if (GuiGameStarted) {
@@ -3229,6 +3260,25 @@ local void MultiPlayerGameMenu(void)
 local void MultiPlayerLANGame(void)
 {
     ProcessMenu("menu-create-join-menu", 1);
+    MetaServerInUse = 0;
+    if (GuiGameStarted) {
+	GameMenuReturn();
+    }
+}
+
+/**
+**	Process Internet game menu
+*/
+local void MultiPlayerInternetGame(void)
+{
+    // Connect to Meta Server
+    if (MetaInit() == -1 ) {
+	MetaServerInUse = 0;
+	MetaServerConnectError();
+	return;
+    }
+    MetaServerInUse = 1;
+    ProcessMenu("menu-internet-create-join-menu", 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -4770,6 +4820,10 @@ local void MultiGameSetupExit(Menuitem *mi)
 local void MultiGameCancel(void)
 {
     NetworkExitServerConnect();
+
+    if (MetaServerInUse) {
+	SendMetaCommand("AbandonGame","");
+    }
 
     NetPlayers = 0;		// Make single player menus work again!
     GameCancel();
@@ -7184,4 +7238,192 @@ global void InitMenuFunctions(void)
 #endif
 }
 
+
+
+
+
+/**
+**	FIXME: docu
+*/
+local void MultiGameMasterReport(void)
+{
+//	EndMenu();
+    VideoLockScreen();
+    MenusSetBackground();
+    VideoUnlockScreen();
+    Invalidate();
+
+    ProcessMenu("menu-metaserver-list", 1);
+    if (GuiGameStarted) {
+	GameMenuReturn();
+    }
+
+}
+
+/**
+**	Menu for Mater Server Game list.
+*/
+local void ShowMetaServerList(void)
+{
+    Invalidate();
+    VideoLockScreen();
+    MenusSetBackground();
+    VideoUnlockScreen();
+
+    DestroyCursorBackground();
+    GuiGameStarted = 0;
+    ProcessMenu("menu-metaserver-list", 1);
+    if (GuiGameStarted) {
+	GameMenuReturn();
+    }
+	
+}
+
+
+/**
+**	Multiplayer server menu init callback
+** Mohydine: Right now, because I find it simpler, the client is sending n commands, one for each online game.
+** TODO: well, redo this :)
+*/
+local void MultiMetaServerGameSetupInit(Menuitem *mi)
+{
+    int i;
+    int j;
+    int k;
+    int numparams;
+    int nummenus;
+    char **reply;
+	
+    SendMetaCommand("GameList","");
+    reply = NULL;
+    //receive
+    //check okay
+    
+    // Meta server only sends matching version
+    // Only Displays games from Matching version
+	nummenus=5;
+	i=1;
+	k=0;
+	numparams=4; //TODO: To be changed if more params are sent
+	
+	//Retrieve list of online game from the meta server
+	for (j=4; j <= nummenus*(numparams+1); j = j + numparams + 1) { // loop over the number of items in the menu
+	    //TODO: hard coded.
+	    // Check if connection to meta server is there.
+	    SendMetaCommand("NextGameInList",""); 
+	    i=RecvMetaReply(reply);
+	    if (i == 0) {
+		// fill the menus with the right info.
+		mi->menu->Items[j].d.text.text="Nick"; 
+		mi->menu->Items[j+1].d.text.text="IP";
+		mi->menu->Items[j+2].d.text.text="OS";
+		mi->menu->Items[j+3].d.text.text="Engine Version";
+	    }
+	    k++;
+	}
+	//	mi->menu->Items[4].d.text.text=TheMessage->Nickname; 
+	//	mi->menu->Items[9].d.text.text=TheMessage->Nickname; 
+	//	mi->menu->Items[14].d.text.text=TheMessage->Nickname; 
+}
+
+/**
+**	Multiplayer server menu exit callback
+*/
+local void MultiMetaServerGameSetupExit(Menuitem *mi)
+{
+	//TODO: how to free stuff?
+	
+    VideoLockScreen();
+    MenusSetBackground();
+    VideoUnlockScreen();
+    Invalidate();
+    EndMenu();
+}
+
+/**
+**	Action taken when a player select an online game
+*/
+local void SelectGameServer(Menuitem *mi)
+{
+	
+    char server_host_buffer[64];
+    char *port;
+    int j;
+
+    j=mi - mi->menu->Items;
+    mi->menu->Items[j].d.gem.state=MI_GSTATE_UNCHECKED;
+    VideoLockScreen();
+    MenusSetBackground();
+    VideoUnlockScreen();
+    Invalidate();
+    EndMenu();
+
+    strcpy(server_host_buffer,mi->menu->Items[j-3].d.text.text);
+
+
+    //Launch join directly
+    if ( (port = strchr(server_host_buffer, ':')) != NULL) {
+	NetworkPort = atoi(port + 1);
+	port[0] = 0;
+    }
+
+    // Now finally here is the address
+    //server_host_buffer[menu->Items[1].d.input.nch] = 0;
+    if (NetworkSetupServerAddress(server_host_buffer)) {
+	NetErrorMenu("Unable to lookup host.");
+	VideoLockScreen();
+	MenusSetBackground();
+	VideoUnlockScreen();
+	ProcessMenu("menu-metaserver-list",1);
+	return;
+    }
+    NetworkInitClientConnect();
+    if (!NetConnectRunning) {
+	TerminateNetConnect();
+	return;
+    }
+
+    if (NetworkArg) {
+	free(NetworkArg);
+    }
+    NetworkArg = strdup(server_host_buffer);
+
+    // Here we really go...
+    ProcessMenu("menu-net-connecting", 1);
+
+    if (GuiGameStarted) {
+	VideoLockScreen();
+	MenusSetBackground();
+	VideoUnlockScreen();
+	Invalidate();
+	EndMenu();
+    }
+
+
+}
+/**
+**	Action to add a game server on the meta-server.
+*/
+local void AddGameServer()
+{
+    //send message to meta server. meta server will detect IP address.
+    //Meta-server will return "BUSY" if the list of online games is busy.
+
+    SendMetaCommand("AddGame","%s\n%s\n%s\n%s\n","Name","Map","Players","Free");
+
+    // FIXME: Get Reply from Queue
+
+}
+
+
+local int MetaServerConnectError()
+{
+    Invalidate();
+    NetErrorMenu("Cannot Connect to Meta-Server");
+    VideoLockScreen();
+    MenusSetBackground();
+    VideoUnlockScreen();
+    return 0;
+
+}
 //@}
