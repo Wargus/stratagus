@@ -165,6 +165,7 @@ local void HandleUnitAction(Unit* unit)
 	    break;
 
 	case UnitActionAttack:
+	case UnitActionAttackGround:
 	    HandleActionAttack(unit);
 	    break;
 

@@ -107,7 +107,19 @@ local void MoveToTarget(Unit* unit)
     int wall;
     int err;
 
-    err=HandleActionMove(unit);
+    if( unit->Command.Action==UnitActionAttackGround ) {
+	// FIXME: workaround for pathfinder problem
+	unit->Command.Data.Move.DX-=unit->Command.Data.Move.Range;
+	unit->Command.Data.Move.DY-=unit->Command.Data.Move.Range;
+	unit->Command.Data.Move.Range*=2;
+	err=HandleActionMove(unit);
+	unit->Command.Data.Move.Range/=2;
+	unit->Command.Data.Move.DX+=unit->Command.Data.Move.Range;
+	unit->Command.Data.Move.DY+=unit->Command.Data.Move.Range;
+	unit->Command.Action=UnitActionAttackGround;
+    } else {
+	err=HandleActionMove(unit);
+    }
     // FIXME: Should handle new return codes here (for Fabrice)
 
     if( unit->Reset ) {
@@ -140,7 +152,8 @@ local void MoveToTarget(Unit* unit)
 	//
 	wall=0;
 	if( !goal && !(wall=WallOnMap(unit->Command.Data.Move.DX
-		     ,unit->Command.Data.Move.DY)) ) {
+		     ,unit->Command.Data.Move.DY))
+		&& unit->Command.Action!=UnitActionAttackGround ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
 #ifdef NEW_UNIT
@@ -192,7 +205,8 @@ local void MoveToTarget(Unit* unit)
 		UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
 	    }
 	    unit->SubAction++;
-	} else if( wall && MapDistance(unit->X,unit->Y
+	} else if( (wall || unit->Command.Action==UnitActionAttackGround) 
+		&& MapDistance(unit->X,unit->Y
 		    ,unit->Command.Data.Move.DX,unit->Command.Data.Move.DY)
 			<=unit->Stats->AttackRange ) {
 	    DebugLevel3("Attacking wall\n");
@@ -202,6 +216,7 @@ local void MoveToTarget(Unit* unit)
 		    ,unit->Command.Data.Move.DY-unit->Y);
 	    }
 	    unit->SubAction=1;
+	    return;
 	} else if( err ) {
 	    unit->State=0;
 	    unit->SubAction=0;
@@ -233,8 +248,9 @@ local void AttackTarget(Unit* unit)
 	//
 	//	Goal is "weak" or a wall.
 	//
-	if( !goal && WallOnMap(unit->Command.Data.Move.DX
-		     ,unit->Command.Data.Move.DY) ) {
+	if( !goal && (WallOnMap(unit->Command.Data.Move.DX
+		     ,unit->Command.Data.Move.DY)
+		|| unit->Command.Action==UnitActionAttackGround) ) {
 	    DebugLevel3("attack a wall!!!!\n");
 	    return;
 	}

@@ -300,7 +300,7 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 	return;
     }
 
-    command->Action=UnitActionAttack;
+    command->Action=UnitActionAttackGround;
     command->Data.Move.Fast=1;
     command->Data.Move.Goal=NoUnitP;
     command->Data.Move.Range=unit->Stats->AttackRange;
@@ -308,6 +308,7 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
+    // FIXME: pathfinder didn't support this kind of target
 
     unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }

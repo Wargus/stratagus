@@ -256,13 +256,12 @@ global void DrawButtonPanel(void)
 			    v=IconSelected;
 			}
 			break;
-/* FIXME: attackground and attack are both ActionAttack
 		    case B_AttackGround:
-			if( Selected[0]->Command.Action==UnitActionAttack ) {
+			if( Selected[0]->Command.Action
+				==UnitActionAttackGround ) {
 			    v=IconSelected;
 			}
 			break;
-*/
 
 		    // FIXME: must handle more actions
 
