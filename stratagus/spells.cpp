@@ -92,7 +92,7 @@ global SpellType SpellTypeTable[]
 	= {
 
 //TTL's below are in ticks: approx: 500=13sec, 1000=25sec, 2000=50sec
-
+  
 // ident,		 	name,			range,mana,ttl, spell action,		  sound config
 //	---human paladins---
 { "spell-holy-vision",		"holy vison",		0x7F,  70,  -1, SpellActionHolyVision	, { "holy vision", NULL }    , { NULL, NULL} },
@@ -444,9 +444,14 @@ local void SpellFlameShieldController(Missile *missile)
   missile->X = mx;
   missile->Y = my;
 
+  if ( missile->TTL == 0 )
+    {
+    missile->TargetUnit->FlameShield = 0;
+    }
+  
   // FIXME: vladi: uhm... perhaps is a bit powerfull?
-  if ( missile->TTL % 2 == 0 ) return;
-  n = SelectUnits( ux - 1, uy - 1, ux + 1, uy + 1, table );
+  if ( missile->TTL % 10 == 0 ) return;
+  n = SelectUnits( ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table );
   for (i = 0; i < n; ++i) {
     if (table[i] == missile->TargetUnit) continue; // cannot hit target unit
   	if (table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP) {
@@ -624,7 +629,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	case SpellActionFlameShield:
 	    // flame shield only on organic land units?
 	    if (target && target->Type->Organic && target->Type->LandUnit
-		    && target->FlameShield < spell->TTL / FRAMES_PER_SECOND) {
+		    && target->FlameShield < spell->TTL ) {
 		return 1;
 	    }
 	    return 0;
