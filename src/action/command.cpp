@@ -1373,13 +1373,6 @@ global void CommandAutoSpellCast(Unit* unit,SpellType* spell)
 */
 global void CommandDiplomacy(int player,int state,int opponent)
 {
-    // If we work changing states with a computer, it should
-    // automatically reciprocate the changes :)
-    if( Players[opponent].Type == PlayerComputer && 
-	Players[player].Type == PlayerPerson ) {
-	CommandDiplomacy(opponent,state,player);
-    }
-
     switch( state ) {
 	case DiplomacyNeutral:
 	    Players[player].Enemy&=~(1<<opponent);
@@ -1412,13 +1405,6 @@ global void CommandSharedVision(int player,int state,int opponent)
 {
     int i;
     Unit* unit;
-
-    // If we work changing states with a computer, it should
-    // automatically reciprocate the changes :)
-    if( Players[opponent].Type == PlayerComputer && 
-	Players[player].Type == PlayerPerson ) {
-	CommandSharedVision(opponent,state,player);
-    }
     
     if( state==0 ) {
 	// Check all tiles and mark unseen ones as explored.
