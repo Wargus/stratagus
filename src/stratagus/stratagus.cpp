@@ -834,7 +834,6 @@ global volatile void Exit(int err)
 	UnitCacheStatistic();
 	CclUnits(Lua);
 	CleanModules();
-	CleanFonts();
 	lua_close(Lua);
 #endif
 
