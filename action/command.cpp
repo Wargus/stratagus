@@ -679,6 +679,11 @@ global void CommandBuildBuilding(Unit* unit, int x, int y,
 	    order->Range = 1;
 	}
 	order->Type = what;
+	if (what->BuilderOutside) {
+	    order->MinRange = 1;
+	} else {
+	    order->MinRange = 0;
+	}
 	order->Arg1 = NULL;
     }
     ClearSavedAction(unit);
