@@ -14,8 +14,11 @@ stderr.txt
 stdout.txt
 cscope.out
 save
+logs
 Debug
 Release
+include
+lib
 freecraft.opt
 freecraft.dsp
 freecraft.dsw
