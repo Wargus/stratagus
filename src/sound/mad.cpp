@@ -184,7 +184,7 @@ local enum mad_flow MAD_error(void *user __attribute__((unused)),
 #if 0
 
 /**
-**	Type member function to read from the ogg file
+**	Type member function to read from the Mp3 file
 **
 **	@param sample	    Sample reading from
 **	@param buf	    Buffer to write data to
@@ -234,7 +234,7 @@ local int Mp3ReadStream(Sample* sample, void* buf, int len)
 }
 
 /**
-**	Type member function to free an ogg file
+**	Type member function to free an Mp3 file
 **
 **	@param sample	    Sample to free
 */
@@ -260,7 +260,7 @@ local const SampleType Mp3StreamSampleType = {
 #endif
 
 /**
-**	Type member function to read from the ogg file
+**	Type member function to read from the Mp3 file
 **
 **	@param sample	    Sample reading from
 **	@param buf	    Buffer to write data to
@@ -284,7 +284,7 @@ local int Mp3Read(Sample* sample, void* buf, int len)
 }
 
 /**
-**	Type member function to free an ogg file
+**	Type member function to free an Mp3 file
 **
 **	@param sample	    Sample to free
 */
