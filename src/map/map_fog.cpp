@@ -1394,7 +1394,8 @@ global void VideoDraw32Fog32Alpha(const GraphicData* data,int x,int y)
     VMemType32* dp;
     VMemType32 fog;
     int da;
-    int i, r, g, b, v ;
+    int r, g, b, v ;
+    VMemType32 i;
     VMemType32 lasti;
     VMemType32 lastrgb;
 
@@ -1419,8 +1420,7 @@ global void VideoDraw32Fog32Alpha(const GraphicData* data,int x,int y)
 	    if (i != fog) { \
 		if (i == lasti) { \
 		    dp[x] = lastrgb; \
-		} \
-		else { \
+		} else { \
 		    lasti = i; \
 		    r=i       & 0xff; \
 		    g=(i>>8 ) & 0xff; \
@@ -1467,7 +1467,8 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
     VMemType32* dp;
     VMemType32 fog;
     int da;
-    int i, r, g, b, v;
+    int r, g, b, v;
+    VMemType32 i;
     VMemType32 lasti;
     VMemType32 lastrgb;
 
@@ -1491,8 +1492,7 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 	if (i != fog) { \
 	    if (i == lasti) { \
 		dp[x] = lastrgb; \
-	    } \
-	    else { \
+	    } else { \
 		lasti = i; \
 		r=i       & 0xff; \
 		g=(i>>8 ) & 0xff; \
@@ -1818,7 +1818,8 @@ global void InitMapFogOfWar(void)
 		    FogOfWarAlphaTable=malloc(n*sizeof(VMemType8));
 		}
 		if ( lookup25trans8 ) { // if enabled, make use of it in 8bpp ;)
-		    unsigned int trans_color, j;
+		    unsigned int trans_color;
+		    int j;
 
 		    trans_color=Pixels8[ColorBlack];
 		    trans_color<<=8;
