@@ -380,7 +380,7 @@ int RockOnMap(int tx, int ty)
 **
 **  @return      True if could be entered, false otherwise.
 */
-int CheckedCanMoveToMask(int x, int y, int mask)
+static int CheckedCanMoveToMask(int x, int y, int mask)
 {
 	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 		return 0;
@@ -390,31 +390,45 @@ int CheckedCanMoveToMask(int x, int y, int mask)
 }
 
 /**
-**  Can a unit of unit-type move to this point.
+**  Can an unittype move to this point.
 **
+**  @param unit  unit to be checked.
 **  @param x     X map tile position.
 **  @param y     Y map tile position.
-**  @param type  unit-type to be checked.
 **
 **  @return      True if could be entered, false otherwise.
 */
-int UnitTypeCanMoveTo(int x, int y, const UnitType* type)
+int UnitTypeCanMoveTo(const UnitType* type, int x, int y)
 {
-	return CanMoveToMask(x, y, TypeMovementMask(type));
+	int addx;
+	int addy;
+	int mask;  // movement mask of the unit.
+
+	Assert(type);
+	mask = TypeMovementMask(type);
+	for (addx = 0; addx < type->TileWidth; addx++) {
+		for (addy = 0; addy < type->TileHeight; addy++) {
+			if (!CheckedCanMoveToMask(x + addx, y + addy, mask)) {
+				return 0;
+			}
+		}
+	}
+	return 1;
 }
 
 /**
 **  Can an unit move to this point.
 **
+**  @param unit  unit to be checked.
 **  @param x     X map tile position.
 **  @param y     Y map tile position.
-**  @param unit  unit to be checked.
 **
 **  @return      True if could be entered, false otherwise.
 */
-int UnitCanMoveTo(int x, int y, const Unit* unit)
+int UnitCanMoveTo(const Unit* unit, int x, int y)
 {
-	return CanMoveToMask(x, y, TypeMovementMask(unit->Type));
+	Assert(unit);
+	return UnitTypeCanMoveTo(unit->Type, x, y);
 }
 
 /**

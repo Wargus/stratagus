@@ -152,7 +152,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 			y = TheMap.Height - 1;
 		}
 		if (x != unit->X || y != unit->Y) {
-			if (CheckedCanMoveToMask(x, y, TypeMovementMask(type))) {
+			if (UnitCanMoveTo(unit, x, y)) {
 				// FIXME: Don't use pathfinder for this, costs too much cpu.
 				unit->Orders[0].Action = UnitActionMove;
 				Assert(!unit->Orders[0].Goal);
