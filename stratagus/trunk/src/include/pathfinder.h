@@ -106,4 +106,8 @@ extern void PathfinderCclRegister(void);
 
 //@}
 
+#ifdef HIERARCHIC_PATHFINDER
+#include "../pathfinder/hierarchical.h"
+#endif /* HIERARCHIC_PATHFINDER */
+
 #endif	// !__PATH_FINDER_H__
