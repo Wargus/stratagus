@@ -1021,6 +1021,13 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 			,unit->Data.UpgradeTo.Ticks);
 
 	    //
+	    //	Chopping wood.
+	    //
+	    } else if( unit->Orders[0].Action==UnitActionHarvest
+		    && unit->SubAction==64 ) {
+		DrawManaBar(x,y,type,CHOP_FOR_WOOD,CHOP_FOR_WOOD-unit->Value);
+
+	    //
 	    //	Building research new technologie.
 	    //
 	    } else if( unit->Orders[0].Action==UnitActionResearch ) {
@@ -1085,6 +1092,14 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		DrawManaSprite(x,y,type,unit->Orders[0].Type
 			    ->Stats[unit->Player->Player].Costs[TimeCost]
 			,unit->Data.UpgradeTo.Ticks);
+
+	    //
+	    //	Chopping wood.
+	    //
+	    } else if( unit->Orders[0].Action==UnitActionHarvest
+		    && unit->SubAction==64 ) {
+		DrawManaSprite(x,y,type,CHOP_FOR_WOOD,
+			CHOP_FOR_WOOD-unit->Value);
 
 	    //
 	    //	Building research new technologie.
