@@ -579,7 +579,7 @@ global void VideoDrawOnlyFogAlpha(int x, int y)
     SDL_Rect drect;
     SDL_Color csrc;
     SDL_Color cdest;
-    unsigned char alpha;
+    unsigned char bright;
     unsigned char sat;
     unsigned char max;
 
@@ -593,7 +593,7 @@ global void VideoDrawOnlyFogAlpha(int x, int y)
     csrc.g = 255;
     csrc.b = 255;
 
-    alpha = (255 - FogOfWarBrightness * 255 / 100);
+    bright = FogOfWarBrightness * 255 / 100;
     sat = 100 - FogOfWarSaturation;
 
     SDL_LockSurface(TheScreen);
@@ -601,11 +601,11 @@ global void VideoDrawOnlyFogAlpha(int x, int y)
 	for (j = x; j < x + TileSizeX; ++j) {
 	    p = &((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
 	    if (*p) {
-		// Brightness
 		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
-		cdest.r = ((cdest.r * alpha) + (csrc.r * (255 - alpha))) >> 8;
-		cdest.g = ((cdest.g * alpha) + (csrc.g * (255 - alpha))) >> 8;
-		cdest.b = ((cdest.b * alpha) + (csrc.b * (255 - alpha))) >> 8;
+		// Brightness
+		cdest.r = (cdest.r) + (csrc.r * bright);
+		cdest.g = (cdest.g) + (csrc.g * bright);
+		cdest.b = (cdest.b) + (csrc.b * bright);
 
 		// Saturation
 		if (cdest.r > cdest.g && cdest.r > cdest.b) {
@@ -660,6 +660,7 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
     unsigned char alpha;
     unsigned char sat;
     unsigned char max;
+    unsigned char bright;
 
     tilepitch = TheMap.TileGraphic->Width / TileSizeX;
 
@@ -682,7 +683,7 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
     csrc.g = 255;
     csrc.b = 255;
 
-    alpha = (255 - FogOfWarBrightness * 255 / 100);
+    bright = FogOfWarBrightness * 255 / 100;
     sat = 100 - FogOfWarSaturation;
 
     SDL_LockSurface(TheScreen);
@@ -696,9 +697,9 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
 	    if (!(cdest.r | cdest.g | cdest.b) && *p) {
 		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
 		// Brightness
-		cdest.r = ((cdest.r * alpha) + (csrc.r * (255 - alpha))) >> 8;
-		cdest.g = ((cdest.g * alpha) + (csrc.g * (255 - alpha))) >> 8;
-		cdest.b = ((cdest.b * alpha) + (csrc.b * (255 - alpha))) >> 8;
+		cdest.r = (cdest.r) + (csrc.r * bright);
+		cdest.g = (cdest.g) + (csrc.g * bright);
+		cdest.b = (cdest.b) + (csrc.b * bright);
 
 		// Saturation
 		if (cdest.r > cdest.g && cdest.r > cdest.b) {
