@@ -1228,9 +1228,6 @@ local void PrintHeader(void)
 #ifdef HIERARCHIC_PATHFINDER
     "HIERARCHIC-PATHFINDER "
 #endif
-#ifdef SLOW_INPUT
-    "SLOW-INPUT "
-#endif
 	, NameLine);
 }
 

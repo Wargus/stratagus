@@ -33,7 +33,6 @@ EXTRA_LDFLAGS="$LDFLAGS"
 
 ## These could be used for experimental versions
 ## ---------------------------------------------
-## SLOW_INPUT		If you have problems that events aren't fetched.
 ## BPP8_*               Only for X11 8bpp common palette:
 ##   BPP8_NORMAL          disables default, like other Xbpp (delivers errors)
 ##   BPP8_WINSAFE         Uses a windows safe palette instead.
