@@ -97,7 +97,7 @@
 #define __attribute__()			// does nothing
 #ifndef __FUNCTION__
     // I don't know, but eVC didn't has it, even it is documented
-#define __FUNCTION__ __FILE__ ":" __LINE__
+#define __FUNCTION__ __FILE__ ":" /* __LINE__ */
 #endif
 
 /**
