@@ -86,19 +86,21 @@
 
 #if __GNUC__==2 && __GNUC_MINOR__==96
 
-#warning "GCC 2.96 can't compile FreeCraft, downgrade to GCC 2.95"
+#error "GCC 2.96 can't compile FreeCraft, downgrade to GCC 2.95"
 
 #endif
 
-#if __GNUC__>=3 && !defined(__I_KNOW_THAT_GNUC_3_IS_UNSUPPORTED__)
+#if __GNUC__>=3 
+
+#if !defined(__I_KNOW_THAT_GNUC_3_IS_UNSUPPORTED__)
+#warning "GCC 3.XX is not supported, downgrade to GCC 2.95"
+#endif
 
 //	It looks that GCC 3.xx is becoming nutty:
 //	__FUNCTION__	can't be concated in the future.
 //	__func__	Is defined by ISO C99 as
 //		static const char __func__[] = "function-name";
-
 #define __FUNCTION__ "Wrong compiler:"__FILE__
-#warning "GCC 3.XX is not supported, downgrade to GCC 2.95"
 
 #endif
 
