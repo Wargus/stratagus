@@ -80,9 +80,12 @@ local void GameMenuReturn(void);
 local void GameShowCredits(void);
 local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
+local void CDRomDisabled(void);
 local void SoundOptions(void);
 local void SetCdMode(Menuitem *mi);
-local void CDRomDisabled(void);
+local void Preferences(void);
+local void SpeedSettings(void);
+local void GameOptions(void);
 
 local void EndScenarioRestart(void);
 local void EndScenarioSurrender(void);
@@ -320,21 +323,6 @@ local Menuitem EndScenarioMenuItems[] = {
 	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!Previous", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
-#else
-    { 0 }
-#endif
-};
-
-local Menuitem CDRomDisabledMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 15, 0, LargeFont, NULL, NULL,
-	{ text:{ "Sorry, this version of", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 15 + 20*1, 0, LargeFont, NULL, NULL,
-	{ text:{ "freecraft was not compiled", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 15 + 20*2, 0, LargeFont, NULL, NULL,
-	{ text:{ "with CD Audio support", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 144 - (106 / 2), 128 - 15 - 27, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
 #else
     { 0 }
 #endif
@@ -775,7 +763,68 @@ local Menuitem CampaignContMenuItems[] = {
 #endif
 };
 
+local Menuitem CDRomDisabledMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 144, 15, 0, LargeFont, NULL, NULL,
+	{ text:{ "Sorry, this version of", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 15 + 20*1, 0, LargeFont, NULL, NULL,
+	{ text:{ "freecraft was not compiled", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 15 + 20*2, 0, LargeFont, NULL, NULL,
+	{ text:{ "with CD Audio support", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 144 - (106 / 2), 128 - 15 - 27, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
+#else
+    { 0 }
+#endif
+};
+
+
 local Menuitem SoundOptionsMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+    { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
+	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
+#else
+    { 0 }
+#endif
+};
+
+local Menuitem PreferencesMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+    { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
+	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
+#else
+    { 0 }
+#endif
+};
+
+local Menuitem SpeedSettingsMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+    { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
+	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
+#else
+    { 0 }
+#endif
+};
+
+local Menuitem GameOptionsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
@@ -967,16 +1016,6 @@ global Menu Menus[] = {
 	NULL,
     },
     {
-	// Game Options Menu
-	176+(14*TileSizeX-256)/2,
-	16+(14*TileSizeY-288)/2,
-	256, 288,
-	ImagePanel1,
-	2, 4,
-	SoundOptionsMenuItems,
-	NULL,
-    },
-    {
     	// CDRom Disabled Message
 	176+(14*TileSizeX-288)/2,
 	16+(14*TileSizeY-128)/2,
@@ -986,6 +1025,47 @@ global Menu Menus[] = {
 	CDRomDisabledMenuItems,
 	NULL,
     },
+    {
+    	// Sound Options Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	2, 4,
+	SoundOptionsMenuItems,
+	NULL,
+    },
+    {
+	// Preferences Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	2, 4,
+	PreferencesMenuItems,
+	NULL,
+    },
+    {
+	// Speed Settings Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	2, 4,
+	SpeedSettingsMenuItems,
+	NULL,
+    },
+    {
+	// Game Options Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	2, 4,
+	GameOptionsMenuItems,
+	NULL,
+    },
+    
 };
 
 /*----------------------------------------------------------------------------
