@@ -226,18 +226,18 @@ global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 
 	sx = x;
 	ex = sx + sprite->Width;
-	ey = VideoHeight - y;
-	sy = ey - sprite->Height;
+	sy = y;
+	ey = sy + sprite->Height;
 
 	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 1.0f - sprite->TextureHeight);
+	glTexCoord2f(0.0f, 0.0f);
 	glVertex2i(sx, sy);
-	glTexCoord2f(0.0f, 1.0f);
+	glTexCoord2f(0.0f, sprite->TextureHeight);
 	glVertex2i(sx, ey);
-	glTexCoord2f(sprite->TextureWidth, 1.0f);
+	glTexCoord2f(sprite->TextureWidth, sprite->TextureHeight);
 	glVertex2i(ex, ey);
-	glTexCoord2f(sprite->TextureWidth, 1.0f - sprite->TextureHeight);
+	glTexCoord2f(sprite->TextureWidth, 0.0f);
 	glVertex2i(ex, sy);
 	glEnd();
 }
@@ -300,8 +300,8 @@ global void VideoDrawClipX(const Graphic* sprite, unsigned frame,
 
 	svx = x;
 	evx = svx + w;
-	evy = VideoHeight - y;
-	svy = evy - h;
+	svy = y;
+	evy = svy + h;
 
 	if (w < sprite->Width) {
 		if (ox == 0) {
@@ -312,8 +312,8 @@ global void VideoDrawClipX(const Graphic* sprite, unsigned frame,
 	}
 	stx = (GLfloat)ox / sprite->Width * sprite->TextureWidth;
 	etx = (GLfloat)(ox + w) / sprite->Width * sprite->TextureWidth;
-	ety = 1.0f - (GLfloat)oy / sprite->Height * sprite->TextureHeight;
-	sty = 1.0f - (GLfloat)(oy + h) / sprite->Height * sprite->TextureHeight;
+	sty = (GLfloat)oy / sprite->Height * sprite->TextureHeight;
+	ety = (GLfloat)(oy + h) / sprite->Height * sprite->TextureHeight;
 
 	glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
 	glBegin(GL_QUADS);

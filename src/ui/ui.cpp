@@ -183,7 +183,7 @@ global void InitUserInterface(const char* race_name)
 		SetViewportMode(VIEWPORT_SINGLE);
 	}
 
-	TheUI.CompletedBarColor = SDL_MapRGB(TheScreen->format,
+	TheUI.CompletedBarColor = VideoMapRGB(TheScreen->format,
 		TheUI.CompletedBarColorRGB.r,
 		TheUI.CompletedBarColorRGB.g,
 		TheUI.CompletedBarColorRGB.b);

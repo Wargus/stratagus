@@ -324,6 +324,12 @@ extern int ColorBuildingCycleStart;		/// color # start for color cycling
 extern int ColorBuildingCycleEnd;		/// color # end   for color cycling
 
 #ifndef USE_OPENGL
+#define VideoMapRGB(f, r, g, b) SDL_MapRGB((f), (r), (g), (b))
+#else
+#define VideoMapRGB(f, r, g, b) (((r) << 16) | ((g) << 8) | (b))
+#endif
+
+#ifndef USE_OPENGL
 	///		Draw pixel unclipped.
 extern void (*VideoDrawPixel)(Uint32 color, int x, int y);
 

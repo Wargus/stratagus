@@ -588,16 +588,16 @@ global void VideoDrawOnlyFogAlphaOpenGL(int x, int y)
 	g = TheMap.TileGraphic;
 	sx = x;
 	ex = sx + TileSizeX;
-	ey = VideoHeight - y;
-	sy = ey - TileSizeY;
+	sy = y;
+	ey = sy + TileSizeY;
 
 	glDisable(GL_TEXTURE_2D);
 	glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
 	glBegin(GL_QUADS);
 	glVertex2i(sx, sy);
-	glVertex2i(sx, ey);
+	glVertex2i(sx, sy);
 	glVertex2i(ex, ey);
-	glVertex2i(ex, sy);
+	glVertex2i(ex, ey);
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
 }
@@ -943,7 +943,7 @@ global void InitMapFogOfWar(void)
 
 		// FIXME: Make the color configurable
 		SDL_GetRGB(ColorBlack, TheScreen->format, &r, &g, &b);
-		color = SDL_MapRGB(s->format, r, g, b);
+		color = VideoMapRGB(s->format, r, g, b);
 
 		SDL_FillRect(s, NULL, color);
 		OnlyFogSurface = SDL_DisplayFormat(s);

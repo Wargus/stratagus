@@ -1536,7 +1536,7 @@ global void CleanUnitTypes(void)
 		free(type->BoolFlag);
 		free(type->CanTargetFlag);
 
-			if (type->SameSprite) {
+		if (type->SameSprite) {
 			free(type->SameSprite);
 		}
 		if (type->File[0]) {
@@ -1619,8 +1619,8 @@ global void CleanUnitTypes(void)
 			VideoSafeFree(type->Sprite);
 		}
 #ifdef USE_OPENGL
-		for (i = 0; i < PlayerMax; ++i) {
-			VideoSafeFree(type->PlayerColorSprite[i]);
+		for (j = 0; j < PlayerMax; ++j) {
+			VideoSafeFree(type->PlayerColorSprite[j]);
 		}
 #endif
 		free(UnitTypes[i]);

@@ -293,7 +293,7 @@ local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 	//  FIXME: We should force unittypes to have a certain color on the minimap.
 	//
 	if (unit->Player->Player == PlayerNumNeutral) {
-		color = SDL_MapRGB(TheScreen->format,
+		color = VideoMapRGB(TheScreen->format,
 			unit->Type->NeutralMinimapColorRGB.r,
 			unit->Type->NeutralMinimapColorRGB.g,
 			unit->Type->NeutralMinimapColorRGB.b);
@@ -325,7 +325,7 @@ local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 		while (h-- >= 0) {
 			SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
 			((Uint8*)MinimapSurface->pixels)[mx + w + (my + h) * TheUI.MinimapW] =
-				SDL_MapRGB(MinimapSurface->format, c.r, c.g, c.b);
+				VideoMapRGB(MinimapSurface->format, c.r, c.g, c.b);
 		}
 	}
 }
@@ -363,7 +363,7 @@ global void UpdateMinimap(void)
 					((Uint8*)MinimapTerrainSurface->pixels)[mx + my * TheUI.MinimapW];
 			} else if (visiontype > 0) {
 				((Uint8*)MinimapSurface->pixels)[mx + my * TheUI.MinimapW] =
-					SDL_MapRGB(MinimapSurface->format, 0, 0, 0);
+					VideoMapRGB(MinimapSurface->format, 0, 0, 0);
 			}
 		}
 	}

@@ -259,15 +259,15 @@ global void InitVideoSdl(void)
 	InitOpenGL();
 #endif
 
-	ColorBlack = SDL_MapRGB(TheScreen->format, 0, 0, 0);
-	ColorDarkGreen = SDL_MapRGB(TheScreen->format, 48, 100, 4);
-	ColorBlue = SDL_MapRGB(TheScreen->format, 0, 0, 252);
-	ColorOrange = SDL_MapRGB(TheScreen->format, 248, 140, 20);
-	ColorWhite = SDL_MapRGB(TheScreen->format, 252, 248, 240);
-	ColorGray = SDL_MapRGB(TheScreen->format, 128, 128, 128);
-	ColorRed = SDL_MapRGB(TheScreen->format, 252, 0, 0);
-	ColorGreen = SDL_MapRGB(TheScreen->format, 0, 252, 0);
-	ColorYellow = SDL_MapRGB(TheScreen->format, 252, 252, 0);
+	ColorBlack = VideoMapRGB(TheScreen->format, 0, 0, 0);
+	ColorDarkGreen = VideoMapRGB(TheScreen->format, 48, 100, 4);
+	ColorBlue = VideoMapRGB(TheScreen->format, 0, 0, 252);
+	ColorOrange = VideoMapRGB(TheScreen->format, 248, 140, 20);
+	ColorWhite = VideoMapRGB(TheScreen->format, 252, 248, 240);
+	ColorGray = VideoMapRGB(TheScreen->format, 128, 128, 128);
+	ColorRed = VideoMapRGB(TheScreen->format, 252, 0, 0);
+	ColorGreen = VideoMapRGB(TheScreen->format, 0, 252, 0);
+	ColorYellow = VideoMapRGB(TheScreen->format, 252, 252, 0);
 
 	DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
 
