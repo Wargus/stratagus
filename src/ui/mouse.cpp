@@ -651,10 +651,6 @@ global void UIHandleMouseMove(int x,int y)
 	    scroll=1;
 	}
 
-#ifdef WIN32
-	scroll*=2;
-#endif
-
 	xo = TheUI.MouseViewport->MapX;
 	yo = TheUI.MouseViewport->MapY;
 	if( TheUI.ReverseMouseMove ) {
