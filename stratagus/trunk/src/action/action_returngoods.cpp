@@ -97,7 +97,7 @@ global void HandleActionReturnGoods(Unit* unit)
 
     if( type==UnitTypeHumanTankerFull || type==UnitTypeOrcTankerFull ) {
 	if( !unit->Orders[0].Goal ) {
-	    if( !(destu=FindOilDeposit(unit->Player,unit->X,unit->Y)) ) {
+	    if( !(destu=FindOilDeposit(unit,unit->X,unit->Y)) ) {
 		// No deposit -> can't return
 		unit->Orders[0].Action=UnitActionStill;
 		return;

@@ -433,6 +433,8 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 **	@param range	Distance range to look.
 **
 **	@return		Unit to be attacked.
+**
+**	@note	This could be improved, for better performance.
 */
 global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 {
@@ -450,6 +452,8 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
     const Player* player;
     const Unit* best_unit;
     int best_cost;
+
+    DebugLevel3Fn("(%d)%s\n" _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
     //
     //	Select all units in range.
@@ -529,6 +533,13 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	    best_cost=cost;
 	}
     }
+
+/*
+    if( best_unit ) {
+	DebugLevel3Fn("Attacking (%d)%s -> %s\n" _C_ UnitNumber(unit) _C_
+		unit->Type->Ident _C_ best_unit->Type->Ident);
+    }
+*/
 
     // FIXME: No idea how to make this correct, without cast!!
     return (Unit*)best_unit;
