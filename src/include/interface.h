@@ -91,6 +91,12 @@ enum _iface_state_ {
     IfaceStateMenu,			/// Menu active
 };
 
+    /// current key state
+enum _key_state_ {
+    KeyStateCommand = 0,	/// keys -> commands
+    KeyStateInput		/// keys -> line editor
+} KeyState;			/// current keyboard state
+
     /// additional keycodes
 enum _key_codes_ {
     KeyCodeUp=0x101,			/// internal keycode: cursor up key

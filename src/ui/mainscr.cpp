@@ -914,7 +914,7 @@ global void DrawStatusLine(void)
 */
 global void SetStatusLine(char* status)
 {
-    if( strcmp( StatusLine, status ) ) {
+    if( KeyState!=KeyStateInput && strcmp( StatusLine, status ) ) {
 	MustRedraw|=RedrawStatusLine;
 	strncpy( StatusLine, status, STATUS_LINE_LEN-1 );
 	StatusLine[STATUS_LINE_LEN-1] = 0;
@@ -926,7 +926,9 @@ global void SetStatusLine(char* status)
 */
 global void ClearStatusLine(void)
 {
-    SetStatusLine( "" );
+    if( KeyState!=KeyStateInput ) {
+	SetStatusLine( "" );
+    }
 }
 
 /*----------------------------------------------------------------------------
