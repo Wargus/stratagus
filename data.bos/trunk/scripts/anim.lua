@@ -10,7 +10,7 @@
 --
 --	anim.lua	-	The unit animation definitions.
 --
---	(c) Copyright 2000-2004 by Josh Cogliati, Lutz Sammer, Crestez Leonard
+--	(c) Copyright 2000-2005 by Josh Cogliati, Lutz Sammer, Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
