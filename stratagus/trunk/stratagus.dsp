@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "src\include" /I "src\movie\vp31\include" /I "include" /D "NDEBUG" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_SDL" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_OGG" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "src\include" /I "include" /D "NDEBUG" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_SDL" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "src\include" /I "src\movie\vp31\include" /I "include" /D "_DEBUG" /D "DEBUG" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_SDL" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_OGG" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "src\include" /I "include" /D "_DEBUG" /D "DEBUG" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_SDL" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -313,86 +313,6 @@ SOURCE=.\src\missile\script_missile.c
 # Begin Group "movie"
 
 # PROP Default_Filter ""
-# Begin Group "vp31"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\BlockMapping.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\DCT_decode.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\dct_globals.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\DDecode.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\DFrameR.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\DSystemDependant.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\FrameIni.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\Frarray.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\Huffman.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\IDctPart.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\pb_globals.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\postproc.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\Quantize.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\Reconstruct.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\unpack.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\vfwPback.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\vfwpbdll_if.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\YUVtofromRGB.c
-# End Source File
-# End Group
-# Begin Source File
-
-SOURCE=.\src\movie\avi.c
-# End Source File
 # Begin Source File
 
 SOURCE=.\src\movie\movie.c
@@ -706,78 +626,6 @@ SOURCE=.\src\video\video.c
 # Begin Group "include"
 
 # PROP Default_Filter ""
-# Begin Group "vp31."
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\BlockMapping.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\codec_common.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\codec_common_interface.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\compdll.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\dct.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\Huffman.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\HuffTables.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\machine.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\mcomp.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\pbdll.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\PreprocIf.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\Quantize.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\rawTypes.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\Reconstruct.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\type_aliases.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\vfw_PB_Interface.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\movie\vp31\include\YUVtofromRGB.h
-# End Source File
-# End Group
 # Begin Source File
 
 SOURCE=.\src\include\actions.h
@@ -785,10 +633,6 @@ SOURCE=.\src\include\actions.h
 # Begin Source File
 
 SOURCE=.\src\include\ai.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\avi.h
 # End Source File
 # Begin Source File
 
@@ -1051,6 +895,10 @@ SOURCE=.\lib\mikmod.lib
 # Begin Source File
 
 SOURCE=.\lib\libmng.lib
+# End Source File
+# Begin Source File
+
+SOURCE=.\lib\theora_static.lib
 # End Source File
 # End Target
 # End Project
