@@ -553,6 +553,9 @@ global Graphic* MakeGraphic(
     graphic->NumFrames=0;
     graphic->Frames=data;
     graphic->Size=size;
+#ifdef USE_OPENGL
+    graphic->NumTextureNames=0;
+#endif
 
     return graphic;
 }
@@ -612,7 +615,7 @@ global void MakeTexture(Graphic* graphic,int width,int height)
     h=i;
     graphic->TextureWidth = (float)width/w;
     graphic->TextureHeight = (float)height/h;
-    tex = (unsigned char*)malloc(w*h*4);
+    tex = alloca(w*h*4);
     for( x=0; x<n; ++x ) {
 	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[x]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -621,47 +624,116 @@ global void MakeTexture(Graphic* graphic,int width,int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	for( i=0; i<height; ++i ) {
 	    sp=(const unsigned char*)graphic->Frames+(x%fl)*width+((x/fl)*height+i)*graphic->Width;
-#if 0
-	    for( j=0; j<width; ++j ) {
-		VMemType32 c;
-
-		if( *sp==255 ) {
-		    tex[(h-i-1)*w*4+j*4+3] = 0;
-		} else {
-		    c = ((VMemType32*)graphic->Pixels)[*sp];
-		    tex[(h-i-1)*w*4+j*4+0] = ((unsigned char*)&c)[2];
-		    tex[(h-i-1)*w*4+j*4+1] = ((unsigned char*)&c)[1];
-		    tex[(h-i-1)*w*4+j*4+2] = ((unsigned char*)&c)[0];
-		    tex[(h-i-1)*w*4+j*4+3] = 0xff;
-		}
-		++sp;
-	    }
-#else
 	    for( j=0; j<width; ++j ) {
 		int c;
+		Palette p;
 
-		if( (c=*sp)==255 ) {
-		    tex[(h-i-1)*w*4+j*4+3] = 0;
+		c = (h-i-1)*w*4+j*4;
+		if( *sp==255 ) {
+		    tex[c+3] = 0;
 		} else {
-		    tex[(h-i-1)*w*4+j*4+0] = graphic->Palette[c].r;
-		    tex[(h-i-1)*w*4+j*4+1] = graphic->Palette[c].g;
-		    tex[(h-i-1)*w*4+j*4+2] = graphic->Palette[c].b;
-		    tex[(h-i-1)*w*4+j*4+3] = 0xff;
+		    p = graphic->Palette[*sp];
+		    tex[c+0] = p.r;
+		    tex[c+1] = p.g;
+		    tex[c+2] = p.b;
+		    tex[c+3] = 0xff;
 		}
 		++sp;
 	    }
-#endif
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
 	    GL_UNSIGNED_BYTE, tex);
 	IfDebug(
+	    i = glGetError();
+	    if (i) {
+		DebugLevel0Fn("glTexImage2D(%x)\n" _C_ i);
+	    }
+	);
+    }
+}
+
+/**
+**	Make an OpenGL texture of the player color pixels only.
+*/
+global void MakePlayerColorTexture(Graphic** g,Graphic* graphic,int frame,unsigned char *map,int maplen)
+{
+    int i;
+    int j;
+    int h;
+    int w;
+//    int x;
+    int n;
+    unsigned char* tex;
+    const unsigned char* sp;
+    int fl;
+
+    if( !*g ) {
+	*g = calloc(1,sizeof(Graphic));
+
+	n = graphic->NumFrames;
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	(*g)->NumTextureNames = n;
+	(*g)->TextureNames = calloc(n,sizeof(GLuint));
+
+	(*g)->Type = graphic->Type;
+	(*g)->Width = graphic->Width;
+	(*g)->Height = graphic->Height;
+	(*g)->GraphicWidth = graphic->GraphicWidth;
+	(*g)->GraphicHeight = graphic->GraphicHeight;
+	(*g)->TextureWidth = graphic->TextureWidth;
+	(*g)->TextureHeight = graphic->TextureHeight;
+    }
+
+    fl = graphic->GraphicWidth/graphic->Width;
+    glGenTextures(1, &(*g)->TextureNames[frame]);
+
+    for( i=1; i<graphic->Width; i<<=1 ) {
+    }
+    w=i;
+    for( i=1; i<graphic->Height; i<<=1 ) {
+    }
+    h=i;
+
+    tex = alloca(w*h*4);
+
+    glBindTexture(GL_TEXTURE_2D, (*g)->TextureNames[frame]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    for( i=0; i<graphic->Height; ++i ) {
+	sp=(const unsigned char*)graphic->Frames + (frame%fl)*graphic->Width + ((frame/fl)*graphic->Height+i)*graphic->GraphicWidth;
+	for( j=0; j<graphic->Width; ++j ) {
+	    int c;
+	    int z;
+	    Palette p;
+
+	    c=(h-i-1)*w*4+j*4;
+	    for( z=0; z<maplen; ++z ) {
+		if( *sp==map[z*2] ) {
+		    p=GlobalPalette[map[z*2+1]];
+		    tex[c+0] = p.r;
+		    tex[c+1] = p.g;
+		    tex[c+2] = p.b;
+		    tex[c+3] = 0xff;
+		    break;
+		}
+	    }
+	    if( z==maplen ) {
+		tex[c+3] = 0;
+	    }
+	    ++sp;
+	}
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+	GL_UNSIGNED_BYTE, tex);
+    IfDebug(
 	i = glGetError();
 	if (i) {
 	    DebugLevel0Fn("glTexImage2D(%x)\n" _C_ i);
 	}
-	);
-    }
-    free(tex);
+    );
 }
 #endif
 
