@@ -405,19 +405,23 @@ local unsigned char *ssmsoptions[] = {
     "64 x 64",
     "96 x 96",
     "128 x 128",
+    "256 x 256",
+    "512 x 512",
+    "1024 x 1024",
     // FIXME: We support bigger sizes
 };
 
-local char ScenSelectDisplayPath[1024];
-local char ScenSelectFileName[128];
 local int GuiGameStarted;
-local char ScenSelectPath[1024];
 
-global char ScenSelectFullPath[1024];
-global MapInfo *ScenSelectPudInfo = NULL;
+local char ScenSelectPath[1024];		/// Scenario selector path
+local char ScenSelectDisplayPath[1024];		/// Displayed selector path
+local char ScenSelectFileName[128];		/// Scenario selector name
+global char ScenSelectFullPath[1024];		/// Scenario selector path+name
+
+global MapInfo *ScenSelectPudInfo;		/// Selected pud info
 
 /**
-**	Scenario selectio menu.
+**	Scenario selection menu.
 **
 **	@todo FIXME: Configure with CCL.
 */
@@ -444,7 +448,7 @@ local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL,
 	{ text:{ "Map size:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL,
-	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 5, 0, 0, 0, 0} } },
+	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 8, 0, 0, 0, 0} } },
     { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL,
 	{ button:{ NULL, 36, 24, MBUTTON_FOLDER, ScenSelectFolder, 0} } },
 #else
@@ -2606,35 +2610,54 @@ local void GameMenuObjectives(void)
     FreeMenuObjectives();
 }
 
-local void ScenSelectMenu(void)
+/**
+**	Get pud info from select path+name
+*/
+local void GetInfoFromSelectPath(void)
 {
     int i;
 
-    ProcessMenu(MENU_SCEN_SELECT, 1);
     FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
+
     if (ScenSelectPath[0]) {
 	i = strlen(ScenSelectPath);
 	strcat(ScenSelectPath, "/");
     } else {
 	i = 0;
     }
-    strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
+    strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
     if (strcasestr(ScenSelectFileName, ".pud")) {
 	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
 	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else {
 	// FIXME: GetCmInfo();
     }
-    ScenSelectPath[i] = 0;
+    ScenSelectPath[i] = '\0';		// Remove appended part
 }
 
+/**
+**	Enter select scenario menu.
+*/
+local void ScenSelectMenu(void)
+{
+    ProcessMenu(MENU_SCEN_SELECT, 1);
+
+    GetInfoFromSelectPath();
+}
+
+/**
+**	Enter multiplayer select scenario menu.
+*/
 local void MultiScenSelectMenu(void)
 {
     ScenSelectMenu();
     MultiGamePlayerSelectorsUpdate(1);
 }
 
+/**
+**	Enter single player menu.
+*/
 local void SinglePlayerGameMenu(void)
 {
     DestroyCursorBackground();
@@ -2901,6 +2924,9 @@ local void CreateNetGameMenu(void)
     }
 }
 
+/**
+**	Enter multiplayer game menu.
+*/
 local void MultiPlayerGameMenu(void)
 {
     char NameBuf[32];
@@ -2947,12 +2973,16 @@ local void FreeMapInfos(FileList *fl, int n)
     }
 }
 
-local void ScenSelectInit(Menuitem *mi __attribute__((unused)))
+/**
+**	Initialize the scenario selector menu.
+*/
+local void ScenSelectInit(Menuitem * mi __attribute__ ((unused)))
 {
-    strcpy(ScenSelectPath, FreeCraftLibPath);
-    ScenSelectDisplayPath[0] = 0;
-    ScenSelectMenuItems[9].flags = MenuButtonDisabled;
-    ScenSelectMenuItems[9].d.button.text = NULL;
+    DebugCheck(!*ScenSelectPath);
+    ScenSelectMenuItems[9].flags =
+	*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
+    ScenSelectMenuItems[9].d.button.text = ScenSelectDisplayPath;
+    DebugLevel0Fn("Start path: %s\n", ScenSelectPath);
 }
 
 local void ScenSelectLBAction(Menuitem *mi, int i)
@@ -2996,7 +3026,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     MapInfo *info;
     char *suf, *cp, *lcp, *np;
     int p, sz;
-    static int szl[] = { -1, 32, 64, 96, 128 };
+    static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
 #ifdef USE_ZZIPLIB
     ZZIP_FILE *zzf;
 #endif
@@ -3624,10 +3654,35 @@ local void ScenSelectOk(void)
     }
 }
 
+/**
+**	Scenario select cancel button.
+*/
 local void ScenSelectCancel(void)
 {
+    char* s;
+
+    //
+    //  Use last selected map.
+    //
+    DebugLevel0Fn("Map   path: %s\n", CurrentMapPath);
     strcpy(ScenSelectPath, FreeCraftLibPath);
-    strcpy(ScenSelectFileName, "default.pud");
+    if (*ScenSelectPath) {
+	strcat(ScenSelectPath, "/");
+    }
+    strcat(ScenSelectPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectPath, '/'))) {
+	strcpy(ScenSelectFileName, s + 1);
+	*s = '\0';
+    }
+    strcpy(ScenSelectDisplayPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectDisplayPath, '/'))) {
+	*s = '\0';
+    } else {
+	*ScenSelectDisplayPath = '\0';
+    }
+
+    DebugLevel0Fn("Start path: %s\n", ScenSelectPath);
+
     EndMenu();
 }
 
@@ -3641,6 +3696,9 @@ local void GameCancel(void)
     EndMenu();
 }
 
+/**
+**	Custom game start game button pressed.
+*/
 local void CustomGameStart(void)
 {
     int i;
@@ -3648,24 +3706,24 @@ local void CustomGameStart(void)
 
     FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
+
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");
 	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
-	p=ScenSelectPath+strlen(FreeCraftLibPath)+1;
+	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
 	strcpy(CurrentMapPath, p);
-    }
-    else {
+    } else {
 	strcpy(CurrentMapPath, ScenSelectFileName);
 	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
     }
 
-    for( i=0;i<MAX_OBJECTIVES;i++) {
-	if( GameIntro.Objectives[i] ) {
+    for (i = 0; i < MAX_OBJECTIVES; i++) {
+	if (GameIntro.Objectives[i]) {
 	    free(GameIntro.Objectives[i]);
-	    GameIntro.Objectives[i]=NULL;
+	    GameIntro.Objectives[i] = NULL;
 	}
     }
-    GameIntro.Objectives[0]=strdup(DefaultObjective);
+    GameIntro.Objectives[0] = strdup(DefaultObjective);
 
     // FIXME: Johns is this here needed? Can the map loaded in create game?
     // ARI: Yes - This switches the menu gfx.. from def. Orc to Human, etc
@@ -3680,24 +3738,43 @@ local void CustomGameStart(void)
     EndMenu();
 }
 
-local void GameSetupInit(Menuitem *mi __attribute__((unused)))
+/**
+**	Single player custom game menu entered.
+*/
+local void GameSetupInit(Menuitem * mi __attribute__ ((unused)))
 {
-    strcpy(ScenSelectPath, FreeCraftLibPath);
-#if 0	// FIXME: as soon as .cm is supported..
-    strcpy(ScenSelectFileName, "default.cm");
+    char* s;
+
+    //
+    //  No old path, setup the default.
+    //
+    if (!*CurrentMapPath || *CurrentMapPath == '.' || *CurrentMapPath == '/') {
+#if 0					// FIXME: as soon as .cm is supported..
+	strcpy(CurrentMapPath, "default.cm");
 #endif
-    strcpy(ScenSelectFileName, "default.pud");
-    if (ScenSelectPath[0]) {
+	strcpy(CurrentMapPath, "default.pud");
+
+    }
+
+    DebugLevel0Fn("Map   path: %s\n", CurrentMapPath);
+    strcpy(ScenSelectPath, FreeCraftLibPath);
+    if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
     }
-    strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
-    if (strcasestr(ScenSelectFileName, ".pud")) {
-	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
-	strcpy(ScenSelectFullPath, ScenSelectPath);
-    } else {
-	// FIXME: GetCmInfo();
+    strcat(ScenSelectPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectPath, '/'))) {
+	strcpy(ScenSelectFileName, s + 1);
+	*s = '\0';
     }
-    strcpy(ScenSelectPath, FreeCraftLibPath);
+    strcpy(ScenSelectDisplayPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectDisplayPath, '/'))) {
+	*s = '\0';
+    } else {
+	*ScenSelectDisplayPath = '\0';
+    }
+    DebugLevel0Fn("Start path: %s\n", ScenSelectPath);
+
+    GetInfoFromSelectPath();
 }
 
 local void GameDrawFunc(Menuitem *mi)
@@ -5091,13 +5168,16 @@ global void InitMenus(unsigned int race)
     file = strcat(strcpy(buf, "graphics/"), file);
     MenuButtonGfx.Sprite = LoadSprite(file, 300, 144);	// 50/53 images!
 
-    strcpy(ScenSelectPath, FreeCraftLibPath);
-    if (ScenSelectPath[0]) {
-	strcat(ScenSelectPath, "/graphics/tilesets/");
-    }
+    //
+    //	Autodetect the swamp tileset 
+    //
 #ifdef HAVE_EXPANSION
-    strcat(ScenSelectPath, "swamp");
-    if (access(ScenSelectPath, F_OK) != 0) {
+    strcpy(ScenSelectFullPath, FreeCraftLibPath);
+    if (ScenSelectFullPath[0]) {
+	strcat(ScenSelectFullPath, "/graphics/tilesets/");
+    }
+    strcat(ScenSelectFullPath, "swamp");
+    if (access(ScenSelectFullPath, F_OK) != 0) {
 	// ARI FIXME: Hack to disable Expansion Gfx..
 	// also shows how to add new tilesets....
 	// - FIXME2:
