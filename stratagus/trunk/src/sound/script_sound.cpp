@@ -404,6 +404,22 @@ local SCM CclSetSoundRange(SCM sound,SCM range) {
 }
 
 /**
+**	Play a music file.
+**
+**	@param name	Name of the music file to play.
+*/
+local SCM CclPlayMusic(SCM name)
+{
+    char* music_name;
+
+    music_name=gh_scm2newstr(name,NULL);
+    PlayMusic(music_name);
+    free(music_name);
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for sound.
 */
 global void SoundCclRegister(void)
@@ -424,6 +440,7 @@ global void SoundCclRegister(void)
     init_subr_3("make-sound-group",CclMakeSoundGroup);
     init_subr_1("play-sound",CclPlaySound);
 
+    gh_new_procedure1_0("play-music",CclPlayMusic);
 }
 
 #else	// }{ WITH_SOUND
@@ -519,14 +536,24 @@ local SCM CclDefineGameSounds(SCM list)
 **	Glue between c and scheme. Ask to the sound system to remap a sound id
 **	to a given name.
 **
-**	@param name the new name for the sound
-**	@param sound the sound object
+**	@param name	the new name for the sound
+**	@param sound	the sound object
 **
 **	@return the sound object
 */
 local SCM CclMapSound(SCM name,SCM sound)
 {
     return sound;
+}
+
+/**
+**	Play a music file.
+**
+**	@param name	Name of the music file to play.
+*/
+local SCM CclPlayMusic(SCM name)
+{
+    return SCM_UNSPECIFIED;
 }
 
 /**
@@ -544,6 +571,7 @@ global void SoundCclRegister(void)
     gh_new_procedure2_0("map-sound",CclMapSound);
     gh_new_procedure1_0("sound-for-name",CclSoundForName);
     gh_new_procedure2_0("set-sound-range",CclSetSoundRange);
+    gh_new_procedure1_0("play-music",CclPlayMusic);
 }
 
 #endif	// } !WITH_SOUND

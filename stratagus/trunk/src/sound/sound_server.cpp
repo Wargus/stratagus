@@ -32,7 +32,9 @@
 
 #ifdef WITH_SOUND	// {
 
-#define USE_LIBMODPLUG
+#if !defined(USE_LIBMODPLUG) && !defined(noUSE_LIBMODPLUG)
+#define USE_LIBMODPLUG			/// Include lib modplug support
+#endif
 
 #include <stdlib.h>
 #include <string.h>
@@ -61,9 +63,6 @@
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"
-#include "unittype.h"
-#include "player.h"
-#include "unit.h"
 #include "tileset.h"
 #include "map.h"
 #include "iolib.h"
@@ -71,6 +70,7 @@
 #include "sound_server.h"
 #include "sound.h"
 #include "wav.h"
+#include "ccl.h"
 
 #ifdef USE_LIBMODPLUG
 #include "../libmodplug/modplug.h"
@@ -131,13 +131,16 @@ global int SoundThreadRunning;		/// FIXME: docu
 local int PlayingMusic;			/// Flag true if playing music
 
 /**
+**	Play a music file. Currently supported are .mod, .it, .s3m, .wav, .xm.
+**
 **	Some quick hacks for mods.
+**
+**	@param name	Name of sound file, format is automatic detected.
 */
-local void PlayMusic(void)
+local void PlayMusic(const char* name)
 {
     ModPlug_Settings settings;
     CLFile* f;
-    char* name;
     char* buffer;
     int size;
     int i;
@@ -146,16 +149,17 @@ local void PlayMusic(void)
     settings.mFrequency=SoundFrequency;
     settings.mBits=16;
 
-    settings.mLoopCount=-1;
     ModPlug_SetSettings(&settings);
 
     size=0;
     buffer=malloc(1024);
 
-    name="music/default.mod";
+    if( PlayingMusic ) {
+	ModPlug_Unload();
+	PlayingMusic=0;
+    }
 
     name=LibraryFileName(name,buffer);
-    //ModPlug_Unload();
 
     DebugLevel2Fn("Loading `%s'\n",name);
 
@@ -188,25 +192,41 @@ local void MixMusicToStereo32(int* buffer,int size)
 {
     short* buf;
     int i;
+    int n;
 
     if( PlayingMusic ) {
 	buf=alloca(size*sizeof(short)*2);
 
-	i=ModPlug_Read(buf,size*2);
-	// FIXME: end of file!
-	DebugLevel3Fn("%d\n",i);
+	n=ModPlug_Read(buf,size*2);
 
-	for( i=0; i<size; ++i ) {
+	for( i=0; i<n/2; ++i ) {	// Add to our samples
 	    buffer[i]+=buf[i];
+	}
+
+	if( n!=size*2 ) {		// End reached
+	    SCM cb;
+
+	    DebugLevel2Fn("End of music %d\n",i);
+	    PlayingMusic=0;
+	    ModPlug_Unload();
+
+	    cb=gh_symbol2scm("music-stopped");
+	    if( !gh_null_p(symbol_boundp(cb,NIL)) ) {
+		SCM value;
+
+		value=symbol_value(cb,NIL);
+		if( !gh_null_p(value) ) {
+		    gh_apply(value,NIL);
+		}
+	    }
 	}
     }
 }
 
 #else
 
-local void PlayMusic(void)
-{
-}
+#define PlayMusic(name)
+#define MixMusicToStereo32(buffer,size)
 
 #endif
 
@@ -1246,7 +1266,7 @@ global int InitSound(void)
     DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
 #endif
 
-    PlayMusic();
+    PlayMusic("music/default.mod");
 
     return 0;
 }
