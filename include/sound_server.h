@@ -164,6 +164,21 @@ extern unsigned AllocatedSoundMemory;
 extern unsigned CompressedSoundMemory;
 #endif
 
+#ifdef USE_SDLCD 
+    /// SDL cdrom device
+extern SDL_CD *CDRom;
+#endif 
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) 
+    /// cd play mode, ":off" ":random" or ":all"
+extern char *CDMode;
+    /// FIXME: docu
+extern int CDTrack;
+#endif 
+#ifdef USE_LIBCDA 
+    /// number of tracks on the cd
+extern int NumCDTracks;
+#endif 
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
