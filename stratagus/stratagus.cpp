@@ -576,8 +576,21 @@ local void VideoEffect0(int frame)
 	buf1=calloc(VideoWidth*VideoHeight,sizeof(int));
 	buf2=calloc(VideoWidth*VideoHeight,sizeof(int));
 	VideoLockScreen();
-	vmem=malloc(VideoWidth*VideoHeight*2);
-	memcpy(vmem,VideoMemory,VideoWidth*VideoHeight*2);
+	switch( VideoBpp ) {
+	    case 15:
+	    case 16:
+		vmem=malloc(VideoWidth*VideoHeight*sizeof(VMemType16));
+		memcpy(vmem,VideoMemory,VideoWidth*VideoHeight*sizeof(VMemType16));
+		break;
+	    case 24:
+		vmem=malloc(VideoWidth*VideoHeight*sizeof(VMemType24));
+		memcpy(vmem,VideoMemory,VideoWidth*VideoHeight*sizeof(VMemType24));
+		break;
+	    case 32:
+		vmem=malloc(VideoWidth*VideoHeight*sizeof(VMemType32));
+		memcpy(vmem,VideoMemory,VideoWidth*VideoHeight*sizeof(VMemType32));
+		break;
+	}
 	VideoUnlockScreen();
 
 	if( 1 ) {
@@ -635,7 +648,9 @@ local void VideoEffect0(int frame)
 	    int yo;
 	    int xt;
 	    int yt;
-	    unsigned pixel;
+	    VMemType16 pixel16;
+	    VMemType24 pixel24;
+	    VMemType32 pixel32;
 
 	    xo=buf2[y*VideoWidth+x-1] - buf2[y*VideoWidth+x+1];
 	    yo=buf2[y*VideoWidth-VideoWidth+x] -
@@ -656,40 +671,81 @@ local void VideoEffect0(int frame)
 
 	    switch( VideoDepth ) {
 		case 15:
-		    pixel=((unsigned short*)vmem)[xt+yt*VideoWidth];
+		    pixel16=((VMemType16*)vmem)[xt+yt*VideoWidth];
 		    if( xo ) {		// Shading
 			int r,g,b;
 
-			r=(pixel>>0)&0x1F;
-			g=(pixel>>5)&0x1F;
-			b=(pixel>>10)&0x1F;
+			r=(pixel16>>0)&0x1F;
+			g=(pixel16>>5)&0x1F;
+			b=(pixel16>>10)&0x1F;
 			r+=xo;
 			g+=xo;
 			b+=xo;
 			r= r<0 ? 0 : r>0x1F ? 0x1F : r;
 			g= g<0 ? 0 : g>0x1F ? 0x1F : g;
 			b= b<0 ? 0 : b>0x1F ? 0x1F : b;
-			pixel=r|(g<<5)|(b<<10);
+			pixel16=r|(g<<5)|(b<<10);
 		    }
-		    VideoMemory16[x+VideoWidth*y]=pixel;
+		    VideoMemory16[x+VideoWidth*y]=pixel16;
 		    break;
 		case 16:
-		    pixel=((unsigned short*)vmem)[xt+yt*VideoWidth];
+		    pixel16=((VMemType16*)vmem)[xt+yt*VideoWidth];
 		    if( xo ) {		// Shading
 			int r,g,b;
 
-			r=(pixel>>0)&0x1F;
-			g=(pixel>>5)&0x3F;
-			b=(pixel>>11)&0x1F;
+			r=(pixel16>>0)&0x1F;
+			g=(pixel16>>5)&0x3F;
+			b=(pixel16>>11)&0x1F;
 			r+=xo;
 			g+=xo*2;
 			b+=xo;
 			r= r<0 ? 0 : r>0x1F ? 0x1F : r;
 			g= g<0 ? 0 : g>0x3F ? 0x3F : g;
 			b= b<0 ? 0 : b>0x1F ? 0x1F : b;
-			pixel=r|(g<<5)|(b<<11);
+			pixel16=r|(g<<5)|(b<<11);
 		    }
-		    VideoMemory16[x+VideoWidth*y]=pixel;
+		    VideoMemory16[x+VideoWidth*y]=pixel16;
+		    break;
+		case 24:
+		    if( VideoBpp==24 ) {
+			pixel24=((VMemType24*)vmem)[xt+yt*VideoWidth];
+			if( xo ) {
+			    int r,g,b;
+
+			    r=(pixel24.a)&0xFF;
+			    g=(pixel24.b)&0xFF;
+			    b=(pixel24.c)&0xFF;
+			    r+=xo<<3;
+			    g+=xo<<3;
+			    b+=xo<<3;
+			    r= r<0 ? 0 : r>0xFF ? 0xFF : r;
+			    g= g<0 ? 0 : g>0xFF ? 0xFF : g;
+			    b= b<0 ? 0 : b>0xFF ? 0xFF : b;
+			    pixel24.a=r;
+			    pixel24.b=g;
+			    pixel24.c=b;
+			}
+			VideoMemory24[x+VideoWidth*y]=pixel24;
+			break;
+		    }
+		    // FALL THROUGH
+		case 32:
+		    pixel32=((VMemType32*)vmem)[xt+yt*VideoWidth];
+		    if( xo ) {
+			int r,g,b;
+
+			r=(pixel32>>0)&0xFF;
+			g=(pixel32>>8)&0xFF;
+			b=(pixel32>>16)&0xFF;
+			r+=xo<<3;
+			g+=xo<<3;
+			b+=xo<<3;
+			r= r<0 ? 0 : r>0xFF ? 0xFF : r;
+			g= g<0 ? 0 : g>0xFF ? 0xFF : g;
+			b= b<0 ? 0 : b>0xFF ? 0xFF : b;
+			pixel32=r|(g<<8)|(b<<16);
+		    }
+		    VideoMemory32[x+VideoWidth*y]=pixel32;
 		    break;
 	    }
 	}
