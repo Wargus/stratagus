@@ -107,6 +107,10 @@ global void InitUserInterface(const char *RaceName)
 
 /**
 **	Load the user interface graphics.
+**
+**	@todo	If sub images of the same graphic are used, they are loaded
+**		multiple into memory. Use the IconFile code and perhaps build
+**		a new layer, which supports image sharing.
 */
 global void LoadUserInterface(void)
 {
