@@ -172,7 +172,7 @@ Graphic* LoadGraphicPNG(const char* name)
 			/* Check if all tRNS entries are opaque except one */
 			int i;
 			int t;
-			
+
 			t = -1;
 			for (i = 0; i < num_trans; ++i) {
 				if (trans[i] == 0) {
@@ -206,7 +206,7 @@ Graphic* LoadGraphicPNG(const char* name)
 		&color_type, &interlace_type, NULL, NULL);
 
 	/* Allocate the SDL surface to hold the image */
-	Rmask = Gmask = Bmask = Amask = 0 ; 
+	Rmask = Gmask = Bmask = Amask = 0 ;
 	if (color_type != PNG_COLOR_TYPE_PALETTE) {
 		if (SDL_BYTEORDER == SDL_LIL_ENDIAN) {
 			Rmask = 0x000000FF;
@@ -271,7 +271,7 @@ Graphic* LoadGraphicPNG(const char* name)
 				palette->colors[i].b = i;
 			}
 		} else if (info_ptr->num_palette > 0) {
-			palette->ncolors = info_ptr->num_palette; 
+			palette->ncolors = info_ptr->num_palette;
 			for (i = 0; i < info_ptr->num_palette; ++i) {
 				palette->colors[i].b = info_ptr->palette[i].blue;
 				palette->colors[i].g = info_ptr->palette[i].green;

@@ -53,24 +53,24 @@
 
 	/// Font color mapping
 typedef struct _font_color_mapping_ {
-	char* ColorName;                        /// Font color name
-	SDL_Color Color[NumFontColors];         /// Array of colors
-	struct _font_color_mapping_* Next;      /// Next pointer
+	char* ColorName;                        ///< Font color name
+	SDL_Color Color[NumFontColors];         ///< Array of colors
+	struct _font_color_mapping_* Next;      ///< Next pointer
 } FontColorMapping;
 
-static FontColorMapping* FontColor;
+static FontColorMapping* FontColor;         ///< FIXME
 
 	/// Font color mappings
 static FontColorMapping* FontColorMappings;
 
 	/// Font mapping
 typedef struct _font_mapping_ {
-	char* Ident;                            /// Font name
-	int Font;                               /// Ident number
-	struct _font_mapping_* Next;            /// Next pointer
+	char* Ident;                            ///< Font name
+	int Font;                               ///< Ident number
+	struct _font_mapping_* Next;            ///< Next pointer
 } FontMapping;
 
-static FontMapping* FontMappings;
+static FontMapping* FontMappings;           ///< FIXME
 
 /**
 **  Fonts table
@@ -79,27 +79,19 @@ static FontMapping* FontMappings;
 */
 static ColorFont Fonts[MaxFonts];
 
-	/// Last text color
-static FontColorMapping* LastTextColor;
-	/// Default text color
-static FontColorMapping* DefaultTextColor;
-	/// Reverse text color
-static FontColorMapping* ReverseTextColor;
-	/// Default normal color index
-static char* DefaultNormalColorIndex;
-	/// Default reverse color index
-static char* DefaultReverseColorIndex;
+static FontColorMapping* LastTextColor;    ///< Last text color
+static FontColorMapping* DefaultTextColor; ///< Default text color
+static FontColorMapping* ReverseTextColor; ///< Reverse text color
+static char* DefaultNormalColorIndex;      ///< Default normal color index
+static char* DefaultReverseColorIndex;     ///< Default reverse color index
 
 	/// Draw character with current video depth.
 static void VideoDrawChar(const Graphic*, int, int, int, int, int, int);
 
 #ifdef USE_OPENGL
-	/// Font bitmaps
-static GLubyte* FontBitmaps[MaxFonts][NumFontColors];
-	/// Font bitmap widths
-static int FontBitmapWidths[MaxFonts];
-	/// Current font
-static int CurrentFont;
+static GLubyte* FontBitmaps[MaxFonts][NumFontColors]; ///< Font bitmaps
+static int FontBitmapWidths[MaxFonts];                ///< Font bitmap widths
+static int CurrentFont;                               ///< Current font
 #endif
 
 /*----------------------------------------------------------------------------
@@ -235,7 +227,7 @@ int VideoTextLength(unsigned font, const unsigned char* text)
 			if (*s == '<' || *s == '>' || *s == '!') {
 				continue;
 			}
-			if (*s != '~') {				// ~~ -> ~
+			if (*s != '~') { // ~~ -> ~
 				isformat = !isformat;
 				continue;
 			}
@@ -283,11 +275,11 @@ static void VideoDrawCharClip(const Graphic* graphic, int gx, int gy, int w, int
 /**
 **  Draw text with font at x,y clipped/unclipped.
 **
-**  ~		is special prefix.
-**  ~~		is the ~ character self.
-**  ~!		print next character reverse.
-**  ~<		start reverse.
-**  ~>		switch back to last used color.
+**  ~    is special prefix.
+**  ~~   is the ~ character self.
+**  ~!   print next character reverse.
+**  ~<   start reverse.
+**  ~>   switch back to last used color.
 **
 **  @param x     X screen position
 **  @param y     Y screen position
@@ -387,12 +379,12 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 /**
 **  Draw text with font at x,y unclipped.
 **
-**  ~		is special prefix.
-**  ~~		is the ~ character self.
-**  ~!		print next character reverse.
-**  ~n		0123456789abcdef print text in color 1-16.
-**  ~<		start reverse.
-**  ~>		switch back to last used color.
+**  ~    is special prefix.
+**  ~~   is the ~ character self.
+**  ~!   print next character reverse.
+**  ~n   0123456789abcdef print text in color 1-16.
+**  ~<   start reverse.
+**  ~>   switch back to last used color.
 **
 **  @param x     X screen position
 **  @param y     Y screen position
@@ -894,14 +886,14 @@ void FontsCclRegister(void)
 	lua_register(Lua, "DefineFont", CclDefineFont);
 	lua_register(Lua, "DefineFontColor", CclDefineFontColor);
 
-//	lua_register(Lua, "DefaultTextColors", CclDefaultTextColors);
-//	lua_register(Lua, "TextLength", CclTextLength);
-//	lua_register(Lua, "DrawText", CclDrawText);
-//	lua_register(Lua, "DrawReverseText", CclDrawReverseText);
-//	lua_register(Lua, "DrawTextCentered", CclDrawTextCentered);
-//	lua_register(Lua, "DrawReverseTextCentered", CclDrawReverseTextCentered);
-//	lua_register(Lua, "DrawNumber", CclDrawNumber);
-//	lua_register(Lua, "DrawReverseNumber", CclDrawReverseNumber);
+// lua_register(Lua, "DefaultTextColors", CclDefaultTextColors);
+// lua_register(Lua, "TextLength", CclTextLength);
+// lua_register(Lua, "DrawText", CclDrawText);
+// lua_register(Lua, "DrawReverseText", CclDrawReverseText);
+// lua_register(Lua, "DrawTextCentered", CclDrawTextCentered);
+// lua_register(Lua, "DrawReverseTextCentered", CclDrawReverseTextCentered);
+// lua_register(Lua, "DrawNumber", CclDrawNumber);
+// lua_register(Lua, "DrawReverseNumber", CclDrawReverseNumber);
 }
 
 /**
