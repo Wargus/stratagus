@@ -568,7 +568,7 @@ global void PlayerPixels(const Player* player)
 	//Pixels8[209]=player->UnitColor2;
 	//Pixels8[210]=player->UnitColor3;
 	//Pixels8[211]=player->UnitColor4;
-	*((struct __4pixel8__*)Pixels8+208)=player->UnitColors.Depth8;
+	*((struct __4pixel8__*)(Pixels8+208))=player->UnitColors.Depth8;
 	break;
     case 15:
     case 16:
@@ -576,14 +576,14 @@ global void PlayerPixels(const Player* player)
 	//Pixels16[209]=player->UnitColor2;
 	//Pixels16[210]=player->UnitColor3;
 	//Pixels16[211]=player->UnitColor4;
-	*((struct __4pixel16__*)Pixels16+208)=player->UnitColors.Depth16;
+	*((struct __4pixel16__*)(Pixels16+208))=player->UnitColors.Depth16;
 	break;
     case 32:
 	//Pixels32[208]=player->UnitColor1;
 	//Pixels32[209]=player->UnitColor2;
 	//Pixels32[210]=player->UnitColor3;
 	//Pixels32[211]=player->UnitColor4;
-	*((struct __4pixel32__*)Pixels32+208)=player->UnitColors.Depth32;
+	*((struct __4pixel32__*)(Pixels32+208))=player->UnitColors.Depth32;
 	break;
     }
 }
