@@ -393,7 +393,7 @@ local MapField *LowAstarLoop (Unit *unit)
 					continue;	/* we are blocked by a permanent obstacle */
 				} else {
 					Unit *obstacle = UnitOnMapTile (neighx, neighy);
-#ifdef DEBUG
+#ifdef DEBUG_NO 
 					if (!obstacle)
 						longjmp (main_loop, 1);
 #endif
