@@ -587,6 +587,11 @@ global void FlipGraphic(Graphic* graphic)
 	}
     }
 
+    if (s->format->palette) {
+	free(s->format->palette);
+	s->format->palette = graphic->Surface->format->palette;
+    }
+
     SDL_UnlockSurface(s);
 }
 #endif
