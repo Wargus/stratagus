@@ -489,21 +489,10 @@ global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
     srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
     srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
     srect.w = sprite->Width;
+
     srect.h = sprite->Height;
 
-    // FIXME: is this right?
-    if (x + srect.w > ClipX2) {
-	srect.w = ClipX2 - x;
-    }
-    if (y + srect.h > ClipY2) {
-	srect.h = ClipY2 - y;
-    }
-    if (x < ClipX1) {
-	x = ClipX1;
-    }
-    if (y < ClipY1) {
-	y = ClipY1;
-    }
+    CLIP_RECTANGLE(x, y, srect.w, srect.h);
 
     drect.x = x;
     drect.y = y;
