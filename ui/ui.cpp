@@ -406,6 +406,9 @@ local void OldSaveUi(FILE* file,const UI* ui)
     fprintf(file,"  (list \"%s\")\n",ui->VictoryPanel.File);
     fprintf(file,"  (list \"%s\")",ui->ScenarioPanel.File);
 
+    fprintf(file,"  (list \"%s\")",ui->VictoryBackground.File);
+    fprintf(file,"  (list \"%s\")",ui->DefeatBackground.File);
+
     fprintf(file," )\n\n");
 }
 
