@@ -844,15 +844,15 @@ global GraphicData * VideoCreateNewPalette(const Palette *palette)
 
     switch( VideoDepth ) {
     case 8:
-	pixels=calloc(256,sizeof(VMemType8));
+	pixels=malloc(256*sizeof(VMemType8));
 	break;
     case 15:
     case 16:
-	pixels=calloc(256,sizeof(VMemType16));
+	pixels=malloc(256*sizeof(VMemType16));
 	break;
     case 24:
     case 32:
-	pixels=calloc(256,sizeof(VMemType32));
+	pixels=malloc(256*sizeof(VMemType32));
 	break;
     default:
 	DebugLevel0(__FUNCTION__": Unknown depth\n");
