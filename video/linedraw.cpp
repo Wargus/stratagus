@@ -897,10 +897,10 @@ global void VideoFillTransCircle(Uint32 color, int x, int y,
 
 			// Fill up the left/right half of the circle
 			if (py >= px) {
-				VideoDrawTransVLine(color, x + py + 1, y, px + 1, alpha);
-				VideoDrawTransVLine(color, x + py + 1, y - px, px, alpha);
-				VideoDrawTransVLine(color, x - py - 1, y, px + 1, alpha);
-				VideoDrawTransVLine(color, x - py - 1, y - px,  px, alpha);
+				VideoDrawTransVLine(color, x + py + 2, y, px + 1, alpha);
+				VideoDrawTransVLine(color, x + py + 2, y - px, px, alpha);
+				VideoDrawTransVLine(color, x - py - 2, y, px + 1, alpha);
+				VideoDrawTransVLine(color, x - py - 2, y - px,  px, alpha);
 			}
 		}
 	}
@@ -976,10 +976,10 @@ global void VideoFillTransCircleClip(Uint32 color, int x, int y,
 
 			// Fill up the left/right half of the circle
 			if (py >= px) {
-				VideoDrawTransVLineClip(color, x + py + 1, y, px + 1, alpha);
-				VideoDrawTransVLineClip(color, x + py + 1, y - px, px, alpha);
-				VideoDrawTransVLineClip(color, x - py - 1, y, px + 1, alpha);
-				VideoDrawTransVLineClip(color, x - py - 1, y - px,  px, alpha);
+				VideoDrawTransVLineClip(color, x + py + 2, y, px + 1, alpha);
+				VideoDrawTransVLineClip(color, x + py + 2, y - px, px, alpha);
+				VideoDrawTransVLineClip(color, x - py - 2, y, px + 1, alpha);
+				VideoDrawTransVLineClip(color, x - py - 2, y - px,  px, alpha);
 			}
 		}
 	}
@@ -1772,8 +1772,8 @@ global void VideoFillTransCircle(Uint32 color, int x, int y,
 
 			// Fill up the left/right half of the circle
 			if (py >= px) {
-				VideoDrawTransVLine(color, x + py + 1, y, px + 1, alpha);
-				VideoDrawTransVLine(color, x + py + 1, y - px, px, alpha);
+/*				VideoDrawTransVLine(color, x + py + 1, y, px + 1, alpha);
+				VideoDrawTransVLine(color, x + py + 1, y - px, px, alpha);*/
 				VideoDrawTransVLine(color, x - py - 1, y, px + 1, alpha);
 				VideoDrawTransVLine(color, x - py - 1, y - px,  px, alpha);
 			}
@@ -1809,8 +1809,8 @@ global void VideoFillTransCircleClip(Uint32 color, int x, int y,
 
 			// Fill up the left/right half of the circle
 			if (py >= px) {
-				VideoDrawTransVLineClip(color, x + py + 1, y, px + 1, alpha);
-				VideoDrawTransVLineClip(color, x + py + 1, y - px, px, alpha);
+/*				VideoDrawTransVLineClip(color, x + py + 1, y, px + 1, alpha);
+				VideoDrawTransVLineClip(color, x + py + 1, y - px, px, alpha);*/
 				VideoDrawTransVLineClip(color, x - py - 1, y, px + 1, alpha);
 				VideoDrawTransVLineClip(color, x - py - 1, y - px,  px, alpha);
 			}
