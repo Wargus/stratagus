@@ -212,6 +212,7 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 		stepx = TheUI.SelectedViewport->MapWidth / 2 * TileSizeX * FRAMES_PER_SECOND;
 		stepy = TheUI.SelectedViewport->MapHeight / 2 * TileSizeY * FRAMES_PER_SECOND;
 	} else {				// dynamic: let these variables increase upto fast..
+		// FIXME: pixels per second should be configurable
 		stepx = TileSizeX * FRAMES_PER_SECOND;
 		stepy = TileSizeY * FRAMES_PER_SECOND;
 	}
