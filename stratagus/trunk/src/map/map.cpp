@@ -158,8 +158,8 @@ global void RevealMap(void)
 */
 global void MapViewportSetViewpoint(int v, int x, int y)
 {
-    unsigned map_width;
-    unsigned map_height;
+    int map_width;
+    int map_height;
 
     if (x == TheUI.VP[v].MapX && y == TheUI.VP[v].MapY) {
 	return;
@@ -528,8 +528,8 @@ global int UnitMovementMask(const Unit* unit)
 */
 global void PreprocessMap(void)
 {
-    unsigned ix;
-    unsigned iy;
+    int ix;
+    int iy;
     MapField* mf;
 
     for (ix = 0; ix < TheMap.Width; ix++) {
