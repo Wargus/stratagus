@@ -62,91 +62,7 @@ global PlayerAi* AiPlayer;		/// Current AI player
 /**
 **	W*rCr*ft number to internal ai-type name.
 */
-local char* AiTypeWcNames[] = {
-    "land-attack",
-    "passive",
-    "orc-03",
-    "hum-04",
-    "orc-04",
-    "hum-05",
-    "orc-05",
-    "hum-06",
-    "orc-06",
-    "hum-07",
-    "orc-07",
-    "hum-08",
-    "orc-08",
-    "hum-09",
-    "orc-09",
-    "hum-10",
-    "orc-10",
-    "hum-11",
-    "orc-11",
-    "hum-12",
-    "orc-12",
-    "hum-13",
-    "orc-13",
-    "hum-14-orange",
-    "orc-14-blue",
-    "sea-attack",
-    "air-attack",
-    "hum-14-red",
-    "hum-14-white",
-    "hum-14-black",
-    "orc-14-green",
-    "orc-14-white",
-    "orc-exp-04",
-    "orc-exp-05",
-    "orc-exp-07a",
-    "orc-exp-09",
-    "orc-exp-10",
-    "orc-exp-12",
-    "orc-exp-06a",
-    "orc-exp-06b",
-    "orc-exp-11a",
-    "orc-exp-11b",
-    "hum-exp-02a-red",
-    "hum-exp-02b-black",
-    "hum-exp-02c-yellow",
-    "hum-exp-03a-orange",
-    "hum-exp-03b-red",
-    "hum-exp-03c-violet",
-    "hum-exp-04a-black",
-    "hum-exp-04b-red",
-    "hum-exp-04c-white",
-    "hum-exp-05a-green",
-    "hum-exp-05b-orange",
-    "hum-exp-05c-violet",
-    "hum-exp-05d-yellow",
-    "hum-exp-06a-green",
-    "hum-exp-06b-black",
-    "hum-exp-06c-orange",
-    "hum-exp-06d-red",
-    "hum-exp-08a-white",
-    "hum-exp-08b-yellow",
-    "hum-exp-08c-violet",
-    "hum-exp-09a-black",
-    "hum-exp-09b-red",
-    "hum-exp-09c-green",
-    "hum-exp-09d-white",
-    "hum-exp-10a-violet",
-    "hum-exp-10b-green",
-    "hum-exp-10c-black",
-    "hum-exp-11a",
-    "hum-exp-11b",
-    "hum-exp-12a",
-    "orc-exp-05b",
-    "hum-exp-07a",
-    "hum-exp-07b",
-    "hum-exp-07c",
-    "orc-exp-12a",
-    "orc-exp-12b",
-    "orc-exp-12c",
-    "orc-exp-12d",
-    "orc-exp-02",
-    "orc-exp-07b",
-    "orc-exp-03",
-};
+global char** AiTypeWcNames;
 
 /*----------------------------------------------------------------------------
 --	Lowlevel functions
@@ -317,10 +233,29 @@ local void AiCheckUnits(void)
 */
 global void SaveAi(FILE* file)
 {
+    char** cp;
+    int i;
+
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: AI $Id$\n\n");
 
     DebugLevel0Fn("FIXME: Saving AI isn't supported\n");
+
+    //
+    //	Dump table wc2 race numbers -> internal symbol.
+    //
+    if( (cp=AiTypeWcNames) ) {
+	fprintf(file,"(define-ai-wc-names");
+
+	i=90;
+	while( *cp ) {
+	    if( i+strlen(*cp)>79 ) {
+		i=fprintf(file,"\n ");
+	    }
+	    i+=fprintf(file," '%s",*cp++);
+	}
+	fprintf(file,")\n\n");
+    }
 }
 
 /**
@@ -344,18 +279,14 @@ global void AiInit(Player* player)
     pai->Player=player;
     ait=AiTypes;
 
-    ainame=NULL;
-    if( player->AiNum<sizeof(AiTypeWcNames)/sizeof(*AiTypeWcNames) ) {
-	ainame=AiTypeWcNames[player->AiNum];
-    }
-
+    ainame=AiTypeWcNames[player->AiNum];
     DebugLevel0(" %s\n",ainame);
 
     //
     //	Search correct AI type.
     //
     for( ;; ) {
-    	if( ait->Race && strcmp(ait->Race,player->RaceName) ) {
+   	if( ait->Race && strcmp(ait->Race,player->RaceName) ) {
 	    ait=ait->Next;
 	    if( !ait && ainame ) {
 		ainame=NULL;
@@ -398,6 +329,7 @@ global void CleanAi(void)
     void* temp;
     AiType* aitype;
     AiBuildQueue* queue;
+    char** cp;
 
     for( p=0; p<PlayerMax; ++p ) {
 	if( (pai=Players[p].Ai) ) {
@@ -505,6 +437,17 @@ global void CleanAi(void)
     free(AiHelpers.Equiv);
 
     memset(&AiHelpers,0,sizeof(AiHelpers));
+
+    //
+    //	Mapping original AI numbers in puds to our internal strings
+    //
+    if( (cp=AiTypeWcNames) ) {			// Free all old names
+	while( *cp ) {
+	    free(*cp++);
+	}
+	free(AiTypeWcNames);
+	AiTypeWcNames=NULL;
+    }
 }
 
 /*----------------------------------------------------------------------------

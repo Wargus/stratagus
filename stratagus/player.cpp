@@ -110,7 +110,7 @@ global void CleanPlayers(void)
 
     for( p=0; p<PlayerMax; ++p ) {
 	if( Players[p].Name ) {
-	    free(Players[p].Name); 
+	    free(Players[p].Name);
 	}
 	if( Players[p].Units ) {
 	    free(Players[p].Units);
@@ -764,15 +764,18 @@ global void PlayersEachSecond(void)
     int player;
     int res;
 
-    for( player=0; player<NumPlayers; ++player ) {
-    	if ( (FrameCounter / FRAMES_PER_SECOND) % 10 == 0 ) {
-	  for( res = 0; res < MaxCosts; res++ ) {
-	    Players[player].Revenue[res] = Players[player].Resources[res] - Players[player].LastResources[res];
-	    Players[player].Revenue[res] *= 6; // estimate per minute
-	    Players[player].LastResources[res] = Players[player].Resources[res];
-	  }
-	}  
-	if( Players[player].AiEnabled ) {
+    for (player = 0; player < NumPlayers; ++player) {
+	if ((FrameCounter / FRAMES_PER_SECOND) % 10 == 0) {
+	    for (res = 0; res < MaxCosts; res++) {
+		Players[player].Revenue[res] =
+		    Players[player].Resources[res] -
+		    Players[player].LastResources[res];
+		Players[player].Revenue[res] *= 6;	// estimate per minute
+		Players[player].LastResources[res] =
+		    Players[player].Resources[res];
+	    }
+	}
+	if (Players[player].AiEnabled) {
 	    AiEachSecond(&Players[player]);
 	}
     }

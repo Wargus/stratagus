@@ -920,6 +920,37 @@ local SCM CclAiDump(void)
     return SCM_BOOL_F;
 }
 
+/**
+**	Define AI mapping from original number to internal symbol
+**
+**	@param list	List of all names.
+*/
+local SCM CclDefineAiWcNames(SCM list)
+{
+    int i;
+    char** cp;
+
+    if( (cp=AiTypeWcNames) ) {		// Free all old names
+	while( *cp ) {
+	    free(*cp++);
+	}
+	free(AiTypeWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i=gh_length(list);
+    AiTypeWcNames=cp=malloc((i+1)*sizeof(char*));
+    while( i-- ) {
+	*cp++=gh_scm2newstr(gh_car(list),NULL);
+	list=gh_cdr(list);
+    }
+    *cp=NULL;
+
+    return SCM_UNSPECIFIED;
+}
+
 #else
 
 /**
@@ -972,6 +1003,8 @@ global void AiCclRegister(void)
     gh_new_procedure1_0("ai:set-reserve!",CclAiSetReserve);
 
     gh_new_procedure0_0("ai:dump",CclAiDump);
+
+    gh_new_procedureN("define-ai-wc-names",CclDefineAiWcNames);
 #endif
 }
 
