@@ -750,6 +750,8 @@ static void DrawUnitInfo(const Unit* unit)
 
 /**
 **  Draw the player resource in top line.
+**
+**  @todo FIXME : make DrawResources more configurable (format, font).
 */
 void DrawResources(void)
 {
@@ -757,23 +759,21 @@ void DrawResources(void)
 	int i;
 	int v;
 
-	for (i = 0; i < MaxCosts; ++i) {
+	// Draw all icons of resource.
+	for (i = 0; i <= ScoreCost; ++i) {
 		if (TheUI.Resources[i].G) {
 			VideoDrawClip(TheUI.Resources[i].G,
 				TheUI.Resources[i].IconFrame,
 				TheUI.Resources[i].IconX, TheUI.Resources[i].IconY);
 		}
+	}
+	for (i = 0; i < MaxCosts; ++i) {
 		if (TheUI.Resources[i].TextX != -1) {
 			v = ThisPlayer->Resources[i];
 			VideoDrawNumber(TheUI.Resources[i].TextX,
 				TheUI.Resources[i].TextY + (v > 99999) * 3,
 				v > 99999 ? SmallFont : GameFont, v);
 		}
-	}
-	if (TheUI.Resources[FoodCost].G) {
-		VideoDrawClip(TheUI.Resources[FoodCost].G,
-			TheUI.Resources[FoodCost].IconFrame,
-			TheUI.Resources[FoodCost].IconX, TheUI.Resources[FoodCost].IconY);
 	}
 	if (TheUI.Resources[FoodCost].TextX != -1) {
 		sprintf(tmp, "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
@@ -784,12 +784,6 @@ void DrawResources(void)
 			VideoDrawText(TheUI.Resources[FoodCost].TextX,
 				TheUI.Resources[FoodCost].TextY, GameFont, tmp);
 		}
-	}
-
-	if (TheUI.Resources[ScoreCost].G) {
-		VideoDrawClip(TheUI.Resources[ScoreCost].G,
-			TheUI.Resources[ScoreCost].IconFrame,
-			TheUI.Resources[ScoreCost].IconX, TheUI.Resources[ScoreCost].IconY);
 	}
 	if (TheUI.Resources[ScoreCost].TextX != -1) {
 		v = ThisPlayer->Score;
@@ -1069,7 +1063,7 @@ void CenterOnMessage(void)
 	if (MessagesEventIndex >= MessagesEventCount) {
 		MessagesEventIndex = 0;
 	}
-	if (MessagesEventIndex >= MessagesEventCount) {
+	if (MessagesEventCount == 0) {
 		return;
 	}
 	ViewportCenterViewpoint(TheUI.SelectedViewport,
@@ -1139,12 +1133,17 @@ void ClearStatusLine(void)
 --  COSTS
 ----------------------------------------------------------------------------*/
 
-static int CostsFood;                        ///< mana cost to display in status line
 static int CostsMana;                        ///< mana cost to display in status line
-static int Costs[MaxCosts];                  ///< costs to display in status line
+static int Costs[MaxCosts + 1];              ///< costs to display in status line
 
 /**
 **  Draw costs in status line.
+**
+**  @todo FIXME : make DrawCosts more configurable.
+**  @todo FIXME : 'time' resource should be shown too.
+**  @todo FIXME : remove hardcoded image for mana.
+**
+**  @internal MaxCost == FoodCost.
 */
 void DrawCosts(void)
 {
@@ -1162,7 +1161,7 @@ void DrawCosts(void)
 		x += 45;
 	}
 
-	for (i = 1; i < MaxCosts; ++i) {
+	for (i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			if (TheUI.Resources[i].G) {
 				VideoDrawClip(TheUI.Resources[i].G,
@@ -1176,15 +1175,6 @@ void DrawCosts(void)
 			}
 		}
 	}
-
-	if (CostsFood) {
-		// FIXME: hardcoded image!!!
-		VideoDrawClip(TheUI.Resources[FoodCost].G,
-			TheUI.Resources[FoodCost].IconFrame,
-			x, TheUI.StatusLineTextY);
-		VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont, CostsFood);
-		x += 45;
-	}
 }
 
 /**
@@ -1196,20 +1186,13 @@ void DrawCosts(void)
 */
 void SetCosts(int mana, int food, const int* costs)
 {
-	int i;
-
 	CostsMana = mana;
-	CostsFood = food;
-
 	if (costs) {
-		for (i = 0; i < MaxCosts; ++i) {
-			Costs[i] = costs[i];
-		}
+		memcpy(Costs, costs, MaxCosts * sizeof(*costs));
 	} else {
-		for (i = 0; i < MaxCosts; ++i) {
-			Costs[i] = 0;
-		}
+		memset(Costs, 0, sizeof (Costs));
 	}
+	Costs[FoodCost] = food;
 }
 
 /**
@@ -1362,6 +1345,8 @@ void DrawInfoPanel(void)
 
 /**
 **  Draw the timer
+**
+**  @todo FIXME : make DrawTimer more configurable (Pos, format).
 */
 void DrawTimer(void)
 {
