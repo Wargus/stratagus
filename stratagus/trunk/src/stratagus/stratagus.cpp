@@ -986,7 +986,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 		PlayMusic(MenuMusic);
 	    }
 	    EnableRedraw=RedrawMenu;
-	    ProcessMenu(MENU_PRG_START, 1);
+	    ProcessMenu("menu-program-start", 1);
 	    EnableRedraw=RedrawEverything;
 	    DebugLevel0Fn("Menu start: NetPlayers %d\n" _C_ NetPlayers);
 	    filename = CurrentMapPath;

@@ -844,7 +844,7 @@ global void GameMainLoop(void)
 	}
 
 	if( showtip ) {
-	    ProcessMenu(MENU_TIPS, 1);
+	    ProcessMenu("menu-tips", 1);
 	    InterfaceState = IfaceStateNormal;
 	    showtip=0;
 	}
@@ -857,12 +857,12 @@ global void GameMainLoop(void)
     if( GameResult==GameDefeat ) {
 	fprintf(stderr,"You have lost!\n");
 	SetStatusLine("You have lost!");
-	ProcessMenu(MENU_LOST, 1);
+	ProcessMenu("menu-defeated", 1);
     }
     else if( GameResult==GameVictory ) {
 	fprintf(stderr,"You have won!\n");
 	SetStatusLine("You have won!");
-	ProcessMenu(MENU_VICTORY, 1);
+	ProcessMenu("menu-victory", 1);
     }
 
     if( GameResult==GameVictory || GameResult==GameDefeat ) {
