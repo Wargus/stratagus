@@ -83,9 +83,9 @@ global enum _scroll_state_ MouseScrollState=ScrollNone;
 global jmp_buf MainLoopJmpBuf;		/// Hierarchic pathfinder error exit.
 #endif
 
-EventCallback* Callbacks;		/// Current callbacks
-EventCallback GameCallbacks;		/// Game callbacks
-EventCallback MenuCallbacks;		/// Menu callbacks
+global EventCallback* Callbacks;	/// Current callbacks
+global EventCallback GameCallbacks;	/// Game callbacks
+global EventCallback MenuCallbacks;	/// Menu callbacks
 
 //----------------------------------------------------------------------------
 //	Functions
