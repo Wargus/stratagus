@@ -240,7 +240,7 @@ local int ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
 /**
 **	Show level intro.
 **
-**	First version - only testing.
+**	@param intro	Intro struct
 */
 global void ShowIntro(const Intro *intro)
 {
@@ -500,21 +500,41 @@ global void ShowCredits(Credits *credits)
     // PlayMusic(MenuMusic);
 }
 
+local void DrawTitle(const char* act,const char* title)
+{
+    VideoDrawTextCentered(
+	VideoWidth/2,
+	VideoHeight/2 - VideoTextHeight(LargeTitleFont) - 
+	    VideoTextHeight(SmallTitleFont)/2,
+	SmallTitleFont,
+	act);
+    VideoDrawTextCentered(
+	VideoWidth/2,
+	VideoHeight/2 - VideoTextHeight(LargeTitleFont)/2,
+	LargeTitleFont,
+	title);
+}
+
 /**
 **	Show picture.
 **
-**	@param name	Path file name of the picture.
+**	@param act	Text showing the act number
+**	@param title	Title text
+**	@param picture	Name of the picture file to show.
 */
-global void ShowPicture(const char* name)
+global void ShowPicture(const char* act,const char* title,const char* picture)
 {
     EventCallback callbacks;
     Graphic* background;
-    int x;
-    int y;
+    int OldVideoSyncSpeed;
+    int DoFadeOut;
+    int maxi;
+    int i;
 
-    VideoLockScreen();
-    VideoClearScreen();
-    VideoUnlockScreen();
+    OldVideoSyncSpeed=VideoSyncSpeed;
+    VideoSyncSpeed=100;
+    SetVideoSync();
+    VideoCreatePalette(GlobalPalette);
 
     callbacks.ButtonPressed=IntroCallbackButton1;
     callbacks.ButtonReleased=IntroCallbackButton2;
@@ -526,35 +546,98 @@ global void ShowPicture(const char* name)
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
 
-    background=LoadGraphic(name);
+    background=LoadGraphic(picture);
+    DoFadeOut=1;
 
-    x=(VideoWidth-640)/2;
+    //
+    // Show title then fade in background
+    //
+    VideoLockScreen();
+    VideoClearScreen();
+    DrawTitle(act,title);
+    VideoUnlockScreen();
+
+    Invalidate();
+    RealizeVideoMemory();
     IntroNoEvent=1;
-    while( IntroNoEvent ) {
-	y=(VideoHeight-480)/2;
+    i=0;
+    maxi=2*30;
+    while( IntroNoEvent && i<maxi ) {
+	WaitEventsOneFrame(&callbacks);
+	i++;
+    }
+    if( !IntroNoEvent ) {
+	DoFadeOut=0;
+    }
 
+    i=0;
+    maxi=1*30;
+    while( IntroNoEvent && i<maxi ) {
 	VideoLockScreen();
-	//
-	//	Draw background
-	//
-	VideoDrawSubClip(background,0,0,
-		background->Width,background->Height,
-		(VideoWidth-background->Width)/2,
-		(VideoHeight-background->Height)/2);
-
+	VideoDrawSubClipFaded(background,0,0,
+	    background->Width,background->Height,
+	    (VideoWidth-background->Width)/2,
+	    (VideoHeight-background->Height)/2,
+	    256*i/maxi);
+	DrawTitle(act,title);
 	VideoUnlockScreen();
 
 	Invalidate();
 	RealizeVideoMemory();
 
 	WaitEventsOneFrame(&callbacks);
+	i++;
     }
+
+    //
+    //	Draw background and title
+    //
+    if( IntroNoEvent ) {
+	VideoLockScreen();
+	VideoDrawSubClip(background,0,0,
+	    background->Width,background->Height,
+	    (VideoWidth-background->Width)/2,
+	    (VideoHeight-background->Height)/2);
+	DrawTitle(act,title);
+	VideoUnlockScreen();
+
+	Invalidate();
+	RealizeVideoMemory();
+
+	while( IntroNoEvent ) {
+	    WaitEventsOneFrame(&callbacks);
+	}
+    }
+
+    // Fade out background and title
+    if( DoFadeOut ) {
+	while( i>=0 ) {
+	    VideoLockScreen();
+	    VideoDrawSubClipFaded(background,0,0,
+		background->Width,background->Height,
+		(VideoWidth-background->Width)/2,
+		(VideoHeight-background->Height)/2,
+		256*i/maxi);
+	    DrawTitle(act,title);
+	    VideoUnlockScreen();
+
+	    Invalidate();
+	    RealizeVideoMemory();
+
+	    WaitEventsOneFrame(&callbacks);
+	    i--;
+	}
+    }
+
 
     VideoFree(background);
 
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+
+    VideoSyncSpeed=OldVideoSyncSpeed;
+    SetVideoSync();
 }
 
 

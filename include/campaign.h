@@ -51,7 +51,7 @@ typedef enum _game_results_ {
 */
 typedef enum _chapter_types_ {
     ChapterPlayVideo,			/// Play a video (NOT SUPPORTED)
-    ChapterShowPicture,			/// Show a picture (NOT SUPPORTED)
+    ChapterShowPicture,			/// Show a picture
     ChapterPlayLevel,			/// Play a level
     ChapterDefeat,			/// Levels played on defeat
     ChapterDraw,			/// Levels played on draw
@@ -69,7 +69,16 @@ typedef struct _campaign_chapter_ CampaignChapter;
 struct _campaign_chapter_ {
     CampaignChapter*	Next;		/// Next campaign chapter
     ChapterTypes	Type;		/// Type of the chapter (level,...)
-    char*		Name;		/// Chapter name
+    union {
+	struct {
+	    char* Name;			/// Chapter name
+	} level;
+	struct {
+	    char* Act;			/// Act number
+	    char* Title;		/// Title text
+	    char* Background;		/// Background image
+	} picture;
+    } d;
     GameResults		Result;		/// Result of this chapter
 };
 
@@ -93,6 +102,10 @@ typedef struct _campaign_ {
 ----------------------------------------------------------------------------*/
 
 extern int GameResult;			/// Outcome of the game
+extern int RestartScenario;		/// Restart the scenario
+extern int QuitToMenu;			/// Quit to menu
+extern char CurrentMapPath[];		/// Path of the current map
+extern char DefaultObjective[];		/// The default scenario objective
 
 extern const char CampaignType[];	/// Campaign type
 extern Campaign* Campaigns;		/// Campaigns

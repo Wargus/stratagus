@@ -47,7 +47,12 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+global char DefaultObjective[] = "-Destroy your enemies";
+
 global int GameResult;			/// Outcome of the game
+global char CurrentMapPath[1024];	/// Path of the current map
+global int RestartScenario=0;		/// Restart the scenario
+global int QuitToMenu=0;		/// Quit to menu
 global Campaign* Campaigns;		/// Campaigns
 global int NumCampaigns;		/// Number of campaigns
 
@@ -72,6 +77,15 @@ global const char CampaignType[] = "campaign-type";
 */
 global char* NextChapter(void)
 {
+    if (RestartScenario) {
+	RestartScenario=0;
+	return CurrentMapPath;
+    }
+    if ( QuitToMenu ) {
+	QuitToMenu=0;
+	CurrentCampaign=NULL;
+	return NULL;
+    }
     if (!CurrentCampaign) {
 	return NULL;
     }
@@ -90,7 +104,9 @@ global char* NextChapter(void)
 	}
 	while( CurrentChapter) {
 	    if( CurrentChapter->Type==ChapterShowPicture ) {
-		ShowPicture(CurrentChapter->Name);
+		ShowPicture(CurrentChapter->d.picture.Act,
+		            CurrentChapter->d.picture.Title,
+		            CurrentChapter->d.picture.Background);
 	    }
 	    else if( CurrentChapter->Type==ChapterPlayLevel ) {
 		break;
@@ -107,7 +123,7 @@ global char* NextChapter(void)
 	return NULL;
     }
 
-    return CurrentChapter->Name;
+    return CurrentChapter->d.level.Name;
 }
 
 /**
@@ -133,6 +149,8 @@ global void PlayCampaign(const char* name)
 	return;
     }
 
+    GameIntro.Objectives[0]=strdup(DefaultObjective);
+
     CurrentChapter = CurrentCampaign->Chapters;
     SkipCurrentChapter=0;
     GameResult=GameVictory;
@@ -151,6 +169,7 @@ global void PlayCampaign(const char* name)
     //  For an alternative Method see network games..
     //  That way it should work finally..
 
+    strcpy(CurrentMapPath, filename);
     s = NULL;
     // FIXME: LibraryFile here?
     if (filename[0] != '/' && filename[0] != '.') {
@@ -243,13 +262,24 @@ local SCM CclDefineCampaign(SCM list)
 		    sublist=gh_cdr(sublist);
 
 		    chapter->Type=ChapterShowPicture;
-		    chapter->Name=gh_scm2newstr(value,NULL);
+		    chapter->d.picture.Act=gh_scm2newstr(value,NULL);
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+
+		    chapter->Type=ChapterShowPicture;
+		    chapter->d.picture.Title=gh_scm2newstr(value,NULL);
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+
+		    chapter->d.picture.Background=gh_scm2newstr(value,NULL);
 		} else if( gh_eq_p(value,gh_symbol2scm("play-level")) ) {
 		    value=gh_car(sublist);
 		    sublist=gh_cdr(sublist);
 
 		    chapter->Type=ChapterPlayLevel;
-		    chapter->Name=gh_scm2newstr(value,NULL);
+		    chapter->d.level.Name=gh_scm2newstr(value,NULL);
 		} else {
 		   // FIXME: this leaves a half initialized campaign
 		   errl("Unsupported tag",value);
