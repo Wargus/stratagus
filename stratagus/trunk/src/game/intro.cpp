@@ -1208,14 +1208,12 @@ void ShowStats(void)
 
 	background = NULL;
 	if (GameResult == GameVictory) {
-		if (TheUI.VictoryBackground.File) {
-			background = NewGraphic(TheUI.VictoryBackground.File, 0, 0);
-			LoadGraphic(background);
+		if (TheUI.VictoryBackgroundG) {
+			LoadGraphic(TheUI.VictoryBackgroundG);
 		}
 	} else {
-		if (TheUI.DefeatBackground.File) {
-			background = NewGraphic(TheUI.DefeatBackground.File, 0, 0);
-			LoadGraphic(background);
+		if (TheUI.DefeatBackgroundG) {
+			LoadGraphic(TheUI.DefeatBackgroundG);
 		}
 	}
 	ResizeGraphic(background, VideoWidth, VideoHeight);
