@@ -181,6 +181,8 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
     size += i;
     buffer = realloc(buffer, size);
 
+    CLclose(f);
+
     StopMusic();			// stop music before new music
 
     ModPlug_GetSettings(&settings);	// Conversion settings
