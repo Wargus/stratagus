@@ -136,8 +136,7 @@ void LoadIcons(void)
 	for (i = 0; i < NumIcons; ++i) {
 		Icon* icon;
 
-		icon = Icons[0];
-		// If tileset only fitting tileset.
+		icon = Icons[i];
 		LoadGraphic(icon->Sprite);
 		ShowLoadProgress("Icons %s", icon->Sprite->File);
 		if (icon->Frame >= icon->Sprite->NumFrames) {
