@@ -291,7 +291,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->HP=unit->Stats->HitPoints;
     unit->Active=1;
 
-    unit->GroupId=-1;
+    unit->GroupId=0;
 
     unit->Wait=1;
     unit->Reset=1;
@@ -483,9 +483,9 @@ global void RemoveUnit(Unit* unit)
 	UpdateButtonPanel();
     }
 
-    //  Remove unit from its group
-    if( unit->GroupId!=-1 ) {
-        RemoveUnitFromGroup(unit);
+    //  Remove unit from its groups
+    if( unit->GroupId!=0 ) {
+        RemoveUnitFromGroups(unit);
     }
 
     // Unit is seen as under cursor
