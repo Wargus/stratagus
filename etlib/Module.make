@@ -23,7 +23,7 @@
 ##
 
 MODULE = etlib
-MSRC = hash.c prgname.c getopt.c
+MSRC = hash.c prgname.c
 
 SRC += $(addprefix $(MODULE)/,$(MSRC))
 HDRS += etlib/prgname.h
