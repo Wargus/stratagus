@@ -670,7 +670,9 @@ global void GameMainLoop(void)
 	    UpdateTimer();		// update game timer
 
 	    // FIXME: We don't do redraw if needed, costs to much cpu time
-	    MustRedraw&=~RedrawMinimap; // FIXME: this a little hack!
+	    if( MustRedraw!=RedrawEverything ) {
+		MustRedraw&=~RedrawMinimap; // FIXME: this a little hack!
+	    }
 
 	    //
 	    //	Work todo each second.
