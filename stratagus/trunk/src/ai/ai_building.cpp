@@ -193,13 +193,15 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 **
 **	@param worker	Worker to build building.
 **	@param type	Type of building.
+**	@param ox	Original X position to try building
+**	@param oy	Original Y position to try building
 **	@param dx	Pointer for X position returned.
 **	@param dy	Pointer for Y position returned.
 **	@param flag	Flag if surrounding must be free.
 **	@return		True if place found, false if no found.
 */
 local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
-	int *dx, int *dy,int flag)
+	int ox, int oy, int *dx, int *dy,int flag)
 {
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -224,8 +226,8 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     points=alloca(TheMap.Width*TheMap.Height);
     size=TheMap.Width*TheMap.Height/sizeof(*points);
 
-    x=worker->X;
-    y=worker->Y;
+    x=ox;
+    y=oy;
     //
     //	Look if we can build at current place.
     //
@@ -248,6 +250,10 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 
     points[0].X=x;
     points[0].Y=y;
+    if( type->TileWidth>1 ) {			// also use the bottom right
+	points[1].X=x+type->TileWidth-1;
+	points[1].Y=y+type->TileWidth-1;
+    }
     matrix+=w+w+2;
     rp=0;
     matrix[x+y*w]=1;				// mark start point
@@ -277,6 +283,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 		    *dy=y;
 		    return 1;
 		}
+		fprintf(stderr,"%d,%d\n",x,y);
 
 		if( CanMoveToMask(x,y,mask) ) {	// reachable
 		    *m=1;
@@ -308,6 +315,241 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 }
 
 /**
+**      Find building place for hall.
+**
+**      The best place:
+**              1) near to goldmine.
+**              !2) near to wood.
+**              !3) near to worker and must be reachable.
+**              4) no enemy near it.
+**              5) no hall already near
+**              !6) enough gold in mine
+**
+**	@param worker	Worker to build building.
+**	@param type	Type of building.
+**	@param dx	Pointer for X position returned.
+**	@param dy	Pointer for Y position returned.
+**	@return		True if place found, false if no found.
+*/
+local int AiFindHallPlace(const Unit * worker, const UnitType * type,
+	int *dx, int *dy)
+{
+    int i;
+    int j;
+    int minx;
+    int maxx;
+    int miny;
+    int maxy;
+    int num_goldmine;
+    Unit* goldmines[UnitMax];
+    int nunits;
+    Unit* units[UnitMax];
+    int d;
+    struct {
+	int d;
+	Unit* unit;
+    } best_mines[30];
+    int buildings;
+
+    //
+    //  Find all goldmines.
+    //
+    num_goldmine = FindUnitsByType(UnitTypeGoldMine, goldmines);
+    DebugLevel3("\tGoldmines %d\n" _C_ num_goldmine);
+    if (!num_goldmine) {
+	return 0;
+    }
+
+    for( i=0; i<sizeof(best_mines)/sizeof(*best_mines); ++i) {
+	best_mines[i].d=-1;
+    }
+
+    for( i=0; i<num_goldmine; ++i ) {
+	buildings=0;
+
+	//
+	//  Check units around mine
+	//
+	minx=goldmines[i]->X-5;
+	if( minx<0 ) minx=0;
+	miny=goldmines[i]->Y-5;
+	if( miny<0 ) miny=0;
+	maxx=goldmines[i]->X+goldmines[i]->Type->TileWidth+5;
+	if( maxx>TheMap.Width ) maxx=TheMap.Width;
+	maxy=goldmines[i]->Y+goldmines[i]->Type->TileHeight+5;
+	if( maxy>TheMap.Height ) maxy=TheMap.Height;
+
+	nunits=SelectUnits(minx,miny,maxx,maxy,units);
+	for( j=0; j<nunits; ++j ) {
+	    // Enemy near mine
+	    if( AiPlayer->Player->Enemy&(1<<units[j]->Player->Player) ) {
+		break;
+	    }
+	    // Town hall near mine
+	    if( units[j]->Type->StoresGold ) {
+		break;
+	    }
+	    // Town hall may not be near but we may be using it, check
+	    // for 2 buildings near it and assume it's been used
+	    if( units[j]->Type->Building && !units[j]->Type->GoldMine ) {
+		buildings++;
+		if( buildings==2 ) {
+		    break;
+		}
+	    }
+	}
+	if( j!=nunits ) {
+	    continue;
+	}
+
+	//
+	//  Sort by distance to mine
+	//
+	d = MapDistanceToUnit(worker->X, worker->Y, goldmines[i]);
+	for( j=0; j<sizeof(best_mines)/sizeof(*best_mines); ++j ) {
+	    int k;
+	    if( best_mines[j].d==-1 || d<best_mines[j].d ) {
+		for( k=sizeof(best_mines)/sizeof(*best_mines)-1; k>j; --k ) {
+		    best_mines[k].d=best_mines[k-1].d;
+		    best_mines[k].unit=best_mines[k-1].unit;
+		}
+		best_mines[j].d=d;
+		best_mines[j].unit=goldmines[i];
+		break;
+	    }
+	}
+    }
+    best_mines[i].d=-1;
+
+    for( i=0; i<sizeof(best_mines)/sizeof(*best_mines) && best_mines[i].d!=-1; ++i) {
+	//
+	//  Find a building place near the mine
+	//
+	if( AiFindBuildingPlace2(worker,type,
+	    best_mines[i].unit->X,
+	    best_mines[i].unit->Y,dx,dy,0) ) {
+	    return 1;
+	}
+	if( AiFindBuildingPlace2(worker,type,
+	    best_mines[i].unit->X+best_mines[i].unit->Type->TileWidth,
+	    best_mines[i].unit->Y+best_mines[i].unit->Type->TileHeight,
+	    dx,dy,0) ) {
+	    return 1;
+	}
+    }
+
+    return 0;
+}
+
+/**
+**      Find free building place for lumber mill. (flood fill version)
+**
+**	@param worker	Worker to build building.
+**	@param type	Type of building.
+**	@param dx	Pointer for X position returned.
+**	@param dy	Pointer for Y position returned.
+**	@return		True if place found, false if no found.
+*/
+local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
+	int *dx, int *dy)
+{
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+		unsigned short X;
+		unsigned short Y;
+    } * points;
+    int size;
+    int x;
+    int y;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    unsigned char* m;
+    unsigned char* matrix;
+
+    x=worker->X;
+    y=worker->Y;
+    size=TheMap.Width*TheMap.Height/4;
+    points=alloca(size*sizeof(*points));
+
+    //
+    //	Make movement matrix.
+    //
+    matrix=CreateMatrix();
+    w=TheMap.Width+2;
+    matrix+=w+w+2;
+
+    points[0].X=x;
+    points[0].Y=y;
+    rp=0;
+    matrix[x+y*w]=1;			// mark start point
+    ep=wp=1;				// start with one point
+
+    mask=UnitMovementMask(worker);
+
+    //
+    //	Pop a point from stack, push all neightbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		m=matrix+x+y*w;
+		if( *m ) {			// already checked
+		    continue;
+		}
+
+		//
+		//	Look if there is wood
+		//
+		if ( ForestOnMap(x,y) ) {
+		    if( AiFindBuildingPlace2(worker,type,x,y,dx,dy,0) ) {
+			return 1;
+		    }
+		}
+
+		if( CanMoveToMask(x,y,mask) ) {	// reachable
+		    *m=1;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+			if( ++wp>=size ) {			// round about
+				wp=0;
+			}
+		} else {			// unreachable
+		    *m=99;
+		}
+	    }
+
+	    if( ++rp>=size ) {			// round about
+		    rp=0;
+	    }
+	}
+
+	//
+	//	Continue with next frame.
+	//
+	if( rp==wp ) {			// unreachable, no more points available
+	    break;
+	}
+	ep=wp;
+    }
+
+    DebugLevel0Fn("no wood in range by %s(%d,%d)\n"
+	    _C_ worker->Type->Ident _C_ worker->X _C_ worker->Y);
+
+    return 0;
+}
+
+/**
 **      Find free building place.
 **
 **	@param worker	Worker to build building.
@@ -322,15 +564,30 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
 	int *dx, int *dy)
 {
+
+    //
+    //	Find a good place for a new hall
+    //
+    if( type->StoresGold && AiFindHallPlace(worker,type,dx,dy) ) {
+	return 1;
+    }
+
+    //
+    //	Find a place near wood for a lumber mill
+    //
+    if( type->StoresWood && AiFindLumberMillPlace(worker,type,dx,dy) ) {
+	return 1;
+    }
+
     //
     //	Platforms can only be build on oil patches
     //
-    if( !type->GivesOil && AiFindBuildingPlace2(worker,type,dx,dy,1) ) {
+    if( !type->GivesOil && AiFindBuildingPlace2(worker,type,worker->X,worker->Y,dx,dy,1) ) {
 	return 1;
     }
 
     // FIXME: Should do this if all units can't build better!
-    return AiFindBuildingPlace2(worker,type,dx,dy,0);
+    return AiFindBuildingPlace2(worker,type,worker->X,worker->Y,dx,dy,0);
 
     // return 0;
 }
