@@ -1108,7 +1108,8 @@ local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu.
+**	Draw the version and copyright at bottom of the screen.
+**	Also include now the license.
 */
 local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
 {
@@ -1118,6 +1119,8 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
     StartMenusSetBackground(mi);
     SetDefaultTextColors(rc, rc);
     DrawTextCentered(VideoWidth/2, OffsetY + 440, GameFont, NameLine);
+    DrawTextCentered(VideoWidth/2, OffsetY + 456, GameFont,
+	"Distributed under the terms of the GNU General Public License.");
     SetDefaultTextColors(nc, rc);
 }
 
@@ -2679,7 +2682,8 @@ global void InitMenus(unsigned int race)
 #else
     file = strcat(strcpy(buf, "graphic/"), file);
 #endif
-    MenuButtonGfx.Sprite = LoadSprite(file, 0, 144);
+    // FIXME: johns 300 added, please check this
+    MenuButtonGfx.Sprite = LoadSprite(file, 300, 144);	// 53 images!
 
     strcpy(ScenSelectPath, FreeCraftLibPath);
     if (ScenSelectPath[0]) {
