@@ -1705,10 +1705,10 @@ local SCM CclDefineMenuItem(SCM list)
 			item->d.button.ysize=gh_scm2int(gh_car(value));
 			sublist=gh_cdr(sublist);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("caption")) ) {
-			if ( gh_eq_p(gh_car(sublist), gh_symbol2scm("null")) ) {
+			item->d.button.text=gh_scm2newstr(gh_car(sublist),NULL);
+			if ( !strcmp(item->d.button.text, "null") ) {
+			    free(item->d.button.text);
 			    item->d.button.text = NULL;
-			} else {
-			    item->d.button.text=gh_scm2newstr(gh_car(sublist),NULL);
 			}
 			sublist=gh_cdr(sublist);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("hotkey")) ) {
