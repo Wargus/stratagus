@@ -4480,13 +4480,14 @@ static int CclSetGroupKeys(lua_State* l)
 */
 static int CclPresentMap(lua_State* l)
 {
-	if (lua_gettop(l) != 4) {
+	if (lua_gettop(l) != 5) {
 		LuaError(l, "incorrect argument");
 	}
 	TheMap.Info.Description = strdup(LuaToString(l, 1));
 	// Number of players in LuaToNumber(l, 3); // Not used yet.
 	TheMap.Info.MapWidth = LuaToNumber(l, 3);
 	TheMap.Info.MapHeight = LuaToNumber(l, 4);
+	TheMap.Info.MapUID = LuaToNumber(l, 5);
 
 	return 0;
 }
