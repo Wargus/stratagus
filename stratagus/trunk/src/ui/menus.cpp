@@ -1518,7 +1518,7 @@ local unsigned char *keystrokehintstexts[] = {
     "- pause game",
     "- make screen shot",
     "- help menu",
-    "- restart scenario (NOT SUPPORTED)",
+    "- restart scenario",
     "- quit to main menu",
     "- quit game",
     "- toggle expand map",
@@ -3531,8 +3531,10 @@ local void GameShowCredits(void)
 local void GameMenuEndScenario(void)
 {
     ProcessMenu("menu-end-scenario", 1);
-    if (!GameRunning)
+    if (!GameRunning) {
 	EndMenu();
+	InterfaceState=IfaceStateNormal;
+    }
 }
 
 /**
@@ -3541,7 +3543,6 @@ local void GameMenuEndScenario(void)
 local void EndScenarioRestart(void)
 {
     RestartScenario=1;
-    InterfaceState=IfaceStateNormal;
     GameRunning=0;
     EndMenu();
 }
@@ -3551,7 +3552,6 @@ local void EndScenarioRestart(void)
 */
 local void EndScenarioSurrender(void)
 {
-    InterfaceState=IfaceStateNormal;
     GameResult=GameDefeat;
     GameRunning=0;
     EndMenu();
@@ -3563,7 +3563,6 @@ local void EndScenarioSurrender(void)
 local void EndScenarioQuitMenu(void)
 {
     QuitToMenu=1;
-    InterfaceState=IfaceStateNormal;
     GameRunning=0;
     EndMenu();
 }
