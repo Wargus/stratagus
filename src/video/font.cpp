@@ -63,7 +63,7 @@ typedef struct _font_color_mapping_ {
     struct _font_color_mapping_* Next;	/// Next pointer
 } FontColorMapping;
 
-local const VMemType *FontPixels;		/// Font pixels
+local const VMemType* FontPixels;		/// Font pixels
 #define FontPixels8	(&FontPixels->D8)	/// font pixels  8bpp
 #define FontPixels16	(&FontPixels->D16)	/// font pixels 16bpp
 #define FontPixels24	(&FontPixels->D24)	/// font pixels 24bpp
@@ -535,7 +535,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 		case '~':
 		    break;
 		case '!':
-		    rev=FontPixels;
+		    rev = FontPixels;
 		    FontPixels = ReverseTextColor;
 		    ++text;
 		    break;
@@ -746,15 +746,15 @@ global int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
 local void FontMeasureWidths(ColorFont* fp)
 {
     int y;
-    const unsigned char *sp;
-    const unsigned char *lp;
-    const unsigned char *gp;
+    const unsigned char* sp;
+    const unsigned char* lp;
+    const unsigned char* gp;
 
-    for (y = 1; y < 207; y++) {
+    for (y = 1; y < 207; ++y) {
 	fp->CharWidth[y] = 0;
     }
 
-    for (y = 1; y < 207; y++) {
+    for (y = 1; y < 207; ++y) {
 	sp = (const unsigned char *)fp->Graphic->Frames +
 	    y * fp->Height * fp->Graphic->Width - 1;
 	gp = sp + fp->Graphic->Width * fp->Height;
