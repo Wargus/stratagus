@@ -412,20 +412,20 @@ global void CreatePlayer(int type)
 	case PlayerNobody:
 	default:
 	    team = 0;
-	    player->Name = strdup("Neutral");
+	    PlayerSetName(player, "Neutral");
 	    break;
 	case PlayerComputer:
 	    team = 1;
-	    player->Name = strdup("Computer");
+	    PlayerSetName(player, "Computer");
 	    break;
 	case PlayerPerson:
 	    team = 2 + NumPlayers;
-	    player->Name = strdup("Person");
+	    PlayerSetName(player, "Person");
 	    break;
 	case PlayerRescuePassive:
 	case PlayerRescueActive:
 	    // FIXME: correct for multiplayer games?
-	    player->Name = strdup("Computer");
+	    PlayerSetName(player, "Computer");
 	    team = 2 + NumPlayers;
 	    break;
     }

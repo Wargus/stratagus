@@ -571,7 +571,9 @@ local SCM CclDefineSpell(SCM list)
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("sound-when-cast"))) {
 	    //  Free the old name, get the new one
-	    free(spell->SoundWhenCast.Name);
+	    if (spell->SoundWhenCast.Name) {
+		free(spell->SoundWhenCast.Name);
+	    }
 	    spell->SoundWhenCast.Name = gh_scm2newstr(gh_car(list), 0);
 	    spell->SoundWhenCast.Sound = SoundIdForName(spell->SoundWhenCast.Name);
 	    //  Check for sound.

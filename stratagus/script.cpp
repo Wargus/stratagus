@@ -749,6 +749,7 @@ local SCM CclSetLocalPlayerName(SCM name)
     str = gh_scm2newstr(name, 0);
     strncpy(LocalPlayerName, str, sizeof(LocalPlayerName) - 1);
     LocalPlayerName[sizeof(LocalPlayerName) - 1] = '\0';
+    free(str);
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
