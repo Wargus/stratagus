@@ -190,17 +190,18 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 
     ptype = spell->Action->Data.SpawnPortal.PortalType;
 
+    DebugLevel0Fn("Spawning a portal exit.\n");
     portal = caster->Goal;
     if (portal) {
 	// FIXME: if cop is already defined --> move it, but it doesn't work?
 	RemoveUnit(portal, NULL);
 	PlaceUnit(portal, x, y);
     } else {
-	portal = MakeUnitAndPlace(x, y, ptype, &Players[PlayerMax - 1]);
+	portal = MakeUnitAndPlace(x, y, ptype, caster->Player);
     }
-    MakeMissile(spell->Missile,
+/*    MakeMissile(spell->Missile,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);*/
     //  Goal is used to link to destination circle of power
     caster->Goal = portal;
     RefsDebugCheck(!portal->Refs || portal->Destroyed);
@@ -1200,8 +1201,8 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	y=caster->Y;
 	target=caster;
     }
-    DebugLevel3Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->IdentName _C_
-	unit->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
+    DebugLevel0Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->IdentName _C_
+	caster->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
     if (CanCastSpell(caster, spell, target, x, y)) {
 	act=spell->Action;
 	cont=1;

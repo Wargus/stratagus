@@ -1062,6 +1062,8 @@ local void SendSpellCast(int sx, int sy)
     for (i = 0; i < NumSelected; ++i) {
 	unit = Selected[i];
 	if (!unit->Type->CanCastSpell) {
+	    DebugLevel0Fn("but unit %d(%s) can't cast spells?\n"
+		    _C_ unit->Slow _C_ unit->Type->Name);
 	    continue;			// this unit cannot cast spell
 	}
 	if (dest && unit == dest) {
