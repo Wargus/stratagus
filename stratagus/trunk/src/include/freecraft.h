@@ -130,15 +130,23 @@
 #define snprintf _snprintf		/// Unix -> dumm
 #endif
 
-#endif	// } m$
 
 #ifndef __FUNCTION__
+
 #define __FUNCTION__ __FILE__  /* ":" __LINE__ */
-#define PrintFunction() do { fprintf(stdout,"%s:%d: ",__FILE__,__LINE__); } while(0)
-#else
-#define PrintFunction() do { fprintf(stdout,__FUNCTION__": "); } while(0)
+
+    /// Print function in debug macros
+#define PrintFunction() \
+    do { fprintf(stdout,"%s:%d: ",__FILE__,__LINE__); } while(0)
+
 #endif
 
+#endif	// } m$
+
+#ifndef PrintFunction
+    /// Print function in debug macros
+#define PrintFunction() do { fprintf(stdout,__FUNCTION__": "); } while(0)
+#endif
 
 /*============================================================================
 ==	Debug definitions
@@ -266,7 +274,7 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef VERSION
-#define VERSION	"1.17.1"		/// Engine version shown
+#define VERSION	"1.17.2pre1"		/// Engine version shown
 #endif
 
 #ifndef FreeCraftMajorVerion
