@@ -1790,7 +1790,7 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 #ifdef WITH_SOUND
     SCM cb;
 
-    if (!MusicOff) {
+    if (PlayingMusic) {
 	MusicOff = 1;
 	StopMusic();
     } else {
