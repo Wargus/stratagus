@@ -327,7 +327,13 @@ local void HandleBuffs(Unit* unit, int amount)
     //
     if (unit->TTL && unit->TTL < (GameCycle - unit->HP)) {
 	DebugLevel0Fn("Unit must die %lu %lu!\n" _C_ unit->TTL _C_ GameCycle);
-	HitUnit(0, unit, amount);	// * type->LossPerCycle or somthing?
+	//
+	//	Hit unit does some funky stuff...
+	//
+	unit->HP -= amount;
+	if (unit->HP < 0) {
+	    LetUnitDie(unit);
+	}
 	if (unit->Selected) {
 	    MustRedraw |= RedrawInfoPanel;
 	}
