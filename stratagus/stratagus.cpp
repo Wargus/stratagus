@@ -177,17 +177,19 @@ global void SaveAll(void)
 --	Random
 ----------------------------------------------------------------------------*/
 
+global unsigned SyncRandSeed = 0x87654321;	/// sync random seed value.
+
 /**
 **	Syncron rand.
 */
 global int SyncRand(void)
 {
-    static unsigned rnd = 0x87654321;
+    //static unsigned SyncRandSeed = 0x87654321;
     int val;
 
-    val=rnd>>16;
+    val=SyncRandSeed>>16;
 
-    rnd=rnd*(0x12345678 * 4 + 1) + 1;
+    SyncRandSeed=SyncRandSeed*(0x12345678 * 4 + 1) + 1;
 
     return val;
 }
