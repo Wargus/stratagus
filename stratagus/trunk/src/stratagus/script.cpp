@@ -1113,6 +1113,30 @@ global void ScriptProxyTypeInitBlock(ScriptProxyType* type)
 }
 
 /**
+** 	Get a value from the Stratagus syncronized random number generator.
+*/
+local int ScriptSyncRand(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "Wrong argument count, %d got %d expected" _C_ lua_gettop(l) _C_ 1);
+	}
+	lua_pushnumber(l, SyncRand() % (int)LuaToNumber(l, -1));
+	return 1;
+}
+
+/**
+** 	Get a value from the Stratagus truly"" random number generator.
+*/
+local int ScriptMyRand(lua_State* l)
+{
+	if (lua_gettop(l)){
+		LuaError(l, "Wrong arguments");
+	}
+	lua_pushnumber(l, MyRand());
+	return 1;
+}
+
+/**
 **  Get a value from the big Stratagus struct.
 */
 local int ScriptStratagusGetValue(lua_State* l)
@@ -1154,6 +1178,20 @@ local int ScriptStratagusSetValue(lua_State* l)
 	lua_error(l);
 	return 0;
 
+}
+
+/**
+**	Initialize the main Stratagus namespace.
+*/
+local void ScriptStratagusInit(void)
+{
+	lua_pushstring(Lua, "SyncRand");
+	lua_pushcfunction(Lua, ScriptSyncRand);
+	lua_rawset(Lua, -3);
+
+	lua_pushstring(Lua, "MyRand");
+	lua_pushcfunction(Lua, ScriptMyRand);
+	lua_rawset(Lua, -3);
 }
 
 /**
@@ -1199,6 +1237,7 @@ local void InitScript(void)
 	lua_setmetatable(Lua, -2);
 	
 	// Add all our namespaces and stuff.
+	ScriptStratagusInit();
 	ScriptSpellInit();
 	ScriptMissileTypesInit();
 	ScriptPlayerInit();
