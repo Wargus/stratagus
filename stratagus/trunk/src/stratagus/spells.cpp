@@ -683,7 +683,8 @@ local int CanCastInvisibility(const Unit* target, const SpellType* spell)
 **
 **	@return		=!0 if spell should/can casted, 0 if not
 */
-local int CanCastPolymorph(const Unit* target, const SpellType* spell)
+local int CanCastPolymorph(const Unit* target,
+    const SpellType* spell __attribute__((unused)))
 {
     // only can polymorph organic units
     if (target && target->Type->Organic) {
@@ -718,7 +719,8 @@ local int CanCastBloodlust(const Unit* target, const SpellType* spell)
 **
 **	@return		=!0 if spell should/can casted, 0 if not
 */
-local int CanCastDeathCoil(const Unit* target, const SpellType* spell)
+local int CanCastDeathCoil(const Unit* target,
+    const SpellType* spell __attribute__((unused)))
 {
     if ((target && target->Type->Organic) || (!target)) {
 	return 1;
