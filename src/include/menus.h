@@ -44,8 +44,15 @@ typedef unsigned MenuButtonId;
 #define MBUTTON_GM_HALF		10
 #define MBUTTON_132		13
 #define MBUTTON_GM_FULL		16
+#define MBUTTON_UP_ARROW	29
 #define MBUTTON_DOWN_ARROW	32
+#define MBUTTON_LEFT_ARROW	35
+#define MBUTTON_RIGHT_ARROW	38
+#define MBUTTON_S_KNOB		40
+#define MBUTTON_S_VCONT		42
+#define MBUTTON_S_HCONT		44
 #define MBUTTON_PULLDOWN	46
+#define MBUTTON_VTHIN		48
 #define MBUTTON_FOLDER		51
 
 /*----------------------------------------------------------------------------
@@ -101,6 +108,16 @@ typedef struct _menuitem_ {
 	    int startline;
 	    void *(*retrieveopt)(struct _menuitem_ *, int);
 	} listbox;
+	struct {
+	    unsigned cflags;
+	    unsigned xsize;
+	    unsigned ysize;
+	    void (*action)(struct _menuitem_ *, int);
+	    int defper;
+	    int percent;
+	    int curper;		/* used in mouse-move state */
+	    int cursel;		/* used in mouse-over state */
+	} vslider;
 	/// ... add here ...
 
     } d;
@@ -110,10 +127,19 @@ typedef struct _menuitem_ {
 #define MI_TYPE_BUTTON 2
 #define MI_TYPE_PULLDOWN 3
 #define MI_TYPE_LISTBOX 4
+#define MI_TYPE_VSLIDER 5
 
     /// for MI_TYPE_TEXT
-#define MI_FLAGS_CENTERED 1
-#define MI_FLAGS_RALIGN 2
+#define MI_TFLAGS_CENTERED 1
+#define MI_TFLAGS_RALIGN 2
+
+    /// for MI_TYPE_xSLIDER
+#define MI_CFLAGS_UP 1
+#define MI_CFLAGS_DOWN 2
+#define MI_CFLAGS_LEFT MI_CURC_UP
+#define MI_CFLAGS_RIGHT MI_CURC_DOWN
+#define MI_CFLAGS_KNOB 4
+#define MI_CFLAGS_CONT 8		/// unused right now
 
 /**
 **	Menu definition.
