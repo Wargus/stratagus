@@ -111,8 +111,8 @@ local SCM CclDefineMissileType(SCM list)
 			mtype->SpriteFrames = gh_scm2int(gh_car(list));
 		} else if (gh_eq_p(value, gh_symbol2scm("num-directions"))) {
 			mtype->NumDirections = gh_scm2int(gh_car(list));
-        } else if (gh_eq_p(value, gh_symbol2scm("transparency"))) {
-            mtype->Transparency = gh_scm2int(gh_car(list));
+		} else if (gh_eq_p(value, gh_symbol2scm("transparency"))) {
+			mtype->Transparency = gh_scm2int(gh_car(list));
 		} else if (gh_eq_p(value, gh_symbol2scm("fired-sound"))) {
 			free(mtype->FiredSound.Name);
 			mtype->FiredSound.Name = gh_scm2newstr(gh_car(list), NULL);
@@ -226,6 +226,8 @@ local int CclDefineMissileType(lua_State* l)
 			mtype->SpriteFrames = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NumDirections")) {
 			mtype->NumDirections = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "transparency")) {
+			mtype->Transparency = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "FiredSound")) {
 			free(mtype->FiredSound.Name);
 			mtype->FiredSound.Name = strdup(LuaToString(l, -1));
