@@ -163,8 +163,10 @@ typedef enum _unit_voice_group_ {
 */
 struct _unit_ {
 #ifdef NEW_UNIT
-    short	Count;			/// Reference counter
+    short	Refs;			/// Reference counter
     UnitRef	Slot;			/// Assignd slot number
+    UnitRef	UnitSlot;		/// slot number in Units
+    UnitRef	PlayerSlot;		/// slot number in Player->Units
     Unit*	Next;			/// generic link pointer
 #else
     // FIXME: this will be removed
@@ -188,10 +190,10 @@ struct _unit_ {
 
     unsigned	Attacked : 1;		/// unit is attacked
     // FIXME: next not used!
-    unsigned	Visible : 1;		/// unit is visible (submarine)
+    //unsigned	Visible : 1;		/// unit is visible (submarine)
+    unsigned	Destroyed : 1;		/// unit is destroyed pending reference
     unsigned	Removed : 1;		/// unit is removed (not on map)
     unsigned	Selected : 1;		/// unit is selected
-    // FIXME: next not used!
     unsigned	Constructed : 1;	/// unit is in construction
 
     unsigned	Mana : 8;		/// mana points
@@ -282,8 +284,7 @@ struct _unit_ {
 #ifdef NEW_UNIT
 #define UnitNumber(unit)	((unit)->Slot)
 #else
-#define UnitNumber(unit) \
-    ((unit) - UnitsPool)
+#define UnitNumber(unit)	((unit)-UnitsPool)
 #endif
 
 /**
@@ -306,8 +307,11 @@ struct _unit_ {
 ----------------------------------------------------------------------------*/
 
 #ifdef NEW_UNIT
-extern Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All units
+extern Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All possible units
 extern Unit** UnitSlotFree; 		/// First free unit slot
+
+extern Unit* Units[MAX_UNIT_SLOTS];	/// Units used
+extern int NumUnits;			/// Number of units used
 #else
 extern int NumUnits;			/// Number of units used
 extern Unit** Units;			/// Units used

@@ -619,7 +619,7 @@ local Animation * GetSingleAnimation(SCM list){
   //printf("list %p %d",list,gh_list_p(list));
   length = gh_length(list);
 
-  finallist = (Animation *)calloc(sizeof(Animation),length);
+  finallist = (Animation *)calloc(length,sizeof(Animation));
   while(list){
     SCM value;
     Animation anim;
@@ -667,7 +667,7 @@ local SCM CclAnimType(SCM list)
   {
     int length = gh_length(list)-1;
     Animation ** whole_animation = 
-      (Animation **)calloc(sizeof(Animation*),length);
+      (Animation **)calloc(length,sizeof(Animation*));
     int type = gh_scm2int(gh_car(list));
     int cur = 0;
 
@@ -686,7 +686,7 @@ local SCM CclAnimType(SCM list)
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
-	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
+	    unittype->Animations=calloc(1,sizeof(*unittype->Animations));
 	}
 	// FIXME: animations are shared?
 	CclFree(unittype->Animations->Still);
@@ -699,7 +699,7 @@ local SCM CclAnimType(SCM list)
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
-	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
+	    unittype->Animations=calloc(1,sizeof(*unittype->Animations));
 	}
 	CclFree(unittype->Animations->Move);
 	unittype->Animations->Move=whole_animation[i];
@@ -711,7 +711,7 @@ local SCM CclAnimType(SCM list)
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
-	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
+	    unittype->Animations=calloc(1,sizeof(*unittype->Animations));
 	}
 	CclFree(unittype->Animations->Die);
 	unittype->Animations->Die=whole_animation[i];
@@ -723,7 +723,7 @@ local SCM CclAnimType(SCM list)
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
-	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
+	    unittype->Animations=calloc(1,sizeof(*unittype->Animations));
 	}
 	CclFree(unittype->Animations->Attack);
 	unittype->Animations->Attack=whole_animation[i];
