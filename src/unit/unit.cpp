@@ -1148,28 +1148,36 @@ global int UnitVisibleInViewport (int v, const Unit* unit)
     return 0;
 }
 
+/**
+**	Returns true, if unit is visible on current map view (any viewport).
+**
+**	@param unit	Unit to be checked.
+**	@return		True if visible, false otherwise.
+*/
 global int UnitVisibleOnScreen(const Unit* unit)
 {
     int i;
-    for (i=0; i < TheUI.NumViewports; i++) {
-	if (UnitVisibleInViewport(i, unit))
+
+    for (i = 0; i < TheUI.NumViewports; i++) {
+	if (UnitVisibleInViewport(i, unit)) {
 	    return 1;
+	}
     }
     return 0;
 }
 
 /**
-**      StephanR: Get area of tiles covered by unit, including its displacement
+**      Get area of map tiles covered by unit, including its displacement.
 **
 **      @param unit     Unit to be checked and set.
 **	@param sx	Out: Top left X tile map postion.
 **	@param sy	Out: Top left Y tile map postion.
 **	@param ex	Out: Bottom right X tile map postion.
 **	@param ey	Out: Bottom right Y tile map postion.
-**      @return         sx,sy,ex,ey defining area in Map
+**
+**      @return		sx,sy,ex,ey defining area in Map
 */
-global void GetUnitMapArea( const Unit* unit,
-                            int *sx, int *sy, int *ex, int *ey )
+global void GetUnitMapArea(const Unit* unit, int *sx, int *sy, int *ex, int *ey)
 {
     *sx = unit->X - (unit->IX < 0);
     *ex = *sx + unit->Type->TileWidth - !unit->IX;
@@ -1177,60 +1185,59 @@ global void GetUnitMapArea( const Unit* unit,
     *ey = *sy + unit->Type->TileHeight - !unit->IY;
 }
 
-
 #ifdef NEW_DECODRAW
 /**
 **	Decoration redraw function that will redraw an unit (no building) for
 **	set clip rectangle by decoration mechanism.
 **
-**	@param data  Unit* to be drawn
+**	@param data	Unit pointer to be drawn
 */
-local void unitdeco_draw( void *data )
+local void DecoUnitDraw(void* data)
 {
-  Unit *unit = (Unit *)data;
+    Unit* unit;
 
-  DebugCheck( unit->Removed );
-  DebugCheck( !UnitVisibleOnScreen(unit) );
+    unit = (Unit*) data;
+    DebugCheck(unit->Removed);
+    DebugCheck(!UnitVisibleOnScreen(unit));
 
-  DrawUnit( unit );
+    DrawUnit(unit);
 }
 
 /**
 **	Decoration redraw function that will redraw a building for
 **	set clip rectangle by decoration mechanism.
 **
-**	@param data  Unit* to be drawn
+**	@param data	Unit pointer to be drawn
 */
-local void buildingdeco_draw( void *data )
+local void DecoBuildingDraw(void* data)
 {
-  Unit *unit = (Unit *)data;
+    Unit *unit;
 
-  DebugCheck( unit->Removed );
-  DebugCheck( !UnitVisibleOnScreen(unit) );
+    unit = (Unit*) data;
+    DebugCheck(unit->Removed);
+    DebugCheck(!UnitVisibleOnScreen(unit));
 
-  DrawBuilding( unit );
+    DrawBuilding(unit);
 }
 
 /**
 **	Create decoration for any unit-type
 **
-**	@param u = an unit which is visible on screen
-**      @param x = x pixel position on screen of left-top
-**      @param y = y pixel position on screen of left-top
-**      @param w = width in pixels of area to be drawn from (x,y)
-**      @param h = height in pixels of area to be drawn from (x,y)
+**	@param u	an unit which is visible on screen
+**      @param x	x pixel position on screen of left-top
+**      @param y	y pixel position on screen of left-top
+**      @param w	width in pixels of area to be drawn from (x,y)
+**      @param h	height in pixels of area to be drawn from (x,y)
 */
-local void AddUnitDeco( Unit *u, int x, int y, int w, int h )
+local void AddUnitDeco(Unit* u, int x, int y, int w, int h)
 {
-  if ( u->Type->Building )
-    u->deco = DecorationAdd( u, buildingdeco_draw, LevBuilding, x, y, w, h );
-  else
-  {
-    if ( u->Type->UnitType==UnitTypeFly )
-      u->deco = DecorationAdd( u, unitdeco_draw, LevSkylow, x, y, w, h );
-    else
-      u->deco = DecorationAdd( u, unitdeco_draw, LevCarLow, x, y, w, h );
-  }
+    if (u->Type->Building) {
+	u->deco = DecorationAdd(u, DecoBuildingDraw, LevBuilding, x, y, w, h);
+    } else if (u->Type->UnitType == UnitTypeFly) {
+	u->deco = DecorationAdd(u, DecoUnitDraw, LevSkylow, x, y, w, h);
+    } else {
+	u->deco = DecorationAdd(u, DecoUnitDraw, LevCarLow, x, y, w, h);
+    }
 }
 #endif
 
@@ -1240,7 +1247,7 @@ local void AddUnitDeco( Unit *u, int x, int y, int w, int h )
 **      @param unit     Unit to be checked.
 **      @return         True if map marked to be drawn, false otherwise.
 */
-global int CheckUnitToBeDrawn(const Unit * unit)
+global int CheckUnitToBeDrawn(const Unit* unit)
 {
 #ifdef NEW_MAPDRAW
     int sx;
@@ -1312,31 +1319,34 @@ global int CheckUnitToBeDrawn(const Unit * unit)
     return 0;
 }
 
-#ifdef HIERARCHIC_PATHFINDER
+#ifdef HIERARCHIC_PATHFINDER	// {
 
-/* hack */
+// hack
 #include "../pathfinder/pf_lowlevel.h"
 
 /**
 **	FIXME: Docu
 */
-global int UnitGetNextPathSegment (Unit *unit, int *dx, int *dy)
+global int UnitGetNextPathSegment(const Unit* unit, int *dx, int *dy)
 {
     int segment;
-    int shift, neighbor;
+    int shift;
+    int neighbor;
 
-    if (unit->Data.Move.Length <= 0)
-	return 0;       /* *dx and *dy returned to the caller are invalid */
+    if (unit->Data.Move.Length <= 0) {
+	return 0;
+	// *dx and *dy returned to the caller are invalid
+    }
 
     segment = unit->Data.Move.Length - 1;
-    shift = segment%2 ? 4 : 0;
-    neighbor = (unit->Data.Move.Path[segment/2] >> shift) & 0xf;
+    shift = segment % 2 ? 4 : 0;
+    neighbor = (unit->Data.Move.Path[segment / 2] >> shift) & 0xf;
     *dx = Neighbor[neighbor].dx;
     *dy = Neighbor[neighbor].dy;
     return 1;
 }
 
-#endif /* HIERARCHIC_PATHFINDER */
+#endif // } HIERARCHIC_PATHFINDER
 
 // FIXME: perhaps I should write a function UnitSelectable?
 
@@ -1382,7 +1392,8 @@ global void UnitIncrementMana(void)
 	//	Look if the time to live is over.
 	//
 	if( unit->TTL && unit->TTL<GameCycle ) {
-	    DebugLevel0Fn("Unit must die %lu %lu!\n" _C_ unit->TTL _C_ GameCycle);
+	    DebugLevel0Fn("Unit must die %lu %lu!\n" _C_ unit->TTL
+		    _C_ GameCycle);
 	    //if( !--unit->HP ) { FIXME: must reduce hp the last seconds of life
 		LetUnitDie(unit);
 	    //}
@@ -1426,8 +1437,8 @@ global void UnitIncrementMana(void)
 	    }
 	}
 	DebugLevel3Fn("%d:%d,%d,%d,%d,%d\n" _C_ UnitNumber(unit) _C_
-		unit->Bloodlust _C_ unit->Haste _C_ unit->Slow _C_ unit->Invisible _C_
-		unit->UnholyArmor);
+		unit->Bloodlust _C_ unit->Haste _C_ unit->Slow _C_
+		unit->Invisible _C_ unit->UnholyArmor);
 
 	if (  unit->Type->Submarine ) {
 	    if( !flag && (unit->Visible&(1<<ThisPlayer->Player)) ) {
