@@ -1126,14 +1126,14 @@ local int InputKey(int key)
 	    if (!strlen(namestart)) {
 		return 1;
 	    }
-	    for (i = 0; i < PlayerMax; ++i)
-	    {
-		if (!strncmp(namestart, Players[i].Name, strlen(namestart)))
-		{
+	    for (i = 0; i < PlayerMax; ++i) {
+		if (Players[i].Type != PlayerPerson) {
+		    continue;
+		}
+		if (!strncmp(namestart, Players[i].Name, strlen(namestart))) {
 		    InputIndex += strlen(Players[i].Name) - strlen(namestart);
 		    strcpy(namestart, Players[i].Name);
-		    if (namestart == Input)
-		    {
+		    if (namestart == Input) {
 			InputIndex += 2;
 			strcat(namestart, ": ");
 		    }
