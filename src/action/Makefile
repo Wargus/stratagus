@@ -23,7 +23,7 @@ MODULE  = action
 
 OBJS	= command.$(OE) actions.$(OE) action_die.$(OE) action_patrol.$(OE) \
 	action_still.$(OE) action_stand.$(OE) action_move.$(OE) \
-	action_attack.$(OE) action_resource.$(OE) \
+	action_follow.$(OE) action_attack.$(OE) action_resource.$(OE) \
 	action_board.$(OE) action_unload.$(OE) action_repair.$(OE) \
 	action_harvest.$(OE) action_minegold.$(OE) \
 	action_returngoods.$(OE) action_research.$(OE) action_demolish.$(OE) \
