@@ -121,7 +121,7 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     if( num!=-1 ) {
 	fprintf(logf," %d",num);
     }
-    fprintf(logf,") ;%d %d",unit->Refs,SyncRandSeed);
+    fprintf(logf,") ;%d:%d %X",unit->Player->Player,unit->Refs,SyncRandSeed);
 
     fprintf(logf,"\n");
     fflush(logf);
