@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name minimap.c	-	The minimap. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -369,7 +368,7 @@ global void HideMinimapCursor(void)
     h=OldMinimapCursorH;
 
     // FIXME: Attention 8/16/32 bpp!
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
     case 8:
 	{ VMemType8* sp;
 	  VMemType8* dp;
@@ -449,7 +448,7 @@ global void DrawMinimapCursor(int vx,int vy)
     OldMinimapCursorW=w=(MapWidth*MinimapScale)/MINIMAP_FAC-1;
     OldMinimapCursorH=h=(MapHeight*MinimapScale)/MINIMAP_FAC-1;
 
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
 	case 8:
 	    i=(w+1+h)*2*sizeof(VMemType8);
 	    break;
@@ -476,7 +475,7 @@ global void DrawMinimapCursor(int vx,int vy)
     }
 
     // FIXME: not 100% correct
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
     case 8:
 	{ VMemType8* sp;
 	VMemType8* dp;

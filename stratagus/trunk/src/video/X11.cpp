@@ -197,6 +197,7 @@ foundvisual:
     if( !VideoDepth ) {
 	VideoDepth=xvi.depth;
     }
+    VideoBpp=xpfv[i].bits_per_pixel;
 
     if( !VideoWidth ) {
 	VideoWidth = DEFAULT_VIDEO_WIDTH;
@@ -898,7 +899,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	return NULL;
     }
 
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
     case 8:
 	pixels=malloc(256*sizeof(VMemType8));
 	break;
@@ -961,7 +962,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	    //exit(-1);
 	}
 
-	switch( VideoDepth ) {
+	switch( VideoBpp ) {
 	case 8:
 	    ((VMemType8*)pixels)[i]=color.pixel;
 	    break;

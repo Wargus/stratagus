@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name sprite.c	-	The general sprite functions. */
-/*
-**	(c) Copyright 2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -1621,7 +1620,7 @@ local void FreeSprite8(Graphic* graphic)
 **	@param	width	Width of a single frame.
 **	@param	height	Height of a single frame.
 **
-**	@return 	A graphic object for the loaded sprite.
+**	@return		A graphic object for the loaded sprite.
 **
 **	@see	LoadGraphic
 */
@@ -1769,7 +1768,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 */
 global void InitSprite(void)
 {
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
 	case 8:
 	    GraphicSprite8Type.Draw=VideoDraw8to8;
 	    GraphicSprite8Type.DrawClip=VideoDraw8to8Clip;
@@ -1800,7 +1799,7 @@ global void InitSprite(void)
 	    break;
 
 	default:
-	    DebugLevel0Fn("Unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("Unsupported %d bpp\n",VideoBpp);
 	    abort();
     }
 

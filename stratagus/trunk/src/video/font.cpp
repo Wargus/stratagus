@@ -596,7 +596,7 @@ global void LoadFonts(void)
 	FontMeasureWidths(Fonts+i);
     }
 
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
 	case 8:
 	    VideoDrawChar=VideoDrawChar8;
 	    break;
@@ -615,7 +615,7 @@ global void LoadFonts(void)
 	    break;
 
 	default:
-	    DebugLevel0Fn("unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("unsupported %d bpp\n",VideoBpp);
 	    abort();
     }
 }

@@ -917,7 +917,7 @@ global void InitCursor(void)
 	free( OldCursorRectangle );
     }
 
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
 	case 8:
 	    SaveCursorBackground=SaveCursorBackground8;
 	    LoadCursorBackground=LoadCursorBackground8;
@@ -948,7 +948,7 @@ global void InitCursor(void)
 	    LoadCursorRectangle=LoadCursorRectangle32;
 	    break;
 	default:
-	    DebugLevel0Fn("unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("unsupported %d bpp\n",VideoBpp);
 	    abort();
     }
     OldCursorRectangle=malloc((2*VideoWidth+2*(VideoHeight-2))*memsize);

@@ -534,7 +534,7 @@ global void PlayersEachSecond(void)
 */
 global void GraphicPlayerPixels(const Player* player,const Graphic* sprite)
 {
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
 	case 8:
 	    *((struct __4pixel8__*)(((VMemType8*)sprite->Pixels)+208))
 		    =player->UnitColors.Depth8;
@@ -563,7 +563,7 @@ global void GraphicPlayerPixels(const Player* player,const Graphic* sprite)
 global void PlayerPixels(const Player* player)
 {
     // FIXME: use function pointer
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
     case 8:
 	*((struct __4pixel8__*)(Pixels8+208))=player->UnitColors.Depth8;
 	break;
@@ -590,7 +590,7 @@ global void SetPlayersPalette(void)
 {
     int i;
 
-    switch( VideoDepth ) {
+    switch( VideoBpp ) {
     case 8:
 	// New player colors setup
 	if( !Pixels8 ) {

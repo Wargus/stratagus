@@ -10,7 +10,7 @@
 //
 /**@name video.h	-	The video headerfile. */
 //
-//	(c) Copyright 1999,2000 by Lutz Sammer
+//	(c) Copyright 1999-2001 by Lutz Sammer
 //
 //	$Id$
 //
@@ -261,6 +261,14 @@ extern char VideoFullScreen;
     **	@see InitVideoWin32 @see main
     */
 extern int VideoDepth;
+
+    /**
+    **	Architecture-dependant video bpp (bits pro pixel).
+    **	Set by InitVideoXXX. (8,16,24,32)
+    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
+    **	@see InitVideoWin32 @see main
+    */
+extern int VideoBpp;
 
     /**
     **	Architecture-dependant videomemory. Set by InitVideoXXX.
