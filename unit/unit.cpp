@@ -91,7 +91,7 @@ global void InitUnitsMemory(void)
     // Initialize the "list" of free unit slots
 
     slot=UnitSlots+MAX_UNIT_SLOTS;
-    *--slot=NULL;			// leave the last slot free as no marker
+    *--slot=NULL;			// leave last slot free as no marker
     *--slot=NULL;
     do {
 	slot[-1]=(void*)slot;
@@ -165,7 +165,7 @@ global void ReleaseUnit(Unit* unit)
 	    return;
 	}
 #ifdef HIERARCHIC_PATHFINDER
-	PfHierReleaseData (unit);
+	PfHierReleaseData(unit);
 #endif
     }
 
@@ -178,19 +178,6 @@ global void ReleaseUnit(Unit* unit)
 	free(unit->Name);
     }
 
-#ifdef UNIT_ON_MAP
-    if( 0 ) {		// debug check
-	Unit* list;
-
-	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
-	while( list ) {			// find the unit
-	    if( list==unit ) {
-		abort();
-	    }
-	    list=list->Next;
-	}
-    }
-#endif
     //
     //	No more references remaining, but the network could have an order
     //	on the way. We must wait a little time before we could free the
@@ -198,7 +185,7 @@ global void ReleaseUnit(Unit* unit)
     //
     *ReleasedTail=unit;
     ReleasedTail=&unit->Next;
-    unit->Refs=GameCycle+NetworkMaxLag;	// could be reuse after this.
+    unit->Refs=GameCycle+NetworkMaxLag;	// could be reuse after this time
     IfDebug(
 	DebugLevel2Fn("%lu:No more references %d\n" _C_
 		GameCycle _C_ UnitNumber(unit));
@@ -209,7 +196,7 @@ global void ReleaseUnit(Unit* unit)
 /**
 **	FIXME: Docu
 */
-local Unit *AllocUnit (void)
+local Unit *AllocUnit(void)
 {
     Unit* unit;
     Unit** slot;
@@ -406,6 +393,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
     const UnitType* type;
     int h;
     int w;
+    unsigned flags;
 
     DebugCheck( !unit->Removed || unit->Destroyed );
 
@@ -424,6 +412,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
     unit->X=x;
     unit->Y=y;
 
+#if 0
     //
     //	Place unit on the map.
     //
@@ -453,13 +442,36 @@ global void PlaceUnit(Unit* unit,int x,int y)
     } else {
 	unsigned flags;
 
-	flags=UnitFieldFlags(unit);
+	flags=unit->Type->FieldFlags;
 	for( h=type->TileHeight; h--; ) {
 	    for( w=type->TileWidth; w--; ) {
 		TheMap.Fields[x+w+(y+h)*TheMap.Width].Flags|=flags;
 	    }
 	}
     }
+#else
+
+    //
+    //	Place unit on the map, mark the field with the FieldFlags.
+    //
+    flags=type->FieldFlags;
+    for( h=type->TileHeight; h--; ) {
+	for( w=type->TileWidth; w--; ) {
+	    TheMap.Fields[x+w+(y+h)*TheMap.Width].Flags|=flags;
+	}
+    }
+
+#ifdef HIERARCHIC_PATHFINDER
+    //
+    //	Update hierarchic pathfinder structures.
+    //
+    if( type->Building ) {
+	PfHierMapChangedCallback(x, y,
+	    x + type->TileWidth - 1, y + type->TileHeight - 1);
+    }
+#endif
+
+#endif
 
     x+=unit->Type->TileWidth/2;
     y+=unit->Type->TileHeight/2;
@@ -491,6 +503,20 @@ global void PlaceUnit(Unit* unit,int x,int y)
 
     MustRedraw|=RedrawMinimap;
     CheckUnitToBeDrawn(unit);
+
+    //
+    //	Building oil-platform, must remove oil-patch.
+    //
+    if( type->GivesOil ) {
+	Unit* temp;
+
+        DebugLevel0Fn("Remove oil-patch\n");
+	temp=OilPatchOnMap(x,y);
+	DebugCheck( !temp );
+	unit->Value=temp->Value;
+	// oil patch should NOT make sound, handled by let unit die
+	LetUnitDie(temp);		// Destroy oil patch
+    }
 }
 
 /**
@@ -520,11 +546,6 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 
     PlaceUnit(unit,x,y);
 
-#ifdef NEW_DECODRAW
-// FIXME: needed?
-//    CheckUnitToBeDrawn(unit);
-#endif
-
     return unit;
 }
 
@@ -542,6 +563,7 @@ global void RemoveUnit(Unit* unit)
     int h;
     int w;
     const UnitType* type;
+    unsigned flags;
 
     if( unit->Removed ) {		// could happen!
 	// If unit is removed (inside) and building is destroyed.
@@ -559,22 +581,18 @@ global void RemoveUnit(Unit* unit)
 	UpdateButtonPanel();
     }
 
-#if 0
-    //  Remove unit from its groups
-    if( unit->GroupId ) {
-        RemoveUnitFromGroups(unit);
-    }
-#endif
-
     // Unit is seen as under cursor
     if( unit==UnitUnderCursor ) {
 	UnitUnderCursor=NULL;
     }
 
+    // FIXME: unit is tracked?
+
+    type=unit->Type;
+#if 0
     //
     //	Update map
     //
-    type=unit->Type;
     if( type->Building ) {
 	//
 	//	Unmark building on movement map.
@@ -599,6 +617,9 @@ global void RemoveUnit(Unit* unit)
 	    }
 	}
 #ifdef HIERARCHIC_PATHFINDER
+	//
+	//	Update hierarchic pathfinder structures.
+	//
 	PfHierMapChangedCallback (unit->X, unit->Y,
 		    unit->X + unit->Type->TileWidth - 1,
 		    unit->Y + unit->Type->TileHeight - 1);
@@ -613,24 +634,31 @@ global void RemoveUnit(Unit* unit)
 	    }
 	}
     }
+#else
+
+    //
+    //	Update map
+    //
+    flags=~type->FieldFlags;
+    for( h=type->TileHeight; h--; ) {
+	for( w=type->TileWidth; w--; ) {
+	    TheMap.Fields[unit->X+w+(unit->Y+h)*TheMap.Width].Flags&=flags;
+	}
+    }
+#ifdef HIERARCHIC_PATHFINDER
+    //
+    //	Update hierarchic pathfinder structures.
+    //
+    if( type->Building ) {
+	PfHierMapChangedCallback(unit->X, unit->Y,
+	    unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
+    }
+#endif
+
+#endif
 
     DebugLevel3Fn("%d %p %p\n" _C_ UnitNumber(unit) _C_ unit _C_ unit->Next);
     UnitCacheRemove(unit);
-#ifdef UNIT_ON_MAP
-    if( 0 ) {
-	Unit* list;
-
-	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
-	while( list ) {				// find the unit
-	    if( list==unit ) {
-		DebugLevel0Fn("%d\n" _C_ UnitNumber(unit));
-		abort();
-		break;
-	    }
-	    list=list->Next;
-	}
-    }
-#endif
 
     MustRedraw|=RedrawMinimap;
     CheckUnitToBeDrawn(unit);
@@ -753,8 +781,7 @@ global void UnitLost(Unit* unit)
     if( type->GivesOil && unit->Value>0 ) {
 	// NOTE: I wasn't sure the best UnitType/Player
 	// NOTE: This should really NOT be hardcoded?!
-	temp=MakeUnitAndPlace(unit->X,unit->Y
-		,UnitTypeByIdent("unit-oil-patch"),&Players[15]);
+	temp=MakeUnitAndPlace(unit->X,unit->Y,UnitTypeOilPatch,&Players[15]);
 	temp->Value=unit->Value;
     }
 
@@ -1348,6 +1375,9 @@ global int CheckUnitToBeDrawn(const Unit * unit)
 /* hack */
 #include "../pathfinder/pf_lowlevel.h"
 
+/**
+**	FIXME: Docu
+*/
 global int UnitGetNextPathSegment (Unit *unit, int *dx, int *dy)
 {
     int segment;
@@ -1373,10 +1403,14 @@ global int UnitGetNextPathSegment (Unit *unit, int *dx, int *dy)
 **	Also clears the blink flag and handles submarines.
 **
 **	@NOTE: we could build a table of all magic units reducing cpu use.
+**
+**	@todo FIXME: Split this into more functions, to make the use clearer
+**		or rename the function.
 */
 //FIXME: vladi: the doc says incrementing mana is done by 1 per second
 //       the spells effect can be decremented at the same time and this
 //       will reduse calls to this function to one time per second only!
+//	johns: We must also walk through all units = also overhead.
 global void UnitIncrementMana(void)
 {
     Unit** table;
@@ -1910,41 +1944,8 @@ startn:
     }
 
 found:
-    unit->X=x;
-    unit->Y=y;
-
     unit->Wait=1;		// should be correct unit has still action
-
-    // FIXME: Should I use PlaceUnit here?
-    // latimerius: I think so
-    UnitCacheInsert(unit);
-    // FIXME: This only works with 1x1 big units
-    DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
-    TheMap.Fields[x+y*TheMap.Width].Flags|=UnitFieldFlags(unit);
-
-    unit->Removed=0;
-
-    x+=unit->Type->TileWidth/2;
-    y+=unit->Type->TileHeight/2;
-#ifdef NEW_FOW
-    //
-    //	Update fog of war.
-    //
-    MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
-#else
-    //
-    //	Update fog of war, if unit belongs to player on this computer
-    //
-    if( unit->Player==ThisPlayer ) {
-	MapMarkSight(x,y,unit->Stats->SightRange);
-    }
-#endif
-    if( unit->Type->CanSeeSubmarine ) {
-	MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
-    }
-
-    MustRedraw|=RedrawMinimap;
-    CheckUnitToBeDrawn(unit);
+    PlaceUnit(unit, x, y);
 }
 
 /**
@@ -2040,43 +2041,8 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    }
 	}
 	if( bestd!=99999 ) {
-	    unit->X=bestx;
-	    unit->Y=besty;
-
 	    unit->Wait=1;		// unit should have action still
-	    // FIXME: Should I use PlaceUnit here?
-
-	    // FIXME: This only works with 1x1 big units
-	    DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
-	    TheMap.Fields[bestx+besty*TheMap.Width].Flags|=UnitFieldFlags(unit);
-
-	    unit->Removed=0;
-	    UnitCacheInsert(unit);
-
-	    // {FIXME: Should make a general function for this
-	    bestx+=unit->Type->TileWidth/2;
-	    besty+=unit->Type->TileHeight/2;
-#ifdef NEW_FOW
-	    //
-	    //	Update fog of war.
-	    //
-	    MapMarkSight(unit->Player,bestx,besty,unit->Stats->SightRange);
-#else
-	    //
-	    //	Update fog of war, if unit belongs to player on this computer
-	    //
-	    if( unit->Player==ThisPlayer ) {
-		MapMarkSight(bestx,besty,unit->Stats->SightRange);
-	    }
-#endif
-	    if( unit->Type->CanSeeSubmarine ) {
-		MarkSubmarineSeen(unit->Player,bestx,besty,
-			unit->Stats->SightRange);
-	    }
-	    // }FIXME: Should make a general function for this
-
-	    MustRedraw|=RedrawMinimap;
-            CheckUnitToBeDrawn(unit);
+	    PlaceUnit(unit,bestx,besty);
 	    return;
 	}
 	++addy;
@@ -2322,11 +2288,13 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
     //
     IfDebug( j=0; );
     if( unit ) {
-	j=UnitFieldFlags(unit);
 	// FIXME: This only works with 1x1 big units
+	DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
+	j=unit->Type->FieldFlags;
 	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags&=~j;
     }
 
+#if 0
     // FIXME: Should be moved into unittype structure, and allow more types.
     if( type->ShoreBuilding ) {
 	mask=MapFieldLandUnit
@@ -2397,6 +2365,11 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 	    }
 	    return 0;
     }
+#else
+
+    mask = type->MovementMask;
+
+#endif
 
     for( h=type->TileHeight; h--; ) {
 	for( w=type->TileWidth; w--; ) {

@@ -191,11 +191,13 @@ global void HandleActionBuild(Unit* unit)
     build=MakeUnit(type,unit->Player);
     build->Constructed=1;
     PlaceUnit(build,x,y);
+/* Done by PlaceUnit now
 #ifdef HIERARCHIC_PATHFINDER
     PfHierMapChangedCallback (build->X, build->Y,
 		    build->X + build->Type->TileWidth - 1,
 		    build->Y + build->Type->TileHeight - 1);
 #endif
+*/
 
     // HACK: the building is not ready yet
     build->Player->UnitTypesCount[type->Type]--;
@@ -222,6 +224,7 @@ global void HandleActionBuild(Unit* unit)
 	_C_ build->Data.Builded.Val _C_ build->Data.Builded.Sub);
     build->Wait=CYCLES_PER_SECOND/6;
 
+#if 0
     //
     //	Building oil-platform, must remove oil-patch.
     //
@@ -229,43 +232,20 @@ global void HandleActionBuild(Unit* unit)
         DebugLevel0Fn("Remove oil-patch\n");
 	temp=OilPatchOnMap(x,y);
 	DebugCheck( !temp );
+	// FIXME: Johns: why the worker and not the construction?
 	unit->Value=temp->Value;	// Let worker hold value while building
 	// oil patch should NOT make sound, handled by let unit die
 	LetUnitDie(temp);		// Destroy oil patch
     }
+#endif
+    unit->Value=build->Value;		// worker holding value while building
 
-    RemoveUnit(unit);	// automaticly: CheckUnitToBeDrawn(unit)
-#if 0
-    // FIXME: breaks drop out code
-    // FIXME: this is a hack, but solves the problem, a better solution is
-    // FIXME: still wanted.
-
-    // Place unit where pathfinder is more likely to work
-    if (unit->X < x) {
-	PlaceUnit(unit,x,unit->Y);
- 	RemoveUnit(unit);		// Unit removal necessary to free map tiles
-    }
-    if (unit->X > x+type->TileWidth-1) {
-	PlaceUnit(unit,x+type->TileWidth-1,unit->Y);
-	RemoveUnit(unit);
-    }
-    if (unit->Y < y) {
-	PlaceUnit(unit,unit->X,y);
-	RemoveUnit(unit);
-    }
-    if (unit->Y > y+type->TileHeight-1) {
-	PlaceUnit(unit,unit->X,y+type->TileHeight-1);
-	RemoveUnit(unit);
-    }
-#else
+    RemoveUnit(unit);		// automaticly: CheckUnitToBeDrawn(unit)
+    // FIXME: Johns: should connect it to the building with ->Next?
     unit->X=x;
     unit->Y=y;
-#endif
     unit->Orders[0].Action=UnitActionStill;
     unit->SubAction=0;
-
-    CheckUnitToBeDrawn(build);
-    MustRedraw|=RedrawMinimap;
 }
 
 /**

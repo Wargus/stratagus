@@ -72,6 +72,7 @@ global int NumUnitTypes;		/// number of unit-types made
 **
 **	FIXME: find a way to make it configurable!
 */
+global UnitType*UnitTypeOilPatch;	/// Oil patch for oil patch removement
 global UnitType*UnitTypeGoldMine;	/// Gold mine unit type pointer
 global UnitType*UnitTypeOrcTanker;	/// Orc tanker unit type pointer
 global UnitType*UnitTypeHumanTanker;	/// Human tanker unit type pointer
@@ -94,10 +95,21 @@ global UnitType*UnitTypeBerserker;	/// Berserker for berserker regeneration
 */
 global char** UnitTypeWcNames;
 
+#ifdef DOXYGEN                          // no real code, only for document
+
+/**
+**	Lookup table for unit-type names
+*/
+local UnitType* UnitTypeHash[61];
+
+#else
+
 /**
 **	Lookup table for unit-type names
 */
 local hashtable(UnitType*,61) UnitTypeHash;
+
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -108,32 +120,109 @@ local hashtable(UnitType*,61) UnitTypeHash;
 */
 global void UpdateStats(void)
 {
-    UnitType* type;
-    UnitStats* stats;
+    UnitType *type;
+    UnitStats *stats;
     unsigned player;
     unsigned i;
 
     //
-    //	Update players stats
+    //  Update players stats
     //
-    for( type=UnitTypes; type->OType; ++type ) {
-	for( player=0; player<PlayerMax; ++player ) {
-	    stats=&type->Stats[player];
-	    stats->AttackRange=type->_AttackRange;
-	    stats->SightRange=type->_SightRange;
-	    stats->Armor=type->_Armor;
-	    stats->BasicDamage=type->_BasicDamage;
-	    stats->PiercingDamage=type->_PiercingDamage;
-	    stats->Speed=type->_Speed;
-	    stats->HitPoints=type->_HitPoints;
-	    for( i=0; i<MaxCosts; ++i ) {
-		stats->Costs[i]=type->_Costs[i];
+    for (type = UnitTypes; type->OType; ++type) {
+	for (player = 0; player < PlayerMax; ++player) {
+	    stats = &type->Stats[player];
+	    stats->AttackRange = type->_AttackRange;
+	    stats->SightRange = type->_SightRange;
+	    stats->Armor = type->_Armor;
+	    stats->BasicDamage = type->_BasicDamage;
+	    stats->PiercingDamage = type->_PiercingDamage;
+	    stats->Speed = type->_Speed;
+	    stats->HitPoints = type->_HitPoints;
+	    for (i = 0; i < MaxCosts; ++i) {
+		stats->Costs[i] = type->_Costs[i];
 	    }
-	    if( type->Building ) {
-		stats->Level=0;		// Disables level display
+	    if (type->Building) {
+		stats->Level = 0;	// Disables level display
 	    } else {
-		stats->Level=1;
+		stats->Level = 1;
 	    }
+	}
+
+	//
+	//      As side effect we calculate the movement flags/mask here.
+	//
+	switch (type->UnitType) {
+	    case UnitTypeLand:		// on land
+		type->MovementMask =
+		    MapFieldLandUnit
+		    | MapFieldSeaUnit
+		    | MapFieldBuilding	// already occuppied
+		    | MapFieldCoastAllowed
+		    | MapFieldWaterAllowed	// can't move on this
+		    | MapFieldUnpassable;
+		break;
+	    case UnitTypeFly:		// in air
+		type->MovementMask =
+		    MapFieldAirUnit;	// already occuppied
+		break;
+	    case UnitTypeNaval:		// on water
+		if (type->Transporter) {
+		    type->MovementMask =
+			MapFieldLandUnit
+			| MapFieldSeaUnit
+			| MapFieldBuilding	// already occuppied
+			| MapFieldLandAllowed;	// can't move on this
+		    // Johns: MapFieldUnpassable only for land units?
+		} else {
+		    type->MovementMask =
+			MapFieldLandUnit
+			| MapFieldSeaUnit
+			| MapFieldBuilding	// already occuppied
+			| MapFieldCoastAllowed
+			| MapFieldLandAllowed	// can't move on this
+			| MapFieldUnpassable;
+		}
+		break;
+	    default:
+		DebugLevel1Fn("Were moves this unit?\n");
+		type->MovementMask = 0;
+		break;
+	}
+	if( type->Building || type->ShoreBuilding ) {
+	    // Shore building is something special.
+	    if( type->ShoreBuilding ) {
+		type->MovementMask =
+		    MapFieldLandUnit
+		    | MapFieldSeaUnit
+		    | MapFieldBuilding	// already occuppied
+		    | MapFieldLandAllowed;	// can't build on this
+	    }
+	    type->MovementMask |= MapFieldNoBuilding;
+	    //
+	    //	A little chaos, buildings without HP can be entered.
+	    //	The oil-patch is a very special case.
+	    //
+	    if( type->_HitPoints ) {
+		type->FieldFlags = MapFieldBuilding;
+	    } else if( type->OilPatch ) {
+		type->FieldFlags = 0;
+	    } else {
+		type->FieldFlags = MapFieldNoBuilding;
+	    }
+	} else switch (type->UnitType) {
+	    case UnitTypeLand:		// on land
+		type->FieldFlags = MapFieldLandUnit;
+		break;
+	    case UnitTypeFly:		// in air
+		type->FieldFlags = MapFieldAirUnit;
+		break;
+	    case UnitTypeNaval:		// on water
+		type->FieldFlags = MapFieldSeaUnit;
+		break;
+	    default:
+		DebugLevel1Fn("Were moves this unit?\n");
+		type->FieldFlags = 0;
+		break;
 	}
     }
 }
@@ -1328,9 +1417,12 @@ global void InitUnitTypes(void)
 	}
     }
 
+    UpdateStats();			// Calculate the stats
+
     //
     //	Setup hardcoded unit types. FIXME: should be moved to some configs.
     //
+    UnitTypeOilPatch=UnitTypeByIdent("unit-oil-patch");
     UnitTypeGoldMine=UnitTypeByIdent("unit-gold-mine");
     UnitTypeHumanTanker=UnitTypeByIdent("unit-human-oil-tanker");
     UnitTypeOrcTanker=UnitTypeByIdent("unit-orc-oil-tanker");

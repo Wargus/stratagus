@@ -595,6 +595,7 @@ extern UnitType* UnitTypes;		/// All unit-types
 extern int NumUnitTypes;		/// Number of unit-types made
 
 // FIXME: this hardcoded unit-types must be removed!!
+extern UnitType*UnitTypeOilPatch;	/// Oil patch unit-type pointer
 extern UnitType*UnitTypeGoldMine;	/// Gold-mine unit-type pointer
 extern UnitType*UnitTypeHumanTanker;	/// Orc tanker unit-type pointer
 extern UnitType*UnitTypeOrcTanker;	/// Human tanker unit-type pointer

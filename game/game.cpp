@@ -239,7 +239,6 @@ global void CreateGame(char* filename, WorldMap* map)
 	//	Load the map.
 	//
 	InitUnitTypes();
-	UpdateStats();
 	LoadMap(filename, map);
 
 	if (s) {

@@ -1740,7 +1740,6 @@ local void CreateEditor(void)
     TheMap.NoFogOfWar = 1;
     if (!*CurrentMapPath) {		// new map!
 	InitUnitTypes();
-	UpdateStats();
 #if 0
 	//
 	//      Inititialize TheMap / Players.
