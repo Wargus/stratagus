@@ -371,9 +371,13 @@ local void SaveUi(FILE* file,const UI* ui)
     fprintf(file,"  (list \"%s\" %d %d)\n",
 	    ui->Minimap.File,ui->MinimapX,ui->MinimapY);
 
-    fprintf(file,"  ; Status line\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    ui->StatusLine.File,ui->StatusLineX,ui->StatusLineY);
+    fprintf(file,"\n  'status-line '(");
+    fprintf(file,"\n    file \"%s\"",ui->StatusLine.File);
+    fprintf(file,"\n    pos (%d %d)",ui->StatusLineX,ui->StatusLineY);
+    fprintf(file,"\n    text-pos (%d %d)",
+	    ui->StatusLineTextX,ui->StatusLineTextY);
+    fprintf(file,"\n    font %s",FontNames[ui->StatusLineFont]);
+    fprintf(file,")\n");
 
     fprintf(file,"\n  'menu-button '(");
     fprintf(file,"\n    pos (%d %d)",
@@ -519,14 +523,101 @@ global void SaveUserInterface(FILE* file)
 }
 
 /**
+**	Clean up a user interface.
+*/
+global void CleanUI(UI* ui)
+{
+    int i;
+    MenuPanel* menupanel;
+    MenuPanel* tmp;
+
+    free(ui->Name);
+    free(ui->NormalFontColor);
+    free(ui->ReverseFontColor);
+
+    // Filler
+    for( i=0; i<ui->NumFillers; ++i ) {
+	free(ui->Filler[i].File);
+    }
+    free(ui->FillerX);
+    free(ui->FillerY);
+    free(ui->Filler);
+
+    // Resource
+    free(ui->Resource.File);
+
+    // Resource Icons
+    for( i=0; i<MaxCosts+2; ++i ) {
+	free(ui->Resources[i].Icon.File);
+    }
+
+    // Info Panel
+    free(ui->InfoPanel.File);
+
+    // Completed Bar
+    free(ui->CompleteBarText);
+
+    // Button Panel
+    free(ui->ButtonPanel.File);
+
+    // Menu Button
+    free(ui->MenuButtonGraphic.File);
+
+    // Minimap
+    free(ui->Minimap.File);
+
+    // Status Line
+    free(ui->StatusLine.File);
+
+    // Buttons
+    free(ui->MenuButton.Text);
+    free(ui->NetworkMenuButton.Text);
+    free(ui->NetworkDiplomacyButton.Text);
+    free(ui->InfoButtons);
+    free(ui->TrainingButtons);
+    free(ui->ButtonButtons);
+
+    // Cursors
+    free(ui->Point.Name);
+    free(ui->Glass.Name);
+    free(ui->Cross.Name);
+    free(ui->YellowHair.Name);
+    free(ui->GreenHair.Name);
+    free(ui->RedHair.Name);
+    free(ui->Scroll.Name);
+    free(ui->ArrowE.Name);
+    free(ui->ArrowNE.Name);
+    free(ui->ArrowN.Name);
+    free(ui->ArrowNW.Name);
+    free(ui->ArrowW.Name);
+    free(ui->ArrowSW.Name);
+    free(ui->ArrowS.Name);
+    free(ui->ArrowSE.Name);
+
+    // Menu Panels
+    menupanel=ui->MenuPanels;
+    while( menupanel ) {
+	tmp=menupanel;
+	menupanel=menupanel->Next;
+	free(tmp->Panel.File);
+	free(tmp->Ident);
+	free(tmp);
+    }
+
+    // Backgrounds
+    free(ui->VictoryBackground.File);
+    free(ui->DefeatBackground.File);
+
+    free(ui);
+}
+
+/**
 **	Clean up the user interface module.
 */
 global void CleanUserInterface(void)
 {
     int i;
-    UI* ui;
     MenuPanel* menupanel;
-    MenuPanel* tmp;
 
     //
     //	Free the graphics. FIXME: if they are shared this will crash.
@@ -538,8 +629,6 @@ global void CleanUserInterface(void)
 
     for( i=0; i<MaxCosts+2; ++i ) {
 	VideoSaveFree(TheUI.Resources[i].Icon.Graphic);
-	free(TheUI.Resources[i].Icon.File);
-	TheUI.Resources[i].Icon.File=NULL;
     }
 
     VideoSaveFree(TheUI.InfoPanel.Graphic);
@@ -559,26 +648,7 @@ global void CleanUserInterface(void)
     //
     if( UI_Table ) {
 	for( i=0; UI_Table[i]; ++i ) {
-	    int j;
-
-	    ui=UI_Table[i];
-
-	    for( j=0; j<ui->NumFillers; ++j ) {
-		free(ui->Filler[j].File);
-	    }
-	    free(ui->FillerX);
-	    free(ui->FillerY);
-	    free(ui->Filler);
-
-	    menupanel=ui->MenuPanels;
-	    while( menupanel ) {
-		tmp=menupanel;
-		menupanel=menupanel->Next;
-		free(tmp->Panel.File);
-		free(tmp->Ident);
-		free(tmp);
-	    }
-	    free(ui);
+	    CleanUI(UI_Table[i]);
 	}
 	free(UI_Table);
 	UI_Table=NULL;
