@@ -595,6 +595,7 @@ global void ShowCredits(Credits *credits)
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+    DestroyCursorBackground();
 
     VideoSyncSpeed=OldVideoSyncSpeed;
     SetVideoSync();
