@@ -948,7 +948,9 @@ global void RealizeVideoMemory(void)
 global void SdlLockScreen(void)
 {
 #ifndef USE_OPENGL
-    SDL_LockSurface(TheScreen);
+    if (SDL_MUSTLOCK(TheScreen)) {
+	SDL_LockSurface(TheScreen);
+    }
 #ifndef USE_SDL_SURFACE
     VideoMemory = TheScreen->pixels;
 #endif
@@ -961,7 +963,9 @@ global void SdlLockScreen(void)
 global void SdlUnlockScreen(void)
 {
 #ifndef USE_OPENGL
-    SDL_UnlockSurface(TheScreen);
+    if (SDL_MUSTLOCK(TheScreen)) {
+	SDL_UnlockSurface(TheScreen);
+    }
 #ifndef USE_SDL_SURFACE
 #ifdef DEBUG
     VideoMemory = NULL;			// Catch errors!
