@@ -126,7 +126,8 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 		stepx = TileSizeX * FRAMES_PER_SECOND;
 		stepy = TileSizeY * FRAMES_PER_SECOND;
 	}
-	if (state & (ScrollLeft | ScrollRight)) {
+	if ((state & (ScrollLeft | ScrollRight)) &&
+			(state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
 		stepx = stepx * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
 		remx += stepx - (stepx / 100) * 100;
 		stepx /= 100;
@@ -137,7 +138,8 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 	} else {
 		stepx = 0;
 	}
-	if (state & (ScrollUp | ScrollDown)) {
+	if ((state & (ScrollUp | ScrollDown)) &&
+			(state & (ScrollUp | ScrollDown)) != (ScrollUp | ScrollDown)) {
 		stepy = stepy * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
 		remy += stepy - (stepy / 100) * 100;
 		stepy /= 100;
