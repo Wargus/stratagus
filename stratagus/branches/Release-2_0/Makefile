@@ -158,7 +158,7 @@ distclean:	clean
 
 configure:
 	autoconf
-	./configure --enable-static
+	./configure
 
 lockver:
 	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
