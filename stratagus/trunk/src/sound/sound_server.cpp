@@ -1016,6 +1016,7 @@ global int InitSound(void)
     //
     //	Open dsp device, 8bit samples, stereo. 
     //
+    //SoundFildes=open(SoundDeviceName,O_WRONLY|O_NDELAY);
     SoundFildes=open(SoundDeviceName,O_WRONLY);
     if( SoundFildes==-1 ) {
 	printf("Can't open audio device `%s'\n",SoundDeviceName);
