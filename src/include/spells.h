@@ -328,8 +328,6 @@ extern unsigned CclGetSpellByIdent(SCM value);
 // return 0, 1, 2 for true, only, false.
 extern char Scm2Condition(SCM value);
 #elif defined(USE_LUA)
-extern unsigned CclGetSpellByIdent(lua_State* l);
-
 // return 0, 1, 2 for true, only, false.
 extern char Ccl2Condition(lua_State* l, const char* value);
 #endif
@@ -348,7 +346,7 @@ SpellFunc CastDemolish;
 SpellFunc CastDeathCoil;
 SpellFunc CastSpawnPortal;
 SpellFunc CastSpawnMissile;
-
+SpellFunc CastReclaim;
 //@}
 
 #endif	// !__SPELLS_H__
