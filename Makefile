@@ -82,11 +82,15 @@ freecraft:	src etlib/hash.o src/libclone.a
 	$(CC) -o freecraft src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o src/libclone.a 
-	$(CC) -o freecraft$(EXE) main.c src/libclone.a -lSDLmain $(CLONELIBS) -I. \
-	$(CFLAGS)
+freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o \
+		src/freecraftrc.o src/libclone.a 
+	$(CC) -o freecraft$(EXE) src/main.c src/libclone.a src/freecraftrc.o \
+	-lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
-# -L. -lefence 
+src/freecraftrc.o: src/freecraft.rc
+	windres --include-dir contrib -osrc/freecraftrc.o src/freecraft.rc
+
+# -L. 
 # -Lccmalloc-0.2.3/src -lccmalloc -ldl 
 
 tools::
@@ -133,7 +137,7 @@ DOCS    = README doc/readme.html doc/install.html doc/freecraft.html \
 	  doc/artistic-license.html doc/ccl/unittype.html \
 	  doc/graphic/*.html doc/graphic/*.png
 
-PICS    = contrib/freecraft.png
+PICS    = contrib/freecraft.png contrib/freecraft.ico
 
 CCLS	= data/ccl/clone.ccl data/ccl/units.ccl data/ccl/missiles.ccl \
 	  data/ccl/tilesets.ccl data/ccl/sound.ccl data/ccl/freecraft.ccl \
@@ -147,7 +151,7 @@ MISC    = Makefile Common.mk Rules.make.orig doxygen-clone.cfg \
 	  doxygen-0.4.diff setup \
 	  .indent.pro make/common.scc make/rules.scc make/makefile.scc \
 	  make/README tools/udta.c tools/ugrd.c contrib/req.cm $(CONTRIB) \
-	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h main.c
+	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h
 
 mydate	= $(shell date +%y%m%d)
 distdir	= freecraft-$(mydate)
@@ -167,7 +171,8 @@ dist::
 	chmod -R a+r $(distdir)
 	tar chzf $(distdir).tar.gz $(distdir)
 	tar chIf $(distdir).tar.bz2 $(distdir)
-	zip -q9r $(distdir).zip $(distdir)
+	echo "(c) 2000 by the FreeCraft Project http://FreeCraft.Org" | \
+	zip -zq9r $(distdir).zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 	du -h $(distdir).tar.gz $(distdir).tar.bz2 $(distdir).zip
@@ -186,7 +191,8 @@ small-dist::
 	chmod -R a+r $(distdir)
 	tar chzf $(distdir)-small.tar.gz $(distdir)
 	tar chIf $(distdir)-small.tar.bz2 $(distdir)
-	zip -q9r $(distdir)-small.zip $(distdir)
+	echo "(c) 2000 by the FreeCraft Project http://FreeCraft.Org" | \
+	zip -zq9r $(distdir)-small.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 	du -h $(distdir)-small.tar.gz $(distdir)-small.tar.bz2 $(distdir)-small.zip
@@ -218,25 +224,33 @@ win32-bin-dist2:: win32
 	@echo $(CONTRIB) >>$(DISTLIST)
 	@echo $(CCLS) >>$(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
-	@echo SDL.dll README-SDL.txt >>$(DISTLIST)
+	@echo SDL.dll README-SDL.txt doc/ZIP-LICENSE >>$(DISTLIST)
 	@echo freecraft$(EXE) >>$(DISTLIST)
 	@echo tools/wartool$(EXE) >>$(DISTLIST)
 	@echo tools/build.bat >>$(DISTLIST)
+	@echo build.bat >>$(DISTLIST)
 	@rm -rf $(distdir)
 	@mkdir $(distdir)
 	@chmod 777 $(distdir)
 	@for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir) 
+	@cp tools/build.bat $(distdir)
 	@chmod -R a+r $(distdir)
 	@strip -s -R .comment $(distdir)/freecraft$(EXE)
 	@strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	@zip -q9r freecraft-$(mydate)-win32bin.zip $(distdir)
+	@echo "(c) 2000 by the FreeCraft Project http://FreeCraft.Org" | \
+	zip -zq9r freecraft-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
 	@$(RM) -r $(distdir)
 	du -h freecraft-$(mydate)-win32bin.zip
 
-win32-bin-dist:: win32
+win32-bin-dist: win32
 	@export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
-	make $(WIN32) win32-bin-dist2
+	$(MAKE) $(WIN32) win32-bin-dist2
+
+win32-exe-dist:	win32-bin-dist
+	cat tools/SFXWiz32-gcc.exe freecraft-$(mydate)-win32bin.zip \
+		> freecraft-$(mydate)-win32bin.exe
+	
 
 difffile=	freecraft-`date +%y%m%d`.diff
 diff:	
@@ -259,13 +273,13 @@ buildclean:
 	rm -rf data/graphics data/sounds data/texts
 
 release:
-	make distclean
-	make depend
-	make bin-dist "ZDEFS=-DUSE_ZLIB -DUSE_BZ2LIB" "ZLIBS=-lz -lbz2"
-	make win32new
-	make win32-bin-dist
-	make dist
-	make win32distclean
+	$(MAKE) distclean
+	$(MAKE) depend
+	$(MAKE) bin-dist "ZDEFS=-DUSE_ZLIB -DUSE_BZ2LIB" "ZLIBS=-lz -lbz2"
+	$(MAKE) win32new
+	$(MAKE) win32-bin-dist
+	$(MAKE) dist
+	$(MAKE) win32distclean
 
 ##############################################################################
 #	WIN32 Crosscompiler Build
@@ -277,20 +291,20 @@ WIN32=	\
     VIDEOLIB='$(SDLLIB) -lwsock32 -Wl,--stack,16777216'
 
 win32new:
-	@make distclean
+	@$(MAKE) distclean
 	export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
-	make $(WIN32) depend
+	$(MAKE) $(WIN32) depend
 
 win32_2:
-	make $(WIN32) all
+	$(MAKE) $(WIN32) all
 
 win32:
 	export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
-	make win32_2
+	$(MAKE) win32_2
 
 win32distclean:
 	export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
-	make $(WIN32) distclean
+	$(MAKE) $(WIN32) distclean
 
 ##############################################################################
 #	INSTALL/UNINSTALL	
