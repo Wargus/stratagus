@@ -141,7 +141,7 @@ enum _sys_colors_ {
     ColorGreen = 250,
     ColorYellow = 251,
     ColorBlinkRed = 252,
-    ColorViolett = 253,
+    ColorViolet = 253,
 };
 
 extern int ColorWaterCycleStart;	/// color # start for color cycling

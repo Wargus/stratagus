@@ -319,6 +319,7 @@ global void HandleActionBuilded(Unit* unit)
     Unit* worker;
     UnitType* type;
     int n;
+    int progress;
 
     type=unit->Type;
     
@@ -327,12 +328,15 @@ global void HandleActionBuilded(Unit* unit)
 	    (type->Stats->Costs[TimeCost]*600)-unit->HP;
     //  This below is most often 0
     if (type->BuilderOutside) {
-	unit->Data.Builded.Progress+=unit->Type->AutoBuildRate;
+	progress=unit->Type->AutoBuildRate;
     } else {
-	unit->Data.Builded.Progress+=100;
+	progress=100;
 	    // FIXME: implement this below:
 	    //unit->Data.Builded.Worker->Type->BuilderSpeedFactor;
     }
+    //  Building speeds increase or decrease.
+    progress*=SpeedBuild;
+    unit->Data.Builded.Progress+=progress;
     //  Keep the same level of damage while increasing HP.
     unit->HP=(unit->Data.Builded.Progress*unit->Stats->HitPoints)/
 	    (type->Stats->Costs[TimeCost]*600)-n;
