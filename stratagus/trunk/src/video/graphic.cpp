@@ -28,6 +28,7 @@
 
 #include "freecraft.h"
 #include "video.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -451,93 +452,6 @@ global Graphic* NewGraphic(
     IfDebug( AllocatedGraphicMemory+=size );
 
     return MakeGraphic(depth,width,height,data,size);
-}
-
-/**
-**	Generate a filename into library.
-**
-**	Try current directory, user home directory, global directory.
-**
-**	FIXME: I want also support files stored into tar/zip archives.
-**
-**	@param file	Filename to open.
-**	@param buffer	Allocated buffer for generated filename.
-**
-**	@return		Pointer to buffer.
-*/
-global char* LibraryFileName(const char* file,char* buffer)
-{
-    //
-    //	Absolute path or in current directory.
-    //
-    strcpy(buffer,file);
-    if( *buffer=='/' || !access(buffer,R_OK) ) {
-	return buffer;
-    }
-#ifdef USE_ZLIB		// gzip or bzip2 in current directory
-    sprintf(buffer,"%s.gz",file);
-    if( !access(buffer,R_OK) ) {
-	return buffer;
-    }
-#endif
-#ifdef USE_BZ2LIB
-    sprintf(buffer,"%s.bz2",file);
-    if( !access(buffer,R_OK) ) {
-	return buffer;
-    }
-#endif
-
-    //
-    //	In user home directory
-    //
-    sprintf(buffer,"%s/%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH,file);
-    if( !access(buffer,R_OK) ) {
-	return buffer;
-    }
-#ifdef USE_ZLIB		// gzip or bzip2 in user home directory
-    strcat(buffer,".gz");
-    if( !access(buffer,R_OK) ) {
-	return buffer;
-    }
-#endif
-#ifdef USE_BZ2LIB
-#ifndef USE_ZLIB
-    strcat(buffer,".bz2");
-#else
-    sprintf(buffer,"%s/%s/%s.bz2",getenv("HOME"),FREECRAFT_HOME_PATH,file);
-#endif
-    if( !access(buffer,R_OK) ) {
-	return buffer;
-    }
-#endif
-
-    //
-    //	In global shared directory
-    //
-    sprintf(buffer,"%s/%s",FreeCraftLibPath,file);
-    if( !access(buffer,R_OK) ) {
-	return buffer;
-    }
-#ifdef USE_ZLIB		// gzip or bzip2 in global shared directory
-    strcat(buffer,".gz");
-    if( !access(buffer,R_OK) ) {
-	return buffer;
-    }
-#endif
-#ifdef USE_BZ2LIB
-#ifndef USE_ZLIB
-    strcat(buffer,".bz2");
-#else
-    sprintf(buffer,"%s/%s.bz2",FreeCraftLibPath,file);
-#endif
-    if( !access(buffer,R_OK) ) {
-	return buffer;
-    }
-#endif
-    DebugLevel0(__FUNCTION__": File `%s' not found\n",file);
-
-    strcpy(buffer,file);
-    return buffer;
 }
 
 /**

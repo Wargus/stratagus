@@ -38,7 +38,7 @@
 #include "new_video.h"
 
 #ifndef NEW_VIDEO
-#error ONLY WORKS WITH NEW VIDEO!
+//#error ONLY WORKS WITH NEW VIDEO!
 #endif
 
 /*----------------------------------------------------------------------------
@@ -762,35 +762,29 @@ global void ProcessMenu(int MenuId, int Loop)
     MenuButtonCurSel = -1;
     for (i = 0; i < menu->nitems; ++i) {
 	mi = menu->items + i;
-	// FIXME: Maybe activate if mouse-pointer is over it right now?
 	switch (mi->mitype) {
 	    case MI_TYPE_BUTTON:
+	    case MI_TYPE_PULLDOWN:
+	    case MI_TYPE_LISTBOX:
 		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
+		// FIXME: Maybe activate if mouse-pointer is over it right now?
 		if (i == menu->defsel) {
 		    mi->flags |= MenuButtonSelected;
 		    MenuButtonCurSel = i;
 		}
 		break;
+	}
+	switch (mi->mitype) {
 	    case MI_TYPE_PULLDOWN:
-		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
 		mi->d.pulldown.cursel = 0;
 		if (mi->d.pulldown.defopt != -1)
 		    mi->d.pulldown.curopt = mi->d.pulldown.defopt;
-		if (i == menu->defsel) {
-		    mi->flags |= MenuButtonSelected;
-		    MenuButtonCurSel = i;
-		}
 		break;
 	    case MI_TYPE_LISTBOX:
-		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
 		mi->d.listbox.cursel = 0;
 		mi->d.listbox.startline = 0;
 		if (mi->d.listbox.defopt != -1)
 		    mi->d.listbox.curopt = mi->d.listbox.defopt;
-		if (i == menu->defsel) {
-		    mi->flags |= MenuButtonSelected;
-		    MenuButtonCurSel = i;
-		}
 		break;
 	    default:
 		break;

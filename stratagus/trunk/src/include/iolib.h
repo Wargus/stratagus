@@ -79,7 +79,11 @@ extern int CLclose(CLFile *file);			  ///  Library file close
 extern int CLread(CLFile *file, void *buf, size_t len);	  ///  Library file read
 extern int CLseek(CLFile *file, long offset, int whence); ///  Library file seek
 
+
 #endif	// USE_ZLIB || USE_BZ2LIB
+
+    /// Build libary path name
+extern char* LibraryFileName(const char* file,char* buffer);
 
 //@}
 
