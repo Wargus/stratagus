@@ -354,6 +354,8 @@ global void DrawUnitInfo(const Unit* unit)
 		    unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost]);
 	    VideoDrawText(x+126,y+8+93,GameFont,buf);
 	}
+	return;
+
     } else if( type->StoresOil ) {
 	VideoDrawText(x+20,y+8+78,GameFont,"Production");
 	VideoDrawText(x+52,y+8+93,GameFont,"Oil:");
@@ -363,6 +365,8 @@ global void DrawUnitInfo(const Unit* unit)
 		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
 	    VideoDrawText(x+126,y+8+93,GameFont,buf);
 	}
+	return;
+
     } else if( type->StoresGold ) {
 	VideoDrawText(x+20,y+8+61,GameFont,"Production");
 	VideoDrawText(x+73,y+8+77,GameFont,"Gold:");
@@ -388,6 +392,7 @@ global void DrawUnitInfo(const Unit* unit)
 		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
 	    VideoDrawText(x+126,y+8+109,GameFont,buf);
 	}
+	return;
 
     } else if( type->Transporter && unit->Value ) {
 	for( i=0; i<6; ++i ) {
@@ -412,8 +417,7 @@ global void DrawUnitInfo(const Unit* unit)
     }
 
     if( type->Building && !type->Tower ) {
-	// FIXME: Make some bit in the unit-type structure.
-	if( type==UnitTypeHumanFarm || type==UnitTypeOrcFarm ) {
+	if( type->Supply ) {		// Supply unit
 	    VideoDrawText(x+16,y+8+63,GameFont,"Food Usage");
 	    VideoDrawText(x+58,y+8+78,GameFont,"Grown:");
 	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Player->Food);
