@@ -88,6 +88,27 @@ typedef struct _button_style_ {
 	ButtonStyleProperties Disabled; ///< Disabled button properties
 } ButtonStyle;
 
+typedef struct _checkbox_style_ {
+	int Width;                      ///< Checkbox width
+	int Height;                     ///< Checkbox height
+	int Font;                       ///< Font
+	char* TextNormalColor;          ///< Normal text color
+	char* TextReverseColor;         ///< Reverse text color
+	TextAlignment TextAlign;        ///< Text alignment
+	int TextX;                      ///< Text X location
+	int TextY;                      ///< Text Y location
+	ButtonStyleProperties Default;  ///< Default checkbox properties
+	ButtonStyleProperties Hover;    ///< Hover checkbox properties
+	ButtonStyleProperties Selected; ///< Selected checkbox properties
+	ButtonStyleProperties Clicked;  ///< Clicked checkbox properties
+	ButtonStyleProperties Disabled; ///< Disabled checkbox properties
+	ButtonStyleProperties Checked;  ///< Default checkbox properties
+	ButtonStyleProperties CheckedHover;    ///< Checked hover checkbox properties
+	ButtonStyleProperties CheckedSelected; ///< Checked selected checkbox properties
+	ButtonStyleProperties CheckedClicked;  ///< Checked clicked checkbox properties
+	ButtonStyleProperties CheckedDisabled; ///< Checked disabled checkbox properties
+} CheckboxStyle;
+
 	/// buttons on screen themselves
 typedef struct _button_ {
 	int X;                          ///< x coordinate on the screen
@@ -388,6 +409,10 @@ extern UI** UI_Table;                   ///< All available user interfaces
 typedef hashtable(ButtonStyle*,128) _ButtonStyleHash;
 extern _ButtonStyleHash ButtonStyleHash;
 
+	/// Hash table of all the checkbox styles
+typedef hashtable(CheckboxStyle*,128) _CheckboxStyleHash;
+extern _CheckboxStyleHash CheckboxStyleHash;
+
 extern char RightButtonAttacks;         ///< right button 0 move, 1 attack.
 extern ButtonAction* CurrentButtons;    ///< Current Selected Buttons
 extern char FancyBuildings;             ///< Mirror buildings 1 yes, 0 now.
@@ -418,6 +443,8 @@ extern void UserInterfaceCclRegister(void);
 
 	/// Find a button style
 extern ButtonStyle* FindButtonStyle(const char* style);
+	/// Find a checkbox style
+extern CheckboxStyle* FindCheckboxStyle(const char* style);
 
 	/// Called if the mouse is moved in Normal interface state
 extern void UIHandleMouseMove(int x, int y);
