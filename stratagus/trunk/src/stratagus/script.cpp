@@ -193,7 +193,8 @@ int LuaLoadFile(const char* file)
 	CLFile* fp;
 
 	if (!(fp = CLopen(file, CL_OPEN_READ))) {
-		perror("Can't open file");
+		fprintf(stderr,"Can't open file '%s': %s\n",
+			file, strerror(errno));
 		return -1;
 	}
 
