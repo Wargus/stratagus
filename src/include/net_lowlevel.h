@@ -116,6 +116,12 @@ typedef struct _OLD_INTERFACE_INFO
 	(int)(((ad) >> 24) & 0xff), (int)(((ad) >> 16) & 0xff), \
 	(int)(((ad) >> 8) & 0xff), (int)((ad) & 0xff)
 
+#ifdef USE_WIN32
+typedef SOCKET Socket;
+#else
+typedef int Socket;
+#endif
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -140,34 +146,34 @@ extern void NetExit(void);
     /// Resolve host in name or or colon dot notation.
 extern unsigned long NetResolveHost(const char* host);
     ///	Get local IP from network file descriptor
-extern int NetSocketAddr(const int sock);
+extern int NetSocketAddr(const Socket sock);
     /// Open a UDP Socket port.
-extern int NetOpenUDP(int port);
+extern Socket NetOpenUDP(int port);
     /// Open a TCP Socket port.
-extern int NetOpenTCP(int port);
+extern Socket NetOpenTCP(int port);
     /// Close a UDP socket port.
-extern void NetCloseUDP(int sockfd);
+extern void NetCloseUDP(Socket sockfd);
     /// Close a TCP socket port.
-extern void NetCloseTCP(int sockfd);
+extern void NetCloseTCP(Socket sockfd);
     /// Set socket to non-blocking
-extern int NetSetNonBlocking(int sockfd);
+extern int NetSetNonBlocking(Socket sockfd);
     /// Open a TCP connection.
-extern int NetConnectTCP(int sockfd,unsigned long addr,int port);
+extern int NetConnectTCP(Socket sockfd,unsigned long addr,int port);
     /// Send through a UPD socket to a host:port.
-extern int NetSendUDP(int sockfd,unsigned long host,int port
+extern int NetSendUDP(Socket sockfd,unsigned long host,int port
 	,const void* buf,int len);
     /// Send through a TCP socket
-extern int NetSendTCP(int sockfd,const void* buf,int len);
+extern int NetSendTCP(Socket sockfd,const void* buf,int len);
     /// Wait for socket ready.
-extern int NetSocketReady(int sockfd,int timeout);
+extern int NetSocketReady(Socket sockfd,int timeout);
     /// Receive from a UDP socket.
-extern int NetRecvUDP(int sockfd,void* buf,int len);
+extern int NetRecvUDP(Socket sockfd,void* buf,int len);
     /// Receive from a TCP socket.
-extern int NetRecvTCP(int sockfd,void* buf,int len);
+extern int NetRecvTCP(Socket sockfd,void* buf,int len);
     /// Listen for connections on a TCP socket
-extern int NetListenTCP(int sockfd);
+extern int NetListenTCP(Socket sockfd);
     /// Accept a connection on a TCP socket
-extern int NetAcceptTCP(int sockfd);
+extern Socket NetAcceptTCP(Socket sockfd);
 
 //@}
 

@@ -46,6 +46,7 @@
 #if defined(_MSC_VER) && !defined(_WIN32_WCE)
 #define DrawIcon WinDrawIcon
 #define EndMenu WinEndMenu
+#include <winsock2.h>
 #include <windows.h>
 #undef DrawIcon
 #undef EndMenu
@@ -1267,7 +1268,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				 Players[o].Type != PlayerComputer) ) {
 pawn:
 			if (t != WC_UnitGoldMine && t != WC_UnitOilPatch) {
-			    if (NetworkFildes == -1
+			    if (NetworkFildes == (Socket)-1
 				    && ReplayGameType != ReplayMultiPlayer
 				    && o == ThisPlayer->Player) {
 				s = GameSettings.Presets[0].Race;

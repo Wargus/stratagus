@@ -386,7 +386,7 @@ local void HandleMouseOn(int x,int y)
     //
     //	Handle buttons
     //
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	if( TheUI.MenuButton.X!=-1 ) {
 	    if( x>=TheUI.MenuButton.X
 		    && x<=TheUI.MenuButton.X+TheUI.MenuButton.Width
@@ -1622,7 +1622,7 @@ global void UIHandleButtonUp(unsigned button)
 		&& (ButtonUnderCursor==ButtonUnderMenu
 		    || ButtonUnderCursor==ButtonUnderNetworkMenu) ) {
 	    // FIXME: Not if, in input mode.
-	    if( NetworkFildes==-1 ) {
+	    if( NetworkFildes==(Socket)-1 ) {
 		GamePaused=1;
 		SetStatusLine("Game Paused");
 	    }

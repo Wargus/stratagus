@@ -308,7 +308,7 @@ global void CreateGame(char* filename, WorldMap* map)
     SyncHash = 0;
     InitSyncRand();
 
-    if (NetworkFildes != -1) {		// Prepare network play
+    if (NetworkFildes != (Socket)-1) {		// Prepare network play
 	DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
 	InitNetwork2();
     } else {
@@ -414,16 +414,14 @@ global void CreateGame(char* filename, WorldMap* map)
     LoadUnitTypes();
     LoadDecorations();
 
-    IfDebug(
-	DebugLevel0("Graphics uses %d bytes (%d KB, %d MB)\n"
-		_C_ AllocatedGraphicMemory
-		_C_ AllocatedGraphicMemory / 1024
-		_C_ AllocatedGraphicMemory / 1024 / 1024);
-	DebugLevel0("Compressed graphics uses %d bytes (%d KB, %d MB)\n"
-		_C_ CompressedGraphicMemory
-		_C_ CompressedGraphicMemory / 1024
-		_C_ CompressedGraphicMemory / 1024 / 1024);
-    );
+    DebugLevel0("Graphics uses %d bytes (%d KB, %d MB)\n" _C_
+	AllocatedGraphicMemory _C_
+	AllocatedGraphicMemory / 1024 _C_
+	AllocatedGraphicMemory / 1024 / 1024);
+    DebugLevel0("Compressed graphics uses %d bytes (%d KB, %d MB)\n" _C_
+	CompressedGraphicMemory _C_
+	CompressedGraphicMemory / 1024 _C_
+	CompressedGraphicMemory / 1024 / 1024);
 
     CreateMinimap();			// create minimap for pud
     InitMap();				// setup draw functions
@@ -442,16 +440,14 @@ global void CreateGame(char* filename, WorldMap* map)
     MapUnitSounds();
 
 #ifdef WITH_SOUND
-    IfDebug(
-	DebugLevel0("Sounds uses %d bytes (%d KB, %d MB)\n"
-		_C_ AllocatedSoundMemory
-		_C_ AllocatedSoundMemory / 1024
-		_C_ AllocatedSoundMemory / 1024 / 1024);
-	DebugLevel0("Compressed sounds uses %d bytes (%d KB, %d MB)\n"
-		_C_ CompressedSoundMemory
-		_C_ CompressedSoundMemory / 1024
-		_C_ CompressedSoundMemory / 1024 / 1024);
-    );
+    DebugLevel0("Sounds uses %d bytes (%d KB, %d MB)\n" _C_
+	AllocatedSoundMemory _C_
+	AllocatedSoundMemory / 1024 _C_
+	AllocatedSoundMemory / 1024 / 1024);
+    DebugLevel0("Compressed sounds uses %d bytes (%d KB, %d MB)\n" _C_
+	CompressedSoundMemory _C_
+	CompressedSoundMemory / 1024 _C_
+	CompressedSoundMemory / 1024 / 1024);
 #endif
 
     //

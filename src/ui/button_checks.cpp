@@ -162,7 +162,7 @@ global int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
     const ButtonAction* button __attribute__((unused)))
 {
-    return NetworkFildes != -1;
+    return NetworkFildes != (Socket)-1;
 }
 
 /**
@@ -177,7 +177,7 @@ global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
 global int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
     const ButtonAction* button __attribute__((unused)))
 {
-    return NetworkFildes == -1;
+    return NetworkFildes == (Socket)-1;
 }
 
 /**
