@@ -348,16 +348,24 @@ int AddButton(int pos, int level, const char *icon_ident,
     return 1;
 }
 
-/// FIXME: docu
+/**
+**	Cleanup buttons.
+*/
 global void DoneButtons(void)
 {
     int z;
 
     for (z = 0; z < UnitButtonCount; z++) {
 	DebugCheck(!UnitButtonTable[z]);
-	free(UnitButtonTable[z]->ValueStr);
-	free(UnitButtonTable[z]->Hint);
-	free(UnitButtonTable[z]->UnitMask);
+	if( UnitButtonTable[z]->ValueStr ) {
+	    free(UnitButtonTable[z]->ValueStr);
+	}
+	if( UnitButtonTable[z]->Hint ) {
+	    free(UnitButtonTable[z]->Hint);
+	}
+	if( UnitButtonTable[z]->UnitMask ) {
+	    free(UnitButtonTable[z]->UnitMask);
+	}
 	free(UnitButtonTable[z]);
     }
     UnitButtonCount = 0;
