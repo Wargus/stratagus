@@ -391,7 +391,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
     //
     //	Place unit inside the depot
     //
-    RemoveUnit(unit,NULL);
+    RemoveUnit(unit,goal);
     unit->X=goal->X;
     unit->Y=goal->Y;
 
