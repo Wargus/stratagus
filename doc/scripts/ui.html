@@ -54,7 +54,7 @@
 <a href="#DefineMenu">DefineMenu</a>
 <a href="#DefineMenuGraphics">DefineMenuGraphics</a>
 <a href="#DefineMenuItem">DefineMenuItem</a>
-<a href="#DefinePanel">DefinePanel</a>
+<a href="#DefinePanelContents">DefinePanelContents</a>
 <a href="#DefineUI">DefineUI</a>
 <a href="#DefineViewports">DefineViewports</a>
 <a href="#DisplayPicture">DisplayPicture</a>
@@ -507,7 +507,7 @@ Possible tags:
 <dt>"panel", "panel-name" or "none"</dt>
 <dd>Panel name (FIXME: how is it used?).</dd>
 <dt>"default", number</dt>
-<dd>FIXME: what for? Default button, or what?</dd>
+<dd>Initial selected item number</dd>
 <dt>"netaction", "menu-action"</dt>
 <dd>FIXME: which are menu-action ?</dd>
 <dl>
@@ -881,8 +881,8 @@ Example:
                    "menu", "menu-game")
 </pre>
 
-<a name="DefinePanel"></a>
-<h3>DefinePanel({flag = value}, ...)</h3>
+<a name="DefinePanelContents"></a>
+<h3>DefinePanelContents({flag = value}, ...)</h3>
 
 Define panel content when an unit is selected.
 
@@ -909,7 +909,7 @@ Define panel content when an unit is selected.
     <dt>Flag = "only", "false", "true"<dt>
     <dd>For flags defined by DefineBoolFlags(), show info if unit correpond with the criteria<dd>
   </dl> </dd>
-  <dt>Content = {flag = value}</dt>
+  <dt>Contents = {flag = value}</dt>
   <dd>The info to show, and the method associated.
   <dl>
     <dt>Pos = {x, y}</dt>
