@@ -526,16 +526,19 @@ local SCM CclAiSet(SCM value,SCM count)
 */
 local SCM CclAiWait(SCM value)
 {
-    AiUnitTypeTable* autt;
-    UnitType* type;
+    const AiUnitTypeTable* autt;
+    const UnitType* type;
+    const int* unit_types_count;
     int j;
+    int n;
 
     type=CclGetUnitType(value);
+    unit_types_count=AiPlayer->Player->UnitTypesCount;
     if( !(autt=FindInUnitTypeRequests(type)) ) {
 	//
 	//	Look if we have this unit-type.
 	//
-	if( AiPlayer->Player->UnitTypesCount[type->Type] ) {
+	if( unit_types_count[type->Type] ) {
 	    return SCM_BOOL_F;
 	}
 	//
@@ -544,7 +547,7 @@ local SCM CclAiWait(SCM value)
 	if( type->Type<AiHelpers.EquivCount && AiHelpers.Equiv[type->Type] ) {
 	    DebugLevel3Fn("Equivalence for %s\n" _C_ type->Ident);
 	    for( j=0; j<AiHelpers.Equiv[type->Type]->Count; ++j ) {
-		if( AiPlayer->Player->UnitTypesCount[
+		if( unit_types_count[
 			AiHelpers.Equiv[type->Type]->Table[j]->Type] ) {
 		    return SCM_BOOL_F;
 		}
@@ -554,10 +557,21 @@ local SCM CclAiWait(SCM value)
 	DebugLevel0Fn("Broken? waiting on unit-type which wasn't requested.\n");
 	return SCM_BOOL_T;
     }
+
+    //
+    //	Add equivalent units
+    //
+    n=unit_types_count[type->Type];
+    if( type->Type<AiHelpers.EquivCount && AiHelpers.Equiv[type->Type] ) {
+	for( j=0; j<AiHelpers.Equiv[type->Type]->Count; ++j ) {
+	    n+=unit_types_count[AiHelpers.Equiv[type->Type]->Table[j]->Type];
+	}
+    }
+    
     // units available?
-    DebugLevel3Fn("%d,%d\n"
-	    _C_ AiPlayer->Player->UnitTypesCount[type->Type] _C_ autt->Count);
-    if( AiPlayer->Player->UnitTypesCount[type->Type]>=autt->Count ) {
+    DebugLevel3Fn("%d,%d\n" _C_ n _C_ autt->Count);
+
+    if( n>=autt->Count ) {
 	return SCM_BOOL_F;
     }
 
