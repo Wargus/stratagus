@@ -259,7 +259,8 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
     int w;
     int h;
     Unit** corpses;
-    Unit** remove;
+    Unit* unit;
+    Unit* remove;
 #endif
 
     // Mark as seen
@@ -305,19 +306,21 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 			if( player->Type == PlayerPerson ) {
 			    corpses = &DestroyedBuildings;
 			    while( *corpses ) {
-				if( ((*corpses)->Visible & 1 << player->Player) ) {
-				    w = (*corpses)->Type->TileWidth;
-				    h = (*corpses)->Type->TileHeight;
-				    if( i >= (*corpses)->X && y >= (*corpses)->Y
-					&& i < (*corpses)->X+w && y < (*corpses)->Y+h ) {
-					    (*corpses)->Visible &= ~(1 << player->Player);
-					    UnitMarkSeen(*corpses);
+				unit = *corpses;
+				if( (unit->Visible & 1 << player->Player) ) {
+				    w = unit->Type->TileWidth;
+				    h = unit->Type->TileHeight;
+				    if( i >= unit->X && y >= unit->Y
+					&& i < unit->X+w && y < unit->Y+h ) {
+					    unit->Visible &= ~(1 << player->Player);
+					    UnitMarkSeen(unit);
 				    }
 				}
-				remove = corpses;
-				corpses=&(*corpses)->Next;
-				if( (*remove)->Visible == 0x0000 ) {
-				    ReleaseUnit( *remove );
+				remove = unit;
+				unit = unit->Next;
+				corpses=&(unit);
+				if( remove->Visible == 0x0000 ) {
+				    ReleaseUnit( remove );
 				}
 			    }
                         }
