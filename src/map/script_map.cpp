@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_map.c	-	The map ccl functions. */
+/**@name ccl_map.c - The map ccl functions. */
 //
 //      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <string.h>
@@ -47,13 +47,13 @@
 #include "ui.h"
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Parse a stratagus map.
+**  Parse a stratagus map.
 **
-**		@param list		list of tuples keyword data
+**  @param list  list of tuples keyword data
 */
 local int CclStratagusMap(lua_State* l)
 {
@@ -64,7 +64,7 @@ local int CclStratagusMap(lua_State* l)
 	int k;
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	//  Parse the list: (still everything could be changed!)
 	//
 
 	if (!TheMap.Info) {
@@ -191,12 +191,6 @@ local int CclStratagusMap(lua_State* l)
 						TheMap.Fields[i].SeenTile = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						++j2;
-#ifdef UNITS_ON_MAP
-						TheMap.Fields[i].Building = 0xffff;
-						TheMap.Fields[i].AirUnit = 0xffff;
-						TheMap.Fields[i].LandUnit = 0xffff;
-						TheMap.Fields[i].SeaUnit = 0xffff;
-#endif /* UNITS_ON_MAP */
 						for (; j2 < args2; ++j2) {
 							lua_rawgeti(l, -1, j2 + 1);
 							if (lua_isnumber(l, -1)) {
@@ -267,7 +261,7 @@ local int CclStratagusMap(lua_State* l)
 }
 
 /**
-**		Reveal the complete map.
+**  Reveal the complete map.
 */
 local int CclRevealMap(lua_State* l)
 {
@@ -285,10 +279,10 @@ local int CclRevealMap(lua_State* l)
 }
 
 /**
-**		Center the map.
+**  Center the map.
 **
-**		@param x		X tile location.
-**		@param y		Y tile location.
+**  @param x  X tile location.
+**  @param y  Y tile location.
 */
 local int CclCenterMap(lua_State* l)
 {
@@ -303,19 +297,20 @@ local int CclCenterMap(lua_State* l)
 }
 
 /**
-**		Show Map Location
+**  Show Map Location
 **
-**		@param		x		X tile location.
-**		@param		y		Y tile location.
-**		@param		radius		radius of view.
-**		@param		cycle		cycles show vision for.
-**		@param		unit		name of unit to use for showing map
+**  @param x       X tile location.
+**  @param y       Y tile location.
+**  @param radius  radius of view.
+**  @param cycle   cycles show vision for.
+**  @param unit    name of unit to use for showing map
 */
 local int CclShowMapLocation(lua_State* l)
 {
 	Unit* target;
 	const char* unitname;
-	// Put a unit on map, use it's properties, except for
+
+	// Put a unit on map, use its properties, except for
 	// what is listed below
 
 	if (lua_gettop(l) != 4) {
@@ -335,11 +330,11 @@ local int CclShowMapLocation(lua_State* l)
 }
 
 /**
-**		Set the default map.
+**  Set the default map.
 **
-**		@param map		Path to the default map.
+**  @param map  Path to the default map.
 **
-**		@return				The old default map.
+**  @return     The old default map.
 */
 local int CclSetDefaultMap(lua_State* l)
 {
@@ -358,11 +353,11 @@ local int CclSetDefaultMap(lua_State* l)
 }
 
 /**
-**		Set fog of war on/off.
+**  Set fog of war on/off.
 **
-**		@param flag		True = turning fog of war on, false = off.
+**  @param flag  True = turning fog of war on, false = off.
 **
-**		@return				The old state of fog of war.
+**  @return      The old state of fog of war.
 */
 local int CclSetFogOfWar(lua_State* l)
 {
@@ -383,11 +378,11 @@ local int CclSetFogOfWar(lua_State* l)
 }
 
 /**
-**		Enable display of terrain in minimap.
+**  Enable display of terrain in minimap.
 **
-**		@param flag		#t = show minimap with terrain, #f = show no terrain.
+**  @param flag  true = show minimap with terrain, false = show no terrain.
 **
-**		@return				The old state of the minimap with terrain.
+**  @return      The old state of the minimap with terrain.
 */
 local int CclSetMinimapTerrain(lua_State* l)
 {
@@ -405,7 +400,7 @@ local int CclSetMinimapTerrain(lua_State* l)
 }
 
 /**
-**		Original fog of war.
+**  Original fog of war.
 */
 local int CclOriginalFogOfWar(lua_State* l)
 {
@@ -423,7 +418,7 @@ local int CclOriginalFogOfWar(lua_State* l)
 }
 
 /**
-**		Alpha style fog of war.
+**  Alpha style fog of war.
 */
 local int CclAlphaFogOfWar(lua_State* l)
 {
@@ -441,7 +436,7 @@ local int CclAlphaFogOfWar(lua_State* l)
 }
 
 /**
-**		Gray style fog of war brightness.
+**  Gray style fog of war brightness.
 */
 local int CclSetFogOfWarOpacity(lua_State* l)
 {
@@ -470,11 +465,11 @@ local int CclSetFogOfWarOpacity(lua_State* l)
 }
 
 /**
-**		Set forest regeneration speed.
+**  Set forest regeneration speed.
 **
-**		@param speed		New regeneration speed (0 disabled)
+**  @param speed  New regeneration speed (0 disabled)
 **
-**		@return				Old speed
+**  @return       Old speed
 */
 local int CclSetForestRegeneration(lua_State* l)
 {
@@ -503,7 +498,7 @@ local int CclSetForestRegeneration(lua_State* l)
 }
 
 /**
-**		Register CCL features for map.
+**  Register CCL features for map.
 */
 global void MapCclRegister(void)
 {
