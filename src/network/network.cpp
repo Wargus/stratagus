@@ -814,7 +814,7 @@ global void NetworkChatMessage(const char *msg)
     if (NetworkFildes != -1) {
 	cp = msg;
 	n = strlen(msg);
-	while (n >= sizeof(ncm->Text)) {
+	while (n >= (int)sizeof(ncm->Text)) {
 	    ncq = malloc(sizeof(NetworkCommandQueue));
 	    dl_insert_last(CommandsIn, ncq->List);
 	    ncq->Data.Type = MessageChat;

@@ -39,7 +39,7 @@ extern int CommandLogDisabled;		/// True, if command log is off
 ----------------------------------------------------------------------------*/
 
     /// Log commands into file
-global void CommandLog(const char*,const Unit*,int,unsigned,unsigned,
+global void CommandLog(const char*,const Unit*,int,int,int,
 		       const Unit*,const char*,int);
     /// Replay user commands from log each cycle
 extern void ReplayEachCycle(void);
