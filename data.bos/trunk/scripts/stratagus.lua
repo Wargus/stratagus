@@ -205,8 +205,8 @@ function SinglePlayerTriggers()
     function() return ActionDefeat() end)
 
   AddTrigger(
-    function() return IfOpponents("this", "==", 0) end,
-    function() return ActionVictory() end)
+    function() return GetNumOpponents(GetThisPlayer()) == 0 end,
+    function() return ActionVictory() end)   
 end
 
 -------------------------------------------------------------------------------
