@@ -171,6 +171,9 @@ typedef struct _network_command_queue_ {
     NetworkCommand	Data;		/// command content
 } NetworkCommandQueue;
 
+    /// Send packets
+local void NetworkSendPacket(NetworkCommandQueue* ncq);
+
 //----------------------------------------------------------------------------
 //	Variables
 //----------------------------------------------------------------------------
@@ -1121,7 +1124,7 @@ local void NetworkServerSetup(void)
 
 	    NetRecvUDP(NetworkFildes,&msg,sizeof(msg));
 	    DebugLevel0(__FUNCTION__": receive ack %d %ld:%d\n",
-		    msg.Type,NetLastHost,NetLastPort);
+		    msg.Type,NetLastHost,ntohl(NetLastPort));
 
 	    if( message.Type==MessageInitHello ) {
 		DebugLevel0(__FUNCTION__": Acknowledge lost\n");
@@ -1131,13 +1134,17 @@ local void NetworkServerSetup(void)
 		NetSendUDP(NetworkFildes,NetLastHost,NetLastPort
 			,&message,sizeof(message));
 	    } else {
+		DebugLevel0(__FUNCTION__": Acknowledge for config\n");
 
 		for( i=0; i<HostsCount; ++i ) {
 		    if( NetLastHost==Hosts[i].Host
 			    && NetLastPort==Hosts[i].Port
 			    && msg.Type==MessageInitReply ) {
-			num[i]=-1;
-			j--;
+			if( num[i]!=-1 ) {
+			    DebugLevel0(__FUNCTION__": Removing host\n");
+			    num[i]=-1;
+			    j--;
+			}
 			break;
 		    }
 		}
@@ -1194,6 +1201,10 @@ local void NetworkClientSetup(void)
 		exit(-1);
 	    }
 	    DebugLevel0(__FUNCTION__": receive reply\n");
+	    if( NetLastHost==MyHost && NetLastPort==MyPort  ) {
+		fprintf(stderr,"speaking with me self\n");
+		exit(-1);
+	    }
 	    if( NetLastHost==host && NetLastPort==port
 		    && message.Type==MessageInitReply ) {
 		break;
@@ -1394,8 +1405,31 @@ global void NetworkEvent(void)
 	}
 
 	if( nc->Type==MessageResend ) {
-	    DebugLevel0(__FUNCTION__": resend\n");
-	    return;
+	    NetworkCommandQueue* ncq;
+
+	    // Destination frame (time to execute).
+	    n=((FrameCounter+128)&~0xFF)|nc->Frame;
+	    if( n>FrameCounter+128 ) {
+		n-=0x100;
+	    }
+
+	    DebugLevel0(__FUNCTION__": resend for %d\n",n);
+	    //
+	    //	Find the commands to resend
+	    //
+	    ncq=(NetworkCommandQueue*)(CommandsOut->first);
+	    while( ncq->List->next ) {
+		if( ncq->Time==n ) {
+		    NetworkSendPacket(ncq);
+		    break;
+		}
+		ncq=(NetworkCommandQueue*)(ncq->List->next);
+	    }
+	    if( !ncq->List->next ) {
+		DebugLevel0(__FUNCTION__": no packets for resend\n");
+	    }
+
+	    continue;
 	}
 
 	// need player number. This could also be calculated from the
@@ -1427,18 +1461,15 @@ global void NetworkEvent(void)
     //
     if( !NetworkInSync ) {
 	NetworkInSync=1;
-	n=((FrameCounter-1)/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
-	DebugLevel0(__FUNCTION__": wait for %d\n",n);
+	n=((FrameCounter)/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
+	DebugLevel0(__FUNCTION__": wait for %d -",n);
 	for( player=0; player<HostsCount; ++player ) {
 	    if( NetworkIn[n&0xFF][NetPlyNr[player]].Time!=n ) {
 		NetworkInSync=0;
-		NetworkDelay=NetworkUpdates;
-		// FIXME: should send a resent request, after sometime.
-
 		break;
 	    }
 	}
-	DebugLevel0(__FUNCTION__": %d in sync %d\n",FrameCounter,NetworkInSync);
+	DebugLevel0("%d in sync %d\n",FrameCounter,NetworkInSync);
     }
 }
 
@@ -1644,6 +1675,30 @@ local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
 }
 
 /**
+**	Network send packet.
+*/
+local void NetworkSendPacket(NetworkCommandQueue* ncq)
+{
+    NetworkPacket packet;
+    int i;
+
+    //
+    //	Build packet of 4 messages.
+    //
+    for( i=0; i<NetworkDups; ++i ) {
+	packet.Commands[i]=ncq->Data;
+	DebugLevel3(__FUNCTION__": %p %p %d\n"
+		,ncq,ncq->List->next,ncq->Data.Type);
+	if( ncq->List->next->next ) {
+	    ncq=(NetworkCommandQueue*)(ncq->List->next);
+	}
+    }
+
+    if( 1 || !(rand()&1) )
+	NetworkBroadcast(&packet,sizeof(packet));
+}
+
+/**
 **	Network resend commands.
 */
 local void NetworkResendCommands(void)
@@ -1657,11 +1712,11 @@ local void NetworkResendCommands(void)
     //
     //	Build packet of 4 messages.
     //
-    //packet.Commands[0].Type=MessageResend;
-    //packet.Commands[0].Frame=
-    //		(FrameCounter/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
+    packet.Commands[0].Type=MessageResend;
+    packet.Commands[0].Frame=
+    		(FrameCounter/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
 
-    for( i=0; i<NetworkDups; ++i ) {
+    for( i=1; i<NetworkDups; ++i ) {
 	packet.Commands[i]=ncq->Data;
 	DebugLevel3(__FUNCTION__": %p %p %d %d\n"
 		,ncq,ncq->List->prev,ncq->Data.Type,ncq->Time);
@@ -1670,7 +1725,8 @@ local void NetworkResendCommands(void)
 	}
     }
 
-    NetworkBroadcast(&packet,sizeof(packet));
+    if( 1 || !(rand()&1) )
+	NetworkBroadcast(&packet,sizeof(packet));
 }
 
 /**
@@ -1679,8 +1735,6 @@ local void NetworkResendCommands(void)
 local void NetworkSendCommands(void)
 {
     NetworkCommandQueue* ncq;
-    NetworkPacket packet;
-    int i;
 
     //
     //	No command available, send sync.
@@ -1705,20 +1759,7 @@ local void NetworkSendCommands(void)
     ncq->Data.Frame=ncq->Time&0xFF;
     DebugLevel3(__FUNCTION__": sending for %d\n",ncq->Time);
 
-
-    //
-    //	Build packet of 4 messages.
-    //
-    for( i=0; i<NetworkDups; ++i ) {
-	packet.Commands[i]=ncq->Data;
-	DebugLevel3(__FUNCTION__": %p %p %d\n"
-		,ncq,ncq->List->next,ncq->Data.Type);
-	if( ncq->List->next->next ) {
-	    ncq=(NetworkCommandQueue*)(ncq->List->next);
-	}
-    }
-
-    NetworkBroadcast(&packet,sizeof(packet));
+    NetworkSendPacket(ncq);
 }
 
 /**
@@ -1735,18 +1776,30 @@ local void NetworkExecCommands(void)
     for( i=0; i<NumPlayers; ++i ) {
 	if( i==ThisPlayer->Player ) {
 	    //
-	    //	Remove local commands from queue
+	    //	Remove outdated commands from queue
 	    //
 	    while( !dl_empty(CommandsOut) ) {
 		ncq=(NetworkCommandQueue*)(CommandsOut->last);
-		DebugLevel3(__FUNCTION__": Type %d Time %d\n"
-			,ncq->Data.Type,ncq->Time);
-		if( ncq->Time+NetworkLag>=FrameCounter ) {
+		if( ncq->Time+NetworkLag+1>=FrameCounter ) {
 		    break;
 		}
+		DebugLevel3(__FUNCTION__": remove %d,%d\n"
+			,FrameCounter,ncq->Time);
 		dl_remove_last(CommandsOut);
-		ParseNetworkCommand(ncq);
 		free(ncq);
+	    }
+	    //
+	    //	Execute local commands from queue
+	    //
+	    ncq=(NetworkCommandQueue*)(CommandsOut->last);
+	    while( ncq->List->prev ) {
+		if( ncq->Time==FrameCounter ) {
+		    DebugLevel3(__FUNCTION__": execute loc %d,%d\n"
+			    ,FrameCounter,ncq->Time);
+		    ParseNetworkCommand(ncq);
+		    break;
+		}
+		ncq=(NetworkCommandQueue*)(ncq->List->prev);
 	    }
 	} else {
 	    //
@@ -1754,9 +1807,13 @@ local void NetworkExecCommands(void)
 	    //
 	    ncq=&NetworkIn[FrameCounter&0xFF][i];
 	    if( ncq->Time ) {
-		DebugLevel3(__FUNCTION__": execute %d,%d\n"
+		DebugLevel3(__FUNCTION__": execute net %d,%d\n"
 			,FrameCounter,ncq->Time);
-		DebugCheck( ncq->Time!=FrameCounter );
+		if( ncq->Time!=FrameCounter ) {
+		    DebugLevel0(__FUNCTION__": frame %d idx %d time %d\n"
+			    ,FrameCounter,FrameCounter&0xFF,ncq->Time);
+		    DebugCheck( ncq->Time!=FrameCounter );
+		}
 		ParseNetworkCommand(ncq);
 	    }
 	}
@@ -1816,7 +1873,7 @@ global void NetworkCommands(void)
 global void NetworkRecover(void)
 {
     // Got no message just resent our oldest messages
-    if( NetworkDelay==VideoInterrupts ) {
+    if( NetworkDelay<VideoInterrupts ) {
 	NetworkDelay+=NetworkUpdates;
 	if( !dl_empty(CommandsOut) ) {
 	    DebugLevel0(__FUNCTION__": %d %d\n",FrameCounter,VideoInterrupts);
