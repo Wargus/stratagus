@@ -1305,12 +1305,6 @@ Use it at your own risk.\n\n");
 */
 global volatile void Exit(int err)
 {
-#ifdef DEBUG
-    extern unsigned PfCounterFail;
-    extern unsigned PfCounterOk;
-    extern unsigned PfCounterDepth;
-    extern unsigned PfCounterNotReachable;
-#endif
 
     StopMusic();
     QuitSound();
@@ -1323,11 +1317,6 @@ global volatile void Exit(int err)
 	FrameCounter _C_ SlowFrameCounter _C_
 	(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
     UnitCacheStatistic();
-    DebugLevel0("Path: Error: %u Unreachable: %u OK: %u Depth: %u\n" _C_
-	PfCounterFail _C_ PfCounterNotReachable _C_
-	PfCounterOk _C_ PfCounterDepth);
-#endif
-#ifdef DEBUG
     CclUnits();
     CleanModules();
     CleanFonts();

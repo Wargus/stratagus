@@ -97,8 +97,6 @@ extern unsigned char* CreateMatrix(void);
 extern unsigned char* MakeMatrix(void);
     /// Get next element of the way to goal.
 extern int NewPath(Unit* unit);
-    /// Return distance to place.
-extern int PlaceReachable(Unit* src,int x,int y,int w, int h, int range);
     /// Return distance to unit.
 extern int UnitReachable(Unit* unit,Unit* dst,int range);
 
