@@ -569,35 +569,59 @@ global void HandleMouseExit(void)
 }
 
 /**
+**	Restrict mouse cursor to viewport.
+*/
+global void RestrictCursorToViewport(void)
+{
+    const Viewport *vp;
+
+    vp = &TheUI.VP[TheUI.LastClickedVP];
+    if (CursorX < vp->X) {
+	CursorStartX = vp->X;
+    } else if (CursorX >= vp->EndX) {
+	CursorStartX = vp->EndX - 1;
+    } else {
+	CursorStartX = CursorX;
+    }
+
+    if (CursorY < vp->Y) {
+	CursorStartY = vp->Y;
+    } else if (CursorY >= vp->EndY) {
+	CursorStartY = vp->EndY - 1;
+    } else {
+	CursorStartY = CursorY;
+    }
+
+    TheUI.WarpX = CursorX = CursorStartX;
+    TheUI.WarpY = CursorY = CursorStartY;
+    CursorOn = CursorOnMap;
+}
+
+/**
 **	Restrict mouse cursor to minimap
 */
 global void RestrictCursorToMinimap(void)
 {
-    if( CursorX<TheUI.MinimapX+24 ) {
-	CursorStartX=TheUI.MinimapX+24;
-    }
-    else if( CursorX>=TheUI.MinimapX+24+MINIMAP_W ) {
-	CursorStartX=TheUI.MinimapX+24+MINIMAP_W-1;
-    }
-    else {
-	CursorStartX=CursorX;
+    if (CursorX < TheUI.MinimapX + 24) {
+	CursorStartX = TheUI.MinimapX + 24;
+    } else if (CursorX >= TheUI.MinimapX + 24 + MINIMAP_W) {
+	CursorStartX = TheUI.MinimapX + 24 + MINIMAP_W - 1;
+    } else {
+	CursorStartX = CursorX;
     }
 
-    if( CursorY<TheUI.MinimapY+2 ) {
-	CursorStartY=TheUI.MinimapY+2;
-    }
-    else if( CursorY>=TheUI.MinimapY+2+MINIMAP_H ) {
-	CursorStartY=TheUI.MinimapY+2+MINIMAP_H-1;
-    }
-    else {
-	CursorStartY=CursorY;
+    if (CursorY < TheUI.MinimapY + 2) {
+	CursorStartY = TheUI.MinimapY + 2;
+    } else if (CursorY >= TheUI.MinimapY + 2 + MINIMAP_H) {
+	CursorStartY = TheUI.MinimapY + 2 + MINIMAP_H - 1;
+    } else {
+	CursorStartY = CursorY;
     }
 
-    CursorX=TheUI.WarpX=CursorStartX;
-    CursorY=TheUI.WarpY=CursorStartY;
-    CursorOn=CursorOnMinimap;
+    CursorX = TheUI.WarpX = CursorStartX;
+    CursorY = TheUI.WarpY = CursorStartY;
+    CursorOn = CursorOnMinimap;
 }
-
 
 /**
 **	Handle movement of the cursor.
