@@ -335,11 +335,11 @@ local SCM CclDefineGameSounds(SCM list)
 		    break;
 		}
 	    }
-	    free(str);
 	    if (i == PlayerRaces.Count) {
 		fprintf(stderr, "Unknown race: %s\n", str);
 		ExitFatal(1);
 	    }
+	    free(str);
 	    sublist = gh_cdr(sublist);
 	    data = gh_car(sublist);
 	    if (!CCL_SOUNDP(data)) {
@@ -364,11 +364,11 @@ local SCM CclDefineGameSounds(SCM list)
 		    break;
 		}
 	    }
-	    free(str);
 	    if (i == PlayerRaces.Count) {
 		fprintf(stderr, "Unknown race: %s\n", str);
 		ExitFatal(1);
 	    }
+	    free(str);
 	    sublist = gh_cdr(sublist);
 	    data = gh_car(sublist);
 	    if (!CCL_SOUNDP(data)) {
