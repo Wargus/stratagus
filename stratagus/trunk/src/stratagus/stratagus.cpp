@@ -594,7 +594,7 @@ map is relative to FreeCraftLibPath=datapath, use ./map for relative to cwd\n\
 **	@param	argc	Number of arguments.
 **	@param	argv	Vector of arguments.
 */
-#ifdef __MINGW32__
+#if defined(__MINGW32__) || defined(__CYGWIN__)
 global int mymain(int argc,char** argv)
 #else
 global int main(int argc,char** argv)
