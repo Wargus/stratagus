@@ -87,9 +87,14 @@ global void LoadConstructions(void)
 	    if( !(*cop)->Ident ) {
 		continue;
 	    }
-	    file=(*cop)->File[TheMap.Terrain];
-	    if( !file ) {			// default one
-		file=(*cop)->File[0];
+	    file=(*cop)->File[TheMap.Terrain].File;
+	    if( file ) {			// default one
+		(*cop)->Width=(*cop)->File[TheMap.Terrain].Width;
+		(*cop)->Height=(*cop)->File[TheMap.Terrain].Height;
+	    } else {
+		file=(*cop)->File[0].File;
+		(*cop)->Width=(*cop)->File[0].Width;
+		(*cop)->Height=(*cop)->File[0].Height;
 	    }
 	    if( *file ) {
 		char* buf;
@@ -100,7 +105,16 @@ global void LoadConstructions(void)
 		(*cop)->Sprite=LoadSprite(file
 			,(*cop)->Width,(*cop)->Height);
 	    }
-	    if( (file=(*cop)->ShadowFile) ) {
+	    file=(*cop)->ShadowFile[TheMap.Terrain].File;
+	    if( file ) {
+		(*cop)->ShadowWidth=(*cop)->ShadowFile[TheMap.Terrain].Width;
+		(*cop)->ShadowHeight=(*cop)->ShadowFile[TheMap.Terrain].Height;
+	    } else {
+		file=(*cop)->ShadowFile[0].File;
+		(*cop)->ShadowWidth=(*cop)->ShadowFile[0].Width;
+		(*cop)->ShadowHeight=(*cop)->ShadowFile[0].Height;
+	    }
+	    if( file && *file ) {
 		char *buf;
 
 		buf=alloca(strlen(file)+9+1);
@@ -154,23 +168,25 @@ global void SaveConstructions(FILE* file)
 		continue;
 	    }
 	    fprintf(file,"(define-construction '%s\n",(*cop)->Ident);
-	    fprintf(file,"  'files '(");
 	    for( j=0; j<TilesetMax; ++j ) {
-		if( (*cop)->File[j] ) {
-		    if( j ) {
-			fputs("\n    ",file);
-		    }
-		    fprintf(file,"%s \"%s\"",Tilesets[j]->Class,
-			    (*cop)->File[j]);
+		if( !(*cop)->File[j].File ) {
+		    break;
 		}
+		fprintf(file,"  'file '(\n");
+		fprintf(file,"    tileset %s\n",Tilesets[j]->Class);
+		fprintf(file,"    file  \"%s\"\n",(*cop)->File[j].File);
+		fprintf(file,"    size (%d %d))\n",(*cop)->File[j].Width,
+			(*cop)->File[j].Height);
 	    }
-	    fprintf(file,")\n");
-	    fprintf(file,"  'size '(%d %d)", (*cop)->Width,
-		    (*cop)->Height);
-	    if( (*cop)->ShadowFile ) {
-		fprintf(file,"\n  'shadow '(file \"%s\" width %d height %d)",
-			(*cop)->ShadowFile, (*cop)->ShadowWidth,
-			(*cop)->ShadowHeight);
+	    for( j=0; j<TilesetMax; ++j ) {
+		if( (*cop)->ShadowFile ) {
+		    break;
+		}
+		fprintf(file,"  'shadow-file '(\n");
+		fprintf(file,"    tileset %s\n",Tilesets[j]->Class);
+		fprintf(file,"    file  \"%s\"\n",(*cop)->ShadowFile[j].File);
+		fprintf(file,"    size (%d %d))\n",(*cop)->ShadowFile[j].Width,
+			(*cop)->ShadowFile[j].Height);
 	    }
 	    fprintf(file,")\n\n");
 	    ++cop;
@@ -207,13 +223,15 @@ global void CleanConstructions(void)
 		free((*cop)->Ident);
 	    }
 	    for( j=0; j<TilesetMax; ++j ) {
-		if( (*cop)->File[j] ) {
-		    free((*cop)->File[j]);
+		if( (*cop)->File[j].File ) {
+		    free((*cop)->File[j].File);
 		}
 	    }
 	    VideoSaveFree((*cop)->Sprite);
-	    if( (*cop)->ShadowFile ) {
-		free((*cop)->ShadowFile);
+	    for( j=0; j<TilesetMax; ++j ) {
+		if( (*cop)->ShadowFile[j].File ) {
+		    free((*cop)->ShadowFile[j].File);
+		}
 	    }
 	    VideoSaveFree((*cop)->ShadowSprite);
 	    free(*cop);
@@ -360,62 +378,72 @@ local SCM CclDefineConstruction(SCM list)
     //	Parse the arguments, in tagged format.
     //
     while( !gh_null_p(list) ) {
+	int files;
+
 	value=gh_car(list);
 	list=gh_cdr(list);
-	if( gh_eq_p(value,gh_symbol2scm("files")) ) {
-	    sublist=gh_car(list);
 
-	    //
-	    //	Parse the tilesets
-	    //
-	    while( !gh_null_p(sublist) ) {
-		str=gh_scm2newstr(gh_car(sublist),NULL);
+	if( (files=gh_eq_p(value,gh_symbol2scm("file")))
+		|| gh_eq_p(value,gh_symbol2scm("shadow-file")) ) {
+	    int tileset;
+	    char* file;
+	    int w;
+	    int h;
 
-		// FIXME: use a general get tileset function here!
-		i=0; 
-		if( strcmp(str,"default") ) {
-		    for( ; i<NumTilesets; ++i ) {
-			if( !strcmp(str,Tilesets[i]->Ident) ) {
-			    break;
-			}
-			if( !strcmp(str,Tilesets[i]->Class) ) {
-			    break;
-			}
-		    }
-		    if( i==NumTilesets ) {
-			fprintf(stderr,"Tileset `%s' not available\n",str);
-			errl("tileset not available",gh_car(sublist));
-		    }
-		}
-		sublist=gh_cdr(sublist);
-		free(str);
-		free(construction->File[i]);
-		construction->File[i]=gh_scm2newstr(gh_car(sublist),NULL);
-		sublist=gh_cdr(sublist);
-	    }
+	    file=NULL;
+	    w=0;
+	    h=0;
 
-	} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-	    value=gh_car(list);
-	    construction->Width=gh_scm2int(gh_car(value));
-	    value=gh_cdr(value);
-	    construction->Height=gh_scm2int(gh_car(value));
-
-	} else if( gh_eq_p(value,gh_symbol2scm("shadow")) ) {
 	    sublist=gh_car(list);
 	    while( !gh_null_p(sublist) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
 
-		if( gh_eq_p(value,gh_symbol2scm("file")) ) {
-		    construction->ShadowFile=gh_scm2newstr(gh_car(sublist),NULL);
-		} else if( gh_eq_p(value,gh_symbol2scm("width")) ) {
-		    construction->ShadowWidth=gh_scm2int(gh_car(sublist));
-		} else if( gh_eq_p(value,gh_symbol2scm("height")) ) {
-		    construction->ShadowHeight=gh_scm2int(gh_car(sublist));
+		if( gh_eq_p(value,gh_symbol2scm("tileset")) ) {
+		    str=gh_scm2newstr(gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+
+		    // FIXME: use a general get tileset function here!
+		    i=0; 
+		    if( strcmp(str,"default") ) {
+			for( ; i<NumTilesets; ++i ) {
+			    if( !strcmp(str,Tilesets[i]->Ident) ) {
+				break;
+			    }
+			    if( !strcmp(str,Tilesets[i]->Class) ) {
+				break;
+			    }
+			}
+			if( i==NumTilesets ) {
+			    fprintf(stderr,"Tileset `%s' not available\n",str);
+			    errl("tileset not available",gh_car(sublist));
+			}
+		    }
+		    tileset=i;
+		    free(str);
+		} else if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+		    file=gh_scm2newstr(gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    w=gh_scm2int(gh_car(value));
+		    value=gh_cdr(value);
+		    h=gh_scm2int(gh_car(value));
 		} else {
-		    errl("Unsupported shadow tag",value);
+		    errl("Unsupported tag",value);
 		}
-		sublist=gh_cdr(sublist);
+	    }
+	    if( files ) {
+		free(construction->File[tileset].File);
+		construction->File[tileset].File=file;
+		construction->File[tileset].Width=w;
+		construction->File[tileset].Height=h;
+	    } else {
+		free(construction->ShadowFile[tileset].File);
+		construction->ShadowFile[tileset].File=file;
+		construction->ShadowFile[tileset].Width=w;
+		construction->ShadowFile[tileset].Height=h;
 	    }
 	} else {
 	    // FIXME: this leaves a half initialized construction
