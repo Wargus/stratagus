@@ -90,6 +90,7 @@ local int CheckGoalFieldConnectivity (int , int , int );
 local void MarkGoalField (int , int , int );
 
 local PathCacheEntry *CacheAdd (Region * , RectBounds * , HighlevelPath * );
+local void CacheFlush (void);
 local void CacheInsertEntry (PathCacheEntry * );
 local void CacheDeleteEntry (PathCacheEntry * );
 local void CacheReleaseEntry (PathCacheEntry * );
@@ -633,6 +634,11 @@ void HighReleasePath (Unit *unit)
 	unit->PfHierData = NULL;
 }
 
+void HighlevelClean (void)
+{
+	CacheFlush ();
+}
+
 /* To avoid having to find all units that reference this path, we don't flush
  * the path(s) out of cache right away. We just mark it invalid instead.
  * As units using this path come back for more path segments, they see that
@@ -679,6 +685,17 @@ local PathCacheEntry *CacheLookup (Region *Start, RectBounds *Goal)
 		}
 	}
 	return NULL;
+}
+
+local void CacheFlush (void)
+{
+	PathCacheEntry *pce;
+
+	for (pce = PathCache.Entries; pce; pce = pce->Next) {
+		/* otherwise CacheDeleteEntry() would refuse to do its work */
+		pce->RefCnt = 0;
+		CacheDeleteEntry (pce);
+	}
 }
 
 local void CacheRef (HighlevelPath *hp)

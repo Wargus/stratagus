@@ -5,6 +5,7 @@
 #define REGION_GROUPS_H
 
 int RegGroupsInitialize (void);
+void RegGroupsDestroy (void);
 int RegGroupSetInitialize (void);
 int RegGroupCheckConnectivity (Unit * , int , int );
 void RegGroupDestroy (int );
