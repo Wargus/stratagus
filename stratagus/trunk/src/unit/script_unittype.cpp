@@ -1015,8 +1015,6 @@ global void UnitTypeCclRegister(void)
     gh_new_procedureN("define-unittype-wc-names",CclDefineUnitTypeWcNames);
 
     gh_new_procedureN("define-animations",CclDefineAnimations);
-
-    InitUnitTypes();
 }
 
 //@}
