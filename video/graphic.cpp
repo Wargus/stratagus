@@ -311,6 +311,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 	const unsigned char* sp;
 	int fl;
 	Uint32 ckey;
+	int useckey;
 	int bpp;
 	int size;
 
@@ -324,6 +325,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 	n = (graphic->Width / width) * (graphic->Height / height);
 	fl = graphic->Width / width;
 	bpp = graphic->Surface->format->BytesPerPixel;
+	useckey = graphic->Surface->flags & SDL_SRCCOLORKEY;
 	ckey = graphic->Surface->format->colorkey;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -356,7 +358,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 
 				c = i * w * 4 + j * 4;
 				if (bpp == 1) {
-					if (ckey && *sp == ckey) {
+					if (useckey && *sp == ckey) {
 						tex[c + 3] = 0;
 					} else {
 						p = graphic->Surface->format->palette->colors[*sp];
