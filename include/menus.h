@@ -281,7 +281,7 @@ extern _MenuFuncHash MenuFuncHash;
 extern void InitMenuFuncHash(void);
 
     /// Set-up menus for a specific race
-extern void InitMenus(unsigned int race);
+extern void InitMenus(int race);
 
     /// Draw menu
 extern void DrawMenu(Menu *menu);
