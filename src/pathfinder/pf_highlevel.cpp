@@ -544,7 +544,7 @@ local HighlevelPath *HighTraceback (Region *reg)
 						AreaNeighborship (&reg->Area, &reg->Parent->Area) ==
 						AREAS_8CONNECTED) {
 			unsigned int regid_add = GetAdditionalPathRegion (reg);
-			Region *reg_add = RegionSetFind (regid_add);
+			//Region *reg_add = RegionSetFind (regid_add);
 
 			Highlevel.Path[regid_add / 8] |= 1 << regid_add % 8;
 			HighPath->Sequence[i++].RegId = regid_add;

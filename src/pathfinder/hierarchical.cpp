@@ -611,7 +611,8 @@ local int GetGroupsInNeighborhood (int x0, int y0, int x1, int y1,
 local int ScanNeighborhood (int x0, int y0, int x1, int y1,
 						unsigned int group_id)
 {
-	unsigned int FirstGroupId, LastGroupId, GroupId;
+	unsigned int FirstGroupId, LastGroupId;
+	//unsigned int GroupId;
 	int x, y, changes=0;
 #ifdef USE_PASSABILITY
 	unsigned short Passability;
