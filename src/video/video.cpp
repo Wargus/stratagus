@@ -212,7 +212,6 @@ global volatile int VideoInterrupts;		/// be happy, were are quicker
 global SDL_Color* lookup25trans8;
 	// FIXME: docu
 global SDL_Color* lookup50trans8;
-	syspalette);
 #else
 	// FIXME: docu
 global VMemType8* lookup25trans8;
