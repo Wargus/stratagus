@@ -10,7 +10,7 @@
 //
 /**@name font.c - The color fonts. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -98,13 +98,13 @@ static Graphic** FontColorGraphics[MaxFonts];   ///< Font color graphics
 /**
 **  Draw character with current color.
 **
-**  @param sprite  Pointer to object
-**  @param gx      X offset into object
-**  @param gy      Y offset into object
-**  @param w       width to display
-**  @param h       height to display
-**  @param x       X screen position
-**  @param y       Y screen position
+**  @param g   Pointer to object
+**  @param gx  X offset into object
+**  @param gy  Y offset into object
+**  @param w   width to display
+**  @param h   height to display
+**  @param x   X screen position
+**  @param y   Y screen position
 */
 #ifndef USE_OPENGL
 static void VideoDrawChar(const Graphic* g,
@@ -236,13 +236,13 @@ int VideoTextHeight(unsigned font)
 /**
 **  Draw character with current color clipped into 8 bit framebuffer.
 **
-**  @param graphic  Pointer to object
-**  @param gx       X offset into object
-**  @param gy       Y offset into object
-**  @param w        width to display
-**  @param h        height to display
-**  @param x        X screen position
-**  @param y        Y screen position
+**  @param g   Pointer to object
+**  @param gx  X offset into object
+**  @param gy  Y offset into object
+**  @param w   width to display
+**  @param h   height to display
+**  @param x   X screen position
+**  @param y   Y screen position
 */
 static void VideoDrawCharClip(const Graphic* g, int gx, int gy, int w, int h,
 	int x, int y)

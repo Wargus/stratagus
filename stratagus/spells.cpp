@@ -10,7 +10,7 @@
 //
 /**@name spells.c - The spell cast action. */
 //
-//      (c) Copyright 1998-2004 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2005 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -457,13 +457,14 @@ int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 /**
 **  Adjust User Variables.
 **
-**  @param caster    Unit that casts the spell
-**  @param spell     Spell-type pointer
-**  @param target    Target unit that spell is addressed to
-**  @param x         X coord of target spot when/if target does not exist
-**  @param y         Y coord of target spot when/if target does not exist
+**  @param caster  Unit that casts the spell
+**  @param spell   Spell-type pointer
+**  @param action  Spell action
+**  @param target  Target
+**  @param x       X coord of target spot when/if target does not exist
+**  @param y       Y coord of target spot when/if target does not exist
 **
-**  @return          =!0 if spell should be repeated, 0 if not
+**  @return        =!0 if spell should be repeated, 0 if not
 */
 int CastAdjustVariable(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
