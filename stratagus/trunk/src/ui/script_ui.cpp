@@ -2438,6 +2438,11 @@ local int scm2style(SCM value)
         id=MI_STYLE_SC_VSLIDER;
     } else if ( gh_eq_p(value, gh_symbol2scm("sc-hslider")) ) {
         id=MI_STYLE_SC_HSLIDER;
+    } else {
+	char *s1=gh_scm2newstr(value, NULL);
+        fprintf(stderr, "Unsupported style %s\n", s1);
+        free(s1);
+	return 0;
     }
     return id;
 }
