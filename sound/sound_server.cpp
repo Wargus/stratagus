@@ -11,12 +11,11 @@
 /**@name sound_server.c		-	The sound server
 **                                      (hardware layer and so on) */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2002 by Lutz Sammer and Fabrice Rossi
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -1191,7 +1190,7 @@ local void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
     int dummy1,dummy2;
 
 #if SoundSampleSize==16
-    len/=2;
+    len>>=1;
 #endif
 
     mixer_buffer=alloca(len*sizeof(*mixer_buffer));
@@ -1314,7 +1313,7 @@ global int InitSound(void)
     wanted.samples=2048;
 #endif
 #if SoundSampleSize==16
-    wanted.samples=4096;
+    wanted.samples=2048;
 #endif
     wanted.callback=FillAudio;
     wanted.userdata=NULL;
