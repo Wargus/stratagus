@@ -68,9 +68,9 @@ global Tileset** Tilesets;
 ----------------------------------------------------------------------------*/
 
 /**
-**	Load tileset and setup TheMap for this tileset.
+**	Load tileset and setup ::TheMap for this tileset.
 **
-**	@see TheMap, @see Tilesets
+**	@see TheMap @see Tilesets.
 */
 global void LoadTileset(void)
 {

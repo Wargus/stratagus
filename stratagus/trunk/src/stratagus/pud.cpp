@@ -112,6 +112,7 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
 		map->TerrainName);
     } else {
 	DebugLevel1("Unknown terrain!\n");
+	// FIXME: don't use TilesetSummer
 	ctab=Tilesets[TilesetSummer]->Table;
     }
 
