@@ -1134,7 +1134,7 @@ fi
 
 echo "" >> $RULESFILE
 
-echo "CFLAGS=$CFLAGS $STATIC $EXTRA_CFLAGS" >> $RULESFILE
+echo "CFLAGS=$CFLAGS $STATIC $EXTRA_CFLAGS $PROFILE" >> $RULESFILE
 
 ## JOHNS: my ctags didn't support
 #CTAGSFLAGS=-i defmpstuvFS -a -f
