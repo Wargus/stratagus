@@ -1271,6 +1271,38 @@ local SCM CclDefineButton(SCM list)
 }
 
 /**
+**	Set double-click delay.
+**
+**	@param delay	Delay in ms
+**	@return		Old delay
+*/
+local SCM CclSetDoubleClickDelay(SCM delay)
+{
+    int i;
+
+    i=DoubleClickDelay;
+    DoubleClickDelay=gh_scm2int(delay);
+
+    return gh_int2scm(i);
+}
+
+/**
+**	Set hold-click delay.
+**
+**	@param delay	Delay in ms
+**	@return		Old delay
+*/
+local SCM CclSetHoldClickDelay(SCM delay)
+{
+    int i;
+
+    i=HoldClickDelay;
+    HoldClickDelay=gh_scm2int(delay);
+
+    return gh_int2scm(i);
+}
+
+/**
 **	Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
@@ -1302,6 +1334,12 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure0_0("fancy-buildings",CclFancyBuildings);
 
     gh_new_procedureN("define-button",CclDefineButton);
+
+    //
+    //	Correct named functions
+    //
+    gh_new_procedure1_0("set-double-click-delay!",CclSetDoubleClickDelay);
+    gh_new_procedure1_0("set-hold-click-delay!",CclSetHoldClickDelay);
 }
 
 //@}

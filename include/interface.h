@@ -226,8 +226,10 @@ extern int CurrentButtonLevel;
     /// Display the command key in the buttons
 extern char ShowCommandKey;
 
-    /// All buttons in game
-extern ButtonAction AllButtons[];
+    /// Time to detect double clicks
+extern int DoubleClickDelay;
+    /// Time to detect hold clicks
+extern int HoldClickDelay;
 
 /*----------------------------------------------------------------------------
 --	Functions
