@@ -501,7 +501,9 @@ global void PlaceUnit(Unit* unit, int x, int y)
 		if (unit->Container) {
 			RemoveUnitFromContainer(unit);
 		}
-		unit->CurrentSightRange = unit->Stats->SightRange;
+		if (!SaveGameLoading) {
+			unit->CurrentSightRange = unit->Stats->SightRange;
+		}
 		MapMarkUnitSight(unit);
 	}
 
