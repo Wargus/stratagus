@@ -369,6 +369,10 @@ win32:
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
 	$(MAKE) $(WIN32) win32_2
 
+win32depend:
+	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
+	$(MAKE) $(WIN32) depend
+
 win32distclean:
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
 	$(MAKE) $(WIN32) distclean
