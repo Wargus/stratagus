@@ -171,12 +171,6 @@ global void LoadUserInterface(void)
 #endif
 	}
     }
-    if( TheUI.Resource.File ) {
-	TheUI.Resource.Graphic=LoadGraphic(TheUI.Resource.File);
-#ifdef USE_OPENGL
-	MakeTexture(TheUI.Resource.Graphic,TheUI.Resource.Graphic->Width,TheUI.Resource.Graphic->Height);
-#endif
-    }
 
     for( i=0; i<MaxCosts; ++i ) {
 	// FIXME: reuse same graphics?
@@ -540,7 +534,6 @@ global void CleanUserInterface(void)
     for( i=0; i<TheUI.NumPanels; ++i ) {
 	VideoSaveFree(TheUI.Panel[i].Graphic);
     }
-    VideoSaveFree(TheUI.Resource.Graphic);
 
     for( i=0; i<MaxCosts; ++i ) {
 	VideoSaveFree(TheUI.Resources[i].Icon.Graphic);
