@@ -371,9 +371,9 @@ local void MoveToTarget(Unit* unit)
 	} else if( err<0 ) {
 #endif
 	    unit->State=unit->SubAction=0;
-	    DebugLevel0Fn("%d\n",unit->Orders[0].Action);
 	    // Return to old task?
 #ifdef NEW_ORDERS
+	    DebugLevel0Fn("%d\n",unit->Orders[0].Action);
 	    if( err==-2 ) {
 		DebugLevel0Fn("Target not reachable\n");
 	    }
