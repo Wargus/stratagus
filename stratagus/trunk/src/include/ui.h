@@ -214,7 +214,8 @@ typedef struct _ui_ {
     int		InfoPanelH;		/// Info panel height
 
     // Complete bar
-    int		CompleteBarColor;	/// color for complete bar
+    VMemType	CompleteBarColorRGB;	/// color for complete bar
+    VMemType	CompleteBarColor;	/// color for complete bar
     int		CompleteBarX;		/// complete bar X position
     int		CompleteBarY;		/// complete bar Y position
     int		CompleteBarW;		/// complete bar width
@@ -264,7 +265,7 @@ typedef struct _ui_ {
     int		MinimapPosX;		/// minimap screen X position
     int		MinimapPosY;		/// minimap screen Y position
     int		MinimapTransparent;     /// unexplored areas are transparent
-    int		ViewportCursorColor;	/// minimap cursor color
+    VMemType	ViewportCursorColor;	/// minimap cursor color
 
     // The status line
     GraphicConfig StatusLine;		/// Status line background

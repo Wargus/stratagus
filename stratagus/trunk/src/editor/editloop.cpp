@@ -664,7 +664,7 @@ local void DrawUnitIcons(void)
 */
 local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 {
-    int color;
+    VMemType color;
 
     color = (flags & IconActive) ? ColorGray : ColorBlack;
 

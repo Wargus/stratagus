@@ -346,7 +346,7 @@ struct _player_ {
     int		TotalKills;		/// How many unit killed
 
 // Display video
-    unsigned	Color;			/// color of units on minimap
+    VMemType	Color;			/// color of units on minimap
 
     UnitColors	UnitColors;		/// Unit colors for new units
 
@@ -456,7 +456,7 @@ extern int NumPlayers;			/// How many player slots used
 extern Player Players[PlayerMax];	/// All players
 extern Player* ThisPlayer;		/// Player on local computer
 extern int NoRescueCheck;		/// Disable rescue check
-extern int PlayerColors[PlayerMax];	/// Player colors
+extern VMemType PlayerColors[PlayerMax];	/// Player colors
 extern char* PlayerColorNames[PlayerMax];	/// Player color names
 
 extern PlayerRace PlayerRaces;		/// Player races

@@ -91,8 +91,8 @@ global int ShowManaBackgroundLong;
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
-global void (*DrawSelection)(int color,int x1,int y1,int x2,int y2)
-    =DrawSelectionNone;
+global void (*DrawSelection)(VMemType color, int x1, int y1,
+    int x2, int y2) = DrawSelectionNone;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -110,29 +110,30 @@ global const Viewport* CurrentViewport;	/// FIXME: quick hack for split screen
 **
 **	@param unit	Pointer to the unit.
 **
-**	@return		Color for selection, or -1 if not selected.
+**	@return		Color for selection, or NULL if not selected.
 */
-local int SelectionColor(const Unit* unit)
+local VMemType* SelectionColor(const Unit* unit)
 {
-    if( unit->Selected || (unit->Blink&1) ) {
-	if( unit->Player->Player==PlayerNumNeutral ) {
-	    return ColorYellow;
+    if( unit->Selected || (unit->Blink & 1) ) {
+	if (unit->Player->Player == PlayerNumNeutral) {
+	    return &ColorYellow;
 	}
 	// FIXME: better allied?
-	if( unit->Player==ThisPlayer ) {
-	    return ColorGreen;
+	if (unit->Player == ThisPlayer) {
+	    return &ColorGreen;
 	}
-	if( IsEnemy(ThisPlayer,unit) ) {
-	    return ColorRed;
+	if (IsEnemy(ThisPlayer, unit)) {
+	    return &ColorRed;
 	}
-	return unit->Player->Color;
+	return &unit->Player->Color;
     }
 
     // If building mark all own buildings
-    if( CursorBuilding && unit->Type->Building && unit->Player==ThisPlayer ) {
-	return ColorGray;	
+    if (CursorBuilding && unit->Type->Building &&
+	    unit->Player == ThisPlayer) {
+	return &ColorGray;	
     }
-    return -1;
+    return NULL;
 }
 
 /**
@@ -142,24 +143,24 @@ local int SelectionColor(const Unit* unit)
 */
 global void DrawUnitSelection(const Unit* unit)
 {
-    int color;
+    VMemType* color;
     int x;
     int y;
     UnitType* type;
 
-    type=unit->Type;
+    type = unit->Type;
     
-    color=SelectionColor(unit);
-    if (color<0) {
+    color = SelectionColor(unit);
+    if (!color) {
 	return;
     }
-    x=Map2ViewportX(CurrentViewport,unit->X)+unit->IX
-	+type->TileWidth*TileSizeX/2-type->BoxWidth/2
-	-(type->Width-VideoGraphicWidth(type->Sprite))/2;
-    y=Map2ViewportY(CurrentViewport,unit->Y)+unit->IY
-	+type->TileHeight*TileSizeY/2-type->BoxHeight/2
-	-(type->Height-VideoGraphicHeight(type->Sprite))/2;
-    DrawSelection(color,x,y,x+type->BoxWidth,y+type->BoxHeight);
+    x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX +
+	type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
+	(type->Width - VideoGraphicWidth(type->Sprite)) / 2;
+    y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY +
+	type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
+	(type->Height - VideoGraphicHeight(type->Sprite)) / 2;
+    DrawSelection(*color, x, y, x + type->BoxWidth, y + type->BoxHeight);
 }
 
 /**
@@ -169,10 +170,8 @@ global void DrawUnitSelection(const Unit* unit)
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
-global void DrawSelectionNone(int color,int x1,int y1,int x2,int y2)
-/*global void DrawSelectionNone(int color __attribute__((unused)),
-	int x1 __attribute__((unused)),int y1 __attribute__((unused)),
-	int x2 __attribute__((unused)),int y2 __attribute__((unused)))*/
+global void DrawSelectionNone(VMemType color, int x1, int y1,
+    int x2, int y2)
 {
 }
 
@@ -183,13 +182,13 @@ global void DrawSelectionNone(int color,int x1,int y1,int x2,int y2)
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
-global void DrawSelectionCircle(int color,int x1,int x2,int y1,int y2)
+global void DrawSelectionCircle(VMemType color, int x1, int x2,
+    int y1, int y2)
 {
-    DebugCheck(color<0);
-    VideoDrawCircleClip(color,(x1+x2)/2,(y1+y2)/2,
-	    min((x2-x1)/2,(y2-y1)/2));
-    VideoDrawCircleClip(color,(x1+x2)/2,(y1+y2)/2,
-	    min((x2-x1)/2,(y2-y1)/2)+2);
+    VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
+	min((x2 - x1) / 2, (y2 - y1) / 2));
+    VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
+	min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
 }
 
 /**
@@ -199,13 +198,13 @@ global void DrawSelectionCircle(int color,int x1,int x2,int y1,int y2)
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
-global void DrawSelectionCircleWithTrans(int color,int x1,int y1,int x2,int y2)
-{   
-    DebugCheck(color<0);
-    VideoFill75TransCircleClip(color,(x1+x2)/2,(y1+y2)/2,
-	    min((x2-x1)/2,(y2-y1)/2)-2);
-    VideoDrawCircleClip(color,(x1+x2)/2,(y1+y2)/2,
-	    min((x2-x1)/2,(y2-y1)/2));
+global void DrawSelectionCircleWithTrans(VMemType color, int x1, int y1,
+    int x2, int y2)
+{
+    VideoFill75TransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
+	min((x2 - x1) / 2, (y2 - y1) / 2) - 2);
+    VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
+	min((x2 - x1) / 2, (y2 - y1) / 2));
 }
 
 /**
@@ -215,10 +214,10 @@ global void DrawSelectionCircleWithTrans(int color,int x1,int y1,int x2,int y2)
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
-global void DrawSelectionRectangle(int color,int x1,int y1,int x2,int y2)
+global void DrawSelectionRectangle(VMemType color, int x1, int y1,
+    int x2, int y2)
 {
-    DebugCheck(color<0);
-    VideoDrawRectangleClip(color,x1,y1,x2-x1,y2-y1);
+    VideoDrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 }
 
 /**
@@ -228,11 +227,12 @@ global void DrawSelectionRectangle(int color,int x1,int y1,int x2,int y2)
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
-global void DrawSelectionRectangleWithTrans(int color,int x1,int y1,int x2,int y2)
+global void DrawSelectionRectangleWithTrans(VMemType color, int x1, int y1,
+    int x2, int y2)
 {
-    DebugCheck(color<0);
-    VideoDrawRectangleClip(color,x1,y1,x2-x1,y2-y1);
-    VideoFill75TransRectangleClip(color,x1+1,y1+1,x2-x1-2,y2-y1-2);
+    VideoDrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
+    VideoFill75TransRectangleClip(color, x1 + 1, y1 + 1,
+	x2 - x1 - 2, y2 - y1 - 2);
 }
 
 /**
@@ -242,22 +242,22 @@ global void DrawSelectionRectangleWithTrans(int color,int x1,int y1,int x2,int y
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
-global void DrawSelectionCorners(int color,int x1,int y1,int x2,int y2)
+global void DrawSelectionCorners(VMemType color, int x1, int y1,
+    int x2, int y2)
 {
-    DebugCheck(color<0);
 #define CORNER_PIXELS 6
 
-    VideoDrawVLineClip(color,x1,y1,CORNER_PIXELS);
-    VideoDrawHLineClip(color,x1+1,y1,CORNER_PIXELS-1);
+    VideoDrawVLineClip(color, x1, y1, CORNER_PIXELS);
+    VideoDrawHLineClip(color, x1 + 1, y1, CORNER_PIXELS - 1);
 
-    VideoDrawVLineClip(color,x2,y1,CORNER_PIXELS);
-    VideoDrawHLineClip(color,x2-CORNER_PIXELS+1,y1,CORNER_PIXELS-1);
+    VideoDrawVLineClip(color, x2, y1, CORNER_PIXELS);
+    VideoDrawHLineClip(color, x2 - CORNER_PIXELS + 1, y1, CORNER_PIXELS - 1);
 
-    VideoDrawVLineClip(color,x1,y2-CORNER_PIXELS+1,CORNER_PIXELS);
-    VideoDrawHLineClip(color,x1,y2,CORNER_PIXELS-1);
+    VideoDrawVLineClip(color, x1, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
+    VideoDrawHLineClip(color, x1, y2, CORNER_PIXELS - 1);
 
-    VideoDrawVLineClip(color,x2,y2-CORNER_PIXELS+1,CORNER_PIXELS);
-    VideoDrawHLineClip(color,x2-CORNER_PIXELS+1,y2,CORNER_PIXELS-1);
+    VideoDrawVLineClip(color, x2, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
+    VideoDrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
 }
 
 /**
@@ -775,7 +775,7 @@ local void DrawManaBar(int x,int y,const UnitType* type,int full,int ready)
 local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 {
     int f;
-    int color;
+    VMemType color;
     int w;
     int x1;
     int y1;
@@ -806,13 +806,13 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		&& !(ShowNoFull && unit->HP==stats->HitPoints) ) {
 	    f=(100*unit->HP)/stats->HitPoints;
 	    if( f>75) {
-		color=ColorDarkGreen;
+		color = ColorDarkGreen;
 	    } else if( f>50 ) {
-		color=ColorYellow;
+		color = ColorYellow;
 	    } else if( f>25 ) {
-		color=ColorOrange;
+		color = ColorOrange;
 	    } else {
-		color=ColorRed;
+		color = ColorRed;
 	    }
 	    if ( ShowHealthHorizontal )  {
 		//
@@ -1352,31 +1352,36 @@ global void DrawPath(const Unit* unit)
 **	@param x	Resulting screen X cordinate.
 **	@param y	Resulting screen Y cordinate.
 */
-local void GetOrderPosition(const Unit* unit,const Order* order,int* x,int* y)
+local void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y)
 {
     Unit* goal;
+
     // FIXME: n0body: Check for goal gone?
-    if ((goal=order->Goal)&&(!goal->Removed)) {
+    if ((goal = order->Goal) && (!goal->Removed)) {
 	// Order has a goal, get it's location.
-	*x = Map2ViewportX(CurrentViewport,goal->X)+goal->IX+goal->Type->TileWidth*TileSizeX/2;
-	*y = Map2ViewportY(CurrentViewport,goal->Y)+goal->IY+goal->Type->TileHeight*TileSizeY/2;
+	*x = Map2ViewportX(CurrentViewport, goal->X) + goal->IX +
+	    goal->Type->TileWidth * TileSizeX / 2;
+	*y = Map2ViewportY(CurrentViewport, goal->Y) + goal->IY +
+	    goal->Type->TileHeight * TileSizeY / 2;
     } else {
-	if (order->X>=0 && order->Y >=0) {
+	if (order->X >= 0 && order->Y >= 0) {
 	    // Order is for a location, show that.
-	    *x = Map2ViewportX(CurrentViewport,order->X)+TileSizeX/2;
-	    *y = Map2ViewportY(CurrentViewport,order->Y)+TileSizeY/2;
+	    *x = Map2ViewportX(CurrentViewport, order->X) + TileSizeX / 2;
+	    *y = Map2ViewportY(CurrentViewport, order->Y) + TileSizeY / 2;
 	} else {
 	    // Some orders ignore x,y (like StandStill).
 	    // Use the unit's position instead.
-	    *x=Map2ViewportX(CurrentViewport,unit->X)+unit->IX+unit->Type->TileWidth*TileSizeX/2;
-	    *y=Map2ViewportY(CurrentViewport,unit->Y)+unit->IY+unit->Type->TileHeight*TileSizeY/2;
+	    *x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX +
+		unit->Type->TileWidth * TileSizeX / 2;
+	    *y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY +
+		unit->Type->TileHeight * TileSizeY / 2;
 	}
-	if (order->Action==UnitActionBuild) {
+	if (order->Action == UnitActionBuild) {
 	    // FIXME: mr-russ, can this be removed? since the build order now has a goal?
 	    // When building a building point to the center of the would-be building.
 	    // The -1 is because of what we have above.
-	    *x += (order->Type->TileWidth-1)*TileSizeX/2;
-	    *y += (order->Type->TileHeight-1)*TileSizeY/2;
+	    *x += (order->Type->TileWidth - 1) * TileSizeX / 2;
+	    *y += (order->Type->TileHeight - 1) * TileSizeY / 2;
 	}
     }
     DebugLevel3Fn(": (%d,%d)\n" _C_ order->X _C_ order->Y);
@@ -1394,11 +1399,11 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 {
     int x2;
     int y2;
-    int color;
-    int e_color;
+    VMemType color;
+    VMemType e_color;
     int dest;
 
-    GetOrderPosition(unit,order,&x2,&y2);
+    GetOrderPosition(unit, order, &x2, &y2);
     
     dest = 0;
     switch (order->Action) {
@@ -1481,8 +1486,10 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 	    break;
 
 	case UnitActionBuild:
-	    DrawSelection(ColorGray,x2-order->Type->BoxWidth/2,y2-order->Type->BoxHeight/2,
-		    x2+order->Type->BoxWidth/2,y2+order->Type->BoxHeight/2);
+	    DrawSelection(ColorGray, x2 - order->Type->BoxWidth / 2,
+		y2 - order->Type->BoxHeight / 2,
+		x2 + order->Type->BoxWidth / 2,
+		y2 + order->Type->BoxHeight / 2);
 	    e_color = color = ColorGreen;
 	    dest = 1;
 	    break;

@@ -916,7 +916,9 @@ local SCM CclDefineUI(SCM list)
 		if (gh_eq_p(value, gh_symbol2scm("color"))) {
 		    value = gh_car(sublist);
 		    sublist = gh_cdr(sublist);
-		    ui->CompleteBarColor = gh_scm2int(value);
+		    ui->CompleteBarColorRGB.D24.a = gh_scm2int(gh_car(value));
+		    ui->CompleteBarColorRGB.D24.b = gh_scm2int(gh_car(gh_cdr(value)));
+		    ui->CompleteBarColorRGB.D24.c = gh_scm2int(gh_car(gh_cdr(gh_cdr(value))));
 		} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
 		    value = gh_car(sublist);
 		    sublist = gh_cdr(sublist);

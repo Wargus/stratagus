@@ -492,7 +492,7 @@ struct _unit_ {
     Unit**	UnitSlot;		/// Slot pointer of Units
     Unit**	PlayerSlot;		/// Slot pointer of Player->Units
     
-    Unit*	Next;		/// Generic link pointer (on map)
+    Unit*	Next;			/// Generic link pointer (on map)
     
     int		InsideCount;		/// Number of units inside.
     Unit*	UnitInside;		/// Pointer to one of the units inside.
@@ -564,7 +564,7 @@ struct _unit_ {
     unsigned	Blink : 3;		/// Let selection rectangle blink
     unsigned	Moving : 1;		/// The unit is moving
 					/** set to random 1..100 when MakeUnit()
-					** ,used for fancy buildings
+					** used for fancy buildings
 					*/
     unsigned	Rs : 8;
     unsigned char	CurrentResource;
@@ -640,8 +640,8 @@ struct _unit_ {
 **	attacked)?
 */
 #define UnitUnusable(unit) \
-    ( (unit)->Removed || (unit)->Orders[0].Action==UnitActionDie || \
-      (unit)->Orders[0].Action==UnitActionBuilded)
+    ((unit)->Removed || (unit)->Orders[0].Action == UnitActionDie || \
+      (unit)->Orders[0].Action == UnitActionBuilded)
 
 /**
 **	Returns unit number (unique to this unit)
@@ -724,7 +724,7 @@ extern char EnableBuildingCapture;	/// Config: building capture enabled
 extern char RevealAttacker;		/// Config: reveal attacker enabled
 extern const Viewport* CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const Unit*);
-extern void (*DrawSelection)(int,int,int,int,int);
+extern void (*DrawSelection)(VMemType, int, int, int, int);
 
 //	in selection.c
 extern Unit* Selected[MaxSelectable];	/// currently selected units
@@ -747,9 +747,9 @@ extern void AssignUnitToPlayer(Unit* unit, Player* player);
     ///	Create a new unit
 extern Unit* MakeUnit(UnitType* type,Player* player);
     /// Place an unit on map
-extern void PlaceUnit(Unit* unit,int x,int y);
+extern void PlaceUnit(Unit* unit, int x, int y);
     ///	Create a new unit and place on map
-extern Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player);
+extern Unit* MakeUnitAndPlace(int x, int y, UnitType* type,Player* player);
     /// Add an unit inside a container. Only deal with list stuff.
 extern void AddUnitInContainer(Unit* unit, Unit* host);
     /// Remove an unit from inside a container. Only deals with list stuff.
@@ -759,18 +759,18 @@ extern void RemoveUnit(Unit* unit, Unit* host);
     /// Handle the loose of an unit (food,...)
 extern void UnitLost(Unit* unit);
     /// Remove the Orders of a Unit
-extern void UnitClearOrders(Unit *unit);
+extern void UnitClearOrders(Unit* unit);
     /// FIXME: more docu
-extern void UpdateForNewUnit(const Unit* unit,int upgrade);
+extern void UpdateForNewUnit(const Unit* unit, int upgrade);
     /// FIXME: more docu
-extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
+extern void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy);
     /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if building is known on the map
 extern int BuildingVisibleOnMap(const Unit* unit);
 
     /// Updates seen data
-extern void UnitsMarkSeen(int x,int y);
+extern void UnitsMarkSeen(int x, int y);
     /// Checks and updates if a Unit's seen information
 extern void UnitMarkSeen(Unit* unit);
     /// Returns true, if unit is known on the map
@@ -779,72 +779,72 @@ extern int UnitKnownOnMap(const Unit* unit);
     /// FIXME: more docu
 extern int CheckUnitToBeDrawn(const Unit* unit);
     /// FIXME: more docu
-extern void GetUnitMapArea( const Unit* unit,
-                            int *sx, int *sy, int *ex, int *ey );
+extern void GetUnitMapArea(const Unit* unit, int *sx, int *sy,
+    int *ex, int *ey);
 #ifdef HIERARCHIC_PATHFINDER
     /// FIXME: more docu
-extern int UnitGetNextPathSegment (const Unit * , int * , int * );
+extern int UnitGetNextPathSegment(const Unit*, int*, int*);
 #endif
     /// Check for rescue each second
 extern void RescueUnits(void);
     /// Change owner of unit
-extern void ChangeUnitOwner(Unit* unit,Player* newplayer);
+extern void ChangeUnitOwner(Unit* unit, Player* newplayer);
 
     /// Convert direction (dx,dy) to heading (0-255)
-extern int DirectionToHeading(int,int);
+extern int DirectionToHeading(int, int);
     /// Update frame from heading
 extern void UnitUpdateHeading(Unit* unit);
     /// Heading and frame from delta direction x,y
-extern void UnitHeadingFromDeltaXY(Unit* unit,int x,int y);
+extern void UnitHeadingFromDeltaXY(Unit* unit, int x, int y);
 
     /// FIXME: more docu
-extern void DropOutOnSide(Unit* unit,int heading,int addx,int addy);
+extern void DropOutOnSide(Unit* unit, int heading, int addx, int addy);
     /// FIXME: more docu
-extern void DropOutNearest(Unit* unit,int x,int y,int addx,int addy);
+extern void DropOutNearest(Unit* unit, int x, int y, int addx, int addy);
     /// Drop out all units in the unit
 extern void DropOutAll(const Unit* unit);
 
     /// FIXME: more docu
-extern int CanBuildHere(const UnitType* type,int x,int y);
+extern int CanBuildHere(const UnitType* type, int x, int y);
     /// FIXME: more docu
-extern int CanBuildOn(int x,int y,int mask);
+extern int CanBuildOn(int x, int y, int mask);
     /// FIXME: more docu
-extern int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y);
+extern int CanBuildUnitType(const Unit* unit,const UnitType* type, int x, int y);
 
     /// Find resource
-extern Unit* FindResource(const Unit* unit,int x,int y,int range,int resource);
+extern Unit* FindResource(const Unit* unit, int x, int y, int range, int resource);
     /// Find nearest deposit
-extern Unit* FindDeposit(const Unit* unit,int x,int y,int range,int resource);
+extern Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource);
     /// Find the next idle worker
 extern Unit* FindIdleWorker(const Player* player,const Unit* last);
 
     /// Find the neareast piece of terrain with specific flags.	
-extern int FindTerrainType(int movemask,int resmask,int rvresult,int range,
-	const Player *player,int x,int y,int* px,int* py);
+extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
+	const Player *player, int x, int y, int* px, int* py);
     /// Find the nearest piece of wood in sight range
-extern int FindWoodInSight(const Unit* unit,int* x,int* y);
+extern int FindWoodInSight(const Unit* unit, int* x, int* y);
 
     /// FIXME: more docu
-extern Unit* UnitOnScreen(Unit* unit,int x,int y);
+extern Unit* UnitOnScreen(Unit* unit, int x, int y);
 
     /// Let an unit die
 extern void LetUnitDie(Unit* unit);
     /// Destory all units inside another unit
 extern void DestroyAllInside(Unit* source);
     /// Hit unit with damage, if destroyed give attacker the points
-extern void HitUnit(Unit* attacker,Unit* target,int damage);
+extern void HitUnit(Unit* attacker, Unit* target, int damage);
 
     /// Returns the map distance between two points
-extern int MapDistance(int x1,int y1,int x2,int y2);
+extern int MapDistance(int x1, int y1, int x2, int y2);
     ///	Returns the map distance between two points with unit-type
-extern int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2);
+extern int MapDistanceToType(int x1, int y1,const UnitType* type, int x2, int y2);
     ///	Returns the map distance to unit
-extern int MapDistanceToUnit(int x,int y,const Unit* dest);
+extern int MapDistanceToUnit(int x, int y,const Unit* dest);
     ///	Returns the map distance between two units
 extern int MapDistanceBetweenUnits(const Unit* src,const Unit* dst);
 
     /// Calculate the distance from current view point to coordinate
-extern int ViewPointDistance(int x,int y);
+extern int ViewPointDistance(int x, int y);
     /// Calculate the distance from current view point to unit
 extern int ViewPointDistanceToUnit(const Unit* dest);
 
@@ -877,19 +877,19 @@ extern void UnitCacheRemove(Unit* unit);
     /// Change unit position in cache
 extern void UnitCacheChange(Unit* unit);
     /// Select units in range
-extern int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table);
+extern int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table);
     /// Select units on tile
-extern int UnitCacheOnTile(int x,int y,Unit** table);
+extern int UnitCacheOnTile(int x, int y, Unit** table);
     /// Select unit on X,Y of type naval,fly,land
-extern Unit* UnitCacheOnXY(int x,int y,unsigned type);
+extern Unit* UnitCacheOnXY(int x, int y, unsigned type);
     /// Print unit-cache statistic
 extern void UnitCacheStatistic(void);
     /// Initialize unit-cache
 extern void InitUnitCache(void);
     /// Inserts a corpse into the corpse list cache
-extern void DeadCacheInsert(Unit* unit,Unit** List );
+extern void DeadCacheInsert(Unit* unit, Unit** List);
     /// Removes a corpse from the corpse cache
-extern void DeadCacheRemove(Unit* unit,Unit** List );
+extern void DeadCacheRemove(Unit* unit, Unit** List);
 
 #define CorpseCacheInsert(unit) \
 	(DeadCacheInsert((unit),&CorpseList))
@@ -906,17 +906,17 @@ extern void DeadCacheRemove(Unit* unit,Unit** List );
 //	in unit_draw.c
 //--------------------
     /// Draw nothing around unit
-extern void DrawSelectionNone(int,int,int,int,int);
+extern void DrawSelectionNone(VMemType, int, int, int, int);
     /// Draw circle around unit
-extern void DrawSelectionCircle(int,int,int,int,int);
+extern void DrawSelectionCircle(VMemType, int, int, int, int);
     /// Draw circle filled with alpha around unit
-extern void DrawSelectionCircleWithTrans(int,int,int,int,int);
+extern void DrawSelectionCircleWithTrans(VMemType, int, int, int, int);
     /// Draw rectangle around unit
-extern void DrawSelectionRectangle(int,int,int,int,int);
+extern void DrawSelectionRectangle(VMemType, int, int, int, int);
     /// Draw rectangle filled with alpha around unit
-extern void DrawSelectionRectangleWithTrans(int,int,int,int,int);
+extern void DrawSelectionRectangleWithTrans(VMemType, int, int, int, int);
     /// Draw corners around unit
-extern void DrawSelectionCorners(int,int,int,int,int);
+extern void DrawSelectionCorners(VMemType, int, int, int, int);
 
     /// Register CCL decorations features
 extern void DecorationCclRegister(void);
@@ -937,33 +937,33 @@ extern void ShowOrder(const Unit* unit);
 
 //	in unit_find.c
     /// Select units in rectangle range
-extern int SelectUnits(int x1,int y1,int x2,int y2,Unit** table);
+extern int SelectUnits(int x1, int y1, int x2, int y2, Unit** table);
     /// Select units on map tile
-extern int SelectUnitsOnTile(int x,int y,Unit** table);
+extern int SelectUnitsOnTile(int x, int y, Unit** table);
     /// Find all units of this type
-extern int FindUnitsByType(const UnitType* type,Unit** table);
+extern int FindUnitsByType(const UnitType* type, Unit** table);
     /// Find all units of this type of the player
-extern int FindPlayerUnitsByType(const Player*,const UnitType*,Unit**);
+extern int FindPlayerUnitsByType(const Player*,const UnitType*, Unit**);
     /// Return any unit on that map tile
-extern Unit* UnitOnMapTile(int tx,int ty);
+extern Unit* UnitOnMapTile(int tx, int ty);
     /// Return repairable unit on that map tile
-extern Unit* RepairableOnMapTile(int tx,int ty);
+extern Unit* RepairableOnMapTile(int tx, int ty);
     /// Return possible attack target on a tile
 extern Unit* TargetOnMapTile(const Unit* soruce, int tx, int ty);
     /// Return possible attack target on that map area
-extern Unit* TargetOnMap(const Unit* unit,int x1,int y1,int x2,int y2);
+extern Unit* TargetOnMap(const Unit* unit, int x1, int y1, int x2, int y2);
     /// Return transporter unit on that map tile
-extern Unit* TransporterOnMapTile(int tx,int ty);
+extern Unit* TransporterOnMapTile(int tx, int ty);
 
     /// Return unit of a fixed type on a map tile.
-extern Unit* UnitTypeOnMap(int tx,int ty,UnitType* type);
+extern Unit* UnitTypeOnMap(int tx, int ty, UnitType* type);
     /// Return resource, if on map tile
-extern Unit* ResourceOnMap(int tx,int ty,int resource);
+extern Unit* ResourceOnMap(int tx, int ty, int resource);
     /// Return resource deposit, if on map tile
-extern Unit* ResourceDepositOnMap(int tx,int ty,int resource);
+extern Unit* ResourceDepositOnMap(int tx, int ty, int resource);
 
     /// Find best enemy in numeric range to attack
-extern Unit* AttackUnitsInDistance(Unit* unit,int range);
+extern Unit* AttackUnitsInDistance(Unit* unit, int range);
     /// Find best enemy in attack range to attack
 extern Unit* AttackUnitsInRange(Unit* unit);
     /// Find best enemy in reaction range to attack
@@ -987,23 +987,23 @@ extern Unit** GetUnitsOfGroup(int num);
     /// Remove all units from a group
 extern void ClearGroup(int num);
     /// Add the array of units to the group
-extern void AddToGroup(Unit **units,int nunits,int num);
+extern void AddToGroup(Unit** units, int nunits, int num);
     /// Set the contents of a particular group with an array of units
-extern void SetGroup(Unit **units,int nunits,int num);
+extern void SetGroup(Unit** units, int nunits, int num);
     /// Remove a unit from a group
-extern void RemoveUnitFromGroups(Unit *unit);
+extern void RemoveUnitFromGroups(Unit* unit);
     /// Register CCL group features
 extern void GroupCclRegister(void);
 
 //	in selection.c
 
     /// Check if unit is the currently only selected
-#define IsOnlySelected(unit)	(NumSelected==1 && Selected[0]==(unit))
+#define IsOnlySelected(unit)	(NumSelected == 1 && Selected[0] == (unit))
 
     /// Clear current selection
 extern void UnSelectAll(void);
     /// Select group as selection
-extern void ChangeSelectedUnits(Unit** units,int num_units);
+extern void ChangeSelectedUnits(Unit** units, int num_units);
     /// Add a unit to selection
 extern int SelectUnit(Unit* unit);
     /// Select one unit as selection
@@ -1023,17 +1023,17 @@ extern int AddGroupFromUnitToSelection(Unit* unit);
     /// Select the units from the same group as the one in parameter
 extern int SelectGroupFromUnit(Unit* unit);
     /// Select the units in the selection rectangle
-extern int SelectUnitsInRectangle(int tx,int ty,int w,int h);
+extern int SelectUnitsInRectangle(int tx, int ty, int w, int h);
     /// Select ground units in the selection rectangle
-extern int SelectGroundUnitsInRectangle(int tx,int ty,int w,int h);
+extern int SelectGroundUnitsInRectangle(int tx, int ty, int w, int h);
     /// Select flying units in the selection rectangle
-extern int SelectAirUnitsInRectangle(int tx,int ty,int w,int h);
+extern int SelectAirUnitsInRectangle(int tx, int ty, int w, int h);
     /// Add the units in the selection rectangle to the current selection
-extern int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h);
+extern int AddSelectedUnitsInRectangle(int tx, int ty, int w, int h);
     /// Add ground units in the selection rectangle to the current selection
-extern int AddSelectedGroundUnitsInRectangle(int tx,int ty,int w,int h);
+extern int AddSelectedGroundUnitsInRectangle(int tx, int ty, int w, int h);
     /// Add flying units in the selection rectangle to the current selection
-extern int AddSelectedAirUnitsInRectangle(int tx,int ty,int w,int h);
+extern int AddSelectedAirUnitsInRectangle(int tx, int ty, int w, int h);
 
     /// Init selections
 extern void InitSelections(void);

@@ -85,7 +85,7 @@
 local void UiDrawLifeBar(const Unit* unit, int x, int y)
 {
     int f;
-    int color;
+    VMemType color;
 
     y += IconHeight + 7;
     VideoFillRectangleClip(ColorBlack, x, y, IconWidth + 7, 7);
@@ -189,10 +189,10 @@ global void DrawUnitInfo(const Unit* unit)
     type = unit->Type;
     stats = unit->Stats;
 #ifdef DEBUG
-	if (!type) {
-	    DebugLevel1Fn(" FIXME: free unit selected\n");
-	    return;
-	}
+    if (!type) {
+	DebugLevel1Fn(" FIXME: free unit selected\n");
+	return;
+    }
 #endif
 
     //
