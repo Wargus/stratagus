@@ -77,6 +77,9 @@ local void CustomGameStart(void);
 local void CustomGameDrawFunc(Menuitem *mi);
 
 local void CustomGameRCSAction(Menuitem *mi, int i);
+local void CustomGameRESAction(Menuitem *mi, int i);
+local void CustomGameUNSAction(Menuitem *mi, int i);
+local void CustomGameOPSAction(Menuitem *mi, int i);
 local void CustomGameTSSAction(Menuitem *mi, int i);
 
 /*----------------------------------------------------------------------------
@@ -257,7 +260,8 @@ local unsigned char *cgtssoptions[] = {
     "Forest",
     "Winter",
     "Wasteland",
-    "Orc Swamp",	// hmm. need flag if XPN-GFX is present!
+    "Orc Swamp",	// hmm. need flag if XPN-GFX is present! - tmp-hack in InitMenus()..
+			// Some time later _all_ tilesets should be a dynamic (ccl-defineable) resource..
 };
 
 local Menuitem CustomGameMenuItems[] = {
@@ -278,15 +282,15 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgresoptions, 152, 20, MBUTTON_PULLDOWN, NULL, 4, 0, 0, 0} } },
+	{ pulldown:{ cgresoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameRESAction, 4, 0, 0, 0} } },
     { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Units:~>", 0} } },
     { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgunsoptions, 190, 20, MBUTTON_PULLDOWN, NULL, 2, 0, 0, 0} } },
+	{ pulldown:{ cgunsoptions, 190, 20, MBUTTON_PULLDOWN, CustomGameUNSAction, 2, 0, 0, 0} } },
     { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Opponents:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgopsoptions, 152, 20, MBUTTON_PULLDOWN, NULL, 8, 0, 0, 0} } },
+	{ pulldown:{ cgopsoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameOPSAction, 8, 0, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Map Tileset:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
@@ -1169,6 +1173,24 @@ local void CustomGameRCSAction (Menuitem *mi __attribute__((unused)), int i)
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
 
     GameSettings.Presets[0].Race = v[i];
+}
+
+local void CustomGameRESAction (Menuitem *mi __attribute__((unused)), int i)
+{
+    int v[] = { SettingsResourcesMapDefault, SettingsResourcesLow,
+		SettingsResourcesMedium, SettingsResourcesHigh };
+
+    GameSettings.Resources = v[i];
+}
+
+local void CustomGameUNSAction (Menuitem *mi __attribute__((unused)), int i)
+{
+    GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
+}
+
+local void CustomGameOPSAction (Menuitem *mi __attribute__((unused)), int i)
+{
+    GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
 
 local void CustomGameTSSAction (Menuitem *mi __attribute__((unused)), int i)
