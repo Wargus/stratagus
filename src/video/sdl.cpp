@@ -486,82 +486,72 @@ global void WaitEventsAndKeepSync(void)
     for(;;) {
 	// Not very nice, but this is the problem if you use other libraries
 	// The event handling of SDL is wrong designed = polling.
-#ifdef SLOW_INPUT
-	while (SDL_PollEvent(event)) {
+	while( SDL_PollEvent(event) ) {
 	    // Handle SDL event
 	    DoEvent(event);
 	}
-	{
-#else
-	if( SDL_PollEvent(event) ) {
+#ifndef USE_WIN32
+	//
+	//	Prepare select
+	//
+	tv.tv_sec=0;
+	tv.tv_usec=0;
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
+	maxfd=0;
+
+	//
+	//	Network
+	//
+	if( NetworkFildes!=-1 ) {
+	    if( NetworkFildes>maxfd ) {
+		maxfd=NetworkFildes;
+	    }
+	    FD_SET(NetworkFildes,&rfds);
+	}
+
+	//
+	//	Sound
+	//
+	if( !SoundOff && !SoundThreadRunning ) {
+	    if( SoundFildes>maxfd ) {
+		maxfd=SoundFildes;
+	    }
+	    FD_SET(SoundFildes,&wfds);
+	}
+
+	maxfd=select(maxfd+1,&rfds,&wfds,NULL
+		,(i=SDL_PollEvent(event)) ? &tv : NULL);
+
+	if ( i ) {
 	    // Handle SDL event
 	    DoEvent(event);
-	} else {
-#endif
+	}
 
-#ifndef USE_WIN32
+	if( maxfd>0 ) {
 	    //
-	    //	Prepare select
+	    //	Sound
 	    //
-	    tv.tv_sec=0;
-	    tv.tv_usec=0;
-	    FD_ZERO(&rfds);
-	    FD_ZERO(&wfds);
-	    maxfd=0;
+	    if( !SoundOff && !SoundThreadRunning
+			&& FD_ISSET(SoundFildes,&wfds) ) {
+		WriteSound();
+	    }
+
+	    //
+	    //	Network in sync and time for frame over: return
+	    //
+	    if( !i && NetworkInSync && VideoInterrupts ) {
+		return;
+	    }
 
 	    //
 	    //	Network
 	    //
-	    if( NetworkFildes!=-1 ) {
-		if( NetworkFildes>maxfd ) {
-		    maxfd=NetworkFildes;
-		}
-		FD_SET(NetworkFildes,&rfds);
+	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
+		NetworkEvent();
 	    }
-
-	    //
-	    //	Sound
-	    //
-	    if( !SoundOff && !SoundThreadRunning ) {
-		if( SoundFildes>maxfd ) {
-		    maxfd=SoundFildes;
-		}
-		FD_SET(SoundFildes,&wfds);
-	    }
-
-	    maxfd=select(maxfd+1,&rfds,&wfds,NULL
-		    ,(i=SDL_PollEvent(event)) ? &tv : NULL);
-
-	    if ( i ) {
-		// Handle SDL event
-		DoEvent(event);
-	    }
-
-	    if( maxfd>0 ) {
-		//
-		//	Sound
-		//
-		if( !SoundOff && !SoundThreadRunning
-			    && FD_ISSET(SoundFildes,&wfds) ) {
-		    WriteSound();
-		}
-
-		//
-		//	Network in sync and time for frame over: return
-		//
-		if( !i && NetworkInSync && VideoInterrupts ) {
-		    return;
-		}
-
-		//
-		//	Network
-		//
-		if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
-		    NetworkEvent();
-		}
-	    }
-#endif
 	}
+#endif
 
 	//
 	//	Network in sync and time for frame over: return
