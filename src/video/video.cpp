@@ -1007,6 +1007,26 @@ global void VideoUnlockScreen(void)
 }
 
 /**
+**	Return ticks in ms since start.
+*/
+global unsigned long GetTicks(void)
+{
+#if UseSdl
+    return SDL_GetTicks();
+#endif
+#if UseX11
+    extern unsigned long X11GetTicks(void);
+
+    return X11GetTicks();
+#endif
+#if UseSVGALib
+    extern unsigned long SVGAGetTicks(void);
+
+    return SVGAGetTicks();
+#endif
+}
+
+/**
 **	Video initialize.
 */
 global void InitVideo(void)

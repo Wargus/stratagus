@@ -165,10 +165,10 @@ global void SetVideoSync(void)
 **
 **	@return		Game ticks in ms.
 */
-local long X11GetTicks(void)
+global unsigned long X11GetTicks(void)
 {
     struct timeval now;
-    long ticks;
+    unsigned long ticks;
  
     gettimeofday(&now,NULL);
 
