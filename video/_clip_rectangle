@@ -8,9 +8,9 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name _clip_rectangle	-	Clip rectangle mechanism */
+/** name _clip_rectangle	-	Clip rectangle mechanism */
 //
-//	(c) Copyright 2000,2001 by Lutz Sammer
+//	(c) Copyright 2001 by Lutz Sammer, Stephan Rasenberg
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
