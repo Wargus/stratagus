@@ -1278,6 +1278,9 @@ local void PrintHeader(void)
 #ifdef HIERARCHIC_PATHFINDER
     "HIERARCHIC-PATHFINDER "
 #endif
+#ifdef MAP_REGIONS
+    "MAP_REGIONS "
+#endif
 	, NameLine);
 }
 
