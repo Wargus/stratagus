@@ -44,7 +44,7 @@ Proposal for the new FreeCraft data directory structure:
 <B>$FREECRAFT_LIBRARY_PATH/data</B>
 |   Contains all data files for the FreeCraft game engine.
 |
-|-- <B>data/campaigns</B>
+}-- <B>data/campaigns</B>
 |   |	Contains all available campaigns.
 |   |
 |   `-- <B>data/campaigns/<I>{race-campaign}</I></B>
@@ -53,17 +53,17 @@ Proposal for the new FreeCraft data directory structure:
 |	`-- <B>data/campaigns/<I>{race-campaign}</I>/interface</B>
 |		Contains special backgrounds images for the campaign.
 |    
-|-- <B>data/ccl</B>
+}-- <B>data/ccl</B>
 |	Contains all global CCL - Craft Configuration Language files.
 |
-|-- <B>data/graphics</B>
+}-- <B>data/graphics</B>
 |   |	Contains all available graphics.
 |   |
-|   |-- <B>data/graphics/<I>{race}</I></B>
+|   }-- <B>data/graphics/<I>{race}</I></B>
 |   |	|   Contains all graphics of a race, which could be used in any
 |   |	|   tileset.
 |   |	|
-|   |	|-- <B>data/graphics/<I>{race}</I>/buildings</B>
+|   |	}-- <B>data/graphics/<I>{race}</I>/buildings</B>
 |   |	|	Contains the building of the race, which could be used in
 |   |	|	any tileset.
 |   |	|
@@ -71,11 +71,11 @@ Proposal for the new FreeCraft data directory structure:
 |   |		Contains all units of the race, which could be used in any
 |   |		any tileset.
 |   |
-|   |-- <B>data/graphics/neutral</B>
+|   }-- <B>data/graphics/neutral</B>
 |   |	|   Contains all graphics that didn't belong to a special race and
 |   |	|   which could be used in any tileset.
 |   |	|
-|   |	|-- <B>data/graphics/neutral/buildings</B>
+|   |	}-- <B>data/graphics/neutral/buildings</B>
 |   |	|	Contains all buildings that didn't belong to a special race
 |   |	|	and which could be used in any tileset.
 |   |	|
@@ -83,29 +83,29 @@ Proposal for the new FreeCraft data directory structure:
 |   |		Contains all units that didn't belong to a special race and
 |   |		which could be used in any tileset.
 |   |
-|   |-- <B>data/graphics/missiles</B>
+|   }-- <B>data/graphics/missiles</B>
 |   |	    Contains all graphics of missiles.
 |   |
-|   |-- <B>data/graphics/tilesets</B>
+|   }-- <B>data/graphics/tilesets</B>
 |   |	|   Contains the graphics special to a single tileset.
 |   |	|   Icons, buildings, units, tileset, decorations.
 |   |	|
 |   |	`-- <B>data/graphics/tilesets/<I>{tileset}</I></B>
 |   |	    |	Contains the special graphics of this tileset of all races.
 |   |	    |
-|   |	    |-- <B>data/graphics/tilesets/<I>{tileset}</I>/<I>{race}</I></B>
+|   |	    }-- <B>data/graphics/tilesets/<I>{tileset}</I>/<I>{race}</I></B>
 |   |	    |	|   Contains all graphics of a race special to this tileset.
 |   |	    |	|
-|   |	    |	|-- <B>data/graphics/tilesets/<I>{tileset}</I>/<I>{race}</I>/buildings</B>
+|   |	    |	}-- <B>data/graphics/tilesets/<I>{tileset}</I>/<I>{race}</I>/buildings</B>
 |   |	    |	|	Contains all buildings graphics of a race and a tileset.
 |   |	    |	|
 |   |	    |	`-- <B>data/graphics/tilesets/<I>{tileset}</I>/<I>{race}</I>/units</B>
 |   |	    |		Contains all units graphics of a race and a tileset.
 |   |	    |
-|   |	    |-- <B>data/graphics/tilesets/<I>{tileset}</I>/neutral</B>
+|   |	    }-- <B>data/graphics/tilesets/<I>{tileset}</I>/neutral</B>
 |   |	    |	|   Contains the graphics not belonging to any race.
 |   |	    |	|
-|   |	    |	|-- <B>data/graphics/tilesets/<I>{tileset}</I>/neutral/buildings</B>
+|   |	    |	}-- <B>data/graphics/tilesets/<I>{tileset}</I>/neutral/buildings</B>
 |   |	    |	|	Contains the buildings graphics of the neutral race.
 |   |	    |	|
 |   |	    |	`-- <B>data/graphics/tilesets/<I>{tileset}</I>/neutral/units</B>
@@ -118,47 +118,47 @@ Proposal for the new FreeCraft data directory structure:
 |   `-- <B>data/graphics/ui</B>
 |	|   Contains all user interface graphics.
 |	|
-|	|-- <B>data/graphics/ui/cursors</B>
+|	}-- <B>data/graphics/ui/cursors</B>
 |	|	Contains all cursors not special to any race.
 |	|
-|	|-- <B>data/graphics/ui/fonts</B>
+|	}-- <B>data/graphics/ui/fonts</B>
 |	|	Contains all fonts not special to any race.
 |	|
 |	`-- <B>data/graphics/ui/<I>{race}</I></B>
 |	    |	Contains all user interface graphics special to a race.
 |	    |
-|	    |-- <B>data/graphics/ui/<I>{race}</I>/640x480</B>
+|	    }-- <B>data/graphics/ui/<I>{race}</I>/640x480</B>
 |	    |	    Contains the user interface graphics for this resolution.
 |	    |
 |	    `-- <B>data/graphics/ui/<I>{race}</I>/cursors</B>
 |		    Contains the cursors special to this race.
 |
 |
-|-- <B>data/puds</B>
+}-- <B>data/puds</B>
 |   |	Contains all 'puds' the original level format.
 |   |
-|   |-- <B>data/puds/demo</B>
+|   }-- <B>data/puds/demo</B>
 |   |	    Contains the demo levels.
 |   |
-|   |-- <B>data/puds/internal</B>
+|   }-- <B>data/puds/internal</B>
 |   |	    Contains the internal (stored in the data file) levels.
 |   |
-|   |-- <B>data/puds/multi</B>
+|   }-- <B>data/puds/multi</B>
 |   |	    Contains multi-player levels.
 |   |
-|   |-- <B>data/puds/my_puds</B>
+|   }-- <B>data/puds/my_puds</B>
 |   |	    Contains your own levels.
 |   |
-|   |-- <B>data/puds/single</B>
+|   }-- <B>data/puds/single</B>
 |   |	    Contains single player levels.
 |   |
 |   `-- <B>data/puds/strange</B>
 |	    Contains strange levels.
 |
-|-- <B>data/maps</B>
+}-- <B>data/maps</B>
 |   |	Contains all maps in our own level format.
 |   |
-|   |-- <B>data/maps/single</B>
+|   }-- <B>data/maps/single</B>
 |   |	    Contains single player levels.
 |   |
 |   `-- <B>data/maps/multi</B>
@@ -168,37 +168,37 @@ Proposal for the new FreeCraft data directory structure:
 `-- <B>data/sounds</B>
     |	Contains all available sounds.
     |
-    |-- <B>data/sounds/buildings</B>
+    }-- <B>data/sounds/buildings</B>
     |	    Contains all general buildings sounds.
     |
-    |-- <B>data/sounds/<I>{race}</I></B>
+    }-- <B>data/sounds/<I>{race}</I></B>
     |	|   Contains all sounds special to a race.
     |	|
-    |	|-- <B>data/sounds/<I>{race}</I>/basic_voices</B>
+    |	}-- <B>data/sounds/<I>{race}</I>/basic_voices</B>
     |	|   |	Contains the general sounds of this race.
     |	|   |
-    |	|   |-- <B>data/sounds/<I>{race}</I>/basic_voices/acknowledgement</B>
+    |	|   }-- <B>data/sounds/<I>{race}</I>/basic_voices/acknowledgement</B>
     |	|   |	    Contains the general acknowledgement sounds of this race.
     |	|   |
-    |	|   |-- <B>data/sounds/<I>{race}</I>/basic_voices/annoyed</B>
+    |	|   }-- <B>data/sounds/<I>{race}</I>/basic_voices/annoyed</B>
     |	|   |	    Contains the general annoyed sounds of this race.
     |	|   |
-    |	|   |-- <B>data/sounds/<I>{race}</I>/basic_voices/help</B>
+    |	|   }-- <B>data/sounds/<I>{race}</I>/basic_voices/help</B>
     |	|   |	    Contains the general help sounds of this race.
     |	|   |
     |	|   `-- <B>data/sounds/<I>{race}</I>/basic_voices/selected</B>
     |	|	    Contains the general selected sounds of this race.
     |	|
-    |	|-- <B>data/sounds/<I>{race}</I>/buildings</B>
+    |	}-- <B>data/sounds/<I>{race}</I>/buildings</B>
     |	|	Contains the buildings sounds of this race.
     |	|
-    |	|-- <B>data/sounds/<I>{race}</I>/ships</B>
+    |	}-- <B>data/sounds/<I>{race}</I>/ships</B>
     |	|   |	Contains all general ship sounds of this race.
     |	|   |
-    |	|   |-- <B>data/sounds/<I>{race}</I>/ships/acknowledgement</B>
+    |	|   }-- <B>data/sounds/<I>{race}</I>/ships/acknowledgement</B>
     |	|   |	    Contains the ship acknowledgement sound of this race.
     |	|   |
-    |	|   |-- <B>data/sounds/<I>{race}</I>/ships/annoyed</B>
+    |	|   }-- <B>data/sounds/<I>{race}</I>/ships/annoyed</B>
     |	|   |	    Contains the ship annoyed sound of this race.
     |	|   |
     |	|   `-- <B>data/sounds/<I>{race}</I>/ships/selected</B>
@@ -210,34 +210,34 @@ Proposal for the new FreeCraft data directory structure:
     |	    `-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I></B>
     |		|   Contains the special sounds of this units of the race.
     |		|
-    |		|-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I>/acknowledgement</B>
+    |		}-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I>/acknowledgement</B>
     |		|	Contains the acknowledge sound of this unit.
     |		|
-    |		|-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I>/annoyed</B>
+    |		}-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I>/annoyed</B>
     |		|	Contains the annoyed sound of this unit.
     |		|
     |		`-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I>/selected</B>
     |			Contains the selected sound of this unit.
     |
-    |-- <B>data/sounds/misc</B>
+    }-- <B>data/sounds/misc</B>
     |	|   Contains the sounds that didn't fit in any section.
     |	|
-    |	|-- <B>data/sounds/misc/building explosion</B>
+    |	}-- <B>data/sounds/misc/building explosion</B>
     |	|	Contains the building explosion sounds.
     |	|
     |	`-- <B>data/sounds/misc/tree chopping</B>
     |		Contains the tree chopping sounds.
     |
-    |-- <B>data/sounds/missiles</B>
+    }-- <B>data/sounds/missiles</B>
     |	|   Contains the fire and hit sounds of missiles.
     |	|
     |	`-- <B>data/sounds/missiles/sword attack</B>
     |		Contains different sounds of the same kind.
     |
-    |-- <B>data/sounds/neutral</B>
+    }-- <B>data/sounds/neutral</B>
     |	|   Contains the sounds of buildings or units not belonging to any race.
     |	|
-    |	|-- <B>data/sounds/neutral/buildings</B>
+    |	}-- <B>data/sounds/neutral/buildings</B>
     |	|	Contains the building sounds of the neutral race.
     |	|
     |	`-- <B>data/sounds/neutral/units</B>
@@ -246,11 +246,11 @@ Proposal for the new FreeCraft data directory structure:
     |	    `-- <B>data/sounds/neutral/units/<I>{unit}</I></B>
     |		|   Contains the special sounds of the unit of the neutral race.
     |		|
-    |		|-- <B>data/sounds/neutral/units/<I>{unit}</I>/acknowledgement</B>
+    |		}-- <B>data/sounds/neutral/units/<I>{unit}</I>/acknowledgement</B>
     |		|	Contains the acknowledgement sound of the unit of
     |		|	the neutral race.
     |		|
-    |		|-- <B>data/sounds/neutral/units/<I>{unit}</I>/annoyed</B>
+    |		}-- <B>data/sounds/neutral/units/<I>{unit}</I>/annoyed</B>
     |		|	Contains the annoyed sound of the unit of the neutral
     |		|	race.
     |		|
@@ -258,11 +258,26 @@ Proposal for the new FreeCraft data directory structure:
     |			Contains the selected sound of the unit of the neutral
     |			race.
     |
-    |-- <B>data/sounds/spells</B>
+    }-- <B>data/sounds/spells</B>
     |	    Contains the sounds of the different spells.
     |
-    |-- <B>data/sounds/ui</B>
+    }-- <B>data/sounds/ui</B>
     |	    Contains the sounds for the user interface.
+    |
+    }-- <B>data/sounds/ships</B>
+    |	|   Contains the sounds of ships common for all races.
+    |	|
+    |	`-- <B>data/sounds/ships/<I>{unit}</I></B>
+    |	    |	Contains the sounds of this unit.
+    |	    |
+    |	    }-- <B>data/sounds/ships/<I>{unit}</I>/acknowledgement</B>
+    |	    |	    Contains the acknowledgement sound of this unit.
+    |	    |
+    |	    }-- <B>data/sounds/ships/<I>{unit}</I>/annoyed</B>
+    |	    |	    Contains the annoyed sound of this unit.
+    |	    |
+    |	    `-- <B>data/sounds/ships/<I>{unit}</I>/selected</B>
+    |		    Contains the selected sound of this unit.
     |
     `-- <B>data/sounds/units</B>
 	|   Contains the sounds of units common for all races.
@@ -270,10 +285,10 @@ Proposal for the new FreeCraft data directory structure:
 	`-- <B>data/sounds/units/<I>{unit}</I></B>
 	    |	Contains the sounds of this unit.
 	    |
-	    |-- <B>data/sounds/units/<I>{unit}</I>/acknowledgement</B>
+	    }-- <B>data/sounds/units/<I>{unit}</I>/acknowledgement</B>
 	    |	    Contains the acknowledgement sound of this unit.
 	    |
-	    |-- <B>data/sounds/units/<I>{unit}</I>/annoyed</B>
+	    }-- <B>data/sounds/units/<I>{unit}</I>/annoyed</B>
 	    |	    Contains the annoyed sound of this unit.
 	    |
 	    `-- <B>data/sounds/units/<I>{unit}</I>/selected</B>
