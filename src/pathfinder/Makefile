@@ -34,7 +34,7 @@ MODULE  = pathfinder
 ifeq (HIERARCHIC_PATHFINDER, $(findstring HIERARCHIC_PATHFINDER, $(CFLAGS)))
 	SRCS	= pathfinder.c astar.c ccl_pathfinder.c avl_tree.c hierarchical.c \
 			  regid.c region.c region_set.c region_groups.c pf_highlevel.c \
-			  pf_high_open.c pf_lowlevel.c pf_low_open.c
+			  pf_high_open.c pf_lowlevel.c pf_low_open.c pf_goal.c
 else
 	SRCS	= pathfinder.c astar.c ccl_pathfinder.c
 endif

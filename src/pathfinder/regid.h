@@ -14,8 +14,8 @@ enum regid_usage {
 };
 
 typedef struct regid_space {
-	unsigned short RegidHigh;
-	unsigned short BitmapSize;
+	unsigned int RegidHigh;
+	unsigned int BitmapSize;
 	unsigned char *Bitmap;
 } RegidSpace;
 

@@ -7,11 +7,9 @@
 #include "freecraft.h"
 #include "map.h"
 #include "hierarchical.h"
-#define REGION_GATHER_STATS
 #include "region.h"
 
-#define REGION_IMPORTANT_FLAGS	(MapFieldLandAllowed | MapFieldCoastAllowed | \
-				MapFieldWaterAllowed | MapFieldUnpassable)
+Region *AllRegions = NULL;
 
 local void RegionDestroyNeighborList (Region * );
 local void RegionRemoveFromNeighborLists (Region * );
@@ -27,6 +25,8 @@ local void OpenInit (int );
 local void OpenInsert (int , int );
 local void OpenGetHead (int * , int * );
 local int OpenNonempty (void);
+local void RegionListAddRegion (Region ** , Region * );
+local void RegionListDeleteRegion (Region ** , Region * );
 
 /**
 **	Region constructor.
@@ -47,11 +47,12 @@ Region *RegionNew (int seed_x, int seed_y)
 		return NULL;
 	new->SeedX = seed_x;
 	new->SeedY = seed_y;
-	new->Passability = mf->Flags & REGION_IMPORTANT_FLAGS;
+	new->Passability = mf->Flags & MOVEMENT_IMPORTANT_FLAGS;
 	new->Area.X = seed_x / AreaGetWidth();
 	new->Area.Y = seed_y / AreaGetHeight();
 	/* the rest of the attribs are initialized implicitly to 0 by calloc() */
 
+	RegionListAddRegion (&AllRegions, new);
 	return new;
 }
 
@@ -65,6 +66,7 @@ void RegionDestroy (Region *reg)
 {
 	RegionRemoveFromNeighborLists (reg);
 	RegionDestroyNeighborList (reg);
+	RegionListDeleteRegion (&AllRegions, reg);
 	free (reg);
 }
 
@@ -198,6 +200,54 @@ void RegionChangeRegId (Region *reg, int regid)
 	RegionProcessEachField (reg, SET_REGID, args);
 }
 
+/* finds the reg's nearest field to the goal (gx,gy) and return its h */
+int RegionGetH (Region *reg, int gx, int gy)
+{
+#if 0
+	/* goal x and y coords, the best h so far */
+	int args[3] = { gx, gy, (unsigned short )~0 };
+
+	RegionProcessEachField (reg, GET_BEST, args);
+	return args[2];
+#endif
+
+	/* this approach looks cruder than the elegant one above but is
+	 * much more efficient :-( */
+	int x, y;
+	int xmin, xmax, ymin, ymax;
+	unsigned best_h = (unsigned )~0;
+
+	xmin = reg->Area.X * AreaGetWidth ();
+	xmax = (reg->Area.X + 1) * AreaGetWidth () - 1;
+	ymin = reg->Area.Y * AreaGetHeight ();
+	ymax = (reg->Area.Y + 1) * AreaGetHeight () - 1;
+
+	for (y = ymin; y <= ymax; y++)
+		for (x = xmin; x <= xmax; x++) {
+			if ( MapFieldGetRegId (x, y) == reg->RegId) {
+				unsigned dx = abs (x - gx);
+				unsigned dy = abs (y - gy);
+				//unsigned h = dx + dy + max (dx, dy);
+				unsigned h = dx*dx + dy*dy;
+				if (h < best_h)
+					best_h = h;
+			}
+		}
+
+	//printf ("region %d: h==%d\n", reg->RegId, best_h);
+	return best_h;
+}
+
+void RegionMarkBest (Region *reg, int gx, int gy)
+{
+	/* FIXME couldn't RegionMarkBest() and RegionGetH() be implemented
+	 * a bit more efficiently? */
+	int best_h = RegionGetH (reg, gx, gy);
+	int args[3] = { gx, gy, best_h };
+
+	RegionProcessEachField (reg, MARK_BEST, args);
+}
+
 static struct constraints {
 	unsigned int x0, y0, x1, y1;
 } constraints;
@@ -255,10 +305,8 @@ local void RegionProcessEachField (Region *reg, NodeOperation opcode,
 
 		OpenGetHead (&x, &y);
 		RegionExpandNode (reg, x, y, opcode, opargs);
-#ifdef REGION_GATHER_STATS
 		if (opcode == SET_REGID)
 			++reg->NumFields;
-#endif
 	}
 	
 }
@@ -290,7 +338,7 @@ local int NodeSuitableForOpen (Region *reg, int x, int y)
 		return 0;
 	if (!CheckConstraints (x, y))
 		return 0;
-	if ( (mf->Flags & REGION_IMPORTANT_FLAGS) != reg->Passability)
+	if ( (mf->Flags & MOVEMENT_IMPORTANT_FLAGS) != reg->Passability)
 		return 0;
 
 	return 1;
@@ -373,4 +421,37 @@ local void OpenGetHead (int *x, int *y)
 local int OpenNonempty (void)
 {
 	return Open.Tail != Open.Head;
+}
+
+local void RegionListAddRegion (Region **listp, Region *reg)
+{
+	Region *list = *listp;
+	Region *r;
+
+	reg->Next = NULL;	/* should be done by the caller already, but ... */
+
+	if (list == NULL) {
+		*listp = reg;
+	} else {
+		for (r=list; r->Next; r=r->Next);
+		r->Next = reg;
+	}
+}
+
+local void RegionListDeleteRegion (Region **listp, Region *reg)
+{
+	Region *list = *listp;
+	Region *r, *p;
+
+	if (list == NULL)
+		return;
+	if (list == reg) {
+		*listp = reg->Next;
+		return;
+	}
+	for (p=list, r=p->Next; r; p=r, r=r->Next)
+		if (r == reg) {
+			p->Next = r->Next;
+			break;
+		}
 }

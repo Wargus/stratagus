@@ -18,6 +18,8 @@ void RegidSpaceInitialize (RegidSpace *space, int size)
 void RegidBitmapInflate (RegidSpace *space)
 {
 	space->Bitmap = realloc (space->Bitmap, ++space->BitmapSize);
+	/* initialize the newly acquired memory */
+	space->Bitmap[space->BitmapSize - 1] = 0;
 }
 
 void RegidBitmapShrink (RegidSpace *space)

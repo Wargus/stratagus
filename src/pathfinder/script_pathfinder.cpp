@@ -113,6 +113,18 @@ local SCM CclAStarSetMovingUCC(SCM cost)
     return SCM_UNSPECIFIED;
 }
 
+local SCM CclPfHierShowRegIds (SCM flag)
+{
+    PfHierShowRegIds = gh_scm2bool (flag);
+    return SCM_UNSPECIFIED;
+}
+
+local SCM CclPfHierShowGroupIds (SCM flag)
+{
+    PfHierShowGroupIds = gh_scm2bool (flag);
+    return SCM_UNSPECIFIED;
+}
+
 
 /**
 **	Register CCL features for pathfinder.
@@ -123,6 +135,8 @@ global void PathfinderCclRegister(void)
     gh_new_procedure0_0("no-a-star",CclNoAStar);
     gh_new_procedure1_0("a-star-fixed-unit-cost",CclAStarSetFixedUCC);
     gh_new_procedure1_0("a-star-moving-unit-cost",CclAStarSetMovingUCC);
+    gh_new_procedure1_0 ("pf-show-regids!", CclPfHierShowRegIds);
+    gh_new_procedure1_0 ("pf-show-groupids!", CclPfHierShowGroupIds);
 }
 
 //@}
