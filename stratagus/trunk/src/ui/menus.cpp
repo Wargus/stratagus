@@ -2715,7 +2715,7 @@ local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
 		TheUI.MouseScroll = 1;
 		SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		if (mi[1].d.hslider.percent == 0)
@@ -2761,7 +2761,7 @@ local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
 		TheUI.KeyScroll = 1;
 		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		if (mi[1].d.hslider.percent == 0)
@@ -2804,7 +2804,7 @@ local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
 		SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 		MustRedraw |= RedrawMenu;
 	    }
@@ -2844,7 +2844,7 @@ local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
 		SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 		MustRedraw |= RedrawMenu;
 	    }
@@ -2885,7 +2885,7 @@ local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
 		cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 		MustRedraw |= RedrawMenu;
 	    }
@@ -3880,6 +3880,7 @@ global void MenuHandleMouseMove(int x,int y)
 			    continue;
 			}
 			j = x - xs;
+			j -= 6;
 			if (j < 20) {
 			    mi->d.hslider.cursel |= MI_CFLAGS_LEFT;
 			} else if (j > mi->d.hslider.xsize - 20) {
