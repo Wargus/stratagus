@@ -150,8 +150,10 @@ global void SetVideoSync(void)
 
 /**
 **	X11 get ticks in ms.
+**
+**	@return		Game ticks in ms.
 */
-long X11GetTicks(void)
+local long X11GetTicks(void)
 {
     struct timeval now;
     long ticks;

@@ -131,8 +131,10 @@ global void SetVideoSync(void)
 
 /**
 **	SVGALib get ticks in ms.
+**
+**	@return		Game ticks in ms.
 */
-long SVGALibGetTicks(void)
+local long SVGALibGetTicks(void)
 {
     struct timeval now;
     long ticks;
