@@ -549,10 +549,8 @@ global int PlayerCheckLimits(const Player* player,const UnitType* type)
 	}
     }
 
-    // FIXME: need a general notify function
-    if( player==ThisPlayer ) {
-	SetMessage("Cannot create more units.");
-    } else {
+    NotifyPlayer(player,NotifyYellow,0,0,"Cannot create more units.");
+    if( player->Ai ) {
 	// AiNoMoreUnits(player,type);
     }
     return 0;
@@ -572,10 +570,8 @@ global int PlayerCheckFood(const Player* player,const UnitType* type)
     // FIXME: currently all units costs 1 food
 
     if( player->Food<player->NumFoodUnits+type->Demand ) {
-	// FIXME: need a general notify function
-	if( player==ThisPlayer ) {
-	    SetMessage("Not enough food...build more farms.");
-	} else {
+	NotifyPlayer(player,NotifyYellow,0,0,"Not enough food...build more farms.");
+	if( player->Ai ) {
 	    // FIXME: message to AI, called too much
 	    DebugLevel3("Ai: Not enough food...build more farms.\n");
 	}
@@ -597,21 +593,16 @@ global int PlayerCheckCosts(const Player* player,const int* costs)
 {
     int i;
     int err;
-    char buf[128];
 
     err=0;
     for( i=1; i<MaxCosts; ++i ) {
 	if( player->Resources[i]<costs[i] ) {
-	    // FIXME: noticed all or only one?
-	    if( !err ) {
-		sprintf(buf,"Not enough %s...%s more %s."
-			,DefaultResourceNames[i],DefaultActions[i],DefaultResourceNames[i]);
-		//	FIXME: use the general notify function vor this
-		if( player==ThisPlayer ) {
-		    SetMessage(buf);
-		} else {
-		    DebugLevel3("Ai: %s.\n" _C_ buf);
-		}
+	    NotifyPlayer(player,NotifyYellow,0,0,"Not enough %s...%s more %s.",
+			DefaultResourceNames[i],DefaultActions[i],DefaultResourceNames[i]);
+
+	    if( player->Ai ) {
+		DebugLevel3("Ai: Not enough %s...%s more %s." _C_
+			DefaultResourceNames[i] _C_ DefaultActions[i] _C_ DefaultResourceNames[i]);
 	    }
 	    err|=1<<i;
 	}

@@ -101,10 +101,7 @@ local Order* GetNextOrder(Unit* unit,int flush)
 	// FIXME: johns: wrong place for an error message.
 	// FIXME: johns: should be checked by AI or the user interface
 	// NOTE: But must still be checked here.
-	if( unit->Player==ThisPlayer ) {
-	    // FIXME: use a general notify call
-            SetMessage( "Unit order list is full" );
-	}
+	NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,"Unit order list is full" );
 	return NULL;
     }
 
