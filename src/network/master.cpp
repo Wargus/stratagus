@@ -265,16 +265,17 @@ int SendMetaCommand(char* command, char* format, ...)
 		} else {              /* glibc 2.0 */
 			size *= 2;    /* twice the old size */
 		}
-		if ((p = realloc(p, size)) == NULL) {
+		if ((p = realloc(p, size + 1)) == NULL) {
 			return -1;
 		}
 	}
 	// Allocate the correct size
-	if ((s = realloc(s, size + strlen(s))) == NULL ) {
+	if ((s = realloc(s, size + strlen(s) + 1)) == NULL ) {
 		free(p);
 		return -1;
 	}
 	strcat(s, p);
+	strcat(s, "\n");
 	size = strlen(s);
 	ret = NetSendTCP(MetaServerFildes, s, size);
 	free(p);
