@@ -2292,6 +2292,9 @@ global void ProcessMenu(const char *menu_id, int loop)
     MustRedraw = RedrawEverything;
     if (loop) {
 	while (CurrentMenu != NULL) {
+	    if (!(FrameCounter % ((VideoSyncSpeed * CYCLES_PER_SECOND)/50))) {
+		PlaySectionMusic(PlaySectionUnknown);
+	    }
 	    DebugLevel3("MustRedraw: 0x%08x\n" _C_ MustRedraw);
 	    if (MustRedraw) {
 		if (CurrentMenu->image == ScPanel) {
