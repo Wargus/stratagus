@@ -296,24 +296,24 @@ typedef struct _player_ Player;		/// player typedef
 
     ///	Player structure
 struct _player_ {
-    unsigned	Player;			/// player as number
+    int		Player;			/// player as number
     char*	Name;			/// name of non computer
 
-    unsigned	Type;			/// type of player (human,computer,...)
+    int		Type;			/// type of player (human,computer,...)
     char*	RaceName;		/// name of race
-    unsigned	Race;			/// race of player (orc,human,...)
-    unsigned	AiNum;			/// AI for computer
+    int		Race;			/// race of player (orc,human,...)
+    int		AiNum;			/// AI for computer
 
     // friend enemy detection
-    unsigned	Team;			/// team of player
+    int		Team;			/// team of player
     unsigned	Enemy;			/// enemy bit field for this player
     unsigned	Allied;			/// allied bit field for this player
 
-    unsigned	StartX;			/// map tile start X position
-    unsigned	StartY;			/// map tile start Y position
+    int		StartX;			/// map tile start X position
+    int		StartY;			/// map tile start Y position
 
-    unsigned	Resources[MaxCosts];	/// resources in store
-    unsigned	LastResources[MaxCosts];	/// last values for revenue
+    int		Resources[MaxCosts];	/// resources in store
+    int		LastResources[MaxCosts];	/// last values for revenue
     int		Incomes[MaxCosts];	/// income of the resources
     int		Revenue[MaxCosts];	/// income rate of the resources
 
@@ -322,29 +322,29 @@ struct _player_ {
 //	(UnitTypeMax+BitsOf(unsigned)-1)
 //	    /BitsOf(unsigned)];		/// flags what units are available
     // FIXME: shouldn't use the constant
-    unsigned    UnitTypesCount[UnitTypeMax];	/// total units of unit-type
+    int		UnitTypesCount[UnitTypeMax];	/// total units of unit-type
 
-    unsigned	AiEnabled;		/// handle AI on local computer
+    int		AiEnabled;		/// handle AI on local computer
     void*	Ai;			/// Ai structure pointer
 
     Unit**	Units;			/// units of this player
-    unsigned	TotalNumUnits;		/// total # units for units' list
+    int		TotalNumUnits;		/// total # units for units' list
 
-    unsigned	NumFoodUnits;		/// # units (need food)
-    unsigned	NumBuildings;		/// # buildings (don't need food)
+    int		NumFoodUnits;		/// # units (need food)
+    int		NumBuildings;		/// # buildings (don't need food)
 
-    unsigned	Food;			/// food available/produced
-    unsigned	FoodUnitLimit;		/// # food units allowed
-    unsigned	BuildingLimit;		/// # buildings allowed
-    unsigned	TotalUnitLimit;		/// # total unit number allowed
-    unsigned	LastRepairResource;	/// last resource for repair cycles
+    int		Food;			/// food available/produced
+    int		FoodUnitLimit;		/// # food units allowed
+    int		BuildingLimit;		/// # buildings allowed
+    int		TotalUnitLimit;		/// # total unit number allowed
+    int		LastRepairResource;	/// last resource for repair cycles
 
-    unsigned	Score;			/// Points for killing ...
-    unsigned	TotalUnits;
-    unsigned	TotalBuildings;
-    unsigned	TotalResources[MaxCosts];
-    unsigned	TotalRazings;
-    unsigned	TotalKills;		/// How many unit killed
+    int		Score;			/// Points for killing ...
+    int		TotalUnits;
+    int		TotalBuildings;
+    int		TotalResources[MaxCosts];
+    int		TotalRazings;
+    int		TotalKills;		/// How many unit killed
 
 // Display video
     unsigned	Color;			/// color of units on minimap
