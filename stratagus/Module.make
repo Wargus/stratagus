@@ -27,6 +27,7 @@
 
 MODULE = src/stratagus
 MSRC =   script.c script_player.c stratagus.c construct.c groups.c iolib.c \
-         mainloop.c player.c pud.c selection.c spells.c script_spell.c util.c
+         mainloop.c player.c pud.c selection.c spells.c script_spell.c util.c \
+         script_missile.c missile.c
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
