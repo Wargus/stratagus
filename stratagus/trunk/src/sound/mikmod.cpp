@@ -62,9 +62,40 @@ typedef struct _mikmod_data_ {
 
 #define MIKMOD_BUFFER_SIZE (1024 * 32)
 
+static CLFile *ModFile;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+static BOOL Seek(struct MREADER* mreader, long off, int whence)
+{
+	return CLseek(ModFile, off, whence);
+}
+
+static long Tell(struct MREADER* mreader)
+{
+	return CLseek(ModFile, 0, SEEK_CUR);
+}
+
+static BOOL Read(struct MREADER* mreader, void *buf, size_t len)
+{
+	return CLread(ModFile, buf, len);
+}
+
+static int Get(struct MREADER* mreader)
+{
+	char c;
+	CLread(ModFile, &c, 1);
+	return c;
+}
+
+static BOOL Eof(struct MREADER* mreader)
+{
+	return 0;
+}
+
+static MREADER MReader = { Seek, Tell, Read, Get, Eof };
 
 /**
 **  Type member function to read from the module
@@ -115,6 +146,7 @@ local void MikModFree(Sample* sample)
 
 	data = (MikModData*)sample->User;
 
+	CLclose(ModFile);
 	Player_Stop();
 	Player_Free(data->MikModModule);
 	MikMod_Exit();
@@ -160,7 +192,8 @@ global Sample* LoadMikMod(const char* name, int flags __attribute__((unused)))
 	MikMod_Init("");
 
 	strcpy(s, name);
-	data->MikModModule = Player_Load(s, 64, 0);
+	ModFile = CLopen(name, CL_OPEN_READ);
+	data->MikModModule = Player_LoadGeneric(&MReader, 64, 0);
 	if (!data->MikModModule) {
 		MikMod_Exit();
 		free(data->Buffer);
