@@ -737,7 +737,8 @@ local SCM CclUnit(SCM list)
 		unit->Player->UnitTypesCount[type->Type]--;
 	    }
 #ifdef NEW_FOW
-	    if( unit->Orders[0].Action==UnitActionDie ) {
+	    if( unit->Orders[0].Action==UnitActionDie &&
+		unit->Type->CorpseScript ) {
 		MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2,
 					unit->Y+unit->Type->TileHeight/2,
 					unit->CurrentSightRange);
