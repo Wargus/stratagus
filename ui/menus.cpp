@@ -4682,7 +4682,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	menu->Items[3].flags = MenuButtonDisabled;
     }
 
-    if (MetaServerInUse){
+    if (MetaServerInUse) {
 	ChangeGameServer();
     }
 }
@@ -4808,7 +4808,7 @@ local void MultiGameSetupInit(Menuitem *mi)
     MultiGamePlayerSelectorsUpdate(1);
     DebugLevel3Fn("h = %d, NetPlayers = %d\n" _C_ h _C_ NetPlayers);
 
-    if (MetaServerInUse){
+    if (MetaServerInUse) {
 	ChangeGameServer();
     }
 
@@ -7322,7 +7322,8 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     if (RecvMetaReply(&reply) == -1) {
 	//TODO: Notify player that connection was aborted...
 	nummenus = 0;
-    } else {
+    } 
+    else {
 	GetMetaParameter(reply, 0, &parameter);
 	nummenus = atoi(parameter);
     }
@@ -7340,14 +7341,15 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 	// Check if connection to meta server is there.
 
 	SendMetaCommand("GameNumber","%d\n",k + 1); 
-	i=RecvMetaReply(&reply);
+	i = RecvMetaReply(&reply);
 	if (i == 0) {
 	    // fill the menus with the right info.
 	    menu->Items[j].d.text.text = NULL; 
 	    menu->Items[j + 1].d.text.text = NULL;
 	    menu->Items[j + 2].d.text.text = NULL;
 	    menu->Items[j + 3].d.text.text = NULL;
-	} else {
+	} 
+	else {
 	    GetMetaParameter(reply, 0, &parameter);  // Player Name
 	    menu->Items[j].d.text.text = parameter;
 	   
@@ -7391,15 +7393,15 @@ local void SelectGameServer(Menuitem *mi)
     char *port;
     int j;
 
-    j=mi - mi->menu->Items;
-    mi->menu->Items[j].d.gem.state=MI_GSTATE_UNCHECKED;
+    j = mi - mi->menu->Items;
+    mi->menu->Items[j].d.gem.state = MI_GSTATE_UNCHECKED;
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
     EndMenu();
 
-    strcpy(server_host_buffer,mi->menu->Items[j-4].d.text.text);
+    strcpy(server_host_buffer, mi->menu->Items[j-4].d.text.text);
 
 
     //Launch join directly
@@ -7463,9 +7465,12 @@ local void ChangeGameServer(void)
 {
     //send message to meta server. meta server will detect IP address.
     //Meta-server will return "ERR" if the list of online games is busy.
-    int i,freespots,players; 
-    freespots=0;
-    players=0;
+    int i;
+    int freespots;
+    int	players; 
+
+    freespots = 0;
+    players = 0;
     for (i = 0; i < PlayerMax - 1; ++i) {
 	if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
 	    ++players;
@@ -7498,7 +7503,7 @@ local int MetaServerConnectError(void)
 local void MultiMetaServerClose(void)
 {
     MetaClose();
-    MetaServerInUse=0;
+    MetaServerInUse = 0;
     EndMenu();
 }
 //@}
