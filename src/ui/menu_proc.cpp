@@ -102,8 +102,6 @@ local int MenuRedrawH;
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
 
-local int DrawScPanel;
-
 /*----------------------------------------------------------------------------
 --	Menu operation functions
 ----------------------------------------------------------------------------*/
@@ -714,10 +712,6 @@ global void DrawMenu(Menu *menu)
 
     switch (menu->image) {
 	case ScPanel:
-	    if (!DrawScPanel) {
-		break;
-	    }
-	    DrawScPanel = 0;
 	    // Background
 	    VideoFill50TransRectangle(ColorBlack,MenuRedrawX+1,MenuRedrawY+1,MenuRedrawW-2,MenuRedrawH-2);
 	    VideoDrawHLineClip(ColorBlue,MenuRedrawX+3,MenuRedrawY,MenuRedrawW-6);
@@ -1791,7 +1785,6 @@ global void EndMenu(void)
     CurrentMenu = NULL;
 
     MustRedraw = RedrawEverything;
-    DrawScPanel = 1;
 }
 
 /**
@@ -1897,8 +1890,10 @@ global void ProcessMenu(const char *menu_id, int loop)
 	while (CurrentMenu != NULL) {
 	    DebugLevel3("MustRedraw: 0x%08x\n" _C_ MustRedraw);
 	    if (MustRedraw) {
+		if (CurrentMenu->image == ScPanel) {
+		    MustRedraw = RedrawEverything;
+		}
 		if (MustRedraw == RedrawEverything) {
-		    DrawScPanel = 1;
 		    InterfaceState = IfaceStateNormal;
 		    UpdateDisplay();
 		    InterfaceState = IfaceStateMenu;
