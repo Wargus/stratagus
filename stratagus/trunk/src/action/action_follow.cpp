@@ -112,9 +112,9 @@ global void HandleActionFollow(Unit* unit)
 	    // FIXME: dark portal teleportation: Goal is used for target circle of power
 	    // FIXME: teleporting of units should use dark portal's mana
 	    if( (goal=unit->Orders[0].Goal) && 
-		goal->Type->Teleporter && goal->Goal &&
-		MapDistanceBetweenUnits( unit, goal ) < 4 )
-	      {
+		    goal->Type->Teleporter && goal->Goal &&
+		    MapDistanceBetweenUnits( unit, goal ) < 4 ) {
+	      RemoveUnit(unit);
 	      unit->X = goal->Goal->X;
 	      unit->Y = goal->Goal->Y;
 	      DropOutOnSide(unit,unit->Direction,1,1);
@@ -122,8 +122,10 @@ global void HandleActionFollow(Unit* unit)
 	      PlayGameSound(SoundIdForName("invisibility"),MaxSampleVolume);
 	      //FIXME: MissileTypeByIdent() should be called once
 	      MakeMissile(MissileTypeByIdent("missile-normal-spell"),
-	        	unit->X*TileSizeX+TileSizeX/2, unit->Y*TileSizeY+TileSizeY/2,
-			unit->X*TileSizeX+TileSizeX/2, unit->Y*TileSizeY+TileSizeY/2 );
+	        	unit->X*TileSizeX+TileSizeX/2,
+			unit->Y*TileSizeY+TileSizeY/2,
+			unit->X*TileSizeX+TileSizeX/2,
+			unit->Y*TileSizeY+TileSizeY/2 );
 	    }
 	
 	    if( !(goal=unit->Orders[0].Goal) ) {// goal has died
