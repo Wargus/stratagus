@@ -37,6 +37,9 @@
 -- Documentation
 ----------------------------------------------------------------------------*/
 
+struct _CL_File_;
+struct lua_State;
+
 /**
 **  @struct _unit_type_ unittype.h
 **
@@ -943,7 +946,6 @@ extern struct _UnitTypeVar_{
 --  Functions
 ----------------------------------------------------------------------------*/
 
-struct lua_State;
 extern UnitType* CclGetUnitType(struct lua_State* l);  ///< Access unit-type object
 extern void UnitTypeCclRegister(void);          ///< Register ccl features
 
@@ -956,8 +958,8 @@ extern int GetVariableIndex(const char *VarName); ///< Get index of the variable
 	/// Get the animations structure by ident
 extern Animations* AnimationsByIdent(const char* ident);
 
-extern void SaveUnitTypes(CLFile* file);        ///< Save the unit-type table
-extern UnitType* NewUnitTypeSlot(char*);        ///< Allocate an empty unit-type slot
+extern void SaveUnitTypes(struct _CL_File_* file);  ///< Save the unit-type table
+extern UnitType* NewUnitTypeSlot(char*);            ///< Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
 extern void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y);
 

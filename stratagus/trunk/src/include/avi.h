@@ -31,14 +31,10 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-#include "iolib.h"
-
-/*----------------------------------------------------------------------------
---  Declaration
-----------------------------------------------------------------------------*/
+struct _CL_File_;
 
 /**
 **  Avi frame buffer typedef
@@ -60,7 +56,7 @@ struct _avi_frame_buffer_ {
 **  Avi file handle structure
 */
 typedef struct _avi_file_ {
-	CLFile*          FileHandle;       ///< File handle
+	struct _CL_File_* FileHandle;      ///< File handle
 	// Video streams
 	char             VideoCodec[8];    ///< Video codec
 	int              Width;            ///< Video frame width

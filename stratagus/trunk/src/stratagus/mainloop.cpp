@@ -68,6 +68,7 @@
 #include "cdaudio.h"
 #include "pathfinder.h"
 #include "editor.h"
+#include "sound.h"
 
 #ifdef USE_SDLCD
 #include "SDL.h"

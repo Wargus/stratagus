@@ -60,6 +60,7 @@
 #include "ui.h"
 #include "script.h"
 #include "editor.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
   -- Variables

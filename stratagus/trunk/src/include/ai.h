@@ -34,10 +34,14 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-#include "player.h"
+struct _player_;
+struct _CL_File_;
+struct _unit_;
+struct _unit_type_;
+struct _upgrade_;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -51,13 +55,13 @@ extern int AiCostFactor;   ///< Adjust the AI costs
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void AiEachCycle(Player* player);   ///< Called each game cycle
-extern void AiEachSecond(Player* player);  ///< Called each second
+extern void AiEachCycle(struct _player_* player);   ///< Called each game cycle
+extern void AiEachSecond(struct _player_* player);  ///< Called each second
 
 extern void InitAiModule(void);       ///< Init AI global structures
-extern void AiInit(Player* player);   ///< Init AI for this player
+extern void AiInit(struct _player_* player);   ///< Init AI for this player
 extern void CleanAi(void);            ///< Cleanup the AI module
-extern void SaveAi(CLFile* file);     ///< Save the AI state
+extern void SaveAi(struct _CL_File_* file);     ///< Save the AI state
 
 extern void AiCclRegister(void);      ///< Register ccl features
 
@@ -66,25 +70,31 @@ extern void AiCclRegister(void);      ///< Register ccl features
 --------------------------------------------------------*/
 
 	/// Called if AI unit is attacked
-extern void AiHelpMe(const Unit* attacker, Unit* defender);
+extern void AiHelpMe(const struct _unit_* attacker, struct _unit_* defender);
 	/// Called if AI unit is killed
-extern void AiUnitKilled(Unit* unit);
+extern void AiUnitKilled(struct _unit_* unit);
 	/// Called if AI needs more farms
-extern void AiNeedMoreSupply(const Unit* unit, const UnitType* what);
+extern void AiNeedMoreSupply(const struct _unit_* unit,
+	const struct _unit_type_* what);
 	/// Called if AI unit has completed work
-extern void AiWorkComplete(Unit* unit,Unit* what);
+extern void AiWorkComplete(struct _unit_* unit, struct _unit_* what);
 	/// Called if AI unit can't build
-extern void AiCanNotBuild(Unit* unit, const UnitType* what);
+extern void AiCanNotBuild(struct _unit_* unit,
+	const struct _unit_type_* what);
 	/// Called if AI unit can't reach building place
-extern void AiCanNotReach(Unit* unit, const UnitType* what);
+extern void AiCanNotReach(struct _unit_* unit,
+	const struct _unit_type_* what);
 	/// Called if an AI unit can't move
-extern void AiCanNotMove(Unit* unit);
+extern void AiCanNotMove(struct _unit_* unit);
 	/// Called if AI unit has completed training
-extern void AiTrainingComplete(Unit* unit, Unit* what);
+extern void AiTrainingComplete(struct _unit_* unit,
+	struct _unit_* what);
 	/// Called if AI unit has completed upgrade to
-extern void AiUpgradeToComplete(Unit* unit, const UnitType* what);
+extern void AiUpgradeToComplete(struct _unit_* unit,
+	const struct _unit_type_* what);
 	/// Called if AI unit has completed research
-extern void AiResearchComplete(Unit* unit, const Upgrade* what);
+extern void AiResearchComplete(struct _unit_* unit,
+	const struct _upgrade_* what);
 
 //@}
 
