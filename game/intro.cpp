@@ -337,7 +337,7 @@ global void ShowIntro(const Intro *intro)
     int OldVideoSyncSpeed;
 
     UseContinueButton=1;
-    InitContinueButton(455,480-40);
+    InitContinueButton((VideoWidth-640)/2+455,(VideoHeight-480)/2+440);
     GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 
@@ -531,7 +531,7 @@ global void ShowCredits(Credits *credits)
     }
 
     UseContinueButton=1;
-    InitContinueButton(455,480-40);
+    InitContinueButton((VideoWidth-640)/2+455,(VideoHeight-480)/2+440);
     GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 
@@ -1133,7 +1133,7 @@ global void ShowStats(void)
     VideoUnlockScreen();
 
     UseContinueButton=1;
-    InitContinueButton(455,480-40);
+    InitContinueButton((VideoWidth-640)/2+455,(VideoHeight-480)/2+440);
     GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 
