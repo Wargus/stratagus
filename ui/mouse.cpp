@@ -870,6 +870,13 @@ global void UIHandleButtonDown(int b)
 	    }
 	    return;
 	}
+	if( CursorOn==CursorOnButton ) {
+	    // FIXME: other buttons?
+	    if( ButtonUnderCursor>9 ) {
+		DoButtonButtonClicked(ButtonUnderCursor-10);
+		return;
+	    }
+	}
 	ClearStatusLine();
 	ClearCosts();
 	CursorState=CursorStatePoint;
