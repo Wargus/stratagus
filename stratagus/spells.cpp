@@ -447,6 +447,66 @@ int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 	return 0;
 }
 
+
+/**
+**  Adjust User Variables.
+**
+**  @param caster    Unit that casts the spell
+**  @param spell     Spell-type pointer
+**  @param target    Target unit that spell is addressed to
+**  @param x         X coord of target spot when/if target does not exist
+**  @param y         Y coord of target spot when/if target does not exist
+**
+**  @return          =!0 if spell should be repeated, 0 if not
+*/
+int CastAdjustVariable(Unit* caster, const SpellType* spell,
+	const SpellActionType* action, Unit* target, int x, int y)
+{
+	int index;     // index of the variable.
+	Unit* unit;    // unit to modify.
+
+	Assert(action);
+
+	index = action->Data.AdjustVariable.Index;
+	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
+	unit = (action->Data.AdjustVariable.TargetIsCaster) ? caster : target;
+	Assert(unit);
+
+	// Enable flag.
+	if (action->Data.AdjustVariable.ModifEnable) {
+		unit->Variable[index].Enable = action->Data.AdjustVariable.Enable;
+	}
+	unit->Variable[index].Enable ^= action->Data.AdjustVariable.InvertEnable;
+
+	// Max field
+	if (action->Data.AdjustVariable.ModifMax) {
+		unit->Variable[index].Max = action->Data.AdjustVariable.Max;
+	}
+	unit->Variable[index].Max += action->Data.AdjustVariable.AddMax;
+
+	// Increase field
+	if (action->Data.AdjustVariable.ModifIncrease) {
+		unit->Variable[index].Increase = action->Data.AdjustVariable.Increase;
+	}
+	unit->Variable[index].Increase += action->Data.AdjustVariable.AddIncrease;
+
+	// Value field
+	if (action->Data.AdjustVariable.ModifValue) {
+		unit->Variable[index].Value = action->Data.AdjustVariable.Value;
+	}
+	unit->Variable[index].Value += action->Data.AdjustVariable.AddValue;
+	unit->Variable[index].Value += action->Data.AdjustVariable.IncreaseTime
+		* unit->Variable[index].Increase;
+
+	if (unit->Variable[index].Value <= 0) {
+		unit->Variable[index].Value = 0;
+	} else if (unit->Variable[index].Value > unit->Variable[index].Max) {
+		unit->Variable[index].Value = unit->Variable[index].Max;
+	}
+	return 0;
+}
+
+
 /**
 ** Cast healing. (or exorcism)
 **
@@ -742,6 +802,35 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 		return 1;
 	}
 
+	for (i = 0; i < UnitTypeVar.NumberVariable; i++) { // for custom variables
+		const Unit *unit;
+
+		unit = (condition->Variable[i].ConditionApplyOnCaster) ? caster : target;
+		Assert(unit);
+		if (condition->Variable[i].Enable != CONDITION_TRUE) {
+			if ((condition->Variable[i].Enable == CONDITION_ONLY) ^ (unit->Variable[i].Enable)) {
+				return 0;
+			}
+		}
+	// Value and Max
+		if (condition->Variable[i].MinValue >= unit->Variable[i].Value) {
+			return 0;
+		}
+		if (condition->Variable[i].MinMax >= unit->Variable[i].Max) {
+			return 0;
+		}
+
+	// Percent
+		if (condition->Variable[i].MinValuePercent * unit->Variable[i].Max
+			> 100 * unit->Variable[i].Value) {
+			return 0;
+		}
+		if (condition->Variable[i].MaxValuePercent * unit->Variable[i].Max
+			< 100 * unit->Variable[i].Value) {
+			return 0;
+		}
+	}
+
 	if (!target) {
 		return 1;
 	}
@@ -755,7 +844,7 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 			return 0;
 		}
 	}
-	for (i = 0; i < NumberBoolFlag; ++i) { // User defined flags
+	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
 		if (condition->BoolFlag[i] != CONDITION_TRUE) {
 			if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
 				return 0;

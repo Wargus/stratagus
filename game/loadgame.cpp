@@ -69,6 +69,8 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+void InitDefinedVariables();
+
 /**
 **  Cleanup modules.
 **
@@ -111,6 +113,7 @@ void CleanModules(void)
 	MapSplitterClean();
 #endif
 	FreeAStar();
+	InitDefinedVariables(); // internal script. should be to a better place, don't find for restart.
 }
 
 /**
