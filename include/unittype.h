@@ -29,6 +29,358 @@
 //@{
 
 /*----------------------------------------------------------------------------
+--	Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**	@struct _unit_type_ unittype.h
+**
+**	\#include "unittype.h"
+**
+**	typedef struct _unit_type_ UnitType;
+**
+**	This structure contains the informations that are shared between all
+**	units of the same type and determins if an unit is a building,
+**	a person, ...
+**
+**	The unit-type structure members:
+**
+**	UnitType::OType
+**
+**		Object type (future extensions).
+**
+**	UnitType::Ident
+**
+**		Unique identifier of the unit-type, used to reference it in
+**		config files and during startup. As convention they start with
+**		"unit-" fe. "unit-farm".
+**		@note Don't use this member in game, use instead the pointer
+**		to this structure. See UnitTypeByIdent().
+**
+**	UnitType::Name
+**
+**		Pretty name shown by the engine. The name should be shorter
+**		than 17 characters and no word can be longer than 8 characters. 
+**
+**	UnitType::SameSprite
+**
+**		Identifier of an unit-type with this are the sprites shared.
+**
+**	UnitType::File[::TilesetMax]
+**
+**		Path file name of sprite files for the different tilesets.
+**		@note It is planned to change this to support more and 
+**		better tilesets.
+**
+**	UnitType::Width UnitType::Height
+**
+**		Size of a sprite frame in pixels. All frames of a sprite have
+**		the same size. Also all sprites (tilesets) must have the same
+**		size.
+**
+**	UnitType::Animations
+**
+**		Animation scripts for the different actions. Currently the
+**		animations still, move, attack and die are supported.
+**		@see Animations @see _animations_
+**		@see Animation @see _animation_
+**
+**	UnitType::Icon
+**
+**		Icon to display for this unit-type. Contains configuration and
+**		run time variable.
+**		@note This icon can be used for training, but isn't used.
+**
+**	UnitType::Missile
+**
+**		Configuration and run time variable of the missile weapon.
+**		@note It is planned to support more than one weapons.
+**		And the sound of the missile should be used as fire sound.
+**
+**	UnitType::CorpseName
+**
+**		Corpse unit-type name, should only be used during setup.
+**
+**	UnitType::CorpseType
+**
+**		Corpse unit-type pointer, only this should be used during run
+**		time. Many unit-types can share the same corpse.
+**
+**	UnitType::CorpseScript
+**
+**		Index into corpse animation script. Used if unit-types share
+**		the same corpse but have different animations.
+**
+**	UnitType::_Speed
+**
+**		Non upgraded movement speed.
+**		@note Until now we didn't support speed upgrades.
+**
+**	FIXME: continue this documentation
+**
+**	UnitType::Construction
+**
+**		What is shown in construction phase.
+**
+**	UnitType::SightRange
+**
+**		Sight range
+**
+**	UnitType::_HitPoints
+**
+**		Maximum hit points
+**
+**	UnitType::Magic
+**
+**		Unit can cast spells
+**
+**	UnitType::_Costs[::MaxCosts]
+**
+**		How many resources needed
+**
+**	UnitType::TileWidth
+**
+**		Tile size on map width
+**
+**	UnitType::TileHeight
+**
+**		Tile size on map height
+**
+**	UnitType::BoxWidth
+**
+**		Selected box size width
+**
+**	UnitType::BoxHeight
+**
+**		Selected box size height
+**
+**	UnitType::MinAttackRange
+**
+**		Minimal attack range
+**
+**
+**	UnitType::_AttackRange
+**
+**		How far can the unit attack
+**
+**	UnitType::ReactRangeComputer
+**
+**		Reacts on enemy for computer
+**
+**	UnitType::ReactRangePerson
+**
+**		Reacts on enemy for person player
+**
+**	UnitType::_Armor
+**
+**		Amount of armor this unit has
+**
+**	UnitType::Priority
+**
+**		Priority value / AI Treatment
+**
+**	UnitType::_BasicDamage
+**
+**		Basic damage dealt
+**
+**	UnitType::_PiercingDamage
+**
+**		Piercing damage dealt
+**
+**	UnitType::WeaponsUpgradable
+**
+**		Weapons could be upgraded
+**
+**	UnitType::ArmorUpgradable
+**
+**		Armor could be upgraded
+**
+**	UnitType::UnitType
+**
+**		Land / fly / naval
+**
+**		FIXME: original only visual effect, we do more with this!
+**
+**	UnitType::DecayRate
+**
+**		Decay rate in 1/6 seconds
+**
+**	UnitType::AnnoyComputerFactor
+**
+**		How much this annoys the computer
+**
+**		FIXME: not used
+**
+**	UnitType::MouseAction
+**
+**		Right click action
+**
+**	UnitType::Points
+**
+**		How many points you get for unit
+**
+**	UnitType::CanTarget
+**
+**		Which units can it attack
+**
+**	UnitType::LandUnit
+**
+**		Land animated
+**
+**	UnitType::AirUnit
+**
+**		Air animated
+**
+**	UnitType::SeaUnit
+**
+**		Sea animated
+**
+**	UnitType::ExplodeWhenKilled
+**
+**		Death explosion animated
+**
+**	UnitType::Critter
+**
+**		Unit is controlled by nobody
+**
+**	UnitType::Building
+**
+**		Building
+**
+**	UnitType::Submarine
+**
+**		Is only visible by CanSeeSubmarine
+**
+**	UnitType::CanSeeSubmarine
+**
+**		Only this units can see Submarine
+**
+**	UnitType::CowerWorker
+**
+**		Is a worker, runs away if attcked
+**
+**	UnitType::Tanker
+**
+**		FIXME: used? Can transport oil
+**
+**	UnitType::Transporter
+**
+**		Can transport units
+**
+**	UnitType::GivesOil
+**
+**		We get here oil
+**
+**	UnitType::StoresGold
+**
+**		We can store oil/gold/wood here
+**
+**	UnitType::Vanishes
+**
+**		Corpes & destroyed places
+**
+**	UnitType::GroundAttack
+**
+**		Can do command ground attack
+**
+**	UnitType::IsUndead
+**
+**		Unit is already dead
+**
+**	UnitType::ShoreBuilding
+**
+**		Building must be build on coast
+**
+**	UnitType::CanCastSpell
+**
+**		Unit is able to use spells
+**
+**	UnitType::StoresWood
+**
+**		We can store wood here
+**
+**	UnitType::CanAttack
+**
+**		FIXME: docu
+**
+**	UnitType::Tower
+**
+**		FIXME: docu
+**
+**	UnitType::OilPatch
+**
+**		FIXME: docu
+**
+**	UnitType::GoldMine
+**
+**		FIXME: docu
+**
+**	UnitType::Hero
+**
+**		FIXME: docu
+**
+**	UnitType::StoresOil
+**
+**		We can store oil here
+**
+**	UnitType::Volatile
+**
+**		Invisiblity/unholy armor kills unit
+**
+**	UnitType::CowerMage
+**
+**		FIXME: docu
+**
+**	UnitType::Organic
+**
+**		Organic can be healed
+**
+**	UnitType::SelectableByRectangle
+**
+**		Selectable with mouse rectangle
+**
+**	UnitType::Teleporter
+**
+**		Can teleport other units.
+**
+**	UnitType::Sound
+**
+**		Sounds for events
+**
+**	UnitType::Weapon
+**
+**		Currently sound for weapon
+**
+**	FIXME: temporary solution
+**
+**	UnitType::Supply
+**
+**		Food supply
+**
+**	UnitType::Demand
+**
+**		Food demand
+**
+**	UnitType::Stats[PlayerMax]
+**
+**		Unit status for each player
+**	// FIXME: This stats should? be moved into the player struct
+**
+**	UnitType::Type
+**
+**		Type as number
+**	FIXME: Should us a general name f.e. Slot here?
+**
+**	UnitType::Property
+**
+**		CCL property storage
+**
+**	UnitType::Sprite
+**
+**		Sprite images
+*/
+
+/*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
 
@@ -39,6 +391,11 @@
 #include "upgrade_structs.h"
 #include "construct.h"
 
+#ifndef __STRUCT_MISSILETYPE__
+#define __STRUCT_MISSILETYPE__
+typedef struct _missile_type_ MissileType;         /// Missile-type typedef
+#endif
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -47,17 +404,17 @@
 **	Defines the animation for different actions.
 */
 typedef struct _animation_ {
-    char	Flags;			/// Flags for actions
-    char	Pixel;			/// Change the position in pixels
-    char	Sleep;			/// Wait for next animation
-    char	Frame;			/// Sprite-frame to display
+    unsigned char	Flags;		/// Flags for actions
+    signed char		Pixel;		/// Change the position in pixels
+    unsigned char	Sleep;		/// Wait for next animation
+    unsigned char	Frame;		/// Sprite-frame to display
 } Animation;
 
-#define AnimationRestart	1	/// restart animation
-#define AnimationReset		2	/// animation could here be aborted
-#define AnimationSound		4	/// play sound
-#define AnimationMissile	8	/// fire projectil
-#define AnimationEnd		0x80	/// animation end in memory
+#define AnimationRestart	1	/// Restart animation
+#define AnimationReset		2	/// Animation could here be aborted
+#define AnimationSound		4	/// Play sound
+#define AnimationMissile	8	/// Fire projectil
+#define AnimationEnd		0x80	/// Animation end in memory
 
 /**
 **	Define all animations scripts of an unittype.
@@ -70,19 +427,14 @@ typedef struct __animations__ {
     Animation**	Extend;			/// For future extensions
 } Animations;
 
-#ifndef __STRUCT_MISSILETYPE__
-#define __STRUCT_MISSILETYPE__
-typedef struct _missile_type_ MissileType;         /// missile-type typedef
-#endif
-
 /**
 **      Missile type definition (used in config tables)
 **
 **	@todo Shouldn't I move this into missle.h?
 */
 typedef struct _missile_config_ {
-    char*	Name;			/// config missile name
-    MissileType*Missile;		/// identifier to use to run time
+    char*	Name;			/// Config missile name
+    MissileType*Missile;		/// Identifier to use to run time
 } MissileConfig;
 
 /**
@@ -90,63 +442,58 @@ typedef struct _missile_config_ {
 */
 typedef struct _unit_type_ UnitType;
 
-/**
-**	Base structure of unit-type
-**
-**	Contains all informations for a special unit-type.
-**	Appearance, features...
-*/
+    /// Base structure of unit-type
 struct _unit_type_ {
     const void*	OType;			/// Object type (future extensions)
 
-    char*	Ident;			/// identifier
-    char*	Name;			/// unit name shown from the engine
-    char*	SameSprite;		/// unit-type shared sprites
-    char*	File[4/*TilesetMax*/];	/// sprite files
+    char*	Ident;			/// Identifier
+    char*	Name;			/// Pretty name shown from the engine
+    char*	SameSprite;		/// Unit-type shared sprites
+    char*	File[4/*TilesetMax*/];	/// Sprite files
 
-    int		Width;			/// sprite width
-    int		Height;			/// sprite height
+    int		Width;			/// Sprite width
+    int		Height;			/// Sprite height
 
-    Animations*	Animations;		/// animation scripts
+    Animations*	Animations;		/// Animation scripts
 
-    IconConfig	Icon;			/// icon to display for this unit
-    MissileConfig Missile;		/// missile weapon
+    IconConfig	Icon;			/// Icon to display for this unit
+    MissileConfig Missile;		/// Missile weapon
 
-    char*	CorpseName;		/// corpse type name
-    UnitType*	CorpseType;		/// corpse unit-type
-    int		CorpseScript;		/// corpse script start
+    char*	CorpseName;		/// Corpse type name
+    UnitType*	CorpseType;		/// Corpse unit-type
+    int		CorpseScript;		/// Corpse script start
 
-    int		_Speed;			/// movement speed
+    int		_Speed;			/// Movement speed
 
 // this is taken from the UDTA section
-    Construction*Construction;		/// what is shown in construction phase
-    int		_SightRange;		/// sight range
-    unsigned	_HitPoints;		/// maximum hit points
+    Construction*Construction;		/// What is shown in construction phase
+    int		_SightRange;		/// Sight range
+    unsigned	_HitPoints;		/// Maximum hit points
     // FIXME: only flag
     int		Magic;			/// Unit can cast spells
 
-    int		_Costs[MaxCosts];	/// how many resources needed
+    int		_Costs[MaxCosts];	/// How many resources needed
 
-    int		TileWidth;		/// tile size on map width
-    int		TileHeight;		/// tile size on map height
-    int		BoxWidth;		/// selected box size width
-    int		BoxHeight;		/// selected box size height
-    int		MinAttackRange;		/// minimal attack range
-    int		_AttackRange;		/// how far can the unit attack
-    int		ReactRangeComputer;	/// reacts on enemy for computer
-    int		ReactRangePerson;	/// reacts on enemy for person player
-    int		_Armor;			/// amount of armor this unit has
+    int		TileWidth;		/// Tile size on map width
+    int		TileHeight;		/// Tile size on map height
+    int		BoxWidth;		/// Selected box size width
+    int		BoxHeight;		/// Selected box size height
+    int		MinAttackRange;		/// Minimal attack range
+    int		_AttackRange;		/// How far can the unit attack
+    int		ReactRangeComputer;	/// Reacts on enemy for computer
+    int		ReactRangePerson;	/// Reacts on enemy for person player
+    int		_Armor;			/// Amount of armor this unit has
     int		Priority;		/// Priority value / AI Treatment
     int		_BasicDamage;		/// Basic damage dealt
     int		_PiercingDamage;	/// Piercing damage dealt
     int		WeaponsUpgradable;	/// Weapons could be upgraded
     int		ArmorUpgradable;	/// Armor could be upgraded
-    //int	MissileWeapon;		/// Missile type used when it attacks
-    int		UnitType;		/// land / fly / naval
     // FIXME: original only visual effect, we do more with this!
-#define UnitTypeLand	0			/// Unit lives on land
-#define UnitTypeFly	1			/// Unit lives in air
-#define UnitTypeNaval	2			/// Unit lives on water
+    enum {
+	UnitTypeLand,			/// Unit lives on land
+	UnitTypeFly,			/// Unit lives in air
+	UnitTypeNaval,			/// Unit lives on water
+    }		UnitType;		/// Land / fly / naval
     int		DecayRate;		/// Decay rate in 1/6 seconds
     // FIXME: not used
     int		AnnoyComputerFactor;	/// How much this annoys the computer
@@ -159,10 +506,10 @@ struct _unit_type_ {
 #define MouseActionDemolish	5		/// Demolish
 #define MouseActionSail		6		/// Sail
     int		Points;			/// How many points you get for unit
-    int		CanTarget;		/// which units can it attack
-#define CanTargetLand	1			/// can attack land units
-#define CanTargetSea	2			/// can attack sea units
-#define CanTargetAir	4			/// can attack air units
+    int		CanTarget;		/// Which units can it attack
+#define CanTargetLand	1			/// Can attack land units
+#define CanTargetSea	2			/// Can attack sea units
+#define CanTargetAir	4			/// Can attack air units
 
     unsigned LandUnit : 1;		/// Land animated
     unsigned AirUnit : 1;		/// Air animated
@@ -174,14 +521,14 @@ struct _unit_type_ {
     unsigned CanSeeSubmarine : 1;	/// Only this units can see Submarine
     unsigned CowerWorker : 1;		/// Is a worker, runs away if attcked
     unsigned Tanker : 1;		/// FIXME: used? Can transport oil
-    unsigned Transporter : 1;		/// can transport units
+    unsigned Transporter : 1;		/// Can transport units
     unsigned GivesOil : 1;		/// We get here oil
     unsigned StoresGold : 1;		/// We can store oil/gold/wood here
     unsigned Vanishes : 1;		/// Corpes & destroyed places
     unsigned GroundAttack : 1;		/// Can do command ground attack
-    unsigned IsUndead : 1;		/// FIXME: docu
-    unsigned ShoreBuilding : 1;		/// FIXME: docu
-    unsigned CanCastSpell : 1;		/// FIXME: docu
+    unsigned IsUndead : 1;		/// Unit is already dead
+    unsigned ShoreBuilding : 1;		/// Building must be build on coast
+    unsigned CanCastSpell : 1;		/// Unit is able to use spells
     unsigned StoresWood : 1;		/// We can store wood here
     unsigned CanAttack : 1;		/// FIXME: docu
     unsigned Tower : 1;			/// FIXME: docu
@@ -189,20 +536,21 @@ struct _unit_type_ {
     unsigned GoldMine : 1;		/// FIXME: docu
     unsigned Hero : 1;			/// FIXME: docu
     unsigned StoresOil : 1;		/// We can store oil here
-    unsigned Volatile : 1;		/// invisiblity/unholy armor kills unit
+    unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit
     unsigned CowerMage : 1;		/// FIXME: docu
-    unsigned Organic : 1;		/// organic
+    unsigned Organic : 1;		/// Organic can be healed
 
-    unsigned SelectableByRectangle : 1;	/// selectable with mouse rectangle
+    unsigned SelectableByRectangle : 1;	/// Selectable with mouse rectangle
+    unsigned Teleporter : 1;		/// Can teleport other units.
 
-    UnitSound Sound;			/// sounds for events
+    UnitSound Sound;			/// Sounds for events
     // FIXME: temporary solution
-    WeaponSound Weapon;                 /// currently sound for weapon
-
-// --- FILLED UP ---
+    WeaponSound Weapon;                 /// Currently sound for weapon
 
     unsigned	Supply;			/// Food supply
     unsigned	Demand;			/// Food demand
+
+// --- FILLED UP ---
 
 	// FIXME: This stats should? be moved into the player struct
     UnitStats Stats[PlayerMax];		/// Unit status for each player
@@ -212,10 +560,10 @@ struct _unit_type_ {
 
     void*	Property;		/// CCL property storage
 
-    Graphic*	Sprite;			/// sprite images
+    Graphic*	Sprite;			/// Sprite images
 };
 
-    // FIXME: ARI: should be dynamic (ccl..)
+    // FIXME: ARI: should be dynamic (ccl..), JOHNS: Pud only supports 255.
     /// How many unit-types are currently supported
 #define UnitTypeMax	0xFF
 
@@ -223,15 +571,16 @@ struct _unit_type_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern const char UnitTypeType[];	/// unit-type type
-extern UnitType* UnitTypes;		/// all unit-types
-extern int NumUnitTypes;		/// number of unit-types made
+extern const char UnitTypeType[];	/// Unit-type type
+extern UnitType* UnitTypes;		/// All unit-types
+extern int NumUnitTypes;		/// Number of unit-types made
 
+// FIXME: this hardcoded unit-types must be removed!!
 extern UnitType*UnitTypeGoldMine;	/// Gold-mine unit-type pointer
-extern UnitType*UnitTypeHumanTanker;	/// orc tanker unit-type pointer
-extern UnitType*UnitTypeOrcTanker;	/// human tanker unit-type pointer
-extern UnitType*UnitTypeHumanTankerFull;/// orc tanker full unit-type pointer
-extern UnitType*UnitTypeOrcTankerFull;	/// human tanker full unit-type pointer
+extern UnitType*UnitTypeHumanTanker;	/// Orc tanker unit-type pointer
+extern UnitType*UnitTypeOrcTanker;	/// Human tanker unit-type pointer
+extern UnitType*UnitTypeHumanTankerFull;/// Orc tanker full unit-type pointer
+extern UnitType*UnitTypeOrcTankerFull;	/// Human tanker full unit-type pointer
 extern UnitType*UnitTypeHumanWorker;	/// Human worker
 extern UnitType*UnitTypeOrcWorker;	/// Orc worker
 extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
@@ -249,22 +598,21 @@ extern char** UnitTypeWcNames;		/// Mapping wc-number 2 symbol
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void UnitTypeCclRegister(void);	/// register ccl features
+extern void UnitTypeCclRegister(void);	/// Register ccl features
 
-extern void PrintUnitTypeTable(void);	/// generate c-table
-extern void UpdateStats(void);		/// update unit stats
-extern void ParsePudUDTA(const char*,int); /// parse pud udta table
-extern UnitType* UnitTypeByIdent(const char*);	/// get unit-type by ident
-extern UnitType* UnitTypeByWcNum(unsigned);	/// get unit-type by wc number
+extern void UpdateStats(void);		/// Update unit stats
+extern void ParsePudUDTA(const char*,int); /// Parse pud udta table
+extern UnitType* UnitTypeByIdent(const char*);	/// Get unit-type by ident
+extern UnitType* UnitTypeByWcNum(unsigned);	/// Get unit-type by wc number
 
-extern void SaveUnitTypes(FILE* file);	/// save the unit-type table
-extern UnitType* NewUnitTypeSlot(char*);/// allocate an empty unit-type slot
+extern void SaveUnitTypes(FILE* file);	/// Save the unit-type table
+extern UnitType* NewUnitTypeSlot(char*);/// Allocate an empty unit-type slot
     /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const UnitType* type,unsigned frame,int x,int y);
 
-extern void InitUnitTypes(void);	/// init unit-type table
-extern void LoadUnitTypes(void);	/// load the unit-type data
-extern void CleanUnitTypes(void);	/// cleanup unit-type module
+extern void InitUnitTypes(void);	/// Init unit-type table
+extern void LoadUnitTypes(void);	/// Load the unit-type data
+extern void CleanUnitTypes(void);	/// Cleanup unit-type module
 
 //@}
 
