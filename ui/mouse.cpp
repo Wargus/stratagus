@@ -66,28 +66,28 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global enum _mouse_buttons_ MouseButtons;/// Current pressed mouse buttons
+enum _mouse_buttons_ MouseButtons;/// Current pressed mouse buttons
 
-global enum _key_modifiers_ KeyModifiers;/// Current keyboard modifiers
+enum _key_modifiers_ KeyModifiers;/// Current keyboard modifiers
 
-global Unit* UnitUnderCursor;				/// Unit under cursor
-global int ButtonAreaUnderCursor = -1;  /// Button area under cursor
-global int ButtonUnderCursor = -1;		/// Button under cursor
-global char GameMenuButtonClicked;		/// Menu button was clicked
-global char GameDiplomacyButtonClicked; /// Diplomacy button was clicked
-global char LeaveStops;						/// Mouse leaves windows stops scroll
+Unit* UnitUnderCursor;				/// Unit under cursor
+int ButtonAreaUnderCursor = -1;  /// Button area under cursor
+int ButtonUnderCursor = -1;		/// Button under cursor
+char GameMenuButtonClicked;		/// Menu button was clicked
+char GameDiplomacyButtonClicked; /// Diplomacy button was clicked
+char LeaveStops;						/// Mouse leaves windows stops scroll
 
-global enum _cursor_on_ CursorOn = CursorOnUnknown;		/// Cursor on field
+enum _cursor_on_ CursorOn = CursorOnUnknown;		/// Cursor on field
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-local void HandlePieMenuMouseSelection(void);
+static void HandlePieMenuMouseSelection(void);
 
 /**
 **  Cancel building cursor mode.
 */
-global void CancelBuildingMode(void)
+void CancelBuildingMode(void)
 {
 	CursorBuilding = NULL;
 	ClearStatusLine();
@@ -102,7 +102,7 @@ global void CancelBuildingMode(void)
 **  @param sx  X map position in pixels.
 **  @param sy  Y map position in pixels.
 */
-global void DoRightButton(int sx, int sy)
+void DoRightButton(int sx, int sy)
 {
 	int i;
 	int x;
@@ -369,7 +369,7 @@ global void DoRightButton(int sx, int sy)
 **  @param x  X map tile position.
 **  @param y  Y map tile position.
 */
-local void HandleMouseOn(int x, int y)
+static void HandleMouseOn(int x, int y)
 {
 	int i;
 
@@ -571,7 +571,7 @@ local void HandleMouseOn(int x, int y)
 **         Game should run (for network play), but not react on or show
 **         interactive events.
 */
-global void HandleMouseExit(void)
+void HandleMouseExit(void)
 {
 	// Disabled
 	if (!LeaveStops) {
@@ -593,7 +593,7 @@ global void HandleMouseExit(void)
 /**
 **  Restrict mouse cursor to viewport.
 */
-global void RestrictCursorToViewport(void)
+void RestrictCursorToViewport(void)
 {
 	if (CursorX < TheUI.SelectedViewport->X) {
 		CursorStartX = TheUI.SelectedViewport->X;
@@ -619,7 +619,7 @@ global void RestrictCursorToViewport(void)
 /**
 **  Restrict mouse cursor to minimap
 */
-global void RestrictCursorToMinimap(void)
+void RestrictCursorToMinimap(void)
 {
 	if (CursorX < TheUI.MinimapPosX) {
 		CursorStartX = TheUI.MinimapPosX;
@@ -648,7 +648,7 @@ global void RestrictCursorToMinimap(void)
 **  @param x  Screen X position.
 **  @param y  Screen Y position.
 */
-global void UIHandleMouseMove(int x, int y)
+void UIHandleMouseMove(int x, int y)
 {
 	int mx;
 	int my;
@@ -820,7 +820,7 @@ global void UIHandleMouseMove(int x, int y)
 **  @param sx  X screen map position.
 **  @param sy  Y screen map position.
 */
-local int SendRepair(int sx, int sy)
+static int SendRepair(int sx, int sy)
 {
 	int i;
 	Unit* unit;
@@ -859,7 +859,7 @@ local int SendRepair(int sx, int sy)
 **  @todo To reduce the CPU load for pathfinder, we should check if
 **        the destination is reachable and handle nice group movements.
 */
-local int SendMove(int sx, int sy)
+static int SendMove(int sx, int sy)
 {
 	int i;
 	int flush;
@@ -910,7 +910,7 @@ local int SendMove(int sx, int sy)
 **
 **  @see Selected, @see NumSelected
 */
-local int SendAttack(int sx, int sy)
+static int SendAttack(int sx, int sy)
 {
 	int i;
 	Unit* unit;
@@ -949,7 +949,7 @@ local int SendAttack(int sx, int sy)
 **  @param sx  X screen map position.
 **  @param sy  Y screen map position.
 */
-local int SendAttackGround(int sx, int sy)
+static int SendAttackGround(int sx, int sy)
 {
 	int i;
 	Unit* unit;
@@ -977,7 +977,7 @@ local int SendAttackGround(int sx, int sy)
 **  @param sx  X screen map position.
 **  @param sy  Y screen map position.
 */
-local int SendPatrol(int sx, int sy)
+static int SendPatrol(int sx, int sy)
 {
 	int i;
 	Unit* unit;
@@ -1001,7 +1001,7 @@ local int SendPatrol(int sx, int sy)
 **
 **  @see Selected
 */
-local int SendResource(int sx, int sy)
+static int SendResource(int sx, int sy)
 {
 	int i;
 	int x;
@@ -1076,7 +1076,7 @@ local int SendResource(int sx, int sy)
 **  @param sx  X screen map position.
 **  @param sy  Y screen map position.
 */
-local int SendUnload(int sx, int sy)
+static int SendUnload(int sx, int sy)
 {
 	int i;
 	int ret;
@@ -1103,7 +1103,7 @@ local int SendUnload(int sx, int sy)
 **
 **  @see Selected, @see NumSelected
 */
-local int SendSpellCast(int sx, int sy)
+static int SendSpellCast(int sx, int sy)
 {
 	int i;
 	Unit *unit;
@@ -1150,7 +1150,7 @@ local int SendSpellCast(int sx, int sy)
 **  @param sx  X screen map position
 **  @param sy  Y screen map position
 */
-local void SendCommand(int sx, int sy)
+static void SendCommand(int sx, int sy)
 {
 	int i;
 	int x;
@@ -1212,7 +1212,7 @@ local void SendCommand(int sx, int sy)
 **  @param num     Button number.
 **  @param button  Mouse Button pressed.
 */
-local void DoSelectionButtons(int num, unsigned button __attribute__((unused)))
+static void DoSelectionButtons(int num, unsigned button __attribute__((unused)))
 {
 	Unit* unit;
 
@@ -1259,7 +1259,7 @@ local void DoSelectionButtons(int num, unsigned button __attribute__((unused)))
 **
 **  @param button  Button pressed down.
 */
-local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
+static void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 {
 	int sx;
 	int sy;
@@ -1350,7 +1350,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 **
 **  @param button  Button pressed down.
 */
-global void UIHandleButtonDown(unsigned button)
+void UIHandleButtonDown(unsigned button)
 {
 	static int OldShowOrders;
 	static int OldShowSightRange;
@@ -1664,7 +1664,7 @@ global void UIHandleButtonDown(unsigned button)
 **
 **  @param button  Button released.
 */
-global void UIHandleButtonUp(unsigned button)
+void UIHandleButtonUp(unsigned button)
 {
 	//
 	//  Move map.
@@ -1878,7 +1878,7 @@ global void UIHandleButtonUp(unsigned button)
 /**
 **  Get pie menu under the cursor
 */
-local int GetPieUnderCursor(void)
+static int GetPieUnderCursor(void)
 {
 	int i;
 	int x;
@@ -1898,7 +1898,7 @@ local int GetPieUnderCursor(void)
 /**
 **  Draw Pie Menu
 */
-global void DrawPieMenu(void)
+void DrawPieMenu(void)
 {
 	int i;
 	const ButtonAction* buttons;
@@ -1962,7 +1962,7 @@ global void DrawPieMenu(void)
 /**
 **  Handle pie menu mouse selection
 */
-local void HandlePieMenuMouseSelection(void)
+static void HandlePieMenuMouseSelection(void)
 {
 	int pie;
 

@@ -47,7 +47,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global PaletteLink* PaletteList;        /// List of all used palettes.
+PaletteLink* PaletteList;        /// List of all used palettes.
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -65,7 +65,7 @@ global PaletteLink* PaletteList;        /// List of all used palettes.
 **  @param y        Y screen position
 */
 #ifndef USE_OPENGL
-global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
+void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y)
 {
 	SDL_Rect srect;
@@ -82,7 +82,7 @@ global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 	SDL_BlitSurface(graphic->Surface, &srect, TheScreen, &drect);
 }
 #else
-global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
+void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y)
 {
 	int sx;
@@ -129,7 +129,7 @@ global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 **  @param x        X screen position
 **  @param y        Y screen position
 */
-global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
+void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y)
 {
 	int oldx;
@@ -154,7 +154,7 @@ global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 **  @param alpha    Alpha
 */
 #ifndef USE_OPENGL
-global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
+void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha)
 {
 	int oldalpha;
@@ -165,7 +165,7 @@ global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, oldalpha);
 }
 #else
-global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
+void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha)
 {
 	// FIXME: not done
@@ -185,7 +185,7 @@ global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 **  @param y        Y screen position
 **  @param alpha    Alpha
 */
-global void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
+void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha)
 {
 	int oldx;
@@ -200,7 +200,7 @@ global void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 /**
 **  Free graphic object.
 */
-global void VideoFree(Graphic* graphic)
+void VideoFree(Graphic* graphic)
 {
 #ifdef USE_OPENGL
 	if (graphic->NumTextureNames) {
@@ -236,7 +236,7 @@ global void VideoFree(Graphic* graphic)
 **  @todo docu
 **  @return        New graphic object (malloced).
 */
-global Graphic* MakeGraphic(SDL_Surface* surface)
+Graphic* MakeGraphic(SDL_Surface* surface)
 {
 	Graphic* graphic;
 
@@ -259,7 +259,7 @@ global Graphic* MakeGraphic(SDL_Surface* surface)
 **
 **  @param g  Pointer to object
 */
-global void FlipGraphic(Graphic* g)
+void FlipGraphic(Graphic* g)
 {
 #ifdef USE_OPENGL
 	return;
@@ -299,7 +299,7 @@ global void FlipGraphic(Graphic* g)
 **  @param height   Graphic height.
 */
 #ifdef USE_OPENGL
-global void MakeTexture(Graphic* graphic, int width, int height)
+void MakeTexture(Graphic* graphic, int width, int height)
 {
 	int i;
 	int j;
@@ -406,7 +406,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 **  @param map      FIXME: docu
 **  @param maplen   FIXME: docu
 */
-global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
+void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 	UnitColors* colors)
 {
 	int i;
@@ -506,7 +506,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 **  @todo FIXME: Higher quality resizing.
 **        FIXME: Works only with 8bit indexed graphic objects.
 */
-global void ResizeGraphic(Graphic* g, int w, int h)
+void ResizeGraphic(Graphic* g, int w, int h)
 {
 	int i;
 	int j;

@@ -60,7 +60,7 @@
 **
 **  @return   The player pointer
 */
-local Player* CclGetPlayer(lua_State* l)
+static Player* CclGetPlayer(lua_State* l)
 {
 	return &Players[(int)LuaToNumber(l, -1)];
 }
@@ -70,7 +70,7 @@ local Player* CclGetPlayer(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclPlayer(lua_State* l)
+static int CclPlayer(lua_State* l)
 {
 	const char* value;
 	Player* player;
@@ -349,7 +349,7 @@ local int CclPlayer(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclChangeUnitsOwner(lua_State* l)
+static int CclChangeUnitsOwner(lua_State* l)
 {
 	Unit* table[UnitMax];
 	int n;
@@ -401,7 +401,7 @@ local int CclChangeUnitsOwner(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclGetThisPlayer(lua_State* l)
+static int CclGetThisPlayer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -415,7 +415,7 @@ local int CclGetThisPlayer(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetThisPlayer(lua_State* l)
+static int CclSetThisPlayer(lua_State* l)
 {
 	int plynr;
 
@@ -434,7 +434,7 @@ local int CclSetThisPlayer(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetMaxSelectable(lua_State* l)
+static int CclSetMaxSelectable(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -450,7 +450,7 @@ local int CclSetMaxSelectable(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetAllPlayersUnitLimit(lua_State* l)
+static int CclSetAllPlayersUnitLimit(lua_State* l)
 {
 	int i;
 
@@ -470,7 +470,7 @@ local int CclSetAllPlayersUnitLimit(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetAllPlayersBuildingLimit(lua_State* l)
+static int CclSetAllPlayersBuildingLimit(lua_State* l)
 {
 	int i;
 
@@ -490,7 +490,7 @@ local int CclSetAllPlayersBuildingLimit(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetAllPlayersTotalUnitLimit(lua_State* l)
+static int CclSetAllPlayersTotalUnitLimit(lua_State* l)
 {
 	int i;
 
@@ -512,7 +512,7 @@ local int CclSetAllPlayersTotalUnitLimit(lua_State* l)
 **
 **  @return          FIXME: should return old state.
 */
-local int CclSetDiplomacy(lua_State* l)
+static int CclSetDiplomacy(lua_State* l)
 {
 	int plynr;
 	int base;
@@ -543,7 +543,7 @@ local int CclSetDiplomacy(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDiplomacy(lua_State* l)
+static int CclDiplomacy(lua_State* l)
 {
 	lua_pushnumber(l, ThisPlayer->Player);
 	lua_insert(l, 1);
@@ -557,7 +557,7 @@ local int CclDiplomacy(lua_State* l)
 **
 **  @return   FIXME: should return old state.
 */
-local int CclSetSharedVision(lua_State* l)
+static int CclSetSharedVision(lua_State* l)
 {
 	int plynr;
 	int base;
@@ -581,7 +581,7 @@ local int CclSetSharedVision(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSharedVision(lua_State* l)
+static int CclSharedVision(lua_State* l)
 {
 	lua_pushnumber(l, ThisPlayer->Player);
 	lua_insert(l, 1);
@@ -593,7 +593,7 @@ local int CclSharedVision(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineRaceNames(lua_State* l)
+static int CclDefineRaceNames(lua_State* l)
 {
 	int i;
 	int j;
@@ -655,7 +655,7 @@ local int CclDefineRaceNames(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclNewPlayerColors(lua_State* l)
+static int CclNewPlayerColors(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -672,7 +672,7 @@ local int CclNewPlayerColors(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclGetPlayerData(lua_State* l)
+static int CclGetPlayerData(lua_State* l)
 {
 	Player* p;
 	const char* data;
@@ -787,7 +787,7 @@ local int CclGetPlayerData(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetPlayerData(lua_State* l)
+static int CclSetPlayerData(lua_State* l)
 {
 	Player* p;
 	const char* data;
@@ -872,7 +872,7 @@ local int CclSetPlayerData(lua_State* l)
 /**
 **  Register CCL features for players.
 */
-global void PlayerCclRegister(void)
+void PlayerCclRegister(void)
 {
 	lua_register(Lua, "Player", CclPlayer);
 	lua_register(Lua, "ChangeUnitsOwner", CclChangeUnitsOwner);

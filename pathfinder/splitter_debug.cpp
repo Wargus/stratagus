@@ -56,7 +56,7 @@
 **		@param sy		Image size (Y)
 **		@param nbcols		Max number of colors
 */
-local void StartXpm(FILE * f, int sx,int sy, int nbcols)
+static void StartXpm(FILE * f, int sx,int sy, int nbcols)
 {
 	int i;
 	static unsigned int colors[4] = {
@@ -95,7 +95,7 @@ local void StartXpm(FILE * f, int sx,int sy, int nbcols)
 **		Assign each region a color in such a way that
 **		two adjacents regions will never have the same color
 */
-local void RegionAssignColor(void)
+static void RegionAssignColor(void)
 {
 	int i, j, c, good;
 	for (i = 0; i < RegionMax; i++) {
@@ -123,7 +123,7 @@ local void RegionAssignColor(void)
 **		Create a "debugregions.xpm" containing the splitted map
 **		Also call some debug functions
 */
-global void MapSplitterDebug(void)
+void MapSplitterDebug(void)
 {
 	FILE * f;
 	unsigned int color;
@@ -224,7 +224,7 @@ global void MapSplitterDebug(void)
 **		check that water is mapped in watter region,
 **		...
 */
-global void RegionDebugWater(void)
+void RegionDebugWater(void)
 {
 	int x,y;
 	RegionId reg;
@@ -247,7 +247,7 @@ global void RegionDebugWater(void)
 **
 **		@param reg		the region
 */
-local void RegionDebugConnexion(RegionId reg)
+static void RegionDebugConnexion(RegionId reg)
 {
 	RegionId opp;
 	RegionSegment * seg;
@@ -330,7 +330,7 @@ local void RegionDebugConnexion(RegionId reg)
 **		Find all existing connections between regions & compare to dynamic structure
 **
 */
-global void RegionDebugAllConnexions(void)
+void RegionDebugAllConnexions(void)
 {
 	int i;
 	for (i = 0; i < RegionMax; i++) {

@@ -73,22 +73,22 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-local int IconWidth;                       /// Icon width in panels
-local int IconHeight;                      /// Icon height in panels
+static int IconWidth;                       /// Icon width in panels
+static int IconHeight;                      /// Icon height in panels
 
 
-global char EditorRunning;    /// True editor is running
-global char EditorMapLoaded;  /// Map loaded in editor
+char EditorRunning;    /// True editor is running
+char EditorMapLoaded;  /// Map loaded in editor
 
-global EditorStateType EditorState;  /// Current editor state.
+EditorStateType EditorState;  /// Current editor state.
 
-local char TileToolRandom;      /// Tile tool draws random
-local char TileToolDecoration;  /// Tile tool draws with decorations
-local int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
-local int TileCursor;           /// Tile type number
+static char TileToolRandom;      /// Tile tool draws random
+static char TileToolDecoration;  /// Tile tool draws with decorations
+static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
+static int TileCursor;           /// Tile type number
 
-local int MirrorEdit = 0;           /// Mirror editing enabled
-local int UnitPlacedThisPress = 0;  ///Only allow one unit per press
+static int MirrorEdit = 0;           /// Mirror editing enabled
+static int UnitPlacedThisPress = 0;  ///Only allow one unit per press
 
 enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
@@ -96,26 +96,26 @@ enum _mode_buttons_ {
 	TileButton,          /// Tile mode button
 };
 
-global char** EditorUnitTypes;  /// Sorted editor unit-type table
-global int MaxUnitIndex;        /// Max unit icon draw index
+char** EditorUnitTypes;  /// Sorted editor unit-type table
+int MaxUnitIndex;        /// Max unit icon draw index
 
-local char** ShownUnitTypes;       /// Shown editor unit-type table
-local int MaxShownUnits;           /// Max unit icon draw index
-local char ShowUnitsToSelect;      /// Show units in unit list
-local char ShowBuildingsToSelect;  /// Show buildings in unit list
+static char** ShownUnitTypes;       /// Shown editor unit-type table
+static int MaxShownUnits;           /// Max unit icon draw index
+static char ShowUnitsToSelect;      /// Show units in unit list
+static char ShowBuildingsToSelect;  /// Show buildings in unit list
 #if 0
-local char ShowHeroesToSelect;     /// Show heroes in unit list
+static char ShowHeroesToSelect;     /// Show heroes in unit list
 #endif
-local char ShowAirToSelect;        /// Show air units in unit list
-local char ShowLandToSelect;       /// Show land units in unit list
-local char ShowWaterToSelect;      /// Show water units in unit list
+static char ShowAirToSelect;        /// Show air units in unit list
+static char ShowLandToSelect;       /// Show land units in unit list
+static char ShowWaterToSelect;      /// Show water units in unit list
 
-local int UnitIndex;               /// Unit icon draw index
-local int CursorUnitIndex;         /// Unit icon under cursor
-local int SelectedUnitIndex;       /// Unit type to draw
+static int UnitIndex;               /// Unit icon draw index
+static int CursorUnitIndex;         /// Unit icon under cursor
+static int SelectedUnitIndex;       /// Unit type to draw
 
-local int CursorPlayer;            /// Player under the cursor
-local int SelectedPlayer;          /// Player selected for draw
+static int CursorPlayer;            /// Player under the cursor
+static int SelectedPlayer;          /// Player selected for draw
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -136,7 +136,7 @@ local int SelectedPlayer;          /// Player selected for draw
 **
 **  @todo  FIXME: Solid tiles are here still hardcoded.
 */
-global int GetTileNumber(int basic, int random, int filler)
+int GetTileNumber(int basic, int random, int filler)
 {
 	int tile;
 	int i;
@@ -181,7 +181,7 @@ global int GetTileNumber(int basic, int random, int filler)
 **  @param y     Y map tile coordinate.
 **  @param tile  Tile type to edit.
 */
-global void EditTile(int x, int y, int tile)
+void EditTile(int x, int y, int tile)
 {
 	MapField* mf;
 
@@ -217,7 +217,7 @@ global void EditTile(int x, int y, int tile)
 **  @bug  This function does not support mirror editing!
 **
 */
-global void EditTilesInternal(int x, int y, int tile, int size)
+void EditTilesInternal(int x, int y, int tile, int size)
 {
 	int ex;
 	int ey;
@@ -248,7 +248,7 @@ global void EditTilesInternal(int x, int y, int tile, int size)
 **  @param size  Size of rectangle
 **
 */
-global void EditTiles(int x, int y, int tile, int size)
+void EditTiles(int x, int y, int tile, int size)
 {
 	int mx;
 	int my;
@@ -284,7 +284,7 @@ global void EditTiles(int x, int y, int tile, int size)
 **  @bug   This function does not support mirror editing!
 **
 */
-local void EditUnitInternal(int x, int y, UnitType* type, Player* player)
+static void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 {
 	Unit* unit;
 
@@ -305,7 +305,7 @@ local void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 **
 **  @todo  FIXME: Check if the player has already a start-point.
 */
-local void EditUnit(int x, int y, UnitType* type, Player* player)
+static void EditUnit(int x, int y, UnitType* type, Player* player)
 {
 	int mx;
 	int my;
@@ -334,7 +334,7 @@ local void EditUnit(int x, int y, UnitType* type, Player* player)
 **
 **  @return  Number of unit icons that can be displayed.
 */
-local int CalculateUnitIcons(void)
+static int CalculateUnitIcons(void)
 {
 	int i;
 	int x;
@@ -361,7 +361,7 @@ local int CalculateUnitIcons(void)
 **	Calculate the max height and the max widht of icons,
 **	and assign them to IconHeight and IconWidth
 */
-local void CalculateMaxIconSize(void)
+static void CalculateMaxIconSize(void)
 {
 	int i;
 	const UnitType* type;
@@ -386,7 +386,7 @@ local void CalculateMaxIconSize(void)
 /**
 **  Recalculate the shown units.
 */
-local void RecalculateShownUnits(void)
+static void RecalculateShownUnits(void)
 {
 	int i;
 	int n;
@@ -446,7 +446,7 @@ local void RecalculateShownUnits(void)
 **        If we have more solid tiles, than they fit into the panel, we need
 **        some new ideas.
 */
-local void DrawTileIcons(void)
+static void DrawTileIcons(void)
 {
 	int x;
 	int y;
@@ -519,7 +519,7 @@ local void DrawTileIcons(void)
 /**
 **  Draw unit icons.
 */
-local void DrawUnitIcons(void)
+static void DrawUnitIcons(void)
 {
 	int x;
 	int y;
@@ -688,7 +688,7 @@ local void DrawUnitIcons(void)
 **  @param y        Y display position
 **  @param flags    State of the icon (::IconActive,::IconClicked,...)
 */
-local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
+static void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 {
 	Uint32 color;
 
@@ -729,7 +729,7 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 /**
 **  Draw the editor panels.
 */
-local void DrawEditorPanel(void)
+static void DrawEditorPanel(void)
 {
 	int x;
 	int y;
@@ -775,7 +775,7 @@ local void DrawEditorPanel(void)
 **
 **  @todo support for bigger cursors (2x2, 3x3 ...)
 */
-local void DrawMapCursor(void)
+static void DrawMapCursor(void)
 {
 	int x;
 	int y;
@@ -837,7 +837,7 @@ local void DrawMapCursor(void)
 **  If cursor is on map or minimap show information about the current tile.
 **
 */
-local void DrawEditorInfo(void)
+static void DrawEditorInfo(void)
 {
 	int tile;
 	int i;
@@ -903,7 +903,7 @@ local void DrawEditorInfo(void)
 **
 **  @param unit  Unit pointer.
 */
-local void ShowUnitInfo(const Unit* unit)
+static void ShowUnitInfo(const Unit* unit)
 {
 	char buf[256];
 	int i;
@@ -920,7 +920,7 @@ local void ShowUnitInfo(const Unit* unit)
 /**
 **  Update editor display.
 */
-global void EditorUpdateDisplay(void)
+void EditorUpdateDisplay(void)
 {
 	int i;
 
@@ -1026,7 +1026,7 @@ global void EditorUpdateDisplay(void)
 /**
 **  Callback for input.
 */
-local void EditorCallbackButtonUp(unsigned button)
+static void EditorCallbackButtonUp(unsigned button)
 {
 	if (GameCursor == TheUI.Scroll.Cursor) {
 		// Move map.
@@ -1050,7 +1050,7 @@ local void EditorCallbackButtonUp(unsigned button)
 **
 **  @param button  Mouse button number (0 left, 1 middle, 2 right)
 */
-local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
+static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 {
 	//
 	// Click on menu button
@@ -1293,7 +1293,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
+static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 {
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
@@ -1413,7 +1413,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-local void EditorCallbackKeyUp(unsigned key, unsigned keychar)
+static void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 {
 	if (HandleKeyModifiersUp(key, keychar)) {
 		return;
@@ -1444,7 +1444,7 @@ local void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-local void EditorCallbackKey3(unsigned dummy1 __attribute__((unused)),
+static void EditorCallbackKey3(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
 }
@@ -1455,7 +1455,7 @@ local void EditorCallbackKey3(unsigned dummy1 __attribute__((unused)),
 **  @param x  Screen X position.
 **  @param y  Screen Y position.
 */
-local void EditorCallbackMouse(int x, int y)
+static void EditorCallbackMouse(int x, int y)
 {
 	int i;
 	int bx;
@@ -1815,14 +1815,14 @@ local void EditorCallbackMouse(int x, int y)
 /**
 **  Callback for exit.
 */
-local void EditorCallbackExit(void)
+static void EditorCallbackExit(void)
 {
 }
 
 /**
 **  Create editor.
 */
-local void CreateEditor(void)
+static void CreateEditor(void)
 {
 	int i;
 	int n;
@@ -1973,7 +1973,7 @@ local void CreateEditor(void)
 **         At least two players, one human slot, every player a startpoint
 **         ...
 */
-global int EditorSavePud(const char* file)
+int EditorSavePud(const char* file)
 {
 	int i;
 
@@ -2016,7 +2016,7 @@ global int EditorSavePud(const char* file)
 /**
 **  Editor main event loop.
 */
-global void EditorMainLoop(void)
+void EditorMainLoop(void)
 {
 	EventCallback callbacks;
 	int OldCommandLogDisabled;

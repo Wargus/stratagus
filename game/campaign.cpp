@@ -55,19 +55,19 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global char DefaultObjective[] = "-Destroy your enemies";
+char DefaultObjective[] = "-Destroy your enemies";
 
-global int GameResult;  /// Outcome of the game
-global char CurrentMapPath[1024];  /// Path of the current map
-global char DefaultMap[1024] = "maps/default.pud";  /// Default map path
-global int RestartScenario;  /// Restart the scenario
-global int QuitToMenu;  /// Quit to menu
-global Campaign* Campaigns;  /// Campaigns
-global int NumCampaigns;  /// Number of campaigns
+int GameResult;  /// Outcome of the game
+char CurrentMapPath[1024];  /// Path of the current map
+char DefaultMap[1024] = "maps/default.pud";  /// Default map path
+int RestartScenario;  /// Restart the scenario
+int QuitToMenu;  /// Quit to menu
+Campaign* Campaigns;  /// Campaigns
+int NumCampaigns;  /// Number of campaigns
 
-local Campaign* CurrentCampaign;        /// Playing this campaign
-local CampaignChapter* CurrentChapter;  /// Playing this chapter of campaign
-local int SkipCurrentChapter = 1;       /// Skip the current chapter when
+static Campaign* CurrentCampaign;        /// Playing this campaign
+static CampaignChapter* CurrentChapter;  /// Playing this chapter of campaign
+static int SkipCurrentChapter = 1;       /// Skip the current chapter when
                                         /// looking for the next one
 
 /*----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ local int SkipCurrentChapter = 1;       /// Skip the current chapter when
 **
 **  @return  The filename of the next level
 */
-global char* NextChapter(void)
+char* NextChapter(void)
 {
 	if (RestartScenario) {
 		RestartScenario = 0;
@@ -133,7 +133,7 @@ global char* NextChapter(void)
 **
 **  @note  ::CurrentMapPath contains the filename of first level.
 */
-global void PlayCampaign(const char* name)
+void PlayCampaign(const char* name)
 {
 	char* filename;
 	int i;
@@ -177,7 +177,7 @@ global void PlayCampaign(const char* name)
 **  @param l        Lua state.
 **  @param chapter  Chapter.
 */
-local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
+static void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 {
 	const char* value;
 	int args;
@@ -282,7 +282,7 @@ local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 **
 **  @param chapters  Chapters to be freed.
 */
-local void FreeChapters(CampaignChapter** chapters)
+static void FreeChapters(CampaignChapter** chapters)
 {
 	CampaignChapter* ch;
 	CampaignChapter* chptr;
@@ -319,7 +319,7 @@ local void FreeChapters(CampaignChapter** chapters)
 **
 **  @note FIXME: play-video, defeat, draw are missing.
 */
-local int CclDefineCampaign(lua_State* l)
+static int CclDefineCampaign(lua_State* l)
 {
 	char* ident;
 	const char* value;
@@ -434,7 +434,7 @@ local int CclDefineCampaign(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetCurrentChapter(lua_State* l)
+static int CclSetCurrentChapter(lua_State* l)
 {
 	int i;
 
@@ -467,7 +467,7 @@ local int CclSetCurrentChapter(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclBriefing(lua_State* l)
+static int CclBriefing(lua_State* l)
 {
 	const char* value;
 	int voice;
@@ -533,7 +533,7 @@ local int CclBriefing(lua_State* l)
 /**
 **  Register CCL features for campaigns.
 */
-global void CampaignCclRegister(void)
+void CampaignCclRegister(void)
 {
 	lua_register(Lua, "DefineCampaign", CclDefineCampaign);
 	lua_register(Lua, "SetCurrentChapter", CclSetCurrentChapter);
@@ -543,7 +543,7 @@ global void CampaignCclRegister(void)
 /**
 **  Save the campaign module.
 */
-global void SaveCampaign(CLFile* file)
+void SaveCampaign(CLFile* file)
 {
 	CampaignChapter* ch;
 	ChapterPictureText* text;
@@ -618,7 +618,7 @@ global void SaveCampaign(CLFile* file)
 /**
 **  Clean up the campaign module.
 */
-global void CleanCampaign(void)
+void CleanCampaign(void)
 {
 	int i;
 

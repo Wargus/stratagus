@@ -58,7 +58,7 @@ extern void FillAudio(void* udata __attribute__((unused)), Uint8* stream,
 **
 **		@return				True if failure, false if everything ok.
 */
-global int InitSdlSound(const char* dev __attribute__((unused)), int freq,
+int InitSdlSound(const char* dev __attribute__((unused)), int freq,
 	int size, int wait __attribute__((unused)))
 {
 	SDL_AudioSpec wanted;

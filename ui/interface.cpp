@@ -67,20 +67,20 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-local int SavedMapPositionX[4];     /// Saved map position X
-local int SavedMapPositionY[4];     /// Saved map position Y
-local char Input[80];               /// line input for messages/long commands
-local int InputIndex;               /// current index into input
-local char InputStatusLine[99];     /// Last input status line
-global char* UiGroupKeys = "0123456789`"; /// Up to 11 keys, last unselect. Default for qwerty
-global char GameRunning;            /// Current running state
-global char GamePaused;             /// Current pause state
-global char GameObserve;            /// Observe mode
-global char SkipGameCycle;          /// Skip the next game cycle
-global char BigMapMode;             /// Show only the map
-global enum _iface_state_ InterfaceState; /// Current interface state
-global int GodMode;                 /// Invincibility cheat
-global enum _key_state_ KeyState;   /// current key state
+static int SavedMapPositionX[4];     /// Saved map position X
+static int SavedMapPositionY[4];     /// Saved map position Y
+static char Input[80];               /// line input for messages/long commands
+static int InputIndex;               /// current index into input
+static char InputStatusLine[99];     /// Last input status line
+char* UiGroupKeys = "0123456789`"; /// Up to 11 keys, last unselect. Default for qwerty
+char GameRunning;            /// Current running state
+char GamePaused;             /// Current pause state
+char GameObserve;            /// Observe mode
+char SkipGameCycle;          /// Skip the next game cycle
+char BigMapMode;             /// Show only the map
+enum _iface_state_ InterfaceState; /// Current interface state
+int GodMode;                 /// Invincibility cheat
+enum _key_state_ KeyState;   /// current key state
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -89,7 +89,7 @@ global enum _key_state_ KeyState;   /// current key state
 /**
 **  Show input.
 */
-local void ShowInput(void)
+static void ShowInput(void)
 {
 	char* input;
 
@@ -109,7 +109,7 @@ local void ShowInput(void)
 /**
 **  Begin input.
 */
-local void UiBeginInput(void)
+static void UiBeginInput(void)
 {
 	KeyState = KeyStateInput;
 	Input[0] = '\0';
@@ -125,7 +125,7 @@ local void UiBeginInput(void)
 /**
 **  Unselect all currently selected units.
 */
-local void UiUnselectAll(void)
+static void UiUnselectAll(void)
 {
 	UnSelectAll();
 	NetworkSendSelection(NULL, 0);
@@ -140,7 +140,7 @@ local void UiUnselectAll(void)
 **  @todo Improve this function, try to show all selected units
 **        or the most possible units.
 */
-local void UiCenterOnGroup(unsigned group)
+static void UiCenterOnGroup(unsigned group)
 {
 	Unit** units;
 	int n;
@@ -167,7 +167,7 @@ local void UiCenterOnGroup(unsigned group)
 **
 **  @param group  Group number to select.
 */
-local void UiSelectGroup(unsigned group)
+static void UiSelectGroup(unsigned group)
 {
 	Unit** units;
 	int n;
@@ -197,7 +197,7 @@ local void UiSelectGroup(unsigned group)
 **
 **  @param group  Group number to add.
 */
-local void UiAddGroupToSelection(unsigned group)
+static void UiAddGroupToSelection(unsigned group)
 {
 	Unit** units;
 	int n;
@@ -232,7 +232,7 @@ local void UiAddGroupToSelection(unsigned group)
 **
 **  @param group  Group number to create.
 */
-local void UiDefineGroup(unsigned group)
+static void UiDefineGroup(unsigned group)
 {
 	SetGroup(Selected, NumSelected, group);
 }
@@ -242,7 +242,7 @@ local void UiDefineGroup(unsigned group)
 **
 **  @param group  Group number to be expanded.
 */
-local void UiAddToGroup(unsigned group)
+static void UiAddToGroup(unsigned group)
 {
 	AddToGroup(Selected, NumSelected, group);
 }
@@ -250,7 +250,7 @@ local void UiAddToGroup(unsigned group)
 /**
 **  Toggle sound on / off.
 */
-local void UiToggleSound(void)
+static void UiToggleSound(void)
 {
 	if (SoundFildes != -1) {
 		SoundOff ^= 1;
@@ -265,7 +265,7 @@ local void UiToggleSound(void)
 /**
 **  Toggle music on / off.
 */
-local void UiToggleMusic(void)
+static void UiToggleMusic(void)
 {
 	static int vol;
 	if (MusicVolume) {
@@ -281,7 +281,7 @@ local void UiToggleMusic(void)
 /**
 **  Toggle pause on / off.
 */
-global void UiTogglePause(void)
+void UiTogglePause(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused ^= 1;
@@ -296,7 +296,7 @@ global void UiTogglePause(void)
 /**
 **  Enter menu mode.
 */
-local void UiEnterMenu(void)
+static void UiEnterMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
@@ -308,7 +308,7 @@ local void UiEnterMenu(void)
 /**
 **  Enter help menu
 */
-local void UiEnterHelpMenu(void)
+static void UiEnterHelpMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
@@ -320,7 +320,7 @@ local void UiEnterHelpMenu(void)
 /**
 **  Enter options menu
 */
-local void UiEnterOptionsMenu(void)
+static void UiEnterOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
@@ -332,7 +332,7 @@ local void UiEnterOptionsMenu(void)
 /**
 **  Enter Sound Options menu
 */
-local void UiEnterSoundOptionsMenu(void)
+static void UiEnterSoundOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
@@ -344,7 +344,7 @@ local void UiEnterSoundOptionsMenu(void)
 /**
 **  Enter Speed Options menu
 */
-local void UiEnterSpeedOptionsMenu(void)
+static void UiEnterSpeedOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
@@ -356,7 +356,7 @@ local void UiEnterSpeedOptionsMenu(void)
 /**
 **  Enter Preferences Options menu
 */
-local void UiEnterPreferencesOptionsMenu(void)
+static void UiEnterPreferencesOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
@@ -368,7 +368,7 @@ local void UiEnterPreferencesOptionsMenu(void)
 /**
 **  Enter Save Game Menu
 */
-local void UiEnterSaveGameMenu(void)
+static void UiEnterSaveGameMenu(void)
 {
 	// Disable save menu in multiplayer and replays
 	if (IsNetworkGame() || ReplayGameType != ReplayNone) {
@@ -385,7 +385,7 @@ local void UiEnterSaveGameMenu(void)
 /**
 **  Enter Load Game Menu
 */
-local void UiEnterLoadGameMenu(void)
+static void UiEnterLoadGameMenu(void)
 {
 	// Disable load menu in multiplayer
 	if (IsNetworkGame()) {
@@ -402,7 +402,7 @@ local void UiEnterLoadGameMenu(void)
 /**
 **  Enter Exit Confirm menu
 */
-local void UiExitConfirmMenu(void)
+static void UiExitConfirmMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
@@ -414,7 +414,7 @@ local void UiExitConfirmMenu(void)
 /**
 **  Enter Quit To Menu Confirm menu
 */
-local void UiQuitToMenuConfirmMenu(void)
+static void UiQuitToMenuConfirmMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
@@ -426,7 +426,7 @@ local void UiQuitToMenuConfirmMenu(void)
 /**
 **  Enter Restart Confirm menu
 */
-local void UiRestartConfirmMenu(void)
+static void UiRestartConfirmMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
@@ -440,7 +440,7 @@ local void UiRestartConfirmMenu(void)
 **
 **  @todo FIXME: We should try to keep the same view, if possible
 */
-local void UiToggleBigMap(void)
+static void UiToggleBigMap(void)
 {
 	static int mapx;
 	static int mapy;
@@ -480,7 +480,7 @@ local void UiToggleBigMap(void)
 /**
 **  Increase game speed.
 */
-local void UiIncreaseGameSpeed(void)
+static void UiIncreaseGameSpeed(void)
 {
 	VideoSyncSpeed += 10;
 	SetVideoSync();
@@ -490,7 +490,7 @@ local void UiIncreaseGameSpeed(void)
 /**
 **  Decrease game speed.
 */
-local void UiDecreaseGameSpeed(void)
+static void UiDecreaseGameSpeed(void)
 {
 	if (VideoSyncSpeed <= 10) {
 		if (VideoSyncSpeed > 1) {
@@ -509,7 +509,7 @@ local void UiDecreaseGameSpeed(void)
 **  @todo Improve this function, try to show all selected units
 **        or the most possible units.
 */
-local void UiCenterOnSelected(void)
+static void UiCenterOnSelected(void)
 {
 	int x;
 	int y;
@@ -531,7 +531,7 @@ local void UiCenterOnSelected(void)
 **
 **  @param position  Map position slot.
 */
-local void UiSaveMapPosition(unsigned position)
+static void UiSaveMapPosition(unsigned position)
 {
 	SavedMapPositionX[position] = TheUI.SelectedViewport->MapX;
 	SavedMapPositionY[position] = TheUI.SelectedViewport->MapY;
@@ -542,7 +542,7 @@ local void UiSaveMapPosition(unsigned position)
 **
 **  @param position  Map position slot.
 */
-local void UiRecallMapPosition(unsigned position)
+static void UiRecallMapPosition(unsigned position)
 {
 	ViewportSetViewpoint(TheUI.SelectedViewport,
 		SavedMapPositionX[position], SavedMapPositionY[position], TileSizeX / 2, TileSizeY / 2);
@@ -551,7 +551,7 @@ local void UiRecallMapPosition(unsigned position)
 /**
 **  Toggle terrain display on/off.
 */
-local void UiToggleTerrain(void)
+static void UiToggleTerrain(void)
 {
 	MinimapWithTerrain ^= 1;
 	if (MinimapWithTerrain) {
@@ -565,7 +565,7 @@ local void UiToggleTerrain(void)
 /**
 **  Find the next idle worker, select it, and center on it
 */
-local void UiFindIdleWorker(void)
+static void UiFindIdleWorker(void)
 {
 	Unit* unit;
 	// FIXME: static variable, is not needed.
@@ -587,7 +587,7 @@ local void UiFindIdleWorker(void)
 /**
 **  Toggle grab mouse on/off.
 */
-local void UiToggleGrabMouse(void)
+static void UiToggleGrabMouse(void)
 {
 	DebugPrint("%x\n" _C_ KeyModifiers);
 	ToggleGrabMouse(0);
@@ -597,7 +597,7 @@ local void UiToggleGrabMouse(void)
 /**
 **  Track unit, the viewport follows the unit.
 */
-local void UiTrackUnit(void)
+static void UiTrackUnit(void)
 {
 	if (TheUI.SelectedViewport->Unit == Selected[0]) {
 		TheUI.SelectedViewport->Unit = NULL;
@@ -613,7 +613,7 @@ local void UiTrackUnit(void)
 **
 **  @return     True, if key is handled; otherwise false.
 */
-local int CommandKey(int key)
+static int CommandKey(int key)
 {
 	char* ptr;
 
@@ -910,7 +910,7 @@ local int CommandKey(int key)
 **
 **  @return  1 if a cheat was handled, 0 otherwise
 */
-global int HandleCheats(const char* input)
+int HandleCheats(const char* input)
 {
 	int ret;
 
@@ -956,7 +956,7 @@ global int HandleCheats(const char* input)
 **  @param key  Key scancode.
 **  @return     True input finished.
 */
-local int InputKey(int key)
+static int InputKey(int key)
 {
 	char ChatMessage[sizeof(Input) + 40];
 	int i;
@@ -1079,7 +1079,7 @@ local int InputKey(int key)
 /**
 **  Save a screenshot.
 */
-local void Screenshot(void)
+static void Screenshot(void)
 {
 	CLFile* fd;
 	char filename[30];
@@ -1104,7 +1104,7 @@ local void Screenshot(void)
 **
 **  @return         1 if modifier found, 0 otherwise
 */
-global int HandleKeyModifiersDown(unsigned key, unsigned keychar
+int HandleKeyModifiersDown(unsigned key, unsigned keychar
 	__attribute__ ((unused)))
 {
 	switch (key) {
@@ -1145,7 +1145,7 @@ global int HandleKeyModifiersDown(unsigned key, unsigned keychar
 **
 **  @return         1 if modifier found, 0 otherwise
 */
-global int HandleKeyModifiersUp(unsigned key,
+int HandleKeyModifiersUp(unsigned key,
 	unsigned keychar __attribute__((unused)))
 {
 	switch (key) {
@@ -1178,7 +1178,7 @@ global int HandleKeyModifiersUp(unsigned key,
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-global void HandleKeyDown(unsigned key, unsigned keychar)
+void HandleKeyDown(unsigned key, unsigned keychar)
 {
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
@@ -1209,7 +1209,7 @@ global void HandleKeyDown(unsigned key, unsigned keychar)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-global void HandleKeyUp(unsigned key, unsigned keychar)
+void HandleKeyUp(unsigned key, unsigned keychar)
 {
 	if (HandleKeyModifiersUp(key, keychar)) {
 		return;
@@ -1243,7 +1243,7 @@ global void HandleKeyUp(unsigned key, unsigned keychar)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-global void HandleKeyRepeat(unsigned key __attribute__((unused)),
+void HandleKeyRepeat(unsigned key __attribute__((unused)),
 	unsigned keychar)
 {
 	if (KeyState == KeyStateInput && keychar) {
@@ -1259,7 +1259,7 @@ global void HandleKeyRepeat(unsigned key __attribute__((unused)),
 **
 **  @return   1 if the mouse is in the scroll area, 0 otherwise
 */
-global int HandleMouseScrollArea(int x, int y)
+int HandleMouseScrollArea(int x, int y)
 {
 	if (x < SCROLL_LEFT) {
 		if (y < SCROLL_UP) {
@@ -1309,7 +1309,7 @@ global int HandleMouseScrollArea(int x, int y)
 **  @param x  screen pixel X position.
 **  @param y  screen pixel Y position.
 */
-global void HandleCursorMove(int* x, int* y)
+void HandleCursorMove(int* x, int* y)
 {
 	//
 	//  Reduce coordinates to window-size.
@@ -1335,7 +1335,7 @@ global void HandleCursorMove(int* x, int* y)
 **  @param x  screen pixel X position.
 **  @param y  screen pixel Y position.
 */
-global void HandleMouseMove(int x, int y)
+void HandleMouseMove(int x, int y)
 {
 	HandleCursorMove(&x, &y);
 	UIHandleMouseMove(x, y);
@@ -1346,7 +1346,7 @@ global void HandleMouseMove(int x, int y)
 **
 **  @param button  Mouse button number (0 left, 1 middle, 2 right)
 */
-global void HandleButtonDown(unsigned button)
+void HandleButtonDown(unsigned button)
 {
 	UIHandleButtonDown(button);
 }
@@ -1359,7 +1359,7 @@ global void HandleButtonDown(unsigned button)
 **
 **  @param button  Mouse button number (0 left, 1 middle, 2 right)
 */
-global void HandleButtonUp(unsigned button)
+void HandleButtonUp(unsigned button)
 {
 	UIHandleButtonUp(button);
 }
@@ -1368,19 +1368,19 @@ global void HandleButtonUp(unsigned button)
 --  Lowlevel input functions
 ----------------------------------------------------------------------------*/
 
-global int DoubleClickDelay = 300;      /// Time to detect double clicks.
-global int HoldClickDelay = 1000;       /// Time to detect hold clicks.
+int DoubleClickDelay = 300;      /// Time to detect double clicks.
+int HoldClickDelay = 1000;       /// Time to detect hold clicks.
 
-local enum {
+static enum {
 	InitialMouseState,                  /// start state
 	ClickedMouseState,                  /// button is clicked
 } MouseState;                           /// Current state of mouse
 
-local int MouseX;                       /// Last mouse X position
-local int MouseY;                       /// Last mouse Y position
-local unsigned LastMouseButton;         /// last mouse button handled
-local unsigned StartMouseTicks;         /// Ticks of first click
-local unsigned LastMouseTicks;          /// Ticks of last mouse event
+static int MouseX;                       /// Last mouse X position
+static int MouseY;                       /// Last mouse Y position
+static unsigned LastMouseButton;         /// last mouse button handled
+static unsigned StartMouseTicks;         /// Ticks of first click
+static unsigned LastMouseTicks;          /// Ticks of last mouse event
 
 /**
 **  Called if any mouse button is pressed down
@@ -1393,7 +1393,7 @@ local unsigned LastMouseTicks;          /// Ticks of last mouse event
 **  @param ticks      Denotes time-stamp of video-system
 **  @param button     Mouse button pressed.
 */
-global void InputMouseButtonPress(const EventCallback* callbacks,
+void InputMouseButtonPress(const EventCallback* callbacks,
 	unsigned ticks, unsigned button)
 {
 	//
@@ -1426,7 +1426,7 @@ global void InputMouseButtonPress(const EventCallback* callbacks,
 **  @param ticks      Denotes time-stamp of video-system
 **  @param button     Mouse button released.
 */
-global void InputMouseButtonRelease(const EventCallback* callbacks,
+void InputMouseButtonRelease(const EventCallback* callbacks,
 	unsigned ticks, unsigned button)
 {
 	unsigned mask;
@@ -1465,7 +1465,7 @@ global void InputMouseButtonRelease(const EventCallback* callbacks,
 **  @param x          X movement
 **  @param y          Y movement
 */
-global void InputMouseMove(const EventCallback* callbacks,
+void InputMouseMove(const EventCallback* callbacks,
 	unsigned ticks, int x, int y)
 {
 	// Don't reset the mouse state unless we really moved
@@ -1485,7 +1485,7 @@ global void InputMouseMove(const EventCallback* callbacks,
 **  @param ticks      Denotes time-stamp of video-system
 **
 */
-global void InputMouseExit(const EventCallback* callbacks,
+void InputMouseExit(const EventCallback* callbacks,
 	unsigned ticks __attribute__((unused)))
 {
 	// FIXME: should we do anything here with ticks? don't know, but conform others
@@ -1499,7 +1499,7 @@ global void InputMouseExit(const EventCallback* callbacks,
 **  @param callbacks  Callback structure for events.
 **  @param ticks      Denotes time-stamp of video-system
 */
-global void InputMouseTimeout(const EventCallback* callbacks, unsigned ticks)
+void InputMouseTimeout(const EventCallback* callbacks, unsigned ticks)
 {
 	if (MouseButtons & (1 << LastMouseButton)) {
 		if (ticks > StartMouseTicks + DoubleClickDelay) {
@@ -1515,12 +1515,12 @@ global void InputMouseTimeout(const EventCallback* callbacks, unsigned ticks)
 }
 
 
-local int HoldKeyDelay = 250;               /// Time to detect hold key
-local int HoldKeyAdditionalDelay = 50;      /// Time to detect additional hold key
+static int HoldKeyDelay = 250;               /// Time to detect hold key
+static int HoldKeyAdditionalDelay = 50;      /// Time to detect additional hold key
 
-local unsigned LastIKey;                    /// last key handled
-local unsigned LastIKeyChar;                /// last keychar handled
-local unsigned LastKeyTicks;                /// Ticks of last key
+static unsigned LastIKey;                    /// last key handled
+static unsigned LastIKeyChar;                /// last keychar handled
+static unsigned LastKeyTicks;                /// Ticks of last key
 
 /**
 **  Handle keyboard key press.
@@ -1530,7 +1530,7 @@ local unsigned LastKeyTicks;                /// Ticks of last key
 **  @param ikey       Key scancode.
 **  @param ikeychar   Character code.
 */
-global void InputKeyButtonPress(const EventCallback* callbacks,
+void InputKeyButtonPress(const EventCallback* callbacks,
 	unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
 	LastIKey = ikey;
@@ -1547,7 +1547,7 @@ global void InputKeyButtonPress(const EventCallback* callbacks,
 **  @param ikey       Key scancode.
 **  @param ikeychar   Character code.
 */
-global void InputKeyButtonRelease(const EventCallback* callbacks,
+void InputKeyButtonRelease(const EventCallback* callbacks,
 	unsigned ticks __attribute__((unused)), unsigned ikey,
 	unsigned ikeychar)
 {
@@ -1563,7 +1563,7 @@ global void InputKeyButtonRelease(const EventCallback* callbacks,
 **  @param callbacks  Callback structure for events.
 **  @param ticks      Denotes time-stamp of video-system
 */
-global void InputKeyTimeout(const EventCallback* callbacks, unsigned ticks)
+void InputKeyTimeout(const EventCallback* callbacks, unsigned ticks)
 {
 	if (LastIKey && ticks > LastKeyTicks + HoldKeyDelay) {
 		LastKeyTicks = ticks - (HoldKeyDelay - HoldKeyAdditionalDelay);

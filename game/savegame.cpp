@@ -81,7 +81,7 @@
 **		else a string that could be executed in lua to restore lua state
 **	@todo do the output prettier (adjust indentation, newline)
 */
-local char* SaveGlobal(lua_State *l, int is_root)
+static char* SaveGlobal(lua_State *l, int is_root)
 {
 	int type_key;
 	int type_value;
@@ -223,7 +223,7 @@ local char* SaveGlobal(lua_State *l, int is_root)
 **
 **  @note  Later we want to store in a more compact binary format.
 */
-global void SaveGame(const char* filename)
+void SaveGame(const char* filename)
 {
 	time_t now;
 	CLFile* file;

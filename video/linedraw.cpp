@@ -66,10 +66,10 @@ typedef enum {
 ----------------------------------------------------------------------------*/
 
 #ifndef USE_OPENGL
-global void (*VideoDrawPixel)(Uint32 color, int x, int y);
-local void (*VideoDoDrawPixel)(Uint32 color, int x, int y);
-global void (*VideoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
-local void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
+void (*VideoDrawPixel)(Uint32 color, int x, int y);
+static void (*VideoDoDrawPixel)(Uint32 color, int x, int y);
+void (*VideoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
+static void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
 #endif
 
 // ===========================================================================
@@ -81,7 +81,7 @@ local void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char al
 /**
 **  FIXME: docu
 */
-local void VideoDoDrawPixel16(Uint32 color, int x, int y)
+static void VideoDoDrawPixel16(Uint32 color, int x, int y)
 {
 	((Uint16*)TheScreen->pixels)[x + y * VideoWidth] = color;
 }
@@ -89,7 +89,7 @@ local void VideoDoDrawPixel16(Uint32 color, int x, int y)
 /**
 **  FIXME: docu
 */
-global void VideoDrawPixel16(Uint32 color, int x, int y)
+void VideoDrawPixel16(Uint32 color, int x, int y)
 {
 	VideoLockScreen();
 	VideoDoDrawPixel16(color, x, y);
@@ -99,7 +99,7 @@ global void VideoDrawPixel16(Uint32 color, int x, int y)
 /**
 **  FIXME: docu
 */
-local void VideoDoDrawPixel32(Uint32 color, int x, int y)
+static void VideoDoDrawPixel32(Uint32 color, int x, int y)
 {
 	((Uint32*)TheScreen->pixels)[x + y * VideoWidth] = color;
 }
@@ -107,7 +107,7 @@ local void VideoDoDrawPixel32(Uint32 color, int x, int y)
 /**
 **  FIXME: docu
 */
-global void VideoDrawPixel32(Uint32 color, int x, int y)
+void VideoDrawPixel32(Uint32 color, int x, int y)
 {
 	VideoLockScreen();
 	VideoDoDrawPixel32(color, x, y);
@@ -117,7 +117,7 @@ global void VideoDrawPixel32(Uint32 color, int x, int y)
 /**
 **  FIXME: docu
 */
-local void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
+static void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
 	Uint16* p;
 	unsigned long dp;
@@ -136,7 +136,7 @@ local void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alp
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
+void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
 	VideoLockScreen();
 	VideoDoDrawTransPixel16(color, x, y, alpha);
@@ -146,7 +146,7 @@ global void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alph
 /**
 **  FIXME: docu
 */
-local void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
+static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
 {
 	unsigned long sp2;
 	unsigned long dp1;
@@ -176,7 +176,7 @@ local void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alp
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
+void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
 {
 	VideoLockScreen();
 	VideoDoDrawTransPixel32(color, x, y, alpha);
@@ -186,7 +186,7 @@ global void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alph
 /**
 **  FIXME: docu
 */
-local void VideoDoDrawPixelClip(Uint32 color, int x, int y)
+static void VideoDoDrawPixelClip(Uint32 color, int x, int y)
 {
 	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
 		VideoDoDrawPixel(color, x, y);
@@ -196,7 +196,7 @@ local void VideoDoDrawPixelClip(Uint32 color, int x, int y)
 /**
 **  FIXME: docu
 */
-global void VideoDrawPixelClip(Uint32 color, int x, int y)
+void VideoDrawPixelClip(Uint32 color, int x, int y)
 {
 	VideoLockScreen();
 	VideoDoDrawPixelClip(color, x, y);
@@ -206,7 +206,7 @@ global void VideoDrawPixelClip(Uint32 color, int x, int y)
 /**
 **  FIXME: docu
 */
-local void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
+static void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
 	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
 		VideoDoDrawTransPixel(color, x, y, alpha);
@@ -216,7 +216,7 @@ local void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char a
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
+void VideoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
 	VideoLockScreen();
 	VideoDoDrawTransPixelClip(color, x, y, alpha);
@@ -226,7 +226,7 @@ global void VideoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char al
 /**
 **  FIXME: docu
 */
-global void VideoDrawVLine(Uint32 color, int x, int y, int height)
+void VideoDrawVLine(Uint32 color, int x, int y, int height)
 {
 	int i;
 
@@ -240,7 +240,7 @@ global void VideoDrawVLine(Uint32 color, int x, int y, int height)
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransVLine(Uint32 color, int x, int y,
+void VideoDrawTransVLine(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
 	int i;
@@ -255,7 +255,7 @@ global void VideoDrawTransVLine(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
+void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
 {
 	int w;
 	
@@ -267,7 +267,7 @@ global void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransVLineClip(Uint32 color, int x, int y,
+void VideoDrawTransVLineClip(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
 	int i;
@@ -282,7 +282,7 @@ global void VideoDrawTransVLineClip(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoDrawHLine(Uint32 color, int x, int y, int width)
+void VideoDrawHLine(Uint32 color, int x, int y, int width)
 {
 	int i;
 
@@ -296,7 +296,7 @@ global void VideoDrawHLine(Uint32 color, int x, int y, int width)
 /**
 **  FIXME: docu
 */
-global void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
+void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
 {
 	int h;
 	
@@ -308,7 +308,7 @@ global void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransHLine(Uint32 color, int x, int y,
+void VideoDrawTransHLine(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
 {
 	int i;
@@ -323,7 +323,7 @@ global void VideoDrawTransHLine(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransHLineClip(Uint32 color, int x, int y,
+void VideoDrawTransHLineClip(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
 {
 	int i;
@@ -338,7 +338,7 @@ global void VideoDrawTransHLineClip(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
+void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 {
 	int x;
 	int y;
@@ -448,7 +448,7 @@ global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 /**
 **  FIXME: docu
 */
-global void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
+void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 {
 	int x;
 	int y;
@@ -558,7 +558,7 @@ global void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransLine(Uint32 color, int sx, int sy,
+void VideoDrawTransLine(Uint32 color, int sx, int sy,
 	int dx, int dy, unsigned char alpha)
 {
 	// FIXME: trans
@@ -568,7 +568,7 @@ global void VideoDrawTransLine(Uint32 color, int sx, int sy,
 /**
 **  FIXME: docu
 */
-global void VideoDrawRectangle(Uint32 color, int x, int y,
+void VideoDrawRectangle(Uint32 color, int x, int y,
 	int w, int h)
 {
 	VideoDrawHLine(color, x, y, w);
@@ -581,7 +581,7 @@ global void VideoDrawRectangle(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoDrawRectangleClip(Uint32 color, int x, int y,
+void VideoDrawRectangleClip(Uint32 color, int x, int y,
 	int w, int h)
 {
 	VideoDrawHLineClip(color, x, y, w);
@@ -594,7 +594,7 @@ global void VideoDrawRectangleClip(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransRectangle(Uint32 color, int x, int y,
+void VideoDrawTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	VideoDrawTransHLine(color, x, y, w, alpha);
@@ -607,7 +607,7 @@ global void VideoDrawTransRectangle(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoFillRectangle(Uint32 color, int x, int y,
+void VideoFillRectangle(Uint32 color, int x, int y,
 	int w, int h)
 {
 	SDL_Rect drect;
@@ -623,7 +623,7 @@ global void VideoFillRectangle(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoFillRectangleClip(Uint32 color, int x, int y,
+void VideoFillRectangleClip(Uint32 color, int x, int y,
 	int w, int h)
 {
 	SDL_Rect oldrect;
@@ -643,7 +643,7 @@ global void VideoFillRectangleClip(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoFillTransRectangle(Uint32 color, int x, int y,
+void VideoFillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	SDL_Rect drect;
@@ -672,7 +672,7 @@ global void VideoFillTransRectangle(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoFillTransRectangleClip(Uint32 color, int x, int y,
+void VideoFillTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	SDL_Rect oldrect;
@@ -692,7 +692,7 @@ global void VideoFillTransRectangleClip(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoDrawCircle(Uint32 color, int x, int y, int r)
+void VideoDrawCircle(Uint32 color, int x, int y, int r)
 {
 	int p;
 	int px;
@@ -726,7 +726,7 @@ global void VideoDrawCircle(Uint32 color, int x, int y, int r)
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransCircle(Uint32 color, int x, int y,
+void VideoDrawTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
 	int p;
@@ -761,7 +761,7 @@ global void VideoDrawTransCircle(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
+void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 {
 	int p;
 	int px;
@@ -795,7 +795,7 @@ global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 /**
 **  FIXME: docu
 */
-global void VideoDrawTransCircleClip(Uint32 color, int x, int y,
+void VideoDrawTransCircleClip(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
 	int p;
@@ -830,7 +830,7 @@ global void VideoDrawTransCircleClip(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoFillCircle(Uint32 color, int x, int y, int r)
+void VideoFillCircle(Uint32 color, int x, int y, int r)
 {
 	int p;
 	int px;
@@ -868,7 +868,7 @@ global void VideoFillCircle(Uint32 color, int x, int y, int r)
 /**
 **  FIXME: docu
 */
-global void VideoFillTransCircle(Uint32 color, int x, int y,
+void VideoFillTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
 	int p;
@@ -907,7 +907,7 @@ global void VideoFillTransCircle(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
+void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 {
 	int p;
 	int px;
@@ -945,7 +945,7 @@ global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 /**
 **  FIXME: docu
 */
-global void VideoFillTransCircleClip(Uint32 color, int x, int y,
+void VideoFillTransCircleClip(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
 	int p;
@@ -984,7 +984,7 @@ global void VideoFillTransCircleClip(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void InitLineDraw(void)
+void InitLineDraw(void)
 {
 	switch (VideoDepth) {
 		case 16:
@@ -1010,7 +1010,7 @@ global void InitLineDraw(void)
 **  @param x      x coordinate on the screen
 **  @param y      y coordinate on the screen
 */
-global void VideoDrawPixel(Uint32 color, int x, int y)
+void VideoDrawPixel(Uint32 color, int x, int y)
 {
 	GLubyte r, g, b, a;
 
@@ -1031,7 +1031,7 @@ global void VideoDrawPixel(Uint32 color, int x, int y)
 **  @param y      y coordinate on the screen
 **  @param alpha  alpha value of pixel.
 */
-global void VideoDrawTransPixel(Uint32 color, int x, int y,
+void VideoDrawTransPixel(Uint32 color, int x, int y,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
@@ -1052,7 +1052,7 @@ global void VideoDrawTransPixel(Uint32 color, int x, int y,
 **  @param x      x coordinate on the screen
 **  @param y      y coordinate on the screen
 */
-global void VideoDrawPixelClip(Uint32 color, int x, int y)
+void VideoDrawPixelClip(Uint32 color, int x, int y)
 {
 	GLubyte r, g, b, a;
 
@@ -1078,7 +1078,7 @@ global void VideoDrawPixelClip(Uint32 color, int x, int y)
 **  @param y      y coordinate on the screen
 **  @param width  width of line (0=don't draw).
 */
-global void VideoDrawHLine(Uint32 color, int x, int y, int width)
+void VideoDrawHLine(Uint32 color, int x, int y, int width)
 {
 	GLubyte r, g, b, a;
 
@@ -1120,7 +1120,7 @@ global void VideoDrawHLine(Uint32 color, int x, int y, int width)
 **  @param y      y coordinate on the screen
 **  @param width  width of line (0=don't draw).
 */
-global void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
+void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
 {
     CLIP_HLINE(x, y, width);
     VideoDrawHLine(color, x, y, width);
@@ -1135,7 +1135,7 @@ global void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
 **  @param width  width of line (0=don't draw).
 **  @param alpha  alpha value of pixels.
 */
-global void VideoDrawTransHLine(Uint32 color, int x, int y, int width,
+void VideoDrawTransHLine(Uint32 color, int x, int y, int width,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
@@ -1159,7 +1159,7 @@ global void VideoDrawTransHLine(Uint32 color, int x, int y, int width,
 **  @param width  Width of line (0=don't draw)
 **  @param alpha  Alpha value of pixels
 */
-global void VideoDrawTransHLineClip(Uint32 color, int x, int y, int width,
+void VideoDrawTransHLineClip(Uint32 color, int x, int y, int width,
 	unsigned char alpha)
 {
 	CLIP_HLINE(x, y, width);
@@ -1174,7 +1174,7 @@ global void VideoDrawTransHLineClip(Uint32 color, int x, int y, int width,
 **  @param y       y coordinate on the screen
 **  @param height  height of line (0=don't draw).
 */
-global void VideoDrawVLine(Uint32 color, int x, int y, int height)
+void VideoDrawVLine(Uint32 color, int x, int y, int height)
 {
 	GLubyte r, g, b, a;
 
@@ -1216,7 +1216,7 @@ global void VideoDrawVLine(Uint32 color, int x, int y, int height)
 **  @param y       y coordinate on the screen
 **  @param height  height of line (0=don't draw).
 */
-global void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
+void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
 {
     CLIP_VLINE(x, y, height);
     VideoDrawVLine(color, x, y, height);
@@ -1231,7 +1231,7 @@ global void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
 **  @param height  height of line (0=don't draw).
 **  @param alpha   alpha value of pixels.
 */
-global void VideoDrawTransVLine(Uint32 color, int x, int y, int height,
+void VideoDrawTransVLine(Uint32 color, int x, int y, int height,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
@@ -1255,7 +1255,7 @@ global void VideoDrawTransVLine(Uint32 color, int x, int y, int height,
 **  @param height  height of line (0=don't draw).
 **  @param alpha   alpha value of pixels.
 */
-global void VideoDrawTransVLineClip(Uint32 color, int x, int y,
+void VideoDrawTransVLineClip(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
 	CLIP_VLINE(x, y, height);
@@ -1271,7 +1271,7 @@ global void VideoDrawTransVLineClip(Uint32 color, int x, int y,
 **  @param x2     Destination x coordinate on the screen
 **  @param y2     Destination y coordinate on the screen
 */
-global void VideoDrawLine(Uint32 color, int x1, int y1, int x2, int y2)
+void VideoDrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	GLubyte r, g, b, a;
 
@@ -1302,7 +1302,7 @@ global void VideoDrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 **  @param x  pixel's x position (not restricted to screen width)
 **  @param y  pixel's y position (not restricted to screen height)
 */
-local ClipCode ClipCodeLine(int x, int y)
+static ClipCode ClipCodeLine(int x, int y)
 {
 	ClipCode result;
 
@@ -1330,7 +1330,7 @@ local ClipCode ClipCodeLine(int x, int y)
 **  @param code1  ClipCode of one point of line
 **  @param code2  ClipCode of second point of line
 */
-local ClipCode LineIsUnclippedOnSameSide(int code1, int code2)
+static ClipCode LineIsUnclippedOnSameSide(int code1, int code2)
 {
 	return code1 & code2;
 }
@@ -1342,7 +1342,7 @@ local ClipCode LineIsUnclippedOnSameSide(int code1, int code2)
 **  @param code1  ClipCode of one point of line
 **  @param code2  ClipCode of second point of line
 */
-local ClipCode LineIsUnclipped(int code1, int code2)
+static ClipCode LineIsUnclipped(int code1, int code2)
 {
 	return code1 | code2;
 }
@@ -1359,7 +1359,7 @@ local ClipCode LineIsUnclipped(int code1, int code2)
 **  @param x2     Destination x coordinate on the screen
 **  @param y2     Destination y coordinate on the screen
 */
-global void VideoDrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
+void VideoDrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	ClipCode code1;
 	ClipCode code2;
@@ -1416,7 +1416,7 @@ global void VideoDrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 **  @param h      height of rectangle (0=don't draw).
 **  @param w      width of rectangle (0=don't draw).
 */
-global void VideoDrawRectangle(Uint32 color, int x, int y, int w, int h)
+void VideoDrawRectangle(Uint32 color, int x, int y, int w, int h)
 {
 	GLubyte r, g, b, a;
 
@@ -1441,7 +1441,7 @@ global void VideoDrawRectangle(Uint32 color, int x, int y, int w, int h)
 **  @param h      height of rectangle (0=don't draw).
 **  @param w      width of rectangle (0=don't draw).
 */
-global void VideoDrawRectangleClip(Uint32 color, int x, int y,
+void VideoDrawRectangleClip(Uint32 color, int x, int y,
     int w, int h)
 {
 	#define _x              x
@@ -1471,7 +1471,7 @@ global void VideoDrawRectangleClip(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 **  @param alpha  alpha value of pixel.
 */
-global void VideoDrawTransRectangle(Uint32 color, int x, int y,
+void VideoDrawTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
@@ -1497,7 +1497,7 @@ global void VideoDrawTransRectangle(Uint32 color, int x, int y,
 **  @param h      height of rectangle (0=don't draw).
 **  @param w      width of rectangle (0=don't draw).
 */
-global void VideoFillRectangle(Uint32 color, int x, int y,
+void VideoFillRectangle(Uint32 color, int x, int y,
 	int w, int h)
 {
 	GLubyte r, g, b, a;
@@ -1523,7 +1523,7 @@ global void VideoFillRectangle(Uint32 color, int x, int y,
 **  @param h      height of rectangle (0=don't draw).
 **  @param w      width of rectangle (0=don't draw).
 */
-global void VideoFillRectangleClip(Uint32 color, int x, int y,
+void VideoFillRectangleClip(Uint32 color, int x, int y,
     int w, int h)
 {
     CLIP_RECTANGLE(x, y, w, h);
@@ -1540,7 +1540,7 @@ global void VideoFillRectangleClip(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 **  @param alpha  alpha value of pixel.
 */
-global void VideoFillTransRectangle(Uint32 color, int x, int y,
+void VideoFillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
@@ -1567,7 +1567,7 @@ global void VideoFillTransRectangle(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 **  @param alpha  alpha value of pixels.
 */
-global void VideoFillTransRectangleClip(Uint32 color, int x, int y,
+void VideoFillTransRectangleClip(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     CLIP_RECTANGLE(x, y, w, h);
@@ -1582,7 +1582,7 @@ global void VideoFillTransRectangleClip(Uint32 color, int x, int y,
 **  @param y      Center y coordinate on the screen
 **  @param r      radius of circle
 */
-global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
+void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 {
 	int cx;
 	int cy;
@@ -1641,7 +1641,7 @@ global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 **  @param y      Center y coordinate on the screen
 **  @param r      radius of circle
 */
-global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
+void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 {
 	int cx;
 	int cy;
@@ -1678,7 +1678,7 @@ global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 	} while (cx <= cy);
 }
 
-global void VideoFillTransCircle(Uint32 color, int x, int y, 
+void VideoFillTransCircle(Uint32 color, int x, int y, 
 	int r, unsigned char alpha)
 {
 	int p;
@@ -1714,7 +1714,7 @@ global void VideoFillTransCircle(Uint32 color, int x, int y,
 	}
 }
 
-global void VideoFillTransCircleClip(Uint32 color, int x, int y,
+void VideoFillTransCircleClip(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
 	int p;
@@ -1753,7 +1753,7 @@ global void VideoFillTransCircleClip(Uint32 color, int x, int y,
 /**
 **  FIXME: docu
 */
-global void InitLineDraw(void)
+void InitLineDraw(void)
 {
 }
 

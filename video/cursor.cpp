@@ -59,52 +59,52 @@
 /**
 **  Cursor-type type definition
 */
-global const char CursorTypeType[] = "cursor-type";
+const char CursorTypeType[] = "cursor-type";
 
 /**
 **  Define cursor-types.
 **
 **  @todo FIXME: Should this be move to ui part?
 */
-global CursorType* Cursors;
+CursorType* Cursors;
 
-global CursorStates CursorState;    /// current cursor state (point,...)
-global int CursorAction;            /// action for selection
-global int CursorValue;             /// value for CursorAction (spell type f.e.)
+CursorStates CursorState;    /// current cursor state (point,...)
+int CursorAction;            /// action for selection
+int CursorValue;             /// value for CursorAction (spell type f.e.)
 
 	// Event changed mouse position, can alter at any moment
-global int CursorX;                 /// cursor position on screen X
-global int CursorY;                 /// cursor position on screen Y
+int CursorX;                 /// cursor position on screen X
+int CursorY;                 /// cursor position on screen Y
 
-global int CursorStartX;            /// rectangle started on screen X
-global int CursorStartY;            /// rectangle started on screen Y
+int CursorStartX;            /// rectangle started on screen X
+int CursorStartY;            /// rectangle started on screen Y
 
-global int SubScrollX;              /// pixels the mouse moved while scrolling
-global int SubScrollY;              /// pixels the mouse moved while scrolling
+int SubScrollX;              /// pixels the mouse moved while scrolling
+int SubScrollY;              /// pixels the mouse moved while scrolling
 
 	/// X position of starting point of selection rectangle, in screen pixels.
-global int CursorStartScrMapX;
+int CursorStartScrMapX;
 	/// Y position of starting point of selection rectangle, in screen pixels.
-global int CursorStartScrMapY;
+int CursorStartScrMapY;
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-local int BuildingCursor;           /// Flag (0/1): last cursor was building
+static int BuildingCursor;           /// Flag (0/1): last cursor was building
 
 	/// area of tiles covered by building cursor (SX,SY;EX,EY)
-local int BuildingCursorSX;
+static int BuildingCursorSX;
 	/// area of tiles covered by building cursor (SX,SY;EX,EY)
-local int BuildingCursorSY;
+static int BuildingCursorSY;
 	/// area of tiles covered by building cursor (SX,SY;EX,EY)
-local int BuildingCursorEX;
+static int BuildingCursorEX;
 	/// area of tiles covered by building cursor (SX,SY;EX,EY)
-local int BuildingCursorEY;
+static int BuildingCursorEY;
 
-global UnitType* CursorBuilding;		/// building cursor
+UnitType* CursorBuilding;		/// building cursor
 
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
-global CursorType* GameCursor;      /// current shown cursor-type
+CursorType* GameCursor;      /// current shown cursor-type
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -115,7 +115,7 @@ global CursorType* GameCursor;      /// current shown cursor-type
 **
 **  @param race  Cursor graphics of this race to load.
 */
-global void LoadCursors(const char* race)
+void LoadCursors(const char* race)
 {
 	int i;
 	const char* file;
@@ -163,7 +163,7 @@ global void LoadCursors(const char* race)
 **
 **  @note If we have more cursors, we should add hash to find them faster.
 */
-global CursorType* CursorTypeByIdent(const char* ident)
+CursorType* CursorTypeByIdent(const char* ident)
 {
 	CursorType* cursortype;
 
@@ -191,7 +191,7 @@ global CursorType* CursorTypeByIdent(const char* ident)
 **  @param x1  Screen x end position of rectangle
 **  @param y1  Screen y end position of rectangle
 */
-local void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
+static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 {
 	int w;
 	int h;
@@ -242,7 +242,7 @@ local void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 **  @param y      Screen y pixel position.
 **  @param frame  Animation frame # of the cursor.
 */
-local void DrawCursor(const CursorType* type, int x, int y, int frame)
+static void DrawCursor(const CursorType* type, int x, int y, int frame)
 {
 	VideoDrawClip(type->Sprite, frame, x - type->HotX, y - type->HotY);
 }
@@ -253,7 +253,7 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
 /**
 **  Draw cursor for selecting building position.
 */
-local void DrawBuildingCursor(void)
+static void DrawBuildingCursor(void)
 {
 	int i;
 	int x;
@@ -354,7 +354,7 @@ local void DrawBuildingCursor(void)
 **         CursorX, CursorY,.. because between two copy commands another
 **         event can occure, which let invalid mouse position be delivered.
 */
-global void DrawAnyCursor(void)
+void DrawAnyCursor(void)
 {
 	//
 	//  First, Selecting rectangle
@@ -385,7 +385,7 @@ global void DrawAnyCursor(void)
 **
 **  @param ticks  Current tick
 */
-global void CursorAnimate(unsigned ticks)
+void CursorAnimate(unsigned ticks)
 {
 	static unsigned last = 0;
 
@@ -405,7 +405,7 @@ global void CursorAnimate(unsigned ticks)
 /**
 **  Setup the cursor part.
 */
-global void InitVideoCursors(void)
+void InitVideoCursors(void)
 {
 	CursorX = VideoWidth / 2;
 	CursorY = VideoHeight / 2;
@@ -414,7 +414,7 @@ global void InitVideoCursors(void)
 /**
 **  Cleanup cursor module
 */
-global void CleanCursors(void)
+void CleanCursors(void)
 {
 	int i;
 

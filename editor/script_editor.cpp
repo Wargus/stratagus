@@ -50,8 +50,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global char* EditorSelectIcon;
-global char* EditorUnitsIcon;
+char* EditorSelectIcon;
+char* EditorUnitsIcon;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -62,7 +62,7 @@ global char* EditorUnitsIcon;
 **
 **  @param l  Lua state.
 */
-local int CclDefineEditorUnitTypes(lua_State* l)
+static int CclDefineEditorUnitTypes(lua_State* l)
 {
 	char** cp;
 	int args;
@@ -94,7 +94,7 @@ local int CclDefineEditorUnitTypes(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetEditorSelectIcon(lua_State* l)
+static int CclSetEditorSelectIcon(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -109,7 +109,7 @@ local int CclSetEditorSelectIcon(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetEditorUnitsIcon(lua_State* l)
+static int CclSetEditorUnitsIcon(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -122,7 +122,7 @@ local int CclSetEditorUnitsIcon(lua_State* l)
 /**
 **  Register CCL features for the editor.
 */
-global void EditorCclRegister(void)
+void EditorCclRegister(void)
 {
 	lua_register(Lua, "DefineEditorUnitTypes", CclDefineEditorUnitTypes);
 	lua_register(Lua, "SetEditorSelectIcon", CclSetEditorSelectIcon);

@@ -55,7 +55,7 @@
 **
 **  @param unit  Pointer to unit.
 */
-global void HandleActionUpgradeTo(Unit* unit)
+void HandleActionUpgradeTo(Unit* unit)
 {
 	Player* player;
 	UnitType* type;

@@ -55,7 +55,7 @@ typedef struct _unit_group_ {
 	int    NumUnits;                    /// How many units in the group
 } UnitGroup;                            /// group of units
 
-global UnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
+UnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -66,7 +66,7 @@ global UnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
 **
 **  @todo Not needed with the new unit code!
 */
-global void InitGroups(void)
+void InitGroups(void)
 {
 	int i;
 
@@ -82,7 +82,7 @@ global void InitGroups(void)
 **
 **  @param file  Output file.
 */
-global void SaveGroups(CLFile* file)
+void SaveGroups(CLFile* file)
 {
 	int i;
 	int g;
@@ -105,7 +105,7 @@ global void SaveGroups(CLFile* file)
 /**
 **  Clean up group part.
 */
-global void CleanGroups(void)
+void CleanGroups(void)
 {
 	int i;
 
@@ -124,7 +124,7 @@ global void CleanGroups(void)
 **
 **  @return     Returns the number of units in the group.
 */
-global int GetNumberUnitsOfGroup(int num)
+int GetNumberUnitsOfGroup(int num)
 {
 	return Groups[num].NumUnits;
 }
@@ -136,7 +136,7 @@ global int GetNumberUnitsOfGroup(int num)
 **
 **  @return     Returns an array of all units in the group.
 */
-global Unit** GetUnitsOfGroup(int num)
+Unit** GetUnitsOfGroup(int num)
 {
 	return Groups[num].Units;
 }
@@ -146,7 +146,7 @@ global Unit** GetUnitsOfGroup(int num)
 **
 **  @param num  Group number.
 */
-global void ClearGroup(int num)
+void ClearGroup(int num)
 {
 	UnitGroup* group;
 	int i;
@@ -166,7 +166,7 @@ global void ClearGroup(int num)
 **  @param nunits  Number of units in array.
 **  @param num     Group number for storage.
 */
-global void AddToGroup(Unit** units, int nunits, int num)
+void AddToGroup(Unit** units, int nunits, int num)
 {
 	UnitGroup* group;
 	int i;
@@ -187,7 +187,7 @@ global void AddToGroup(Unit** units, int nunits, int num)
 **  @param nunits  Number of units in array.
 **  @param num     Group number for storage.
 */
-global void SetGroup(Unit** units, int nunits, int num)
+void SetGroup(Unit** units, int nunits, int num)
 {
 	Assert(num <= NUM_GROUPS && nunits <= MaxSelectable);
 
@@ -200,7 +200,7 @@ global void SetGroup(Unit** units, int nunits, int num)
 **
 **  @param unit  Unit to remove from group.
 */
-global void RemoveUnitFromGroups(Unit* unit)
+void RemoveUnitFromGroups(Unit* unit)
 {
 	UnitGroup* group;
 	int num;
@@ -235,7 +235,7 @@ global void RemoveUnitFromGroups(Unit* unit)
 **
 **  @param l  Lua state.
 */
-local int CclGroup(lua_State* l)
+static int CclGroup(lua_State* l)
 {
 	int i;
 	UnitGroup* grp;
@@ -266,7 +266,7 @@ local int CclGroup(lua_State* l)
 /**
 **  Register CCL features for groups.
 */
-global void GroupCclRegister(void)
+void GroupCclRegister(void)
 {
 	lua_register(Lua, "Group", CclGroup);
 }

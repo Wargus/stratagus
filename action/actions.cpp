@@ -52,7 +52,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global unsigned SyncHash;			/// Hash calculated to find sync failures
+unsigned SyncHash;			/// Hash calculated to find sync failures
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -71,7 +71,7 @@ global unsigned SyncHash;			/// Hash calculated to find sync failures
 **
 **  @return           The flags of the current script step.
 */
-global int UnitShowAnimation(Unit* unit, const Animation* animation)
+int UnitShowAnimation(Unit* unit, const Animation* animation)
 {
 	int state;
 	int flags;
@@ -122,7 +122,7 @@ global int UnitShowAnimation(Unit* unit, const Animation* animation)
 **
 **  @param unit  Unit pointer for none action.
 */
-local void HandleActionNone(Unit* unit __attribute__((unused)))
+static void HandleActionNone(Unit* unit __attribute__((unused)))
 {
 	DebugPrint("FIXME: Should not happen!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action none.!\n" _C_
@@ -134,7 +134,7 @@ local void HandleActionNone(Unit* unit __attribute__((unused)))
 **
 **  @param unit  Unit pointer for not written action.
 */
-local void HandleActionNotWritten(Unit* unit __attribute__((unused)))
+static void HandleActionNotWritten(Unit* unit __attribute__((unused)))
 {
 	DebugPrint("FIXME: Not written!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action %d.!\n" _C_
@@ -146,7 +146,7 @@ local void HandleActionNotWritten(Unit* unit __attribute__((unused)))
 **
 **  @note can move function into unit structure.
 */
-local void (*HandleActionTable[256])(Unit*) = {
+static void (*HandleActionTable[256])(Unit*) = {
 	HandleActionNone,
 	HandleActionStill,
 	HandleActionStandGround,
@@ -256,7 +256,7 @@ local void (*HandleActionTable[256])(Unit*) = {
 **
 **  @param unit  the unit to operate on
 */
-local void HandleRegenerations(Unit* unit)
+static void HandleRegenerations(Unit* unit)
 {
 	int f;
 
@@ -302,7 +302,7 @@ local void HandleRegenerations(Unit* unit)
 **  @param unit    The unit that the decay is handled for
 **  @param amount  The amount of time to make up for.(in cycles)
 */
-local void HandleBuffs(Unit* unit, int amount)
+static void HandleBuffs(Unit* unit, int amount)
 {
 	int deadunit;
 
@@ -367,7 +367,7 @@ local void HandleBuffs(Unit* unit, int amount)
 **
 **  @param unit  Pointer to handled unit.
 */
-local void HandleUnitAction(Unit* unit)
+static void HandleUnitAction(Unit* unit)
 {
 	int z;
 
@@ -444,7 +444,7 @@ local void HandleUnitAction(Unit* unit)
 **
 **  @todo  To improve the preformance use slots for waiting.
 */
-global void UnitActions(void)
+void UnitActions(void)
 {
 	Unit* table[UnitMax];
 	Unit* unit;

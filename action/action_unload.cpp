@@ -87,7 +87,7 @@
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
 */
-local int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
+static int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
 {
 	int i;
 	int n;
@@ -144,7 +144,7 @@ local int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
 */
-global int UnloadUnit(Unit* unit)
+int UnloadUnit(Unit* unit)
 {
 	int x;
 	int y;
@@ -171,7 +171,7 @@ global int UnloadUnit(Unit* unit)
 **
 **  @return       1 if a location was found, 0 otherwise
 */
-local int ClosestFreeCoast(int x, int y, int* resx, int* resy)
+static int ClosestFreeCoast(int x, int y, int* resx, int* resy)
 {
 	int i;
 	int addx;
@@ -249,7 +249,7 @@ local int ClosestFreeCoast(int x, int y, int* resx, int* resy)
 **  @return              1 if a location was found, 0 otherwise
 **
 */
-local int ClosestFreeDropZone(Unit* transporter, int x, int y, int* resx, int* resy)
+static int ClosestFreeDropZone(Unit* transporter, int x, int y, int* resx, int* resy)
 {
 	// Type (land/fly/naval) of the transporter
 	int transporterType;
@@ -298,7 +298,7 @@ local int ClosestFreeDropZone(Unit* transporter, int x, int y, int* resx, int* r
 **
 **  @return      -1 if unreachable, True if reached, False otherwise.
 */
-local int MoveToDropZone(Unit* unit)
+static int MoveToDropZone(Unit* unit)
 {
 	switch (DoActionMove(unit)) {		// reached end-point?
 		case PF_UNREACHABLE:
@@ -318,7 +318,7 @@ local int MoveToDropZone(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-local void LeaveTransporter(Unit* unit)
+static void LeaveTransporter(Unit* unit)
 {
 	int i;
 	int stillonboard;
@@ -386,7 +386,7 @@ local void LeaveTransporter(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-global void HandleActionUnload(Unit* unit)
+void HandleActionUnload(Unit* unit)
 {
 	int i;
 	int x;

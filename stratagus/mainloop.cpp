@@ -78,18 +78,18 @@
 //----------------------------------------------------------------------------
 
 	/// variable set when we are scrolling via keyboard
-global enum _scroll_state_ KeyScrollState = ScrollNone;
+enum _scroll_state_ KeyScrollState = ScrollNone;
 
 	/// variable set when we are scrolling via mouse
-global enum _scroll_state_ MouseScrollState = ScrollNone;
+enum _scroll_state_ MouseScrollState = ScrollNone;
 
 #if defined(DEBUG)
-global jmp_buf MainLoopJmpBuf;				/// Hierarchic pathfinder error exit.
+jmp_buf MainLoopJmpBuf;				/// Hierarchic pathfinder error exit.
 #endif
 
-global EventCallback* Callbacks;		/// Current callbacks
-global EventCallback GameCallbacks;		/// Game callbacks
-global EventCallback MenuCallbacks;		/// Menu callbacks
+EventCallback* Callbacks;		/// Current callbacks
+EventCallback GameCallbacks;		/// Game callbacks
+EventCallback MenuCallbacks;		/// Menu callbacks
 
 //----------------------------------------------------------------------------
 //		Functions
@@ -104,7 +104,7 @@ global EventCallback MenuCallbacks;		/// Menu callbacks
 **  @todo  Support dynamic acceleration of scroll speed.
 **  @todo  If the scroll key is longer pressed the area is scrolled faster.
 */
-global void DoScrollArea(enum _scroll_state_ state, int fast)
+void DoScrollArea(enum _scroll_state_ state, int fast)
 {
 	Viewport* vp;
 	int stepx;
@@ -171,7 +171,7 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 **
 **  @note  Johns: I think parsing the viewport pointer is faster.
 */
-local void DrawMapViewport(Viewport* vp)
+static void DrawMapViewport(Viewport* vp)
 {
 	Unit* table[UnitMax];
 	Missile* missiletable[MAX_MISSILES * 9];
@@ -289,7 +289,7 @@ local void DrawMapViewport(Viewport* vp)
 **  @todo  Fix the FIXME's and we only need to draw a line between the
 **         viewports and show the active viewport.
 */
-global void DrawMapArea(void)
+void DrawMapArea(void)
 {
 	Viewport* vp;
 	const Viewport* evp;
@@ -334,7 +334,7 @@ global void DrawMapArea(void)
 **  This functions updates everything on screen. The map, the gui, the
 **  cursors.
 */
-global void UpdateDisplay(void)
+void UpdateDisplay(void)
 {
 	if (EnableRedraw != RedrawMenu) {
 		int i;
@@ -397,7 +397,7 @@ global void UpdateDisplay(void)
 **  Display update.
 **  Input/Network/Sound.
 */
-global void GameMainLoop(void)
+void GameMainLoop(void)
 {
 #ifdef DEBUG  // removes the setjmp warnings
 	static int showtip;

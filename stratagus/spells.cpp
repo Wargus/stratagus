@@ -89,11 +89,11 @@ static inline max(int a, int b) { return a > b ? a : b; }
 /**
 **		Define the names and effects of all im play available spells.
 */
-global SpellType** SpellTypeTable;
+SpellType** SpellTypeTable;
 
 
 /// How many spell-types are available
-global int SpellTypeCount;
+int SpellTypeCount;
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -114,7 +114,7 @@ global int SpellTypeCount;
 **
 **		@return				=!0 if spell should be repeated, 0 if not
 */
-global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
+int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
 {
 	int xmin;
@@ -194,7 +194,7 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
 **
 **		@return				=!0 if spell should be repeated, 0 if not
 */
-global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused)),
+int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused)),
 	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
 {
 	// FIXME: vladi: cop should be placed only on explored land
@@ -232,7 +232,7 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 **
 **		@return				=!0 if spell should be repeated, 0 if not
 */
-global int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
+int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
 {
 	Unit* units[UnitMax];
@@ -289,7 +289,7 @@ global int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 **      @internal: vladi: blizzard differs than original in this way:
 **       original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-global int CastAreaBombardment(Unit* caster, const SpellType* spell,
+int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
 {
 	int fields;
@@ -352,7 +352,7 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 **		@param resx		pointer to X coord of the result
 **		@param resy		pointer to Y coord of the result
 */
-local void EvaluateMissileLocation(const SpellActionMissileLocation* location,
+static void EvaluateMissileLocation(const SpellActionMissileLocation* location,
 	Unit* caster, Unit* target, int x, int y, int* resx, int* resy)
 {
 	if (location->Base == LocBaseCaster) {
@@ -389,7 +389,7 @@ local void EvaluateMissileLocation(const SpellActionMissileLocation* location,
 **
 **		@return				=!0 if spell should be repeated, 0 if not
 */
-global int CastSpawnMissile(Unit* caster, const SpellType* spell,
+int CastSpawnMissile(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
 	Missile* missile;
@@ -429,7 +429,7 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 **
 **		@return				=!0 if spell should be repeated, 0 if not
 */
-global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
+int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
 	if (action->Data.AdjustBuffs.HasteTicks != BUFF_NOT_AFFECTED) {
@@ -462,7 +462,7 @@ global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 **
 **		@return				=!0 if spell should be repeated, 0 if not
 */
-global int CastAdjustVitals(Unit* caster, const SpellType* spell,
+int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
 	int castcount;
@@ -539,7 +539,7 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 **
 **		@return				=!0 if spell should be repeated, 0 if not
 */
-global int CastPolymorph(Unit* caster, const SpellType* spell,
+int CastPolymorph(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
 	int i;
@@ -601,7 +601,7 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 **
 **		@return				=!0 if spell should be repeated, 0 if not
 */
-global int CastSummon(Unit* caster, const SpellType* spell,
+int CastSummon(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
 	int ttl;
@@ -683,7 +683,7 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 **      @param y            y coord of the target.
 **      @return the new target.
 */
-local Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
+static Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
 {
 	Target* target;
 
@@ -703,11 +703,12 @@ local Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
 **
 **      @return the new target.
 */
-local Target* NewTargetUnit(const Unit* unit)
+static Target* NewTargetUnit(const Unit* unit)
 {
 	return NewTarget(TargetUnit, unit, 0, 0);
 }
 
+#if 0
 /**
 **      Target constructor for position.
 **
@@ -716,10 +717,11 @@ local Target* NewTargetUnit(const Unit* unit)
 **
 **      @return the new target.
 */
-local Target* NewTargetPosition(int x, int y)
+static Target* NewTargetPosition(int x, int y)
 {
 	return NewTarget(TargetPosition, NULL, x, y);
 }
+#endif
 
 // ****************************************************************************
 //		Main local functions
@@ -737,7 +739,7 @@ local Target* NewTargetPosition(int x, int y)
 **
 **		@return 1 if passed, 0 otherwise.
 */
-local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* target,
+static int PassCondition(const Unit* caster, const SpellType* spell, const Unit* target,
 	int x, int y, const ConditionInfo* condition)
 {
 	int i;
@@ -841,7 +843,7 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 **      @fixme should be global (for AI) ???
 **      @fixme write for position target.
 */
-local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* spell)
+static Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* spell)
 {
 	Unit* table[UnitMax];
 	int x;
@@ -958,7 +960,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 /**
 **		Spells constructor, inits spell id's and sounds
 */
-global void InitSpells(void)
+void InitSpells(void)
 {
 }
 
@@ -969,7 +971,7 @@ global void InitSpells(void)
 **
 **  @return       spell-type struct pointer.
 */
-global SpellType* SpellTypeByIdent(const char* ident)
+SpellType* SpellTypeByIdent(const char* ident)
 {
 	int i;
 
@@ -992,7 +994,7 @@ global SpellType* SpellTypeByIdent(const char* ident)
 **
 **      @return 0 if spell is not available, else no null.
 */
-global int SpellIsAvailable(const Player* player, int spellid)
+int SpellIsAvailable(const Player* player, int spellid)
 {
 	int dependencyId;
 
@@ -1009,7 +1011,7 @@ global int SpellIsAvailable(const Player* player, int spellid)
 **
 **		@return				1 if spell can be cast, 0 if not
 */
-global int CanAutoCastSpell(const SpellType* spell)
+int CanAutoCastSpell(const SpellType* spell)
 {
 	return spell->AutoCast ? 1 : 0;
 }
@@ -1026,7 +1028,7 @@ global int CanAutoCastSpell(const SpellType* spell)
 **		@return				=!0 if spell should/can casted, 0 if not
 **		@note caster must know the spell, and spell must be researched.
 */
-global int CanCastSpell(const Unit* caster, const SpellType* spell,
+int CanCastSpell(const Unit* caster, const SpellType* spell,
 	const Unit* target, int x, int y)
 {
 	if (spell->Target == TargetUnit && target == NULL) {
@@ -1043,7 +1045,7 @@ global int CanCastSpell(const Unit* caster, const SpellType* spell,
 **
 **		@return				1 if spell is casted, 0 if not.
 */
-global int AutoCastSpell(Unit* caster, const SpellType* spell)
+int AutoCastSpell(Unit* caster, const SpellType* spell)
 {
 	Target* target;
 
@@ -1076,7 +1078,7 @@ global int AutoCastSpell(Unit* caster, const SpellType* spell)
 **
 **		@return				!=0 if spell should/can continue or 0 to stop
 */
-global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
+int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	int x, int y)
 {
 	int cont;

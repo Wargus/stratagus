@@ -59,7 +59,7 @@
 **  @param unit    Unit, for that the repair animation is played.
 **  @param repair  Repair animation.
 */
-local void DoActionRepairGeneric(Unit* unit, const Animation* repair)
+static void DoActionRepairGeneric(Unit* unit, const Animation* repair)
 {
 	int flags;
 
@@ -77,7 +77,7 @@ local void DoActionRepairGeneric(Unit* unit, const Animation* repair)
 **  @param goal  unit being repaired
 **
 */
-local void RepairUnit(Unit* unit, Unit* goal)
+static void RepairUnit(Unit* unit, Unit* goal)
 {
 	Player* player;
 	int i;
@@ -156,7 +156,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 **
 **	@param unit		Unit, for that the repair animation is played.
 */
-local int AnimateActionRepair(Unit* unit)
+static int AnimateActionRepair(Unit* unit)
 {
 	if (unit->Type->Animations) {
 		Assert(unit->Type->Animations->Repair);
@@ -171,7 +171,7 @@ local int AnimateActionRepair(Unit* unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-global void HandleActionRepair(Unit* unit)
+void HandleActionRepair(Unit* unit)
 {
 	Unit* goal;
 	int err;

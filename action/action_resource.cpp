@@ -71,7 +71,7 @@
 **
 **  @return      TRUE if reached, otherwise FALSE.
 */
-local int MoveToResource(Unit* unit)
+static int MoveToResource(Unit* unit)
 {
 	Unit* goal;
 	ResourceInfo* resinfo;
@@ -143,7 +143,7 @@ local int MoveToResource(Unit* unit)
 **
 **  @return      TRUE if ready, otherwise FALSE.
 */
-local int StartGathering(Unit* unit)
+static int StartGathering(Unit* unit)
 {
 	Unit* goal;
 	ResourceInfo* resinfo;
@@ -246,7 +246,7 @@ local int StartGathering(Unit* unit)
 **
 **  @param unit  Unit to animate
 */
-local void AnimateActionHarvest(Unit* unit)
+static void AnimateActionHarvest(Unit* unit)
 {
 	int flags;
 
@@ -267,7 +267,7 @@ local void AnimateActionHarvest(Unit* unit)
 **  @param unit    pointer to harvester unit.
 **  @param source  pointer to resource unit.
 */
-local void LoseResource(Unit* unit, const Unit* source)
+static void LoseResource(Unit* unit, const Unit* source)
 {
 	Unit* depot;
 	ResourceInfo* resinfo;
@@ -333,7 +333,7 @@ local void LoseResource(Unit* unit, const Unit* source)
 **
 **  @return      TRUE if ready, otherwise FALSE.
 */
-local int GatherResource(Unit* unit)
+static int GatherResource(Unit* unit)
 {
 	Unit* source;
 	Unit* uins;
@@ -474,7 +474,7 @@ local int GatherResource(Unit* unit)
 **
 **  @return      TRUE if ready, otherwise FALSE.
 */
-local int StopGathering(Unit* unit)
+static int StopGathering(Unit* unit)
 {
 	Unit* depot;
 	Unit* source;
@@ -546,7 +546,7 @@ local int StopGathering(Unit* unit)
 **
 **  @return      TRUE if reached, otherwise FALSE.
 */
-local int MoveToDepot(Unit* unit)
+static int MoveToDepot(Unit* unit)
 {
 	Unit* goal;
 	ResourceInfo* resinfo;
@@ -625,7 +625,7 @@ local int MoveToDepot(Unit* unit)
 **
 **  @return      TRUE if ready, otherwise FALSE.
 */
-local int WaitInDepot(Unit* unit)
+static int WaitInDepot(Unit* unit)
 {
 	const Unit* depot;
 	Unit* goal;
@@ -711,7 +711,7 @@ void ResourceGiveUp(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-global void HandleActionResource(Unit* unit)
+void HandleActionResource(Unit* unit)
 {
 	int ret;
 	int newres;

@@ -55,7 +55,7 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-global int ForestRegeneration;				/// Forest regeneration
+int ForestRegeneration;				/// Forest regeneration
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -67,7 +67,7 @@ global int ForestRegeneration;				/// Forest regeneration
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global int MapIsSeenTileWood(int x, int y)
+int MapIsSeenTileWood(int x, int y)
 {
 	return TheMap.Tileset->TileTypeTable[
 		TheMap.Fields[x + y * TheMap.Width].SeenTile] == TileTypeWood;
@@ -79,7 +79,7 @@ global int MapIsSeenTileWood(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapFixSeenWoodTile(int x, int y)
+void MapFixSeenWoodTile(int x, int y)
 {
 	int tile;
 	int ttup;
@@ -186,7 +186,7 @@ global void MapFixSeenWoodTile(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapFixSeenWoodNeighbors(int x, int y)
+void MapFixSeenWoodNeighbors(int x, int y)
 {
 	MapFixSeenWoodTile(x + 1, y);				// side neighbors
 	MapFixSeenWoodTile(x - 1, y);
@@ -204,7 +204,7 @@ global void MapFixSeenWoodNeighbors(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-local void MapFixWoodNeighbors(int x, int y)
+static void MapFixWoodNeighbors(int x, int y)
 {
 	MapFixWoodTile(x + 1, y);				// side neighbors
 	MapFixWoodTile(x - 1, y);
@@ -222,7 +222,7 @@ local void MapFixWoodNeighbors(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapFixWoodTile(int x, int y)
+void MapFixWoodTile(int x, int y)
 {
 	int tile;
 	int ttup;
@@ -324,7 +324,7 @@ global void MapFixWoodTile(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapRemoveWood(unsigned x, unsigned y)
+void MapRemoveWood(unsigned x, unsigned y)
 {
 	//EditTile(x, y, TheMap.Tileset->RemovedTree);
 	MapField* mf;
@@ -351,7 +351,7 @@ global void MapRemoveWood(unsigned x, unsigned y)
 /**
 **		Regenerate forest.
 */
-global void RegenerateForest(void)
+void RegenerateForest(void)
 {
 	MapField* mf;
 	MapField* tmp;

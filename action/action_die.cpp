@@ -53,7 +53,7 @@
 **
 **  @param unit  The unit which dies.
 */
-global void HandleActionDie(Unit* unit)
+void HandleActionDie(Unit* unit)
 {
 	//
 	// Show death animation

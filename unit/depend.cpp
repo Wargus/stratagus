@@ -51,7 +51,7 @@
 ----------------------------------------------------------------------------*/
 
 	/// All dependencies hash
-local DependRule* DependHash[101];
+static DependRule* DependHash[101];
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -65,7 +65,7 @@ local DependRule* DependHash[101];
 **  @param count     Amount of the required needed.
 **  @param or_flag   Start of or rule.
 */
-global void AddDependency(const char* target, const char* required, int count,
+void AddDependency(const char* target, const char* required, int count,
 	int or_flag)
 {
 	DependRule rule;
@@ -188,7 +188,7 @@ global void AddDependency(const char* target, const char* required, int count,
 **
 **  @return        True if available, false otherwise.
 */
-global int CheckDependByIdent(const Player* player, const char* target)
+int CheckDependByIdent(const Player* player, const char* target)
 {
 	DependRule rule;
 	const DependRule* node;
@@ -270,14 +270,14 @@ try_or:
 /**
 **  Initialize unit and upgrade dependencies.
 */
-global void InitDependencies(void)
+void InitDependencies(void)
 {
 }
 
 /**
 **  Clean up unit and upgrade dependencies.
 */
-global void CleanDependencies(void)
+void CleanDependencies(void)
 {
 	unsigned u;
 	DependRule* node;
@@ -323,7 +323,7 @@ global void CleanDependencies(void)
 **
 **  @param l  Lua state.
 */
-local int CclDefineDependency(lua_State* l)
+static int CclDefineDependency(lua_State* l)
 {
 	const char* target;
 	const char* required;
@@ -389,7 +389,7 @@ local int CclDefineDependency(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclGetDependency(lua_State* l __attribute__((unused)))
+static int CclGetDependency(lua_State* l __attribute__((unused)))
 {
 	DebugPrint("FIXME: write this %p\n" _C_ l);
 
@@ -403,7 +403,7 @@ local int CclGetDependency(lua_State* l __attribute__((unused)))
 **
 **  @param l  Lua state.
 */
-local int CclCheckDependency(lua_State* l __attribute__((unused)))
+static int CclCheckDependency(lua_State* l __attribute__((unused)))
 {
 	DebugPrint("FIXME: write this %p\n" _C_ l);
 
@@ -413,7 +413,7 @@ local int CclCheckDependency(lua_State* l __attribute__((unused)))
 /**
 **  Register CCL features for dependencies.
 */
-global void DependenciesCclRegister(void)
+void DependenciesCclRegister(void)
 {
 	lua_register(Lua, "DefineDependency", CclDefineDependency);
 	lua_register(Lua, "GetDependency", CclGetDependency);

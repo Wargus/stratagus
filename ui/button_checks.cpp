@@ -57,7 +57,7 @@
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckTrue(const Unit* unit __attribute__((unused)),
+int ButtonCheckTrue(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
 {
 	return 1;
@@ -72,7 +72,7 @@ global int ButtonCheckTrue(const Unit* unit __attribute__((unused)),
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckFalse(const Unit* unit __attribute__((unused)),
+int ButtonCheckFalse(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
 {
 	return 0;
@@ -86,7 +86,7 @@ global int ButtonCheckFalse(const Unit* unit __attribute__((unused)),
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckUpgrade(const Unit* unit, const ButtonAction* button)
+int ButtonCheckUpgrade(const Unit* unit, const ButtonAction* button)
 {
 	return UpgradeIdentAllowed(unit->Player, button->AllowStr) == 'R';
 }
@@ -99,7 +99,7 @@ global int ButtonCheckUpgrade(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckUnitsOr(const Unit* unit, const ButtonAction* button)
+int ButtonCheckUnitsOr(const Unit* unit, const ButtonAction* button)
 {
 	char* buf;
 	const char* s;
@@ -124,7 +124,7 @@ global int ButtonCheckUnitsOr(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
+int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 {
 	char* buf;
 	const char* s;
@@ -151,7 +151,7 @@ global int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 **
 **  NOTE: this check could also be moved into intialisation.
 */
-global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
+int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
 {
 	return IsNetworkGame();
@@ -167,7 +167,7 @@ global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
 **
 **  NOTE: this check could also be moved into intialisation.
 */
-global int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
+int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
 {
 	return !IsNetworkGame();
@@ -182,7 +182,7 @@ global int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckNoWork(const Unit* unit,
+int ButtonCheckNoWork(const Unit* unit,
 	const ButtonAction* button __attribute__((unused)))
 {
 	return unit->Type->Building &&
@@ -199,7 +199,7 @@ global int ButtonCheckNoWork(const Unit* unit,
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckNoResearch(const Unit* unit,
+int ButtonCheckNoResearch(const Unit* unit,
 	const ButtonAction* button __attribute__((unused)))
 {
 	return unit->Type->Building &&
@@ -216,7 +216,7 @@ global int ButtonCheckNoResearch(const Unit* unit,
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckUpgradeTo(const Unit* unit, const ButtonAction* button)
+int ButtonCheckUpgradeTo(const Unit* unit, const ButtonAction* button)
 {
 	if (unit->Orders[0].Action != UnitActionStill) {
 		return 0;
@@ -232,7 +232,7 @@ global int ButtonCheckUpgradeTo(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckAttack(const Unit* unit,
+int ButtonCheckAttack(const Unit* unit,
 	const ButtonAction* button __attribute__((unused)))
 {
 	return unit->Type->CanAttack;
@@ -246,7 +246,7 @@ global int ButtonCheckAttack(const Unit* unit,
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckResearch(const Unit* unit, const ButtonAction* button)
+int ButtonCheckResearch(const Unit* unit, const ButtonAction* button)
 {
 	// don't show any if working
 	if (!ButtonCheckNoWork(unit, button)) {
@@ -273,7 +273,7 @@ global int ButtonCheckResearch(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-global int ButtonCheckSingleResearch(const Unit* unit,
+int ButtonCheckSingleResearch(const Unit* unit,
 	const ButtonAction* button)
 {
 	if (ButtonCheckResearch(unit, button)) {

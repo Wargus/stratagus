@@ -63,84 +63,84 @@
 /**
 **  Unit-type type definition
 */
-global const char UnitTypeType[] = "unit-type";
+const char UnitTypeType[] = "unit-type";
 
 #ifdef DEBUG
-global int NoWarningUnitType;  /// quiet ident lookup
+int NoWarningUnitType;  /// quiet ident lookup
 #endif
 
-global UnitType* UnitTypes[UnitTypeMax];  /// unit-types definition
-global int NumUnitTypes;  /// number of unit-types made
+UnitType* UnitTypes[UnitTypeMax];  /// unit-types definition
+int NumUnitTypes;  /// number of unit-types made
 
 /*
 **  Next unit type are used hardcoded in the source.
 **
 **  @todo find a way to make it configurable!
 */
-global UnitType* UnitTypeHumanWall; /// Human wall
-global UnitType* UnitTypeOrcWall;   /// Orc wall
+UnitType* UnitTypeHumanWall; /// Human wall
+UnitType* UnitTypeOrcWall;   /// Orc wall
 
 /**
 **  Mapping of W*rCr*ft number to our internal unit-type symbol.
 **  The numbers are used in puds.
 */
-global char** UnitTypeWcNames;
+char** UnitTypeWcNames;
 
 #ifdef DOXYGEN // no real code, only for document
 
 /**
 **  Lookup table for unit-type names
 */
-local UnitType* UnitTypeHash[UnitTypeMax];
+static UnitType* UnitTypeHash[UnitTypeMax];
 
 #else
 
 /**
 **  Lookup table for unit-type names
 */
-local hashtable(UnitType*, UnitTypeMax) UnitTypeHash;
+static hashtable(UnitType*, UnitTypeMax) UnitTypeHash;
 
 #endif
 
 /**
 **  Default resources for a new player.
 */
-global int DefaultResources[MaxCosts];
+int DefaultResources[MaxCosts];
 
 /**
 **  Default resources for a new player with low resources.
 */
-global int DefaultResourcesLow[MaxCosts];
+int DefaultResourcesLow[MaxCosts];
 
 /**
 **  Default resources for a new player with mid resources.
 */
-global int DefaultResourcesMedium[MaxCosts];
+int DefaultResourcesMedium[MaxCosts];
 
 /**
 **  Default resources for a new player with high resources.
 */
-global int DefaultResourcesHigh[MaxCosts];
+int DefaultResourcesHigh[MaxCosts];
 
 /**
 **  Default incomes for a new player.
 */
-global int DefaultIncomes[MaxCosts];
+int DefaultIncomes[MaxCosts];
 
 /**
 **  Default action for the resources.
 */
-global char* DefaultActions[MaxCosts];
+char* DefaultActions[MaxCosts];
 
 /**
 **  Default names for the resources.
 */
-global char* DefaultResourceNames[MaxCosts];
+char* DefaultResourceNames[MaxCosts];
 
 /**
 **  Default amounts for the resources.
 */
-global int DefaultResourceAmounts[MaxCosts];
+int DefaultResourceAmounts[MaxCosts];
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -150,7 +150,7 @@ global int DefaultResourceAmounts[MaxCosts];
 **  Update the player stats for changed unit types.
 **  @param reset indicates wether default value should be set to each stat (level, upgrades)
 */
-global void UpdateStats(int reset)
+void UpdateStats(int reset)
 {
 	UnitType* type;
 	UnitStats* stats;
@@ -271,7 +271,7 @@ global void UpdateStats(int reset)
 **  @param udta    Pointer to udta area.
 **  @param length  length of udta area.
 */
-global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
+void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 {
 	int i;
 	int v;
@@ -526,7 +526,7 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 **
 **  @todo Remove the use of scheme symbols to store, use own hash.
 */
-global Animations* AnimationsByIdent(const char* ident)
+Animations* AnimationsByIdent(const char* ident)
 {
 	Animations** tmp;
 
@@ -546,7 +546,7 @@ global Animations* AnimationsByIdent(const char* ident)
 **  @param plynr  Player number.
 **  @param file   Output file.
 */
-local void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
+static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 	CLFile* file)
 {
 	int j;
@@ -577,7 +577,7 @@ local void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 **
 **  @param file  Output file.
 */
-global void SaveUnitTypes(CLFile* file)
+void SaveUnitTypes(CLFile* file)
 {
 	int i;
 	int j;
@@ -629,7 +629,7 @@ global void SaveUnitTypes(CLFile* file)
 **
 **  @return       Unit-type pointer.
 */
-global UnitType* UnitTypeByIdent(const char* ident)
+UnitType* UnitTypeByIdent(const char* ident)
 {
 	UnitType* const* type;
 
@@ -644,7 +644,7 @@ global UnitType* UnitTypeByIdent(const char* ident)
 **
 **  @return     Unit-type pointer.
 */
-global UnitType* UnitTypeByWcNum(unsigned num)
+UnitType* UnitTypeByWcNum(unsigned num)
 {
 	return UnitTypeByIdent(UnitTypeWcNames[num]);
 }
@@ -656,7 +656,7 @@ global UnitType* UnitTypeByWcNum(unsigned num)
 **
 **  @return       New allocated (zeroed) unit-type pointer.
 */
-global UnitType* NewUnitTypeSlot(char* ident)
+UnitType* NewUnitTypeSlot(char* ident)
 {
 	UnitType* type;
 
@@ -684,7 +684,7 @@ global UnitType* NewUnitTypeSlot(char* ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-global void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y)
+void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y)
 {
 	// FIXME: move this calculation to high level.
 	x -= (type->Width - type->TileWidth * TileSizeX) / 2;
@@ -712,7 +712,7 @@ global void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x
 /**
 **  Init unit types.
 */
-global void InitUnitTypes(int reset_player_stats)
+void InitUnitTypes(int reset_player_stats)
 {
 	int type;
 
@@ -743,7 +743,7 @@ global void InitUnitTypes(int reset_player_stats)
 **
 **  @param unittype  type of unit to load
 */
-global void LoadUnitTypeSprite(UnitType* unittype)
+void LoadUnitTypeSprite(UnitType* unittype)
 {
 	const char* file;
 	char buf[4096];
@@ -809,7 +809,7 @@ global void LoadUnitTypeSprite(UnitType* unittype)
 /**
 ** Load the graphics for the unit-types.
 */
-global void LoadUnitTypes(void)
+void LoadUnitTypes(void)
 {
 	UnitType* type;
 	int i;
@@ -855,7 +855,7 @@ global void LoadUnitTypes(void)
 /**
 **  Cleanup the unit-type module.
 */
-global void CleanUnitTypes(void)
+void CleanUnitTypes(void)
 {
 	UnitType* type;
 	char** ptr;

@@ -66,7 +66,7 @@ extern unsigned CclGetResourceByName(lua_State* l);
 **
 **  @return   The old state of the xp damage
 */
-local int CclSetXpDamage(lua_State* l)
+static int CclSetXpDamage(lua_State* l)
 {
 	int old;
 
@@ -87,7 +87,7 @@ local int CclSetXpDamage(lua_State* l)
 **
 **  @return  The old state of the training queue
 */
-local int CclSetTrainingQueue(lua_State* l)
+static int CclSetTrainingQueue(lua_State* l)
 {
 	int old;
 
@@ -108,7 +108,7 @@ local int CclSetTrainingQueue(lua_State* l)
 **
 **  @return   The old state of the flag
 */
-local int CclSetBuildingCapture(lua_State* l)
+static int CclSetBuildingCapture(lua_State* l)
 {
 	int old;
 
@@ -129,7 +129,7 @@ local int CclSetBuildingCapture(lua_State* l)
 **
 **  @return   The old state of the flag
 */
-local int CclSetRevealAttacker(lua_State* l)
+static int CclSetRevealAttacker(lua_State* l)
 {
 	int old;
 
@@ -150,7 +150,7 @@ local int CclSetRevealAttacker(lua_State* l)
 **
 **  @return   The unit pointer
 */
-local Unit* CclGetUnit(lua_State* l)
+static Unit* CclGetUnit(lua_State* l)
 {
 	return UnitSlots[(int)LuaToNumber(l, -1)];
 }
@@ -161,7 +161,7 @@ local Unit* CclGetUnit(lua_State* l)
 **  @param l      Lua state.
 **  @param order  OUT: resulting order.
 */
-global void CclParseOrder(lua_State* l, Order* order)
+void CclParseOrder(lua_State* l, Order* order)
 {
 	const char* value;
 	int args;
@@ -344,7 +344,7 @@ global void CclParseOrder(lua_State* l, Order* order)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should get the orders.
 */
-local void CclParseOrders(lua_State* l, Unit* unit)
+static void CclParseOrders(lua_State* l, Unit* unit)
 {
 	int args;
 	int j;
@@ -364,7 +364,7 @@ local void CclParseOrders(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-local void CclParseBuilded(lua_State* l, Unit* unit)
+static void CclParseBuilded(lua_State* l, Unit* unit)
 {
 	const char* value;
 	int args;
@@ -418,7 +418,7 @@ local void CclParseBuilded(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-local void CclParseResWorker(lua_State* l, Unit* unit)
+static void CclParseResWorker(lua_State* l, Unit* unit)
 {
 	const char* value;
 	int args;
@@ -450,7 +450,7 @@ local void CclParseResWorker(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-local void CclParseResearch(lua_State* l, Unit* unit)
+static void CclParseResearch(lua_State* l, Unit* unit)
 {
 	const char* value;
 	int args;
@@ -480,7 +480,7 @@ local void CclParseResearch(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-local void CclParseUpgradeTo(lua_State* l, Unit* unit)
+static void CclParseUpgradeTo(lua_State* l, Unit* unit)
 {
 	const char* value;
 	int args;
@@ -509,7 +509,7 @@ local void CclParseUpgradeTo(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-local void CclParseTrain(lua_State* l, Unit* unit)
+static void CclParseTrain(lua_State* l, Unit* unit)
 {
 	const char* value;
 	int i;
@@ -563,7 +563,7 @@ local void CclParseTrain(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-local void CclParseMove(lua_State* l, Unit* unit)
+static void CclParseMove(lua_State* l, Unit* unit)
 {
 	const char* value;
 	int args;
@@ -606,7 +606,7 @@ local void CclParseMove(lua_State* l, Unit* unit)
 **
 **  @param l  Lua state.
 */
-local int CclUnit(lua_State* l)
+static int CclUnit(lua_State* l)
 {
 	const char* value;
 	Unit* unit;
@@ -965,7 +965,7 @@ local int CclUnit(lua_State* l)
 **
 **  @return   Returns the slot number of the made unit.
 */
-local int CclMakeUnit(lua_State* l)
+static int CclMakeUnit(lua_State* l)
 {
 	UnitType* unittype;
 	Unit* unit;
@@ -990,7 +990,7 @@ local int CclMakeUnit(lua_State* l)
 **
 **  @return   Returns the slot number of the made placed.
 */
-local int CclPlaceUnit(lua_State* l)
+static int CclPlaceUnit(lua_State* l)
 {
 	Unit* unit;
 
@@ -1013,7 +1013,7 @@ local int CclPlaceUnit(lua_State* l)
 **
 **  @return   Returns the slot number of the made unit.
 */
-local int CclCreateUnit(lua_State* l)
+static int CclCreateUnit(lua_State* l)
 {
 	UnitType* unittype;
 	Unit* unit;
@@ -1071,7 +1071,7 @@ local int CclCreateUnit(lua_State* l)
 **
 **  OrderUnit(player, unit-type, sloc, dloc, order)
 */
-local int CclOrderUnit(lua_State* l)
+static int CclOrderUnit(lua_State* l)
 {
 	int plynr;
 	int x1;
@@ -1175,7 +1175,7 @@ local int CclOrderUnit(lua_State* l)
 **
 **  @return   Returns true if a unit was killed.
 */
-local int CclKillUnit(lua_State* l)
+static int CclKillUnit(lua_State* l)
 {
 	int j;
 	int plynr;
@@ -1222,7 +1222,7 @@ local int CclKillUnit(lua_State* l)
 **
 **  @return   Returns the number of units killed.
 */
-local int CclKillUnitAt(lua_State* l)
+static int CclKillUnitAt(lua_State* l)
 {
 	int plynr;
 	int q;
@@ -1289,7 +1289,7 @@ local int CclKillUnitAt(lua_State* l)
 **
 **  @return   Array of units.
 */
-local int CclGetUnits(lua_State* l)
+static int CclGetUnits(lua_State* l)
 {
 	int plynr;
 	int i;
@@ -1322,7 +1322,7 @@ local int CclGetUnits(lua_State* l)
 **
 **  @return   The mana of the unit.
 */
-local int CclGetUnitMana(lua_State* l)
+static int CclGetUnitMana(lua_State* l)
 {
 	const Unit* unit;
 
@@ -1342,7 +1342,7 @@ local int CclGetUnitMana(lua_State* l)
 **
 **  @return				The new mana of the unit.
 */
-local int CclSetUnitMana(lua_State* l)
+static int CclSetUnitMana(lua_State* l)
 {
 	Unit* unit;
 	int mana;
@@ -1374,7 +1374,7 @@ local int CclSetUnitMana(lua_State* l)
 **
 **  @return   The unholy-armor of the unit.
 */
-local int CclGetUnitUnholyArmor(lua_State* l)
+static int CclGetUnitUnholyArmor(lua_State* l)
 {
 	const Unit* unit;
 
@@ -1394,7 +1394,7 @@ local int CclGetUnitUnholyArmor(lua_State* l)
 **
 **  @return   The value of the unit.
 */
-local int CclSetUnitUnholyArmor(lua_State* l)
+static int CclSetUnitUnholyArmor(lua_State* l)
 {
 	Unit* unit;
 
@@ -1416,7 +1416,7 @@ local int CclSetUnitUnholyArmor(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSlotUsage(lua_State* l)
+static int CclSlotUsage(lua_State* l)
 {
 #define SLOT_LEN MAX_UNIT_SLOTS / 8 + 1
 	unsigned char SlotUsage[SLOT_LEN];
@@ -1471,7 +1471,7 @@ local int CclSlotUsage(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclUnitAllocQueue(lua_State* l)
+static int CclUnitAllocQueue(lua_State* l)
 {
 	int i;
 	int args;
@@ -1512,7 +1512,7 @@ local int CclUnitAllocQueue(lua_State* l)
 /**
 **  Register CCL features for unit.
 */
-global void UnitCclRegister(void)
+void UnitCclRegister(void)
 {
 	lua_register(Lua, "SetXPDamage", CclSetXpDamage);
 	lua_register(Lua, "SetTrainingQueue", CclSetTrainingQueue);

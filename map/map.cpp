@@ -54,9 +54,9 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global WorldMap TheMap;                 /// The current map
-global int FlagRevealMap;               /// Flag must reveal the map
-global int ReplayRevealMap;             /// Reveal Map is replay
+WorldMap TheMap;                 /// The current map
+int FlagRevealMap;               /// Flag must reveal the map
+int ReplayRevealMap;             /// Reveal Map is replay
 
 /*----------------------------------------------------------------------------
 --  Visible and explored handling
@@ -68,7 +68,7 @@ global int ReplayRevealMap;             /// Reveal Map is replay
 **  @param x  Map X tile-position.
 **  @param y  Map Y tile-position.
 */
-global void MapMarkSeenTile(int x, int y)
+void MapMarkSeenTile(int x, int y)
 {
 	int tile;
 	int seentile;
@@ -132,7 +132,7 @@ global void MapMarkSeenTile(int x, int y)
 /**
 **  Reveal the entire map.
 */
-global void RevealMap(void)
+void RevealMap(void)
 {
 	int x;
 	int y;
@@ -183,7 +183,7 @@ global void RevealMap(void)
 **  @param offsetx  X offset in tile.
 **	@param offsety  Y offset in tile.
 */
-global void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
+void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 {
 	Assert(vp);
 
@@ -220,7 +220,7 @@ global void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int of
 **  @param offsetx  X offset in tile.
 **	@param offsety  Y offset in tile.
 */
-global void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
+void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 {
 	x = x * TileSizeX + offsetx - (vp->EndX - vp->X) / 2;
 	y = y * TileSizeY + offsety - (vp->EndY - vp->Y) / 2;
@@ -239,7 +239,7 @@ global void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int
 **
 **  @return    True if empty, false otherwise.
 */
-global int IsMapFieldEmpty(int tx, int ty)
+int IsMapFieldEmpty(int tx, int ty)
 {
 	return !(TheMap.Fields[tx + ty * TheMap.Width].Flags &
 		(MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest |
@@ -254,7 +254,7 @@ global int IsMapFieldEmpty(int tx, int ty)
 **
 **  @return    True if water, false otherwise.
 */
-global int WaterOnMap(int tx, int ty)
+int WaterOnMap(int tx, int ty)
 {
 	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldWaterAllowed;
 }
@@ -267,7 +267,7 @@ global int WaterOnMap(int tx, int ty)
 **
 **  @return    True if coast, false otherwise.
 */
-global int CoastOnMap(int tx, int ty)
+int CoastOnMap(int tx, int ty)
 {
 	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldCoastAllowed;
 }
@@ -280,7 +280,7 @@ global int CoastOnMap(int tx, int ty)
 **
 **  @return    True if wall, false otherwise.
 */
-global int WallOnMap(int tx, int ty)
+int WallOnMap(int tx, int ty)
 {
 	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldWall;
 }
@@ -293,7 +293,7 @@ global int WallOnMap(int tx, int ty)
 **
 **  @return    True if human wall, false otherwise.
 */
-global int HumanWallOnMap(int tx, int ty)
+int HumanWallOnMap(int tx, int ty)
 {
 	return (TheMap.Fields[tx + ty * TheMap.Width].Flags &
 		(MapFieldWall | MapFieldHuman)) == (MapFieldWall | MapFieldHuman);
@@ -307,7 +307,7 @@ global int HumanWallOnMap(int tx, int ty)
 **
 **  @return    True if orcish wall, false otherwise.
 */
-global int OrcWallOnMap(int tx, int ty)
+int OrcWallOnMap(int tx, int ty)
 {
 	return (TheMap.Fields[tx + ty * TheMap.Width].Flags &
 		(MapFieldWall | MapFieldHuman)) == MapFieldWall;
@@ -321,7 +321,7 @@ global int OrcWallOnMap(int tx, int ty)
 **
 **  @return    True if forest, false otherwise.
 */
-global int CheckedForestOnMap(int tx, int ty)
+int CheckedForestOnMap(int tx, int ty)
 {
 	if (tx < 0 || ty < 0 || tx >= TheMap.Width || ty >= TheMap.Height) {
 		return 0;
@@ -337,7 +337,7 @@ global int CheckedForestOnMap(int tx, int ty)
 **
 **  @return    True if forest, false otherwise.
 */
-global int ForestOnMap(int tx, int ty)
+int ForestOnMap(int tx, int ty)
 {
 #ifdef DEBUG
 	if (tx < 0 || ty < 0 || tx >= TheMap.Width || ty >= TheMap.Height) {
@@ -359,7 +359,7 @@ global int ForestOnMap(int tx, int ty)
 **
 **  @return    True if rock, false otherwise.
 */
-global int RockOnMap(int tx, int ty)
+int RockOnMap(int tx, int ty)
 {
 #ifdef DEBUG
 	if (tx < 0 || ty < 0 || tx >= TheMap.Width || ty >= TheMap.Height) {
@@ -382,7 +382,7 @@ global int RockOnMap(int tx, int ty)
 **
 **  @return      True if could be entered, false otherwise.
 */
-global int CheckedCanMoveToMask(int x, int y, int mask)
+int CheckedCanMoveToMask(int x, int y, int mask)
 {
 	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 		return 0;
@@ -400,7 +400,7 @@ global int CheckedCanMoveToMask(int x, int y, int mask)
 **
 **  @return      True if could be entered, false otherwise.
 */
-global int UnitTypeCanMoveTo(int x, int y, const UnitType* type)
+int UnitTypeCanMoveTo(int x, int y, const UnitType* type)
 {
 	return CanMoveToMask(x, y, TypeMovementMask(type));
 }
@@ -414,7 +414,7 @@ global int UnitTypeCanMoveTo(int x, int y, const UnitType* type)
 **
 **  @return      True if could be entered, false otherwise.
 */
-global int UnitCanMoveTo(int x, int y, const Unit* unit)
+int UnitCanMoveTo(int x, int y, const Unit* unit)
 {
 	return CanMoveToMask(x, y, TypeMovementMask(unit->Type));
 }
@@ -422,7 +422,7 @@ global int UnitCanMoveTo(int x, int y, const Unit* unit)
 /**
 **  Fixes initially the wood and seen tiles.
 */
-global void PreprocessMap(void)
+void PreprocessMap(void)
 {
 	int ix;
 	int iy;
@@ -454,7 +454,7 @@ global void PreprocessMap(void)
 **
 **  @return    X map tile coordinate.
 */
-global int Viewport2MapX(const Viewport* vp, int x)
+int Viewport2MapX(const Viewport* vp, int x)
 {
 	int r;
 
@@ -472,7 +472,7 @@ global int Viewport2MapX(const Viewport* vp, int x)
 **
 **  @return    Y map tile coordinate.
 */
-global int Viewport2MapY(const Viewport* vp, int y)
+int Viewport2MapY(const Viewport* vp, int y)
 {
 	int r;
 
@@ -489,7 +489,7 @@ global int Viewport2MapY(const Viewport* vp, int y)
 **  @return    X screen coordinate in pixels (relative
 **             to origin of Stratagus's window).
 */
-global int Map2ViewportX(const Viewport* vp, int x)
+int Map2ViewportX(const Viewport* vp, int x)
 {
 	return vp->X + (x - vp->MapX) * TileSizeX - vp->OffsetX;
 }
@@ -503,7 +503,7 @@ global int Map2ViewportX(const Viewport* vp, int x)
 **  @return    Y screen coordinate in pixels (relative
 **             to origin of Stratagus's window).
 */
-global int Map2ViewportY(const Viewport* vp, int y)
+int Map2ViewportY(const Viewport* vp, int y)
 {
 	return vp->Y + (y - vp->MapY) * TileSizeY - vp->OffsetY;
 }
@@ -513,7 +513,7 @@ global int Map2ViewportY(const Viewport* vp, int y)
 **
 **  @param info  MapInfo pointer.
 */
-global void FreeMapInfo(MapInfo* info)
+void FreeMapInfo(MapInfo* info)
 {
 	if (info) {
 		if (info->Description) {
@@ -532,7 +532,7 @@ global void FreeMapInfo(MapInfo* info)
 /**
 **  Cleanup the map module.
 */
-global void CleanMap(void)
+void CleanMap(void)
 {
 	free(TheMap.Fields);
 	free(TheMap.TerrainName);

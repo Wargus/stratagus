@@ -61,23 +61,23 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global int FogOfWarOpacity;                 /// Fog of war Opacity.
+int FogOfWarOpacity;                 /// Fog of war Opacity.
 
 /**
 **  Mapping for fog of war tiles.
 */
-local const int FogTable[16] = {
+static const int FogTable[16] = {
 	 0,11,10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
 };
 
-global unsigned char* VisionTable[3];
-global int* VisionLookup;
+unsigned char* VisionTable[3];
+int* VisionLookup;
 
-local unsigned char* VisibleTable;
+static unsigned char* VisibleTable;
 
 #ifndef USE_OPENGL
-local SDL_Surface* OnlyFogSurface;
-local SDL_Surface* AlphaFogSurface;
+static SDL_Surface* OnlyFogSurface;
+static SDL_Surface* AlphaFogSurface;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ local SDL_Surface* AlphaFogSurface;
 **
 **  @return        Number of units that can see this square.
 */
-local int LookupSight(const Player* player, int tx, int ty)
+static int LookupSight(const Player* player, int tx, int ty)
 {
 	int i;
 	int visiblecount;
@@ -133,7 +133,7 @@ local int LookupSight(const Player* player, int tx, int ty)
 **
 **  @return        0 unexplored, 1 explored, > 1 visible.
 */
-global unsigned char IsTileVisible(const Player* player, int x, int y)
+unsigned char IsTileVisible(const Player* player, int x, int y)
 {
 	int i;
 	unsigned char visiontype;
@@ -177,7 +177,7 @@ global unsigned char IsTileVisible(const Player* player, int x, int y)
 **
 **  @return        Filtered mask after taking fog into account
 */
-global int MapFogFilterFlags(Player* player, int x, int y, int mask)
+int MapFogFilterFlags(Player* player, int x, int y, int mask)
 {
 	int nunits;
 	int unitcount;
@@ -208,7 +208,7 @@ global int MapFogFilterFlags(Player* player, int x, int y, int mask)
 **  @param x       X tile to mark.
 **  @param y       Y tile to mark.
 */
-global void MapMarkTileSight(const Player* player, int x, int y)
+void MapMarkTileSight(const Player* player, int x, int y)
 {
 	unsigned char v;
 
@@ -243,7 +243,7 @@ global void MapMarkTileSight(const Player* player, int x, int y)
 **  @param x       X tile to mark.
 **  @param y       Y tile to mark.
 */
-global void MapUnmarkTileSight(const Player* player, int x, int y)
+void MapUnmarkTileSight(const Player* player, int x, int y)
 {
 	unsigned char v;
 
@@ -283,7 +283,7 @@ global void MapUnmarkTileSight(const Player* player, int x, int y)
 **	@param x       X tile to mark.
 **	@param y       Y tile to mark.
 */
-global void MapMarkTileDetectCloak(const Player* player, int x, int y)
+void MapMarkTileDetectCloak(const Player* player, int x, int y)
 {
 	unsigned char v;
 
@@ -303,7 +303,7 @@ global void MapMarkTileDetectCloak(const Player* player, int x, int y)
 **	@param x       X tile to mark.
 **	@param y       Y tile to mark.
 */
-global void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
+void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
 {
 	unsigned char v;
 
@@ -327,7 +327,7 @@ global void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-global void MapSight(const Player* player, int x, int y, int w, int h, int range,
+void MapSight(const Player* player, int x, int y, int w, int h, int range,
 	void (*marker)(const Player*, int, int))
 {
 	int mx;
@@ -423,7 +423,7 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
 /**
 **  Update fog of war.
 */
-global void UpdateFogOfWarChange(void)
+void UpdateFogOfWarChange(void)
 {
 	int x;
 	int y;
@@ -463,7 +463,7 @@ global void UpdateFogOfWarChange(void)
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawFog(const int tile, int x, int y)
+void VideoDrawFog(const int tile, int x, int y)
 {
 	int tilepitch;
 	int oldx;
@@ -497,7 +497,7 @@ global void VideoDrawFog(const int tile, int x, int y)
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawUnexplored(const int tile, int x, int y)
+void VideoDrawUnexplored(const int tile, int x, int y)
 {
 	int tilepitch;
 	int oldx;
@@ -529,7 +529,7 @@ global void VideoDrawUnexplored(const int tile, int x, int y)
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawOnlyFog(int x, int y)
+void VideoDrawOnlyFog(int x, int y)
 {
 	int oldx;
 	int oldy;
@@ -562,7 +562,7 @@ global void VideoDrawOnlyFog(int x, int y)
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawFog(
+void VideoDrawFog(
 	const int tile __attribute__((unused)),
 	int x __attribute__((unused)), int y __attribute__((unused)))
 {
@@ -631,7 +631,7 @@ global void VideoDrawFog(
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void VideoDrawUnexplored(const int tile, int x, int y)
+void VideoDrawUnexplored(const int tile, int x, int y)
 {
 	int tilepitch;
 	int gx;
@@ -691,7 +691,7 @@ global void VideoDrawUnexplored(const int tile, int x, int y)
 **  @param x  X position into video memory
 **  @param y  Y position into video memory
 */
-global void VideoDrawOnlyFog(int x, int y)
+void VideoDrawOnlyFog(int x, int y)
 {
 	int oldx;
 	int oldy;
@@ -719,7 +719,7 @@ global void VideoDrawOnlyFog(int x, int y)
 **  @param dx  X position into video memory.
 **  @param dy  Y position into video memory.
 */
-local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
+static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 {
 	int w;
 	int tile;
@@ -842,7 +842,7 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 **  @param x   Map viewpoint x position.
 **  @param y   Map viewpoint y position.
 */
-global void DrawMapFogOfWar(Viewport* vp, int x, int y)
+void DrawMapFogOfWar(Viewport* vp, int x, int y)
 {
 	int sx;
 	int sy;
@@ -926,7 +926,7 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 **  Initialise the fog of war.
 **  Build tables, setup functions.
 */
-global void InitMapFogOfWar(void)
+void InitMapFogOfWar(void)
 {
 #ifndef USE_OPENGL
 	unsigned char r;
@@ -1000,7 +1000,7 @@ global void InitMapFogOfWar(void)
 /**
 **  Cleanup the fog of war.
 */
-global void CleanMapFogOfWar(void)
+void CleanMapFogOfWar(void)
 {
 	if (VisibleTable) {
 		free(VisibleTable);
@@ -1021,7 +1021,7 @@ global void CleanMapFogOfWar(void)
 /**
 **  Initialize Vision and Goal Tables.
 */
-global void InitVisionTable(void)
+void InitVisionTable(void)
 {
 	int* visionlist;
 	int maxsize;
@@ -1167,7 +1167,7 @@ global void InitVisionTable(void)
 /**
 **  Clean Up Generated Vision and Goal Tables.
 */
-global void FreeVisionTable(void)
+void FreeVisionTable(void)
 {
 	// Free Vision Data
 	if (VisionTable[0]) {

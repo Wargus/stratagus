@@ -72,7 +72,7 @@
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
-local int ActionMoveGeneric(Unit* unit, const Animation* anim)
+static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 {
 	int xd;
 	int yd;
@@ -227,7 +227,7 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
-global int DoActionMove(Unit* unit)
+int DoActionMove(Unit* unit)
 {
 	if (unit->Type->Animations && unit->Type->Animations->Move) {
 		return ActionMoveGeneric(unit, unit->Type->Animations->Move);
@@ -248,7 +248,7 @@ global int DoActionMove(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-global void HandleActionMove(Unit* unit)
+void HandleActionMove(Unit* unit)
 {
 	Unit* goal;
 

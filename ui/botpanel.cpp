@@ -64,17 +64,17 @@
 ----------------------------------------------------------------------------*/
 
 	/// Display the command key in the buttons.
-global char ShowCommandKey;
+char ShowCommandKey;
 
 	/// for unit buttons sub-menus etc.
-global int CurrentButtonLevel;
+int CurrentButtonLevel;
 	/// All buttons for units
-local ButtonAction* UnitButtonTable[MAX_BUTTONS];
+static ButtonAction* UnitButtonTable[MAX_BUTTONS];
 	/// buttons in UnitButtonTable
-local int NumUnitButtons;
+static int NumUnitButtons;
 
-global ButtonAction* CurrentButtons;        /// Pointer to current buttons
-local ButtonAction* _current_buttons;    /// FIXME: this is just for test
+ButtonAction* CurrentButtons;        /// Pointer to current buttons
+static ButtonAction* _current_buttons;    /// FIXME: this is just for test
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -83,7 +83,7 @@ local ButtonAction* _current_buttons;    /// FIXME: this is just for test
 /**
 **  Initialize the buttons.
 */
-global void InitButtons(void)
+void InitButtons(void)
 {
 	int z;
 
@@ -179,7 +179,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 /**
 **  Cleanup buttons.
 */
-global void CleanButtons(void)
+void CleanButtons(void)
 {
 	int z;
 
@@ -216,7 +216,7 @@ global void CleanButtons(void)
 /**
 **  Draw bottom panel.
 */
-global void DrawButtonPanel(void)
+void DrawButtonPanel(void)
 {
 	int i;
 	int v;
@@ -386,7 +386,7 @@ global void DrawButtonPanel(void)
 **
 **  @param button  Button
 */
-global void UpdateStatusLineForButton(const ButtonAction* button)
+void UpdateStatusLineForButton(const ButtonAction* button)
 {
 	int v;
 	const UnitStats* stats;
@@ -421,7 +421,7 @@ global void UpdateStatusLineForButton(const ButtonAction* button)
 /**
 **  Update bottom panel for multiple units.
 */
-local void UpdateButtonPanelMultipleUnits(void)
+static void UpdateButtonPanelMultipleUnits(void)
 {
 	char unit_ident[128];
 	int z;
@@ -511,7 +511,7 @@ local void UpdateButtonPanelMultipleUnits(void)
 /**
 **  Update bottom panel.
 */
-global void UpdateButtonPanel(void)
+void UpdateButtonPanel(void)
 {
 	Unit* unit;
 	char unit_ident[128];
@@ -690,7 +690,7 @@ global void UpdateButtonPanel(void)
 **
 **  @param button  Button that was clicked.
 */
-global void DoButtonButtonClicked(int button)
+void DoButtonButtonClicked(int button)
 {
 	int i;
 	UnitType* type;
@@ -898,7 +898,7 @@ global void DoButtonButtonClicked(int button)
 **
 **  @return     True, if button is handled (consumed).
 */
-global int DoButtonPanelKey(int key)
+int DoButtonPanelKey(int key)
 {
 	int i;
 

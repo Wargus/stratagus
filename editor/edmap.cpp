@@ -55,7 +55,7 @@
 #define RH_QUAD_M 0x00FF00FF /// Right half quad mask
 
 	/// Callback for changed tile (with direction mask)
-local void EditorTileChanged2(int x, int y, int d);
+static void EditorTileChanged2(int x, int y, int d);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -87,7 +87,7 @@ local void EditorTileChanged2(int x, int y, int d);
 **
 **  @todo     Make a lookup table to speed up the things.
 */
-local unsigned QuadFromTile(int x, int y)
+static unsigned QuadFromTile(int x, int y)
 {
 	int tile;
 	int i;
@@ -159,7 +159,7 @@ local unsigned QuadFromTile(int x, int y)
 **  @param marks   Already visited tile types.
 **  @param tile    Tile pointer.
 */
-local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
+static int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 {
 	int i;
 	int l;
@@ -228,7 +228,7 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 **  @param quad   Quad of the tile type.
 **  @return       Best matching tile.
 */
-local int TileFromQuad(unsigned fixed, unsigned quad)
+static int TileFromQuad(unsigned fixed, unsigned quad)
 {
 	int i;
 	unsigned type1;
@@ -406,7 +406,7 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 **
 **  @note  this is a rather dumb function, doesn't do any tile fixing.
 */
-global void ChangeTile(int x, int y, int tile)
+void ChangeTile(int x, int y, int tile)
 {
 	MapField *mf;
 
@@ -430,7 +430,7 @@ global void ChangeTile(int x, int y, int tile)
 **  @param tile  Tile type to edit.
 **  @param d     Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-local void EditorChangeTile(int x, int y, int tile, int d)
+static void EditorChangeTile(int x, int y, int tile, int d)
 {
 	MapField* mf;
 
@@ -461,7 +461,7 @@ local void EditorChangeTile(int x, int y, int tile, int d)
 **  @param y  Map Y tile position of change.
 **  @param d  Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-local void EditorTileChanged2(int x, int y, int d)
+static void EditorTileChanged2(int x, int y, int d)
 {
 	unsigned quad;
 	unsigned q2;
@@ -551,7 +551,7 @@ local void EditorTileChanged2(int x, int y, int d)
 **  @param x  Map X tile position of change.
 **  @param y  Map Y tile position of change.
 */
-global void EditorTileChanged(int x, int y)
+void EditorTileChanged(int x, int y)
 {
 	EditorTileChanged2(x, y, 0xF);
 }
@@ -572,7 +572,7 @@ global void EditorTileChanged(int x, int y)
 **  TileFill(centerx, centery, tile_type_water, map_width)
 **  will fill map with water...
 */
-local void TileFill(int x, int y, int tile, int size)
+static void TileFill(int x, int y, int tile, int size)
 {
 	int ix;
 	int ax;
@@ -618,7 +618,7 @@ local void TileFill(int x, int y, int tile, int size)
 **  @param count     FIXME: docu
 **  @param max_size  FIXME: docu
 */
-local void EditorRandomizeTile(int tile, int count, int max_size)
+static void EditorRandomizeTile(int tile, int count, int max_size)
 {
 	int mx;
 	int my;
@@ -649,7 +649,7 @@ local void EditorRandomizeTile(int tile, int count, int max_size)
 **  @param count      FIXME: docu
 **  @param value      FIXME: docu
 */
-local void EditorRandomizeUnit(const char* unit_type, int count, int value)
+static void EditorRandomizeUnit(const char* unit_type, int count, int value)
 {
 	int mx;
 	int my;
@@ -697,7 +697,7 @@ local void EditorRandomizeUnit(const char* unit_type, int count, int value)
 /**
 **  Destroy all units
 */
-local void EditorDestroyAllUnits(void)
+static void EditorDestroyAllUnits(void)
 {
 	Unit* unit;
 
@@ -713,7 +713,7 @@ local void EditorDestroyAllUnits(void)
 /**
 **  Create a random map
 */
-global void EditorCreateRandomMap(void)
+void EditorCreateRandomMap(void)
 {
 	int mz;
 

@@ -53,16 +53,16 @@
 ----------------------------------------------------------------------------*/
 
 
-global int adjacents[8][2] = { {-1,-1}, {-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
+int adjacents[8][2] = { {-1,-1}, {-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
 
-global RegionId* RegionMappingStorage;
-global int* RegionTempStorage;
-global int RegionCount;
-global int RegionMax;
-global int NextFreeRegion;
-global RegionDefinition Regions[MaxRegionNumber];
-global int MapSplitterInitialised;
-global int ZoneNeedRefresh;
+RegionId* RegionMappingStorage;
+int* RegionTempStorage;
+int RegionCount;
+int RegionMax;
+int NextFreeRegion;
+RegionDefinition Regions[MaxRegionNumber];
+int MapSplitterInitialised;
+int ZoneNeedRefresh;
 
 
 /*----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ global int ZoneNeedRefresh;
 **		@param x		X coord of the tile
 **		@param y		Y coord of the tile
 */
-global void RegionUnassignTile(RegionId region, int x, int y)
+void RegionUnassignTile(RegionId region, int x, int y)
 {
 	RegionDefinition* adef;
 	RegionSegment* cur;
@@ -151,7 +151,7 @@ global void RegionUnassignTile(RegionId region, int x, int y)
 **		@param x		X coord of the tile
 **		@param y		Y coord of the tile
 */
-global void RegionAssignTile(RegionId region, int x, int y)
+void RegionAssignTile(RegionId region, int x, int y)
 {
 	RegionDefinition* adef;
 	RegionSegment* left;
@@ -201,7 +201,7 @@ global void RegionAssignTile(RegionId region, int x, int y)
 **		@param iswater		Indicate if the region is water/sea/...
 **		@return 		the new RegionID
 */
-global RegionId NewRegion(int iswater)
+RegionId NewRegion(int iswater)
 {
 	RegionId result;
 
@@ -245,7 +245,7 @@ global RegionId NewRegion(int iswater)
 **
 **		@param regid		The region to free
 */
-global void RegionFree(RegionId regid)
+void RegionFree(RegionId regid)
 {
 	RegionSegment* cur;
 	RegionSegment* next;
@@ -276,7 +276,7 @@ global void RegionFree(RegionId regid)
 **		Update connections for all regions (slow)
 **
 */
-global void UpdateConnections(void)
+void UpdateConnections(void)
 {
 	int x;
 	int y;
@@ -300,7 +300,7 @@ global void UpdateConnections(void)
 **		@param nbarea		The number of area
 **		@param updateConnections		indicate if connection should be updated
 */
-global void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
+void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
 {
 	RegionSegment* oldsegs;
 	RegionSegment* seg;
@@ -399,7 +399,7 @@ global void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections
 **		@param a		One of the two regions
 **		@param b		One of the two regions
 */
-global void RegionJoin(RegionId a, RegionId b)
+void RegionJoin(RegionId a, RegionId b)
 {
 	RegionSegment* cur;
 	RegionId tmp;
@@ -448,7 +448,7 @@ global void RegionJoin(RegionId a, RegionId b)
 **		@param regid		the region to broke
 **		@param updateConnections		indicate if connection should be updated as well
 */
-global void RegionSplit(RegionId regid, int updateConnections)
+void RegionSplit(RegionId regid, int updateConnections)
 {
 	RegionDefinition* adef;
 	int tileleft;
@@ -562,7 +562,7 @@ global void RegionSplit(RegionId regid, int updateConnections)
 **
 **		@param reg		the region ID
 */
-global void RegionCheckConnex(RegionId reg)
+void RegionCheckConnex(RegionId reg)
 {
 	CircularFiller filler;
 	int nbarea;
@@ -612,7 +612,7 @@ global void RegionCheckConnex(RegionId reg)
 **		@param x		x position of the tile
 **		@param y		y position of the tile
 */
-local void MapSplitterTileOccuped(int x, int y) {
+static void MapSplitterTileOccuped(int x, int y) {
 	RegionId reg;
 	int tx;
 	int ty;
@@ -676,7 +676,7 @@ local void MapSplitterTileOccuped(int x, int y) {
 **		@param x1		x1 coord of the changed rectangle
 **		@param y1		y1 coord of the changed rectangle
 */
-global void MapSplitterTilesCleared(int x0, int y0, int x1, int y1) {
+void MapSplitterTilesCleared(int x0, int y0, int x1, int y1) {
 	static int directions[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
 	int x;
 	int y;
@@ -781,7 +781,7 @@ global void MapSplitterTilesCleared(int x0, int y0, int x1, int y1) {
 **		@param x1		x1 coord of the changed rectangle
 **		@param y1		y1 coord of the changed rectangle
 */
-global void MapSplitterTilesOccuped(int x0, int y0, int x1, int y1)
+void MapSplitterTilesOccuped(int x0, int y0, int x1, int y1)
 {
 	int x;
 	int y;
@@ -801,7 +801,7 @@ global void MapSplitterTilesOccuped(int x0, int y0, int x1, int y1)
 **		Decide if region should be broken, regarding size & nb of tiles
 **
 */
-local int ShouldBreakRegion(int x0, int y0, int x1, int y1, int tilecount, int hardlimit)
+static int ShouldBreakRegion(int x0, int y0, int x1, int y1, int tilecount, int hardlimit)
 {
 	int sx;
 	int sy;
@@ -828,7 +828,7 @@ local int ShouldBreakRegion(int x0, int y0, int x1, int y1, int tilecount, int h
 **		Extend A segment, fill it.
 **
 */
-local void FindHExtent(int x, int y, int* vx0, int* vx1, int water)
+static void FindHExtent(int x, int y, int* vx0, int* vx1, int water)
 {
 	int x0;
 	int x1;
@@ -860,7 +860,7 @@ local void FindHExtent(int x, int y, int* vx0, int* vx1, int water)
 /**
 **		Flood fill a region in the mapping area
 */
-local void RegionFloodFill(int x0, int x1, int starty, int RegId, int IsWater)
+static void RegionFloodFill(int x0, int x1, int starty, int RegId, int IsWater)
 {
 	int subx0;
 	int subx1;
@@ -912,7 +912,7 @@ local void RegionFloodFill(int x0, int x1, int starty, int RegId, int IsWater)
 **		Initialise the region mapping ( map tile => regions )
 **		Need an already initialised map to work correctly
 */
-global void InitaliseMapping(void)
+void InitaliseMapping(void)
 {
 	int found;
 	int i;
@@ -991,7 +991,7 @@ global void InitaliseMapping(void)
 **		@param rsltx		Will hold result X
 **		@param rsltx		Will hold result Y
 */
-global void ZoneFindConnexion(int a, int b, int refx, int refy, int* rsltx, int* rslty)
+void ZoneFindConnexion(int a, int b, int refx, int refy, int* rsltx, int* rslty)
 {
 	int oppzone;
 	RegionId oppregion;
@@ -1053,7 +1053,7 @@ global void ZoneFindConnexion(int a, int b, int refx, int refy, int* rsltx, int*
 /**
 **		Refresh connection between zones
 */
-local void RefreshZones(void)
+static void RefreshZones(void)
 {
 	int* regions_stack;
 	RegionId regid;
@@ -1116,7 +1116,7 @@ local void RefreshZones(void)
 /**
 **		Allocate space for tile=>region mapping
 */
-local void AllocateMapping(void)
+static void AllocateMapping(void)
 {
 	int total;
 
@@ -1131,7 +1131,7 @@ local void AllocateMapping(void)
 ** 		Initialise all data structures of the MapSplitter
 **
 */
-global void MapSplitterInit(void)
+void MapSplitterInit(void)
 {
 	MapSplitterInitialised = 1;
 
@@ -1147,7 +1147,7 @@ global void MapSplitterInit(void)
 **		Free all structure owned by the MapSplitter
 **
 */
-global void MapSplitterClean(void)
+void MapSplitterClean(void)
 {
 	// FIXME : free !
 	MapSplitterInitialised = 0;
@@ -1157,7 +1157,7 @@ global void MapSplitterClean(void)
 **		Called each cycle to maintain correctness of the mapping
 **
 */
-global void MapSplitterEachCycle(void)
+void MapSplitterEachCycle(void)
 {
 	int k;
 	int x0;
@@ -1251,7 +1251,7 @@ global void MapSplitterEachCycle(void)
 **
 **		@return				Distance to place.
 */
-global int PlaceReachable(Unit* src, int goal_x, int goal_y, int w, int h, int minrange, int maxrange)
+int PlaceReachable(Unit* src, int goal_x, int goal_y, int w, int h, int minrange, int maxrange)
 {
 	static ZoneSet source = {0};
 	static ZoneSet dest = {0};
@@ -1273,7 +1273,7 @@ global int PlaceReachable(Unit* src, int goal_x, int goal_y, int w, int h, int m
 /**
 **		Check if zone connections need a refresh & do it
 */
-global void ClearZoneNeedRefresh(void)
+void ClearZoneNeedRefresh(void)
 {
 	if (ZoneNeedRefresh) {
 		RefreshZones();

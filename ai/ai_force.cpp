@@ -51,7 +51,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
+int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -61,7 +61,7 @@ global int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
 /**
 **  Remove any equivalence between unittypes
 */
-global void AiResetUnitTypeEquiv(void)
+void AiResetUnitTypeEquiv(void)
 {
 	int i;
 
@@ -76,7 +76,7 @@ global void AiResetUnitTypeEquiv(void)
 **  @param a  the first unittype
 **  @param b  the second unittype
 */
-global void AiNewUnitTypeEquiv(UnitType* a, UnitType* b)
+void AiNewUnitTypeEquiv(UnitType* a, UnitType* b)
 {
 	int find;
 	int replace;
@@ -109,7 +109,7 @@ global void AiNewUnitTypeEquiv(UnitType* a, UnitType* b)
 **
 **  @return          the number of unittype found
 */
-global int AiFindUnitTypeEquiv(const UnitType* unittype, int* result)
+int AiFindUnitTypeEquiv(const UnitType* unittype, int* result)
 {
 	int i;
 	int search;
@@ -138,7 +138,7 @@ global int AiFindUnitTypeEquiv(const UnitType* unittype, int* result)
 **
 **  @return             the number of unittype found
 */
-global int AiFindAvailableUnitTypeEquiv(const UnitType* unittype, int* usableTypes)
+int AiFindAvailableUnitTypeEquiv(const UnitType* unittype, int* usableTypes)
 {
 	int usableTypesCount;
 	int i;
@@ -190,7 +190,7 @@ global int AiFindAvailableUnitTypeEquiv(const UnitType* unittype, int* usableTyp
 **
 **  @param force  Force number.
 */
-local void AiCleanForce(int force)
+static void AiCleanForce(int force)
 {
 	AiUnit** prev;
 	AiUnit* aiunit;
@@ -262,7 +262,7 @@ local void AiCleanForce(int force)
 /**
 **  Cleanup units in forces.
 */
-global void AiCleanForces(void)
+void AiCleanForces(void)
 {
 	int force;
 
@@ -282,7 +282,7 @@ global void AiCleanForces(void)
 **
 **  @return       True if it fits, false otherwise.
 */
-local int AiCheckBelongsToForce(int force, const UnitType* type)
+static int AiCheckBelongsToForce(int force, const UnitType* type)
 {
 	AiUnit* aiunit;
 	AiUnitType* aitype;
@@ -326,7 +326,7 @@ local int AiCheckBelongsToForce(int force, const UnitType* type)
 **
 **  @param unit  Unit to assign to force.
 */
-global void AiAssignToForce(Unit* unit)
+void AiAssignToForce(Unit* unit)
 {
 	int force;
 
@@ -356,7 +356,7 @@ global void AiAssignToForce(Unit* unit)
 /**
 **  Assign free units to force.
 */
-global void AiAssignFreeUnitsToForce(void)
+void AiAssignFreeUnitsToForce(void)
 {
 	const AiUnit* aiunit;
 	Unit* table[UnitMax];
@@ -403,7 +403,7 @@ global void AiAssignFreeUnitsToForce(void)
 **  @param x      X tile map position to be attacked.
 **  @param y      Y tile map position to be attacked.
 */
-global void AiAttackWithForceAt(int force, int x, int y)
+void AiAttackWithForceAt(int force, int x, int y)
 {
 	const AiUnit* aiunit;
 
@@ -431,7 +431,7 @@ global void AiAttackWithForceAt(int force, int x, int y)
 **
 **  @param force  Force number to attack with.
 */
-global void AiAttackWithForce(int force)
+void AiAttackWithForce(int force)
 {
 	const AiUnit* aiunit;
 	const Unit* enemy;
@@ -527,7 +527,7 @@ global void AiAttackWithForce(int force)
 **
 **	@param force	Force pointer.
 */
-local void AiForceAttacks(AiForce* force)
+static void AiForceAttacks(AiForce* force)
 {
 	const AiUnit* aiunit;
 
@@ -554,7 +554,7 @@ local void AiForceAttacks(AiForce* force)
 **
 ** @todo FIXME: is this really needed anymore
 */
-global void AiForceManager(void)
+void AiForceManager(void)
 {
 	int force;
 

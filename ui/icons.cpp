@@ -54,25 +54,25 @@
 /**
 **  Maps the original icon numbers in puds to our internal strings.
 */
-global char** IconWcNames;
+char** IconWcNames;
 
-local Icon** Icons;                         /// Table of all icons.
-local int NumIcons;                         /// Number of icons in Icons.
+static Icon** Icons;                         /// Table of all icons.
+static int NumIcons;                         /// Number of icons in Icons.
 
-local char** IconAliases;                   /// Table of all aliases for icons.
-local int NumIconAliases;                   /// Number of icons aliases in Aliases.
+static char** IconAliases;                   /// Table of all aliases for icons.
+static int NumIconAliases;                   /// Number of icons aliases in Aliases.
 
 #ifdef DOXYGEN                              // no real code, only for document
 
-local IconFile* IconFileHash[61];           /// lookup table for icon file names
+static IconFile* IconFileHash[61];           /// lookup table for icon file names
 
-local Icon* IconHash[61];                   /// lookup table for icon names
+static Icon* IconHash[61];                   /// lookup table for icon names
 
 #else
 
-local hashtable(IconFile*, 61) IconFileHash;/// lookup table for icon file names
+static hashtable(IconFile*, 61) IconFileHash;/// lookup table for icon file names
 
-local hashtable(Icon*, 61) IconHash;        /// lookup table for icon names
+static hashtable(Icon*, 61) IconHash;        /// lookup table for icon names
 
 #endif
 
@@ -92,7 +92,7 @@ local hashtable(Icon*, 61) IconHash;        /// lookup table for icon names
 **  @param index    Index into file.
 **  @param file     Graphic file containing the icons.
 */
-local void AddIcon(const char* ident, const char* tileset,
+static void AddIcon(const char* ident, const char* tileset,
 	int index, int width, int height, const char* file)
 {
 	IconFile** ptr;
@@ -152,7 +152,7 @@ local void AddIcon(const char* ident, const char* tileset,
 **
 **  Add the short name and icon aliases to hash table.
 */
-global void InitIcons(void)
+void InitIcons(void)
 {
 	int i;
 
@@ -183,7 +183,7 @@ global void InitIcons(void)
 **  Load the graphics for the icons. Graphic data is only loaded once
 **  and then shared.
 */
-global void LoadIcons(void)
+void LoadIcons(void)
 {
 	int i;
 
@@ -220,7 +220,7 @@ global void LoadIcons(void)
 /**
 **  Clean up memory used by the icons.
 */
-global void CleanIcons(void)
+void CleanIcons(void)
 {
 	char** ptr;
 	IconFile** table;
@@ -308,7 +308,7 @@ global void CleanIcons(void)
 **
 **  @return       Icon pointer or NoIcon == NULL if not found.
 */
-global Icon* IconByIdent(const char* ident)
+Icon* IconByIdent(const char* ident)
 {
 	Icon* const* icon;
 
@@ -329,7 +329,7 @@ global Icon* IconByIdent(const char* ident)
 **
 **  @return      The identifier for the icon
 */
-global const char* IdentOfIcon(const Icon* icon)
+const char* IdentOfIcon(const Icon* icon)
 {
 	Assert(icon);
 
@@ -344,7 +344,7 @@ global const char* IdentOfIcon(const Icon* icon)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
 */
-global void DrawIcon(const Player* player, Icon* icon, int x, int y)
+void DrawIcon(const Player* player, Icon* icon, int x, int y)
 {
 	GraphicPlayerPixels(player, icon->Sprite);
 	VideoDrawClip(icon->Sprite, icon->Index, x, y);
@@ -359,7 +359,7 @@ global void DrawIcon(const Player* player, Icon* icon, int x, int y)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
 */
-global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
+void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 	int x, int y)
 {
 	Uint32 color;
@@ -418,7 +418,7 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 **
 **  @param l  Lua state.
 */
-local int CclDefineIcon(lua_State* l)
+static int CclDefineIcon(lua_State* l)
 {
 	const char* value;
 	const char* ident;
@@ -473,7 +473,7 @@ local int CclDefineIcon(lua_State* l)
 **
 **  @todo  Should check if alias is free and icon already defined.
 */
-local int CclDefineIconAlias(lua_State* l)
+static int CclDefineIconAlias(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
 		LuaError(l, "incorrect argument");
@@ -489,7 +489,7 @@ local int CclDefineIconAlias(lua_State* l)
 /**
 **  Define icon mapping from original number to internal symbol
 */
-local int CclDefineIconWcNames(lua_State* l)
+static int CclDefineIconWcNames(lua_State* l)
 {
 	int i;
 	int j;
@@ -524,7 +524,7 @@ local int CclDefineIconWcNames(lua_State* l)
 /**
 **  Register CCL features for icons.
 */
-global void IconCclRegister(void)
+void IconCclRegister(void)
 {
 	lua_register(Lua, "DefineIcon", CclDefineIcon);
 	lua_register(Lua, "DefineIconAlias", CclDefineIconAlias);

@@ -62,8 +62,8 @@
 ----------------------------------------------------------------------------*/
 
 //###### For Magnant META SERVER
-local Socket MetaServerFildes;  // This is a TCP socket.
-global int MetaServerInUse;
+static Socket MetaServerFildes;  // This is a TCP socket.
+int MetaServerInUse;
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -75,7 +75,7 @@ global int MetaServerInUse;
 **
 **		@return		-1 fail, 0 success.
 */
-global int MetaInit(void)
+int MetaInit(void)
 {
 	int i;
 	char* reply;
@@ -121,7 +121,7 @@ global int MetaInit(void)
 **
 **		@return		nothing
 */
-global int MetaClose(void)
+int MetaClose(void)
 {
 	NetCloseTCP(MetaServerFildes);
 	return 0;
@@ -132,7 +132,7 @@ global int MetaClose(void)
 **
 **		@return 1 OK, 0 Error.
 */
-global int MetaServerOK(char* reply)
+int MetaServerOK(char* reply)
 {
 	return !strcmp("OK\r\n", reply) || !strcmp("OK\n", reply);
 }
@@ -145,7 +145,7 @@ global int MetaServerOK(char* reply)
 **
 **		@returns -1 if error.
 */
-global int GetMetaParameter(char* reply, int pos, char** value)
+int GetMetaParameter(char* reply, int pos, char** value)
 {
 	char* endline;
 
@@ -191,7 +191,7 @@ global int GetMetaParameter(char* reply, int pos, char** value)
 **
 **		@returns		-1 fail, length of command
 */
-global int SendMetaCommand(char* command, char* format, ...)
+int SendMetaCommand(char* command, char* format, ...)
 {
 	int n;
 	int size;
@@ -265,7 +265,7 @@ global int SendMetaCommand(char* command, char* format, ...)
 **		@param		reply		Text of the reply
 **		@return		error or number of bytes
 */
-global int RecvMetaReply(char** reply)
+int RecvMetaReply(char** reply)
 {
 	int n;
 	char* p;
