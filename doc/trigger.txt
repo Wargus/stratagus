@@ -53,9 +53,11 @@ For the following syntax I use:
 	'units		All non building units
 	'building	All building units
 <op>
-	'==		opperator equal
-	'>		opperator more
-	'<		opperator less
+	'==		operator equal
+	'>		operator greater than
+	'>=		operator greater than or equal
+	'<		operator less than
+	'<=		operator less than or equal
 <quantity>
 	0 ... oo	Number for the quantity
 <location>
@@ -169,7 +171,7 @@ The default triggers for single player:
 ;;
 (add-trigger
   ;; Condition
-  (lambda () (if-unit 'this 0 'all))
+  (lambda () (if-unit 'this '== 0 'all))
   ;; Action
   (lambda () (action-defeat)))
 ;;
@@ -177,7 +179,7 @@ The default triggers for single player:
 ;;
 (add-trigger
   ;; Condition
-  (lambda () (if-opponents 'this 0))
+  (lambda () (if-opponents 'this '== 0))
   ;; Action
   (lambda () (action-victory)))
 
@@ -189,8 +191,8 @@ This is an example for a bring to goal trigger:
 ;;
 (add-trigger
   ;; Condition
-  (lambda () (and (if-unit 1 0 '== 'unit-archer)
-    (if-near-unit 'this 1 '== 'unit-archer 'unit-circle-of-power)) )
+  (lambda () (and (if-unit 1 '== 0 'unit-archer)
+    (if-near-unit 'this '== 1 'unit-archer 'unit-circle-of-power)) )
   ;; Action
   (lambda () (action-victory)))
 
