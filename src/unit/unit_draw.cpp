@@ -433,22 +433,8 @@ local void DrawManaSprite(int x,int y,const UnitType* type,int full,int ready)
 
     n=VideoGraphicFrames(ManaSprite.Sprite)-1;
     n-=(n*ready)/full;
-#if 0
-    f=(100*ready)/full;
-    if( f>75) {
-	n=0;
-    } else if( f>50 ) {
-	n=1;
-    } else if( f>25 ) {
-	n=2;
-		// FIXME: v--- compatibility hack
-    } else if( f
-	&& ManaSprite.Width*4<VideoGraphicWidth(ManaSprite.Sprite) ) {
-	n=3;
-    } else {
-	n=4;
-    }
-#endif
+
+    DebugCheck( n<0 || n>=VideoGraphicFrames(ManaSprite.Sprite)) ;
     if( ManaSprite.HotX<0 ) {
 	x+=ManaSprite.HotX
 		+(type->TileWidth*TileSizeX+type->BoxWidth+1)/2;
@@ -830,6 +816,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	x+=(type->TileWidth*TileSizeX+type->BoxWidth)/2-f;
 	y+=(type->TileHeight*TileSizeY+type->BoxHeight)/2-14;
 	// FIXME: should use FontHeight(GameFont);
+	// FIXME: need clipping
 	if( x>TheUI.MapX && x+f<TheUI.MapEndX && y>TheUI.MapY
 		&& y+14<TheUI.MapEndY ) {
 	    VideoDrawNumber(x,y,GameFont,unit->GroupId);
