@@ -872,7 +872,7 @@ local SCM CclCreateUnit(SCM type,SCM player,SCM x,SCM y)
     int heading;
 
     unittype=CclGetUnitType(type);
-    heading=MyRand()%256;
+    heading=SyncRand()%256;
     unit=MakeUnit(unittype,&Players[gh_scm2int(player)]);
     unit->X=gh_scm2int(x);
     unit->Y=gh_scm2int(y);
