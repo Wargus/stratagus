@@ -1835,27 +1835,29 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 	const UnitType* type, int frame, int x, int y)
 {
+	int player;
+
+	player = unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player;
 	if (cframe->File == ConstructionFileConstruction) {
 		const Construction* construction;
 
 		construction = type->Construction;
+		if (!construction->Sprite->PlayerColorTextures[player]) {
+			MakePlayerColorTexture(construction->Sprite, player);
+		}
 		x -= construction->Width / 2;
 		y -= construction->Height / 2;
 		if (frame < 0) {
 			VideoDrawPlayerColorClipX(construction->Sprite,
-				unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
-				-frame - 1, x, y);
+				player, -frame - 1, x, y);
 		} else {
 			VideoDrawPlayerColorClip(construction->Sprite,
-				unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
-				frame, x, y);
+				player, frame, x, y);
 		}
 	} else {
 		x -= type->TileWidth * TileSizeX / 2;
 		y -= type->TileHeight * TileSizeY / 2;
-		DrawUnitType(type, type->Sprite,
-			unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
-			frame, x, y);
+		DrawUnitType(type, type->Sprite, player, frame, x, y);
 	}
 }
 
