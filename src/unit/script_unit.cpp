@@ -1509,7 +1509,48 @@ local int CclSlotUsage(lua_State* l)
 #undef SLOT_LEN
 }
 
-// FIXME: write the missing access functions
+/**
+**	Load the unit allocator state.
+**	We need to do this in order to make sure that the game allocates units in the exact same way.
+*/
+local int CclUnitAllocQueue(lua_State* l)
+{
+	int i;
+	int args;
+	const char* key;
+	Unit* unit;
+
+	ReleasedHead = ReleasedTail = 0;
+	args = lua_gettop(l);
+	for (i = 1; i <= args; ++i) {
+		unit = malloc(sizeof(Unit));
+
+		lua_pushnil(l);
+		while (lua_next(l, i)) {
+			key = LuaToString(l, -2);
+			if (!strcmp(key, "Slot")) {
+				unit->Slot = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			} else if (!strcmp(key, "FreeCycle")) {
+				unit->Refs = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			} else {
+				lua_pushfstring(l, "Wrong key %s", key);
+				lua_error(l);
+				return 0;
+			}
+		}
+
+		unit->Next = 0;
+		if (ReleasedHead) {
+			ReleasedTail->Next = unit;
+			ReleasedTail = unit;
+		} else {
+			ReleasedHead = ReleasedTail = unit;
+		}
+	}
+	return 0;
+}
 
 /**
 **		Register CCL features for unit.
@@ -1539,6 +1580,7 @@ global void UnitCclRegister(void)
 	lua_register(Lua, "SetUnitUnholyArmor", CclSetUnitUnholyArmor);
 
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
+	lua_register(Lua, "UnitAllocQueue", CclUnitAllocQueue);
 }
 
 //@}

@@ -36,6 +36,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 #include "stratagus.h"
@@ -68,6 +69,156 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	For saving lua state (table, number, string, bool, not function).
+**
+**	@param l	lua_State to save.
+**	@param is_root	non-null for the main call, 0 for recursif call.
+**
+**	@return NULL if nothing could be saved.
+**		else a string that could be executed in lua to restore lua state
+**	@todo do the output prettier (adjust indentation, newline)
+*/
+local char* SaveGlobal(lua_State *l, int is_root)
+{
+	int type_key;
+	int type_value;
+	const char *sep;
+	const char *key;
+	char *value;
+	char *res;
+	int first;
+	char *tmp;
+	int b;
+
+//	DebugCheck(is_root && lua_gettop(l));
+	first = 1;
+	res = NULL;
+	if (is_root) {
+		lua_pushstring(l, "_G");// global table in lua.
+		lua_gettable(l, LUA_GLOBALSINDEX);
+	}
+	sep = (is_root) ? "" : ", ";
+	DebugCheck(!lua_istable(l, -1));
+	lua_pushnil(l);
+	while (lua_next(l, -2)) {
+		type_key = lua_type(l, -2);
+		type_value = lua_type(l, -1);
+		key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
+		if (!strcmp(key, "_G") || (is_root
+			&& (!strcmp(key, "assert") || !strcmp(key, "gcinfo") || !strcmp(key, "getfenv")
+			|| !strcmp(key, "unpack") || !strcmp(key, "tostring") || !strcmp(key, "tonumber")
+			|| !strcmp(key, "setmetatable") || !strcmp(key, "require") || !strcmp(key, "pcall")
+			|| !strcmp(key, "rawequal") || !strcmp(key, "collectgarbage") || !strcmp(key, "type")
+			|| !strcmp(key, "getmetatable") || !strcmp(key, "next") || !strcmp(key, "print")
+			|| !strcmp(key, "xpcall") || !strcmp(key, "rawset") || !strcmp(key, "setfenv")
+			|| !strcmp(key, "rawget") || !strcmp(key, "newproxy") || !strcmp(key, "ipairs")
+			|| !strcmp(key, "loadstring") || !strcmp(key, "dofile") || !strcmp(key, "_TRACEBACK")
+			|| !strcmp(key, "_VERSION") || !strcmp(key, "pairs") || !strcmp(key, "__pow")
+			|| !strcmp(key, "error") || !strcmp(key, "loadfile") || !strcmp(key, "arg")
+			|| !strcmp(key, "_LOADED") || !strcmp(key, "loadlib") || !strcmp(key, "string")
+			|| !strcmp(key, "os") || !strcmp(key, "io") || !strcmp(key, "debug")
+			|| !strcmp(key, "coroutine")
+		// other string to protected ?
+#if META_LUA
+			|| !strcmp(key, "Stratagus") // do not save stratagus table. or should be ?
+#endif
+		))) {
+			lua_pop(l, 1); // pop the value
+			continue;
+		}
+		switch (type_value) {
+			case LUA_TNIL:
+				value = strdup("nil");
+				break;
+			case LUA_TNUMBER:
+				value = strdup(lua_tostring(l, -1)); // let lua do the conversion
+				break;
+			case LUA_TBOOLEAN:
+				b = lua_toboolean(l, -1);
+				value = strdup(b ? "true" : "false"); // let lua do the conversion
+				break;
+			case LUA_TSTRING:
+				value = strdcat3("\"", lua_tostring(l, -1), "\"");
+				break;
+			case LUA_TTABLE:
+				lua_pushvalue(l, -1);
+				tmp = SaveGlobal(l, 0); 
+				value = NULL;
+				if (tmp != NULL) {
+					value = strdcat3("{", tmp, "}");
+					free(tmp);
+				}
+				break;
+			case LUA_TFUNCTION:
+			// Could be done with string.dump(function)
+			// and debug.getinfo(function).name (coulb be nil for anonymous function)
+			// But not usefull yet.
+				value = NULL;
+				break;
+			case LUA_TUSERDATA:
+			case LUA_TTHREAD:
+			case LUA_TLIGHTUSERDATA:
+			case LUA_TNONE:
+			default : // no other cases
+				value = NULL;
+				break;
+		}
+		lua_pop(l, 1); /* pop the value */
+
+		// Check the validity of the key (only [a-zA-z_])
+		if (type_key == LUA_TSTRING) {
+			int i;
+
+			for (i = 0; key[i]; i++) {
+				if (!(('a' <= key[i] && 'z' >= key[i])
+					|| ('A' <= key[i] && 'Z' >= key[i])
+					|| ('0' <= key[i] && key[i] >= '9') || key[i] == '_')) {
+					free(value);
+					value = NULL;
+					break;
+				}
+			}
+		}
+		if (value == NULL) {
+			if (!is_root) {
+				lua_pop(l, 2); // pop the key and the table
+				return NULL;
+			}
+			continue;
+		}
+		if (type_key == LUA_TSTRING && !strcmp(key, value)) {
+			continue;
+		}
+		if (first) {
+			first = 0;
+			if (type_key == LUA_TSTRING) {
+				res = strdcat3(key, "=", value);
+				free(value);
+			} else {
+				res = value;
+			}
+		} else {
+			if (type_key == LUA_TSTRING) {
+				tmp = value;
+				value = strdcat3(key, "=", value);
+				free(tmp);
+				tmp = res;
+				res = strdcat3(res, sep, value);
+				free(tmp);
+			} else {
+				res = strdcat3(res, sep, value);
+			}
+		}
+		tmp = res;
+		res = strdcat3("", res, "\n");
+		free(tmp);
+	}
+	lua_pop(l, 1); // pop the table
+//	DebugCheck(is_root && lua_gettop(l));
+	return res;
+}
 
 /**
 **  Save a game to file.
@@ -162,7 +313,10 @@ global void SaveGame(const char* filename)
 	SaveObjectives(file);
 	SaveReplayList(file);
 	// FIXME: find all state information which must be saved.
-
+	s = SaveGlobal(Lua, 1);
+	if (s != NULL) {
+		CLprintf(file, "-- Lua state\n\n %s\n", s);
+	}
 	CLclose(file);
 }
 
