@@ -351,8 +351,8 @@ global int ConvertToStereo32(const char *src, char *dest, int frequency,
             for (b = 0; b < 2; ++b) {
                 offset=( ((s/4)/freqratio)*samplesize*chanratio +
                     (c/chanratio)*chansize + b/(2/chansize));
-                    dest[s + c*2 + b] = src[offset] + (chansize == 1 ? 127 : 0);
-                    // FIXME: should this be 127 or 128?
+                dest[s + c*2 + b] = src[offset] + (chansize == 1 ? 127 : 0);
+                // FIXME: should this be 127 or 128?
             }
         }
     }
