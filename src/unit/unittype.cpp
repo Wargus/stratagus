@@ -61,6 +61,7 @@ global UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood.
 global UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
 global UnitType*UnitTypeHumanFarm;	/// Human farm.
 global UnitType*UnitTypeOrcFarm;	/// Orc farm.
+global UnitType*UnitTypeCritter;	/// Critter unit type pointer
 
 /**
 **	Lookup table for unit-type names
@@ -1084,6 +1085,7 @@ global void InitUnitTypes(void)
     UnitTypeOrcWorkerWithWood=UnitTypeByIdent("unit-peon-with-wood");
     UnitTypeHumanFarm=UnitTypeByIdent("unit-farm");
     UnitTypeOrcFarm=UnitTypeByIdent("unit-pig-farm");
+    UnitTypeCritter=UnitTypeByIdent("unit-critter");
 }
 
 /**
