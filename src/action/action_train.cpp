@@ -143,7 +143,7 @@ global void HandleActionTrain(Unit* unit)
 		|| (unit->NewOrder.Action==UnitActionAttack
 		    && !nunit->Type->CanAttack) ) {
 	    DebugLevel0Fn("Wrong order for unit\n");
-	    unit->Orders[0].Action=UnitActionStill;
+	    nunit->Orders[0].Action=UnitActionStill;
 	} else {
 	    if( unit->NewOrder.Goal ) {
 		if( unit->NewOrder.Goal->Destroyed ) {
