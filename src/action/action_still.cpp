@@ -153,6 +153,8 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		DebugLevel3Fn(" %Zd Attacking in range %d\n"
 			,UnitNumber(unit),unit->SubAction);
+		DebugCheck( unit->SavedOrder.Action!=UnitActionStill );
+		DebugCheck( unit->SavedOrder.Goal );
 		unit->SavedOrder.Action=UnitActionAttack;
 		unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
 		unit->SavedOrder.X=unit->X;
