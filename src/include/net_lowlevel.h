@@ -121,17 +121,25 @@ extern void NetExit(void);
 extern unsigned long NetResolveHost(const char* host);
     ///	Get local IP from network file descriptor
 extern int NetSocketAddr(const int sock);
-    /// Open an UDP Socket port.
+    /// Open a UDP Socket port.
 extern int NetOpenUDP(int port);
-    /// Close an UDP socket port.
+    /// Open a TCP Socket port.
+extern int NetOpenTCP(int port);
+    /// Close a UDP socket port.
 extern void NetCloseUDP(int sockfd);
-    /// Send through an UPD socket to a host:port.
+    /// Close a TCP socket port.
+extern void NetCloseTCP(int sockfd);
+    /// Send through a UPD socket to a host:port.
 extern int NetSendUDP(int sockfd,unsigned long host,int port
 	,const void* buf,int len);
+    /// Send through a TCP socket
+extern int NetSendTCP(int sockfd,const void* buf,int len);
     /// Wait for socket ready.
 extern int NetSocketReady(int sockfd,int timeout);
-    /// Receive from an UDP socket.
+    /// Receive from a UDP socket.
 extern int NetRecvUDP(int sockfd,void* buf,int len);
+    /// Receive from a TCP socket.
+extern int NetRecvTCP(int sockfd,void* buf,int len);
 
 //@}
 
