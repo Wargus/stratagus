@@ -106,7 +106,7 @@ global GameSound GameSounds
 local void InsertSoundRequest(const Unit* unit,unsigned id,unsigned char power,
 			      SoundId sound,unsigned char fight,
 			      unsigned char selection,unsigned char volume,
-			      float stereo) 
+			      char stereo) 
 {
 #ifdef USE_SDLA
     SDL_LockAudio();
@@ -203,17 +203,18 @@ local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
 */
 global void PlayUnitSound(const Unit* unit,UnitVoiceGroup voice)
 {
-    float stereo;
+    int stereo;
 #ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
 
-    stereo = (unit->X + ((float)unit->IX / TileSizeX) - v->MapX) / v->MapWidth;
+    stereo = ((unit->X*TileSizeX + unit->IX - (int)v->MapX*TileSizeX) * 256 /
+              (((int)v->MapWidth - 1) * TileSizeX)) - 128;
 #else /* SPLIT_SCREEN_SUPPORT */
-    stereo = (unit->X + ((float)unit->IX / TileSizeX) - MapX) / MapWidth;
+    stereo = ((unit->X*TileSizeX + unit->IX - MapX*TileSizeX) * 256 / 
+              ((MapWidth - 1) * TileSizeX)) - 128;
 #endif /* SPLIT_SCREEN_SUPPORT */
-    stereo = (stereo * 2.0) - 1.0;
-    if (stereo < -1.0) stereo=-1.0;
-    else if (stereo > 1.0) stereo=1.0;
+    if (stereo < -128) stereo=-128;
+    else if (stereo > 127) stereo=127;
 
     InsertSoundRequest(unit,
 		       unit->Slot,
@@ -230,17 +231,18 @@ global void PlayUnitSound(const Unit* unit,UnitVoiceGroup voice)
 */
 global void PlayMissileSound(const Missile* missile,SoundId sound)
 {
-    float stereo;
+    int stereo;
 #ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
 
-    stereo = (((float)missile->X / TileSizeX) - v->MapX) / v->MapWidth;
+    stereo = ((missile->X - (int)v->MapX*TileSizeX) * 256 /
+              (((int)v->MapWidth - 1) * TileSizeX)) - 128;
 #else /* SPLIT_SCREEN_SUPPORT */
-    stereo = (((float)missile->X / TileSizeX) - MapX) / MapWidth;
+    stereo = ((missile->X - MapX*TileSizeX) * 256 /
+              ((MapWidth - 1) * TileSizeX)) - 128;
 #endif /* SPLIT_SCREEN_SUPPORT */
-    stereo = (stereo * 2.0) - 1.0;
-    if (stereo < -1.0) stereo=-1.0;
-    else if (stereo > 1.0) stereo=1.0;
+    if (stereo < -128) stereo=-128;
+    else if (stereo > 127) stereo=127;
 
     DebugLevel3("Playing %p\n" _C_ sound);
     InsertSoundRequest(NULL,
@@ -266,7 +268,7 @@ global void PlayGameSound(SoundId sound,unsigned char volume)
 		       0,
 		       0,
 		       1,
-		       0.0);
+		       0);
 }
 
 /**
