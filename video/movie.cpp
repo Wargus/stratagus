@@ -244,7 +244,7 @@ int PlayMovie(const char* name)
 			OggFree(data);
 			free(data);
 			CLclose(f);
-			return 0;
+			return -1;
 		}
 		MusicSample = sample;
 		PlayingMusic = 1;
