@@ -1186,7 +1186,7 @@ static int GameStatsDrawFunc(int frame)
 void ShowStats(void)
 {
 	EventCallback callbacks;
-	Graphic* background;
+	Graphic** g;
 	int done;
 	int old_video_sync;
 	int frame;
@@ -1206,19 +1206,20 @@ void ShowStats(void)
 
 	VideoClearScreen();
 
-	background = NULL;
+	g = NULL;
 	if (GameResult == GameVictory) {
 		if (TheUI.VictoryBackgroundG) {
-			LoadGraphic(TheUI.VictoryBackgroundG);
-			background = TheUI.VictoryBackgroundG;
+			g = &TheUI.VictoryBackgroundG;
 		}
 	} else {
 		if (TheUI.DefeatBackgroundG) {
-			LoadGraphic(TheUI.DefeatBackgroundG);
-			background = TheUI.DefeatBackgroundG;
+			g = &TheUI.DefeatBackgroundG;
 		}
 	}
-	ResizeGraphic(background, VideoWidth, VideoHeight);
+	if (g && *g) {
+		LoadGraphic(*g);
+		ResizeGraphic(*g, VideoWidth, VideoHeight);
+	}
 
 	UseContinueButton = 1;
 	InitContinueButton(TheUI.Offset640X + 455, TheUI.Offset480Y + 440);
@@ -1229,11 +1230,11 @@ void ShowStats(void)
 	IntroNoEvent = 1;
 	IntroButtonPressed = 0;
 	while (1) {
-		if (background) {
-			VideoDrawSubClip(background, 0, 0,
-				background->Width, background->Height,
-				(VideoWidth - background->Width) / 2,
-				(VideoHeight - background->Height) / 2);
+		if (g && *g) {
+			VideoDrawSubClip(*g, 0, 0,
+				(*g)->Width, (*g)->Height,
+				(VideoWidth - (*g)->Width) / 2,
+				(VideoHeight - (*g)->Height) / 2);
 		}
 		GameStatsDrawFunc(frame);
 		DrawContinueButton();
@@ -1249,6 +1250,9 @@ void ShowStats(void)
 		WaitEventsOneFrame(&callbacks);
 		++frame;
 	}
+
+	FreeGraphic(*g);
+	*g = NULL;
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
