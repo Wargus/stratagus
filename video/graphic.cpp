@@ -439,8 +439,12 @@ local void VideoDrawSubOpenGLClip(const Graphic* graphic, int gx, int gy,
 local void FreeGraphic8(Graphic* graphic)
 {
 #ifdef DEBUG
+#ifdef USE_SDL_SURFACE
 	AllocatedGraphicMemory -=
 		graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
+#else
+	AllocatedGraphicMemory -= graphic->Size;
+#endif
 	AllocatedGraphicMemory -= sizeof(Graphic);
 #endif
 
