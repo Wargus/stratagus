@@ -1,7 +1,19 @@
+<HTML><HEAD>
 <!--
 ----	$Id$
+
+----	(c) Copyright 2001 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
 -->
-<HTML><HEAD>
     <TITLE>FAQ for FreeCraft (fka ALE Clone) Version 1.17</TITLE>
 </HEAD>
 <BODY>
@@ -18,7 +30,7 @@
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
 <P><B>(C) Copyright 1998-2001 by The FreeCraft Project. Distributed under the
-<A HREF="artistic-license.html">"Artistic License"</A></B>
+<A HREF="gpl.html">"GNU General Public License"</A></B>
 <HR>
 
 Any questions not mentioned here, please contact
@@ -34,7 +46,6 @@ Any questions not mentioned here, please contact
 <DD>A: The original graphics aren't designed for this resolutions, you could
     design your own user interface, see "data/ccl/ui.ccl".
 <P>
-<DT>Q: The graphics didn't fit on 800x600 or higher resolution?
 <DT>Q: gzseek already defined or undefined!
 
 <DD>A: You have an incompatible libpng version, better you install the latest
@@ -71,6 +82,8 @@ bigmap1.pud is in the upper left corner.
 bigmap2.pud is in the upper right corner.
 bigmap3.pud is in the lower left corner.
 bigmap4.pud is in the lower right corner.
+<P>
+Soon CraftED - The FreeCraft map editor, will support the creation of big maps.
 <P>
 <DT>Q: Can I use the original without expansion?
 
@@ -110,21 +123,35 @@ DFLAGS= $(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) \
 	$(DEBUG)
 <P>
 "-DSLOW_INPUT" in Rules.make.
+<P>
 <DT>Q: I want play but do not want use CD...  can i copy files from cd to hdd ? 
     what i have to copy ?
 <DD>A: After running 'build.bat' (WINDOWS) or 'build.sh' (UNIX) the CD isn't
     longer needed. This script converts the data on CD into our own format.
     <BR>
     A: You didn't need to copy, the installation did it for you.
+<P>
 <DT>Q: The game becomes very slow under X11.
 <DD>A: Give your X11 server a higher priority than the clients.<P>
     renice -5 &lt;pid-of-your-x11-server&gt;<P>
+    newer linux distributions (debian) does this automatic.<P>
     or start freecraft with<P>
     nice -n 5 ./freecraft
-
+<P>
 <DT>Q: Can I use FreeCraft to join in an original network game?
 <DD>A: Sorry, FreeCraft use its own network protocol. You can only play
     with FreeCraft against other FreeCrafts.
+
+<P>
+<DT>Q: I only have the original BNE version, can I use it?
+<DD>A: No. Until now nobody has written a converter for this, if you want to
+	write it, please contact me. It is only a question of time and you
+	must understand writting C.
+
+<P>
+<DT>Q: I get only a black window, after I have installed it on windows. What
+       have I done wrong?
+<DD>A: Install FreeCraft to C:\.
 
 </DL>
 

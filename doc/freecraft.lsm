@@ -7,9 +7,7 @@ Description:    A realtime, fantasy strategy war game for UNIX or Win32.
 		the original game CD or expansion CD to use this program or
 		the free graphic replacement.
 Keywords:       RTS realtime strategy game X11
-Author:         johns@locknar.cne.de or johns98@gmx.net (Lutz Sammer)
-		(Valery Shchedrin)
-		(Fabrice Rossi)
+Author:         johns98@gmx.net (Lutz Sammer) (Valery Shchedrin) (Fabrice Rossi)
 Maintained-by:  aleclone@FreeCraft.org (The FreeCraft Project Group)
 Primary-site:   ftp://metalab.unc.edu/pub/Linux/games/strategy
 		684 KB freecraft-000402.tar.gz
@@ -21,5 +19,5 @@ Original-site:  http://FreeCraft.org/freecraft-000402.tar.gz
 		684 KB freecraft-000402.tar.gz
 		1.2 MB freecraft-000402-bin.tar.gz
 Platforms:      Unix/Win32,SVGALIB/X11,libz,libpng and the original CD-ROM.
-Copying-policy: Artistic license.
+Copying-policy: GNU General Public License
 End
