@@ -376,6 +376,7 @@ global void UpdateDisplay(void)
 		DrawTimer();
 	}
 
+	DrawPieMenu(); // draw pie menu only if needed
 	DrawMenu(CurrentMenu);
 
 	DrawAnyCursor();

@@ -249,6 +249,12 @@ typedef struct _ui_ {
 	int           ButtonPanelY;         ///< Button panel screen Y position
 	int           CommandKeyFont;       ///< Command key font
 
+	// Pie Menu
+	GraphicConfig PieMenuBackground;      ///< Optional background image for the piemenu
+	enum _mouse_buttons_ PieMouseButton; ///< Which mouse button pops up the piemenu. Deactivate with the NoButton value.
+	int PieX[8];                         ///< X position of the pies
+	int PieY[8];                         ///< Y position of the pies
+
 	// Map area
 	ViewportMode ViewportMode;          ///< Current viewport mode
 	Viewport*    MouseViewport;         ///< Viewport containing mouse
