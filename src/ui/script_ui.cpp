@@ -65,6 +65,7 @@ local SCM ChooseTargetFinishHook;  /// Script to draw target selection buttons
 #endif
 
 global char* ClickMissile;
+global char* DamageMissile;
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -808,6 +809,29 @@ local SCM CclSetClickMissile(SCM missile)
     return old;
 }
 
+/**
+**	Set which missile shows Damage
+**
+**	@param missile	missile name to use
+**	@return		old value
+*/
+local SCM CclSetDamageMissile(SCM missile)
+{
+    SCM old;
+
+    old=NIL;
+
+    if( DamageMissile ) {
+	old=gh_str02scm(DamageMissile);
+	free( DamageMissile );
+	DamageMissile = NULL;
+    }
+
+    if( !gh_null_p(missile) ) {
+	DamageMissile=gh_scm2newstr(missile,NULL);
+    }
+    return old;
+}
 /**
 **	Game contrast.
 **
@@ -3717,6 +3741,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-mouse-scale!",CclSetMouseScale);
 
     gh_new_procedure1_0("set-click-missile!",CclSetClickMissile);
+    gh_new_procedure1_0("set-damage-missile!",CclSetDamageMissile);
 
     gh_new_procedure1_0("set-contrast!",CclSetContrast);
     gh_new_procedure1_0("set-brightness!",CclSetBrightness);

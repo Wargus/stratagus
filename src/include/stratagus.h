@@ -467,6 +467,7 @@ extern char* MenuBackgroundWithTitle;	/// File for menu with title
 extern char* TitleMusic;		/// File for title music
 extern char* MenuMusic;			/// File for menu music
 extern char* ClickMissile;		/// Missile to show when you click
+extern char* DamageMissile;		/// Missile to show damage caused
 extern char* StratagusLibPath;		/// Location of stratagus data
 
 extern int SpeedBuild;			/// Speed factor for building

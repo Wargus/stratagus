@@ -105,7 +105,6 @@ global MissileType* MissileTypeSmallFire;	/// Small fire missile-type
 global MissileType* MissileTypeBigFire;		/// Big fire missile-type
     /// missile-type for the explosion missile
 global MissileType* MissileTypeExplosion;
-global MissileType* MissileTypeHit;		/// Hit missile-type
 
 IfDebug(
 global int NoWarningMissileType;		/// quiet ident lookup.
@@ -1643,7 +1642,6 @@ global void InitMissileTypes(void)
     MissileTypeSmallFire=MissileTypeByIdent("missile-small-fire");
     MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
     MissileTypeExplosion = MissileTypeByIdent("missile-explosion");
-    MissileTypeHit = MissileTypeByIdent("missile-hit");
 }
 
 /**
@@ -1670,7 +1668,6 @@ global void CleanMissileTypes(void)
 
     MissileTypeSmallFire=NULL;
     MissileTypeBigFire=NULL;
-    MissileTypeHit=NULL;
 }
 
 /**
