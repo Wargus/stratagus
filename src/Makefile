@@ -31,7 +31,7 @@ include $(TOPDIR)/$(RULESFILE)
 OBJS=
 
 MODULES= clone map unit action ai ui sound video network pathfinder siod \
-	 game beos missile libmodplug editor
+	 game beos missile libmodplug editor movie
 
 all::
 	@if [ ! -d ./$(OBJDIR) ] ; then mkdir ./$(OBJDIR) ; fi
