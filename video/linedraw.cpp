@@ -2141,36 +2141,6 @@ local int ClipTest(double p,double q,double *u1,double *u2)
 }
 
 /**
-**	Liang/Barksy clipping algorithm.
-*/
-local void LineClip(int x1,int y1,int x2,int y2)
-{
-    double u1;
-    double u2;
-    int dx;
-    int dy;
-
-    u1 = 0.0;
-    u2 = 1.0;
-    dx = x2-x1;
-    if (ClipTest(-dx,x1-ClipX1, &u1, &u2)
-	    && ClipTest(dx,ClipX2-x1, &u1, &u2)) {
-	dy = y2-y1;
-	if (ClipTest(-dy, y1-ClipY1, &u1, &u2)
-		&& ClipTest(dy,ClipY2-y1, &u1, &u2)) {
-	    if (u1 > 0) {
-		x1 = (x1 + u1*dx) + 0.5;
-		y1 = (y1 + u1*dy) + 0.5;
-	    }
-	    if (u2 < 1) {
-		x2 = (x1 + u2*dx) + 0.5;
-		y2 = (y1 + u2*dy) + 0.5;
-	    }
-	}
-    }
-}
-
-/**
 **	Draw line clipped into 8bit framebuffer.
 **
 **	@param color	Color index.
@@ -2203,6 +2173,12 @@ global void DrawLineClip8(SysColors color,int x1,int y1,int x2,int y2)
 		y2 = (y1 + u2*dy) + 0.5;
 	    }
 
+	    if( x1<0 || x2<0 || x1>VideoWidth || x2>VideoWidth
+		    || y1<0 || y2<0 || y1>VideoHeight || y2>VideoHeight ) {
+		DebugLevel0Fn("Wrong coordinates %d,%d %d,%d\n",
+			x1,y1,x2,y2);
+		return;
+	    }
 	    DrawLine8(color,x1,y1,x2,y2);
 	}
     }
@@ -2241,6 +2217,12 @@ global void DrawLineClip16(SysColors color,int x1,int y1,int x2,int y2)
 		y2 = (y1 + u2*dy) + 0.5;
 	    }
 
+	    if( x1<0 || x2<0 || x1>VideoWidth || x2>VideoWidth
+		    || y1<0 || y2<0 || y1>VideoHeight || y2>VideoHeight ) {
+		DebugLevel0Fn("Wrong coordinates %d,%d %d,%d\n",
+			x1,y1,x2,y2);
+		return;
+	    }
 	    DrawLine16(color,x1,y1,x2,y2);
 	}
     }
@@ -2279,6 +2261,12 @@ global void DrawLineClip24(SysColors color,int x1,int y1,int x2,int y2)
 		y2 = (y1 + u2*dy) + 0.5;
 	    }
 
+	    if( x1<0 || x2<0 || x1>VideoWidth || x2>VideoWidth
+		    || y1<0 || y2<0 || y1>VideoHeight || y2>VideoHeight ) {
+		DebugLevel0Fn("Wrong coordinates %d,%d %d,%d\n",
+			x1,y1,x2,y2);
+		return;
+	    }
 	    DrawLine24(color,x1,y1,x2,y2);
 	}
     }
@@ -2317,6 +2305,12 @@ global void DrawLineClip32(SysColors color,int x1,int y1,int x2,int y2)
 		y2 = (y1 + u2*dy) + 0.5;
 	    }
 
+	    if( x1<0 || x2<0 || x1>VideoWidth || x2>VideoWidth
+		    || y1<0 || y2<0 || y1>VideoHeight || y2>VideoHeight ) {
+		DebugLevel0Fn("Wrong coordinates %d,%d %d,%d\n",
+			x1,y1,x2,y2);
+		return;
+	    }
 	    DrawLine32(color,x1,y1,x2,y2);
 	}
     }
