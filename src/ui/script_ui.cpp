@@ -3950,7 +3950,7 @@ static int CclSetGroupKeys(lua_State* l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	if (UiGroupKeys) {
+	if (UiGroupKeys != DefaultGroupKeys) {
 		free(UiGroupKeys);
 	}
 	UiGroupKeys = strdup(LuaToString(l, 1));
