@@ -53,13 +53,10 @@
 #include "ui.h"
 #include "campaign.h"
 #include "sound_server.h"
+#include "sound.h"
 
 #ifdef USE_SDLCD
 #include "SDL.h"
-#endif
-
-#ifdef USE_LIBCDA
-#include "sound.h"
 #endif
 
 /*----------------------------------------------------------------------------
@@ -2738,36 +2735,28 @@ local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		TheUI.KeyScroll = 1;
-		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing keyboard speed\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		TheUI.KeyScroll = 1;
-		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
-	    if (mi[1].d.hslider.percent == 0)
-		TheUI.KeyScroll = 0;
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.KeyScroll = 1;
-		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		    SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.KeyScroll = 1;
-		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		    SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
-		if (mi[1].d.hslider.percent == 0)
-		    TheUI.KeyScroll = 0;
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -2788,36 +2777,28 @@ local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		TheUI.KeyScroll = 1;
-		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing keyboard speed\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		TheUI.KeyScroll = 1;
-		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
-	    if (mi[1].d.hslider.percent == 0)
-		TheUI.KeyScroll = 0;
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.KeyScroll = 1;
-		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.KeyScroll = 1;
-		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
+		    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
-		if (mi[1].d.hslider.percent == 0)
-		    TheUI.KeyScroll = 0;
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
