@@ -503,13 +503,14 @@ local void FreeMissile(Missile* missile)
 **				    2
 **	damage is multiplied by random 1 or 2.
 **
-**	NOTE: different targets (big are hit by some missiles better)
-**	NOTE: hidden targets are hit worser.
-**	NOTE: targets higher are hit worser.
+**	@todo NOTE: different targets (big are hit by some missiles better)
+**	@todo NOTE: hidden targets are hit worser.
+**	@todo NOTE: targets higher are hit worser.
 **
 **	@param attacker_stats	Attacker attributes.
 **	@param goal_stats	Goal attributes.
 **	@param bloodlust	If attacker has bloodlust
+**	@param xp		Experience of attack.
 **
 **	@return			damage produces on goal.
 */
@@ -548,6 +549,8 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 **	@param attacker_stats	Attacker attributes.
 **	@param goal		Goal unit.
 **	@param bloodlust	If attacker has bloodlust
+**	@param xp		Experience of attack.
+**
 **	@return			damage produces on goal.
 */
 local int CalculateDamage(const UnitStats* attacker_stats,
