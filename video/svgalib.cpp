@@ -1073,7 +1073,9 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     ticks=SVGAGetTicks();
     if( ticks>NextFrameTicks ) {	// We are too slow :(
 	IfDebug(
-	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    if (InterfaceState == IfaceStateNormal) {
+		VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    }
 	);
 	++SlowFrameCounter;
     }
@@ -1268,7 +1270,9 @@ global void CheckVideoInterrupts(void)
     if( VideoInterrupts ) {
         //DebugLevel1Fn("Slow frame\n");
 	IfDebug(
-	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    if (InterfaceState == IfaceStateNormal) {
+		VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    }
 	);
         ++SlowFrameCounter;
     }
