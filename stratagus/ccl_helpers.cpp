@@ -420,7 +420,8 @@ global void IOCcl(SCM scmfrom, void *binaryform, void *para)
     ptr = (SCM *) binaryform;
     if (IOLoadingMode) {
 	*ptr = scmfrom;
-	CclGcProtect(*ptr);
+	// FIXME : wrong place to prevent GC ?
+	CclGcProtect(ptr);
     } else {
 	CLprintf(IOOutFile, " ");
 	lprin1CL(*ptr, IOOutFile);

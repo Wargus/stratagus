@@ -931,9 +931,9 @@ local SCM CclSetTriggerNumber(SCM number)
 
     num = gh_scm2int(number);
     if (num == -1) {
-	Trigger = NULL;
+	CclGcProtectedAssign(&Trigger, NULL);
     } else {
-	Trigger = symbol_value(gh_symbol2scm("*triggers*"), NIL);
+	CclGcProtectedAssign(&Trigger, symbol_value(gh_symbol2scm("*triggers*"), NIL));
 	if (gh_null_p(Trigger)) {
 	    DebugLevel0Fn("Invalid trigger number: %d out of -1\n" _C_ num);
 	} else {
@@ -943,7 +943,7 @@ local SCM CclSetTriggerNumber(SCM number)
 			num _C_ i - 1);
 		    break;
 		}
-		Trigger = gh_cdr(Trigger);
+		CclGcProtectedAssign(&Trigger, gh_cdr(Trigger));
 	    }
 	}
     }
@@ -968,7 +968,7 @@ local int TriggerExecuteAction(SCM script)
 	value = gh_eval(gh_car(script), NIL);
 	script = gh_cdr(script);
 	if (WaitFrame > FrameCounter) {
-	    WaitScript = script;
+	    CclGcProtectedAssign(&WaitScript, script);
 	    return 0;
 	}
     }
@@ -994,7 +994,7 @@ local void TriggerRemoveTrigger(SCM trig)
 	gh_set_car_x(trig, NIL);
 	gh_set_cdr_x(trig, NIL);
     }
-    Trigger = trig;
+    CclGcProtectedAssign(&Trigger, trig);
 }
 
 /**
@@ -1008,7 +1008,7 @@ global void TriggersEachCycle(void)
     SCM script;
 
     if (!Trigger) {
-	Trigger = symbol_value(gh_symbol2scm("*triggers*"), NIL);
+	CclGcProtectedAssign(&Trigger, symbol_value(gh_symbol2scm("*triggers*"), NIL));
     }
     trig = Trigger;
 
@@ -1029,8 +1029,8 @@ global void TriggersEachCycle(void)
 
     if (!gh_null_p(trig)) {		// Next trigger
 	pair = gh_car(trig);
-	Trigger = gh_cdr(trig);
-	WaitTrigger = trig;
+	CclGcProtectedAssign(&Trigger, gh_cdr(trig));
+	CclGcProtectedAssign(&WaitTrigger, trig);
 	// Pair is condition action
 	if (!gh_null_p(pair)) {
 	    script = gh_car(pair);
@@ -1047,7 +1047,7 @@ global void TriggersEachCycle(void)
 	    }
 	}
     } else {
-	Trigger = NULL;
+	CclGcProtectedAssign(&Trigger, NULL);
     }
 }
 
@@ -1056,6 +1056,12 @@ global void TriggersEachCycle(void)
 */
 global void TriggerCclRegister(void)
 {
+    Trigger = NIL;
+    WaitScript = NIL;
+    WaitTrigger  = NIL;
+    CclGcProtect(&Trigger);
+    CclGcProtect(&WaitScript);
+    CclGcProtect(&WaitTrigger);
     gh_new_procedure2_0("add-trigger", CclAddTrigger);
     gh_new_procedure1_0("set-trigger-number!", CclSetTriggerNumber);
     // Conditions
@@ -1246,7 +1252,7 @@ global void CleanTriggers(void)
     var = gh_symbol2scm("*triggers*");
     setvar(var, NIL, NIL);
 
-    Trigger = NULL;
+    CclGcProtectedAssign(&Trigger, NULL);
 
     memset(&GameTimer, 0, sizeof(GameTimer));
 }

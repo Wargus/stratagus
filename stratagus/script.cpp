@@ -74,6 +74,14 @@
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_GUILE
+#define GC_PROTECT_VALUE 1
+#endif
+
+#ifdef SIOD_HEAP_GC
+#define GC_PROTECT_VALUE 1
+#endif
+
+#ifdef USE_GUILE
 int siod_verbose_level;
 #endif
 
@@ -197,20 +205,38 @@ global ccl_smob_type_t CclMakeSmobType(const char* name)
   return new_type;
 }
 
+
+#ifdef GC_PROTECT_VALUE
+local int CclNeedProtect(SCM val)
+{
+    return (val != SCM_UNSPECIFIED) && (!gh_null_p(val));
+}
+#endif
+
 /**
 **	Protect SCM object against garbage collector.
 **
 **	@param obj	Scheme object
 */
-global void CclGcProtect(SCM obj)
+global void CclGcProtect(SCM * obj)
 {
+#ifdef GC_PROTECT_VALUE
+    if (!CclNeedProtect(*obj)) {
+	return;
+    }
+#endif
+
 #ifdef USE_GUILE
-    scm_gc_protect_object(obj);
+    scm_gc_protect_object(*obj);
 #else
+#ifdef SIOD_HEAP_GC
     SCM var;
 
     var = gh_symbol2scm("*ccl-protect*");
     setvar(var, cons(obj, symbol_value(var, NIL)), NIL);
+#else
+    gc_protect(obj);
+#endif
 #endif
 }
 
@@ -219,11 +245,17 @@ global void CclGcProtect(SCM obj)
 **
 **	@param obj	Scheme object
 */
-global void CclGcUnprotect(SCM obj)
+global void CclGcUnprotect(SCM * obj)
 {
+#ifdef GC_PROTECT_VALUE
+    if (!CclNeedProtect(*obj)) {
+	return;
+    }
+#endif
 #ifdef USE_GUILE
-    scm_gc_unprotect_object(obj);
+    scm_gc_unprotect_object(*obj);
 #else
+#ifdef SIOD_HEAP_GC
     SCM sym;
     SCM old_lst;
     SCM new_lst;
@@ -238,14 +270,26 @@ global void CclGcUnprotect(SCM obj)
         SCM el;
 	
 	el = gh_car(old_lst);
-        if (el != obj) {
+        if (el != (*obj)) {
 	    new_lst = cons(el, new_lst);
 	}
 	old_lst = gh_cdr(old_lst);
       }
     
     setvar(sym, new_lst, NIL);
+#else
+    gc_unprotect(obj);
 #endif
+#endif
+}
+
+global void CclGcProtectedAssign(SCM* obj, SCM value)
+{
+#ifdef GC_PROTECT_VALUE
+    CclGcProtect(&value);
+    CclGcUnprotect(obj);
+#endif
+    (*obj) = value;
 }
 
 global void CclFlushOutput(void)
@@ -254,6 +298,33 @@ global void CclFlushOutput(void)
     scm_flush_all_ports();
 #else
     fflush(stdout);
+#endif
+}
+
+/**
+**	Perform CCL garbage collection
+**
+**	@param fast	set this flag to disable slow GC ( during game )
+*/
+global void CclGarbageCollect(int fast)
+{
+#ifdef USE_GUILE
+    if (!fast) {
+	// GUILE handle gc nicely by itself
+    	scm_gc();
+    }
+#else
+#ifdef SIOD_HEAP_GC
+    static int cpt=0;
+    
+    // Very slow, so differ...
+    if (!(++cpt & 15)) {
+    	user_gc(SCM_BOOL_F);
+    }
+#else
+    // stop and copy iterates only the allocated SCM
+    gc_stop_and_copy();
+#endif
 #endif
 }
 
@@ -845,8 +916,15 @@ global void InitCcl(void)
 
     sargv[0] = "Stratagus";
     sargv[1] = "-v1";
+#ifdef SIOD_HEAP_GC
+    // Mark & sweep GC : scan the heap entirely
     sargv[2] = "-g0";
     sargv[3] = "-h800000:10";
+#else
+    // Stop & copy GC : scan only allocated cells
+    sargv[2] = "-g1";
+    sargv[3] = "-h800000";
+#endif
     buf = malloc(strlen(StratagusLibPath) + 4);
     sprintf(buf, "-l%s", StratagusLibPath);
     sargv[4] = buf;			// never freed
@@ -1175,7 +1253,7 @@ global void LoadCcl(void)
     }
     LoadPreferences2();
     CclInConfigFile = 0;
-    user_gc(SCM_BOOL_F);		// Cleanup memory after load
+    CclGarbageCollect(0);		// Cleanup memory after load
 }
 
 /**

@@ -1815,7 +1815,7 @@ local void CreateEditor(void)
 	} else {
 	    vload(file, 0, 1);
 	}
-	user_gc(SCM_BOOL_F);		// Cleanup memory after load
+	CclGarbageCollect(0);		// Cleanup memory after load
     }
 
     ThisPlayer = &Players[0];

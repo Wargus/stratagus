@@ -138,6 +138,9 @@ local SCM CclDefineUnitType(SCM list)
 
     type->NumDirections = 8;
 
+    type->Property = SCM_UNSPECIFIED;
+    CclGcProtect((SCM*)&type->Property);
+
     //
     //	Parse the list:	(still everything could be changed!)
     //
@@ -938,14 +941,10 @@ local SCM CclSetUnitTypeProperty(SCM ptr, SCM property)
 
     type = CclGetUnitType(ptr);
 
-    if (type->Property) {
-	// FIXME: old value must be unprotected!!
-    }
     if (!property) {
 	DebugLevel0Fn("oops, my fault\n");
     }
-    type->Property = property;
-    CclGcProtect(type->Property);
+    CclGcProtectedAssign((SCM*)&type->Property, property);
 
     return property;
 }

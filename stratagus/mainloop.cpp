@@ -840,7 +840,7 @@ global void GameMainLoop(void)
 		    }
 		    // Clear scheme heap each second
 		    // FIXME: this is too slow to call during the game
-		    //user_gc(SCM_BOOL_F);
+		    CclGarbageCollect(1);
 		    break;		    
 		case 1:
 		    HandleCloak();

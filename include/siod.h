@@ -206,6 +206,7 @@ LISP rintern(char *name);
 LISP subrcons(long type, char *name, SUBR_FUNC f);
 LISP closure(LISP env,LISP code);
 void gc_protect(LISP *location);
+void gc_unprotect(LISP *location);
 void gc_protect_n(LISP *location,long n);
 void gc_protect_sym(LISP *location,char *st);
 
