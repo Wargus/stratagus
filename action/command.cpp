@@ -151,9 +151,6 @@ global void CommandStopUnit(Unit* unit)
 	order->Arg1 = NULL;
 	ReleaseOrder(&unit->SavedOrder);
 	ReleaseOrder(&unit->NewOrder);
-#ifdef HIERARCHIC_PATHFINDER
-	PfHierReleaseData(unit);
-#endif
 	unit->SavedOrder = unit->NewOrder = *order;
 }
 
@@ -323,17 +320,6 @@ global void CommandMove(Unit* unit, int x, int y, int flush)
 		order->Range = 0;
 		order->Type = NULL;
 		order->Arg1 = NULL;
-#ifdef HIERARCHIC_PATHFINDER
-		/*
-		 * EXPERIMENTAL: This indicates this unit's intent to move.
-		 * unit->Moving is finally set in ActionMoveGeneric() after the
-		 * pathfinder is run, according to its return status. Setting
-		 * unit->Moving here is preliminary and is done to hint the pathfinder
-		 * that this unit intents to move asap.
-		 */
-		unit->Moving = 1;
-		PfHierReleaseData(unit);
-#endif
 	}
 	ClearSavedAction(unit);
 }

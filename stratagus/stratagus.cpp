@@ -942,9 +942,6 @@ global int main(int argc, char** argv)
 #ifdef NEW_MAPDRAW
 		"NEW-MAPDRAW "
 #endif
-#ifdef HIERARCHIC_PATHFINDER
-		"HIERARCHIC-PATHFINDER "
-#endif
 #ifdef MAP_REGIONS
 		"MAP-REGIONS "
 #endif

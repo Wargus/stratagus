@@ -106,9 +106,6 @@ global void CleanModules(void)
 	CleanCclCredits();
 	CleanSpells();
 	FreeVisionTable();
-#ifdef HIERARCHIC_PATHFINDER
-	PfHierClean ();
-#endif
 #ifdef MAP_REGIONS
 	MapSplitterClean();
 #endif
@@ -155,9 +152,6 @@ global void InitModules(void)
 
 	InitAiModule();
 
-#ifdef HIERARCHIC_PATHFINDER
-	PfHierInitialize();
-#endif
 	InitMap();
 	InitMapFogOfWar(); // build tables for fog of war
 }

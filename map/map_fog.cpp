@@ -831,12 +831,6 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 #undef IsMapFieldVisibleTable
 }
 
-#ifdef HIERARCHIC_PATHFINDER
-#include "pathfinder.h"
-// hack
-#include "../pathfinder/region_set.h"
-#endif		// HIERARCHIC_PATHFINDER
-
 /**
 **		Draw the map fog of war.
 **
@@ -921,7 +915,7 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 #endif
 
 // Used to debug NEW_FOW problems
-#if !defined(HIERARCHIC_PATHFINDER) && defined(DEBUG_FOG_OF_WAR)
+#if defined(DEBUG_FOG_OF_WAR)
 extern int VideoDrawText(int x, int y, unsigned font, const unsigned char* text);
 #define GameFont 1
 					{
@@ -950,32 +944,6 @@ extern int VideoDrawText(int x, int y, unsigned font, const unsigned char* text)
 #endif
 					}
 #endif
-#if defined(HIERARCHIC_PATHFINDER) && defined(DEBUG) && 0
-					{
-						char regidstr[8];
-						char groupstr[8];
-						int regid;
-extern int VideoDrawText(int x, int y, unsigned font, const unsigned char* text);
-#define GameFont 1
-
-						if (PfHierShowRegIds || PfHierShowGroupIds) {
-							regid = MapFieldGetRegId (
-								(dx - vp->X) / TileSizeX + vp->MapX,
-								(dy - vp->Y) / TileSizeY + vp->MapY);
-							if (regid) {
-								Region* r = RegionSetFind(regid);
-								if (PfHierShowRegIds) {
-									snprintf(regidstr, 8, "%d", regid);
-									VideoDrawText(dx, dy, GameFont, regidstr);
-								}
-								if (PfHierShowGroupIds) {
-									snprintf(groupstr, 8, "%d", r->GroupId);
-									VideoDrawText(dx, dy + 19, GameFont, groupstr);
-								}
-							}
-						}
-					}
-#endif		// HIERARCHIC_PATHFINDER
 				}
 				++redraw_tile;
 				++sx;

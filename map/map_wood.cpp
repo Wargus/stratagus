@@ -47,7 +47,7 @@
 #include "minimap.h"
 #include "player.h"
 #include "editor.h"
-#if defined(HIERARCHIC_PATHFINDER) || defined(MAP_REGIONS)
+#if defined(MAP_REGIONS)
 #include "pathfinder.h"
 #endif
 
@@ -346,9 +346,6 @@ global void MapRemoveWood(unsigned x, unsigned y)
 		MarkDrawPosMap(x, y);
 		MustRedraw |= RedrawMinimap;
 	}
-#ifdef HIERARCHIC_PATHFINDER
-	PfHierMapChangedCallback (x, y, x, y);
-#endif
 #ifdef MAP_REGIONS
 	MapSplitterTilesCleared(x, y, x, y);
 #endif

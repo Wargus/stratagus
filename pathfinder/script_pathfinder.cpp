@@ -107,37 +107,6 @@ local int CclAStar(lua_State* l)
 	return 0;
 }
 
-#ifdef HIERARCHIC_PATHFINDER
-local int CclPfHierShowRegIds(lua_State* l)
-{
-	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	}
-	PfHierShowRegIds = LuaToBoolean(l, 1);
-	return 0;
-}
-
-local int CclPfHierShowGroupIds(lua_State* l)
-{
-	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	}
-	PfHierShowGroupIds = LuaToBoolean(l, 1);
-	return 0;
-}
-#else
-local int CclPfHierShowRegIds(lua_State* l)
-{
-	return 0;
-}
-
-local int CclPfHierShowGroupIds(lua_State* l)
-{
-	return 0;
-}
-
 #ifdef MAP_REGIONS
 global void MapSplitterDebug(void);
 
@@ -148,9 +117,6 @@ local int CclDebugRegions(lua_State* l)
 }
 #endif // MAP_REGIONS
 
-#endif
-
-
 /**
 **		Register CCL features for pathfinder.
 */
@@ -160,8 +126,6 @@ global void PathfinderCclRegister(void)
 #ifdef MAP_REGIONS
 	lua_register(Lua, "DebugRegions", CclDebugRegions);
 #endif // MAP_REGIONS
-	lua_register(Lua, "PfShowRegids", CclPfHierShowRegIds);
-	lua_register(Lua, "PfShowGroupids", CclPfHierShowGroupIds);
 }
 
 //@}
