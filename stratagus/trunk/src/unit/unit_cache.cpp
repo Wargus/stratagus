@@ -131,7 +131,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 	UnitListItem* listitem;
 
 	// Optimize small searches.
-	if (x1 == x2 && y1 == y2) {
+	if (x1 >= x2 - 1 && y1 >= y2 - 1) {
 		return UnitCacheOnTile(x1, y1, table);
 	}
 
