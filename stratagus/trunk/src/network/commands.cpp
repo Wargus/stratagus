@@ -568,13 +568,14 @@ global void ReplayEachCycle(void)
 	return;
     }
 
-    if( NextLogCycle!=(unsigned long)-1 && NextLogCycle!=GameCycle ) {
+    if( NextLogCycle!=-1UL && NextLogCycle!=GameCycle ) {
 	return;
     }
 
     do {
 	DoNextReplay();
-    } while( !gh_null_p(ReplayLog) && (NextLogCycle==-1 || NextLogCycle==GameCycle) );
+    } while( !gh_null_p(ReplayLog)
+	    && (NextLogCycle==-1UL || NextLogCycle==GameCycle) );
 
     if( gh_null_p(ReplayLog) ) {
 	SetMessage("End of replay");
