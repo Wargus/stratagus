@@ -71,6 +71,9 @@
 **	Construction::Sprite
 **
 **		FIXME: write the documentation
+**
+**	@todo	FIXME: must change unit-type to use construction pointer.
+**		Need ::ConstructionByName, ::TilesetByName, ...
 */
 
 /*----------------------------------------------------------------------------
@@ -86,6 +89,8 @@
 
     /// Construction shown during construction of a building
 typedef struct _construction_ {
+    //const void* OType;		/// Object type (future extensions)
+
     char*	Ident;			/// construction identifier
     char*	File[TilesetMax];	/// sprite file
 

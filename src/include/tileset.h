@@ -159,6 +159,8 @@ typedef struct _tileset_ {
 ----------------------------------------------------------------------------*/
 
 extern char** TilesetWcNames;		/// Mapping wc-number 2 symbol
+
+extern int NumTilesets;			/// Number of  of available tilesets
 extern Tileset Tilesets[TilesetMax];	/// Tileset information
 
 /*----------------------------------------------------------------------------

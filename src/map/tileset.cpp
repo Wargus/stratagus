@@ -1345,16 +1345,18 @@ local const unsigned short TileTableWasteland[0x9E0] = {
 #endif
 
 /**
-**	Count of available Tilesets.
+**	Number of available Tilesets.
 */
-global int TilesetsCount=4;
+global int NumTilesets=4;
 
 /**
 **	Tileset information.
 **
 **	@see TilesetMax
 */
-global Tileset Tilesets[TilesetMax] = {
+global Tileset Tilesets[TilesetMax]
+#ifndef laterUSE_CCL
+     = {
 {
     "tileset-summer"
     ,"summer"
@@ -1440,6 +1442,9 @@ global Tileset Tilesets[TilesetMax] = {
     ,160
 },
 };
+#else
+    ;
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -1463,12 +1468,12 @@ global void LoadTileset(void)
     //
     //	Find the tileset.
     //
-    for( i=0; i<TilesetsCount; ++i ) {
+    for( i=0; i<NumTilesets; ++i ) {
 	if( !strcmp(TheMap.TerrainName,Tilesets[i].Ident) ) {
 	    break;
 	}
     }
-    if( i==TilesetsCount ) {
+    if( i==NumTilesets ) {
 	fprintf(stderr,"Tileset `%s' not available\n",TheMap.TerrainName);
 	exit(-1);
     }
