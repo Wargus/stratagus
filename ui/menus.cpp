@@ -1416,11 +1416,11 @@ local void LoadGameOk(void)
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		sprintf(TempPathBuf, "%s/%s", SaveDir, fl[i].name);
+		SaveGameLoading = 1;
 		LoadGame(TempPathBuf);
 		Callbacks = &GameCallbacks;
 		SetMessage("Loaded game: %s", TempPathBuf);
 		GuiGameStarted = 1;
-		CurrentMapPath[0] = '\0';
 		GameMenuReturn();
 	}
 }

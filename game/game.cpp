@@ -305,7 +305,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	int j;
 	char* s;
 
-	if (filename && !*filename) {
+	if (SaveGameLoading) {
 		// Load game, already created game with Init/LoadModules
 		return;
 	}
