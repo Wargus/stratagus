@@ -1228,8 +1228,9 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 **
 **  @param unit   pointer to unit.
 **  @param spell  Spell type pointer.
+**  @param on     1 for auto cast on, 0 for off.
 */
-global void CommandAutoSpellCast(Unit* unit, int spellid)
+global void CommandAutoSpellCast(Unit* unit, int spellid, int on)
 {
 	DebugLevel3Fn(": %d auto-spell-casts %s\n" _C_
 		UnitNumber(unit) _C_ spell->Ident);
@@ -1238,7 +1239,7 @@ global void CommandAutoSpellCast(Unit* unit, int spellid)
 	// Check if unit is still valid? (NETWORK!)
 	//
 	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
-		unit->AutoCastSpell[spellid] ^= 1;
+		unit->AutoCastSpell[spellid] = on;
 	}
 }
 
