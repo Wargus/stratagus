@@ -609,8 +609,8 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   mis->Damage = BLIZZARD_DAMAGE;
 	   //FIXME: not correct -- blizzard should continue even if mage is 
 	   //       destroyed (though it will be quite short time...)
-	   mis->SourceUnit = unit; 
-	   mis->SourceType = unit->Type;
+	   mis->SourceUnit = unit;
+	   mis->SourceUnit->Refs++;
 	   }
 	   
 	 unit->Mana -= spell->ManaCost;
@@ -681,8 +681,8 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	                dx*TileSizeX+TileSizeX/2,   
 	                dy*TileSizeX+TileSizeX/2 ); 
 	   
-	   unit->Refs++;
 	   mis->SourceUnit = unit;
+	   mis->SourceUnit->Refs++;
 	   if (target)
 	     {
 	     mis->TargetUnit = target;
@@ -784,7 +784,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   //FIXME: not correct -- blizzard should continue even if mage is 
 	   //       destroyed (though it will be quite short time...)
 	   mis->SourceUnit = unit; 
-	   mis->SourceType = unit->Type;
+	   mis->SourceUnit->Refs++;
 	   }
 	   
 	 unit->Mana -= spell->ManaCost;
