@@ -50,7 +50,7 @@
 #include "unit.h"
 #include "tileset.h"
 #include "map.h"
-#include "compression.h"
+#include "iolib.h"
 
 #include "sound_server.h"
 #include "missile.h"

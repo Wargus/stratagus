@@ -36,7 +36,7 @@
 #include "player.h"
 #include "unit.h"
 #include "pud.h"
-#include "compression.h"
+#include "iolib.h"
 
 #include "myendian.h"
 
