@@ -605,9 +605,6 @@ global void MapUpdateVisible(void)
 #else
 	    MapMarkSight(x,y,unit->Stats->SightRange);
 #endif
-	    if( unit->Type->CanSeeSubmarine ) {
-		MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
-	    }
 	}
     }
 
