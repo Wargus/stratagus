@@ -275,8 +275,8 @@ local int EditorLoadCancelled;
 /**
 **	Offsets from top and left, used for different resolutions
 */
-local int OffsetX = 0;
-local int OffsetY = 0;
+local int OffsetX;
+local int OffsetY;
 
 /**
 **	Other client and server selection state for Multiplayer clients
@@ -4683,12 +4683,20 @@ local void EditorPlayerProperties(void)
     VideoCreatePalette(GlobalPalette);
 }
 
+/**
+**	Called form menu, to quit editor to menu.
+**
+**	@todo Should check if modified file should be saved.
+*/
 local void EditorQuitMenu(void)
 {
     EditorRunning=0;
     GameMenuReturn();
 }
 
+/**
+**	End menus state of the editor.
+*/
 local void EditorEndMenu(void)
 {
     CursorOn = CursorOnUnknown;
@@ -4769,6 +4777,9 @@ global void InitMenuFunctions(void)
     }
     strcat(ScenSelectFullPath, "swamp");
     menu = FindMenu("menu-custom-game");
+    //
+    //	FIXME: Johns: this didn't work if the files are in ZIP archive.
+    //
     if (access(ScenSelectFullPath, F_OK) != 0) {
 	// ARI FIXME: Hack to disable Expansion Gfx..
 	// also shows how to add new tilesets....
