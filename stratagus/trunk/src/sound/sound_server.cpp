@@ -360,21 +360,23 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 --	Channels and other internal variables
 ----------------------------------------------------------------------------*/
 
-#define MaxChannels	16
+#define MaxChannels	16		/// How many channels are supported
 
-typedef struct _sound_channel_ {
-    unsigned char	Command;	// channel command
-    int			Point;		// point into sample
-    Sample*		Sample;		// sample to play
-    Origin              Source;         // unit playing
-    unsigned char       Volume;         // Volume of this channel
-    SoundId             Sound;          // The sound currently played
-    char                Stereo;         // stereo location of sound (
-                                        //-128 left, 0 center, 127 right)
+    /// Channels for sound effects and unit speach
+typedef struct _sound_channel_
+{
+    unsigned char	Command;	/// channel command
+    int			Point;		/// point into sample
+    Sample*		Sample;		/// sample to play
+    Origin		Source;		/// unit playing
+    unsigned char	Volume;		/// Volume of this channel
+    SoundId		Sound;		/// The sound currently played
+	/// stereo location of sound (-128 left, 0 center, 127 right)
+    signed char		Stereo;
 } SoundChannel;
 
-#define ChannelFree	0		// channel is free
-#define ChannelPlay	3		// channel is playing
+#define ChannelFree	0		/// channel is free
+#define ChannelPlay	3		/// channel is playing
 
 /*
 **	All possible sound channels.
