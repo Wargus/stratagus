@@ -10,7 +10,7 @@
 //
 /**@name splitter.c	-	Map splitter into regions. 	*/
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer,Fabrice Rossi, Russell Smith
+//	(c) Copyright 1999-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -315,8 +315,8 @@ global void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections
 	int i;
 	int* tempptr;
 
-	newregions = alloca(nbarea * sizeof(RegionDefinition*));
-	newregionsid = alloca(nbarea * sizeof(RegionId));
+	newregions = malloc(nbarea * sizeof(RegionDefinition*));
+	newregionsid = malloc(nbarea * sizeof(RegionId));
 
 	oldsegs = Regions[reg].FirstSegment;
 
@@ -381,12 +381,17 @@ global void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections
 	}
 
 	if (!updateConnections) {
+		free(newregions);
+		free(newregionsid);
 		return;
 	}
 
 	for (i = 0; i < nbarea; ++i) {
 		RegionRescanAdjacents(newregionsid[i]);
 	}
+
+	free(newregions);
+	free(newregionsid);
 }
 
 /**
@@ -1070,7 +1075,7 @@ local void RefreshZones(void)
 	int zoneid;
 
 	DebugCheck(!RegionCount);
-	regions_stack = alloca(RegionCount * sizeof(int));
+	regions_stack = malloc(RegionCount * sizeof(int));
 
 	for (i = 0; i < RegionMax; ++i) {
 		Regions[i].Zone = -1;
@@ -1085,6 +1090,7 @@ local void RefreshZones(void)
 			}
 
 		if (i == RegionMax) {
+			free(regions_stack);
 			return;
 		}
 
@@ -1112,6 +1118,9 @@ local void RefreshZones(void)
 
 		++zoneid;
 	} while (1);
+
+	// Should never get here, but just in case
+	free(regions_stack);
 }
 
 /**
@@ -1215,9 +1224,10 @@ global void MapSplitterEachCycle(void)
 				}
 
 				// ConnectionsCount == ~ 3 * n°of tile connected
+				// (avoid to connect region with only few adjacents cells)
 				if ((Regions[i].TileCount > 256 && Regions[j].TileCount> 256) &&
-					Regions[i].ConnectionsCount[j] / 3 < isqrt(Regions[i].TileCount) / 2 &&
-					Regions[i].ConnectionsCount[j] / 3 < isqrt(Regions[j].TileCount) / 2) {
+					Regions[i].ConnectionsCount[k] / 3 < isqrt(Regions[i].TileCount) / 2 &&
+					Regions[i].ConnectionsCount[k] / 3 < isqrt(Regions[j].TileCount) / 2) {
 					continue;
 				}
 
