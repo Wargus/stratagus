@@ -124,10 +124,14 @@ AC_ARG_WITH(opengl,
 if test "$with_opengl" != "no"; then
 	VIDEO_CFLAGS="$VIDEO_CFLAGS -DUSE_OPENGL"
 	if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
+		AC_CHECK_LIB(opengl32, glViewport,, AC_MSG_ERROR(libopengl32 not found))
 		VIDEO_LIBS="$VIDEO_LIBS -lopengl32"
 	else
 		AC_PATH_X
 		AC_PATH_XTRA
+		CPPFLAGS="$CPPFLAGS -I$x_includes"
+		LDFLAGS="$LDFLAGS -L$x_libraries"
+		AC_CHECK_LIB(GL, glViewport,, AC_MSG_ERROR(libGL not found))
 		if test "x$have_x" = "xyes"; then
 			VIDEO_CFLAGS="$VIDEO_CFLAGS $X_CFLAGS"
 			VIDEO_LIBS="$VIDEO_LIBS $X_LIBS -lGL"
@@ -167,6 +171,7 @@ if test "$OGG" != "no"; then
     AC_CHECK_HEADERS(ogg/ogg.h,, OGG=no)
     AC_CHECK_HEADERS(vorbis/vorbisfile.h,, OGG=no)
     if test "$OGG" != "no"; then
+	AC_CHECK_LIB(vorbis, vorbis_info_init,, AC_MSG_ERROR(libvorbis not found))
 	OGG_CFLAGS="-DUSE_OGG"
 	OGG_LIBS="-lvorbisfile -lvorbis -logg"
     fi
@@ -183,6 +188,7 @@ MIKMOD_LIBS=
 if test "$MIKMOD" != "no"; then
     AC_CHECK_HEADERS(mikmod.h, MIKMOD=yes, MIKMOD=no)
     if test "$MIKMOD" != "no"; then
+	AC_CHECK_LIB(mikmod, MikMod_Init,, AC_MSG_ERROR(libmikmod not found))
 	MIKMOD_CFLAGS="-DUSE_MIKMOD"
 	MIKMOD_LIBS="-lmikmod"
     fi
@@ -200,6 +206,7 @@ if test "$MNG" != "yes"; then
     MNG_CFLAGS=""
     MNG_LIBS=""
 else
+    AC_CHECK_LIB(mng, mng_initialize,, AC_MSG_ERROR(libmng not found))
     MNG_CFLAGS="-DUSE_MNG"
     MNG_LIBS="-lmng"
 fi
@@ -216,6 +223,7 @@ if test "$MAD" != "yes"; then
     MAD_CFLAGS=""
     MAD_LIBS=""
 else
+    AC_CHECK_LIB(mad, mad_decoder_init,, AC_MSG_ERROR(libmad not found))
     MAD_CFLAGS="-DUSE_MAD"
     MAD_LIBS="-lmad"
 fi
@@ -230,6 +238,7 @@ if test "$FLAC" != "yes"; then
     FLAC_CFLAGS=
     FLAC_LIBS=
 else
+    AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init,, AC_MSG_ERROR(libFLAC not found))
     FLAC_CFLAGS="-DUSE_FLAC"
     FLAC_LIBS="-lFLAC"
 fi
