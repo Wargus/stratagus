@@ -219,7 +219,10 @@ global int PlayMovie(const char *name, int flags)
     if (!(avi = MovieOpen(name))) {
 	return 1;
     }
-    StopMusic();
+
+    if( avi->AudioStream != -1 ) {	// Only if audio available
+	StopMusic();
+    }
 
     //
     //  Prepare video
@@ -234,13 +237,18 @@ global int PlayMovie(const char *name, int flags)
 	fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 	exit(1);
     }
+    if (overlay->hw_overlay) {
+	DebugLevel0Fn("Got a hardware overlay.\n");
+    }
     VideoSyncSpeed = avi->FPS100 / FRAMES_PER_SECOND;
     SetVideoSync();
 
     StartDecoder(&pbi, avi->Width, avi->Height);
 
 #ifdef USE_OGG
-    PlayAviOgg(avi);
+    if( avi->AudioStream != -1 ) {	// Only if audio available
+	PlayAviOgg(avi);
+    }
 #endif
 
     callbacks.ButtonPressed=MovieCallbackKey;
@@ -275,7 +283,9 @@ global int PlayMovie(const char *name, int flags)
 	WaitEventsOneFrame(&callbacks);
     }
 
-    StopMusic();
+    if( avi->AudioStream != -1 ) {	// Only if audio available
+	StopMusic();
+    }
 
     StopDecoder(&pbi);
     SDL_FreeYUVOverlay(overlay);
