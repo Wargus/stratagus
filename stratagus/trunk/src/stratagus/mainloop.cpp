@@ -720,6 +720,8 @@ global void GameMainLoop(void)
 	    MissileActions();		// handle missiles
 	    PlayersEachCycle();		// handle players
 	    TriggersEachCycle();	// handle triggers
+
+	    // FIXME: We don't do redraw if needed, costs to much cpu time
 	    MustRedraw&=~RedrawMinimap;	// FIXME: this a little hack!
 
 	    //
