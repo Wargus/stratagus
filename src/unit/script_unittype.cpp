@@ -272,7 +272,7 @@ static int CclDefineUnitType(lua_State* l)
 		redefine = 0;
 	}
 
-	type->NumDirections = 8;
+	type->NumDirections = 0;
 	type->Flip = 1;
 
 	//
@@ -1000,6 +1000,14 @@ static int CclDefineUnitType(lua_State* l)
 			}
 		}
 		lua_pop(l, 1);
+	}
+
+	// If number of directions is not specified, make a guess
+	// Building have 1 direction and units 8
+	if (type->Building && type->NumDirections == 0) {
+		type->NumDirections = 1;
+	} else if (type->NumDirections == 0) {
+		type->NumDirections = 8;
 	}
 
 	// FIXME: try to simplify/combine the flags instead

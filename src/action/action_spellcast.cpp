@@ -117,26 +117,19 @@ static void SpellMoveToTarget(Unit* unit)
 
 		// there is goal and it is in range
 		unit->State = 0;
-		if (!unit->Type->Building) {
-			// FIXME: buildings could have directions
-			UnitHeadingFromDeltaXY(unit,
-				goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
-				goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
-		}
+		UnitHeadingFromDeltaXY(unit,
+			goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
+			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 		unit->SubAction++; // cast the spell
 		return;
 	} else if (!goal && MapDistanceToUnit(unit->Orders[0].X,
 			unit->Orders[0].Y, unit) <= unit->Orders[0].Range) {
 		// there is no goal and target spot is in range
-		unit->State = 0;
-		if (!unit->Type->Building) {
-			// FIXME: buildings could have directions
-			UnitHeadingFromDeltaXY(unit,
-				unit->Orders[0].X +
-					unit->Orders[0].Arg1.Spell->Range - unit->X,
-				unit->Orders[0].Y +
-					unit->Orders[0].Arg1.Spell->Range - unit->Y);
-		}
+		UnitHeadingFromDeltaXY(unit,
+			unit->Orders[0].X +
+				unit->Orders[0].Arg1.Spell->Range - unit->X,
+			unit->Orders[0].Y +
+				unit->Orders[0].Arg1.Spell->Range - unit->Y);
 		unit->SubAction++; // cast the spell
 		return;
 	} else if (err) {
