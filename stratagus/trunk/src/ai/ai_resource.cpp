@@ -275,7 +275,6 @@ local int AiMakeUnit(UnitType* type)
 	DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 	return 0;
     }
-    i=0;
     n=table->Count;
 
     unit_count=AiPlayer->Player->UnitTypesCount;
@@ -316,7 +315,7 @@ local int AiResearchUpgrade(const UnitType* type,Upgrade* what)
     int i;
     int num;
 
-    DebugLevel0Fn("%s can research %s\n" _C_ type->Ident _C_ what->Ident);
+    DebugLevel3Fn("%s can research %s\n" _C_ type->Ident _C_ what->Ident);
 
     IfDebug( unit=NoUnitP; );
     //
@@ -333,7 +332,7 @@ local int AiResearchUpgrade(const UnitType* type,Upgrade* what)
     for( i=0; i<num; ++i ) {
 
 	unit=table[i];
-	DebugLevel0Fn("Have an unit to research %d :)\n" _C_ UnitNumber(unit));
+	DebugLevel3Fn("Have an unit to research %d :)\n" _C_ UnitNumber(unit));
 
 	CommandResearch(unit, what,FlushCommands);
 
@@ -377,7 +376,6 @@ global void AiAddResearchRequest(Upgrade* upgrade)
 	DebugLevel0Fn("Nothing known about `%s'\n" _C_ upgrade->Ident);
 	return;
     }
-    i=0;
     n=table->Count;
 
     unit_count=AiPlayer->Player->UnitTypesCount;
@@ -412,7 +410,7 @@ local int AiUpgradeTo(const UnitType* type,UnitType* what)
     int i;
     int num;
 
-    DebugLevel0Fn("%s can upgrade-to %s\n" _C_ type->Ident _C_ what->Ident);
+    DebugLevel3Fn("%s can upgrade-to %s\n" _C_ type->Ident _C_ what->Ident);
 
     IfDebug( unit=NoUnitP; );
     //
@@ -429,7 +427,7 @@ local int AiUpgradeTo(const UnitType* type,UnitType* what)
     for( i=0; i<num; ++i ) {
 
 	unit=table[i];
-	DebugLevel0Fn("Have an unit to upgrade-to %d :)\n" _C_
+	DebugLevel3Fn("Have an unit to upgrade-to %d :)\n" _C_
 		UnitNumber(unit));
 
 	CommandUpgradeTo(unit, what,FlushCommands);
@@ -474,7 +472,6 @@ global void AiAddUpgradeToRequest(UnitType* type)
 	DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 	return;
     }
-    i=0;
     n=table->Count;
 
     unit_count=AiPlayer->Player->UnitTypesCount;
@@ -501,7 +498,7 @@ local void AiCheckingWork(void)
     UnitType* type;
     AiBuildQueue* queue;
 
-    DebugLevel2Fn("%d:%d %d %d\n" _C_ AiPlayer->Player->Player _C_
+    DebugLevel3Fn("%d:%d %d %d\n" _C_ AiPlayer->Player->Player _C_
 	    AiPlayer->Player->Resources[1] _C_
 	    AiPlayer->Player->Resources[2] _C_
 	    AiPlayer->Player->Resources[3]);
@@ -618,7 +615,9 @@ local int AiMineGold(Unit * unit)
 	DebugLevel0Fn("goldmine not reachable\n");
 	return 0;
     }
-    DebugCheck(unit->Type!=UnitTypeHumanWorker && unit->Type!=UnitTypeOrcWorker);
+    DebugCheck(unit->Type!=UnitTypeHumanWorker
+	    && unit->Type!=UnitTypeOrcWorker);
+
     CommandMineGold(unit, dest,FlushCommands);
 
     return 1;
@@ -711,6 +710,7 @@ local int AiHarvest(Unit * unit)
 	}
 	++addy;
     }
+
     DebugLevel0Fn("no wood reachable\n");
     return 0;
 }
@@ -728,7 +728,9 @@ local int AiHaulOil(Unit * unit)
 	DebugLevel0Fn("oil platform not reachable\n");
 	return 0;
     }
-    DebugCheck(unit->Type!=UnitTypeHumanTanker && unit->Type!=UnitTypeOrcTanker);
+    DebugCheck(unit->Type!=UnitTypeHumanTanker
+	    && unit->Type!=UnitTypeOrcTanker);
+
     CommandHaulOil(unit, dest,FlushCommands);
 
     return 1;
@@ -878,6 +880,126 @@ local void AiCollectResources(void)
     }
 }
 
+/*----------------------------------------------------------------------------
+--      WORKERS/REPAIR
+----------------------------------------------------------------------------*/
+
+/**
+**	Check if we can repair the building.
+**
+**	@param type	Unit that can repair the building.
+**	@param building	Building to be repaired.
+**	@return		True if can repair, false if can't repair..
+*/
+local int AiRepairBuilding(const UnitType* type,Unit* building)
+{
+    Unit* table[UnitMax];
+    Unit* unit;
+    int nunits;
+    int i;
+    int num;
+
+    DebugLevel2Fn("%s can repair %s\n" _C_ type->Ident _C_
+	    building->Type->Ident);
+
+    IfDebug( unit=NoUnitP; );
+    //
+    //  Remove all workers not mining. //on the way building something
+    //	FIXME: too hardcoded, not nice, needs improvement.
+    //
+    nunits = FindPlayerUnitsByType(AiPlayer->Player,type,table);
+    for (num = i = 0; i < nunits; i++) {
+	unit = table[i];
+    //if (unit->Orders[0].Action != UnitActionBuild && unit->OrderCount==1 ) {
+	if (unit->Orders[0].Action == UnitActionMineGold && unit->OrderCount==1 ) {
+	    table[num++] = unit;
+	}
+    }
+
+    for( i=0; i<num; ++i ) {
+
+	unit=table[i];
+	DebugLevel2Fn("Have an unit to repair %d :)\n" _C_ UnitNumber(unit));
+
+	if( UnitReachable(unit,building,REPAIR_RANGE) ) {
+	    CommandRepair(unit, 0, 0, building,FlushCommands);
+	    return 1;
+	}
+    }
+
+    return 0;
+}
+
+/**
+**	Check if we can repair this unit.
+**
+**	@param unit	Unit that must be repaired.
+**	@return		True if made, false if can't be made.
+**
+**	@note	Can be improved take the unit nearest to unit.
+*/
+local int AiRepairUnit(Unit* unit)
+{
+    int i;
+    int n;
+    const UnitType* type;
+    const int* unit_count;
+    AiUnitTypeTable* const* tablep;
+    const AiUnitTypeTable* table;
+
+    n=AiHelpers.BuildCount;
+    tablep=AiHelpers.Build;
+    type=unit->Type;
+    if( type->Type>n ) {		// Oops not known.
+	DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+	return 0;
+    }
+    table=tablep[type->Type];
+    if( !table ) {			// Oops not known.
+	DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+	return 0;
+    }
+
+    n=table->Count;
+    unit_count=AiPlayer->Player->UnitTypesCount;
+    for( i=0; i<n; ++i ) {
+	//
+	//	The type is available
+	//
+	if( unit_count[table->Table[i]->Type] ) {
+	    if( AiRepairBuilding(table->Table[i],unit) ) {
+		return 1;
+	    }
+	}
+    }
+
+    return 0;
+}
+
+/**
+**	Look through the units, if an unit must be repaired.
+*/
+local void AiCheckRepair(void)
+{
+    int i;
+    int n;
+    Unit* unit;
+
+    n=AiPlayer->Player->TotalNumUnits;
+    for( i=0; i<n; ++i ) {
+	unit=AiPlayer->Player->Units[i];
+	// Unit defekt?
+	if( unit->Type->Building && unit->HP<unit->Stats->HitPoints ) {
+	    DebugLevel0Fn("Have building to repair %d(%s)\n" _C_
+		    UnitNumber(unit) _C_ unit->Type->Ident);
+	    //
+	    //	Find a free worker, who can build this building can repair it?
+	    //
+	    AiRepairUnit(unit);
+	}
+    }
+}
+
 /**
 **	Add unit-type request to resource manager.
 **
@@ -888,7 +1010,7 @@ global void AiAddUnitTypeRequest(UnitType* type,int count)
 {
     AiBuildQueue** queue;
 
-    DebugLevel0Fn("%s %d\n" _C_ type->Ident _C_ count);
+    DebugLevel3Fn("%s %d\n" _C_ type->Ident _C_ count);
 
     //
     //	Find end of the list.
@@ -916,6 +1038,10 @@ global void AiResourceManager(void)
     //	Collect resources.
     //
     AiCollectResources();
+    //
+    //	Check repair.
+    //
+    AiCheckRepair();
 
     AiPlayer->NeededMask=0;
 }
