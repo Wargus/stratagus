@@ -347,6 +347,9 @@ static int GatherResource(Unit* unit)
 		AnimateActionHarvest(unit);
 		unit->Data.ResWorker.TimeToHarvest -= unit->Wait;
 	} else {
+		if (unit->Type->NewAnimations) {
+			unit->Anim.CurrAnim = NULL;
+		}
 		unit->Data.ResWorker.TimeToHarvest--;
 		unit->Wait = 1;
 	}
@@ -358,7 +361,8 @@ static int GatherResource(Unit* unit)
 
 	// Target gone?
 	if (resinfo->TerrainHarvester && !ForestOnMap(unit->Orders->X, unit->Orders->Y)) {
-		if (unit->Reset) {
+		if ((unit->Type->NewAnimations && !unit->Anim.Unbreakable) ||
+				(!unit->Type->NewAnimations && unit->Reset)) {
 			// Action now breakable, move to resource again.
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
 			// Give it some reasonable look while serching.
@@ -434,7 +438,7 @@ static int GatherResource(Unit* unit)
 
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
-				if (UnitVisibleAsGoal(source, unit->Player)){
+				if (UnitVisibleAsGoal(source, unit->Player)) {
 					LetUnitDie(source);
 					// FIXME: make the workers inside look for a new resource.
 				}
@@ -561,7 +565,8 @@ static int MoveToDepot(Unit* unit)
 		case PF_REACHED:
 			break;
 		default:
-			if (!unit->Reset || UnitVisibleAsGoal(goal, unit->Player)) {
+			if ((unit->Type->NewAnimations && unit->Anim.Unbreakable) ||
+					(!unit->Type->NewAnimations && !unit->Reset) || UnitVisibleAsGoal(goal, unit->Player)) {
 				return 0;
 			}
 			break;
@@ -597,6 +602,9 @@ static int MoveToDepot(Unit* unit)
 	// Place unit inside the depot
 	//
 	RemoveUnit(unit, goal);
+	if (unit->Type->NewAnimations) {
+		unit->Anim.CurrAnim = NULL;
+	}
 
 	//
 	// Update resource.

@@ -293,6 +293,26 @@ Animations* AnimationsByIdent(const char* ident)
 }
 
 /**
+**  Get the animations structure by ident.
+**
+**  @param ident  Identifier for the animation.
+**  @return  Pointer to the animation structure.
+**
+**  @todo Remove the use of scheme symbols to store, use own hash.
+*/
+NewAnimations* NewAnimationsByIdent(const char* ident)
+{
+	NewAnimations** tmp;
+
+	tmp = (NewAnimations**)hash_find(NewAnimationsHash, ident);
+	if (tmp) {
+		return *tmp;
+	}
+	DebugPrint("Warning animation `%s' not found\n" _C_ ident);
+	return NULL;
+}
+
+/**
 **  Save state of an unit-stats to file.
 **
 **  @param stats  Unit-stats to save.
@@ -590,8 +610,9 @@ void LoadUnitTypes(void)
 		if (type->BuildingRules) {
 			int x;
 			BuildRestriction* b;
+
 			x = 0;
-			while(type->BuildingRules[x] != NULL) {
+			while (type->BuildingRules[x] != NULL) {
 				b = type->BuildingRules[x];
 				while (b != NULL) {
 					if (b->RestrictType == RestrictAddOn) {
@@ -709,8 +730,9 @@ void CleanUnitTypes(void)
 			int x;
 			BuildRestriction* b;
 			BuildRestriction* f;
-				x = 0;
-			while(type->BuildingRules[x] != NULL) {
+
+			x = 0;
+			while (type->BuildingRules[x] != NULL) {
 				b = type->BuildingRules[x];
 				while (b != NULL) {
 					f = b;

@@ -71,6 +71,107 @@ unsigned SyncHash; ///< Hash calculated to find sync failures
 **
 **  @return           The flags of the current script step.
 */
+int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
+{
+	int move;
+
+	// Changing animations
+	if (unit->Anim.CurrAnim != anim) {
+		Assert(!unit->Anim.Unbreakable);
+		unit->Anim.Anim = unit->Anim.CurrAnim = anim;
+		unit->Anim.Wait = 0;
+	}
+
+	// Currently waiting
+	if (unit->Anim.Wait) {
+		--unit->Anim.Wait;
+		if (!unit->Anim.Wait) {
+			// Advance to next frame
+			unit->Anim.Anim = unit->Anim.Anim->Next;
+			if (!unit->Anim.Anim) {
+				unit->Anim.Anim = unit->Anim.CurrAnim;
+			}
+		}
+		return 0;
+	}
+
+	move = 0;
+	while (!unit->Anim.Wait) {
+		switch (unit->Anim.Anim->Type) {
+			case NewAnimationFrame:
+				// FIXME: plus offset
+				unit->Frame = unit->Anim.Anim->D.Frame.Frame;
+				UnitUpdateHeading(unit);
+				break;
+			case NewAnimationExactFrame:
+				unit->Frame = unit->Anim.Anim->D.Frame.Frame;
+				break;
+
+			case NewAnimationWait:
+				unit->Anim.Wait = unit->Anim.Anim->D.Wait.Wait;
+				if (unit->Slow) { // unit is slowed down
+					unit->Anim.Wait <<= 1;
+				}
+				if (unit->Haste && unit->Anim.Wait > 1) { // unit is accelerated
+					unit->Anim.Wait >>= 1;
+				}
+				break;
+			case NewAnimationRandomWait:
+				unit->Anim.Wait = unit->Anim.Anim->D.RandomWait.MinWait +
+					SyncRand() % (unit->Anim.Anim->D.RandomWait.MaxWait - unit->Anim.Anim->D.RandomWait.MinWait + 1);
+				break;
+
+			case NewAnimationSound:
+				break;
+			case NewAnimationRandomSound:
+				break;
+
+			case NewAnimationAttack:
+				break;
+
+			case NewAnimationRotate:
+				break;
+
+			case NewAnimationMove:
+				Assert(!move);
+				move = unit->Anim.Anim->D.Move.Move;
+				break;
+
+			case NewAnimationUnbreakable:
+				Assert(unit->Anim.Unbreakable ^ unit->Anim.Anim->D.Unbreakable.Begin);
+				unit->Anim.Unbreakable = unit->Anim.Anim->D.Unbreakable.Begin;
+				break;
+		}
+
+		if (!unit->Anim.Wait) {
+			// Advance to next frame
+			unit->Anim.Anim = unit->Anim.Anim->Next;
+			if (!unit->Anim.Anim) {
+				unit->Anim.Anim = unit->Anim.CurrAnim;
+			}
+		}
+	}
+
+	--unit->Anim.Wait;
+	if (!unit->Anim.Wait) {
+		// Advance to next frame
+		unit->Anim.Anim = unit->Anim.Anim->Next;
+		if (!unit->Anim.Anim) {
+			unit->Anim.Anim = unit->Anim.CurrAnim;
+		}
+	}
+	return move;
+}
+
+/**
+**  Show unit animation.
+**  Returns animation flags.
+**
+**  @param unit       Unit of the animation.
+**  @param animation  Animation script to handle.
+**
+**  @return           The flags of the current script step.
+*/
 int UnitShowAnimation(Unit* unit, const Animation* animation)
 {
 	int state;
@@ -389,7 +490,8 @@ static void HandleUnitAction(Unit* unit)
 	//
 	// If current action is breakable proceed with next one.
 	//
-	if (unit->Reset) {
+	if ((unit->Type->NewAnimations && !unit->Anim.Unbreakable) ||
+			(!unit->Type->NewAnimations && unit->Reset)) {
 		unit->Reset = 0;
 		//
 		// o Look if we have a new order and old finished.
@@ -470,7 +572,7 @@ void UnitActions(void)
 	int tabsize;
 
 	buffsthiscycle = regenthiscycle = blinkthiscycle =
-			!(GameCycle % CYCLES_PER_SECOND);
+		!(GameCycle % CYCLES_PER_SECOND);
 
 	memcpy(table, Units, NumUnits * sizeof(Unit*));
 	tabsize = NumUnits;
@@ -519,12 +621,12 @@ void UnitActions(void)
 	// Do all actions
 	//
 	for (i = 0; i < tabsize; ++i) {
-		while(table[i]->Destroyed) {
+		while (table[i]->Destroyed) {
 			table[i] = table[--tabsize];
 		}
 		unit = table[i];
 
-		if (--unit->Wait) { // Wait until counter reached
+		if (!unit->Type->NewAnimations && --unit->Wait) { // Wait until counter reached
 			continue;
 		}
 

@@ -39,9 +39,6 @@
 #include <string.h>
 
 #include "stratagus.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
