@@ -156,7 +156,7 @@ local void UiCenterOnGroup(unsigned group)
 	    x+=(units[n]->X-x)/2;
 	    y+=(units[n]->Y-y)/2;
 	}
-	MapCenterViewport(TheUI.LastClickedVP, x,y);
+	MapViewportCenter(TheUI.LastClickedVP,x,y);
     }
 }
 
@@ -577,7 +577,7 @@ local void UiCenterOnSelected(void)
 	    x+=(Selected[n]->X-x)/2;
 	    y+=(Selected[n]->Y-y)/2;
 	}
-	MapCenterViewport(TheUI.LastClickedVP, x,y);
+	MapViewportCenter(TheUI.LastClickedVP,x,y);
     }
 }
 
@@ -639,7 +639,7 @@ local void UiFindIdleWorker(void)
 	CurrentButtonLevel=0;
 	UpdateButtonPanel();
 	PlayUnitSound(Selected[0],VoiceSelected);
-	MapCenterViewport(TheUI.LastClickedVP,  unit->X, unit->Y);
+	MapViewportCenter(TheUI.LastClickedVP,unit->X,unit->Y);
     }
 }
 

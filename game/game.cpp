@@ -473,7 +473,7 @@ global void CreateGame(char* filename, WorldMap* map)
 
     SetDefaultTextColors(TheUI.NormalFontColor,TheUI.ReverseFontColor);
 
-    MapCenterViewport(0, ThisPlayer->StartX, ThisPlayer->StartY);
+    MapViewportCenter(0,ThisPlayer->StartX,ThisPlayer->StartY);
 
     //
     //	Various hacks wich must be done after the map is loaded.

@@ -193,7 +193,7 @@ global void MapViewportSetViewpoint(int v, int x, int y)
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
 */
-global void MapCenterViewport(int v, int x, int y)
+global void MapViewportCenter(int v, int x, int y)
 {
     MapViewportSetViewpoint(v,
 	    x - (TheUI.VP[v].MapWidth / 2), y - (TheUI.VP[v].MapHeight / 2));
