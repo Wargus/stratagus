@@ -199,6 +199,8 @@ tools/wartool$(EXE): tools/wartool.c
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
 tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
+	if [ ! -d $(TOPDIR)/src/clone/$(OBJDIR) ]; then \
+	mkdir -p $(TOPDIR)/src/clone/$(OBJDIR); fi
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS) $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
 
 ##############################################################################
