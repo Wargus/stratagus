@@ -51,34 +51,34 @@ typedef struct _avi_frame_buffer_ AviFrameBuffer;
 **  Used to stored read and used frames.
 */
 struct _avi_frame_buffer_ {
-	AviFrameBuffer* Next;     /// Next buffer
-	int             Length;   /// Buffer length
-	unsigned char   Data[1];  /// Buffer data
+	AviFrameBuffer* Next;     ///< Next buffer
+	int             Length;   ///< Buffer length
+	unsigned char   Data[1];  ///< Buffer data
 };
 
 /**
 **  Avi file handle structure
 */
 typedef struct _avi_file_ {
-	CLFile*          FileHandle;       /// File handle
+	CLFile*          FileHandle;       ///< File handle
 	// Video streams
-	char             VideoCodec[8];    /// Video codec
-	int              Width;            /// Video frame width
-	int              Height;           /// Video frame height
-	int              FPS100;           /// Frames per second * 100
-	long             NumFrames;        /// Number of video frames
-	int              VideoStream;      /// Video stream number
-	unsigned long    VideoTag;         /// Video stream tag
-	AviFrameBuffer*  VideoFrames;      /// Video frames
-	AviFrameBuffer** VideoFramesTail;  /// Video frames tail pointer
-	AviFrameBuffer*  VideoBuffer;      /// Current video frame buffer
+	char             VideoCodec[8];    ///< Video codec
+	int              Width;            ///< Video frame width
+	int              Height;           ///< Video frame height
+	int              FPS100;           ///< Frames per second * 100
+	long             NumFrames;        ///< Number of video frames
+	int              VideoStream;      ///< Video stream number
+	unsigned long    VideoTag;         ///< Video stream tag
+	AviFrameBuffer*  VideoFrames;      ///< Video frames
+	AviFrameBuffer** VideoFramesTail;  ///< Video frames tail pointer
+	AviFrameBuffer*  VideoBuffer;      ///< Current video frame buffer
 	// Audio streams
-	int              AudioStream;      /// Audio stream number
-	unsigned long    AudioTag;         /// Audio stream tag
-	AviFrameBuffer*  AudioFrames;      /// Audio frames
-	AviFrameBuffer** AudioFramesTail;  /// Audio frames tail pointer
-	AviFrameBuffer*  AudioBuffer;      /// Current audio frame buffer
-	int              AudioRemain;      /// Remaining bytes in buffer
+	int              AudioStream;      ///< Audio stream number
+	unsigned long    AudioTag;         ///< Audio stream tag
+	AviFrameBuffer*  AudioFrames;      ///< Audio frames
+	AviFrameBuffer** AudioFramesTail;  ///< Audio frames tail pointer
+	AviFrameBuffer*  AudioBuffer;      ///< Current audio frame buffer
+	int              AudioRemain;      ///< Remaining bytes in buffer
 } AviFile;
 
 /*----------------------------------------------------------------------------

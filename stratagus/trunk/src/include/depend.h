@@ -107,20 +107,20 @@
 typedef struct _depend_rule_ DependRule;
 
 enum {
-	DependRuleUnitType,  /// Kind is an unit-type
-	DependRuleUpgrade,   /// Kind is an upgrade
+	DependRuleUnitType,  ///< Kind is an unit-type
+	DependRuleUpgrade,   ///< Kind is an upgrade
 };
 
 	/// Dependency rule
 struct _depend_rule_ {
-	DependRule*   Next;   /// next hash chain, or rules
-	unsigned char Count;  /// how many required
-	char          Type;   /// an unit-type or upgrade
+	DependRule*   Next;   ///< next hash chain, or rules
+	unsigned char Count;  ///< how many required
+	char          Type;   ///< an unit-type or upgrade
 	union {
-		UnitType* UnitType;  /// unit-type pointer
-		Upgrade*  Upgrade;   /// upgrade pointer
-	} Kind;                  /// required object
-	DependRule* Rule;        /// requirements, and rule
+		UnitType* UnitType;  ///< unit-type pointer
+		Upgrade*  Upgrade;   ///< upgrade pointer
+	} Kind;                  ///< required object
+	DependRule* Rule;        ///< requirements, and rule
 };
 
 /*----------------------------------------------------------------------------

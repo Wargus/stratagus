@@ -65,24 +65,24 @@
 ----------------------------------------------------------------------------*/
 
 typedef enum _cd_modes_ {
-	CDModeStopped = -1,  /// Stopped
-	CDModeOff,           /// Off
-	CDModeAll,           /// All
-	CDModeRandom,        /// Random
-	CDModeDefined,       /// Defined
+	CDModeStopped = -1,  ///< Stopped
+	CDModeOff,           ///< Off
+	CDModeAll,           ///< All
+	CDModeRandom,        ///< Random
+	CDModeDefined,       ///< Defined
 } CDModes;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern CDModes CDMode;   /// CD mode
-extern int CDTrack;      /// Current track
-extern int NumCDTracks;  /// Number of tracks on CD
+extern CDModes CDMode;   ///< CD mode
+extern int CDTrack;      ///< Current track
+extern int NumCDTracks;  ///< Number of tracks on CD
 
 #ifdef USE_CDDA
-extern int CDDrive;  /// CDRom device
-extern struct cdrom_tocentry CDtocentry[64];  /// TOC track header struct
+extern int CDDrive;  ///< CDRom device
+extern struct cdrom_tocentry CDtocentry[64];  ///< TOC track header struct
 #endif
 
 /*----------------------------------------------------------------------------
@@ -115,7 +115,7 @@ extern int CDRomCheck(void *);
 
 #else
 
-#define QuitCD()  /// Dummy macro for without cd
+#define QuitCD()  ///< Dummy macro for without cd
 
 #endif
 

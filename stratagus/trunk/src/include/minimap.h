@@ -37,7 +37,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-#define MINIMAP_FAC (16*3)  /// integer scale factor
+#define MINIMAP_FAC (16*3)  ///< integer scale factor
 
 	/// unit attacked are shown red for at least this amount of cycles
 #define ATTACK_RED_DURATION (1*CYCLES_PER_SECOND)
@@ -51,12 +51,12 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int MinimapX;  /// Minimap drawing position x offset
-extern int MinimapY;  /// Minimap drawing position y offset
+extern int MinimapX;  ///< Minimap drawing position x offset
+extern int MinimapY;  ///< Minimap drawing position y offset
 
-extern int MinimapWithTerrain;   /// display minimap with terrain
-extern int MinimapFriendly;      /// switch colors of friendly units
-extern int MinimapShowSelected;  /// highlight selected units
+extern int MinimapWithTerrain;   ///< display minimap with terrain
+extern int MinimapFriendly;      ///< switch colors of friendly units
+extern int MinimapShowSelected;  ///< highlight selected units
 
 /*----------------------------------------------------------------------------
 --  Functions

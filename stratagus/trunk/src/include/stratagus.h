@@ -66,7 +66,7 @@
 #endif  // } __GNUC__
 
 #ifndef __GNUC__  // { disable GNU C Compiler features
-#define __attribute__(args)                 /// Does nothing for non GNU CC
+#define __attribute__(args)                 ///< Does nothing for non GNU CC
 #endif  // }
 
 #ifdef _MSC_VER
@@ -77,8 +77,8 @@
 #define inline __inline
 #define alloca _alloca
 
-#pragma warning(disable:4244)               /// Conversion from double to uchar
-#pragma warning(disable:4761)               /// Integral size mismatch
+#pragma warning(disable:4244)               ///< Conversion from double to uchar
+#pragma warning(disable:4761)               ///< Integral size mismatch
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #include <string.h>
@@ -118,7 +118,7 @@ typedef struct _missile_type_ MissileType;
 	**    DebugLevel0("Test %d\n" _C_ 1);
 	**    DebugLevel0("Test %d %d\n" _C_ 1 _C_ 2);
 	*/
-#define _C_  ,				    /// Debug , to simulate vararg macros
+#define _C_  ,    ///< Debug , to simulate vararg macros
 
 	/// Print function in debug macros
 #define PrintFunction() \
@@ -216,10 +216,10 @@ typedef struct _missile_type_ MissileType;
 ==  Storage types
 ============================================================================*/
 
-#define global                          /// Defines global visible names
+#define global                          ///< Defines global visible names
 
 #ifdef DEBUG
-#define local                           /// Defines local visible names
+#define local                           ///< Defines local visible names
 #else
 #define local static
 #endif
@@ -233,7 +233,7 @@ typedef struct _missile_type_ MissileType;
 ----------------------------------------------------------------------------*/
 
 #ifndef VERSION
-#define VERSION  "2.00"                 /// Engine version shown
+#define VERSION  "2.00"                 ///< Engine version shown
 #endif
 
 #ifndef StratagusMajorVerion
@@ -258,28 +258,28 @@ typedef struct _missile_type_ MissileType;
 extern char NameLine[];
 
 #ifndef STRATAGUS_LIB_PATH
-#define STRATAGUS_LIB_PATH  "data"      /// Where to find the data files
+#define STRATAGUS_LIB_PATH  "data"      ///< Where to find the data files
 #endif
 
 #ifndef STRATAGUS_HOME_PATH
 #ifdef __APPLE__
 #define STRATAGUS_HOME_PATH "Library/Stratagus"
 #else
-#define STRATAGUS_HOME_PATH  ".stratagus"/// Data files in user home dir
+#define STRATAGUS_HOME_PATH  ".stratagus"///< Data files in user home dir
 #endif
 #endif
 
-#define MAGIC_FOR_NEW_UNITS  33         /// How many percent of max mana for new units
+#define MAGIC_FOR_NEW_UNITS  33         ///< How many percent of max mana for new units
 
 /*----------------------------------------------------------------------------
 --  Some limits
 ----------------------------------------------------------------------------*/
 
-#define TilesetMax   8                  /// How many tilesets are supported
-#define PlayerMax    16                 /// How many players are supported
-#define UnitTypeMax  257                /// How many unit types supported
-#define UpgradeMax   256                /// How many upgrades supported
-#define UnitMax      2048               /// How many units supported
+#define TilesetMax   8                  ///< How many tilesets are supported
+#define PlayerMax    16                 ///< How many players are supported
+#define UnitTypeMax  257                ///< How many unit types supported
+#define UpgradeMax   256                ///< How many upgrades supported
+#define UnitMax      2048               ///< How many units supported
 
 /*----------------------------------------------------------------------------
 --  Screen
@@ -287,12 +287,12 @@ extern char NameLine[];
 
 	// FIXME: this values should go into a general ui structure
 
-#define DEFAULT_VIDEO_WIDTH   640       /// Default video width
-#define DEFAULT_VIDEO_HEIGHT  480       /// Default video height
+#define DEFAULT_VIDEO_WIDTH   640       ///< Default video width
+#define DEFAULT_VIDEO_HEIGHT  480       ///< Default video height
 
 	// This is for 1600x1200
-#define MAXMAP_W  50                    /// Maximum map width in tiles on screen
-#define MAXMAP_H  40                    /// Maximum map height in tiles
+#define MAXMAP_W  50                    ///< Maximum map width in tiles on screen
+#define MAXMAP_H  40                    ///< Maximum map height in tiles
 
 	/// Scrolling area (<= 15 y)
 #define SCROLL_UP     15
@@ -316,29 +316,29 @@ extern char NameLine[];
 
 	/// Must redraw flags
 enum _must_redraw_flags_ {
-	RedrawNothing   = 1 << 0,           /// Nothing to do
-	RedrawMinimap   = 1 << 1,           /// Minimap area
-	RedrawMap       = 1 << 2,           /// Map area
-	RedrawCursor    = 1 << 3,           /// Cursor changed
-	RedrawResources = 1 << 4,           /// Resources
+	RedrawNothing   = 1 << 0,           ///< Nothing to do
+	RedrawMinimap   = 1 << 1,           ///< Minimap area
+	RedrawMap       = 1 << 2,           ///< Map area
+	RedrawCursor    = 1 << 3,           ///< Cursor changed
+	RedrawResources = 1 << 4,           ///< Resources
 
-	RedrawMessage       = 1 << 13,      /// Message
-	RedrawStatusLine    = 1 << 14,      /// Statusline
-	RedrawInfoPanel     = 1 << 15,      /// Unit description
-	RedrawButtonPanel   = 1 << 16,      /// Unit buttons
-	RedrawFillers       = 1 << 17,      /// Fillers
-	RedrawMinimapBorder = 1 << 18,      /// Area around minimap
+	RedrawMessage       = 1 << 13,      ///< Message
+	RedrawStatusLine    = 1 << 14,      ///< Statusline
+	RedrawInfoPanel     = 1 << 15,      ///< Unit description
+	RedrawButtonPanel   = 1 << 16,      ///< Unit buttons
+	RedrawFillers       = 1 << 17,      ///< Fillers
+	RedrawMinimapBorder = 1 << 18,      ///< Area around minimap
 
-	RedrawCosts         = 1 << 19,      /// Costs in status line
-	RedrawMenuButton    = 1 << 20,      /// Area above minimap
-	RedrawMinimapCursor = 1 << 21,      /// Minimap cursor changed
-	RedrawMenu          = 1 << 22,      /// Menu
-	RedrawTimer         = 1 << 23,      /// Timer
+	RedrawCosts         = 1 << 19,      ///< Costs in status line
+	RedrawMenuButton    = 1 << 20,      ///< Area above minimap
+	RedrawMinimapCursor = 1 << 21,      ///< Minimap cursor changed
+	RedrawMenu          = 1 << 22,      ///< Menu
+	RedrawTimer         = 1 << 23,      ///< Timer
 
 	// Bits 24-29 are unused.
 
-	RedrawAll           = 1 << 30,      /// All flag set by RedrawEverything
-	RedrawEverything    = -1,           /// Must redraw everything
+	RedrawAll           = 1 << 30,      ///< All flag set by RedrawEverything
+	RedrawEverything    = -1,           ///< Must redraw everything
 };
 
 	/// Must redraw all maps
@@ -379,7 +379,7 @@ extern int SlowFrameCounter;
 #define MyRand()  rand()
 
 enum {
-    TitleFlagCenter	= 1 << 0,  /// Center Text
+    TitleFlagCenter	= 1 << 0,  ///< Center Text
 };
 
 typedef struct _title_screen_label_ {
@@ -397,44 +397,44 @@ typedef struct _title_screen_ {
 	TitleScreenLabel** Labels;
 } TitleScreen;
 
-extern TitleScreen** TitleScreens;          /// File for title screen
-extern char* GameName;                      /// Name of the game
-extern char* MenuBackground;                /// File for menu background
-extern char* MenuMusic;                     /// File for menu music
-extern char* ClickMissile;                  /// Missile to show when you click
-extern char* DamageMissile;                 /// Missile to show damage caused
-extern char* StratagusLibPath;              /// Location of stratagus data
+extern TitleScreen** TitleScreens;          ///< File for title screen
+extern char* GameName;                      ///< Name of the game
+extern char* MenuBackground;                ///< File for menu background
+extern char* MenuMusic;                     ///< File for menu music
+extern char* ClickMissile;                  ///< Missile to show when you click
+extern char* DamageMissile;                 ///< Missile to show damage caused
+extern char* StratagusLibPath;              ///< Location of stratagus data
 
-extern int SpeedBuild;                      /// Speed factor for building
-extern int SpeedTrain;						/// Speed factor for training
-extern int SpeedUpgrade;                    /// Speed factor for upgrading
-extern int SpeedResearch;                   /// Speed factor for researching
+extern int SpeedBuild;                      ///< Speed factor for building
+extern int SpeedTrain;                      ///< Speed factor for training
+extern int SpeedUpgrade;                    ///< Speed factor for upgrading
+extern int SpeedResearch;                   ///< Speed factor for researching
 
-extern char UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
+extern char UseHPForXp;                     ///< true if gain XP by dealing damage, false if by killing.
 
-extern unsigned SyncRandSeed;               /// Sync random seed value
+extern unsigned SyncRandSeed;               ///< Sync random seed value
 
-extern unsigned long GameCycle;             /// Game simulation cycle counter
-extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
+extern unsigned long GameCycle;             ///< Game simulation cycle counter
+extern unsigned long FastForwardCycle;      ///< Game Replay Fast Forward Counter
 
-extern void LoadGame(char*);                /// Load saved game back
-extern void SaveGame(const char*);          /// Save game for later load
-extern int SaveGameLoading;                 /// Save game is in progress of loading
+extern void LoadGame(char*);                ///< Load saved game back
+extern void SaveGame(const char*);          ///< Save game for later load
+extern int SaveGameLoading;                 ///< Save game is in progress of loading
 
-extern void LoadAll(void);                  /// Load all data back
+extern void LoadAll(void);                  ///< Load all data back
 
-extern void InitSyncRand(void);             /// Initialize the syncron rand
-extern int SyncRand(void);                  /// Syncron rand
+extern void InitSyncRand(void);             ///< Initialize the syncron rand
+extern int SyncRand(void);                  ///< Syncron rand
 
-extern volatile void Exit(int err);         /// Exit stratagus
-extern volatile void ExitFatal(int err);    /// Exit stratagus with fatal error
+extern volatile void Exit(int err);         ///< Exit stratagus
+extern volatile void ExitFatal(int err);    ///< Exit stratagus with fatal error
 
-extern void UpdateDisplay(void);            /// Game display update
-extern void InitModules(void);              /// Initinalize all modules
-extern void LoadModules(void);              /// Load all modules
-extern void CleanModules(void);             /// Cleanup all modules
-extern void DrawMapArea(void);              /// Draw the map area
-extern void GameMainLoop(void);             /// Game main loop
+extern void UpdateDisplay(void);            ///< Game display update
+extern void InitModules(void);              ///< Initinalize all modules
+extern void LoadModules(void);              ///< Load all modules
+extern void CleanModules(void);             ///< Cleanup all modules
+extern void DrawMapArea(void);              ///< Draw the map area
+extern void GameMainLoop(void);             ///< Game main loop
 
 	/// Show load progress
 extern void ShowLoadProgress(const char* fmt,...);
@@ -456,8 +456,8 @@ extern long isqrt(long num);
 ==  Misc
 ============================================================================*/
 
-// FIXME: configurable. maybe we could move it into one big global
-// FIXME: settings struct?
+// @fixme configurable. maybe we could move it into one big global
+// @fixme settings struct?
 	/// How many resources the player gets back if canceling building
 #define CancelBuildingCostsFactor  75
 	/// How many resources the player gets back if canceling training
