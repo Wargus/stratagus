@@ -136,6 +136,10 @@ local void DeleteMenu(void);
 local void DeleteInit(Menuitem *mi __attribute__((unused)));
 local void DeleteFile(void);
 
+local void ConfirmSaveMenu(void);
+local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)));
+local void ConfirmSaveFile(void);
+
 local void JoinNetGameMenu(void);
 local void CreateNetGameMenu(void);
 
@@ -1484,11 +1488,23 @@ local void InitLoadGameMenuItems() {
 }
 
 local Menuitem ConfirmSaveMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, GameFont, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, ConfirmSaveInit, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 16, 11+20*1.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 16, 11+20*2.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_BUTTON, 16, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 288-16-106, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitConfirmSaveMenuItems() {
-    MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
+    MenuitemText    i0 = { "Overwrite File", MI_TFLAGS_CENTERED};
+    MenuitemText    i1 = { "Are you sure you want to overwrite", MI_TFLAGS_LALIGN};
+    MenuitemText    i2 = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemButton  i3 = { "~!Ok", 106, 27, MBUTTON_GM_HALF, ConfirmSaveFile, 'o'};
+    MenuitemButton  i4 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     ConfirmSaveMenuItems[0].d.text = i0;
+    ConfirmSaveMenuItems[1].d.text = i1;
+    ConfirmSaveMenuItems[2].d.text = i2;
+    ConfirmSaveMenuItems[3].d.button = i3;
+    ConfirmSaveMenuItems[4].d.button = i4;
 }
 
 local Menuitem ConfirmDeleteMenuItems[] = {
@@ -1789,11 +1805,11 @@ global Menu Menus[] = {
     },
     {
 	// Confirm Save Menu
-	(640-288)/2,
-	260,
+	176+(14*TileSizeX-288)/2,
+	16+(14*TileSizeY-256)/2,
 	288, 128,
 	ImagePanel4,
-	2, 4,
+	1, 5,
 	ConfirmSaveMenuItems,
 	NULL,
     },
@@ -2419,14 +2435,16 @@ local void SaveAction(void)
     strcat(filename, "/");
     strncat(filename, name, nameLength);
 
-    SaveGame(filename);
+    if (access(filename,F_OK)) {
+        SaveGame(filename);
+    } else {
+	ProcessMenu(MENU_CONFIRM_SAVE, 1);
+    }
 
     SetMessage("Saved game to: %s", filename);
 
     EndMenu();
 }
-
-
 
 local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 {
@@ -2641,6 +2659,30 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
 	    break;
     }
     TypedFileName = 0;
+}
+
+local void SaveMenu(void)
+{
+    EndMenu();
+    ProcessMenu(MENU_CONFIRM_SAVE, 1);
+}
+
+local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)))
+{
+    static char name[128];
+    strcpy(name, "the file: ");
+    strcat(name, SaveGameMenuItems[1].d.input.buffer);
+    ConfirmSaveMenuItems[2].d.text.text = name;
+}
+
+local void ConfirmSaveFile(void)
+{
+    char name[256];
+    strcpy(name, SaveDir);
+    strcat(name, "/");
+    strcat(name, SaveGameMenuItems[1].d.input.buffer);
+    SaveGame(name);
+    EndMenu();
 }
 
 local void DeleteMenu(void)
