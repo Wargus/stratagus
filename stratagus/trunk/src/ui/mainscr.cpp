@@ -989,21 +989,10 @@ static char StatusLine[256];                                /// status line/hint
 */
 void DrawStatusLine(void)
 {
-	if (TheUI.StatusLine.Graphic) {
-		VideoDrawSubClip(TheUI.StatusLine.Graphic, 0, 0,
-			TheUI.StatusLine.Graphic->Width, TheUI.StatusLine.Graphic->Height,
-			TheUI.StatusLineX, TheUI.StatusLineY);
-	}
 	if (StatusLine[0]) {
 		PushClipping();
-		if (TheUI.StatusLine.Graphic) {
-			SetClipping(TheUI.StatusLineTextX, TheUI.StatusLineTextY,
-				TheUI.StatusLineX + TheUI.StatusLine.Graphic->Width - 1,
-				TheUI.StatusLineY + TheUI.StatusLine.Graphic->Height - 1);
-		} else {
-			SetClipping(TheUI.StatusLineTextX, TheUI.StatusLineTextY,
-				VideoWidth - 1, VideoHeight - 1);
-		}
+		SetClipping(TheUI.StatusLineTextX, TheUI.StatusLineTextY,
+			TheUI.StatusLineTextX + TheUI.StatusLineW - 1, VideoHeight - 1);
 		VideoDrawTextClip(TheUI.StatusLineTextX, TheUI.StatusLineTextY,
 			TheUI.StatusLineFont, StatusLine);
 		PopClipping();
@@ -1049,7 +1038,7 @@ void DrawCosts(void)
 	int i;
 	int x;
 
-	x = TheUI.StatusLineX + 270;
+	x = TheUI.StatusLineTextX + 268;
 	if (CostsMana) {
 		// FIXME: hardcoded image!!!
 		VideoDrawClip(TheUI.Resources[GoldCost].Icon.Graphic,
