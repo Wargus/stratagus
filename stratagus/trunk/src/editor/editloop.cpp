@@ -1781,6 +1781,7 @@ local void CreateEditor(void)
 	TheMap.Terrain = TheMap.Info->MapTerrain;
 	TheMap.TerrainName = strdup(Tilesets[TheMap.Info->MapTerrain]->Ident);
 	TheMap.Tileset = Tilesets[TheMap.Info->MapTerrain];
+	LoadTileset();
 
 	for (i = 0; i < TheMap.Width * TheMap.Height; ++i) {
 	    TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile = 0;
@@ -1791,6 +1792,7 @@ local void CreateEditor(void)
 	GameSettings.Resources = SettingsResourcesMapDefault;
 	CreateGame(NULL, &TheMap);
     } else {
+	LoadTileset();
 	CreateGame(CurrentMapPath, &TheMap);
 	if (strcasestr(CurrentMapPath,".scm") ||
 	    strcasestr(CurrentMapPath,".chk")) {
