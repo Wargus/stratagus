@@ -110,6 +110,8 @@ global void FreeUnitMemory(Unit* unit)
 */
 global void ReleaseUnit(Unit* unit)
 {
+    DebugLevel3Fn(" Unit %p %Zd\n",unit,UnitNumber(unit));
+
     DebugCheck( !unit->Type );		// already free.
 
     //
@@ -143,7 +145,8 @@ global void ReleaseUnit(Unit* unit)
 	if( --unit->Refs>0 ) {
 	    unit->Destroyed=1;		// mark as destroyed
 
-	    DebugLevel3Fn("more references\n");
+	    DebugLevel3Fn("More references of %Zd #%d\n"
+		    ,UnitNumber(unit),unit->Refs);
 	    return;
 	}
     }
