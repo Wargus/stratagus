@@ -1,0 +1,526 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<!--
+----	(c) Copyright 2002 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FreeCraft Configuration Language Description: Index</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,index">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Index</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 2002 by The FreeCraft Project. Distributed under the
+<A HREF="../gpl.html">"GNU General Public License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<HR>
+<A HREF="ai.html">AI</A>
+<A HREF="config.html">Config</A>
+<A HREF="icon.html">Icon</A>
+<A HREF="research.html">Research</A>
+<A HREF="tileset.html">Tileset</A>
+<A HREF="unittype.html">UnitType</A>
+<HR>
+
+<DL>
+<DT><A HREF="config.html#a-star">a-star</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#a-star-fixed-unit-cost">a-star-fixed-unit-cost</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#a-star-moving-unit-cost">a-star-moving-unit-cost</A></DT>
+<DD></DD>
+<DT><A HREF=".html#action-defeat">action-defeat</A></DT>
+<DD></DD>
+<DT><A HREF=".html#action-draw">action-draw</A></DT>
+<DD></DD>
+<DT><A HREF=".html#action-set-timer">action-set-timer</A></DT>
+<DD></DD>
+<DT><A HREF=".html#action-start-timer">action-start-timer</A></DT>
+<DD></DD>
+<DT><A HREF=".html#action-stop-timer">action-stop-timer</A></DT>
+<DD></DD>
+<DT><A HREF=".html#action-victory">action-victory</A></DT>
+<DD></DD>
+<DT><A HREF=".html#add-keystroke-help">add-keystroke-help</A></DT>
+<DD></DD>
+<DT><A HREF=".html#add-message">add-message</A></DT>
+<DD></DD>
+<DT><A HREF=".html#add-tip">add-tip</A></DT>
+<DD></DD>
+<DT><A HREF=".html#add-trigger">add-trigger</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:attack-with-force">ai:attack-with-force</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:check-force">ai:check-force</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:debug">ai:debug</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:dump">ai:dump</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:force">ai:force</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:force-role">ai:force-role</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:get-race">ai:get-race</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:get-sleep-cycles">ai:get-sleep-cycles</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:need">ai:need</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:player">ai:player</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:research">ai:research</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:restart">ai:restart</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:script">ai:script</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:set">ai:set</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:set-collect!">ai:set-collect!</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:set-reserve!">ai:set-reserve!</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:sleep">ai:sleep</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:upgrade-to">ai:upgrade-to</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:wait">ai:wait</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#ai:wait-force">ai:wait-force</A></DT>
+<DD></DD>
+<DT><A HREF=".html#briefing">briefing</A></DT>
+<DD></DD>
+<DT><A HREF="research.html#check-dependency">check-dependency</A></DT>
+<DD></DD>
+<DT><A HREF=".html#create-unit">create-unit</A></DT>
+<DD></DD>
+<DT><A HREF=".html#credits">credits</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#decoration-on-top">decoration-on-top</A></DT>
+<DD></DD>
+<!--
+<DT><A HREF=".html#default-text-colors">default-text-colors</A></DT>
+<DD></DD>
+-->
+<DT><A HREF="ai.html#define-ai">define-ai</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#define-ai-helper">define-ai-helper</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#define-ai-player">define-ai-player</A></DT>
+<DD></DD>
+<DT><A HREF="ai.html#define-ai-wc-names">define-ai-wc-names</A></DT>
+<DD></DD>
+<DT><A HREF="research.html#define-allow">define-allow</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#define-animations">define-animations</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-button">define-button</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-campaign">define-campaign</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-construction">define-construction</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-construction-wc-names">define-construction-wc-names</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-cursor">define-cursor</A></DT>
+<DD></DD>
+<DT><A HREF="research.html#define-dependency">define-dependency</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-editor-unittypes">define-editor-unittypes</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-font">define-font</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-font-colors">define-font-colors</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-game-sounds">define-game-sounds</A></DT>
+<DD></DD>
+<DT><A HREF="icon.html#define-icon">define-icon</A></DT>
+<DD></DD>
+<DT><A HREF="icon.html#define-icon-alias">define-icon-alias</A></DT>
+<DD></DD>
+<DT><A HREF="icon.html#define-icon-wc-names">define-icon-wc-names</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-map">define-map</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-menu">define-menu</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-menu-item">define-menu-item</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-missile-type">define-missile-type</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-missiletype-wc-names">define-missiletype-wc-names</A></DT>
+<DD></DD>
+<DT><A HREF="research.html#define-modifier">define-modifier</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-new-ui">define-new-ui</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-race-wc-names">define-race-wc-names</A></DT>
+<DD></DD>
+<DT><A HREF="tileset.html#define-tileset">define-tileset</A></DT>
+<DD></DD>
+<DT><A HREF="tileset.html#define-tileset-wc-names">define-tileset-wc-names</A></DT>
+<DD></DD>
+<DT><A HREF=".html#define-ui">define-ui</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#define-unit-stats">define-unit-stats</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#define-unit-type">define-unit-type</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#define-unittype-wc-names">define-unittype-wc-names</A></DT>
+<DD></DD>
+<DT><A HREF="research.html#define-upgrade">define-upgrade</A></DT>
+<DD></DD>
+<DT><A HREF="research.html#define-upgrade-wc-names">define-upgrade-wc-names</A></DT>
+<DD></DD>
+<DT><A HREF=".html#diplomacy">diplomacy</A></DT>
+<DD></DD>
+<DT><A HREF=".html#display-picture">display-picture</A></DT>
+<DD></DD>
+<DT><A HREF=".html#display-sounds">display-sounds</A></DT>
+<DD></DD>
+<!--
+<DT><A HREF=".html#draw-number">draw-number</A></DT>
+<DD></DD>
+-->
+<!--
+<DT><A HREF=".html#draw-reverse-number">draw-reverse-number</A></DT>
+<DD></DD>
+-->
+<!--
+<DT><A HREF=".html#draw-reverse-text">draw-reverse-text</A></DT>
+<DD></DD>
+-->
+<!--
+<DT><A HREF=".html#draw-reverse-text-centered">draw-reverse-text-centered</A></DT>
+<DD></DD>
+-->
+<!--
+<DT><A HREF=".html#draw-text">draw-text</A></DT>
+<DD></DD>
+-->
+<!--
+<DT><A HREF=".html#draw-text-centered">draw-text-centered</A></DT>
+<DD></DD>
+-->
+<DT><A HREF=".html#freecraft-map">freecraft-map</A></DT>
+<DD></DD>
+<DT><A HREF=".html#game-cycle">game-cycle</A></DT>
+<DD></DD>
+<DT><A HREF="research.html#get-dependency">get-dependency</A></DT>
+<DD></DD>
+<DT><A HREF=".html#get-freecraft-home-path">get-freecraft-home-path</A></DT>
+<DD></DD>
+<DT><A HREF=".html#get-freecraft-library-path">get-freecraft-library-path</A></DT>
+<DD></DD>
+<DT><A HREF=".html#get-player-resources">get-player-resources</A></DT>
+<DD></DD>
+<DT><A HREF=".html#get-this-player">get-this-player</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#get-unit-type-ident">get-unit-type-ident</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#get-unit-type-name">get-unit-type-name</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#get-unit-type-property">get-unit-type-property</A></DT>
+<DD></DD>
+<DT><A HREF=".html#get-unit-unholy-armor">get-unit-unholy-armor</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#gray-fog-of-war">gray-fog-of-war</A></DT>
+<DD></DD>
+<DT><A HREF=".html#group">group</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#health-sprite">health-sprite</A></DT>
+<DD></DD>
+<DT><A HREF=".html#if-elapsed">if-elapsed</A></DT>
+<DD></DD>
+<DT><A HREF=".html#if-kills">if-kills</A></DT>
+<DD></DD>
+<DT><A HREF=".html#if-near-unit">if-near-unit</A></DT>
+<DD></DD>
+<DT><A HREF=".html#if-opponents">if-opponents</A></DT>
+<DD></DD>
+<DT><A HREF=".html#if-rescued-near-unit">if-rescued-near-unit</A></DT>
+<DD></DD>
+<DT><A HREF=".html#if-resource">if-resource</A></DT>
+<DD></DD>
+<DT><A HREF=".html#if-score">if-score</A></DT>
+<DD></DD>
+<DT><A HREF=".html#if-timer">if-timer</A></DT>
+<DD></DD>
+<DT><A HREF=".html#if-unit">if-unit</A></DT>
+<DD></DD>
+<DT><A HREF=".html#library-path">library-path</A></DT>
+<DD></DD>
+<DT><A HREF=".html#load-pud">load-pud</A></DT>
+<DD></DD>
+<DT><A HREF=".html#log">log</A></DT>
+<DD></DD>
+<DT><A HREF=".html#make-sound">make-sound</A></DT>
+<DD></DD>
+<DT><A HREF=".html#make-sound-group">make-sound-group</A></DT>
+<DD></DD>
+<DT><A HREF=".html#make-unit">make-unit</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#mana-sprite">mana-sprite</A></DT>
+<DD></DD>
+<DT><A HREF=".html#map-sound">map-sound</A></DT>
+<DD></DD>
+<DT><A HREF=".html#missile">missile</A></DT>
+<DD></DD>
+<DT><A HREF=".html#new-colors">new-colors</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#no-a-star">no-a-star</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#original-fog-of-war">original-fog-of-war</A></DT>
+<DD></DD>
+<DT><A HREF=".html#pf-show-groupids!">pf-show-groupids!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#pf-show-regids!">pf-show-regids!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#place-unit">place-unit</A></DT>
+<DD></DD>
+<DT><A HREF=".html#play-file">play-file</A></DT>
+<DD></DD>
+<DT><A HREF=".html#play-music">play-music</A></DT>
+<DD></DD>
+<DT><A HREF=".html#play-sound">play-sound</A></DT>
+<DD></DD>
+<DT><A HREF=".html#player">player</A></DT>
+<DD></DD>
+<DT><A HREF=".html#process-menu">process-menu</A></DT>
+<DD></DD>
+<DT><A HREF=".html#replay-log">replay-log</A></DT>
+<DD></DD>
+<DT><A HREF=".html#reset-keystroke-help">reset-keystroke-help</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#reveal-map">reveal-map</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#right-button-attacks">right-button-attacks</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#right-button-moves">right-button-moves</A></DT>
+<DD></DD>
+<DT><A HREF=".html#selection">selection</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-all-players-building-limit!">set-all-players-building-limit!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-all-players-food-unit-limit!">set-all-players-food-unit-limit!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-all-players-total-unit-limit!">set-all-players-total-unit-limit!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-brightness!">set-brightness!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-building-capture!">set-building-capture!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-burn-buildings!">set-burn-buildings!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#set-cd-mode!">set-cd-mode!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-color-cycle-all!">set-color-cycle-all!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-contrast!">set-contrast!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#set-diplomacy!">set-diplomacy!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-double-click-delay!">set-double-click-delay!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-fancy-buildings!">set-fancy-buildings!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-fog-of-war!">set-fog-of-war!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-fog-of-war-brightness!">set-fog-of-war-brightness!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-fog-of-war-contrast!">set-fog-of-war-contrast!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-fog-of-war-saturation!">set-fog-of-war-saturation!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-forest-regeneration!">set-forest-regeneration!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#set-game-cursor!">set-game-cursor!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#set-global-sound-range!">set-global-sound-range!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-goldmine-depleted!">set-goldmine-depleted!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-grab-mouse!">set-grab-mouse!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#set-group-id!">set-group-id!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-hitpoint-regeneration!">set-hitpoint-regeneration!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-hold-click-delay!">set-hold-click-delay!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-key-scroll!">set-key-scroll!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-key-scroll-speed!">set-key-scroll-speed!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-leave-stops!">set-leave-stops!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-menu-background!">set-menu-background!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-menu-background-with-title!">set-menu-background-with-title!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-menu-music!">set-menu-music!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-minimap-terrain!">set-minimap-terrain!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-mouse-adjust!">set-mouse-adjust!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-mouse-scale!">set-mouse-scale!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-mouse-scroll!">set-mouse-scroll!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-mouse-scroll-speed!">set-mouse-scroll-speed!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-music-volume!">set-music-volume!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-original-resources!">set-original-resources!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#set-player-resources!">set-player-resources!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-reveal-attacker!">set-reveal-attacker!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-reverse-map-move!">set-reverse-map-move!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-saturation!">set-saturation!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-selection-style!">set-selection-style!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-show-attack-range!">set-show-attack-range!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-show-command-key!">set-show-command-key!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-show-orders!">set-show-orders!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-show-reaction-range!">set-show-reaction-range!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-show-sight-range!">set-show-sight-range!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-show-tips!">set-show-tips!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#set-sound-range!">set-sound-range!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-sound-volume!">set-sound-volume!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#set-this-player!">set-this-player!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-title-music!">set-title-music!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-title-screen!">set-title-screen!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-training-queue!">set-training-queue!</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#set-unit-type-name!">set-unit-type-name!</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#set-unit-type-property!">set-unit-type-property!</A></DT>
+<DD></DD>
+<DT><A HREF=".html#set-unit-unholy-armor!">set-unit-unholy-armor!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#set-xp-damage!">set-xp-damage!</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#shadow-sprite">shadow-sprite</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-energy-selected-only">show-energy-selected-only</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-full">show-full</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-health-bar">show-health-bar</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-health-dot">show-health-dot</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-health-horizontal">show-health-horizontal</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-health-vertical">show-health-vertical</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-mana-bar">show-mana-bar</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-mana-dot">show-mana-dot</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-mana-horizontal">show-mana-horizontal</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-mana-vertical">show-mana-vertical</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#show-no-full">show-no-full</A></DT>
+<DD></DD>
+<DT><A HREF=".html#slot-usage">slot-usage</A></DT>
+<DD></DD>
+<DT><A HREF=".html#sound-for-name">sound-for-name</A></DT>
+<DD></DD>
+<DT><A HREF=".html#sound-off">sound-off</A></DT>
+<DD></DD>
+<DT><A HREF=".html#sound-on">sound-on</A></DT>
+<DD></DD>
+<DT><A HREF=".html#sound-thread">sound-thread</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-build">speed-build</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-chop">speed-chop</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-gold">speed-gold</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-haul">speed-haul</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-mine">speed-mine</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-oil">speed-oil</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-research">speed-research</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-train">speed-train</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-upgrade">speed-upgrade</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speed-wood">speed-wood</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#speeds">speeds</A></DT>
+<DD></DD>
+<DT><A HREF="config.html#spell-sprite">spell-sprite</A></DT>
+<DD></DD>
+<DT><A HREF=".html#stop-music">stop-music</A></DT>
+<DD></DD>
+<!--
+<DT><A HREF=".html#text-length">text-length</A></DT>
+<DD></DD>
+-->
+<DT><A HREF=".html#unit">unit</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#unit-type">unit-type</A></DT>
+<DD></DD>
+<DT><A HREF="unittype.html#unit-type-array">unit-type-array</A></DT>
+<DD></DD>
+<DT><A HREF=".html#units">units</A></DT>
+<DD></DD>
+<DT><A HREF=".html#with-sound">with-sound</A></DT>
+<DD></DD>
+</DL>
+
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2002 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
+
