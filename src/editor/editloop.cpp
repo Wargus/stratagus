@@ -956,7 +956,7 @@ local void EditorCallbackButtonUp(unsigned button)
 	    ProcessMenu("menu-editor",1);
 	}
     }
-    if((1<<button) == LeftButton) {
+    if( (1<<button) == LeftButton ) {
 	UnitPlacedThisPress = 0;
     }
 }
@@ -1162,7 +1162,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 
 	vp = GetViewport(CursorX, CursorY);
 	DebugCheck( !vp );
-	if (TheUI.SelectedViewport != vp ) {	// viewport changed
+	if (TheUI.SelectedViewport != vp) {	// viewport changed
 	    TheUI.SelectedViewport = vp;
 	    MustRedraw = RedrawMinimapCursor | RedrawMap;
 	}
@@ -1172,7 +1172,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		Viewport2MapY(TheUI.MouseViewport, CursorY), TileCursor,
 		TileCursorSize);
 	}
-	if(!UnitPlacedThisPress) {
+	if (!UnitPlacedThisPress) {
 	    if (EditorState == EditorEditUnit && CursorBuilding) {
 		if (CanBuildUnitType(NULL, CursorBuilding,
 			Viewport2MapX(TheUI.MouseViewport, CursorX),
@@ -1377,19 +1377,18 @@ local void EditorCallbackMouse(int x, int y)
 
     HandleCursorMove(&x, &y);		// Reduce to screen
 
-	//Automatically unpress when map tile has changed
-	if (LastMapX != Viewport2MapX(TheUI.SelectedViewport, CursorX) ||
-		LastMapY != Viewport2MapY(TheUI.SelectedViewport, CursorY)) {
-	    LastMapX=Viewport2MapX(TheUI.SelectedViewport, CursorX);
-	    LastMapY=Viewport2MapY(TheUI.SelectedViewport, CursorY);
-	    UnitPlacedThisPress = 0;
-	}
+    // Automatically unpress when map tile has changed
+    if (LastMapX != Viewport2MapX(TheUI.SelectedViewport, CursorX) ||
+	LastMapY != Viewport2MapY(TheUI.SelectedViewport, CursorY)) {
+	LastMapX = Viewport2MapX(TheUI.SelectedViewport, CursorX);
+	LastMapY = Viewport2MapY(TheUI.SelectedViewport, CursorY);
+	UnitPlacedThisPress = 0;
+    }
     //
     //	Drawing tiles on map.
     //
-    if( CursorOn == CursorOnMap && (MouseButtons&LeftButton)
-		&& (EditorState == EditorEditTile
-		    || EditorState == EditorEditUnit) ) {
+    if( CursorOn == CursorOnMap && (MouseButtons&LeftButton) &&
+	(EditorState == EditorEditTile || EditorState == EditorEditUnit) ) {
 
 	//
 	//	Scroll the map
@@ -1428,13 +1427,13 @@ local void EditorCallbackMouse(int x, int y)
 	} else if (EditorState == EditorEditUnit && CursorBuilding) {
 	    if (!UnitPlacedThisPress) {
 		if (CanBuildUnitType(NULL, CursorBuilding,
-			Viewport2MapX(TheUI.SelectedViewport, CursorX),
-			Viewport2MapY(TheUI.SelectedViewport, CursorY))) {
+		    Viewport2MapX(TheUI.SelectedViewport, CursorX),
+		    Viewport2MapY(TheUI.SelectedViewport, CursorY))) {
 		    EditUnit(Viewport2MapX(TheUI.SelectedViewport, CursorX),
 			Viewport2MapY(TheUI.SelectedViewport, CursorY),
 			CursorBuilding, Players + SelectedPlayer);
-		UnitPlacedThisPress = 1;
-		ClearStatusLine();
+		    UnitPlacedThisPress = 1;
+		    ClearStatusLine();
 		}
 	    }
 	}
@@ -1617,6 +1616,7 @@ local void EditorCallbackMouse(int x, int y)
 	CursorOn = CursorOnMinimap;
 	return;
     }
+
     //
     //  Map
     //
@@ -1757,11 +1757,11 @@ local void CreateEditor(void)
 
 #ifdef NEW_FOW    
     // Must change visible for ALL Players
-    for (i=0; i < TheMap.Width*TheMap.Height; i++) {
-	//Player 0 is selected and will be done by RevealMap
-        for(n=1;n<PlayerMax;n++) {
+    for (i = 0; i < TheMap.Width*TheMap.Height; ++i) {
+	// Player 0 is selected and will be done by RevealMap
+	for (n = 1; n < PlayerMax; ++n) {
 	    if (TheMap.Fields[i].Visible[n] == 0) {
-		TheMap.Fields[i].Visible[n]=2;
+		TheMap.Fields[i].Visible[n] = 2;
 	    } else {
 		TheMap.Fields[i].Visible[n]++;
 	    }
