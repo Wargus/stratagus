@@ -141,7 +141,7 @@
 **    Non upgraded movement speed.
 **  @note Until now we didn't support speed upgrades.
 **
-**  @fixme continue this documentation
+**  @todo continue this documentation
 **
 **  UnitType::Construction
 **
@@ -252,7 +252,7 @@
 **
 **    How much this annoys the computer
 **
-**  @fixme not used
+**  @todo not used
 **
 **  UnitType::MouseAction
 **
@@ -343,7 +343,7 @@
 **
 **    Resource can be harvested. It's false for things like
 **    oil patches.
-**  @fixme crappy name.
+**  @todo crappy name.
 **
 **  UnitType::Harvester
 **
@@ -393,7 +393,7 @@
 **    Unit can repair buildings. It will use the actack animation.
 **    It will heal 4 points for every repair cycle, and cost 1 of
 **    each resource, alternatively(1 cycle wood, 1 cycle gold)
-**  @fixme The above should be more configurable.
+**  @todo The above should be more configurable.
 **    If units have a repair range, they can repair, and this is the
 **    distance.
 **
@@ -426,7 +426,7 @@
 **
 **    Currently sound for weapon
 **
-**  @fixme temporary solution
+**  @todo temporary solution
 **
 **  UnitType::Supply
 **
@@ -453,12 +453,12 @@
 **  UnitType::Stats[::PlayerMax]
 **
 **    Unit status for each player
-**  @fixme This stats should? be moved into the player struct
+**  @todo This stats should? be moved into the player struct
 **
 **  UnitType::Type
 **
 **    Type as number
-**  @fixme Should us a general name f.e. Slot here?
+**  @todo Should us a general name f.e. Slot here?
 **
 **  UnitType::Sprite
 **
@@ -544,7 +544,7 @@
 **    The unit will harvest terrain. For now this only works
 **    for wood. maybe it could be made to work for rocks, but
 **    more than that requires a tileset rewrite.
-**  @fixme more configurable.
+**  @todo more configurable.
 **
 */
 
@@ -688,7 +688,7 @@ struct _unit_type_ {
 	int RepairRange;                ///< Units repair range.
 	char *CanCastSpell;             ///< Unit is able to use spells.
 	char *AutoCastActive;           ///< Default value for autocast.
-	/// @fixme n0body: AutoBuildRate not implemented.
+	/// @todo n0body: AutoBuildRate not implemented.
 	int AutoBuildRate;              ///< The rate at which the building builds itself
 	int RandomMovementProbability;  ///< Probability to move randomly.
 	int ClicksToExplode;            ///< Number of consecutive clicks until unit suicides.
@@ -701,7 +701,7 @@ struct _unit_type_ {
 		UnitTypeNaval,              ///< Unit lives on water
 	} UnitType;                     ///< Land / fly / naval
 	int DecayRate;                  ///< Decay rate in 1/6 seconds
-	/// @fixme not used
+	/// @todo not used
 	int AnnoyComputerFactor;        ///< How much this annoys the computer
 	int MouseAction;                ///< Right click action
 #define MouseActionNone      0      ///< Nothing
@@ -751,7 +751,7 @@ struct _unit_type_ {
 	SDL_Color NeutralMinimapColorRGB;   ///< Minimap Color for Neutral Units.
 
 	UnitSound Sound;                ///< Sounds for events
-	/// @fixme temporary solution
+	/// @todo temporary solution
 	WeaponSound Weapon;             ///< Currently sound for weapon
 
 	int Supply;                     ///< Food supply
@@ -764,7 +764,7 @@ struct _unit_type_ {
 	unsigned FieldFlags;            ///< Unit map field flags
 	unsigned MovementMask;          ///< Unit check this map flags for move
 
-	/// @fixme This stats should? be moved into the player struct
+	/// @todo This stats should? be moved into the player struct
 	UnitStats Stats[PlayerMax];     ///< Unit status for each player
 
 	Graphic* Sprite;                ///< Sprite images
@@ -774,7 +774,7 @@ struct _unit_type_ {
 #endif
 };
 
-	/// @fixme ARI: should be dynamic (lua..), JOHNS: Pud only supports 255.
+	/// @todo ARI: should be dynamic (lua..), JOHNS: Pud only supports 255.
 	/// How many unit-types are currently supported
 #define UnitTypeMax 257
 
@@ -785,7 +785,7 @@ struct _unit_type_ {
 extern UnitType* UnitTypes[UnitTypeMax];    ///< All unit-types
 extern int NumUnitTypes;                    ///< Number of unit-types made
 
-/// @fixme this hardcoded unit-types must be removed!!
+/// @todo this hardcoded unit-types must be removed!!
 extern UnitType*UnitTypeHumanWall;          ///< Human wall
 extern UnitType*UnitTypeOrcWall;            ///< Orc wall
 

@@ -93,7 +93,7 @@ typedef struct {
 struct _spell_action_type_ {
 	SpellFunc* CastFunction;
 
-	/// @fixme some time information doesn't work as it should.
+	/// @todo some time information doesn't work as it should.
 	union {
 		struct {
 			int HP;         ///< Target HP gain.(can be negative)
@@ -196,7 +196,7 @@ typedef struct ConditionInfo {
 	char Building;          ///< Target is a building.
 	char TargetSelf;        ///< Target is the same as the caster.
 	char *BoolFlag;         ///< User defined boolean flag.
-		/// @fixme NOT IMPLEMENTED:
+		/// @todo NOT IMPLEMENTED:
 	char UnitBuffed;        ///< Target is buffed(haste/slow/bloodlust). Dispel magic?
 	//
 	//  Conditions related to vitals:
@@ -214,8 +214,8 @@ typedef struct ConditionInfo {
 	int MaxInvisibilityTicks;   ///< Target must less bloodlust ticks left.
 	int MaxInvincibilityTicks;  ///< Target must less bloodlust ticks left.
 	//
-	//  @fixme more? feel free to add, here and to
-	//  @fixme PassCondition, CclSpellParseCondition, SaveSpells
+	//  @todo more? feel free to add, here and to
+	//  @todo PassCondition, CclSpellParseCondition, SaveSpells
 	//
 } ConditionInfo;
 
@@ -224,7 +224,7 @@ typedef struct ConditionInfo {
 **  Informations about the autocasting mode.
 */
 typedef struct {
-	/// @fixme this below is SQUARE!!!
+	/// @todo this below is SQUARE!!!
 	int Range;                   ///< Max range of the target.
 
 	ConditionInfo* Condition;    ///< Conditions to cast the spell.
@@ -233,8 +233,8 @@ typedef struct {
 	/// Combat mode is when there are hostile non-coward units around
 	int Combat;                  ///< If it should be casted in combat
 
-	/// @fixme Add stuff here for target preference.
-	/// @fixme Heal units with the lowest hit points first.
+	/// @todo Add stuff here for target preference.
+	/// @todo Heal units with the lowest hit points first.
 } AutoCastInfo;
 
 struct _spell_type_;

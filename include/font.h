@@ -103,7 +103,7 @@ typedef struct _color_font_ {
 
 /**
 **  Font selector for the font functions.
-**  @fixme should be removed
+**  @todo should be removed
 */
 enum _game_font_ {
 	SmallFont,       ///< Small font used in stats
@@ -130,7 +130,7 @@ enum _game_font_ {
 
 /**
 **  Font names
-**  @fixme should use the names of the real fonts.
+**  @todo should use the names of the real fonts.
 */
 extern char *FontNames[];
 

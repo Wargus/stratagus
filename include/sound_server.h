@@ -64,7 +64,7 @@ typedef struct _sample_ Sample;
 /**
 **  General sound object type.
 **
-**  @fixme This is the planned new sample handling,
+**  @todo This is the planned new sample handling,
 **         which supports streaming, decompressing on demand, caching.
 */
 typedef struct _sample_type_ {
@@ -242,7 +242,7 @@ extern int NextFreeChannel;
 extern int WithSoundThread;
 #endif
 
-	/// @fixme docu
+	/// @todo docu
 extern int SoundThreadRunning;
 
 #ifdef DEBUG
