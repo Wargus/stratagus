@@ -887,7 +887,11 @@ global void UnitIncrementMana(void)
 /**
 **	Increment health of all regenerating units. Called each second.
 **
-**	NOTE: we could build a table of all regenerating units reducing cpu use.
+**	@note:	We could build a table of all regenerating units reducing cpu
+**		use. Also the berserker unit-type and upgrade regeneration
+**		should be initialized in some init function.
+**		Any idea how to handle this more general? It whould be nice
+**		to have more units that could regenerate.
 */
 global void UnitIncrementHealth(void)
 {

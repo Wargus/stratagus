@@ -34,9 +34,19 @@
 
 #include "etlib/hash.h"
 
+local int AddUpgradeModifierBase(int,int,int,int,int,int,int,int,int*,
+	const char*,const char*,const char*,const char*);
+local int AddUpgradeModifier(int,int,int,int,int,int,int,int,int*,
+	const char*,const char*,const char*,const char*);
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
+/**
+**	upgrade type definition
+*/
+global const char UpgradeType[] = "upgrade";
 
 global Upgrade Upgrades[MAXUACOUNT];	/// The main user useable upgrades
 local int UpgradesCount;		/// Upgrades used
@@ -51,6 +61,8 @@ local int UpgradeModifiersCount;
 local hashtable(int,61) UpgradeHash;	/// lookup table for upgrade names
 
 local int AllowDone;			/// allow already setup.
+
+#ifndef USE_CCL
 
 /**
 **	Builtin (default) upgrades.
@@ -175,10 +187,10 @@ local struct _wc_upgrades_ {
   "unit-axethrower,unit-berserker" },
 { "upgrade-ogre-mage",			NULL,
   {  250, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "unit-ogre-mage" },
+  "unit-ogre" },
 { "upgrade-paladin",			NULL,
   {  250, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "unit-paladin" },
+  "unit-knight" },
 { "upgrade-holy-vision",		NULL,
   {  0,    0,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
   "unit-paladin" },
@@ -212,6 +224,9 @@ local struct _wc_upgrades_ {
 { "upgrade-bloodlust",			NULL,
   {  100, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
   "unit-ogre-mage" },
+{ "upgrade-runes",			NULL,
+  {  150, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
+  "unit-ogre-mage" },
 { "upgrade-raise-dead",			NULL,
   {  100, 1500,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
   "" },
@@ -227,15 +242,11 @@ local struct _wc_upgrades_ {
 { "upgrade-unholy-armor",		NULL,
   {  200, 2500,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
   "" },
-{ "upgrade-runes",			NULL,
-  {  150, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "unit-ogre-mage" },
 { "upgrade-death-and-decay",		NULL,
   {  200, 2000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
   "" },
 };
 
-#if !defined(USE_CCL)
 /**
 **	Default without CCL support.
 */
@@ -321,6 +332,8 @@ local char** UpgradeWcNames
 local Upgrade* AddUpgrade(const char* ident,const char* icon,const int* costs)
 {
     char buf[256];
+    Upgrade* upgrade;
+    Upgrade** tmp;
     int i;
 
     //	Check for free slot.
@@ -332,25 +345,31 @@ local Upgrade* AddUpgrade(const char* ident,const char* icon,const int* costs)
 
     //	Fill upgrade structure
 
-    Upgrades[UpgradesCount].Ident = strdup( ident );
-
-    for( i=0; i<MaxCosts; ++i ) {
-	Upgrades[UpgradesCount].Costs[i]=costs[i];
+    if( (tmp=(Upgrade**)hash_find(UpgradeHash,(char*)ident)) ) {
+	DebugLevel0Fn("Already defined upgrade\n");
+	upgrade=*tmp;
+    } else {
+	upgrade=Upgrades+UpgradesCount++;
+	upgrade->OType = UpgradeType;
+	upgrade->Ident = strdup( ident );
+	*(Upgrade**)hash_add(UpgradeHash,upgrade->Ident)=upgrade;
     }
 
     if( icon ) {
-	Upgrades[UpgradesCount].Icon = IconByIdent(icon);
-    } else {
+	upgrade->Icon = IconByIdent(icon);
+    } else {				// automatic generated icon-name
 	sprintf(buf,"icon-%s",ident+8);
-	Upgrades[UpgradesCount].Icon = IconByIdent(buf);
+	upgrade->Icon = IconByIdent(buf);
     }
 
-    *(Upgrade**)hash_add(UpgradeHash,Upgrades[UpgradesCount].Ident)
-	    =&Upgrades[UpgradesCount];
+    for( i=0; i<MaxCosts; ++i ) {
+	upgrade->Costs[i]=costs[i];
+    }
 
-    return &Upgrades[UpgradesCount++];
+    return upgrade;
 }
 
+#ifndef USE_CCL
 /**
 **	Setup allow.
 */
@@ -366,8 +385,10 @@ local void SetupAllow(void)
 		    ,sizeof(Players[z].Allow.Upgrades));
 	    memset(Players[z].Allow.Units,'A'
 		    ,sizeof(Players[z].Allow.Units));
+#if 0
 	    memset(Players[z].Allow.Actions,'A'
 		    ,sizeof(Players[z].Allow.Actions));
+#endif
 	}
 
 	// Give some upgrades as default.
@@ -380,8 +401,11 @@ local void SetupAllow(void)
 	}
 
 	AllowDone=1;
+    } else {
+	DebugLevel0Fn("called twice\n");
     }
 }
+#endif
 
 /**
 **	Upgrade by identifier.
@@ -393,9 +417,7 @@ global Upgrade* UpgradeByIdent(const char* ident)
 {
     Upgrade** upgrade;
 
-    upgrade=(Upgrade**)hash_find(UpgradeHash,(char*)ident);
-
-    if( upgrade ) {
+    if( (upgrade=(Upgrade**)hash_find(UpgradeHash,(char*)ident)) ) {
 	return *upgrade;
     }
 
@@ -409,9 +431,9 @@ global Upgrade* UpgradeByIdent(const char* ident)
 */
 global void InitUpgrades(void)
 {
+#ifndef USE_CCL
     int z;
 
-    DebugLevel3Fn(" ---------------------------------------\n");
     if( !UpgradesCount ) {
 	InitIcons();			// wired, but I need them here
 
@@ -439,6 +461,7 @@ global void InitUpgrades(void)
     }
 
     SetupAllow();
+#endif
 }
 
 /**
@@ -449,6 +472,7 @@ global void InitUpgrades(void)
 */
 global void ParsePudALOW(const char* alow,int length)
 {
+    // FIXME: must loaded from config files
     // units allow bits -> internal names.
     static char* units[] = {
 	"unit-footman",		"unit-grunt",
@@ -718,7 +742,6 @@ global void ParsePudALOW(const char* alow,int length)
 global void ParsePudUGRD(const char* ugrd,int length)
 {
     int i;
-    int j;
     int time;
     int gold;
     int lumber;
@@ -726,6 +749,7 @@ global void ParsePudUGRD(const char* ugrd,int length)
     int icon;
     int group;
     int flags;
+    int costs[MaxCosts];
 
     DebugLevel3Fn(" Length %d\n",length);
     DebugCheck( length!=780 );
@@ -743,17 +767,28 @@ global void ParsePudUGRD(const char* ugrd,int length)
 		,UpgradeWcNames[i]
 		,time,gold,lumber,oil
 		,icon,group,flags);
+#ifdef USE_CCL
+	memset(costs,0,sizeof(costs));
+	costs[TimeCost]=time;
+	costs[GoldCost]=gold;
+	costs[WoodCost]=lumber;
+	costs[OilCost]=oil;
+	AddUpgrade(UpgradeWcNames[i],IdentOfIcon(icon),costs);
+#else
 	if( UpgradesCount ) {
-	    printf("// FIXME: no bock to write this better\n");
+	    DebugLevel0Fn("// FIXME: no bock to write this better\n");
 	}
+
 	WcUpgrades[i].Costs[TimeCost]=time;
 	WcUpgrades[i].Costs[GoldCost]=gold;
 	WcUpgrades[i].Costs[WoodCost]=lumber;
 	WcUpgrades[i].Costs[OilCost]=oil;
+	{ int j;
 	for( j=OilCost+1; j<MaxCosts; ++j ) {
 	    WcUpgrades[i].Costs[j]=0;
-	}
+	}}
 	WcUpgrades[i].Icon=IdentOfIcon(icon);
+#endif
 
 	// group+flags are to mystic to be implemented
     }
@@ -771,93 +806,104 @@ global void SaveUpgrades(FILE* file)
     int p;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: upgrades $Id$\n");
-
-    //
-    //	Save all upgrade modifiers.
-    //
-    for( i=0; i<UpgradeModifiersCount; ++i ) {
-	fprintf(file,"(define-modifier \"%s\"\n",
-		Upgrades[UpgradeModifiers[i]->uid].Ident);
-
-	if( UpgradeModifiers[i]->mods.AttackRange ) {
-	    fprintf(file,"  '('attack-range %d)\n"
-		    ,UpgradeModifiers[i]->mods.AttackRange );
-	}
-	if( UpgradeModifiers[i]->mods.SightRange ) {
-	    fprintf(file,"  '('sight-range %d)\n"
-		    ,UpgradeModifiers[i]->mods.SightRange );
-	}
-	if( UpgradeModifiers[i]->mods.SightRange ) {
-	    fprintf(file,"  '('attack-range %d)\n"
-		    ,UpgradeModifiers[i]->mods.SightRange );
-	}
-	if( UpgradeModifiers[i]->mods.BasicDamage ) {
-	    fprintf(file,"  '('basic-damage %d)\n"
-		    ,UpgradeModifiers[i]->mods.BasicDamage );
-	}
-	if( UpgradeModifiers[i]->mods.PiercingDamage ) {
-	    fprintf(file,"  '('piercing-damage %d)\n"
-		    ,UpgradeModifiers[i]->mods.PiercingDamage );
-	}
-	if( UpgradeModifiers[i]->mods.Armor ) {
-	    fprintf(file,"  '('armor %d)\n"
-		    ,UpgradeModifiers[i]->mods.Armor );
-	}
-	if( UpgradeModifiers[i]->mods.Speed ) {
-	    fprintf(file,"  '('speed %d)\n"
-		    ,UpgradeModifiers[i]->mods.Speed );
-	}
-	if( UpgradeModifiers[i]->mods.HitPoints ) {
-	    fprintf(file,"  '('hit-points %d)\n"
-		    ,UpgradeModifiers[i]->mods.HitPoints );
-	}
-
-	for( j=0; j<MaxCosts; ++j ) {
-	    if( UpgradeModifiers[i]->mods.Costs[j] ) {
-		fprintf(file,"  '('%s-cost %d)\n"
-			,DEFAULT_NAMES[j],UpgradeModifiers[i]->mods.Costs[j]);
-	    }
-	}
-
-
-	fprintf(file,"  )\n");
-    }
-
-#if 0
-  // allow/forbid bitmaps -- used as chars for example:
-  // `?' -- leave as is, `F' -- forbid, `A' -- allow
-  char af_units[MAXUNITTYPES];   // allow/forbid units
-  char af_actions[MAXACTIONS]; // allow/forbid actions
-  char af_upgrades[MAXUPGRADES]; // allow/forbid upgrades
-  char apply_to[MAXUNITTYPES]; // which unit types are affected
-#endif
+    fprintf(file,";;; MODULE: upgrades $Id$\n\n");
 
     //
     //	Save all upgrades
     //
     for( i=0; i<UpgradesCount; ++i ) {
-	fprintf(file,"(define-upgrade \"%s\" \"%s\"\n"
+	fprintf(file,"(define-upgrade '%s 'icon '%s\n"
 		,Upgrades[i].Ident,IdentOfIcon(Upgrades[i].Icon));
-	fprintf(file,"  #(");
+	fprintf(file,"  'costs #(");
 	for( j=0; j<MaxCosts; ++j ) {
 	    fprintf(file," %5d",Upgrades[i].Costs[j]);
 	}
 
 	fprintf(file,"))\n");
     }
-
     fprintf(file,"\n");
 
-    // Save the allow
-    fprintf(file,"(define-allow\n");
-    for( i=0; i<sizeof(UnitTypes)/sizeof(*UnitTypes); ++i ) {
-	fprintf(file,"  \"%s\"\t",UnitTypes[i].Ident);
-	if( strlen(UnitTypes[i].Ident)<12 ) {
+    //
+    //	Save all upgrade modifiers.
+    //
+    for( i=0; i<UpgradeModifiersCount; ++i ) {
+	fprintf(file,"(define-modifier '%s",
+		Upgrades[UpgradeModifiers[i]->uid].Ident);
+
+	if( UpgradeModifiers[i]->mods.AttackRange ) {
+	    fprintf(file,"\n  '(attack-range %d)"
+		    ,UpgradeModifiers[i]->mods.AttackRange );
+	}
+	if( UpgradeModifiers[i]->mods.SightRange ) {
+	    fprintf(file,"\n  '(sight-range %d)"
+		    ,UpgradeModifiers[i]->mods.SightRange );
+	}
+	if( UpgradeModifiers[i]->mods.SightRange ) {
+	    fprintf(file,"\n  '(attack-range %d)"
+		    ,UpgradeModifiers[i]->mods.SightRange );
+	}
+	if( UpgradeModifiers[i]->mods.BasicDamage ) {
+	    fprintf(file,"\n  '(basic-damage %d)"
+		    ,UpgradeModifiers[i]->mods.BasicDamage );
+	}
+	if( UpgradeModifiers[i]->mods.PiercingDamage ) {
+	    fprintf(file,"\n  '(piercing-damage %d)"
+		    ,UpgradeModifiers[i]->mods.PiercingDamage );
+	}
+	if( UpgradeModifiers[i]->mods.Armor ) {
+	    fprintf(file,"\n  '(armor %d)"
+		    ,UpgradeModifiers[i]->mods.Armor );
+	}
+	if( UpgradeModifiers[i]->mods.Speed ) {
+	    fprintf(file,"\n  '(speed %d)"
+		    ,UpgradeModifiers[i]->mods.Speed );
+	}
+	if( UpgradeModifiers[i]->mods.HitPoints ) {
+	    fprintf(file,"\n  '(hit-points %d)"
+		    ,UpgradeModifiers[i]->mods.HitPoints );
+	}
+
+	for( j=0; j<MaxCosts; ++j ) {
+	    if( UpgradeModifiers[i]->mods.Costs[j] ) {
+		fprintf(file,"\n  '(%s-cost %d)"
+			,DEFAULT_NAMES[j],UpgradeModifiers[i]->mods.Costs[j]);
+	    }
+	}
+
+	for( j=0; j<MAXUNITTYPES; ++j ) {	// allow/forbid units
+	    if( UpgradeModifiers[i]->af_units[j]!='?' ) {
+		fprintf(file,"\n  '(allow %s %d)",
+			UnitTypes[j].Ident,
+			UpgradeModifiers[i]->af_units[j]);
+	    }
+	}
+
+	for( j=0; j<MAXUPGRADES; ++j ) {	// allow/forbid upgrades
+	    if( UpgradeModifiers[i]->af_upgrades[j]!='?' ) {
+		fprintf(file,"\n  '(allow %s %c)",Upgrades[j].Ident,
+			UpgradeModifiers[i]->af_upgrades[j]);
+	    }
+	}
+
+	for( j=0; j<MAXUNITTYPES; ++j ) {	// apply to units
+	    if( UpgradeModifiers[i]->apply_to[j]!='?' ) {
+		fprintf(file,"\n  '(apply-to %s)",UnitTypes[j].Ident);
+	    }
+	}
+
+	fprintf(file,")\n\n");
+    }
+
+    //
+    //	Save the allow
+    //
+    for( i=0; UnitTypes[i].OType; ++i ) {
+	fprintf(file,"(define-allow '%s\t",UnitTypes[i].Ident);
+	if( strlen(UnitTypes[i].Ident)<9 ) {
 	    fprintf(file,"\t\t\t\"");
-	} else if( strlen(UnitTypes[i].Ident)<20 ) {
+	} else if( strlen(UnitTypes[i].Ident)<17 ) {
 	    fprintf(file,"\t\t\"");
-	} else if( strlen(UnitTypes[i].Ident)<28 ) {
+	} else if( strlen(UnitTypes[i].Ident)<25 ) {
 	    fprintf(file,"\t\"");
 	} else {
 	    fprintf(file,"\"");
@@ -865,31 +911,20 @@ global void SaveUpgrades(FILE* file)
 	for( p=0; p<PlayerMax; ++p ) {
 	    fprintf(file,"%c",Players[p].Allow.Units[i]);
 	}
-	fprintf(file,"\"\n");
+	fprintf(file,"\")\n");
     }
-
     fprintf(file,"\n");
 
-#if 0
-    // Save the actions
-    for( i=0; i<20; ++i ) {
-	for( p=0; p<PlayerMax; ++p ) {
-	    fprintf(file,"(allow-action %d \"%s\" \"%c\")\n"
-		    ,p,UnitTypes[i].Ident,Players[p].Allow.Actions[i]);
-	}
-    }
-
-    fprintf(file,"\n");
-#endif
-
-    // Save the upgrades
+    //
+    //	Save the upgrades
+    //
     for( i=0; i<UpgradesCount; ++i ) {
-	fprintf(file,"  \"%s\"\t",Upgrades[i].Ident);
-	if( strlen(Upgrades[i].Ident)<12 ) {
+	fprintf(file,"(define-allow '%s\t",Upgrades[i].Ident);
+	if( strlen(Upgrades[i].Ident)<9 ) {
 	    fprintf(file,"\t\t\t\"");
-	} else if( strlen(Upgrades[i].Ident)<20 ) {
+	} else if( strlen(Upgrades[i].Ident)<17 ) {
 	    fprintf(file,"\t\t\"");
-	} else if( strlen(Upgrades[i].Ident)<28 ) {
+	} else if( strlen(Upgrades[i].Ident)<25 ) {
 	    fprintf(file,"\t\"");
 	} else {
 	    fprintf(file,"\"");
@@ -897,16 +932,16 @@ global void SaveUpgrades(FILE* file)
 	for( p=0; p<PlayerMax; ++p ) {
 	    fprintf(file,"%c",Players[p].Allow.Upgrades[i]);
 	}
-	fprintf(file,"\"\n");
+	fprintf(file,"\"");
+	fprintf(file,")\n");
     }
-    fprintf(file,")\n");
 }
 
 /*----------------------------------------------------------------------------
 --	Ccl part of upgrades
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_CCL)
+#ifdef USE_CCL
 
 #include "ccl.h"
 
@@ -915,41 +950,174 @@ global void SaveUpgrades(FILE* file)
 */
 local SCM CclDefineModifier(SCM list)
 {
+    SCM temp;
     SCM value;
-    const char* str;
+    int uid;
+    char* str;
+    int attack_range;
+    int sight_range;
+    int basic_damage;
+    int piercing_damage;
+    int armor;
+    int speed;
+    int hit_points;
+    int costs[MaxCosts];
+    char units[MAXUNITTYPES];
+    char upgrades[MAXUPGRADES];
+    char apply_to[MAXUNITTYPES];
+
+    attack_range=0;
+    sight_range=0;
+    basic_damage=0;
+    piercing_damage=0;
+    armor=0;
+    speed=0;
+    hit_points=0;
+    memset(costs,0,sizeof(costs));
+    memset(units,'?',sizeof(units));
+    memset(upgrades,'?',sizeof(upgrades));
+    memset(apply_to,'?',sizeof(apply_to));
 
     value=gh_car(list);
     list=gh_cdr(list);
 
     str=gh_scm2newstr(value,NULL);
     DebugLevel2Fn(" %s\n",str);
+    uid=UpgradeIdByIdent(str);
+    free(str);
 
-    //CclFree(type->Name);
-    //type->Name=str;
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( !gh_list_p(value) ) {
+	    errl("wrong tag",value);
+	    return SCM_UNSPECIFIED;
+	}
+	temp=gh_car(value);
+	if( gh_eq_p(temp,gh_symbol2scm("attack-range")) ) {
+	    attack_range=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("sight-range")) ) {
+	    sight_range=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("attack-range")) ) {
+	    attack_range=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("basic-damage")) ) {
+	    basic_damage=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("piercing-damage")) ) {
+	    piercing_damage=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("armor")) ) {
+	    armor=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("speed")) ) {
+	    speed=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("hit-points")) ) {
+	    hit_points=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("time-cost")) ) {
+	    costs[0]=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("gold-cost")) ) {
+	    costs[1]=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("wood-cost")) ) {
+	    costs[2]=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("oil-cost")) ) {
+	    costs[3]=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("ore-cost")) ) {
+	    costs[4]=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("stone-cost")) ) {
+	    costs[5]=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("coal-cost")) ) {
+	    costs[6]=gh_scm2int(gh_cadr(value));
+	} else if( gh_eq_p(temp,gh_symbol2scm("allow")) ) {
+	    value=gh_cdr(value);
+	    str=gh_scm2newstr(gh_car(value),NULL);
+	    value=gh_cdr(value);
+	    DebugLevel0Fn("%s\n",str);
+	    if( !strncmp(str,"upgrade-",8) ) {
+		upgrades[UpgradeIdByIdent(str)]=gh_scm2int(gh_car(value));
+	    } else if( !strncmp(str,"unit-",5) ) {
+		units[UnitTypeIdByIdent(str)]=gh_scm2int(gh_car(value));
+	    } else {
+		free(str);
+		errl("upgrade or unit expected",NIL);
+	    }
+	    free(str);
+	} else if( gh_eq_p(temp,gh_symbol2scm("apply-to")) ) {
+	    value=gh_cdr(value);
+	    str=gh_scm2newstr(gh_car(value),NULL);
+	    apply_to[UnitTypeIdByIdent(str)]='X';
+	    free(str);
+	} else {
+	    errl("wrong tag",temp);
+	    return SCM_UNSPECIFIED;
+	}
+    }
 
-    DebugLevel0Fn(" not written\n");
+    AddUpgradeModifierBase(uid,attack_range,sight_range,
+	    basic_damage,piercing_damage,armor,speed,hit_points,costs,
+	    units,NULL,upgrades,apply_to);
 
     return SCM_UNSPECIFIED;
 }
 
 /**
 **	Define a new upgrade.
+**
+**	@param list	List defining the upgrade.
 */
 local SCM CclDefineUpgrade(SCM list)
 {
     SCM value;
-    const char* str;
+    char* str;
+    char* icon;
+    char* ident;
+    int costs[MaxCosts];
+    int n;
+    int j;
 
-    value=gh_car(list);
+    InitIcons();
+
+    //	Identifier
+
+    ident=gh_scm2newstr(gh_car(list),NULL);
     list=gh_cdr(list);
 
-    str=gh_scm2newstr(value,NULL);
-    DebugLevel2Fn(" %s\n",str);
+    icon=NULL;
+    memset(costs,0,sizeof(costs));
 
-    //CclFree(type->Name);
-    //type->Name=str;
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("icon")) ) {
+	    //	Icon
 
-    DebugLevel0Fn(" not written\n");
+	    free(icon);
+	    icon=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("costs")) ) {
+	    //	Costs
+
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    n=gh_vector_length(value);
+	    if( n<4 || n>MaxCosts ) {
+		fprintf(stderr,"%s: Wrong vector length\n",ident);
+		if( n>MaxCosts ) {
+		    n=MaxCosts;
+		}
+	    }
+	    for( j=0; j<n; ++j ) {
+		costs[j]=gh_scm2int(gh_vector_ref(value,gh_int2scm(j)));
+	    }
+	    while( j<MaxCosts ) {
+		costs[j++]=0;
+	    }
+	} else {
+	    str=gh_scm2newstr(value,NULL);
+	    fprintf(stderr,"%s: Wrong tag `%s'\n",ident,str);
+	    free(str);
+	}
+    }
+
+    AddUpgrade(ident,icon,costs);
+    free(ident);
+    free(icon);
 
     return SCM_UNSPECIFIED;
 }
@@ -973,10 +1141,9 @@ local SCM CclDefineAllow(SCM list)
 	list=gh_cdr(list);
 	ids=gh_scm2newstr(value,NULL);
 
-	DebugLevel3Fn(" %s - %s\n",str,ids);
-
 	n=strlen(ids);
 	if( n>16 ) {
+	    fprintf(stderr,"%s: Allow string too long %d\n",str,n);
 	    n=16;
 	}
 
@@ -1089,9 +1256,50 @@ void UpgradesDone(void) // free upgrade/allow structures
 }
 #endif
 
+// returns upgrade modifier id or -1 for error ( actually this id is useless, just error checking )
+local int AddUpgradeModifierBase(int aUid,int aattack_range,int asight_range,
+    int abasic_damage,int apiercing_damage,int aarmor,int aspeed,
+    int ahit_points,int* acosts,const char* aaf_units,const char* aaf_actions,
+    const char* aaf_upgrades,const char* aapply_to)
+{
+    int i;
+    UpgradeModifier *um;
+
+    um=(UpgradeModifier*)malloc(sizeof(UpgradeModifier));
+    if( !um ) {
+	return -1;
+    }
+
+    um->uid = aUid;
+
+    // get/save stats modifiers
+    um->mods.AttackRange	= aattack_range;
+    um->mods.SightRange		= asight_range;
+    um->mods.BasicDamage	= abasic_damage;
+    um->mods.PiercingDamage	= apiercing_damage;
+    um->mods.Armor		= aarmor;
+    um->mods.Speed		= aspeed;
+    um->mods.HitPoints		= ahit_points;
+
+    for( i=0; i<MaxCosts; ++i ) {
+	um->mods.Costs[i]	= acosts[i];
+    }
+
+    memcpy(um->af_units,aaf_units,sizeof(um->af_units));
+#if 0
+    memcpy(um->af_actions,aaf_actions,sizeof(um->af_actions));
+#endif
+    memcpy(um->af_upgrades,aaf_upgrades,sizeof(um->af_upgrades));
+    memcpy(um->apply_to,aapply_to,sizeof(um->apply_to));
+
+    UpgradeModifiers[UpgradeModifiersCount] = um;
+
+    return UpgradeModifiersCount++;
+}
+
 
 // returns upgrade modifier id or -1 for error ( actually this id is useless, just error checking )
-global int AddUpgradeModifier( int aUid,
+local int AddUpgradeModifier( int aUid,
     int aattack_range,
     int asight_range,
     int abasic_damage,
@@ -1141,7 +1349,9 @@ global int AddUpgradeModifier( int aUid,
     // FIXME: perhaps the function `strtok()' should be replaced with local one?
 
     memset( um->af_units,    '?', sizeof(um->af_units)    );
+#if 0
     memset( um->af_actions,  '?', sizeof(um->af_actions)  );
+#endif
     memset( um->af_upgrades, '?', sizeof(um->af_upgrades) );
     memset( um->apply_to,    '?', sizeof(um->apply_to)    );
 
@@ -1165,6 +1375,7 @@ global int AddUpgradeModifier( int aUid,
     //
     // get allow/forbid's for actions
     //
+#if 0
     s1 = strdup( aaf_actions );
     DebugCheck(!s1);
     for( s2 = strtok( s1, "," ); s2; s2=strtok( NULL, "," ) ) {
@@ -1178,6 +1389,7 @@ global int AddUpgradeModifier( int aUid,
 	um->af_actions[id] = s2[0];
     }
     free(s1);
+#endif
 
     //
     // get allow/forbid's for upgrades
@@ -1309,7 +1521,7 @@ global int ActionIdByIdent( const char* sid )
 // amount==-1 to cancel upgrade, could happen when building destroyed during upgrade
 // using this we could have one upgrade research in two buildings, so we can have
 // this upgrade faster.
-void UpgradeIncTime( Player* player, int id, int amount )
+global void UpgradeIncTime( Player* player, int id, int amount )
 {
     player->UTimers.upgrades[id] += amount;
     if ( player->UTimers.upgrades[id] >= Upgrades[id].Costs[TimeCost] )
@@ -1321,7 +1533,7 @@ void UpgradeIncTime( Player* player, int id, int amount )
 
 // this function will mark upgrade done and do all required modifications to
 // unit types and will modify allow/forbid maps
-void ApplyUpgradeModifier( Player* player, UpgradeModifier* um )
+global void ApplyUpgradeModifier( Player* player, UpgradeModifier* um )
 {
     int z;
     int j;
@@ -1333,9 +1545,11 @@ void ApplyUpgradeModifier( Player* player, UpgradeModifier* um )
 	if ( um->af_units[z] == 'A' ) player->Allow.Units[z] = 'A';
 	if ( um->af_units[z] == 'F' ) player->Allow.Units[z] = 'F';
 
+#if 0
 	// allow/forbid actions for player
 	if ( um->af_actions[z] == 'A' ) player->Allow.Actions[z] = 'A';
 	if ( um->af_actions[z] == 'F' ) player->Allow.Actions[z] = 'F';
+#endif
 
 	// allow/forbid upgrades for player
 	if ( player->Allow.Upgrades[z] != 'R' )
@@ -1399,7 +1613,7 @@ global void UpgradeAcquire( Player* player, Upgrade* upgrade )
 // perhaps acquired upgrade can be lost if ( for example ) a building is lost
 // ( lumber mill? stronghold? )
 // this function will apply all modifiers in reverse way
-void UpgradeLost( Player* player, int id )
+global void UpgradeLost( Player* player, int id )
 {
   return; //FIXME: remove this if implemented below
 
@@ -1417,25 +1631,27 @@ void UpgradeLost( Player* player, int id )
 /**
 **	FIXME: docu
 */
-void AllowUnitId( Player* player, int id, char af ) // id -- unit type id, af -- `A'llow/`F'orbid
+global void AllowUnitId( Player* player, int id, char af ) // id -- unit type id, af -- `A'llow/`F'orbid
 {
   DebugCheck(!( af == 'A' || af == 'F' ));
   player->Allow.Units[id] = af;
 }
 
+#if 0
 /**
 **	FIXME: docu
 */
-void AllowActionId( Player* player,  int id, char af )
+global void AllowActionId( Player* player,  int id, char af )
 {
   DebugCheck(!( af == 'A' || af == 'F' ));
   player->Allow.Actions[id] = af;
 }
+#endif
 
 /**
 **	FIXME: docu
 */
-void AllowUpgradeId( Player* player,  int id, char af )
+global void AllowUpgradeId( Player* player,  int id, char af )
 {
   DebugCheck(!( af == 'A' || af == 'F' || af == 'R' ));
   player->Allow.Upgrades[id] = af;
@@ -1444,20 +1660,22 @@ void AllowUpgradeId( Player* player,  int id, char af )
 /**
 **	FIXME: docu
 */
-char UnitIdAllowed(const Player* player,  int id )
+global char UnitIdAllowed(const Player* player,  int id )
 {
   if ( id < 0 || id >= MAXUACOUNT ) return 'F';
   return player->Allow.Units[id];
 }
 
+#if 0
 /**
 **	FIXME: docu
 */
-char ActionIdAllowed(const Player* player,  int id )
+global char ActionIdAllowed(const Player* player,  int id )
 {
   if ( id < 0 || id >= MAXUACOUNT ) return 'F';
   return player->Allow.Actions[id];
 }
+#endif
 
 /**
 **	FIXME: docu
@@ -1474,34 +1692,36 @@ global char UpgradeIdAllowed(const Player* player,  int id )
 /**
 **	FIXME: docu
 */
-void UpgradeIncTime2( Player* player, char* sid, int amount ) // by ident string
+global void UpgradeIncTime2( Player* player, char* sid, int amount ) // by ident string
   { UpgradeIncTime( player, UpgradeIdByIdent(sid), amount ); }
 /**
 **	FIXME: docu
 */
-void UpgradeLost2( Player* player, char* sid ) // by ident string
+global void UpgradeLost2( Player* player, char* sid ) // by ident string
   { UpgradeLost( player, UpgradeIdByIdent(sid) ); }
 
 /**
 **	FIXME: docu
 */
-void AllowUnitByIdent( Player* player,  const char* sid, char af )
+global void AllowUnitByIdent( Player* player,  const char* sid, char af )
      { AllowUnitId( player,  UnitTypeIdByIdent(sid), af ); };
+#if 0
 /**
 **	FIXME: docu
 */
-void AllowActionByIdent( Player* player,  const char* sid, char af )
+global void AllowActionByIdent( Player* player,  const char* sid, char af )
      { AllowActionId( player,  ActionIdByIdent(sid), af ); };
+#endif
 /**
 **	FIXME: docu
 */
-void AllowUpgradeByIdent( Player* player,  const char* sid, char af )
+global void AllowUpgradeByIdent( Player* player,  const char* sid, char af )
      { AllowUpgradeId( player,  UpgradeIdByIdent(sid), af ); };
 
 /**
 **	FIXME: docu
 */
-void AllowByIdent(Player* player,  const char* sid, char af )
+global void AllowByIdent(Player* player,  const char* sid, char af )
 {
     if( !strncmp(sid,"unit-",5) ) {
 	AllowUnitByIdent(player,sid,af);
@@ -1515,23 +1735,25 @@ void AllowByIdent(Player* player,  const char* sid, char af )
 /**
 **	FIXME: docu
 */
-char UnitIdentAllowed(const Player* player,const char* sid )
+global char UnitIdentAllowed(const Player* player,const char* sid )
 {
     return UnitIdAllowed( player,  UnitTypeIdByIdent(sid) );
 }
 
+#if 0
 /**
 **	FIXME: docu
 */
-char ActionIdentAllowed(const Player* player,const char* sid )
+global char ActionIdentAllowed(const Player* player,const char* sid )
 {
     return ActionIdAllowed( player,  ActionIdByIdent(sid) );
 }
+#endif
 
 /**
 **	FIXME: docu
 */
-char UpgradeIdentAllowed(const Player* player,const char* sid )
+global char UpgradeIdentAllowed(const Player* player,const char* sid )
 {
     return UpgradeIdAllowed( player,  UpgradeIdByIdent(sid) );
 }

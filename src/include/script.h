@@ -41,8 +41,12 @@
 #define gh_list_p(lisp)		CONSP(lisp)
 #define gh_car(lisp)		car(lisp)
 #define gh_cdr(lisp)		cdr(lisp)
+#define gh_caar(lisp)		caar(lisp)
+#define gh_cadr(lisp)		cadr(lisp)
+#define gh_cddr(lisp)		cddr(lisp)
 #define gh_length(lisp)		nlength(lisp)
 
+#define gh_exact_p(lisp)	TYPEP(lisp,tc_flonum)
 #define gh_scm2int(lisp)	(long)FLONM(lisp)
 #define gh_int2scm(num)		flocons(num)
 
