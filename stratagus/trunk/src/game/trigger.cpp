@@ -1049,9 +1049,9 @@ global void SaveTriggers(FILE* file)
 	if( gh_eq_p(Trigger,list) ) {
 	    trigger=i;
 	}
-	fprintf(file,"(add-trigger ");
+	fprintf(file,"(add-trigger '");
 	PrintTrigger(gh_car(gh_car(list)),file);
-	fprintf(file," ");
+	fprintf(file," '");
 	PrintTrigger(gh_cdr(gh_car(list)),file);
 	fprintf(file,")\n");
 	list=gh_cdr(list);
