@@ -388,7 +388,7 @@ extern VMemType* VideoMemory;
     **	Architecture-dependant system palette. Applies as conversion between
     **	GlobalPalette colors and their representation in videomemory.
     **	Set by VideoCreatePalette or VideoSetPalette.
-    **	@see VideoCreatePalette @VideoSetPalette
+    **	@see VideoCreatePalette VideoSetPalette
     */
 extern VMemType* Pixels;
 

@@ -51,80 +51,117 @@
 **
 **	Tileset::Ident
 **
-**		FIXME: continue docu.
+**		Unique identifier (FE.: tileset-summer, tileset-winter) for the
+**		tileset. Used by the map to define which tileset should be used.
+**		Like always the identifier should only be used during
+**		configuration and not during runtime!
+**		@see WorldMap, WorldMap::TerrainName.
 **
 **	Tileset::Class
 **
-**		FIXME: continue docu.
+**		Identifier for the tileset class. All exchangable tilesets
+**		should have the same class. Can be used by the level editor.
 **
 **	Tileset::Name
 **
-**		FIXME: continue docu.
+**		Long name of the tileset. Can be used by the level editor.
 **
 **	Tileset::File
 **
-**		FIXME: continue docu.
+**		Name of the graphic file, containing all tiles. Following
+**		widths are supported:
+**			@li 512 pixel: 16 tiles pro row 
+**			@li 527 pixel: 16 tiles pro row with 1 pixel gap
+**			@li 626 pixel: 19 tiles pro row with 1 pixel gap
 **
 **	Tileset::PaletteFile
 **
-**		FIXME: continue docu.
+**		Name of the palette file, containing the RGB colors to use
+**		as global sytem palette.
+**		@see GlobalPalette, VideoSetPalette.
 **
 **	Tileset::Table
 **
-**		FIXME: continue docu.
+**		Table to map the abstract level (PUD) tile numbers, to tile
+**		numbers in the graphic file (Tileset::File).
 **
 **	Tileset::TileTypeTable
 **
-**		FIXME: continue docu.
+**		Lookup table of the tile type. Maps the graphic file tile
+**		number back to a tile type (::TileTypeWood, ::TileTypeWater,
+**		...)
+**
+**		@note The creation of this table is currently hardcoded in
+**		the engine. It should be calculated from the flags in the
+**		tileset configuration (CCL). And it is created for the map
+**		and not for the tileset.
+**
+**		@note I'm not sure if this table is needed in the future.
+**
+**		@see TileType.
 **
 **	Tileset::AnimationTable
 **
-**		FIXME: continue docu.
+**		Contains the animation of tiles.
+**
+**		@note This is currently not used.
 **
 **	Tileset::ExtraTrees[6]
 **
-**		FIXME: continue docu.
+**		This are six extra tile numbers, which are needed for lumber
+**		chopping.
 **
 **	Tileset::TopOneTree
 **
-**		FIXME: continue docu.
+**		The tile number of tile only containing the top part of a tree.
+**		Is created on the map by lumber chopping.
 **
 **	Tileset::MidOneTree
 **
-**		FIXME: continue docu.
+**		The tile number of tile only containing the connection of
+**		the top part to the bottom part of tree.
+**		Is created on the map by lumber chopping.
 **
 **	Tileset::BotOneTree
 **
-**		FIXME: continue docu.
+**		The tile number of tile only containing the bottom part of a
+**		tree. Is created on the map by lumber chopping.
 **
 **	Tileset::RemovedTree
 **
-**		FIXME: continue docu.
+**		The tile number of the tile placed where trees are removed.
+**		Is created on the map by lumber chopping.
 **
 **	Tileset::GrowingTree[2]
 **
-**		FIXME: continue docu.
+**		Contains the tile numbers of a growing tree from small to big.
+**		@note Not yet used.
 **
 **	Tileset::ExtraRocks[6]
 **
-**		FIXME: continue docu.
+**		This are six extra tile numbers, which are needed if rocks are
+**		destroyed.
 **
 **	Tileset::TopOneRock
 **
-**		FIXME: continue docu.
+**		The tile number of tile only containing the top part of a rock.
+**		Is created on the map by destroying rocks.
 **
 **	Tileset::MidOneRock
 **
-**		FIXME: continue docu.
+**		The tile number of tile only containing the connection of
+**		the top part to the bottom part of a rock.
+**		Is created on the map by destroying rocks.
 **
 **	Tileset::BotOneRock
 **
-**		FIXME: continue docu.
+**		The tile number of tile only containing the bottom part of a
+**		rock.  Is created on the map by destroying rocks.
 **
 **	Tileset::RemovedRock
 **
-**		FIXME: continue docu.
-**
+**		The tile number of the tile placed where rocks are removed.
+**		Is created on the map by destroying rocks.
 */
 
 /*----------------------------------------------------------------------------
@@ -142,48 +179,48 @@
 **	mainly used for the FOW implementation of the seen woods/rocks
 **
 **	@todo FIXME: I think this can be removed, we can use the flags?
-**	I'm not sure, we have seen and real time to considere.
+**	I'm not sure, if we have seen and real time to considere.
 */
 typedef enum _tile_type_ {
-    TileTypeUnknown,			/// unknown tile type
+    TileTypeUnknown,			/// Unknown tile type
     TileTypeNoWood,			/// UNUSED: no wood tile
-    TileTypeWood,			/// any wood tile
-    TileTypeGrass,			/// any grass tile
+    TileTypeWood,			/// Any wood tile
+    TileTypeGrass,			/// Any grass tile
     TileTypeNoRock,			/// UNUSED: no rock tile
-    TileTypeRock,			/// any rock tile
-    TileTypeCoast,			/// any coast tile
-    TileTypeHumanWall,			/// any human wall tile
-    TileTypeOrcWall,			/// any orc wall tile
+    TileTypeRock,			/// Any rock tile
+    TileTypeCoast,			/// Any coast tile
+    TileTypeHumanWall,			/// Any human wall tile
+    TileTypeOrcWall,			/// Any orc wall tile
     TileTypeNoWall,			/// UNUSED: no wall tile
-    TileTypeWater,			/// any water tile
+    TileTypeWater,			/// Any water tile
 } TileType;
 
     ///	Tileset definition
 typedef struct _tileset_ {
-    char*	Ident;			/// tileset identifier
-    char*	Class;			/// class for future extensions
-    char*	Name;			/// nice name to display
-    char*	File;			/// file containing image data
-    char*	PaletteFile;		/// file containing the global palette
+    char*	Ident;			/// Tileset identifier
+    char*	Class;			/// Class for future extensions
+    char*	Name;			/// Nice name to display
+    char*	File;			/// File containing image data
+    char*	PaletteFile;		/// File containing the global palette
 
-    unsigned short*	Table;		/// pud to internal conversion table
+    unsigned short*	Table;		/// Pud to internal conversion table
     // FIXME: currently unsupported
-    unsigned char*	TileTypeTable;	/// for fast lookup of tile type
+    unsigned char*	TileTypeTable;	/// For fast lookup of tile type
     // FIXME: currently unsupported
-    unsigned short*	AnimationTable;	/// Tile Animation sequences
+    unsigned short*	AnimationTable;	/// Tile animation sequences
 
-    unsigned	ExtraTrees[6];		/// extra tree tiles for removing
-    unsigned	TopOneTree;		/// tile for one tree top
-    unsigned	MidOneTree;		/// tile for one tree middle
-    unsigned	BotOneTree;		/// tile for one tree bottom
-    unsigned	RemovedTree;		/// tile placed where trees are gone
+    unsigned	ExtraTrees[6];		/// Extra tree tiles for removing
+    unsigned	TopOneTree;		/// Tile for one tree top
+    unsigned	MidOneTree;		/// Tile for one tree middle
+    unsigned	BotOneTree;		/// Tile for one tree bottom
+    unsigned	RemovedTree;		/// Tile placed where trees are gone
     unsigned	GrowingTree[2];		/// Growing tree tiles
 
-    unsigned	ExtraRocks[6];		/// extra rock tiles for removing
-    unsigned	TopOneRock;		/// tile for one rock top
-    unsigned	MidOneRock;		/// tile for one rock middle
-    unsigned	BotOneRock;		/// tile for one rock bottom
-    unsigned	RemovedRock;		/// tile placed where rocks are gone
+    unsigned	ExtraRocks[6];		/// Extra rock tiles for removing
+    unsigned	TopOneRock;		/// Tile for one rock top
+    unsigned	MidOneRock;		/// Tile for one rock middle
+    unsigned	BotOneRock;		/// Tile for one rock bottom
+    unsigned	RemovedRock;		/// Tile placed where rocks are gone
 } Tileset;
 
 // FIXME: this #define's should be removed
@@ -205,7 +242,7 @@ enum _tileset_nr_ {
 
 extern char** TilesetWcNames;		/// Mapping wc-number 2 symbol
 
-extern int NumTilesets;			/// Number of  of available tilesets
+extern int NumTilesets;			/// Number of available tilesets
 extern Tileset** Tilesets;		/// Tileset information
 
 /*----------------------------------------------------------------------------
