@@ -110,6 +110,41 @@ local hashtable(UnitType*,61) UnitTypeHash;
 
 #endif
 
+/**
+**	Default resources for a new player.
+*/
+global int DefaultResources[MaxCosts];
+
+/**
+**	Default resources for a new player with low resources.
+*/
+global int DefaultResourcesLow[MaxCosts];
+
+/**
+**	Default resources for a new player with mid resources.
+*/
+global int DefaultResourcesMedium[MaxCosts];
+
+/**
+**	Default resources for a new player with high resources.
+*/
+global int DefaultResourcesHigh[MaxCosts];
+
+/**
+**	Default incomes for a new player.
+*/
+global int DefaultIncomes[MaxCosts];
+
+/**
+**	Default action for the resources.
+*/
+global char* DefaultActions[MaxCosts];
+
+/**
+**	Default names for the resources.
+*/
+global char* DefaultResourceNames[MaxCosts];
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -650,7 +685,7 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
 	    } else {
 		fputs(" ",file);
 	    }
-	    fprintf(file,"%s %d",DEFAULT_NAMES[i],type->_Costs[i]);
+	    fprintf(file,"%s %d",DefaultResourceNames[i],type->_Costs[i]);
 	}
     }
     if( flag ) {
@@ -941,7 +976,7 @@ local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
 		fputc(' ',file);
 //	    }
 	}
-	fprintf(file,"%s %d",DEFAULT_NAMES[j],stats->Costs[j]);
+	fprintf(file,"%s %d",DefaultResourceNames[j],stats->Costs[j]);
     }
 
     fprintf(file,") )\n");
@@ -1114,35 +1149,35 @@ global void InitUnitTypes(int reset_player_stats)
 	//
 	if( !strcmp(UnitTypes[type].Ident,"unit-elven-lumber-mill") ) {
 	    UnitTypes[type].ImproveIncomes[WoodCost]=
-		    DEFAULT_INCOMES[WoodCost]+25;
+		    DefaultIncomes[WoodCost]+25;
 	}
 	if( !strcmp(UnitTypes[type].Ident,"unit-troll-lumber-mill") ) {
 	    UnitTypes[type].ImproveIncomes[WoodCost]=
-		    DEFAULT_INCOMES[WoodCost]+25;
+		    DefaultIncomes[WoodCost]+25;
 	}
 	if( !strcmp(UnitTypes[type].Ident,"unit-human-refinery") ) {
 	    UnitTypes[type].ImproveIncomes[OilCost]=
-		    DEFAULT_INCOMES[OilCost]+25;
+		    DefaultIncomes[OilCost]+25;
 	}
 	if( !strcmp(UnitTypes[type].Ident,"unit-orc-refinery") ) {
 	    UnitTypes[type].ImproveIncomes[OilCost]=
-		    DEFAULT_INCOMES[OilCost]+25;
+		    DefaultIncomes[OilCost]+25;
 	}
 	if( !strcmp(UnitTypes[type].Ident,"unit-keep") ) {
 	    UnitTypes[type].ImproveIncomes[GoldCost]=
-		    DEFAULT_INCOMES[GoldCost]+10;
+		    DefaultIncomes[GoldCost]+10;
 	}
 	if( !strcmp(UnitTypes[type].Ident,"unit-stronghold") ) {
 	    UnitTypes[type].ImproveIncomes[GoldCost]=
-		    DEFAULT_INCOMES[GoldCost]+10;
+		    DefaultIncomes[GoldCost]+10;
 	}
 	if( !strcmp(UnitTypes[type].Ident,"unit-castle") ) {
 	    UnitTypes[type].ImproveIncomes[GoldCost]=
-		    DEFAULT_INCOMES[GoldCost]+20;
+		    DefaultIncomes[GoldCost]+20;
 	}
 	if( !strcmp(UnitTypes[type].Ident,"unit-fortress") ) {
 	    UnitTypes[type].ImproveIncomes[GoldCost]=
-		    DEFAULT_INCOMES[GoldCost]+20;
+		    DefaultIncomes[GoldCost]+20;
 	}
     }
 

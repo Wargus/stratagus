@@ -209,7 +209,7 @@ global void SavePlayers(FILE* file)
 		    fputc(' ',file);
 		}
 	    }
-	    fprintf(file,"%s %d",DEFAULT_NAMES[j],Players[i].Resources[j]);
+	    fprintf(file,"%s %d",DefaultResourceNames[j],Players[i].Resources[j]);
 	}
 	// Incomes
 	fprintf(file,")\n  'incomes '(");
@@ -221,7 +221,7 @@ global void SavePlayers(FILE* file)
 		    fputc(' ',file);
 		}
 	    }
-	    fprintf(file,"%s %d",DEFAULT_NAMES[j],Players[i].Incomes[j]);
+	    fprintf(file,"%s %d",DefaultResourceNames[j],Players[i].Incomes[j]);
 	}
 	fprintf(file,";;FIXME: new members must be saved\n");
 
@@ -413,14 +413,14 @@ global void CreatePlayer(int type)
     //	Initial default resources.
     //
     for( i=0; i<MaxCosts; ++i ) {
-	player->Resources[i]=DEFAULT_RESOURCES[i];
+	player->Resources[i]=DefaultResources[i];
     }
 
     //
     //	Initial default incomes.
     //
     for( i=0; i<MaxCosts; ++i ) {
-	player->Incomes[i]=DEFAULT_INCOMES[i];
+	player->Incomes[i]=DefaultIncomes[i];
     }
 
     /*
@@ -598,7 +598,7 @@ global int PlayerCheckCosts(const Player* player,const int* costs)
 	    // FIXME: noticed all or only one?
 	    if( !err ) {
 		sprintf(buf,"Not enough %s...%s more %s."
-			,DEFAULT_NAMES[i],DEFAULT_ACTIONS[i],DEFAULT_NAMES[i]);
+			,DefaultResourceNames[i],DefaultActions[i],DefaultResourceNames[i]);
 		//	FIXME: use the general notify function vor this
 		if( player==ThisPlayer ) {
 		    SetMessage(buf);

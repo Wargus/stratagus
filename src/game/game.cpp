@@ -310,13 +310,13 @@ global void CreateGame(char* filename, WorldMap* map)
 	    for (i = 1; i < MaxCosts; ++i) {
 		switch (GameSettings.Resources) {
 		    case SettingsResourcesLow:
-			Players[j].Resources[i]=DEFAULT_RESOURCES_LOW[i];
+			Players[j].Resources[i]=DefaultResourcesLow[i];
 			break;
 		    case SettingsResourcesMedium:
-			Players[j].Resources[i]=DEFAULT_RESOURCES_MEDIUM[i];
+			Players[j].Resources[i]=DefaultResourcesMedium[i];
 			break;
 		    case SettingsResourcesHigh:
-			Players[j].Resources[i]=DEFAULT_RESOURCES_HIGH[i];
+			Players[j].Resources[i]=DefaultResourcesHigh[i];
 			break;
 		    default:
 			break;
