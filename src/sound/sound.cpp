@@ -63,7 +63,9 @@ global GameSound GameSounds={
     { "building construction"},
     { "basic human voices work complete" },
     { "peasant work complete" },
-    { "basic orc voices work complete" }
+    { "basic orc voices work complete" },
+    { "rescue (human)" },
+    { "rescue (orc)" },
 };
 
 /*----------------------------------------------------------------------------
@@ -276,6 +278,14 @@ global void InitSoundClient(void)
     if( !GameSounds.OrcWorkComplete.Sound ) {
 	GameSounds.OrcWorkComplete.Sound=
 		SoundIdForName(GameSounds.OrcWorkComplete.Name);
+    }
+    if( !GameSounds.HumanRescue.Sound ) {
+	GameSounds.HumanRescue.Sound=
+		SoundIdForName(GameSounds.HumanRescue.Name);
+    }
+    if( !GameSounds.OrcRescue.Sound ) {
+	GameSounds.OrcRescue.Sound=
+		SoundIdForName(GameSounds.OrcRescue.Name);
     }
 }
 
