@@ -886,9 +886,11 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     int connection;
 
     connection=ConnectionNumber(TheDisplay);
+#ifdef WITH_SOUND
     if( SoundFildes==-1 ) {
 	SoundOff=1;
     }
+#endif
 
     InputMouseTimeout(callbacks,X11GetTicks());
 
@@ -1066,9 +1068,11 @@ global void WaitEventsAndKeepSync(void)
     callbacks.SoundReady=WriteSound;
 
     connection=ConnectionNumber(TheDisplay);
+#ifdef WITH_SOUND
     if( SoundFildes==-1 ) {
 	SoundOff=1;
     }
+#endif
 
     InputMouseTimeout(&callbacks,X11GetTicks());
 
