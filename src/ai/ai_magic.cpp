@@ -54,7 +54,7 @@
 **	Check what computer units can do with magic.
 **	In fact, turn on autocast for AI.
 */
-global void AiCheckMagic( void )
+global void AiCheckMagic(void)
 {
     int i, j;
     int n;
@@ -67,22 +67,22 @@ global void AiCheckMagic( void )
 
     n = AiPlayer->Player->TotalNumUnits;
     units = AiPlayer->Player->Units;
-    player = AiPlayer->Player;	/*units[0]->Player */
-    for ( i = 0; i < n; ++i ) {
+    player = AiPlayer->Player;		/*units[0]->Player */
+    for (i = 0; i < n; ++i) {
 	unit = units[i];
-       //  Check only magic units
-	if ( unit->Type->CanCastSpell ) {
-	    for ( j = 0; j < SpellTypeCount; ++j ) {
-	       //  Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-		if ( unit->Type->CanCastSpell[j] && SpellIsAvailable( player, j ) &&
-		     ( SpellTypeById( j )->AutoCast || SpellTypeById( j )->AICast ) ) {
+	//  Check only magic units
+	if (unit->Type->CanCastSpell) {
+	    for (j = 0; j < SpellTypeCount; ++j) {
+		//  Check if we can cast this spell. SpellIsAvailable checks for upgrades.
+		if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
+		    (SpellTypeById(j)->AutoCast || SpellTypeById(j)->AICast)) {
 #ifdef DEBUG
-		    success =	// Follow on next line (AutoCastSpell).
+		    success =		// Follow on next line (AutoCastSpell).
 #endif
-			AutoCastSpell( unit, SpellTypeById( j ) );
-		    DebugLevel3Fn( "Mage '%s' cast '%s' : %s\n" _C_
-				   unit->Type->Ident _C_
-				   SpellTypeById( j )->Ident _C_ success ? "success" : "fail" );
+			AutoCastSpell(unit, SpellTypeById(j));
+		    DebugLevel3Fn("Mage '%s' cast '%s' : %s\n" _C_
+			unit->Type->Ident _C_
+			SpellTypeById(j)->Ident _C_ success ? "success" : "fail");
 		}
 	    }
 	}
