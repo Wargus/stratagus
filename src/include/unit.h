@@ -173,6 +173,9 @@
 **
 **	Unit::HP
 **
+**	Unit::XP
+**
+**	Unit::Kills
 **
 **	Unit::Bloodlust
 **
@@ -445,6 +448,8 @@ struct _unit_ {
 
     unsigned	Mana : 8;		/// mana points
     unsigned	HP;			/// hit points
+    unsigned	XP;			/// experience points
+    unsigned	Kills;			/// how many unit has this unit killed
 
     unsigned	TTL;			/// time to life
     unsigned	Bloodlust;		/// ticks bloodlust
@@ -680,12 +685,12 @@ extern Unit* FindOilPlatform(const Player* player,int x,int y);
     /// FIXME: more docu
 extern Unit* UnitOnScreen(Unit* unit,unsigned x,unsigned y);
 
-    /// FIXME: more docu
-extern void DestroyUnit(Unit* unit);
-    /// FIXME: more docu
+    /// Let an unit die
+extern void LetUnitDie(Unit* unit);
+    /// Destory all units inside another unit
 extern void DestroyAllInside(Unit* source);
     /// Hit unit with damage, if destroyed give attacker the points
-extern void HitUnit(const Unit* attacker,Unit* target,int damage);
+extern void HitUnit(Unit* attacker,Unit* target,int damage);
 
     /// Returns the map distance between two points
 extern int MapDistance(int x1,int y1,int x2,int y2);
