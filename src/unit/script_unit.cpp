@@ -261,7 +261,7 @@ global void CclParseOrder(lua_State* l, Order* order)
 			if (!UnitSlots[slot]) {
 				DebugLevel0Fn("FIXME: Forward reference not supported\n");
 			}
-			++UnitSlots[slot]->Refs;
+			//++UnitSlots[slot]->Refs;
 
 		} else if (!strcmp(value, "tile")) {
 			++j;
@@ -399,7 +399,7 @@ local void CclParseBuilded(lua_State* l, Unit* unit)
 			slot = strtol(value + 1, NULL, 16);
 			DebugCheck(!UnitSlots[slot]);
 			unit->Data.Builded.Worker = UnitSlots[slot];
-			++UnitSlots[slot]->Refs;
+			//++UnitSlots[slot]->Refs;
 		} else if (!strcmp(value, "progress")) {
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.Builded.Progress = LuaToNumber(l, -1);
@@ -637,7 +637,11 @@ local int CclUnit(lua_State* l)
 	const char* s;
 	int args;
 	int j;
+	int savrefs;
 
+#ifdef DEBUG
+	savrefs = 0;
+#endif
 	args = lua_gettop(l);
 	j = 0;
 
@@ -688,6 +692,8 @@ local int CclUnit(lua_State* l)
 			unit->Next = UnitSlots[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "current-sight-range")) {
 			unit->CurrentSightRange = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "refs")) {
+			savrefs = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "host-info")) {
 			int x;
 			int y;
@@ -876,7 +882,7 @@ local int CclUnit(lua_State* l)
 				slot = strtol(value + 1, NULL, 16);
 				AddUnitInContainer(UnitSlots[slot], unit);
 				DebugCheck(!UnitSlots[slot]);
-				++UnitSlots[slot]->Refs;
+				//++UnitSlots[slot]->Refs;
 			}
 		} else if (!strcmp(value, "order-count")) {
 			unit->OrderCount = LuaToNumber(l, j + 1);
@@ -893,6 +899,7 @@ local int CclUnit(lua_State* l)
 			AssignUnitToPlayer (unit, player);
 			unit->HP = hp;
 			if (unit->Orders[0].Action == UnitActionBuilded) {
+				DebugLevel0Fn("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;
 			}
@@ -949,7 +956,7 @@ local int CclUnit(lua_State* l)
 
 	//  Revealers are units that can see while removed
 	if (unit->Removed && unit->Type->Revealer) {
-			MapMarkUnitSight(unit);
+		MapMarkUnitSight(unit);
 	}
 
 	// Units Dieing may have sight
@@ -963,6 +970,11 @@ local int CclUnit(lua_State* l)
 		PlaceUnit(unit, unit->X, unit->Y);
 	}
 
+	if (unit->UnitSlot) {
+		UnitCacheRemove(unit);
+		UnitCacheInsert(unit);
+	}
+
 	// FIXME: johns: works only for debug code.
 	if (unit->Moving) {
 		NewResetPath(unit);
@@ -971,6 +983,9 @@ local int CclUnit(lua_State* l)
 	if (unit->RescuedFrom) {
 		unit->Colors = &unit->RescuedFrom->UnitColors;
 	}
+	
+	// Fix references. REFERENCES GET SAVED!.
+	unit->Refs = savrefs;
 	DebugLevel3Fn("unit #%d parsed\n" _C_ slot);
 
 	return 0;
