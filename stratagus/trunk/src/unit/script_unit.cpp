@@ -2246,6 +2246,128 @@ local int CclKillUnitAt(lua_State* l)
 #endif
 
 /**
+**	Get a player's units
+**
+**	@param player	Player number.
+**
+**	@return		Array of units.
+*/
+#if defined(USE_GUILE) || defined(USE_SIOD)
+#elif defined(USE_LUA)
+local int CclGetUnits(lua_State* l)
+{
+    int plynr;
+    int i;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    plynr = TriggerGetPlayer(l);
+
+    lua_newtable(l);
+    if (plynr == -1) {
+	for (i = 0; i < NumUnits; ++i) {
+	    lua_pushnumber(l, Units[i]->Slot);
+	    lua_rawseti(l, -2, i + 1);
+	}
+    } else {
+	for (i = 0; i < Players[plynr].TotalNumUnits; ++i) {
+	    lua_pushnumber(l, Players[plynr].Units[i]->Slot);
+	    lua_rawseti(l, -2, i + 1);
+	}
+    }
+    return 1;
+}
+#endif
+
+/**
+**	Get the mana of the unit structure.
+**
+**	@param ptr	Unit object.
+**
+**	@return		The mana of the unit.
+*/
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclGetUnitMana(SCM ptr)
+{
+    const Unit* unit;
+
+    unit = CclGetUnit(ptr);
+    return gh_int2scm(unit->Mana);
+}
+#elif defined(USE_LUA)
+local int CclGetUnitMana(lua_State* l)
+{
+    const Unit* unit;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    unit = CclGetUnit(l);
+    lua_pushnumber(l, unit->Mana);
+    return 1;
+}
+#endif
+
+/**
+**	Set the mana of the unit structure.
+**
+**	@param ptr	Unit object.
+**	@param value	The value to set.
+**
+**	@return		The new mana of the unit.
+*/
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclSetUnitMana(SCM ptr, SCM value)
+{
+    Unit* unit;
+    int mana;
+
+    unit = CclGetUnit(ptr);
+    mana = gh_scm2int(value);
+    if (unit->Type->CanCastSpell && unit->Type->_MaxMana) {
+	if (mana > unit->Type->_MaxMana) {
+	    unit->Mana = unit->Type->_MaxMana;
+	} else {
+	    unit->Mana = mana;
+	}
+    }
+
+    return gh_int2scm(mana);
+}
+#elif defined(USE_LUA)
+local int CclSetUnitMana(lua_State* l)
+{
+    Unit* unit;
+    int mana;
+
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    unit = CclGetUnit(l);
+    lua_pop(l, 1);
+    mana = LuaToNumber(l, 2);
+    if (unit->Type->CanCastSpell && unit->Type->_MaxMana) {
+	if (mana > unit->Type->_MaxMana) {
+	    unit->Mana = unit->Type->_MaxMana;
+	} else {
+	    unit->Mana = mana;
+	}
+    }
+
+    lua_pushnumber(l, mana);
+    return 1;
+}
+#endif
+
+/**
 **	Get the unholy-armor of the unit structure.
 **
 **	@param ptr	Unit object.
@@ -2437,6 +2559,8 @@ global void UnitCclRegister(void)
     gh_new_procedure4_0("kill-unit-at", CclKillUnitAt);
 
     // unit member access functions
+    gh_new_procedure1_0("get-unit-mana", CclGetUnitMana);
+    gh_new_procedure2_0("set-unit-mana!", CclSetUnitMana);
     gh_new_procedure1_0("get-unit-unholy-armor", CclGetUnitUnholyArmor);
     gh_new_procedure2_0("set-unit-unholy-armor!", CclSetUnitUnholyArmor);
 
@@ -2456,7 +2580,11 @@ global void UnitCclRegister(void)
     lua_register(Lua, "KillUnit", CclKillUnit);
     lua_register(Lua, "KillUnitAt", CclKillUnitAt);
 
+    lua_register(Lua, "GetUnits", CclGetUnits);
+
     // unit member access functions
+    lua_register(Lua, "GetUnitMana", CclGetUnitMana);
+    lua_register(Lua, "SetUnitMana", CclSetUnitMana);
     lua_register(Lua, "GetUnitUnholyArmor", CclGetUnitUnholyArmor);
     lua_register(Lua, "SetUnitUnholyArmor", CclSetUnitUnholyArmor);
 
