@@ -69,7 +69,6 @@ local void UpdateConstructionFrame(Unit* unit)
     }
     if( cframe!=unit->Data.Builded.Frame ) {
 	unit->Data.Builded.Frame=cframe;
-	CheckUnitToBeDrawn(unit);
 	UnitMarkSeen(unit);
     }
 }
@@ -403,6 +402,7 @@ global void HandleActionBuilded(Unit* unit)
     }
 
     UpdateConstructionFrame(unit);
+    CheckUnitToBeDrawn(unit);
 
     unit->Wait=5;
     if( IsOnlySelected(unit) ) {
