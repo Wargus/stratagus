@@ -2206,14 +2206,14 @@ global int CanBuildHere(const UnitType* type,unsigned x,unsigned y)
 next:
     if( type->StoresOil ) {
 	//
-	//	Oil deposit can't be build too near to oil-patch.
+	//	Oil deposit can't be build too near to oil-patch or platform.
 	//
 	// FIXME: use unit-cache here.
 	int i;
 
 	for( i=0; i<NumUnits; i++ ) {
 	    unit=Units[i];
-	    if( unit->Type->OilPatch ) {
+	    if( unit->Type->OilPatch || unit->Type->GivesOil ) {
 	      DebugLevel3("Check oilpatch %d,%d\n"
 			  _C_ unit->X _C_ unit->Y);
 	      if( unit->X<x ) {
