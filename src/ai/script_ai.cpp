@@ -1380,63 +1380,24 @@ local SCM CclAiIsForceDefending(SCM value)
 */
 local SCM CclAiCanReachHotSpot(SCM way)
 {
-    int wayid, i;
-    int x, y, w, h;
+#ifdef MAP_REGIONS
+    ZoneSet targets={0};
+    ZoneSet sources={0};
+    ZoneSet transportable={0};
+    int i;
     Unit *unit;
-
-
+    int transporterplace;
+    UnitType * transporter;
+    AiUnit * aiunit;
+    
     if ((AiScript->HotSpot_X == -1) || (AiScript->HotSpot_Y == -1)
 	|| (AiScript->HotSpot_Ray <= 0)) {
 	return SCM_BOOL_T;
     }
-
-    wayid = -1;
-    // Air is always accessible...
-    if (gh_eq_p(way, gh_symbol2scm("air"))) {
-	wayid = 0;
-    }
-    if (gh_eq_p(way, gh_symbol2scm("ground"))) {
-	wayid = 1;
-    }
-    if (gh_eq_p(way, gh_symbol2scm("sea"))) {
-	wayid = 2;
-    }
-
-    if (wayid == -1) {
-	errl("Unknown way ", way);
-    }
-    // Calculate a rectangle...
-    // FIXME : Why 2 ?
-    x = AiScript->HotSpot_X - 2;
-    y = AiScript->HotSpot_Y - 2;
-    w = 5;
-    h = 5;
-
-    // clip it
-    if (x < 0) {
-	w += x;
-	x = 0;
-    }
-    if (y < 0) {
-	h += y;
-	y = 0;
-    }
-    if (x + w >= TheMap.Width) {
-	w = TheMap.Width - x;
-    }
-
-    if (y + h >= TheMap.Height) {
-	h = TheMap.Height - y;
-    }
-    // Dummy check...
-    if ((w <= 0) || (h <= 0)) {
-	return SCM_BOOL_F;
-    }
-    // Air is no problem...
-    if (wayid == 0) {
-	return SCM_BOOL_T;
-    }
-    // Find a unit which can move, check if it can access the hotspot.
+    
+    ZoneSetClear(&sources);
+    transporter = 0;
+    transporterplace = 0;
     for (i = 0; i < AiPlayer->Player->TotalNumUnits; i++) {
 	unit = AiPlayer->Player->Units[i];
 
@@ -1452,27 +1413,54 @@ local SCM CclAiCanReachHotSpot(SCM way)
 	    continue;
 	}
 
-	if (unit->Type->Building) {
-	    continue;
+	if (unit->Type->UnitType == UnitTypeNaval && unit->Type->Transporter) {
+	    ZoneSetAddUnitZones(&sources, unit);
+	    if ((!transporter) || (transporter->MaxOnBoard < unit->Type->MaxOnBoard)) {
+		transporter = unit->Type;
+	    }
+	    transporterplace += unit->Type->MaxOnBoard;
 	}
+    }
+    ZoneSetClear(&transportable);
+    // Add land connected to transporter
+    ZoneSetAddConnected(&transportable,&sources);
+    // Add water as well
+    ZoneSetAddSet(&transportable,&sources);
+    
 
-	if ((wayid == 1) && (unit->Type->UnitType != UnitTypeLand)) {
-	    continue;
+    aiunit = AiPlayer->Force[AiScript->ownForce].Units;
+    
+    while (aiunit) {
+	switch(aiunit->Unit->Type->UnitType) {
+	    case UnitTypeFly:
+	    	break;
+	    case UnitTypeNaval:
+		if (!PlaceReachable(aiunit->Unit, AiScript->HotSpot_X, AiScript->HotSpot_Y, 1, 1,0,aiunit->Unit->Type->_AttackRange)) {
+		    return SCM_BOOL_F;
+	    	}
+		break;
+	    case UnitTypeLand:
+	    	
+    		ZoneSetClear(&sources);
+		ZoneSetAddUnitZones(&sources,aiunit->Unit);
+		
+		ZoneSetClear(&targets);
+		ZoneSetAddGoalZones(&targets, aiunit->Unit, AiScript->HotSpot_X - 4, AiScript->HotSpot_Y - 4, 9, 9,0,0);
+		
+		if (!ZoneSetHasIntersect(&targets,&sources) &&
+		    (!ZoneSetHasIntersect(&targets,&transportable) ||
+		     !ZoneSetHasIntersect(&sources,&transportable))) {
+		     return SCM_BOOL_F;
+		}
+		break;
 	}
-
-	if ((wayid == 2) && (unit->Type->UnitType != UnitTypeNaval)) {
-	    continue;
-	}
-	// Ok, unit is a possible test
-	if (PlaceReachable(unit, x, y, w, h, 2)) {
-	    return SCM_BOOL_T;
-	}
-	return SCM_BOOL_F;
+	aiunit = aiunit->Next;
     }
 
-    // Fall back : no unit at all ? Use the starting point...
-    DebugLevel3Fn("CclAiCanReach failled to use a test unit...\n");
     return SCM_BOOL_T;
+#else
+    return SCM_BOOL_F;
+#endif
 }
 
 

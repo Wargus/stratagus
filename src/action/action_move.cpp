@@ -101,11 +101,13 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 	switch (d = NextPathElement(unit, &xd, &yd)) {
 #endif /* HIERARCHIC_PATHFINDER */
 	    case PF_UNREACHABLE:	// Can't reach, stop
-		unit->Reset = unit->Wait = 1;
-		unit->Moving = 0;
-		if (unit->Player->AiEnabled) {
+	    	if (unit->Player->AiEnabled) {
 		    AiCanNotMove(unit);
 		}
+
+		unit->Reset = unit->Wait = 1;
+		unit->Moving = 0;
+
 		return d;
 	    case PF_REACHED:		// Reached goal, stop
 		unit->Reset = unit->Wait = 1;

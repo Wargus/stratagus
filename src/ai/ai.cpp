@@ -152,6 +152,8 @@
 #include "actions.h"
 #include "map.h"
 
+#include "pathfinder.h"
+
 #if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
 #endif
@@ -1195,7 +1197,7 @@ local void AiReduceMadeInBuilded(const PlayerAi * pai, const UnitType * type)
 	}
     }
 
-    DebugCheck(1);
+    //DebugCheck(1);
 }
 
 /*----------------------------------------------------------------------------
@@ -1339,15 +1341,9 @@ global void AiCanNotReach(Unit * unit, const UnitType * what)
     AiReduceMadeInBuilded(unit->Player->Ai, what);
 }
 
-/**
-**	Called if an unit can't move. Try to move unit in the way
-**
-**	@param unit	Pointer to unit what builds the building.
-**	@param what	Pointer to unit-type.
-*/
-global void AiCanNotMove(Unit * unit)
+local void AiMoveUnitInTheWay(Unit* unit)
 {
-    static int dirs[8][2]={{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};    
+    static int dirs[8][2]={{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
     int ux0,uy0,ux1,uy1;
     int bx0,by0,bx1,by1;
     int x,y;
@@ -1375,8 +1371,7 @@ global void AiCanNotMove(Unit * unit)
 
     movablenb = 0;
 
-    DebugLevel2Fn("AiCanNotMove : %s at %d %d\n" _C_ unittype->Ident _C_ ux0 _C_ uy0);
-
+    
     // Try to make some unit moves around it
     for (i = 0; i < NumUnits; ++i) {
 	blocker = Units[i];
@@ -1467,6 +1462,256 @@ global void AiCanNotMove(Unit * unit)
     }
 }
 
+
+#ifdef MAP_REGIONS
+/**
+**	Return : 0 if nothing available
+**		 1 if exists (unit may still be null if no one ready)
+**
+*/
+local int FindTransporterOnZone(int waterzone,ZoneSet * destzones,
+				int x,int y,unsigned int unitType,
+				Unit ** bestunit)
+{
+    static ZoneSet TransporterZones={0};
+    Unit ** allunits;
+    Unit * unit;
+    int i;
+    int unitdst;
+    int unitok;
+    int result;
+    int bestunitdst;
+    int unitX,unitY;
+    
+    result = 0;
+    *bestunit = 0;
+    unitdst = -1;
+    
+    // Travel through all units
+    allunits = AiPlayer->Player->Units;
+    for (i = 0; i < AiPlayer->Player->TotalNumUnits; i++) {
+	unit = allunits[i];
+	
+	if (UnitUnusable(unit)) {
+	    continue;
+	}
+	if (unit->Type->UnitType != unitType || !unit->Type->Transporter) {
+	    continue;
+	}
+	
+	result = 1;
+	    
+	if (unit->InsideCount >= unit->Type->MaxOnBoard) {
+	    continue;
+	}
+	
+	// check that it is in the region
+	ZoneSetClear(&TransporterZones);
+	ZoneSetAddUnitZones(&TransporterZones, unit);
+	if (!ZoneSetContains(&TransporterZones, waterzone)) {
+	    continue;
+	}
+	
+	unitok = UnitIdle(unit);
+	unitX = unit->X;
+	unitY = unit->Y;
+     	
+	// If transporter is moving, check if it is moving on our coast
+	if (!unitok &&
+	    unit->OrderCount + (unit->OrderFlush?1:0) >= 2 &&
+	    unit->OrderCount < MAX_ORDERS - 1 &&
+	    unit->Orders[unit->OrderFlush ? 1 : 0].Action == UnitActionFollow &&
+	    unit->Orders[unit->OrderCount - 1].Action == UnitActionUnload &&
+	    unit->InsideCount + unit->OrderCount - (unit->OrderFlush ? 1 : 0) <= unit->Type->MaxOnBoard) {
+		
+	    
+	    // Check that it will unload in the dest zone
+	    ZoneSetClear(&TransporterZones);
+	    ZoneSetAddCell(&TransporterZones, 
+		unit->Orders[unit->OrderCount - 1].X, unit->Orders[unit->OrderCount - 1].Y);
+	    
+	    unitok = ZoneSetHasIntersect(&TransporterZones, destzones);
+	    if (unitok) {
+		unitX = unit->Orders[unit->OrderFlush ? 1 : 0].Goal->X;
+		unitY = unit->Orders[unit->OrderFlush ? 1 : 0].Goal->Y;
+	    }
+	}
+	
+	if (!unitok) {
+	    continue;
+	}
+	
+	unitdst = (unitX - x) * (unitX - x) + (unitY - y) * (unitY - y);
+	if (bestunitdst != -1 && unitdst > bestunitdst) {
+	    continue;
+	}
+	
+	bestunitdst = unitdst;
+	*bestunit = unit;
+    }
+
+    return result;
+}
+
+local void HelpWithTransporter(Unit * unit, Unit * transporter, int transporterzone, int destzone)
+{
+    int x,y;
+    //    Order temp;
+    
+    if (UnitIdle(transporter)) {
+	CommandFollow(transporter, unit, FlushCommands);
+	ZoneFindConnexion(destzone, transporterzone, unit->X, unit->Y, &x, &y);
+	CommandUnload(transporter, x, y ,NoUnitP, 0);
+    } else {
+	CommandFollow(transporter, unit, 0);
+	// We need to swap last with order 1
+	CommandMoveOrder(transporter, transporter->OrderCount - 1, 1);
+    }
+    // Fixme : save order & restore it when unloaded
+    CommandBoard(unit, transporter, FlushCommands);
+}
+#endif // MAP_REGIONS
+
+/**
+**	Called if an unit can't move. Try to move unit in the way
+**
+**	@param unit	Pointer to unit what builds the building.
+**	@param what	Pointer to unit-type.
+*/
+global void AiCanNotMove(Unit * unit)
+{
+
+#ifdef MAP_REGIONS
+    AiTransportRequest* aitr;
+#endif
+    int gx,gy,gw,gh;
+    int minrange, maxrange;
+    
+    DebugLevel2Fn("%s at %d %d\n" _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
+
+    AiPlayer = unit->Player->Ai;
+    
+    if (unit->Orders[0].Goal) {
+    	gw=unit->Orders[0].Goal->Type->TileWidth;
+	gh=unit->Orders[0].Goal->Type->TileHeight;
+	gx=unit->Orders[0].Goal->X;
+	gy=unit->Orders[0].Goal->Y;
+	maxrange=unit->Orders[0].Range;
+	minrange=unit->Orders[0].MinRange;
+    } else {
+	// Take care of non square goals :)
+	// If goal is non square, range states a non-existant goal rather
+	// than a tile.
+	gw = unit->Orders[0].Width;
+	gh = unit->Orders[0].Height;
+	maxrange=unit->Orders[0].Range;
+	minrange=unit->Orders[0].MinRange;
+	gx=unit->Orders[0].X;
+	gy=unit->Orders[0].Y;
+    }
+    
+    if (PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange) || unit->Type->UnitType == UnitTypeFly) {
+	// Path probably closed by unit here
+	DebugLevel2Fn("Place reacheable, move unit in the way.\n");
+	AiMoveUnitInTheWay(unit);
+	return;
+    }
+
+#ifdef MAP_REGIONS
+    aitr = AiPlayer->TransportRequests;
+    while (aitr) {
+	if (aitr->Unit == unit) {
+	    return;
+	}
+	aitr = aitr->Next;
+    }
+    
+    aitr = malloc(sizeof(AiTransportRequest));
+    aitr->Next = AiPlayer->TransportRequests;
+    aitr->Unit = unit;
+    aitr->Order = unit->Orders[0];
+    RefsIncrease(unit);
+    if (aitr->Order.Goal) {
+	RefsIncrease(aitr->Order.Goal);
+    }
+    AiPlayer->TransportRequests = aitr;
+    return;
+#endif // MAP_REGIONS
+}
+
+#ifdef MAP_REGIONS
+local void HandleTransportRequests(AiTransportRequest * aitr)
+{
+    static ZoneSet UnitZones={0};
+    static ZoneSet DestZones={0};
+
+    Unit * transporter;
+    int zonepath[MaxZoneNumber];
+    int zonepathlen;
+    int gx,gy,gw,gh,maxrange,minrange;
+    
+    if (aitr->Unit->Removed) {
+	return;
+    }
+    
+    if (aitr->Order.Goal) {
+	// Check for dead goal here (?)
+	if (aitr->Order.Goal->Removed) {
+	    return;
+	}
+	
+	gw=aitr->Unit->Orders[0].Goal->Type->TileWidth;
+	gh=aitr->Unit->Orders[0].Goal->Type->TileHeight;
+	gx=aitr->Unit->Orders[0].Goal->X;
+	gy=aitr->Unit->Orders[0].Goal->Y;
+	maxrange=aitr->Unit->Orders[0].Range;
+	minrange=aitr->Unit->Orders[0].MinRange;
+    } else {
+	// Take care of non square goals :)
+	// If goal is non square, range states a non-existant goal rather
+	// than a tile.
+	gw = aitr->Unit->Orders[0].Width;
+	gh = aitr->Unit->Orders[0].Height;
+	maxrange=aitr->Unit->Orders[0].Range;
+	minrange=aitr->Unit->Orders[0].MinRange;
+	gx=aitr->Unit->Orders[0].X;
+	gy=aitr->Unit->Orders[0].Y;
+    }
+	
+    // Check if we have an idle air transporter.
+
+    // Check if we have an idle water tranporter
+    ZoneSetClear(&UnitZones);
+    ZoneSetAddUnitZones(&UnitZones, aitr->Unit);
+
+    ZoneSetClear(&DestZones);
+    ZoneSetAddGoalZones(&DestZones, aitr->Unit, gx, gy, gw, gh, minrange, maxrange);
+
+    if (ZoneSetHasIntersect(&UnitZones, &DestZones)) {
+	// Can go, nothing to do.
+	return;
+    }
+    
+    if (!ZoneSetFindPath(&UnitZones, &DestZones, zonepath, &zonepathlen)) {
+	DebugLevel2Fn("no way over there.\n");
+    	return;
+    }
+
+    DebugCheck(zonepathlen < 3);
+
+    if (FindTransporterOnZone(zonepath[1], &DestZones, aitr->Unit->X,aitr->Unit->Y,UnitTypeNaval,&transporter)) {
+	if (transporter) {
+	    HelpWithTransporter(aitr->Unit, transporter, zonepath[1], zonepath[2]);
+	    CommandAnyOrder(aitr->Unit, &aitr->Order, 0);
+	} else {
+	    DebugLevel2Fn("All transporters are busy, waits.\n");
+	}
+    } else {
+	// FIXME : Find or build transporter builder in the zone
+    }
+}
+#endif // MAP_REGIONS
+
 /**
 **	Called if the AI needs more farms.
 **
@@ -1546,6 +1791,27 @@ global void AiResearchComplete(Unit * unit __attribute__ ((unused)),
 */
 global void AiEachCycle(Player * player __attribute__ ((unused)))
 {
+    AiTransportRequest * aitr, * next;
+    
+    AiPlayer = player->Ai;
+    
+    aitr = AiPlayer->TransportRequests;
+    while (aitr) {
+	next = aitr->Next;
+	
+#ifdef MAP_REGIONS
+    	HandleTransportRequests(aitr);
+#endif // MAP_REGIONS
+
+	RefsDecrease(aitr->Unit);
+	if (aitr->Order.Goal) {
+	    RefsDecrease(aitr->Order.Goal);
+	}
+	free(aitr);
+
+	aitr = next;
+    }
+    AiPlayer->TransportRequests = 0;
 }
 
 /**
