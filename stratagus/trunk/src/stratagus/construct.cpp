@@ -145,10 +145,10 @@ local Construction Constructions[] = {
   "tilesets/wasteland/orc/buildings/oil well construction site.png",
   "tilesets/swamp/orc/buildings/oil well construction site.png" },
 #else
-  { "orc/buildings/oil well construction site (summer).png",
-  "orc/buildings/oil well construction site (winter).png",
-  "orc/buildings/oil well construction site (wasteland).png",
-  "orc/buildings/oil well construction site (swamp).png" },
+  { "orc oil well construction site (summer).png",
+  "orc oil well construction site (winter).png",
+  "orc oil well construction site (wasteland).png",
+  "orc oil well construction site (swamp).png" },
 #endif
 	96,96 },
 { "construction-human-refinery",
@@ -171,10 +171,10 @@ local Construction Constructions[] = {
   DEFAULT,
   "tilesets/swamp/orc/buildings/refinery construction site.png" },
 #else
-  { "orc/buildings/refinery construction site (summer,wasteland).png",
-  "orc/buildings/refinery construction site (winter).png",
+  { "orc refinery construction site (summer,wasteland).png",
+  "orc refinery construction site (winter).png",
   DEFAULT,
-  "orc/buildings/refinery construction site (swamp).png" },
+  "orc refinery construction site (swamp).png" },
 #endif
 	96,96 },
 { "construction-human-foundry",
