@@ -1414,10 +1414,10 @@ static void PudWriteSQM(gzFile f,const WorldMap* map)
 		if( f&MapFieldCoastAllowed ) {
 			v|=MapMoveCoast;
 		}
-		if( (f&(MapFieldWall|MapMoveHuman))==MapFieldWall ) {
+		if( (f&(MapFieldWall|MapFieldHuman))==MapFieldWall ) {
 			v|=MapMoveWallO;
 		}
-		if( (f&(MapFieldWall|MapMoveHuman))==(MapFieldWall|MapMoveHuman) ) {
+		if( (f&(MapFieldWall|MapFieldHuman))==(MapFieldWall|MapFieldHuman) ) {
 			v|=MapMoveWallH;
 		}
 		if( f&MapFieldNoBuilding ) {
