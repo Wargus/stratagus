@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,42 +34,42 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Declarations
+--		Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**	Sound referencing.
+**		Sound referencing.
 **
-**	Client side representation of the sound id.
-**	Passed to the sound server API.
+**		Client side representation of the sound id.
+**		Passed to the sound server API.
 */
-typedef void* SoundId;			/// sound identifier
+typedef void* SoundId;						/// sound identifier
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
-    /// Make a sound bound to identifier
+	/// Make a sound bound to identifier
 extern SoundId MakeSound(const char* sound_name,const char* file[], int nb);
-    /// Get the sound id bound to an identifier
+	/// Get the sound id bound to an identifier
 extern SoundId SoundIdForName(const char* sound_name);
-    /// Map sound to identifier
+	/// Map sound to identifier
 extern void MapSound(const char* sound_name,const SoundId id);
-    /// Make a sound group bound to identifier
+	/// Make a sound group bound to identifier
 extern SoundId MakeSoundGroup(const char* name,SoundId first,SoundId second);
-    /// Helper function, displays the mapping between sound names and sound ids
+	/// Helper function, displays the mapping between sound names and sound ids
 extern void DisplaySoundHashTable(void);
 
-#ifndef WITH_SOUND	// {
+#ifndef WITH_SOUND		// {
 
-#define SoundIdForName(n)	NULL	/// Dummy macro for without sound
+#define SoundIdForName(n)		NULL		/// Dummy macro for without sound
 
-#endif	// } WITH_SOUND
+#endif		// } WITH_SOUND
 
 //@}
 
-#endif	// !__SOUND_ID_H__
+#endif		// !__SOUND_ID_H__

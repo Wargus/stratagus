@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,104 +34,104 @@
 //@{
 
 // ============================================================================
-#ifdef USE_SDL	// {
+#ifdef USE_SDL		// {
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include "SDL_endian.h"
 
 /*----------------------------------------------------------------------------
---	Macros
+--		Macros
 ----------------------------------------------------------------------------*/
 
 /**
-**	Convert a 16 bit value in little endian and return it in native format.
+**		Convert a 16 bit value in little endian and return it in native format.
 */
-#define	ConvertLE16(v)	SDL_SwapLE16((v))
+#define		ConvertLE16(v)		SDL_SwapLE16((v))
 
 /**
-**	Convert a 32 bit value in little endian and return it in native format.
+**		Convert a 32 bit value in little endian and return it in native format.
 */
-#define	ConvertLE32(v)	SDL_SwapLE32((v))
+#define		ConvertLE32(v)		SDL_SwapLE32((v))
 
 /**
-**	Access a 16 bit value in little endian and return it in native format.
+**		Access a 16 bit value in little endian and return it in native format.
 */
 #ifdef __ULTRA_SPARC__
 
 extern unsigned short inline AccessLE16(unsigned char *p) {
-        return p[0] + (p[1] << 8);
+		return p[0] + (p[1] << 8);
 }
 
 #else
 
-#define	AccessLE16(p)	SDL_SwapLE16(*((unsigned short*)(p)))
+#define		AccessLE16(p)		SDL_SwapLE16(*((unsigned short*)(p)))
 
 #endif
 
 /**
-**	Access a 32 bit value in little endian and return it in native format.
+**		Access a 32 bit value in little endian and return it in native format.
 */
 #ifdef __ULTRA_SPARC__
 
 extern unsigned inline AccessLE32(unsigned char *p) {
-    return  p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
+	return  p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
 }
 
 #else
 
-#define	AccessLE32(p)	SDL_SwapLE32(*((unsigned int*)(p)))
+#define		AccessLE32(p)		SDL_SwapLE32(*((unsigned int*)(p)))
 
 #endif
 
 /**
-**	Fetch a 16 bit value in little endian with incrementing pointer
-**	and return it in native format.
+**		Fetch a 16 bit value in little endian with incrementing pointer
+**		and return it in native format.
 */
 #ifdef __ULTRA_SPARC__
 
 extern unsigned short inline _FetchLE16(unsigned char **pp) {
-    unsigned char *p = *pp;
-    unsigned short i = p[0] + (p[1] << 8);
-    (*pp) += 2;
-    return i;
+	unsigned char *p = *pp;
+	unsigned short i = p[0] + (p[1] << 8);
+	(*pp) += 2;
+	return i;
 }
-#define FetchLE16(p)    _FetchLE16(&p)
+#define FetchLE16(p)	_FetchLE16(&p)
 
 #else
 
-#define	FetchLE16(p)	SDL_SwapLE16(*((unsigned short*)(p))++)
+#define		FetchLE16(p)		SDL_SwapLE16(*((unsigned short*)(p))++)
 
 #endif
 
 /**
-**	Fetch a 32 bit value in little endian with incrementing pointer
-**	and return it in native format.
+**		Fetch a 32 bit value in little endian with incrementing pointer
+**		and return it in native format.
 */
 #ifdef __ULTRA_SPARC__
 
 extern unsigned inline _FetchLE32(unsigned char **pp) {
-    unsigned char *p = *pp;
-    unsigned int i = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
-    (*pp) += 4;
-    return i;
+	unsigned char *p = *pp;
+	unsigned int i = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
+	(*pp) += 4;
+	return i;
 }
-#define FetchLE32(p)    _FetchLE32(&p)
+#define FetchLE32(p)	_FetchLE32(&p)
 
 #else
 
-#define	FetchLE32(p)	SDL_SwapLE32(*((unsigned int*)(p))++)
+#define		FetchLE32(p)		SDL_SwapLE32(*((unsigned int*)(p))++)
 
 #endif
 
 // ============================================================================
-#else		// }{ SDL
+#else				// }{ SDL
 // ============================================================================
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #if !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(_MSC_VER)
@@ -139,7 +139,7 @@ extern unsigned inline _FetchLE32(unsigned char **pp) {
 #include <sys/types.h>
 #else
 #include <endian.h>
-#endif	// BSD
+#endif		// BSD
 
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 #include <byteswap.h>
@@ -150,81 +150,81 @@ extern unsigned inline _FetchLE32(unsigned char **pp) {
 #endif
 
 /*----------------------------------------------------------------------------
---	Macros
+--		Macros
 ----------------------------------------------------------------------------*/
 
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 
 /**
-**	Convert a 16 bit value in little endian and return it in native format.
+**		Convert a 16 bit value in little endian and return it in native format.
 */
-#define	ConvertLE16(v)	bswap_16((v))
+#define		ConvertLE16(v)		bswap_16((v))
 
 /**
-**	Convert a 32 bit value in little endian and return it in native format.
+**		Convert a 32 bit value in little endian and return it in native format.
 */
-#define	ConvertLE32(v)	bswap_32((v))
+#define		ConvertLE32(v)		bswap_32((v))
 
 #else
 
 #if defined(__APPLE__)
 
 /**
-**	Convert a 16 bit value in little endian and return it in native format.
+**		Convert a 16 bit value in little endian and return it in native format.
 */
-#define	ConvertLE16(v)	NXSwapLittleShortToHost(v)
+#define		ConvertLE16(v)		NXSwapLittleShortToHost(v)
 
 /**
-**	Convert a 32 bit value in little endian and return it in native format.
+**		Convert a 32 bit value in little endian and return it in native format.
 */
-#define	ConvertLE32(v)	NXSwapLittleIntToHost(v)
+#define		ConvertLE32(v)		NXSwapLittleIntToHost(v)
 
 #else
 
 /**
-**	Convert a 16 bit value in little endian and return it in native format.
+**		Convert a 16 bit value in little endian and return it in native format.
 */
-#define	ConvertLE16(v)	(v)
+#define		ConvertLE16(v)		(v)
 
 /**
-**	Convert a 32 bit value in little endian and return it in native format.
+**		Convert a 32 bit value in little endian and return it in native format.
 */
-#define	ConvertLE32(v)	(v)
+#define		ConvertLE32(v)		(v)
 
 #endif  // defined(__APPLE__)
 
-#endif	// ! defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
+#endif		// ! defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 
 /**
-**	Access a 16 bit value in little endian and return it in native format.
+**		Access a 16 bit value in little endian and return it in native format.
 */
-#define	AccessLE16(p)	ConvertLE16(*((unsigned short*)(p)))
+#define		AccessLE16(p)		ConvertLE16(*((unsigned short*)(p)))
 
 /**
-**	Access a 32 bit value in little endian and return it in native format.
+**		Access a 32 bit value in little endian and return it in native format.
 */
-#define	AccessLE32(p)	ConvertLE32(*((unsigned int*)(p)))
+#define		AccessLE32(p)		ConvertLE32(*((unsigned int*)(p)))
 
 /**
-**	Fetch a 16 bit value in little endian with incrementing pointer
-**	and return it in native format.
+**		Fetch a 16 bit value in little endian with incrementing pointer
+**		and return it in native format.
 */
-#define	FetchLE16(p)	ConvertLE16(*((unsigned short*)(p))++)
+#define		FetchLE16(p)		ConvertLE16(*((unsigned short*)(p))++)
 
 /**
-**	Fetch a 32 bit value in little endian with incrementing pointer
-**	and return it in native format.
+**		Fetch a 32 bit value in little endian with incrementing pointer
+**		and return it in native format.
 */
-#define	FetchLE32(p)	ConvertLE32(*((unsigned int*)(p))++)
+#define		FetchLE32(p)		ConvertLE32(*((unsigned int*)(p))++)
 
-#endif		// } !SDL
+#endif				// } !SDL
 // ============================================================================
 
 /**
-**	Fetch a 8 bit value with incrementing pointer
-**	and return it in native format.
+**		Fetch a 8 bit value with incrementing pointer
+**		and return it in native format.
 */
-#define	FetchByte(p)	(*((unsigned char*)(p))++)
+#define		FetchByte(p)		(*((unsigned char*)(p))++)
 
 //@}
 

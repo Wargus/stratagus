@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,7 +34,7 @@
 //@{
 
 #ifndef _MSC_VER
-#include <sys/types.h>			// for u_int64_t
+#include <sys/types.h>						// for u_int64_t
 #endif
 
 #if defined(__MINGW32__)
@@ -46,26 +46,26 @@ typedef unsigned long long u_int64_t;
 #endif
 
 /**
-**      Read the tsc (time-stamp counter) register of the processor.
+**	  Read the tsc (time-stamp counter) register of the processor.
 **
-**      @return the rtc register
+**	  @return the rtc register
 */
 static __inline u_int64_t rdtsc(void)
 {
 #ifdef __i386__
-    u_int64_t rv;
+	u_int64_t rv;
 
-    __asm __volatile(".byte 0x0f, 0x31" : "=A" (rv));
+	__asm __volatile(".byte 0x0f, 0x31" : "=A" (rv));
 #endif
 #ifdef __alpha__
-    int rv;
+	int rv;
 
-    __asm __volatile("rpcc %0" : "=r" (rv));
+	__asm __volatile("rpcc %0" : "=r" (rv));
 #endif
 
-    return rv;
+	return rv;
 }
 
 //@}
 
-#endif	// !__RDTSC_H__
+#endif		// !__RDTSC_H__

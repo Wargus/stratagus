@@ -3,7 +3,7 @@
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -35,201 +35,201 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include "icons.h"
 
 /*----------------------------------------------------------------------------
---	Defines
+--		Defines
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Declarations
+--		Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**	Indices into costs/resource/income array. (A litte future here :)
+**		Indices into costs/resource/income array. (A litte future here :)
 */
 typedef enum _costs_ {
-    TimeCost,				/// time in game cycles
+	TimeCost,								/// time in game cycles
 
 // standard
-    GoldCost,				/// gold  resource
-    WoodCost,				/// wood  resource
-    OilCost,				/// oil   resource
+	GoldCost,								/// gold  resource
+	WoodCost,								/// wood  resource
+	OilCost,								/// oil   resource
 // extensions
-    OreCost,				/// ore   resource
-    StoneCost,				/// stone resource
-    CoalCost,				/// coal  resource
+	OreCost,								/// ore   resource
+	StoneCost,								/// stone resource
+	CoalCost,								/// coal  resource
 
-    MaxCosts				/// how many different costs
+	MaxCosts								/// how many different costs
 } CostType;
 
-#define FoodCost MaxCosts 
-#define ScoreCost MaxCosts+1 
+#define FoodCost MaxCosts
+#define ScoreCost MaxCosts+1
 
 /**
-**	Speed factor for harvesting resources
+**		Speed factor for harvesting resources
 */
 extern int SpeedResourcesHarvest[MaxCosts];
 
 /**
-**	Speed factor for returning resources
+**		Speed factor for returning resources
 */
 extern int SpeedResourcesReturn[MaxCosts];
 
 /**
-**	Default resources for a new player.
+**		Default resources for a new player.
 */
 extern int DefaultResources[MaxCosts];
 
 /**
-**	Default resources for a new player with low resources.
+**		Default resources for a new player with low resources.
 */
 extern int DefaultResourcesLow[MaxCosts];
 
 /**
-**	Default resources for a new player with mid resources.
+**		Default resources for a new player with mid resources.
 */
 extern int DefaultResourcesMedium[MaxCosts];
 
 /**
-**	Default resources for a new player with high resources.
+**		Default resources for a new player with high resources.
 */
 extern int DefaultResourcesHigh[MaxCosts];
 
 /**
-**	Default incomes for a new player.
+**		Default incomes for a new player.
 */
 extern int DefaultIncomes[MaxCosts];
 
 /**
-**	Default action for the resources.
+**		Default action for the resources.
 */
 extern char* DefaultActions[MaxCosts];
 
 /**
-**	Default names for the resources.
+**		Default names for the resources.
 */
 extern char* DefaultResourceNames[MaxCosts];
 
 /**
-**	Default amounts for the resources.
+**		Default amounts for the resources.
 */
 extern int DefaultResourceAmounts[MaxCosts];
 
 /**
-**	This are the current stats of an unit. Upgraded or downgraded.
+**		This are the current stats of an unit. Upgraded or downgraded.
 */
 typedef struct _unit_stats_ {
-    int		AttackRange;		/// how far can the unit attack
-    int		SightRange;		/// how far can the unit see
-    int		Armor;			/// armor strength
-    int		BasicDamage;		/// weapon basic damage
-    int		PiercingDamage;		/// weapon piercing damage
-    int		Speed;			/// movement speed
-    int		HitPoints;		/// hit points
-    int		RegenerationRate;	/// HP regeration rate in HP
-    int		Costs[MaxCosts];	/// current costs of the unit
-    int		Level;			/// unit level (upgrades)
+	int				AttackRange;				/// how far can the unit attack
+	int				SightRange;				/// how far can the unit see
+	int				Armor;						/// armor strength
+	int				BasicDamage;				/// weapon basic damage
+	int				PiercingDamage;				/// weapon piercing damage
+	int				Speed;						/// movement speed
+	int				HitPoints;				/// hit points
+	int				RegenerationRate;		/// HP regeration rate in HP
+	int				Costs[MaxCosts];		/// current costs of the unit
+	int				Level;						/// unit level (upgrades)
 } UnitStats;
 
 /**
-**	The main useable upgrades.
+**		The main useable upgrades.
 */
 typedef struct _upgrade_ {
-    const void*	OType;			/// object type (future extensions)
-    char*	Ident;			/// identifier
-    int		Costs[MaxCosts];	/// costs for the upgrade
-	// FIXME: not used by buttons
-    IconConfig	Icon;			/// icon to display to the user
+	const void*		OType;						/// object type (future extensions)
+	char*		Ident;						/// identifier
+	int				Costs[MaxCosts];		/// costs for the upgrade
+		// FIXME: not used by buttons
+	IconConfig		Icon;						/// icon to display to the user
 } Upgrade;
 
 /*----------------------------------------------------------------------------
---	upgrades and modifiers
+--		upgrades and modifiers
 ----------------------------------------------------------------------------*/
 
 /**
-**	Modifiers of the unit stats.
-**	All the following are modifiers not values!
-**	@see UnitStats
+**		Modifiers of the unit stats.
+**		All the following are modifiers not values!
+**		@see UnitStats
 */
 typedef struct _modifiers_ {
-    int	AttackRange;			/// attack range modifier
-    int	SightRange;			/// sight range modifier
-    int	BasicDamage;			/// basic damage modifier
-    int	PiercingDamage;			/// piercing damage modifier
-    int	Armor;				/// armor modifier
-    int	Speed;				/// speed modifier (FIXME: not working)
-    int	HitPoints;			/// hit points modifier
-    int RegenerationRate;		/// HP regeneration rate modifier
+	int		AttackRange;						/// attack range modifier
+	int		SightRange;						/// sight range modifier
+	int		BasicDamage;						/// basic damage modifier
+	int		PiercingDamage;						/// piercing damage modifier
+	int		Armor;								/// armor modifier
+	int		Speed;								/// speed modifier (FIXME: not working)
+	int		HitPoints;						/// hit points modifier
+	int RegenerationRate;				/// HP regeneration rate modifier
 
-    int	Costs[MaxCosts];		/// costs modifier
+	int		Costs[MaxCosts];				/// costs modifier
 } Modifiers;
 
 /**
-**	This is the modifier of an upgrade.
-**	This do the real action of an upgrade, an upgrade can have multiple
-**	modifiers.
+**		This is the modifier of an upgrade.
+**		This do the real action of an upgrade, an upgrade can have multiple
+**		modifiers.
 */
 typedef struct _upgrade_modifier_ {
 
-  int		UpgradeId;		/// used to filter required modifier
+  int				UpgradeId;				/// used to filter required modifier
 
-  Modifiers	Modifier;		/// modifier of unit stats
+  Modifiers		Modifier;				/// modifier of unit stats
 
   // allow/forbid bitmaps -- used as chars for example:
   // `?' -- leave as is, `F' -- forbid, `A' -- allow
   // FIXME: see below allow more semantics?
   // FIXME: pointers or ids would be faster and less memory use
-  int	ChangeUnits[UnitTypeMax];	/// add/remove allowed units
-  char	ChangeUpgrades[UpgradeMax];	/// allow/forbid upgrades
-  char	ApplyTo[UnitTypeMax];		/// which unit types are affected
+  int		ChangeUnits[UnitTypeMax];		/// add/remove allowed units
+  char		ChangeUpgrades[UpgradeMax];		/// allow/forbid upgrades
+  char		ApplyTo[UnitTypeMax];				/// which unit types are affected
 
   // FIXME: UnitType*
-  void*		ConvertTo;		/// convert to this unit-type.
+  void*				ConvertTo;				/// convert to this unit-type.
 
 } UpgradeModifier;
 
 /**
-**	Allow what a player can do. Every #Player has an own allow struct.
+**		Allow what a player can do. Every #Player has an own allow struct.
 **
-**	This could allow/disallow units, actions or upgrades.
+**		This could allow/disallow units, actions or upgrades.
 **
-**	Values are:
-**		@li `A' -- allowed,
-**		@li `F' -- forbidden,
-**		@li `R' -- acquired, perhaps other values
-**		@li `Q' -- acquired but forbidden (does it make sense?:))
-**		@li `E' -- enabled, allowed by level but currently forbidden
-***		@li `X' -- fixed, acquired can't be disabled
+**		Values are:
+**				@li `A' -- allowed,
+**				@li `F' -- forbidden,
+**				@li `R' -- acquired, perhaps other values
+**				@li `Q' -- acquired but forbidden (does it make sense?:))
+**				@li `E' -- enabled, allowed by level but currently forbidden
+***				@li `X' -- fixed, acquired can't be disabled
 */
 typedef struct _allow_ {
-    int		Units[UnitTypeMax];	/// maximum amount of units allowed
-    char	Upgrades[UpgradeMax];	/// upgrades allowed/disallowed
+	int				Units[UnitTypeMax];		/// maximum amount of units allowed
+	char		Upgrades[UpgradeMax];		/// upgrades allowed/disallowed
 } Allow;
 
 /**
-**	Upgrade timer used in the player structure.
-**	Every player has an own UpgradeTimers struct.
+**		Upgrade timer used in the player structure.
+**		Every player has an own UpgradeTimers struct.
 */
 typedef struct _upgrade_timers_ {
 
-    /**
-    **	all 0 at the beginning, all upgrade actions do increment values in
-    **	this struct.
-    */
-    int	Upgrades[UpgradeMax];		/// counter for each upgrade
+	/**
+	**		all 0 at the beginning, all upgrade actions do increment values in
+	**		this struct.
+	*/
+	int		Upgrades[UpgradeMax];				/// counter for each upgrade
 
 } UpgradeTimers;
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
-extern const char UpgradeType[];	/// upgrade type
-extern Upgrade Upgrades[UpgradeMax];	/// the main user useable upgrades
+extern const char UpgradeType[];		/// upgrade type
+extern Upgrade Upgrades[UpgradeMax];		/// the main user useable upgrades
 
 //@}
 

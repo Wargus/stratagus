@@ -29,35 +29,35 @@ struct obj
 		struct obj * (*f)(struct obj *, struct obj *);} subr2;
 	struct {char *name;
 		struct obj * (*f)(struct obj *, struct obj *, struct obj *);
-	      } subr3;
-	struct {char *name;
-		struct obj * (*f)(struct obj *, struct obj *, struct obj *,
-				  struct obj *);
-	      } subr4;
-	struct {char *name;
-		struct obj * (*f)(struct obj *, struct obj *, struct obj *,
-				  struct obj *,struct obj *);
-	      } subr5;
-	struct {char *name;
-		struct obj * (*f)(struct obj **, struct obj **);} subrm;
-	struct {char *name;
-		struct obj * (*f)(void *,...);} subr;
-	struct {struct obj *env;
-		struct obj *code;} closure;
-	struct {long dim;
-		long *data;} long_array;
-	struct {long dim;
-		double *data;} double_array;
-	struct {long dim;
-		char *data;} string;
-	struct {long dim;
-		unsigned char *data;} u_string;
-	struct {long dim;
-		signed char *data;} s_string;
-	struct {long dim;
-		struct obj **data;} lisp_array;
-	struct {FILE *f;
-		char *name;} c_file;}
+			  } subr3;
+		struct {char *name;
+				struct obj * (*f)(struct obj *, struct obj *, struct obj *,
+								  struct obj *);
+			  } subr4;
+		struct {char *name;
+				struct obj * (*f)(struct obj *, struct obj *, struct obj *,
+								  struct obj *,struct obj *);
+			  } subr5;
+		struct {char *name;
+				struct obj * (*f)(struct obj **, struct obj **);} subrm;
+		struct {char *name;
+				struct obj * (*f)(void *,...);} subr;
+		struct {struct obj *env;
+				struct obj *code;} closure;
+		struct {long dim;
+				long *data;} long_array;
+		struct {long dim;
+				double *data;} double_array;
+		struct {long dim;
+				char *data;} string;
+		struct {long dim;
+				unsigned char *data;} u_string;
+		struct {long dim;
+				signed char *data;} s_string;
+		struct {long dim;
+				struct obj **data;} lisp_array;
+		struct {FILE *f;
+				char *name;} c_file;}
  storage_as;};
 
 #define CAR(x) ((*x).storage_as.cons.car)
@@ -85,7 +85,7 @@ struct obj
 #define TYPEP(x,y) (TYPE(x) == (y))
 #define NTYPEP(x,y) (TYPE(x) != (y))
 
-#define tc_nil    0
+#define tc_nil	0
 #define tc_cons   1
 #define tc_flonum 2
 #define tc_symbol 3
@@ -98,11 +98,11 @@ struct obj
 #define tc_msubr  10
 #define tc_closure 11
 #define tc_free_cell 12
-#define tc_string       13
+#define tc_string	   13
 #define tc_double_array 14
 #define tc_long_array   15
 #define tc_lisp_array   16
-#define tc_c_file       17
+#define tc_c_file	   17
 #define tc_byte_array   18
 #define tc_subr_4 19
 #define tc_subr_5 20
@@ -167,9 +167,9 @@ long no_interrupt(long n);
 LISP get_eof_val(void);
 long repl_driver(long want_sigint,long want_init,struct repl_hooks *);
 void set_repl_hooks(void (*puts_f)(char *),
-		    LISP (*read_f)(void),
-		    LISP (*eval_f)(LISP),
-		    void (*print_f)(LISP));
+					LISP (*read_f)(void),
+					LISP (*eval_f)(LISP),
+					void (*print_f)(LISP));
 long repl(struct repl_hooks *);
 LISP errl(const char *message, LISP x);
 LISP errswitch(void);
@@ -229,11 +229,11 @@ void init_msubr(char *name, LISP (*fcn)(LISP *,LISP *));
 LISP assq(LISP x,LISP alist);
 LISP delq(LISP elem,LISP l);
 void set_gc_hooks(long type,
-		  LISP (*rel)(LISP),
-		  LISP (*mark)(LISP),
-		  void (*scan)(LISP),
-		  void (*free)(LISP),
-		  long *kind);
+				  LISP (*rel)(LISP),
+				  LISP (*mark)(LISP),
+				  void (*scan)(LISP),
+				  void (*free)(LISP),
+				  long *kind);
 LISP gc_relocate(LISP x);
 LISP user_gc(LISP args);
 LISP gc_status(LISP args);
@@ -249,8 +249,8 @@ LISP lread(LISP);
 LISP lreadtk(char *,long j);
 LISP lreadf(FILE *f);
 void set_read_hooks(char *all_set,char *end_set,
-		    LISP (*fcn1)(int, struct gen_readio *),
-		    LISP (*fcn2)(char *,long, int *));
+					LISP (*fcn1)(int, struct gen_readio *),
+					LISP (*fcn2)(char *,long, int *));
 LISP apropos(LISP);
 LISP vload(char *fname,long cflag,long rflag);
 LISP load(LISP fname,LISP cflag,LISP rflag);
@@ -359,4 +359,4 @@ int __stdcall siod_main(int argc,char **argv, char **env);
 void __stdcall siod_shuffle_args(int *pargc,char ***pargv);
 void __stdcall siod_init(int argc,char **argv);
 
-#endif	// !__SIOD_H__
+#endif		// !__SIOD_H__

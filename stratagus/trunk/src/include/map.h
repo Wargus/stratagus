@@ -3,7 +3,7 @@
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -35,152 +35,152 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Documentation
+--		Documentation
 ----------------------------------------------------------------------------*/
 
 /**
-**	@struct _map_field_ map.h
+**		@struct _map_field_ map.h
 **
-**	\#include "map.h"
+**		\#include "map.h"
 **
-**	typedef struct _map_field_ MapField;
+**		typedef struct _map_field_ MapField;
 **
-**	This structure contains all informations about a field on map.
-**	It contains it look, properties and content.
+**		This structure contains all informations about a field on map.
+**		It contains it look, properties and content.
 **
-**	The map-field structure members:
+**		The map-field structure members:
 **
-**	MapField::Tile
+**		MapField::Tile
 **
-**		Tile is number defining the graphic image display for the
-**		map-field. 65535 different tiles are supported. A tile is
-**		currently 32x32 pixels. In the future is planned to support
-**		animated tiles.
+**				Tile is number defining the graphic image display for the
+**				map-field. 65535 different tiles are supported. A tile is
+**				currently 32x32 pixels. In the future is planned to support
+**				animated tiles.
 **
-**	MapField::SeenTile
+**		MapField::SeenTile
 **
-**		This is the tile number, that the player sitting on the computer
-**		currently knows. Idea: Can be uses for illusions.
+**				This is the tile number, that the player sitting on the computer
+**				currently knows. Idea: Can be uses for illusions.
 **
-**	MapField::Flags
+**		MapField::Flags
 **
-**		Contains special information of that tile. What units are
-**		on this field, what units could be placed on this field.
+**				Contains special information of that tile. What units are
+**				on this field, what units could be placed on this field.
 **
-**		This is the list of all flags currently used:
+**				This is the list of all flags currently used:
 **
-**		::MapFieldVisible field is visible.
-**		::MapFieldExplored field is explored.
-**		::MapFieldHuman	human player is the owner of the field used for
-**			walls.
-**		::MapFieldLandAllowed land units are allowed.
-**		::MapFieldCoastAllowed coast units (transporter) and coast
-**			buildings (shipyard) are allowed.
-**		::MapFieldWaterAllowed water units allowed.
-**		::MapFieldNoBuilding no buildings allowed.
-**		::MapFieldUnpassable field is movement blocked.
-**		::MapFieldWall field contains wall.
-**		::MapFieldRocks	field contains rocks.
-**		::MapFieldForest field contains forest.
-**		::MapFieldLandUnit land unit on field.
-**		::MapFieldAirUnit air unit on field.
-**		::MapFieldSeaUnit water unit on field.
-**		::MapFieldBuilding building on field.
+**				::MapFieldVisible field is visible.
+**				::MapFieldExplored field is explored.
+**				::MapFieldHuman		human player is the owner of the field used for
+**						walls.
+**				::MapFieldLandAllowed land units are allowed.
+**				::MapFieldCoastAllowed coast units (transporter) and coast
+**						buildings (shipyard) are allowed.
+**				::MapFieldWaterAllowed water units allowed.
+**				::MapFieldNoBuilding no buildings allowed.
+**				::MapFieldUnpassable field is movement blocked.
+**				::MapFieldWall field contains wall.
+**				::MapFieldRocks		field contains rocks.
+**				::MapFieldForest field contains forest.
+**				::MapFieldLandUnit land unit on field.
+**				::MapFieldAirUnit air unit on field.
+**				::MapFieldSeaUnit water unit on field.
+**				::MapFieldBuilding building on field.
 **
-**		Note: We want to add support for more unit-types like under
-**		ground units.
+**				Note: We want to add support for more unit-types like under
+**				ground units.
 **
-**	MapField::Value
+**		MapField::Value
 **
-**		Extra value for each tile. This currently only used for
-**		walls, contains the remaining hit points of the wall and
-**		for forest, contains the frames until they grow.
+**				Extra value for each tile. This currently only used for
+**				walls, contains the remaining hit points of the wall and
+**				for forest, contains the frames until they grow.
 **
-**	MapField::Visible[]
+**		MapField::Visible[]
 **
-**		Counter how many units of the player can see this field. 0 the
-**		field is not explored, 1 explored, n-1 unit see it. Currently
-**		no more than 253 units can see a field.
+**				Counter how many units of the player can see this field. 0 the
+**				field is not explored, 1 explored, n-1 unit see it. Currently
+**				no more than 253 units can see a field.
 **
-**	MapField::Here MapField::Here::Units
+**		MapField::Here MapField::Here::Units
 **
-**		Contains a list of all units currently on this field.
-**		Note: currently units are only inserted at the insert point.
-**		This means units of the size of 2x2 fields are inserted at the
-**		top and right most map coordinate.
+**				Contains a list of all units currently on this field.
+**				Note: currently units are only inserted at the insert point.
+**				This means units of the size of 2x2 fields are inserted at the
+**				top and right most map coordinate.
 **
-**	MapField::Region
+**		MapField::Region
 **
-**		Number of the region to that the tile belongs.
+**				Number of the region to that the tile belongs.
 */
 
 /**
-**	@struct _world_map_ map.h
+**		@struct _world_map_ map.h
 **
-**	\#include "map.h"
+**		\#include "map.h"
 **
-**	typedef struct _world_map_ WorldMap;
+**		typedef struct _world_map_ WorldMap;
 **
-**	This structure contains all informations about a stratagus world.
-**	A world is a rectangle of any size. In the future it is planned to
-**	support multiple worlds.
+**		This structure contains all informations about a stratagus world.
+**		A world is a rectangle of any size. In the future it is planned to
+**		support multiple worlds.
 **
-**	The world-map structure members:
+**		The world-map structure members:
 **
-**	WorldMap::Width WorldMap::Height
+**		WorldMap::Width WorldMap::Height
 **
-**		The map size in tiles.
+**				The map size in tiles.
 **
-**	WorldMap::Fields
+**		WorldMap::Fields
 **
-**		An array WorldMap::Width*WorldMap::Height of all fields
-**		belonging to this map.
+**				An array WorldMap::Width*WorldMap::Height of all fields
+**				belonging to this map.
 **
-**	WorldMap::NoFogOfWar
+**		WorldMap::NoFogOfWar
 **
-**		Flag if true, the fog of war is disabled.
+**				Flag if true, the fog of war is disabled.
 **
-**	WorldMap::TerrainName
+**		WorldMap::TerrainName
 **
-**		Terrain as name. Used for unit-type look changes depending on
-**		the current terrain type. In the future we want to support
-**		multiple terrains pro map.
+**				Terrain as name. Used for unit-type look changes depending on
+**				the current terrain type. In the future we want to support
+**				multiple terrains pro map.
 **
-**	WorldMap::Terrain
+**		WorldMap::Terrain
 **
-**		The terrain as number, this should be removed.
+**				The terrain as number, this should be removed.
 **
-**	WorldMap::Tileset
+**		WorldMap::Tileset
 **
-**		Tileset data for the map. See ::Tileset. This contains all
-**		information about the tile.
+**				Tileset data for the map. See ::Tileset. This contains all
+**				information about the tile.
 **
-**	WorldMap::TileCount
+**		WorldMap::TileCount
 **
-**		How many graphic tiles are available.
+**				How many graphic tiles are available.
 **
-**	WorldMap::Tiles
+**		WorldMap::Tiles
 **
-**		Pointer into the tile graphic data. Used to find fast the start
-**		of different tiles.
+**				Pointer into the tile graphic data. Used to find fast the start
+**				of different tiles.
 **
-**	WorldMap::TileData
+**		WorldMap::TileData
 **
-**		Tiles graphic for the map, loaded from WorldMap::Tileset::File.
+**				Tiles graphic for the map, loaded from WorldMap::Tileset::File.
 **
-**	WorldMap::Description[32]
+**		WorldMap::Description[32]
 **
-**		Short description of the map.
+**				Short description of the map.
 **
-**	WorldMap::Info
+**		WorldMap::Info
 **
-**		Descriptive information of the map.
-**		@see ::_map_info_
-**		@todo This structure contains duplicate informations of the map.
+**				Descriptive information of the map.
+**				@see ::_map_info_
+**				@todo This structure contains duplicate informations of the map.
 */
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include "unit.h"
@@ -188,418 +188,418 @@
 #include "tileset.h"
 
 /*----------------------------------------------------------------------------
---	Map
+--		Map
 ----------------------------------------------------------------------------*/
 
-// JOHNS:	only limited by computer memory
-//			OLD	NEW Code
-//	 512x512:	  2 MB	 3 MB
-//	1024x1024:	  8 MB  12 MB
-//	2048*2048:	 32 MB  48 MB
-//	4096*4096:	128 MB 192 MB
-#define MaxMapWidth	256		///  maximal map width supported
-#define MaxMapHeight	256		/// maximal map height supported
+// JOHNS:		only limited by computer memory
+//						OLD		NEW Code
+//		 512x512:		  2 MB		 3 MB
+//		1024x1024:		  8 MB  12 MB
+//		2048*2048:		 32 MB  48 MB
+//		4096*4096:		128 MB 192 MB
+#define MaxMapWidth		256				///  maximal map width supported
+#define MaxMapHeight		256				/// maximal map height supported
 
 /*----------------------------------------------------------------------------
---	Map - field
+--		Map - field
 ----------------------------------------------------------------------------*/
 
 #ifdef UNIT_ON_MAP
 /**
-**	All units on a map field, if more than one.
-**	FIXME: unused
+**		All units on a map field, if more than one.
+**		FIXME: unused
 */
 typedef struct _unit_array_ {
-    Unit*		Building;	/// Building or corpse
-    Unit*		SeaUnit;	/// Sea unit
-    Unit*		LandUnit;	/// Land unit
-    Unit*		AirUnit;	/// Air unit
+	Unit*				Building;		/// Building or corpse
+	Unit*				SeaUnit;		/// Sea unit
+	Unit*				LandUnit;		/// Land unit
+	Unit*				AirUnit;		/// Air unit
 } UnitArray;
 
 #endif
 
-    /// Describes a field of the map
+	/// Describes a field of the map
 typedef struct _map_field_ {
-    unsigned short	Tile;		/// graphic tile number
-    unsigned short	SeenTile;	/// last seen tile (FOW)
-    unsigned short	Flags;		/// field flags
-    // FIXME: Value can be removed, walls and regeneration can be handled
-    //	      different.
-    unsigned char	Value;		/// HP for walls/ Wood Regeneration
-    unsigned char Visible[PlayerMax];	/// Seen counter 0 unexplored
+	unsigned short		Tile;				/// graphic tile number
+	unsigned short		SeenTile;		/// last seen tile (FOW)
+	unsigned short		Flags;				/// field flags
+	// FIXME: Value can be removed, walls and regeneration can be handled
+	//			  different.
+	unsigned char		Value;				/// HP for walls/ Wood Regeneration
+	unsigned char Visible[PlayerMax];		/// Seen counter 0 unexplored
 #ifdef UNIT_ON_MAP
-    union {
-	Unit*		Units;		/// An unit on the map field
-	UnitArray*	Array;		/// More units on the map field
-    }			Here;		/// What is on the field
+	union {
+		Unit*				Units;				/// An unit on the map field
+		UnitArray*		Array;				/// More units on the map field
+	}						Here;				/// What is on the field
 #endif
 #ifdef UNITS_ON_MAP
-    UnitRef		Building;	/// Building or corpse
-    UnitRef		AirUnit;	/// Air unit
-    UnitRef		LandUnit;	/// Land unit
-    UnitRef		SeaUnit;	/// Sea unit
+	UnitRef				Building;		/// Building or corpse
+	UnitRef				AirUnit;		/// Air unit
+	UnitRef				LandUnit;		/// Land unit
+	UnitRef				SeaUnit;		/// Sea unit
 #endif
 #ifdef HIERARCHIC_PATHFINDER
-    unsigned short	RegId;	/// Region to which the field belongs
-    // FIXME: Johns: this values can't be placed in the map field,
-    //	      this needs too much memory.
-    unsigned short	f, g;		/// A* parameters (no need to store h)
-    unsigned short	h;		///stored only for BestSoFar computation
-#define HIER_LOW_OPEN	0
-#define HIER_LOW_CLOSED	1
-    unsigned int	Set:1;		/// Open/Closed
-    unsigned int	Goal:1;
-    // FIXME perhaps the previous 2 one-bit fields should be crammed into e.g.
-    // g? There's potentially a *lot* of MapFields in this game and every byte
-    // saved here could translate into 1 MB saved overall for max sized map.
-    char		Traceback;	/// The field through which we arrived
-					/// to this one
+	unsigned short		RegId;		/// Region to which the field belongs
+	// FIXME: Johns: this values can't be placed in the map field,
+	//			  this needs too much memory.
+	unsigned short		f, g;				/// A* parameters (no need to store h)
+	unsigned short		h;				///stored only for BestSoFar computation
+#define HIER_LOW_OPEN		0
+#define HIER_LOW_CLOSED		1
+	unsigned int		Set:1;				/// Open/Closed
+	unsigned int		Goal:1;
+	// FIXME perhaps the previous 2 one-bit fields should be crammed into e.g.
+	// g? There's potentially a *lot* of MapFields in this game and every byte
+	// saved here could translate into 1 MB saved overall for max sized map.
+	char				Traceback;		/// The field through which we arrived
+										/// to this one
 #endif
 } MapField;
 
 // Not used until now:
-//#define MapFieldArray		0x0004	/// More than one unit on the field
+//#define MapFieldArray				0x0004		/// More than one unit on the field
 
-#define MapFieldHuman		0x0008	/// Human is owner of the field (walls)
+#define MapFieldHuman				0x0008		/// Human is owner of the field (walls)
 
-#define MapFieldLandAllowed	0x0010	/// Land units allowed
-#define MapFieldCoastAllowed	0x0020	/// Coast (transporter) units allowed
-#define MapFieldWaterAllowed	0x0040	/// Water units allowed
-#define MapFieldNoBuilding	0x0080	/// No buildings allowed
+#define MapFieldLandAllowed		0x0010		/// Land units allowed
+#define MapFieldCoastAllowed		0x0020		/// Coast (transporter) units allowed
+#define MapFieldWaterAllowed		0x0040		/// Water units allowed
+#define MapFieldNoBuilding		0x0080		/// No buildings allowed
 
-#define MapFieldUnpassable	0x0100	/// Field is movement blocked
-#define MapFieldWall		0x0200	/// Field contains wall
-#define MapFieldRocks		0x0400	/// Field contains rocks
-#define MapFieldForest		0x0800	/// Field contains forest
+#define MapFieldUnpassable		0x0100		/// Field is movement blocked
+#define MapFieldWall				0x0200		/// Field contains wall
+#define MapFieldRocks				0x0400		/// Field contains rocks
+#define MapFieldForest				0x0800		/// Field contains forest
 
-#define MapFieldLandUnit	0x1000	/// Land unit on field
-#define MapFieldAirUnit		0x2000	/// Air unit on field
-#define MapFieldSeaUnit		0x4000	/// Water unit on field
-#define MapFieldBuilding	0x8000	/// Building on field
+#define MapFieldLandUnit		0x1000		/// Land unit on field
+#define MapFieldAirUnit				0x2000		/// Air unit on field
+#define MapFieldSeaUnit				0x4000		/// Water unit on field
+#define MapFieldBuilding		0x8000		/// Building on field
 
 /*----------------------------------------------------------------------------
---	Map info structure
+--		Map info structure
 ----------------------------------------------------------------------------*/
 
 /**
-**	Get info about a map.
+**		Get info about a map.
 */
 typedef struct _map_info_ {
-    char*	Description;		/// Map description
-    char*	MapTerrainName;		/// Map terrain name
-    // FIXME: Map Terrain Nr. should be removed.
-    int		MapTerrain;		/// Map terrain
-    int		MapWidth;		/// Map width
-    int		MapHeight;		/// Map height
-    int		PlayerType[PlayerMax];	/// Same player->Type
-    int		PlayerSide[PlayerMax];	/// Same player->Side
-    int		PlayerResources[PlayerMax][MaxCosts];	/// Same player->Gold
-    int		PlayerAi[PlayerMax];	/// Same player->Ai
-    unsigned int MapUID;		/// Unique Map ID (hash)
+	char*		Description;				/// Map description
+	char*		MapTerrainName;				/// Map terrain name
+	// FIXME: Map Terrain Nr. should be removed.
+	int				MapTerrain;				/// Map terrain
+	int				MapWidth;				/// Map width
+	int				MapHeight;				/// Map height
+	int				PlayerType[PlayerMax];		/// Same player->Type
+	int				PlayerSide[PlayerMax];		/// Same player->Side
+	int				PlayerResources[PlayerMax][MaxCosts];		/// Same player->Gold
+	int				PlayerAi[PlayerMax];		/// Same player->Ai
+	unsigned int MapUID;				/// Unique Map ID (hash)
 } MapInfo;
 
 /*----------------------------------------------------------------------------
---	Map itself
+--		Map itself
 ----------------------------------------------------------------------------*/
 
-    /// Describes the wold map
+	/// Describes the wold map
 typedef struct _world_map_ {
-    int			Width;		/// the map width
-    int			Height;		/// the map height
+	int						Width;				/// the map width
+	int						Height;				/// the map height
 
-    MapField*		Fields;		/// fields on map
-    unsigned*		Visible[PlayerMax]; /// visible bit-field
+	MapField*				Fields;				/// fields on map
+	unsigned*				Visible[PlayerMax]; /// visible bit-field
 
-    unsigned char	NoFogOfWar;	/// fog of war disabled
+	unsigned char		NoFogOfWar;		/// fog of war disabled
 
-    char*		TerrainName;	/// terrain as name
-    // FIXME: terrain nr. should be removed?
-    int			Terrain;	/// terrain type (summer,winter,...)
-    Tileset*		Tileset;	/// tileset data
+	char*				TerrainName;		/// terrain as name
+	// FIXME: terrain nr. should be removed?
+	int						Terrain;		/// terrain type (summer,winter,...)
+	Tileset*				Tileset;		/// tileset data
 
 #ifdef USE_SDL_SURFACE
-    unsigned int	TileCount;	/// how many tiles,
-					/// == TileGraphic->NFrames
-    Graphic*		TileGraphic;	/// graphic for all the tiles
+	unsigned int		TileCount;		/// how many tiles,
+										/// == TileGraphic->NFrames
+	Graphic*				TileGraphic;		/// graphic for all the tiles
 #else
-    unsigned		TileCount;	/// how many tiles are available
-    unsigned char**	Tiles;		/// pointer to tile data
-    Graphic*		TileData;	/// tiles graphic for map
+	unsigned				TileCount;		/// how many tiles are available
+	unsigned char**		Tiles;				/// pointer to tile data
+	Graphic*				TileData;		/// tiles graphic for map
 #endif
 
-    char		Description[32];/// map description short
+	char				Description[32];/// map description short
 
-    MapInfo*		Info;		/// descriptive information (FIXME: DUPLICATES!)
+	MapInfo*				Info;				/// descriptive information (FIXME: DUPLICATES!)
 } WorldMap;
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
-extern WorldMap TheMap;			/// The current map
+extern WorldMap TheMap;						/// The current map
 
-extern char MustRedrawRow[MAXMAP_W];		/// Flags must redraw map row
-extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile
+extern char MustRedrawRow[MAXMAP_W];				/// Flags must redraw map row
+extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];		/// Flags must redraw tile
 
-    /// Fast draw tile, display and video mode independ
+	/// Fast draw tile, display and video mode independ
 #ifdef USE_SDL_SURFACE
 extern void VideoDrawTile(const int,int,int);
 #else
 extern void (*VideoDrawTile)(const unsigned char*,int,int);
 #endif
-    /// Draws tiles display and video mode independ
+	/// Draws tiles display and video mode independ
 #ifdef USE_SDL_SURFACE
 extern void MapDrawTile(int,int,int);
 #else
 extern void (*MapDrawTile)(int,int,int);
 #endif
-    /// Vision Table to see where to locate goals and vision
+	/// Vision Table to see where to locate goals and vision
 extern unsigned char *VisionTable[3];
-    /// Companion table for fast lookups
+	/// Companion table for fast lookups
 extern int *VisionLookup;
 
 #ifdef NEW_DECODRAW
-    /// FIXME: docu
+	/// FIXME: docu
 extern void InitMapDecoration(void);
-    /// Decoration for the map.
+	/// Decoration for the map.
 extern Deco* MapDecoration;
 #endif
 
-    /// Use original style fog of war
+	/// Use original style fog of war
 extern int OriginalFogOfWar;
-    /// Contrast of fog of war
+	/// Contrast of fog of war
 extern int FogOfWarContrast;
-    /// Brightness of fog of war
+	/// Brightness of fog of war
 extern int FogOfWarBrightness;
-    /// Saturation of fog of war
+	/// Saturation of fog of war
 extern int FogOfWarSaturation;
-    /// Forest regeneration
+	/// Forest regeneration
 extern int ForestRegeneration;
-    /// Flag must reveal the map
+	/// Flag must reveal the map
 extern int FlagRevealMap;
-    /// Flag must reveal map when in replay
+	/// Flag must reveal map when in replay
 extern int ReplayRevealMap;
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 //
-//	in map_draw.c
+//		in map_draw.c
 //
-    /// Fast draw 32x32 tile for 32 bpp video modes
+	/// Fast draw 32x32 tile for 32 bpp video modes
 //extern void VideoDraw32Tile32(const unsigned char* data,int x,int y);
-    /// Fast draw 32x32 tile for 16 bpp video modes
+	/// Fast draw 32x32 tile for 16 bpp video modes
 //extern void VideoDraw16Tile32(const unsigned char* data,int x,int y);
-    /// Fast draw 32x32 tile for  8 bpp video modes
+	/// Fast draw 32x32 tile for  8 bpp video modes
 //extern void VideoDraw8Tile32(const unsigned char* data,int x,int y);
 
-    /// Called when the color cycles
+	/// Called when the color cycles
 extern void MapColorCycle(void);
 
-    /// Draw the map background
+	/// Draw the map background
 extern void DrawMapBackgroundInViewport(const Viewport*, int x, int y);
-    /// Build tables for map
+	/// Build tables for map
 extern void InitMap(void);
 
-    /// Mark position inside screenmap be drawn for next display update
+	/// Mark position inside screenmap be drawn for next display update
 extern int MarkDrawPosMap(int x, int y );
-    /// Denote wether area in map is overlapping with viewport on screen
+	/// Denote wether area in map is overlapping with viewport on screen
 extern int MapAreaVisibleInViewport(const Viewport*, int , int , int , int );
-    /// Check if any part of an area is visible in viewport
+	/// Check if any part of an area is visible in viewport
 extern int AnyMapAreaVisibleInViewport(const Viewport*, int , int , int , int );
-    /// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
+	/// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
 extern  int MarkDrawAreaMap( int sx, int sy, int ex, int ey );
-    /// Set all entries in MustRedrawRow and MustRedrawTile
+	/// Set all entries in MustRedrawRow and MustRedrawTile
 extern  void MarkDrawEntireMap(void);
 
 //
-//	in map_fog.c
+//		in map_fog.c
 //
-    /// Mark a tile for normal sight
+	/// Mark a tile for normal sight
 extern void MapMarkTileSight(const Player* player,int x,int y);
-    /// Unmark a tile for normal sight
+	/// Unmark a tile for normal sight
 extern void MapUnmarkTileSight(const Player* player,int x,int y);
-    /// Mark Cloaked units on a tile as detected.
+	/// Mark Cloaked units on a tile as detected.
 extern void MapDetectUnitsOnTile(const Player* player,int x,int y);
-    /// Mark sight changes
+	/// Mark sight changes
 extern void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*,int,int));
-    /// Find if a tile is visible (With shared vision)
+	/// Find if a tile is visible (With shared vision)
 extern unsigned char IsTileVisible(const Player* player, int x, int y);
-    /// Mark tiles with fog of war to be redrawn
+	/// Mark tiles with fog of war to be redrawn
 extern void MapUpdateFogOfWar(int x,int y);
-    ///	Update fog of war
+	///		Update fog of war
 extern void UpdateFogOfWarChange(void);
 
-    /// Draw the map fog of war
+	/// Draw the map fog of war
 extern void DrawMapFogOfWar(const Viewport* vp,int x,int y);
-    /// Build tables for fog of war
+	/// Build tables for fog of war
 extern void InitMapFogOfWar(void);
-    /// Cleanup memory for fog of war tables
+	/// Cleanup memory for fog of war tables
 extern void CleanMapFogOfWar(void);
-    /// Builds Vision and Goal Tables
+	/// Builds Vision and Goal Tables
 extern void InitVisionTable(void);
-    /// Cleans up Vision and Goal Tables
+	/// Cleans up Vision and Goal Tables
 extern void FreeVisionTable(void);
 
 //
-//	in map_wall.c
+//		in map_wall.c
 //
-    ///	Check if the seen tile-type is wall
+	///		Check if the seen tile-type is wall
 extern int MapIsSeenTileWall(int x, int y,int walltype);
-    ///	Correct the seen wall field, depending on the surrounding
+	///		Correct the seen wall field, depending on the surrounding
 extern void MapFixSeenWallTile(int x, int y);
-    ///	Correct the surrounding seen wall fields
+	///		Correct the surrounding seen wall fields
 extern void MapFixSeenWallNeighbors(int x, int y);
-    ///	Correct the real wall field, depending on the surrounding
+	///		Correct the real wall field, depending on the surrounding
 extern void MapFixWallTile(int x, int y);
-    /// Remove wall on tile
+	/// Remove wall on tile
 extern void MapRemoveWall(unsigned x,unsigned y);
-    /// Wall is hit
+	/// Wall is hit
 extern void HitWall(unsigned x,unsigned y,unsigned damage);
 
 //
-//	in map_wood.c
+//		in map_wood.c
 //
-    ///	Check if the seen tile-type is wood
+	///		Check if the seen tile-type is wood
 extern int MapIsSeenTileWood(int x, int y);
-    ///	Correct the seen wood field, depending on the surrounding
+	///		Correct the seen wood field, depending on the surrounding
 extern void MapFixSeenWoodTile(int x, int y);
-    ///	Correct the surrounding seen wood fields
+	///		Correct the surrounding seen wood fields
 extern void MapFixSeenWoodNeighbors(int x, int y);
-    ///	Correct the real wood field, depending on the surrounding
+	///		Correct the real wood field, depending on the surrounding
 extern void MapFixWoodTile(int x, int y);
-    /// Remove wood from the map
+	/// Remove wood from the map
 extern void MapRemoveWood(unsigned x,unsigned y);
-    /// Regenerate the forest
+	/// Regenerate the forest
 extern void RegenerateForest(void);
 
 //
-//	in map_rock.c
+//		in map_rock.c
 //
-    ///	Check if the seen tile-type is rock
+	///		Check if the seen tile-type is rock
 extern int MapIsSeenTileRock(int x, int y);
-    ///	Correct the seen rock field, depending on the surrounding
+	///		Correct the seen rock field, depending on the surrounding
 extern void MapFixSeenRockTile(int x, int y);
-    ///	Correct the surrounding seen rock fields
+	///		Correct the surrounding seen rock fields
 extern void MapFixSeenRockNeighbors(int x, int y);
-    ///	Correct the real rock field, depending on the surrounding
+	///		Correct the real rock field, depending on the surrounding
 extern void MapFixRockTile(int x, int y);
-    /// Remove rock from the map
+	/// Remove rock from the map
 extern void MapRemoveRock(unsigned x,unsigned y);
 
 //
-//	in ccl_map.c
+//		in ccl_map.c
 //
-    /// register ccl features
+	/// register ccl features
 extern void MapCclRegister(void);
 
 //
-//	mixed sources
+//		mixed sources
 //
-    /// Load a map
+	/// Load a map
 //extern void LoadMap(const char* file,WorldMap* map);
-    /// Save the map
+	/// Save the map
 extern void SaveMap(CLFile* file);
-    /// Clean the map
+	/// Clean the map
 extern void CleanMap(void);
 
-    /// Release info for a map
+	/// Release info for a map
 extern void FreeMapInfo(MapInfo* info);
 
-    /// Mark a tile as seen by the player
+	/// Mark a tile as seen by the player
 extern void MapMarkSeenTile(int x,int y);
-    /// Reveal the complete map, make everything known
+	/// Reveal the complete map, make everything known
 extern void RevealMap(void);
 
-    /// Returns true, if the tile field is empty
+	/// Returns true, if the tile field is empty
 extern int IsMapFieldEmpty(int x,int y);
-    /// Returns true, if water on the map tile field
+	/// Returns true, if water on the map tile field
 extern int WaterOnMap(int x,int y);
-    /// Returns true, if coast on the map tile field
+	/// Returns true, if coast on the map tile field
 extern int CoastOnMap(int x,int y);
 
-    /// Returns true, if wall on the map tile field
+	/// Returns true, if wall on the map tile field
 extern int WallOnMap(int x,int y);
-    /// Returns true, if human wall on the map tile field
+	/// Returns true, if human wall on the map tile field
 extern int HumanWallOnMap(int x,int y);
-    /// Returns true, if orc wall on the map tile field
+	/// Returns true, if orc wall on the map tile field
 extern int OrcWallOnMap(int x,int y);
 
-    /// Returns true, if forest on the map tile field with bounds check
+	/// Returns true, if forest on the map tile field with bounds check
 extern int CheckedForestOnMap(int x,int y);
-    /// Returns true, if forest on the map tile field
+	/// Returns true, if forest on the map tile field
 extern int ForestOnMap(int x,int y);
 
-    /// Returns true, if rock on the map tile field
+	/// Returns true, if rock on the map tile field
 extern int RockOnMap(int x,int y);
 
 #ifdef HIERARCHIC_PATHFINDER
-    /// FIXME: docu
+	/// FIXME: docu
 extern inline unsigned short MapFieldGetRegId(int , int );
-    /// FIXME: docu
+	/// FIXME: docu
 extern inline void MapFieldSetRegId(int , int , unsigned short );
-    /// FIXME: docu
+	/// FIXME: docu
 extern inline int MapFieldPassable(int , int , int );
 #endif
 
-    /// Returns true, if the unit-type(mask can enter field with bounds check
+	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern int CheckedCanMoveToMask(int x,int y,int mask);
-    /// Returns true, if the unit-type(mask) can enter the field
+	/// Returns true, if the unit-type(mask) can enter the field
 extern int CanMoveToMask(int x,int y,int mask);
-    /// Returns true, if the unit-type can enter the field
+	/// Returns true, if the unit-type can enter the field
 extern int UnitTypeCanMoveTo(int x,int y,const UnitType* type);
-    /// Returns true, if the unit can enter the field
+	/// Returns true, if the unit can enter the field
 extern int UnitCanMoveTo(int x,int y,const Unit* unit);
 
-    /// Preprocess map, for internal use.
+	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);
 
-    /// Set wall on field
+	/// Set wall on field
 extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 
 /*----------------------------------------------------------------------------
---	Defines
+--		Defines
 ----------------------------------------------------------------------------*/
 
-    /// Tile number of the tile drawn for unexplored space
+	/// Tile number of the tile drawn for unexplored space
 #define UNEXPLORED_TILE 0
 
-    /// Can an unit with 'mask' can enter the field
+	/// Can an unit with 'mask' can enter the field
 #define CanMoveToMask(x,y,mask) \
-	!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
+		!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
 
 #define MapDetectCloakedUnits(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
-	(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapDetectUnitsOnTile)
+		(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapDetectUnitsOnTile)
 #define MapMarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapMarkTileSight)
 #define MapUnmarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapUnmarkTileSight)
 #define MapMarkUnitSight(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
-	(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapMarkTileSight)
+		(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapMarkTileSight)
 #define MapUnmarkUnitSight(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
-	(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight)
+		(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight)
 #define MapMarkUnitOnBoardSight(unit,host) MapSight((unit)->Player,(host)->X,(host)->Y, \
-	(host)->Type->TileWidth,(host)->Type->TileHeight,(unit)->CurrentSightRange,MapMarkTileSight)
+		(host)->Type->TileWidth,(host)->Type->TileHeight,(unit)->CurrentSightRange,MapMarkTileSight)
 #define MapUnmarkUnitOnBoardSight(unit,host) MapSight((unit)->Player,(host)->X,(host)->Y, \
-	(host)->Type->TileWidth,(host)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight)
-    /// Check if a field for the user is explored
+		(host)->Type->TileWidth,(host)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight)
+	/// Check if a field for the user is explored
 #define IsMapFieldExplored(player,x,y) \
-    (IsTileVisible((player),(x),(y)))
+	(IsTileVisible((player),(x),(y)))
 
-    /// Check if a field for the user is visibile
+	/// Check if a field for the user is visibile
 #define IsMapFieldVisible(player,x,y) \
-    (IsTileVisible((player),(x),(y))>1)
+	(IsTileVisible((player),(x),(y))>1)
 
 #ifdef UNITS_ON_MAP
-    /// Is there a building on this field
-#define BuildingOnMapField(mf)	((mf)->Building != 0xffff)
-    /// Is there a land unit on this field
-#define LandUnitOnMapField(mf)	((mf)->LandUnit != 0xffff)
-    /// Is there a sea unit on this field
-#define SeaUnitOnMapField(mf)	((mf)->SeaUnit != 0xffff)
-    /// Is there an air unit on this field
-#define AirUnitOnMapField(mf)	((mf)->AirUnit != 0xffff)
+	/// Is there a building on this field
+#define BuildingOnMapField(mf)		((mf)->Building != 0xffff)
+	/// Is there a land unit on this field
+#define LandUnitOnMapField(mf)		((mf)->LandUnit != 0xffff)
+	/// Is there a sea unit on this field
+#define SeaUnitOnMapField(mf)		((mf)->SeaUnit != 0xffff)
+	/// Is there an air unit on this field
+#define AirUnitOnMapField(mf)		((mf)->AirUnit != 0xffff)
 #endif // UNITS_ON_MAP
 
 //@}
 
-#endif	// !__MAP_H__
+#endif		// !__MAP_H__

@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -34,10 +34,10 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Declarations
+--		Declarations
 ----------------------------------------------------------------------------*/
 
-//	This is needed to have recursive forward references
+//		This is needed to have recursive forward references
 
 #if !defined(__STRUCT_PLAYER__) && !defined(DOXYGEN)
 #define __STRUCT_PLAYER__
@@ -56,4 +56,4 @@ typedef struct _missile_type_ MissileType;
 
 //@}
 
-#endif	// !__FC_TYPES_H__
+#endif		// !__FC_TYPES_H__
