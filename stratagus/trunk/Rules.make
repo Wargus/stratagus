@@ -108,8 +108,8 @@ SDL		= -DUSE_SDL -DUSE_SDLA $(SDL_CFLAGS)
 
 # Uncomment the next for the SDL X11/SVGALIB support.
 
-VIDEO		= $(SDL)
-VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd -lm
+#VIDEO		= $(SDL)
+#VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd -lm
 
 # Choose next to get svgalib support.
 
@@ -169,7 +169,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 PROFILE=	-pg
 
 # Version
-VERSION=	'-DVERSION="1.17pre1-build1"'
+VERSION=	'-DVERSION="1.17pre1-build6"'
 
 ############################################################################
 # below this, nothing should be changed!
@@ -204,7 +204,7 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## define flags
 DEBUG=	-DDEBUG #-DNEW_AI # -DFLAG_DEBUG
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG) -DNEW_VIDEO -DNEW_UNIT # -DNEW_NAMES
+	$(DEBUG) -DNEW_UNIT -DNEW_NETWORK -DNEW_HEADING -DNEW_VIDEO # -DNEW_NAMES
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wall -Werror $(IFLAGS) $(DFLAGS)
