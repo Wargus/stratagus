@@ -1791,8 +1791,7 @@ global void InitSprite(void)
 	    GraphicSprite8Type.DrawClip=VideoDraw8to24Clip;
 	    GraphicSprite8Type.DrawX=VideoDraw8to24X;
 	    GraphicSprite8Type.DrawClipX=VideoDraw8to24ClipX;
-	    // FIXME: need real 24bpp mode!!
-	    // break;
+	    break;
 
 	case 32:
 	    GraphicSprite8Type.Draw=VideoDraw8to32;

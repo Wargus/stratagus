@@ -1619,7 +1619,7 @@ build_table:
 		VideoDrawFog=VideoDraw24Fog32Alpha;
 		VideoDrawOnlyFog=VideoDraw24OnlyFog32Alpha;
 		VideoDrawUnexplored=VideoDraw24Unexplored32Solid;
-		// FIXME: real 24 bpp mode break;
+		break;
 
 	    case 32:
 		VideoDrawFog=VideoDraw32Fog32Alpha;
@@ -1649,7 +1649,7 @@ build_table:
 		VideoDrawFog=VideoDraw24Fog32Solid;
 		VideoDrawOnlyFog=VideoDraw24OnlyFog32Solid;
 		VideoDrawUnexplored=VideoDraw24Unexplored32Solid;
-		// FIXME: real 24bpp mode break;
+		break;
 	    case 32:			// 32 bpp video depth
 		VideoDrawFog=VideoDraw32Fog32Solid;
 		VideoDrawOnlyFog=VideoDraw32OnlyFog32Solid;

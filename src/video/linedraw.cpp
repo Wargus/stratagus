@@ -814,7 +814,7 @@ global void InitLineDraw(void)
 	    VideoDrawHLineClip=DrawHLineClip24;
 	    VideoDrawVLine=DrawVLine24;
 	    VideoDrawVLineClip=DrawVLineClip24;
-	    // FIXME: real 24bpp break;
+	    break;
 
 	case 32:
 	    VideoDrawPixel=DrawPixel32;

@@ -535,9 +535,9 @@ global void GraphicPlayerPixels(const Player* player,const Graphic* sprite)
 		    =player->UnitColors.Depth16;
 	    break;
 	case 24:
-	    // FIXME: support for real 24 bpp mode
-	    //*((struct __4pixel24__*)(((VMemType24*)sprite->Pixels)+208))
-	    //	    =player->UnitColors.Depth24;
+	    *((struct __4pixel24__*)(((VMemType24*)sprite->Pixels)+208))
+	    	    =player->UnitColors.Depth24;
+	    break;
 	case 32:
 	    *((struct __4pixel32__*)(((VMemType32*)sprite->Pixels)+208))
 		    =player->UnitColors.Depth32;
@@ -562,9 +562,8 @@ global void PlayerPixels(const Player* player)
 	*((struct __4pixel16__*)(Pixels16+208))=player->UnitColors.Depth16;
 	break;
     case 24:
-	//*((struct __4pixel24__*)(Pixels24+208))=player->UnitColors.Depth16;
-	// FIXME: support for real 24 bpp mode
-	//break;
+	*((struct __4pixel24__*)(Pixels24+208))=player->UnitColors.Depth24;
+	break;
     case 32:
 	*((struct __4pixel32__*)(Pixels32+208))=player->UnitColors.Depth32;
 	break;
@@ -670,8 +669,7 @@ global void SetPlayersPalette(void)
 	Players[i+8].UnitColors.Depth24.Pixels[2]=Pixels24[14];
 	Players[i+8].UnitColors.Depth24.Pixels[3]=Pixels24[15];
 
-	// FIXME: support for real 24 bpp mode
-	//break;
+	break;
     case 32:
 	// New player colors setup
 	if( !Pixels32 ) {

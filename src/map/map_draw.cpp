@@ -1378,7 +1378,7 @@ void InitMap(void)
 #else
 	    MapDrawTile=MapDraw24Tile32;
 #endif
-	    // FIXME: real 24bpp mode break;
+	    break;
 
 	case 32:
 	    VideoDrawTile=VideoDraw32Tile32;
