@@ -43,15 +43,26 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
+#ifdef __GNUC__	// {
+
 /**
 **	Default resources for a new player.
 */
 #define DEFAULT_RESOURCES \
 	((int[]){ 0,  2000, 1000, 1000,  1000, 1000, 1000 })
+/**
+**	Default resources for a new player with low resources..
+*/
 #define DEFAULT_RESOURCES_LOW \
 	((int[]){ 0,  2000, 1000, 1000,  1000, 1000, 1000 })
+/**
+**	Default resources for a new player with mid resources.
+*/
 #define DEFAULT_RESOURCES_MEDIUM \
 	((int[]){ 0,  5000, 2000, 2000,  2000, 2000, 2000 })
+/**
+**	Default resources for a new player with high resources.
+*/
 #define DEFAULT_RESOURCES_HIGH \
 	((int[]){ 0,  10000, 5000, 5000,  5000, 5000, 5000 })
 
@@ -72,6 +83,60 @@
 */
 #define DEFAULT_NAMES \
 	((char*[]){"time","gold","wood","oil","ore","stone","coal"})
+
+#else	// }{ __GNUC__
+
+/**
+**	Default resources for a new player.
+*/
+static const int DEFAULT_RESOURCES[7] = {
+    0,   2000, 1000, 1000,  1000, 1000, 1000
+};
+
+/**
+**	Default resources for a new player with low resources..
+*/
+static const int DEFAULT_RESOURCES_LOW[7] = {
+    0,   2000, 1000, 1000,  1000, 1000, 1000
+};
+
+/**
+**	Default resources for a new player with mid resources.
+*/
+static const int DEFAULT_RESOURCES_MEDIUM[7] = {
+    0,   5000, 2000, 2000,  2000, 2000, 2000
+};
+
+/**
+**	Default resources for a new player with high resources.
+*/
+static const int DEFAULT_RESOURCES_HIGH[7] = {
+    0,  10000, 5000, 5000,  5000, 5000, 5000
+};
+
+/**
+**	Default incomes for a new player.
+*/
+static const int DEFAULT_INCOMES[7] = {
+    0,    100,  100,  100,   100,  100,  100
+};
+
+/**
+**	Default action for the resources.
+*/
+static const char* DEFAULT_ACTIONS[7] __attribute__((unused)) = {
+    "stop","mine","chop","drill","mine","mine","mine"
+};
+
+
+/**
+**	Default names for the resources.
+*/
+static const char* DEFAULT_NAMES[7] __attribute__((unused)) = {
+    "time","gold","wood","oil","ore","stone","coal"
+};
+
+#endif	// } __GNUC__
 
 /**
 **	Indices into costs/resource/income array. (A litte future here :)
