@@ -35,6 +35,7 @@
 #include "freecraft.h"
 #include "unittype.h"
 #include "ccl.h"
+#include "ai.h"
 #include "ai_local.h"
 
 /*----------------------------------------------------------------------------
@@ -499,6 +500,14 @@ local SCM CclAiGetRace(void)
     return gh_symbol2scm(AiPlayer->Player->RaceName);
 }
 
+/**
+**	Get the number of cycles to sleep.
+*/
+local SCM CclAiGetSleepCycles(void)
+{
+    return gh_int2scm(AiSleepCycles);
+}
+
 //----------------------------------------------------------------------------
 
 /**
@@ -768,23 +777,23 @@ local SCM CclAiAttackWithForce(SCM value)
 }
 
 /**
-**	Sleep n frames.
+**	Sleep n cycles.
 **
-**	@param value	Number of frames to delay.
+**	@param value	Number of cycles to delay.
 */
 local SCM CclAiSleep(SCM value)
 {
     int i;
 
-    DebugLevel3Fn("%lu %d\n",GameCycle,AiPlayer->SleepFrames);
-    if( AiPlayer->SleepFrames ) {
-	if( AiPlayer->SleepFrames<GameCycle ) {
-	    AiPlayer->SleepFrames=0;
+    DebugLevel3Fn("%lu %d\n",GameCycle,AiPlayer->SleepCycles);
+    if( AiPlayer->SleepCycles ) {
+	if( AiPlayer->SleepCycles<GameCycle ) {
+	    AiPlayer->SleepCycles=0;
 	    return SCM_BOOL_F;
 	}
     } else {
 	i=gh_scm2int(value);
-	AiPlayer->SleepFrames=GameCycle+i;
+	AiPlayer->SleepCycles=GameCycle+i;
     }
 
     return SCM_BOOL_T;
@@ -1034,6 +1043,7 @@ global void AiCclRegister(void)
 
 #if defined(NEW_AI)
     gh_new_procedure0_0("ai:get-race",CclAiGetRace);
+    gh_new_procedure0_0("ai:get-sleep-cycles",CclAiGetSleepCycles);
 
     gh_new_procedure1_0("ai:debug",CclAiDebug);
     gh_new_procedure1_0("ai:need",CclAiNeed);

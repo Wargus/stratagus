@@ -836,7 +836,7 @@ global int main(int argc,char** argv)
 		strncpy(NetworkName, optarg, 16);
 		continue;
 	    case 's':
-		AiSleep=atoi(optarg);
+		AiSleepCycles=atoi(optarg);
 		continue;
 	    case 't':
 		AiTimeFactor=atoi(optarg);
