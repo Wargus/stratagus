@@ -518,19 +518,28 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 {
 	int i;
 
-	//  Compute location of the viewport using oldviewport
-	for (i = 0; i < num_vps; ++i) {
-		const Viewport* vp;
+	if (TheUI.NumViewports < num_vps) {
+		//  Compute location of the viewport using oldviewport
+		for (i = 0; i < num_vps; ++i) {
+			const Viewport* vp;
 
-		new_vps[i].MapX = 0;
-		new_vps[i].MapY = 0;
-		vp = GetViewport(new_vps[i].X, new_vps[i].Y);
-		if (vp) {
-			new_vps[i].OffsetX = new_vps[i].X - vp->X + vp->MapX * TileSizeX + vp->OffsetX;
-			new_vps[i].OffsetY = new_vps[i].Y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY;
-		} else {
-			new_vps[i].OffsetX = 0;
-			new_vps[i].OffsetY = 0;
+			new_vps[i].MapX = 0;
+			new_vps[i].MapY = 0;
+			vp = GetViewport(new_vps[i].X, new_vps[i].Y);
+			if (vp) {
+				new_vps[i].OffsetX = new_vps[i].X - vp->X + vp->MapX * TileSizeX + vp->OffsetX;
+				new_vps[i].OffsetY = new_vps[i].Y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY;
+			} else {
+				new_vps[i].OffsetX = 0;
+				new_vps[i].OffsetY = 0;
+			}
+		}
+	} else {
+		for (i = 0; i < num_vps; ++i) {
+			new_vps[i].MapX = TheUI.Viewports[i].MapX;
+			new_vps[i].MapY = TheUI.Viewports[i].MapY;
+			new_vps[i].OffsetX = TheUI.Viewports[i].OffsetX;
+			new_vps[i].OffsetY = TheUI.Viewports[i].OffsetY;
 		}
 	}
 
