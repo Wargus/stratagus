@@ -189,7 +189,7 @@ global void DoRightButton(int sx,int sy)
 	//
 	//	Control + right click on unit is follow anything.
 	//
-	if( KeyModifiers&ModifierControl ) {
+	if( KeyModifiers&ModifierControl && UnitUnderCursor ) {
 	    // FIXME: what todo if more than one unit on that tile?
 	    dest=UnitOnScreenMapPosition(sx,sy);
 	    if( dest ) {
@@ -204,22 +204,22 @@ global void DoRightButton(int sx,int sy)
 	//
 	//	Enter transporters?
 	//
-	dest=TransporterOnScreenMapPosition(sx,sy);
-	if( dest && dest->Type->Transporter
-		&& dest->Player==ThisPlayer
-		&& unit->Type->UnitType==UnitTypeLand ) {
-	    dest->Blink=4;
-	    DebugLevel3Fn("Board transporter\n");
-	    //	Let the transporter move to passenger
-	    //		It should do nothing and not already on coast.
-	    //		FIXME: perhaps force move if not reachable.
-	    if( dest->Orders[0].Action==UnitActionStill
-		    && dest->OrderCount==1
-		    && !CoastOnMap(dest->X,dest->Y) ) {
-		SendCommandFollow(dest,unit,FlushCommands);
+	if( UnitUnderCursor && (dest=TransporterOnScreenMapPosition(sx,sy))) {
+	    if( dest->Player==unit->Player
+		    && unit->Type->UnitType==UnitTypeLand ) {
+		dest->Blink=4;
+		DebugLevel3Fn("Board transporter\n");
+		//	Let the transporter move to passenger
+		//		It should do nothing and not already on coast.
+		//		FIXME: perhaps force move if not reachable.
+		if( dest->Orders[0].Action==UnitActionStill
+			&& dest->OrderCount==1
+			&& !CoastOnMap(dest->X,dest->Y) ) {
+		    SendCommandFollow(dest,unit,FlushCommands);
+		}
+		SendCommandBoard(unit,-1,-1,dest,flush);
+		continue;
 	    }
-	    SendCommandBoard(unit,-1,-1,dest,flush);
-	    continue;
 	}
 
 	//
@@ -230,30 +230,31 @@ global void DoRightButton(int sx,int sy)
 		    || type==UnitTypeHumanWorkerWithWood
 		    || type==UnitTypeOrcWorkerWithGold
 		    || type==UnitTypeHumanWorkerWithGold ) {
-		dest=UnitOnMapTile(x,y);
-		if( dest && dest->Player==unit->Player ) {
-		    dest->Blink=4;
-		    if( dest->Type->StoresGold
-			    && (type==UnitTypeOrcWorkerWithGold
-				|| type==UnitTypeHumanWorkerWithGold) ) {
-			DebugLevel3("GOLD-DEPOSIT\n");
-			SendCommandReturnGoods(unit,dest,flush);
-			continue;
-		    }
-		    if( (dest->Type->StoresWood || dest->Type->StoresGold)
-			    && (type==UnitTypeOrcWorkerWithWood
-				|| type==UnitTypeHumanWorkerWithWood) ) {
-			DebugLevel3("WOOD-DEPOSIT\n");
-			SendCommandReturnGoods(unit,dest,flush);
-			continue;
+		if( UnitUnderCursor && (dest=UnitOnMapTile(x,y)) ) {
+		    if( dest->Player==unit->Player ) {
+			dest->Blink=4;
+			if( dest->Type->StoresGold
+				&& (type==UnitTypeOrcWorkerWithGold
+				    || type==UnitTypeHumanWorkerWithGold) ) {
+			    DebugLevel3("GOLD-DEPOSIT\n");
+			    SendCommandReturnGoods(unit,dest,flush);
+			    continue;
+			}
+			if( (dest->Type->StoresWood || dest->Type->StoresGold)
+				&& (type==UnitTypeOrcWorkerWithWood
+				    || type==UnitTypeHumanWorkerWithWood) ) {
+			    DebugLevel3("WOOD-DEPOSIT\n");
+			    SendCommandReturnGoods(unit,dest,flush);
+			    continue;
+			}
 		    }
 		}
 	    } else {
-		if( ForestOnMap(x,y) ) {
+		if( IsMapFieldExplored(unit->Player,x,y) && ForestOnMap(x,y) ) {
 		    SendCommandHarvest(unit,x,y,flush);
 		    continue;
 		}
-		if( (dest=GoldMineOnMap(x,y)) ) {
+		if( UnitUnderCursor && (dest=GoldMineOnMap(x,y)) ) {
 		    dest->Blink=4;
 		    DebugLevel3("GOLD-MINE\n");
 		    SendCommandMineGold(unit,dest,flush);
@@ -261,9 +262,9 @@ global void DoRightButton(int sx,int sy)
 		}
 	    }
 
-	    dest=TargetOnScreenMapPosition(unit,sx,sy);
-	    if( dest ) {
-		if( IsEnemy(ThisPlayer,dest) ) {
+	    if( UnitUnderCursor
+		    && (dest=TargetOnScreenMapPosition(unit,sx,sy)) ) {
+		if( IsEnemy(unit->Player,dest) ) {
 		    dest->Blink=4;
 		    SendCommandAttack(unit,x,y,dest,flush);
 		    continue;
@@ -271,17 +272,18 @@ global void DoRightButton(int sx,int sy)
 	    }
 
 	    // cade: this is default repair action
-	    dest=RepairableOnScreenMapPosition(sx, sy);
-	    if( dest && dest->Type && (dest->Player==ThisPlayer
-		    || IsAllied(ThisPlayer,dest)) ) {
-		SendCommandRepair(unit,x,y,dest,flush);
-		continue;
+	    if( UnitUnderCursor
+		    && (dest=RepairableOnScreenMapPosition(sx, sy)) ) {
+		if( dest->Type && (dest->Player==unit->Player
+			|| IsAllied(unit->Player,dest)) ) {
+		    SendCommandRepair(unit,x,y,dest,flush);
+		    continue;
+		}
 	    }
 
-	    dest=UnitOnScreenMapPosition(sx,sy);
-	    if( dest ) {
+	    if( UnitUnderCursor && (dest=UnitOnScreenMapPosition(sx,sy)) ) {
 		// FIXME: should ally to self
-		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+		if( (dest->Player==unit->Player || IsAllied(unit->Player,dest))
 			&& dest!=unit ) {
 		    dest->Blink=4;
 		    SendCommandFollow(unit,dest,flush);
@@ -300,7 +302,8 @@ global void DoRightButton(int sx,int sy)
 	    // FIXME: How can I remove here the unit type? More races!
 	    if( type==UnitTypeOrcTankerFull || type==UnitTypeHumanTankerFull ) {
 		DebugLevel2("Should return to oil deposit\n");
-		if( (dest=UnitOnMapTile(x,y)) && dest->Player==unit->Player ) {
+		if( UnitUnderCursor && (dest=UnitOnMapTile(x,y))
+			&& dest->Player==unit->Player ) {
 		    dest->Blink=4;
 		    if( dest->Type->StoresOil ) {
 			DebugLevel3("OIL-DEPOSIT\n");
@@ -309,7 +312,8 @@ global void DoRightButton(int sx,int sy)
 		    }
 		}
 	    } else {
-		if( (dest=PlatformOnMap(x,y)) && dest->Player==unit->Player ) {
+		if( UnitUnderCursor && (dest=PlatformOnMap(x,y))
+			&& dest->Player==unit->Player ) {
 		    dest->Blink=4;
 		    DebugLevel3("PLATFORM\n");
 		    SendCommandHaulOil(unit,dest,flush);
@@ -317,9 +321,8 @@ global void DoRightButton(int sx,int sy)
 		}
 	    }
 
-	    dest=UnitOnScreenMapPosition(sx,sy);
-	    if( dest ) {
-		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+	    if( UnitUnderCursor && (dest=UnitOnScreenMapPosition(sx,sy)) ) {
+		if( (dest->Player==unit->Player || IsAllied(unit->Player,dest))
 			&& dest!=unit ) {
 		    dest->Blink=4;
 		    SendCommandFollow(unit,dest,flush);
@@ -341,52 +344,54 @@ global void DoRightButton(int sx,int sy)
 	//	Fighters
 	//
 	if( action==MouseActionDemolish || action==MouseActionAttack ) {
-	    // Picks the enemy with highest priority and can be attacked
-	    dest=TargetOnScreenMapPosition(unit, sx, sy);
-	    if( dest ) {
-		if( IsEnemy(ThisPlayer,dest) ) {
-		    dest->Blink=4;
-		    if( action==MouseActionDemolish ) {
-			SendCommandDemolish(unit,x,y,dest,flush);
-		    } else {
-			SendCommandAttack(unit,x,y,dest,flush);
+	    if( UnitUnderCursor ) {
+		// Picks the enemy with highest priority and can be attacked
+		dest=TargetOnScreenMapPosition(unit, sx, sy);
+		if( dest ) {
+		    if( IsEnemy(unit->Player,dest) ) {
+			dest->Blink=4;
+			if( action==MouseActionDemolish ) {
+			    SendCommandDemolish(unit,x,y,dest,flush);
+			} else {
+			    SendCommandAttack(unit,x,y,dest,flush);
+			}
+			continue;
 		    }
-		    continue;
 		}
-	    }
 
-	    if( WallOnMap(x,y) ) {
-		DebugLevel3("WALL ON TILE\n");
-		if( ThisPlayer->Race==PlayerRaceHuman
-			&& OrcWallOnMap(x,y) ) {
-		    DebugLevel3("HUMAN ATTACKS ORC\n");
-		    SendCommandAttack(unit,x,y,NoUnitP,flush);
-		    continue;
+		if( WallOnMap(x,y) ) {
+		    DebugLevel3("WALL ON TILE\n");
+		    if( unit->Player->Race==PlayerRaceHuman
+			    && OrcWallOnMap(x,y) ) {
+			DebugLevel3("HUMAN ATTACKS ORC\n");
+			SendCommandAttack(unit,x,y,NoUnitP,flush);
+			continue;
+		    }
+		    if( unit->Player->Race==PlayerRaceOrc
+			    && HumanWallOnMap(x,y) ) {
+			DebugLevel3("ORC ATTACKS HUMAN\n");
+			SendCommandAttack(unit,x,y,NoUnitP,flush);
+			continue;
+		    }
 		}
-		if( ThisPlayer->Race==PlayerRaceOrc
-			&& HumanWallOnMap(x,y) ) {
-		    DebugLevel3("ORC ATTACKS HUMAN\n");
-		    SendCommandAttack(unit,x,y,NoUnitP,flush);
-		    continue;
-		}
-	    }
 
-	    dest=UnitOnScreenMapPosition(sx,sy);
-	    if( dest ) {
-		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
-			&& dest!=unit ) {
-		    dest->Blink=4;
-		    SendCommandFollow(unit,dest,flush);
-		    continue;
+		dest=UnitOnScreenMapPosition(sx,sy);
+		if( dest ) {
+		    if( (dest->Player==unit->Player
+			    || IsAllied(unit->Player,dest)) && dest!=unit ) {
+			dest->Blink=4;
+			SendCommandFollow(unit,dest,flush);
+			continue;
+		    }
 		}
-	    }
 
 #ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand ) {
-		x&=~1;
-		y&=~1;			// Ships could only even fields
-	    }
+		if( unit->Type->UnitType!=UnitTypeLand ) {
+		    x&=~1;
+		    y&=~1;			// Ships could only even fields
+		}
 #endif
+	    }
 
 	    // empty space
 	    if( (KeyModifiers&ModifierControl) ) {
@@ -409,11 +414,10 @@ global void DoRightButton(int sx,int sy)
 
 	// FIXME: attack/follow/board ...
 	if( action==MouseActionMove || action==MouseActionSail ) {
-	    dest=UnitOnScreenMapPosition(sx,sy);
-	    if( dest ) {
+	    if( UnitUnderCursor && (dest=UnitOnScreenMapPosition(sx,sy)) ) {
 		// Follow allied units, but not self.
-		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
-			&& dest!=unit ) {
+		if( (dest->Player==unit->Player
+			|| IsAllied(unit->Player,dest)) && dest!=unit ) {
 		    dest->Blink=4;
 		    SendCommandFollow(unit,dest,flush);
 		    continue;
@@ -698,15 +702,15 @@ global void UIHandleMouseMove(int x,int y)
 	const Viewport* vp;
 
 	vp = TheUI.MouseViewport;
-	if (IsMapFieldVisible(ThisPlayer, Viewport2MapX(vp, x),
-		    Viewport2MapY(vp, y)) || ReplayRevealMap ) {
-	    UnitUnderCursor = UnitOnScreen(NULL ,x-vp->X + vp->MapX*TileSizeX
-		,y-vp->Y + vp->MapY*TileSizeY);
+	if( IsMapFieldExplored(ThisPlayer,Viewport2MapX(vp,x),
+		    Viewport2MapY(vp,y)) || ReplayRevealMap ) {
+	    UnitUnderCursor=UnitOnScreen(NULL,x-vp->X+vp->MapX*TileSizeX
+		,y-vp->Y+vp->MapY*TileSizeY);
 	}
     } else if( CursorOn==CursorOnMinimap ) {
 	mx=ScreenMinimap2MapX(x);
 	my=ScreenMinimap2MapY(y);
-	if( IsMapFieldVisible(ThisPlayer,mx,my) || ReplayRevealMap ) {
+	if( IsMapFieldExplored(ThisPlayer,mx,my) || ReplayRevealMap ) {
 	    UnitUnderCursor=UnitOnMapTile(mx,my);
 	}
     }
@@ -714,7 +718,7 @@ global void UIHandleMouseMove(int x,int y)
     //NOTE: vladi: if unit is invisible, no cursor hint should be allowed
     // FIXME: johns: not corrrect? Should I get informations about
     // buildings under fog of war?
-    if ( UnitUnderCursor && !UnitVisibleOnMap(UnitUnderCursor)
+    if ( UnitUnderCursor && !UnitKnownOnMap(UnitUnderCursor)
 	    && !ReplayRevealMap ) {
 	UnitUnderCursor=NULL;
     }
@@ -753,7 +757,7 @@ global void UIHandleMouseMove(int x,int y)
 	//
 	//	Map
 	//
-	if( UnitUnderCursor ) {
+	if( UnitUnderCursor && UnitVisibleOnMap(UnitUnderCursor) ) {
 	    if( NumSelected==0 ) {
 		MustRedraw|=RedrawInfoPanel;
 	    }
@@ -795,21 +799,26 @@ local void SendRepair(int sx,int sy)
     int x;
     int y;
 
-    dest=RepairableOnScreenMapPosition(sx,sy);
-    if( !(dest && dest->Type && (dest->Player==ThisPlayer
-	    || IsAllied(ThisPlayer,dest))) ) {
-	// FIXME: Should move test in repairable
+    if( UnitUnderCursor ) {
+	dest=RepairableOnScreenMapPosition(sx,sy);
+    } else {
 	dest=NoUnitP;
     }
 
-    x = sx / TileSizeX;
-    y = sy / TileSizeY;
+    x=sx/TileSizeX;
+    y=sy/TileSizeY;
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
 	if( unit->Type->CowerWorker ) {
-	    SendCommandRepair(unit,x,y,dest,!(KeyModifiers&ModifierShift));
+	    // FIXME: Should move test in repairable
+	    if( dest && dest->Type && (dest->Player==unit->Player
+		    || IsAllied(unit->Player,dest)) ) {
+		SendCommandRepair(unit,x,y,dest,!(KeyModifiers&ModifierShift));
+	    } else {
+		SendCommandRepair(unit,x,y,NoUnitP,!(KeyModifiers&ModifierShift));
+	    }
 	} else {
-	    DebugLevel0Fn("No worker repairs\n");
+	    DebugLevel0Fn("Non-worker repairs\n");
 	}
     }
 }
@@ -830,12 +839,17 @@ local void SendMove(int x,int y)
     Unit* unit;
     Unit* transporter;
 
-    transporter=TransporterOnScreenMapPosition(x*TileSizeX,y*TileSizeY);
+    if( UnitUnderCursor ) {
+	transporter=TransporterOnScreenMapPosition(x*TileSizeX,y*TileSizeY);
+    } else {
+	transporter=NoUnitP;
+    }
     flush=!(KeyModifiers&ModifierShift);
 
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
-	if( transporter ) {
+	if( transporter && transporter->Player==unit->Player
+		&& unit->Type->UnitType==UnitTypeLand ) {
 	    transporter->Blink=4;
 	    DebugLevel3Fn("Board transporter\n");
 	    //	Let the transporter move to passenger
@@ -877,15 +891,17 @@ local void SendAttack(int sx,int sy)
     int x;
     int y;
 
-    x = sx / TileSizeX;
-    y = sy / TileSizeY;
+    x=sx/TileSizeX;
+    y=sy/TileSizeY;
     for( i=0; i<NumSelected; i++ ) {
 	unit=Selected[i];
 	if( unit->Type->CanAttack || unit->Type->Building ) {
-	    dest=TargetOnScreenMapPosition(unit,sx,sy);
-	    DebugLevel3Fn("Attacking %p\n" _C_ dest);
-	    if( dest ) {
+	    if( UnitUnderCursor
+		    && (dest=TargetOnScreenMapPosition(unit,sx,sy)) ) {
+		DebugLevel3Fn("Attacking %p\n" _C_ dest);
 		dest->Blink=4;
+	    } else {
+		dest=NoUnitP;
 	    }
 	    if( dest!=unit ) {	// don't let an unit self destruct
 		SendCommandAttack(unit,x,y,dest,!(KeyModifiers&ModifierShift));
@@ -952,8 +968,12 @@ local void SendDemolish(int sx,int sy)
 	unit=Selected[i];
 	if( unit->Type->Volatile ) {
 	    // FIXME: choose correct unit no flying ...
-	    dest=TargetOnScreenMapPosition(unit,sx,sy);
-	    if( dest==unit ) {	// don't let an unit self destruct
+	    if( UnitUnderCursor ) {
+		dest=TargetOnScreenMapPosition(unit,sx,sy);
+		if( dest==unit ) {	// don't let a unit self destruct
+		    dest=NoUnitP;
+		}
+	    } else {
 		dest=NoUnitP;
 	    }
 	    SendCommandDemolish(unit,x,y,dest,!(KeyModifiers&ModifierShift));
@@ -977,13 +997,13 @@ local void SendHarvest(int x,int y)
     Unit* dest;
 
     for( i=0; i<NumSelected; ++i ) {
-	if( (dest=PlatformOnMap(x,y)) ) {
+	if( UnitUnderCursor && (dest=PlatformOnMap(x,y)) ) {
 	    dest->Blink=4;
 	    DebugLevel3("PLATFORM\n");
 	    SendCommandHaulOil(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
 	}
-	if( (dest=GoldMineOnMap(x,y)) ) {
+	if( UnitUnderCursor && (dest=GoldMineOnMap(x,y)) ) {
 	    dest->Blink=4;
 	    DebugLevel3("GOLD-MINE\n");
 	    SendCommandMineGold(Selected[i],dest,!(KeyModifiers&ModifierShift));
@@ -1030,26 +1050,30 @@ local void SendSpellCast(int sx, int sy)
     int x;
     int y;
 
-    dest = UnitOnScreenMapPosition(sx, sy);
-    x = sx / TileSizeX;
-    y = sy / TileSizeY;
+    if( UnitUnderCursor ) {
+	dest=UnitOnScreenMapPosition(sx, sy);
+    } else {
+	dest=NoUnitP;
+    }
+    x=sx/TileSizeX;
+    y=sy/TileSizeY;
     DebugLevel3Fn("SpellCast on: %p (%d,%d)\n" _C_ dest _C_ x _C_ y);
     /*	NOTE: Vladi:
        This is a high-level function, it sends target spot and unit
        (if exists). All checks are performed at spell cast handle
        function which will cancel function if cannot be executed
      */
-    for (i = 0; i < NumSelected; i++) {
-	unit = Selected[i];
+    for( i=0; i<NumSelected; i++ ) {
+	unit=Selected[i];
 	if (!unit->Type->CanCastSpell) {
 	    continue;			// this unit cannot cast spell
 	}
-	if (dest && unit == dest) {
+	if( dest && unit==dest ) {
 	    continue;			// no unit can cast spell on himself
 	}
 	// CursorValue here holds the spell type id
-	SendCommandSpellCast(unit, x, y, dest, CursorValue,
-		!(KeyModifiers & ModifierShift));
+	SendCommandSpellCast(unit,x,y,dest,CursorValue,
+		!(KeyModifiers&ModifierShift));
     }
 }
 
@@ -1067,9 +1091,9 @@ local void SendCommand(int sx, int sy)
     int x;
     int y;
 
-    x = sx / TileSizeX;
-    y = sy / TileSizeY;
-    CurrentButtonLevel = 0; // reset unit buttons to normal
+    x=sx/TileSizeX;
+    y=sy/TileSizeY;
+    CurrentButtonLevel=0; // reset unit buttons to normal
     UpdateButtonPanel();
     switch( CursorAction ) {
 	case ButtonMove:
@@ -1372,15 +1396,14 @@ global void UIHandleButtonDown(unsigned button)
 		y = CursorY - TheUI.MouseViewport->Y
 			+ TheUI.MouseViewport->MapY * TileSizeY;
 		if( x>=TheMap.Width*TileSizeX ) {	// Reduce to map limits
-		    x = (TheMap.Width-1)*TileSizeX;
+		    x=(TheMap.Width-1)*TileSizeX;
 		}
 		if( y>=TheMap.Height*TileSizeY ) {	// Reduce to map limits
-		    y = (TheMap.Height-1)*TileSizeY;
+		    y=(TheMap.Height-1)*TileSizeY;
 		}
 
-		unit = UnitOnScreenMapPosition(x, y);
-		if ( unit ) {	// if right click on building -- blink
-		    unit->Blink=4;
+		if( UnitUnderCursor && (unit=UnitOnScreenMapPosition(x,y)) ) {
+		    unit->Blink=4;	// if right click on building -- blink
 		} else {	// if not not click on building -- green cross
 		    MakeLocalMissile(MissileTypeGreenCross
 			,TheUI.MouseViewport->MapX*TileSizeX
@@ -1388,7 +1411,7 @@ global void UIHandleButtonDown(unsigned button)
 			,TheUI.MouseViewport->MapY*TileSizeY
 			    +CursorY-TheUI.MouseViewport->Y,0,0);
 		}
-		DoRightButton(x, y);
+		DoRightButton(x,y);
 	    }
 	}
     //
