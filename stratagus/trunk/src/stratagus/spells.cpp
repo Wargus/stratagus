@@ -218,7 +218,9 @@ local void SpellDeathCoilController(Missile * missile)
 		if (missile->TargetUnit->HP <= 50) {
 		    missile->TargetUnit->HP = 0;
 		    source->Player->Score+=missile->TargetUnit->Type->Points;
-		    DestroyUnit(missile->TargetUnit);
+		    source->XP+=missile->TargetUnit->Type->Points;
+		    ++source->Kills;
+		    LetUnitDie(missile->TargetUnit);
 		} else {
 		    missile->TargetUnit->HP-=50;
 		}
@@ -253,7 +255,9 @@ local void SpellDeathCoilController(Missile * missile)
 				    table[i]->HP = 0;
 				    source->Player->Score+=
 					    table[i]->Type->Points;
-				    DestroyUnit(table[i]); // too much damage
+				    source->XP+=table[i]->Type->Points;
+				    ++source->Kills;
+				    LetUnitDie(table[i]); // too much damage
 				} else {
 				    table[i]->HP -= 50 / ec;
 				}
@@ -700,7 +704,9 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    }
 	    if( !target->HP ) {
 		unit->Player->Score+=target->Type->Points;
-		DestroyUnit(target);
+		unit->XP+=target->Type->Points;
+		++unit->Kills;
+		LetUnitDie(target);
 	    }
 	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    MakeMissile(MissileTypeHealing,
@@ -853,6 +859,8 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    UnitType* type;
 
 	    unit->Player->Score+=target->Type->Points;
+	    unit->XP+=target->Type->Points;
+	    ++unit->Kills;
 	    // as said somewhere else -- no corpses :)
 	    RemoveUnit(target);
 	    UnitLost(target);
