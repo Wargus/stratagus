@@ -33,6 +33,47 @@
 // FIXME: need support for more races.
 
 /*----------------------------------------------------------------------------
+--	Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**	@struct _construction_ construct.h
+**
+**	\#include "construct.h"
+**
+**	typedef struct _construction_ Construction;
+**
+**		Each building perhaps also units can have its own construction
+**		frames. This construction frames are currently not animated,
+**		this is planned for the future. What construction frames a
+**		building has, is currently done by numbers see
+**		UnitType::OverlapFrame. This will be soon changed to
+**		identifiers. 
+**
+**	The construction structure members:
+**
+**	Construction::Ident
+**
+**		FIXME: write the documentation
+**
+**	Construction::File[]
+**
+**		FIXME: write the documentation
+**
+**	Construction::Width
+**
+**		FIXME: write the documentation
+**
+**	Construction::Height
+**
+**		FIXME: write the documentation
+**
+**	Construction::Sprite
+**
+**		FIXME: write the documentation
+*/
+
+/*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
 
@@ -43,15 +84,13 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-/**
-**	Constructions: shown during construction of a building.
-*/
+    /// Construction shown during construction of a building
 typedef struct _construction_ {
     char*	Ident;			/// construction identifier
     char*	File[TilesetMax];	/// sprite file
 
-    int		Width;			/// " width
-    int		Height;			/// " height
+    int		Width;			/// sprite width
+    int		Height;			/// sprite height
 
 // --- FILLED UP ---
 
@@ -62,16 +101,23 @@ typedef struct _construction_ {
 --	Macros
 ----------------------------------------------------------------------------*/
 
-#define ConstructionWall	15	/// ident nr for wall under construction
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
+    ///	Initialize the constructions module
+extern void InitConstructions(void);
     ///	Load the graphics for constructions
 extern void LoadConstructions(void);
+    /// Save current construction state
+extern void SaveConstructions(FILE* file);
+    ///	Clean up the constructions module
+extern void CleanConstructions(void);
     ///	Draw a construction
 extern void DrawConstruction(int type,int image,int x,int y);
+
+    /// Register ccl features
+extern void ConstructionCclRegister(void);
 
 //@}
 
