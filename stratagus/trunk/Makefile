@@ -37,9 +37,7 @@ CROSSDIR = /usr/local/cross-tools
 
 MODULES = src/action src/ai src/beos src/clone src/editor src/freecraft src/game src/libmodplug src/map \
           src/missile src/movie src/movie/vp31 src/network src/pathfinder src/siod src/sound src/ui src/unit \
-          src/video src/include src/movie/vp31/include
-
-MODULES2 = etlib
+          src/video src/include src/movie/vp31/include etlib
 
 MODULES_TOOLS = tools
 
@@ -53,18 +51,13 @@ include $(patsubst %, %/Module.make, $(MODULES))
 OBJ := $(patsubst %.c, %.o, $(SRC))
 OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ))),$(notdir $(OBJ)))
 
-SRC2 := 
-include $(patsubst %, %/Module.make, $(MODULES2))
-OBJ2 := $(patsubst %.c, %.o, $(SRC2))
-OBJ2 := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ2))),$(notdir $(OBJ2)))
-
 SRC_TOOLS := 
 include $(patsubst %, %/Module.make, $(MODULES_TOOLS))
 OBJ_TOOLS := $(patsubst %.c, %.o, $(SRC_TOOLS))
 OBJ_TOOLS := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ_TOOLS))),$(notdir $(OBJ_TOOLS)))
 
-SRC_ALL = $(SRC) $(SRC2) $(SRC_TOOLS)
-OBJ_ALL = $(OBJ) $(OBJ2) $(OBJ_TOOLS)
+SRC_ALL = $(SRC) $(SRC_TOOLS)
+OBJ_ALL = $(OBJ) $(OBJ_TOOLS)
 
 .SUFFIXES: .c .o
 
@@ -181,14 +174,14 @@ doc++::
 	@if [ ! -d srcdoc ]; then mkdir srcdoc; fi
 	@$(DOCPP) -v -H -A -a -b -c -j -d srcdoc `find . -name "*.doc" -print`
 
-all-src: $(OBJ) $(OBJ2)
+all-src: $(OBJ)
 
 # UNIX-TARGET
-freecraft:	$(OBJ) $(OBJ2)
+freecraft:	$(OBJ) 
 	$(CCLD) -o freecraft $^ $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-freecraft.exe:	$(OBJ) $(OBJ2) src/$(OBJDIR)/freecraftrc.$(OE) src/$(OBJDIR)/main.$(OE)
+freecraft.exe:	$(OBJ) etlib/$(OBJDIR)/winobj src/$(OBJDIR)/freecraftrc.$(OE) src/$(OBJDIR)/main.$(OE)
 	$(CCLD) -o freecraft$(EXE) $^ -lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
 strip:
@@ -232,7 +225,7 @@ lockver:
 	for i in $(MODULES_ALL); do $(LOCKVER) Module.make; done
 
 tags:
-	for i in $(SRC) $(SRC2) $(SRC_TOOLS); do \
+	for i in $(SRC) $(SRC_TOOLS); do \
 	ctags --c-types=defmpstuvx -a -f tags `pwd`/$$i ; done
 
 depend:
