@@ -785,7 +785,7 @@ if [ "$BEOS" != 1 ] ; then
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz -lm \$(THREADLIB)" >> $RULESFILE
 
     # Libraries needed to build freecraft
-    echo "CLONELIBS=$(CLONELIBS) \$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
+    echo "CLONELIBS=$CLONELIBS \$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
     echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS) \\" >> $RULESFILE
     echo "	\$(FLACLIB) \$(OGGLIB) \$(MP3LIB) -lz -lm" >> $RULESFILE
   else
