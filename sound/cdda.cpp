@@ -63,7 +63,6 @@ local int CDRead(Sample *sample, void *buf, int len)
     if (len > 2352 * (CDtocentry[CDTrack+1].cdte_addr.lba - CDtocentry[CDTrack].cdte_addr.lba) - pos) {
         len = 2352 * (CDtocentry[CDTrack+1].cdte_addr.lba - CDtocentry[CDTrack].cdte_addr.lba) - pos;
         pos = 0;
-        CDTrack = (CDTrack != NumCDTracks ? CDTrack + 1 : 1);
         memcpy(buf, sample->User, len);
 	PlayingMusic = 0;
         return len;
