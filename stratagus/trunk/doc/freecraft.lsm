@@ -1,6 +1,6 @@
 Begin4
-Title:          FreeCraft (fka ALE Clone) A free fantasy real time strategy game engine.
-Version:        1.17
+Title:          FreeCraft - A free fantasy real time strategy game engine.
+Version:        1.18
 Entered-date:   26MAI2002
 Description:    A realtime, fantasy strategy war game for UNIX or Win32.
 		It comes without graphics, sounds and documentation. You need
