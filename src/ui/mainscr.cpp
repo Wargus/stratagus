@@ -489,14 +489,14 @@ local int   MessageFrameTimeout;	// frame to expire message
 #define MESSAGES_MAX  10
 
 local char Messages[ MESSAGES_MAX ][64];
-local int  MessagesCount;
-local int  SameMessageCount;
+local int  MessagesCount = 0;
+local int  SameMessageCount = 0;
 
 local char MessagesEvent[ MESSAGES_MAX ][64];
 local int  MessagesEventX[ MESSAGES_MAX ];
 local int  MessagesEventY[ MESSAGES_MAX ];
-local int  MessagesEventCount;
-local int  MessagesEventIndex;
+local int  MessagesEventCount = 0;
+local int  MessagesEventIndex = 0;
 
 /**
 **	Shift messages array with one.
@@ -505,14 +505,9 @@ global void ShiftMessages(void)
 {
   int z;
   if ( MessagesCount == 0 ) return;
-  for ( z = 0; z < MESSAGES_MAX; z++ )
-    if ( z < MESSAGES_MAX-1)
+  for ( z = 0; z < MessagesCount - 1; z++ )
       {
       strcpy( Messages[z], Messages[z+1] );
-      }
-    else
-      {
-      strcpy( Messages[z], "" );
       }
   MessagesCount--;
 }
@@ -524,17 +519,12 @@ global void ShiftMessagesEvent(void)
 {
   int z;
   if ( MessagesEventCount == 0 ) return;
-  for ( z = 0; z < MESSAGES_MAX; z++ )
-    if ( z < MESSAGES_MAX-1)
-      {
-      MessagesEventX[z] = MessagesEventX[z+1];
-      MessagesEventY[z] = MessagesEventY[z+1];
-      }
-    else
-      {
-      MessagesEventX[z] = -1;
-      MessagesEventY[z] = -1;
-      }
+  for ( z = 0; z < MessagesEventCount - 1; z++ )
+	{
+	MessagesEventX[z] = MessagesEventX[z+1];
+	MessagesEventY[z] = MessagesEventY[z+1];
+	strcpy( MessagesEvent[z], MessagesEvent[z+1] );
+	}
   MessagesCount--;
 }
 
@@ -641,6 +631,7 @@ global void SetMessage2( int x, int y, char* fmt, ... )
  
     if ( MessagesEventCount == MESSAGES_MAX )
       ShiftMessagesEvent();
+    
     strcpy( MessagesEvent[ MessagesEventCount ], temp );
     MessagesEventX[ MessagesEventCount ] = x;
     MessagesEventY[ MessagesEventCount ] = y;
