@@ -467,7 +467,7 @@ global void GameMainLoop(void)
 	if( TheUI.MouseScroll && !(FrameCounter%SpeedMouseScroll) ) {
 	    DoScrollArea(MouseScrollState, 0);
 	}
-	if( !(FrameCounter%SpeedKeyScroll) ) {
+	if( TheUI.KeyScroll && !(FrameCounter%SpeedKeyScroll) ) {
 	    DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
 	}
 
