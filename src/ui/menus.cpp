@@ -1483,8 +1483,12 @@ local void GameMenuLoad(void)
 local void GameOptions(void)
 {
     // TODO
+#if !defined(USE_SDLCD) && !defined(USE_LIBCDA)
+    GameOptionsMenuItems[1].d.gem.state = 1;
+#else
     if (strcmp(":off", CDMode))
 	GameOptionsMenuItems[1].d.gem.state = 4;
+#endif
     ProcessMenu(MENU_GAME_OPTIONS, 1);
 }
 
