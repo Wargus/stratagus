@@ -472,6 +472,7 @@ struct _unit_ {
     unsigned	Constructed : 1;	/// unit is in construction
     unsigned	Active : 1;		/// unit is active for AI
 
+#define MaxMana	255			/// maximal mana for units
     unsigned	Mana : 8;		/// mana points
     unsigned	HP;			/// hit points
     unsigned	XP;			/// experience points

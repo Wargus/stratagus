@@ -673,8 +673,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //	Mana bar on right side of unit. FIXME: combine bar and sprite
     //
     if( ShowManaBar ) {
-	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==255) ) {
-	    DrawManaBar(x,y,type,255,unit->Mana);
+	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==MaxMana) ) {
+	    DrawManaBar(x,y,type,MaxMana,unit->Mana);
 	} else if( type->GivesOil || type->GoldMine || type->OilPatch ) {
 	    DrawManaBar(x,y,type,655350,unit->Value);
 	}
@@ -736,8 +736,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //	Mana dot on right side of unit.
     //
     if( ShowManaDot ) {
-	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==255) ) {
-	    DrawManaSprite(x,y,type,255,unit->Mana);
+	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==MaxMana) ) {
+	    DrawManaSprite(x,y,type,MaxMana,unit->Mana);
 	} else if( type->GivesOil || type->GoldMine || type->OilPatch ) {
 	    DrawManaSprite(x,y,type,655350,unit->Value);
 	}
