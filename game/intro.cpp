@@ -239,7 +239,7 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
 		(s1[0]=='\r' && s1[1]=='\n') ) {
 		x1=s1+1;
 		x2=s1+2;
-		while( *x1++ = *x2++ ) {
+		while( (*x1++ = *x2++) ) {
 		}
 	    }
 	    *s1++='\n';
