@@ -237,7 +237,16 @@ global void SavePlayers(FILE* file)
 	fprintf(file," 'building-limit %d",Players[i].BuildingLimit);
 	fprintf(file," 'total-unit-limit %d",Players[i].TotalUnitLimit);
 
-	fprintf(file," 'score %d",Players[i].Score);
+	fprintf(file,"\n  'score %d",Players[i].Score);
+	fprintf(file,"\n  'total-units %d",Players[i].TotalUnits);
+	fprintf(file,"\n  'total-buildings %d",Players[i].TotalBuildings);
+	fprintf(file,"\n  'total-razings %d",Players[i].TotalRazings);
+	fprintf(file,"\n  'total-kills %d",Players[i].TotalKills);
+	fprintf(file,"\n  'total-resources '(");
+	for( j=0; j<MaxCosts; ++j ) {
+	    fprintf(file,"%d ",Players[i].TotalResources[j]);
+	}
+	fprintf(file,")");
 
 	// Colors done by init code.
 
