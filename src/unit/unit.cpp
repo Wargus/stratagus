@@ -3627,8 +3627,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    attacker->Player->Score+=target->Type->Points;
 	    if( type->Building ) {
 		attacker->Player->TotalRazings++;
-	    }
-	    else {
+	    } else {
 		attacker->Player->TotalKills++;
 	    }
 #ifdef USE_HP_FOR_XP
@@ -3641,7 +3640,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	LetUnitDie(target);
 	return;
     }
-    target->HP-=damage;		// UNSIGNED!
+    target->HP-=damage;
 #ifdef USE_HP_FOR_XP
     if( attacker ) {
 	attacker->XP+=damage;
