@@ -92,11 +92,8 @@ global void HandleActionTrain(Unit* unit)
 	if( player->Food<
 		player->NumFoodUnits+unit->Data.Train.What[0]->Demand ) {
 
-	    // FIXME: GameMessage
-	    if( player==ThisPlayer ) {
-		// FIXME: PlayVoice :), see task.txt
-		SetMessage("Not enough food...build more farms.");
-	    } else if( unit->Player->Ai ) {
+	    NotifyPlayer(player,NotifyYellow,unit->X,unit->Y,"Not enough food...build more farms.");
+	    if( unit->Player->Ai ) {
 		AiNeedMoreFarms(unit,unit->Orders[0].Type);
 	    }
 
@@ -122,12 +119,10 @@ global void HandleActionTrain(Unit* unit)
 	    nunit->TTL=GameCycle+type->DecayRate*6*CYCLES_PER_SECOND;
 	}
 
-	// FIXME: GameMessage
-	if( player==ThisPlayer ) {
-	    SetMessageEvent( nunit->X, nunit->Y, "New %s ready",
-		    nunit->Type->Name);
-	    PlayUnitSound(nunit,VoiceReady);
-	} else if( unit->Player->Ai ) {
+	NotifyPlayer(player, NotifyYellow, nunit->X, nunit->Y, "New %s ready",
+	    nunit->Type->Name);
+	PlayUnitSound(nunit,VoiceReady);
+	if( unit->Player->Ai ) {
 	    AiTrainingComplete(unit,nunit);
 	}
 
