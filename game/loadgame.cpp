@@ -34,6 +34,7 @@
 
 #include "freecraft.h"
 #include "icons.h"
+#include "cursor.h"
 #include "unittype.h"
 #include "upgrade.h"
 #include "depend.h"
@@ -42,6 +43,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "ccl.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -59,10 +61,13 @@
 global void CleanModules(void)
 {
     CleanIcons();
-    // CleanUI();
+    CleanCursors();
+    CleanUserInterface();
     CleanPlayers();
     CleanUnitTypes();
     CleanUnits();
+    CleanSelections();
+    CleanGroups();
     CleanUpgrades();
     CleanDependencies();
     CleanButtons();
@@ -80,10 +85,13 @@ global void CleanModules(void)
 global void InitModules(void)
 {
     InitIcons();
-    // InitUI();
+    InitCursors();
+    InitUserInterface();
     InitPlayers();
     InitUnitTypes();
     InitUnits();
+    InitSelections();
+    InitGroups();
     InitUpgrades();
     InitDependencies();
 
@@ -98,7 +106,8 @@ global void InitModules(void)
 global void LoadModules(void)
 {
     LoadIcons();
-    // LoadUI();
+    LoadCursors(ThisPlayer->RaceName);
+    LoadUserInterface();
     // LoadPlayers();
     LoadUnitTypes();
 
@@ -116,13 +125,28 @@ global void LoadModules(void)
 */
 global void LoadGame(char* filename)
 {
+#ifdef USE_CCL
+    int old_siod_verbose_level;
+    extern int siod_verbose_level;
+#endif
+
     CleanModules();
 
+#ifdef USE_CCL
+    old_siod_verbose_level=siod_verbose_level;
+    siod_verbose_level=4;
+    user_gc(SCM_BOOL_F);
+    siod_verbose_level=old_siod_verbose_level;
     gh_eval_file(filename);
+    user_gc(SCM_BOOL_F);
+#endif
 
     InitModules();
     LoadModules();
 
+    //GameCursor=TheUI.Point.Cursor;	// FIXME: just a default.
+    GameCursor=CursorTypeByIdent("cursor-point");	// TheUI not cleaned
+    UpdateButtonPanel();
     MustRedraw=RedrawEverything;	// redraw everything
 }
 
