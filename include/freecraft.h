@@ -417,6 +417,9 @@ static inline void ShowLoadProgress(const char* fmt,...) {};
 
 #endif	// } !_MSC_VER
 
+    /// Mainscreen pitch (default VideoWidth)
+extern int VideoPitch;
+
     /// Mainscreen width (default 640)
 extern int VideoWidth;
 
