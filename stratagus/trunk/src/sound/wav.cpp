@@ -109,7 +109,6 @@ local int WavStreamRead(Sample* sample, void* buf, int len)
 			read = data->ChunkRem;
 		}
 		data->ChunkRem -= read;
-		printf("read = %d rem = %d\n", read, read);
 
 		comp = CLread(data->WavFile, sndbuf, read);
 		if (!comp) {
@@ -384,10 +383,10 @@ global Sample* LoadWav(const char* name, int flags)
 			i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos + sample->Len,
 				sample->Frequency, sample->SampleSize / 8,
 				sample->Channels, comp);
-			printf("i = %d\n", i);
-
 			sample->Len += i;
 		}
+
+		CLclose(data->WavFile);
 	}
 
 	return sample;
