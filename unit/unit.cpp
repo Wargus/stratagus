@@ -2115,8 +2115,15 @@ global Unit* FindWoodDeposit(const Player* player,int x,int y)
     return best;
 }
 
+#if 0
 /**
 **	Find wood in sight range.
+**
+**	@param unit	Unit that needs wood.
+**	@param px	OUT: Map X position of wood.
+**	@param py	OUT: Map Y position of wood.
+**
+**	@return		True if wood was found.
 */
 global int FindWoodInSight(Unit* unit,int* px,int* py)
 {
@@ -2217,6 +2224,161 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
     DebugLevel3Fn("no wood in sight-range\n");
     return 0;
 }
+
+#else
+
+/**
+**	Find wood in sight range.
+**
+**	@param unit	Unit that needs wood.
+**	@param px	OUT: Map X position of wood.
+**	@param py	OUT: Map Y position of wood.
+**
+**	@return		True if wood was found.
+*/
+global int FindWoodInSight(const Unit* unit,int* px,int* py)
+{
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+	unsigned short X;
+	unsigned short Y;
+    } points[MaxMapWidth*MaxMapHeight];
+    int x;
+    int y;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    int n;
+    unsigned char* m;
+    unsigned char* matrix;
+    const Unit* destu;
+    int destx;
+    int desty;
+    int bestx;
+    int besty;
+    int bestd;
+
+    x=unit->X;
+    y=unit->Y;
+
+    //
+    //	Find the nearest wood depot
+    //
+    if( (destu=FindWoodDeposit(unit->Player,x,y)) ) {
+	NearestOfUnit(destu,x,y,&destx,&desty);
+    }
+    bestd=99999;
+    IfDebug( bestx=besty=0; );		// keep the compiler happy
+
+    //
+    //	Make movement matrix. FIXME: can create smaller matrix.
+    //
+    matrix=CreateMatrix();
+    w=TheMap.Width+2;
+    matrix+=w+w+2;
+
+    //
+    //	Mark sight range as border. FIXME: matrix didn't need to be bigger.
+    //
+    n=unit->Stats->SightRange;
+    matrix[x+n+(y+n)*w]=matrix[x-n+(y+n)*w]=
+	matrix[x+n+(y-n)*w]=matrix[x-n+(y-n)*w]=66;
+    for( i=n; i--; ) {
+	matrix[x+n+(y+i)*w]=matrix[x-n+(y+i)*w]=
+	    matrix[x+n+(y-i)*w]=matrix[x-n+(y-i)*w]=
+	    matrix[x-i+(y+n)*w]=matrix[x+i+(y+n)*w]=
+	    matrix[x-i+(y-n)*w]=matrix[x+i+(y-n)*w]=66;
+    }
+
+    mask=UnitMovementMask(unit);
+
+    points[0].X=x;
+    points[0].Y=y;
+    rp=0;
+    matrix[x+y*w]=1;			// mark start point
+    ep=wp=1;				// start with one point
+
+    //
+    //	Pop a point from stack, push all neightbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		m=matrix+x+y*w;
+		if( *m ) {			// already checked
+		    continue;
+		}
+
+		//
+		//	Look if there is wood
+		//
+		if ( ForestOnMap(x,y) ) {
+		    if( destu ) {
+			n=max(abs(destx-x),abs(desty-y));
+			if( n<bestd ) {
+			    bestd=n;
+			    bestx=x;
+			    besty=y;
+			}
+			*m=22;
+		    } else {			// no goal take the first
+			*px=bestx;
+			*py=besty;
+			return 1;
+		    }
+		}
+
+		if( CanMoveToMask(x,y,mask) ) {	// reachable
+		    *m=1;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+		    if( ++wp>=sizeof(points) ) {// round about
+			wp=0;
+		    }
+		} else {			// unreachable
+		    *m=99;
+		}
+	    }
+
+	    if( ++rp>=sizeof(points) ) {	// round about
+		rp=0;
+	    }
+	}
+
+	//
+	//	Take best of this frame, if any.
+	//
+	if( bestd!=99999 ) {
+	    *px=bestx;
+	    *py=besty;
+	    return 1;
+	}
+
+	//
+	//	Continue with next frame.
+	//
+	if( rp==wp ) {			// unreachable, no more points available
+	    break;
+	}
+	ep=wp;
+    }
+
+    DebugLevel3Fn("no wood in sight-range\n");
+
+    return 0;
+}
+
+#endif
 
 /**
 **	Find oil platform.
