@@ -25,7 +25,7 @@
 MODULE= src/clone
 MSRC=	ccl.c ccl_player.c clone.c construct.c groups.c iolib.c mainloop.c \
 	mpq.c player.c pud.c scm.c selection.c spells.c unit.c unit_draw.c \
-	unit_find.c unitcache.c 
+	unit_find.c unitcache.c ccl_spell.c
 
 SRC+=	$(addprefix $(MODULE)/,$(MSRC))
 HDRS+=
