@@ -508,37 +508,37 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
 	pn=plynr+1;
     }
 
-    if( !strcmp(res, DEFAULT_NAMES[GoldCost]) ) {
+    if( !strcmp(res, DefaultResourceNames[GoldCost]) ) {
 	for( ; plynr<pn; ++plynr ) {
 	    if( Compare(Players[plynr].Resources[GoldCost],q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
-    } else if( !strcmp(res, DEFAULT_NAMES[WoodCost]) ) {
+    } else if( !strcmp(res, DefaultResourceNames[WoodCost]) ) {
 	for( ; plynr<pn; ++plynr ) {
 	    if( Compare(Players[plynr].Resources[WoodCost],q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
-    } else if( !strcmp(res, DEFAULT_NAMES[OilCost]) ) {
+    } else if( !strcmp(res, DefaultResourceNames[OilCost]) ) {
 	for( ; plynr<pn; ++plynr ) {
 	    if( Compare(Players[plynr].Resources[OilCost],q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
-    } else if( !strcmp(res, DEFAULT_NAMES[OreCost]) ) {
+    } else if( !strcmp(res, DefaultResourceNames[OreCost]) ) {
 	for( ; plynr<pn; ++plynr ) {
 	    if( Compare(Players[plynr].Resources[OreCost],q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
-    } else if( !strcmp(res, DEFAULT_NAMES[StoneCost]) ) {
+    } else if( !strcmp(res, DefaultResourceNames[StoneCost]) ) {
 	for( ; plynr<pn; ++plynr ) {
 	    if( Compare(Players[plynr].Resources[StoneCost],q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
-    } else if( !strcmp(res, DEFAULT_NAMES[CoalCost]) ) {
+    } else if( !strcmp(res, DefaultResourceNames[CoalCost]) ) {
 	for( ; plynr<pn; ++plynr ) {
 	    if( Compare(Players[plynr].Resources[CoalCost],q) ) {
 		return SCM_BOOL_T;

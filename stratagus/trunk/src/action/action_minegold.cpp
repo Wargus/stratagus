@@ -194,12 +194,12 @@ local int MineInGoldmine(Unit* unit)
 	//	Update gold mine.
 	//
 	if ( OptionUseDepletedMines
-		&& mine->Value < DEFAULT_INCOMES[GoldCost] ) {
+		&& mine->Value < DefaultIncomes[GoldCost] ) {
 	    mine->Value = 0;
 	    unit->Rs = OptionUseDepletedMines;
 	    // vladi: income reduced to 5% (mine depleted)
 	} else {	// remove gold from store
-	    mine->Value-=DEFAULT_INCOMES[GoldCost];
+	    mine->Value-=DefaultIncomes[GoldCost];
   	    unit->Rs = 100;		// vladi: normal income 100%
 	}
 	if( !--mine->Data.Resource.Active ) {
@@ -213,7 +213,7 @@ local int MineInGoldmine(Unit* unit)
 	//
 	//	End of gold: destroy gold-mine.
 	//
-	if( !OptionUseDepletedMines && mine->Value<DEFAULT_INCOMES[GoldCost] ) {
+	if( !OptionUseDepletedMines && mine->Value<DefaultIncomes[GoldCost] ) {
 	    DebugLevel0Fn("Mine destroyed %d,%d\n" _C_ mine->X _C_ mine->Y);
 	    DropOutAll(mine);
 	    LetUnitDie(mine);

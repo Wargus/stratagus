@@ -599,7 +599,7 @@ global void SaveUpgrades(FILE* file)
 	for( j=0; j<MaxCosts; ++j ) {
 	    if( UpgradeModifiers[i]->Modifier.Costs[j] ) {
 		fprintf(file,"\n  '(%s-cost %d)"
-		    ,DEFAULT_NAMES[j],UpgradeModifiers[i]->Modifier.Costs[j]);
+		    ,DefaultResourceNames[j],UpgradeModifiers[i]->Modifier.Costs[j]);
 	    }
 	}
 

@@ -463,10 +463,10 @@ local void SaveAiCostTable(FILE* file,const char* name,int n,
 				    UnitTypes[t].Ident);
 			    f=4;
 			}
-			if( f+strlen(DEFAULT_NAMES[i])>78 ) {
+			if( f+strlen(DefaultResourceNames[i])>78 ) {
 			    f=fprintf(file,"\n    ");
 			}
-			f+=fprintf(file,"'%s ",DEFAULT_NAMES[i]);
+			f+=fprintf(file,"'%s ",DefaultResourceNames[i]);
 		    }
 		}
 	    }
@@ -698,32 +698,32 @@ local void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
 
     fprintf(file,"  'reserve '(");
     for( i=0; i<MaxCosts; ++i ) {
-	fprintf(file,"%s %d ",DEFAULT_NAMES[i],ai->Reserve[i]);
+	fprintf(file,"%s %d ",DefaultResourceNames[i],ai->Reserve[i]);
     }
     fprintf(file,")\n");
 
     fprintf(file,"  'used '(");
     for( i=0; i<MaxCosts; ++i ) {
-	fprintf(file,"%s %d ",DEFAULT_NAMES[i],ai->Used[i]);
+	fprintf(file,"%s %d ",DefaultResourceNames[i],ai->Used[i]);
     }
     fprintf(file,")\n");
 
     fprintf(file,"  'needed '(");
     for( i=0; i<MaxCosts; ++i ) {
-	fprintf(file,"%s %d ",DEFAULT_NAMES[i],ai->Needed[i]);
+	fprintf(file,"%s %d ",DefaultResourceNames[i],ai->Needed[i]);
     }
     fprintf(file,")\n");
 
     fprintf(file,"  'collect '(");
     for( i=0; i<MaxCosts; ++i ) {
-	fprintf(file,"%s %d ",DEFAULT_NAMES[i],ai->Collect[i]);
+	fprintf(file,"%s %d ",DefaultResourceNames[i],ai->Collect[i]);
     }
     fprintf(file,")\n");
 
     fprintf(file,"  'need-mask '(");
     for( i=0; i<MaxCosts; ++i ) {
 	if( ai->NeededMask&(1<<i) ) {
-	    fprintf(file,"%s ",DEFAULT_NAMES[i]);
+	    fprintf(file,"%s ",DefaultResourceNames[i]);
 	}
     }
     fprintf(file,")\n");

@@ -279,6 +279,105 @@ local SCM CclSetSpeeds(SCM speed)
 }
 
 /**
+**	Define default resources for a new player.
+*/
+local SCM CclDefineDefaultResources(SCM list)
+{
+    int i;
+    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
+	DefaultResources[i]=gh_scm2int(gh_car(list));
+	list=gh_cdr(list);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Define default resources for a new player with low resources.
+*/
+local SCM CclDefineDefaultResourcesLow(SCM list)
+{
+    int i;
+    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
+	DefaultResourcesLow[i]=gh_scm2int(gh_car(list));
+	list=gh_cdr(list);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Define default resources for a new player with mid resources.
+*/
+local SCM CclDefineDefaultResourcesMedium(SCM list)
+{
+    int i;
+    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
+	DefaultResourcesMedium[i]=gh_scm2int(gh_car(list));
+	list=gh_cdr(list);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Define default resources for a new player with high resources.
+*/
+local SCM CclDefineDefaultResourcesHigh(SCM list)
+{
+    int i;
+    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
+	DefaultResourcesHigh[i]=gh_scm2int(gh_car(list));
+	list=gh_cdr(list);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Define default incomes for a new player.
+*/
+local SCM CclDefineDefaultIncomes(SCM list)
+{
+    int i;
+    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
+	DefaultIncomes[i]=gh_scm2int(gh_car(list));
+	list=gh_cdr(list);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Define default action for the resources.
+*/
+local SCM CclDefineDefaultActions(SCM list)
+{
+    int i;
+    for( i=0; i<MaxCosts; ++i ) {
+	free(DefaultActions[i]);
+	DefaultActions[i]=NULL;
+    }
+    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
+	DefaultActions[i]=gh_scm2newstr(gh_car(list),NIL);
+	list=gh_cdr(list);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Define default names for the resources.
+*/
+local SCM CclDefineDefaultResourceNames(SCM list)
+{
+    int i;
+    for( i=0; i<MaxCosts; ++i ) {
+	free(DefaultResourceNames[i]);
+	DefaultResourceNames[i]=NULL;
+    }
+    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
+	DefaultResourceNames[i]=gh_scm2newstr(gh_car(list),NIL);
+	list=gh_cdr(list);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Debug unit slots.
 */
 local SCM CclUnits(void)
@@ -467,6 +566,14 @@ global void InitCcl(void)
     gh_new_procedure1_0("set-speed-upgrade!",CclSetSpeedUpgrade);
     gh_new_procedure1_0("set-speed-research!",CclSetSpeedResearch);
     gh_new_procedure1_0("set-speeds!",CclSetSpeeds);
+
+    gh_new_procedureN("define-default-resources",CclDefineDefaultResources);
+    gh_new_procedureN("define-default-resources-low",CclDefineDefaultResourcesLow);
+    gh_new_procedureN("define-default-resources-medium",CclDefineDefaultResourcesMedium);
+    gh_new_procedureN("define-default-resources-high",CclDefineDefaultResourcesHigh);
+    gh_new_procedureN("define-default-incomes",CclDefineDefaultIncomes);
+    gh_new_procedureN("define-default-actions",CclDefineDefaultActions);
+    gh_new_procedureN("define-default-resource-names",CclDefineDefaultResourceNames);
 
     IconCclRegister();
     MissileCclRegister();

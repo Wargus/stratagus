@@ -363,11 +363,11 @@ global void DrawUnitInfo(const Unit* unit)
 	// I'm also assuming that it won't be 100 - x
 	// and since the default is used for comparison we might as well
 	// use that in the printing too.
-	VideoDrawNumber(x+78,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
+	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[WoodCost]);
 
-	if( unit->Player->Incomes[WoodCost] != DEFAULT_INCOMES[WoodCost] ) {
+	if( unit->Player->Incomes[WoodCost] != DefaultIncomes[WoodCost] ) {
 	    sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost]);
+		    unit->Player->Incomes[WoodCost]-DefaultIncomes[WoodCost]);
 	    VideoDrawText(x+96,y+8+93,GameFont,buf);
 	}
 	sprintf(buf, "(%+.1f)", unit->Player->Revenue[WoodCost] / 1000.0);
@@ -377,10 +377,10 @@ global void DrawUnitInfo(const Unit* unit)
     } else if( type->StoresOil ) {
 	VideoDrawText(x+20,y+8+78,GameFont,"Production");
 	VideoDrawText(x+54,y+8+93,GameFont,"Oil:");
-	VideoDrawNumber(x+78,y+8+93,GameFont,DEFAULT_INCOMES[OilCost]);
-	if( unit->Player->Incomes[OilCost]!=DEFAULT_INCOMES[OilCost] ) {
+	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[OilCost]);
+	if( unit->Player->Incomes[OilCost]!=DefaultIncomes[OilCost] ) {
 	    sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
+		    unit->Player->Incomes[OilCost]-DefaultIncomes[OilCost]);
 	    VideoDrawText(x+96,y+8+93,GameFont,buf);
 	}
 	sprintf(buf, "(%+.1f)", unit->Player->Revenue[OilCost] / 1000.0);
@@ -390,32 +390,32 @@ global void DrawUnitInfo(const Unit* unit)
     } else if( type->StoresGold ) {
 	VideoDrawText(x+20,y+8+61,GameFont,"Production");
 	VideoDrawText(x+43,y+8+77,GameFont,"Gold:");
-	VideoDrawNumber(x+78,y+8+77,GameFont,DEFAULT_INCOMES[GoldCost]);
+	VideoDrawNumber(x+78,y+8+77,GameFont,DefaultIncomes[GoldCost]);
 	// Keep/Stronghold, Castle/Fortress
-	if( unit->Player->Incomes[GoldCost] != DEFAULT_INCOMES[GoldCost] ) {
+	if( unit->Player->Incomes[GoldCost] != DefaultIncomes[GoldCost] ) {
 		sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[GoldCost]-DEFAULT_INCOMES[GoldCost]);
+		    unit->Player->Incomes[GoldCost]-DefaultIncomes[GoldCost]);
 		VideoDrawText(x+96,y+8+77,GameFont,buf);
 	}
 	sprintf(buf, "(%+.1f)", unit->Player->Revenue[GoldCost] / 1000.0);
         VideoDrawText(x+120,y+8+77,GameFont,buf);
 
 	VideoDrawText(x+22,y+8+93,GameFont,"Lumber:");
-	VideoDrawNumber(x+78,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
+	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[WoodCost]);
 	// Lumber mill
-	if( unit->Player->Incomes[WoodCost]!=DEFAULT_INCOMES[WoodCost] ) {
+	if( unit->Player->Incomes[WoodCost]!=DefaultIncomes[WoodCost] ) {
 	    sprintf(buf, "~<+%i~>",
-		unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost]);
+		unit->Player->Incomes[WoodCost]-DefaultIncomes[WoodCost]);
 	    VideoDrawText(x+96,y+8+93,GameFont,buf);
 	}
 	sprintf(buf, "(%+.1f)", unit->Player->Revenue[WoodCost] / 1000.0);
         VideoDrawText(x+120,y+8+93,GameFont,buf);
 
 	VideoDrawText(x+54,y+8+109,GameFont,"Oil:");
-	VideoDrawNumber(x+78,y+8+109,GameFont,DEFAULT_INCOMES[OilCost]);
-	if( unit->Player->Incomes[OilCost]!=DEFAULT_INCOMES[OilCost] ) {
+	VideoDrawNumber(x+78,y+8+109,GameFont,DefaultIncomes[OilCost]);
+	if( unit->Player->Incomes[OilCost]!=DefaultIncomes[OilCost] ) {
 	    sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
+		    unit->Player->Incomes[OilCost]-DefaultIncomes[OilCost]);
 	    VideoDrawText(x+96,y+8+109,GameFont,buf);
 	}
 	sprintf(buf, "(%+.1f)", unit->Player->Revenue[OilCost] / 1000.0);
