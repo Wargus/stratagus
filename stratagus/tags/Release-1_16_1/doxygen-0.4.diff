@@ -1,0 +1,44 @@
+diff -U 2 -p -r -x *.o doxygen-0.4/src/scanner.l doxygen-0.4-johns/src/scanner.l
+--- doxygen-0.4/src/scanner.l	Thu Dec  3 15:09:32 1998
++++ doxygen-0.4-johns/src/scanner.l	Thu Dec 17 02:45:46 1998
+@@ -1061,8 +1061,8 @@ VAR	  [vV][aA][rR]
+ <DocScan>"\\b"{BN}+			{ BEGIN( DocBold ); }
+ <DocScan>"\\c"{BN}+                     { BEGIN( DocCode ); }
+-<DocScan>"\\l"{BN}+		
++<DocScan>"\\l"{BN}+	
+ <DocScan>"\\include"{BN}+		{ BEGIN( DocInclude ); }
+ <DocScan>"\\dontinclude"{BN}+		{ BEGIN( DocDontInclude ); }
+-<DocScan>"\\skip"{BN}+		 	{ BEGIN( DocSkipKey ); }	
++<DocScan>"\\skip"{BN}+		 	{ BEGIN( DocSkipKey ); }
+ <DocScan>"\\skipline"{BN}+		{ BEGIN( DocSkiplineKey ); firstLine=TRUE; }
+ <DocScan>"\\line"{BN}+			{ BEGIN( DocLineKey ); firstLine=TRUE; }
+@@ -1121,5 +1121,5 @@ VAR	  [vV][aA][rR]
+ 					  BEGIN( DocScan );
+   					}
+-<DocScan>"<"{MULTICOL}{ATTR}">"		
++<DocScan>"<"{MULTICOL}{ATTR}">"	
+ <DocScan>"</"{MULTICOL}{ATTR}">"
+ <DocScan>"<"{STRONG}{ATTR}">"		{ outDoc->startBold(); }
+@@ -1140,6 +1140,6 @@ VAR	  [vV][aA][rR]
+ <DocScan>"<"{FORM}{ATTR}">"
+ <DocScan>"</"{FORM}{ATTR}">"
+-<DocScan>"<"{HEAD}{ATTR}">"			
+-<DocScan>"</"{HEAD}{ATTR}">"			
++<DocScan>"<"{HEAD}{ATTR}">"		
++<DocScan>"</"{HEAD}{ATTR}">"		
+ <DocScan>"<"{BODY}{ATTR}">"
+ <DocScan>"</"{BODY}{ATTR}">"
+@@ -2586,4 +2586,7 @@ VAR	  [vV][aA][rR]
+ 					}
+ <Doc>.					{ current->doc += *yytext; }
++<Doc>\n[ \t]*"*"+[ \t]+                 { current->doc += '\n' ;
++                                          yyLineNr++ ;
++					}
+ <DefLineDoc,LineDoc>.			{ current->brief += *yytext; }
+ <Doc>\n					{ yyLineNr++; current->doc += *yytext; }
+@@ -2602,4 +2605,5 @@ VAR	  [vV][aA][rR]
+                                           if (afterDocTerminator!=0)
+ 					    unput(afterDocTerminator);
++					  unput('\n');
+ 					  BEGIN(lastAfterDocContext);
+   					}

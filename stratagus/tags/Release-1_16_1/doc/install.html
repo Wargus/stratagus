@@ -1,0 +1,268 @@
+<!--
+----	$Id$
+-->
+<HTML><HEAD>
+    <TITLE>INSTALL: The ALE Clone Version 1.16.1</TITLE>
+</HEAD>
+<BODY>
+    <H1>INSTALL: The ALE Clone Version 1.16.1</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+
+<A HREF="#unix-src">Install Unix source</A> 
+<A HREF="#unix-bin">Install Unix binary</A> 
+<A HREF="#win32-src">Install Win32 source</A> 
+<A HREF="#win32-bin">Install Win32 binary</A> 
+
+    <H2>Software Requirements</H2>
+
+You need:
+<UL>
+	<LI>Operating systems:
+	<UL>
+	<LI>Linux System with an installed X Window System.
+	<LI>Linux System with console (graphic card) supported by svgalib.
+	<LI>Any BSD System with an installed X Window System.
+	<LI>X Window System with 15/16bit X Server.
+	<LI>Win32 system win95, win98, winNT or win2000.
+	</UL>
+	<LI>libpng. (I use libpng-2.1.0, aka 1.0.5)
+	<LI>zlib. (Also needed for libpng, I use libz-1.1.3)
+	<LI>SIOD. (Included in the distribution)
+	<LI>The original game CD or expansion CD for manuals and maindat.war
+	    for graphics and sfxdat.sud for sounds.
+	<LI>or the free replacement.
+</UL>
+These are optional:
+<UL>
+	<LI>Guile. 	(GNU extension language, I use guile-1.2,guile-1.3)
+	    <BR>Currently replaced with SIOD.
+	<LI>libpthread. (For threaded sound support)
+	<LI>guile-gtk.	(Guile bindings for gtk)
+	<LI>gtk.	(Gimp toolkit)
+	<LI>glib.	(Glib needed by gimp toolkit)
+	<LI>SVGALib	(for console support)
+	<LI>SDL		(Additional SDK support)
+</UL>
+
+    <H2>Hardware Requirements</H2>
+
+To use this program you need the following hardware:
+
+<UL>
+	<LI>At least an i586 133 Mhz (faster recommended) and 16 MB Ram.
+	<LI>Any graphic-card with 15/16bit videomode running with X11 or 
+	    SVGALib or Win32.
+</UL>
+
+    <H2>Installation</H2>
+
+    <H3>Unix or BSD</H3>
+<A NAME="unix-src"></A>
+
+Please follow the following instruction to get a working program.
+<UL>
+	<LI>Unpack the archive clone-'data'.tar.gz to any directory.
+	    (stored <B>with</B> path)
+	<LI>Change to the toplevel directory (cd clone-'date').
+	<LI>Read <A HREF="install.html">doc/install.html</A>.
+	<LI>Install the required libraries (development version!).
+	<LI>You own the original:
+	<UL>
+	<LI>Search the files maindat.war, sfxdat.sud,strdat.war  and rezdat.war
+	    from the original game.
+	    <B>This version supports the original or expansion CD!</B>
+	    If you have only the original CD, it should also works, ignore the
+	    warnings.
+	<LI>Edit tools/build.sh, and change ARCHIVE to the correct path.
+	    (You could use an installed version or the CD-ROM)
+	    Extract from "/cdrom" is the default. Just mount your cd to /cdrom.
+	</UL>
+	<LI>With the graphic from the FreeCraft Graphic Project:
+	<UL>
+	<LI>Get the correct fcraft (graphic) and scraft (sound) archives.
+	<LI>Download fcraft from <A HREF="http://fgp.cjb.net">FGP</A>
+	<LI>Download scraft from <A HREF="http://FreeCraft.org">FreeCraft</A>
+	<LI>Extract them.
+	</UL>
+	<LI>Copy Rules.make.orig to Rules.make and edit it or run the setup
+	    script.
+ 	<LI>Type "./setup" to configure the graphics, sound, and compression
+	    options.
+	    <UL>
+	    <LI>"./setup --help" shows a list of available setup options
+	    <LI>You have the option of running "make" from the script,
+		bypassing the next step.
+	    </UL>
+  	<LI>If you have the original type "make buildit" or
+	    ". tools/build.sh", to extract and convert the needed graphics,
+	    sounds and puds. (You need to run this only once!)
+ 	<LI>Now it's time for a coffee break.
+  	<LI>Type "make". (Should compile without errors :-)
+	<LI>Optional:
+	    <UL>
+	    <LI>Edit "data/ccl/clone.ccl" to configure FreeCraft with
+		Guile support.
+	    <LI>or edit "data/ccl/freecraft.ccl" to configure FreeCraft
+		with SIOD support.
+	</UL>
+	<LI>Now you could start with "./clone".
+	<LI>That's all, I hope you have enjoyed the game.
+	<LI>If you find any bug, look in
+		<A HREF="todo.html">todo.html</A>
+	    if it is already known, if not please mail it to
+	    <A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>.
+	<LI>ADVANCED: Type "make help" for more compile options.
+	<P>
+	<LI>If you get everytime killed by the computer, let him sleep with		the command line option "-s n" (sleep n frames) or set the build
+	costs and build times of the computer with -f 110 and -t 110 higher.
+</UL>
+
+    <H2>SVGALib support = console</H2>
+
+<P>Make sure that you have installed the SVGALib development kit.  The setup
+script should take care of the rest.
+
+    <P>You can find more information and the source on the
+    <A HREF="http://www.svgalib.org/">SVGALIB home</A>
+
+    <H2>SDL (Simple DirectMedia Layer) support</H2>
+
+<P>Make sure that you have installed the SDLlib development kit.  The setup
+script should take care of the rest.
+  
+    <P>You can find more information and the source on the
+    <A HREF="http://www.devolution.com/~slouken/SDL/">
+    Simple DirectMedia Layer Home</A>
+
+    <H2>Prepare network play</H2>
+
+You can play ALE Clone in the network or twice on the same computer.  Install
+it on all computers with the above instructions. 
+You can now start it on each computer with: <P>
+
+clone -p [players] [map]<BR>
+clone -p 2 data/puds/multi/3vs3.pud.gz
+
+<P>The game waits until all players are connected. Press 'q' to quit the game.
+<P>You can only play over the <B>local</B> network!
+
+    <H3>Unix or BSD</H3>
+<A NAME="unix-bin"></A>
+
+Please write this part :).
+
+
+    <H3>Win32</H3>
+<A NAME="win32-src"></A>
+
+    <H4>Win32 source</H4>
+
+See unix source and write this part.
+
+    <H4>Win32 binary</H4>
+<A NAME="win32-bin"></A>
+
+Please follow the following instruction to get a working program.
+<UL>
+    <LI>FIXME: Who writes this part?
+    <LI>Get the binary version from the web page.
+    <LI>Unpack it into a directory of your choise (c:\games\FreeCraft)  
+    <LI>Open a dos-shell.
+    <LI>Enter "cd c:\games\FreeCr~1"
+    <LI><B>You own the original:</B>
+    <UL>
+    <LI>Edit tools\build.bat to meet your requirements.<BR>
+	If your original cdrom is in drive D:\, you didn't need to edit.
+    <LI>Run tools\build.bat from the FreeCraft toplevel directory.<BR>
+	This extracts the graphics and sound from the original datafiles.
+    </UL>
+    <LI><B>With the graphic from the FreeCraft Graphic Project:</B>
+    <UL>
+    <LI>Get the correct fcraft (graphic) and scraft (sound) archives.
+    <LI>Download fcraft from <A HREF="http://fgp.cjb.net">FGP</A>
+    <LI>Download scraft from <A HREF="http://FreeCraft.org">FreeCraft</A>
+    <LI>Extract them into your game directory.
+    </UL>
+    <LI>Enter "clone" to play.
+</UL>
+
+    <H2>Hints</H2>
+
+	You find the FreeCraft Graphic Project here:<BR>
+	<A HREF="http://fgp.cjb.net">The FreeCraft Graphic Project</A>
+
+	<P>You get libpng and libz here:<BR>
+	<A HREF="ftp://ftp.uu.net/graphics/png">
+	    ftp://ftp.uu.net/graphics/png
+	</A>
+	<P>Alternative: <A HREF="ftp://swrinde.nde.swri.edu/pub/png/src/">
+	    ftp://swrinde.nde.swri.edu/pub/png/src/
+	</A>
+	<P>Please see the PNG homepage for more information:<BR>
+	<A HREF="http://www.cdrom.com/pub/png/">
+	    http://www.cdrom.com/pub/png/
+	</A>
+	<P>You can also look at the zlib homepage for more informations:<BR>
+	<A HREF="http://www.cdrom.com/pub/infozip/zlib/zlib.html">
+	    http://www.cdrom.com/pub/infozip/zlib/zlib.html
+	</A>
+
+	<P>You get guile here:<BR>
+	<A HREF="ftp://prep.ai.mit.edu/pub/gnu/guile/">
+	    ftp://prep.ai.mit.edu/pub/gnu/guile/ Directory (try first)
+	</A><BR>
+	<A HREF="ftp://prep.ai.mit.edu/pub/gnu/guile/guile-1.2.tar.gz">
+	    ftp://prep.ai.mit.edu/pub/gnu/guile/guile-1.2.tar.gz
+	</A><BR>
+	<A HREF="ftp://prep.ai.mit.edu/pub/gnu/guile/guile-1.3.4.tar.gz">
+	    ftp://prep.ai.mit.edu/pub/gnu/guile/guile-1.3.4.tar.gz
+	</A>
+	<P>Alternative the snapshots:
+	<A HREF="ftp://ftp.red-bean.com/pub/guile/snapshots/guile-core-snap.tar.gz">
+	    ftp://ftp.red-bean.com/pub/guile/snapshots/guile-core-snap.tar.gz
+	</A>
+	<P>You get pthread here:<BR>
+	Please see the LinuxThreads homepage for more information:<BR>
+	<A HREF="http://pauillac.inria.fr/~xleroy/linuxthreads">
+	        http://pauillac.inria.fr/~xleroy/linuxthreads
+	</A>
+	<P>You get guile-gtk here:<BR>
+	<A HREF="http://www.ping.de/sites/zagadka/guile-gtk/">
+	    http://www.ping.de/sites/zagadka/guile-gtk/</A>
+	<P>Alternative from the gnome cvs, see the gnome homepage
+	<A HREF="http://www.gnome.org">www.gnome.org</A>
+	<P>You get gtk here:<BR>
+	<A HREF="ftp://ftp.gtk.org/pub/gtk">
+	    ftp://ftp.gtk.org/pub/gtk</A>
+	<P>Please see the GTK homepage for more information:<BR>
+	<A HREF="http://www.gtk.org">
+	    http://www.gtk.org/</A>
+	<P>You can get SVGALIB here:<BR>
+	<A HREF="http://www.svgalib.org/">
+	    http://www.svgalib.org/</A>
+	<P>You can get SDL here:<BR>
+	<A HREF="http://www.devolution.com/~slouken/SDL/">
+	    http://www.devolution.com/~slouken/SDL/</A>
+	<P>SIOD: Scheme in One Day<BR>
+	The most recent release is available from
+	<A HREF="http://people.delphi.com/gjc/siod.html">this web page</a>,
+	and also from <A HREF="ftp://ftp.std.com/pub/gjc/">
+	ftp://ftp.std.com/pub/gjc/</A>
+
+<HR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>

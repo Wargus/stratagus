@@ -1,0 +1,25 @@
+Begin3
+Title:          ALE Clone, A free fantasy real time strategy game engine.
+Version:        1.16.1 (alpha release, usefull)
+Entered-date:   02APR2000
+Description:    A realtime, fantasy strategy war game for UNIX or Win32.
+		It comes without graphics, sounds and documentation. You need
+		the original game CD or expansion CD to use this program or
+		the free graphic replacement.
+Keywords:       RTS realtime strategy game X11
+Author:         johns@locknar.cne.de or johns98@gmx.net (Lutz Sammer)
+		(Valery Shchedrin)
+		(Fabrice Rossi)
+Maintained-by:  aleclone@FreeCraft.org (The FreeCraft Project Group)
+Primary-site:   ftp://metalab.unc.edu/pub/Linux/games/strategy
+		684 KB clone-000402.tar.gz
+		1.2 MB clone-000402-bin.tar.gz
+Alternate-site: http://user.exit.de/johns/clone-000402.tar.gz
+		684 KB clone-000402.tar.gz
+		1.2 MB clone-000402-bin.tar.gz
+Original-site:  http://FreeCraft.org/clone-000402.tar.gz
+		684 KB clone-000402.tar.gz
+		1.2 MB clone-000402-bin.tar.gz
+Platforms:      Unix/Win32,SVGALIB/X11,libz,libpng and the original CD-ROM.
+Copying-policy: Artistic license.
+End

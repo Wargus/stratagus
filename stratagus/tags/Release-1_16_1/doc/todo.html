@@ -1,0 +1,350 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!--
+----	$Id$
+-->
+<HTML><HEAD>
+    <TITLE>TODO for ALE Clone Version 1.16.1</TITLE>
+</HEAD>
+<BODY>
+    <H1>TODO for ALE Clone Version 1.16.1</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+
+<H2> This must be done for the release (1.17):</H2>
+<!-- ---- ==== -- ---- --- --- ------- ------- -->
+<UL>
+<LI>Ships on oil patches aren't attacked, the oil patch is attacked.
+<LI><B>Remove the oil-patch if the oil is empty. All my tries dumps core. :(</B>
+<LI>DONE: Loading xxx.pud.bz2 didn't work put with xxx.pud does it.
+<LI>DONE: Upgrade armor+attack of ships isn't shown.
+<LI>Worker with gold/wood could go to depot under construction!
+<LI>Units leaving transporter attacks it. (Wrong state?)
+<LI>ACT Image file names couldn't be used with Win32.
+<LI>DONE Message: input is limited by character length and scrolls if not fit on
+    Screen.
+<LI>DONE: Workers could not repair a building under construction.
+<LI>Some scanline are missing with 640x480 resolution and SDL-win32.
+<LI>Worker stops, if a nearer mine couldn't be reached.
+<LI>Ai can't find any way, tries this to often.
+<LI>Decoration on top not supported.
+<LI>Must combine new animation config with old one.
+<LI>Regenerating forest looks wired.
+<LI>Touch of darkness, has wrong time for damage.
+<LI>SVGALIB version didn't support 3 mouse button.
+<LI>Sometime it seems that the command buttons aren't changed.
+<LI>Full tanker didn't return goods on right click.
+<LI>Let target of attack command blink, if selected (like right click)
+<LI>gryphon rider attack animation could trigger oops (internal error).
+<LI>More suggestions?
+</UL>
+
+<H2> This must be done for the release (1.18):</H2>
+<!-- ---- ==== -- ---- --- --- ------- ------- -->
+<UL>
+<LI>Wrong sound for peasant repair/attack.
+<LI>DONE: Nicer corners from fog of war to unexplored area.
+<LI>Support for ccl without sound support?
+<LI>Should rewrite the create player code.
+<LI>DONE: Cancel (with multiplayer mode) of researches/upgrades.
+<LI>GroupID is wrong used, ALT did always select the last group.
+<LI>DONE: ***** NO FREE SLOT IN SOUND FIFO ***** occurs to often.
+<LI>DONE: Computer peons (for chop) stands often without working.
+<LI>DONE: Can't harvest tile 0 of each row. (but still problems here)
+<LI>Can't attack buildings under constructions.
+<LI>DONE: Upgrade of battleaxe didn't shows the correct icon?
+<LI>Should show buildings, if I build with ctrl+shift more than one.
+<LI>Canceled buildings stills shows gray rectangle, if new building is build.
+<LI>New show actions produces new errors, buttons aren't not correct updated.
+<LI>The color cycling isn't 100% correct. See FIXME: in ColorCycle()
+<LI>Scroll with the keyboard: use state and not the repeat rate. Than make
+    the scroll speed configurable. Use the repeat flag for faster scrolling.
+<LI>DONE: Knight graphics dumps core frame 140 only 70 possible. (tym.pud scrolling)
+<LI>Small ships shows an explosion if missile hits target add source.
+<LI>Ships didn't go up down, if attacking.
+<LI>my unit cannot attack enemy building when it is not finished yet (building)
+<LI>FIXED: when I put more unit into train queue than food suply, I produce these units
+    even I do not have enough food - solution before unit is started to train
+    you have to check if there is enough food.
+<LI>I cannot change unit 'pending' or however you call it (command aplied to new
+    trained units) when there is a unit in train queue, I think I could.
+<LI>I send tanker to not complited oil platform and have a crash (core
+    dumped) (not shure about it there were other tasks active :)
+<LI>[DONE] Don't let an organic unit be repaired.
+<LI>Resource line isn't correct updated for new units and food.
+<LI>DONE: If you didn't have a hall and a worker leaves the gold-mine, he attacks
+    randomly.
+<LI>A peon can enter a mine and die in the mine.
+<LI>A pean can enter a deposit and die in the deposite.
+<LI>Don't let neutral buildings (mine), be attacked with the right button.
+<LI>The thing is, if whatever is blocking the path to the wood moves, the
+    worker will stay locked up.
+<LI>Building tower I start see in it range before it completed
+<LI>I stoped ship with 'T' and it newer start moving.
+<LI>Works: Building a peon and seting relay point to gold mine it will not enter
+    it but will be standing near it.
+<LI>Fixed: About attacking sounds 2 destroyers attack silently each other.
+<LI>First sound of attack i never hear, only second,..
+<LI>I cannot create more than 1 tanker at once but peons can.
+<LI>4map of orc compain - I cann't get option for creation of transport
+   (can't upgrade townhall)
+<LI>I can' hear sounds of enemy peons geting lumber when moving to it
+    place with cursor while not see it. bug?
+<LI>Let single player maps played as multiplayer.
+</UL>
+
+<H2> Known  bugs scheduled to next release (1.19):</H2>
+<!-- ----- ---- --------- -- ---- ------- ------- -->
+<UL>
+<LI>Arrows and axes did always hits the target, even if moving away.
+<LI>Building-cursor and cursor over units shouldn't change to looking glas.
+<LI>Flying and ships could only on even fields.
+<LI>The heading of attacking units isn't 100% correct. 
+<LI>The heading of missiles isn't 100% correct.
+<LI>Units trained says nothing?
+<LI>Buildings which are busy (fires,attack, train) didn't show the flame.
+<LI>Only one and incomplete goals implemented.
+<LI>Rescue passive units are attacked.
+<LI>Fix all known core dumpers.
+<LI>Units removed are still shown on minimap. (enters transporters, than it moves)
+<LI>DONE: Attacked units arn't stopping blinking.
+<LI>defaulth.pud: AttackUnitsInDistance: HP==0 QuadTreeDelete: Value not found
+<LI>Ships should first attack units with distance weapon.
+<LI>Units attacked, which can't reattack should go out of range.
+<LI>Catapult has a wrong death sound.
+<LI>Wrong unit to mine gold 113, find the problem.
+</UL>
+
+<H2> Next to implement: </H2>
+<!-- ==== == ========== -->
+<UL>
+<LI>[DONE] Repair code should be rewritten. (Was only quick hack)
+<LI>Document all functions with doc++ or doxygen comments.
+<LI>Rescue of units.
+<LI>[DONE]Add bzip2 support.
+<LI>[DONE] Wrong buttons peon/peasant: selected build menue
+<LI>[DONE] Wrong buttons for peon on the way.
+<LI>Should be fixed: Search bug peon on the way for building, and than let him build an other.
+<LI>[DONE] Upgrades
+<LI>[DONE] Research
+<LI>Show the units in a transporter on map.
+<LI>New spell "show units in enemy transporters"
+<LI>Make a spion unit.
+<LI>Costs Spells
+<LI>Regeneration of berserks
+<LI>Constructions have an own sight-range.
+<LI>Corpse have a sight-range which will slowy reduced.
+<LI>Gold-mines with peons have an sight-range.
+<LI>Show bloodlust,invis,shield,...
+<LI>Reduce memory use. (16 MB)
+<LI>Unit moves away from magni.., glas must disappear.
+<LI>Speed for daemon and skeleton.
+<LI>Buildings/Units blink red even after they aren't being hurt.
+<LI>DONE: After a Unit receives the command stand ground, he won't move again.
+<LI>You can build an oil platform anywhere but where the oil is. :)
+<LI>The price and name of something to be built/upgraded doesn't disappear,
+	and will remain on the screen until another price comes up.
+<LI>The brown background is never updated, and it will build a mass of
+	strange bits of pictures.
+<LI>Water buildings couldn't be always be reached???
+<LI>Selecting with rectangle and scrolling with keyboard: some solutions??
+<LI>Transporter and party didn't meet automatic!
+<LI>Multiple orc units selected shows human units!
+<LI>Playing with + and -, the game stops updating (Should test)?
+<LI>Another big thing I noticed - When loading 
+data/puds/multi/jimland.pud, before the player stats appear,
+MANY lines saying "REGM:  contains unknown action 0x4100" are
+shown.  I didn't even look to see where this message is
+generated, but this serves as a heads-up.
+<LI>the final mission of the humans data/campaigns/human-exp/levelx12h.pud.gz
+is very slow and dumps core.
+<LI>Status line isn't correct cleared.
+<LI>Make color-cycling speed configurable.
+<LI>Buildings under fog of war shouldn't be selectable
+<LI>Buildings under fog of war shouldn't show decoration
+<LI>[DONE] If food is needed it should be shown bold.
+<LI>ActionNone is used, where?
+<LI>Show intro (story) message for levels.
+<LI>Show outcome for levels.
+<LI>Support different goals for levels.
+<LI>Support different AI for levels.
+<LI>Let the campaigns play like the orignal.
+<LI>Setting the units limit for each player seperate.
+</UL>
+
+<H2>In the near future:</H2>
+<!-- == === ==== ======= -->
+<UL>
+<LI>Missiles must be completed
+<LI>Attack must be completed
+<LI>Computer AI should be improved
+<LI>Add map-specific AI strategies
+<LI>[DONE] Fog of war (correct)
+<LI>[DONE] Exploration (correct)
+<LI>Interface: shift mouse select/unselect ...
+<LI>Show unit state in buttons.
+<LI>Never chop the same wood twice.
+<LI>[DONE] Correct buttons for more selected units.
+<LI>DGA X11 supported.
+<LI>Improve network (internet) support
+<LI>Faster and better extraction (build.sh)
+<LI>Slow down speed (not only speed up)
+<LI>Invidual speeds for players.
+<LI>[DONE] Cannot upgrade weapons, shields and catapults
+<LI>Cannot upgrade axethrower to bezerker...
+<LI>[DONE] Cannot upgrade axe damage
+<LI>Cannot upgrade ogres to mages...
+<LI>Cannot upgrade death knight magic...
+<LI>[DONE] The enemies do not develop... they just harvest...
+<LI>[DONE] repair building doesn't seem to work
+<LI>death knight magic doesn't seem to drop at all...
+<LI>Complete the new user interface code, atlast the sounds.
+<LI>Training queues without resources.
+<LI>Hear range, and sound handling of only hearable sounds.
+</UL>
+
+<H2>In the far future:</H2>
+<!-- == === === ======= -->
+<UL>
+<LI>Documentation
+<LI>Background sound support
+<LI>Support for debian / rpm packets
+</UL>
+
+<H2>Future plans:</H2>
+<!-- ====== ====== -->
+<UL>
+<LI>[DONE] Way-points
+<LI>[DONE] Build multiple units (training queue)
+<LI>[DONE] Build list for buildings (building queue)
+<LI>Z coordinates
+<LI>Ground effects (roads faster,...)
+<LI>800x600 resolution support ( requres just 800x600 mode border/interface graphics )
+<LI>Animated cursors
+<LI>[DONE] Automatic repairs
+<LI>Show how time of bloodlust... (blink if short before end)
+<LI>Show invisible better, (transparent...)
+<LI>Radar minimap. (Edgar!)
+<LI>Unit groups on 1-9,0. 
+<LI>Map zoom factor 1,2,4 like anno 1602
+<LI>Add TrueColor 24 bit support
+<LI>Add support for SHM-Extensions without pixmap support
+</UL>
+
+<H2>New ideas:</H2>
+<!-- === ====== -->
+<UL>
+<LI>Animated resource icons.
+<LI>All icons animated.
+<LI>Paladins: Autohealing + Autoexorcism
+<LI>Ogres: Autobloodlust
+<LI>Upgradable magic: One level of upgrade == -(10-15)% required mana to cast,
+                  but +(15-20)% of cost. Up to level 9.
+<LI>Upgradable weapon accuracy: In the same manner as upgradable magic,
+    damage 4-12 --> 5-12 --> ... --> 12-12. ballistas/ships accuracy increases
+    in step of 5. accuracy improvements enabled after full strength upgrades.
+<LI>Count kills for unit/building.
+<LI>Food requires/food provides for units.
+<LI>Units can patrol between other units.
+<LI>Mage Tower/Temple of Death accumulates energy. Then it can be transferred
+    to nearby units in x8 value.
+<LI>What about if peon attack is modified in this way that if attacks
+    bulding it returns 1/2 of the resources for it. something like demolishing,
+    not needed buldings or enemy ones.
+<LI>DONE: Support for W*rC*rft. (without II)
+<LI>Support for W*rC*rft Alpha. (Some nice ideas was dropped)
+<LI>DONE. It would be nice if the game didn't immediately exit
+    once the game is over, instead an "on screen"
+    followed by a game pause would allow the player to
+    see why they won/lost. Then they could just type 'q'
+    to quit as usual.
+<LI>Allow multiple tilesets / map or pud.
+<LI>1) Randomly generate unit structure. Random health, mana, accuracy.
+<LI>2) Allow bridges over rivers, that can be destroyed.
+<LI>3) Allow true stonewalls - make a big castle that can be defended
+   archers on stonewalls, just mages can destroy stonewall, ballist can
+   break gateway into the castle. How ever some war vehicles can overcome
+   stonewall - somethink like ladders.
+<LI>4) Allow attack and defend formation:
+
+<PRE>
+        x              x x x x x    
+       x x              x x x x
+      x   x            x x x x x
+     x     x            x x x x
+</PRE>
+
+   and many others, that will be kept while moving. Also 'disperse' command,
+   i.e. while attacked by catapults.
+<LI>5) Allow retreat command, all units that are in fighting area will reatreat.
+   Or selected units immediately do retreat.
+<LI>6) Allow army structures, select i.e. 9 footmen mark as a column, select 9 
+   columns mark as something other and so on till you select whole army.
+<LI>7) Do it a little bit real. You do not have to kill all enemies but achieve
+   some line and make your enemy to retreat.
+<LI>8) Mage can teleport a unit to another place. Mage could cast spells to
+    multiple units, not just to one.
+<LI>Walls with different Hitpoints.
+<LI>Use or control MP3 music for background.
+<LI>Scrolling/Zooming the minimap.
+<LI>Day and night cycles.
+<LI>Line of sight, shows only viewing direction
+<LI>Line of sight, to be blocked by big objects. (Ground levels...)
+<LI>More critters, and critter that attack, critter that give 
+    birth to other critters, critters which are invisible in forest 
+    but show up in land, critters which are ridable, the give birth 
+    idea could be used as a way to have extinction in those big 1000 x 
+    1000 maps :)
+<LI>Trigger system like St*rCr*ft.
+<LI>Add barks.
+<LI>Now we just have to add plant-trees command to peons
+<LI>Make critters attacking all player units.
+</UL>
+<H2>New units/behaviour:</H2>
+<!--=== ===== ========= -->
+<UL>
+<LI>Critters
+    <UL>
+    <LI> Cost only time ( no food requred )
+    <LI> Every few ( 3-5 ) critters provide food for few units ( 1-2? )
+    </UL>
+<LI>Dark Portal -- teleport, portal between worlds
+    <UL>
+    <LI> Requres Castle,Church and MageTower to build ( perhaps and some
+         Mages trained? )
+    <LI> Collects mana
+    <LI> Uses full mana load to place teleport destination
+    <LI> Teleport units with mana cost
+    <LI> `Recall's unit from the destination spot back ( mana cost )
+    <LI> Can be upgraded to allow to summon other worlds units ( daemons )
+    </UL>
+<LI>Runestone
+    <UL>
+    <LI> Requres Castle,Church and MageTower to build ( build by peon,
+         activate by mage? )
+    <LI> Collects mana
+    <LI> Transfers (auto?) mana to all magic units in the range
+         ( Mages,Paladins )
+    <LI> Even can transfer mana to other buildings like Dark Portal!
+         ( So Dark Portals can be supported by cluster of runestones... )
+    <LI> Heal all units in the range ( requires mana )
+    <LI> Blocks all Dark Portal destination spots in the range
+    </UL>
+</UL>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>
