@@ -1445,7 +1445,7 @@ global void MapColorCycle(void)
 **
 **	@return		True if inside and marked, false otherwise.
 */
-global int MarkDrawPosMap( int x, int y )
+global int MarkDrawPosMap(int x, int y)
 {
     /* NOTE: latimerius: MarkDrawPosMap() in split screen environment
      * schedules RedrawMap if (x,y) is visible inside *any* of the existing
@@ -1453,25 +1453,30 @@ global int MarkDrawPosMap( int x, int y )
      * RedrawViewport0, RedrawViewport1 etc. variables and redraw just
      * vp's that actually need redrawing?  We should evaluate this.
      */
-    if (GetViewport (x, y) != -1) {
-	MustRedraw|=RedrawMap;
+    if (GetViewport(x, y) != -1) {
+	MustRedraw |= RedrawMap;
 	return 1;
     }
     return 0;
 }
 
-global int MapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
+global int MapAreaVisibleInViewport(int v, int sx, int sy, int ex, int ey)
 {
-    Viewport *view = &TheUI.VP[v];
-    return sx>=view->MapX && sy>=view->MapY &&
-		ex<view->MapX+view->MapWidth && ey<view->MapY+view->MapHeight;
+    const Viewport* view;
+
+    view = &TheUI.VP[v];
+    return sx >= view->MapX && sy >= view->MapY
+	&& ex < view->MapX + view->MapWidth
+	&& ey < view->MapY + view->MapHeight;
 }
 
-local inline int PointInViewport (int v, int x, int y)
+local inline int PointInViewport(int v, int x, int y)
 {
-    Viewport *view = &TheUI.VP[v];
-    return view->MapX <= x && x < view->MapX+view->MapWidth &&
-		view->MapY <= y && y < view->MapY+view->MapHeight;
+    const Viewport* view;
+
+    view = &TheUI.VP[v];
+    return view->MapX <= x && x < view->MapX + view->MapWidth
+	&& view->MapY <= y && y < view->MapY + view->MapHeight;
 }
 
 global int AnyMapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
