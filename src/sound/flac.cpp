@@ -156,6 +156,8 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
     unsigned i;
     unsigned channel;
     void *p;
+    int rate;
+    int y;
 
     DebugLevel3Fn("Write callback %d bits, %d channel, %d bytes\n" _C_
 	frame->header.bits_per_sample _C_ frame->header.channels _C_
@@ -169,9 +171,11 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
     i = frame->header.channels * frame->header.blocksize *
 	frame->header.bits_per_sample / 8;
 
+    rate = 44100 / sample->Frequency;
+
     if (sample->Type == &FlacSampleType) {
 	// not streaming
-	sample = realloc(sample, sizeof(*sample) + sample->Length + i);
+	sample = realloc(sample, sizeof(*sample) + sample->Length + i*rate);
 	if (!sample) {
 	    fprintf(stderr, "Out of memory!\n");
 	    CLclose(data->FlacFile);
@@ -182,21 +186,25 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
     }
 
     p = sample->Data + sample->Length;
-    sample->Length += i;
-    data->Bytes -= i;
+    sample->Length += i*rate;
+    data->Bytes -= i*rate;
 
     switch (sample->SampleSize) {
 	case 8:
-	    for (i = 0; i < frame->header.blocksize; i++) {
-		for (channel = 0; channel < frame->header.channels; channel++) {
-		    *((unsigned char *)p)++ = buffer[channel][i] + 128;
+	    for (i = 0; i < frame->header.blocksize; ++i) {
+		for (y = 0; y < rate; ++y) {
+		    for (channel = 0; channel < frame->header.channels; channel++) {
+			*((unsigned char *)p)++ = buffer[channel][i] + 128;
+		    }
 		}
 	    }
 	    break;
 	case 16:
-	    for (i = 0; i < frame->header.blocksize; i++) {
-		for (channel = 0; channel < frame->header.channels; channel++) {
-		    *((short *)p)++ = buffer[channel][i];
+	    for (i = 0; i < frame->header.blocksize; ++i) {
+		for (y = 0; y < rate; ++y) {
+		    for (channel = 0; channel < frame->header.channels; channel++) {
+			*((short *)p)++ = buffer[channel][i];
+		    }
 		}
 	    }
 	    break;
