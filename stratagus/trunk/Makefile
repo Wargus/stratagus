@@ -124,12 +124,12 @@ all-src: make-objdir $(OBJ)
 
 # UNIX-TARGET
 freecraft: $(OBJ) 
-	$(CCLD) -o freecraft $^ $(CLONELIBS) -I. $(CFLAGS)
+	$(CCLD) -o freecraft $^ $(FREECRAFT_LIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
 freecraft.exe:	$(OBJ) etlib/$(OBJDIR)/getopt.$(OE) \
 	    src/$(OBJDIR)/freecraftrc.$(OE)
-	$(CCLD) -o freecraft$(EXE) $^ -lSDLmain $(CLONELIBS) -I. $(CFLAGS)
+	$(CCLD) -o freecraft$(EXE) $^ -lSDLmain $(FREECRAFT_LIBS) -I. $(CFLAGS)
 
 strip:
 	@if [ -f freecraft ]; then strip freecraft; fi
@@ -140,7 +140,7 @@ src/$(OBJDIR)/freecraftrc.$(OE): src/freecraft.rc
 
 echo::
 	@-echo CFLAGS: $(CFLAGS)
-	@-echo LIBS: $(CLONELIBS)
+	@-echo LIBS: $(FREECRAFT_LIBS)
 
 clean::
 	for i in $(MODULES_ALL); do \

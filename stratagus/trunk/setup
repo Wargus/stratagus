@@ -694,7 +694,7 @@ case $ANSWER in
 		echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
 		if [ "$USESDL" != "1" ]; then
 		    echo "SDLCD	= $SDLCD \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
-		    echo "CLONELIBS	= \$(shell $SDL_CONFIG --libs)" >> $RULESFILE
+		    echo "FREECRAFT_LIBS	= \$(shell $SDL_CONFIG --libs)" >> $RULESFILE
 		fi
 		;;
 	    [iI])
@@ -1038,7 +1038,7 @@ if [ "$BEOS" != 1 ] ; then
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz -lm \$(THREADLIB)" >> $RULESFILE
 
     # Libraries needed to build freecraft
-    echo "CLONELIBS=$CLONELIBS \$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
+    echo "FREECRAFT_LIBS=$FREECRAFT_LIBS \$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
     echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS) \\" >> $RULESFILE
     echo "	\$(ARTSCLIB) \$(FLACLIB) \$(OGGLIB) \$(MP3LIB) \\" >> $RULESFILE
     echo "	$EXTRA_LDFLAGS -lz -lm" >> $RULESFILE
@@ -1047,7 +1047,7 @@ if [ "$BEOS" != 1 ] ; then
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
 
     # Libraries needed to build freecraft
-    echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz \\" >> $RULESFILE
+    echo "FREECRAFT_LIBS=\$(XLDFLAGS) -lpng -lz \\" >> $RULESFILE
     echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
   fi
 else
@@ -1055,7 +1055,7 @@ else
   echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
 
   # Libraries needed to build freecraft
-  echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz \\" >> $RULESFILE
+  echo "FREECRAFT_LIBS=\$(XLDFLAGS) -lpng -lz \\" >> $RULESFILE
   echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
 fi
 
