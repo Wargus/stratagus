@@ -2277,7 +2277,8 @@ local void TipsMenuEnd(void)
     NextTip();
     FreeTips();
 
-    GameMenuReturn();
+    EndMenu();
+    InterfaceState=IfaceStateNormal;
 }
 
 /**
