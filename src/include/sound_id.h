@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name sound_id.h	-	Sound identifier client side header file. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer and Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer and Fabrice Rossi
+//
+//	$Id$
 
 #ifndef __SOUND_ID_H__
 #define __SOUND_ID_H__
@@ -75,6 +74,13 @@ extern SoundId MakeSoundGroup(char* group_name,SoundId first,SoundId second);
 /** Helper function, displays the mapping between sound names and sound ids
  */
 extern void DisplaySoundHashTable(void);
+
+
+#ifndef WITH_SOUND	// {
+
+#define SoundIdForName(n)		/// Dummy macro for without sound
+
+#endif	// } WITH_SOUND
 
 //@}
 
