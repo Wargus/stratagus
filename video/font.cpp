@@ -1108,35 +1108,6 @@ global void LoadFonts(void)
 **
 **		@return				Integer as font identifier.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-global int CclFontByIdentifier(SCM type)
-{
-	if (gh_eq_p(type, gh_symbol2scm("game"))) {
-		return GameFont;
-	} else if (gh_eq_p(type, gh_symbol2scm("small"))) {
-		return SmallFont;
-	} else if (gh_eq_p(type, gh_symbol2scm("large"))) {
-		return LargeFont;
-	} else if (gh_eq_p(type, gh_symbol2scm("small-title"))) {
-		return SmallTitleFont;
-	} else if (gh_eq_p(type, gh_symbol2scm("large-title"))) {
-		return LargeTitleFont;
-	} else if (gh_eq_p(type, gh_symbol2scm("user1"))) {
-		return User1Font;
-	} else if (gh_eq_p(type, gh_symbol2scm("user2"))) {
-		return User2Font;
-	} else if (gh_eq_p(type, gh_symbol2scm("user3"))) {
-		return User3Font;
-	} else if (gh_eq_p(type, gh_symbol2scm("user4"))) {
-		return User4Font;
-	} else if (gh_eq_p(type, gh_symbol2scm("user5"))) {
-		return User5Font;
-	} else {
-		errl("Unsupported font tag", type);
-	}
-	return 0;
-}
-#elif defined(USE_LUA)
 global int CclFontByIdentifier(const char* type)
 {
 	if (!strcmp(type, "game")) {
@@ -1165,7 +1136,6 @@ global int CclFontByIdentifier(const char* type)
 	}
 	return 0;
 }
-#endif
 
 /**
 **		Define the used fonts.
@@ -1177,22 +1147,6 @@ global int CclFontByIdentifier(const char* type)
 **
 **		@todo		make the font name functions more general, support more fonts.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineFont(SCM type, SCM file, SCM width, SCM height)
-{
-	int i;
-
-	i = CclFontByIdentifier(type);
-	free(Fonts[i].File);
-	VideoSaveFree(Fonts[i].Graphic);
-	Fonts[i].Graphic = NULL;
-	Fonts[i].File = gh_scm2newstr(file, NULL);
-	Fonts[i].Width = gh_scm2int(width);
-	Fonts[i].Height = gh_scm2int(height);
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineFont(lua_State* l)
 {
 	int i;
@@ -1211,79 +1165,10 @@ local int CclDefineFont(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Define a font color.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineFontColor(SCM list)
-{
-	SCM value;
-	char* color;
-	int i;
-	FontColorMapping* fcm;
-	FontColorMapping** fcmp;
-
-	value = gh_car(list);
-	list = gh_cdr(list);
-
-	color = gh_scm2newstr(value,NULL);
-
-	if (!FontColorMappings) {
-		FontColorMappings = calloc(sizeof(*FontColorMappings), 1);
-		fcm = FontColorMappings;
-	} else {
-		fcmp = &FontColorMappings;
-		while (*fcmp) {
-#ifdef USE_SDL_SURFACE
-			if (!strcmp((*fcmp)->ColorName, color)) {
-				fprintf(stderr, "Warning: Redefining color '%s'\n", color);
-				free((*fcmp)->ColorName);
-				fcm = *fcmp;
-				break;
-			}
-#else
-			if (!strcmp((*fcmp)->Color, color)) {
-				fprintf(stderr, "Warning: Redefining color '%s'\n", color);
-				free((*fcmp)->Color);
-				fcm = *fcmp;
-				break;
-			}
-#endif
-			fcmp = &(*fcmp)->Next;
-		}
-		*fcmp = calloc(sizeof(*FontColorMappings), 1);
-		fcm = *fcmp;
-	}
-#ifdef USE_SDL_SURFACE
-	fcm->ColorName = color;
-#else
-	fcm->Color = color;
-#endif
-	fcm->Next = NULL;
-
-	value = gh_car(list);
-	list = gh_cdr(list);
-
-	if (gh_vector_length(value) != NumFontColors * 3) {
-		fprintf(stderr, "Wrong vector length\n");
-	}
-	for (i = 0; i < NumFontColors; ++i) {
-#ifdef USE_SDL_SURFACE
-		fcm->Color[i].r = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 0)));
-		fcm->Color[i].g = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 1)));
-		fcm->Color[i].b = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 2)));
-#else
-		fcm->RGB[i].R = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 0)));
-		fcm->RGB[i].G = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 1)));
-		fcm->RGB[i].B = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 2)));
-#endif
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineFontColor(lua_State* l)
 {
 	char* color;
@@ -1358,7 +1243,6 @@ local int CclDefineFontColor(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Register CCL features for fonts.
@@ -1367,22 +1251,17 @@ local int CclDefineFontColor(lua_State* l)
 */
 global void FontsCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedure4_0("define-font", CclDefineFont);
-	gh_new_procedureN("define-font-color", CclDefineFontColor);
-
-	//gh_new_procedure2_0("default-text-colors", CclDefaultTextColors);
-	//gh_new_procedure1_0("text-length", CclTextLength);
-	//gh_new_procedure4_0("draw-text", CclDrawText);
-	//gh_new_procedure4_0("draw-reverse-text", CclDrawReverseText);
-	//gh_new_procedure4_0("draw-text-centered", CclDrawTextCentered);
-	//gh_new_procedure4_0("draw-reverse-text-centered", CclDrawReverseTextCentered);
-	//gh_new_procedure4_0("draw-number", CclDrawNumber);
-	//gh_new_procedure4_0("draw-reverse-number", CclDrawReverseNumber);
-#elif defined(USE_LUA)
 	lua_register(Lua, "DefineFont", CclDefineFont);
 	lua_register(Lua, "DefineFontColor", CclDefineFontColor);
-#endif
+
+//	lua_register(Lua, "DefaultTextColors", CclDefaultTextColors);
+//	lua_register(Lua, "TextLength", CclTextLength);
+//	lua_register(Lua, "DrawText", CclDrawText);
+//	lua_register(Lua, "DrawReverseText", CclDrawReverseText);
+//	lua_register(Lua, "DrawTextCentered", CclDrawTextCentered);
+//	lua_register(Lua, "DrawReverseTextCentered", CclDrawReverseTextCentered);
+//	lua_register(Lua, "DrawNumber", CclDrawNumber);
+//	lua_register(Lua, "DrawReverseNumber", CclDrawReverseNumber);
 }
 
 /**

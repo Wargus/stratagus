@@ -176,11 +176,7 @@ extern void CleanFonts(void);
 	/// Check if font is loaded
 extern int IsFontLoaded(unsigned font);
 	/// Font symbol to id
-#if defined(USE_GUILE) || defined(USE_SIOD)
-extern int CclFontByIdentifier(SCM type);
-#elif defined(USE_LUA)
 extern int CclFontByIdentifier(const char* type);
-#endif
 
 //@}
 

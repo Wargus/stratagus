@@ -10,7 +10,7 @@
 //
 /**@name ai_resource.c - AI resource manager. */
 //
-//      (c) Copyright 2000-2002 by Lutz Sammer and Antonis Chaniotis.
+//      (c) Copyright 2000-2004 by Lutz Sammer and Antonis Chaniotis.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

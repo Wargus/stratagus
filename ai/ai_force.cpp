@@ -191,191 +191,16 @@ global int AiFindAvailableUnitTypeEquiv(const UnitType* unittype, int* usableTyp
 }
 
 /**
-**  Count available units by type in a force.
-**
-**  The returned array will map UnitType=>number of unit
-**
-**  @param force        the force to count unit
-**  @param countByType  array[UnitTypeMax+1] of int
-*/
-global void AiForceCountUnits(int force, int* countByType)
-{
-	int type;
-	AiUnit* aiunit;
-
-	memset(countByType, 0, sizeof(int) * (UnitTypeMax + 1));
-
-	aiunit = AiPlayer->Force[force].Units;
-	while (aiunit) {
-		if (!aiunit->Unit->Destroyed && aiunit->Unit->HP &&
-				aiunit->Unit->Orders[0].Action != UnitActionDie) {
-			type = UnitTypeEquivs[aiunit->Unit->Type->Type];
-
-			DebugCheck(type < 0 || type > UnitTypeMax);
-			countByType[type]++;
-		}
-		aiunit = aiunit->Next;
-	}
-}
-
-/**
-**  Substract wanted unit in a force. ( from the result of AiForceCountUnits )
-**
-**  @param force        the force to count unit
-**  @param countByType  array[UnitTypeMax+1] of int
-**
-**  @return             The number of missing unit
-*/
-global int AiForceSubstractWant(int force, int* countByType)
-{
-	int missing;
-	int type;
-	const AiUnitType* aitype;
-
-	missing = 0;
-	aitype = AiPlayer->Force[force].UnitTypes;
-	while (aitype) {
-		type = UnitTypeEquivs[aitype->Type->Type];
-		countByType[type] -= aitype->Want;
-		if (countByType[type] < 0) {
-			missing -= countByType[type];
-		}
-		aitype = aitype->Next;
-	}
-
-	return missing;
-}
-
-/**
-**  Complete dst force with units from src force.
-**
-**  @todo FIXME: should check that unit can reach dst force's hotspot.
-**
-**  @param src  the force from which units are taken
-**  @param dst  the force into which units go
-*/
-global void AiForceTransfert(int src, int dst)
-{
-	AiUnit** prev;
-	AiUnit* aiunit;
-	int type;
-	int counter[UnitTypeMax + 1];
-	int missing;
-
-	//
-	// Count units in dest force.
-	//
-	AiForceCountUnits(dst, counter);
-
-	//
-	// Check the dest force requirements.
-	//
-	if ((missing = AiForceSubstractWant(dst, counter)) == 0) {
-		// Nothing missing => mark completed & abort.
-		AiPlayer->Force[dst].Completed = 1;
-		return;
-	}
-
-	// Iterate the source force, moving needed units into dest...
-	prev = &AiPlayer->Force[src].Units;
-	while (*prev) {
-		aiunit = (*prev);
-		type = UnitTypeEquivs[aiunit->Unit->Type->Type];
-		if (counter[type] < 0) {
-			// move in dest force...
-			*prev = aiunit->Next;
-
-			aiunit->Next = AiPlayer->Force[dst].Units;
-			AiPlayer->Force[dst].Units = aiunit;
-
-			counter[type]++;
-			--missing;
-
-			if (!missing) {
-				AiPlayer->Force[dst].Completed = 1;
-				return;
-			}
-		} else {
-			// Just iterate
-			prev = &aiunit->Next;
-		}
-	}
-}
-
-/**
-**  Complete dst force with overflow units in src force.
-**
-**  @todo FIXME: should check that unit can reach dst force's hotspot.
-**
-**  @param src  the force from which units are taken
-**  @param dst  the force into which units go
-*/
-global void AiForceTransfertOverflow(int src, int dst)
-{
-	AiUnit** prev;
-	AiUnit* aiunit;
-	int type;
-	int counter[UnitTypeMax + 1];
-	int overflow[UnitTypeMax + 1];
-	int missing;
-
-	//
-	// Count units in dest force.
-	//
-	AiForceCountUnits(dst, counter);
-
-	//
-	// Check the dest force requirements.
-	//
-	if ((missing = AiForceSubstractWant(dst, counter)) == 0) {
-		// Nothing missing => abort.
-		AiPlayer->Force[dst].Completed = 1;
-		return;
-	}
-
-	//
-	// Find overflow units in src force
-	//
-	AiForceCountUnits(src, overflow);
-	AiForceSubstractWant(src, overflow);
-
-	// Iterate the source force, moving needed units into dest...
-	prev = &AiPlayer->Force[src].Units;
-	while (*prev) {
-		aiunit = (*prev);
-		type = UnitTypeEquivs[aiunit->Unit->Type->Type];
-		if (counter[type] < 0 && overflow[type] > 0) {
-			// move in dest force...
-			*prev = aiunit->Next;
-
-			aiunit->Next = AiPlayer->Force[dst].Units;
-			AiPlayer->Force[dst].Units = aiunit;
-
-			++counter[type];
-			--overflow[type];
-			--missing;
-			if (!missing) {
-				AiPlayer->Force[dst].Completed = 1;
-				return;
-			}
-		} else {
-			// Just iterate
-			prev = &aiunit->Next;
-		}
-	}
-}
-
-/**
 **  Ai clean units in a force.
 **
 **  @param force  Force number.
 */
-global void AiCleanForce(int force)
+local void AiCleanForce(int force)
 {
 	AiUnit** prev;
 	AiUnit* aiunit;
+	const AiUnitType* aitype;
 	int counter[UnitTypeMax + 1];
-	int unit_released;
 
 	//
 	// Release all killed units.
@@ -400,31 +225,40 @@ global void AiCleanForce(int force)
 	//
 	// Count units in force.
 	//
-	AiForceCountUnits(force, counter);
+	memset(counter, 0, sizeof(counter));
+	aiunit = AiPlayer->Force[force].Units;
+	while (aiunit) {
+		// FIXME: Should I use equivalent unit types?
+		counter[aiunit->Unit->Type->Type]++;
+		aiunit = aiunit->Next;
+	}
 
 	//
 	// Look if the force is complete.
 	//
-	AiPlayer->Force[force].Completed = (AiForceSubstractWant(force, counter) == 0);
+	AiPlayer->Force[force].Completed = 1;
+	aitype = AiPlayer->Force[force].UnitTypes;
+	while (aitype) {
+		if (aitype->Want > counter[aitype->Type->Type]) {
+			DebugLevel3Fn("%d: missing %s.\n" _C_ force _C_ aitype->Type->Ident);
+			AiPlayer->Force[force].Completed = 0;
+		}
+		counter[aitype->Type->Type] -= aitype->Want;
+		aitype = aitype->Next;
+	}
 
-	// Don't prune the 0 force in any case
-	if (force > 0) {
-		//
-		// Release units too much in force.
-		//
-		unit_released = 0;
-		prev = (&AiPlayer->Force[force].Units);
-		while ((aiunit = (*prev))) {
+	//
+	// Release units too much in force.
+	//
+	if (!AiPlayer->Force[force].Attacking) {
+		prev = &AiPlayer->Force[force].Units;
+		while ((aiunit = *prev)) {
 			if (counter[aiunit->Unit->Type->Type] > 0) {
 				DebugLevel3Fn("Release unit %s\n" _C_ aiunit->Unit->Type->Ident);
 				counter[aiunit->Unit->Type->Type]--;
 				RefsDecrease(aiunit->Unit);
 				*prev = aiunit->Next;
-
-				// Move this unit somewhere else...
-				AiAssignToForce(aiunit->Unit);
 				free(aiunit);
-
 				continue;
 			}
 			prev = &aiunit->Next;
@@ -432,41 +266,6 @@ global void AiCleanForce(int force)
 	}
 
 	DebugLevel3Fn("%d complete %d\n" _C_ force _C_ AiPlayer->Force[force].Completed);
-}
-
-/**
-**
-**  Remove everything in the given force
-**
-**  @param force  the force to erase
-*/
-global void AiEraseForce(int force)
-{
-	AiUnitType* aiut;
-	AiUnitType* next;
-	AiUnit* aiu;
-	AiUnit* next_u;
-
-	aiut = AiPlayer->Force[force].UnitTypes;
-	while (aiut) {
-		next = aiut->Next;
-		free(aiut);
-		aiut = next;
-	}
-	AiPlayer->Force[force].UnitTypes = 0;
-
-	aiu = AiPlayer->Force[force].Units;
-	while (aiu) {
-		// Decrease usage count
-		RefsDecrease(aiu->Unit);
-
-		next_u = aiu->Next;
-		free(aiu);
-		aiu = next_u;
-	}
-	AiPlayer->Force[force].Units = 0;
-
-	AiAssignFreeUnitsToForce();
 }
 
 /**
@@ -479,48 +278,57 @@ global void AiCleanForces(void)
 	//
 	// Release all killed units.
 	//
-	for (force = 0; force < AI_MAX_FORCES; ++force) {
+	for (force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
 		AiCleanForce(force);
 	}
 }
 
 /**
 **  Check if the units belongs to the force.
-**  If ok, update the completed flag
 **
 **  @param force  Force to be checked.
 **  @param type   Type to check.
 **
-**  @return       True if it fits & update completed flag, false otherwise.
+**  @return       True if it fits, false otherwise.
 */
 local int AiCheckBelongsToForce(int force, const UnitType* type)
 {
+	AiUnit* aiunit;
+	AiUnitType* aitype;
 	int counter[UnitTypeMax + 1];
-	int missing;
-	int realtype;
+	int flag;
 
+	memset(counter, 0, sizeof(counter));
 	//
 	// Count units in force.
 	//
-	AiForceCountUnits(force, counter);
+	aiunit = AiPlayer->Force[force].Units;
+	while (aiunit) {
+		// FIXME: Should I use equivalent unit types?
+		counter[aiunit->Unit->Type->Type]++;
+		aiunit = aiunit->Next;
+	}
 
 	//
 	// Look what should be in the force.
 	//
-	missing = AiForceSubstractWant(force, counter);
-	AiPlayer->Force[force].Completed = (missing == 0);
-
-	realtype = UnitTypeEquivs[type->Type];
-
-	if (counter[realtype] < 0) {
-		// Ok we will put this unit in this force !
-		// Just one missing ?
-		if (counter[realtype] == -1 && missing == 1) {
-			AiPlayer->Force[force].Completed = 1;
+	flag = 0;
+	AiPlayer->Force[force].Completed = 1;
+	aitype = AiPlayer->Force[force].UnitTypes;
+	while (aitype) {
+		if (aitype->Want > counter[aitype->Type->Type]) {
+			if (type == aitype->Type) {
+				if (aitype->Want - 1 > counter[aitype->Type->Type]) {
+					AiPlayer->Force[force].Completed = 0;
+				}
+				flag = 1;
+			} else {
+				AiPlayer->Force[force].Completed = 0;
+			}
 		}
-		return 1;
+		aitype = aitype->Next;
 	}
-	return 0;
+	return flag;
 }
 
 /**
@@ -530,255 +338,30 @@ local int AiCheckBelongsToForce(int force, const UnitType* type)
 */
 global void AiAssignToForce(Unit* unit)
 {
-	AiUnit* aiunit;
 	int force;
 
 	//
 	// Check to which force it belongs
 	//
 	for (force = 0; force < AI_MAX_FORCES; ++force) {
-		// care of populate from scratch only.
-		if (AiPlayer->Force[force].PopulateMode != AiForcePopulateFromScratch) {
+		// No troops for attacking force
+		if (!AiPlayer->Force[force].Defending &&
+				AiPlayer->Force[force].Attacking) {
 			continue;
 		}
 
 		if (AiCheckBelongsToForce(force, unit->Type)) {
+			AiUnit* aiunit;
+
 			aiunit = malloc(sizeof (*aiunit));
 			aiunit->Next = AiPlayer->Force[force].Units;
 			AiPlayer->Force[force].Units = aiunit;
 			aiunit->Unit = unit;
 			RefsIncrease(unit);
-			return;
-		}
-	}
-
-	// Add to the 0 force !
-	// ( we overflow the 0 force here, so completed does not need update )
-	aiunit = malloc(sizeof (*aiunit));
-	aiunit->Next = AiPlayer->Force[0].Units;
-	AiPlayer->Force[0].Units = aiunit;
-	aiunit->Unit = unit;
-	RefsIncrease(unit);
-}
-
-/**
-**  Try to complete a force, using all available units
-**
-**  @param force  the force to complete
-*/
-global void AiForceComplete(int force)
-{
-	int j;
-	int overflowonly;
-
-	for (j = 0; j < AI_MAX_FORCES; ++j) {
-		// Don't complete with self ...
-		if (j == force) {
-			continue;
-		}
-
-		// Complete only with "reusable" forces.
-		if (!AiPlayer->Force[j].UnitsReusable) {
-			continue;
-		}
-
-		// Honor "populate from attack"
-		if ((AiPlayer->Force[force].PopulateMode == AiForcePopulateFromAttack) &&
-				(!AiPlayer->Force[j].Role == AiForceRoleAttack)) {
-			// Use overflow from force 0...
-			if (j == 0) {
-				overflowonly = 1;
-			} else {
-				continue;
-			}
-		} else {
-			overflowonly = 0;
-		}
-
-		// Complete the force automatically...
-		if (!overflowonly) {
-			AiForceTransfert(j, force);
-		} else {
-			AiForceTransfertOverflow(j, force);
-		}
-
-		if (AiPlayer->Force[force].Completed) {
 			break;
 		}
 	}
 }
-
-/**
-**  Enrole a unit in the specific force.
-**  Does not take equivalence into account
-**
-**  @todo FIXME: currently iterate all units (slow)
-**        FIXME: should take units which are closer to the hotspot.
-**        FIXME: should ensure that units can move to the hotspot.
-**
-**  @param force  the force to put units on
-**  @param ut     the searched unittype
-**  @param count  the number of unit to add
-**
-**  @return       the number of unit still missing (or 0 if successful)
-*/
-global int AiEnroleSpecificUnitType(int force, UnitType* ut, int count)
-{
-	AiForce* dstForce;
-	int src_force;
-	AiUnit* aiUnit;
-	AiUnit** prev;
-
-	dstForce = AiPlayer->Force + force;
-	for (src_force = 0; src_force < AI_MAX_FORCES; src_force++) {
-		if (src_force == force) {
-			continue;
-		}
-		// Only populate with reserve
-		if (!AiPlayer->Force[src_force].UnitsReusable) {
-			continue;
-		}
-		// Don't populate attack force with defend reserve.
-		if ((AiPlayer->Force[src_force].Role == AiForceRoleDefend) &&
-				(AiPlayer->Force[force].PopulateMode == AiForcePopulateFromAttack)) {
-			continue;
-		}
-
-		aiUnit = AiPlayer->Force[src_force].Units;
-		prev = &AiPlayer->Force[src_force].Units;
-		while (aiUnit) {
-			if (aiUnit->Unit->Type->Type == ut->Type) {
-				*prev = aiUnit->Next;
-
-				// Move to dstForce
-				AiPlayer->Force[src_force].Completed = 0;
-				aiUnit->Next = dstForce->Units;
-				dstForce->Units = aiUnit;
-
-				count--;
-				if (!count) {
-					return 0;
-				}
-			}
-			prev = &aiUnit->Next;
-			aiUnit = aiUnit->Next;
-		}
-	}
-	return count;
-}
-
-/**
-**  Make sure that current force requirement are superior to actual assigned
-**  unit count
-**
-**  @param force  FIXME: docu
-*/
-local void AiFinalizeForce(int force)
-{
-	int i;
-	int type;
-	int unitcount[UnitTypeMax + 1];
-	AiUnitType *aitype;
-
-	AiForceCountUnits(force, unitcount);
-	aitype = AiPlayer->Force[force].UnitTypes;
-	while (aitype) {
-		type = UnitTypeEquivs[aitype->Type->Type];
-		if (unitcount[type] > aitype->Want) {
-			aitype->Want = unitcount[type];
-			unitcount[type] = 0;
-		}
-		aitype = aitype->Next;
-	}
-
-	for (i = 0; i <= UnitTypeMax; i++) {
-		if (unitcount[i] > 0) {
-			aitype = (AiUnitType *) malloc(sizeof (AiUnitType));
-			aitype->Want = unitcount[i];
-			aitype->Type = UnitTypes[i];
-
-			// Insert into force.
-			aitype->Next = AiPlayer->Force[force].UnitTypes;
-			AiPlayer->Force[force].UnitTypes = aitype;
-		}
-	}
-}
-
-/**
-**  Create a force full of available units, responding to the powers.
-**
-**  @param power   Land/Sea/Air power to match
-**  @param utypes  array of unittypes to use
-**  @param ucount  Size of the utypes array
-**
-**  @return        -1 if not possible, 0 if force ready.
-*/
-global int AiCreateSpecificForce(int* power, int* unittypes, int unittypescount)
-{
-	UnitType *ut;
-	int id;
-	int maxPower;
-	int forceUpdated;
-	int curpower[3];
-	int maxadd;
-	int lefttoadd;
-	int unittypeforce;
-	int equivalents[UnitTypeMax + 1];
-	int equivalentscount;
-	int equivalentid;
-
-	curpower[0] = power[0];
-	curpower[1] = power[1];
-	curpower[2] = power[2];
-	AiEraseForce(AiScript->OwnForce);
-
-	do {
-		forceUpdated = 0;
-		maxPower = (curpower[0] > curpower[1] ?
-			(curpower[0] > curpower[2] ? 0 : 2) : (curpower[1] > curpower[2] ? 1 : 2));
-
-		for (id = 0; id < unittypescount; id++) {
-			// Search in equivalents
-			equivalentscount = AiFindAvailableUnitTypeEquiv(UnitTypes[unittypes[id]], equivalents);
-			for (equivalentid = 0; equivalentid < equivalentscount; ++equivalentid) {
-				ut = UnitTypes[equivalents[equivalentid]];
-				if (!(ut->CanTarget & (1 << maxPower))) {
-					continue;
-				}
-
-				unittypeforce = AiUnitTypeForce(ut);
-				unittypeforce = (unittypeforce ? unittypeforce : 1);
-
-				// Try to respond to the most important power ...
-				maxadd = 1 + curpower[maxPower] / unittypeforce;
-
-				lefttoadd = AiEnroleSpecificUnitType(AiScript->OwnForce, ut, maxadd);
-
-				// Nothing added, continue.
-				if (lefttoadd == maxadd) {
-					continue;
-				}
-
-				// FIXME: don't always use the right unittype here...
-				curpower[maxPower] -= (maxadd - lefttoadd) * unittypeforce;
-
-				forceUpdated = 1;
-
-				maxPower = (curpower[0] > curpower[1] ?
-					(curpower[0] > curpower[2] ? 0 : 2) :
-					(curpower[1] > curpower[2] ? 1 : 2));
-				if (curpower[maxPower] <= 0) {
-					AiFinalizeForce(AiScript->OwnForce);
-					return 0;
-				}
-			}
-		}
-	} while (forceUpdated);
-	// Sth missing...
-	AiFinalizeForce(AiScript->OwnForce);
-	return -1;
-}
-
 
 /**
 **  Assign free units to force.
@@ -800,7 +383,7 @@ global void AiAssignFreeUnitsToForce(void)
 	//
 	// Remove all units already in forces.
 	//
-	for (f = 0; f < AI_MAX_FORCES; ++f) {
+	for (f = 0; f < AI_MAX_ATTACKING_FORCES; ++f) {
 		aiunit = AiPlayer->Force[f].Units;
 		while (aiunit) {
 			unit = aiunit->Unit;
@@ -848,166 +431,138 @@ global void AiAttackWithForceAt(int force, int x, int y)
 			} else {
 				CommandMove(aiunit->Unit, x, y, FlushCommands);
 			}
-
 			aiunit = aiunit->Next;
 		}
 	}
 }
 
 /**
-**  Try to group units in a force. Units are grouped around the closest
-**  units of the hotspot.
+**  Attack opponent with force.
 **
-**  @param force  the force to send home.
+**  @param force  Force number to attack with.
 */
-global void AiGroupForceNear(int force, int targetX, int targetY)
-{
-	const AiUnit *aiunit;
-	const AiUnit *groupunit;
-	int unitdst, groupdst;
-
-	// Step 1 : find the unit closest to the force hotspot
-	AiCleanForce(force);
-
-	groupdst = -1;
-
-	groupunit = 0;
-
-	aiunit = AiPlayer->Force[force].Units;
-
-	// Sanity : don't group force with only one unit !
-	if ((!aiunit) || (!aiunit->Next)) {
-		return;
-	}
-
-	while (aiunit) {
-		unitdst = abs(aiunit->Unit->X - targetX) + abs(aiunit->Unit->Y - targetY);
-		if ((unitdst < groupdst) || (!groupunit)) {
-			groupunit = aiunit;
-			groupdst = unitdst;
-		}
-
-		aiunit = aiunit->Next;
-	}
-
-	AiPlayer->Force[force].Attacking = 1;
-
-	// Order units to attack near the "group" unit...
-	aiunit = AiPlayer->Force[force].Units;
-	while (aiunit) {
-		if (aiunit->Unit->Type->CanAttack) {
-			CommandAttack(aiunit->Unit, groupunit->Unit->X, groupunit->Unit->Y, NULL,
-				FlushCommands);
-		} else {
-			CommandMove(aiunit->Unit, groupunit->Unit->X, groupunit->Unit->Y,
-				FlushCommands);
-		}
-		aiunit = aiunit->Next;
-	}
-}
-
-/**
-**  Find the closest home batiment.
-**  ground is 0 : land, 1 : air, 2 : water ( as UnitType::UnitType )
-**
-**  @param ground  ground type ( land/air/water )
-**  @param x       X start position
-**  @param y       Y start position
-**  @param rsltx   X destination
-**  @param rslyx   Y destination
-**
-**  @todo  Find in the player unit's the closer to
-*/
-local void AiFindHome(int ground, int x, int y, int* rsltx, int* rslty)
-{
-	// Find in the player unit's the closer to
-	*rsltx = AiPlayer->Player->StartX;
-	*rslty = AiPlayer->Player->StartY;
-}
-
-/**
-**  Try to send this force home
-**
-**  @param force  the force to send home.
-*/
-global void AiSendForceHome(int force)
+global void AiAttackWithForce(int force)
 {
 	const AiUnit* aiunit;
-	int i;
-	int type;
-	int x[3];
-	int y[3];
+	const Unit* enemy;
+	int x;
+	int y;
+	int f;
 
-	AiCleanForce(force);
-	aiunit = AiPlayer->Force[force].Units;
+	// Move the force to a free position so it can be used for a new
+	// attacking party
+	if (force < AI_MAX_FORCES) {
+		AiUnitType* aiut;
+		AiUnitType* temp;
+		AiUnitType** aiut2;
 
-	for (i = 0; i < 3; i++) {
-		x[i] = -1;
-		y[i] = -1;
-	}
+		f = AI_MAX_FORCES;
+		while (AiPlayer->Force[f].Attacking) {
+			++f;
+			if (f == AI_MAX_ATTACKING_FORCES) {
+				DebugLevel0Fn("No free attacking forces\n");
+				f = force;
+				break;
+			}
+		}
+		if (f != AI_MAX_ATTACKING_FORCES) {
+			for (aiut = AiPlayer->Force[f].UnitTypes; aiut; aiut = temp) {
+				temp = aiut->Next;
+				free(aiut);
+			}
 
-	while (aiunit) {
-		type = aiunit->Unit->Type->UnitType;
-
-		if (x[type] == -1) {
-			AiFindHome(type, aiunit->Unit->X, aiunit->Unit->Y, &x[type], &y[type]);
+			AiPlayer->Force[f] = AiPlayer->Force[force];
+			memset(&AiPlayer->Force[force], 0, sizeof(AiForce));
+			aiut = AiPlayer->Force[force].UnitTypes;
+			aiut2 = &AiPlayer->Force[force].UnitTypes;
+			while (aiut) {
+				*aiut2 = malloc(sizeof(**aiut2));
+				(*aiut2)->Next = NULL;
+				(*aiut2)->Want = aiut->Want;
+				(*aiut2)->Type = aiut->Type;
+				aiut = aiut->Next;
+				aiut2 = &(*aiut2)->Next;
+			}
 		}
 
-		CommandMove(aiunit->Unit, x[type], y[type], FlushCommands);
+		force = f;
+	}
 
-		aiunit = aiunit->Next;
+	AiCleanForce(force);
+
+	AiPlayer->Force[force].Attacking = 0;
+	if ((aiunit = AiPlayer->Force[force].Units)) {
+		AiPlayer->Force[force].Attacking = 1;
+		DebugLevel3Fn("FORCE %d started (AiAttackWithForce)\n" _C_ force);
+
+		enemy = NoUnitP;
+		while (aiunit && !enemy) {  // Use a unit that can attack
+			if (aiunit->Unit->Type->CanAttack) {
+				enemy = AttackUnitsInDistance(aiunit->Unit, MaxMapWidth);
+			}
+			aiunit = aiunit->Next;
+		}
+
+		if (!enemy) {
+			DebugLevel0Fn("Need to plan an attack with transporter\n");
+			if (!AiPlayer->Force[force].State &&
+					!AiPlanAttack(&AiPlayer->Force[force])) {
+				DebugLevel0Fn("Can't transport, look for walls\n");
+				if (!AiFindWall(&AiPlayer->Force[force])) {
+					AiPlayer->Force[force].Attacking = 0;
+				}
+			}
+			return;
+		}
+		AiPlayer->Force[force].State = 0;
+		x = enemy->X;
+		y = enemy->Y;
+
+		//
+		//  Send all units in the force to enemy.
+		//
+		aiunit = AiPlayer->Force[force].Units;
+		while (aiunit) {
+			if (aiunit->Unit->Type->CanAttack) {
+				CommandAttack(aiunit->Unit, x, y, NULL, FlushCommands);
+			} else {
+				CommandMove(aiunit->Unit, x, y, FlushCommands);
+			}
+			aiunit = aiunit->Next;
+		}
 	}
 }
 
 /**
-**  Ai Force Action when unit/force requires assistance
+**	Force on attack ride. We attack until there is no unit or enemy left.
 **
-**  @param force     Force Number (FIXME: which?)
-**  @param attacker  attacking unit
-**  @param defender  defending unit
+**	@param force	Force pointer.
 */
-global void AiForceHelpMe(int force, const Unit* attacker, Unit* defender)
+local void AiForceAttacks(AiForce* force)
 {
-	AiForce* aiForce;
-	AiUnit* rescue;
+	const AiUnit* aiunit;
 
-	aiForce = AiPlayer->Force + force;
-
-	// Don't handle special cases
-	if (aiForce->State > 0) {
-		return;
-	}
-
-	switch (aiForce->HelpMode) {
-		case AiForceDontHelp:
-			// Don't react (easy)
-			return;
-
-		case AiForceHelpForce:
-			// Send all idles units in the attacked force for help
-			rescue = aiForce->Units;
-			while (rescue) {
-				// TODO : check that dead units does appear there
-				if (UnitIdle(rescue->Unit)) {
-					// This unit attack !
-					if (rescue->Unit->Type->CanAttack) {
-						CommandAttack(rescue->Unit, attacker->X, attacker->Y, NULL,
-							FlushCommands);
-					} else {
-						CommandMove(rescue->Unit, attacker->X, attacker->Y,
-							FlushCommands);
-					}
-					// Now the force is attacking ( again )
-					aiForce->Attacking = 1;
-				}
-				rescue = rescue->Next;
+	if ((aiunit = force->Units)) {
+		while (aiunit) {
+			// Still some action
+			if (!UnitIdle(aiunit->Unit)) {
+				break;
 			}
-			break;
+			aiunit = aiunit->Next;
+		}
+		// Must mark the attack as terminated
+		if (!aiunit) {
+			DebugLevel3Fn("FORCE stopped ( AiForceAttacks, unitactionstill )\n");
+			DebugLevel3Fn("force target was %d %d\n" _C_ force->GoalX _C_ force->GoalY);
+			DebugLevel3Fn("unit pos was %d %d\n" _C_ force->Units->Unit->X _C_ force->
+			Units->Unit->Y);
 
-		default:
-			// the usual way : create a defense force, send it, ...
-			AiFindDefendScript(attacker->X, attacker->Y);
-			break;
+			force->Attacking = 0;
+			// AiAttackWithForce(force-AiPlayer->Force);
+		}
+	} else {
+		DebugLevel3Fn("FORCE stopped ( AiAttackWithForce, no unit )\n");
+		force->Attacking = 0;
 	}
 }
 
@@ -1018,6 +573,38 @@ global void AiForceHelpMe(int force, const Unit* attacker, Unit* defender)
 */
 global void AiForceManager(void)
 {
+	int force;
+
+	//
+	//  Look if our defenders still have enemies in range.
+	//
+	for (force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
+		if (AiPlayer->Force[force].Defending) {
+			const AiUnit* aiunit;
+
+			AiCleanForce(force);
+			//
+			//  Look if still enemies in attack range.
+			//
+			aiunit = AiPlayer->Force[force].Units;
+			while (aiunit) {
+				if (aiunit->Unit->Type->CanAttack &&
+						AttackUnitsInReactRange(aiunit->Unit)) {
+					break;
+				}
+				aiunit = aiunit->Next;
+			}
+			if (!aiunit) {		// No enemies go home.
+				DebugLevel0Fn("FIXME: not written, should send force home\n");
+				AiPlayer->Force[force].Defending = 0;
+				AiPlayer->Force[force].Attacking = 0;
+			}
+		}
+		if (AiPlayer->Force[force].Attacking) {
+			AiCleanForce(force);
+			AiForceAttacks(&AiPlayer->Force[force]);
+		}
+	}
 	AiAssignFreeUnitsToForce();
 }
 

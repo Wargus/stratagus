@@ -322,17 +322,10 @@ extern SpellType* SpellTypeByIdent(const char* Ident);
 /// return spell type by spell id
 extern SpellType* SpellTypeById(int Id);
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
-extern unsigned CclGetSpellByIdent(SCM value);
-
-// return 0, 1, 2 for true, only, false.
-extern char Scm2Condition(SCM value);
-#elif defined(USE_LUA)
 extern unsigned CclGetSpellByIdent(lua_State* l);
 
 // return 0, 1, 2 for true, only, false.
 extern char Ccl2Condition(lua_State* l, const char* value);
-#endif
 
 /*
 **		Spelltype to cast.

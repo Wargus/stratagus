@@ -237,7 +237,7 @@ local int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* dy
 	int ep;
 	int i;
 	int w;
-	enum { 
+	enum {
 		OnWater,
 		OnLand,
 		OnIsle

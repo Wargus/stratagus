@@ -386,57 +386,6 @@ global void CleanDependencies(void)
 **
 **		@param list		List of the dependency.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineDependency(SCM list)
-{
-	char* target;
-	char* required;
-	int count;
-	SCM value;
-	SCM temp;
-	int or_flag;
-
-	value = gh_car(list);
-	list = gh_cdr(list);
-	target = gh_scm2newstr(value, NULL);
-
-	//
-	//		All or rules.
-	//
-	or_flag = 0;
-	while (!gh_null_p(list)) {
-		temp = gh_car(list);
-		list = gh_cdr(list);
-
-		while (!gh_null_p(temp)) {
-			value = gh_car(temp);
-			temp = gh_cdr(temp);
-			required = gh_scm2newstr(value, NULL);
-			count = 1;
-			if (!gh_null_p(temp) && gh_exact_p(temp)) {
-				value = gh_car(temp);
-				count = gh_scm2int(value);
-				temp = gh_cdr(temp);
-			}
-
-			AddDependency(target, required, count, or_flag);
-			free(required);
-			or_flag = 0;
-		}
-		if (!gh_null_p(list)) {
-			if (!gh_eq_p(gh_car(list), gh_symbol2scm("or"))) {
-				errl("not or symbol", gh_car(list));
-				return SCM_UNSPECIFIED;
-			}
-			or_flag = 1;
-			list = gh_cdr(list);
-		}
-	}
-	free(target);
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineDependency(lua_State* l)
 {
 	const char* target;
@@ -497,7 +446,6 @@ local int CclDefineDependency(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Get the dependency.
@@ -506,21 +454,12 @@ local int CclDefineDependency(lua_State* l)
 **
 **		@param target		Unit type or upgrade.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclGetDependency(SCM target __attribute__((unused)))
-{
-	DebugLevel0Fn("FIXME: write this %p\n" _C_ target);
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclGetDependency(lua_State* l __attribute__((unused)))
 {
 	DebugLevel0Fn("FIXME: write this %p\n" _C_ l);
 
 	return 0;
 }
-#endif
 
 /**
 **		Check the dependency.
@@ -529,36 +468,21 @@ local int CclGetDependency(lua_State* l __attribute__((unused)))
 **
 **		@param target		Unit type or upgrade.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclCheckDependency(SCM target __attribute__((unused)))
-{
-	DebugLevel0Fn("FIXME: write this %p\n" _C_ target);
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclCheckDependency(lua_State* l __attribute__((unused)))
 {
 	DebugLevel0Fn("FIXME: write this %p\n" _C_ l);
 
 	return 0;
 }
-#endif
 
 /**
 **		Register CCL features for dependencies.
 */
 global void DependenciesCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedureN("define-dependency", CclDefineDependency);
-	gh_new_procedure1_0("get-dependency", CclGetDependency);
-	gh_new_procedure1_0("check-dependency", CclCheckDependency);
-#elif defined(USE_LUA)
 	lua_register(Lua, "DefineDependency", CclDefineDependency);
 	lua_register(Lua, "GetDependency", CclGetDependency);
 	lua_register(Lua, "CheckDependency", CclCheckDependency);
-#endif
 }
 
 //@}

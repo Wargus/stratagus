@@ -227,10 +227,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "pathfinder.h"
 
 #ifdef DEBUG
-#if defined(USE_GUILE) || defined(USE_SIOD)
-extern SCM CclUnits(void);
-#elif defined(USE_LUA)
-#endif
+extern int CclUnits(lua_State* l);
 #endif
 
 /*----------------------------------------------------------------------------
@@ -1200,7 +1197,6 @@ local void PrintHeader(void)
 	// vvv---- looks wired, but is needed for GNU brain damage
 	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others.\n"
 	"\t(http://Stratagus.Org)"
-	"\n  SIOD Copyright by George J. Carrette."
 #ifdef USE_LIBMODPLUG
 	"\n  libmodplug Copyright by Kenton Varda & Olivier Lapique."
 #endif
@@ -1209,15 +1205,6 @@ local void PrintHeader(void)
 	"\n  SDL Copyright by Sam Lantinga."
 #endif
 	"\nCompile options "
-#ifdef USE_SIOD
-	"SIOD "
-#endif
-#ifdef USE_GUILE
-	"GUILE "
-#endif
-#ifdef USE_LUA
-	"LUA "
-#endif
 #ifdef USE_THREAD
 	"THREAD "
 #endif
@@ -1394,14 +1381,10 @@ global volatile void Exit(int err)
 		FrameCounter _C_ SlowFrameCounter _C_
 		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
 	UnitCacheStatistic();
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	CclUnits();
-#endif
+	CclUnits(Lua);
 	CleanModules();
 	CleanFonts();
-#ifdef USE_LUA
 	lua_close(Lua);
-#endif
 #endif
 
 	CleanMovie();
@@ -1476,13 +1459,8 @@ global int main(int argc, char** argv)
 #ifndef __APPLE__
 	StratagusLibPath = STRATAGUS_LIB_PATH;
 #endif
-#ifndef USE_LUA
-	CclStartFile = "ccl/stratagus.ccl";
-	EditorStartFile = "ccl/editor.ccl";
-#else
 	CclStartFile = "ccl/stratagus.lua";
 	EditorStartFile = "ccl/editor.lua";
-#endif
 
 	memset(LocalPlayerName, 0, 16);
 	strcpy(LocalPlayerName, "Anonymous");

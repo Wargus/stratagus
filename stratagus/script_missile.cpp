@@ -63,111 +63,6 @@ extern int NoWarningMissileType; /// quiet ident lookup.
 **
 **  @param list  List describing missile-type.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineMissileType(SCM list)
-{
-	SCM value;
-	char* str;
-	MissileType* mtype;
-	unsigned i;
-
-	// Slot identifier
-
-	str = gh_scm2newstr(gh_car(list), NULL);
-	list = gh_cdr(list);
-#ifdef DEBUG
-	i = NoWarningMissileType;
-	NoWarningMissileType = 1;
-#endif
-	mtype = MissileTypeByIdent(str);
-#ifdef DEBUG
-	NoWarningMissileType = i;
-#endif
-	if (mtype) {
-		DebugLevel0Fn("Redefining missile-type `%s'\n" _C_ str);
-		free(str);
-	} else {
-		mtype = NewMissileTypeSlot(str);  // str consumed!
-	}
-
-	mtype->NumDirections = 1;
-	// Ensure we don't divide by zero.
-	mtype->SplashFactor = 100;
-	//
-	// Parse the arguments, already the new tagged format.
-	//
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-		if (gh_eq_p(value, gh_symbol2scm("file"))) {
-			free(mtype->File);
-			mtype->File = gh_scm2newstr(gh_car(list), NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-			value = gh_car(list);
-			mtype->Width = gh_scm2int(gh_car(value));
-			value = gh_cdr(value);
-			mtype->Height = gh_scm2int(gh_car(value));
-		} else if (gh_eq_p(value,gh_symbol2scm("frames"))) {
-			mtype->SpriteFrames = gh_scm2int(gh_car(list));
-		} else if (gh_eq_p(value, gh_symbol2scm("num-directions"))) {
-			mtype->NumDirections = gh_scm2int(gh_car(list));
-		} else if (gh_eq_p(value, gh_symbol2scm("transparency"))) {
-			mtype->Transparency = gh_scm2int(gh_car(list));
-		} else if (gh_eq_p(value, gh_symbol2scm("fired-sound"))) {
-			free(mtype->FiredSound.Name);
-			mtype->FiredSound.Name = gh_scm2newstr(gh_car(list), NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("impact-sound"))) {
-			free(mtype->ImpactSound.Name);
-			mtype->ImpactSound.Name = gh_scm2newstr(gh_car(list), NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("class"))) {
-			const char* name;
-
-			value = gh_car(list);
-			name = get_c_string(value);
-			for (i = 0; MissileClassNames[i]; ++i) {
-				if (!strcmp(name, MissileClassNames[i])) {
-					mtype->Class = i;
-					break;
-				}
-			}
-			if (!MissileClassNames[i]) {
-				// FIXME: this leaves a half initialized missile-type
-				errl("Unsupported class", value);
-			}
-		} else if (gh_eq_p(value, gh_symbol2scm("num-bounces"))) {
-			mtype->NumBounces = gh_scm2int(gh_car(list));
-		} else if (gh_eq_p(value, gh_symbol2scm("delay"))) {
-			mtype->StartDelay = gh_scm2int(gh_car(list));
-		} else if (gh_eq_p(value, gh_symbol2scm("sleep"))) {
-			mtype->Sleep = gh_scm2int(gh_car(list));
-		} else if (gh_eq_p(value, gh_symbol2scm("speed"))) {
-			mtype->Speed = gh_scm2int(gh_car(list));
-		} else if (gh_eq_p(value, gh_symbol2scm("draw-level"))) {
-			mtype->DrawLevel = gh_scm2int(gh_car(list));
-		} else if (gh_eq_p(value, gh_symbol2scm("range"))) {
-			mtype->Range = gh_scm2int(gh_car(list));
-		} else if (gh_eq_p(value, gh_symbol2scm("impact-missile"))) {
-			free(mtype->ImpactName);
-			mtype->ImpactName = gh_scm2newstr(gh_car(list), NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("smoke-missile"))) {
-			free(mtype->ImpactName);
-			mtype->SmokeName = gh_scm2newstr(gh_car(list), NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("can-hit-owner"))) {
-			mtype->CanHitOwner = 1;
-		} else if (gh_eq_p(value, gh_symbol2scm("friendly-fire"))) {
-			mtype->FriendlyFire = 1;
-		} else if (gh_eq_p(value, gh_symbol2scm("splash-factor"))) {
-			mtype->SplashFactor = gh_scm2int(gh_car(list));;
-		} else {
-			// FIXME: this leaves a half initialized missile-type
-			errl("Unsupported tag", value);
-		}
-		list = gh_cdr(list);
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineMissileType(lua_State* l)
 {
 	const char* value;
@@ -279,40 +174,12 @@ local int CclDefineMissileType(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **  Define missile type mapping from original number to internal symbol
 **
 **  @param list  List of all names.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineMissileTypeWcNames(SCM list)
-{
-	int i;
-	char** cp;
-
-	if ((cp = MissileTypeWcNames)) {  // Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(MissileTypeWcNames);
-	}
-
-	//
-	// Get new table.
-	//
-	i = gh_length(list);
-	MissileTypeWcNames = cp = malloc((i + 1) * sizeof(char*));
-	while (i--) {
-		*cp++ = gh_scm2newstr(gh_car(list), NULL);
-		list = gh_cdr(list);
-	}
-	*cp = NULL;
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineMissileTypeWcNames(lua_State* l)
 {
 	int i;
@@ -343,7 +210,6 @@ local int CclDefineMissileTypeWcNames(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **  Create a missile.
@@ -497,52 +363,6 @@ local int CclMissile(lua_State* l)
 **
 **  @param list  FIXME: docu.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineBurningBuilding(SCM list)
-{
-	SCM value;
-	SCM sublist;
-	BurningBuildingFrame** frame;
-	BurningBuildingFrame* ptr;
-	BurningBuildingFrame* next;
-	char* str;
-
-	ptr = BurningBuildingFrames;
-	while (ptr) {
-		next = ptr->Next;
-		free(ptr);
-		ptr = next;
-	}
-	BurningBuildingFrames = NULL;
-
-	frame = &BurningBuildingFrames;
-
-	while (!gh_null_p(list)) {
-		sublist = gh_car(list);
-		list = gh_cdr(list);
-
-		*frame = calloc(1, sizeof(BurningBuildingFrame));
-		while (!gh_null_p(sublist)) {
-			value = gh_car(sublist);
-			sublist = gh_cdr(sublist);
-
-			if (gh_eq_p(value, gh_symbol2scm("percent"))) {
-				value = gh_car(sublist);
-				sublist = gh_cdr(sublist);
-				(*frame)->Percent = gh_scm2int(value);
-			} else if (gh_eq_p(value, gh_symbol2scm("missile"))) {
-				value = gh_car(sublist);
-				sublist = gh_cdr(sublist);
-				str = gh_scm2newstr(value, NULL);
-				(*frame)->Missile = MissileTypeByIdent(str);
-				free(str);
-			}
-		}
-		frame = &((*frame)->Next);
-	}
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineBurningBuilding(lua_State* l)
 {
 	const char* value;
@@ -593,26 +413,17 @@ local int CclDefineBurningBuilding(lua_State* l)
 	}
 	return 0;
 }
-#endif
 
 /**
 **  Register CCL features for missile-type.
 */
 global void MissileCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedureN("define-missiletype-wc-names",
-		CclDefineMissileTypeWcNames);
-	gh_new_procedureN("define-missile-type", CclDefineMissileType);
-	gh_new_procedureN("missile", CclMissile);
-	gh_new_procedureN("define-burning-building", CclDefineBurningBuilding);
-#elif defined(USE_LUA)
 	lua_register(Lua, "DefineMissileTypeWcNames",
 		CclDefineMissileTypeWcNames);
 	lua_register(Lua, "DefineMissileType", CclDefineMissileType);
 	lua_register(Lua, "Missile", CclMissile);
 	lua_register(Lua, "DefineBurningBuilding", CclDefineBurningBuilding);
-#endif
 }
 
 //@}

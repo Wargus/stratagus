@@ -1445,50 +1445,6 @@ global void CleanCclCredits()
 **
 **  @todo  'comment and 'title are only parsed, but not used.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclCredits(SCM list)
-{
-	SCM value;
-	const char* n;
-	int nlen;
-	int len;
-
-	if (GameCredits.Background) {
-		free(GameCredits.Background);
-	}
-	GameCredits.Background = NULL;
-	if (GameCredits.Names) {
-		free(GameCredits.Names);
-		GameCredits.Names = (char*)malloc(1);
-		GameCredits.Names[0] = '\0';
-	}
-	len = 0;
-
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-
-		if (gh_eq_p(value, gh_symbol2scm("background"))) {
-			GameCredits.Background = gh_scm2newstr(gh_car(list), NULL);
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("name")) ||
-				gh_eq_p(value, gh_symbol2scm("title")) ||
-				gh_eq_p(value, gh_symbol2scm("comment"))) {
-			n = get_c_string(gh_car(list));
-			nlen = strlen(n);
-			GameCredits.Names = (char*)realloc(GameCredits.Names, len + nlen + 2);
-			if (len != 0) {
-				GameCredits.Names[len++] = '\n';
-			}
-			strcpy(GameCredits.Names + len, n);
-			len += nlen;
-			list = gh_cdr(list);
-		}
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclCredits(lua_State* l)
 {
 	const char* value;
@@ -1531,7 +1487,6 @@ local int CclCredits(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **  Register CCL features for credits.
@@ -1540,11 +1495,7 @@ global void CreditsCclRegister(void)
 {
 	GameCredits.Background = NULL;
 	GameCredits.Names = NULL;
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedureN("credits", CclCredits);
-#elif defined(USE_LUA)
 	lua_register(Lua, "Credits", CclCredits);
-#endif
 }
 
 /**
@@ -1554,55 +1505,6 @@ global void CreditsCclRegister(void)
 **  specifying where in the list it should be added.  If no number is
 **  given it is added at the end.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclAddObjective(SCM list)
-{
-	int i;
-	const char* obj;
-
-	obj = get_c_string(gh_car(list));
-
-	list = gh_cdr(list);
-	if (!gh_null_p(list)) {
-		// Optional location number given
-		int num;
-
-		num = gh_scm2int(gh_car(list));
-		if (num < 0) {
-			num = 0;
-		}
-
-		i = 0;
-		while (i != MAX_OBJECTIVES && GameIntro.Objectives[i]) {
-			++i;
-		}
-		if (i == MAX_OBJECTIVES) {
-			fprintf(stderr, "Too many objectives: %s\n", obj);
-			ExitFatal(-1);
-		}
-		if (num > i) {
-			num = i;
-		}
-		for (; i > num; --i) {
-			GameIntro.Objectives[i] = GameIntro.Objectives[i - 1];
-		}
-		GameIntro.Objectives[num] = strdup(obj);
-	} else {
-		// Add objective to the end of the list
-		i = 0;
-		while (i != MAX_OBJECTIVES && GameIntro.Objectives[i]) {
-			++i;
-		}
-		if (i == MAX_OBJECTIVES) {
-			fprintf(stderr, "Too many objectives: %s\n", obj);
-			ExitFatal(-1);
-		}
-		GameIntro.Objectives[i] = strdup(obj);
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclAddObjective(lua_State* l)
 {
 	int i;
@@ -1660,38 +1562,10 @@ local int CclAddObjective(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **  Parse the remove objective ccl function
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclRemoveObjective(SCM objective)
-{
-	int num;
-
-	num = gh_scm2int(objective);
-	if (num < 0 || num >= MAX_OBJECTIVES) {
-		fprintf(stderr, "remove-objective: Invalid number: %d\n", num);
-		ExitFatal(-1);
-	}
-	if (!GameIntro.Objectives[num]) {
-		fprintf(stderr, "remove-objective: No objective at location: %d\n", num);
-		ExitFatal(-1);
-	}
-
-	free(GameIntro.Objectives[num]);
-
-	if (num == MAX_OBJECTIVES - 1) {
-		GameIntro.Objectives[num] = NULL;
-	}
-	for (; num < MAX_OBJECTIVES - 1 && GameIntro.Objectives[num]; ++num) {
-		GameIntro.Objectives[num] = GameIntro.Objectives[num + 1];
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclRemoveObjective(lua_State* l)
 {
 	int num;
@@ -1722,32 +1596,10 @@ local int CclRemoveObjective(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **  Set the objectives
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSetObjectives(SCM list)
-{
-	int i;
-
-	// Clean old objectives
-	for (i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
-		free(GameIntro.Objectives[i]);
-		GameIntro.Objectives[i] = NULL;
-	}
-
-	i = 0;
-	while (!gh_null_p(list)) {
-		GameIntro.Objectives[i] = gh_scm2newstr(gh_car(list), NULL);
-		list = gh_cdr(list);
-		++i;
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclSetObjectives(lua_State* l)
 {
 	int i;
@@ -1767,59 +1619,10 @@ local int CclSetObjectives(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **  Parse the define-ranks ccl function
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineRanks(SCM list)
-{
-	PlayerRanks* rank;
-	const char* race;
-	int i;
-	int len;
-
-	rank = NULL;
-	race = get_c_string(gh_car(list));
-	for (i = 0; i < PlayerRaces.Count; ++i) {
-		if (!strcmp(PlayerRaces.Name[i], race)) {
-			rank = &Ranks[i];
-			break;
-		}
-	}
-	if (i == PlayerRaces.Count) {
-		fprintf(stderr, "define-ranks: Invalid race name: %s\n", race);
-		ExitFatal(-1);
-	}
-
-	if (rank->Ranks) {
-		for (i = 0; rank->Ranks[i]; ++i) {
-			free(rank->Ranks[i]);
-		}
-		free(rank->Ranks);
-		free(rank->Scores);
-	}
-
-	list = gh_car(gh_cdr(list));
-	len = gh_length(list) / 2;
-
-	rank->Ranks = (char**)malloc((len + 1) * sizeof(char*));
-	rank->Ranks[len] = NULL;
-	rank->Scores = (int*)malloc(len * sizeof(int));
-
-	i = 0;
-	while (!gh_null_p(list)) {
-		rank->Scores[i] = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-		rank->Ranks[i] = gh_scm2newstr(gh_car(list), NULL);
-		list = gh_cdr(list);
-		++i;
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineRanks(lua_State* l)
 {
 	PlayerRanks* rank;
@@ -1875,24 +1678,16 @@ local int CclDefineRanks(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **  Register CCL functions for objectives
 */
 global void ObjectivesCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedureN("add-objective", CclAddObjective);
-	gh_new_procedure1_0("remove-objective", CclRemoveObjective);
-	gh_new_procedureN("set-objectives!", CclSetObjectives);
-	gh_new_procedureN("define-ranks", CclDefineRanks);
-#elif defined(USE_LUA)
 	lua_register(Lua, "AddObjective", CclAddObjective);
 	lua_register(Lua, "RemoveObjective", CclRemoveObjective);
 	lua_register(Lua, "SetObjectives", CclSetObjectives);
 	lua_register(Lua, "DefineRanks", CclDefineRanks);
-#endif
 }
 
 /**
