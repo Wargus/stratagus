@@ -162,6 +162,12 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
 	    }
 	}
     }
+
+    if (spell->Missile) {
+	MakeMissile(spell->Missile,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+    }
     return 1;
 }
 
