@@ -66,7 +66,7 @@ local SCM CclDefineMissileType(SCM list)
 {
     SCM value;
     char* str;
-    MissileType* type;
+    MissileType* mtype;
     unsigned i;
 
     //	Slot identifier
@@ -74,13 +74,13 @@ local SCM CclDefineMissileType(SCM list)
     str=gh_scm2newstr(gh_car(list),NULL);
     list=gh_cdr(list);
     IfDebug( i=NoWarningMissileType; NoWarningMissileType=1; );
-    type=MissileTypeByIdent(str);
+    mtype=MissileTypeByIdent(str);
     IfDebug( NoWarningMissileType=i; );
-    if( type ) {
+    if( mtype ) {
 	DebugLevel0Fn("Redefining missile-type `%s'\n",str);
 	CclFree(str);
     } else {
-	type=NewMissileTypeSlot(str);
+	mtype=NewMissileTypeSlot(str);	// str consumed!
     }
 
     //
@@ -90,27 +90,27 @@ local SCM CclDefineMissileType(SCM list)
 	value=gh_car(list);
 	list=gh_cdr(list);
 	if( gh_eq_p(value,gh_symbol2scm("file")) ) {
-	    CclFree(type->File);
-	    type->File=gh_scm2newstr(gh_car(list),NULL);
+	    CclFree(mtype->File);
+	    mtype->File=gh_scm2newstr(gh_car(list),NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
 	    value=gh_car(list);
-	    type->Width=gh_scm2int(gh_car(value));
+	    mtype->Width=gh_scm2int(gh_car(value));
 	    value=gh_cdr(value);
-	    type->Height=gh_scm2int(gh_car(value));
+	    mtype->Height=gh_scm2int(gh_car(value));
 	} else if( gh_eq_p(value,gh_symbol2scm("frames")) ) {
-	    type->Frames=gh_scm2int(gh_car(list));
+	    mtype->Frames=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("fired-sound")) ) {
-	    CclFree(type->FiredSound.Name);
-	    type->FiredSound.Name=gh_scm2newstr(gh_car(list),NULL);
+	    CclFree(mtype->FiredSound.Name);
+	    mtype->FiredSound.Name=gh_scm2newstr(gh_car(list),NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("impact-sound")) ) {
-	    CclFree(type->ImpactSound.Name);
-	    type->ImpactSound.Name=gh_scm2newstr(gh_car(list),NULL);
+	    CclFree(mtype->ImpactSound.Name);
+	    mtype->ImpactSound.Name=gh_scm2newstr(gh_car(list),NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("class")) ) {
 	    value=gh_car(list);
 	    for( i=0; MissileClassNames[i]; ++i ) {
 		if( gh_eq_p(value,
 			    gh_symbol2scm((char*)MissileClassNames[i])) ) {
-		    type->Class=i;
+		    mtype->Class=i;
 		    break;
 		}
 	    }
@@ -119,16 +119,16 @@ local SCM CclDefineMissileType(SCM list)
 		errl("Unsupported class",value);
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("delay")) ) {
-	    type->Delay=gh_scm2int(gh_car(list));
+	    mtype->Delay=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("sleep")) ) {
-	    type->Sleep=gh_scm2int(gh_car(list));
+	    mtype->Sleep=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {
-	    type->Speed=gh_scm2int(gh_car(list));
+	    mtype->Speed=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("range")) ) {
-	    type->Range=gh_scm2int(gh_car(list));
+	    mtype->Range=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("impact-missile")) ) {
-	    CclFree(type->ImpactName);
-	    type->ImpactName=gh_scm2newstr(gh_car(list),NULL);
+	    CclFree(mtype->ImpactName);
+	    mtype->ImpactName=gh_scm2newstr(gh_car(list),NULL);
 	} else {
 	    // FIXME: this leaves a half initialized missile-type
 	    errl("Unsupported tag",value);
