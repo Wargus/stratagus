@@ -1140,9 +1140,9 @@ static int TriggerExecuteAction(int script)
 static void TriggerRemoveTrigger(int trig)
 {
 	lua_pushnumber(Lua, -1);
-	lua_rawseti(Lua, -2, trig);
-	lua_pushnumber(Lua, -1);
 	lua_rawseti(Lua, -2, trig + 1);
+	lua_pushnumber(Lua, -1);
+	lua_rawseti(Lua, -2, trig + 2);
 }
 
 /**
