@@ -2524,7 +2524,7 @@ global void MenuHandleMouseMove(int x,int y)
 		ys -= mi->d.pulldown.curopt * h;
 		if (!(x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + h*mi->d.pulldown.noptions)) {
 		    j = (y - ys) / h;
-		    if (j != mi->d.pulldown.cursel) {
+		    if (j >= 0 && j < mi->d.pulldown.noptions && j != mi->d.pulldown.cursel) {
 			mi->d.pulldown.cursel = j;
 			RedrawFlag = 1;
 			if (mi->d.pulldown.action) {
@@ -2726,7 +2726,10 @@ global void MenuHandleButtonDown(int b __attribute__((unused)))
 		    }
 		    break;
 		case MI_TYPE_PULLDOWN:
-		    mi->d.pulldown.cursel = mi->d.pulldown.curopt;
+		    if (mi->d.pulldown.curopt >= 0 &&
+					    mi->d.pulldown.curopt < mi->d.pulldown.noptions) {
+			mi->d.pulldown.cursel = mi->d.pulldown.curopt;
+		    }
 		    break;
 		case MI_TYPE_LISTBOX:
 		    if (mi->d.listbox.cursel != mi->d.listbox.curopt) {
@@ -2798,7 +2801,9 @@ global void MenuHandleButtonUp(int b)
 			mi->flags &= ~MenuButtonClicked;
 			if (MenuButtonUnderCursor == i) {
 			    MenuButtonUnderCursor = -1;
-			    if (mi->d.pulldown.cursel != mi->d.pulldown.curopt) {
+			    if (mi->d.pulldown.cursel != mi->d.pulldown.curopt &&
+					    mi->d.pulldown.cursel >= 0 &&
+					    mi->d.pulldown.cursel < mi->d.pulldown.noptions) {
 				mi->d.pulldown.curopt = mi->d.pulldown.cursel;
 				if (mi->d.pulldown.action) {
 				    (*mi->d.pulldown.action)(mi, mi->d.pulldown.curopt);
