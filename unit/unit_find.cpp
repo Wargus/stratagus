@@ -732,17 +732,17 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 	    //
 	    //  Priority 0-255
 	    //
-	    cost -= dtype->Priority * PRIORITY_FACTOR;
+	    cost += dtype->Priority * PRIORITY_FACTOR;
 	    //
 	    //  Remaining HP (Health) 0-65535
 	    //
-	    cost += dest->HP * HEALTH_FACTOR;
+	    cost -= dest->HP * HEALTH_FACTOR;
 
 	    //
 	    //  Unit can attack back.
 	    //
 	    if (CanTarget(dtype, type)) {
-		cost -= CANATTACK_BONUS;
+		cost += CANATTACK_BONUS;
 	    }
 
 	    if (cost < 1) {
