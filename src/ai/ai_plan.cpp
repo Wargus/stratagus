@@ -36,6 +36,10 @@
 
 #include "freecraft.h"
 
+#include "missile.h"
+#include "unittype.h"
+#include "map.h"
+#include "pathfinder.h"
 #include "ai_local.h"
 
 /*----------------------------------------------------------------------------
@@ -47,15 +51,372 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**	Choose enemy on map tile.
+**
+**	@param source	Unit which want to attack.
+**	@param tx	X position on map, tile-based.
+**	@param ty	Y position on map, tile-based.
+**
+**	@return		Returns ideal target on map tile.
+*/
+global Unit* EnemyOnMapTile(const Unit* source,unsigned tx,unsigned ty)
+{
+    Unit* table[UnitMax];
+    Unit* unit;
+    Unit* best;
+    const UnitType* type;
+    int n;
+    int i;
+
+    n=SelectUnitsOnTile(tx,ty,table);
+    best=NoUnitP;
+    for( i=0; i<n; ++i ) {
+	unit=table[i];
+	// unusable unit ?
+	// if( UnitUnusable(unit) ) can't attack constructions
+	// FIXME: did SelectUnitsOnTile already filter this?
+	// Invisible and not Visible
+	if( unit->Removed || unit->Invisible
+		|| !(unit->Visible&(1<<source->Player->Player))
+		|| unit->Orders[0].Action==UnitActionDie ) {
+	    continue;
+	}
+	type=unit->Type;
+	if( tx<unit->X || tx>=unit->X+type->TileWidth
+		|| ty<unit->Y || ty>=unit->Y+type->TileHeight ) {
+	    continue;
+	}
+	if( !CanTarget(source->Type,unit->Type) ) {
+	    continue;
+	}
+	if( !IsEnemy(source->Player,unit) ) {	// a friend or neutral
+	    continue;
+	}
+
+	//
+	//	Choose the best target.
+	//
+	if( !best || best->Type->Priority<unit->Type->Priority ) {
+	    best=unit;
+	}
+    }
+    return best;
+}
+
+/**
+**	Mark all by transporter reachable water tiles.
+**
+**	@param unit	Transporter
+**	@param matrix	Water matrix.
+**
+**	@note only works for water transporters!
+*/
+local void AiMarkWaterTransporter(const Unit* unit,unsigned char* matrix)
+{
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+	unsigned short X;
+	unsigned short Y;
+    } * points;
+    int size;
+    int x;
+    int y;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    unsigned char* m;
+
+    x=unit->X;
+    y=unit->Y;
+    w=TheMap.Width+2;
+    matrix+=w+w+2;
+    if( matrix[x+y*w] ) {		// already marked
+	DebugLevel0("Done\n");
+	return;
+    }
+
+    points=alloca(TheMap.Width*TheMap.Height);
+    size=TheMap.Width*TheMap.Height/sizeof(*points);
+
+    //
+    //	Make movement matrix.
+    //
+    mask=UnitMovementMask(unit);
+    // Ignore all possible mobile units.
+    mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
+
+    points[0].X=x;
+    points[0].Y=y;
+    rp=0;
+    matrix[x+y*w]=66;				// mark start point
+    ep=wp=1;					// start with one point
+
+    //
+    //	Pop a point from stack, push all neightbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		m=matrix+x+y*w;
+		if( *m ) {			// already checked
+		    continue;
+		}
+
+		if( CanMoveToMask(x,y,mask) ) {	// reachable
+		    /*MakeLocalMissile(MissileTypeRedCross,
+			x*TileSizeX+TileSizeX/2,y*TileSizeY+TileSizeY/2,
+			x*TileSizeX+TileSizeX/2,y*TileSizeY+TileSizeY/2);*/
+			
+		    *m=66;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+		    if( ++wp>=size ) {		// round about
+			wp=0;
+		    }
+		/*	Must be checked multiple
+		} else {			// unreachable
+		    *m=99;
+		*/
+		}
+	    }
+
+	    if( ++rp>=size ) {			// round about
+		rp=0;
+	    }
+	}
+
+	//
+	//	Continue with next frame.
+	//
+	if( rp==wp ) {			// unreachable, no more points available
+	    break;
+	}
+	ep=wp;
+    }
+}
+
+/**
+**	Find possible targets.
+**
+**	@param unit	Attack.
+**	@param matrix	Water matrix.
+**	@param dx	Attack point X.
+**	@param dy	Attack point Y.
+**	@param ds	Attack state.
+**
+**	@return 	True if target found.
+*/
+local int AiFindTarget(const Unit* unit,unsigned char* matrix,
+	int* dx,int* dy,int* ds)
+{
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+	unsigned short X;
+	unsigned short Y;
+	unsigned char State;
+    } * points;
+    int size;
+    int x;
+    int y;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    enum { OnWater, OnLand, OnIsle } state;
+    unsigned char* m;
+
+    size=TheMap.Width*TheMap.Height/2;
+    points=alloca(size*sizeof(*points));
+
+    x=unit->X;
+    y=unit->Y;
+
+    w=TheMap.Width+2;
+    mask=UnitMovementMask(unit);
+    // Ignore all possible mobile units.
+    mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
+
+    points[0].X=x;
+    points[0].Y=y;
+    points[0].State=OnLand;
+    matrix+=w+w+2;
+    rp=0;
+    matrix[x+y*w]=1;				// mark start point
+    ep=wp=1;					// start with one point
+
+    //
+    //	Pop a point from stack, push all neightbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    state=points[rp].State;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		m=matrix+x+y*w;
+
+		if( state!=OnWater ) {
+		    if( *m ) {			// already checked
+			if( state==OnLand && *m==66 ) {	// tansporter?
+			    DebugLevel0Fn("->Water\n");
+			    *m=6;
+			    points[wp].X=x;	// push the point
+			    points[wp].Y=y;
+			    points[wp].State=OnWater;
+			    if( ++wp>=size ) {	// round about
+				wp=0;
+			    }
+			}
+			continue;
+		    }
+
+		    // Check targets on tile?
+		    if( EnemyOnMapTile(unit,x,y) ) {
+			DebugLevel0Fn("Target found %d,%d-%d\n"
+				_C_ x _C_ y _C_ state);
+			*dx=x;
+			*dy=y;
+			*ds=state;
+			return 1;
+		    }
+
+		    if( CanMoveToMask(x,y,mask) ) {	// reachable
+			/*MakeLocalMissile(MissileTypeGreenCross,
+			    x*TileSizeX+TileSizeX/2,y*TileSizeY+TileSizeY/2,
+			    x*TileSizeX+TileSizeX/2,y*TileSizeY+TileSizeY/2);*/
+			    
+			*m=1;
+			points[wp].X=x;		// push the point
+			points[wp].Y=y;
+			points[wp].State=state;
+			if( ++wp>=size ) {	// round about
+			    wp=0;
+			}
+		    } else {			// unreachable
+			*m=99;
+		    }
+		} else {			// On water
+		    if( *m ) {			// already checked 
+			if( *m==66 ) {		// tansporter?
+			    *m=6;
+			    points[wp].X=x;	// push the point
+			    points[wp].Y=y;
+			    points[wp].State=OnWater;
+			    if( ++wp>=size ) {	// round about
+				wp=0;
+			    }
+			}
+			continue;
+		    }
+		    if( CanMoveToMask(x,y,mask) ) {	// reachable
+			DebugLevel0Fn("->Land\n");
+			*m=1;
+			points[wp].X=x;		// push the point
+			points[wp].Y=y;
+			points[wp].State=OnIsle;
+			if( ++wp>=size ) {	// round about
+			    wp=0;
+			}
+		    } else {			// unreachable
+			*m=99;
+		    }
+		}
+	    }
+
+	    if( ++rp>=size ) {			// round about
+		rp=0;
+	    }
+	}
+
+	//
+	//	Continue with next frame.
+	//
+	if( rp==wp ) {			// unreachable, no more points available
+	    break;
+	}
+	ep=wp;
+    }
+    return 0;
+}
+
+/**
 **	Plan an attack with a force.
 **
 **	@param force	Pointer on the force.
 **
+**	@return		True if target found, false otherwise.
+**
 **	@todo Perfect planning.
 */
-global void AiPlanAttack(AiForce* force)
+global int AiPlanAttack(AiForce* force)
 {
+    char* watermatrix;
+    AiUnit* aiunit;
+    int x;
+    int y;
+    int state;
+
     DebugLevel0Fn("Planning for force %d\n" _C_ force-AiPlayer->Force);
+
+    watermatrix=CreateMatrix();
+    //
+    //	Transporter must be already assigned to the force.
+    //	NOTE: finding free transportes was too much work for me.
+    //
+    aiunit=force->Units;
+    while( aiunit ) {
+	if( aiunit->Unit->Type->Transporter ) {
+	    DebugLevel0Fn("Transporter %d\n" _C_ UnitNumber(aiunit->Unit));
+	    AiMarkWaterTransporter(aiunit->Unit,watermatrix);
+	}
+	aiunit=aiunit->Next;
+    }
+
+    //
+    //	Find a land unit of the force.
+    //		FIXME: if force is split over different places -> broken
+    //
+    aiunit=force->Units;
+    while( aiunit ) {
+	if( aiunit->Unit->Type->UnitType==UnitTypeLand ) {
+	    DebugLevel0Fn("Landunit %d\n" _C_ UnitNumber(aiunit->Unit));
+	    break;
+	}
+	aiunit=aiunit->Next;
+    }
+
+    if( !aiunit ) {
+	DebugLevel0Fn("No land unit in force\n");
+	return 0;
+    }
+
+    if( AiFindTarget(aiunit->Unit,watermatrix,&x,&y,&state) ) {
+	DebugLevel0Fn("Can attack\n");
+	force->GoalX=x;
+	force->GoalY=y;
+	force->MustTransport= state==2 ;
+
+	force->State=1;
+	return 1;
+    }
+    return 0;
 }
 
 //@}

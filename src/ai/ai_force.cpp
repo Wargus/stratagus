@@ -323,9 +323,13 @@ global void AiAttackWithForce(int force)
 
 	if (!enemy) {
 	    DebugLevel0Fn("Need to plan an attack with transporter\n");
-	    AiPlanAttack(&AiPlayer->Force[force]);
+	    if( !AiPlayer->Force[force].State 
+		    && !AiPlanAttack(&AiPlayer->Force[force]) ) {
+		AiPlayer->Force[force].Attacking=0;
+	    }
 	    return;
 	}
+	AiPlayer->Force[force].State=0;
 	x = enemy->X;
 	y = enemy->Y;
 
@@ -341,6 +345,152 @@ global void AiAttackWithForce(int force)
 	    }
 	    aiunit=aiunit->Next;
 	}
+    }
+}
+
+/**
+**	Load force on transporters.
+**
+**	@param force	Force pointer.
+*/
+local void AiLoadForce(AiForce* force)
+{
+    AiUnit* aiunit;
+    Unit* table[UnitMax];
+    int n;
+    int i;
+    int o;
+    int f;
+
+    //
+    //	Find all transporters.
+    //
+    n=0;
+    aiunit=force->Units;
+    while( aiunit ) {
+	if( aiunit->Unit->Type->Transporter ) {
+	    table[n++]=aiunit->Unit;
+	}
+	aiunit=aiunit->Next;
+    }
+
+    //
+    //	Load all on transporter.
+    //
+    f=o=i=0;
+    aiunit=force->Units;
+    while( aiunit ) {
+	Unit* unit;
+
+	unit=aiunit->Unit;
+	if( !unit->Type->Transporter
+		&& unit->Type->UnitType==UnitTypeLand ) {
+	    if( !unit->Removed ) {
+		f=1;
+		if( unit->Orders[0].Action!=UnitActionBoard ) {
+		    if( table[i]->Orders[0].Action==UnitActionStill
+			    && table[i]->OrderCount==1 ) {
+			DebugLevel0Fn("Send transporter %d\n",i);
+			CommandFollow(table[i],unit,FlushCommands);
+		    }
+		    CommandBoard(unit,table[i],FlushCommands);
+		    ++o;
+		    if( o==MAX_UNITS_ONBOARD ) {
+			DebugLevel0Fn("FIXME: next transporter\n");
+			return;
+		    }
+		}
+	    }
+	}
+	aiunit=aiunit->Next;
+    }
+    if( !f ) {
+	DebugLevel0Fn("All are loaded\n");
+	++force->State;
+    }
+}
+
+/**
+**	Send force off transporters.
+**
+**	@param force	Force pointer.
+*/
+local void AiSendTransporter(AiForce* force)
+{
+    AiUnit* aiunit;
+
+    //
+    //	Find all transporters.
+    //
+    aiunit=force->Units;
+    while( aiunit ) {
+	if( aiunit->Unit->Type->Transporter ) {
+	    CommandMove(aiunit->Unit, force->GoalX, force->GoalY,
+		    FlushCommands);
+	}
+	aiunit=aiunit->Next;
+    }
+    ++force->State;
+}
+
+/**
+**	Wait for transporters landed.
+**
+**	@param force	Force pointer.
+*/
+local void AiWaitLanded(AiForce* force)
+{
+    AiUnit* aiunit;
+    int i;
+
+    DebugLevel0Fn("Waiting\n");
+    //
+    //	Find all transporters.
+    //
+    i=1;
+    aiunit=force->Units;
+    while( aiunit ) {
+	if( aiunit->Unit->Type->Transporter
+		&& aiunit->Unit->Orders[0].Action==UnitActionStill ) {
+	    DebugLevel0Fn("Unloading\n");
+	    CommandUnload(aiunit->Unit,aiunit->Unit->X,aiunit->Unit->Y,
+		    NoUnitP,FlushCommands);
+	} else {
+	    i=0;
+	}
+	aiunit=aiunit->Next;
+    }
+    if( i ) {
+	++force->State;			// all unloaded
+    }
+}
+
+/**
+**	Handle an attack force.
+**
+**	@param force	Force pointer.
+*/
+local void AiGuideAttackForce(AiForce* force)
+{
+    enum { StartState=1, TransporterLoaded, WaitLanded, AttackNow };
+
+    switch( force->State ) {
+	    //
+	    //	Load units on transporters.
+	    //
+	case StartState:
+	    AiLoadForce(force);
+	    break;
+	case TransporterLoaded:
+	    AiSendTransporter(force);
+	    break;
+	case WaitLanded:
+	    AiWaitLanded(force);
+	    break;
+	case AttackNow:
+	    force->State=0;
+	    AiAttackWithForce(force-AiPlayer->Force);
+	    break;
     }
 }
 
@@ -378,6 +528,7 @@ global void AiForceManager(void)
 	}
 	if( AiPlayer->Force[force].Attacking ) {
 	    AiCleanForce(force);
+	    AiGuideAttackForce(&AiPlayer->Force[force]);
 	}
     }
 
