@@ -1408,30 +1408,42 @@ global void UpgradeLost( Player* player, int id )
 // all the following functions are just map handlers, no specific notes
 
 /**
-**	FIXME: docu
+**	Change allow for an unit-type.
+**
+**	@param player	Player to change
+**	@param id	unit type id
+**	@param af	`A'llow/`F'orbid/`R'eseached
 */
-global void AllowUnitId( Player* player, int id, char af ) // id -- unit type id, af -- `A'llow/`F'orbid
+global void AllowUnitId(Player* player, int id, char af)
 {
-  DebugCheck(!( af == 'A' || af == 'F' ));
-  player->Allow.Units[id] = af;
+    DebugCheck(!(af == 'A' || af == 'F' || af == 'R' ));
+    player->Allow.Units[id] = af;
+}
+
+/**
+**	Change allow for an upgrade.
+**
+**	@param player	Player to change
+**	@param id	upgrade id
+**	@param af	`A'llow/`F'orbid/`R'eseached
+*/
+global void AllowUpgradeId(Player* player, int id, char af)
+{
+    DebugCheck(!(af == 'A' || af == 'F' || af == 'R'));
+    player->Allow.Upgrades[id] = af;
 }
 
 /**
 **	FIXME: docu
 */
-global void AllowUpgradeId( Player* player,  int id, char af )
+global char UnitIdAllowed(const Player* player, int id)
 {
-  DebugCheck(!( af == 'A' || af == 'F' || af == 'R' ));
-  player->Allow.Upgrades[id] = af;
-}
-
-/**
-**	FIXME: docu
-*/
-global char UnitIdAllowed(const Player* player,  int id )
-{
-  if ( id < 0 || id >= UpgradeMax ) return 'F';
-  return player->Allow.Units[id];
+    // JOHNS: Don't be kind, the people should code correct!
+    DebugCheck( id < 0 || id >= UpgradeMax );
+    if (id < 0 || id >= UpgradeMax) {
+	return 'F';
+    }
+    return player->Allow.Units[id];
 }
 
 /**
