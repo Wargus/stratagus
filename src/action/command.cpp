@@ -646,6 +646,14 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
     //	Check if unit is still valid? (NETWORK!)
     //
     if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
+	// FIXME: more races, could happen with many orders in queue.
+	if( !unit->Type->Building
+		&& unit->Type!=UnitTypeHumanWorker
+		&& unit->Type!=UnitTypeOrcWorker ) {
+	    DebugLevel0Fn("None worker gets order\n");
+	    ClearSavedAction(unit);
+	    return;
+	}
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -681,6 +689,14 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     //
     if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie
 	     && !dest->Destroyed ) {
+	// FIXME: more races, could happen with many orders in queue.
+	if( !unit->Type->Building
+		&& unit->Type!=UnitTypeHumanWorker
+		&& unit->Type!=UnitTypeOrcWorker ) {
+	    DebugLevel0Fn("None worker gets order\n");
+	    ClearSavedAction(unit);
+	    return;
+	}
 	// FIXME: if low-level supports searching, pass NoUnitP down.
 
 	if( unit->Type->Building ) {
@@ -719,6 +735,14 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     //
     if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie
 	     && !dest->Destroyed ) {
+	// FIXME: more races, could happen with many orders in queue.
+	if( !unit->Type->Building
+		&& unit->Type!=UnitTypeHumanTanker
+		&& unit->Type!=UnitTypeOrcTanker ) {
+	    ClearSavedAction(unit);
+	    return;
+	}
+
 	// FIXME: if low-level supports searching, pass NoUnitP down.
 
 	if( unit->Type->Building ) {
@@ -756,6 +780,18 @@ global void CommandReturnGoods(Unit* unit,Unit* goal,int flush)
     //	Check if unit is still valid and Goal still alive? (NETWORK!)
     //
     if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
+	// FIXME: more races, could happen with many orders in queue.
+	if( !unit->Type->Building
+		&& unit->Type!=UnitTypeHumanWorkerWithGold
+		&& unit->Type!=UnitTypeHumanWorkerWithWood
+		&& unit->Type!=UnitTypeOrcWorkerWithGold
+		&& unit->Type!=UnitTypeOrcWorkerWithWood
+		&& unit->Type!=UnitTypeHumanTankerFull
+		&& unit->Type!=UnitTypeOrcTankerFull ) {
+	    ClearSavedAction(unit);
+	    return;
+	}
+
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
