@@ -541,11 +541,10 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 #ifdef USE_SDL_SURFACE
     // FIXME: endian
 
-//    graphic->Surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, depth, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
     graphic->Surface = SDL_CreateRGBSurfaceFrom(data, width, height, depth, width * depth / 8, 
-//	0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 	0, 0, 0, 0);
-//	depth * width);//, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+
+    graphic->SurfaceFlip = NULL;
 
     graphic->NumFrames = 0;
 #else
@@ -563,6 +562,34 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 
     return graphic;
 }
+
+#ifdef USE_SDL_SURFACE
+/**
+**
+**	Flip graphic and store in graphic->SurfaceFlip
+**
+*/
+global void FlipGraphic(Graphic* graphic)
+{
+    int i;
+    int j;
+    SDL_Surface* s;
+
+    s = graphic->SurfaceFlip = SDL_ConvertSurface(graphic->Surface, 
+	graphic->Surface->format, SDL_SWSURFACE);
+
+    SDL_LockSurface(s);
+
+    for (i = 0; i < s->h; ++i) {
+	for (j = 0; j < s->w; ++j) {
+	    ((char*)s->pixels)[j + i * s->w] = 
+		((char*)graphic->Surface->pixels)[s->w - j + i * s->w];
+	}
+    }
+
+    SDL_UnlockSurface(s);
+}
+#endif
 
 /**
 **	Make a new graphic object.

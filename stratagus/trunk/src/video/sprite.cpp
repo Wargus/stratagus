@@ -244,18 +244,29 @@ local void VideoDrawOpenGL(const Graphic* sprite, unsigned frame, int x, int y)
 #endif
 
 #ifdef USE_SDL_SURFACE
-local void VideoDrawXFlip(const Graphic* sprite, unsigned frame, int x, int y)
+local void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 {
+    SDL_Rect srect;
+    SDL_Rect drect;
 
-    int sbpp;
-    int dbpp;
+    DebugCheck(!sprite->SurfaceFlip);
 
-    sbpp = sprite->Surface->format->BytesPerPixel;
-    dbpp = TheScreen->format->BytesPerPixel;
+    srect.x = (sprite->SurfaceFlip->w - (frame % (sprite->SurfaceFlip->w / 
+	    sprite->Width)) * sprite->Width) - sprite->Width;
+    srect.y = (frame / (sprite->SurfaceFlip->w / sprite->Width)) * sprite->Height;
+    srect.w = sprite->Width;
+    srect.h = sprite->Height;
 
+    drect.x = x;
+    drect.y = y;
 
-    // FIXME: todo
-//    SDL_BlitSurface(, &srect, temp, &drect);
+    SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
+}
+
+local void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
+{
+    // FIXME?
+    VideoDrawX(sprite, frame, x, y);
 }
 #else
 /**

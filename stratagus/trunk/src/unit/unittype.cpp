@@ -1371,6 +1371,7 @@ global void LoadUnitTypes(void)
 	    ShowLoadProgress("Unit `%s'", file);
 	    type->ShadowSprite = LoadSprite(file, type->ShadowWidth,
 		type->ShadowHeight);
+	    FlipGraphic(type->ShadowSprite);
 	}
 
 	//  Load empty/loaded graphics
@@ -1382,12 +1383,14 @@ global void LoadUnitTypes(void)
 			ShowLoadProgress("Unit `%s'", file);
 			resinfo->SpriteWhenLoaded = LoadSprite(file, type->Width,
 			    type->Height);
+			FlipGraphic(resinfo->SpriteWhenLoaded);
 		    }
 		    if ((file = resinfo->FileWhenEmpty)) {
 			file = strcat(strcpy(buf, "graphics/"), file);
 			ShowLoadProgress("Unit `%s'", file);
 			resinfo->SpriteWhenEmpty = LoadSprite(file, type->Width,
 			    type->Height);
+			FlipGraphic(resinfo->SpriteWhenEmpty);
 		    }
 		}
 	    }
@@ -1415,6 +1418,7 @@ global void LoadUnitTypes(void)
 	    file = strcat(strcpy(buf, "graphics/"), file);
 	    ShowLoadProgress("Unit `%s'", file);
 	    type->Sprite = LoadSprite(file, type->Width, type->Height);
+	    FlipGraphic(type->Sprite);
 	}
     }
 
