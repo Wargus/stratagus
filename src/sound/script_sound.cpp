@@ -87,13 +87,19 @@ static int CclSoundForName(lua_State* l)
 static SoundId CclGetSoundId(lua_State* l)
 {
 	LuaUserData* data;
+	int pop;
 
+	pop = 0;
 	if (lua_isstring(l, -1)) {
 		CclSoundForName(l);
+		pop = 1;
 	}
 	if (lua_isuserdata(l, -1)) {
 		data = lua_touserdata(l, -1);
 		if (data->Type == LuaSoundType) {
+			if (pop) {
+				lua_pop(l, 1);
+			}
 			return data->Data;
 		}
 	}
