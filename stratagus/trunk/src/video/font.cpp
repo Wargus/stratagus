@@ -734,6 +734,16 @@ local SCM CclDefineFont(SCM type,SCM file,SCM width,SCM height)
 	i=SmallTitleFont;
     } else if( gh_eq_p(type,gh_symbol2scm("large-title")) ) {
 	i=LargeTitleFont;
+    } else if( gh_eq_p(type,gh_symbol2scm("user1")) ) {
+	i=User1Font;
+    } else if( gh_eq_p(type,gh_symbol2scm("user2")) ) {
+	i=User2Font;
+    } else if( gh_eq_p(type,gh_symbol2scm("user3")) ) {
+	i=User3Font;
+    } else if( gh_eq_p(type,gh_symbol2scm("user4")) ) {
+	i=User4Font;
+    } else if( gh_eq_p(type,gh_symbol2scm("user5")) ) {
+	i=User5Font;
     } else {
 	fprintf(stderr,"unsupported font type\n");
 	return SCM_UNSPECIFIED;

@@ -101,6 +101,11 @@ enum _game_font_ {
     LargeFont,				/// Large font used in menus
     SmallTitleFont,			/// Small font used in episoden titles
     LargeTitleFont,			/// Large font used in episoden titles
+    User1Font,				/// User font 1
+    User2Font,				/// User font 2
+    User3Font,				/// User font 3
+    User4Font,				/// User font 4
+    User5Font,				/// User font 5
     // ... more to come or not
     MaxFonts,				/// Number of fonts supported
 };
