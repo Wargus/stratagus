@@ -66,153 +66,152 @@ global void HandleActionTrain(Unit* unit)
     Player* player;
     int food;
 
-    player=unit->Player;
+    player = unit->Player;
     //
     //	First entry
     //
-    if( !unit->SubAction ) {
-	unit->Data.Train.Ticks=0;
-	unit->Data.Train.What[0]=unit->Orders[0].Type;
-	unit->Data.Train.Count=1;
-	unit->SubAction=1;
+    if (!unit->SubAction) {
+	unit->Data.Train.Ticks = 0;
+	unit->Data.Train.What[0] = unit->Orders[0].Type;
+	unit->Data.Train.Count = 1;
+	unit->SubAction = 1;
     }
-    unit->Data.Train.Ticks+=SpeedTrain;
+    unit->Data.Train.Ticks += SpeedTrain;
     // FIXME: Should count down
-    if( unit->Data.Train.Ticks
-	    >=unit->Data.Train.What[0]
-		->Stats[player->Player].Costs[TimeCost] ) {
+    if (unit->Data.Train.Ticks >=
+	    unit->Data.Train.What[0]->Stats[player->Player].Costs[TimeCost]) {
 	//
 	//	Check if there are still unit slots.
 	//
-	if( NumUnits>=UnitMax  ) {
-	    unit->Data.Train.Ticks=unit->Data.Train.What[0]
-		    ->Stats[player->Player].Costs[TimeCost];
-	    unit->Reset=1;
-	    unit->Wait=CYCLES_PER_SECOND/6;
+	if (NumUnits >= UnitMax ) {
+	    unit->Data.Train.Ticks = 
+		unit->Data.Train.What[0]->Stats[player->Player].Costs[TimeCost];
+	    unit->Reset = 1;
+	    unit->Wait = CYCLES_PER_SECOND / 6;
 	    return;
 	}
 
 	//
 	//	Check if enough food available.
 	//
-	if( (food=!PlayerCheckFood(player,unit->Data.Train.What[0]))
-		|| !PlayerCheckLimits(player,unit->Data.Train.What[0]) ) {
-	    if( food && unit->Player->Ai ) {
-		AiNeedMoreFarms(unit,unit->Orders[0].Type);
+	if ((food = !PlayerCheckFood(player, unit->Data.Train.What[0])) ||
+		!PlayerCheckLimits(player, unit->Data.Train.What[0])) {
+	    if (food && unit->Player->Ai) {
+		AiNeedMoreFarms(unit, unit->Orders[0].Type);
 	    }
 
-	    unit->Data.Train.Ticks=unit->Data.Train.What[0]
-		    ->Stats[player->Player].Costs[TimeCost];
-	    unit->Reset=1;
-	    unit->Wait=CYCLES_PER_SECOND/6;
+	    unit->Data.Train.Ticks = 
+		unit->Data.Train.What[0]->Stats[player->Player].Costs[TimeCost];
+	    unit->Reset = 1;
+	    unit->Wait = CYCLES_PER_SECOND / 6;
 	    return;
 	}
 
-	nunit=MakeUnit(unit->Data.Train.What[0],player);
-	nunit->X=unit->X;
-	nunit->Y=unit->Y;
-	type=unit->Type;
+	nunit=MakeUnit(unit->Data.Train.What[0], player);
+	nunit->X = unit->X;
+	nunit->Y = unit->Y;
+	type = unit->Type;
 
 	//  Some guy made DropOutOnSide set unit to belong to the building
 	//  training it. This was an ugly hack, setting X and Y is enough,
 	//  no need to add the unit only to be removed.
-	nunit->X=unit->X;
-	nunit->Y=unit->Y;
+	nunit->X = unit->X;
+	nunit->Y = unit->Y;
 
-	DropOutOnSide(nunit,LookingW,type->TileWidth,type->TileHeight);
+	DropOutOnSide(nunit, LookingW, type->TileWidth, type->TileHeight);
 
 	// set life span
-	if( type->DecayRate ) {
-	    nunit->TTL=GameCycle+type->DecayRate*6*CYCLES_PER_SECOND;
+	if (type->DecayRate) {
+	    nunit->TTL = GameCycle + type->DecayRate * 6 * CYCLES_PER_SECOND;
 	}
 
-	NotifyPlayer(player,NotifyYellow,nunit->X,nunit->Y,
-	    "New %s ready",nunit->Type->Name);
-	if( player==ThisPlayer ) {
-	    PlayUnitSound(nunit,VoiceReady);
+	NotifyPlayer(player, NotifyYellow, nunit->X, nunit->Y,
+	    "New %s ready", nunit->Type->Name);
+	if (player == ThisPlayer) {
+	    PlayUnitSound(nunit, VoiceReady);
 	}
-	if( unit->Player->Ai ) {
-	    AiTrainingComplete(unit,nunit);
+	if (unit->Player->Ai) {
+	    AiTrainingComplete(unit, nunit);
 	}
 
-	unit->Reset=unit->Wait=1;
+	unit->Reset = unit->Wait = 1;
 
-	if ( --unit->Data.Train.Count ) {
+	if (--unit->Data.Train.Count) {
 	    int z;
-	    for( z = 0; z < unit->Data.Train.Count ; z++ ) {
-		unit->Data.Train.What[z]=unit->Data.Train.What[z+1];
+	    for (z = 0; z < unit->Data.Train.Count; ++z) {
+		unit->Data.Train.What[z] = unit->Data.Train.What[z + 1];
 	    }
-	    unit->Data.Train.Ticks=0;
+	    unit->Data.Train.Ticks = 0;
 	} else {
-	    unit->Orders[0].Action=UnitActionStill;
-	    unit->SubAction=0;
+	    unit->Orders[0].Action = UnitActionStill;
+	    unit->SubAction = 0;
 	}
 
 	//
 	//	FIXME: we must check if the units supports the new order.
 	//
-	if( (unit->NewOrder.Action==UnitActionResource
-	        && !nunit->Type->Harvester)
-    	    || (unit->NewOrder.Action==UnitActionAttack
-	        && !nunit->Type->CanAttack)
-	    || (unit->NewOrder.Action==UnitActionBoard
-	        && nunit->Type->UnitType!=UnitTypeLand) ) {
+	if ((unit->NewOrder.Action == UnitActionResource &&
+		    !nunit->Type->Harvester) ||
+		(unit->NewOrder.Action == UnitActionAttack &&
+		    !nunit->Type->CanAttack) ||
+		(unit->NewOrder.Action == UnitActionBoard &&
+		    nunit->Type->UnitType != UnitTypeLand)) {
 	    DebugLevel0Fn("Wrong order for unit\n");
             
 	    //nunit->Orders[0].Action=UnitActionStandStill;
             
             // Tell the unit to move instead of trying to harvest
-	    nunit->Orders[0]=unit->NewOrder;
-	    nunit->Orders[0].Action=UnitActionMove;
-	    if( nunit->Orders[0].Goal ) {
-		RefsDebugCheck( !nunit->Orders[0].Goal->Refs );
+	    nunit->Orders[0] = unit->NewOrder;
+	    nunit->Orders[0].Action = UnitActionMove;
+	    if (nunit->Orders[0].Goal) {
+		RefsDebugCheck(!nunit->Orders[0].Goal->Refs);
 		nunit->Orders[0].Goal->Refs++;
 	    }
             
 	} else {
-	    if( unit->NewOrder.Goal ) {
-		if( unit->NewOrder.Goal->Destroyed ) {
+	    if (unit->NewOrder.Goal) {
+		if (unit->NewOrder.Goal->Destroyed) {
 		    // FIXME: perhaps we should use another goal?
 		    DebugLevel0Fn("Destroyed unit in train unit\n");
-		    RefsDebugCheck( !unit->NewOrder.Goal->Refs );
-		    if( !--unit->NewOrder.Goal->Refs ) {
+		    RefsDebugCheck(!unit->NewOrder.Goal->Refs);
+		    if (!--unit->NewOrder.Goal->Refs) {
 			ReleaseUnit(unit->NewOrder.Goal);
 		    }
-		    unit->NewOrder.Goal=NoUnitP;
-		    unit->NewOrder.Action=UnitActionStill;
+		    unit->NewOrder.Goal = NoUnitP;
+		    unit->NewOrder.Action = UnitActionStill;
 		}
 	    }
 
-	    nunit->Orders[0]=unit->NewOrder;
+	    nunit->Orders[0] = unit->NewOrder;
 
 	    //
 	    // FIXME: Pending command uses any references?
 	    //
-	    if( nunit->Orders[0].Goal ) {
-		RefsDebugCheck( !nunit->Orders[0].Goal->Refs );
+	    if (nunit->Orders[0].Goal) {
+		RefsDebugCheck(!nunit->Orders[0].Goal->Refs);
 		nunit->Orders[0].Goal->Refs++;
 	    }
 	}
 
-	if( IsOnlySelected(unit) ) {
+	if (IsOnlySelected(unit)) {
 #ifndef NEW_UI
 	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
+	    MustRedraw |= RedrawPanels;
 #else
 	    SelectedUnitChanged();
-	    MustRedraw|=RedrawInfoPanel;
+	    MustRedraw |= RedrawInfoPanel;
 #endif
 	}
 
 	return;
     }
 
-    if( IsOnlySelected(unit) ) {
-	MustRedraw|=RedrawInfoPanel;
+    if (IsOnlySelected(unit)) {
+	MustRedraw |= RedrawInfoPanel;
     }
 
-    unit->Reset=1;
-    unit->Wait=CYCLES_PER_SECOND/6;
+    unit->Reset = 1;
+    unit->Wait = CYCLES_PER_SECOND / 6;
 }
 
 //@}

@@ -57,7 +57,7 @@
 **	@param unit	Unit pointer for action.
 **	@param ground	Flag: true if unit is standing ground.
 */
-global void ActionStillGeneric(Unit* unit,int ground)
+global void ActionStillGeneric(Unit* unit, int ground)
 {
     const UnitType* type;
     Unit* temp;
@@ -65,9 +65,9 @@ global void ActionStillGeneric(Unit* unit,int ground)
 
     DebugLevel3Fn(" %d\n" _C_ UnitNumber(unit));
 
-    if( unit->Removed ) {		// Removed units, do nothing?
+    if (unit->Removed) {		// Removed units, do nothing?
 	// If peon is in building or unit is in transporter it is removed.
-	unit->Wait=CYCLES_PER_SECOND/6;
+	unit->Wait = CYCLES_PER_SECOND / 6;
 	return;
     }
 
@@ -75,9 +75,9 @@ global void ActionStillGeneric(Unit* unit,int ground)
     //	Animations
     //
 
-    type=unit->Type;
+    type = unit->Type;
 
-    if( unit->SubAction ) {
+    if (unit->SubAction) {
 	//
 	//	Attacking unit in attack range.
 	//
@@ -86,39 +86,39 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	//
 	//	Still animation
 	//
-        DebugCheck( !type->Animations || !type->Animations->Still );
+        DebugCheck(!type->Animations || !type->Animations->Still);
 
-	UnitShowAnimation(unit,type->Animations->Still);
+	UnitShowAnimation(unit, type->Animations->Still);
 
 	//
 	//	FIXME: this a workaround for some bad code.
 	//		UnitShowAnimation resets frame.
 	//	FIXME: the frames are hardcoded they should be configurable
 	//
-	if( unit->State==1 && type->GivesResource==GoldCost ) {
-	    unit->Frame=unit->Data.Resource.Active ? 1 : 0;
+	if (unit->State == 1 && type->GivesResource == GoldCost) {
+	    unit->Frame = unit->Data.Resource.Active ? 1 : 0;
 	}
-	if( unit->State==1 && type->GivesResource==OilCost ) {
-	    unit->Frame=unit->Data.Resource.Active ? 2 : 0;
+	if (unit->State == 1 && type->GivesResource == OilCost) {
+	    unit->Frame = unit->Data.Resource.Active ? 2 : 0;
 	}
 	UnitMarkSeen(unit);
     }
 
-    if( !unit->Reset ) {		// animation can't be aborted here
+    if (!unit->Reset) {		// animation can't be aborted here
 	return;
     }
 
     //
     //	Some units, like critter are moving random around randomly
     //
-    if( type->RandomMovementProbability &&
-	    ((SyncRand()%100)<=type->RandomMovementProbability)) {
+    if (type->RandomMovementProbability &&
+	    ((SyncRand() % 100) <= type->RandomMovementProbability)) {
 	int x;
 	int y;
 
-	x=unit->X;
-	y=unit->Y;
-	switch( (SyncRand()>>12)&15 ) {
+	x = unit->X;
+	y = unit->Y;
+	switch ((SyncRand() >> 12) & 15) {
 	    case 0:	x++;		break;
 	    case 1:	y++;		break;
 	    case 2:	x--;		break;
@@ -128,28 +128,28 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    case 6:	y--; x++;	break;
 	    case 7:	x--; y--;	break;
 	    default:
-		    break;
+		break;
 	}
-	if( x<0 ) {
-	    x=0;
-	} else if( x>=TheMap.Width ) {
-	    x=TheMap.Width-1;
+	if (x < 0) {
+	    x = 0;
+	} else if (x >= TheMap.Width) {
+	    x = TheMap.Width - 1;
 	}
-	if( y<0 ) {
-	    y=0;
-	} else if( y>=TheMap.Height ) {
-	    y=TheMap.Height-1;
+	if (y < 0) {
+	    y = 0;
+	} else if (y >= TheMap.Height) {
+	    y = TheMap.Height - 1;
 	}
-	if( x!=unit->X || y!=unit->Y ) {
-	    if( CheckedCanMoveToMask(x,y,TypeMovementMask(type)) ) {
+	if (x != unit->X || y != unit->Y) {
+	    if (CheckedCanMoveToMask(x, y, TypeMovementMask(type))) {
 		// FIXME: Don't use pathfinder for this, costs too much cpu.
-		unit->Orders[0].Action=UnitActionMove;
-		DebugCheck( unit->Orders[0].Goal );
-		unit->Orders[0].Goal=NoUnitP;
-		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
-		unit->Orders[0].X=x;
-		unit->Orders[0].Y=y;
-		unit->State=0;
+		unit->Orders[0].Action = UnitActionMove;
+		DebugCheck(unit->Orders[0].Goal);
+		unit->Orders[0].Goal = NoUnitP;
+		unit->Orders[0].RangeX = unit->Orders[0].RangeY = 0;
+		unit->Orders[0].X = x;
+		unit->Orders[0].Y = y;
+		unit->State = 0;
 	    }
 	}
 	// NOTE: critter couldn't attack automatic through the return
@@ -159,65 +159,65 @@ global void ActionStillGeneric(Unit* unit,int ground)
     //
     //	Auto cast spells
     //
-    if( unit->AutoCastSpell && AutoCastSpell(unit, unit->AutoCastSpell) ) {
+    if (unit->AutoCastSpell && AutoCastSpell(unit, unit->AutoCastSpell)) {
 	return;
     }
 
     //
     //	Cowards don't attack unless instructed.
     //
-    if( type->CanAttack && !type->Coward ) {
+    if (type->CanAttack && !type->Coward) {
 	//
 	//	Normal units react in reaction range.
 	//
-	if( unit->Stats->Speed && !ground ) {
-	    if( (goal=AttackUnitsInReactRange(unit)) ) {
+	if (unit->Stats->Speed && !ground) {
+	    if ((goal = AttackUnitsInReactRange(unit))) {
 		// Weak goal, can choose other unit, come back after attack
-		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
-		DebugLevel3Fn(" %d Attacking in range %d\n"
-			_C_ UnitNumber(unit) _C_ unit->SubAction);
-		DebugCheck( unit->SavedOrder.Action!=UnitActionStill );
-		DebugCheck( unit->SavedOrder.Goal );
-		unit->SavedOrder.Action=UnitActionAttack;
-		unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
-		unit->SavedOrder.X=unit->X;
-		unit->SavedOrder.Y=unit->Y;
-		unit->SavedOrder.Goal=NoUnitP;
+		CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
+		DebugLevel3Fn(" %d Attacking in range %d\n" _C_
+		    UnitNumber(unit) _C_ unit->SubAction);
+		DebugCheck(unit->SavedOrder.Action != UnitActionStill);
+		DebugCheck(unit->SavedOrder.Goal);
+		unit->SavedOrder.Action = UnitActionAttack;
+		unit->SavedOrder.RangeX = unit->SavedOrder.RangeY = 0;
+		unit->SavedOrder.X = unit->X;
+		unit->SavedOrder.Y = unit->Y;
+		unit->SavedOrder.Goal = NoUnitP;
 	    }
-	} else if( (goal=AttackUnitsInRange(unit)) ) {
+	} else if ((goal = AttackUnitsInRange(unit))) {
 	    DebugLevel3Fn(" %d #%d\n" _C_ UnitNumber(goal) _C_ goal->Refs);
 	    //
 	    //	Old goal destroyed.
 	    //
-	    temp=unit->Orders[0].Goal;
-	    if( temp && temp->Destroyed ) {
-		DebugLevel3Fn(" destroyed unit %d #%d\n"
-			_C_ UnitNumber(temp) _C_ temp->Refs);
-		RefsDebugCheck( !temp->Refs );
-		if( !--temp->Refs ) {
+	    temp = unit->Orders[0].Goal;
+	    if (temp && temp->Destroyed) {
+		DebugLevel3Fn(" destroyed unit %d #%d\n" _C_
+		    UnitNumber(temp) _C_ temp->Refs);
+		RefsDebugCheck(!temp->Refs);
+		if (!--temp->Refs) {
 		    ReleaseUnit(temp);
 		}
-		unit->Orders[0].Goal=temp=NoUnitP;
+		unit->Orders[0].Goal = temp=NoUnitP;
 	    }
-	    if( !unit->SubAction || temp!=goal ) {
+	    if (!unit->SubAction || temp != goal) {
 		// New target.
-		if( temp ) {
-		    DebugLevel3Fn(" old unit %d #%d\n"
-			    _C_ UnitNumber(temp) _C_ temp->Refs);
-		    RefsDebugCheck( !temp->Refs );
+		if (temp) {
+		    DebugLevel3Fn(" old unit %d #%d\n" _C_
+			UnitNumber(temp) _C_ temp->Refs);
+		    RefsDebugCheck(!temp->Refs);
 		    temp->Refs--;
-		    RefsDebugCheck( !temp->Refs );
+		    RefsDebugCheck(!temp->Refs);
 		}
-		unit->Orders[0].Goal=goal;
-		RefsDebugCheck( !goal->Refs );
+		unit->Orders[0].Goal = goal;
+		RefsDebugCheck(!goal->Refs);
 		goal->Refs++;
-		unit->Reset=0;
-		unit->State=0;
-		unit->SubAction=1;	// Mark attacking.
-		if( type->Stats->Speed ) {
+		unit->Reset = 0;
+		unit->State = 0;
+		unit->SubAction = 1;	// Mark attacking.
+		if (type->Stats->Speed) {
 		    UnitHeadingFromDeltaXY(unit,
-			goal->X+(goal->Type->TileWidth-1)/2-unit->X,
-			goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);
+			goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
+			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 		    AnimateActionAttack(unit);
 		}
 	    }
@@ -225,35 +225,35 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	}
     }
 
-    if( unit->SubAction ) {		// was attacking.
-	if( (temp=unit->Orders[0].Goal) ) {
-	    if( temp->Destroyed ) {
-		RefsDebugCheck( !temp->Refs );
-		if( !--temp->Refs ) {
+    if (unit->SubAction) {		// was attacking.
+	if ((temp = unit->Orders[0].Goal)) {
+	    if (temp->Destroyed) {
+		RefsDebugCheck(!temp->Refs);
+		if (!--temp->Refs) {
 		    ReleaseUnit(temp);
 		}
 	    } else {
-		RefsDebugCheck( !temp->Refs );
+		RefsDebugCheck(!temp->Refs);
 		temp->Refs--;
-		RefsDebugCheck( !temp->Refs );
+		RefsDebugCheck(!temp->Refs);
 	    }
-	    unit->Orders[0].Goal=NoUnitP;
+	    unit->Orders[0].Goal = NoUnitP;
 	}
-	unit->SubAction=unit->State=0;	// No attacking, restart
+	unit->SubAction = unit->State = 0;	// No attacking, restart
     }
 
     //
     //	Land units are turning left/right.
     //
-    if( type->LandUnit ) {
-	switch( (MyRand()>>8)&0x0FF ) {
+    if (type->LandUnit) {
+	switch ((MyRand() >> 8) & 0x0FF) {
 	    case 0:			// Turn clockwise
-		unit->Direction+=NextDirection;
+		unit->Direction += NextDirection;
 		UnitUpdateHeading(unit);
                 CheckUnitToBeDrawn(unit);
 		break;
 	    case 1:			// Turn counter clockwise
-		unit->Direction-=NextDirection;
+		unit->Direction -= NextDirection;
 		UnitUpdateHeading(unit);
                 CheckUnitToBeDrawn(unit);
 		break;
@@ -266,8 +266,8 @@ global void ActionStillGeneric(Unit* unit,int ground)
     //
     //	Sea and air units are floating up/down.
     //	
-    if( unit->Type->SeaUnit||unit->Type->AirUnit ) {
-	unit->IY=(MyRand()>>15)&1;
+    if (unit->Type->SeaUnit || unit->Type->AirUnit) {
+	unit->IY = (MyRand() >> 15) & 1;
     }
 }
 
@@ -278,7 +278,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 */
 global void HandleActionStill(Unit* unit)
 {
-    ActionStillGeneric(unit,0);
+    ActionStillGeneric(unit, 0);
 }
 
 //@}
