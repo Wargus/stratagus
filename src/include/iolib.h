@@ -44,6 +44,10 @@
 #include <bzlib.h>
 #endif
 
+#ifdef USE_ZZIPLIB
+#include "zziplib.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --	Definitons
 ----------------------------------------------------------------------------*/
@@ -52,13 +56,13 @@
 **	FileList struct used by directory access routine
 */
 typedef struct _filelist_ {
-    char *name;				/// Name of the file
-    int type;				/// Type of the file
-    void *xdata;			/// Extra data attached by high level
+    char	*name;			/// Name of the file
+    int		type;			/// Type of the file
+    void	*xdata;			/// Extra data attached by high level
 } FileList;
 
 
-#if !defined(USE_ZLIB) && !defined(USE_BZ2LIB)
+#if !defined(USE_ZLIB) && !defined(USE_BZ2LIB) && !defined(USE_ZZIPLIB)
 
 // use plain file routines directly
 
@@ -68,7 +72,7 @@ typedef struct _filelist_ {
 #define CLseek(file,offset,whence)	fseek(file,offset,whence)
 #define CLclose(file)			fclose(file)
 
-#else	// !USE_ZLIB && !USE_BZ2LIB
+#else	// !USE_ZLIB && !USE_BZ2LIB && !defined(USE_ZZIPLIB)
 
 /**
 **	Defines a library file
@@ -84,12 +88,18 @@ typedef struct _CL_File_ {
 #ifdef USE_BZ2LIB
     BZFILE	*cl_bz;			/// bzip2 file pointer
 #endif	// !USE_BZ2LIB
+#ifdef USE_ZZIPLIB
+    ZZIP_FILE	*cl_zz;			/// zzip file pointer
+#endif	// !USE_ZZIPLIB
 } CLFile;
 
-#define CLF_TYPE_INVALID	0	/// invalid file handle
-#define CLF_TYPE_PLAIN		1	/// plain text file handle
-#define CLF_TYPE_GZIP		2	/// gzip file handle
-#define CLF_TYPE_BZIP2		3	/// bzip2 file handle
+enum {
+    CLF_TYPE_INVALID,			/// invalid file handle
+    CLF_TYPE_PLAIN,			/// plain text file handle
+    CLF_TYPE_GZIP,			/// gzip file handle
+    CLF_TYPE_BZIP2,			/// bzip2 file handle
+    CLF_TYPE_ZZIP,			/// zzip file handle
+};
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -105,7 +115,7 @@ extern int CLread(CLFile *file, void *buf, size_t len);
 extern int CLseek(CLFile *file, long offset, int whence);
 
 
-#endif	// USE_ZLIB || USE_BZ2LIB
+#endif	// USE_ZLIB || USE_BZ2LIB || USE_ZZIPLIB
 
     /// Build libary path name
 extern char* LibraryFileName(const char* file,char* buffer);

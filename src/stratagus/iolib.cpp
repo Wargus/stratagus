@@ -44,6 +44,10 @@
 #include "freecraft.h"
 #include "iolib.h"
 
+#ifndef O_BINARY
+#define O_BINARY	0
+#endif
+
 /*----------------------------------------------------------------------------
 --	Defines
 ----------------------------------------------------------------------------*/
@@ -113,7 +117,31 @@ local void bzseek(BZFILE* file,unsigned offset,int whence __attribute__((unused)
 
 #endif	// USE_BZ2LIB
 
-#if defined(USE_ZLIB) || defined(USE_BZ2LIB)
+#ifdef USE_ZZIPLIB
+
+#if 0
+/**
+**	Seek on compressed input. (I hope newer libs support it directly)
+**
+**	@param file	File handle
+**	@param offset	Seek position
+**	@param whence	How to seek
+*/
+local void zzip_seek(ZZIP_FILE* file,unsigned offset,int whence __attribute__((unused)))
+{
+    char buf[32];
+
+    while( offset>sizeof(buf) ) {
+	zzip_read(file,buf,sizeof(buf));
+	offset-=sizeof(buf);
+    }
+    zzip_read(file,buf,offset);
+}
+#endif
+
+#endif	// USE_ZZIPLIB
+
+#if defined(USE_ZLIB) || defined(USE_BZ2LIB) || defined(USE_ZZIPLIB)
 
 /**
 **	CLopen		Library file open
@@ -129,22 +157,24 @@ global CLFile *CLopen(const char *fn)
     if (!(input.cl_plain = fopen(fn, "rb"))) {		// try plain first
 #ifdef USE_ZLIB
 	sprintf(buf, "%s.gz", fn);
-	if (!(input.cl_gz = gzopen(buf, "rb"))) {
-#ifdef USE_BZ2LIB
-	    sprintf(buf, "%s.bz2", fn);
-	    if ((input.cl_bz = bzopen(buf, "rb"))) {
-		input.cl_type = CLF_TYPE_BZIP2;
-	    }
-#endif	// USE_BZ2LIB
-	} else {
+	if ( (input.cl_gz = gzopen(buf, "rb")) ) {
 	    input.cl_type = CLF_TYPE_GZIP;
-	}
-#else	// !USE_ZLIB => USE_BZ2LIB
+	} else
+#endif
+#ifdef USE_BZ2LIB
 	sprintf(buf, "%s.bz2", fn);
 	if ((input.cl_bz = bzopen(buf, "rb"))) {
 	    input.cl_type = CLF_TYPE_BZIP2;
-	}
-#endif	// USE_ZLIB
+	} else
+#endif
+#ifdef USE_ZZIPLIB
+	strcpy(buf,fn);
+	if ((input.cl_zz = zzip_open(buf,O_RDONLY|O_BINARY) )) {
+	    input.cl_type = CLF_TYPE_ZZIP;
+	} else
+#endif
+	{ }
+
     } else {
 	input.cl_type = CLF_TYPE_PLAIN;
 	// Hmm, plain worked, but nevertheless the file may be compressed!
@@ -178,10 +208,12 @@ global CLFile *CLopen(const char *fn)
 	    rewind(input.cl_plain);
 	}
     }
+
     if (input.cl_type == CLF_TYPE_INVALID) {
 	//fprintf(stderr,"%s in ", buf);
 	return NULL;
     }
+
     // ok, here we go
     clf = (CLFile *)malloc(sizeof(CLFile));
     if (clf) {
@@ -214,6 +246,12 @@ global int CLclose(CLFile *file)
 	    ret = 0;
 	}
 #endif	// USE_BZ2LIB
+#ifdef USE_ZZIPLIB
+	if (tp == CLF_TYPE_ZZIP) {
+	    zzip_close(file->cl_zz);
+	    ret = 0;
+	}
+#endif	// USE_ZZIPLIB
 	free(file);
     } else {
 	errno = EBADF;
@@ -246,6 +284,11 @@ global int CLread(CLFile *file, void *buf, size_t len)
 	    ret = bzread(file->cl_bz, buf, len);
 	}
 #endif	// USE_BZ2LIB
+#ifdef USE_ZZIPLIB
+	if (tp == CLF_TYPE_ZZIP) {
+	    ret = zzip_read(file->cl_bz, buf, len);
+	}
+#endif	// USE_ZZIPLIB
     } else {
 	errno = EBADF;
     }
@@ -278,13 +321,19 @@ global int CLseek(CLFile *file, long offset, int whence)
 	    ret = 0;
 	}
 #endif	// USE_BZ2LIB
+#ifdef USE_ZZIPLIB
+	if (tp == CLF_TYPE_ZZIP) {
+	    zzip_seek(file->cl_bz, offset, whence);
+	    ret = 0;
+	}
+#endif	// USE_ZZIPLIB
     } else {
 	errno = EBADF;
     }
     return ret;
 }
 
-#endif	// USE_ZLIB || USE_BZ2LIB
+#endif	// USE_ZLIB || USE_BZ2LIB || USE_ZZIPLIB
 
 /**
 **	Generate a filename into library.
@@ -319,6 +368,17 @@ global char* LibraryFileName(const char* file,char* buffer)
 	return buffer;
     }
 #endif
+#ifdef USE_ZZIPLIB
+    {
+	ZZIP_FILE* zp;
+
+	strcpy(buffer,file);
+	if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+	    zzip_close(zp);
+	    return buffer;
+	}
+    }
+#endif	// USE_ZZIPLIB
 
     //
     //	In user home directory
@@ -328,21 +388,28 @@ global char* LibraryFileName(const char* file,char* buffer)
 	return buffer;
     }
 #ifdef USE_ZLIB		// gzip or bzip2 in user home directory
-    strcat(buffer,".gz");
+    sprintf(buffer,"%s/%s/%s.gz",getenv("HOME"),FREECRAFT_HOME_PATH,file);
     if( !access(buffer,R_OK) ) {
 	return buffer;
     }
 #endif
 #ifdef USE_BZ2LIB
-#ifndef USE_ZLIB
-    strcat(buffer,".bz2");
-#else
     sprintf(buffer,"%s/%s/%s.bz2",getenv("HOME"),FREECRAFT_HOME_PATH,file);
-#endif
     if( !access(buffer,R_OK) ) {
 	return buffer;
     }
 #endif
+#ifdef USE_ZZIPLIB
+    {
+	ZZIP_FILE* zp;
+
+	sprintf(buffer,"%s/%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH,file);
+	if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+	    zzip_close(zp);
+	    return buffer;
+	}
+    }
+#endif	// USE_ZZIPLIB
 
     //
     //	In global shared directory
@@ -352,28 +419,42 @@ global char* LibraryFileName(const char* file,char* buffer)
 	return buffer;
     }
 #ifdef USE_ZLIB		// gzip or bzip2 in global shared directory
-    strcat(buffer,".gz");
+    sprintf(buffer,"%s/%s.gz",FreeCraftLibPath,file);
     if( !access(buffer,R_OK) ) {
 	return buffer;
     }
 #endif
 #ifdef USE_BZ2LIB
-#ifndef USE_ZLIB
-    strcat(buffer,".bz2");
-#else
     sprintf(buffer,"%s/%s.bz2",FreeCraftLibPath,file);
-#endif
     if( !access(buffer,R_OK) ) {
 	return buffer;
     }
 #endif
+#ifdef USE_ZZIPLIB
+    {
+	ZZIP_FILE* zp;
+
+	sprintf(buffer,"%s/%s",FreeCraftLibPath,file);
+	if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+	    zzip_close(zp);
+	    return buffer;
+	}
+    }
+#endif	// USE_ZZIPLIB
     DebugLevel0Fn("File `%s' not found\n",file);
 
     strcpy(buffer,file);
     return buffer;
 }
 
-
+/**
+**	Compare two directory structures.
+**
+**	@param	v1	First structure
+**	@param	v2	Second structure
+**
+**	@return		v1-v2
+*/
 local int flqcmp(const void *v1, const void *v2)
 {
     const FileList *c1 = v1, *c2 = v2;
@@ -392,7 +473,6 @@ local int flqcmp(const void *v1, const void *v2)
 **
 **	@return		Pointer to FileList struct describing Files found.
 */
-
 global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *),FileList **flp)
 {
     DIR *dirp;
