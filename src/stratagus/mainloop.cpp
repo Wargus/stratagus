@@ -787,6 +787,9 @@ global void GameMainLoop(void)
 			ShowOrdersCount--;
 		    }
 		    break;
+		case 8:
+		    BurnBuildings();		// burn buildings
+		    break;
 	    }
 
 	    //

@@ -52,7 +52,9 @@ enum _diplomacy_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern unsigned	SyncHash;	/// Hash calculated to find sync failures
+extern unsigned	SyncHash;	    /// Hash calculated to find sync failures
+extern int BurnBuildingPercent;	    /// Max percent to burn buildings
+extern int BurnBuildingDamageRate;  /// HP per second to damage buildings
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -184,6 +186,8 @@ extern void HandleActionSpellCast(Unit* unit);
 extern int UnitShowAnimation(Unit* unit,const Animation* animation);
     /// Handle the actions of all units each game cycle
 extern void UnitActions(void);
+    /// Handle burning buildings
+extern void BurnBuildings(void);
 
 //@}
 
