@@ -539,20 +539,23 @@ local SCM CclAddTrigger(SCM condition,SCM action)
 global void TriggersEachCycle(void)
 {
     SCM pair;
-    SCM val;
+    SCM trig;
 
     if( !Trigger ) {
 	Trigger=symbol_value(gh_symbol2scm("*triggers*"),NIL);
     }
 
-    if( !gh_null_p(Trigger) ) {		// Next trigger
-	pair=gh_car(Trigger);
-	Trigger=gh_cdr(Trigger);
-	if( !gh_null_p(val=gh_apply(car(pair),NIL)) ) {
-	    val=gh_apply(cdr(pair),NIL);
-	    if( gh_null_p(val) ) {
+    if( !gh_null_p(trig=Trigger) ) {		// Next trigger
+	pair=gh_car(trig);
+	Trigger=gh_cdr(trig);
+	// Pair is condition action
+	if( !gh_null_p(gh_apply(car(pair),NIL)) ) {
+	    if( gh_null_p(gh_apply(cdr(pair),NIL)) ) {
 		DebugLevel0Fn("FIXME: should remove trigger\n");
+		//CAR(trig)=CAR(Trigger);
+		//CDR(trig)=CDR(Trigger);
 	    }
+	    fflush(stdout);
 	}
     } else {
 	Trigger=NULL;
@@ -596,6 +599,9 @@ global void InitTriggers(void)
     //
     //	Setup default triggers
     //
+
+    // FIXME: choose the triggers for game type
+
     if( gh_null_p(symbol_value(gh_symbol2scm("*triggers*"),NIL)) ) {
 	DebugLevel0Fn("Default triggers\n");
 	gh_apply(symbol_value(gh_symbol2scm("single-player-triggers"),NIL),NIL);
