@@ -269,6 +269,7 @@ typedef enum _tile_type_ {
 typedef struct _tile_info_ {
 	unsigned char BaseTerrain; ///< Basic terrain of the tile
 	unsigned char MixTerrain;  ///< Terrain mixed with this
+	unsigned short Flags; ///< Flag table for editor
 } TileInfo;
 
 	/// Definition for a terrain type
@@ -291,7 +292,6 @@ typedef struct _tileset_ {
 	int TileSizeX;              ///< Size of a tile in X
 	int TileSizeY;              ///< Size of a tile in Y
 	unsigned short* Table;      ///< Pud to internal conversion table
-	unsigned short* FlagsTable; ///< Flag table for editor
 
 	TileInfo* Tiles; ///< Tile descriptions
 

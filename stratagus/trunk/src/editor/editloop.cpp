@@ -199,7 +199,7 @@ void EditTile(int x, int y, int tile)
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
 
-	mf->Flags |= TheMap.Tileset->FlagsTable[16 + tile * 16];
+	mf->Flags |= TheMap.Tileset->Tiles[16 + tile * 16].Flags;
 
 	UpdateMinimapSeenXY(x, y);
 	UpdateMinimapXY(x, y);
@@ -1853,7 +1853,7 @@ static void CreateEditor(void)
 			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile = 0;
 			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile =
 				TheMap.Tileset->Table[0x50];
-			TheMap.Fields[i].Flags = TheMap.Tileset->FlagsTable[0x50];
+			TheMap.Fields[i].Flags = TheMap.Tileset->Tiles[0x50].Flags;
 		}
 		GameSettings.Resources = SettingsResourcesMapDefault;
 		CreateGame(NULL, &TheMap);

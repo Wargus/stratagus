@@ -97,12 +97,6 @@ static void ExtendTilesetTables(Tileset* tileset, int tiles)
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->FlagsTable =
-		realloc(tileset->FlagsTable, tiles * sizeof(*tileset->FlagsTable));
-	if (!tileset->FlagsTable) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
 	tileset->Tiles = realloc(tileset->Tiles,
 		tiles * sizeof(*tileset->Tiles));
 	if (!tileset->Tiles) {
@@ -354,14 +348,14 @@ static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 		tileset->Table[index + i] = LuaToNumber(l, -1);
 // tt->SolidTiles[i] = tileset->Table[index + i] = LuaToNumber(l, -1);
 		lua_pop(l, 1);
-		tileset->FlagsTable[index + i] = f;
+		tileset->Tiles[index + i].Flags = f;
 		tileset->Tiles[index + i].BaseTerrain = basic_name;
 		tileset->Tiles[index + i].MixTerrain = 0;
 	}
 	lua_pop(l, 1);
 	while (i < 16) {
 		tileset->Table[index + i] = 0;
-		tileset->FlagsTable[index + i] = 0;
+		tileset->Tiles[index + i].Flags = 0;
 		tileset->Tiles[index + i].BaseTerrain = 0;
 		tileset->Tiles[index + i].MixTerrain = 0;
 		++i;
@@ -422,7 +416,7 @@ static int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 		for (i = 0; i < len; ++i) {
 			lua_rawgeti(l, -1, i + 1);
 			tileset->Table[index + i] = LuaToNumber(l, -1);
-			tileset->FlagsTable[index + i] = f;
+			tileset->Tiles[index + i].Flags = f;
 			tileset->Tiles[index + i].BaseTerrain = basic_name;
 			tileset->Tiles[index + i].MixTerrain = mixed_name;
 			lua_pop(l, 1);
@@ -430,7 +424,7 @@ static int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 		// Fill missing slots
 		while (i < 16) {
 			tileset->Table[index + i] = 0;
-			tileset->FlagsTable[index + i] = 0;
+			tileset->Tiles[index + i].Flags = 0;
 			tileset->Tiles[index + i].BaseTerrain = 0;
 			tileset->Tiles[index + i].MixTerrain = 0;
 			++i;
@@ -441,7 +435,7 @@ static int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 
 	while (index < new_index) {
 		tileset->Table[index] = 0;
-		tileset->FlagsTable[index] = 0;
+		tileset->Tiles[index].Flags = 0;
 		tileset->Tiles[index].BaseTerrain = 0;
 		tileset->Tiles[index].MixTerrain = 0;
 		++index;
@@ -467,12 +461,6 @@ static void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 	index = 0;
 	tileset->Table = malloc(16 * sizeof(*tileset->Table));
 	if (!tileset->Table) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	tileset->FlagsTable =
-		malloc(16 * sizeof(*tileset->FlagsTable));
-	if (!tileset->FlagsTable) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
