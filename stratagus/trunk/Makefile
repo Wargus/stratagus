@@ -129,7 +129,7 @@ freecraft: $(OBJ)
 
 # WIN32-TARGET
 freecraft.exe:	$(OBJ) etlib/$(OBJDIR)/getopt.$(OE) \
-	    src/$(OBJDIR)/freecraftrc.$(OE) src/$(OBJDIR)/main.$(OE)
+	    src/$(OBJDIR)/freecraftrc.$(OE)
 	$(CCLD) -o freecraft$(EXE) $^ -lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
 strip:
