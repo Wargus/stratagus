@@ -47,6 +47,7 @@ tags::
 distlist::
 	echo >>$(DISTLIST)
 	echo src/main.c  >>$(DISTLIST)
+	echo src/dummy.c  >>$(DISTLIST)
 	echo src/freecraft.rc >>$(DISTLIST)
 	echo src/Makefile >>$(DISTLIST)
 	@for i in include $(MODULES) ; do $(MAKE) -C $$i distlist ; done
