@@ -1980,6 +1980,42 @@ local SCM CclDefineNewUI(SCM list)
 }
 
 /**
+**	Define the viewports.
+**
+**	@param list	List of the viewports.
+*/
+local SCM CclDefineViewports(SCM list)
+{
+    SCM value;
+    SCM sublist;
+    UI* ui;
+    int i;
+
+    i=0;
+    ui=&TheUI;
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("mode")) ) {
+	    ui->ViewportMode=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("viewport")) ) {
+	    sublist=gh_car(list);
+	    ui->Viewports[i].MapX=gh_scm2int(gh_car(sublist));
+	    sublist=gh_cdr(sublist);
+	    ui->Viewports[i].MapY=gh_scm2int(gh_car(sublist));
+	    ++i;
+	    list=gh_cdr(list);
+	} else {
+	    errl("Unsupported tag",value);
+	}
+    }
+    ui->NumViewports=i;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Enable/disable scrolling with the mouse.
 **
 **	@param flag	True = turn on, false = off.
@@ -3393,6 +3429,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-game-cursor!",CclSetGameCursor);
     gh_new_procedureN("define-ui",CclDefineUI);
     gh_new_procedureN("define-new-ui",CclDefineNewUI);
+    gh_new_procedureN("define-viewports",CclDefineViewports);
 
     gh_new_procedure1_0("set-grab-mouse!", CclSetGrabMouse);
     gh_new_procedure1_0("set-leave-stops!", CclSetLeaveStops);
