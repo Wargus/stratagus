@@ -135,6 +135,11 @@ $(DEBUG)
     longer needed. This script converts the data on CD into our own format.
     <BR>
     A: You didn't need to copy, the installation did it for you.
+<DT>Q: The game becomes very slow under X11.
+<DD>A: Give your X11 server a higher priority than the clients.<P>
+    renice <pid-of-your-x11-server><P>
+    or start freecraft with<P>
+    nice -n 5 ./freecraft
 
 </DL>
 
