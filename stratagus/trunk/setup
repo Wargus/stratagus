@@ -619,6 +619,10 @@ case $CDMode in
     USE_SDLCD=1
     USE_LIBCDA=0
     echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
+    if [ "$USESDL" != "1" ]; then
+    echo "SDLCD	= $SDLCD \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
+    echo "CLONELIBS	= \$(shell $SDL_CONFIG --libs)" >> $RULESFILE
+    fi
     echo >> $RULESFILE
     ;;
   [iI])
@@ -781,7 +785,7 @@ if [ "$BEOS" != 1 ] ; then
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz -lm \$(THREADLIB)" >> $RULESFILE
 
     # Libraries needed to build freecraft
-    echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
+    echo "CLONELIBS=$(CLONELIBS) \$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
     echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS) \\" >> $RULESFILE
     echo "	\$(FLACLIB) \$(OGGLIB) \$(MP3LIB) -lz -lm" >> $RULESFILE
   else
