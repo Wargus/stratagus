@@ -1561,7 +1561,7 @@ settings.
 
 <H4>Description</H4>
 
-.
+Show unit orders.
 
 <H4>Syntax</H4>
 
@@ -1569,7 +1569,8 @@ settings.
 
 <DL>
 <DT>show</DT>
-<DD>.
+<DD>Use #t to always show unit orders, #f to never show orders.  Or use a
+number to specify the number of seconds an order should be shown.
 </DD>
 </DL>
 
@@ -1577,9 +1578,11 @@ settings.
 
 <PRE>
     (set-show-orders! #f)
+    (set-show-orders! 2)
 </PRE>
 
-<P>.
+<P>The first example never shows unit orders.  The second example only shows
+orders for 2 seconds.
 
 <H4>Used</H4>
 

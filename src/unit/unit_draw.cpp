@@ -64,7 +64,7 @@ global int ShowSightRange;		/// Flag: show right range
 global int ShowReactionRange;		/// Flag: show reaction range
 global int ShowAttackRange;		/// Flag: show attack range
 global int ShowOrders;			/// Flag: show orders of unit on map
-global int ShowOrdersCount;		/// Show orders for some time
+global unsigned long ShowOrdersCount;	/// Show orders for some time
     /// Flag: health horizontal instead of vertical
 global int ShowHealthHorizontal;
     /// Flag: health horizontal instead of vertical
@@ -1608,8 +1608,8 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
     //
     //	Show order.
     //
-    if( ShowOrders || (unit->Selected
-	    && (ShowOrdersCount ||(KeyModifiers&ModifierShift))) ) {
+    if( ShowOrders==SHOW_ORDERS_ALWAYS || (unit->Selected
+	    && (ShowOrdersCount>=GameCycle ||(KeyModifiers&ModifierShift))) ) {
 	ShowOrder(unit);
     }
 

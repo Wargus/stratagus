@@ -3231,7 +3231,14 @@ local SCM CclSetShowOrders(SCM flag)
     int old;
 
     old=!ShowOrders;
-    ShowOrders=gh_scm2bool(flag);
+    if( gh_boolean_p(flag) ) {
+	ShowOrders=gh_scm2bool(flag);
+	if( ShowOrders ) {
+	    ShowOrders=SHOW_ORDERS_ALWAYS;
+	}
+    } else {
+	ShowOrders=gh_scm2int(flag);
+    }
 
     return gh_bool2scm(old);
 }
