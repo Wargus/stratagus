@@ -1171,6 +1171,7 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 				unit->CurrentSightRange = dst->Stats[player->Player].SightRange;
 				MapMarkUnitSight(unit);
 			}
+			player->UnitTypesCount[dst->Slot]++;
 
 			CheckUnitToBeDrawn(unit);
 		//
