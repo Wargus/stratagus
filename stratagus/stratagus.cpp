@@ -1405,7 +1405,7 @@ global int main(int argc,char** argv)
     //	Setup some defaults.
     //
 #ifndef __APPLE__
-    FreeCraftLibPath=FREECRAFT_LIB_PATH;
+    FreeCraftLibPath=STRATAGUS_LIB_PATH;
 #endif
     CclStartFile="ccl/freecraft.ccl";
     EditorStartFile="ccl/editor.ccl";

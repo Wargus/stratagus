@@ -516,10 +516,10 @@ local SCM CclGetFreeCraftHomePath(void)
     char* buf;
 
     cp=getenv("HOME");
-    buf=alloca(strlen(cp)+strlen(GameName)+sizeof(FREECRAFT_HOME_PATH)+3);
+    buf=alloca(strlen(cp)+strlen(GameName)+sizeof(STRATAGUS_HOME_PATH)+3);
     strcpy(buf,cp);
     strcat(buf,"/");
-    strcat(buf,FREECRAFT_HOME_PATH);
+    strcat(buf,STRATAGUS_HOME_PATH);
     strcat(buf,"/");
     strcat(buf,GameName);
 
@@ -531,7 +531,7 @@ local SCM CclGetFreeCraftHomePath(void)
 */
 local SCM CclGetFreeCraftLibraryPath(void)
 {
-    return gh_str02scm(FREECRAFT_LIB_PATH);
+    return gh_str02scm(STRATAGUS_LIB_PATH);
 }
 
 /*............................................................................
@@ -802,7 +802,7 @@ local void LoadPreferences1(void)
 #ifdef USE_WIN32
     strcpy(buf,"preferences1.ccl");
 #else
-    sprintf(buf,"%s/%s/preferences1.ccl",getenv("HOME"),FREECRAFT_HOME_PATH);
+    sprintf(buf,"%s/%s/preferences1.ccl",getenv("HOME"),STRATAGUS_HOME_PATH);
 #endif
 
     fd=fopen(buf,"r");
@@ -823,7 +823,7 @@ local void LoadPreferences2(void)
 #ifdef USE_WIN32
     sprintf(buf,"%s/preferences2.ccl",GameName);
 #else
-    sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH,GameName);
+    sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),STRATAGUS_HOME_PATH,GameName);
 #endif
 
     fd=fopen(buf,"r");
@@ -849,7 +849,7 @@ global void SavePreferences(void)
 #ifdef USE_WIN32
     strcpy(buf,"preferences1.ccl");
 #else
-    sprintf(buf,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
+    sprintf(buf,"%s/%s",getenv("HOME"),STRATAGUS_HOME_PATH);
     mkdir(buf,0777);
     strcat(buf,"/preferences1.ccl");
 #endif
@@ -875,7 +875,7 @@ global void SavePreferences(void)
 #ifdef USE_WIN32
     sprintf(buf,"%s/preferences2.ccl",GameName);
 #else
-    sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH,GameName);
+    sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),STRATAGUS_HOME_PATH,GameName);
 #endif
 
     fd=fopen(buf,"w");
