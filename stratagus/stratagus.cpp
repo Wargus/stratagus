@@ -212,13 +212,6 @@ global int SpeedTrain=SPEED_TRAIN;	/// speed factor for training
 global int SpeedUpgrade=SPEED_UPGRADE;	/// speed factor for upgrading
 global int SpeedResearch=SPEED_RESEARCH;/// speed factor for researching
 
-/*--------------------------------------------------------------
-	Scroll Speeds
---------------------------------------------------------------*/
-
-global int SpeedKeyScroll=KEY_SCROLL_SPEED;
-global int SpeedMouseScroll=MOUSE_SCROLL_SPEED;
-
 /*============================================================================
 ==	DISPLAY
 ============================================================================*/
@@ -496,10 +489,11 @@ Use it at your own risk.\n\n");
     InitUnitTypes();
 
     //
-    //  Inital menues require some gfx..
+    //  Inital menues require some gfx.
     //
+    // FIXME: must search tileset by identifier or use a gui palette?
     LoadRGB(GlobalPalette, s=strdcat3(FreeCraftLibPath,
-	    "/",Tilesets[TilesetSummer].PaletteFile));
+	    "/graphics/",Tilesets[TilesetSummer]->PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
     LoadFonts();
