@@ -138,7 +138,7 @@ static int MoveToResource(Unit* unit)
 	}
 }
 
-/*
+/**
 **  Start harvesting the resource.
 **
 **  @param unit  Pointer to unit.
@@ -251,7 +251,7 @@ static void AnimateActionHarvest(Unit* unit)
 	UnitShowNewAnimation(unit, unit->Type->NewAnimations->Harvest[unit->CurrentResource]);
 }
 
-/*
+/**
 **  Find something else to do when the resource is exhausted.
 **  This is called from GatherResorce when the resource is empty.
 **
