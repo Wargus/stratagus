@@ -360,7 +360,7 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
     if (i >= TheMap.Tileset->NumTiles) {
 	char *marks;
 
-	DebugLevel0Fn("No good mix found\n");
+	DebugLevel3Fn("No good mix found\n");
 	//
 	//      Find the best tile path.
 	//
@@ -472,7 +472,7 @@ local void EditorTileChanged2(int x, int y, int d)
     MapField* mf;
 
     quad = QuadFromTile(x, y);
-    DebugLevel2Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
+    DebugLevel3Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
 	    TheMap.Fields[y * TheMap.Width + x].Tile);
 
     //
@@ -504,9 +504,9 @@ local void EditorTileChanged2(int x, int y, int d)
 	q2 = QuadFromTile(x, y - 1);
 	u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 	if (u != q2) {
-	    DebugLevel2Fn("U+    %08x -> %08x\n" _C_ q2 _C_ u);
+	    DebugLevel3Fn("U+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & BH_QUAD_M, u);
-	    DebugLevel2Fn("= %08x\n" _C_ tile);
+	    DebugLevel3Fn("= %08x\n" _C_ tile);
 	    EditorChangeTile(x, y - 1, tile, d&~D_DOWN);
 	}
     }
@@ -517,7 +517,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	q2 = QuadFromTile(x, y + 1);
 	u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 	if (u != q2) {
-	    DebugLevel2Fn("D+    %08x -> %08x\n" _C_ q2 _C_ u);
+	    DebugLevel3Fn("D+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & TH_QUAD_M, u);
 	    EditorChangeTile(x, y + 1, tile, d&~D_UP);
 	}
@@ -529,7 +529,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	q2 = QuadFromTile(x - 1, y);
 	u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 	if (u != q2) {
-	    DebugLevel2Fn("L+    %08x -> %08x\n" _C_ q2 _C_ u);
+	    DebugLevel3Fn("L+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & RH_QUAD_M, u);
 	    EditorChangeTile(x - 1, y, tile, d&~D_RIGHT);
 	}
@@ -541,7 +541,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	q2 = QuadFromTile(x + 1, y);
 	u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 	if (u != q2) {
-	    DebugLevel2Fn("R+    %08x -> %08x\n" _C_ q2 _C_ u);
+	    DebugLevel3Fn("R+    %08x -> %08x\n" _C_ q2 _C_ u);
 	    tile = TileFromQuad(u & LH_QUAD_M, u);
 	    EditorChangeTile(x + 1, y, tile, d&~D_LEFT);
 	}
