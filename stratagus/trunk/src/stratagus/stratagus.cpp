@@ -562,10 +562,13 @@ global int main(int argc,char** argv)
     //	Setup some defaults.
     //
     FreeCraftLibPath=FREECRAFT_LIB_PATH;
+#ifdef NEW_NAMES
+    TitleScreen=strdup("graphics/ui/title.png");
+#else
     TitleScreen=strdup("graphic/title.png");
-    // FreeCraftLibPath prefixed after it's been decided properly for the next two
+#endif
 #if defined(USE_CCL) || defined(USE_CCL2)
-    CclStartFile="ccl/clone.ccl";
+    CclStartFile="ccl/freecraft.ccl";
     MapName="default.cm";
 #else
     MapName="default.pud";	// .gz/.bz2 automatically appended as needed.

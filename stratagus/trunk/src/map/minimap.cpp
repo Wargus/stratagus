@@ -483,7 +483,7 @@ global void HideMinimapCursor(void)
 	    dp+=VideoWidth;
 	}
 	memcpy(dp,sp,(w+1)*sizeof(VMemType24)); }
-	// FIXME: real 24bpp break;
+	break;
     case 32:
 	{ VMemType32* sp;
 	  VMemType32* dp;
@@ -530,7 +530,7 @@ global void DrawMinimapCursor(int vx,int vy)
 	    break;
 	case 24:
 	    i=(w+1+h)*2*sizeof(VMemType24);
-	    // FIXME: real 24bpp
+	    break;
 	default:
 	case 32:
 	    i=(w+1+h)*2*sizeof(VMemType32);
@@ -589,7 +589,7 @@ global void DrawMinimapCursor(int vx,int vy)
 	    sp+=VideoWidth;
 	}
 	memcpy(dp,sp,(w+1)*sizeof(VMemType24));
-	// FIXME: real 24bpp break;
+	break;
 	}
     case 32:
 	{ VMemType32* sp;

@@ -609,7 +609,7 @@ global void LoadFonts(void)
 
 	case 24:
 	    VideoDrawChar=VideoDrawChar24;
-	    // FIXME: real 24bpp break;
+	    break;
 
 	case 32:
 	    VideoDrawChar=VideoDrawChar32;

@@ -553,8 +553,7 @@ global void InitGraphic(void)
 	case 24:
 	    GraphicImage8Type.DrawSub=VideoDrawSub8to24;
 	    GraphicImage8Type.DrawSubClip=VideoDrawSub8to24Clip;
-	    // FIXME: how detect real 24?
-	    // break;
+	    break;
 
 	case 32:
 	    GraphicImage8Type.DrawSub=VideoDrawSub8to32;

@@ -741,7 +741,7 @@ global void InitCursor(void)
 	case 24:
 	    SaveCursorBackground=SaveCursorBackground24;
 	    LoadCursorBackground=LoadCursorBackground24;
-	    // FIXME: real 24bpp break;
+	    break;
 	case 32:
 	    SaveCursorBackground=SaveCursorBackground32;
 	    LoadCursorBackground=LoadCursorBackground32;
