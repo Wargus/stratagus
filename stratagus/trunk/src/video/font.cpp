@@ -154,6 +154,9 @@ local void VideoDrawChar(const Graphic* sprite,
 
 	glDisable(GL_TEXTURE_2D);
 
+	if (y + h >= VideoHeight) {
+		h = VideoHeight - y - 1;
+	}
 	for (i = 0; i < NumFontColors; ++i) {
 		c = FontColor->Color + i;
 		glColor3ub(c->r, c->g, c->b);
@@ -453,6 +456,30 @@ global int VideoDrawReverseText(int x, int y, unsigned font,
 }
 
 /**
+**  Draw reverse text with font at x,y clipped.
+**
+**  @see VideoDrawText for full description.
+**
+**  @param x     X screen position
+**  @param y     Y screen position
+**  @param font  Font number
+**  @param text  Text to be displayed.
+**
+**  @return      The length of the printed text.
+*/
+global int VideoDrawReverseTextClip(int x, int y, unsigned font,
+	const unsigned char* text)
+{
+	int w;
+
+	FontColor = ReverseTextColor;
+	w = VideoDrawTextClip(x, y, font, text);
+	FontColor = DefaultTextColor;
+
+	return w;
+}
+
+/**
 **  Draw text with font at x,y centered.
 **
 **  @see VideoDrawText for full description.
@@ -476,6 +503,30 @@ global int VideoDrawTextCentered(int x, int y, unsigned font,
 }
 
 /**
+**  Format a number using commas
+**
+**  @param number  Number to be formatted
+**  @param buf     Buffer to save the formatted number to
+*/
+local void FormatNumber(int number, char* buf)
+{
+	char bufs[sizeof(int) * 10 + 2];
+	int sl;
+	int s;
+	int d;
+
+	sl = s = d = 0;
+	sprintf(bufs, "%d", number);
+	sl = strlen(bufs);
+	do {
+		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
+			buf[d++] = ',';
+		}
+		buf[d++] = bufs[s++];
+	} while (s <= sl);
+}
+
+/**
 **  Draw number with font at x,y unclipped.
 **
 **  @param x       X screen position
@@ -487,22 +538,10 @@ global int VideoDrawTextCentered(int x, int y, unsigned font,
 */
 global int VideoDrawNumber(int x, int y, unsigned font, int number)
 {
-	char bufs[sizeof(int) * 10 + 2];
-	char bufd[sizeof(int) * 10 + 2];
-	int sl;
-	int s;
-	int d;
+	char buf[sizeof(int) * 10 + 2];
 
-	sl = s = d = 0;
-	sprintf(bufs, "%d", number);
-	sl = strlen(bufs);
-	do {
-		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
-			bufd[d++] = ',';
-		}
-		bufd[d++] = bufs[s++];
-	} while (s <= sl);
-	return VideoDrawText(x, y, font, bufd);
+	FormatNumber(number, buf);
+	return VideoDrawText(x, y, font, buf);
 }
 
 /**
@@ -519,7 +558,7 @@ global int VideoDrawNumberClip(int x, int y, unsigned font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
-	sprintf(buf, "%d", number);
+	FormatNumber(number, buf);
 	return VideoDrawTextClip(x, y, font, buf);
 }
 
@@ -537,10 +576,31 @@ global int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
-	sprintf(buf, "%d", number);
+	FormatNumber(number, buf);
 	return VideoDrawReverseText(x, y, font, buf);
 }
 
+/**
+**  Draw reverse number with font at x,y clipped.
+**
+**  @param x       X screen position
+**  @param y       Y screen position
+**  @param font    Font number
+**  @param number  Number to be displayed.
+**
+**  @return        The length of the printed text.
+*/
+global int VideoDrawReverseNumberClip(int x, int y, unsigned font, int number)
+{
+	char buf[sizeof(int) * 10 + 2];
+
+	FormatNumber(number, buf);
+	return VideoDrawReverseTextClip(x, y, font, buf);
+}
+
+/**
+**  FIXME: docu
+*/
 local void FontMeasureWidths(ColorFont* fp)
 {
 	// FIXME: todo.. can this be optimized?
