@@ -387,6 +387,7 @@ global int main1(int argc __attribute__ ((unused)),
     LoadFonts();
 
     // All pre-start menues are orcish - may need to be switched later..
+    SetDefaultTextColors(FontYellow,FontWhite);
     InitMenus(1);
     LoadImages(1);
     LoadCursors(1);
