@@ -177,10 +177,6 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 	Show command line help.
     <LI>-l<BR>
 	Enable command log to <VAR>"command.log"</VAR>
-    <LI>-p players<BR>
-	<B>Currently not supported!</B>
-	Number of network <VAR>players</VAR> to connect. This computer be
-	comes the game server.
     <LI>-n [localport:]serverhost[:port]<BR>
 	Connect to FreeCraft server <VAR>serverhost</VAR>.
 	<VAR>serverhost</VAR> is the name of the server like "freecraft.org"
@@ -196,18 +192,20 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 	The AI sleeps 'frames' before it starts working.
     <LI>-t factor<BR>
 	Adjust the build time of units for the computer players by factor.
+    <LI>-v mode<BR>
+	Video mode (0=default, 1=640x480, 2=800x600, 3=1024x768, 4=1600x1200)
     <LI>-w<BR>
 	Wait until sound device comes available. (Only supported with linux OSS
 	driver)
     <LI>-D<BR>
 	Video depth = pixel pro point. Only useful if not automatic
 	detected.
+    <LI>-F<BR>
+	Full-screen video-mode. (Not supported on all platforms, just test)
     <LI>-S speed<BR>
 	Want to play slower? Use for 50 to play with half speed. Want to play
 	faster? Use 200 to play at double speed. (default is 100% which are
 	30 frames/second)
-    <LI>-F<BR>
-	Full-screen video-mode. (Not supported on all platforms, just test)
     <LI>-W<BR>
 	Windowed video-mode.
     </UL>
