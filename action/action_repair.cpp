@@ -74,9 +74,12 @@ local void RepairUnit(Unit* unit,Unit* goal)
     //
     //	Calculate the repair points
     //
+#if 0
     hp=((goal->Stats->Costs[TimeCost]*GIVES_HP*FRAMES_PER_SECOND/6)
 	    /goal->Stats->HitPoints)*MUL;
-    DebugLevel3Fn("hitpoints %d\n",hp);
+#endif
+    hp=GIVES_HP*MUL;
+    DebugLevel2Fn("hitpoints %d\n",hp);
 
     //
     //	Calculate the repair costs.
