@@ -792,14 +792,15 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	    CommandTrainUnit(unit,UnitTypes+dstnr,status);
 	    break;
 	case MessageCommandCancelTrain:
+	    // We need (short)x for the last slot -1
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,
 			UnitTypes[dstnr].Ident,x);
-		CommandCancelTraining(unit,x,UnitTypes+dstnr);
+		CommandCancelTraining(unit,(short)x,UnitTypes+dstnr);
 	    } else {
 		CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,
 			NULL,x);
-		CommandCancelTraining(unit,x,NULL);
+		CommandCancelTraining(unit,(short)x,NULL);
 	    }
 	    break;
 	case MessageCommandUpgrade:
