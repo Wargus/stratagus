@@ -729,7 +729,7 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
 	    background->Width,background->Height,
 	    (VideoWidth-background->Width)/2,
 	    (VideoHeight-background->Height)/2,
-	    256*i/maxi);
+	    255*i/maxi);
 	DrawTitle(act,title);
 	VideoUnlockScreen();
 
@@ -768,7 +768,7 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
 		background->Width,background->Height,
 		(VideoWidth-background->Width)/2,
 		(VideoHeight-background->Height)/2,
-		256*i/maxi);
+		255*i/maxi);
 	    DrawTitle(act,title);
 	    VideoUnlockScreen();
 
