@@ -3496,22 +3496,27 @@ global void NetClientUpdateState(void)
 --	Menu operation functions
 ----------------------------------------------------------------------------*/
 
-
 /**
 **	Handle keys in menu mode.
 **
 **	@param key	Key scancode.
+**	@param keychar	ASCII character code of key.
+**
 **	@return		True, if key is handled; otherwise false.
+**
+**	@todo FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
+**      to implement button animation (depress before action)
 */
-global int MenuHandleKeyboard(int key, int keychar)		// FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
-{					//        to implement button animation (depress before action)
+global int MenuHandleKeyboard(int key, int keychar)
+{
     int i, n;
     Menuitem *mi;
-    Menu *menu = Menus + CurrentMenu;
+    Menu *menu;
 
     if (CurrentMenu < 0) {
 	return 0;
     }
+    menu = Menus + CurrentMenu;
 
     if (MenuButtonCurSel != -1 && menu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
 	mi = menu->items + MenuButtonCurSel;

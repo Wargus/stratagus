@@ -265,7 +265,7 @@ local void FreeTextLines(TextLines** lines)
 **	@param w	width of text area
 **	@param h	height of text area
 **	@param i	scroll index.
-**	@param text	Text to display.
+**	@param lines	Lines of the text to display.
 **
 **	@return		1 if there is more to scroll, 0 if it is done
 */
