@@ -2283,11 +2283,13 @@ global int CanBuildOn(int x,int y,int mask)
 /**
 **	Can build unit-type on this point.
 **
-**	@param unit	Worker that want to build the building.
+**	@param unit	Worker that want to build the building or NULL.
 **	@param type	Building unit-type.
 **	@param x	X tile map position.
 **	@param y	Y tile map position.
 **	@return		True if the building could be build..
+**
+**	@todo can't handle building units !1x1
 */
 global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 {
@@ -2299,9 +2301,12 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
     //
     //	Remove unit that is building!
     //
-    j=UnitFieldFlags(unit);
-    // This only works with 1x1 big units
-    TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags&=~j;
+    IfDebug( j=0; );
+    if( unit ) {
+	j=UnitFieldFlags(unit);
+	// FIXME: This only works with 1x1 big units
+	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags&=~j;
+    }
 
     // FIXME: Should be moved into unittype structure, and allow more types.
     if( type->ShoreBuilding ) {
@@ -2343,12 +2348,16 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
     for( h=type->TileHeight; h--; ) {
 	for( w=type->TileWidth; w--; ) {
 	    if( !CanBuildOn(x+w,y+h,mask) ) {
-		TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+		if( unit ) {
+		    TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+		}
 		return 0;
 	    }
 	}
     }
-    TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+    if( unit ) {
+	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+    }
 
     //
     //	We can build here: check distance to gold mine/oil patch!
