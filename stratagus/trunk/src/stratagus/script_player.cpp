@@ -365,6 +365,16 @@ local SCM CclDefineRaceWcNames(SCM list)
     return SCM_UNSPECIFIED;
 }
 
+/**
+**	Make new player colors
+*/
+local SCM CclNewPlayerColors(void)
+{
+    SetPlayersPalette();
+
+    return SCM_UNSPECIFIED;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -385,6 +395,8 @@ global void PlayerCclRegister(void)
     gh_new_procedure2_0("diplomacy",CclDiplomacy);
 
     gh_new_procedureN("define-race-wc-names",CclDefineRaceWcNames);
+
+    gh_new_procedure0_0("new-colors",CclNewPlayerColors);
 }
 
 //@}
