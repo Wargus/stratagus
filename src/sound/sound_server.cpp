@@ -67,12 +67,7 @@
 --		Defines
 ----------------------------------------------------------------------------*/
 
-//#define SoundSampleSize		8				/// sample size of dsp in bit
-#define SoundSampleSize		16				// sample size of dsp in bit
-#define SoundFrequency		44100				// sample rate of dsp
-//#define SoundFrequency		22050				// sample rate of dsp
-//#define SoundFrequency		11025				/// sample rate of dsp
-#define SoundDeviceName		"/dev/dsp"		/// dsp device
+#define SoundDeviceName  "/dev/dsp"  /// dsp device
 
 /*----------------------------------------------------------------------------
 --		Variables
@@ -612,32 +607,6 @@ static int MixChannelsToStereo32(int* buffer,int size)
 	return new_free_channels;
 }
 
-#if SoundSampleSize == 8
-/**
-**		Clip mix to output stereo 8 unsigned bit.
-**
-**		@param mix		signed 32 bit input.
-**		@param size		number of samples in input.
-**		@param output		clipped 8 unsigned bit output buffer.
-*/
-static void ClipMixToStereo8(const int* mix, int size, unsigned char* output)
-{
-	int s;
-
-	while (size--) {
-		s = (*mix++) / 256;
-		if (s > 127) {
-			*output++ = 255;
-		} else if (s < -127) {
-			*output++ = 0;
-		} else {
-			*output++ = s + 127;
-		}
-	}
-}
-#endif
-
-#if SoundSampleSize == 16
 /**
 **		Clip mix to output stereo 16 signed bit.
 **
@@ -662,7 +631,6 @@ static void ClipMixToStereo16(const int* mix, int size, short* output)
 		}
 	}
 }
-#endif
 
 /*----------------------------------------------------------------------------
 --		Other
@@ -832,12 +800,7 @@ void MixIntoBuffer(void* buffer, int samples)
 	// Add music to mixer buffer
 	MixMusicToStereo32(mixer_buffer, samples);
 
-#if SoundSampleSize == 8
-	ClipMixToStereo8(mixer_buffer, samples, buffer);
-#endif
-#if SoundSampleSize == 16
 	ClipMixToStereo16(mixer_buffer, samples, buffer);
-#endif
 }
 
 /**
@@ -851,9 +814,7 @@ void MixIntoBuffer(void* buffer, int samples)
 */
 void FillAudio(void* udata __attribute__((unused)), Uint8* stream, int len)
 {
-#if SoundSampleSize == 16
 	len >>= 1;
-#endif
 	MixIntoBuffer(stream, len);
 }
 
@@ -870,7 +831,7 @@ int InitSound(void)
 	//
 	//		Open sound device, 8bit samples, stereo.
 	//
-	if (InitSdlSound(SoundDeviceName, SoundFrequency, SoundSampleSize,
+	if (InitSdlSound(SoundDeviceName, 44100, 16,
 			WaitForSoundDevice)) {
 		return 1;
 	}
