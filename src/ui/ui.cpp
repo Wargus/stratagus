@@ -508,24 +508,58 @@ local void SaveUi(CLFile* file, const UI* ui)
     CLprintf(file, "\n    'size '(%d %d)",
 	ui->MapArea.EndX - ui->MapArea.X + 1,
 	ui->MapArea.EndY - ui->MapArea.Y + 1);
-    CLprintf(file, ")\n\n");
+    CLprintf(file, ")\n");
 
-    CLprintf(file, "  ; Menu button background\n");
-    CLprintf(file, "  'menu-panel (list \"%s\" %d %d)\n",
-	ui->MenuPanel.File, ui->MenuPanelX,
-	ui->MenuPanelY);
+    CLprintf(file, "\n  'menu-panel (list\n");
+    CLprintf(file, "\n    'panel (list");
+    CLprintf(file, "\n      'file \"%s\"", ui->MenuPanel.File);
+    CLprintf(file, "\n      'pos '(%d %d)",
+	ui->MenuPanelX, ui->MenuPanelY);
+    CLprintf(file, ")");
+    CLprintf(file, "\n    'menu-button '(");
+    CLprintf(file, "\n      pos (%d %d)",
+	ui->MenuButton.X, ui->MenuButton.Y);
+    CLprintf(file, "\n      size (%d %d)",
+	ui->MenuButton.Width, ui->MenuButton.Height);
+    CLprintf(file, "\n      caption \"%s\"",
+	ui->MenuButton.Text);
+    CLprintf(file, "\n      style %s",
+	MenuButtonStyle(ui->MenuButton.Button));
+    CLprintf(file, ")");
+    CLprintf(file, "\n    'network-menu-button '(");
+    CLprintf(file, "\n      pos (%d %d)",
+	ui->NetworkMenuButton.X, ui->NetworkMenuButton.Y);
+    CLprintf(file, "\n      size (%d %d)",
+	ui->NetworkMenuButton.Width, ui->NetworkMenuButton.Height);
+    CLprintf(file, "\n      caption \"%s\"",
+	ui->NetworkMenuButton.Text);
+    CLprintf(file, "\n      style %s",
+	MenuButtonStyle(ui->NetworkMenuButton.Button));
+    CLprintf(file, ")");
+    CLprintf(file, "\n    'network-diplomacy-button '(");
+    CLprintf(file, "\n      pos (%d %d)",
+	ui->NetworkDiplomacyButton.X, ui->NetworkDiplomacyButton.Y);
+    CLprintf(file, "\n      size (%d %d)",
+	ui->NetworkDiplomacyButton.Width, ui->NetworkDiplomacyButton.Height);
+    CLprintf(file, "\n      caption \"%s\"",
+	ui->NetworkDiplomacyButton.Text);
+    CLprintf(file, "\n      style %s",
+	MenuButtonStyle(ui->NetworkDiplomacyButton.Button));
+    CLprintf(file, ")");
+    CLprintf(file, ")\n");
 
-    CLprintf(file, "  'minimap (list\n");
-    CLprintf(file, "    'file \"%s\"\n", ui->MinimapPanel.File);
+    CLprintf(file, "\n  'minimap (list");
+    CLprintf(file, "\n    'file \"%s\"", ui->MinimapPanel.File);
     if (ui->MinimapTransparent) {
-	CLprintf(file, "    'transparent\n");
+	CLprintf(file, "\n    'transparent");
     }
-    CLprintf(file, "    'panel-pos '(%d %d)\n",
+    CLprintf(file, "\n    'panel-pos '(%d %d)",
 	ui->MinimapPanelX, ui->MinimapPanelY);
-    CLprintf(file, "    'pos '(%d %d)\n",
+    CLprintf(file, "\n    'pos '(%d %d)",
 	ui->MinimapPosX, ui->MinimapPosY);
-    CLprintf(file, "    'size '(%d %d))\n",
+    CLprintf(file, "\n    'size '(%d %d)",
 	ui->MinimapW, ui->MinimapH);
+    CLprintf(file, ")\n");
 
     CLprintf(file, "\n  'status-line '(");
     CLprintf(file, "\n    file \"%s\"",ui->StatusLine.File);
@@ -533,39 +567,6 @@ local void SaveUi(CLFile* file, const UI* ui)
     CLprintf(file, "\n    text-pos (%d %d)",
 	ui->StatusLineTextX, ui->StatusLineTextY);
     CLprintf(file, "\n    font %s",FontNames[ui->StatusLineFont]);
-    CLprintf(file, ")\n");
-
-    CLprintf(file, "\n  'menu-button '(");
-    CLprintf(file, "\n    pos (%d %d)",
-	ui->MenuButton.X, ui->MenuButton.Y);
-    CLprintf(file, "\n    size (%d %d)",
-	ui->MenuButton.Width, ui->MenuButton.Height);
-    CLprintf(file, "\n    caption \"%s\"",
-	ui->MenuButton.Text);
-    CLprintf(file, "\n    style %s",
-	MenuButtonStyle(ui->MenuButton.Button));
-    CLprintf(file, ")");
-
-    CLprintf(file, "\n  'network-menu-button '(");
-    CLprintf(file, "\n    pos (%d %d)",
-	ui->NetworkMenuButton.X, ui->NetworkMenuButton.Y);
-    CLprintf(file, "\n    size (%d %d)",
-	ui->NetworkMenuButton.Width, ui->NetworkMenuButton.Height);
-    CLprintf(file, "\n    caption \"%s\"",
-	ui->NetworkMenuButton.Text);
-    CLprintf(file, "\n    style %s",
-	MenuButtonStyle(ui->NetworkMenuButton.Button));
-    CLprintf(file, ")");
-
-    CLprintf(file, "\n  'network-diplomacy-button '(");
-    CLprintf(file, "\n    pos (%d %d)",
-	ui->NetworkDiplomacyButton.X, ui->NetworkDiplomacyButton.Y);
-    CLprintf(file, "\n    size (%d %d)",
-	ui->NetworkDiplomacyButton.Width, ui->NetworkDiplomacyButton.Height);
-    CLprintf(file, "\n    caption \"%s\"",
-	ui->NetworkDiplomacyButton.Text);
-    CLprintf(file, "\n    style %s",
-	MenuButtonStyle(ui->NetworkDiplomacyButton.Button));
     CLprintf(file, ")\n");
 
     CLprintf(file, "\n  'cursors '(");
