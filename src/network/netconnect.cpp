@@ -284,7 +284,7 @@ global void NetworkServerSetup(WorldMap *map)
       if(n>0) {
 	int chosen=MyRand()%n;
 
-	DebugLevel3Fn("Assigning player %i to slot %i\n", i, chosen);
+	DebugLevel2Fn("Assigning player %i to slot %i\n", i, chosen);
 	Hosts[i].PlyNr=num[chosen];
 	num[chosen]=num[n-1];
 	--n;
@@ -304,15 +304,16 @@ global void NetworkServerSetup(WorldMap *map)
 	message.u.Hosts[i].Host = Hosts[i].Host;
 	message.u.Hosts[i].Port = Hosts[i].Port;
 	memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
-	message.u.Hosts[i].PlyNr = htons(num[i]);
-	PlayerSetName(&Players[num[i]], Hosts[i].PlyName);
+	message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
+	PlayerSetName(&Players[Hosts[i].PlyNr], Hosts[i].PlyName);
     }
-    message.u.Hosts[i].Host = message.u.Hosts[i].Port = 0;	// marks the server
+    message.u.Hosts[i].Host = 0;
+    message.u.Hosts[i].Port = 0;	// marks the server
     memcpy(message.u.Hosts[i].PlyName, NetworkName, 16);
-    message.u.Hosts[i].PlyNr = htons(num[i]);
+    message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
 
-    DebugLevel3Fn("Player here %d\n", num[i]);
-    ThisPlayer = &Players[num[i]];
+    DebugLevel3Fn("Player here %d\n", Hosts[i].PlyNr);
+    ThisPlayer = &Players[Hosts[i].PlyNr];
     PlayerSetName(ThisPlayer, NetworkName);
 
     DebugLevel1Fn("Ready, sending InitConfig to %d host(s)\n", HostsCount);
