@@ -125,6 +125,8 @@ unsigned char *HighlevelPath (Unit *unit)
 	start_regid = MapFieldGetRegId (unit->X, unit->Y);
 	start_reg = RegionSetFind (start_regid);
 
+	printf ("start group: %d\n", start_reg->GroupId);
+
 	start_reg->Parent = NULL;
 	start_reg->g = 0;
 	start_reg->f = H (start_reg);	// f==g+h but g==0 here
@@ -244,6 +246,9 @@ local int CheckPotentialGoalField (int x, int y, int MovementMask)
 		Region *reg = RegionSetFind (regid);
 		if (reg->Passability & MovementMask)
 			return 0;
+
+		printf ("goal group: %d\n", reg->GroupId);
+
 		reg->Open = 0;
 		reg->Closed = 0;
 		reg->Goal = 1;

@@ -10,6 +10,7 @@
 
 #include "hierarchical.h"
 #include "region_set.h"
+#include "region_groups.h"
 #include "pf_highlevel.h"
 #include "pf_lowlevel.h"
 
@@ -36,6 +37,7 @@ int PfHierInitialize (void)
 		Config.Area.Width = Config.Area.Height = 16;
 
 	RegionSetInitialize ();
+	RegGroupSetInitialize ();
 	HighlevelInit ();
 	LowlevelInit ();
 	/* FIXME should return something useful */
