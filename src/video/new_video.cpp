@@ -29,6 +29,7 @@
 
 #include "map.h"
 #include "ui.h"
+#include "cursor.h"
 
 #ifdef USE_SDL
 #include <SDL/SDL.h>
@@ -81,17 +82,57 @@ extern void InitVideoWin32(void);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global int VideoFullScreen;		/// true fullscreen wanted
+global char VideoFullScreen;		/// true fullscreen wanted
+
+#ifdef NEW_VIDEO
+
+global int ClipX1;			/// current clipping top left
+global int ClipY1;			/// current clipping top left
+global int ClipX2;			/// current clipping bottom right
+global int ClipY2;			/// current clipping bottom right
+
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#ifdef NEW_VIDEO
+/**
+**	Set clipping for graphic routines.
+**
+**	@param left	Left X screen coordinate.
+**	@param top	Top Y screen coordinate.
+**	@param right	Right X screen coordinate.
+**	@param bottom	Bottom Y screen coordinate.
+*/
+global void SetClipping(int left,int top,int right,int bottom)
+{
+    if( left>right ) { left^=right; right^=left; left^=right; }
+    if( top>bottom ) { top^=bottom; bottom^=top; top^=bottom; }
+    
+    if( left<0 )    left=0;
+    if( top<0 )	    top=0;
+    if( right<0 )   right=0;
+    if( bottom<0 )  bottom=0;
+
+    if( left>=VideoWidth )	left=VideoWidth-1;
+    if( right>=VideoWidth )	right=VideoWidth-1;
+    if( bottom>=VideoHeight ) bottom=VideoHeight-1;
+    if( top>=VideoHeight )	top=VideoHeight-1;
+    
+    ClipX1=left;
+    ClipY1=top;
+    ClipX2=right;
+    ClipY2=bottom;
+}
+#endif
+
 /**
 **	Load a picture and display it on the screen (full screen),
 **	changing the colormap and so on..
 **
-**	@param name name of the picture (file) to display
+**	@param name	Name of the picture (file) to display.
 */
 global void DisplayPicture(const char *name)
 {
@@ -101,10 +142,11 @@ global void DisplayPicture(const char *name)
     VideoSetPalette(title->Pixels);
 
 #ifdef USE_SDL
+    // FIXME: should be moved to system/hardware dependend part
     { extern SDL_Surface *Screen;		/// internal screen
     SDL_LockSurface(Screen);
 
-    DebugCheck( VideoMemory!=Screen->pixels );
+    VideoMemory=Screen->pixels;
 #endif
 
     // FIXME: bigger window ?
@@ -113,6 +155,7 @@ global void DisplayPicture(const char *name)
 	,(VideoWidth-title->Width)/2,(VideoHeight-title->Height)/2);
 
 #ifdef USE_SDL
+    // FIXME: should be moved to system/hardware dependend part
     SDL_UnlockSurface(Screen); }
 #endif
     VideoFree(title);
@@ -141,9 +184,12 @@ global void InitVideo(void)
     //
     InitGraphic();
     InitLineDraw();
+#ifdef NEW_VIDEO
+    InitSprite();
+    InitCursor();
+#endif
 
     DebugLevel3(__FUNCTION__": %d %d\n",MapWidth,MapHeight);
-    fflush(stdout);
 }
 
 //@}
