@@ -1,11 +1,11 @@
 //   ___________		     _________		      _____  __
-//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
-//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//   \_	  _____/______	 ____	____ \_	  ___ \____________ _/ ____\/  |_
+//    |	   __) \_  __ \_/ __ \_/ __ \/	  \  \/\_  __ \__  \\	__\\   __\ 
+//    |	    \	|  | \/\  ___/\	 ___/\	   \____|  | \// __ \|	|   |  |
+//    \___  /	|__|	\___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
-//  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
+//  ______________________			     ______________________
+//			  T H E	  W A R	  B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name font.h		-	The font headerfile. */
@@ -62,61 +62,70 @@
 **
 **	ColorFont::Graphic
 **
-**              Contains the graphics of the font, loaded from ColorFont::File.
+**		Contains the graphics of the font, loaded from ColorFont::File.
+**		Only 7 colors are supported.
+**		@li #0	 is background color
+**		@li #1	 is the light font color
+**		@li #2	 is the middle = main font color
+**		@li #3	 is the dark font color
+**		@li #4	 is the font/shadow antialias color
+**		@li #5	 is the dark shadow color
+**		@li #6	 is the light shadow color
+**		@li #255 is transparent
 */
 
 /*----------------------------------------------------------------------------
 --	Definitions
 ----------------------------------------------------------------------------*/
 
-    ///	Color font definition
+    /// Color font definition
 typedef struct _color_font_ {
-    char*	File;			/// file containing font data
+    char*	File;			/// File containing font data
 
-    int		Width;			/// max width of characters in file
-    int		Height;			/// max height of characters in file
+    int		Width;			/// Max width of characters in file
+    int		Height;			/// Max height of characters in file
 
-    char	CharWidth[208];		/// real font width (starting with ' ')
+    char	CharWidth[208];		/// Real font width (starting with ' ')
 
 // --- FILLED UP ---
 
-    Graphic*	Graphic;		/// graphic object used to draw
+    Graphic*	Graphic;		/// Graphic object used to draw
 } ColorFont;
 
 /**
 **	Font selector for the font functions.
 */
 enum _game_font_ {
-    SmallFont,				/// small font used in stats
-    GameFont,				/// normal font used in game
-    LargeFont,				/// large font used in menus
-    SmallTitleFont,			/// small font used in episoden titles
-    LargeTitleFont,			/// large font used in episoden titles
+    SmallFont,				/// Small font used in stats
+    GameFont,				/// Normal font used in game
+    LargeFont,				/// Large font used in menus
+    SmallTitleFont,			/// Small font used in episoden titles
+    LargeTitleFont,			/// Large font used in episoden titles
     // ... more to come or not
-    MaxFonts,				/// number of fonts supported
+    MaxFonts,				/// Number of fonts supported
 };
 
 /**
 **	Color selector for the font functions.
 */
 enum _font_color {
-    FontBlack,				/// black font color
-    FontRed,				/// red font color
-    FontGreen,				/// green font color
-    FontYellow,				/// yellow font color
-    FontBlue,				/// blue font color
-    FontMagenta,			/// magenta font color
-    FontCyan,				/// cyan font color
-    FontWhite,				/// white font color
-    FontBrightBlack,			/// bright black font color
-    FontGrey=FontBrightBlack,		/// grey font color
-    FontBrightRed,			/// bright red font color
-    FontBrightGreen,			/// bright green font color
-    FontBrightYellow,			/// bright yellow font color
-    FontBrightBlue,			/// bright blue font color
-    FontBrightMagenta,			/// bright magenta font color
-    FontBrightCyan,			/// bright cyan font color
-    FontBrightWhite,			/// bright white font color
+    FontBlack,				/// Black font color
+    FontRed,				/// Red font color
+    FontGreen,				/// Green font color
+    FontYellow,				/// Yellow font color
+    FontBlue,				/// Blue font color
+    FontMagenta,			/// Magenta font color
+    FontCyan,				/// Cyan font color
+    FontWhite,				/// White font color
+    FontBrightBlack,			/// Bright black font color
+    FontGrey=FontBrightBlack,		/// Grey font color
+    FontBrightRed,			/// Bright red font color
+    FontBrightGreen,			/// Bright green font color
+    FontBrightYellow,			/// Bright yellow font color
+    FontBrightBlue,			/// Bright blue font color
+    FontBrightMagenta,			/// Bright magenta font color
+    FontBrightCyan,			/// Bright cyan font color
+    FontBrightWhite,			/// Bright white font color
 };
 
 /*----------------------------------------------------------------------------
@@ -158,6 +167,8 @@ extern void LoadFonts(void);
 extern void FontsCclRegister(void);
     /// Cleanup the font module
 extern void CleanFonts(void);
+    /// Check if font is loaded
+extern int IsFontLoaded(unsigned font);
 
 //@}
 
