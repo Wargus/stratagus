@@ -248,6 +248,8 @@ extern int NumCDTracks;
 extern SDL_CD *CDRom;                   /// SDL cdrom device
 #endif
 
+extern Sample* MusicSample;		/// Music samples
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/

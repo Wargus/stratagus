@@ -30,8 +30,28 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "freecraft.h"
+#include "video.h"
+#include "network.h"
+#include "sound.h"
+#include "sound_server.h"
+#include "avi.h"
+#include "movie.h"
+
+#include "vfw_PB_Interface.h"
+#include "pbdll.h"
+extern void VPInitLibrary(void);
+extern void VPDeInitLibrary(void);
+
+#ifdef USE_SDL
+#include "SDL.h"
+#endif
+
+#ifdef USE_SDL				/// Only supported with SDL for now
+
+extern SDL_Surface *Screen;		/// internal screen
 
 /*----------------------------------------------------------------------------
 --	Defines
@@ -41,8 +61,260 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+local char MovieKeyPressed;		/// Flag key is pressed to stop
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	Open a movie file.
+**
+**	@param name	Filename of movie file.
+**
+**	@return		Avi file handle on success.
+*/
+global AviFile* MovieOpen(const char* name)
+{
+    AviFile* avi;
+    char buffer[PATH_MAX];
+
+    name = LibraryFileName(name, buffer);
+    if (!(avi = AviOpen(name))) {
+	return NULL;
+    }
+
+    return avi;
+}
+
+/**
+**	Close a movie file.
+**
+**	@param avi	Avi file handle.
+*/
+global void MovieClose(AviFile* avi)
+{
+    AviClose(avi);
+}
+
+/**
+**	Display the next movie frame.
+**
+**	@param avi	Avi file handle.
+**	@param pbi	VP3 decoder.
+**	@param overlay	Output overlay.
+**	@param rect	Destination rectangle.
+**
+**	@return		True if eof.
+*/
+global int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
+    SDL_Overlay* overlay, SDL_Rect rect)
+{
+    unsigned char *frame;
+    int length;
+    int i;
+    int width;
+    int height;
+
+    length = AviReadNextVideoFrame(avi, &frame);
+    if (length < 0) {			// EOF
+	return 1;
+    }
+    if (length) {
+	if (DecodeFrameToYUV(pbi, frame, length, -1, -1)) {
+	    fprintf(stderr, "DecodeFrameToYUV error\n");
+	    exit(-1);
+	}
+
+	SDL_LockYUVOverlay(overlay);
+	width = avi->Width;
+	height = avi->Height;
+	for (i = 0; i < height; ++i) {	// copy Y
+	    memcpy(overlay->pixels[0] + i * overlay->pitches[0],
+		pbi->LastFrameRecon + pbi->ReconYDataOffset + (height - i -
+		    1) * pbi->Configuration.YStride, width);
+	}
+	for (i = 0; i < height / 2; ++i) {	// copy UV
+	    memcpy(overlay->pixels[1] + i * overlay->pitches[1],
+		pbi->LastFrameRecon + pbi->ReconVDataOffset + (height / 2 - i -
+		    1) * pbi->Configuration.UVStride, width / 2);
+	    memcpy(overlay->pixels[2] + i * overlay->pitches[2],
+		pbi->LastFrameRecon + pbi->ReconUDataOffset + (height / 2 - i -
+		    1) * pbi->Configuration.UVStride, width / 2);
+	}
+	SDL_UnlockYUVOverlay(overlay);
+    }
+
+    SDL_DisplayYUVOverlay(overlay, &rect);
+
+    return 0;
+}
+
+/*--------------------------------------------------------------------------*/
+
+/**
+**	Callback for input.
+*/
+local void MovieCallbackKey(unsigned dummy __attribute__((unused)))
+{
+    MovieKeyPressed=0;
+}
+
+/**
+**	Callback for input.
+*/
+local void MovieCallbackKey2(unsigned dummy1 __attribute__((unused)),
+	unsigned dummy2 __attribute__((unused)))
+{
+    MovieKeyPressed=0;
+}
+
+/**
+**	Callback for input.
+*/
+local void MovieCallbackKey3(unsigned dummy1 __attribute__((unused)),
+	unsigned dummy2 __attribute__((unused)))
+{
+    MovieKeyPressed=0;
+}
+
+/**
+**	Callback for input.
+*/
+local void MovieCallbackMouse(int dummy_x __attribute__((unused)),
+	int dummy_y __attribute__((unused)))
+{
+}
+
+/**
+**	Callback for exit.
+*/
+local void MovieCallbackExit(void)
+{
+}
+
+/**
+**	Play a video file.
+**
+**	@param name	Filename of movie file.
+**	@param flags	Flags for movie playback.
+**
+**	@return		True if file isn't a supported movie.
+**
+**	@todo Support full screen and resolution changes.
+*/
+global int PlayMovie(const char *name, int flags)
+{
+    AviFile *avi;
+    SDL_Overlay *overlay;
+    PB_INSTANCE *pbi;
+    EventCallback callbacks;
+    SDL_Rect rect;
+
+    // FIXME: Should split this into lowlevel parts.
+
+    if (!(avi = MovieOpen(name))) {
+	return 1;
+    }
+    StopMusic();
+
+    //
+    //  Prepare video
+    //
+    if (flags & PlayMovieFullScreen) {
+	DebugLevel0Fn("FIXME: full screen switch not supported\n");
+    }
+    overlay =
+	SDL_CreateYUVOverlay(avi->Width, avi->Height, SDL_YV12_OVERLAY,
+	Screen);
+    if (!overlay) {
+	fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
+	exit(1);
+    }
+    VideoSyncSpeed = avi->FPS100 / FRAMES_PER_SECOND;
+    SetVideoSync();
+
+    StartDecoder(&pbi, avi->Width, avi->Height);
+
+    PlayAviOgg(avi);
+
+    callbacks.ButtonPressed=MovieCallbackKey;
+    callbacks.ButtonReleased=MovieCallbackKey;
+    callbacks.MouseMoved=MovieCallbackMouse;
+    callbacks.MouseExit=MovieCallbackExit;
+    callbacks.KeyPressed=MovieCallbackKey2;
+    callbacks.KeyReleased=MovieCallbackKey2;
+    callbacks.KeyRepeated=MovieCallbackKey3;
+    callbacks.NetworkEvent=NetworkEvent;
+    callbacks.SoundReady=WriteSound;
+
+    if (flags & PlayMovieZoomScreen) {
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = VideoWidth;
+	rect.h = VideoHeight;
+    } else {
+	rect.x = (VideoWidth - avi->Width) / 2;
+	rect.y = (VideoHeight - avi->Height) / 2;
+	rect.w = avi->Width;
+	rect.h = avi->Height;
+    }
+
+    MovieKeyPressed = 1;
+    while (MovieKeyPressed) {
+
+	if (MovieDisplayFrame(avi, pbi, overlay, rect)) {
+	    break;
+	}
+
+	WaitEventsOneFrame(&callbacks);
+    }
+
+    StopMusic();
+
+    StopDecoder(&pbi);
+    SDL_FreeYUVOverlay(overlay);
+
+    MovieClose(avi);
+
+    return 0;
+}
+
+#else
+
+/**
+**	Play a video file.
+**
+**	@param file	Filename of movie file.
+**	@param flags	Flags for movie playback.
+**
+**	@return		True if file isn't a supported movie.
+**
+**	@todo Support full screen and resolution changes.
+*/
+global int PlayMovie(const char* file, int flags)
+{
+    printf("FIXME: PlayMovie(\"%s\",%x) not supported.\n", file, flags);
+
+    return 1;
+}
+
+#endif
+
+/**
+**	Initialize the movie module.
+*/
+global void InitMovie(void)
+{
+    VPInitLibrary();
+}
+
+/**
+**	Cleanup the movie module.
+*/
+global void CleanMovie(void)
+{
+    VPDeInitLibrary();
+}
 
 //@}

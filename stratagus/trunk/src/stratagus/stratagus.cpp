@@ -213,6 +213,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "commands.h"
 #include "campaign.h"
 #include "editor.h"
+#include "movie.h"
 
 #ifdef DEBUG
 extern SCM CclUnits(void);
@@ -422,12 +423,11 @@ local void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
 /**
 **	Callback for input.
 */
-local void WaitCallbackMouse(int dummy_x __attribute__((unused)),
-	int dummy_y __attribute__((unused)))
+local void WaitCallbackMouse(int x, int y)
 {
-    DebugLevel3Fn("Moved %d,%d\n" _C_ dummy_x _C_ dummy_y);
-    WaitMouseX=dummy_x;
-    WaitMouseY=dummy_y;
+    DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
+    WaitMouseX=x;
+    WaitMouseY=y;
 }
 
 /**
@@ -1054,7 +1054,10 @@ local void PrintHeader(void)
     fprintf(stdout,"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others.\n"
     "\t(http://FreeCraft.Org)"
     "\n  SIOD Copyright by George J. Carrette."
+#ifdef USE_LIBMODPLUG
     "\n  libmodplug Copyright by Kenton Varda & Olivier Lapique."
+#endif
+    "\n  VP3 codec Copyright by On2 Technologies Inc."
 #ifdef USE_SDL
     "\n  SDL Copyright by Sam Lantinga."
 #endif
@@ -1149,6 +1152,8 @@ local void PrintHeader(void)
 global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
+    int i;
+
     PrintHeader();
     printf(
     "\n\nFreeCraft may be copied only under the terms of the GNU General Public License\
@@ -1173,19 +1178,26 @@ Use it at your own risk.\n\n");
     srand(time(NULL));			// Random counter = random each start
 #endif
 
+    InitMovie();
+
     //
     //	Show title screen.
     //
+    i=1;
     SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     if( TitleScreen ) {
-	DisplayPicture(TitleScreen);
-	Invalidate();
+	if( (i=PlayMovie(TitleScreen,PlayMovieZoomScreen)) ) {
+	    DisplayPicture(TitleScreen);
+	    Invalidate();
+	}
     }
 
     InitUnitsMemory();		// Units memory management
     PreMenuSetup();		// Load everything needed for menus
 
-    WaitForInput(20);		// Show game intro
+    if( i ) {
+	WaitForInput(20);		// Show game intro
+    }
 
     MenuLoop(MapName,&TheMap);	// Enter the menu loop
 
@@ -1225,6 +1237,9 @@ global volatile void Exit(int err)
     CleanModules();
     CleanFonts();
 #endif
+
+    CleanMovie();
+
     fprintf(stderr,"Thanks for playing FreeCraft.\n");
     exit(err);
 }
@@ -1291,7 +1306,9 @@ global int main(int argc,char** argv)
     //
     //	Setup some defaults.
     //
+#ifndef __APPLE__
     FreeCraftLibPath=FREECRAFT_LIB_PATH;
+#endif
     CclStartFile="ccl/freecraft.ccl";
     EditorStartFile="ccl/editor.ccl";
 

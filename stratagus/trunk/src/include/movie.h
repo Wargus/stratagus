@@ -40,6 +40,21 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
+/**
+**	Play movie flags.
+*/
+enum _play_movie_flags_ {
+    PlayMovieFullScreen = 1,		/// Switch to full screen
+    PlayMovieZoomScreen = 2,		/// Zoom to screen size
+};
+
+/**
+**	Movie handle.
+*/
+typedef struct _movie_ {
+    void*	File;			/// Demux handler
+} Movie;
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -50,6 +65,11 @@
 
     /// Play a movie file
 extern int PlayMovie(const char* name, int flags);
+
+    /// Initialize the video module
+extern void InitMovie(void);
+    /// Cleanup the video module
+extern void CleanMovie(void);
 
 //@}
 
