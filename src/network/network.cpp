@@ -649,6 +649,7 @@ void NetworkSendSelection(Unit** units, int count)
 	int i;
 	int teammates[PlayerMax];
 	int numteammates;
+	int nosent;
 
 	// Check if we have any teammates to send to
 	numteammates = 0;
@@ -662,35 +663,47 @@ void NetworkSendSelection(Unit** units, int count)
 	}
 
 	//
-	//  Build packet of Up to MaxNetworkCommands messages.
-	//  FIXME: handle multiple packets (units > MaxNetworkCommands * 4
+	//  Build and send packets to cover all units.
 	//
-	header = (NetworkSelectionHeader*)&(packet.Header);
-	header->NumberSent = count;
-	header->Add = 0;
-	header->Remove = 0;
 	unitcount = 0;
-	for (i = 0; i <= (count / 4); ++i) {
-		Assert(i <= MaxNetworkCommands);
-		header->Type[i] = MessageSelection;
-		selection = (NetworkSelection*)&packet.Command[i];
-		for (ref = 0; ref < 4 && unitcount < count; ++ref, ++unitcount) {
-			selection->Unit[ref] = htons(UnitNumber(units[unitcount]));
+	while (unitcount < count) {
+		header = (NetworkSelectionHeader*)&(packet.Header);
+		if (unitcount == 0) {
+			header->Add = 0;
+		} else {
+			header->Add = 1;
 		}
-	}
+		header->Remove = 0;
 
-	unitcount = i;
+		nosent = 0;
+		for (i = 0; i < MaxNetworkCommands && unitcount < count; ++i) {
+			header->Type[i] = MessageSelection;
+			selection = (NetworkSelection*)&packet.Command[i];
+			for (ref = 0; ref < 4 && unitcount < count; ++ref, ++unitcount) {
+				selection->Unit[ref] = htons(UnitNumber(units[unitcount]));
+				++nosent;
+			}
+		}
 
-	for (; i < MaxNetworkCommands; ++i) {
-		packet.Header.Type[i] = MessageNone;
-	}
+		if (unitcount >= count) {
+			// This is the last command
+			header->NumberSent = nosent;
+		} else {
+			header->NumberSent = MaxNetworkCommands * 4;
+		}
 
-	//
-	// Send the Constructed packet to team members
-	//
-	for (i = 0; i < numteammates; ++i) {
-		ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,
-			&packet, sizeof(NetworkPacketHeader) + sizeof(NetworkSelection) * unitcount);
+		for (; i < MaxNetworkCommands; ++i) {
+			packet.Header.Type[i] = MessageNone;
+		}
+		
+
+		//
+		// Send the Constructed packet to team members
+		//
+		for (i = 0; i < numteammates; ++i) {
+			ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,
+				&packet, sizeof(NetworkPacketHeader) + sizeof(NetworkSelection) * ((nosent + 3) / 4));
+		}
 	}
 
 }
@@ -927,7 +940,7 @@ void NetworkEvent(void)
 				break;
 			case MessageCommandDismiss:
 				// Allow to explode critters.
-				if ((UnitSlots[ntohs(nc->Unit)]->Player->Player == PlayerMax - 1) &&
+				if ((UnitSlots[ntohs(nc->Unit)]->Player->Player == PlayerNumNeutral) &&
 					UnitSlots[ntohs(nc->Unit)]->Type->ClicksToExplode) {
 					allowed = 1;
 					break;
