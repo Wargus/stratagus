@@ -64,13 +64,13 @@ extern struct {
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#define UNIT_ICON_X (ICON_WIDTH + 7)		// Unit mode icon
-#define UNIT_ICON_Y (0)				// Unit mode icon
-#define TILE_ICON_X (ICON_WIDTH * 2 + 16)	// Tile mode icon
-#define TILE_ICON_Y (2)				// Tile mode icon
+#define UNIT_ICON_X (ICON_WIDTH + 7)		/// Unit mode icon
+#define UNIT_ICON_Y (0)				/// Unit mode icon
+#define TILE_ICON_X (ICON_WIDTH * 2 + 16)	/// Tile mode icon
+#define TILE_ICON_Y (2)				/// Tile mode icon
 
-#define TILE_WIDTH 32
-#define TILE_HEIGHT 32
+#define TILE_WIDTH 32				/// Tile mode icon
+#define TILE_HEIGHT 32				/// Tile mode icon
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -88,12 +88,14 @@ local enum _editor_state_ {
 local int TileCursor;			/// Tile type number
 
 local enum _mode_buttons_ {
-    FIXMEButton=201,
-    UnitButton,
-    TileButton,
+    SelectButton=201,			/// Select mode button
+    UnitButton,				/// Unit mode button
+    TileButton,				/// Tile mode button
 };
 
-local int UnitIndex;			/// Unit index
+local int UnitIndex;			/// Unit icon draw index
+local int CursorUnitIndex;		/// Unit icon under cursor
+local int SelectedUnitIndex;		/// Draw this unit
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -340,6 +342,17 @@ local void DrawUnitIcons(void)
 	    icon = UnitTypeByIdent(UnitTypeWcNames[i])->Icon.Icon;
 	    VideoDrawSub(icon->Graphic, icon->X, icon->Y, icon->Width,
 		icon->Height, x, y);
+
+	    VideoDrawRectangle(ColorGray, x, y, icon->Width, icon->Height);
+	    if( i==SelectedUnitIndex ) {
+		VideoDrawRectangle(ColorGreen, x + 1, y + 1,
+			icon->Width - 2, icon->Height - 2);
+	    }
+	    if( i==CursorUnitIndex ) {
+		VideoDrawRectangle(ColorWhite,x - 1, y - 1,
+			icon->Width + 2, icon->Height + 2);
+	    }
+
 	    x += ICON_WIDTH + 8;
 	    ++i;
 	}
@@ -411,10 +424,16 @@ local void DrawEditorPanel(void)
     //
     icon = IconByIdent("icon-human-patrol-land");
     DebugCheck(!icon);
-    DrawUnitIcon(Players, icon, 0, x, y);
+    DrawUnitIcon(Players, icon, 
+        (ButtonUnderCursor == SelectButton ? IconActive : 0) |
+	    (EditorState==EditorSelecting ? IconSelected : 0),
+	x, y);
     icon = IconByIdent("icon-footman");
     DebugCheck(!icon);
-    DrawUnitIcon(Players, icon, 0, x + UNIT_ICON_X, y + UNIT_ICON_Y);
+    DrawUnitIcon(Players, icon, 
+        (ButtonUnderCursor == UnitButton ? IconActive : 0) |
+	    (EditorState==EditorEditUnit ? IconSelected : 0),
+	x + UNIT_ICON_X, y + UNIT_ICON_Y);
 
     DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y);
 
@@ -917,9 +936,9 @@ local void EditorCallbackMouse(int x, int y)
 	    && TheUI.InfoPanelY + 4 < CursorY
 	    && CursorY < TheUI.InfoPanelY + 4 + ICON_HEIGHT+7) {
 	// FIXME: what is this button?
-	ButtonUnderCursor = FIXMEButton;
+	ButtonUnderCursor = SelectButton;
 	CursorOn = CursorOnButton;
-	SetStatusLine("FIXME: What is this?");
+	SetStatusLine("Select mode");
 	return;
     }
     if (TheUI.InfoPanelX + 4 + UNIT_ICON_X < CursorX
@@ -928,7 +947,7 @@ local void EditorCallbackMouse(int x, int y)
 	    && CursorY < TheUI.InfoPanelY + 4 + UNIT_ICON_Y + ICON_HEIGHT+7) {
 	ButtonUnderCursor = UnitButton;
 	CursorOn = CursorOnButton;
-	SetStatusLine("Unit");
+	SetStatusLine("Unit mode");
 	return;
     }
     if (TheUI.InfoPanelX + 4 + TILE_ICON_X < CursorX
@@ -937,7 +956,7 @@ local void EditorCallbackMouse(int x, int y)
 	    && CursorY < TheUI.InfoPanelY + 4 + TILE_ICON_Y + TILE_HEIGHT+7) {
 	ButtonUnderCursor = TileButton;
 	CursorOn = CursorOnButton;
-	SetStatusLine("Tile");
+	SetStatusLine("Tile mode");
 	return;
     }
     for (i = 0; i < sizeof(TheUI.Buttons) / sizeof(*TheUI.Buttons); ++i) {
