@@ -92,11 +92,14 @@ local int WaitForTransporter(Unit* unit)
 	return 0;
     }
 
-    // FIXME: can use pathfinder result?
     if( MapDistanceToUnit(unit->X,unit->Y,trans)==1 ) {
 	DebugLevel3Fn("Enter transporter\n");
 	return 1;
     }
+
+    //
+    //	FIXME: any enemies in range attack them, while waiting.
+    //
 
     DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
 
