@@ -866,6 +866,7 @@ global void GameMainLoop(void)
 	ShowStats();
     }
 
+    FlagRevealMap=0;
     GamePaused=0;
 }
 
