@@ -2241,6 +2241,7 @@ static int CclSyncRand(lua_State* l)
 static int CclLoadPud(lua_State* l)
 {
 	const char* name;
+	int i;
 
 	if (SaveGameLoading) {
 		return 0;
@@ -2250,6 +2251,42 @@ static int CclLoadPud(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	name = LuaToString(l, 1);
+
+	GetPudInfo(name, &TheMap.Info);
+	free(TheMap.Fields);
+	TheMap.Fields = NULL;
+	free(TheMap.Visible[0]);
+	TheMap.Visible[0] = NULL;
+	CreateMap(TheMap.Info.MapWidth, TheMap.Info.MapHeight);
+	for (i = 0; i < PlayerMax; ++i) {
+		free(Players[i].Units);
+	}
+	NumPlayers = 0;
+	for (i = 0; i < PlayerMax; ++i) {
+		int p;
+		int aiopps;
+
+		p = TheMap.Info.PlayerType[i];
+		aiopps = 0;
+		if (GameSettings.Opponents != SettingsPresetMapDefault) {
+			if (p == PlayerPerson && ThisPlayer != NULL) {
+				p = PlayerComputer;
+			}
+			if (p == PlayerComputer) {
+				if (aiopps < GameSettings.Opponents) {
+					++aiopps;
+				} else {
+					p = PlayerNobody;
+				}
+			}
+		}
+		// Network games only:
+		if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
+			p = GameSettings.Presets[i].Type;
+		}
+		CreatePlayer(p);
+	}
+
 	LoadPud(name, &TheMap);
 
 	// FIXME: LoadPud should return an error
