@@ -57,7 +57,7 @@ global void UnitCacheInsert(Unit* unit)
 {
 	MapField* mf;
 
-	DebugCheck(unit->Next);
+	Assert(!unit->Next);
 	DebugLevel3Fn("%d,%d %d %s\n" _C_ unit->X _C_ unit->Y _C_ unit->Slot _C_ unit->Type->Name);
 
 	mf = TheMap.Fields + unit->Y * TheMap.Width + unit->X;
@@ -218,7 +218,7 @@ global void UnitCacheInsert(Unit* unit)
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
 			mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
 			listitem = unit->CacheLinks + i * unit->Type->TileWidth + j;
-			DebugCheck(listitem->Next || listitem->Prev);
+			Assert(!listitem->Next && !listitem->Prev);
 
 			//	Always add at the start of the list.
 			listitem->Next = mf->UnitCache;
@@ -261,7 +261,7 @@ global void UnitCacheRemove(Unit* unit)
 				} else {
 					// item is head of the list.
 					mf->UnitCache = listitem->Next;
-					DebugCheck(mf->UnitCache && mf->UnitCache->Prev);
+					Assert(!mf->UnitCache || !mf->UnitCache->Prev);
 				}
 			}
 

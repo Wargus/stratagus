@@ -126,7 +126,7 @@ global void FreeUnitMemory(Unit* unit)
 	//		Remove from slot table
 	//
 	slot = UnitSlots + unit->Slot;
-	DebugCheck(*slot != unit);
+	Assert(*slot == unit);
 
 	*slot = (void*)UnitSlotFree;
 	free(unit);
@@ -140,7 +140,7 @@ global void FreeUnitMemory(Unit* unit)
 */
 global void RefsIncrease(Unit* unit)
 {
-	RefsDebugCheck(!unit->Refs || unit->Destroyed);
+	RefsAssert(unit->Refs && !unit->Destroyed);
 	if (!SaveGameLoading) {
 		++unit->Refs;
 	}
@@ -153,7 +153,7 @@ global void RefsIncrease(Unit* unit)
 */
 global void RefsDecrease(Unit* unit)
 {
-	RefsDebugCheck(!unit->Refs);
+	RefsAssert(unit->Refs);
 	if (!SaveGameLoading) {
 		if (unit->Destroyed) {
 			if (!--unit->Refs) {
@@ -161,7 +161,7 @@ global void RefsDecrease(Unit* unit)
 			}
 		} else {
 			--unit->Refs;
-			RefsDebugCheck(!unit->Refs);
+			RefsAssert(unit->Refs);
 		}
 	}
 }
@@ -179,9 +179,9 @@ global void ReleaseUnit(Unit* unit)
 	DebugLevel2Fn("%lu:Unit %p %d `%s'\n" _C_ GameCycle _C_
 		unit _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
-	DebugCheck(!unit->Type);				// already free.
-	DebugCheck(unit->OrderCount != 1);
-	DebugCheck(unit->Orders[0].Goal);
+	Assert(unit->Type);				// already free.
+	Assert(unit->OrderCount == 1);
+	Assert(!unit->Orders[0].Goal);
 
 	//
 	//		First release, remove from lists/tables.
@@ -201,7 +201,7 @@ global void ReleaseUnit(Unit* unit)
 		}
 	}
 
-	RefsDebugCheck(unit->Refs);
+	RefsAssert(!unit->Refs);
 
 	//
 	//		No more references remaining, but the network could have an order
@@ -212,7 +212,7 @@ global void ReleaseUnit(Unit* unit)
 	//
 	//		Remove the unit from the global units table.
 	//
-	DebugCheck(*unit->UnitSlot != unit);
+	Assert(*unit->UnitSlot == unit);
 	temp = Units[--NumUnits];
 	temp->UnitSlot = unit->UnitSlot;
 	*unit->UnitSlot = temp;
@@ -292,7 +292,7 @@ global void InitUnit(Unit* unit, UnitType* type)
 	int i;
 #endif
 
-	DebugCheck(!type);
+	Assert(type);
 
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
 	unit->Refs = 1;
@@ -351,13 +351,13 @@ global void InitUnit(Unit* unit, UnitType* type)
 	unit->OrderCount = 1;				// No orders
 	unit->Orders[0].Action = UnitActionStill;
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
-	DebugCheck(unit->Orders[0].Goal);
+	Assert(!unit->Orders[0].Goal);
 	unit->NewOrder.Action = UnitActionStill;
 	unit->NewOrder.X = unit->NewOrder.Y = -1;
-	DebugCheck(unit->NewOrder.Goal);
+	Assert(!unit->NewOrder.Goal);
 	unit->SavedOrder.Action = UnitActionStill;
 	unit->SavedOrder.X = unit->SavedOrder.Y = -1;
-	DebugCheck(unit->SavedOrder.Goal);
+	Assert(!unit->SavedOrder.Goal);
 }
 
 /**
@@ -422,7 +422,7 @@ global Unit* MakeUnit(UnitType* type, Player* player)
 {
 	Unit* unit;
 
-	//DebugCheck(!player);				// Current code didn't support no player
+	//Assert(player);				// Current code didn't support no player
 
 	unit = AllocUnit();
 	InitUnit(unit, type);
@@ -459,7 +459,7 @@ global void PlaceUnit(Unit* unit, int x, int y)
 	int w;
 	unsigned flags;
 
-	DebugCheck(!unit->Removed);
+	Assert(unit->Removed);
 
 	type = unit->Type;
 
@@ -691,10 +691,10 @@ global void UnitLost(Unit* unit)
 	Player* player;
 	int i;
 
-	DebugCheck(!unit);
+	Assert(unit);
 
 	player = unit->Player;
-	DebugCheck(!player);  // Next code didn't support no player!
+	Assert(player);  // Next code didn't support no player!
 
 	//
 	//  Call back to AI, for killed or lost units.
@@ -715,7 +715,7 @@ global void UnitLost(Unit* unit)
 	//
 	type = unit->Type;
 	if (player && !type->Vanishes) {
-		DebugCheck(*unit->PlayerSlot != unit);
+		Assert(*unit->PlayerSlot == unit);
 		temp = player->Units[--player->TotalNumUnits];
 		temp->PlayerSlot = unit->PlayerSlot;
 		*unit->PlayerSlot = temp;
@@ -784,9 +784,9 @@ global void UnitLost(Unit* unit)
 		temp = MakeUnitAndPlace(unit->X, unit->Y, type->MustBuildOnTop, &Players[PlayerNumNeutral]);
 		temp->Value = unit->Value;
 	}
-	DebugCheck(player->NumBuildings > UnitMax);
-	DebugCheck(player->TotalNumUnits > UnitMax);
-	DebugCheck(player->UnitTypesCount[type->Slot] > UnitMax);
+	Assert(player->NumBuildings <= UnitMax);
+	Assert(player->TotalNumUnits <= UnitMax);
+	Assert(player->UnitTypesCount[type->Slot] <= UnitMax);
 }
 
 /**
@@ -1045,15 +1045,15 @@ global void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 				unit->Y > y || unit->Y + unit->Type->TileHeight - 1 < y)) {
 			DebugLevel0Fn("Wrong cache %d %d -> %d %d\n" _C_ x _C_ y _C_ unit->X _C_ unit->Y);
 		}
-		DebugCheck((unit->X > x || unit->X + unit->Type->TileWidth - 1 < x ||
-				unit->Y > y || unit->Y + unit->Type->TileHeight - 1 < y));
+		Assert(unit->X <= x && unit->X + unit->Type->TileWidth - 1 >= x &&
+			unit->Y <= y && unit->Y + unit->Type->TileHeight - 1 >= y);
 		if (cloak != (int)unit->Type->PermanentCloak) {
 			continue;
 		}
 		p = player->Player;
 		DebugLevel3("Unit %d(%d, %d) player %d seen %d -> %d (%d, %d)\n" _C_ unit->Slot _C_ unit->X _C_ unit->Y _C_
 				p _C_ unit->VisCount[p] _C_ unit->VisCount[p] - 1 _C_ x _C_ y);
-		DebugCheck(!unit->VisCount[p]);
+		Assert(unit->VisCount[p]);
 		unit->VisCount[p]--;
 		//
 		//  If the unit goes under of fog, this can happen for any player that
@@ -1088,7 +1088,7 @@ global void UnitCountSeen(Unit* unit)
 	int oldv[PlayerMax];
 	int newv;
 
-	DebugCheck(!unit->Type);
+	Assert(unit->Type);
 
 	//	FIXME: optimize, only work on certain players?
 	//	This is for instance good for updating shared vision...
@@ -1740,7 +1740,7 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 	int n;
 
 	DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
-	DebugCheck(!unit->Removed);
+	Assert(unit->Removed);
 
 	x = y = -1;
 	if (unit->Container) {
@@ -1751,7 +1751,7 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 		y = unit->Y;
 	}
 
-	DebugCheck(x == -1 || y == -1);
+	Assert(x != -1 && y != -1);
 	mask = UnitMovementMask(unit);
 
 	bestd = 99999;
@@ -1832,7 +1832,7 @@ global void DropOutAll(const Unit* source)
 	for (i = source->InsideCount; i; --i, unit = unit->NextContained) {
 		DropOutOnSide(unit, LookingW,
 			source->Type->TileWidth, source->Type->TileHeight);
-		DebugCheck(unit->Orders[0].Goal);
+		Assert(!unit->Orders[0].Goal);
 		unit->Orders[0].Action = UnitActionStill;
 		unit->Wait=unit->Reset = 1;
 		unit->SubAction = 0;
@@ -1980,7 +1980,7 @@ global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y
 	j = 0;
 	if (unit) {
 		// FIXME: This only works with 1x1 big units
-		DebugCheck(unit->Type->TileWidth != 1 || unit->Type->TileHeight != 1);
+		Assert(unit->Type->TileWidth == 1 && unit->Type->TileHeight == 1);
 		j = unit->Type->FieldFlags;
 		TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags &= ~j;
 	}
@@ -2638,8 +2638,8 @@ global void LetUnitDie(Unit* unit)
 
 		if (type->CorpseType) {
 			unit->State = unit->Type->CorpseScript;
-			DebugCheck(type->TileWidth != type->CorpseType->TileWidth ||
-					type->TileHeight != type->CorpseType->TileHeight);
+			Assert(type->TileWidth == type->CorpseType->TileWidth &&
+					type->TileHeight == type->CorpseType->TileHeight);
 			MapMarkUnitSight(unit);
 			type = unit->Type = type->CorpseType;
 
@@ -2656,8 +2656,8 @@ global void LetUnitDie(Unit* unit)
 			unit->Frame = 0;
 			unit->Orders[0].Action = UnitActionDie;
 
-			DebugCheck(!unit->Type->Animations ||
-				!unit->Type->Animations->Die);
+			Assert(unit->Type->Animations &&
+				unit->Type->Animations->Die);
 			UnitShowAnimation(unit, unit->Type->Animations->Die);
 			DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
 			MapUnmarkUnitSight(unit);
@@ -2746,7 +2746,7 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 		return;
 	}
 
-	DebugCheck(damage == 0 || target->HP == 0 || target->Type->Vanishes);
+	Assert(damage != 0 && target->HP != 0 && !target->Type->Vanishes);
 
 	if (target->UnholyArmor > 0 || target->Type->Decoration) {
 		// vladi: units with active UnholyArmour are invulnerable

@@ -511,7 +511,7 @@ global void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 	int costs[MaxCosts];
 
 	DebugLevel3Fn(" Length %d\n" _C_ length);
-	DebugCheck(length != 780);
+	Assert(length == 780);
 
 	for (i = 0; i < 52; ++i) {
 		time = ((unsigned char*)ugrd)[i];
@@ -1035,11 +1035,11 @@ local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 	// get allow/forbid's for upgrades
 	//
 	s1 = strdup(af_upgrades);
-	DebugCheck(!s1);
+	Assert(s1);
 	for (s2 = strtok(s1, ","); s2; s2 = strtok(NULL, ",")) {
 		int id;
-		DebugCheck(!(s2[0] == 'A' || s2[0] == 'F' || s2[0] == 'R'));
-		DebugCheck(!(s2[1] == ':'));
+		Assert(s2[0] == 'A' || s2[0] == 'F' || s2[0] == 'R');
+		Assert(s2[1] == ':');
 		id = UpgradeIdByIdent(s2 + 2);
 		if (id == -1) {
 			continue;				// should we cancel all and return error?!
@@ -1052,7 +1052,7 @@ local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 	// get units that are affected by this upgrade
 	//
 	s1 = strdup(apply_to);
-	DebugCheck(!s1);
+	Assert(s1);
 	for (s2 = strtok(s1, ","); s2; s2 = strtok(NULL, ",")) {
 		int id;
 
@@ -1227,7 +1227,7 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 
 		player->Allow.Units[z] += um->ChangeUnits[z];
 
-		DebugCheck(!(um->ApplyTo[z] == '?' || um->ApplyTo[z] == 'X'));
+		Assert(um->ApplyTo[z] == '?' || um->ApplyTo[z] == 'X');
 
 		// this modifier should be applied to unittype id == z
 		if (um->ApplyTo[z] == 'X') {
@@ -1348,7 +1348,7 @@ local void AllowUnitId(Player* player, int id, int units)
 */
 local void AllowUpgradeId(Player* player, int id, char af)
 {
-	DebugCheck(!(af == 'A' || af == 'F' || af == 'R'));
+	Assert(af == 'A' || af == 'F' || af == 'R');
 	player->Allow.Upgrades[id] = af;
 }
 
@@ -1358,7 +1358,7 @@ local void AllowUpgradeId(Player* player, int id, char af)
 global int UnitIdAllowed(const Player* player, int id)
 {
 	// JOHNS: Don't be kind, the people should code correct!
-	DebugCheck(id < 0 || id >= UnitTypeMax);
+	Assert(id >= 0 && id < UnitTypeMax);
 	if (id < 0 || id >= UnitTypeMax) {
 		return 0;
 	}
@@ -1371,7 +1371,7 @@ global int UnitIdAllowed(const Player* player, int id)
 global char UpgradeIdAllowed(const Player* player, int id)
 {
 	// JOHNS: Don't be kind, the people should code correct!
-	DebugCheck(id < 0 || id >= UpgradeMax);
+	Assert(id >= 0 && id < UpgradeMax);
 	return player->Allow.Upgrades[id];
 }
 
