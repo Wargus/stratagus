@@ -1068,7 +1068,7 @@ local int InputKey(int key)
 	    return 1;
 	default:
 	    if (key >= ' ' && key <= 256) {
-		if (InputIndex < sizeof(Input) - 1) {
+		if (InputIndex < (int)sizeof(Input) - 1) {
 		    DebugLevel3("Key %c\n" _C_ key);
 		    Input[InputIndex++] = key;
 		    Input[InputIndex] = '\0';
