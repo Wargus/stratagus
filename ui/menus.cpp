@@ -242,7 +242,7 @@ local void NetConnectingCancel(void);
 local void TerminateNetConnect(void);
 
 local void StartEditor(void);
-local void CancelEditorSelect(void);
+local void EditorSelectCancel(void);
 local void EditorNewMap(void);
 local void EditorNewDrawFunc(Menuitem *mi);
 local void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key);
@@ -566,9 +566,9 @@ global void InitMenuFuncHash(void) {
     HASHADD(FcDeleteCancel,"fc-delete-cancel");
 
 // Editor select
-    HASHADD(CancelEditorSelect,"cancel-editor-select");
     HASHADD(EditorNewMap,"editor-new-map");
     HASHADD(EditorMainLoadMap,"editor-main-load-map");
+    HASHADD(EditorSelectCancel,"editor-select-cancel");
 
 // Editor new
     HASHADD(EditorNewDrawFunc,"editor-new-draw-func");
@@ -4660,7 +4660,7 @@ local void StartEditor(void)
     EndMenu();
 }
 
-local void CancelEditorSelect(void)
+local void EditorSelectCancel(void)
 {
     QuitToMenu = 1;
     EditorRunning = 0;
