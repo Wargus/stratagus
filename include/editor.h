@@ -57,6 +57,9 @@ extern void EditorCclRegister(void);
     /// Update surroundings for tile changes.
 extern void EditorTileChanged(int x, int y);
 
+    /// Change tile.
+extern void ChangeTile(int x, int y, int tile);
+
 //@}
 
 #endif	// !__EDITOR_H__
