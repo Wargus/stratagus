@@ -42,6 +42,9 @@
 #include "map.h"
 #include "minimap.h"
 #include "player.h"
+#ifdef HIERARCHIC_PATHFINDER
+#include "pathfinder.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -245,6 +248,9 @@ global void MapRemoveWood(unsigned x, unsigned y)
 	MarkDrawPosMap(x, y);
 	MustRedraw |= RedrawMinimap;
     }
+#ifdef HIERARCHIC_PATHFINDER
+    PfHierMapChangedCallback (x, y, x, y);
+#endif
 }
 
 /**
