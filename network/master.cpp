@@ -61,13 +61,33 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-//###### For Magnant META SERVER
 static Socket MetaServerFildes;  // This is a TCP socket.
 int MetaServerInUse;
+
+char* MasterHost;       ///< Metaserver Address
+int MasterPort;         ///< Metaserver Port
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**  Set the metaserver to use for internet play.
+**
+**  @param l  Lua state.
+*/
+int CclSetMetaServer(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "incorrect argument");
+	}
+
+	free(MasterHost);
+	MasterHost = strdup(LuaToString(l, 1));	
+	MasterPort = LuaToNumber(l, 2);
+
+	return 0;
+}
 
 
 /**
@@ -90,7 +110,7 @@ int MetaInit(void)
 	for (i = port_range_min; i < port_range_max; ++i) {
 		MetaServerFildes = NetOpenTCP(i);  //FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
 		if (MetaServerFildes != (Socket)-1) {
-			if (NetConnectTCP(MetaServerFildes, NetResolveHost(MASTER_HOST), MASTER_PORT) != -1) {
+			if (NetConnectTCP(MetaServerFildes, NetResolveHost(MasterHost), MasterPort) != -1) {
 				break;
 			}
 		}
