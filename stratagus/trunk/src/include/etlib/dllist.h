@@ -1,11 +1,14 @@
-#ifndef ETLIB_DLLIST_H
-#define ETLIB_DLLIST_H
 /**
 **	@author	Copyright by Edgar Toernig.
 **	@name	dllist.h		-	Double linked lists.
 **
 *	$Id$
 */
+
+#ifndef ETLIB_DLLIST_H
+#define ETLIB_DLLIST_H
+
+//@{
 
 struct dl_node
 {
@@ -60,5 +63,7 @@ dl_insert_after(struct dl_node *p, struct dl_node *n)
 #define dl_insert_last(h, n)    (dl_insert_after((h)->last, (n)))
 #define dl_remove_first(h)      dl_remove((h)->first) // mustn't be empty!
 #define dl_remove_last(h)       dl_remove((h)->last) // mustn't be empty!
+
+//@}
 
 #endif /* ETLIB_DLLIST_H */

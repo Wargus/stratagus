@@ -157,7 +157,7 @@ global unsigned char* MakeMatrix(void)
 **	@param gy	Y position of target area
 **	@param gw	Width of target area
 **	@param gh	Height of target area
-**	@param rnage	Range to search at
+**	@param range	Range to search at
 **	@param matrix	Target area marked in matrix
 **
 **	@returns	depth, -1 unreachable

@@ -148,7 +148,10 @@ local void zzip_seek(ZZIP_FILE* file,unsigned offset,int whence __attribute__((u
 /**
 **	CLopen		Library file open
 **
-**	@param fn	File name.
+**	@param fn		File name.
+**	@param openflags	Open read, or write and compression options
+**
+**	@return			File Pointer
 */
 global CLFile *CLopen(const char *fn,long openflags)
 {

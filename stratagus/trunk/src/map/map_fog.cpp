@@ -340,7 +340,8 @@ global void MapDetectUnitsOnTile(const Player* player,int x,int y)
 **	@param player	player to mark the sight for (not unit owner)
 **	@param x	x location to mark
 **	@param y	y location to mark
-**
+**	@param w	width to mark, in square
+**	@param h	height to mark, in square
 **	@param range	Radius to mark.
 **	@param marker	Function to mark or unmark sight
 */

@@ -264,9 +264,9 @@ local SCM CclGameCycle(void)
 /**
 **      Return of game name.
 **
-**      @param name    SCM name. (nil reports only)
+**      @param gamename	SCM name. (nil reports only)
 **
-**      @return         Old game name.
+**      @return		Old game name.
 */
 local SCM CclSetGameName(SCM gamename)
 {

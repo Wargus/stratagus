@@ -1453,5 +1453,3 @@ global void ParseExtendedCommand(unsigned char type,int status,
 }
 
 //@}
-
-//@}

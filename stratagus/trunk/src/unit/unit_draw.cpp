@@ -1345,10 +1345,10 @@ global void DrawPath(const Unit* unit)
 /**
 **	Get the location of an unit's order.
 **	
-**	@param order	Pointer to unit.
+**	@param unit	Pointer to unit.
 **	@param order	Pointer to order.
 **	@param x	Resulting screen X cordinate.
-**	@param x	Resulting screen Y cordinate.
+**	@param y	Resulting screen Y cordinate.
 */
 local void GetOrderPosition(const Unit* unit,const Order* order,int* x,int* y)
 {
