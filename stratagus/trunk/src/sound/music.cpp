@@ -608,15 +608,19 @@ global void PlayMusic(const char* name)
 /**
 **	Play a sound file.
 **
-**	Currenly a synomy for PlayMusi
+**	Currenly a synonym for PlayMusic
 **
 **	@param name	Name of sound file, format is automatic detected.
-**			Names starting with ':' control the cdrom.
 */
-global void PlayFile(const char* name)
+global void PlayFile(char* name)
 {
-    MusicOff = 0;
-    PlayMusic(name);
+    SoundId id;
+    if (SoundIdForName("dynamic-sound")) {
+	id = RegisterSound(&name, 1);
+    } else {
+	id = MakeSound("dynamic-sound", &name, 1);
+    }
+    PlayGameSound(id, MaxSampleVolume);
 }
 
 #endif	// } WITH_SOUND

@@ -385,6 +385,8 @@ global void ShowIntro(const Intro *intro)
     TextLines* scrolling_text;
     TextLines* objectives_text[MAX_OBJECTIVES];
     int old_video_sync;
+    int soundfree;
+    int soundout;
 
     UseContinueButton=1;
     InitContinueButton(455*VideoWidth/640,440*VideoHeight/480);
@@ -437,7 +439,11 @@ global void ShowIntro(const Intro *intro)
 #ifdef WITH_SOUND
     PlaySectionMusic(PlaySectionBriefing);
 #endif
-    if( intro->VoiceFile[0] ) {
+    soundfree = -1;
+    soundout = -1;
+    if ( intro->VoiceFile[0] ) {
+	soundfree = NextFreeChannel;
+	soundout = NextSoundRequestOut;
 	PlayFile(intro->VoiceFile[0]);
     }
 
@@ -456,8 +462,10 @@ global void ShowIntro(const Intro *intro)
     IntroNoEvent=1;
     c=0;
     while( 1 ) {
-	if( !PlayingMusic && stage<MAX_BRIEFING_VOICES &&
-		intro->VoiceFile[stage] ) {
+	if( (!Channels[soundfree].Command) && stage<MAX_BRIEFING_VOICES &&
+		(soundout != NextSoundRequestOut) && intro->VoiceFile[stage] ) {
+	    soundfree = NextFreeChannel;
+	    soundout = NextSoundRequestOut;
 	    PlayFile(intro->VoiceFile[stage]);
 	    ++stage;
 	}

@@ -187,6 +187,21 @@ typedef struct _sound_request {
 
 #define MAX_SOUND_REQUESTS 32		/// maximal number of sound requests
 
+#define MaxChannels     16              /// How many channels are supported
+
+    /// Channels for sound effects and unit speach
+typedef struct _sound_channel_
+{
+    unsigned char       Command;        /// channel command
+    int                 Point;          /// point into sample
+    Sample*             Sample;         /// sample to play
+    Origin              Source;         /// unit playing
+    unsigned char       Volume;         /// Volume of this channel
+    SoundId             Sound;          /// The sound currently played
+        /// stereo location of sound (-128 left, 0 center, 127 right)
+    signed char         Stereo;
+} SoundChannel;
+		
 /**
 **      Play audio flags.
 */
@@ -218,6 +233,14 @@ extern SoundRequest SoundRequests[MAX_SOUND_REQUESTS];
 extern int NextSoundRequestIn;
     /// FIFO index out
 extern int NextSoundRequestOut;
+
+#define ChannelFree     0               /// channel is free 
+#define ChannelPlay     3               /// channel is playing 
+
+    /// All possible sound channels
+extern SoundChannel Channels[MaxChannels];
+    /// Next free channel
+extern int NextFreeChannel;
 
 #ifdef USE_THREAD
     /// are we using a sound thread? (default is zero -> no thread)
