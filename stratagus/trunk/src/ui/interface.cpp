@@ -72,7 +72,8 @@ static int SavedMapPositionY[4];     ///< Saved map position Y
 static char Input[80];               ///< line input for messages/long commands
 static int InputIndex;               ///< current index into input
 static char InputStatusLine[99];     ///< Last input status line
-char* UiGroupKeys = "0123456789`";   ///< Up to 11 keys, last unselect. Default for qwerty
+char DefaultGroupKeys[] = "0123456789`";///< Default group keys
+char* UiGroupKeys = DefaultGroupKeys;///< Up to 11 keys, last unselect. Default for qwerty
 char GameRunning;                    ///< Current running state
 char GamePaused;                     ///< Current pause state
 char GameObserve;                    ///< Observe mode
