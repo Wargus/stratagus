@@ -38,7 +38,6 @@
 #ifdef USE_OPENGL
 #define DrawIcon WinDrawIcon
 #define EndMenu WinEndMenu
-#define FindResource WinFindResource
 #include "SDL_opengl.h"
 #undef FindResource
 #undef EndMenu
