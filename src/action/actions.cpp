@@ -38,7 +38,7 @@
 **	Show unit animation.
 **		Returns animation flags.
 */
-global int UnitShowAnimation(Unit* unit,Animation* animation)
+global int UnitShowAnimation(Unit* unit,const Animation* animation)
 {
     int state;
     int flags;
@@ -124,6 +124,8 @@ local void HandleUnitAction(Unit* unit)
 	    }
 	}
     }
+
+    // FIXME: fire handling should be moved to here.
 
     //
     //	Select action.
