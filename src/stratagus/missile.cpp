@@ -102,10 +102,6 @@ static FuncController *MissileClassFunctions[] = {
 MissileType** MissileTypes;              /// Missile types.
 int NumMissileTypes;                     /// number of missile-types made.
 
-#ifdef DEBUG
-int NoWarningMissileType;                /// quiet ident lookup.
-#endif
-
 static Missile* GlobalMissiles[MAX_MISSILES];    /// all global missiles on map
 static int NumGlobalMissiles;                    /// currently used missiles
 

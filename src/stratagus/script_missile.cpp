@@ -51,10 +51,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef DEBUG
-extern int NoWarningMissileType; /// quiet ident lookup.
-#endif
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -67,7 +63,7 @@ extern int NoWarningMissileType; /// quiet ident lookup.
 static int CclDefineMissileType(lua_State* l)
 {
 	const char* value;
-	char* str;
+	const char* str;
 	MissileType* mtype;
 	unsigned i;
 	char* file;
@@ -78,20 +74,13 @@ static int CclDefineMissileType(lua_State* l)
 
 	// Slot identifier
 
-	str = strdup(LuaToString(l, 1));
-#ifdef DEBUG
-	i = NoWarningMissileType;
-	NoWarningMissileType = 1;
-#endif
+	str = LuaToString(l, 1);
 	mtype = MissileTypeByIdent(str);
-#ifdef DEBUG
-	NoWarningMissileType = i;
-#endif
+
 	if (mtype) {
 		DebugPrint("Redefining missile-type `%s'\n" _C_ str);
-		free(str);
 	} else {
-		mtype = NewMissileTypeSlot(str);  // str consumed!
+		mtype = NewMissileTypeSlot(strdup(str));  // str consumed!
 	}
 
 	mtype->NumDirections = 1;
@@ -104,8 +93,7 @@ static int CclDefineMissileType(lua_State* l)
 	//
 	// Parse the arguments
 	//
-	lua_pushnil(l);
-	while (lua_next(l, 2)) {
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "File")) {
 			file = strdup(LuaToString(l, -1));
@@ -171,7 +159,6 @@ static int CclDefineMissileType(lua_State* l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
-		lua_pop(l, 1);
 	}
 
 	if (file) {
