@@ -450,6 +450,13 @@ extern int Screen2MapY(int y);		/// Convert screen pixel to map tile
 extern int Map2ScreenX(int x);		/// Convert map tile to screen pixel
 extern int Map2ScreenY(int y);		/// Convert map tile to screen pixel
 
+#ifdef SPLIT_SCREEN_SUPPORT
+extern int Viewport2MapX (int , int );
+extern int Viewport2MapY (int , int );
+extern int Map2ViewportX (int , int );
+extern int Map2ViewportY (int , int );
+#endif /* SPLIT_SCREEN_SUPPORT */
+
 /*----------------------------------------------------------------------------
 --	clone.c
 ----------------------------------------------------------------------------*/
