@@ -51,6 +51,15 @@
 extern void PreMenuSetup(void);		/// FIXME: not here!
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
+extern struct {
+	/// resource filename one for each race
+    const char*	File[PlayerMaxRaces];
+	/// Width of button
+    int		Width, Height;
+	/// sprite : FILLED
+    Graphic*	Sprite;
+} MenuButtonGfx;
+
 /*----------------------------------------------------------------------------
 --	Defines
 ----------------------------------------------------------------------------*/
@@ -326,6 +335,27 @@ local void DrawUnitIcons(void)
 	}
 	y += ICON_HEIGHT / 2 + 2;
     }
+
+    x = TheUI.ButtonPanelX + 4;
+    y = TheUI.ButtonPanelY + 4;
+    j = 176-8;
+
+    PushClipping();
+    SetClipping(0,0,x + j - 20,VideoHeight-1);
+    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
+    PopClipping();
+    if (1) {
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
+    } else {
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
+    }
+    if (1) {
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
+    } else {
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + j - 20, y);
+    }
+    i = (50 * (j - 54)) / 100;
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + i, y + 1);
 }
 
 /**
