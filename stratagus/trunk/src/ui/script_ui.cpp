@@ -2315,6 +2315,8 @@ local SCM CclDefineMenu(SCM list)
 	} else {
 	    int i;
 	    int mitype;
+
+	    free(menu->Panel);
 	    for (i=0; i<menu->NumItems; ++i) {
 		mitype = menu->Items[i].mitype;
 		if (mitype == MI_TYPE_TEXT) {
