@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || !defined(_WIN32_WCE)
 #include <time.h>
 #endif
 
