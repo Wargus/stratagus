@@ -939,14 +939,15 @@ global void DrawPath(const Unit* unit)
 }
 
 /**
-**	Show the current order of an unit.
+**	Show the order on map.
 **
-**	@param unit	Pointer to the unit.
+**	@param unit	Unit pointer.
+**	@param x1	X pixel coordinate.
+**	@param y1	Y pixel coordinate.
+**	@param order	Order to display.
 */
-local void ShowOrder(const Unit* unit)
+local void ShowSingleOrder(const Unit* unit,int x1,int y1,const Order* order)
 {
-    int x1;
-    int y1;
     int x2;
     int y2;
     int color;
@@ -954,21 +955,15 @@ local void ShowOrder(const Unit* unit)
     int dest;
     const Unit* goal;
 
-    if( unit->Destroyed ) {
-	return;
-    }
-    x1=Map2ScreenX(unit->X)+unit->IX+unit->Type->TileWidth*TileSizeX/2;
-    y1=Map2ScreenY(unit->Y)+unit->IY+unit->Type->TileHeight*TileSizeY/2;
-
-    if( (goal=unit->Orders[0].Goal) && goal->Type ) {
+    if( (goal=order->Goal) && goal->Type ) {
 	x2=Map2ScreenX(goal->X)+goal->IX+goal->Type->TileWidth*TileSizeX/2;
 	y2=Map2ScreenY(goal->Y)+goal->IY+goal->Type->TileHeight*TileSizeY/2;
     } else {
-	x2=Map2ScreenX(unit->Orders[0].X)+TileSizeX/2;
-	y2=Map2ScreenY(unit->Orders[0].Y)+TileSizeY/2;
+	x2=Map2ScreenX(order->X+order->RangeX/2)+TileSizeX/2;
+	y2=Map2ScreenY(order->Y+order->RangeY/2)+TileSizeY/2;
     }
     dest=0;
-    switch( unit->Orders[0].Action ) {
+    switch( order->Action ) {
 	case UnitActionNone:
 	    e_color=color=ColorGray;
 	    break;
@@ -990,8 +985,8 @@ local void ShowOrder(const Unit* unit)
 	case UnitActionPatrol:
 	    VideoDrawLineClip(ColorGreen,x1,y1,x2,y2);
 	    e_color=color=ColorBlue;
-	    x1=Map2ScreenX(((int)unit->Orders[0].Arg1)>>16)+TileSizeX/2;
-	    y1=Map2ScreenY(((int)unit->Orders[0].Arg1)&0xFFFF)+TileSizeY/2;
+	    x1=Map2ScreenX(((int)order->Arg1)>>16)+TileSizeX/2;
+	    y1=Map2ScreenY(((int)order->Arg1)&0xFFFF)+TileSizeY/2;
 	    dest=1;
 	    break;
 
@@ -1078,7 +1073,7 @@ local void ShowOrder(const Unit* unit)
 
 	default:
 	    e_color=color=ColorGray;
-	    DebugLevel1Fn("Unknown action %d\n",unit->Orders[0].Action);
+	    DebugLevel1Fn("Unknown action %d\n",order->Action);
 	    break;
     }
     VideoFillCircleClip(color,x1,y1,2);
@@ -1088,6 +1083,28 @@ local void ShowOrder(const Unit* unit)
     }
 
     //DrawPath(unit);
+}
+
+/**
+**	Show the current order of an unit.
+**
+**	@param unit	Pointer to the unit.
+*/
+local void ShowOrder(const Unit* unit)
+{
+    int x1;
+    int y1;
+
+    if( unit->Destroyed ) {
+	return;
+    }
+    x1=Map2ScreenX(unit->X)+unit->IX+unit->Type->TileWidth*TileSizeX/2;
+    y1=Map2ScreenY(unit->Y)+unit->IY+unit->Type->TileHeight*TileSizeY/2;
+
+    ShowSingleOrder(unit,x1,y1,unit->Orders);
+    if( unit->Type->Building ) {
+	ShowSingleOrder(unit,x1,y1,&unit->NewOrder);
+    }
 }
 
 /**
