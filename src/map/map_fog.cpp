@@ -56,6 +56,10 @@
 ----------------------------------------------------------------------------*/
 
 #ifdef DEBUG
+
+// Uncomment this to see FOW visibility for every tile
+// #define DEBUG_FOG_OF_WAR
+
 #define noTIMEIT			/// defined time function
 #endif
 
@@ -388,7 +392,7 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 		    case 0:		// Unexplored
 		    case 1:
 			// We are at minimum, don't do anything shouldn't happen.
-			DebugCheck( 1 );
+			//DebugCheck( 1 );
 			break;
 		    case 2:
 		    	// Check visible Tile, then deduct...
@@ -2675,7 +2679,7 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
 #endif
 
 // Used to debug NEW_FOW problems
-#if !defined(HIERARCHIC_PATHFINDER) && 0
+#if !defined(HIERARCHIC_PATHFINDER) && defined(DEBUG_FOG_OF_WAR)
 extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 #define GameFont 1
 	{

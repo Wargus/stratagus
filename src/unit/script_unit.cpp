@@ -717,8 +717,6 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("rs")) ) {
 	    unit->Rs=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("revealer")) ) {
-	    unit->Revealer=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("units-contained-count")) ) {
 	    insidecount=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
@@ -812,17 +810,16 @@ local SCM CclUnit(SCM list)
 	UpdateForNewUnit(unit,0);
 	unit->HP = unit->Type->_HitPoints;
     }
-    //
+
+    //  Revealers are units that can see while removed
+    if ( unit->Removed && unit->Type->Revealer ) {
+    	MapMarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
+    }
+    
     //	Place on map
-    //
     if( !unit->Removed && !unit->Destroyed && !unit->Type->Vanishes ) {
 	unit->Removed=1;
 	PlaceUnit(unit,unit->X,unit->Y);
-
-    //
-    //	Connect unit to position (on-board,building,in store,in deposite)
-    //
-    } else {
     }
 
     // FIXME: johns: works only for debug code.
