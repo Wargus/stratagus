@@ -49,11 +49,9 @@ EXTRA_LDFLAGS="$LDFLAGS"
 ## USE_MAD		Use mad mp3 audio player support (asked by setup).
 ## These aren't working yet:
 ## NEW_MAPDRAW		Stephans new map draw code (value>1 shows update)
-## USE_FFMPEG		Use ffmpeg video player support.
 ## NEW_FOW		New fog of war code, should work correct
 ## NEW_SHIPS		New correct ship movement.
 ## HIERARCHIC_PATHFINDER	Use hierarchic pathfinder
-## USE_LUA		Lua scripting support
 
 ##-----------------------------------------------------------------------------
 
