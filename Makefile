@@ -248,7 +248,7 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/orc/campaign1.ccl data/ccl/orc/campaign2.ccl \
 	  data/ccl/anim.ccl data/ccl/wc2.ccl data/ccl/ranks.ccl \
 	  data/ccl/tips.ccl data/ccl/menus.ccl data/ccl/keystrokes.ccl \
-	  data/ccl/siod.ccl \
+	  data/ccl/siod.ccl data/ccl/spells.ccl \
 	  data/ccl/editor.ccl # data/campaigns/*/*.cm
 
 CONTRIB	= contrib/cross.png contrib/red_cross.png \
