@@ -61,8 +61,7 @@ extern void SoundCclRegister(void);	/// register ccl features
 
 #if !defined(USE_CCL) && !defined(USE_CCL2) || !defined(WITH_SOUND) // {
 
-#define SoundCclRegister()		/// dummy function for without sound
-
+extern void SoundCclRegister(void);	/// register ccl features
 
 #endif	// } !defined(USE_CCL) && !defined(USE_CCL2) || !defined(WITH_SOUND)
 //@}
