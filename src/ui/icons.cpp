@@ -110,7 +110,7 @@ local void AddIcon(const char *ident, const char *tileset,
     } else {				// new file
 	iconfile = malloc(sizeof(IconFile));
 	iconfile->FileName = strdup(file);
-	iconfile->Graphic = NULL;
+	iconfile->Sprite = NULL;
 	*(IconFile **) hash_add(IconFileHash, iconfile->FileName) = iconfile;
     }
 
@@ -139,10 +139,7 @@ local void AddIcon(const char *ident, const char *tileset,
 	icon->Width = width;
 	icon->Height = height;
 
-	icon->X = 0;
-	icon->Y = 0;
-
-	icon->Graphic = NULL;
+	icon->Sprite = NULL;
 
 	*(Icon **) hash_add(IconHash, str) = icon;
 	free(str);
@@ -199,12 +196,9 @@ global void LoadIcons(void)
 
 	icon=Icons[i];
 	// If tileset only fitting tileset.
-	if (!icon->Tileset
-		|| !strcmp(icon->Tileset, TheMap.TerrainName)) {
-	    int icons_per_row;
-
+	if (!icon->Tileset || !strcmp(icon->Tileset, TheMap.TerrainName)) {
 	    // File already loaded?
-	    if (!icon->File->Graphic) {
+	    if (!icon->File->Sprite) {
 		char* buf;
 		char* file;
 
@@ -212,17 +206,13 @@ global void LoadIcons(void)
 		buf = alloca(strlen(file) + 9 + 1);
 		file = strcat(strcpy(buf, "graphics/"), file);
 		ShowLoadProgress("\tIcons %s\n", file);
-		icon->File->Graphic = LoadGraphic(file);
+		icon->File->Sprite = LoadSprite(file,IconWidth,IconHeight);
 #ifdef USE_OPENGL
-		MakeTexture(icon->File->Graphic,icon->File->Graphic->Width,
-		            icon->File->Graphic->Height);
+		MakeTexture(icon->File->Sprite,icon->File->Sprite->Width,
+		            icon->File->Sprite->Height);
 #endif
 	    }
-	    icon->Graphic = icon->File->Graphic;
-
-	    icons_per_row = icon->Graphic->Width / icon->Width;
-	    icon->X = (icon->Index % icons_per_row) * icon->Width;
-	    icon->Y = (icon->Index / icons_per_row) * icon->Height;
+	    icon->Sprite = icon->File->Sprite;
 	}
     }
 }
@@ -289,7 +279,7 @@ global void CleanIcons(void)
 	for (i = 0; i < n; ++i) {
 	    hash_del(IconFileHash, table[i]->FileName);
 	    free(table[i]->FileName);
-	    VideoSaveFree(table[i]->Graphic);
+	    VideoSaveFree(table[i]->Sprite);
 	    free(table[i]);
 	}
     }
@@ -355,9 +345,8 @@ global const char* IdentOfIcon(const Icon* icon)
 */
 global void DrawIcon(const Player* player, Icon* icon, int x, int y)
 {
-    GraphicPlayerPixels(player, icon->Graphic);
-    VideoDrawSub(icon->Graphic, icon->X, icon->Y, icon->Width, icon->Height,
-	x, y);
+    GraphicPlayerPixels(player, icon->Sprite);
+    VideoDraw(icon->Sprite, icon->Index, x, y);
 }
 
 /**
