@@ -78,12 +78,6 @@
 // map while loading, but are taken from the actual tileset information of
 // the game (which might have changed since the map was saved)
 #define USE_TILEFLAGS_FROM_TILESET_WHILE_LOADING_A_PUD
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
-
-static int MapOffsetX; ///< Offset X for combined maps
-static int MapOffsetY; ///< Offset Y for combined maps
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -154,10 +148,10 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			int v;
 
 			v=ConvertLE16(mtxm[h*width+w]);
-			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Tile=ctab[v];
-			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Value=0;
+			map->Fields[w + h * TheMap.Info.MapWidth].Tile=ctab[v];
+			map->Fields[w + h * TheMap.Info.MapWidth].Value=0;
 #ifdef USE_TILEFLAGS_FROM_TILESET_WHILE_LOADING_A_PUD
-			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Flags = tileset->FlagsTable[v];
+			map->Fields[w+h*TheMap.Info.MapWidth].Flags = tileset->FlagsTable[v];
 #endif
 			//
 			// Walls are handled special (very ugly).
@@ -165,12 +159,12 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			if( (v&0xFFF0)==0x00A0
 					|| (v&0xFFF0)==0x00C0
 					|| (v&0xFF00)==0x0900 ) {
-				map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Value=
+				map->Fields[w+h*TheMap.Info.MapWidth].Value=
 						UnitTypeOrcWall->_HitPoints;
 			} else if( (v&0x00F0)==0x0090
 					|| (v&0xFFF0)==0x00B0
 					|| (v&0xFF00)==0x0800 ) {
-				map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Value=
+				map->Fields[w+h*TheMap.Info.MapWidth].Value=
 						UnitTypeHumanWall->_HitPoints;
 			}
 		}
@@ -197,7 +191,7 @@ static void ConvertSQM(const unsigned short* sqm,int width,int height
 	for( h=0; h<height; ++h ) {
 		for( w=0; w<width; ++w ) {
 			v=ConvertLE16(sqm[w+h*width]);
-			i=MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth;
+			i=w+(h)*TheMap.Info.MapWidth;
 			if( v&MapMoveOnlyLand ) {
 				map->Fields[i].Flags|=MapFieldLandAllowed;
 			}
@@ -246,6 +240,7 @@ static void ConvertSQM(const unsigned short* sqm,int width,int height
 }
 #endif
 
+#ifndef LUA_MAP_API
 /**
 ** Convert puds REGM section into internal format.
 **
@@ -265,7 +260,7 @@ static void ConvertREGM(const unsigned short* regm,int width,int height
 	for( h=0; h<height; ++h ) {
 		for( w=0; w<width; ++w ) {
 			v=ConvertLE16(regm[w+h*width]);
-			i=MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth;
+			i=w+h*TheMap.Info.MapWidth;
 			if( v==MapActionForest ) { // forest could be chopped
 				map->Fields[i].Flags|=MapFieldForest;
 				continue;
@@ -296,6 +291,7 @@ static void ConvertREGM(const unsigned short* regm,int width,int height
 		}
 	}
 }
+#endif
 
 /*============================================================================
 == Read
@@ -814,8 +810,6 @@ void LoadPud(const char* pud,WorldMap* map)
 	char header[5];
 	char buf[1024];
 	char pudfull[PATH_MAX];
-	int width;
-	int height;
 
 	strcpy(pudfull, StratagusLibPath);
 	strcat(pudfull, "/");
@@ -844,8 +838,6 @@ void LoadPud(const char* pud,WorldMap* map)
 		fprintf(stderr,"LoadPud: %s: invalid pud\n", pud);
 		ExitFatal(-1);
 	}
-
-	width=height=0;
 
 	//
 	// Parse all sections.
@@ -930,26 +922,8 @@ void LoadPud(const char* pud,WorldMap* map)
 		// Dimension
 		//
 		if( !memcmp(header,"DIM ",4) ) {
-
-			width=PudReadWord(input);
-			height=PudReadWord(input);
-
-			if( !map->Fields ) {
-				map->Fields=calloc(width*height,sizeof(*map->Fields));
-				if( !map->Fields ) {
-					perror("calloc()");
-					ExitFatal(-1);
-				}
-				TheMap.Visible[0]=calloc(TheMap.Info.MapWidth*TheMap.Info.MapHeight/8,1);
-				if( !TheMap.Visible[0] ) {
-					perror("calloc()");
-					ExitFatal(-1);
-				}
-				InitUnitCache();
-				// FIXME: this should be CreateMap or InitMap?
-			} else { // FIXME: should do some checks here!
-				DebugPrint("Warning: Fields already allocated\n");
-			}
+			PudReadWord(input);
+			PudReadWord(input);
 			continue;
 		}
 
@@ -1146,7 +1120,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		if( !memcmp(header,"MTXM",4) ) {
 			unsigned short* mtxm;
 
-			if( length!=(uint32_t)width*height*2 ) {
+			if( length!=(uint32_t)TheMap.Info.MapWidth * TheMap.Info.MapHeight * 2 ) {
 				DebugPrint("wrong length of MTXM section %u\n" _C_ length);
 				ExitFatal(-1);
 			}
@@ -1159,7 +1133,7 @@ void LoadPud(const char* pud,WorldMap* map)
 				ExitFatal(-1);
 			}
 
-			ConvertMTXM(mtxm,width,height,map);
+			ConvertMTXM(mtxm, TheMap.Info.MapWidth, TheMap.Info.MapHeight,map);
 			free(mtxm);
 
 			continue;
@@ -1171,7 +1145,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		if( !memcmp(header,"SQM ",4) ) {
 			unsigned short* sqm;
 
-			if( length!=(uint32_t)width*height*sizeof(short) ) {
+			if( length!=(uint32_t)TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(short) ) {
 				DebugPrint("wrong length of SQM  section %u\n" _C_ length);
 				ExitFatal(-1);
 			}
@@ -1185,7 +1159,7 @@ void LoadPud(const char* pud,WorldMap* map)
 			}
 
 #ifndef USE_TILEFLAGS_FROM_TILESET_WHILE_LOADING_A_PUD
-			ConvertSQM(sqm,width,height,map);
+			ConvertSQM(sqm, TheMap.Info.MapWidth, TheMap.Info.MapHeight, map);
 #endif
 
 			free(sqm);
@@ -1199,7 +1173,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		if( !memcmp(header,"REGM",4) ) {
 			unsigned short* regm;
 
-			if( length!=(uint32_t)width*height*sizeof(short) ) {
+			if( length!=(uint32_t)TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(short) ) {
 				DebugPrint("wrong length of REGM section %u\n" _C_ length);
 				ExitFatal(-1);
 			}
@@ -1211,8 +1185,9 @@ void LoadPud(const char* pud,WorldMap* map)
 				perror("CLread()");
 				ExitFatal(-1);
 			}
-
-			ConvertREGM(regm,width,height,map);
+#ifndef LUA_MAP_API
+			ConvertREGM(regm, TheMap.Info.MapWidth, TheMap.Info.MapHeight, map);
+#endif
 			free(regm);
 
 			continue;
@@ -1244,8 +1219,8 @@ void LoadPud(const char* pud,WorldMap* map)
 				if( t==WC_StartLocationHuman
 						|| t==WC_StartLocationOrc ) { // starting points?
 
-					Players[o].StartX=MapOffsetX+x;
-					Players[o].StartY=MapOffsetY+y;
+					Players[o].StartX=x;
+					Players[o].StartY=y;
 					if (GameSettings.NumUnits == SettingsNumUnits1
 							&& Players[o].Type != PlayerNobody ) {
 						if (t == WC_StartLocationHuman) {
@@ -1281,7 +1256,7 @@ pawn:
 							}
 						}
 						if (Players[o].Type != PlayerNobody) {
-							unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
+							unit=MakeUnitAndPlace(x, y
 									,UnitTypeByWcNum(t),&Players[o]);
 							if( unit->Type->GivesResource ) {
 								if (!v) {
@@ -1311,12 +1286,6 @@ pawn:
 	}
 
 	CLclose(input);
-
-	MapOffsetX+=width;
-	if( MapOffsetX>=map->Info.MapWidth ) {
-		MapOffsetX=0;
-		MapOffsetY+=height;
-	}
 }
 
 /**
@@ -1700,7 +1669,6 @@ void ChangeTilesetPud(int old,WorldMap* map)
 {
 	unsigned char* mtxm;
 
-	MapOffsetX=MapOffsetY=0;
 	mtxm=malloc(map->Info.MapWidth*map->Info.MapHeight*2);
 	PudConvertMTXM(mtxm,map,Tilesets[old]);
 	ConvertMTXM((const unsigned short*)mtxm,map->Info.MapWidth,map->Info.MapHeight,map);
@@ -1712,7 +1680,6 @@ void ChangeTilesetPud(int old,WorldMap* map)
 */
 void CleanPud(void)
 {
-	MapOffsetX=MapOffsetY=0;
 }
 
 //@}

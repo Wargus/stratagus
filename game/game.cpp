@@ -155,6 +155,7 @@ static void LoadMap(const char* filename, WorldMap* map)
 				LuaLoadFile(filename);
 			}
 			Assert(TheMap.Info.Filename);
+			CreateMap(TheMap.Info.MapWidth, TheMap.Info.MapHeight);
 			LoadStratagusMap(TheMap.Info.Filename, map);
 			return;
 		}
@@ -172,6 +173,7 @@ static void LoadMap(const char* filename, WorldMap* map)
 	}
 	// ARI: This bombs out, if no pud, so will be safe.
 	if (strcasestr(filename, ".pud")) {
+		CreateMap(TheMap.Info.MapWidth, TheMap.Info.MapHeight);
 		LoadPud(filename, map);
 		map->Info.Filename = strdup(filename);
 		return;
