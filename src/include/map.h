@@ -307,8 +307,8 @@ typedef struct _map_info_ {
 
     /// Describes the wold map
 typedef struct _world_map_ {
-    unsigned		Width;		/// the map width
-    unsigned		Height;		/// the map height
+    int			Width;		/// the map width
+    int			Height;		/// the map height
 
     MapField*		Fields;		/// fields on map
     unsigned*		Visible[PlayerMax]; /// visible bit-field
@@ -317,7 +317,7 @@ typedef struct _world_map_ {
 
     char*		TerrainName;	/// terrain as name
     // FIXME: terrain nr. should be removed?
-    unsigned		Terrain;	/// terrain type (summer,winter,...)
+    int			Terrain;	/// terrain type (summer,winter,...)
     Tileset*		Tileset;	/// tileset data
 
     unsigned		TileCount;	/// how many tiles are available

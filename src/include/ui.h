@@ -102,13 +102,13 @@ typedef struct _viewport_ Viewport;	/// Viewport typedef
 struct _viewport_ {
     int X;			/// Screen pixel left corner x coordinate
     int Y;			/// Screen pixel upper corner y coordinate
-    unsigned EndX;		/// Screen pixel right x coordinate
-    unsigned EndY;		/// Screen pixel bottom y coordinate
+    int EndX;			/// Screen pixel right x coordinate
+    int EndY;			/// Screen pixel bottom y coordinate
 
-    unsigned MapX;		/// Map tile left corner x coordinate
-    unsigned MapY;		/// Map tile upper corner y coordinate
-    unsigned MapWidth;		/// Width in map tiles
-    unsigned MapHeight;		/// Height in map tiles
+    int MapX;			/// Map tile left corner x coordinate
+    int MapY;			/// Map tile upper corner y coordinate
+    int MapWidth;		/// Width in map tiles
+    int MapHeight;		/// Height in map tiles
 
     Unit* Unit;			/// Bound to this unit
 };
@@ -145,8 +145,8 @@ enum {
 typedef struct _ui_ {
     // to select the correct user interface.
     char*	Name;			/// interface name to select
-    unsigned	Width;			/// useable for this width
-    unsigned	Height;			/// useable for this height
+    int		Width;			/// useable for this width
+    int		Height;			/// useable for this height
 
     int		Contrast;		/// General Contrast
     int		Brightness;		/// General Brightness

@@ -329,9 +329,9 @@ struct _missile_type_ {
     char*	Ident;			/// missile name
     char*	File;			/// missile sprite file
 
-    unsigned	Width;			/// missile width in pixels
-    unsigned	Height;			/// missile height in pixels
-    unsigned	SpriteFrames;		/// number of sprite frames in graphic
+    int		Width;			/// missile width in pixels
+    int		Height;			/// missile height in pixels
+    int		SpriteFrames;		/// number of sprite frames in graphic
     int		NumDirections;		/// number of directions missile can face
 
 	// FIXME: FireSound defined but not used!
