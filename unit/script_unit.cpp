@@ -62,23 +62,6 @@ extern UnitType* CclGetUnitType(SCM ptr);
 extern unsigned CclGetResourceByName(SCM ptr);
 
 /**
-**	Set hit-point regeneration
-**
-**	@param flag	Flag enabling or disabling it.
-**
-**	@return		The old state of the hit-point regeneration.
-*/
-local SCM CclSetHitPointRegeneration(SCM flag)
-{
-    int old;
-
-    old = HitPointRegeneration;
-    HitPointRegeneration = gh_scm2bool(flag);
-
-    return gh_bool2scm(old);
-}
-
-/**
 **  Set xp damage
 **
 **  @param flag Flag enabling or disabling it.
@@ -1178,8 +1161,6 @@ local SCM CclSlotUsage(SCM list)
 */
 global void UnitCclRegister(void)
 {
-    gh_new_procedure1_0("set-hitpoint-regeneration!",
-	CclSetHitPointRegeneration);
     gh_new_procedure1_0("set-xp-damage!", CclSetXpDamage);
     gh_new_procedure1_0("set-training-queue!", CclSetTrainingQueue);
     gh_new_procedure1_0("set-building-capture!", CclSetBuildingCapture);

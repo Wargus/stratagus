@@ -79,7 +79,6 @@ global int NumUnits;			/// Number of slots used
 global Unit* DestroyedBuildings;	/// List of DestroyedBuildings
 global Unit* CorpseList;		/// List of Corpses On Map
 
-global int HitPointRegeneration;	/// Hit point regeneration for all units
 global int XpDamage;			/// Hit point regeneration for all units
 global char EnableTrainingQueue;	/// Config: training queues enabled
 global char EnableBuildingCapture;	/// Config: capture buildings enabled
@@ -3744,8 +3743,6 @@ global void SaveUnits(CLFile* file)
     //
     //	Local variables
     //
-    CLprintf(file, "(set-hitpoint-regeneration! #%s)\n",
-	HitPointRegeneration ? "t" : "f");
     CLprintf(file, "(set-xp-damage! #%s)\n",
 	XpDamage ? "t" : "f");
     CLprintf(file, "(set-fancy-buildings! #%s)\n",
@@ -3836,7 +3833,6 @@ global void CleanUnits(void)
 
     InitUnitsMemory();
 
-    HitPointRegeneration = 0;
     XpDamage = 0;
     FancyBuildings = 0;
 }

@@ -315,6 +315,7 @@ local Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
     missile->SourceUnit = NULL;
 
     missile->Damage = 0;
+    missile->Hidden = 0;
     missile->TargetUnit = NULL;
     missile->TTL = -1;
 
@@ -758,8 +759,8 @@ global int FindAndSortMissiles(const Viewport* vp, Missile** table)
     do {
 	for (; missiles < missiles_end; ++missiles) {
 	    missile = *missiles;
-	    if (missile->Delay) {
-		continue;	// delayed aren't shown
+	    if (missile->Delay || missile->Hidden) {
+		continue;	// delayed or hidden -> aren't shown
 	    }
 	    // Draw only visible missiles
 	    if (!flag || MissileVisibleInViewport(vp, missile)) {
@@ -1434,6 +1435,9 @@ local void SaveMissile(const Missile* missile,CLFile* file)
     }
     CLprintf(file, " 'damage %d", missile->Damage);
     CLprintf(file, " 'ttl %d",	missile->TTL);
+    if (missile->Hidden) {
+	CLprintf(file, " 'hidden ");
+    }
     CLprintf(file, " 'step '(%d %d)",
 	missile->CurrentStep,
 	missile->TotalStep);
@@ -1787,6 +1791,7 @@ global void MissileActionFlameShield(Missile *missile)
 	-27, -15, -30, -10, -31, -5, -32, 0, -31, 5, -30, 10, -27, 16, -24,
 	20, -20, 24, -15, 27, -10, 30, -5, 31, 0, 32};
     Unit *table[UnitMax];
+    Unit *unit;
     int n;
     int i;
     int dx;
@@ -1803,22 +1808,35 @@ global void MissileActionFlameShield(Missile *missile)
     i = missile->TTL % 36;		// 36 positions on the circle
     dx = fs_dc[i * 2];
     dy = fs_dc[i * 2 + 1];
-    ux = missile->TargetUnit->X;
-    uy = missile->TargetUnit->Y;
-    ix = missile->TargetUnit->IX;
-    iy = missile->TargetUnit->IY;
-    uw = missile->TargetUnit->Type->Width;
-    uh = missile->TargetUnit->Type->Height;
-    missile->X = ux * TileSizeX + ix + uw / 2 + dx - 32;
-    missile->Y = uy * TileSizeY + iy + uh / 2 + dy - 32 - 16;
-    if (missile->TargetUnit->Orders[0].Action == UnitActionDie) {
+    unit = missile->TargetUnit;
+    //
+    //	Show around the top most unit.
+    //	FIXME: conf, do we hide if the unit is contained or not?
+    //
+    while (unit->Container) {
+	unit=unit->Container;
+    }
+    ux = unit->X;
+    uy = unit->Y;
+    ix = unit->IX;
+    iy = unit->IY;
+    uw = unit->Type->TileWidth;
+    uh = unit->Type->TileHeight;
+    missile->X = ux * TileSizeX + ix + uw * TileSizeX / 2 + dx - 16;
+    missile->Y = uy * TileSizeY + iy + uh * TileSizeY / 2 + dy - 32;
+    if (unit->Orders[0].Action == UnitActionDie) {
 	missile->TTL = i;
     }
     if (missile->TTL == 0) {
-	missile->TargetUnit->FlameShield = 0;
+	unit->FlameShield = 0;
     }
-    //vladi: still no have clear idea what is this about :)
-    CheckMissileToBeDrawn(missile);
+
+    if (unit->Container) {
+	missile->Hidden = 1;
+	return;		/// Hidden missile don't do damage.
+    } else {
+	missile->Hidden = 0;
+    }
 
     // Only hit 1 out of 8 frames
     if (missile->TTL & 7) {
@@ -1826,7 +1844,7 @@ global void MissileActionFlameShield(Missile *missile)
     }
     n = SelectUnits(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
     for (i = 0; i < n; ++i) {
-	if (table[i] == missile->TargetUnit) {
+	if (table[i] == unit) {
 	    // cannot hit target unit
 	    continue;
 	}
