@@ -883,17 +883,21 @@ global void LoadScm(const char* scm,WorldMap* map)
 		for( i=0; i<12; ++i ) {
 		    v=ScmReadByte();
 		    switch( v ) {
-//			case PlayerRaceHuman:
-//			case PlayerRaceOrc:
-//			case PlayerRaceNeutral:
-			case 0:
-			case 1:
+			case 0: // Zerg
+			case 1: // Terran
 			    break;
 			case 2:	// Protoss
-			    v=PlayerRaceHuman;
+			    // FIXME: Add more races
+			    v=0;
 			    break;
-			case 5:
-			    v=PlayerRaceHuman;
+			case 4: // Neutral
+			    v=PlayerRaceNeutral;
+			    break;
+			case 5: // User select
+			    v=0;
+			    break;
+			case 7: // Inactive
+			    v=0;
 			    break;
 			default:
 			    DebugLevel1("Unknown race %d\n" _C_ v);
@@ -920,7 +924,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 		scm_ptr += length;
 		continue;
 	    }
-	    DebugLevel1("Wrong SIDE length\n");
+	    DebugLevel1("Wrong MTXM length\n");
 	}
 
 	//
