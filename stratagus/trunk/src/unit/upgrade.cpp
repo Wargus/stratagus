@@ -568,10 +568,6 @@ global void SaveUpgrades(FILE* file)
 	    fprintf(file,"\n  '(sight-range %d)"
 		    ,UpgradeModifiers[i]->Modifier.SightRange );
 	}
-	if( UpgradeModifiers[i]->Modifier.SightRange ) {
-	    fprintf(file,"\n  '(attack-range %d)"
-		    ,UpgradeModifiers[i]->Modifier.SightRange );
-	}
 	if( UpgradeModifiers[i]->Modifier.BasicDamage ) {
 	    fprintf(file,"\n  '(basic-damage %d)"
 		    ,UpgradeModifiers[i]->Modifier.BasicDamage );
