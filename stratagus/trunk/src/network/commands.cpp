@@ -947,6 +947,8 @@ local void ReplayEachCycle(void)
 	}
 
 	if (!ReplayStep) {
+		SetMessage("End of replay");
+		GameObserve = 0;
 		return;
 	}
 
