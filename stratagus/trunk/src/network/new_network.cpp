@@ -1518,14 +1518,14 @@ global void NetworkEvent(void)
     if( !NetworkInSync ) {
 	NetworkInSync=1;
 	n=((FrameCounter)/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
-	DebugLevel3(__FUNCTION__": wait for %d - ",n);
+	DebugLevel2(__FUNCTION__": wait for %d - ",n);
 	for( player=0; player<HostsCount; ++player ) {
 	    if( NetworkIn[n&0xFF][NetPlyNr[player]].Time!=n ) {
 		NetworkInSync=0;
 		break;
 	    }
 	}
-	DebugLevel3("%d in sync %d\n",FrameCounter,NetworkInSync);
+	DebugLevel2("%d in sync %d\n",FrameCounter,NetworkInSync);
     }
 }
 
