@@ -55,8 +55,8 @@
 **  Private flac data structure to handle flac streaming.
 */
 typedef struct _flac_data_ {
-	CLFile* FlacFile;			/// File handle
-	FLAC__StreamDecoder* Stream;		/// Decoder stream
+	FLAC__StreamDecoder *Stream;		/// Decoder stream
+	CLFile *FlacFile;			/// File handle
 } FlacData;
 
 /*----------------------------------------------------------------------------
@@ -187,7 +187,8 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 
 	dest = sample->Buffer + sample->Pos + sample->Len;
 	i = ConvertToStereo32(buf, dest, sample->Frequency,
-		sample->SampleSize / 8, sample->Channels, frame->header.blocksize * sample->Channels * 2);
+		sample->SampleSize / 8, sample->Channels,
+		frame->header.blocksize * sample->Channels * 2);
 	sample->Len += i;
 
 	free(buf);
@@ -204,11 +205,11 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 **
 **  @return        Number of bytes read
 */
-static int FlacStreamRead(Sample* sample, void* buf, int len)
+static int FlacStreamRead(Sample *sample, void *buf, int len)
 {
-	FlacData* data;
+	FlacData *data;
 
-	data = (FlacData*)sample->User;
+	data = sample->User;
 
 	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
@@ -238,9 +239,9 @@ static int FlacStreamRead(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void FlacStreamFree(Sample* sample)
+local void FlacStreamFree(Sample *sample)
 {
-	FlacData* data;
+	FlacData *data;
 
 	data = sample->User;
 
@@ -269,7 +270,7 @@ local const SampleType FlacStreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-local int FlacRead(Sample* sample, void* buf, int len)
+local int FlacRead(Sample *sample, void *buf, int len)
 {
 	FlacData *data;
 
@@ -293,7 +294,7 @@ local int FlacRead(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void FlacFree(Sample* sample)
+local void FlacFree(Sample *sample)
 {
 	free(sample->User);
 	free(sample->Buffer);
@@ -316,13 +317,14 @@ local const SampleType FlacSampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-global Sample* LoadFlac(const char* name, int flags)
+global Sample* LoadFlac(const char *name, int flags)
 {
-	CLFile* f;
-	Sample* sample;
+	Sample *sample;
+	FlacData *data;
+	CLFile *f;
 	unsigned int magic[1];
-	FLAC__StreamDecoder* stream;
-	FlacData* data;
+	FLAC__StreamDecoder *stream;
+
 
 	if (!(f = CLopen(name, CL_OPEN_READ))) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
