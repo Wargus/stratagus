@@ -3185,8 +3185,14 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	    fprintf(file,"\n  'data-train 'FIXME");
 	    break;
 	default:
-	    DebugLevel0Fn("FIXME: not written\n");
-	    fprintf(file,"\n  'data-move 'FIXME");
+	    fprintf(file,"\n  'data-move '(");
+	    if( unit->Data.Move.Fast ) {
+		fprintf(file,"fast ");
+	    }
+	    if( unit->Data.Move.Length ) {
+		fprintf(file,"with-path ");
+	    }
+	    fprintf(file,")");
 	    break;
     }
 
