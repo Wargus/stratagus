@@ -60,13 +60,13 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int SoundOff;						/// True quiet, sound turned off
-int MusicOff;						/// Music turned off
+int SoundOff; ///< True quiet, sound turned off
+int MusicOff; ///< Music turned off
 
 /**
-**		Various sounds used in game.
+** Various sounds used in game.
 **
-**		FIXME: @todo support more races. Must remove static config.
+** FIXME: @todo support more races. Must remove static config.
 */
 GameSound GameSounds
 #ifndef laterUSE_CCL
@@ -77,10 +77,10 @@ GameSound GameSounds
 	{ "click", NULL },
 	{ "transport docking", NULL },
 	{ "building construction", NULL },
-	{		{ "basic human voices work complete", NULL },
+	{ { "basic human voices work complete", NULL },
 		{ "basic orc voices work complete", NULL },
 	},
-	{		{ "rescue (human) UNUSED", NULL },
+	{ { "rescue (human) UNUSED", NULL },
 		{ "rescue (orc) UNUSED", NULL },
 	},
 }
@@ -88,20 +88,20 @@ GameSound GameSounds
 	;
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Helper function: insert a sound request in the server side sound FIFO.
+** Helper function: insert a sound request in the server side sound FIFO.
 **
-**		@param unit		Pointer to unit.
-**		@param id		Unit identifier, for pointer reuse detection.
-**		@param power		How loud to play the sound.
-**		@param sound		FIXME: docu
-**		@param fight		FIXME: docu
-**		@param selection		FIXME: docu
-**		@param volume		FIXME: docu
-**		@param stereo		FIXME: docu
+** @param unit         Pointer to unit.
+** @param id           Unit identifier, for pointer reuse detection.
+** @param power        How loud to play the sound.
+** @param sound        FIXME: docu
+** @param fight        FIXME: docu
+** @param selection    FIXME: docu
+** @param volume       FIXME: docu
+** @param stereo       FIXME: docu
 */
 static void InsertSoundRequest(const Unit* unit, unsigned id,
 	unsigned short power, SoundId sound, unsigned char fight,
@@ -135,14 +135,14 @@ static void InsertSoundRequest(const Unit* unit, unsigned id,
 }
 
 /**
-**		Maps a UnitVoiceGroup to a SoundId.
+** Maps a UnitVoiceGroup to a SoundId.
 **
-**		@param unit		Sound initiator
-**		@param voice		Type of sound wanted
+** @param unit    Sound initiator
+** @param voice   Type of sound wanted
 **
-**		@return				Sound identifier
+** @return Sound identifier
 **
-**		@todo FIXME: The work completed sounds only supports two races.
+** @todo FIXME: The work completed sounds only supports two races.
 */
 static SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 {
@@ -174,12 +174,12 @@ static SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 }
 
 /**
-**		Ask to the sound server to play a sound attached to an unit. The
-**		sound server may discard the sound if needed (e.g., when the same
-**		unit is already speaking).
+** Ask to the sound server to play a sound attached to an unit. The
+** sound server may discard the sound if needed (e.g., when the same
+** unit is already speaking).
 **
-**		@param unit		Sound initiator, unit speaking
-**		@param voice		Type of sound wanted (Ready,Die,Yes,...)
+** @param unit    Sound initiator, unit speaking
+** @param voice   Type of sound wanted (Ready,Die,Yes,...)
 */
 void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 {
@@ -200,10 +200,10 @@ void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 }
 
 /**
-**		Ask the sound server to play a sound for a missile.
+** Ask the sound server to play a sound for a missile.
 **
-**		@param missile		Sound initiator, missile exploding
-**		@param sound		Sound to be generated
+** @param missile   Sound initiator, missile exploding
+** @param sound     Sound to be generated
 */
 void PlayMissileSound(const Missile* missile, SoundId sound)
 {
@@ -223,7 +223,7 @@ void PlayMissileSound(const Missile* missile, SoundId sound)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void PlayGameSound(SoundId sound, unsigned char volume)
 {
@@ -231,11 +231,11 @@ void PlayGameSound(SoundId sound, unsigned char volume)
 }
 
 /**
-**		Ask to the sound server to set the global volume of the sound.
+** Ask to the sound server to set the global volume of the sound.
 **
-**		@param volume		the sound volume (positive number) 0-255
+** @param volume     the sound volume (positive number) 0-255
 **
-**		@see MaxVolume
+** @see MaxVolume
 */
 void SetGlobalVolume(int volume)
 {
@@ -252,11 +252,11 @@ void SetGlobalVolume(int volume)
 }
 
 /**
-**		Ask to the sound server to set the volume of the music.
+** Ask to the sound server to set the volume of the music.
 **
-**		@param volume		the music volume (positive number) 0-255
+** @param volume    the music volume (positive number) 0-255
 **
-**		@see MaxVolume
+** @see MaxVolume
 */
 void SetMusicVolume(int volume)
 {
@@ -274,13 +274,13 @@ void SetMusicVolume(int volume)
 }
 
 /**
-**		Lookup the sound id's for the game sounds.
+** Lookup the sound id's for the game sounds.
 */
 void InitSoundClient(void)
 {
 	int i;
 
-	if (SoundFildes == -1) {				// No sound enabled
+	if (SoundFildes == -1) { // No sound enabled
 		return;
 	}
 	// let's map game sounds, look if already setup in ccl.

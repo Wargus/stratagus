@@ -412,7 +412,7 @@ void cd_exit(void)
 
 /* internal helpers */
 
-#define startof(track)		(MCI_MAKE_TMSF(track, 0, 0, 0))
+#define startof(track) (MCI_MAKE_TMSF(track, 0, 0, 0))
 
 static char* lengthof(int track)
 {
@@ -529,7 +529,7 @@ int cd_is_audio(int track)
 void cd_get_volume(int *c0, int *c1)
 {
 	if (c0) {
-		*c0 = 128;		/* (shrug) */
+		*c0 = 128; /* (shrug) */
 	}
 	if (c1) {
 		*c1 = 128;

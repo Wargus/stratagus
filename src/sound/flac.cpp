@@ -55,8 +55,8 @@
 **  Private flac data structure to handle flac streaming.
 */
 typedef struct _flac_data_ {
-	FLAC__StreamDecoder* FlacStream;  /// Decoder stream
-	CLFile* FlacFile;                 /// File handle
+	FLAC__StreamDecoder* FlacStream;  ///< Decoder stream
+	CLFile* FlacFile;                 ///< File handle
 } FlacData;
 
 /*----------------------------------------------------------------------------
@@ -317,7 +317,7 @@ Sample* LoadFlac(const char* name, int flags)
 	}
 
 	CLread(f, magic, sizeof(magic));
-	if (AccessLE32(magic) != 0x43614C66) {		// "fLaC" in ASCII
+	if (AccessLE32(magic) != 0x43614C66) { // "fLaC" in ASCII
 		CLclose(f);
 		return NULL;
 	}

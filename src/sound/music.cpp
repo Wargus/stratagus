@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name music.c		-	Background music support */
+/**@name music.c - Background music support */
 //
-//	(c) Copyright 2002-2004 by Lutz Sammer, Nehal Mistry
+// (c) Copyright 2002-2004 by Lutz Sammer, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -54,36 +54,36 @@
 #include "cdaudio.h"
 
 /*----------------------------------------------------------------------------
---		Declaration
+-- Declaration
 ----------------------------------------------------------------------------*/
 
-#define SoundFrequency		44100				// sample rate of dsp
+#define SoundFrequency 44100 // sample rate of dsp
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
-Sample* MusicSample;			 /// Music samples
+Sample* MusicSample;  ///< Music samples
 
 char* CurrentMusicFile;
 
-PlaySection* PlaySections;				// Play Sections
-int NumPlaySections;						// Number of Play Sections
-PlaySectionType CurrentPlaySection;		// Current Play Section
+PlaySection* PlaySections;          ///< Play Sections
+int NumPlaySections;                ///< Number of Play Sections
+PlaySectionType CurrentPlaySection; ///< Current Play Section
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Stop the current playing music.
+** Stop the current playing music.
 **
-**		@todo 		FIXME: Stop the CD-PLAYER.
+** @todo  FIXME: Stop the CD-PLAYER.
 */
 void StopMusic(void)
 {
 	if (PlayingMusic) {
-		PlayingMusic = 0;				// Callback!
+		PlayingMusic = 0; // Callback!
 		if (MusicSample) {
 #ifdef USE_SDL
 			SDL_LockAudio();
@@ -99,7 +99,7 @@ void StopMusic(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void PlaySectionMusic(PlaySectionType section)
 {
@@ -190,15 +190,15 @@ void PlaySectionMusic(PlaySectionType section)
 }
 
 /**
-**		Play a music file.
+** Play a music file.
 **
-**		Currently supported are .mod, .it, .s3m, .wav, .xm.
-**		Optional .ogg, .mp3, .flac and cdrom.
+** Currently supported are .mod, .it, .s3m, .wav, .xm.
+** Optional .ogg, .mp3, .flac and cdrom.
 **
-**		@param name		Name of sound file, format is automatic detected.
-**						Names starting with ':' control the cdrom.
+** @param name Name of sound file, format is automatic detected.
+** Names starting with ':' control the cdrom.
 **
-**		@return				1 if music is playing, 0 if not.
+** @return 1 if music is playing, 0 if not.
 */
 int PlayMusic(const char* name)
 {
@@ -241,12 +241,12 @@ int PlayMusic(const char* name)
 #endif
 #ifdef USE_MAD
 	if ((sample = LoadMp3(name, PlayAudioStream))) {
-//		if (sample->Channels != 2 || sample->SampleSize != 16
-//			|| sample->Frequency != SoundFrequency) {
-//			DebugPrint("Not supported music format\n");
-//			SoundFree(sample);
-//			return;
-//		}
+// if (sample->Channels != 2 || sample->SampleSize != 16
+// || sample->Frequency != SoundFrequency) {
+// DebugPrint("Not supported music format\n");
+// SoundFree(sample);
+// return;
+// }
 		StopMusic();
 		MusicSample = sample;
 		PlayingMusic = 1;
@@ -283,9 +283,9 @@ int PlayMusic(const char* name)
 }
 
 /**
-**		Play a sound file.
+** Play a sound file.
 **
-**		@param name		Name of sound file
+** @param name Name of sound file
 */
 void PlaySoundFile(const char* name)
 {

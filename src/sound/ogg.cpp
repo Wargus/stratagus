@@ -5,8 +5,8 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
 /**@name ogg.c - ogg support */
 //
@@ -36,7 +36,7 @@
 
 #include "stratagus.h"
 
-#ifdef USE_OGG		// {
+#ifdef USE_OGG // {
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -68,7 +68,7 @@
 **  Private ogg data structure to handle ogg streaming.
 */
 typedef struct _ogg_data_ {
-	OggVorbis_File VorbisFile;  /// Vorbis file handle
+	OggVorbis_File VorbisFile;  ///< Vorbis file handle
 } OggData;
 
 /*----------------------------------------------------------------------------
@@ -194,7 +194,7 @@ static void OggStreamFree(Sample* sample)
 }
 
 /**
-**		Ogg stream type structure.
+** Ogg stream type structure.
 */
 static const SampleType OggStreamSampleType = {
 	OggStreamRead,
@@ -266,7 +266,7 @@ Sample* LoadOgg(const char* name,int flags)
 	}
 
 	CLread(f, magic, sizeof(magic));
-	if (AccessLE32(magic) != 0x5367674F) {		// "OggS" in ASCII
+	if (AccessLE32(magic) != 0x5367674F) { // "OggS" in ASCII
 		CLclose(f);
 		return NULL;
 	}
@@ -305,7 +305,7 @@ Sample* LoadOgg(const char* name,int flags)
 		int i;
 		int n;
 		int bitstream;
-		
+
 		total = ov_pcm_total(&data->VorbisFile, -1) * 2;
 
 		sample->Buffer = malloc(total);
@@ -358,7 +358,7 @@ static size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 	unsigned char* frame;
 
 	avi = user;
-	if (avi->AudioRemain) {				// Bytes remaining
+	if (avi->AudioRemain) { // Bytes remaining
 		length = avi->AudioRemain;
 		if (length > nmemb * size) {
 			length = nmemb * size;
@@ -384,11 +384,11 @@ static size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 }
 
 /**
-**		OGG vorbis close callback.
+** OGG vorbis close callback.
 **
-**		@param user				User argument.
+** @param user User argument.
 **
-**		@return						Success status.
+** @return Success status.
 */
 static int AVI_OGG_close(void* user __attribute__((unused)))
 {
@@ -396,16 +396,16 @@ static int AVI_OGG_close(void* user __attribute__((unused)))
 }
 
 /**
-**		Play the ogg stream of an avi movie.
+** Play the ogg stream of an avi movie.
 **
-**		@param avi		Avi file handle
+** @param avi Avi file handle
 */
 void PlayAviOgg(AviFile* avi)
 {
 	Sample* sample;
 	OggData* data;
 	vorbis_info* info;
-	static const ov_callbacks vc = { AVI_OGG_read, OGG_seek, AVI_OGG_close,	NULL };
+	static const ov_callbacks vc = { AVI_OGG_read, OGG_seek, AVI_OGG_close, NULL };
 
 	data = malloc(sizeof(OggData));
 
@@ -437,6 +437,6 @@ void PlayAviOgg(AviFile* avi)
 	PlayingMusic = 1;
 }
 
-#endif		// USE_OGG
+#endif // USE_OGG
 
 //@}
