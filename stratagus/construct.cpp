@@ -45,6 +45,11 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**	Construction type definition
+*/
+global const char ConstructionType[] = "construction";
+
+/**
 **	Constructions.
 **
 **	@todo support more constructions and don't use a fixed size table.
@@ -280,6 +285,8 @@ local SCM CclDefineConstructionWcNames(SCM list)
 **	Parse the construction.
 **
 **	@param list	List describing the construction.
+**
+**	@note make this more flexible
 */
 local SCM CclDefineConstruction(SCM list)
 {
@@ -305,7 +312,8 @@ local SCM CclDefineConstruction(SCM list)
 	return SCM_UNSPECIFIED;
     }
     construction=&Constructions[i];
-    construction->Nr=i;
+    construction->OType=ConstructionType;
+    construction->Nr=i;			// FIXME: remove
     construction->Ident=str;
 
     //
