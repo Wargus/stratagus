@@ -99,9 +99,9 @@ extern unsigned char* MakeMatrix(void);
 	/// Get next element of the way to goal.
 extern int NewPath(struct _unit_* unit);
 	/// Return distance to unit.
-extern int UnitReachable(struct _unit_* unit, struct _unit_* dst, int range);
+extern int UnitReachable(const struct _unit_* unit, const struct _unit_* dst, int range);
 	/// Can the unit 'src' reach the place x,y
-extern int PlaceReachable(struct _unit_* src, int x, int y, int w, int h,
+extern int PlaceReachable(const struct _unit_* src, int x, int y, int w, int h,
 	int minrange, int maxrange);
 
 //
