@@ -791,6 +791,24 @@ local int CclSetLocalPlayerName(lua_State* l)
 #endif
 
 /**
+**	Set God mode.
+**
+**	@return		The old mode.
+*/
+#if defined(USE_LUA)
+local int CclSetGodMode(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_pushboolean(l, GodMode);
+    GodMode = LuaToBoolean(l, 1);
+    return 0;
+}
+#endif
+
+/**
 **	Enable/disable Showing the tips at the start of a level.
 **
 **	@param flag	True = turn on, false = off.
@@ -1779,6 +1797,7 @@ global void InitCcl(void)
     lua_register(Lua, "SetGamePaused", CclSetGamePaused);
     lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
     lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
+    lua_register(Lua, "SetGodMode", CclSetGodMode);
 
     lua_register(Lua, "SetShowTips", CclSetShowTips);
     lua_register(Lua, "SetCurrentTip", CclSetCurrentTip);

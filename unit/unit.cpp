@@ -2922,7 +2922,7 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 
     if (GodMode) {
 	if (attacker && attacker->Player == ThisPlayer) {
-	    damage = 255;
+	    damage = target->HP;
 	}
 	if (target->Player == ThisPlayer) {
 	    damage = 0;
