@@ -257,6 +257,9 @@ local void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
 local void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
 local void EditorEnterMapDescriptionAction(Menuitem *mi, int key);
 local void EditorMapPropertiesOk(void);
+local void EditorEditResourceEnterAction(Menuitem *mi,int key);
+local void EditorEditResourceOk(void);
+local void EditorEditResourceCancel(void);
 local void EditorQuitMenu(void);
 
 /*----------------------------------------------------------------------------
@@ -538,6 +541,11 @@ global void InitMenuFuncHash(void) {
 // Editor player properties
     HASHADD(EditorPlayerPropertiesDrawFunc,"editor-player-properties-draw-func");
     HASHADD(EditorPlayerPropertiesEnterAction,"editor-player-properties-enter-action");
+
+// Editor edit resource
+    HASHADD(EditorEditResourceEnterAction,"editor-edit-resource-enter-action");
+    HASHADD(EditorEditResourceOk,"editor-edit-resource-ok");
+    HASHADD(EditorEditResourceCancel,"editor-edit-resource-cancel");
 }
 
 /*----------------------------------------------------------------------------
@@ -2464,6 +2472,7 @@ local void JoinNetGameMenu(void)
     // Now finally here is the address
     server_host_buffer[menu->items[1].d.input.nch] = 0;
     if (NetworkSetupServerAddress(server_host_buffer)) {
+	menu = FindMenu("menu-net-error");
 	menu->items[1].d.text.text = "Unable to lookup host.";
 	ProcessMenu("menu-net-error", 1);
 	VideoLockScreen();
@@ -4840,6 +4849,9 @@ local int player_ai_menu_to_fc(int num)
     return -1;
 }
 
+/**
+**	Edit player properties menu
+*/
 local void EditorPlayerProperties(void)
 {
     Menu *menu;
@@ -4890,7 +4902,77 @@ local void EditorPlayerProperties(void)
 }
 
 /**
-**	Called form menu, to quit editor to menu.
+**	Edit resource properties
+*/
+global void EditorEditResource(void)
+{
+    Menu *menu;
+    char buf[13];
+
+    menu = FindMenu("menu-editor-edit-resource");
+
+    if (UnitUnderCursor->Type->GoldMine) {
+	menu->items[0].d.text.text = "Amount of gold:";
+    } else if (UnitUnderCursor->Type->OilPatch) {
+	menu->items[0].d.text.text = "Amount of oil:";
+    }
+    sprintf(buf, "%d~!_", UnitUnderCursor->Value);
+    menu->items[1].d.input.buffer = buf;
+    menu->items[1].d.input.nch = strlen(buf) - 3;
+    menu->items[1].d.input.maxch = 7;
+    ProcessMenu("menu-editor-edit-resource", 1);
+}
+
+/**
+**	Key pressed in menu-editor-edit-resource
+*/
+local void EditorEditResourceEnterAction(Menuitem *mi,int key)
+{
+    if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch-1])) {
+	strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
+    } else if (key==10 || key==13) {
+	EditorEditResourceOk();
+    }
+}
+
+/**
+**	Ok button from menu-editor-edit-resource
+*/
+local void EditorEditResourceOk(void)
+{
+    Menu *menu;
+    unsigned value;
+
+    menu = FindMenu("menu-editor-edit-resource");
+    value = atoi(menu->items[1].d.input.buffer);
+    if (value == 0) {
+	menu = FindMenu("menu-editor-error");
+	menu->items[1].d.text.text = "Must be greater than 0";
+	ProcessMenu("menu-editor-error", 1);
+    } else if (value/2500*2500 != value) {
+	menu = FindMenu("menu-editor-error");
+	menu->items[1].d.text.text = "Must be a multiple of 2500";
+	ProcessMenu("menu-editor-error", 1);
+    } else if (value > 655350) {
+	menu = FindMenu("menu-editor-error");
+	menu->items[1].d.text.text = "Must be smaller than 655350";
+	ProcessMenu("menu-editor-error", 1);
+    } else {
+	UnitUnderCursor->Value = value;
+	GameMenuReturn();
+    }
+}
+
+/**
+**	Cancel button from menu-editor-edit-resource
+*/
+local void EditorEditResourceCancel(void)
+{
+    GameMenuReturn();
+}
+
+/**
+**	Called from menu, to quit editor to menu.
 **
 **	@todo Should check if modified file should be saved.
 */
