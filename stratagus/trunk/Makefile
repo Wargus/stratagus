@@ -109,11 +109,14 @@ freecraft:	src etlib/$(OBJDIR)hash.$(OE) src/$(OBJDIR)libclone.a
 	$(CCLD) -o freecraft src/$(OBJDIR)libclone.a etlib/$(OBJDIR)hash.$(OE) $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-freecraft.exe:	src etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) etlib/$(OBJDIR)hash.$(OE) \
-		src/$(OBJDIR)freecraftrc.$(OE) src/$(OBJDIR)libclone.a src/$(OBJDIR)main.$(OE)
-	$(CCLD) -o freecraft$(EXE) src/$(OBJDIR)main.$(OE) src/$(OBJDIR)libclone.a src/$(OBJDIR)freecraftrc.$(OE) \
-	etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) etlib/$(OBJDIR)hash.$(OE) \
-	-lSDLmain $(CLONELIBS) -I. $(CFLAGS)
+freecraft.exe:	src etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) \
+		etlib/$(OBJDIR)hash.$(OE) src/$(OBJDIR)freecraftrc.$(OE) \
+		src/$(OBJDIR)libclone.a src/$(OBJDIR)main.$(OE)
+	$(CCLD) -o freecraft$(EXE) src/$(OBJDIR)main.$(OE) \
+		src/$(OBJDIR)libclone.a src/$(OBJDIR)freecraftrc.$(OE) \
+		etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) \
+		etlib/$(OBJDIR)hash.$(OE) \
+		-lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
 src/$(OBJDIR)freecraftrc.$(OE): src/freecraft.rc
 	windres --include-dir contrib -osrc/$(OBJDIR)freecraftrc.$(OE) src/freecraft.rc
@@ -395,9 +398,12 @@ release:
 
 #-lws2_32 -Wl,--stack,63550000  -Wl,--stack,16777216
 WIN32=	\
+    OBJDIR='' \
     EXE='.exe' \
     XLDFLAGS='' \
     XIFLAGS='' \
+    VIDEO='-DUSE_WIN32 $(SDL)'  \
+    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32' \
     RULESFILE=$(WINRULESFILE)
 
 win32new:
