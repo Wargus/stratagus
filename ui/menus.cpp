@@ -780,8 +780,8 @@ global void InitMenuFuncHash(void) {
     HASHADD(ReplayGameCancel,"replay-game-cancel");
 
 // Metaserver
-    HASHADD(ShowMetaServerList,"menu-metaserver-list");
-    HASHADD(MultiMetaServerGameSetupInit,"menu-metaserver-init");
+    HASHADD(ShowMetaServerList,"metaserver-list");
+    HASHADD(MultiMetaServerGameSetupInit,"metaserver-list-init");
     HASHADD(MultiMetaServerGameSetupExit,"menu-metaserver-exit");
     HASHADD(SelectGameServer,"select-game-server");
 }
@@ -7255,7 +7255,7 @@ local void MultiGameMasterReport(void)
     VideoUnlockScreen();
     Invalidate();
 
-    ProcessMenu("menu-metaserver-list", 1);
+    ProcessMenu("metaserver-list", 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -7274,7 +7274,7 @@ local void ShowMetaServerList(void)
 
     DestroyCursorBackground();
     GuiGameStarted = 0;
-    ProcessMenu("menu-metaserver-list", 1);
+    ProcessMenu("metaserver-list", 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -7296,21 +7296,19 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     int nummenus;
     char* parameter;
     char* reply;
-    Menu *menu;
+    Menu* menu;
 
     SendMetaCommand("NumberOfGames","");
-    menu = FindMenu("menu-metaserver-list");
+    menu = FindMenu("metaserver-list");
 
     reply = NULL;
     //receive
     //check okay
-    if (1 || RecvMetaReply(&reply) == -1) {
+    if (RecvMetaReply(&reply) == -1) {
 	//TODO: Notify player that connection was aborted...
-	nummenus = 1;
-
-	
+	nummenus = 0;
     } else {
-	GetMetaParameter(reply, 1, &parameter);
+	GetMetaParameter(reply, 0, &parameter);
 	nummenus = atoi(parameter);
     }
     // Meta server only sends matching version
@@ -7399,7 +7397,7 @@ local void SelectGameServer(Menuitem *mi)
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
-	ProcessMenu("menu-metaserver-list",1);
+	ProcessMenu("metaserver-list",1);
 	return;
     }
     NetworkInitClientConnect();
