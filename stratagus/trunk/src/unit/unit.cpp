@@ -558,13 +558,6 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	}
     }
     
-    unit->Removed=0;
-    UnitCacheInsert(unit);
-
-    MustRedraw|=RedrawMinimap;
-    CheckUnitToBeDrawn(unit);
-    UnitMarkSeen(unit);
-
     //
     //	Building oil-platform, must remove oil-patch.
     //
@@ -580,6 +573,13 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	    DebugLevel0Fn("No oil-patch to remove.\n");
 	}
     }
+
+    unit->Removed=0;
+    UnitCacheInsert(unit);
+
+    MustRedraw|=RedrawMinimap;
+    CheckUnitToBeDrawn(unit);
+    UnitMarkSeen(unit);
 }
 
 /**
