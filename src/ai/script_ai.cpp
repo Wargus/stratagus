@@ -580,7 +580,7 @@ local SCM CclAiWait(SCM value)
 	    n+=unit_types_count[AiHelpers.Equiv[type->Type]->Table[j]->Type];
 	}
     }
-    
+
     // units available?
     DebugLevel3Fn("%d,%d\n" _C_ n _C_ autt->Count);
 
@@ -648,6 +648,27 @@ local SCM CclAiForce(SCM list)
     }
 
     AiAssignFreeUnitsToForce();
+
+    return SCM_BOOL_F;
+}
+
+/**
+**	Check if a force ready.
+**
+**	@param value	Force number.
+**	@return		#t if ready, #f otherwise.
+*/
+local SCM CclAiCheckForce(SCM value)
+{
+    int force;
+
+    force=gh_scm2int(value);
+    if( force<0 || force>=AI_MAX_FORCES ) {
+	errl("Force out of range",value);
+    }
+    if( AiPlayer->Force[force].Completed ) {
+	return SCM_BOOL_T;
+    }
 
     return SCM_BOOL_F;
 }
@@ -775,7 +796,7 @@ local SCM CclAiScript(SCM value)
 /**
 **	Return the player of the running AI.
 **
-**	@return 	Player number of the AI.
+**	@return		Player number of the AI.
 */
 local SCM CclAiPlayer(void)
 {
@@ -842,6 +863,7 @@ global void AiCclRegister(void)
     gh_new_procedure2_0("ai:set",CclAiSet);
     gh_new_procedure1_0("ai:wait",CclAiWait);
     gh_new_procedureN("ai:force",CclAiForce);
+    gh_new_procedure1_0("ai:check-force",CclAiCheckForce);
     gh_new_procedure1_0("ai:wait-force",CclAiWaitForce);
     gh_new_procedure1_0("ai:attack-with-force",CclAiAttackWithForce);
     gh_new_procedure1_0("ai:sleep",CclAiSleep);
