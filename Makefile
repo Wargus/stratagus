@@ -151,7 +151,7 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 	  doc/development.html doc/gpl.txt doc/gpl.html doc/SIOD.txt \
 	  doc/ccl/ai.html doc/ccl/ccl.html doc/ccl/config.html \
 	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
-	  doc/graphic/*.html doc/graphic/*.png
+	  doc/ccl/research.html doc/graphic/*.html doc/graphic/*.png
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
