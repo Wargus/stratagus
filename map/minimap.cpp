@@ -10,7 +10,7 @@
 //
 /**@name minimap.c	-	The minimap. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -269,7 +269,6 @@ global void DrawMinimap(int vx __attribute__((unused)),int vy __attribute__((unu
 			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
 #else
-#ifdef NEW_FOW2
 		flags=Minimap2MapX[mx]+Minimap2MapY[my];
 		if( TheMap.Fields[flags].Flags&MapFieldExplored &&
 			( (TheMap.Visible[0][flags/32]&(1<<(flags%32)))
@@ -277,14 +276,6 @@ global void DrawMinimap(int vx __attribute__((unused)),int vy __attribute__((unu
 		    VideoDrawPixel(((char*)MinimapGraphic->Frames)
 			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
-#else
-		flags=TheMap.Fields[Minimap2MapX[mx]+Minimap2MapY[my]].Flags;
-		if( flags&MapFieldExplored &&
-			( (flags&MapFieldVisible) || ((mx&1)==(my&1)) ) ) {
-		    VideoDrawPixel(((char*)MinimapGraphic->Frames)
-			    [mx+my*MINIMAP_W],x+mx,y+my);
-		}
-#endif
 #endif
 	    }
 	}
