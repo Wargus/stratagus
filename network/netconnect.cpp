@@ -70,15 +70,14 @@ extern int MyPort;			/// My port number.
 global int HostsCount;			/// Number of hosts.
 global NetworkHost Hosts[PlayerMax];	/// Host and ports of all players.
 
-global NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
-global int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
-global int NetLocalPlayerNumber;	/// Network menu: Player number of local client
-global char NetworkName[16];		/// Network menu: Name of local player
 global int NetConnectRunning;		/// Network menu: Setup mode active
+global NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
 global unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state;
+global int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
 global char NetTriesText[32];		/// Network menu: Client tries count text
 global char NetServerText[64];		/// Network menu: Text describing the Network Server IP
 
+local int NetLocalPlayerNumber;		/// Player number of local client
 local int NetStateMsgCnt;		/// Number of consecutive msgs of same type sent
 local unsigned char LastStateMsgType;	/// Subtype of last InitConfig message sent
 local unsigned long NetLastPacketSent;	/// Tick the last network packet was sent
@@ -136,7 +135,7 @@ local const char *ncconstatenames[] = {
     "ccs_goahead",		// server wants to start game
     "ccs_started",		// server has started game
     "ccs_incompatibleengine",	// incompatible engine version
-    "ccs_incompatiblenetwork",	// incompatible netowrk version
+    "ccs_incompatiblenetwork",	// incompatible network version
 };
 
 local const char *icmsgsubtypenames[] = {
@@ -189,7 +188,7 @@ local void NetworkSendRateLimitedClientMessage(InitMessage * msg, unsigned long 
 	}
 	n = NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort),
 	    msg);
-	if( !NetStateMsgCnt ) {
+	if (!NetStateMsgCnt) {
 	    DebugLevel1Fn
 		("Sending Init Message (%s:%d): %d:%d(%d) %d.%d.%d.%d:%d\n" _C_
 		    ncconstatenames[NetLocalState] _C_ NetStateMsgCnt _C_ 
@@ -242,7 +241,6 @@ global void NetworkInitClientConnect(void)
 	Hosts[i].PlyNr = 0;
 	memset(Hosts[i].PlyName, 0, 16);
     }
-    // HostsCount = 0;
 }
 
 /**
@@ -282,10 +280,8 @@ global void NetworkInitServerConnect(void)
 	memset(Hosts[i].PlyName, 0, 16);
     }
 
-    // HostsCount = 0;
     // preset the server (initially always slot 0)
-    memcpy(Hosts[0].PlyName, NetworkName, 16);
-    // HostsCount++;
+    memcpy(Hosts[0].PlyName, LocalPlayerName, 16);
 }
 
 /**
@@ -300,6 +296,7 @@ global void NetworkExitServerConnect(void)
     message.SubType = ICMServerQuit;
     for (h = 1; h < PlayerMax-1; ++h) {
 	// Spew out 5 and trust in God that they arrive
+	// Clients will time out otherwise anyway
 	if (Hosts[h].PlyNr) {
 	    for (i = 0; i < 5; i++) {
 		n = NetworkSendICMessage(Hosts[h].Host, Hosts[h].Port, &message);
@@ -422,6 +419,7 @@ global void NetworkServerStartGame(void)
     }
 
     // Randomize the position.
+    // ARI: FIXME: should be possible to disable! Top vs Bottom et al.
     j = h;
     for (i = 0; i < NetPlayers; i++) {
 	if (j > 0) {
@@ -446,6 +444,7 @@ global void NetworkServerStartGame(void)
 	    DebugCheck(1 == 1);
 #if 0
 	    // ARI: is this code path really executed? (initially h >= NetPlayers..)
+	    // Above Debugcheck will catch it..
 	    Hosts[i].PlyNr = num[0];
 	    DebugLevel0Fn("Hosts[%d].PlyNr = %i\n" _C_ i _C_ num[0]);
 #endif
@@ -590,7 +589,7 @@ global void NetworkConnectSetupGame(void)
     int i;
 
     ThisPlayer = &Players[NetLocalPlayerNumber];
-    PlayerSetName(ThisPlayer, NetworkName);
+    PlayerSetName(ThisPlayer, LocalPlayerName);
     for (i = 0; i < HostsCount; ++i) {
 	PlayerSetName(&Players[Hosts[i].PlyNr], Hosts[i].PlyName);
     }
@@ -633,7 +632,7 @@ changed:
 	    if (NetStateMsgCnt < 60) {	// 60 retries = 30 seconds
 		message.Type = MessageInitHello;
 		message.SubType = ICMHello;
-		memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);
+		memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, 16);
 		message.MapUID = 0L;
 		NetworkSendRateLimitedClientMessage(&message, 500);
 		sprintf(NetTriesText, "Connecting try %d of 60", NetStateMsgCnt);
@@ -887,7 +886,7 @@ local void ClientParseConnecting(const InitMessage* msg)
 		    }
 		} else {
 		    Hosts[i].PlyNr = i;
-		    memcpy(Hosts[i].PlyName, NetworkName, 16);
+		    memcpy(Hosts[i].PlyName, LocalPlayerName, 16);
 		}
 	    }
 	    break;
@@ -1018,7 +1017,7 @@ local void ClientParseSynced(const InitMessage* msg)
 	    Hosts[HostsCount].Host = 0;
 	    Hosts[HostsCount].Port = 0;
 	    Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
-	    memcpy(Hosts[HostsCount].PlyName, NetworkName, 16);
+	    memcpy(Hosts[HostsCount].PlyName, LocalPlayerName, 16);
 
 	    NetLocalState = ccs_goahead;
 	    NetStateMsgCnt = 0;
@@ -1053,7 +1052,7 @@ local void ClientParseAsync(const InitMessage* msg)
 		    }
 		} else {
 		    Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-		    memcpy(Hosts[i].PlyName, NetworkName, 16);
+		    memcpy(Hosts[i].PlyName, LocalPlayerName, 16);
 		}
 	    }
 	    NetClientUpdateState();
@@ -1182,7 +1181,7 @@ local void ServerParseHello(const InitMessage* msg)
     message.Type = MessageInitReply;
     message.SubType = ICMWelcome;				// Acknowledge: Client is welcome
     message.u.Hosts[0].PlyNr = htons(k);			// Host array slot number
-    memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);	// Name of server player
+    memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, 16);	// Name of server player
     message.MapUID = 0L;
     for (i = 1; i < PlayerMax-1; i++) {			// Info about other clients
 	if (i != k) {
@@ -1676,7 +1675,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
     } else if (NetConnectRunning == 1) {	// server
 
-	if( CheckVersions(msg) ) {
+	if (CheckVersions(msg)) {
 	    return;
 	}
 
