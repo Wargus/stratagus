@@ -1528,7 +1528,7 @@ local void PudSaveUnits(gzFile f)
 **	@param pud	File name.
 **	@param map	Map to save.
 */
-global void SavePud(const char* pud,const WorldMap* map)
+global int SavePud(const char* pud,const WorldMap* map)
 {
     gzFile f;
     int i;
@@ -1536,7 +1536,7 @@ global void SavePud(const char* pud,const WorldMap* map)
 
     if( !(f=gzopen(pud,strcasestr(pud,".gz") ? "wb9" : "wb0")) ) {
 	fprintf(stderr,"Can't save pud `%s'\n",pud);
-	return;
+	return -1;
     }
 
     PudWriteHeader(f,"TYPE",16);
@@ -1644,6 +1644,8 @@ global void SavePud(const char* pud,const WorldMap* map)
     PudSaveUnits(f);
 
     gzclose(f);
+
+    return 0;
 }
 
 #else
