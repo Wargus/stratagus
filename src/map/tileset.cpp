@@ -1510,7 +1510,7 @@ global void LoadTileset(void)
 		/TileSizeY);
     }
 
-    DebugLevel2Fn(" %d Tiles in file %s, pro row %d\n"
+    DebugLevel2Fn(" %d Tiles in file %s, %d per row\n"
 	    ,TheMap.TileCount,TheMap.Tileset->File,tiles_per_row);
 
     if( n>MaxTilesInTileset ) {
