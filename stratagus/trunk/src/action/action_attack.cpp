@@ -10,7 +10,7 @@
 //
 /**@name action_attack.c - The attack action. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -79,7 +79,8 @@ void AnimateActionAttack(Unit* unit)
 	//  No animation.
 	//  So direct fire missile.
 	//  FIXME : wait a little.
-	if (!unit->Type->Animations) {
+	if (!unit->Type->Animations &&
+			(!unit->Type->NewAnimations || !unit->Type->NewAnimations->Attack)) {
 		if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
 			PlayUnitSound(unit, VoiceAttacking);
 		}
@@ -87,16 +88,20 @@ void AnimateActionAttack(Unit* unit)
 		unit->Invisible = 0; // unit is invisible until attacks
 		return;
 	}
-	Assert(unit->Type->Animations->Attack);
-	flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
+	if (unit->Type->Animations) {
+		Assert(unit->Type->Animations->Attack);
+		flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
 
-	if ((flags & AnimationSound) && (UnitVisible(unit, ThisPlayer) || ReplayRevealMap)) {
-		PlayUnitSound(unit, VoiceAttacking);
-	}
+		if ((flags & AnimationSound) && (UnitVisible(unit, ThisPlayer) || ReplayRevealMap)) {
+			PlayUnitSound(unit, VoiceAttacking);
+		}
 
-	if (flags & AnimationMissile) { // time to fire projectil
-		FireMissile(unit);
-		unit->Invisible = 0; // unit is invisible until attacks
+		if (flags & AnimationMissile) { // time to fire projectil
+			FireMissile(unit);
+			unit->Invisible = 0; // unit is invisible until attacks
+		}
+	} else {
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Attack);
 	}
 }
 
@@ -141,7 +146,9 @@ static int CheckForDeadGoal(Unit* unit)
 		// Restart order state.
 		unit->State = 0;
 		unit->SubAction = 0;
-		unit->Wait = 1;
+		if (!unit->Type->NewAnimations) {
+			unit->Wait = 1;
+		}
 		NewResetPath(unit);
 		return 1;
 	}
@@ -243,8 +250,9 @@ static void MoveToTarget(Unit* unit)
 
 	err = DoActionMove(unit);
 
-	if (!unit->Reset) {
-		return ;
+	if ((!unit->Type->NewAnimations && !unit->Reset) ||
+			(unit->Type->NewAnimations && unit->Anim.Unbreakable)) {
+		return;
 	}
 	//
 	// Look if we have reached the target.
@@ -335,7 +343,8 @@ static void AttackTarget(Unit* unit)
 	Assert(unit->Orders[0].Goal || (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1));
 
 	AnimateActionAttack(unit);
-	if (!unit->Reset) {
+	if ((!unit->Type->NewAnimations && !unit->Reset) ||
+			(unit->Type->NewAnimations && unit->Anim.Unbreakable)) {
 		return;
 	}
 	//
@@ -484,8 +493,9 @@ void HandleActionAttack(Unit* unit)
 	int dist;          // dist between unit and unit->Orders[0].Goal.
 
 	Assert(unit->Orders[0].Action == UnitActionAttackGround ||
-			unit->Orders[0].Action == UnitActionAttack);
+		unit->Orders[0].Action == UnitActionAttack);
 	Assert(unit->Orders[0].Goal || (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1));
+
 	switch (unit->SubAction) {
 		//
 		// First entry
@@ -499,6 +509,9 @@ void HandleActionAttack(Unit* unit)
 			if (unit->Orders[0].Goal) {
 				dist = MapDistanceBetweenUnits(unit, unit->Orders[0].Goal);
 				if (unit->Type->MinAttackRange < dist && dist <= unit->Stats->AttackRange) {
+					UnitHeadingFromDeltaXY(unit,
+						unit->Orders[0].Goal->X + (unit->Orders[0].Goal->Type->TileWidth - 1) / 2 - unit->X,
+						unit->Orders[0].Goal->Y + (unit->Orders[0].Goal->Type->TileHeight - 1) / 2 - unit->Y);
 					unit->SubAction = ATTACK_TARGET;
 					AttackTarget(unit);
 					return;
@@ -524,8 +537,10 @@ void HandleActionAttack(Unit* unit)
 				unit->Orders[0] = unit->SavedOrder;
 				unit->SavedOrder.Action = UnitActionStill;
 				unit->SavedOrder.Goal = NoUnitP;
-				unit->Reset = 1;
-				unit->Wait = 1;
+				if (!unit->Type->NewAnimations) {
+					unit->Reset = 1;
+					unit->Wait = 1;
+				}
 				return;
 			}
 			MoveToTarget(unit);
