@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name editloop.c	-	The editor main loop. */
+/**@name editloop.c - The editor main loop. */
 //
-//	(c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
+//     (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -61,74 +61,76 @@
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
 /*----------------------------------------------------------------------------
---		Defines
+--  Defines
 ----------------------------------------------------------------------------*/
 
-#define UNIT_ICON_X (IconWidth + 7)				/// Unit mode icon
-#define UNIT_ICON_Y (0)								/// Unit mode icon
-#define TILE_ICON_X (IconWidth * 2 + 16)		/// Tile mode icon
-#define TILE_ICON_Y (2)								/// Tile mode icon
+#define UNIT_ICON_X (IconWidth + 7)       /// Unit mode icon
+#define UNIT_ICON_Y (0)                   /// Unit mode icon
+#define TILE_ICON_X (IconWidth * 2 + 16)  /// Tile mode icon
+#define TILE_ICON_Y (2)                   /// Tile mode icon
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global char EditorRunning;				/// True editor is running
-global char EditorMapLoaded;				/// Map loaded in editor
+global char EditorRunning;    /// True editor is running
+global char EditorMapLoaded;  /// Map loaded in editor
 
-global EditorStateType EditorState;		/// Current editor state.
+global EditorStateType EditorState;  /// Current editor state.
 
-local char TileToolRandom;				/// Tile tool draws random
-local char TileToolDecoration;				/// Tile tool draws with decorations
-local int TileCursorSize;				/// Tile cursor size 1x1 2x2 ... 4x4
-local int TileCursor;						/// Tile type number
+local char TileToolRandom;      /// Tile tool draws random
+local char TileToolDecoration;  /// Tile tool draws with decorations
+local int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
+local int TileCursor;           /// Tile type number
 
-local int MirrorEdit = 0;				/// Mirror editing enabled
-local int UnitPlacedThisPress = 0;		///Only allow one unit per press
+local int MirrorEdit = 0;           /// Mirror editing enabled
+local int UnitPlacedThisPress = 0;  ///Only allow one unit per press
 
 enum _mode_buttons_ {
-	SelectButton = 201,						/// Select mode button
-	UnitButton,								/// Unit mode button
-	TileButton,								/// Tile mode button
+	SelectButton = 201,  /// Select mode button
+	UnitButton,          /// Unit mode button
+	TileButton,          /// Tile mode button
 };
 
-global char** EditorUnitTypes;				/// Sorted editor unit-type table
-global int MaxUnitIndex;				/// Max unit icon draw index
+global char** EditorUnitTypes;  /// Sorted editor unit-type table
+global int MaxUnitIndex;        /// Max unit icon draw index
 
-local char** ShownUnitTypes;				/// Shown editor unit-type table
-local int MaxShownUnits;				/// Max unit icon draw index
-local char ShowUnitsToSelect;				/// Show units in unit list
-local char ShowBuildingsToSelect;		/// Show buildings in unit list
-//local char ShowHeroesToSelect;				/// Show heroes in unit list
-local char ShowAirToSelect;				/// Show air units in unit list
-local char ShowLandToSelect;				/// Show land units in unit list
-local char ShowWaterToSelect;				/// Show water units in unit list
+local char** ShownUnitTypes;       /// Shown editor unit-type table
+local int MaxShownUnits;           /// Max unit icon draw index
+local char ShowUnitsToSelect;      /// Show units in unit list
+local char ShowBuildingsToSelect;  /// Show buildings in unit list
+#if 0
+local char ShowHeroesToSelect;     /// Show heroes in unit list
+#endif
+local char ShowAirToSelect;        /// Show air units in unit list
+local char ShowLandToSelect;       /// Show land units in unit list
+local char ShowWaterToSelect;      /// Show water units in unit list
 
-local int UnitIndex;						/// Unit icon draw index
-local int CursorUnitIndex;				/// Unit icon under cursor
-local int SelectedUnitIndex;				/// Unit type to draw
+local int UnitIndex;               /// Unit icon draw index
+local int CursorUnitIndex;         /// Unit icon under cursor
+local int SelectedUnitIndex;       /// Unit type to draw
 
-local int CursorPlayer;						/// Player under the cursor
-local int SelectedPlayer;				/// Player selected for draw
+local int CursorPlayer;            /// Player under the cursor
+local int SelectedPlayer;          /// Player selected for draw
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Edit
+--  Edit
 ----------------------------------------------------------------------------*/
 
 /**
-**		Get tile number.
+**  Get tile number.
 **
-**		@param basic		Basic tile number
-**		@param random		Return random tile
-**		@param filler		Get a decorated tile.
+**  @param basic   Basic tile number
+**  @param random  Return random tile
+**  @param filler  Get a decorated tile.
 **
-**		@return				Tile number used in pud.
+**  @return        Tile number used in pud.
 **
-**		@todo		FIXME: Solid tiles are here still hardcoded.
+**  @todo  FIXME: Solid tiles are here still hardcoded.
 */
 global int GetTileNumber(int basic, int random, int filler)
 {
@@ -169,11 +171,11 @@ global int GetTileNumber(int basic, int random, int filler)
 }
 
 /**
-**		Edit tile.
+**  Edit tile.
 **
-**		@param x		X map tile coordinate.
-**		@param y		Y map tile coordinate.
-**		@param tile		Tile type to edit.
+**  @param x     X map tile coordinate.
+**  @param y     Y map tile coordinate.
+**  @param tile  Tile type to edit.
 */
 global void EditTile(int x, int y, int tile)
 {
@@ -184,7 +186,7 @@ global void EditTile(int x, int y, int tile)
 	ChangeTile(x, y, GetTileNumber(tile, TileToolRandom, TileToolDecoration));
 
 	//
-	//  Change the flags
+	// Change the flags
 	//
 	mf = &TheMap.Fields[y * TheMap.Width + x];
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
@@ -201,14 +203,14 @@ global void EditTile(int x, int y, int tile)
 }
 
 /**
-**		Edit tiles (internal, used by EditTiles()).
+**  Edit tiles (internal, used by EditTiles()).
 **
-**		@param x		X map tile coordinate.
-**		@param y		Y map tile coordinate.
-**		@param tile		Tile type to edit.
-**		@param size		Size of rectangle
+**  @param x     X map tile coordinate.
+**  @param y     Y map tile coordinate.
+**  @param tile  Tile type to edit.
+**  @param size  Size of rectangle
 **
-**	  This function does not support mirror editing!
+**  @bug  This function does not support mirror editing!
 **
 */
 global void EditTilesInternal(int x, int y, int tile, int size)
@@ -234,12 +236,12 @@ global void EditTilesInternal(int x, int y, int tile, int size)
 }
 
 /**
-**		Edit tiles
+**  Edit tiles
 **
-**		@param x		X map tile coordinate.
-**		@param y		Y map tile coordinate.
-**		@param tile		Tile type to edit.
-**		@param size		Size of rectangle
+**  @param x     X map tile coordinate.
+**  @param y     Y map tile coordinate.
+**  @param tile  Tile type to edit.
+**  @param size  Size of rectangle
 **
 */
 global void EditTiles(int x, int y, int tile, int size)
@@ -267,15 +269,15 @@ global void EditTiles(int x, int y, int tile, int size)
 }
 
 /**
-**		Edit unit (internal, used by EditUnit()).
+**  Edit unit (internal, used by EditUnit()).
 **
-**		@param x		X map tile coordinate.
-**		@param y		Y map tile coordinate.
-**		@param type		Unit type to edit.
-**		@param player		Player owning the unit.
+**  @param x       X map tile coordinate.
+**  @param y       Y map tile coordinate.
+**  @param type    Unit type to edit.
+**  @param player  Player owning the unit.
 **
-**		@todo		FIXME: Check if the player has already a start-point.
-**	  This function does not support mirror editing!
+**  @todo  FIXME: Check if the player has already a start-point.
+**  @bug   This function does not support mirror editing!
 **
 */
 local void EditUnitInternal(int x, int y, UnitType* type, Player* player)
@@ -290,14 +292,14 @@ local void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 }
 
 /**
-**		Edit unit.
+**  Edit unit.
 **
-**		@param x		X map tile coordinate.
-**		@param y		Y map tile coordinate.
-**		@param type		Unit type to edit.
-**		@param player		Player owning the unit.
+**  @param x       X map tile coordinate.
+**  @param y       Y map tile coordinate.
+**  @param type    Unit type to edit.
+**  @param player  Player owning the unit.
 **
-**		@todo		FIXME: Check if the player has already a start-point.
+**  @todo  FIXME: Check if the player has already a start-point.
 */
 local void EditUnit(int x, int y, UnitType* type, Player* player)
 {
@@ -324,9 +326,9 @@ local void EditUnit(int x, int y, UnitType* type, Player* player)
 }
 
 /**
-**		Calculate the number of unit icons that can be displayed
+**  Calculate the number of unit icons that can be displayed
 **
-**		@return				Number of unit icons that can be displayed.
+**  @return  Number of unit icons that can be displayed.
 */
 local int CalculateUnitIcons(void)
 {
@@ -351,7 +353,7 @@ local int CalculateUnitIcons(void)
 }
 
 /**
-**		Recalculate the shown units.
+**  Recalculate the shown units.
 */
 local void RecalculateShownUnits(void)
 {
@@ -372,9 +374,11 @@ local void RecalculateShownUnits(void)
 		if (!type->Building && !ShowUnitsToSelect) {
 			continue;
 		}
-//		if (type->Hero && !ShowHeroesToSelect) {
-//			continue;
-//		}
+#if 0
+		if (type->Hero && !ShowHeroesToSelect) {
+			continue;
+		}
+#endif
 		if (type->UnitType == UnitTypeLand && !ShowLandToSelect) {
 			continue;
 		}
@@ -401,15 +405,15 @@ local void RecalculateShownUnits(void)
 }
 
 /*----------------------------------------------------------------------------
---		Display
+--  Display
 ----------------------------------------------------------------------------*/
 
 /**
-**		Draw tile icons.
+**  Draw tile icons.
 **
-**		@todo for the start the solid tiles are hardcoded
-**		If we have more solid tiles, than they fit into the panel, we need
-**		some new ideas.
+**  @todo for the start the solid tiles are hardcoded
+**        If we have more solid tiles, than they fit into the panel, we need
+**        some new ideas.
 */
 local void DrawTileIcons(void)
 {
@@ -493,7 +497,7 @@ local void DrawTileIcons(void)
 }
 
 /**
-**		Draw unit icons.
+**  Draw unit icons.
 */
 local void DrawUnitIcons(void)
 {
@@ -559,7 +563,7 @@ local void DrawUnitIcons(void)
 	}
 
 	//
-	//		Draw the unit selection buttons.
+	// Draw the unit selection buttons.
 	//
 	x = TheUI.InfoPanelX + 10;
 	y = TheUI.InfoPanelY + 140;
@@ -571,9 +575,11 @@ local void DrawUnitIcons(void)
 	VideoDraw(MenuButtonGfx.Sprite,
 		MBUTTON_GEM_SQUARE + (ShowBuildingsToSelect ? 2 : 0), x + 28 * 1,
 		y + 16);
-//	VideoDrawText(x + 28 * 2, y, GameFont, "He");
-//	VideoDraw(MenuButtonGfx.Sprite,
-//		MBUTTON_GEM_SQUARE + (ShowHeroesToSelect ? 2 : 0), x + 28 * 2, y + 16);
+#if 0
+	VideoDrawText(x + 28 * 2, y, GameFont, "He");
+	VideoDraw(MenuButtonGfx.Sprite,
+		MBUTTON_GEM_SQUARE + (ShowHeroesToSelect ? 2 : 0), x + 28 * 2, y + 16);
+#endif
 	VideoDrawText(x + 28 * 3, y, GameFont, "La");
 	VideoDraw(MenuButtonGfx.Sprite,
 		MBUTTON_GEM_SQUARE + (ShowLandToSelect ? 2 : 0), x + 28 * 3, y + 16);
@@ -585,7 +591,7 @@ local void DrawUnitIcons(void)
 		MBUTTON_GEM_SQUARE + (ShowAirToSelect ? 2 : 0), x + 28 * 5, y + 16);
 
 	//
-	//		Scroll bar for units. FIXME: drag not supported.
+	// Scroll bar for units. FIXME: drag not supported.
 	//
 	x = TheUI.ButtonPanelX + 4;
 	y = TheUI.ButtonPanelY + 4;
@@ -614,13 +620,15 @@ local void DrawUnitIcons(void)
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + j - 20, y);
 	}
 
-	//percent = UnitIndex * 100 / ((MaxShownUnits ? MaxShownUnits : 9) / 9 * 9);
+#if 0
+	percent = UnitIndex * 100 / ((MaxShownUnits ? MaxShownUnits : 9) / 9 * 9);
+#endif
 	percent = UnitIndex * 100 / (MaxShownUnits ? MaxShownUnits : 1);
 	i = (percent * (j - 54)) / 100;
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + i, y + 1);
 
 	//
-	//		Draw the unit icons.
+	//  Draw the unit icons.
 	//
 	y = TheUI.ButtonPanelY + 24;
 
@@ -656,12 +664,12 @@ local void DrawUnitIcons(void)
 }
 
 /**
-**		Draw a tile icon
+**  Draw a tile icon
 **
-**		@param tilenum		Tile number to display
-**		@param x		X display position
-**		@param y		Y display position
-**		@param flags		State of the icon (::IconActive,::IconClicked,...)
+**  @param tilenum  Tile number to display
+**  @param x        X display position
+**  @param y        Y display position
+**  @param flags    State of the icon (::IconActive,::IconClicked,...)
 */
 local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 {
@@ -710,7 +718,7 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 }
 
 /**
-**		Draw the editor panels.
+**  Draw the editor panels.
 */
 local void DrawEditorPanel(void)
 {
@@ -722,7 +730,7 @@ local void DrawEditorPanel(void)
 	y = TheUI.InfoPanelY + 4;
 
 	//
-	//  Select / Units / Tiles
+	// Select / Units / Tiles
 	//
 	icon = IconByIdent(EditorSelectIcon);
 	DebugCheck(!icon);
@@ -754,9 +762,9 @@ local void DrawEditorPanel(void)
 }
 
 /**
-**		Draw special cursor on map.
+**  Draw special cursor on map.
 **
-**		@todo support for bigger cursors (2x2, 3x3 ...)
+**  @todo support for bigger cursors (2x2, 3x3 ...)
 */
 local void DrawMapCursor(void)
 {
@@ -764,7 +772,7 @@ local void DrawMapCursor(void)
 	int y;
 
 	//
-	//  Draw map cursor
+	// Draw map cursor
 	//
 	if (TheUI.MouseViewport && !CursorBuilding) {
 		x = Viewport2MapX(TheUI.MouseViewport, CursorX);
@@ -809,7 +817,7 @@ local void DrawMapCursor(void)
 			SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
 		} else {
 			//
-			//  If there is an unit under the cursor, it's selection thing
+			// If there is an unit under the cursor, it's selection thing
 			//  is drawn somewhere else (Check DrawUnitSelection.)
 			//
 			if (!UnitUnderCursor) {
@@ -820,9 +828,9 @@ local void DrawMapCursor(void)
 }
 
 /**
-**		Draw editor info.
+**  Draw editor info.
 **
-**		If cursor is on map or minimap show information about the current tile.
+**  If cursor is on map or minimap show information about the current tile.
 **
 */
 local void DrawEditorInfo(void)
@@ -844,7 +852,7 @@ local void DrawEditorInfo(void)
 	VideoDrawText(TheUI.ResourceX + 2, TheUI.ResourceY + 2, GameFont, buf);
 
 	//
-	//		Flags info
+	// Flags info
 	//
 	flags = TheMap.Fields[x + y * TheMap.Width].Flags;
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
@@ -865,7 +873,7 @@ local void DrawEditorInfo(void)
 	VideoDrawText(TheUI.ResourceX + 118, TheUI.ResourceY + 2, GameFont, buf);
 
 	//
-	//		Tile info
+	// Tile info
 	//
 	tile = TheMap.Fields[x + y * TheMap.Width].Tile;
 
@@ -887,9 +895,9 @@ local void DrawEditorInfo(void)
 }
 
 /**
-**		Show info about unit.
+**  Show info about unit.
 **
-**		@param unit		Unit pointer.
+**  @param unit  Unit pointer.
 */
 local void ShowUnitInfo(const Unit* unit)
 {
@@ -906,26 +914,26 @@ local void ShowUnitInfo(const Unit* unit)
 }
 
 /**
-**		Update editor display.
+**  Update editor display.
 */
 global void EditorUpdateDisplay(void)
 {
 	int i;
 
 #ifndef USE_SDL_SURFACE
-	VideoLockScreen();						// { prepare video write
+	VideoLockScreen(); // { prepare video write
 #endif
 
-	HideAnyCursor();						// remove cursor (when available)
+	HideAnyCursor(); // remove cursor (when available)
 
-	DrawMapArea();						// draw the map area
+	DrawMapArea(); // draw the map area
 
 	if (CursorOn == CursorOnMap) {
-		DrawMapCursor();						// cursor on map
+		DrawMapCursor(); // cursor on map
 	}
 
 	//
-	//  Menu button
+	// Menu button
 	//
 	if (TheUI.MenuPanel.Graphic) {
 		VideoDrawSub(TheUI.MenuPanel.Graphic, 0, 0,
@@ -943,14 +951,14 @@ global void EditorUpdateDisplay(void)
 		GameFont,TheUI.MenuButton.Text, NULL, NULL);
 
 	//
-	//  Minimap border
+	// Minimap border
 	//
 	if (TheUI.MinimapPanel.Graphic) {
 		VideoDrawSub(TheUI.MinimapPanel.Graphic, 0, 0, TheUI.MinimapPanel.Graphic->Width,
 			TheUI.MinimapPanel.Graphic->Height, TheUI.MinimapPanelX, TheUI.MinimapPanelY);
 	}
 	//
-	//  Minimap
+	// Minimap
 	//
 	if (TheUI.SelectedViewport) {
 		DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
@@ -958,7 +966,7 @@ global void EditorUpdateDisplay(void)
 			TheUI.SelectedViewport->MapY);
 	}
 	//
-	//  Info panel
+	// Info panel
 	//
 	if (TheUI.InfoPanel.Graphic) {
 		VideoDrawSub(TheUI.InfoPanel.Graphic, 0, 0,
@@ -966,7 +974,7 @@ global void EditorUpdateDisplay(void)
 			TheUI.InfoPanelX, TheUI.InfoPanelY);
 	}
 	//
-	//  Button panel
+	// Button panel
 	//
 	if (TheUI.ButtonPanel.Graphic) {
 		VideoDrawSub(TheUI.ButtonPanel.Graphic, 0, 0,
@@ -977,7 +985,7 @@ global void EditorUpdateDisplay(void)
 	DrawEditorPanel();
 
 	//
-	//  Resource
+	// Resource
 	//
 	if (TheUI.Resource.Graphic) {
 		VideoDrawSub(TheUI.Resource.Graphic, 0, 0,
@@ -989,7 +997,7 @@ global void EditorUpdateDisplay(void)
 	}
 
 	//
-	//  Fillers
+	// Fillers
 	//
 	for (i = 0; i < TheUI.NumFillers; ++i) {
 		if (TheUI.Filler[i].Graphic) {
@@ -1000,7 +1008,7 @@ global void EditorUpdateDisplay(void)
 		}
 	}
 	//
-	//  Status line
+	// Status line
 	//
 	DrawStatusLine();
 
@@ -1018,11 +1026,11 @@ global void EditorUpdateDisplay(void)
 }
 
 /*----------------------------------------------------------------------------
---		Input / Keyboard / Mouse
+--  Input / Keyboard / Mouse
 ----------------------------------------------------------------------------*/
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void EditorCallbackButtonUp(unsigned button)
 {
@@ -1030,7 +1038,7 @@ local void EditorCallbackButtonUp(unsigned button)
 
 	if (GameCursor == TheUI.Scroll.Cursor) {
 		// Move map.
-		GameCursor = TheUI.Point.Cursor;				// Reset
+		GameCursor = TheUI.Point.Cursor; // Reset
 		return;
 	}
 
@@ -1046,16 +1054,16 @@ local void EditorCallbackButtonUp(unsigned button)
 }
 
 /**
-**		Called if mouse button pressed down.
+**  Called if mouse button pressed down.
 **
-**		@param button		Mouse button number (0 left, 1 middle, 2 right)
+**  @param button  Mouse button number (0 left, 1 middle, 2 right)
 */
 local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 {
 	DebugLevel3Fn("%x %x\n" _C_ button _C_ MouseButtons);
 
 	//
-	//  Click on menu button
+	// Click on menu button
 	//
 	if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu &&
 			(MouseButtons & LeftButton) && !GameMenuButtonClicked) {
@@ -1064,10 +1072,10 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		return;
 	}
 	//
-	//  Click on minimap
+	// Click on minimap
 	//
 	if (CursorOn == CursorOnMinimap) {
-		if (MouseButtons & LeftButton) {		// enter move mini-mode
+		if (MouseButtons & LeftButton) { // enter move mini-mode
 			ViewportSetViewpoint(TheUI.SelectedViewport,
 				ScreenMinimap2MapX(CursorX) -
 					TheUI.SelectedViewport->MapWidth / 2,
@@ -1077,7 +1085,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		return;
 	}
 	//
-	//  Click on mode area
+	// Click on mode area
 	//
 	if (CursorOn == CursorOnButton) {
 		if (ButtonUnderCursor == SelectButton) {
@@ -1096,7 +1104,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		}
 	}
 	//
-	//  Click on tile area
+	// Click on tile area
 	//
 	if (CursorOn == CursorOnButton && ButtonUnderCursor >= 100 &&
 			EditorState == EditorEditTile) {
@@ -1126,7 +1134,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		return;
 	}
 	//
-	//  Click on unit area
+	// Click on unit area
 	//
 	if (EditorState == EditorEditUnit) {
 		int percent;
@@ -1190,14 +1198,16 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 			RecalculateShownUnits();
 			return;
 		}
-//		if (TheUI.InfoPanelX + 10 + 28 * 2 < CursorX &&
-//				CursorX < TheUI.InfoPanelX + 10 + 28 * 3 &&
-//				TheUI.InfoPanelY + 140 < CursorY &&
-//				CursorY < TheUI.InfoPanelY + 140 + 28) {
-//			ShowHeroesToSelect ^= 1;
-//			RecalculateShownUnits();
-//			return;
-//		}
+#if 0
+		if (TheUI.InfoPanelX + 10 + 28 * 2 < CursorX &&
+				CursorX < TheUI.InfoPanelX + 10 + 28 * 3 &&
+				TheUI.InfoPanelY + 140 < CursorY &&
+				CursorY < TheUI.InfoPanelY + 140 + 28) {
+			ShowHeroesToSelect ^= 1;
+			RecalculateShownUnits();
+			return;
+		}
+#endif
 		if (TheUI.InfoPanelX + 10 + 28 * 3 < CursorX &&
 				CursorX < TheUI.InfoPanelX + 10 + 28 * 4 &&
 				TheUI.InfoPanelY + 140 < CursorY &&
@@ -1225,7 +1235,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	}
 
 	//
-	//		Right click on a resource
+	// Right click on a resource
 	//
 	if (EditorState == EditorSelecting) {
 		if ((MouseButtons&RightButton && UnitUnderCursor)) {
@@ -1240,7 +1250,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	}
 
 	//
-	//  Click on map area
+	// Click on map area
 	//
 	if (CursorOn == CursorOnMap) {
 		Viewport* vp;
@@ -1290,10 +1300,10 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 }
 
 /**
-**		Handle key down.
+**  Handle key down.
 **
-**		@param key		Key scancode.
-**		@param keychar		Character code.
+**  @param key      Key scancode.
+**  @param keychar  Character code.
 */
 local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 {
@@ -1304,14 +1314,14 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	switch (key) {
 		case 'f' & 0x1F:
 		case 'f':
-		case 'F':						// ALT+F, CTRL+F toggle fullscreen
+		case 'F': // ALT+F, CTRL+F toggle fullscreen
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			ToggleFullScreen();
 			break;
 
-		case 's':						// ALT s F11 save pud menu
+		case 's': // ALT s F11 save pud menu
 		case 'S':
 		case KeyCodeF11:
 			if (EditorSaveMenu() != -1) {
@@ -1325,7 +1335,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			InterfaceState = IfaceStateNormal;
 			break;
 
-		case 'v':				// 'v' Viewport
+		case 'v': // 'v' Viewport
 			if (KeyModifiers & ModifierControl) {
 				CycleViewportMode(-1);
 			} else {
@@ -1334,7 +1344,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 
 		case 'r':
-		case 'R':						// CTRL+R Randomize map
+		case 'R': // CTRL+R Randomize map
 			if (KeyModifiers & ModifierControl) {
 				DebugLevel3Fn("Randomizing map...\n");
   				EditorCreateRandomMap();
@@ -1342,7 +1352,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 
 		case 'm':
-		case 'M':						// CTRL+M Mirror edit
+		case 'M': // CTRL+M Mirror edit
 			if (KeyModifiers & ModifierControl)  {
   				++MirrorEdit;
 				if (MirrorEdit == 3) {
@@ -1364,13 +1374,13 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 		case 'x' & 0x1F:
 		case 'x':
-		case 'X':						// ALT+X, CTRL+X: Exit editor
+		case 'X': // ALT+X, CTRL+X: Exit editor
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			Exit(0);
 
-		case KeyCodeDelete:		// Delete
+		case KeyCodeDelete: // Delete
 			if (UnitUnderCursor) {
 				Unit* unit;
 
@@ -1386,7 +1396,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			ProcessMenu("menu-editor", 1);
 			break;
 
-		case KeyCodeUp:				// Keyboard scrolling
+		case KeyCodeUp: // Keyboard scrolling
 		case KeyCodeKP8:
 			KeyScrollState |= ScrollUp;
 			break;
@@ -1411,10 +1421,10 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 }
 
 /**
-**		Handle key up.
+**  Handle key up.
 **
-**		@param key		Key scancode.
-**		@param keychar		Character code.
+**  @param key      Key scancode.
+**  @param keychar  Character code.
 */
 local void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 {
@@ -1423,7 +1433,7 @@ local void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 	}
 
 	switch (key) {
-		case KeyCodeUp:						// Keyboard scrolling
+		case KeyCodeUp: // Keyboard scrolling
 		case KeyCodeKP8:
 			KeyScrollState &= ~ScrollUp;
 			break;
@@ -1445,7 +1455,7 @@ local void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void EditorCallbackKey3(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
@@ -1455,10 +1465,10 @@ local void EditorCallbackKey3(unsigned dummy1 __attribute__((unused)),
 }
 
 /**
-**		Callback for input movement of the cursor.
+**  Callback for input movement of the cursor.
 **
-**		@param x		Screen X position.
-**		@param y		Screen Y position.
+**  @param x  Screen X position.
+**  @param y  Screen Y position.
 */
 local void EditorCallbackMouse(int x, int y)
 {
@@ -1472,10 +1482,10 @@ local void EditorCallbackMouse(int x, int y)
 
 	DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
 
-	HandleCursorMove(&x, &y);				// Reduce to screen
+	HandleCursorMove(&x, &y); // Reduce to screen
 
 	//
-	//		Move map.
+	// Move map.
 	//
 	if (GameCursor == TheUI.Scroll.Cursor) {
 		int xo;
@@ -1522,13 +1532,13 @@ local void EditorCallbackMouse(int x, int y)
 		UnitPlacedThisPress = 0;
 	}
 	//
-	//		Drawing tiles on map.
+	// Drawing tiles on map.
 	//
 	if (CursorOn == CursorOnMap && (MouseButtons&LeftButton) &&
 			(EditorState == EditorEditTile || EditorState == EditorEditUnit)) {
 
 		//
-		//		Scroll the map
+		// Scroll the map
 		//
 		if (!(FrameCounter % SpeedMouseScroll)) {
 			if (CursorX <= TheUI.SelectedViewport->X) {
@@ -1553,7 +1563,7 @@ local void EditorCallbackMouse(int x, int y)
 		}
 
 		//
-		//		Scroll the map, if cursor moves outside the viewport.
+		// Scroll the map, if cursor moves outside the viewport.
 		//
 		RestrictCursorToViewport();
 
@@ -1579,7 +1589,7 @@ local void EditorCallbackMouse(int x, int y)
 	}
 
 	//
-	//		Minimap move viewpoint
+	// Minimap move viewpoint
 	//
 	if (CursorOn==CursorOnMinimap && (MouseButtons&LeftButton)) {
 		RestrictCursorToMinimap();
@@ -1601,7 +1611,7 @@ local void EditorCallbackMouse(int x, int y)
 	ButtonUnderCursor = -1;
 
 	//
-	//		Minimap
+	// Minimap
 	//
 	if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
 			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
@@ -1609,7 +1619,7 @@ local void EditorCallbackMouse(int x, int y)
 	}
 
 	//
-	//  Handle edit unit area
+	// Handle edit unit area
 	//
 	if (EditorState == EditorEditUnit) {
 		bx = TheUI.InfoPanelX + 8;
@@ -1627,8 +1637,10 @@ local void EditorCallbackMouse(int x, int y)
 					ClearStatusLine();
 				}
 				CursorPlayer = i;
-				//ButtonUnderCursor = i + 100;
-				//CursorOn = CursorOnButton;
+#if 0
+				ButtonUnderCursor = i + 100;
+				CursorOn = CursorOnButton;
+#endif
 				return;
 			}
 			bx += 20;
@@ -1653,8 +1665,10 @@ local void EditorCallbackMouse(int x, int y)
 						UnitTypeByIdent(ShownUnitTypes[i])->Name);
 					SetStatusLine(buf);
 					CursorUnitIndex = i;
-					//ButtonUnderCursor = i + 100;
-					//CursorOn = CursorOnButton;
+#if 0
+					ButtonUnderCursor = i + 100;
+					CursorOn = CursorOnButton;
+#endif
 					return;
 				}
 				bx += IconWidth + 8;
@@ -1665,7 +1679,7 @@ local void EditorCallbackMouse(int x, int y)
 	}
 
 	//
-	//  Handle tile area
+	// Handle tile area
 	//
 	if (EditorState == EditorEditTile) {
 		i = 0;
@@ -1710,7 +1724,7 @@ local void EditorCallbackMouse(int x, int y)
 	}
 
 	//
-	//  Handle buttons
+	// Handle buttons
 	//
 	if (TheUI.InfoPanelX + 4 < CursorX &&
 			CursorX < TheUI.InfoPanelX + 4 + IconWidth + 7 &&
@@ -1757,7 +1771,7 @@ local void EditorCallbackMouse(int x, int y)
 	}
 
 	//
-	//  Minimap
+	// Minimap
 	//
 	if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
 			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
@@ -1766,7 +1780,7 @@ local void EditorCallbackMouse(int x, int y)
 	}
 
 	//
-	//  Map
+	// Map
 	//
 	UnitUnderCursor = NULL;
 	if (x >= TheUI.MapArea.X && x <= TheUI.MapArea.EndX &&
@@ -1775,7 +1789,7 @@ local void EditorCallbackMouse(int x, int y)
 
 		vp = GetViewport(x, y);
 		DebugCheck(!vp);
-		if (TheUI.MouseViewport != vp) {		// viewport changed
+		if (TheUI.MouseViewport != vp) { // viewport changed
 			TheUI.MouseViewport = vp;
 			DebugLevel0Fn("active viewport changed to %d.\n" _C_
 				TheUI.Viewports - vp);
@@ -1784,8 +1798,8 @@ local void EditorCallbackMouse(int x, int y)
 		CursorOn = CursorOnMap;
 
 		//
-		//		Look if there is an unit under the cursor.
-		//		FIXME: use Viewport2MapX Viewport2MapY
+		// Look if there is an unit under the cursor.
+		// FIXME: use Viewport2MapX Viewport2MapY
 		//
 		UnitUnderCursor = UnitOnScreen(NULL,
 			CursorX - TheUI.MouseViewport->X +
@@ -1798,19 +1812,19 @@ local void EditorCallbackMouse(int x, int y)
 		}
 	}
 	//
-	//  Scrolling Region Handling
+	// Scrolling Region Handling
 	//
 	if (HandleMouseScrollArea(x, y)) {
 		return;
 	}
 
-	//  Not reached if cursor is inside the scroll area
+	// Not reached if cursor is inside the scroll area
 
 	ClearStatusLine();
 }
 
 /**
-**		Callback for exit.
+**  Callback for exit.
 */
 local void EditorCallbackExit(void)
 {
@@ -1818,7 +1832,7 @@ local void EditorCallbackExit(void)
 }
 
 /**
-**		Create editor.
+**  Create editor.
 */
 local void CreateEditor(void)
 {
@@ -1834,8 +1848,8 @@ local void CreateEditor(void)
 
 	scm = 0;
 	//
-	//  Load and evaluate the editor configuration file
-	//  FIXME: the CLopen is very slow and repeats the work of LibraryFileName.
+	// Load and evaluate the editor configuration file
+	// FIXME: the CLopen is very slow and repeats the work of LibraryFileName.
 	//
 	file = LibraryFileName(EditorStartFile, buf);
 	if ((clf = CLopen(file, CL_OPEN_READ))) {
@@ -1850,18 +1864,18 @@ local void CreateEditor(void)
 #elif defined(USE_LUA)
 		LuaLoadFile(file);
 #endif
-		CclGarbageCollect(0);				// Cleanup memory after load
+		CclGarbageCollect(0); // Cleanup memory after load
 	}
 
 	ThisPlayer = &Players[0];
 
-	FlagRevealMap = 1;						// editor without fog and all visible
+	FlagRevealMap = 1; // editor without fog and all visible
 	TheMap.NoFogOfWar = 1;
 
-	if (!*CurrentMapPath) {				// new map!
+	if (!*CurrentMapPath) { // new map!
 		InitUnitTypes(1);
 		//
-		//	  Inititialize TheMap / Players.
+		// Inititialize TheMap / Players.
 		//
 		TheMap.Info->MapTerrainName =
 			strdup(Tilesets[TheMap.Info->MapTerrain]->Ident);
@@ -1915,7 +1929,7 @@ local void CreateEditor(void)
 	SelectedPlayer = 15;
 
 	//
-	//		Place the start points, which the loader discarded.
+	// Place the start points, which the loader discarded.
 	//
 	for (i = 0; i < PlayerMax; ++i) {
 		if (TheMap.Info->PlayerType[i] != PlayerNobody) {
@@ -1945,7 +1959,7 @@ local void CreateEditor(void)
 
 	if (!EditorUnitTypes) {
 		//
-		//  Build editor unit-type tables.
+		// Build editor unit-type tables.
 		//
 		i = 0;
 		while (UnitTypeWcNames[i]) {
@@ -1959,9 +1973,11 @@ local void CreateEditor(void)
 		MaxUnitIndex = n - 1;
 	}
 
-	ShowUnitsToSelect = 1;				// Show all units as default
+	ShowUnitsToSelect = 1; // Show all units as default
 	ShowBuildingsToSelect = 1;
-//	ShowHeroesToSelect = 1;
+#if 0
+	ShowHeroesToSelect = 1;
+#endif
 	ShowAirToSelect = 1;
 	ShowLandToSelect = 1;
 	ShowWaterToSelect = 1;
@@ -1977,15 +1993,15 @@ local void CreateEditor(void)
 }
 
 /**
-**		Save a pud from editor.
+**  Save a pud from editor.
 **
-**		@param file		Save the level to this file.
+**  @param file  Save the level to this file.
 **
-**		@return				0 for success, -1 for error
+**  @return      0 for success, -1 for error
 **
-**		@todo		FIXME: Check if the pud is valid, contains no failures.
-**				At least two players, one human slot, every player a startpoint
-**				...
+**  @todo  FIXME: Check if the pud is valid, contains no failures.
+**         At least two players, one human slot, every player a startpoint
+**         ...
 */
 global int EditorSavePud(const char* file)
 {
@@ -2026,11 +2042,11 @@ global int EditorSavePud(const char* file)
 }
 
 /*----------------------------------------------------------------------------
---		Editor main loop
+--  Editor main loop
 ----------------------------------------------------------------------------*/
 
 /**
-**		Editor main event loop.
+**  Editor main event loop.
 */
 global void EditorMainLoop(void)
 {
@@ -2078,7 +2094,7 @@ global void EditorMainLoop(void)
 			}
 
 			//
-			//		Map scrolling
+			// Map scrolling
 			//
 			if (TheUI.MouseScroll && !(FrameCounter%SpeedMouseScroll)) {
 				DoScrollArea(MouseScrollState, 0);
@@ -2100,12 +2116,12 @@ global void EditorMainLoop(void)
 		}
 
 		//
-		//		Restore all for menu
+		// Restore all for menu
 		//
 		CleanModules();
 		CleanFonts();
 
-		LoadCcl();						// Reload the main config file
+		LoadCcl(); // Reload the main config file
 
 		PreMenuSetup();
 
