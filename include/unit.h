@@ -763,10 +763,10 @@ extern Unit* MakeUnit(UnitType* type,Player* player);
 extern void PlaceUnit(Unit* unit, int x, int y);
 	/// Create a new unit and place on map
 extern Unit* MakeUnitAndPlace(int x, int y, UnitType* type,Player* player);
-	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
-extern void MoveUnitToXY(Unit* unit, int x, int y);
 	/// Add an unit inside a container. Only deal with list stuff.
 extern void AddUnitInContainer(Unit* unit, Unit* host);
+	/// Remove an unit from inside a container. Only deals with list stuff.
+extern void RemoveUnitFromContainer(Unit* unit);
 	/// Remove unit from map/groups/...
 extern void RemoveUnit(Unit* unit, Unit* host);
 	/// Handle the loose of an unit (food,...)

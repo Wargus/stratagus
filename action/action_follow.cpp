@@ -136,6 +136,7 @@ void HandleActionFollow(Unit* unit)
 
 				// Teleport the unit
 				RemoveUnit(unit, NULL);
+				UnitCacheRemove(unit);
 				unit->X = goal->Goal->X;
 				unit->Y = goal->Goal->Y;
 				DropOutOnSide(unit, unit->Direction, 1, 1);

@@ -206,7 +206,10 @@ int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused))
 	DebugPrint("Spawning a portal exit.\n");
 	portal = caster->Goal;
 	if (portal) {
-		MoveUnitToXY(portal, x, y);
+		// FIXME: if cop is already defined --> move it, but it doesn't work?
+		RemoveUnit(portal, NULL);
+		UnitCacheRemove(portal);
+		PlaceUnit(portal, x, y);
 	} else {
 		portal = MakeUnitAndPlace(x, y, ptype, &Players[PlayerNumNeutral]);
 	}
@@ -565,6 +568,7 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 
 	// as said somewhere else -- no corpses :)
 	RemoveUnit(target, NULL);
+	UnitCacheRemove(target);
 	for (i = 0; i < type->TileWidth; ++i) {
 		for (j = 0; j < type->TileHeight; ++j) {
 			if (!UnitTypeCanMoveTo(x + i, y + j, type)) {
@@ -639,17 +643,27 @@ int CastSummon(Unit* caster, const SpellType* spell,
 		// FIXME: do summoned units count on food?
 		//
 		target = MakeUnit(unittype, caster->Player);
-		// This is a hack to walk around behaviour of DropOutOnSide
-		target->X = x + 1;
+		target->X = x;
 		target->Y = y;
-		DropOutOnSide(target, LookingW, 0, 0); // FIXME : 0,0) : good parameter ?
 		//
 		//  set life span. ttl=0 results in a permanent unit.
 		//
 		if (ttl) {
 			target->TTL = GameCycle + ttl;
 		}
-
+		//
+		// Revealers are always removed, since they don't have graphics
+		//
+		if (target->Type->Revealer) {
+			DebugPrint("summoned unit is a revealer, removed.\n");
+			target->Removed = 1;
+			target->CurrentSightRange = target->Stats->SightRange;
+			MapMarkUnitSight(target);
+		} else {
+			// This is a hack to walk around behaviour of DropOutOnSide
+			target->X++;
+			DropOutOnSide(target, LookingW, 0, 0);
+		}
 		caster->Mana -= spell->ManaCost;
 		return 1;
 	}

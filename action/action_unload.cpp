@@ -153,6 +153,8 @@ int UnloadUnit(Unit* unit)
 	if (!FindUnloadPosition(unit->X, unit->Y, &x, &y, UnitMovementMask(unit))) {
 		return 0;
 	}
+	unit->X = x;
+	unit->Y = y;
 	unit->Wait = 1; // should be correct unit has still action
 	unit->Boarded = 0;
 	PlaceUnit(unit, x, y);
