@@ -3153,8 +3153,8 @@ global void LetUnitDie(Unit* unit)
     unit->Wait=1;
     unit->Orders[0].Action=UnitActionDie;
 #ifdef NEW_FOW
-	    unit->CurrentSightRange=unit->Type->CorpseType->Stats->SightRange;
-	    MapMarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
+    unit->CurrentSightRange=unit->Type->CorpseType->Stats->SightRange;
+    MapMarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
 #endif
 }
 
