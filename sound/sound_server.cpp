@@ -254,7 +254,7 @@ global void StopMusic(void)
 **
 **	Perodic called from the main loop.
 */
-global int CDRomCheck(void *unused)
+global int CDRomCheck(void *unused __attribute__((unused)))
 {
 #ifdef USE_SDLCD
     if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped") && SDL_CDStatus(CDRom) == 1) {
