@@ -762,6 +762,7 @@ global void CleanTilesets(void)
     //
     for (i = 0; i < NumTilesets; ++i) {
 	free(Tilesets[i]->Ident);
+	free(Tilesets[i]->File);
 	free(Tilesets[i]->Class);
 	free(Tilesets[i]->Name);
 	free(Tilesets[i]->ImageFile);

@@ -2400,6 +2400,7 @@ global int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 		    *px = x;
 		    *py = y;
 		    DebugLevel3("Found it! %X %X\n" _C_ TheMap.Fields[x+y*TheMap.Width].Flags _C_ resmask);
+		    free(points);
 		    return 1;
 		}
 		if (CanMoveToMask(x, y, movemask)) {	// reachable

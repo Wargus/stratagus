@@ -991,7 +991,7 @@ local SCM CclCreateUnit(SCM type, SCM player, SCM x, SCM y)
     iy = gh_scm2int(y);
 
     heading = SyncRand() % 256;
-    unit = MakeUnit(unittype, &Players[gh_scm2int(player)]);
+    unit = MakeUnit(unittype, &Players[TriggerGetPlayer(player)]);
     mask = UnitMovementMask(unit);
     if (CheckedCanMoveToMask(ix, iy, mask)) {
 	unit->Wait = 1;
