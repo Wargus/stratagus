@@ -89,7 +89,7 @@ local void DrawMouseCoordsOnMap(int x,int y)
     x=Screen2MapX(x);
     y=Screen2MapY(y);
     if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-        DebugLevel0(__FUNCTION__": coords outside map %d,%d\n",x,y);
+        DebugLevel0Fn("coords outside map %d,%d\n",x,y);
 	return;
     }
     VideoDrawSub(TheUI.MenuButton.Graphic,0,0
@@ -166,7 +166,7 @@ global void DoRightButton(int x,int y)
             acknowledged=1;
         }
         action=type->MouseAction;
-	DebugLevel3(__FUNCTION__": Mouse action %d\n",action);
+	DebugLevel3Fn("Mouse action %d\n",action);
 
         //
         //      Enter transporters?
@@ -177,7 +177,7 @@ global void DoRightButton(int x,int y)
                 && dest->Player==ThisPlayer
                 && unit->Type->UnitType==UnitTypeLand ) {
             dest->Blink=3;
-	    DebugLevel3(__FUNCTION__": Board transporter\n");
+	    DebugLevel3Fn("Board transporter\n");
             SendCommandBoard(unit,-1,-1,dest,flush);
             continue;
         }
@@ -390,8 +390,8 @@ local void HandleMouseOn(int x,int y)
     //
     //	Minimap
     //
-    if( x>=TheUI.MinimapX+24 && x<=TheUI.MinimapX+24+MINIMAP_W
-	    && y>=TheUI.MinimapY+2 && y<=TheUI.MinimapY+2+MINIMAP_H ) {
+    if( x>=TheUI.MinimapX+24 && x<TheUI.MinimapX+24+MINIMAP_W
+	    && y>=TheUI.MinimapY+2 && y<TheUI.MinimapY+2+MINIMAP_H ) {
 	CursorOn=CursorOnMinimap;
 	return;
     }
@@ -522,7 +522,7 @@ global void UIHandleMouseMove(int x,int y)
     // FIXME: This must done new, moving units, scrolling...
     if( CursorOn==CursorOnMap ) {
 	if( IsMapFieldVisible(Screen2MapX(x),Screen2MapY(y)) ) {
-	    DebugLevel3(__FUNCTION__": %d,%d\n"
+	    DebugLevel3Fn("%d,%d\n"
 		    ,x-TheUI.MapX+MapX*TileSizeX
 		    ,y-TheUI.MapY+MapY*TileSizeY);
 	    // Map coordinate in pixels
@@ -656,7 +656,7 @@ local void SendAttack(int x,int y)
         unit=Selected[i];
 	if( unit->Type->CanAttack ) {
 	    dest=TargetOnMapTile(unit,x,y);
-	    DebugLevel3(__FUNCTION__": Attacking %p\n",dest);
+	    DebugLevel3Fn("Attacking %p\n",dest);
 	    if( dest!=unit ) {  // don't let an unit self destruct
 	        SendCommandAttack(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	    }
@@ -721,7 +721,7 @@ local void SendDemolish(int x,int y)
 	    }
 	    SendCommandDemolish(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	} else {
-	    DebugLevel0(__FUNCTION__": can't demolish %p\n",unit);
+	    DebugLevel0Fn("can't demolish %p\n",unit);
 	}
     }
 }
