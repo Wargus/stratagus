@@ -274,9 +274,7 @@ global void DoRightButton(int sx,int sy)
 	//	Tanker
 	//
 	if( action==MouseActionHaulOil ) {
-	    // FIXME: How can I remove here the unit type? More races!
 	    if( type==UnitTypeOrcTankerFull || type==UnitTypeHumanTankerFull ) {
-		DebugLevel2("Should return to oil deposit\n");
 		if( UnitUnderCursor && (dest=UnitOnMapTile(x,y))
 			&& dest->Player==unit->Player ) {
 		    dest->Blink=4;
@@ -291,7 +289,7 @@ global void DoRightButton(int sx,int sy)
 			&& dest->Player==unit->Player ) {
 		    dest->Blink=4;
 		    DebugLevel3("PLATFORM\n");
-		    SendCommandHaulOil(unit,dest,flush);
+		    SendCommandResource(unit,dest,flush);
 		    continue;
 		}
 	    }
@@ -418,7 +416,7 @@ global void DoRightButton(int sx,int sy)
 	    if( UnitUnderCursor && (dest=PlatformOnMap(x,y)) ) {
                 dest->Blink=4;
 	        DebugLevel3("RALY POINT TO PLATFORM\n");
-                SendCommandHaulOil(Selected[i],dest,!(KeyModifiers&ModifierShift));
+                SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	        continue;
             }
             if( UnitUnderCursor && (dest=GoldMineOnMap(x,y)) ) {
@@ -1049,7 +1047,7 @@ local void SendHarvest(int x,int y)
 	if( UnitUnderCursor && (dest=PlatformOnMap(x,y)) ) {
 	    dest->Blink=4;
 	    DebugLevel3("PLATFORM\n");
-	    SendCommandHaulOil(Selected[i],dest,!(KeyModifiers&ModifierShift));
+	    SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
 	}
 	if( UnitUnderCursor && (dest=GoldMineOnMap(x,y)) ) {

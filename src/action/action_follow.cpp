@@ -154,8 +154,8 @@ global void HandleActionFollow(Unit* unit)
 		}
 
 		if( dest ) {
-		    if( (dest->NewOrder.Action==UnitActionHaulOil
-				&& !unit->Type->Tanker)
+		    if( (dest->NewOrder.Action==UnitActionResource
+				&& !unit->Type->Harvester  )
 			    || (dest->NewOrder.Action==UnitActionAttack
 				&& !unit->Type->CanAttack)
 			    || (dest->NewOrder.Action==UnitActionBoard

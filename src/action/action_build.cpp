@@ -230,7 +230,7 @@ global void HandleActionBuild(Unit* unit)
     if( type->MustBuildOnTop ) {
 	Unit* temp;
 	if( (temp=UnitTypeOnMap(x,y,type->MustBuildOnTop)) ) {
-	    build->Value=temp->Value;
+	    build->Value=temp->Value;   // We capture the value of what is beneath.
 	    RemoveUnit(temp,NULL);	// Destroy building beneath
 	    UnitLost(temp);
 	    UnitClearOrders(temp);
@@ -274,21 +274,6 @@ global void HandleActionBuild(Unit* unit)
     build->Wait=CYCLES_PER_SECOND/6;
     UpdateConstructionFrame(build);
 
-#if 0
-    //
-    //	Building oil-platform, must remove oil-patch.
-    //
-    if( type->GivesOil ) {
-	Unit* temp;
-        DebugLevel0Fn("Remove oil-patch\n");
-	temp=OilPatchOnMap(x,y);
-	DebugCheck( !temp );
-	// FIXME: Johns: why the worker and not the construction?
-	unit->Value=temp->Value;	// Let worker hold value while building
-	// oil patch should NOT make sound, handled by let unit die
-	LetUnitDie(temp);		// Destroy oil patch
-    }
-#endif
     unit->Value=build->Value;		// worker holding value while building
 
     RemoveUnit(unit,build);		// automaticly: CheckUnitToBeDrawn(unit)
@@ -373,14 +358,18 @@ global void HandleActionBuilded(Unit* unit)
 	worker->Reset=worker->Wait=1;
 	DropOutOnSide(worker,LookingW,type->TileWidth,type->TileHeight);
 	//
-	//	Building oil-platform, must update oil.
+	//	Whe
 	//
-	if( type->GivesResource==OilCost ) {
-	    CommandHaulOil(worker,unit,0);	// Let the unit haul oil
-	    DebugLevel0Fn("Update oil-platform\n");
-	    DebugLevel0Fn(" =%d\n" _C_ unit->Data.Resource.Active);
+	if( type->MustBuildOnTop ) {
+	    // FIXME: nobody: shouldn't this be already 0?
+	    // It holds the number of units inside a resource.
 	    unit->Data.Resource.Active=0;
-	    unit->Value=worker->Value;	// worker holding value while building
+	}
+	//
+	//	If we can harvest from the new building, do it.
+	//
+	if (worker->Type->Harvester&&worker->Type->ResourceHarvested==type->GivesResource) {
+	    CommandResource(worker,unit,0);
 	}
 	//
 	//	Building lumber mill, let worker automatic chopping wood.

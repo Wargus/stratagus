@@ -177,12 +177,7 @@ local int MoveToGoldMine(Unit* unit)
     unit->Y=destu->Y;
 #endif
 
-    if( MINE_FOR_GOLD<MAX_UNIT_WAIT ) {
-	unit->Wait=MINE_FOR_GOLD;
-    } else {
-	unit->Wait=MAX_UNIT_WAIT;
-    }
-    unit->Value=MINE_FOR_GOLD-unit->Wait;
+    unit->Wait=MINE_FOR_GOLD;
 
     return 1;
 }
@@ -201,145 +196,126 @@ local int MineInGoldmine(Unit* unit)
 
     DebugLevel3Fn("Waiting\n");
 
-    if( !unit->Value ) {
-	//
-	//	Have gold
-	//
-	mine=GoldMineOnMap(unit->X,unit->Y);
-	IfDebug(
-	    DebugLevel3Fn("Found %d,%d=%d\n" _C_ unit->X _C_ unit->Y _C_ UnitNumber(mine));
-	    if( !mine ) {
-		DebugLevel0Fn("No unit? (%d,%d)\n" _C_ unit->X _C_ unit->Y);
-		abort();
-	    } );
+    //
+    //	Have gold
+    //
+    mine=GoldMineOnMap(unit->X,unit->Y);
 
-	DebugCheck( mine->Value>655350 );
+    DebugCheck( mine->Value>655350 );
 
-	//
-	//	Update gold mine.
-	//
-	if( OptionUseDepletedMines
-		&& mine->Value < DefaultIncomes[GoldCost] ) {
-	    mine->Value = 0;
-	    unit->Rs = OptionUseDepletedMines;
-	    // vladi: income reduced to 5% (mine depleted)
-	} else {	// remove gold from store
-	    mine->Value-=DefaultIncomes[GoldCost];
-  	    unit->Rs = 100;		// vladi: normal income 100%
-	}
-	if( !--mine->Data.Resource.Active ) {
-	    mine->Frame=0;
-	    CheckUnitToBeDrawn(mine);
-	}
-	UnitMarkSeen(mine);
-	if( IsOnlySelected(mine) ) {
-	    MustRedraw|=RedrawInfoPanel;
-	}
-
-	//
-	//	End of gold: destroy gold-mine.
-	//
-	if( !OptionUseDepletedMines && mine->Value<DefaultIncomes[GoldCost] ) {
-	    Unit* table[UnitMax];
-	    Unit* u;
-	    Unit* destu;
-	    int i;
-	    int count;
-
-	    DebugLevel0Fn("Mine destroyed %d,%d\n" _C_ mine->X _C_ mine->Y);
-
-	    count=0;
-	    for( i=0; i<NumUnits; ++i ) {
-		u=Units[i];
-		if( u!=unit && u->Removed && u->X==mine->X && u->Y==mine->Y ) {
-		    table[count++]=u;
-		}
-	    }
-
-	    DropOutAll(mine);
-	    LetUnitDie(mine);
-	    mine=NULL;
-
-	    u=table[0];
-	    if( count && (destu=FindGoldMine(u,u->X,u->Y)) ) {
-		for( i=0; i<count; ++i ) {
-		    u=table[i];
-		    u->Orders[0].Goal=destu;
-		    RefsDebugCheck( destu->Destroyed || !destu->Refs );
-		    ++destu->Refs;
-		    u->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-		    u->Orders[0].X=-1;
-		    u->Orders[0].Y=-1;
-		    u->Orders[0].Action=UnitActionMineGold;
-		    CheckUnitToBeDrawn(u);
-		}
-	    }
-	}
-
-	//	Store gold mine position
-	unit->Orders[0].Arg1=(void*)((unit->X<<16)|unit->Y);
-
-	//
-	//	Find gold depot
-	//
-	if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,GoldCost)) ) {
-	    if( mine ) {
-		DropOutOnSide(unit,LookingW
-			,mine->Type->TileWidth,mine->Type->TileHeight);
-	    }
-	    unit->Orders[0].Action=UnitActionStill;
-	    unit->SubAction=0;
-	    DebugLevel2Fn("Mine without deposit\n");
-	} else {
-	    if( mine ) {
-		DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
-			,destu->Y+destu->Type->TileHeight/2
-			,mine->Type->TileWidth,mine->Type->TileHeight);
-	    }
-	    unit->Orders[0].Goal=destu;
-	    NewResetPath(unit);
-	    RefsDebugCheck( destu->Destroyed || !destu->Refs );
-	    ++destu->Refs;
-	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	    unit->Orders[0].X=unit->Orders[0].Y=-1;
-	    unit->Orders[0].Action=UnitActionMineGold;
-	    unit->SubAction=64;
-	    DebugLevel3Fn("Mine with deposit %d,%d\n" _C_ destu->X _C_ destu->Y);
-	}
-
-	//
-	//	Change unit outfit. (Unit type is used for this.)
-	//
-	unit->Player->UnitTypesCount[unit->Type->Type]--;
-	if( unit->Type==UnitTypeOrcWorker ) {
-	    unit->Type=UnitTypeOrcWorkerWithGold;
-	} else if( unit->Type==UnitTypeHumanWorker ) {
-	    unit->Type=UnitTypeHumanWorkerWithGold;
-	} else {
-	    // FIXME: support workers for more races.
-	    DebugLevel0Fn("Wrong unit (%d,%d) for mining gold %d (%s)\n"
-		_C_ unit->X _C_ unit->Y _C_ unit->Type->Type _C_ unit->Type->Name);
-	}
-	unit->Player->UnitTypesCount[unit->Type->Type]++;
-        CheckUnitToBeDrawn(unit);
-	if( unit->Selected ) {
-	    SelectedUnitChanged();
-	}
-	unit->Wait=1;
-	return unit->SubAction;
+    //
+    //	Update gold mine.
+    //
+    if( OptionUseDepletedMines
+	    && mine->Value < DefaultIncomes[GoldCost] ) {
+	mine->Value = 0;
+	unit->Rs = OptionUseDepletedMines;
+	// vladi: income reduced to 5% (mine depleted)
+    } else {	// remove gold from store
+	mine->Value-=DefaultIncomes[GoldCost];
+	unit->Rs = 100;		// vladi: normal income 100%
+    }
+    if( !--mine->Data.Resource.Active ) {
+	mine->Frame=0;
+	CheckUnitToBeDrawn(mine);
+    }
+    UnitMarkSeen(mine);
+    if( IsOnlySelected(mine) ) {
+	MustRedraw|=RedrawInfoPanel;
     }
 
     //
-    //	Continue waiting
+    //	End of gold: destroy gold-mine.
     //
-    if( unit->Value<MAX_UNIT_WAIT ) {
-	unit->Wait=unit->Value;
+    if( !OptionUseDepletedMines && mine->Value<DefaultIncomes[GoldCost] ) {
+	Unit* table[UnitMax];
+	Unit* u;
+	Unit* destu;
+	int i;
+	int count;
+
+	DebugLevel0Fn("Mine destroyed %d,%d\n" _C_ mine->X _C_ mine->Y);
+
+	count=0;
+	for( i=0; i<NumUnits; ++i ) {
+	    u=Units[i];
+	    if( u!=unit && u->Removed && u->X==mine->X && u->Y==mine->Y ) {
+		table[count++]=u;
+	    }
+	}
+
+	DropOutAll(mine);
+	LetUnitDie(mine);
+	mine=NULL;
+
+	u=table[0];
+	if( count && (destu=FindGoldMine(u,u->X,u->Y)) ) {
+	    for( i=0; i<count; ++i ) {
+		u=table[i];
+		u->Orders[0].Goal=destu;
+		RefsDebugCheck( destu->Destroyed || !destu->Refs );
+		++destu->Refs;
+		u->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+		u->Orders[0].X=-1;
+		u->Orders[0].Y=-1;
+		u->Orders[0].Action=UnitActionMineGold;
+		CheckUnitToBeDrawn(u);
+	    }
+	}
+    }
+
+    //	Store gold mine position
+    unit->Orders[0].Arg1=(void*)((unit->X<<16)|unit->Y);
+
+    //
+    //	Find gold depot
+    //
+    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,GoldCost)) ) {
+	if( mine ) {
+	    DropOutOnSide(unit,LookingW
+		    ,mine->Type->TileWidth,mine->Type->TileHeight);
+	}
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	DebugLevel2Fn("Mine without deposit\n");
     } else {
-	unit->Wait=MAX_UNIT_WAIT;
+	if( mine ) {
+	    DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
+		    ,destu->Y+destu->Type->TileHeight/2
+		    ,mine->Type->TileWidth,mine->Type->TileHeight);
+	}
+	unit->Orders[0].Goal=destu;
+	NewResetPath(unit);
+	RefsDebugCheck( destu->Destroyed || !destu->Refs );
+	++destu->Refs;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
+	unit->Orders[0].Action=UnitActionMineGold;
+	unit->SubAction=64;
+	DebugLevel3Fn("Mine with deposit %d,%d\n" _C_ destu->X _C_ destu->Y);
     }
-    unit->Value-=unit->Wait;
 
-    return 0;
+    //
+    //	Change unit outfit. (Unit type is used for this.)
+    //
+    unit->Player->UnitTypesCount[unit->Type->Type]--;
+    if( unit->Type==UnitTypeOrcWorker ) {
+	unit->Type=UnitTypeOrcWorkerWithGold;
+    } else if( unit->Type==UnitTypeHumanWorker ) {
+	unit->Type=UnitTypeHumanWorkerWithGold;
+    } else {
+	// FIXME: support workers for more races.
+	DebugLevel0Fn("Wrong unit (%d,%d) for mining gold %d (%s)\n"
+		_C_ unit->X _C_ unit->Y _C_ unit->Type->Type _C_ unit->Type->Name);
+    }
+    unit->Player->UnitTypesCount[unit->Type->Type]++;
+    CheckUnitToBeDrawn(unit);
+    if( unit->Selected ) {
+	SelectedUnitChanged();
+	UpdateButtonPanel();
+    }
+    unit->Wait=1;
+    return unit->SubAction;
 }
 
 /**
@@ -448,12 +424,7 @@ local int MoveToGoldDeposit(Unit* unit)
     }
     unit->Player->UnitTypesCount[unit->Type->Type]++;
 
-    if( WAIT_FOR_GOLD<MAX_UNIT_WAIT ) {
-	unit->Wait=WAIT_FOR_GOLD;
-    } else {
-	unit->Wait=MAX_UNIT_WAIT;
-    }
-    unit->Value=WAIT_FOR_GOLD-unit->Wait;
+    unit->Wait=WAIT_FOR_GOLD;
 
     return 1;
 }
@@ -472,51 +443,41 @@ local int StoreGoldInDeposit(Unit* unit)
     int x;
     int y;
 
-    DebugLevel3Fn("Waiting\n");
-    if( !unit->Value ) {
-	depot=ResourceDepositOnMap(unit->X,unit->Y,GoldCost);
-	DebugCheck( !depot );
-	// Could be destroyed, but than we couldn't be in?
+    depot=ResourceDepositOnMap(unit->X,unit->Y,GoldCost);
+    DebugCheck( !depot );
+    // Could be destroyed, but than we couldn't be in?
 
-	// FIXME: Ari says, don't automatic search a new mine.
-	// Return to last position
-	if( unit->Orders[0].Arg1==(void*)-1 ) {
-	    x=unit->X;
-	    y=unit->Y;
-	} else {
-	    x=(int)unit->Orders[0].Arg1>>16;
-	    y=(int)unit->Orders[0].Arg1&0xFFFF;
-	}
-	if( !(destu=FindGoldMine(unit,x,y)) ) {
-	    DropOutOnSide(unit,LookingW
-		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-	    unit->Orders[0].Action=UnitActionStill;
-	    unit->SubAction=0;
-	} else {
-	    DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
-		    ,destu->Y+destu->Type->TileHeight/2
-		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-	    unit->Orders[0].Goal=destu;
-	    RefsDebugCheck( destu->Destroyed || !destu->Refs );
-	    ++destu->Refs;
-	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	    unit->Orders[0].X=-1;
-	    unit->Orders[0].Y=-1;
-	    unit->Orders[0].Action=UnitActionMineGold;
-	}
-
-        CheckUnitToBeDrawn(unit);
-	unit->Wait=1;
-	unit->SubAction=0;
-	return 1;
-    }
-    if( unit->Value<MAX_UNIT_WAIT ) {
-	unit->Wait=unit->Value;
+    // FIXME: Ari says, don't automatic search a new mine.
+    // Return to last position
+    if( unit->Orders[0].Arg1==(void*)-1 ) {
+	x=unit->X;
+	y=unit->Y;
     } else {
-	unit->Wait=MAX_UNIT_WAIT;
+	x=(int)unit->Orders[0].Arg1>>16;
+	y=(int)unit->Orders[0].Arg1&0xFFFF;
     }
-    unit->Value-=unit->Wait;
-    return 0;
+    if( !(destu=FindGoldMine(unit,x,y)) ) {
+	DropOutOnSide(unit,LookingW
+		,depot->Type->TileWidth,depot->Type->TileHeight);
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+    } else {
+	DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
+		,destu->Y+destu->Type->TileHeight/2
+		,depot->Type->TileWidth,depot->Type->TileHeight);
+	unit->Orders[0].Goal=destu;
+	RefsDebugCheck( destu->Destroyed || !destu->Refs );
+	++destu->Refs;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+	unit->Orders[0].X=-1;
+	unit->Orders[0].Y=-1;
+	unit->Orders[0].Action=UnitActionMineGold;
+    }
+
+    CheckUnitToBeDrawn(unit);
+    unit->Wait=1;
+    unit->SubAction=0;
+    return 1;
 }
 
 /**

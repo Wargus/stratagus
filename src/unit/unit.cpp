@@ -2397,7 +2397,7 @@ global int CanBuildHere(const UnitType* type,int x,int y)
 	}
     }
 
-    if( type->MustBuildOnTop ) {
+    if( type->MustBuildOnTop && !EditorRunning) {
 	// Resource platform could only be build on resource patch.
 	n=UnitCacheSelect(x,y,x+1,y+1,table);
 	for( i=0; i<n; ++i ) {
@@ -3043,15 +3043,19 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 #endif
 
 /**
- **	Find oil platform.
+ **	Find Resource.
  **
- **	@param player	A deposit owning this player
+ **	@param player	The player that wants to find a resource.
  **	@param x	Nearest to X position.
- **	@param y	Nearest to Y position.
+ **	@param y	Nearest to Y position
+ **	@param resource	The ID of the resource.
+ **
+ **	@notes 		This will return an usable resource building that
+ **			belongs to "player" or is neutral.
  **
  **	@return		NoUnitP or oil platform unit
  */
-global Unit* FindOilPlatform(const Player* player,int x,int y)
+global Unit* FindResource(const Player* player,int x,int y,int resource)
 {
     Unit* unit;
     Unit* best;
@@ -3060,38 +3064,39 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
     int best_d;
     int d;
     int i;
+    int pnum;
 
     //	FIXME:	this is not the best one
     //		We need the deposit with the shortest way!
     //		At least it must be reachable!
-    //
 
     best=NoUnitP;
     best_d=99999;
-    nunits=player->TotalNumUnits;
-    units=player->Units;
-    for( i=0; i<nunits; i++ ) {
-	unit=units[i];
-	if( UnitUnusable(unit) ) {
+    for (pnum=0;pnum<PlayerMax;++pnum) {
+	// FIXME: allow harvesting from ally
+	if ( (pnum!=PlayerMax-1) && (pnum!=ThisPlayer->Player) ) {
 	    continue;
 	}
-	// Want platform
-	if( unit->Type->GivesResource==OilCost ) {
-	    d=MapDistanceToUnit(x,y,unit);
-	    if( d<best_d ) {
-		best_d=d;
-		best=unit;
+	nunits=Players[pnum].TotalNumUnits;
+	units=Players[pnum].Units;
+	for( i=0; i<nunits; i++ ) {
+	    unit=units[i];
+	    if( UnitUnusable(unit) || !unit->Type->CanHarvest ) {
+		continue;
+	    }
+	    // Want platform
+	    if( unit->Type->GivesResource==resource ) {
+		d=MapDistanceToUnit(x,y,unit);
+		if( d<best_d ) {
+		    best_d=d;
+		    best=unit;
+		}
 	    }
 	}
     }
 
     DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
 	    best?best->X:-1 _C_ best?best->Y:-1);
-    /*	Oil platforms are our own, they should be known
-	if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
-	return NoUnitP;
-	}
-	*/
     return best;
 }
 
@@ -3964,17 +3969,8 @@ local void SaveOrder(const Order* order,FILE* file)
 	case UnitActionMineGold:
 	    fprintf(file,"action-mine-gold");
 	    break;
-	case UnitActionMineOre:
-	    fprintf(file,"action-mine-ore");
-	    break;
-	case UnitActionMineCoal:
-	    fprintf(file,"action-mine-coal");
-	    break;
-	case UnitActionQuarryStone:
-	    fprintf(file,"action-quarry-stone");
-	    break;
-	case UnitActionHaulOil:
-	    fprintf(file,"action-haul-oil");
+	case UnitActionResource:
+	    fprintf(file,"action-resource");
 	    break;
 	case UnitActionReturnGoods:
 	    fprintf(file,"action-return-goods");

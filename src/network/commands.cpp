@@ -565,8 +565,8 @@ local void DoNextReplay(void)
 	SendCommandHarvest(UnitSlots[unit],posx,posy,flags);
     } else if( !strcmp(name,"mine") ) {
 	SendCommandMineGold(UnitSlots[unit],dunit,flags);
-    } else if( !strcmp(name,"haul") ) {
-	SendCommandHaulOil(UnitSlots[unit],dunit,flags);
+    } else if( !strcmp(name,"resource") ) {
+	SendCommandResource(UnitSlots[unit],dunit,flags);
     } else if( !strcmp(name,"return") ) {
 	SendCommandReturnGoods(UnitSlots[unit],dunit,flags);
     } else if( !strcmp(name,"train") ) {
@@ -945,13 +945,13 @@ global void SendCommandMineGold(Unit* unit,Unit* dest,int flush)
 **	@param dest	pointer to destination (oil-platform).
 **	@param flush	Flag flush all pending commands.
 */
-global void SendCommandHaulOil(Unit* unit,Unit* dest,int flush)
+global void SendCommandResource(Unit* unit,Unit* dest,int flush)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("haul",unit,flush,-1,-1,dest,NULL,-1);
-	CommandHaulOil(unit,dest,flush);
+	CommandLog("resource",unit,flush,-1,-1,dest,NULL,-1);
+	CommandResource(unit,dest,flush);
     } else {
-	NetworkSendCommand(MessageCommandHaul,unit,0,0,dest,0,flush);
+	NetworkSendCommand(MessageCommandResource,unit,0,0,dest,0,flush);
     }
 }
 
@@ -1340,14 +1340,14 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	    CommandLog("mine",unit,status,-1,-1,dest,NULL,-1);
 	    CommandMineGold(unit,dest,status);
 	    break;
-	case MessageCommandHaul:
+	case MessageCommandResource:
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
 		DebugCheck( !dest || !dest->Type );
 	    }
-	    CommandLog("haul",unit,status,-1,-1,dest,NULL,-1);
-	    CommandHaulOil(unit,dest,status);
+	    CommandLog("resource",unit,status,-1,-1,dest,NULL,-1);
+	    CommandResource(unit,dest,status);
 	    break;
 	case MessageCommandReturn:
 	    dest=NoUnitP;

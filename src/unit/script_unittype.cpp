@@ -66,6 +66,24 @@ local ccl_smob_type_t SiodUnitTypeTag;		/// siod unit-type object
 ----------------------------------------------------------------------------*/
 
 /**
+** 	Get the resource ID from a SCM object.
+**
+** 	@param value	SCM thingie
+**	@return 	the resource id
+*/
+local unsigned CclGetResourceByName(SCM value)
+{
+    int i;
+    for( i=0; i<MaxCosts; ++i ) {
+	if( gh_eq_p(value,gh_symbol2scm(DefaultResourceNames[i])) ) {
+	    return i;
+	}
+    }
+    errl("Unsupported resource tag",value);
+    return 0xABCDEF;
+}
+
+/**
 **	Parse unit-type.
 **
 **	@note Should write a general parser for this.
@@ -200,20 +218,9 @@ local SCM CclDefineUnitType(SCM list)
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
 	    while( !gh_null_p(sublist) ) {
-
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-
-		for( i=0; i<MaxCosts; ++i ) {
-		    if( gh_eq_p(value,gh_symbol2scm(DefaultResourceNames[i])) ) {
-			type->_Costs[i]=gh_scm2int(gh_car(sublist));
-			break;
-		    }
-		}
-		if( i==MaxCosts ) {
-		   // FIXME: this leaves half initialized unit-type
-		   errl("Unsupported resource tag",value);
-		}
+		type->_Costs[CclGetResourceByName(value)]=gh_scm2int(gh_car(sublist));
 		sublist=gh_cdr(sublist);
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("construction")) ) {
@@ -388,30 +395,52 @@ local SCM CclDefineUnitType(SCM list)
 	    type->Transporter=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("cower-worker")) ) {
 	    type->CowerWorker=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("tanker")) ) {
-	    type->Tanker=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("gives-oil")) ) {
-	    type->GivesResource=OilCost;
+	} else if( gh_eq_p(value,gh_symbol2scm("harvester")) ) {
+	    type->Harvester=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("resource-harvested")) ) {
+	    type->ResourceHarvested=CclGetResourceByName(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("wait-at-resource")) ) {
+	    type->WaitAtResource=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("wait-at-depot")) ) {
+	    type->WaitAtDepot=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("resource-capacity")) ) {
+	    type->ResourceCapacity=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("transform-when-empty")) ) {
+	    str=gh_scm2newstr(gh_car(list),NULL);
+	    auxtype=UnitTypeByIdent(str);
+	    if (!auxtype) {
+		DebugLevel0("Undefined unit \"%s\".\n" _C_ str);
+		exit(0);
+	    }
+	    type->TransformWhenEmpty=auxtype;
+	    free(str);
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("transform-when-loaded")) ) {
+	    str=gh_scm2newstr(gh_car(list),NULL);
+	    auxtype=UnitTypeByIdent(str);
+	    if (!auxtype) {
+		DebugLevel0("Undefined unit \"%s\".\n" _C_ str);
+		exit(0);
+	    }
+	    type->TransformWhenLoaded=auxtype;
+	    free(str);
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("gives-resource")) ) {
+	    type->GivesResource=CclGetResourceByName(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("can-harvest")) ) {
+	    type->CanHarvest=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-store")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
 	    while( !gh_null_p(sublist) ) {
-		value=gh_car(sublist);
+		type->CanStore[CclGetResourceByName(gh_car(sublist))]=1;
 		sublist=gh_cdr(sublist);
-	    	for( i=0; i<MaxCosts; ++i ) {
-		    if( gh_eq_p(value,gh_symbol2scm(DefaultResourceNames[i])) ) {
-			type->CanStore[i]=1;
-			break;
-		    }
-		}
-		if( i==MaxCosts ) {
-		   errl("Unsupported resource tag",value);
-		}
 	    }
-	} else if( gh_eq_p(value,gh_symbol2scm("oil-patch")) ) {
-	    type->GivesResource=OilCost;
-	} else if( gh_eq_p(value,gh_symbol2scm("gives-gold")) ) {
-	    type->GivesResource=GoldCost;
 	} else if( gh_eq_p(value,gh_symbol2scm("vanishes")) ) {
 	    type->Vanishes=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("tower")) ) {
@@ -609,7 +638,7 @@ global UnitType* CclGetUnitType(SCM ptr)
 
     // Be kind allow also strings or symbols
     if( (str = CclConvertToString(ptr)) != NULL )  {
-        printf("CclGetUnitType: %s\n", str);
+        DebugLevel3("CclGetUnitType: %s\n"_C_ str);
         UnitType* type = UnitTypeByIdent(str);
         free(str);
         return type;

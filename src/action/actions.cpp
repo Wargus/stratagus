@@ -179,7 +179,7 @@ local void (*HandleActionTable[256])(Unit*) = {
     HandleActionNotWritten,	// HandleActionMineOre,
     HandleActionNotWritten,	// HandleActionMineCoal,
     HandleActionNotWritten,	// HandleActionQuarryStone,
-    HandleActionHaulOil,
+    HandleActionResource,
     HandleActionReturnGoods,
     HandleActionDemolish,
 

@@ -49,25 +49,13 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-/**
-**	Helper structure for getting resources.
-**	FIXME: later we should make this configurable, to allow game
-**	FIXME: designers to create own resources.
-*/
-typedef struct _resource_ {
-    unsigned char Action;		/// Unit action.
-    int	Frame;				/// Frame for active resource
-    Unit* (*ResourceOnMap)(int,int);	/// Get the resource on map.
-    int Cost;				/// Resource type
-    UnitType** Human;			/// Human worker
-    UnitType** HumanWithResource;	/// Human worker with resource
-    UnitType** Orc;			/// Orc worker
-    UnitType** OrcWithResource;		/// Orc worker with resource
-
-    int	GetTime;			/// Time to get the resource
-    int	PutTime;			/// Time to store the resource
-
-} Resource;
+#define SUB_START_RESOURCE 0
+#define SUB_MOVE_TO_RESOURCE 1
+#define SUB_UNREACHABLE_RESOURCE 31
+#define SUB_GATHER_RESOURCE 60
+#define SUB_MOVE_TO_DEPOT 70
+#define SUB_UNREACHABLE_DEPOT 100
+#define SUB_RETURN_RESOURCE 120
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -77,11 +65,10 @@ typedef struct _resource_ {
 **	Move unit to resource.
 **
 **	@param unit	Pointer to unit.
-**	@param resource	How to handle the resource.
 **
 **	@return		TRUE if reached, otherwise FALSE.
 */
-local int MoveToResource(Unit* unit,const Resource* resource)
+local int MoveToResource(Unit* unit)
 {
     Unit* goal;
 
@@ -90,7 +77,6 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
-	    DebugCheck( unit->Orders[0].Action!=resource->Action );
 	    return -1;
 	case PF_REACHED:
 	    break;
@@ -106,7 +92,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     //	Target is dead, stop getting resources.
     //
     if( goal->Destroyed ) {
-	DebugLevel0Fn("Destroyed unit\n");
+	DebugLevel0Fn("Destroyed resource goal, stop gathering.\n");
 	RefsDebugCheck( !goal->Refs );
 	if( !--goal->Refs ) {
 	    ReleaseUnit(goal);
@@ -132,7 +118,6 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)>1 );
 
     DebugCheck( unit->Wait!=1 );
-    DebugCheck( unit->Orders[0].Action!=resource->Action );
 
     //
     //	If resource is still under construction, wait!
@@ -154,7 +139,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     DebugLevel3Fn("+%d\n" _C_ goal->Data.Resource.Active);
 
     if( !goal->Frame ) {		// show resource working
-	goal->Frame=resource->Frame;
+	goal->Frame=2;
 	CheckUnitToBeDrawn(goal);
     }
     UnitMarkSeen(goal);
@@ -162,42 +147,14 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     //	Place unit inside the resource
     //
     RemoveUnit(unit,goal);
-#if 0
-    // This breaks the drop out code complete
-    // FIXME: this is a hack, but solves the problem, a better solution is
-    // FIXME: still wanted.
-
-    // Place unit where pathfinder is more likely to work
-    if (unit->X < goal->X) {
-	PlaceUnit(unit,goal->X,unit->Y);
- 	RemoveUnit(unit,NULL);	// Unit removal necessary to free map tiles
-    }
-    if (unit->X > goal->X+goal->Type->TileWidth-1) {
-	PlaceUnit(unit,goal->X+goal->Type->TileWidth-1,unit->Y);
-	RemoveUnit(unit,NULL);
-    }
-    if (unit->Y < goal->Y) {
-	PlaceUnit(unit,unit->X,goal->Y);
-	RemoveUnit(unit,NULL);
-    }
-    if (unit->Y > goal->Y+goal->Type->TileHeight-1) {
-	PlaceUnit(unit,unit->X,goal->Y+goal->Type->TileHeight-1);
-	RemoveUnit(unit,NULL);
-    }
-#else
     unit->X=goal->X;
     unit->Y=goal->Y;
-#endif
 
-    //
-    //	Time to collect the resource.
-    //
-    if( resource->GetTime<MAX_UNIT_WAIT ) {
-	unit->Wait=resource->GetTime;
+    if (unit->Type->WaitAtResource) {
+	unit->Wait=unit->Type->WaitAtResource;
     } else {
-	unit->Wait=MAX_UNIT_WAIT;
+	unit->Wait=1;
     }
-    unit->Value=resource->GetTime-unit->Wait;
 
     return 1;
 }
@@ -206,134 +163,109 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 **	Wait in resource, for collecting the resource.
 **
 **	@param unit	Pointer to unit.
-**	@param resource	How to handle the resource.
 **
 **	@return		TRUE if ready, otherwise FALSE.
 */
-local int WaitInResource(Unit* unit,const Resource* resource)
+local int WaitInResource(Unit* unit)
 {
     Unit* source;
     Unit* depot;
 
-    DebugLevel3Fn("Waiting\n");
+    //
+    //	Have the resource
+    //
+    source=unit->Container;
 
-    if( !unit->Value ) {
-	//
-	//	Have the resource
-	//
-	source=resource->ResourceOnMap(unit->X,unit->Y);
-	IfDebug(
-	    DebugLevel3Fn("Found %d,%d=%d\n" _C_ unit->X _C_ unit->Y
-		_C_ UnitNumber(source));
-	    if( !source ) {
-		DebugLevel0Fn("No unit? (%d,%d)\n" _C_ unit->X _C_ unit->Y);
-		abort();
-	    } );
-
-	DebugCheck( source->Value>655350 );
-
-	//
-	//	Update the resource.
-	//	Remove what we can carry, FIXME: always this?
-	//
-	source->Value-=DefaultIncomes[resource->Cost];
-
-	DebugLevel3Fn("-%d\n" _C_ source->Data.Resource.Active);
-	if( !--source->Data.Resource.Active ) {
-	    source->Frame=0;
-	    CheckUnitToBeDrawn(source);
-	}
-	UnitMarkSeen(source);
-	if( IsOnlySelected(source) ) {
-	    MustRedraw|=RedrawInfoPanel;
-	}
-
-	//
-	//	End of resource: destroy the resource.
-	//
-	if( source->Value<DefaultIncomes[resource->Cost] ) {
-	    DebugLevel0Fn("Resource is destroyed\n");
-	    DropOutAll(source);
-	    LetUnitDie(source);
-	    source=NULL;
-	}
-
-	//
-	//	Change unit to full state. FIXME: more races
-	//
-	unit->Player->UnitTypesCount[unit->Type->Type]--;
-	if( unit->Type==*resource->Human ) {
-	    unit->Type=*resource->HumanWithResource;
-	} else if( unit->Type==*resource->Orc ) {
-	    unit->Type=*resource->OrcWithResource;
-	} else {
-	    // FIXME: should support more races
-	    DebugLevel0Fn("Wrong unit-type `%s' for resource `%s'\n"
-		_C_ unit->Type->Ident _C_ DefaultResourceNames[resource->Cost]);
-	}
-	unit->Player->UnitTypesCount[unit->Type->Type]++;
-
-	//	Store gold mine position
-	unit->Orders[0].Arg1=(void*)((unit->X<<16)|unit->Y);
-
-	//
-	//	Find and send to resource deposit.
-	//
-	if( !(depot=FindDeposit(unit->Player,unit->X,unit->Y,resource->Cost)) ) {
-	    if( source ) {
-		DropOutOnSide(unit,LookingW
-		    ,source->Type->TileWidth,source->Type->TileHeight);
-	    }
-	    unit->Orders[0].Action=UnitActionStill;
-	    unit->SubAction=0;
-	    // should return 0, done below!
-	} else {
-	    if( source ) {
-		DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
-		    ,depot->Y+depot->Type->TileHeight/2
-		    ,source->Type->TileWidth,source->Type->TileHeight);
-	    }
-	    unit->Orders[0].Goal=depot;
-	    RefsDebugCheck( !depot->Refs );
-	    ++depot->Refs;
-	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	    unit->Orders[0].X=unit->Orders[0].Y=-1;
-	    unit->Orders[0].Action=resource->Action;
-	    unit->SubAction=64;
-	    NewResetPath(unit);
-	}
-
-        CheckUnitToBeDrawn(unit);
-	if( IsOnlySelected(unit) ) {
-	    SelectedUnitChanged();
-	    // FIXME: redundant?
-	    MustRedraw|=RedrawButtonPanel;
-	}
-	unit->Wait=1;
-	return unit->Orders[0].Action==resource->Action;
-    }
+    DebugCheck( !source );
+    DebugCheck( source->Value>655350 );
 
     //
-    //	Continue waiting
+    //	Update the resource. FIXME: depleted resources.
     //
-    if( unit->Value<MAX_UNIT_WAIT ) {
-	unit->Wait=unit->Value;
+    if (source->Value<unit->Type->ResourceCapacity) {
+	// Uhh-oh, depleted.
+	unit->Value=source->Value;
+	source->Value=0;
     } else {
-	unit->Wait=MAX_UNIT_WAIT;
+	unit->Value=unit->Type->ResourceCapacity;
+	source->Value-=unit->Type->ResourceCapacity;
     }
-    unit->Value-=unit->Wait;
-    return 0;
+    
+    if( !--source->Data.Resource.Active ) {
+	source->Frame=0;
+	CheckUnitToBeDrawn(source);
+    }
+    
+    UnitMarkSeen(source);
+    if( IsOnlySelected(source) ) {
+	MustRedraw|=RedrawInfoPanel;
+    }
+
+    //
+    //	Change unit to full state.
+    //
+    if( unit->Type->TransformWhenLoaded ) {
+	unit->Player->UnitTypesCount[unit->Type->Type]--;
+	unit->Type=unit->Type->TransformWhenLoaded;
+    	unit->Player->UnitTypesCount[unit->Type->Type]++;
+    }
+
+    //	Store resource position.
+    unit->Orders[0].Arg1=(void*)((unit->X<<16)|unit->Y);
+    
+    //
+    //	Find and send to resource deposit.
+    //
+    if( !(depot=FindDeposit(unit->Player,unit->X,unit->Y,unit->Type->ResourceHarvested)) ) {
+	DropOutOnSide(unit,LookingW
+		,source->Type->TileWidth,source->Type->TileHeight);
+	DebugLevel0Fn("Can't find a resource deposit.\n");
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	// should return 0, done below!
+    } else {
+	DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
+		,depot->Y+depot->Type->TileHeight/2
+		,source->Type->TileWidth,source->Type->TileHeight);
+	unit->Orders[0].Goal=depot;
+	RefsDebugCheck( !depot->Refs );
+	++depot->Refs;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
+	unit->SubAction=SUB_MOVE_TO_DEPOT;
+	NewResetPath(unit);
+    }
+    
+    //
+    //	End of resource: destroy the resource.
+    //
+    if( source->Value==0 ) {
+	DebugLevel0Fn("Resource is destroyed\n");
+	DropOutAll(source);
+	LetUnitDie(source);
+	source=NULL;
+    }
+
+    CheckUnitToBeDrawn(unit);
+    if( IsOnlySelected(unit) ) {
+	UpdateButtonPanel();
+	SelectedUnitChanged();
+	// FIXME: redundant?
+	MustRedraw|=RedrawButtonPanel;
+    }
+    unit->Wait=1;
+    return unit->Orders[0].Action!=UnitActionStill;
 }
 
 /**
 **	Move to resource depot
 **
 **	@param unit	Pointer to unit.
-**	@param resource	How to handle the resource.
 **
 **	@return		TRUE if reached, otherwise FALSE.
 */
-local int MoveToDepot(Unit* unit,const Resource* resource)
+local int MoveToDepot(Unit* unit)
 {
     Unit* goal;
 
@@ -342,7 +274,6 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
-	    DebugCheck( unit->Orders[0].Action!=resource->Action );
 	    return -1;
 	case PF_REACHED:
 	    break;
@@ -383,13 +314,12 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
 
     DebugCheck( unit->Wait!=1 );
-    DebugCheck( unit->Orders[0].Action!=resource->Action );
 
     //
-    //	If resource is still under construction, wait!
+    //	If resource depot is still under construction, wait!
     //
     if( goal->Orders[0].Action==UnitActionBuilded ) {
-        DebugLevel2Fn("Invalid resource\n");
+        DebugLevel2Fn("Invalid resource depot. FIXME:WAIT!!! \n");
 	return 0;
     }
 
@@ -408,37 +338,28 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
     //
     //	Update resource.
     //
-    unit->Player->Resources[resource->Cost]
-	+=unit->Player->Incomes[resource->Cost];
-    unit->Player->TotalResources[resource->Cost]
-	+=unit->Player->Incomes[resource->Cost];
+    unit->Player->Resources[unit->Type->ResourceHarvested]+=
+	(unit->Value*unit->Player->Incomes[unit->Type->ResourceHarvested])/100;
+    unit->Player->TotalResources[unit->Type->ResourceHarvested]+=
+	(unit->Value*unit->Player->Incomes[unit->Type->ResourceHarvested])/100;
     if( unit->Player==ThisPlayer ) {
 	MustRedraw|=RedrawResources;
     }
 
     //
-    //	Change unit to empty state. FIXME: more races
+    //	Change unit to empty state.
     //
-    unit->Player->UnitTypesCount[unit->Type->Type]--;
-    if( unit->Type==*resource->HumanWithResource ) {
-	unit->Type=*resource->Human;
-    } else if( unit->Type==*resource->OrcWithResource ) {
-	unit->Type=*resource->Orc;
-    } else {
-	DebugLevel0Fn("Wrong unit-type `%s' for resource `%s'\n"
-	    _C_ unit->Type->Ident _C_ DefaultResourceNames[resource->Cost]);
+    if( unit->Type->TransformWhenEmpty ) {
+    	unit->Player->UnitTypesCount[unit->Type->Type]--;
+	unit->Type=unit->Type->TransformWhenEmpty;
+    	unit->Player->UnitTypesCount[unit->Type->Type]++;
     }
-    unit->Player->UnitTypesCount[unit->Type->Type]++;
 
-    //
-    //	Time to store the resource.
-    //
-    if( resource->PutTime<MAX_UNIT_WAIT ) {
-	unit->Wait=resource->PutTime;
+    if (unit->Type->WaitAtDepot) {
+	unit->Wait=unit->Type->WaitAtDepot;
     } else {
-	unit->Wait=MAX_UNIT_WAIT;
+	unit->Wait=1;
     }
-    unit->Value=resource->PutTime-unit->Wait;
     return 1;
 }
 
@@ -446,63 +367,65 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 **	Wait in depot, for the resources stored.
 **
 **	@param unit	Pointer to unit.
-**	@param resource	How to handle the resource.
 **
 **	@return		TRUE if ready, otherwise FALSE.
 */
-local int WaitInDepot(Unit* unit,const Resource* resource)
+local int WaitInDepot(Unit* unit)
 {
     const Unit* depot;
     Unit* goal;
     int x;
     int y;
 
-    DebugLevel3Fn("Waiting\n");
-    if( !unit->Value ) {
-	depot=ResourceDepositOnMap(unit->X,unit->Y,resource->Cost);
-	DebugCheck( !depot );
-	// Could be destroyed, but than we couldn't be in?
+    depot=ResourceDepositOnMap(unit->X,unit->Y,unit->Type->ResourceHarvested);
+    DebugCheck( !depot );
+    // Could be destroyed, but then we couldn't be in?
 
-	if( unit->Orders[0].Arg1==(void*)-1 ) {
-	    x=unit->X;
-	    y=unit->Y;
-	} else {
-	    x=(int)unit->Orders[0].Arg1>>16;
-	    y=(int)unit->Orders[0].Arg1&0xFFFF;
-	}
-	if( !(goal=FindOilPlatform(unit->Player,x,y)) ) {
-	    DropOutOnSide(unit,LookingW,
-		    depot->Type->TileWidth,depot->Type->TileHeight);
-	    unit->Orders[0].Action=UnitActionStill;
-	    unit->SubAction=0;
-	} else {
-	    DropOutNearest(unit,goal->X+goal->Type->TileWidth/2
-		    ,goal->Y+goal->Type->TileHeight/2
-		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-	    unit->Orders[0].Goal=goal;
-	    RefsDebugCheck( !goal->Refs );
-	    ++goal->Refs;
-	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	    unit->Orders[0].X=unit->Orders[0].Y=-1;
-	    unit->Orders[0].Action=resource->Action;
-	    NewResetPath(unit);
-	}
-
-        CheckUnitToBeDrawn(unit);
-	unit->Wait=1;
-	return unit->Orders[0].Action==resource->Action;
-    }
-
-    //
-    //	Continue waiting
-    //
-    if( unit->Value<MAX_UNIT_WAIT ) {
-	unit->Wait=unit->Value;
+    if( unit->Orders[0].Arg1==(void*)-1 ) {
+	x=unit->X;
+	y=unit->Y;
     } else {
-	unit->Wait=MAX_UNIT_WAIT;
+	x=(int)unit->Orders[0].Arg1>>16;
+	y=(int)unit->Orders[0].Arg1&0xFFFF;
     }
-    unit->Value-=unit->Wait;
-    return 0;
+    if( !(goal=FindResource(unit->Player,x,y,unit->Type->ResourceHarvested)) ) {
+	DropOutOnSide(unit,LookingW,
+		depot->Type->TileWidth,depot->Type->TileHeight);
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+    } else {
+	DropOutNearest(unit,goal->X+goal->Type->TileWidth/2
+		,goal->Y+goal->Type->TileHeight/2
+		,depot->Type->TileWidth,depot->Type->TileHeight);
+	unit->Orders[0].Goal=goal;
+	RefsDebugCheck( !goal->Refs );
+	++goal->Refs;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
+	NewResetPath(unit);
+    }
+
+    CheckUnitToBeDrawn(unit);
+    unit->Wait=1;
+    return unit->Orders[0].Action!=UnitActionStill;
+}
+
+/**
+** 	Give up on gathering.
+**
+**	@param unit	Pointer to unit.
+*/
+void ResourceGiveUp(Unit* unit)
+{
+    unit->Orders[0].Action=UnitActionStill;
+    unit->Wait=1;
+    unit->SubAction=0;
+    if( unit->Orders[0].Goal ) {
+	RefsDebugCheck( !unit->Orders[0].Goal->Refs );
+	--unit->Orders[0].Goal->Refs;
+	RefsDebugCheck( !unit->Orders[0].Goal->Refs );
+	unit->Orders[0].Goal=NoUnitP;
+    }
 }
 
 /**
@@ -511,133 +434,69 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 **	This the generic function for oil, gold, ...
 **
 **	@param unit	Pointer to unit.
-**	@param resource	How to handle the resource.
 */
-global void HandleActionResource(Unit* unit,const Resource* resource)
+global void HandleActionResource(Unit* unit)
 {
     int ret;
 
     DebugLevel3Fn("%s(%d) SubAction %d\n"
 	_C_ unit->Type->Ident _C_ UnitNumber(unit) _C_ unit->SubAction);
 
-    switch( unit->SubAction ) {
-	//
-	//	Move to the resource
-	//
-	case 0:
-	    NewResetPath(unit);
-	    unit->SubAction=1;
-	    // FALL THROUGH
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	    if( (ret=MoveToResource(unit,resource)) ) {
-		if( ret==-1 ) {
-		    if( ++unit->SubAction==5 ) {
-			unit->Orders[0].Action=UnitActionStill;
-			unit->SubAction=0;
-			if( unit->Orders[0].Goal ) {
-			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
-			    --unit->Orders[0].Goal->Refs;
-			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
-			    unit->Orders[0].Goal=NoUnitP;
-			}
-		    } else {			// Do a little delay
-			unit->Wait*=unit->SubAction;
-			DebugLevel0Fn("Retring\n");
-		    }
-		} else {
-		    unit->SubAction=64;
-		}
-	    }
-	    break;
-
-	//
-	//	Wait for collecting the resource
-	//
-	case 64:
-	    if( WaitInResource(unit,resource) ) {
-		++unit->SubAction;
-	    }
-	    break;
-
-	//
-	//	Return to the resource depot
-	//
-	case 65:
-	case 66:
-	case 67:
-	case 68:
-	case 69:
-	    if( (ret=MoveToDepot(unit,resource)) ) {
-		if( ret==-1 ) {
-		    if( ++unit->SubAction==70 ) {
-			unit->Orders[0].Action=UnitActionStill;
-			unit->SubAction=0;
-			if( unit->Orders[0].Goal ) {
-			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
-			    --unit->Orders[0].Goal->Refs;
-			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
-			    unit->Orders[0].Goal=NoUnitP;
-			}
-		    } else {			// Do a little delay
-			unit->Wait*=unit->SubAction-65;
-			DebugLevel0Fn("Retring\n");
-		    }
-		} else {
-		    unit->SubAction=128;
-		}
-	    }
-	    break;
-
-	//
-	//	Wait for resource stored
-	//
-	case 128:
-	    if( WaitInDepot(unit,resource) ) {
-		unit->SubAction=0;
-	    }
-	    break;
+    if ( unit->SubAction==SUB_START_RESOURCE ) {
+	NewResetPath(unit);
+	unit->SubAction=1;
     }
-}
+    
+    if ( unit->SubAction>=SUB_MOVE_TO_RESOURCE && unit->SubAction<SUB_UNREACHABLE_RESOURCE ) {
+	// -1 failure, 0 not yet reached, 1 reached
+	if( (ret=MoveToResource(unit)) ) {
+	    if( ret==-1 ) {
+		// Can't Reach
+		unit->SubAction++;
+		unit->Wait=10;
+	    } else {
+		unit->SubAction=SUB_GATHER_RESOURCE;
+	    }
+	}
+	return;
+    }
 
-/*----------------------------------------------------------------------------
---	High level
-----------------------------------------------------------------------------*/
+    if (unit->SubAction==SUB_UNREACHABLE_RESOURCE) {
+	return;
+	ResourceGiveUp(unit);
+    }
 
-/**
-**	The oil resource.
-*/
-local Resource ResourceOil[1] = {
-{
-    UnitActionHaulOil,
-    2,					// FIXME: hardcoded.
-    PlatformOnMap,
-    OilCost,
-    // FIXME: The & could be removed.
-    &UnitTypeHumanTanker,
-    &UnitTypeHumanTankerFull,
-    &UnitTypeOrcTanker,
-    &UnitTypeOrcTankerFull,
+    if (unit->SubAction==SUB_GATHER_RESOURCE) {
+	if( WaitInResource(unit) ) {
+	    unit->SubAction=SUB_MOVE_TO_DEPOT;
+	}
+    }
 
-    0,					// Must be initialized
-    0,					// Must be initialized
-}
-};
+    if (unit->SubAction>=SUB_MOVE_TO_DEPOT&&unit->SubAction<SUB_UNREACHABLE_DEPOT) {
+	// -1 failure, 0 not yet reached, 1 reached
+	if( (ret=MoveToDepot(unit)) ) {
+	    if( ret==-1 ) {
+		// Can't Reach
+		unit->SubAction++;
+		unit->Wait=10;
+	    } else {
+		unit->SubAction=SUB_RETURN_RESOURCE;
+	    }
+	}
+	return;
+    }
 
-/**
-**	Control the unit action haul oil
-**
-**	@param unit	Pointer to unit.
-*/
-global void HandleActionHaulOil(Unit* unit)
-{
-    // FIXME: move into init function, debug could change this values.
-    ResourceOil->GetTime=HAUL_FOR_OIL;
-    ResourceOil->PutTime=WAIT_FOR_OIL;
+    if (unit->SubAction==SUB_UNREACHABLE_DEPOT) {
+	ResourceGiveUp(unit);
+	return;
+    }
 
-    HandleActionResource(unit,ResourceOil);
+    if (unit->SubAction==SUB_RETURN_RESOURCE) {
+	if( WaitInDepot(unit) ) {
+	    unit->SubAction=SUB_START_RESOURCE;
+	}
+	return;
+    }
 }
 
 //@}
