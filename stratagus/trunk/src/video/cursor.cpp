@@ -10,8 +10,8 @@
 //
 /**@name cursor.c - The cursors. */
 //
-//      (c) Copyright 1998,2000-2004 by Lutz Sammer, Nehal Mistry,
-//                                      and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer, Nehal Mistry,
+//                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -53,39 +53,34 @@
 #include "intern_video.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**		Number of bytes needed for current video-mode
-*/
-local int MemSize;
-
-/**
-**		Cursor-type type definition
+**  Cursor-type type definition
 */
 global const char CursorTypeType[] = "cursor-type";
 
 /**
-**		Define cursor-types.
+**  Define cursor-types.
 **
-**		@todo FIXME: Should this be move to ui part?
+**  @todo FIXME: Should this be move to ui part?
 */
 global CursorType* Cursors;
 
-global CursorStates CursorState;/// current cursor state (point,...)
-global int CursorAction;		/// action for selection
-global int CursorValue;				/// value for CursorAction (spell type f.e.)
+global CursorStates CursorState;    /// current cursor state (point,...)
+global int CursorAction;            /// action for selection
+global int CursorValue;             /// value for CursorAction (spell type f.e.)
 
-		//Event changed mouse position, can alter at any moment
-global int CursorX;				/// cursor position on screen X
-global int CursorY;				/// cursor position on screen Y
+	// Event changed mouse position, can alter at any moment
+global int CursorX;                 /// cursor position on screen X
+global int CursorY;                 /// cursor position on screen Y
 
-global int CursorStartX;		/// rectangle started on screen X
-global int CursorStartY;		/// rectangle started on screen Y
+global int CursorStartX;            /// rectangle started on screen X
+global int CursorStartY;            /// rectangle started on screen Y
 
-global int SubScrollX;		  /// pixels the mouse moved while scrolling
-global int SubScrollY;		  /// pixels the mouse moved while scrolling
+global int SubScrollX;              /// pixels the mouse moved while scrolling
+global int SubScrollY;              /// pixels the mouse moved while scrolling
 
 	/// X position of starting point of selection rectangle, in screen pixels.
 global int CursorStartScrMapX;
@@ -94,7 +89,7 @@ global int CursorStartScrMapY;
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-local int BuildingCursor;				/// Flag (0/1): last cursor was building
+local int BuildingCursor;           /// Flag (0/1): last cursor was building
 
 	/// area of tiles covered by building cursor (SX,SY;EX,EY)
 local int BuildingCursorSX;
@@ -109,38 +104,37 @@ global UnitType* CursorBuilding;		/// building cursor
 
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
-		// Saved area after draw cursor, needed later to hide it again
-		// (OldCursorW!=0 denotes it's defined)
-local int OldCursorInvalidate;		/// flag (0/1): if cursor need invalidate
-local int OldCursorX;				/// saved cursor position on screen X
-local int OldCursorY;				/// saved cursor position on screen Y
-local int OldCursorW;				/// saved cursor width in pixel
-local int OldCursorH;				/// saved cursor height in pixel
-global CursorType* GameCursor;		/// current shown cursor-type
+	// Saved area after draw cursor, needed later to hide it again
+	// (OldCursorW!=0 denotes it's defined)
+local int OldCursorInvalidate;      /// flag (0/1): if cursor need invalidate
+local int OldCursorX;               /// saved cursor position on screen X
+local int OldCursorY;               /// saved cursor position on screen Y
+local int OldCursorW;               /// saved cursor width in pixel
+local int OldCursorH;               /// saved cursor height in pixel
+global CursorType* GameCursor;      /// current shown cursor-type
 
-		// Area which is already hidden, but needed for invalidate
-		// (HiddenCursorW!=0 denotes it's defined)
-local int HiddenCursorX;		/// saved cursor position on screen X
-local int HiddenCursorY;		/// saved cursor position on screen Y
-local int HiddenCursorW;		/// saved cursor width in pixel
-local int HiddenCursorH;		/// saved cursor height in pixel
+	// Area which is already hidden, but needed for invalidate
+	// (HiddenCursorW!=0 denotes it's defined)
+local int HiddenCursorX;            /// saved cursor position on screen X
+local int HiddenCursorY;            /// saved cursor position on screen Y
+local int HiddenCursorW;            /// saved cursor width in pixel
+local int HiddenCursorH;            /// saved cursor height in pixel
 
-		/// Memory re-use, so can be defined although no save present!
-local int OldCursorSize;		/// size of saved cursor image
-local SDL_Surface* OldCursorImage;				/// background saved behind cursor
+	/// Memory re-use, so can be defined although no save present!
+local int OldCursorSize;            /// size of saved cursor image
+local SDL_Surface* OldCursorImage;  /// background saved behind cursor
 
-	/**
-	**		Function pointer: Save 2D image behind sprite cursor
-	**
-	**		@param x		Screen X pixels coordinate for left-top corner.
-	**		@param y		Screen Y pixels coordinate for left-top corner.
-	**		@param w		Width in pixels for image starting at left-top.
-	**		@param h		Height in pixels for image starting at left-top.
-	**
-	**		@note the complete image should be in TheScreen (no clipping) and
-	**		non-empty
-	**	 (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
-	*/
+/**
+**  Function pointer: Save 2D image behind sprite cursor
+**
+**  @param x  Screen X pixels coordinate for left-top corner.
+**  @param y  Screen Y pixels coordinate for left-top corner.
+**  @param w  Width in pixels for image starting at left-top.
+**  @param h  Height in pixels for image starting at left-top.
+**
+**  @note the complete image should be in TheScreen (no clipping) and non-empty
+**        (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
+*/
 #ifndef USE_OPENGL
 local void SaveCursorBackground(int x, int y, int w, int h);
 	/// Function pointer: Load background behind cursor
@@ -151,62 +145,61 @@ local void LoadCursorBackground(int x, int y, int w, int h);
 #endif
 
 /*--- DRAW RECTANGLE CURSOR ------------------------------------------------*/
-		// Saved area after draw rectangle, needed later to hide it again
-		// (OldCursorRectangleW != 0 denotes it's defined)
-local int OldCursorRectangleInvalidate;		/// flag (0/1): ..need invalidate
-local int OldCursorRectangleX;				/// saved cursor position on screen X
-local int OldCursorRectangleY;				/// saved cursor position on screen Y
-local int OldCursorRectangleW;				/// saved cursor width in pixel
-local int OldCursorRectangleH;				/// saved cursor height in pixel
-local void* OldCursorRectangle;				/// background saved behind rectangle
+	// Saved area after draw rectangle, needed later to hide it again
+	// (OldCursorRectangleW != 0 denotes it's defined)
+local int OldCursorRectangleInvalidate; /// flag (0/1): ..need invalidate
+local int OldCursorRectangleX;          /// saved cursor position on screen X
+local int OldCursorRectangleY;          /// saved cursor position on screen Y
+local int OldCursorRectangleW;          /// saved cursor width in pixel
+local int OldCursorRectangleH;          /// saved cursor height in pixel
+local void* OldCursorRectangle;         /// background saved behind rectangle
 
-		// Area which is already hidden, but needed for invalidate
-		// (HiddenCursorRectangleW != 0 denotes it's defined)
-local int HiddenCursorRectangleX;		/// saved cursor position on screen X
-local int HiddenCursorRectangleY;		/// saved cursor position on screen Y
-local int HiddenCursorRectangleW;		/// saved cursor width in pixel
-local int HiddenCursorRectangleH;		/// saved cursor height in pixel
+	// Area which is already hidden, but needed for invalidate
+	// (HiddenCursorRectangleW != 0 denotes it's defined)
+local int HiddenCursorRectangleX;       /// saved cursor position on screen X
+local int HiddenCursorRectangleY;       /// saved cursor position on screen Y
+local int HiddenCursorRectangleW;       /// saved cursor width in pixel
+local int HiddenCursorRectangleH;       /// saved cursor height in pixel
 
 /**
-**		Function pointer: Save rectangle behind cursor
+**  Function pointer: Save rectangle behind cursor
 **
-**		@param buffer		Buffer in which the graphic is stored.
-**		@param x		Screen X pixels coordinate for left-top corner.
-**		@param y		Screen Y pixels coordinate for left-top corner.
-**		@param w		Width in pixels for rectangle starting at left-top.
-**		@param h		Height in pixels for rectangle starting at left-top.
+**  @param buffer  Buffer in which the graphic is stored.
+**  @param x       Screen X pixels coordinate for left-top corner.
+**  @param y       Screen Y pixels coordinate for left-top corner.
+**  @param w       Width in pixels for rectangle starting at left-top.
+**  @param h       Height in pixels for rectangle starting at left-top.
 **
-**		@note the complete rectangle should be in TheScreen (no clipping) and
-**		non-empty
-**	 (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
+**  @note the complete rectangle should be in TheScreen (no clipping) and non-empty
+**        (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
 */
 #ifndef USE_OPENGL
 global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h);
 #endif
 
 /**
-**		Function pointer: Load rectangle behind cursor
+**  Function pointer: Load rectangle behind cursor
 **
-**		@param buffer		Buffer in which the graphic is stored.
-**		@param x		Screen X pixels coordinate.
-**		@param y		Screen Y pixels coordinate.
-**		@param w		Width in pixels.
-**		@param h		Height in pixels.
+**  @param buffer  Buffer in which the graphic is stored.
+**  @param x       Screen X pixels coordinate.
+**  @param y       Screen Y pixels coordinate.
+**  @param w       Width in pixels.
+**  @param h       Height in pixels.
 **
-**		@note rectangle previously saved with SaveCursorRectangle(x,y,w,h)
+**  @note rectangle previously saved with SaveCursorRectangle(x,y,w,h)
 */
 #ifndef USE_OPENGL
 global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h);
 #endif
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Load all cursor sprites.
+**  Load all cursor sprites.
 **
-**		@param race		Cursor graphics of this race to load.
+**  @param race  Cursor graphics of this race to load.
 */
 global void LoadCursors(const char* race)
 {
@@ -214,7 +207,7 @@ global void LoadCursors(const char* race)
 	const char* file;
 
 	//
-	//		Free old cursor sprites.
+	//  Free old cursor sprites.
 	//
 	for (i = 0; Cursors[i].OType; ++i) {
 		VideoSafeFree(Cursors[i].Sprite);
@@ -222,11 +215,11 @@ global void LoadCursors(const char* race)
 	}
 
 	//
-	//		Load the graphics
+	//  Load the graphics
 	//
 	for (i = 0; Cursors[i].OType; ++i) {
 		//
-		//		Only load cursors of this race or universal cursors.
+		//  Only load cursors of this race or universal cursors.
 		//
 		if (Cursors[i].Race && strcmp(Cursors[i].Race, race)) {
 			continue;
@@ -248,13 +241,13 @@ global void LoadCursors(const char* race)
 }
 
 /**
-**		Find the cursor-type of with this identifier.
+**  Find the cursor-type of with this identifier.
 **
-**		@param ident		Identifier for the cursor (from config files).
+**  @param ident  Identifier for the cursor (from config files).
 **
-**		@return				Returns the matching cursor-type.
+**  @return       Returns the matching cursor-type.
 **
-**		@note If we have more cursors, we should add hash to find them faster.
+**  @note If we have more cursors, we should add hash to find them faster.
 */
 global CursorType* CursorTypeByIdent(const char* ident)
 {
@@ -273,7 +266,7 @@ global CursorType* CursorTypeByIdent(const char* ident)
 }
 
 /*----------------------------------------------------------------------------
---		DRAW RECTANGLE CURSOR
+--  DRAW RECTANGLE CURSOR
 ----------------------------------------------------------------------------*/
 
 #ifndef USE_OPENGL
@@ -340,14 +333,14 @@ global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h)
 #endif
 
 /**
-**		Draw rectangle cursor when visible, defined by
-**	  OldCursorRectangleW (!=0),..
-**	  Pre: for this to work OldCursorRectangleW should be 0 upfront
+**  Draw rectangle cursor when visible, defined by
+**  OldCursorRectangleW (!=0),..
+**  Pre: for this to work OldCursorRectangleW should be 0 upfront
 **
-**		@param x		Screen x start position of rectangle
-**		@param y		Screen y start position of rectangle
-**		@param x1		Screen x end position of rectangle
-**		@param y1		Screen y end position of rectangle
+**  @param x   Screen x start position of rectangle
+**  @param y   Screen y start position of rectangle
+**  @param x1  Screen x end position of rectangle
+**  @param y1  Screen y end position of rectangle
 */
 local void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 {
@@ -356,8 +349,8 @@ local void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 	const Viewport* vp;
 
 	//
-	//		Clip to map window.
-	//		FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
+	//  Clip to map window.
+	//  FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
 	//
 	vp = TheUI.SelectedViewport;
 	if (x1 < vp->X) {
@@ -386,15 +379,15 @@ local void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 
 	if (w && h) {
 		SaveCursorRectangle(OldCursorRectangle,
-			OldCursorRectangleX = x,OldCursorRectangleY = y,
-			OldCursorRectangleW = w,OldCursorRectangleH = h);
+			OldCursorRectangleX = x, OldCursorRectangleY = y,
+			OldCursorRectangleW = w, OldCursorRectangleH = h);
 		VideoDrawRectangleClip(ColorGreen, x, y, w, h);
 		OldCursorRectangleInvalidate = 1;
 	}
 }
 
 /*----------------------------------------------------------------------------
---		DRAW SPRITE CURSOR
+--  DRAW SPRITE CURSOR
 ----------------------------------------------------------------------------*/
 #ifndef USE_OPENGL
 local void LoadCursorBackground(int x, int y, int w, int h)
@@ -427,7 +420,7 @@ local void SaveCursorBackground(int x, int y, int w, int h)
 #endif
 
 /**
-**		Destroy image behind cursor.
+**  Destroy image behind cursor.
 */
 global void DestroyCursorBackground(void)
 {
@@ -439,14 +432,14 @@ global void DestroyCursorBackground(void)
 }
 
 /**
-**		Draw (sprite) cursor when visible, defined by
-**	  OldCursorW (!=0),..
-**	  Pre: for this to work OldCursorW should be 0 upfront
+**  Draw (sprite) cursor when visible, defined by
+**  OldCursorW (!=0),..
+**  Pre: for this to work OldCursorW should be 0 upfront
 **
-**		@param type		Cursor-type of the cursor to draw.
-**		@param x		Screen x pixel position.
-**		@param y		Screen y pixel position.
-**		@param frame		Animation frame # of the cursor.
+**  @param type   Cursor-type of the cursor to draw.
+**  @param x      Screen x pixel position.
+**  @param y      Screen y pixel position.
+**  @param frame  Animation frame # of the cursor.
 */
 local void DrawCursor(const CursorType* type, int x, int y, int frame)
 {
@@ -458,34 +451,34 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
 
 	DebugCheck(!type);
 	//
-	//		Save cursor position and size, for faster cursor redraw.
+	//  Save cursor position and size, for faster cursor redraw.
 	//
 	spritex = (x -= type->HotX);
 	spritey = (y -= type->HotY);
 	w = VideoGraphicWidth(type->Sprite);
 	h = VideoGraphicHeight(type->Sprite);
 
-	//Reserve enough memory for background of sprite (also for future calls)
+	// Reserve enough memory for background of sprite (also for future calls)
 	size = w * h;
 	if (OldCursorSize < size) {
 		OldCursorImage = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32, BMASK, GMASK, RMASK, AMASK);
 		OldCursorSize = size;
 	}
-	//Save (seen) area behind sprite
+	// Save (seen) area behind sprite
 	CLIP_RECTANGLE(x, y, w, h);
 	SaveCursorBackground(OldCursorX = x, OldCursorY = y,
 		OldCursorW = w, OldCursorH = h);
 
-	//Draw sprite (using its own clipping)  FIXME: prevent clipping twice
+	// Draw sprite (using its own clipping)  FIXME: prevent clipping twice
 	VideoDrawClip(type->Sprite, frame, spritex, spritey);
 	OldCursorInvalidate = 1;
 }
 
 /*----------------------------------------------------------------------------
---		DRAW BUILDING CURSOR
+--  DRAW BUILDING CURSOR
 ----------------------------------------------------------------------------*/
 /**
-**		Draw cursor for selecting building position.
+**  Draw cursor for selecting building position.
 */
 local void DrawBuildingCursor(void)
 {
@@ -510,7 +503,7 @@ local void DrawBuildingCursor(void)
 	BuildingCursorSY = my = Viewport2MapY(vp, y);
 
 	//
-	//		Draw building
+	//  Draw building
 	//
 #ifdef DYNAMIC_LOAD
 	if (!CursorBuilding->Sprite) {
@@ -527,17 +520,18 @@ local void DrawBuildingCursor(void)
 	PopClipping();
 
 	//
-	//		Draw the allow overlay
+	//  Draw the allow overlay
 	//
 	f = CanBuildHere(CursorBuilding, mx, my);
 
 	mask = CursorBuilding->MovementMask;
 	h=CursorBuilding->TileHeight;
 	BuildingCursorEY = my + h - 1;
-	if (my + h > vp->MapY + vp->MapHeight) {		// reduce to view limits
+	// reduce to view limits
+	if (my + h > vp->MapY + vp->MapHeight) {
 		h = vp->MapY + vp->MapHeight - my;
 	}
-	w0 = CursorBuilding->TileWidth;		// reduce to view limits
+	w0 = CursorBuilding->TileWidth;
 	BuildingCursorEX = mx + w0 - 1;
 	if (mx + w0 > vp->MapX + vp->MapWidth) {
 		w0 = vp->MapX + vp->MapWidth - mx;
@@ -548,9 +542,9 @@ local void DrawBuildingCursor(void)
 			if (f && (CursorBuilding->MustBuildOnTop ||
 					CanBuildOn(mx + w, my + h, MapFogFilterFlags(ThisPlayer, mx + w, my + h, 
 						mask & ((NumSelected && !CursorBuilding->BuilderOutside &&
-						Selected[0]->X == mx + w && Selected[0]->Y == my + h) ?
-							~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
-				  && IsMapFieldExplored(ThisPlayer, mx + w, my + h))  {
+							Selected[0]->X == mx + w && Selected[0]->Y == my + h) ?
+								~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
+					IsMapFieldExplored(ThisPlayer, mx + w, my + h))  {
 				color = ColorGreen;
 			} else {
 				color = ColorRed;
@@ -563,21 +557,21 @@ local void DrawBuildingCursor(void)
 
 
 /*----------------------------------------------------------------------------
---		DRAW/HIDE CURSOR (interface for the outside world)
+--  DRAW/HIDE CURSOR (interface for the outside world)
 ----------------------------------------------------------------------------*/
 /**
-**		Draw the cursor and prepare tobe restored by HideAnyCursor again.
-**	  Note: This function can be called, without calling HideAnyCursor first,
-**			which means that this function should re-use/free memory of the
-**			last call.
-**			When calling multiple times, the old cursor is expected to be
-**			overdrawn by something else (else HideAnyCursor is needed!)
-**			Also the cursors are not invalidated (refresh on real screen)
-**			here, but this is done by InvalidateCursorAreas.
+**  Draw the cursor and prepare tobe restored by HideAnyCursor again.
+**  Note: This function can be called, without calling HideAnyCursor first,
+**        which means that this function should re-use/free memory of the
+**        last call.
+**  When calling multiple times, the old cursor is expected to be
+**  overdrawn by something else (else HideAnyCursor is needed!)
+**  Also the cursors are not invalidated (refresh on real screen)
+**  here, but this is done by InvalidateCursorAreas.
 **
 **  FIXME: event handler should be temporary stopped while copying
-**		 CursorX, CursorY,.. because between two copy commands another
-**		 event can occure, which let invalid mouse position be delivered.
+**         CursorX, CursorY,.. because between two copy commands another
+**         event can occure, which let invalid mouse position be delivered.
 */
 global void DrawAnyCursor(void)
 {
@@ -586,24 +580,24 @@ global void DrawAnyCursor(void)
 		OldCursorRectangleW = BuildingCursor = 0;
 
 	//
-	//		First, Selecting rectangle
+	//  First, Selecting rectangle
 	//
 	if (CursorState == CursorStateRectangle &&
 			(CursorStartX != CursorX || CursorStartY != CursorY)) {
 		DrawVisibleRectangleCursor(CursorStartX, CursorStartY, CursorX, CursorY);
 	} else if (CursorBuilding && CursorOn == CursorOnMap) {
 		//
-		//		Or Selecting position for building
+		//  Or Selecting position for building
 		//
 		DrawBuildingCursor();
 		BuildingCursor = 1;
 	}
 
 	//
-	//		Last, Normal cursor.
+	//  Last, Normal cursor.
 	//  This will also save (part of) drawn rectangle cursor, but that's ok.
 	//  Cursor May not Exist if we are loading a game or something. Only
-	//		draw it if it exists
+	//  draw it if it exists
 	//
 	if (GameCursor) {
 		DrawCursor(GameCursor, CursorX, CursorY, GameCursor->SpriteFrame);
@@ -611,17 +605,17 @@ global void DrawAnyCursor(void)
 }
 
 /**
-**		Remove old cursor from display.
-**	  (in the opposite direction of DrawAnyCursor)
-**	  Note: this function can be called, without calling DrawAnyCursor first,
-**			which means that cursors shouldn't be restored twice.
-**			As cursors are, like DrawAnyCursor,  not invalidated here, it
-**			still needs to be done by InvalidateCursorAreas.
+**  Remove old cursor from display.
+**  (in the opposite direction of DrawAnyCursor)
+**  Note: this function can be called, without calling DrawAnyCursor first,
+**        which means that cursors shouldn't be restored twice.
+**        As cursors are, like DrawAnyCursor,  not invalidated here, it
+**        still needs to be done by InvalidateCursorAreas.
 */
 global void HideAnyCursor(void)
 {
 	//
-	//		First, Normal cursor (might restore part of rectangle cursor also).
+	//  First, Normal cursor (might restore part of rectangle cursor also).
 	//
 	if (OldCursorW && OldCursorImage) {
 		// restore area of visible cursor
@@ -638,10 +632,10 @@ global void HideAnyCursor(void)
 	}
 
 	//
-	//		Last, Selecting rectangle
+	//  Last, Selecting rectangle
 	//
 	if (OldCursorRectangleW) {
-		//  restore area of visible cursor
+		// restore area of visible cursor
 		LoadCursorRectangle(OldCursorRectangle,
 			OldCursorRectangleX, OldCursorRectangleY,
 			OldCursorRectangleW, OldCursorRectangleH);
@@ -656,9 +650,9 @@ global void HideAnyCursor(void)
 		OldCursorRectangleW = 0;
 	} else if (BuildingCursor) {
 		//
-		//		Or Selecting position for building
+		//  Or Selecting position for building
 		//
-		//NOTE: this will restore tiles themselves later in next video update
+		// NOTE: this will restore tiles themselves later in next video update
 		MarkDrawAreaMap(BuildingCursorSX, BuildingCursorSY,
 			BuildingCursorEX, BuildingCursorEY);
 		BuildingCursor = 0;
@@ -666,9 +660,9 @@ global void HideAnyCursor(void)
 }
 
 /**
-**		Animate the cursor.
+**  Animate the cursor.
 **
-**		@param ticks		Current tick
+**  @param ticks  Current tick
 */
 global void CursorAnimate(unsigned ticks)
 {
@@ -689,24 +683,24 @@ global void CursorAnimate(unsigned ticks)
 }
 
 /**
-**	  Let an area be invalidated, but remembering if cursor is automaticly
-**	  invalidated with this area.
-**	  Note: building-cursor is already invalidated by redraw-map
+**  Let an area be invalidated, but remembering if cursor is automaticly
+**  invalidated with this area.
+**  Note: building-cursor is already invalidated by redraw-map
 **
-**		@param x		left-top x-position of area on screen
-**		@param y		left-top y-position of area on screen
-**		@param w		width of area on screen
-**		@param h		height of area on screen
+**  @param x  left-top x-position of area on screen
+**  @param y  left-top y-position of area on screen
+**  @param w  width of area on screen
+**  @param h  height of area on screen
 */
 global void InvalidateAreaAndCheckCursor(int x, int y, int w, int h)
 {
 	int dx;
 	int dy;
 
-	//Invalidate area
+	// Invalidate area
 	InvalidateArea(x, y, w, h);
 
-	//Now check if cursor sprite is inside it, then no need for invalidate
+	// Now check if cursor sprite is inside it, then no need for invalidate
 	if (OldCursorInvalidate) {
 		dx = OldCursorX - x;
 		dy = OldCursorY - y;
@@ -716,17 +710,17 @@ global void InvalidateAreaAndCheckCursor(int x, int y, int w, int h)
 		}
 	}
 
-	//Now check if previously hidden cursor sprite is inside it..
+	// Now check if previously hidden cursor sprite is inside it..
 	if (HiddenCursorW) {
 		dx = HiddenCursorX - x;
 		dy = HiddenCursorY - y;
 		if (dx >= 0 && dy >= 0 && (w - dx) >= HiddenCursorW &&
-			(h - dy) >= HiddenCursorH) {
+				(h - dy) >= HiddenCursorH) {
 			HiddenCursorW = 0;
 		}
 	}
 
-	//Now check if cursor rectangle is inside it..
+	// Now check if cursor rectangle is inside it..
 	if (OldCursorRectangleInvalidate) {
 		dx = OldCursorRectangleX - x;
 		dy = OldCursorRectangleY - y;
@@ -736,7 +730,7 @@ global void InvalidateAreaAndCheckCursor(int x, int y, int w, int h)
 		}
 	}
 
-	//Now check if previously hidden cursor rectangle is inside it..
+	// Now check if previously hidden cursor rectangle is inside it..
 	if (HiddenCursorRectangleW) {
 		dx = HiddenCursorRectangleX - x;
 		dy = HiddenCursorRectangleY - y;
@@ -748,12 +742,12 @@ global void InvalidateAreaAndCheckCursor(int x, int y, int w, int h)
 }
 
 /**
-**	  Invalidate only the sides of a given rectangle (not its contents)
+**  Invalidate only the sides of a given rectangle (not its contents)
 **
-**		@param x		left-top x-position of rectangle on screen
-**		@param y		left-top y-position of rectangle on screen
-**		@param w		width of rectangle on screen
-**		@param h		height of rectangle on screen
+**  @param x  left-top x-position of rectangle on screen
+**  @param y  left-top y-position of rectangle on screen
+**  @param w  width of rectangle on screen
+**  @param h  height of rectangle on screen
 */
 local void InvalidateRectangle(int x, int y, int w, int h)
 {
@@ -770,32 +764,32 @@ local void InvalidateRectangle(int x, int y, int w, int h)
 }
 
 /**
-**	  Let the (remaining) areas taken by the cursors, as determined by
-**	  DrawAnyCursor and InvalidateAreaAndCheckcursor,  be invalidated.
-**	  Note: building-cursor is already invalidated by redraw-map
+**  Let the (remaining) areas taken by the cursors, as determined by
+**  DrawAnyCursor and InvalidateAreaAndCheckcursor,  be invalidated.
+**  Note: building-cursor is already invalidated by redraw-map
 */
 global void InvalidateCursorAreas(void)
 {
-	//Invalidate cursor sprite
+	// Invalidate cursor sprite
 	if (OldCursorInvalidate) {
 		InvalidateArea(OldCursorX, OldCursorY, OldCursorW, OldCursorH);
 		OldCursorInvalidate = 0;
 	}
 
-	//Invalidate hidden cursor sprite
+	// Invalidate hidden cursor sprite
 	if (HiddenCursorW) {
 		InvalidateArea(HiddenCursorX, HiddenCursorY, HiddenCursorW, HiddenCursorH);
 		HiddenCursorW = 0;
 	}
 
-	//Invalidate cursor rectangle
+	// Invalidate cursor rectangle
 	if (OldCursorRectangleInvalidate) {
 		InvalidateRectangle(OldCursorRectangleX, OldCursorRectangleY,
 			OldCursorRectangleW, OldCursorRectangleH);
 		OldCursorRectangleInvalidate = 0;
 	}
 
-	//Invalidate hidden cursor rectangle
+	// Invalidate hidden cursor rectangle
 	if (HiddenCursorRectangleW) {
 		InvalidateRectangle(HiddenCursorRectangleX, HiddenCursorRectangleY,
 			HiddenCursorRectangleW, HiddenCursorRectangleH);
@@ -804,15 +798,16 @@ global void InvalidateCursorAreas(void)
 }
 
 /**
-**		Setup the cursor part.
+**  Setup the cursor part.
 **
-**		@todo		FIXME: Now max possible memory for OldCursorRectangle,
-**				to be limited to Map?
+**  @todo FIXME: Now max possible memory for OldCursorRectangle,
+**               to be limited to Map?
 */
 global void InitVideoCursors(void)
 {
 #ifndef USE_OPENGL
-	if (OldCursorRectangle) {		// memory of possible previous video-setting?
+	// memory of possible previous video-setting?
+	if (OldCursorRectangle) {
 		free(OldCursorRectangle);
 		OldCursorRectangle = 0;
 	}
@@ -825,7 +820,7 @@ global void InitVideoCursors(void)
 }
 
 /**
-**		Save cursor state.
+**  Save cursor state.
 */
 global void SaveCursors(CLFile* file)
 {
@@ -870,7 +865,7 @@ global void SaveCursors(CLFile* file)
 }
 
 /**
-**		Cleanup cursor module
+**  Cleanup cursor module
 */
 global void CleanCursors(void)
 {
