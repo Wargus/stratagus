@@ -176,7 +176,7 @@ local void SpellFireballController(Missile *missile)
 	n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
 	for (i = 0; i < n; ++i) {
 	    if (table[i]->HP) {
-		HitUnit(table[i], FIREBALL_DAMAGE);
+		HitUnit(missile->SourceUnit,table[i], FIREBALL_DAMAGE);
 	    }
 	}
     }
@@ -209,6 +209,7 @@ local void SpellDeathCoilController(Missile * missile)
 		    && missile->TargetUnit->HP) {
 		if (missile->TargetUnit->HP <= 50) {
 		    missile->TargetUnit->HP = 0;
+		    source->Player->Score+=missile->TargetUnit->Type->Points;
 		    DestroyUnit(missile->TargetUnit);
 		} else {
 		    missile->TargetUnit->HP-=50;
@@ -242,6 +243,8 @@ local void SpellDeathCoilController(Missile * missile)
 				//NOTE: 1 is the minimal damage
 				if (table[i]->HP <= 50 / ec ) {
 				    table[i]->HP = 0;
+				    source->Player->Score+=
+					    table[i]->Type->Points;
 				    DestroyUnit(table[i]); // too much damage
 				} else {
 				    table[i]->HP -= 50 / ec;
@@ -290,7 +293,7 @@ local void SpellWhirlwindController(Missile *missile)
 	n = SelectUnitsOnTile(x, y, table);
 	for (i = 0; i < n; ++i) {
 	    if (table[i]->HP) {
-		HitUnit(table[i], WHIRLWIND_DAMAGE1);
+		HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE1);
 	    }
 	}
     }
@@ -303,7 +306,7 @@ local void SpellWhirlwindController(Missile *missile)
 	DebugLevel3Fn("Damage on %d,%d-%d,%d = %d\n",x-1,y-1,x+1,y+1,n);
 	for (i = 0; i < n; ++i) {
 	    if( (table[i]->X!=x || table[i]->Y!=y) && table[i]->HP) {
-		HitUnit(table[i], WHIRLWIND_DAMAGE2);
+		HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE2);
 	    }
 	}
     }
@@ -354,7 +357,7 @@ local void SpellRunesController(Missile * missile)
 	    PlayMissileSound(missile,SoundIdForName("explosion"));
 	    MakeMissile(MissileTypeExplosion,missile->X, missile->Y,
 		missile->X, missile->Y);
-	    HitUnit(table[i], RUNE_DAMAGE);
+	    HitUnit(missile->SourceUnit,table[i], RUNE_DAMAGE);
 	    missile->TTL=0;		// Rune can only hit once.
 	}
     }
@@ -573,6 +576,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 		target->HP--;
 	    }
 	    if( !target->HP ) {
+		unit->Player->Score+=target->Type->Points;
 		DestroyUnit(target);
 	    }
 	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);

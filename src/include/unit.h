@@ -670,8 +670,8 @@ extern Unit* UnitOnScreen(Unit* unit,unsigned x,unsigned y);
 extern void DestroyUnit(Unit* unit);
     /// FIXME: more docu
 extern void DestroyAllInside(Unit* source);
-    /// FIXME: more docu
-extern void HitUnit(Unit* unit,int damage);
+    /// Hit unit with damage, if destroyed give attacker the points.
+extern void HitUnit(const Unit* attacker,Unit* target,int damage);
 
     /// Returns the map distance between two points
 extern int MapDistance(int x1,int y1,int x2,int y2);
