@@ -307,6 +307,7 @@ global void ShowIntro(void)
 
 	WaitEventsOneFrame(&callbacks);
 	WaitEventsOneFrame(&callbacks);
+	WaitEventsOneFrame(&callbacks);
 	++line;
     }
 
