@@ -93,9 +93,8 @@ global void ChangeSelectedUnits(Unit** units,int count)
  */
 global int SelectUnit(Unit* unit)
 {
-    if ( unit->Revealer )
-    {
-	return 0; // Revealers cannot be selected
+    if ( unit->Revealer ) {		// Revealers cannot be selected
+	return 0;
     }
 
     if( NumSelected == MaxSelectable ) {
