@@ -21,7 +21,7 @@
 
 #include <png.h>
 
-#define VERSION "0.4"
+#define VERSION "0.5"
 
 /* To simulate varargs macros */
 #define _C_ ,
