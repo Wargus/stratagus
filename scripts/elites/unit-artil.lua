@@ -40,7 +40,8 @@ DefineAnimations("animations-artil",
 	   {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0},
            {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {3, 1, 1, 0},},
    "attack", {
-           {2, 0, 10, 0}, {12, 0, 2, 5}, {3, 0, 10, 10}, {3, 0, 10, 15}, {3, 0, 20, 20}},
+           {2, 0, 20, 0}, {12, 0, 2, 5}, {0, 0, 10, 10}, {0, 0, 10, 15}, 
+           {0, 0, 20, 20}, {3, 0, 20, 0}},
    "die", {
            {0, 0, 5, 30}})
 
@@ -56,17 +57,17 @@ DefineUnitType("unit-artil", {
         Shadow = {"file", "elites/units/unit_artil_s.png", "size", {96, 96}},
         Animations = "animations-artil", Icon = "icon-artil",
         Flip = false,
-        Costs = {"time", 120, "titanium", 170, "crystal", 300},
+        Costs = {"time", 200, "titanium", 300, "crystal", 300},
         RepairHp = 1, RepairCosts = {"crystal", 6},
-        Speed = 10, HitPoints = 50, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
-        SightRange = 5, Armor = 20, BasicDamage = 10, PiercingDamage = 0,
+        Speed = 10, HitPoints = 250, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
+        SightRange = 5, Armor = 25, BasicDamage = 10, PiercingDamage = 50,
         Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
-        Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+        Points = 25, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
         Type = "land",
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
 	LandUnit = true, SelectableByRectangle = true, 
-	Demand = 0, CanAttack = true, CanTargetLand = true,
+	Demand = 50, CanAttack = true, CanTargetLand = true,
 	NumDirections = 8, MaxAttackRange = 8,
         Sounds = {}
         })
