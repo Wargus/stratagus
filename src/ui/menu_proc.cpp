@@ -310,7 +310,7 @@ local void DrawPulldown(Menuitem *mi, int mx, int my)
 	    int max;
 
 	    // Check if the pulldown goes below the bottom
-	    if (mi->yofs + (h+1)*mi->d.pulldown.noptions >= mi->menu->ysize) {
+	    if (mi->yofs + (h+1)*mi->d.pulldown.noptions >= mi->menu->Height) {
 		y -= h*mi->d.pulldown.noptions;
 		usetop = 0;
 	    } else {
@@ -435,14 +435,14 @@ local void DrawPulldown(Menuitem *mi, int mx, int my)
 	oh = h = mi->d.pulldown.ysize - 2;
 	if (flags&MenuButtonClicked) {
 	    // Make the menu inside of the screen (TOP)
-	    if (y + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->y) {
-		y = 2 + CurrentMenu->y;
+	    if (y + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->Y) {
+		y = 2 + CurrentMenu->Y;
 	    } else {
 		y -= mi->d.pulldown.curopt * h;
 		// Make the menu inside the bottom of the screen
 		// FIXME: can't assume bottom is always 480
-		if (y + h*mi->d.pulldown.noptions >= 480 + CurrentMenu->y) {
-		    y -= y + h*mi->d.pulldown.noptions - (480 + CurrentMenu->y);
+		if (y + h*mi->d.pulldown.noptions >= 480 + CurrentMenu->Y) {
+		    y -= y + h*mi->d.pulldown.noptions - (480 + CurrentMenu->Y);
 		}
 	    }
 	    i = mi->d.pulldown.noptions;
@@ -922,12 +922,12 @@ global void DrawMenu(Menu *menu)
 	return;
     }
 
-    MenuRedrawX = menu->x;
-    MenuRedrawY = menu->y;
-    MenuRedrawW = menu->xsize;
-    MenuRedrawH = menu->ysize;
+    MenuRedrawX = menu->X;
+    MenuRedrawY = menu->Y;
+    MenuRedrawW = menu->Width;
+    MenuRedrawH = menu->Height;
 
-    switch (menu->image) {
+    switch (menu->Image) {
 	case ScPanel:
 	    // Background
 	    VideoFill50TransRectangle(ColorBlack,MenuRedrawX+1,MenuRedrawY+1,MenuRedrawW-2,MenuRedrawH-2);
@@ -957,36 +957,36 @@ global void DrawMenu(Menu *menu)
 	    VideoDrawSub(TheUI.GameMenuPanel.Graphic,0,0,
 		    VideoGraphicWidth(TheUI.GameMenuPanel.Graphic),
 		    VideoGraphicHeight(TheUI.GameMenuPanel.Graphic),
-		    menu->x,menu->y);
+		    menu->X,menu->Y);
 	    break;
 	case ImagePanel2:
 	    VideoDrawSub(TheUI.Menu1Panel.Graphic,0,0,
 		    VideoGraphicWidth(TheUI.Menu1Panel.Graphic),
 		    VideoGraphicHeight(TheUI.Menu1Panel.Graphic),
-		    menu->x,menu->y);
+		    menu->X,menu->Y);
 	    break;
 	case ImagePanel3:
 	    VideoDrawSub(TheUI.Menu2Panel.Graphic,0,0,
 		   VideoGraphicWidth(TheUI.Menu2Panel.Graphic),
 		   VideoGraphicHeight(TheUI.Menu2Panel.Graphic),
-		   menu->x,menu->y);
+		   menu->X,menu->Y);
 	    break;
 	case ImagePanel4:
 	    VideoDrawSub(TheUI.VictoryPanel.Graphic,0,0,
 		   VideoGraphicWidth(TheUI.VictoryPanel.Graphic),
 		   VideoGraphicHeight(TheUI.VictoryPanel.Graphic),
-		   menu->x,menu->y);
+		   menu->X,menu->Y);
 	    break;
 	case ImagePanel5:
 	    VideoDrawSub(TheUI.ScenarioPanel.Graphic,0,0,
 		   VideoGraphicWidth(TheUI.ScenarioPanel.Graphic),
 		   VideoGraphicHeight(TheUI.ScenarioPanel.Graphic),
-		   menu->x,menu->y);
+		   menu->X,menu->Y);
 	default:
 	    break;
     }
-    n = menu->nitems;
-    mi = menu->items;
+    n = menu->NumItems;
+    mi = menu->Items;
     mip = NULL;
     for (i = 0; i < n; i++) {
 	switch (mi->mitype) {
@@ -1004,20 +1004,20 @@ global void DrawMenu(Menu *menu)
 		    rc = oldrc;
 		}
 		if (mi->flags&MenuButtonActive && mi->d.text.action) {
-		    VideoDrawRectangleClip(ColorGray,menu->x+mi->xofs-4,menu->y+mi->yofs-4,
+		    VideoDrawRectangleClip(ColorGray,menu->X+mi->xofs-4,menu->Y+mi->yofs-4,
 					    VideoTextLength(mi->font, mi->d.text.text)+5,
 					    VideoTextHeight(mi->font)+5);
 		    SetDefaultTextColors(rc,rc);
 		}
 		if (mi->d.text.align&MI_TFLAGS_CENTERED) {
-		    VideoDrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
+		    VideoDrawTextCentered(menu->X+mi->xofs,menu->Y+mi->yofs,
 			    mi->font,mi->d.text.text);
 		} else if (mi->d.text.align&MI_TFLAGS_RALIGN) {
 		    l = VideoTextLength(mi->font,mi->d.text.text);
-		    VideoDrawText(menu->x+mi->xofs-l,menu->y+mi->yofs,
+		    VideoDrawText(menu->X+mi->xofs-l,menu->Y+mi->yofs,
 			    mi->font,mi->d.text.text);
 		} else {
-		    VideoDrawText(menu->x+mi->xofs,menu->y+mi->yofs,
+		    VideoDrawText(menu->X+mi->xofs,menu->Y+mi->yofs,
 			    mi->font,mi->d.text.text);
 		}
 		SetDefaultTextColors(oldnc,oldrc);
@@ -1025,7 +1025,7 @@ global void DrawMenu(Menu *menu)
 	    case MI_TYPE_BUTTON:
 		DrawMenuButton(mi->d.button.button,mi->flags,
 			mi->d.button.xsize,mi->d.button.ysize,
-			menu->x+mi->xofs,menu->y+mi->yofs,
+			menu->X+mi->xofs,menu->Y+mi->yofs,
 			mi->font,mi->d.button.text,
 			mi->d.button.normalcolor,mi->d.button.reversecolor);
 		break;
@@ -1033,17 +1033,17 @@ global void DrawMenu(Menu *menu)
 		if (mi->flags&MenuButtonClicked) {
 		    mip = mi;	// Delay, due to possible overlaying!
 		} else {
-		    DrawPulldown(mi,menu->x,menu->y);
+		    DrawPulldown(mi,menu->X,menu->Y);
 		}
 		break;
 	    case MI_TYPE_LISTBOX:
-		DrawListbox(mi,menu->x,menu->y);
+		DrawListbox(mi,menu->X,menu->Y);
 		break;
 	    case MI_TYPE_VSLIDER:
-		DrawVSlider(mi,menu->x,menu->y);
+		DrawVSlider(mi,menu->X,menu->Y);
 		break;
 	    case MI_TYPE_HSLIDER:
-		DrawHSlider(mi,menu->x,menu->y);
+		DrawHSlider(mi,menu->X,menu->Y);
 		break;
 	    case MI_TYPE_DRAWFUNC:
 		if (mi->d.drawfunc.draw) {
@@ -1051,10 +1051,10 @@ global void DrawMenu(Menu *menu)
 		}
 		break;
 	    case MI_TYPE_INPUT:
-		DrawInput(mi,menu->x,menu->y);
+		DrawInput(mi,menu->X,menu->Y);
 		break;
 	    case MI_TYPE_GEM:
-		DrawGem(mi,menu->x,menu->y);
+		DrawGem(mi,menu->X,menu->Y);
 		break;
 	    default:
 		break;
@@ -1062,7 +1062,7 @@ global void DrawMenu(Menu *menu)
 	mi++;
     }
     if (mip) {
-	DrawPulldown(mip,menu->x,menu->y);
+	DrawPulldown(mip,menu->X,menu->Y);
     }
 }
 
@@ -1189,8 +1189,8 @@ local void MenuHandleKeyDown(unsigned key,unsigned keychar)
     }
 
     menu = CurrentMenu;
-    if (MenuButtonCurSel != -1 && menu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
-	mi = menu->items + MenuButtonCurSel;
+    if (MenuButtonCurSel != -1 && menu->Items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
+	mi = menu->Items + MenuButtonCurSel;
 	if (!(mi->flags & MenuButtonDisabled)) {
 inkey:
 	    if (key >= 0x80 && key < 0x100) {
@@ -1245,8 +1245,8 @@ inkey:
 
 normkey:
     if( !(KeyModifiers&ModifierAlt) ) {
-	mi = menu->items;
-	i = menu->nitems;
+	mi = menu->Items;
+	i = menu->NumItems;
 	while (i--) {
 	    switch (mi->mitype) {
 		case MI_TYPE_BUTTON:
@@ -1265,7 +1265,7 @@ normkey:
     switch (key) {
 	case 10: case 13:			// RETURN
 	    if (MenuButtonCurSel != -1) {
-		mi = menu->items + MenuButtonCurSel;
+		mi = menu->Items + MenuButtonCurSel;
 		switch (mi->mitype) {
 		    case MI_TYPE_BUTTON:
 			if (mi->d.button.handler) {
@@ -1294,7 +1294,7 @@ normkey:
 	    break;
 	case KeyCodeUp: case KeyCodeDown:
 	    if (MenuButtonCurSel != -1) {
-		mi = menu->items + MenuButtonCurSel;
+		mi = menu->Items + MenuButtonCurSel;
 		if (!(mi->flags&MenuButtonClicked)) {
 		    switch (mi->mitype) {
 			case MI_TYPE_PULLDOWN:
@@ -1360,7 +1360,7 @@ normkey:
 	    break;
 	case KeyCodeLeft: case KeyCodeRight:
 	    if (MenuButtonCurSel != -1) {
-		mi = menu->items + MenuButtonCurSel;
+		mi = menu->Items + MenuButtonCurSel;
 		if (!(mi->flags&MenuButtonClicked)) {
 		    switch (mi->mitype) {
 			case MI_TYPE_HSLIDER:
@@ -1384,10 +1384,10 @@ normkey:
 	    if (KeyModifiers&ModifierAlt) {
 		break;
 	    }
-	    if (MenuButtonCurSel != -1 && !(menu->items[MenuButtonCurSel].flags&MenuButtonClicked)) {
-		n = menu->nitems;
+	    if (MenuButtonCurSel != -1 && !(menu->Items[MenuButtonCurSel].flags&MenuButtonClicked)) {
+		n = menu->NumItems;
 		for (i = 0; i < n; ++i) {
-		    mi = menu->items + ((MenuButtonCurSel + i + 1) % n);
+		    mi = menu->Items + ((MenuButtonCurSel + i + 1) % n);
 		    switch (mi->mitype) {
 			case MI_TYPE_PULLDOWN:
 			    if ((mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
@@ -1403,8 +1403,8 @@ normkey:
 				break;
 			    }
 			    mi->flags |= MenuButtonSelected;
-			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
-			    MenuButtonCurSel = mi - menu->items;
+			    menu->Items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
+			    MenuButtonCurSel = mi - menu->Items;
 			    MustRedraw |= RedrawMenu;
 			    return;
 			default:
@@ -1419,18 +1419,18 @@ normkey:
 		Exit(0);
 	    }
 	default:
-	    mi = menu->items;
-	    i = menu->nitems;
+	    mi = menu->Items;
+	    i = menu->NumItems;
 	    while (i--) {
 		switch (mi->mitype) {
 		    case MI_TYPE_INPUT:
 			if (!(mi->flags & MenuButtonDisabled)) {
 			    if (MenuButtonCurSel != -1) {
-				menu->items[MenuButtonCurSel].flags
+				menu->Items[MenuButtonCurSel].flags
 					&= ~MenuButtonSelected;
 			    }
 			    mi->flags |= MenuButtonSelected;
-			    MenuButtonCurSel = mi - menu->items;
+			    MenuButtonCurSel = mi - menu->Items;
 			    MustRedraw |= RedrawMenu;
 			    goto inkey;
 			}
@@ -1470,7 +1470,7 @@ local void MenuHandleKeyRepeat(unsigned key,unsigned keychar)
 	return;
     }
 
-    if (MenuButtonCurSel != -1 && CurrentMenu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
+    if (MenuButtonCurSel != -1 && CurrentMenu->Items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
 	MenuHandleKeyDown(key,keychar);
     }
 }
@@ -1506,22 +1506,22 @@ local void MenuHandleMouseMove(int x,int y)
 
     menu = CurrentMenu;
 
-    n = menu->nitems;
+    n = menu->NumItems;
     MenuButtonUnderCursor = -1;
     redraw_flag = 0;
 
     // check active (popped-up) pulldown first, as it may overlay other menus!
-    mi = menu->items;
+    mi = menu->Items;
     for (i = 0; i < n; ++i) {
 	if (!(mi->flags&MenuButtonDisabled)) {
 	    if (mi->mitype == MI_TYPE_PULLDOWN && (mi->flags&MenuButtonClicked)) {
-		xs = menu->x + mi->xofs;
-		ys = menu->y + mi->yofs;
+		xs = menu->X + mi->xofs;
+		ys = menu->Y + mi->yofs;
 		if (mi->d.pulldown.button == MBUTTON_SC_PULLDOWN) {
 		    int usetop;
 
 		    h = mi->d.pulldown.ysize;
-		    if (mi->yofs + (h+1)*mi->d.pulldown.noptions >= mi->menu->ysize) {
+		    if (mi->yofs + (h+1)*mi->d.pulldown.noptions >= mi->menu->Height) {
 			ys -= h*mi->d.pulldown.noptions;
 			usetop = 0;
 		    } else {
@@ -1547,12 +1547,12 @@ local void MenuHandleMouseMove(int x,int y)
 		    MenuButtonUnderCursor = i;
 		} else {
 		    h = mi->d.pulldown.ysize - 2;
-		    if (ys + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->y) {
-			ys = 2 + CurrentMenu->y;
+		    if (ys + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->Y) {
+			ys = 2 + CurrentMenu->Y;
 		    } else {
 			ys -= mi->d.pulldown.curopt * h;
-			if (ys + h*mi->d.pulldown.noptions >= 480 + CurrentMenu->y) {
-			    ys -= ys + h*mi->d.pulldown.noptions - (480 + CurrentMenu->y);
+			if (ys + h*mi->d.pulldown.noptions >= 480 + CurrentMenu->Y) {
+			    ys -= ys + h*mi->d.pulldown.noptions - (480 + CurrentMenu->Y);
 			}
 		    }
 		    if (!(x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + h*mi->d.pulldown.noptions)) {
@@ -1574,14 +1574,14 @@ local void MenuHandleMouseMove(int x,int y)
     }
     if (MenuButtonUnderCursor == -1) {
 	for (i = 0; i < n; ++i) {
-	    mi = menu->items + i;
+	    mi = menu->Items + i;
 	    if (!(mi->flags&MenuButtonDisabled)) {
 		switch (mi->mitype) {
 		    case MI_TYPE_TEXT:
 			if (!mi->d.text.text || !mi->d.text.action)
 			    continue;
-			xs = menu->x + mi->xofs;
-			ys = menu->y + mi->yofs;
+			xs = menu->X + mi->xofs;
+			ys = menu->Y + mi->yofs;
 			if (x < xs - 4 || x > xs + VideoTextLength(mi->font, mi->d.text.text)+5
 			    || y < ys - 4 || y > ys + VideoTextHeight(mi->font)+5) {
 			    if (!(mi->flags&MenuButtonClicked)) {
@@ -1594,8 +1594,8 @@ local void MenuHandleMouseMove(int x,int y)
 			}
 			break;			
 		    case MI_TYPE_GEM:
-			xs = menu->x + mi->xofs;
-			ys = menu->y + mi->yofs;
+			xs = menu->X + mi->xofs;
+			ys = menu->Y + mi->yofs;
 			if ((!mi->d.gem.text || x < xs - 1 || x > xs + 
 				VideoTextLength(GameFont, mi->d.gem.text)+28 || y < ys - 2 || 
 				y > ys + VideoTextHeight(GameFont)+9) && (x < xs || 
@@ -1610,8 +1610,8 @@ local void MenuHandleMouseMove(int x,int y)
 			}
 			break;
 		    case MI_TYPE_BUTTON:
-			xs = menu->x + mi->xofs;
-			ys = menu->y + mi->yofs;
+			xs = menu->X + mi->xofs;
+			ys = menu->Y + mi->yofs;
 			if (x < xs || x > xs + mi->d.button.xsize || y < ys || y > ys + mi->d.button.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
@@ -1623,8 +1623,8 @@ local void MenuHandleMouseMove(int x,int y)
 			}
 			break;
 		    case MI_TYPE_INPUT:
-			xs = menu->x + mi->xofs;
-			ys = menu->y + mi->yofs;
+			xs = menu->X + mi->xofs;
+			ys = menu->Y + mi->yofs;
 			if (x<xs || x>xs + mi->d.input.xsize
 				|| y<ys || y>ys + mi->d.input.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
@@ -1641,8 +1641,8 @@ local void MenuHandleMouseMove(int x,int y)
 			    continue;
 			}
 			// Clicked-state already checked above - there can only be one!
-			xs = menu->x + mi->xofs;
-			ys = menu->y + mi->yofs;
+			xs = menu->X + mi->xofs;
+			ys = menu->Y + mi->yofs;
 			if (x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + mi->d.pulldown.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
@@ -1654,8 +1654,8 @@ local void MenuHandleMouseMove(int x,int y)
 			}
 			break;
 		    case MI_TYPE_LISTBOX:
-			xs = menu->x + mi->xofs;
-			ys = menu->y + mi->yofs;
+			xs = menu->X + mi->xofs;
+			ys = menu->Y + mi->yofs;
 			if (x < xs || x > xs + mi->d.listbox.xsize || y < ys || y > ys + mi->d.listbox.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
@@ -1684,8 +1684,8 @@ local void MenuHandleMouseMove(int x,int y)
 		    {
 			int arrowsize;
 
-			xs = menu->x + mi->xofs;
-			ys = menu->y + mi->yofs;
+			xs = menu->X + mi->xofs;
+			ys = menu->Y + mi->yofs;
 			if (x < xs || x > xs + mi->d.vslider.xsize || y < ys || y > ys + mi->d.vslider.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
@@ -1743,8 +1743,8 @@ local void MenuHandleMouseMove(int x,int y)
 		    {
 			int arrowsize;
 
-			xs = menu->x + mi->xofs;
-			ys = menu->y + mi->yofs;
+			xs = menu->X + mi->xofs;
+			ys = menu->Y + mi->yofs;
 			if (x < xs || x > xs + mi->d.hslider.xsize || y < ys || y > ys + mi->d.hslider.ysize) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
@@ -1882,7 +1882,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 
     if (MouseButtons&LeftButton) {
 	if (MenuButtonUnderCursor != -1) {
-	    mi = menu->items + MenuButtonUnderCursor;
+	    mi = menu->Items + MenuButtonUnderCursor;
 	    if (!(mi->flags&MenuButtonClicked)) {
 		switch (mi->mitype) {
 		    case MI_TYPE_GEM:
@@ -1894,7 +1894,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    case MI_TYPE_INPUT:
 		    case MI_TYPE_TEXT:
 			if (MenuButtonCurSel != -1) {
-			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
+			    menu->Items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
 			}
 			MenuButtonCurSel = MenuButtonUnderCursor;
 			mi->flags |= MenuButtonClicked|MenuButtonSelected;
@@ -1943,7 +1943,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 
     if (MouseButtons&MiddleButton) {
 	if (MenuButtonUnderCursor != -1) {
-	    mi = menu->items + MenuButtonUnderCursor;
+	    mi = menu->Items + MenuButtonUnderCursor;
 	    if (!(mi->flags&MenuButtonClicked)) {
 		switch (mi->mitype) {
 		    case MI_TYPE_INPUT:
@@ -1961,7 +1961,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 
     if (MouseButtons&UpButton) {
 	if (MenuButtonUnderCursor != -1) {
-	    mi = menu->items + MenuButtonUnderCursor;
+	    mi = menu->Items + MenuButtonUnderCursor;
 	    switch (mi->mitype) {
 		case MI_TYPE_LISTBOX:
 		    if (mi->d.listbox.curopt < 0) {
@@ -2004,7 +2004,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 
     if (MouseButtons&DownButton) {
 	if (MenuButtonUnderCursor != -1) {
-	    mi = menu->items + MenuButtonUnderCursor;
+	    mi = menu->Items + MenuButtonUnderCursor;
 	    switch (mi->mitype) {
 		case MI_TYPE_LISTBOX:
 		    if (mi->d.listbox.curopt < 0)
@@ -2067,9 +2067,9 @@ local void MenuHandleButtonUp(unsigned b)
     menu = CurrentMenu;
 
     if ((1<<b) == LeftButton) {
-	n = menu->nitems;
+	n = menu->NumItems;
 	for (i = 0; i < n; ++i) {
-	    mi = menu->items + i;
+	    mi = menu->Items + i;
 	    switch (mi->mitype) {
 		case MI_TYPE_GEM:
 		    if (mi->flags&MenuButtonClicked) {
@@ -2207,8 +2207,8 @@ local void PopMenu(void)
     int i;
 
     if (Menus && Menus->Menu == CurrentMenu) {
-	for (i = 0; i < CurrentMenu->nitems; ++i) {
-	    mi = CurrentMenu->items + i;
+	for (i = 0; i < CurrentMenu->NumItems; ++i) {
+	    mi = CurrentMenu->Items + i;
 	    if (mi->exitfunc) {
 		(*mi->exitfunc)(mi);		// action/destructor
 	    }
@@ -2299,8 +2299,8 @@ global void ProcessMenu(const char *menu_id, int loop)
     }
 
     MenuButtonCurSel = -1;
-    for (i = 0; i < menu->nitems; ++i) {
-	mi = menu->items + i;
+    for (i = 0; i < menu->NumItems; ++i) {
+	mi = menu->Items + i;
 	switch (mi->mitype) {
 	    case MI_TYPE_BUTTON:
 	    case MI_TYPE_PULLDOWN:
@@ -2310,7 +2310,7 @@ global void ProcessMenu(const char *menu_id, int loop)
 	    case MI_TYPE_INPUT:
 		mi->flags &= ~(MenuButtonClicked|MenuButtonActive
 				|MenuButtonSelected);
-		if (i == menu->defsel) {
+		if (i == menu->DefSel) {
 		    mi->flags |= MenuButtonSelected;
 		    MenuButtonCurSel = i;
 		}
@@ -2360,7 +2360,7 @@ global void ProcessMenu(const char *menu_id, int loop)
 	    }
 	    DebugLevel3("MustRedraw: 0x%08x\n" _C_ MustRedraw);
 	    if (MustRedraw) {
-		if (CurrentMenu->image == ScPanel) {
+		if (CurrentMenu->Image == ScPanel) {
 		    MustRedraw = RedrawEverything;
 		}
 		if (MustRedraw == RedrawEverything) {
@@ -2384,8 +2384,8 @@ global void ProcessMenu(const char *menu_id, int loop)
 	    }
 	    // stopped by network activity?
 	    if (oldncr == 2 && NetConnectRunning == 0) {
-		if (menu->netaction) {
-		    (*menu->netaction)();
+		if (menu->NetAction) {
+		    (*menu->NetAction)();
 		}
 	    }
 	}
@@ -2394,8 +2394,8 @@ global void ProcessMenu(const char *menu_id, int loop)
     }
 
     if (loop) {
-	for (i = 0; i < menu->nitems; ++i) {
-	    mi = menu->items + i;
+	for (i = 0; i < menu->NumItems; ++i) {
+	    mi = menu->Items + i;
 	    if (mi->exitfunc) {
 		(*mi->exitfunc)(mi);		// action/destructor
 	    }
