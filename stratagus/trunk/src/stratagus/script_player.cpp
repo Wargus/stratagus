@@ -827,7 +827,96 @@ local int CclGetPlayerData(lua_State* l)
 		lua_error(l);
 	}
 
-	return 1;
+	return 0;
+}
+
+/**
+**  Set player data.
+*/
+local int CclSetPlayerData(lua_State* l)
+{
+	Player* p;
+	const char* data;
+
+	if (lua_gettop(l) < 3) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	}
+	lua_pushvalue(l, 1);
+	p = CclGetPlayer(l);
+	lua_pop(l, 1);
+	data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		free(p->Name);
+		p->Name = strdup(LuaToString(l, 3));
+//	} else if (!strcmp(data, "RaceName")) {
+	} else if (!strcmp(data, "Resources")) {
+		const char* res;
+		int i;
+
+		if (lua_gettop(l) != 4) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		}
+		res = LuaToString(l, 3);
+		for (i = 0; i < MaxCosts; ++i) {
+			if (!strcmp(res, DefaultResourceNames[i])) {
+				break;
+			}
+		}
+		if (i == MaxCosts) {
+			lua_pushfstring(l, "Invalid resource \"%s\"", res);
+			lua_error(l);
+		}
+		p->Resources[i] = LuaToNumber(l, 4);
+//	} else if (!strcmp(data, "UnitTypesCount")) {
+//	} else if (!strcmp(data, "AiEnabled")) {
+//	} else if (!strcmp(data, "TotalNumUnits")) {
+//	} else if (!strcmp(data, "NumBuildings")) {
+//	} else if (!strcmp(data, "Supply")) {
+//	} else if (!strcmp(data, "Demand")) {
+	} else if (!strcmp(data, "UnitLimit")) {
+		p->UnitLimit = LuaToNumber(l, 3);
+	} else if (!strcmp(data, "BuildingLimit")) {
+		p->BuildingLimit = LuaToNumber(l, 3);
+	} else if (!strcmp(data, "TotalUnitLimit")) {
+		p->TotalUnitLimit = LuaToNumber(l, 3);
+	} else if (!strcmp(data, "Score")) {
+		p->Score = LuaToNumber(l, 3);
+	} else if (!strcmp(data, "TotalUnits")) {
+		p->TotalUnits = LuaToNumber(l, 3);
+	} else if (!strcmp(data, "TotalBuildings")) {
+		p->TotalBuildings = LuaToNumber(l, 3);
+	} else if (!strcmp(data, "TotalResources")) {
+		const char* res;
+		int i;
+
+		if (lua_gettop(l) != 3) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		}
+		res = LuaToString(l, 3);
+		for (i = 0; i < MaxCosts; ++i) {
+			if (!strcmp(res, DefaultResourceNames[i])) {
+				break;
+			}
+		}
+		if (i == MaxCosts) {
+			lua_pushfstring(l, "Invalid resource \"%s\"", res);
+			lua_error(l);
+		}
+		p->TotalResources[i] = LuaToNumber(l, 4);
+	} else if (!strcmp(data, "TotalRazings")) {
+		p->TotalRazings = LuaToNumber(l, 3);
+	} else if (!strcmp(data, "TotalKills")) {
+		p->TotalKills = LuaToNumber(l, 3);
+	} else {
+		lua_pushfstring(l, "Invalid field: %s", data);
+		lua_error(l);
+	}
+
+	return 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -862,6 +951,7 @@ global void PlayerCclRegister(void)
 
 	// player member access functions
 	lua_register(Lua, "GetPlayerData", CclGetPlayerData);
+	lua_register(Lua, "SetPlayerData", CclSetPlayerData);
 }
 
 #ifdef META_LUA
