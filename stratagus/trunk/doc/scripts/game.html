@@ -76,7 +76,7 @@
 <a href="#Log">Log</a>
 <a href="#Makeunit">MakeUnit</a>
 <a href="#NewColors">NewColors</a>
-<a href="#PlaceUnit">PlaceUnit</a>
+<a href="#MoveUnit">MoveUnit</a>
 <a href="#Player">Player</a>
 <a href="#RemoveObjective">RemoveObjective</a>
 <a href="#ReplayLog">ReplayLog</a>
@@ -261,7 +261,7 @@ Changes the owner of a group of units from one player to another.
 </pre>
 
 <a name="CreateUnit"></a>
-<h3>CreateUnit(type, player, x, y)</h3>
+<h3>CreateUnit(type, player, {x, y})</h3>
 
 Create a unit at a location.  If the location is occupied, the unit will be
 placed in the closest available spot.
@@ -280,13 +280,16 @@ placed in the closest available spot.
 <dt>y</dt>
 <dd>Y map tile location.
 </dd>
+<dt><I>RETURNS</I></dt>
+<dd>The slot number of the created unit.
+</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
     -- Creates a footman for player 2 at location 31x34.
-    CreateUnit("unit-footman", 2, 31, 34)
+    CreateUnit("unit-footman", 2, {31, 34})
 </pre>
 
 <a name="Credits"></a>
@@ -905,10 +908,11 @@ Change players colors.
     NewColors()
 </pre>
 
-<a name="PlaceUnit"></a>
-<h3>PlaceUnit(unit-slot, x, y)</h3>
+<a name="MoveUnit"></a>
+<h3>MoveUnit(unit-slot, {x, y})</h3>
 
-Place a unit on map.
+Place a unit on map. If the location is occupied, 
+the unit will be placed in the closest available spot.
 
 
 <dl>
@@ -926,7 +930,7 @@ Place a unit on map.
 <h4>Example</h4>
 
 <pre>
-    PlaceUnit(0, 10, 12)
+    MoveUnit(0, {10, 12})
 </pre>
 
 <a name="Player"></a>

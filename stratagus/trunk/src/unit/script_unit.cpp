@@ -968,24 +968,47 @@ static int CclMakeUnit(lua_State* l)
 }
 
 /**
-**  Place a unit on map.
+**  Move a unit on map.
 **
 **  @param l  Lua state.
 **
 **  @return   Returns the slot number of the made placed.
 */
-static int CclPlaceUnit(lua_State* l)
+static int CclMoveUnit(lua_State* l)
 {
 	Unit* unit;
+	int heading;
+	int mask;
+	int ix;
+	int iy;
 
-	if (lua_gettop(l) != 3) {
+	if (lua_gettop(l) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	PlaceUnit(unit, LuaToNumber(l, 2), LuaToNumber(l, 3));
+
+	lua_rawgeti(l, 2, 1);
+	ix = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	lua_rawgeti(l, 2, 2);
+	iy = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+
+	heading = SyncRand() % 256;
+	mask = UnitMovementMask(unit);
+	if (CheckedCanMoveToMask(ix, iy, mask)) {
+		unit->Wait = 1;
+		PlaceUnit(unit, ix, iy);
+	} else {
+		unit->X = ix;
+		unit->Y = iy;
+		DropOutOnSide(unit, heading, unit->Type->TileWidth, unit->Type->TileHeight);
+	}
+
+//	PlaceUnit(unit, ix, iy);
 	lua_pushvalue(l, 1);
 	return 1;
 }
@@ -1008,14 +1031,15 @@ static int CclCreateUnit(lua_State* l)
 	int iy;
 
 	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect argument");
+	    printf("%d\n", lua_gettop(l));
+		LuaError(l, "incorrect argument aa");
 	}
 
 	lua_pushvalue(l, 1);
 	unittype = CclGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 3) || luaL_getn(l, 3) != 2) {
-		LuaError(l, "incorrect argument");
+		LuaError(l, "incorrect argument !!");
 	}
 	lua_rawgeti(l, 3, 1);
 	ix = LuaToNumber(l, -1);
@@ -1505,8 +1529,7 @@ void UnitCclRegister(void)
 
 	lua_register(Lua, "Unit", CclUnit);
 
-	lua_register(Lua, "MakeUnit", CclMakeUnit);
-	lua_register(Lua, "PlaceUnit", CclPlaceUnit);
+	lua_register(Lua, "MoveUnit", CclMoveUnit);
 	lua_register(Lua, "CreateUnit", CclCreateUnit);
 	lua_register(Lua, "OrderUnit", CclOrderUnit);
 	lua_register(Lua, "KillUnit", CclKillUnit);
