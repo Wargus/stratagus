@@ -39,7 +39,6 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
-#ifdef NEW_ORDERS
 /**
 **	Release an order.
 **
@@ -120,48 +119,6 @@ local void ClearSavedAction(Unit* unit)
     unit->SavedOrder.Arg1=NULL;
 }
 
-#else
-
-/**
-**	Get next command.
-**
-**	@param unit	pointer to unit.
-**	@param flush	if true, flush command queue.
-**
-**	@return		Pointer to next free command.
-*/
-local Command* GetNextCommand(Unit* unit,int flush)
-{
-    if( flush ) {			// empty command queue
-	unit->NextCount=0;
-	unit->NextFlush=1;
-    } else if( unit->NextCount==MAX_COMMANDS ) {
-	// FIXME: johns: wrong place for an error message.
-	// FIXME: johns: should be checked by AI or the user interface
-	if( unit->Player==ThisPlayer ) {
-            SetMessage( "Unit action list is full" );
-	}
-	return NULL;
-    }
-
-    return &unit->NextCommand[(int)unit->NextCount++];
-}
-
-/**
-**	Clear the saved action.
-**
-**	@param unit	Unit pointer, that get the saved action cleared.
-**
-**	If we make an new order, we must clear any saved actions.
-**	Internal functions, must protect it, if needed.
-*/
-local void ClearSavedAction(Unit* unit)
-{
-    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
-}
-
-#endif
-
 /*----------------------------------------------------------------------------
 --	Commands
 ----------------------------------------------------------------------------*/
@@ -173,7 +130,6 @@ local void ClearSavedAction(Unit* unit)
 */
 global void CommandStopUnit(Unit* unit)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     // Ignore that the unit could be removed.
@@ -187,16 +143,6 @@ global void CommandStopUnit(Unit* unit)
     ReleaseOrder(&unit->SavedOrder);
     ReleaseOrder(&unit->NewOrder);
     unit->SavedOrder=unit->NewOrder=*order;
-#else
-    unit->NextFlush=1;
-    unit->NextCount=1;
-    unit->NextCommand[0].Action=UnitActionStill;
-    unit->NextCommand[0].Data.Move.Goal=NoUnitP;
-
-    unit->PendCommand=unit->NextCommand[0];
-
-    ClearSavedAction(unit);
-#endif
 }
 
 /**
@@ -207,7 +153,6 @@ global void CommandStopUnit(Unit* unit)
 */
 global void CommandStandGround(Unit* unit,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     // Ignore that the unit could be removed.
@@ -224,17 +169,6 @@ global void CommandStandGround(Unit* unit,int flush)
     order->Goal=NoUnitP;
     order->Type=NULL;
     order->Arg1=NULL;
-#else
-    Command* command;
-
-    if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionStandGround;
-    command->Data.Move.Goal=NoUnitP;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -247,7 +181,6 @@ global void CommandStandGround(Unit* unit,int flush)
 */
 global void CommandFollow(Unit* unit,Unit* dest,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -283,37 +216,6 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-#else
-    Command* command;
-
-    //
-    //	Check if unit is still valid? (NETWORK!)
-    //
-    if( !unit->Removed ) {
-	if( !(command=GetNextCommand(unit,flush)) ) {
-	    return;
-	}
-
-	command->Action=UnitActionFollow;
-	ResetPath(*command);
-	//
-	//	Destination could be killed.
-	//	Should be handled in action, but is not possible!
-	//		Unit::Refs is used as timeout counter.
-	//
-	if( dest->Destroyed ) {
-	    command->Data.Move.Goal=NoUnitP;
-	    command->Data.Move.DX=dest->X+dest->Type->TileWidth/2;
-	    command->Data.Move.DY=dest->Y+dest->Type->TileHeight/2;
-	} else {
-	    command->Data.Move.Goal=dest;
-	    RefsDebugCheck( !dest->Refs );
-	    dest->Refs++;
-	}
-	command->Data.Move.Range=1;
-	command->Data.Move.SX=command->Data.Move.SY=-1;
-    }
-#endif
     ClearSavedAction(unit);
 }
 
@@ -327,7 +229,6 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
 */
 global void CommandMove(Unit* unit,int x,int y,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     IfDebug(
@@ -357,38 +258,6 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-#else
-    Command* command;
-
-    IfDebug(
-	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0Fn("Internal movement error\n");
-	    return;
-	}
-    );
-
-    //
-    //	Check if unit is still valid? (NETWORK!)
-    //
-    if( !unit->Removed ) {
-
-	if( unit->Type->Building ) {
-	    // FIXME: should find a better way for pending commands.
-	    command=&unit->PendCommand;
-	} else if( !(command=GetNextCommand(unit,flush)) ) {
-	    return;
-	}
-
-	command->Action=UnitActionMove;
-	ResetPath(*command);
-	command->Data.Move.Goal=NoUnitP;
-	command->Data.Move.Range=0;
-	command->Data.Move.SX=unit->X;
-	command->Data.Move.SY=unit->Y;
-	command->Data.Move.DX=x;
-	command->Data.Move.DY=y;
-    }
-#endif
     ClearSavedAction(unit);
 }
 
@@ -403,7 +272,6 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
 */
 global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -446,48 +314,6 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-#else
-    Command* command;
-
-    IfDebug(
-	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0Fn("Internal movement error\n");
-	    return;
-	}
-	// FIXME: dest until now not supported
-	if( dest ) {
-	    DebugLevel0Fn("not used %p\n",dest);
-	}
-    );
-
-
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending commands.
-	command=&unit->PendCommand;
-    } else if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    if ( !(dest=RepairableOnMapTile(x,y)) ) {
-	// FIXME: don't work for automatic repairs.
-	command->Action=UnitActionStill;
-        return;
-    }
-
-    command->Action=UnitActionRepair;
-    ResetPath(*command);
-    command->Data.Move.Goal=dest;
-    if( dest ) {
-	RefsDebugCheck( dest->Destroyed || !dest->Refs );
-	dest->Refs++;
-    }
-    command->Data.Move.Range=REPAIR_RANGE;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x;
-    command->Data.Move.DY=y;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -502,7 +328,6 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 */
 global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     IfDebug(
@@ -562,53 +387,6 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-
-#else
-    Command* command;
-
-    IfDebug(
-	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0Fn("Internal movement error\n");
-	    return;
-	}
-	if( unit->Type->Vanishes ) {
-	    DebugLevel0Fn("Internal error\n");
-	    abort();
-	}
-    );
-
-    DebugLevel3("%Zd attacks %Zd\n"
-	,UnitNumber(unit),attack ? UnitNumber(attack) : 0);
-
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending commands.
-	command=&unit->PendCommand;
-    } else if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionAttack;
-    ResetPath(*command);
-    // choose goal and good attack range
-    if( attack ) {
-	command->Data.Move.Goal=attack;
-	RefsDebugCheck( attack->Destroyed || !attack->Refs );
-	attack->Refs++;
-	command->Data.Move.Range=unit->Stats->AttackRange;
-    } else {
-	command->Data.Move.Goal=NoUnitP;
-	if( WallOnMap(x,y) ) {
-	    command->Data.Move.Range=unit->Stats->AttackRange;
-	} else {
-	    command->Data.Move.Range=0;
-	}
-    }
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x;
-    command->Data.Move.DY=y;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -622,7 +400,6 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 */
 global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     IfDebug(
@@ -654,34 +431,6 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 
 	DebugLevel0("FIXME this next\n");
     }
-
-#else
-    Command* command;
-
-    IfDebug(
-	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0Fn("Internal movement error\n");
-	    return;
-	}
-	DebugCheck( unit->Type->Vanishes );
-    );
-
-    if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionAttackGround;
-    ResetPath(*command);
-    command->Data.Move.Goal=NoUnitP;
-    command->Data.Move.Range=unit->Stats->AttackRange;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x;
-    command->Data.Move.DY=y;
-    // FIXME: pathfinder didn't support this kind of target
-    DebugLevel0("FIXME this next\n");
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -697,7 +446,6 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 */
 global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     IfDebug(
@@ -729,30 +477,6 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
 	// BUG-ALERT: encode source into arg1 as two 16 bit values!
 	order->Arg1=(void*)((unit->X<<16)|unit->Y);
     }
-#else
-    Command* command;
-
-    IfDebug(
-	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0Fn("Internal movement error\n");
-	    return;
-	}
-    );
-
-    if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionPatrol;
-    ResetPath(*command);
-    command->Data.Move.Goal=NoUnitP;
-    command->Data.Move.Range=0;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x;
-    command->Data.Move.DY=y;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -765,7 +489,6 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
 */
 global void CommandBoard(Unit* unit,Unit* dest,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -798,24 +521,6 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-#else
-    Command* command;
-
-    if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionBoard;
-    ResetPath(*command);
-    command->Data.Move.Goal=dest;
-    RefsDebugCheck( dest->Destroyed || !dest->Refs );
-    dest->Refs++;
-    command->Data.Move.Range=1;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=dest->X;
-    command->Data.Move.DY=dest->Y;
-#endif
     ClearSavedAction(unit);
 }
 
@@ -830,7 +535,6 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
 */
 global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -863,34 +567,6 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-#else
-    Command* command;
-
-    IfDebug(
-	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0Fn("Internal movement error\n");
-	    return;
-	}
-    );
-
-    if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionUnload;
-    ResetPath(*command);
-    command->Data.Move.Goal=what;
-    if( what ) {
-	RefsDebugCheck( what->Destroyed || !what->Refs );
-	what->Refs++;
-    }
-    command->Data.Move.Range=0;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x;
-    command->Data.Move.DY=y;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -906,7 +582,6 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 global void CommandBuildBuilding(Unit* unit,int x,int y
 	,UnitType* what,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -938,35 +613,6 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 	order->Type=what;
 	order->Arg1=NULL;
     }
-#else
-    Command* command;
-
-    if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionBuild;
-    ResetPath(*command);
-    command->Data.Move.Goal=NoUnitP;
-    // FIXME: only quadratic buildings supported!!!
-    if( what->ShoreBuilding ) {
-	command->Data.Move.Range=what->TileWidth+1;
-	// FIXME: this hack didn't work correct on map border
-	command->Data.Move.DX=x ? x-1 : x;
-	command->Data.Move.DY=y ? y-1 : y;
-    } else {
-	command->Data.Move.Range=what->TileWidth-1;
-	command->Data.Move.DX=x;
-	command->Data.Move.DY=y;
-    }
-    // FIXME: must change movement for not build goal!
-
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-
-    command->Data.Build.BuildThis=what;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -978,34 +624,12 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 */
 global void CommandCancelBuilding(Unit* unit,Unit* worker)
 {
-#ifdef NEW_ORDERS
     //
     //	Check if building is still under construction? (NETWORK!)
     //
     if( unit->Orders[0].Action==UnitActionBuilded ) {
 	unit->Data.Builded.Cancel=1;
     }
-#else
-#if 0
-    if( unit->Command.Action==UnitActionBuilded ) {
-	unit->NextCount=1;
-	unit->NextFlush=1;
-
-	unit->NextCommand[0].Action=UnitActionBuilded;
-	unit->NextCommand[0].Data.Builded.Cancel=1;
-	unit->NextCommand[0].Data.Builded.Worker=worker;
-
-	unit->Wait=1;
-	unit->Reset=1;
-    }
-#endif
-    //
-    //	Check if building is still under construction? (NETWORK!)
-    //
-    if( unit->Command.Action==UnitActionBuilded ) {
-	unit->Command.Data.Builded.Cancel=1;
-    }
-#endif
     ClearSavedAction(unit);
 }
 
@@ -1019,7 +643,6 @@ global void CommandCancelBuilding(Unit* unit,Unit* worker)
 */
 global void CommandHarvest(Unit* unit,int x,int y,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -1042,29 +665,6 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-#else
-    Command* command;
-
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending commands.
-	command=&unit->PendCommand;
-    } else if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    unit->WoodToHarvest=CHOP_FOR_WOOD;
-
-    command->Action=UnitActionHarvest;
-    ResetPath(*command);
-
-    command->Data.Move.Goal=NoUnitP;
-    command->Data.Move.Range=2;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x-1;
-    command->Data.Move.DY=y-1;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -1077,7 +677,6 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 */
 global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -1103,27 +702,6 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-#else
-    Command* command;
-
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending commands.
-	command=&unit->PendCommand;
-    } else if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionMineGold;
-    ResetPath(*command);
-    command->Data.Move.Goal=dest;
-    RefsDebugCheck( dest->Destroyed || !dest->Refs );
-    dest->Refs++;
-    command->Data.Move.Range=1;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=command->Data.Move.DY=-1;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -1136,7 +714,6 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 */
 global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -1162,27 +739,6 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-#else
-    Command* command;
-
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending commands.
-	command=&unit->PendCommand;
-    } else if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionHaulOil;
-    ResetPath(*command);
-    command->Data.Move.Goal=dest;
-    RefsDebugCheck( dest->Destroyed || !dest->Refs );
-    dest->Refs++;
-    command->Data.Move.Range=1;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=command->Data.Move.DY=-1;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -1195,7 +751,6 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 */
 global void CommandReturnGoods(Unit* unit,Unit* goal,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -1225,20 +780,6 @@ global void CommandReturnGoods(Unit* unit,Unit* goal,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-#else
-    // FIXME: flush, and command que not supported!
-
-    unit->NextCount=1;
-    unit->NextFlush=1;
-
-    unit->NextCommand[0].Action=UnitActionReturnGoods;
-    ResetPath(unit->NextCommand[0]);
-    unit->NextCommand[0].Data.Move.Goal=NoUnitP;
-    unit->NextCommand[0].Data.Move.Range=1;
-    unit->NextCommand[0].Data.Move.SX=unit->X;
-    unit->NextCommand[0].Data.Move.SY=unit->Y;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -1251,7 +792,6 @@ global void CommandReturnGoods(Unit* unit,Unit* goal,int flush)
 */
 global void CommandTrainUnit(Unit* unit,UnitType* type,int flush)
 {
-#ifdef NEW_ORDERS
     //
     //	Check if enough resources remains? (NETWORK!)
     //
@@ -1302,65 +842,6 @@ global void CommandTrainUnit(Unit* unit,UnitType* type,int flush)
     // FIXME: if you give quick an other order, the resources are lost!
     PlayerSubUnitType(unit->Player,type);
 
-#else
-
-    //
-    //	Check if enough resources remains? (NETWORK!)
-    //
-    if( !PlayerCheckFood(unit->Player,type)
-	    || PlayerCheckUnitType(unit->Player,type) ) {
-	return;
-    }
-    // FIXME: if you give quick an other order, the resources are lost!
-    PlayerSubUnitType(unit->Player,type);
-
-    //
-    //	Not already training?
-    //
-    if( unit->Command.Action!=UnitActionTrain ) {
-	Command* command;
-
-	DebugCheck( unit->Wait>6 );
-
-	command=unit->NextCommand;
-
-	unit->NextCount=unit->NextFlush=1;
-
-	if( command->Action!=UnitActionTrain ) {
-	    command->Action=UnitActionTrain;
-	    command->Data.Train.Ticks=command->Data.Train.Count=0;
-	}
-
-	//
-	//	Training slots are all already full. (NETWORK!)
-	//
-	if( command->Data.Train.Count>=MAX_UNIT_TRAIN ) {
-	    DebugLevel0Fn("Unit queue full!\n");
-	    PlayerAddUnitType(unit->Player,type);
-	    return;
-	}
-	command->Data.Train.What[command->Data.Train.Count++]=type;
-
-    } else {
-	//
-	//	Training slots are all already full. (NETWORK!)
-	//
-	if( unit->Command.Data.Train.Count>=MAX_UNIT_TRAIN ) {
-	    DebugLevel0Fn("Unit queue full!\n");
-	    PlayerAddUnitType(unit->Player,type);
-	    return;
-	}
-	unit->Command.Data.Train.What[unit->Command.Data.Train.Count++]=type;
-
-	//
-	//	Update interface.
-	//
-	if( unit->Player==ThisPlayer && unit->Selected ) {
-	    MustRedraw|=RedrawInfoPanel;
-	}
-    }
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -1372,7 +853,6 @@ global void CommandTrainUnit(Unit* unit,UnitType* type,int flush)
 */
 global void CommandCancelTraining(Unit* unit,int slot)
 {
-#ifdef NEW_ORDERS
     int i;
     int n;
 
@@ -1412,50 +892,6 @@ global void CommandCancelTraining(Unit* unit,int slot)
 
 	unit->Wait=unit->Reset=1;	// immediately start next training
     }
-
-#else
-    int i;
-    int n;
-
-    // FIXME: over network we could cancel the wrong slot.
-
-    //
-    //	Check if unit is still training 'slot'? (NETWORK!)
-    //
-    n=unit->Command.Data.Train.Count;
-    if( unit->Command.Action==UnitActionTrain && slot<n ) {
-	PlayerAddCostsFactor(unit->Player,
-		unit->Command.Data.Train.What[slot]
-			->Stats[unit->Player->Player].Costs,
-		CancelTrainingCostsFactor);
-
-	if ( --n ) {
-	    for( i = slot; i < n; i++ ) {
-		unit->Command.Data.Train.What[i] =
-			unit->Command.Data.Train.What[i+1];
-	    }
-	    if( !slot ) {
-		unit->Command.Data.Train.Ticks=0;
-	    }
-	    unit->Command.Data.Train.Count=n;
-	} else {
-	    unit->Command.Action=UnitActionStill;
-	    unit->SubAction=0;
-	}
-
-	//
-	//	Update interface.
-	//
-	if( unit->Player==ThisPlayer && unit->Selected ) {
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
-	}
-
-	unit->Wait=unit->Reset=1;	// immediately start next training
-    }
-
-#endif
-
     ClearSavedAction(unit);
 }
 
@@ -1468,7 +904,6 @@ global void CommandCancelTraining(Unit* unit,int slot)
 */
 global void CommandUpgradeTo(Unit* unit,UnitType* type,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -1498,29 +933,6 @@ global void CommandUpgradeTo(Unit* unit,UnitType* type,int flush)
 	order->Type=type;
 	order->Arg1=NULL;
     }
-
-#else
-    //
-    //	Check if enough resources remains? (NETWORK!)
-    //
-    if( PlayerCheckUnitType(unit->Player,type) ) {
-	return;
-    }
-    // FIXME: if you give quick an other order, the resources are lost!
-    PlayerSubUnitType(unit->Player,type);
-
-    unit->NextCount=1;
-    unit->NextFlush=1;
-
-    unit->NextCommand[0].Action=UnitActionUpgradeTo;
-    unit->NextCommand[0].Data.UpgradeTo.Ticks=0;
-    unit->NextCommand[0].Data.UpgradeTo.What=type;
-
-    unit->Wait=1;			// FIXME: correct this
-    unit->Reset=1;
-
-#endif
-
     ClearSavedAction(unit);
 }
 
@@ -1531,7 +943,6 @@ global void CommandUpgradeTo(Unit* unit,UnitType* type,int flush)
 */
 global void CommandCancelUpgradeTo(Unit* unit)
 {
-#ifdef NEW_ORDERS
     ReleaseOrders(unit);		// empty command queue
 
     //
@@ -1561,32 +972,6 @@ global void CommandCancelUpgradeTo(Unit* unit)
 
 	unit->Wait=unit->Reset=1;	// immediately start next command.
     }
-
-#else
-    //
-    //	Check if unit is still upgrading? (NETWORK!)
-    //
-    if( unit->Command.Action == UnitActionUpgradeTo ) {
-
-	PlayerAddCostsFactor(unit->Player,
-		unit->Command.Data.UpgradeTo.What->Stats->Costs,
-		CancelUpgradeCostsFactor);
-
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-
-	//
-	//	Update interface.
-	//
-	if( unit->Player==ThisPlayer && unit->Selected ) {
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
-	}
-
-	unit->Wait=unit->Reset=1;	// immediately start next command.
-    }
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -1599,7 +984,6 @@ global void CommandCancelUpgradeTo(Unit* unit)
 */
 global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     //
@@ -1629,28 +1013,6 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 	order->Type=NULL;
 	order->Arg1=what;
     }
-#else
-    //
-    //	Check if enough resources remains? (NETWORK!)
-    //
-    if( PlayerCheckCosts(unit->Player,what->Costs) ) {
-	return;
-    }
-    // FIXME: if you give quick an other order, the resources are lost!
-    PlayerSubCosts(unit->Player,what->Costs);
-
-    unit->NextCount=1;
-    unit->NextFlush=1;
-
-    DebugLevel0Fn("FIXME: must support command queing!!\n");
-    unit->NextCommand[0].Action=UnitActionResearch;
-    unit->NextCommand[0].Data.Research.Ticks=0;
-    unit->NextCommand[0].Data.Research.What=what;
-
-    unit->Wait=1;			// FIXME: correct this
-    unit->Reset=1;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -1661,7 +1023,6 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 */
 global void CommandCancelResearch(Unit* unit)
 {
-#ifdef NEW_ORDERS
     ReleaseOrders(unit);		// empty command queue
 
     //
@@ -1691,30 +1052,6 @@ global void CommandCancelResearch(Unit* unit)
 
 	unit->Wait=unit->Reset=1;	// immediately start next command.
     }
-
-#else
-    //
-    //	Check if unit is still researching? (NETWORK!)
-    //
-    if( unit->Command.Action == UnitActionResearch ) {
-	PlayerAddCostsFactor(unit->Player,
-		unit->Command.Data.Research.What->Costs,
-		CancelResearchCostsFactor);
-
-	unit->Command.Action=UnitActionStill;
-
-	//
-	//	Update interface.
-	//
-	if( unit->Player==ThisPlayer && unit->Selected ) {
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
-	}
-
-	unit->Wait=unit->Reset=1;	// immediately start next command.
-    }
-#endif
-
     ClearSavedAction(unit);
 }
 
@@ -1729,7 +1066,6 @@ global void CommandCancelResearch(Unit* unit)
 */
 global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     IfDebug(
@@ -1784,46 +1120,6 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
     }
-
-#else
-    Command* command;
-
-    IfDebug(
-	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0Fn("Internal movement error\n");
-	    return;
-	}
-    );
-
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending commands.
-	command=&unit->PendCommand;
-    } else if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionDemolish;
-    ResetPath(*command);
-    // choose goal and good attack range
-    if( dest ) {
-	command->Data.Move.Goal=dest;
-	RefsDebugCheck( dest->Destroyed || !dest->Refs );
-	dest->Refs++;
-	command->Data.Move.Range=1;
-    } else {
-	command->Data.Move.Goal=NoUnitP;
-	if( WallOnMap(x,y) ) {
-	    command->Data.Move.Range=1;
-	} else {
-	    command->Data.Move.Range=0;
-	}
-    }
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x;
-    command->Data.Move.DY=y;
-
-#endif
     ClearSavedAction(unit);
 }
 
@@ -1840,7 +1136,6 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
 global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
 	,SpellType* spell,int flush)
 {
-#ifdef NEW_ORDERS
     Order* order;
 
     IfDebug(
@@ -1898,44 +1193,6 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
 	order->Type=NULL;
 	order->Arg1=spell;
     }
-
-#else
-    Command* command;
-
-    IfDebug(
-	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0("Internal movement error\n");
-	    return;
-	}
-    );
-
-    DebugLevel3Fn(": %Zd spell-casts on %Zd\n"
-	,UnitNumber(unit),dest ? UnitNumber(dest) : 0);
-
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending commands.
-	command=&unit->PendCommand;
-    } else if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
-    }
-
-    command->Action=UnitActionSpellCast;
-    ResetPath(*command);
-
-    if (dest) {
-	RefsDebugCheck( dest->Destroyed || !dest->Refs );
-	dest->Refs++;
-    }
-
-    command->Data.Move.Goal=dest;
-    command->Data.Move.Range=spell->Range;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x;
-    command->Data.Move.DY=y;
-    command->Data.Move.Spell = spell;
-
-#endif
     ClearSavedAction(unit);
 }
 

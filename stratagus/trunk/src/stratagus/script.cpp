@@ -784,9 +784,6 @@ global void CclInit(void)
 #ifdef USE_SDL
     gh_symbol2scm("freecraft-feature-use-sdl");
 #endif
-#ifdef USE_CCL
-    gh_symbol2scm("freecraft-feature-use-ccl");
-#endif
 #ifdef USE_ONLYCCL
     gh_symbol2scm("freecraft-feature-only-ccl");
 #endif
@@ -816,9 +813,6 @@ global void CclInit(void)
 #endif
 #ifdef UNIT_ON_MAP
     gh_symbol2scm("freecraft-feature-unit-on-map");
-#endif
-#ifdef NEW_ORDERS
-    gh_symbol2scm("freecraft-feature-new-orders");
 #endif
 #ifdef NEW_MAPDRAW
     gh_symbol2scm("freecraft-feature-new-mapdraw");

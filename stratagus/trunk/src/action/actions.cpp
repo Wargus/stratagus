@@ -97,13 +97,10 @@ local void HandleUnitAction(Unit* unit)
 {
     int z;
 
-    // FIXME: Johns: What should this do?
+    // FIXME: Revealer is special unit, that should reveal the map.
+    // FIXME: Johns: What should this do here?
     if ( unit->Revealer ) {
-#ifdef NEW_ORDERS
 	unit->Orders[0].Action = UnitActionDie;
-#else
-	unit->Command.Action = UnitActionDie;
-#endif
     }
 
     //
@@ -111,9 +108,6 @@ local void HandleUnitAction(Unit* unit)
     //
     if( unit->Reset ) {
 	unit->Reset=0;
-
-#ifdef NEW_ORDERS
-
 	//
 	//	o Look if we have a new order and old finished.
 	//	o Or the order queue should be flushed.
@@ -160,52 +154,14 @@ local void HandleUnitAction(Unit* unit)
 		MustRedraw|=RedrawInfoPanel;
 	    }
 	}
-
-#else
-
-	//
-	//	New command and forced or old ready (= still)
-	//	FIXME: how should we deal with saved commands?
-	//
-	if( unit->NextCount
-		&& (unit->Command.Action == UnitActionStill || unit->NextFlush)
-		&& !unit->Removed ) {
-
-	    //	Structure assign
-	    unit->Command=unit->NextCommand[0];
-	    // Next line shouldn't affect human players,
-	    //	but needed for AI player
-	    unit->NextCommand[0].Action=UnitActionStill;
-	    // cade: shift queue
-	    unit->NextCount--;
-	    for ( z = 0; z < unit->NextCount; z++ ) {
-		unit->NextCommand[z] = unit->NextCommand[z+1];
-	    }
-
-	    unit->NextFlush=0;
-
-	    // Reset for new order
-	    unit->SubAction=unit->State=0;
-	    unit->Wait=1;
-
-	    if( IsSelected(unit) ) {	// update display for new action
-		UpdateButtonPanel();
-		MustRedraw|=RedrawInfoPanel;
-	    }
-	}
-#endif
     }
 
     // FIXME: fire handling should be moved to here.
 
     //
-    //	Select action.
+    //	Select action. FIXME: should us function pointers|array.
     //
-#ifdef NEW_ORDERS
     switch( unit->Orders[0].Action ) {
-#else
-    switch( unit->Command.Action ) {
-#endif
 	case UnitActionNone:
 	    DebugLevel1Fn("FIXME: Should not happen!\n");
 	    break;
@@ -296,11 +252,7 @@ local void HandleUnitAction(Unit* unit)
 	    break;
 
 	default:
-#ifdef NEW_ORDERS
 	    DebugLevel1Fn("Unknown action %d\n",unit->Orders[0].Action);
-#else
-	    DebugLevel1Fn("Unknown action %d\n",unit->Command.Action);
-#endif
 	    break;
     }
 }

@@ -52,7 +52,6 @@ global void HandleActionTrain(Unit* unit)
     Player* player;
 
     player=unit->Player;
-#ifdef NEW_ORDERS
     //
     //	First entry
     //
@@ -67,14 +66,6 @@ global void HandleActionTrain(Unit* unit)
     if( unit->Data.Train.Ticks
 	    >=unit->Data.Train.What[0]
 		->Stats[player->Player].Costs[TimeCost] ) {
-#else
-    unit->Command.Data.Train.Ticks+=SpeedTrain;
-    // FIXME: Should count down
-    if( unit->Command.Data.Train.Ticks
-	    >=unit->Command.Data.Train.What[0]
-		->Stats[player->Player].Costs[TimeCost] ) {
-#endif
-
 	//
 	//	Check if enough food available.
 	//
@@ -89,21 +80,13 @@ global void HandleActionTrain(Unit* unit)
 		// AiNeedMoreFarms(unit);
 	    }
 
-#ifdef NEW_ORDERS
 	    unit->Data.Train.Ticks-=SpeedTrain;
-#else
-	    unit->Command.Data.Train.Ticks-=SpeedTrain;
-#endif
 	    unit->Reset=1;
 	    unit->Wait=FRAMES_PER_SECOND/6;
 	    return;
 	}
 
-#ifdef NEW_ORDERS
 	nunit=MakeUnit(unit->Data.Train.What[0],player);
-#else
-	nunit=MakeUnit(unit->Command.Data.Train.What[0],player);
-#endif
 	nunit->X=unit->X;
 	nunit->Y=unit->Y;
 	type=unit->Type;
@@ -119,7 +102,6 @@ global void HandleActionTrain(Unit* unit)
 
 	unit->Reset=unit->Wait=1;
 
-#ifdef NEW_ORDERS
 	if ( --unit->Data.Train.Count ) {
 	    int z;
 	    for( z = 0; z < unit->Data.Train.Count ; z++ ) {
@@ -143,30 +125,6 @@ global void HandleActionTrain(Unit* unit)
 	    RefsDebugCheck( !nunit->Orders[0].Goal->Refs );
 	    nunit->Orders[0].Goal->Refs++;
 	}
-#else
-	if ( --unit->Command.Data.Train.Count ) {
-	    int z;
-	    for( z = 0; z < unit->Command.Data.Train.Count ; z++ ) {
-		unit->Command.Data.Train.What[z] =
-			unit->Command.Data.Train.What[z+1];
-	    }
-	    unit->Command.Data.Train.Ticks=0;
-	} else {
-	    unit->Command.Action=UnitActionStill;
-	    unit->SubAction=0;
-	}
-
-	nunit->Command=unit->PendCommand;
-	//
-	// FIXME: Pending command uses any references?
-	//
-	if( nunit->Command.Data.Move.Goal ) {
-	    if( nunit->Command.Data.Move.Goal->Destroyed ) {
-		DebugLevel0Fn("FIXME: you have found a bug, please fix it.\n");
-	    }
-	    nunit->Command.Data.Move.Goal->Refs++;
-	}
-#endif
 
 	if( IsSelected(unit) ) {
 	    UpdateButtonPanel();

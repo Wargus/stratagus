@@ -63,11 +63,7 @@ local int MoveToCoast(Unit* unit)
 	}
     )
 
-#ifdef NEW_ORDERS
-    unit->Orders[0].Action=UnitActionUnload;
-#else
-    unit->Command.Action=UnitActionUnload;
-#endif
+    DebugCheck( unit->Orders[0].Action!=UnitActionUnload );
     return 1;
 }
 
@@ -81,18 +77,10 @@ local void LeaveTransporter(Unit* unit)
     int i;
     Unit* goal;
 
-#ifdef NEW_ORDERS
     goal=unit->Orders[0].Goal;
-#else
-    goal=unit->Command.Data.Move.Goal;
-#endif
     DebugLevel3Fn("Goal %p\n",goal);
     if( goal ) {
-#ifdef NEW_ORDERS
 	unit->Orders[0].Goal=NoUnitP;
-#else
-	unit->Command.Data.Move.Goal=NoUnitP;
-#endif
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
 	    RefsDebugCheck( !goal->Refs );
@@ -132,11 +120,7 @@ local void LeaveTransporter(Unit* unit)
 	MustRedraw|=RedrawPanels;
     }
     unit->Wait=1;
-#ifdef NEW_ORDERS
     unit->Orders[0].Action=UnitActionStill;
-#else
-    unit->Command.Action=UnitActionStill;
-#endif
     unit->SubAction=0;
 }
 
@@ -157,26 +141,16 @@ global void HandleActionUnload(Unit* unit)
 	//	Move the transporter
 	//
 	case 0:
-#ifdef NEW_ORDERS
 	    NewResetPath(unit);
-#endif
 	    unit->SubAction=1;
 	    // FALL THROUGH
 	case 1:
-#ifdef NEW_ORDERS
 	    if( !unit->Orders[0].Goal ) {
-#else
-	    if( !unit->Command.Data.Move.Goal ) {
-#endif
 		// NOTE: the Move clears the goal!!
 		if( (i=MoveToCoast(unit)) ) {
 		    if( i==-1 ) {
 			if( ++unit->SubAction==1 ) {
-#ifdef NEW_ORDERS
 			    unit->Orders[0].Action=UnitActionStill;
-#else
-			    unit->Command.Action=UnitActionStill;
-#endif
 			    unit->SubAction=0;
 			}
 		    } else {
