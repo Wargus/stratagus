@@ -1460,6 +1460,31 @@ global int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
 	    || PointOnScreen(ex,sy) || PointOnScreen(ex,ey);
 }
 
+#ifdef SPLIT_SCREEN_SUPPORT
+
+global int MapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
+{
+    Viewport *view = &TheUI.VP[v];
+    return sx>=view->MapX && sy>=view->MapY &&
+		ex<view->MapX+view->MapWidth && ey<view->MapY+view->MapHeight;
+}
+
+local inline int PointInViewport (int v, int x, int y)
+{
+    Viewport *view = &TheUI.VP[v];
+    return view->MapX <= x && x < view->MapX+view->MapWidth &&
+		view->MapY <= y && y < view->MapY+view->MapHeight;
+}
+
+global int AnyMapAreaVisibleInViewport (int v, int sx, int sy, int ex, int ey)
+{
+    // FIXME: Can be faster written
+    return PointInViewport (v,sx,sy) || PointInViewport (v,sx,ey)
+	    || PointInViewport (v,ex,sy) || PointInViewport (v,ex,ey);
+}
+
+#endif /* SPLIT_SCREEN_SUPPORT */
+
 /**
 **	Mark overlapping area with screenmap be drawn for next display update.
 **
@@ -1567,6 +1592,103 @@ global void MarkDrawEntireMap(void)
 ** (in pixels)
 ** </PRE>
 */
+
+#ifdef SPLIT_SCREEN_SUPPORT
+
+global void DrawMapBackgroundInViewport (int v, int x, int y)
+{
+    int sx;
+    int sy;
+    int dx;
+    int ex;
+    int dy;
+    int ey;
+    const char* redraw_row;
+    const char* redraw_tile;
+#ifdef TIMEIT
+    u_int64_t sv=rdtsc();
+    u_int64_t ev;
+    static long mv=9999999;
+#endif
+#ifdef USE_SMART_TILECACHE
+    memset(TileCached,0,sizeof(TileCached));
+#endif
+
+    redraw_row=MustRedrawRow;		// flags must redraw or not
+    redraw_tile=MustRedrawTile;
+
+    ex=TheUI.VP[v].EndX;
+    sy=y*TheMap.Width;
+    dy=TheUI.VP[v].Y;
+    ey=TheUI.VP[v].EndY;
+
+    while( dy<ey ) {
+	if( *redraw_row++ ) {		// row must be redrawn
+	    sx=x+sy;
+	    dx=TheUI.VP[v].X;
+	    while( dx<ex ) {
+		//
+		//	draw only tiles which must be drawn
+		//
+		if( *redraw_tile++ ) {
+		    // FIXME: unexplored fields could be drawn faster
+		    MapDrawTile(TheMap.Fields[sx].SeenTile,dx,dy);
+
+		// StephanR: debug-mode denote tiles that are redrawn
+		#if NEW_MAPDRAW > 1
+		  VideoDrawRectangle( redraw_tile[-1] > 1
+				      ? ColorWhite
+				      : ColorRed,
+				      dx, dy, 32, 32 );
+		#endif
+		}
+		++sx;
+		dx+=TileSizeX;
+	    }
+	} else {
+	    redraw_tile += TheUI.VP[v].MapWidth;
+	}
+	sy+=TheMap.Width;
+	dy+=TileSizeY;
+    }
+
+#if defined(HIERARCHIC_PATHFINDER) && defined(GRID)
+    {
+    int xmax = x + (TheUI.VP[v].EndX-TheUI.VP[v].X)/TileSizeX;
+    int xmin = x;
+    int ymax = y + (TheUI.VP[v].EndY-TheUI.VP[v].Y)/TileSizeY;
+    int ymin = y;
+    int AreaWidth = AreaGetWidth ();
+    int AreaHeight = AreaGetHeight ();
+    for ( ; x <= xmax; x++)  {
+	if (x%AreaWidth == 0) {
+	    int	xx = TheUI.VP[v].X + TileSizeX * (x - xmin) - 1;
+	    VideoDrawLineClip (ColorRed, xx, TheUI.VP[v].Y, xx, TheUI.VP[v].EndY);
+	}
+    }
+    for ( ; y <= ymax; y++)  {
+	if (y%AreaHeight == 0) {
+	    int	yy = TheUI.VP[v].Y + TileSizeY * (y - ymin) - 1;
+	    VideoDrawLineClip (ColorRed, TheUI.VP[v].X, yy, TheUI.VP[v].EndX, yy);
+	}
+    }
+
+    }
+#endif
+
+#ifdef TIMEIT
+    ev=rdtsc();
+    sx=(ev-sv);
+    if( sx<mv ) {
+	mv=sx;
+    }
+
+    DebugLevel1("%ld %ld %3ld\n",(long)sx,mv,(sx*100)/mv);
+#endif
+}
+
+#endif /* SPLIT_SCREEN_SUPPORT */
+
 global void DrawMapBackground(int x,int y)
 {
     int sx;

@@ -378,6 +378,11 @@ extern int FlagRevealMap;
 
     /// Called when the color cycles
 extern void MapColorCycle(void);
+
+#ifdef SPLIT_SCREEN_SUPPORT
+    /// Draw the map background
+extern void DrawMapBackgroundInViewport (int ,int , int );
+#endif /* SPLIT_SCREEN_SUPPORT */
     /// Draw the map background
 extern void DrawMapBackground(int x,int y);
     /// Build tables for map
@@ -389,6 +394,10 @@ extern int MarkDrawPosMap( int x, int y );
 extern int MapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
     /// Check if any part of an area is visible
 extern int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
+#ifdef SPLIT_SCREEN_SUPPORT
+extern int MapAreaVisibleInViewport (int , int , int , int , int );
+extern int AnyMapAreaVisibleInViewport (int , int , int , int , int );
+#endif /* SPLIT_SCREEN_SUPPORT */
     /// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
 extern  int MarkDrawAreaMap( int sx, int sy, int ex, int ey );
     /// Set all entries in MustRedrawRow and MustRedrawTile
@@ -415,7 +424,12 @@ extern void UpdateFogOfWarChange(void);
     /// Update visible areas for fog of war
 extern void MapUpdateVisible(void);
     /// Draw the map fog of war
+
+#ifdef SPLIT_SCREEN_SUPPORT
+extern void DrawMapFogOfWar (int , int , int );
+#else /* SPLIT_SCREEN_SUPPORT */
 extern void DrawMapFogOfWar(int x,int y);
+#endif /* SPLIT_SCREEN_SUPPORT */
     /// Build tables for fog of war
 extern void InitMapFogOfWar(void);
     /// Cleanup memory for fog of war tables
@@ -495,6 +509,11 @@ extern void RevealMap(void);
 extern void MapCenter(int x,int y);
     /// Set the current map view to x,y (upper,left corner)
 extern void MapSetViewpoint(int x,int y);
+
+#ifdef SPLIT_SCREEN_SUPPORT
+extern void MapViewportSetViewpoint (int , int , int );
+extern void MapCenterViewport (int , int , int );
+#endif /* SPLIT_SCREEN_SUPPORT */
 
     /// Returns true, if the tile field is empty
 extern int IsMapFieldEmpty(int x,int y);

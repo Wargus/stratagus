@@ -430,8 +430,14 @@ extern Missile* MakeLocalMissile(MissileType*,int,int,int,int);
 extern void FireMissile(Unit*);
     /// check if missile should be drawn
 extern int CheckMissileToBeDrawn(const Missile* missile);
+
+#ifdef SPLIT_SCREEN_SUPPORT
+extern void DrawMissiles (int );
+#else /* SPLIT_SCREEN_SUPPORT */
     /// draw all missiles
 extern void DrawMissiles(void);
+#endif /* SPLIT_SCREEN_SUPPORT */
+
     /// handle all missiles
 extern void MissileActions(void);
     /// distance from view point to missile

@@ -1658,8 +1658,14 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 **	@param x	Map viewpoint x position.
 **	@param y	Map viewpoint y position.
 */
+#ifdef SPLIT_SCREEN_SUPPORT
+global void DrawMapFogOfWar (int v, int x,int y)
+{
+    Viewport *vp = &TheUI.VP[v];
+#else /* SPLIT_SCREEN_SUPPORT */
 global void DrawMapFogOfWar(int x,int y)
 {
+#endif /* SPLIT_SCREEN_SUPPORT */
     int sx;
     int sy;
     int dx;
@@ -1684,10 +1690,17 @@ global void DrawMapFogOfWar(int x,int y)
     p=ThisPlayer->Player;
 #endif
 
+#ifdef SPLIT_SCREEN_SUPPORT
+    ex = vp->EndX;
+    sy = y*TheMap.Width;
+    dy = vp->Y;
+    ey = vp->EndY;
+#else /* SPLIT_SCREEN_SUPPORT */
     ex=TheUI.MapEndX;
     sy=y*TheMap.Width;
     dy=TheUI.MapY;
     ey=TheUI.MapEndY;
+#endif /* SPLIT_SCREEN_SUPPORT */
 
     while( dy<ey ) {
 	if( *redraw_row ) {		// row must be redrawn
@@ -1697,7 +1710,11 @@ global void DrawMapFogOfWar(int x,int y)
 	    *redraw_row=0;
 #endif
 	    sx=x+sy;
+#ifdef SPLIT_SCREEN_SUPPORT
+	    dx = vp->X;
+#else /* SPLIT_SCREEN_SUPPORT */
 	    dx=TheUI.MapX;
+#endif /* SPLIT_SCREEN_SUPPORT */
 	    while( dx<ex ) {
 		if( *redraw_tile ) {
 #if NEW_MAPDRAW > 1
@@ -1730,8 +1747,13 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 			if (PfHierShowRegIds || PfHierShowGroupIds) {
 			    regid =
 				MapFieldGetRegId (
+#ifdef SPLIT_SCREEN_SUPPORT
+					    (dx-vp->X)/TileSizeX + vp->MapX,
+					    (dy-vp->Y)/TileSizeY + vp->MapY);
+#else /* SPLIT_SCREEN_SUPPORT */
 					    (dx-TheUI.MapX)/TileSizeX + MapX,
 					    (dy-TheUI.MapY)/TileSizeY + MapY);
+#endif /* SPLIT_SCREEN_SUPPORT */
 			    if (regid) {
 				Region *r = RegionSetFind (regid);
 				if (PfHierShowRegIds) {

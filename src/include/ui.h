@@ -67,6 +67,41 @@ struct _button_ {
     int	    Height;			/// height of the button on the screen
 };
 
+#ifdef SPLIT_SCREEN_SUPPORT
+
+#define MAX_NUM_VIEWPORTS 4
+
+typedef struct _viewport_ Viewport;
+
+struct _viewport_ {
+    /* upper left corner of this viewport is located at pixel coordinates
+     * (X, Y) with respect to upper left corner of freecraft's window,
+     * similarly lower right corner of this viewport is (EndX, EndY)
+     * pixels away from the UL corner of freecraft's window. */
+    int X;
+    int Y;
+    unsigned EndX;
+    unsigned EndY;
+
+    /* tile coordinates of UL corner of this viewport with respect to UL
+     * corner of the whole map. */
+    unsigned MapX;
+    unsigned MapY;
+    unsigned MapWidth;
+    unsigned MapHeight;
+};
+
+typedef enum {
+    VIEWPORT_SINGLE,
+    VIEWPORT_SPLIT_HORIZ,
+    VIEWPORT_SPLIT_HORIZ3,
+    VIEWPORT_SPLIT_VERT,
+    VIEWPORT_QUAD,
+    NUM_VIEWPORT_MODES
+} ViewportMode;
+
+#endif /* SPLIT_SCREEN_SUPPORT */
+
 /**
 **	Defines the user interface.
 */
@@ -159,6 +194,17 @@ typedef struct _ui_ {
 	/// map height for current mode (MapY+14*32-1 for 640x480)
     unsigned	MapEndY;
 
+#ifdef SPLIT_SCREEN_SUPPORT
+    ViewportMode	ViewportMode;
+    int 	ActiveViewport;		/// contains (or last contained) pointer
+					/// (index into VP[])
+    int		LastClickedVP;
+    int		NumViewports;		/// viewports currently used
+    Viewport	VP[MAX_NUM_VIEWPORTS];
+    /* Map* attributes of Viewport are unused here */
+    Viewport	MapArea;		/// geometry of the whole map area
+#endif /* SPLIT_SCREEN_SUPPORT */
+
     // The menu button
     GraphicConfig MenuButton;		/// menu button background
     int		MenuButtonX;		/// menu button screen X position
@@ -242,6 +288,14 @@ extern void UIHandleMouseMove(int x,int y);
 extern void UIHandleButtonDown(unsigned button);
     /// Called if any mouse button is released up
 extern void UIHandleButtonUp(unsigned button);
+
+#ifdef SPLIT_SCREEN_SUPPORT
+
+extern int GetViewport (int , int );
+extern void CycleViewportMode (int );
+extern void SetViewportMode (void);
+
+#endif /* SPLIT_SCREEN_SUPPORT */
 
 //@}
 
