@@ -10,7 +10,7 @@
 ##	
 ##	Rules.make	-	Make RULES (GNU MAKE).
 ##
-##	(c) Copyright 1998-2000 by Lutz Sammer
+##	(c) Copyright 1998-2001 by Lutz Sammer
 ##
 ##	$Id$
 ##
@@ -202,7 +202,7 @@ EXE=
 ## include flags
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## define flags
-DEBUG=	-DDEBUG #-DNEW_AI # -DFLAG_DEBUG
+DEBUG=	-DDEBUG #-DNEW_AI # -DREFS_DEBUG -DFLAG_DEBUG
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
 	$(DEBUG) -DUNIT_ON_MAP # -DNEW_NAMES -DNEW_FOW
 
