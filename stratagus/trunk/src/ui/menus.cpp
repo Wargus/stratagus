@@ -107,6 +107,8 @@ local void TipsMenuEnd(void);
 local void SetTips(Menuitem *mi);
 local void ShowNextTip(void);
 
+local void InitGameMenu(Menuitem *mi);
+
 local void SetMasterPower(Menuitem *mi);
 local void SetMusicPower(Menuitem *mi);
 local void SetCdPower(Menuitem *mi);
@@ -303,7 +305,7 @@ local Graphic* Menusbgnd;
 **	@todo FIXME: Configure with CCL.
 */
 local Menuitem GameMenuItems[] = {
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, InitGameMenu, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
@@ -1479,8 +1481,8 @@ local unsigned char *keystrokehelptexts[] = {
     "F8     - speed options",
     "F9     - preferences",
     "F10    - game menu",
-    "F11    - save game (NOT WORKING)",
-    "F12    - load game (NOT WORKING)",
+    "F11    - save game",
+    "F12    - load game",
 };
 
 local void InitKeystrokeHelpMenuItems() {
@@ -2555,7 +2557,7 @@ local void SaveLBInit(Menuitem *mi)
 
     SaveLBExit(mi);
     
-    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, NULL,
+    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, SaveRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i != 0) {
 	if (i > 7) {
@@ -2755,28 +2757,11 @@ local void SaveOk(void)
 
 local int SaveRDFilter(char *pathbuf, FileList *fl)
 {
-    MapInfo *info;
-    char *suf, *cp, *lcp, *np;
+    char *suf, *cp, *fsuffix, *np;
     int p, sz;
     static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
-#ifdef USE_ZZIPLIB
-    ZZIP_FILE *zzf;
-#endif
-
-#if 0
-    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
-	suf = NULL;
-	p = -1;
-    } else
-#endif
-    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
-	suf = ".cm";
-	p = 0;
-    } else {
-	suf = ".pud";
-	p = 1;
-    }
     np = strrchr(pathbuf, '/');
+
     if (np) {
 	np++;
     } else {
@@ -2785,33 +2770,15 @@ local int SaveRDFilter(char *pathbuf, FileList *fl)
     cp = np;
     cp--;
     fl->type = -1;
-#ifdef USE_ZZIPLIB
-    if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
-	sz = zzip_file_real(zzf);
-	zzip_close(zzf);
-	if (!sz) {
-	    goto usezzf;
-	}
-    }
-#endif
+
+    suf = ".sav";
+
     do {
-	lcp = cp++;
+	fsuffix = cp++;
 	cp = strcasestr(cp, suf);
-#if 0
-	if( suf ) {
-	} else if( !suf && (cp = strcasestr(cp, ".cm")) ) {
-	    suf = ".cm";
-	    p = 0;
-	} else if( !suf && (cp = strcasestr(cp, ".pud")) ) {
-	    suf = ".pud";
-	    p = 1;
-	} else {
-	    cp=NULL;
-	}
-#endif
     } while (cp != NULL);
-    if (lcp >= np) {
-	cp = lcp + strlen(suf);
+    if (fsuffix >= np) {
+	cp = fsuffix + strlen(suf);
 #ifdef USE_ZLIB
 	if (strcmp(cp, ".gz") == 0) {
 	    *cp = 0;
@@ -2822,47 +2789,13 @@ local int SaveRDFilter(char *pathbuf, FileList *fl)
 	    *cp = 0;
 	}
 #endif
-	if (*cp == 0) {
-#ifdef USE_ZZIPLIB
-usezzf:
-#endif
-#if 0
-	    if( p==-1 ) {
-		printf("What now ?\n");
-		if (strcasestr(pathbuf, ".pud")) {
-		    p=1;
-		} else {
-		    p=0;
-		}
-	    }
-#endif
-	    if (p) {
-		if (strcasestr(pathbuf, ".pud")) {
-		    info = GetPudInfo(pathbuf);
-		    if (info) {
-			DebugLevel3Fn("GetPudInfo(%s) : %p\n" _C_ pathbuf _C_ info);
-			sz = szl[ScenSelectMenuItems[8].d.pulldown.curopt];
-			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
-			    fl->type = 1;
-			    fl->name = strdup(np);
-			    fl->xdata = info;
-			    return 1;
-			} else {
-			    FreeMapInfo(info);
-			}
-		    }
-		}
-	    } else {
-		if (strstr(pathbuf, ".cm")) {
-		    // info = GetCmInfo(pathbuf);
-		    info = NULL;
-		    DebugLevel3Fn("GetCmInfo(%s) : %p\n" _C_ pathbuf _C_ info);
+
+		if (strstr(pathbuf, ".sav")) {
+		    *fsuffix = 0;
 		    fl->type = 1;
 		    fl->name = strdup(np);
-		    fl->xdata = info;
+		    fl->xdata = NULL;
 		    return 1;
-		}
-	    }
 	}
     }
     return 0;
@@ -3166,6 +3099,10 @@ global void GameMenuLoad(void)
     if( GameLoaded ) {
 	GameMenuReturn();
     }
+}
+
+local void InitGameMenu(Menuitem *mi)
+{
 }
 
 global void SoundOptions(void)
