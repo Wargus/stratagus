@@ -2,6 +2,7 @@ Change log for Invasion - Battle of Survival
 --------------------------------------------
 
 CVS version:
+- Added tree unit (TimberDragon, François Beerten)
 - Playlist created dynamically with music files found in 
   the music subdirectory. (François Beerten)
 - Added radar unit. (François Beerten)

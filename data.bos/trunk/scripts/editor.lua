@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: editor.lua,v 1.8 2004/12/12 14:53:11 feb Exp $
+--	$Id$
 
 
 --	Set which icons to display
@@ -62,6 +62,7 @@ DefineEditorUnitTypes(
    "unit-radar",
 
    "unit-gold-mine",
+   "unit-tree",
    "unit-crystal-field1",
    "unit-crystal-field2",
    "unit-crystal-field3",
