@@ -130,8 +130,8 @@ local void FLAC_metadata_callback(
 **	Write callback from FLAC stream decoder.
 **
 **	@param stream	Decoder stream.
+**	@param frame	Frame to decode.
 **	@param buffer	Buffer to be filled.
-**	@param bytes	Number of bytes to be filled.
 **	@param user	User data.
 **
 **	@return		Error status.

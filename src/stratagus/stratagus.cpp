@@ -84,14 +84,16 @@
 **		background music support, voices and sound effects.
 **		Following low level backends are supported: OSS and SDL.
 **
-**		@todo ogg and mp3 file format support for background music
-**		@todo flac and adpcm file format support for sound effects
+**		@todo adpcm file format support for sound effects
 **		@todo better separation of low and high level, assembler mixing
 **			support.
+**		@todo Streaming support of ogg/mp3 files.
 **
 **		@see sound.h @see sound.c
 **		@see ccl_sound.c @see sound_id.c @see sound_server.c
 **		@see unitsound.c
+**		@see oss_audio.c @see sdl_audio.c
+**		@see mad.c @see ogg.c @see flac.c @see wav.c
 **
 **	@subsection Video Video
 **
