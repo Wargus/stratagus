@@ -430,16 +430,16 @@ void NetworkServerStartGame(void)
 
 	// Randomize the position.
 	// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
-    // Players slots are then mapped to players numbers(and colors).
-    
+	// Players slots are then mapped to players numbers(and colors).
+
 	j = h;
-   if (NoRandomPlacementMultiplayer == 1) {
-        for (i = 0; i < PlayerMax; ++i) {
-            if (MenuMapInfo->PlayerType[i] != PlayerComputer) {
-                org[i] = Hosts[i].PlyNr;
-            }
-        }
-   } else { 
+	if (NoRandomPlacementMultiplayer == 1) {
+		for (i = 0; i < PlayerMax; ++i) {
+			if (MenuMapInfo->PlayerType[i] != PlayerComputer) {
+				org[i] = Hosts[i].PlyNr;
+			}
+		}
+	} else { 
 	    for (i = 0; i < NetPlayers; ++i) {
 		    if (j > 0) {
 			    int k;
@@ -474,7 +474,7 @@ void NetworkServerStartGame(void)
 #endif
 		    }
 	    }
-    }
+	}
 
 	// Complete all setup states for the assigned slots.
 	for (i = 0; i < PlayerMax; ++i) {
