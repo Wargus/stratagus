@@ -31,7 +31,7 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
- // -1 is hack should be fixed later
+ // FIXME: -1 is hack should be fixed later
 #define FIRST_ROCK_TILE  (TheMap.Tileset->FirstRockTile-1)
 
 /*----------------------------------------------------------------------------
@@ -47,50 +47,71 @@ local const int RockTable[16] = {
 --	Functions
 ----------------------------------------------------------------------------*/
 
-local int RockChk(int x,int y) // used by FixRock and PreprocessMap
+/**
+**	Check if the tile type is rock.
+**
+** 	Used by @see FixRock and @see PreprocessMap
+*/
+local int MapRockChk(int x,int y)
 {
-  if( !INMAP(x,y) ) return 1; // outside considered rock
-  return (TILETYPE(MAPSEENTILE(x,y)) == TileTypeRock);
+    if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	return 1;		// outside considered rock
+    }
+
+    return TheMap.Tileset->TileTypeTable[
+	    TheMap.Fields[(x)+(y)*TheMap.Width].SeenTile
+	] == TileTypeRock;
 }
 
+// FIXME: docu
 local int FixRock(int x,int y) // used by MapRemoveRock and PreprocessMap
 {
-  int tile = 0;
+    int tile;
+    MapField* mf;
 
-  if ( !INMAP(x,y) ) return 0;
-  if ( RockChk(x,y) == 0 ) return 0;
-
-  #define ROCK(xx,yy) (RockChk(xx,yy) != 0)
-  if (ROCK(x  ,y-1)) tile |= 1<<0;
-  if (ROCK(x+1,y  )) tile |= 1<<1;
-  if (ROCK(x  ,y+1)) tile |= 1<<2;
-  if (ROCK(x-1,y  )) tile |= 1<<3;
-
-  tile = RockTable[tile];
-  if (tile == -1)
-    MapRemoveRock(x,y);
-  else
-    {
-    if (tile == RockTable[15])
-      {
-      // Vladi: still to filter tiles w. corner empties -- note: the original
-      // tiles and order are not perfect either. It's a hack but is enough and
-      // looks almost fine.
-      if (RockChk(x+1,y-1) == 0) tile =  7; else
-      if (RockChk(x+1,y+1) == 0) tile = 10; else
-      if (RockChk(x-1,y+1) == 0) tile = 11; else
-      if (RockChk(x-1,y-1) == 0) tile =  4; else
-                                 tile = RockTable[15]; // not required really
-      }
-
-    tile += FIRST_ROCK_TILE;
-    if (MAPFIELD(x,y).SeenTile == tile) return 0;
-    MAPFIELD(x,y).SeenTile =  tile;
+    //	Outside map or no rock.
+    if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	return 0;
     }
-  UpdateMinimapXY(x,y);
-  return 1;
+    if ( !MapRockChk(x,y) ) {
+	return 0;
+    }
+
+#define ROCK(xx,yy) (MapRockChk(xx,yy) != 0)
+    tile = 0;
+    if (ROCK(x  ,y-1)) tile |= 1<<0;
+    if (ROCK(x+1,y  )) tile |= 1<<1;
+    if (ROCK(x  ,y+1)) tile |= 1<<2;
+    if (ROCK(x-1,y  )) tile |= 1<<3;
+
+    tile = RockTable[tile];
+    if (tile == -1) {
+	MapRemoveRock(x,y);
+    } else {
+	if (tile == RockTable[15]) {
+    // Vladi: still to filter tiles w. corner empties -- note: the original
+    // tiles and order are not perfect either. It's a hack but is enough and
+    // looks almost fine.
+	    if (MapRockChk(x+1,y-1) == 0) tile =  7; else
+	    if (MapRockChk(x+1,y+1) == 0) tile = 10; else
+	    if (MapRockChk(x-1,y+1) == 0) tile = 11; else
+	    if (MapRockChk(x-1,y-1) == 0) tile =  4; else
+				tile = RockTable[15]; // not required really
+	}
+
+	tile += FIRST_ROCK_TILE;
+	mf=TheMap.Fields+x+y*TheMap.Width;
+
+	if ( mf->SeenTile == tile) {
+	    return 0;
+	}
+	mf->SeenTile =  tile;
+    }
+    UpdateMinimapXY(x,y);
+    return 1;
 }
 
+// FIXME: docu
 global void MapFixRock(int x,int y)
 {
     // side neighbors
@@ -115,8 +136,12 @@ global void MapRemoveRock(unsigned x,unsigned y)
     mf->Tile=TheMap.Tileset->NoRockTile;
     mf->Flags &= ~(MapFieldRocks|MapFieldUnpassable);
 
-    UpdateMinimapXY(x,y);
-    MustRedraw|=RedrawMaps;
+    UpdateMinimapXY(x,y);		// FIXME: should be done if visible?
+
+    // Must redraw map only if field is visibile
+    if( mf->Flags&MapFieldVisible ) {
+	MustRedraw|=RedrawMaps;
+    }
 }
 
 //@}

@@ -67,22 +67,30 @@ local int WallTable[16] = {
 
 global int MapWallChk(int x,int y,int walltype) // used by FixWall, walltype==-1 for auto
 {
-  if( !INMAP(x,y) ) return 1; // outside considered wall
-  // return !!(MAPFIELD(x,y).Flags & MapFieldForest);
-  if (walltype == -1)
-    return (TILETYPE(MAPSEENTILE(x,y)) == TileTypeHWall ||
-            TILETYPE(MAPSEENTILE(x,y)) == TileTypeOWall );
-  else
-    return (TILETYPE(MAPSEENTILE(x,y)) == walltype);
+    int t;
+
+    if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	return 1;	// Outside considered wall
+    }
+    t=TheMap.Tileset->TileTypeTable[
+	    TheMap.Fields[(x)+(y)*TheMap.Width].SeenTile];
+    if (walltype == -1) {
+	return t == TileTypeHWall || t == TileTypeOWall ;
+    }
+    return t == walltype;
 }
 
 global int FixWall(int x,int y) // used by MapRemoveWall and PreprocessMap
 {
   int tile;
   int walltype;
+  MapField* mf;
 
-  if ( !INMAP(x,y) ) return 0;
-  walltype = TILETYPE(MAPSEENTILE(x,y));
+  if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+      return 0;
+  }
+  mf=TheMap.Fields+(x)+(y)*TheMap.Width;
+  walltype = TheMap.Tileset->TileTypeTable[mf->SeenTile];
   if ( walltype != TileTypeHWall && walltype != TileTypeOWall ) return 0;
 
   #define WALL(xx,yy) (MapWallChk(xx,yy,walltype) != 0)
@@ -96,23 +104,23 @@ global int FixWall(int x,int y) // used by MapRemoveWall and PreprocessMap
 
   if (walltype == TileTypeHWall)
      {
-     if (MAPFIELD(x,y).Value < WALL_50HP)
+     if (mf->Value < WALL_50HP)
         tile += TheMap.Tileset->HumanWall50Tile;
       else
         tile += TheMap.Tileset->HumanWall100Tile;
      }
    else
      {
-     if (MAPFIELD(x,y).Value < WALL_50HP)
+     if (mf->Value < WALL_50HP)
         tile += TheMap.Tileset->OrcWall50Tile;
       else
         tile += TheMap.Tileset->OrcWall100Tile;
      }
 
 // FIXME: Johns, Is this correct? Could this function be called under fog of war
-    if (MAPFIELD(x,y).SeenTile == tile)
+    if (mf->SeenTile == tile)
 	return 0;
-    MAPFIELD(x,y).SeenTile =  tile;
+    mf->SeenTile = tile;
 
     UpdateMinimapXY(x,y);
     return 1;

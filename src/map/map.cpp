@@ -143,54 +143,63 @@ global void SaveMap(FILE* file)
 }
 
 /*----------------------------------------------------------------------------
---
+--	Visibile and explored handling
 ----------------------------------------------------------------------------*/
 
 /**
 **      Marks seen tile -- used mainly for the Fog Of War
+**
+**	@param x	Map X position.
+**	@param y	Map Y position.
 */
 global void MapMarkSeenTile( int x, int y )
 {
-  int t, st; // tile, seentile
+    int t, st; // tile, seentile
+    MapField* mf;
 
-  if (MAPFIELD(x,y).SeenTile == MAPFIELD(x,y).Tile) return;
-
-  t  = MAPFIELD(x,y).Tile;
-  st = MAPFIELD(x,y).SeenTile;
-  MAPFIELD(x,y).SeenTile = MAPFIELD(x,y).Tile;
-
-  if( !TheMap.Tileset ) return;	// FIXME: this is needed, because tileset
-				// is loaded after this function is needed
-				// LoadPud, PlaceUnit, ... MapMarkSeenTile
-
-  // handle WOODs
-
-  if ( st != TheMap.Tileset->NoWoodTile && t == TheMap.Tileset->NoWoodTile )
-    MapFixWood( x, y );
-  else
-  if ( st == TheMap.Tileset->NoWoodTile && t != TheMap.Tileset->NoWoodTile )
-    FixWood( x, y );
-  else
-  if ( MapWoodChk( x, y ) && t != st )
-    {
-    FixWood( x, y );
-    MapFixWood( x, y );
+    mf=TheMap.Fields+x+y*TheMap.Width;
+    t  = mf->Tile;
+    st = mf->SeenTile;
+    if ( st == t ) {			// Nothing changed.
+	return;
     }
 
-  // handle WALLs
-#define ISTILEWALL(t) (TILETYPE(t) == TileTypeHWall || TILETYPE(t) == TileTypeOWall)
-  if ( ISTILEWALL(st) && !ISTILEWALL(st) )
-    MapFixWall( x, y );
-  else
-  if ( !ISTILEWALL(st) && ISTILEWALL(st) )
-    FixWall( x, y );
-  else
-  if ( MapWallChk( x, y, -1 ) && t != st )
-    {
-    FixWall( x, y );
-    MapFixWall( x, y );
+    mf->SeenTile=t;
+
+    // FIXME: this is needed, because tileset is loaded after this function
+    //		is needed LoadPud, PlaceUnit, ... MapMarkSeenTile
+    if( !TheMap.Tileset ) {
+	return;
     }
-};
+
+    // handle WOODs
+
+    if ( st != TheMap.Tileset->NoWoodTile
+	    && t == TheMap.Tileset->NoWoodTile ) {
+	MapFixWood( x, y );
+    } else if ( st == TheMap.Tileset->NoWoodTile
+	    && t != TheMap.Tileset->NoWoodTile ) {
+	FixWood( x, y );
+    } else if ( MapWoodChk( x, y ) ) {
+	FixWood( x, y );
+	MapFixWood( x, y );
+    }
+
+    // handle WALLs
+
+#define ISTILEWALL(tile) \
+    (TheMap.Tileset->TileTypeTable[(tile)] == TileTypeHWall	\
+	|| TheMap.Tileset->TileTypeTable[(tile)] == TileTypeOWall)
+
+    if ( ISTILEWALL(st) && !ISTILEWALL(st) )
+	MapFixWall( x, y );
+    else if ( !ISTILEWALL(st) && ISTILEWALL(st) )
+	FixWall( x, y );
+    else if ( MapWallChk( x, y, -1 ) ) {
+	FixWall( x, y );
+	MapFixWall( x, y );
+    }
+}
 
 /**
 **	Reveal the entire map.
@@ -201,10 +210,9 @@ global void RevealMap(void)
 
     for ( ix = 0; ix < TheMap.Width; ix++ ) {
 	for ( iy = 0; iy < TheMap.Height; iy++ ) {
-	    MAPFIELD(ix,iy).Flags |= MapFieldExplored;
-	    if (TheMap.NoFogOfWar) {
-		MAPFIELD(ix,iy).Flags |= MapFieldVisible;
-	    }
+	    TheMap.Fields[ix+iy*TheMap.Width].Flags
+		    |= MapFieldExplored
+			| TheMap.NoFogOfWar ? MapFieldVisible : 0;
 	    MapMarkSeenTile(ix,iy);
 	}
     }
@@ -255,6 +263,7 @@ global void MapCenter(int x,int y)
 **
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
+**
 **	@return		True if water, false otherwise.
 */
 global int WaterOnMap(int tx,int ty)
@@ -314,6 +323,11 @@ global int OrcWallOnMap(int tx,int ty)
 
 /**
 **	Forest on map tile. Checking version.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**
+**	@return		True if forest, false otherwise.
 */
 global int CheckedForestOnMap(int tx,int ty)
 {
@@ -325,6 +339,11 @@ global int CheckedForestOnMap(int tx,int ty)
 
 /**
 **	Forest on map tile.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**
+**	@return		True if forest, false otherwise.
 */
 global int ForestOnMap(int tx,int ty)
 {
@@ -342,6 +361,12 @@ global int ForestOnMap(int tx,int ty)
 
 /**
 **	Can move to this point, applying mask.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**	@param mask	Mask for movement to apply.
+**
+**	@return		True if could be entered, false otherwise.
 */
 global int CheckedCanMoveToMask(int x,int y,int mask)
 {
@@ -355,6 +380,12 @@ global int CheckedCanMoveToMask(int x,int y,int mask)
 #ifndef CanMoveToMask
 /**
 **	Can move to this point, applying mask.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**	@param mask	Mask for movement to apply.
+**
+**	@return		True if could be entered, false otherwise.
 */
 global int CanMoveToMask(int x,int y,int mask)
 {
@@ -376,6 +407,7 @@ global int CanMoveToMask(int x,int y,int mask)
 **	This flags are used to mark the field for this unit.
 **
 **	@param unit	Pointer to unit.
+**
 **	@return		Field flags to be set.
 */
 global unsigned UnitFieldFlags(const Unit* unit)
@@ -418,7 +450,7 @@ global int TypeMovementMask(const UnitType* type)
 	case UnitTypeFly:		// in air
 	    return MapFieldAirUnit;	// already occuppied
 	case UnitTypeNaval:		// on water
-	    if( type->Transporter ) {	
+	    if( type->Transporter ) {
 		return MapFieldLandUnit
 		    | MapFieldSeaUnit
 		    | MapFieldBuilding	// already occuppied
@@ -448,35 +480,76 @@ global int UnitMovementMask(const Unit* unit)
     return TypeMovementMask(unit->Type);
 }
 
-/*----------------------------------------------------------------------------
-*/
-
 /**
 **	Fixes initially the wood and seen tiles.
 */
 global void PreprocessMap(void)
 {
-  unsigned ix, iy;
+    unsigned ix, iy;
+    MapField* mf;
 
-    for ( ix = 0; ix < TheMap.Width; ix++ )
-      for ( iy = 0; iy < TheMap.Height; iy++ )
-        {
-        MAPFIELD( ix, iy ).SeenTile = MAPFIELD( ix, iy ).Tile;
-        }
+    for ( ix = 0; ix < TheMap.Width; ix++ ) {
+	for ( iy = 0; iy < TheMap.Height; iy++ ) {
+	    mf=TheMap.Fields+ix+iy*TheMap.Width;
+	    mf->SeenTile=mf->Tile;
+	}
+    }
 
     // it is required for fixing the wood that all tiles are marked as seen!
-    for ( ix = 0; ix < TheMap.Width; ix++ )
-      for ( iy = 0; iy < TheMap.Height; iy++ )
-        {
-        FixWood( ix, iy );
-        FixWall( ix, iy );
-        }
-};
+    for ( ix = 0; ix < TheMap.Width; ix++ ) {
+	for ( iy = 0; iy < TheMap.Height; iy++ ) {
+	    FixWood( ix, iy );
+	    FixWall( ix, iy );
+	}
+    }
+}
 
+/**
+**	Convert a screen coordinate to map tile.
+**
+**	@param x	X screen coordinate.
+**
+**	@returns	X tile number.
+*/
+global int Screen2MapX(int x)
+{
+    return (((x)-TheUI.MapX)/TileSizeX+MapX);
+}
 
-global int Screen2MapX(int x) { return (((x)-TheUI.MapX)/TileSizeX+MapX); }
-global int Screen2MapY(int x) { return (((x)-TheUI.MapY)/TileSizeY+MapY); }
-global int Map2ScreenX(int x) { return (TheUI.MapX+((x)-MapX)*TileSizeX); }
-global int Map2ScreenY(int x) { return (TheUI.MapY+((x)-MapY)*TileSizeY); }
+/**
+**	Convert a screen coordinate to map tile.
+**
+**	@param y	Y screen coordinate.
+**
+**	@returns	Y tile number.
+*/
+global int Screen2MapY(int y)
+{
+    return (((y)-TheUI.MapY)/TileSizeY+MapY);
+}
+
+/**
+**	Convert a map tile into screen coordinate.
+**
+**	@param x	X tile number.
+**
+**	@returns	X screen coordinate.
+*/
+global int Map2ScreenX(int x)
+{
+    return (TheUI.MapX+((x)-MapX)*TileSizeX);
+}
+
+/**
+**	Convert a map tile into screen coordinate.
+**
+**	@param y	Y tile number.
+**
+**	@returns	Y screen coordinate.
+*/
+global int Map2ScreenY(int y)
+{
+    return (TheUI.MapY+((y)-MapY)*TileSizeY);
+}
 
 //@}

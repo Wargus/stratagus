@@ -191,7 +191,7 @@ global void MapUpdateVisible(void)
     if (TheMap.NoFogOfWar) {
 	for( x=0; x<TheMap.Width; ++x ) {
 	    for( y=0; y<TheMap.Height; y++ ) {
-		if ( MAPVISIBLE(x,y) ) {
+		if ( IsMapFieldVisible(x,y) ) {
 		    MapMarkSeenTile( x,y );
 		}
 	    }

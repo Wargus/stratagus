@@ -522,11 +522,11 @@ local void DrawBuilding(Unit* unit)
     // FIXME: johns: under the fog are shown partly.
 
     // FIXME: There is already a check in the main loop UnitVisibile!
-    if ( !MAPEXPLORED( x, y ) ) {
+    if ( !IsMapFieldExplored( x, y ) ) {
 	return;
     }
 
-    if ( !TheMap.NoFogOfWar && !MAPVISIBLE( x, y ) ) {
+    if ( !TheMap.NoFogOfWar && !IsMapFieldVisible( x, y ) ) {
 	frame = unit->SeenFrame;
 	if (frame == 255) {
 	    return;
@@ -534,12 +534,6 @@ local void DrawBuilding(Unit* unit)
     } else {
 	frame = unit->SeenFrame = unit->Frame;
     }
-
-#if 0
-    if( type->Type==UnitOilPlatformHuman || type->Type==UnitOilPlatformOrc ) {
-	DebugLevel0("%d -> %d\n",unit->Frame,frame);
-    }
-#endif
 
     n_frame = 0;
     if ((frame & 128) == 0 && unit->Rs > 50) {
@@ -579,7 +573,7 @@ local void DrawBuilding(Unit* unit)
 	DrawUnitType(type,frame+n_frame,x,y);
     }
 
-    // FIXME: johns: ugly check here should be removed! vanish could be used
+    // FIXME: johns: ugly check here should be removed! vanish could be used?
     if( unit->Command.Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
 	DrawSelectionRectangle(unit,type,x,y);
