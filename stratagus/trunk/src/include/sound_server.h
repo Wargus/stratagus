@@ -266,7 +266,7 @@ extern int ConvertToStereo32(const char* in, char* out, int frequency,
     int bitrate, int channels, int bytes);
 
     ///	Register a sound (can be a simple sound or a group)
-extern SoundId RegisterSound(char* file[],unsigned number);
+extern SoundId RegisterSound(const char* file[],unsigned number);
 
     /**
     **	Ask the sound server to put together two sounds to form a special sound.
