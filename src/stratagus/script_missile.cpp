@@ -10,7 +10,7 @@
 //
 /**@name ccl_missile.c	-	The missile-type ccl functions. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//	(c) Copyright 2002-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -255,6 +255,14 @@ local SCM CclMissile(SCM list)
 	    missile->SourceUnit = UnitSlots[strtol (str+1, 0, 16)];
 	    free(str);
 	    ++missile->SourceUnit->Refs;
+	} else if (gh_eq_p (value, gh_symbol2scm ("target"))) {
+	    DebugCheck (!missile);
+	    value = gh_car (list);
+	    list = gh_cdr (list);
+	    str = gh_scm2newstr (value, NULL);
+	    missile->TargetUnit = UnitSlots[strtol (str+1, 0, 16)];
+	    free(str);
+	    ++missile->TargetUnit->Refs;
 	} else if (gh_eq_p (value, gh_symbol2scm ("damage"))) {
 	    DebugCheck (!missile);
 	    missile->Damage = gh_scm2int (gh_car (list));
