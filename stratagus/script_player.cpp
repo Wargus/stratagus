@@ -265,7 +265,9 @@ local SCM CclPlayer(SCM list)
 		sublist = gh_cdr(sublist);
 		++i;
 	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("total-units"))) {
 	    player->TotalUnits = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("timers"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
