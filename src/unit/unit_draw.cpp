@@ -1891,20 +1891,25 @@ global void DrawUnit(const Unit* unit)
 
 local int DrawLevelCompare(const void *v1, const void *v2) {
 
-    const Unit *c1 = *(Unit**)v1, *c2 = *(Unit**)v2;
+    const Unit *c1 = *(Unit**)v1;
+    const Unit *c2 = *(Unit**)v2;
     int DrawLevelA;
     int DrawLevelB;
-    if ( c1->Orders[0].Action == UnitActionDie && c1->Type->CorpseType) {
+    if( c1->Orders[0].Action == UnitActionDie && c1->Type->CorpseType) {
 	DrawLevelA = c1->Type->CorpseType->DrawLevel;
     } else {
 	DrawLevelA = c1->Type->DrawLevel;
     }
-    if ( c2->Orders[0].Action == UnitActionDie && c2->Type->CorpseType) {
+    if( c2->Orders[0].Action == UnitActionDie && c2->Type->CorpseType) {
 	DrawLevelB = c2->Type->CorpseType->DrawLevel;
     } else {
 	DrawLevelB = c2->Type->DrawLevel;
     }
-    return DrawLevelA <= DrawLevelB ? -1 : 1;
+    if( DrawLevelA == DrawLevelB ) {
+	return c1->Slot < c2->Slot ? -1 : 1;
+    } else {
+	return DrawLevelA <= DrawLevelB ? -1 : 1;
+    }
 }
 /**
 **	Find all units to draw in viewport.

@@ -722,6 +722,7 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     fprintf(file," 'basic-damage %d",type->_BasicDamage);
     fprintf(file," 'piercing-damage %d",type->_PiercingDamage);
     fprintf(file," 'missile '%s\n",type->Missile.Name);
+    fprintf(file," 'draw-level %d",type->DrawLevel);
     if( all || type->MinAttackRange ) {
 	fprintf(file,"  'min-attack-range %d",type->MinAttackRange);
 	fprintf(file," 'max-attack-range %d\n",type->_AttackRange);
