@@ -13,12 +13,6 @@ struct hash_st
 	int middepth;
 };
 
-#ifdef _MSC_VER
-typedef void hash_no_data;
-#else
-typedef struct { } hash_no_data;
-#endif
-
 extern void* _hash_get(const u8* id, void* table, int size, int usize);
 extern const void* _hash_find(const u8* id, const void* table, int size, int usize);
 extern void  _hash_del(const u8* id, void* table, int size, int usize);
