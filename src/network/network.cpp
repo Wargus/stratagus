@@ -625,6 +625,8 @@ global void NetworkSendCommand(int command,const Unit* unit,int x,int y
     ncq->Data.Unit=htons(unit->Slot);
     ncq->Data.X=htons(x);
     ncq->Data.Y=htons(y);
+
+    DebugCheck( dest && type );
     if( dest ) {
 	ncq->Data.Dest=htons(dest->Slot);
     } else if( type ) {
@@ -721,7 +723,8 @@ global void NetworkEvent(void)
 
 	// need player number. This could also be calculated from the
 	//	sender ip, port.
-	if( nc->Type==MessageChat || nc->Type==MessageChatCont || nc->Type==MessageChatTerm ) {
+	if( nc->Type==MessageChat || nc->Type==MessageChatCont
+		|| nc->Type==MessageChatTerm ) {
 	    player=((NetworkChat*)nc)->Player;
 	} else if( nc->Type==MessageSync ) {
 	    player=ntohs(nc->X);
