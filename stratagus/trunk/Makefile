@@ -210,7 +210,7 @@ CONTRIB	= contrib/cross.png contrib/red_cross.png \
 	  contrib/health2.png contrib/mana2.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
 	  contrib/music/toccata.mod.gz \
-	  contrib/msvc.zip contrib/stdint.h
+	  contrib/msvc.zip contrib/macosx.tgz contrib/stdint.h
 
 MISC    = Makefile Common.mk Rules.make.orig FreeCraft-beos.proj setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
