@@ -218,7 +218,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
 { MissileTypeType,
     "missile-exorcism",
     "exorcism.png",
-    32,32,
+    48,48,
     { NULL },
     MissileClassPointToPoint,	
     1,
@@ -226,7 +226,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
 { MissileTypeType,
     "missile-heal-effect",
     "heal effect.png",
-    32,32,
+    48,48,
     { NULL },
     MissileClassPointToPoint,	
     1,
@@ -242,7 +242,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
 { MissileTypeType,
     "missile-rune",
     "rune.png",
-    32,32,
+    16,16,
     { NULL },
     MissileClassStayWithDelay,	
     1,
@@ -431,8 +431,13 @@ global void LoadMissileSprites(void)
 	    buf=alloca(strlen(file)+9+1);
 	    file=strcat(strcpy(buf,"graphic/"),file);
 	    ShowLoadProgress("\tMissile %s\n",file);
+#ifdef NEW_VIDEO
+	    MissileTypes[i].Sprite=LoadSprite(
+		    file,MissileTypes[i].Width,MissileTypes[i].Height);
+#else
 	    MissileTypes[i].RleSprite=LoadRleSprite(
 		    file,MissileTypes[i].Width,MissileTypes[i].Height);
+#endif
 	}
     }
 
@@ -455,8 +460,13 @@ global void LoadMissileSprites(void)
     }
 
     MissileTypeSmallFire=MissileTypeByIdent("missile-small-fire");
+#ifdef NEW_VIDEO
+    // FIXME: FIXME: FIXME: very diry hack
+    MissileTypeSmallFire->Sprite->NumFrames=6;
+#else
     // FIXME: FIXME: FIXME: very diry hack
     MissileTypeSmallFire->RleSprite->NumFrames=6;
+#endif
     MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
 }
 
@@ -728,14 +738,23 @@ local int MissileVisible(const Missile* missile)
 /**
 **	Draw missile.
 */
-global void DrawMissile(const MissileType* type,int frame,int x,int y)
+global void DrawMissile(const MissileType* type,unsigned frame,int x,int y)
 {
+#ifdef NEW_VIDEO
+    // FIXME: This is a hack for mirrored sprites
+    if( frame&128 ) {
+	VideoDrawClipX(type->Sprite,frame&127,x,y);
+    } else {
+	VideoDrawClip(type->Sprite,frame,x,y);
+    }
+#else
     // FIXME: This is a hack for mirrored sprites
     if( frame&128 ) {
 	DrawRleSpriteClippedX(type->RleSprite,frame&127,x,y);
     } else {
 	DrawRleSpriteClipped(type->RleSprite,frame,x,y);
     }
+#endif
 }
 
 /**
@@ -1030,13 +1049,23 @@ global void MissileActions(void)
 		    //	Animate missile, cycle through frames
 		    //
 		    missile->Frame+=5;		// FIXME: frames pro row
+#ifdef NEW_VIDEO
+		    if( (missile->Frame&127)
+			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
+			missile->Frame-=
+				VideoGraphicFrames(missile->Type->Sprite);
+		    }
+		    DebugLevel3("Frame %d of %d\n"
+			    ,missile->Frame
+			    ,VideoGraphicFrames(missile->Type->Sprite));
+#else
 		    if( (missile->Frame&127)
 			    >=missile->Type->RleSprite->NumFrames ) {
 			missile->Frame-=missile->Type->RleSprite->NumFrames;
 		    }
 		    DebugLevel3("Frame %d of %d\n"
-			,missile->Frame
-			,missile->Type->RleSprite->NumFrames);
+			,missile->Frame,missile->Type->RleSprite->NumFrames);
+#endif
 		}
 		break;
 
@@ -1079,14 +1108,23 @@ global void MissileActions(void)
 		    //	Animate missile, cycle through frames
 		    //
 		    missile->Frame+=5;		// FIXME: frames pro row
+#ifdef NEW_VIDEO
+		    if( (missile->Frame&127)
+			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
+			missile->Frame-=
+				VideoGraphicFrames(missile->Type->Sprite);
+		    }
+		    DebugLevel3("Frame %d of %d\n"
+			    ,missile->Frame
+			    ,VideoGraphicFrames(missile->Type->Sprite));
+#else
 		    if( (missile->Frame&127)
 			    >=missile->Type->RleSprite->NumFrames ) {
 			missile->Frame-=missile->Type->RleSprite->NumFrames;
 		    }
 		    DebugLevel3("Frame %d of %d\n"
-			,missile->Frame
-			,missile->Type->RleSprite->NumFrames);
-
+			,missile->Frame,missile->Type->RleSprite->NumFrames);
+#endif
 		}
 		break;
 
@@ -1097,20 +1135,36 @@ global void MissileActions(void)
 		    //	Animate hit
 		    //
 		    missile->Frame+=5;	// FIXME: frames pro row
+#ifdef NEW_VIDEO
+		    if( (missile->Frame&127)
+			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
+			MissileHit(missile);
+			missile->Type=MissileFree;
+		    }
+#else
 		    if( (missile->Frame&127)
 			    >=missile->Type->RleSprite->NumFrames ) {
 			MissileHit(missile);
 			missile->Type=MissileFree;
 		    }
+#endif
 		}
 		break;
 
 	    case MissileClassStayWithDelay:
 		missile->Wait=missile->Type->Speed;
+#ifdef NEW_VIDEO
+		if( ++missile->Frame
+			==VideoGraphicFrames(missile->Type->Sprite) ) {
+		    MissileHit(missile);
+		    missile->Type=MissileFree;
+		}
+#else
 		if( ++missile->Frame==missile->Type->RleSprite->NumFrames ) {
 		    MissileHit(missile);
 		    missile->Type=MissileFree;
 		}
+#endif
 		break;
 
 	    case MissileClassCycleOnce:
@@ -1121,11 +1175,19 @@ global void MissileActions(void)
 			++missile->State;
 			break;
 		    case 1:
+#ifdef NEW_VIDEO
+			if( ++missile->Frame
+				==VideoGraphicFrames(missile->Type->Sprite) ) {
+			    --missile->Frame;
+			    ++missile->State;
+			}
+#else
 			if( ++missile->Frame
 				==missile->Type->RleSprite->NumFrames ) {
 			    --missile->Frame;
 			    ++missile->State;
 			}
+#endif
 			break;
 		    case 3:
 			if( !missile->Frame-- ) {
@@ -1138,7 +1200,13 @@ global void MissileActions(void)
 
 	    case MissileClassFire:
 		missile->Wait=missile->Type->Speed;
-		if( ++missile->Frame==missile->Type->RleSprite->NumFrames ) {
+#ifdef NEW_VIDEO
+		if( ++missile->Frame
+			==VideoGraphicFrames(missile->Type->Sprite) )
+#else
+		if( ++missile->Frame==missile->Type->RleSprite->NumFrames )
+#endif
+		{
 		    int f;
 		    Unit* unit;
 
