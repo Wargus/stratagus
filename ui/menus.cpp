@@ -1377,47 +1377,63 @@ local void InitGameMenu(Menuitem *mi __attribute__((unused)))
 
 global void SoundOptions(void)
 {
+    ProcessMenu("menu-sound-options", 1);
+}
+
+local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
+{
+#ifdef WITH_SOUND
     Menu *menu;
 
     menu = FindMenu("menu-sound-options");
-#ifdef WITH_SOUND
-    menu->items[2].flags = 0;				// master volume slider
-    menu->items[5].d.gem.state = MI_GSTATE_CHECKED;	// master power
-    menu->items[8].flags = 0;				// music volume slider
-    menu->items[11].flags = 0;				// music power
-    menu->items[11].d.gem.state = MI_GSTATE_CHECKED;
-    menu->items[14].flags = 0;				// cd volume slider
-    menu->items[17].d.gem.state = MI_GSTATE_CHECKED;	// cd power
-    menu->items[19].flags = 0;				// all tracks button
-    menu->items[19].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[21].flags = 0;				// random tracks button
-    menu->items[21].d.gem.state = MI_GSTATE_UNCHECKED;
 
-    // Set master volume checkbox and slider
+    // master volume slider
+    if (SoundFildes == -1) {
+	menu->items[2].flags = -1;
+    } else {
+	menu->items[2].flags = 0;
+	menu->items[2].d.hslider.percent = (GlobalVolume * 100) / 255;
+    }
+
+    // master power
     if (SoundFildes == -1) {
 	menu->items[5].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->items[2].flags = -1;
+    } else {
+	menu->items[5].d.gem.state = MI_GSTATE_CHECKED;
+    }
+
+    // music volume slider
+    if (PlayingMusic != 1 || SoundFildes == -1) {
+	menu->items[8].flags = -1;
+    } else {
+	menu->items[8].flags = 0;
+	menu->items[8].d.hslider.percent = (MusicVolume * 100) / 255;
+    }
+
+    // music power
+    if (SoundFildes == -1) {
+	menu->items[11].flags = -1;
+    } else {
+	menu->items[11].flags = 0;
+    }
+    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
 	menu->items[11].flags = -1;
     }
-    menu->items[2].d.hslider.percent = (GlobalVolume * 100) / 255;
-
-    // Set music volume checkbox and slider
     if (PlayingMusic != 1 || SoundFildes == -1) {
 	menu->items[11].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->items[8].flags = -1;
+    } else {
+	menu->items[11].d.gem.state = MI_GSTATE_CHECKED;
     }
-    menu->items[8].d.hslider.percent = (MusicVolume * 100) / 255;
 
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->items[14].flags = -1;
-	menu->items[19].flags = -1;
-
-	menu->items[21].flags = -1;
+	menu->items[14].flags = -1;		// cd volume slider
+	menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED; // cd power
+	menu->items[19].flags = -1;		// all tracks button
+	menu->items[21].flags = -1;		// random tracks button
     } else {
 #ifdef USE_LIBCDA
-	int i = 17;
+	int i = 0;
 
 	cd_get_volume(&i, &i);
 	menu->items[14].d.hslider.percent = (i * 100) / 255;
@@ -1430,22 +1446,14 @@ global void SoundOptions(void)
 	}
 	menu->items[11].flags = -1;
     }
-#else
+#else // without cd
     menu->items[14].flags = -1;			// cd volume slider
     menu->items[17].flags = -1;			// cd power
     menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[19].flags = -1;			// all tracks button
     menu->items[21].flags = -1;			// random tracks button
-#endif
-    if (InterfaceState == IfaceStateMenu)
-	ProcessMenu("menu-sound-options", 0);
-    else
-	ProcessMenu("menu-sound-options", 1);
+#endif // cd
 #endif // with sound
-}
-
-local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
-{
 }
 
 local void GlobalOptions(void)
@@ -1561,8 +1569,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 	InitSoundClient();
     }
 #endif
-    CurrentMenu=NULL;
-    SoundOptions();
+    InitSoundOptions(NULL);
 }
 
 local void SetMusicPower(Menuitem *mi __attribute__((unused)))
@@ -1586,8 +1593,7 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 	}
     }
 #endif // with sound
-    CurrentMenu=NULL;
-    SoundOptions();
+    InitSoundOptions(NULL);
 }
 
 local void SetCdPower(Menuitem *mi __attribute__((unused)))
@@ -1614,8 +1620,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 	CDMode = ":stopped";
     }
 #endif
-    CurrentMenu=NULL;
-    SoundOptions();
+    InitSoundOptions(NULL);
 }
 
 /**
