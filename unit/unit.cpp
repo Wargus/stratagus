@@ -591,11 +591,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
 				unit->CurrentSightRange);
 	}
     }
-    if( host ) {
-	unit->Next=host;
-    } else {
-	unit->Next=NULL;
-    }
 #endif
 
     if( unit->Removed ) {		// could happen!
