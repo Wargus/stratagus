@@ -563,6 +563,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     int i, entvalid;
     char zzbasepath[PATH_MAX];
     struct stat st;
+    char *cp;
 #else
 #ifndef _MSC_VER
     DIR *dirp;
@@ -575,7 +576,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 #endif
     FileList *nfl, *fl = NULL;
     int n, isdir = 0; // silence gcc..
-    char *cp, *np;
+    char *np;
     char buffer[PATH_MAX];
     char *filename;
 
