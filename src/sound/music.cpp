@@ -508,6 +508,7 @@ global void PlayMusic(const char* name)
 */
 global void PlayFile(const char* name)
 {
+    MusicOff = 0;
     PlayMusic(name);
 }
 
