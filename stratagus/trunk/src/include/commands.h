@@ -10,12 +10,11 @@
 //
 /**@name commands.h	-	The commands header file. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -94,6 +93,8 @@ extern void SendCommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Send spell cast command
 extern void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 	,int flush);
+    /// Send diplomacy command
+extern void SendCommandDiplomacy(int player,int state,int opponent);
 
     /// Parse a command (from network).
 extern void ParseCommand(unsigned short Type,UnitRef Unum,unsigned short x
