@@ -86,7 +86,9 @@
 
 #if __GNUC__==2 && __GNUC_MINOR__==96
 
-/* #error "GCC 2.96 can't compile FreeCraft, downgrade to GCC 2.95" */
+#if !defined(__I_KNOW_THAT_GNUC_296_IS_BUGGY__)
+#warning "GCC 2.96 is not supported and buggy, downgrade to GCC 2.95"
+#endif
 
 #endif
 
