@@ -558,6 +558,8 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 **	Returns if the time for one frame is over.
 **
 **	@param callbacks	Call backs that handle the events.
+**
+**	FIXME:	the initialition could be moved out of the loop
 */
 global void WaitEventsOneFrame(const EventCallback* callbacks)
 {
@@ -565,31 +567,35 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     fd_set rfds;
     fd_set wfds;
     int maxfd;
-    Uint32 i;
+    int i;
     SDL_Event event[1];
+    Uint32 ticks;
 
 #ifndef USE_SDLA
+    // FIXME: ugly hack, move into sound part!!!
     if( SoundFildes==-1 ) {
 	SoundOff=1;
     }
 #endif
-    InputMouseTimeout(callbacks,SDL_GetTicks());
-    for(;;) {
-#if 1
-	static Uint32 LastTick;
 
+    ticks=SDL_GetTicks();
+    if( ticks>NextFrameTicks ) {	// We are too slow :(
+	++SlowFrameCounter;
+    }
+
+    InputMouseTimeout(callbacks,ticks);
+    for(;;) {
 	//
 	//	Time of frame over? This makes the CPU happy. :(
 	//
-	i=SDL_GetTicks();
-	if( !VideoInterrupts && i+10<LastTick ) {
+	ticks=SDL_GetTicks();
+	if( !VideoInterrupts && ticks+11<NextFrameTicks ) {
 	    SDL_Delay(10);
 	}
-	while( i>=LastTick ) {
+	while( ticks>=NextFrameTicks ) {
 	    ++VideoInterrupts;
-	    LastTick+=(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
+	    NextFrameTicks+=(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
 	}
-#endif
 
 	//
 	//	Prepare select
@@ -607,6 +613,10 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 		maxfd=NetworkFildes;
 	    }
 	    FD_SET(NetworkFildes,&rfds);
+	    if( !NetworkInSync ) {
+		DebugLevel0Fn("recover-network\n");
+		NetworkRecover();	// recover network
+	    }
 	}
 
 #ifndef USE_SDLA
@@ -669,7 +679,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	Not more input and time for frame over: return
 	//
-	if( !i && VideoInterrupts ) {
+	if( !i && NetworkInSync && VideoInterrupts ) {
 	    break;
 	}
     }
@@ -688,22 +698,11 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 **	Network messages.
 **	Sound queue.
 **
-**	We must handle atlast one X11 event
-**
-**	FIXME:	the initialition could be moved out of the loop
+**	@todo FIXME: Use the ::WaitEventsOneFrame().
 */
 global void WaitEventsAndKeepSync(void)
 {
     EventCallback callbacks;
-
-    struct timeval tv;
-    fd_set rfds;
-    fd_set wfds;
-    int maxfd;
-    int i;
-
-    SDL_Event event[1];
-    static Uint32 LastTick;
 
     callbacks.ButtonPressed=(void*)HandleButtonDown;
     callbacks.ButtonReleased=(void*)HandleButtonUp;
@@ -716,113 +715,7 @@ global void WaitEventsAndKeepSync(void)
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
 
-#ifndef USE_SDLA
-    if( SoundFildes==-1 ) {
-	SoundOff=1;
-    }
-#endif
-    InputMouseTimeout(&callbacks,SDL_GetTicks());
-    for(;;) {
-#if 1
-	//
-	//	Time of frame over? This makes the CPU happy. :(
-	//
-	i=SDL_GetTicks();
-	if( !VideoInterrupts && i+10<LastTick ) {
-	    SDL_Delay(10);
-	}
-	while( i>=LastTick ) {
-	    ++VideoInterrupts;
-	    LastTick+=(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
-	}
-#endif
-
-	//
-	//	Prepare select
-	//
-	maxfd=0;
-	tv.tv_sec=tv.tv_usec=0;
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-
-	//
-	//	Network
-	//
-	if( NetworkFildes!=-1 ) {
-	    if( NetworkFildes>maxfd ) {
-		maxfd=NetworkFildes;
-	    }
-	    FD_SET(NetworkFildes,&rfds);
-	    if( !NetworkInSync ) {
-		NetworkRecover();	// recover network
-	    }
-	}
-
-#ifndef USE_SDLA
-	//
-	//	Sound
-	//
-	if( !SoundOff && !SoundThreadRunning ) {
-	    if( SoundFildes>maxfd ) {
-		maxfd=SoundFildes;
-	    }
-	    FD_SET(SoundFildes,&wfds);
-	}
-#endif
-
-#if 0
-	maxfd=select(maxfd+1,&rfds,&wfds,NULL
-		,(i=SDL_PollEvent(event)) ? &tv : NULL);
-#else
-	// Not very nice, but this is the problem if you use other libraries
-	// The event handling of SDL is wrong designed = polling only.
-	// QUICK HACK to fix the event/timer problem
-	maxfd=select(maxfd+1,&rfds,&wfds,NULL,&tv);
-	i=SDL_PollEvent(event);
-#endif
-
-	if ( i ) {			// Handle SDL event
-	    SdlDoEvent(&callbacks,event);
-	}
-
-	if( maxfd>0 ) {
-#ifndef USE_SDLA
-	    //
-	    //	Sound
-	    //
-	    if( !SoundOff && !SoundThreadRunning
-			&& FD_ISSET(SoundFildes,&wfds) ) {
-		callbacks.SoundReady();
-	    }
-#endif
-
-	    //
-	    //	Network in sync and time for frame over: return
-	    //
-	    if( !i && NetworkInSync && VideoInterrupts ) {
-		break;
-	    }
-
-	    //
-	    //	Network
-	    //
-	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
-		callbacks.NetworkEvent();
-	    }
-	}
-
-	//
-	//	Network in sync and time for frame over: return
-	//
-	if( !i && NetworkInSync && VideoInterrupts ) {
-	    break;
-	}
-    }
-
-    //
-    //	Prepare return, time for one frame is over.
-    //
-    VideoInterrupts=0;
+    WaitEventsOneFrame(&callbacks);
 }
 
 /**
