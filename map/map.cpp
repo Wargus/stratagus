@@ -133,21 +133,8 @@ global void RevealMap(void)
     for ( ix = 0; ix < TheMap.Width; ix++ ) {
 	for ( iy = 0; iy < TheMap.Height; iy++ ) {
 #ifdef NEW_FOW
-	    if( TheMap.NoFogOfWar ) {
-		if (!TheMap.Fields[ix+iy*TheMap.Width].
-			Visible[ThisPlayer->Player]) {
-		    TheMap.Fields[ix+iy*TheMap.Width].
-			Visible[ThisPlayer->Player]=2;
-		} else {
-		    TheMap.Fields[ix+iy*TheMap.Width].
-			Visible[ThisPlayer->Player]++;
-		}
-	    } else {
-		if (!TheMap.Fields[ix+iy*TheMap.Width].
-			Visible[ThisPlayer->Player]) {
-		    TheMap.Fields[ix+iy*TheMap.Width].
-			Visible[ThisPlayer->Player]=1;
-		}
+	    if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[ThisPlayer->Player]) {
+		TheMap.Fields[ix+iy*TheMap.Width].Visible[ThisPlayer->Player]=1;
 	    }
 #else
 	    TheMap.Fields[ix+iy*TheMap.Width].Flags |= MapFieldExplored;
