@@ -368,6 +368,15 @@ extern char* strdcat3(const char* l, const char *m, const char* r);
     /// How long stay in a oil-deposit
 #define WAIT_FOR_OIL	(100/SpeedOil)
 
+    /// How many resource get the player back if canceling building.
+#define CancelBuildingCostsFactor	75
+    /// How many resource get the player back if canceling training.
+#define CancelTrainingCostsFactor	100
+    /// How many resource get the player back if canceling research.
+#define CancelResearchCostsFactor	100
+    /// How many resource get the player back if canceling upgrade.
+#define CancelUpgradeCostsFactor	100
+
     /// How near could a hall or gold-depot be build to a goldmine.
 #define GOLDMINE_DISTANCE	3
     /// How near could a oil-depot be build to a oil-patch.
