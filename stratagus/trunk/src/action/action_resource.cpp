@@ -195,7 +195,7 @@ local int StartGathering(Unit* unit)
 	    ++goal->Refs;
 	} else {
 	    unit->Orders[0].Action = UnitActionStill;
-	    unit->Orders[0].Goal = 0;
+	    unit->Orders[0].Goal = NoUnitP;
 	    unit->SubAction = 0;
 	}
 	return 0;
@@ -543,6 +543,7 @@ local int StopGathering(Unit* unit)
 	}
 	DebugLevel0Fn("Can't find a resource deposit for unit %d.\n" _C_ unit->Slot);
 	unit->Orders[0].Action = UnitActionStill;
+	unit->Orders[0].Goal = NoUnitP;
 	unit->SubAction = 0;
 	// should return 0, done below!
     } else {
