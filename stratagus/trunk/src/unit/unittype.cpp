@@ -116,8 +116,9 @@ local hashtable(UnitType*,61) UnitTypeHash;
 
 /**
 **	Update the player stats for changed unit types.
+**      @param reset indicates wether default value should be set to each stat ( level, upgrades )
 */
-global void UpdateStats(void)
+global void UpdateStats(int reset)
 {
     UnitType* type;
     UnitStats* stats;
@@ -128,6 +129,8 @@ global void UpdateStats(void)
     //  Update players stats
     //
     for (type = UnitTypes; type->OType; ++type) {
+        if (reset){
+	    // LUDO : FIXME : reset loading of player stats !
 	for (player = 0; player < PlayerMax; ++player) {
 	    stats = &type->Stats[player];
 	    stats->AttackRange = type->_AttackRange;
@@ -145,6 +148,7 @@ global void UpdateStats(void)
 	    } else {
 		stats->Level = 1;
 	    }
+	}
 	}
 
 	//
@@ -456,7 +460,7 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 
     DebugLevel0("\tUDTA used %d bytes\n" _C_ udta-start);
 
-    UpdateStats();
+    UpdateStats(1);
 }
 
 /**
@@ -1091,7 +1095,7 @@ global void DrawUnitType(const UnitType* type,int frame,int x,int y)
 /**
 **	Init unit types.
 */
-global void InitUnitTypes(void)
+global void InitUnitTypes(int reset_player_stats)
 {
     int type;
 
@@ -1142,7 +1146,8 @@ global void InitUnitTypes(void)
 	}
     }
 
-    UpdateStats();			// Calculate the stats
+    // LUDO : called after game is loaded -> don't reset stats !
+    UpdateStats(reset_player_stats);	// Calculate the stats
 
     //
     //	Setup hardcoded unit types. FIXME: should be moved to some configs.
