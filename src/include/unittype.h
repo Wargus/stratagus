@@ -365,6 +365,16 @@
 **
 **		Gives the player an improved income.
 **
+**	UnitType::FieldFlags
+**
+**		Flags that are set, if an unit enters a map field or cleared, if
+**		an unit leaves a map field.
+**
+**	UnitType::MovementMask
+**
+**		Movement mask, this value is and'ed to the map field flags, to
+**		see if an unit can enter or placed on the map field.
+**
 **	UnitType::Stats[::PlayerMax]
 **
 **		Unit status for each player
@@ -534,11 +544,11 @@ struct _unit_type_ {
     unsigned ShoreBuilding : 1;		/// Building must be build on coast
     unsigned CanCastSpell : 1;		/// Unit is able to use spells
     unsigned StoresWood : 1;		/// We can store wood here
-    unsigned CanAttack : 1;		/// FIXME: docu
-    unsigned Tower : 1;			/// FIXME: docu
-    unsigned OilPatch : 1;		/// FIXME: docu
-    unsigned GoldMine : 1;		/// FIXME: docu
-    unsigned Hero : 1;			/// FIXME: docu
+    unsigned CanAttack : 1;		/// Unit can attack
+    unsigned Tower : 1;			/// Unit can attack, but not move
+    unsigned OilPatch : 1;		/// Platform can be build here
+    unsigned GoldMine : 1;		/// Gold can be collected here
+    unsigned Hero : 1;			/// Is hero only used for triggers 
     unsigned StoresOil : 1;		/// We can store oil here
     unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit
     unsigned CowerMage : 1;		/// FIXME: docu
@@ -557,6 +567,9 @@ struct _unit_type_ {
 // --- FILLED UP ---
 
     unsigned	ImproveIncomes[MaxCosts];/// Gives player an improved income
+
+    unsigned	FieldFlags;		/// Unit map field flags
+    unsigned	MovementMask;		/// Unit check this map flags for move
 
 	// FIXME: This stats should? be moved into the player struct
     UnitStats Stats[PlayerMax];		/// Unit status for each player
