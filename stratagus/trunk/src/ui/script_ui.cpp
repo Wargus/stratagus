@@ -1453,7 +1453,9 @@ local SCM CclDefineUI(SCM list)
 
     ui->MinimapPosX = -1;
     ui->MinimapPosY = -1;
-
+    for (i = 0; i < MaxCosts + 2; ++i) {
+	ui->Resources[i].TextX = -1;
+    }
     //
     //	Parse the arguments, already the new tagged format.
     //  maxy: this could be much simpler
