@@ -508,16 +508,14 @@ extern void VideoDoDrawClip(const Graphic* s, GLuint* textures, unsigned frame,
 
 #define VideoDrawClip(s, frame, x, y) \
 	VideoDoDrawClip((s), (s)->Textures, (frame), (x), (y))
-
-#define VideoDrawPlayerColorClip(sprite, player, frame, x, y) \
-	VideoDoDrawClip((sprite), (sprite)->PlayerColorTextures[player], (frame), (x), (y))
 #else
 	/// Draw a graphic object clipped to the current clipping.
 extern void VideoDrawClip(const Graphic* s, unsigned frame, int x, int y);
-
-#define VideoDrawPlayerColorClip(sprite, player, frame, x, y) \
-	VideoDrawClip((sprite), (frame), (x), (y))
 #endif
+
+	/// Draw graphic object clipped and with player colors.
+extern void VideoDrawPlayerColorClip(const Graphic* sprite, int player,
+	unsigned frame, int x, int y);
 
 	/// Draw a graphic object clipped to the current clipping.
 extern void VideoDrawSubClip(const Graphic* sprite, int ix, int iy, int w,
@@ -533,16 +531,14 @@ extern void VideoDoDrawClipX(const Graphic* sprite, GLuint* textures, unsigned f
 
 #define VideoDrawClipX(s, frame, x, y) \
 	VideoDoDrawClipX((s), (s)->Textures, (frame), (x), (y))
-
-#define VideoDrawPlayerColorClipX(sprite, player, frame, x, y) \
-	VideoDoDrawClipX((sprite), (sprite)->PlayerColorTextures[player], (frame), (x), (y))
 #else
 	/// Draw a graphic object clipped and flipped in X direction.
 extern void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y);
-
-#define VideoDrawPlayerColorClipX(sprite, player, frame, x, y) \
-	VideoDrawClipX((sprite), (frame), (x), (y))
 #endif
+
+	/// Draw graphic object clipped, flipped, and with player colors.
+extern void VideoDrawPlayerColorClipX(const Graphic* sprite, int player,
+	unsigned frame, int x, int y);
 
 	/// Translucent Functions
 	/// Draw a graphic object unclipped.

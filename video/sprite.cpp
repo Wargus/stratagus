@@ -10,7 +10,7 @@
 //
 /**@name sprite.c - The general sprite functions. */
 //
-//      (c) Copyright 2000-2004 by Lutz Sammer, Stephan Rasenberg,
+//      (c) Copyright 2000-2005 by Lutz Sammer, Stephan Rasenberg,
 //                                 Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,7 @@
 
 #include "stratagus.h"
 #include "video.h"
+#include "player.h"
 #include "iocompat.h"
 #include "iolib.h"
 
@@ -154,6 +155,52 @@ void VideoDoDrawClip(const Graphic* sprite, GLuint* textures,
 	glEnd();
 }
 #endif
+
+/**
+**  Draw graphic object clipped and with player colors.
+**
+**  @param sprite  pointer to object
+**  @param player  player number
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
+*/
+void VideoDrawPlayerColorClip(const Graphic* sprite, int player,
+	unsigned frame, int x, int y)
+{
+#ifndef USE_OPENGL
+	GraphicPlayerPixels(&Players[player], sprite);
+	VideoDrawClip(sprite, frame, x, y);
+#else
+	if (!sprite->PlayerColorTextures[player]) {
+		MakePlayerColorTexture(sprite, player);
+	}
+	VideoDoDrawClip(sprite, sprite->PlayerColorTextures[player], frame, x, y)
+#endif
+}
+
+/**
+**  Draw graphic object clipped, flipped, and with player colors.
+**
+**  @param sprite  pointer to object
+**  @param player  player number
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
+*/
+void VideoDrawPlayerColorClipX(const Graphic* sprite, int player,
+	unsigned frame, int x, int y)
+{
+#ifndef USE_OPENGL
+	GraphicPlayerPixels(&Players[player], sprite);
+	VideoDrawClipX(sprite, frame, x, y);
+#else
+	if (!sprite->PlayerColorTextures[player]) {
+		MakePlayerColorTexture(sprite, player);
+	}
+	VideoDoDrawClipX(sprite, sprite->PlayerColorTextures[player], frame, x, y)
+#endif
+}
 
 /**
 **  Draw graphic object unclipped and flipped in X direction.

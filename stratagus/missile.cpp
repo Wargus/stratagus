@@ -677,8 +677,6 @@ void DrawMissile(const Missile* missile)
 			LoadMissileSprite(missile->Type);
 		}
 #endif
-		GraphicPlayerPixels(missile->SourceUnit->Player,
-			missile->Type->G);
 	}
 	vp = CurrentViewport;
 	x = missile->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
