@@ -269,7 +269,7 @@ typedef struct _tileset_ {
     unsigned	TopOneTree;		/// Tile for one tree top
     unsigned	MidOneTree;		/// Tile for one tree middle
     unsigned	BotOneTree;		/// Tile for one tree bottom
-    unsigned	RemovedTree;		/// Tile placed where trees are gone
+    int		RemovedTree;		/// Tile placed where trees are gone
     unsigned	GrowingTree[2];		/// Growing tree tiles
     int		WoodTable[16];		/// Table for tree removable
 
@@ -277,7 +277,7 @@ typedef struct _tileset_ {
     unsigned	TopOneRock;		/// Tile for one rock top
     unsigned	MidOneRock;		/// Tile for one rock middle
     unsigned	BotOneRock;		/// Tile for one rock bottom
-    unsigned	RemovedRock;		/// Tile placed where rocks are gone
+    int		RemovedRock;		/// Tile placed where rocks are gone
     int		RockTable[20];		/// Removed rock placement table
 
     unsigned	HumanWallTable[16];	/// Human wall placement table
