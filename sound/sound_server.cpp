@@ -211,9 +211,18 @@ local void MixMusicToStereo32(int* buffer, int size)
 	    SCM cb;
 
 	    PlayingMusic = 0;
+#ifdef USE_LIBMODPLUG
 	    if (ModFile) {
 		ModPlug_Unload(ModFile);
+		ModFile=NULL;
 	    }
+#endif
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
+	    if (MusicSample) {
+		free(MusicSample);
+		MusicSample=NULL;
+	    }
+#endif
 	    // FIXME: we are inside the SDL callback!
 	    if (CallbackMusic) {
 		cb = gh_symbol2scm("music-stopped");
