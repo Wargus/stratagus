@@ -135,10 +135,15 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 	//
 	//	Update visible area.
 	//
+#ifdef NEW_FOW
+	MapMarkNewSight(unit->Player
+		,unit->X,unit->Y,unit->Stats->SightRange,xd,yd);
+#else
 	if( unit->Player==ThisPlayer ) {
 	    // FIXME: need only mark to new direction!!
 	    MapMarkSight(unit->X,unit->Y,unit->Stats->SightRange);
 	}
+#endif
 
 	unit->IX=-xd*TileSizeX;
 	unit->IY=-yd*TileSizeY;

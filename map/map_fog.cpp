@@ -43,7 +43,6 @@
 #ifdef DEBUG
 #define noTIMEIT			/// defines time function
 #endif
-#define OLD_FOG				/// use old not correct version
 
 /**
 **	Do unroll 8x
@@ -115,8 +114,108 @@ local void* FogOfWarAlphaTable;
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#ifdef NEW_FOW
 /**
-**	Mark the sight of unit. (Explore and make visibile.)
+**	Mask
+*/
+local int MapExploredMask(void)
+{
+    return 8;
+}
+
+/**
+**	Mask
+*/
+local int MapVisibleMask(void)
+{
+    return 8;
+}
+
+/**
+**	Mark the sight of unit. (Explore and make visible.)
+**
+**	@param player	Player to mark sight.
+**	@param tx	X center position.
+**	@param ty	Y center position.
+**	@param range	Radius to mark.
+*/
+global void MapMarkSight(const Player* player,int tx,int ty,int range)
+{
+    int i;
+    int x;
+    int y;
+    int height;
+    int width;
+    int mask;
+
+    x=tx-range;
+    y=ty-range;
+    width=height=range+range;
+
+    //	Clipping
+    if( y<0 ) {
+	height+=y;
+	y=0;
+    }
+    if( x<0 ) {
+	width+=x;
+	x=0;
+    }
+    if( y+height>=TheMap.Height ) {
+	height=TheMap.Height-y-1;
+    }
+    if( x+width>=TheMap.Width ) {
+	width=TheMap.Width-x-1;
+    }
+
+    mask=1<<player->Player;
+    ++range;
+    while( height-->=0 ) {
+	for( i=x; i<=x+width; ++i ) {
+	    // FIXME: Can use quadrat table!
+	    if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))==range*range ) {
+		TheMap.Fields[i+y*TheMap.Width].ExploredMask=8;
+		TheMap.Fields[i+y*TheMap.Width].VisibleMask=8;
+
+		TheMap.Fields[i+y*TheMap.Width].Visible|=mask;
+		TheMap.Fields[i+y*TheMap.Width].Explored|=mask;
+		if( player==ThisPlayer ) {
+		    MapMarkSeenTile(i,y);
+		}
+	    } else if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))<range*range ) {
+		TheMap.Fields[i+y*TheMap.Width].ExploredMask=0;
+		TheMap.Fields[i+y*TheMap.Width].VisibleMask=0;
+
+		TheMap.Fields[i+y*TheMap.Width].Visible|=mask;
+		TheMap.Fields[i+y*TheMap.Width].Explored|=mask;
+		if( player==ThisPlayer ) {
+		    MapMarkSeenTile(i,y);
+		}
+	    }
+	}
+	++y;
+    }
+}
+
+/**
+**	Mark the new sight of unit. (Explore and make visible.)
+**
+**	@param player	Player to mark sight.
+**	@param tx	X center position.
+**	@param ty	Y center position.
+**	@param range	Radius to mark.
+*/
+global void MapMarkNewSight(const Player* player,int tx,int ty,int range
+	,int dx,int dy)
+{
+    // FIXME: must write this
+    MapMarkSight(player,tx,ty,range);
+}
+
+#else
+
+/**
+**	Mark the sight of unit. (Explore and make visible.)
 **
 **	@param tx	X center position.
 **	@param ty	Y center position.
@@ -130,9 +229,6 @@ global void MapMarkSight(int tx,int ty,int range)
     int height;
     int width;
 
-#ifndef OLD_FOG
-    range--;
-#endif
     x=tx-range;
     y=ty-range;
     width=height=range+range;
@@ -167,6 +263,8 @@ global void MapMarkSight(int tx,int ty,int range)
     }
 }
 
+#endif
+
 /**
 **	Update visible of the map.
 */
@@ -199,7 +297,11 @@ global void MapUpdateVisible(void)
     } else {
 	for( y=0; y<ye; y+=w ) {
 	    for( x=0; x<w; ++x ) {
+#ifdef NEW_FOW
+		TheMap.Fields[x+y].Visible=0;
+#else
 		TheMap.Fields[x+y].Flags&=~MapFieldVisible;
+#endif
 	    }
 	}
     }
@@ -221,17 +323,29 @@ global void MapUpdateVisible(void)
 	    if( unit->Command.Action==UnitActionMineGold ) {
 	        mine=GoldMineOnMap(unit->X,unit->Y);
 		if( mine ) {  // Somtimes, the peon is at home :).
+#ifdef NEW_FOW
+		    MapMarkSight(unit->Player,mine->X+mine->Type->TileWidth/2
+			    ,mine->Y+mine->Type->TileHeight/2
+			    ,mine->Stats->SightRange);
+#else
 		    MapMarkSight(mine->X+mine->Type->TileWidth/2
 				 ,mine->Y+mine->Type->TileHeight/2
 				 ,mine->Stats->SightRange);
+#endif
 		}
 	    } else {
 	        continue;
 	    }
 	}
+#ifdef NEW_FOW
+	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+		,unit->Y+unit->Type->TileHeight/2
+		,unit->Stats->SightRange);
+#else
 	MapMarkSight(unit->X+unit->Type->TileWidth/2
 		,unit->Y+unit->Type->TileHeight/2
 		,unit->Stats->SightRange);
+#endif
     }
 }
 
@@ -817,92 +931,9 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data,int x,int y)
     }
 }
 
-
-/*----------------------------------------------------------------------------
---	New better version, not working
-----------------------------------------------------------------------------*/
-
-#ifndef OLD_FOG
-
-#if 0
-	|--|--|--|
-	| 1|  |2 |
-	|--|--|--|
-	|  |XX|  |
-	|--|--|--|
-	| 8|  |4 |
-	|--|--|--|
-#endif
-
-static int NewFogTable[16] = {
-      0,  9,  7,  8,	// 0-3
-      1,  0,  4,  0,	// 4-7
-      3,  6,  0,  0,    // 8-B
-      2,  0,  0,  0,	// C-F
-};
-
-/**
-**	Draw unexplored tiles.
-**
-**	@param sx	Offset into fields to current tile.
-**	@param sy	Start of the current row.
-**	@param dx	X position into video memory.
-**	@param dy	Y position into video memory.
-*/
-local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
-{
-    int tile;
-    int w;
-
-    w=TheMap.Width;
-    tile=0;
-    //
-    //	Check each field around it
-    //
-    if( sy ) {
-	if( sx!=sy && !(TheMap.Fields[sx-w-1].Flags&MapFieldVisible) ) {
-	    tile|=2;
-	}
-	if( !(TheMap.Fields[sx-w].Flags&MapFieldVisible) ) {
-	    tile|=3;
-	}
-	if( sx!=sy+w-1 && !(TheMap.Fields[sx-w+1].Flags&MapFieldVisible) ) {
-	    tile|=1;
-	}
-    }
-    if( sx!=sy && !(TheMap.Fields[sx-1].Flags&MapFieldVisible) ) {
-	tile|=10;
-    }
-    if( sx!=sy+w-1 && !(TheMap.Fields[sx+1].Flags&MapFieldVisible) ) {
-	tile|=5;
-    }
-    if( sy+w<TheMap.Height*w ) {
-	if( sx!=sy && !(TheMap.Fields[sx+w-1].Flags&MapFieldVisible) ) {
-	    tile|=8;
-	}
-	if( !(TheMap.Fields[sx+w].Flags&MapFieldVisible) ) {
-	    tile|=12;
-	}
-	if( sx!=sy+w-1 && !(TheMap.Fields[sx+w+1].Flags&MapFieldVisible) ) {
-	    tile|=4;
-	}
-    }
-
-    tile=NewFogTable[tile];
-    if( tile ) {
-	VideoDraw16Fog32(TheMap.Tiles[tile],dx,dy);
-    } else {
-	VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
-    }
-}
-
-#endif
-
 /*----------------------------------------------------------------------------
 --	Old version correct working but not 100% original
 ----------------------------------------------------------------------------*/
-
-#ifdef OLD_FOG
 
 /**
 **	Draw fog of war tile.
@@ -914,6 +945,38 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 */
 local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 {
+#ifdef NEW_FOW
+    int m;
+    MapField* mf;
+
+    m=1<<ThisPlayer->Player;
+    mf=TheMap.Fields+sx;
+
+    //
+    //	Draw unexplored area
+    //
+    if( mf->Explored && mf->ExploredMask ) {
+	VideoDrawUnexplored(TheMap.Tiles[mf->ExploredMask],dx,dy);
+    }
+    if( mf->Visible ) {
+	if( mf->VisibleMask ) {
+	    VideoDrawFog(TheMap.Tiles[mf->VisibleMask],dx,dy);
+	}
+    } else {
+	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
+    }
+#if 0
+    if( !TheMap.NoFogOfWar ) {
+	if( TheMap.Fields[sx].Flags&MapFieldVisible ) {
+	    if( tile ) {
+		VideoDrawFog(TheMap.Tiles[tile],dx,dy);
+	    }
+	} else {
+	    VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
+	}
+    }
+#endif
+#else
     int w;
     int tile;
     int tile2;
@@ -1003,7 +1066,7 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 	}
     }
     if( !TheMap.NoFogOfWar ) {
-	if( (TheMap.Fields[sx].Flags&MapFieldVisible) ) {
+	if( TheMap.Fields[sx].Flags&MapFieldVisible ) {
 	    if( tile ) {
 		VideoDrawFog(TheMap.Tiles[tile],dx,dy);
 	    }
@@ -1011,9 +1074,8 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 	    VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
 	}
     }
-}
-
 #endif
+}
 
 /**
 **	Draw the map fog of war.
@@ -1050,17 +1112,17 @@ global void DrawMapFogOfWar(int x,int y)
 	    dx=TheUI.MapX;
 	    while( dx<ex ) {
 		if( *redraw_tile++ ) {
-#ifdef OLD_FOG
-		    if( TheMap.Fields[sx].Flags&MapFieldExplored ) {
+#ifdef NEW_FOW
+		    if( TheMap.Fields[sx].Explored&(1<<ThisPlayer->Player) ) {
 			DrawFogOfWarTile(sx,sy,dx,dy);
 		    } else {
 			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
 		    }
 #else
-		    if( !(TheMap.Fields[sx].Flags&MapFieldExplored) ) {
-			DrawUnexploredTile(sx,sy,dx,dy);
-		    } else if( !(TheMap.Fields[sx].Flags&MapFieldVisible) ) {
+		    if( TheMap.Fields[sx].Flags&MapFieldExplored ) {
 			DrawFogOfWarTile(sx,sy,dx,dy);
+		    } else {
+			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
 		    }
 #endif
 		}

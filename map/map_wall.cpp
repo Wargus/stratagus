@@ -26,6 +26,7 @@
 #include "freecraft.h"
 #include "map.h"
 #include "minimap.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -155,9 +156,13 @@ global void MapRemoveWall(unsigned x,unsigned y)
     mf->Flags &= ~(MapFieldHuman|MapFieldWall|MapFieldUnpassable);
 
     UpdateMinimapXY(x,y);
-    MustRedraw|=RedrawMaps;
 
+#ifdef NEW_FOW
+    if( mf->Visible&(1<<ThisPlayer->Player) ) {
+#else
     if( mf->Flags&MapFieldVisible ) {
+#endif
+	MustRedraw|=RedrawMaps;
 	MapMarkSeenTile(x,y);
     }
 }
@@ -184,9 +189,13 @@ global void MapSetWall(unsigned x,unsigned y,int humanwall)
 
     UpdateMinimapXY(x,y);
 
-    MustRedraw|=RedrawMaps;
 
+#ifdef NEW_FOW
+    if( mf->Visible&(1<<ThisPlayer->Player) ) {
+#else
     if( mf->Flags&MapFieldVisible ) {
+#endif
+	MustRedraw|=RedrawMaps;
 	MapMarkSeenTile(x,y);
     }
 }
