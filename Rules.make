@@ -121,8 +121,8 @@ ZLIBS		= -lz
 #ZDEFS		= -DUSE_BZ2LIB
 #ZLIBS		= -lbz2
 # GZ + BZ2 compression
-#ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB
-#ZLIBS		= -lz -lbz2
+ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB
+ZLIBS		= -lz -lbz2
 
 #------------------------------------------------------------------------------
 
@@ -180,13 +180,13 @@ DEBUG=	-DDEBUG -DREFS_DEBUG # -DFLAG_DEBUG
 ## UNITS_ON_MAP:	Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code
 ## NEW_NAMES:		New unit names without copyleft problems
+## NEW_AI:		New better improved AI code
 ## This aren't working:
 ## NEW_FOW:		New fog of war code, should work correct
-## NEW_AI:		New better improved AI code
 ## NEW_SHIPS:		New correct ship movement.
 ## NEW_NETMENUS:	Include new network menues.
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DHAVE_EXPANSION -DUNIT_ON_MAP -D_NEW_NAMES -DNEW_NETMENUS # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_AI -DNEW_SHIPS
+	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -D_NEW_NAMES -D_NEW_NETMENUS # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
