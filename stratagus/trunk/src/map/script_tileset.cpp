@@ -592,7 +592,6 @@ local int CclDefineTileset(lua_State* l)
 				free(Tilesets[type]->Class);
 				free(Tilesets[type]->Name);
 				free(Tilesets[type]->ImageFile);
-				free(Tilesets[type]->PaletteFile);
 				free(Tilesets[type]->Table);
 				free(Tilesets[type]->Tiles);
 				free(Tilesets[type]->TileTypeTable);
@@ -638,8 +637,6 @@ local int CclDefineTileset(lua_State* l)
 			tileset->Name = strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "image")) {
 			tileset->ImageFile = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "palette")) {
-			tileset->PaletteFile = strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "size")) {
 			if (!lua_istable(l, j + 1)) {
 				lua_pushstring(l, "incorrect argument");

@@ -693,7 +693,6 @@ local void SaveTileset(CLFile* file, const Tileset* tileset)
 		tileset->Class);
 	CLprintf(file, "\n  'name \"%s\"", tileset->Name);
 	CLprintf(file, "\n  'image \"%s\"", tileset->ImageFile);
-	CLprintf(file, "\n  'palette \"%s\"", tileset->PaletteFile);
 	CLprintf(file, "\n  ;; Slots descriptions");
 	CLprintf(file, "\n  'slots (list\n  'special (list\t\t;; Can't be in pud\n");
 	CLprintf(file, "	'top-one-tree %d 'mid-one-tree %d 'bot-one-tree %d\n",
@@ -787,7 +786,6 @@ global void CleanTilesets(void)
 		free(Tilesets[i]->Class);
 		free(Tilesets[i]->Name);
 		free(Tilesets[i]->ImageFile);
-		free(Tilesets[i]->PaletteFile);
 		free(Tilesets[i]->Table);
 		free(Tilesets[i]->FlagsTable);
 		free(Tilesets[i]->Tiles);

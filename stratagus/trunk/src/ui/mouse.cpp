@@ -1329,7 +1329,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 		return;
 	}
 
-	if (CursorOn==CursorOnButton) {
+	if (CursorOn == CursorOnButton) {
 		// FIXME: other buttons?
 		if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			DoButtonButtonClicked(ButtonUnderCursor);

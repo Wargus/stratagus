@@ -458,9 +458,9 @@ extern Player Players[PlayerMax];  /// All players
 extern Player* ThisPlayer;         /// Player on local computer
 extern int NoRescueCheck;          /// Disable rescue check
 #ifdef USE_SDL_SURFACE
-extern Uint32 PlayerColors[PlayerMax];
+extern Uint32 PlayerColors[PlayerMax][4];
 #else
-extern VMemType PlayerColors[PlayerMax];   /// Player colors
+extern VMemType PlayerColors[PlayerMax][4];   /// Player colors
 #endif
 extern char* PlayerColorNames[PlayerMax];  /// Player color names
 
@@ -525,9 +525,6 @@ extern void PlayersInitAi(void);
 extern void PlayersEachCycle(void);
 	/// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
-
-	/// Change current color set to new player
-extern void PlayerPixels(const Player* player);
 
 	/// Change current color set to new player of the sprite
 extern void GraphicPlayerPixels(const Player* player, const Graphic * sprite);

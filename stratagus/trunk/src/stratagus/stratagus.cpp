@@ -1028,31 +1028,9 @@ global void ShowLoadProgress(const char* fmt, ...)
 */
 global void PreMenuSetup(void)
 {
-	char* s;
-
-	if (Tilesets == NULL) {
-		fprintf(stderr, "Tilesets is null!!\n");
-		ExitFatal(-1);
-	}
-
 	//
 	//  Initial menus require some gfx.
 	//
-	// FIXME: must search tileset by identifier or use a gui palette?
-	TheMap.TerrainName = Tilesets[0]->Ident;
-	LoadTileset();
-#ifdef USE_SDL_SURFACE
-	GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath,
-		"/graphics/", Tilesets[0]->PaletteFile));
-	TheMap.TerrainName = NULL;
-	free(s);
-#else
-	LoadRGB(GlobalPalette, s = strdcat3(StratagusLibPath,
-		"/graphics/", Tilesets[0]->PaletteFile));
-	TheMap.TerrainName = NULL;
-	free(s);
-	VideoCreatePalette(GlobalPalette);
-#endif
 	SetDefaultTextColors(FontYellow, FontWhite);
 
 	LoadFonts();

@@ -41,7 +41,6 @@ typedef struct _graphic_
 {
 	SDL_Surface *Surface;
 	SDL_Surface *SurfaceFlip;
-	SDL_Palette *Palette;
 	int Width;
 	int Height;
 	int NumFrames;
@@ -237,12 +236,6 @@ extern SDL_Surface* TheScreen;
 #define AMASK 0xff000000
 #endif
 
-extern SDL_Palette *Pixels;
-
-	///		Loaded system palette. 256-entries long, active system palette.
-// FIXME: use SDL_Palette
-extern SDL_Palette* GlobalPalette;
-
 typedef unsigned char GraphicData;		/// generic graphic data type
 
 	/// initialize the video part
@@ -300,11 +293,6 @@ extern void SetClipping(int left, int top, int right, int bottom);
 
 	///		Realize video memory.
 extern void RealizeVideoMemory(void);
-
-	///		Load palette from resource. Just loads palette, to set it use
-	///		VideoCreatePalette, which sets system palette.
-// FIXME: use SDL_Palette
-extern SDL_Palette* LoadRGB(const char* name);
 
 	/// Load sprite
 extern Graphic* LoadSprite(const char* file, int w, int h);
@@ -872,22 +860,6 @@ extern VMemType* VideoMemory;
 #define VideoMemory32		(&VideoMemory->D32)		/// video memory 32bpp
 
 	/**
-	**		Architecture-dependant system palette. Applies as conversion between
-	**		GlobalPalette colors and their representation in videomemory.
-	**		Set by VideoCreatePalette or VideoSetPalette.
-	**		@see VideoCreatePalette VideoSetPalette
-	*/
-extern VMemType* Pixels;
-
-#define Pixels8				(&Pixels->D8)				/// global pixels  8bpp
-#define Pixels16		(&Pixels->D16)				/// global pixels 16bpp
-#define Pixels24		(&Pixels->D24)				/// global pixels 24bpp
-#define Pixels32		(&Pixels->D32)				/// global pixels 32bpp
-
-	///		Loaded system palette. 256-entries long, active system palette.
-extern Palette GlobalPalette[256];
-
-	/**
 	**		Special 8bpp functionality, only to be used in ../video
 	**		@todo use CommonPalette names!
 	*/
@@ -1391,10 +1363,6 @@ extern void PopClipping(void);
 	///		changing the colormap and so on..
 extern void DisplayPicture(const char *name);
 
-	///		Load palette from resource. Just loads palette, to set it use
-	///		VideoCreatePalette, which sets system palette.
-extern void LoadRGB(Palette* pal,const char* name);
-
 	///		Maps RGB to a hardware dependent pixel.
 extern VMemType VideoMapRGB(int r, int g, int b);
 
@@ -1410,13 +1378,6 @@ extern void VideoFreeSharedPalette(VMemType* pixels);
 	///		Initialize Pixels[] for all players.
 	///		(bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette(void);
-
-	///		Initializes system palette. Also calls SetPlayersPalette to set
-	///		palette for all players.
-extern void VideoSetPalette(const VMemType* palette);
-
-	///		Set the system hardware palette from an independend Palette struct.
-extern void VideoCreatePalette(const Palette* palette);
 
 	///		Initializes video synchronization.
 extern void SetVideoSync(void);
