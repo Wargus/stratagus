@@ -329,6 +329,7 @@ local SCM CclDefineAi(SCM list)
 	aitype->Race=str;
     } else {
 	aitype->Race=NULL;
+	free(str);
     }
 
     //
