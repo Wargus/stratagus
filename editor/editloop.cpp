@@ -888,7 +888,7 @@ local void ShowUnitInfo(const Unit* unit)
 	unit->Active ? "active" : "passive");
     if( unit->Type->OilPatch || unit->Type->GivesOil
 	    || unit->Type->GoldMine ) {
-	sprintf(buf+i," Amount %d\n",unit->Value);
+	sprintf(buf+i," Amount %d",unit->Value);
     }
     SetStatusLine(buf);
 }
@@ -1730,7 +1730,7 @@ local void CreateEditor(void)
     file = LibraryFileName(EditorStartFile, buf);
     if ((clf = CLopen(file))) {
 	CLclose(clf);
-	ShowLoadProgress("Script %s\n", file);
+	ShowLoadProgress("Script %s", file);
 	if ((s = strrchr(file, '.')) && s[1] == 'C') {
 	    fast_load(gh_str02scm(file), NIL);
 	} else {
