@@ -1166,11 +1166,10 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int x, int y)
 		}
 	    } else {
 		// FIXME: correct frame?  taken from DrawBuildingCursor
-		if (VideoGraphicFrames(type->Sprite) > 5) {
-		    VideoDrawShadowClip(type->ShadowSprite, 4, x, y);
-		} else {
-		    VideoDrawShadowClip(type->ShadowSprite, 0, x, y);
-		}
+		VideoDrawShadowClip(type->ShadowSprite,
+		    CursorBuilding->Animations->Still[0].Frame +
+			(CursorBuilding->Building ? 0 : CursorBuilding->NumDirections / 2 + 1 - 1),
+		    x, y);
 	    }
 	}
 	return;
@@ -1196,11 +1195,10 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int x, int y)
 	    }
 	} else {
 	    // FIXME: correct frame?  taken from DrawBuildingCursor
-	    if (VideoGraphicFrames(type->Sprite) > 5) {
-		VideoDrawShadowClip(type->ShadowSprite, 4, x, y);
-	    } else {
-		VideoDrawShadowClip(type->ShadowSprite, 0, x, y);
-	    }
+	    VideoDrawShadowClip(type->ShadowSprite,
+		CursorBuilding->Animations->Still[0].Frame +
+		    (CursorBuilding->Building ? 0 : CursorBuilding->NumDirections / 2 + 1 - 1),
+		x, y);
 	}
 	return;
     }
