@@ -133,7 +133,8 @@ local SCM CclSetContrast(SCM contrast)
     old=gh_int2scm(TheUI.Contrast);
     i=gh_scm2int(contrast);
     if( i<0 || i>400 ) {
-	fprintf(stderr,__FUNCTION__": contrast should be 0-400\n");
+	PrintFunction();
+	fprintf(stdout,"Contrast should be 0-400\n");
 	i=100;
     }
     TheUI.Contrast=i;
@@ -157,7 +158,8 @@ local SCM CclSetBrightness(SCM brightness)
     old=gh_int2scm(TheUI.Brightness);
     i=gh_scm2int(brightness);
     if( i<-100 || i>100 ) {
-	fprintf(stderr,__FUNCTION__": brightness should be -100-100\n");
+	PrintFunction();
+	fprintf(stdout,"Brightness should be -100-100\n");
 	i=0;
     }
     TheUI.Brightness=i;
@@ -182,7 +184,8 @@ local SCM CclSetSaturation(SCM saturation)
 
     i=gh_scm2int(saturation);
     if( i<-100 || i>200 ) {
-	fprintf(stderr,__FUNCTION__": saturation should be -100-200\n");
+	PrintFunction();
+	fprintf(stdout,"Saturation should be -100-200\n");
 	i=0;
     }
     TheUI.Saturation=i;

@@ -92,7 +92,11 @@
 
 #if __GNUC__>=3
 
-#if !defined(__I_KNOW_THAT_GNUC_3_IS_UNSUPPORTED__)
+#if __GNUC__==3 && __GNUC_MINOR__>=2 || __GNUC__>3
+#define __GCC32__MAYBE_OK__ 1
+#endif
+
+#if !defined(__GCC32__MAYBE_OK__) && !defined(__I_KNOW_THAT_GNUC_3_IS_UNSUPPORTED__)
 #warning "GCC 3.XX is not supported, downgrade to GCC 2.95"
 #endif
 
@@ -148,9 +152,13 @@
 
 #endif	// } m$
 
+#if defined(__GCC32__MAYBE_OK__)
+#define PrintFunction() do { fprintf(stdout,"%s: ", __func__); } while(0)
+#else
 #ifndef PrintFunction
     /// Print function in debug macros
 #define PrintFunction() do { fprintf(stdout,__FUNCTION__": "); } while(0)
+#endif
 #endif
 
 /*============================================================================

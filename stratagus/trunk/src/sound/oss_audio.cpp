@@ -30,12 +30,14 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <string.h>
 #include "freecraft.h"
 
 #if defined(WITH_SOUND) && !defined(USE_SDLA)	// {
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include "sound_server.h"
 
@@ -79,21 +81,24 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
     }
     dummy=size;
     if( ioctl(SoundFildes,SNDCTL_DSP_SAMPLESIZE,&dummy)==-1 ) {
-	perror(__FUNCTION__ " ioctl(SNDCTL_DSP_SAMPLESIZE)");
+	PrintFunction();
+	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_SAMPLESIZE)", strerror(errno));
 	close(SoundFildes);
 	SoundFildes=-1;
 	return 1;
     }
     dummy=1;
     if( ioctl(SoundFildes,SNDCTL_DSP_STEREO,&dummy)==-1 ) {
-	perror(__FUNCTION__ " ioctl(SNDCTL_DSP_STEREO)");
+	PrintFunction();
+	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_STEREO)", strerror(errno));
 	close(SoundFildes);
 	SoundFildes=-1;
 	return 1;
     }
     dummy=freq;
     if( ioctl(SoundFildes,SNDCTL_DSP_SPEED,&dummy)==-1 ) {
-	perror(__FUNCTION__ " ioctl(SNDCTL_DSP_SPEED)");
+	PrintFunction();
+	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_SPEED)", strerror(errno));
 	close(SoundFildes);
 	SoundFildes=-1;
 	return 1;
@@ -125,7 +130,8 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
 	((dummy>>16)*(1<<(dummy&0xFFFF))*1000)/(freq*size/8));
 
     if( ioctl(SoundFildes,SNDCTL_DSP_SETFRAGMENT,&dummy)==-1 ) {
-	perror(__FUNCTION__);
+	PrintFunction();
+	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_SETFRAGMENT)", strerror(errno));
 	close(SoundFildes);
 	SoundFildes=-1;
 	return 1;
@@ -134,7 +140,8 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
 #if 0
     dummy=4;
     if( ioctl(SoundFildes,SNDCTL_DSP_SUBDIVIDE,&dummy)==-1 ) {
-	perror(__FUNCTION__ " ioctl(SNDCTL_DSP_SUBDIVIDE)");
+	PrintFunction();
+	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_SUBDIVIDE)", strerror(errno));
 	close(SoundFildes);
 	SoundFildes=-1;
 	return;
@@ -143,7 +150,8 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
 
 #ifdef DEBUG
     if( ioctl(SoundFildes,SNDCTL_DSP_GETBLKSIZE,&dummy)==-1 ) {
-	perror(__FUNCTION__ " ioctl(SNDCTL_DSP_GETBLKSIZE)");
+	PrintFunction();
+	fprintf(stdout,"%s - ioctl(SNDCTL_DSP_GETBLKSIZE)", strerror(errno));
 	close(SoundFildes);
 	SoundFildes=-1;
 	return 1;
