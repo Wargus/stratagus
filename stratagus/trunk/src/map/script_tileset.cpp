@@ -107,11 +107,7 @@ local int CclDefineTilesetWcNames(lua_State* l)
     }
 
     for (j = 0; j < i; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	*cp++ = strdup(lua_tostring(l, j + 1));
+	*cp++ = strdup(LuaToString(l, j + 1));
     }
     *cp = NULL;
 
@@ -179,11 +175,7 @@ local int TilesetParseName(lua_State* l, Tileset* tileset)
     char* ident;
     int i;
 
-    if (!lua_isstring(l, -1)) {
-	lua_pushstring(l, "incorrect argument");
-	lua_error(l);
-    }
-    ident = strdup(lua_tostring(l, -1));
+    ident = strdup(LuaToString(l, -1));
     for (i = 0; i < tileset->NumTerrainTypes; ++i) {
 	if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName)) {
 	    free(ident);
@@ -275,12 +267,8 @@ local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
     flags = 0;
     while (1) {
 	lua_rawgeti(l, -1, *j + 1);
-	if (!lua_isstring(l, -1)) {
-	    lua_pop(l, 1);
-	    break;
-	}
 	++(*j);
-	value = lua_tostring(l, -1);
+	value = LuaToString(l, -1);
 	lua_pop(l, 1);
 
 	//
@@ -407,11 +395,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
     //
     for (j = 0; j < args; ++j) {
 	lua_rawgeti(l, -1, j + 1);
-	if (!lua_isstring(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, -1);
+	value = LuaToString(l, -1);
 	lua_pop(l, 1);
 
 	//
@@ -420,29 +404,17 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 	if (!strcmp(value, "top-one-tree")) {
 	    ++j;
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->TopOneTree = lua_tonumber(l, -1);
+	    tileset->TopOneTree = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "mid-one-tree")) {
 	    ++j;
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->MidOneTree = lua_tonumber(l, -1);
+	    tileset->MidOneTree = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "bot-one-tree")) {
 	    ++j;
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->BotOneTree = lua_tonumber(l, -1);
+	    tileset->BotOneTree = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	//
 	//	removed-tree
@@ -450,11 +422,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 	} else if (!strcmp(value, "removed-tree")) {
 	    ++j;
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->RemovedTree = lua_tonumber(l, -1);
+	    tileset->RemovedTree = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	//
 	//	growing-tree
@@ -472,11 +440,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 	    }
 	    for (i = 0; i < 2; ++i) {
 		lua_rawgeti(l, -1, i + 1);
-		if (!lua_isnumber(l, -1)) {
-		    lua_pushstring(l, "incorrect argument");
-		    lua_error(l);
-		}
-		tileset->GrowingTree[i] = lua_tonumber(l, -1);
+		tileset->GrowingTree[i] = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	    }
 	    lua_pop(l, 1);
@@ -487,29 +451,17 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 	} else if (!strcmp(value, "top-one-rock")) {
 	    ++j;
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->TopOneRock = lua_tonumber(l, -1);
+	    tileset->TopOneRock = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "mid-one-rock")) {
 	    ++j;
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->MidOneRock = lua_tonumber(l, -1);
+	    tileset->MidOneRock = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "bot-one-rock")) {
 	    ++j;
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->BotOneRock = lua_tonumber(l, -1);
+	    tileset->BotOneRock = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	//
 	//	removed-rock
@@ -517,11 +469,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 	} else if (!strcmp(value, "removed-rock")) {
 	    ++j;
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->RemovedRock = lua_tonumber(l, -1);
+	    tileset->RemovedRock = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else {
 	    lua_pushfstring(l, "special: unsupported tag: %s", value);
@@ -631,12 +579,8 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 
     for (i = 0; i < len; ++i) {
 	lua_rawgeti(l, -1, i + 1);
-	if (!lua_isnumber(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	tileset->Table[index + i] = lua_tonumber(l, -1);
-//	tt->SolidTiles[i] = tileset->Table[index + i] = lua_tonumber(l, -1);
+	tileset->Table[index + i] = LuaToNumber(l, -1);
+//	tt->SolidTiles[i] = tileset->Table[index + i] = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	tileset->FlagsTable[index + i] = f;
 	tileset->Tiles[index + i].BaseTerrain = basic_name;
@@ -769,11 +713,7 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 	len = luaL_getn(l, -1);
 	for (i = 0; i < len; ++i) {
 	    lua_rawgeti(l, -1, i + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->Table[index + i] = lua_tonumber(l, -1);
+	    tileset->Table[index + i] = LuaToNumber(l, -1);
 	    tileset->FlagsTable[index + i] = f;
 	    tileset->Tiles[index + i].BaseTerrain = basic_name;
 	    tileset->Tiles[index + i].MixTerrain = mixed_name;
@@ -909,11 +849,7 @@ local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
     args = luaL_getn(l, t);
     for (j = 0; j < args; ++j) {
 	lua_rawgeti(l, t, j + 1);
-	if (!lua_isstring(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, -1);
+	value = LuaToString(l, -1);
 	lua_pop(l, 1);
 	++j;
 
@@ -989,19 +925,11 @@ local void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
     args = luaL_getn(l, t);
     for (j = 0; j < args; ++j) {
 	lua_rawgeti(l, -1, j + 1);
-	if (!lua_isnumber(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	num = lua_tonumber(l, -1);
+	num = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	++j;
 	lua_rawgeti(l, -1, j + 1);
-	if (!lua_isstring(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	unit = strdup(lua_tostring(l, -1));
+	unit = strdup(LuaToString(l, -1));
 	lua_pop(l, 1);
 	sprintf(buf, "%d", num);
 	if ((h = (char**)hash_find(tileset->ItemsHash, buf)) != NULL) {
@@ -1123,11 +1051,7 @@ local int CclDefineTileset(lua_State* l)
     int args;
     int j;
 
-    if (!lua_isstring(l, 1)) {
-	lua_pushstring(l, "incorrect argument");
-	lua_error(l);
-    }
-    ident = strdup(lua_tostring(l, 1));
+    ident = strdup(LuaToString(l, 1));
 
     //
     //	Find the tile set.
@@ -1175,61 +1099,29 @@ local int CclDefineTileset(lua_State* l)
     //
     args = lua_gettop(l);
     for (j = 1; j < args; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, j + 1);
+	value = LuaToString(l, j + 1);
 	++j;
 
 	if (!strcmp(value, "file")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->File = strdup(lua_tostring(l, j + 1));
+	    tileset->File = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "class")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->Class = strdup(lua_tostring(l, j + 1));
+	    tileset->Class = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "name")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->Name = strdup(lua_tostring(l, j + 1));
+	    tileset->Name = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "image")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->ImageFile = strdup(lua_tostring(l, j + 1));
+	    tileset->ImageFile = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "palette")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->PaletteFile = strdup(lua_tostring(l, j + 1));
+	    tileset->PaletteFile = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "size")) {
 	    if (!lua_istable(l, j + 1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
 	    lua_rawgeti(l, j + 1, 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->TileSizeX = lua_tonumber(l, -1);
+	    tileset->TileSizeX = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    lua_rawgeti(l, j + 1, 2);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    tileset->TileSizeY = lua_tonumber(l, -1);
+	    tileset->TileSizeY = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "slots")) {
 	    if (!lua_istable(l, j + 1)) {
