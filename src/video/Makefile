@@ -31,7 +31,7 @@ include $(TOPDIR)/Rules.make
 
 MODULE	= video
 
-HDRS	= _clip_rectangle
+HDRS	= _clip_rectangle intern_video.h
 
 OBJS	= video.$(OE) cursor.$(OE) sprite.$(OE) \
 	  graphic.$(OE) linedraw.$(OE) font.$(OE) png.$(OE) \
