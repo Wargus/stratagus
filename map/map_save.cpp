@@ -10,7 +10,7 @@
 //
 /**@name map_save.c	-	Saving the map. */
 //
-//	(c) Copyright 2001,2002 by Lutz Sammer
+//	(c) Copyright 2001-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -123,8 +123,10 @@ global void SaveMap(FILE* file)
 	    if( mf->Flags&MapFieldForest ) {
 		fprintf(file," wood");
 	    }
-#if 0
+#if 1
 	    // Not Required for save
+	    // These are required for now, UnitType::FieldFlags is 0 until
+	    // UpdateStats is called which is after the game is loaded
 	    if( mf->Flags&MapFieldLandUnit ) {
 		fprintf(file," ground");
 	    }
