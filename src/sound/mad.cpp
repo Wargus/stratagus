@@ -270,9 +270,9 @@ local const SampleType Mp3StreamSampleType = {
 */
 local int Mp3Read(Sample* sample, void* buf, int len)
 {
-    unsigned pos;
+    int pos;
 
-    pos = (unsigned)sample->User;
+    pos = (int)sample->User;
     if (pos + len > sample->Length) {		// Not enough data?
 	len = sample->Length - pos;
     }
