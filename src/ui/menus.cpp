@@ -81,6 +81,7 @@ local void CreateNetGameMenu(void);
 
 local void SinglePlayerGameMenu(void);
 local void MultiPlayerGameMenu(void);
+local void CampainGameMenu(void);
 local void ScenSelectMenu(void);
 
 local void ScenSelectLBExit(Menuitem *mi);
@@ -318,11 +319,13 @@ local Menuitem PrgStartMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL,
 	{ drawfunc:{ NameLineDrawFunc } } },
-    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 284, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
-    { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 284 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
-    { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 284 + 36 + 36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Campain Game", 224, 27, MBUTTON_GM_FULL, CampainGameMenu, 'c'} } },
+    { MI_TYPE_BUTTON, 208, 284 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
 #else
     { 0 }
@@ -708,7 +711,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	1, 4,
+	1, 5,
 	PrgStartMenuItems,
 	NULL,
     },
@@ -1347,6 +1350,16 @@ local void SinglePlayerGameMenu(void)
     DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
+    if (GuiGameStarted) {
+	GameMenuReturn();
+    }
+}
+
+local void CampainGameMenu(void)
+{
+    DestroyCursorBackground();
+    GuiGameStarted = 0;
+    // ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -3064,6 +3077,10 @@ global void InitMenus(unsigned int race)
     if (access(ScenSelectPath, F_OK) != 0) {
 	// ARI FIXME: Hack to disable Expansion Gfx..
 	// also shows how to add new tilesets....
+	// - FIXME2:
+	// With new dynamic tileset configuration this
+	// should read what siod-config gave us and
+	// build the menu from that..
 	CustomGameMenuItems[14].d.pulldown.noptions = 4;
     }
 #else
