@@ -172,7 +172,9 @@ global void UpdateDisplay(void)
 
     if( MustRedraw&RedrawMap ) {
 	if (InterfaceState == IfaceStateNormal) {
-            #ifndef NEW_MAPDRAW
+#ifdef NEW_MAPDRAW
+	    MapUpdateFogOfWar(MapX,MapY);
+#else
 	    int i;
 
 	    // FIXME: only needed until flags are correct set
@@ -182,7 +184,7 @@ global void UpdateDisplay(void)
 	    for( i=0; i<MapHeight*MapWidth; ++i ) {
 		MustRedrawTile[i]=1;
 	    }
-            #endif
+#endif
 
 	    SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapEndX,TheUI.MapEndY);
 
