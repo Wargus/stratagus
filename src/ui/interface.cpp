@@ -1399,7 +1399,8 @@ global void InputKeyButtonPress(const EventCallback* callbacks,
 }
 
 global void InputKeyButtonRelease(const EventCallback* callbacks,
-	unsigned ticks, unsigned ikey, unsigned ikeychar)
+	unsigned ticks __attribute__((unused)), unsigned ikey,
+	unsigned ikeychar)
 {
     if( ikey==LastIKey ) {
 	LastIKey=0;
