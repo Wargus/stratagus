@@ -497,7 +497,7 @@ global void PlaySectionMusic(PlaySectionType section)
 	}
     }
 
-    if (CDMode != CDModeStopped && CDMode != CDModeOff) {
+    if (CDMode == CDModeDefined) {
 	if ( (1 << track) & PlaySections[i].CDTracks ) {
 	    newtrack = 0;
 	} else {
@@ -519,7 +519,7 @@ global void PlaySectionMusic(PlaySectionType section)
 	if (newtrack) {
 	    cd_play(newtrack);
 	}
-    } else {
+    } else if (PlaySections[i].Files && (CDMode == CDModeOff || CDMode == CDModeStopped)) {
 	found = 0;
 	numfiles = 0;
 	for (j = 0; PlaySections[i].Files[j] && !found; ++j) {
