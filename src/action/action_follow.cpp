@@ -66,14 +66,10 @@ global void HandleActionFollow(Unit* unit)
     //
     if (unit->SubAction == 128) {
 	goal = unit->Orders[0].Goal;
-	if (!goal || goal->Destroyed || !goal->HP ||
-		goal->Orders[0].Action == UnitActionDie) {
-	    DebugLevel0Fn("Goal dead\n");
+	if (!goal || GoalGone(unit,goal)) {
+	    DebugLevel0Fn("Goal gone\n");
 	    if (goal) {
-		RefsDebugCheck(!goal->Refs);
-		if (!--goal->Refs && goal->Destroyed) {
-		    ReleaseUnit(goal);
-		}
+		RefsDecrease(goal);
 	    }
 	    unit->Orders[0].Goal = NoUnitP;
 	    unit->Wait = 1;
@@ -178,10 +174,7 @@ global void HandleActionFollow(Unit* unit)
 			    if (dest->NewOrder.Goal->Destroyed) {
 				// FIXME: perhaps we should use another dest?
 				DebugLevel0Fn("Destroyed unit in teleport unit\n");
-				RefsDebugCheck(!dest->NewOrder.Goal->Refs);
-				if (!--dest->NewOrder.Goal->Refs) {
-				    ReleaseUnit(dest->NewOrder.Goal);
-				}
+				RefsDecrease(dest);
 				dest->NewOrder.Goal = NoUnitP;
 				dest->NewOrder.Action = UnitActionStill;
 			    }
@@ -193,8 +186,7 @@ global void HandleActionFollow(Unit* unit)
 			// FIXME: Pending command uses any references?
 			//
 			if (unit->Orders[0].Goal) {
-			    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-			    unit->Orders[0].Goal->Refs++;
+			    RefsIncrease(unit->Orders->Goal);
 			}
 		    }
 		}
@@ -222,30 +214,12 @@ global void HandleActionFollow(Unit* unit)
     //
     //	Target destroyed?
     //
-    if ((goal = unit->Orders[0].Goal) && goal->Destroyed) {
-	DebugLevel0Fn("Goal dead\n");
+    if ((goal = unit->Orders[0].Goal) && GoalGone(unit, goal)) {
+	DebugLevel0Fn("Goal gone\n");
 	unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 	unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
 	unit->Orders[0].Goal = NoUnitP;
-	RefsDebugCheck(!goal->Refs);
-	if (!--goal->Refs) {
-	    ReleaseUnit(goal);
-	}
-	goal = NoUnitP;
-	NewResetPath(unit);
-    }
-    //
-    //	Target removed?
-    //
-    if (unit->Type->Transporter && goal && goal->Removed) {
-	DebugLevel0Fn("Goal removed\n");
-	unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
-	unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
-	unit->Orders[0].Goal = NoUnitP;
-	RefsDebugCheck(!goal->Refs);
-	if (!--goal->Refs) {
-	    ReleaseUnit(goal);
-	}
+	RefsDecrease(goal);
 	goal = NoUnitP;
 	NewResetPath(unit);
     }

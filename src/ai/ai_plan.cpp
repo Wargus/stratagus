@@ -582,8 +582,7 @@ global int AiPlanAttack(AiForce * force)
 	    aiunit->Next = force->Units;
 	    force->Units = aiunit;
 	    aiunit->Unit = transporter;
-	    RefsDebugCheck(transporter->Destroyed || !transporter->Refs);
-	    ++transporter->Refs;
+	    RefsIncrease(transporter);
 	}
 
 	DebugLevel0Fn("Can attack\n");

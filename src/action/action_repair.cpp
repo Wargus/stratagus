@@ -105,10 +105,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 		NotifyPlayer(player, NotifyYellow, unit->X, unit->Y, buf);
 		if (player->Ai) {
 		    // FIXME: call back to AI?
-		    RefsDebugCheck(!goal->Refs);
-		    if (!--goal->Refs) {
-			ReleaseUnit(goal);
-		    }
+		    RefsDecrease(goal);
 		    unit->Orders[0].Goal = NULL;
 		    unit->Orders[0].Action = UnitActionStill;
 		    unit->State = unit->SubAction = 0;
@@ -216,27 +213,13 @@ global void HandleActionRepair(Unit* unit)
 		// Check if goal is correct unit.
 		// FIXME: should I do a function for this?
 		if (goal) {
-		    if (goal->Destroyed) {
-			DebugLevel0Fn("destroyed unit\n");
+		    if (GoalGone(unit, goal)) {
+			DebugLevel0Fn("repair target gone. Booohooo\n");
 			unit->Orders[0].X = goal->X;
 			unit->Orders[0].Y = goal->Y;
-			RefsDebugCheck(!goal->Refs);
-			if (!--goal->Refs) {
-			    ReleaseUnit(goal);
-			}
+			RefsDecrease(goal);
 			// FIXME: should I clear this here?
 			unit->Orders[0].Goal = goal = NULL;
-			NewResetPath(unit);
-		    } else if (!goal->HP ||
-			    goal->Orders[0].Action == UnitActionDie ||
-			    goal->HP > goal->Stats->HitPoints) {
-			unit->Orders[0].X = goal->X;
-			unit->Orders[0].Y = goal->Y;
-			RefsDebugCheck(!goal->Refs);
-			--goal->Refs;
-			RefsDebugCheck(!goal->Refs);
-			unit->Orders[0].Goal = goal = NULL;
-			// FIXME: should I clear this here?
 			NewResetPath(unit);
 		    }
 		} else if (unit->Player->AiEnabled) {
@@ -259,9 +242,7 @@ global void HandleActionRepair(Unit* unit)
 		    CheckUnitToBeDrawn(unit);
 		} else if (err < 0) {
 		    if (goal) {		// release reference
-			RefsDebugCheck(!goal->Refs);
-			goal->Refs--;
-			RefsDebugCheck(!goal->Refs);
+			RefsDecrease(goal);
 			unit->Orders[0].Goal = NoUnitP;
 		    }
 		    unit->Orders[0].Action = UnitActionStill;
@@ -291,22 +272,12 @@ global void HandleActionRepair(Unit* unit)
 		// Check if goal is correct unit.
 		// FIXME: should I do a function for this?
 		if (goal) {
-		    if (goal->Destroyed) {
-			DebugLevel0Fn("destroyed unit\n");
+		    if (GoalGone(unit, goal)) {
+			DebugLevel0Fn("repair goal is gone\n");
 			unit->Orders[0].X = goal->X;
 			unit->Orders[0].Y = goal->Y;
-			RefsDebugCheck(!goal->Refs);
-			if (!--goal->Refs) {
-			    ReleaseUnit(goal);
-			}
+			RefsDecrease(goal);
 			// FIXME: should I clear this here?
-			unit->Orders[0].Goal = goal = NULL;
-			NewResetPath(unit);
-		    } else if (!goal->HP ||
-			    goal->Orders[0].Action == UnitActionDie) {
-			// FIXME: should I clear this here?
-			unit->Orders[0].X = goal->X;
-			unit->Orders[0].Y = goal->Y;
 			unit->Orders[0].Goal = goal = NULL;
 			NewResetPath(unit);
 		    }
@@ -321,9 +292,7 @@ global void HandleActionRepair(Unit* unit)
 		//
 		if (!goal || goal->HP >= goal->Stats->HitPoints) {
 		    if (goal) {		// release reference
-			RefsDebugCheck(!goal->Refs);
-			goal->Refs--;
-			RefsDebugCheck(!goal->Refs);
+			RefsDecrease(goal);
 			unit->Orders[0].Goal = NULL;
 		    }
                     unit->Orders[0].Action = UnitActionStill;

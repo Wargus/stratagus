@@ -59,7 +59,7 @@ global int FlagRevealMap;		/// Flag must reveal the map
 global int ReplayRevealMap;		/// Reveal Map is replay
 
 /*----------------------------------------------------------------------------
---	Visibile and explored handling
+--	Visible and explored handling
 ----------------------------------------------------------------------------*/
 
 /**

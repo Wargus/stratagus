@@ -122,7 +122,7 @@ local Unit* CheckForDeadGoal(Unit* unit)
     //	Do we have a goal?
     //
     if ((goal = unit->Orders[0].Goal)) {
-	if (goal->Destroyed) {
+	if (GoalGone(unit, goal)) {
 	    //
 	    //	Goal is destroyed
 	    //
@@ -131,29 +131,14 @@ local Unit* CheckForDeadGoal(Unit* unit)
 	    unit->Orders[0].MinRange = 0;
 	    unit->Orders[0].Range = 0;
 
-	    DebugLevel0Fn("destroyed unit %d\n" _C_ UnitNumber(goal));
-	    RefsDebugCheck(!goal->Refs);
-	    if (!--goal->Refs) {
-		ReleaseUnit(goal);
-	    }
-
-	    unit->Orders[0].Goal = goal = NoUnitP;
-	} else if (!goal->HP || goal->Orders[0].Action == UnitActionDie ||
-		goal->Removed) {
-	    //
-	    //	Goal is unusable, dies or has entered a building.
-	    //
-	    unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
-	    unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
-	    unit->Orders[0].MinRange = 0;
-	    unit->Orders[0].Range = 0;
-
-	    RefsDebugCheck(!goal->Refs);
-	    --goal->Refs;
-	    RefsDebugCheck(!goal->Refs);
+	    DebugLevel0Fn("attack target %d(%s) gone for %d(%s)\n" _C_
+		    UnitNumber(goal) _C_ goal->Type->Name _C_
+		    UnitNumber(unit) _C_ unit->Type->Name);
+	    RefsDecrease(goal);
 
 	    unit->Orders[0].Goal = goal = NoUnitP;
 	}
+
 	if (!goal) {
 	    //
 	    //	If we have a saved order continue this saved order.
@@ -209,8 +194,7 @@ local int CheckForTargetInRange(Unit* unit)
 		DebugCheck(unit->Orders[0].Goal);
 		unit->SavedOrder = unit->Orders[0];
 	    }
-	    RefsDebugCheck(goal->Destroyed || !goal->Refs);
-	    goal->Refs++;
+	    RefsIncrease(goal);
 	    unit->Orders[0].Goal = goal;
 	    unit->Orders[0].MinRange = unit->Type->MinAttackRange;
 	    unit->Orders[0].Range = unit->Stats->AttackRange;
@@ -227,11 +211,8 @@ local int CheckForTargetInRange(Unit* unit)
     } else if (goal && (unit->SubAction & WEAK_TARGET)) {
 	temp = AttackUnitsInReactRange(unit);
 	if (temp && temp->Type->Priority > goal->Type->Priority) {
-	    RefsDebugCheck(!goal->Refs);
-	    goal->Refs--;
-	    RefsDebugCheck(!goal->Refs);
-	    RefsDebugCheck(temp->Destroyed || !temp->Refs);
-	    temp->Refs++;
+	    RefsDecrease(goal);
+	    RefsIncrease(temp);
 	    if (unit->SavedOrder.Action == UnitActionStill) {
 		// Save current command to come back.
 		unit->SavedOrder = unit->Orders[0];
@@ -358,9 +339,7 @@ local void MoveToTarget(Unit* unit)
 	unit->State = unit->SubAction = 0;
 	DebugLevel3Fn("Returning to old task.\n");
 	if (unit->Orders[0].Goal) {
-	    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-	    unit->Orders[0].Goal->Refs--;
-	    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
+	    RefsDecrease(unit->Orders->Goal);
 	}
 	unit->Orders[0] = unit->SavedOrder;
 	NewResetPath(unit);
@@ -465,8 +444,7 @@ local void AttackTarget(Unit* unit)
 		}
 	    }
 
-	    RefsDebugCheck(goal->Destroyed || !goal->Refs);
-	    goal->Refs++;
+	    RefsIncrease(goal);
 	    DebugLevel3Fn("%d Unit in react range %d\n" _C_
 		UnitNumber(unit) _C_ UnitNumber(goal));
 	    unit->Orders[0].Goal = goal;
@@ -483,11 +461,8 @@ local void AttackTarget(Unit* unit)
 	} else if (goal && (unit->SubAction & WEAK_TARGET)) {
 	    temp = AttackUnitsInReactRange(unit);
 	    if (temp && temp->Type->Priority > goal->Type->Priority) {
-		RefsDebugCheck(!goal->Refs);
-		goal->Refs--;
-		RefsDebugCheck(!goal->Refs);
-		RefsDebugCheck(temp->Destroyed || !temp->Refs);
-		temp->Refs++;
+		RefsDecrease(goal);
+		RefsIncrease(temp);
 
 		if (unit->SavedOrder.Action == UnitActionStill) {
 		    // Save current order to come back or to continue it.

@@ -125,8 +125,7 @@ local int MoveToResource(Unit* unit)
 		break;
 	    default:
 		// Goal gone or something.
-		if (!unit->Reset || !(goal->Destroyed || goal->Removed ||
-			!goal->HP || goal->Orders[0].Action == UnitActionDie)) {
+		if (!unit->Reset || GoalGone(unit, goal)) {
 		    return 0;
 		}
 		break;
@@ -174,25 +173,15 @@ local int StartGathering(Unit* unit)
     //
     //	Target is dead, stop getting resources.
     //
-    if (goal->Destroyed || goal->Removed || !goal->HP ||
-	    goal->Orders[0].Action==UnitActionDie) {
+    if (GoalGone(unit, goal)) {
 	DebugLevel3Fn("Destroyed resource goal, stop gathering.\n");
-	RefsDebugCheck(!goal->Refs);
-	--goal->Refs;
-	if (goal->Destroyed) {
-	    if (!goal->Refs) {
-		ReleaseUnit(goal);
-	    }
-	} else {
-	    RefsDebugCheck(!goal->Refs);
-	}
+	RefsDecrease(goal);
 	//  Find an alternative, but don't look too far.
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
 	if ((goal = FindResource(unit, unit->X, unit->Y, 10, unit->CurrentResource))) {
 	    unit->SubAction = SUB_START_RESOURCE;
 	    unit->Orders[0].Goal = goal;
-	    RefsDebugCheck(!goal->Refs);
-	    ++goal->Refs;
+	    RefsIncrease(goal);
 	} else {
 	    unit->Orders[0].Action = UnitActionStill;
 	    unit->Orders[0].Goal = NoUnitP;
@@ -239,10 +228,7 @@ local int StartGathering(Unit* unit)
     //	Place unit inside the resource
     //
     if (!resinfo->HarvestFromOutside) {
-
-	RefsDebugCheck(!goal->Refs);
-	--goal->Refs;
-	RefsDebugCheck(!goal->Refs);
+	RefsDecrease(goal);
 	unit->Orders[0].Goal = NoUnitP;
 
 	RemoveUnit(unit, goal);
@@ -307,8 +293,7 @@ local void LoseResource(Unit* unit,const Unit* source)
 	//
 	unit->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
 	unit->Orders[0].Goal = depot;
-	RefsDebugCheck(!depot->Refs);
-	++depot->Refs;
+	RefsIncrease(depot);
 	NewResetPath(unit);
 	unit->SubAction = SUB_MOVE_TO_DEPOT;
 	unit->Wait = unit->Reset = 1;
@@ -332,8 +317,7 @@ local void LoseResource(Unit* unit,const Unit* source)
 	unit->SubAction = SUB_START_RESOURCE;
 	unit->Wait = unit->Reset = 1;
 	unit->State = 0;
-	RefsDebugCheck(!uins->Orders[0].Goal->Refs);
-	++unit->Orders[0].Goal->Refs;
+	RefsIncrease(unit->Orders[0].Goal);
     } else {
 	DebugLevel0Fn("Unit %d just sits around confused.\n" _C_ unit->Slot);
 	unit->Orders[0].Action = UnitActionStill;
@@ -424,10 +408,9 @@ local int GatherResource(Unit* unit)
 	    DebugCheck(source->Value > 655350);
 
 	    //
-	    //	Target is dead, stop getting resources.
+	    //	Target is not dead, getting resources.
 	    //
-	    if (!(source->Destroyed || source->Removed || !source->HP ||
-		    source->Orders[0].Action == UnitActionDie)) {
+	    if (!GoalGone(unit, source)) {
 		//  Don't load more that there is.
 		if (addload > source->Value) {
 		    addload = source->Value;
@@ -447,8 +430,7 @@ local int GatherResource(Unit* unit)
 	    //	End of resource: destroy the resource.
 	    //	FIXME: implement depleted resources.
 	    //
-	    if (source->Destroyed || source->Removed || !source->HP ||
-		    source->Orders[0].Action == UnitActionDie || source->Value == 0) {
+	    if (GoalGone(unit, source) || (source->Value == 0)) {
 		DebugLevel0Fn("Resource is destroyed for unit %d\n" _C_ unit->Slot);
 		uins = source->UnitInside;
 		//
@@ -460,8 +442,8 @@ local int GatherResource(Unit* unit)
 		}
 
 		//  Don't destroy the resource twice.
-		if (!(source->Destroyed || source->Removed || !source->HP ||
-		    source->Orders[0].Action == UnitActionDie)){
+		//  This only happens when it's empty.
+		if (!GoalGone(unit, source)){
 		    LetUnitDie(source);
 		    // FIXME: make the workers inside look for a new resource.
 		}
@@ -552,8 +534,7 @@ local int StopGathering(Unit* unit)
 		source->Type->TileWidth, source->Type->TileHeight);
 	}
 	unit->Orders[0].Goal = depot;
-	RefsDebugCheck(!depot->Refs);
-	++depot->Refs;
+	RefsIncrease(depot);
 	unit->Orders[0].Range = 1;
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
 	unit->SubAction = SUB_MOVE_TO_DEPOT;
@@ -594,8 +575,7 @@ local int MoveToDepot(Unit* unit)
 	case PF_REACHED:
 	    break;
 	default:
-	    if (!unit->Reset || !(goal->Destroyed || goal->Removed ||
-		    !goal->HP || goal->Orders[0].Action == UnitActionDie)) {
+	    if (!unit->Reset || !GoalGone(unit, goal)) {
 		return 0;
 	    }
 	    break;
@@ -604,22 +584,9 @@ local int MoveToDepot(Unit* unit)
     //
     //	Target is dead, stop getting resources.
     //
-    if (goal->Destroyed) {
-	DebugLevel0Fn("Destroyed unit\n");
-	RefsDebugCheck(!goal->Refs);
-	if (!--goal->Refs) {
-	    ReleaseUnit(goal);
-	}
-	unit->Orders[0].Goal = NoUnitP;
-	// FIXME: perhaps we should choose an alternative
-	unit->Orders[0].Action = UnitActionStill;
-	unit->SubAction = 0;
-	return 0;
-    } else if (goal->Removed || !goal->HP ||
-	    goal->Orders[0].Action == UnitActionDie) {
-	RefsDebugCheck(!goal->Refs);
-	--goal->Refs;
-	RefsDebugCheck(!goal->Refs);
+    if (GoalGone(unit, goal)) {
+	DebugLevel0Fn("Destroyed depot\n");
+	RefsDecrease(goal);
 	unit->Orders[0].Goal = NoUnitP;
 	// FIXME: perhaps we should choose an alternative
 	unit->Orders[0].Action = UnitActionStill;
@@ -637,9 +604,7 @@ local int MoveToDepot(Unit* unit)
 	return 0;
     }
 
-    RefsDebugCheck(!goal->Refs);
-    --goal->Refs;
-    RefsDebugCheck(!goal->Refs);
+    RefsDecrease(goal);
     unit->Orders[0].Goal = NoUnitP;
 
     //
@@ -715,8 +680,7 @@ local int WaitInDepot(Unit* unit)
 		goal->Y + goal->Type->TileHeight / 2,
 		depot->Type->TileWidth, depot->Type->TileHeight);
 	    unit->Orders[0].Goal = goal;
-	    RefsDebugCheck(!goal->Refs);
-	    ++goal->Refs;
+	    RefsIncrease(goal);
 	    unit->Orders[0].Range = 1;
 	    unit->Orders[0].X = unit->Orders[0].Y = -1;
 	} else {
@@ -750,9 +714,7 @@ void ResourceGiveUp(Unit* unit)
 	unit->CurrentResource = 0;
     }
     if (unit->Orders[0].Goal) {
-	RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-	--unit->Orders[0].Goal->Refs;
-	RefsDebugCheck(!unit->Orders[0].Goal->Refs);
+	RefsDecrease(unit->Orders->Goal);
 	unit->Orders[0].Goal = NoUnitP;
     }
 }

@@ -156,11 +156,7 @@ local void SpellMoveToTarget(Unit* unit)
 	    unit->State = unit->SubAction = 0;
 
 	    if (unit->Orders[0].Goal) {	// Release references
-		RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-		if (!--unit->Orders[0].Goal->Refs) {
-		    RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
-		    ReleaseUnit(unit->Orders[0].Goal);
-		}
+		RefsDecrease(unit->Orders->Goal);
 		unit->Orders[0].Goal = NoUnitP;
 	    }
 	}
@@ -211,11 +207,7 @@ global void HandleActionSpellCast(Unit* unit)
 		unit->SubAction = 0;
 		unit->Wait = 1;
 		if (unit->Orders[0].Goal) {
-		    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-		    if (!--unit->Orders[0].Goal->Refs) {
-			RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
-			ReleaseUnit(unit->Orders[0].Goal);
-		    }
+		    RefsDecrease(unit->Orders->Goal);
 		    unit->Orders[0].Goal = NoUnitP;
 		}
 		return;
@@ -240,8 +232,7 @@ global void HandleActionSpellCast(Unit* unit)
 		flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
 		if (flags & AnimationMissile) {
 		    // FIXME: what todo, if unit/goal is removed?
-		    if (unit->Orders[0].Goal &&
-			    unit->Orders[0].Goal->Orders[0].Action == UnitActionDie) {
+		    if (unit->Orders[0].Goal && GoalGone(unit,unit->Orders->Goal)) {
 			unit->Value = 0;
 		    } else {
 			spell = unit->Orders[0].Arg1;
@@ -254,8 +245,7 @@ global void HandleActionSpellCast(Unit* unit)
 		}
 	    } else {
 		// FIXME: what todo, if unit/goal is removed?
-		if (unit->Orders[0].Goal &&
-			unit->Orders[0].Goal->Orders[0].Action == UnitActionDie) {
+		if (unit->Orders[0].Goal && GoalGone(unit, unit->Orders->Goal)) {
 		    unit->Value = 0;
 		} else {
 		    spell = unit->Orders[0].Arg1;
@@ -268,12 +258,7 @@ global void HandleActionSpellCast(Unit* unit)
 		unit->SubAction = 0;
 		unit->Wait = 1;
 		if (unit->Orders[0].Goal) {
-		    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-		    if (!--unit->Orders[0].Goal->Refs) {
-			if (unit->Orders[0].Goal->Destroyed) {
-			    ReleaseUnit(unit->Orders[0].Goal);
-			}
-		    }
+		    RefsDecrease(unit->Orders->Goal);
 		    unit->Orders[0].Goal = NoUnitP;
 		}
 	    }

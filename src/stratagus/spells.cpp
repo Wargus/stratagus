@@ -204,8 +204,7 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);*/
     //  Goal is used to link to destination circle of power
     caster->Goal = portal;
-    RefsDebugCheck(!portal->Refs || portal->Destroyed);
-    portal->Refs++;
+    RefsIncrease(portal);
     //FIXME: setting destination circle of power should use mana
     return 0;
 }
@@ -332,8 +331,7 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	    // FIXME: not correct -- blizzard should continue even if mage is
 	    //       destroyed (though it will be quite short time...)
 	    mis->SourceUnit = caster;
-	    RefsDebugCheck(!caster->Refs || caster->Destroyed);
-	    caster->Refs++;
+	    RefsIncrease(caster);
 	}
     }
     return 1;
@@ -413,8 +411,7 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
     missile->Damage = action->Data.SpawnMissile.Damage;
     missile->SourceUnit = caster;
     missile->TargetUnit = target;
-    RefsDebugCheck(!caster->Refs || caster->Destroyed);
-    caster->Refs++;
+    RefsIncrease(caster);
     return 1;
 }
 

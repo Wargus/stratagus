@@ -138,6 +138,35 @@ global void FreeUnitMemory(Unit* unit)
 #endif
 
 /**
+**	Increase an unit's reference count.
+**
+**	@param unit	The unit
+*/
+global void RefsIncrease(Unit* unit)
+{
+    RefsDebugCheck(!unit->Refs || unit->Destroyed);
+    ++unit->Refs;
+}
+
+/**
+**	Decrease an unit's reference count.
+**
+**	@param unit	The unit
+*/
+global void RefsDecrease(Unit* unit)
+{
+    RefsDebugCheck(!unit->Refs);
+    if (unit->Destroyed) {
+	if (!--unit->Refs) {
+	    ReleaseUnit(unit);
+	}
+    } else {
+	--unit->Refs;
+	RefsDebugCheck(!unit->Refs);
+    }
+}
+
+/**
 **	Release an unit.
 **
 **	The unit is only released, if all references are dropped.
@@ -151,7 +180,7 @@ global void ReleaseUnit(Unit* unit)
 
     DebugCheck(!unit->Type);		// already free.
     DebugCheck(unit->OrderCount != 1);
-    RefsDebugCheck(unit->Orders[0].Goal);
+    DebugCheck(unit->Orders[0].Goal);
 
     //
     //	First release, remove from lists/tables.
@@ -821,29 +850,17 @@ global void UnitClearOrders(Unit *unit)
     //
     for (i = unit->OrderCount; i-- > 0;) {
 	if (unit->Orders[i].Goal) {
-	    RefsDebugCheck(!unit->Orders[i].Goal->Refs);
-	    if (!--unit->Orders[i].Goal->Refs) {
-		RefsDebugCheck(!unit->Orders[i].Goal->Destroyed);
-		ReleaseUnit(unit->Orders[i].Goal);
-	    }
+	    RefsDecrease(unit->Orders[i].Goal);
 	    unit->Orders[i].Goal = NoUnitP;
 	}
 	unit->OrderCount = 1;
     }
     if (unit->NewOrder.Goal) {
-	RefsDebugCheck(!unit->NewOrder.Goal->Refs);
-	if (!--unit->NewOrder.Goal->Refs) {
-	    DebugCheck(!unit->NewOrder.Goal->Destroyed);
-	    ReleaseUnit(unit->NewOrder.Goal);
-	}
+	RefsDecrease(unit->NewOrder.Goal);
 	unit->NewOrder.Goal = NoUnitP;
     }
     if (unit->SavedOrder.Goal) {
-	RefsDebugCheck(!unit->SavedOrder.Goal->Refs);
-	if (!--unit->SavedOrder.Goal->Refs) {
-	    DebugCheck(!unit->SavedOrder.Goal->Destroyed);
-	    ReleaseUnit(unit->SavedOrder.Goal);
-	}
+	RefsDecrease(unit->SavedOrder.Goal);
 	unit->SavedOrder.Goal = NoUnitP;
     }
     unit->Orders[0].Action = UnitActionStill;
