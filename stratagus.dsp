@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "src\include" /I "src\movie\vp31\include" /I "include" /D "NDEBUG" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_SDL" /D "USE_SDLA" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "WITH_SOUND" /D "USE_LIBMODPLUG" /D "USE_OGG" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "src\include" /I "src\movie\vp31\include" /I "include" /D "NDEBUG" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_SDL" /D "USE_SDLA" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_OGG" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "src\include" /I "src\movie\vp31\include" /I "include" /D "_DEBUG" /D "DEBUG" /D "USE_HP_FOR_XP" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_SDL" /D "USE_SDLA" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "WITH_SOUND" /D "USE_LIBMODPLUG" /D "USE_OGG" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "src\include" /I "src\movie\vp31\include" /I "include" /D "_DEBUG" /D "DEBUG" /D "USE_HP_FOR_XP" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_SDL" /D "USE_SDLA" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_OGG" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -667,10 +667,6 @@ SOURCE=.\src\video\cursor.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\deco.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\video\font.c
 # End Source File
 # Begin Source File
@@ -692,10 +688,6 @@ SOURCE=.\src\video\sdl.c
 # Begin Source File
 
 SOURCE=.\src\video\sprite.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\video\sweepline.c
 # End Source File
 # Begin Source File
 
@@ -1025,31 +1017,11 @@ SOURCE=.\src\video\intern_video.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\libmodplug\it_defs.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\libmodplug\modplug.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\libmodplug\sndfile.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\pathfinder\splitter.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\pathfinder\splitter_local.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\libmodplug\stdafx.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\video\sweepline.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
