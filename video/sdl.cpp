@@ -67,7 +67,7 @@
 */
 local Uint32 VideoSyncHandler(Uint32 unused)
 {
-    DebugLevel2("Interrupt %d - %d\n"
+    DebugLevel3("Interrupt %d - %d\n"
 	    ,VideoInterrupts,(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
 
     ++VideoInterrupts;
