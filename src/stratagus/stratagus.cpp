@@ -81,9 +81,25 @@
 **
 **	@subsection Sound Sound
 **
+**		Handles the high and low level of the sound. There are the
+**		background music support, voices and sound effects.
+**		Following low level backends are supported: OSS and SDL.
+**
+**		@todo ogg and mp3 file format support for background music
+**		@todo flac and adpcm file format support for sound effects
+**		@todo better separation of low and high level, assembler mixing
+**			support.
+**
 **		@see sound.h @see sound.c
+**		@see ccl_sound.c @see sound_id.c @see sound_server.c
+**		@see unitsound.c
 **
 **	@subsection Video Video
+**
+**		Handles the high and low level of the graphics. This also
+**		contains the sprite and line drawing routines.
+**		Following low level backends are supported: X11, SVGAlib and
+**		SDL.
 **
 **		@see video.h @see video.c
 **
