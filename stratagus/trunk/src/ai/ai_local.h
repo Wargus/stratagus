@@ -267,6 +267,12 @@ typedef struct _ai_helper_ {
     int			ResearchCount;
     AiUnitTypeTable**	Research;
     /**
+    **	The index is the unit that should be repaired, giving a table of all
+    **	units/buildings which could repair this unit.
+    */
+    int			RepairCount;
+    AiUnitTypeTable**	Repair;
+    /**
     **	The index is the costs that should be collected, giving a table of all
     **	units/buildings which could collect this resource.
     */

@@ -911,7 +911,8 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
     //if (unit->Orders[0].Action != UnitActionBuild && unit->OrderCount==1 ) {
-	if (unit->Orders[0].Action == UnitActionMineGold && unit->OrderCount==1 ) {
+	if (unit->Orders[0].Action == UnitActionMineGold
+		&& unit->OrderCount==1 ) {
 	    table[num++] = unit;
 	}
     }
@@ -947,8 +948,8 @@ local int AiRepairUnit(Unit* unit)
     AiUnitTypeTable* const* tablep;
     const AiUnitTypeTable* table;
 
-    n=AiHelpers.BuildCount;
-    tablep=AiHelpers.Build;
+    n=AiHelpers.RepairCount;
+    tablep=AiHelpers.Repair;
     type=unit->Type;
     if( type->Type>n ) {		// Oops not known.
 	DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
