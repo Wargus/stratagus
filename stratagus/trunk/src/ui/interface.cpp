@@ -73,6 +73,7 @@ local char InputStatusLine[80];	/// Last input status line
 global char GameRunning;	/// Current running state
 global char GamePaused;		/// Current pause state
 global char SkipGameCycle;	/// Skip the next game cycle
+global char BigMapMode;		/// Show only the map
 global enum _iface_state_ InterfaceState; /// Current interface state
 
 /*----------------------------------------------------------------------------
@@ -299,6 +300,19 @@ local void UiEnterMenu(void)
     GamePaused=1;
     SetStatusLine("Game Paused");
     ProcessMenu(MENU_GAME, 0);
+}
+
+/**
+**	Toggle big map mode.
+*/
+local void UiToggleBigMap(void)
+{
+    BigMapMode^=1;
+    if(BigMapMode) {
+	SetStatusLine("Big map enabled");
+    } else {
+	SetStatusLine("Returning to old map");
+    }
 }
 
 /**
@@ -543,6 +557,15 @@ local int CommandKey(int key)
 	    }
 	case KeyCodeF11:
 	    SaveAll();
+	    break;
+
+	case 'b'&0x1F:
+	case 'b':
+	case 'B':			// ALT+B, CTRL+B Toggle big map
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
+	    UiToggleBigMap();
 	    break;
 
 	case 'c':			// CTRL+C,ALT+C, C center on units
