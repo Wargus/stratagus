@@ -10,7 +10,7 @@
 //
 /**@name action_move.c	-	The move action. */
 //
-//	(c) Copyright 1998,2001,2002 by Lutz Sammer
+//	(c) Copyright 1998,2001,2002,2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -47,12 +47,6 @@
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
-
-//
-//	Convert heading into direction.
-//			      //  N NE  E SE  S SW  W NW
-local const int Heading2X[8] = {  0,+1,+1,+1, 0,-1,-1,-1 };
-local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
 
 /*----------------------------------------------------------------------------
 --	Function
@@ -285,10 +279,6 @@ global void HandleActionMove(Unit* unit)
 	//
 	//	FIXME: should use a reachable place to reduce pathfinder time.
 	//
-	IfDebug(
-	if( !PlaceReachable(unit,unit->Orders[0].X,unit->Orders[0].Y,1) ) {
-	    DebugLevel0Fn("FIXME: should use other goal.\n");
-	});
 	DebugCheck( unit->State!=0 );
     }
 

@@ -10,7 +10,7 @@
 //
 /**@name pathfinder.h	-	The path finder headerfile. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer,Russell Smith
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -47,6 +47,9 @@
 **		stop others how far to goal.
 */
 enum _move_return_ {
+    MUST_REACH_GOAL=-4,
+    BEST_GOAL=-5,
+    PF_FAILED=-3,			/// This Pathfinder failed, try another
     PF_UNREACHABLE=-2,			/// Unreachable stop
     PF_REACHED=-1,			/// Reached goal stop
     PF_WAIT=0,				/// Wait, no time or blocked
@@ -72,6 +75,13 @@ extern int AStarFixedUnitCrossingCost;
     /// cost associated to move on a tile occupied by a moving unit
 extern int AStarMovingUnitCrossingCost;
 
+//
+//  Convert heading into direction.
+//                            //  N NE  E SE  S SW  W NW
+extern const int Heading2X[8];
+extern const int Heading2Y[8];
+extern const int XY2Heading[3][3];
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -81,11 +91,11 @@ extern unsigned char* CreateMatrix(void);
     /// Allocate a new matrix and initialize
 extern unsigned char* MakeMatrix(void);
     /// Get next element of the way to goal.
-extern int NewPath(Unit* unit,int* xdp,int* ydp);
+extern int NewPath(Unit* unit);
     /// Return distance to place.
-extern int PlaceReachable(const Unit* unit,int x,int y,int range);
+extern int PlaceReachable(Unit* unit,int x,int y,int range);
     /// Return distance to unit.
-extern int UnitReachable(const Unit* unit,const Unit* dest,int range);
+extern int UnitReachable(Unit* unit,const Unit* dest,int range);
 
 //
 //	in astar.c
@@ -99,6 +109,8 @@ extern void InitAStar(void);
     /// free the a* data structures
 extern void FreeAStar(void);
 
+    /// Find and a* path for a unit
+extern int AStarFindPath(Unit* unit, int x1, int y1, int x2, int y2, int best,char* path);
 //
 //	in ccl_pathfinder.c
 //
