@@ -304,6 +304,7 @@ local void MoveToTarget(Unit* unit)
 	    unit->State=0;
 	    if( !unit->Type->Tower ) {
 		UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
+		CheckUnitToBeDrawn(unit);
 	    }
 	    unit->SubAction++;
 #ifdef NEW_ORDERS
