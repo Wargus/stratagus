@@ -151,7 +151,7 @@ extern void PlaySectionMusic(PlaySectionType section);
     /// Play a sample file
 extern void PlayFile(char* name);
     /// Play a music file
-extern void PlayMusic(const char* name);
+extern int PlayMusic(const char* name);
     /// Stop music playing
 extern void StopMusic(void);
 
@@ -179,7 +179,7 @@ extern void StopMusic(void);
 #define InitSoundClient()		/// Dummy macro for without sound
 
 #define PlayFile(v)			/// Dummy macro for without sound
-#define PlayMusic(v)			/// Dummy macro for without sound
+#define PlayMusic(v) 0			/// Dummy macro for without sound
 #define StopMusic()			/// Dummy macro for without sound
 #define CallbackMusicOn()		/// Dummy macro for without sound
 #define CallbackMusicOff()		/// Dummy macro for without sound

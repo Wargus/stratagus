@@ -326,8 +326,10 @@ global void PlaySectionMusic(PlaySectionType section)
 **
 **	@param name	Name of sound file, format is automatic detected.
 **			Names starting with ':' control the cdrom.
+**
+**	@return		1 if music is playing, 0 if not.
 */
-global void PlayMusic(const char* name)
+global int PlayMusic(const char* name)
 {
     char buffer[PATH_MAX];
 #if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
@@ -335,7 +337,7 @@ global void PlayMusic(const char* name)
 #endif
 
     if (MusicOff) {
-	return;
+	return 0;
     }
 
     if (CurrentMusicFile) {
@@ -349,7 +351,7 @@ global void PlayMusic(const char* name)
 	StopMusic();
 	MusicSample = sample;
 	PlayingMusic = 1;
-	return;
+	return 1;
     }
 
 #ifdef USE_OGG
@@ -358,12 +360,12 @@ global void PlayMusic(const char* name)
 		sample->SampleSize != 16) {
 	    DebugLevel0Fn("Not supported music format\n");
 	    SoundFree(sample);
-	    return;
+	    return 0;
 	}
 	StopMusic();
 	MusicSample = sample;
 	PlayingMusic = 1;
-	return;
+	return 1;
     }
 #endif
 #ifdef USE_MAD
@@ -377,7 +379,7 @@ global void PlayMusic(const char* name)
 	StopMusic();
 	MusicSample = sample;
 	PlayingMusic = 1;
-	return;
+	return 1;
     }
 #endif
 #ifdef USE_FLAC
@@ -393,16 +395,17 @@ global void PlayMusic(const char* name)
 	StopMusic();
 	MusicSample = sample;
 	PlayingMusic = 1;
-	return;
+	return 1;
     }
 #endif
 #ifdef USE_LIBMODPLUG
     if ((sample = LoadMod(name, PlayAudioStream))) {
 	MusicSample = sample;
 	PlayingMusic = 1;
-	return;
+	return 1;
     }
 #endif
+    return 0;
 }
 
 /**
