@@ -95,8 +95,7 @@ local int CclDefineEditorUnitTypes(lua_State* l)
 local int CclSetEditorSelectIcon(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	free(EditorSelectIcon);
 	EditorSelectIcon = strdup(LuaToString(l, 1));
@@ -109,8 +108,7 @@ local int CclSetEditorSelectIcon(lua_State* l)
 local int CclSetEditorUnitsIcon(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	free(EditorUnitsIcon);
 	EditorUnitsIcon = strdup(LuaToString(l, 1));

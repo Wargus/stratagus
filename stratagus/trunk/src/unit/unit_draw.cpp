@@ -308,8 +308,7 @@ global Decoration SpellSprite;
 local int CclManaSprite(lua_State* l)
 {
 	if (lua_gettop(l) != 5) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	free(ManaSprite.File);
 
@@ -334,8 +333,7 @@ local int CclManaSprite(lua_State* l)
 local int CclHealthSprite(lua_State* l)
 {
 	if (lua_gettop(l) != 5) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	free(HealthSprite.File);
 
@@ -360,8 +358,7 @@ local int CclHealthSprite(lua_State* l)
 local int CclShadowSprite(lua_State* l)
 {
 	if (lua_gettop(l) != 5) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	free(ShadowSprite.File);
 
@@ -386,8 +383,7 @@ local int CclShadowSprite(lua_State* l)
 local int CclSpellSprite(lua_State* l)
 {
 	if (lua_gettop(l) != 5) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	free(SpellSprite.File);
 
@@ -406,8 +402,7 @@ local int CclSpellSprite(lua_State* l)
 local int CclShowHealthBar(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowHealthBar = 1;
 	ShowHealthDot = 0;
@@ -421,8 +416,7 @@ local int CclShowHealthBar(lua_State* l)
 local int CclShowHealthDot(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowHealthBar = 0;
 	ShowHealthDot = 1;
@@ -436,8 +430,7 @@ local int CclShowHealthDot(lua_State* l)
 local int CclShowHealthHorizontal(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowHealthBar = 1;
 	ShowHealthDot = 0;
@@ -452,8 +445,7 @@ local int CclShowHealthHorizontal(lua_State* l)
 local int CclShowHealthVertical(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowHealthBar = 1;
 	ShowHealthDot = 0;
@@ -468,8 +460,7 @@ local int CclShowHealthVertical(lua_State* l)
 local int CclShowManaBar(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowManaBar = 1;
 	ShowManaDot = 0;
@@ -483,8 +474,7 @@ local int CclShowManaBar(lua_State* l)
 local int CclShowManaDot(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowManaBar = 0;
 	ShowManaDot = 1;
@@ -498,8 +488,7 @@ local int CclShowManaDot(lua_State* l)
 local int CclShowEnergySelected(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowEnergySelectedOnly = 1;
 
@@ -512,8 +501,7 @@ local int CclShowEnergySelected(lua_State* l)
 local int CclShowFull(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowNoFull = 0;
 
@@ -526,8 +514,7 @@ local int CclShowFull(lua_State* l)
 local int CclShowManaHorizontal(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowManaBar = 1;
 	ShowManaDot = 0;
@@ -542,8 +529,7 @@ local int CclShowManaHorizontal(lua_State* l)
 local int CclShowManaVertical(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowManaBar = 1;
 	ShowManaDot = 0;
@@ -558,8 +544,7 @@ local int CclShowManaVertical(lua_State* l)
 local int CclShowNoFull(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ShowNoFull = 1;
 
@@ -572,8 +557,7 @@ local int CclShowNoFull(lua_State* l)
 local int CclDecorationOnTop(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	DecorationOnTop = 1;
 

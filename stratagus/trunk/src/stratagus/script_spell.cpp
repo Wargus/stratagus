@@ -70,8 +70,7 @@ local void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* loc
 	memset(location, 0, sizeof(*location));
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	j = 0;
@@ -90,8 +89,7 @@ local void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* loc
 			} else if (!strcmp(value, "target")) {
 				location->Base = LocBaseTarget;
 			} else {
-				lua_pushfstring(l, "Unsupported missile location base flag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported missile location base flag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "add-x")) {
 			lua_rawgeti(l, -1, j + 1);
@@ -110,8 +108,7 @@ local void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* loc
 			location->AddRandY = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else {
-			lua_pushfstring(l, "Unsupported missile location description flag: %s",value);
-			lua_error(l);
+			LuaError(l, "Unsupported missile location description flag: %s" _C_ value);
 		}
 	}
 }
@@ -129,8 +126,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 	int j;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	j = 0;
@@ -179,14 +175,12 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				}
 				lua_pop(l, 1);
 			} else {
-				lua_pushfstring(l, "Unsupported spawn-missile tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported spawn-missile tag: %s" _C_ value);
 			}
 		}
 		// Now, checking value.
 		if (spellaction->Data.SpawnMissile.Missile == NULL) {
-			lua_pushstring(l, "Use a missile for spawn-missile (with missile)");
-			lua_error(l);
+			LuaError(l, "Use a missile for spawn-missile (with missile)");
 		}
 	} else if (!strcmp(value, "area-adjust-vitals")) {
 		spellaction->CastFunction = CastAreaAdjustVitals;
@@ -204,8 +198,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				spellaction->Data.AreaAdjustVitals.Mana = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
-				lua_pushfstring(l, "Unsupported area-adjust-vitals tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported area-adjust-vitals tag: %s" _C_ value);
 			}
 		}
 	} else if (!strcmp(value, "area-bombardment")) {
@@ -244,14 +237,12 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				}
 				lua_pop(l, 1);
 			} else {
-				lua_pushfstring(l, "Unsupported area-bombardment tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value);
 			}
 		}
 		// Now, checking value.
 		if (spellaction->Data.AreaBombardment.Missile == NULL) {
-			lua_pushstring(l, "Use a missile for area-bombardment (with missile)");
-			lua_error(l);
+			LuaError(l, "Use a missile for area-bombardment (with missile)");
 		}
 	} else if (!strcmp(value, "demolish")) {
 		spellaction->CastFunction = CastDemolish;
@@ -269,8 +260,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				spellaction->Data.Demolish.Damage = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
-				lua_pushfstring(l, "Unsupported demolish tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported demolish tag: %s" _C_ value);
 			}
 		}
 	} else if (!strcmp(value, "adjust-buffs")) {
@@ -306,8 +296,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				spellaction->Data.AdjustBuffs.InvincibilityTicks = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
-				lua_pushfstring(l, "Unsupported adjust-buffs tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported adjust-buffs tag: %s" _C_ value);
 			}
 		}
 	} else if (!strcmp(value, "summon")) {
@@ -334,14 +323,12 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				spellaction->Data.Summon.RequireCorpse = 1;
 				--j;
 			} else {
-				lua_pushfstring(l, "Unsupported summon tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported summon tag: %s" _C_ value);
 			}
 		}
 		// Now, checking value.
 		if (spellaction->Data.Summon.UnitType == NULL) {
-			lua_pushstring(l, "Use a unittype for summon (with unit-type)");
-			lua_error(l);
+			LuaError(l, "Use a unittype for summon (with unit-type)");
 		}
 	} else if (!strcmp(value, "spawn-portal")) {
 		spellaction->CastFunction = CastSpawnPortal;
@@ -360,14 +347,12 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 					DebugLevel0("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
 				}
 			} else {
-				lua_pushfstring(l, "Unsupported spawn-portal tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported spawn-portal tag: %s" _C_ value);
 			}
 		}
 		// Now, checking value.
 		if (spellaction->Data.SpawnPortal.PortalType == NULL) {
-			lua_pushstring(l, "Use a unittype for spawn-portal (with portal-type)");
-			lua_error(l);
+			LuaError(l, "Use a unittype for spawn-portal (with portal-type)");
 		}
 	} else if (!strcmp(value, "polymorph")) {
 		spellaction->CastFunction = CastPolymorph;
@@ -390,14 +375,12 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				spellaction->Data.Polymorph.PlayerNeutral = 1;
 				--j;
 			} else {
-				lua_pushfstring(l, "Unsupported polymorph tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported polymorph tag: %s" _C_ value);
 			}
 		}
 		// Now, checking value.
 		if (spellaction->Data.Polymorph.NewForm == NULL) {
-			lua_pushstring(l, "Use a unittype for polymorph (with new-form)");
-			lua_error(l);
+			LuaError(l, "Use a unittype for polymorph (with new-form)");
 		}
 	} else if (!strcmp(value, "adjust-vitals")) {
 		spellaction->CastFunction = CastAdjustVitals;
@@ -419,13 +402,11 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				spellaction->Data.AdjustVitals.MaxMultiCast = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
-				lua_pushfstring(l, "Unsupported adjust-vitals tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported adjust-vitals tag: %s" _C_ value);
 			}
 		}
 	} else {
-		lua_pushfstring(l, "Unsupported action type: %s", value);
-		lua_error(l);
+		LuaError(l, "Unsupported action type: %s" _C_ value);
 	}
 }
 
@@ -447,8 +428,7 @@ global char Ccl2Condition(lua_State* l, const char* value)
 	} else if (!strcmp(value, "only")) {
 		return CONDITION_ONLY;
 	} else {
-		lua_pushfstring(l, "Bad condition result: %s", value);
-		lua_error(l);
+		LuaError(l, "Bad condition result: %s" _C_ value);
 		return -1;
 	}
 }
@@ -489,8 +469,7 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 	condition->MaxInvincibilityTicks = 0xFFFFFFF;
 	//  Now parse the list and set values.
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -562,8 +541,7 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 			if (i != NumberBoolFlag) {
 				continue;
 			}
-			lua_pushfstring(l, "Unsuported condition tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsuported condition tag: %s" _C_ value);
 		}
 	}
 }
@@ -583,8 +561,7 @@ local void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 	int j;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -608,8 +585,7 @@ local void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 			CclSpellCondition(l, autocast->Condition);
 			lua_pop(l, 1);
 		} else {
-			lua_pushfstring(l, "Unsupported autocast tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported autocast tag: %s" _C_ value);
 		}
 	}
 }
@@ -666,16 +642,14 @@ local int CclDefineSpell(lua_State* l)
 			spell->ManaCost = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "range")) {
 			if (!lua_isstring(l, i + 1) && !lua_isnumber(l, i + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, i + 1) && !strcmp(lua_tostring(l, i + 1), "infinite")) {
 				spell->Range = INFINITE_RANGE;
 			} else if (lua_isnumber(l, i + 1)) {
 				spell->Range = lua_tonumber(l, i + 1);
 			} else {
-				lua_pushstring(l, "Invalid range");
-				lua_error(l);
+				LuaError(l, "Invalid range");
 			}
 		} else if (!strcmp(value, "repeat-cast")) {
 			spell->RepeatCast = 1;
@@ -689,8 +663,7 @@ local int CclDefineSpell(lua_State* l)
 			} else if (!strcmp(value, "position")) {
 				spell->Target = TargetPosition;
 			} else {
-				lua_pushfstring(l, "Unsupported spell target type tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported spell target type tag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "action")) {
 			int subargs;
@@ -700,8 +673,7 @@ local int CclDefineSpell(lua_State* l)
 			act = spell->Action;
 			memset(act, 0, sizeof(SpellActionType));
 			if (!lua_istable(l, i + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, i + 1);
 			k = 0;
@@ -759,8 +731,7 @@ local int CclDefineSpell(lua_State* l)
 				lua_pushfstring(l, "Bad upgrade name: %s", value);
 			}
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	return 0;

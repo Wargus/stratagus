@@ -186,8 +186,7 @@ local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 	chapter->Type = ChapterShowPicture;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -219,8 +218,7 @@ local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 
 			text = &chapter->Data.Picture.Text;
@@ -264,9 +262,8 @@ local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 					} else if (!strcmp(value, "center")) {
 						(*text)->Align = PictureTextAlignCenter;
 					} else {
-						lua_pushfstring(l, "Invalid chapter picture text align value: %s",
+						LuaError(l, "Invalid chapter picture text align value: %s" _C_
 							value);
-						lua_error(l);
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "text")) {
@@ -392,8 +389,7 @@ local int CclDefineCampaign(lua_State* l)
 			campaign->Players = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "campaign")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			//
 			// Parse the list
@@ -422,13 +418,11 @@ local int CclDefineCampaign(lua_State* l)
 					chapter->Data.Level.Name = strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else {
-					lua_pushfstring(l, "Unsupported tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
@@ -445,8 +439,7 @@ local int CclSetCurrentChapter(lua_State* l)
 	int i;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	for (i = 0; i < NumCampaigns; ++i) {
@@ -494,8 +487,7 @@ local int CclBriefing(lua_State* l)
 		if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
 			if (strcmp(value, "wc2") && strcmp(value, "sc")) {
-				lua_pushfstring(l, "Unsupported briefing type: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported briefing type: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "title")) {
 			if (GameIntro.Title) {
@@ -514,8 +506,7 @@ local int CclBriefing(lua_State* l)
 			GameIntro.TextFile = strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "voice")) {
 			if (voice == MAX_BRIEFING_VOICES) {
-				lua_pushfstring(l, "too many voices");
-				lua_error(l);
+				LuaError(l, "too many voices");
 			}
 			if (GameIntro.VoiceFile[voice]) {
 				free(GameIntro.VoiceFile[voice]);
@@ -524,8 +515,7 @@ local int CclBriefing(lua_State* l)
 			++voice;
 		} else if (!strcmp(value, "objective")) {
 			if (objective == MAX_OBJECTIVES) {
-				lua_pushfstring(l, "too many objectives");
-				lua_error(l);
+				LuaError(l, "too many objectives");
 			}
 			if (GameIntro.Objectives[objective]) {
 				free(GameIntro.Objectives[objective]);
@@ -533,8 +523,7 @@ local int CclBriefing(lua_State* l)
 			GameIntro.Objectives[objective] = strdup(LuaToString(l, j + 1));
 			++objective;
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 

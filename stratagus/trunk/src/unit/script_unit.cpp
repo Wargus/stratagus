@@ -71,8 +71,7 @@ local int CclSetXpDamage(lua_State* l)
 	int old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = XpDamage;
 	XpDamage = LuaToBoolean(l, 1);
@@ -93,8 +92,7 @@ local int CclSetTrainingQueue(lua_State* l)
 	int old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = EnableTrainingQueue;
 	EnableTrainingQueue = LuaToBoolean(l, 1);
@@ -115,8 +113,7 @@ local int CclSetBuildingCapture(lua_State* l)
 	int old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = EnableBuildingCapture;
 	EnableBuildingCapture = LuaToBoolean(l, 1);
@@ -137,8 +134,7 @@ local int CclSetRevealAttacker(lua_State* l)
 	int old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = RevealAttacker;
 	RevealAttacker = LuaToBoolean(l, 1);
@@ -265,8 +261,7 @@ global void CclParseOrder(lua_State* l, Order* order)
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			order->X = LuaToNumber(l, -1);
@@ -289,8 +284,7 @@ global void CclParseOrder(lua_State* l, Order* order)
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			x1 = LuaToNumber(l, -1);
@@ -320,8 +314,7 @@ global void CclParseOrder(lua_State* l, Order* order)
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			x1 = LuaToNumber(l, -1);
@@ -340,8 +333,7 @@ global void CclParseOrder(lua_State* l, Order* order)
 
 		} else {
 		   // This leaves a half initialized unit
-		   lua_pushfstring(l, "Unsupported tag: %s", value);
-		   lua_error(l);
+		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -379,8 +371,7 @@ local void CclParseBuilded(lua_State* l, Unit* unit)
 	int j;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -434,8 +425,7 @@ local void CclParseResWorker(lua_State* l, Unit* unit)
 	int j;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -468,8 +458,7 @@ local void CclParseResearch(lua_State* l, Unit* unit)
 	int j;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -499,8 +488,7 @@ local void CclParseUpgradeTo(lua_State* l, Unit* unit)
 	int j;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -530,8 +518,7 @@ local void CclParseTrain(lua_State* l, Unit* unit)
 	int j;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -553,8 +540,7 @@ local void CclParseTrain(lua_State* l, Unit* unit)
 
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (i = 0, k = 0; i < MAX_UNIT_TRAIN && k < subargs; ++i, ++k) {
@@ -585,8 +571,7 @@ local void CclParseMove(lua_State* l, Unit* unit)
 	int j;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -603,8 +588,7 @@ local void CclParseMove(lua_State* l, Unit* unit)
 
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -694,8 +678,7 @@ local int CclUnit(lua_State* l)
 			int h;
 
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 4) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			x = LuaToNumber(l, -1);
@@ -712,8 +695,7 @@ local int CclUnit(lua_State* l)
 			MapMarkSight(player, x, y, w, h, unit->CurrentSightRange);
 		} else if (!strcmp(value, "tile")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			unit->X = LuaToNumber(l, -1);
@@ -725,8 +707,7 @@ local int CclUnit(lua_State* l)
 			unit->Stats = &type->Stats[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "pixel")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			unit->IX = LuaToNumber(l, -1);
@@ -736,8 +717,7 @@ local int CclUnit(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "seen-pixel")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			unit->Seen.IX = LuaToNumber(l, -1);
@@ -863,8 +843,7 @@ local int CclUnit(lua_State* l)
 			int k;
 
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -939,8 +918,7 @@ local int CclUnit(lua_State* l)
 			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
 		} else {
 		   // FIXME: this leaves a half initialized unit
-		   lua_pushfstring(l, "Unsupported tag: %s", value);
-		   lua_error(l);
+		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
@@ -999,8 +977,7 @@ local int CclMakeUnit(lua_State* l)
 	Unit* unit;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -1026,8 +1003,7 @@ local int CclPlaceUnit(lua_State* l)
 	Unit* unit;
 
 	if (lua_gettop(l) != 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -1059,8 +1035,7 @@ local int CclCreateUnit(lua_State* l)
 	int iy;
 
 	if (lua_gettop(l) != 4) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -1075,8 +1050,7 @@ local int CclCreateUnit(lua_State* l)
 	lua_pop(l, 1);
 	if (playerno == -1) {
 		printf("CreateUnit: You cannot use 'any in create-unit, specify a player\n");
-		lua_pushfstring(l, "bad player");
-		lua_error(l);
+		LuaError(l, "bad player");
 		return 0;
 	}
 	unit = MakeUnit(unittype, &Players[playerno]);
@@ -1118,8 +1092,7 @@ local int CclOrderUnit(lua_State* l)
 	const char* order;
 
 	if (lua_gettop(l) != 5) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -1129,8 +1102,7 @@ local int CclOrderUnit(lua_State* l)
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 3)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 3, 1);
 	x1 = LuaToNumber(l, -1);
@@ -1150,8 +1122,7 @@ local int CclOrderUnit(lua_State* l)
 		y2 = y1;
 	}
 	if (!lua_istable(l, 4)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 4, 1);
 	dx1 = LuaToNumber(l, -1);
@@ -1190,8 +1161,7 @@ local int CclOrderUnit(lua_State* l)
 				} else if (!strcmp(order, "patrol")) {
 					CommandPatrolUnit(unit, (dx1 + dx2) / 2, (dy1 + dy2) / 2, 1);
 				} else {
-					lua_pushfstring(l, "Unsupported order: %s", order);
-					lua_error(l);
+					LuaError(l, "Unsupported order: %s" _C_ order);
 				}
 			}
 		}
@@ -1217,8 +1187,7 @@ local int CclKillUnit(lua_State* l)
 	Unit** table;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -1275,8 +1244,7 @@ local int CclKillUnitAt(lua_State* l)
 	int s;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 2);
@@ -1287,8 +1255,7 @@ local int CclKillUnitAt(lua_State* l)
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 4)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 4, 1);
 	x1 = LuaToNumber(l, -1);
@@ -1334,8 +1301,7 @@ local int CclGetUnits(lua_State* l)
 	int i;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	plynr = TriggerGetPlayer(l);
@@ -1367,8 +1333,7 @@ local int CclGetUnitMana(lua_State* l)
 	const Unit* unit;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	unit = CclGetUnit(l);
@@ -1390,8 +1355,7 @@ local int CclSetUnitMana(lua_State* l)
 	int mana;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -1422,8 +1386,7 @@ local int CclGetUnitUnholyArmor(lua_State* l)
 	const Unit* unit;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	unit = CclGetUnit(l);
@@ -1444,8 +1407,7 @@ local int CclSetUnitUnholyArmor(lua_State* l)
 	Unit* unit;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -1534,8 +1496,7 @@ local int CclUnitAllocQueue(lua_State* l)
 				unit->Refs = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
-				lua_pushfstring(l, "Wrong key %s", key);
-				lua_error(l);
+				LuaError(l, "Wrong key %s" _C_ key);
 				return 0;
 			}
 		}

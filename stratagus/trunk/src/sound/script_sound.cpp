@@ -98,8 +98,7 @@ local SoundId CclGetSoundId(lua_State* l)
 			return data->Data;
 		}
 	}
-	lua_pushfstring(l, "CclGetSoundId: not a sound");
-	lua_error(l);
+	LuaError(l, "CclGetSoundId: not a sound");
 	return NULL;
 }
 
@@ -126,8 +125,7 @@ local int CclMakeSound(lua_State* l)
 	LuaUserData* data;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	c_name = LuaToString(l, 1);
@@ -155,8 +153,7 @@ local int CclMakeSound(lua_State* l)
 		}
 		free(c_files);
 	} else {
-		lua_pushfstring(l, "string or table expected");
-		lua_error(l);
+		LuaError(l, "string or table expected");
 		return 0;
 	}
 	data = lua_newuserdata(l, sizeof(LuaUserData));
@@ -184,8 +181,7 @@ local int CclMakeSoundGroup(lua_State* l)
 	LuaUserData* data;
 
 	if (lua_gettop(l) != 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	c_name = LuaToString(l, 1);
@@ -215,8 +211,7 @@ local int CclMapSound(lua_State* l)
 	const char* sound_name;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	sound_name = LuaToString(l, 1);
 	MapSound(sound_name, CclGetSoundId(l));
@@ -236,8 +231,7 @@ local int CclPlaySound(lua_State* l)
 	SoundId id;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	id = CclGetSoundId(l);
@@ -252,8 +246,7 @@ local int CclPlaySound(lua_State* l)
 local int CclDisplaySounds(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	DisplaySoundHashTable();
@@ -283,28 +276,24 @@ local int CclDefineGameSounds(lua_State* l)
 		if (!strcmp(value, "click")) {
 			if (!lua_isuserdata(l, j + 1) ||
 					(data = lua_touserdata(l, j + 1))->Type != LuaSoundType) {
-				lua_pushfstring(l, "Sound id expected");
-				lua_error(l);
+				LuaError(l, "Sound id expected");
 			}
 			GameSounds.Click.Sound = data->Data;
 		} else if (!strcmp(value, "placement-error")) {
 			if (!lua_isuserdata(l, j + 1) ||
 					(data = lua_touserdata(l, j + 1))->Type != LuaSoundType) {
-				lua_pushfstring(l, "Sound id expected");
-				lua_error(l);
+				LuaError(l, "Sound id expected");
 			}
 			GameSounds.PlacementError.Sound = data->Data;
 		} else if (!strcmp(value, "placement-success")) {
 			if (!lua_isuserdata(l, j + 1) ||
 					(data = lua_touserdata(l, j + 1))->Type != LuaSoundType) {
-				lua_pushfstring(l, "Sound id expected");
-				lua_error(l);
+				LuaError(l, "Sound id expected");
 			}
 			GameSounds.PlacementSuccess.Sound = data->Data;
 		} else if (!strcmp(value, "work-complete")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			value = LuaToString(l, -1);
@@ -315,21 +304,18 @@ local int CclDefineGameSounds(lua_State* l)
 				}
 			}
 			if (i == PlayerRaces.Count) {
-				lua_pushfstring(l, "Unknown race: %s", value);
-				lua_error(l);
+				LuaError(l, "Unknown race: %s" _C_ value);
 			}
 			lua_rawgeti(l, j + 1, 2);
 			if (!lua_isuserdata(l, -1) ||
 					(data = lua_touserdata(l, -1))->Type != LuaSoundType) {
-				lua_pushfstring(l, "Sound id expected");
-				lua_error(l);
+				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
 			GameSounds.WorkComplete[i].Sound = data->Data;
 		} else if (!strcmp(value, "rescue")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			value = LuaToString(l, -1);
@@ -340,20 +326,17 @@ local int CclDefineGameSounds(lua_State* l)
 				}
 			}
 			if (i == PlayerRaces.Count) {
-				lua_pushfstring(l, "Unknown race: %s", value);
-				lua_error(l);
+				LuaError(l, "Unknown race: %s" _C_ value);
 			}
 			lua_rawgeti(l, j + 1, 2);
 			if (!lua_isuserdata(l, -1) ||
 					(data = lua_touserdata(l, -1))->Type != LuaSoundType) {
-				lua_pushfstring(l, "Sound id expected");
-				lua_error(l);
+				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
 			GameSounds.Rescue[i].Sound = data->Data;
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	return 0;
@@ -367,8 +350,7 @@ local int CclDefineGameSounds(lua_State* l)
 local int CclSetSoundVolume(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	SetGlobalVolume(LuaToNumber(l, 1));
@@ -384,8 +366,7 @@ local int CclSetSoundVolume(lua_State* l)
 local int CclSetMusicVolume(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	SetMusicVolume(LuaToNumber(l, 1));
@@ -405,8 +386,7 @@ local int CclSetCdMode(lua_State* l)
 	const char* mode;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	mode = LuaToString(l, 1);
 
@@ -420,8 +400,7 @@ local int CclSetCdMode(lua_State* l)
 		cdmode = CDModeOff;
 	} else {
 		cdmode = CDModeOff;
-		lua_pushfstring(l, "Unsupported tag: %s", mode);
-		lua_error(l);
+		LuaError(l, "Unsupported tag: %s" _C_ mode);
 	}
 
 	PlayCDRom(cdmode);
@@ -466,13 +445,11 @@ local int CclDefinePlaySections(lua_State* l)
 			} else if (!strcmp(value, "main-menu")) {
 				p->Type = PlaySectionMainMenu;
 			} else {
-				lua_pushfstring(l, "Unsupported tag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "cd")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -489,8 +466,7 @@ local int CclDefinePlaySections(lua_State* l)
 					} else if (!strcmp(value, "random")) {
 						p->CDOrder = PlaySectionOrderRandom;
 					} else {
-						lua_pushfstring(l, "Unsupported tag: %s", value);
-						lua_error(l);
+						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				} else if (!strcmp(value, "tracks")) {
 					int subsubargs;
@@ -498,8 +474,7 @@ local int CclDefinePlaySections(lua_State* l)
 
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
-						lua_pushstring(l, "incorrect argument");
-						lua_error(l);
+						LuaError(l, "incorrect argument");
 					}
 					subsubargs = luaL_getn(l, -1);
 					for (subk = 0; subk < subsubargs; ++subk) {
@@ -509,14 +484,12 @@ local int CclDefinePlaySections(lua_State* l)
 					}
 					lua_pop(l, 1);
 				} else {
-					lua_pushfstring(l, "Unsupported tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "no-cd")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -533,8 +506,7 @@ local int CclDefinePlaySections(lua_State* l)
 					} else if (!strcmp(value, "random")) {
 						p->FileOrder = PlaySectionOrderRandom;
 					} else {
-						lua_pushfstring(l, "Unsupported tag: %s", value);
-						lua_error(l);
+						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				} else if (!strcmp(value, "files")) {
 					int subsubargs;
@@ -542,8 +514,7 @@ local int CclDefinePlaySections(lua_State* l)
 
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
-						lua_pushstring(l, "incorrect argument");
-						lua_error(l);
+						LuaError(l, "incorrect argument");
 					}
 					subsubargs = luaL_getn(l, -1);
 					p->Files = malloc((subsubargs + 1) * sizeof(char*));
@@ -555,13 +526,11 @@ local int CclDefinePlaySections(lua_State* l)
 					}
 					lua_pop(l, 1);
 				} else {
-					lua_pushfstring(l, "Unsupported tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	return 0;
@@ -573,8 +542,7 @@ local int CclDefinePlaySections(lua_State* l)
 local int CclSoundOff(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	SoundOff = 1;
@@ -590,8 +558,7 @@ local int CclSoundOff(lua_State* l)
 local int CclSoundOn(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	if (SoundFildes != -1) {
@@ -609,8 +576,7 @@ local int CclSoundOn(lua_State* l)
 local int CclMusicOff(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	StopMusic();
@@ -627,8 +593,7 @@ local int CclMusicOff(lua_State* l)
 local int CclMusicOn(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	MusicOff = 0;
@@ -645,8 +610,7 @@ local int CclSetGlobalSoundRange(lua_State* l)
 	int d;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	// FIXME: check for errors
@@ -664,8 +628,7 @@ local int CclSetGlobalSoundRange(lua_State* l)
 local int CclSoundThread(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 #ifdef USE_THREAD
@@ -686,8 +649,7 @@ local int CclSetSoundRange(lua_State* l) {
 	SoundId id;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	tmp = LuaToNumber(l, 2);
@@ -713,8 +675,7 @@ local int CclSetSoundRange(lua_State* l) {
 local int CclPlayMusic(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	PlayMusic(LuaToString(l, 1));
@@ -730,8 +691,7 @@ local int CclPlayMusic(lua_State* l)
 local int CclPlayFile(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	PlaySoundFile(LuaToString(l, 1));
@@ -745,8 +705,7 @@ local int CclPlayFile(lua_State* l)
 local int CclStopMusic(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	StopMusic();
@@ -797,8 +756,7 @@ global void SoundCclRegister(void)
 local int CclSetSoundVolume(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
 	return 1;
@@ -812,8 +770,7 @@ local int CclSetSoundVolume(lua_State* l)
 local int CclSetMusicVolume(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
 	return 1;
@@ -827,8 +784,7 @@ local int CclSetMusicVolume(lua_State* l)
 local int CclSetCdMode(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
 	return 1;
@@ -881,8 +837,7 @@ local int CclMusicOn(lua_State* l)
 local int CclSetGlobalSoundRange(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
 	return 1;
@@ -897,8 +852,7 @@ local int CclSetGlobalSoundRange(lua_State* l)
 local int CclSetSoundRange(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
 	return 1;
@@ -951,8 +905,7 @@ local int CclDefineGameSounds(lua_State* l)
 local int CclMapSound(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 2);
 	return 1;

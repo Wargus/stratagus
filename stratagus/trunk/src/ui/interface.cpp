@@ -978,8 +978,7 @@ global int HandleCheats(const char* input)
 		ret = LuaToBoolean(Lua, 1);
 		lua_pop(Lua, 1);
 	} else {
-		lua_pushstring(Lua, "HandleCheats must return a boolean");
-		lua_error(Lua);
+		LuaError(Lua, "HandleCheats must return a boolean");
 		ret = 0;
 	}
 	return ret;

@@ -71,8 +71,7 @@ local int CclDefineMissileType(lua_State* l)
 	unsigned i;
 
 	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	// Slot identifier
@@ -109,8 +108,7 @@ local int CclDefineMissileType(lua_State* l)
 			mtype->File = strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			mtype->Width = LuaToNumber(l, -1);
@@ -141,8 +139,7 @@ local int CclDefineMissileType(lua_State* l)
 				}
 			}
 			if (!MissileClassNames[i]) {
-				lua_pushfstring(l, "Unsupported class: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported class: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "NumBounces")) {
 			mtype->NumBounces = LuaToNumber(l, -1);
@@ -169,8 +166,7 @@ local int CclDefineMissileType(lua_State* l)
 		} else if (!strcmp(value, "SplashFactor")) {
 			mtype->SplashFactor = LuaToNumber(l, -1);
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
@@ -248,8 +244,7 @@ local int CclMissile(lua_State* l)
 			type = MissileTypeByIdent(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "pos")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			x = LuaToNumber(l, -1);
@@ -259,8 +254,7 @@ local int CclMissile(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "origin-pos")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			sx = LuaToNumber(l, -1);
@@ -270,8 +264,7 @@ local int CclMissile(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			dx = LuaToNumber(l, -1);
@@ -333,8 +326,7 @@ local int CclMissile(lua_State* l)
 		} else if (!strcmp(value, "step")) {
 			DebugCheck(!missile);
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			missile->CurrentStep = LuaToNumber(l, -1);
@@ -386,8 +378,7 @@ local int CclDefineBurningBuilding(lua_State* l)
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 
 		*frame = calloc(1, sizeof(BurningBuildingFrame));

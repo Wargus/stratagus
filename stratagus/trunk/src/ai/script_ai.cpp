@@ -156,8 +156,7 @@ local int CclDefineAiHelper(lua_State* l)
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		subargs = luaL_getn(l, j + 1);
 		k = 0;
@@ -184,8 +183,7 @@ local int CclDefineAiHelper(lua_State* l)
 		} else if (!strcmp(value, "repair")) {
 			what = 6;
 		} else {
-			lua_pushfstring(l, "unknown tag: %s", value);
-			lua_error(l);
+			LuaError(l, "unknown tag: %s" _C_ value);
 			what = -1;
 		}
 
@@ -200,8 +198,7 @@ local int CclDefineAiHelper(lua_State* l)
 		++k;
 		base = UnitTypeByIdent(value);
 		if (!base) {
-			lua_pushfstring(l, "unknown unittype: %s", value);
-			lua_error(l);
+			LuaError(l, "unknown unittype: %s" _C_ value);
 		}
 		DebugLevel3Fn("%s\n" _C_ base->Name);
 
@@ -215,23 +212,20 @@ local int CclDefineAiHelper(lua_State* l)
 			if (what == 3) {
 				upgrade = UpgradeByIdent(value);
 				if (!upgrade) {
-					lua_pushfstring(l, "unknown upgrade: %s", value);
-					lua_error(l);
+					LuaError(l, "unknown upgrade: %s" _C_ value);
 				}
 				DebugLevel3Fn("> %s\n" _C_ upgrade->Ident);
 			} else if (what == 4) {
 				if (!strcmp("food", value)) {
 					cost = 0;
 				} else {
-					lua_pushfstring(l, "unknown limit: %s", value);
-					lua_error(l);
+					LuaError(l, "unknown limit: %s" _C_ value);
 				}
 				DebugLevel3Fn("> %s\n" _C_ str);
 			} else {
 				type = UnitTypeByIdent(value);
 				if (!type) {
-					lua_pushfstring(l, "unknown unittype: %s", value);
-					lua_error(l);
+					LuaError(l, "unknown unittype: %s" _C_ value);
 				}
 				DebugLevel3Fn("> %s\n" _C_ type->Name);
 			}
@@ -296,10 +290,9 @@ local int CclDefineAi(lua_State* l)
 	const AiType* ait;
 #endif
 
-    if (lua_gettop(l) != 4 || !lua_isfunction(l, 4)) {
-	lua_pushstring(l, "incorrect argument");
-	lua_error(l);
-    }
+	if (lua_gettop(l) != 4 || !lua_isfunction(l, 4)) {
+		LuaError(l, "incorrect argument");
+	}
 
 	aitype = malloc(sizeof(AiType));
 	aitype->Next = AiTypes;
@@ -495,8 +488,7 @@ local void InsertResearchRequests(Upgrade* upgrade)
 local int CclAiGetRace(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushstring(l, AiPlayer->Player->RaceName);
 	return 1;
@@ -512,8 +504,7 @@ local int CclAiGetRace(lua_State* l)
 local int CclAiGetSleepCycles(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushnumber(l, AiSleepCycles);
 	return 1;
@@ -531,8 +522,7 @@ local int CclAiGetSleepCycles(lua_State* l)
 local int CclAiDebug(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	if (!LuaToBoolean(l, 1)) {
 		AiPlayer->ScriptDebug = 0;
@@ -604,8 +594,7 @@ local int CclAiDebugPlayer(lua_State* l)
 local int CclAiNeed(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	InsertUnitTypeRequests(CclGetUnitType(l), 1);
 
@@ -626,8 +615,7 @@ local int CclAiSet(lua_State* l)
 	UnitType* type;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
 	type = CclGetUnitType(l);
@@ -659,8 +647,7 @@ local int CclAiWait(lua_State* l)
 	int n;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	type = CclGetUnitType(l);
 	unit_types_count = AiPlayer->Player->UnitTypesCount;
@@ -733,13 +720,11 @@ local int CclAiForce(lua_State* l)
 	int j;
 
 	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
-		lua_pushfstring(l, "Force out of range: %d", force);
-		lua_error(l);
+		LuaError(l, "Force out of range: %d" _C_ force);
 	}
 
 	args = luaL_getn(l, 2);
@@ -804,13 +789,11 @@ local int CclAiForceRole(lua_State* l)
 	const char* flag;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
-		lua_pushfstring(l, "Force out of range", force);
-		lua_error(l);
+		LuaError(l, "Force out of range" _C_ force);
 	}
 	flag = LuaToString(l, 2);
 	if (!strcmp(flag, "attack")) {
@@ -818,8 +801,7 @@ local int CclAiForceRole(lua_State* l)
 	} else if (!strcmp(flag, "defend")) {
 		AiPlayer->Force[force].Role = AiForceRoleDefend;
 	} else {
-		lua_pushfstring(l, "Unknown force role", flag);
-		lua_error(l);
+		LuaError(l, "Unknown force role" _C_ flag);
 	}
 
 	lua_pushboolean(l, 0);
@@ -837,8 +819,7 @@ local int CclAiCheckForce(lua_State* l)
 	int force;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
@@ -862,13 +843,11 @@ local int CclAiWaitForce(lua_State* l)
 	int force;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
-		lua_pushfstring(l, "Force out of range: %d", force);
-		lua_error(l);
+		LuaError(l, "Force out of range: %d" _C_ force);
 	}
 	if (AiPlayer->Force[force].Completed) {
 		lua_pushboolean(l, 0);
@@ -895,13 +874,11 @@ local int CclAiAttackWithForce(lua_State* l)
 	int force;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
-		lua_pushfstring(l, "Force out of range: %d", force);
-		lua_error(l);
+		LuaError(l, "Force out of range: %d" _C_ force);
 	}
 
 	AiAttackWithForce(force);
@@ -920,8 +897,7 @@ local int CclAiSleep(lua_State* l)
 	int i;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	DebugLevel3Fn("%lu %d\n" _C_ GameCycle _C_ AiPlayer->SleepCycles);
 	if (AiPlayer->SleepCycles) {
@@ -950,14 +926,12 @@ local int CclAiResearch(lua_State* l)
 	Upgrade* upgrade;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	if ((str = LuaToString(l, 1))) {
 		upgrade = UpgradeByIdent(str);
 	} else {
-		lua_pushfstring(l, "Upgrade needed");
-		lua_error(l);
+		LuaError(l, "Upgrade needed");
 		upgrade = 0;
 	}
 
@@ -977,8 +951,7 @@ local int CclAiUpgradeTo(lua_State* l)
 	UnitType* type;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	type = CclGetUnitType(l);
 	InsertUpgradeToRequests(type);
@@ -995,8 +968,7 @@ local int CclAiUpgradeTo(lua_State* l)
 local int CclAiPlayer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushnumber(l, AiPlayer->Player->Player);
 	return 1;
@@ -1013,8 +985,7 @@ local int CclAiSetReserve(lua_State* l)
 	int i;
 
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_newtable(l);
 	for (i = 0; i < MaxCosts; ++i) {
@@ -1041,8 +1012,7 @@ local int CclAiSetCollect(lua_State* l)
 	int i;
 
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	// FIXME: use key/value pairs
 	lua_newtable(l);
@@ -1069,8 +1039,7 @@ local int CclAiDump(lua_State* l)
 	const AiBuildQueue* queue;
 
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	//
 	// Script
@@ -1247,8 +1216,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			ai->SleepCycles = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "force")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			k = 0;
@@ -1282,8 +1250,7 @@ local int CclDefineAiPlayer(lua_State* l)
 					} else if (!strcmp(value, "defend")) {
 						ai->Force[i].Role = AiForceRoleDefend;
 					} else {
-						lua_pushfstring(l, "Unsupported force tag: %s", value);
-						lua_error(l);
+						LuaError(l, "Unsupported force tag: %s" _C_ value);
 					}
 				} else if (!strcmp(value, "types")) {
 					AiUnitType** queue;
@@ -1292,8 +1259,7 @@ local int CclDefineAiPlayer(lua_State* l)
 
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
-						lua_pushstring(l, "incorrect argument");
-						lua_error(l);
+						LuaError(l, "incorrect argument");
 					}
 					subsubargs = luaL_getn(l, -1);
 					queue = &ai->Force[i].UnitTypes;
@@ -1322,8 +1288,7 @@ local int CclDefineAiPlayer(lua_State* l)
 
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
-						lua_pushstring(l, "incorrect argument");
-						lua_error(l);
+						LuaError(l, "incorrect argument");
 					}
 					subsubargs = luaL_getn(l, -1);
 					queue = &ai->Force[i].Units;
@@ -1348,8 +1313,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			}
 		} else if (!strcmp(value, "reserve")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -1367,8 +1331,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			}
 		} else if (!strcmp(value, "used")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -1386,8 +1349,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			}
 		} else if (!strcmp(value, "needed")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -1405,8 +1367,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			}
 		} else if (!strcmp(value, "collect")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -1424,8 +1385,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			}
 		} else if (!strcmp(value, "need-mask")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -1443,8 +1403,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			AiExplorationRequest** queue;
 
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			queue = &ai->FirstExplorationRequest;
@@ -1455,8 +1414,7 @@ local int CclDefineAiPlayer(lua_State* l)
 
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
-					lua_pushstring(l, "incorrect argument");
-					lua_error(l);
+					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1);
 				x = LuaToNumber(l, -1);
@@ -1481,8 +1439,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			AiTransportRequest** queue;
 
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			queue = &ai->TransportRequests;
@@ -1491,8 +1448,7 @@ local int CclDefineAiPlayer(lua_State* l)
 
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-					lua_pushstring(l, "incorrect argument");
-					lua_error(l);
+					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1);
 				unit = LuaToNumber(l, -1);
@@ -1510,8 +1466,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			ai->LastCanNotMoveGameCycle = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "unit-type")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			i = 0;
@@ -1536,8 +1491,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			ai->UnitTypeRequestsCount = i;
 		} else if (!strcmp(value, "upgrade")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			i = 0;
@@ -1556,8 +1510,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			ai->UpgradeToRequestsCount = i;
 		} else if (!strcmp(value, "research")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			i = 0;
@@ -1578,8 +1531,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			AiBuildQueue** queue;
 
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			queue = &ai->UnitTypeBuilded;
@@ -1610,8 +1562,7 @@ local int CclDefineAiPlayer(lua_State* l)
 			ai->LastRepairBuilding = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "repair-workers")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -1629,8 +1580,7 @@ local int CclDefineAiPlayer(lua_State* l)
 				++i;
 			}
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
