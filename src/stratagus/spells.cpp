@@ -207,10 +207,11 @@ local void SpellDeathCoilController(Missile * missile)
 	    //
 	    if (missile->TargetUnit && !missile->TargetUnit->Destroyed
 		    && missile->TargetUnit->HP) {
-		missile->TargetUnit->HP-=50;
-		if (missile->TargetUnit->HP <= 0) {
+		if (missile->TargetUnit->HP <= 50) {
 		    missile->TargetUnit->HP = 0;
 		    DestroyUnit(missile->TargetUnit);
+		} else {
+		    missile->TargetUnit->HP-=50;
 		}
 		if (source->Orders[0].Action!=UnitActionDie) {
 		    source->HP += 50;
@@ -239,10 +240,11 @@ local void SpellDeathCoilController(Missile * missile)
 				    && table[i]->Type->Organic != 0) {
 				// disperse damage between them
 				//NOTE: 1 is the minimal damage
-				table[i]->HP -= 50 / ec;
-				if (table[i]->HP <= 0) {
+				if (table[i]->HP <= 50 / ec ) {
 				    table[i]->HP = 0;
 				    DestroyUnit(table[i]); // too much damage
+				} else {
+				    table[i]->HP -= 50 / ec;
 				}
 			    }
 			}
@@ -559,9 +561,12 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	// exorcism works only on undead units
 	if (target && target->Type->IsUndead) {
 	    // FIXME: johns this can be calculated.
-	    while (target->HP > 0 && unit->Mana > spell->ManaCost) {
+	    while (target->HP && unit->Mana > spell->ManaCost) {
 		unit->Mana -= spell->ManaCost;	// get mana cost
 		target->HP--;
+	    }
+	    if( !target->HP ) {
+		DestroyUnit(target);
 	    }
 	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
 	    MakeMissile(MissileTypeHealing,
