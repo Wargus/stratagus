@@ -53,6 +53,7 @@
 #include "missile.h"
 #include "map.h"
 #include "ui.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --	Definitons
@@ -580,6 +581,42 @@ global SpellType *SpellTypeById(int id)
 }
 
 /**
+**	Check if healing can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastHealing(const Unit* target)
+{
+    // only can heal organic units, with injury.
+    if (target && target->Type->Organic
+	    && target->HP<target->Stats->HitPoints ) {
+	return 1;
+    }
+    // FIXME: johns: should we support healing near own units?
+    return 0;
+}
+
+/**
+**	Check if bloodlust can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastBloodlust(const Unit* target, const SpellType* spell)
+{
+    if (target && target->Type->Organic
+	    && target->Bloodlust < spell->TTL / CYCLES_PER_SECOND) {
+	return 1;
+    }
+    // FIXME: should we support making bloodlust in range?
+    return 0;
+}
+
+/**
 **	Check if unit can cast the spell.
 **
 **	@param unit	Unit that casts the spell
@@ -611,13 +648,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	    return 1;
 
 	case SpellActionHealing:
-	    // only can heal organic units, with injury.
-	    if (target && target->Type->Organic
-		    && target->HP<target->Stats->HitPoints ) {
-		return 1;
-	    }
-	    // FIXME: johns: should we support healing near own units?
-	    return 0;
+	    return CanCastHealing(target);
 
 	case SpellActionExorcism:
 	    // FIXME: johns: target is random selected within range of 6 fields
@@ -672,12 +703,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	    return 1;
 
 	case SpellActionBloodlust:
-	    if (target && target->Type->Organic
-		    && target->Bloodlust < spell->TTL / CYCLES_PER_SECOND) {
-		return 1;
-	    }
-	    // FIXME: should we support making bloodlust in range?
-	    return 0;
+	    return CanCastBloodlust(target, spell);
 
 	case SpellActionRunes:
 	    return 1;
@@ -721,6 +747,193 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
     }
 
     return 1;
+}
+
+/**
+**	Auto cast healing if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastHealing(Unit* unit, SpellType* spell)
+{
+    Unit* table[UnitMax];
+    int r;
+    int i;
+    int j;
+    int n;
+
+    r = unit->Type->ReactRangePerson;
+    if (spell->Range < r) {
+	r = spell->Range;
+    }
+    n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	unit->Y + r + 1, table);
+
+    for (i = 0, j = 0; i < n; ++i) {
+	// Only cast on ourselves or an ally
+	if (table[i] == unit || (unit->Player != table[i]->Player
+		&& !IsAllied(unit->Player, table[i]))) {
+	    continue;
+	}
+
+	if (!CanCastHealing(table[i])) {
+	    continue;
+	}
+
+	table[j++] = table[i];
+    }
+
+    if (j) {
+	j = SyncRand() % j;
+	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Auto cast bloodlust if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastBloodlust(Unit* unit, SpellType* spell)
+{
+    Unit* table[UnitMax];
+    int r;
+    int i;
+    int j;
+    int n;
+
+    r = unit->Type->ReactRangePerson;
+    if (spell->Range < r) {
+	r = spell->Range;
+    }
+    n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	unit->Y + r + 1, table);
+
+    for (i = 0, j = 0; i < n; ++i) {
+	// Only cast on ourselves or an ally
+	if (table[i] == unit || (unit->Player != table[i]->Player
+		&& !IsAllied(unit->Player, table[i]))) {
+	    continue;
+	}
+
+	if (!CanCastBloodlust(table[i], spell)) {
+	    continue;
+	}
+
+	// Skip bloodlusted units and cowards
+	if (table[i]->Bloodlust || table[i]->Type->CowerWorker
+		|| table[i]->Type->CowerMage) {
+	    continue;
+	}
+
+	table[j++] = table[i];
+    }
+
+    if (j) {
+	j = SyncRand() % j;
+	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Auto cast the spell if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+global int AutoCastSpell(Unit* unit, SpellType* spell)
+{
+    DebugCheck(spell == NULL);
+    DebugCheck(!unit->Type->CanCastSpell);	// NOTE: this must not happen
+
+    if (unit->Mana < spell->ManaCost) {		// mana is a must!
+	return 0;
+    }
+
+    switch (spell->Action) {
+	case SpellActionNone:
+	    DebugLevel0Fn("No spell action\n");
+	    return 0;
+
+//  ---human paladins---
+	case SpellActionHolyVision:
+	    return 0;
+
+	case SpellActionHealing:
+	    return AutoCastHealing(unit, spell);
+
+	case SpellActionExorcism:
+	    return 0;
+
+//  ---human mages---
+	case SpellActionFireball:
+	    return 0;
+
+	case SpellActionSlow:
+	    return 0;
+
+	case SpellActionFlameShield:
+	    return 0;
+
+	case SpellActionInvisibility:
+	    return 0;
+
+	case SpellActionPolymorph:
+	    return 0;
+
+	case SpellActionBlizzard:
+	    return 0;
+
+//  ---orc ogres---
+	case SpellActionEyeOfKilrogg:
+	    return 0;
+
+	case SpellActionBloodlust:
+	    return AutoCastBloodlust(unit, spell);
+
+	case SpellActionRunes:
+	    return 0;
+
+//  ---orc death knights---
+	case SpellActionDeathCoil:
+	    return 0;
+
+	case SpellActionHaste:
+	    return 0;
+
+	case SpellActionRaiseDead:
+	    return 0;
+
+	case SpellActionWhirlwind:
+	    return 0;
+
+	case SpellActionUnholyArmor:
+	    return 0;
+
+	case SpellActionDeathAndDecay:
+	    return 0;
+
+	case SpellActionCircleOfPower:
+	    return 0;
+
+	default:
+	    DebugLevel0Fn("Unknown spell action `%d'\n" _C_ spell->Action);
+	    return 0;
+    }
+
+    return 0;
 }
 
 /**

@@ -129,6 +129,9 @@ extern int CanCastSpell( const Unit*, const SpellType*, const Unit*, int, int );
     /// fire spell on target unit or place at x,y
 extern int SpellCast( Unit*, const SpellType* , Unit* , int , int );
 
+    /// auto cast the spell if possible
+extern int AutoCastSpell(Unit* unit, SpellType* spell);
+
 //@}
 
 #endif	// !__SPELLS_H__

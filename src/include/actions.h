@@ -119,7 +119,9 @@ extern void CommandCancelResearch(Unit* unit);
 extern void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Prepare command spellcast
 extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
-	,SpellType* spell, int flush);
+	,SpellType* spell,int flush);
+    /// Prepare command auto spellcast
+extern void CommandAutoSpellCast(Unit* unit,SpellType* spell);
     /// Prepare diplomacy command
 extern void CommandDiplomacy(int player,int state,int opponent);
     /// Prepare shared vision command

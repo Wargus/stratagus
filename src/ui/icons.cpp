@@ -414,6 +414,8 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 
     if (flags & IconSelected) {
 	VideoDrawRectangleClip(ColorGreen, x, y, width, height);
+    } else if (flags & IconAutoCast) {
+	VideoDrawRectangleClip(ColorBlue, x, y, width, height);
     }
 }
 
