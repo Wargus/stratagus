@@ -43,13 +43,13 @@
 #undef DrawIcon
 #endif
 
-typedef struct _graphic_
-{
-	SDL_Surface *Surface;
-	SDL_Surface *SurfaceFlip;
+typedef struct _graphic_ {
+	SDL_Surface* Surface;
+	SDL_Surface* SurfaceFlip;
 	int Width;
 	int Height;
 	int NumFrames;
+	void* Data;
 #ifdef USE_OPENGL
 	int GraphicWidth;       /// Original graphic width
 	int GraphicHeight;      /// Original graphic height
@@ -60,8 +60,7 @@ typedef struct _graphic_
 #endif
 } Graphic;
 
-typedef struct _unit_colors_
-{
+typedef struct _unit_colors_ {
 	SDL_Color Colors[4];
 } UnitColors;
 
