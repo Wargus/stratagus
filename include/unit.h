@@ -840,6 +840,8 @@ extern int CanBuildHere(const UnitType* type, int x, int y);
 extern int CanBuildOn(int x, int y, int mask);
 	/// FIXME: more docu
 extern int CanBuildUnitType(const Unit* unit,const UnitType* type, int x, int y);
+	/// FIXME: more docu
+extern int CanBuildUnitTypeMask(const Unit* unit,const UnitType* type, int x, int y, int mask);
 
 	/// Find resource
 extern Unit* FindResource(const Unit* unit, int x, int y, int range, int resource);

@@ -2087,10 +2087,25 @@ global int CanBuildOn(int x, int y, int mask)
 */
 global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y)
 {
+	return CanBuildUnitTypeMask(unit, type, x, y, type->MovementMask);
+}
+/**
+**		Can build unit-type on this point.
+**
+**		@param unit		Worker that want to build the building or NULL.
+**		@param type		Building unit-type.
+**		@param x		X tile map position.
+**		@param y		Y tile map position.
+**  @param mask  movement mask to check
+**		@return				True if the building could be build..
+**
+**		@todo can't handle building units !1x1, needs a rewrite.
+*/
+global int CanBuildUnitTypeMask(const Unit* unit, const UnitType* type, int x, int y, int mask)
+{
 	int w;
 	int h;
 	int j;
-	int mask;
 	Player* player;
 
 	// Terrain Flags don't matter.
@@ -2183,8 +2198,6 @@ global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y
 			return 0;
 	}
 #else
-
-	mask = type->MovementMask;
 
 #endif
 
