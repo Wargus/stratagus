@@ -669,7 +669,7 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 	y2=TheMap.Height;
     }
 
-    /StephanR: seems to be within (i-1,j-1;x2,y2) ???
+    //StephanR: seems to be within (i-1,j-1;x2,y2) ???
     n=QuadTreeSelect(PositionCache,i,j,x2,y2,table);
 
     //
