@@ -221,7 +221,23 @@
 **		Total number of points. You can get points for killing units,
 **		destroying buildings ...
 **
-**	Player::Kills
+**	Player::TotalUnits
+**
+**		Total number of units made.
+**
+**	Player::TotalBuildings
+**
+**		Total number of buildings made.
+**
+**	Player::TotalResources
+**
+**		Total number of resources collected.
+**
+**	Player::TotalRazings
+**
+**		Total number of buildings destroyed.
+**
+**	Player::TotalKills
 **
 **		Total number of kills.
 **
@@ -323,7 +339,11 @@ struct _player_ {
     unsigned	LastRepairResource;	/// last resource for repair cycles
 
     unsigned	Score;			/// Points for killing ...
-    unsigned	Kills;			/// How many unit killed
+    unsigned	TotalUnits;
+    unsigned	TotalBuildings;
+    unsigned	TotalResources[MaxCosts];
+    unsigned	TotalRazings;
+    unsigned	TotalKills;		/// How many unit killed
 
 // Display video
     unsigned	Color;			/// color of units on minimap

@@ -265,6 +265,12 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     //
     if( player ) {
 	unit->PlayerSlot=player->Units+player->TotalNumUnits++;
+	if( type->Building ) {
+	    player->TotalBuildings++;
+	}
+	else {
+	    player->TotalUnits++;
+	}
 	*unit->PlayerSlot=unit;
 
 	player->UnitTypesCount[type->Type]++;
@@ -1441,6 +1447,12 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     //	Insert into new player table.
 
     unit->PlayerSlot=newplayer->Units+newplayer->TotalNumUnits++;
+    if( unit->Type->Building ) {
+	newplayer->TotalBuildings++;
+    }
+    else {
+	newplayer->TotalUnits++;
+    }
     *unit->PlayerSlot=unit;
 
     unit->Player=newplayer;
@@ -3128,7 +3140,12 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     if( target->HP<=damage ) {	// unit is killed or destroyed
 	if( attacker ) {
 	    attacker->Player->Score+=target->Type->Points;
-	    attacker->Player->Kills++;
+	    if( type->Building ) {
+		attacker->Player->TotalRazings++;
+	    }
+	    else {
+		attacker->Player->TotalKills++;
+	    }
 #ifdef USE_HP_FOR_XP
 	    attacker->XP+=target->HP;
 #else
