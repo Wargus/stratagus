@@ -1068,7 +1068,7 @@ extern void (*ColorCycle)(void);
     **	Draw part of a graphic clipped and faded.
     */
 extern void VideoDrawSubClipFaded(Graphic* graphic,int gx,int gy,
-	int w,int h,int x,int y,int fade);
+	int w,int h,int x,int y,unsigned char fade);
 
 /*----------------------------------------------------------------------------
 --	Macros
