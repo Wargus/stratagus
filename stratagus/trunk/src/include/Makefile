@@ -10,15 +10,14 @@
 ##
 ##	Makefile	-	The make file (3 level).
 ##
-##	(c) Copyright 1998-2001 by Lutz Sammer
+##	(c) Copyright 1998-2002 by Lutz Sammer
 ##
 ##	siod.h siodp.h from SIOD - Scheme In One Day interpreter.
 ##		Copyright and Author: George J. Carrette, gjc@delphi.com
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
-##	by the Free Software Foundation; either version 2 of the License,
-##	or (at your option) any later version.
+##	by the Free Software Foundation; only version 2 of the License.
 ##
 ##	FreeCraft is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,7 +43,7 @@ HDRS	= actions.h ai.h ccl.h freecraft.h construct.h cursor.h font.h icons.h \
 	  ccl_sound.h sound.h sound_id.h unitsound.h wav.h sound_server.h \
 	  video.h network.h commands.h goal.h ui.h menus.h spells.h \
 	  siod.h siodp.h iolib.h depend.h settings.h myendian.h net_lowlevel.h \
-	  netconnect.h rdtsc.h \
+	  netconnect.h rdtsc.h campaign.h \
 	  etlib/generic.h etlib/xmalloc.h etlib/hash.h etlib/dllist.h \
 
 all:
