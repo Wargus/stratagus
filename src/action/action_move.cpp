@@ -287,6 +287,16 @@ global void HandleActionMove(Unit* unit)
 	    // FALL THROUGH
 	case PF_REACHED:
 	    unit->SubAction=0;
+	    // FIXME: dark portal teleportation: Goal is used for target circle of power
+	    // FIXME: teleporting of units should use dark portal's mana
+	    if( (goal=unit->Orders[0].Goal) && 
+	        strcmp( goal->Type->Ident, "unit-dark-portal" ) == 0 && 
+		goal->Goal )
+	      {
+	      unit->X = goal->Goal->X;
+	      unit->Y = goal->Goal->Y;
+	      DropOutOnSide(unit,LookingW,1,1);
+	      }
 	    // Release target, if any.
 	    if( (goal=unit->Orders[0].Goal) ) {
 		RefsDebugCheck( !goal->Refs );
@@ -300,6 +310,7 @@ global void HandleActionMove(Unit* unit)
 	    if( unit->Selected ) {	// update display for new action
 		UpdateButtonPanel();
 	    }
+	    
 	    return;
 
 	default:
