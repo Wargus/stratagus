@@ -85,17 +85,25 @@ local void LoadFreeCraftMap(const char* filename,
     DebugLevel3Fn("%p \n",map);
 
     if (lcm_prevent_recurse) {
-	fprintf(stderr,"recursive use of load clone map!\n");
+	fprintf(stderr,"recursive use of load FreeCraft map!\n");
 	exit(-1);
     }
     lcm_prevent_recurse = 1;
     gh_eval_file((char*)filename);
     lcm_prevent_recurse = 0;
+
+#if 0
+    // Not true if multiplayer levels!
     if (!ThisPlayer) {		/// ARI: bomb if nothing was loaded!
-	fprintf(stderr,"%s: invalid clone map\n", filename);
+	fprintf(stderr,"%s: invalid FreeCraft map\n", filename);
 	exit(-1);
     }
     // FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
+#endif
+    if( !TheMap.Width || !TheMap.Height ) {
+	fprintf(stderr,"%s: invalid FreeCraft map\n", filename);
+	exit(-1);
+    }
 }
 
 /**
