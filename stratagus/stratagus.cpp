@@ -97,7 +97,6 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "sound_id.h"
 #include "unitsound.h"
 #include "icons.h"
-#include "button.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"

@@ -253,7 +253,6 @@ global void CreateGame(char* filename, WorldMap* map)
     LoadImages(ThisPlayer->Race);
     LoadCursors(ThisPlayer->Race);
 
-    InitUnitButtons();
     LoadMissileSprites();
     InitSpells();
     LoadUnitSprites();
