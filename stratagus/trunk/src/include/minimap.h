@@ -10,12 +10,11 @@
 //
 /**@name minimap.h	-	The minimap headerfile. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,7 +34,6 @@
 
 #define MINIMAP_FAC	(16*3)		/// integer scale factor
 
-
     /// Update seen tile change in minimap
 #define UpdateMinimapSeenXY(tx,ty)
 
@@ -44,8 +42,8 @@
 ----------------------------------------------------------------------------*/
 
 extern int MinimapScale;		/// Minimap scale to fit into window
-extern int MinimapX;			/// Minimap drawing position x offset.
-extern int MinimapY;			/// Minimap drawing position y offset.
+extern int MinimapX;			/// Minimap drawing position x offset
+extern int MinimapY;			/// Minimap drawing position y offset
 
 extern int MinimapWithTerrain;		/// display minimap with terrain
 extern int MinimapFriendly;		/// switch colors of friendly units
@@ -61,6 +59,8 @@ extern void UpdateMinimapXY(int tx,int ty);
 extern void UpdateMinimap(void);
     /// Create new minimap
 extern void CreateMinimap(void);
+    /// Destroy minimap
+extern void DestroyMinimap(void);
     /// Draw minimap with viewpoint
 extern void DrawMinimap(int vx,int vy);
     /// Hide minimap cursor
