@@ -1146,6 +1146,8 @@ global void DrawInfoPanel(void)
     } else {
 	int x;
 	int y;
+	int nc;
+	int rc;
 	// FIXME: need some cool ideas for this.
 
 	x=TheUI.InfoPanelX+16;
@@ -1159,14 +1161,24 @@ global void DrawInfoPanel(void)
 	    CYCLES_PER_SECOND*VideoSyncSpeed/100);
 	y+=20;
 
+	GetDefaultTextColors(&nc, &rc);
 	for( i=0; i<PlayerMax; ++i ) {
 	    if( Players[i].Type!=PlayerNobody ) {
+		if( ThisPlayer->Allied&(1<<Players[i].Player) ) {
+		    SetDefaultTextColors(FontGreen, rc);
+		} else if( ThisPlayer->Enemy&(1<<Players[i].Player) ) {
+		    SetDefaultTextColors(FontRed, rc);
+		} else {
+		    SetDefaultTextColors(nc, rc);
+		}
+
 		VideoDrawNumber(x,y,GameFont,i);
 		VideoDrawText(x+20,y,GameFont,Players[i].Name);
 		VideoDrawNumber(x+110,y,GameFont,Players[i].Score);
 		y+=14;
 	    }
 	}
+	SetDefaultTextColors(nc, rc);
     }
 }
 
