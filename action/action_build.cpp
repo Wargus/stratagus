@@ -60,7 +60,6 @@ global void HandleActionBuild(Unit* unit)
     UnitType* type;
     const UnitStats* stats;
     Unit* build;
-    Unit* temp;
 
     if( !unit->SubAction ) {		// first entry
 	unit->SubAction=1;
@@ -229,6 +228,7 @@ global void HandleActionBuild(Unit* unit)
     //	Building oil-platform, must remove oil-patch.
     //
     if( type->GivesOil ) {
+	Unit* temp;
         DebugLevel0Fn("Remove oil-patch\n");
 	temp=OilPatchOnMap(x,y);
 	DebugCheck( !temp );
