@@ -467,7 +467,6 @@ local void DoEvent(SDL_Event* event)
 
 	case SDL_QUIT:
 	    Exit(0);
-	    break;
     }
 }
 
