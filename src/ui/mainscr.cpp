@@ -202,7 +202,11 @@ global void DrawUnitInfo(const Unit* unit)
 	VideoDrawText(TheUI.SingleSelectedTextX, TheUI.SingleSelectedTextY,
 	    TheUI.SingleSelectedFont, TheUI.SingleSelectedText);
     }
-    if (TheUI.SingleSelectedButton) {
+
+    // FIXME: allow without button
+    //if (TheUI.SingleSelectedButton) {
+    DebugCheck(!TheUI.SingleSelectedButton);
+    if (1) {
 	x = TheUI.SingleSelectedButton->X;
 	y = TheUI.SingleSelectedButton->Y;
 	DrawUnitIcon(unit->Player, type->Icon.Icon,
