@@ -420,10 +420,10 @@ WIN32=	\
 win32new:
 	@$(MAKE) RULESFILE=$(WINRULESFILE) distclean
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
-	$(MAKE) $(WIN32) depend
+	$(WIN32) $(MAKE) depend
 
 win32_2:
-	$(MAKE) $(WIN32) all
+	$(WIN32) $(MAKE) all
 
 win32:
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
@@ -431,7 +431,7 @@ win32:
 
 win32distclean:
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
-	$(MAKE) $(WIN32) distclean
+	$(WIN32) $(MAKE) distclean
 
 ##############################################################################
 #	INSTALL/UNINSTALL
