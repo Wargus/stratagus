@@ -227,12 +227,12 @@ global void MapFixRockTile(int x, int y)
     MapField *mf;
     
 
-    //  Outside of map or no wood.
+    //  Outside of map or no rock.
     if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 	return;
     }
     mf = TheMap.Fields + x + y * TheMap.Width;
-    if (!(mf->Flags & MapFieldForest)) {
+    if (!(mf->Flags & MapFieldRocks)) {
 	return;
     }
     //
