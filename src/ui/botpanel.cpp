@@ -725,7 +725,7 @@ void DoButtonButtonClicked(int button)
 			//  That or a bunker.
 			//
 			if ((NumSelected == 1 && Selected[0]->Orders[0].Action == UnitActionStill &&
-					CoastOnMap(Selected[0]->X, Selected[0]->Y)) || Selected[0]->Type->Building) {
+					CoastOnMap(Selected[0]->X, Selected[0]->Y)) || !CanMove(Selected[0])) {
 				SendCommandUnload(Selected[0],
 					Selected[0]->X, Selected[0]->Y, NoUnitP,
 					!(KeyModifiers & ModifierShift));
@@ -799,7 +799,7 @@ void DoButtonButtonClicked(int button)
 
 		case ButtonCancel:
 		case ButtonCancelUpgrade:
-			if (NumSelected == 1 && Selected[0]->Type->Building) {
+			if (NumSelected == 1) {
 				if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo) {
 					SendCommandCancelUpgradeTo(Selected[0]);
 				} else if (Selected[0]->Orders[0].Action == UnitActionResearch) {
@@ -824,7 +824,8 @@ void DoButtonButtonClicked(int button)
 
 		case ButtonCancelBuild:
 			// FIXME: johns is this not sure, only building should have this?
-			if (NumSelected == 1 && Selected[0]->Type->Building) {
+			Assert(Selected[0]->Orders[0].Action == UnitActionBuild);
+			if (NumSelected == 1) {
 				SendCommandDismiss(Selected[0]);
 			}
 			ClearStatusLine();

@@ -182,6 +182,22 @@ static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 }
 
 /**
+**  Test if unit can move.
+**  For the moment only check for move animation.
+**
+**  @param unit unit to test if it can move.
+**
+**  @return 0 if unit cannot move.
+*/
+int CanMove(const Unit* unit)
+{
+	Assert(unit);
+	Assert(unit->Type);
+	return (unit->Type->Animations && unit->Type->Animations->Move);
+}
+
+
+/**
 **  Unit moves! Generic function called from other actions.
 **
 **  @param unit  Pointer to unit.
@@ -191,13 +207,8 @@ static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 */
 int DoActionMove(Unit* unit)
 {
-	if (unit->Type->Animations && unit->Type->Animations->Move) {
-		return ActionMoveGeneric(unit, unit->Type->Animations->Move);
-	}
-
-	DebugPrint("Warning tried to move an object, which can't move\n");
-
-	return PF_UNREACHABLE;
+	Assert(CanMove(unit));
+	return ActionMoveGeneric(unit, unit->Type->Animations->Move);
 }
 
 /**
@@ -214,6 +225,8 @@ void HandleActionMove(Unit* unit)
 {
 	Unit* goal;
 
+	Assert(unit);
+	Assert(CanMove(unit));
 	if (!unit->SubAction) { // first entry
 		unit->SubAction = 1;
 		NewResetPath(unit);

@@ -290,7 +290,7 @@ void CommandFollow(Unit* unit, Unit* dest, int flush)
 	// Check if unit is still valid? (NETWORK!)
 	//
 	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
-		if (unit->Type->Building) {
+		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
 			ReleaseOrder(order);
@@ -339,7 +339,7 @@ void CommandMove(Unit* unit, int x, int y, int flush)
 	//  Check if unit is still valid? (NETWORK!)
 	//
 	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
-		if (unit->Type->Building) {
+		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
 			ReleaseOrder(order);
@@ -542,7 +542,7 @@ void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 	// Check if unit is still valid? (NETWORK!)
 	//
 	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
-		if (unit->Type->Building) {
+		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
 			ReleaseOrder(order);

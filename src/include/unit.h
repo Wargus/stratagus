@@ -563,7 +563,7 @@ struct _unit_ {
 	/* Seen stuff. */
 	char VisCount[PlayerMax]; ///< Unit visibility counts
 	struct _seen_stuff_ {
-		unsigned            ByPlayer : 16;           ///< Track unit seen by player
+		unsigned            ByPlayer : PlayerMax;    ///< Track unit seen by player
 		int                 Frame;                   ///< last seen frame/stage of buildings
 		struct _unit_type_* Type;                    ///< Pointer to last seen unit-type
 		signed char         IX;                      ///< Seen X image displacement to map position
@@ -888,6 +888,8 @@ extern int CanTarget(const struct _unit_type_* type, const struct _unit_type_* d
 	/// Can transporter transport the other unit
 extern int CanTransport(const Unit* transporter, const Unit* unit);
 
+	/// Check if unit can move.
+extern int CanMove(const Unit*);
 
 	/// Generate a unit reference, a printable unique string for unit
 extern char* UnitReference(const Unit*);
