@@ -117,6 +117,49 @@ Menu* FindMenu(const char* menu_id)
 /**
 **  Draw menu button 'button' on x,y
 **
+**  @param mit    Text to display.
+**  @param x      X display position
+**  @param y      Y display position
+**  @param font   Font to use.
+**  @param flag   flag of text.
+*/
+static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int flag)
+{
+	char* oldnc;
+	char* oldrc;
+	char* nc;
+	char* rc;
+	const char* text;
+	int l;
+
+	text = mit->text;
+	l = VideoTextLength(font, text);
+	GetDefaultTextColors(&oldnc, &oldrc);
+	if (mit->normalcolor || mit->reversecolor) {
+		nc = mit->normalcolor ? mit->normalcolor : oldnc;
+		rc = mit->reversecolor ? mit->reversecolor : oldrc;
+		SetDefaultTextColors(nc, rc);
+	} else {
+		nc = oldnc;
+		rc = oldrc;
+	}
+	if (flag & MenuButtonActive && mit->action) {
+		VideoDrawRectangle(ColorGray, x - 4, y - 4, l + 5, VideoTextHeight(font) + 5);
+		SetDefaultTextColors(nc, rc);
+	}
+	if (mit->align & MI_TFLAGS_CENTERED) {
+		VideoDrawTextCentered(x, y,	font, text);
+	} else if (mit->align & MI_TFLAGS_RALIGN) {
+		VideoDrawText(x - l, y,	font, text);
+	} else {
+		VideoDrawText(x, y,	font, text);
+	}
+	SetDefaultTextColors(oldnc, oldrc);
+}
+
+/**
+**  Draw menu button 'button' on x,y
+**
 **  @param style  Button style
 **  @param flags  State of Button (clicked, mouse over...)
 **  @param x      X display position
@@ -1004,11 +1047,6 @@ void DrawMenu(Menu* menu)
 {
 	int i;
 	int n;
-	int l;
-	char* nc;
-	char* rc;
-	char* oldnc;
-	char* oldrc;
 	Menuitem* mi;
 	Menuitem* mip;
 
@@ -1075,33 +1113,8 @@ void DrawMenu(Menu* menu)
 				if (!mi->D.Text.text) {
 					break;
 				}
-				GetDefaultTextColors(&oldnc, &oldrc);
-				if (mi->D.Text.normalcolor || mi->D.Text.reversecolor) {
-					nc = mi->D.Text.normalcolor ? mi->D.Text.normalcolor : oldnc;
-					rc = mi->D.Text.reversecolor ? mi->D.Text.reversecolor : oldrc;
-					SetDefaultTextColors(nc, rc);
-				} else {
-					nc = oldnc;
-					rc = oldrc;
-				}
-				if (mi->Flags & MenuButtonActive && mi->D.Text.action) {
-					VideoDrawRectangleClip(ColorGray, menu->X + mi->XOfs - 4, menu->Y + mi->YOfs - 4,
-											VideoTextLength(mi->Font, mi->D.Text.text) + 5,
-											VideoTextHeight(mi->Font) + 5);
-					SetDefaultTextColors(rc, rc);
-				}
-				if (mi->D.Text.align & MI_TFLAGS_CENTERED) {
-					VideoDrawTextCentered(menu->X + mi->XOfs, menu->Y + mi->YOfs,
-							mi->Font, mi->D.Text.text);
-				} else if (mi->D.Text.align & MI_TFLAGS_RALIGN) {
-					l = VideoTextLength(mi->Font, mi->D.Text.text);
-					VideoDrawText(menu->X + mi->XOfs-l,menu->Y + mi->YOfs,
-							mi->Font, mi->D.Text.text);
-				} else {
-					VideoDrawText(menu->X + mi->XOfs, menu->Y + mi->YOfs,
-							mi->Font, mi->D.Text.text);
-				}
-				SetDefaultTextColors(oldnc, oldrc);
+				DrawMenuText(&mi->D.Text, menu->X + mi->XOfs, menu->Y + mi->YOfs,
+					mi->Font, mi->Flags);
 				break;
 			case MI_TYPE_BUTTON:
 				UpdateMenuItemButton(mi);
