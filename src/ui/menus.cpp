@@ -1671,9 +1671,7 @@ local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":all";
 #endif
-    CurrentMenu=NULL;
-    SoundOptions();
-
+    InitSoundOptions(NULL);
 }
 
 local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
@@ -1681,9 +1679,7 @@ local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":random";
 #endif
-    CurrentMenu=NULL;
-    SoundOptions();
-
+    InitSoundOptions(NULL);
 }
 
 global void SpeedSettings(void)
