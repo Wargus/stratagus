@@ -398,9 +398,13 @@ local void DrawUnitIcons(void)
 **	@param x	X display position
 **	@param y	Y display position
 */
-local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y)
+local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 {
-    VideoDrawRectangleClip(ColorBlack,x,y,TILE_WIDTH+7,TILE_HEIGHT+7);
+    int color;
+
+    color= (flags&IconActive) ? ColorGray : ColorBlack;
+
+    VideoDrawRectangleClip(color,x,y,TILE_WIDTH+7,TILE_HEIGHT+7);
     VideoDrawRectangleClip(ColorBlack,x+1,y+1,TILE_WIDTH+5,TILE_HEIGHT+5);
 
     VideoDrawVLine(ColorGray,x+TILE_WIDTH+4,y+5,TILE_HEIGHT-1);	// _|
@@ -408,13 +412,23 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y)
     VideoDrawHLine(ColorGray,x+5,y+TILE_HEIGHT+4,TILE_WIDTH+1);
     VideoDrawHLine(ColorGray,x+5,y+TILE_HEIGHT+5,TILE_WIDTH+1);
 
-    VideoDrawHLine(ColorWhite,x+5,y+3,TILE_WIDTH+1);
-    VideoDrawHLine(ColorWhite,x+5,y+4,TILE_WIDTH+1);
-    VideoDrawVLine(ColorWhite,x+3,y+3,TILE_HEIGHT+3);
-    VideoDrawVLine(ColorWhite,x+4,y+3,TILE_HEIGHT+3);
+    color= (flags&IconClicked) ? ColorGray : ColorWhite;
+    VideoDrawHLine(color,x+5,y+3,TILE_WIDTH+1);
+    VideoDrawHLine(color,x+5,y+4,TILE_WIDTH+1);
+    VideoDrawVLine(color,x+3,y+3,TILE_HEIGHT+3);
+    VideoDrawVLine(color,x+4,y+3,TILE_HEIGHT+3);
 
-    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[tilenum]],
-	x + 4, y + 4);
+    if( flags&IconClicked ) {
+	++x; ++y;
+    }
+
+    x+=4;
+    y+=4;
+    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[tilenum]], x, y);
+
+    if( flags&IconSelected ) {
+	VideoDrawRectangleClip(ColorGreen,x,y,TILE_WIDTH,TILE_HEIGHT);
+    }
 }
 
 /**
@@ -445,7 +459,9 @@ local void DrawEditorPanel(void)
 	    (EditorState==EditorEditUnit ? IconSelected : 0),
 	x + UNIT_ICON_X, y + UNIT_ICON_Y);
 
-    DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y);
+    DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
+	(ButtonUnderCursor == TileButton ? IconActive : 0) |
+	    (EditorState==EditorEditTile ? IconSelected : 0));
 
     switch (EditorState) {
 	case EditorSelecting:
@@ -713,6 +729,10 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
     //	Click on mode area
     //
     if (CursorOn == CursorOnButton) {
+	if (ButtonUnderCursor == SelectButton) {
+	    EditorState = EditorSelecting;
+	    return;
+	}
 	if (ButtonUnderCursor == UnitButton) {
 	    EditorState = EditorEditUnit;
 	    return;
@@ -839,6 +859,10 @@ global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		ReleaseUnit(unit);
 		SetStatusLine("Unit deleted");
 	    }
+	    break;
+
+	case KeyCodeF10:
+	    ProcessMenu(MENU_EDITOR,1);
 	    break;
 
 	case KeyCodeUp:		// Keyboard scrolling
