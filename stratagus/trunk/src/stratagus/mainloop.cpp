@@ -346,14 +346,14 @@ local void DrawMapViewport(Viewport* vp)
 	}
 
 #else
-   Unit* table[UnitMax];
-   Missile* missiletable[MAX_MISSILES * 9];
-   int nunits;
-   int nmissiles;
-   int i;
-   int j;
-   int x;
-   int y;
+	Unit* table[UnitMax];
+	Missile* missiletable[MAX_MISSILES * 9];
+	int nunits;
+	int nmissiles;
+	int i;
+	int j;
+	int x;
+	int y;
 
 	if (InterfaceState == IfaceStateNormal) {
 #ifdef NEW_MAPDRAW
