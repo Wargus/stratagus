@@ -99,6 +99,9 @@ local int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 **	@param host	Host to send to (network byte order).
 **	@param port	Port of host to send to (network byte order).
 **	@param msg	The message to send
+**
+**	@todo	FIXME: we don't need to put the header into all messages.
+**		(header = msg->FreeCraft ... )
 */
 local int NetworkSendICMessage(unsigned long host, int port, InitMessage *msg)
 {
@@ -106,6 +109,7 @@ local int NetworkSendICMessage(unsigned long host, int port, InitMessage *msg)
     msg->Version = htonl(NetworkProtocolVersion);
     msg->Lag = htonl(NetworkLag);
     msg->Updates = htonl(NetworkUpdates);
+
     return NetSendUDP(NetworkFildes, host, port, msg, sizeof(*msg));
 }
 
@@ -163,7 +167,7 @@ local const char *icmsgsubtypenames[] = {
 **	@param msg	The message to send
 **	@param msecs	microseconds to delay
 */
-local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
+local void NetworkSendRateLimitedClientMessage(InitMessage * msg, long msecs)
 {
     unsigned long now;
     int n;
@@ -177,13 +181,15 @@ local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
 	    NetStateMsgCnt = 0;
 	    LastStateMsgType = msg->SubType;
 	}
-	n = NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), msg);
-#ifdef DEBUG
-	DebugLevel0Fn("Sending Init Message (%s:%d): %d:%d(%d) %d.%d.%d.%d:%d\n" _C_
-		ncconstatenames[NetLocalState] _C_ NetStateMsgCnt _C_ msg->Type _C_
-		msg->SubType _C_ n _C_
-		NIPQUAD(ntohl(NetworkServerIP)) _C_ NetworkServerPort);
-#endif
+	n = NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort),
+	    msg);
+	if( !NetStateMsgCnt ) {
+	    DebugLevel1Fn
+		("Sending Init Message (%s:%d): %d:%d(%d) %d.%d.%d.%d:%d\n" _C_
+		    ncconstatenames[NetLocalState] _C_ NetStateMsgCnt _C_ 
+		    msg->Type _C_ msg->SubType _C_ n _C_ 
+		    NIPQUAD(ntohl(NetworkServerIP)) _C_ NetworkServerPort);
+	}
     }
 }
 
