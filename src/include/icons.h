@@ -83,11 +83,11 @@
 **
 **	Icon::Width
 **
-**		Icon width in pixels, defaults to ICON_WIDTH.
+**		Icon width in pixels, defaults to ICON_WIDTH (46).
 **
 **	Icon::Height
 **
-**		Icon height in pixels, defaults to ICON_WIDTH.
+**		Icon height in pixels, defaults to ICON_WIDTH (38).
 **
 **	Icon::Graphic
 **
