@@ -603,14 +603,18 @@ global int AiEvaluateForceCost(int force, int total)
     AiUnitType *unittype;
     UnitType * usedtype;
 
-    AiForceCountUnits(force, count);
+    if (total) {
+	for (i = 0; i <= UnitTypeMax; i++) {
+	    count[i]=0;
+	}
+    } else {
+	AiForceCountUnits(force, count);
+    }
 
     // We have everything ready
-    if (!total) {
-	if (!AiForceSubstractWant(force, count)) {
-	    DebugLevel3Fn("Force ready, no cost\n");
-	    return 0;
-	}
+    if (!AiForceSubstractWant(force, count)) {
+	DebugLevel3Fn("Force ready, no cost\n");
+	return 0;
     }
 
     for (i = 0; i < MaxCosts; i++) {
@@ -827,13 +831,14 @@ local void AiStartScript(AiScriptAction * script, char *ident)
     // Compute force requirements.
     AiEvaluateScript(script->Action);
 
-    // TODO : move from force 0 to force script->ownForce    
-    // TODO : give some feedback on force 0 !
-
     // Launch the code.
     code = gh_eval(gh_cadr(gh_cdr(gh_car(script->Action))), NIL);
     AiScript->Script = code;
     AiScript->SleepCycles = 0;
+
+    // Don't add anymore units to this force.
+    AiPlayer->Force[AiScript->ownForce].PopulateMode = AiForceDontPopulate;
+
     snprintf(AiScript->ident, 10, "%s", ident);
 }
 
@@ -877,6 +882,7 @@ local Unit *RandomPlayerUnit(Player * player)
     int unitId;
     Unit *unit;
     AiActionEvaluation * action;
+
     if (!player->TotalNumUnits) {
 	return NoUnitP;
     }
@@ -1084,13 +1090,13 @@ global void AiPeriodicAttack(void)
 	leftCost = AiEvaluateForceCost(AiScript->ownForce, 0);
 	totalCost = AiEvaluateForceCost(AiScript->ownForce, 1);
 	if (leftCost > totalCost) {
-	    DebugLevel3Fn("Left cost superior to totalcost ( %d > %d )\n" _C_ leftCost _C_ totalCost);
+	    DebugLevel0Fn("Left cost superior to totalcost ( %d > %d )\n" _C_ leftCost _C_ totalCost);
 	}
 
 	if (leftCost <= ((2 * totalCost) / 10)) {
 	    DebugLevel3Fn("Attack script !...\n");
 	    AiStartScript(bestActionEvaluation->aiScriptAction, "attack");
-	} else if (leftCost <= ((8 * totalCost) /10)) {
+	} else if (leftCost <= ((9 * totalCost) /10)) {
 	    DebugLevel3Fn("Not ready for attack script, wait...\n");
 
 	    AiUpdateForce(1, AiScript->ownForce);
